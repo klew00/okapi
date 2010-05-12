@@ -201,20 +201,20 @@ public class RailsYamlFilter extends AbstractFilter {
 			switch(parseLine(line)) {
 			case ITEM_COMMENT:
 //				skel.append(line);
-				getEventBuilder().addDocumentPart(line + "\n");
+				getEventBuilder().addDocumentPart(line + getNewlineType());
 				return RESULT_DATA;
 			case ITEM_CONTAINER:
-				getEventBuilder().addDocumentPart(line + "\n");
+				getEventBuilder().addDocumentPart(line + getNewlineType());
 //				skel.append(line);
 				return RESULT_DATA;
 			case ITEM_STRING:
 				return RESULT_ENTRY;
 			case ITEM_SKELETON:
-				getEventBuilder().addDocumentPart(line + "\n");
+				getEventBuilder().addDocumentPart(line + getNewlineType());
 //				skel.append(line);
 				return RESULT_DATA;
 			case ITEM_NONE:
-				getEventBuilder().addDocumentPart(line + "\n");
+				getEventBuilder().addDocumentPart(line + getNewlineType());
 				return RESULT_DATA;
 			}
 		}
@@ -229,14 +229,13 @@ public class RailsYamlFilter extends AbstractFilter {
 
 		String trimLine = line.trim();
 		
-		if(trimLine.length() == 0) {
+		if ( trimLine.length() == 0 ) {
 			return ITEM_SKELETON;
 		}
-		if(trimLine.startsWith("#")) {
+		if ( trimLine.startsWith("#") ) {
 			return ITEM_COMMENT;
 		}
 		
-//Not used		int prevIndentation = indentation;
 		indentation = getIndentation(line);
 
 		int colonIndex = trimLine.indexOf(':');
@@ -259,7 +258,7 @@ public class RailsYamlFilter extends AbstractFilter {
 				keyStack.pop();
 			}
 			key = generateKey();
-			tmpKey = line.substring(matcher.start(YAML_STRING_INDEX_KEY), matcher.end(YAML_STRING_INDEX_KEY));
+			tmpKey = line.substring(matcher.start(YAML_STRING_INDEX_KEY), matcher.end(YAML_STRING_INDEX_KEY)).trim();
 
 			tuEntry = new TextUnit(String.valueOf(++tuid), matcher.group(YAML_STRING_INDEX_TU));
 			tuEntry.setName(key + tmpKey);
@@ -269,7 +268,7 @@ public class RailsYamlFilter extends AbstractFilter {
 			skel.addContentPlaceholder(tuEntry, null);
 			skel.append(matcher.group(YAML_STRING_INDEX_TU + 1));
 			// TODO Generalize the line break character
-			skel.append("\n");
+			skel.append(getNewlineType());
 			tuEntry.setSkeleton(skel);
 			Property propIndentation = new Property("indentation", String.valueOf(indentation));
 			tuEntry.setProperty(propIndentation);
@@ -296,7 +295,7 @@ public class RailsYamlFilter extends AbstractFilter {
 	
 	private String generateKey() {
 		String key = "";
-		for(KeyPair kp : keyStack) {
+		for ( KeyPair kp : keyStack ) {
 			key += kp.key + ".";
 		}
 		return key;
@@ -322,6 +321,7 @@ public class RailsYamlFilter extends AbstractFilter {
 		// Handle the encoding
 		BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input.getStream(), input.getEncoding());
 		detector.detectAndRemoveBom();
+		setNewlineType(detector.getNewlineType().toString());
 		input.setEncoding(detector.getEncoding());
 		String encoding = input.getEncoding();
 		isUtf8Bom = detector.hasUtf8Bom();
@@ -334,7 +334,7 @@ public class RailsYamlFilter extends AbstractFilter {
 			reader = new BufferedReader(new InputStreamReader(detector.getInputStream(), encoding));
 		}
 		catch(UnsupportedEncodingException e) {
-			throw new OkapiUnsupportedEncodingException(String.format("The encoding %s is not supported.", encoding),e);
+			throw new OkapiUnsupportedEncodingException(String.format("The encoding %s is not supported.", encoding), e);
 		}
 		
 		// Start the EventBuilder

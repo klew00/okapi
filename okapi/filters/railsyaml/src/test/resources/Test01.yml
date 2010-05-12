@@ -3,3 +3,4 @@ config:
 	author: "Santa Claus with é"
 	email: email@company.com
 	css_file: default.css
+	test: "\"\\"

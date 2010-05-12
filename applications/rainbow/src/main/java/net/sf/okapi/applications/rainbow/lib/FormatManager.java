@@ -74,6 +74,7 @@ public class FormatManager {
 		pairs.put(".json", "okf_json");
 		pairs.put(".ttx", "okf_ttx");
 		pairs.put(".pentm", "okf_pensieve");
+		pairs.put(".yml", "okf_railsyaml");
 	}
 	
 	/**

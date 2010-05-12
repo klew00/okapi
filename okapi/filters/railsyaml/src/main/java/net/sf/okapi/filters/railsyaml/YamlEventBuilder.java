@@ -42,11 +42,11 @@ public class YamlEventBuilder extends EventBuilder {
 	@Override
 	protected TextUnit postProcessTextUnit(TextUnit textUnit) {
 		TextFragment text = textUnit.getSource().getFirstContent();
-		text.setCodedText(normalizeEntities(text.getCodedText()));
+		text.setCodedText(normalize(text.getCodedText()));
 		return textUnit;
 	}
 
-	private String normalizeEntities(String text) {
+	private String normalize (String text) {
 		text = text.replace("&#34;", "\"");
 		text = text.replace("&#42;", "*");
 		text = text.replace("&#45;", "-");
@@ -55,7 +55,10 @@ public class YamlEventBuilder extends EventBuilder {
 		text = text.replace("&#63;", "?");
 		text = text.replace("&#x2F;", "/");
 
+		text = text.replace("\\_", "\u00A0"); // Non-breaking space
+		//TODO: other escaped chars
+		
 		return text;
 	}
-
+	
 }
