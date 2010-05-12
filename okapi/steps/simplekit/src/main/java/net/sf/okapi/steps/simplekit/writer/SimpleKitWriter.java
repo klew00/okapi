@@ -26,6 +26,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.encoder.EncoderManager;
+import net.sf.okapi.common.filterwriter.XLIFFWriter;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubDocument;
@@ -206,7 +207,7 @@ public class SimpleKitWriter extends BasePackageWriter {
 	}
 
 	private void processStartSubDocument (StartSubDocument resource) {
-		xlfWriter.writeStartFile(resource.getName(), resource.getMimeType(), null);		
+		xlfWriter.writeStartFile(resource.getName(), resource.getMimeType(), resource.getName());		
 	}
 	
 	private void processEndSubDocument () {
