@@ -29,15 +29,19 @@ import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 @EditorFor(XLIFFKitWriterStep.class)
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
-	static final String GMODE = "gMode"; //$NON-NLS-1$
+	static final String PLACEHOLDERMODE = "placeholderMode"; //$NON-NLS-1$
+	static final String COPYSOURCE = "copySource"; //$NON-NLS-1$
+	static final String MESSAGE = "message"; //$NON-NLS-1$
+	
 	static final String INCLUDE_NO_TRANSLATE = "includeNoTranslate"; //$NON-NLS-1$
 	static final String SET_APPROVED_AS_NO_TRANSLATE = "setApprovedAsNoTranslate"; //$NON-NLS-1$
-	static final String MESSAGE = "message"; //$NON-NLS-1$
+	
 	static final String OUTPUT_URI = "outputURI"; //$NON-NLS-1$
 	static final String INCLUDE_SOURCE = "includeSource"; //$NON-NLS-1$
 	static final String INCLUDE_ORIGINAL = "includeOriginal"; //$NON-NLS-1$
 	
-	private boolean gMode;
+	private boolean placeholderMode;
+	private boolean copySource;
 	private boolean includeNoTranslate;
 	private boolean setApprovedAsNoTranslate;
 	private String message;
@@ -50,7 +54,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	}
 	
 	public void reset() {
-		gMode = false;
+		placeholderMode = false;
+		copySource = true;
 		includeNoTranslate = true;
 		setApprovedAsNoTranslate = false;
 		message = "";
@@ -63,7 +68,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		reset();
 		buffer.fromString(data);
 		
-		gMode = buffer.getBoolean(GMODE, gMode);
+		placeholderMode = buffer.getBoolean(PLACEHOLDERMODE, placeholderMode);
+		copySource = buffer.getBoolean(COPYSOURCE, copySource);
 		includeNoTranslate = buffer.getBoolean(INCLUDE_NO_TRANSLATE, includeNoTranslate);
 		setApprovedAsNoTranslate = buffer.getBoolean(SET_APPROVED_AS_NO_TRANSLATE, setApprovedAsNoTranslate);
 		message = buffer.getString(MESSAGE, message);
@@ -81,7 +87,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public String toString () {
 		buffer.reset();
 		
-		buffer.setParameter(GMODE, gMode);
+		buffer.setParameter(PLACEHOLDERMODE, placeholderMode);
+		buffer.setBoolean(COPYSOURCE, copySource);
 		buffer.setBoolean(INCLUDE_NO_TRANSLATE, includeNoTranslate);
 		buffer.setBoolean(SET_APPROVED_AS_NO_TRANSLATE, setApprovedAsNoTranslate);
 		buffer.setParameter(MESSAGE, message);
@@ -96,7 +103,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
 		
-		desc.add(GMODE, "Use <g></g> and <x/> notation", "G-mode");
+		desc.add(PLACEHOLDERMODE, "Use the <g></g> and <x/> notation", null);
+		desc.add(COPYSOURCE, "Copy source text in target if no target is available", null);
 		desc.add(INCLUDE_NO_TRANSLATE, "Include non-translatable text units", "Include non-translatables");
 		desc.add(SET_APPROVED_AS_NO_TRANSLATE, "Set approved entries as non-translatable", "Approved as non-translatable");
 		desc.add(MESSAGE, "Description of the XLIFF file", "Description");
@@ -111,7 +119,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 			ParametersDescription parametersDescription) {
 		EditorDescription desc = new EditorDescription("XLIFF Kit Writer Options", true, false);
 		
-		desc.addCheckboxPart(parametersDescription.get(GMODE));
+		desc.addCheckboxPart(parametersDescription.get(PLACEHOLDERMODE));
+		desc.addCheckboxPart(parametersDescription.get(COPYSOURCE));
 		desc.addCheckboxPart(parametersDescription.get(INCLUDE_NO_TRANSLATE));
 		desc.addCheckboxPart(parametersDescription.get(SET_APPROVED_AS_NO_TRANSLATE));
 		desc.addTextInputPart(parametersDescription.get(MESSAGE));
@@ -122,12 +131,12 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		return desc;
 	}
 
-	public boolean isgMode() {
-		return gMode;
+	public boolean isPlaceholderMode() {
+		return placeholderMode;
 	}
 
-	public void setgMode(boolean gMode) {
-		this.gMode = gMode;
+	public void setPlaceholderMode(boolean placeholderMode) {
+		this.placeholderMode = placeholderMode;
 	}
 
 	public boolean isIncludeNoTranslate() {
@@ -176,5 +185,13 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 
 	public void setIncludeOriginal(boolean includeOriginal) {
 		this.includeOriginal = includeOriginal;
+	}
+
+	public void setCopySource(boolean copySource) {
+		this.copySource = copySource;
+	}
+
+	public boolean isCopySource() {
+		return copySource;
 	}	
 }

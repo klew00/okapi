@@ -42,6 +42,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filterwriter.XLIFFContent;
+import net.sf.okapi.common.filterwriter.XLIFFWriter;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
@@ -72,26 +73,13 @@ import org.apache.poi.openxml4j.opc.TargetMode;
 @UsingParameters(Parameters.class)
 public class XLIFFKitWriterStep extends BasePipelineStep {
 
-	private static final String RESTYPEVALUES = 
-		";auto3state;autocheckbox;autoradiobutton;bedit;bitmap;button;caption;cell;"
-		+ "checkbox;checkboxmenuitem;checkedlistbox;colorchooser;combobox;comboboxexitem;"
-		+ "comboboxitem;component;contextmenu;ctext;cursor;datetimepicker;defpushbutton;"
-		+ "dialog;dlginit;edit;file;filechooser;fn;font;footer;frame;grid;groupbox;"
-		+ "header;heading;hedit;hscrollbar;icon;iedit;keywords;label;linklabel;list;"
-		+ "listbox;listitem;ltext;menu;menubar;menuitem;menuseparator;message;monthcalendar;"
-		+ "numericupdown;panel;popupmenu;pushbox;pushbutton;radio;radiobuttonmenuitem;rcdata;"
-		+ "row;rtext;scrollpane;separator;shortcut;spinner;splitter;state3;statusbar;string;"
-		+ "tabcontrol;table;textbox;togglebutton;toolbar;tooltip;trackbar;tree;uri;userbutton;"
-		+ "usercontrol;var;versioninfo;vscrollbar;window;";
-
-	private XMLWriter writer;
-	private XLIFFContent xliffCont;
+	private XLIFFWriter writer;
+	
 	private LocaleId srcLoc;
 	private LocaleId trgLoc;
-	private boolean inFile;
+	//private boolean inFile;
 	private String docMimeType;
 	private String docName;
-	//private String outputPath;
 	private String inputEncoding;
 	private String configId;
 	private Parameters params;
@@ -103,15 +91,9 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 	private String xliffFileName;
 	private String skeletonFileName;	
 	private String resourcesFileName;
-//	private String tmxFileName;
-//	private String tbxFileName;
-//	private String srxFileName;
-//	private String annotationsFileName;
 	
 	private String originalPartName;
 	private String sourcePartName;
-	//private String altOriginalPartName;
-	//private String altSourcePartName;
 	private String xliffPartName;
 	private String skeletonPartName;	
 	private String resourcesPartName;
@@ -121,16 +103,15 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 	private OPCPackage pack;
 	private File tempXliff;
 	private File tempResources;
-	private PersistenceSession session;
+	private PersistenceSession session;  // resource session
 	private List<String> sources = new ArrayList<String> ();
 	private List<String> originals = new ArrayList<String> ();
 	
 	public XLIFFKitWriterStep() {
 		super();
-		xliffCont = new XLIFFContent();
 		params = new Parameters();		
 		session = new OkapiJsonSession();
-		//OkapiBeans.register();
+		writer = new XLIFFWriter();
 	}
 	
 	public String getDescription () {
@@ -194,9 +175,6 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 		case TEXT_UNIT:
 			processTextUnit((TextUnit)event.getResource());
 			break;
-		case DOCUMENT_PART:
-			processDocumentPart((DocumentPart)event.getResource());
-			break;
 		}
 		session.serialize(event); // won't serialize END_DOCUMENT
 		
@@ -222,6 +200,9 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 		} catch (InvalidFormatException e1) {
 			// TODO Handle exception
 		}
+		
+		writer.setCopySource(params.isCopySource());
+        writer.setPlaceholderMode(params.isPlaceholderMode());
 		
 		session.setDescription(params.getMessage());
 	}
@@ -252,13 +233,8 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 		originalFileName = Util.getFilename(docName, true);
 		sourceFileName = Util.getFilename(docName, true);
 		xliffFileName = originalFileName + ".xlf";
-		//skeletonFileName = originalFileName + ".skeleton";
 		resourcesFileName = originalFileName + resourcesFileExt;
 		skeletonFileName = String.format("resources/%s/%s", sourceFileName, resourcesFileName);
-//		tmxFileName = originalFileName + ".tmx";
-//		tbxFileName = originalFileName + ".tbx";
-//		srxFileName = originalFileName + ".srx";
-//		annotationsFileName = originalFileName + ".annotations";
 		
 		filterWriterClassName = resource.getFilterWriter().getClass().getName();
 		
@@ -269,11 +245,8 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 			tempResources = File.createTempFile(resourcesFileName, null);
 			tempResources.deleteOnExit();
 		
-			writer = new XMLWriter(new PrintWriter(tempXliff)); // XLIFF file writer
-			writer.writeStartDocument();
-			writer.writeStartElement("xliff");
-			writer.writeAttributeString("version", "1.2");
-			writer.writeAttributeString("xmlns", "urn:oasis:names:tc:xliff:document:1.2");
+			writer.create(tempXliff.getAbsolutePath(), skeletonFileName, resource.getLocale(), trgLoc,
+					resource.getMimeType(), sourceFileName, params.getMessage());
 		} catch (IOException e) {
 			// TODO Handle exception
 			e.printStackTrace();
@@ -328,9 +301,6 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 		session.end();
 		
 		// XLIFF
-		if ( inFile ) writeEndFile();
-		writer.writeEndElementLineBreak(); // xliff
-		writer.writeEndDocument();
 		writer.close();
 		
 		// Save to package		
@@ -338,8 +308,6 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 		sourcePartName = String.format("content/source/%s/%s", srcLoc.toString(), sourceFileName);
 		xliffPartName = String.format("content/target/%s.%s/%s", srcLoc.toString(), trgLoc.toString(), xliffFileName);
 		resourcesPartName = String.format("content/target/%s.%s/resources/%s/%s", srcLoc.toString(), trgLoc.toString(), sourceFileName, resourcesFileName);
-//		altOriginalPartName = String.format("content/original/%s.%s/%s", srcLoc.toString(), trgLoc.toString(), originalFileName);
-//		altSourcePartName = String.format("content/source/%s.%s/%s", srcLoc.toString(), trgLoc.toString(), sourceFileName);
 		
 		PackagePart corePart =
 			createPart(pack, null, xliffPartName, tempXliff, MimeTypeMapper.XLIFF_MIME_TYPE, TKitRelationshipTypes.CORE_DOCUMENT);
@@ -349,193 +317,35 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 		if (params.isIncludeSource())
 			if (!sources.contains(docName)) {
 				
-//				if (createPart(pack, corePart, sourcePartName, new File(docName), docMimeType, TKitRelationshipTypes.SOURCE) == null)
-//					createPart(pack, corePart, altSourcePartName, new File(docName), docMimeType, TKitRelationshipTypes.SOURCE);
 				createPart(pack, corePart, sourcePartName, new File(docName), docMimeType, TKitRelationshipTypes.SOURCE);
 				sources.add(docName);
 			}
 		
 		if (params.isIncludeOriginal())
 			if (!originals.contains(docName)) {
-//				if (createPart(pack, corePart, originalPartName, new File(docName), docMimeType, TKitRelationshipTypes.ORIGINAL) == null)
-//					createPart(pack, corePart, altOriginalPartName, new File(docName), docMimeType, TKitRelationshipTypes.ORIGINAL);
 				createPart(pack, corePart, originalPartName, new File(docName), docMimeType, TKitRelationshipTypes.ORIGINAL);
 				originals.add(docName);
 			}
 	}
 
 	private void processStartSubDocument (StartSubDocument resource) {
-		writeStartFile(resource.getName(), resource.getMimeType(),
-			configId, inputEncoding);		
-	}
-	
-	private void writeStartFile (String original,
-		String contentType,
-		String configId,
-		String inputEncoding)
-	{
-		writer.writeStartElement("file");
-		writer.writeAttributeString("original",
-			(original!=null) ? original : "unknown");
-		writer.writeAttributeString("source-language", srcLoc.toBCP47());
-		if ( trgLoc != null ) {
-			writer.writeAttributeString("target-language", trgLoc.toBCP47());
-		}
-		
-		if ( contentType == null ) contentType = "x-undefined";
-		else if ( contentType.equals("text/html") ) contentType = "html";
-		else if ( contentType.equals("text/xml") ) contentType = "xml";
-		// TODO: other standard XLIFF content types
-		else contentType = "x-"+contentType;
-		writer.writeAttributeString("datatype",contentType);
-		
-		if (( configId != null ) || ( inputEncoding != null )) {
-			writer.writeAttributeString("xmlns:x", "http://net.sf.okapi/ns/xliff-extensions");
-			writer.writeAttributeString("x:inputEncoding", inputEncoding);
-			writer.writeAttributeString("x:configId", configId);
-		}
-		writer.writeLineBreak();
-		
-		inFile = true;
-
-		writer.writeStartElement("header");
-		writer.writeStartElement("skl");
-		writer.writeStartElement("external-file");
-		writer.writeAttributeString("href", skeletonFileName);
-		writer.writeEndElement(); // external-file
-		writer.writeEndElementLineBreak(); // skl
-		writer.writeEndElementLineBreak(); // header
-		
-		writer.writeStartElement("body");
-		writer.writeLineBreak();
+		writer.writeStartFile(resource.getName(), resource.getMimeType(), skeletonFileName);
 	}
 	
 	private void processEndSubDocument (Ending resource) {
-		writeEndFile();
-	}
-	
-	private void writeEndFile () {
-		writer.writeEndElementLineBreak(); // body
-		writer.writeEndElementLineBreak(); // file
-		inFile = false;
+		writer.writeEndFile();
 	}
 	
 	private void processStartGroup (StartGroup resource) {
-		if ( !inFile ) writeStartFile(docName, docMimeType, configId, inputEncoding);
-		writer.writeStartElement("group");
-		writer.writeAttributeString("id", resource.getId());
-		String tmp = resource.getName();
-		if (( tmp != null ) && ( tmp.length() != 0 )) {
-			writer.writeAttributeString("resname", tmp);
-		}
-		tmp = resource.getType();
-		if ( !Util.isEmpty(tmp) ) {
-			if ( tmp.startsWith("x-") || ( RESTYPEVALUES.contains(";"+tmp+";")) ) {
-				writer.writeAttributeString("restype", tmp);
-			}
-			else { // Make sure the value is valid
-				writer.writeAttributeString("restype", "x-"+tmp);
-			}
-		}
-		writer.writeLineBreak();
+		writer.writeStartGroup(resource.getId(), resource.getName(), resource.getType());
 	}
 	
 	private void processEndGroup (Ending resource) {
-		writer.writeEndElementLineBreak(); // group
+		writer.writeEndGroup();
 	}
 	
 	private void processTextUnit (TextUnit tu) {
-		// Check if we need to set the entry as non-translatable
-		if ( params.isSetApprovedAsNoTranslate()) {
-			Property prop = tu.getTargetProperty(trgLoc, Property.APPROVED);
-			if (( prop != null ) && prop.getValue().equals("yes") ) {
-				tu.setIsTranslatable(false);
-			}
-		}
-		// Check if we need to skip non-translatable entries
-		if ( !params.isIncludeNoTranslate() && !tu.isTranslatable() ) {
-			return;
-		}
-
-		if ( !inFile ) writeStartFile(docName, docMimeType, configId, inputEncoding);
-
-		writer.writeStartElement("trans-unit");
-		writer.writeAttributeString("id", String.valueOf(tu.getId()));
-		String tmp = tu.getName();
-		if (( tmp != null ) && ( tmp.length() != 0 )) {
-			writer.writeAttributeString("resname", tmp);
-		}
-		tmp = tu.getType();
-		if ( !Util.isEmpty(tmp) ) {
-			if ( tmp.startsWith("x-") || ( RESTYPEVALUES.contains(";"+tmp+";")) ) {
-				writer.writeAttributeString("restype", tmp);
-			}
-			else { // Make sure the value is valid
-				writer.writeAttributeString("restype", "x-"+tmp);
-			}
-		}
-		if ( !tu.isTranslatable() )
-			writer.writeAttributeString("translate", "no");
-
-		if ( tu.hasTargetProperty(trgLoc, Property.APPROVED) ) {
-			if ( tu.getTargetProperty(trgLoc, Property.APPROVED).getValue().equals("yes") ) {
-				writer.writeAttributeString(Property.APPROVED, "yes");
-			}
-			// "no" is the default
-		}
-		
-		if ( tu.preserveWhitespaces() )
-			writer.writeAttributeString("xml:space", "preserve");
-		writer.writeLineBreak();
-
-		// Get the source container
-		TextContainer tc = tu.getSource();
-		boolean srcHasText = tc.hasText(false);
-
-		//--- Write the source
-		
-		writer.writeStartElement("source");
-		writer.writeAttributeString("xml:lang", srcLoc.toBCP47());
-		// Write full source content (always without segments markers
-		writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, false, false,
-			params.isgMode()));
-		writer.writeEndElementLineBreak(); // source
-		// Write segmented source (with markers) if needed
-		if ( tc.hasBeenSegmented()) {
-			writer.writeStartElement("seg-source");
-			writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, false, true,
-				params.isgMode()));
-			writer.writeEndElementLineBreak(); // seg-source
-		}
-
-		//--- Write the target
-		
-		writer.writeStartElement("target");
-		writer.writeAttributeString("xml:lang", trgLoc.toBCP47());
-		
-		// At this point tc contains the source
-		// Do we have an available target to use instead?
-		tc = tu.getTarget(trgLoc);
-		if (( tc == null ) || ( tc.isEmpty() ) || ( srcHasText && !tc.hasText(false) )) {
-			tc = tu.getSource(); // Go back to the source
-		}
-		
-		// Now tc hold the content to write. Write it with or without marks
-		writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, false, tc.hasBeenSegmented(),
-			params.isgMode()));
-		writer.writeEndElementLineBreak(); // target
-		
-		// Note
-		if ( tu.hasProperty(Property.NOTE) ) {
-			writer.writeStartElement("note");
-			writer.writeString(tu.getProperty(Property.NOTE).getValue());
-			writer.writeEndElementLineBreak(); // note
-		}
-
-		writer.writeEndElementLineBreak(); // trans-unit
-	}
-	private void processDocumentPart(DocumentPart resource) {
-		
+		writer.writeTextUnit(tu);
 	}
 	
 	@Override
