@@ -25,8 +25,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.Stack;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -70,8 +68,6 @@ public class RailsYamlFilter extends AbstractFilter {
 	private static final int YAML_STRING_INDEX_KEY = 2;
 	private static final int YAML_STRING_INDEX_TU = 4;
 
-	private static final Logger LOGGER = Logger.getLogger(RailsYamlFilter.class.getName());
-	
 	private static final String YAML_MIME_TYPE = "text/x-yaml";
 	
 	private YamlEventBuilder eventBuilder;
@@ -86,6 +82,7 @@ public class RailsYamlFilter extends AbstractFilter {
 	private Stack<KeyPair> keyStack;
 	private boolean isUtf8Encoding = false;
 	private boolean isUtf8Bom = false;
+	private Parameters params;
 	
 	private class KeyPair {
 		public int indent;
@@ -102,7 +99,7 @@ public class RailsYamlFilter extends AbstractFilter {
 		setFilterWriter(createFilterWriter());
 		
 		setName("okf_railsyaml");
-		setDisplayName("Ruby on Rails YAML Filter");
+		setDisplayName("Ruby on Rails YAML Filter (BETA)");
 		addConfiguration(new FilterConfiguration(getName(), 
 			YAML_MIME_TYPE, 
 			getClass().getName(),
@@ -111,6 +108,7 @@ public class RailsYamlFilter extends AbstractFilter {
 		parseState = PARSE_STOP;
 		indentation = 0;
 		keyStack = new Stack<KeyPair>();
+		params = new Parameters();
 	}
 
 	@Override
@@ -138,12 +136,12 @@ public class RailsYamlFilter extends AbstractFilter {
 	}
 
 	@Override
-	public IParameters getParameters() {
-		return null;
+	public IParameters getParameters () {
+		return params;
 	}
 
 	@Override
-	public boolean hasNext() {
+	public boolean hasNext () {
 		return (parseState  != PARSE_STOP);
 	}
 
@@ -162,10 +160,8 @@ public class RailsYamlFilter extends AbstractFilter {
 				break;
 			case RESULT_ENTRY:
 				// TODO Add the TextUnit event
-				Event e = new Event(
-							EventType.TEXT_UNIT, 
-							getEventBuilder().postProcessTextUnit(tuEntry)
-							);
+				Event e = new Event(EventType.TEXT_UNIT, 
+					getEventBuilder().postProcessTextUnit(tuEntry));
 				getEventBuilder().addFilterEvent(e);
 				resetBuffer = true;
 				break;
@@ -277,6 +273,10 @@ public class RailsYamlFilter extends AbstractFilter {
 			tuEntry.setSkeleton(skel);
 			Property propIndentation = new Property("indentation", String.valueOf(indentation));
 			tuEntry.setProperty(propIndentation);
+			if ( params.useCodeFinder ) {
+				params.codeFinder.process(tuEntry.getSource().getFirstContent());
+			}
+
 //			System.out.println(tuEntry.getName() + "=" + tuEntry.toString());
 			return ITEM_STRING;
 		}
@@ -292,7 +292,6 @@ public class RailsYamlFilter extends AbstractFilter {
 		else {
 			return 0;
 		}
-
 	}
 	
 	private String generateKey() {
@@ -306,7 +305,6 @@ public class RailsYamlFilter extends AbstractFilter {
 	@Override
 	public void open (RawDocument input) {
 		open(input, true);
-		LOGGER.log(Level.FINE, getName() + ": opened an input document");
 	}
 
 	@Override
@@ -316,6 +314,10 @@ public class RailsYamlFilter extends AbstractFilter {
 		// Set the parseState to 
 		parseState = PARSE_CONTINUE;
 		tuid = 0;
+		// Compile code finder rules
+		if ( params.useCodeFinder ) {
+			params.codeFinder.compile();
+		}
 		
 		// Handle the encoding
 		BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input.getStream(), input.getEncoding());
@@ -342,10 +344,10 @@ public class RailsYamlFilter extends AbstractFilter {
 
 	@Override
 	public void setParameters (IParameters params) {
-		// Not used
+		this.params = (Parameters)params;
 	}
 	
-	private YamlEventBuilder getEventBuilder() {
+	private YamlEventBuilder getEventBuilder () {
 		return eventBuilder;
 	}
 
