@@ -1,6 +1,6 @@
 config:
-	title: "My Rails Website"
-	author: "Santa Claus with é"
-	email: email@company.com
-	css_file: default.css
-	test: "\"\\"
+  title: "My Rails Website"
+  author: "Santa Claus with é"
+  email: email@company.com
+  css_file: default.css
+  test: "\"\\"
