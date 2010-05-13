@@ -521,6 +521,9 @@ public class Main {
 		filtersMap.put("okf_pensieve", "net.sf.okapi.filters.pensieve.PensieveFilter");
 
 		filtersMap.put("okf_vignette", "net.sf.okapi.filters.vignette.VignetteFilter");
+
+		extensionsMap.put(".yml", "okf_railsyaml");
+		filtersMap.put("okf_railsyaml", "net.sf.okapi.filters.railsyaml.RailsYamlFilter");
 	}
 	
 	private String getConfigurationId (String ext) {

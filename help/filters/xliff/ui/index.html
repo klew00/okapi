@@ -28,7 +28,7 @@
 
 <h2><a name="overview"></a>Overview</h2>
 <p>The XLIFF Filter is an Okapi component that implements the <code>IFilter</code> interface for 
-XLIFF (XML Localisation Interchange File Format) documents. The filter is implement in the class <code>
+XLIFF (XML Localisation Interchange File Format) documents. The filter is implemented in the class <code>
 net.sf.okapi.filters.xliff.XLIFFFilter</code> of the Okapi library.</p>
 <p>XLIFF is an OASIS Standard that defines a file format for 
 transporting translatable text and localization-related information across a 
@@ -83,8 +83,9 @@ from <code>&quot;preserve&quot;</code>, the content of the source and target is 
 		The <i>note</i> property of the text unit in all other cases.</td>
 	</tr>
 	<tr>
-		<td align="left" valign="top">The <code>&lt;alt-trans&gt;</code> element.</td>
-		<td align="left" valign="top">The <code>AltTransAnnotation</code> 
+		<td align="left" valign="top">The <code>&lt;alt-trans&gt;</code> element 
+		that has.its <code>alttranstype</code> attribute set to <code>proposal</code>.</td>
+		<td align="left" valign="top">The <code>AltTranslationsAnnotation</code> 
 		annotation.</td>
 	</tr>
 	<tr>
@@ -110,7 +111,7 @@ from <code>&quot;preserve&quot;</code>, the content of the source and target is 
 		text unit.</td>
 	</tr>
 	<tr>
-		<td align="left" valign="top">the <code>target-language</code> attribute</td>
+		<td align="left" valign="top">The <code>target-language</code> attribute.</td>
 		<td align="left" valign="top">The <i>targetLanguage</i> property of the 
 		sub-document for the given <code>&lt;file&gt;</code>.</td>
 	</tr>

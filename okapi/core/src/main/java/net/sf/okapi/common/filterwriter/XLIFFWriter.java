@@ -200,8 +200,8 @@ public class XLIFFWriter {
 	
 	/**
 	 * Writes the end of a &lt;file> element.
-	 * This method should be called for each call to {@link #writeStartFile(String, String, String, String)}.
-	 * @see #writeStartFile(String, String, String, String)
+	 * This method should be called for each call to {@link #writeStartFile(String, String, String)}.
+	 * @see #writeStartFile(String, String, String)
 	 */
 	public void writeEndFile () {
 		writer.writeEndElementLineBreak(); // body
