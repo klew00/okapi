@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -47,6 +48,8 @@ import net.sf.okapi.common.pipeline.IPipelineWriter;
 import net.sf.okapi.common.pipeline.Pipeline;
 
 public class PipelineStorage implements IPipelineWriter, IPipelineReader {
+
+	private final Logger LOGGER = Logger.getLogger(getClass().getName());
 
 	private String path;
 	private StringWriter strWriter;
@@ -153,8 +156,11 @@ public class PipelineStorage implements IPipelineWriter, IPipelineReader {
 				StepInfo stepInfo = availableSteps.get(stepName);
 				if ( stepInfo == null ) {
 					// The pipeline has a step that is not currently in the available steps
-					throw new RuntimeException(String.format(
-						"The step '%s' is not among the steps currently available.", className));
+					LOGGER.warning(String.format(
+						"The step '%s' is not among the steps currently available. " +
+						"It will be removed from the loaded pipeline.",
+						className));
+					continue;
 				}
 				IPipelineStep step;
 				if ( stepInfo.loader == null ) {
@@ -171,6 +177,7 @@ public class PipelineStorage implements IPipelineWriter, IPipelineReader {
 				// add the step
 				pipeline.addStep(step);
 			}
+			
 			return pipeline;
 		}
 		catch ( IOException e ) {

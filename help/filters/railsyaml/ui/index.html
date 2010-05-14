@@ -68,7 +68,15 @@ identifiers. For example, in the example above, the name of the text unit with
 the content &quot;<code>n&#39;est pas disponible</code>&quot; is <code>
 fr.activerecord.errors.messages.exclusion</code>.</p>
 <h2><a name="parameters"></a>Parameters</h2>
-<p>TODO</p>
+<p>The filter includes options to set given parts of the extracted text as 
+inline codes, using regular expression.</p>
+<p>Example of the options with three regular expressions:</p>
+<pre>#v1
+useCodeFinder.b=true
+codeFinderRules.count.i=3
+codeFinderRules.rule0=%(([-0+#]?)[-0+#]?)((\d\$)?)(([\d\*]*)(\.[\d\*]*)?)[dioxXucsfeEgGpnYyBbHhSMmAZ]
+codeFinderRules.rule1=(\\r\\n)|\\a|\\b|\\f|\\n|\\r|\\t|\\v
+codeFinderRules.rule2=\{\{\w.*?\}\}</pre>
 <p>&nbsp;</p>
 
 </body>
