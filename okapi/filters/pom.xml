@@ -35,6 +35,6 @@
         <module>ttx</module>
         <module>vignette</module>
         <module>railsyaml</module>
-		<module>versified-txt</module>
+		<module>versifiedtxt</module>
     </modules>
 </project>

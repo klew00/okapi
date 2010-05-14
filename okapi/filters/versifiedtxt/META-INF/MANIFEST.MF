@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Versified Text Filter
-Bundle-SymbolicName: net.sf.okapi.filters.versified-txt
+Bundle-SymbolicName: net.sf.okapi.filters.versifiedtxt
 Bundle-Version: 1.0.0
 Export-Package: net.sf.okapi.filters.versifiedtxt
 Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0"
