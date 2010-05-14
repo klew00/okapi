@@ -20,8 +20,10 @@
 
 package net.sf.okapi.common.resource;
 
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Range;
-import net.sf.okapi.common.annotation.ScoresAnnotation;
+import net.sf.okapi.common.annotation.AltTranslationType;
+import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import static org.junit.Assert.*;
@@ -204,18 +206,19 @@ public class TextContainerTest {
     	TextContainer tc = new TextContainer("text");
         Property p1 = new Property("name", "value", true);
         tc.setProperty(p1);
-        ScoresAnnotation ann1 = new ScoresAnnotation();
-        ann1.add(99, "abc");
+        AltTranslationsAnnotation ann1 = new AltTranslationsAnnotation();
+        ann1.add(LocaleId.ENGLISH, LocaleId.FRENCH, null, new TextFragment("src"),
+        	new TextFragment("trg"), AltTranslationType.TM, 99, "origin");
         tc.setAnnotation(ann1);
 		TextContainer tc2 = tc.clone();
 		assertEquals(tc.getFirstContent().toString(), tc2.getFirstContent().toString());
 		assertNotSame(tc.getFirstContent(), tc2.getFirstContent());
         assertEquals("name property", p1.getValue(), tc2.getProperty("name").getValue());
         assertNotSame("properties should not be the same reference due to clone", p1, tc2.getProperty("name"));
-        ScoresAnnotation ann2 = tc2.getAnnotation(ScoresAnnotation.class); 
+        AltTranslationsAnnotation ann2 = tc2.getAnnotation(AltTranslationsAnnotation.class); 
         assertNotNull(ann2);
-        assertEquals(99, ann2.get(0).score);
-        assertEquals("abc", ann2.get(0).origin);
+        assertEquals(99, ann2.getFirst().getScore());
+        assertEquals("origin", ann2.getLast().getOrigin());
 //TODO: check this with everyone        assertNotSame(ann2, ann1);
     }
 
@@ -737,22 +740,22 @@ public class TextContainerTest {
 	@Test
 	public void testJoinSegmentWithNext () {
 		TextContainer tc = createMultiSegmentContent();
-		Segments segments = tc.getSegments();		
+		Segments segments = tc.getSegments();
 		// Make it 3 segments
 		segments.append(new TextFragment("seg3"));
-		segments.get(0).id = "id1"; // Set the ID to non-default
+		segments.get(1).id = "id2"; // Set the ID to non-default
 		assertEquals(3, segments.count());
 		assertEquals("[text1] [text2][seg3]", fmt.printSegmentedContent(tc, true));
-		// First join
-		segments.joinWithNext(0);
-		assertEquals("[text1 text2][seg3]", fmt.printSegmentedContent(tc, true));
-		assertEquals("id1", segments.get(0).id);
+		// Join second segment with next
+		segments.joinWithNext(1);
+		assertEquals("[text1] [text2seg3]", fmt.printSegmentedContent(tc, true));
+		assertEquals("id2", segments.get(1).id);
 		assertFalse(tc.contentIsOneSegment());
 		assertTrue(tc.hasBeenSegmented());
-		// Second join
+		// Second first with next
 		segments.joinWithNext(0);
 		assertEquals("[text1 text2seg3]", fmt.printSegmentedContent(tc, true));
-		assertEquals("id1", segments.get(0).id);
+		assertEquals("s1", segments.get(0).id);
 		assertTrue(tc.contentIsOneSegment());
 		assertTrue(tc.hasBeenSegmented()); // "manual" segmentation change
 	}
@@ -1224,10 +1227,6 @@ public class TextContainerTest {
 	}
 	
 	private TextContainer createMultiSegmentContent () {
-//		TextFragment tf = new TextFragment("text1");
-//		TextContainer tc = new TextContainer(tf);
-//		tc.append(new TextFragment(" "));
-//		tc.getSegments().append(new TextFragment("text2"));
 		TextFragment tf = new TextFragment("text1 text2");
 		TextContainer tc = new TextContainer(tf);
 		List<Range> ranges = new ArrayList<Range>();

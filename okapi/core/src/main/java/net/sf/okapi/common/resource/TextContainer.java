@@ -314,21 +314,10 @@ public class TextContainer implements Iterable<TextPart> {
 				return 0; // Nothing to do
 			}
 			
-			// Find the segment to join
-			int start = -1;
-			int tmp = -1;
-			for ( TextPart part : parts ) {
-				if ( part.isSegment() ) {
-					if ( ++tmp == segmentIndex ) {
-						start = tmp;
-						break;
-					}
-				}
-			}
-			
+			// Find the part for the segment index
+			int start = getPartIndex(segmentIndex);
 			// Check if we have a segment at such index
 			if ( start == -1 ) {
-				//TODO: some kind of error???
 				return 0; // Not found
 			}
 			
