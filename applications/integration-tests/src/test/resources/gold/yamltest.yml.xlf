@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2"><file original="yamltest.yml" source-language="en" target-language="fr" datatype="x-text/x-yaml" xmlns:x="http://net.sf.okapi/ns/xliff-extensions" x:inputEncoding="UTF-8" x:configId="">
+<body>
+<trans-unit id="1" resname="fr.date.formats.default" xml:space="preserve">
+<source xml:lang="en"><x id="1"/>/<x id="2"/>/<x id="3"/></source>
+<target xml:lang="fr"><x id="1"/>/<x id="2"/>/<x id="3"/></target>
+</trans-unit>
+<trans-unit id="2" resname="fr.date.formats.short" xml:space="preserve">
+<source xml:lang="en"><x id="1"/> <x id="2"/></source>
+<target xml:lang="fr"><x id="1"/> <x id="2"/></target>
+</trans-unit>
+<trans-unit id="3" resname="fr.date.formats.long" xml:space="preserve">
+<source xml:lang="en"><x id="1"/> <x id="2"/> <x id="3"/></source>
+<target xml:lang="fr"><x id="1"/> <x id="2"/> <x id="3"/></target>
+</trans-unit>
+<trans-unit id="4" resname="fr.date.formats.long_ordinal" xml:space="preserve">
+<source xml:lang="en"><x id="1"/> <x id="2"/> <x id="3"/></source>
+<target xml:lang="fr"><x id="1"/> <x id="2"/> <x id="3"/></target>
+</trans-unit>
+<trans-unit id="5" resname="fr.date.formats.only_day" xml:space="preserve">
+<source xml:lang="en"><x id="1"/></source>
+<target xml:lang="fr"><x id="1"/></target>
+</trans-unit>
+<trans-unit id="6" resname="fr.time.formats.default" xml:space="preserve">
+<source xml:lang="en"><x id="1"/> <x id="2"/> <x id="3"/> <x id="4"/>:<x id="5"/></source>
+<target xml:lang="fr"><x id="1"/> <x id="2"/> <x id="3"/> <x id="4"/>:<x id="5"/></target>
+</trans-unit>
+<trans-unit id="7" resname="fr.time.formats.time" xml:space="preserve">
+<source xml:lang="en"><x id="1"/>:<x id="2"/></source>
+<target xml:lang="fr"><x id="1"/>:<x id="2"/></target>
+</trans-unit>
+<trans-unit id="8" resname="fr.time.formats.short" xml:space="preserve">
+<source xml:lang="en"><x id="1"/> <x id="2"/> <x id="3"/>:<x id="4"/></source>
+<target xml:lang="fr"><x id="1"/> <x id="2"/> <x id="3"/>:<x id="4"/></target>
+</trans-unit>
+<trans-unit id="9" resname="fr.time.formats.long" xml:space="preserve">
+<source xml:lang="en"><x id="1"/> <x id="2"/> <x id="3"/> <x id="4"/> <x id="5"/>:<x id="6"/>:<x id="7"/> <x id="8"/></source>
+<target xml:lang="fr"><x id="1"/> <x id="2"/> <x id="3"/> <x id="4"/> <x id="5"/>:<x id="6"/>:<x id="7"/> <x id="8"/></target>
+</trans-unit>
+<trans-unit id="10" resname="fr.time.formats.long_ordinal" xml:space="preserve">
+<source xml:lang="en"><x id="1"/> <x id="2"/> <x id="3"/> <x id="4"/> <x id="5"/>:<x id="6"/>:<x id="7"/> <x id="8"/></source>
+<target xml:lang="fr"><x id="1"/> <x id="2"/> <x id="3"/> <x id="4"/> <x id="5"/>:<x id="6"/>:<x id="7"/> <x id="8"/></target>
+</trans-unit>
+<trans-unit id="11" resname="fr.time.formats.only_second" xml:space="preserve">
+<source xml:lang="en"><x id="1"/></source>
+<target xml:lang="fr"><x id="1"/></target>
+</trans-unit>
+<trans-unit id="12" resname="fr.datetime.distance_in_words.half_a_minute" xml:space="preserve">
+<source xml:lang="en">une demi-minute</source>
+<target xml:lang="fr">une demi-minute</target>
+</trans-unit>
+<trans-unit id="13" resname="fr.datetime.distance_in_words.less_than_x_seconds.zero" xml:space="preserve">
+<source xml:lang="en">moins d'une seconde</source>
+<target xml:lang="fr">moins d'une seconde</target>
+</trans-unit>
+<trans-unit id="14" resname="fr.datetime.distance_in_words.less_than_x_seconds.one" xml:space="preserve">
+<source xml:lang="en">moins de 1 seconde</source>
+<target xml:lang="fr">moins de 1 seconde</target>
+</trans-unit>
+<trans-unit id="15" resname="fr.datetime.distance_in_words.less_than_x_seconds.other" xml:space="preserve">
+<source xml:lang="en">moins de <x id="1"/> secondes</source>
+<target xml:lang="fr">moins de <x id="1"/> secondes</target>
+</trans-unit>
+<trans-unit id="16" resname="fr.datetime.distance_in_words.x_seconds.one" xml:space="preserve">
+<source xml:lang="en">1 seconde</source>
+<target xml:lang="fr">1 seconde</target>
+</trans-unit>
+<trans-unit id="17" resname="fr.datetime.distance_in_words.x_seconds.other" xml:space="preserve">
+<source xml:lang="en"><x id="1"/> secondes</source>
+<target xml:lang="fr"><x id="1"/> secondes</target>
+</trans-unit>
+<trans-unit id="18" resname="fr.datetime.distance_in_words.less_than_x_minutes.zero" xml:space="preserve">
+<source xml:lang="en">moins d'une minute</source>
+<target xml:lang="fr">moins d'une minute</target>
+</trans-unit>
+<trans-unit id="19" resname="fr.datetime.distance_in_words.less_than_x_minutes.one" xml:space="preserve">
+<source xml:lang="en">moins de 1 minute</source>
+<target xml:lang="fr">moins de 1 minute</target>
+</trans-unit>
+<trans-unit id="20" resname="fr.datetime.distance_in_words.less_than_x_minutes.other" xml:space="preserve">
+<source xml:lang="en">moins de <x id="1"/> minutes</source>
+<target xml:lang="fr">moins de <x id="1"/> minutes</target>
+</trans-unit>
+<trans-unit id="21" resname="fr.datetime.distance_in_words.x_minutes.one" xml:space="preserve">
+<source xml:lang="en">1 minute</source>
+<target xml:lang="fr">1 minute</target>
+</trans-unit>
+<trans-unit id="22" resname="fr.datetime.distance_in_words.x_minutes.other" xml:space="preserve">
+<source xml:lang="en"><x id="1"/> minutes</source>
+<target xml:lang="fr"><x id="1"/> minutes</target>
+</trans-unit>
+<trans-unit id="23" resname="fr.datetime.distance_in_words.about_x_hours.one" xml:space="preserve">
+<source xml:lang="en">environ une heure</source>
+<target xml:lang="fr">environ une heure</target>
+</trans-unit>
+<trans-unit id="24" resname="fr.datetime.distance_in_words.about_x_hours.other" xml:space="preserve">
+<source xml:lang="en">environ <x id="1"/> heures</source>
+<target xml:lang="fr">environ <x id="1"/> heures</target>
+</trans-unit>
+<trans-unit id="25" resname="fr.datetime.distance_in_words.x_days.one" xml:space="preserve">
+<source xml:lang="en">1 jour</source>
+<target xml:lang="fr">1 jour</target>
+</trans-unit>
+<trans-unit id="26" resname="fr.datetime.distance_in_words.x_days.other" xml:space="preserve">
+<source xml:lang="en"><x id="1"/> jours</source>
+<target xml:lang="fr"><x id="1"/> jours</target>
+</trans-unit>
+<trans-unit id="27" resname="fr.datetime.distance_in_words.about_x_months.one" xml:space="preserve">
+<source xml:lang="en">environ un mois</source>
+<target xml:lang="fr">environ un mois</target>
+</trans-unit>
+<trans-unit id="28" resname="fr.datetime.distance_in_words.about_x_months.other" xml:space="preserve">
+<source xml:lang="en">environ <x id="1"/> mois</source>
+<target xml:lang="fr">environ <x id="1"/> mois</target>
+</trans-unit>
+<trans-unit id="29" resname="fr.datetime.distance_in_words.x_months.one" xml:space="preserve">
+<source xml:lang="en">1 mois</source>
+<target xml:lang="fr">1 mois</target>
+</trans-unit>
+<trans-unit id="30" resname="fr.datetime.distance_in_words.x_months.other" xml:space="preserve">
+<source xml:lang="en"><x id="1"/> mois</source>
+<target xml:lang="fr"><x id="1"/> mois</target>
+</trans-unit>
+<trans-unit id="31" resname="fr.datetime.distance_in_words.about_x_years.one" xml:space="preserve">
+<source xml:lang="en">environ un an</source>
+<target xml:lang="fr">environ un an</target>
+</trans-unit>
+<trans-unit id="32" resname="fr.datetime.distance_in_words.about_x_years.other" xml:space="preserve">
+<source xml:lang="en">environ <x id="1"/> ans</source>
+<target xml:lang="fr">environ <x id="1"/> ans</target>
+</trans-unit>
+<trans-unit id="33" resname="fr.datetime.distance_in_words.over_x_years.one" xml:space="preserve">
+<source xml:lang="en">plus d'un an</source>
+<target xml:lang="fr">plus d'un an</target>
+</trans-unit>
+<trans-unit id="34" resname="fr.datetime.distance_in_words.over_x_years.other" xml:space="preserve">
+<source xml:lang="en">plus de <x id="1"/> ans</source>
+<target xml:lang="fr">plus de <x id="1"/> ans</target>
+</trans-unit>
+<trans-unit id="35" resname="fr.datetime.prompts.year" xml:space="preserve">
+<source xml:lang="en">Année</source>
+<target xml:lang="fr">Année</target>
+</trans-unit>
+<trans-unit id="36" resname="fr.datetime.prompts.month" xml:space="preserve">
+<source xml:lang="en">Mois</source>
+<target xml:lang="fr">Mois</target>
+</trans-unit>
+<trans-unit id="37" resname="fr.datetime.prompts.day" xml:space="preserve">
+<source xml:lang="en">Jour</source>
+<target xml:lang="fr">Jour</target>
+</trans-unit>
+<trans-unit id="38" resname="fr.datetime.prompts.hour" xml:space="preserve">
+<source xml:lang="en">Heure</source>
+<target xml:lang="fr">Heure</target>
+</trans-unit>
+<trans-unit id="39" resname="fr.datetime.prompts.minute" xml:space="preserve">
+<source xml:lang="en">Minute</source>
+<target xml:lang="fr">Minute</target>
+</trans-unit>
+<trans-unit id="40" resname="fr.datetime.prompts.second" xml:space="preserve">
+<source xml:lang="en">Seconde</source>
+<target xml:lang="fr">Seconde</target>
+</trans-unit>
+<trans-unit id="41" resname="fr.number.human.format.delimiter" xml:space="preserve">
+<source xml:lang="en"></source>
+<target xml:lang="fr"></target>
+</trans-unit>
+<trans-unit id="42" resname="fr.number.human.storage_units.format" xml:space="preserve">
+<source xml:lang="en"><x id="1"/> <x id="2"/></source>
+<target xml:lang="fr"><x id="1"/> <x id="2"/></target>
+</trans-unit>
+<trans-unit id="43" resname="fr.number.human.storage_units.units.byte.one" xml:space="preserve">
+<source xml:lang="en">octet</source>
+<target xml:lang="fr">octet</target>
+</trans-unit>
+<trans-unit id="44" resname="fr.number.human.storage_units.units.byte.other" xml:space="preserve">
+<source xml:lang="en">octets</source>
+<target xml:lang="fr">octets</target>
+</trans-unit>
+<trans-unit id="45" resname="fr.number.human.storage_units.units.kb" xml:space="preserve">
+<source xml:lang="en">ko</source>
+<target xml:lang="fr">ko</target>
+</trans-unit>
+<trans-unit id="46" resname="fr.number.human.storage_units.units.mb" xml:space="preserve">
+<source xml:lang="en">Mo</source>
+<target xml:lang="fr">Mo</target>
+</trans-unit>
+<trans-unit id="47" resname="fr.number.human.storage_units.units.gb" xml:space="preserve">
+<source xml:lang="en">Go</source>
+<target xml:lang="fr">Go</target>
+</trans-unit>
+<trans-unit id="48" resname="fr.number.human.storage_units.units.tb" xml:space="preserve">
+<source xml:lang="en">To</source>
+<target xml:lang="fr">To</target>
+</trans-unit>
+<trans-unit id="49" resname="fr.support.array.words_connector" xml:space="preserve">
+<source xml:lang="en">, </source>
+<target xml:lang="fr">, </target>
+</trans-unit>
+<trans-unit id="50" resname="fr.support.array.two_words_connector" xml:space="preserve">
+<source xml:lang="en"> et </source>
+<target xml:lang="fr"> et </target>
+</trans-unit>
+<trans-unit id="51" resname="fr.support.array.last_word_connector" xml:space="preserve">
+<source xml:lang="en"> et </source>
+<target xml:lang="fr"> et </target>
+</trans-unit>
+<trans-unit id="52" resname="fr.activerecord.errors.template.header.one" xml:space="preserve">
+<source xml:lang="en">Impossible d'enregistrer <x id="1"/>: 1 erreur</source>
+<target xml:lang="fr">Impossible d'enregistrer <x id="1"/>: 1 erreur</target>
+</trans-unit>
+<trans-unit id="53" resname="fr.activerecord.errors.template.header.other" xml:space="preserve">
+<source xml:lang="en">Impossible d'enregistrer <x id="1"/>: <x id="2"/> erreurs.</source>
+<target xml:lang="fr">Impossible d'enregistrer <x id="1"/>: <x id="2"/> erreurs.</target>
+</trans-unit>
+<trans-unit id="54" resname="fr.activerecord.errors.template.body" xml:space="preserve">
+<source xml:lang="en">Veuillez vérifier les champs suivants :</source>
+<target xml:lang="fr">Veuillez vérifier les champs suivants :</target>
+</trans-unit>
+<trans-unit id="55" resname="fr.activerecord.errors.messages.inclusion" xml:space="preserve">
+<source xml:lang="en">n'est pas inclus(e) dans la liste</source>
+<target xml:lang="fr">n'est pas inclus(e) dans la liste</target>
+</trans-unit>
+<trans-unit id="56" resname="fr.activerecord.errors.messages.exclusion" xml:space="preserve">
+<source xml:lang="en">n'est pas disponible</source>
+<target xml:lang="fr">n'est pas disponible</target>
+</trans-unit>
+<trans-unit id="57" resname="fr.activerecord.errors.messages.invalid" xml:space="preserve">
+<source xml:lang="en">n'est pas valide</source>
+<target xml:lang="fr">n'est pas valide</target>
+</trans-unit>
+<trans-unit id="58" resname="fr.activerecord.errors.messages.confirmation" xml:space="preserve">
+<source xml:lang="en">ne concorde pas avec la confirmation</source>
+<target xml:lang="fr">ne concorde pas avec la confirmation</target>
+</trans-unit>
+<trans-unit id="59" resname="fr.activerecord.errors.messages.accepted" xml:space="preserve">
+<source xml:lang="en">doit être accepté(e)</source>
+<target xml:lang="fr">doit être accepté(e)</target>
+</trans-unit>
+<trans-unit id="60" resname="fr.activerecord.errors.messages.empty" xml:space="preserve">
+<source xml:lang="en">doit être rempli(e)</source>
+<target xml:lang="fr">doit être rempli(e)</target>
+</trans-unit>
+<trans-unit id="61" resname="fr.activerecord.errors.messages.blank" xml:space="preserve">
+<source xml:lang="en">doit être rempli(e)</source>
+<target xml:lang="fr">doit être rempli(e)</target>
+</trans-unit>
+<trans-unit id="62" resname="fr.activerecord.errors.messages.too_long" xml:space="preserve">
+<source xml:lang="en">est trop long (pas plus de <x id="1"/> caractères)</source>
+<target xml:lang="fr">est trop long (pas plus de <x id="1"/> caractères)</target>
+</trans-unit>
+<trans-unit id="63" resname="fr.activerecord.errors.messages.too_short" xml:space="preserve">
+<source xml:lang="en">est trop court (au moins <x id="1"/> caractères)</source>
+<target xml:lang="fr">est trop court (au moins <x id="1"/> caractères)</target>
+</trans-unit>
+<trans-unit id="64" resname="fr.activerecord.errors.messages.wrong_length" xml:space="preserve">
+<source xml:lang="en">ne fait pas la bonne longueur (doit comporter <x id="1"/> caractères)</source>
+<target xml:lang="fr">ne fait pas la bonne longueur (doit comporter <x id="1"/> caractères)</target>
+</trans-unit>
+<trans-unit id="65" resname="fr.activerecord.errors.messages.taken" xml:space="preserve">
+<source xml:lang="en">n'est pas disponible</source>
+<target xml:lang="fr">n'est pas disponible</target>
+</trans-unit>
+<trans-unit id="66" resname="fr.activerecord.errors.messages.not_a_number" xml:space="preserve">
+<source xml:lang="en">n'est pas un nombre</source>
+<target xml:lang="fr">n'est pas un nombre</target>
+</trans-unit>
+<trans-unit id="67" resname="fr.activerecord.errors.messages.greater_than" xml:space="preserve">
+<source xml:lang="en">doit être supérieur à <x id="1"/></source>
+<target xml:lang="fr">doit être supérieur à <x id="1"/></target>
+</trans-unit>
+<trans-unit id="68" resname="fr.activerecord.errors.messages.greater_than_or_equal_to" xml:space="preserve">
+<source xml:lang="en">doit être supérieur ou égal à <x id="1"/></source>
+<target xml:lang="fr">doit être supérieur ou égal à <x id="1"/></target>
+</trans-unit>
+<trans-unit id="69" resname="fr.activerecord.errors.messages.equal_to" xml:space="preserve">
+<source xml:lang="en">doit être égal à <x id="1"/></source>
+<target xml:lang="fr">doit être égal à <x id="1"/></target>
+</trans-unit>
+<trans-unit id="70" resname="fr.activerecord.errors.messages.less_than" xml:space="preserve">
+<source xml:lang="en">doit être inférieur à <x id="1"/></source>
+<target xml:lang="fr">doit être inférieur à <x id="1"/></target>
+</trans-unit>
+<trans-unit id="71" resname="fr.activerecord.errors.messages.less_than_or_equal_to" xml:space="preserve">
+<source xml:lang="en">doit être inférieur ou égal à <x id="1"/></source>
+<target xml:lang="fr">doit être inférieur ou égal à <x id="1"/></target>
+</trans-unit>
+<trans-unit id="72" resname="fr.activerecord.errors.messages.odd" xml:space="preserve">
+<source xml:lang="en">doit être impair</source>
+<target xml:lang="fr">doit être impair</target>
+</trans-unit>
+<trans-unit id="73" resname="fr.activerecord.errors.messages.even" xml:space="preserve">
+<source xml:lang="en">doit être pair</source>
+<target xml:lang="fr">doit être pair</target>
+</trans-unit>
+<trans-unit id="74" resname="fr.activerecord.errors.messages.record_invalid" xml:space="preserve">
+<source xml:lang="en">La validation a échoué : <x id="1"/></source>
+<target xml:lang="fr">La validation a échoué : <x id="1"/></target>
+</trans-unit>
+</body>
+</file>
+</xliff>

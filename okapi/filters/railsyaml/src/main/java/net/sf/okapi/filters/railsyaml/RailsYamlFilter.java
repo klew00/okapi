@@ -326,6 +326,9 @@ public class RailsYamlFilter extends AbstractFilter {
 		String encoding = input.getEncoding();
 		isUtf8Bom = detector.hasUtf8Bom();
 		isUtf8Encoding = detector.hasUtf8Encoding();
+		if ( input.getInputURI() != null ) {
+			setDocumentName(input.getInputURI().getPath());
+		}
 		
 		setOptions(input.getSourceLocale(), input.getTargetLocale(), encoding, generateSkeleton);
 		

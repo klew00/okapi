@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -25,6 +25,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,6 +44,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class RailsYmlFilterTest {
+	
 	private RailsYamlFilter filter;
 	private String root;
 
@@ -62,6 +64,12 @@ public class RailsYmlFilterTest {
 		assertTrue(list.size() > 0);
 	}
 
+	@Test
+	public void testStartDocument () {
+		assertTrue("Problem in StartDocument", FilterTestDriver.testStartDocument(filter,
+			new InputDocument(root + "Test01.yml", null),
+			"UTF-8", LocaleId.ENGLISH, LocaleId.FRENCH));
+	}
 	@Test
 	public void testSimpleYaml() {
 		String snippet = "config:\n  title: \"My Rails Website\"";

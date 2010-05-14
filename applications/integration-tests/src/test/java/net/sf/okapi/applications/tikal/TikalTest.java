@@ -292,6 +292,19 @@ public class TikalTest {
     }
 
     @Test
+    public void testExtractMergeYAML () throws IOException, InterruptedException {
+    	// Delete previous output
+    	assertTrue(deleteOutputFile("yamltest.yml.xlf"));
+    	assertTrue(deleteOutputFile("yamltest.out.yml"));
+    	// Extract
+    	assertEquals(0, runTikal("-x -sl en -tl fr yamltest.yml -ie UTF-8")); // Auto-assign okf_railsyaml
+    	assertTrue("File different from gold", compareWithGoldFile("yamltest.yml.xlf", "windows-1252"));
+    	// Merge
+    	assertEquals(0, runTikal("-m -sl en -tl fr yamltest.yml.xlf -ie UTF-8")); // Auto-assign okf_railsyaml
+    	assertTrue("File different from gold", compareWithGoldFile("yamltest.out.yml", "UTF-8"));
+    }
+
+    @Test
     public void testImportExportPensieve () throws IOException, InterruptedException {
     	// Delete previous output
     	assertTrue(deleteOutputDir("pensieveTM.pentm", true));
