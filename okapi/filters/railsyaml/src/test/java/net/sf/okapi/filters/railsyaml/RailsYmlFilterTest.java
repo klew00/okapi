@@ -94,8 +94,9 @@ public class RailsYmlFilterTest {
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
 		list.add(new InputDocument(root + "Test01.yml", null));
 		list.add(new InputDocument(root + "Test02.yml", null));
+		list.add(new InputDocument(root + "Test03.yml", null));
 		RoundTripComparison rtc = new RoundTripComparison();
-		assertTrue(rtc.executeCompare(filter, list, "windows-1252", LocaleId.ENGLISH,
+		assertTrue(rtc.executeCompare(filter, list, "UTF-8", LocaleId.ENGLISH,
 				LocaleId.ENGLISH));
 	}
 
