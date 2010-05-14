@@ -34,7 +34,7 @@
         <module>json</module>
         <module>ttx</module>
         <module>vignette</module>
-        <module>railsyaml</module>
+<!--        <module>railsyaml</module>-->
 		<module>versifiedtxt</module>
     </modules>
 </project>
