@@ -579,7 +579,8 @@ public class XMLFilter implements IFilter {
 		if ( !node.hasChildNodes() ) tmp.append("/");
 		tmp.append(">");
 		// Set the inline code
-		Code code = frag.append(TagType.OPENING, node.getLocalName(), tmp.toString());
+		Code code = frag.append((node.hasChildNodes() ? TagType.OPENING : TagType.PLACEHOLDER),
+			node.getLocalName(), tmp.toString());
 		code.setReferenceFlag(id!=null); // Set reference flag if we created TU(s)
 	}
 

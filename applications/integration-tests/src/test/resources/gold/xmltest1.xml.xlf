@@ -18,8 +18,8 @@
 <target xml:lang="fr">Text &amp;=amp, &lt;=lt, >=gt, ]=cbracket, [=obracket</target>
 </trans-unit>
 <trans-unit id="5">
-<source xml:lang="en">Before <bx id="1"/> after.</source>
-<target xml:lang="fr">Before <bx id="1"/> after.</target>
+<source xml:lang="en">Before <x id="1"/> after.</source>
+<target xml:lang="fr">Before <x id="1"/> after.</target>
 </trans-unit>
 <trans-unit id="6">
 <source xml:lang="en">Text for p <g id="1"><x id="2"/></g> text for p again</source>

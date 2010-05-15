@@ -34,7 +34,6 @@ import com.crosslang.clgateway.ws.gateway.impl.ClGatewayPortBindingStub;
 
 import net.sf.okapi.common.Base64;
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.BaseConnector;
 import net.sf.okapi.lib.translation.QueryResult;

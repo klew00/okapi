@@ -28,9 +28,11 @@ import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -131,6 +133,50 @@ public class XMLFilterTest {
 		assertEquals("id1_d", tu.getName());
 	}
 
+	@Test
+	public void testEmptyElements () {
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc><its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "<its:withinTextRule selector=\"//c\" withinText=\"yes\"/>"
+			+ "</its:rules>"
+			+ "<p>t1<c/>t2</p>"
+			+ "<p>t1<c />t2</p>"
+			+ "<p>t1<c></c>t2</p>"
+			+ "</doc>";
+		ArrayList<Event> list = getEvents(snippet);
+		TextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		Code code = tu.getSource().getFirstContent().getCodes().get(0);
+		assertEquals(TagType.PLACEHOLDER, code.getTagType());
+		assertEquals("t1<1/>t2", fmt.setContent(tu.getSource().getFirstContent()).toString());
+		tu = FilterTestDriver.getTextUnit(list, 2);
+		assertEquals("t1<1/>t2", fmt.setContent(tu.getSource().getFirstContent()).toString());
+		tu = FilterTestDriver.getTextUnit(list, 3);
+		assertEquals("t1<1/>t2", fmt.setContent(tu.getSource().getFirstContent()).toString());
+	}
+
+	@Test
+	public void testOutputEmptyElements () {
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc><its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "<its:withinTextRule selector=\"//c\" withinText=\"yes\"/>"
+			+ "</its:rules>"
+			+ "<p>t1<c/>t2</p>"
+			+ "<p>t1<c />t2</p>"
+			+ "<p>t1<c></c>t2</p>"
+			+ "</doc>";
+		// Empty elements are re-written and empty
+		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			+ "<doc><its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "<its:withinTextRule selector=\"//c\" withinText=\"yes\"/>"
+			+ "</its:rules>"
+			+ "<p>t1<c/>t2</p>"
+			+ "<p>t1<c/>t2</p>"
+			+ "<p>t1<c/>t2</p>"
+			+ "</doc>";
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), locEN));
+	}
+	
 // Cannot test with internal rules, works with external only
 //	@Test
 //	public void testLineBreakAsCode () {
