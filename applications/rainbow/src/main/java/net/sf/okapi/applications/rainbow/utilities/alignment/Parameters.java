@@ -38,6 +38,8 @@ public class Parameters extends BaseParameters {
 	public String attributes;
 	public boolean useExclusion;
 	public String exclusion;
+	public boolean createTMXForUnknown;
+	public String tmxForUnknownPath;
 
 	public Parameters () {
 		reset();
@@ -46,6 +48,8 @@ public class Parameters extends BaseParameters {
 	public void reset () {
 		createTMX = true;
 		tmxPath = "";
+		createTMXForUnknown = false;
+		tmxForUnknownPath = "";
 		useTradosWorkarounds = true;
 		createTM = false;
 		tmPath = "";
@@ -77,6 +81,8 @@ public class Parameters extends BaseParameters {
 		attributes = buffer.getString("attributes", attributes);
 		useExclusion = buffer.getBoolean("useExclusion", useExclusion);
 		exclusion = buffer.getString("exclusion", exclusion);
+		createTMXForUnknown = buffer.getBoolean("createTMXForUnknown", createTMXForUnknown);
+		tmxForUnknownPath = buffer.getString("tmxForUnknownPath", tmxForUnknownPath);
 	}
 
 	public String toString () {
@@ -95,6 +101,8 @@ public class Parameters extends BaseParameters {
 		buffer.setString("attributes", attributes);
 		buffer.setBoolean("useExclusion", useExclusion);
 		buffer.setString("exclusion", exclusion);
+		buffer.setBoolean("createTMXForUnknown", createTMXForUnknown);
+		buffer.setString("tmxForUnknownPath", tmxForUnknownPath);
 		return buffer.toString();
 	}
 }

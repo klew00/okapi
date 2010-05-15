@@ -28,8 +28,9 @@ based on the identifiers of the text units. In addition, each text unit can be
 segmented and this utility provides a basic default alignment of the segments, 
 along with <a href="aligner.html">an <cite>Alignment Verification</cite> editor</a> to fix any issue within those segments.</p>
 <p><b>Warning:</b>
-This utility is designed to be used only with documents formats that provide identifiers 
-(e.g. Properties files). Text units without identifier will not be aligned.</p>
+This utility is designed to be used only with documents formats that provide 
+identifiers (e.g. Properties files). Text units without identifier will not be 
+aligned (but they can be output in a separate TMX file).</p>
 <p><b>Note:</b>
 The result of the alignment is generated in a single TMX document even when the 
 input is made of several input documents. You can use an attribute with the 
@@ -75,10 +76,17 @@ and target segments. The user is always prompted to confirm the modifications
 made by auto-correction.</p>
 <h3>Output Tab</h3>
 <h4>TMX Output</h4>
-<p><cite>Create a translation memory with the following path</cite> -- Set this 
-option to create a translation memory from the results of the alignment.</p>
+<p><cite>Create a TMX document with the aligned entries</cite> -- Set this 
+option to create a TMX document from the results of the alignment.</p>
 <p>Enter the full path of the TMX document where to put the results of the 
 alignment. If the document already exists it will be overwritten. You can use 
+the variable <code>${ProjDir}</code> 
+to specify the directory of the project.</p>
+<p><cite>Create a TMX document with the source entries not found</cite> -- Set this 
+option to create a TMX document with the source entries not found or skipped 
+during the alignment.</p>
+<p>Enter the full path of the TMX document where to put the entries not found or 
+skipped. If the document already exists it will be overwritten. You can use 
 the variable <code>${ProjDir}</code> 
 to specify the directory of the project.</p>
 <p><cite>Generate Trados workarounds</cite> -- Set this option to generate Trados-specific output in the TMX document. This non-standard notation is needed 

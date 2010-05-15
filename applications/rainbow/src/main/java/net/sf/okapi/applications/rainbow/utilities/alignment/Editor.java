@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -55,6 +55,9 @@ public class Editor implements IParametersEditor {
 	private Button chkCreateTMX;
 	private Text edTMXPath;
 	private Button btGetTMXPath;
+	private Button chkCreateTMXForUnknown;
+	private Text edTMXForUnknownPath;
+	private Button btGetTMXForUnknownPath;
 	private Button chkUseTradosWorkarounds;
 	private Button chkUseExclusion;
 	private Text edExclusion;
@@ -157,7 +160,7 @@ public class Editor implements IParametersEditor {
 		grpTmp.setLayoutData(gdTmp);
 		
 		chkCreateTMX = new Button(grpTmp, SWT.CHECK);
-		chkCreateTMX.setText("Create a TMX document with the following path:");
+		chkCreateTMX.setText("Create a TMX document with the aligned entries:");
 		gdTmp = new GridData();
 		gdTmp.horizontalSpan = 2;
 		chkCreateTMX.setLayoutData(gdTmp);
@@ -178,6 +181,31 @@ public class Editor implements IParametersEditor {
 					"TMX Documents (*.tmx)\tAll Files (*.*)",
 					"*.tmx\t*.*");
 				Utils.checkProjectDirAfterPick(path, edTMXPath, projectDir);				
+			}
+		});
+		
+		chkCreateTMXForUnknown = new Button(grpTmp, SWT.CHECK);
+		chkCreateTMXForUnknown.setText("Create a TMX document with the source entries not found:");
+		gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		chkCreateTMXForUnknown.setLayoutData(gdTmp);
+		chkCreateTMXForUnknown.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				updateTMXOptions();
+			}
+		});
+		
+		edTMXForUnknownPath = new Text(grpTmp, SWT.BORDER);
+		edTMXForUnknownPath.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		
+		btGetTMXForUnknownPath = new Button(grpTmp, SWT.PUSH);
+		btGetTMXForUnknownPath.setText("...");
+		btGetTMXForUnknownPath.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				String path = Dialogs.browseFilenamesForSave(shell, "TMX File", null,
+					"TMX Documents (*.tmx)\tAll Files (*.*)",
+					"*.tmx\t*.*");
+				Utils.checkProjectDirAfterPick(path, edTMXForUnknownPath, projectDir);				
 			}
 		});
 		
@@ -304,6 +332,9 @@ public class Editor implements IParametersEditor {
 		
 		chkCreateTMX.setSelection(params.createTMX);
 		edTMXPath.setText(params.tmxPath);
+		chkCreateTMXForUnknown.setSelection(params.createTMXForUnknown);
+		edTMXForUnknownPath.setText(params.tmxForUnknownPath);
+
 		edTMPath.setText(params.tmPath);
 		chkUseTradosWorkarounds.setSelection(params.useTradosWorkarounds);
 		chkUseExclusion.setSelection(params.useExclusion);
@@ -324,7 +355,9 @@ public class Editor implements IParametersEditor {
 	private void updateTMXOptions () {
 		edTMXPath.setEnabled(chkCreateTMX.getSelection());
 		btGetTMXPath.setEnabled(chkCreateTMX.getSelection());
-		chkUseTradosWorkarounds.setEnabled(chkCreateTMX.getSelection());
+		edTMXForUnknownPath.setEnabled(chkCreateTMXForUnknown.getSelection());
+		btGetTMXForUnknownPath.setEnabled(chkCreateTMXForUnknown.getSelection());
+		chkUseTradosWorkarounds.setEnabled(chkCreateTMX.getSelection() || chkCreateTMXForUnknown.getSelection());
 		edExclusion.setEnabled(chkUseExclusion.getSelection());
 	}
 	
@@ -355,6 +388,12 @@ public class Editor implements IParametersEditor {
 				return false;
 			}
 		}
+		if ( chkCreateTMXForUnknown.getSelection() ) {
+			if ( edTMXForUnknownPath.getText().length() == 0 ) {
+				Dialogs.showError(shell, "You must specify the path of the TMX document.", null);
+				return false;
+			}
+		}
 		// Check TM output
 		if ( chkCreateTM.getSelection() ) {
 			if ( edTMPath.getText().length() == 0 ) {
@@ -363,7 +402,7 @@ public class Editor implements IParametersEditor {
 			}
 		}
 		// Check that we have at least one output
-		if ( !chkCreateTMX.getSelection() && !chkCreateTM.getSelection() ) {
+		if ( !chkCreateTMX.getSelection() && !chkCreateTMXForUnknown.getSelection() && !chkCreateTM.getSelection() ) {
 			Dialogs.showError(shell, "You must specify at least one output.", null);
 			return false;
 		}
@@ -380,6 +419,19 @@ public class Editor implements IParametersEditor {
 		params.createTMX = chkCreateTMX.getSelection();
 		if ( params.createTMX ) {
 			params.tmxPath = edTMXPath.getText();
+			params.useTradosWorkarounds = chkUseTradosWorkarounds.getSelection();
+			params.useExclusion = chkUseExclusion.getSelection();
+			if ( params.useExclusion ) {
+				params.exclusion = edExclusion.getText();
+			}
+		}
+
+		params.createTMXForUnknown = chkCreateTMXForUnknown.getSelection();
+		if ( params.createTMXForUnknown ) {
+			params.tmxForUnknownPath = edTMXForUnknownPath.getText();
+		}
+		
+		if ( params.createTMX || params.createTMXForUnknown ) {
 			params.useTradosWorkarounds = chkUseTradosWorkarounds.getSelection();
 			params.useExclusion = chkUseExclusion.getSelection();
 			if ( params.useExclusion ) {

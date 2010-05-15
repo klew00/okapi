@@ -164,7 +164,7 @@ public class XMLFilterTest {
 			+ "<p>t1<c />t2</p>"
 			+ "<p>t1<c></c>t2</p>"
 			+ "</doc>";
-		// Empty elements are re-written and empty
+		// All empty elements are re-written as <elem/>
 		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 			+ "<doc><its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
 			+ "<its:withinTextRule selector=\"//c\" withinText=\"yes\"/>"

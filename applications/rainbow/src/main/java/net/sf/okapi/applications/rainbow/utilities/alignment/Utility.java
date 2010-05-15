@@ -46,6 +46,7 @@ public class Utility extends BaseFilterDrivenUtility {
 	private DbStoreBuilder dbStoreBuilder;
 	private DbStore dbStore;
 	private TMXWriter tmxWriter = null;
+	private TMXWriter tmxWriterForUnknown = null;
 	private Database simpleTm = null;
 	private IFilter trgFilter;
 	private ISegmenter srcSeg;
@@ -63,7 +64,6 @@ public class Utility extends BaseFilterDrivenUtility {
 	private int targetCount;
 	private Map<String, String> originalAttributes;
 	private Map<String, String> assignedAttributes;
-	private String resolvedTmxPath;
 
 	public Utility () {
 		params = new Parameters();
@@ -96,10 +96,20 @@ public class Utility extends BaseFilterDrivenUtility {
 				tmxWriter.close();
 				tmxWriter = null;
 			}
-            resolvedTmxPath = params.tmxPath.replace(VAR_PROJDIR, projectDir);
-            tmxWriter = new TMXWriter(resolvedTmxPath);
+            tmxWriter = new TMXWriter(params.tmxPath.replace(VAR_PROJDIR, projectDir));
 			tmxWriter.setTradosWorkarounds(params.useTradosWorkarounds);
 			tmxWriter.writeStartDocument(srcLang, trgLang,
+				getName(), null, (params.segment ? "sentence" : "paragraph"),
+				null, null);
+		}
+		if ( params.createTMXForUnknown ) {
+			if ( tmxWriterForUnknown != null ) {
+				tmxWriterForUnknown.close();
+				tmxWriterForUnknown = null;
+			}
+            tmxWriterForUnknown = new TMXWriter(params.tmxForUnknownPath.replace(VAR_PROJDIR, projectDir));
+			tmxWriterForUnknown.setTradosWorkarounds(params.useTradosWorkarounds);
+			tmxWriterForUnknown.writeStartDocument(srcLang, trgLang,
 				getName(), null, (params.segment ? "sentence" : "paragraph"),
 				null, null);
 		}
@@ -120,10 +130,20 @@ public class Utility extends BaseFilterDrivenUtility {
 		
 		// Prepare exclusion pattern if needed
 		if ( params.useExclusion ) {
-			tmxWriter.setExclusionOption(params.exclusion);
+			if ( tmxWriter != null ) {
+				tmxWriter.setExclusionOption(params.exclusion);
+			}
+			if ( tmxWriterForUnknown != null ) {
+				tmxWriterForUnknown.setExclusionOption(params.exclusion);
+			}
 		}
 		else {
-			tmxWriter.setExclusionOption(null);
+			if ( tmxWriter != null ) {
+				tmxWriter.setExclusionOption(null);
+			}
+			if ( tmxWriterForUnknown != null ) {
+				tmxWriterForUnknown.setExclusionOption(null);
+			}
 		}
 		
 		// Prepare the db store
@@ -157,6 +177,11 @@ public class Utility extends BaseFilterDrivenUtility {
 			tmxWriter.writeEndDocument();
 			tmxWriter.close();
 			tmxWriter = null;
+		}
+		if ( tmxWriterForUnknown != null ) {
+			tmxWriterForUnknown.writeEndDocument();
+			tmxWriterForUnknown.close();
+			tmxWriterForUnknown = null;
 		}
 		if ( simpleTm != null ) {
 			simpleTm.close();
@@ -197,7 +222,14 @@ public class Utility extends BaseFilterDrivenUtility {
 
 	@Override
 	public String getFolderAfterProcess () {
-		return Util.getDirectoryName(resolvedTmxPath);
+		if ( params.createTMX ) {
+			return Util.getDirectoryName(params.tmxPath.replace(VAR_PROJDIR, projectDir));
+		}
+		if ( params.createTM ) {
+			return Util.getDirectoryName(params.tmPath.replace(VAR_PROJDIR, projectDir));
+		}
+		// Else
+		return Util.getDirectoryName(params.tmxForUnknownPath.replace(VAR_PROJDIR, projectDir));
 	}
 
 	public Event handleEvent (Event event) {
@@ -339,8 +371,16 @@ public class Utility extends BaseFilterDrivenUtility {
 				break;
 			}
 		}
+		
 		// Else: track the item not aligned
-		logger.info("Not aligned: "+tu.getName());
+		if ( !stopProcess ) {
+			logger.info("Not aligned: "+tu.getName());
+			if ( tmxWriterForUnknown != null ) {
+				tu.removeTarget(trgLang); // Write empty target
+				tmxWriterForUnknown.writeItem(tu, assignedAttributes);
+			}
+		}
+		
 	}
 	
 }

@@ -269,9 +269,12 @@ public class TMXWriter {
 		for ( Segment srcSeg : srcTC.getSegments() ) {
     		i++;
     		TextFragment tf = srcSeg.text;
-			Segment trgSeg = trgTC.getSegments().get(srcSeg.id);
+			Segment trgSeg = null;
+			if ( trgTC != null ) {
+				trgSeg = trgTC.getSegments().get(srcSeg.id);
+			}
 			if ( trgSeg == null ) {
-				// No corresponding target: skip it
+	       		writeTU(tf, null, String.format("%s_s%s", tuid, srcSeg.id), attributes);
 				continue;
 			}
     		if ( scores != null ) { // If the TU is scored
