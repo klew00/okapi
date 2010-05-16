@@ -325,7 +325,7 @@ public final class BOMNewlineEncodingDetector {
 	 * 
 	 * @return true if the encoding is obvious from the BOM or bytes, false if the encoding must be guessed.
 	 */
-	public boolean isDifinitive() {
+	public boolean isDefinitive() {
 		return definitive;
 	}
 

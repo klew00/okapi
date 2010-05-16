@@ -222,7 +222,7 @@ public interface IFilterConfigurationMapper extends IParametersEditorMapper {
 	 * The new configuration is <b>not</b> added to the current list.
 	 * @param baseConfig the base configuration from which to base the new one.
 	 * @return a new {@link FilterConfiguration} object set with some
-	 * default values. 
+	 * default values, or null if the configuration could not be created. 
 	 */
 	public FilterConfiguration createCustomConfiguration (FilterConfiguration baseConfig);
 

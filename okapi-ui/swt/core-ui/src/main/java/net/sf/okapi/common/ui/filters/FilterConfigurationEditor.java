@@ -20,6 +20,8 @@
 
 package net.sf.okapi.common.ui.filters;
 
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 
 import net.sf.okapi.common.BaseContext;
@@ -57,9 +59,16 @@ public class FilterConfigurationEditor implements IFilterConfigurationEditor {
 				"Cannot find the configuration for '%s'.", configId));
 		}
 		IParameters params = fcMapper.getParameters(config, cachedFilter);
-		if ( params == null ) {
-			throw new RuntimeException(String.format(
-				"Cannot load parameters for '%s'.", config.configId));
+		if ( params == null ) { // No parameter for this filter
+			Shell shell = null;
+			if (( parent != null ) && ( parent instanceof Shell )) {
+				shell = (Shell)parent;
+			}
+			MessageBox dlg = new MessageBox(shell, SWT.ICON_INFORMATION);
+			dlg.setMessage("This filter has no parameters to edit.");
+			dlg.setText("Information");
+			dlg.open();
+			return true;
 		}
 
 		IParametersEditor editor = fcMapper.createConfigurationEditor(configId, cachedFilter);

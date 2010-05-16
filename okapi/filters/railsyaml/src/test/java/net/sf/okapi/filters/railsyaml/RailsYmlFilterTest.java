@@ -70,6 +70,7 @@ public class RailsYmlFilterTest {
 			new InputDocument(root + "Test01.yml", null),
 			"UTF-8", LocaleId.ENGLISH, LocaleId.FRENCH));
 	}
+
 	@Test
 	public void testSimpleYaml() {
 		String snippet = "config:\n  title: \"My Rails Website\"";

@@ -4,7 +4,7 @@
 Okapi Handbook
 
 |v1
-Book 1
+Book 1 - test é=eacute
 
 |v2
 Test Okapi

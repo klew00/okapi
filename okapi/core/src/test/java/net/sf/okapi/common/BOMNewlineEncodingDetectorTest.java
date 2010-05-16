@@ -50,12 +50,12 @@ public class BOMNewlineEncodingDetectorTest {
 	public void isDefinitve() throws IOException {
 		InputStream is = new ByteArrayInputStream(DEFINITIVE.getBytes("UTF-16LE"));
 		BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(is, "UTF-16LE");
-		assertTrue(detector.isDifinitive());
+		assertTrue(detector.isDefinitive());
 		
 		is = new ByteArrayInputStream(NON_DEFINITIVE.getBytes("UTF-8"));
 		detector = new BOMNewlineEncodingDetector(is, "UTF-8");
 		detector.detectBom();
-		assertFalse(detector.isDifinitive());
+		assertFalse(detector.isDefinitive());
 	}
 
 	@Test

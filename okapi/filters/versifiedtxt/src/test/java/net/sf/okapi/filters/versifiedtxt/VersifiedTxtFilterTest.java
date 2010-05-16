@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.FilterTestDriver;
@@ -62,9 +61,16 @@ public class VersifiedTxtFilterTest {
 	}
 	
 	@Test
+	public void testStartDocument () {
+		assertTrue("Problem in StartDocument", FilterTestDriver.testStartDocument(filter,
+			new InputDocument(root + "part1.txt", null),
+			"UTF-8", LocaleId.ENGLISH, LocaleId.FRENCH));
+	}
+
+	@Test
 	public void testSimpleVerse() {
 		String snippet = "|v1\nThis is a test.";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, null), 1);
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
 		assertEquals("This is a test.\n", tu.getSource().toString());
 		assertEquals("::1", tu.getName());
@@ -73,16 +79,35 @@ public class VersifiedTxtFilterTest {
 	@Test
 	public void testSimpleBookChapterVerse() {
 		String snippet = "|bbook\n|cchapter\n|v1\nThis is a test.";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, null), 1);
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
 		assertEquals("This is a test.\n", tu.getSource().toString());
 		assertEquals("book:chapter:1", tu.getName());
 	}
 	
+// Line-break types not supported currently
+//	@Test
+//	public void testOutputSimpleBookChapterVerseWithMacLB () {
+//		String snippet = "|bbook\r|cchapter\r|v1\rThis is a test.\r";
+//		String expected = "|bbook\r|cchapter\r|v1\rThis is a test.\r";
+//		String result = FilterTestDriver.generateOutput(getEvents(snippet),
+//			filter.getEncoderManager(), LocaleId.ENGLISH);
+//		assertEquals(result, expected);
+//	}
+
+	@Test
+	public void testOutputSimpleBookChapterVerse () {
+		String snippet = "|bbook\n|cchapter\n|v1\nThis is a test.";
+		String expected = "|bbook\n|cchapter\n|v1\nThis is a test.\n"; // Extra LB on output
+		String result = FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), LocaleId.ENGLISH);
+		assertEquals(result, expected);
+	}
+
 	@Test
 	public void testSimplePlaceholders() {
 		String snippet = "|bbook\n|cchapter\n|v1\n{1}This is {2}a test{3}";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, null), 1);
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
 		assertEquals("{1}This is {2}a test{3}\n", tu.getSource().toString());
 		assertEquals("book:chapter:1", tu.getName());
@@ -104,7 +129,7 @@ public class VersifiedTxtFilterTest {
 		filter.close();
 	}
 	
-	private ArrayList<Event> getEvents(String snippet, IParameters params) {
+	private ArrayList<Event> getEvents (String snippet) {
 		ArrayList<Event> list = new ArrayList<Event>();		
 		filter.open(new RawDocument(snippet, LocaleId.ENGLISH));
 		while (filter.hasNext()) {

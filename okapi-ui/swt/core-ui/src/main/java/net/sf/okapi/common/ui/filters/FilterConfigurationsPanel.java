@@ -302,8 +302,11 @@ public class FilterConfigurationsPanel extends Composite {
 
 			FilterConfiguration newConfig = mapper.createCustomConfiguration(baseConfig);
 			if ( newConfig == null ) {
-				throw new Exception(String.format(Res.getString("FilterConfigurationsPanel.cannotCreateConfig"), //$NON-NLS-1$
-					baseConfig.configId));
+				MessageBox dlg = new MessageBox(getShell(), SWT.ICON_INFORMATION);
+				dlg.setMessage("This filter has no parameters.");
+				dlg.setText("Information");
+				dlg.open();
+				return;
 			}
 			
 			// Edit the configuration info

@@ -720,7 +720,6 @@ public class FilterTestDriver {
 				assertNotNull("ID is null", sd.getId());
 				assertNotNull("Language is null", sd.getLocale());
 				assertNotNull("Linebreak is null", sd.getLineBreak());
-				assertNotNull("Filter Parameters is null", sd.getFilterParameters());
 				assertNotNull("FilterWriter is null", sd.getFilterWriter());
 				assertNotNull("Mime type is null", sd.getMimeType());
 				return true;

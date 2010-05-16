@@ -120,6 +120,8 @@
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi/filters/ts/target/classes"
 			 excludes="**/META-INF/**"/>
+			<fileset dir="../../okapi/filters/versifiedtxt/target/classes"
+			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi/filters/vignette/target/classes"
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi/filters/xliff/target/classes"

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -98,7 +98,8 @@ public interface IFilter {
 
 	/**
 	 * Gets the current parameters for this filter.
-	 * @return The current parameters for this filter.
+	 * @return The current parameters for this filter, or null if this filter
+	 * has no parameters.
 	 */
 	public IParameters getParameters ();
 

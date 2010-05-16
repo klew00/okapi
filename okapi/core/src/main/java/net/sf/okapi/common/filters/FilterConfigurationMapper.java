@@ -201,8 +201,7 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 		IFilter filter = instantiateFilter(config, existingFilter);
 		IParameters params = filter.getParameters();
 		if ( params == null ) {
-			throw new RuntimeException(String.format(
-				"Cannot create default parameters for '%s'.", config.configId));
+			return null; // No parameters for this filter
 		}
 		if ( config.parametersLocation == null ) {
 			return params; // Default parameters for the null location
@@ -388,6 +387,9 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 		// Instantiate a filter and set the new parameters based on the base ones
 		IFilter filter = instantiateFilter(baseConfig, null);
 		IParameters baseParams = getParameters(baseConfig, filter);
+		if ( baseParams == null ) { // Filter without parameters
+			return null;
+		}
 		IParameters newParams = filter.getParameters();
 		newParams.fromString(baseParams.toString());
 		// Make sure to reset the path, the save function should set it

@@ -296,44 +296,8 @@ public class FilterConfigSelectionPanel extends Composite {
 			FilterConfiguration config = mapper.getConfiguration(configId);
 			if ( config == null ) return;
 			cachedFilter = mapper.createFilter(config.configId, cachedFilter);
-			
 			IFilterConfigurationEditor editor = new FilterConfigurationEditor();
 			editor.editConfiguration(configId, mapper, cachedFilter, getShell());
-
-// Replaced by IFilterConfigurationEditor
-//			IParametersEditor editor = mapper.createConfigurationEditor(config.configId, cachedFilter);
-//			IParameters params = mapper.getParameters(config, cachedFilter);
-//			
-//			// Call the editor
-//			if ( editor == null ) {
-//				// Try to see if we can edit with the generic editor
-//				IEditorDescriptionProvider descProv = mapper.getDescriptionProvider(params.getClass().getCanonicalName());
-//				if ( descProv != null ) {
-//					if ( genEditor == null ) genEditor = new GenericEditor();
-//					// Edit the data
-//					if ( !genEditor.edit(params, descProv, !config.custom, context) ) return; // Cancel
-//					// The params object gets updated if edit not canceled.
-//				}
-//				else { // Else: fall back to the plain text editor
-//					InputDialog dlg  = new InputDialog(getShell(),
-//						String.format(Res.getString("FilterConfigSelectionPanel.parametersCaption"), config.configId), //$NON-NLS-1$
-//						Res.getString("FilterConfigSelectionPanel.parametersLabel"), //$NON-NLS-1$
-//						params.toString(), null, 0, 200, 600);
-//					dlg.setReadOnly(!config.custom); // Pre-defined configurations should be read-only
-//					String data = dlg.showDialog();
-//					if ( data == null ) return;
-//					if ( !config.custom ) return; // Don't save pre-defined parameters
-//					data = data.replace("\r\n", "\n"); //$NON-NLS-1$ //$NON-NLS-2$
-//					params.fromString(data.replace("\r", "\n")); //$NON-NLS-1$ //$NON-NLS-2$
-//				}
-//			}
-//			else {
-//				if ( !editor.edit(params, !config.custom, context) ) return;
-//			}
-//			// Don't try to save pre-defined parameters
-//			if ( !config.custom ) return;
-//			// Else save the modified parameters to custom storage
-//			mapper.saveCustomParameters(config, params);
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(getShell(), e.getMessage(), null);
@@ -346,11 +310,13 @@ public class FilterConfigSelectionPanel extends Composite {
 			if ( baseConfigId == null ) return;
 			FilterConfiguration baseConfig = mapper.getConfiguration(baseConfigId);
 			if ( baseConfig == null ) return;
-
 			FilterConfiguration newConfig = mapper.createCustomConfiguration(baseConfig);
 			if ( newConfig == null ) {
-				throw new Exception(String.format(Res.getString("FilterConfigSelectionPanel.cannotCreateConfig"), //$NON-NLS-1$
-					baseConfig.configId));
+				MessageBox dlg = new MessageBox(getShell(), SWT.ICON_INFORMATION);
+				dlg.setMessage("This filter has no parameters.");
+				dlg.setText("Information");
+				dlg.open();
+				return;
 			}
 			
 			// Edit the configuration info
@@ -371,7 +337,7 @@ public class FilterConfigSelectionPanel extends Composite {
 			editParameters();
 		}
 		catch ( Throwable e ) {
-			Dialogs.showError(getShell(), e.getMessage(), null);
+			Dialogs.showError(getShell(), "Error while creating or editing the new configuration. " + e.getMessage(), null);
 		}
 	}
 

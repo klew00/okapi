@@ -76,7 +76,9 @@ public class VersifiedTextFilter extends AbstractFilter {
 		
 		setMimeType(VERSIFIED_TXT_MIME_TYPE);
 		setFilterWriter(createFilterWriter());
-		setName("okf_versified_txt"); //$NON-NLS-1$
+		// Cannot use '_' or '-' in name: conflicts with other filters (e.g. plaintext, table)
+		// for defining different configurations
+		setName("okf_versifiedtxt"); //$NON-NLS-1$
 		setDisplayName("Versified Text Filter"); //$NON-NLS-1$
 		addConfiguration(new FilterConfiguration(getName(), VERSIFIED_TXT_MIME_TYPE, getClass()
 				.getName(), "Versified Text", "LDS Versified Text Documents"));
@@ -113,12 +115,12 @@ public class VersifiedTextFilter extends AbstractFilter {
 		String detectedEncoding = getEncoding();
 
 		// may need to override encoding based on what we detect
-		if (detector.isDifinitive()) {
+		if (detector.isDefinitive()) {
 			detectedEncoding = detector.getEncoding();
 			LOGGER.log(Level.FINE, String.format(
 					"Overridding user set encoding (if any). Setting auto-detected encoding (%s).",
 					detectedEncoding));
-		} else if (!detector.isDifinitive() && getEncoding().equals(RawDocument.UNKOWN_ENCODING)) {
+		} else if (!detector.isDefinitive() && getEncoding().equals(RawDocument.UNKOWN_ENCODING)) {
 			detectedEncoding = detector.getEncoding();
 			LOGGER.log(Level.FINE, String.format(
 					"Default encoding and detected encoding not found. Using best guess encoding (%s)",

@@ -177,8 +177,11 @@ public class Merger {
 			// Load the relevant filter
 			inpFilter = mapper.createFilter(item.getFilterID(), inpFilter);
 			IParameters params = inpFilter.getParameters();
-			File file = new File(paramsFile);
-			params.load(file.toURI(), false);
+			// Load them only if the filter has parameters
+			if ( params != null ) {
+				File file = new File(paramsFile);
+				params.load(file.toURI(), false);
+			}
 
 			reader.openDocument(fileToMerge, manifest.getSourceLanguage(), manifest.getTargetLanguage());
 			
