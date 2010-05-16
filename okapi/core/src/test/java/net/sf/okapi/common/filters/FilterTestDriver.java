@@ -46,7 +46,7 @@ import net.sf.okapi.common.resource.INameable;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Segment;
-import net.sf.okapi.common.resource.Segments;
+import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubDocument;
@@ -1070,8 +1070,8 @@ public class FilterTestDriver {
 				System.err.println("isSegmented difference");
 				return false;
 			}
-			Segments t1Segments = t1.getSegments();
-			Segments t2Segments = t2.getSegments(); 
+			ISegments t1Segments = t1.getSegments();
+			ISegments t2Segments = t2.getSegments(); 
 			if ( t1Segments.count() != t2Segments.count() ) {
 				System.err.println("Number of segments difference");
 				return false;

@@ -42,7 +42,7 @@ import net.sf.okapi.common.filterwriter.TMXContent;
 import net.sf.okapi.common.filterwriter.XLIFFContent;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Segment;
-import net.sf.okapi.common.resource.Segments;
+import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
@@ -297,7 +297,7 @@ public class TableFilterWriter implements IFilterWriter {
 		}
 		// If we do have the same number of segments:
 		// Output each of them
-		Segments trgSegs = trgCont.getSegments();
+		ISegments trgSegs = trgCont.getSegments();
 		for ( Segment srcSeg : srcCont.getSegments() ) {
 			Segment trgSeg = trgSegs.get(srcSeg.id);
 			if ( trgSeg == null ) {

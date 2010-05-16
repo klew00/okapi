@@ -30,7 +30,7 @@ import net.sf.okapi.common.filterwriter.TMXWriter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.Segment;
-import net.sf.okapi.common.resource.Segments;
+import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
@@ -314,7 +314,7 @@ public abstract class BaseWriter implements IWriter {
 		TextContainer altCont = tu.getTarget(trgLoc);
 		if ( altCont != null ) {
 			// From the segments
-			Segments srcSegs = tu.getSource().getSegments();
+			ISegments srcSegs = tu.getSource().getSegments();
 			for ( Segment seg : altCont.getSegments() ) {
 				Segment srcSeg = srcSegs.get(seg.id);
 				if ( srcSeg == null ) continue;

@@ -31,7 +31,7 @@ import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Segment;
-import net.sf.okapi.common.resource.Segments;
+import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
@@ -158,7 +158,7 @@ public class PensieveFilterWriter implements IFilterWriter {
 		}
 
 		// Index each segment
-		Segments trgSegs = trgCont.getSegments();
+		ISegments trgSegs = trgCont.getSegments();
 		for ( Segment srcSeg :srcCont.getSegments() ) {
 			Segment trgSeg = trgSegs.get(srcSeg.id);
 			// Skip entries with no target match

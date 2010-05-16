@@ -32,7 +32,7 @@ import net.sf.okapi.common.Range;
 import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filterwriter.GenericContent;
-import net.sf.okapi.common.resource.Segments;
+import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
@@ -88,7 +88,7 @@ public class SegmentationTest {
 	@Test
 	public void testGetSegments () {
 		TextContainer tc = createSegmentedContainer();
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		assertEquals("<s>Part 1.</s>", segments.get(0).toString());
 		assertEquals(" Part 2.", segments.get(1).toString());
 		assertEquals("[<1>Part 1.</1>] Outside[ Part 2.]", fmt.printSegmentedContent(tc, true));
@@ -97,7 +97,7 @@ public class SegmentationTest {
 	@Test
 	public void testMergeOneSegment () {
 		TextContainer tc = createSegmentedContainer();
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		assertEquals("[<1>Part 1.</1>] Outside[ Part 2.]", fmt.printSegmentedContent(tc, true));
 		tc.changePart(2);
 		assertEquals(1, segments.count());
@@ -120,7 +120,7 @@ public class SegmentationTest {
 	@Test
 	public void testJoinTwoSegmentsIntoOne () {
 		TextContainer tc = createSegmentedContainer();
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		segments.joinWithNext(0);
 		assertEquals(1, segments.count());
 		assertTrue(tc.contentIsOneSegment());
@@ -131,7 +131,7 @@ public class SegmentationTest {
 	@Test
 	public void testMergeAllSegments () {
 		TextContainer tc = createSegmentedContainer();
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		segments.joinAll();
 		assertEquals(1, segments.count());
 		assertTrue(tc.contentIsOneSegment());
@@ -142,7 +142,7 @@ public class SegmentationTest {
 	@Test
 	public void testCreateSegment () {
 		TextContainer tc = createSegmentedContainer();
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		// "**Part 1.** Outside Part2."
 		//  01234567890123456789012345"
 		segments.create(11, 19);
@@ -154,7 +154,7 @@ public class SegmentationTest {
 	@Test
 	public void testAppendSegment () {
 		TextContainer tc = createSegmentedContainer();
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		segments.append(new TextFragment(" Added Part."));
 		assertEquals(3, segments.count());
 		assertEquals(" Added Part.", segments.get(2).toString());
@@ -163,7 +163,7 @@ public class SegmentationTest {
 	@Test
 	public void testSegmentationSimple1 () {
 		TextContainer tc = createSegmentedContainer("a. z", segmenter);
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		assertEquals(2, segments.count());
 		assertEquals("a.", segments.get(0).toString());
 		assertEquals(" z", segments.get(1).toString());
@@ -177,7 +177,7 @@ public class SegmentationTest {
 	@Test
 	public void testSegmentationSimpleWithLeadingTrainlingWS () {
 		TextContainer tc = createSegmentedContainer(" a.  ", segmenter);
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		assertEquals(2, segments.count());
 		assertEquals(" a.", segments.get(0).toString());
 		assertEquals("  ", segments.get(1).toString());
@@ -191,7 +191,7 @@ public class SegmentationTest {
 	@Test
 	public void testSegmentationWithEmpty () {
 		TextContainer tc = createSegmentedContainer(" a. | b.", segmenter);
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		assertEquals(3, segments.count());
 		assertEquals(" a.", segments.get(0).toString());
 		assertEquals(" |", segments.get(1).toString());
@@ -300,7 +300,7 @@ public class SegmentationTest {
 		// Check the FR against the source
 		Segment srcSeg;
 		tu.synchronizeSourceSegmentation(locFR);
-		Segments segs = tu.getSource().getSegments();
+		ISegments segs = tu.getSource().getSegments();
 		for ( Segment seg : tc1.getSegments() ) {
 			srcSeg = segs.get(seg.id);
 			assertNotNull(srcSeg);

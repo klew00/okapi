@@ -24,7 +24,7 @@ import net.sf.okapi.common.ISegmenter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Range;
 import net.sf.okapi.common.resource.Segment;
-import net.sf.okapi.common.resource.Segments;
+import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
@@ -60,7 +60,7 @@ public class Main {
 			tf.append(" Part 3.");
 			TextContainer tc = new TextContainer(tf);
 			segmenter.computeSegments(tc);
-			Segments segs = tc.getSegments();
+			ISegments segs = tc.getSegments();
 			segs.create(segmenter.getRanges());
 			for ( Segment seg : segs ) {
 				System.out.println("segment=[" + seg.toString() + "]");

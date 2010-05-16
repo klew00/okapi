@@ -28,7 +28,7 @@ import net.sf.okapi.common.resource.INameable;
 import net.sf.okapi.common.resource.IReferenceable;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.Segment;
-import net.sf.okapi.common.resource.Segments;
+import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextPart;
@@ -246,7 +246,7 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 		// The output is driven by the target, not the source, so the interstices parts
 		// are the ones of the target, no the one of the source
 		int scoreIndex = -1;
-		Segments srcSegs = srcCont.getSegments();
+		ISegments srcSegs = srcCont.getSegments();
 		for ( TextPart part : trgCont ) {
 			if ( part.isSegment() ) {
 				scoreIndex++;

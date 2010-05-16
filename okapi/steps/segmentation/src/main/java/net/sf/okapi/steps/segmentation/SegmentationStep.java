@@ -33,7 +33,7 @@ import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.Segment;
-import net.sf.okapi.common.resource.Segments;
+import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.segmentation.SRXDocument;
@@ -163,7 +163,7 @@ public class SegmentationStep extends BasePipelineStep {
 			}
 			// Otherwise make sure we have matches
 			else {
-				Segments trgSegs = trgCont.getSegments();
+				ISegments trgSegs = trgCont.getSegments();
 				for ( Segment seg : tu.getSource().getSegments() ) {
 					if ( trgSegs.get(seg.id) == null ) {
 						// No target segment matching source segment seg.id

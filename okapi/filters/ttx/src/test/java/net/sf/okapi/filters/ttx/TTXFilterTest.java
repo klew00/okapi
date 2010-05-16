@@ -27,7 +27,7 @@ import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.resource.Segments;
+import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.filters.FilterTestDriver;
@@ -94,7 +94,7 @@ public class TTXFilterTest {
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(filter1, snippet, locESEM), 1);
 		assertNotNull(tu);
 		TextContainer cont = tu.getSource();
-		Segments segments = cont.getSegments();
+		ISegments segments = cont.getSegments();
 		assertEquals(1, segments.count());
 		assertEquals("en1", segments.get(0).toString());
 		segments = tu.getTarget(locESEM).getSegments();
@@ -117,7 +117,7 @@ public class TTXFilterTest {
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(filter1, snippet, locESEM), 1);
 		assertNotNull(tu);
 		TextContainer cont = tu.getSource();
-		Segments segments = cont.getSegments();
+		ISegments segments = cont.getSegments();
 		assertEquals(1, segments.count());
 		assertEquals("en1", segments.get(0).toString());
 		segments = tu.getTarget(locESEM).getSegments();
@@ -577,7 +577,7 @@ public class TTXFilterTest {
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(filter1, snippet, locESEM), 1);
 		assertNotNull(tu);
 		TextContainer cont = tu.getSource();
-		Segments segments = cont.getSegments();
+		ISegments segments = cont.getSegments();
 		assertEquals(1, segments.count());
 		segments.joinAll();
 		assertEquals("text en", cont.toString());
@@ -597,7 +597,7 @@ public class TTXFilterTest {
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(filter1, snippet, locESEM), 1);
 		assertNotNull(tu);
 		TextContainer cont = tu.getSource();
-		Segments segments = cont.getSegments();
+		ISegments segments = cont.getSegments();
 		assertEquals(2, segments.count());
 		assertEquals("text1 en", segments.get(0).text.toString());
 		assertEquals("text2 en", segments.get(1).text.toString());
@@ -634,7 +634,7 @@ public class TTXFilterTest {
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(filter1, snippet, locESEM), 1);
 		assertNotNull(tu);
 		TextContainer cont = tu.getSource();
-		Segments segments = cont.getSegments();
+		ISegments segments = cont.getSegments();
 		assertEquals(1, segments.count());
 		assertEquals("text <br/>en <b>bold</b>.", segments.get(0).text.toString());
 		assertEquals("text <1/>en <2>bold</2>.", fmt.setContent(segments.get(0).text).toString());

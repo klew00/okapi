@@ -22,7 +22,7 @@ package net.okapi.steps.codesremoval;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.filterwriter.GenericContent;
-import net.sf.okapi.common.resource.Segments;
+import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
@@ -104,7 +104,7 @@ public class CodesRemoverTest {
 		params = new Parameters();
 		remover = new CodesRemover(params, LocaleId.SPANISH);
 		TextContainer tc = new TextContainer();
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		tc.append("C1"); // Becomes segment
 		segments.append(createSimpleFragment());
 		tc.append("C2");

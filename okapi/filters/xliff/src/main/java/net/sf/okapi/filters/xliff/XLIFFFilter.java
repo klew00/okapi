@@ -58,7 +58,7 @@ import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.Segment;
-import net.sf.okapi.common.resource.Segments;
+import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubDocument;
@@ -921,7 +921,7 @@ public class XLIFFFilter implements IFilter {
 		try {
 			boolean changeFirstPart = false;
 			content = new TextContainer();
-			Segments segments = content.getSegments();
+			ISegments segments = content.getSegments();
 			int id = 0;
 			Stack<Integer> idStack = new Stack<Integer>();
 			idStack.push(id);

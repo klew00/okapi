@@ -32,7 +32,7 @@ import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.InvalidContentException;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.Segment;
-import net.sf.okapi.common.resource.Segments;
+import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
@@ -1015,7 +1015,7 @@ public class Aligner {
 			
 			// Sanity check using common anchors
 			int i = 0;
-			Segments trgSegs = target.getSegments();
+			ISegments trgSegs = target.getSegments();
 			for ( Segment srcSeg : source.getSegments() ) {
 				// Normally we would use srcSeg.id, but the class works based on segment index not id
 				Segment trgSeg = trgSegs.get(i);
@@ -1107,8 +1107,8 @@ public class Aligner {
 		int n = trgList.getSelectionIndex();
 		if ( n == -1 ) n = 0;
 		try {
-			Segments sourceSegments = source.getSegments();
-			Segments targetSegments = target.getSegments();
+			ISegments sourceSegments = source.getSegments();
+			ISegments targetSegments = target.getSegments();
 			
 			int lastMatch = -1;
 			int trgStart = 0;

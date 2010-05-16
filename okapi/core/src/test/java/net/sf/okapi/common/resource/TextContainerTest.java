@@ -76,7 +76,7 @@ public class TextContainerTest {
     public void testTextSegmentConstructor () {
     	Segment seg = new Segment("qwerty", new TextFragment("xyz"));
 		TextContainer tc = new TextContainer(seg);
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		assertFalse(tc.hasBeenSegmented());
 		assertTrue(tc.contentIsOneSegment());
 		assertEquals("xyz", tc.getFirstContent().toString());
@@ -89,7 +89,7 @@ public class TextContainerTest {
     	Segment seg = new Segment(null, null);
     	seg.text = null;
 		TextContainer tc = new TextContainer(seg);
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		assertFalse(tc.hasBeenSegmented());
 		assertTrue(tc.contentIsOneSegment());
 		assertEquals("", tc.getFirstContent().toString());
@@ -103,7 +103,7 @@ public class TextContainerTest {
 		tf.append(TagType.PLACEHOLDER, "BR", "<br/>");
 		tf.append(".");
 		TextContainer tc = new TextContainer(tf);
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		assertEquals(1, segments.count());
 		assertEquals("<br/>.", segments.get(0).toString());
 	}
@@ -113,7 +113,7 @@ public class TextContainerTest {
 		TextFragment tf = new TextFragment();
 		tf.append(TagType.PLACEHOLDER, "BR", "<br/>");
 		TextContainer tc = new TextContainer(tf);
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		assertEquals(1, segments.count());
 		assertEquals("<br/>", segments.get(0).toString());
 	}
@@ -148,7 +148,7 @@ public class TextContainerTest {
 			Segment seg = iter.next();
 			assertEquals("[s1]", seg.text.toString());
 		}
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		segments.append(new TextFragment("[s2]"));
 		segments.append(new TextFragment("[s3]"));
 		segments.append(new TextFragment("[s4]"));
@@ -166,7 +166,7 @@ public class TextContainerTest {
 		tf.append(TagType.PLACEHOLDER, "BR1", "<br1/>");
 		tf.append(TagType.PLACEHOLDER, "BR2", "<br2/>");
 		TextContainer tc = new TextContainer(tf);
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		assertEquals(1, segments.count());
 		assertEquals("<br1/><br2/>", segments.get(0).toString());
 	}
@@ -174,7 +174,7 @@ public class TextContainerTest {
 	@Test
 	public void testHasBeenSegmented () {
 		TextContainer tc = new TextContainer("seg1");
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		assertFalse(tc.hasBeenSegmented());
 		segments.append(new Segment("1", new TextFragment("seg2")));
 		assertTrue(tc.hasBeenSegmented());
@@ -188,7 +188,7 @@ public class TextContainerTest {
 	@Test
 	public void testSegmentsWithOneChar () {
 		TextContainer tc = new TextContainer(new TextFragment("z"));
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		assertEquals(1, segments.count());
 		assertEquals("z", segments.get(0).toString());
 	}
@@ -196,7 +196,7 @@ public class TextContainerTest {
 	@Test
 	public void testSegmentsEmpty () {
 		TextContainer tc = new TextContainer();
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		assertEquals(1, segments.count());
 		assertEquals("0", segments.get(0).id);
 	}
@@ -320,7 +320,7 @@ public class TextContainerTest {
 	@Test
 	public void testCreateSegmentEmptySpan () {
 		TextContainer tc = new TextContainer("text");
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		assertEquals(1, segments.count());
 		segments.create(1, 1); // No change because end is <= start+1
 		assertEquals(1, segments.count()); // No change
@@ -375,7 +375,7 @@ public class TextContainerTest {
 		tf.append("t2");
 		tf.append(TagType.PLACEHOLDER, "BR2", "<br2/>");
 		TextContainer tc = new TextContainer(tf);
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		assertEquals("t1<br1/>t2<br2/>", tc.toString());
 		segments.create(4, 8); // "t1**t2**"
 		assertEquals("t1<1/>[t2<2/>]", fmt.printSegmentedContent(tc, true));
@@ -389,7 +389,7 @@ public class TextContainerTest {
 		tf.append("t2");
 		tf.append(TagType.CLOSING, "b", "</b>");
 		TextContainer tc = new TextContainer(tf);
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		assertEquals("t1<b>t2</b>", tc.toString());
 		segments.create(2, 8); // "t1**t2**"
 		assertEquals("t1[<b>t2</b>]", fmt.printSegmentedContent(tc, true, true));
@@ -403,7 +403,7 @@ public class TextContainerTest {
 		tf.append("t2");
 		tf.append(TagType.CLOSING, "b", "</b>");
 		TextContainer tc = new TextContainer(tf);
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		assertEquals("t1<b>t2</b>", tc.toString());
 		segments.create(4, -1);
 		assertEquals("t1<b>[t2</b>]", fmt.printSegmentedContent(tc, true, true));
@@ -419,7 +419,7 @@ public class TextContainerTest {
 		tf.append("t3");
 		tf.append(TagType.PLACEHOLDER, "br", "<br/>");
 		TextContainer tc = new TextContainer(tf);
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		assertEquals("[t1<1>t2</1>t3<2/>]", fmt.printSegmentedContent(tc, true));
 		List<Range> ranges = new ArrayList<Range>();
 		ranges.add(new Range(0, 4));
@@ -433,7 +433,7 @@ public class TextContainerTest {
 	@Test
 	public void testSameFirstAndLastSegments () {
 		TextContainer tc = new TextContainer("text");
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		assertEquals("text", segments.getFirstContent().toString());
 		assertSame(segments.getFirstContent(), segments.getLastContent());
 		assertFalse(tc.hasBeenSegmented());
@@ -442,7 +442,7 @@ public class TextContainerTest {
 	@Test
 	public void testGetSameSegment () {
 		TextContainer tc = createMultiSegmentContent();
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		assertEquals("text1", segments.getFirstContent().toString());
 		assertSame(segments.getFirstContent(), segments.get(0).text);
 	}
@@ -450,7 +450,7 @@ public class TextContainerTest {
 	@Test
 	public void testGetLastSegment () {
 		TextContainer tc = createMultiSegmentContent();
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		assertEquals("text2", segments.getLastContent().toString());
 		assertSame(segments.getLastContent(), segments.get(1).text);
 	}
@@ -569,7 +569,7 @@ public class TextContainerTest {
 	@Test
 	public void testAppendSimpleSegmentToEmpty () {
 		TextContainer tc = new TextContainer();
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		assertEquals(1, segments.count());
 		segments.append(new TextFragment("seg"));
 		assertEquals(1, segments.count());
@@ -579,7 +579,7 @@ public class TextContainerTest {
 	@Test
 	public void testAppendSimpleSegmentToNonEmpty () {
 		TextContainer tc = new TextContainer("seg1");
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		assertEquals(1, segments.count());
 		segments.append(new TextFragment("seg2"));
 		assertEquals(2, segments.count());
@@ -590,7 +590,7 @@ public class TextContainerTest {
 	@Test
 	public void testAutoID () {
 		TextContainer tc = new TextContainer("seg1");
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		
 		// Same as the one passed
 		assertEquals("0", segments.get(0).id);
@@ -619,7 +619,7 @@ public class TextContainerTest {
 	@Test
 	public void testAppendSeveralSegments () {
 		TextContainer tc = createMultiSegmentContent();
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		assertEquals(2, segments.count());
 		assertEquals("text1", segments.get(0).toString());
 		assertEquals("text2", segments.get(1).toString());
@@ -656,7 +656,7 @@ public class TextContainerTest {
 	@Test
 	public void ContentIsOneSegment2Segments () {
 		TextContainer tc = new TextContainer("seg1");
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		segments.append(new Segment("s2", new TextFragment("seg2")));
 		assertEquals("[seg1][seg2]", fmt.printSegmentedContent(tc, true));
 		assertFalse(tc.contentIsOneSegment());
@@ -689,7 +689,7 @@ public class TextContainerTest {
 	@Test
 	public void testMergingAndResplitting () {
 		TextContainer tc = createMultiSegmentContent();
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		assertEquals("[text1] [text2]", fmt.printSegmentedContent(tc, true));
 		ArrayList<Range> ranges = new ArrayList<Range>();
 		tc.getSegments().joinAll(ranges);
@@ -705,7 +705,7 @@ public class TextContainerTest {
 	@Test
 	public void testGetSegmentFromId () {
 		TextContainer tc = createMultiSegmentContent();
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		assertSame(segments.get(0), segments.get("s1"));
 		assertSame(segments.get(1), segments.get("s2"));
 		segments.get(1).id = "newId";
@@ -715,7 +715,7 @@ public class TextContainerTest {
 	@Test
 	public void testGetSegmentFromIdAfterReindex () {
 		TextContainer tc = createMultiSegmentContent();
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		assertSame(segments.get(0), segments.get("s1"));
 		assertSame(segments.get(1), segments.get("s2"));
 		tc.changePart(1); // Change non-segment to a segment
@@ -729,7 +729,7 @@ public class TextContainerTest {
 	@Test
 	public void testJoinSegmentWithNextOnUnsegmented () {
 		TextContainer tc = new TextContainer("text");
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		segments.get(0).id = "id1"; // Set the ID to non-default
 		segments.joinWithNext(0);
 		assertEquals("id1", segments.get(0).id);
@@ -740,7 +740,7 @@ public class TextContainerTest {
 	@Test
 	public void testJoinSegmentWithNext () {
 		TextContainer tc = createMultiSegmentContent();
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		// Make it 3 segments
 		segments.append(new TextFragment("seg3"));
 		segments.get(1).id = "id2"; // Set the ID to non-default
@@ -802,7 +802,7 @@ public class TextContainerTest {
 	@Test
 	public void testChangePartNonSegmentToSegment () {
 		TextContainer tc = createMultiSegmentContentWithCodes();
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		
 		assertEquals("[text1<1/>] [text2<2/>]", fmt.printSegmentedContent(tc, true));
 		tc.changePart(1); // Change non-segment into a segment
@@ -824,7 +824,7 @@ public class TextContainerTest {
 	@Test
 	public void testMergingSegmentsWithCodes () {
 		TextContainer tc = createMultiSegmentContentWithCodes();
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		segments.joinAll();
 		assertEquals(1, segments.count());
 		TextFragment tf = segments.getFirstContent();
@@ -839,7 +839,7 @@ public class TextContainerTest {
 	@Test
 	public void testMergingAndResplittingWithCodes () {
 		TextContainer tc = createMultiSegmentContentWithCodes();
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		
 		assertEquals("[text1<1/>] [text2<2/>]", fmt.printSegmentedContent(tc, true));
 		ArrayList<Range> ranges = new ArrayList<Range>();
@@ -859,7 +859,7 @@ public class TextContainerTest {
 	@Test
 	public void testSplitPartNewSegmentOnLeft () {
 		TextContainer tc = new TextContainer("part1part2");
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		
 		assertEquals("[part1part2]", fmt.printSegmentedContent(tc, true));
 		tc.split(0, 0, 5, true);
@@ -873,7 +873,7 @@ public class TextContainerTest {
 	@Test
 	public void testSplitPartNewNonSegmentOnLeft () {
 		TextContainer tc = new TextContainer("part1part2");
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		
 		assertEquals("[part1part2]", fmt.printSegmentedContent(tc, true));
 		tc.split(0, 0, 5, false); // Create non-segment
@@ -886,7 +886,7 @@ public class TextContainerTest {
 	@Test
 	public void testSplitPartNewSegmentOnRight () {
 		TextContainer tc = new TextContainer("part1part2");
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		
 		assertEquals("[part1part2]", fmt.printSegmentedContent(tc, true));
 		tc.split(0, 5, -1, true);
@@ -900,7 +900,7 @@ public class TextContainerTest {
 	@Test
 	public void testSplitPartNonSegmentOnRight () {
 		TextContainer tc = new TextContainer("part1part2");
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		
 		assertEquals("[part1part2]", fmt.printSegmentedContent(tc, true));
 		tc.split(0, 5, -1, false); // Create non-segment part
@@ -913,7 +913,7 @@ public class TextContainerTest {
 	@Test
 	public void testSplitPartWithoutSpan () {
 		TextContainer tc = new TextContainer("part1part2");
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 
 		assertEquals("[part1part2]", fmt.printSegmentedContent(tc, true));
 		tc.split(0, 5, 5, false); // Ask for non-segment, but that should be ignored
@@ -927,7 +927,7 @@ public class TextContainerTest {
 	@Test
 	public void testSplitNewSegmentAtMiddle () {
 		TextContainer tc = new TextContainer("part1part2part3");
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		
 		assertEquals("[part1part2part3]", fmt.printSegmentedContent(tc, true));
 		tc.split(0, 5, 10, true);
@@ -942,7 +942,7 @@ public class TextContainerTest {
 	@Test
 	public void testSplitNewNonSegmentAtMiddle () {
 		TextContainer tc = new TextContainer("part1part2part3");
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		
 		assertEquals("[part1part2part3]", fmt.printSegmentedContent(tc, true));
 		tc.split(0, 5, 10, false); // Create non-segment
@@ -957,7 +957,7 @@ public class TextContainerTest {
 	@Test
 	public void testVariousSplitsAndJoins () {
 		TextContainer tc = createMultiSegmentContentWithCodes();
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 
 		assertEquals("[text1<1/>] [text2<2/>]", fmt.printSegmentedContent(tc, true));
 		// Make "te" an non-segment
@@ -978,7 +978,7 @@ public class TextContainerTest {
 	@Test
 	public void testSplitResultingInNoChanges () {
 		TextContainer tc = new TextContainer("text");
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		
 		assertEquals("[text]", fmt.printSegmentedContent(tc, true));
 		tc.split(0, 0, 0, true); // Span is empty and at the front
@@ -1084,7 +1084,7 @@ public class TextContainerTest {
 	@Test
 	public void testUnwrap_MixedPartsWithText () {
 		TextContainer tc1 = new TextContainer();
-		Segments segments = tc1.getSegments();		
+		ISegments segments = tc1.getSegments();		
 		tc1.append(new TextFragment(" \tt1 "));
 		tc1.append(new TextFragment("   "));
 		segments.append(new TextFragment("t2"));
@@ -1102,7 +1102,7 @@ public class TextContainerTest {
 	public void testSegments () {
 		String originalText = "[seg1][seg2] [seg3]";
 		TextContainer tc = new TextContainer(originalText);
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		
 		// "[seg1][seg2] [seg3]"
 		//  0123456789012345678
@@ -1127,7 +1127,7 @@ public class TextContainerTest {
 	public void testSegmentsFromArray () {
 		String originalText = "[seg1][seg2] [seg3]";
 		TextContainer tc = new TextContainer(originalText);
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 
 		// Test segmenting from an array
 		List<Range> ranges = new ArrayList<Range>();
@@ -1215,7 +1215,7 @@ public class TextContainerTest {
 	@Test
 	public void testSwapSegments () {
 		TextContainer tc = createMultiSegmentContentWithCodes();
-		Segments segments = tc.getSegments();
+		ISegments segments = tc.getSegments();
 		
 		assertEquals("[text1<1/>] [text2<2/>]", fmt.printSegmentedContent(tc, true));
 		assertEquals("0", segments.get(0).id);

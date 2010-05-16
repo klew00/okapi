@@ -32,7 +32,7 @@ import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.resource.Segments;
+import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextContainer;
@@ -104,7 +104,7 @@ public class XLIFFFilterTest {
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
 		TextContainer cont = tu.getTarget(locFR);
-		Segments segments = cont.getSegments();
+		ISegments segments = cont.getSegments();
 		assertEquals("[t1.] [t2]", fmt.printSegmentedContent(cont, true));
 		assertEquals(2, segments.count());
 		assertEquals("t1.", segments.get(0).text.toString());
@@ -128,7 +128,7 @@ public class XLIFFFilterTest {
 			+ "</file></xliff>";
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		TextContainer cont = tu.getSource();
-		Segments segments = cont.getSegments();
+		ISegments segments = cont.getSegments();
 		assertNotNull(tu);
 		assertEquals("[t1.] [t2]", fmt.printSegmentedContent(cont, true));
 		assertEquals(2, segments.count());
@@ -279,7 +279,7 @@ public class XLIFFFilterTest {
 		assertNotNull(annot);
 		assertEquals("", annot.getFirst().getEntry().getSource().toString()); // No source
 		assertEquals("TRG for t1 inter t2", annot.getFirst().getEntry().getTarget(locFR).toString());
-		Segments segs = tu.getTarget(locFR).getSegments();
+		ISegments segs = tu.getTarget(locFR).getSegments();
 		annot = segs.get(0).getAnnotation(AltTranslationsAnnotation.class);
 		assertNull(annot);
 		annot = segs.get(1).getAnnotation(AltTranslationsAnnotation.class);
