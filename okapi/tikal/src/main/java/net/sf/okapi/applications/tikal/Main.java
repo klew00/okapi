@@ -524,6 +524,8 @@ public class Main {
 
 		extensionsMap.put(".yml", "okf_railsyaml");
 		filtersMap.put("okf_railsyaml", "net.sf.okapi.filters.railsyaml.RailsYamlFilter");
+
+		filtersMap.put("okf_versifiedtxt", "net.sf.okapi.filters.versifiedtxt.VersifiedTextFilter");
 	}
 	
 	private String getConfigurationId (String ext) {
@@ -537,7 +539,7 @@ public class Main {
 	}
 	
 	private void editAllConfigurations () {
-		throw new UnsupportedOperationException("The -e command without parameter is temporarily unsupported. use -e configId");
+		throw new UnsupportedOperationException("The -e command without parameter is temporarily unsupported. Use -e configId");
 //		initialize();
 //		// Add all the pre-defined configurations
 //		DefaultFilters.setMappings(fcMapper, false, true);

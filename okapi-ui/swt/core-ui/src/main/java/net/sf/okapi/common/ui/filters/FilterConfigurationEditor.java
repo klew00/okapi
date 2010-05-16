@@ -68,7 +68,7 @@ public class FilterConfigurationEditor implements IFilterConfigurationEditor {
 			dlg.setMessage("This filter has no parameters to edit.");
 			dlg.setText("Information");
 			dlg.open();
-			return true;
+			return false;
 		}
 
 		IParametersEditor editor = fcMapper.createConfigurationEditor(configId, cachedFilter);

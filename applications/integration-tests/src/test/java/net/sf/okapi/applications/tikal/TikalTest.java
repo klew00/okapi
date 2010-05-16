@@ -305,6 +305,19 @@ public class TikalTest {
     }
 
     @Test
+    public void testExtractMergeVersified () throws IOException, InterruptedException {
+    	// Delete previous output
+    	assertTrue(deleteOutputFile("versifiedtest.txt.xlf"));
+    	assertTrue(deleteOutputFile("versifiedtest.out.txt"));
+    	// Extract
+    	assertEquals(0, runTikal("-x -sl en -tl fr versifiedtest.txt -ie UTF-8 -fc okf_versifiedtxt"));
+    	assertTrue("File different from gold", compareWithGoldFile("versifiedtest.txt.xlf", "windows-1252"));
+    	// Merge
+    	assertEquals(0, runTikal("-m -sl en -tl fr versifiedtest.txt.xlf -ie UTF-8 -fc okf_versifiedtxt"));
+    	assertTrue("File different from gold", compareWithGoldFile("versifiedtest.out.txt", "UTF-8"));
+    }
+
+    @Test
     public void testImportExportPensieve () throws IOException, InterruptedException {
     	// Delete previous output
     	assertTrue(deleteOutputDir("pensieveTM.pentm", true));
