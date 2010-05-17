@@ -33,6 +33,7 @@ import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationType;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.annotation.ScoresAnnotation;
+import net.sf.okapi.common.annotation.AltTranslation.AltTranslationOriginType;
 import net.sf.okapi.common.filterwriter.TMXWriter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
@@ -508,9 +509,10 @@ public class QueryManager {
 						seg.text = adjustNewFragment(seg.text, qr.source, qr.target, qr.score, tu);
 						leveraged++;
 						// Temporary code for alt-trans annotation
-						addAltTranslation(seg, new AltTranslation(srcLoc, trgLoc, seg.text, qr.source,
-							qr.target, (qr.fromMT ? AltTranslationType.MT : AltTranslationType.TM),
-							qr.score, qr.origin));
+						AltTranslation at = new AltTranslation(srcLoc, trgLoc, seg.text, qr.source,
+								qr.target, AltTranslationType.NONE,	qr.score, qr.origin);
+						at.setOriginType((qr.fromMT ? AltTranslationOriginType.MT : AltTranslationOriginType.TM));
+						addAltTranslation(seg, at);
 						continue;
 					}
 				}
@@ -520,9 +522,10 @@ public class QueryManager {
 					seg.text = adjustNewFragment(seg.text, qr.source, qr.target, qr.score, tu);
 					leveraged++;
 					// temporary code for alt-trans annotation
-					addAltTranslation(seg, new AltTranslation(srcLoc, trgLoc, seg.text, qr.source,
-						qr.target, (qr.fromMT ? AltTranslationType.MT : AltTranslationType.TM),
-						qr.score, qr.origin));
+					AltTranslation at = new AltTranslation(srcLoc, trgLoc, seg.text, qr.source,
+							qr.target, AltTranslationType.NONE,	qr.score, qr.origin);
+					at.setOriginType((qr.fromMT ? AltTranslationOriginType.MT : AltTranslationOriginType.TM));
+					addAltTranslation(seg, at);
 					continue;
 				}
 			}
@@ -532,9 +535,10 @@ public class QueryManager {
 				seg.text = adjustNewFragment(seg.text, qr.source, qr.target, qr.score, tu);
 				leveraged++;
 				// temporary code for alt-trans annotation
-				addAltTranslation(seg, new AltTranslation(srcLoc, trgLoc, seg.text, qr.source,
-					qr.target, (qr.fromMT ? AltTranslationType.MT : AltTranslationType.TM),
-					qr.score, qr.origin));
+				AltTranslation at = new AltTranslation(srcLoc, trgLoc, seg.text, qr.source,
+						qr.target, AltTranslationType.NONE,	qr.score, qr.origin);
+				at.setOriginType((qr.fromMT ? AltTranslationOriginType.MT : AltTranslationOriginType.TM));
+				addAltTranslation(seg, at);
 			}
 		}
 		
