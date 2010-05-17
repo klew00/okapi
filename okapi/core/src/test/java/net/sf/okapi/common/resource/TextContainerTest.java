@@ -208,7 +208,7 @@ public class TextContainerTest {
         tc.setProperty(p1);
         AltTranslationsAnnotation ann1 = new AltTranslationsAnnotation();
         ann1.add(LocaleId.ENGLISH, LocaleId.FRENCH, null, new TextFragment("src"),
-        	new TextFragment("trg"), AltTranslationType.TM, 99, "origin");
+        	new TextFragment("trg"), AltTranslationType.EXACT, 99, "origin");
         tc.setAnnotation(ann1);
 		TextContainer tc2 = tc.clone();
 		assertEquals(tc.getFirstContent().toString(), tc2.getFirstContent().toString());
