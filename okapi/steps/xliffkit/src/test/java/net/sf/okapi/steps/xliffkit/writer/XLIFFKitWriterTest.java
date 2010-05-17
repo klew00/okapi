@@ -511,11 +511,11 @@ public class XLIFFKitWriterTest {
 								
 				new RawDocumentToFilterEventsStep()
 				,				
-//				new PipelineStep(new LeveragingStep(), 
-//						new Parameter("resourceClassName", net.sf.okapi.connectors.google.GoogleMTConnector.class.getName()),
-//						new Parameter("threshold", 80),
-//						new Parameter("fillTarget", true)
-//				),
+				new PipelineStep(new LeveragingStep(), 
+						new Parameter("resourceClassName", net.sf.okapi.connectors.google.GoogleMTConnector.class.getName()),
+						new Parameter("threshold", 80),
+						new Parameter("fillTarget", true)
+				),
 				
 				new PipelineStep(
 						new XLIFFKitWriterStep(),								
@@ -612,11 +612,11 @@ public class XLIFFKitWriterTest {
 								
 				new RawDocumentToFilterEventsStep()
 				,				
-//				new PipelineStep(new LeveragingStep(), 
-//						new Parameter("resourceClassName", net.sf.okapi.connectors.google.GoogleMTConnector.class.getName()),
-//						new Parameter("threshold", 80),
-//						new Parameter("fillTarget", true)
-//				),
+				new PipelineStep(new LeveragingStep(), 
+						new Parameter("resourceClassName", net.sf.okapi.connectors.google.GoogleMTConnector.class.getName()),
+						new Parameter("threshold", 80),
+						new Parameter("fillTarget", true)
+				),
 				
 				new PipelineStep(
 						new XLIFFKitWriterStep(),								
@@ -624,7 +624,7 @@ public class XLIFFKitWriterTest {
 						new Parameter("includeOriginal", true),
 						new Parameter("message", "This document is a part of the test t-kit, generated from net.sf.okapi.steps.xliffkit.writer.testPackageFormat()"),
 						//new Parameter("outputURI", this.getClass().getResource("draft4.xliff.kit").toURI().toString()))
-						new Parameter("outputURI", new URL("file", null, pathBase + "testPackageFormat4.xliff.kit").toURI().toString()))
+						new Parameter("outputURI", new URL("file", null, pathBase + "testPackageFormat5.xliff.kit").toURI().toString()))
 		).execute();
 		}
 		System.out.println(" Total: " + (System.currentTimeMillis() - start) + " milliseconds.");

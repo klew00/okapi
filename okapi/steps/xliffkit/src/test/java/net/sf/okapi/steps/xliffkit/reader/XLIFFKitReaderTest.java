@@ -123,7 +123,31 @@ public class XLIFFKitReaderTest {
 //				new FilterEventsToRawDocumentStep()
 		).execute();
 	}
-	
+
+	// DEBUG 		
+	@Test
+	public void testReader5() {
+		
+		new Pipeline(
+				"Test pipeline for XLIFFKitReaderStep",
+				new Batch(
+						new BatchItem(
+								this.getClass().getResource("testPackageFormat5.xliff.kit"),
+								"UTF-8",
+								Util.getTempDirectory() + "/testPackageFormat4",
+								"UTF-8",
+								ENUS,
+								ENUS)
+						),
+				new XLIFFKitReaderStep()
+				,				
+				new EventLogger()
+//				,
+//				
+//				new FilterEventsToRawDocumentStep()
+		).execute();
+	}
+
 	// DEBUG 		
 	@Test
 	public void testReader6() {

@@ -29,7 +29,6 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Range;
 import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
-import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.TMXFilterWriter;
 import net.sf.okapi.common.filterwriter.ZipFilterWriter;
@@ -125,7 +124,6 @@ public class OkapiBeans implements IVersionDriver {
 		beanMapper.registerBean(InlineAnnotation.class, InlineAnnotationBean.class);
 		beanMapper.registerBean(InputTokenAnnotation.class, InputTokenAnnotationBean.class);
 		beanMapper.registerBean(MetricsAnnotation.class, MetricsAnnotationBean.class);
-		beanMapper.registerBean(ScoresAnnotation.class, ScoresAnnotationBean.class);
 		beanMapper.registerBean(SubFilterAnnotation.class, SubFilterAnnotationBean.class);
 		beanMapper.registerBean(TargetPropertiesAnnotation.class, TargetPropertiesAnnotationBean.class);
 		beanMapper.registerBean(TokensAnnotation.class, TokensAnnotationBean.class);
