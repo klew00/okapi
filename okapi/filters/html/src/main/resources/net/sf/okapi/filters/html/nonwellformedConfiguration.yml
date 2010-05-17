@@ -63,7 +63,7 @@ meta:
   
 area:
   ruleTypes: [ATTRIBUTES_ONLY]
-  translatableAttributes: [accesskey, area]
+  translatableAttributes: [accesskey, area, alt]
   
 isindex:
   ruleTypes: [ATTRIBUTES_ONLY]
