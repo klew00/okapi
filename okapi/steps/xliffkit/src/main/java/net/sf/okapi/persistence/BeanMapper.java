@@ -34,12 +34,13 @@ public class BeanMapper {
 	private static final String MAPPER_NOT_INIT = "BeanMapper: bean mapping is not initialized";
 	private static final String MAPPER_UNK_CLASS = "BeanMapper: unknown class: %s";		
 	private static final String MAPPER_EMPTY_REF = "BeanMapper: class reference cannot be empty";
+	private static final String MAPPER_NOT_REG = "No bean class registered for %s, using %s for %s instead.";
 	
-	private static final String OBJ_MAPPER_NOT_INIT = "BeanMapper: obhect mapping is not initialized";
+	private static final String OBJ_MAPPER_NOT_INIT = "BeanMapper: object mapping is not initialized";
 	private static final String OBJ_MAPPER_EMPTY_REF = "BeanMapper: bean class reference cannot be empty";
 	
 	private static final String PROXIES_CANT_INST = "BeanMapper: cannot instantiate a proxy for %s";
-	private static final String PROXIES_NOT_INIT = "BeanMapper: proxy mapping is not initialized";
+	private static final String PROXIES_NOT_INIT = "BeanMapper: proxy mapping is not initialized";	
 	
 	// !!! LinkedHashMap to preserve registration order
 	private LinkedHashMap<Class<?>, Class<? extends IPersistenceBean<?>>> beanClassMapping;
@@ -47,9 +48,11 @@ public class BeanMapper {
 	private ArrayList<Class<?>> loggedClasses; 
 	private ArrayList<String> loggedClassNames;
 	private ConcurrentHashMap<String, IPersistenceBean<?>> proxies; // used in ref resolution
+	private IPersistenceSession session;
 	private final Logger LOGGER = Logger.getLogger(this.getClass().getName());
 	
-	public BeanMapper() {
+	public BeanMapper(IPersistenceSession session) {
+		this.session = session;
 		beanClassMapping = new LinkedHashMap<Class<?>, Class<? extends IPersistenceBean<?>>> ();
 		objectClassMapping = new HashMap<Class<? extends IPersistenceBean<?>>, Class<?>> ();
 		proxies = new ConcurrentHashMap<String, IPersistenceBean<?>>();
@@ -74,8 +77,6 @@ public class BeanMapper {
 		if (beanClassMapping == null)
 			throw(new RuntimeException(MAPPER_NOT_INIT));
 		
-		// TODO Make sure if a bean for already registered class was registered later, the later bean takes precedence
-		// HashMap.put(): "If the map previously contained a mapping for the key, the old value is replaced". Test it.
 		beanClassMapping.put(classRef, beanClassRef);
 				
 		if (objectClassMapping == null)
@@ -124,9 +125,9 @@ public class BeanMapper {
 			for (Class<?> cls : beanClassMapping.keySet())
 				if (cls.isAssignableFrom(classRef)) {
 					beanClass = (Class<IPersistenceBean<T>>) beanClassMapping.get(cls);
-					if (!loggedClasses.contains(classRef)) {
+					if (session.getState() == SessionState.WRITING && !loggedClasses.contains(classRef)) {
 						loggedClasses.add(classRef);
-						LOGGER.warning(String.format("No bean class registered for %s, using %s for %s instead.", 
+						LOGGER.warning(String.format(MAPPER_NOT_REG, 
 								ClassUtil.getQualifiedClassName(classRef),
 								ClassUtil.getQualifiedClassName(beanClass),
 								ClassUtil.getQualifiedClassName(cls)));
@@ -185,5 +186,5 @@ public class BeanMapper {
 			throw(new RuntimeException(String.format(MAPPER_UNK_CLASS, className)));
 		}
 		return res;		
-	}			
+	}
 }

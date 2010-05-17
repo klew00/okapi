@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.MimeTypeMapper;
@@ -53,6 +54,7 @@ import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.persistence.IPersistenceSession;
 import net.sf.okapi.persistence.PersistenceSession;
@@ -143,7 +145,6 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 	}
 	
 	public Event handleEvent (Event event) {
-		
 		//System.out.println(event.getEventType());
 		switch ( event.getEventType() ) {
 		case START_BATCH:			
@@ -173,11 +174,22 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 			processEndGroup((Ending)event.getResource());
 			break;
 		case TEXT_UNIT:
-			processTextUnit((TextUnit)event.getResource());
-			break;
+			TextUnit tu = (TextUnit)event.getResource();
+			processTextUnit(tu); // XLIFF
+			Event ev = new Event(EventType.TEXT_UNIT, tu.clone());
+			
+//			TextContainer srcCont  = tu.getSource();
+//			if ( !tu.getSource().contentIsOneSegment() ) {
+//				srcCont.getSegments().joinAll();
+//			}
+//			TextFragment tf = srcCont.getFirstContent();
+//			tf.setCodedText("", false);
+			tu.removeTarget(trgLoc); // Also removes AltTranslationsAnnotations
+						
+			session.serialize(event); // JSON
+			return ev;
 		}
-		session.serialize(event); // won't serialize END_DOCUMENT
-		
+		session.serialize(event); // won't serialize END_DOCUMENT		
 		return event;
 	}
 		

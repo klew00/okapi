@@ -28,8 +28,12 @@ import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
 	static final String GENERATE_TARGETS = "generateTargets"; //$NON-NLS-1$
+	static final String USE_APPROVED_ONLY = "useApprovedOnly"; //$NON-NLS-1$
+	static final String UPDATE_APPROVED_FLAG = "updateApprovedFlag"; //$NON-NLS-1$
 	
 	private boolean generateTargets; 
+	private boolean useApprovedOnly;
+	private boolean updateApprovedFlag;
 	
 	public Parameters () {
 		reset();
@@ -38,27 +42,34 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	@Override
 	public void fromString(String data) {
 		reset();
-		buffer.fromString(data);
-		
+		buffer.fromString(data);		
 		generateTargets = buffer.getBoolean(GENERATE_TARGETS, generateTargets);
+		useApprovedOnly = buffer.getBoolean(USE_APPROVED_ONLY, useApprovedOnly);
+		updateApprovedFlag = buffer.getBoolean(UPDATE_APPROVED_FLAG, updateApprovedFlag);
 	}
 
 	@Override
 	public String toString () {
 		buffer.reset();		
 		buffer.setParameter(GENERATE_TARGETS, generateTargets);		
+		buffer.setParameter(USE_APPROVED_ONLY, useApprovedOnly);
+		buffer.setParameter(UPDATE_APPROVED_FLAG, updateApprovedFlag);
 		return buffer.toString();
 	}
 	
 	@Override
 	public void reset() {
 		generateTargets = true;
+		useApprovedOnly = false;
+		updateApprovedFlag = true;
 	}
 
 	@Override
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);		
 		desc.add(GENERATE_TARGETS, "Generate target files in the output directory", "Generate targets");		
+		desc.add(USE_APPROVED_ONLY, "Update target only if translation was approved", "Use only approved translation");
+		desc.add(UPDATE_APPROVED_FLAG, "Update the approved flag if translation was approved", "Update approved flag");
 		return desc;
 	}
 	
@@ -67,6 +78,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 			ParametersDescription parametersDescription) {
 		EditorDescription desc = new EditorDescription("XLIFF Kit Reader Options", true, false);		
 		desc.addCheckboxPart(parametersDescription.get(GENERATE_TARGETS));		
+		desc.addCheckboxPart(parametersDescription.get(USE_APPROVED_ONLY));
+		desc.addCheckboxPart(parametersDescription.get(UPDATE_APPROVED_FLAG));
 		return desc;
 	}
 
@@ -76,6 +89,22 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 
 	public boolean isGenerateTargets() {
 		return generateTargets;
+	}
+
+	public void setUseApprovedOnly(boolean useApprovedOnly) {
+		this.useApprovedOnly = useApprovedOnly;
+	}
+
+	public boolean isUseApprovedOnly() {
+		return useApprovedOnly;
+	}
+
+	public void setUpdateApprovedFlag(boolean updateApprovedFlag) {
+		this.updateApprovedFlag = updateApprovedFlag;
+	}
+
+	public boolean isUpdateApprovedFlag() {
+		return updateApprovedFlag;
 	}
 
 }

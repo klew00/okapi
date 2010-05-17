@@ -36,6 +36,7 @@ public class ReferenceResolver {
 	private final String MSG1 = "ReferenceResolver: class %s is not registered";
 	private final String MSG2 = "ReferenceResolver: cannot instantiate %s";
 //	private final String MSG3 = "ReferenceResolver.createAntiBean: anti-bean class mismatch (actual: %s, expected: %s)";
+	private final String MSG3 = "ReferenceResolver: object references are broken, reference to a non-existing object";
 	private final String MSG4 = "ReferenceResolver.createAntiBean: objClassRef cannot be null";
 	private final String MSG5 = "ReferenceResolver.createAntiBean: refId cannot be 0";
 	private final static String MSG6 = "ReferenceResolver: idCounter overflow";
@@ -127,7 +128,8 @@ public class ReferenceResolver {
 
 	public void setRefIdForObject(Object obj, long refId) {
 		if (obj == null) return;
-		if (refId == 0) return;
+		if (refId == 0)
+			throw new RuntimeException(MSG3);
 		
 		refIdLookup.put(obj, refId);  // refIdLookup.get(obj)
 		rootLookup.put(refId, rootId);
@@ -135,6 +137,9 @@ public class ReferenceResolver {
 	}
 	
 	public void setReference(long parentRefId, long childRefId) {
+		if (parentRefId == 0 || childRefId == 0)
+			throw new RuntimeException(MSG3);
+			
 		Set<Long> list = references.get(parentRefId);
 		if (list == null) {
 			list = new HashSet<Long>();
@@ -184,6 +189,9 @@ public class ReferenceResolver {
 				long parentRoot = getRootId(parentRefId);
 				long childRoot = getRootId(childRefId);
 
+				if (parentRoot == 0 || childRoot == 0)
+					throw new RuntimeException(MSG3);
+				
 				if (parentRoot == childRoot) continue; // refs within same bean
 				
 				Set<Long> parentFrame = getFrame(parentRoot);

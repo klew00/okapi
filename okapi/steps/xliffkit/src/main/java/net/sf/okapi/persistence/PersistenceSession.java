@@ -51,7 +51,7 @@ public abstract class PersistenceSession implements IPersistenceSession, IObserv
 	private String itemLabel = ITEM_LABEL;
 	private SessionState state = SessionState.IDLE;
 	private ReferenceResolver refResolver = new ReferenceResolver(this);
-	private BeanMapper beanMapper = new BeanMapper(); 
+	private BeanMapper beanMapper = new BeanMapper(this); 
 	private int itemCounter = 0;
 	private Class<?> prevClass;
 	private Class<? extends IPersistenceBean<?>> beanClass;

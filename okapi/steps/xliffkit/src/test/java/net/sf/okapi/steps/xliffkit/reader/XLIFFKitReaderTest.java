@@ -52,7 +52,8 @@ public class XLIFFKitReaderTest {
 	private static final LocaleId DEDE = new LocaleId("de", "de");
 //	private static final LocaleId ITIT = new LocaleId("it", "it");
 	
-	// DEBUG 		@Test
+	// DEBUG 		
+	@Test
 	public void testReader() {
 		
 		new Pipeline(
@@ -75,7 +76,8 @@ public class XLIFFKitReaderTest {
 		).execute();
 	}
 	
-	// DEBUG 		@Test
+	// DEBUG 		
+	@Test
 	public void testReader2() {
 		
 		new Pipeline(
@@ -121,6 +123,31 @@ public class XLIFFKitReaderTest {
 //				new FilterEventsToRawDocumentStep()
 		).execute();
 	}
+	
+	// DEBUG 		
+	@Test
+	public void testReader6() {
+		
+		new Pipeline(
+				"Test pipeline for XLIFFKitReaderStep",
+				new Batch(
+						new BatchItem(
+								this.getClass().getResource("testPackageFormat6_2.xliff.kit"),
+								"UTF-8",
+								Util.getTempDirectory() + "/testPackageFormat2",
+								"UTF-8",
+								ENUS,
+								FRFR)
+						),
+				new XLIFFKitReaderStep()
+				,				
+				new EventLogger()
+//				,
+//				
+//				new FilterEventsToRawDocumentStep()
+		).execute();
+	}
+
 	
 	// DEBUG 	@Test
 	public void testReferences() {

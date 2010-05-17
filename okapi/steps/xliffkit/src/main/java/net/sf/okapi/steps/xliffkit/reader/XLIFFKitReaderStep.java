@@ -20,40 +20,35 @@
 
 package net.sf.okapi.steps.xliffkit.reader;
 
-import java.io.File;
 import java.net.URI;
 
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.UsingParameters;
-import net.sf.okapi.common.Util;
-import net.sf.okapi.common.filters.IFilter;
-import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.steps.xliffkit.opc.OPCPackageReader;
 
 @UsingParameters()
 public class XLIFFKitReaderStep extends BasePipelineStep {
 
-	private IFilter reader;
+	private OPCPackageReader reader;
 	private boolean isDone = true;
 	private String outputPath;
-	private boolean writeTargets = false;
-	private LocaleId targetLocale; 
-	private IFilterWriter filterWriter;
+	//private boolean writeTargets = false;
+	//private LocaleId targetLocale; 
+	//private IFilterWriter filterWriter;
 	private String outputEncoding;
 	private Parameters params;
+	private TextUnitMerger merger;
 
 	public XLIFFKitReaderStep() {
 		super();
 		params = new Parameters();
-		reader = new OPCPackageReader();
+		merger = new TextUnitMerger();
+		reader = new OPCPackageReader(merger);
 	}
 	
 	public String getDescription () {
@@ -67,13 +62,13 @@ public class XLIFFKitReaderStep extends BasePipelineStep {
 	@StepParameterMapping(parameterType = StepParameterType.OUTPUT_URI)
 	public void setOutputURI (URI outputURI) {
 		this.outputPath = outputURI.getPath();
-		writeTargets = !Util.isEmpty(outputPath);
+		//writeTargets = !Util.isEmpty(outputPath);
 	}
 	
-	@StepParameterMapping(parameterType = StepParameterType.TARGET_LOCALE)
-	public void setTargetLocale (LocaleId targetLocale) {
-		this.targetLocale = targetLocale;
-	}
+//	@StepParameterMapping(parameterType = StepParameterType.TARGET_LOCALE)
+//	public void setTargetLocale (LocaleId targetLocale) {
+//		this.targetLocale = targetLocale;
+//	}
 	
 	@StepParameterMapping(parameterType = StepParameterType.OUTPUT_ENCODING)
 	public void setOutputEncoding (String outputEncoding) {
@@ -93,7 +88,14 @@ public class XLIFFKitReaderStep extends BasePipelineStep {
 
 		case RAW_DOCUMENT:
 			isDone = false;
-			reader.open((RawDocument)event.getResource());
+			RawDocument rd = (RawDocument)event.getResource();
+			//targetLocale = rd.getTargetLocale();
+			//merger.setTrgLoc(targetLocale);
+			merger.setUseApprovedOnly(params.isUseApprovedOnly());
+			merger.setUpdateApprovedFlag(params.isUpdateApprovedFlag());
+			reader.setOptions(outputEncoding, params.isGenerateTargets(), outputPath);
+			//reader.setGenerateTargets(params.isGenerateTargets());
+			reader.open(rd);
 			return reader.next();
 		}
 
@@ -101,31 +103,31 @@ public class XLIFFKitReaderStep extends BasePipelineStep {
 			return event;
 		} else {
 			
-			if (writeTargets) {
-				switch (event.getEventType()) {
-				case START_DOCUMENT:
-					processStartDocument(event);
-					break;
-
-				case END_DOCUMENT:
-					processEndDocument(event);
-					break;
-					
-				case START_SUBDOCUMENT:
-				case START_GROUP:
-				case END_SUBDOCUMENT:
-				case END_GROUP:
-				case DOCUMENT_PART:
-				case TEXT_UNIT:
-					if (params.isGenerateTargets())
-						filterWriter.handleEvent(event);
-				}
-			}
+//			if (writeTargets) {
+//				switch (event.getEventType()) {				
+//				case START_DOCUMENT:
+//					processStartDocument(event);
+//					break;
+//
+//				case END_DOCUMENT:
+//					processEndDocument(event);
+//					break;
+//				
+//				case TEXT_UNIT:								
+//				case START_SUBDOCUMENT:
+//				case START_GROUP:
+//				case END_SUBDOCUMENT:
+//				case END_GROUP:
+//				case DOCUMENT_PART:
+//					if (params.isGenerateTargets())
+//						filterWriter.handleEvent(event);
+//				}
+//			}
 			
 			Event e = reader.next(); 
 			isDone = !reader.hasNext();			
-			if (isDone && e.getEventType() == EventType.END_DOCUMENT)
-				processEndDocument(e);
+//			if (isDone && e.getEventType() == EventType.END_DOCUMENT)
+//				processEndDocument(e);
 			
 			return e;
 		}			
@@ -146,37 +148,36 @@ public class XLIFFKitReaderStep extends BasePipelineStep {
 		reader.cancel();
 	}
 	
-	private void processStartDocument (Event event) {
-		StartDocument startDoc = (StartDocument)event.getResource();
-		if ( outputEncoding == null ) outputEncoding = startDoc.getEncoding();
-		
-		if (params.isGenerateTargets()) {
-			filterWriter = startDoc.getFilterWriter();
-			filterWriter.setOptions(targetLocale, outputEncoding);
-		}		
-		
-		String srcName = startDoc.getName();
-		String outFileName = outputPath + srcName;
-		
-		File outputFile = new File(outFileName);
-		Util.createDirectories(outputFile.getAbsolutePath());
-		
-		if (params.isGenerateTargets()) {
-			filterWriter.setOutput(outputFile.getAbsolutePath());
-			filterWriter.handleEvent(event);
-		}
-	}
-	
-	private void processEndDocument (Event event) {
-		if (params.isGenerateTargets()) {
-			filterWriter.handleEvent(event);
-			filterWriter.close();
-		}
-		//isDone = !reader.hasNext();
-	}
-	
 	@Override
 	public IParameters getParameters() {
 		return params;
 	}
+	
+//	private void processStartDocument (Event event) {
+//		StartDocument startDoc = (StartDocument)event.getResource();
+//		if ( outputEncoding == null ) outputEncoding = startDoc.getEncoding();
+//		
+////		if (params.isGenerateTargets()) {
+////			filterWriter = startDoc.getFilterWriter();
+////			//filterWriter.setOptions(targetLocale, outputEncoding);
+////		}		
+//		
+//		String srcName = startDoc.getName();
+//		String outFileName = outputPath + srcName;
+//		
+//		File outputFile = new File(outFileName);
+//		Util.createDirectories(outputFile.getAbsolutePath());
+//		
+//		if (params.isGenerateTargets()) {
+//			filterWriter.setOutput(outputFile.getAbsolutePath());
+//			filterWriter.handleEvent(event);
+//		}
+//	}
+//	
+//	private void processEndDocument (Event event) {
+//		if (params.isGenerateTargets()) {
+//			filterWriter.handleEvent(event);
+//			filterWriter.close();
+//		}
+//	}
 }
