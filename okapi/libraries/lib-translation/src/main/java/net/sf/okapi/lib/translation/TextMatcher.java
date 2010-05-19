@@ -27,10 +27,23 @@ import java.util.List;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextFragment;
 
+/**
+ * Provides a simple way to compare two lists of tokens using
+ * basic fuzzy matching algorithms. 
+ */
 public class TextMatcher {
 
+	/**
+	 * Flag indicating to ignore case differences.
+	 */
 	public static final int IGNORE_CASE = 0x01;
+	/**
+	 * Flag indicating to ignore whitespaces differences.
+	 */
 	public static final int IGNORE_WHITESPACES = 0x02;
+	/**
+	 * Flag indication to ignore punctuation differences.
+	 */
 	public static final int IGNORE_PUNCTUATION = 0x04;
 	
 	private static final int MAXTOKEN = 1024;
@@ -61,6 +74,13 @@ public class TextMatcher {
 		}
 	}
 	
+	/**
+	 * Returns the minimum value between three given values.
+	 * @param value1 the first given value.
+	 * @param value2 the second given value.
+	 * @param value3 the third given value.
+	 * @return the minimum value between three given values.
+	 */
 	protected static short minimum (int value1,
 		int value2,
 		int value3)

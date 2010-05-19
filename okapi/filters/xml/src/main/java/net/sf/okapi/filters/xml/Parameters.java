@@ -57,14 +57,12 @@ import net.sf.okapi.common.DefaultEntityResolver;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.ParametersDescription;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.encoder.XMLEncoder;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.InlineCodeFinder;
 
 public class Parameters implements IParameters {
 	
-	private static final String ESCAPEGT = "escapeGt";
-	private static final String ESCAPENBSP = "escapeNbsp";
-	private static final String ESCAPELINEBREAK = "escapeLineBreak";
 	private static final String PROTECTENTITYREF = "protectEntityRef";
 	private static final String LINEBREAKASCODE = "lineBreakAsCode";
 	private static final String USECODEFINDER = "useCodeFinder";
@@ -90,7 +88,7 @@ public class Parameters implements IParameters {
 
 	public boolean useCodeFinder;
 	public InlineCodeFinder codeFinder;
-	public boolean escapeGt;
+	public boolean escapeGT;
 	public boolean escapeNbsp;
 	public boolean protectEntityRef;
 	public boolean escapeLineBreak;
@@ -228,7 +226,7 @@ public class Parameters implements IParameters {
 		codeFinder = new InlineCodeFinder();
 		useCodeFinder = false;
 		codeFinder.reset();
-		escapeGt = true;
+		escapeGT = true;
 		escapeNbsp = true;
 		protectEntityRef = true;
 		escapeLineBreak = false;
@@ -279,10 +277,10 @@ public class Parameters implements IParameters {
 
 	@Override
 	public boolean getBoolean (String name) {
-		if ( name.equals(ESCAPEGT) ) return escapeGt;
-		if ( name.equals(ESCAPENBSP) ) return escapeNbsp;
+		if ( name.equals(XMLEncoder.ESCAPEGT) ) return escapeGT;
+		if ( name.equals(XMLEncoder.ESCAPENBSP) ) return escapeNbsp;
 		if ( name.equals(PROTECTENTITYREF) ) return protectEntityRef;
-		if ( name.equals(ESCAPELINEBREAK) ) return escapeLineBreak;
+		if ( name.equals(XMLEncoder.ESCAPELINEBREAK) ) return escapeLineBreak;
 		if ( name.equals(LINEBREAKASCODE) ) return lineBreakAsCode;
 		return false;
 	}
@@ -308,11 +306,11 @@ public class Parameters implements IParameters {
 		if ( nl.getLength() > 0 ) {
 		// One element only
 			Element elem = (Element)nl.item(0);
-			String tmp = elem.getAttribute(ESCAPELINEBREAK);
+			String tmp = elem.getAttribute(XMLEncoder.ESCAPELINEBREAK);
 			if ( !Util.isEmpty(tmp) ) {
 				escapeLineBreak = tmp.equals("yes");
 			}
-			tmp = elem.getAttribute(ESCAPENBSP);
+			tmp = elem.getAttribute(XMLEncoder.ESCAPENBSP);
 			if ( !Util.isEmpty(tmp) ) {
 				escapeNbsp = tmp.equals("yes");
 			}
@@ -320,9 +318,9 @@ public class Parameters implements IParameters {
 			if ( !Util.isEmpty(tmp) ) {
 				lineBreakAsCode = tmp.equals("yes");
 			}
-			tmp = elem.getAttribute(ESCAPEGT);
+			tmp = elem.getAttribute(XMLEncoder.ESCAPEGT);
 			if ( !Util.isEmpty(tmp) ) {
-				escapeGt = tmp.equals("yes");
+				escapeGT = tmp.equals("yes");
 			}
 			tmp = elem.getAttribute(PROTECTENTITYREF);
 			if ( !Util.isEmpty(tmp) ) {

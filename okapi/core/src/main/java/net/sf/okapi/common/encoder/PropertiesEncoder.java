@@ -26,7 +26,7 @@ import java.nio.charset.CharsetEncoder;
 import net.sf.okapi.common.IParameters;
 
 /**
- * Implements IEncoder for properties-type format.
+ * Implements {@link IEncoder} for properties-type format.
  */
 public class PropertiesEncoder implements IEncoder {
 	

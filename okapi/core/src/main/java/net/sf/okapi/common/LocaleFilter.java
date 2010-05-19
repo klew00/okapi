@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -27,10 +27,17 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Provides ways to work with sets of {@link LocaleId} objects and regular expressions.
+ * <p>For example <code>"e.*-us"</code> to match: <code>"en-US"</code> and <code>"es-US"</code>
+ * but not <code>"en-GB"</code>.
+ */
 public class LocaleFilter {
 	
-	protected static enum FilterType{
-		
+	/**
+	 * Type of locale filter.
+	 */
+	protected static enum FilterType {
 		/**
 		 * The filter allows no locale. 
 		 */

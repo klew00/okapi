@@ -26,7 +26,7 @@ import java.nio.charset.CharsetEncoder;
 import net.sf.okapi.common.IParameters;
 
 /**
- * Implements IEncoder for JSON format.
+ * Implements {@link IEncoder} for JSON format.
  */
 public class JSONEncoder implements IEncoder {
 	

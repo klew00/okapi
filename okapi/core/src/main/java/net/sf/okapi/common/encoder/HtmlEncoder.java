@@ -26,7 +26,7 @@ import java.nio.charset.CharsetEncoder;
 import net.sf.okapi.common.IParameters;
 
 /**
- * Implements IEncoder for HTML format.
+ * Implements {@link IEncoder} for HTML format.
  */
 public class HtmlEncoder implements IEncoder {
 			

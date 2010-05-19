@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -23,6 +23,9 @@ package net.sf.okapi.common;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
+/**
+ * Collection of helper functions for working with classes.
+ */
 public class ClassUtil {
 	
 	private static String MSG_CANT_INSTANTIATE = "ClassUtil: cannot instantiate %s";
@@ -61,7 +64,7 @@ public class ClassUtil {
 	}
 	
 	/**
-	 * Gets non-qualified (w/o package name prefix) class name for the given object.
+	 * Gets non-qualified (without package name prefix) class name for the given object.
 	 * @param obj The object
 	 * @return The object's class name (w/o package name prefix)
 	 */

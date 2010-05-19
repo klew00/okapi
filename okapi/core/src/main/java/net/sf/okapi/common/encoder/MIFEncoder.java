@@ -24,7 +24,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.resource.Property;
 
 /**
- * Implements IEncoder for Adobe FrameMaker MIF format.
+ * Implements {@link IEncoder} for Adobe FrameMaker MIF format.
  */
 public class MIFEncoder implements IEncoder {
 

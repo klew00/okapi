@@ -36,9 +36,9 @@ public class DummyParameters implements IParameters {
 	{
 		if ( name.equals("escapeExtendedChars") )
 			escapeExtendedChars = value;
-		if ( name.equals("escapeGt") )
+		if ( name.equals(XMLEncoder.ESCAPEGT) )
 			escapeGt = value;
-		if ( name.equals("escapeNbsp") )
+		if ( name.equals(XMLEncoder.ESCAPENBSP) )
 			escapeNbsp = value;
 	}
 	
@@ -49,9 +49,9 @@ public class DummyParameters implements IParameters {
 	public boolean getBoolean (String name) {
 		if ( name.equals("escapeExtendedChars") )
 			return escapeExtendedChars;
-		if ( name.equals("escapeGt") )
+		if ( name.equals(XMLEncoder.ESCAPEGT) )
 			return escapeGt;
-		if ( name.equals("escapeNbsp") )
+		if ( name.equals(XMLEncoder.ESCAPENBSP) )
 			return escapeNbsp;
 		return false;
 	}

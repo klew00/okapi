@@ -63,8 +63,8 @@ public class EncodersTest {
 		assertEquals(">", enc.encode('>', 0));
 		
 		DummyParameters params = new DummyParameters();
-		params.setBoolean("escapeGt", true);
-		params.setBoolean("escapeNbsp", true);
+		params.setBoolean(XMLEncoder.ESCAPEGT, true);
+		params.setBoolean(XMLEncoder.ESCAPENBSP, true);
 		enc.setOptions(params, "UTF-8", "\n");
 		assertEquals("&#x00a0;", enc.encode("\u00a0", 0));
 		assertEquals("&#x00a0;", enc.encode('\u00a0', 0));

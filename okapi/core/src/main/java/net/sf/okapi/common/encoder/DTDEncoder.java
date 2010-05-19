@@ -26,7 +26,7 @@ import java.nio.charset.CharsetEncoder;
 import net.sf.okapi.common.IParameters;
 
 /**
- * Implements IEncoder for DTD text.
+ * Implements {@link IEncoder} for DTD text.
  */
 public class DTDEncoder implements IEncoder {
 

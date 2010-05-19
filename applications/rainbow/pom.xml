@@ -347,15 +347,21 @@
 		</dependency>
 		<dependency>
 			<groupId>net.sf.okapi.steps</groupId>
-			<artifactId>okapi-step-simplekit</artifactId>
+			<artifactId>okapi-step-external-command</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 <!-- Plugin
 		<dependency>
 			<groupId>net.sf.okapi.steps</groupId>
-			<artifactId>okapi-step-wordcount</artifactId>
+			<artifactId>okapi-step-simplekit</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 -->
+        <dependency>
+			<groupId>net.sf.okapi.steps</groupId>
+			<artifactId>okapi-step-wordcount</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 	</dependencies>
 </project>

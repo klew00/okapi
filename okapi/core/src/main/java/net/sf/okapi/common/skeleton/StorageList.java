@@ -32,6 +32,11 @@ import net.sf.okapi.common.resource.IReferenceable;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartGroup;
 
+/**
+ * provides a way to store a list of resources and implements the different
+ * interfaces of the resources.
+ * <p>This class is designed to be used with {@link GenericSkeletonWriter} and derived classes.
+ */
 public class StorageList extends ArrayList<IResource>
 	implements IResource, INameable, IReferenceable {
 
@@ -39,6 +44,10 @@ public class StorageList extends ArrayList<IResource>
 	
 	private StartGroup startGroup;
 
+	/**
+	 * Creates a new StorageList object with w StartGroup.
+	 * @param startGroup StartGroup to start with.
+	 */
 	public StorageList (StartGroup startGroup) {
 		this.startGroup = startGroup;
 	}
@@ -106,7 +115,6 @@ public class StorageList extends ArrayList<IResource>
 
 	@Override
 	public <A extends IAnnotation> A getAnnotation (Class<A> annotationType) {
-		//return null; //TODO: Fix this (doesn't compile on command-line) startGroup.getAnnotation(type);
 		return startGroup.getAnnotation(annotationType);
 	}
 

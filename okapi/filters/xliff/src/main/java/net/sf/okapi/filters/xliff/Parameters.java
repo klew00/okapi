@@ -23,6 +23,7 @@ package net.sf.okapi.filters.xliff;
 import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.ParametersDescription;
+import net.sf.okapi.common.encoder.XMLEncoder;
 import net.sf.okapi.common.uidescription.EditorDescription;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 import net.sf.okapi.common.uidescription.ListSelectionPart;
@@ -34,10 +35,9 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public static final int SEGMENTATIONTYPE_SEGMENTED = 1;
 	public static final int SEGMENTATIONTYPE_NOTSEGMENTED = 2;
 
-	public static final String FALLBACKTOID = "fallbackToID";
-	public static final String ESCAPEGT = "escapeGT";
-	public static final String ADDTARGETLANGUAGE = "addTargetLanguage";
-	public static final String SEGMENTATIONTYPE = "segmentationType";
+	private static final String FALLBACKTOID = "fallbackToID";
+	private static final String ADDTARGETLANGUAGE = "addTargetLanguage";
+	private static final String SEGMENTATIONTYPE = "segmentationType";
 	
 	private boolean fallbackToID;
 	private boolean escapeGT;
@@ -137,7 +137,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 //		stateValues = buffer.getString("stateValues", stateValues);
 //		extractNoState = buffer.getBoolean("extractNoState", extractNoState);
 		fallbackToID = buffer.getBoolean(FALLBACKTOID, fallbackToID);
-		escapeGT = buffer.getBoolean(ESCAPEGT, escapeGT);
+		escapeGT = buffer.getBoolean(XMLEncoder.ESCAPEGT, escapeGT);
 		addTargetLanguage = buffer.getBoolean(ADDTARGETLANGUAGE, addTargetLanguage);
 		segmentationType = buffer.getInteger(SEGMENTATIONTYPE, segmentationType);
 	}
@@ -150,7 +150,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 //		buffer.setString("stateValues", stateValues);
 //		buffer.setBoolean("extractNoState", extractNoState);
 		buffer.setBoolean(FALLBACKTOID, fallbackToID);
-		buffer.setBoolean(ESCAPEGT, escapeGT);
+		buffer.setBoolean(XMLEncoder.ESCAPEGT, escapeGT);
 		buffer.setBoolean(ADDTARGETLANGUAGE, addTargetLanguage);
 		buffer.setInteger(SEGMENTATIONTYPE, segmentationType);
 		return buffer.toString();
@@ -160,7 +160,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
 		desc.add(FALLBACKTOID, "Use the trans-unit id attribute for the text unit name if there is no resname", null);
-		desc.add(ESCAPEGT, "Escape the greater-than characters", null);
+		desc.add(XMLEncoder.ESCAPEGT, "Escape the greater-than characters", null);
 		desc.add(ADDTARGETLANGUAGE, "Add the target-language attribute if not present", null);
 		desc.add(SEGMENTATIONTYPE, "Type of segmentation", "Indicates wether to segment or not the text content");
 		return desc;
@@ -169,7 +169,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public EditorDescription createEditorDescription (ParametersDescription paramDesc) {
 		EditorDescription desc = new EditorDescription("XLIFF Filter Parameters", true, false);
 		desc.addCheckboxPart(paramDesc.get(FALLBACKTOID));
-		desc.addCheckboxPart(paramDesc.get(ESCAPEGT));
+		desc.addCheckboxPart(paramDesc.get(XMLEncoder.ESCAPEGT));
 		desc.addCheckboxPart(paramDesc.get(ADDTARGETLANGUAGE));
 
 		String[] values = {

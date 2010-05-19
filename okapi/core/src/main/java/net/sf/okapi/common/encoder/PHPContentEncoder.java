@@ -23,7 +23,7 @@ package net.sf.okapi.common.encoder;
 import net.sf.okapi.common.IParameters;
 
 /**
- * Implements IEncoder for JSON format.
+ * Implements {@link IEncoder} for JSON format.
  */
 public class PHPContentEncoder implements IEncoder {
 	

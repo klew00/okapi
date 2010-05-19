@@ -24,7 +24,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.resource.Property;
 
 /**
- * Implements IEncoder for TS file format.
+ * Implements {@link IEncoder} for TS file format.
  */
 public class TSEncoder implements IEncoder {
 	

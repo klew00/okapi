@@ -26,13 +26,26 @@ import java.nio.charset.CharsetEncoder;
 import net.sf.okapi.common.IParameters;
 
 /**
- * Implements IEncoder for XML format.
+ * Implements {@link IEncoder} for XML format.
  */
 public class XMLEncoder implements IEncoder {
 
+	/**
+	 * Parameter flag for escaping the greater-than characters.
+	 */
+	public static final String ESCAPEGT = "escapeGT";
+	/**
+	 * Parameter flag for escaping the non-breaking space characters.
+	 */
+	public static final String ESCAPENBSP = "escapeNbsp";
+	/**
+	 * Parameter flag for escaping the line-breaks.
+	 */
+	public static final String ESCAPELINEBREAK = "escapeLineBreak";
+	
 	private CharsetEncoder chsEnc;
 	private String lineBreak;
-	private boolean escapeGt = false;
+	private boolean escapeGT = false;
 	private boolean escapeNbsp = false;
 	private boolean escapeLineBreak = false;
 	private int quoteMode = 1;
@@ -65,9 +78,9 @@ public class XMLEncoder implements IEncoder {
 		}
 		
 		if ( params != null ) {
-			escapeGt = params.getBoolean("escapeGt");
-			escapeNbsp = params.getBoolean("escapeNbsp");
-			escapeLineBreak = params.getBoolean("escapeLineBreak");
+			escapeGT = params.getBoolean(ESCAPEGT);
+			escapeNbsp = params.getBoolean(ESCAPENBSP);
+			escapeLineBreak = params.getBoolean(ESCAPELINEBREAK);
 			if ( params.getBoolean("quoteModeDefined") ) {
 				quoteMode = params.getInteger("quoteMode");
 			}
@@ -89,7 +102,7 @@ public class XMLEncoder implements IEncoder {
 				sbTmp.append("&lt;");
 				continue;
 			case '>':
-				if ( escapeGt ) sbTmp.append("&gt;");
+				if ( escapeGT ) sbTmp.append("&gt;");
 				else {
 					if (( i > 0 ) && ( text.charAt(i-1) == ']' )) sbTmp.append("&gt;");
 					else sbTmp.append('>');
@@ -172,7 +185,7 @@ public class XMLEncoder implements IEncoder {
 		case '&':
 			return "&amp;";
 		case '>':
-			if ( escapeGt ) return "&gt;";
+			if ( escapeGT ) return "&gt;";
 			else return ">";
 		case '\n':
 			if ( escapeLineBreak ) return "&#10;";
@@ -211,7 +224,7 @@ public class XMLEncoder implements IEncoder {
 		case '&':
 			return "&amp;";
 		case '>':
-			if ( escapeGt ) return "&gt;";
+			if ( escapeGT ) return "&gt;";
 			else return ">";
 		case '\n':
 			if ( escapeLineBreak ) return "&#10;";

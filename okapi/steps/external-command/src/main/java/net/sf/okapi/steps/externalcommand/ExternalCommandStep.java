@@ -1,3 +1,23 @@
+/*===========================================================================
+  Copyright (C) 2010 by the Okapi Framework contributors
+-----------------------------------------------------------------------------
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
+
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+===========================================================================*/
+
 package net.sf.okapi.steps.externalcommand;
 
 import java.io.ByteArrayOutputStream;
@@ -5,6 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,6 +57,7 @@ import org.apache.commons.exec.PumpStreamHandler;
  */
 @UsingParameters(Parameters.class)
 public class ExternalCommandStep extends BasePipelineStep {
+	
 	private static final Logger LOGGER = Logger.getLogger(ExternalCommandStep.class.getName());
 
 	private static final String INPUT_FILE_VAR = "inputPath";
@@ -46,6 +68,10 @@ public class ExternalCommandStep extends BasePipelineStep {
 	private Executor executor;
 	private ExecuteWatchdog watchdog;
 	private URI outputURI;
+
+	public ExternalCommandStep () {
+		parameters = new Parameters();
+	}
 
 	@StepParameterMapping(parameterType = StepParameterType.OUTPUT_URI)
 	public void setOutputURI(URI outputURI) {
@@ -69,12 +95,12 @@ public class ExternalCommandStep extends BasePipelineStep {
 
 	@Override
 	public String getDescription() {
-		return "Execute an external command line program.";
+		return "Execute an external command line.";
 	}
 
 	@Override
 	public String getName() {
-		return "Execute External Command";
+		return "External Command";
 	}
 
 	@Override
@@ -93,20 +119,30 @@ public class ExternalCommandStep extends BasePipelineStep {
 
 	@Override
 	protected Event handleRawDocument(Event event) {
+		
 		int exitValue;
-
-		// setup input and output paths
 		Map<String, String> subtitutions = new HashMap<String, String>();
-		String inputPath = (new File(event.getRawDocument().getInputURI()).getAbsolutePath());
-		String outputPath = inputPath + ".out";
+		RawDocument rawDoc = event.getRawDocument();
+		
+		// Set input path variable
+		String inputPath = (new File(rawDoc.getInputURI()).getPath());
 		subtitutions.put(INPUT_FILE_VAR, inputPath);
-		if (isLastOutputStep() && outputURI != null && !outputURI.getPath().isEmpty()) {
-			outputPath = outputURI.getPath();
-			subtitutions.put(OUTPUT_FILE_VAR, outputURI.toString());
-		} else {
-			subtitutions.put(OUTPUT_FILE_VAR, outputPath);
+		
+		// Set output path variable
+		String outputPath = inputPath + ".out"; // Default
+		if ( isLastOutputStep() && outputURI != null && !outputURI.getPath().isEmpty() ) {
+			outputPath = (new File(outputURI).getPath());
 		}
+		subtitutions.put(OUTPUT_FILE_VAR, outputPath);
 
+		// Set source-related variables
+		subtitutions.put("srcLangName", rawDoc.getSourceLocale().toJavaLocale().getDisplayLanguage(Locale.ENGLISH));
+		subtitutions.put("srcLang", rawDoc.getSourceLocale().getLanguage());
+		
+		// Set target-related variables
+		subtitutions.put("trgLangName", rawDoc.getTargetLocale().toJavaLocale().getDisplayLanguage(Locale.ENGLISH));
+		subtitutions.put("trgLang", rawDoc.getTargetLocale().getLanguage());
+		
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		ByteArrayOutputStream err = new ByteArrayOutputStream();
 		PumpStreamHandler psh = new PumpStreamHandler(out, err);
@@ -116,9 +152,11 @@ public class ExternalCommandStep extends BasePipelineStep {
 			CommandLine cl = CommandLine.parse(parameters.getCommand(), subtitutions);
 			LOGGER.log(Level.INFO, "External Command: " + cl.toString());
 			exitValue = executor.execute(cl);
-		} catch (ExecuteException e) {
+		}
+		catch (ExecuteException e) {
 			throw new RuntimeException(e);
-		} catch (IOException e) {
+		}
+		catch (IOException e) {
 			throw new OkapiIOException(e);
 		}
 
@@ -134,7 +172,7 @@ public class ExternalCommandStep extends BasePipelineStep {
 		try {
 			out.close();
 		} catch (IOException e) {
-			throw new OkapiIOException("Error closing process output streamm", e);
+			throw new OkapiIOException("Error closing process output streamm.", e);
 		}
 		try {
 			err.close();
@@ -142,10 +180,10 @@ public class ExternalCommandStep extends BasePipelineStep {
 			throw new OkapiIOException("Error closing process error streamm", e);
 		}
 
-		// create new event resource pointing to the output
+		// Create new event resource pointing to the output
 		RawDocument outRawDoc = null;
-		outRawDoc = new RawDocument((new File(outputPath)).toURI(), event.getRawDocument()
-				.getEncoding(), event.getRawDocument().getSourceLocale());
+		outRawDoc = new RawDocument((new File(outputPath)).toURI(), rawDoc.getEncoding(),
+			rawDoc.getSourceLocale(), rawDoc.getTargetLocale());
 
 		event.setResource(outRawDoc);
 		done = true;
@@ -156,4 +194,5 @@ public class ExternalCommandStep extends BasePipelineStep {
 	protected Event handleEndBatch(Event event) {
 		return event;
 	}
+
 }

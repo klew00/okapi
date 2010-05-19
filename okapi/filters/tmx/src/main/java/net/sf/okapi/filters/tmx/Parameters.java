@@ -22,6 +22,7 @@ package net.sf.okapi.filters.tmx;
 
 import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.ParametersDescription;
+import net.sf.okapi.common.encoder.XMLEncoder;
 
 public class Parameters extends BaseParameters{
 
@@ -67,14 +68,14 @@ public class Parameters extends BaseParameters{
 	public void fromString(String data) {
 		reset();
 		buffer.fromString(data);
-		escapeGT = buffer.getBoolean("escapeGT", escapeGT);
+		escapeGT = buffer.getBoolean(XMLEncoder.ESCAPEGT, escapeGT);
 		processAllTargets = buffer.getBoolean("processAllTargets", processAllTargets);
 		consolidateDpSkeleton = buffer.getBoolean("consolidateDpSkeleton", consolidateDpSkeleton);
 	}
 
 	public String toString () {
 		buffer.reset();
-		buffer.setBoolean("escapeGT", escapeGT);		
+		buffer.setBoolean(XMLEncoder.ESCAPEGT, escapeGT);		
 		buffer.setBoolean("processAllTargets", processAllTargets);
 		buffer.setBoolean("consolidateDpSkeleton", consolidateDpSkeleton);
 		return buffer.toString();
@@ -83,7 +84,7 @@ public class Parameters extends BaseParameters{
 	@Override
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
-		desc.add("escapeGT", "Escape the greater-than characters", null);
+		desc.add(XMLEncoder.ESCAPEGT, "Escape the greater-than characters", null);
 		desc.add("processAllTargets", "Read all traget entries", null);
 		desc.add("consolidateDpSkeleton", "Group all document parts skeleton into one", null);
 		return desc;

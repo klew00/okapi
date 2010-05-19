@@ -123,9 +123,10 @@ public class FilterEventsToRawDocumentStep extends BasePipelineStep {
 		filterWriter.handleEvent(event);
 		filterWriter.close();
 
-		// Return the RawDocument Event that is the end result of all
-		// previous Events
-		RawDocument input = new RawDocument(outputFile.toURI(), outputEncoding, targetLocale);
+		// Return the RawDocument Event that is the end result of all previous Events
+		// Note that the source locale is now set to the 'target locale' value since it is an output
+		// We also set the target to the same value to have a value
+		RawDocument input = new RawDocument(outputFile.toURI(), outputEncoding, targetLocale, targetLocale);
 		isDone = true;
 		return new Event(EventType.RAW_DOCUMENT, input);
 	}

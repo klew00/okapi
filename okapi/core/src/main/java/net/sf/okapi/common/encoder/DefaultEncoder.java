@@ -23,7 +23,7 @@ package net.sf.okapi.common.encoder;
 import net.sf.okapi.common.IParameters;
 
 /**
- * Implements IEncoder for non-specific formats. It only converts the line-breaks to the proper type.
+ * Implements {@link IEncoder} for non-specific formats. It only converts the line-breaks to the proper type.
  */
 public class DefaultEncoder implements IEncoder {
 	

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -38,7 +38,11 @@ import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
+/**
+ * Basic abstract implementation of {@link IFilter}.
+ */
 public abstract class AbstractFilter implements IFilter {
+	
 	private static final Logger LOGGER = Logger.getLogger(AbstractFilter.class.getName());
 
 	private static final String START_DOCUMENT = "sd"; //$NON-NLS-1$

@@ -1,6 +1,27 @@
+/*===========================================================================
+  Copyright (C) 2010 by the Okapi Framework contributors
+-----------------------------------------------------------------------------
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
+
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+===========================================================================*/
+
 package net.sf.okapi.common.resource;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -12,23 +33,38 @@ import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.pipeline.Pipeline;
 
+/**
+ * Special resource that holds one or more events.
+ */
 public class MultiEvent implements IResource, Iterable<Event> {
+
 	private Annotations annotations;
 	private String id;
 	private boolean propagateAsSingleEvent = false;
 	private List<Event> events;
 
-	public MultiEvent() {
+	/**
+	 * Creates a new empty MultiEvent object.
+	 */
+	public MultiEvent () {
 		propagateAsSingleEvent = false;
 		events = new ArrayList<Event>(100);
 	}
 	
-	public MultiEvent(List<Event> events) {
+	/**
+	 * Creates a new MultiEvent object with a list of given events.
+	 * @param events the list of initial events.
+	 */
+	public MultiEvent (List<Event> events) {
 		propagateAsSingleEvent = false;
 		this.events = events;;
 	}
 
-	public void addEvent(Event event) {
+	/**
+	 * Adds an event to this object.
+	 * @param event the event to add.
+	 */
+	public void addEvent (Event event) {
 		events.add(event);
 	}
 
@@ -78,6 +114,9 @@ public class MultiEvent implements IResource, Iterable<Event> {
 		throw new OkapiNotImplementedException("MultiResource does not have a skeketon");
 	}
 
+	/**
+	 * Creates an iterator for the events in this resource.
+	 */
 	@Override
 	public Iterator<Event> iterator() {
 		return events.iterator();
@@ -93,15 +132,19 @@ public class MultiEvent implements IResource, Iterable<Event> {
 
 	/**
 	 * Do we send this {@link Event} by itself or does the {@link Pipeline} break the individual Events and end them
-	 * singley. Default is false - we send each Event singley.
+	 * singly. Default is false - we send each Event singly.
 	 * 
-	 * @return true if we send the Event as-is, false to send the invidual Events contined here.
+	 * @return true if we send the Event as-is, false to send the individual Events continued here.
 	 */
-	public boolean isPropagateAsSingleEvent() {
+	public boolean isPropagateAsSingleEvent () {
 		return propagateAsSingleEvent;
 	}
 
-	public Annotations getAnnotations() {
-		return (annotations == null) ? new Annotations() : annotations;
+	public Iterable<IAnnotation> getAnnotations () {
+		if ( annotations == null ) {
+			return Collections.emptyList();
+		}
+		return annotations;
 	}
+
 }

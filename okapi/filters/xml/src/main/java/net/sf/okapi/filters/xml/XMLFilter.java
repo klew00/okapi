@@ -723,7 +723,7 @@ public class XMLFilter implements IFilter {
 			List<Code> codes = frag.getCodes();
 			for ( Code code : codes ) {
 				if ( code.getData().equals("&#10;") ) continue; // Do not re-escape escaped line-breaks
-				code.setData(Util.escapeToXML(code.getData(), 0, params.escapeGt, null));
+				code.setData(Util.escapeToXML(code.getData(), 0, params.escapeGT, null));
 			}
 			frag.setCodedText(frag.getCodedText(), codes);
 		}

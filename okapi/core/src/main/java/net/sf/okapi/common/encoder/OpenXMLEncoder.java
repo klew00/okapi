@@ -20,12 +20,12 @@
 
 package net.sf.okapi.common.encoder;
 
-/**
- * Encodes <, >, and &, but not " or '
- */
-
 import net.sf.okapi.common.IParameters;
 
+/**
+ * Implements {@link IEncoder} for the Open XML format.
+ * <p>This encoder encodes <, >, and &, but not " or '.
+ */
 public class OpenXMLEncoder implements IEncoder {
 
 	private String lineBreak;

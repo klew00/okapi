@@ -25,9 +25,14 @@ import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.ParametersDescription;
 import net.sf.okapi.common.uidescription.EditorDescription;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
+import net.sf.okapi.common.uidescription.TextInputPart;
 
 @EditorFor(Parameters.class)
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
+	
+	private static final String COMMAND = "command";
+	private static final String TIMEOUT = "timeout";
+
 	private String command;	
 	private int timeout;
 
@@ -61,31 +66,33 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
-		command = buffer.getString("command", command);
-		timeout = buffer.getInteger("timeout", -1);
+		command = buffer.getString(COMMAND, command);
+		timeout = buffer.getInteger(TIMEOUT, -1);
 	}
 
 	@Override
 	public String toString() {
 		buffer.reset();
-		buffer.setParameter("command", command);
-		buffer.setParameter("timeout", timeout);	
+		buffer.setParameter(COMMAND, command);
+		buffer.setParameter(TIMEOUT, timeout);	
 		return buffer.toString();
 	}
 
 	@Override
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
-		desc.add("command",	"Command Path", "Command path to execute");
-		desc.add("timeout",	"Command Timeout", "Command timeout in seconds");
+		desc.add(COMMAND, "Command line", "Command path to execute");
+		desc.add(TIMEOUT, "Timeout", "Timeout in seconds after which the command is cancelled (use -1 for no timeout)");
 		return desc;
 	}
 	
 	@Override
-	public EditorDescription createEditorDescription(ParametersDescription paramsDesc) {
+	public EditorDescription createEditorDescription (ParametersDescription paramsDesc) {
 		EditorDescription desc = new EditorDescription("Execute Command Line Tool", true, false);
-		desc.addTextInputPart(paramsDesc.get("timeout"));
-		desc.addTextInputPart(paramsDesc.get("command"));
+		desc.addTextInputPart(paramsDesc.get(COMMAND));
+		TextInputPart tip = desc.addTextInputPart(paramsDesc.get(TIMEOUT));
+		tip.setVertical(false);
 		return desc;
 	}
+
 }

@@ -186,6 +186,8 @@
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi/steps/encodingconversion/target/classes"
 			 excludes="**/META-INF/**"/>
+			<fileset dir="../../okapi/steps/external-command/target/classes"
+			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi/steps/fullwidthconversion/target/classes"
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi/steps/formatconversion/target/classes"
@@ -383,6 +385,16 @@
 		   <fileset dir="../shared/licenses" includes="**/trove-*"/>
 		</copy>
 		
+		<property name="dep022" value="${mavenStore}/org/apache/commons/commons-exec/1.0.1"/>
+		<fileset id="list.contents" dir="${dep022}"
+		 includes="**/commons-exec-1.0.1.jar"/>
+		<property name="jar022" refid="list.contents"/>
+		<echo file="tmpJars" append="yes"> ${jar022}</echo>
+		<copy todir="${distLib}" file="${dep022}/${jar022}"/>
+		<copy todir="${distLicenses}">
+		   <fileset dir="../shared/licenses" includes="**/commons-*"/>
+		</copy>
+
 <!--For xliff-tkit later
 		<property name="dep022" value="${mavenStore}/org/apache/poi/poi-ooxml/3.6"/>
 		<fileset id="list.contents" dir="${dep022}"

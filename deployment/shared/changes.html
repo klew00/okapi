@@ -30,16 +30,16 @@ distribution.</p>
 	was pre-translated but not segmented.</li>
 		</ul></li>
 		<li>ID-Based Alignment<ul>
-		<li>Implemented TMX output for unfound entries. (<a href="http://code.google.com/p/okapi/issues/detail?id=134">Request 
-		#134</a>)</li>
+		<li>Implemented request #134: A TMX output can now be created for 
+		un-aligned entries.</li>
 	</ul>
 		</li>
 	</ul>
 	</li>
 	<li>Libraries:<ul>
-		<li>Changed the TextContainer class and refactor all dependencies. Note 
+		<li>Changed the TextContainer class and refactor all dependencies. This 
 		modification is a major code change.</li>
-		<li>Added the setRootDirectory() method to the IQuery interface.</li>
+		<li>Added the <code>setRootDirectory()</code> method to the IQuery interface.</li>
 		<li>Updated QueryManager to handle empty inline codes and inline codes 
 		with references when leveraging fuzzy matches</li>
 		<li>Added spin-like input part to the generic editor.</li>
@@ -52,7 +52,7 @@ distribution.</p>
 	</li>
 	<li>Translation resources:<ul>
 	<li>Updated all the connectors for the IQuery change and Implemented 
-	${rootDir} for all the connectors using locale files: SimpleTM and Pensieve.</li>
+	<code>${rootDir}</code> for all the connectors using locale files: SimpleTM and Pensieve.</li>
 	<li>Apertium MT:<ul>
 	<li>Updated the connector to use the new JSONP API (<a href="http://wiki.apertium.org/wiki/Apertium_web_service">http://wiki.apertium.org/wiki/Apertium_web_service</a>)</li>
 	<li>Added support for API key (See
@@ -60,8 +60,11 @@ distribution.</p>
 	http://api.apertium.org/register.jsp</a>)</li>
 </ul>
 	</li>
-	<li>Added a new connector for the (commercial) Cross-Language Gateway MT 
-	services (<a href="http://www.crosslang.com/language-professionals/machine-translation/cl-gateway">http://www.crosslang.com/language-professionals/machine-translation/cl-gateway</a>)</li>
+	<li>Cross-Language Gateway MT services:<ul>
+	<li>Added a new connector for this commercial service. See:
+	<a href="http://www.crosslang.com/language-professionals/machine-translation/cl-gateway">http://www.crosslang.com/language-professionals/machine-translation/cl-gateway</a></li>
+</ul>
+	</li>
 </ul>
 	</li>
 	<li>Filters:<ul>
@@ -90,8 +93,24 @@ distribution.</p>
 	writeUTF() limitation): added multi-chunks write/read function.</li>
 </ul>
 	</li>
-	<li>Added the Ruby on Rails YAML filter for partial support of
+	<li>Ruby on Rails YAML filter:<ul>
+	<li>Added support for Ruby on Rails YAML filter. It offers partial support of
 	<a href="http://www.yaml.org/">YAML files</a>.</li>
+</ul>
+	</li>
+	<li>Versified Text Filter:<ul>
+	<li>Added support for filter on versified text documents.</li>
+</ul>
+	</li>
+	<li>HTML filter:<ul>
+	<li>Fixed default configurations to extract ALT attribute of AREA elements.</li>
+</ul>
+	</li>
+	<li>TMX filter:<ul>
+	<li>Fixed the bug where the option &quot;escape greater-than characters&quot; was not 
+	working.</li>
+</ul>
+	</li>
 </ul>
 	</li>
 	<li>Steps:<ul>
@@ -103,7 +122,8 @@ distribution.</p>
 	segmentation.</li>
 </ul>
 	</li>
-	<li>Added &quot;Diff Leverage&quot; step.</li>
+	<li>Added the &quot;Diff Leverage&quot; step.</li>
+	<li>Added the &quot;External Command&quot; step.</li>
 	<li>Format Conversion step: added the option to generate output files with 
 	automated extension.</li>
 </ul>

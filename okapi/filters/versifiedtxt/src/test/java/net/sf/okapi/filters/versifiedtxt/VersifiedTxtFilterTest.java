@@ -85,15 +85,14 @@ public class VersifiedTxtFilterTest {
 		assertEquals("book:chapter:1", tu.getName());
 	}
 	
-// Line-break types not supported currently
-//	@Test
-//	public void testOutputSimpleBookChapterVerseWithMacLB () {
-//		String snippet = "|bbook\r|cchapter\r|v1\rThis is a test.\r";
-//		String expected = "|bbook\r|cchapter\r|v1\rThis is a test.\r";
-//		String result = FilterTestDriver.generateOutput(getEvents(snippet),
-//			filter.getEncoderManager(), LocaleId.ENGLISH);
-//		assertEquals(result, expected);
-//	}
+	@Test
+	public void testOutputSimpleBookChapterVerseWithMacLB () {
+		String snippet = "|bbook\r|cchapter\r|v1\rThis is a test.\r";
+		String expected = "|bbook\r|cchapter\r|v1\rThis is a test.\r";
+		String result = FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), LocaleId.ENGLISH);
+		assertEquals(result, expected);
+	}
 
 	@Test
 	public void testOutputSimpleBookChapterVerse () {

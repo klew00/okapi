@@ -53,7 +53,7 @@ public class ExternalCommandStepTest {
 		externalCommand.setParameters(p);
 
 		URL url = ExternalCommandStepTest.class.getResource("/test.txt");
-		RawDocument d = new RawDocument(url.toURI(), "UTF-8", LocaleId.ENGLISH);
+		RawDocument d = new RawDocument(url.toURI(), "UTF-8", LocaleId.ENGLISH, LocaleId.CHINA_CHINESE);
 
 		pipeline.startBatch();
 

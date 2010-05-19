@@ -24,7 +24,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.resource.Property;
 
 /**
- * Implements IEncoder for PO file format.
+ * Implements {@link IEncoder} for PO file format.
  */
 public class POEncoder implements IEncoder {
 	
