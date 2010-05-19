@@ -87,11 +87,11 @@ public class VersifiedTxtFilterTest {
 	
 	@Test
 	public void testOutputSimpleBookChapterVerseWithMacLB () {
-		String snippet = "|bbook\r|cchapter\r|v1\rThis is a test.\r";
-		String expected = "|bbook\r|cchapter\r|v1\rThis is a test.\r";
+		String snippet = "|bbook\r|cchapter\r|v0\rTest\r\r|v1\rThis is a test.\r";
+		String expected = "|bbook\r|cchapter\r|v0\rTest\r\r|v1\rThis is a test.\r";
 		String result = FilterTestDriver.generateOutput(getEvents(snippet),
 			filter.getEncoderManager(), LocaleId.ENGLISH);
-		assertEquals(result, expected);
+		assertEquals(expected, result);
 	}
 
 	@Test

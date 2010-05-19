@@ -243,11 +243,8 @@ public class VersifiedTextFilter extends AbstractFilter {
 				verse.reset();
 				break;
 			}
-			if (line.isEmpty()) {
-				source.append(line);
-			} else {
-				source.append(line + newline);
-			}
+			// Need to capture all line-breaks between lines, even empty (they can be between lines)
+			source.append(line + "\n"); // But use standard line-break in content
 			
 			verse.mark(3200);
 		}
