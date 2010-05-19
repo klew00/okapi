@@ -88,7 +88,7 @@ public enum AltTranslationType {
 	MT,
 
 	/**
-	 * Unknown match type. A NONE type always sorts below all other matches. Make sure this type is the last in the list.
+	 * Unknown match type. A UNKOWN type always sorts below all other matches. Make sure this type is the last in the list.
 	 */
 	UKNOWN
 }
