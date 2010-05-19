@@ -44,7 +44,7 @@ public class AltTranslationTest {
 		at2 = new AltTranslation(LocaleId.ENGLISH, LocaleId.SPANISH, null, source2,
 				target2, AltTranslationType.EXACT, 90, "");
 		at3 = new AltTranslation(LocaleId.ENGLISH, LocaleId.SPANISH, null, source3,
-				target3, AltTranslationType.PREVIOUS_VERSION_EXACT, 100, "");
+				target3, AltTranslationType.EXACT_PREVIOUS_VERSION, 100, "");
 	}
 
 	@Test

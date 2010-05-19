@@ -509,8 +509,8 @@ public class QueryManager {
 						leveraged++;
 						// Temporary code for alt-trans annotation
 						AltTranslation at = new AltTranslation(srcLoc, trgLoc, seg.text, qr.source,
-								qr.target, AltTranslationType.NONE,	qr.score, qr.origin);
-						at.setType((qr.fromMT ? AltTranslationType.MT : AltTranslationType.NONE));
+								qr.target, AltTranslationType.UKNOWN,	qr.score, qr.origin);
+						at.setType((qr.fromMT ? AltTranslationType.MT : AltTranslationType.UKNOWN));
 						addAltTranslation(seg, at);
 						continue;
 					}
@@ -523,8 +523,8 @@ public class QueryManager {
 					// temporary code for alt-trans annotation
 					// Temporary code for alt-trans annotation
 					AltTranslation at = new AltTranslation(srcLoc, trgLoc, seg.text, qr.source,
-							qr.target, AltTranslationType.NONE,	qr.score, qr.origin);
-					at.setType((qr.fromMT ? AltTranslationType.MT : AltTranslationType.NONE));
+							qr.target, AltTranslationType.UKNOWN,	qr.score, qr.origin);
+					at.setType((qr.fromMT ? AltTranslationType.MT : AltTranslationType.UKNOWN));
 					addAltTranslation(seg, at);
 					continue;
 				}
@@ -537,8 +537,8 @@ public class QueryManager {
 				// temporary code for alt-trans annotation
 				// Temporary code for alt-trans annotation
 				AltTranslation at = new AltTranslation(srcLoc, trgLoc, seg.text, qr.source,
-						qr.target, AltTranslationType.NONE,	qr.score, qr.origin);
-				at.setType((qr.fromMT ? AltTranslationType.MT : AltTranslationType.NONE));
+						qr.target, AltTranslationType.UKNOWN,	qr.score, qr.origin);
+				at.setType((qr.fromMT ? AltTranslationType.MT : AltTranslationType.UKNOWN));
 				addAltTranslation(seg, at);
 			}
 		}

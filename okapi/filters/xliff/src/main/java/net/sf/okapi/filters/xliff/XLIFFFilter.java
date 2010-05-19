@@ -704,7 +704,7 @@ public class XLIFFFilter implements IFilter {
 					}
 					else {
 						// Add the source, no target yet
-						altTrans.add(lang, null, null, tc.getFirstContent(), null, AltTranslationType.NONE, 0, null);
+						altTrans.add(lang, null, null, tc.getFirstContent(), null, AltTranslationType.UKNOWN, 0, null);
 						altTrans.getLast().getEntry().setPreserveWhitespaces(preserveSpaces.peek());
 					}
 				}
@@ -761,7 +761,7 @@ public class XLIFFFilter implements IFilter {
 						alt = null; // Behave like it's a first entry
 					}
 					if ( alt == null ) {
-						altTrans.add(srcLang, null, null, null, null, AltTranslationType.NONE, 0, null);
+						altTrans.add(srcLang, null, null, null, null, AltTranslationType.UKNOWN, 0, null);
 					}
 					if ( tc.contentIsOneSegment() ) {
 						altTrans.getLast().setTarget(lang, tc.getFirstContent());

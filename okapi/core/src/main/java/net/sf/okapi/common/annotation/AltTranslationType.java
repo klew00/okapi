@@ -33,20 +33,25 @@ public enum AltTranslationType {
 	EXACT_UNIQUE_ID,
 
 	/**
-	 * A match that is EXACT and comes from a different version of the same document
+	 * A match that is EXACT and comes from a previous version of the same document
 	 */
-	PREVIOUS_VERSION_EXACT,
+	EXACT_PREVIOUS_VERSION,
 
 	/**
-	 * Matches both codes and text exactly and a small number of segments before and/or after.
+	 * Matches EXACT and a small number of segments before and/or after.
 	 */
 	EXACT_LOCAL_CONEXT,
 
 	/**
-	 * Matches both codes and text exactly and the structural type of the segment (title, paragraph, list element etc..)
+	 * Matches EXACT and comes from a repeated segment in the same document
+	 */
+	EXACT_REPEATED_SEGMENT_SAME_DOCUMENT,
+
+	/**
+	 * Matches EXACT and the structural type of the segment (title, paragraph, list element etc..)
 	 */
 	EXACT_STRUCTURAL,
-
+	
 	/**
 	 * Matches text and codes exactly.
 	 */
@@ -58,14 +63,9 @@ public enum AltTranslationType {
 	FUZZY_UNIQUE_ID,
 
 	/**
-	 * A match that is FUZZY_FULL_TEXT_MATCH and comes from a different version of the same document
+	 * Matches FUZZY and comes from a previous version of the same document
 	 */
-	PREVIOUS_VERSION_FUZZY_FULL_TEXT_MATCH,
-
-	/**
-	 * A match that is FUZZY and comes from a different version of the same document
-	 */
-	PREVIOUS_VERSION_FUZZY,
+	FUZZY_PREVIOUS_VERSION,
 
 	/**
 	 * Matches text exactly, but there is a difference in one or more codes
@@ -73,7 +73,7 @@ public enum AltTranslationType {
 	FUZZY_EXACT_TEXT,
 
 	/**
-	 * Matches both text and codes partially.
+	 * Matches both text and/or codes partially.
 	 */
 	FUZZY,
 
@@ -83,12 +83,12 @@ public enum AltTranslationType {
 	PHRASE_ASSEMBLED,
 
 	/**
-	 * Indicates an alternate translation coming from an MT engine.
+	 * Indicates a translation coming from an MT engine.
 	 */
 	MT,
 
 	/**
-	 * A NONE type always sorts below all other matches. Make sure this type is the last in the list.
+	 * Unknown match type. A NONE type always sorts below all other matches. Make sure this type is the last in the list.
 	 */
-	NONE
+	UKNOWN
 }
