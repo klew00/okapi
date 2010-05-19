@@ -34,35 +34,11 @@ import net.sf.okapi.common.resource.TextUnit;
  * This object is used with the {@link AltTranslationsAnnotation} annotation.
  */
 public class AltTranslation implements Comparable<AltTranslation> {
-
-	public enum AltTranslationOriginType {
-		/**
-		 * Indicates an alternate translation coming from the DiffLeverageStep.
-		 */
-		DIFF_LEVERAGE,
-		
-		/**
-		 * Indicates an alternate translation coming from a TM engine.
-		 */
-		TM,
-		
-		/**
-		 * Indicates an alternate translation coming from an MT engine.
-		 */
-		MT,
-
-		/**
-		 * Indicates an alternate translation coming from the source document.
-		 * For example from an old translation in a PO file.
-		 */
-		FROM_DOCUMENT
-	}
 	
 	LocaleId srcLocId;
 	LocaleId trgLocId;
 	TextUnit tu;
 	AltTranslationType type;
-	AltTranslationOriginType originType;
 	int score;
 	String origin;
 
@@ -194,10 +170,6 @@ public class AltTranslation implements Comparable<AltTranslation> {
 
 	public void setType(AltTranslationType type) {
 		this.type = type;
-	}
-
-	public void setOriginType(AltTranslationOriginType originType) {
-		this.originType = originType;
 	}
 
 	public void setScore(int score) {

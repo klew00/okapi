@@ -33,12 +33,6 @@ public enum AltTranslationType {
 	EXACT_UNIQUE_ID,
 
 	/**
-	 * Indicates an alternate translation coming from the source document. For example from an old translation in a PO
-	 * file.
-	 */
-	FROM_DOCUMENT, // TODO: How is this different from a DiffLeverage???
-
-	/**
 	 * A match that is EXACT and comes from a different version of the same document
 	 */
 	PREVIOUS_VERSION_EXACT,
