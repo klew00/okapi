@@ -33,7 +33,6 @@ import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationType;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.annotation.ScoresAnnotation;
-import net.sf.okapi.common.annotation.AltTranslation.AltTranslationOriginType;
 import net.sf.okapi.common.filterwriter.TMXWriter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
@@ -511,7 +510,7 @@ public class QueryManager {
 						// Temporary code for alt-trans annotation
 						AltTranslation at = new AltTranslation(srcLoc, trgLoc, seg.text, qr.source,
 								qr.target, AltTranslationType.NONE,	qr.score, qr.origin);
-						at.setOriginType((qr.fromMT ? AltTranslationOriginType.MT : AltTranslationOriginType.TM));
+						at.setType((qr.fromMT ? AltTranslationType.MT : AltTranslationType.NONE));
 						addAltTranslation(seg, at);
 						continue;
 					}
@@ -522,9 +521,10 @@ public class QueryManager {
 					seg.text = adjustNewFragment(seg.text, qr.source, qr.target, qr.score, tu);
 					leveraged++;
 					// temporary code for alt-trans annotation
+					// Temporary code for alt-trans annotation
 					AltTranslation at = new AltTranslation(srcLoc, trgLoc, seg.text, qr.source,
 							qr.target, AltTranslationType.NONE,	qr.score, qr.origin);
-					at.setOriginType((qr.fromMT ? AltTranslationOriginType.MT : AltTranslationOriginType.TM));
+					at.setType((qr.fromMT ? AltTranslationType.MT : AltTranslationType.NONE));
 					addAltTranslation(seg, at);
 					continue;
 				}
@@ -535,9 +535,10 @@ public class QueryManager {
 				seg.text = adjustNewFragment(seg.text, qr.source, qr.target, qr.score, tu);
 				leveraged++;
 				// temporary code for alt-trans annotation
+				// Temporary code for alt-trans annotation
 				AltTranslation at = new AltTranslation(srcLoc, trgLoc, seg.text, qr.source,
 						qr.target, AltTranslationType.NONE,	qr.score, qr.origin);
-				at.setOriginType((qr.fromMT ? AltTranslationOriginType.MT : AltTranslationOriginType.TM));
+				at.setType((qr.fromMT ? AltTranslationType.MT : AltTranslationType.NONE));
 				addAltTranslation(seg, at);
 			}
 		}
