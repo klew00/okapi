@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -21,7 +21,6 @@
 package net.sf.okapi.applications.rainbow.pipeline;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -93,7 +92,7 @@ public class PipelineStorage implements IPipelineWriter, IPipelineReader {
 			}
 			else {
 				// File writer
-				writer = new XMLWriter(new FileWriter(path));
+				writer = new XMLWriter(path);
 			}
 
 			writer.writeStartDocument();
@@ -108,9 +107,6 @@ public class PipelineStorage implements IPipelineWriter, IPipelineReader {
 				}
 				writer.writeEndElementLineBreak(); // step
 			}
-		}
-		catch ( IOException e ) {
-			throw new RuntimeException(e);
 		}
 		finally {
 			if ( writer != null ) {

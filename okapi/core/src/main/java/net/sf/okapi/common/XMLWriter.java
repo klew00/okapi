@@ -1,21 +1,21 @@
 /*===========================================================================
-Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
-This library is free software; you can redistribute it and/or modify it 
-under the terms of the GNU Lesser General Public License as published by 
-the Free Software Foundation; either version 2.1 of the License, or (at 
-your option) any later version.
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
 
-This library is distributed in the hope that it will be useful, but 
-WITHOUT ANY WARRANTY; without even the implied warranty of 
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
-General Public License for more details.
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
 
-You should have received a copy of the GNU Lesser General Public License 
-along with this library; if not, write to the Free Software Foundation, 
-Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
 package net.sf.okapi.common;
@@ -61,7 +61,8 @@ public class XMLWriter {
 
     /**
      * Creates a new XML document for a given writer object.
-     * @param writer the writer to use to output the document.
+     * @param writer the writer to use to output the document. If this writer outputs to
+     * bytes it must be set to output in UTF-8.
      */
     public XMLWriter (Writer writer) {
     	this.writer = new PrintWriter(writer);
