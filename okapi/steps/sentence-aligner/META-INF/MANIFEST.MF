@@ -7,3 +7,4 @@ Export-Package: net.sf.okapi.steps.gcaligner
 Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0",
  net.sf.okapi.lib.segmentation;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Import-Package: net.sf.okapi.filters.tmx

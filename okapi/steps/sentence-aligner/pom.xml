@@ -14,17 +14,15 @@
 		<dependency>
 			<groupId>net.sf.okapi</groupId>
 			<artifactId>okapi-core</artifactId>
+            <scope>test</scope>
+            <classifier>tests</classifier>
 			<version>${project.version}</version>
 		</dependency>        
-		
-
-		
 		<dependency>
 			<groupId>net.sf.okapi.lib</groupId>
 			<artifactId>okapi-lib-segmentation</artifactId>
 			<version>0.7-SNAPSHOT</version>
 		</dependency>
-		
 		<dependency>
 			<groupId>net.sf.okapi.steps</groupId>
 			<artifactId>okapi-step-common</artifactId>
@@ -33,6 +31,12 @@
 		<dependency>
 			<groupId>net.sf.okapi.filters</groupId>
 			<artifactId>okapi-filter-plaintext</artifactId>
+			<version>0.7-SNAPSHOT</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.okapi.filters</groupId>
+			<artifactId>okapi-filter-tmx</artifactId>
 			<version>0.7-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>

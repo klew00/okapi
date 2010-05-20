@@ -21,6 +21,7 @@
 package net.sf.okapi.steps.gcaligner;
 
 import java.io.InputStream;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
@@ -31,6 +32,7 @@ import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
+import net.sf.okapi.common.filterwriter.TMXFilterWriter;
 import net.sf.okapi.common.filterwriter.TMXWriter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.observer.IObservable;
@@ -40,11 +42,13 @@ import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.segmentation.SRXDocument;
 
 /**
- * Align sentences between two source and target paragraphs (TextUnits) and produce a TMX file with aligned sentences.
+ * Align sentences between source and target paragraphs (TextUnits) and produce a TMX file with aligned sentences.
  * This {@link IPipelineStep} (via configuration) can also output aligned (multilingual {@link TextUnit}s)
  * 
  * @author HARGRAVEJE
@@ -55,13 +59,14 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 	private static final Logger LOGGER = Logger.getLogger(SentenceAlignerStep.class.getName());
 
 	private Parameters params;
-	private IFilter filter;
+	private IFilter filter=null; // DWH 5-19-10 initialize it
 	private XMLWriter writer;
 	private TMXWriter tmx;
 	private IFilterConfigurationMapper fcMapper;
 	private LocaleId targetLocale;
 	private LocaleId sourceLocale;
-	private RawDocument targetInput;
+	private RawDocument targetInput=null; // DWH 5-19-10 added = null; null unless set externally
+	private TMXFilterWriter tmxFull=null; // DWH 5-19-10 writes multiple TUVs, one per sentence segment
 	private SentenceAligner sentenceAligner;
 	private ISegmenter sourceSegmenter;
 	private ISegmenter targetSegmenter;
@@ -69,6 +74,7 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 	public SentenceAlignerStep() {
 		params = new Parameters();
 		sentenceAligner = new SentenceAligner();
+		tmxFull = new TMXFilterWriter(); // DWH 5-19-10 open the full writer
 	}
 
 	@StepParameterMapping(parameterType = StepParameterType.FILTER_CONFIGURATION_MAPPER)
@@ -146,7 +152,13 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 
 	@Override
 	protected Event handleStartDocument(Event event1) {
-		initializeFilter();
+		if (targetInput!=null)
+			initializeFilter();
+		else { // DWH 5-19-10 
+			StartDocument sd;
+			sd = (StartDocument) event1.getResource();
+			sd.setFilterWriter(tmxFull); // set it to write out full TXM with separate aligned (sentence) segments
+		}
 		return event1;
 	}
 
@@ -161,18 +173,28 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 	@Override
 	protected Event handleTextUnit(Event sourceEvent) {
 		TextUnit sourceTu = (TextUnit) sourceEvent.getResource();
+		TextUnit targetTu=null; // DWH 5-19-10 moved declaration here
+		
 		if (!params.isSourceAlreadySegmented()) {
 			sourceTu.createSourceSegmentation(sourceSegmenter);
 		}
-
-		// Move to the next target TU
-		Event targetEvent = synchronize(EventType.TEXT_UNIT);
 
 		// Skip non-translatable
 		if (!sourceTu.isTranslatable())
 			return sourceEvent;
 
-		TextUnit targetTu = (TextUnit) targetEvent.getResource();
+		// Move to the next target TU
+		if (targetInput!=null) {
+			Event targetEvent = synchronize(EventType.TEXT_UNIT);
+		  targetTu = (TextUnit) targetEvent.getResource();
+		} else { // DWH 5-19-10 grab target text from target in sourceTu
+			TextContainer targetTextContainer = sourceTu.getTarget(targetLocale);
+			if (targetTextContainer==null || targetTextContainer.getCodedText().length()==0)
+				return sourceEvent;
+			targetTu = new TextUnit(UUID.randomUUID().toString());
+			targetTu.setSource(targetTextContainer);
+		}
+
 		targetTu.createSourceSegmentation(targetSegmenter);
 
 		if (!sourceTu.getSource().hasBeenSegmented() || !targetTu.getSource().hasBeenSegmented()) {
