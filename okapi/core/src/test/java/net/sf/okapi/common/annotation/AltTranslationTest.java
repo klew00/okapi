@@ -29,6 +29,11 @@ public class AltTranslationTest {
 	private AltTranslation at2;
 	private AltTranslation at3;
 	
+	private AltTranslation at4;
+	private AltTranslation at5;
+	private AltTranslation at6;
+
+	
 	@Before
 	public void setUp() throws Exception {
 		source1 = new TextFragment("source one");
@@ -45,6 +50,13 @@ public class AltTranslationTest {
 				target2, AltTranslationType.EXACT, 90, "");
 		at3 = new AltTranslation(LocaleId.ENGLISH, LocaleId.SPANISH, null, source3,
 				target3, AltTranslationType.EXACT_PREVIOUS_VERSION, 100, "");
+		
+		at4 = new AltTranslation(LocaleId.ENGLISH, LocaleId.SPANISH, null, source1,
+				target1, AltTranslationType.FUZZY, 60, "");
+		at5 = new AltTranslation(LocaleId.ENGLISH, LocaleId.SPANISH, null, source2,
+				target2, AltTranslationType.FUZZY_EXACT_TEXT, 95, "");
+		at6 = new AltTranslation(LocaleId.ENGLISH, LocaleId.SPANISH, null, source3,
+				target3, AltTranslationType.FUZZY_UNIQUE_ID, 99, "");
 	}
 
 	@Test
@@ -54,11 +66,22 @@ public class AltTranslationTest {
 		ats.add(at2);
 		ats.add(at3);
 		Collections.sort(ats);
-		Assert.assertEquals(source3, ats.get(0).getSource());
-		Assert.assertEquals(source2, ats.get(1).getSource());
-		Assert.assertEquals(source1, ats.get(2).getSource());
+		Assert.assertEquals(at3, ats.get(0));
+		Assert.assertEquals(at2, ats.get(1));
+		Assert.assertEquals(at1, ats.get(2));
 	}
 	
+	@Test
+	public void altTranslationFuzzySortedList() {
+		List<AltTranslation> ats = new LinkedList<AltTranslation>();
+		ats.add(at4);
+		ats.add(at5);
+		ats.add(at6);
+		Collections.sort(ats);
+		Assert.assertEquals(at6, ats.get(0));
+		Assert.assertEquals(at5, ats.get(1));
+		Assert.assertEquals(at4, ats.get(2));
+	}
 	@Test
 	public void instanceEquality() {
 		AltTranslation h1 = new AltTranslation(LocaleId.ENGLISH, LocaleId.SPANISH, null, source2,
@@ -89,18 +112,18 @@ public class AltTranslationTest {
 	@Test 
 	public void compareToGreaterThanScore() {
 		AltTranslation h1 = new AltTranslation(LocaleId.ENGLISH, LocaleId.SPANISH, null, source2,
-				target2, AltTranslationType.EXACT, 90, "");
+				target2, AltTranslationType.FUZZY, 90, "");
 		AltTranslation h2 = new AltTranslation(LocaleId.ENGLISH, LocaleId.SPANISH, null, source2,
-				target2, AltTranslationType.EXACT, 50, "");
+				target2, AltTranslationType.FUZZY, 50, "");
 		assertTrue(h1.compareTo(h2) < 0);
 	}
 	
 	@Test 
 	public void compareToLessThanScore() {
 		AltTranslation h1 = new AltTranslation(LocaleId.ENGLISH, LocaleId.SPANISH, null, source2,
-				target2, AltTranslationType.EXACT, 90, "");
+				target2, AltTranslationType.FUZZY, 90, "");
 		AltTranslation h2 = new AltTranslation(LocaleId.ENGLISH, LocaleId.SPANISH, null, source2,
-				target2, AltTranslationType.EXACT, 50, "");
+				target2, AltTranslationType.FUZZY, 50, "");
 		assertTrue(h2.compareTo(h1) > 0);
 	}
 	

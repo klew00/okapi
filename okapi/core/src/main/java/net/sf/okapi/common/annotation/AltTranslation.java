@@ -179,6 +179,13 @@ public class AltTranslation implements Comparable<AltTranslation> {
 	public void setOrigin(String origin) {
 		this.origin = origin;
 	}
+	
+	private boolean isExact(AltTranslationType type) {
+		if (type.ordinal() <= AltTranslationType.EXACT.ordinal()) {
+			return true;
+		}
+		return false;
+	}
 
 	@Override
 	/**
@@ -196,21 +203,27 @@ public class AltTranslation implements Comparable<AltTranslation> {
 
 		String thisSource = this.getSource().toString();
 		String otherSource = other.getSource().toString();
-
-		// compare TmMatchType
-		int comparison = this.getType().compareTo(other.getType());
-		if (comparison != EQUAL)
-			return comparison;
-
+		int comparison;
+		
+		// only sort by match type if this or other is some kind of exact match
+		if (isExact(this.getType()) || isExact(other.getType())) {					
+			// compare TmMatchType
+			comparison = this.getType().compareTo(other.getType());
+			if (comparison != EQUAL)
+				return comparison;
+		}
+		
 		// compare score
 		comparison = Float.compare(this.score, other.getScore());
-		if (comparison != EQUAL)
+		if (comparison != EQUAL) {
 			return comparison * -1; // we want to reverse the normal score sort
+		}
 
 		// compare source strings with codes
 		comparison = thisSource.compareTo(otherSource);
-		if (comparison != EQUAL)
+		if (comparison != EQUAL) {
 			return comparison;
+		}
 
 		// default
 		return EQUAL;
