@@ -99,7 +99,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	@Override
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
-		desc.add(USESERVER, "Use a server instead of a file", null);
+		desc.add(USESERVER, "Use a server (instead of a locale TM)", null);
 		desc.add(HOST, "Server URL", "URL of the server to use (e.g. http://localhost:8080/");
 		desc.add(DBDIRECTORY, "TM Directory", "Directory of the TM database");
 		return desc;

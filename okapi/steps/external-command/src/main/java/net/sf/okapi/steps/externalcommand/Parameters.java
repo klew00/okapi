@@ -88,7 +88,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	
 	@Override
 	public EditorDescription createEditorDescription (ParametersDescription paramsDesc) {
-		EditorDescription desc = new EditorDescription("Execute Command Line Tool", true, false);
+		EditorDescription desc = new EditorDescription("External Command", true, false);
 		desc.addTextInputPart(paramsDesc.get(COMMAND));
 		TextInputPart tip = desc.addTextInputPart(paramsDesc.get(TIMEOUT));
 		tip.setVertical(false);
