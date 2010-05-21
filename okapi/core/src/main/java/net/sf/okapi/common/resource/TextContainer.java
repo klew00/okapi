@@ -1134,6 +1134,14 @@ public class TextContainer implements Iterable<TextPart> {
 	}
 
 	/**
+	 * Merges back together all parts (segments and non-segments) of this container,
+	 * and clear the list of segments. The content becomes a single segment content.
+	 */
+	public void joinAll () {
+		setContent(createJoinedContent(null));
+	}
+
+	/**
 	 * Joins a given part with a specified number of its following parts.
 	 * <p>If the resulting part is the only part in the container and is not a segment,
 	 * it is set automatically changed into a segment. 

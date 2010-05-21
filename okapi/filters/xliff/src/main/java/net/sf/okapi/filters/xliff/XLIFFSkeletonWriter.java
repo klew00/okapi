@@ -157,6 +157,14 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 			// We fall back to source
 			trgCont = srcCont;
 		}
+		// We if show segments, makw sure both entries are actually segmented
+//		if ( doSegments ) {
+//			doSegments = trgCont.hasBeenSegmented();
+//			if ( doSegments ) {
+//				doSegments = srcCont.hasBeenSegmented();
+//			}
+//		}
+
 		// Process the target content: either with or without segments
 		if ( doSegments ) {
 			return getSegmentedOutput(srcCont, trgCont, locToUse, context);
@@ -173,6 +181,7 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 		
 		TextContainer srcCont = tu.getSource();
 		if ( srcCont.isEmpty() ) return ""; // No segmented entry if it's empty
+//		if ( srcCont.isEmpty() || !srcCont.hasBeenSegmented() ) return ""; // No segmented entry if it's empty
 		
 		// Else: output new seg-source
 		StringBuilder tmp = new StringBuilder("<seg-source>");
@@ -309,7 +318,7 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 	
 	private boolean doSegments (TextUnit tu) {
 		// Do we always segment?
-		switch ( params.getSegmentationType() ) {
+		switch ( params.getOutputSegmentationType() ) {
 		case Parameters.SEGMENTATIONTYPE_SEGMENTED:
 			return true;
 		case Parameters.SEGMENTATIONTYPE_NOTSEGMENTED:

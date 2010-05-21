@@ -37,12 +37,15 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 
 	private static final String FALLBACKTOID = "fallbackToID";
 	private static final String ADDTARGETLANGUAGE = "addTargetLanguage";
-	private static final String SEGMENTATIONTYPE = "segmentationType";
+	private static final String OUTPUTSEGMENTATIONTYPE = "outputSegmentationType";
+	private static final String IGNOREINPUTSEGMENTATION = "ignoreInputSegmentation";
 	
 	private boolean fallbackToID;
 	private boolean escapeGT;
 	private boolean addTargetLanguage;
-	private int segmentationType;
+	private int outputSegmentationType;
+	private boolean ignoreInputSegmentation;
+	
 	// Not used for now
 //	private boolean useStateValues;
 //	private boolean extractOnlyMatchingValues;
@@ -110,12 +113,20 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.addTargetLanguage = addTargetLanguage;
 	}
 	
-	public int getSegmentationType () {
-		return this.segmentationType;
+	public int getOutputSegmentationType () {
+		return this.outputSegmentationType;
 	}
 	
-	public void setSegmentationType (int segmentationType) {
-		this.segmentationType = segmentationType;
+	public void setOutputSegmentationType (int segmentationType) {
+		this.outputSegmentationType = segmentationType;
+	}
+
+	public boolean getIgnoreInputSegmentation () {
+		return this.ignoreInputSegmentation;
+	}
+	
+	public void setIgnoreInputSegmentation (boolean ignoreInputSegmentation) {
+		this.ignoreInputSegmentation = ignoreInputSegmentation;
 	}
 
 	public void reset () {
@@ -126,7 +137,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		fallbackToID = false;
 		escapeGT = false;
 		addTargetLanguage = true;
-		segmentationType = SEGMENTATIONTYPE_ORIGINAL;
+		outputSegmentationType = SEGMENTATIONTYPE_ORIGINAL;
+		ignoreInputSegmentation = false;
 	}
 
 	public void fromString (String data) {
@@ -139,7 +151,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		fallbackToID = buffer.getBoolean(FALLBACKTOID, fallbackToID);
 		escapeGT = buffer.getBoolean(XMLEncoder.ESCAPEGT, escapeGT);
 		addTargetLanguage = buffer.getBoolean(ADDTARGETLANGUAGE, addTargetLanguage);
-		segmentationType = buffer.getInteger(SEGMENTATIONTYPE, segmentationType);
+		outputSegmentationType = buffer.getInteger(OUTPUTSEGMENTATIONTYPE, outputSegmentationType);
+		ignoreInputSegmentation = buffer.getBoolean(IGNOREINPUTSEGMENTATION, ignoreInputSegmentation);
 	}
 
 	@Override
@@ -152,7 +165,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.setBoolean(FALLBACKTOID, fallbackToID);
 		buffer.setBoolean(XMLEncoder.ESCAPEGT, escapeGT);
 		buffer.setBoolean(ADDTARGETLANGUAGE, addTargetLanguage);
-		buffer.setInteger(SEGMENTATIONTYPE, segmentationType);
+		buffer.setInteger(OUTPUTSEGMENTATIONTYPE, outputSegmentationType);
+		buffer.setBoolean(IGNOREINPUTSEGMENTATION, ignoreInputSegmentation);
 		return buffer.toString();
 	}
 	
@@ -160,15 +174,18 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
 		desc.add(FALLBACKTOID, "Use the trans-unit id attribute for the text unit name if there is no resname", null);
+		desc.add(IGNOREINPUTSEGMENTATION, "Ignore the segmentation information in the input", null);
 		desc.add(XMLEncoder.ESCAPEGT, "Escape the greater-than characters", null);
 		desc.add(ADDTARGETLANGUAGE, "Add the target-language attribute if not present", null);
-		desc.add(SEGMENTATIONTYPE, "Type of segmentation", "Indicates wether to segment or not the text content");
+		desc.add(OUTPUTSEGMENTATIONTYPE, "Type of output segmentation", "Indicates wether to segment or not the text content in output");
 		return desc;
 	}
 
 	public EditorDescription createEditorDescription (ParametersDescription paramDesc) {
 		EditorDescription desc = new EditorDescription("XLIFF Filter Parameters", true, false);
 		desc.addCheckboxPart(paramDesc.get(FALLBACKTOID));
+		desc.addCheckboxPart(paramDesc.get(IGNOREINPUTSEGMENTATION));
+
 		desc.addCheckboxPart(paramDesc.get(XMLEncoder.ESCAPEGT));
 		desc.addCheckboxPart(paramDesc.get(ADDTARGETLANGUAGE));
 
@@ -177,11 +194,11 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 			String.valueOf(SEGMENTATIONTYPE_SEGMENTED),
 			String.valueOf(SEGMENTATIONTYPE_NOTSEGMENTED)};
 		String[] labels = {
-			"Segment only if the input is segmented",
-			"Always segment (even if the input is not segmented)",
-			"Never segment (even if the input is segmented)",
+			"Segment only if the input text unit is segmented",
+			"Always segment (even if the input text unit is not segmented)",
+			"Never segment (even if the input text unit is segmented)",
 		};
-		ListSelectionPart lsp = desc.addListSelectionPart(paramDesc.get(SEGMENTATIONTYPE), values);
+		ListSelectionPart lsp = desc.addListSelectionPart(paramDesc.get(OUTPUTSEGMENTATIONTYPE), values);
 		lsp.setChoicesLabels(labels);
 		
 		return desc;

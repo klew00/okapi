@@ -281,6 +281,9 @@ public class Project {
 			Document doc = Fact.newDocumentBuilder().parse(file);
 			
 			Element rootElem = doc.getDocumentElement();
+			if ( !rootElem.getNodeName().equals("rainbowProject") ) { //$NON-NLS-1$
+				throw new Exception(String.format(Res.getString("Project.notProjectFile"), newPath)); //$NON-NLS-1$
+			}
 			String tmp = rootElem.getAttribute("version"); //$NON-NLS-1$
 			if ( !tmp.equals("4") ) { //$NON-NLS-1$
 				throw new Exception(Res.getString("Project.unsupportedVersion")); //$NON-NLS-1$

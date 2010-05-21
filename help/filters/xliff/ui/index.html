@@ -115,6 +115,10 @@ from <code>&quot;preserve&quot;</code>, the content of the source and target is 
 		<td align="left" valign="top">The <i>targetLanguage</i> property of the 
 		sub-document for the given <code>&lt;file&gt;</code>.</td>
 	</tr>
+	<tr>
+		<td align="left" valign="top">The <code>&lt;seg-source&gt;</code> element.</td>
+		<td align="left" valign="top">Segmentation of the text unit.</td>
+	</tr>
 </table>
 
 <h2><a name="limitations"></a>Limitations</h2>
@@ -131,12 +135,33 @@ attribute of the <code>&lt;trans-unit&gt;</code> element as a fall-back value if
 resname</code> is not present. This may be useful for XLIFF document that use
 <code>resname</code>-like values for id and do not bother providing <code>
 resname</code>.</p>
+<p><cite>Ignore the segmentation information in the input</cite> -- Set this 
+option to ignore any segmentation information contains in the input XLIFF. When 
+this option is set all segmented content are reduced to a new un-segmented 
+content when extracted. Note that any <code>&lt;alt-trans&gt;</code> data attached to 
+a given segment is also lost.</p>
 <p><cite>Escape the greater-than characters</cite> -- Set this option to have 
 all greater-than characters (&#39;<code>&gt;</code>&#39;) escaped as &quot;<code>&amp;gt;</code>&quot; in 
 the output.</p>
 <p><cite>Add the target-language attribute if not present</cite> -- Set this 
 option to add the <code>target-language</code> attribute in <code>&lt;file&gt;</code> 
 if it is not present.</p>
+<p><cite>Type of output segmentation</cite> -- Select one of the type of 
+segmentation representation to use for the output. there are the following 
+choices:</p>
+<ul>
+	<li><cite>Segment only if the input text unit is segmented</cite> -- Each 
+	text unit in output are represented with a <code>&lt;seg-source&gt;</code> element 
+	only if the original text unit was already represented like this in the 
+	input file.</li>
+	<li><cite>Always segment (even if the input text unit is not segmented)</cite> 
+	-- Each text unit in output are represented with a <code>&lt;seg-source&gt;</code> 
+	element, even if the original text unit was not segmented, and even if the 
+	whole content of the text unit is made of a single segment.</li>
+	<li><cite>Never segment (even if the input text unit is segmented)</cite> -- 
+	None of the text unit in output is segmented, even if they were in the input 
+	file. All <code>&lt;seg-source&gt;</code> elements are removed.</li>
+</ul>
 <p>&nbsp;</p>
 
 </body>

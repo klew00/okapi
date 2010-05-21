@@ -421,6 +421,13 @@ public class TextUnit implements INameable, IReferenceable {
 		if ( hasTarget(locId) ) {
 			targets.remove(locId);
 		}
+		// Remove associated segmentation info if needed
+		if ( trgSegRanges != null ) {
+			trgSegRanges.remove(locId);
+		}
+		if ( syncLoc != null ) {
+			if ( syncLoc.equals(locId) ) syncLoc = null;
+		}
 	}
 
     /**
@@ -598,8 +605,30 @@ public class TextUnit implements INameable, IReferenceable {
 			// No target-specific ranges available: use the source
 			ranges = srcSegRanges;
 		}
-		source.getSegments().create(ranges);
+		source.getSegments().create(ranges); // Ranges can be null: no segmentation occures then
 		syncLoc = locId;
+	}
+	
+	public void removeAllSegmentations () {
+		// Desegment the source if needed
+		if ( getSource().hasBeenSegmented() ) {
+			getSource().joinAll();
+		}
+		// Remove default source segmentation ranges
+		srcSegRanges = null;
+		
+		// Desegment all targets as needed
+		for ( Entry<LocaleId, TextContainer> entry : targets.entrySet() ) {
+			if ( entry.getValue().hasBeenSegmented() ) {
+				entry.getValue().joinAll();
+			}
+		}
+		// Removes all target-specific source segmentations 
+		if ( trgSegRanges != null ) {
+			trgSegRanges.clear();
+		}
+		// Re-synch to nothing
+		syncLoc = null;
 	}
 
 	@Override

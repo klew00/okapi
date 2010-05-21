@@ -211,7 +211,7 @@ public class XLIFFFilter implements IFilter {
 
 			XMLInputFactory fact = XMLInputFactory.newInstance();
 			fact.setProperty(XMLInputFactory.IS_COALESCING, true);
-//Removed for Java 1.6			fact.setProperty(XMLInputFactory2.P_REPORT_PROLOG_WHITESPACE, true);
+			//Removed for Java 1.6: fact.setProperty(XMLInputFactory2.P_REPORT_PROLOG_WHITESPACE, true);
 			
 			//fact.setXMLResolver(new DefaultXMLResolver());
 			//TODO: Resolve the re-construction of the DTD, for now just skip it
@@ -632,6 +632,9 @@ public class XLIFFFilter implements IFilter {
 					if ( "trans-unit".equals(name) ) {
 						addTargetIfNeeded();
 						storeEndElement();
+						if ( params.getIgnoreInputSegmentation() ) {
+							tu.removeAllSegmentations();
+						}
 						tu.setSkeleton(skel);
 						tu.setMimeType(MimeTypeMapper.XLIFF_MIME_TYPE);
 						queue.add(new Event(EventType.TEXT_UNIT, tu));

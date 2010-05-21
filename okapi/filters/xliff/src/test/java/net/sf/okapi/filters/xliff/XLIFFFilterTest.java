@@ -51,8 +51,9 @@ import static org.junit.Assert.*;
 public class XLIFFFilterTest {
 
 	private XLIFFFilter filter;
-	private XLIFFFilter segFilter;
-	private XLIFFFilter noSegFilter;
+	private XLIFFFilter outSegFilter;
+	private XLIFFFilter outNoSegFilter;
+	private XLIFFFilter noInSegFilter;
 	private GenericContent fmt;
 	private String root;
 	private LocaleId locEN = LocaleId.fromString("en");
@@ -65,12 +66,15 @@ public class XLIFFFilterTest {
 		filter = new XLIFFFilter();
 		fmt = new GenericContent();
 		root = TestUtil.getParentDir(this.getClass(), "/JMP-11-Test01.xlf");
-		segFilter = new XLIFFFilter();
-		Parameters params = (Parameters)segFilter.getParameters();
-		params.setSegmentationType(Parameters.SEGMENTATIONTYPE_SEGMENTED);
-		noSegFilter = new XLIFFFilter();
-		params = (Parameters)noSegFilter.getParameters();
-		params.setSegmentationType(Parameters.SEGMENTATIONTYPE_NOTSEGMENTED);
+		outSegFilter = new XLIFFFilter();
+		Parameters params = (Parameters)outSegFilter.getParameters();
+		params.setOutputSegmentationType(Parameters.SEGMENTATIONTYPE_SEGMENTED);
+		outNoSegFilter = new XLIFFFilter();
+		params = (Parameters)outNoSegFilter.getParameters();
+		params.setOutputSegmentationType(Parameters.SEGMENTATIONTYPE_NOTSEGMENTED);
+		noInSegFilter = new XLIFFFilter();
+		params = (Parameters)noInSegFilter.getParameters();
+		params.setIgnoreInputSegmentation(true);
 	}
 
 //	@Test
@@ -111,6 +115,35 @@ public class XLIFFFilterTest {
 		assertEquals("i2", segments.get(1).id);
 		assertEquals("t2", segments.get(1).text.toString());
 		assertEquals("i2", segments.get(1).id);
+	}
+
+	@Test
+	public void testIgnoredSegmentedTarget () {
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+			+ "<xliff version=\"1.2\">"
+			+ "<file source-language=\"en\" target-language=\"fr\" datatype=\"x-test\" original=\"file.ext\">"
+			+ "<body>"
+			+ "<trans-unit id=\"1\">"
+			+ "<source>t1. t2</source>"
+			+ "<target xml:lang=\"fr\"><mrk mid=\"i1\" mtype=\"seg\">t1.</mrk> <mrk mid=\"i2\" mtype=\"seg\">t2</mrk></target>"
+			+ "</trans-unit>"
+			+ "<trans-unit id=\"2\">"
+			+ "<source>t1. t2</source>"
+			+ "<target xml:lang=\"fr\">t1. t2</target>"
+			+ "</trans-unit>"
+			+ "</body>"
+			+ "</file></xliff>";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, noInSegFilter), 1);
+		assertNotNull(tu);
+		TextContainer cont = tu.getTarget(locFR);
+		ISegments segments = cont.getSegments();
+		assertEquals("[t1. t2]", fmt.printSegmentedContent(cont, true));
+		assertEquals(1, segments.count());
+		assertEquals("t1. t2", segments.get(0).text.toString());
+		assertEquals("0", segments.get(0).id);
+		tu = FilterTestDriver.getTextUnit(getEvents(snippet, noInSegFilter), 2);
+		assertNotNull(tu);
+		assertEquals("t1. t2", segments.get(0).text.toString());
 	}
 
 	@Test
@@ -219,7 +252,7 @@ public class XLIFFFilterTest {
 			+ "<target xml:lang=\"fr\">t1.   t2</target>"
 			+ "\r</trans-unit></body></file></xliff>";
 		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
-			locFR, noSegFilter.createSkeletonWriter(), noSegFilter.getEncoderManager()));
+			locFR, outNoSegFilter.createSkeletonWriter(), outNoSegFilter.getEncoderManager()));
 	}
 
 	@Test
@@ -254,7 +287,7 @@ public class XLIFFFilterTest {
 			+ "</trans-unit></body>"
 			+ "</file></xliff>";
 		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
-			locFR, segFilter.createSkeletonWriter(), segFilter.getEncoderManager()));
+			locFR, outSegFilter.createSkeletonWriter(), outSegFilter.getEncoderManager()));
 	}
 
 	@Test
@@ -741,13 +774,19 @@ public class XLIFFFilterTest {
 	}
 	
 	private ArrayList<Event> getEvents(String snippet) {
+		return getEvents(snippet, filter);
+	}
+	
+	private ArrayList<Event> getEvents(String snippet,
+		XLIFFFilter filterToUse)
+	{
 		ArrayList<Event> list = new ArrayList<Event>();
-		filter.open(new RawDocument(snippet, locEN, locFR));
-		while ( filter.hasNext() ) {
-			Event event = filter.next();
+		filterToUse.open(new RawDocument(snippet, locEN, locFR));
+		while ( filterToUse.hasNext() ) {
+			Event event = filterToUse.next();
 			list.add(event);
 		}
-		filter.close();
+		filterToUse.close();
 		return list;
 	}
 	
