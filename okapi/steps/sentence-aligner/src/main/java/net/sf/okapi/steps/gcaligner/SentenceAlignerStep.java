@@ -32,6 +32,7 @@ import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
+import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.filterwriter.TMXFilterWriter;
 import net.sf.okapi.common.filterwriter.TMXWriter;
 import net.sf.okapi.common.LocaleId;
@@ -66,7 +67,6 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 	private LocaleId targetLocale;
 	private LocaleId sourceLocale;
 	private RawDocument targetInput=null; // DWH 5-19-10 added = null; null unless set externally
-	private TMXFilterWriter tmxFull=null; // DWH 5-19-10 writes multiple TUVs, one per sentence segment
 	private SentenceAligner sentenceAligner;
 	private ISegmenter sourceSegmenter;
 	private ISegmenter targetSegmenter;
@@ -74,7 +74,6 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 	public SentenceAlignerStep() {
 		params = new Parameters();
 		sentenceAligner = new SentenceAligner();
-		tmxFull = new TMXFilterWriter(); // DWH 5-19-10 open the full writer
 	}
 
 	@StepParameterMapping(parameterType = StepParameterType.FILTER_CONFIGURATION_MAPPER)
@@ -154,11 +153,6 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 	protected Event handleStartDocument(Event event1) {
 		if (targetInput!=null)
 			initializeFilter();
-		else { // DWH 5-19-10 
-			StartDocument sd;
-			sd = (StartDocument) event1.getResource();
-			sd.setFilterWriter(tmxFull); // set it to write out full TXM with separate aligned (sentence) segments
-		}
 		return event1;
 	}
 
