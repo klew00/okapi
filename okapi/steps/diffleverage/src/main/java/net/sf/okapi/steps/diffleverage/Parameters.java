@@ -32,6 +32,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private boolean codesensitive;
 	private boolean diffOnly;
 	private boolean copyToTarget;
+	//private boolean diffOnSentences;
 	
 	public Parameters() {
 		reset();
@@ -43,7 +44,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		fuzzyThreshold = 100;
 		codesensitive = true;
 		diffOnly = false;
-		copyToTarget = true;
+		copyToTarget = false;
+		//diffOnSentences = false;
 	}
 
 	@Override
@@ -54,6 +56,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		codesensitive = buffer.getBoolean("codesensitive", codesensitive);
 		diffOnly = buffer.getBoolean("diffOnly", diffOnly);
 		copyToTarget = buffer.getBoolean("copyToTarget", copyToTarget);
+		//diffOnSentences = buffer.getBoolean("diffOnSentences", diffOnSentences);
 	}
 	
 	@Override
@@ -63,6 +66,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.setParameter("codesensitive", codesensitive);
 		buffer.setParameter("diffOnly", diffOnly);
 		buffer.setParameter("copyToTarget", copyToTarget);
+		//buffer.setParameter("diffOnSentences", diffOnSentences);
 		return buffer.toString();
 	}
 
@@ -71,8 +75,9 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		ParametersDescription desc = new ParametersDescription(this);
 		desc.add("fuzzyThreshold", "Leverage only if the match is equal or above this score", "Fuzzy Threshold between 1 and 100.");		
 		desc.add("codesensitive", "Include inline codes in the comparison", "Use codes to compare contents");
-		desc.add("diffOnly", "Do not fill the target with the leveraged translation", "Diff only (do not copy translation)?");
+		desc.add("diffOnly", "Diff only and mark the TextUnit as matched", "Diff only (do not copy translation)?");
 		desc.add("copyToTarget", "Copy to/over the target?", "Copy to/over the target or copy to the leverage annotation?");
+		//desc.add("diffOnSentences", "Diff on sentences or paragraphs (if sentences then source and target must be aligned)?", "Diff On Sentences?");
 		return desc;
 	}
 	
@@ -85,6 +90,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.addCheckboxPart(paramsDesc.get("codesensitive"));
 		desc.addCheckboxPart(paramsDesc.get("diffOnly"));
 		desc.addCheckboxPart(paramsDesc.get("copyToTarget"));
+		//desc.addCheckboxPart(paramsDesc.get("diffOnSentences"));
 		return desc;
 	}
 	
@@ -119,4 +125,12 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public boolean isCopyToTarget() {
 		return copyToTarget;
 	}
+
+//	public boolean isDiffOnSentences() {
+//		return diffOnSentences;
+//	}
+//
+//	public void setDiffOnSentences(boolean diffOnSentences) {
+//		this.diffOnSentences = diffOnSentences;
+//	}
 }
