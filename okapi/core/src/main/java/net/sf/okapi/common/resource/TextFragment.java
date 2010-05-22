@@ -411,6 +411,8 @@ public class TextFragment implements Comparable<Object> {
 	 * @param oriSrc the original source text fragment.
 	 * @param newTrg the new target text fragment (this is the fragment that will be adjusted).
 	 * @param alwaysCopyCodes indicates the adjustment of the codes is always done. Set this option to false to only
+	 * @param addMissingCodes indicates if codes that are in the original source but not in the new target should be
+	 * automatically added at the end of the new target (even if they are removable)
 	 * copy if there are references in the original source and/or empty codes in the new target.
 	 * @param newSrc the new source text fragment. (Can be null)
 	 * @param parent the parent text unit (Can be null. Used for error information only)
@@ -420,6 +422,7 @@ public class TextFragment implements Comparable<Object> {
 	public static TextFragment adjustTargetCodes (TextFragment oriSrc,
 		TextFragment newTrg,
 		boolean alwaysCopyCodes,
+		boolean addMissingCodes,
 		TextFragment newSrc,
 		TextUnit parent,
 		Logger logger)
@@ -527,10 +530,15 @@ public class TextFragment implements Comparable<Object> {
 			for ( int i=0; i<oriIndices.length; i++ ) {
 				if ( oriIndices[i] != -1 ) {
 					Code code = oriCodes.get(oriIndices[i]);
-					if ( !code.isDeleteable() && ( logger != null )) {
-						logger.warning(String.format("The code id='%d' (%s) is missing in target (item id='%s', name='%s')",
-							code.getId(), code.getData(), parent.getId(), (parent.getName()==null ? "" : parent.getName())));
-						logger.info(String.format("Source='%s'\nTarget='%s'", oriSrc.toString(), newTrg.toString()));
+					if ( addMissingCodes ) {
+						newTrg.append(code.clone());
+					}
+					else {
+						if ( !code.isDeleteable() && ( logger != null )) {
+							logger.warning(String.format("The code id='%d' (%s) is missing in target (item id='%s', name='%s')",
+								code.getId(), code.getData(), parent.getId(), (parent.getName()==null ? "" : parent.getName())));
+							logger.info(String.format("Source='%s'\nTarget='%s'", oriSrc.toString(), newTrg.toString()));
+						}
 					}
 				}
 			}

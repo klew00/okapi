@@ -300,9 +300,9 @@ public class DiffLeverageStep extends BasePipelineStep {
 			if ((t = oldTu.getTarget(targetLocale)) != null) {
 				// only copy the old target if wdiffOnly is false
 				if (!params.isDiffOnly()) {
-					   TextFragment tf = t.getFirstContent();
-		               TextFragment.adjustTargetCodes(newTu.getSource().getFirstContent(),
-		                       tf, true, null, newTu, null);
+					TextFragment tf = t.getFirstContent();
+					TextFragment.adjustTargetCodes(newTu.getSource().getFirstContent(),
+						tf, true, true, null, newTu, null);
 					newTu.setTarget(targetLocale, t);
 				}
 				// set the DiffLeverageAnnotation which marks the new TextUnit as a match with the old TextUnit

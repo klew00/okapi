@@ -688,10 +688,29 @@ public class TextFragmentTest {
 	public void testAdjustTargetFragment () {
 		TextFragment toTransSrc = makeFragment1();
 		TextFragment proposalTrg = makeFragment1Bis("trg");
-		
 		assertEquals("{B}A{/B}B{BR/}C trg", proposalTrg.toString());
-		TextFragment.adjustTargetCodes(toTransSrc, proposalTrg, true, null, null, null);
+		TextFragment.adjustTargetCodes(toTransSrc, proposalTrg, true, true, null, null, null);
 		assertEquals("[b]A[/b]B[br/]C trg", proposalTrg.toString());
+	}
+	
+	@Test
+	public void testAdjustIncompleteTargetFragmentAutoAdded () {
+		TextFragment toTransSrc = makeFragment1();
+		TextFragment proposalTrg = makeFragment1Bis("trg");
+		proposalTrg.remove(6, 8); // "xxAxxBxxC trg"
+		assertEquals("{B}A{/B}BC trg", proposalTrg.toString());
+		TextFragment.adjustTargetCodes(toTransSrc, proposalTrg, true, true, null, null, null);
+		assertEquals("[b]A[/b]BC trg[br/]", proposalTrg.toString());
+	}
+	
+	@Test
+	public void testAdjustIncompleteTargetFragmentNoAddition () {
+		TextFragment toTransSrc = makeFragment1();
+		TextFragment proposalTrg = makeFragment1Bis("trg");
+		proposalTrg.remove(6, 8); // "xxAxxBxxC trg"
+		assertEquals("{B}A{/B}BC trg", proposalTrg.toString());
+		TextFragment.adjustTargetCodes(toTransSrc, proposalTrg, true, false, null, null, null);
+		assertEquals("[b]A[/b]BC trg", proposalTrg.toString());
 	}
 	
 	/**
