@@ -403,7 +403,8 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 	    	  }
 	    	  else if (tugname.equals("v:textbox")) // DWH 7-16-09 ignore textboxes
 	    	  {
-	    		  bInsideNastyTextBox = true;
+	    		  if (!isAStandaloneTug(tug))
+	    		  	bInsideNastyTextBox = true;
 	    		  innanar(tug);
 	    	  }
 	    	  else if (tugname.equals("w:p") || tugname.equals("a:p"))
@@ -703,15 +704,20 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 	      }
 	      private void rat(String s) // the Texan form of "write"
 	      {
-	    	try
-	    	{
-				bw.write(s);
-				LOGGER.log(Level.FINEST,s); //
-			} catch (IOException e) {
-				LOGGER.log(Level.WARNING,"Problem writing piped stream.");
-//				throw new OkapiIOException("Can't read piped input.");
-				s = s + " ";
-			}
+		    	try
+		    	{
+					  bw.write(s);
+					  LOGGER.log(Level.FINEST,s); //
+				  } catch (IOException e) {
+					  LOGGER.log(Level.WARNING,"Problem writing piped stream.");
+	//				throw new OkapiIOException("Can't read piped input.");
+					  s = s + " ";
+				  }
+	      }
+	      private boolean isAStandaloneTug(String tug)
+	      {
+	      	int len=tug.length();
+	      	return(tug.substring(len-2, len).equals("/>") ? true : false);
 	      }
 	    });
 	    readThread.start();
