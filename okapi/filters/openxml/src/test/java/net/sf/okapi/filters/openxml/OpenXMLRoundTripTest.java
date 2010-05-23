@@ -95,8 +95,8 @@ public class OpenXMLRoundTripTest {
 		themfiles.add("MissingPara.docx");
 		themfiles.add("EndGroup.docx");
 		themfiles.add("Practice2.docx");
+		themfiles.add("Hangs.docx");
 		
-//		themfiles.add("Test_Hangs.docx");
 //		themfiles.add("2008FinancialsDecember.xlsx");
 //		themfiles.add("welfarelesson_new_skin_Mar3.pptx");	
 //		themfiles.add("glorp.docx");
