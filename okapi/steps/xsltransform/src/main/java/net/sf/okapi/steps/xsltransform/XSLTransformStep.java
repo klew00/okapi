@@ -108,7 +108,7 @@ public class XSLTransformStep extends BasePipelineStep {
 	
 	public String getDescription () {
 		return "Apply an XSLT template to an XML document."
-			+ " Expects: raw XML document. Sends back: raw XML document.";
+			+ " Expects: raw XML document. Sends back: raw document.";
 	}
 
 	public String getName () {
