@@ -79,8 +79,9 @@ public class ParagraphToSentenceAlignStepTest {
 
 		pipeline.endBatch();
 
-		// test we observed the correct events
+		// Test we observed the correct events
+		// (per line to avoid line-break differences on each platform)
 		FileCompare fc = new FileCompare();
-		assert(fc.filesExactlyTheSame(sOutputPath, sGoldPath));
+		assert(fc.compareFilesPerLines(sOutputPath, sGoldPath, "UTF-8"));
 	}
 }
