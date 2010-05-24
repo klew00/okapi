@@ -35,6 +35,8 @@ public class ParagraphToSentenceAlignStepTest {
 
 		Parameters p = new Parameters();
 		p.setGenerateTMX(true);
+		p.setUsingCustomTargetSegmentation(true);
+		p.setSrxTargetSegmentationPath(this.getClass().getResource("default2.srx").getPath());
 		aligner.setParameters(p);
 		FilterConfigurationMapper fcMapper = new FilterConfigurationMapper();
 		fcMapper.addConfigurations("net.sf.okapi.filters.plaintext.PlainTextFilter");

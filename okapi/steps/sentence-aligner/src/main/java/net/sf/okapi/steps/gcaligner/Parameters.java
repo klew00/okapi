@@ -34,6 +34,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private String tmxOutputPath;
 	private boolean generateTMX;	
 	private boolean sourceAlreadySegmented;
+	private boolean usingCustomTargetSegmentation; // DWH 5-24-10 added this and all relevant code below
+	private String srxTargetSegmentationPath=""; // DWH 5-24-10 added this and all relevant code below
 
 	public Parameters () {
 		reset();
@@ -47,11 +49,21 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.tmxOutputPath = tmxOutputPath;
 	}
 
+	public String getSrxTargetSegmentationPath () {
+		return srxTargetSegmentationPath;
+	}
+
+	public void setSrxTargetSegmentationPath (String srxTargetSegmentationPath) {
+		this.srxTargetSegmentationPath = srxTargetSegmentationPath;
+	}
+
 	@Override
 	public void reset() {
 		tmxOutputPath = "aligned.tmx";
 		generateTMX = true;
 		sourceAlreadySegmented = false;
+		usingCustomTargetSegmentation = false;
+		srxTargetSegmentationPath = "";		
 	}
 
 	@Override
@@ -61,6 +73,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		tmxOutputPath = buffer.getString("tmxPath", tmxOutputPath);
 		generateTMX = buffer.getBoolean("generateTMX");
 		sourceAlreadySegmented = buffer.getBoolean("sourceAlreadySegmented");
+		usingCustomTargetSegmentation = buffer.getBoolean("usingCustomTargetSegmentation");
+		srxTargetSegmentationPath = buffer.getString("srxTargetSegmentationPath", srxTargetSegmentationPath);
 	}
 
 	@Override
@@ -69,6 +83,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.setParameter("tmxPath", tmxOutputPath);
 		buffer.setBoolean("generateTMX", generateTMX);
 		buffer.setBoolean("alreadySourceSegmented", sourceAlreadySegmented);
+		buffer.setBoolean("usingCustomTargetSegmentation", usingCustomTargetSegmentation);
+		buffer.setParameter("srxTargetSegmentationPath",srxTargetSegmentationPath);
 		return buffer.toString();
 	}
 
@@ -78,18 +94,25 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.add("tmxPath",	"TMX output path", "Full path of the output TMX file");
 		desc.add("generateTMX",	"Generate TMX?", "If generateTMX is false generate bilingual TextUnits, otherwise (true) output a TMX file");		
 		desc.add("sourceAlreadySegmented","Source Already Segmented?", "Have the source input files arelady been segmented?");
+		desc.add("usingCustomTargetSegmentation","Use custom target segmentation?","Specify custom target segmentation file?");
+		desc.add("srxTargetSegmentationPath",	"Target SRX Path", "Full path of the target segmentation rules");
 		return desc;
 	}
 	
 	@Override
 	public EditorDescription createEditorDescription(ParametersDescription paramsDesc) {
 		EditorDescription desc = new EditorDescription("Gale and Church Sentence Aligner", true, false);	
-		CheckboxPart cbp = desc.addCheckboxPart(paramsDesc.get("generateTMX"));
 		desc.addCheckboxPart(paramsDesc.get("sourceAlreadySegmented"));
+		CheckboxPart cbp = desc.addCheckboxPart(paramsDesc.get("generateTMX"));
 		PathInputPart pip = desc.addPathInputPart(paramsDesc.get("tmxPath"), "TMX Document", true);
 		pip.setBrowseFilters("TMX Documents (*.tmx)\tAll Files (*.*)", "*.tmx\t*.*");
 		pip.setWithLabel(false);
 		pip.setMasterPart(cbp, true);
+		CheckboxPart cbp2 = desc.addCheckboxPart(paramsDesc.get("usingCustomTargetSegmentation"));
+		PathInputPart pipSRX = desc.addPathInputPart(paramsDesc.get("srxTargetSegmentationPath"), "Target (SRX) Segmentation Rules", false);
+		pipSRX.setBrowseFilters("SRX Documents (*.srx)\tAll Files (*.*)", "*.srx\t*.*");
+		pipSRX.setWithLabel(false);
+		pipSRX.setMasterPart(cbp2, true);
 		return desc;
 	}
 
@@ -107,5 +130,13 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 
 	public void setSourceAlreadySegmented(boolean sourceAlreadySegmented) {
 		this.sourceAlreadySegmented = sourceAlreadySegmented;
+	}
+
+	public boolean isUsingCustomTargetSegmentation() {
+		return usingCustomTargetSegmentation;
+	}
+
+	public void setUsingCustomTargetSegmentation(boolean usingCustomTargetSegmentation) {
+		this.usingCustomTargetSegmentation = usingCustomTargetSegmentation;
 	}
 }

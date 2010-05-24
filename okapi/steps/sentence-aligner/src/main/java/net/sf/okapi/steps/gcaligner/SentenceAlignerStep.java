@@ -21,6 +21,7 @@
 package net.sf.okapi.steps.gcaligner;
 
 import java.io.InputStream;
+import java.io.FileInputStream;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -118,15 +119,37 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 
 	@Override
 	protected Event handleStartBatch(Event event) {
+		String srxTargetSegmentationPath; // DWH 5-24-10 allow segmentation specific to target
+		SRXDocument srxTargetDocument; // DWH 5-24-10
 		SRXDocument srxDocument = new SRXDocument();
 		srxDocument.setTrimLeadingWhitespaces(false);
 		InputStream is = SentenceAlignerStep.class.getResourceAsStream("default.srx");
 		srxDocument.loadRules(is);
 		srxDocument.setTrimLeadingWhitespaces(false);
+		
+		// The following section added to handle target segmentation rules DWH 5-24-10
+		srxTargetSegmentationPath = params.getSrxTargetSegmentationPath();
+		if (params.isUsingCustomTargetSegmentation()) {
+			try {
+				is = new FileInputStream(srxTargetSegmentationPath);
+				srxTargetDocument = new SRXDocument();
+				srxTargetDocument.loadRules(is);
+				srxTargetDocument.setTrimLeadingWhitespaces(false);
+			}
+			catch(Exception e) {
+				LOGGER.warning("Target segmentation rules file "+srxTargetSegmentationPath+
+						" cannot be read.  Using default segmentation rules");
+				srxTargetDocument = srxDocument;
+			}
+		}
+		else
+			srxTargetDocument = srxDocument;
+		
 		if (!params.isSourceAlreadySegmented()) {
 			sourceSegmenter = srxDocument.compileLanguageRules(sourceLocale, null);
 		}
-		targetSegmenter = srxDocument.compileLanguageRules(targetLocale, null);
+//	targetSegmenter = srxDocument.compileLanguageRules(targetLocale, null);
+		targetSegmenter = srxTargetDocument.compileLanguageRules(targetLocale, null); // DWH 5-24-10
 
 		// Start TMX writer (one for all input documents)
 		if (params.isGenerateTMX()) {

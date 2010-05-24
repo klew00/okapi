@@ -40,6 +40,7 @@ public class SentenceAlignStepTest {
 
 		Parameters p = new Parameters();
 		p.setGenerateTMX(false);
+		p.setUsingCustomTargetSegmentation(false);
 		aligner.setParameters(p);
 		FilterConfigurationMapper fcMapper = new FilterConfigurationMapper();
 		fcMapper.addConfigurations("net.sf.okapi.filters.plaintext.PlainTextFilter");
