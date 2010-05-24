@@ -60,8 +60,9 @@ public class AltTranslationsAnnotation implements IAnnotation, Iterable<AltTrans
 	 * @param type the type of alternate translation.
 	 * @param score the score for this alternate translation (must be between 0 and 100).
 	 * @param origin an option identifier for the origin of this alternate translation.
+	 * @return the {@link AltTranslation} object created and added to this annotation.
 	 */
-	public void add (LocaleId sourceLocId,
+	public AltTranslation add (LocaleId sourceLocId,
 		LocaleId targetLocId,
 		TextFragment originalSource,
 		TextFragment alternateSource,
@@ -72,6 +73,7 @@ public class AltTranslationsAnnotation implements IAnnotation, Iterable<AltTrans
 	{
 		list.add(new AltTranslation(sourceLocId, targetLocId, originalSource,
 			alternateSource, alternateTarget, type, score, origin));
+		return list.get(list.size()-1);
 	}
 
 	/**

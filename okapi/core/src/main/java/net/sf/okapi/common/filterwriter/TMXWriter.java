@@ -54,6 +54,7 @@ public class TMXWriter {
     private LocaleId trgLoc;
     private int itemCount;
     private Pattern exclusionPattern = null;
+    private Pattern altTransInclusionPattern = null;
     private Hashtable<String, String> MTattribute;
     private boolean useMTPrefix = true;
 
@@ -119,9 +120,9 @@ public class TMXWriter {
     }
     
     /**
-     * Sets a pattern oc content to not output. The given pattern is matched against
+     * Sets a pattern of content to not output. The given pattern is matched against
      * the source content of each item, if it matches, the item is not written.
-     * @param pattern The regular expression pattern of the contents to not output.
+     * @param pattern the regular expression pattern of the contents to not output.
      */
     public void setExclusionOption (String pattern) {
     	if ( Util.isEmpty(pattern) ) {
@@ -129,6 +130,21 @@ public class TMXWriter {
     	} 
     	else {
     		exclusionPattern = Pattern.compile(pattern);
+    	}
+    }
+    
+    /**
+     * Sets a pattern used to indicate which entries to include when using the
+     * {@link #writeAlternate(AltTranslation, TextFragment)} method. When this pattern is set to null (the default)
+     * all entries are included.
+     * @param pattern the regular expression of the origin(s) to include. Use null to include all entries. 
+     */
+    public void setAltTranslationOption (String pattern) {
+    	if ( Util.isEmpty(pattern) ) {
+    		this.altTransInclusionPattern = null;
+    	} 
+    	else {
+    		this.altTransInclusionPattern = Pattern.compile(pattern);
     	}
     }
 
@@ -317,6 +333,16 @@ public class TMXWriter {
     public void writeAlternate (AltTranslation alt,
     	TextFragment srcOriginal)
     {
+    	// Check if this entry should be included or not
+    	if ( altTransInclusionPattern != null ) {
+    		String ori = alt.getOrigin();
+    		if ( ori == null ) ori = ""; // Make sure null are treated
+    		if ( !altTransInclusionPattern.matcher(ori).matches() ) {
+    			// The origin value does not match: do not include this entry in the output
+    			return;
+    		}
+    	}
+
     	// Alternates are expected to be un-segmented
     	TextFragment srcFrag = alt.getSource().getFirstContent();
     	if ( srcFrag.isEmpty() ) {

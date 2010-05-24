@@ -158,6 +158,8 @@ public abstract class BasePackageWriter implements IPackageWriter {
 		tmxWriterAlternate = new TMXWriter(tmxPathAlternate);
 		tmxWriterAlternate.writeStartDocument(manifest.getSourceLanguage(),
 			manifest.getTargetLanguage(), creationTool, null, null, null, null);
+		// Make sure we output only alt-translation annotation coming from the source itself
+		tmxWriterAlternate.setAltTranslationOption(AltTranslation.ORIGIN_SOURCEDOC);
 
 		// Create the reference TMX (pre-translation TM)
 		if ( tmxPathLeverage == null ) {

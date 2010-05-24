@@ -30,11 +30,16 @@ import net.sf.okapi.common.resource.TextUnit;
 
 /**
  * Stores the data representing an alternate translation.
- * <p>
- * This object is used with the {@link AltTranslationsAnnotation} annotation.
+ * <p>This object is used with the {@link AltTranslationsAnnotation} annotation.
  */
 public class AltTranslation implements Comparable<AltTranslation> {
-	
+
+	/**
+	 * Origin string indicating that the match is coming from a source input document
+	 * (e.g. alt-trans elements in XLIFF). 
+	 */
+	public static final String ORIGIN_SOURCEDOC = "SourceDoc";
+
 	LocaleId srcLocId;
 	LocaleId trgLocId;
 	TextUnit tu;
@@ -62,9 +67,10 @@ public class AltTranslation implements Comparable<AltTranslation> {
 	 * @param origin
 	 *            an optional identifier for the origin of this alternate translation.
 	 */
-	public AltTranslation(LocaleId sourceLocId, LocaleId targetLocId, TextFragment originalSource,
+	public AltTranslation (LocaleId sourceLocId, LocaleId targetLocId, TextFragment originalSource,
 			TextFragment alternateSource, TextFragment alternateTarget, AltTranslationType type,
-			int score, String origin) {
+			int score, String origin)
+	{
 		this.srcLocId = sourceLocId;
 		this.trgLocId = targetLocId;
 		this.type = type;
@@ -187,7 +193,6 @@ public class AltTranslation implements Comparable<AltTranslation> {
 		return false;
 	}
 
-	@Override
 	/**
 	 * This method implements a three way sort on (1) AltTranslationType (2) Score (3)
 	 * source string match. AltTranslationType is the primary key, score secondary and source
@@ -195,6 +200,7 @@ public class AltTranslation implements Comparable<AltTranslation> {
 	 * 
 	 * @param other - the AltTranslation we are comparing against.
 	 */
+	@Override
 	public int compareTo(AltTranslation other) {
 		final int EQUAL = 0;
 

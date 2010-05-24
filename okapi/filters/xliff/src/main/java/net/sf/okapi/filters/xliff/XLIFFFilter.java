@@ -707,8 +707,12 @@ public class XLIFFFilter implements IFilter {
 					}
 					else {
 						// Add the source, no target yet
-						altTrans.add(lang, null, null, tc.getFirstContent(), null, AltTranslationType.UKNOWN, 0, null);
-						altTrans.getLast().getEntry().setPreserveWhitespaces(preserveSpaces.peek());
+						AltTranslation alt = altTrans.add(lang, null, null, tc.getFirstContent(), null,
+							AltTranslationType.UKNOWN, 0, AltTranslation.ORIGIN_SOURCEDOC);
+						alt.getEntry().setPreserveWhitespaces(preserveSpaces.peek());
+						if ( altTransQuality > 0 ) {
+							alt.setScore(altTransQuality);
+						}
 					}
 				}
 			}
@@ -827,7 +831,8 @@ public class XLIFFFilter implements IFilter {
 		
 		// Get possible mid for segment
 		String mid = reader.getAttributeValue(null, "mid");
-		// Get possible score
+		// Get possible score (it will be set when we create the entry) -1 or 0 means: don't set it
+		altTransQuality = -1;
 		tmp = reader.getAttributeValue(null, "match-quality");
 		if ( !Util.isEmpty(tmp) ) {
 			if ( Character.isDigit(tmp.charAt(0)) ) {
@@ -854,7 +859,8 @@ public class XLIFFFilter implements IFilter {
 			}
 		}
 		
-		if ( mid == null ) { // Annotation should be Attached on the container
+		// Decide where to attach the annotation: the segment or the container
+		if ( mid == null ) { // Annotation should be attached on the container
 			altTrans = tc.getAnnotation(AltTranslationsAnnotation.class);
 			if ( altTrans == null ) {
 				// If none exists: create one
@@ -879,6 +885,7 @@ public class XLIFFFilter implements IFilter {
 				seg.setAnnotation(altTrans);
 			}
 		}
+		
 	}
 	
 	private void addSegSourceIfNeeded () {
