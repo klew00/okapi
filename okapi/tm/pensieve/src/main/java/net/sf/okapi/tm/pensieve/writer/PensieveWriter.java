@@ -89,6 +89,19 @@ public class PensieveWriter implements ITmWriter {
 			}
 		}
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void commit() {
+		try {
+			indexWriter.commit();
+		} catch (IOException e) {
+			throw new OkapiIOException(e);
+		}
+	}
+	
 
 	/**
 	 * Gets a handle on the IndexWriter so that commits and rollbacks can happen outside. For now, this is a convience

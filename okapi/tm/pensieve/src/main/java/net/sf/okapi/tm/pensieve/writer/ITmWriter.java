@@ -55,4 +55,10 @@ public interface ITmWriter {
      * @throws OkapiIOException if the update can not happen
      */
     public void update(TranslationUnit tu);
+    
+    /**
+     * Forces a commit against the index.
+     * @throws OkapiIOException if the commit can not happen
+     */
+    void commit();
 }
