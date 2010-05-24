@@ -211,7 +211,7 @@ public class PipelineBuilderTest {
 					new RawDocumentToFilterEventsStep(),
 					
 					new PipelineStep(new LeveragingStep(), 
-							new Parameter("resourceClassName", net.sf.okapi.connectors.opentran.OpenTranTMConnector.class.getName()),
+							new Parameter("resourceClassName", net.sf.okapi.connectors.google.GoogleMTConnector.class.getName()),
 							new Parameter("threshold", 80),
 							new Parameter("fillTarget", true)),
 							
@@ -260,5 +260,45 @@ public class PipelineBuilderTest {
 		assertNotNull(pd.getPipeline());
 		assertEquals(4, pd.getPipeline().getSteps().size());
 	}
+
+	// DEBUG 
+	@Test
+	public void testParallelPipeline() {
+		Pipeline p5 =
+			new Pipeline(
+					"Alignment pipeline. Source and target documents are processed by separate " +
+					"pipelines connected in parallel. Events from both pipelines are anilized in TestAlignerStep.",
+					new Pipeline(
+							"Parallel pipeline for parrallel handling of source and target documents.",
+							PipelineType.PARALLEL,
+							
+							new Pipeline(
+									"Source document translatable text extraction",
+									new Batch(
+											new BatchItem(
+													(new File("source.html")).toURI(),
+													 "UTF-8",
+													 LocaleId.ENGLISH)),
+									new RawDocumentToFilterEventsStep()),
+									
+							new Pipeline(
+									"Target document translatable text extraction",
+									new Batch(
+											new BatchItem(
+													(new File("target.doc")).toURI(),
+													 "UTF-16",
+													 LocaleId.CHINA_CHINESE)),
+									new RawDocumentToFilterEventsStep())),
+									
+					new SentenceAlignerStep(),
+					
+					new FilterEventsWriterStep());
+
+		PipelineDriver pd = new PipelineDriver();
+		pd.setPipeline(p5);
+		assertNotNull(pd.getPipeline());
+		assertEquals(3, pd.getPipeline().getSteps().size());
 		
+		p5.execute();
+	}		
 }

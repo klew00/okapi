@@ -93,7 +93,9 @@ public class XLIFFKitReaderStep extends BasePipelineStep {
 			//merger.setTrgLoc(targetLocale);
 			merger.setUseApprovedOnly(params.isUseApprovedOnly());
 			merger.setUpdateApprovedFlag(params.isUpdateApprovedFlag());
-			reader.setOptions(outputEncoding, params.isGenerateTargets(), outputPath);
+			if (params.isGenerateTargets())
+				reader.setGeneratorOptions(outputEncoding, outputPath);
+			
 			//reader.setGenerateTargets(params.isGenerateTargets());
 			reader.open(rd);
 			return reader.next();

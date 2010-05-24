@@ -281,9 +281,9 @@ public class OPCPackageReader extends AbstractFilter {
 		writeEvent(event);
 	}
 
-	public void setOptions(String outputEncoding, boolean generateTargets, String outputPath) {
+	public void setGeneratorOptions(String outputEncoding, String outputPath) {
 		this.outputEncoding = outputEncoding;
-		this.generateTargets = generateTargets && !Util.isEmpty(outputPath);
+		this.generateTargets = !Util.isEmpty(outputPath);
 		this.outputPath = outputPath;
 	}
 }
