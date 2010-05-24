@@ -2,7 +2,6 @@ package net.sf.okapi.tm.pensieve.server;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -38,7 +37,6 @@ public class PensieveStartup {
 
 		// create index if it doesn't exist
 		PensieveWriter writer = getWriter();
-		
 		importTestData();
 	}	
 	
@@ -62,6 +60,7 @@ public class PensieveStartup {
 		OkapiTmxImporter importer = new OkapiTmxImporter(new LocaleId("EN-US"), new TmxFilter());
 		try{
 			importer.importTmx(PensieveStartup.class.getResource("mytm.tmx").toURI(), new LocaleId("FR-FR"), writer);
+			writer.commit();
 		}
 		catch (URISyntaxException e) {
 			throw new RuntimeException(e);
