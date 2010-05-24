@@ -416,7 +416,7 @@ public class TextFragment implements Comparable<Object> {
 	 * copy if there are references in the original source and/or empty codes in the new target.
 	 * @param newSrc the new source text fragment. (Can be null)
 	 * @param parent the parent text unit (Can be null. Used for error information only)
-	 * @logger the logger to use to log warnings. (Can be null)
+	 * @param logger the logger to use to log warnings. (Can be null)
 	 * @return the newTrg parameter with its inline codes adjusted
 	 */
 	public static TextFragment adjustTargetCodes (TextFragment oriSrc,
