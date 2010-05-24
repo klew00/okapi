@@ -31,7 +31,7 @@ import java.security.InvalidParameterException;
 public class IdGenerator {
 	
 	private long seq = 0;
-	private String root;
+	private String rootId;
 	private String prefix;
 	
 	/**
@@ -70,7 +70,7 @@ public class IdGenerator {
 	 *  the new identifier.
 	 */
 	public String createId () {
-		return root + "-" + prefix + Long.toString(++seq);
+		return rootId + "-" + prefix + Long.toString(++seq);
 	}
 	
 	/**
@@ -86,9 +86,17 @@ public class IdGenerator {
 		if ( seq <= 0 ) {
 			throw new RuntimeException("The method createId() has not been called yet.");
 		}
-		return root + "-" + prefix + Long.toString(seq);
+		return rootId + "-" + prefix + Long.toString(seq);
 	}
 
+	/**
+	 * Gets the id generated from the root string given when creating this object.
+	 * @return the if of the root for this object.
+	 */
+	public String getRootId () {
+		return rootId;
+	}
+	
 	private void create (String root,
 		String prefix)
 	{
@@ -97,7 +105,7 @@ public class IdGenerator {
 			throw new InvalidParameterException("The root argument must not be null or empty.");
 		}
 		// makeId() uses the String.hashCode which should be reproducible across VM and sessions
-		this.root = Util.makeId(root);
+		this.rootId = Util.makeId(root);
 	
 		// Set the prefix part (empty is OK)
 		if ( prefix == null ) this.prefix = "";

@@ -468,14 +468,6 @@ public class TextUnit implements INameable, IReferenceable {
 		return trgCont;
 	}
 
-//    /**
-//	 * Gets the content of the source for this TextUnit (a {@link TextFragment} object).
-//	 * @return the content of the source for this TextUnit.
-//	 */
-//	public TextFragment getSourceContent () {
-//		return source;
-//	}
-
 	/**
 	 * Sets the content of the source for this TextUnit.
 	 * @param content the new content to set.
@@ -487,18 +479,6 @@ public class TextUnit implements INameable, IReferenceable {
 		return source.getSegments().getFirstContent();
 	}
 
-//	/**
-//	 * Gets the content of the target for a given locale for this TextUnit.
-//	 * @param locId the locale to query.
-//	 * @return the content of the target for the given locale for this TextUnit,
-//	 * or null if the locale is not found.
-//	 */
-//	public TextFragment getTargetContent (LocaleId locId) {
-//		TextContainer tc = getTarget(locId);
-//		if ( tc == null ) return null;
-//		return tc.getContent();
-//	}
-	
 	/**
 	 * Sets the content of the target for a given locale for this TextUnit.
 	 * @param locId the locale to set.
@@ -571,7 +551,9 @@ public class TextUnit implements INameable, IReferenceable {
 	 * @param locId the locale to match.
 	 * @param ranges the source segment ranges for matching the segments of that locale. 
 	 */
-	public void setSourceSegmentationForTarget (LocaleId locId, List<Range> ranges) {
+	public void setSourceSegmentationForTarget (LocaleId locId,
+		List<Range> ranges)
+	{
 		if ( trgSegRanges == null ) {
 			trgSegRanges = new ConcurrentHashMap<LocaleId, List<Range>>();
 		}
@@ -608,7 +590,11 @@ public class TextUnit implements INameable, IReferenceable {
 		source.getSegments().create(ranges); // Ranges can be null: no segmentation occures then
 		syncLoc = locId;
 	}
-	
+
+	/**
+	 * Removes all segmentations (source and targets) in this text unit.
+	 * All entries are converted to non-segmented entries.
+	 */
 	public void removeAllSegmentations () {
 		// Desegment the source if needed
 		if ( getSource().hasBeenSegmented() ) {
