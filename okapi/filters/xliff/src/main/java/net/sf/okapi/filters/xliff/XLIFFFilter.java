@@ -768,15 +768,15 @@ public class XLIFFFilter implements IFilter {
 						alt = null; // Behave like it's a first entry
 					}
 					if ( alt == null ) {
-						altTrans.add(srcLang, null, null, null, null, AltTranslationType.UKNOWN, 0, null);
+						alt = altTrans.add(srcLang, null, null, null, null, AltTranslationType.UKNOWN, 0, AltTranslation.ORIGIN_SOURCEDOC);
 					}
 					if ( tc.contentIsOneSegment() ) {
-						altTrans.getLast().setTarget(lang, tc.getFirstContent());
+						alt.setTarget(lang, tc.getFirstContent());
 					}
 					else {
-						altTrans.getLast().setTarget(lang, tc.getUnSegmentedContentCopy());
+						alt.setTarget(lang, tc.getUnSegmentedContentCopy());
 					}
-					altTrans.getLast().getEntry().setPreserveWhitespaces(preserveSpaces.peek());
+					alt.getEntry().setPreserveWhitespaces(preserveSpaces.peek());
 				}
 			}
 		}
