@@ -22,6 +22,7 @@ package net.sf.okapi.common.resource;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import net.sf.okapi.common.ReversedIterator;
 import net.sf.okapi.common.Util;
@@ -36,6 +37,8 @@ import net.sf.okapi.common.skeleton.SkeletonUtil;
  */
 public class TextUnitUtil {
 
+	private static final Logger LOGGER = Logger.getLogger(TextUnitUtil.class.getName()); 
+	
 	/**
 	 * Removes leading whitespaces from a given text fragment.
 	 * 
@@ -45,6 +48,145 @@ public class TextUnitUtil {
 	public static void trimLeading(TextFragment textFragment) {
 
 		trimLeading(textFragment, null);
+	}
+
+	/**
+	 * <b>TEMPORARY</b>: Adjusts the inline codes of a new target text based on an original source.
+	 * <p>This method compares an original source with a new target, and transfer the codes of the original source
+	 * at their equivalent places in the new target. The text of the new target is left untouched.</p>
+	 * <p>If the option alwaysCopyCodes is false, the codes are copied only if it the original source codes
+	 * have references or if the new target codes are empty.
+	 * @param oriSrc the original source text fragment.
+	 * @param newTrg the new target text fragment (this is the fragment that will be adjusted).
+	 * @param alwaysCopyCodes indicates the adjustment of the codes is always done. Set this option to false to only
+	 * @param addMissingCodes indicates if codes that are in the original source but not in the new target should be
+	 * automatically added at the end of the new target (even if they are removable)
+	 * copy if there are references in the original source and/or empty codes in the new target.
+	 * @param newSrc the new source text fragment. (Can be null)
+	 * @param parent the parent text unit (Can be null. Used for error information only)
+	 * @return the newTrg parameter with its inline codes adjusted
+	 */
+	public static TextFragment adjustTargetCodes (TextFragment oriSrc,
+		TextFragment newTrg,
+		boolean alwaysCopyCodes,
+		boolean addMissingCodes,
+		TextFragment newSrc,
+		TextUnit parent)
+	{
+		List<Code> newCodes = newTrg.getCodes();
+		List<Code> oriCodes = oriSrc.getCodes();
+		
+		// If not alwaysCopyCodes: no reason to adjust anything: use the target as-it
+		// This allows targets with only code differences to be used as-it
+		boolean needAdjustment = false;
+		if ( !alwaysCopyCodes ) {
+			// Check if we need to adjust regardless of copying the codes or not
+			// For example: when we have empty codes in the destination target
+			for ( Code code : newCodes ) {
+				if ( !code.hasData() ) {
+					needAdjustment = true;
+					break;
+				}
+			}
+			// Or when the original has references
+			if ( !needAdjustment ) {
+				for ( Code code : oriCodes ) {
+					if ( code.hasReference() ) {
+						needAdjustment = true;
+						break;
+					}
+				}
+			}
+			if ( !needAdjustment ) {
+				return newTrg;
+			}
+		}
+		// If both new and original have no code, return the new fragment
+		if ( !newTrg.hasCode() && !oriSrc.hasCode() ) {
+			return newTrg;
+		}
+		
+		// If the codes of the original sources and the matched one are the same: no need to adjust
+		if ( newSrc != null ) {
+			if ( !needAdjustment && oriCodes.toString().equals(newSrc.getCodes().toString()) ) {
+				return newTrg;
+			}
+		}
+
+		// Else: try to adjust
+		int[] oriIndices = new int[oriCodes.size()];
+		for ( int i=0; i<oriIndices.length; i++ ) oriIndices[i] = i;
+		
+		int done = 0;
+		Code newCode, oriCode;
+//		int oriIndex = -1;
+
+		for ( int i=0; i<newCodes.size(); i++ ) {
+			newCode = newCodes.get(i);
+			newCode.setOuterData(null); // Remove XLIFF outer codes if needed
+
+			// Get the data from the original code (match on id)
+			oriCode = null;
+			for ( int j=0; j<oriIndices.length; j++ ) {
+				if ( oriIndices[j] == -1) continue; // Used already
+				//if (( oriCodes.get(oriIndices[j]).getId() == newCode.getId() ))
+					//TOFIX && ( oriCodes.get(oriIndices[j]).getTagType() == newCode.getTagType() ))
+				if ( oriCodes.get(oriIndices[j]).getTagType() == newCode.getTagType() ) {
+					//oriIndex = oriIndices[j];
+					oriCode = oriCodes.get(oriIndices[j]);
+					oriIndices[j] = -1;
+					done++;
+					break;
+				}
+			}
+			
+			if ( oriCode == null ) { // Not found in original (extra in target)
+				if (( newCode.getData() == null )
+					|| ( newCode.getData().length() == 0 )) {
+					// Leave it like that
+					String place = null;
+					if ( parent != null ) {
+						place = String.format(" (item id='%s', name='%s')",
+							parent.getId(), (parent.getName()==null ? "" : parent.getName()));
+					}
+					LOGGER.warning(String.format("The extra target code id='%d' does not have corresponding data.",
+						newCode.getId()) + ((place == null) ? "" : place));
+				}
+				// Else: This is a new code: keep it
+			}
+			else { // A code with same ID existed in the original
+				// Get the data from the original
+				newCode.setData(oriCode.getData());
+				newCode.setOuterData(oriCode.getOuterData());
+				newCode.setReferenceFlag(oriCode.hasReference());
+			}
+		}
+		
+		// If needed, check for missing codes in new fragment
+		if ( oriCodes.size() > done ) {
+			// Any index > -1 in source means it was was deleted in target
+			for ( int i=0; i<oriIndices.length; i++ ) {
+				if ( oriIndices[i] != -1 ) {
+					Code code = oriCodes.get(oriIndices[i]);
+					if ( addMissingCodes ) {
+						newTrg.append(code.clone());
+					}
+					else {
+						if ( !code.isDeleteable() ) {
+							String msg = String.format("The code id='%d' (%s) is missing in target.",
+								code.getId(), code.getData());
+							if ( parent != null ) {
+								msg += String.format(" (item id='%s', name='%s')", parent.getId(),
+									(parent.getName()==null ? "" : parent.getName()));
+							}
+							LOGGER.warning(msg);
+							LOGGER.info(String.format("Source='%s'\nTarget='%s'", oriSrc.toString(), newTrg.toString()));
+						}
+					}
+				}
+			}
+		}
+		return newTrg;
 	}
 
 	/**

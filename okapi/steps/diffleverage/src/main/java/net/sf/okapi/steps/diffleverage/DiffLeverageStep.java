@@ -41,6 +41,7 @@ import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.lib.extra.diff.incava.DiffLists;
 
 /**
@@ -301,8 +302,8 @@ public class DiffLeverageStep extends BasePipelineStep {
 				// only copy the old target if wdiffOnly is false
 				if (!params.isDiffOnly()) {
 					TextFragment tf = t.getFirstContent();
-					TextFragment.adjustTargetCodes(newTu.getSource().getFirstContent(),
-						tf, true, true, null, newTu, null);
+					TextUnitUtil.adjustTargetCodes(newTu.getSource().getFirstContent(),
+						tf, true, true, null, newTu);
 					newTu.setTarget(targetLocale, t);
 				}
 				// set the DiffLeverageAnnotation which marks the new TextUnit as a match with the old TextUnit

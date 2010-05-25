@@ -684,35 +684,6 @@ public class TextFragmentTest {
 		assertEquals(8, TextFragment.indexOfLastNonWhitespace(text, 9, 0, true, true, false, true));
 	}
 
-	@Test
-	public void testAdjustTargetFragment () {
-		TextFragment toTransSrc = makeFragment1();
-		TextFragment proposalTrg = makeFragment1Bis("trg");
-		assertEquals("{B}A{/B}B{BR/}C trg", proposalTrg.toString());
-		TextFragment.adjustTargetCodes(toTransSrc, proposalTrg, true, true, null, null, null);
-		assertEquals("[b]A[/b]B[br/]C trg", proposalTrg.toString());
-	}
-	
-	@Test
-	public void testAdjustIncompleteTargetFragmentAutoAdded () {
-		TextFragment toTransSrc = makeFragment1();
-		TextFragment proposalTrg = makeFragment1Bis("trg");
-		proposalTrg.remove(6, 8); // "xxAxxBxxC trg"
-		assertEquals("{B}A{/B}BC trg", proposalTrg.toString());
-		TextFragment.adjustTargetCodes(toTransSrc, proposalTrg, true, true, null, null, null);
-		assertEquals("[b]A[/b]BC trg[br/]", proposalTrg.toString());
-	}
-	
-	@Test
-	public void testAdjustIncompleteTargetFragmentNoAddition () {
-		TextFragment toTransSrc = makeFragment1();
-		TextFragment proposalTrg = makeFragment1Bis("trg");
-		proposalTrg.remove(6, 8); // "xxAxxBxxC trg"
-		assertEquals("{B}A{/B}BC trg", proposalTrg.toString());
-		TextFragment.adjustTargetCodes(toTransSrc, proposalTrg, true, false, null, null, null);
-		assertEquals("[b]A[/b]BC trg", proposalTrg.toString());
-	}
-	
 	/**
 	 * Makes a fragment <code>[b]A[br/]B[/b]C<code>
 	 * @return the new fragment.
@@ -725,21 +696,6 @@ public class TextFragmentTest {
 		tf.append("B");
 		tf.append(TagType.CLOSING, "b", "[/b]");
 		tf.append("C");
-		return tf;
-	}
-
-	/**
-	 * Makes a fragment <code>{B}A{/B}B{BR/}C extra<code>
-	 * @return the new fragment.
-	 */
-	private TextFragment makeFragment1Bis (String extra) {
-		TextFragment tf = new TextFragment();
-		tf.append(TagType.OPENING, "b", "{B}");
-		tf.append("A");
-		tf.append(TagType.CLOSING, "b", "{/B}");
-		tf.append("B");
-		tf.append(TagType.PLACEHOLDER, "br", "{BR/}");
-		tf.append("C "+extra);
 		return tf;
 	}
 

@@ -46,6 +46,35 @@ public class TextUnitUtilTest {
 	private GenericContent fmt = new GenericContent();
 
 	@Test
+	public void testAdjustTargetFragment () {
+		TextFragment toTransSrc = makeFragment1();
+		TextFragment proposalTrg = makeFragment1Bis("trg");
+		assertEquals("{B}A{/B}B{BR/}C trg", proposalTrg.toString());
+		TextUnitUtil.adjustTargetCodes(toTransSrc, proposalTrg, true, true, null, null);
+		assertEquals("[b]A[/b]B[br/]C trg", proposalTrg.toString());
+	}
+	
+	@Test
+	public void testAdjustIncompleteTargetFragmentAutoAdded () {
+		TextFragment toTransSrc = makeFragment1();
+		TextFragment proposalTrg = makeFragment1Bis("trg");
+		proposalTrg.remove(6, 8); // "xxAxxBxxC trg"
+		assertEquals("{B}A{/B}BC trg", proposalTrg.toString());
+		TextUnitUtil.adjustTargetCodes(toTransSrc, proposalTrg, true, true, null, null);
+		assertEquals("[b]A[/b]BC trg[br/]", proposalTrg.toString());
+	}
+	
+	@Test
+	public void testAdjustIncompleteTargetFragmentNoAddition () {
+		TextFragment toTransSrc = makeFragment1();
+		TextFragment proposalTrg = makeFragment1Bis("with warning");
+		proposalTrg.remove(6, 8); // "xxAxxBxxC with warning"
+		assertEquals("{B}A{/B}BC with warning", proposalTrg.toString());
+		TextUnitUtil.adjustTargetCodes(toTransSrc, proposalTrg, true, false, null, null);
+		assertEquals("[b]A[/b]BC with warning", proposalTrg.toString());
+	}
+	
+	@Test
 	public void testUtils() {
 		String st = "12345678";
 		assertEquals("45678", Util.trimStart(st, "123"));
@@ -309,4 +338,35 @@ public class TextUnitUtilTest {
 				
 		assertEquals(sseg.id, tseg.id);
 	}
+
+	/**
+	 * Makes a fragment <code>[b]A[br/]B[/b]C<code>
+	 * @return the new fragment.
+	 */
+	private TextFragment makeFragment1 () {
+		TextFragment tf = new TextFragment();
+		tf.append(TagType.OPENING, "b", "[b]");
+		tf.append("A");
+		tf.append(TagType.PLACEHOLDER, "br", "[br/]");
+		tf.append("B");
+		tf.append(TagType.CLOSING, "b", "[/b]");
+		tf.append("C");
+		return tf;
+	}
+
+	/**
+	 * Makes a fragment <code>{B}A{/B}B{BR/}C extra<code>
+	 * @return the new fragment.
+	 */
+	private TextFragment makeFragment1Bis (String extra) {
+		TextFragment tf = new TextFragment();
+		tf.append(TagType.OPENING, "b", "{B}");
+		tf.append("A");
+		tf.append(TagType.CLOSING, "b", "{/B}");
+		tf.append("B");
+		tf.append(TagType.PLACEHOLDER, "br", "{BR/}");
+		tf.append("C "+extra);
+		return tf;
+	}
+
 }
