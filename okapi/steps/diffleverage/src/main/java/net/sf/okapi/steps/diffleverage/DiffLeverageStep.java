@@ -30,6 +30,8 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.annotation.AltTranslationType;
+import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.exceptions.OkapiBadStepInputException;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
@@ -43,17 +45,21 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.lib.extra.diff.incava.DiffLists;
+import net.sf.okapi.lib.search.lucene.analysis.AlphabeticNgramTokenizer;
+import net.sf.okapi.lib.search.lucene.scorer.Util;
 
 /**
  * Contextually match source segments between two documents using a standard diff algorithm
- * (http://en.wikipedia.org/wiki/Diff). The result is a new document with the translations from the old document
- * copied into it. This allows translations between different document versions to be preserved while still maintaining
- * the newer source document modifications.
- *
+ * (http://en.wikipedia.org/wiki/Diff). The result is a new document with the translations from the old document copied
+ * into it. This allows translations between different document versions to be preserved while still maintaining the
+ * newer source document modifications.
+ * 
  * @author HARGRAVEJE
  * 
  */
 public class DiffLeverageStep extends BasePipelineStep {
+	private static final int NGRAM_SIZE = 3;
+
 	private Parameters params;
 	private IFilter filter;
 	private IFilterConfigurationMapper fcMapper;
@@ -65,6 +71,7 @@ public class DiffLeverageStep extends BasePipelineStep {
 	private LocaleId targetLocale;
 	private boolean done = true;
 	private Comparator<TextUnit> sourceComparator;
+	private AlphabeticNgramTokenizer tokenizer;
 
 	public DiffLeverageStep() {
 		params = new Parameters();
@@ -118,15 +125,15 @@ public class DiffLeverageStep extends BasePipelineStep {
 	public String getName() {
 		return "Diff Leverage";
 	}
-	
+
 	@Override
-	public IParameters getParameters () {
+	public IParameters getParameters() {
 		return params;
 	}
-	
+
 	@Override
-	public void setParameters (IParameters params) {
-		this.params = (Parameters)params;
+	public void setParameters(IParameters params) {
+		this.params = (Parameters) params;
 	}
 
 	@Override
@@ -137,10 +144,9 @@ public class DiffLeverageStep extends BasePipelineStep {
 			sourceComparator = new TextUnitComparator(params.isCodesensitive());
 		} else {
 			// fuzzy match
-			sourceComparator = new FuzzyTextUnitComparator(
-					params.isCodesensitive(), 
-					params.getFuzzyThreshold(), 
-					sourceLocale);
+			tokenizer = Util.createNgramTokenizer(NGRAM_SIZE, sourceLocale);
+			sourceComparator = new FuzzyTextUnitComparator(params.isCodesensitive(), params
+					.getFuzzyThreshold(), sourceLocale);
 		}
 		return event;
 	}
@@ -295,16 +301,36 @@ public class DiffLeverageStep extends BasePipelineStep {
 		for (Map.Entry<Integer, Integer> m : diffTextUnits.getMatches().entrySet()) {
 			TextUnit oldTu = oldTextUnits.get(m.getKey());
 			TextUnit newTu = newTextUnits.get(m.getValue());
+			int score = 100;
 
 			// copy the old translation to the new TextUnit
 			TextContainer t = null;
 			if ((t = oldTu.getTarget(targetLocale)) != null) {
-				// only copy the old target if wdiffOnly is false
+				// only copy the old target if diffOnly is false
 				if (!params.isDiffOnly()) {
+					if (params.getFuzzyThreshold() < 100) {
+						score = (int) Util.calculateNgramDiceCoefficient(oldTu.getSource()
+								.getUnSegmentedContentCopy().getText(), newTu.getSource()
+								.getUnSegmentedContentCopy().getText(), tokenizer);
+					}
 					TextFragment tf = t.getFirstContent();
 					TextUnitUtil.adjustTargetCodes(newTu.getSource().getFirstContent(),
-						tf, true, true, null, newTu);
-					newTu.setTarget(targetLocale, t);
+							tf, true, true, null, newTu);
+
+					if (params.isCopyToTarget()) {
+						newTu.setTarget(targetLocale, t);
+					}
+
+					// make an AltTranslationAnnotation and attach to Source TextContainer
+					AltTranslationsAnnotation altAnno = new AltTranslationsAnnotation();
+					altAnno.add(sourceLocale, targetLocale, 
+							newTu.getSource().getUnSegmentedContentCopy(), 
+							oldTu.getSource().getUnSegmentedContentCopy(), t.getFirstContent(), 
+							params.getFuzzyThreshold() >= 100 ? AltTranslationType.EXACT_PREVIOUS_VERSION
+									: AltTranslationType.FUZZY_PREVIOUS_VERSION, score, getName());
+
+					// add the annotation to the source paragraph
+					newTu.setAnnotation(altAnno);
 				}
 				// set the DiffLeverageAnnotation which marks the new TextUnit as a match with the old TextUnit
 				newTu.setAnnotation(new DiffMatchAnnotation());
