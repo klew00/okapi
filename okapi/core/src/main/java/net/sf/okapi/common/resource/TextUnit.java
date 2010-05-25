@@ -65,7 +65,7 @@ public class TextUnit implements INameable, IReferenceable {
 	private List<Range> srcSegRanges;
 	private ConcurrentHashMap<LocaleId, List<Range>> trgSegRanges;
 	// Do not serialize. This variable is used internally for efficiency
-	private LocaleId syncLoc;
+	private transient LocaleId syncLoc;
 
 	/**
 	 * Creates a new TextUnit object with its identifier.
