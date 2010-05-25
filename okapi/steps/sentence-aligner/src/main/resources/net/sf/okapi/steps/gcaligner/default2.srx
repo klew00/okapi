@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- LGPL see http://languagetool.cvs.sourceforge.net/viewvc/languagetool/JLanguageTool/src/resource/segment.srx -->
 <srx xmlns="http://www.lisa.org/srx20" xmlns:okpsrx="http://okapi.sf.net/srx-extensions"
 	version="2.0">
 	<header segmentsubflows="yes" cascade="yes">

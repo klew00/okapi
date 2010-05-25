@@ -119,10 +119,10 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 		String srxTargetSegmentationPath; // DWH 5-24-10 allow segmentation specific to target
 		SRXDocument srxTargetDocument; // DWH 5-24-10
 		SRXDocument srxDocument = new SRXDocument();
-		srxDocument.setTrimLeadingWhitespaces(false);
+//	srxDocument.setTrimLeadingWhitespaces(false);
 		InputStream is = SentenceAlignerStep.class.getResourceAsStream("default.srx");
 		srxDocument.loadRules(is);
-		srxDocument.setTrimLeadingWhitespaces(false);
+//	srxDocument.setTrimLeadingWhitespaces(false);
 		
 		// The following section added to handle target segmentation rules DWH 5-24-10
 		srxTargetSegmentationPath = params.getSrxTargetSegmentationPath();
@@ -131,7 +131,7 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 				is = new FileInputStream(srxTargetSegmentationPath);
 				srxTargetDocument = new SRXDocument();
 				srxTargetDocument.loadRules(is);
-				srxTargetDocument.setTrimLeadingWhitespaces(false);
+//			srxTargetDocument.setTrimLeadingWhitespaces(false);
 			}
 			catch(Exception e) {
 				LOGGER.warning("Target segmentation rules file "+srxTargetSegmentationPath+
