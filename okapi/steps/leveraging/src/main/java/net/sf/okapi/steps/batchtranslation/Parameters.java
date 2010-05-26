@@ -28,6 +28,7 @@ import net.sf.okapi.common.uidescription.EditorDescription;
 import net.sf.okapi.common.uidescription.FolderInputPart;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 import net.sf.okapi.common.uidescription.PathInputPart;
+import net.sf.okapi.common.uidescription.SpinInputPart;
 import net.sf.okapi.common.uidescription.TextInputPart;
 
 @EditorFor(Parameters.class)
@@ -232,11 +233,11 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 
 		desc.addTextInputPart(paramDesc.get(COMMAND));
 
-		TextInputPart tip = desc.addTextInputPart(paramDesc.get(BLOCKSIZE));
-		tip.setVertical(false);
-		tip.setRange(1, Integer.MAX_VALUE);
+		SpinInputPart sip = desc.addSpinInputPart(paramDesc.get(BLOCKSIZE));
+		sip.setVertical(false);
+		sip.setRange(1, Integer.MAX_VALUE);
 		
-		tip = desc.addTextInputPart(paramDesc.get(ORIGIN));
+		TextInputPart tip = desc.addTextInputPart(paramDesc.get(ORIGIN));
 		tip.setAllowEmpty(true);
 		tip.setVertical(false);
 		
