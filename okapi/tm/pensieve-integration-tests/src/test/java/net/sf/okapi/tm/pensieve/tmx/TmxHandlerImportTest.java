@@ -172,6 +172,7 @@ public class TmxHandlerImportTest {
 		OkapiTmxImporter tmxHandler = new OkapiTmxImporter(locENUS, tmxFilter);
 		tmxHandler.importTmx(this.getClass().getResource("/Paragraph_TM.tmx")
 				.toURI(), locDEDE, tmWriter);
+		tmWriter.close();
 
 		ITmSeeker seeker = new PensieveSeeker(ramDir);
 		TranslationUnit tu = seeker
@@ -193,6 +194,7 @@ public class TmxHandlerImportTest {
 		OkapiTmxImporter tmxHandler = new OkapiTmxImporter(locEN, tmxFilter);
 		tmxHandler.importTmx(this.getClass().getResource("/sample_tmx.xml")
 				.toURI(), locIT, tmWriter);
+		tmWriter.close();
 
 		ITmSeeker seeker = new PensieveSeeker(ramDir);
 		TranslationUnit tu = seeker
@@ -216,6 +218,7 @@ public class TmxHandlerImportTest {
 		OkapiTmxImporter tmxHandler = new OkapiTmxImporter(locEN, tmxFilter);
 		tmxHandler.importTmx(this.getClass().getResource("/sample_tmx.xml")
 				.toURI(), locIT, tmWriter);
+		tmWriter.close();
 
 		ITmSeeker seeker = new PensieveSeeker(ramDir);
 		TranslationUnit tu = seeker

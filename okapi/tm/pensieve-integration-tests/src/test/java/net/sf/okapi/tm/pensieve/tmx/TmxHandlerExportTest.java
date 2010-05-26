@@ -27,7 +27,7 @@ public class TmxHandlerExportTest {
         OkapiTmxImporter tmxImporter = new OkapiTmxImporter(locEN, new TmxFilter());
         OkapiTmxExporter tmxExporter = new OkapiTmxExporter();
         tmxImporter.importTmx(this.getClass().getResource("/sample_tmx.xml").toURI(), locIT, tmWriter);
-
+        tmWriter.close();
         ITmSeeker seeker = new PensieveSeeker(ramDir);
         StringWriter sWriter = new StringWriter();
         tmxExporter.exportTmx(locEN, locIT, seeker, new TMXWriter(new XMLWriter(sWriter)));
