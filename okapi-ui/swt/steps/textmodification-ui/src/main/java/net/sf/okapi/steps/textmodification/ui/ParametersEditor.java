@@ -61,6 +61,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Button chkAddID;
 	private Button chkAddName;
 	private Button chkMarkSegments;
+	private Button chkApplyToBlankEntries;
 	private IHelp help;
 	private Composite mainComposite;
 	
@@ -213,18 +214,30 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		gdTmp.horizontalSpan = 2;
 		chkAddID.setLayoutData(gdTmp);
 
-		chkApplyToExistingTarget = new Button(mainComposite, SWT.CHECK);
-		chkApplyToExistingTarget.setText("Modify also the items with an exiting translation.");
-		gdTmp = new GridData();
-		gdTmp.horizontalSpan = 2;
-		chkApplyToExistingTarget.setLayoutData(gdTmp);
-		
 		chkMarkSegments = new Button(mainComposite, SWT.CHECK);
 		chkMarkSegments.setText("Mark segments with '[' and ']' delimiters");
 		gdTmp = new GridData();
 		gdTmp.horizontalSpan = 2;
 		chkMarkSegments.setLayoutData(gdTmp);
+		
+		Label separator = new Label(mainComposite, SWT.BORDER);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.heightHint = 1;
+		gdTmp.horizontalSpan = 2;
+		separator.setLayoutData(gdTmp);
 
+		chkApplyToBlankEntries = new Button(mainComposite, SWT.CHECK);
+		chkApplyToBlankEntries.setText("Modify also the items without text");
+		gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		chkApplyToBlankEntries.setLayoutData(gdTmp);
+		
+		chkApplyToExistingTarget = new Button(mainComposite, SWT.CHECK);
+		chkApplyToExistingTarget.setText("Modify also the items with an exiting translation");
+		gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		chkApplyToExistingTarget.setLayoutData(gdTmp);
+		
 	}
 	
 	private boolean showDialog () {
@@ -242,6 +255,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		edPrefix.setText(params.prefix);
 		chkAddSuffix.setSelection(params.addSuffix);
 		edSuffix.setText(params.suffix);
+		chkApplyToBlankEntries.setSelection(params.applyToBlankEntries);
 		chkApplyToExistingTarget.setSelection(params.applyToExistingTarget);
 		chkAddName.setSelection(params.addName);
 		chkAddID.setSelection(params.addID);
@@ -258,6 +272,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		params.prefix = edPrefix.getText();
 		params.addSuffix = chkAddSuffix.getSelection();
 		params.suffix = edSuffix.getText();
+		params.applyToBlankEntries = chkApplyToBlankEntries.getSelection();
 		params.applyToExistingTarget = chkApplyToExistingTarget.getSelection();
 		params.addName = chkAddName.getSelection();
 		params.addID = chkAddID.getSelection();

@@ -29,6 +29,7 @@ import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.Segment;
+import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.common.resource.TextUnit;
@@ -82,6 +83,12 @@ public class TextModificationStep extends BasePipelineStep {
 		if ( !tu.isTranslatable() ) return event;
 		// Skip if already translate (only if required)
 		if ( !params.applyToExistingTarget && tu.hasTarget(targetLocale) ) return event;
+		// Check if we need to apply to blank entries
+		if ( !params.applyToBlankEntries ) {
+			TextContainer tc = tu.getTarget(targetLocale);
+			if ( tc == null ) tc = tu.getSource();
+			if ( !tc.hasText() ) return event;
+		}
 		
 		// Create the target if needed
 		tu.createTarget(targetLocale, false, IResource.COPY_ALL);

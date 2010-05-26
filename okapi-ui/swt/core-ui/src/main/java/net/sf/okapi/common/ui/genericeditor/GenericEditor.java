@@ -54,6 +54,7 @@ import net.sf.okapi.common.uidescription.IContainerPart;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 import net.sf.okapi.common.uidescription.ListSelectionPart;
 import net.sf.okapi.common.uidescription.PathInputPart;
+import net.sf.okapi.common.uidescription.SeparatorPart;
 import net.sf.okapi.common.uidescription.SpinInputPart;
 import net.sf.okapi.common.uidescription.TextInputPart;
 import net.sf.okapi.common.ui.Dialogs;
@@ -302,6 +303,18 @@ public class GenericEditor {
 					spinner.setLayoutData(gdTmp);
 				}
 				spinner.setEnabled(d.getWriteMethod()!=null);
+			}
+			else if ( part instanceof SeparatorPart ) {
+				SeparatorPart d = (SeparatorPart)part;
+				cmp = lookupParent(d.getContainer());
+				Label separator = new Label(cmp, SWT.BORDER);
+				controls.put(d.getName(), separator);
+				gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+				gdTmp.heightHint = 1;
+				if ( part.isVertical() || !part.isWithLabel() ) {
+					gdTmp.horizontalSpan = 2;
+				}
+				separator.setLayoutData(gdTmp);
 			}
 
 			// Update the list of observers if needed

@@ -408,8 +408,11 @@ extract the document.</p>
 <h2><a name="editConfig"></a>Edit Filter Configurations</h2>
 <p>This command edits or view filter configurations.</p>
 <p>Note: This command requires access to UI editors that are available only if 
-you have one of the <b>okapi-apps</b> platform-specific distribution. It is not 
-available with the <b>okapi-lib</b> cross-platform distribution.</p>
+you have one of the <b>okapi-apps</b> platform-specific distribution. If you run 
+this command from the <b>okapi-lib</b> cross-platform distribution you will get 
+an error. To edit filter configurations in the <b>okapi-lib</b> distribution, 
+open the <code>.fprm</code> files. Make sure to always save your modifications 
+in UTF-8.</p>
 <p>The syntax of this command is:</p>
 <pre>-e [[-fc] configId]</pre>
 <p>For example:</p>
@@ -697,9 +700,11 @@ other searchable translation repository. the following resources are available:<
 <p>Note that some of these resources are Web-based and require an internet 
 connection, others can be installed and used locally.</p>
 <h3><a name="pensieve"></a>Pensieve TM</h3>
-<p>This is the framework&#39;s own TM engine. It is still under development, but 
+<p>This is the Okapi framework&#39;s own TM engine. It is still under development, but 
 can be used. This resource is indicated by the&nbsp; option <code>-pen</code> in 
-Tikal and takes one argument: the directory of the TM:</p>
+Tikal and takes one argument: the directory of the TM for a local TM, or the URL 
+of the server for a remote TM. If no argument is provided the default host <code>
+http://localhost:8080</code> is used by default.</p>
 <pre>tikal -q &quot;text to translate&quot; -pen myTmDir</pre>
 <h3><a name="translatetoolkit"></a>Translate Toolkit TM</h3>
 <p>The Translate Toolkit TM is an engine that comes with the Translate Toolkit, 

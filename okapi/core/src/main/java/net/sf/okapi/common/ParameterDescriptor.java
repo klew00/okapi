@@ -60,6 +60,9 @@ public class ParameterDescriptor implements IParameterDescriptor {
 		this.displayName = displayName;
 		this.shortDescription = shortDescription;
 		
+		// Case of UI-only parts: no parent to update
+		if ( parent == null ) return;
+			
 		try {
 			BeanInfo info;
 			info = Introspector.getBeanInfo(parent.getClass());

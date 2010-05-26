@@ -28,8 +28,10 @@ import net.sf.okapi.common.BaseContext;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.filters.FilterConfiguration;
+import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationEditor;
+import net.sf.okapi.common.filters.IFilterConfigurationListEditor;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.ui.InputDialog;
 import net.sf.okapi.common.ui.genericeditor.GenericEditor;
@@ -38,7 +40,7 @@ import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 /**
  * Implements {@link IFilterConfigurationEditor} for the SWT-based UI.
  */
-public class FilterConfigurationEditor implements IFilterConfigurationEditor {
+public class FilterConfigurationEditor implements IFilterConfigurationEditor, IFilterConfigurationListEditor  {
 
 	@Override
 	public boolean editConfiguration (String configId,
@@ -111,6 +113,13 @@ public class FilterConfigurationEditor implements IFilterConfigurationEditor {
 			fcMapper.saveCustomParameters(config, params);
 		}
 		return true;
+	}
+
+	@Override
+	public void editConfigurations (IFilterConfigurationMapper fcMapper) {
+		FilterConfigurationsDialog dlg = new FilterConfigurationsDialog(null, false,
+			(FilterConfigurationMapper)fcMapper, null);
+		dlg.showDialog(null);
 	}
 
 }

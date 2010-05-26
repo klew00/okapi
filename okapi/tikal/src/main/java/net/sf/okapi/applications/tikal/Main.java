@@ -45,6 +45,7 @@ import net.sf.okapi.common.filters.DefaultFilters;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.filters.IFilterConfigurationEditor;
+import net.sf.okapi.common.filters.IFilterConfigurationListEditor;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipelinedriver.PipelineDriver;
@@ -86,6 +87,7 @@ public class Main {
 	protected final static int CMD_TRANSLATE = 8;
 	
 	private static final String DEFAULT_SEGRULES = "-";
+	private static final String MSG_ONLYWITHUICOMP = "UI-based commands are available only in the distributions with UI components.";
 
 	private static PrintStream ps;
 	
@@ -539,17 +541,30 @@ public class Main {
 	}
 	
 	private void editAllConfigurations () {
-		throw new UnsupportedOperationException("The -e command without parameter is temporarily unsupported. Use -e configId");
-//		initialize();
-//		// Add all the pre-defined configurations
-//		DefaultFilters.setMappings(fcMapper, false, true);
-//		loadFromPluginsAndUpdate();
-//		// Add the custom configurations
-//		fcMapper.updateCustomConfigurations();
-//		
-//		// Edit
-//		FilterConfigurationsDialog dlg = new FilterConfigurationsDialog(null, false, fcMapper, null);
-//		dlg.showDialog(specifiedConfigId);
+		initialize();
+		// Add all the pre-defined configurations
+		DefaultFilters.setMappings(fcMapper, false, true);
+		loadFromPluginsAndUpdate();
+		// Add the custom configurations
+		fcMapper.updateCustomConfigurations();
+
+		// Edit
+		try {
+			// Invoke the editor using dynamic instantiation so we can compile non-UI distributions 
+			IFilterConfigurationListEditor editor =
+				(IFilterConfigurationListEditor)Class.forName("net.sf.okapi.common.ui.filters.FilterConfigurationEditor").newInstance();
+			// Call the editor
+			editor.editConfigurations(fcMapper);
+		}
+		catch ( InstantiationException e ) {
+			throw new RuntimeException(MSG_ONLYWITHUICOMP);
+		}
+		catch ( IllegalAccessException e ) {
+			throw new RuntimeException(MSG_ONLYWITHUICOMP);
+		}
+		catch ( ClassNotFoundException e ) {
+			throw new RuntimeException(MSG_ONLYWITHUICOMP);
+		}
 	}
 	
 	private void editConfiguration () {
@@ -569,13 +584,13 @@ public class Main {
 			editor.editConfiguration(configId, fcMapper);
 		}
 		catch ( InstantiationException e ) {
-			throw new RuntimeException("UI-based commands are available only in the distributions with UI components.");
+			throw new RuntimeException(MSG_ONLYWITHUICOMP);
 		}
 		catch ( IllegalAccessException e ) {
-			throw new RuntimeException("UI-based commands are available only in the distributions with UI components.");
+			throw new RuntimeException(MSG_ONLYWITHUICOMP);
 		}
 		catch ( ClassNotFoundException e ) {
-			throw new RuntimeException("UI-based commands are available only in the distributions with UI components.");
+			throw new RuntimeException(MSG_ONLYWITHUICOMP);
 		}
 	}
 	

@@ -682,12 +682,6 @@ public class QueryManager {
 			}
 		}
 		
-		// Check order for warning
-//		if ( oriCodes.size() > 1 ) {
-//			StringBuilder tmp = new StringBuilder(oriCodes.size()*2);
-//		
-//		}
-		
 		// If needed, check for missing codes in new fragment
 		if ( oriCodes.size() > done ) {
 			// Any index > -1 in source means it was was deleted in target

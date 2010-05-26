@@ -1010,7 +1010,7 @@ public class TextContainer implements Iterable<TextPart> {
 
 	/**
 	 * Indicates if this container contains at least one character that is not a whitespace.
-	 * All parts (segments and non-segments) are checed.
+	 * All parts (segments and non-segments) are checked.
 	 * @param whiteSpacesAreText indicates if whitespaces should be considered 
 	 * text characters or not.
 	 * @return true if this container contains at least one character that is not a whitespace.

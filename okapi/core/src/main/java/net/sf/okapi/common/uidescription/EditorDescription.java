@@ -203,4 +203,16 @@ public class EditorDescription {
 		return desc;
 	}
 	
+	/**
+	 * Adds a separator part to this editor description.
+	 * @return the UI part created by this call.
+	 */
+	public SeparatorPart addSeparatorPart () {
+		SeparatorPart desc = new SeparatorPart();
+		desc.setVertical(defaultVertical);
+		desc.setLabelFlushed(defaultLabelFlushed);
+		descriptors.put(desc.getName(), desc);
+		return desc;
+	}
+	
 }

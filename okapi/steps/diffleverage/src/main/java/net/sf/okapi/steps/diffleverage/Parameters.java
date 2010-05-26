@@ -88,6 +88,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		sip.setRange(1, 100);
 		sip.setVertical(false);
 		desc.addCheckboxPart(paramsDesc.get("codesensitive"));
+		desc.addSeparatorPart();
 		desc.addCheckboxPart(paramsDesc.get("diffOnly"));
 		desc.addCheckboxPart(paramsDesc.get("copyToTarget"));
 		//desc.addCheckboxPart(paramsDesc.get("diffOnSentences"));
