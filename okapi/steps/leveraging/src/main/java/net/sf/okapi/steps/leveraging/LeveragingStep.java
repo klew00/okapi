@@ -47,6 +47,7 @@ public class LeveragingStep extends BasePipelineStep {
 	private QueryManager qm;
 	private TMXWriter tmxWriter;
 	private String rootDir;
+	private boolean initDone;
 
 	public LeveragingStep () {
 		params = new Parameters();
@@ -88,26 +89,7 @@ public class LeveragingStep extends BasePipelineStep {
 
 	@Override
 	protected Event handleStartBatch (Event event) {
-		// If we don't really use this step, just move on
-		if ( !params.getLeverage() ) return event;
-		
-		// Else: initialize the global variables
-		qm = new QueryManager();
-		qm.setThreshold(params.getThreshold());
-		qm.setRootDirectory(rootDir);
-		int id = qm.addAndInitializeResource(params.getResourceClassName(), null,
-			params.getResourceParameters());
-		ResourceItem res = qm.getResource(id);
-		logger.info("Leveraging settings: "+res.name);
-		logger.info(res.query.getSettingsDisplay());
-			
-		if ( params.getMakeTMX() ) {
-			tmxWriter = new TMXWriter(Util.fillRootDirectoryVariable(params.getTMXPath(), rootDir));
-			tmxWriter.setUseMTPrefix(params.getUseMTPrefix());
-			tmxWriter.writeStartDocument(sourceLocale, targetLocale,
-				getClass().getName(), "", "sentence", "undefined", "undefined");
-		}
-		
+		initDone = false;
 		return event;
 	}
 	
@@ -120,6 +102,9 @@ public class LeveragingStep extends BasePipelineStep {
 	@Override
 	protected Event handleStartDocument (Event event) {
 		if ( !params.getLeverage() ) return event;
+		if ( !initDone ) {
+			initialize();
+		}
 		qm.setLanguages(sourceLocale, targetLocale);
 		qm.resetCounters();
 		return event;
@@ -174,4 +159,29 @@ public class LeveragingStep extends BasePipelineStep {
 		}
 	}
 
+	private void initialize () {
+		// If we don't really use this step, just move on
+		if ( !params.getLeverage() ) {
+			initDone = true;
+			return;
+		}
+		
+		// Else: initialize the global variables
+		qm = new QueryManager();
+		qm.setThreshold(params.getThreshold());
+		qm.setRootDirectory(rootDir);
+		int id = qm.addAndInitializeResource(params.getResourceClassName(), null,
+			params.getResourceParameters());
+		ResourceItem res = qm.getResource(id);
+		logger.info("Leveraging settings: "+res.name);
+		logger.info(res.query.getSettingsDisplay());
+			
+		if ( params.getMakeTMX() ) {
+			tmxWriter = new TMXWriter(Util.fillRootDirectoryVariable(params.getTMXPath(), rootDir));
+			tmxWriter.setUseMTPrefix(params.getUseMTPrefix());
+			tmxWriter.writeStartDocument(sourceLocale, targetLocale,
+				getClass().getName(), "", "sentence", "undefined", "undefined");
+		}
+		initDone = true;
+	}
 }

@@ -28,8 +28,7 @@ import net.sf.okapi.common.ParameterDescriptor;
 public class SeparatorPart extends AbstractPart {
 
 	/**
-	 * Creates a new CheckboxPart object with a given parameter descriptor.
-	 * @param paramDescriptor the parameter descriptor for this UI part.
+	 * Creates a new SeparatorPart object with a given parameter descriptor.
 	 */
 	public SeparatorPart () {
 		super(new ParameterDescriptor("sep", null, null, null));
