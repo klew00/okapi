@@ -82,6 +82,7 @@ public class Utility extends BaseFilterDrivenUtility {
 			qm = new QueryManager();
 			qm.setLanguages(srcLang, trgLang);
 			qm.setThreshold(params.threshold);
+			qm.setRootDirectory(projectDir);
 			qm.addAndInitializeResource(params.transResClass, null, params.transResParams);
 			if ( params.useTransRes2 ) {
 				qm.addAndInitializeResource(params.transResClass2, null, params.transResParams2);

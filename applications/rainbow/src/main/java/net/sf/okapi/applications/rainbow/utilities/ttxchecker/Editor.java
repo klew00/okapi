@@ -114,7 +114,7 @@ public class Editor implements IParametersEditor {
 				shell.close();
 			};
 		};
-		pnlActions = new OKCancelPanel(shell, SWT.NONE, OKCancelActions, true);
+		pnlActions = new OKCancelPanel(shell, SWT.NONE, OKCancelActions, true, "Execute");
 		pnlActions.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		pnlActions.btOK.setEnabled(!readOnly);
 		if ( !readOnly ) {
