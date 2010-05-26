@@ -449,6 +449,7 @@ public class ServalForm {
 			
 			File file = new File(paths[0]);
 			imp.importTmx(file.toURI(), LocaleId.fromString(langs[1]), writer);
+			writer.close();
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getLocalizedMessage(), null);
