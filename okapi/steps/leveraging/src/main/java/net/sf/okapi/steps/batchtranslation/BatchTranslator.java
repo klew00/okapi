@@ -98,8 +98,6 @@ public class BatchTranslator {
 		}
 		qutil = new QueryUtil();
 		initDone = false;
-		attributes = new Hashtable<String, String>();
-		attributes.put("creationid", Util.MTFLAG);
 	}
 	
 	@Override
@@ -140,12 +138,19 @@ public class BatchTranslator {
 	private void initialize () {
 		if ( params.getMakeTMX() ) {
 			tmxWriter = new TMXWriter(Util.fillRootDirectoryVariable(params.getTmxPath(), rootDir));
-			tmxWriter.writeStartDocument(srcLoc, trgLoc, getClass().getCanonicalName(), "1", "sentence", "MT-based", "unknown");
+			tmxWriter.writeStartDocument(srcLoc, trgLoc, getClass().getCanonicalName(), "1", "sentence",
+				(params.getMarkAsMT() ? "MT-based" : null), "unknown");
+		}
+		
+		attributes = new Hashtable<String, String>();
+		if ( params.getMarkAsMT() ) {
+			attributes.put("creationid", Util.MTFLAG);
 		}
 		if ( !Util.isEmpty(params.getOrigin()) ) {
 			attributes.put("Txt::Origin", params.getOrigin());
 		}
 		initDone = true;
+
 		store = new SimpleStore();
 		totalInternalMatches = 0;
 		totalExternalMatches = 0;
