@@ -313,6 +313,16 @@ public class HtmlSnippetsTest {
 		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, locEN));
 	}
 	
+	/*
+	 * Issue 126: Problem with un-quoted translatable attributes
+	 * This will fail until fixed!!!
+	@Test
+	public void textWithUnquotedAttribtes() {
+		String snippet = "<img alt=R&amp;D src=image.png>";
+		assertEquals("<img alt=\"R&amp;D\" src=\"image.png\">", generateOutput(getEvents(snippet), snippet, locEN));
+	}
+	*/
+	
 	@Test
 	public void table() {
 		String snippet = 
