@@ -43,7 +43,7 @@
     	<repository>
         	<name>OkapiPublicRepository</name>
         	<id>okapi-pub-repo</id>
-        	<url>http://okapi.opentag.com/maven2</url>
+        	<url>http://openl10n.net/maven2</url>
     	</repository>
 	</repositories>
     

@@ -40,9 +40,12 @@ Then run the integration tests for the applications
 (The skip option is because you don't need to re-run the unit tests)
 
 
---- 6) Update the Okapi Public repository with the proper JARs
-Site: http://okapi.opentag.com/maven2/
-(So the examples can be build using Maven)
+#--- 6) Update the Okapi Public repository with the proper JARs
+#Site: http://okapi.opentag.com/maven2/
+#(So the examples can be build using Maven)
+
+6) is not needed anymore as the repository http://openl10n.net/maven2 contains automatically the latest build.
+
 
 
 --- 6.bis) If you have trunk/deployment/utils/tests
