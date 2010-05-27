@@ -104,32 +104,40 @@ public class GenericEditor {
 		}
 		
 		public void handleEvent (Event event) {
-			propagate(masterCtrl, masterCtrl.getSelection());
+			// Propagate to the slaves
+			propagate(masterCtrl, masterCtrl.getSelection(), masterCtrl.getEnabled());
 		}
 		
 		private void propagate (Control ctrl,
-			boolean checked)
+			boolean isCallerSelected,
+			boolean isCallerEnabled)
 		{
 			Button button = (Button)ctrl;
 			MasterItem mi = masters.get(button);
 			for ( AbstractPart part : mi.slaves ) {
 				Control slaveCtrl = controls.get(part.getName());
-				if ( masters.containsKey(slaveCtrl) ) {
-					slaveCtrl.setEnabled(checked);
-					if ( checked ) {
-						propagate(slaveCtrl, part.isEnabledOnSelection());
-					}
-					else {
-						propagate(slaveCtrl, !part.isEnabledOnSelection());
-					}
+				boolean slaveEnabled = false;
+				// Enabled/disable the slave
+				if ( !isCallerEnabled ) { // If master is disabled: slave is always disabled
+					slaveCtrl.setEnabled(false);
 				}
 				else {
-					if ( checked ) {
-						slaveCtrl.setEnabled(part.isEnabledOnSelection());
+					// Else: slave is enabled/disabled based on the master's selection
+					// and the slave's isEnabledOnSelection() option
+					if ( isCallerSelected ) {
+						slaveEnabled = part.isEnabledOnSelection();
 					}
 					else {
-						slaveCtrl.setEnabled(!part.isEnabledOnSelection());
+						slaveEnabled = !part.isEnabledOnSelection();
 					}
+					slaveCtrl.setEnabled(slaveEnabled);
+				}
+				// Look if the slave is also a master
+				if ( masters.containsKey(slaveCtrl) ) {
+					// If it is: propagate the info down the sub-slaves
+					// If the slave is disabled; always disable the sub-slaves
+					// Otherwise, masters are always Button-based so get the selection from there
+					propagate(slaveCtrl, ((Button)slaveCtrl).getSelection(), slaveEnabled);
 				}
 			}
 		}
