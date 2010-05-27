@@ -22,12 +22,17 @@
         </dependency>
         <dependency>
             <groupId>net.sf.okapi.connectors</groupId>
-            <artifactId>okapi-connector-globalsight</artifactId>
+            <artifactId>okapi-connector-apertium</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>net.sf.okapi.connectors</groupId>
             <artifactId>okapi-connector-opentran</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.okapi.connectors</groupId>
+            <artifactId>okapi-connector-globalsight</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
