@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -29,10 +29,19 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.exceptions.OkapiBadStepInputException;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 
+/**
+ * Scan a class for retrieving the different {@link ConfigurationParameter} it uses.
+ */
 public final class StepIntrospector {
 
-	public static List<ConfigurationParameter> getStepParameters(
-			IPipelineStep step) {
+	/**
+	 * Gets the list of the {@link ConfigurationParameter} in a given step.
+	 * @param step the step to introspect.
+	 * @return the list of the {@link ConfigurationParameter}.
+	 */
+	public static List<ConfigurationParameter> getStepParameters (
+		IPipelineStep step)
+	{
 		List<ConfigurationParameter> parameters = new LinkedList<ConfigurationParameter>();
 
 		// get all the declared fields (skipping any inherited ones) of the
@@ -52,7 +61,12 @@ public final class StepIntrospector {
 		return parameters;
 	}
 
-	public static List<String> getStepEventHandlers(IPipelineStep step) {
+	/**
+	 * Gets the list of the event handlers for a given step.
+	 * @param step the step to introspect.
+	 * @return the list of the event handlers.
+	 */
+	public static List<String> getStepEventHandlers (IPipelineStep step) {
 		List<String> eventHandlers = new LinkedList<String>();
 		Method[] methods = step.getClass().getDeclaredMethods();
 		for (Method m : methods) {
@@ -68,7 +82,7 @@ public final class StepIntrospector {
 
 		if (eventHandlers.size() <= 0) {
 			throw new OkapiBadStepInputException(
-					"Steps must implement at least one handler method"); //$NON-NLS-1$
+				"Steps must implement at least one handler method"); //$NON-NLS-1$
 		}
 
 		return eventHandlers;

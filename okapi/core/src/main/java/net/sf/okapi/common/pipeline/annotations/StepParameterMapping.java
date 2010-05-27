@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -25,8 +25,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Java annotation for mapping configuration parameters in steps.
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface StepParameterMapping {
+	
   StepParameterType parameterType();
+
 }

@@ -1,5 +1,5 @@
 /*===========================================================================
-Copyright (C) 2009 by the Okapi Framework contributors
+Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
 This library is free software; you can redistribute it and/or modify it 
 under the terms of the GNU Lesser General Public License as published by 
@@ -24,38 +24,73 @@ import java.lang.reflect.Method;
 
 import net.sf.okapi.common.pipeline.IPipelineStep;
 
+/**
+ * Java annotation item for runtime configuration parameters used in {@link IPipelineStep}.
+ */
 public class ConfigurationParameter {
 	private Method method;
 	private StepParameterType parameterType;
 	private IPipelineStep step;
 
-	ConfigurationParameter(Method method, StepParameterType parameterType, IPipelineStep step) {
+	/**
+	 * Creates a new ConfigurationParameter object.
+	 * @param method method for this parameter.
+	 * @param parameterType type of parameter.
+	 * @param step step where the parameter is set.
+	 */
+	ConfigurationParameter (Method method,
+		StepParameterType parameterType,
+		IPipelineStep step)
+	{
 		this.setMethod(method);
 		this.setParameterType(parameterType);
 		this.setStep(step);
 	}
 
-
-	public void setMethod(Method method) {
+	/**
+	 * Sets the method for this parameter.
+	 * @param method the method for this parameter.
+	 */
+	public void setMethod (Method method) {
 		this.method = method;
 	}
 
+	/**
+	 * Gets the method for this parameter.
+	 * @return the method for this parameter.
+	 */
 	public Method getMethod() {
 		return method;
 	}
 
-	public void setParameterType(StepParameterType parameterType) {
+	/**
+	 * Sets the type of parameter for this parameter.
+	 * @param parameterType the type of parameter for this parameter.
+	 */
+	public void setParameterType (StepParameterType parameterType) {
 		this.parameterType = parameterType;
 	}
 
-	public StepParameterType getParameterType() {
+	/**
+	 * Gets the type of parameter for this parameter.
+	 * @return the type of parameter for this parameter.
+	 */
+	public StepParameterType getParameterType () {
 		return parameterType;
 	}
 
-	public void setStep(IPipelineStep step) {
+	/**
+	 * Sets the step for this parameter.
+	 * @param step the step for this parameter.
+	 */
+	public void setStep (IPipelineStep step) {
 		this.step = step;
 	}
 
+	/**
+	 * Gets the step for this parameter.
+	 * @return the step for this parameter.
+	 */
 	public IPipelineStep getStep() {
 		return step;
 	}

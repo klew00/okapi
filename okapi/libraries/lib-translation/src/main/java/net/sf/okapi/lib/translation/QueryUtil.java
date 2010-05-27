@@ -306,6 +306,7 @@ public class QueryUtil {
 	 * Converts from coded text to XLIFF.
 	 * @param fragment the fragment to convert.
 	 * @return The resulting XLIFF string.
+	 * @see #fromXLIFF(Element, TextFragment)
 	 */
 	public String toXLIFF (TextFragment fragment) {
 		if ( fragment == null ) return "";
@@ -313,32 +314,37 @@ public class QueryUtil {
 		return fmt.toString();
 	}
 	
-	/**
-	 * Converts back an XLIFF text to a coded text.
-	 * @param text the XLIFF text to convert back.
-	 * @param fragment the original text fragment.
-	 * @return the coded text with its code markers.
-	 */
-	public String fromXLIFF (String text,
-		TextFragment fragment)
-	{
-		if ( Util.isEmpty(text) ) return "";
-		// Un-escape first layer
-		text = text.replace("&apos;", "'");
-		text = text.replace("&lt;", "<");
-		text = text.replace("&gt;", ">");
-		text = text.replace("&quot;", "\"");
-		text = text.replace("&amp;", "&");
-		// Now we have XLIFF valid content
-		
-		// Read it to XML parser
-		// Un-escape XML
+//	/**
+//	 * Converts back an XLIFF text to a coded text.
+//	 * @param text the XLIFF text to convert back.
+//	 * @param fragment the original text fragment.
+//	 * @return the coded text with its code markers.
+//	 */
+//	public String fromXLIFF (String text,
+//		TextFragment fragment)
+//	{
+//		if ( Util.isEmpty(text) ) return "";
+//		// Un-escape first layer
+//		text = text.replace("&apos;", "'");
+//		text = text.replace("&lt;", "<");
+//		text = text.replace("&gt;", ">");
+//		text = text.replace("&quot;", "\"");
+//		text = text.replace("&amp;", "&");
+//		// Now we have XLIFF valid content
+//		
+//		// Read it to XML parser
+//		// Un-escape XML
+//
+//		//TODO: code conversion
+//		return text;
+//	}
 
-		//TODO: code conversion
-		return text;
-	}
-	
-	// The original parameter can be null
+	/**
+	 * Converts back an XLIFF text contained in a given element into a TextFragment.
+	 * @param elem The element containing the XLIFF data.
+	 * @param original the original TextFragment (cannot be null).
+	 * @see #toXLIFF(TextFragment)
+	 */
 	public TextFragment fromXLIFF (Element elem,
 		TextFragment original)
 	{

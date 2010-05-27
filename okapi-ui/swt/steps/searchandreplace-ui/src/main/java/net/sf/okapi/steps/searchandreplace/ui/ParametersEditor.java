@@ -471,17 +471,14 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			public void widgetSelected(SelectionEvent e) {
 				result = false;
 				if ( e.widget.getData().equals("h") ) {
-					if ( help != null ) help.showTopic(this, "editItem");
 					return;
 				}
 				if ( e.widget.getData().equals("o") ) {
-					
 					//--validating empty search string--
 					if(searchText.getText().trim().length()<1){
 						Dialogs.showError(shell, "You need to provide a search expression", null);
 						return;
 					}					
-					
 					//--validating regEx--
 					if( chkRegEx.getSelection() ){
 						try{
@@ -493,8 +490,6 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 							return;
 						}
 					}
-					
-					//saveData();
 					if(updateType==EDIT_ITEM){
 						int index = table.getSelectionIndex();
 				        TableItem ti = table.getItem(index);
@@ -509,12 +504,11 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 						updateUpDownBtnState();
 					}
 				}
-				
 				dialog.close();
 			};
 		};
 
-		pnlActionsDialog = new OKCancelPanel(dialog, SWT.NONE, OKCancelActions, true);
+		pnlActionsDialog = new OKCancelPanel(dialog, SWT.NONE, OKCancelActions, false);
 		pnlActionsDialog.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		dialog.setDefaultButton(pnlActionsDialog.btOK);
 		// end - dialog level buttons

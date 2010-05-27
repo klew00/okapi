@@ -700,16 +700,30 @@ public class QueryManager {
 		return newTrg;
 	}
 	
+	/**
+	 * Resets the counters used to calculate the number of segments leveraged.
+	 * @see #getLeveragedSegments()
+	 * @see #getTotalSegments()
+	 */
 	public void resetCounters () {
 		totalSegments = 0;
 		leveragedSegments = 0;
 	}
 	
+	/**
+	 * Gets the total number of segments processed since the last call to {@link #resetCounters()}.
+	 * @return the total number of segment processed.
+	 */
 	public int getTotalSegments () {
 		return totalSegments;
 	}
 	
+	/**
+	 * Gets the number of segments leveraged since the last call to {@link #resetCounters()}.
+	 * @return the number of segments leveraged.
+	 */
 	public int getLeveragedSegments () {
 		return leveragedSegments;
 	}
+
 }

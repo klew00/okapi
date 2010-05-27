@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -24,10 +24,24 @@ import java.net.URI;
 
 import net.sf.okapi.common.resource.RawDocument;
 
+/**
+ * Structure to hold the data associated to a document in a pipeline.
+ */
 public class DocumentData {
 
+	/**
+	 * The input {@link RawDocument} itself.
+	 */
 	public RawDocument rawDocument;
+	
+	/**
+	 * The URI for the output.
+	 */
 	public URI outputURI;
+	
+	/**
+	 * The encoding for the output.
+	 */
 	public String outputEncoding;
 
 }
