@@ -35,8 +35,9 @@ public class ParagraphToSentenceAlignStepTest {
 
 		Parameters p = new Parameters();
 		p.setGenerateTMX(true);
-		p.setUsingCustomTargetSegmentation(true);
-		p.setSrxTargetSegmentationPath(this.getClass().getResource("default.srx").getPath());
+		p.setSegmentTarget(true);
+		p.setUseCustomTargetRules(true);
+		p.setCustomTargetRulesPath(this.getClass().getResource("default.srx").getPath());
 		aligner.setParameters(p);
 		FilterConfigurationMapper fcMapper = new FilterConfigurationMapper();
 		fcMapper.addConfigurations("net.sf.okapi.filters.plaintext.PlainTextFilter");
@@ -67,10 +68,10 @@ public class ParagraphToSentenceAlignStepTest {
 		String sGoldPath = sPath+".gold";
 
 		aligner.setSourceLocale(sourceLocale);
-  	aligner.setTargetLocale(targetLocale);
+		aligner.setTargetLocale(targetLocale);
 
 		Parameters p = (net.sf.okapi.steps.gcaligner.Parameters) aligner.getParameters();
-		p.setTmxPath(sOutputPath);
+		p.setTmxOutputPath(sOutputPath);
 		p.setGenerateTMX(true);
 		aligner.setParameters(p);
 		

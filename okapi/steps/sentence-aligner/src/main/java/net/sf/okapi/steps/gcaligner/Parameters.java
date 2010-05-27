@@ -31,92 +31,25 @@ import net.sf.okapi.common.uidescription.PathInputPart;
 @EditorFor(Parameters.class)
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
+	private static final String GENERATETMX = "generateTMX";
+	private static final String TMXOUTPUTPATH = "tmxOutputPath";
+		
+	private boolean generateTMX;
 	private String tmxOutputPath;
-	private boolean generateTMX;	
-	private boolean sourceAlreadySegmented;
-	private boolean usingCustomTargetSegmentation; // DWH 5-24-10 added this and all relevant code below
-	private String srxTargetSegmentationPath=""; // DWH 5-24-10 added this and all relevant code below
+	
+	private boolean segmentSource;
+	private boolean useCustomSourceRules;
+	private String customSourceRulesPath;
+	
+	private boolean segmentTarget;
+	private boolean useCustomTargetRules;
+	private String customTargetRulesPath;
 
 	public Parameters () {
 		reset();
 	}
 	
-	public String getTmxPath () {
-		return tmxOutputPath;
-	}
-
-	public void setTmxPath (String tmxOutputPath) {
-		this.tmxOutputPath = tmxOutputPath;
-	}
-
-	public String getSrxTargetSegmentationPath () {
-		return srxTargetSegmentationPath;
-	}
-
-	public void setSrxTargetSegmentationPath (String srxTargetSegmentationPath) {
-		this.srxTargetSegmentationPath = srxTargetSegmentationPath;
-	}
-
-	@Override
-	public void reset() {
-		tmxOutputPath = "aligned.tmx";
-		generateTMX = true;
-		sourceAlreadySegmented = false;
-		usingCustomTargetSegmentation = false;
-		srxTargetSegmentationPath = "";		
-	}
-
-	@Override
-	public void fromString (String data) {
-		reset();
-		buffer.fromString(data);
-		tmxOutputPath = buffer.getString("tmxPath", tmxOutputPath);
-		generateTMX = buffer.getBoolean("generateTMX");
-		sourceAlreadySegmented = buffer.getBoolean("sourceAlreadySegmented");
-		usingCustomTargetSegmentation = buffer.getBoolean("usingCustomTargetSegmentation");
-		srxTargetSegmentationPath = buffer.getString("srxTargetSegmentationPath", srxTargetSegmentationPath);
-	}
-
-	@Override
-	public String toString() {
-		buffer.reset();
-		buffer.setParameter("tmxPath", tmxOutputPath);
-		buffer.setBoolean("generateTMX", generateTMX);
-		buffer.setBoolean("alreadySourceSegmented", sourceAlreadySegmented);
-		buffer.setBoolean("usingCustomTargetSegmentation", usingCustomTargetSegmentation);
-		buffer.setParameter("srxTargetSegmentationPath",srxTargetSegmentationPath);
-		return buffer.toString();
-	}
-
-	@Override
-	public ParametersDescription getParametersDescription () {
-		ParametersDescription desc = new ParametersDescription(this);
-		desc.add("tmxPath",	"TMX output path", "Full path of the output TMX file");
-		desc.add("generateTMX",	"Generate TMX?", "If generateTMX is false generate bilingual TextUnits, otherwise (true) output a TMX file");		
-		desc.add("sourceAlreadySegmented","Source Already Segmented?", "Have the source input files arelady been segmented?");
-		desc.add("usingCustomTargetSegmentation","Use custom target segmentation?","Specify custom target segmentation file?");
-		desc.add("srxTargetSegmentationPath",	"Target SRX Path", "Full path of the target segmentation rules");
-		return desc;
-	}
-	
-	@Override
-	public EditorDescription createEditorDescription(ParametersDescription paramsDesc) {
-		EditorDescription desc = new EditorDescription("Gale and Church Sentence Aligner", true, false);	
-		desc.addCheckboxPart(paramsDesc.get("sourceAlreadySegmented"));
-		CheckboxPart cbp = desc.addCheckboxPart(paramsDesc.get("generateTMX"));
-		PathInputPart pip = desc.addPathInputPart(paramsDesc.get("tmxPath"), "TMX Document", true);
-		pip.setBrowseFilters("TMX Documents (*.tmx)\tAll Files (*.*)", "*.tmx\t*.*");
-		pip.setWithLabel(false);
-		pip.setMasterPart(cbp, true);
-		CheckboxPart cbp2 = desc.addCheckboxPart(paramsDesc.get("usingCustomTargetSegmentation"));
-		PathInputPart pipSRX = desc.addPathInputPart(paramsDesc.get("srxTargetSegmentationPath"), "Target (SRX) Segmentation Rules", false);
-		pipSRX.setBrowseFilters("SRX Documents (*.srx)\tAll Files (*.*)", "*.srx\t*.*");
-		pipSRX.setWithLabel(false);
-		pipSRX.setMasterPart(cbp2, true);
-		return desc;
-	}
-
-	public boolean isGenerateTMX() {
+	public boolean getGenerateTMX() {
 		return generateTMX;
 	}
 	
@@ -124,19 +57,150 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.generateTMX = generateTMX;
 	}
 
-	public boolean isSourceAlreadySegmented() {
-		return sourceAlreadySegmented;
+	public String getTmxOutputPath () {
+		return tmxOutputPath;
 	}
 
-	public void setSourceAlreadySegmented(boolean sourceAlreadySegmented) {
-		this.sourceAlreadySegmented = sourceAlreadySegmented;
+	public void setTmxOutputPath (String tmxOutputPath) {
+		this.tmxOutputPath = tmxOutputPath;
 	}
 
-	public boolean isUsingCustomTargetSegmentation() {
-		return usingCustomTargetSegmentation;
+	public boolean getSegmentSource () {
+		return segmentSource;
 	}
 
-	public void setUsingCustomTargetSegmentation(boolean usingCustomTargetSegmentation) {
-		this.usingCustomTargetSegmentation = usingCustomTargetSegmentation;
+	public void setSegmentSource (boolean segmentSource) {
+		this.segmentSource = segmentSource;
 	}
+
+	public boolean getUseCustomSourceRules () {
+		return useCustomSourceRules;
+	}
+
+	public void setUseCustomSourceRules (boolean useCustomSourceRules) {
+		this.useCustomSourceRules = useCustomSourceRules;
+	}
+
+	public String getCustomSourceRulesPath () {
+		return customSourceRulesPath;
+	}
+
+	public void setCustomSourceRulesPath (String customSourceRulesPath) {
+		this.customSourceRulesPath = customSourceRulesPath;
+	}
+
+	public boolean getSegmentTarget () {
+		return segmentTarget;
+	}
+
+	public void setSegmentTarget (boolean segmentTarget) {
+		this.segmentTarget = segmentTarget;
+	}
+
+	public boolean getUseCustomTargetRules () {
+		return useCustomTargetRules;
+	}
+
+	public void setUseCustomTargetRules (boolean useCustomTargetRules) {
+		this.useCustomTargetRules = useCustomTargetRules;
+	}
+
+	public String getCustomTargetRulesPath () {
+		return customTargetRulesPath;
+	}
+
+	public void setCustomTargetRulesPath (String customTargetRulesPath) {
+		this.customTargetRulesPath = customTargetRulesPath;
+	}
+
+	@Override
+	public void reset() {
+		tmxOutputPath = "aligned.tmx";
+		generateTMX = true;
+		segmentSource = true;
+		useCustomSourceRules = false;
+		customSourceRulesPath = "";
+		segmentTarget = true;
+		useCustomTargetRules = false;
+		customTargetRulesPath = "";
+	}
+
+	@Override
+	public void fromString (String data) {
+		reset();
+		buffer.fromString(data);
+		generateTMX = buffer.getBoolean(GENERATETMX, generateTMX);
+		tmxOutputPath = buffer.getString(TMXOUTPUTPATH, tmxOutputPath);
+
+		segmentSource = buffer.getBoolean("segmentSource", segmentSource);
+		useCustomSourceRules = buffer.getBoolean("useCustomSourceRules", useCustomSourceRules);
+		customSourceRulesPath = buffer.getString("customSourceRulesPath", customSourceRulesPath);
+		segmentTarget = buffer.getBoolean("segmentTarget", segmentTarget);
+		useCustomTargetRules = buffer.getBoolean("useCustomTargetRules", useCustomTargetRules);
+		customTargetRulesPath = buffer.getString("customTargetRulesPath", customTargetRulesPath);
+	}
+
+	@Override
+	public String toString() {
+		buffer.reset();
+		buffer.setBoolean(GENERATETMX, generateTMX);
+		buffer.setParameter(TMXOUTPUTPATH, tmxOutputPath);
+		
+		buffer.setBoolean("segmentSource", segmentSource);
+		buffer.setBoolean("useCustomSourceRules", useCustomSourceRules);
+		buffer.setParameter("customSourceRulesPath", customSourceRulesPath);
+		buffer.setBoolean("segmentTarget", segmentTarget);
+		buffer.setBoolean("useCustomTargetRules", useCustomTargetRules);
+		buffer.setString("customTargetRulesPath", customTargetRulesPath);
+
+		return buffer.toString();
+	}
+
+	@Override
+	public ParametersDescription getParametersDescription () {
+		ParametersDescription desc = new ParametersDescription(this);
+		desc.add(GENERATETMX, "Generate the following TMX document:", "If generateTMX is false generate bilingual TextUnits, otherwise (true) output a TMX file");		
+		desc.add(TMXOUTPUTPATH, "TMX output path", "Full path of the output TMX file");
+		
+		desc.add("segmentSource", "Segment the source content (overriding possible existing segmentation)", null);
+		desc.add("useCustomSourceRules", "Use custom source segmentation rules (instead of the default ones)", null);
+		desc.add("customSourceRulesPath", "SRX path for the source", "Full path of the SRX document to use for the source");
+		desc.add("segmentTarget", "Segment the target content (overriding possible existing segmentation)", null);
+		desc.add("useCustomTargetRules", "Use custom target segmentation rules (instead of the default ones)", null);
+		desc.add("customTargetRulesPath", "SRX path for the target", "Full path of the SRX document to use for the target");
+		return desc;
+	}
+	
+	@Override
+	public EditorDescription createEditorDescription(ParametersDescription paramsDesc) {
+		EditorDescription desc = new EditorDescription("Sentence Aligner", true, false);	
+		CheckboxPart cbp = desc.addCheckboxPart(paramsDesc.get(GENERATETMX));
+		PathInputPart pip = desc.addPathInputPart(paramsDesc.get(TMXOUTPUTPATH), "TMX Document to Generate", true);
+		pip.setBrowseFilters("TMX Documents (*.tmx)\tAll Files (*.*)", "*.tmx\t*.*");
+		pip.setWithLabel(false);
+		pip.setMasterPart(cbp, true);
+		
+		desc.addSeparatorPart();
+
+		CheckboxPart cbp1 = desc.addCheckboxPart(paramsDesc.get("segmentSource"));
+		CheckboxPart cbp2 = desc.addCheckboxPart(paramsDesc.get("useCustomSourceRules"));
+		cbp2.setMasterPart(cbp1, true);
+		pip = desc.addPathInputPart(paramsDesc.get("customSourceRulesPath"), "Segmentation Rules for Source", false);
+		pip.setBrowseFilters("SRX Documents (*.srx)\tAll Files (*.*)", "*.srx\t*.*");
+		pip.setWithLabel(false);
+		pip.setMasterPart(cbp2, true);
+		
+		desc.addSeparatorPart();
+
+		cbp1 = desc.addCheckboxPart(paramsDesc.get("segmentTarget"));
+		cbp2 = desc.addCheckboxPart(paramsDesc.get("useCustomTargetRules"));
+		cbp2.setMasterPart(cbp1, true);
+		pip = desc.addPathInputPart(paramsDesc.get("customTargetRulesPath"), "Segmentation Rules for Target", false);
+		pip.setBrowseFilters("SRX Documents (*.srx)\tAll Files (*.*)", "*.srx\t*.*");
+		pip.setWithLabel(false);
+		pip.setMasterPart(cbp2, true);
+
+		return desc;
+	}
+
 }

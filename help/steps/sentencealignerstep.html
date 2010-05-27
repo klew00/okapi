@@ -52,9 +52,34 @@ target TextUnits and finds the best possible alignment based on the character
 lengths of the sentences. Internal parameters take into account that some 
 languages translate into fewer (or more) characters. Possible match types 
 produced are: 1-1, 2-1, 1-2, 0-1, 1-0, 2-0, 2-3, 3-2 etc.</p>
+<p>Entries set as non-translatable are not processed.</p>
 <h2><a name="parameters"></a>Parameters</h2>
-<p><cite>TMX output path</cite> -- Enter the directory of the TMX
+<p><cite>Generate the following TMX document</cite> -- Set this option to 
+generate a TMX files with the aligned entries.</p>
+<ul>
+	<li>If this option is set: this step returns the event it recieved (possibly 
+	re-segmented).</li>
+	<li>If this option is not set: this step returns the bilingual text unit 
+	corresponding to the alignment (also segmented).</li>
+</ul>
+<p>Enter the directory of the TMX
 document to generate. If the file already exists it will be overwritten.</p>
+<p><cite>Segment the source content</cite> -- Set this option to segment the 
+source content before trying to align it. If this option is not set the content 
+is expected to be already segmented. If this option is set and the content is 
+already segmented, the existing segmentation will be reset to the new one.</p>
+<p><cite>Use custom source segmentation rules</cite> -- Set this option to use a 
+specified SRX file for segmenting the source. If this option is not set, and 
+segmentation is required, the default rules are used.</p>
+<p>Enter the full path of the SRX file to use for segmenting the source.</p>
+<p><cite>Segment the target content</cite> -- Set this option to segment the 
+target content before trying to align it. If this option is not set the content 
+is expected to be already segmented. If this option is set and the content is 
+already segmented, the existing segmentation will be reset to the new one.</p>
+<p><cite>Use custom target segmentation rules</cite> -- Set this option to use a 
+specified SRX file for segmenting the target. If this option is not set, and 
+segmentation is required, the default rules are used.</p>
+<p>Enter the full path of the SRX file to use for segmenting the target.</p>
 <p>&nbsp;</p>
 </body>
 </html>

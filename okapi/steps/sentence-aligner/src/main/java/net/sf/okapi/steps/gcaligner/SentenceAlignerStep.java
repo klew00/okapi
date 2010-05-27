@@ -21,7 +21,6 @@
 package net.sf.okapi.steps.gcaligner;
 
 import java.io.InputStream;
-import java.io.FileInputStream;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -116,69 +115,87 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 
 	@Override
 	protected Event handleStartBatch(Event event) {
-		String srxTargetSegmentationPath; // DWH 5-24-10 allow segmentation specific to target
-		SRXDocument srxTargetDocument; // DWH 5-24-10
+		boolean loadDefault = true;
 		SRXDocument srxDocument = new SRXDocument();
-//	srxDocument.setTrimLeadingWhitespaces(false);
-		InputStream is = SentenceAlignerStep.class.getResourceAsStream("default.srx");
-		srxDocument.loadRules(is);
-//	srxDocument.setTrimLeadingWhitespaces(false);
-		
-		// The following section added to handle target segmentation rules DWH 5-24-10
-		srxTargetSegmentationPath = params.getSrxTargetSegmentationPath();
-		if (params.isUsingCustomTargetSegmentation()) {
-			try {
-				is = new FileInputStream(srxTargetSegmentationPath);
-				srxTargetDocument = new SRXDocument();
-				srxTargetDocument.loadRules(is);
-//			srxTargetDocument.setTrimLeadingWhitespaces(false);
+
+		// Prepare source segmentation if needed
+		if ( params.getSegmentSource() ) {
+			// Load default or custom rules
+			if ( params.getUseCustomSourceRules() ) {
+				try {
+					srxDocument.loadRules(params.getCustomSourceRulesPath());
+					loadDefault = false;
+				}
+				catch ( Exception e ) {
+					LOGGER.warning(String.format(
+						"Custom source segmentation rules file '%s' cannot be read.\nUsing the default rules instead.",
+						params.getCustomSourceRulesPath()));
+				}
 			}
-			catch(Exception e) {
-				LOGGER.warning("Target segmentation rules file "+srxTargetSegmentationPath+
-						" cannot be read.  Using default segmentation rules");
-				srxTargetDocument = srxDocument;
+			if ( loadDefault ) {
+				InputStream is = SentenceAlignerStep.class.getResourceAsStream("default.srx");
+				srxDocument.loadRules(is);
 			}
-		}
-		else
-			srxTargetDocument = srxDocument;
-		
-		if (!params.isSourceAlreadySegmented()) {
+			//TODO: decide how we deal with leading/trailing spaces
+			//srxDocument.setTrimLeadingWhitespaces(false);
 			sourceSegmenter = srxDocument.compileLanguageRules(sourceLocale, null);
 		}
-//	targetSegmenter = srxDocument.compileLanguageRules(targetLocale, null);
-		targetSegmenter = srxTargetDocument.compileLanguageRules(targetLocale, null); // DWH 5-24-10
+		
+		// Prepare target segmentation if needed
+		if ( params.getSegmentTarget() ) {
+			loadDefault = true;
+			// Load default or custom rules
+			if ( params.getUseCustomTargetRules() ) {
+				try {
+					srxDocument.loadRules(params.getCustomTargetRulesPath());
+					loadDefault = false;
+				}
+				catch ( Exception e ) {
+					LOGGER.warning(String.format(
+						"Custom target segmentation rules file '%s' cannot be read.\nUsing the default rules instead.",
+						params.getCustomTargetRulesPath()));
+				}
+			}
+			if ( loadDefault ) {
+				InputStream is = SentenceAlignerStep.class.getResourceAsStream("default.srx");
+				srxDocument.loadRules(is);
+			}
+			//TODO: decide how we deal with leading/trailing spaces
+			//srxDocument.setTrimLeadingWhitespaces(false);
+			targetSegmenter = srxDocument.compileLanguageRules(targetLocale, null);
+		}
 
 		// Start TMX writer (one for all input documents)
-		if (params.isGenerateTMX()) {
-			tmx = new TMXWriter(params.getTmxPath());
-			// TODO: how to get filter mime type here???
+		if ( params.getGenerateTMX() ) {
+			tmx = new TMXWriter(params.getTmxOutputPath());
+			// TODO: How to get filter mime type here???
 			tmx.writeStartDocument(sourceLocale, targetLocale, getClass().getName(), null,
-					"sentence", null, "text/plain");
+				"sentence", null, "text/plain");
 		}
 
 		return event;
 	}
 
 	protected Event handleEndBatch(Event event) {
-		if (params.isGenerateTMX() && (tmx != null)) {
+		if ( tmx != null ) {
 			tmx.writeEndDocument();
 			tmx.close();
 			tmx = null;
 		}
-
 		return event;
 	}
 
 	@Override
-	protected Event handleStartDocument(Event event1) {
-		if (targetInput!=null)
+	protected Event handleStartDocument (Event event) {
+		if ( targetInput != null ) {
 			initializeFilter();
-		return event1;
+		}
+		return event;
 	}
 
 	@Override
-	protected Event handleEndDocument(Event event) {
-		if (filter != null) {
+	protected Event handleEndDocument (Event event) {
+		if ( filter != null ) {
 			filter.close();
 		}
 		return event;
@@ -186,46 +203,53 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 
 	@Override
 	protected Event handleTextUnit(Event sourceEvent) {
-		TextUnit sourceTu = (TextUnit) sourceEvent.getResource();
-		TextUnit targetTu=null; // DWH 5-19-10 moved declaration here
+		TextUnit sourceTu = sourceEvent.getTextUnit();
+		TextUnit targetTu = null; // DWH 5-19-10 moved declaration here
 		
-		if (!params.isSourceAlreadySegmented()) {
+		// Skip non-translatable
+		if ( !sourceTu.isTranslatable() ) {
+			return sourceEvent;
+		}
+
+		// Segment the source if requested
+		if ( params.getSegmentSource() ) {
 			sourceTu.createSourceSegmentation(sourceSegmenter);
 		}
 
-		// Skip non-translatable
-		if (!sourceTu.isTranslatable())
-			return sourceEvent;
-
 		// Move to the next target TU
-		if (targetInput!=null) {
+		if ( targetInput != null ) {
 			Event targetEvent = synchronize(EventType.TEXT_UNIT);
-		  targetTu = (TextUnit) targetEvent.getResource();
-		} else { // DWH 5-19-10 grab target text from target in sourceTu
+			targetTu = targetEvent.getTextUnit();
+		}
+		else { // DWH 5-19-10 grab target text from target in sourceTu
 			TextContainer targetTextContainer = sourceTu.getTarget(targetLocale);
-			if (targetTextContainer==null || targetTextContainer.getCodedText().length()==0)
+			if (targetTextContainer==null || targetTextContainer.getCodedText().length()==0) {
 				return sourceEvent;
+			}
 			targetTu = new TextUnit(UUID.randomUUID().toString());
 			targetTu.setSource(targetTextContainer);
 		}
 
-		targetTu.createSourceSegmentation(targetSegmenter);
+		// Segment the target if requested
+		if ( params.getSegmentTarget() ) {
+			targetTu.createSourceSegmentation(targetSegmenter);
+		}
 
 		if (!sourceTu.getSource().hasBeenSegmented() || !targetTu.getSource().hasBeenSegmented()) {
-			// we must have hit some empty content that did not segment
+			// We must have hit some empty content that did not segment
 			LOGGER.warning("Found unsegmented TextUnit. Possibly a TextUnit with empty content.");
 			return sourceEvent;
 		}
 
 		TextUnit alignedTextUnit = sentenceAligner.align(sourceTu, targetTu, sourceLocale,
-				targetLocale);
+			targetLocale);
 
-		// send the aligned TU to the TMX file
-		if (params.isGenerateTMX()) {
+		// Send the aligned TU to the TMX file
+		if ( params.getGenerateTMX() ) {
 			tmx.writeTUFull(alignedTextUnit);
-		} else { // otherwise send each aligned TextUnit downstream as a multi event
-			Event e = new Event(EventType.TEXT_UNIT, alignedTextUnit);
-			return e;
+		}
+		else { // Otherwise send each aligned TextUnit downstream as a multi-event
+			return new Event(EventType.TEXT_UNIT, alignedTextUnit);
 		}
 
 		return sourceEvent;
@@ -251,7 +275,7 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 			found = (event.getEventType() == untilType);
 		}
 		if (!found) {
-			if (params.isGenerateTMX() && (tmx != null)) {
+			if (params.getGenerateTMX() && (tmx != null)) {
 				tmx.writeEndDocument();
 				tmx.close();
 				tmx = null;

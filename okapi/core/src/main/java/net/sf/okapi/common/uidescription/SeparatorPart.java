@@ -20,6 +20,8 @@
 
 package net.sf.okapi.common.uidescription;
 
+import java.util.UUID;
+
 import net.sf.okapi.common.ParameterDescriptor;
 
 /**
@@ -31,7 +33,8 @@ public class SeparatorPart extends AbstractPart {
 	 * Creates a new SeparatorPart object with a given parameter descriptor.
 	 */
 	public SeparatorPart () {
-		super(new ParameterDescriptor("sep", null, null, null));
+		// Create descriptor with unique name to allow several in the same dialog
+		super(new ParameterDescriptor(UUID.randomUUID().toString(), null, null, null));
 	}
 
 	@Override
