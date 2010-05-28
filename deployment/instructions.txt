@@ -90,10 +90,9 @@ At least here: http://tech.groups.yahoo.com/group/okapitools/
 --- 11) Update the versions numbers in the files for the next version
 - All the POM.XML files
 - trunk/deployment/shared/release.properties
-- trunk/deployment/shared/changes.html (make the Change Log ready for next set of changes)
-Now any new build will be a snapshot of the next release
+- trunk/deployment/shared/changes.html (make the Changes Log ready for next set of changes)
 
-Also reset the changes.html log
+Now any new build will be a snapshot of the next release
 
 
 -end-
