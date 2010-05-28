@@ -44,7 +44,7 @@ public class Main {
 	    	// Remove the application folder in all cases
 	    	helpRoot = Util.getDirectoryName(helpRoot);
 	    	BaseHelp help = new BaseHelp(helpRoot + File.separator + "help"); //$NON-NLS-1$
-			
+	    	
 			// Start the application
 			dispMain = new Display();
 			Shell shlMain = new Shell(dispMain);

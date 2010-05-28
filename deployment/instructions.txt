@@ -20,7 +20,7 @@ mvn -PWIN_SWT -PCOCOA_SWT -PCOCOA_64_SWT -PLinux_x86_swt -PLinux_x86_64_swt depe
 
 - All the POM.XML files
 - trunk/deployment/shared/release.properties
-- The Change Log has it's titles set with the proper versions
+- The Change Log has its titles set with the proper versions
 
 --- 4) Make also sure the readme files are up-to-date:
 
@@ -90,6 +90,7 @@ At least here: http://tech.groups.yahoo.com/group/okapitools/
 --- 11) Update the versions numbers in the files for the next version
 - All the POM.XML files
 - trunk/deployment/shared/release.properties
+- trunk/deployment/shared/changes.html (make the Change Log ready for next set of changes)
 Now any new build will be a snapshot of the next release
 
 Also reset the changes.html log
