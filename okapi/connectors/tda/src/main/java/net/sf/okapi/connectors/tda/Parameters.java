@@ -150,18 +150,20 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	@Override
 	public EditorDescription createEditorDescription(ParametersDescription paramsDesc) {
 		EditorDescription desc = new EditorDescription("TDA TM Connector Settings");
-		desc.addTextInputPart(paramsDesc.get(SERVER));
 		desc.addTextInputPart(paramsDesc.get(USERNAME));
 		TextInputPart tip = desc.addTextInputPart(paramsDesc.get(PASSWORD));
 		tip.setPassword(true);
+
+		desc.addTextInputPart(paramsDesc.get(SERVER));
+
 		tip = desc.addTextInputPart(paramsDesc.get(APPKEY));
 		tip.setPassword(true);
 
 		// List of industries
 		//TODO: Get list dynamically from the API
-		String[] values = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+		String[] values1 = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
 			"10", "11", "12", "13", "14", "15", "16", "17", "18"};
-		String[] labels = {
+		String[] labels1 = {
 			"Any",
 			"Automotive Manufacturing",
 			"Consumer Electronics", 
@@ -182,8 +184,27 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 			"Undefined Sector", 
 			"Leisure, Tourism, and Arts" 
 		};
-		ListSelectionPart lsp = desc.addListSelectionPart(paramsDesc.get(INDUSTRY), values);
-		lsp.setChoicesLabels(labels);
+		ListSelectionPart lsp = desc.addListSelectionPart(paramsDesc.get(INDUSTRY), values1);
+		lsp.setChoicesLabels(labels1);
+
+		// List of content types
+		//TODO: Get list dynamically from the API
+		String[] values2 = {"0", "1", "2", "4", "5", "6", "7", "8", "9", "10", "12"};
+		String[] labels2 = {
+			"Any",
+			"Instructions for Use", 
+			"Sales and Marketing Material", 
+			"Policies, Process and Procedures", 
+			"Software Strings and Documentation", 
+			"Undefined Content Type", 
+			"News Announcements, Reports and Research", 
+			"Patents", 
+			"Standards, Statutes and Regulations", 
+			"Financial Documentation", 
+			"Support Content" 
+		};
+		lsp = desc.addListSelectionPart(paramsDesc.get(CONTENTTYPE), values2);
+		lsp.setChoicesLabels(labels2);
 
 		return desc;
 	}

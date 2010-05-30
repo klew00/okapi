@@ -46,6 +46,27 @@ import net.sf.okapi.lib.translation.TextMatcher;
 
 public class TDATMConnector implements ITMQuery {
 
+	// Language code to TDA code, except for reg=lang cases (fr-fr)
+	private static final String[][] LANGSMAP = {
+		{"ar", "ar-ar"}, // Yes, ar-ar (Argentina) is Arabic default in TDA, TODO: or use ar-sa?
+		{"cs", "cs-cz"},
+		{"cy", "cy-gb"},
+		{"da", "da-dk"},
+		{"el", "el-gr"},
+		{"en", "en-us"},
+		{"et", "et-ee"},
+		{"fa", "fa-ir"},
+		{"he", "he-il"},
+		{"ko", "ko-kr"},
+		{"nb", "nb-no"},
+		{"nn", "nn-no"},
+		{"sl", "sl-si"},
+		{"sv", "sv-se"},
+		{"uk", "uk-ua"},
+		{"vi", "vi-vn"},
+		{"zh", "zh-cn"}
+	};
+	
 	private JSONParser parser;
 	private Parameters params;
 	private String baseURL;
@@ -116,6 +137,7 @@ public class TDATMConnector implements ITMQuery {
 			URL url = new URL(baseURL + String.format("segment.json?limit=%d&source_lang=%s&target_lang=%s",
 				maxHits, srcCode, trgCode) + "&auth_auth_key="+authKey
 				+ (params.getIndustry()>0 ? "&industry="+String.valueOf(params.getIndustry()) : "")
+				+ (params.getContentType()>0 ? "&content_type="+String.valueOf(params.getContentType()) : "")
 				+ "&q=" + URLEncoder.encode(qtext, "UTF-8"));
 			URLConnection conn = url.openConnection();
 
@@ -134,6 +156,7 @@ public class TDATMConnector implements ITMQuery {
 	    		result.source = new TextFragment((String)entry.get("source"));
 	    		result.target = new TextFragment((String)entry.get("target"));
 	    		result.origin = "TDA";
+	    		@SuppressWarnings("unchecked")
 	    		String tmp = (String)((Map<String, Object>)entry.get("provider")).get("name");
 	    		if ( !Util.isEmpty(tmp) ) result.origin += ("/" + tmp);
 	    		result.score = 90; //TODO: re-score the data to get meaningfull hits
@@ -163,7 +186,22 @@ public class TDATMConnector implements ITMQuery {
 	}
 	
 	private String toInternalCode (LocaleId locale) {
-		String code = locale.toBCP47();
+		String code = locale.toBCP47(); 
+		String lang = locale.getLanguage();
+		if ( locale.getRegion() == null ) {
+			// TDA langs have all a region code: Try to add it here.
+			boolean found = false;
+			for ( int i=0; i<LANGSMAP.length; i++ ) {
+				if ( lang.equals(LANGSMAP[i][0]) ) {
+					code = LANGSMAP[i][1];
+					found = true;
+					break;
+				}
+			}
+			if ( !found ) { // Default: region code is same as lang code: fr-fr
+				code = lang+"-"+lang;
+			}
+		}
 		return code;
 	}
 	
