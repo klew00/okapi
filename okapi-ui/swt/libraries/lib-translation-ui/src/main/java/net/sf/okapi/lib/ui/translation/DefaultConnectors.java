@@ -78,6 +78,12 @@ public class DefaultConnectors implements IConnectorList {
 		trc.connectorClass = "net.sf.okapi.connectors.crosslanguage.CrossLanguageMTConnector";
 		trc.descriptionProviderClass = "net.sf.okapi.connectors.crosslanguage.Parameters";
 		list.add(trc);
+
+		trc = new ConnectorInfo();
+		trc.description = "TAUS Data Association Repository (Beta connector)";
+		trc.connectorClass = "net.sf.okapi.connectors.tda.TDATMConnector";
+		trc.descriptionProviderClass = "net.sf.okapi.connectors.tda.Parameters";
+		list.add(trc);
 	}
 
 	public List<ConnectorInfo> getList () {

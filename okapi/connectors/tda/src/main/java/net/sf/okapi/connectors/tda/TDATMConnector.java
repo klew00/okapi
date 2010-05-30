@@ -82,7 +82,12 @@ public class TDATMConnector implements ITMQuery {
 
 	@Override
 	public String getSettingsDisplay () {
-		return "Server: " + params.getServer();
+		String tmp = "Server: " + (Util.isEmpty(params.getServer())
+			? "<To be specified>"
+			: params.getServer());
+		return tmp + "\nUser: " + (Util.isEmpty(params.getUsername())
+			? "<To be specified>"
+			: params.getUsername());
 	}
 
 	@Override
@@ -110,6 +115,7 @@ public class TDATMConnector implements ITMQuery {
 			// Create the connection and query
 			URL url = new URL(baseURL + String.format("segment.json?limit=%d&source_lang=%s&target_lang=%s",
 				maxHits, srcCode, trgCode) + "&auth_auth_key="+authKey
+				+ (params.getIndustry()>0 ? "&industry="+String.valueOf(params.getIndustry()) : "")
 				+ "&q=" + URLEncoder.encode(qtext, "UTF-8"));
 			URLConnection conn = url.openConnection();
 
