@@ -13,6 +13,7 @@ import net.sf.okapi.connectors.opentran.OpenTranTMConnector;
 import net.sf.okapi.connectors.pensieve.PensieveTMConnector;
 import net.sf.okapi.connectors.promt.ProMTConnector;
 import net.sf.okapi.connectors.simpletm.SimpleTMConnector;
+import net.sf.okapi.connectors.tda.TDATMConnector;
 import net.sf.okapi.connectors.translatetoolkit.TranslateToolkitTMConnector;
 
 import org.eclipse.swt.SWT;
@@ -55,6 +56,7 @@ public class SelectionForm {
 		lbResources.add("Apertium MT (remote or local)");
 		lbResources.add("ProMT (Internet)");
 		lbResources.add("Cross-Language (Internet)");
+		lbResources.add("TDA Search (Internet)");
 		lbResources.setSelection(0);
 		
 		// Dialog-level buttons
@@ -96,6 +98,9 @@ public class SelectionForm {
 						break;
 					case 9: // Cross-Language
 						result = new CrossLanguageMTConnector();
+						break;
+					case 10: // TDA
+						result = new TDATMConnector();
 						break;
 					}
 				}

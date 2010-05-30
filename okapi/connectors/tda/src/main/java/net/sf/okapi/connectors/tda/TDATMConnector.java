@@ -26,6 +26,9 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -35,11 +38,11 @@ import org.json.simple.parser.JSONParser;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.lib.translation.BaseConnector;
-import net.sf.okapi.lib.translation.IQuery;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
+import net.sf.okapi.lib.translation.TextMatcher;
 
 public class TDATMConnector implements ITMQuery {
 
@@ -49,10 +52,19 @@ public class TDATMConnector implements ITMQuery {
 	private String authKey;
 	private String srcCode;
 	private String trgCode;
-	protected int current = -1;
+	private int current = -1;
 	private int maxHits = 20;
 	private List<QueryResult> results;
+	private TextMatcher matcher;
+	private ScoreComparer scorComp = new ScoreComparer();
+	private int threshold = 60;
 
+	class ScoreComparer implements Comparator<QueryResult> {
+		public int compare(QueryResult arg0, QueryResult arg1) {
+			return (arg0.score>arg1.score ? -1 : (arg0.score==arg1.score ? 0 : 1));
+		}
+	}
+	
 	public TDATMConnector () {
 		parser = new JSONParser();
 		params = new Parameters();
@@ -96,8 +108,8 @@ public class TDATMConnector implements ITMQuery {
 			String qtext = text.toString(); // Plain text for now
 
 			// Create the connection and query
-			URL url = new URL(baseURL + String.format("segment.json?source_lang=%s&target_lang=%s", srcCode, trgCode)
-				+ "&auth_auth_key="+authKey
+			URL url = new URL(baseURL + String.format("segment.json?limit=%d&source_lang=%s&target_lang=%s",
+				maxHits, srcCode, trgCode) + "&auth_auth_key="+authKey
 				+ "&q=" + URLEncoder.encode(qtext, "UTF-8"));
 			URLConnection conn = url.openConnection();
 
@@ -106,17 +118,27 @@ public class TDATMConnector implements ITMQuery {
 			@SuppressWarnings("unchecked")
 			Map<String, Object> map = (Map<String, Object>)object;
 	    	JSONArray array = (JSONArray)map.get("segment");
-	    	for ( int i=0; i<array.size(); i++ ) {
+	    	
+			// We keep our own hit count as TDA 'limit' may return more than the value asked
+			int count = ((array.size() > maxHits) ? maxHits : array.size());
+	    	for ( int i=0; i<count; i++ ) {
 	    		@SuppressWarnings("unchecked")
 	    		Map<String, Object> entry = (Map<String, Object>)array.get(i);
 	    		QueryResult result = new QueryResult();
 	    		result.source = new TextFragment((String)entry.get("source"));
 	    		result.target = new TextFragment((String)entry.get("target"));
 	    		result.origin = "TDA";
-	    		result.score = 1;
+	    		String tmp = (String)((Map<String, Object>)entry.get("provider")).get("name");
+	    		if ( !Util.isEmpty(tmp) ) result.origin += ("/" + tmp);
+	    		result.score = 90; //TODO: re-score the data to get meaningfull hits
 	    		results.add(result);
 	    	}
-			current = (( results.size() > 0 ) ? 0 : -1);
+
+			// Adjust scores
+			//TODO: re-order and re-filter results
+			fixupResults(qtext);
+			
+	    	current = (( results.size() > 0 ) ? 0 : -1);
 		}
 		catch ( Throwable e ) {
 			throw new RuntimeException("Error querying the server." + e.getMessage(), e);
@@ -183,8 +205,7 @@ public class TDATMConnector implements ITMQuery {
 
 	@Override
 	public int getThreshold () {
-		// Not used
-		return 0;
+		return threshold;
 	}
 
 	@Override
@@ -194,7 +215,7 @@ public class TDATMConnector implements ITMQuery {
 
 	@Override
 	public void setThreshold (int threshold) {
-		// Not used yet
+		this.threshold = threshold;
 	}
 
 	@Override
@@ -248,6 +269,7 @@ public class TDATMConnector implements ITMQuery {
 	public void setLanguages (LocaleId sourceLocale,
 		LocaleId targetLocale)
 	{
+		matcher = new TextMatcher(sourceLocale, sourceLocale);
 		srcCode = toInternalCode(sourceLocale);
 		trgCode = toInternalCode(targetLocale);
 	}
@@ -257,4 +279,23 @@ public class TDATMConnector implements ITMQuery {
 		// Not used
 	}
 
+	/**
+	 * Re-calculates the scores, re-orders and filters the results based on
+	 * more meaning full comparisons.
+	 * @param plainText the original text query.
+	 */
+	private void fixupResults (String plainText) {
+		if ( results.size() == 0 ) return;
+		List<String> tokens = matcher.prepareBaseTokens(plainText);
+		// Loop through the results
+		for ( Iterator<QueryResult> iter = results.iterator(); iter.hasNext(); ) {
+			QueryResult qr = iter.next();
+			// Compute the adjusted score
+			qr.score = matcher.compareToBaseTokens(plainText, tokens, qr.source);
+			// Remove the item if lower than the threshold 
+			if ( qr.score < threshold ) iter.remove();
+		}
+		// Re-order the list from the 
+		Collections.sort(results, scorComp);
+	}
 }
