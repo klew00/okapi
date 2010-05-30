@@ -186,6 +186,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.addCheckboxPart(paramDesc.get(FALLBACKTOID));
 		desc.addCheckboxPart(paramDesc.get(IGNOREINPUTSEGMENTATION));
 
+		desc.addSeparatorPart();
+		
 		desc.addCheckboxPart(paramDesc.get(XMLEncoder.ESCAPEGT));
 		desc.addCheckboxPart(paramDesc.get(ADDTARGETLANGUAGE));
 

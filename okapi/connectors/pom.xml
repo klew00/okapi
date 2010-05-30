@@ -23,5 +23,6 @@
         <module>promt</module>
         <module>crosslanguage</module>
         <module>microsoft</module>
+        <module>tda</module>
     </modules>
 </project>
