@@ -72,6 +72,7 @@ import net.sf.okapi.connectors.mymemory.MyMemoryTMConnector;
 import net.sf.okapi.connectors.opentran.OpenTranTMConnector;
 import net.sf.okapi.connectors.pensieve.PensieveTMConnector;
 //import net.sf.okapi.connectors.promt.ProMTConnector;
+import net.sf.okapi.connectors.tda.TDATMConnector;
 import net.sf.okapi.connectors.translatetoolkit.TranslateToolkitTMConnector;
 
 public class Main {
@@ -108,6 +109,8 @@ public class Main {
 	protected String transToolkitParams;
 	protected boolean useGlobalSight;
 	protected String globalSightParams;
+	protected boolean useTDA;
+	protected String tdaParams;
 	protected boolean useMyMemory;
 	protected String myMemoryParams;
 	protected boolean useApertium;
@@ -319,6 +322,10 @@ public class Main {
 				else if ( arg.equals("-gs") ) {
 					prog.useGlobalSight = true;
 					prog.globalSightParams = prog.getArgument(args, ++i);
+				}
+				else if ( arg.equals("-tda") ) {
+					prog.useTDA = true;
+					prog.tdaParams = prog.getArgument(args, ++i);
 				}
 				else if ( arg.equals("-ms") ) {
 					prog.useMicrosoft = true;
@@ -851,7 +858,8 @@ public class Main {
 		ps.println("   -x inputFile [inputFile2...] [-fc configId] [-ie encoding] [-sl srcLang]");
 		ps.println("      [-tl trgLang] [-seg [srxFile]] [-tt hostname[:port]-mm key");
 		ps.println("      |-pen tmDirectory|-gs configFile|-google|-apertium [serverURL]");
-		ps.println("      |-ms configFile] [-maketmx [tmxFile]] [-opt threshold] [-nocopy]");
+		ps.println("      |-ms configFile|-tda configFile] [-maketmx [tmxFile]] [-opt threshold]");
+		ps.println("      [-nocopy]");
 		ps.println("Merges an XLIFF document back to its original format:");
 		ps.println("   -m xliffFile [xliffFile2...] [-fc configId] [-ie encoding]");
 		ps.println("      [-oe encoding] [-sl srcLang] [-tl trgLang]");
@@ -859,11 +867,12 @@ public class Main {
 		ps.println("   -t inputFile [inputFile2...] [-fc configId] [-ie encoding] [-oe encoding]");
 		ps.println("      [-sl srcLang] [-tl trgLang] [-seg [srxFile]] [-tt hostname[:port]");
 		ps.println("      |-mm key|-pen tmDirectory|-gs configFile|-google|-apertium [serverURL]");
-		ps.println("      |-ms configFile] [-maketmx [tmxFile]] [-opt threshold]");
+		ps.println("      |-ms configFile|-tda configFile] [-maketmx [tmxFile]] [-opt threshold]");
 		ps.println("Queries translation resources:");
 		ps.println("   -q \"source text\" [-sl srcLang] [-tl trgLang] [-google] [-opentran]");
 		ps.println("      [-tt hostname[:port]] [-mm key] [-pen tmDirectory] [-gs configFile]");
-		ps.println("      [-apertium [serverURL]] [-ms configFile] [-opt threshold[:maxhits]]");
+		ps.println("      [-apertium [serverURL]] [-ms configFile] [-tda configFile]");
+		ps.println("      [-opt threshold[:maxhits]]");
 		ps.println("Converts to PO format:");
 		ps.println("   -2po inputFile [inputFile2...] [-fc configId] [-ie encoding] [-all]");
 		ps.println("      [-sl srcLang] [-tl trgLang] [-generic] [-trgsource|-trgempty]");
@@ -922,7 +931,7 @@ public class Main {
 	
 	private void processQuery () {
 		if ( !useGoogle && !useOpenTran && !useTransToolkit && !useMyMemory
-			&& !usePensieve && !useGlobalSight && !useApertium && !useMicrosoft ) {
+			&& !usePensieve && !useGlobalSight && !useApertium && !useMicrosoft && !useTDA ) {
 			useGoogle = true; // Default if none is specified
 		}
 		// Query options
@@ -959,6 +968,15 @@ public class Main {
 		}
 		if ( useGlobalSight ) {
 			conn = new GlobalSightTMConnector();
+			conn.setParameters(prepareConnectorParameters(conn.getClass().getName()));
+			conn.setLanguages(srcLoc, trgLoc);
+			setTMOptionsIfPossible(conn, threshold, maxhits);
+			conn.open();
+			displayQuery(conn, true);
+			conn.close();
+		}
+		if ( useTDA ) {
+			conn = new TDATMConnector();
 			conn.setParameters(prepareConnectorParameters(conn.getClass().getName()));
 			conn.setLanguages(srcLoc, trgLoc);
 			setTMOptionsIfPossible(conn, threshold, maxhits);
@@ -1131,6 +1149,9 @@ public class Main {
 		else if ( useGlobalSight ) {
 			levParams.setResourceClassName(GlobalSightTMConnector.class.getName());
 		}
+		else if ( useTDA ) {
+			levParams.setResourceClassName(TDATMConnector.class.getName());
+		}
 		else if ( useMicrosoft ) {
 			levParams.setResourceClassName(MicrosoftMTConnector.class.getName());
 		}
@@ -1170,7 +1191,7 @@ public class Main {
 		
 		// Add leveraging step if requested
 		if ( useGoogle || useTransToolkit || useMyMemory || usePensieve
-				|| useGlobalSight || useApertium ) {
+			|| useGlobalSight || useApertium || useMicrosoft || useTDA ) {
 			driver.addStep(addLeveragingStep());
 		}
 		
@@ -1218,7 +1239,7 @@ public class Main {
 		
 		// Add leveraging step
 		if ( useGoogle || useTransToolkit || useMyMemory || usePensieve
-			|| useGlobalSight || useApertium ) {
+			|| useGlobalSight || useApertium || useMicrosoft || useTDA ) {
 			driver.addStep(addLeveragingStep());
 		}
 		else { // Or indicate that we won't translate
@@ -1294,6 +1315,14 @@ public class Main {
 			net.sf.okapi.connectors.globalsight.Parameters params
 				= new net.sf.okapi.connectors.globalsight.Parameters();
 			URI paramURI = (new File(globalSightParams).toURI());
+			params.load(paramURI, false);
+			return params;
+		}
+
+		if ( connectorClassName.equals(TDATMConnector.class.getName()) ) {
+			net.sf.okapi.connectors.tda.Parameters params
+				= new net.sf.okapi.connectors.tda.Parameters();
+			URI paramURI = (new File(tdaParams).toURI());
 			params.load(paramURI, false);
 			return params;
 		}
