@@ -796,17 +796,17 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		if ( !code.hasReference() ) {
 			return codeTmp;
 		}
-		// Check for segment
-		if ( code.getType().equals(TextFragment.CODETYPE_SEGMENT) ) {
-			if ( layer == null ) {
-				return "[SEG-"+code.getData()+"]";
-			}
-			else {
-				return layer.startInline()
-					+ layer.encode("[SEG-"+code.getData()+"]", 2)
-					+ layer.endInline();
-			}
-		}
+//Not used anymore		// Check for segment
+//		if ( code.getType().equals(TextFragment.CODETYPE_SEGMENT) ) {
+//			if ( layer == null ) {
+//				return "[SEG-"+code.getData()+"]";
+//			}
+//			else {
+//				return layer.startInline()
+//					+ layer.encode("[SEG-"+code.getData()+"]", 2)
+//					+ layer.endInline();
+//			}
+//		}
 		// Else: look for place-holders
 		StringBuilder tmp = new StringBuilder(codeTmp);
 		Object[] marker = null;

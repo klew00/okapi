@@ -92,10 +92,11 @@ public class TextFragment implements Comparable<Object> {
 	 */
 	public static final String REFMARKER_SEP   = "@%";
 
-	/**
-	 * Code type name for segment place-holder.
-	 */
-	public static final String CODETYPE_SEGMENT  = "$seg$";
+//Not used anymore
+//	/**
+//	 * Code type name for segment place-holder.
+//	 */
+//	public static final String CODETYPE_SEGMENT  = "$seg$";
 	
 	/*
 	 * Compiled regex for all TextFragment markers
@@ -108,8 +109,8 @@ public class TextFragment implements Comparable<Object> {
 	public static enum TagType {
 		OPENING,
 		CLOSING,
-		PLACEHOLDER,
-		SEGMENTHOLDER
+		PLACEHOLDER
+//Not used anymore		SEGMENTHOLDER
 	};
 	
 	/**
@@ -506,8 +507,7 @@ public class TextFragment implements Comparable<Object> {
 			break;
 		}
 		// Flag it as needing balancing, if needed
-		if (( code.tagType != TagType.PLACEHOLDER )
-			&& ( code.tagType != TagType.SEGMENTHOLDER )) {
+		if ( code.tagType != TagType.PLACEHOLDER ) {
 			// Set as not balanced only if no id is defined
 			if ( code.id == -1) isBalanced = false;
 		}
@@ -572,8 +572,9 @@ public class TextFragment implements Comparable<Object> {
 		if ( tagType != TagType.CLOSING ) {
 			codes.get(codes.size()-1).id = ++lastCodeID;
 		}
-		if (( tagType != TagType.PLACEHOLDER )
-			&& ( tagType != TagType.SEGMENTHOLDER )) isBalanced = false;
+		if ( tagType != TagType.PLACEHOLDER ) {
+			isBalanced = false;
+		}
 		return codes.get(codes.size()-1);
 	}
 
@@ -611,8 +612,7 @@ public class TextFragment implements Comparable<Object> {
 		codes.add(code);
 		
 		// Flag it as needing balancing, if needed
-		if (( code.tagType != TagType.PLACEHOLDER )
-			&& ( code.tagType != TagType.SEGMENTHOLDER )) {
+		if ( code.tagType != TagType.PLACEHOLDER ) {
 			// Set as not balanced only if no id is defined
 			if ( id == -1) isBalanced = false;
 		}

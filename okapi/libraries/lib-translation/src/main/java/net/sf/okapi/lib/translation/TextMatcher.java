@@ -213,8 +213,9 @@ public class TextMatcher {
 	}
 
 	/**
-	 * Compare a list of tokens to a {@link TextFragment} object. 
-	 * @param text1 the list of tokens.
+	 * Compare a list of tokens to a {@link TextFragment} object.
+	 * @param text1 the original plain text. 
+	 * @param tokens1 the list of tokens.
 	 * @param frag2 the fragment to compare against list of tokens.
 	 * @return A score between 0 (no match) and 100 (exact match).
 	 */

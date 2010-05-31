@@ -42,6 +42,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
+import net.sf.okapi.lib.translation.QueryUtil;
 import net.sf.okapi.lib.translation.TextMatcher;
 
 public class TDASearchConnector implements ITMQuery {
@@ -79,6 +80,7 @@ public class TDASearchConnector implements ITMQuery {
 	private TextMatcher matcher;
 	private ScoreComparer scorComp = new ScoreComparer();
 	private int threshold = 60;
+	private QueryUtil qutil;
 
 	class ScoreComparer implements Comparator<QueryResult> {
 		public int compare(QueryResult arg0, QueryResult arg1) {
@@ -89,6 +91,7 @@ public class TDASearchConnector implements ITMQuery {
 	public TDASearchConnector () {
 		parser = new JSONParser();
 		params = new Parameters();
+		qutil = new QueryUtil();
 	}
 	
 	@Override
@@ -120,25 +123,35 @@ public class TDASearchConnector implements ITMQuery {
 
 	@Override
 	public int query (String plainText) {
-		return query(new TextFragment(plainText));
+		results = new ArrayList<QueryResult>();
+		current = -1;
+		if ( Util.isEmpty(plainText) ) return 0;
+		return doTDAQuery(plainText, plainText);
 	}
 	
 	@Override
 	public int query (TextFragment frag) {
 		results = new ArrayList<QueryResult>();
 		current = -1;
+		if ( !frag.hasText(false) ) return 0;
+		return doTDAQuery(qutil.separateCodesFromText(frag), frag.toString());
+	}
+	
+	private int doTDAQuery (String query,
+		String original)
+	{
 		try {
+			// Login if needed
 			loginIfNeeded();
-			// Check if there is actually text to translate
-			if ( !frag.hasText(false) ) return 0;
-			String qtext = prepareQuery(frag);
+			// Prepare the plain text
+			query = query.replaceAll("\\p{Po}", "");
 
 			// Create the connection and query
 			URL url = new URL(baseURL + String.format("segment.json?limit=%d&source_lang=%s&target_lang=%s",
 				maxHits, srcCode, trgCode) + "&auth_auth_key="+authKey
 				+ (params.getIndustry()>0 ? "&industry="+String.valueOf(params.getIndustry()) : "")
 				+ (params.getContentType()>0 ? "&content_type="+String.valueOf(params.getContentType()) : "")
-				+ "&q=" + URLEncoder.encode(qtext, "UTF-8"));
+				+ "&q=" + URLEncoder.encode(query, "UTF-8"));
 			URLConnection conn = url.openConnection();
 
 			// Get the response
@@ -166,7 +179,7 @@ public class TDASearchConnector implements ITMQuery {
 			// Adjust scores
 			//TODO: re-order and re-filter results
 	    	//TODO: fixup based on original text, not pre-processed one
-			fixupResults(frag.toString());
+			fixupResults(original);
 			
 	    	current = (( results.size() > 0 ) ? 0 : -1);
 		}
@@ -176,12 +189,6 @@ public class TDASearchConnector implements ITMQuery {
 		return ((current==0) ? 1 : 0);
 	}
 
-	private String prepareQuery (TextFragment frag) {
-		String tmp1 = frag.toString(); // Plain text for now
-		// Remove punctuation
-		return tmp1.replaceAll("\\p{Po}", "");
-	}
-	
 	@Override
 	public IParameters getParameters () {
 		return this.params;
@@ -349,4 +356,5 @@ public class TDASearchConnector implements ITMQuery {
 		// Re-order the list from the 
 		Collections.sort(results, scorComp);
 	}
+
 }
