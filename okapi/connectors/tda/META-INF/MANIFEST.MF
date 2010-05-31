@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: TDA TM Connector
+Bundle-Name: TDA Search Connector
 Bundle-SymbolicName: net.sf.okapi.connectors.tda
 Bundle-Version: 1.0.0
 Export-Package: net.sf.okapi.connectors.tda

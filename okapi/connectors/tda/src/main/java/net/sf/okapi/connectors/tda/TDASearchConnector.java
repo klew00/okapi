@@ -44,7 +44,7 @@ import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
 import net.sf.okapi.lib.translation.TextMatcher;
 
-public class TDATMConnector implements ITMQuery {
+public class TDASearchConnector implements ITMQuery {
 
 	// Language code to TDA code, except for reg=lang cases (fr-fr)
 	private static final String[][] LANGSMAP = {
@@ -86,7 +86,7 @@ public class TDATMConnector implements ITMQuery {
 		}
 	}
 	
-	public TDATMConnector () {
+	public TDASearchConnector () {
 		parser = new JSONParser();
 		params = new Parameters();
 	}
@@ -98,7 +98,7 @@ public class TDATMConnector implements ITMQuery {
 
 	@Override
 	public String getName () {
-		return "TDA-TM";
+		return "TDA-Search";
 	}
 
 	@Override
@@ -124,14 +124,14 @@ public class TDATMConnector implements ITMQuery {
 	}
 	
 	@Override
-	public int query (TextFragment text) {
+	public int query (TextFragment frag) {
 		results = new ArrayList<QueryResult>();
 		current = -1;
 		try {
 			loginIfNeeded();
 			// Check if there is actually text to translate
-			if ( !text.hasText(false) ) return 0;
-			String qtext = text.toString(); // Plain text for now
+			if ( !frag.hasText(false) ) return 0;
+			String qtext = prepareQuery(frag);
 
 			// Create the connection and query
 			URL url = new URL(baseURL + String.format("segment.json?limit=%d&source_lang=%s&target_lang=%s",
@@ -165,7 +165,8 @@ public class TDATMConnector implements ITMQuery {
 
 			// Adjust scores
 			//TODO: re-order and re-filter results
-			fixupResults(qtext);
+	    	//TODO: fixup based on original text, not pre-processed one
+			fixupResults(frag.toString());
 			
 	    	current = (( results.size() > 0 ) ? 0 : -1);
 		}
@@ -175,6 +176,12 @@ public class TDATMConnector implements ITMQuery {
 		return ((current==0) ? 1 : 0);
 	}
 
+	private String prepareQuery (TextFragment frag) {
+		String tmp1 = frag.toString(); // Plain text for now
+		// Remove punctuation
+		return tmp1.replaceAll("\\p{Po}", "");
+	}
+	
 	@Override
 	public IParameters getParameters () {
 		return this.params;

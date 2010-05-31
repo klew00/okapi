@@ -149,7 +149,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 
 	@Override
 	public EditorDescription createEditorDescription(ParametersDescription paramsDesc) {
-		EditorDescription desc = new EditorDescription("TDA TM Connector Settings");
+		EditorDescription desc = new EditorDescription("TDA Search Connector Settings");
 		desc.addTextInputPart(paramsDesc.get(USERNAME));
 		TextInputPart tip = desc.addTextInputPart(paramsDesc.get(PASSWORD));
 		tip.setPassword(true);

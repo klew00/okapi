@@ -80,8 +80,8 @@ public class DefaultConnectors implements IConnectorList {
 		list.add(trc);
 
 		trc = new ConnectorInfo();
-		trc.description = "TAUS Data Association Repository (Beta connector)";
-		trc.connectorClass = "net.sf.okapi.connectors.tda.TDATMConnector";
+		trc.description = "TAUS Data Association Search Repository (Beta connector)";
+		trc.connectorClass = "net.sf.okapi.connectors.tda.TDASearchConnector";
 		trc.descriptionProviderClass = "net.sf.okapi.connectors.tda.Parameters";
 		list.add(trc);
 	}

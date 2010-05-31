@@ -8,7 +8,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>okapi-connector-tda</artifactId>
-    <name>Okapi Connector for TDA TM Services</name>
+    <name>Okapi Connector for TDA Search Services</name>
     <dependencies>
         <dependency>
             <groupId>net.sf.okapi</groupId>

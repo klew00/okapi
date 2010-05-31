@@ -106,7 +106,7 @@ XLIFF 1.2 specifications</a>.</p>
 		GlobalSight TM</a>, <a href="#mymemory"><code>-mm</code> for MyMemory 
 		repository</a>, <a href="#google"><code>-google</code> for Google MT</a>,&nbsp; <a href="#apertium"><code>-apertium</code> for an Apertium server</a>., 
 		<a href="#microsoft"><code>-ms</code> for Microsoft MT</a>, and
-		<a href="#tda"><code>-tda</code> for the TDA TM</a>. The leveraging occurs after 
+		<a href="#tda"><code>-tda</code> for the TDA translation repository</a>. The leveraging occurs after 
 		segmentation, if you have specify segmentation rules.<p>Note that some 
 		internet-based resource may be slow and result in lengthy processing 
 		time. Be also aware that some translation resources may not always 
@@ -266,7 +266,7 @@ file must be in SRX format.</p>
 		repository</a>, <a href="#google"><code>-google</code> for Google MT</a>, 
 		<a href="#apertium"><code>-apertium</code> for an Apertium server</a>,
 		<a href="#microsoft"><code>-ms</code> for Microsoft MT</a>, and
-		<a href="#tda"><code>-tda</code> for the TDA TM</a>. The leveraging occurs after 
+		<a href="#tda"><code>-tda</code> for the TDA translation repository</a>. The leveraging occurs after 
 		segmentation, if you have specify segmentation rules.<p>Note that some 
 		internet-based resource may be slow and result in lengthy processing 
 		time. Be also aware that some translation resources may not always 
@@ -365,7 +365,7 @@ per resource, not sorted by best score as a whole.</p>
 	<tr>
 		<td align="left" valign="top" nowrap><code>-tda configFile</code></td>
 		<td align="left" valign="top">
-		Queries the <a href="#tda">TDA TM</a>. this requires Internet access.</td>
+		Queries the <a href="#tda">TDA translation repository</a>. this requires Internet access.</td>
 	</tr>
 	<tr>
 		<td align="left" valign="top" nowrap><code>-opt threshold[:maxhits]</code></td>
@@ -705,7 +705,7 @@ other searchable translation repository. the following resources are available:<
 	<li><a href="#google">Google MT</a></li>
 	<li><a href="#apertium">Apertium MT</a></li>
 	<li><a href="#microsoft">Microsoft MT</a></li>
-	<li><a href="#tda">TDA TM</a></li>
+	<li><a href="#tda">TDA Translation Repository</a></li>
 </ul>
 <p>Note that some of these resources are Web-based and require an internet 
 connection, others can be installed and used locally.</p>
@@ -817,7 +817,7 @@ appId=mypersonalappid</pre>
 <p>To use the Microsoft MT engine call Tikal like this (where <code>myMS.cfg</code> 
 is your configuration file).</p>
 <pre>tikal -q &quot;text to translate&quot; -ms myMS.cfg</pre>
-<h3><a name="tda"></a>TDA TM</h3>
+<h3><a name="tda"></a>TDA Translation Repository</h3>
 <p>The <a href="http://www.tausdata.org/">TAUS Data Association (TDA)</a> offers 
 a public Search facility on a large corpus of translations. Okapi provides a 
 connector for the REST API provided by TDA. The TDA Web Search is accessible 
@@ -835,7 +835,7 @@ username=myTDAUsername
 password=myTDAPassword
 industry.i=0
 contentType.i=0</pre>
-<p>For example, to access the TDA search, call Tikal like this (where <code>
+<p>For example, to access TDA Search, call Tikal like this (where <code>
 myTDA.cfg</code> is your configuration file):</p>
 <pre>tikal -q &quot;text to translate&quot; -tda myTDA.cfg -sl en-us -tl fr-fr</pre>
 <p>&nbsp;</p>

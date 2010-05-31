@@ -72,7 +72,7 @@ import net.sf.okapi.connectors.mymemory.MyMemoryTMConnector;
 import net.sf.okapi.connectors.opentran.OpenTranTMConnector;
 import net.sf.okapi.connectors.pensieve.PensieveTMConnector;
 //import net.sf.okapi.connectors.promt.ProMTConnector;
-import net.sf.okapi.connectors.tda.TDATMConnector;
+import net.sf.okapi.connectors.tda.TDASearchConnector;
 import net.sf.okapi.connectors.translatetoolkit.TranslateToolkitTMConnector;
 
 public class Main {
@@ -976,7 +976,7 @@ public class Main {
 			conn.close();
 		}
 		if ( useTDA ) {
-			conn = new TDATMConnector();
+			conn = new TDASearchConnector();
 			conn.setParameters(prepareConnectorParameters(conn.getClass().getName()));
 			conn.setLanguages(srcLoc, trgLoc);
 			setTMOptionsIfPossible(conn, threshold, maxhits);
@@ -1150,7 +1150,7 @@ public class Main {
 			levParams.setResourceClassName(GlobalSightTMConnector.class.getName());
 		}
 		else if ( useTDA ) {
-			levParams.setResourceClassName(TDATMConnector.class.getName());
+			levParams.setResourceClassName(TDASearchConnector.class.getName());
 		}
 		else if ( useMicrosoft ) {
 			levParams.setResourceClassName(MicrosoftMTConnector.class.getName());
@@ -1319,7 +1319,7 @@ public class Main {
 			return params;
 		}
 
-		if ( connectorClassName.equals(TDATMConnector.class.getName()) ) {
+		if ( connectorClassName.equals(TDASearchConnector.class.getName()) ) {
 			net.sf.okapi.connectors.tda.Parameters params
 				= new net.sf.okapi.connectors.tda.Parameters();
 			URI paramURI = (new File(tdaParams).toURI());
