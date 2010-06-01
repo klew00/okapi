@@ -115,6 +115,16 @@ public class RainbowTest {
 		assertTrue("Pensive leveraged output is different", fc.filesExactlyTheSame(outputPath, basePath));
 	}
 	
+
+	@Test
+	public void testDiffLeverage1 () throws IOException, InterruptedException {
+		// Delete previous output
+		assertTrue(deleteOutputFile("pipelines/diffleverage/myFile_en_new.out.html"));
+		assertEquals(0, runRainbow("-np -p pipelines/diffleverage/diffleverage1.rnb -pln pipelines/diffleverage/diffleverage1.pln"));
+		assertTrue("File different from gold",
+			compareWithGoldFile("pipelines/diffleverage/myFile_en_new.out.html"));
+	}
+
     private boolean compareWithGoldFile (String outputBase) {
     	String outputPath = root + File.separator + outputBase;
     	String goldPath = root + File.separator + "gold" + File.separator + outputBase; 
