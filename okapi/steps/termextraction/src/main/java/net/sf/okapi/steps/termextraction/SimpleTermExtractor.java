@@ -23,16 +23,18 @@ package net.sf.okapi.steps.termextraction;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.BreakIterator;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
@@ -54,9 +56,9 @@ public class SimpleTermExtractor {
 	{
 		this.srcLocale = sourceLocaleId.toJavaLocale();
 		this.params = params;
-		stopWords = loadList(params.getStopWordsPath());
-		noStartWords = loadList(params.getNoStartWordsPath());
-		noEndWords = loadList(params.getNoEndWordsPath());
+		stopWords = loadList(params.getStopWordsPath(), "stopWords_en.txt");
+		noStartWords = loadList(params.getNoStartWordsPath(), "noStartWords_en.txt");
+		noEndWords = loadList(params.getNoEndWordsPath(), "noEndWords_en.txt");
 		terms = new HashMap<String, Integer>();
 		breaker = null;
 	}
@@ -67,7 +69,7 @@ public class SimpleTermExtractor {
 		
 		// Get the list of words
 		TokensAnnotation annot = tu.getAnnotation(TokensAnnotation.class);
-		Collection<String> words = null;
+		List<String> words = null;
 		
 		// Tokens annotation are set at the text container level
 		if ( annot == null ) {
@@ -78,15 +80,66 @@ public class SimpleTermExtractor {
 			Tokens tokens = annot.getFilteredList("WORDS");
 		}
 
-		
-		
+		// Gather the terms
+		String term;
+		for ( int i=0; i<words.size(); i++ ) {
+			// Skip words too short
+			if ( words.get(i).length() < 2 ) continue;
+			// Skip stop words
+			if ( stopWords.containsKey(words.get(i)) ) continue;
+
+			term = "";
+			for ( int j=0; j<params.getMaxWordsPerTerm(); j++ ) {
+				// Check we don't go outside the array
+				if ( i+j >= words.size() ) continue;
+				if ( words.get(i+j).length() == 0 ) continue;
+
+				// Stop at stop words
+				if ( stopWords.containsKey(words.get(i+j)) ) {
+					j = params.getMaxWordsPerTerm()+1; // Stop here
+					continue;
+				}
+
+				// Do not include terms starting on a no-start word
+				if ( j == 0 ) {
+					if ( noStartWords.containsKey(words.get(i+j)) ) {
+						j = params.getMaxWordsPerTerm()+1; // Stop here
+						continue;
+					}
+				}
+
+				if ( j > 0 ) term += " ";
+				term += words.get(i+j);
+
+				// Do not include term with less than m_nMinWords
+				if ( j+1 < params.getMinWordsPerTerm() ) continue;
+				// But continue to build the term with more words
+
+				// Do not include terms ending on a no-end word
+				if ( noEndWords.containsKey(words.get(i+j)) ) continue;
+				// But continue to build the term with more words
+
+				// Add or increment the term
+				if ( terms.containsKey(term) ) {
+					terms.put(term, terms.get(term)+1);
+				}
+				else {
+					terms.put(term, 1);
+					//count++;
+				}
+			}
+		}
 	}
 	
 	public void completeExtraction () {
 		//TODO
 	}
 	
-	public Collection<String> getWordsFromDefaultBreaker (TextContainer tc) {
+	public Map<String, Integer> getTerms () {
+		return terms;
+	}
+	
+	public List<String> getWordsFromDefaultBreaker (TextContainer tc) {
 		String content;
 		if ( tc.contentIsOneSegment() ) {
 			content = TextUnitUtil.getText(tc.getFirstContent()); 
@@ -106,11 +159,16 @@ public class SimpleTermExtractor {
 		ArrayList<String> words = new ArrayList<String>();
 		int start = breaker.first();
 		for ( int end=breaker.next(); end!=BreakIterator.DONE; start=end, end=breaker.next()) {
-			//if ( m_Opt.m_bKeepCase )
-			//	aWords = p_sText.Split("\'\t \r\n".ToCharArray());
-			//else
-			//TODO: case change if needed
-			words.add(content.substring(start, end));
+			String word = content.substring(start, end);
+			if ( word.length() < 2 ) continue;
+			if ( !Character.isLetter(word.codePointAt(0)) ) continue;
+			// Add the word (and preserve or not the case)
+			if ( params.getKeepCase() ) {
+				words.add(word);
+			}
+			else {
+				words.add(word.toLowerCase());
+			}
 		}
 //		// Clean endings
 //		for ( int i=0; i<words.length; i++ ) {
@@ -120,11 +178,21 @@ public class SimpleTermExtractor {
 		return words;
 	}
 
-	private HashMap<String, Boolean> loadList (String path) {
+	private HashMap<String, Boolean> loadList (String path,
+		String defaultFile)
+	{
 		HashMap<String, Boolean> map = new HashMap<String, Boolean>();
 		BufferedReader reader = null;
 		try {
-			reader = new BufferedReader(new InputStreamReader(new FileInputStream(path), "UTF-8"));
+			InputStream is;
+			// Use the default resource if no path is provided
+			if ( Util.isEmpty(path) ) {
+				is = SimpleTermExtractor.class.getResourceAsStream(defaultFile);
+			}
+			else {
+				is = new FileInputStream(path);
+			}
+			reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
 			String line;
 			while ((line = reader.readLine()) != null ) {
 				line = line.trim();

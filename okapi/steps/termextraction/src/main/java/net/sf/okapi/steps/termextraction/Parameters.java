@@ -23,6 +23,7 @@ package net.sf.okapi.steps.termextraction;
 import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.ParametersDescription;
+import net.sf.okapi.common.uidescription.CheckboxPart;
 import net.sf.okapi.common.uidescription.EditorDescription;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 import net.sf.okapi.common.uidescription.PathInputPart;
@@ -39,6 +40,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private static final String STOPWORDSPATH = "stopWordsPath";
 	private static final String NOSTARTWORDSPATH = "noStartWordsPath";
 	private static final String NOENDWORDSPATH = "noEndWordsPath";
+	private static final String KEEPCASE = "keepCase";
 	
 	private String outputPath;
 	private int minWordsPerTerm;
@@ -47,6 +49,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private String stopWordsPath;
 	private String noStartWordsPath;
 	private String noEndWordsPath;
+	private boolean keepCase;
 
 	public Parameters () {
 		reset();
@@ -108,6 +111,14 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.noEndWordsPath = noEndWordsPath;
 	}
 
+	public boolean getKeepCase () {
+		return keepCase;
+	}
+
+	public void setKeepCase (boolean keepCase) {
+		this.keepCase = keepCase;
+	}
+
 	@Override
 	public void reset () {
 		outputPath = "terms.txt";
@@ -117,6 +128,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		stopWordsPath = "";
 		noStartWordsPath = "";
 		noEndWordsPath = "";
+		keepCase = false;
 	}
 
 	@Override
@@ -130,6 +142,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		stopWordsPath = buffer.getString(STOPWORDSPATH, stopWordsPath);
 		noStartWordsPath = buffer.getString(NOSTARTWORDSPATH, noStartWordsPath);
 		noEndWordsPath = buffer.getString(NOENDWORDSPATH, noEndWordsPath);
+		keepCase = buffer.getBoolean(KEEPCASE, keepCase);
 	}
 
 	@Override
@@ -142,6 +155,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.setString(STOPWORDSPATH, stopWordsPath);
 		buffer.setString(NOSTARTWORDSPATH, noStartWordsPath);
 		buffer.setString(NOENDWORDSPATH, noEndWordsPath);
+		buffer.setBoolean(KEEPCASE, keepCase);
 		return buffer.toString();
 	}
 	
@@ -155,6 +169,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.add(STOPWORDSPATH, "Path of the file with stop words", "Full path of the file containing stop words");
 		desc.add(NOSTARTWORDSPATH, "Path of the file with no-start words", "Full path of the file containing no-start words");
 		desc.add(NOENDWORDSPATH, "Path of the file with no-end words", "Full path of the file containing no-end words");
+		desc.add(KEEPCASE, "Preserve case differences", null);
 		return desc;
 	}
 	
@@ -172,6 +187,9 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		sip.setRange(1, 999);
 		sip = desc.addSpinInputPart(paramsDesc.get(MINOCCURRENCES));
 		sip.setRange(1, 999);
+		
+		CheckboxPart cbp = desc.addCheckboxPart(paramsDesc.get(KEEPCASE));
+		cbp.setVertical(true);
 		
 		SeparatorPart sp = desc.addSeparatorPart();
 		sp.setVertical(true);
