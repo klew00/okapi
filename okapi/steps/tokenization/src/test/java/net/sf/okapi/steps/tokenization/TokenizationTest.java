@@ -245,6 +245,15 @@ public class TokenizationTest {
 	}
 	
 	@Test
+	public void testTokenizer2() {
+		Tokens tokens = Tokenizer.tokenize("word1 word2 word3", locENUS, "WORD");
+		assertEquals(3, tokens.size());
+		assertEquals("word1", tokens.get(0).getValue());
+		assertEquals("word2", tokens.get(1).getValue());
+		assertEquals("word3", tokens.get(2).getValue());
+	}
+	
+	@Test
 	public void testJavaCC() {
 		
 		StringReader sr = new StringReader("This is a 1248-th test. U.S.A.F. read-through\n didn't AT&T, P&G, Johnson&Johnson \n\nadmin@yahoo.com 192.168.0.7");
