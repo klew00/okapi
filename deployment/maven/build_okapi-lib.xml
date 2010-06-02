@@ -210,6 +210,8 @@
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi/steps/tokenization/target/classes"
 			 excludes="**/META-INF/**"/>
+			<fileset dir="../../okapi/steps/termextraction/target/classes"
+			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi/steps/translationcomparison/target/classes"
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi/steps/uriconversion/target/classes"
