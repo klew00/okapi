@@ -56,18 +56,11 @@ public class SimpleTermExtractor {
 	private Map<String, Integer> terms;
 	private Locale srcLocale;
 	private BreakIterator breaker;
-	private boolean charBased = false;
 	
 	public void initialize (Parameters params,
 		LocaleId sourceLocaleId)
 	{
 		this.srcLocale = sourceLocaleId.toJavaLocale();
-		// Set specil flag for CJK locales
-		String lang = sourceLocaleId.getLanguage();
-		if ( lang.equals("ja") || lang.equals("zh") || lang.equals("ko") ) {
-			charBased = true;
-		}
-		
 		this.params = params;
 		stopWords = loadList(params.getStopWordsPath(), "stopWords_en.txt");
 		noStartWords = loadList(params.getNoStartWordsPath(), "noStartWords_en.txt");
@@ -87,11 +80,10 @@ public class SimpleTermExtractor {
 		// Get the "words" to use for the extraction.
 		// First try to use the TokensAnnotation if one is present
 		if ( annot != null ) {
-			//TODO: how to ensure we have "WORD" token + others?
-			Tokens tokens = annot.getFilteredList((String)null);
+			Tokens tokens = annot.getFilteredList("WORD", "KANA", "IDEOGRAM");
 			words = new ArrayList<String>();
 			for ( Token token : tokens ) {
-				words.add(token.getValue());
+				addWord(words, token.getValue());
 			}
 		}
 		else { // If no annotation is available: use the default word-breaker
@@ -101,40 +93,51 @@ public class SimpleTermExtractor {
 		// Gather the term candidates
 		String term;
 		for ( int i=0; i<words.size(); i++ ) {
-			// Skip words too short
-			if ( !charBased && ( words.get(i).length() < 2 )) continue;
 			// Skip stop words
 			if ( stopWords.containsKey(words.get(i)) ) continue;
-
+			// Start term candidate
 			term = "";
 			for ( int j=0; j<params.getMaxWordsPerTerm(); j++ ) {
 				// Check we don't go outside the array
 				if ( i+j >= words.size() ) continue;
-				if ( words.get(i+j).length() == 0 ) continue;
+				String word = words.get(i+j);
+				// Not needed, no word should be empty at this point: if ( word.length() == 0 ) continue;
 
 				// Stop at stop words
-				if ( stopWords.containsKey(words.get(i+j)) ) {
+				if ( stopWords.containsKey(word) ) {
 					j = params.getMaxWordsPerTerm()+1; // Stop here
 					continue;
 				}
 
 				// Do not include terms starting on a no-start word
 				if ( j == 0 ) {
-					if ( noStartWords.containsKey(words.get(i+j)) ) {
+					if ( noStartWords.containsKey(word) ) {
 						j = params.getMaxWordsPerTerm()+1; // Stop here
 						continue;
 					}
 				}
-
-				if ( j > 0 ) term += " ";
-				term += words.get(i+j);
+				// Add space if needed
+				if ( j > 0 ) {
+					String sep = " ";
+					// Check the last character of the term
+					if ( term.charAt(term.length()-1) > 0x0700 ) {
+						// If it is OTHER_LETTER above U+700 it's likely to be CJK, Thai, Devanagari, etc.
+						switch ( Character.getType(term.charAt(term.length()-1)) ) {
+						case Character.OTHER_LETTER:
+							sep = ""; // No space separation for those
+							break;
+						}
+					}
+					term += sep;
+				}
+				term += word;
 
 				// Do not include term with less than m_nMinWords
 				if ( j+1 < params.getMinWordsPerTerm() ) continue;
 				// But continue to build the term with more words
 
 				// Do not include terms ending on a no-end word
-				if ( noEndWords.containsKey(words.get(i+j)) ) continue;
+				if ( noEndWords.containsKey(word) ) continue;
 				// But continue to build the term with more words
 
 				// Add or increment the term
@@ -168,7 +171,7 @@ public class SimpleTermExtractor {
 			Util.createDirectories(params.getOutputPath());
 			writer = new PrintWriter(params.getOutputPath(), "UTF-8");
 			for ( Entry<String, Integer> entry : terms.entrySet() ) {
-				writer.println(String.format("%s\t%d", entry.getKey(), entry.getValue()));
+				writer.println(String.format("%d\t%s", entry.getValue(), entry.getKey()));
 			}
 		}
 		catch ( IOException e ) {
@@ -185,8 +188,27 @@ public class SimpleTermExtractor {
 	public Map<String, Integer> getTerms () {
 		return terms;
 	}
-	
+
+	private void addWord (List<String> list,
+		String token)
+	{
+		// No empty words and keep only extended single-char
+		if (( token.length() == 0 )
+			|| (( token.length() == 1 ) && ( token.codePointAt(0) < 126 ))) return;
+		// Keep only "letters" (includes CJK characters)
+		if ( !Character.isLetter(token.codePointAt(0)) ) return;
+		
+		// Add the word (and preserve or not the case)
+		if ( params.getKeepCase() ) {
+			list.add(token);
+		}
+		else {
+			list.add(token.toLowerCase(srcLocale));
+		}
+	}
+
 	public List<String> getWordsFromDefaultBreaker (TextContainer tc) {
+		// Get the plain text to process
 		String content;
 		if ( tc.contentIsOneSegment() ) {
 			content = TextUnitUtil.getText(tc.getFirstContent()); 
@@ -194,11 +216,11 @@ public class SimpleTermExtractor {
 		else {
 			content = TextUnitUtil.getText(tc.getUnSegmentedContentCopy());
 		}
-
 		if ( content.length() == 0 ) {
 			return Collections.emptyList();
 		}
-		
+
+		// Break down the text into "words"
 		if ( breaker == null ) {
 			breaker = BreakIterator.getWordInstance(srcLocale);
 		}
@@ -206,22 +228,7 @@ public class SimpleTermExtractor {
 		ArrayList<String> words = new ArrayList<String>();
 		int start = breaker.first();
 		for ( int end=breaker.next(); end!=BreakIterator.DONE; start=end, end=breaker.next()) {
-			String word = content.substring(start, end);
-			if ( word.length() < 2 ) {
-				if ( charBased ) {
-					if ( word.codePointAt(0) < 126 ) continue;
-					// Else: keep single extended chars
-				}
-				else continue;
-			}
-			if ( !Character.isLetter(word.codePointAt(0)) ) continue;
-			// Add the word (and preserve or not the case)
-			if ( params.getKeepCase() ) {
-				words.add(word);
-			}
-			else {
-				words.add(word.toLowerCase());
-			}
+			addWord(words, content.substring(start, end));
 		}
 
 		return words;
