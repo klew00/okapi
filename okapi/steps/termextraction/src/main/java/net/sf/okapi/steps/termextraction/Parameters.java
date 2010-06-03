@@ -38,8 +38,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private static final String MAXWORDSPERTERM = "maxWordsPerTerm";
 	private static final String MINOCCURRENCES = "minOccurrences";
 	private static final String STOPWORDSPATH = "stopWordsPath";
-	private static final String NOSTARTWORDSPATH = "noStartWordsPath";
-	private static final String NOENDWORDSPATH = "noEndWordsPath";
+	private static final String NOTSTARTWORDSPATH = "notStartWordsPath";
+	private static final String NOTENDWORDSPATH = "notEndWordsPath";
 	private static final String KEEPCASE = "keepCase";
 	private static final String REMOVESUBTERMS = "removeSubTerms";
 	
@@ -48,8 +48,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private int maxWordsPerTerm;
 	private int minOccurrences;
 	private String stopWordsPath;
-	private String noStartWordsPath;
-	private String noEndWordsPath;
+	private String notStartWordsPath;
+	private String notEndWordsPath;
 	private boolean keepCase;
 	private boolean removeSubTerms;
 
@@ -97,20 +97,20 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.stopWordsPath = stopWordsPath;
 	}
 
-	public String getNoStartWordsPath () {
-		return noStartWordsPath;
+	public String getNotStartWordsPath () {
+		return notStartWordsPath;
 	}
 
-	public void setNoStartWordsPath (String noStartWordsPath) {
-		this.noStartWordsPath = noStartWordsPath;
+	public void setNotStartWordsPath (String notStartWordsPath) {
+		this.notStartWordsPath = notStartWordsPath;
 	}
 
-	public String getNoEndWordsPath () {
-		return noEndWordsPath;
+	public String getNotEndWordsPath () {
+		return notEndWordsPath;
 	}
 
-	public void setNoEndWordsPath (String noEndWordsPath) {
-		this.noEndWordsPath = noEndWordsPath;
+	public void setNotEndWordsPath (String notEndWordsPath) {
+		this.notEndWordsPath = notEndWordsPath;
 	}
 
 	public boolean getKeepCase () {
@@ -136,8 +136,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		maxWordsPerTerm = 3;
 		minOccurrences = 2;
 		stopWordsPath = "";
-		noStartWordsPath = "";
-		noEndWordsPath = "";
+		notStartWordsPath = "";
+		notEndWordsPath = "";
 		keepCase = false;
 		removeSubTerms = false;
 	}
@@ -151,8 +151,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		maxWordsPerTerm = buffer.getInteger(MAXWORDSPERTERM, maxWordsPerTerm);
 		minOccurrences = buffer.getInteger(MINOCCURRENCES, minOccurrences);
 		stopWordsPath = buffer.getString(STOPWORDSPATH, stopWordsPath);
-		noStartWordsPath = buffer.getString(NOSTARTWORDSPATH, noStartWordsPath);
-		noEndWordsPath = buffer.getString(NOENDWORDSPATH, noEndWordsPath);
+		notStartWordsPath = buffer.getString(NOTSTARTWORDSPATH, notStartWordsPath);
+		notEndWordsPath = buffer.getString(NOTENDWORDSPATH, notEndWordsPath);
 		keepCase = buffer.getBoolean(KEEPCASE, keepCase);
 		removeSubTerms = buffer.getBoolean(REMOVESUBTERMS, removeSubTerms);
 	}
@@ -165,8 +165,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.setInteger(MAXWORDSPERTERM, maxWordsPerTerm);
 		buffer.setInteger(MINOCCURRENCES, minOccurrences);
 		buffer.setString(STOPWORDSPATH, stopWordsPath);
-		buffer.setString(NOSTARTWORDSPATH, noStartWordsPath);
-		buffer.setString(NOENDWORDSPATH, noEndWordsPath);
+		buffer.setString(NOTSTARTWORDSPATH, notStartWordsPath);
+		buffer.setString(NOTENDWORDSPATH, notEndWordsPath);
 		buffer.setBoolean(KEEPCASE, keepCase);
 		buffer.setBoolean(REMOVESUBTERMS, removeSubTerms);
 		return buffer.toString();
@@ -178,10 +178,10 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.add(OUTPUTPATH, "Output path", "Full path of the output file");
 		desc.add(MINWORDSPERTERM, "Minimum number of words per term", "A term will be made up at least of that many words");
 		desc.add(MAXWORDSPERTERM, "Maximum number of words per term", "A term will be made up at the most of that many words");
-		desc.add(MINOCCURRENCES, "Minimum number of occurrences", "A term will have at least that many occurrences");
+		desc.add(MINOCCURRENCES, "Minimum number of occurrences per term", "A term will have at least that many occurrences");
 		desc.add(STOPWORDSPATH, "Path of the file with stop words (leave empty for default)", "Full path of the file containing stop words");
-		desc.add(NOSTARTWORDSPATH, "Path of the file with no-start words (leave empty for default)", "Full path of the file containing no-start words");
-		desc.add(NOENDWORDSPATH, "Path of the file with no-end words (leave empty for default)", "Full path of the file containing no-end words");
+		desc.add(NOTSTARTWORDSPATH, "Path of the file with not-start words (leave empty for default)", "Full path of the file containing not-start words");
+		desc.add(NOTENDWORDSPATH, "Path of the file with not-end words (leave empty for default)", "Full path of the file containing not-end words");
 		desc.add(KEEPCASE, "Preserve case differences", null);
 		desc.add(REMOVESUBTERMS, "Remove entries that seem to be sub-strings of longer entries", null);
 		return desc;
@@ -216,12 +216,12 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		pip.setVertical(true);
 		pip.setAllowEmpty(true);
 
-		pip = desc.addPathInputPart(paramsDesc.get(NOSTARTWORDSPATH), "No-Start Words File", false);
+		pip = desc.addPathInputPart(paramsDesc.get(NOTSTARTWORDSPATH), "Not-Start Words File", false);
 		pip.setBrowseFilters("Text Files (*.txt)\tAll Files (*.*)", "*.txt\t*.*");
 		pip.setVertical(true);
 		pip.setAllowEmpty(true);
 
-		pip = desc.addPathInputPart(paramsDesc.get(NOENDWORDSPATH), "No-End Words File", false);
+		pip = desc.addPathInputPart(paramsDesc.get(NOTENDWORDSPATH), "Not-End Words File", false);
 		pip.setBrowseFilters("Text Files (*.txt)\tAll Files (*.*)", "*.txt\t*.*");
 		pip.setVertical(true);
 		pip.setAllowEmpty(true);

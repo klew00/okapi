@@ -52,8 +52,8 @@ public class SimpleTermExtractor {
 
 	Parameters params;
 	private Map<String, Boolean> stopWords;
-	private Map<String, Boolean> noStartWords;
-	private Map<String, Boolean> noEndWords;
+	private Map<String, Boolean> notStartWords;
+	private Map<String, Boolean> notEndWords;
 	private Map<String, Integer> terms;
 	private Locale srcLocale;
 	private BreakIterator breaker;
@@ -64,8 +64,8 @@ public class SimpleTermExtractor {
 		this.srcLocale = sourceLocaleId.toJavaLocale();
 		this.params = params;
 		stopWords = loadList(params.getStopWordsPath(), "stopWords_en.txt");
-		noStartWords = loadList(params.getNoStartWordsPath(), "noStartWords_en.txt");
-		noEndWords = loadList(params.getNoEndWordsPath(), "noEndWords_en.txt");
+		notStartWords = loadList(params.getNotStartWordsPath(), "notStartWords_en.txt");
+		notEndWords = loadList(params.getNotEndWordsPath(), "notEndWords_en.txt");
 		terms = new LinkedHashMap<String, Integer>();
 		breaker = null;
 	}
@@ -112,7 +112,7 @@ public class SimpleTermExtractor {
 
 				// Do not include terms starting on a no-start word
 				if ( j == 0 ) {
-					if ( noStartWords.containsKey(word) ) {
+					if ( notStartWords.containsKey(word) ) {
 						j = params.getMaxWordsPerTerm()+1; // Stop here
 						continue;
 					}
@@ -128,7 +128,7 @@ public class SimpleTermExtractor {
 				// But continue to build the term with more words
 
 				// Do not include terms ending on a no-end word
-				if ( noEndWords.containsKey(word) ) continue;
+				if ( notEndWords.containsKey(word) ) continue;
 				// But continue to build the term with more words
 
 				// Add or increment the term
