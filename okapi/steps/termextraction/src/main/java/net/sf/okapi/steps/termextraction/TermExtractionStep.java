@@ -22,17 +22,22 @@ package net.sf.okapi.steps.termextraction;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
+import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 
 @UsingParameters(Parameters.class)
 public class TermExtractionStep extends BasePipelineStep {
 
 	private Parameters params;
+	private SimpleTermExtractor extractor;
+	private LocaleId sourceLocale;
 
 	public TermExtractionStep () {
 		params = new Parameters();
+		extractor = new SimpleTermExtractor();
 	}
 	
 	@Override
@@ -56,12 +61,26 @@ public class TermExtractionStep extends BasePipelineStep {
 		this.params = (Parameters)params;
 	}
 
+	@StepParameterMapping(parameterType = StepParameterType.SOURCE_LOCALE)
+	public void setTargetLocale (LocaleId sourceLocale) {
+		this.sourceLocale = sourceLocale;
+	}
+	
+	@Override
+	protected Event handleStartBatch (Event event) {
+		extractor.initialize(params, sourceLocale);
+		return event;
+	}
+	
 	@Override
 	protected Event handleTextUnit (Event event) {
-		TextUnit tu = (TextUnit)event.getResource();
-		// Skip non-translatable
-		if ( !tu.isTranslatable() ) return event;
-
+		extractor.processTextUnit(event.getTextUnit());
+		return event;
+	}
+	
+	@Override
+	protected Event handleEndBatch (Event event) {
+		extractor.completeExtraction();
 		return event;
 	}
 

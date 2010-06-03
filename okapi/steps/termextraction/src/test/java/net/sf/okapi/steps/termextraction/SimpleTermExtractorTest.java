@@ -43,10 +43,20 @@ public class SimpleTermExtractorTest {
 	@Test
 	public void testSimpleCase () {
 		extr.initialize(params, LocaleId.ENGLISH);
-		extr.processTextUnit(createLongTU());
+		extr.processTextUnit(new TextUnit("id", "This is a test, a rather simple test."));
+		extr.completeExtraction();
 		Map<String, Integer> res = extr.getTerms();
-		assertNotNull(res);
-//		assertEquals(2, res.size());
+		assertEquals("{test=2}", res.toString());
+	}
+
+	@Test
+	public void testLongTextCaseWithMinOcc3 () {
+		params.setMinOccurrences(3);
+		extr.initialize(params, LocaleId.ENGLISH);
+		extr.processTextUnit(createLongTU());
+		extr.completeExtraction();
+		Map<String, Integer> res = extr.getTerms();
+		assertEquals("{complex=4, complex expression=3, expression=3}", res.toString());
 	}
 
 	private TextUnit createLongTU () {

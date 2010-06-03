@@ -197,14 +197,17 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		pip = desc.addPathInputPart(paramsDesc.get(STOPWORDSPATH), "Stop Words File", false);
 		pip.setBrowseFilters("Text Files (*.txt)\tAll Files (*.*)", "*.txt\t*.*");
 		pip.setVertical(true);
+		pip.setAllowEmpty(true);
 
 		pip = desc.addPathInputPart(paramsDesc.get(NOSTARTWORDSPATH), "No-Start Words File", false);
 		pip.setBrowseFilters("Text Files (*.txt)\tAll Files (*.*)", "*.txt\t*.*");
 		pip.setVertical(true);
+		pip.setAllowEmpty(true);
 
 		pip = desc.addPathInputPart(paramsDesc.get(NOENDWORDSPATH), "No-End Words File", false);
 		pip.setBrowseFilters("Text Files (*.txt)\tAll Files (*.*)", "*.txt\t*.*");
 		pip.setVertical(true);
+		pip.setAllowEmpty(true);
 
 		return desc;
 	}

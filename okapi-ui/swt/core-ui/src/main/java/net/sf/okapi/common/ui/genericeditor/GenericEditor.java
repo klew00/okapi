@@ -638,7 +638,7 @@ public class GenericEditor {
 		try {
 			if ( !ctrl.isEnabled() ) return true; // Don't save disabled input
 			if ( desc.getType().equals(String.class) ) {
-				if ( ctrl.getText().length() == 0 ) {
+				if ( !desc.isAllowEmpty() && ( ctrl.getText().length() == 0 )) {
 					Dialogs.showError(shell, String.format("You must specify a path for '%s'.",
 						desc.getDisplayName()), null);
 					ctrl.setFocus();

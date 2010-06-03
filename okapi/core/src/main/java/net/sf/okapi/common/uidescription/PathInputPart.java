@@ -35,6 +35,7 @@ public class PathInputPart extends AbstractPart {
 	private String browseTitle;
 	private String filterNames;
 	private String filterExtensions;
+	private boolean allowEmpty = false;
 	
 	/**
 	 * Creates a new PathInputPart object with a given  parameter descriptor.
@@ -123,6 +124,22 @@ public class PathInputPart extends AbstractPart {
 	 */
 	public void setForSaveAs (boolean forSaveAs) {
 		this.forSaveAs = forSaveAs;
+	}
+
+	/**
+	 * Indicates if the input text can be empty.
+	 * @return true if the input text can be empty, false otherwise.
+	 */
+	public boolean isAllowEmpty () {
+		return allowEmpty;
+	}
+
+	/**
+	 * Sets the flag indicating if the input text can be empty. 
+	 * @param allowEmpty true if the input text can be empty, false otherwise.
+	 */
+	public void setAllowEmpty (boolean allowEmpty) {
+		this.allowEmpty = allowEmpty;
 	}
 
 }
