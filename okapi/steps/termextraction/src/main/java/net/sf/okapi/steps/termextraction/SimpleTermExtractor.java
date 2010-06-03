@@ -34,6 +34,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import com.ibm.icu.text.BreakIterator;
@@ -116,19 +117,9 @@ public class SimpleTermExtractor {
 						continue;
 					}
 				}
-				// Add space if needed
+				// Add separator if needed
 				if ( j > 0 ) {
-					String sep = " ";
-					// Check the last character of the term
-					if ( term.charAt(term.length()-1) > 0x0700 ) {
-						// If it is OTHER_LETTER above U+700 it's likely to be CJK, Thai, Devanagari, etc.
-						switch ( Character.getType(term.charAt(term.length()-1)) ) {
-						case Character.OTHER_LETTER:
-							sep = ""; // No space separation for those
-							break;
-						}
-					}
-					term += sep;
+					term += getWordSeparator(term.charAt(term.length()-1));
 				}
 				term += word;
 
@@ -152,6 +143,18 @@ public class SimpleTermExtractor {
 		}
 	}
 	
+	private String getWordSeparator (char prevChar) {
+		// Check the last character of the term
+		if ( prevChar > 0x0700 ) {
+			// If it is OTHER_LETTER above U+700 it's likely to be CJK, Thai, Devanagari, etc.
+			switch ( Character.getType(prevChar) ) {
+			case Character.OTHER_LETTER:
+				return ""; // No space separation for those
+			}
+		}
+		return " ";
+	}
+	
 	public void completeExtraction () {
 		// Remove entries with less occurrences than allowed
 		Iterator<Entry<String, Integer>> iter = terms.entrySet().iterator();
@@ -162,6 +165,12 @@ public class SimpleTermExtractor {
 			}
 		}
 
+		// Remove sub-string type entries
+		Map<String, Integer> outMap = terms;
+		if ( params.getRemoveSubTerms() ) {
+			outMap = cleanupSubStrings();
+		}
+		
 		// Sort by frequency if requested
 		//TODO
 		
@@ -170,7 +179,7 @@ public class SimpleTermExtractor {
 		try {
 			Util.createDirectories(params.getOutputPath());
 			writer = new PrintWriter(params.getOutputPath(), "UTF-8");
-			for ( Entry<String, Integer> entry : terms.entrySet() ) {
+			for ( Entry<String, Integer> entry : outMap.entrySet() ) {
 				writer.println(String.format("%d\t%s", entry.getValue(), entry.getKey()));
 			}
 		}
@@ -189,6 +198,50 @@ public class SimpleTermExtractor {
 		return terms;
 	}
 
+	private Map<String, Integer> cleanupSubStrings () {
+		// Sort by text of the term candidate, the longest first.
+		// This allows longest sub-string to be eliminated first, so shorter sub-strings
+		// that should be removed are not preserved because the count is off dur to the
+		// presence of the longer sub-strings.
+		Map<String, Integer> sortedTerms = new TreeMap<String, Integer>(Collections.reverseOrder());
+		sortedTerms.putAll(terms);
+		
+		// Prepare the iteration through all entries
+		Iterator<Entry<String, Integer>> iter1 = sortedTerms.entrySet().iterator();
+		Entry<String, Integer> entry1;
+		// Go through all entries
+		while ( iter1.hasNext() ) {
+			// Get the next entry1 to see if it is a sub-string to remove
+			entry1 = iter1.next();
+			Iterator<Entry<String, Integer>> iter2 = sortedTerms.entrySet().iterator();
+			Entry<String, Integer> entry2;
+			int count = 0;
+			String sub = entry1.getKey();
+			// Add separator to avoid real text sub-string (e.g. "word" part of "wording")
+			sub += getWordSeparator(sub.charAt(sub.length()-1));
+			// Go through all (other) entries
+			while ( iter2.hasNext() ) {
+				entry2 = iter2.next();
+				// If the entry2 contains entry1 (but is not entry1) then it's a super-string
+				// Note that we do need to check entry2!=entry1 as CJK terms may have no extra ending
+				if ( entry2.getKey().startsWith(sub) && !entry2.equals(entry1) ) {
+					// Count its occurrences
+					count += entry2.getValue();
+				}
+			}
+			// If entry1 occurs as many time as all its super-strings occur, then we remove it
+			if ( entry1.getValue() == count ) {
+				iter1.remove();
+			}
+			else { // Adjust the number of occurrences to reflect when the entry
+				// is found alone (not in a one of the super-string)
+				entry1.setValue(entry1.getValue()-count);
+			}
+		}
+		
+		return sortedTerms;
+	}
+	
 	private void addWord (List<String> list,
 		String token)
 	{

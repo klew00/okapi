@@ -41,6 +41,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private static final String NOSTARTWORDSPATH = "noStartWordsPath";
 	private static final String NOENDWORDSPATH = "noEndWordsPath";
 	private static final String KEEPCASE = "keepCase";
+	private static final String REMOVESUBTERMS = "removeSubTerms";
 	
 	private String outputPath;
 	private int minWordsPerTerm;
@@ -50,6 +51,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private String noStartWordsPath;
 	private String noEndWordsPath;
 	private boolean keepCase;
+	private boolean removeSubTerms;
 
 	public Parameters () {
 		reset();
@@ -119,6 +121,14 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.keepCase = keepCase;
 	}
 
+	public boolean getRemoveSubTerms () {
+		return removeSubTerms;
+	}
+
+	public void setRemoveSubTerms (boolean removeSubTerms) {
+		this.removeSubTerms = removeSubTerms;
+	}
+
 	@Override
 	public void reset () {
 		outputPath = "terms.txt";
@@ -129,6 +139,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		noStartWordsPath = "";
 		noEndWordsPath = "";
 		keepCase = false;
+		removeSubTerms = false;
 	}
 
 	@Override
@@ -143,6 +154,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		noStartWordsPath = buffer.getString(NOSTARTWORDSPATH, noStartWordsPath);
 		noEndWordsPath = buffer.getString(NOENDWORDSPATH, noEndWordsPath);
 		keepCase = buffer.getBoolean(KEEPCASE, keepCase);
+		removeSubTerms = buffer.getBoolean(REMOVESUBTERMS, removeSubTerms);
 	}
 
 	@Override
@@ -156,6 +168,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.setString(NOSTARTWORDSPATH, noStartWordsPath);
 		buffer.setString(NOENDWORDSPATH, noEndWordsPath);
 		buffer.setBoolean(KEEPCASE, keepCase);
+		buffer.setBoolean(REMOVESUBTERMS, removeSubTerms);
 		return buffer.toString();
 	}
 	
@@ -166,10 +179,11 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.add(MINWORDSPERTERM, "Minimum number of words per term", "A term will be made up at least of that many words");
 		desc.add(MAXWORDSPERTERM, "Maximum number of words per term", "A term will be made up at the most of that many words");
 		desc.add(MINOCCURRENCES, "Minimum number of occurrences", "A term will have at least that many occurrences");
-		desc.add(STOPWORDSPATH, "Path of the file with stop words", "Full path of the file containing stop words");
-		desc.add(NOSTARTWORDSPATH, "Path of the file with no-start words", "Full path of the file containing no-start words");
-		desc.add(NOENDWORDSPATH, "Path of the file with no-end words", "Full path of the file containing no-end words");
+		desc.add(STOPWORDSPATH, "Path of the file with stop words (leave empty for default)", "Full path of the file containing stop words");
+		desc.add(NOSTARTWORDSPATH, "Path of the file with no-start words (leave empty for default)", "Full path of the file containing no-start words");
+		desc.add(NOENDWORDSPATH, "Path of the file with no-end words (leave empty for default)", "Full path of the file containing no-end words");
 		desc.add(KEEPCASE, "Preserve case differences", null);
+		desc.add(REMOVESUBTERMS, "Remove entries that seem to be sub-strings of longer entries", null);
 		return desc;
 	}
 	
@@ -189,6 +203,9 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		sip.setRange(1, 999);
 		
 		CheckboxPart cbp = desc.addCheckboxPart(paramsDesc.get(KEEPCASE));
+		cbp.setVertical(true);
+		
+		cbp = desc.addCheckboxPart(paramsDesc.get(REMOVESUBTERMS));
 		cbp.setVertical(true);
 		
 		SeparatorPart sp = desc.addSeparatorPart();
