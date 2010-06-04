@@ -28,6 +28,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -57,7 +58,12 @@ public class SimpleTermExtractor {
 	private Map<String, Integer> terms;
 	private Locale srcLocale;
 	private BreakIterator breaker;
-	
+
+	/**
+	 * Initializes this extractor. This must be called before starting to process the input files.
+	 * @param params the options to use.
+	 * @param sourceLocaleId the source locale.
+	 */
 	public void initialize (Parameters params,
 		LocaleId sourceLocaleId)
 	{
@@ -70,6 +76,10 @@ public class SimpleTermExtractor {
 		breaker = null;
 	}
 	
+	/**
+	 * Processes a text unit for term extraction.
+	 * @param tu the text unit to process.
+	 */
 	public void processTextUnit (TextUnit tu) {
 		// Skip non-translatable
 		if ( !tu.isTranslatable() ) return;
@@ -143,6 +153,11 @@ public class SimpleTermExtractor {
 		}
 	}
 	
+	/**
+	 * Gets the string that is the separator to use between two words.
+	 * @param prevChar tha last character of the string where the separator needs to be added.
+	 * @return the separator (a space or empty)
+	 */
 	private String getWordSeparator (char prevChar) {
 		// Check the last character of the term
 		if ( prevChar > 0x0700 ) {
@@ -154,32 +169,38 @@ public class SimpleTermExtractor {
 		}
 		return " ";
 	}
-	
+
+	/**
+	 * Performs the post-processing clean-up. this must be called once all files
+	 * have been processed.  
+	 */
 	public void completeExtraction () {
 		// Remove entries with less occurrences than allowed
-		Iterator<Entry<String, Integer>> iter = terms.entrySet().iterator();
-		while ( iter.hasNext() ) {
-			Entry<String, Integer> entry = iter.next();
-			if ( entry.getValue() < params.getMinOccurrences() ) {
-				iter.remove();
-			}
+		// Do this first so there is less items to go through if we clean up the sub-strings
+		cleanupLowCounts(terms);
+		
+		// Remove sub-string entries if requested
+		if ( params.getRemoveSubTerms() ) {
+			// Create the new cleaned-up map, make sure to assign it properly
+			terms = cleanupSubStrings(terms);
+			// Then re-cleanup entries with less occurrences than allowed
+			cleanupLowCounts(terms);
 		}
 
-		// Remove sub-string type entries
-		Map<String, Integer> outMap = terms;
-		if ( params.getRemoveSubTerms() ) {
-			outMap = cleanupSubStrings();
+		// Sort alphabetically
+		terms = new TreeMap<String, Integer>(terms);
+
+		// Then sort by number of occurrences if requested
+		if ( params.getSortByOccurrence() ) {
+			terms = sortByValues(terms);
 		}
-		
-		// Sort by frequency if requested
-		//TODO
 		
 		// Output the report
 		PrintWriter writer = null;
 		try {
 			Util.createDirectories(params.getOutputPath());
 			writer = new PrintWriter(params.getOutputPath(), "UTF-8");
-			for ( Entry<String, Integer> entry : outMap.entrySet() ) {
+			for ( Entry<String, Integer> entry : terms.entrySet() ) {
 				writer.println(String.format("%d\t%s", entry.getValue(), entry.getKey()));
 			}
 		}
@@ -194,17 +215,41 @@ public class SimpleTermExtractor {
 		}
 	}
 	
+	/**
+	 * Gets the list of term candidates.
+	 * @return the list of term candidates.
+	 */
 	public Map<String, Integer> getTerms () {
 		return terms;
 	}
 
-	private Map<String, Integer> cleanupSubStrings () {
+	/**
+	 * Removes entries that have less occurrences than the minimum allowed.
+	 * The modifications are done directly in mapToClean. 
+	 * @param mapToClean the map to clean up
+	 */
+	private void cleanupLowCounts (Map<String, Integer> mapToClean) {
+		Iterator<Entry<String, Integer>> iter = mapToClean.entrySet().iterator();
+		while ( iter.hasNext() ) {
+			Entry<String, Integer> entry = iter.next();
+			if ( entry.getValue() < params.getMinOccurrences() ) {
+				iter.remove();
+			}
+		}
+	}
+
+	/**
+	 * Removes entries that look like sub-sequences of a longer entry.
+	 * @param mapToClean the map to clean up
+	 * @return a new map with only the entries left.
+	 */
+	private Map<String, Integer> cleanupSubStrings (Map<String, Integer> mapToClean) {
 		// Sort by text of the term candidate, the longest first.
 		// This allows longest sub-string to be eliminated first, so shorter sub-strings
 		// that should be removed are not preserved because the count is off dur to the
 		// presence of the longer sub-strings.
 		Map<String, Integer> sortedTerms = new TreeMap<String, Integer>(Collections.reverseOrder());
-		sortedTerms.putAll(terms);
+		sortedTerms.putAll(mapToClean);
 		
 		// Prepare the iteration through all entries
 		Iterator<Entry<String, Integer>> iter1 = sortedTerms.entrySet().iterator();
@@ -242,6 +287,11 @@ public class SimpleTermExtractor {
 		return sortedTerms;
 	}
 	
+	/**
+	 * Adds a word in a given list of words. 
+	 * @param list the list where to add the word.
+	 * @param token the word/token to add.
+	 */
 	private void addWord (List<String> list,
 		String token)
 	{
@@ -260,7 +310,12 @@ public class SimpleTermExtractor {
 		}
 	}
 
-	public List<String> getWordsFromDefaultBreaker (TextContainer tc) {
+	/**
+	 * Gets a list of words/tokens from a text container.
+	 * @param tc the text container to process.
+	 * @return the list of words/tokens.
+	 */
+	private List<String> getWordsFromDefaultBreaker (TextContainer tc) {
 		// Get the plain text to process
 		String content;
 		if ( tc.contentIsOneSegment() ) {
@@ -287,6 +342,12 @@ public class SimpleTermExtractor {
 		return words;
 	}
 
+	/**
+	 * Loads a list of words into a hash map.
+	 * @param path the path of the file to load or null/empty to load the default.
+	 * @param defaultFile the default file name to use if the provided path is null or empty.
+	 * @return a map of the words in the loaded file.
+	 */
 	private HashMap<String, Boolean> loadList (String path,
 		String defaultFile)
 	{
@@ -327,4 +388,22 @@ public class SimpleTermExtractor {
 		return map;
 	}
 
+	/**
+	 * Sorts a given map by its values.
+	 * @param map the map to sort.
+	 * @return the sorted map.
+	 */
+	private <K, V extends Comparable<V>> Map<K, V> sortByValues (final Map<K, V> map) { 
+		Comparator<K> valueComparator =  new Comparator<K> () { 
+			public int compare (K k1, K k2) { 
+		    	int res = map.get(k2).compareTo(map.get(k1)); 
+		        if (res == 0) return 1; 
+		        else return res; 
+		    } 
+		};
+		Map<K, V> sortedMap = new TreeMap<K, V>(valueComparator); 
+		sortedMap.putAll(map); 
+		return sortedMap;
+	}
+	
 }

@@ -42,6 +42,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private static final String NOTENDWORDSPATH = "notEndWordsPath";
 	private static final String KEEPCASE = "keepCase";
 	private static final String REMOVESUBTERMS = "removeSubTerms";
+	private static final String SORTBYOCCURRENCE = "sortByOccurrence";
 	
 	private String outputPath;
 	private int minWordsPerTerm;
@@ -52,6 +53,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private String notEndWordsPath;
 	private boolean keepCase;
 	private boolean removeSubTerms;
+	private boolean sortByOccurrence;
 
 	public Parameters () {
 		reset();
@@ -129,6 +131,14 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.removeSubTerms = removeSubTerms;
 	}
 
+	public boolean getSortByOccurrence () {
+		return sortByOccurrence;
+	}
+
+	public void setSortByOccurrence (boolean sortByOccurrence) {
+		this.sortByOccurrence = sortByOccurrence;
+	}
+
 	@Override
 	public void reset () {
 		outputPath = "terms.txt";
@@ -140,6 +150,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		notEndWordsPath = "";
 		keepCase = false;
 		removeSubTerms = false;
+		sortByOccurrence = false;
 	}
 
 	@Override
@@ -155,6 +166,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		notEndWordsPath = buffer.getString(NOTENDWORDSPATH, notEndWordsPath);
 		keepCase = buffer.getBoolean(KEEPCASE, keepCase);
 		removeSubTerms = buffer.getBoolean(REMOVESUBTERMS, removeSubTerms);
+		sortByOccurrence = buffer.getBoolean(SORTBYOCCURRENCE, sortByOccurrence);
 	}
 
 	@Override
@@ -169,6 +181,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.setString(NOTENDWORDSPATH, notEndWordsPath);
 		buffer.setBoolean(KEEPCASE, keepCase);
 		buffer.setBoolean(REMOVESUBTERMS, removeSubTerms);
+		buffer.setBoolean(SORTBYOCCURRENCE, sortByOccurrence);
 		return buffer.toString();
 	}
 	
@@ -184,6 +197,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.add(NOTENDWORDSPATH, "Path of the file with not-end words (leave empty for default)", "Full path of the file containing not-end words");
 		desc.add(KEEPCASE, "Preserve case differences", null);
 		desc.add(REMOVESUBTERMS, "Remove entries that seem to be sub-strings of longer entries", null);
+		desc.add(SORTBYOCCURRENCE, "Sort the results by the number of occurrences", null);
 		return desc;
 	}
 	
@@ -206,6 +220,9 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		cbp.setVertical(true);
 		
 		cbp = desc.addCheckboxPart(paramsDesc.get(REMOVESUBTERMS));
+		cbp.setVertical(true);
+		
+		cbp = desc.addCheckboxPart(paramsDesc.get(SORTBYOCCURRENCE));
 		cbp.setVertical(true);
 		
 		SeparatorPart sp = desc.addSeparatorPart();
