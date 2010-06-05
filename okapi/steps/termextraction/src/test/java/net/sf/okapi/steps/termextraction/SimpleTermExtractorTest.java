@@ -42,7 +42,7 @@ public class SimpleTermExtractorTest {
 
 	@Test
 	public void testSimpleCase () {
-		extr.initialize(params, LocaleId.ENGLISH);
+		extr.initialize(params, LocaleId.ENGLISH, null);
 		extr.processTextUnit(new TextUnit("id", "This is a test, a rather simple test."));
 		extr.completeExtraction();
 		Map<String, Integer> res = extr.getTerms();
@@ -52,7 +52,7 @@ public class SimpleTermExtractorTest {
 	@Test
 	public void testLongTextCaseWithMinOcc3 () {
 		params.setMinOccurrences(3);
-		extr.initialize(params, LocaleId.ENGLISH);
+		extr.initialize(params, LocaleId.ENGLISH, null);
 		extr.processTextUnit(createLongTU());
 		extr.completeExtraction();
 		Map<String, Integer> res = extr.getTerms();

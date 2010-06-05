@@ -34,6 +34,7 @@ import net.sf.okapi.common.uidescription.SpinInputPart;
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 	
 	private static final String OUTPUTPATH = "outputPath";
+	private static final String AUTOOPEN = "autoOpen";
 	private static final String MINWORDSPERTERM = "minWordsPerTerm";
 	private static final String MAXWORDSPERTERM = "maxWordsPerTerm";
 	private static final String MINOCCURRENCES = "minOccurrences";
@@ -45,6 +46,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private static final String SORTBYOCCURRENCE = "sortByOccurrence";
 	
 	private String outputPath;
+	private boolean autoOpen;
 	private int minWordsPerTerm;
 	private int maxWordsPerTerm;
 	private int minOccurrences;
@@ -139,9 +141,18 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.sortByOccurrence = sortByOccurrence;
 	}
 
+	public boolean getAutoOpen () {
+		return autoOpen;
+	}
+
+	public void setAutoOpen (boolean autoOpen) {
+		this.autoOpen = autoOpen;
+	}
+
 	@Override
 	public void reset () {
 		outputPath = "terms.txt";
+		autoOpen = false;
 		minWordsPerTerm = 1;
 		maxWordsPerTerm = 3;
 		minOccurrences = 2;
@@ -167,6 +178,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		keepCase = buffer.getBoolean(KEEPCASE, keepCase);
 		removeSubTerms = buffer.getBoolean(REMOVESUBTERMS, removeSubTerms);
 		sortByOccurrence = buffer.getBoolean(SORTBYOCCURRENCE, sortByOccurrence);
+		autoOpen = buffer.getBoolean(AUTOOPEN, autoOpen);
 	}
 
 	@Override
@@ -182,6 +194,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.setBoolean(KEEPCASE, keepCase);
 		buffer.setBoolean(REMOVESUBTERMS, removeSubTerms);
 		buffer.setBoolean(SORTBYOCCURRENCE, sortByOccurrence);
+		buffer.setBoolean(AUTOOPEN, autoOpen);
 		return buffer.toString();
 	}
 	
@@ -198,49 +211,47 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.add(KEEPCASE, "Preserve case differences", null);
 		desc.add(REMOVESUBTERMS, "Remove entries that seem to be sub-strings of longer entries", null);
 		desc.add(SORTBYOCCURRENCE, "Sort the results by the number of occurrences", null);
+		desc.add(SORTBYOCCURRENCE, "Sort the results by the number of occurrences", null);
+		desc.add(AUTOOPEN, "Open the result file after completion", null);
 		return desc;
 	}
 	
 	@Override
 	public EditorDescription createEditorDescription (ParametersDescription paramsDesc) {
-		EditorDescription desc = new EditorDescription("Term Extraction");
+		EditorDescription desc = new EditorDescription("Term Extraction", true, false);
 
 		PathInputPart pip = desc.addPathInputPart(paramsDesc.get(OUTPUTPATH), "Output File to Generate", true);
 		pip.setBrowseFilters("Text Files (*.txt)\tAll Files (*.*)", "*.txt\t*.*");
-		pip.setVertical(true);
+		desc.addCheckboxPart(paramsDesc.get(AUTOOPEN));
 
+		desc.addSeparatorPart();
+		
 		SpinInputPart sip = desc.addSpinInputPart(paramsDesc.get(MINWORDSPERTERM));
 		sip.setRange(1, 999);
+		sip.setVertical(false);
 		sip = desc.addSpinInputPart(paramsDesc.get(MAXWORDSPERTERM));
 		sip.setRange(1, 999);
+		sip.setVertical(false);
 		sip = desc.addSpinInputPart(paramsDesc.get(MINOCCURRENCES));
 		sip.setRange(1, 999);
+		sip.setVertical(false);
 		
-		CheckboxPart cbp = desc.addCheckboxPart(paramsDesc.get(KEEPCASE));
-		cbp.setVertical(true);
+		desc.addCheckboxPart(paramsDesc.get(KEEPCASE));
+		desc.addCheckboxPart(paramsDesc.get(REMOVESUBTERMS));
+		desc.addCheckboxPart(paramsDesc.get(SORTBYOCCURRENCE));
 		
-		cbp = desc.addCheckboxPart(paramsDesc.get(REMOVESUBTERMS));
-		cbp.setVertical(true);
-		
-		cbp = desc.addCheckboxPart(paramsDesc.get(SORTBYOCCURRENCE));
-		cbp.setVertical(true);
-		
-		SeparatorPart sp = desc.addSeparatorPart();
-		sp.setVertical(true);
+		desc.addSeparatorPart();
 		
 		pip = desc.addPathInputPart(paramsDesc.get(STOPWORDSPATH), "Stop Words File", false);
 		pip.setBrowseFilters("Text Files (*.txt)\tAll Files (*.*)", "*.txt\t*.*");
-		pip.setVertical(true);
 		pip.setAllowEmpty(true);
 
 		pip = desc.addPathInputPart(paramsDesc.get(NOTSTARTWORDSPATH), "Not-Start Words File", false);
 		pip.setBrowseFilters("Text Files (*.txt)\tAll Files (*.*)", "*.txt\t*.*");
-		pip.setVertical(true);
 		pip.setAllowEmpty(true);
 
 		pip = desc.addPathInputPart(paramsDesc.get(NOTENDWORDSPATH), "Not-End Words File", false);
 		pip.setBrowseFilters("Text Files (*.txt)\tAll Files (*.*)", "*.txt\t*.*");
-		pip.setVertical(true);
 		pip.setAllowEmpty(true);
 
 		return desc;

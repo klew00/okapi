@@ -20,10 +20,14 @@
 
 package net.sf.okapi.steps.termextraction;
 
+import java.io.File;
+import java.util.logging.Logger;
+
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.UsingParameters;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
@@ -31,9 +35,12 @@ import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 @UsingParameters(Parameters.class)
 public class TermExtractionStep extends BasePipelineStep {
 
+	private static final Logger LOGGER = Logger.getLogger(TermExtractionStep.class.getName());
+
 	private Parameters params;
 	private SimpleTermExtractor extractor;
 	private LocaleId sourceLocale;
+	private String rootDir;
 
 	public TermExtractionStep () {
 		params = new Parameters();
@@ -47,7 +54,7 @@ public class TermExtractionStep extends BasePipelineStep {
 
 	@Override
 	public String getDescription () {
-		return "Extract a list of possible terms for the source content. "
+		return "Extract a list of possible terms found in the source content. "
 			+ "Expects: filter events. Sends back: filter events.";
 	}
 
@@ -61,6 +68,11 @@ public class TermExtractionStep extends BasePipelineStep {
 		this.params = (Parameters)params;
 	}
 
+	@StepParameterMapping(parameterType = StepParameterType.ROOT_DIRECTORY)
+	public void setRootDirectory (String rootDir) {
+		this.rootDir = rootDir;
+	}
+
 	@StepParameterMapping(parameterType = StepParameterType.SOURCE_LOCALE)
 	public void setTargetLocale (LocaleId sourceLocale) {
 		this.sourceLocale = sourceLocale;
@@ -68,7 +80,7 @@ public class TermExtractionStep extends BasePipelineStep {
 	
 	@Override
 	protected Event handleStartBatch (Event event) {
-		extractor.initialize(params, sourceLocale);
+		extractor.initialize(params, sourceLocale, rootDir);
 		return event;
 	}
 	
@@ -81,6 +93,14 @@ public class TermExtractionStep extends BasePipelineStep {
 	@Override
 	protected Event handleEndBatch (Event event) {
 		extractor.completeExtraction();
+
+		String finalPath = Util.fillRootDirectoryVariable(params.getOutputPath(), rootDir);
+		LOGGER.info("Output: " + finalPath);
+		LOGGER.info(String.format("Candidate terms found = %d", extractor.getTerms().size()));
+
+		if ( params.getAutoOpen() ) {
+			Util.openURL((new File(finalPath)).getAbsolutePath());
+		}
 		return event;
 	}
 

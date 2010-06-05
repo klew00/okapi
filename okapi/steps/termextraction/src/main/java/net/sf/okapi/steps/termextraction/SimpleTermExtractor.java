@@ -51,24 +51,29 @@ import net.sf.okapi.steps.tokenization.tokens.Tokens;
 
 public class SimpleTermExtractor {
 
-	Parameters params;
+	private Parameters params;
 	private Map<String, Boolean> stopWords;
 	private Map<String, Boolean> notStartWords;
 	private Map<String, Boolean> notEndWords;
 	private Map<String, Integer> terms;
 	private Locale srcLocale;
 	private BreakIterator breaker;
+	private String rootDir;
 
 	/**
 	 * Initializes this extractor. This must be called before starting to process the input files.
 	 * @param params the options to use.
 	 * @param sourceLocaleId the source locale.
+	 * @param rootDir the value to use for the ${rootDir} variable (can be null).
 	 */
 	public void initialize (Parameters params,
-		LocaleId sourceLocaleId)
+		LocaleId sourceLocaleId,
+		String rootDir)
 	{
 		this.srcLocale = sourceLocaleId.toJavaLocale();
 		this.params = params;
+		this.rootDir = rootDir;
+		
 		stopWords = loadList(params.getStopWordsPath(), "stopWords_en.txt");
 		notStartWords = loadList(params.getNotStartWordsPath(), "notStartWords_en.txt");
 		notEndWords = loadList(params.getNotEndWordsPath(), "notEndWords_en.txt");
@@ -147,7 +152,6 @@ public class SimpleTermExtractor {
 				}
 				else {
 					terms.put(term, 1);
-					//count++;
 				}
 			}
 		}
@@ -195,11 +199,20 @@ public class SimpleTermExtractor {
 			terms = sortByValues(terms);
 		}
 		
+		// Create the results file
+		generateReport();
+	}
+
+	/**
+	 * Generates the report file with the results.
+	 */
+	private void generateReport () {
 		// Output the report
 		PrintWriter writer = null;
 		try {
-			Util.createDirectories(params.getOutputPath());
-			writer = new PrintWriter(params.getOutputPath(), "UTF-8");
+			String finalPath = Util.fillRootDirectoryVariable(params.getOutputPath(), rootDir);
+			Util.createDirectories(finalPath);
+			writer = new PrintWriter(finalPath, "UTF-8");
 			for ( Entry<String, Integer> entry : terms.entrySet() ) {
 				writer.println(String.format("%d\t%s", entry.getValue(), entry.getKey()));
 			}
