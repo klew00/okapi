@@ -25,17 +25,18 @@
 		<module>generatesimpletm</module>
 		<module>leveraging</module>
 		<module>linebreakconversion</module>
+        <module>qualitycheck</module>
 		<module>searchandreplace</module>
 		<module>segmentation</module>
         <module>sentence-aligner</module>
         <module>simplekit</module>
+        <module>termextraction</module>
 		<module>textmodification</module>
         <module>tokenization</module>
         <module>translationcomparison</module>
 		<module>uriconversion</module>
 		<module>wordcount</module>
         <module>xsltransform</module>
-        <module>termextraction</module>
 <!--        <module>xliffkit</module>-->
     </modules>
 </project>

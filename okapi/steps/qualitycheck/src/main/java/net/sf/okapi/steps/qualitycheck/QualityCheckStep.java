@@ -18,54 +18,46 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.termextraction;
-
-import java.io.File;
-import java.util.logging.Logger;
+package net.sf.okapi.steps.qualitycheck;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.UsingParameters;
-import net.sf.okapi.common.Util;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 
 @UsingParameters(Parameters.class)
-public class TermExtractionStep extends BasePipelineStep {
+public class QualityCheckStep extends BasePipelineStep {
 
-	private static final Logger LOGGER = Logger.getLogger(TermExtractionStep.class.getName());
-
-	private Parameters params;
-	private SimpleTermExtractor extractor;
-	private LocaleId sourceLocale;
+	private QualityChecker checker;
+	private LocaleId targetLocale;
 	private String rootDir;
 
-	public TermExtractionStep () {
-		params = new Parameters();
-		extractor = new SimpleTermExtractor();
+	public QualityCheckStep () {
+		checker = new QualityChecker();
 	}
 	
 	@Override
 	public String getName () {
-		return "Term Extraction";
+		return "Quality Check";
 	}
 
 	@Override
 	public String getDescription () {
-		return "Extract a list of possible terms found in the source content. "
+		return "Compare source and target for quality. "
 			+ "Expects: filter events. Sends back: filter events.";
 	}
 
 	@Override
 	public IParameters getParameters () {
-		return params;
+		return checker.getParameters();
 	}
 
 	@Override
 	public void setParameters (IParameters params) {
-		this.params = (Parameters)params;
+		checker.setParameters((Parameters)params);
 	}
 
 	@StepParameterMapping(parameterType = StepParameterType.ROOT_DIRECTORY)
@@ -73,34 +65,26 @@ public class TermExtractionStep extends BasePipelineStep {
 		this.rootDir = rootDir;
 	}
 
-	@StepParameterMapping(parameterType = StepParameterType.SOURCE_LOCALE)
-	public void setSourcetLocale (LocaleId sourceLocale) {
-		this.sourceLocale = sourceLocale;
+	@StepParameterMapping(parameterType = StepParameterType.TARGET_LOCALE)
+	public void setTargetLocale (LocaleId targetLocale) {
+		this.targetLocale = targetLocale;
 	}
 	
 	@Override
 	protected Event handleStartBatch (Event event) {
-		extractor.initialize(params, sourceLocale, rootDir);
+		checker.initialize(targetLocale, rootDir);
 		return event;
 	}
 	
 	@Override
 	protected Event handleTextUnit (Event event) {
-		extractor.processTextUnit(event.getTextUnit());
+		checker.processTextUnit(event.getTextUnit());
 		return event;
 	}
 	
 	@Override
 	protected Event handleEndBatch (Event event) {
-		extractor.completeExtraction();
-
-		String finalPath = Util.fillRootDirectoryVariable(params.getOutputPath(), rootDir);
-		LOGGER.info("Output: " + finalPath);
-		LOGGER.info(String.format("Candidate terms found = %d", extractor.getTerms().size()));
-
-		if ( params.getAutoOpen() ) {
-			Util.openURL((new File(finalPath)).getAbsolutePath());
-		}
+		checker.completeProcess();
 		return event;
 	}
 

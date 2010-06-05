@@ -262,17 +262,17 @@
 		</dependency>
 		<dependency>
 			<groupId>net.sf.okapi.steps</groupId>
+			<artifactId>okapi-step-qualitycheck-ui</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.okapi.steps</groupId>
 			<artifactId>okapi-step-searchandreplace-ui</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.okapi.steps</groupId>
 			<artifactId>okapi-step-segmentation-ui</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sf.okapi.steps</groupId>
-			<artifactId>okapi-step-sentence-aligner</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -295,6 +295,12 @@
 			<artifactId>okapi-step-uriconversion-ui</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+
+		<dependency>
+			<groupId>net.sf.okapi.steps</groupId>
+			<artifactId>okapi-step-sentence-aligner</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>net.sf.okapi.steps</groupId>
 			<artifactId>okapi-step-common</artifactId>
@@ -303,6 +309,11 @@
 	 	<dependency>
 			<groupId>net.sf.okapi.steps</groupId>
 			<artifactId>okapi-step-charlisting</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	 	<dependency>
+			<groupId>net.sf.okapi.steps</groupId>
+			<artifactId>okapi-step-qualitycheck</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	 	<dependency>

@@ -148,6 +148,8 @@
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi-ui/swt/steps/linebreakconversion-ui/target/classes"
 			 excludes="**/META-INF/**"/>
+			<fileset dir="../../okapi-ui/swt/steps/qualitycheck-ui/target/classes"
+			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi-ui/swt/steps/searchandreplace-ui/target/classes"
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi-ui/swt/steps/segmentation-ui/target/classes"

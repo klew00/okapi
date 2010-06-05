@@ -48,7 +48,7 @@ import net.sf.okapi.common.plugins.PluginsManager;
 
 public class PipelineWrapper {
 	
-	private final Logger LOGGER = Logger.getLogger(getClass().getName());
+	private static final Logger LOGGER = Logger.getLogger(PipelineWrapper.class.getName());
 
 	private Map<String, StepInfo> availableSteps;
 	private String path;
@@ -307,6 +307,18 @@ public class PipelineWrapper {
 //			availableSteps.put(step.id, step);
 
 			ps = (IPipelineStep)Class.forName(
+				"net.sf.okapi.steps.qualitycheck.QualityCheckStep").newInstance();
+			params = ps.getParameters();
+			step = new StepInfo(ps.getClass().getSimpleName(),
+				ps.getName(), ps.getDescription(), ps.getClass().getName(), null,
+				params.getClass().getName());
+			if ( params != null ) {
+				step.paramsData = params.toString();
+				peMapper.addEditor("net.sf.okapi.steps.qualitycheck.ui.ParametersEditor", step.paramsClass);
+			}
+			availableSteps.put(step.id, step);
+
+			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.searchandreplace.SearchAndReplaceStep").newInstance();
 			params = ps.getParameters();
 			step = new StepInfo(ps.getClass().getSimpleName(),
@@ -475,13 +487,13 @@ public class PipelineWrapper {
 
 		}
 		catch ( InstantiationException e ) {
-			e.printStackTrace();
+			LOGGER.warning("Could not instantiate a step.\n" + e.getMessage());
 		}
 		catch ( IllegalAccessException e ) {
-			e.printStackTrace();
+			LOGGER.warning("Illegal access for a step.\n" + e.getMessage());
 		}
 		catch ( ClassNotFoundException e ) {
-			e.printStackTrace();
+			LOGGER.warning("Step class not found.\n" + e.getMessage());
 		}		
 	}
 	
