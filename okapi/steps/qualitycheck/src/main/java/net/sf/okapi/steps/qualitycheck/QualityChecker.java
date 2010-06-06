@@ -28,6 +28,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.Segment;
+import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 
@@ -50,10 +51,21 @@ public class QualityChecker {
 		repWriter = new XMLWriter(finalPath);
 		repWriter.writeStartDocument();
 		repWriter.writeStartElement("html");
-		repWriter.writeRawXML("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"/>");
-		repWriter.writeStartElement("head");
-		repWriter.writeEndElementLineBreak();
+		repWriter.writeRawXML("<head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />"
+			+ "<title>Quality Check Report</title><style type=\"text/css\">"
+			+ "body { font-family: Verdana; font-size: smaller; }"
+			+ "h1 { font-size: 110%; }"
+			+ "h2 { font-size: 100%; }"
+			+ "h3 { font-size: 100%; }"
+			+ "p.item { font-family: Courier New, courier; font-size: 100%; white-space: pre;"
+			+ "   border: solid 1px; padding: 0.5em; border-color: silver; background-color: whitesmoke; }"
+      		+ "pre { font-family: Courier New, courier; font-size: 100%;"
+      		+ "   border: solid 1px; padding: 0.5em; border-color: silver; background-color: whitesmoke; }"
+			+ "span.hi { background-color: #FFFF00; }"
+			+ "</style></head>");
 		repWriter.writeStartElement("body");
+		repWriter.writeLineBreak();
+		repWriter.writeElementString("h1", "Quality Check Report");
 	}
 
 	public Parameters getParameters () {
@@ -68,6 +80,13 @@ public class QualityChecker {
 		return issues;
 	}
 	
+	public  void processStartDocument (StartDocument sd) {
+		if ( repWriter != null ) {
+			repWriter.writeRawXML("<hr />");
+			repWriter.writeElementString("p", "Input: "+sd.getName());
+		}
+	}
+	
 	public void processTextUnit (TextUnit tu) {
 		// Skip non-translatable entries
 		if ( !tu.isTranslatable() ) return;
@@ -79,33 +98,44 @@ public class QualityChecker {
 		// Check if we have a target (even if option disabled)
 		if ( trgCont == null ) {
 			// No translation available
-			reportIssue(IssueType.MISSING_TARGETTU,
-				String.format("Missing translation for id=%s", tu.getId()),
+			reportIssue(IssueType.MISSING_TARGETTU, tu, null,
+				"Missing translation.",
 				0, 0, 0, 0, srcCont.toString(), "");
 			return;
 		}
 		
 		tu.synchronizeSourceSegmentation(trgLoc);
-		// Check for missing/empty target
-		if ( params.getMissingTarget() ) {
-			ISegments srcSegs = srcCont.getSegments();
-			ISegments trgSegs = trgCont.getSegments();
-			for ( Segment srcSeg : srcSegs ) {
-				Segment trgSeg = trgSegs.get(srcSeg.getId());
-				if ( trgSeg == null ) {
-					reportIssue(IssueType.MISSING_TARGETSEG,
-						String.format("Missing translation for id=%s segment=%s", tu.getId(), srcSeg.getId()),
-						0, 0, 0, 0, srcSeg.toString(), "");
-					continue;
-				}
+		ISegments srcSegs = srcCont.getSegments();
+		ISegments trgSegs = trgCont.getSegments();
+		for ( Segment srcSeg : srcSegs ) {
+			Segment trgSeg = trgSegs.get(srcSeg.getId());
+			if ( trgSeg == null ) {
+				reportIssue(IssueType.MISSING_TARGETSEG, tu, srcSeg.getId(),
+					"Missing translation.",
+					0, 0, 0, 0, srcSeg.toString(), "");
+				continue; // Cannot go further for that segment
+			}
+			
+			if ( params.getMissingTarget() ) {
 				if ( trgSeg.text.isEmpty() && !srcSeg.text.isEmpty() ) {
-					reportIssue(IssueType.EMPTY_TARGETSEG,
-						String.format("Empty translation for id=%s segment=%s", tu.getId(), srcSeg.getId()),
+					reportIssue(IssueType.EMPTY_TARGETSEG, tu, srcSeg.getId(),
+						"Empty translation.",
 						0, 0, 0, 0, srcSeg.toString(), "");
 				}
 			}
+			
+			if ( params.getTargetSameAsSource() ) {
+				if ( srcSeg.text.hasText() ) {
+					if ( srcSeg.text.compareTo(trgSeg.text, params.getTargetSameAsSourceWithCodes()) == 0 ) {
+						reportIssue(IssueType.TARGET_SAME_AS_SOURCE, tu, srcSeg.getId(),
+							"Translation is the same as the source.",
+							0, 0, 0, 0, srcSeg.toString(), trgSeg.toString());
+					}
+				}
+			}
+			
 		}
-		
+
 		String srcOri = null;
 		if ( srcCont.contentIsOneSegment() ) {
 			srcOri = srcCont.toString();
@@ -122,7 +152,7 @@ public class QualityChecker {
 			trgOri = trgCont.getUnSegmentedContentCopy().toString();
 		}
 
-		checkWhiteSpaces(srcOri, trgOri);
+		checkWhiteSpaces(srcOri, trgOri, tu);
 	}
 
 	public void completeProcess () {
@@ -135,7 +165,8 @@ public class QualityChecker {
 	}
 	
 	private void checkWhiteSpaces (String srcOri,
-		String trgOri)
+		String trgOri,
+		TextUnit tu)
 	{
 		// Check for leading whitespaces
 		if ( params.getLeadingWS() ) {
@@ -145,12 +176,16 @@ public class QualityChecker {
 				if ( Character.isWhitespace(srcOri.charAt(i)) ) {
 					if ( srcOri.length() > i ) {
 						if ( trgOri.charAt(i) != srcOri.charAt(i) ) {
-							//reportIssue("QC_WSMISSINGORDIFFERENT"), i), i, 1, -1, 0);
+							reportIssue(IssueType.MISSINGORDIFF_LEADINGWS, tu, null,
+								String.format("Missing or different leading white space at position %d.", i),
+								i, 1, -1, 0, srcOri, trgOri);
 							break;
 						}
 					}
 					else {
-						//ReportIssue(string.Format(m_RM.GetString("QC_WSMISSING"), i), i, 1, -1, 0);
+						reportIssue(IssueType.MISSING_LEADINGWS, tu, null,
+							String.format("Missing leading white space at position %d.", i),
+							i, 1, -1, 0, srcOri, trgOri);
 					}
 				}
 				else break;
@@ -161,12 +196,16 @@ public class QualityChecker {
 				if ( Character.isWhitespace(trgOri.charAt(i)) ) {
 					if ( srcOri.length() > i ) {
 						if ( srcOri.charAt(i) != trgOri.charAt(i) ) {
-							//ReportIssue(string.Format(m_RM.GetString("QC_WSEXTRAORDIFFERENT"), i), -1, 0, i, 1);
+							reportIssue(IssueType.EXTRAORDIFF_LEADINGWS, tu, null,
+								String.format("Extra or different leading white space at position %d.", i),
+								-1, 0, i, 1, srcOri, trgOri);
 							break;
 						}
 					}
 					else {
-						//ReportIssue(string.Format(m_RM.GetString("QC_WSEXTRA"), i),} -1, 0, i, 1);
+						reportIssue(IssueType.EXTRA_LEADINGWS, tu, null,
+							String.format("Extra leading white space at position %d.", i),
+							-1, 0, i, 1, srcOri, trgOri);
 					}
 				}
 				else break;
@@ -182,15 +221,15 @@ public class QualityChecker {
 				if ( Character.isWhitespace(srcOri.charAt(i)) ) {
 					if ( j >= 0 ) {
 						if ( trgOri.charAt(j) != srcOri.charAt(i) ) {
-							reportIssue(IssueType.MISSINGORDIFF_TRAILINGWS,
-								String.format("Missing or different white space at position %d", i),
+							reportIssue(IssueType.MISSINGORDIFF_TRAILINGWS, tu, null,
+								String.format("Missing or different trailing white space at position %d", i),
 								i, 1, -1, 0, srcOri, trgOri);
 							break;
 						}
 					}
 					else {
-						reportIssue(IssueType.MISSING_TRAILINGWS,
-							String.format("Missing white space at position %d.", i),
+						reportIssue(IssueType.MISSING_TRAILINGWS, tu, null,
+							String.format("Missing trailing white space at position %d.", i),
 							i, 1, -1, 0, srcOri, trgOri);
 					}
 				}
@@ -204,15 +243,15 @@ public class QualityChecker {
 				if ( Character.isWhitespace(trgOri.charAt(i)) ) {
 					if ( j >= 0 ) {
 						if ( srcOri.charAt(j) != trgOri.charAt(i) ) {
-							reportIssue(IssueType.EXTRAORDIFF_TRAILINGWS,
-								String.format("Extra or different white space at position %d.", i),
+							reportIssue(IssueType.EXTRAORDIFF_TRAILINGWS, tu, null,
+								String.format("Extra or different trailing white space at position %d.", i),
 								-1, 0, i, 1, srcOri, trgOri);
 							break;
 						}
 					}
 					else {
-						reportIssue(IssueType.EXTRA_TRAILINGWS,
-							String.format("Extra white space at position %d.", i),
+						reportIssue(IssueType.EXTRA_TRAILINGWS, tu, null,
+							String.format("Extra white trailing space at position %d.", i),
 							-1, 0, i, 1, srcOri, trgOri);
 					}
 				}
@@ -224,6 +263,8 @@ public class QualityChecker {
 	}
 
 	private void reportIssue (IssueType issueType,
+		TextUnit tu,
+		String segId,
 		String message,
 		int srcStart,
 		int srcLength,
@@ -232,25 +273,26 @@ public class QualityChecker {
 		String srcOri,
 		String trgOri)
 	{
-		Issue issue = new Issue(issueType, message, srcStart, srcLength, trgStart, trgLength);
+		Issue issue = new Issue(issueType, tu.getId(), segId, message, srcStart, srcLength, trgStart, trgLength);
 		issues.add(issue);
 
 		if ( repWriter != null ) {
-			repWriter.writeStartElement("table");
+			String position = String.format("ID=%s", tu.getId());
+			if ( tu.getName() != null ) {
+				position += (" ("+tu.getName()+")");
+			}
+			if ( segId != null ) {
+				position += String.format(", segment=%s", segId);
+			}
+			repWriter.writeElementString("p", position+": "+issue.message);
+			
+			repWriter.writeRawXML("<p class=\"item\">");
+			repWriter.writeString("Source: ["+Util.escapeToXML(srcOri, 0, false, null)+"]");
+			repWriter.writeRawXML("<br />");
+			repWriter.writeString("Target: ["+Util.escapeToXML(trgOri, 0, false, null)+"]");
+			repWriter.writeRawXML("</p>");
 
-			repWriter.writeRawXML("<tr><td colspan=\"2\">");
-			repWriter.writeElementString("p", issue.message);
-			repWriter.writeRawXML("</td>");
-			
-			repWriter.writeRawXML("<tr><td>Src:</td><td>");
-			repWriter.writeElementString("pre", srcOri);
-			repWriter.writeRawXML("</td></td>");
-			
-			repWriter.writeRawXML("<tr><td>Trg:</td><td>");
-			repWriter.writeElementString("pre", trgOri);
-			repWriter.writeRawXML("</td></td>");
-			
-			repWriter.writeEndElementLineBreak(); // table
+			repWriter.writeLineBreak();
 		}
 	}
 

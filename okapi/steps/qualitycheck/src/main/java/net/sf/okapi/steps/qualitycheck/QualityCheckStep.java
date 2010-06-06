@@ -20,16 +20,23 @@
 
 package net.sf.okapi.steps.qualitycheck;
 
+import java.io.File;
+import java.util.logging.Logger;
+
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.UsingParameters;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
+import net.sf.okapi.common.resource.StartDocument;
 
 @UsingParameters(Parameters.class)
 public class QualityCheckStep extends BasePipelineStep {
+
+	private static final Logger LOGGER = Logger.getLogger(QualityCheckStep.class.getName());
 
 	private QualityChecker checker;
 	private LocaleId targetLocale;
@@ -77,6 +84,12 @@ public class QualityCheckStep extends BasePipelineStep {
 	}
 	
 	@Override
+	protected Event handleStartDocument (Event event) {
+		checker.processStartDocument((StartDocument)event.getResource());
+		return event;
+	}
+	
+	@Override
 	protected Event handleTextUnit (Event event) {
 		checker.processTextUnit(event.getTextUnit());
 		return event;
@@ -85,6 +98,20 @@ public class QualityCheckStep extends BasePipelineStep {
 	@Override
 	protected Event handleEndBatch (Event event) {
 		checker.completeProcess();
+		
+		String finalPath = Util.fillRootDirectoryVariable(checker.getParameters().getOutputPath(), rootDir);
+		LOGGER.info("\nOutput: " + finalPath);
+		int count = checker.getIssues().size();
+		if ( count == 0 ) {
+			LOGGER.info("No issue found.");
+		}
+		else {
+			LOGGER.warning(String.format("Number of issues found = %d", count));
+		}
+
+		if ( checker.getParameters().getAutoOpen() ) {
+			Util.openURL((new File(finalPath)).getAbsolutePath());
+		}
 		return event;
 	}
 

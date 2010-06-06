@@ -52,6 +52,8 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Button chkLeadingWS;
 	private Button chkTrailingWS;
 	private Button chkMissingTarget;
+	private Button chkTargetSameAsSource;
+	private Button chkTargetSameAsSourceWithCodes;
 	private Composite mainComposite;
 	
 	public boolean edit (IParameters params,
@@ -158,6 +160,21 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		
 		chkMissingTarget = new Button(mainComposite, SWT.CHECK);
 		chkMissingTarget.setText("Missing or empty translation");
+
+		chkTargetSameAsSource = new Button(mainComposite, SWT.CHECK);
+		chkTargetSameAsSource.setText("Target is the same as the source (when it has text)");
+		chkTargetSameAsSource.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				updateTargetSameAsSourceWithCodes();
+			};
+		});
+		
+		chkTargetSameAsSourceWithCodes = new Button(mainComposite, SWT.CHECK);
+		chkTargetSameAsSourceWithCodes.setText("Include the codes in the comparison");
+		GridData gdTmp = new GridData();
+		gdTmp.horizontalIndent = 16;
+		chkTargetSameAsSourceWithCodes.setLayoutData(gdTmp);
+
 	}
 	
 	private boolean showDialog () {
@@ -168,17 +185,28 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		}
 		return result;
 	}
+	
+	private void updateTargetSameAsSourceWithCodes () {
+		chkTargetSameAsSourceWithCodes.setEnabled(chkTargetSameAsSource.getSelection());
+	}
 
 	private void setData () {
 		chkLeadingWS.setSelection(params.getLeadingWS());
 		chkTrailingWS.setSelection(params.getTrailingWS());
 		chkMissingTarget.setSelection(params.getMissingTarget());
+		chkTargetSameAsSource.setSelection(params.getTargetSameAsSource());
+		chkTargetSameAsSourceWithCodes.setSelection(params.getTargetSameAsSourceWithCodes());
+		updateTargetSameAsSourceWithCodes();
 	}
 
 	private boolean saveData () {
 		params.setLeadingWS(chkLeadingWS.getSelection());
 		params.setTrailingWS(chkTrailingWS.getSelection());
 		params.setMissingTarget(chkMissingTarget.getSelection());
+		params.setTargetSameAsSource(chkTargetSameAsSource.getSelection());
+		if ( chkTargetSameAsSourceWithCodes.isEnabled() ) {
+			params.setTargetSameAsSourceWithCodes(chkTargetSameAsSourceWithCodes.getSelection());
+		}
 		result = true;
 		return result;
 	}

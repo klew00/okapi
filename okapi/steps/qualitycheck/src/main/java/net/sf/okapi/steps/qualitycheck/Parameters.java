@@ -29,12 +29,16 @@ public class Parameters extends BaseParameters {
 	private static final String LEADINGWS = "leadingWS";
 	private static final String TRAILINGWS = "trailingWS";
 	private static final String MISSINGTARGET = "missingTarget";
+	private static final String TARGETSAMEASSOURCE = "targetSameAsSource";
+	private static final String TARGETSAMEASSOURCE_WITHCODES = "targetSameAsSourceWithCodes";
 
 	String outputPath;
 	boolean autoOpen;
 	boolean leadingWS;
 	boolean trailingWS;
 	boolean missingTarget;
+	boolean targetSameAsSource;
+	boolean targetSameAsSourceWithCodes;
 
 	public Parameters () {
 		reset();
@@ -80,6 +84,22 @@ public class Parameters extends BaseParameters {
 		this.missingTarget = missingTarget;
 	}
 
+	public boolean getTargetSameAsSource () {
+		return targetSameAsSource;
+	}
+
+	public void setTargetSameAsSource (boolean targetSameAsSource) {
+		this.targetSameAsSource = targetSameAsSource;
+	}
+
+	public boolean getTargetSameAsSourceWithCodes () {
+		return targetSameAsSourceWithCodes;
+	}
+
+	public void setTargetSameAsSourceWithCodes (boolean targetSameAsSourceWithCodes) {
+		this.targetSameAsSourceWithCodes = targetSameAsSourceWithCodes;
+	}
+
 	@Override
 	public void reset () {
 		outputPath = "${rootDir}/qaReport.html";
@@ -87,6 +107,8 @@ public class Parameters extends BaseParameters {
 		leadingWS = true;
 		trailingWS = true;
 		missingTarget = true;
+		targetSameAsSource = true;
+		targetSameAsSourceWithCodes = true;
 	}
 
 	@Override
@@ -98,6 +120,8 @@ public class Parameters extends BaseParameters {
 		leadingWS = buffer.getBoolean(LEADINGWS, leadingWS);
 		trailingWS = buffer.getBoolean(TRAILINGWS, trailingWS);
 		missingTarget = buffer.getBoolean(MISSINGTARGET, missingTarget);
+		targetSameAsSource = buffer.getBoolean(TARGETSAMEASSOURCE, targetSameAsSource);
+		targetSameAsSourceWithCodes = buffer.getBoolean(TARGETSAMEASSOURCE_WITHCODES, targetSameAsSourceWithCodes);
 	}
 
 	@Override
@@ -108,6 +132,8 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean(LEADINGWS, leadingWS);
 		buffer.setBoolean(TRAILINGWS, trailingWS);
 		buffer.setBoolean(MISSINGTARGET, missingTarget);
+		buffer.setBoolean(TARGETSAMEASSOURCE, targetSameAsSource);
+		buffer.setBoolean(TARGETSAMEASSOURCE_WITHCODES, targetSameAsSourceWithCodes);
 		return buffer.toString();
 	}
 	
