@@ -28,7 +28,7 @@ public class Parameters extends BaseParameters {
 	private static final String AUTOOPEN = "autoOpen";
 	private static final String LEADINGWS = "leadingWS";
 	private static final String TRAILINGWS = "trailingWS";
-	private static final String MISSINGTARGET = "missingTarget";
+	private static final String EMPTYTARGET = "emptyTarget";
 	private static final String TARGETSAMEASSOURCE = "targetSameAsSource";
 	private static final String TARGETSAMEASSOURCE_WITHCODES = "targetSameAsSourceWithCodes";
 
@@ -36,7 +36,7 @@ public class Parameters extends BaseParameters {
 	boolean autoOpen;
 	boolean leadingWS;
 	boolean trailingWS;
-	boolean missingTarget;
+	boolean emptyTarget;
 	boolean targetSameAsSource;
 	boolean targetSameAsSourceWithCodes;
 
@@ -76,12 +76,12 @@ public class Parameters extends BaseParameters {
 		this.trailingWS = trailingWS;
 	}
 
-	public boolean getMissingTarget () {
-		return missingTarget;
+	public boolean getEmptyTarget () {
+		return emptyTarget;
 	}
 
-	public void setMissingTarget (boolean missingTarget) {
-		this.missingTarget = missingTarget;
+	public void setEmptyTarget (boolean emptyTarget) {
+		this.emptyTarget = emptyTarget;
 	}
 
 	public boolean getTargetSameAsSource () {
@@ -106,7 +106,7 @@ public class Parameters extends BaseParameters {
 		autoOpen = false;
 		leadingWS = true;
 		trailingWS = true;
-		missingTarget = true;
+		emptyTarget = true;
 		targetSameAsSource = true;
 		targetSameAsSourceWithCodes = true;
 	}
@@ -119,7 +119,7 @@ public class Parameters extends BaseParameters {
 		autoOpen = buffer.getBoolean(AUTOOPEN, autoOpen);
 		leadingWS = buffer.getBoolean(LEADINGWS, leadingWS);
 		trailingWS = buffer.getBoolean(TRAILINGWS, trailingWS);
-		missingTarget = buffer.getBoolean(MISSINGTARGET, missingTarget);
+		emptyTarget = buffer.getBoolean(EMPTYTARGET, emptyTarget);
 		targetSameAsSource = buffer.getBoolean(TARGETSAMEASSOURCE, targetSameAsSource);
 		targetSameAsSourceWithCodes = buffer.getBoolean(TARGETSAMEASSOURCE_WITHCODES, targetSameAsSourceWithCodes);
 	}
@@ -131,7 +131,7 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean(AUTOOPEN, autoOpen);
 		buffer.setBoolean(LEADINGWS, leadingWS);
 		buffer.setBoolean(TRAILINGWS, trailingWS);
-		buffer.setBoolean(MISSINGTARGET, missingTarget);
+		buffer.setBoolean(EMPTYTARGET, emptyTarget);
 		buffer.setBoolean(TARGETSAMEASSOURCE, targetSameAsSource);
 		buffer.setBoolean(TARGETSAMEASSOURCE_WITHCODES, targetSameAsSourceWithCodes);
 		return buffer.toString();

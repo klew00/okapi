@@ -47,6 +47,7 @@ import net.sf.okapi.applications.rainbow.pipeline.IPredefinedPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.ImportTMPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.PipelineEditor;
 import net.sf.okapi.applications.rainbow.pipeline.PipelineWrapper;
+import net.sf.okapi.applications.rainbow.pipeline.QualityCheckPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.SnRWithFilterPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.TermExtractionPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.TextRewritingPipeline;
@@ -1418,6 +1419,14 @@ public class MainForm { //implements IParametersProvider {
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				executePipeline(new TermExtractionPipeline());
+			}
+		});
+		
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "utilities.qualitycheck"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				executePipeline(new QualityCheckPipeline());
 			}
 		});
 		

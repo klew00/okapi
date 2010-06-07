@@ -116,7 +116,7 @@ public class QualityChecker {
 				continue; // Cannot go further for that segment
 			}
 			
-			if ( params.getMissingTarget() ) {
+			if ( params.getEmptyTarget() ) {
 				if ( trgSeg.text.isEmpty() && !srcSeg.text.isEmpty() ) {
 					reportIssue(IssueType.EMPTY_TARGETSEG, tu, srcSeg.getId(),
 						"Empty translation.",

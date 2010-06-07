@@ -51,7 +51,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private IHelp help;
 	private Button chkLeadingWS;
 	private Button chkTrailingWS;
-	private Button chkMissingTarget;
+	private Button chkEmptyTarget;
 	private Button chkTargetSameAsSource;
 	private Button chkTargetSameAsSourceWithCodes;
 	private Composite mainComposite;
@@ -152,15 +152,15 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		Label label = new Label(mainComposite, SWT.NONE);
 		label.setText("Verify the following items:");
 		
+		chkEmptyTarget = new Button(mainComposite, SWT.CHECK);
+		chkEmptyTarget.setText("Empty translation");
+
 		chkLeadingWS = new Button(mainComposite, SWT.CHECK);
 		chkLeadingWS.setText("Leading white spaces");
 		
 		chkTrailingWS = new Button(mainComposite, SWT.CHECK);
-		chkTrailingWS.setText("Trailing white sapces");
+		chkTrailingWS.setText("Trailing white spaces");
 		
-		chkMissingTarget = new Button(mainComposite, SWT.CHECK);
-		chkMissingTarget.setText("Missing or empty translation");
-
 		chkTargetSameAsSource = new Button(mainComposite, SWT.CHECK);
 		chkTargetSameAsSource.setText("Target is the same as the source (when it has text)");
 		chkTargetSameAsSource.addSelectionListener(new SelectionAdapter() {
@@ -193,7 +193,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private void setData () {
 		chkLeadingWS.setSelection(params.getLeadingWS());
 		chkTrailingWS.setSelection(params.getTrailingWS());
-		chkMissingTarget.setSelection(params.getMissingTarget());
+		chkEmptyTarget.setSelection(params.getEmptyTarget());
 		chkTargetSameAsSource.setSelection(params.getTargetSameAsSource());
 		chkTargetSameAsSourceWithCodes.setSelection(params.getTargetSameAsSourceWithCodes());
 		updateTargetSameAsSourceWithCodes();
@@ -202,7 +202,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private boolean saveData () {
 		params.setLeadingWS(chkLeadingWS.getSelection());
 		params.setTrailingWS(chkTrailingWS.getSelection());
-		params.setMissingTarget(chkMissingTarget.getSelection());
+		params.setEmptyTarget(chkEmptyTarget.getSelection());
 		params.setTargetSameAsSource(chkTargetSameAsSource.getSelection());
 		if ( chkTargetSameAsSourceWithCodes.isEnabled() ) {
 			params.setTargetSameAsSourceWithCodes(chkTargetSameAsSourceWithCodes.getSelection());

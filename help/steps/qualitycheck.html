@@ -45,7 +45,20 @@ Sends: Filter events</p>
 generate. You can use the variable <code>${rootDir}</code> in the path.</p>
 <p><cite>Open the result file after completion</cite> -- Set this option to 
 automatically open the report file after the process is complete.</p>
+<p><cite>Empty translation</cite> -- Set this option to flag the segments for 
+which the translation is empty (if the corresponding source is not empty).</p>
+<p><cite>Leading white spaces</cite> -- Set this option&nbsp; to flag the text 
+units where the leading white spaces are different between source and target.</p>
+<p><cite>Trailing white spaces</cite> -- Set this option to flag the text units 
+where the trailing white spaces are different between source and target.</p>
+<p><cite>Target is the same as the source</cite> -- Set this option to flag the 
+segments where the translation is the same as the source.</p>
+<p><cite>Include the codes in the comparison</cite> -- Set this option if the 
+comparison done when verifying if the target is the same as the source should 
+take inline codes into account. If this option is set and the only difference 
+between the source and the translation is the inline code, the segment will not 
+be flagged as having the target the same as the source. This option is enabled 
+only when <cite>Target is the same as the source</cite> is set.</p>
 <p>&nbsp;</p>
-<p>TODO</p>
 </body>
 </html>

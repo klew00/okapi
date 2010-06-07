@@ -115,8 +115,8 @@ public class QualityCheckerTest {
 
 	@Test
 	public void testMISSINGORDIFF_TRAILINGWS () {
-		TextUnit tu = new TextUnit("id", "srctext  ");
-		tu.setTarget(locFR, new TextContainer("trgext"));
+		TextUnit tu = new TextUnit("id", " srctext ");
+		tu.setTarget(locFR, new TextContainer(" trgext"));
 		
 		checker.processTextUnit(tu);
 		List<Issue> issues = checker.getIssues();
