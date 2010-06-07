@@ -177,6 +177,7 @@ public class QualityCheckerTest {
 		tu.setTarget(locFR, new TextContainer("src text"));
 		tu.getTarget(locFR).getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<CODE/>");
 		
+		checker.getParameters().setCodeDifference(false);
 		checker.processTextUnit(tu);
 		List<Issue> issues = checker.getIssues();
 		// Codes are different, since the option is code-sensitive: no issue (target not the same as source)
@@ -190,6 +191,7 @@ public class QualityCheckerTest {
 		tu.setTarget(locFR, new TextContainer("src text"));
 		tu.getTarget(locFR).getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<CODE/>");
 		
+		checker.getParameters().setCodeDifference(false);
 		checker.getParameters().setTargetSameAsSourceWithCodes(false);
 		checker.processTextUnit(tu);
 		List<Issue> issues = checker.getIssues();

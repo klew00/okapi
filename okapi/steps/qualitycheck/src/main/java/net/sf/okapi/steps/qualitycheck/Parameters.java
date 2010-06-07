@@ -31,6 +31,7 @@ public class Parameters extends BaseParameters {
 	private static final String EMPTYTARGET = "emptyTarget";
 	private static final String TARGETSAMEASSOURCE = "targetSameAsSource";
 	private static final String TARGETSAMEASSOURCE_WITHCODES = "targetSameAsSourceWithCodes";
+	private static final String CODEDIFFERENCE = "codeDifference";
 
 	String outputPath;
 	boolean autoOpen;
@@ -39,6 +40,7 @@ public class Parameters extends BaseParameters {
 	boolean emptyTarget;
 	boolean targetSameAsSource;
 	boolean targetSameAsSourceWithCodes;
+	boolean codeDifference;
 
 	public Parameters () {
 		reset();
@@ -100,6 +102,14 @@ public class Parameters extends BaseParameters {
 		this.targetSameAsSourceWithCodes = targetSameAsSourceWithCodes;
 	}
 
+	public boolean getCodeDifference () {
+		return codeDifference;
+	}
+
+	public void setCodeDifference (boolean codeDifference) {
+		this.codeDifference = codeDifference;
+	}
+
 	@Override
 	public void reset () {
 		outputPath = "${rootDir}/qaReport.html";
@@ -109,6 +119,7 @@ public class Parameters extends BaseParameters {
 		emptyTarget = true;
 		targetSameAsSource = true;
 		targetSameAsSourceWithCodes = true;
+		codeDifference = true;
 	}
 
 	@Override
@@ -122,6 +133,7 @@ public class Parameters extends BaseParameters {
 		emptyTarget = buffer.getBoolean(EMPTYTARGET, emptyTarget);
 		targetSameAsSource = buffer.getBoolean(TARGETSAMEASSOURCE, targetSameAsSource);
 		targetSameAsSourceWithCodes = buffer.getBoolean(TARGETSAMEASSOURCE_WITHCODES, targetSameAsSourceWithCodes);
+		codeDifference = buffer.getBoolean(CODEDIFFERENCE, codeDifference);
 	}
 
 	@Override
@@ -134,6 +146,7 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean(EMPTYTARGET, emptyTarget);
 		buffer.setBoolean(TARGETSAMEASSOURCE, targetSameAsSource);
 		buffer.setBoolean(TARGETSAMEASSOURCE_WITHCODES, targetSameAsSourceWithCodes);
+		buffer.setBoolean(CODEDIFFERENCE, codeDifference);
 		return buffer.toString();
 	}
 	

@@ -116,6 +116,10 @@ public class QualityChecker {
 				continue; // Cannot go further for that segment
 			}
 			
+			if ( params.getCodeDifference() ) {
+				checkInlineCodes(srcSeg, trgSeg, tu);
+			}
+			
 			if ( params.getEmptyTarget() ) {
 				if ( trgSeg.text.isEmpty() && !srcSeg.text.isEmpty() ) {
 					reportIssue(IssueType.EMPTY_TARGETSEG, tu, srcSeg.getId(),
@@ -162,6 +166,50 @@ public class QualityChecker {
 			repWriter.writeEndDocument();
 			repWriter.close();
 		}
+	}
+
+	private void checkInlineCodes (Segment srcSeg,
+		Segment trgSeg,
+		TextUnit tu)
+	{
+		String srcCodes = srcSeg.text.getCodes().toString();
+		String trgCodes = trgSeg.text.getCodes().toString();
+		if ( !srcCodes.equals(trgCodes) ) {
+			reportIssue(IssueType.CODE_DIFFERENCE, tu, srcSeg.getId(),
+				"The translation does not have the same codes as the source.",
+				0, -1, 0, -1, srcSeg.toString(), trgSeg.toString());
+		}
+		
+//		List<Code> srcCodes = new ArrayList<Code>();
+//		for ( Code code: srcSeg.text.getCodes() ) {
+//			srcCodes.add(code.clone());
+//		}
+//		List<Code> trgCodes = new ArrayList<Code>();
+//		for ( Code code: trgSeg.text.getCodes() ) {
+//			trgCodes.add(code.clone());
+//		}
+//		
+//		for ( Code srcCode : srcCodes ) {
+//			for ( int j=0; j<trgCodes.size(); j++ ) {
+//				if ( srcCode.getId() == trgCodes.get(j).getId() ) {
+//					if ( srcCode.getTagType() == trgCodes.get(j).getTagType() ) {
+//						String srcData = srcCode.getData();
+//						String trgData = trgCodes.get(j).getData();
+//						if (( srcData != null ) && ( trgData != null )) {
+//							if ( !srcData.equals(trgData) ) {
+//								
+//							}
+//						}
+//						// Else: either one or both are null
+//						if (( srcData == null ) && ( trgData == null )) {
+//							continue; // No difference
+//						}
+//						reportIssue(IssueType.EMPTY_TARGETSEG, tu, srcSeg.getId(),
+//							"Code difference: source='%s' "
+//					}
+//				}
+//			}
+//		}
 	}
 	
 	private void checkWhiteSpaces (String srcOri,
@@ -287,9 +335,9 @@ public class QualityChecker {
 			repWriter.writeElementString("p", position+": "+issue.message);
 			
 			repWriter.writeRawXML("<p class=\"item\">");
-			repWriter.writeString("Source: ["+Util.escapeToXML(srcOri, 0, false, null)+"]");
+			repWriter.writeString("Source: ["+srcOri+"]");
 			repWriter.writeRawXML("<br />");
-			repWriter.writeString("Target: ["+Util.escapeToXML(trgOri, 0, false, null)+"]");
+			repWriter.writeString("Target: ["+trgOri+"]");
 			repWriter.writeRawXML("</p>");
 
 			repWriter.writeLineBreak();

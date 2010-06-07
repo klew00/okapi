@@ -28,6 +28,7 @@ import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.ISWTEmbeddableParametersEditor;
 import net.sf.okapi.common.ui.OKCancelPanel;
+import net.sf.okapi.common.ui.TextAndBrowsePanel;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.steps.qualitycheck.Parameters;
 
@@ -49,12 +50,15 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private OKCancelPanel pnlActions;
 	private Parameters params;
 	private IHelp help;
+	private Button chkAutoOpen;
 	private Button chkLeadingWS;
 	private Button chkTrailingWS;
 	private Button chkEmptyTarget;
 	private Button chkTargetSameAsSource;
 	private Button chkTargetSameAsSourceWithCodes;
 	private Composite mainComposite;
+	private TextAndBrowsePanel pnlOutputPath;
+	private Button chkCodeDifference;
 	
 	public boolean edit (IParameters params,
 		boolean readOnly,
@@ -150,16 +154,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		mainComposite.setLayout(new GridLayout());
 		
 		Label label = new Label(mainComposite, SWT.NONE);
-		label.setText("Verify the following items:");
-		
-		chkEmptyTarget = new Button(mainComposite, SWT.CHECK);
-		chkEmptyTarget.setText("Empty translation");
-
-		chkLeadingWS = new Button(mainComposite, SWT.CHECK);
-		chkLeadingWS.setText("Leading white spaces");
-		
-		chkTrailingWS = new Button(mainComposite, SWT.CHECK);
-		chkTrailingWS.setText("Trailing white spaces");
+		label.setText("Flag the following potential issues:");
 		
 		chkTargetSameAsSource = new Button(mainComposite, SWT.CHECK);
 		chkTargetSameAsSource.setText("Target is the same as the source (when it has text)");
@@ -174,7 +169,38 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		GridData gdTmp = new GridData();
 		gdTmp.horizontalIndent = 16;
 		chkTargetSameAsSourceWithCodes.setLayoutData(gdTmp);
+		
+		chkCodeDifference = new Button(mainComposite, SWT.CHECK);
+		chkCodeDifference.setText("Code differences between source and target");
 
+		chkEmptyTarget = new Button(mainComposite, SWT.CHECK);
+		chkEmptyTarget.setText("Empty translation");
+
+		chkLeadingWS = new Button(mainComposite, SWT.CHECK);
+		chkLeadingWS.setText("Leading white spaces");
+		
+		chkTrailingWS = new Button(mainComposite, SWT.CHECK);
+		chkTrailingWS.setText("Trailing white spaces");
+
+		Label separator = new Label(mainComposite, SWT.BORDER);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.heightHint = 1;
+		separator.setLayoutData(gdTmp);
+
+		// Output
+		
+		label = new Label(mainComposite, SWT.NONE);
+		label.setText("Path of the report file:");
+		pnlOutputPath = new TextAndBrowsePanel(mainComposite, SWT.NONE, false);
+		pnlOutputPath.setSaveAs(true);
+		pnlOutputPath.setTitle("Quality Check Report");
+		pnlOutputPath.setBrowseFilters("HTML Files (*.html;*.htm)\tAll Files (*.*)", "*.html;**.htm\t*.*");
+		gdTmp = new GridData();
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		pnlOutputPath.setLayoutData(gdTmp);
+
+		chkAutoOpen = new Button(mainComposite, SWT.CHECK);
+		chkAutoOpen.setText("Open the report after completion");
 	}
 	
 	private boolean showDialog () {
@@ -191,6 +217,9 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	}
 
 	private void setData () {
+		pnlOutputPath.setText(params.getOutputPath());
+		chkAutoOpen.setSelection(params.getAutoOpen());
+		chkCodeDifference.setSelection(params.getCodeDifference());
 		chkLeadingWS.setSelection(params.getLeadingWS());
 		chkTrailingWS.setSelection(params.getTrailingWS());
 		chkEmptyTarget.setSelection(params.getEmptyTarget());
@@ -200,6 +229,14 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	}
 
 	private boolean saveData () {
+		if ( pnlOutputPath.getText().length() == 0 ) {
+			Dialogs.showError(shell, "Please, enter a path for the report.", null);
+			pnlOutputPath.setFocus();
+			return false;
+		}
+		params.setOutputPath(pnlOutputPath.getText());
+		params.setCodeDifference(chkCodeDifference.getSelection());
+		params.setAutoOpen(chkAutoOpen.getSelection());
 		params.setLeadingWS(chkLeadingWS.getSelection());
 		params.setTrailingWS(chkTrailingWS.getSelection());
 		params.setEmptyTarget(chkEmptyTarget.getSelection());
