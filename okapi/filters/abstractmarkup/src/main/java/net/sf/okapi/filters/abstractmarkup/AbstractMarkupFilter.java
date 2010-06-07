@@ -65,6 +65,7 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
+import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
 
 /**
  * Abstract class useful for creating an {@link IFilter} around the Jericho
@@ -80,9 +81,9 @@ import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
  */
 public abstract class AbstractMarkupFilter extends AbstractFilter {
 	private static final Logger LOGGER = Logger.getLogger(AbstractMarkupFilter.class.getName());
-
 	private static final int PREVIEW_BYTE_COUNT = 1024;
 
+	protected StringBuilder bufferedWhitespace;
 	private StreamedSource document;
 	private ExtractionRuleState ruleState;
 	private Iterator<Segment> nodeIterator;
@@ -116,6 +117,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 */
 	public AbstractMarkupFilter(EventBuilder eventBuilder) {
 		setEventBuilder(eventBuilder);
+		bufferedWhitespace = new StringBuilder();
 		hasUtf8Bom = false;
 		hasUtf8Encoding = false;
 		preserveWhitespace = true;
@@ -383,6 +385,29 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 * @return true if the normal handlers can be skipped, false otherwise
 	 */
 	protected void preProcess(Segment segment) {
+		if (bufferedWhitespace == null) {
+			return;
+		}
+		
+		boolean isInsideTextRun = false;
+		if (segment instanceof Tag) {
+			isInsideTextRun = getConfig().getMainRuleType(((Tag) segment).getName()) == RULE_TYPE.INLINE_ELEMENT;
+		}
+
+		// add buffered whitespace to the current translatable text
+		if (bufferedWhitespace.length() > 0 && isInsideTextRun) {
+			if (canStartNewTextUnit()) {
+				startTextUnit(bufferedWhitespace.toString());
+			} else {
+				addToTextUnit(bufferedWhitespace.toString());
+			}
+		} else if (bufferedWhitespace.length() > 0) {
+			// otherwise add it as non-translatable
+			addToDocumentPart(bufferedWhitespace.toString());
+		}
+		// reset buffer for next pass
+		bufferedWhitespace.setLength(0);
+		bufferedWhitespace.trimToSize();
 	}
 
 	/**
@@ -399,63 +424,109 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 * 
 	 * @param tag
 	 */
-	protected abstract void handleServerCommonEscaped(Tag tag);
+	protected void handleServerCommonEscaped(Tag tag) {
+		handleDocumentPart(tag);
+	}
 
 	/**
 	 * Handle any recognized server tags (i.e., PHP, Mason etc.)
 	 * 
 	 * @param tag
 	 */
-	protected abstract void handleServerCommon(Tag tag);
+	protected void handleServerCommon(Tag tag) {
+		handleDocumentPart(tag);
+	}
 
 	/**
 	 * Handle an XML markup declaration.
 	 * 
 	 * @param tag
 	 */
-	protected abstract void handleMarkupDeclaration(Tag tag);
+	protected void handleMarkupDeclaration(Tag tag) {
+		handleDocumentPart(tag);
+	}
 
 	/**
 	 * Handle an XML declaration.
 	 * 
 	 * @param tag
 	 */
-	protected abstract void handleXmlDeclaration(Tag tag);
+	protected void handleXmlDeclaration(Tag tag) {
+		handleDocumentPart(tag);
+	}
 
 	/**
 	 * Handle the XML doc type declaration (DTD).
 	 * 
 	 * @param tag
 	 */
-	protected abstract void handleDocTypeDeclaration(Tag tag);
+	protected void handleDocTypeDeclaration(Tag tag) {
+		handleDocumentPart(tag);
+	}
 
 	/**
 	 * Handle processing instructions.
 	 * 
 	 * @param tag
 	 */
-	protected abstract void handleProcessingInstruction(Tag tag);
+	protected void handleProcessingInstruction(Tag tag) {
+		if (!isInsideTextRun()) {
+			handleDocumentPart(tag);
+		} else {
+			addCodeToCurrentTextUnit(tag);
+		}
+	}
 
 	/**
 	 * Handle comments.
 	 * 
 	 * @param tag
 	 */
-	protected abstract void handleComment(Tag tag);
+	protected void handleComment(Tag tag) {
+		if (!isInsideTextRun()) {
+			handleDocumentPart(tag);
+		} else {
+			addCodeToCurrentTextUnit(tag);
+		}
+	}
 
 	/**
 	 * Handle CDATA sections.
 	 * 
 	 * @param tag
 	 */
-	protected abstract void handleCdataSection(Tag tag);
+	protected void handleCdataSection(Tag tag) {
+		addToDocumentPart(tag.toString());
+	}
 
 	/**
 	 * Handle all text (PCDATA).
 	 * 
 	 * @param text
 	 */
-	protected abstract void handleText(Segment text);
+	protected void handleText(Segment text) {
+		// if in excluded state everything is skeleton including text
+		if (getRuleState().isExludedState()) {
+			addToDocumentPart(text.toString());
+			return;
+		}
+
+		// check for ignorable whitespace and add it to the skeleton
+		if (text.isWhiteSpace() && !isInsideTextRun()) {
+			if (bufferedWhitespace.length() <= 0) {
+				// buffer the whitespace until we know that we are not inside
+				// translatable text.
+				bufferedWhitespace.append(text.toString());
+			}
+			return;
+		}
+
+		if (canStartNewTextUnit()) {
+			startTextUnit(text.toString());
+		} else {
+			addToTextUnit(text.toString());
+		}
+	}
 
 	/**
 	 * Handle all Character entities. Default implementation converts entity to
@@ -492,21 +563,184 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 * 
 	 * @param startTag
 	 */
-	protected abstract void handleStartTag(StartTag startTag);
+	protected void handleStartTag(StartTag startTag) {
+		try {
+			// if in excluded state everything is skeleton including text
+			if (getRuleState().isExludedState()) {
+				addToDocumentPart(startTag.toString());
+				// process these tag types to update parser state
+				switch (getConfig().getMainRuleType(startTag.getName())) {
+				case EXCLUDED_ELEMENT:
+					getRuleState().pushExcludedRule(startTag.getName());
+					break;
+				case INCLUDED_ELEMENT:
+					getRuleState().pushIncludedRule(startTag.getName());
+					break;
+				}
+				return;
+			}
+
+			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders;
+			propertyTextUnitPlaceholders = createPropertyTextUnitPlaceholders(startTag);
+
+			switch (getConfig().getMainRuleType(startTag.getName())) {
+			case INLINE_ELEMENT:
+				if (canStartNewTextUnit()) {
+					startTextUnit();
+				}
+				addCodeToCurrentTextUnit(startTag);
+				break;
+			case ATTRIBUTES_ONLY:
+				// we assume we have already ended any (non-complex) TextUnit in
+				// the main while loop in AbstractMarkupFilter
+				handleAttributesThatAppearAnywhere(propertyTextUnitPlaceholders, startTag);
+				break;
+			case GROUP_ELEMENT:
+				getRuleState().pushGroupRule(startTag.getName());
+				handleAttributesThatAppearAnywhere(propertyTextUnitPlaceholders, startTag);
+				break;
+			case EXCLUDED_ELEMENT:
+				getRuleState().pushExcludedRule(startTag.getName());
+				handleAttributesThatAppearAnywhere(propertyTextUnitPlaceholders, startTag);
+				break;
+			case INCLUDED_ELEMENT:
+				getRuleState().pushIncludedRule(startTag.getName());
+				handleAttributesThatAppearAnywhere(propertyTextUnitPlaceholders, startTag);
+				break;
+			case TEXT_UNIT_ELEMENT:
+				// search for an idAttribute and set it on the newly created TextUnit if found
+				String idValue = null;
+				for (PropertyTextUnitPlaceholder propOrText : propertyTextUnitPlaceholders) {
+					if (propOrText.getAccessType() == PlaceholderAccessType.NAME) {
+						idValue = propOrText.getValue();
+						break;
+					}
+				}
+				getRuleState().pushTextUnitRule(startTag.getName(), idValue);
+				handleAttributesThatAppearAnywhere(propertyTextUnitPlaceholders, startTag);
+				setTextUnitName(idValue);
+				setTextUnitType(getConfig().getElementType(startTag.getName()));
+				break;
+			default:
+				handleAttributesThatAppearAnywhere(propertyTextUnitPlaceholders, startTag);
+			}
+		} finally {
+			// does this tag have a PRESERVE_WHITESPACE rule?
+			if (getConfig().isRuleType(startTag.getName(), RULE_TYPE.PRESERVE_WHITESPACE)) {
+				getRuleState().pushPreserverWhitespaceRule(startTag.getName());
+				setPreserveWhitespace(getRuleState().isPreserveWhitespaceState());
+			}
+
+			// A TextUnit may have already been created. Update its preserveWS field
+			if (getEventBuilder().isCurrentTextUnit()) {
+				TextUnit tu = getEventBuilder().peekMostRecentTextUnit();
+				tu.setPreserveWhitespaces(getRuleState().isPreserveWhitespaceState());
+			}
+		}
+	}
+	
+	/*
+	 * catch tags which are not listed in the config but have attributes that require processing
+	 */
+	private void handleAttributesThatAppearAnywhere(List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders,
+			StartTag tag) {
+		switch (getConfig().getMainRuleType(tag.getName())) {
+
+		case TEXT_UNIT_ELEMENT:
+			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
+				startTextUnit(new GenericSkeleton(tag.toString()), propertyTextUnitPlaceholders);
+			} else {
+				startTextUnit(new GenericSkeleton(tag.toString()));
+			}
+			break;
+		case GROUP_ELEMENT:
+			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
+				startGroup(new GenericSkeleton(tag.toString()), getConfig().getElementType(tag), getSrcLoc(),
+						propertyTextUnitPlaceholders);
+			} else {
+				// no attributes that need processing - just treat as skeleton
+				startGroup(new GenericSkeleton(tag.toString()), getConfig().getElementType(tag));
+			}
+			break;
+		default:
+			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
+				startDocumentPart(tag.toString(), tag.getName(), propertyTextUnitPlaceholders);
+				endDocumentPart();
+			} else {
+				// no attributes that needs processing - just treat as skeleton
+				addToDocumentPart(tag.toString());
+			}
+
+			break;
+		}
+	}
 
 	/**
 	 * Handle end tags, including empty tags.
 	 * 
 	 * @param endTag
 	 */
-	protected abstract void handleEndTag(EndTag endTag);
+	protected void handleEndTag(EndTag endTag) {
+		try {
+			// if in excluded state everything is skeleton including text
+			if (getRuleState().isExludedState()) {
+				addToDocumentPart(endTag.toString());
+				// process these tag types to update parser state
+				switch (getConfig().getMainRuleType(endTag.getName())) {
+				case EXCLUDED_ELEMENT:
+					getRuleState().popExcludedIncludedRule();
+					break;
+				case INCLUDED_ELEMENT:
+					getRuleState().popExcludedIncludedRule();
+					break;
+				}
+				return;
+			}
+
+			switch (getConfig().getMainRuleType(endTag.getName())) {
+			case INLINE_ELEMENT:
+				if (canStartNewTextUnit()) {
+					startTextUnit();
+				}
+				addCodeToCurrentTextUnit(endTag);
+				break;
+			case GROUP_ELEMENT:
+				getRuleState().popGroupRule();
+				endGroup(new GenericSkeleton(endTag.toString()));
+				break;
+			case EXCLUDED_ELEMENT:
+				getRuleState().popExcludedIncludedRule();
+				addToDocumentPart(endTag.toString());
+				break;
+			case INCLUDED_ELEMENT:
+				getRuleState().popExcludedIncludedRule();
+				addToDocumentPart(endTag.toString());
+				break;
+			case TEXT_UNIT_ELEMENT:
+				getRuleState().popTextUnitRule();
+				endTextUnit(new GenericSkeleton(endTag.toString()));
+				break;
+			default:
+				addToDocumentPart(endTag.toString());
+				break;
+			}
+		} finally {
+			// does this tag have a PRESERVE_WHITESPACE rule?
+			if (getConfig().isRuleType(endTag.getName(), RULE_TYPE.PRESERVE_WHITESPACE)) {
+				getRuleState().popPreserverWhitespaceRule();
+				setPreserveWhitespace(getRuleState().isPreserveWhitespaceState());
+			}
+		}
+	}
 
 	/**
 	 * Handle anything else not classified by Jericho.
 	 * 
 	 * @param tag
 	 */
-	protected abstract void handleDocumentPart(Tag tag);
+	protected void handleDocumentPart(Tag tag) {
+		addToDocumentPart(tag.toString());
+	}
 
 	/**
 	 * Some attributes names are converted to Okapi standards such as HTML
@@ -532,6 +766,47 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 *            {@link Code}
 	 */
 	protected void addCodeToCurrentTextUnit(Tag tag) {
+		List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders;
+		String literalTag = tag.toString();
+		TextFragment.TagType codeType;
+
+		// start tag or empty tag
+		if (tag.getTagType() == StartTagType.NORMAL || tag.getTagType() == StartTagType.UNREGISTERED) {
+			StartTag startTag = ((StartTag) tag);
+
+			// is this an empty tag?
+			if (startTag.isSyntacticalEmptyElementTag()) {
+				codeType = TextFragment.TagType.PLACEHOLDER;
+			} else if (startTag.isEndTagRequired()) {
+				codeType = TextFragment.TagType.OPENING;
+			} else {
+				codeType = TextFragment.TagType.PLACEHOLDER;
+			}
+
+			// create a list of Property or Text placeholders for this tag
+			// If this list is empty we know that there are no attributes that
+			// need special processing
+			propertyTextUnitPlaceholders = null;
+
+			propertyTextUnitPlaceholders = createPropertyTextUnitPlaceholders(startTag);
+			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
+				// add code and process actionable attributes
+				addToTextUnit(new Code(codeType, getConfig().getElementType(tag), literalTag),
+						propertyTextUnitPlaceholders);
+			} else {
+				// no actionable attributes, just add the code as-is
+				addToTextUnit(new Code(codeType, getConfig().getElementType(tag), literalTag));
+			}
+		} else { // end or unknown tag
+			if (tag.getTagType() == EndTagType.NORMAL || tag.getTagType() == EndTagType.UNREGISTERED) {
+				codeType = TextFragment.TagType.CLOSING;
+			} else {
+				codeType = TextFragment.TagType.PLACEHOLDER;
+			}
+			addToTextUnit(new Code(codeType, getConfig().getElementType(tag), literalTag));
+		}
+
+		/*
 		List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders;
 		String literalTag = tag.toString();
 		TextFragment.TagType codeType;
@@ -569,6 +844,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 			}
 			getEventBuilder().addToTextUnit(new Code(codeType, getConfig().getElementType(tag), literalTag));
 		}
+		*/
 	}
 
 	/**
