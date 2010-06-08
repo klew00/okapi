@@ -23,6 +23,7 @@ package net.sf.okapi.filters.ttx;
 import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.ParametersDescription;
+import net.sf.okapi.common.encoder.XMLEncoder;
 import net.sf.okapi.common.uidescription.EditorDescription;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 
@@ -32,6 +33,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	protected static final String FORCESEGMENTS = "forceSegments";
 	
 	private boolean forceSegments;
+	private boolean escapeGT;
+	
 
 	public Parameters () {
 		reset();
@@ -46,20 +49,31 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.forceSegments = forceSegments;
 	}
 
+	public boolean getEscapeGT () {
+		return escapeGT;
+	}
+
+	public void setEscapeGT (boolean escapeGT) {
+		this.escapeGT = escapeGT;
+	}
+
 	public void reset () {
 		forceSegments = true;
+		escapeGT = false;
 	}
 
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
 		forceSegments = buffer.getBoolean(FORCESEGMENTS, forceSegments);
+		escapeGT = buffer.getBoolean(XMLEncoder.ESCAPEGT, escapeGT);
 	}
 
 	@Override
 	public String toString () {
 		buffer.reset();
 		buffer.setBoolean(FORCESEGMENTS, forceSegments);
+		buffer.setBoolean(XMLEncoder.ESCAPEGT, escapeGT);
 		return buffer.toString();
 	}
 	
@@ -67,12 +81,14 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
 		desc.add(FORCESEGMENTS, "Force un-segmented entries to be output as a segment", null);
+		desc.add(XMLEncoder.ESCAPEGT, "Escape the greater-than characters", null);
 		return desc;
 	}
 
 	public EditorDescription createEditorDescription (ParametersDescription paramDesc) {
 		EditorDescription desc = new EditorDescription("TTX Filter Parameters", true, false);
 		desc.addCheckboxPart(paramDesc.get(FORCESEGMENTS));
+		desc.addCheckboxPart(paramDesc.get(XMLEncoder.ESCAPEGT));
 		return desc;
 	}
 

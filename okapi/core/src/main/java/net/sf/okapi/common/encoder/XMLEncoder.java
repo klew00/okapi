@@ -78,6 +78,10 @@ public class XMLEncoder implements IEncoder {
 		}
 		
 		if ( params != null ) {
+			// Force the options to be written out in the internal buffer
+			// So we can use the name-based methods to get the latest info
+			params.toString(); 
+			// Retrieve the options
 			escapeGT = params.getBoolean(ESCAPEGT);
 			escapeNbsp = params.getBoolean(ESCAPENBSP);
 			escapeLineBreak = params.getBoolean(ESCAPELINEBREAK);

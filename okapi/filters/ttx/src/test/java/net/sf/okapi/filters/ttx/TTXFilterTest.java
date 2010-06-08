@@ -658,16 +658,35 @@ public class TTXFilterTest {
 	public void testOutputSimple () {
 		String snippet = STARTFILE
 			+ "<Tu MatchPercent=\"0\">"
-			+ "<Tuv Lang=\"EN-US\">text en</Tuv>"
-			+ "<Tuv Lang=\"ES-EM\">text es</Tuv>"
+			+ "<Tuv Lang=\"EN-US\">text en >=gt</Tuv>"
+			+ "<Tuv Lang=\"ES-EM\">text es >=gt</Tuv>"
 			+ "</Tu>"
 			+ "</Raw></Body></TRADOStag>";
 		String expected = STARTFILE
 			+ "<Tu MatchPercent=\"0\">"
-			+ "<Tuv Lang=\"EN-US\">text en</Tuv>"
-			+ "<Tuv Lang=\"ES-EM\">text es</Tuv>"
+			+ "<Tuv Lang=\"EN-US\">text en >=gt</Tuv>"
+			+ "<Tuv Lang=\"ES-EM\">text es >=gt</Tuv>"
 			+ "</Tu>"
 			+ "</Raw></Body></TRADOStag>";
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(filter2, snippet, locESEM),
+			locESEM, filter2.createSkeletonWriter(), filter2.getEncoderManager()));
+	}
+
+	@Test
+	public void testOutputSimpleGTEscaped () {
+		String snippet = STARTFILE
+			+ "<Tu MatchPercent=\"0\">"
+			+ "<Tuv Lang=\"EN-US\">text en >=gt</Tuv>"
+			+ "<Tuv Lang=\"ES-EM\">text es >=gt</Tuv>"
+			+ "</Tu>"
+			+ "</Raw></Body></TRADOStag>";
+		String expected = STARTFILE
+			+ "<Tu MatchPercent=\"0\">"
+			+ "<Tuv Lang=\"EN-US\">text en &gt;=gt</Tuv>"
+			+ "<Tuv Lang=\"ES-EM\">text es &gt;=gt</Tuv>"
+			+ "</Tu>"
+			+ "</Raw></Body></TRADOStag>";
+		((Parameters)(filter2.getParameters())).setEscapeGT(true);
 		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(filter2, snippet, locESEM),
 			locESEM, filter2.createSkeletonWriter(), filter2.getEncoderManager()));
 	}

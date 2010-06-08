@@ -91,90 +91,23 @@ public class TTXSkeletonWriter extends GenericSkeletonWriter {
 					// Fall back to the target
 					srcSeg = trgSeg;
 				}
-
-				AltTranslation altTrans = null;
-				AltTranslationsAnnotation ann = trgSeg.getAnnotation(AltTranslationsAnnotation.class);
-				if ( ann != null ) {
-					altTrans = ann.getFirst();
-				}
 				if ( trgCont.hasBeenSegmented() ) {
+					AltTranslation altTrans = null;
+					AltTranslationsAnnotation ann = trgSeg.getAnnotation(AltTranslationsAnnotation.class);
+					if ( ann != null ) {
+						altTrans = ann.getFirst();
+					}
 					tmp.append(processSegment(srcSeg.text, trgSeg.text, altTrans));
 				}
 				else {
 					tmp.append(processFragment(part.getContent()));
 				}
-
-//				ScoreInfo si = null;
-//				if ( scores != null ) {
-//					si = scores.get(i);
-//				}
-//				if ( trgCont.hasBeenSegmented() ) {
-//					tmp.append(processSegment(srcSeg.text, trgSeg.text, si));
-//				}
-//				else {
-//					tmp.append(processFragment(part.getContent()));
-//				}
 			}
 			else {
 				tmp.append(processFragment(part.getContent()));
 			}
 			i++;
 		}
-		
-//		//==================
-//		TextContainer srcCont = tu.getSource();
-//		TextFragment srcFrag;
-//		if ( forceSegmentedOutput && !srcCont.isSegmented() ) {
-//			srcCont = srcCont.clone();
-//			srcCont.createSegment(0, -1);
-//		}
-//		List<Segment> srcSegments = srcCont.getSegments();
-//		String text = srcCont.getCodedText();
-//
-//		ScoresAnnotation scores = null;
-//		TextFragment trgFrag;
-//		List<Segment> trgSegments = null;
-//		if ( tu.hasTarget(outputLoc) ) {
-//			TextContainer trgCont = tu.getTarget(outputLoc);
-//			scores = trgCont.getAnnotation(ScoresAnnotation.class);
-//			if ( !trgCont.isSegmented() ) {
-//				trgCont = trgCont.clone();
-//				trgCont.createSegment(0, -1);
-//			}
-//			trgSegments = trgCont.getSegments();
-//		}
-//		else {
-//			trgSegments = srcSegments;
-//		}
-//
-//		Code code;
-//		for ( int i=0; i<text.length(); i++ ) {
-//			switch ( text.charAt(i) ) {
-//			case TextFragment.MARKER_ISOLATED:
-//			case TextFragment.MARKER_OPENING:
-//			case TextFragment.MARKER_CLOSING:
-//				tmp.append(expandCode(srcCont.getCode(text.charAt(++i))));
-//				break;
-//				
-//			case TextFragment.MARKER_SEGMENT:
-//				code = srcCont.getCode(text.charAt(++i));
-//				int n = Integer.valueOf(code.getData());
-//				// Get segments source/target
-//				srcFrag = srcSegments.get(n).text;
-//				trgFrag = trgSegments.get(n).text;
-//				// Get score info if possible
-//				ScoreInfo si = null;
-//				if ( scores != null ) {
-//					si = scores.get(n);
-//				}
-//				tmp.append(processSegment(srcFrag, trgFrag, si));
-//				break;
-//
-//			default:
-//				tmp.append(encoderManager.encode(text.charAt(i), 0));
-//				break;
-//			}
-//		}
 
 		return tmp.toString();
 	}
