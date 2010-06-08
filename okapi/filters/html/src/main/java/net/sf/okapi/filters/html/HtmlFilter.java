@@ -74,7 +74,6 @@ public class HtmlFilter extends AbstractMarkupFilter {
 	@Override
 	protected void startFilter() {
 		super.startFilter();
-		setPreserveWhitespace(false);
 		eventBuilder.setCollapseWhitespace(!isPreserveWhitespace() && getConfig().collapseWhitespace());
 		if (getConfig().collapseWhitespace()) {
 			LOGGER.log(Level.FINE,

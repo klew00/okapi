@@ -107,9 +107,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		setEventBuilder(new EventBuilder());
 		bufferedWhitespace = new StringBuilder();
 		hasUtf8Bom = false;
-		hasUtf8Encoding = false;
-		preserveWhitespace = true;
-		getEventBuilder().setPreserveWhitespace(preserveWhitespace);
+		hasUtf8Encoding = false;		
 	}
 
 	/**
@@ -120,9 +118,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		setEventBuilder(eventBuilder);
 		bufferedWhitespace = new StringBuilder();
 		hasUtf8Bom = false;
-		hasUtf8Encoding = false;
-		preserveWhitespace = true;
-		getEventBuilder().setPreserveWhitespace(preserveWhitespace);
+		hasUtf8Encoding = false;	
 	}
 
 	/**

@@ -92,6 +92,7 @@ public class EventBuilder {
 	 * Instantiates a new EventBuilder.
 	 */
 	public EventBuilder() {
+		reset();
 	}
 
 	/**
@@ -367,7 +368,7 @@ public class EventBuilder {
 		subDocumentId = 0;
 
 		done = false;
-		preserveWhitespace = true;
+		preserveWhitespace = false;
 
 		referencableFilterEvents = new LinkedList<Event>();
 		filterEvents = new LinkedList<Event>();
