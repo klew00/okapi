@@ -22,8 +22,8 @@ package net.sf.okapi.filters.ttx;
 
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.annotation.ScoreInfo;
-import net.sf.okapi.common.annotation.ScoresAnnotation;
+import net.sf.okapi.common.annotation.AltTranslation;
+import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Segment;
@@ -69,10 +69,8 @@ public class TTXSkeletonWriter extends GenericSkeletonWriter {
 		}
 		
 		TextContainer trgCont;
-		ScoresAnnotation scores = null;
 		if ( tu.hasTarget(outputLoc) ) {
 			trgCont = tu.getTarget(outputLoc);
-			scores = trgCont.getAnnotation(ScoresAnnotation.class);
 			if ( forceSegmentedOutput && !trgCont.hasBeenSegmented() ) {
 				trgCont = trgCont.clone();
 				trgCont.setHasBeenSegmentedFlag(true);
@@ -93,16 +91,29 @@ public class TTXSkeletonWriter extends GenericSkeletonWriter {
 					// Fall back to the target
 					srcSeg = trgSeg;
 				}
-				ScoreInfo si = null;
-				if ( scores != null ) {
-					si = scores.get(i);
+
+				AltTranslation altTrans = null;
+				AltTranslationsAnnotation ann = trgSeg.getAnnotation(AltTranslationsAnnotation.class);
+				if ( ann != null ) {
+					altTrans = ann.getFirst();
 				}
 				if ( trgCont.hasBeenSegmented() ) {
-					tmp.append(processSegment(srcSeg.text, trgSeg.text, si));
+					tmp.append(processSegment(srcSeg.text, trgSeg.text, altTrans));
 				}
 				else {
 					tmp.append(processFragment(part.getContent()));
 				}
+
+//				ScoreInfo si = null;
+//				if ( scores != null ) {
+//					si = scores.get(i);
+//				}
+//				if ( trgCont.hasBeenSegmented() ) {
+//					tmp.append(processSegment(srcSeg.text, trgSeg.text, si));
+//				}
+//				else {
+//					tmp.append(processFragment(part.getContent()));
+//				}
 			}
 			else {
 				tmp.append(processFragment(part.getContent()));
@@ -170,7 +181,7 @@ public class TTXSkeletonWriter extends GenericSkeletonWriter {
 	
 	private String processSegment (TextFragment srcFrag,
 		TextFragment trgFrag,
-		ScoreInfo scoreInfo)
+		AltTranslation altTrans)
 	{
 		if ( trgFrag == null ) { // No target available: use the source
 			trgFrag = srcFrag;
@@ -178,14 +189,20 @@ public class TTXSkeletonWriter extends GenericSkeletonWriter {
 
 		StringBuilder tmp = new StringBuilder();
 
-		if ( scoreInfo != null ) {
-			if ( !Util.isEmpty(scoreInfo.origin) ) {
-				tmp.append("<Tu Origin=\""+scoreInfo.origin+"\" ");
+		if ( altTrans != null ) {
+			String origin = altTrans.getOrigin();
+			if (( origin != null ) && origin.equals(AltTranslation.ORIGIN_SOURCEDOC) ) {
+				// Remove the origin if it was AltTranslation.ORIGIN_SOURCEDOC
+				// as it corresponds to empty one in TTX
+				origin = null;
+			}
+			if ( !Util.isEmpty(origin) ) {
+				tmp.append("<Tu Origin=\""+altTrans.getOrigin()+"\" ");
 			}
 			else {
 				tmp.append("<Tu ");
 			}
-			tmp.append(String.format("MatchPercent=\"%d\">", scoreInfo.score));
+			tmp.append(String.format("MatchPercent=\"%d\">", altTrans.getScore()));
 		}
 		else {
 			tmp.append("<Tu MatchPercent=\"0\">");

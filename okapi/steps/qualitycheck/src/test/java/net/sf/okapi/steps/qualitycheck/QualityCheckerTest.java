@@ -171,6 +171,19 @@ public class QualityCheckerTest {
 	}
 	
 	@Test
+	public void testCODE_DIFFERENCE () {
+		TextUnit tu = new TextUnit("id", "src ");
+		tu.getSource().getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<code/>");
+		tu.setTarget(locFR, new TextContainer("trg "));
+		tu.getTarget(locFR).getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<CODE />");
+		
+		checker.processTextUnit(tu);
+		List<Issue> issues = checker.getIssues();
+		assertEquals(1, issues.size());
+		assertEquals(IssueType.CODE_DIFFERENCE, issues.get(0).issueType);
+	}
+
+	@Test
 	public void testTARGET_SAME_AS_SOURCE_WithDifferentCodes () {
 		TextUnit tu = new TextUnit("id", "src text");
 		tu.getSource().getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<code/>");

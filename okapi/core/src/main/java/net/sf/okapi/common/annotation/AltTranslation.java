@@ -57,7 +57,7 @@ public class AltTranslation implements Comparable<AltTranslation> {
 	 * @param originalSource
 	 *            the original source content.
 	 * @param alternateSource
-	 *            the source content corresponding to the alternate translation.
+	 *            the source content corresponding to the alternate translation (can be null).
 	 * @param alternateTarget
 	 *            the content of alternate translation.
 	 * @param type
@@ -67,9 +67,14 @@ public class AltTranslation implements Comparable<AltTranslation> {
 	 * @param origin
 	 *            an optional identifier for the origin of this alternate translation.
 	 */
-	public AltTranslation (LocaleId sourceLocId, LocaleId targetLocId, TextFragment originalSource,
-			TextFragment alternateSource, TextFragment alternateTarget, AltTranslationType type,
-			int score, String origin)
+	public AltTranslation (LocaleId sourceLocId,
+		LocaleId targetLocId,
+		TextFragment originalSource,
+		TextFragment alternateSource,
+		TextFragment alternateTarget,
+		AltTranslationType type,
+		int score,
+		String origin)
 	{
 		this.srcLocId = sourceLocId;
 		this.trgLocId = targetLocId;
@@ -78,13 +83,13 @@ public class AltTranslation implements Comparable<AltTranslation> {
 		this.origin = origin;
 
 		tu = new TextUnit(UUID.randomUUID().toString());
-		if (alternateSource != null) {
+		if ( alternateSource != null ) {
 			tu.setSourceContent(alternateSource);
 		}
 
 		// TODO: copy code-content from original source to alternate target if necessary
 		// TODO: the magic should go here
-		if (alternateTarget != null) {
+		if ( alternateTarget != null ) {
 			tu.setTargetContent(targetLocId, alternateTarget);
 		}
 	}
@@ -94,7 +99,7 @@ public class AltTranslation implements Comparable<AltTranslation> {
 	 * 
 	 * @return the target content of this entry.
 	 */
-	public TextContainer getTarget() {
+	public TextContainer getTarget () {
 		return tu.getTarget(trgLocId);
 	}
 
@@ -106,7 +111,9 @@ public class AltTranslation implements Comparable<AltTranslation> {
 	 * @param alternateTarget
 	 *            the content of the alternate translation.
 	 */
-	public void setTarget(LocaleId targetLocId, TextFragment alternateTarget) {
+	public void setTarget (LocaleId targetLocId,
+		TextFragment alternateTarget)
+	{
 		this.trgLocId = targetLocId;
 		tu.setTargetContent(targetLocId, alternateTarget);
 	}
@@ -116,7 +123,7 @@ public class AltTranslation implements Comparable<AltTranslation> {
 	 * 
 	 * @return the source locale for this entry.
 	 */
-	public LocaleId getSourceLocale() {
+	public LocaleId getSourceLocale () {
 		return srcLocId;
 	}
 
@@ -125,7 +132,7 @@ public class AltTranslation implements Comparable<AltTranslation> {
 	 * 
 	 * @return the target locale for this entry.
 	 */
-	public LocaleId getTargetLocale() {
+	public LocaleId getTargetLocale () {
 		return trgLocId;
 	}
 
@@ -134,7 +141,7 @@ public class AltTranslation implements Comparable<AltTranslation> {
 	 * 
 	 * @return the source content of this entry (can be empty)
 	 */
-	public TextContainer getSource() {
+	public TextContainer getSource () {
 		return tu.getSource();
 	}
 
@@ -143,7 +150,7 @@ public class AltTranslation implements Comparable<AltTranslation> {
 	 * 
 	 * @return the score for this entry.
 	 */
-	public int getScore() {
+	public int getScore () {
 		return score;
 	}
 
@@ -152,7 +159,7 @@ public class AltTranslation implements Comparable<AltTranslation> {
 	 * 
 	 * @return the origin for this entry, or null if none is defined.
 	 */
-	public String getOrigin() {
+	public String getOrigin () {
 		return origin;
 	}
 
@@ -161,7 +168,7 @@ public class AltTranslation implements Comparable<AltTranslation> {
 	 * 
 	 * @return the text unit for this entry.
 	 */
-	public TextUnit getEntry() {
+	public TextUnit getEntry () {
 		return tu;
 	}
 
@@ -170,24 +177,24 @@ public class AltTranslation implements Comparable<AltTranslation> {
 	 * 
 	 * @return the type of this alternate translation.
 	 */
-	public AltTranslationType getType() {
+	public AltTranslationType getType () {
 		return type;
 	}
 
-	public void setType(AltTranslationType type) {
+	public void setType (AltTranslationType type) {
 		this.type = type;
 	}
 
-	public void setScore(int score) {
+	public void setScore (int score) {
 		this.score = score;
 	}
 
-	public void setOrigin(String origin) {
+	public void setOrigin (String origin) {
 		this.origin = origin;
 	}
 	
-	private boolean isExact(AltTranslationType type) {
-		if (type.ordinal() <= AltTranslationType.EXACT.ordinal()) {
+	private boolean isExact (AltTranslationType type) {
+		if ( type.ordinal() <= AltTranslationType.EXACT.ordinal() ) {
 			return true;
 		}
 		return false;
@@ -197,37 +204,39 @@ public class AltTranslation implements Comparable<AltTranslation> {
 	 * This method implements a three way sort on (1) AltTranslationType (2) Score (3)
 	 * source string match. AltTranslationType is the primary key, score secondary and source
 	 * string tertiary.
-	 * 
-	 * @param other - the AltTranslation we are comparing against.
+	 * @param other the AltTranslation we are comparing against.
+	 * @return the comparison result (0 if both object are equal).
 	 */
 	@Override
-	public int compareTo(AltTranslation other) {
+	public int compareTo (AltTranslation other) {
 		final int EQUAL = 0;
 
-		if (this == other)
+		if ( this == other ) {
 			return EQUAL;
+		}
 
 		String thisSource = this.getSource().toString();
 		String otherSource = other.getSource().toString();
 		int comparison;
 		
 		// only sort by match type if this or other is some kind of exact match
-		if (isExact(this.getType()) || isExact(other.getType())) {					
+		if ( isExact(this.getType()) || isExact(other.getType()) ) {					
 			// compare TmMatchType
 			comparison = this.getType().compareTo(other.getType());
-			if (comparison != EQUAL)
+			if ( comparison != EQUAL ) {
 				return comparison;
+			}
 		}
 		
 		// compare score
 		comparison = Float.compare(this.score, other.getScore());
-		if (comparison != EQUAL) {
+		if ( comparison != EQUAL ) {
 			return comparison * -1; // we want to reverse the normal score sort
 		}
 
 		// compare source strings with codes
 		comparison = thisSource.compareTo(otherSource);
-		if (comparison != EQUAL) {
+		if ( comparison != EQUAL ) {
 			return comparison;
 		}
 
@@ -237,25 +246,30 @@ public class AltTranslation implements Comparable<AltTranslation> {
 
 	/**
 	 * Define equality of state.
+	 * @param other the object to compare with.
+	 * @return true if the objects are equal, false otherwise.
 	 */
 	@Override
-	public boolean equals(Object other) {
-		if (this == other)
+	public boolean equals (Object other) {
+		if ( this == other ) {
 			return true;
-		if (!(other instanceof AltTranslation))
+		}
+		if ( !(other instanceof AltTranslation) ) {
 			return false;
+		}
 
 		AltTranslation otherHit = (AltTranslation) other;
-		return (this.getType() == otherHit.getType())
+		return ( this.getType() == otherHit.getType() )
 				&& (this.getSource().toString().equals(otherHit.getSource().toString()))
 				&& (this.getTarget().toString().equals(otherHit.getTarget().toString()));
 	}
 
 	/**
 	 * A class that overrides equals must also override hashCode.
+	 * @return the has code for this object.
 	 */
 	@Override
-	public int hashCode() {
+	public int hashCode () {
 		int result = HashCodeUtil.SEED;
 		result = HashCodeUtil.hash(result, getType());
 		result = HashCodeUtil.hash(result, getSource().toString());

@@ -24,7 +24,7 @@ import java.util.ArrayList;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.TestUtil;
-import net.sf.okapi.common.annotation.ScoresAnnotation;
+import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.ISegments;
@@ -123,6 +123,7 @@ public class TTXFilterTest {
 		segments = tu.getTarget(locESEM).getSegments();
 		assertEquals(1, segments.count());
 		assertEquals("es1", segments.get(0).toString());
+		assertNull(segments.get(0).getAnnotation(AltTranslationsAnnotation.class));
 		// Check that last DF is not included in TU
 		// We should have only one marker, for the segment
 //TOFIX: isolated df in TU		assertEquals(1, cont.getCodes().size());
@@ -358,6 +359,11 @@ public class TTXFilterTest {
 		cont = tu.getTarget(locESEM);
 		assertNotNull(cont);
 		assertEquals("[text] more text", fmt.printSegmentedContent(cont, true));
+		ISegments segs = cont.getSegments();
+		AltTranslationsAnnotation ann = segs.get(0).getAnnotation(AltTranslationsAnnotation.class);
+		assertNotNull(ann);
+		assertEquals(1, ann.size());
+		assertEquals("text", ann.getFirst().getTarget().toString());
 	}
 
 	@Test
@@ -383,10 +389,13 @@ public class TTXFilterTest {
 		assertNotNull(tu);
 		TextContainer cont = tu.getTarget(locESEM);
 		assertNotNull(cont);
-		ScoresAnnotation scores = cont.getAnnotation(ScoresAnnotation.class);
-		assertNotNull(scores);
-		assertEquals("abc", scores.get(0).origin);
-		assertEquals(50, scores.get(0).score);
+		ISegments segs = cont.getSegments();
+		AltTranslationsAnnotation ann = segs.get(0).getAnnotation(AltTranslationsAnnotation.class);
+		assertNotNull(ann);
+		assertEquals(1, ann.size());
+		assertEquals("es", ann.getFirst().getTarget().toString());
+		assertEquals("abc", ann.getFirst().getOrigin());
+		assertEquals(50, ann.getFirst().getScore());
 	}
 
 	@Test

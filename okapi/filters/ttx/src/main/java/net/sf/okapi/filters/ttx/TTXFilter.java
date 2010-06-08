@@ -37,8 +37,9 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.annotation.AltTranslation;
+import net.sf.okapi.common.annotation.AltTranslationType;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
-import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.FilterConfiguration;
@@ -413,13 +414,13 @@ public class TTXFilter implements IFilter {
 			tu = new TextUnit(null); // No id yet
 			TextContainer srcCont = tu.getSource();
 			ArrayList<TextFragment> trgFragments = new ArrayList<TextFragment>();
+			ArrayList<AltTranslation> altTranslations = new ArrayList<AltTranslation>();
 			TextFragment srcSegFrag = null;
 			TextFragment trgSegFrag = null;
+			AltTranslation altTrans = null;
 			TextFragment inter = new TextFragment();
 			TextFragment current = inter;
 			boolean returnValueAfterTextUnitDone = true;
-			ScoresAnnotation scores = null;
-			AltTranslationsAnnotation altTrans = null;
 
 			String tmp;
 			String name;
@@ -458,6 +459,7 @@ public class TTXFilter implements IFilter {
 						inTarget = false;
 						srcSegFrag = new TextFragment();
 						trgSegFrag = null;
+						altTrans = null;
 						if ( !inter.isEmpty() ) {
 							changeFirst = srcCont.isEmpty();
 							srcCont.append(inter);
@@ -468,9 +470,6 @@ public class TTXFilter implements IFilter {
 						tmp = reader.getAttributeValue(null, MATCHPERCENT);
 						String origin = reader.getAttributeValue(null, ORIGIN);
 						if (( tmp != null ) || ( origin != null )) {
-							if ( scores == null ) {
-								scores = new ScoresAnnotation();
-							}
 							int value = 0;
 							if ( tmp != null ) {
 								try {
@@ -480,7 +479,10 @@ public class TTXFilter implements IFilter {
 									logger.warning(String.format("Unexpected value in %s attribute (%s)", MATCHPERCENT, tmp));
 								}
 							}
-							scores.add(value, origin);
+							if ( value > 0 ) {
+								altTrans = new AltTranslation(srcLoc, trgLoc, null, null, null, AltTranslationType.UKNOWN,
+									value, ((origin==null) ? AltTranslation.ORIGIN_SOURCEDOC : origin));
+							}
 						}
 						continue;
 					}
@@ -555,8 +557,16 @@ public class TTXFilter implements IFilter {
 							// If the target is not there, we copy the source instead
 							// TTX should not have source-only TU
 							trgFragments.add((trgSegFrag==null) ? srcSegFrag.clone() : trgSegFrag);
+							// Set the alt-trans target if we had an alt-trans
+							if ( altTrans != null ) {
+								// Use target or source if target is not available (rare case)
+								// Falling back to source is not great but it's how the TTX file is, and this allows to preserve score, etc.
+								altTrans.setTarget(trgLoc, trgFragments.get(trgFragments.size()-1));
+							}
+							altTranslations.add(altTrans);
 							srcSegFrag = null;
 							trgSegFrag = null;
+							altTrans = null;
 							inter = new TextFragment();
 							current = inter; // Start storing inter-segment part
 							// A Tu stops the current segment, but not the text unit
@@ -607,12 +617,15 @@ public class TTXFilter implements IFilter {
 				int i = 0;
 				for ( Segment seg : cont.getSegments() ) {
 					seg.text = trgFragments.get(i);
+					AltTranslation altTmp = altTranslations.get(i);
+					if ( altTmp != null ) {
+						AltTranslationsAnnotation ann = new AltTranslationsAnnotation();
+						ann.add(altTmp);
+						seg.setAnnotation(ann);
+					}
 					i++;
 				}
 				tu.setTarget(trgLoc, cont);
-				if ( scores != null ) {
-					cont.setAnnotation(scores);
-				}
 			}
 			
 			tu.setId(String.valueOf(++tuId));
