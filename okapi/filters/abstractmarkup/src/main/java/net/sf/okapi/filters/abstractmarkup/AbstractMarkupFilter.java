@@ -83,7 +83,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	private static final Logger LOGGER = Logger.getLogger(AbstractMarkupFilter.class.getName());
 	private static final int PREVIEW_BYTE_COUNT = 1024;
 
-	protected StringBuilder bufferedWhitespace;
+	private StringBuilder bufferedWhitespace;
 	private StreamedSource document;
 	private ExtractionRuleState ruleState;
 	private Iterator<Segment> nodeIterator;
@@ -105,6 +105,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 */
 	public AbstractMarkupFilter() {
 		setEventBuilder(new EventBuilder());
+		bufferedWhitespace = new StringBuilder();
 		hasUtf8Bom = false;
 		hasUtf8Encoding = false;
 		preserveWhitespace = true;
@@ -385,10 +386,6 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 * @return true if the normal handlers can be skipped, false otherwise
 	 */
 	protected void preProcess(Segment segment) {
-		if (bufferedWhitespace == null) {
-			return;
-		}
-		
 		boolean isInsideTextRun = false;
 		if (segment instanceof Tag) {
 			isInsideTextRun = getConfig().getMainRuleType(((Tag) segment).getName()) == RULE_TYPE.INLINE_ELEMENT;
@@ -805,46 +802,6 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 			}
 			addToTextUnit(new Code(codeType, getConfig().getElementType(tag), literalTag));
 		}
-
-		/*
-		List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders;
-		String literalTag = tag.toString();
-		TextFragment.TagType codeType;
-
-		// start tag or empty tag
-		if (tag.getTagType() == StartTagType.NORMAL || tag.getTagType() == StartTagType.UNREGISTERED) {
-			StartTag startTag = ((StartTag) tag);
-
-			// is this an empty tag?
-			if (startTag.isSyntacticalEmptyElementTag())
-				codeType = TextFragment.TagType.PLACEHOLDER;
-			else
-				codeType = TextFragment.TagType.OPENING;
-
-			// create a list of Property or Text placeholders for this tag
-			// If this list is empty we know that there are no attributes that
-			// need special processing
-			propertyTextUnitPlaceholders = null;
-
-			propertyTextUnitPlaceholders = createPropertyTextUnitPlaceholders(startTag);
-			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
-				// add code and process actionable attributes
-				getEventBuilder().addToTextUnit(new Code(codeType, getConfig().getElementType(tag), literalTag),
-						getTrgLoc(),						
-						propertyTextUnitPlaceholders);
-			} else {
-				// no actionable attributes, just add the code as-is
-				getEventBuilder().addToTextUnit(new Code(codeType, getConfig().getElementType(tag), literalTag));
-			}
-		} else { // end or unknown tag
-			if (tag.getTagType() == EndTagType.NORMAL || tag.getTagType() == EndTagType.UNREGISTERED) {
-				codeType = TextFragment.TagType.CLOSING;
-			} else {
-				codeType = TextFragment.TagType.PLACEHOLDER;
-			}
-			getEventBuilder().addToTextUnit(new Code(codeType, getConfig().getElementType(tag), literalTag));
-		}
-		*/
 	}
 
 	/**
@@ -1081,5 +1038,9 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	public void setMimeType(String mimeType) {
 		super.setMimeType(mimeType);
 		eventBuilder.setMimeType(mimeType);
+	}
+	
+	public StringBuilder getBufferedWhiteSpace() {
+		return bufferedWhitespace;
 	}
 }
