@@ -52,7 +52,7 @@ public class HtmlFilter extends AbstractMarkupFilter {
 	private Parameters parameters;	
 
 	public HtmlFilter() {
-		super();
+		super(new AbstractMarkupEventBuilder());
 		setMimeType(MimeTypeMapper.HTML_MIME_TYPE);
 		setFilterWriter(createFilterWriter());
 		setParameters(new Parameters());
