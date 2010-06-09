@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.filters.html;
+package net.sf.okapi.filters.abstractmarkup;
 
 import java.util.regex.Pattern;
 
@@ -29,7 +29,7 @@ import net.sf.okapi.common.filters.InlineCodeFinder;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 
-public class HtmlEventBuilder extends EventBuilder {
+public class AbstractMarkupEventBuilder extends EventBuilder {
 	/*
 	 * HTML whitespace space (U+0020) tab (U+0009) form feed (U+000C) line feed
 	 * (U+000A) carriage return (U+000D) zero-width space (U+200B) (IE6 does not
@@ -42,7 +42,7 @@ public class HtmlEventBuilder extends EventBuilder {
 	private boolean useCodeFinder = false;
 	private InlineCodeFinder codeFinder;
 	
-	public HtmlEventBuilder () {
+	public AbstractMarkupEventBuilder () {
 		codeFinder = new InlineCodeFinder();
 	}
 	

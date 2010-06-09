@@ -39,6 +39,7 @@ import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderAccessType;
 import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.filters.abstractmarkup.AbstractMarkupEventBuilder;
 import net.sf.okapi.filters.abstractmarkup.AbstractMarkupFilter;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
@@ -48,12 +49,10 @@ public class HtmlFilter extends AbstractMarkupFilter {
 
 	private static final Logger LOGGER = Logger.getLogger(HtmlFilter.class.getName());
 
-	private Parameters parameters;
-	private HtmlEventBuilder eventBuilder;
+	private Parameters parameters;	
 
 	public HtmlFilter() {
-		super(new HtmlEventBuilder());
-		eventBuilder = (HtmlEventBuilder) getEventBuilder();
+		super();
 		setMimeType(MimeTypeMapper.HTML_MIME_TYPE);
 		setFilterWriter(createFilterWriter());
 		setParameters(new Parameters());
@@ -74,13 +73,13 @@ public class HtmlFilter extends AbstractMarkupFilter {
 	@Override
 	protected void startFilter() {
 		super.startFilter();
-		eventBuilder.setPreserveWhitespace(false);
-		eventBuilder.setCollapseWhitespace(!isPreserveWhitespace() && getConfig().collapseWhitespace());
+		getEventBuilder().setPreserveWhitespace(false);
+		getEventBuilder().setCollapseWhitespace(!isPreserveWhitespace() && getConfig().collapseWhitespace());
 		if (getConfig().collapseWhitespace()) {
 			LOGGER.log(Level.FINE,
 					"By default the HTML filter will collapse whitespace unless overridden in the configuration"); //$NON-NLS-1$
 		}
-		eventBuilder.initializeCodeFinder(getConfig().getUseCodeFinder(), getConfig().getCodeFinderRules());
+		getEventBuilder().initializeCodeFinder(getConfig().getUseCodeFinder(), getConfig().getCodeFinderRules());
 	}
 
 	@Override
@@ -112,13 +111,13 @@ public class HtmlFilter extends AbstractMarkupFilter {
 	@Override
 	protected void handleStartTag(StartTag startTag) {
 		super.handleStartTag(startTag);
-		eventBuilder.setCollapseWhitespace(!isPreserveWhitespace() && getConfig().collapseWhitespace());
+		getEventBuilder().setCollapseWhitespace(!isPreserveWhitespace() && getConfig().collapseWhitespace());
 	}
 	
 	@Override
 	protected void handleEndTag(EndTag endTag) {
 		super.handleEndTag(endTag);
-		eventBuilder.setCollapseWhitespace(!isPreserveWhitespace() && getConfig().collapseWhitespace());
+		getEventBuilder().setCollapseWhitespace(!isPreserveWhitespace() && getConfig().collapseWhitespace());
 	}
 
 	@Override
@@ -148,7 +147,7 @@ public class HtmlFilter extends AbstractMarkupFilter {
 		}
 
 		// name is normalized in super-class
-		return super.createPropertyTextUnitPlaceholder(type, name, eventBuilder.normalizeHtmlText(value, true,
+		return super.createPropertyTextUnitPlaceholder(type, name, getEventBuilder().normalizeHtmlText(value, true,
 				!isPreserveWhitespace() && getConfig().collapseWhitespace()), tag, attribute);
 	}
 
@@ -246,5 +245,12 @@ public class HtmlFilter extends AbstractMarkupFilter {
 	 */
 	public void setParametersFromString(String config) {
 		parameters = new Parameters(config);
+	}
+	
+	/**
+	 * @return the {@link AbstractMarkupEventBuilder}
+	 */
+	public AbstractMarkupEventBuilder getEventBuilder() {
+		return (AbstractMarkupEventBuilder)super.getEventBuilder();
 	}
 }

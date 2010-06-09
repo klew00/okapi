@@ -104,7 +104,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 * {@link EventBuilder}
 	 */
 	public AbstractMarkupFilter() {
-		setEventBuilder(new EventBuilder());
+		setEventBuilder(new AbstractMarkupEventBuilder());
 		bufferedWhitespace = new StringBuilder();
 		hasUtf8Bom = false;
 		hasUtf8Encoding = false;		
