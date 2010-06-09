@@ -506,7 +506,7 @@ public class TTXFilter implements IFilter {
 					else if ( name.equals("df") ) {
 						// We have to use placeholder for df because they don't match ut nesting order
 						dfCount++;
-						Code code = current.append(TagType.PLACEHOLDER, "x-df", "", -1);
+						Code code = current.append(TagType.PLACEHOLDER, "x-df-s", "", -1);
 						code.setOuterData(buildStartElement(false));
 						continue;
 					}
@@ -535,14 +535,10 @@ public class TTXFilter implements IFilter {
 						done = true;
 					}
 					else if ( name.equals("df") ) {
-//						if ( --dfCount < 0 ) { // External DF
-//							done = true;
-//						}
-//						else {
-							// We have to use placeholder for df because they don't match ut nesting order
-							Code code = current.append(TagType.PLACEHOLDER, "x-df", "", -1); //(inTarget ? ++trgId : ++srcId));
-							code.setOuterData(buildEndElement(false));
-//						}
+						// We have to use placeholder for df because they don't match ut nesting order
+						dfCount--;
+						Code code = current.append(TagType.PLACEHOLDER, "x-df-e", "", -1); //(inTarget ? ++trgId : ++srcId));
+						code.setOuterData(buildEndElement(false));
 						continue;
 					}
 					// Possible end of segment
@@ -611,7 +607,7 @@ public class TTXFilter implements IFilter {
 			}
 			
 			// Else genuine text unit, finalize and send
-			
+			String movedCodes = "";
 			if ( srcCont.hasBeenSegmented() ) {
 				TextContainer cont = srcCont.clone();
 				int i = 0;
@@ -627,6 +623,12 @@ public class TTXFilter implements IFilter {
 				}
 				tu.setTarget(trgLoc, cont);
 			}
+			else { // We assume pre-segmented entry don't have the overlapping DF problem.
+				// If they are un-segmented they may, and we try to fix it here:
+				if ( dfCount < 0 ) { // Extra </df> in content
+					movedCodes = moveDFCodesToString(srcCont, dfCount);
+				}
+			}
 			
 			tu.setId(String.valueOf(++tuId));
 			skel.addContentPlaceholder(tu); // Used by the TTXFilterWriter
@@ -635,6 +637,9 @@ public class TTXFilter implements IFilter {
 			tu.setMimeType(MimeTypeMapper.TTX_MIME_TYPE);
 			queue.add(new Event(EventType.TEXT_UNIT, tu));
 			skel = new GenericSkeleton();
+			if ( !Util.isEmpty(movedCodes) ) {
+				skel.add(movedCodes);
+			}
 			return returnValueAfterTextUnitDone;
 		}
 //		catch ( IndexOutOfBoundsException e ) {
@@ -643,6 +648,38 @@ public class TTXFilter implements IFilter {
 		catch ( XMLStreamException e) {
 			throw new OkapiIOException("Error processing top-level ut element.", e);
 		}
+	}
+	
+	/**
+	 * Moves the trailing DF codes to a string until dfCount is 0.
+	 * The container must not be segmented yet.
+	 * @param tc the container to update.
+	 * @param dfCount the df counter.
+	 * @return the string with removed codes.
+	 */
+	private String moveDFCodesToString (TextContainer tc, int dfCount) {
+		if ( dfCount >= 0 ) return "";
+		String tmp = "";
+		TextFragment tf = tc.get(0).text; 
+		StringBuilder ctext = new StringBuilder(tf.getCodedText());
+		List<Code> codes = tc.getFirstContent().getCodes();
+		
+		for ( int i=ctext.length()-1; i>=0; i-- ) {
+			if ( TextFragment.isMarker(ctext.charAt(i)) ) {
+				Code code = codes.get(TextFragment.toIndex(ctext.charAt(i+1)));
+				if (( code.getType() != null ) && code.getType().equals("x-df-e") ) {
+					// Copy the code data at the front of the skeleton string
+					tmp = code.getOuterData() + tmp;
+					// Remove the code from the fragment
+					tf.remove(i, i+2);
+					// Get the coded text again 
+					ctext.setLength(0);
+					ctext.append(tf.getCodedText());
+					if ( ++dfCount == 0 ) break;
+				}
+			}
+		}
+		return tmp;
 	}
 	
 	private boolean hasText (TextContainer tc) {

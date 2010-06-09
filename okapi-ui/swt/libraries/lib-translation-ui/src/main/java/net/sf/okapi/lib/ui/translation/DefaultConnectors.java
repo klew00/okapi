@@ -79,11 +79,12 @@ public class DefaultConnectors implements IConnectorList {
 		trc.descriptionProviderClass = "net.sf.okapi.connectors.crosslanguage.Parameters";
 		list.add(trc);
 
-		trc = new ConnectorInfo();
-		trc.description = "TAUS Data Association Search Repository (Beta connector)";
-		trc.connectorClass = "net.sf.okapi.connectors.tda.TDASearchConnector";
-		trc.descriptionProviderClass = "net.sf.okapi.connectors.tda.Parameters";
-		list.add(trc);
+//Implement concordance search only for now
+//		trc = new ConnectorInfo();
+//		trc.description = "TAUS Data Association Search Repository (Beta connector)";
+//		trc.connectorClass = "net.sf.okapi.connectors.tda.TDASearchConnector";
+//		trc.descriptionProviderClass = "net.sf.okapi.connectors.tda.Parameters";
+//		list.add(trc);
 	}
 
 	public List<ConnectorInfo> getList () {

@@ -97,9 +97,69 @@ public class TTXFilterTest {
 		ISegments segments = cont.getSegments();
 		assertEquals(1, segments.count());
 		assertEquals("en1", segments.get(0).toString());
-		segments = tu.getTarget(locESEM).getSegments();
+		cont = tu.getTarget(locESEM);
+		segments = cont.getSegments();
 		assertEquals(1, segments.count());
-		assertEquals("es1", segments.get(0).toString());
+		assertEquals("<b1/>[es1]<e1/>", fmt.printSegmentedContent(cont, true));
+	}
+
+	@Test
+	public void testNotSegmentedWithDFAndCodes () {
+		String snippet = STARTFILENOLB
+			+ "<df Size=\"12\">"
+			+ "<ut Type=\"start\" Style=\"external\">{P}</ut><ut Type=\"start\">{i}</ut>"
+			+ "src text" 
+			+ "</df><ut Type=\"end\">{/i}</ut>"
+			+ "<ut Type=\"end\" Style=\"external\">{/P}</ut>"
+			+ "</Raw></Body></TRADOStag>";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(filter1, snippet, locESEM), 1);
+		assertNotNull(tu);
+		TextContainer cont = tu.getSource();
+		ISegments segments = cont.getSegments();
+		assertEquals(1, segments.count());
+		// </df> moved outside
+		assertEquals("[<1>src text</1>]", fmt.printSegmentedContent(cont, true));
+	}
+
+	@Test
+	public void testNotSegmentedWithDF () {
+		String snippet = STARTFILENOLB
+			+ "<df Size=\"12\">"
+			+ "<ut Type=\"start\" Style=\"external\">{P}</ut>"
+			+ "src text" 
+			+ "</df>"
+			+ "<ut Type=\"end\" Style=\"external\">{/P}</ut>"
+			+ "</Raw></Body></TRADOStag>";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(filter1, snippet, locESEM), 1);
+		assertNotNull(tu);
+		TextContainer cont = tu.getSource();
+		ISegments segments = cont.getSegments();
+		assertEquals(1, segments.count());
+		// </df> moved outside
+		assertEquals("[src text]", fmt.printSegmentedContent(cont, true));
+	}
+
+	@Test
+	public void testOutputNotSegmentedWithDF_ForcingOutSeg () {
+		String snippet = STARTFILENOLB
+			+ "<df Size=\"12\">"
+			+ "<ut Type=\"start\" Style=\"external\">{P}</ut>"
+			+ "src text" 
+			+ "</df>"
+			+ "<ut Type=\"end\" Style=\"external\">{/P}</ut>"
+			+ "</Raw></Body></TRADOStag>";
+		String expected = STARTFILENOLB
+			+ "<df Size=\"12\">"
+			+ "<ut Type=\"start\" Style=\"external\">{P}</ut>"
+			+ "<Tu MatchPercent=\"0\">"
+			+ "<Tuv Lang=\"EN-US\">src text</Tuv>"
+			+ "<Tuv Lang=\"ES-EM\">src text</Tuv>"
+			+ "</Tu>"
+			+ "</df>"
+			+ "<ut Type=\"end\" Style=\"external\">{/P}</ut>"
+			+ "</Raw></Body></TRADOStag>";
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(filter1, snippet, locESEM),
+			locESEM, filter1.createSkeletonWriter(), filter1.getEncoderManager()));
 	}
 
 	@Test
@@ -124,9 +184,6 @@ public class TTXFilterTest {
 		assertEquals(1, segments.count());
 		assertEquals("es1", segments.get(0).toString());
 		assertNull(segments.get(0).getAnnotation(AltTranslationsAnnotation.class));
-		// Check that last DF is not included in TU
-		// We should have only one marker, for the segment
-//TOFIX: isolated df in TU		assertEquals(1, cont.getCodes().size());
 	}
 
 	@Test
@@ -547,7 +604,7 @@ public class TTXFilterTest {
 //			+ "<Tu MatchPercent=\"0\"><Tuv Lang=\"EN-US\">text2</Tuv><Tuv Lang=\"ES-EM\">text2</Tuv></Tu>"
 //			+ "</Raw></Body></TRADOStag>";
 //		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(filter2, snippet, locESEM), locESEM,
-//			filter2.createSkeletonWriter()));
+//			filter2.createSkeletonWriter(), filter2.getEncoderManager()));
 //	}
 
 	@Test
