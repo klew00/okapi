@@ -368,7 +368,7 @@ public class EventBuilder {
 		subDocumentId = 0;
 
 		done = false;
-		preserveWhitespace = false;
+		preserveWhitespace = true;
 
 		referencableFilterEvents = new LinkedList<Event>();
 		filterEvents = new LinkedList<Event>();
