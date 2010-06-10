@@ -16,6 +16,9 @@
 			<property name="platform" value="win32-x86"/>
 		</ant>
 		<ant antfile="build_okapi-apps.xml">
+			<property name="platform" value="win32-x86_64"/>
+		</ant>
+		<ant antfile="build_okapi-apps.xml">
 			<property name="platform" value="gtk2-linux-x86"/>
 		</ant>
 		<ant antfile="build_okapi-apps.xml">

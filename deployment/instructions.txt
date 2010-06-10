@@ -8,12 +8,12 @@ in trunk/deployment/shared/changes.html
 --- 1) Make sure all unit tests pass
 
 Do a full rebuild of the Maven build:
-mvn clean install from /trunk
+mvn clean install from trunk
 
 
 --- 2) Make sure platform-specific dependencies are downloaded:
-from /trunk/okapi-ui/swt/core-ui run
-mvn -PWIN_SWT -PCOCOA_SWT -PCOCOA_64_SWT -PLinux_x86_swt -PLinux_x86_64_swt dependency:resolve
+from trunk/okapi-ui/swt/core-ui run
+mvn -PWIN_SWT -PWIN_64_SWT -PCOCOA_SWT -PCOCOA_64_SWT -PLinux_x86_swt -PLinux_x86_64_swt dependency:resolve
 
 
 --- 3) Make sure the following files have the proper version and release numbers for this release:
