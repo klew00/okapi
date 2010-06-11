@@ -23,11 +23,9 @@ package net.sf.okapi.steps.termextraction;
 import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.ParametersDescription;
-import net.sf.okapi.common.uidescription.CheckboxPart;
 import net.sf.okapi.common.uidescription.EditorDescription;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 import net.sf.okapi.common.uidescription.PathInputPart;
-import net.sf.okapi.common.uidescription.SeparatorPart;
 import net.sf.okapi.common.uidescription.SpinInputPart;
 
 @EditorFor(Parameters.class)
@@ -151,7 +149,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 
 	@Override
 	public void reset () {
-		outputPath = "terms.txt";
+		outputPath = "${rootDir}/terms.txt";
 		autoOpen = false;
 		minWordsPerTerm = 1;
 		maxWordsPerTerm = 3;

@@ -292,19 +292,17 @@ public class PipelineWrapper {
 			}
 			availableSteps.put(step.id, step);
 
-// Not ready
-//			ps = (IPipelineStep)Class.forName(
-//				"net.sf.okapi.steps.linebreakconversion.LineBreakConversionStep").newInstance();
-//			params = ps.getParameters();
-//			step = new StepInfo(ps.getClass().getSimpleName(),
-//				ps.getName(), ps.getDescription(), ps.getClass().getName(), null,
-//				params.getClass().getName());
-//			if ( params != null ) {
-//				step.paramsData = params.toString();
-//				peMapper.addEditor("net.sf.okapi.steps.linebreakconversion.ui.ParametersEditor", step.paramsClass);
-//				peMapper.addDescriptionProvider("net.sf.okapi.steps.linebreakconversion.Parameters", step.paramsClass);
-//			}
-//			availableSteps.put(step.id, step);
+			ps = (IPipelineStep)Class.forName(
+				"net.sf.okapi.steps.linebreakconversion.LineBreakConversionStep").newInstance();
+			params = ps.getParameters();
+			step = new StepInfo(ps.getClass().getSimpleName(),
+				ps.getName(), ps.getDescription(), ps.getClass().getName(), null,
+				params.getClass().getName());
+			if ( params != null ) {
+				step.paramsData = params.toString();
+				peMapper.addDescriptionProvider("net.sf.okapi.steps.linebreakconversion.Parameters", step.paramsClass);
+			}
+			availableSteps.put(step.id, step);
 
 			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.qualitycheck.QualityCheckStep").newInstance();

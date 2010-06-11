@@ -97,19 +97,6 @@
  </plugin>
 
  <plugin type="utility"
-  id="oku_linebreakconversion"
-  version="1.0"
-  pluginClass="net.sf.okapi.applications.rainbow.utilities.linebreakconversion.Utility"
-  editorClass="net.sf.okapi.applications.rainbow.utilities.linebreakconversion.Editor"
-  updateUri="http://okapi.opentag.com/updates.html">
-  <info>
-   <name>Line-Break Conversion</name>
-   <description>Converts the line-breaks of any text input file to a give type.</description>
-   <provider>Okapi Framework</provider>
-  </info>
- </plugin>
-
- <plugin type="utility"
   id="oku_bomconversion"
   version="1.0"
   pluginClass="net.sf.okapi.applications.rainbow.utilities.bomconversion.Utility"

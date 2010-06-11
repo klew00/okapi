@@ -252,11 +252,6 @@
 		</dependency>
 		<dependency>
 			<groupId>net.sf.okapi.steps</groupId>
-			<artifactId>okapi-step-linebreakconversion-ui</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sf.okapi.steps</groupId>
 			<artifactId>okapi-step-qualitycheck-ui</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -329,6 +324,11 @@
 		<dependency>
 			<groupId>net.sf.okapi.steps</groupId>
 			<artifactId>okapi-step-formatconversion</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.okapi.steps</groupId>
+			<artifactId>okapi-step-linebreakconversion</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

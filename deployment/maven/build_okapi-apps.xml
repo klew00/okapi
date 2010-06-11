@@ -152,8 +152,6 @@
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi-ui/swt/steps/leveraging-ui/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../okapi-ui/swt/steps/linebreakconversion-ui/target/classes"
-			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi-ui/swt/steps/qualitycheck-ui/target/classes"
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi-ui/swt/steps/searchandreplace-ui/target/classes"

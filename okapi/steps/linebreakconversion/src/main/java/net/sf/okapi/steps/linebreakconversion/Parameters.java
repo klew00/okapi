@@ -69,7 +69,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	@Override
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
-		desc.add(LINEBREAK, "New type of line-break", "Type of line-break to conver to");
+		desc.add(LINEBREAK, "Convert line-breaks to the following type", "Select the new type of line-break for the output.");
 		return desc;
 	}
 	

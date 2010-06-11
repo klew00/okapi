@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -60,7 +60,8 @@ public class LineBreakConversionStep extends BasePipelineStep {
 	}
 	
 	public String getDescription () {
-		return "Convert the type of line-breaks in a text-based file.";
+		return "Convert the type of line-breaks in a text-based file."
+			+ " Expects: raw document. Sends back: raw document.";
 	}
 
 	public String getName () {
