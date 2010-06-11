@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -115,7 +115,8 @@ public class Project {
 		// Is the root OK?
 		String inputRoot = getInputRoot(listIndex);
 		if ( newPath.indexOf(inputRoot) == -1 ) return 1;
-		newPath = newPath.substring(inputRoot.length()+1); // No leading separator
+		int correction = (inputRoot.endsWith(File.separator) ? -1 : 0);
+		newPath = newPath.substring(inputRoot.length()+correction+1); // No leading separator
 		
 		// Does the path exists already?
 		if ( !allowDuplicates ) {
