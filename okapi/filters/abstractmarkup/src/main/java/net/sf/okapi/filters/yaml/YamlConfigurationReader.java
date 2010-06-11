@@ -26,15 +26,24 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.yaml.snakeyaml.Yaml;
 
 public class YamlConfigurationReader  {	
+	private static final String REGEX_META_CHARS_REGEX = "[\\(\\[\\{\\^\\$\\|\\]\\}\\)\\?\\*\\+]+";
+	private static final Pattern REGEX_META_CHARS_PATTERN = Pattern.compile(REGEX_META_CHARS_REGEX);
+	
 	private boolean preserveWhitespace;
 	private Yaml yaml;
 	@SuppressWarnings("unchecked")
 	private Map config;
+	private Map<String, Object> regexRules;
+	private Map<String, Pattern> compiledRegexRules;
 	
 	public boolean isPreserveWhitespace() {
 		return preserveWhitespace;
@@ -50,7 +59,10 @@ public class YamlConfigurationReader  {
 	@SuppressWarnings("unchecked")
 	public YamlConfigurationReader() {
 		yaml = new Yaml();
-		config = (Map)yaml.load("collapse_whitespace: false");		
+		config = (Map)yaml.load("collapse_whitespace: false\nassumeWellformed: true");
+		regexRules = new HashMap<String, Object>();
+		findRegexRules();
+		compileRegexRules();
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -58,6 +70,9 @@ public class YamlConfigurationReader  {
 		try {
 			yaml = new Yaml();
 			config = (Map)yaml.load(new InputStreamReader(configurationPathAsResource.openStream()));
+			regexRules = new HashMap<String, Object>();
+			findRegexRules();
+			compileRegexRules();
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
 		} catch (IOException e) {			
@@ -70,6 +85,9 @@ public class YamlConfigurationReader  {
 		try {
 			yaml = new Yaml();
 			config = (Map)yaml.load(new FileReader(configurationFile));
+			regexRules = new HashMap<String, Object>();
+			findRegexRules();
+			compileRegexRules();
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
 		}		
@@ -78,7 +96,10 @@ public class YamlConfigurationReader  {
 	@SuppressWarnings("unchecked")
 	public YamlConfigurationReader(String configurationScript) {
 		yaml = new Yaml();
-		config = (Map)yaml.load(configurationScript);			
+		config = (Map)yaml.load(configurationScript);
+		regexRules = new HashMap<String, Object>();
+		findRegexRules();
+		compileRegexRules();
 	}
 	
 	@Override
@@ -89,6 +110,11 @@ public class YamlConfigurationReader  {
 	@SuppressWarnings("unchecked")
 	public Map getRule(String ruleName) {		
 		return (Map)config.get(ruleName);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public Map getCompiledRegexRules() {		
+		return compiledRegexRules;
 	}
 	
 	public Object getProperty(String property) {
@@ -112,5 +138,32 @@ public class YamlConfigurationReader  {
 	
 	public void clearRules() {
 		config.clear();
+		regexRules.clear();
+		compiledRegexRules.clear();
+	}
+		
+	private void findRegexRules() {		
+		for (Object r : config.keySet()) {			
+			try {
+				Matcher m = REGEX_META_CHARS_PATTERN.matcher((String)r);
+				if (m.find()) {
+					regexRules.put((String)r, config.get(r));
+				}
+			} catch (PatternSyntaxException e) {
+				throw new IllegalConditionalAttributeException(e);
+			}
+		}		
+	}
+	
+	private void compileRegexRules() {
+		if (regexRules.isEmpty()) {
+			return;
+		}
+		
+		compiledRegexRules = new HashMap<String, Pattern>();
+		for (String r : regexRules.keySet()) {
+			Pattern compiledRegex = Pattern.compile(r);
+			compiledRegexRules.put(r, compiledRegex);			
+		}
 	}
 }

@@ -95,7 +95,11 @@ public class TaggedFilterConfiguration {
 	private static final String WELLFORMED = "assumeWellformed";
 	private static final String USECODEFINDER = "useCodeFinder";
 	private static final String CODEFINDERRULES = "codeFinderRules";
-
+	private static final String GLOBAL_PCDATA_SUBFILTER = "global_pcdata_subfilter";
+	private static final String GLOBAL_CDATA_SUBFILTER = "global_cdata_subfilter";
+	private static final String CONDITIONS = "conditions";
+	private static final String SUBFILTER = "subfilter";
+	
 	public static enum RULE_TYPE {
 		INLINE_ELEMENT, EXCLUDED_ELEMENT, INCLUDED_ELEMENT, GROUP_ELEMENT, TEXT_UNIT_ELEMENT, TEXT_RUN_ELEMENT, TEXT_MARKER_ELEMENT, PRESERVE_WHITESPACE, SCRIPT_ELEMENT, SERVER_ELEMENT, ATTRIBUTE_TRANS, ATTRIBUTE_WRITABLE, ATTRIBUTE_READONLY, ATTRIBUTES_ONLY, ATTRIBUTE_ID, UNKOWN
 	};
@@ -144,7 +148,15 @@ public class TaggedFilterConfiguration {
 		if ( useCF == null ) return false;
 		else return useCF;
 	}
+	
+	public String globalPCDATASubfilter() {		 
+		return (String) configReader.getProperty(GLOBAL_PCDATA_SUBFILTER);
+	}
 
+	public String globalCDATASubfilter() {		 
+		return (String) configReader.getProperty(GLOBAL_CDATA_SUBFILTER);
+	}
+	
 	public String getCodeFinderRules () {
 		return (String)configReader.getProperty(CODEFINDERRULES);
 	}
