@@ -136,6 +136,30 @@ public class HtmlConfigurationSupportTest {
 	}
 	
 	@Test
+	public void test_translatableAttributes_withCondition () {
+		String config = "p: \n"
+			+ "   ruleTypes: [TEXTUNIT]\n"
+			+ "   translatableAttributes: {alt: [attr1, EQUALS, trans]}";
+		filter.setParameters(new Parameters(config));
+		String snippet = "<p alt='t1' attr1='NOTRANS'>t2</p><p alt='t-alt' attr1='trans'>t4</p>";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 2);
+		assertEquals("t-alt", tu.getSource().toString());
+	}
+	
+	@Test
+	public void test_translatableAttributes_with2ORConditions () {
+		String config = "p: \n"
+			+ "   ruleTypes: [TEXTUNIT]\n"
+			+ "   translatableAttributes: {alt: [[attr1, EQUALS, trans], [attr2, EQUALS, 'yes']]}";
+		filter.setParameters(new Parameters(config));
+		String snippet = "<p alt='t-alt1' attr2='yes'>t2</p><p alt='t-alt2' attr1='trans'>t4</p>";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		assertEquals("t-alt1", tu.getSource().toString());
+		tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 3);
+		assertEquals("t-alt2", tu.getSource().toString());
+	}
+	
+	@Test
 	public void test_ATTRIBUTE_WRITABLE () {
 		String config = "dir: \n"
 			+ "   ruleTypes: [ATTRIBUTE_WRITABLE]\n"
