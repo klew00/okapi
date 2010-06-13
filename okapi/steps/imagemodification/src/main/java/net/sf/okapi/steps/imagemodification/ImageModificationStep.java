@@ -60,7 +60,7 @@ public class ImageModificationStep extends BasePipelineStep {
 	
 	@Override
 	public String getName () {
-		return "Image Resizing";
+		return "Image Modification";
 	}
 
 	@Override
@@ -120,6 +120,9 @@ public class ImageModificationStep extends BasePipelineStep {
 							newFormat = "png";
 						}
 					}
+					else { // Same as before
+						newFormat = currentSuffix;
+					}
 				}
 				else {
 					// Else: newFormat is set to the proper value
@@ -132,7 +135,6 @@ public class ImageModificationStep extends BasePipelineStep {
 				BufferedImage img2 = createResizedCopy(img1);
 				
 				// Save the output
-				// Open the output
 				File outFile;
 				if ( isLastOutputStep() ) {
 					outFile = new File(outputURI);
@@ -175,7 +177,7 @@ public class ImageModificationStep extends BasePipelineStep {
 			
 			// Perform the resizing
 			BufferedImage scaledImg = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB); 
-			g2d = scaledImg.createGraphics(); 
+			g2d = scaledImg.createGraphics();
 			g2d.setComposite(AlphaComposite.Src); 
 			g2d.drawImage(originalImage, 0, 0, newWidth, newHeight, null);
 			return scaledImg;
