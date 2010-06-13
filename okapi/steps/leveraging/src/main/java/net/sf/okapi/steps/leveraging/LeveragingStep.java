@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.filterwriter.TMXWriter;
@@ -37,6 +38,7 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.translation.QueryManager;
 import net.sf.okapi.lib.translation.ResourceItem;
 
+@UsingParameters(Parameters.class)
 public class LeveragingStep extends BasePipelineStep {
 
 	private final Logger logger = Logger.getLogger(getClass().getName());

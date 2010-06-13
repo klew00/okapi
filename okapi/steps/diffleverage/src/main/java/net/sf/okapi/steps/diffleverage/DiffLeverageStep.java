@@ -30,6 +30,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.annotation.AltTranslationType;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.exceptions.OkapiBadStepInputException;
@@ -57,6 +58,7 @@ import net.sf.okapi.lib.search.lucene.scorer.Util;
  * @author HARGRAVEJE
  * 
  */
+@UsingParameters(Parameters.class)
 public class DiffLeverageStep extends BasePipelineStep {
 	private static final int NGRAM_SIZE = 3;
 

@@ -313,6 +313,11 @@
 		</dependency>
 	 	<dependency>
 			<groupId>net.sf.okapi.steps</groupId>
+			<artifactId>okapi-step-imagemodification</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	 	<dependency>
+			<groupId>net.sf.okapi.steps</groupId>
 			<artifactId>okapi-step-translationcomparison</artifactId>
 			<version>${project.version}</version>
 		</dependency>

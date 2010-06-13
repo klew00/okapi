@@ -23,6 +23,7 @@
         <module>formatconversion</module>
 		<module>fullwidthconversion</module>
 		<module>generatesimpletm</module>
+		<module>imagemodification</module>
 		<module>leveraging</module>
 		<module>linebreakconversion</module>
         <module>qualitycheck</module>
