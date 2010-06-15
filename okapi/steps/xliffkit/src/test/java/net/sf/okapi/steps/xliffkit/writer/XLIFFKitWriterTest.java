@@ -58,6 +58,7 @@ import net.sf.okapi.persistence.beans.v0.TestEventBean2;
 import net.sf.okapi.persistence.beans.v1.EventBean;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 import net.sf.okapi.steps.leveraging.LeveragingStep;
+import net.sf.okapi.steps.xliffkit.reader.EventLogger;
 import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.Batch;
 import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.BatchItem;
 import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.Parameter;
@@ -283,6 +284,8 @@ public class XLIFFKitWriterTest {
 								
 				new RawDocumentToFilterEventsStep()
 				,				
+				new EventLogger()
+				,
 				new PipelineStep(new LeveragingStep(), 
 						new Parameter("resourceClassName", net.sf.okapi.connectors.google.GoogleMTConnector.class.getName()),
 						new Parameter("threshold", 80),

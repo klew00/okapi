@@ -36,7 +36,9 @@ public abstract class PersistenceSession implements IPersistenceSession, IObserv
 	private static final String ITEM_LABEL = "item"; //$NON-NLS-1$
 	
 	protected abstract void writeBean(IPersistenceBean<?> bean, String name);	
+	protected abstract String writeBeanToString(IPersistenceBean<?> bean);
 	protected abstract <T extends IPersistenceBean<?>> T readBean(Class<T> beanClass, String name);
+	protected abstract <T extends IPersistenceBean<?>> T readBeanFromString(String content, Class<T> beanClass);
 	
 	protected abstract void startWriting(OutputStream outStream);
 	protected abstract void endWriting(OutputStream outStream);
@@ -419,6 +421,9 @@ public abstract class PersistenceSession implements IPersistenceSession, IObserv
 	}
 	
 	protected void setVersion(String versionId) {
+		if (Util.isEmpty(versionId))
+			throw new IllegalArgumentException(String.format("PersistenceSession: version id cannot be empty"));
+		
 		if (versionDriver != null && 
 				versionId.equalsIgnoreCase(versionDriver.getVersionId())) return; // already set
 		
@@ -427,5 +432,32 @@ public abstract class PersistenceSession implements IPersistenceSession, IObserv
 			throw new RuntimeException(String.format("PersistenceSession: the version %s is not supported", versionId));
 		beanMapper.reset();
 		versionDriver.registerBeans(beanMapper);
+	}
+	
+	@Override
+	public <T> T readObject(String content, Class<T> classRef) {
+		beanClass = beanMapper.getBeanClass(classRef);		
+		if (beanClass == null)
+			throw new RuntimeException("PersistenceSession: no bean class found");
+		
+		IPersistenceBean<?> bean = readBeanFromString(content, beanClass);
+		notifyObservers(bean);
+		
+		return classRef.cast(bean.get(classRef, this));		
+	}
+	
+	@Override
+	@SuppressWarnings("unchecked")
+	public String writeObject(Object obj) {
+		if (obj == null)
+			throw new IllegalArgumentException("PersistenceSession: cannot write a null object");
+
+		// Throws an exception if fails
+		IPersistenceBean<Object> bean = (IPersistenceBean<Object>) refResolver.createBean(obj.getClass());
+
+		bean.set(obj, this);
+	
+		notifyObservers(bean);
+		return writeBeanToString(bean);
 	}
 }

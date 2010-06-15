@@ -21,6 +21,7 @@
 package net.sf.okapi.steps.xliffkit.common.persistence.sessions;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.persistence.IPersistenceBean;
 import net.sf.okapi.persistence.VersionMapper;
 import net.sf.okapi.persistence.beans.v1.OkapiBeans;
 import net.sf.okapi.persistence.xml.java.xstream.XStreamPersistenceSession;
@@ -46,5 +47,4 @@ public class OkapiXstreamSession extends XStreamPersistenceSession {
 	public void registerVersions() {
 		VersionMapper.registerVersion(OkapiBeans.class);		// v1
 	}
-
 }

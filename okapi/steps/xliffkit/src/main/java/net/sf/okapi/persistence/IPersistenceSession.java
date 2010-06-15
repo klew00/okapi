@@ -69,6 +69,9 @@ public interface IPersistenceSession {
 	 */
 	<T> T deserialize(Class<T> classRef);
 
+	<T> T readObject(String content, Class<T> classRef);
+	
+	String writeObject(Object obj);
 	
 	<T> IPersistenceBean<T> createBean(Class<T> classRef);
 	

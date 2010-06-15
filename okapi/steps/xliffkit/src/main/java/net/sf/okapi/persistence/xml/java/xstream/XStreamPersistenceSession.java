@@ -91,4 +91,14 @@ public abstract class XStreamPersistenceSession extends PersistenceSession {
 		return MimeTypeMapper.XML_MIME_TYPE;
 	}
 
+	@Override
+	protected String writeBeanToString(IPersistenceBean<?> bean) {
+		return null;
+	}
+	
+	@Override
+	protected <T extends IPersistenceBean<?>> T readBeanFromString(
+			String content, Class<T> beanClass) {
+		return null;
+	}
 }

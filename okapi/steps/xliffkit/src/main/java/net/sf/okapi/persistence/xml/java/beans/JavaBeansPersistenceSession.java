@@ -76,4 +76,15 @@ public abstract class JavaBeansPersistenceSession extends PersistenceSession {
 	public String getMimeType() {
 		return MimeTypeMapper.XML_MIME_TYPE;
 	}
+	
+	@Override
+	protected String writeBeanToString(IPersistenceBean<?> bean) {
+		return null;
+	}
+
+	@Override
+	protected <T extends IPersistenceBean<?>> T readBeanFromString(
+			String content, Class<T> beanClass) {
+		return null;
+	}
 }

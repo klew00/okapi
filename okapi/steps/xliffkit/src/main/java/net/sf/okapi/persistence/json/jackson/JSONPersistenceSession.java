@@ -300,4 +300,29 @@ public abstract class JSONPersistenceSession extends PersistenceSession {
 			throw new OkapiFileNotFoundException(e);
 		}
 	}
+
+	@Override
+	protected String writeBeanToString(IPersistenceBean<?> bean) {
+		try {
+			return mapper.writeValueAsString(bean);
+		} catch (JsonGenerationException e) {
+			throw new RuntimeException(MSG_JSON_WRITE_EX, e);
+		} catch (IOException e) {
+			throw new OkapiIOException(e);
+		}
+	}
+
+	@Override
+	protected <T extends IPersistenceBean<?>> T readBeanFromString(
+			String content, Class<T> beanClass) {
+		try {
+			return mapper.readValue(content, beanClass);
+		} catch (JsonParseException e) {			
+			throw new RuntimeException(MSG_JSON_READ_EX, e);
+		} catch (JsonMappingException e) {
+			throw new RuntimeException(MSG_JSON_READ_EX, e);
+		} catch (IOException e) {
+			throw new OkapiIOException(e);
+		}
+	}
 }
