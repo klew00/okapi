@@ -74,12 +74,12 @@ public class HtmlFilter extends AbstractMarkupFilter {
 	protected void startFilter() {
 		super.startFilter();
 		getEventBuilder().setPreserveWhitespace(false);
-		getEventBuilder().setCollapseWhitespace(!isPreserveWhitespace() && getConfig().collapseWhitespace());
-		if (getConfig().collapseWhitespace()) {
+		getEventBuilder().setCollapseWhitespace(!isPreserveWhitespace() && getConfig().isCollapseWhitespace());
+		if (getConfig().isCollapseWhitespace()) {
 			LOGGER.log(Level.FINE,
 					"By default the HTML filter will collapse whitespace unless overridden in the configuration"); //$NON-NLS-1$
 		}
-		getEventBuilder().initializeCodeFinder(getConfig().getUseCodeFinder(), getConfig().getCodeFinderRules());
+		getEventBuilder().initializeCodeFinder(getConfig().isUseCodeFinder(), getConfig().getCodeFinderRules());
 	}
 
 	@Override
@@ -111,13 +111,13 @@ public class HtmlFilter extends AbstractMarkupFilter {
 	@Override
 	protected void handleStartTag(StartTag startTag) {
 		super.handleStartTag(startTag);
-		getEventBuilder().setCollapseWhitespace(!isPreserveWhitespace() && getConfig().collapseWhitespace());
+		getEventBuilder().setCollapseWhitespace(!isPreserveWhitespace() && getConfig().isCollapseWhitespace());
 	}
 	
 	@Override
 	protected void handleEndTag(EndTag endTag) {
 		super.handleEndTag(endTag);
-		getEventBuilder().setCollapseWhitespace(!isPreserveWhitespace() && getConfig().collapseWhitespace());
+		getEventBuilder().setCollapseWhitespace(!isPreserveWhitespace() && getConfig().isCollapseWhitespace());
 	}
 
 	@Override
@@ -148,7 +148,7 @@ public class HtmlFilter extends AbstractMarkupFilter {
 
 		// name is normalized in super-class
 		return super.createPropertyTextUnitPlaceholder(type, name, getEventBuilder().normalizeHtmlText(value, true,
-				!isPreserveWhitespace() && getConfig().collapseWhitespace()), tag, attribute);
+				!isPreserveWhitespace() && getConfig().isCollapseWhitespace()), tag, attribute);
 	}
 
 	/*

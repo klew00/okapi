@@ -140,12 +140,12 @@ public class HtmlConfigurationTest {
 				.getResource("/net/sf/okapi/filters/html/nonwellformedConfiguration.yml");
 		TaggedFilterConfiguration rules = new TaggedFilterConfiguration(url);
 
-		assertEquals(rules.getElementType("b"), "bold");
-		assertEquals(rules.getElementType("i"), "italic");
-		assertEquals(rules.getElementType("u"), "underlined");
-		assertEquals(rules.getElementType("img"), "image");
-		assertEquals(rules.getElementType("a"), "link");		
-		assertEquals(rules.getElementType("x"), "x");
+		assertEquals(getElementType(rules, "b"), "bold");
+		assertEquals(getElementType(rules, "i"), "italic");
+		assertEquals(getElementType(rules, "u"), "underlined");
+		assertEquals(getElementType(rules, "img"), "image");
+		assertEquals(getElementType(rules, "a"), "link");		
+		assertEquals(getElementType(rules, "x"), "x");
 	}
 	
 	@Test
@@ -153,7 +153,7 @@ public class HtmlConfigurationTest {
 		URL url = HtmlFilter.class
 				.getResource("/net/sf/okapi/filters/html/wellformedConfiguration.yml");
 		TaggedFilterConfiguration rules = new TaggedFilterConfiguration(url);
-		assertEquals(rules.getElementType("p"), "paragraph");	
+		assertEquals(getElementType(rules, "p"), "paragraph");	
 	}
 
 	@Test
@@ -161,12 +161,12 @@ public class HtmlConfigurationTest {
 		URL url = HtmlFilter.class
 				.getResource("/net/sf/okapi/filters/html/nonwellformedConfiguration.yml");
 		TaggedFilterConfiguration rules = new TaggedFilterConfiguration(url);
-		assertTrue(rules.collapseWhitespace());
+		assertTrue(rules.isCollapseWhitespace());
 
 		url = HtmlConfigurationTest.class
 				.getResource("/collapseWhitespaceOff.yml");
 		rules = new TaggedFilterConfiguration(url);
-		assertFalse(rules.collapseWhitespace());
+		assertFalse(rules.isCollapseWhitespace());
 	}
 
 	@Test
@@ -174,7 +174,7 @@ public class HtmlConfigurationTest {
 		URL url = HtmlConfigurationTest.class
 			.getResource("/withCodeFinderRules.yml");
 		TaggedFilterConfiguration rules = new TaggedFilterConfiguration(url);
-		assertTrue(rules.getUseCodeFinder());
+		assertTrue(rules.isUseCodeFinder());
 		InlineCodeFinder cf = new InlineCodeFinder();
 		cf.fromString(rules.getCodeFinderRules());
 		cf.compile();
@@ -237,5 +237,14 @@ public class HtmlConfigurationTest {
 		attributes.put("id", "value");
 		assertTrue(rules.isIdAttribute("p", "id", attributes));
 		assertFalse(rules.isIdAttribute("p", "foo", attributes));
+	}
+	
+	private String getElementType(TaggedFilterConfiguration rules, String elementName) {
+		Map<String, Object> rule = rules.getConfigReader().getRule(elementName.toLowerCase());
+		if (rule != null && rule.containsKey(TaggedFilterConfiguration.ELEMENT_TYPE)) {
+			return (String) rule.get(TaggedFilterConfiguration.ELEMENT_TYPE);
+		}
+
+		return elementName;
 	}
 }

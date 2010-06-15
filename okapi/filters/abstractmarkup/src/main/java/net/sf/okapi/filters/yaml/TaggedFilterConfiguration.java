@@ -66,45 +66,45 @@ import net.sf.okapi.common.resource.TextUnit;
  * example, "type=button" OR "type=default".
  */
 public class TaggedFilterConfiguration {
-	private static final String COLLAPSE_WHITSPACE = "collapse_whitespace";
-	private static final String INLINE = "INLINE";
-	private static final String GROUP = "GROUP";
-	private static final String EXCLUDE = "EXCLUDE";
-	private static final String INCLUDE = "INCLUDE";
-	private static final String TEXTUNIT = "TEXTUNIT";
-	private static final String TEXTRUN = "TEXTRUN";
-	private static final String TEXTMARKER = "TEXTMARKER";
-	private static final String PRESERVE_WHITESPACE = "PRESERVE_WHITESPACE";
-	private static final String SCRIPT = "SCRIPT";
-	private static final String SERVER = "SERVER";
-	private static final String ATTRIBUTE_TRANS = "ATTRIBUTE_TRANS";
-	private static final String ATTRIBUTE_WRITABLE = "ATTRIBUTE_WRITABLE";
-	private static final String ATTRIBUTE_READONLY = "ATTRIBUTE_READONLY";
-	private static final String ATTRIBUTES_ONLY = "ATTRIBUTES_ONLY";
-	private static final String ATTRIBUTE_ID = "ATTRIBUTE_ID";
+	public static final String COLLAPSE_WHITSPACE = "collapse_whitespace";
+	public static final String INLINE = "INLINE";
+	public static final String GROUP = "GROUP";
+	public static final String EXCLUDE = "EXCLUDE";
+	public static final String INCLUDE = "INCLUDE";
+	public static final String TEXTUNIT = "TEXTUNIT";
+	public static final String TEXTRUN = "TEXTRUN";
+	public static final String TEXTMARKER = "TEXTMARKER";
+	public static final String PRESERVE_WHITESPACE = "PRESERVE_WHITESPACE";
+	public static final String SCRIPT = "SCRIPT";
+	public static final String SERVER = "SERVER";
+	public static final String ATTRIBUTE_TRANS = "ATTRIBUTE_TRANS";
+	public static final String ATTRIBUTE_WRITABLE = "ATTRIBUTE_WRITABLE";
+	public static final String ATTRIBUTE_READONLY = "ATTRIBUTE_READONLY";
+	public static final String ATTRIBUTES_ONLY = "ATTRIBUTES_ONLY";
+	public static final String ATTRIBUTE_ID = "ATTRIBUTE_ID";
 
-	private static final String ALL_ELEMENTS_EXCEPT = "allElementsExcept";
-	private static final String ONLY_THESE_ELEMENTS = "onlyTheseElements";
+	public static final String ALL_ELEMENTS_EXCEPT = "allElementsExcept";
+	public static final String ONLY_THESE_ELEMENTS = "onlyTheseElements";
 
-	private static final String EQUALS = "EQUALS";
-	private static final String NOT_EQUALS = "NOT_EQUALS";
-	private static final String MATCH = "MATCH";
+	public static final String EQUALS = "EQUALS";
+	public static final String NOT_EQUALS = "NOT_EQUALS";
+	public static final String MATCH = "MATCH";
 
-	private static final String ELEMENT_TYPE = "elementType";
-	private static final String ELEMENT_ID = "idAttributes";
-	private static final String WELLFORMED = "assumeWellformed";
-	private static final String USECODEFINDER = "useCodeFinder";
-	private static final String CODEFINDERRULES = "codeFinderRules";
-	private static final String GLOBAL_PCDATA_SUBFILTER = "global_pcdata_subfilter";
-	private static final String GLOBAL_CDATA_SUBFILTER = "global_cdata_subfilter";
-	private static final String CONDITIONS = "conditions";
-	private static final String SUBFILTER = "subfilter";
+	public static final String ELEMENT_TYPE = "elementType";
+	public static final String ELEMENT_ID = "idAttributes";
+	public static final String WELLFORMED = "assumeWellformed";
+	public static final String USECODEFINDER = "useCodeFinder";
+	public static final String CODEFINDERRULES = "codeFinderRules";
+	public static final String GLOBAL_PCDATA_SUBFILTER = "global_pcdata_subfilter";
+	public static final String GLOBAL_CDATA_SUBFILTER = "global_cdata_subfilter";
+	public static final String CONDITIONS = "conditions";
+	public static final String SUBFILTER = "subfilter";
 	
 	public static enum RULE_TYPE {
 		INLINE_ELEMENT, EXCLUDED_ELEMENT, INCLUDED_ELEMENT, GROUP_ELEMENT, TEXT_UNIT_ELEMENT, TEXT_RUN_ELEMENT, TEXT_MARKER_ELEMENT, PRESERVE_WHITESPACE, SCRIPT_ELEMENT, SERVER_ELEMENT, ATTRIBUTE_TRANS, ATTRIBUTE_WRITABLE, ATTRIBUTE_READONLY, ATTRIBUTES_ONLY, ATTRIBUTE_ID, UNKOWN
 	};
 
-	private YamlConfigurationReader configReader;
+	private final YamlConfigurationReader configReader;
 
 	public TaggedFilterConfiguration() {
 		configReader = new YamlConfigurationReader();
@@ -122,12 +122,16 @@ public class TaggedFilterConfiguration {
 		configReader = new YamlConfigurationReader(configurationScript);
 	}
 	
+	public YamlConfigurationReader getConfigReader() {
+		return configReader;
+	}
+	
 	@Override
 	public String toString() {
 		return configReader.toString();
 	}
 
-	public boolean collapseWhitespace() {
+	public boolean isCollapseWhitespace() {
 		Boolean cw = (Boolean) configReader.getProperty(COLLAPSE_WHITSPACE);
 		if (cw == null) {
 			return true;
@@ -143,17 +147,17 @@ public class TaggedFilterConfiguration {
 		return wf.booleanValue();
 	}
 	
-	public boolean getUseCodeFinder () {
+	public boolean isUseCodeFinder () {
 		Boolean useCF = (Boolean)configReader.getProperty(USECODEFINDER);
 		if ( useCF == null ) return false;
 		else return useCF;
 	}
 	
-	public String globalPCDATASubfilter() {		 
+	public String getGlobalPCDATASubfilter() {		 
 		return (String) configReader.getProperty(GLOBAL_PCDATA_SUBFILTER);
 	}
 
-	public String globalCDATASubfilter() {		 
+	public String getGlobalCDATASubfilter() {		 
 		return (String) configReader.getProperty(GLOBAL_CDATA_SUBFILTER);
 	}
 	
@@ -244,39 +248,6 @@ public class TaggedFilterConfiguration {
 		return element.getName();
 	}
 
-	@SuppressWarnings("unchecked")
-	public String getElementType(String elementName) {
-		Map<String, Object> rule = configReader.getRule(elementName.toLowerCase());
-		if (rule != null && rule.containsKey(ELEMENT_TYPE)) {
-			return (String) rule.get(ELEMENT_TYPE);
-		}
-
-		return elementName;
-	}
-
-	@SuppressWarnings("unchecked")
-	public List getElementIds(String elementName) {
-		Map<String, Object> rule = configReader.getRule(elementName.toLowerCase());
-		if (rule != null && rule.containsKey(ELEMENT_ID)) {
-			return (List) rule.get(ELEMENT_ID);
-		}
-
-		// return null when there are no ids configured
-		return null;
-	}
-
-	@SuppressWarnings("unchecked")
-	public boolean isAttributeRule(String ruleName) {
-		Map rule = configReader.getRule(ruleName.toLowerCase());
-		if (rule != null && isRuleType(ruleName, RULE_TYPE.ATTRIBUTE_TRANS)
-				|| isRuleType(ruleName, RULE_TYPE.ATTRIBUTE_WRITABLE)
-				|| isRuleType(ruleName, RULE_TYPE.ATTRIBUTE_READONLY)
-				|| isRuleType(ruleName, RULE_TYPE.ATTRIBUTE_ID)) {
-			return true;
-		}
-		return false;
-	}
-
 	public boolean isTranslatableAttribute(String elementName, String attribute, Map<String, String> attributes) {
 		return isActionableAttribute("translatableAttributes", elementName, attribute, attributes);
 	}
@@ -359,19 +330,19 @@ public class TaggedFilterConfiguration {
 	 */
 	private boolean isActionableAttributeRule(String elementName, String attrName, String type) {
 		if (type.equalsIgnoreCase("translatableAttributes") && isRuleType(attrName, RULE_TYPE.ATTRIBUTE_TRANS)) {
-			if (isListedElement(elementName, attrName, type)) {
+			if (isListedElement(elementName, attrName)) {
 				return true;
 			}
 		} else if (type.equalsIgnoreCase("readOnlyLocalizableAttributes") && isRuleType(attrName, RULE_TYPE.ATTRIBUTE_READONLY)) {
-			if (isListedElement(elementName, attrName, type)) {
+			if (isListedElement(elementName, attrName)) {
 				return true;
 			}
 		} else if (type.equalsIgnoreCase("writableLocalizableAttributes") && isRuleType(attrName, RULE_TYPE.ATTRIBUTE_WRITABLE)) {
-			if (isListedElement(elementName, attrName, type)) {
+			if (isListedElement(elementName, attrName)) {
 				return true;
 			}
 		} else if (type.equalsIgnoreCase("idAttributes") && isRuleType(attrName, RULE_TYPE.ATTRIBUTE_ID)) {
-			if (isListedElement(elementName, attrName, type)) {
+			if (isListedElement(elementName, attrName)) {
 				return true;
 			}
 		}
@@ -384,17 +355,17 @@ public class TaggedFilterConfiguration {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	private boolean isListedElement(String elementName, String attrName, String type) {
+	private boolean isListedElement(String elementName, String attrName) {
 		List excludedElements;
 		List onlyTheseElements;
-		Map elementRule = configReader.getRule(attrName.toLowerCase());
+		Map attrRule = configReader.getRule(attrName.toLowerCase());
 
-		if (elementRule == null) {
+		if (attrRule == null) {
 			return false;
 		}
 
-		excludedElements = (List) elementRule.get(ALL_ELEMENTS_EXCEPT);
-		onlyTheseElements = (List) elementRule.get(ONLY_THESE_ELEMENTS);
+		excludedElements = (List) attrRule.get(ALL_ELEMENTS_EXCEPT);
+		onlyTheseElements = (List) attrRule.get(ONLY_THESE_ELEMENTS);
 
 		if (excludedElements == null && onlyTheseElements == null) {
 			// means no exceptions - all tags can have this attribute/rule

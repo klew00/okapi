@@ -612,7 +612,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 				getRuleState().pushTextUnitRule(startTag.getName(), idValue);
 				handleAttributesThatAppearAnywhere(propertyTextUnitPlaceholders, startTag);
 				setTextUnitName(idValue);
-				setTextUnitType(getConfig().getElementType(startTag.getName()));
+				setTextUnitType(getConfig().getElementType(startTag));
 				break;
 			default:
 				handleAttributesThatAppearAnywhere(propertyTextUnitPlaceholders, startTag);

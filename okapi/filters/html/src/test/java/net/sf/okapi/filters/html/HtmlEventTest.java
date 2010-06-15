@@ -21,6 +21,8 @@ package net.sf.okapi.filters.html;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.ISkeleton;
+import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.*;
@@ -184,7 +186,32 @@ public class HtmlEventTest {
 		assertTrue(FilterTestDriver.compareEvents(events, getEvents(snippet)));
 	}
 	
-	// TODO - re-enable test when logic in AbstractBaseFilter is fixed @Test
+	@Test
+	public void testIdOnP() {
+		String snippet = "<p id=\"foo\"/>";
+		ArrayList<Event> events = new ArrayList<Event>();
+
+		addStartEvents(events);
+
+		// Build the input
+		TextUnit tu1 = new TextUnit("tu1", "");		
+		tu1.setName("foo");
+		tu1.setType("paragraph");
+		tu1.setMimeType(MimeTypeMapper.HTML_MIME_TYPE);
+		tu1.setSourceProperty(new Property("id", "foo", true));
+		GenericSkeleton skel = new GenericSkeleton();		
+		skel.add("<p id=\"foo\"/>");
+		skel.addContentPlaceholder(tu1);
+		tu1.setSkeleton(skel);
+		events.add(new Event(EventType.TEXT_UNIT, tu1));
+
+		addEndEvents(events);
+
+		assertTrue(FilterTestDriver.compareEvents(events, getEvents(snippet)));
+	}
+	
+	// TODO - re-enable test when logic in AbstractBaseFilter is fixed 
+	//@Test
 	public void testTextUnitWithoutText() {
 		String snippet = "<b>    <font>  </font> </b>";
 		ArrayList<Event> events = new ArrayList<Event>();
@@ -601,10 +628,10 @@ public class HtmlEventTest {
 	}
 
 	private void addStartEvents(ArrayList<Event> events) {		
-		events.add(new Event(EventType.START_DOCUMENT));
+		events.add(new Event(EventType.START_DOCUMENT, new StartDocument("sd1")));
 	}
 
 	private void addEndEvents(ArrayList<Event> events) {
-		events.add(new Event(EventType.END_DOCUMENT));
+		events.add(new Event(EventType.END_DOCUMENT, new Ending("ed2")));
 	}
 }
