@@ -948,7 +948,7 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 		}
 		sTagName = startTag.getName(); // DWH 2-26-09
 		sTagString = startTag.toString(); // DWH 2-26-09
-		sTagElementType = getConfig().getElementType(sTagName); // DWH 6-13-09
+		sTagElementType = getConfig().getElementType(startTag); // DWH 6-15-10
 		if (bInTextBox) // DWH 7-23-09 textbox
 		{
 			if (sTagName.equals("w:txbxcontent")) // DWH 10-22-09 so this won't be an inline code
@@ -1141,7 +1141,7 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 			{
 				addNonTextRunToCurrentTextUnit(); // DWH 5-5-09
 				bBeforeFirstTextRun = false; // DWH 5-5-09
-				if (getConfig().getElementType(sTagName).equals("insert")) // DWH 5-8-09 w:ins
+				if (getConfig().getElementType(startTag).equals("insert")) // DWH 6-15-10 startTag was sTagName
 					bInInsertion = true;
 				else if (bInTextRun)
 					bInSubTextRun = true;
@@ -1216,7 +1216,7 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 		if (endTag==null) // DWH 4-14-09
 			return;
 		sTagName = endTag.getName(); // DWH 2-26-09
-		sTagElementType = getConfig().getElementType(sTagName); // DWH 6-13-09
+		sTagElementType = getConfig().getElementType(endTag); // DWH 6-15-10 endTag was sTagName
 		if (bInDeletion)
 		{
 			addToNonTextRun(endTag);
