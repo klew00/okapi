@@ -21,7 +21,6 @@
 package net.sf.okapi.steps.xliffkit.common.persistence.sessions;
 
 import net.sf.okapi.common.Event;
-import net.sf.okapi.persistence.IPersistenceBean;
 import net.sf.okapi.persistence.VersionMapper;
 import net.sf.okapi.persistence.beans.v1.OkapiBeans;
 import net.sf.okapi.persistence.xml.java.beans.JavaBeansPersistenceSession;

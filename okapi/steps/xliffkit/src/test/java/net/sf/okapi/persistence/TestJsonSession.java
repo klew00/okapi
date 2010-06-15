@@ -31,7 +31,6 @@ import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
-import net.sf.okapi.persistence.beans.v0.PersistenceMapper;
 import net.sf.okapi.persistence.beans.v1.OkapiBeans;
 import net.sf.okapi.steps.xliffkit.common.persistence.sessions.OkapiJsonSession;
 
