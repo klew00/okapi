@@ -20,34 +20,59 @@
 
 package net.sf.okapi.steps.qualitycheck;
 
-public class Issue {
+import java.util.regex.Pattern;
 
-	IssueType issueType;
-	String tuId;
-	String segId;
-	String message;
-	int srcStart;
-	int srcEnd;
-	int trgStart;
-	int trgEnd;
+public class PatternItem {
 	
-	public Issue (IssueType issueType,
-		String tuId,
-		String segId,
-		String message, 
-		int srcStart, 
-		int srcEnd, 
-		int trgStart, 
-		int trgEnd)
+	public static final String SAME = "<same>";
+
+	public String source;
+	public String target;
+	public boolean enabled;
+	public String message;
+	
+	private Pattern srcPat;
+	private Pattern trgPat;
+
+	public PatternItem (String source,
+		String target,
+		boolean enabled)
 	{
-		this.issueType = issueType;
-		this.tuId = tuId;
-		this.segId = segId;
+		create(source, target, enabled, null);
+	}
+
+	public PatternItem (String source,
+		String target,
+		boolean enabled,
+		String message)
+	{
+		create(source, target, enabled, message);
+	}
+
+	private void create (String source,
+		String target,
+		boolean enabled,
+		String message)
+	{
+		this.source = source;
+		this.target = target;
+		this.enabled = enabled;
 		this.message = message;
-		this.srcStart = srcStart;
-		this.srcEnd = srcEnd;
-		this.trgStart = trgStart;
-		this.trgEnd = trgEnd;
+	}
+
+	public void compile () {
+		srcPat = Pattern.compile(source);
+		if ( !target.equals(SAME) ) {
+			trgPat = Pattern.compile(target);
+		}
+	}
+
+	public Pattern getSourcePattern () {
+		return srcPat; 
+	}
+
+	public Pattern getTargetPattern () {
+		return trgPat; 
 	}
 
 }

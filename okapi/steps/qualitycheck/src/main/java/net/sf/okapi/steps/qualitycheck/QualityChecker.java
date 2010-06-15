@@ -22,6 +22,7 @@ package net.sf.okapi.steps.qualitycheck;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
@@ -38,9 +39,13 @@ public class QualityChecker {
 	private LocaleId trgLoc;
 	private List<Issue> issues;
 	private XMLWriter repWriter;
+	private ArrayList<PatternItem> patterns;
 
 	public QualityChecker () {
 		params = new Parameters();
+		patterns = new ArrayList<PatternItem>();
+		patterns.add(new PatternItem("[\\?\\!]", PatternItem.SAME, true));
+		patterns.add(new PatternItem("%s", PatternItem.SAME, true));
 	}
 	
 	public void initialize (LocaleId targetLocale, String rootDir) {
@@ -66,6 +71,13 @@ public class QualityChecker {
 		repWriter.writeStartElement("body");
 		repWriter.writeLineBreak();
 		repWriter.writeElementString("h1", "Quality Check Report");
+
+		// Compile the patterns
+		for ( PatternItem item : patterns ) {
+			if ( item.enabled ) {
+				item.compile();
+			}
+		}
 	}
 
 	public Parameters getParameters () {
@@ -116,10 +128,12 @@ public class QualityChecker {
 				continue; // Cannot go further for that segment
 			}
 			
+			// Check code differences, if requested
 			if ( params.getCodeDifference() ) {
 				checkInlineCodes(srcSeg, trgSeg, tu);
 			}
 			
+			// Check for empty target, if requested
 			if ( params.getEmptyTarget() ) {
 				if ( trgSeg.text.isEmpty() && !srcSeg.text.isEmpty() ) {
 					reportIssue(IssueType.EMPTY_TARGETSEG, tu, srcSeg.getId(),
@@ -128,6 +142,7 @@ public class QualityChecker {
 				}
 			}
 			
+			// Check for target is the same as source, if requested
 			if ( params.getTargetSameAsSource() ) {
 				if ( srcSeg.text.hasText() ) {
 					if ( srcSeg.text.compareTo(trgSeg.text, params.getTargetSameAsSourceWithCodes()) == 0 ) {
@@ -138,6 +153,11 @@ public class QualityChecker {
 				}
 			}
 			
+			// Check for patterns, if requested
+			if ( params.getPatterns() ) {
+				checkPatterns(srcSeg, trgSeg, tu);
+			}
+		
 		}
 
 		String srcOri = null;
@@ -226,14 +246,14 @@ public class QualityChecker {
 						if ( trgOri.charAt(i) != srcOri.charAt(i) ) {
 							reportIssue(IssueType.MISSINGORDIFF_LEADINGWS, tu, null,
 								String.format("Missing or different leading white space at position %d.", i),
-								i, 1, -1, 0, srcOri, trgOri);
+								i, i+1, -1, 0, srcOri, trgOri);
 							break;
 						}
 					}
 					else {
 						reportIssue(IssueType.MISSING_LEADINGWS, tu, null,
 							String.format("Missing leading white space at position %d.", i),
-							i, 1, -1, 0, srcOri, trgOri);
+							i, i+1, -1, 0, srcOri, trgOri);
 					}
 				}
 				else break;
@@ -246,14 +266,14 @@ public class QualityChecker {
 						if ( srcOri.charAt(i) != trgOri.charAt(i) ) {
 							reportIssue(IssueType.EXTRAORDIFF_LEADINGWS, tu, null,
 								String.format("Extra or different leading white space at position %d.", i),
-								-1, 0, i, 1, srcOri, trgOri);
+								-1, 0, i, i+1, srcOri, trgOri);
 							break;
 						}
 					}
 					else {
 						reportIssue(IssueType.EXTRA_LEADINGWS, tu, null,
 							String.format("Extra leading white space at position %d.", i),
-							-1, 0, i, 1, srcOri, trgOri);
+							-1, 0, i, i+1, srcOri, trgOri);
 					}
 				}
 				else break;
@@ -271,14 +291,14 @@ public class QualityChecker {
 						if ( trgOri.charAt(j) != srcOri.charAt(i) ) {
 							reportIssue(IssueType.MISSINGORDIFF_TRAILINGWS, tu, null,
 								String.format("Missing or different trailing white space at position %d", i),
-								i, 1, -1, 0, srcOri, trgOri);
+								i, i+1, -1, 0, srcOri, trgOri);
 							break;
 						}
 					}
 					else {
 						reportIssue(IssueType.MISSING_TRAILINGWS, tu, null,
 							String.format("Missing trailing white space at position %d.", i),
-							i, 1, -1, 0, srcOri, trgOri);
+							i, i+1, -1, 0, srcOri, trgOri);
 					}
 				}
 				else break;
@@ -293,14 +313,14 @@ public class QualityChecker {
 						if ( srcOri.charAt(j) != trgOri.charAt(i) ) {
 							reportIssue(IssueType.EXTRAORDIFF_TRAILINGWS, tu, null,
 								String.format("Extra or different trailing white space at position %d.", i),
-								-1, 0, i, 1, srcOri, trgOri);
+								-1, 0, i, i+1, srcOri, trgOri);
 							break;
 						}
 					}
 					else {
 						reportIssue(IssueType.EXTRA_TRAILINGWS, tu, null,
 							String.format("Extra white trailing space at position %d.", i),
-							-1, 0, i, 1, srcOri, trgOri);
+							-1, 0, i, i+1, srcOri, trgOri);
 					}
 				}
 				else break;
@@ -310,18 +330,69 @@ public class QualityChecker {
 		
 	}
 
+
+	public void checkPatterns (Segment srcSeg,
+		Segment trgSeg,
+		TextUnit tu)
+	{
+		// Get the source text
+		String srcCText = srcSeg.text.getCodedText();
+		
+		// Search for any enabled pattern in the source
+		for ( PatternItem item : patterns ) {
+			// Skip disabled items
+			if ( !item.enabled ) continue;
+			
+			Matcher srcM = item.getSourcePattern().matcher(srcCText);
+			
+			// Use a copy for the target: it may get modified for the search
+			StringBuilder trgCText = new StringBuilder(trgSeg.text.getCodedText());
+
+			while ( srcM.find() ) {
+				// Get the source text corresponding to the match
+				String srcPart = srcCText.substring(srcM.start(), srcM.end());
+				int start, end;
+				boolean bFound = false;
+				// Try to get the corresponding part in the target
+				if ( item.target.equals(PatternItem.SAME) ) {
+					// If the target pattern is defined as being the same as the source
+					// Look for the same text in the source.
+					bFound = ((start = trgCText.indexOf(srcPart)) != -1);
+					end = start + srcPart.length();
+				}
+				else { // Target part has its own pattern
+					Matcher trgM = item.getTargetPattern().matcher(trgCText);
+					bFound = trgM.find();
+					start = trgM.start();
+					end = trgM.end();
+				}
+				// Process result
+				if ( bFound ) { // Remove that match in case source has several occurrences to match
+					trgCText.delete(start, end);
+				}
+				else { // Generate an issue
+					reportIssue(IssueType.MISSING_PATTERN, tu, srcSeg.getId(),
+						String.format("The source part '%s' has no correspondance in the target.", srcPart),
+						srcM.start(), -1, start, -1,
+						srcSeg.toString(), trgSeg.toString());
+				}
+			}
+			
+		}
+	}
+
 	private void reportIssue (IssueType issueType,
 		TextUnit tu,
 		String segId,
 		String message,
 		int srcStart,
-		int srcLength,
+		int srcEnd,
 		int trgStart,
-		int trgLength,
+		int trgEnd,
 		String srcOri,
 		String trgOri)
 	{
-		Issue issue = new Issue(issueType, tu.getId(), segId, message, srcStart, srcLength, trgStart, trgLength);
+		Issue issue = new Issue(issueType, tu.getId(), segId, message, srcStart, srcEnd, trgStart, trgEnd);
 		issues.add(issue);
 
 		if ( repWriter != null ) {

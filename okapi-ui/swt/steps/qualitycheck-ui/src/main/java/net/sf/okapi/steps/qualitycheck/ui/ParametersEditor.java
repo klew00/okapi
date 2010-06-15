@@ -33,14 +33,23 @@ import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.steps.qualitycheck.Parameters;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.TabFolder;
+import org.eclipse.swt.widgets.TabItem;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 
 @EditorFor(Parameters.class)
 public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParametersEditor {
@@ -59,6 +68,15 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Composite mainComposite;
 	private TextAndBrowsePanel pnlOutputPath;
 	private Button chkCodeDifference;
+	private Button chkPatterns;
+	private Table table;
+	private Button btAdd;
+	private Button btEdit;
+	private Button btRemove;
+	private Button btMoveUp;
+	private Button btMoveDown;
+	private Button btImport;
+	private Button btExport;
 	
 	public boolean edit (IParameters params,
 		boolean readOnly,
@@ -100,7 +118,9 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	{
 		params = (Parameters)paramsObject; 
 		shell = (Shell)context.getObject("shell");
+		
 		createComposite(parent);
+		
 		setData();
 	}
 
@@ -150,13 +170,22 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	
 	private void createComposite (Composite parent) {
 		mainComposite = new Composite(parent, SWT.BORDER);
-		mainComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
 		mainComposite.setLayout(new GridLayout());
+		mainComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+		TabFolder tfTmp = new TabFolder(mainComposite, SWT.NONE);
+		tfTmp.setLayout(new GridLayout());
+		tfTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+		//--- General tab
 		
-		Label label = new Label(mainComposite, SWT.NONE);
+		Composite cmpTmp = new Composite(tfTmp, SWT.NONE);
+		cmpTmp.setLayout(new GridLayout());
+		
+		Label label = new Label(cmpTmp, SWT.NONE);
 		label.setText("Flag the following potential issues:");
 		
-		chkTargetSameAsSource = new Button(mainComposite, SWT.CHECK);
+		chkTargetSameAsSource = new Button(cmpTmp, SWT.CHECK);
 		chkTargetSameAsSource.setText("Target is the same as the source (when it has text)");
 		chkTargetSameAsSource.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -164,34 +193,146 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			};
 		});
 		
-		chkTargetSameAsSourceWithCodes = new Button(mainComposite, SWT.CHECK);
+		chkTargetSameAsSourceWithCodes = new Button(cmpTmp, SWT.CHECK);
 		chkTargetSameAsSourceWithCodes.setText("Include the codes in the comparison");
 		GridData gdTmp = new GridData();
 		gdTmp.horizontalIndent = 16;
 		chkTargetSameAsSourceWithCodes.setLayoutData(gdTmp);
 		
-		chkCodeDifference = new Button(mainComposite, SWT.CHECK);
+		chkCodeDifference = new Button(cmpTmp, SWT.CHECK);
 		chkCodeDifference.setText("Code differences between source and target");
 
-		chkEmptyTarget = new Button(mainComposite, SWT.CHECK);
+		chkEmptyTarget = new Button(cmpTmp, SWT.CHECK);
 		chkEmptyTarget.setText("Empty translation");
 
-		chkLeadingWS = new Button(mainComposite, SWT.CHECK);
+		chkLeadingWS = new Button(cmpTmp, SWT.CHECK);
 		chkLeadingWS.setText("Leading white spaces");
 		
-		chkTrailingWS = new Button(mainComposite, SWT.CHECK);
+		chkTrailingWS = new Button(cmpTmp, SWT.CHECK);
 		chkTrailingWS.setText("Trailing white spaces");
 
-		Label separator = new Label(mainComposite, SWT.BORDER);
-		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.heightHint = 1;
-		separator.setLayoutData(gdTmp);
+		TabItem tiTmp = new TabItem(tfTmp, SWT.NONE);
+		tiTmp.setText("General");
+		tiTmp.setControl(cmpTmp);
 
-		// Output
+
+		//--- Patterns tab
 		
-		label = new Label(mainComposite, SWT.NONE);
+		cmpTmp = new Composite(tfTmp, SWT.NONE);
+		cmpTmp.setLayout(new GridLayout());
+		cmpTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+		chkPatterns = new Button(cmpTmp, SWT.CHECK);
+		chkPatterns.setText("Verify that the following source patterns are translated as expected:");
+		chkPatterns.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				updatePatterns();
+			};
+		});
+		
+		table = new Table(cmpTmp, SWT.CHECK | SWT.FULL_SELECTION | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
+		table.setHeaderVisible(true);
+		table.setLinesVisible(true);
+		table.setLayoutData(new GridData(GridData.FILL_BOTH));
+		// Update buttons when moving cursor
+		table.addListener(SWT.Selection, new Listener () {
+			public void handleEvent (Event event) {
+				if ( event.detail != SWT.CHECK ) {
+					updateMoveButtons();
+				}
+			}
+		});		
+		// Double-click is like edit
+		table.addListener(SWT.MouseDoubleClick, new Listener () {
+			public void handleEvent (Event event) {
+				if ( table.getSelectionIndex() != -1 ) {
+					editPattern(false);
+				}				
+			}
+		});		
+		// Resizing the columns
+		table.addControlListener(new ControlAdapter() {
+			public void controlResized(ControlEvent e) {
+				int tableWidth = table.getClientArea().width;
+				int remaining = tableWidth - table.getColumn(0).getWidth();
+				table.getColumn(1).setWidth(remaining/2);
+				table.getColumn(2).setWidth(remaining/2);
+			}
+		});
+
+		String[] titles = {"Use", "Source Pattern", "Expected Target Pattern"};
+		for ( int i=0; i<titles.length; i++ ) {
+			TableColumn column = new TableColumn(table, SWT.LEFT);
+			column.setText(titles [i]);
+			column.pack();
+		}
+		
+		// Buttons
+		Composite cmpTmp2 = new Composite(cmpTmp, SWT.NONE);
+		GridLayout layTmp = new GridLayout(7, true);
+		layTmp.marginHeight = layTmp.marginWidth = 0;
+		cmpTmp2.setLayout(layTmp);
+
+//TODO: Fix resizing of buttons!!!		
+		btAdd = UIUtil.createGridButton(cmpTmp2, SWT.PUSH, "Add...", UIUtil.BUTTON_DEFAULT_WIDTH, 1);
+		btAdd.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				editPattern(true);
+			}
+		});
+
+		btEdit = UIUtil.createGridButton(cmpTmp2, SWT.PUSH, "Edit...", UIUtil.BUTTON_DEFAULT_WIDTH, 1);
+		btEdit.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				editPattern(false);
+			}
+		});
+		
+		btRemove = UIUtil.createGridButton(cmpTmp2, SWT.PUSH, "Remove", UIUtil.BUTTON_DEFAULT_WIDTH, 1);
+		btRemove.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				removePattern();
+			}
+		});
+
+		btMoveUp = UIUtil.createGridButton(cmpTmp2, SWT.PUSH, "Move Up", UIUtil.BUTTON_DEFAULT_WIDTH, 1);
+		btMoveUp.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+			}
+		});
+
+		btMoveDown = UIUtil.createGridButton(cmpTmp2, SWT.PUSH, "Move Down", UIUtil.BUTTON_DEFAULT_WIDTH, 1);
+		btMoveDown.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+			}
+		});
+
+		btImport = UIUtil.createGridButton(cmpTmp2, SWT.PUSH, "Import...", UIUtil.BUTTON_DEFAULT_WIDTH, 1);
+		btImport.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+			}
+		});
+
+		btExport = UIUtil.createGridButton(cmpTmp2, SWT.PUSH, "Export...", UIUtil.BUTTON_DEFAULT_WIDTH, 1);
+		btExport.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+			}
+		});
+
+		tiTmp = new TabItem(tfTmp, SWT.NONE);
+		tiTmp.setText("Patterns");
+		tiTmp.setControl(cmpTmp);
+
+		
+		//--- Output tab
+		
+		cmpTmp = new Composite(tfTmp, SWT.NONE);
+		layTmp = new GridLayout();
+		cmpTmp.setLayout(layTmp);
+
+		label = new Label(cmpTmp, SWT.NONE);
 		label.setText("Path of the report file:");
-		pnlOutputPath = new TextAndBrowsePanel(mainComposite, SWT.NONE, false);
+		pnlOutputPath = new TextAndBrowsePanel(cmpTmp, SWT.NONE, false);
 		pnlOutputPath.setSaveAs(true);
 		pnlOutputPath.setTitle("Quality Check Report");
 		pnlOutputPath.setBrowseFilters("HTML Files (*.html;*.htm)\tAll Files (*.*)", "*.html;**.htm\t*.*");
@@ -199,8 +340,12 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		pnlOutputPath.setLayoutData(gdTmp);
 
-		chkAutoOpen = new Button(mainComposite, SWT.CHECK);
+		chkAutoOpen = new Button(cmpTmp, SWT.CHECK);
 		chkAutoOpen.setText("Open the report after completion");
+		
+		tiTmp = new TabItem(tfTmp, SWT.NONE);
+		tiTmp.setText("Output");
+		tiTmp.setControl(cmpTmp);
 	}
 	
 	private boolean showDialog () {
@@ -212,8 +357,62 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		return result;
 	}
 	
+	private void editPattern (boolean add) {
+		TableItem item = new TableItem(table, SWT.NONE);
+		String[] data = {"", "search", "target"};
+		item.setText(data);
+		item.setChecked(true);
+		table.setSelection(table.getItemCount()-1);
+		
+		updatePatternsButtons();
+	}
+
+	private void removePattern () {
+		int index = table.getSelectionIndex();
+		if ( index < 0 ) return;
+		table.remove(index);
+		int count = table.getItemCount();
+		if ( index > count-1 ) table.setSelection(table.getItemCount()-1);
+		else table.setSelection(index);
+		updatePatternsButtons();
+	}
+	
 	private void updateTargetSameAsSourceWithCodes () {
 		chkTargetSameAsSourceWithCodes.setEnabled(chkTargetSameAsSource.getSelection());
+	}
+
+	private void updatePatterns () {
+		boolean enabled = chkPatterns.getSelection();
+		table.setEnabled(enabled);
+		btAdd.setEnabled(enabled);
+		if ( enabled ) {
+			updatePatternsButtons();
+		}
+		else {
+			btEdit.setEnabled(false);
+			btRemove.setEnabled(false);
+			btMoveUp.setEnabled(false);
+			btMoveDown.setEnabled(false);
+			btImport.setEnabled(false);
+			btExport.setEnabled(false);
+		}
+	}
+	
+	private void updatePatternsButtons () {
+		int index = table.getSelectionIndex();
+		int count = table.getItemCount();
+		btEdit.setEnabled(index!=-1);
+		btRemove.setEnabled(index!=-1);
+		updateMoveButtons();
+		btImport.setEnabled(count>0);
+		btExport.setEnabled(count>0);
+	}
+	
+	private void updateMoveButtons () {
+		int index = table.getSelectionIndex();
+		int count = table.getItemCount();
+		btMoveUp.setEnabled(index>0);
+		btMoveDown.setEnabled(index<count-1);
 	}
 
 	private void setData () {
@@ -225,7 +424,9 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		chkEmptyTarget.setSelection(params.getEmptyTarget());
 		chkTargetSameAsSource.setSelection(params.getTargetSameAsSource());
 		chkTargetSameAsSourceWithCodes.setSelection(params.getTargetSameAsSourceWithCodes());
+		chkPatterns.setSelection(params.getPatterns());
 		updateTargetSameAsSourceWithCodes();
+		updatePatterns();
 	}
 
 	private boolean saveData () {
@@ -244,6 +445,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		if ( chkTargetSameAsSourceWithCodes.isEnabled() ) {
 			params.setTargetSameAsSourceWithCodes(chkTargetSameAsSourceWithCodes.getSelection());
 		}
+		params.setPatterns(chkPatterns.getSelection());
 		result = true;
 		return result;
 	}

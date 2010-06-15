@@ -224,6 +224,22 @@ public class QualityCheckerTest {
 	}
 
 	@Test
+	public void testMISSING_PATTERN () {
+		TextUnit tu = new TextUnit("id", "src text !? %s");
+		tu.setTarget(locFR, new TextContainer("trg text"));
+		
+		checker.processTextUnit(tu);
+		List<Issue> issues = checker.getIssues();
+		assertEquals(3, issues.size());
+		assertEquals(IssueType.MISSING_PATTERN, issues.get(0).issueType);
+		assertEquals(9, issues.get(0).srcStart); 
+		assertEquals(IssueType.MISSING_PATTERN, issues.get(1).issueType);
+		assertEquals(10, issues.get(1).srcStart); 
+		assertEquals(IssueType.MISSING_PATTERN, issues.get(2).issueType);
+		assertEquals(12, issues.get(2).srcStart); 
+	}
+
+	@Test
 	public void testNoIssues () {
 		TextUnit tu = new TextUnit("id", "  Text with 123. ");
 		tu.setTarget(locFR, new TextContainer("  Texte avec 123. "));

@@ -32,6 +32,7 @@ public class Parameters extends BaseParameters {
 	private static final String TARGETSAMEASSOURCE = "targetSameAsSource";
 	private static final String TARGETSAMEASSOURCE_WITHCODES = "targetSameAsSourceWithCodes";
 	private static final String CODEDIFFERENCE = "codeDifference";
+	private static final String PATTERNS = "patterns";
 
 	String outputPath;
 	boolean autoOpen;
@@ -41,6 +42,7 @@ public class Parameters extends BaseParameters {
 	boolean targetSameAsSource;
 	boolean targetSameAsSourceWithCodes;
 	boolean codeDifference;
+	boolean patterns;
 
 	public Parameters () {
 		reset();
@@ -110,6 +112,14 @@ public class Parameters extends BaseParameters {
 		this.codeDifference = codeDifference;
 	}
 
+	public boolean getPatterns () {
+		return patterns;
+	}
+
+	public void setPatterns (boolean patterns) {
+		this.patterns = patterns;
+	}
+
 	@Override
 	public void reset () {
 		outputPath = "${rootDir}/qaReport.html";
@@ -120,6 +130,7 @@ public class Parameters extends BaseParameters {
 		targetSameAsSource = true;
 		targetSameAsSourceWithCodes = true;
 		codeDifference = true;
+		patterns = true;
 	}
 
 	@Override
@@ -134,6 +145,7 @@ public class Parameters extends BaseParameters {
 		targetSameAsSource = buffer.getBoolean(TARGETSAMEASSOURCE, targetSameAsSource);
 		targetSameAsSourceWithCodes = buffer.getBoolean(TARGETSAMEASSOURCE_WITHCODES, targetSameAsSourceWithCodes);
 		codeDifference = buffer.getBoolean(CODEDIFFERENCE, codeDifference);
+		patterns = buffer.getBoolean(PATTERNS, patterns);
 	}
 
 	@Override
@@ -147,6 +159,7 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean(TARGETSAMEASSOURCE, targetSameAsSource);
 		buffer.setBoolean(TARGETSAMEASSOURCE_WITHCODES, targetSameAsSourceWithCodes);
 		buffer.setBoolean(CODEDIFFERENCE, codeDifference);
+		buffer.setBoolean(PATTERNS, patterns);
 		return buffer.toString();
 	}
 	
