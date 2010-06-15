@@ -20,6 +20,9 @@
 
 package net.sf.okapi.steps.qualitycheck;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.sf.okapi.common.BaseParameters;
 
 public class Parameters extends BaseParameters {
@@ -32,7 +35,11 @@ public class Parameters extends BaseParameters {
 	private static final String TARGETSAMEASSOURCE = "targetSameAsSource";
 	private static final String TARGETSAMEASSOURCE_WITHCODES = "targetSameAsSourceWithCodes";
 	private static final String CODEDIFFERENCE = "codeDifference";
-	private static final String PATTERNS = "patterns";
+	private static final String CHECKPATTERNS = "checkPatterns";
+	private static final String PATTERNCOUNT = "patternCount";
+	private static final String USEPATTERN = "usePattern";
+	private static final String SOURCEPATTERN = "sourcePattern";
+	private static final String TARGETPATTERN = "targetPattern";
 
 	String outputPath;
 	boolean autoOpen;
@@ -42,7 +49,8 @@ public class Parameters extends BaseParameters {
 	boolean targetSameAsSource;
 	boolean targetSameAsSourceWithCodes;
 	boolean codeDifference;
-	boolean patterns;
+	boolean checkPatterns;
+	List<PatternItem> patterns;
 
 	public Parameters () {
 		reset();
@@ -112,17 +120,25 @@ public class Parameters extends BaseParameters {
 		this.codeDifference = codeDifference;
 	}
 
-	public boolean getPatterns () {
-		return patterns;
+	public boolean getCheckPatterns () {
+		return checkPatterns;
 	}
 
-	public void setPatterns (boolean patterns) {
+	public void setCheckPatterns (boolean patterns) {
+		this.checkPatterns = patterns;
+	}
+	
+	public List<PatternItem> getPatterns () {
+		return this.patterns;
+	}
+	
+	public void setPatterns (List<PatternItem> patterns) {
 		this.patterns = patterns;
 	}
 
 	@Override
 	public void reset () {
-		outputPath = "${rootDir}/qaReport.html";
+		outputPath = "${rootDir}/qa-report.html";
 		autoOpen = false;
 		leadingWS = true;
 		trailingWS = true;
@@ -130,7 +146,8 @@ public class Parameters extends BaseParameters {
 		targetSameAsSource = true;
 		targetSameAsSourceWithCodes = true;
 		codeDifference = true;
-		patterns = true;
+		checkPatterns = true;
+		patterns = new ArrayList<PatternItem>();
 	}
 
 	@Override
@@ -145,7 +162,15 @@ public class Parameters extends BaseParameters {
 		targetSameAsSource = buffer.getBoolean(TARGETSAMEASSOURCE, targetSameAsSource);
 		targetSameAsSourceWithCodes = buffer.getBoolean(TARGETSAMEASSOURCE_WITHCODES, targetSameAsSourceWithCodes);
 		codeDifference = buffer.getBoolean(CODEDIFFERENCE, codeDifference);
-		patterns = buffer.getBoolean(PATTERNS, patterns);
+		checkPatterns = buffer.getBoolean(CHECKPATTERNS, checkPatterns);
+		// Patterns
+		int count = buffer.getInteger(PATTERNCOUNT, 0);
+		for ( int i=0; i<count; i++ ) {
+			boolean enabled = buffer.getBoolean(String.format("%s%d", USEPATTERN, i), true);
+			String source = buffer.getString(String.format("%s%d", SOURCEPATTERN, i), "");
+			String target = buffer.getString(String.format("%s%d", TARGETPATTERN, i), PatternItem.SAME);
+			patterns.add(new PatternItem(source, target, enabled));
+		}
 	}
 
 	@Override
@@ -159,7 +184,14 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean(TARGETSAMEASSOURCE, targetSameAsSource);
 		buffer.setBoolean(TARGETSAMEASSOURCE_WITHCODES, targetSameAsSourceWithCodes);
 		buffer.setBoolean(CODEDIFFERENCE, codeDifference);
-		buffer.setBoolean(PATTERNS, patterns);
+		buffer.setBoolean(CHECKPATTERNS, checkPatterns);
+		// Patterns
+		buffer.setInteger(PATTERNCOUNT, patterns.size());
+		for ( int i=0; i<patterns.size(); i++ ) {
+			buffer.setBoolean(String.format("%s%d", USEPATTERN, i), patterns.get(i).enabled);
+			buffer.setString(String.format("%s%d", SOURCEPATTERN, i), patterns.get(i).source);
+			buffer.setString(String.format("%s%d", TARGETPATTERN, i), patterns.get(i).target);
+		}
 		return buffer.toString();
 	}
 	

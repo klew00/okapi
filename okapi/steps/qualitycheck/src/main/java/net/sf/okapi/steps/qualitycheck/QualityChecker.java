@@ -39,13 +39,10 @@ public class QualityChecker {
 	private LocaleId trgLoc;
 	private List<Issue> issues;
 	private XMLWriter repWriter;
-	private ArrayList<PatternItem> patterns;
+	private List<PatternItem> patterns;
 
 	public QualityChecker () {
 		params = new Parameters();
-		patterns = new ArrayList<PatternItem>();
-		patterns.add(new PatternItem("[\\?\\!]", PatternItem.SAME, true));
-		patterns.add(new PatternItem("%s", PatternItem.SAME, true));
 	}
 	
 	public void initialize (LocaleId targetLocale, String rootDir) {
@@ -73,6 +70,7 @@ public class QualityChecker {
 		repWriter.writeElementString("h1", "Quality Check Report");
 
 		// Compile the patterns
+		patterns = params.getPatterns();
 		for ( PatternItem item : patterns ) {
 			if ( item.enabled ) {
 				item.compile();
@@ -154,7 +152,7 @@ public class QualityChecker {
 			}
 			
 			// Check for patterns, if requested
-			if ( params.getPatterns() ) {
+			if ( params.getCheckPatterns() ) {
 				checkPatterns(srcSeg, trgSeg, tu);
 			}
 		

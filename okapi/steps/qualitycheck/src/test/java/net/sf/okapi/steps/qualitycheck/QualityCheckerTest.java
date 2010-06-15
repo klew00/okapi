@@ -20,6 +20,7 @@
 
 package net.sf.okapi.steps.qualitycheck;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.okapi.common.LocaleId;
@@ -227,6 +228,11 @@ public class QualityCheckerTest {
 	public void testMISSING_PATTERN () {
 		TextUnit tu = new TextUnit("id", "src text !? %s");
 		tu.setTarget(locFR, new TextContainer("trg text"));
+		ArrayList<PatternItem> list = new ArrayList<PatternItem>();
+		list.add(new PatternItem("[!\\?]", PatternItem.SAME, true));
+		list.add(new PatternItem("%s", PatternItem.SAME, true));
+		checker.getParameters().setPatterns(list);
+		checker.initialize(locFR, null); // Make sure we re-initialize
 		
 		checker.processTextUnit(tu);
 		List<Issue> issues = checker.getIssues();

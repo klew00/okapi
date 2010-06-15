@@ -20,6 +20,7 @@
 
 package net.sf.okapi.steps.qualitycheck;
 
+import java.util.List;
 import java.util.regex.Pattern;
 
 public class PatternItem {
@@ -34,6 +35,10 @@ public class PatternItem {
 	private Pattern srcPat;
 	private Pattern trgPat;
 
+	public static List<PatternItem> loadFile () {
+		return null;
+	}
+	
 	public PatternItem (String source,
 		String target,
 		boolean enabled)

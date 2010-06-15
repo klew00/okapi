@@ -20,6 +20,10 @@
 
 package net.sf.okapi.steps.qualitycheck.ui;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
+
 import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.IHelp;
@@ -31,6 +35,7 @@ import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.TextAndBrowsePanel;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.steps.qualitycheck.Parameters;
+import net.sf.okapi.steps.qualitycheck.PatternItem;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
@@ -50,6 +55,7 @@ import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.Text;
 
 @EditorFor(Parameters.class)
 public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParametersEditor {
@@ -77,6 +83,11 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Button btMoveDown;
 	private Button btImport;
 	private Button btExport;
+	private Text edSource;
+	private Text edTarget;
+	private Shell dialog;
+	private TableItem editItem;
+	private boolean addMode;
 	
 	public boolean edit (IParameters params,
 		boolean readOnly,
@@ -298,12 +309,14 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		btMoveUp = UIUtil.createGridButton(cmpTmp2, SWT.PUSH, "Move Up", UIUtil.BUTTON_DEFAULT_WIDTH, 1);
 		btMoveUp.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
+				moveItem(-1);
 			}
 		});
 
 		btMoveDown = UIUtil.createGridButton(cmpTmp2, SWT.PUSH, "Move Down", UIUtil.BUTTON_DEFAULT_WIDTH, 1);
 		btMoveDown.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
+				moveItem(+1);
 			}
 		});
 
@@ -358,13 +371,96 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	}
 	
 	private void editPattern (boolean add) {
-		TableItem item = new TableItem(table, SWT.NONE);
-		String[] data = {"", "search", "target"};
-		item.setText(data);
-		item.setChecked(true);
-		table.setSelection(table.getItemCount()-1);
+		addMode = add;
+		dialog = new Shell(shell, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
+		dialog.setText(add ? "Add Patter Entry" : "Edit Pattern Entry");
+		dialog.setMinimumSize(400, 200);
+		dialog.setSize(dialog.getMinimumSize());
+		dialog.setLayout(new GridLayout());
+		dialog.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+		// Source pattern
+		Label label = new Label(dialog, SWT.NONE | SWT.WRAP);
+		label.setText("Pattern for the source:");
 		
-		updatePatternsButtons();
+		edSource = new Text(dialog, SWT.BORDER);
+		GridData gdTmp = new GridData(GridData.FILL_BOTH);
+		edSource.setLayoutData(gdTmp);
+		
+		// Target correspondence
+		label = new Label(dialog, SWT.NONE);
+		label.setText(String.format("Expected corresponding target pattern (use '%s' if same as source):", PatternItem.SAME));
+
+		edTarget = new Text(dialog, SWT.BORDER | SWT.WRAP);
+		gdTmp = new GridData(GridData.FILL_BOTH);
+		edTarget.setLayoutData(gdTmp);
+
+		// Set the text in the edit fields
+		if ( add ) {
+			edTarget.setText(PatternItem.SAME);
+		}
+		else {
+			int index = table.getSelectionIndex();
+			if ( index < 0 ) return;
+			editItem = table.getItem(index);
+			edSource.setText(editItem.getText(1));
+			edTarget.setText(editItem.getText(2));
+		}
+
+		//  Dialog buttons
+		SelectionAdapter OKCancelActions = new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				if ( event.widget.getData().equals("o") ) {
+					// Validate entries
+					if ( edSource.getText().trim().length() < 1 ) {
+						Dialogs.showError(shell, "You must enter a pattern for the source.", null);
+						edSource.setFocus();
+						return;
+					}
+					if ( edTarget.getText().trim().length() < 1 ) {
+						Dialogs.showError(shell, "You must enter a corresponding part for the target.", null);
+						edTarget.setFocus();
+						return;
+					}
+					// Try patterns
+					try {
+						Pattern.compile(edSource.getText());
+						if ( !edTarget.getText().equals(PatternItem.SAME) ) {
+							Pattern.compile(edTarget.getText());
+						}
+					}
+					catch ( Exception e ) {
+						Dialogs.showError(shell, "Pattern error:\n" + e.getLocalizedMessage(), null);
+						return;
+					}
+
+					// Update the table
+					if ( addMode ) { // Add a new item if needed
+						editItem = new TableItem(table, SWT.NONE);
+						editItem.setText(2, PatternItem.SAME);
+						editItem.setChecked(true);
+						table.setSelection(table.getItemCount()-1);
+					}
+					editItem.setText(1, edSource.getText());
+					editItem.setText(2, edTarget.getText());
+					updatePatternsButtons();
+				}
+				// Close
+				dialog.close();
+			};
+		};
+
+		OKCancelPanel pnlActionsDialog = new OKCancelPanel(dialog, SWT.NONE, OKCancelActions, false);
+		pnlActionsDialog.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		dialog.setDefaultButton(pnlActionsDialog.btOK);
+		
+		dialog.pack();
+		Dialogs.centerWindow(dialog, shell);
+		dialog.open ();
+		while ( !dialog.isDisposed() ) {
+			if ( !dialog.getDisplay().readAndDispatch() )
+				dialog.getDisplay().sleep();
+		}
 	}
 
 	private void removePattern () {
@@ -377,6 +473,32 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		updatePatternsButtons();
 	}
 	
+	private void moveItem (int offset) {
+		int index = table.getSelectionIndex();
+		int count = table.getItemCount();
+		if ( offset < 0 ) {
+			if ( index < 1 ) return;
+		}
+		else {
+			if ( index >= count-1 ) return;
+		}
+		
+		// Get the selected entry
+        TableItem ti = table.getItem(index);
+        boolean isChecked = ti.getChecked();
+        String[] data = {ti.getText(0), ti.getText(1), ti.getText(2)};
+        ti.dispose();
+        
+        // Add the new item at the new place
+		ti = new TableItem (table, SWT.NONE, index+offset);
+		ti.setChecked(isChecked);
+		ti.setText(data);
+		
+		// Update cursor and buttons
+		table.select(index+offset);
+		updateMoveButtons();
+	}
+
 	private void updateTargetSameAsSourceWithCodes () {
 		chkTargetSameAsSourceWithCodes.setEnabled(chkTargetSameAsSource.getSelection());
 	}
@@ -424,9 +546,23 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		chkEmptyTarget.setSelection(params.getEmptyTarget());
 		chkTargetSameAsSource.setSelection(params.getTargetSameAsSource());
 		chkTargetSameAsSourceWithCodes.setSelection(params.getTargetSameAsSourceWithCodes());
-		chkPatterns.setSelection(params.getPatterns());
+		chkPatterns.setSelection(params.getCheckPatterns());
+		setPatternsData(params.getPatterns());
 		updateTargetSameAsSourceWithCodes();
 		updatePatterns();
+	}
+	
+	private void setPatternsData (List<PatternItem> list) {
+		table.removeAll();
+		for ( PatternItem item : list ) {
+			TableItem row = new TableItem(table, SWT.NONE);
+			row.setChecked(item.enabled);
+			row.setText(1, item.source);
+			row.setText(2, item.target);
+		}
+		if ( table.getItemCount() > 0 ) {
+			table.setSelection(0);
+		}
 	}
 
 	private boolean saveData () {
@@ -445,9 +581,19 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		if ( chkTargetSameAsSourceWithCodes.isEnabled() ) {
 			params.setTargetSameAsSourceWithCodes(chkTargetSameAsSourceWithCodes.getSelection());
 		}
-		params.setPatterns(chkPatterns.getSelection());
+		params.setCheckPatterns(chkPatterns.getSelection());
+		params.setPatterns(savePatternsData());
 		result = true;
 		return result;
+	}
+	
+	private List<PatternItem> savePatternsData () {
+		List<PatternItem> list = new ArrayList<PatternItem>();
+		for ( int i=0; i<table.getItemCount(); i++ ) {
+			list.add(new PatternItem(table.getItem(i).getText(1), table.getItem(i).getText(2),
+				table.getItem(i).getChecked()));
+		}
+		return list;
 	}
 	
 }
