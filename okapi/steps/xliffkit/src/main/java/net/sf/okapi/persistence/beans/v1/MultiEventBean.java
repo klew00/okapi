@@ -31,7 +31,7 @@ import net.sf.okapi.persistence.PersistenceBean;
 import net.sf.okapi.persistence.beans.FactoryBean;
 
 public class MultiEventBean extends PersistenceBean<MultiEvent> {
-	private List<FactoryBean> annotations = new ArrayList<FactoryBean>();
+	private AnnotationsBean annotations = new AnnotationsBean();
 	private String id;
 	private boolean propagateAsSingleEvent = false;
 	private List<EventBean> events = new ArrayList<EventBean>();
@@ -43,11 +43,7 @@ public class MultiEventBean extends PersistenceBean<MultiEvent> {
 
 	@Override
 	protected void fromObject(MultiEvent obj, IPersistenceSession session) {
-		for (IAnnotation annotation : obj.getAnnotations()) {
-			FactoryBean annotationBean = new FactoryBean();
-			annotations.add(annotationBean);
-			annotationBean.set(annotation, session);
-		}
+		annotations.set(obj.getAnnotations(), session);
 		
 		id = obj.getId();
 		propagateAsSingleEvent = obj.isPropagateAsSingleEvent();
@@ -61,7 +57,7 @@ public class MultiEventBean extends PersistenceBean<MultiEvent> {
 
 	@Override
 	protected void setObject(MultiEvent obj, IPersistenceSession session) {
-		for (FactoryBean annotationBean : annotations)
+		for (FactoryBean annotationBean : annotations.getItems())
 			obj.setAnnotation(annotationBean.get(IAnnotation.class, session));
 
 		obj.setId(id);
@@ -71,11 +67,11 @@ public class MultiEventBean extends PersistenceBean<MultiEvent> {
 			obj.addEvent(eventBean.get(Event.class, session));
 	}
 
-	public List<FactoryBean> getAnnotations() {
+	public AnnotationsBean getAnnotations() {
 		return annotations;
 	}
 
-	public void setAnnotations(List<FactoryBean> annotations) {
+	public void setAnnotations(AnnotationsBean annotations) {
 		this.annotations = annotations;
 	}
 

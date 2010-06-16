@@ -156,7 +156,7 @@ public class XLIFFKitReaderTest {
 				"Test pipeline for XLIFFKitReaderStep",
 				new Batch(
 						new BatchItem(
-								this.getClass().getResource("testPackageFormat6_2.xliff.kit"),
+								this.getClass().getResource("testPackageFormat6.xliff.kit"),
 								"UTF-8",
 								Util.getTempDirectory() + "/testPackageFormat2",
 								"UTF-8",

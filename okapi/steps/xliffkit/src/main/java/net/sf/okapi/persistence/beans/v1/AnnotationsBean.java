@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -23,68 +23,44 @@ package net.sf.okapi.persistence.beans.v1;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.okapi.common.annotation.Annotations;
 import net.sf.okapi.common.annotation.IAnnotation;
-import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.persistence.IPersistenceSession;
 import net.sf.okapi.persistence.PersistenceBean;
 import net.sf.okapi.persistence.beans.FactoryBean;
 
-public class PropertyBean extends PersistenceBean<Property> {
+public class AnnotationsBean extends PersistenceBean<Iterable<IAnnotation>> {
 
-	private String name;
-	private String value;
-	private boolean isReadOnly;
-	private AnnotationsBean annotations = new AnnotationsBean();
-
+	private List<FactoryBean> items = new ArrayList<FactoryBean>();
+	
 	@Override
-	protected Property createObject(IPersistenceSession session) {
-		return new Property(name, value, isReadOnly);
+	protected Iterable<IAnnotation> createObject(IPersistenceSession session) {
+		return new Annotations();
 	}
 
 	@Override
-	protected void fromObject(Property obj, IPersistenceSession session) {
-			name = obj.getName();
-			value = obj.getValue();
-			isReadOnly = obj.isReadOnly();
-			
-			annotations.set(obj.getAnnotations(), session);
+	protected void fromObject(Iterable<IAnnotation> obj, IPersistenceSession session) {
+		for (IAnnotation annotation : obj) {
+			FactoryBean annotationBean = new FactoryBean();
+			items.add(annotationBean);
+			annotationBean.set(annotation, session);
+		}
 	}
 
 	@Override
-	protected void setObject(Property obj, IPersistenceSession session) {
-		for (FactoryBean annotationBean : annotations.getItems())
-			obj.setAnnotation(annotationBean.get(IAnnotation.class, session));
+	protected void setObject(Iterable<IAnnotation> obj, IPersistenceSession session) {
+		if (obj instanceof Annotations) { // Otherwise a read-only collection
+			Annotations annots = (Annotations) obj; 
+			for (FactoryBean annotationBean : items)
+				annots.set(annotationBean.get(IAnnotation.class, session));
+		}		
 	}
 
-	public String getValue() {
-		return value;
+	public List<FactoryBean> getItems() {
+		return items;
 	}
 
-	public void setValue(String value) {
-		this.value = value;
-	}
-
-	public AnnotationsBean getAnnotations() {
-		return annotations;
-	}
-
-	public void setAnnotations(AnnotationsBean annotations) {
-		this.annotations = annotations;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public boolean isReadOnly() {
-		return isReadOnly;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public void setReadOnly(boolean isReadOnly) {
-		this.isReadOnly = isReadOnly;
+	public void setItems(List<FactoryBean> items) {
+		this.items = items;
 	}
 }

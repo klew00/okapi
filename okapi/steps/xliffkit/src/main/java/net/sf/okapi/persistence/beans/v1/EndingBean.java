@@ -34,7 +34,7 @@ public class EndingBean extends PersistenceBean<Ending> {
 
 	private String id;
 	private FactoryBean skeleton = new FactoryBean();
-	private List<FactoryBean> annotations = new ArrayList<FactoryBean>();
+	private AnnotationsBean annotations = new AnnotationsBean();
 
 	@Override
 	protected Ending createObject(IPersistenceSession session) {
@@ -46,11 +46,7 @@ public class EndingBean extends PersistenceBean<Ending> {
 		id = obj.getId();
 		skeleton.set(obj.getSkeleton(), session);
 		
-		for (IAnnotation annotation : obj.getAnnotations()) {
-			FactoryBean annotationBean = new FactoryBean();
-			annotations.add(annotationBean);
-			annotationBean.set(annotation, session);
-		}
+		annotations.set(obj.getAnnotations(), session);
 	}
 
 	@Override
@@ -58,7 +54,7 @@ public class EndingBean extends PersistenceBean<Ending> {
 		obj.setId(id);
 		obj.setSkeleton(skeleton.get(ISkeleton.class, session));
 		
-		for (FactoryBean annotationBean : annotations)
+		for (FactoryBean annotationBean : annotations.getItems())
 			obj.setAnnotation(annotationBean.get(IAnnotation.class, session));
 	}
 
@@ -78,11 +74,11 @@ public class EndingBean extends PersistenceBean<Ending> {
 		this.skeleton = skeleton;
 	}
 
-	public List<FactoryBean> getAnnotations() {
+	public AnnotationsBean getAnnotations() {
 		return annotations;
 	}
 
-	public void setAnnotations(List<FactoryBean> annotations) {
+	public void setAnnotations(AnnotationsBean annotations) {
 		this.annotations = annotations;
 	}
 }

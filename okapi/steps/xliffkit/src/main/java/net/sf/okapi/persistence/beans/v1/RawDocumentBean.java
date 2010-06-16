@@ -35,7 +35,7 @@ import net.sf.okapi.persistence.beans.FactoryBean;
 
 public class RawDocumentBean extends PersistenceBean<RawDocument> {
 
-	private List<FactoryBean> annotations = new ArrayList<FactoryBean>();
+	private AnnotationsBean annotations = new AnnotationsBean();
 	private String filterConfigId;
 	private String id;
 	private String encoding;
@@ -68,11 +68,7 @@ public class RawDocumentBean extends PersistenceBean<RawDocument> {
 
 	@Override
 	protected void fromObject(RawDocument obj, IPersistenceSession session) {
-		for (IAnnotation annotation : obj.getAnnotations()) {
-			FactoryBean annotationBean = new FactoryBean();
-			annotations.add(annotationBean);
-			annotationBean.set(annotation, session);
-		}
+		annotations.set(obj.getAnnotations(), session);
 		
 		filterConfigId = obj.getFilterConfigId();
 		id = obj.getId();
@@ -93,7 +89,7 @@ public class RawDocumentBean extends PersistenceBean<RawDocument> {
 
 	@Override
 	protected void setObject(RawDocument obj, IPersistenceSession session) {
-		for (FactoryBean annotationBean : annotations)
+		for (FactoryBean annotationBean : annotations.getItems())
 			obj.setAnnotation(annotationBean.get(IAnnotation.class, session));
 						
 		obj.setFilterConfigId(filterConfigId);
@@ -101,11 +97,11 @@ public class RawDocumentBean extends PersistenceBean<RawDocument> {
 		obj.setEncoding(encoding);			
 	}
 	
-	public List<FactoryBean> getAnnotations() {
+	public AnnotationsBean getAnnotations() {
 		return annotations;
 	}
 
-	public void setAnnotations(List<FactoryBean> annotations) {
+	public void setAnnotations(AnnotationsBean annotations) {
 		this.annotations = annotations;
 	}
 

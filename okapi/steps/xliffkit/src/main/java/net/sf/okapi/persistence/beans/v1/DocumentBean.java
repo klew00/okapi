@@ -32,7 +32,7 @@ import net.sf.okapi.persistence.beans.FactoryBean;
 
 public class DocumentBean extends PersistenceBean<Document> {
 
-	private List<FactoryBean> annotations = new ArrayList<FactoryBean>();
+	private AnnotationsBean annotations = new AnnotationsBean();
 	private String id;
 	private List<FactoryBean> documentResources = new ArrayList<FactoryBean>();
 
@@ -43,11 +43,7 @@ public class DocumentBean extends PersistenceBean<Document> {
 
 	@Override
 	protected void fromObject(Document obj, IPersistenceSession session) {
-		for (IAnnotation annotation : obj.getAnnotations()) {
-			FactoryBean annotationBean = new FactoryBean();
-			annotations.add(annotationBean);
-			annotationBean.set(annotation, session);
-		}
+		annotations.set(obj.getAnnotations(), session);
 		
 		id = obj.getId();
 		
@@ -60,7 +56,7 @@ public class DocumentBean extends PersistenceBean<Document> {
 
 	@Override
 	protected void setObject(Document obj, IPersistenceSession session) {
-		for (FactoryBean annotationBean : annotations)
+		for (FactoryBean annotationBean : annotations.getItems())
 			obj.setAnnotation(annotationBean.get(IAnnotation.class, session));
 		
 		obj.setId(id);
@@ -69,11 +65,11 @@ public class DocumentBean extends PersistenceBean<Document> {
 			obj.addResource(docPropBean.get(IResource.class, session));
 	}
 	
-	public List<FactoryBean> getAnnotations() {
+	public AnnotationsBean getAnnotations() {
 		return annotations;
 	}
 
-	public void setAnnotations(List<FactoryBean> annotations) {
+	public void setAnnotations(AnnotationsBean annotations) {
 		this.annotations = annotations;
 	}
 

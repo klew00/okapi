@@ -20,9 +20,6 @@
 
 package net.sf.okapi.persistence.beans.v1;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.sf.okapi.common.Range;
 import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.persistence.IPersistenceSession;
@@ -36,7 +33,7 @@ public class LexemBean extends PersistenceBean<Lexem> {
 	private String value;
 	private RangeBean range = new RangeBean();
 	private int lexerId;
-	private List<FactoryBean> annotations = new ArrayList<FactoryBean>();
+	private AnnotationsBean annotations = new AnnotationsBean();
 	private boolean deleted;
 	private boolean immutable;
 	
@@ -51,11 +48,7 @@ public class LexemBean extends PersistenceBean<Lexem> {
 		value = obj.getValue();
 		range.set(obj.getRange(), session);
 		lexerId = obj.getLexerId();
-		for (IAnnotation annotation : obj.getAnnotations()) {
-			FactoryBean annotationBean = new FactoryBean();
-			annotations.add(annotationBean);
-			annotationBean.set(annotation, session);
-		}
+		annotations.set(obj.getAnnotations(), session);
 		deleted = obj.isDeleted();
 		immutable = obj.isImmutable();
 	}
@@ -63,7 +56,7 @@ public class LexemBean extends PersistenceBean<Lexem> {
 	@Override
 	protected void setObject(Lexem obj, IPersistenceSession session) {
 		obj.setLexerId(lexerId);
-		for (FactoryBean annotationBean : annotations)
+		for (FactoryBean annotationBean : annotations.getItems())
 			obj.setAnnotation(annotationBean.get(IAnnotation.class, session));
 		obj.setDeleted(deleted);
 		obj.setImmutable(immutable);
@@ -101,14 +94,14 @@ public class LexemBean extends PersistenceBean<Lexem> {
 		this.lexerId = lexerId;
 	}
 
-	public List<FactoryBean> getAnnotations() {
+	public AnnotationsBean getAnnotations() {
 		return annotations;
 	}
 
-	public void setAnnotations(List<FactoryBean> annotations) {
+	public void setAnnotations(AnnotationsBean annotations) {
 		this.annotations = annotations;
 	}
-
+	
 	public boolean isDeleted() {
 		return deleted;
 	}

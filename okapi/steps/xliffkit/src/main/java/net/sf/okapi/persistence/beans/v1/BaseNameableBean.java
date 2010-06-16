@@ -41,7 +41,7 @@ public class BaseNameableBean extends PersistenceBean<BaseNameable> {
 	private boolean isTranslatable;
 	private boolean preserveWS;
 	private List<PropertyBean> properties = new ArrayList<PropertyBean>();
-	private List<FactoryBean> annotations = new ArrayList<FactoryBean>();
+	private AnnotationsBean annotations = new AnnotationsBean();
 	private List<PropertyBean> sourceProperties = new ArrayList<PropertyBean>();
 
 	@Override
@@ -65,12 +65,8 @@ public class BaseNameableBean extends PersistenceBean<BaseNameable> {
 				propBean.set(obj.getProperty(propName), session);
 				properties.add(propBean);
 			}
-			
-			for (IAnnotation annotation : obj.getAnnotations()) {
-				FactoryBean annotationBean = new FactoryBean();
-				annotations.add(annotationBean);
-				annotationBean.set(annotation, session);
-			}
+						
+			annotations.set(obj.getAnnotations(), session);
 			
 			for (String propName : obj.getSourcePropertyNames()) {
 				PropertyBean propBean = new PropertyBean();
@@ -94,7 +90,7 @@ public class BaseNameableBean extends PersistenceBean<BaseNameable> {
 				//obj.setProperty(prop.get(new Property(prop.getName(), prop.getValue(), prop.isReadOnly()), session));
 				obj.setProperty(prop.get(Property.class, session));
 			
-			for (FactoryBean annotationBean : annotations)
+			for (FactoryBean annotationBean : annotations.getItems())
 				obj.setAnnotation(annotationBean.get(IAnnotation.class, session));
 			
 			for (PropertyBean prop : sourceProperties)
@@ -158,14 +154,6 @@ public class BaseNameableBean extends PersistenceBean<BaseNameable> {
 		this.properties = properties;
 	}
 
-	public List<FactoryBean> getAnnotations() {
-		return annotations;
-	}
-
-	public void setAnnotations(List<FactoryBean> annotations) {
-		this.annotations = annotations;
-	}
-
 	public List<PropertyBean> getSourceProperties() {
 		return sourceProperties;
 	}
@@ -180,5 +168,13 @@ public class BaseNameableBean extends PersistenceBean<BaseNameable> {
 
 	public void setSkeleton(FactoryBean skeleton) {
 		this.skeleton = skeleton;
+	}
+
+	public AnnotationsBean getAnnotations() {
+		return annotations;
+	}
+
+	public void setAnnotations(AnnotationsBean annotations) {
+		this.annotations = annotations;
 	}
 }

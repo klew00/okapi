@@ -44,7 +44,7 @@ public class TextUnitBean extends PersistenceBean<TextUnit> {
 	private boolean preserveWS;	
 	private FactoryBean skeleton = new FactoryBean();
 	private List<PropertyBean> properties = new ArrayList<PropertyBean>();
-	private List<FactoryBean> annotations = new ArrayList<FactoryBean>();
+	private AnnotationsBean annotations = new AnnotationsBean();
 	private TextContainerBean source = new TextContainerBean();
 	private String mimeType;
 	private Map<String, TextContainerBean> targets = new ConcurrentHashMap<String, TextContainerBean>();
@@ -73,11 +73,7 @@ public class TextUnitBean extends PersistenceBean<TextUnit> {
 			properties.add(propBean);
 		}
 		
-		for (IAnnotation annotation : obj.getAnnotations()) {
-			FactoryBean annotationBean = new FactoryBean();
-			annotations.add(annotationBean);
-			annotationBean.set(annotation, session);
-		}
+		annotations.set(obj.getAnnotations(), session);
 								
 		source.set(obj.getSource(), session);
 		mimeType = obj.getMimeType();
@@ -112,7 +108,7 @@ public class TextUnitBean extends PersistenceBean<TextUnit> {
 		for (PropertyBean propBean : properties)
 			obj.setProperty(propBean.get(Property.class, session));
 		
-		for (FactoryBean annotationBean : annotations)
+		for (FactoryBean annotationBean : annotations.getItems())
 			obj.setAnnotation(annotationBean.get(IAnnotation.class, session));
 		
 		obj.setSource(source.get(TextContainer.class, session));
@@ -190,11 +186,11 @@ public class TextUnitBean extends PersistenceBean<TextUnit> {
 		this.targets = targets;
 	}
 
-	public List<FactoryBean> getAnnotations() {
+	public AnnotationsBean getAnnotations() {
 		return annotations;
 	}
 
-	public void setAnnotations(List<FactoryBean> annotations) {
+	public void setAnnotations(AnnotationsBean annotations) {
 		this.annotations = annotations;
 	}
 

@@ -34,7 +34,7 @@ import net.sf.okapi.persistence.beans.FactoryBean;
 public class TextContainerBean extends PersistenceBean<TextContainer> {
 	
 	private List<PropertyBean> properties = new ArrayList<PropertyBean>();
-	private List<FactoryBean> annotations = new ArrayList<FactoryBean>();
+	private AnnotationsBean annotations = new AnnotationsBean();
 	private List<TextPartBean> parts = new ArrayList<TextPartBean>();
 	private boolean segApplied;
 
@@ -51,11 +51,7 @@ public class TextContainerBean extends PersistenceBean<TextContainer> {
 			properties.add(propBean);
 		}
 		
-		for (IAnnotation annotation : obj.getAnnotations()) {
-			FactoryBean annotationBean = new FactoryBean();
-			annotations.add(annotationBean);
-			annotationBean.set(annotation, session);
-		}
+		annotations.set(obj.getAnnotations(), session);
 		
 		for (int i = 0; i < obj.count(); i++) {
 			TextPartBean partBean = (TextPartBean) session.createBean(obj.get(i).getClass());
@@ -71,7 +67,7 @@ public class TextContainerBean extends PersistenceBean<TextContainer> {
 		for (PropertyBean prop : properties)
 			obj.setProperty(prop.get(Property.class, session));
 		
-		for (FactoryBean annotationBean : annotations)
+		for (FactoryBean annotationBean : annotations.getItems())
 			obj.setAnnotation(annotationBean.get(IAnnotation.class, session));
 		
 		for (TextPartBean partBean : parts)
@@ -80,12 +76,12 @@ public class TextContainerBean extends PersistenceBean<TextContainer> {
 		obj.setHasBeenSegmentedFlag(segApplied);
 	}
 
-	public void setAnnotations(List<FactoryBean> annotations) {
-		this.annotations = annotations;
+	public AnnotationsBean getAnnotations() {
+		return annotations;
 	}
 
-	public List<FactoryBean> getAnnotations() {
-		return annotations;
+	public void setAnnotations(AnnotationsBean annotations) {
+		this.annotations = annotations;
 	}
 
 	public List<PropertyBean> getProperties() {
