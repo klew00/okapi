@@ -41,24 +41,57 @@ target of text units.</p>
 Sends: Filter events</p>
 <p>No check is done on the entries set as non-translatable.</p>
 <h2><a name="parameters"></a>Parameters</h2>
-<p><cite>Path of the report file</cite> -- Enter the full path of the HTML report to 
-generate. You can use the variable <code>${rootDir}</code> in the path.</p>
-<p><cite>Open the report after completion</cite> -- Set this option to 
-automatically open the report file after the process is complete.</p>
-<p><cite>Empty translation</cite> -- Set this option to flag the segments for 
-which the translation is empty (if the corresponding source is not empty).</p>
+<h3>General Tab</h3>
+<p><cite>Target is the same as the source</cite> -- Set this option to flag the 
+segments where the translation is the same as the source.</p>
 <p><cite>Include the codes in the comparison</cite> -- Set this option if the 
 comparison done when verifying if the target is the same as the source should 
 take inline codes into account. If this option is set and the only difference 
 between the source and the translation is the inline code, the segment will not 
 be flagged as having the target the same as the source. This option is enabled 
 only when <cite>Target is the same as the source</cite> is set.</p>
+<p><cite>Code differences between source and target</cite> -- Set this option to 
+verify that the target content has the same inline codes as the source content.</p>
+<p><cite>Empty translation</cite> -- Set this option to flag the segments for 
+which the translation is empty (if the corresponding source is not empty).</p>
 <p><cite>Leading white spaces</cite> -- Set this option&nbsp; to flag the text 
 units where the leading white spaces are different between source and target.</p>
 <p><cite>Trailing white spaces</cite> -- Set this option to flag the text units 
 where the trailing white spaces are different between source and target.</p>
-<p><cite>Target is the same as the source</cite> -- Set this option to flag the 
-segments where the translation is the same as the source.</p>
+<p><cite>Perform the verifications provided by the Language Tool server</cite> 
+-- Set this option to run the verifications provided by a Language Tool server. 
+To use this option you must have access to <a href="http://www.languagetool.org">
+Language Tool Checker</a> run as a server. Most of the time this is simply a 
+local server. You can start the application with Java Web Start:
+<a href="http://www.languagetool.org/webstart/web/LanguageTool.jnlp">Start 
+Language Tool Checker from the Web</a>.</p>
+<h3>Patterns Tab</h3>
+<p><cite>Verify that the following source patterns are translated as expected</cite> 
+-- Set this option to verify that each source pattern defined in the list has 
+its corresponding expected part in the target content.</p>
+<p>The first column of the table indicates if the pattern should be verified or 
+not. The second column is the regular expression of the pattern to look for in 
+the source. The third column is the target pattern corresponding to the part 
+found in the source. If the part should be the same as in the source, just use 
+the &quot;<code>&lt;same&gt;</code>&quot; keyword.</p>
+<p><cite>Add</cite> -- Click this buttion to add a new pattern to the list.</p>
+<p><cite>Edit</cite> -- Click this button to edit the pattern currently 
+selected. You can also double-click the pattern in the table.</p>
+<p><cite>Remove</cite> -- Click this button to remove the pattern currently 
+selected from the table.</p>
+<p><cite>Move Up</cite> -- Click this button to move the pattern currently 
+selected upward in the table.</p>
+<p><cite>Move Down</cite> -- Click this button to move the pattern currently 
+selected downward in the table.</p>
+<p><cite>Import</cite> -- Click this button to import an existing file in the 
+table.</p>
+<p><cite>Export</cite> -- Click this button to export the patterns in the table 
+to a tab-delimited file.</p>
+<h3>Output Tab</h3>
+<p><cite>Path of the report file</cite> -- Enter the full path of the HTML report to 
+generate. You can use the variable <code>${rootDir}</code> in the path.</p>
+<p><cite>Open the report after completion</cite> -- Set this option to 
+automatically open the report file after the process is complete.</p>
 <p>&nbsp;</p>
 </body>
 </html>

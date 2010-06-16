@@ -20,8 +20,16 @@
 
 package net.sf.okapi.steps.qualitycheck;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+
+import net.sf.okapi.common.exceptions.OkapiIOException;
 
 public class PatternItem {
 	
@@ -35,8 +43,63 @@ public class PatternItem {
 	private Pattern srcPat;
 	private Pattern trgPat;
 
-	public static List<PatternItem> loadFile () {
-		return null;
+	public static List<PatternItem> loadFile (String path) {
+		ArrayList<PatternItem> list = new ArrayList<PatternItem>();
+		BufferedReader br = null;
+		try {
+			br = new BufferedReader(new InputStreamReader(new FileInputStream(path), "UTF-8"));
+			String line = br.readLine();
+			while ( line != null ) {
+				if ( line.trim().length() == 0 ) continue;
+				if ( line.startsWith("#") ) continue;
+				String[] parts = line.split("\t", -2);
+				if ( parts.length < 3 ) {
+					throw new OkapiIOException("Missing one or more tabs in line:\n"+line);
+				}
+				list.add(new PatternItem(parts[1], parts[2], parts[0].equals("1")));
+				line = br.readLine();
+			}
+		}
+		catch ( IOException e ) {
+			throw new OkapiIOException("Error reading pattern file.", e);
+		}
+		finally {
+			if ( br != null ) {
+				try {
+					br.close();
+				}
+				catch ( IOException e ) {
+					throw new OkapiIOException("Error closing pattern file.", e);
+				}
+			}
+		}
+		return list;
+	}
+	
+	public static List<PatternItem> saveFile (String path,
+		List<PatternItem> list)
+	{
+		PrintWriter pr = null;
+		final String lineBreak = System.getProperty("line.separator");
+		try {
+			pr = new PrintWriter(path);
+			for ( PatternItem item : list ) {
+				pr.write((item.enabled ? "1" : "0")
+					+ "\t" + item.source
+					+ "\t" + item.target
+					+ lineBreak);
+			}
+			pr.flush();
+		}
+		catch ( IOException e ) {
+			throw new OkapiIOException("Error reading pattern file.", e);
+		}
+		finally {
+			if ( pr != null ) {
+				pr.close();
+			}
+		}
+		return list;
 	}
 	
 	public PatternItem (String source,

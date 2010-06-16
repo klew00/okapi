@@ -40,6 +40,8 @@ public class Parameters extends BaseParameters {
 	private static final String USEPATTERN = "usePattern";
 	private static final String SOURCEPATTERN = "sourcePattern";
 	private static final String TARGETPATTERN = "targetPattern";
+	private static final String CHECKWITHLT = "checkWithLT";
+	private static final String SERVERURL = "serverURL";
 
 	String outputPath;
 	boolean autoOpen;
@@ -51,6 +53,8 @@ public class Parameters extends BaseParameters {
 	boolean codeDifference;
 	boolean checkPatterns;
 	List<PatternItem> patterns;
+	boolean checkWithLT;
+	String serverURL;
 
 	public Parameters () {
 		reset();
@@ -135,7 +139,23 @@ public class Parameters extends BaseParameters {
 	public void setPatterns (List<PatternItem> patterns) {
 		this.patterns = patterns;
 	}
+	
+	public boolean getCheckWithLT () {
+		return this.checkWithLT;
+	}
 
+	public void setCheckWithLT (boolean checkWithLT) {
+		this.checkWithLT = checkWithLT;
+	}
+	
+	public String getServerURL () {
+		return this.serverURL;
+	}
+	
+	public void setServerURL (String serverURL) {
+		this.serverURL = serverURL;
+	}
+	
 	@Override
 	public void reset () {
 		outputPath = "${rootDir}/qa-report.html";
@@ -148,6 +168,8 @@ public class Parameters extends BaseParameters {
 		codeDifference = true;
 		checkPatterns = true;
 		patterns = new ArrayList<PatternItem>();
+		checkWithLT = false;
+		serverURL = "http://localhost:8081/"; // Default
 	}
 
 	@Override
@@ -162,8 +184,10 @@ public class Parameters extends BaseParameters {
 		targetSameAsSource = buffer.getBoolean(TARGETSAMEASSOURCE, targetSameAsSource);
 		targetSameAsSourceWithCodes = buffer.getBoolean(TARGETSAMEASSOURCE_WITHCODES, targetSameAsSourceWithCodes);
 		codeDifference = buffer.getBoolean(CODEDIFFERENCE, codeDifference);
-		checkPatterns = buffer.getBoolean(CHECKPATTERNS, checkPatterns);
+		checkWithLT = buffer.getBoolean(CHECKWITHLT, checkWithLT);
+		serverURL = buffer.getString(SERVERURL, serverURL);
 		// Patterns
+		checkPatterns = buffer.getBoolean(CHECKPATTERNS, checkPatterns);
 		int count = buffer.getInteger(PATTERNCOUNT, 0);
 		for ( int i=0; i<count; i++ ) {
 			boolean enabled = buffer.getBoolean(String.format("%s%d", USEPATTERN, i), true);
@@ -184,8 +208,10 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean(TARGETSAMEASSOURCE, targetSameAsSource);
 		buffer.setBoolean(TARGETSAMEASSOURCE_WITHCODES, targetSameAsSourceWithCodes);
 		buffer.setBoolean(CODEDIFFERENCE, codeDifference);
-		buffer.setBoolean(CHECKPATTERNS, checkPatterns);
+		buffer.setBoolean(CHECKWITHLT, checkWithLT);
+		buffer.setString(SERVERURL, serverURL);
 		// Patterns
+		buffer.setBoolean(CHECKPATTERNS, checkPatterns);
 		buffer.setInteger(PATTERNCOUNT, patterns.size());
 		for ( int i=0; i<patterns.size(); i++ ) {
 			buffer.setBoolean(String.format("%s%d", USEPATTERN, i), patterns.get(i).enabled);

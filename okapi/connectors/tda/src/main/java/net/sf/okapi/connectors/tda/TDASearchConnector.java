@@ -172,7 +172,7 @@ public class TDASearchConnector implements ITMQuery {
 	    		@SuppressWarnings("unchecked")
 	    		String tmp = (String)((Map<String, Object>)entry.get("provider")).get("name");
 	    		if ( !Util.isEmpty(tmp) ) result.origin += ("/" + tmp);
-	    		result.score = 90; //TODO: re-score the data to get meaningfull hits
+	    		result.score = 90; //TODO: re-score the data to get meaningful hits
 	    		results.add(result);
 	    	}
 

@@ -40,6 +40,7 @@ public class QualityChecker {
 	private List<Issue> issues;
 	private XMLWriter repWriter;
 	private List<PatternItem> patterns;
+	private LanguageToolConnector ltConn;
 
 	public QualityChecker () {
 		params = new Parameters();
@@ -75,6 +76,11 @@ public class QualityChecker {
 			if ( item.enabled ) {
 				item.compile();
 			}
+		}
+		
+		if ( params.getCheckWithLT() ) {
+			ltConn = new LanguageToolConnector();
+			ltConn.initialize(targetLocale, params.getServerURL());
 		}
 	}
 
@@ -154,6 +160,16 @@ public class QualityChecker {
 			// Check for patterns, if requested
 			if ( params.getCheckPatterns() ) {
 				checkPatterns(srcSeg, trgSeg, tu);
+			}
+			
+			// Run a check with LanguageTool connector
+			if ( params.getCheckWithLT() ) {
+				if ( ltConn.checkSegment(trgSeg, tu) > 0 ) {
+					for ( Issue issue : ltConn.getIssues() ) {
+						reportIssue(issue.issueType, tu, issue.segId, issue.message, issue.srcStart, issue.srcEnd,
+							issue.trgStart, issue.trgEnd, srcSeg.toString(), trgSeg.toString());
+					}
+				}
 			}
 		
 		}

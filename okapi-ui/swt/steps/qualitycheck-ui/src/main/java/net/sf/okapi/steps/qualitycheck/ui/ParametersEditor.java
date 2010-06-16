@@ -88,6 +88,8 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Shell dialog;
 	private TableItem editItem;
 	private boolean addMode;
+	private Button chkCheckWithLT;
+	private Text edServerURL;
 	
 	public boolean edit (IParameters params,
 		boolean readOnly,
@@ -221,6 +223,22 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		
 		chkTrailingWS = new Button(cmpTmp, SWT.CHECK);
 		chkTrailingWS.setText("Trailing white spaces");
+		
+		chkCheckWithLT = new Button(cmpTmp, SWT.CHECK);
+		chkCheckWithLT.setText("Perform the verifications provided by the Language Tool server");
+		gdTmp = new GridData();
+		gdTmp.verticalIndent = 16;
+		chkCheckWithLT.setLayoutData(gdTmp);
+		chkCheckWithLT.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				updateLTOptions();
+			};
+		});
+		
+		label = new Label(cmpTmp, SWT.NONE);
+		label.setText("Server URL (e.g. http://localhost:8081/):");
+		edServerURL = new Text(cmpTmp, SWT.BORDER);
+		edServerURL.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		TabItem tiTmp = new TabItem(tfTmp, SWT.NONE);
 		tiTmp.setText("General");
@@ -323,12 +341,14 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		btImport = UIUtil.createGridButton(cmpTmp2, SWT.PUSH, "Import...", UIUtil.BUTTON_DEFAULT_WIDTH, 1);
 		btImport.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
+				importPatterns();
 			}
 		});
 
 		btExport = UIUtil.createGridButton(cmpTmp2, SWT.PUSH, "Export...", UIUtil.BUTTON_DEFAULT_WIDTH, 1);
 		btExport.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
+				exportPatterns();
 			}
 		});
 
@@ -499,6 +519,34 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		updateMoveButtons();
 	}
 
+	private void importPatterns () {
+		try {
+			String[] paths = Dialogs.browseFilenames(shell, "Import Patterns", false, null,
+				"Patterns Files (*.txt)\tAll Files (*.*)", "*.txt\t*.*");
+			if ( paths == null ) return;
+			setPatternsData(PatternItem.loadFile(paths[0]));
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+	}
+
+	private void exportPatterns () {
+		try {
+			String path = Dialogs.browseFilenamesForSave(shell, "Export Patterns", null,
+				"Patterns Files (*.txt)\tAll Files (*.*)", "*.txt\t*.*");
+			if ( path == null ) return;
+			PatternItem.saveFile(path, savePatternsData());
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+	}
+
+	private void updateLTOptions () {
+		edServerURL.setEnabled(chkCheckWithLT.getSelection());
+	}
+	
 	private void updateTargetSameAsSourceWithCodes () {
 		chkTargetSameAsSourceWithCodes.setEnabled(chkTargetSameAsSource.getSelection());
 	}
@@ -507,6 +555,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		boolean enabled = chkPatterns.getSelection();
 		table.setEnabled(enabled);
 		btAdd.setEnabled(enabled);
+		btImport.setEnabled(enabled);
 		if ( enabled ) {
 			updatePatternsButtons();
 		}
@@ -515,7 +564,6 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			btRemove.setEnabled(false);
 			btMoveUp.setEnabled(false);
 			btMoveDown.setEnabled(false);
-			btImport.setEnabled(false);
 			btExport.setEnabled(false);
 		}
 	}
@@ -526,7 +574,6 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		btEdit.setEnabled(index!=-1);
 		btRemove.setEnabled(index!=-1);
 		updateMoveButtons();
-		btImport.setEnabled(count>0);
 		btExport.setEnabled(count>0);
 	}
 	
@@ -546,10 +593,13 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		chkEmptyTarget.setSelection(params.getEmptyTarget());
 		chkTargetSameAsSource.setSelection(params.getTargetSameAsSource());
 		chkTargetSameAsSourceWithCodes.setSelection(params.getTargetSameAsSourceWithCodes());
+		chkCheckWithLT.setSelection(params.getCheckWithLT());
+		edServerURL.setText(params.getServerURL());
 		chkPatterns.setSelection(params.getCheckPatterns());
 		setPatternsData(params.getPatterns());
 		updateTargetSameAsSourceWithCodes();
 		updatePatterns();
+		updateLTOptions();
 	}
 	
 	private void setPatternsData (List<PatternItem> list) {
@@ -571,6 +621,13 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			pnlOutputPath.setFocus();
 			return false;
 		}
+		if ( chkCheckWithLT.getSelection() ) {
+			if ( edServerURL.getText().trim().length() == 0 ) {
+				Dialogs.showError(shell, "Please, enter a server URL.", null);
+				edServerURL.setFocus();
+				return false;
+			}
+		}
 		params.setOutputPath(pnlOutputPath.getText());
 		params.setCodeDifference(chkCodeDifference.getSelection());
 		params.setAutoOpen(chkAutoOpen.getSelection());
@@ -581,6 +638,11 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		if ( chkTargetSameAsSourceWithCodes.isEnabled() ) {
 			params.setTargetSameAsSourceWithCodes(chkTargetSameAsSourceWithCodes.getSelection());
 		}
+		params.setCheckWithLT(chkCheckWithLT.getSelection());
+		if ( chkCheckWithLT.getSelection() ) {
+			params.setServerURL(edServerURL.getText());
+		}
+		
 		params.setCheckPatterns(chkPatterns.getSelection());
 		params.setPatterns(savePatternsData());
 		result = true;

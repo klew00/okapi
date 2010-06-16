@@ -3,6 +3,11 @@
 <file original="testForSegments" source-language="en" target-language="fr" datatype="xml">
 <body>
 
+<trans-unit id="pre1">
+<source xml:lang="en">This is an example.</source>
+<target xml:lang="fr">c'est une exemple.</target>
+</trans-unit>
+
 <trans-unit id="1" resname="RESNAME1">
 <source xml:lang="en">Sentence 1© of p1. Sentence 2 p1.</source>
 </trans-unit>
