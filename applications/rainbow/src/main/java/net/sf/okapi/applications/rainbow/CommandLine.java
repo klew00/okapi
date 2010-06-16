@@ -277,9 +277,6 @@ public class CommandLine {
 
 	private void launchPipeline () {
 		// Save any pending data
-//		saveSurfaceData();
-//		updateCustomConfigurations();
-
 		fcMapper.setCustomConfigurationsDirectory(prj.getParametersFolder());
 		fcMapper.updateCustomConfigurations();
 		PipelineWrapper wrapper = new PipelineWrapper(fcMapper, appRootFolder, prj.getParametersFolder());
@@ -305,13 +302,6 @@ public class CommandLine {
 				return; // No execution, no save
 			}
 
-//			// If it's a predefined pipeline: save the parameters
-//			if ( predefinedPipeline != null ) {
-//				wrapper.copyParametersToPipeline(predefinedPipeline);
-//				prj.setUtilityParameters(predefinedPipeline.getId(),
-//					predefinedPipeline.getParameters());
-//			}
-		
 			if ( res == PipelineEditor.RESULT_CLOSE ) {
 				return; // No execution
 			}

@@ -32,6 +32,8 @@ import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.lib.verification.Parameters;
+import net.sf.okapi.lib.verification.QualityChecker;
 
 @UsingParameters(Parameters.class)
 public class QualityCheckStep extends BasePipelineStep {

@@ -14,6 +14,7 @@
     <modules>
         <module>lib-segmentation-ui</module>
         <module>lib-translation-ui</module>
+        <module>lib-verification-ui</module>
     </modules>
     
     <dependencies>

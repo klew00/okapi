@@ -324,7 +324,7 @@ public class PipelineWrapper {
 				params.getClass().getName());
 			if ( params != null ) {
 				step.paramsData = params.toString();
-				peMapper.addEditor("net.sf.okapi.steps.qualitycheck.ui.ParametersEditor", step.paramsClass);
+				peMapper.addEditor("net.sf.okapi.lib.ui.verification.ParametersEditor", step.paramsClass);
 			}
 			availableSteps.put(step.id, step);
 

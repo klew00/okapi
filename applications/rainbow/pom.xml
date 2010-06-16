@@ -26,6 +26,16 @@
 		</dependency>
 		<dependency>
 			<groupId>net.sf.okapi.lib</groupId>
+			<artifactId>okapi-lib-verification-ui</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.okapi.lib</groupId>
+			<artifactId>okapi-lib-verification</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.okapi.lib</groupId>
 			<artifactId>okapi-lib-segmentation-ui</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -248,11 +258,6 @@
 		<dependency>
 			<groupId>net.sf.okapi.steps</groupId>
 			<artifactId>okapi-step-fullwidthconversion-ui</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sf.okapi.steps</groupId>
-			<artifactId>okapi-step-qualitycheck-ui</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
