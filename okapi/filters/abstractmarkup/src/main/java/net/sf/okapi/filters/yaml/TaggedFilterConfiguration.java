@@ -104,7 +104,23 @@ public class TaggedFilterConfiguration {
 	public static final String ELEMENT_ID_ATTRIBUTES = "idAttributes";
 
 	public static enum RULE_TYPE {
-		INLINE_ELEMENT, EXCLUDED_ELEMENT, INCLUDED_ELEMENT, GROUP_ELEMENT, TEXT_UNIT_ELEMENT, TEXT_RUN_ELEMENT, TEXT_MARKER_ELEMENT, PRESERVE_WHITESPACE, SCRIPT_ELEMENT, SERVER_ELEMENT, ATTRIBUTE_TRANS, ATTRIBUTE_WRITABLE, ATTRIBUTE_READONLY, ATTRIBUTES_ONLY, ATTRIBUTE_ID, DOES_NOT_APPLY
+		INLINE_ELEMENT, 
+		EXCLUDED_ELEMENT, 
+		INCLUDED_ELEMENT, 
+		GROUP_ELEMENT, 
+		TEXT_UNIT_ELEMENT, 
+		TEXT_RUN_ELEMENT, 
+		TEXT_MARKER_ELEMENT, 
+		PRESERVE_WHITESPACE, 
+		SCRIPT_ELEMENT, 
+		SERVER_ELEMENT, 
+		ATTRIBUTE_TRANS, 
+		ATTRIBUTE_WRITABLE, 
+		ATTRIBUTE_READONLY, 
+		ATTRIBUTES_ONLY, 
+		ATTRIBUTE_ID,
+		RULE_FAILED,
+		RULE_NOT_FOUND
 	};
 
 	private final YamlConfigurationReader configReader;
@@ -205,44 +221,38 @@ public class TaggedFilterConfiguration {
 		return element.getName();
 	}
 
-	public RULE_TYPE findMatchingElementRule(String tag, Map<String, String> attributes) {
-		return RULE_TYPE.DOES_NOT_APPLY;
-	}
-
+	/**
+	 * Rules are checked in priority order, first elements, then attributes, then regex
+	 * @param tag
+	 * @param attributes
+	 * @param attribute
+	 * @return
+	 */
 	public RULE_TYPE findMatchingAttributeRule(String tag, Map<String, String> attributes,
 			String attribute) {
-		RULE_TYPE ruleType = RULE_TYPE.DOES_NOT_APPLY;
+		RULE_TYPE ruleType = RULE_TYPE.RULE_NOT_FOUND;
 
-		// rules are checked in priority order, first elements, then attributes, then regex
-
-		// check element rules a match here has priority over attribute and regex rules
+		// check element rules (including regex). A match here has priority over attribute and regex rules		
+		// we return any result as long as the element rule lists the attribute. Element
+		// rules always have priority
 		ruleType = findMatchingAttributeRuleOnElementRule(tag, attributes, attribute);
-		if (ruleType != RULE_TYPE.DOES_NOT_APPLY) {
+		if (ruleType != RULE_TYPE.RULE_NOT_FOUND) {
 			return ruleType;
 		}
 
-		// check attribute rules
-		ruleType = getAttributeRuleType(attribute.toLowerCase());
-		if (ruleType != RULE_TYPE.DOES_NOT_APPLY && isElementFoundOnAttributeRule(tag, attribute)
-				&& !isAttributeFoundOnElementRule(tag, attribute, ruleType)) {
-			return ruleType;
-		} else {
-			ruleType = RULE_TYPE.DOES_NOT_APPLY;
-		}
-
-		// TODO: check regex attribute rules
-		// default no rules apply
-		return ruleType;
-
+		// check attribute rules (including regex)
+		return findMatchingElementOnAttributeRule(tag, attribute, getAttributeRuleType(attribute.toLowerCase()));
 	}
 
 	@SuppressWarnings("unchecked")
 	private RULE_TYPE findMatchingAttributeRuleOnElementRule(String tag,
 			Map<String, String> attributes, String attribute) {
 
+		boolean attributeIsFound = false;
+		
 		Map elementRule = configReader.getRule(tag.toLowerCase());
 		if (elementRule == null) {
-			return RULE_TYPE.DOES_NOT_APPLY;
+			return RULE_TYPE.RULE_NOT_FOUND;
 		}
 
 		// these attribute rules are mutually exclusive
@@ -265,6 +275,7 @@ public class TaggedFilterConfiguration {
 			} else if (ta != null && ta instanceof Map) {
 				Map actionableAttributes = (Map) elementRule.get(attributeRule);
 				if (actionableAttributes.containsKey(attribute.toLowerCase())) {
+					attributeIsFound = true;
 					List condition = (List) actionableAttributes.get(attribute.toLowerCase());
 					// case where there is no condition applied to attribute
 					if (condition == null) {
@@ -282,18 +293,23 @@ public class TaggedFilterConfiguration {
 									return convertRuleAsStringToRuleType(attributeRule);
 								}
 							}
-							continue;
+						} else {
+							// single condition
+							if (applyConditions(condition, attributes)) {
+								return convertRuleAsStringToRuleType(attributeRule);
+							}
 						}
-						if (applyConditions(condition, attributes)) {
-							return convertRuleAsStringToRuleType(attributeRule);
-						}
-
 					}
 				}
 			}
 		}
 
-		return RULE_TYPE.DOES_NOT_APPLY;
+		// if we found the attribute and we get to this point the condition must have failed
+		if (attributeIsFound) {
+			return RULE_TYPE.RULE_FAILED;
+		}
+		
+		return RULE_TYPE.RULE_NOT_FOUND;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -311,8 +327,55 @@ public class TaggedFilterConfiguration {
 			}
 		}
 
-		return RULE_TYPE.DOES_NOT_APPLY;
+		return RULE_TYPE.RULE_NOT_FOUND;
 	}
+	
+	/**
+	 * @param elementName
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	private RULE_TYPE findMatchingElementOnAttributeRule(String tag, String attribute, RULE_TYPE ruleType) {
+		List excludedElements;
+		List onlyTheseElements;
+		Map attrRule = configReader.getRule(attribute.toLowerCase());
+
+		if (attrRule == null) {
+			return RULE_TYPE.RULE_NOT_FOUND;
+		}
+
+		excludedElements = (List) attrRule.get(ALL_ELEMENTS_EXCEPT);
+		onlyTheseElements = (List) attrRule.get(ONLY_THESE_ELEMENTS);
+
+		if (excludedElements == null && onlyTheseElements == null) {
+			// means no exceptions - all tags can have this attribute/rule
+			return ruleType;
+		}
+
+		// ALL_ELEMENTS_EXCEPT and ONLY_THESE_ELEMENTS are mutually exclusive
+		// categories, either one or the other must be true , not both
+		if (excludedElements != null) {
+			for (int i = 0; i <= excludedElements.size() - 1; i++) {
+				String elem = (String) excludedElements.get(i);
+				if (elem.equalsIgnoreCase(tag)) {
+					return RULE_TYPE.RULE_FAILED;
+				}
+			}
+			// default
+			return ruleType;
+		} else if (onlyTheseElements != null) {
+			for (int i = 0; i <= onlyTheseElements.size() - 1; i++) {
+				String elem = (String) onlyTheseElements.get(i);
+				if (elem.equalsIgnoreCase(tag)) {
+					return ruleType;
+				}
+			}
+			// default
+			return RULE_TYPE.RULE_FAILED;
+		}
+		return ruleType;
+	}
+
 
 	@SuppressWarnings("unchecked")
 	public RULE_TYPE getElementRuleType(String tag) {
@@ -344,7 +407,7 @@ public class TaggedFilterConfiguration {
 			} 
 		}
 
-		return RULE_TYPE.DOES_NOT_APPLY;
+		return RULE_TYPE.RULE_NOT_FOUND;
 	}
 
 	public boolean isTranslatableAttribute(String tag, String attribute,
@@ -406,7 +469,7 @@ public class TaggedFilterConfiguration {
 		} else if (ruleType.equalsIgnoreCase(ELEMENT_ID_ATTRIBUTES)) {
 			return RULE_TYPE.ATTRIBUTE_ID;
 		} else {
-			return RULE_TYPE.DOES_NOT_APPLY;
+			return RULE_TYPE.RULE_NOT_FOUND;
 		}
 	}
 
@@ -428,9 +491,12 @@ public class TaggedFilterConfiguration {
 			break;			
 		case ATTRIBUTE_WRITABLE:
 			attributeRule = ELEMENT_WRITABLE_ATTRIBUTES;
-			break;			
+			break;	
+		case ATTRIBUTE_ID:
+			attributeRule = ELEMENT_ID_ATTRIBUTES;
+			break;	
 		default:
-			break;
+			return false;			
 		}
 
 		Object ta = elementRule.get(attributeRule);
@@ -451,52 +517,7 @@ public class TaggedFilterConfiguration {
 		return false;
 	}
 
-	/**
-	 * @param elementName
-	 * @return
-	 */
-	@SuppressWarnings("unchecked")
-	private boolean isElementFoundOnAttributeRule(String tag, String attribute) {
-		List excludedElements;
-		List onlyTheseElements;
-		Map attrRule = configReader.getRule(attribute.toLowerCase());
-
-		if (attrRule == null) {
-			return false;
-		}
-
-		excludedElements = (List) attrRule.get(ALL_ELEMENTS_EXCEPT);
-		onlyTheseElements = (List) attrRule.get(ONLY_THESE_ELEMENTS);
-
-		if (excludedElements == null && onlyTheseElements == null) {
-			// means no exceptions - all tags can have this attribute/rule
-			return true;
-		}
-
-		// ALL_ELEMENTS_EXCEPT and ONLY_THESE_ELEMENTS are mutually exclusive
-		// categories, either one or the other must be true , not both
-		if (excludedElements != null) {
-			for (int i = 0; i <= excludedElements.size() - 1; i++) {
-				String elem = (String) excludedElements.get(i);
-				if (elem.equalsIgnoreCase(tag)) {
-					return false;
-				}
-			}
-			// default
-			return true;
-		} else if (onlyTheseElements != null) {
-			for (int i = 0; i <= onlyTheseElements.size() - 1; i++) {
-				String elem = (String) onlyTheseElements.get(i);
-				if (elem.equalsIgnoreCase(tag)) {
-					return true;
-				}
-			}
-			// default
-			return false;
-		}
-		return true;
-	}
-
+	
 	@SuppressWarnings("unchecked")
 	private boolean applyConditions(List<?> condition, Map<String, String> attributes) {
 		String conditionalAttribute = null;
