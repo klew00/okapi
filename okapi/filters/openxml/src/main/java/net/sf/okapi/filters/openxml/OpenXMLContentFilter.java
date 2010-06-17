@@ -19,35 +19,25 @@
 ===========================================================================*/
 package net.sf.okapi.filters.openxml;
 
-//import org.apache.log4j.BasicConfigurator;
-//import org.apache.log4j.Level;
-//import org.apache.log4j.Logger;
-
 import java.io.*;
 import java.net.URL;
 import java.util.Hashtable;
-//import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-//import java.util.TreeMap; // DWH 10-10-08
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.htmlparser.jericho.EndTag;
-//import net.htmlparser.jericho.EndTagType;
 import net.htmlparser.jericho.Segment;
-//import net.htmlparser.jericho.StartTagType;
 import net.htmlparser.jericho.Attribute;
 import net.htmlparser.jericho.CharacterReference;
 import net.htmlparser.jericho.StartTag;
-import net.htmlparser.jericho.StartTagType;
 import net.htmlparser.jericho.Tag;
 
-//import net.sf.okapi.common.encoder.IEncoder;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.Event;
@@ -965,7 +955,7 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 		if (getRuleState().isExludedState()) {
 			addToDocumentPart(sTagString);
 			// process these tag types to update parser state
-			switch (getConfig().getMainRuleType(sTagName)) {
+			switch (getConfig().getElementRuleType(sTagName)) {
 			  // DWH 1-23-09
 			case EXCLUDED_ELEMENT:
 				getRuleState().pushExcludedRule(sTagName);
@@ -979,7 +969,7 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 			}
 			return;
 		}
-		switch (getConfig().getMainRuleType(sTagName)) {
+		switch (getConfig().getElementRuleType(sTagName)) {
 		  // DWH 1-23-09
 		case INLINE_ELEMENT:
 			if (canStartNewTextUnit()) {
@@ -1230,7 +1220,7 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 		if (getRuleState().isExludedState()) {
 			addToDocumentPart(sTagString); // DWH 7-16-09
 			// process these tag types to update parser state
-			switch (getConfig().getMainRuleType(sTagName)) {
+			switch (getConfig().getElementRuleType(sTagName)) {
 			  // DWH 1-23-09
 			case EXCLUDED_ELEMENT:
 				getRuleState().popExcludedIncludedRule();
@@ -1245,7 +1235,7 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 
 			return;
 		}
-		if (bInTextBox && getConfig().getMainRuleType(sTagName)!=RULE_TYPE.GROUP_ELEMENT)
+		if (bInTextBox && getConfig().getElementRuleType(sTagName)!=RULE_TYPE.GROUP_ELEMENT)
 		{
 			if (sTagName.equals("w:txbxcontent")) // DWH 10-22-09 so this won't be an inline code
 				sEndTxbxContent = sTagString;
@@ -1260,7 +1250,7 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 				bInPowerpointEndPara = false;
 			return;
 		}
-		switch (getConfig().getMainRuleType(sTagName)) {
+		switch (getConfig().getElementRuleType(sTagName)) {
 		  // DWH 1-23-09
 		case INLINE_ELEMENT:
 			if (canStartNewTextUnit())

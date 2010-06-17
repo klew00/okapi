@@ -91,7 +91,6 @@ public class TaggedFilterConfiguration {
 	public static final String MATCH = "MATCH";
 
 	public static final String ELEMENT_TYPE = "elementType";
-	public static final String ELEMENT_ID = "idAttributes";
 	public static final String WELLFORMED = "assumeWellformed";
 	public static final String USECODEFINDER = "useCodeFinder";
 	public static final String CODEFINDERRULES = "codeFinderRules";
@@ -99,9 +98,13 @@ public class TaggedFilterConfiguration {
 	public static final String GLOBAL_CDATA_SUBFILTER = "global_cdata_subfilter";
 	public static final String CONDITIONS = "conditions";
 	public static final String SUBFILTER = "subfilter";
-	
+	public static final String ELEMENT_TRANSLATABLE_ATTRIBUTES = "translatableAttributes";
+	public static final String ELEMENT_WRITABLE_ATTRIBUTES = "writableLocalizableAttributes";
+	public static final String ELEMENT_READ_ONLY_ATTRIBUTES = "readOnlyLocalizableAttributes";
+	public static final String ELEMENT_ID_ATTRIBUTES = "idAttributes";
+
 	public static enum RULE_TYPE {
-		INLINE_ELEMENT, EXCLUDED_ELEMENT, INCLUDED_ELEMENT, GROUP_ELEMENT, TEXT_UNIT_ELEMENT, TEXT_RUN_ELEMENT, TEXT_MARKER_ELEMENT, PRESERVE_WHITESPACE, SCRIPT_ELEMENT, SERVER_ELEMENT, ATTRIBUTE_TRANS, ATTRIBUTE_WRITABLE, ATTRIBUTE_READONLY, ATTRIBUTES_ONLY, ATTRIBUTE_ID, UNKOWN
+		INLINE_ELEMENT, EXCLUDED_ELEMENT, INCLUDED_ELEMENT, GROUP_ELEMENT, TEXT_UNIT_ELEMENT, TEXT_RUN_ELEMENT, TEXT_MARKER_ELEMENT, PRESERVE_WHITESPACE, SCRIPT_ELEMENT, SERVER_ELEMENT, ATTRIBUTE_TRANS, ATTRIBUTE_WRITABLE, ATTRIBUTE_READONLY, ATTRIBUTES_ONLY, ATTRIBUTE_ID, DOES_NOT_APPLY
 	};
 
 	private final YamlConfigurationReader configReader;
@@ -121,11 +124,11 @@ public class TaggedFilterConfiguration {
 	public TaggedFilterConfiguration(String configurationScript) {
 		configReader = new YamlConfigurationReader(configurationScript);
 	}
-	
+
 	public YamlConfigurationReader getConfigReader() {
 		return configReader;
 	}
-	
+
 	@Override
 	public String toString() {
 		return configReader.toString();
@@ -146,71 +149,25 @@ public class TaggedFilterConfiguration {
 		}
 		return wf.booleanValue();
 	}
-	
-	public boolean isUseCodeFinder () {
-		Boolean useCF = (Boolean)configReader.getProperty(USECODEFINDER);
-		if ( useCF == null ) return false;
-		else return useCF;
+
+	public boolean isUseCodeFinder() {
+		Boolean useCF = (Boolean) configReader.getProperty(USECODEFINDER);
+		if (useCF == null)
+			return false;
+		else
+			return useCF;
 	}
-	
-	public String getGlobalPCDATASubfilter() {		 
+
+	public String getGlobalPCDATASubfilter() {
 		return (String) configReader.getProperty(GLOBAL_PCDATA_SUBFILTER);
 	}
 
-	public String getGlobalCDATASubfilter() {		 
+	public String getGlobalCDATASubfilter() {
 		return (String) configReader.getProperty(GLOBAL_CDATA_SUBFILTER);
 	}
-	
-	public String getCodeFinderRules () {
-		return (String)configReader.getProperty(CODEFINDERRULES);
-	}
 
-	private RULE_TYPE convertRuleAsStringToRuleType(String ruleType) {
-		if (ruleType.equalsIgnoreCase(INLINE)) {
-			return RULE_TYPE.INLINE_ELEMENT;
-		} else if (ruleType.equalsIgnoreCase(GROUP)) {
-			return RULE_TYPE.GROUP_ELEMENT;
-		} else if (ruleType.equalsIgnoreCase(EXCLUDE)) {
-			return RULE_TYPE.EXCLUDED_ELEMENT;
-		} else if (ruleType.equalsIgnoreCase(INCLUDE)) {
-			return RULE_TYPE.INCLUDED_ELEMENT;
-		} else if (ruleType.equalsIgnoreCase(TEXTUNIT)) {
-			return RULE_TYPE.TEXT_UNIT_ELEMENT;
-		} else if (ruleType.equalsIgnoreCase(TEXTRUN)) {
-			return RULE_TYPE.TEXT_RUN_ELEMENT;
-		} else if (ruleType.equalsIgnoreCase(TEXTMARKER)) {
-			return RULE_TYPE.TEXT_MARKER_ELEMENT;
-		} else if (ruleType.equalsIgnoreCase(PRESERVE_WHITESPACE)) {
-			return RULE_TYPE.PRESERVE_WHITESPACE;
-		} else if (ruleType.equalsIgnoreCase(SCRIPT)) {
-			return RULE_TYPE.SCRIPT_ELEMENT;
-		} else if (ruleType.equalsIgnoreCase(SERVER)) {
-			return RULE_TYPE.SERVER_ELEMENT;
-		} else if (ruleType.equalsIgnoreCase(ATTRIBUTE_TRANS)) {
-			return RULE_TYPE.ATTRIBUTE_TRANS;
-		} else if (ruleType.equalsIgnoreCase(ATTRIBUTE_WRITABLE)) {
-			return RULE_TYPE.ATTRIBUTE_WRITABLE;
-		} else if (ruleType.equalsIgnoreCase(ATTRIBUTE_READONLY)) {
-			return RULE_TYPE.ATTRIBUTE_READONLY;
-		} else if (ruleType.equalsIgnoreCase(ATTRIBUTES_ONLY)) {
-			return RULE_TYPE.ATTRIBUTES_ONLY;
-		} else if (ruleType.equalsIgnoreCase(ATTRIBUTE_ID)) {
-			return RULE_TYPE.ATTRIBUTE_ID;
-		} else {
-			return RULE_TYPE.UNKOWN;
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public RULE_TYPE getMainRuleType(String ruleName) {
-		Map<String, Object> rule = configReader.getRule(ruleName.toLowerCase());
-		if (rule == null) {
-			return RULE_TYPE.UNKOWN;
-		}
-
-		List ruleTypes = (List) rule.get("ruleTypes");
-		String ruleType = (String) ruleTypes.get(0);
-		return convertRuleAsStringToRuleType(ruleType);
+	public String getCodeFinderRules() {
+		return (String) configReader.getProperty(CODEFINDERRULES);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -248,105 +205,249 @@ public class TaggedFilterConfiguration {
 		return element.getName();
 	}
 
-	public boolean isTranslatableAttribute(String elementName, String attribute, Map<String, String> attributes) {
-		return isActionableAttribute("translatableAttributes", elementName, attribute, attributes);
+	public RULE_TYPE findMatchingElementRule(String tag, Map<String, String> attributes) {
+		return RULE_TYPE.DOES_NOT_APPLY;
 	}
 
-	public boolean isReadOnlyLocalizableAttribute(String elementName, String attribute, Map<String, String> attributes) {
-		return isActionableAttribute("readOnlyLocalizableAttributes", elementName, attribute, attributes);
-	}
+	public RULE_TYPE findMatchingAttributeRule(String tag, Map<String, String> attributes,
+			String attribute) {
+		RULE_TYPE ruleType = RULE_TYPE.DOES_NOT_APPLY;
 
-	public boolean isWritableLocalizableAttribute(String elementName, String attribute, Map<String, String> attributes) {
-		return isActionableAttribute("writableLocalizableAttributes", elementName, attribute, attributes);
-	}
+		// rules are checked in priority order, first elements, then attributes, then regex
 
-	public boolean isIdAttribute(String elementName, String attribute, Map<String, String> attributes) {
-		return isActionableAttribute("idAttributes", elementName, attribute, attributes);
+		// check element rules a match here has priority over attribute and regex rules
+		ruleType = findMatchingAttributeRuleOnElementRule(tag, attributes, attribute);
+		if (ruleType != RULE_TYPE.DOES_NOT_APPLY) {
+			return ruleType;
+		}
+
+		// check attribute rules
+		ruleType = getAttributeRuleType(attribute.toLowerCase());
+		if (ruleType != RULE_TYPE.DOES_NOT_APPLY && isElementFoundOnAttributeRule(tag, attribute)
+				&& !isAttributeFoundOnElementRule(tag, attribute, ruleType)) {
+			return ruleType;
+		} else {
+			ruleType = RULE_TYPE.DOES_NOT_APPLY;
+		}
+
+		// TODO: check regex attribute rules
+		// default no rules apply
+		return ruleType;
+
 	}
 
 	@SuppressWarnings("unchecked")
-	private boolean isActionableAttribute(String type, String elementName, String attribute,
-			Map<String, String> attributes) {
+	private RULE_TYPE findMatchingAttributeRuleOnElementRule(String tag,
+			Map<String, String> attributes, String attribute) {
 
-		Map elementRule = configReader.getRule(elementName.toLowerCase());
+		Map elementRule = configReader.getRule(tag.toLowerCase());
 		if (elementRule == null) {
-			// catch attributes that may appear on any element
-			if (isActionableAttributeRule(elementName, attribute, type)) {
-				return true;
+			return RULE_TYPE.DOES_NOT_APPLY;
+		}
+
+		// these attribute rules are mutually exclusive
+		String[] elementRuleNames = { ELEMENT_TRANSLATABLE_ATTRIBUTES, ELEMENT_WRITABLE_ATTRIBUTES,
+				ELEMENT_READ_ONLY_ATTRIBUTES, ELEMENT_ID_ATTRIBUTES };
+
+		for (String attributeRule : elementRuleNames) {
+
+			Object ta = elementRule.get(attributeRule);
+
+			if (ta != null && ta instanceof List) {
+				List actionableAttributes = (List) elementRule.get(attributeRule);
+				for (Iterator<String> i = actionableAttributes.iterator(); i.hasNext();) {
+					String a = i.next();
+					if (a.equalsIgnoreCase(attribute)) {
+						return convertRuleAsStringToRuleType(attributeRule);
+					}
+				}
+
+			} else if (ta != null && ta instanceof Map) {
+				Map actionableAttributes = (Map) elementRule.get(attributeRule);
+				if (actionableAttributes.containsKey(attribute.toLowerCase())) {
+					List condition = (List) actionableAttributes.get(attribute.toLowerCase());
+					// case where there is no condition applied to attribute
+					if (condition == null) {
+						return convertRuleAsStringToRuleType(attributeRule);
+					} else {
+						// apply conditions
+						if (condition.get(0) instanceof List) {
+							// We have multiple conditions - individual results are
+							// OR'ed together
+							// so only one condition need be true for the rule to
+							// apply
+							for (int i = 0; i <= condition.size() - 1; i++) {
+								List c = (List) condition.get(i);
+								if (applyConditions(c, attributes)) {
+									return convertRuleAsStringToRuleType(attributeRule);
+								}
+							}
+							continue;
+						}
+						if (applyConditions(condition, attributes)) {
+							return convertRuleAsStringToRuleType(attributeRule);
+						}
+
+					}
+				}
 			}
+		}
+
+		return RULE_TYPE.DOES_NOT_APPLY;
+	}
+
+	@SuppressWarnings("unchecked")
+	public RULE_TYPE getAttributeRuleType(String attribute) {
+		Map rule = configReader.getRule(attribute.toLowerCase());
+		if (rule != null) {
+			if (isRuleType(attribute, RULE_TYPE.ATTRIBUTE_TRANS)) {
+				return RULE_TYPE.ATTRIBUTE_TRANS;
+			} else if (isRuleType(attribute, RULE_TYPE.ATTRIBUTE_WRITABLE)) {
+				return RULE_TYPE.ATTRIBUTE_WRITABLE;
+			} else if (isRuleType(attribute, RULE_TYPE.ATTRIBUTE_READONLY)) {
+				return RULE_TYPE.ATTRIBUTE_READONLY;
+			} else if (isRuleType(attribute, RULE_TYPE.ATTRIBUTE_ID)) {
+				return RULE_TYPE.ATTRIBUTE_ID;
+			}
+		}
+
+		return RULE_TYPE.DOES_NOT_APPLY;
+	}
+
+	@SuppressWarnings("unchecked")
+	public RULE_TYPE getElementRuleType(String tag) {
+		Map rule = configReader.getRule(tag.toLowerCase());
+		if (rule != null) {
+			// ORDER is important!!! These are matched in priority order
+			if (isRuleType(tag, RULE_TYPE.EXCLUDED_ELEMENT)) {
+				return RULE_TYPE.EXCLUDED_ELEMENT;
+			} else if (isRuleType(tag, RULE_TYPE.GROUP_ELEMENT)) {
+				return RULE_TYPE.GROUP_ELEMENT;
+			} else if (isRuleType(tag, RULE_TYPE.INCLUDED_ELEMENT)) {
+				return RULE_TYPE.INCLUDED_ELEMENT;
+			} else if (isRuleType(tag, RULE_TYPE.INLINE_ELEMENT)) {
+				return RULE_TYPE.INLINE_ELEMENT;
+			} else if (isRuleType(tag, RULE_TYPE.SCRIPT_ELEMENT)) {
+				return RULE_TYPE.SCRIPT_ELEMENT;
+			} else if (isRuleType(tag, RULE_TYPE.SERVER_ELEMENT)) {
+				return RULE_TYPE.SERVER_ELEMENT;
+			} else if (isRuleType(tag, RULE_TYPE.ATTRIBUTES_ONLY)) {
+				return RULE_TYPE.ATTRIBUTES_ONLY;
+			} else if (isRuleType(tag, RULE_TYPE.TEXT_UNIT_ELEMENT)) {
+				return RULE_TYPE.TEXT_UNIT_ELEMENT;
+			} else if (isRuleType(tag, RULE_TYPE.TEXT_MARKER_ELEMENT)) {
+				return RULE_TYPE.TEXT_MARKER_ELEMENT;
+			} else if (isRuleType(tag, RULE_TYPE.TEXT_RUN_ELEMENT)) {
+				return RULE_TYPE.TEXT_RUN_ELEMENT;
+			} else if (isRuleType(tag, RULE_TYPE.PRESERVE_WHITESPACE)) {
+				return RULE_TYPE.PRESERVE_WHITESPACE;
+			} 
+		}
+
+		return RULE_TYPE.DOES_NOT_APPLY;
+	}
+
+	public boolean isTranslatableAttribute(String tag, String attribute,
+			Map<String, String> attributes) {
+		return findMatchingAttributeRule(tag, attributes, attribute) == RULE_TYPE.ATTRIBUTE_TRANS;
+	}
+
+	public boolean isReadOnlyLocalizableAttribute(String tag, String attribute,
+			Map<String, String> attributes) {
+		return findMatchingAttributeRule(tag, attributes, attribute) == RULE_TYPE.ATTRIBUTE_READONLY;
+	}
+
+	public boolean isWritableLocalizableAttribute(String tag, String attribute,
+			Map<String, String> attributes) {
+		return findMatchingAttributeRule(tag, attributes, attribute) == RULE_TYPE.ATTRIBUTE_WRITABLE;
+	}
+
+	public boolean isIdAttribute(String tag, String attribute, Map<String, String> attributes) {
+		return findMatchingAttributeRule(tag, attributes, attribute) == RULE_TYPE.ATTRIBUTE_ID;
+	}
+
+	private RULE_TYPE convertRuleAsStringToRuleType(String ruleType) {
+		if (ruleType.equalsIgnoreCase(INLINE)) {
+			return RULE_TYPE.INLINE_ELEMENT;
+		} else if (ruleType.equalsIgnoreCase(GROUP)) {
+			return RULE_TYPE.GROUP_ELEMENT;
+		} else if (ruleType.equalsIgnoreCase(EXCLUDE)) {
+			return RULE_TYPE.EXCLUDED_ELEMENT;
+		} else if (ruleType.equalsIgnoreCase(INCLUDE)) {
+			return RULE_TYPE.INCLUDED_ELEMENT;
+		} else if (ruleType.equalsIgnoreCase(TEXTUNIT)) {
+			return RULE_TYPE.TEXT_UNIT_ELEMENT;
+		} else if (ruleType.equalsIgnoreCase(TEXTRUN)) {
+			return RULE_TYPE.TEXT_RUN_ELEMENT;
+		} else if (ruleType.equalsIgnoreCase(TEXTMARKER)) {
+			return RULE_TYPE.TEXT_MARKER_ELEMENT;
+		} else if (ruleType.equalsIgnoreCase(PRESERVE_WHITESPACE)) {
+			return RULE_TYPE.PRESERVE_WHITESPACE;
+		} else if (ruleType.equalsIgnoreCase(SCRIPT)) {
+			return RULE_TYPE.SCRIPT_ELEMENT;
+		} else if (ruleType.equalsIgnoreCase(SERVER)) {
+			return RULE_TYPE.SERVER_ELEMENT;
+		} else if (ruleType.equalsIgnoreCase(ATTRIBUTE_TRANS)) {
+			return RULE_TYPE.ATTRIBUTE_TRANS;
+		} else if (ruleType.equalsIgnoreCase(ATTRIBUTE_WRITABLE)) {
+			return RULE_TYPE.ATTRIBUTE_WRITABLE;
+		} else if (ruleType.equalsIgnoreCase(ATTRIBUTE_READONLY)) {
+			return RULE_TYPE.ATTRIBUTE_READONLY;
+		} else if (ruleType.equalsIgnoreCase(ATTRIBUTES_ONLY)) {
+			return RULE_TYPE.ATTRIBUTES_ONLY;
+		} else if (ruleType.equalsIgnoreCase(ATTRIBUTE_ID)) {
+			return RULE_TYPE.ATTRIBUTE_ID;
+		} else if (ruleType.equalsIgnoreCase(ELEMENT_TRANSLATABLE_ATTRIBUTES)) {
+			return RULE_TYPE.ATTRIBUTE_TRANS;
+		} else if (ruleType.equalsIgnoreCase(ELEMENT_WRITABLE_ATTRIBUTES)) {
+			return RULE_TYPE.ATTRIBUTE_WRITABLE;
+		} else if (ruleType.equalsIgnoreCase(ELEMENT_READ_ONLY_ATTRIBUTES)) {
+			return RULE_TYPE.ATTRIBUTE_READONLY;
+		} else if (ruleType.equalsIgnoreCase(ELEMENT_ID_ATTRIBUTES)) {
+			return RULE_TYPE.ATTRIBUTE_ID;
+		} else {
+			return RULE_TYPE.DOES_NOT_APPLY;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private boolean isAttributeFoundOnElementRule(String tag, String attribute, RULE_TYPE ruleType) {
+		Map elementRule = configReader.getRule(tag.toLowerCase());
+
+		if (elementRule == null) {
 			return false;
 		}
 
-		Object ta = elementRule.get(type);
+		String attributeRule = "";
+		switch (ruleType) {
+		case ATTRIBUTE_TRANS:
+			attributeRule = ELEMENT_TRANSLATABLE_ATTRIBUTES;
+			break;
+		case ATTRIBUTE_READONLY:
+			attributeRule = ELEMENT_READ_ONLY_ATTRIBUTES;
+			break;			
+		case ATTRIBUTE_WRITABLE:
+			attributeRule = ELEMENT_WRITABLE_ATTRIBUTES;
+			break;			
+		default:
+			break;
+		}
 
+		Object ta = elementRule.get(attributeRule);
 		if (ta != null && ta instanceof List) {
-			List actionableAttributes = (List) elementRule.get(type);
+			List actionableAttributes = (List) elementRule.get(attributeRule);
 			for (Iterator<String> i = actionableAttributes.iterator(); i.hasNext();) {
 				String a = i.next();
 				if (a.equalsIgnoreCase(attribute)) {
 					return true;
 				}
 			}
-
 		} else if (ta != null && ta instanceof Map) {
-			Map actionableAttributes = (Map) elementRule.get(type);
+			Map actionableAttributes = (Map) elementRule.get(attributeRule);
 			if (actionableAttributes.containsKey(attribute.toLowerCase())) {
-				List condition = (List) actionableAttributes.get(attribute.toLowerCase());
-				// case where there is no condition applied to attribute
-				if (condition == null) {
-					return true;
-				} else {
-					// apply conditions
-					if (condition.get(0) instanceof List) {
-						// We have multiple conditions - individual results are
-						// OR'ed together
-						// so only one condition need be true for the rule to
-						// apply
-						for (int i = 0; i <= condition.size() - 1; i++) {
-							List c = (List) condition.get(i);
-							if (applyConditions(c, attribute, attributes)) {
-								return true;
-							}
-						}
-						return false;
-					}
-					return applyConditions(condition, attribute, attributes);
-				}
-			}
-		}
-
-		// catch attributes that may appear on any element
-		if (isActionableAttributeRule(elementName, attribute, type)) {
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
-	 * @param elementName
-	 * @param type
-	 * @return
-	 */
-	private boolean isActionableAttributeRule(String elementName, String attrName, String type) {
-		if (type.equalsIgnoreCase("translatableAttributes") && isRuleType(attrName, RULE_TYPE.ATTRIBUTE_TRANS)) {
-			if (isListedElement(elementName, attrName)) {
-				return true;
-			}
-		} else if (type.equalsIgnoreCase("readOnlyLocalizableAttributes") && isRuleType(attrName, RULE_TYPE.ATTRIBUTE_READONLY)) {
-			if (isListedElement(elementName, attrName)) {
-				return true;
-			}
-		} else if (type.equalsIgnoreCase("writableLocalizableAttributes") && isRuleType(attrName, RULE_TYPE.ATTRIBUTE_WRITABLE)) {
-			if (isListedElement(elementName, attrName)) {
-				return true;
-			}
-		} else if (type.equalsIgnoreCase("idAttributes") && isRuleType(attrName, RULE_TYPE.ATTRIBUTE_ID)) {
-			if (isListedElement(elementName, attrName)) {
 				return true;
 			}
 		}
-
 		return false;
 	}
 
@@ -355,10 +456,10 @@ public class TaggedFilterConfiguration {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	private boolean isListedElement(String elementName, String attrName) {
+	private boolean isElementFoundOnAttributeRule(String tag, String attribute) {
 		List excludedElements;
 		List onlyTheseElements;
-		Map attrRule = configReader.getRule(attrName.toLowerCase());
+		Map attrRule = configReader.getRule(attribute.toLowerCase());
 
 		if (attrRule == null) {
 			return false;
@@ -377,7 +478,7 @@ public class TaggedFilterConfiguration {
 		if (excludedElements != null) {
 			for (int i = 0; i <= excludedElements.size() - 1; i++) {
 				String elem = (String) excludedElements.get(i);
-				if (elem.equalsIgnoreCase(elementName)) {
+				if (elem.equalsIgnoreCase(tag)) {
 					return false;
 				}
 			}
@@ -386,19 +487,18 @@ public class TaggedFilterConfiguration {
 		} else if (onlyTheseElements != null) {
 			for (int i = 0; i <= onlyTheseElements.size() - 1; i++) {
 				String elem = (String) onlyTheseElements.get(i);
-				if (elem.equalsIgnoreCase(elementName)) {
+				if (elem.equalsIgnoreCase(tag)) {
 					return true;
 				}
 			}
 			// default
 			return false;
 		}
-
 		return true;
 	}
 
 	@SuppressWarnings("unchecked")
-	private boolean applyConditions(List<?> condition, String attribute, Map<String, String> attributes) {
+	private boolean applyConditions(List<?> condition, Map<String, String> attributes) {
 		String conditionalAttribute = null;
 		conditionalAttribute = (String) condition.get(0);
 
@@ -418,7 +518,8 @@ public class TaggedFilterConfiguration {
 			if (compareType.equalsIgnoreCase(NOT_EQUALS)) {
 				for (Iterator<String> i = conditionValues.iterator(); i.hasNext();) {
 					String value = i.next();
-					if (applyCondition(attributes.get(conditionalAttribute.toLowerCase()), compareType, value)) {
+					if (applyCondition(attributes.get(conditionalAttribute.toLowerCase()),
+							compareType, value)) {
 						return false;
 					}
 				}
@@ -427,7 +528,8 @@ public class TaggedFilterConfiguration {
 				// OR'ed together
 				for (Iterator<String> i = conditionValues.iterator(); i.hasNext();) {
 					String value = i.next();
-					if (applyCondition(attributes.get(conditionalAttribute.toLowerCase()), compareType, value)) {
+					if (applyCondition(attributes.get(conditionalAttribute.toLowerCase()),
+							compareType, value)) {
 						return true;
 					}
 				}
@@ -436,7 +538,8 @@ public class TaggedFilterConfiguration {
 		// single condition
 		else if (condition.get(2) instanceof String) {
 			String conditionValue = (String) condition.get(2);
-			return applyCondition(attributes.get(conditionalAttribute.toLowerCase()), compareType, conditionValue);
+			return applyCondition(attributes.get(conditionalAttribute.toLowerCase()), compareType,
+					conditionValue);
 		} else {
 			throw new RuntimeException("Error reading attributes from config file");
 		}

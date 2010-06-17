@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -384,7 +383,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	protected void preProcess(Segment segment) {
 		boolean isInsideTextRun = false;
 		if (segment instanceof Tag) {
-			isInsideTextRun = getConfig().getMainRuleType(((Tag) segment).getName()) == RULE_TYPE.INLINE_ELEMENT;
+			isInsideTextRun = getConfig().getElementRuleType(((Tag) segment).getName()) == RULE_TYPE.INLINE_ELEMENT;
 		}
 
 		// add buffered whitespace to the current translatable text
@@ -562,7 +561,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 			if (getRuleState().isExludedState()) {
 				addToDocumentPart(startTag.toString());
 				// process these tag types to update parser state
-				switch (getConfig().getMainRuleType(startTag.getName())) {
+				switch (getConfig().getElementRuleType(startTag.getName())) {
 				case EXCLUDED_ELEMENT:
 					getRuleState().pushExcludedRule(startTag.getName());
 					break;
@@ -576,7 +575,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders;
 			propertyTextUnitPlaceholders = createPropertyTextUnitPlaceholders(startTag);
 
-			switch (getConfig().getMainRuleType(startTag.getName())) {
+			switch (getConfig().getElementRuleType(startTag.getName())) {
 			case INLINE_ELEMENT:
 				if (canStartNewTextUnit()) {
 					startTextUnit();
@@ -637,7 +636,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 */
 	private void handleAttributesThatAppearAnywhere(List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders,
 			StartTag tag) {
-		switch (getConfig().getMainRuleType(tag.getName())) {
+		switch (getConfig().getElementRuleType(tag.getName())) {
 
 		case TEXT_UNIT_ELEMENT:
 			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
@@ -679,7 +678,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 			if (getRuleState().isExludedState()) {
 				addToDocumentPart(endTag.toString());
 				// process these tag types to update parser state
-				switch (getConfig().getMainRuleType(endTag.getName())) {
+				switch (getConfig().getElementRuleType(endTag.getName())) {
 				case EXCLUDED_ELEMENT:
 					getRuleState().popExcludedIncludedRule();
 					break;
@@ -690,7 +689,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 				return;
 			}
 
-			switch (getConfig().getMainRuleType(endTag.getName())) {
+			switch (getConfig().getElementRuleType(endTag.getName())) {
 			case INLINE_ELEMENT:
 				if (canStartNewTextUnit()) {
 					startTextUnit();
@@ -814,31 +813,39 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	protected List<PropertyTextUnitPlaceholder> createPropertyTextUnitPlaceholders(StartTag startTag) {
 		// list to hold the properties or TextUnits
 		List<PropertyTextUnitPlaceholder> propertyOrTextUnitPlaceholders = new LinkedList<PropertyTextUnitPlaceholder>();
-
-		// convert Jericho attributes to HashMap
-		Map<String, String> attrs = startTag.getAttributes().populateMap(new HashMap<String, String>(), true);
+		
 		for (Attribute attribute : startTag.parseAttributes()) {
-			if (getConfig().isTranslatableAttribute(startTag.getName(), attribute.getName(), attrs)) {
+			switch (getConfig().findMatchingAttributeRule(startTag.getName(), 
+					startTag.getAttributes().populateMap(new HashMap<String,String>(), true), 
+					attribute.getName())) {
+			case ATTRIBUTE_TRANS:
 				propertyOrTextUnitPlaceholders.add(createPropertyTextUnitPlaceholder(PlaceholderAccessType.TRANSLATABLE,
 						attribute.getName(), attribute.getValue(), startTag, attribute));
-			} else {
+				break;
 
-				if (getConfig().isReadOnlyLocalizableAttribute(startTag.getName(), attribute.getName(), attrs)) {
-					propertyOrTextUnitPlaceholders.add(createPropertyTextUnitPlaceholder(
-							PlaceholderAccessType.READ_ONLY_PROPERTY, attribute.getName(), attribute.getValue(), startTag,
-							attribute));
-				} else if (getConfig().isWritableLocalizableAttribute(startTag.getName(), attribute.getName(), attrs)) {
-					propertyOrTextUnitPlaceholders.add(createPropertyTextUnitPlaceholder(
-							PlaceholderAccessType.WRITABLE_PROPERTY, attribute.getName(), attribute.getValue(), startTag,
-							attribute));
-				} else if (getConfig().isIdAttribute(startTag.getName(), attribute.getName(), attrs)) {
-					propertyOrTextUnitPlaceholders.add(createPropertyTextUnitPlaceholder(
-							PlaceholderAccessType.NAME, attribute.getName(), attribute.getValue(), startTag,
-							attribute));
-				}
+			case ATTRIBUTE_WRITABLE:
+				propertyOrTextUnitPlaceholders.add(createPropertyTextUnitPlaceholder(
+						PlaceholderAccessType.WRITABLE_PROPERTY, attribute.getName(), attribute.getValue(), startTag,
+						attribute));
+				break;
+				
+			case ATTRIBUTE_READONLY:
+				propertyOrTextUnitPlaceholders.add(createPropertyTextUnitPlaceholder(
+						PlaceholderAccessType.READ_ONLY_PROPERTY, attribute.getName(), attribute.getValue(), startTag,
+						attribute));
+				break;
+				
+			case ATTRIBUTE_ID:
+				propertyOrTextUnitPlaceholders.add(createPropertyTextUnitPlaceholder(
+						PlaceholderAccessType.NAME, attribute.getName(), attribute.getValue(), startTag,
+						attribute));
+				break;
+				
+			default:
+				break;
 			}
 		}
-
+			
 		return propertyOrTextUnitPlaceholders;
 	}
 

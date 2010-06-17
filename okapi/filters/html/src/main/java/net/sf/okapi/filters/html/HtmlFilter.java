@@ -96,7 +96,7 @@ public class HtmlFilter extends AbstractMarkupFilter {
 			// We just hit a tag that could close the current TextUnit
 			final Tag tag = (Tag) segment;
 			boolean inlineTag = false;
-			if (getConfig().getMainRuleType(tag.getName()) == RULE_TYPE.INLINE_ELEMENT
+			if (getConfig().getElementRuleType(tag.getName()) == RULE_TYPE.INLINE_ELEMENT
 					|| (getEventBuilder().isInsideTextRun() && (tag.getTagType() == StartTagType.COMMENT || tag
 							.getTagType() == StartTagType.XML_PROCESSING_INSTRUCTION)))
 				inlineTag = true;

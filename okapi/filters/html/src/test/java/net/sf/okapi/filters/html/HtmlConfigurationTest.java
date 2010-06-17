@@ -45,16 +45,16 @@ public class HtmlConfigurationTest {
 				.getResource("/net/sf/okapi/filters/html/nonwellformedConfiguration.yml");
 		TaggedFilterConfiguration rules = new TaggedFilterConfiguration(url);
 		assertTrue(rules.isRuleType("title", TaggedFilterConfiguration.RULE_TYPE.ATTRIBUTE_TRANS));
-		assertEquals(rules.getMainRuleType("title"),
+		assertEquals(rules.getElementRuleType("title"),
 				TaggedFilterConfiguration.RULE_TYPE.TEXT_UNIT_ELEMENT);
-		assertEquals(rules.getMainRuleType("abbr"),
+		assertEquals(rules.getElementRuleType("abbr"),
 				TaggedFilterConfiguration.RULE_TYPE.INLINE_ELEMENT);
-		assertEquals(rules.getMainRuleType("area"),
+		assertEquals(rules.getElementRuleType("area"),
 				TaggedFilterConfiguration.RULE_TYPE.ATTRIBUTES_ONLY);
-		assertEquals(rules.getMainRuleType("script"),
+		assertEquals(rules.getElementRuleType("script"),
 				TaggedFilterConfiguration.RULE_TYPE.EXCLUDED_ELEMENT);
 		assertTrue(rules.isRuleType("pre", TaggedFilterConfiguration.RULE_TYPE.PRESERVE_WHITESPACE));
-		assertEquals(rules.getMainRuleType("meta"),
+		assertEquals(rules.getElementRuleType("meta"),
 				TaggedFilterConfiguration.RULE_TYPE.ATTRIBUTES_ONLY);
 	}
 
@@ -67,27 +67,22 @@ public class HtmlConfigurationTest {
 		Map<String, String> attributes = new HashMap<String, String>();
 		attributes.put("name", "keywords");
 		assertTrue(rules.isTranslatableAttribute("meta", "content", attributes));
-		assertFalse(rules.isTranslatableAttribute("dummy", "content",
-				attributes));
+		assertFalse(rules.isTranslatableAttribute("dummy", "content", attributes));
 		attributes.put("name", "description");
 		assertTrue(rules.isTranslatableAttribute("meta", "content", attributes));
-		assertFalse(rules.isTranslatableAttribute("dummy", "content",
-				attributes));
+		assertFalse(rules.isTranslatableAttribute("dummy", "content", attributes));
 
 		attributes.clear();
 		attributes.put("http-equiv", "content-language");
-		assertTrue(rules.isWritableLocalizableAttribute("meta", "content",
-				attributes));
+		assertTrue(rules.isWritableLocalizableAttribute("meta", "content", attributes));
 
 		attributes.clear();
 		attributes.put("http-equiv", "content-type");
-		assertFalse(rules.isReadOnlyLocalizableAttribute("meta", "content",
-				attributes));
+		assertFalse(rules.isReadOnlyLocalizableAttribute("meta", "content", attributes));
 
 		attributes.clear();
 		attributes.put("name", "generator");
-		assertTrue(rules.isReadOnlyLocalizableAttribute("meta", "content",
-				attributes));
+		assertTrue(rules.isReadOnlyLocalizableAttribute("meta", "content", attributes));
 	}
 
 	@Test
@@ -97,14 +92,12 @@ public class HtmlConfigurationTest {
 		TaggedFilterConfiguration rules = new TaggedFilterConfiguration(url);
 
 		assertTrue(rules.isRuleType("pre", TaggedFilterConfiguration.RULE_TYPE.PRESERVE_WHITESPACE));
-		assertEquals(rules.getMainRuleType("style"),
+		assertEquals(rules.getElementRuleType("style"),
 				TaggedFilterConfiguration.RULE_TYPE.EXCLUDED_ELEMENT);
-		assertTrue(rules.isRuleType("pre",
-				TaggedFilterConfiguration.RULE_TYPE.PRESERVE_WHITESPACE));
+		assertTrue(rules.isRuleType("pre", TaggedFilterConfiguration.RULE_TYPE.PRESERVE_WHITESPACE));
 		assertFalse(rules.isRuleType("stylesheet",
 				TaggedFilterConfiguration.RULE_TYPE.PRESERVE_WHITESPACE));
-		assertFalse(rules.isRuleType("p",
-				TaggedFilterConfiguration.RULE_TYPE.PRESERVE_WHITESPACE));
+		assertFalse(rules.isRuleType("p", TaggedFilterConfiguration.RULE_TYPE.PRESERVE_WHITESPACE));
 	}
 
 	@Test
@@ -116,22 +109,17 @@ public class HtmlConfigurationTest {
 		Map<String, String> attributes = new HashMap<String, String>();
 		attributes.clear();
 		attributes.put("lang", "en");
-		assertTrue(rules
-				.isWritableLocalizableAttribute("x", "lang", attributes));
-		assertFalse(rules.isReadOnlyLocalizableAttribute("x", "lang",
-				attributes));
+		assertTrue(rules.isWritableLocalizableAttribute("x", "lang", attributes));
+		assertFalse(rules.isReadOnlyLocalizableAttribute("x", "lang", attributes));
 		assertFalse(rules.isTranslatableAttribute("x", "lang", attributes));
 
-		assertTrue(rules
-				.isWritableLocalizableAttribute("p", "lang", attributes));
-		assertFalse(rules.isReadOnlyLocalizableAttribute("p", "lang",
-				attributes));
+		assertTrue(rules.isWritableLocalizableAttribute("p", "lang", attributes));
+		assertFalse(rules.isReadOnlyLocalizableAttribute("p", "lang", attributes));
 		assertFalse(rules.isTranslatableAttribute("p", "lang", attributes));
 
 		attributes.clear();
 		attributes.put("xml:lang", "en");
-		assertTrue(rules.isWritableLocalizableAttribute("x", "xml:lang",
-				attributes));
+		assertTrue(rules.isWritableLocalizableAttribute("x", "xml:lang", attributes));
 	}
 
 	@Test
@@ -144,16 +132,16 @@ public class HtmlConfigurationTest {
 		assertEquals(getElementType(rules, "i"), "italic");
 		assertEquals(getElementType(rules, "u"), "underlined");
 		assertEquals(getElementType(rules, "img"), "image");
-		assertEquals(getElementType(rules, "a"), "link");		
+		assertEquals(getElementType(rules, "a"), "link");
 		assertEquals(getElementType(rules, "x"), "x");
 	}
-	
+
 	@Test
 	public void textUnitCodeTypes() {
 		URL url = HtmlFilter.class
 				.getResource("/net/sf/okapi/filters/html/wellformedConfiguration.yml");
 		TaggedFilterConfiguration rules = new TaggedFilterConfiguration(url);
-		assertEquals(getElementType(rules, "p"), "paragraph");	
+		assertEquals(getElementType(rules, "p"), "paragraph");
 	}
 
 	@Test
@@ -163,16 +151,14 @@ public class HtmlConfigurationTest {
 		TaggedFilterConfiguration rules = new TaggedFilterConfiguration(url);
 		assertTrue(rules.isCollapseWhitespace());
 
-		url = HtmlConfigurationTest.class
-				.getResource("/collapseWhitespaceOff.yml");
+		url = HtmlConfigurationTest.class.getResource("/collapseWhitespaceOff.yml");
 		rules = new TaggedFilterConfiguration(url);
 		assertFalse(rules.isCollapseWhitespace());
 	}
 
 	@Test
-	public void testCodeFinderRules () {
-		URL url = HtmlConfigurationTest.class
-			.getResource("/withCodeFinderRules.yml");
+	public void testCodeFinderRules() {
+		URL url = HtmlConfigurationTest.class.getResource("/withCodeFinderRules.yml");
 		TaggedFilterConfiguration rules = new TaggedFilterConfiguration(url);
 		assertTrue(rules.isUseCodeFinder());
 		InlineCodeFinder cf = new InlineCodeFinder();
@@ -197,32 +183,28 @@ public class HtmlConfigurationTest {
 		attributes.put("type", "hidden");
 		assertFalse(rules.isTranslatableAttribute("input", "alt", attributes));
 		assertFalse(rules.isTranslatableAttribute("input", "value", attributes));
-		assertFalse(rules.isTranslatableAttribute("input", "accesskey",
-				attributes));
+		assertFalse(rules.isTranslatableAttribute("input", "accesskey", attributes));
 		assertFalse(rules.isTranslatableAttribute("input", "title", attributes));
 
 		attributes.clear();
 		attributes.put("type", "image");
 		assertFalse(rules.isTranslatableAttribute("input", "alt", attributes));
 		assertFalse(rules.isTranslatableAttribute("input", "value", attributes));
-		assertFalse(rules.isTranslatableAttribute("input", "accesskey",
-				attributes));
+		assertFalse(rules.isTranslatableAttribute("input", "accesskey", attributes));
 		assertFalse(rules.isTranslatableAttribute("input", "title", attributes));
 
 		attributes.clear();
 		attributes.put("type", "submit");
 		assertTrue(rules.isTranslatableAttribute("input", "alt", attributes));
 		assertTrue(rules.isTranslatableAttribute("input", "value", attributes));
-		assertTrue(rules.isTranslatableAttribute("input", "accesskey",
-				attributes));
+		assertTrue(rules.isTranslatableAttribute("input", "accesskey", attributes));
 		assertTrue(rules.isTranslatableAttribute("input", "title", attributes));
 
 		attributes.clear();
 		attributes.put("type", "button");
 		assertTrue(rules.isTranslatableAttribute("input", "alt", attributes));
 		assertTrue(rules.isTranslatableAttribute("input", "value", attributes));
-		assertTrue(rules.isTranslatableAttribute("input", "accesskey",
-				attributes));
+		assertTrue(rules.isTranslatableAttribute("input", "accesskey", attributes));
 		assertTrue(rules.isTranslatableAttribute("input", "title", attributes));
 	}
 
@@ -238,13 +220,13 @@ public class HtmlConfigurationTest {
 		assertTrue(rules.isIdAttribute("p", "id", attributes));
 		assertFalse(rules.isIdAttribute("p", "foo", attributes));
 	}
-	
+
+	@SuppressWarnings("unchecked")
 	private String getElementType(TaggedFilterConfiguration rules, String elementName) {
 		Map<String, Object> rule = rules.getConfigReader().getRule(elementName.toLowerCase());
 		if (rule != null && rule.containsKey(TaggedFilterConfiguration.ELEMENT_TYPE)) {
 			return (String) rule.get(TaggedFilterConfiguration.ELEMENT_TYPE);
 		}
-
 		return elementName;
 	}
 }
