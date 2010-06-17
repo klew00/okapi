@@ -20,7 +20,6 @@
 
 package net.sf.okapi.lib.verification;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 
@@ -33,22 +32,24 @@ import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 
-public class QualityChecker {
+class QualityChecker {
 
-	private Parameters params;
 	private LocaleId trgLoc;
-	private List<Issue> issues;
 	private XMLWriter repWriter;
 	private List<PatternItem> patterns;
 	private LanguageToolConnector ltConn;
+	private Parameters params;
+	private List<Issue> issues;
+	private String currentDocId;
 
-	public QualityChecker () {
-		params = new Parameters();
-	}
-	
-	public void initialize (LocaleId targetLocale, String rootDir) {
+	void startProcess (LocaleId targetLocale,
+		String rootDir,
+		Parameters params,
+		List<Issue> issues)
+	{
 		this.trgLoc = targetLocale;
-		issues = new ArrayList<Issue>();
+		this.params = params;
+		this.issues = issues;
 
 		String finalPath = Util.fillRootDirectoryVariable(params.getOutputPath(), rootDir);
 		repWriter = new XMLWriter(finalPath);
@@ -84,26 +85,15 @@ public class QualityChecker {
 		}
 	}
 
-	public Parameters getParameters () {
-		return params;
-	}
-	
-	public void setParameters (Parameters params) {
-		this.params = params;
-	}
-
-	public List<Issue> getIssues () {
-		return issues;
-	}
-	
-	public  void processStartDocument (StartDocument sd) {
+	void processStartDocument (StartDocument sd) {
 		if ( repWriter != null ) {
 			repWriter.writeRawXML("<hr />");
 			repWriter.writeElementString("p", "Input: "+sd.getName());
 		}
+		currentDocId = Util.makeId(sd.getName());
 	}
 	
-	public void processTextUnit (TextUnit tu) {
+	void processTextUnit (TextUnit tu) {
 		// Skip non-translatable entries
 		if ( !tu.isTranslatable() ) return;
 		
@@ -164,7 +154,7 @@ public class QualityChecker {
 			
 			// Run a check with LanguageTool connector
 			if ( params.getCheckWithLT() ) {
-				if ( ltConn.checkSegment(trgSeg, tu) > 0 ) {
+				if ( ltConn.checkSegment(currentDocId, trgSeg, tu) > 0 ) {
 					for ( Issue issue : ltConn.getIssues() ) {
 						reportIssue(issue.issueType, tu, issue.segId, issue.message, issue.srcStart, issue.srcEnd,
 							issue.trgStart, issue.trgEnd, srcSeg.toString(), trgSeg.toString());
@@ -193,7 +183,7 @@ public class QualityChecker {
 		checkWhiteSpaces(srcOri, trgOri, tu);
 	}
 
-	public void completeProcess () {
+	void completeProcess () {
 		if ( repWriter != null ) {
 			repWriter.writeEndElementLineBreak(); // body
 			repWriter.writeEndElementLineBreak(); // html
@@ -345,7 +335,7 @@ public class QualityChecker {
 	}
 
 
-	public void checkPatterns (Segment srcSeg,
+	private void checkPatterns (Segment srcSeg,
 		Segment trgSeg,
 		TextUnit tu)
 	{
@@ -406,7 +396,7 @@ public class QualityChecker {
 		String srcOri,
 		String trgOri)
 	{
-		Issue issue = new Issue(issueType, tu.getId(), segId, message, srcStart, srcEnd, trgStart, trgEnd);
+		Issue issue = new Issue(currentDocId, issueType, tu.getId(), segId, message, srcStart, srcEnd, trgStart, trgEnd);
 		issues.add(issue);
 
 		if ( repWriter != null ) {

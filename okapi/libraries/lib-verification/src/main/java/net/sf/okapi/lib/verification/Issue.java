@@ -22,16 +22,18 @@ package net.sf.okapi.lib.verification;
 
 public class Issue {
 
-	IssueType issueType;
-	String tuId;
-	String segId;
-	String message;
-	int srcStart;
-	int srcEnd;
-	int trgStart;
-	int trgEnd;
+	public String docId;
+	public IssueType issueType;
+	public String tuId;
+	public String segId;
+	public String message;
+	public int srcStart;
+	public int srcEnd;
+	public int trgStart;
+	public int trgEnd;
 	
-	public Issue (IssueType issueType,
+	public Issue (String docId,
+		IssueType issueType,
 		String tuId,
 		String segId,
 		String message, 
@@ -40,6 +42,7 @@ public class Issue {
 		int trgStart, 
 		int trgEnd)
 	{
+		this.docId = docId;
 		this.issueType = issueType;
 		this.tuId = tuId;
 		this.segId = segId;
@@ -48,6 +51,10 @@ public class Issue {
 		this.srcEnd = srcEnd;
 		this.trgStart = trgStart;
 		this.trgEnd = trgEnd;
+	}
+
+	String getSignature () {
+		return String.format("%s-%s-%s-%d-%s", docId, tuId, (segId==null) ? "" : segId, srcStart, issueType);
 	}
 
 }

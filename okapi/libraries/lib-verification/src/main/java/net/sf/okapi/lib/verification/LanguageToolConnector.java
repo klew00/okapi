@@ -75,7 +75,8 @@ public class LanguageToolConnector {
 		return issues;
 	}
 
-	public int checkSegment (Segment seg,
+	public int checkSegment (String docId,
+		Segment seg,
 		TextUnit tu)
 	{
 		issues.clear();
@@ -97,7 +98,7 @@ public class LanguageToolConnector {
 				String msg = error.getAttribute("msg");
 				int start = Integer.valueOf(error.getAttribute("fromx"));
 				int end = Integer.valueOf(error.getAttribute("tox"));
-				issues.add(new Issue(IssueType.LANGUAGETOOL_ERROR, tu.getId(), seg.getId(), msg, 0, 0, start, end));
+				issues.add(new Issue(docId, IssueType.LANGUAGETOOL_ERROR, tu.getId(), seg.getId(), msg, 0, 0, start, end));
 			}
 		}
 		catch ( ConnectException e ) {

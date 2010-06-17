@@ -33,19 +33,19 @@ import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.lib.verification.Parameters;
-import net.sf.okapi.lib.verification.QualityChecker;
+import net.sf.okapi.lib.verification.QualityCheckSession;
 
 @UsingParameters(Parameters.class)
 public class QualityCheckStep extends BasePipelineStep {
 
 	private static final Logger LOGGER = Logger.getLogger(QualityCheckStep.class.getName());
 
-	private QualityChecker checker;
+	private QualityCheckSession session;
 	private LocaleId targetLocale;
 	private String rootDir;
 
 	public QualityCheckStep () {
-		checker = new QualityChecker();
+		session = new QualityCheckSession();
 	}
 	
 	@Override
@@ -61,12 +61,12 @@ public class QualityCheckStep extends BasePipelineStep {
 
 	@Override
 	public IParameters getParameters () {
-		return checker.getParameters();
+		return session.getParameters();
 	}
 
 	@Override
 	public void setParameters (IParameters params) {
-		checker.setParameters((Parameters)params);
+		session.setParameters((Parameters)params);
 	}
 
 	@StepParameterMapping(parameterType = StepParameterType.ROOT_DIRECTORY)
@@ -81,29 +81,29 @@ public class QualityCheckStep extends BasePipelineStep {
 	
 	@Override
 	protected Event handleStartBatch (Event event) {
-		checker.initialize(targetLocale, rootDir);
+		session.startProcess(targetLocale, rootDir);
 		return event;
 	}
 	
 	@Override
 	protected Event handleStartDocument (Event event) {
-		checker.processStartDocument((StartDocument)event.getResource());
+		session.processStartDocument((StartDocument)event.getResource());
 		return event;
 	}
 	
 	@Override
 	protected Event handleTextUnit (Event event) {
-		checker.processTextUnit(event.getTextUnit());
+		session.processTextUnit(event.getTextUnit());
 		return event;
 	}
 	
 	@Override
 	protected Event handleEndBatch (Event event) {
-		checker.completeProcess();
+		session.completeProcess();
 		
-		String finalPath = Util.fillRootDirectoryVariable(checker.getParameters().getOutputPath(), rootDir);
+		String finalPath = Util.fillRootDirectoryVariable(session.getParameters().getOutputPath(), rootDir);
 		LOGGER.info("\nOutput: " + finalPath);
-		int count = checker.getIssues().size();
+		int count = session.getIssues().size();
 		if ( count == 0 ) {
 			LOGGER.info("No issue found.");
 		}
@@ -111,7 +111,7 @@ public class QualityCheckStep extends BasePipelineStep {
 			LOGGER.warning(String.format("Number of issues found = %d", count));
 		}
 
-		if ( checker.getParameters().getAutoOpen() ) {
+		if ( session.getParameters().getAutoOpen() ) {
 			Util.openURL((new File(finalPath)).getAbsolutePath());
 		}
 		return event;
