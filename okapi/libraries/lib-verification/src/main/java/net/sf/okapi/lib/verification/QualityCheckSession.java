@@ -20,6 +20,11 @@
 
 package net.sf.okapi.lib.verification;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,6 +35,7 @@ import java.util.Map;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.resource.RawDocument;
@@ -38,19 +44,17 @@ import net.sf.okapi.common.resource.TextUnit;
 
 public class QualityCheckSession {
 
-	Map<URI, RawDocument> rawDocs;
+	Map<URI, RawDocument> rawDocs; // Temporary solution waiting for the DB
 	IFilterConfigurationMapper fcMapper;
 	private Parameters params;
 	private List<Issue> issues;
 	private QualityChecker checker;
+	private LocaleId sourceLocale = LocaleId.ENGLISH;
 	private LocaleId targetLocale = LocaleId.FRENCH;
 	private IFilter filter;
 	
 	public QualityCheckSession () {
-		rawDocs = new HashMap<URI, RawDocument>();
-		issues = new ArrayList<Issue>();
-		params = new Parameters();
-		checker = new QualityChecker();
+		resetData();
 	}
 	
 	public List<Issue> getIssues () {
@@ -72,6 +76,13 @@ public class QualityCheckSession {
 
 	public void setFilterConfigurationMapper (IFilterConfigurationMapper fcMapper) {
 		this.fcMapper = fcMapper;
+	}
+
+	private void resetData () {
+		rawDocs = new HashMap<URI, RawDocument>();
+		issues = new ArrayList<Issue>();
+		params = new Parameters();
+		checker = new QualityChecker();
 	}
 	
 	public void refreshAll () {
@@ -111,13 +122,80 @@ public class QualityCheckSession {
 		}
 	}
 	
-	
 	private void clearIssues (String docId) {
 		Iterator<Issue> iter = issues.iterator();
 		while ( iter.hasNext() ) {
 			Issue issue = iter.next();
 			if ( issue.docId.equals(docId) ) {
 				iter.remove();
+			}
+		}
+	}
+	
+	public void saveSession (String path) {
+		// Temporary code, waiting for DB
+		DataOutputStream dos = null;
+		try {
+			dos = new DataOutputStream(new FileOutputStream(path));
+			dos.writeUTF(sourceLocale.toBCP47());
+			dos.writeUTF(targetLocale.toBCP47());
+			dos.writeUTF(params.toString());
+			dos.writeInt(rawDocs.size());
+			for ( RawDocument rd : rawDocs.values() ) {
+				dos.writeUTF(rd.getInputURI().toString());
+				dos.writeUTF(rd.getFilterConfigId());
+				dos.writeUTF(rd.getEncoding());
+			}
+		}
+		catch ( IOException e ) {
+			throw new OkapiIOException("Error while saving session.", e);
+		}
+		finally {
+			if ( dos != null ) {
+				try {
+					dos.close();
+				}
+				catch ( IOException e ) {
+					throw new OkapiIOException("Error closing session file.", e);
+				}
+			}
+		}
+	}
+	
+	public void loadSession (String path) {
+		resetData();
+		// Temporary code, waiting for DB
+		DataInputStream dis = null;
+		try {
+			dis = new DataInputStream(new FileInputStream(path));
+			String tmp = dis.readUTF(); // Source
+			sourceLocale = LocaleId.fromBCP47(tmp);
+			tmp = dis.readUTF(); // Target
+			targetLocale = LocaleId.fromBCP47(tmp);
+			tmp = dis.readUTF(); // Parameters
+			params.fromString(tmp);
+			int count = dis.readInt();
+			for ( int i=0; i<count; i++ ) {
+				tmp = dis.readUTF();
+				URI uri = new URI(tmp);
+				String configId = dis.readUTF();
+				String encoding = dis.readUTF();
+				RawDocument rd = new RawDocument(uri, encoding, sourceLocale, targetLocale);
+				rd.setFilterConfigId(configId);
+				rawDocs.put(uri, rd);
+			}
+		}
+		catch ( Throwable e ) {
+			throw new OkapiIOException("Error reading session file.", e);
+		}
+		finally {
+			if ( dis != null ) {
+				try {
+					dis.close();
+				}
+				catch ( IOException e ) {
+					throw new OkapiIOException("Error closing session file.", e);
+				}
 			}
 		}
 	}

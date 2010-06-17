@@ -79,6 +79,7 @@ public class PatternItem {
 	public static List<PatternItem> saveFile (String path,
 		List<PatternItem> list)
 	{
+//TODO: UTF-8		
 		PrintWriter pr = null;
 		final String lineBreak = System.getProperty("line.separator");
 		try {

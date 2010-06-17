@@ -55,6 +55,7 @@ public class QualityCheckEditor {
 
 	private static final String APPNAME = "CheckMate"; //$NON-NLS-1$
 
+	private String qcsPath;
 	private UserConfiguration config;
 	private IHelp help;
 	private Shell shell;
@@ -127,10 +128,62 @@ public class QualityCheckEditor {
 	    Menu menuBar = new Menu(shell, SWT.BAR);
 		shell.setMenuBar(menuBar);
 
+		//=== File menu
+		
 		MenuItem topItem = new MenuItem(menuBar, SWT.CASCADE);
-		topItem.setText("&File"); //$NON-NLS-1$
+		topItem.setText(rm.getCommandLabel("file")); //$NON-NLS-1$
 		Menu dropMenu = new Menu(shell, SWT.DROP_DOWN);
 		topItem.setMenu(dropMenu);
+		
+		MenuItem menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "file.open"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				loadSession();
+            }
+		});
+
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "file.save"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				saveSessionAs(qcsPath);
+            }
+		});
+
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "file.saveas"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				saveSessionAs(null);
+            }
+		});
+
+		new MenuItem(dropMenu, SWT.SEPARATOR);
+
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "file.exit"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				shell.close();
+            }
+		});
+
+		//=== Issues menu
+
+		topItem = new MenuItem(menuBar, SWT.CASCADE);
+		topItem.setText(rm.getCommandLabel("issues")); //$NON-NLS-1$
+		dropMenu = new Menu(shell, SWT.DROP_DOWN);
+		topItem.setMenu(dropMenu);
+		
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "issues.options"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				editOptions();
+            }
+		});
+		
 	}
 	
 	private void createContent () {
@@ -216,6 +269,8 @@ public class QualityCheckEditor {
 		
 		issuesModel = new IssuesTableModel();
 		issuesModel.linkTable(tblIssues);
+
+		sashMain.setWeights(new int[]{30, 70});
 		
 		// Set minimum and start sizes
 		Point defaultSize = shell.getSize();
@@ -257,6 +312,18 @@ public class QualityCheckEditor {
 		session.addRawDocument(rd);
 	}
 	
+	private void updateCaption () {
+		String filename;
+		if ( qcsPath != null ) {
+			filename = Util.getFilename(qcsPath, true);
+		}
+		else {
+			filename = "Untitled";
+		}
+		String text = "CheckMate";
+		shell.setText(filename + " - " + text); //$NON-NLS-1$
+	}
+	
 	private void refresh () {
 		try {
 			session.refreshAll();
@@ -280,4 +347,36 @@ public class QualityCheckEditor {
 			Dialogs.showError(shell, "Error editing options.\n"+e.getMessage(), null);
 		}
 	}
+
+	private void saveSessionAs (String path) {
+		try {
+			if ( path == null ) {
+				path = Dialogs.browseFilenamesForSave(shell, "Save Session", null,
+					"Quality Check Sessions (*.qcs)\tAll Files (*.*)", "*.qcs\t*.*");
+				if ( path == null ) return;
+				qcsPath = path;
+			}
+			session.saveSession(qcsPath);
+			updateCaption();
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, "Error while saving.\n"+e.getMessage(), null);
+		}
+	}
+
+	private void loadSession () {
+		try {
+			String[] paths = Dialogs.browseFilenames(shell, "Open Session", false, null,
+				"Quality Check Sessions (*.qcs)\tAll Files (*.*)", "*.qcs\t*.*");
+			if ( paths == null ) return;
+			session.loadSession(paths[0]);
+			issuesModel.updateTable(0);
+			qcsPath = paths[0];
+			updateCaption();
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, "Error while saving.\n"+e.getMessage(), null);
+		}
+	}
+
 }
