@@ -1018,7 +1018,7 @@ public class Util {
 	}
 	
 	/**
-	 * Converts a string to an long. If the conversion fails the method
+	 * Converts a string to a long. If the conversion fails the method
 	 * returns the given default value.
 	 * @param value the string to convert.
 	 * @param longDefault the default value to use if the conversion fails.
