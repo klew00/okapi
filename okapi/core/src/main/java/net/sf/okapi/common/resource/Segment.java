@@ -60,7 +60,10 @@ public class Segment extends TextPart {
 
 	@Override
 	public Segment clone () {
-		return new Segment(id, text.clone());
+		Segment newSeg = new Segment(id, text.clone());
+		if (annotations != null)
+			newSeg.annotations = annotations.clone();
+		return newSeg;
 	}
 	
 	@Override

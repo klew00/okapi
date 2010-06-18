@@ -1016,6 +1016,26 @@ public class Util {
 			return intDefault; 
 		}
 	}
+	
+	/**
+	 * Converts a string to an long. If the conversion fails the method
+	 * returns the given default value.
+	 * @param value the string to convert.
+	 * @param longDefault the default value to use if the conversion fails.
+	 * @return the long value of the string, or the provided default
+	 * value if the conversion failed.
+	 */
+	public static long strToLong (String value, long longDefault) {
+		if ( Util.isEmpty(value) ) {
+			return longDefault;
+		}
+		try {
+			return Long.valueOf(value);
+		}
+		catch (NumberFormatException e) {
+			return longDefault; 
+		}
+	}
 
 	/**
 	 * Gets the element of an array for a given index.
