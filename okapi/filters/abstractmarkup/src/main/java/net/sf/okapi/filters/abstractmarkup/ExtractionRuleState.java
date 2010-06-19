@@ -151,9 +151,12 @@ public class ExtractionRuleState {
 	}
 
 	public RuleType popTextUnitRule() {
+		if ( textUnitRuleStack.isEmpty() ) { // suggested by Yves, added by DWH
+			return null;
+		}
 		return textUnitRuleStack.pop();
 	}
-	
+		
 	public void clearTextUnitRules() {
 		textUnitRuleStack.clear();
 	}
