@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -26,6 +26,7 @@ public class Parameters extends BaseParameters {
 	
 	public boolean toHalfWidth;
 	public boolean asciiOnly;
+	public boolean includeSLA;
 	
 	public Parameters () {
 		reset();
@@ -34,6 +35,7 @@ public class Parameters extends BaseParameters {
 	public void reset() {
 		toHalfWidth = true;
 		asciiOnly = false;
+		includeSLA = false;
 	}
 
 	public void fromString (String data) {
@@ -41,6 +43,7 @@ public class Parameters extends BaseParameters {
 		buffer.fromString(data);
 		toHalfWidth = buffer.getBoolean("toHalfWidth", toHalfWidth);
 		asciiOnly = buffer.getBoolean("asciiOnly", asciiOnly);
+		includeSLA = buffer.getBoolean("includeSLA", includeSLA);
 	}
 
 	@Override
@@ -48,6 +51,7 @@ public class Parameters extends BaseParameters {
 		buffer.reset();
 		buffer.setBoolean("toHalfWidth", toHalfWidth);
 		buffer.setBoolean("asciiOnly", asciiOnly);
+		buffer.setBoolean("includeSLA", includeSLA);
 		return buffer.toString();
 	}
 	

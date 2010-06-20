@@ -51,6 +51,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Button rdToFullWidth;
 	private Button rdToHalfWidth;
 	private Button chkAsciiOnly;
+	private Button chkIncludeSLA;
 	private Composite mainComposite;
 	
 	public boolean edit (IParameters params,
@@ -145,18 +146,22 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		mainComposite = new Composite(parent, SWT.BORDER);
 		mainComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
 		mainComposite.setLayout(new GridLayout());
+		int indent = 16;
 		
 		rdToHalfWidth = new Button(mainComposite, SWT.RADIO);
 		rdToHalfWidth.setText("Convert full-width characters to half-width or ASCII equivalents");
+		
+		chkIncludeSLA = new Button(mainComposite, SWT.CHECK);
+		chkIncludeSLA.setText("Include Squared Latin Abbreviations of the CJK Compatibility block");
+		GridData gdTmp = new GridData();
+		gdTmp.horizontalIndent = indent;
+		chkIncludeSLA.setLayoutData(gdTmp);
 		
 		rdToFullWidth = new Button(mainComposite, SWT.RADIO);
 		rdToFullWidth.setText("Convert half-width and ASCII characters to full-width equivalents");
 		
 		chkAsciiOnly = new Button(mainComposite, SWT.CHECK);
 		chkAsciiOnly.setText("Convert only the ASCII characters");
-		
-		int indent = 16;
-		GridData gdTmp = new GridData();
 		gdTmp = new GridData();
 		gdTmp.horizontalIndent = indent;
 		chkAsciiOnly.setLayoutData(gdTmp);
@@ -169,6 +174,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	}
 	
 	private void updateChkBox() {
+		chkIncludeSLA.setEnabled(rdToHalfWidth.getSelection());
 		chkAsciiOnly.setEnabled(!rdToHalfWidth.getSelection());
 	}
 	
@@ -183,6 +189,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 
 	private void setData () {
 		rdToHalfWidth.setSelection(params.toHalfWidth);
+		chkIncludeSLA.setSelection(params.includeSLA);
 		rdToFullWidth.setSelection(!params.toHalfWidth);
 		chkAsciiOnly.setSelection(params.asciiOnly);
 		updateChkBox();
@@ -190,6 +197,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 
 	private boolean saveData () {
 		params.toHalfWidth = rdToHalfWidth.getSelection();
+		params.includeSLA = chkIncludeSLA.getSelection();
 		params.asciiOnly = chkAsciiOnly.getSelection();
 		result = true;
 		return result;

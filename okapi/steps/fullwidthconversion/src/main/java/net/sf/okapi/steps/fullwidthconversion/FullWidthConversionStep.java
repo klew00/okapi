@@ -86,8 +86,8 @@ public class FullWidthConversionStep extends BasePipelineStep {
 
 		int ch;
 		if ( params.toHalfWidth ) {
-			for ( int i=0; i<text.length(); i++ ) {
-				ch = text.charAt(i);
+			for ( int i=0; i<sb.length(); i++ ) {
+				ch = sb.charAt(i);
 				if ( TextFragment.isMarker((char)ch) ) {
 					i++; // Skip codes
 					continue;
@@ -97,8 +97,6 @@ public class FullWidthConversionStep extends BasePipelineStep {
 					sb.setCharAt(i, (char)(ch-0xFEE0));
 					continue;
 				}
-				// Stop here for ASCII only
-				if ( params.asciiOnly ) continue;
 				// Hangul
 				if (( ch > 0x3131 ) && ( ch <= 0x314E )) {
 					sb.setCharAt(i, (char)(ch+0xCE70));
@@ -182,6 +180,122 @@ public class FullWidthConversionStep extends BasePipelineStep {
 				case 0x2193: sb.setCharAt(i, (char)0xFFEC); break;
 				case 0x25A0: sb.setCharAt(i, (char)0xFFED); break;
 				case 0x25CB: sb.setCharAt(i, (char)0xFFEE); break;
+				}
+
+				// Stop here if we don't convert Squared Latin Abbreviations 
+				if ( !params.includeSLA ) continue;
+				
+				switch ( ch ) {
+				// Squared Latin Abbreviations 1
+				case 0x3371: sb.setCharAt(i, 'h'); sb.insert(i+1, "Pa"); i+=2; break;
+				case 0x3372: sb.setCharAt(i, 'd'); sb.insert(i+1, "a"); i++; break;
+				case 0x3373: sb.setCharAt(i, 'A'); sb.insert(i+1, "U"); i++; break;
+				case 0x3374: sb.setCharAt(i, 'b'); sb.insert(i+1, "ar"); i+=2; break;
+				case 0x3375: sb.setCharAt(i, 'o'); sb.insert(i+1, "V"); i++; break;
+				case 0x3376: sb.setCharAt(i, 'p'); sb.insert(i+1, "c"); i++; break;
+				case 0x3377: sb.setCharAt(i, 'd'); sb.insert(i+1, "m"); i++; break;
+				case 0x3378: sb.setCharAt(i, 'd'); sb.insert(i+1, "m\u00B2"); i+=2; break;
+				case 0x3379: sb.setCharAt(i, 'd'); sb.insert(i+1, "m\u00B3"); i+=2; break;
+				case 0x337A: sb.setCharAt(i, 'I'); sb.insert(i+1, "U"); i++; break;
+				// Squared Latin Abbreviations 2
+				case 0x3380: sb.setCharAt(i, 'p'); sb.insert(i+1, "A"); i++; break;
+				case 0x3381: sb.setCharAt(i, 'n'); sb.insert(i+1, "A"); i++; break;
+				case 0x3382: sb.setCharAt(i, (char)0x03BC); sb.insert(i+1, "A"); i++; break;
+				case 0x3383: sb.setCharAt(i, 'm'); sb.insert(i+1, "A"); i++; break;
+				case 0x3384: sb.setCharAt(i, 'k'); sb.insert(i+1, "A"); i++; break;
+				case 0x3385: sb.setCharAt(i, 'K'); sb.insert(i+1, "B"); i++; break;
+				case 0x3386: sb.setCharAt(i, 'M'); sb.insert(i+1, "B"); i++; break;
+				case 0x3387: sb.setCharAt(i, 'G'); sb.insert(i+1, "B"); i++; break;
+				case 0x3388: sb.setCharAt(i, 'c'); sb.insert(i+1, "al"); i+=2; break;
+				case 0x3389: sb.setCharAt(i, 'k'); sb.insert(i+1, "cal"); i+=3; break;
+				case 0x338A: sb.setCharAt(i, 'p'); sb.insert(i+1, "F"); i++; break;
+				case 0x338B: sb.setCharAt(i, 'n'); sb.insert(i+1, "F"); i++; break;
+				case 0x338C: sb.setCharAt(i, (char)0x03BC); sb.insert(i+1, "F"); i++; break;
+				case 0x338D: sb.setCharAt(i, (char)0x03BC); sb.insert(i+1, "g"); i++; break;
+				case 0x338E: sb.setCharAt(i, 'm'); sb.insert(i+1, "g"); i++; break;
+				case 0x338F: sb.setCharAt(i, 'k'); sb.insert(i+1, "g"); i++; break;
+				case 0x3390: sb.setCharAt(i, 'H'); sb.insert(i+1, "z"); i++; break;
+				case 0x3391: sb.setCharAt(i, 'k'); sb.insert(i+1, "Hz"); i+=2; break;
+				case 0x3392: sb.setCharAt(i, 'M'); sb.insert(i+1, "Hz"); i+=2; break;
+				case 0x3393: sb.setCharAt(i, 'G'); sb.insert(i+1, "Hz"); i+=2; break;
+				case 0x3394: sb.setCharAt(i, 'T'); sb.insert(i+1, "Hz"); i+=2; break;
+				case 0x3395: sb.setCharAt(i, (char)0x03BC); sb.insert(i+1, "\u2113"); i++; break;
+				case 0x3396: sb.setCharAt(i, 'm'); sb.insert(i+1, "\u2113"); i++; break;
+				case 0x3397: sb.setCharAt(i, 'd'); sb.insert(i+1, "\u2113"); i++; break;
+				case 0x3398: sb.setCharAt(i, 'k'); sb.insert(i+1, "\u2113"); i++; break;
+				case 0x3399: sb.setCharAt(i, 'f'); sb.insert(i+1, "m"); i++; break;
+				case 0x339A: sb.setCharAt(i, 'n'); sb.insert(i+1, "m"); i++; break;
+				case 0x339B: sb.setCharAt(i, (char)0x03BC); sb.insert(i+1, "m"); i++; break;
+				case 0x339C: sb.setCharAt(i, 'm'); sb.insert(i+1, "m"); i++; break;
+				case 0x339D: sb.setCharAt(i, 'c'); sb.insert(i+1, "m"); i++; break;
+				case 0x339E: sb.setCharAt(i, 'k'); sb.insert(i+1, "m"); i++; break;
+				case 0x339F: sb.setCharAt(i, 'm'); sb.insert(i+1, "m\u00B2"); i+=2; break;
+				case 0x33A0: sb.setCharAt(i, 'c'); sb.insert(i+1, "m\u00B2"); i+=2; break;
+				case 0x33A1: sb.setCharAt(i, 'm'); sb.insert(i+1, "\u00B2"); i++; break;
+				case 0x33A2: sb.setCharAt(i, 'k'); sb.insert(i+1, "m\u00B2"); i+=2; break;
+				case 0x33A3: sb.setCharAt(i, 'm'); sb.insert(i+1, "m\u00B3"); i+=2; break;
+				case 0x33A4: sb.setCharAt(i, 'c'); sb.insert(i+1, "m\u00B3"); i+=2; break;
+				case 0x33A5: sb.setCharAt(i, 'm'); sb.insert(i+1, "\u00B3"); i++; break;
+				case 0x33A6: sb.setCharAt(i, 'k'); sb.insert(i+1, "m\u00B3"); i+=2; break;
+				case 0x33A7: sb.setCharAt(i, 'm'); sb.insert(i+1, "/s"); i+=2; break;
+				case 0x33A8: sb.setCharAt(i, 'm'); sb.insert(i+1, "/s\u00B2"); i+=3; break;
+				case 0x33A9: sb.setCharAt(i, 'P'); sb.insert(i+1, "a"); i++; break;
+				case 0x33AA: sb.setCharAt(i, 'k'); sb.insert(i+1, "Pa"); i+=2; break;
+				case 0x33AB: sb.setCharAt(i, 'M'); sb.insert(i+1, "Pa"); i+=2; break;
+				case 0x33AC: sb.setCharAt(i, 'G'); sb.insert(i+1, "Pa"); i+=2; break;
+				case 0x33AD: sb.setCharAt(i, 'r'); sb.insert(i+1, "ad"); i+=2; break;
+				case 0x33AE: sb.setCharAt(i, 'r'); sb.insert(i+1, "ad/s"); i+=4; break;
+				case 0x33AF: sb.setCharAt(i, 'r'); sb.insert(i+1, "ad/s\u00B2"); i+=5; break;
+				case 0x33B0: sb.setCharAt(i, 'p'); sb.insert(i+1, "s"); i++; break;
+				case 0x33B1: sb.setCharAt(i, 'n'); sb.insert(i+1, "s"); i++; break;
+				case 0x33B2: sb.setCharAt(i, (char)0x03BC); sb.insert(i+1, "s"); i++; break;
+				case 0x33B3: sb.setCharAt(i, 'm'); sb.insert(i+1, "s"); i++; break;
+				case 0x33B4: sb.setCharAt(i, 'p'); sb.insert(i+1, "V"); i++; break;
+				case 0x33B5: sb.setCharAt(i, 'n'); sb.insert(i+1, "V"); i++; break;
+				case 0x33B6: sb.setCharAt(i, (char)0x03BC); sb.insert(i+1, "V"); i++; break;
+				case 0x33B7: sb.setCharAt(i, 'm'); sb.insert(i+1, "V"); i++; break;
+				case 0x33B8: sb.setCharAt(i, 'k'); sb.insert(i+1, "V"); i++; break;
+				case 0x33B9: sb.setCharAt(i, 'M'); sb.insert(i+1, "V"); i++; break;
+				case 0x33BA: sb.setCharAt(i, 'p'); sb.insert(i+1, "W"); i++; break;
+				case 0x33BB: sb.setCharAt(i, 'n'); sb.insert(i+1, "W"); i++; break;
+				case 0x33BC: sb.setCharAt(i, (char)0x03BC); sb.insert(i+1, "W"); i++; break;
+				case 0x33BD: sb.setCharAt(i, 'm'); sb.insert(i+1, "W"); i++; break;
+				case 0x33BE: sb.setCharAt(i, 'k'); sb.insert(i+1, "W"); i++; break;
+				case 0x33BF: sb.setCharAt(i, 'M'); sb.insert(i+1, "W"); i++; break;
+				case 0x33C0: sb.setCharAt(i, 'k'); sb.insert(i+1, "\u03A9"); i++; break;
+				case 0x33C1: sb.setCharAt(i, 'M'); sb.insert(i+1, "\u03A9"); i++; break;
+				case 0x33C2: sb.setCharAt(i, 'a'); sb.insert(i+1, ".m."); i+=3; break;
+				case 0x33C3: sb.setCharAt(i, 'B'); sb.insert(i+1, "q"); i++; break;
+				case 0x33C4: sb.setCharAt(i, 'c'); sb.insert(i+1, "c"); i++; break;
+				case 0x33C5: sb.setCharAt(i, 'c'); sb.insert(i+1, "d"); i++; break;
+				case 0x33C6: sb.setCharAt(i, 'C'); sb.insert(i+1, "/kg"); i+=3; break;
+				case 0x33C7: sb.setCharAt(i, 'C'); sb.insert(i+1, "o."); i+=2; break;
+				case 0x33C8: sb.setCharAt(i, 'd'); sb.insert(i+1, "B"); i++; break;
+				case 0x33C9: sb.setCharAt(i, 'G'); sb.insert(i+1, "y"); i++; break;
+				case 0x33CA: sb.setCharAt(i, 'h'); sb.insert(i+1, "a"); i++; break;
+				case 0x33CB: sb.setCharAt(i, 'H'); sb.insert(i+1, "P"); i++; break;
+				case 0x33CC: sb.setCharAt(i, 'i'); sb.insert(i+1, "n"); i++; break;
+				case 0x33CD: sb.setCharAt(i, 'K'); sb.insert(i+1, "K"); i++; break;
+				case 0x33CE: sb.setCharAt(i, 'K'); sb.insert(i+1, "M"); i++; break;
+				case 0x33CF: sb.setCharAt(i, 'K'); sb.insert(i+1, "t"); i++; break;
+				case 0x33D0: sb.setCharAt(i, 'l'); sb.insert(i+1, "m"); i++; break;
+				case 0x33D1: sb.setCharAt(i, 'l'); sb.insert(i+1, "n"); i++; break;
+				case 0x33D2: sb.setCharAt(i, 'l'); sb.insert(i+1, "og"); i+=2; break;
+				case 0x33D3: sb.setCharAt(i, 'l'); sb.insert(i+1, "x"); i++; break;
+				case 0x33D4: sb.setCharAt(i, 'm'); sb.insert(i+1, "b"); i++; break;
+				case 0x33D5: sb.setCharAt(i, 'm'); sb.insert(i+1, "il"); i+=2; break;
+				case 0x33D6: sb.setCharAt(i, 'm'); sb.insert(i+1, "ol"); i+=2; break;
+				case 0x33D7: sb.setCharAt(i, 'p'); sb.insert(i+1, "H"); i++; break;
+				case 0x33D8: sb.setCharAt(i, 'p'); sb.insert(i+1, ".m."); i+=3; break;
+				case 0x33D9: sb.setCharAt(i, 'P'); sb.insert(i+1, "PM"); i+=2; break;
+				case 0x33DA: sb.setCharAt(i, 'P'); sb.insert(i+1, "R"); i++; break;
+				case 0x33DB: sb.setCharAt(i, 's'); sb.insert(i+1, "r"); i++; break;
+				case 0x33DC: sb.setCharAt(i, 'S'); sb.insert(i+1, "v"); i++; break;
+				case 0x33DD: sb.setCharAt(i, 'W'); sb.insert(i+1, "b"); i++; break;
+				case 0x33DE: sb.setCharAt(i, 'v'); sb.insert(i+1, "/m"); i+=2; break;
+				case 0x33DF: sb.setCharAt(i, 'a'); sb.insert(i+1, "/m"); i+=2; break;
+				// Squared Latin Abbreviations 3
+				case 0x33FF: sb.setCharAt(i, 'g'); sb.insert(i+1, "al"); i+=2; break;
 				}
 			}
 		}
