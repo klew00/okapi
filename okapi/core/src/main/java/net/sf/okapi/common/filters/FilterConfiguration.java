@@ -71,9 +71,38 @@ public class FilterConfiguration {
 	public URLClassLoader classLoader;
 	
 	/**
+	 * List of extensions corresponding to this configuration. The list can be null.
+	 * Otherwise it must be in the form: ".ext1;.ext2;" The ';' must be present even
+	 * when there is only one extension. All extensions must have the '.'
+	 */
+	public String extensions;
+	
+	/**
 	 * Creates an empty FilterConfiguration object.
 	 */
 	public FilterConfiguration () {
+	}
+	
+	/**
+	 * Creates a FilterConfiguration object and initializes it.
+	 * @param configId the configuration identifier.
+	 * @param mimeType the MIME type associated with this configuration.
+	 * @param filterClass the filter class name.
+	 * @param name the localizable name of this configuration.
+	 * @param description the localizable description of this configuration. 
+	 * @param parametersLocation the location where the parameters for this configuration
+	 * are stored.
+	 * @param extensions the extensions for this configuration (eg. ".htm;.html;") 
+	 */
+	public FilterConfiguration (String configId,
+		String mimeType,
+		String filterClass,
+		String name,
+		String description,
+		String parametersLocation,
+		String extensions)
+	{
+		create(configId, mimeType, filterClass, name, description, parametersLocation, extensions);
 	}
 	
 	/**
@@ -92,7 +121,7 @@ public class FilterConfiguration {
 		String description,
 		String parametersLocation)
 	{
-		create(configId, mimeType, filterClass, name, description, parametersLocation);
+		create(configId, mimeType, filterClass, name, description, parametersLocation, null);
 	}
 	
 	/**
@@ -109,7 +138,7 @@ public class FilterConfiguration {
 		String name,
 		String description)
 	{
-		create(configId, mimeType, filterClass, name, description, null);
+		create(configId, mimeType, filterClass, name, description, null, null);
 	}
 
 	/**
@@ -121,13 +150,15 @@ public class FilterConfiguration {
 	 * @param description the localizable description of this configuration. 
 	 * @param parametersLocation the location where the parameters for this configuration are stored.
 	 * (use null if there are no parameters).
+	 * @param extensions the extensions for this configuration (eg. ".htm;.html;") 
 	 */
 	private void create (String configId,
 		String mimeType,
 		String filterClass,
 		String name,
 		String description,
-		String parametersLocation)
+		String parametersLocation,
+		String extensions)
 	{
 		this.configId = configId;
 		this.mimeType = mimeType;
@@ -135,6 +166,7 @@ public class FilterConfiguration {
 		this.description = description;
 		this.filterClass = filterClass;
 		this.parametersLocation = parametersLocation;
+		this.extensions = extensions;
 	}
 
 }

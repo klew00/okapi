@@ -398,6 +398,9 @@ class QualityChecker {
 	{
 		Issue issue = new Issue(currentDocId, issueType, tu.getId(), segId, message, srcStart, srcEnd, trgStart, trgEnd);
 		issues.add(issue);
+		issue.enabled = true;
+		issue.oriSource = srcOri;
+		issue.oriTarget = trgOri;
 
 		if ( repWriter != null ) {
 			String position = String.format("ID=%s", tu.getId());

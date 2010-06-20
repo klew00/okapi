@@ -149,7 +149,9 @@ public class XLIFFFilter implements IFilter {
 			MimeTypeMapper.XLIFF_MIME_TYPE,
 			getClass().getName(),
 			"XLIFF",
-			"Configuration for XML Localisation Interchange File Format (XLIFF) documents."));
+			"Configuration for XML Localisation Interchange File Format (XLIFF) documents.",
+			null,
+			".xlf;.xliff;.sdlxliff;"));
 		return list;
 	}
 	

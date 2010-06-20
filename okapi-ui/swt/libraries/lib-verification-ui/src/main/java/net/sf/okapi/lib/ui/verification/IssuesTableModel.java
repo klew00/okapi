@@ -49,15 +49,29 @@ class IssuesTableModel {
 		this.list = list;
 	}
 
-	void updateTable (int selection) {
+	// displayType: 0=all, 1=enabled 2=disabled
+	void updateTable (int selection,
+		int displayType)
+	{
 		table.removeAll();
 		if ( list == null ) return;
 		for ( Issue issue : list ) {
+			// Select the type of items to show
+			switch ( displayType ) {
+			case 1: // Enabled
+				if ( !issue.enabled ) continue;
+				break;
+			case 2: // Disabled
+				if ( issue.enabled ) continue;
+				break;
+			}
+			// display the item
 			TableItem item = new TableItem(table, SWT.NONE);
-			item.setChecked(true);
+			item.setChecked(issue.enabled);
 			item.setText(1, issue.tuId);
 			item.setText(2, (issue.segId == null ? "" : issue.segId));
 			item.setText(3, issue.message);
+			item.setData(issue);
 		}
 		
 		if (( selection < 0 ) || ( selection > table.getItemCount()-1 )) {

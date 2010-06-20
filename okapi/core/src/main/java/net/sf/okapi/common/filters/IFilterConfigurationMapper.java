@@ -169,6 +169,14 @@ public interface IFilterConfigurationMapper extends IParametersEditorMapper {
 	public FilterConfiguration getDefaultConfiguration (String mimeType);
 	
 	/**
+	 * Gets the first filter configuration for a given extension.
+	 * @param ext the extension to search for (must be in the form ".ext"
+	 * but can be in any case).
+	 * @return the filter configuration for the given extension, or null if none is found.
+	 */
+	public FilterConfiguration getDefaultConfigurationFromExtension (String ext);
+	
+	/**
 	 * Gets a list of information on all filters in this mapper.
 	 * @return a list of information on all filters in this mapper.
 	 */

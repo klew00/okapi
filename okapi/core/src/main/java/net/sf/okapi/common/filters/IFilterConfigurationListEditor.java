@@ -31,4 +31,14 @@ public interface IFilterConfigurationListEditor {
 	 */
 	public void editConfigurations (IFilterConfigurationMapper fcMapper);
 
+	/**
+	 * Displays a list of all available configurations in a given {@link FilterConfigurationMapper}, allow to edit them
+	 * and to select one.
+	 * @param fcMapper the {@link IFilterConfigurationMapper} to use.
+	 * @param configId the configuration id to start with (can be null or empty).
+	 * @return the configuration ID selected or null if none was selected. If the dialog
+	 * is terminated with a Cancel or Close rather than a Select action, the return is null.
+	 */
+	public String editConfigurations (IFilterConfigurationMapper fcMapper, String configId);
+
 }

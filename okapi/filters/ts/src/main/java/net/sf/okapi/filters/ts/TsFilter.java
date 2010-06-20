@@ -341,7 +341,9 @@ public class TsFilter implements IFilter {
 			MimeTypeMapper.TS_MIME_TYPE,
 			getClass().getName(),
 			"TS",
-			"Configuration for Qt TS files."));
+			"Configuration for Qt TS files.",
+			null,
+			".ts;"));
 		return list;
 	}
 

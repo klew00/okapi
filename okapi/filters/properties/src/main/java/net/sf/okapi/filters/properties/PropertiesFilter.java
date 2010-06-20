@@ -127,7 +127,9 @@ public class PropertiesFilter implements IFilter {
 			MimeTypeMapper.PROPERTIES_MIME_TYPE,
 			getClass().getName(),
 			"Java Properties",
-			"Java properties files (Output used \\uHHHH escapes)"));
+			"Java properties files (Output used \\uHHHH escapes)",
+			null,
+			".properties;"));
 		list.add(new FilterConfiguration(getName()+"-outputNotEscaped",
 			MimeTypeMapper.PROPERTIES_MIME_TYPE,
 			getClass().getName(),
@@ -139,7 +141,8 @@ public class PropertiesFilter implements IFilter {
 			getClass().getName(),
 			"Skype Language Files",
 			"Skype language properties files (including support for HTML codes)",
-			"skypeLang.fprm"));
+			"skypeLang.fprm",
+			".lang;"));
 		return list;
 	}
 

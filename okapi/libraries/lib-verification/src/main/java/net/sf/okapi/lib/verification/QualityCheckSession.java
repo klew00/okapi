@@ -44,6 +44,8 @@ import net.sf.okapi.common.resource.TextUnit;
 
 public class QualityCheckSession {
 
+	public static String FILE_EXTENSION = ".qcs";
+	
 	Map<URI, RawDocument> rawDocs; // Temporary solution waiting for the DB
 	IFilterConfigurationMapper fcMapper;
 	private Parameters params;
@@ -64,6 +66,7 @@ public class QualityCheckSession {
 	public Parameters getParameters () {
 		return params;
 	}
+
 	
 	public void setParameters (Parameters params) {
 		this.params = params;
@@ -78,6 +81,26 @@ public class QualityCheckSession {
 		this.fcMapper = fcMapper;
 	}
 
+	public IFilterConfigurationMapper getFilterConfigurationMapper () {
+		return fcMapper;
+	}
+
+	public LocaleId getSourceLocale () {
+		return sourceLocale;
+	}
+
+	public void setSourceLocale (LocaleId sourceLocale) {
+		this.sourceLocale = sourceLocale;
+	}
+
+	public LocaleId getTargetLocale () {
+		return targetLocale;
+	}
+
+	public void setTargetLocale (LocaleId targetLocale) {
+		this.targetLocale = targetLocale;
+	}
+
 	private void resetData () {
 		rawDocs = new HashMap<URI, RawDocument>();
 		issues = new ArrayList<Issue>();
@@ -85,7 +108,12 @@ public class QualityCheckSession {
 		checker = new QualityChecker();
 	}
 	
+	public int getDocumentCount () {
+		return rawDocs.size();
+	}
+	
 	public void refreshAll () {
+		if ( rawDocs.size() == 0 ) return;
 		startProcess(targetLocale, null);
 		for ( RawDocument rd : rawDocs.values() ) {
 			executeRefresh(rd);
@@ -95,8 +123,6 @@ public class QualityCheckSession {
 	
 	private void executeRefresh (RawDocument rd) {
 		try {
-			// Reset the issues for that document
-			
 			// Process the document
 			filter = fcMapper.createFilter(rd.getFilterConfigId(), filter);
 			if ( filter == null ) {

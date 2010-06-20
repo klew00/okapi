@@ -138,7 +138,9 @@ public class TmxFilter implements IFilter {
 			MimeTypeMapper.TMX_MIME_TYPE,
 			getClass().getName(),
 			"TMX",
-			"Configuration for Translation Memory eXchange (TMX) documents."));
+			"Configuration for Translation Memory eXchange (TMX) documents.",
+			null,
+			".tmx;"));
 		return list;
 	}
 	

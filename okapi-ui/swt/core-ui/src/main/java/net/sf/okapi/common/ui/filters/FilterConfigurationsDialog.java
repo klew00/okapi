@@ -122,7 +122,7 @@ public class FilterConfigurationsDialog {
 		
 		if ( selectionMode ) {
 			OKCancelPanel pnlActions = new OKCancelPanel(shell, SWT.NONE, Actions, (help!=null), Res.getString("FilterConfigurationsDialog.select")); //$NON-NLS-1$
-			pnlActions.btCancel.setText(Res.getString("FilterConfigurationsDialog.close")); //$NON-NLS-1$
+			//Use Cancel in select mode: pnlActions.btCancel.setText(Res.getString("FilterConfigurationsDialog.close")); //$NON-NLS-1$
 			gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 			gdTmp.horizontalSpan = 2;
 			pnlActions.setLayoutData(gdTmp);
@@ -172,7 +172,8 @@ public class FilterConfigurationsDialog {
 	/**
 	 * Opens this dialog box.
 	 * @param configId the identifier of the configuration to select (can be null).
-	 * @return the identifier of the selected configuration, or null if none is selected.
+	 * @return the identifier of the selected configuration, or null if none is selected. Or always
+	 * null if the dialog is terminated using Close rather than Select.
 	 */
 	public String showDialog (String configId) {
 		pnlConfigs.setConfiguration(configId);

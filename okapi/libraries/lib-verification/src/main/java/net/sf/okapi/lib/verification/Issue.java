@@ -31,6 +31,10 @@ public class Issue {
 	public int srcEnd;
 	public int trgStart;
 	public int trgEnd;
+	public boolean enabled;
+	// Temporary waiting for DB
+	public String oriSource;
+	public String oriTarget;
 	
 	public Issue (String docId,
 		IssueType issueType,

@@ -296,6 +296,19 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 		}
 		return null;
 	}
+	
+	@Override
+	public FilterConfiguration getDefaultConfigurationFromExtension (String ext) {
+		String tmp = ext.toLowerCase() + ";";
+		for ( FilterConfiguration config : configMap.values() ) {
+			if ( config.extensions != null ) {
+				if ( config.extensions.indexOf(tmp) > -1 ) {
+					return config;
+				}
+			}
+		}
+		return null;
+	}
 
 	@Override
 	public void removeConfiguration (String configId) {

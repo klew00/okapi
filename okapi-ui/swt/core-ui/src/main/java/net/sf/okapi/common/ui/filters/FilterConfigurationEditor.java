@@ -122,4 +122,12 @@ public class FilterConfigurationEditor implements IFilterConfigurationEditor, IF
 		dlg.showDialog(null);
 	}
 
+	public String editConfigurations (IFilterConfigurationMapper fcMapper,
+		String configId)
+	{
+		FilterConfigurationsDialog dlg = new FilterConfigurationsDialog(null, true,
+			(FilterConfigurationMapper)fcMapper, null);
+		return dlg.showDialog(configId);
+	}
+
 }

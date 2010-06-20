@@ -164,13 +164,16 @@ public class POFilter implements IFilter {
 			MimeTypeMapper.PO_MIME_TYPE,
 			getClass().getName(),
 			"PO (Standard)",
-			"Standard bilingual PO files"));
+			"Standard bilingual PO files",
+			null,
+			".po;"));
 		list.add(new FilterConfiguration(getName()+"-monolingual",
 			MimeTypeMapper.PO_MIME_TYPE,
 			getClass().getName(),
 			"PO (Monolingual)",
 			"Monolingual PO files (msgid is a real ID, not the source text).",
-			"monolingual.fprm"));
+			"monolingual.fprm",
+			".po;"));
 		return list;
 	}
 

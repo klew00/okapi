@@ -126,13 +126,16 @@ public class XMLFilter implements IFilter {
 			MimeTypeMapper.XML_MIME_TYPE,
 			getClass().getName(),
 			"Generic XML",
-			"Configuration for generic XML documents (default ITS rules)."));
+			"Configuration for generic XML documents (default ITS rules).",
+			null,
+			".xml;"));
 		list.add(new FilterConfiguration(getName()+"-resx",
 			MimeTypeMapper.XML_MIME_TYPE,
 			getClass().getName(),
 			"RESX",
 			"Configuration for Microsoft RESX documents (without binary data).",
-			"resx.fprm"));
+			"resx.fprm",
+			".resx;"));
 		list.add(new FilterConfiguration(getName()+"-MozillaRDF",
 			MimeTypeMapper.XML_MIME_TYPE,
 			getClass().getName(),

@@ -119,7 +119,9 @@ public class PHPContentFilter implements IFilter {
 			MimeTypeMapper.PHP_MIME_TYPE,
 			getClass().getName(),
 			"PHP Content Default",
-			"Default PHP Content configuration."));
+			"Default PHP Content configuration.",
+			null,
+			".php;"));
 		return list;
 	}
 

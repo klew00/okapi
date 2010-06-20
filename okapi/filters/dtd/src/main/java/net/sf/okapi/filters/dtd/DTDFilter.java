@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -175,7 +175,9 @@ public class DTDFilter implements IFilter {
 			MimeTypeMapper.DTD_MIME_TYPE,
 			getClass().getName(),
 			"DTD (Document Type Definition)",
-			"Configuration for XML DTD documents (entities content)"));
+			"Configuration for XML DTD documents (entities content)",
+			null,
+			".dtd;"));
 		return list;
 	}
 

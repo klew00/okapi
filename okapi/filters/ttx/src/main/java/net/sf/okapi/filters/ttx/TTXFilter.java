@@ -140,13 +140,16 @@ public class TTXFilter implements IFilter {
 			MimeTypeMapper.TTX_MIME_TYPE,
 			getClass().getName(),
 			"TTX",
-			"Configuration for Trados TTX documents."));
+			"Configuration for Trados TTX documents.",
+			null,
+			".ttx;"));
 		list.add(new FilterConfiguration(getName()+"-noForcedTuv",
 			MimeTypeMapper.TTX_MIME_TYPE,
 			getClass().getName(),
 			"TTX (without forced Tuv in output)",
 			"Configuration for Trados TTX documents without forcing Tuv in output.",
-			"noForcedTuv.fprm"));
+			"noForcedTuv.fprm",
+			".ttx;"));
 		return list;
 	}
 	
