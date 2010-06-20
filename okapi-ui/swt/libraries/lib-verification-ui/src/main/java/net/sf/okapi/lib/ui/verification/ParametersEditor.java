@@ -228,7 +228,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		chkTrailingWS.setText("Trailing white spaces");
 		
 		chkCheckWithLT = new Button(cmpTmp, SWT.CHECK);
-		chkCheckWithLT.setText("Perform the verifications provided by the Language Tool server");
+		chkCheckWithLT.setText("Perform the verifications provided by the LanguageTool server");
 		gdTmp = new GridData();
 		gdTmp.verticalIndent = 16;
 		chkCheckWithLT.setLayoutData(gdTmp);

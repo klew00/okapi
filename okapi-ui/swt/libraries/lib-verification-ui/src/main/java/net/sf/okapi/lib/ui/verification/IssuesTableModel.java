@@ -51,7 +51,8 @@ class IssuesTableModel {
 
 	// displayType: 0=all, 1=enabled 2=disabled
 	void updateTable (int selection,
-		int displayType)
+		int displayType,
+		int issueType)
 	{
 		table.removeAll();
 		if ( list == null ) return;
@@ -65,7 +66,47 @@ class IssuesTableModel {
 				if ( issue.enabled ) continue;
 				break;
 			}
-			// display the item
+			// Select the issue type
+			if ( issueType > 0 ) {
+				switch ( issue.issueType ) {
+				case MISSING_TARGETTU:
+					if ( issueType != 1 ) continue;
+					break;
+				case MISSING_TARGETSEG:
+					if ( issueType != 2 ) continue;
+					break;
+				case EMPTY_TARGETSEG:
+					if ( issueType != 3 ) continue;
+					break;
+				case TARGET_SAME_AS_SOURCE:
+					if ( issueType != 4 ) continue;
+					break;
+				case MISSING_LEADINGWS:
+				case MISSINGORDIFF_LEADINGWS:
+				case MISSING_TRAILINGWS:
+				case MISSINGORDIFF_TRAILINGWS:
+					if ( issueType != 5 ) continue;
+					break;
+				case EXTRA_LEADINGWS:
+				case EXTRAORDIFF_LEADINGWS:
+				case EXTRA_TRAILINGWS:
+				case EXTRAORDIFF_TRAILINGWS:
+					if ( issueType != 6 ) continue;
+					break;
+				case CODE_DIFFERENCE:
+					if ( issueType != 7 ) continue;
+					break;
+				case MISSING_PATTERN:
+					if ( issueType != 8 ) continue;
+					break;
+				case LANGUAGETOOL_ERROR:
+					if ( issueType != 9 ) continue;
+					break;
+				default:
+					continue;
+				}
+			}
+			// Display the item
 			TableItem item = new TableItem(table, SWT.NONE);
 			item.setChecked(issue.enabled);
 			item.setText(1, issue.tuId);

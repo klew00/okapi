@@ -78,8 +78,10 @@ public class QualityCheckEditor {
 	private Button btCheckAll;
 	private Combo cbDisplay;
 	private Button btRefreshDisplay;
+	private Combo cbTypes;
 	
 	private int displayType = 0;
+	private int issueType = 0;
 
 	@Override
 	protected void finalize () {
@@ -114,6 +116,9 @@ public class QualityCheckEditor {
 
 		rm = new ResourceManager(QualityCheckEditor.class, shell.getDisplay());
 		rm.loadCommands("net.sf.okapi.lib.ui.verification.Commands"); //$NON-NLS-1$
+
+		rm.addImages("checkmate", "checkmate16", "checkmate32"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		shell.setImages(rm.getImages("checkmate")); //$NON-NLS-1$
 		
 		createMenus();
 		createContent();
@@ -308,7 +313,7 @@ public class QualityCheckEditor {
 			public void widgetSelected(SelectionEvent event) {
 				AboutDialog dlg = new AboutDialog(shell,
 					"About CheckMate",
-					"CheckMate - Okapi Quality Check Utility",
+					"CheckMate - Okapi Quality Checker",
 					getClass().getPackage().getImplementationVersion());
 				dlg.showDialog();
             }
@@ -352,17 +357,17 @@ public class QualityCheckEditor {
 		//--- Issues panel
 		
 		cmpTmp = new Composite(sashMain, SWT.BORDER);
-		layTmp = new GridLayout(3, false);
+		layTmp = new GridLayout(4, false);
 		cmpTmp.setLayout(layTmp);
 		cmpTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
 		edMessage = new Text(cmpTmp, SWT.BORDER);
 		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.horizontalSpan = 3;
+		gdTmp.horizontalSpan = 4;
 		edMessage.setLayoutData(gdTmp);
 
 		Composite cmpButtons = new Composite(cmpTmp, SWT.NONE);
-		layTmp = new GridLayout(5, true);
+		layTmp = new GridLayout(4, true);
 		layTmp.marginHeight = 0;
 		layTmp.marginWidth = 0;
 		cmpButtons.setLayout(layTmp);
@@ -384,6 +389,26 @@ public class QualityCheckEditor {
 			public void widgetSelected(SelectionEvent e) {
 				editOptions();
 			}
+		});
+		
+		cbTypes = new Combo(cmpTmp, SWT.DROP_DOWN | SWT.READ_ONLY);
+		cbTypes.add("<All types of issues>"); // All types
+		cbTypes.add("Missing target"); // MISSING_TARGETTU
+		cbTypes.add("Missing target segment"); // MISSING_TARGETSEG
+		cbTypes.add("Empty target segment"); // EMPTY_TARGETSEG
+		cbTypes.add("Target same as source"); // TARGET_SAME_AS_SOURCE
+		cbTypes.add("Missing white spaces"); // All missing whitespace-related issues
+		cbTypes.add("Extra white spaces"); // All extra whitespace-related issues
+		cbTypes.add("Inline codes differents"); // CODE_DIFFERENCE
+		cbTypes.add("Unexpected patterns"); // MISSING_PATTERN
+		cbTypes.add("Warnings from LanguageTool checker"); // LANGUAGETOOL_ERROR
+		cbTypes.setVisibleItemCount(10);
+		cbTypes.setLayoutData(new GridData());
+		cbTypes.select(issueType);
+		cbTypes.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				updateDisplayType();
+			};
 		});
 		
 		cbDisplay = new Combo(cmpTmp, SWT.DROP_DOWN | SWT.READ_ONLY);
@@ -411,7 +436,7 @@ public class QualityCheckEditor {
 		tblIssues.setHeaderVisible(true);
 		tblIssues.setLinesVisible(true);
 		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.horizontalSpan = 3;
+		gdTmp.horizontalSpan = 4;
 		//gdTmp.minimumHeight = 250;
 		tblIssues.setLayoutData(gdTmp);
 		
@@ -464,7 +489,8 @@ public class QualityCheckEditor {
 
 	private void updateDisplayType () {
 		displayType = cbDisplay.getSelectionIndex();
-		issuesModel.updateTable(tblIssues.getSelectionIndex(), displayType);
+		issueType = cbTypes.getSelectionIndex();
+		issuesModel.updateTable(tblIssues.getSelectionIndex(), displayType, issueType);
 		updateCurrentIssue();
 	}
 	
@@ -543,7 +569,7 @@ public class QualityCheckEditor {
 		try {
 			session.refreshAll();
 			issuesModel.setIssues(session.getIssues());
-			issuesModel.updateTable(0, displayType);
+			issuesModel.updateTable(0, displayType, issueType);
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, "Error while refreshing.\n"+e.getMessage(), null);
@@ -595,7 +621,7 @@ public class QualityCheckEditor {
 				path = paths[0];
 			}
 			session.loadSession(path);
-			issuesModel.updateTable(0, displayType);
+			issuesModel.updateTable(0, displayType, issueType);
 			qcsPath = path;
 			updateCaption();
 		}
