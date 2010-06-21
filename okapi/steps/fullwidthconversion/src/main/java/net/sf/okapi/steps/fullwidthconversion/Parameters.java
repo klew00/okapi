@@ -27,6 +27,7 @@ public class Parameters extends BaseParameters {
 	public boolean toHalfWidth;
 	public boolean asciiOnly;
 	public boolean includeSLA;
+	public boolean includeLLS;
 	
 	public Parameters () {
 		reset();
@@ -36,6 +37,7 @@ public class Parameters extends BaseParameters {
 		toHalfWidth = true;
 		asciiOnly = false;
 		includeSLA = false;
+		includeLLS = false;
 	}
 
 	public void fromString (String data) {
@@ -44,6 +46,7 @@ public class Parameters extends BaseParameters {
 		toHalfWidth = buffer.getBoolean("toHalfWidth", toHalfWidth);
 		asciiOnly = buffer.getBoolean("asciiOnly", asciiOnly);
 		includeSLA = buffer.getBoolean("includeSLA", includeSLA);
+		includeLLS = buffer.getBoolean("includeLLS", includeLLS);
 	}
 
 	@Override
@@ -52,6 +55,7 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean("toHalfWidth", toHalfWidth);
 		buffer.setBoolean("asciiOnly", asciiOnly);
 		buffer.setBoolean("includeSLA", includeSLA);
+		buffer.setBoolean("includeLLS", includeLLS);
 		return buffer.toString();
 	}
 	

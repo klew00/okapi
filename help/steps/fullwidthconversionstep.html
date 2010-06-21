@@ -40,10 +40,52 @@ the source text is copied to the target and processed.</p>
 -- Select this option to convert all full-width character to their half-width or 
 ASCII equivalent. For example, the character &#39;Ｑ&#39; (U+FF31) is converted to &#39;Q&#39; 
 (U+0051) and the character &#39;サ&#39; (U+30B5) is converted to &#39;ｻ&#39; (U+FF7B).</p>
+<p>Additional non-Full-width characters can also be converted:</p>
 <p><cite>Include Squared Latin Abbreviations of the CJK Compatibility block</cite> 
 -- Set this option to also convert the Squared Latin Abbreviations of the CJK 
 Compatibility block into sequences of non-CJK characters. For example &#39;㏀&#39; 
 (U+33C0) to &quot;kΩ&quot; (U+006B, U+03A9).</p>
+<p><cite>Include special characters of the Letter-Like Symbols block</cite> -- 
+Set this option to also convert several characters of the Letter-Like Symbols 
+block to character sequences. The conversions are shown in the following table:</p>
+<table border="1" cellspacing="0" cellpadding="3">
+	<tr>
+		<th align="left" valign="top">Letter-Like Symbol</th>
+		<th align="left" valign="top">Character sequence</th>
+	</tr>
+	<tr>
+		<td><font SIZE="3">U+2100</font></td>
+		<td>a/c</td>
+	</tr>
+	<tr>
+		<td>U+2101</td>
+		<td>a/s</td>
+	</tr>
+	<tr>
+		<td>U+2105</td>
+		<td>c/o</td>
+	</tr>
+	<tr>
+		<td>U+2103</td>
+		<td>°C</td>
+	</tr>
+	<tr>
+		<td>U+2109</td>
+		<td>°F</td>
+	</tr>
+	<tr>
+		<td>U+2116</td>
+		<td>No</td>
+	</tr>
+	<tr>
+		<td>U+212A</td>
+		<td>K</td>
+	</tr>
+	<tr>
+		<td>U+212B</td>
+		<td>Å</td>
+	</tr>
+</table>
 <p><cite>Convert half-width and ASCII characters to full width equivalents</cite> 
 -- Select this option to convert all half-width and ASCII characters to their 
 full-width equivalent. For example, the character &#39;Q&#39; (U+0051) is converted to 

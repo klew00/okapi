@@ -52,6 +52,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Button rdToHalfWidth;
 	private Button chkAsciiOnly;
 	private Button chkIncludeSLA;
+	private Button chkIncludeLLS;
 	private Composite mainComposite;
 	
 	public boolean edit (IParameters params,
@@ -157,6 +158,12 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		gdTmp.horizontalIndent = indent;
 		chkIncludeSLA.setLayoutData(gdTmp);
 		
+		chkIncludeLLS = new Button(mainComposite, SWT.CHECK);
+		chkIncludeLLS.setText("Include special characters of the Letter-Like Symbols block");
+		gdTmp = new GridData();
+		gdTmp.horizontalIndent = indent;
+		chkIncludeLLS.setLayoutData(gdTmp);
+		
 		rdToFullWidth = new Button(mainComposite, SWT.RADIO);
 		rdToFullWidth.setText("Convert half-width and ASCII characters to full-width equivalents");
 		
@@ -175,6 +182,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	
 	private void updateChkBox() {
 		chkIncludeSLA.setEnabled(rdToHalfWidth.getSelection());
+		chkIncludeLLS.setEnabled(rdToHalfWidth.getSelection());
 		chkAsciiOnly.setEnabled(!rdToHalfWidth.getSelection());
 	}
 	
@@ -190,6 +198,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private void setData () {
 		rdToHalfWidth.setSelection(params.toHalfWidth);
 		chkIncludeSLA.setSelection(params.includeSLA);
+		chkIncludeLLS.setSelection(params.includeLLS);
 		rdToFullWidth.setSelection(!params.toHalfWidth);
 		chkAsciiOnly.setSelection(params.asciiOnly);
 		updateChkBox();
@@ -198,6 +207,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private boolean saveData () {
 		params.toHalfWidth = rdToHalfWidth.getSelection();
 		params.includeSLA = chkIncludeSLA.getSelection();
+		params.includeLLS = chkIncludeLLS.getSelection();
 		params.asciiOnly = chkAsciiOnly.getSelection();
 		result = true;
 		return result;

@@ -182,6 +182,20 @@ public class FullWidthConversionStep extends BasePipelineStep {
 				case 0x25CB: sb.setCharAt(i, (char)0xFFEE); break;
 				}
 
+				// Process letter-like symbols
+				if ( params.includeLLS ) {
+					switch ( ch ) {
+					case 0x2100: sb.setCharAt(i, 'a'); sb.insert(i+1, "/c"); i+=2; break;
+					case 0x2101: sb.setCharAt(i, 'a'); sb.insert(i+1, "/s"); i+=2; break;
+					case 0x2105: sb.setCharAt(i, 'c'); sb.insert(i+1, "/o"); i+=2; break;
+					case 0x2103: sb.setCharAt(i, (char)0x00B0); sb.insert(i+1, "C"); i++; break;
+					case 0x2109: sb.setCharAt(i, (char)0x00B0); sb.insert(i+1, "F"); i++; break;
+					case 0x2116: sb.setCharAt(i, 'N'); sb.insert(i+1, "o"); i++; break;
+					case 0x212A: sb.setCharAt(i, 'K'); break;
+					case 0x212B: sb.setCharAt(i, (char)0x00C5); break;
+					}
+				}
+				
 				// Stop here if we don't convert Squared Latin Abbreviations 
 				if ( !params.includeSLA ) continue;
 				
