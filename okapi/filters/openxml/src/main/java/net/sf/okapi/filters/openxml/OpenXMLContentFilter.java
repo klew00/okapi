@@ -1368,8 +1368,12 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 			} // otherwise this is an illegal element, so just ignore it
 			addNonTextRunToCurrentTextUnit(); // DWH 5-5-09
 			bBetweenTextMarkers = true; // DWH 4-16-09 ???
-			if (getRuleState().popTextUnitRule() != null) // DWH 6-19-10 only end Text Unit if inside one
-				endTextUnit(new GenericSkeleton(endpara+sTagString)); // DWH 8-17-09
+			try
+			{
+				getRuleState().popTextUnitRule(); // DWH 6-19-10 could die if not in text unit
+			}
+			catch(Exception e) {}; // will do its best to recover anyway 
+			endTextUnit(new GenericSkeleton(endpara+sTagString)); // DWH 8-17-09
 			endpara = ""; // DWH 8-17-09 for Powerpoint a:endParaRpr
 			break;
 		case TEXT_RUN_ELEMENT: // DWH 4-10-09 smoosh text runs into single <x>text</x>
