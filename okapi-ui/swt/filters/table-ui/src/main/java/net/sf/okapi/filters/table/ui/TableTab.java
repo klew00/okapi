@@ -482,7 +482,7 @@ public class TableTab extends Composite implements IDialogPage, SelectionListene
 				net.sf.okapi.filters.table.csv.Parameters params =
 					(net.sf.okapi.filters.table.csv.Parameters) data;
 				
-				if (params.fieldDelimiter.equals(",")) {
+				if (params.fieldDelimiter.equals(",") || params.fieldDelimiter.equals("")) {
 					delim.select(0);
 					custDelim.setText("");
 				}
@@ -503,7 +503,7 @@ public class TableTab extends Composite implements IDialogPage, SelectionListene
 					custDelim.setText(params.fieldDelimiter);
 				}
 				
-				if (params.textQualifier.equals("\"")) {
+				if (params.textQualifier.equals("\"") || params.textQualifier.equals("")) {
 					qualif.select(0);
 					custQualif.setText("");
 				}

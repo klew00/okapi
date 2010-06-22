@@ -407,8 +407,11 @@ public class ColumnsTab extends Composite implements IDialogPage {
 			for (int i = 0; i < sourceIdSourceRefs.size(); i++)
 				adapter.setValue(adapter.findValue(sourceIdColumns.get(i), 1), 3, sourceIdSourceRefs.get(i));
 			
-			for (int i = 0; i < targetSourceRefs.size(); i++)
+			for (int i = 0; i < targetSourceRefs.size(); i++) {
+				//System.out.println("item = " + adapter.findValue(targetColumns.get(i), 1) + " col=" + 3 + " val=" + targetSourceRefs.get(i));
 				adapter.setValue(adapter.findValue(targetColumns.get(i), 1), 3, targetSourceRefs.get(i));
+			}
+				
 			
 			for (int i = 0; i < targetLanguages.size(); i++)
 				adapter.setValue(adapter.findValue(targetColumns.get(i), 1), 4, targetLanguages.get(i));
