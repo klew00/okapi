@@ -82,7 +82,6 @@ public class OkapiGUITester {
 			net.sf.okapi.steps.bomconversion.ui.ParametersEditor.class.getName(),
 			net.sf.okapi.steps.encodingconversion.ui.ParametersEditor.class.getName(),
 			net.sf.okapi.steps.fullwidthconversion.ui.ParametersEditor.class.getName(),
-			net.sf.okapi.steps.linebreakconversion.ui.ParametersEditor.class.getName(),
 			net.sf.okapi.steps.searchandreplace.ui.ParametersEditor.class.getName(),
 			net.sf.okapi.steps.segmentation.ui.ParametersEditor.class.getName(),
 			net.sf.okapi.steps.textmodification.ui.ParametersEditor.class.getName(),
@@ -93,7 +92,6 @@ public class OkapiGUITester {
 
 			// Descriptors
 			net.sf.okapi.steps.batchtranslation.Parameters.class.getName(),
-			net.sf.okapi.steps.linebreakconversion.Parameters.class.getName(),
 			net.sf.okapi.steps.gcaligner.Parameters.class.getName()
 	};
 

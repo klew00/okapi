@@ -43,6 +43,7 @@ public class QualityCheckStep extends BasePipelineStep {
 	private QualityCheckSession session;
 	private LocaleId targetLocale;
 	private String rootDir;
+	private boolean RawDocumentMode = false;
 
 	public QualityCheckStep () {
 		session = new QualityCheckSession();
@@ -80,6 +81,13 @@ public class QualityCheckStep extends BasePipelineStep {
 	}
 	
 	@Override
+	protected Event handleRawDocument (Event event) {
+		RawDocumentMode = true;
+		
+		return event;
+	}
+	
+	@Override
 	protected Event handleStartBatch (Event event) {
 		session.startProcess(targetLocale, rootDir);
 		return event;
@@ -87,6 +95,7 @@ public class QualityCheckStep extends BasePipelineStep {
 	
 	@Override
 	protected Event handleStartDocument (Event event) {
+		RawDocumentMode = false;
 		session.processStartDocument((StartDocument)event.getResource());
 		return event;
 	}

@@ -86,17 +86,12 @@
 		</dependency>
 		<dependency>
 			<groupId>net.sf.okapi.steps</groupId>
-			<artifactId>okapi-step-fullwidthconversion-ui</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sf.okapi.steps</groupId>
-			<artifactId>okapi-step-linebreakconversion-ui</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sf.okapi.steps</groupId>
 			<artifactId>okapi-step-searchandreplace-ui</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.okapi.steps</groupId>
+			<artifactId>okapi-step-fullwidthconversion-ui</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

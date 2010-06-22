@@ -42,6 +42,9 @@ public class Parameters extends BaseParameters {
 	private static final String TARGETPATTERN = "targetPattern";
 	private static final String CHECKWITHLT = "checkWithLT";
 	private static final String SERVERURL = "serverURL";
+	private static final String TRANSLATELTMSG = "translateLTMsg";
+	private static final String LTTRANSLATIONSOURCE = "ltTranslationSource";
+	private static final String LTTRANSLATIONTARGET = "ltTranslationTarget";
 
 	String outputPath;
 	boolean autoOpen;
@@ -55,6 +58,9 @@ public class Parameters extends BaseParameters {
 	List<PatternItem> patterns;
 	boolean checkWithLT;
 	String serverURL;
+	boolean translateLTMsg;
+	String ltTranslationSource;
+	String ltTranslationTarget;
 
 	public Parameters () {
 		reset();
@@ -156,6 +162,30 @@ public class Parameters extends BaseParameters {
 		this.serverURL = serverURL;
 	}
 	
+	public boolean getTranslateLTMsg () {
+		return translateLTMsg;
+	}
+
+	public void setTranslateLTMsg (boolean translateLTMsg) {
+		this.translateLTMsg = translateLTMsg;
+	}
+
+	public String getLtTranslationSource () {
+		return ltTranslationSource;
+	}
+
+	public void setLtTranslationSource (String ltTranslationSource) {
+		this.ltTranslationSource = ltTranslationSource;
+	}
+
+	public String getLtTranslationTarget () {
+		return ltTranslationTarget;
+	}
+
+	public void setLtTranslationTarget (String ltTranslationTarget) {
+		this.ltTranslationTarget = ltTranslationTarget;
+	}
+
 	@Override
 	public void reset () {
 		outputPath = "${rootDir}/qa-report.html";
@@ -170,6 +200,9 @@ public class Parameters extends BaseParameters {
 		patterns = new ArrayList<PatternItem>();
 		checkWithLT = false;
 		serverURL = "http://localhost:8081/"; // Default
+		translateLTMsg = false;
+		ltTranslationSource = "";
+		ltTranslationTarget = "en";
 	}
 
 	@Override
@@ -186,6 +219,9 @@ public class Parameters extends BaseParameters {
 		codeDifference = buffer.getBoolean(CODEDIFFERENCE, codeDifference);
 		checkWithLT = buffer.getBoolean(CHECKWITHLT, checkWithLT);
 		serverURL = buffer.getString(SERVERURL, serverURL);
+		translateLTMsg = buffer.getBoolean(TRANSLATELTMSG, translateLTMsg);
+		ltTranslationSource = buffer.getString(LTTRANSLATIONSOURCE, ltTranslationSource);
+		ltTranslationTarget = buffer.getString(LTTRANSLATIONTARGET, ltTranslationTarget);
 		// Patterns
 		checkPatterns = buffer.getBoolean(CHECKPATTERNS, checkPatterns);
 		int count = buffer.getInteger(PATTERNCOUNT, 0);
@@ -210,6 +246,9 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean(CODEDIFFERENCE, codeDifference);
 		buffer.setBoolean(CHECKWITHLT, checkWithLT);
 		buffer.setString(SERVERURL, serverURL);
+		buffer.setBoolean(TRANSLATELTMSG, translateLTMsg);
+		buffer.setString(LTTRANSLATIONSOURCE, ltTranslationSource);
+		buffer.setString(LTTRANSLATIONTARGET, ltTranslationTarget);
 		// Patterns
 		buffer.setBoolean(CHECKPATTERNS, checkPatterns);
 		buffer.setInteger(PATTERNCOUNT, patterns.size());

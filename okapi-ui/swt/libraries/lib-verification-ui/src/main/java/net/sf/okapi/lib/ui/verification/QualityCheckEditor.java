@@ -80,7 +80,7 @@ public class QualityCheckEditor {
 	private Button btRefreshDisplay;
 	private Combo cbTypes;
 	
-	private int displayType = 0;
+	private int displayType = 1;
 	private int issueType = 0;
 
 	@Override
@@ -524,15 +524,8 @@ public class QualityCheckEditor {
 		}
 	}
 	
-	//For test only, for now
-	void addDocument (String path) {
-		String filterConfigId = null; //session.guessConfigurationId(path);
-		LocaleId srcLoc = session.getSourceLocale();
-		LocaleId trgLoc = session.getTargetLocale();
-		String encoding = "UTF-8";
-		RawDocument rd = new RawDocument((new File(path)).toURI(), encoding, srcLoc, trgLoc);
-		rd.setFilterConfigId(filterConfigId);
-		session.addRawDocument(rd);
+	public void addRawDocument (RawDocument rawDoc) {
+		session.addRawDocument(rawDoc);
 	}
 	
 	private void updateCaption () {
@@ -596,9 +589,8 @@ public class QualityCheckEditor {
 		try {
 			if ( path == null ) {
 				path = Dialogs.browseFilenamesForSave(shell, "Save Session", null,
-					String.format("Quality Check Sessions (*%s)\tAll Files (*.*)",
-						QualityCheckSession.FILE_EXTENSION, QualityCheckSession.FILE_EXTENSION),
-						"*%s\t*.*");
+					String.format("Quality Check Sessions (*%s)\tAll Files (*.*)", QualityCheckSession.FILE_EXTENSION),
+					String.format("*%s\t*.*", QualityCheckSession.FILE_EXTENSION));
 				if ( path == null ) return;
 				qcsPath = path;
 			}
@@ -614,9 +606,8 @@ public class QualityCheckEditor {
 		try {
 			if ( path == null ) {
 				String[] paths = Dialogs.browseFilenames(shell, "Open Session", false, null,
-					String.format("Quality Check Sessions (*%s)\tAll Files (*.*)",
-						QualityCheckSession.FILE_EXTENSION, QualityCheckSession.FILE_EXTENSION),
-						"*%s\t*.*");
+					String.format("Quality Check Sessions (*%s)\tAll Files (*.*)", QualityCheckSession.FILE_EXTENSION),
+					String.format("*%s\t*.*", QualityCheckSession.FILE_EXTENSION));
 				if ( paths == null ) return;
 				path = paths[0];
 			}

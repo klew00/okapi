@@ -90,6 +90,9 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private boolean addMode;
 	private Button chkCheckWithLT;
 	private Text edServerURL;
+	private Button chkTranslateLTMsg;
+	private Text edLTTranslationSource;
+	private Text edLTTranslationTarget;
 	
 	public boolean edit (IParameters params,
 		boolean readOnly,
@@ -241,7 +244,43 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		label = new Label(cmpTmp, SWT.NONE);
 		label.setText("Server URL (e.g. http://localhost:8081/):");
 		edServerURL = new Text(cmpTmp, SWT.BORDER);
-		edServerURL.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalSpan = 2;
+		edServerURL.setLayoutData(gdTmp);
+		
+		chkTranslateLTMsg = new Button(cmpTmp, SWT.CHECK);
+		chkTranslateLTMsg.setText("Auto-translate the messages from the LanguageTool checker");
+		gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		chkTranslateLTMsg.setLayoutData(gdTmp);
+		chkTranslateLTMsg.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				updateTranslateLTMsg();
+			};
+		});
+		
+		Composite grpTmp = new Composite(cmpTmp, SWT.NONE);
+		grpTmp.setLayout(new GridLayout(2, false));
+		
+		label = new Label(grpTmp, SWT.NONE);
+		label.setText("From:");
+		gdTmp = new GridData();
+		label.setLayoutData(gdTmp);
+		
+		edLTTranslationSource = new Text(grpTmp, SWT.BORDER);
+		gdTmp = new GridData();
+		gdTmp.widthHint = 80;
+		edLTTranslationSource.setLayoutData(gdTmp);
+		
+		label = new Label(grpTmp, SWT.NONE);
+		label.setText("Into:");
+		gdTmp = new GridData();
+		label.setLayoutData(gdTmp);
+
+		edLTTranslationTarget = new Text(grpTmp, SWT.BORDER);
+		gdTmp = new GridData();
+		gdTmp.widthHint = 80;
+		edLTTranslationTarget.setLayoutData(gdTmp);
 
 		TabItem tiTmp = new TabItem(tfTmp, SWT.NONE);
 		tiTmp.setText("General");
@@ -547,7 +586,21 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	}
 
 	private void updateLTOptions () {
-		edServerURL.setEnabled(chkCheckWithLT.getSelection());
+		boolean enabled = chkCheckWithLT.getSelection();
+		edServerURL.setEnabled(enabled);
+		chkTranslateLTMsg.setEnabled(enabled);
+		if ( enabled ) {
+			updateTranslateLTMsg();
+		}
+		else {
+			edLTTranslationSource.setEnabled(false);
+			edLTTranslationTarget.setEnabled(false);
+		}
+	}
+	
+	private void updateTranslateLTMsg () {
+		edLTTranslationSource.setEnabled(chkTranslateLTMsg.getSelection());
+		edLTTranslationTarget.setEnabled(chkTranslateLTMsg.getSelection());
 	}
 	
 	private void updateTargetSameAsSourceWithCodes () {
@@ -598,6 +651,9 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		chkTargetSameAsSourceWithCodes.setSelection(params.getTargetSameAsSourceWithCodes());
 		chkCheckWithLT.setSelection(params.getCheckWithLT());
 		edServerURL.setText(params.getServerURL());
+		chkTranslateLTMsg.setSelection(params.getTranslateLTMsg());
+		edLTTranslationSource.setText(params.getLtTranslationSource());
+		edLTTranslationTarget.setText(params.getLtTranslationTarget());
 		chkPatterns.setSelection(params.getCheckPatterns());
 		setPatternsData(params.getPatterns());
 		updateTargetSameAsSourceWithCodes();
@@ -630,6 +686,19 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 				edServerURL.setFocus();
 				return false;
 			}
+			if ( chkTranslateLTMsg.getSelection() ) {
+				if ( edLTTranslationSource.getText().trim().length() == 0 ) {
+					Dialogs.showError(shell, "Please, enter the language code of the messages returned by LanguageTool (e.g. fr).", null);
+					edLTTranslationSource.setFocus();
+					return false;
+					
+				}
+				if ( edLTTranslationTarget.getText().trim().length() == 0 ) {
+					Dialogs.showError(shell, "Please, enter the language to translate the LanguageTool messages into (e.g. en).", null);
+					edLTTranslationTarget.setFocus();
+					return false;
+				}
+			}
 		}
 		params.setOutputPath(pnlOutputPath.getText());
 		params.setCodeDifference(chkCodeDifference.getSelection());
@@ -644,6 +713,11 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		params.setCheckWithLT(chkCheckWithLT.getSelection());
 		if ( chkCheckWithLT.getSelection() ) {
 			params.setServerURL(edServerURL.getText());
+			params.setTranslateLTMsg(chkTranslateLTMsg.getSelection());
+			if ( chkTranslateLTMsg.getSelection() ) {
+				params.setLtTranslationSource(edLTTranslationSource.getText());
+				params.setLtTranslationTarget(edLTTranslationTarget.getText());
+			}
 		}
 		
 		params.setCheckPatterns(chkPatterns.getSelection());

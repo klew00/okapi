@@ -38,6 +38,8 @@ import org.w3c.dom.NodeList;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.connectors.google.GoogleMTConnector;
+import net.sf.okapi.lib.translation.IQuery;
 
 public class LanguageToolConnector {
 
@@ -45,6 +47,7 @@ public class LanguageToolConnector {
 	private String lang;
 	private String serverUrl;
 	private DocumentBuilder docBuilder;
+	private IQuery mt;
 	
 	/**
 	 * Creates a new LanguageToolConnector object.
@@ -62,13 +65,27 @@ public class LanguageToolConnector {
 	}
 
 	public void initialize (LocaleId locId,
-		String serverUrl)
+		String serverUrl,
+		boolean translateLTMsg,
+		String ltTranslationSource,
+		String ltTranslationTarget)
 	{
 		//TODO: Better mapping to LT language codes
 		lang = locId.getLanguage();
 		// Set the server URL
 		if ( !serverUrl.endsWith("/") ) serverUrl += "/";
 		this.serverUrl = serverUrl;
+
+		if ( mt != null ) {
+			mt.close();
+			mt = null;
+		}
+		if ( translateLTMsg ) {
+			mt = new GoogleMTConnector();
+			mt.setLanguages(LocaleId.fromBCP47(ltTranslationSource),
+				LocaleId.fromBCP47(ltTranslationTarget));
+			mt.open();
+		}
 	}
 	
 	public List<Issue> getIssues () {
@@ -96,6 +113,11 @@ public class LanguageToolConnector {
 			for ( int i=0; i<errors.getLength(); i++ ) {
 				Element error = (Element)errors.item(i);
 				String msg = error.getAttribute("msg");
+				if ( mt != null ) {
+					if ( mt.query(msg) > 0 ) {
+						msg = String.format("%s  (--> %s)", msg, mt.next().target.toString());
+					}
+				}
 				int start = Integer.valueOf(error.getAttribute("fromx"));
 				int end = Integer.valueOf(error.getAttribute("tox"));
 				issues.add(new Issue(docId, IssueType.LANGUAGETOOL_ERROR, tu.getId(), seg.getId(), msg, 0, 0, start, end));

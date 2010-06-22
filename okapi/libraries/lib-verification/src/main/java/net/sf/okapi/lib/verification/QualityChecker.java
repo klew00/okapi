@@ -31,6 +31,8 @@ import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.connectors.google.GoogleMTConnector;
+import net.sf.okapi.lib.translation.IQuery;
 
 class QualityChecker {
 
@@ -81,7 +83,8 @@ class QualityChecker {
 		
 		if ( params.getCheckWithLT() ) {
 			ltConn = new LanguageToolConnector();
-			ltConn.initialize(targetLocale, params.getServerURL());
+			ltConn.initialize(targetLocale, params.getServerURL(), params.translateLTMsg,
+				params.ltTranslationSource, params.ltTranslationTarget);
 		}
 	}
 
