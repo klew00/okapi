@@ -54,8 +54,8 @@ public class Parameters extends net.sf.okapi.filters.table.base.Parameters {
 
 		super.parameters_load(buffer);
 		
-		fieldDelimiter = buffer.getString("fieldDelimiter", "").trim(); 
-		textQualifier = buffer.getString("textQualifier", "").trim();
+		fieldDelimiter = buffer.getString("fieldDelimiter", ""); 
+		textQualifier = buffer.getString("textQualifier", "");
 		removeQualifiers = buffer.getBoolean("removeQualifiers", true);
 	}
 
