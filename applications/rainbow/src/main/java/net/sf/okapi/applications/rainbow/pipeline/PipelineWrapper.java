@@ -509,13 +509,15 @@ public class PipelineWrapper {
 	
 	public PipelineWrapper (IFilterConfigurationMapper fcMapper,
 		String appFolder,
-		String rootDir)
+		String rootDir,
+		Object uiParent)
 	{
 		this.fcMapper = fcMapper;
 		steps = new ArrayList<StepInfo>();
 		driver = new PipelineDriver();
 		driver.setFilterConfigurationMapper(this.fcMapper);
 		driver.setRootDirectory(rootDir);
+		driver.setUIParent(uiParent);
 		
 		// Hard-wired steps
 		buildStepList();

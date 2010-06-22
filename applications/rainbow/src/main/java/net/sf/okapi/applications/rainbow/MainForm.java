@@ -1198,7 +1198,7 @@ public class MainForm { //implements IParametersProvider {
 			saveSurfaceData();
 			updateCustomConfigurations();
 			if ( wrapper == null ) {
-				wrapper = new PipelineWrapper(fcMapper, appRootFolder, prj.getProjectFolder());
+				wrapper = new PipelineWrapper(fcMapper, appRootFolder, prj.getProjectFolder(), shell);
 			}
 
 			if ( predefinedPipeline == null ) {

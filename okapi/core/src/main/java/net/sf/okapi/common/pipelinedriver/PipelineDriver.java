@@ -56,6 +56,7 @@ public class PipelineDriver implements IPipelineDriver {
 	private int maxInputCount;
 	private IFilterConfigurationMapper fcMapper;
 	private String rootDir;
+	private Object uiParent;
 	
 	/**
 	 * Creates an new PipelineDriver object with an empty pipeline.
@@ -75,6 +76,11 @@ public class PipelineDriver implements IPipelineDriver {
 	@Override
 	public void setRootDirectory (String rootDir) {
 		this.rootDir = rootDir;
+	}
+	
+	@Override
+	public void setUIParent (Object uiParent) {
+		this.uiParent = uiParent;
 	}
 
 	@Override
@@ -273,6 +279,9 @@ public class PipelineDriver implements IPipelineDriver {
 						break;
 					case ROOT_DIRECTORY:
 						method.invoke(p.getStep(), (rootDir==null) ? "" : rootDir);
+						break;
+					case UI_PARENT:
+						method.invoke(p.getStep(), uiParent);
 						break;
 					default:
 						throw new OkapiBadStepInputException(String.format(

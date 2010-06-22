@@ -1,4 +1,5 @@
 /*===========================================================================
+  Copyright (C) 2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -33,6 +34,7 @@ import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.ResourceManager;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.common.ui.UserConfiguration;
+import net.sf.okapi.lib.verification.IQualityCheckEditor;
 import net.sf.okapi.lib.verification.Issue;
 import net.sf.okapi.lib.verification.QualityCheckSession;
 
@@ -51,6 +53,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
@@ -58,7 +61,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
-public class QualityCheckEditor {
+public class QualityCheckEditor implements IQualityCheckEditor {
 
 	private static final String APPNAME = "CheckMate"; //$NON-NLS-1$
 
@@ -83,34 +86,62 @@ public class QualityCheckEditor {
 	private int displayType = 1;
 	private int issueType = 0;
 
-	@Override
-	protected void finalize () {
-		dispose();
+	/**
+	 * Creates a default editor, to allow dynamic instantiation.
+	 * Either {@link #runEditSession(Object, boolean, IHelp, IFilterConfigurationMapper)} or
+	 * {@link #initialize(Object, boolean, IHelp, IFilterConfigurationMapper)} must be called
+	 * afterward. 
+	 */
+	public QualityCheckEditor () {
 	}
 	
+	@Override
+	public void edit () {
+		showDialog(null);
+	}
+
 	/**
-	 * Creates a new QualityCheckEditor dialog.
-	 * @param parent the parent shell.
+	 * Initializes this IQualityCheckEditor object.
+	 * @param parent the object representing the parent window/shell for this editor.
+	 * In this implementation  this parameter must be the Shell of the caller.
 	 * @param asDialog true if used from another program.
 	 * @param helpParam the help engine to use.
+	 * @param fcMapper the IFilterConfigurationMapper object to use with the editor.
+	 * @param session an optional session to use (null to use one created internally)
 	 */
-	public QualityCheckEditor (Shell parent,
+	@Override
+	public void initialize (Object parent,
 		boolean asDialog,
 		IHelp helpParam,
-		IFilterConfigurationMapper fcMapper)
+		IFilterConfigurationMapper fcMapper,
+		QualityCheckSession paramSession)
 	{
 		help = helpParam;
 		config = new UserConfiguration();
 		config.load(APPNAME);
+		long id = Thread.currentThread().getId();
+		// If no parent is defined, create a new display and shell
+		if ( parent == null ) {
+			// Start the application
+			Display dispMain = new Display();
+			long t2 = dispMain.getThread().getId();
+			parent = new Shell(dispMain);
+		}
 
-		session = new QualityCheckSession();
+		// Set or create the session
+		if ( paramSession == null ) {
+			session = new QualityCheckSession();
+		}
+		else {
+			session = paramSession;
+		}
 		session.setFilterConfigurationMapper(fcMapper);
 
 		if ( asDialog ) {
-			shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.MAX | SWT.MIN | SWT.APPLICATION_MODAL);
+			shell = new Shell((Shell)parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.MAX | SWT.MIN | SWT.APPLICATION_MODAL);
 		}
 		else {
-			shell = parent;
+			shell = (Shell)parent;
 		}
 		shell.setLayout(new GridLayout());
 
@@ -124,7 +155,16 @@ public class QualityCheckEditor {
 		createContent();
 	}
 	
-	public void dispose () {
+	public void addRawDocument (RawDocument rawDoc) {
+		session.addRawDocument(rawDoc);
+	}
+	
+	@Override
+	protected void finalize () {
+		dispose();
+	}
+
+	private void dispose () {
 		if ( displayFont != null ) {
 			displayFont.dispose();
 			displayFont = null;
@@ -494,7 +534,7 @@ public class QualityCheckEditor {
 		updateCurrentIssue();
 	}
 	
-	public void addDocumentFromUI (String path) {
+	private void addDocumentFromUI (String path) {
 		try {
 			InputDocumentDialog dlg = new InputDocumentDialog(shell, "Add document",
 				session.getFilterConfigurationMapper());
@@ -522,10 +562,6 @@ public class QualityCheckEditor {
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, "Error adding document.\n"+e.getMessage(), null);
 		}
-	}
-	
-	public void addRawDocument (RawDocument rawDoc) {
-		session.addRawDocument(rawDoc);
 	}
 	
 	private void updateCaption () {

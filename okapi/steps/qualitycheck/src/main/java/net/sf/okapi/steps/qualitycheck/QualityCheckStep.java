@@ -28,10 +28,13 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.exceptions.OkapiEditorCreationException;
+import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.lib.verification.IQualityCheckEditor;
 import net.sf.okapi.lib.verification.Parameters;
 import net.sf.okapi.lib.verification.QualityCheckSession;
 
@@ -41,12 +44,18 @@ public class QualityCheckStep extends BasePipelineStep {
 	private static final Logger LOGGER = Logger.getLogger(QualityCheckStep.class.getName());
 
 	private QualityCheckSession session;
+	private IQualityCheckEditor editor;
 	private LocaleId targetLocale;
+	private boolean isDone;
+	private boolean initDone;
 	private String rootDir;
-	private boolean RawDocumentMode = false;
+	private IFilterConfigurationMapper fcMapper;
+	private boolean RawDocumentMode;
+	private Object uiParent;
 
 	public QualityCheckStep () {
 		session = new QualityCheckSession();
+		// Initialization is done when getting either a RawDocument or a StartDocument event.
 	}
 	
 	@Override
@@ -80,22 +89,60 @@ public class QualityCheckStep extends BasePipelineStep {
 		this.targetLocale = targetLocale;
 	}
 	
+	@StepParameterMapping(parameterType = StepParameterType.FILTER_CONFIGURATION_MAPPER)
+	public void setFilterConfigurationMapper (IFilterConfigurationMapper fcMapper) {
+		this.fcMapper = fcMapper;
+	}
+	
+	@StepParameterMapping(parameterType = StepParameterType.UI_PARENT)
+	public void setUIParent (Object uiParent) {
+		this.uiParent = uiParent;
+	}
+	
 	@Override
-	protected Event handleRawDocument (Event event) {
-		RawDocumentMode = true;
-		
+	public boolean isDone () {
+		return isDone;
+	}
+
+	@Override
+	protected Event handleStartBatch (Event event) {
+		isDone = true;
+		initDone = false;
 		return event;
 	}
 	
 	@Override
-	protected Event handleStartBatch (Event event) {
-		session.startProcess(targetLocale, rootDir);
+	protected Event handleStartBatchItem (Event event) {
+		// To get the raw document
+		isDone = false;
+		return event;
+	}
+
+	@Override
+	protected Event handleRawDocument (Event event) {
+		RawDocumentMode = true;
+		if ( editor == null ) {
+			try {
+				// Hard code UI class for now
+				editor = (IQualityCheckEditor)Class.forName("net.sf.okapi.lib.ui.verification.QualityCheckEditor").newInstance();
+				editor.initialize(uiParent, true, null, fcMapper, session);
+			}
+			catch ( Throwable e ) {
+				throw new OkapiEditorCreationException("Could not create an instance of IQualityCheckEditor.\n"+e.getMessage(), e);
+			}
+		}
+		editor.addRawDocument(event.getRawDocument());
+		isDone = true;
 		return event;
 	}
 	
 	@Override
 	protected Event handleStartDocument (Event event) {
 		RawDocumentMode = false;
+		if ( !initDone ) {
+			session.startProcess(targetLocale, rootDir);
+			initDone = true;
+		}
 		session.processStartDocument((StartDocument)event.getResource());
 		return event;
 	}
@@ -108,20 +155,25 @@ public class QualityCheckStep extends BasePipelineStep {
 	
 	@Override
 	protected Event handleEndBatch (Event event) {
-		session.completeProcess();
-		
-		String finalPath = Util.fillRootDirectoryVariable(session.getParameters().getOutputPath(), rootDir);
-		LOGGER.info("\nOutput: " + finalPath);
-		int count = session.getIssues().size();
-		if ( count == 0 ) {
-			LOGGER.info("No issue found.");
+		if ( RawDocumentMode ) {
+			editor.edit();
+			// Make sure next batch will be re-initialized
+			editor = null;
 		}
 		else {
-			LOGGER.warning(String.format("Number of issues found = %d", count));
-		}
-
-		if ( session.getParameters().getAutoOpen() ) {
-			Util.openURL((new File(finalPath)).getAbsolutePath());
+			session.completeProcess();
+			String finalPath = Util.fillRootDirectoryVariable(session.getParameters().getOutputPath(), rootDir);
+			LOGGER.info("\nOutput: " + finalPath);
+			int count = session.getIssues().size();
+			if ( count == 0 ) {
+				LOGGER.info("No issue found.");
+			}
+			else {
+				LOGGER.warning(String.format("Number of issues found = %d", count));
+			}
+			if ( session.getParameters().getAutoOpen() ) {
+				Util.openURL((new File(finalPath)).getAbsolutePath());
+			}
 		}
 		return event;
 	}

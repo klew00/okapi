@@ -55,6 +55,13 @@ public interface IPipelineDriver {
 	public void setRootDirectory (String rootDir);
 	
 	/**
+	 * Sets the UI parent object for this driver.
+	 * @param uiParent the UI parent object (window/shell/etc.). Its type depend
+	 * on the caller, for example for SWT you pass the shell of the caller.
+	 */
+	public void setUIParent (Object uiParent);
+	
+	/**
 	 * Gets the {@link IPipeline} currently associated with this driver.
 	 * @return the {@link IPipeline} currently associated with this driver.
 	 */

@@ -279,7 +279,7 @@ public class CommandLine {
 		// Save any pending data
 		fcMapper.setCustomConfigurationsDirectory(prj.getParametersFolder());
 		fcMapper.updateCustomConfigurations();
-		PipelineWrapper wrapper = new PipelineWrapper(fcMapper, appRootFolder, prj.getParametersFolder());
+		PipelineWrapper wrapper = new PipelineWrapper(fcMapper, appRootFolder, prj.getParametersFolder(), null);
 
 		IPredefinedPipeline predefinedPipeline = null;
 		

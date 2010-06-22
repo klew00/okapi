@@ -78,6 +78,11 @@ public enum StepParameterType {
 	/**
 	 * Root directory for the batch.
 	 */
-	ROOT_DIRECTORY
+	ROOT_DIRECTORY,
+	
+	/**
+	 * UI parent object of the calling application (shell, main window, etc.)
+	 */
+	UI_PARENT
 
 }
