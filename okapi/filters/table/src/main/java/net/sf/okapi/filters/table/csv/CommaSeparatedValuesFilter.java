@@ -65,6 +65,7 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 	private boolean merging = false;
 	private int level = 0;
 	private boolean lineFlushed = false;
+	@SuppressWarnings("unused")
 	private int qualifierLen;
 	
 	public CommaSeparatedValuesFilter() {
