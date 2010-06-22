@@ -31,32 +31,33 @@
 # NOT_EQUALS 
 # MATCH regex match. Must match the entire attribute value
 
-filetype:
-  ruleTypes: [ATTRIBUTES_ONLY]
-  elementType: MSEXCELSTYLES
-
-# used in sheetn files
-dimension:
-  ruleTypes: [ATTRIBUTES_ONLY]
-  translatableAttributes: [ref]
-
-# used in styles file
-cellxfs:
-  ruleTypes: [INLINE]
-# elementType: cellxfs
-
-color:
-  ruleTypes: [ATTRIBUTES_ONLY]
-  translatableAttributes: [rgb]
-
-fonts:
-  ruleTypes: [ATTRIBUTES_ONLY]
-  translatableAttributes: [count]
-
-font:
-  ruleTypes: [INLINE]
-# elementType: font
-
-xf:
-  ruleTypes: [ATTRIBUTES_ONLY]
-  translatableAttributes: [fontId]
+elements:
+  filetype:
+    ruleTypes: [ATTRIBUTES_ONLY]
+    elementType: MSEXCELSTYLES
+  
+  # used in sheetn files
+  dimension:
+    ruleTypes: [ATTRIBUTES_ONLY]
+    translatableAttributes: [ref]
+  
+  # used in styles file
+  cellxfs:
+    ruleTypes: [INLINE]
+  # elementType: cellxfs
+  
+  color:
+    ruleTypes: [ATTRIBUTES_ONLY]
+    translatableAttributes: [rgb]
+  
+  fonts:
+    ruleTypes: [ATTRIBUTES_ONLY]
+    translatableAttributes: [count]
+  
+  font:
+    ruleTypes: [INLINE]
+  # elementType: font
+  
+  xf:
+    ruleTypes: [ATTRIBUTES_ONLY]
+    translatableAttributes: [fontId]                              

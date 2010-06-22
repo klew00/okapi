@@ -150,10 +150,7 @@ public class ExtractionRuleState {
 		return groupRuleStack.pop();
 	}
 
-	public RuleType popTextUnitRule() {
-		if ( textUnitRuleStack.isEmpty() ) { // suggested by Yves, added by DWH
-			return null;
-		}
+	public RuleType popTextUnitRule() {		
 		return textUnitRuleStack.pop();
 	}
 		

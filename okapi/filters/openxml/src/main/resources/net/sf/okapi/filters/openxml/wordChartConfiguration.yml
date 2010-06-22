@@ -33,11 +33,11 @@
 # NOT_EQUALS 
 # MATCH regex match. Must match the entire attribute value
 
-filetype:
-  ruleTypes: [ATTRIBUTES_ONLY]
-  elementType: MSWORDCHART
-
-'c:lang':
-  ruleTypes: [ATTRIBUTES_ONLY]
-  writableLocalizableAttributes: [val]
-
+elements:
+  filetype:
+    ruleTypes: [ATTRIBUTES_ONLY]
+    elementType: MSWORDCHART
+  
+  'c:lang':
+    ruleTypes: [ATTRIBUTES_ONLY]
+    writableLocalizableAttributes: [val]

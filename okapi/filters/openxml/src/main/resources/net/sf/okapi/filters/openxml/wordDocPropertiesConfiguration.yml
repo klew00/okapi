@@ -33,28 +33,28 @@
 # NOT_EQUALS 
 # MATCH regex match. Must match the entire attribute value
 
-filetype:
-  ruleTypes: [ATTRIBUTES_ONLY]
-  elementType: MSWORDCHART
-
-'dc:title':
-  ruleTypes: [TEXTUNIT]
-
-'dc:subject':
-  ruleTypes: [TEXTUNIT]
-
-'dc:creator':
-  ruleTypes: [TEXTUNIT]
-
-'dc:description':
-  ruleTypes: [TEXTUNIT]
-
-'cp:category':
-  ruleTypes: [TEXTUNIT]
-
-'cp:contentstatus':
-  ruleTypes: [TEXTUNIT]
-
-'cp:keywords':
-  ruleTypes: [TEXTUNIT]
-
+elements:
+  filetype:
+    ruleTypes: [ATTRIBUTES_ONLY]
+    elementType: MSWORDCHART
+  
+  'dc:title':
+    ruleTypes: [TEXTUNIT]
+  
+  'dc:subject':
+    ruleTypes: [TEXTUNIT]
+  
+  'dc:creator':
+    ruleTypes: [TEXTUNIT]
+  
+  'dc:description':
+    ruleTypes: [TEXTUNIT]
+  
+  'cp:category':
+    ruleTypes: [TEXTUNIT]
+  
+  'cp:contentstatus':
+    ruleTypes: [TEXTUNIT]
+  
+  'cp:keywords':
+    ruleTypes: [TEXTUNIT]          

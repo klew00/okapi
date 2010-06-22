@@ -33,79 +33,78 @@
 # NOT_EQUALS 
 # MATCH regex match. Must match the entire attribute value
 
-filetype:
-  ruleTypes: [ATTRIBUTES_ONLY]
-  elementType: MSWORD
-
-#'c:lang':
-#  ruleTypes: [ATTRIBUTES_ONLY]
-#  writableLocalizableAttributes: [val]
-
-'m:r':
-  ruleTypes: [TEXTRUN]
-
-'m:t':
-  ruleTypes: [TEXTMARKER]
-
-#'v:textbox':
-#  ruleTypes: [TEXTUNIT]
-#  elementType: textbox
-
-'v:textbox':
-  ruleTypes: [GROUP]
-
-'w:p':
-  ruleTypes: [TEXTUNIT]
-
-'w:r':
-  ruleTypes: [TEXTRUN]
-
-'pic:cnvpr':
-  ruleTypes: [ATTRIBUTES_ONLY]
-  translatableAttributes: [name]
-  elementType: image
-
-'wp:docpr':
-  ruleTypes: [ATTRIBUTES_ONLY]
-  translatableAttributes: [name]
-
-'w:del':
-  ruleTypes: [INLINE]
-  elementType: delete
-
-'w:ins':
-  ruleTypes: [TEXTRUN]
-  elementType: insert
-
-#'w:ppr':
-#  ruleTypes: [TEXTRUN]
-#  elementType: ParaStyle
-
-'w:lang':
-  ruleTypes: [ATTRIBUTES_ONLY]
-  writableLocalizableAttributes: ['w:val']
-
-'w:pstyle':
-  ruleTypes: [INLINE]
-  elementType: pstyle
-
-'w:rstyle':
-  ruleTypes: [INLINE]
-  elementType: rstyle
-
-'w:style':
-  ruleTypes: [INLINE]
-  elementType: style
-
-'w:t':
-  ruleTypes: [TEXTMARKER]
-
-'w:themefontlang':
-  ruleTypes: [ATTRIBUTES_ONLY]
-  writableLocalizableAttributes: ['w:val']
-
-'w:vanish':
-  ruleTypes: [INLINE]
-  elementType: hidden
-
-
+elements:
+  filetype:
+    ruleTypes: [ATTRIBUTES_ONLY]
+    elementType: MSWORD
+  
+  #'c:lang':
+  #  ruleTypes: [ATTRIBUTES_ONLY]
+  #  writableLocalizableAttributes: [val]
+  
+  'm:r':
+    ruleTypes: [TEXTRUN]
+  
+  'm:t':
+    ruleTypes: [TEXTMARKER]
+  
+  #'v:textbox':
+  #  ruleTypes: [TEXTUNIT]
+  #  elementType: textbox
+  
+  'v:textbox':
+    ruleTypes: [GROUP]
+  
+  'w:p':
+    ruleTypes: [TEXTUNIT]
+  
+  'w:r':
+    ruleTypes: [TEXTRUN]
+  
+  'pic:cnvpr':
+    ruleTypes: [ATTRIBUTES_ONLY]
+    translatableAttributes: [name]
+    elementType: image
+  
+  'wp:docpr':
+    ruleTypes: [ATTRIBUTES_ONLY]
+    translatableAttributes: [name]
+  
+  'w:del':
+    ruleTypes: [INLINE]
+    elementType: delete
+  
+  'w:ins':
+    ruleTypes: [TEXTRUN]
+    elementType: insert
+  
+  #'w:ppr':
+  #  ruleTypes: [TEXTRUN]
+  #  elementType: ParaStyle
+  
+  'w:lang':
+    ruleTypes: [ATTRIBUTES_ONLY]
+    writableLocalizableAttributes: ['w:val']
+  
+  'w:pstyle':
+    ruleTypes: [INLINE]
+    elementType: pstyle
+  
+  'w:rstyle':
+    ruleTypes: [INLINE]
+    elementType: rstyle
+  
+  'w:style':
+    ruleTypes: [INLINE]
+    elementType: style
+  
+  'w:t':
+    ruleTypes: [TEXTMARKER]
+  
+  'w:themefontlang':
+    ruleTypes: [ATTRIBUTES_ONLY]
+    writableLocalizableAttributes: ['w:val']
+  
+  'w:vanish':
+    ruleTypes: [INLINE]
+    elementType: hidden                        

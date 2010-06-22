@@ -31,52 +31,48 @@
 # NOT_EQUALS 
 # MATCH regex match. Must match the entire attribute value
 
-
-filetype:
-  ruleTypes: [ATTRIBUTES_ONLY]
-  elementType: MSEXCEL
-
-# used in sheetn files
-#author:
-#  ruleTypes: [EXCLUDE]
-
-v:
-  ruleTypes: [TEXTUNIT]
-
-c:
-  ruleTypes: [INLINE]
-  elementType: excell
-
-# used in sharedString file
-sst:
-  ruleTypes: [INLINE]
-  elementType: count
-
-si:
-  ruleTypes: [INLINE]
-  elementType: sharedstring
-
-t:
-  ruleTypes: [TEXTUNIT]
-
-# used in comments file
-text:
-  ruleTypes: [TEXTUNIT]
-
-# used in workbook file
-#sheet:
-#  ruleTypes: [ATTRIBUTES_ONLY]
-#  translatableAttributes: [name]
-
-# next two used in table definition file
-table:
-  ruleTypes: [ATTRIBUTES_ONLY]
-  translatableAttributes: [name]
-
-tablecolumn:
-  ruleTypes: [ATTRIBUTES_ONLY]
-  translatableAttributes: [name]
-
-
-
-
+elements:
+  filetype:
+    ruleTypes: [ATTRIBUTES_ONLY]
+    elementType: MSEXCEL
+  
+  # used in sheetn files
+  #author:
+  #  ruleTypes: [EXCLUDE]
+  
+  v:
+    ruleTypes: [TEXTUNIT]
+  
+  c:
+    ruleTypes: [INLINE]
+    elementType: excell
+  
+  # used in sharedString file
+  sst:
+    ruleTypes: [INLINE]
+    elementType: count
+  
+  si:
+    ruleTypes: [INLINE]
+    elementType: sharedstring
+  
+  t:
+    ruleTypes: [TEXTUNIT]
+  
+  # used in comments file
+  text:
+    ruleTypes: [TEXTUNIT]
+  
+  # used in workbook file
+  #sheet:
+  #  ruleTypes: [ATTRIBUTES_ONLY]
+  #  translatableAttributes: [name]
+  
+  # next two used in table definition file
+  table:
+    ruleTypes: [ATTRIBUTES_ONLY]
+    translatableAttributes: [name]
+  
+  tablecolumn:
+    ruleTypes: [ATTRIBUTES_ONLY]
+    translatableAttributes: [name]                        

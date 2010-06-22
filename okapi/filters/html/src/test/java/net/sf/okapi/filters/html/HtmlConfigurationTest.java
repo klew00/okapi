@@ -223,7 +223,7 @@ public class HtmlConfigurationTest {
 
 	@SuppressWarnings("unchecked")
 	private String getElementType(TaggedFilterConfiguration rules, String elementName) {
-		Map<String, Object> rule = rules.getConfigReader().getRule(elementName.toLowerCase());
+		Map<String, Object> rule = rules.getConfigReader().getElementRule(elementName.toLowerCase());
 		if (rule != null && rule.containsKey(TaggedFilterConfiguration.ELEMENT_TYPE)) {
 			return (String) rule.get(TaggedFilterConfiguration.ELEMENT_TYPE);
 		}

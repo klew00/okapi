@@ -22,6 +22,7 @@ package net.sf.okapi.filters.html;
 
 import java.io.File;
 import java.net.URL;
+import java.util.EmptyStackException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,8 +40,10 @@ import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderAccessType;
 import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.filters.abstractmarkup.AbstractMarkupEventBuilder;
 import net.sf.okapi.filters.abstractmarkup.AbstractMarkupFilter;
+import net.sf.okapi.filters.abstractmarkup.ExtractionRuleState.RuleType;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
 
@@ -49,7 +52,7 @@ public class HtmlFilter extends AbstractMarkupFilter {
 
 	private static final Logger LOGGER = Logger.getLogger(HtmlFilter.class.getName());
 
-	private Parameters parameters;	
+	private Parameters parameters;
 
 	public HtmlFilter() {
 		super(new AbstractMarkupEventBuilder());
@@ -58,10 +61,10 @@ public class HtmlFilter extends AbstractMarkupFilter {
 		setParameters(new Parameters());
 		setName("okf_html"); //$NON-NLS-1$
 		setDisplayName("HTML/XHTML Filter"); //$NON-NLS-1$
-		addConfiguration(new FilterConfiguration(getName(), MimeTypeMapper.HTML_MIME_TYPE, getClass().getName(),
-				"HTML", "HTML or XHTML documents", //$NON-NLS-1$
+		addConfiguration(new FilterConfiguration(getName(), MimeTypeMapper.HTML_MIME_TYPE,
+				getClass().getName(), "HTML", "HTML or XHTML documents", //$NON-NLS-1$
 				Parameters.NONWELLFORMED_PARAMETERS));
-		addConfiguration(new FilterConfiguration(getName()+"-wellFormed",
+		addConfiguration(new FilterConfiguration(getName() + "-wellFormed",
 				MimeTypeMapper.XHTML_MIME_TYPE, getClass().getName(),
 				"HTML (Well-Formed)", "XHTML and well-formed HTML documents", //$NON-NLS-1$
 				Parameters.WELLFORMED_PARAMETERS));
@@ -74,18 +77,21 @@ public class HtmlFilter extends AbstractMarkupFilter {
 	protected void startFilter() {
 		super.startFilter();
 		getEventBuilder().setPreserveWhitespace(false);
-		getEventBuilder().setCollapseWhitespace(!isPreserveWhitespace() && getConfig().isCollapseWhitespace());
+		getEventBuilder().setCollapseWhitespace(
+				!isPreserveWhitespace() && getConfig().isCollapseWhitespace());
 		if (getConfig().isCollapseWhitespace()) {
-			LOGGER.log(Level.FINE,
-					"By default the HTML filter will collapse whitespace unless overridden in the configuration"); //$NON-NLS-1$
+			LOGGER
+					.log(Level.FINE,
+							"By default the HTML filter will collapse whitespace unless overridden in the configuration"); //$NON-NLS-1$
 		}
-		getEventBuilder().initializeCodeFinder(getConfig().isUseCodeFinder(), getConfig().getCodeFinderRules());
+		getEventBuilder().initializeCodeFinder(getConfig().isUseCodeFinder(),
+				getConfig().getCodeFinderRules());
 	}
 
 	@Override
 	protected void preProcess(Segment segment) {
 		super.preProcess(segment);
-		
+
 		// let the handlers deal with wellformed content
 		if (getConfig().isWellformed()) {
 			return;
@@ -107,22 +113,82 @@ public class HtmlFilter extends AbstractMarkupFilter {
 			}
 		}
 	}
-
+	
 	@Override
 	protected void handleStartTag(StartTag startTag) {
 		super.handleStartTag(startTag);
-		getEventBuilder().setCollapseWhitespace(!isPreserveWhitespace() && getConfig().isCollapseWhitespace());
-	}
-	
-	@Override
-	protected void handleEndTag(EndTag endTag) {
-		super.handleEndTag(endTag);
-		getEventBuilder().setCollapseWhitespace(!isPreserveWhitespace() && getConfig().isCollapseWhitespace());
+		getEventBuilder().setCollapseWhitespace(
+				!isPreserveWhitespace() && getConfig().isCollapseWhitespace());
 	}
 
 	@Override
-	protected PropertyTextUnitPlaceholder createPropertyTextUnitPlaceholder(PlaceholderAccessType type, String name,
-			String value, Tag tag, Attribute attribute) {
+	protected void handleEndTag(EndTag endTag) {
+		try {
+			// if in excluded state everything is skeleton including text
+			if (getRuleState().isExludedState()) {
+				addToDocumentPart(endTag.toString());
+				// process these tag types to update parser state
+				switch (getConfig().getElementRuleType(endTag.getName())) {
+				case EXCLUDED_ELEMENT:
+					getRuleState().popExcludedIncludedRule();
+					break;
+				case INCLUDED_ELEMENT:
+					getRuleState().popExcludedIncludedRule();
+					break;
+				}
+				return;
+			}
+
+			switch (getConfig().getElementRuleType(endTag.getName())) {
+			case INLINE_ELEMENT:
+				if (canStartNewTextUnit()) {
+					startTextUnit();
+				}
+				addCodeToCurrentTextUnit(endTag);
+				break;
+			case GROUP_ELEMENT:
+				getRuleState().popGroupRule();
+				endGroup(new GenericSkeleton(endTag.toString()));
+				break;
+			case EXCLUDED_ELEMENT:
+				getRuleState().popExcludedIncludedRule();
+				addToDocumentPart(endTag.toString());
+				break;
+			case INCLUDED_ELEMENT:
+				getRuleState().popExcludedIncludedRule();
+				addToDocumentPart(endTag.toString());
+				break;
+			case TEXT_UNIT_ELEMENT:
+				try {
+					getRuleState().popTextUnitRule();
+				} catch (EmptyStackException e) {
+					// empty stack means the input is not wellformed. 
+					// we try our best to recover by ending the current TextUnit	
+					// The EventBuilder should handle this case where there is an 
+					// TextUnit end tag without a TextUnit. It will simply be turned 
+					// into a DocumentPart
+				}
+				endTextUnit(new GenericSkeleton(endTag.toString()));
+				break;
+			default:
+				addToDocumentPart(endTag.toString());
+				break;
+			}
+		} finally {
+			// does this tag have a PRESERVE_WHITESPACE rule?
+			if (getConfig().isRuleType(endTag.getName(), RULE_TYPE.PRESERVE_WHITESPACE)) {
+				getRuleState().popPreserverWhitespaceRule();
+				setPreserveWhitespace(getRuleState().isPreserveWhitespaceState());
+			}
+		}
+		
+		getEventBuilder().setCollapseWhitespace(
+				!isPreserveWhitespace() && getConfig().isCollapseWhitespace());
+	}
+
+	@Override
+	protected PropertyTextUnitPlaceholder createPropertyTextUnitPlaceholder(
+			PlaceholderAccessType type, String name, String value, Tag tag, Attribute attribute) {
 
 		String normalizeAttributeName = normalizeAttributeName(name, value, tag);
 
@@ -137,18 +203,21 @@ public class HtmlFilter extends AbstractMarkupFilter {
 			// adjust offset of value of the attribute
 			int charsetValueOffset = value.toLowerCase().lastIndexOf("charset=") + "charset=".length(); //$NON-NLS-1$
 
-			int valueStartPos = (attribute.getValueSegment().getBegin() + charsetValueOffset) - tag.getBegin();
+			int valueStartPos = (attribute.getValueSegment().getBegin() + charsetValueOffset)
+					- tag.getBegin();
 			int valueEndPos = attribute.getValueSegment().getEnd() - tag.getBegin();
 
 			// get the charset value (encoding)
 			String v = tag.toString().substring(valueStartPos, valueEndPos);
-			return new PropertyTextUnitPlaceholder(type, normalizeAttributeName, v, mainStartPos, mainEndPos,
-					valueStartPos, valueEndPos);
+			return new PropertyTextUnitPlaceholder(type, normalizeAttributeName, v, mainStartPos,
+					mainEndPos, valueStartPos, valueEndPos);
 		}
 
 		// name is normalized in super-class
-		return super.createPropertyTextUnitPlaceholder(type, name, getEventBuilder().normalizeHtmlText(value, true,
-				!isPreserveWhitespace() && getConfig().isCollapseWhitespace()), tag, attribute);
+		return super.createPropertyTextUnitPlaceholder(type, name, getEventBuilder()
+				.normalizeHtmlText(value, true,
+						!isPreserveWhitespace() && getConfig().isCollapseWhitespace()), tag,
+				attribute);
 	}
 
 	/*
@@ -168,7 +237,8 @@ public class HtmlFilter extends AbstractMarkupFilter {
 		}
 
 		// <meta http-equiv="Content-Language" content="en"
-		if (tag.getName().equalsIgnoreCase("meta") && attrName.equalsIgnoreCase(HtmlEncoder.CONTENT)) {
+		if (tag.getName().equalsIgnoreCase("meta")
+				&& attrName.equalsIgnoreCase(HtmlEncoder.CONTENT)) {
 			StartTag st = (StartTag) tag;
 			if (st.getAttributeValue("http-equiv") != null) {
 				if (st.getAttributeValue("http-equiv").equalsIgnoreCase("Content-Language")) {
@@ -187,9 +257,11 @@ public class HtmlFilter extends AbstractMarkupFilter {
 	}
 
 	private boolean isMetaCharset(String attrName, String attrValue, Tag tag) {
-		if (tag.getName().equalsIgnoreCase("meta") && attrName.equalsIgnoreCase(HtmlEncoder.CONTENT)) {
+		if (tag.getName().equalsIgnoreCase("meta")
+				&& attrName.equalsIgnoreCase(HtmlEncoder.CONTENT)) {
 			StartTag st = (StartTag) tag;
-			if (st.getAttributeValue("http-equiv") != null && st.getAttributeValue("content") != null) {
+			if (st.getAttributeValue("http-equiv") != null
+					&& st.getAttributeValue("content") != null) {
 				if (st.getAttributeValue("http-equiv").equalsIgnoreCase("Content-Type")
 						&& st.getAttributeValue("content").toLowerCase().contains("charset=")) {
 					return true;
@@ -246,11 +318,11 @@ public class HtmlFilter extends AbstractMarkupFilter {
 	public void setParametersFromString(String config) {
 		parameters = new Parameters(config);
 	}
-	
+
 	/**
 	 * @return the {@link AbstractMarkupEventBuilder}
 	 */
 	public AbstractMarkupEventBuilder getEventBuilder() {
-		return (AbstractMarkupEventBuilder)super.getEventBuilder();
+		return (AbstractMarkupEventBuilder) super.getEventBuilder();
 	}
 }

@@ -517,7 +517,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 			startTextUnit(text.toString());
 		} else {
 			addToTextUnit(text.toString());
-		}
+		}				
 	}
 
 	/**
@@ -609,12 +609,14 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 					}
 				}
 				getRuleState().pushTextUnitRule(startTag.getName(), idValue);
+			
 				handleAttributesThatAppearAnywhere(propertyTextUnitPlaceholders, startTag);
+				
 				setTextUnitName(idValue);
 				setTextUnitType(getConfig().getElementType(startTag));
 				break;
-			default:
-				handleAttributesThatAppearAnywhere(propertyTextUnitPlaceholders, startTag);
+			default:				
+				handleAttributesThatAppearAnywhere(propertyTextUnitPlaceholders, startTag);								
 			}
 		} finally {
 			// does this tag have a PRESERVE_WHITESPACE rule?
@@ -635,7 +637,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 * catch tags which are not listed in the config but have attributes that require processing
 	 */
 	private void handleAttributesThatAppearAnywhere(List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders,
-			StartTag tag) {
+			StartTag tag) {	
 		switch (getConfig().getElementRuleType(tag.getName())) {
 
 		case TEXT_UNIT_ELEMENT:
@@ -659,12 +661,12 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 				startDocumentPart(tag.toString(), tag.getName(), propertyTextUnitPlaceholders);
 				endDocumentPart();
 			} else {
-				// no attributes that needs processing - just treat as skeleton
+				// no attributes that need processing - just treat as skeleton
 				addToDocumentPart(tag.toString());
 			}
 
 			break;
-		}
+		}		
 	}
 
 	/**
@@ -709,7 +711,6 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 				addToDocumentPart(endTag.toString());
 				break;
 			case TEXT_UNIT_ELEMENT:
-				getRuleState().popTextUnitRule();
 				endTextUnit(new GenericSkeleton(endTag.toString()));
 				break;
 			default:

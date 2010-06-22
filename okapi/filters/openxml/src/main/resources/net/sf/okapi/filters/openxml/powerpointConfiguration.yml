@@ -33,26 +33,27 @@
 # NOT_EQUALS 
 # MATCH regex match. Must match the entire attribute value
 
-filetype:
-  ruleTypes: [ATTRIBUTES_ONLY]
-  elementType: MSPOWERPOINT
-
-'a:endpararpr':
-  ruleTypes: [ATTRIBUTES_ONLY]
-  writableLocalizableAttributes: [lang]
-
-'a:fld': 
-  ruleTypes: [TEXTRUN]
-
-'a:p': 
-  ruleTypes: [TEXTUNIT]
-
-'a:r': 
-  ruleTypes: [TEXTRUN]
-
-'a:rpr':
-  ruleTypes: [ATTRIBUTES_ONLY]
-  writableLocalizableAttributes: [lang]
-
-'a:t':
-  ruleTypes: [TEXTMARKER]
+elements:
+  filetype:
+    ruleTypes: [ATTRIBUTES_ONLY]
+    elementType: MSPOWERPOINT
+  
+  'a:endpararpr':
+    ruleTypes: [ATTRIBUTES_ONLY]
+    writableLocalizableAttributes: [lang]
+  
+  'a:fld': 
+    ruleTypes: [TEXTRUN]
+  
+  'a:p': 
+    ruleTypes: [TEXTUNIT]
+  
+  'a:r': 
+    ruleTypes: [TEXTRUN]
+  
+  'a:rpr':
+    ruleTypes: [ATTRIBUTES_ONLY]
+    writableLocalizableAttributes: [lang]
+  
+  'a:t':
+    ruleTypes: [TEXTMARKER]                          

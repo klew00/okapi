@@ -63,16 +63,7 @@ public class ExtractionComparisionTest {
 	public void testDoubleExtractionSingle() throws URISyntaxException, MalformedURLException {
 		RoundTripComparison rtc = new RoundTripComparison();
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
-		list.add(new InputDocument(root + "World'sWorstWebsite.htm", null));
-		
-//		FilterTestDriver testDriver = new FilterTestDriver();
-//		testDriver.setDisplayLevel(2);
-//		testDriver.setShowSkeleton(true);
-//		
-//		URI i = new File(root + "msg00058.html").toURI();
-//		htmlFilter.open(new RawDocument(i, "UTF-8", locEN));
-//		if ( !testDriver.process(htmlFilter) ) Assert.fail();
-//		htmlFilter.close();
+		list.add(new InputDocument(root + "Carnation Chiropractic Center Inc.htm", null));
 		assertTrue(rtc.executeCompare(htmlFilter, list, "UTF-8", locEN, locEN));
 	}
 	

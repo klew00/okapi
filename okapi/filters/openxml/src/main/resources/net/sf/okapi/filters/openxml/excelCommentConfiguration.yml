@@ -33,16 +33,17 @@
 # NOT_EQUALS 
 # MATCH regex match. Must match the entire attribute value
 
-filetype:
-  ruleTypes: [ATTRIBUTES_ONLY]
-  elementType: MSEXCELCOMMENT
-
-'r':
-  ruleTypes: [TEXTRUN]
-
-'t':
-  ruleTypes: [TEXTMARKER]
-
-'text':
-  ruleTypes: [TEXTUNIT]
-
+elements:
+  filetype:
+    ruleTypes: [ATTRIBUTES_ONLY]
+    elementType: MSEXCELCOMMENT
+  
+  'r':
+    ruleTypes: [TEXTRUN]
+  
+  't':
+    ruleTypes: [TEXTMARKER]
+  
+  'text':
+    ruleTypes: [TEXTUNIT]
+  

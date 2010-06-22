@@ -1,8 +1,9 @@
 collapse_whitespace: true
 
-# test read-only, writable attributes
-dummy: 
-  ruleTypes: [ATTRIBUTES_ONLY]
-  translatableAttributes: [trans]  
-  writableLocalizableAttributes: [write]
-  readOnlyLocalizableAttributes: [readonly]
+elements:
+  # test read-only, writable attributes
+  dummy: 
+      ruleTypes: [ATTRIBUTES_ONLY]
+      translatableAttributes: [trans]  
+      writableLocalizableAttributes: [write]
+      readOnlyLocalizableAttributes: [readonly]

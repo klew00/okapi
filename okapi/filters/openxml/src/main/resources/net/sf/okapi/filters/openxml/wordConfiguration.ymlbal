@@ -31,133 +31,135 @@
 # NOT_EQUALS 
 # MATCH regex match. Must match the entire attribute value
 
-w_p:
-  ruleTypes: [TEXTUNIT]
+attributes:
+  wp_docpr:
+    ruleTypes: [ATTRIBUTE]
+    onlyTheseElements: [name]
 
-pic_cnvpr:
-  ruleTypes: [ATTRIBUTES_ONLY]
-  translatableAttributes: [name]
-
-wp_docpr:
-  ruleTypes: [ATTRIBUTE]
-  onlyTheseElements: [name]
-
-w_b:
-  ruleTypes: [INLINE]
-
-w_bcs:
-  ruleTypes: [INLINE]
-
-w_bdr:
-  ruleTypes: [INLINE]
-
-w_color:
-  ruleTypes: [INLINE]
-
-w_commentrangeend:
-  ruleTypes: [INLINE]
-
-w_commentrangestart:
-  ruleTypes: [INLINE]
-
-w_commentreference:
-  ruleTypes: [INLINE]
-
-w_drawing:
-  ruleTypes: [INCLUDE]
-
-w_endnotereference:
-  ruleTypes: [INLINE]
-
-w_fldchar:
-  ruleTypes: [INLINE]
-
-w_footnotereference:
-  ruleTypes: [INLINE]
-
-w_highlight:
-  ruleTypes: [INLINE]
-
-w_hps:
-  ruleTypes: [INLINE]
-
-w_hpsbasetext:
-  ruleTypes: [INLINE]
-
-w_hpsraise:
-  ruleTypes: [INLINE]
-
-w_i:
-  ruleTypes: [INLINE]
-
-w_instrtext:
-  ruleTypes: [INLINE]
-
-w_ics:
-  ruleTypes: [INLINE]
-
-w_lang:
-  ruleTypes: [INLINE]
-
-w_lid:
-  ruleTypes: [INLINE]
-
-w_noproof:
-  ruleTypes: [INLINE]
-
-w_position:
-  ruleTypes: [INLINE]
-
-w_ppr:
-  ruleTypes: [EXCLUDE]
-
-w_r:
-  ruleTypes: [INLINE]
-
-w_rfonts:
-  ruleTypes: [INLINE]
-
-w_rpr:
-  ruleTypes: [INLINE]
-
-w_prooferr:
-  ruleTypes: [INLINE]
-
-w_rstyle:
-  ruleTypes: [INLINE]
-
-w_rt:
-  ruleTypes: [INLINE]
-
-w_ruby:
-  ruleTypes: [INLINE]
-
-w_rubyalign:
-  ruleTypes: [INLINE]
-
-w_rubybase:
-  ruleTypes: [INLINE]
-
-w_rubypr:
-  ruleTypes: [INLINE]
-
-w_strike:
-  ruleTypes: [INLINE]
-
-w_style:
-  ruleTypes: [INLINE]
-
-w_sz:
-  ruleTypes: [INLINE]
-
-w_szcs:
-  ruleTypes: [INLINE]
-
-w_t:
-  ruleTypes: [INLINE]
-
-w_u:
-  ruleTypes: [INLINE]
-
-w_vertalign:
-  ruleTypes: [INLINE]
+elements:
+  w_p:
+    ruleTypes: [TEXTUNIT]
+  
+  pic_cnvpr:
+    ruleTypes: [ATTRIBUTES_ONLY]
+    translatableAttributes: [name]
+  
+  w_b:
+    ruleTypes: [INLINE]
+  
+  w_bcs:
+    ruleTypes: [INLINE]
+  
+  w_bdr:
+    ruleTypes: [INLINE]
+  
+  w_color:
+    ruleTypes: [INLINE]
+  
+  w_commentrangeend:
+    ruleTypes: [INLINE]
+  
+  w_commentrangestart:
+    ruleTypes: [INLINE]
+  
+  w_commentreference:
+    ruleTypes: [INLINE]
+  
+  w_drawing:
+    ruleTypes: [INCLUDE]
+  
+  w_endnotereference:
+    ruleTypes: [INLINE]
+  
+  w_fldchar:
+    ruleTypes: [INLINE]
+  
+  w_footnotereference:
+    ruleTypes: [INLINE]
+  
+  w_highlight:
+    ruleTypes: [INLINE]
+  
+  w_hps:
+    ruleTypes: [INLINE]
+  
+  w_hpsbasetext:
+    ruleTypes: [INLINE]
+  
+  w_hpsraise:
+    ruleTypes: [INLINE]
+  
+  w_i:
+    ruleTypes: [INLINE]
+  
+  w_instrtext:
+    ruleTypes: [INLINE]
+  
+  w_ics:
+    ruleTypes: [INLINE]
+  
+  w_lang:
+    ruleTypes: [INLINE]
+  
+  w_lid:
+    ruleTypes: [INLINE]
+  
+  w_noproof:
+    ruleTypes: [INLINE]
+  
+  w_position:
+    ruleTypes: [INLINE]
+  
+  w_ppr:
+    ruleTypes: [EXCLUDE]
+  
+  w_r:
+    ruleTypes: [INLINE]
+  
+  w_rfonts:
+    ruleTypes: [INLINE]
+  
+  w_rpr:
+    ruleTypes: [INLINE]
+  
+  w_prooferr:
+    ruleTypes: [INLINE]
+  
+  w_rstyle:
+    ruleTypes: [INLINE]
+  
+  w_rt:
+    ruleTypes: [INLINE]
+  
+  w_ruby:
+    ruleTypes: [INLINE]
+  
+  w_rubyalign:
+    ruleTypes: [INLINE]
+  
+  w_rubybase:
+    ruleTypes: [INLINE]
+  
+  w_rubypr:
+    ruleTypes: [INLINE]
+  
+  w_strike:
+    ruleTypes: [INLINE]
+  
+  w_style:
+    ruleTypes: [INLINE]
+  
+  w_sz:
+    ruleTypes: [INLINE]
+  
+  w_szcs:
+    ruleTypes: [INLINE]
+  
+  w_t:
+    ruleTypes: [INLINE]
+  
+  w_u:
+    ruleTypes: [INLINE]
+  
+  w_vertalign:
+    ruleTypes: [INLINE]                          

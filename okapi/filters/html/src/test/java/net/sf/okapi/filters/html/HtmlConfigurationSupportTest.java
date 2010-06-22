@@ -36,8 +36,10 @@ public class HtmlConfigurationSupportTest {
 
 	@Test
 	public void test_PRESERVE_WHITESPACE () {
-		String config = "pre: \n"
-			+ "   ruleTypes: [PRESERVE_WHITESPACE]";
+		String config = 
+			    "elements:\n" +
+				"  pre: \n" +
+			    "    ruleTypes: [PRESERVE_WHITESPACE]";
 		filter.setParameters(new Parameters(config));
 		String snippet = "<p> t1  \nt2  </p><pre> t3  \nt4  </pre>";
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
@@ -48,8 +50,10 @@ public class HtmlConfigurationSupportTest {
 
 	@Test
 	public void test_EXCLUDE () {
-		String config = "pre: \n"
-			+ "   ruleTypes: [EXCLUDE]";
+		String config = 
+			    "elements:\n" +
+				"  pre: \n" +
+			    "    ruleTypes: [EXCLUDE]";
 		filter.setParameters(new Parameters(config));
 		String snippet = "<pre>t1</pre><p>t2</p>";
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
@@ -58,10 +62,12 @@ public class HtmlConfigurationSupportTest {
 
 	@Test
 	public void test_INCLUDE () {
-		String config = "pre: \n"
-			+ "   ruleTypes: [EXCLUDE] \n"
-			+ "b: \n"
-			+ "   ruleTypes: [INCLUDE]";
+		String config = 
+			"elements:\n" +
+			"  pre: \n" +
+			"    ruleTypes: [EXCLUDE] \n" +
+			"  b: \n" +
+			"    ruleTypes: [INCLUDE]";
 		filter.setParameters(new Parameters(config));
 		String snippet = "<pre>t1<b>t2</b>t3</pre><p>t4</p>";
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
@@ -70,10 +76,17 @@ public class HtmlConfigurationSupportTest {
 		assertEquals("t4", tu.getSource().toString());
 	}
 
-	//@Test
+	@Test
 	public void test_ATTRIBUTE_ID () {
-		String config = "id: \n"
-			+ "   ruleTypes: [ATTRIBUTE_ID]";
+		String config = 
+			"attributes:\n" +
+			"  id: \n" +
+			"    ruleTypes: [ATTRIBUTE_ID]\n" +
+			"elements:\n" +
+			"  p:\n" +
+			"    ruleTypes: [TEXTUNIT]\n" +
+			"  pre:\n" +
+			"    ruleTypes: [TEXTUNIT]\n";
 		filter.setParameters(new Parameters(config));
 		String snippet = "<p id='id1'>t1</p><pre id='id2'>t2</pre>";
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
@@ -84,11 +97,13 @@ public class HtmlConfigurationSupportTest {
 		assertEquals("id2", tu.getName());
 	}
 
-	//@Test
+	@Test
 	public void test_idAttributes () {
-		String config = "p:\n"
-			+ "  ruleTypes: [TEXTUNIT]\n"
-			+ "  idAttribues: [id, 'xml:id']";
+		String config = 
+			"elements:\n" +
+			"  p:\n" +
+			"    ruleTypes: [TEXTUNIT]\n" +
+			"    idAttributes: [id, 'xml:id']";
 		filter.setParameters(new Parameters(config));
 		String snippet = "<p id='id1'>t1</p><p xml:id='id2'>t2</p>";
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
@@ -101,9 +116,11 @@ public class HtmlConfigurationSupportTest {
 
 	@Test
 	public void test_allElementsExcept () {
-		String config = "alt:\n"
-			+ "  ruleTypes: [ATTRIBUTE_TRANS]\n"
-			+ "  allElementsExcept: [elem2, elem3]";
+		String config = 
+			"attributes:\n" +
+			"  alt:\n" +
+			"    ruleTypes: [ATTRIBUTE_TRANS]\n" +
+			"    allElementsExcept: [elem2, elem3]";
 		filter.setParameters(new Parameters(config));
 		String snippet = "<elem1 alt='t1'>t2</elem1><elem2 alt='t3'>t4</elem2><elem3 alt='t5'>t6</elem3>";
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
@@ -118,9 +135,11 @@ public class HtmlConfigurationSupportTest {
 
 	@Test
 	public void test_onlyTheseElements () {
-		String config = "alt: \n"
-			+ "   ruleTypes: [ATTRIBUTE_TRANS] \n"
-			+ "   onlyTheseElements: [elem1, elem3]"; // only in elem1 and elem3, not elem2
+		String config = 
+			"attributes:\n" +
+		    "  alt:\n" +
+		    "    ruleTypes: [ATTRIBUTE_TRANS]\n" +
+			"    onlyTheseElements: [elem1, elem3]"; // only in elem1 and elem3, not elem2
 		filter.setParameters(new Parameters(config));
 		String snippet = "<elem1 alt='t1'>t2</elem1><elem2 alt='t3'>t4</elem2><elem3 alt='t5'>t6</elem3>";
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
@@ -137,9 +156,11 @@ public class HtmlConfigurationSupportTest {
 	
 	@Test
 	public void test_translatableAttributes_withCondition () {
-		String config = "p: \n"
-			+ "   ruleTypes: [TEXTUNIT]\n"
-			+ "   translatableAttributes: {alt: [attr1, EQUALS, trans]}";
+		String config = 
+			"elements:\n" +
+			"  p: \n" +
+			"    ruleTypes: [TEXTUNIT]\n" +
+			"    translatableAttributes: {alt: [attr1, EQUALS, trans]}";
 		filter.setParameters(new Parameters(config));
 		String snippet = "<p alt='t1' attr1='NOTRANS'>t2</p><p alt='t-alt' attr1='trans'>t4</p>";
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 2);
@@ -148,9 +169,11 @@ public class HtmlConfigurationSupportTest {
 	
 	@Test
 	public void test_translatableAttributes_with2ORConditions () {
-		String config = "p: \n"
-			+ "   ruleTypes: [TEXTUNIT]\n"
-			+ "   translatableAttributes: {alt: [[attr1, EQUALS, trans], [attr2, EQUALS, 'yes']]}";
+		String config = 
+			"elements:\n" +
+			"  p: \n" +
+			"    ruleTypes: [TEXTUNIT]\n" +
+			"    translatableAttributes: {alt: [[attr1, EQUALS, trans], [attr2, EQUALS, 'yes']]}";
 		filter.setParameters(new Parameters(config));
 		String snippet = "<p alt='t-alt1' attr2='yes'>t2</p><p alt='t-alt2' attr1='trans'>t4</p>";
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
@@ -161,10 +184,13 @@ public class HtmlConfigurationSupportTest {
 	
 	@Test
 	public void test_ATTRIBUTE_WRITABLE () {
-		String config = "dir: \n"
-			+ "   ruleTypes: [ATTRIBUTE_WRITABLE]\n"
-			+ "p:\n"
-			+ "   ruleTypes: [TEXTUNIT]";
+		String config = 
+			"attributes:\n" +
+			"  dir: \n" +
+			"    ruleTypes: [ATTRIBUTE_WRITABLE]\n" +
+			"elements:\n" +
+			"  p:\n" +
+			"    ruleTypes: [TEXTUNIT]"; 
 		filter.setParameters(new Parameters(config));
 		String snippet = "<p dir='rtl'>t1</p><pre dir='ltr'>t2</pre>";
 		// p is defined as TEXTUNIT so the property is with the TU
@@ -178,6 +204,29 @@ public class HtmlConfigurationSupportTest {
 		assertEquals("ltr", dp.getSourceProperty("dir").getValue());
 	}
 
+	@Test
+	public void test_regex_ATTRIBUTE_WRITABLE () {
+		String config = 
+			"attributes:\n" +
+			"  '.+': \n" +
+			"    ruleTypes: [ATTRIBUTE_WRITABLE]\n" +
+			"elements:\n" +
+			"  '.+':\n" +
+			"    ruleTypes: [TEXTUNIT]";
+		filter.setParameters(new Parameters(config));
+		String snippet = "<p dir='rtl'>t1</p><pre dir='ltr'>t2</pre>";
+		// p is defined as TEXTUNIT so the property is with the TU
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		assertEquals("t1", tu.getSource().toString());
+		assertNotNull(tu.getSource().getProperty("dir"));
+		assertEquals("rtl", tu.getSource().getProperty("dir").getValue());
+		// pre is also defined as TEXTUNIT 
+		TextUnit tu2 = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 2);
+		assertEquals("t2", tu2.getSource().toString());
+		assertNotNull(tu2.getSource().getProperty("dir"));
+		assertEquals("ltr", tu2.getSource().getProperty("dir").getValue());
+	}
+	
 	private ArrayList<Event> getEvents(String snippet,
 		LocaleId srcLang,
 		LocaleId trgLang)

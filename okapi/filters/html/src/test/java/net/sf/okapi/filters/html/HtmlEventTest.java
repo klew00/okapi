@@ -21,7 +21,6 @@ package net.sf.okapi.filters.html;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
-import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.LocaleId;

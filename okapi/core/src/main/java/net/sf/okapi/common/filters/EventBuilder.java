@@ -1168,7 +1168,9 @@ public class EventBuilder {
 	 */
 	public void setTextUnitName(String name) {
 		TextUnit tu = peekMostRecentTextUnit();
-		tu.setName(name);
+		if (tu != null) {
+			tu.setName(name);
+		}
 	}
 
 	/**
@@ -1179,7 +1181,9 @@ public class EventBuilder {
 	 */
 	public void setTextUnitType(String type) {
 		TextUnit tu = peekMostRecentTextUnit();
-		tu.setType(type);
+		if (tu != null) {
+			tu.setType(type);
+		}
 	}
 
 	/**
