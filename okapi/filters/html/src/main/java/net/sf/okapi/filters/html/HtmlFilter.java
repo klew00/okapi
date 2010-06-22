@@ -80,9 +80,8 @@ public class HtmlFilter extends AbstractMarkupFilter {
 		getEventBuilder().setCollapseWhitespace(
 				!isPreserveWhitespace() && getConfig().isCollapseWhitespace());
 		if (getConfig().isCollapseWhitespace()) {
-			LOGGER
-					.log(Level.FINE,
-							"By default the HTML filter will collapse whitespace unless overridden in the configuration"); //$NON-NLS-1$
+			LOGGER.log(Level.FINE,
+					"By default the HTML filter will collapse whitespace unless overridden in the configuration"); //$NON-NLS-1$
 		}
 		getEventBuilder().initializeCodeFinder(getConfig().isUseCodeFinder(),
 				getConfig().getCodeFinderRules());
