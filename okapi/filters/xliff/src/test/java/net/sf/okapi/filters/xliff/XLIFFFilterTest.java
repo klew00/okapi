@@ -21,6 +21,7 @@
 package net.sf.okapi.filters.xliff;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import net.sf.okapi.common.Event;
@@ -37,6 +38,7 @@ import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
@@ -274,7 +276,25 @@ public class XLIFFFilterTest {
 			+ "<target>T1<ph ts=\"&lt;&quot;>'\" id=\"1\" x=\"&lt;&quot;>'\">code</ph></target>"
 			+ "</trans-unit></body>"
 			+ "</file></xliff>";
-		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
+		
+		
+		//--This section tests the codesToString--
+		ArrayList<Event> events = getEvents(snippet);
+		for(Event ev : events){
+			if(ev.getResource() instanceof TextUnit){
+				TextUnit tu = ev.getTextUnit();
+				TextContainer tc = tu.getSource();
+				for (Iterator<TextPart> it = tc.iterator(); it.hasNext(); ) {
+				    TextPart tp = it.next();  
+				    TextFragment tf= tp.getContent();
+				    String codeStr = Code.codesToString(tf.getCodes());
+				    //--make TextFragment.codes public for the test--
+				    //tf.codes = (ArrayList<Code>) Code.stringToCodes(codeStr);
+				}
+			}
+		}
+		
+		assertEquals(expected, FilterTestDriver.generateOutput(events,
 			locFR, filter.createSkeletonWriter(), filter.getEncoderManager()));
 
 		expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
