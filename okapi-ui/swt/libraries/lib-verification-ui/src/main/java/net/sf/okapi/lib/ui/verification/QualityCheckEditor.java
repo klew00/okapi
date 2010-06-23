@@ -612,7 +612,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		try {
 			ParametersEditor editor = new ParametersEditor();
 			BaseContext context = new BaseContext();
-			context.setObject("help", help);
+			if ( help != null ) context.setObject("help", help);
 			context.setObject("shell", shell);
 			editor.edit(session.getParameters(), false, context);
 		}

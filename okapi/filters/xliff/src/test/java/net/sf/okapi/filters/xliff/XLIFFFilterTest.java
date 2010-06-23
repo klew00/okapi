@@ -277,19 +277,28 @@ public class XLIFFFilterTest {
 			+ "</trans-unit></body>"
 			+ "</file></xliff>";
 		
-		
 		//--This section tests the codesToString--
 		ArrayList<Event> events = getEvents(snippet);
-		for(Event ev : events){
-			if(ev.getResource() instanceof TextUnit){
+		for ( Event ev : events ) {
+			if ( ev.getResource() instanceof TextUnit ) {
 				TextUnit tu = ev.getTextUnit();
 				TextContainer tc = tu.getSource();
-				for (Iterator<TextPart> it = tc.iterator(); it.hasNext(); ) {
+				for ( Iterator<TextPart> it=tc.iterator(); it.hasNext(); ) {
 				    TextPart tp = it.next();  
-				    TextFragment tf= tp.getContent();
-				    String codeStr = Code.codesToString(tf.getCodes());
-				    //--make TextFragment.codes public for the test--
-				    //tf.codes = (ArrayList<Code>) Code.stringToCodes(codeStr);
+				    TextFragment tf = tp.getContent();
+				    List<Code> oriCodes = tf.getCodes();
+				    String codeStr = Code.codesToString(oriCodes);
+				    // Compare the codes
+				    List<Code> newCodes = Code.stringToCodes(codeStr);
+				    assertEquals(oriCodes.size(), newCodes.size());
+				    for ( int i=0; i<oriCodes.size(); i++ ) {
+				    	Code oriCode = oriCodes.get(i);
+				    	Code newCode = newCodes.get(i);
+				    	assertEquals(oriCode.getData(), newCode.getData());
+				    	assertEquals(oriCode.getId(), newCode.getId());
+				    	assertEquals(oriCode.getTagType(), newCode.getTagType());
+				    	assertEquals(oriCode.getOuterData(), newCode.getOuterData());
+				    }
 				}
 			}
 		}

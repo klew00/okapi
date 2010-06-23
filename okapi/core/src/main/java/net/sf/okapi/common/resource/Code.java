@@ -79,9 +79,9 @@ public class Code {
 	public static String codesToString (List<Code> list) {
 		StringBuilder tmp = new StringBuilder();
 		for ( Code code : list ) {
-			tmp.append(String.format("%s\u009C%d\u009C%s\u009C%s\u009C%s\u009C%s\u009D",
-				code.tagType, code.id, code.type, code.data,
-				code.flag, annotationsToString(code.annotations)));
+			tmp.append(String.format("%s\u009C%d\u009C%s\u009C%s\u009C%d\u009C%s\u009C%s\u009D",
+				code.tagType, code.id, code.type, code.data, code.flag,
+				code.outerData, annotationsToString(code.annotations)));
 		}
 		return tmp.toString();
 	}
@@ -145,8 +145,9 @@ public class Code {
 				Code code = new Code(TagType.valueOf(tmpFields[0]), tmpFields[2], tmpFields[3]);
 				code.id = Integer.valueOf(tmpFields[1]);
 				code.flag = Integer.valueOf(tmpFields[4]);
-				if ( tmpFields.length > 5 ) {
-					code.annotations = stringToAnnotations(tmpFields[5]);
+				code.outerData = tmpFields[5];
+				if ( tmpFields.length > 6 ) {
+					code.annotations = stringToAnnotations(tmpFields[6]);
 				}
 				else code.annotations = null;
 				list.add(code);

@@ -435,7 +435,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private void editPattern (boolean add) {
 		addMode = add;
 		dialog = new Shell(shell, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
-		dialog.setText(add ? "Add Patter Entry" : "Edit Pattern Entry");
+		dialog.setText(add ? "Add Pattern Entry" : "Edit Pattern Entry");
 		dialog.setMinimumSize(400, 200);
 		dialog.setSize(dialog.getMinimumSize());
 		dialog.setLayout(new GridLayout());
