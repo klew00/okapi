@@ -47,6 +47,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
@@ -197,58 +198,87 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		
 		Composite cmpTmp = new Composite(tfTmp, SWT.NONE);
 		cmpTmp.setLayout(new GridLayout());
+
+		Group grpTU = new Group(cmpTmp, SWT.NONE);
+		grpTU.setText("Text unit verifications");
+		grpTU.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		grpTU.setLayout(new GridLayout());
 		
-		Label label = new Label(cmpTmp, SWT.NONE);
-		label.setText("Flag the following potential issues:");
+		Button chkTmp = new Button(grpTU, SWT.CHECK);
+		chkTmp.setText("[Always On] Warn if an entry does not have a translation");
+		chkTmp.setSelection(true);
+		chkTmp.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				((Button)e.getSource()).setSelection(true);
+			};
+		});
 		
-		chkTargetSameAsSource = new Button(cmpTmp, SWT.CHECK);
-		chkTargetSameAsSource.setText("Target is the same as the source (when it has text)");
+		chkLeadingWS = new Button(grpTU, SWT.CHECK);
+		chkLeadingWS.setText("Warn if target has a difference in leading white spaces");
+		
+		chkTrailingWS = new Button(grpTU, SWT.CHECK);
+		chkTrailingWS.setText("Warn if target entry has a difference in trailing white spaces");
+
+		Group grpSeg = new Group(cmpTmp, SWT.NONE);
+		grpSeg.setText("Segment verifications");
+		grpSeg.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		grpSeg.setLayout(new GridLayout());
+		
+		chkTmp = new Button(grpSeg, SWT.CHECK);
+		chkTmp.setText("[Always On] Warn if a source segment does not have a corresponding target");
+		chkTmp.setSelection(true);
+		chkTmp.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				((Button)e.getSource()).setSelection(true);
+			};
+		});
+		
+		chkEmptyTarget = new Button(grpSeg, SWT.CHECK);
+		chkEmptyTarget.setText("Warn if a target segment is empty (and its source is not)");
+
+		chkTargetSameAsSource = new Button(grpTU, SWT.CHECK);
+		chkTargetSameAsSource.setText("Warn if target segment is the same as its source (for segments with text)");
 		chkTargetSameAsSource.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				updateTargetSameAsSourceWithCodes();
 			};
 		});
-		GridData gdTmp = new GridData();
-		gdTmp.verticalIndent = 16;
-		chkTargetSameAsSource.setLayoutData(gdTmp);
-		
-		chkTargetSameAsSourceWithCodes = new Button(cmpTmp, SWT.CHECK);
+		chkTargetSameAsSource.setLayoutData(new GridData());
+
+		chkTargetSameAsSourceWithCodes = new Button(grpTU, SWT.CHECK);
 		chkTargetSameAsSourceWithCodes.setText("Include the codes in the comparison");
-		gdTmp = new GridData();
+		GridData gdTmp = new GridData();
 		gdTmp.horizontalIndent = 16;
 		chkTargetSameAsSourceWithCodes.setLayoutData(gdTmp);
 		
-		chkCodeDifference = new Button(cmpTmp, SWT.CHECK);
-		chkCodeDifference.setText("Code differences between source and target");
+		chkCodeDifference = new Button(grpSeg, SWT.CHECK);
+		chkCodeDifference.setText("Warn if there is a code difference between source and target segments");
 
-		chkEmptyTarget = new Button(cmpTmp, SWT.CHECK);
-		chkEmptyTarget.setText("Empty translation");
+		
+		//--- Language Tool
+		
+		Group grpLT = new Group(cmpTmp, SWT.NONE);
+		grpLT.setText("LanguageTool verifications");
+		grpLT.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		grpLT.setLayout(new GridLayout());
 
-		chkLeadingWS = new Button(cmpTmp, SWT.CHECK);
-		chkLeadingWS.setText("Leading white spaces");
-		
-		chkTrailingWS = new Button(cmpTmp, SWT.CHECK);
-		chkTrailingWS.setText("Trailing white spaces");
-		
-		chkCheckWithLT = new Button(cmpTmp, SWT.CHECK);
+		chkCheckWithLT = new Button(grpLT, SWT.CHECK);
 		chkCheckWithLT.setText("Perform the verifications provided by the LanguageTool server");
-		gdTmp = new GridData();
-		gdTmp.verticalIndent = 16;
-		chkCheckWithLT.setLayoutData(gdTmp);
+		chkCheckWithLT.setLayoutData(new GridData());
 		chkCheckWithLT.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				updateLTOptions();
 			};
 		});
 		
-		label = new Label(cmpTmp, SWT.NONE);
+		Label label = new Label(grpLT, SWT.NONE);
 		label.setText("Server URL (e.g. http://localhost:8081/):");
-		edServerURL = new Text(cmpTmp, SWT.BORDER);
+		edServerURL = new Text(grpLT, SWT.BORDER);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalSpan = 2;
 		edServerURL.setLayoutData(gdTmp);
 		
-		chkTranslateLTMsg = new Button(cmpTmp, SWT.CHECK);
+		chkTranslateLTMsg = new Button(grpLT, SWT.CHECK);
 		chkTranslateLTMsg.setText("Auto-translate the messages from the LanguageTool checker");
 		gdTmp = new GridData();
 		gdTmp.horizontalSpan = 2;
@@ -259,7 +289,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			};
 		});
 		
-		Composite grpTmp = new Composite(cmpTmp, SWT.NONE);
+		Composite grpTmp = new Composite(grpLT, SWT.NONE);
 		grpTmp.setLayout(new GridLayout(2, false));
 		
 		label = new Label(grpTmp, SWT.NONE);

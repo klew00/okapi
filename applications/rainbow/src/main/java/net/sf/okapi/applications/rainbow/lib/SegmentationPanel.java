@@ -173,6 +173,16 @@ public class SegmentationPanel extends Composite {
 		updateDisplay();
 	}
 
+	public boolean validate () {
+		if ( !chkSegment.getSelection() ) return true;
+		if ( edSourceSRX.getText().trim().length() == 0 ) {
+			Dialogs.showError(getShell(), "You must specify an SRX document for the source.", null);
+			edSourceSRX.setFocus();
+			return false;
+		}
+		return true;
+	}
+	
 	public boolean getSegment () {
 		return chkSegment.getSelection();
 	}

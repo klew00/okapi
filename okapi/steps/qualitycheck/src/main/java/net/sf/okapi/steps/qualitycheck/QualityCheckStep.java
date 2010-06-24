@@ -143,7 +143,8 @@ public class QualityCheckStep extends BasePipelineStep {
 			session.startProcess(targetLocale, rootDir);
 			initDone = true;
 		}
-		session.processStartDocument((StartDocument)event.getResource());
+		// No pre-existing disabled issues: sigList = null
+		session.processStartDocument((StartDocument)event.getResource(), null);
 		return event;
 	}
 	

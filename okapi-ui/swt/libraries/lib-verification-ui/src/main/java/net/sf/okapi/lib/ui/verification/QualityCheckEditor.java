@@ -40,8 +40,15 @@ import net.sf.okapi.lib.verification.QualityCheckSession;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.DropTarget;
+import org.eclipse.swt.dnd.DropTargetAdapter;
+import org.eclipse.swt.dnd.DropTargetEvent;
+import org.eclipse.swt.dnd.FileTransfer;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
@@ -82,6 +89,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 	private Combo cbDisplay;
 	private Button btRefreshDisplay;
 	private Combo cbTypes;
+	private int waitCount;
 	
 	private int displayType = 1;
 	private int issueType = 0;
@@ -119,12 +127,10 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		help = helpParam;
 		config = new UserConfiguration();
 		config.load(APPNAME);
-		long id = Thread.currentThread().getId();
 		// If no parent is defined, create a new display and shell
 		if ( parent == null ) {
 			// Start the application
 			Display dispMain = new Display();
-			long t2 = dispMain.getThread().getId();
 			parent = new Shell(dispMain);
 		}
 
@@ -241,6 +247,16 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				addDocumentFromUI(null);
+            }
+		});
+
+		new MenuItem(dropMenu, SWT.SEPARATOR);
+
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "file.sessionsettings"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				editSessionSettings();
             }
 		});
 
@@ -368,6 +384,25 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		sashMain.setSashWidth(4);
 		//Not needed: sashMain.setBackground(shell.getDisplay().getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW));
 		
+		// Drop target for the table
+		DropTarget dropTarget = new DropTarget(sashMain, DND.DROP_DEFAULT | DND.DROP_COPY | DND.DROP_MOVE);
+		dropTarget.setTransfer(new FileTransfer[]{FileTransfer.getInstance()}); 
+		dropTarget.addDropListener(new DropTargetAdapter() {
+			public void drop (DropTargetEvent e) {
+				FileTransfer FT = FileTransfer.getInstance();
+				if ( FT.isSupportedType(e.currentDataType) ) {
+					String[] paths = (String[])e.data;
+					if ( paths != null ) {
+						for ( String path : paths ) {
+							if ( !addDocumentFromUI(path) ) {
+								break; // Stop now
+							}
+						}
+					}
+				}
+			}
+		});
+
 		//--- Edit panel
 		
 		Composite cmpTmp = new Composite(sashMain, SWT.NONE);
@@ -422,6 +457,15 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 			}
 		});
 		
+		Button btSession = new Button(cmpButtons, SWT.PUSH);
+		btSession.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		btSession.setText("Session...");
+		btSession.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				editSessionSettings();
+			}
+		});
+		
 		Button btOptions = new Button(cmpButtons, SWT.PUSH);
 		btOptions.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		btOptions.setText("Options...");
@@ -472,7 +516,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 			}
 		});
 
-		tblIssues = new Table(cmpTmp, SWT.BORDER | SWT.SINGLE | SWT.FULL_SELECTION | SWT.CHECK);
+		tblIssues = new Table(cmpTmp, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION | SWT.CHECK);
 		tblIssues.setHeaderVisible(true);
 		tblIssues.setLinesVisible(true);
 		gdTmp = new GridData(GridData.FILL_BOTH);
@@ -496,12 +540,26 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		tblIssues.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				if ( event.detail == SWT.CHECK ) {
-					tblIssues.setSelection((TableItem)event.item); // Force selection to move if needed
+					// Do not force the selection: tblIssues.setSelection((TableItem)event.item);
 					Issue issue = (Issue)event.item.getData();
 					issue.enabled = !issue.enabled;
 				}
 				updateCurrentIssue();
             }
+		});
+
+		tblIssues.addKeyListener(new KeyAdapter() {
+			public void keyPressed(KeyEvent e) {
+				if ( e.character == ' ' ) {
+					TableItem si = tblIssues.getItem(tblIssues.getSelectionIndex());
+					for ( TableItem ti : tblIssues.getSelection() ) {
+						if ( ti == si ) continue; // Skip focused item because it will get set by SelectionAdapter()
+						Issue issue = (Issue)ti.getData();
+						issue.enabled = !issue.enabled;
+						ti.setChecked(issue.enabled);
+					}
+				}
+			}
 		});
 
 		issuesModel = new IssuesTableModel();
@@ -534,7 +592,19 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		updateCurrentIssue();
 	}
 	
-	private void addDocumentFromUI (String path) {
+	private void editSessionSettings () {
+		try {
+			SessionSettingsDialog dlg = new SessionSettingsDialog(shell, help);
+			dlg.setData(session);
+			if ( !dlg.showDialog() ) return;
+			
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, "Error adding document.\n"+e.getMessage(), null);
+		}
+	}
+	
+	private boolean addDocumentFromUI (String path) {
 		try {
 			InputDocumentDialog dlg = new InputDocumentDialog(shell, "Add document",
 				session.getFilterConfigurationMapper());
@@ -545,7 +615,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 
 			// Edit
 			Object[] data = dlg.showDialog();
-			if ( data == null ) return;
+			if ( data == null ) return false;
 			
 			// Create the raw document to add to the session
 			URI uri = (new File((String)data[0])).toURI();
@@ -558,9 +628,11 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 				session.setSourceLocale((LocaleId)data[3]);
 				session.setTargetLocale((LocaleId)data[4]);
 			}
+			return true;
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, "Error adding document.\n"+e.getMessage(), null);
+			return false;
 		}
 	}
 	
@@ -591,11 +663,32 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 			tmp = issue.oriTarget;
 			edTarget.setText(tmp);
 		}
-		statusBar.setCounter(n, tblIssues.getItemCount());
+		statusBar.setCounter(n, tblIssues.getItemCount(), session.getIssues().size());
+	}
+
+	private void startWaiting (String text) {
+		if ( ++waitCount > 1 ) {
+			shell.getDisplay().update();
+			return;
+		}
+		if ( text != null ) statusBar.setInfo(text);
+		//startLogWasRequested = p_bStartLog;
+		//if ( startLogWasRequested ) log.beginProcess(null);
+		shell.getDisplay().update();
+	}
+
+	private void stopWaiting () {
+		waitCount--;
+		if ( waitCount < 1 ) statusBar.clearInfo();
+		shell.getDisplay().update();
+		//if ( log.inProgress() ) log.endProcess(null); 
+		//if ( startLogWasRequested && ( log.getErrorAndWarningCount() > 0 )) log.show();
+		//startLogWasRequested = false;
 	}
 
 	private void checkAll () {
 		try {
+			startWaiting("Checking all documents...");
 			session.refreshAll();
 			issuesModel.setIssues(session.getIssues());
 			issuesModel.updateTable(0, displayType, issueType);
@@ -605,6 +698,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		}
 		finally {
 			updateCurrentIssue();
+			stopWaiting();
 		}
 	}
 
@@ -630,11 +724,15 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 				if ( path == null ) return;
 				qcsPath = path;
 			}
+			startWaiting("Saving session...");
 			session.saveSession(qcsPath);
 			updateCaption();
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, "Error while saving.\n"+e.getMessage(), null);
+		}
+		finally {
+			stopWaiting();
 		}
 	}
 
@@ -647,6 +745,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 				if ( paths == null ) return;
 				path = paths[0];
 			}
+			startWaiting("Loading session...");
 			session.loadSession(path);
 			issuesModel.updateTable(0, displayType, issueType);
 			qcsPath = path;
@@ -654,6 +753,9 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, "Error while saving.\n"+e.getMessage(), null);
+		}
+		finally {
+			stopWaiting();
 		}
 	}
 

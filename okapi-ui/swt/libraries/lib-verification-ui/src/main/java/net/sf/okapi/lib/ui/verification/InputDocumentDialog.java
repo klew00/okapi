@@ -82,7 +82,7 @@ public class InputDocumentDialog {
 		shell.pack();
 		Point size = shell.getSize();
 		shell.setMinimumSize(size);
-		if ( size.x < 450 ) size.x = 450;
+		if ( size.x < 600 ) size.x = 600;
 		shell.setSize(size);
 		Dialogs.centerWindow(shell, parent);
 	}

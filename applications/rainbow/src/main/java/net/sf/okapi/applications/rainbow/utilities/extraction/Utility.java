@@ -65,15 +65,19 @@ public class Utility extends BaseFilterDrivenUtility {
 		// Load SRX file(s) and create segmenters if required
 		if ( params.preSegment ) {
 			String src = params.sourceSRX.replace(VAR_PROJDIR, projectDir);
-			String trg = params.targetSRX.replace(VAR_PROJDIR, projectDir);
 			SRXDocument doc = new SRXDocument();
 			doc.loadRules(src);
 			if ( doc.hasWarning() ) logger.warning(doc.getWarning());
 			sourceSeg = doc.compileLanguageRules(srcLang, null);
-			//TODO: This is not working cross-platform!
-			if ( !src.equalsIgnoreCase(trg) ) {
-				doc.loadRules(trg);
-				if ( doc.hasWarning() ) logger.warning(doc.getWarning());
+
+			// Load the target only if needed
+			if ( !Util.isEmpty(params.targetSRX) ) {
+				String trg = params.targetSRX.replace(VAR_PROJDIR, projectDir);
+				//TODO: This is not working cross-platform!
+				if ( !src.equalsIgnoreCase(trg) ) {
+					doc.loadRules(trg);
+					if ( doc.hasWarning() ) logger.warning(doc.getWarning());
+				}
 			}
 			targetSeg = doc.compileLanguageRules(trgLang, null);
 		}

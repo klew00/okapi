@@ -76,6 +76,10 @@ public class QualityCheckSession {
 		URI uri = rawDoc.getInputURI();
 		rawDocs.put(uri, rawDoc);
 	}
+	
+	public List<RawDocument> getDocuments () {
+		return new ArrayList<RawDocument>(rawDocs.values());
+	}
 
 	public void setFilterConfigurationMapper (IFilterConfigurationMapper fcMapper) {
 		this.fcMapper = fcMapper;
@@ -134,8 +138,8 @@ public class QualityCheckSession {
 				switch ( event.getEventType() ) {
 				case START_DOCUMENT:
 					StartDocument sd = (StartDocument)event.getResource();
-					clearIssues(Util.makeId(sd.getName()));
-					processStartDocument(sd);
+					List<String> sigList = clearIssues(Util.makeId(sd.getName()), true);
+					processStartDocument(sd, sigList);
 					break;
 				case TEXT_UNIT:
 					processTextUnit(event.getTextUnit());
@@ -148,14 +152,28 @@ public class QualityCheckSession {
 		}
 	}
 	
-	private void clearIssues (String docId) {
+	private List<String> clearIssues (String docId,
+		boolean generateSigList)
+	{
+		ArrayList<String> sigList = null;
+		// Create signature list if needed
+		if ( generateSigList ) {
+			sigList = new ArrayList<String>();
+		}
+		
 		Iterator<Issue> iter = issues.iterator();
 		while ( iter.hasNext() ) {
 			Issue issue = iter.next();
 			if ( issue.docId.equals(docId) ) {
+				// Generate signature if the issue is disabled
+				if ( generateSigList && !issue.enabled ) {
+					sigList.add(issue.getSignature());
+				}
+				// Remove issue
 				iter.remove();
 			}
 		}
+		return sigList;
 	}
 	
 	public void saveSession (String path) {
@@ -232,8 +250,10 @@ public class QualityCheckSession {
 		checker.startProcess(locId, rootDir, params, issues);
 	}
 	
-	public void processStartDocument (StartDocument startDoc) {
-		checker.processStartDocument(startDoc);
+	public void processStartDocument (StartDocument startDoc,
+		List<String> sigList)
+	{
+		checker.processStartDocument(startDoc, sigList);
 	}
 
 	public void processTextUnit (TextUnit textUnit) {

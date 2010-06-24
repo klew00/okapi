@@ -51,7 +51,7 @@ class StatusBar extends Composite {
 		
 		counterLabel = new CLabel(this, SWT.BORDER | SWT.CENTER);
 		gdTmp = new GridData();
-		gdTmp.widthHint = 100;
+		gdTmp.widthHint = 140;
 		counterLabel.setLayoutData(gdTmp);
 
 		infoLabel = new CLabel(this, SWT.BORDER);
@@ -68,10 +68,15 @@ class StatusBar extends Composite {
 	}
 	
 	void setCounter (int current,
+		int outOf,
 		int total)
 	{
-		if ( current < 0 ) counterLabel.setText(""); //$NON-NLS-1$
-		else counterLabel.setText(String.format("%d / %d", current+1, total)); //$NON-NLS-1$
+		if ( current < 0 ) {
+			counterLabel.setText(String.format("0 / 0 / T=%d", total)); //$NON-NLS-1$
+		}
+		else {
+			counterLabel.setText(String.format("%d / %d / T=%d", current+1, outOf, total)); //$NON-NLS-1$
+		}
 	}
 
 }

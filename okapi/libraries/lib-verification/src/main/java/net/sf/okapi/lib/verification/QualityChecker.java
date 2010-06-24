@@ -31,8 +31,6 @@ import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.connectors.google.GoogleMTConnector;
-import net.sf.okapi.lib.translation.IQuery;
 
 class QualityChecker {
 
@@ -43,6 +41,7 @@ class QualityChecker {
 	private Parameters params;
 	private List<Issue> issues;
 	private String currentDocId;
+	private List<String> sigList;
 
 	void startProcess (LocaleId targetLocale,
 		String rootDir,
@@ -88,12 +87,15 @@ class QualityChecker {
 		}
 	}
 
-	void processStartDocument (StartDocument sd) {
+	void processStartDocument (StartDocument sd,
+		List<String> sigList)
+	{
 		if ( repWriter != null ) {
 			repWriter.writeRawXML("<hr />");
 			repWriter.writeElementString("p", "Input: "+sd.getName());
 		}
 		currentDocId = Util.makeId(sd.getName());
+		this.sigList = sigList;
 	}
 	
 	void processTextUnit (TextUnit tu) {
@@ -404,6 +406,11 @@ class QualityChecker {
 		issue.enabled = true;
 		issue.oriSource = srcOri;
 		issue.oriTarget = trgOri;
+		
+		if ( sigList != null ) {
+			// Disable any issue for which we have the signature in the list
+			issue.enabled = !sigList.contains(issue.getSignature());
+		}
 
 		if ( repWriter != null ) {
 			String position = String.format("ID=%s", tu.getId());

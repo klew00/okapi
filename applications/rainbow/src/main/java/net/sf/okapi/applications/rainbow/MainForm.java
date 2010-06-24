@@ -73,6 +73,8 @@ import net.sf.okapi.common.ui.UserConfiguration;
 import net.sf.okapi.common.ui.filters.FilterConfigurationsDialog;
 import net.sf.okapi.common.plugins.PluginsManager;
 import net.sf.okapi.lib.ui.segmentation.SRXEditor;
+import net.sf.okapi.lib.ui.verification.QualityCheckEditor;
+import net.sf.okapi.lib.verification.IQualityCheckEditor;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DND;
@@ -526,6 +528,13 @@ public class MainForm { //implements IParametersProvider {
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				editSegmentationRules(null);
+			}
+		});
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "tools.qualitycheck"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				runQualityChecker();
 			}
 		});
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
@@ -2166,6 +2175,21 @@ public class MainForm { //implements IParametersProvider {
 		}
 		finally {
 			if ( dlg != null ) dlg.dispose();
+		}
+	}
+	
+	private void runQualityChecker () {
+		IQualityCheckEditor dlg = null;
+		try {
+			dlg = new QualityCheckEditor();
+			dlg.initialize(shell, true, help, fcMapper, null);
+			dlg.edit();
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+		finally {
+			if ( dlg != null ) dlg = null;
 		}
 	}
 	
