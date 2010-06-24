@@ -55,6 +55,28 @@ public class HtmlSnippetsTest {
 	}
 
 	@Test
+	public void testInlineCodesStorage () {
+		String snippet = "<p>Before <b>bold</b> <a href=\"there\"/> after.</p>";
+		ArrayList<Event> events = getEventsDefault(snippet);
+		TextUnit tu = FilterTestDriver.getTextUnit(events, 1);
+		List<Code> codes1 = tu.getSource().getFirstContent().getCodes();
+		String tmp = Code.codesToString(codes1);
+		List<Code> codes2 = Code.stringToCodes(tmp);
+		assertEquals(codes1.size(), codes2.size());
+		for ( int i=0; i<codes1.size(); i++ ) {
+			Code code1 = codes1.get(i);
+			Code code2 = codes2.get(i);
+			assertEquals(code1.getData(), code2.getData());
+			assertEquals(code1.getId(), code2.getId());
+			assertEquals(code1.getOuterData(), code2.getOuterData());
+			assertEquals(code1.getType(), code2.getType());
+			assertEquals(code1.getTagType(), code2.getTagType());
+			assertEquals(code1.isCloneable(), code2.isCloneable());
+			assertEquals(code1.isDeleteable(), code2.isDeleteable());
+		}
+	}
+
+	@Test
 	public void testTitleInP () {
 		String snippet = "<p title=\"Text1\">Text2</p>";
 		ArrayList<Event> events = getEventsDefault(snippet);

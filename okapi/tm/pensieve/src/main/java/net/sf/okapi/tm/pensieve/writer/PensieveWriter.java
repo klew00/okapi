@@ -249,8 +249,12 @@ public class PensieveWriter implements ITmWriter {
 		return new Field(fieldType.name(), frag.getCodedText(), store, index);
 	}
 
-	private Field createCodesField(TranslationUnitField field, TextFragment frag,
-			Field.Store store, Field.Index index) {
-		return new Field(field.name(), Code.codesToString(frag.getCodes()), store, index);
+	private Field createCodesField(TranslationUnitField field,
+		TextFragment frag,
+		Field.Store store,
+		Field.Index index)
+	{
+		// We don't keep the outerData in the codes
+		return new Field(field.name(), Code.codesToString(frag.getCodes(), true), store, index);
 	}
 }

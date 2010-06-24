@@ -72,16 +72,34 @@ public class Code {
 
 	/**
 	 * Helper method to convert a list of codes into a string.
+	 * This method preserves the outerData in the codes.
 	 * @param list the list of the codes to flatten into a string.
 	 * @return the string with all the codes.
+	 * @see #codesToString(List, boolean)
 	 * @see #stringToCodes(String)
 	 */
 	public static String codesToString (List<Code> list) {
+		return codesToString(list, false); // Keep outerData
+	}
+	
+	/**
+	 * Helper method to convert a list of codes into a string.
+	 * This method allows optionally to strip the outerData in the codes. 
+	 * @param list the list of the codes to flatten into a string.
+	 * @param stripOuterData true to remove the outerData in the storage string, false to keep it. 
+	 * @return the string with all the codes.
+	 * @see #codesToString(List)
+	 * @see #stringToCodes(String)
+	 */
+	public static String codesToString (List<Code> list,
+		boolean stripOuterData)
+	{
 		StringBuilder tmp = new StringBuilder();
 		for ( Code code : list ) {
 			tmp.append(String.format("%s\u009C%d\u009C%s\u009C%s\u009C%d\u009C%s\u009C%s\u009D",
 				code.tagType, code.id, code.type, code.data, code.flag,
-				code.outerData, annotationsToString(code.annotations)));
+				stripOuterData ? null : code.outerData,
+				annotationsToString(code.annotations)));
 		}
 		return tmp.toString();
 	}
@@ -134,6 +152,7 @@ public class Code {
 	 * @param data the storage string to convert (can be null).
 	 * @return a list of the codes in the storage string.
 	 * @see #codesToString(List)
+	 * @see #codesToString(List, boolean)
 	 */
 	public static List<Code> stringToCodes (String data) {
 		ArrayList<Code> list = new ArrayList<Code>();
@@ -145,7 +164,7 @@ public class Code {
 				Code code = new Code(TagType.valueOf(tmpFields[0]), tmpFields[2], tmpFields[3]);
 				code.id = Integer.valueOf(tmpFields[1]);
 				code.flag = Integer.valueOf(tmpFields[4]);
-				code.outerData = tmpFields[5];
+				if ( !tmpFields[5].equals("null") ) code.outerData = tmpFields[5];
 				if ( tmpFields.length > 6 ) {
 					code.annotations = stringToAnnotations(tmpFields[6]);
 				}

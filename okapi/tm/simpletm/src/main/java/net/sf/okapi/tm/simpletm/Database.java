@@ -240,11 +240,12 @@ public class Database {
 				ISegments trgSegs = trgCont.getSegments();
 				for ( Segment srcSeg : srcCont.getSegments() ) {
 					pstm.setString(2, srcSeg.text.getCodedText());
-					pstm.setString(3, Code.codesToString(srcSeg.text.getCodes()));
+					// We don't keep the outerData of the codes
+					pstm.setString(3, Code.codesToString(srcSeg.text.getCodes(), true));
 					Segment trgSeg = trgSegs.get(srcSeg.id);
 					if ( trgSeg != null ) { // Skip source without target
 						pstm.setString(4, trgSeg.text.getCodedText());
-						pstm.setString(5, Code.codesToString(trgSeg.text.getCodes()));
+						pstm.setString(5, Code.codesToString(trgSeg.text.getCodes(), true));
 						pstm.execute();
 						count++;
 						segIndex++;
@@ -257,9 +258,10 @@ public class Database {
 				pstm.setString(1, tu.getName());
 				pstm.setString(2, tu.getType());
 				pstm.setString(3, srcCont.getCodedText());
-				pstm.setString(4, Code.codesToString(srcCont.getFirstContent().getCodes()));
+				// We don't keep the outrerData
+				pstm.setString(4, Code.codesToString(srcCont.getFirstContent().getCodes(), true));
 				pstm.setString(5, trgCont.getCodedText());
-				pstm.setString(6, Code.codesToString(trgCont.getFirstContent().getCodes()));
+				pstm.setString(6, Code.codesToString(trgCont.getFirstContent().getCodes(), true));
 				pstm.setString(7, grpName);
 				pstm.setString(8, fileName);
 				pstm.execute();
