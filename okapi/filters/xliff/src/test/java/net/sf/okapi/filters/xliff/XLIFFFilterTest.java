@@ -331,6 +331,24 @@ public class XLIFFFilterTest {
 	}
 
 	@Test
+	public void testOutputAlTrans () {
+		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><xliff version=\"1.2\">\r"
+			+ "<file source-language=\"en\" target-language=\"fr\" datatype=\"x-test\" original=\"file.ext\">"
+			+ "<body>"
+			+ "<trans-unit id=\"1\"><source>t1</source>"
+			+ "<target>translated t1</target>"
+			+ "<alt-trans>"
+			+ "<source>alt source <bpt id=\"1\">{</bpt>t1<ept id=\"1\">}</ept></source>"
+			+ "<target>alt target <mrk mtype=\"term\"><bpt id=\"1\">{</bpt>t1<ept id=\"1\">}</ept></mrk></target>"
+			+ "</alt-trans>"
+			+ "</trans-unit>"
+			+ "</body>"
+			+ "</file></xliff>";
+		assertEquals(expected, FilterTestDriver.generateOutput(createTUWithAltTrans(),
+			locFR, filter.createSkeletonWriter(), filter.getEncoderManager()));
+	}
+
+	@Test
 	public void testMixedAlTrans () {
 		TextUnit tu = FilterTestDriver.getTextUnit(createTUWithMixedAltTrans(), 1);
 		assertNotNull(tu);
@@ -768,7 +786,7 @@ public class XLIFFFilterTest {
 	private ArrayList<Event> createTUWithAltTrans () {
 		String snippet = "<?xml version=\"1.0\"?>\r"
 			+ "<xliff version=\"1.2\">\r"
-			+ "<file source-language=\"en\" datatype=\"x-test\" original=\"file.ext\">"
+			+ "<file source-language=\"en\" target-language=\"fr\" datatype=\"x-test\" original=\"file.ext\">"
 			+ "<body>"
 			+ "<trans-unit id=\"1\"><source>t1</source>"
 			+ "<target>translated t1</target>"

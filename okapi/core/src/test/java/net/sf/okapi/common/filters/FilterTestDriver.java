@@ -556,42 +556,26 @@ public class FilterTestDriver {
 		LocaleId trgLang)
 	{
 		GenericSkeletonWriter writer = new GenericSkeletonWriter();
-		return generateOutput(list, trgLang, writer, encoderManager);
-//		StringBuilder tmp = new StringBuilder();
-//		for (Event event : list) {
-//			switch (event.getEventType()) {
-//			case START_DOCUMENT:
-//				tmp.append(writer.processStartDocument(trgLang, "UTF-8", null, encoderManager,
-//					(StartDocument) event.getResource()));
-//				break;
-//			case END_DOCUMENT:
-//				tmp.append(writer.processEndDocument((Ending)event.getResource()));
-//				break;
-//			case START_SUBDOCUMENT:
-//				tmp.append(writer.processStartSubDocument((StartSubDocument)event.getResource()));
-//				break;
-//			case END_SUBDOCUMENT:
-//				tmp.append(writer.processEndSubDocument((Ending)event.getResource()));
-//				break;
-//			case TEXT_UNIT:
-//				TextUnit tu = (TextUnit)event.getResource();
-//				tmp.append(writer.processTextUnit(tu));
-//				break;
-//			case DOCUMENT_PART:
-//				DocumentPart dp = (DocumentPart)event.getResource();
-//				tmp.append(writer.processDocumentPart(dp));
-//				break;
-//			case START_GROUP:
-//				StartGroup startGroup = (StartGroup)event.getResource();
-//				tmp.append(writer.processStartGroup(startGroup));
-//				break;
-//			case END_GROUP:
-//				tmp.append(writer.processEndGroup((Ending) event.getResource()));
-//				break;
-//			}
-//		}
-//		writer.close();
-//		return tmp.toString();
+		return generateOutput(list, trgLang, writer, encoderManager, false);
+	}
+
+	/**
+	 * Creates a string output from a list of events and upper-case the content of the target TUs.
+	 * 
+	 * @param list
+	 *      The list of events.
+	 * @param encoderManager
+	 * 		the encoder manager.
+	 * @param trgLang
+	 *      Code of the target (output) language.
+	 * @return The generated output string
+	 */
+	public static String generateChangedOutput (ArrayList<Event> list,
+		EncoderManager encoderManager,
+		LocaleId trgLang)
+	{
+		GenericSkeletonWriter writer = new GenericSkeletonWriter();
+		return generateOutput(list, trgLang, writer, encoderManager, true);
 	}
 
 	/**
@@ -606,6 +590,24 @@ public class FilterTestDriver {
 		LocaleId trgLang,
 		ISkeletonWriter skelWriter,
 		EncoderManager encoderManager)
+	{
+		return generateOutput(list, trgLang, skelWriter, encoderManager, false);
+	}
+	
+	/**
+	 * Creates a string output from a list of events, using a given ISkeletonWriter.
+	 * @param list the list of events.
+	 * @param trgLang code of the target (output) language.
+	 * @param skelWriter the ISkeletonWriter to use. 
+	 * @param encoderManager the encoder manager.
+	 * @param changeTarget true to change the content of the target TU.
+	 * @return The generated output string.
+	 */
+	public static String generateOutput (ArrayList<Event> list,
+		LocaleId trgLang,
+		ISkeletonWriter skelWriter,
+		EncoderManager encoderManager,
+		boolean changeTarget)
 	{
 		StringBuilder tmp = new StringBuilder();
 		for (Event event : list) {
@@ -625,6 +627,11 @@ public class FilterTestDriver {
 				break;
 			case TEXT_UNIT:
 				TextUnit tu = (TextUnit)event.getResource();
+				if ( changeTarget ) {
+					TextContainer tc = tu.createTarget(trgLang, false, IResource.COPY_ALL);
+					TextFragment tf = tc.getFirstContent();
+					tf.setCodedText(tf.getCodedText().toUpperCase());
+				}
 				tmp.append(skelWriter.processTextUnit(tu));
 				break;
 			case DOCUMENT_PART:

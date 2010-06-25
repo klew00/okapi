@@ -95,7 +95,7 @@ public class RoundTripComparison {
 		}
 		catch ( Throwable e ) {
 			System.err.println(path);
-			System.err.println(e.getMessage());
+			e.printStackTrace();
 			return false;
 		}
 		return true;
