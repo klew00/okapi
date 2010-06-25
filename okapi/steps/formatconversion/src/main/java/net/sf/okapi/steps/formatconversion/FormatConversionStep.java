@@ -47,6 +47,7 @@ public class FormatConversionStep extends BasePipelineStep {
 	private static final int TMX_OUTPUT = 1;
 	private static final int TABLE_OUTPUT = 2;
 	private static final int PENSIEVE_OUTPUT = 3;
+	private static final int CORPUS_OUTPUT = 4;
 	
 	private Parameters params;
 	private IFilterWriter writer;
@@ -120,6 +121,10 @@ public class FormatConversionStep extends BasePipelineStep {
 				outputType = TABLE_OUTPUT;
 				createTableWriter();
 			}
+			else if ( params.getOutputFormat().equals(Parameters.FORMAT_CORPUS) ) {
+				outputType = CORPUS_OUTPUT;
+				createCorpusWriter();
+			}
 			// Start sending event to the writer
 			writer.handleEvent(event);
 			break;
@@ -146,6 +151,9 @@ public class FormatConversionStep extends BasePipelineStep {
 					break;
 				case PENSIEVE_OUTPUT:
 					startPensieveOutput();
+					break;
+				case CORPUS_OUTPUT:
+					startCorpusOutput();
 					break;
 				}
 				writer.handleEvent(event);
@@ -239,6 +247,30 @@ public class FormatConversionStep extends BasePipelineStep {
 		else {
 			if ( params.getAutoExtensions() ) {
 				outFile = new File(inputURI.getPath() + ".tmx");
+			}
+			else {
+				outFile = new File(outputURI);
+			}
+		}
+		writer.setOutput(outFile.getPath());
+		writer.setOptions(targetLocale, "UTF-8");
+		firstOutputCreated = true;
+	}
+
+	private void createCorpusWriter () {
+		writer = new CorpusFilterWriter();
+		//TableFilterWriterParameters options = (TableFilterWriterParameters)writer.getParameters();
+		//options.fromString(params.getFormatOptions());
+	}
+	
+	private void startCorpusOutput () {
+		File outFile;
+		if ( params.getSingleOutput() ) {
+			outFile = new File(Util.fillRootDirectoryVariable(params.getOutputPath(), rootDir));
+		}
+		else {
+			if ( params.getAutoExtensions() ) {
+				outFile = new File(inputURI.getPath() + ".txt"); 
 			}
 			else {
 				outFile = new File(outputURI);

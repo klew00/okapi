@@ -36,6 +36,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public static final String FORMAT_PO = "po";
 	public static final String FORMAT_TABLE = "table";
 	public static final String FORMAT_PENSIEVE = "pensieve";
+	public static final String FORMAT_CORPUS = "corpus";
 	
 	public static final int TRG_TARGETOREMPTY = 0; 
 	public static final int TRG_FORCESOURCE = 1; 
@@ -181,8 +182,10 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public EditorDescription createEditorDescription(ParametersDescription paramDesc) {
 		EditorDescription desc = new EditorDescription("Format Conversion", true, false);
 
-		String[] choices = {FORMAT_PO, FORMAT_TMX, FORMAT_TABLE, FORMAT_PENSIEVE};
-		String[] choicesLabels = {"PO File", "TMX Document", "Tab-Delimited Table", "Pensieve TM"};
+		String[] choices = {FORMAT_PO, FORMAT_TMX, FORMAT_TABLE,
+			FORMAT_PENSIEVE, FORMAT_CORPUS};
+		String[] choicesLabels = {"PO File", "TMX Document", "Tab-Delimited Table",
+			"Pensieve TM", "Parallel Corpus Files"};
 		ListSelectionPart lsp = desc.addListSelectionPart(paramDesc.get(OUTPUTFORMAT), choices);
 		lsp.setChoicesLabels(choicesLabels);
 		
