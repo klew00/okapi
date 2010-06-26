@@ -72,6 +72,7 @@ import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.common.ui.UserConfiguration;
 import net.sf.okapi.common.ui.filters.FilterConfigurationsDialog;
 import net.sf.okapi.common.plugins.PluginsManager;
+import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.lib.ui.segmentation.SRXEditor;
 import net.sf.okapi.lib.ui.verification.QualityCheckEditor;
 import net.sf.okapi.lib.verification.IQualityCheckEditor;
@@ -2181,8 +2182,35 @@ public class MainForm { //implements IParametersProvider {
 	private void runQualityChecker () {
 		IQualityCheckEditor dlg = null;
 		try {
+			saveSurfaceData();
+			// Create the dialog
 			dlg = new QualityCheckEditor();
 			dlg.initialize(shell, true, help, fcMapper, null);
+			// Load the current input to the session (if user wants)
+			if ( prj.getList(0).size() > 0 ) {
+				// Ask to the user first
+				// Ask confirmation
+				MessageBox msgDlg = new MessageBox(shell, SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
+				msgDlg.setMessage(Res.getString("MainForm.askAddDocsToQCSession")); //$NON-NLS-1$
+				msgDlg.setText(Res.getString("MainForm.qcSessionCaption"));
+				switch ( msgDlg.open() ) {
+				case SWT.CANCEL:
+					return; // Stop here
+				case SWT.YES:
+					// Load the documents
+					//TODO: init session
+					for ( Input item : prj.getList(0) ) {
+						String inputPath = prj.getInputRoot(0) + File.separator + item.relativePath;
+						File f = new File(inputPath);
+						RawDocument rd = new RawDocument(f.toURI(), prj.buildSourceEncoding(item),
+							prj.getSourceLanguage(), prj.getTargetLanguage());
+						rd.setFilterConfigId(item.filterConfigId);
+						dlg.addRawDocument(rd);
+					}
+					break;
+				}
+			}
+			// Start the dialog
 			dlg.edit();
 		}
 		catch ( Throwable e ) {

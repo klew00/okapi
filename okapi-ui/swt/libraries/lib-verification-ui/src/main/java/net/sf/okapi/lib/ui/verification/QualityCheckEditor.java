@@ -159,6 +159,9 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		
 		createMenus();
 		createContent();
+		if ( asDialog ) {
+			Dialogs.centerWindow(shell, (Shell)parent);
+		}
 	}
 	
 	public void addRawDocument (RawDocument rawDoc) {
@@ -416,11 +419,13 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		sashEdit.setLayoutData(new GridData(GridData.FILL_BOTH));
 		sashEdit.setSashWidth(2);
 		
-		edSource = new Text(sashEdit, SWT.BORDER);
+		edSource = new Text(sashEdit, SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
 		edSource.setLayoutData(new GridData(GridData.FILL_BOTH));
+		edSource.setEditable(false);
 
-		edTarget = new Text(sashEdit, SWT.BORDER);
+		edTarget = new Text(sashEdit, SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
 		edTarget.setLayoutData(new GridData(GridData.FILL_BOTH));
+		edTarget.setEditable(false);
 		
 		Font font = edSource.getFont();
 		FontData[] fontData = font.getFontData();
@@ -440,6 +445,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalSpan = 4;
 		edMessage.setLayoutData(gdTmp);
+		edMessage.setEditable(false);
 
 		Composite cmpButtons = new Composite(cmpTmp, SWT.NONE);
 		layTmp = new GridLayout(4, true);
@@ -577,9 +583,6 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		if ( startSize.x < 700 ) startSize.x = 700; 
 		if ( startSize.y < 600 ) startSize.y = 600; 
 		shell.setSize(startSize);
-//		if ( asDialog ) {
-//			Dialogs.centerWindow(shell, parent);
-//		}
 		
 		updateCaption();
 		updateDisplayType();

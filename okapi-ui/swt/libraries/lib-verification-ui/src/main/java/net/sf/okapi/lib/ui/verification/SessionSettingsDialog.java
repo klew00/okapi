@@ -30,6 +30,7 @@ import net.sf.okapi.lib.verification.QualityCheckSession;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Group;
@@ -106,7 +107,10 @@ class SessionSettingsDialog {
 		pnlActions.setLayoutData(gdTmp);
 
 		dialog.pack();
-		dialog.setMinimumSize(dialog.getSize());
+		Point size = dialog.getSize();
+		dialog.setMinimumSize(size);
+		if ( size.x < 600 ) size.x = 600;
+		dialog.setSize(size);
 		Dialogs.centerWindow(dialog, parent);
 	}
 
