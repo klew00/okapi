@@ -218,6 +218,14 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		topItem.setMenu(dropMenu);
 		
 		MenuItem menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "file.new"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				newSession();
+            }
+		});
+
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
 		rm.setCommand(menuItem, "file.open"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
@@ -498,9 +506,10 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		cbTypes.add("Missing white spaces"); // All missing whitespace-related issues
 		cbTypes.add("Extra white spaces"); // All extra whitespace-related issues
 		cbTypes.add("Inline codes differents"); // CODE_DIFFERENCE
-		cbTypes.add("Unexpected patterns"); // MISSING_PATTERN
+		cbTypes.add("Unexpected patterns"); // UNEXPECTED_PATTERN
+		cbTypes.add("Suspect patterns"); // SUSPECT_PATTERN
 		cbTypes.add("Warnings from LanguageTool checker"); // LANGUAGETOOL_ERROR
-		cbTypes.setVisibleItemCount(10);
+		cbTypes.setVisibleItemCount(11);
 		cbTypes.setLayoutData(new GridData());
 		cbTypes.select(issueType);
 		cbTypes.addSelectionListener(new SelectionAdapter() {
@@ -766,6 +775,19 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		}
 	}
 
+	private void newSession () {
+		try {
+			session.reset();
+			qcsPath = null;
+			issuesModel.setIssues(session.getIssues());
+			issuesModel.updateTable(0, displayType, issueType);
+			updateCaption();
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+	}
+	
 	private void loadSession (String path) {
 		try {
 			if ( path == null ) {

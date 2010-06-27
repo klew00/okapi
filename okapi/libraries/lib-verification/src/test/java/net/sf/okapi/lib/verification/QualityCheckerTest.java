@@ -243,11 +243,11 @@ public class QualityCheckerTest {
 		session.processTextUnit(tu);
 		List<Issue> issues = session.getIssues();
 		assertEquals(3, issues.size());
-		assertEquals(IssueType.MISSING_PATTERN, issues.get(0).issueType);
+		assertEquals(IssueType.UNEXPECTED_PATTERN, issues.get(0).issueType);
 		assertEquals(9, issues.get(0).srcStart); 
-		assertEquals(IssueType.MISSING_PATTERN, issues.get(1).issueType);
+		assertEquals(IssueType.UNEXPECTED_PATTERN, issues.get(1).issueType);
 		assertEquals(10, issues.get(1).srcStart); 
-		assertEquals(IssueType.MISSING_PATTERN, issues.get(2).issueType);
+		assertEquals(IssueType.UNEXPECTED_PATTERN, issues.get(2).issueType);
 		assertEquals(12, issues.get(2).srcStart); 
 	}
 

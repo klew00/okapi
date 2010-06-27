@@ -47,6 +47,7 @@ public class Parameters extends BaseParameters {
 	private static final String LTTRANSLATIONTARGET = "ltTranslationTarget";
 	private static final String SAVESESSION = "saveSession";
 	private static final String SESSIONPATH = "sessionPath";
+	private static final String DOUBLEDWORD = "doubledWord";
 
 	String outputPath;
 	boolean autoOpen;
@@ -65,11 +66,21 @@ public class Parameters extends BaseParameters {
 	String ltTranslationTarget;
 	boolean saveSession;
 	String sessionPath;
+	boolean doubledWord;
 
 	public Parameters () {
 		reset();
 	}
 	
+
+	public boolean getDoubledWord () {
+		return doubledWord;
+	}
+
+	public void setDoubledWord (boolean doubledWord) {
+		this.doubledWord = doubledWord;
+	}
+
 	public boolean getSaveSession () {
 		return saveSession;
 	}
@@ -225,6 +236,7 @@ public class Parameters extends BaseParameters {
 		ltTranslationTarget = "en";
 		saveSession = true;
 		sessionPath = "${rootDir}/qa-session"+QualityCheckSession.FILE_EXTENSION;
+		doubledWord = true;
 	}
 
 	@Override
@@ -246,6 +258,7 @@ public class Parameters extends BaseParameters {
 		ltTranslationTarget = buffer.getString(LTTRANSLATIONTARGET, ltTranslationTarget);
 		saveSession = buffer.getBoolean(SAVESESSION, saveSession);
 		sessionPath = buffer.getString(SESSIONPATH, sessionPath);
+		doubledWord = buffer.getBoolean(DOUBLEDWORD, doubledWord);
 		// Patterns
 		checkPatterns = buffer.getBoolean(CHECKPATTERNS, checkPatterns);
 		int count = buffer.getInteger(PATTERNCOUNT, 0);
@@ -275,6 +288,7 @@ public class Parameters extends BaseParameters {
 		buffer.setString(LTTRANSLATIONTARGET, ltTranslationTarget);
 		buffer.setBoolean(SAVESESSION, saveSession);
 		buffer.setString(SESSIONPATH, sessionPath);
+		buffer.setBoolean(DOUBLEDWORD, doubledWord);
 		// Patterns
 		buffer.setBoolean(CHECKPATTERNS, checkPatterns);
 		buffer.setInteger(PATTERNCOUNT, patterns.size());

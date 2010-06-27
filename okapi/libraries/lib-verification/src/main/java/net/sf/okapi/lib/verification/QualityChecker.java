@@ -22,6 +22,7 @@ package net.sf.okapi.lib.verification;
 
 import java.util.List;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
@@ -40,6 +41,7 @@ class QualityChecker {
 	private List<Issue> issues;
 	private String currentDocId;
 	private List<String> sigList;
+	private Pattern patDoubledWords;
 
 	void startProcess (LocaleId targetLocale,
 		Parameters params,
@@ -62,6 +64,8 @@ class QualityChecker {
 			ltConn.initialize(targetLocale, params.getServerURL(), params.translateLTMsg,
 				params.ltTranslationSource, params.ltTranslationTarget);
 		}
+		
+		patDoubledWords = Pattern.compile("\\b(\\w+)\\s+\\1\\b", Pattern.CASE_INSENSITIVE);
 	}
 
 	void processStartDocument (StartDocument sd,
@@ -129,6 +133,9 @@ class QualityChecker {
 			if ( params.getCheckPatterns() ) {
 				checkPatterns(srcSeg, trgSeg, tu);
 			}
+			
+			// check all suspect patterns
+			checkSuspectPatterns(srcSeg, trgSeg, tu);
 			
 			// Run a check with LanguageTool connector
 			if ( params.getCheckWithLT() ) {
@@ -300,9 +307,25 @@ class QualityChecker {
 				j--;
 			}
 		}
-		
+
 	}
 
+	private void checkSuspectPatterns (Segment srcSeg,
+		Segment trgSeg,
+		TextUnit tu)
+	{
+		String trgCText = trgSeg.text.getCodedText();
+		
+		if ( params.getDoubledWord() ) {
+			Matcher m = patDoubledWords.matcher(trgCText);
+			while ( m.find() ) {
+				reportIssue(IssueType.SUSPECT_PATTERN, tu, srcSeg.getId(),
+					String.format("Double word: \"%s\" found in the target.", m.group()),
+					0, -1, m.start(), m.end(),
+					srcSeg.toString(), trgSeg.toString());
+			}
+		}
+	}
 
 	private void checkPatterns (Segment srcSeg,
 		Segment trgSeg,
@@ -344,13 +367,12 @@ class QualityChecker {
 					trgCText.delete(start, end);
 				}
 				else { // Generate an issue
-					reportIssue(IssueType.MISSING_PATTERN, tu, srcSeg.getId(),
+					reportIssue(IssueType.UNEXPECTED_PATTERN, tu, srcSeg.getId(),
 						String.format("The source part '%s' has no correspondance in the target.", srcPart),
 						srcM.start(), -1, start, -1,
 						srcSeg.toString(), trgSeg.toString());
 				}
 			}
-			
 		}
 	}
 

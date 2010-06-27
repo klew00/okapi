@@ -77,6 +77,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private TextAndBrowsePanel pnlOutputPath;
 	private Button chkCodeDifference;
 	private Button chkPatterns;
+	private Button chkDoubledWord;
 	private Table table;
 	private Button btAdd;
 	private Button btEdit;
@@ -257,7 +258,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		});
 		chkTargetSameAsSource.setLayoutData(new GridData());
 
-		chkTargetSameAsSourceWithCodes = new Button(grpTU, SWT.CHECK);
+		chkTargetSameAsSourceWithCodes = new Button(grpSeg, SWT.CHECK);
 		chkTargetSameAsSourceWithCodes.setText("Include the codes in the comparison");
 		gdTmp = new GridData();
 		gdTmp.horizontalIndent = 16;
@@ -266,15 +267,21 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		chkCodeDifference = new Button(grpSeg, SWT.CHECK);
 		chkCodeDifference.setText("Warn if there is a code difference between source and target segments");
 
+		chkDoubledWord = new Button(grpSeg, SWT.CHECK);
+		chkDoubledWord.setText("Warn on doubled words (e.g. \"This [is is an example\")");
 		
-		//--- Language Tool
-		
-		Group grpLT = new Group(cmpTmp, SWT.NONE);
-		grpLT.setText("LanguageTool verifications");
-		grpLT.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		grpLT.setLayout(new GridLayout());
+		TabItem tiTmp = new TabItem(tfTmp, SWT.NONE);
+		tiTmp.setText("General");
+		tiTmp.setControl(cmpTmp);
 
-		chkCheckWithLT = new Button(grpLT, SWT.CHECK);
+		
+		//--- Language Tool tab
+		
+		cmpTmp = new Composite(tfTmp, SWT.NONE);
+		cmpTmp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		cmpTmp.setLayout(new GridLayout());
+
+		chkCheckWithLT = new Button(cmpTmp, SWT.CHECK);
 		chkCheckWithLT.setText("Perform the verifications provided by the LanguageTool server");
 		chkCheckWithLT.setLayoutData(new GridData());
 		chkCheckWithLT.addSelectionListener(new SelectionAdapter() {
@@ -283,17 +290,16 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			};
 		});
 		
-		Label label = new Label(grpLT, SWT.NONE);
+		Label label = new Label(cmpTmp, SWT.NONE);
 		label.setText("Server URL (e.g. http://localhost:8081/):");
-		edServerURL = new Text(grpLT, SWT.BORDER);
+		edServerURL = new Text(cmpTmp, SWT.BORDER);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.horizontalSpan = 2;
 		edServerURL.setLayoutData(gdTmp);
 		
-		chkTranslateLTMsg = new Button(grpLT, SWT.CHECK);
+		chkTranslateLTMsg = new Button(cmpTmp, SWT.CHECK);
 		chkTranslateLTMsg.setText("Auto-translate the messages from the LanguageTool checker");
 		gdTmp = new GridData();
-		gdTmp.horizontalSpan = 2;
+		gdTmp.verticalIndent = 16;
 		chkTranslateLTMsg.setLayoutData(gdTmp);
 		chkTranslateLTMsg.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -301,7 +307,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			};
 		});
 		
-		Composite grpTmp = new Composite(grpLT, SWT.NONE);
+		Composite grpTmp = new Composite(cmpTmp, SWT.NONE);
 		grpTmp.setLayout(new GridLayout(2, false));
 		
 		label = new Label(grpTmp, SWT.NONE);
@@ -324,8 +330,8 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		gdTmp.widthHint = 80;
 		edLTTranslationTarget.setLayoutData(gdTmp);
 
-		TabItem tiTmp = new TabItem(tfTmp, SWT.NONE);
-		tiTmp.setText("General");
+		tiTmp = new TabItem(tfTmp, SWT.NONE);
+		tiTmp.setText("LanguageTool");
 		tiTmp.setControl(cmpTmp);
 
 
@@ -721,6 +727,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		edLTTranslationSource.setText(params.getLtTranslationSource());
 		edLTTranslationTarget.setText(params.getLtTranslationTarget());
 		chkPatterns.setSelection(params.getCheckPatterns());
+		chkDoubledWord.setSelection(params.getDoubledWord());
 		setPatternsData(params.getPatterns());
 		updateTargetSameAsSourceWithCodes();
 		updatePatterns();
@@ -789,6 +796,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		params.setTrailingWS(chkTrailingWS.getSelection());
 		params.setEmptyTarget(chkEmptyTarget.getSelection());
 		params.setTargetSameAsSource(chkTargetSameAsSource.getSelection());
+		params.setDoubledWord(chkDoubledWord.getSelection());
 		if ( chkTargetSameAsSourceWithCodes.isEnabled() ) {
 			params.setTargetSameAsSourceWithCodes(chkTargetSameAsSourceWithCodes.getSelection());
 		}

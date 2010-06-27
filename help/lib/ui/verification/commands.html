@@ -22,15 +22,15 @@
 		<li><a href="#Open">Open Session</a></li>
 		<li><a href="#Save">Save Session</a></li>
 		<li><a href="#SaveAs">Save Session As</a></li>
-		<li>Add Document</li>
-		<li>Session Settings</li>
+		<li><a href="#AddDocument">Add Document</a></li>
+		<li><a href="#SessionSettings">Session Settings</a></li>
 		<li><a href="#Exit">Exit</a></li>
 	</ul>
 	</li>
-	<li>Issues<ul>
-		<li>Options</li>
-		<li>Check All</li>
-		<li>Generate Report</li>
+	<li><a href="#Issues">Issues</a><ul>
+		<li><a href="#IssuesOptions">Options</a></li>
+		<li><a href="#CheckAll">Check All</a></li>
+		<li><a href="#GenerateReport">Generate Report</a></li>
 	</ul>
 	</li>
 	<li><a href="#helpMenu">Help</a><ul>
@@ -62,17 +62,33 @@ you to choose one.</p>
 <p>Shortcut: <kbd>Ctrl+S</kbd></p>
 <h3><a name="SaveAs"></a>Save Session As</h3>
 <p>Saves the current session under a new name.</p>
+<h3><a name="AddDocument"></a>Add Document</h3>
+<p>Adds a document to the list of documents to check in this session. You can 
+also add a document by:</p>
+<ul>
+	<li>dropping the file onto the issue list of the main window.</li>
+	<li>opening the <cite><a href="sessionsettings.html">Session Settings</a></cite> 
+	dialog box and use the <cite>Add</cite> button there.</li>
+</ul>
+<h3><a name="SessionSettings"></a>Session Settings</h3>
+<p>Opens the <cite><a href="sessionsettings.html">Session Settings</a></cite> 
+dialog box, where you can set the documents to process and other options.</p>
 <h3><a name="Exit"></a>Exit</h3>
 <p>Exits the editor. If you have a modified un-saved document already opened, 
 the tool will ask you if you want to save your changes before.</p>
 <p>Shortcut: <kbd>Alt+F4</kbd></p>
-<h2>Issues</h2>
-<h3>Options</h3>
-<p>TODO</p>
-<h3>Check All</h3>
-<p>TODO</p>
-<h3>Generate Report</h3>
-<p>TODO</p>
+<h2><a name="Issues"></a>Issues</h2>
+<h3><a name="IssuesOptions"></a>Options</h3>
+<p>Opens the <cite><a href="parameterseditor.html">Quality Check Options</a></cite> 
+dialog box, where you specify the types of checks to perform.</p>
+<h3><a name="CheckAll"></a>Check All</h3>
+<p>Perform all the checked currently selected for all the documents currently in 
+the session.</p>
+<p>Shortcut: <kbd>F5</kbd></p>
+<h3><a name="GenerateReport"></a>Generate Report</h3>
+<p>Generates a report of all issues (disabled issues are not included in the 
+report). The path of the report is specified in the <cite>
+<a href="parameterseditor.html">Quality Check Options</a></cite> dialog box.</p>
 <h2><a name="helpMenu"></a>Help</h2>
 <h3><a name="HelpTopics"></a>Help Topics</h3>
 <p>Opens the main help page for this application.</p>

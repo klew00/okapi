@@ -58,7 +58,7 @@ public class QualityCheckSession {
 	private String rootDir;
 	
 	public QualityCheckSession () {
-		resetData();
+		reset();
 	}
 	
 	public List<Issue> getIssues () {
@@ -111,7 +111,7 @@ public class QualityCheckSession {
 		this.targetLocale = targetLocale;
 	}
 
-	private void resetData () {
+	public void reset () {
 		rawDocs = new HashMap<URI, RawDocument>();
 		issues = new ArrayList<Issue>();
 		params = new Parameters();
@@ -212,7 +212,7 @@ public class QualityCheckSession {
 	}
 	
 	public void loadSession (String path) {
-		resetData();
+		reset();
 		// Temporary code, waiting for DB
 		DataInputStream dis = null;
 		try {

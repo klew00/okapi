@@ -96,11 +96,14 @@ class IssuesTableModel {
 				case CODE_DIFFERENCE:
 					if ( issueType != 7 ) continue;
 					break;
-				case MISSING_PATTERN:
+				case UNEXPECTED_PATTERN:
 					if ( issueType != 8 ) continue;
 					break;
-				case LANGUAGETOOL_ERROR:
+				case SUSPECT_PATTERN:
 					if ( issueType != 9 ) continue;
+					break;
+				case LANGUAGETOOL_ERROR:
+					if ( issueType != 10 ) continue;
 					break;
 				default:
 					continue;

@@ -13,6 +13,7 @@ ant -f build_okapi-apps.xml -Dplatform=gtk2-linux-x86
 chmod a+x dist_gtk2-linux-x86/tikal.sh
 chmod a+x dist_gtk2-linux-x86/rainbow.sh
 chmod a+x dist_gtk2-linux-x86/ratel.sh
+chmod a+x dist_gtk2-linux-x86/checkmate.sh
 
 cd ../../applications/integration-tests
 mvn clean integration-test
