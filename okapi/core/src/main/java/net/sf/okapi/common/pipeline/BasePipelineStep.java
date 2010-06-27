@@ -276,4 +276,5 @@ public abstract class BasePipelineStep implements IPipelineStep {
 	protected Event handleMultiEvent(Event event) {
 		return event;
 	}
+
 }

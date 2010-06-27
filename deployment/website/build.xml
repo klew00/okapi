@@ -23,6 +23,7 @@
 		<replace file="${dist}/downloads.html" token="@okapiappsVersion@" value="${okapiappsVersion}"/>
 		<replace file="${dist}/downloads.html" token="@rainbowVersion@" value="${rainbowVersion}"/>
 		<replace file="${dist}/downloads.html" token="@ratelVersion@" value="${ratelVersion}"/>
+		<replace file="${dist}/downloads.html" token="@checkmateVersion@" value="${checkmateVersion}"/>
 		<replace file="${dist}/downloads.html" token="@tikalVersion@" value="${tikalVersion}"/>
 		
 		<copy todir="${dist}" file="../shared/changes.html"/>

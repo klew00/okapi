@@ -45,6 +45,8 @@ public class Parameters extends BaseParameters {
 	private static final String TRANSLATELTMSG = "translateLTMsg";
 	private static final String LTTRANSLATIONSOURCE = "ltTranslationSource";
 	private static final String LTTRANSLATIONTARGET = "ltTranslationTarget";
+	private static final String SAVESESSION = "saveSession";
+	private static final String SESSIONPATH = "sessionPath";
 
 	String outputPath;
 	boolean autoOpen;
@@ -61,11 +63,29 @@ public class Parameters extends BaseParameters {
 	boolean translateLTMsg;
 	String ltTranslationSource;
 	String ltTranslationTarget;
+	boolean saveSession;
+	String sessionPath;
 
 	public Parameters () {
 		reset();
 	}
 	
+	public boolean getSaveSession () {
+		return saveSession;
+	}
+
+	public void setSaveSession (boolean saveSession) {
+		this.saveSession = saveSession;
+	}
+
+	public String getSessionPath () {
+		return sessionPath;
+	}
+
+	public void setSessionPath (String sessionPath) {
+		this.sessionPath = sessionPath;
+	}
+
 	public String getOutputPath () {
 		return outputPath;
 	}
@@ -203,6 +223,8 @@ public class Parameters extends BaseParameters {
 		translateLTMsg = false;
 		ltTranslationSource = "";
 		ltTranslationTarget = "en";
+		saveSession = true;
+		sessionPath = "${rootDir}/qa-session"+QualityCheckSession.FILE_EXTENSION;
 	}
 
 	@Override
@@ -222,6 +244,8 @@ public class Parameters extends BaseParameters {
 		translateLTMsg = buffer.getBoolean(TRANSLATELTMSG, translateLTMsg);
 		ltTranslationSource = buffer.getString(LTTRANSLATIONSOURCE, ltTranslationSource);
 		ltTranslationTarget = buffer.getString(LTTRANSLATIONTARGET, ltTranslationTarget);
+		saveSession = buffer.getBoolean(SAVESESSION, saveSession);
+		sessionPath = buffer.getString(SESSIONPATH, sessionPath);
 		// Patterns
 		checkPatterns = buffer.getBoolean(CHECKPATTERNS, checkPatterns);
 		int count = buffer.getInteger(PATTERNCOUNT, 0);
@@ -249,6 +273,8 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean(TRANSLATELTMSG, translateLTMsg);
 		buffer.setString(LTTRANSLATIONSOURCE, ltTranslationSource);
 		buffer.setString(LTTRANSLATIONTARGET, ltTranslationTarget);
+		buffer.setBoolean(SAVESESSION, saveSession);
+		buffer.setString(SESSIONPATH, sessionPath);
 		// Patterns
 		buffer.setBoolean(CHECKPATTERNS, checkPatterns);
 		buffer.setInteger(PATTERNCOUNT, patterns.size());

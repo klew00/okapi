@@ -36,6 +36,7 @@ import net.sf.okapi.common.ui.TextAndBrowsePanel;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.lib.verification.Parameters;
 import net.sf.okapi.lib.verification.PatternItem;
+import net.sf.okapi.lib.verification.QualityCheckSession;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlAdapter;
@@ -94,7 +95,14 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Button chkTranslateLTMsg;
 	private Text edLTTranslationSource;
 	private Text edLTTranslationTarget;
+	// Flag to indicate the editor is use for step parameters
+	// We default to true because the step cannot set this option
+	private boolean stepMode = false; // Disabled for now
+	// step-mode fields:
+	private TextAndBrowsePanel pnlSessionPath;
+	private Button chkSaveSession;
 	
+	@Override
 	public boolean edit (IParameters params,
 		boolean readOnly,
 		IContext context)
@@ -103,6 +111,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		try {
 			shell = null;
 			help = (IHelp)context.getObject("help");
+			stepMode = context.getBoolean("stepMode");
 			this.params = (Parameters)params;
 			shell = new Shell((Shell)context.getObject("shell"), SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 			create((Shell)context.getObject("shell"), readOnly);
@@ -150,7 +159,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private void create (Shell parent,
 		boolean readOnly)
 	{
-		shell.setText("Quality Check");
+		shell.setText("Quality Check Options");
 		if ( parent != null ) UIUtil.inheritIcon(shell, parent);
 		GridLayout layTmp = new GridLayout();
 		layTmp.marginBottom = 0;
@@ -165,7 +174,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			public void widgetSelected(SelectionEvent e) {
 				result = false;
 				if ( e.widget.getData().equals("h") ) {
-					if ( help != null ) help.showTopic(this, "qualitycheckstep");
+					if ( help != null ) help.showTopic(this, "parameterseditor");
 					return;
 				}
 				if ( e.widget.getData().equals("o") ) saveData();
@@ -179,10 +188,10 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			shell.setDefaultButton(pnlActions.btOK);
 		}
 
-		setData();
 		shell.pack();
 		shell.setMinimumSize(shell.getSize());
 		Dialogs.centerWindow(shell, parent);
+		setData();
 	}
 	
 	private void createComposite (Composite parent) {
@@ -192,7 +201,10 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 
 		TabFolder tfTmp = new TabFolder(mainComposite, SWT.NONE);
 		tfTmp.setLayout(new GridLayout());
-		tfTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
+		GridData gdTmp = new GridData(GridData.FILL_BOTH);
+		// Auto-size is too high, we need to fix it manually
+		gdTmp.heightHint = 430;
+		tfTmp.setLayoutData(gdTmp);
 
 		//--- General tab
 		
@@ -247,7 +259,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 
 		chkTargetSameAsSourceWithCodes = new Button(grpTU, SWT.CHECK);
 		chkTargetSameAsSourceWithCodes.setText("Include the codes in the comparison");
-		GridData gdTmp = new GridData();
+		gdTmp = new GridData();
 		gdTmp.horizontalIndent = 16;
 		chkTargetSameAsSourceWithCodes.setLayoutData(gdTmp);
 		
@@ -334,7 +346,9 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		table = new Table(cmpTmp, SWT.CHECK | SWT.FULL_SELECTION | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
-		table.setLayoutData(new GridData(GridData.FILL_BOTH));
+		gdTmp = new GridData(GridData.FILL_BOTH);
+//		gdTmp.heightHint = 5;
+		table.setLayoutData(gdTmp);
 		// Update buttons when moving cursor
 		table.addListener(SWT.Selection, new Listener () {
 			public void handleEvent (Event event) {
@@ -440,17 +454,39 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		pnlOutputPath = new TextAndBrowsePanel(cmpTmp, SWT.NONE, false);
 		pnlOutputPath.setSaveAs(true);
 		pnlOutputPath.setTitle("Quality Check Report");
-		pnlOutputPath.setBrowseFilters("HTML Files (*.html;*.htm)\tAll Files (*.*)", "*.html;**.htm\t*.*");
+		pnlOutputPath.setBrowseFilters("HTML Files (*.html;*.htm)\tAll Files (*.*)", "*.html;*.htm\t*.*");
 		gdTmp = new GridData();
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		pnlOutputPath.setLayoutData(gdTmp);
 
 		chkAutoOpen = new Button(cmpTmp, SWT.CHECK);
 		chkAutoOpen.setText("Open the report after completion");
+
+		if ( stepMode ) {
+			chkSaveSession = new Button(cmpTmp, SWT.CHECK);
+			chkSaveSession.setText("Save the session using the following path:");
+			chkSaveSession.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent e) {
+					pnlSessionPath.setEnabled(chkSaveSession.getSelection());
+				}
+			});
+
+			pnlSessionPath = new TextAndBrowsePanel(cmpTmp, SWT.NONE, false);
+			pnlSessionPath.setSaveAs(true);
+			pnlSessionPath.setTitle("Quality Check Session");
+			pnlSessionPath.setBrowseFilters(
+				String.format("Quality Check Sessions (*%s)\tAll Files (*.*)", QualityCheckSession.FILE_EXTENSION),
+				String.format("*%s\t*.*", QualityCheckSession.FILE_EXTENSION));
+			gdTmp = new GridData();
+			gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+			pnlSessionPath.setLayoutData(gdTmp);
+		}
 		
 		tiTmp = new TabItem(tfTmp, SWT.NONE);
 		tiTmp.setText("Output");
 		tiTmp.setControl(cmpTmp);
+		
+		mainComposite.pack();
 	}
 	
 	private boolean showDialog () {
@@ -689,6 +725,12 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		updateTargetSameAsSourceWithCodes();
 		updatePatterns();
 		updateLTOptions();
+		// Step-mode fields
+		if ( stepMode ) {
+			chkSaveSession.setSelection(params.getSaveSession());
+			pnlSessionPath.setText(params.getSessionPath());
+			pnlSessionPath.setEnabled(chkSaveSession.getSelection());
+		}
 	}
 	
 	private void setPatternsData (List<PatternItem> list) {
@@ -705,7 +747,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	}
 
 	private boolean saveData () {
-		if ( pnlOutputPath.getText().length() == 0 ) {
+		if ( pnlOutputPath.getText().trim().length() == 0 ) {
 			Dialogs.showError(shell, "Please, enter a path for the report.", null);
 			pnlOutputPath.setFocus();
 			return false;
@@ -730,6 +772,16 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 				}
 			}
 		}
+		if ( stepMode ) {
+			if ( chkSaveSession.getSelection() ) {
+				if ( pnlSessionPath.getText().trim().length() == 0 ) {
+					Dialogs.showError(shell, "Please, enter a path for the session.", null);
+					pnlSessionPath.setFocus();
+					return false;
+				}
+			}
+		}
+
 		params.setOutputPath(pnlOutputPath.getText());
 		params.setCodeDifference(chkCodeDifference.getSelection());
 		params.setAutoOpen(chkAutoOpen.getSelection());
@@ -749,7 +801,12 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 				params.setLtTranslationTarget(edLTTranslationTarget.getText());
 			}
 		}
-		
+		if ( stepMode ) {
+			params.setSaveSession(chkSaveSession.getSelection());
+			if ( chkSaveSession.getSelection() ) {
+				params.setSessionPath(pnlSessionPath.getText());
+			}
+		}
 		params.setCheckPatterns(chkPatterns.getSelection());
 		params.setPatterns(savePatternsData());
 		result = true;

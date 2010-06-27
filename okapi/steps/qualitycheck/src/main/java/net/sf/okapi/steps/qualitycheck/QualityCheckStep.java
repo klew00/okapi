@@ -66,7 +66,7 @@ public class QualityCheckStep extends BasePipelineStep {
 	@Override
 	public String getDescription () {
 		return "Compare source and target for quality. "
-			+ "Expects: filter events. Sends back: filter events.";
+			+ "Expects: filter events or raw documents. Sends back: filter events or raw document.";
 	}
 
 	@Override
@@ -139,6 +139,7 @@ public class QualityCheckStep extends BasePipelineStep {
 	@Override
 	protected Event handleStartDocument (Event event) {
 		RawDocumentMode = false;
+		isDone = true;
 		if ( !initDone ) {
 			session.startProcess(targetLocale, rootDir);
 			initDone = true;
@@ -162,8 +163,17 @@ public class QualityCheckStep extends BasePipelineStep {
 			editor = null;
 		}
 		else {
-			session.completeProcess();
+			// Generate the report
+			session.generateReport();
 			String finalPath = Util.fillRootDirectoryVariable(session.getParameters().getOutputPath(), rootDir);
+			
+			// save the session if requested
+			if ( session.getParameters().getSaveSession() ) {
+				String sessionPath = Util.fillRootDirectoryVariable(session.getParameters().getSessionPath(), rootDir);
+				session.saveSession(sessionPath);
+			}
+				
+			// Log the info
 			LOGGER.info("\nOutput: " + finalPath);
 			int count = session.getIssues().size();
 			if ( count == 0 ) {
@@ -172,6 +182,8 @@ public class QualityCheckStep extends BasePipelineStep {
 			else {
 				LOGGER.warning(String.format("Number of issues found = %d", count));
 			}
+			
+			// Open the report if requested
 			if ( session.getParameters().getAutoOpen() ) {
 				Util.openURL((new File(finalPath)).getAbsolutePath());
 			}

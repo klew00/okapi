@@ -296,6 +296,14 @@ public class QualityCheckEditor implements IQualityCheckEditor {
             }
 		});
 		
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "issues.generatereport"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				generateReport();
+            }
+		});
+		
 		//=== Help menu
 
 		topItem = new MenuItem(menuBar, SWT.CASCADE);
@@ -689,15 +697,33 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		//startLogWasRequested = false;
 	}
 
+	private void generateReport () {
+		try {
+			startWaiting("Generating report...");
+			session.generateReport();
+			//TODO: get a rootDir
+			String finalPath = Util.fillRootDirectoryVariable(session.getParameters().getOutputPath(), null);
+			if ( session.getParameters().getAutoOpen() ) {
+				Util.openURL((new File(finalPath)).getAbsolutePath());
+			}
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, "Error while generating report.\n"+e.getMessage(), null);
+		}
+		finally {
+			stopWaiting();
+		}
+	}
+
 	private void checkAll () {
 		try {
 			startWaiting("Checking all documents...");
-			session.refreshAll();
+			session.recheckAll();
 			issuesModel.setIssues(session.getIssues());
 			issuesModel.updateTable(0, displayType, issueType);
 		}
 		catch ( Throwable e ) {
-			Dialogs.showError(shell, "Error while refreshing.\n"+e.getMessage(), null);
+			Dialogs.showError(shell, "Error while running the verification.\n"+e.getMessage(), null);
 		}
 		finally {
 			updateCurrentIssue();
@@ -711,6 +737,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 			BaseContext context = new BaseContext();
 			if ( help != null ) context.setObject("help", help);
 			context.setObject("shell", shell);
+			context.setBoolean("stepMode", false); // Not in a step
 			editor.edit(session.getParameters(), false, context);
 		}
 		catch ( Throwable e ) {

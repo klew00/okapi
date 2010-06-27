@@ -102,7 +102,7 @@ public class InputDocumentDialog {
 		LocaleId srcLoc,
 		LocaleId trgLoc)
 	{
-		pnlMain.setDocumentPath(path);
+		pnlMain.setDocumentPath(path==null ? "" : path);
 		pnlMain.setFilterConfigurationId(configId);
 		pnlMain.setEncoding(encoding);
 		pnlMain.setSourceLocale(srcLoc);

@@ -25,7 +25,6 @@ import java.util.regex.Matcher;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.StartDocument;
@@ -35,7 +34,6 @@ import net.sf.okapi.common.resource.TextUnit;
 class QualityChecker {
 
 	private LocaleId trgLoc;
-	private XMLWriter repWriter;
 	private List<PatternItem> patterns;
 	private LanguageToolConnector ltConn;
 	private Parameters params;
@@ -44,33 +42,12 @@ class QualityChecker {
 	private List<String> sigList;
 
 	void startProcess (LocaleId targetLocale,
-		String rootDir,
 		Parameters params,
 		List<Issue> issues)
 	{
 		this.trgLoc = targetLocale;
 		this.params = params;
 		this.issues = issues;
-
-		String finalPath = Util.fillRootDirectoryVariable(params.getOutputPath(), rootDir);
-		repWriter = new XMLWriter(finalPath);
-		repWriter.writeStartDocument();
-		repWriter.writeStartElement("html");
-		repWriter.writeRawXML("<head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />"
-			+ "<title>Quality Check Report</title><style type=\"text/css\">"
-			+ "body { font-family: Verdana; font-size: smaller; }"
-			+ "h1 { font-size: 110%; }"
-			+ "h2 { font-size: 100%; }"
-			+ "h3 { font-size: 100%; }"
-			+ "p.item { font-family: Courier New, courier; font-size: 100%; white-space: pre;"
-			+ "   border: solid 1px; padding: 0.5em; border-color: silver; background-color: whitesmoke; }"
-      		+ "pre { font-family: Courier New, courier; font-size: 100%;"
-      		+ "   border: solid 1px; padding: 0.5em; border-color: silver; background-color: whitesmoke; }"
-			+ "span.hi { background-color: #FFFF00; }"
-			+ "</style></head>");
-		repWriter.writeStartElement("body");
-		repWriter.writeLineBreak();
-		repWriter.writeElementString("h1", "Quality Check Report");
 
 		// Compile the patterns
 		patterns = params.getPatterns();
@@ -90,10 +67,6 @@ class QualityChecker {
 	void processStartDocument (StartDocument sd,
 		List<String> sigList)
 	{
-		if ( repWriter != null ) {
-			repWriter.writeRawXML("<hr />");
-			repWriter.writeElementString("p", "Input: "+sd.getName());
-		}
 		currentDocId = Util.makeId(sd.getName());
 		this.sigList = sigList;
 	}
@@ -186,15 +159,6 @@ class QualityChecker {
 		}
 
 		checkWhiteSpaces(srcOri, trgOri, tu);
-	}
-
-	void completeProcess () {
-		if ( repWriter != null ) {
-			repWriter.writeEndElementLineBreak(); // body
-			repWriter.writeEndElementLineBreak(); // html
-			repWriter.writeEndDocument();
-			repWriter.close();
-		}
 	}
 
 	private void checkInlineCodes (Segment srcSeg,
@@ -410,25 +374,6 @@ class QualityChecker {
 		if ( sigList != null ) {
 			// Disable any issue for which we have the signature in the list
 			issue.enabled = !sigList.contains(issue.getSignature());
-		}
-
-		if ( repWriter != null ) {
-			String position = String.format("ID=%s", tu.getId());
-			if ( tu.getName() != null ) {
-				position += (" ("+tu.getName()+")");
-			}
-			if ( segId != null ) {
-				position += String.format(", segment=%s", segId);
-			}
-			repWriter.writeElementString("p", position+": "+issue.message);
-			
-			repWriter.writeRawXML("<p class=\"item\">");
-			repWriter.writeString("Source: ["+srcOri+"]");
-			repWriter.writeRawXML("<br />");
-			repWriter.writeString("Target: ["+trgOri+"]");
-			repWriter.writeRawXML("</p>");
-
-			repWriter.writeLineBreak();
 		}
 	}
 

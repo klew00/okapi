@@ -35,6 +35,7 @@ import java.util.Map;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
@@ -54,6 +55,7 @@ public class QualityCheckSession {
 	private LocaleId sourceLocale = LocaleId.ENGLISH;
 	private LocaleId targetLocale = LocaleId.FRENCH;
 	private IFilter filter;
+	private String rootDir;
 	
 	public QualityCheckSession () {
 		resetData();
@@ -79,6 +81,10 @@ public class QualityCheckSession {
 	
 	public List<RawDocument> getDocuments () {
 		return new ArrayList<RawDocument>(rawDocs.values());
+	}
+
+	public Map<URI, RawDocument> getDocumentsMap () {
+		return rawDocs;
 	}
 
 	public void setFilterConfigurationMapper (IFilterConfigurationMapper fcMapper) {
@@ -116,16 +122,15 @@ public class QualityCheckSession {
 		return rawDocs.size();
 	}
 	
-	public void refreshAll () {
+	public void recheckAll () {
 		if ( rawDocs.size() == 0 ) return;
 		startProcess(targetLocale, null);
 		for ( RawDocument rd : rawDocs.values() ) {
-			executeRefresh(rd);
+			executeRecheck(rd);
 		}
-		completeProcess();
 	}
 	
-	private void executeRefresh (RawDocument rd) {
+	private void executeRecheck (RawDocument rd) {
 		try {
 			// Process the document
 			filter = fcMapper.createFilter(rd.getFilterConfigId(), filter);
@@ -247,7 +252,8 @@ public class QualityCheckSession {
 	public void startProcess (LocaleId locId,
 		String rootDir)
 	{
-		checker.startProcess(locId, rootDir, params, issues);
+		this.rootDir = rootDir;
+		checker.startProcess(locId, params, issues);
 	}
 	
 	public void processStartDocument (StartDocument startDoc,
@@ -260,8 +266,68 @@ public class QualityCheckSession {
 		checker.processTextUnit(textUnit);
 	}
 
-	public void completeProcess () {
-		checker.completeProcess();
+	public void generateReport () {
+		XMLWriter writer = null;
+		try {
+			// Create the output file
+			String finalPath = Util.fillRootDirectoryVariable(params.getOutputPath(), rootDir);
+			writer = new XMLWriter(finalPath);
+			writer.writeStartDocument();
+			writer.writeStartElement("html");
+			writer.writeRawXML("<head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />"
+				+ "<title>Quality Check Report</title><style type=\"text/css\">"
+				+ "body { font-family: Verdana; font-size: smaller; }"
+				+ "h1 { font-size: 110%; }"
+				+ "h2 { font-size: 100%; }"
+				+ "h3 { font-size: 100%; }"
+				+ "p.item { font-family: Courier New, courier; font-size: 100%; white-space: pre;"
+				+ "   border: solid 1px; padding: 0.5em; border-color: silver; background-color: whitesmoke; }"
+	      		+ "pre { font-family: Courier New, courier; font-size: 100%;"
+	      		+ "   border: solid 1px; padding: 0.5em; border-color: silver; background-color: whitesmoke; }"
+				+ "span.hi { background-color: #FFFF00; }"
+				+ "</style></head>");
+			writer.writeStartElement("body");
+			writer.writeLineBreak();
+			writer.writeElementString("h1", "Quality Check Report");
+
+			// Process the issues
+			String docId = "";
+			for ( Issue issue : issues ) {
+				// Skip disabled issues
+				if ( !issue.enabled ) continue;
+				// Do we start a new input document?
+				if ( !docId.equals(issue.docId) ) {
+					// Ruler only after first input document
+					if ( !docId.isEmpty() ) writer.writeRawXML("<hr />");
+					writer.writeElementString("p", "Input: "+docId);
+					docId = issue.docId;
+				}
+
+				String position = String.format("ID=%s", issue.tuId);
+//				if ( issue.tuName != null ) {
+//					position += (" ("+issue.tuName+")");
+//				}
+				if ( issue.segId != null ) {
+					position += String.format(", segment=%s", issue.segId);
+				}
+				writer.writeElementString("p", position+": "+issue.message);
+				writer.writeRawXML("<p class=\"item\">");
+				writer.writeString("Source: ["+issue.oriSource+"]");
+				writer.writeRawXML("<br />");
+				writer.writeString("Target: ["+issue.oriTarget+"]");
+				writer.writeRawXML("</p>");
+				writer.writeLineBreak();
+
+			} // End of for issues
+
+			// Write end of document
+			writer.writeEndElementLineBreak(); // body
+			writer.writeEndElementLineBreak(); // html
+			writer.writeEndDocument();
+		}
+		finally {
+			if ( writer != null ) writer.close();
+		}
 	}
 
 }

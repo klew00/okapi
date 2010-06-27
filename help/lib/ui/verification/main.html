@@ -1,0 +1,56 @@
+<html>
+
+<head>
+<link rel="stylesheet" type="text/css" href="../../../help.css">
+<meta http-equiv="Content-Language" content="en-us">
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>CheckMate - Main Window</title>
+</head>
+
+<body>
+
+<table border="0" width="100%" cellspacing="0" cellpadding="0">
+	<tr class="head">
+		<td class="head" colspan="2"><h1 class="head">CheckMate</h1>
+		<h2 class="head2">Main Window</h2></td>
+	</tr>
+</table>
+
+<p>The main window is divided in two parts:</p>
+<ul>
+	<li>The upper part shows the source and traget text of the item where the 
+	issue currently selected is located.</li>
+	<li>The lower part shows the list of issues detected. Which issues are 
+	displayed depends on several options.</li>
+</ul>
+<p><cite>Check All</cite> -- Click this button to run the verification on all 
+documents in the session.</p>
+<p><cite>Settings</cite> -- Click this button to open the Session Settings 
+dialog box, where you can add or removed the documents in the session, and edit 
+other parameters of the session.</p>
+<p><cite>Options</cite> -- Click this button to open the Quality Check Options 
+dialog box, where you can specify what checks to perform.</p>
+<p>Which issues are displayed in the list is decided by two filters:</p>
+<ul>
+	<li>The first one selects the types of issue to display: Choose <cite>&lt;All 
+	types of issues&gt;</cite> to display issues of any types.</li>
+	<li>The second one selects where to display enabled and disabled issues. An
+	<b>enabled issue</b> (an <b>issue with a check mark</b>) is an issue that is 
+	concidered valid (i.e. a real problem), while a <b>disabled issue</b> (an 
+	issue <b>without check mark</b>) is an issue that is, in the context where 
+	it occurs, not a problem (i.e. a non-issue), in other words: a false 
+	positive. usually you want to display only the issues that are enabled.</li>
+</ul>
+<p>To toggle the status of a given issue between enabled or disabled, simply 
+check or uncheck its corresponding check mark. You can click on the check box, 
+or select the issue and press the <kbd>Space</kbd> key. You can select multiple 
+issues at the same time by holding the <kbd>Shift</kbd> key pressed while moving 
+the cursor up or down.</p>
+<p><cite>Refresh</cite> -- Click this button to refresh the display of the list 
+of issues. This does not re-process the documents, just refresh the list. This 
+action is done automatically when you change the selection of one of the two 
+listboxes.</p>
+
+</body>
+
+</html>

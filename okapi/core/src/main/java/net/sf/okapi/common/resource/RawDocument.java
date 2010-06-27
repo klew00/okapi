@@ -392,12 +392,28 @@ public class RawDocument implements IResource {
 	}
 
 	/**
+	 * Sets the source locale associated to this document.
+	 * @param locId the locale to set.
+	 */
+	public void setSourceLocale (LocaleId locId) {
+		srcLoc = locId;
+	}
+
+	/**
 	 * Gets the target locale associated to this resource.
 	 * 
 	 * @return the target locale associated to this resource.
 	 */
 	public LocaleId getTargetLocale() {
 		return trgLoc;
+	}
+	
+	/**
+	 * Sets the target locale associated to this document.
+	 * @param locId the locale to set.
+	 */
+	public void setTargetLocale (LocaleId locId) {
+		trgLoc = locId;
 	}
 
 	/**

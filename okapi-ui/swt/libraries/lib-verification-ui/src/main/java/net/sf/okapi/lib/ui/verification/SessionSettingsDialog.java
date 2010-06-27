@@ -20,11 +20,17 @@
 
 package net.sf.okapi.lib.ui.verification;
 
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Map;
+
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
+import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.lib.verification.QualityCheckSession;
 
 import org.eclipse.swt.SWT;
@@ -33,6 +39,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
@@ -57,6 +64,7 @@ class SessionSettingsDialog {
 		dialog.setText("Session Settings");
 		dialog.setLayout(new GridLayout());
 		dialog.setLayoutData(new GridData(GridData.FILL_BOTH));
+		UIUtil.inheritIcon(dialog, parent);
 
 		// Documents
 		
@@ -69,6 +77,13 @@ class SessionSettingsDialog {
 		GridData gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.horizontalSpan = 2;
 		lbDocs.setLayoutData(gdTmp);
+		
+		Button btAdd = UIUtil.createGridButton(grpDocs, SWT.PUSH, "Add...", UIUtil.BUTTON_DEFAULT_WIDTH, 1);
+		btAdd.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				addDocument();
+			}
+		});
 		
 		// Locales
 		
@@ -109,27 +124,74 @@ class SessionSettingsDialog {
 		dialog.pack();
 		Point size = dialog.getSize();
 		dialog.setMinimumSize(size);
-		if ( size.x < 600 ) size.x = 600;
+		if ( size.x < 630 ) size.x = 630;
+		if ( size.y < 400 ) size.y = 400;
 		dialog.setSize(size);
 		Dialogs.centerWindow(dialog, parent);
 	}
 
+	private void addDocument () {
+		try {
+			InputDocumentDialog dlg = new InputDocumentDialog(dialog, "Add document",
+				session.getFilterConfigurationMapper());
+			// Set default data
+			dlg.setData(null, null, "UTF-8", session.getSourceLocale(), session.getTargetLocale());
+			// Lock the locales if we have already documents in the session
+			dlg.setLocalesEditable(lbDocs.getItemCount()==0);
+			// Edit
+			Object[] data = dlg.showDialog();
+			if ( data == null ) return;
+			
+			// Create the raw document to add to the session
+			URI uri = (new File((String)data[0])).toURI();
+			RawDocument rd = new RawDocument(uri, (String)data[2], (LocaleId)data[3], (LocaleId)data[4]);
+			rd.setFilterConfigId((String)data[1]);
+			// Add to list
+			lbDocs.add(formatDocument(rd));
+			lbDocs.select(lbDocs.getItemCount()-1);
+			
+			// If it is the first document: its locales become the default
+			if ( lbDocs.getItemCount() == 1 ) {
+				edSourceLocale.setText(((LocaleId)data[3]).toBCP47());
+				edTargetLocale.setText(((LocaleId)data[4]).toBCP47());
+			}
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(dialog, "Error adding document.\n"+e.getMessage(), null);
+		}
+	}
+	
+	private String formatDocument (RawDocument rd) {
+		return String.format("%s    \t(%s,  %s)", rd.getInputURI().toString(), rd.getFilterConfigId(), rd.getEncoding());
+	}
+	
+	private String[] explodeDocument (String doc) {
+		String[] res = new String[3]; 
+		String tmp[] = doc.split("\t");
+		res[0] = tmp[0].trim(); // the URI
+		tmp = tmp[1].split(",");
+		res[1] = tmp[0].substring(1); // The filter configuration
+		res[2] = tmp[1].trim(); // The encoding
+		res[2] = res[2].substring(0, res[2].length()-1);
+		return res;
+	}
+	
 	public void setData (QualityCheckSession session) {
 		this.session = session;
-		
 		for ( RawDocument rd : session.getDocuments() ) {
-			lbDocs.add(rd.getInputURI().toString());
+			lbDocs.add(formatDocument(rd));
 		}
-		
 		edSourceLocale.setText(session.getSourceLocale().toBCP47());
 		edTargetLocale.setText(session.getTargetLocale().toBCP47());
 	}
 	
 	private boolean saveData () {
 		// Check source locale
+		LocaleId srcLoc;
+		LocaleId trgLoc;
 		String tmp = edSourceLocale.getText();
 		try {
-			LocaleId.fromBCP47(tmp);
+			srcLoc = LocaleId.fromBCP47(tmp);
 		}
 		catch ( Throwable e ) {
 			// Invalid BCP-47 tag
@@ -142,7 +204,7 @@ class SessionSettingsDialog {
 		// Check target locale
 		tmp = edTargetLocale.getText();
 		try {
-			LocaleId.fromBCP47(tmp);
+			trgLoc = LocaleId.fromBCP47(tmp);
 		}
 		catch ( Throwable e ) {
 			// Invalid BCP-47 tag
@@ -152,10 +214,29 @@ class SessionSettingsDialog {
 			return false;
 		}
 		
-		// Save data
-		session.setSourceLocale(LocaleId.fromBCP47(edSourceLocale.getText()));
-		session.setTargetLocale(LocaleId.fromBCP47(edTargetLocale.getText()));
+		// Save locales
+		session.setSourceLocale(srcLoc);
+		session.setTargetLocale(trgLoc);
 		
+		// Save documents
+		Map<URI, RawDocument> docs = session.getDocumentsMap();
+		docs.clear(); // Clear existing list
+		// Add all documents
+		for ( String item : lbDocs.getItems() ) {
+			String[] res = explodeDocument(item);
+			try {
+				URI uri = new URI(res[0]);
+				RawDocument rd = new RawDocument(uri, res[2], srcLoc, trgLoc);
+				rd.setFilterConfigId(res[1]);
+				session.addRawDocument(rd);
+			}
+			catch ( URISyntaxException e ) {
+				Dialogs.showError(dialog,
+					String.format("Invalid URI: %s", res[0]), null);
+				return false;
+			}
+		}
+
 		return true;
 	}
 
