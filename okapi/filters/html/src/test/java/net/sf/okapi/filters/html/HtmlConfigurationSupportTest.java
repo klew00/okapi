@@ -77,6 +77,73 @@ public class HtmlConfigurationSupportTest {
 	}
 
 	@Test
+	public void test_EXCLUDE_with_positive_condition() {
+		String config = 
+			    "elements:\n" +
+				"  pre: \n" +
+			    "    ruleTypes: [EXCLUDE]\n" +
+			    "    conditions: [x, EQUALS, 'true']";
+		filter.setParameters(new Parameters(config));
+		String snippet = "<pre x = \"true\">t1</pre><p>t2</p>";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		assertEquals("t2", tu.getSource().toString());
+	}
+
+	@Test
+	public void test_INLINE_with_positive_condition() {
+		String config = 
+			    "elements:\n" +
+				"  b: \n" +
+			    "    ruleTypes: [INLINE]\n" +
+			    "    conditions: [x, EQUALS, 'true']";
+		filter.setParameters(new Parameters(config));
+		String snippet = "<p><b x=\"true\">t2</b></p>";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		assertEquals("<b x=\"true\">t2</b>", tu.getSource().toString());
+	}
+	
+	@Test
+	public void test_INLINE_without_condition() {
+		String config = 
+			    "elements:\n" +
+				"  b: \n" +
+			    "    ruleTypes: [INLINE]\n" +
+			    "    conditions: [x, EQUALS, 'true']";
+		filter.setParameters(new Parameters(config));
+		String snippet = "<p>t2<b>test</b></p>";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		assertEquals("t2", tu.getSource().toString());
+		tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 2);
+		assertEquals("test", tu.getSource().toString());
+	}
+	
+	@Test
+	public void test_INLINE_with_negative_condition() {
+		String config = 
+			    "elements:\n" +
+				"  b: \n" +
+			    "    ruleTypes: [INLINE]\n" +
+			    "    conditions: [x, EQUALS, 'true']";
+		filter.setParameters(new Parameters(config));
+		String snippet = "<p><b x=\"false\">t2</b></p>";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		assertEquals("t2", tu.getSource().toString());
+	}
+	
+	@Test
+	public void test_EXCLUDE_with_negative_condition() {
+		String config = 
+			    "elements:\n" +
+				"  pre: \n" +
+			    "    ruleTypes: [EXCLUDE]\n" +
+			    "    conditions: [x, EQUALS, 'false']";
+		filter.setParameters(new Parameters(config));
+		String snippet = "<pre x =\"true\">t1</pre><p>t2</p>";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		assertEquals("t1", tu.getSource().toString());
+	}
+	
+	@Test
 	public void test_ATTRIBUTE_ID () {
 		String config = 
 			"attributes:\n" +

@@ -27,12 +27,19 @@ import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
 
 /**
  * Holds the current parser's rule state. State is maintained on separate
- * stacks.
+ * stacks for each type of {@link RULE_TYPE}
+ *  
+ * @author HargraveJE
+ *
  */
 public class ExtractionRuleState {
 
+	/**
+	 * This class carries the rule and other information
+	 * @author HargraveJE
+	 *
+	 */
 	public final class RuleType {
-
 		public String ruleName;
 		public RULE_TYPE ruleType;
 		public String idValue;
@@ -40,106 +47,128 @@ public class ExtractionRuleState {
 		public RuleType(String ruleName, RULE_TYPE ruleType, String idValue) {
 			this.ruleName = ruleName;
 			this.ruleType = ruleType;
-			this.idValue = idValue;
+			this.idValue = idValue;			
+		}
+		
+		public RuleType(String ruleName, RULE_TYPE ruleType) {
+			this.ruleName = ruleName;
+			this.ruleType = ruleType;
+			this.idValue = null;			
 		}
 	}
 
+	// for rules without primary conditions
 	private Stack<RuleType> preserveWhiteSpaceRuleStack;
 	private Stack<RuleType> excludedIncludedRuleStack;
 	private Stack<RuleType> groupRuleStack;
 	private Stack<RuleType> textUnitRuleStack;
+	private Stack<RuleType> inlineRuleStack;
 
 	/**
 	 * 
 	 */
 	public ExtractionRuleState() {
+		reset();
+	}
+
+	public void reset() {
 		preserveWhiteSpaceRuleStack = new Stack<RuleType>();
 		excludedIncludedRuleStack = new Stack<RuleType>();
 		groupRuleStack = new Stack<RuleType>();
 		textUnitRuleStack = new Stack<RuleType>();
-	}
-
-	public void reset() {
+		inlineRuleStack = new Stack<RuleType>();
 	}
 
 	public boolean isGroupState() {
-		if (groupRuleStack.isEmpty())
+		if (groupRuleStack.isEmpty()) {
 			return false;
-		if (groupRuleStack.peek().ruleType == RULE_TYPE.GROUP_ELEMENT)
+		}
+		if (groupRuleStack.peek().ruleType == RULE_TYPE.GROUP_ELEMENT) {
 			return true;
-
+		}
 		return false;
 	}
 
 	public boolean isTextUnitState() {
-		if (textUnitRuleStack.isEmpty())
+		if (textUnitRuleStack.isEmpty()) {
 			return false;
-		if (textUnitRuleStack.peek().ruleType == RULE_TYPE.TEXT_UNIT_ELEMENT)
+		}
+		if (textUnitRuleStack.peek().ruleType == RULE_TYPE.TEXT_UNIT_ELEMENT) {
 			return true;
-
+		}
 		return false;
 	}
 
 	public boolean isExludedState() {
-		if (excludedIncludedRuleStack.isEmpty())
+		if (excludedIncludedRuleStack.isEmpty()) {
 			return false;
-		if (excludedIncludedRuleStack.peek().ruleType == RULE_TYPE.EXCLUDED_ELEMENT)
+		}
+		if (excludedIncludedRuleStack.peek().ruleType == RULE_TYPE.EXCLUDED_ELEMENT) {
 			return true;
-
+		}
 		return false;
 	}
 
 	public boolean isPreserveWhitespaceState() {
-		if (preserveWhiteSpaceRuleStack.isEmpty())
+		if (preserveWhiteSpaceRuleStack.isEmpty()) {
 			return false;
-		if (preserveWhiteSpaceRuleStack.peek().ruleType == RULE_TYPE.PRESERVE_WHITESPACE)
+		}
+		if (preserveWhiteSpaceRuleStack.peek().ruleType == RULE_TYPE.PRESERVE_WHITESPACE) {
 			return true;
-
+		}
 		return false;
 	}
 
 	public void pushPreserverWhitespaceRule(String ruleName) {
 		preserveWhiteSpaceRuleStack.push(new RuleType(ruleName, RULE_TYPE.PRESERVE_WHITESPACE, null));
 	}
-	
-	public void pushPreserverWhitespaceRule(String ruleName, String idValue) {
-		preserveWhiteSpaceRuleStack.push(new RuleType(ruleName, RULE_TYPE.PRESERVE_WHITESPACE, idValue));
-	}
 
-	public RuleType popPreserverWhitespaceRule() {
-		return preserveWhiteSpaceRuleStack.pop();
+	public void pushPreserverWhitespaceRule(String ruleName, RULE_TYPE rule) {
+		preserveWhiteSpaceRuleStack.push(new RuleType(ruleName, RULE_TYPE.PRESERVE_WHITESPACE, null));
 	}
 
 	public void pushExcludedRule(String ruleName) {
 		excludedIncludedRuleStack.push(new RuleType(ruleName, RULE_TYPE.EXCLUDED_ELEMENT, null));
 	}
 
-	public void pushExcludedRule(String ruleName, String idValue) {
-		excludedIncludedRuleStack.push(new RuleType(ruleName, RULE_TYPE.EXCLUDED_ELEMENT, idValue));
+	public void pushExcludedRule(String ruleName, RULE_TYPE rule) {
+		excludedIncludedRuleStack.push(new RuleType(ruleName, rule, null));
 	}
-
+	
 	public void pushIncludedRule(String ruleName) {
 		excludedIncludedRuleStack.push(new RuleType(ruleName, RULE_TYPE.INCLUDED_ELEMENT, null));
 	}
 	
-	public void pushIncludedRule(String ruleName, String idValue) {
-		excludedIncludedRuleStack.push(new RuleType(ruleName, RULE_TYPE.INCLUDED_ELEMENT, idValue));
+	public void pushIncludedRule(String ruleName, RULE_TYPE rule) {
+		excludedIncludedRuleStack.push(new RuleType(ruleName, rule, null));
 	}
 
 	public void pushGroupRule(String ruleName) {
 		groupRuleStack.push(new RuleType(ruleName, RULE_TYPE.GROUP_ELEMENT, null));
 	}
 	
-	public void pushGroupRule(String ruleName, String idValue) {
-		groupRuleStack.push(new RuleType(ruleName, RULE_TYPE.GROUP_ELEMENT, idValue));
+	public void pushGroupRule(String ruleName, RULE_TYPE rule) {
+		groupRuleStack.push(new RuleType(ruleName, rule, null));
 	}
-
+	
+	public void pushInlineRule(String ruleName) {
+		inlineRuleStack.push(new RuleType(ruleName, RULE_TYPE.INLINE_ELEMENT, null));
+	}
+	
+	public void pushInlineRule(String ruleName, RULE_TYPE rule) {
+		inlineRuleStack.push(new RuleType(ruleName, rule, null));
+	}
+	
 	public void pushTextUnitRule(String ruleName) {
 		textUnitRuleStack.push(new RuleType(ruleName, RULE_TYPE.TEXT_UNIT_ELEMENT, null));
 	}
 	
-	public void pushTextUnitRule(String ruleName, String idValue) {
-		textUnitRuleStack.push(new RuleType(ruleName, RULE_TYPE.TEXT_UNIT_ELEMENT, idValue));
+	public void pushTextUnitRule(String ruleName, RULE_TYPE rule, String idValue) {
+		textUnitRuleStack.push(new RuleType(ruleName, rule, idValue));
+	}
+
+	public RuleType popPreserverWhitespaceRule() {
+		return preserveWhiteSpaceRuleStack.pop();
 	}
 
 	public RuleType popExcludedIncludedRule() {
@@ -153,9 +182,37 @@ public class ExtractionRuleState {
 	public RuleType popTextUnitRule() {		
 		return textUnitRuleStack.pop();
 	}
-		
+	
+	public RuleType popInlineRule() {		
+		return inlineRuleStack.pop();
+	}
+
+	public RuleType peekPreserverWhitespaceRule() {
+		return preserveWhiteSpaceRuleStack.peek();
+	}
+
+	public RuleType peekExcludedIncludedRule() {
+		return excludedIncludedRuleStack.peek();
+	}
+
+	public RuleType peekGroupRule() {
+		return groupRuleStack.peek();
+	}
+
+	public RuleType peekTextUnitRule() {		
+		return textUnitRuleStack.peek();
+	}
+	
+	public RuleType peekInlineRule() {		
+		return inlineRuleStack.peek();
+	}
+
 	public void clearTextUnitRules() {
 		textUnitRuleStack.clear();
+	}
+		
+	public void clearInlineRules() {
+		inlineRuleStack.clear();
 	}
 	
 	public String getTextUnitElementName() {

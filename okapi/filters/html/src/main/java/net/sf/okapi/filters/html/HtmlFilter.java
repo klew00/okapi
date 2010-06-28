@@ -122,67 +122,118 @@ public class HtmlFilter extends AbstractMarkupFilter {
 
 	@Override
 	protected void handleEndTag(EndTag endTag) {
-		try {
-			// if in excluded state everything is skeleton including text
-			if (getRuleState().isExludedState()) {
-				addToDocumentPart(endTag.toString());
-				// process these tag types to update parser state
-				switch (getConfig().getElementRuleType(endTag.getName())) {
-				case EXCLUDED_ELEMENT:
-					getRuleState().popExcludedIncludedRule();
-					break;
-				case INCLUDED_ELEMENT:
-					getRuleState().popExcludedIncludedRule();
-					break;
-				}
-				return;
-			}
-
-			switch (getConfig().getElementRuleType(endTag.getName())) {
-			case INLINE_ELEMENT:
-				if (canStartNewTextUnit()) {
-					startTextUnit();
-				}
-				addCodeToCurrentTextUnit(endTag);
-				break;
-			case GROUP_ELEMENT:
-				getRuleState().popGroupRule();
-				endGroup(new GenericSkeleton(endTag.toString()));
-				break;
-			case EXCLUDED_ELEMENT:
-				getRuleState().popExcludedIncludedRule();
-				addToDocumentPart(endTag.toString());
-				break;
-			case INCLUDED_ELEMENT:
-				getRuleState().popExcludedIncludedRule();
-				addToDocumentPart(endTag.toString());
-				break;
-			case TEXT_UNIT_ELEMENT:
-				try {
-					getRuleState().popTextUnitRule();
-				} catch (EmptyStackException e) {
-					// empty stack means the input is not wellformed. 
-					// we try our best to recover by ending the current TextUnit	
-					// The EventBuilder should handle this case where there is an 
-					// TextUnit end tag without a TextUnit. It will simply be turned 
-					// into a DocumentPart
-				}
-				endTextUnit(new GenericSkeleton(endTag.toString()));
-				break;
-			default:
-				addToDocumentPart(endTag.toString());
-				break;
-			}
-		} finally {
-			// does this tag have a PRESERVE_WHITESPACE rule?
-			if (getConfig().isRuleType(endTag.getName(), RULE_TYPE.PRESERVE_WHITESPACE)) {
-				getRuleState().popPreserverWhitespaceRule();
-				setPreserveWhitespace(getRuleState().isPreserveWhitespaceState());
-			}
+		RULE_TYPE ruleType = RULE_TYPE.RULE_NOT_FOUND;
+		
+		// if in excluded state everything is skeleton including text
+		if (getRuleState().isExludedState()) {
+			addToDocumentPart(endTag.toString());
+			updateEndTagRuleState(endTag);
+			return;
 		}
+		
+		ruleType = updateEndTagRuleState(endTag);
+
+		switch (ruleType) {
+		case INLINE_ELEMENT:
+			if (canStartNewTextUnit()) {
+				startTextUnit();
+			}
+			addCodeToCurrentTextUnit(endTag);
+			break;
+		case GROUP_ELEMENT:
+			endGroup(new GenericSkeleton(endTag.toString()));
+			break;
+		case EXCLUDED_ELEMENT:
+			addToDocumentPart(endTag.toString());
+			break;
+		case INCLUDED_ELEMENT:
+			addToDocumentPart(endTag.toString());
+			break;
+		case TEXT_UNIT_ELEMENT:
+			endTextUnit(new GenericSkeleton(endTag.toString()));
+			break;
+		default:
+			addToDocumentPart(endTag.toString());
+			break;
+		} 
 		
 		getEventBuilder().setCollapseWhitespace(
 				!isPreserveWhitespace() && getConfig().isCollapseWhitespace());
+	}
+	
+	@Override
+	/**
+	 * Overridden to support non-wellformed (unbalanced tag exceptions in HTML)
+	 */
+	protected RULE_TYPE updateEndTagRuleState(EndTag endTag) {
+		RULE_TYPE ruleType = getConfig().getElementRuleType(endTag.getName()); 
+		RuleType currentState = null;
+		
+		switch(ruleType) {
+		case INLINE_ELEMENT:
+			try {
+				currentState = getRuleState().popInlineRule();
+				ruleType = currentState.ruleType;
+			} catch (EmptyStackException e) {
+				// empty stack means the inline tags are not wellformed. 
+				// assume the tag is a valid inline tag - even if
+				// it doesn't have a mate
+			}			
+			break;
+		case ATTRIBUTES_ONLY:
+			// TODO: add a rule state for ATTRIBUTE_ONLY rules
+			break;
+		case GROUP_ELEMENT:
+			// must be wellformed - don't check for EmptyStackException
+			currentState = getRuleState().popGroupRule();
+			ruleType = currentState.ruleType;
+			break;
+		case EXCLUDED_ELEMENT:
+			// must be wellformed - don't check for EmptyStackException
+			currentState = getRuleState().popExcludedIncludedRule();
+			ruleType = currentState.ruleType;
+			break;
+		case INCLUDED_ELEMENT:
+			// must be wellformed - don't check for EmptyStackException
+			currentState = getRuleState().popExcludedIncludedRule();
+			ruleType = currentState.ruleType;
+			break;
+		case TEXT_UNIT_ELEMENT:
+			try {
+				currentState = getRuleState().popTextUnitRule();
+				ruleType = currentState.ruleType;
+			} catch (EmptyStackException e) {	
+				// empty stack means the text unit tags are not wellformed. 
+				// we try our best to recover by ending the current TextUnit	
+				// The EventBuilder should handle this case where there is an 
+				// TextUnit end tag without a TextUnit. It will simply be turned 
+				// into a DocumentPart
+			}
+			break;
+		default:				
+			break;
+		}	
+		
+		if (currentState != null) {
+			// if the end tag doesn't match with what is on the stack then assume the default (non-conditional) rule
+			if (!currentState.ruleName.equalsIgnoreCase(endTag.getName())) {
+				ruleType = getConfig().getElementRuleType(endTag.getName());
+				
+				String character = Integer.toString(endTag.getBegin());			
+				LOGGER.log(Level.FINE,
+						"End tag " + endTag.getName() + " and start tag " + currentState.ruleName 
+						+ " do not match at character number " + character);
+			}
+		}
+		
+		// TODO: add conditional support for PRESERVE_WHITESPACE rules
+		// does this tag have a PRESERVE_WHITESPACE rule?
+		if (getConfig().isRuleType(endTag.getName(), RULE_TYPE.PRESERVE_WHITESPACE)) {
+			getRuleState().popPreserverWhitespaceRule();
+			setPreserveWhitespace(getRuleState().isPreserveWhitespaceState());
+		}
+		
+		return ruleType;
 	}
 
 	@Override

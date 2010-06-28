@@ -34,6 +34,7 @@ import net.htmlparser.jericho.Tag;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.filters.abstractmarkup.AbstractMarkupFilter;
 
 /**
  * Defines extraction rules useful for markup languages such as HTML and XML.
@@ -82,6 +83,7 @@ public class TaggedFilterConfiguration {
 	public static final String ATTRIBUTE_READONLY = "ATTRIBUTE_READONLY";
 	public static final String ATTRIBUTES_ONLY = "ATTRIBUTES_ONLY";
 	public static final String ATTRIBUTE_ID = "ATTRIBUTE_ID";
+	public static final String ATTRIBUTE_PRESERVE_WHITESPACE = "ATTRIBUTE_PRESERVE_WHITESPACE";
 
 	public static final String ALL_ELEMENTS_EXCEPT = "allElementsExcept";
 	public static final String ONLY_THESE_ELEMENTS = "onlyTheseElements";
@@ -103,8 +105,88 @@ public class TaggedFilterConfiguration {
 	public static final String ELEMENT_READ_ONLY_ATTRIBUTES = "readOnlyLocalizableAttributes";
 	public static final String ELEMENT_ID_ATTRIBUTES = "idAttributes";
 
+	/**
+	 * {@link AbstractMarkupFilter} rule types. These rules are listed in YAML configuration files 
+	 * and interpreted by the {@link TaggedFilterConfiguration} class. 
+	 * @author HargraveJE
+	 *
+	 */
 	public static enum RULE_TYPE {
-		INLINE_ELEMENT, EXCLUDED_ELEMENT, INCLUDED_ELEMENT, GROUP_ELEMENT, TEXT_UNIT_ELEMENT, TEXT_RUN_ELEMENT, TEXT_MARKER_ELEMENT, PRESERVE_WHITESPACE, SCRIPT_ELEMENT, SERVER_ELEMENT, ATTRIBUTE_TRANS, ATTRIBUTE_WRITABLE, ATTRIBUTE_READONLY, ATTRIBUTES_ONLY, ATTRIBUTE_ID, RULE_FAILED, RULE_NOT_FOUND
+		/**
+		 * Tag that exists inside a text run, i.e., bold, underline etc..
+		 */
+		INLINE_ELEMENT, 
+		/**
+		 * Marks the beginning of an excluded block - 
+		 * all content in this block will be filtered as {@link DocumentPart}s
+		 */
+		EXCLUDED_ELEMENT, 
+		/**
+		 * Used inside EXCLUDED_ELEMENTs to mark exceptions to 
+		 * the excluded rule. Anything marked as INCLUDED_ELEMENT will be filtered normally 
+		 * (i.e, not excluded)   
+		 */
+		INCLUDED_ELEMENT, 
+		/**
+		 * Marks a tag that is converted to an Okapi Group resource.
+		 */
+		GROUP_ELEMENT, 
+		/**
+		 * Marks a tag that is converted to an Okapi TextUnit resource.
+		 */
+		TEXT_UNIT_ELEMENT,
+		/**
+		 * TODO: Used by the OpenXML filter (???)
+		 */
+		TEXT_RUN_ELEMENT,
+		/**
+		 * TODO: Used by the OpenXML filter (???)
+		 */
+		TEXT_MARKER_ELEMENT,
+		/**
+		 * Marks a tag that triggers a preserve whitespace rule.
+		 */
+		PRESERVE_WHITESPACE,
+		/**
+		 * Marks a tag begins or ends a web script (PHP, Perl, VBA etc..)
+		 */
+		SCRIPT_ELEMENT,
+		/**
+		 * Marks a tag that begins or ends a server side content (SSI)
+		 */
+		SERVER_ELEMENT, 
+		/**
+		 * Attribute rule that defines the attribute as translatable.
+		 */
+		ATTRIBUTE_TRANS,
+		/**
+		 * Attribute rule that defines the attribute as writable (or localizable).
+		 */
+		ATTRIBUTE_WRITABLE, 
+		/**
+		 * Attribute rule that defines the attribute as read-only.
+		 */
+		ATTRIBUTE_READONLY,
+		/**
+		 * Attribute rule that defines the attribute marking preserve whitespace state.
+		 */
+		ATTRIBUTE_PRESERVE_WHITESPACE,
+		/**
+		 * Element rule specifies a tag where only the attributes require processing.
+		 */
+		ATTRIBUTES_ONLY, 
+		/**
+		 * Attribute rule that specifies the attribyte has an ID.
+		 */
+		ATTRIBUTE_ID, 
+		/**
+		 * Rule was found but some condition of the rule failed
+		 */
+		RULE_FAILED, 
+		/**
+		 * Rule was not found - default rule.
+		 */
+		RULE_NOT_FOUND
 	};
 
 	private final YamlConfigurationReader configReader;
@@ -179,7 +261,7 @@ public class TaggedFilterConfiguration {
 		return false;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public boolean isRuleType(String ruleName, RULE_TYPE ruleType) {
 		List<Map> rules = configReader.getRules(ruleName.toLowerCase());
 		for (Map rule : rules) {
@@ -236,7 +318,7 @@ public class TaggedFilterConfiguration {
 				.toLowerCase()));
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private RULE_TYPE findMatchingAttributeRuleOnElementRule(String tag,
 			Map<String, String> attributes, String attribute) {
 
@@ -245,6 +327,11 @@ public class TaggedFilterConfiguration {
 		Map elementRule = configReader.getElementRule(tag.toLowerCase());
 		if (elementRule == null) {
 			return RULE_TYPE.RULE_NOT_FOUND;
+		}
+		
+		// test for a conditional rule on this element
+		if (!doesElementRuleConditionApply(elementRule, attributes)) {
+			return RULE_TYPE.RULE_FAILED; 
 		}
 
 		// these attribute rules are mutually exclusive
@@ -306,7 +393,19 @@ public class TaggedFilterConfiguration {
 		return RULE_TYPE.RULE_NOT_FOUND;
 	}
 
-	@SuppressWarnings("unchecked")
+	public RULE_TYPE getConditionalAttributeRuleType(String attribute, Map<String, String> attributes) {
+		RULE_TYPE type = getAttributeRuleType(attribute);
+		if (type != RULE_TYPE.RULE_NOT_FOUND) {
+			if (doesAttributeRuleConditionApply(configReader.getAttributeRule(attribute), attributes)) {
+				return type;
+			} else {
+				return RULE_TYPE.RULE_FAILED;
+			}
+		}		
+		return type;
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public RULE_TYPE getAttributeRuleType(String attribute) {
 		Map rule = configReader.getAttributeRule(attribute.toLowerCase());
 		if (rule != null) {
@@ -319,6 +418,8 @@ public class TaggedFilterConfiguration {
 				return RULE_TYPE.ATTRIBUTE_READONLY;
 			} else if (isRuleType(attribute, RULE_TYPE.ATTRIBUTE_ID, ruleTypes)) {
 				return RULE_TYPE.ATTRIBUTE_ID;
+			} else if (isRuleType(attribute, RULE_TYPE.ATTRIBUTE_PRESERVE_WHITESPACE, ruleTypes)) {
+				return RULE_TYPE.ATTRIBUTE_PRESERVE_WHITESPACE;
 			}
 		}
 
@@ -329,7 +430,7 @@ public class TaggedFilterConfiguration {
 	 * @param elementName
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	private RULE_TYPE findMatchingElementOnAttributeRule(String tag, String attribute,
 			RULE_TYPE ruleType) {
 		List excludedElements;
@@ -372,10 +473,22 @@ public class TaggedFilterConfiguration {
 		return ruleType;
 	}
 
-	@SuppressWarnings("unchecked")
+	public RULE_TYPE getConditionalElementRuleType(String tag, Map<String, String> attributes) {
+		RULE_TYPE type = getElementRuleType(tag);
+		if (type != RULE_TYPE.RULE_NOT_FOUND) {
+			if (doesElementRuleConditionApply(configReader.getElementRule(tag), attributes)) {
+				return type;
+			} else {
+				return RULE_TYPE.RULE_FAILED;
+			}
+		}		
+		return type;
+	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public RULE_TYPE getElementRuleType(String tag) {
 		Map rule = configReader.getElementRule(tag.toLowerCase());
-		if (rule != null) {
+		if (rule != null) {			
 			List<String> ruleTypes = (List<String>) rule.get("ruleTypes");
 			// ORDER is important!!! These are matched in priority order
 			if (isRuleType(tag, RULE_TYPE.EXCLUDED_ELEMENT, ruleTypes)) {
@@ -456,6 +569,8 @@ public class TaggedFilterConfiguration {
 			return RULE_TYPE.ATTRIBUTES_ONLY;
 		} else if (ruleType.equalsIgnoreCase(ATTRIBUTE_ID)) {
 			return RULE_TYPE.ATTRIBUTE_ID;
+		} else if (ruleType.equalsIgnoreCase(ATTRIBUTE_PRESERVE_WHITESPACE)) {
+			return RULE_TYPE.ATTRIBUTE_PRESERVE_WHITESPACE;
 		} else if (ruleType.equalsIgnoreCase(ELEMENT_TRANSLATABLE_ATTRIBUTES)) {
 			return RULE_TYPE.ATTRIBUTE_TRANS;
 		} else if (ruleType.equalsIgnoreCase(ELEMENT_WRITABLE_ATTRIBUTES)) {
@@ -469,8 +584,8 @@ public class TaggedFilterConfiguration {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	private boolean applyConditions(List<?> condition, Map<String, String> attributes) {
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private boolean applyConditions(List condition, Map<String, String> attributes) {
 		String conditionalAttribute = null;
 		conditionalAttribute = (String) condition.get(0);
 
@@ -539,4 +654,25 @@ public class TaggedFilterConfiguration {
 		}
 	}
 
+	@SuppressWarnings("rawtypes")
+	private boolean doesElementRuleConditionApply(Map elementRule, Map<String, String> attributes) {
+		List conditions = (List)elementRule.get(CONDITIONS);
+		if (conditions != null) {
+			return applyConditions(conditions, attributes);
+		}
+		
+		return true;
+	}
+	
+	@SuppressWarnings("rawtypes")
+	private boolean doesAttributeRuleConditionApply(Map attributeRule,
+			Map<String, String> attributes) {
+	
+		List conditions = (List)attributeRule.get(CONDITIONS);
+		if (conditions != null) {
+			return applyConditions(conditions, attributes);
+		}
+		
+		return true;
+	}
 }

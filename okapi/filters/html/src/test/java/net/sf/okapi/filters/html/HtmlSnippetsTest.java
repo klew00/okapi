@@ -335,6 +335,18 @@ public class HtmlSnippetsTest {
 		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, locEN));
 	}
 	
+	@Test
+	public void textUnbalancedInlineTag() {
+		String snippet = "<p>this is some text</i></p>";
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, locEN));
+	}
+	
+	@Test
+	public void textOverlapInlineTags() {
+		String snippet = "<p><i><b>this is some text</i></b></p>";
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, locEN));
+	}
+	
 	/*
 	 * Issue 126: Problem with un-quoted translatable attributes
 	 * This will fail until fixed!!!
