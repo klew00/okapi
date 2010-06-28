@@ -31,7 +31,7 @@ public class RegexUtil {
 	
 	private static HashMap<String, Pattern> patternCache = new HashMap<String, Pattern>();
 
-	private static Pattern getPattern(String regex) {
+	public static Pattern getPattern(String regex) {
 		
 		Pattern pattern = patternCache.get(regex);
 		if (pattern == null) {
