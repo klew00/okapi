@@ -19,29 +19,34 @@
 <p>This dialog box allows you to specify what checks are performed.</p>
 <h2><a name="parameters"></a>Parameters</h2>
 <h3>General Tab</h3>
-<p><cite>Target is the same as the source</cite> -- Set this option to flag the 
-segments where the translation is the same as the source.</p>
+<h4>Text unit verification</h4>
+<p><cite>Warn if an entry does not have a translation</cite> -- This 
+verification is always done. It checks if each entry has a corresponding 
+translation.</p>
+<p><cite>Warn if a target entry has a difference in leading white spaces</cite> -- Set this option&nbsp; to flag the text 
+units where the leading white spaces are different between source and target.</p>
+<p><cite>Warn if a target entry has a difference in trailing white spaces</cite> -- Set this option to flag the text units 
+where the trailing white spaces are different between source and target.</p>
+<h4>Segment verification</h4>
+<p><cite>Warn if a source segment does not have a corresponding target</cite> -- 
+This verification is always done. It checks if all source segments have a 
+corresponding target segment.</p>
+<p><cite>warn if a target segment is empty</cite> -- Set this option to flag the segments for 
+which the translation is empty (if the corresponding source is not empty).</p>
+<p><cite>Warn if a target segment is the same as its source</cite> -- Set this option to flag the 
+segments where the translation is the same as the source. This check is done 
+only if the source segment contain text.</p>
 <p><cite>Include the codes in the comparison</cite> -- Set this option if the 
 comparison done when verifying if the target is the same as the source should 
 take inline codes into account. If this option is set and the only difference 
 between the source and the translation is the inline code, the segment will not 
-be flagged as having the target the same as the source. This option is enabled 
-only when <cite>Target is the same as the source</cite> is set.</p>
-<p><cite>Code differences between source and target</cite> -- Set this option to 
+be flagged as having the target the same as the source.</p>
+<p><cite>Warn if there is a code differences between source and target segments</cite> -- Set this option to 
 verify that the target content has the same inline codes as the source content.</p>
-<p><cite>Empty translation</cite> -- Set this option to flag the segments for 
-which the translation is empty (if the corresponding source is not empty).</p>
-<p><cite>Leading white spaces</cite> -- Set this option&nbsp; to flag the text 
-units where the leading white spaces are different between source and target.</p>
-<p><cite>Trailing white spaces</cite> -- Set this option to flag the text units 
-where the trailing white spaces are different between source and target.</p>
-<p><cite>Perform the verifications provided by the LanguageTool server</cite> 
--- Set this option to run the verifications provided by a LanguageTool server. 
-To use this option you must have access to <a href="http://www.languagetool.org">
-LanguageTool Checker</a> run as a server. Most of the time this is simply a 
-local server. You can start the application with Java Web Start:
-<a href="http://www.languagetool.org/webstart/web/LanguageTool.jnlp">Start 
-LanguageTool Checker from the Web</a>.</p>
+<p><cite>Warn on doubled words</cite> -- Set this option to flag the target 
+segments where there is a sequential repetition of the same word, for example 
+&quot;is is&quot; in &quot;this is is an example&quot;. The check is not case-sensitive, for example 
+&quot;This this an example&quot; is flagged.</p>
 <h3>Patterns Tab</h3>
 <p><cite>Verify that the following source patterns are translated as expected</cite> 
 -- Set this option to verify that each source pattern defined in the list has 
@@ -64,6 +69,26 @@ selected downward in the table.</p>
 table.</p>
 <p><cite>Export</cite> -- Click this button to export the patterns in the table 
 to a tab-delimited file.</p>
+<h3>LanguageTool Tab</h3>
+<p><cite>Perform the verifications provided by the LanguageTool server</cite> 
+-- Set this option to run the verifications provided by a LanguageTool server. 
+To use this option you must have access to <a href="http://www.languagetool.org">
+LanguageTool Checker</a> run as a server. Most of the time this is simply a 
+local server. You can start the application with Java Web Start:
+<a href="http://www.languagetool.org/webstart/web/LanguageTool.jnlp">Start 
+LanguageTool Checker from the Web</a>.</p>
+<p><cite>Auto-translate the messages from the LanguageTool checker</cite> - Set 
+this option to have the messages coming from the languageTool checker translated 
+into a given language. Most of the time, the error messages of LanguageTool when 
+checking for a given language are provided in the same language as the text 
+verified (e.g. verifying a Polish text will give you back error messages in 
+Polish). Use this option to have the messages automatically
+<a href="http://code.google.com/apis/ajaxlanguage/">translated using Google MT</a> 
+and displayed along with the original messages.</p>
+<p><cite>From</cite> -- Enter the language of the original messages (e.g. <code>
+po</code> for Polish).</p>
+<p><cite>Into</cite> -- Enter the code of the language into which you want to 
+translate the messages (e.g. <code>en</code> for English)</p>
 <h3>Output Tab</h3>
 <p><cite>Path of the report file</cite> -- Enter the full path of the HTML 
 report to generate. You can use the variable <code>${rootDir}</code> in the 

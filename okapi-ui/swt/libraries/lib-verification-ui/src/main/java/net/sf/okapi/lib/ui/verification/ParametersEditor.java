@@ -227,10 +227,10 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		});
 		
 		chkLeadingWS = new Button(grpTU, SWT.CHECK);
-		chkLeadingWS.setText("Warn if target has a difference in leading white spaces");
+		chkLeadingWS.setText("Warn if a target entry has a difference in leading white spaces");
 		
 		chkTrailingWS = new Button(grpTU, SWT.CHECK);
-		chkTrailingWS.setText("Warn if target entry has a difference in trailing white spaces");
+		chkTrailingWS.setText("Warn if a target entry has a difference in trailing white spaces");
 
 		Group grpSeg = new Group(cmpTmp, SWT.NONE);
 		grpSeg.setText("Segment verifications");
@@ -249,8 +249,8 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		chkEmptyTarget = new Button(grpSeg, SWT.CHECK);
 		chkEmptyTarget.setText("Warn if a target segment is empty (and its source is not)");
 
-		chkTargetSameAsSource = new Button(grpTU, SWT.CHECK);
-		chkTargetSameAsSource.setText("Warn if target segment is the same as its source (for segments with text)");
+		chkTargetSameAsSource = new Button(grpSeg, SWT.CHECK);
+		chkTargetSameAsSource.setText("Warn if a target segment is the same as its source (for segments with text)");
 		chkTargetSameAsSource.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				updateTargetSameAsSourceWithCodes();
@@ -275,66 +275,6 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		tiTmp.setControl(cmpTmp);
 
 		
-		//--- Language Tool tab
-		
-		cmpTmp = new Composite(tfTmp, SWT.NONE);
-		cmpTmp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		cmpTmp.setLayout(new GridLayout());
-
-		chkCheckWithLT = new Button(cmpTmp, SWT.CHECK);
-		chkCheckWithLT.setText("Perform the verifications provided by the LanguageTool server");
-		chkCheckWithLT.setLayoutData(new GridData());
-		chkCheckWithLT.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				updateLTOptions();
-			};
-		});
-		
-		Label label = new Label(cmpTmp, SWT.NONE);
-		label.setText("Server URL (e.g. http://localhost:8081/):");
-		edServerURL = new Text(cmpTmp, SWT.BORDER);
-		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		edServerURL.setLayoutData(gdTmp);
-		
-		chkTranslateLTMsg = new Button(cmpTmp, SWT.CHECK);
-		chkTranslateLTMsg.setText("Auto-translate the messages from the LanguageTool checker");
-		gdTmp = new GridData();
-		gdTmp.verticalIndent = 16;
-		chkTranslateLTMsg.setLayoutData(gdTmp);
-		chkTranslateLTMsg.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				updateTranslateLTMsg();
-			};
-		});
-		
-		Composite grpTmp = new Composite(cmpTmp, SWT.NONE);
-		grpTmp.setLayout(new GridLayout(2, false));
-		
-		label = new Label(grpTmp, SWT.NONE);
-		label.setText("From:");
-		gdTmp = new GridData();
-		label.setLayoutData(gdTmp);
-		
-		edLTTranslationSource = new Text(grpTmp, SWT.BORDER);
-		gdTmp = new GridData();
-		gdTmp.widthHint = 80;
-		edLTTranslationSource.setLayoutData(gdTmp);
-		
-		label = new Label(grpTmp, SWT.NONE);
-		label.setText("Into:");
-		gdTmp = new GridData();
-		label.setLayoutData(gdTmp);
-
-		edLTTranslationTarget = new Text(grpTmp, SWT.BORDER);
-		gdTmp = new GridData();
-		gdTmp.widthHint = 80;
-		edLTTranslationTarget.setLayoutData(gdTmp);
-
-		tiTmp = new TabItem(tfTmp, SWT.NONE);
-		tiTmp.setText("LanguageTool");
-		tiTmp.setControl(cmpTmp);
-
-
 		//--- Patterns tab
 		
 		cmpTmp = new Composite(tfTmp, SWT.NONE);
@@ -449,6 +389,66 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		tiTmp.setControl(cmpTmp);
 
 		
+		//--- Language Tool tab
+		
+		cmpTmp = new Composite(tfTmp, SWT.NONE);
+		cmpTmp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		cmpTmp.setLayout(new GridLayout());
+
+		chkCheckWithLT = new Button(cmpTmp, SWT.CHECK);
+		chkCheckWithLT.setText("Perform the verifications provided by the LanguageTool server");
+		chkCheckWithLT.setLayoutData(new GridData());
+		chkCheckWithLT.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				updateLTOptions();
+			};
+		});
+		
+		Label label = new Label(cmpTmp, SWT.NONE);
+		label.setText("Server URL (e.g. http://localhost:8081/):");
+		edServerURL = new Text(cmpTmp, SWT.BORDER);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		edServerURL.setLayoutData(gdTmp);
+		
+		chkTranslateLTMsg = new Button(cmpTmp, SWT.CHECK);
+		chkTranslateLTMsg.setText("Auto-translate the messages from the LanguageTool checker");
+		gdTmp = new GridData();
+		gdTmp.verticalIndent = 16;
+		chkTranslateLTMsg.setLayoutData(gdTmp);
+		chkTranslateLTMsg.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				updateTranslateLTMsg();
+			};
+		});
+		
+		Composite grpTmp = new Composite(cmpTmp, SWT.NONE);
+		grpTmp.setLayout(new GridLayout(2, false));
+		
+		label = new Label(grpTmp, SWT.NONE);
+		label.setText("From:");
+		gdTmp = new GridData();
+		label.setLayoutData(gdTmp);
+		
+		edLTTranslationSource = new Text(grpTmp, SWT.BORDER);
+		gdTmp = new GridData();
+		gdTmp.widthHint = 80;
+		edLTTranslationSource.setLayoutData(gdTmp);
+		
+		label = new Label(grpTmp, SWT.NONE);
+		label.setText("Into:");
+		gdTmp = new GridData();
+		label.setLayoutData(gdTmp);
+
+		edLTTranslationTarget = new Text(grpTmp, SWT.BORDER);
+		gdTmp = new GridData();
+		gdTmp.widthHint = 80;
+		edLTTranslationTarget.setLayoutData(gdTmp);
+
+		tiTmp = new TabItem(tfTmp, SWT.NONE);
+		tiTmp.setText("LanguageTool");
+		tiTmp.setControl(cmpTmp);
+
+
 		//--- Output tab
 		
 		cmpTmp = new Composite(tfTmp, SWT.NONE);
