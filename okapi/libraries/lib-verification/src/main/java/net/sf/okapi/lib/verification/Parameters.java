@@ -228,7 +228,6 @@ public class Parameters extends BaseParameters {
 		targetSameAsSourceWithCodes = true;
 		codeDifference = true;
 		checkPatterns = true;
-		patterns = new ArrayList<PatternItem>();
 		checkWithLT = false;
 		serverURL = "http://localhost:8081/"; // Default
 		translateLTMsg = false;
@@ -237,6 +236,24 @@ public class Parameters extends BaseParameters {
 		saveSession = true;
 		sessionPath = "${rootDir}/qa-session"+QualityCheckSession.FILE_EXTENSION;
 		doubledWord = true;
+
+		patterns = new ArrayList<PatternItem>();
+		// Enclosing marks
+		patterns.add(new PatternItem(
+			"[\\(\\[{}\\]\\)]", "<same>", true));
+		// Email addresses
+		patterns.add(new PatternItem(
+			"[\\w\\.\\-]+@[\\w\\.\\-]+", "<same>", true));
+		// URLs
+		patterns.add(new PatternItem( //TODO: file URL
+			"https?:[\\w/\\.:;+\\-~\\%#\\$?=&,()]+|www\\.[\\w/\\.:;+\\-~\\%#\\$?=&,()]+|ftp:[\\w/\\.:;+\\-~\\%#?=&,]+", "<same>", true));
+		// IP addresses
+		patterns.add(new PatternItem(
+			"\\b(?:\\d{1,3}\\.){3}\\d{1,3}\\b", "<same>", true));
+		// C-style printf 
+		patterns.add(new PatternItem(
+			"%(([-0+#]?)[-0+#]?)((\\d\\$)?)(([\\d\\*]*)(\\.[\\d\\*]*)?)[dioxXucsfeEgGpn]", "<same>", true));
+		
 	}
 
 	@Override
@@ -262,6 +279,7 @@ public class Parameters extends BaseParameters {
 		// Patterns
 		checkPatterns = buffer.getBoolean(CHECKPATTERNS, checkPatterns);
 		int count = buffer.getInteger(PATTERNCOUNT, 0);
+		if ( count > 0 ) patterns.clear(); // Clear the defaults
 		for ( int i=0; i<count; i++ ) {
 			boolean enabled = buffer.getBoolean(String.format("%s%d", USEPATTERN, i), true);
 			String source = buffer.getString(String.format("%s%d", SOURCEPATTERN, i), "");

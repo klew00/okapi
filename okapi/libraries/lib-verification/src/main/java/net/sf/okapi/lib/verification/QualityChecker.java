@@ -65,7 +65,10 @@ class QualityChecker {
 				params.ltTranslationSource, params.ltTranslationTarget);
 		}
 		
-		patDoubledWords = Pattern.compile("\\b(\\w+)\\s+\\1\\b", Pattern.CASE_INSENSITIVE);
+		// The expression: "\\b(\\w+)\\s+\\1\\b" does not work for extended chars (\w and \s are ASCII based)
+		// We have to use the Unicode equivalents
+		patDoubledWords = Pattern.compile("\\b([\\p{Ll}\\p{Lu}\\p{Lt}\\p{Lo}\\p{Nd}]+)[\\t\\n\\f\\r\\p{Z}]+\\1\\b",
+			Pattern.CASE_INSENSITIVE);
 	}
 
 	void processStartDocument (StartDocument sd,

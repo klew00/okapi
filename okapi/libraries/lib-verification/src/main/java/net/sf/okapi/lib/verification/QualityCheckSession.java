@@ -56,11 +56,20 @@ public class QualityCheckSession {
 	private LocaleId targetLocale = LocaleId.FRENCH;
 	private IFilter filter;
 	private String rootDir;
+	private boolean modified;
 	
 	public QualityCheckSession () {
 		reset();
 	}
 	
+	public boolean isModified () {
+		return modified;
+	}
+	
+	public void setModified (boolean modified) {
+		this.modified = modified;
+	}
+
 	public List<Issue> getIssues () {
 		return issues;
 	}
@@ -77,6 +86,7 @@ public class QualityCheckSession {
 	public void addRawDocument (RawDocument rawDoc) {
 		URI uri = rawDoc.getInputURI();
 		rawDocs.put(uri, rawDoc);
+		modified = true;
 	}
 	
 	public List<RawDocument> getDocuments () {
@@ -100,6 +110,7 @@ public class QualityCheckSession {
 	}
 
 	public void setSourceLocale (LocaleId sourceLocale) {
+		if ( !this.sourceLocale.equals(sourceLocale) ) modified = true;
 		this.sourceLocale = sourceLocale;
 	}
 
@@ -108,6 +119,7 @@ public class QualityCheckSession {
 	}
 
 	public void setTargetLocale (LocaleId targetLocale) {
+		if ( !this.targetLocale.equals(targetLocale) ) modified = true;
 		this.targetLocale = targetLocale;
 	}
 
@@ -195,6 +207,7 @@ public class QualityCheckSession {
 				dos.writeUTF(rd.getFilterConfigId());
 				dos.writeUTF(rd.getEncoding());
 			}
+			modified = false;
 		}
 		catch ( IOException e ) {
 			throw new OkapiIOException("Error while saving session.", e);
@@ -233,6 +246,7 @@ public class QualityCheckSession {
 				rd.setFilterConfigId(configId);
 				rawDocs.put(uri, rd);
 			}
+			modified = false;
 		}
 		catch ( Throwable e ) {
 			throw new OkapiIOException("Error reading session file.", e);

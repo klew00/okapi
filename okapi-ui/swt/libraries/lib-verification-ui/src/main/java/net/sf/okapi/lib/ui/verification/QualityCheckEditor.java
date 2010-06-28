@@ -51,6 +51,8 @@ import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Point;
@@ -63,6 +65,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
@@ -71,6 +74,8 @@ import org.eclipse.swt.widgets.Text;
 public class QualityCheckEditor implements IQualityCheckEditor {
 
 	private static final String APPNAME = "CheckMate"; //$NON-NLS-1$
+	private static final String CFG_SOURCELOCALE = "sourceLocale"; //$NON-NLS-1$
+	private static final String CFG_TARGETLOCALE = "targetLocale"; //$NON-NLS-1$
 
 	private String qcsPath;
 	private UserConfiguration config;
@@ -107,7 +112,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 	public void edit () {
 		showDialog(null);
 	}
-
+	
 	/**
 	 * Initializes this IQualityCheckEditor object.
 	 * @param parent the object representing the parent window/shell for this editor.
@@ -127,6 +132,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		help = helpParam;
 		config = new UserConfiguration();
 		config.load(APPNAME);
+		
 		// If no parent is defined, create a new display and shell
 		if ( parent == null ) {
 			// Start the application
@@ -142,6 +148,16 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 			session = paramSession;
 		}
 		session.setFilterConfigurationMapper(fcMapper);
+		try {
+			LocaleId tmpLoc = LocaleId.fromBCP47(config.getProperty(CFG_SOURCELOCALE, "en"));
+			session.setSourceLocale(tmpLoc);
+			tmpLoc = LocaleId.fromBCP47(config.getProperty(CFG_TARGETLOCALE, "fr"));
+			session.setTargetLocale(tmpLoc);
+			session.setModified(false);
+		}
+		catch ( Throwable e ) {
+			// Just use the defaults, no need to have an error
+		}
 
 		if ( asDialog ) {
 			shell = new Shell((Shell)parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.MAX | SWT.MIN | SWT.APPLICATION_MODAL);
@@ -162,6 +178,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		if ( asDialog ) {
 			Dialogs.centerWindow(shell, (Shell)parent);
 		}
+		tblIssues.setFocus();
 	}
 	
 	public void addRawDocument (RawDocument rawDoc) {
@@ -397,6 +414,17 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 	}
 	
 	private void createContent () {
+		// Handling of the closing event
+		shell.addShellListener(new ShellListener() {
+			public void shellActivated(ShellEvent event) {}
+			public void shellClosed(ShellEvent event) {
+				if ( !saveSessionIfNeeded() ) event.doit = false;
+			}
+			public void shellDeactivated(ShellEvent event) {}
+			public void shellDeiconified(ShellEvent event) {}
+			public void shellIconified(ShellEvent event) {}
+		});
+
 		// Create the two main parts of the UI
 		SashForm sashMain = new SashForm(shell, SWT.VERTICAL);
 		sashMain.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -747,7 +775,13 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 			if ( help != null ) context.setObject("help", help);
 			context.setObject("shell", shell);
 			context.setBoolean("stepMode", false); // Not in a step
-			editor.edit(session.getParameters(), false, context);
+			String old = session.getParameters().toString();
+			if ( editor.edit(session.getParameters(), false, context) ) {
+				// Compare before and after to set or not the modified flag
+				if ( !old.equals(session.getParameters().toString()) ) {
+					session.setModified(true);
+				}
+			}
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, "Error editing options.\n"+e.getMessage(), null);
@@ -777,6 +811,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 
 	private void newSession () {
 		try {
+			if ( !saveSessionIfNeeded() ) return;
 			session.reset();
 			qcsPath = null;
 			issuesModel.setIssues(session.getIssues());
@@ -790,6 +825,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 	
 	private void loadSession (String path) {
 		try {
+			if ( !saveSessionIfNeeded() ) return;
 			if ( path == null ) {
 				String[] paths = Dialogs.browseFilenames(shell, "Open Session", false, null,
 					String.format("Quality Check Sessions (*%s)\tAll Files (*.*)", QualityCheckSession.FILE_EXTENSION),
@@ -809,6 +845,30 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		finally {
 			stopWaiting();
 		}
+	}
+
+	/**
+	 * Checks if the session needs to be saved, if so save them after prompting
+	 * the user if needed.
+	 * @return False if the user cancel, true if a decision is made. 
+	 */
+	private boolean saveSessionIfNeeded () {
+		config.setProperty(CFG_SOURCELOCALE, session.getSourceLocale().toBCP47());
+		config.setProperty(CFG_TARGETLOCALE, session.getTargetLocale().toBCP47());
+		config.save(APPNAME, "N/A"); //$NON-NLS-1$
+		
+		if ( session.isModified() ) {
+			MessageBox dlg = new MessageBox(shell, SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
+			dlg.setText(shell.getText());
+			dlg.setMessage("The session has been modified. Do you want to save it?");
+			switch ( dlg.open() ) {
+			case SWT.CANCEL:
+				return false;
+			case SWT.YES:
+				saveSessionAs(qcsPath);
+			}
+		}
+		return true;
 	}
 
 }
