@@ -636,10 +636,7 @@ public class TextUnitUtil {
 		GenericSkeleton skel = (GenericSkeleton) tu.getSkeleton();
 		if (skel == null) {
 
-			skel = new GenericSkeleton();
-			if (skel == null)
-				return null;
-
+			skel = new GenericSkeleton();			
 			tu.setSkeleton(skel);
 		}
 

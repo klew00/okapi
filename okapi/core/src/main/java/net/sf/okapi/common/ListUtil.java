@@ -129,10 +129,7 @@ public class ListUtil {
 	 * @return a list of substrings.
 	 */
 	public static List<String> stringAsList(String st, String delimiter) {
-
-		ArrayList<String> res = new ArrayList<String>();
-		if (res == null) return null;
-
+		ArrayList<String> res = new ArrayList<String>();		
 		stringAsList(res, st, delimiter);		
 		return res;		
 	}
@@ -144,10 +141,7 @@ public class ListUtil {
 	 * @return a list of substrings.
 	 */
 	public static List<String> stringAsList(String st, char delimiter) {
-
 		ArrayList<String> res = new ArrayList<String>();
-		if (res == null) return null;
-
 		stringAsList(res, st, Character.toString(delimiter));		
 		return res;		
 	}
@@ -258,7 +252,7 @@ public class ListUtil {
 	 */
 	public static String merge(List<String> list, int start, int end, String joiner) {
 		
-		return merge(listAsArray(list), start, end, joiner);		
+		return merge(stringListAsArray(list), start, end, joiner);		
 	}
 	
 	/**
@@ -343,7 +337,7 @@ public class ListUtil {
 	 * @param list List of strings.
 	 * @return an array of strings.
 	 */
-	public static String[] listAsArray(List<String> list) {
+	public static String[] stringListAsArray(List<String> list) {
 		if (Util.isEmpty(list))
 			return new String[] {};
 		
@@ -355,7 +349,7 @@ public class ListUtil {
 	 * @param list List of class references.
 	 * @return An array of class references.
 	 */
-	public static Class<?>[] listAsArray(List<Class<?>> list) {
+	public static Class<?>[] classListAsArray(List<Class<?>> list) {
 		if (Util.isEmpty(list))
 			return null;
 		
@@ -371,7 +365,7 @@ public class ListUtil {
 	 * @param list List of objects.
 	 * @return an array of objects.
 	 */
-	public static Object[] listAsArray(List<Object> list) {
+	public static Object[] objectListAsArray(List<Object> list) {
 		if (Util.isEmpty(list))
 			return null;
 		

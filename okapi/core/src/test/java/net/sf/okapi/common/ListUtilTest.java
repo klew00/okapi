@@ -19,7 +19,7 @@ public class ListUtilTest {
 		list.add("Dumbo");
 		list.add("");
 		assertEquals(4, list.size());
-		String[] sl = ListUtil.listAsArray(list);
+		String[] sl = ListUtil.stringListAsArray(list);
 		assertEquals(4, sl.length);
 		
 		List<Object> list2 = new ArrayList<Object>();
@@ -30,7 +30,7 @@ public class ListUtilTest {
 		list2.add(null);
 		list2.add(new Character('A'));
 		assertEquals(6, list2.size());
-		Object[] ol = ListUtil.listAsArray(list2);
+		Object[] ol = ListUtil.objectListAsArray(list2);
 		assertEquals(6, ol.length);
 		
 		List<Class<?>> list3 = new ArrayList<Class<?>>();
@@ -40,7 +40,7 @@ public class ListUtilTest {
 		list3.add(null);
 		list3.add(Character.class);
 		assertEquals(5, list3.size());
-		Class<?>[] cl = (Class<?>[]) ListUtil.listAsArray(list3);
+		Class<?>[] cl = (Class<?>[]) ListUtil.classListAsArray(list3);
 		assertEquals(5, cl.length);
 	}
 
