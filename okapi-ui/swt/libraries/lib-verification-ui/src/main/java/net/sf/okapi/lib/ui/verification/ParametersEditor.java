@@ -88,6 +88,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Button btExport;
 	private Text edSource;
 	private Text edTarget;
+	private Text edDescription;
 	private Shell dialog;
 	private TableItem editItem;
 	private boolean addMode;
@@ -293,7 +294,6 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
 		gdTmp = new GridData(GridData.FILL_BOTH);
-//		gdTmp.heightHint = 5;
 		table.setLayoutData(gdTmp);
 		// Update buttons when moving cursor
 		table.addListener(SWT.Selection, new Listener () {
@@ -316,15 +316,17 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			public void controlResized(ControlEvent e) {
 				int tableWidth = table.getClientArea().width;
 				int remaining = tableWidth - table.getColumn(0).getWidth();
-				table.getColumn(1).setWidth(remaining/2);
-				table.getColumn(2).setWidth(remaining/2);
+				//remaining += (remaining % 3);
+				table.getColumn(1).setWidth(remaining/3);
+				table.getColumn(2).setWidth(remaining/3);
+				table.getColumn(3).setWidth(remaining/3);
 			}
 		});
 
-		String[] titles = {"Use", "Source Pattern", "Expected Target Pattern"};
+		String[] titles = {"Use", "Source Pattern", "Expected Target Pattern", "Description"};
 		for ( int i=0; i<titles.length; i++ ) {
 			TableColumn column = new TableColumn(table, SWT.LEFT);
-			column.setText(titles [i]);
+			column.setText(titles[i]);
 			column.pack();
 		}
 		
@@ -529,6 +531,14 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		edTarget.setLayoutData(gdTmp);
 
+		// Description
+		label = new Label(dialog, SWT.NONE);
+		label.setText(String.format("Description:", PatternItem.SAME));
+
+		edDescription = new Text(dialog, SWT.BORDER | SWT.WRAP);
+		gdTmp = new GridData(GridData.FILL_BOTH);
+		edDescription.setLayoutData(gdTmp);
+		
 		// Set the text in the edit fields
 		if ( add ) {
 			edTarget.setText(PatternItem.SAME);
@@ -539,6 +549,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			editItem = table.getItem(index);
 			edSource.setText(editItem.getText(1));
 			edTarget.setText(editItem.getText(2));
+			edDescription.setText(editItem.getText(3));
 		}
 
 		//  Dialog buttons
@@ -554,6 +565,11 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 					if ( edTarget.getText().trim().length() < 1 ) {
 						Dialogs.showError(shell, "You must enter a corresponding part for the target.", null);
 						edTarget.setFocus();
+						return;
+					}
+					if ( edDescription.getText().trim().length() < 1 ) {
+						Dialogs.showError(shell, "You must enter a description for the pattern.", null);
+						edDescription.setFocus();
 						return;
 					}
 					// Try patterns
@@ -577,6 +593,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 					}
 					editItem.setText(1, edSource.getText());
 					editItem.setText(2, edTarget.getText());
+					editItem.setText(3, edDescription.getText());
 					updatePatternsButtons();
 				}
 				// Close
@@ -747,6 +764,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			row.setChecked(item.enabled);
 			row.setText(1, item.source);
 			row.setText(2, item.target);
+			row.setText(3, item.description);
 		}
 		if ( table.getItemCount() > 0 ) {
 			table.setSelection(0);

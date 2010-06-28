@@ -38,7 +38,7 @@ public class PatternItem {
 	public String source;
 	public String target;
 	public boolean enabled;
-	public String message;
+	public String description;
 	
 	private Pattern srcPat;
 	private Pattern trgPat;
@@ -53,10 +53,10 @@ public class PatternItem {
 				if ( line.trim().length() == 0 ) continue;
 				if ( line.startsWith("#") ) continue;
 				String[] parts = line.split("\t", -2);
-				if ( parts.length < 3 ) {
+				if ( parts.length < 4 ) {
 					throw new OkapiIOException("Missing one or more tabs in line:\n"+line);
 				}
-				list.add(new PatternItem(parts[1], parts[2], parts[0].equals("1")));
+				list.add(new PatternItem(parts[1], parts[2], parts[0].equals("1"), parts[3]));
 				line = br.readLine();
 			}
 		}
@@ -88,6 +88,7 @@ public class PatternItem {
 				pr.write((item.enabled ? "1" : "0")
 					+ "\t" + item.source
 					+ "\t" + item.target
+					+ "\t" + item.description
 					+ lineBreak);
 			}
 			pr.flush();
@@ -126,7 +127,7 @@ public class PatternItem {
 		this.source = source;
 		this.target = target;
 		this.enabled = enabled;
-		this.message = message;
+		this.description = message;
 	}
 
 	public void compile () {

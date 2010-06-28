@@ -240,19 +240,24 @@ public class Parameters extends BaseParameters {
 		patterns = new ArrayList<PatternItem>();
 		// Enclosing marks
 		patterns.add(new PatternItem(
-			"[\\(\\[{}\\]\\)]", "<same>", true));
+			"[\\(\\[{}\\]\\)]", "<same>",
+			true, "Enclosing characters"));
 		// Email addresses
 		patterns.add(new PatternItem(
-			"[\\w\\.\\-]+@[\\w\\.\\-]+", "<same>", true));
+			"[\\w\\.\\-]+@[\\w\\.\\-]+", "<same>",
+			true, "Email addresses"));
 		// URLs
 		patterns.add(new PatternItem( //TODO: file URL
-			"https?:[\\w/\\.:;+\\-~\\%#\\$?=&,()]+|www\\.[\\w/\\.:;+\\-~\\%#\\$?=&,()]+|ftp:[\\w/\\.:;+\\-~\\%#?=&,]+", "<same>", true));
+			"https?:[\\w/\\.:;+\\-~\\%#\\$?=&,()]+|www\\.[\\w/\\.:;+\\-~\\%#\\$?=&,()]+|ftp:[\\w/\\.:;+\\-~\\%#?=&,]+", "<same>",
+			true, "URLs"));
 		// IP addresses
 		patterns.add(new PatternItem(
-			"\\b(?:\\d{1,3}\\.){3}\\d{1,3}\\b", "<same>", true));
+			"\\b(?:\\d{1,3}\\.){3}\\d{1,3}\\b", "<same>",
+			true, "IP addresses"));
 		// C-style printf 
 		patterns.add(new PatternItem(
-			"%(([-0+#]?)[-0+#]?)((\\d\\$)?)(([\\d\\*]*)(\\.[\\d\\*]*)?)[dioxXucsfeEgGpn]", "<same>", true));
+			"%(([-0+#]?)[-0+#]?)((\\d\\$)?)(([\\d\\*]*)(\\.[\\d\\*]*)?)[dioxXucsfeEgGpn]", "<same>",
+			true, "C-style printf codes"));
 		
 	}
 

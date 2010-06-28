@@ -56,6 +56,7 @@ class SessionSettingsDialog {
 	private Text edSourceLocale;
 	private Text edTargetLocale;
 	private List lbDocs;
+	private Button btRemove;
 	
 	public SessionSettingsDialog (Shell parent, IHelp paramHelp) {
 
@@ -82,6 +83,13 @@ class SessionSettingsDialog {
 		btAdd.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				addDocument();
+			}
+		});
+		
+		btRemove = UIUtil.createGridButton(grpDocs, SWT.PUSH, "Remove...", UIUtil.BUTTON_DEFAULT_WIDTH, 1);
+		btRemove.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				removeDocument();
 			}
 		});
 		
@@ -130,6 +138,15 @@ class SessionSettingsDialog {
 		Dialogs.centerWindow(dialog, parent);
 	}
 
+	private void removeDocument () {
+		int n = lbDocs.getSelectionIndex();
+		if ( n < 0 ) return;
+		lbDocs.remove(n);
+		if ( n >= lbDocs.getItemCount() ) n = lbDocs.getItemCount()-1;
+		lbDocs.select(n);
+		updateFileButtons();
+	}
+	
 	private void addDocument () {
 		try {
 			InputDocumentDialog dlg = new InputDocumentDialog(dialog, "Add document",
@@ -159,6 +176,9 @@ class SessionSettingsDialog {
 		catch ( Throwable e ) {
 			Dialogs.showError(dialog, "Error adding document.\n"+e.getMessage(), null);
 		}
+		finally {
+			updateFileButtons();
+		}
 	}
 	
 	private String formatDocument (RawDocument rd) {
@@ -176,13 +196,21 @@ class SessionSettingsDialog {
 		return res;
 	}
 	
+	private void updateFileButtons () {
+		btRemove.setEnabled(lbDocs.getSelectionIndex()>-1);
+	}
+	
 	public void setData (QualityCheckSession session) {
 		this.session = session;
 		for ( RawDocument rd : session.getDocuments() ) {
 			lbDocs.add(formatDocument(rd));
 		}
+		if ( lbDocs.getItemCount() > 0 ) {
+			lbDocs.setSelection(0);
+		}
 		edSourceLocale.setText(session.getSourceLocale().toBCP47());
 		edTargetLocale.setText(session.getTargetLocale().toBCP47());
+		updateFileButtons();
 	}
 	
 	private boolean saveData () {
