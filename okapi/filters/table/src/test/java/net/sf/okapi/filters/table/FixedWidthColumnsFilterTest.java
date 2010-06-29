@@ -53,6 +53,7 @@ import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.filters.table.base.BaseTableFilter;
 import net.sf.okapi.filters.table.fwc.FixedWidthColumnsFilter;
 import net.sf.okapi.filters.table.fwc.Parameters;
@@ -321,11 +322,17 @@ public class FixedWidthColumnsFilterTest {
 		testEvent(EventType.START_GROUP, null);
 		testEvent(EventType.TEXT_UNIT, "Value24", "Value21", "Value27", locIT, "Value25");
 		testEvent(EventType.TEXT_UNIT, "Value26", "Value23", "Value22", locGESW, "");
+		testEvent(EventType.DOCUMENT_PART, "Value21            [#$$self$]                       " +
+				"Value23              [#$$self$]         Value25        [#$$self$]              " +
+				"[#$$self$]              recID1");
 		testEvent(EventType.END_GROUP, null);
 		
 		testEvent(EventType.START_GROUP, null);
 		testEvent(EventType.TEXT_UNIT, "Value34", "Value31", "Value37", locIT, "Value35");
 		testEvent(EventType.TEXT_UNIT, "Value36", "recID2_descr", "Value32", locGESW, "");
+		testEvent(EventType.DOCUMENT_PART, "Value31            [#$$self$]                       " +
+				"                     [#$$self$]         Value35        [#$$self$]              " +
+				"[#$$self$]              recID2");
 		testEvent(EventType.END_GROUP, null);
 		
 		testEvent(EventType.END_DOCUMENT, null);
@@ -366,33 +373,44 @@ public class FixedWidthColumnsFilterTest {
 		testEvent(EventType.START_DOCUMENT, null);
 		
 		testEvent(EventType.START_GROUP, null);
-		testEvent(EventType.TEXT_UNIT, "ID"); 
-		testEvent(EventType.TEXT_UNIT, "Target1");
-		testEvent(EventType.TEXT_UNIT, "SID1");
+		testEvent(EventType.TEXT_UNIT, "SID1"); 
+		testEvent(EventType.TEXT_UNIT, "Target2");
+		testEvent(EventType.TEXT_UNIT, "SID2");
 		testEvent(EventType.TEXT_UNIT, "Source1");
 		testEvent(EventType.TEXT_UNIT, "Source2");
-		testEvent(EventType.TEXT_UNIT, "Target2");
+		testEvent(EventType.TEXT_UNIT, "Target1");
 		testEvent(EventType.TEXT_UNIT, "Key");
 		testEvent(EventType.END_GROUP, null);
 		
 		testEvent(EventType.START_GROUP, null);
 		testEvent(EventType.TEXT_UNIT, "Value14", "Value11", "Value17", locIT, "");
-		//testEvent(EventType.TEXT_UNIT, "");
+		testEvent(EventType.TEXT_UNIT, "",        "Value13", "Value12", locGESW, "");
+		testEvent(EventType.DOCUMENT_PART, "Value11            [#$$self$]          " +
+				"             Value13              [#$$self$]                      " +
+				"            [#$$self$]           [#$$self$]");		
 		testEvent(EventType.END_GROUP, null);
 		
 		testEvent(EventType.START_GROUP, null);
 		testEvent(EventType.TEXT_UNIT, "Value24", "Value28_name", "Value27", locIT, "Value25");
-		testEvent(EventType.TEXT_UNIT, "Value26", "Value23", "Value22", locGESW, "");
+		testEvent(EventType.TEXT_UNIT, "Value26", "Value23", "Value22", locGESW, "");		
+		testEvent(EventType.DOCUMENT_PART, "                   [#$$self$]           " +
+				"            Value23              [#$$self$]         Value25        " +
+				"[#$$self$]              [#$$self$]              Value28");
 		testEvent(EventType.END_GROUP, null);
 		
 		testEvent(EventType.START_GROUP, null);
 		testEvent(EventType.TEXT_UNIT, "Value34", "Value31", "", locIT, "");
-		//testEvent(EventType.TEXT_UNIT, "");
+		//No 2-nd TU because the line 4 is shorter, no src2 
+		testEvent(EventType.DOCUMENT_PART, "Value31            Value32              " +
+				"         Value33              [#$$self$]        ");
 		testEvent(EventType.END_GROUP, null);
 		
 		testEvent(EventType.START_GROUP, null);
 		testEvent(EventType.TEXT_UNIT, "Value44", "Value41", "Value47", locIT, "Value45");
 		testEvent(EventType.TEXT_UNIT, "Value46", "Value48_descr", "Value42", locGESW, "");
+		testEvent(EventType.DOCUMENT_PART, "Value41            [#$$self$]           " +
+				"                                 [#$$self$]         Value45        " +
+				"[#$$self$]              [#$$self$]              Value48");
 		testEvent(EventType.END_GROUP, null);
 		
 		testEvent(EventType.END_DOCUMENT, null);
@@ -427,6 +445,94 @@ public class FixedWidthColumnsFilterTest {
 		params.commentColumns = "5";
 		params.commentSourceRefs = "4";
 		params.recordIdColumn = 8;
+		
+		String snippet = null;
+		
+		try {
+			snippet = streamAsString(input);
+			
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+		}
+		//System.out.println(snippet);
+		
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, locEN, locGESW),
+			filter.getEncoderManager(), locGESW);
+		assertEquals(snippet, result);
+	}
+	
+	@Test
+	public void testListedColumns4() {
+		
+		Parameters params = (Parameters) filter.getParameters();
+		
+		InputStream input = TableFilterTest.class.getResourceAsStream("/fwc_test4.txt");
+		assertNotNull(input);
+		
+		params.columnNamesLineNum = 1;
+		params.valuesStartLineNum = 2;
+		params.detectColumnsMode = Parameters.DETECT_COLUMNS_NONE;
+		params.sendHeaderMode = Parameters.SEND_HEADER_NONE;
+		params.sendColumnsMode = Parameters.SEND_COLUMNS_LISTED;
+		//params.columnWidths = "19, 30, 21, 16, 15, 21, 20, 10";
+		params.columnStartPositions = "1, 20";
+		params.columnEndPositions = "11, 32";
+		
+		params.sourceColumns = "2";
+		params.sourceIdSuffixes = "";
+		params.targetColumns = "1";
+		params.targetLanguages = "ge-sw";
+		params.targetSourceRefs = "2";
+		params.sourceIdColumns = "";
+		params.sourceIdSourceRefs = "";
+		params.commentColumns = "";
+		params.commentSourceRefs = "";
+		params.recordIdColumn = 0;
+		
+		String snippet = null;
+		
+		try {
+			snippet = streamAsString(input);
+			
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+		}
+		//System.out.println(snippet);
+		
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, locEN, locGESW),
+			filter.getEncoderManager(), locGESW);
+		assertEquals(snippet, result);
+	}
+	
+	@Test
+	public void testListedColumns5() {
+		
+		Parameters params = (Parameters) filter.getParameters();
+		
+		InputStream input = TableFilterTest.class.getResourceAsStream("/fwc_test5.txt");
+		assertNotNull(input);
+		
+		params.columnNamesLineNum = 1;
+		params.valuesStartLineNum = 2;
+		params.detectColumnsMode = Parameters.DETECT_COLUMNS_NONE;
+		params.sendHeaderMode = Parameters.SEND_HEADER_NONE;
+		params.sendColumnsMode = Parameters.SEND_COLUMNS_LISTED;
+		//params.columnWidths = "19, 30, 21, 16, 15, 21, 20, 10";
+		params.columnStartPositions = "1, 20";
+		params.columnEndPositions = "11, 32";
+		
+		params.sourceColumns = "1";
+		params.sourceIdSuffixes = "";
+		params.targetColumns = "2";
+		params.targetLanguages = "ge-sw";
+		params.targetSourceRefs = "1";
+		params.sourceIdColumns = "";
+		params.sourceIdSourceRefs = "";
+		params.commentColumns = "";
+		params.commentSourceRefs = "";
+		params.recordIdColumn = 0;
 		
 		String snippet = null;
 		
@@ -1314,4 +1420,11 @@ public class FixedWidthColumnsFilterTest {
 			return list;
 		}
 
+	@Test
+	public void testSkelRefs() {
+		GenericSkeleton skel = new GenericSkeleton();
+		GenericSkeleton newSkel = skel;
+		skel = null;
+		assertNotNull(newSkel);
+	}
 }

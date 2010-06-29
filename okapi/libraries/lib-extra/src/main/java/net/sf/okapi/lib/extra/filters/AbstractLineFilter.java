@@ -38,6 +38,7 @@ import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
@@ -281,6 +282,17 @@ public abstract class AbstractLineFilter extends AbstractBaseFilter {
 			
 			if (event.getEventType() == EventType.TEXT_UNIT)
 				return (TextUnit) event.getResource();
+		}
+		
+		return null;
+	}
+	
+	protected DocumentPart getFirstDocumentPart() {
+		
+		for (Event event : queue) {
+			
+			if (event.getEventType() == EventType.DOCUMENT_PART)
+				return (DocumentPart) event.getResource();
 		}
 		
 		return null;

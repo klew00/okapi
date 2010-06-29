@@ -129,13 +129,17 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 //	}
 	
 	protected final TextProcessingResult sendAsSource(TextUnit textUnit) {
+		return sendAsSource(textUnit, true);
+	}
+	
+	protected final TextProcessingResult sendAsSource(TextUnit textUnit, boolean rejectEmpty) {
 		
 		if (textUnit == null) return TextProcessingResult.REJECTED;
 		TextUnitUtil.forceSkeleton(textUnit);
 		
 		if (!processTU(textUnit)) return TextProcessingResult.REJECTED;
 		
-		if (!TextUnitUtil.hasSource(textUnit)) return TextProcessingResult.REJECTED;
+		if (rejectEmpty && !TextUnitUtil.hasSource(textUnit)) return TextProcessingResult.REJECTED;
 		
 		sendEvent(EventType.TEXT_UNIT, textUnit);
 		
@@ -158,6 +162,8 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 		GenericSkeleton skel = getActiveSkeleton();
 		if (skel == null) return TextProcessingResult.REJECTED;
 		
+		//boolean selfRef = (source.getSkeleton() == skel); 
+		
 		GenericSkeleton targetSkel = TextUnitUtil.forceSkeleton(target);
 		if ( targetSkel == null ) return TextProcessingResult.REJECTED;
 		if ( !processTU(target) ) return TextProcessingResult.REJECTED;
@@ -165,8 +171,19 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 		source.setTarget(language, target.getSource());
 	
 		int index = SkeletonUtil.findTuRefInSkeleton(targetSkel);
+//		if ( index != -1 ) {
+//			// Replace target tu reference with a source reference
+//			GenericSkeleton tempSkel = new GenericSkeleton();
+//			if (selfRef)
+//				tempSkel.addContentPlaceholder(source, language);
+//			else {
+//				source.setIsReferent(true);
+//				tempSkel.addReference(source);
+//			}				
+//			SkeletonUtil.replaceSkeletonPart(targetSkel, index, tempSkel);
+//		}
+		
 		if ( index != -1 ) {
-			// Replace target tu reference with a source reference
 			GenericSkeleton tempSkel = new GenericSkeleton();
 			tempSkel.addContentPlaceholder(source, language);
 			SkeletonUtil.replaceSkeletonPart(targetSkel, index, tempSkel);

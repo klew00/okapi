@@ -204,10 +204,12 @@ public class CommaSeparatedValuesFilterTest {
 		
 		testEvent(EventType.START_GROUP, null);
 		testEvent(EventType.TEXT_UNIT, "source1", "", "target1", locFRCA, "");
+		testEvent(EventType.DOCUMENT_PART, "\"[#$$self$]\",\"[#$$self$]\",data1");
 		testEvent(EventType.END_GROUP, null);
 		
 		testEvent(EventType.START_GROUP, null);
 		testEvent(EventType.TEXT_UNIT, "source2", "", "target2", locFRCA, "");
+		testEvent(EventType.DOCUMENT_PART, "\"[#$$self$]\",\"[#$$self$]\",data2");
 		testEvent(EventType.END_GROUP, null);
 		
 		testEvent(EventType.END_DOCUMENT, null);
@@ -247,10 +249,12 @@ public class CommaSeparatedValuesFilterTest {
 		
 		testEvent(EventType.START_GROUP, null);
 		testEvent(EventType.TEXT_UNIT, "source1", "", "target1", locFRCA, "");
+		testEvent(EventType.DOCUMENT_PART, "\"[#$$self$]\",\"[#$$self$]\",data1");
 		testEvent(EventType.END_GROUP, null);
 		
 		testEvent(EventType.START_GROUP, null);
 		testEvent(EventType.TEXT_UNIT, "source2", "", "target2", locFRCA, "");
+		testEvent(EventType.DOCUMENT_PART, "\"[#$$self$]\",\"[#$$self$]\",data2");
 		testEvent(EventType.END_GROUP, null);
 		
 		testEvent(EventType.END_DOCUMENT, null);
@@ -798,14 +802,17 @@ public class CommaSeparatedValuesFilterTest {
 		testEvent(EventType.START_GROUP, null);
 		//testEvent(EventType.TEXT_UNIT, "one");
 		testEvent(EventType.TEXT_UNIT, "one", "01", null, null, null);
+		testEvent(EventType.DOCUMENT_PART, "01,[#$$self$]");
 		testEvent(EventType.END_GROUP, null);
 		
 		testEvent(EventType.START_GROUP, null);
 		testEvent(EventType.TEXT_UNIT, "first,\nsecond\n", "02", null, null, null);
+		testEvent(EventType.DOCUMENT_PART, "02,\"[#$$self$]\"");
 		testEvent(EventType.END_GROUP, null);
 		
 		testEvent(EventType.START_GROUP, null);
 		testEvent(EventType.TEXT_UNIT, "three", "03", null, null, null);
+		testEvent(EventType.DOCUMENT_PART, "03,[#$$self$]");
 		testEvent(EventType.END_GROUP, null);
 		
 		testEvent(EventType.END_DOCUMENT, null);
@@ -846,131 +853,157 @@ public class CommaSeparatedValuesFilterTest {
 		// Lines 2, 3
 		testEvent(EventType.START_GROUP, null);		
 		testEvent(EventType.TEXT_UNIT, "works \"\"text\"\" and \"\"text\"\" text\n", "815", null, null, null);
+		testEvent(EventType.DOCUMENT_PART, "815,\"[#$$self$]\"");
 		testEvent(EventType.END_GROUP, null);
 		
 		// Line 4
 		testEvent(EventType.START_GROUP, null);		
 		testEvent(EventType.TEXT_UNIT, "works \"\"text\"\", and \"\"text\"\" text", "815", null, null, null);
+		testEvent(EventType.DOCUMENT_PART, "815,\"[#$$self$]\"");
 		testEvent(EventType.END_GROUP, null);
 		
 		// Lines 5, 6
 		testEvent(EventType.START_GROUP, null);		
 		testEvent(EventType.TEXT_UNIT, "does not work \"\"text\"\", and \"\"text\"\" text\n", "815", null, null, null);
+		testEvent(EventType.DOCUMENT_PART, "815,\"[#$$self$]\"");
 		testEvent(EventType.END_GROUP, null);
 		
 		// Line 7
 		testEvent(EventType.START_GROUP, null);		
 		testEvent(EventType.TEXT_UNIT, "text", "816", null, null, null);
+		testEvent(EventType.DOCUMENT_PART, "816,[#$$self$]");
 		testEvent(EventType.END_GROUP, null);
 		
 		// Line 8
 		testEvent(EventType.START_GROUP, null);		
 		testEvent(EventType.TEXT_UNIT, "works \"text\" and \"text\"", "817", null, null, null);
+		testEvent(EventType.DOCUMENT_PART, "817,\"[#$$self$]\"");
 		testEvent(EventType.END_GROUP, null);
 		
 		// Lines 9, 10
 		testEvent(EventType.START_GROUP, null);
 		testEvent(EventType.TEXT_UNIT, "works \"text\" and \"text\"\n", "817", null, null, null);
+		testEvent(EventType.DOCUMENT_PART, "817,\"[#$$self$]\"");
 		testEvent(EventType.END_GROUP, null);
 				
 		// Line 11
 		testEvent(EventType.START_GROUP, null);
 		testEvent(EventType.TEXT_UNIT, "works \"text\", and \"text\"", "817", null, null, null);
+		testEvent(EventType.DOCUMENT_PART, "817,\"[#$$self$]\"");
 		testEvent(EventType.END_GROUP, null);
 		
 		// Lines 12, 13
 		testEvent(EventType.START_GROUP, null);
 		testEvent(EventType.TEXT_UNIT, "works \"text\", and \"text\"\n", "817", null, null, null);
+		testEvent(EventType.DOCUMENT_PART, "817,\"[#$$self$]\"");
 		testEvent(EventType.END_GROUP, null);
 		
 		// Line 14
 		testEvent(EventType.START_GROUP, null);
 		testEvent(EventType.TEXT_UNIT, "\"text\" and text", "818", null, null, null);
+		testEvent(EventType.DOCUMENT_PART, "818,\"[#$$self$]\"");
 		testEvent(EventType.END_GROUP, null);
 		
 		// Line 15
 		testEvent(EventType.START_GROUP, null);
 		testEvent(EventType.TEXT_UNIT, "text, \"text\" text", "818", null, null, null);
+		testEvent(EventType.DOCUMENT_PART, "818,\"[#$$self$]\"");
 		testEvent(EventType.END_GROUP, null);
 		
 		// Line 16
 		testEvent(EventType.START_GROUP, null);
 		testEvent(EventType.TEXT_UNIT, "text \"text\", text", "818", null, null, null);
+		testEvent(EventType.DOCUMENT_PART, "818,\"[#$$self$]\"");
 		testEvent(EventType.END_GROUP, null);
 		
 		// Lines 17, 18
 		testEvent(EventType.START_GROUP, null);
 		testEvent(EventType.TEXT_UNIT, "text \"text\", text\n", "818", null, null, null);
+		testEvent(EventType.DOCUMENT_PART, "818,\"[#$$self$]\", text");
 		testEvent(EventType.END_GROUP, null);
 		
 		// Line 19
 		testEvent(EventType.START_GROUP, null);
 		testEvent(EventType.TEXT_UNIT, "text \"text, text\", text", "819", null, null, null);
+		testEvent(EventType.DOCUMENT_PART, "819,\"[#$$self$]\"");
 		testEvent(EventType.END_GROUP, null);
 		
 		// Lines 20, 21
 		testEvent(EventType.START_GROUP, null);
 		testEvent(EventType.TEXT_UNIT, "text \"text, text\", text\n", "819", null, null, null);
+		testEvent(EventType.DOCUMENT_PART, "819,\"[#$$self$]\", text");
 		testEvent(EventType.END_GROUP, null);
 		
 		// Line 22
 		testEvent(EventType.START_GROUP, null);
 		testEvent(EventType.TEXT_UNIT, "\"text, text\" text", "820", null, null, null);
+		testEvent(EventType.DOCUMENT_PART, "820,[#$$self$], text");
 		testEvent(EventType.END_GROUP, null);
 		
 		// Line 23
 		testEvent(EventType.START_GROUP, null);
 		testEvent(EventType.TEXT_UNIT, "text, text", "820", null, null, null);
+		testEvent(EventType.DOCUMENT_PART, "820,\"[#$$self$]\", text, text");
 		testEvent(EventType.END_GROUP, null);
 		
 		// Line 24
 		testEvent(EventType.START_GROUP, null);
 		testEvent(EventType.TEXT_UNIT, "text \"text, text\" text", "820", null, null, null);
+		testEvent(EventType.DOCUMENT_PART, "820, [#$$self$], text");
 		testEvent(EventType.END_GROUP, null);
 		
 		// Line 25
 		testEvent(EventType.START_GROUP, null);
 		testEvent(EventType.TEXT_UNIT, "\"text\"text \"text", "820", null, null, null);
+		testEvent(EventType.DOCUMENT_PART, "820, [#$$self$],text\",text\"text, text");
 		testEvent(EventType.END_GROUP, null);
 		
 		// Line 26
 		testEvent(EventType.START_GROUP, null);
 		testEvent(EventType.TEXT_UNIT, "X <x>xxxxN</x> xxxxN <X>xxxxN</X>, text4.", "999", null, null, null);
+		testEvent(EventType.DOCUMENT_PART, "999,\"[#$$self$]\"");
 		testEvent(EventType.END_GROUP, null);
 		
 		// Line 27
 		testEvent(EventType.START_GROUP, null);
 		testEvent(EventType.TEXT_UNIT, "A <b>text1</b> text2 <B>text3</B>, text4.", "999", null, null, null);
+		testEvent(EventType.DOCUMENT_PART, "999,\"[#$$self$]\"");
 		testEvent(EventType.END_GROUP, null);
 		
 		// Line 28
 		testEvent(EventType.START_GROUP, null);
 		testEvent(EventType.TEXT_UNIT, "A <b>text1</b> text2 <B>text3</B>, text4 ", "999", null, null, null);
+		testEvent(EventType.DOCUMENT_PART, "999,\"[#$$self$]\"");
 		testEvent(EventType.END_GROUP, null);
 		
 		// Line 29
 		testEvent(EventType.START_GROUP, null);
 		testEvent(EventType.TEXT_UNIT, "text \"text, text.\", text", "819", null, null, null);
+		testEvent(EventType.DOCUMENT_PART, "819,\"[#$$self$]\"");
 		testEvent(EventType.END_GROUP, null);
 		
 		// Line 30
 		testEvent(EventType.START_GROUP, null);
 		testEvent(EventType.TEXT_UNIT, "text \"text, text \", text", "819", null, null, null);
+		testEvent(EventType.DOCUMENT_PART, "819,\"[#$$self$]\"");
 		testEvent(EventType.END_GROUP, null);
 		
 		// Line 31
 		testEvent(EventType.START_GROUP, null);
 		testEvent(EventType.TEXT_UNIT, "Text", "111", null, null, null);
+		testEvent(EventType.DOCUMENT_PART, "111,[#$$self$]");
 		testEvent(EventType.END_GROUP, null);
 		
 		// Line 32
 		testEvent(EventType.START_GROUP, null);
 		testEvent(EventType.TEXT_UNIT, " text1 \"\"text2\"\" text3, text4, text5.", "222", null, null, null);
+		testEvent(EventType.DOCUMENT_PART, "222,\"[#$$self$]\"");
 		testEvent(EventType.END_GROUP, null);
 		
 		// Line 33
 		testEvent(EventType.START_GROUP, null);
 		testEvent(EventType.TEXT_UNIT, "Text", "333", null, null, null);
+		testEvent(EventType.DOCUMENT_PART, "333,\"[#$$self$]\"");
 		testEvent(EventType.END_GROUP, null);
 		
 		testEvent(EventType.END_DOCUMENT, null);
@@ -1001,10 +1034,12 @@ public class CommaSeparatedValuesFilterTest {
 		
 		testEvent(EventType.START_GROUP, null);
 		testEvent(EventType.TEXT_UNIT, "Source text 1", "", "Target text 1", locFRFR, "");
+		testEvent(EventType.DOCUMENT_PART, "\"[#$$self$]\",\"[#$$self$]\",third column data1");
 		testEvent(EventType.END_GROUP, null);
 		
 		testEvent(EventType.START_GROUP, null);
 		testEvent(EventType.TEXT_UNIT, "Source text 2", "", "Target text 2", locFRFR, "");
+		testEvent(EventType.DOCUMENT_PART, "\"[#$$self$]\",\"[#$$self$]\",third column data2");
 		testEvent(EventType.END_GROUP, null);
 		
 		testEvent(EventType.END_DOCUMENT, null);
@@ -1022,10 +1057,12 @@ public class CommaSeparatedValuesFilterTest {
 						
 		testEvent(EventType.START_GROUP, null);
 		testEvent(EventType.TEXT_UNIT, "Source text 1", "", "Target text 1", locFRFR, "");
+		testEvent(EventType.DOCUMENT_PART, "\"[#$$self$]\",\"[#$$self$]\",third column data1");
 		testEvent(EventType.END_GROUP, null);
 		
 		testEvent(EventType.START_GROUP, null);
 		testEvent(EventType.TEXT_UNIT, "Source text 2", "", "Target text 2", locFRFR, "");
+		testEvent(EventType.DOCUMENT_PART, "\"[#$$self$]\",\"[#$$self$]\",third column data2");
 		testEvent(EventType.END_GROUP, null);
 		
 		testEvent(EventType.END_DOCUMENT, null);
@@ -1059,11 +1096,13 @@ public class CommaSeparatedValuesFilterTest {
 		testEvent(EventType.START_GROUP, null);
 		testEvent(EventType.TEXT_UNIT, "Source text 1", "", "Target text 1", locFRFR, "");
 		testEvent(EventType.TEXT_UNIT, "SourceB1", "", "TargetB1", locFRCA, "");
+		testEvent(EventType.DOCUMENT_PART, "\"[#$$self$]\",\"[#$$self$]\",third column data1,\"[#$$self$]\",\"[#$$self$]\"");
 		testEvent(EventType.END_GROUP, null);
 		
 		testEvent(EventType.START_GROUP, null);
 		testEvent(EventType.TEXT_UNIT, "Source text 2", "", "Target text 2", locFRFR, "");
 		testEvent(EventType.TEXT_UNIT, "SourceB2", "", "TargetB2", locFRCA, "");
+		testEvent(EventType.DOCUMENT_PART, "\"[#$$self$]\",\"[#$$self$]\",third column data2,\"[#$$self$]\",\"[#$$self$]\"");
 		testEvent(EventType.END_GROUP, null);
 		
 		testEvent(EventType.END_DOCUMENT, null);
@@ -1083,11 +1122,13 @@ public class CommaSeparatedValuesFilterTest {
 		testEvent(EventType.START_GROUP, null);
 		testEvent(EventType.TEXT_UNIT, "Source text 1", "", "Target text 1", locFRFR, "");
 		testEvent(EventType.TEXT_UNIT, "SourceB1", "", "TargetB1", locFRCA, "");
+		testEvent(EventType.DOCUMENT_PART, "\"[#$$self$]\",\"[#$$self$]\",third column data1,\"[#$$self$]\",\"[#$$self$]\"");
 		testEvent(EventType.END_GROUP, null);
 		
 		testEvent(EventType.START_GROUP, null);
 		testEvent(EventType.TEXT_UNIT, "Source text 2", "", "Target text 2", locFRFR, "");
 		testEvent(EventType.TEXT_UNIT, "SourceB2", "", "TargetB2", locFRCA, "");
+		testEvent(EventType.DOCUMENT_PART, "\"[#$$self$]\",\"[#$$self$]\",third column data2,\"[#$$self$]\",\"[#$$self$]\"");
 		testEvent(EventType.END_GROUP, null);
 		
 		testEvent(EventType.END_DOCUMENT, null);
@@ -1608,6 +1649,7 @@ public class CommaSeparatedValuesFilterTest {
 		
 		list.add(new InputDocument(root + "csv_test1.txt", ""));
 		list.add(new InputDocument(root + "csv_test2.txt", ""));
+		list.add(new InputDocument(root + "csv_testc.txt", ""));
 		list.add(new InputDocument(root + "csv_test3.txt", ""));
 		list.add(new InputDocument(root + "csv.txt", ""));
 		list.add(new InputDocument(root + "csv2.txt", ""));

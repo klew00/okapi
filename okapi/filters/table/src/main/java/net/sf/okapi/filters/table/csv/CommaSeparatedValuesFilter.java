@@ -28,6 +28,7 @@ import net.sf.okapi.common.RegexUtil;
 import net.sf.okapi.common.StringUtil;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
@@ -506,11 +507,22 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 		
 		
 		if (lineFlushed && forceEnding) {
-		
-			TextUnit tu = getFirstTextUnit();
-			if (tu == null) return;
-			
-			GenericSkeleton skel = (GenericSkeleton) tu.getSkeleton();
+
+			GenericSkeleton skel = null;
+			if (isSendListedMode()) {
+				// DocumentParts in listed columns contain the skeleton, TUs don't write the skeleton being isReferred = true
+				DocumentPart dp = getFirstDocumentPart();
+				if (dp == null) return;
+				
+				skel = (GenericSkeleton) dp.getSkeleton();
+			}
+			else {
+				TextUnit tu = getFirstTextUnit();
+				if (tu == null) return;
+				
+				skel = (GenericSkeleton) tu.getSkeleton();
+			}
+						
 			if (skel != null) {
 			
 				List <GenericSkeletonPart> parts = skel.getParts();				

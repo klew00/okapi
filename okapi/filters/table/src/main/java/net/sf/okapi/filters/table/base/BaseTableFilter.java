@@ -25,15 +25,17 @@ import java.util.List;
 
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.ListUtil;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
+import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.filters.plaintext.base.BasePlainTextFilter;
 import net.sf.okapi.lib.extra.filters.AbstractLineFilter;
 import net.sf.okapi.lib.extra.filters.TextProcessingResult;
@@ -189,7 +191,14 @@ public class BaseTableFilter extends BasePlainTextFilter {
 			
 		if (isColumnNames) inMultilineColumnNames = false;
 		if (Util.isEmpty(cells)) return super.sendAsSource(lineContainer); // No chunks, process the whole line
-			
+
+		// Assign missing id's
+		for (int i = 0; i < cells.size(); i++)	{
+			TextUnit cell = cells.get(i);
+			if (Util.isEmpty(cell.getId()))
+				cell.setId(String.format("%d_%d", lineNum, i + 1));
+		}
+		
 		if (processCells(cells, lineNum))
 			return TextProcessingResult.ACCEPTED;
 		else 
@@ -345,13 +354,165 @@ public class BaseTableFilter extends BasePlainTextFilter {
 					continue;
 				}				
 			}
-			
-			// Send cells (OKAPI-A 7*)
-			for (int i = 0; i < cells.size(); i++)	{
 
-				if (i > 0) sendAsSkeleton(getFieldDelimiter());
-					
+// --------------------------------------------------------------------------------------			
+//			// Send cells (OKAPI-A 7*)
+//			for (int i = 0; i < cells.size(); i++)	{
+//
+//				if (i > 0) sendAsSkeleton(getFieldDelimiter());
+//					
+//				
+//				TextUnit cell = cells.get(i); // Can be empty
+//				
+//				int colNumber = i + 1;
+//				
+//				if (isSource(colNumber)) {
+//					
+//					if (cell == null) continue;
+//
+//					if (sendAsSource(cell) != TextProcessingResult.ACCEPTED) {
+//						
+//						sendAsSkeleton(cell);
+//						continue; 
+//					}
+//					tuSent = true;
+//					
+//					continue;
+//				}
+//				
+//				if (isTarget(colNumber)) {
+//					TextUnit tu = getSourceFromTargetRef(cells, colNumber);
+//					if ( tu == null ) {
+//						sendAsSkeleton(cell);
+//						continue;
+//					}
+//					// Else:
+//					LocaleId language = getLanguageFromTargetRef(colNumber);
+//					if ( Util.isNullOrEmpty(language) ) {
+//						sendAsSkeleton(cell);
+//						continue;
+//					}
+//					
+//					sendAsTarget(cell, tu, language);
+//					continue;
+//				}
+//				
+//				// All other kinds of cells go to skeleton
+//				sendAsSkeleton(cell);
+//			}
+// --------------------------------------------------------------------------------------
+			
+//			// 1. Send all TUs with their skeletons 
+//			//GenericSkeleton skel = getActiveSkeleton(); 
+//			for (int i = 0; i < cells.size(); i++)	{				
+//				TextUnit cell = cells.get(i); // Can be empty				
+//				int colNumber = i + 1;
+//				
+//				if (isSource(colNumber)) {
+//					
+//					if (cell == null) continue;
+//
+////					if (sendAsSource(cell) != TextProcessingResult.ACCEPTED) {
+////						
+////						sendAsSkeleton(cell);
+////						continue; 
+////					}
+//					sendAsSource(cell, false);
+//					tuSent = true;
+//					
+//					continue;
+//				}								
+//			}
+//			
+//			// 2. Create a document part to provide a skeleton for references
+//			sendEvent(EventType.DOCUMENT_PART, new DocumentPart(null, false, new GenericSkeleton())); // id will be autoset
+//			GenericSkeleton skel = getActiveSkeleton();
+//			
+//			// 3. Loop through the cells, set references to tu's, and hook up the tu skeletons
+//			for (int i = 0; i < cells.size(); i++)	{
+//				if (i > 0) sendAsSkeleton(getFieldDelimiter());
+//				TextUnit cell = cells.get(i); // Can be empty
+//				
+//				int colNumber = i + 1;
+//				
+//				if (isSource(colNumber)) {
+//					
+//					if (cell == null) continue;
+//
+////					if (sendAsSource(cell) != TextProcessingResult.ACCEPTED) {
+////						
+////						sendAsSkeleton(cell);
+////						continue; 
+////					}
+////					tuSent = true;
+//					
+//					// Transfer the tu skeleton to the document part, removing the self ref to an external tu ref
+//					GenericSkeleton tuSkel = (GenericSkeleton)cell.getSkeleton(); 
+//					int index = SkeletonUtil.findTuRefInSkeleton(tuSkel);
+//					if (index != -1) {
+//						GenericSkeleton tempSkel = new GenericSkeleton();
+//						cell.setIsReferent(true);
+//						tempSkel.addReference(cell);
+//						SkeletonUtil.replaceSkeletonPart(tuSkel, index, tempSkel);
+//					}
+//					skel.add(tuSkel);
+//					cell.setSkeleton(null);
+//					
+//					continue;
+//				}
+//				
+//				if (isTarget(colNumber)) {
+//					TextUnit tu = getSourceFromTargetRef(cells, colNumber);
+//					if ( tu == null ) {
+//						sendAsSkeleton(cell);
+//						continue;
+//					}
+//					// Else:
+//					LocaleId language = getLanguageFromTargetRef(colNumber);
+//					if ( Util.isNullOrEmpty(language) ) {
+//						sendAsSkeleton(cell);
+//						continue;
+//					}
+//					
+//					sendAsTarget(cell, tu, language);
+//					continue;
+//				}
+//				
+//				// All other kinds of cells go to skeleton
+//				sendAsSkeleton(cell);
+//			}
+// --------------------------------------------------------------------------------------			
+			
+			// 1. Send all TUs with their skeletons 
+			//GenericSkeleton skel = getActiveSkeleton(); 
+			for (int i = 0; i < cells.size(); i++)	{				
+				TextUnit cell = cells.get(i); // Can be empty				
+				int colNumber = i + 1;
 				
+				if (isSource(colNumber)) {
+					
+					if (cell == null) continue;
+
+//					if (sendAsSource(cell) != TextProcessingResult.ACCEPTED) {
+//						
+//						sendAsSkeleton(cell);
+//						continue; 
+//					}
+					cell.setIsReferent(true); // not to have a writer write the skeleton 
+					sendAsSource(cell, false); // TU is processed (spaces etc.)
+					tuSent = true;
+					
+					continue;
+				}								
+			}
+			
+			// 2. Create a document part to provide a skeleton for references
+			sendEvent(EventType.DOCUMENT_PART, new DocumentPart(null, false, new GenericSkeleton())); // id will be autoset
+			GenericSkeleton skel = getActiveSkeleton(); // references are added to the document part's skeleton
+			
+			// 3. Loop through the cells, set references to tu's, and hook up the tu skeletons
+			for (int i = 0; i < cells.size(); i++)	{
+				if (i > 0) sendAsSkeleton(getFieldDelimiter());
 				TextUnit cell = cells.get(i); // Can be empty
 				
 				int colNumber = i + 1;
@@ -360,12 +521,25 @@ public class BaseTableFilter extends BasePlainTextFilter {
 					
 					if (cell == null) continue;
 
-					if (sendAsSource(cell) != TextProcessingResult.ACCEPTED) {
-						
-						sendAsSkeleton(cell);
-						continue; 
-					}
-					tuSent = true;
+//					if (sendAsSource(cell) != TextProcessingResult.ACCEPTED) {
+//						
+//						sendAsSkeleton(cell);
+//						continue; 
+//					}
+//					tuSent = true;
+					
+					// Transfer the tu skeleton to the document part, removing the self ref to an external tu ref
+					GenericSkeleton tuSkel = (GenericSkeleton)cell.getSkeleton(); 
+//					int index = SkeletonUtil.findTuRefInSkeleton(tuSkel);
+//					if (index != -1) {
+//						GenericSkeleton tempSkel = new GenericSkeleton();
+//						cell.setIsReferent(true);
+//						tempSkel.addReference(cell);
+//						SkeletonUtil.replaceSkeletonPart(tuSkel, index, tempSkel);
+//					}
+					tuSkel.changeSelfReferents(cell);
+					skel.add(tuSkel); // TU keeps its skeleton as well (2 refs to the generic parts list) for other cells to use
+					//cell.setSkeleton(null);
 					
 					continue;
 				}
@@ -389,7 +563,7 @@ public class BaseTableFilter extends BasePlainTextFilter {
 				
 				// All other kinds of cells go to skeleton
 				sendAsSkeleton(cell);
-			}									
+			}
 		}
 		
 		if (tuSent) {
@@ -528,5 +702,9 @@ public class BaseTableFilter extends BasePlainTextFilter {
 		isFixedNumColumns = 		
 			(params.detectColumnsMode == Parameters.DETECT_COLUMNS_FIXED_NUMBER && params.numColumns > 0) ||
 			(params.detectColumnsMode == Parameters.DETECT_COLUMNS_COL_NAMES && !inHeaderArea);
+	}
+
+	protected boolean isSendListedMode() {
+		return sendListedMode;
 	}
 }
