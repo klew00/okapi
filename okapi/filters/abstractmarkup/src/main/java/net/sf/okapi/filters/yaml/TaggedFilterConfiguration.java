@@ -299,7 +299,7 @@ public class TaggedFilterConfiguration {
 	 * @param tag
 	 * @param attributes
 	 * @param attribute
-	 * @return
+	 * @return the matching {@link RULE_TYPE}
 	 */
 	public RULE_TYPE findMatchingAttributeRule(String tag, Map<String, String> attributes,
 			String attribute) {
@@ -314,8 +314,8 @@ public class TaggedFilterConfiguration {
 		}
 
 		// check attribute rules (including regex)
-		return findMatchingElementOnAttributeRule(tag, attribute, getAttributeRuleType(attribute
-				.toLowerCase()));
+		return findMatchingElementOnAttributeRule(tag, attribute, attributes, 
+				getAttributeRuleType(attribute.toLowerCase()));
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -431,7 +431,8 @@ public class TaggedFilterConfiguration {
 	 * @return
 	 */
 	@SuppressWarnings("rawtypes")
-	private RULE_TYPE findMatchingElementOnAttributeRule(String tag, String attribute,
+	private RULE_TYPE findMatchingElementOnAttributeRule(String tag, String attribute, 
+			Map<String, String> attributes,
 			RULE_TYPE ruleType) {
 		List excludedElements;
 		List onlyTheseElements;
@@ -439,6 +440,11 @@ public class TaggedFilterConfiguration {
 
 		if (attrRule == null) {
 			return RULE_TYPE.RULE_NOT_FOUND;
+		}
+		
+		// test for a conditional rule on this attribute
+		if (!doesAttributeRuleConditionApply(attrRule, attributes)) {
+			return RULE_TYPE.RULE_FAILED; 
 		}
 
 		excludedElements = (List) attrRule.get(ALL_ELEMENTS_EXCEPT);
@@ -665,9 +671,7 @@ public class TaggedFilterConfiguration {
 	}
 	
 	@SuppressWarnings("rawtypes")
-	private boolean doesAttributeRuleConditionApply(Map attributeRule,
-			Map<String, String> attributes) {
-	
+	private boolean doesAttributeRuleConditionApply(Map attributeRule, Map<String, String> attributes) {
 		List conditions = (List)attributeRule.get(CONDITIONS);
 		if (conditions != null) {
 			return applyConditions(conditions, attributes);

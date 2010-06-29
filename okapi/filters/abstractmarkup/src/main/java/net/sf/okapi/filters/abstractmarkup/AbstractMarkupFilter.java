@@ -891,25 +891,27 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 				propertyOrTextUnitPlaceholders.add(createPropertyTextUnitPlaceholder(PlaceholderAccessType.TRANSLATABLE,
 						attribute.getName(), attribute.getValue(), startTag, attribute));
 				break;
-
 			case ATTRIBUTE_WRITABLE:
 				propertyOrTextUnitPlaceholders.add(createPropertyTextUnitPlaceholder(
 						PlaceholderAccessType.WRITABLE_PROPERTY, attribute.getName(), attribute.getValue(), startTag,
 						attribute));
 				break;
-				
 			case ATTRIBUTE_READONLY:
 				propertyOrTextUnitPlaceholders.add(createPropertyTextUnitPlaceholder(
 						PlaceholderAccessType.READ_ONLY_PROPERTY, attribute.getName(), attribute.getValue(), startTag,
 						attribute));
 				break;
-				
 			case ATTRIBUTE_ID:
 				propertyOrTextUnitPlaceholders.add(createPropertyTextUnitPlaceholder(
 						PlaceholderAccessType.NAME, attribute.getName(), attribute.getValue(), startTag,
 						attribute));
 				break;
-				
+			case ATTRIBUTE_PRESERVE_WHITESPACE:
+				//setPreserveWhitespace(getRuleState().isPreserveWhitespaceState());
+				propertyOrTextUnitPlaceholders.add(createPropertyTextUnitPlaceholder(
+						PlaceholderAccessType.WRITABLE_PROPERTY, attribute.getName(), attribute.getValue(), startTag,
+						attribute));
+				break;
 			default:
 				break;
 			}
