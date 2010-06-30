@@ -13,6 +13,7 @@
     <name>Okapi Filters UI Build</name>
     <modules>
         <module>html-ui</module>
+        <module>abstractmarkup-ui</module>
         <module>openoffice-ui</module>
         <module>openxml-ui</module>
         <module>plaintext-ui</module>

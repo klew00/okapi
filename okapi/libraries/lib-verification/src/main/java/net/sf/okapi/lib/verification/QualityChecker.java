@@ -64,7 +64,8 @@ class QualityChecker {
 			ltConn.initialize(targetLocale, params.getServerURL(), params.translateLTMsg,
 				params.ltTranslationSource, params.ltTranslationTarget);
 		}
-		
+
+		// Expression for finding doubled words
 		// The expression: "\\b(\\w+)\\s+\\1\\b" does not work for extended chars (\w and \s are ASCII based)
 		// We have to use the Unicode equivalents
 		patDoubledWords = Pattern.compile("\\b([\\p{Ll}\\p{Lu}\\p{Lt}\\p{Lo}\\p{Nd}]+)[\\t\\n\\f\\r\\p{Z}]+\\1\\b",
@@ -107,18 +108,19 @@ class QualityChecker {
 				continue; // Cannot go further for that segment
 			}
 			
-			// Check code differences, if requested
-			if ( params.getCodeDifference() ) {
-				checkInlineCodes(srcSeg, trgSeg, tu);
-			}
-			
 			// Check for empty target, if requested
 			if ( params.getEmptyTarget() ) {
 				if ( trgSeg.text.isEmpty() && !srcSeg.text.isEmpty() ) {
 					reportIssue(IssueType.EMPTY_TARGETSEG, tu, srcSeg.getId(),
 						"Empty translation.",
 						0, 0, 0, 0, srcSeg.toString(), "");
+					continue; // No need to check more if it's empty
 				}
+			}
+			
+			// Check code differences, if requested
+			if ( params.getCodeDifference() ) {
+				checkInlineCodes(srcSeg, trgSeg, tu);
 			}
 			
 			// Check for target is the same as source, if requested
@@ -137,7 +139,10 @@ class QualityChecker {
 				checkPatterns(srcSeg, trgSeg, tu);
 			}
 			
-			// check all suspect patterns
+			// Check length
+			checkLengths(srcSeg, trgSeg, tu);
+			
+			// Check all suspect patterns
 			checkSuspectPatterns(srcSeg, trgSeg, tu);
 			
 			// Run a check with LanguageTool connector
@@ -313,6 +318,31 @@ class QualityChecker {
 
 	}
 
+	private void checkLengths (Segment srcSeg,
+		Segment trgSeg,
+		TextUnit tu)
+	{
+		int srcLen = srcSeg.text.getCodedText().length();
+		int trgLen = trgSeg.text.getCodedText().length();
+		int n = (srcLen==0 ? 0 : (int)((srcLen*params.getMaxCharLength())/100));
+		if ( trgLen > n ) {
+			double d = (((float)trgLen)/(srcLen==0 ? 1.0 : ((float)srcLen)))*100.0;
+			reportIssue(IssueType.TARGET_LENGTH, tu, srcSeg.getId(),
+				String.format("The target is suspiciously longer than its source (%.2f%% of the source).", d),
+				0, -1, 0, -1,
+				srcSeg.toString(), trgSeg.toString());
+		}
+		
+		n = (srcLen==0 ? 0 : (int)((srcLen*params.getMinCharLength())/100));
+		if ( trgSeg.text.getCodedText().length() < n ) {
+			double d = (((float)trgLen)/(srcLen==0 ? 1.0 : ((float)srcLen)))*100.0;
+			reportIssue(IssueType.TARGET_LENGTH, tu, srcSeg.getId(),
+				String.format("The target is suspiciously shorter than its source (%.2f%% of the source).", d),
+				0, -1, 0, -1,
+				srcSeg.toString(), trgSeg.toString());
+		}
+	}
+	
 	private void checkSuspectPatterns (Segment srcSeg,
 		Segment trgSeg,
 		TextUnit tu)
@@ -351,28 +381,35 @@ class QualityChecker {
 				// Get the source text corresponding to the match
 				String srcPart = srcCText.substring(srcM.start(), srcM.end());
 				int start, end;
-				boolean bFound = false;
+				boolean found = false;
+				boolean expectSame = item.target.equals(PatternItem.SAME);
 				// Try to get the corresponding part in the target
-				if ( item.target.equals(PatternItem.SAME) ) {
+				if ( expectSame ) {
 					// If the target pattern is defined as being the same as the source
 					// Look for the same text in the source.
-					bFound = ((start = trgCText.indexOf(srcPart)) != -1);
+					found = ((start = trgCText.indexOf(srcPart)) != -1);
 					end = start + srcPart.length();
 				}
 				else { // Target part has its own pattern
 					Matcher trgM = item.getTargetPattern().matcher(trgCText);
-					bFound = trgM.find();
+					found = trgM.find();
 					start = trgM.start();
 					end = trgM.end();
 				}
 				// Process result
-				if ( bFound ) { // Remove that match in case source has several occurrences to match
+				if ( found ) { // Remove that match in case source has several occurrences to match
 					trgCText.delete(start, end);
 				}
 				else { // Generate an issue
+					String msg;
+					if ( expectSame ) {
+						msg = String.format("The source part \"%s\" is not in the target.", srcPart);
+					}
+					else {
+						msg = String.format("The source part \"%s\" has no correspondance in the target.", srcPart);
+					}
 					reportIssue(IssueType.UNEXPECTED_PATTERN, tu, srcSeg.getId(),
-						String.format("The source part '%s' has no correspondance in the target.", srcPart),
-						srcM.start(), -1, start, -1,
+						msg, srcM.start(), -1, start, -1,
 						srcSeg.toString(), trgSeg.toString());
 				}
 			}

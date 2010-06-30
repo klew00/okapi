@@ -18,33 +18,16 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.lib.verification;
+package net.sf.okapi.filters.abstractmarkup.ui;
 
-public enum IssueType {
+import java.util.List;
 
-	MISSING_TARGETTU,
-	MISSING_TARGETSEG,
-	
-	EMPTY_TARGETSEG,
-	
-	MISSING_LEADINGWS,
-	MISSINGORDIFF_LEADINGWS,
-	EXTRA_LEADINGWS,
-	EXTRAORDIFF_LEADINGWS,
-	MISSING_TRAILINGWS,
-	MISSINGORDIFF_TRAILINGWS,
-	EXTRA_TRAILINGWS,
-	EXTRAORDIFF_TRAILINGWS,
+import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
 
-	TARGET_SAME_AS_SOURCE,
-	
-	CODE_DIFFERENCE,
-	
-	UNEXPECTED_PATTERN,
-	
-	SUSPECT_PATTERN,
-	
-	TARGET_LENGTH,
-	
-	LANGUAGETOOL_ERROR
+class AttributeRule {
+
+	RULE_TYPE ruleType;
+	int scope;
+	List<Condition> conditions;
+
 }

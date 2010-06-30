@@ -253,4 +253,9 @@ public class YamlConfigurationReader {
 			}
 		}
 	}
+
+	public 	Map<String, Object> getAttributeRules () {
+		return attributeRules;
+	}
+
 }

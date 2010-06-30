@@ -679,4 +679,8 @@ public class TaggedFilterConfiguration {
 		
 		return true;
 	}
+	
+	public Map<String, Object> getAttributeRules () {
+		return configReader.getAttributeRules();
+	}
 }

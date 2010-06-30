@@ -533,11 +533,12 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		cbTypes.add("Target same as source"); // TARGET_SAME_AS_SOURCE
 		cbTypes.add("Missing white spaces"); // All missing whitespace-related issues
 		cbTypes.add("Extra white spaces"); // All extra whitespace-related issues
-		cbTypes.add("Inline codes differents"); // CODE_DIFFERENCE
+		cbTypes.add("Inline codes difference"); // CODE_DIFFERENCE
 		cbTypes.add("Unexpected patterns"); // UNEXPECTED_PATTERN
 		cbTypes.add("Suspect patterns"); // SUSPECT_PATTERN
-		cbTypes.add("Warnings from LanguageTool checker"); // LANGUAGETOOL_ERROR
-		cbTypes.setVisibleItemCount(11);
+		cbTypes.add("Target length"); // TARGET_LENGTH
+		cbTypes.add("LanguageTool checker warnings"); // LANGUAGETOOL_ERROR
+		cbTypes.setVisibleItemCount(12);
 		cbTypes.setLayoutData(new GridData());
 		cbTypes.select(issueType);
 		cbTypes.addSelectionListener(new SelectionAdapter() {
@@ -840,7 +841,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 			updateCaption();
 		}
 		catch ( Throwable e ) {
-			Dialogs.showError(shell, "Error while saving.\n"+e.getMessage(), null);
+			Dialogs.showError(shell, "Error while loading.\n"+e.getMessage(), null);
 		}
 		finally {
 			stopWaiting();

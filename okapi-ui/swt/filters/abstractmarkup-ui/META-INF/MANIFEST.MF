@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Abstract Markup Filter UI
+Bundle-SymbolicName: net.sf.okapi.filters.abstractmarkup.ui
+Bundle-Version: 1.0.0.qualifier
+Require-Bundle: org.eclipse.swt;bundle-version="3.5.0",
+ net.sf.okapi.ui.common;bundle-version="1.0.0",
+ net.sf.okapi.common;bundle-version="1.0.0",
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: net.sf.okapi.filters.abstractmarkup.ui
+Bundle-ClassPath: lib/swing2swt.jar,
+ .

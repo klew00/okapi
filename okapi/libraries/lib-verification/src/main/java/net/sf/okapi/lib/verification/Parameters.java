@@ -48,6 +48,10 @@ public class Parameters extends BaseParameters {
 	private static final String SAVESESSION = "saveSession";
 	private static final String SESSIONPATH = "sessionPath";
 	private static final String DOUBLEDWORD = "doubledWord";
+	private static final String CHECKMAXCHARLENGTH = "checkMaxCharLength";
+	private static final String MAXCHARLENGTH = "maxCharLength";
+	private static final String CHECKMINCHARLENGTH = "checkMinCharLength";
+	private static final String MINCHARLENGTH = "minCharLength";
 
 	String outputPath;
 	boolean autoOpen;
@@ -67,11 +71,46 @@ public class Parameters extends BaseParameters {
 	boolean saveSession;
 	String sessionPath;
 	boolean doubledWord;
+	boolean checkMaxCharLength;
+	int maxCharLength;
+	boolean checkMinCharLength;
+	int minCharLength;
 
 	public Parameters () {
 		reset();
 	}
 	
+	public boolean getCheckMaxCharLength () {
+		return checkMaxCharLength;
+	}
+
+	public void setCheckMaxCharLength (boolean checkMaxCharLength) {
+		this.checkMaxCharLength = checkMaxCharLength;
+	}
+
+	public int getMaxCharLength () {
+		return maxCharLength;
+	}
+
+	public void setMaxCharLength (int maxCharLength) {
+		this.maxCharLength = maxCharLength;
+	}
+
+	public boolean getCheckMinCharLength() {
+		return checkMinCharLength;
+	}
+
+	public void setCheckMinCharLength (boolean checkMinCharLength) {
+		this.checkMinCharLength = checkMinCharLength;
+	}
+
+	public int getMinCharLength() {
+		return minCharLength;
+	}
+
+	public void setMinCharLength(int minCharLength) {
+		this.minCharLength = minCharLength;
+	}
 
 	public boolean getDoubledWord () {
 		return doubledWord;
@@ -236,6 +275,11 @@ public class Parameters extends BaseParameters {
 		saveSession = true;
 		sessionPath = "${rootDir}/qa-session"+QualityCheckSession.FILE_EXTENSION;
 		doubledWord = true;
+		
+		checkMaxCharLength = true;
+		maxCharLength = 150;
+		checkMinCharLength = true;
+		minCharLength = 50;
 
 		patterns = new ArrayList<PatternItem>();
 		// Enclosing marks
@@ -281,6 +325,10 @@ public class Parameters extends BaseParameters {
 		saveSession = buffer.getBoolean(SAVESESSION, saveSession);
 		sessionPath = buffer.getString(SESSIONPATH, sessionPath);
 		doubledWord = buffer.getBoolean(DOUBLEDWORD, doubledWord);
+		checkMaxCharLength = buffer.getBoolean(CHECKMAXCHARLENGTH, checkMaxCharLength);
+		maxCharLength = buffer.getInteger(MAXCHARLENGTH, maxCharLength);
+		checkMinCharLength = buffer.getBoolean(CHECKMINCHARLENGTH, checkMinCharLength);
+		minCharLength = buffer.getInteger(MINCHARLENGTH, minCharLength);
 		// Patterns
 		checkPatterns = buffer.getBoolean(CHECKPATTERNS, checkPatterns);
 		int count = buffer.getInteger(PATTERNCOUNT, 0);
@@ -312,6 +360,10 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean(SAVESESSION, saveSession);
 		buffer.setString(SESSIONPATH, sessionPath);
 		buffer.setBoolean(DOUBLEDWORD, doubledWord);
+		buffer.setBoolean(CHECKMAXCHARLENGTH, checkMaxCharLength);
+		buffer.setInteger(MAXCHARLENGTH, maxCharLength);
+		buffer.setBoolean(CHECKMINCHARLENGTH, checkMinCharLength);
+		buffer.setInteger(MINCHARLENGTH, minCharLength);
 		// Patterns
 		buffer.setBoolean(CHECKPATTERNS, checkPatterns);
 		buffer.setInteger(PATTERNCOUNT, patterns.size());

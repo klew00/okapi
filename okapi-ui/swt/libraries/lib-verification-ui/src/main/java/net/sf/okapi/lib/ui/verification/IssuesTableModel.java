@@ -102,8 +102,11 @@ class IssuesTableModel {
 				case SUSPECT_PATTERN:
 					if ( issueType != 9 ) continue;
 					break;
-				case LANGUAGETOOL_ERROR:
+				case TARGET_LENGTH:
 					if ( issueType != 10 ) continue;
+					break;
+				case LANGUAGETOOL_ERROR:
+					if ( issueType != 11 ) continue;
 					break;
 				default:
 					continue;

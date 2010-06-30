@@ -18,33 +18,12 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.lib.verification;
+package net.sf.okapi.filters.abstractmarkup.ui;
 
-public enum IssueType {
+class Condition {
 
-	MISSING_TARGETTU,
-	MISSING_TARGETSEG,
-	
-	EMPTY_TARGETSEG,
-	
-	MISSING_LEADINGWS,
-	MISSINGORDIFF_LEADINGWS,
-	EXTRA_LEADINGWS,
-	EXTRAORDIFF_LEADINGWS,
-	MISSING_TRAILINGWS,
-	MISSINGORDIFF_TRAILINGWS,
-	EXTRA_TRAILINGWS,
-	EXTRAORDIFF_TRAILINGWS,
+	String part1;
+	int operator;
+	String part2;
 
-	TARGET_SAME_AS_SOURCE,
-	
-	CODE_DIFFERENCE,
-	
-	UNEXPECTED_PATTERN,
-	
-	SUSPECT_PATTERN,
-	
-	TARGET_LENGTH,
-	
-	LANGUAGETOOL_ERROR
 }

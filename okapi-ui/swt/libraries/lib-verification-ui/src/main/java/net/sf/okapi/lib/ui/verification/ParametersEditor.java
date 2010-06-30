@@ -52,6 +52,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.widgets.Table;
@@ -97,6 +98,10 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Button chkTranslateLTMsg;
 	private Text edLTTranslationSource;
 	private Text edLTTranslationTarget;
+	private Button chkMaxCharLength;
+	private Spinner spMaxCharLength;
+	private Button chkMinCharLength;
+	private Spinner spMinCharLength;
 	// Flag to indicate the editor is use for step parameters
 	// We default to true because the step cannot set this option
 	private boolean stepMode = false; // Disabled for now
@@ -259,17 +264,48 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		});
 		chkTargetSameAsSource.setLayoutData(new GridData());
 
+		final int horizIndent = 16;
 		chkTargetSameAsSourceWithCodes = new Button(grpSeg, SWT.CHECK);
 		chkTargetSameAsSourceWithCodes.setText("Include the codes in the comparison");
 		gdTmp = new GridData();
-		gdTmp.horizontalIndent = 16;
+		gdTmp.horizontalIndent = horizIndent;
 		chkTargetSameAsSourceWithCodes.setLayoutData(gdTmp);
 		
 		chkCodeDifference = new Button(grpSeg, SWT.CHECK);
 		chkCodeDifference.setText("Warn if there is a code difference between source and target segments");
 
 		chkDoubledWord = new Button(grpSeg, SWT.CHECK);
-		chkDoubledWord.setText("Warn on doubled words (e.g. \"This [is is an example\")");
+		chkDoubledWord.setText("Warn on doubled words (e.g. \"This is is an example\")");
+		
+		chkMaxCharLength = new Button(grpSeg, SWT.CHECK);
+		chkMaxCharLength.setText("Warn if a target is longer than the following percentage of the character length of its source:");
+		chkMaxCharLength.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				updateMaxCharLength();
+			};
+		});
+		spMaxCharLength = new Spinner(grpSeg, SWT.BORDER);
+		gdTmp = new GridData();
+		gdTmp.widthHint = 40;
+		gdTmp.horizontalIndent = horizIndent;
+		spMaxCharLength.setLayoutData(gdTmp);
+		spMaxCharLength.setMaximum(999);
+		spMaxCharLength.setMinimum(1);
+		
+		chkMinCharLength = new Button(grpSeg, SWT.CHECK);
+		chkMinCharLength.setText("Warn if a target is shorter than the following percentage of the character length of its source:");
+		chkMinCharLength.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				updateMinCharLength();
+			};
+		});
+		spMinCharLength = new Spinner(grpSeg, SWT.BORDER);
+		gdTmp = new GridData();
+		gdTmp.widthHint = 40;
+		gdTmp.horizontalIndent = horizIndent;
+		spMinCharLength.setLayoutData(gdTmp);
+		spMinCharLength.setMaximum(999);
+		spMinCharLength.setMinimum(1);
 		
 		TabItem tiTmp = new TabItem(tfTmp, SWT.NONE);
 		tiTmp.setText("General");
@@ -696,6 +732,14 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		chkTargetSameAsSourceWithCodes.setEnabled(chkTargetSameAsSource.getSelection());
 	}
 
+	private void updateMaxCharLength () {
+		spMaxCharLength.setEnabled(chkMaxCharLength.getSelection());
+	}
+
+	private void updateMinCharLength () {
+		spMinCharLength.setEnabled(chkMinCharLength.getSelection());
+	}
+
 	private void updatePatterns () {
 		boolean enabled = chkPatterns.getSelection();
 		table.setEnabled(enabled);
@@ -745,10 +789,16 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		edLTTranslationTarget.setText(params.getLtTranslationTarget());
 		chkPatterns.setSelection(params.getCheckPatterns());
 		chkDoubledWord.setSelection(params.getDoubledWord());
+		chkMaxCharLength.setSelection(params.getCheckMaxCharLength());
+		spMaxCharLength.setSelection(params.getMaxCharLength());
+		chkMinCharLength.setSelection(params.getCheckMinCharLength());
+		spMinCharLength.setSelection(params.getMinCharLength());
 		setPatternsData(params.getPatterns());
 		updateTargetSameAsSourceWithCodes();
 		updatePatterns();
 		updateLTOptions();
+		updateMaxCharLength();
+		updateMinCharLength();
 		// Step-mode fields
 		if ( stepMode ) {
 			chkSaveSession.setSelection(params.getSaveSession());
@@ -764,7 +814,8 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			row.setChecked(item.enabled);
 			row.setText(1, item.source);
 			row.setText(2, item.target);
-			row.setText(3, item.description);
+			// Handle null for old sessions
+			row.setText(3, item.description==null ? "<Enter description here>" : item.description);
 		}
 		if ( table.getItemCount() > 0 ) {
 			table.setSelection(0);
@@ -807,6 +858,15 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			}
 		}
 
+		params.setCheckMaxCharLength(chkMaxCharLength.getSelection());
+		if ( chkMaxCharLength.getSelection() ) {
+			params.setMaxCharLength(spMaxCharLength.getSelection());
+		}
+		params.setCheckMinCharLength(chkMinCharLength.getSelection());
+		if ( chkMinCharLength.getSelection() ) {
+			params.setMinCharLength(spMinCharLength.getSelection());
+		}
+
 		params.setOutputPath(pnlOutputPath.getText());
 		params.setCodeDifference(chkCodeDifference.getSelection());
 		params.setAutoOpen(chkAutoOpen.getSelection());
@@ -843,7 +903,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		List<PatternItem> list = new ArrayList<PatternItem>();
 		for ( int i=0; i<table.getItemCount(); i++ ) {
 			list.add(new PatternItem(table.getItem(i).getText(1), table.getItem(i).getText(2),
-				table.getItem(i).getChecked()));
+				table.getItem(i).getChecked(), table.getItem(i).getText(3)));
 		}
 		return list;
 	}
