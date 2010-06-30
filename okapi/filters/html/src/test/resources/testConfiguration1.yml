@@ -31,7 +31,7 @@
 # NOT_EQUALS 
 # MATCH regex match. Must match the entire attribute value
 
-collapse_whitespace: true
+preserve_whitespace: false
 
 attributes:
   # attributes that occur on many elements

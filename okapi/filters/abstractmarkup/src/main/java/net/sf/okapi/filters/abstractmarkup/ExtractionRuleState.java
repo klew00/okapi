@@ -43,6 +43,7 @@ public class ExtractionRuleState {
 		public String ruleName;
 		public RULE_TYPE ruleType;
 		public String idValue;
+		public boolean ruleApplies;
 		
 		public RuleType(String ruleName, RULE_TYPE ruleType, String idValue) {
 			this.ruleName = ruleName;
@@ -50,10 +51,11 @@ public class ExtractionRuleState {
 			this.idValue = idValue;			
 		}
 		
-		public RuleType(String ruleName, RULE_TYPE ruleType) {
+		public RuleType(String ruleName, RULE_TYPE ruleType, boolean ruleApplies) {
 			this.ruleName = ruleName;
 			this.ruleType = ruleType;
 			this.idValue = null;			
+			this.ruleApplies = ruleApplies;
 		}
 	}
 
@@ -67,12 +69,14 @@ public class ExtractionRuleState {
 	/**
 	 * 
 	 */
-	public ExtractionRuleState() {
-		reset();
+	public ExtractionRuleState(boolean preserveWhitespace) {
+		reset(preserveWhitespace);
 	}
 
-	public void reset() {
+	public void reset(boolean preserveWhitespace) {
 		preserveWhiteSpaceRuleStack = new Stack<RuleType>();
+		pushPreserverWhitespaceRule(preserveWhitespace);
+		
 		excludedIncludedRuleStack = new Stack<RuleType>();
 		groupRuleStack = new Stack<RuleType>();
 		textUnitRuleStack = new Stack<RuleType>();
@@ -113,18 +117,15 @@ public class ExtractionRuleState {
 		if (preserveWhiteSpaceRuleStack.isEmpty()) {
 			return false;
 		}
-		if (preserveWhiteSpaceRuleStack.peek().ruleType == RULE_TYPE.PRESERVE_WHITESPACE) {
-			return true;
-		}
-		return false;
+		return preserveWhiteSpaceRuleStack.peek().ruleApplies;
 	}
 
-	public void pushPreserverWhitespaceRule(String ruleName) {
-		preserveWhiteSpaceRuleStack.push(new RuleType(ruleName, RULE_TYPE.PRESERVE_WHITESPACE, null));
+	public void pushPreserverWhitespaceRule(boolean ruleApplies) {
+		preserveWhiteSpaceRuleStack.push(new RuleType("", RULE_TYPE.PRESERVE_WHITESPACE, ruleApplies));
 	}
 
-	public void pushPreserverWhitespaceRule(String ruleName, RULE_TYPE rule) {
-		preserveWhiteSpaceRuleStack.push(new RuleType(ruleName, RULE_TYPE.PRESERVE_WHITESPACE, null));
+	public void pushPreserverWhitespaceRule(String ruleName, boolean ruleApplies) {
+		preserveWhiteSpaceRuleStack.push(new RuleType(ruleName, RULE_TYPE.PRESERVE_WHITESPACE, ruleApplies));
 	}
 
 	public void pushExcludedRule(String ruleName) {

@@ -1,4 +1,4 @@
-collapse_whitespace: true
+preserve_whitespace: false
 
 elements:
   # test read-only, writable attributes

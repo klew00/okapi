@@ -368,7 +368,7 @@ public class EventBuilder {
 		subDocumentId = 0;
 
 		done = false;
-		preserveWhitespace = true;
+		this.preserveWhitespace = true;
 
 		referencableFilterEvents = new LinkedList<Event>();
 		filterEvents = new LinkedList<Event>();
@@ -1136,6 +1136,14 @@ public class EventBuilder {
 	 */
 	public void setPreserveWhitespace(boolean preserveWhitespace) {
 		this.preserveWhitespace = preserveWhitespace;
+	}
+	
+	/**
+	 * What is the current preserve whitespace  state?
+	 * @return true if whitespace is to be preserved, false otherwise
+	 */
+	public boolean isPreserveWhitespace() {
+		return this.preserveWhitespace;
 	}
 
 	/**

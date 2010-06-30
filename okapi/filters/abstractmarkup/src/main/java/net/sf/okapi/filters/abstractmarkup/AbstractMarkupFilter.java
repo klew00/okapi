@@ -86,13 +86,12 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 
 	private StringBuilder bufferedWhitespace;
 	private StreamedSource document;
-	private ExtractionRuleState ruleState;
 	private Iterator<Segment> nodeIterator;
 	private boolean hasUtf8Bom;
 	private boolean hasUtf8Encoding;
-	private boolean preserveWhitespace;
 	private EventBuilder eventBuilder;
 	private RawDocument currentRawDocument;
+	private ExtractionRuleState ruleState;
 
 	static {
 		Config.ConvertNonBreakingSpaces = false;
@@ -105,42 +104,23 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 * {@link EventBuilder}
 	 */
 	public AbstractMarkupFilter() {
-		setEventBuilder(new EventBuilder());
-		bufferedWhitespace = new StringBuilder();
-		hasUtf8Bom = false;
-		hasUtf8Encoding = false;		
+		this.eventBuilder = new AbstractMarkupEventBuilder();		 
+		this.bufferedWhitespace = new StringBuilder();
+		this.hasUtf8Bom = false;
+		this.hasUtf8Encoding = false;		
 	}
 
 	/**
-	 * Create a {@link AbstractMarkupFilter} with an {@link EventBuilder} for
-	 * {@link AbstractMarkupFilter}
+	 * Default constructor for {@link AbstractMarkupFilter} using default
+	 * {@link EventBuilder}
 	 */
 	public AbstractMarkupFilter(EventBuilder eventBuilder) {
-		setEventBuilder(eventBuilder);
-		bufferedWhitespace = new StringBuilder();
-		hasUtf8Bom = false;
-		hasUtf8Encoding = false;	
+		this.eventBuilder = eventBuilder;		
+		this.bufferedWhitespace = new StringBuilder();
+		this.hasUtf8Bom = false;
+		this.hasUtf8Encoding = false;		
 	}
-
-	/**
-	 * Get the current {@link ExtractionRuleState} object.
-	 * 
-	 * @return a {@link ExtractionRuleState}
-	 */
-	public ExtractionRuleState getRuleState() {
-		return ruleState;
-	}
-
-	/**
-	 * Sets the current {@link ExtractionRuleState}
-	 * 
-	 * @param ruleState
-	 *            a {@link ExtractionRuleState}
-	 */
-	public void setRuleState(ExtractionRuleState ruleState) {
-		this.ruleState = ruleState;
-	}
-
+	
 	/**
 	 * Get the current {@link TaggedFilterConfiguration}. A
 	 * TaggedFilterConfiguration is the result of reading in a YAML
@@ -156,7 +136,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	public void close() {
 		
 		if (ruleState != null) {
-			ruleState.reset();
+			ruleState.reset(!getConfig().isGlobalPreserveWhitespace());
 		}
 		
 		if (currentRawDocument != null) {
@@ -236,11 +216,6 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	public void open(RawDocument input, boolean generateSkeleton) {
 		// close RawDocument from previous run
 		close();
-		
-		// close StreamedSource from previous run
-		if (document != null) {
-			close();
-		}
 
 		currentRawDocument = input;
 		
@@ -358,11 +333,17 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 * {@link Event}
 	 */
 	protected void startFilter() {
+		// order of execution matters	
 		getEventBuilder().reset();
 		getEventBuilder().addFilterEvent(createStartDocumentEvent());
-
-		// Segment iterator
-		ruleState = new ExtractionRuleState();
+		
+		// default is to preserve whitespace
+		boolean preserveWhitespace = true;
+		if (getConfig() != null) {
+			preserveWhitespace = getConfig().isGlobalPreserveWhitespace();
+		}
+		ruleState = new ExtractionRuleState(preserveWhitespace);
+		setPreserveWhitespace(ruleState.isPreserveWhitespaceState());
 
 		// This optimizes memory at the expense of performance
 		nodeIterator = document.iterator();
@@ -382,7 +363,6 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 * is to do nothing.
 	 * 
 	 * @param segment
-	 * @return true if the normal handlers can be skipped, false otherwise
 	 */
 	protected void preProcess(Segment segment) {
 		boolean isInsideTextRun = false;
@@ -502,7 +482,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 */
 	protected void handleText(Segment text) {
 		// if in excluded state everything is skeleton including text
-		if (getRuleState().isExludedState()) {
+		if (ruleState.isExludedState()) {
 			addToDocumentPart(text.toString());
 			return;
 		}
@@ -567,7 +547,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		
 		try {
 			// if in excluded state everything is skeleton including text
-			if (getRuleState().isExludedState()) {
+			if (ruleState.isExludedState()) {
 				addToDocumentPart(startTag.toString());
 				updateStartTagRuleState(startTag.getName(), ruleType, idValue);
 				return;
@@ -621,7 +601,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 			// A TextUnit may have already been created. Update its preserveWS field
 			if (getEventBuilder().isCurrentTextUnit()) {
 				TextUnit tu = getEventBuilder().peekMostRecentTextUnit();
-				tu.setPreserveWhitespaces(getRuleState().isPreserveWhitespaceState());
+				tu.setPreserveWhitespaces(ruleState.isPreserveWhitespaceState());
 			}
 		}
 	}
@@ -629,22 +609,22 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	protected void updateStartTagRuleState(String tag, RULE_TYPE ruleType, String idValue) {
 		switch(getConfig().getElementRuleType(tag)) {
 		case INLINE_ELEMENT:
-			getRuleState().pushInlineRule(tag, ruleType);
+			ruleState.pushInlineRule(tag, ruleType);
 			break;
 		case ATTRIBUTES_ONLY:
 			// TODO: add a rule state for ATTRIBUTE_ONLY rules
 			break;
 		case GROUP_ELEMENT:
-			getRuleState().pushGroupRule(tag, ruleType);
+			ruleState.pushGroupRule(tag, ruleType);
 			break;
 		case EXCLUDED_ELEMENT:
-			getRuleState().pushExcludedRule(tag, ruleType);
+			ruleState.pushExcludedRule(tag, ruleType);
 			break;
 		case INCLUDED_ELEMENT:
-			getRuleState().pushIncludedRule(tag, ruleType);
+			ruleState.pushIncludedRule(tag, ruleType);
 			break;
 		case TEXT_UNIT_ELEMENT:
-			getRuleState().pushTextUnitRule(tag, ruleType, idValue);
+			ruleState.pushTextUnitRule(tag, ruleType, idValue);
 			break;
 		default:				
 			break;
@@ -653,8 +633,8 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		// TODO: add conditional support for PRESERVE_WHITESPACE rules
 		// does this tag have a PRESERVE_WHITESPACE rule?
 		if (getConfig().isRuleType(tag, RULE_TYPE.PRESERVE_WHITESPACE)) {
-			getRuleState().pushPreserverWhitespaceRule(tag);
-			setPreserveWhitespace(getRuleState().isPreserveWhitespaceState());
+			ruleState.pushPreserverWhitespaceRule(tag, true);
+			setPreserveWhitespace(ruleState.isPreserveWhitespaceState());
 		}
 	}
 
@@ -664,26 +644,26 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		
 		switch(ruleType) {
 		case INLINE_ELEMENT:
-			currentState = getRuleState().popInlineRule();
+			currentState = ruleState.popInlineRule();
 			ruleType = currentState.ruleType;
 			break;
 		case ATTRIBUTES_ONLY:
 			// TODO: add a rule state for ATTRIBUTE_ONLY rules
 			break;
 		case GROUP_ELEMENT:
-			currentState = getRuleState().popGroupRule();
+			currentState = ruleState.popGroupRule();
 			ruleType = currentState.ruleType;
 			break;
 		case EXCLUDED_ELEMENT:
-			currentState = getRuleState().popExcludedIncludedRule();
+			currentState = ruleState.popExcludedIncludedRule();
 			ruleType = currentState.ruleType;
 			break;
 		case INCLUDED_ELEMENT:
-			currentState = getRuleState().popExcludedIncludedRule();
+			currentState = ruleState.popExcludedIncludedRule();
 			ruleType = currentState.ruleType;
 			break;
 		case TEXT_UNIT_ELEMENT:
-			currentState = getRuleState().popTextUnitRule();
+			currentState = ruleState.popTextUnitRule();
 			ruleType = currentState.ruleType;
 			break;
 		default:				
@@ -699,14 +679,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 						+ " do not match at character number " + character);
 			}
 		}
-		
-		// TODO: add conditional support for PRESERVE_WHITESPACE rules
-		// does this tag have a PRESERVE_WHITESPACE rule?
-		if (getConfig().isRuleType(endTag.getName(), RULE_TYPE.PRESERVE_WHITESPACE)) {
-			getRuleState().popPreserverWhitespaceRule();
-			setPreserveWhitespace(getRuleState().isPreserveWhitespaceState());
-		}
-		
+				
 		return ruleType;
 	}
 	
@@ -759,7 +732,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		RULE_TYPE ruleType = RULE_TYPE.RULE_NOT_FOUND;
 				
 		// if in excluded state everything is skeleton including text
-		if (getRuleState().isExludedState()) {
+		if (ruleState.isExludedState()) {
 			addToDocumentPart(endTag.toString());
 			updateEndTagRuleState(endTag);
 			return;
@@ -790,6 +763,18 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 			addToDocumentPart(endTag.toString());
 			break;
 		} 
+		
+		// TODO: add conditional support for PRESERVE_WHITESPACE rules
+		// does this tag have a PRESERVE_WHITESPACE rule?
+		if (getConfig().isRuleType(endTag.getName(), RULE_TYPE.PRESERVE_WHITESPACE)) {
+			ruleState.popPreserverWhitespaceRule();
+			setPreserveWhitespace(ruleState.isPreserveWhitespaceState());
+		// handle cases such as xml:space where we popped on an element while
+		// processing the attributes
+		} else if (ruleState.peekPreserverWhitespaceRule().ruleName.equalsIgnoreCase(endTag.getName())) {
+			ruleState.popPreserverWhitespaceRule();
+			setPreserveWhitespace(ruleState.isPreserveWhitespaceState());
+		}
 	}
 
 	/**
@@ -907,10 +892,20 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 						attribute));
 				break;
 			case ATTRIBUTE_PRESERVE_WHITESPACE:
-				//setPreserveWhitespace(getRuleState().isPreserveWhitespaceState());
-				propertyOrTextUnitPlaceholders.add(createPropertyTextUnitPlaceholder(
-						PlaceholderAccessType.WRITABLE_PROPERTY, attribute.getName(), attribute.getValue(), startTag,
-						attribute));
+				boolean preserveWS = getConfig().isPreserveWhitespaceCondition(attribute.getName(), attributeMap);
+				boolean defaultWS = getConfig().isDefaultWhitespaceCondition(attribute.getName(), attributeMap);
+				// if its not reserve or default then the rule doesn't apply
+				if (preserveWS || defaultWS) {					
+					if (preserveWS) {
+						ruleState.pushPreserverWhitespaceRule(startTag.getName(), true);
+					} else if (defaultWS) {
+						ruleState.pushPreserverWhitespaceRule(startTag.getName(), false);
+					}
+					setPreserveWhitespace(ruleState.isPreserveWhitespaceState());				
+					propertyOrTextUnitPlaceholders.add(createPropertyTextUnitPlaceholder(
+							PlaceholderAccessType.WRITABLE_PROPERTY, attribute.getName(), attribute.getValue(), startTag,
+							attribute));
+				}
 				break;
 			default:
 				break;
@@ -976,11 +971,10 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 * @return the preserveWhitespace boolean.
 	 */
 	protected boolean isPreserveWhitespace() {
-		return preserveWhitespace;
+		return ruleState.isPreserveWhitespaceState();
 	}
 
-	protected void setPreserveWhitespace(boolean preserveWhitespace) {
-		this.preserveWhitespace = preserveWhitespace;
+	protected void setPreserveWhitespace(boolean preserveWhitespace) {		
 		getEventBuilder().setPreserveWhitespace(preserveWhitespace);
 	}
 
@@ -1088,11 +1082,8 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		getEventBuilder().addFilterEvent(event);
 	}
 	
-	/**
-	 * @param eventBuilder the eventBuilder to set
-	 */
-	public void setEventBuilder(EventBuilder eventBuilder) {
-		this.eventBuilder = eventBuilder;
+	protected ExtractionRuleState getRuleState() {
+		return ruleState;
 	}
 
 	/**

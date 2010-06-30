@@ -22,13 +22,13 @@ public class HtmlConfigurationSupportTest {
 	
 	@Test
 	public void test_collapse_whitespace () {
-		String config = "collapse_whitespace: true";
+		String config = "preserve_whitespace: false";
 		filter.setParameters(new Parameters(config));
 		String snippet = "<p> t1  \nt2  </p>";
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
 		assertEquals("t1 t2", tu.getSource().toString());
 
-		config = "collapse_whitespace: false";
+		config = "preserve_whitespace: true";
 		filter.setParameters(new Parameters(config));
 		tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
 		assertEquals(" t1  \nt2  ", tu.getSource().toString());
@@ -37,6 +37,7 @@ public class HtmlConfigurationSupportTest {
 	@Test
 	public void test_PRESERVE_WHITESPACE () {
 		String config = 
+				"preserve_whitespace: false\n" +
 			    "elements:\n" +
 				"  pre: \n" +
 			    "    ruleTypes: [PRESERVE_WHITESPACE]";

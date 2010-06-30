@@ -964,7 +964,7 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 				getRuleState().pushIncludedRule(sTagName);
 				break;
 			case PRESERVE_WHITESPACE:
-				getRuleState().pushPreserverWhitespaceRule(sTagName);
+				getRuleState().pushPreserverWhitespaceRule(sTagName, true);
 				break;
 			}
 			return;
@@ -1161,7 +1161,7 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 			}
 			break;
 		case PRESERVE_WHITESPACE:
-			getRuleState().pushPreserverWhitespaceRule(sTagName);
+			getRuleState().pushPreserverWhitespaceRule(sTagName, true);
 			addToDocumentPart(sTagString);
 			break;
 		default:

@@ -67,8 +67,8 @@ import net.sf.okapi.filters.abstractmarkup.AbstractMarkupFilter;
  * example, "type=button" OR "type=default".
  */
 public class TaggedFilterConfiguration {
-	public static final String COLLAPSE_WHITSPACE = "collapse_whitespace";
 	public static final String RULETYPES = "ruleTypes";
+	public static final String GLOBAL_PRESERVE_WHITESPACE = "preserve_whitespace";
 	public static final String INLINE = "INLINE";
 	public static final String GROUP = "GROUP";
 	public static final String EXCLUDE = "EXCLUDE";
@@ -105,6 +105,8 @@ public class TaggedFilterConfiguration {
 	public static final String ELEMENT_WRITABLE_ATTRIBUTES = "writableLocalizableAttributes";
 	public static final String ELEMENT_READ_ONLY_ATTRIBUTES = "readOnlyLocalizableAttributes";
 	public static final String ELEMENT_ID_ATTRIBUTES = "idAttributes";
+	private static final Object PRESERVE_CONDITION = "preserve";
+	private static final Object DEFAULT_CONDITION = "default";
 
 	/**
 	 * {@link AbstractMarkupFilter} rule types. These rules are listed in YAML configuration files 
@@ -217,12 +219,13 @@ public class TaggedFilterConfiguration {
 		return configReader.toString();
 	}
 
-	public boolean isCollapseWhitespace() {
-		Boolean cw = (Boolean) configReader.getProperty(COLLAPSE_WHITSPACE);
-		if (cw == null) {
+	public boolean isGlobalPreserveWhitespace() {
+		Boolean pw = (Boolean) configReader.getProperty(GLOBAL_PRESERVE_WHITESPACE);
+		if (pw == null) {
+			// default is preserve whitespace
 			return true;
 		}
-		return cw.booleanValue();
+		return pw.booleanValue();
 	}
 
 	public boolean isWellformed() {
@@ -423,6 +426,7 @@ public class TaggedFilterConfiguration {
 				return RULE_TYPE.ATTRIBUTE_PRESERVE_WHITESPACE;
 			}
 		}
+
 		return RULE_TYPE.RULE_NOT_FOUND;
 	}
 
@@ -544,7 +548,7 @@ public class TaggedFilterConfiguration {
 		return findMatchingAttributeRule(tag, attributes, attribute) == RULE_TYPE.ATTRIBUTE_ID;
 	}
 
-	public RULE_TYPE convertRuleAsStringToRuleType (String ruleType) {
+	public RULE_TYPE convertRuleAsStringToRuleType(String ruleType) {
 		if (ruleType.equalsIgnoreCase(INLINE)) {
 			return RULE_TYPE.INLINE_ELEMENT;
 		} else if (ruleType.equalsIgnoreCase(GROUP)) {
@@ -634,7 +638,8 @@ public class TaggedFilterConfiguration {
 			return applyCondition(attributes.get(conditionalAttribute.toLowerCase()), compareType,
 					conditionValue);
 		} else {
-			throw new RuntimeException("Error reading attributes from config file");
+			throw new RuntimeException("Error reading conditions. " +
+					"Have you quoted values such as 'true', 'false', 'yes', and 'no'?");
 		}
 
 		return false;
@@ -678,6 +683,30 @@ public class TaggedFilterConfiguration {
 		}
 		
 		return true;
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public boolean isPreserveWhitespaceCondition(String attribute, Map<String, String> attributes) {
+		Map attributeRule = configReader.getAttributeRule(attribute);
+		if (doesAttributeRuleConditionApply(attributeRule, attributes)) {
+			List preserveWhiteSpace = (List)attributeRule.get(PRESERVE_CONDITION);
+			if (preserveWhiteSpace != null) {
+				return applyConditions(preserveWhiteSpace, attributes);
+			}
+		}		
+		return false;
+	}	
+	
+	@SuppressWarnings("rawtypes")
+	public boolean isDefaultWhitespaceCondition(String attribute, Map<String, String> attributes) {
+		Map attributeRule = configReader.getAttributeRule(attribute);
+		if (doesAttributeRuleConditionApply(attributeRule, attributes)) {
+			List defaultWhiteSpace = (List)attributeRule.get(DEFAULT_CONDITION);
+			if (defaultWhiteSpace != null) {
+				return applyConditions(defaultWhiteSpace, attributes);
+			}
+		}		
+		return false;
 	}
 	
 	public Map<String, Object> getAttributeRules () {

@@ -55,7 +55,7 @@ public class HtmlFilter extends AbstractMarkupFilter {
 	private Parameters parameters;
 
 	public HtmlFilter() {
-		super(new AbstractMarkupEventBuilder());
+		super();		
 		setMimeType(MimeTypeMapper.HTML_MIME_TYPE);
 		setFilterWriter(createFilterWriter());
 		setParameters(new Parameters());
@@ -75,11 +75,8 @@ public class HtmlFilter extends AbstractMarkupFilter {
 	 */
 	@Override
 	protected void startFilter() {
-		super.startFilter();
-		getEventBuilder().setPreserveWhitespace(false);
-		getEventBuilder().setCollapseWhitespace(
-				!isPreserveWhitespace() && getConfig().isCollapseWhitespace());
-		if (getConfig().isCollapseWhitespace()) {
+		super.startFilter();		
+		if (!getConfig().isGlobalPreserveWhitespace()) {
 			LOGGER.log(Level.FINE,
 					"By default the HTML filter will collapse whitespace unless overridden in the configuration"); //$NON-NLS-1$
 		}
@@ -115,9 +112,7 @@ public class HtmlFilter extends AbstractMarkupFilter {
 	
 	@Override
 	protected void handleStartTag(StartTag startTag) {
-		super.handleStartTag(startTag);
-		getEventBuilder().setCollapseWhitespace(
-				!isPreserveWhitespace() && getConfig().isCollapseWhitespace());
+		super.handleStartTag(startTag);		
 	}
 
 	@Override
@@ -155,10 +150,18 @@ public class HtmlFilter extends AbstractMarkupFilter {
 		default:
 			addToDocumentPart(endTag.toString());
 			break;
-		} 
+		} 		
 		
-		getEventBuilder().setCollapseWhitespace(
-				!isPreserveWhitespace() && getConfig().isCollapseWhitespace());
+		// does this tag have a PRESERVE_WHITESPACE rule?
+		if (getConfig().isRuleType(endTag.getName(), RULE_TYPE.PRESERVE_WHITESPACE)) {
+			getRuleState().popPreserverWhitespaceRule();
+			setPreserveWhitespace(getRuleState().isPreserveWhitespaceState());
+		// handle cases such as xml:space where we popped on an element while
+		// processing the attributes
+		} else if (getRuleState().peekPreserverWhitespaceRule().ruleName.equalsIgnoreCase(endTag.getName())) {
+			getRuleState().popPreserverWhitespaceRule();
+			setPreserveWhitespace(getRuleState().isPreserveWhitespaceState());
+		}		
 	}
 	
 	@Override
@@ -226,13 +229,6 @@ public class HtmlFilter extends AbstractMarkupFilter {
 			}
 		}
 		
-		// TODO: add conditional support for PRESERVE_WHITESPACE rules
-		// does this tag have a PRESERVE_WHITESPACE rule?
-		if (getConfig().isRuleType(endTag.getName(), RULE_TYPE.PRESERVE_WHITESPACE)) {
-			getRuleState().popPreserverWhitespaceRule();
-			setPreserveWhitespace(getRuleState().isPreserveWhitespaceState());
-		}
-		
 		return ruleType;
 	}
 
@@ -264,10 +260,8 @@ public class HtmlFilter extends AbstractMarkupFilter {
 		}
 
 		// name is normalized in super-class
-		return super.createPropertyTextUnitPlaceholder(type, name, getEventBuilder()
-				.normalizeHtmlText(value, true,
-						!isPreserveWhitespace() && getConfig().isCollapseWhitespace()), tag,
-				attribute);
+		return super.createPropertyTextUnitPlaceholder(type, name, getEventBuilder().normalizeHtmlText(
+				value, true, isPreserveWhitespace()), tag, attribute);
 	}
 
 	/*

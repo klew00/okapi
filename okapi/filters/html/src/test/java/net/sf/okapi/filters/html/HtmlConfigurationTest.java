@@ -149,11 +149,11 @@ public class HtmlConfigurationTest {
 		URL url = HtmlFilter.class
 				.getResource("/net/sf/okapi/filters/html/nonwellformedConfiguration.yml");
 		TaggedFilterConfiguration rules = new TaggedFilterConfiguration(url);
-		assertTrue(rules.isCollapseWhitespace());
+		assertFalse(rules.isGlobalPreserveWhitespace());
 
 		url = HtmlConfigurationTest.class.getResource("/collapseWhitespaceOff.yml");
 		rules = new TaggedFilterConfiguration(url);
-		assertFalse(rules.isCollapseWhitespace());
+		assertTrue(rules.isGlobalPreserveWhitespace());
 	}
 
 	@Test

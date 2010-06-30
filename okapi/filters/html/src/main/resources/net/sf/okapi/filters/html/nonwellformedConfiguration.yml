@@ -34,7 +34,7 @@
 # ELEMENT AND ATTRIBUTE NAMES MUST BE LOWER CASED!!!!!!
 
 assumeWellformed: false
-collapse_whitespace: true
+preserve_whitespace: false
 
 attributes:
   # attributes that occur on many elements

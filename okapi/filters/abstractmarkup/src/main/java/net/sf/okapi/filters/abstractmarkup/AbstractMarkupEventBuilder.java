@@ -31,33 +31,19 @@ import net.sf.okapi.common.resource.TextUnit;
 
 public class AbstractMarkupEventBuilder extends EventBuilder {
 	/*
-	 * HTML whitespace space (U+0020) tab (U+0009) form feed (U+000C) line feed
+	 * Typical whitespace space (U+0020) tab (U+0009) form feed (U+000C) line feed
 	 * (U+000A) carriage return (U+000D) zero-width space (U+200B) (IE6 does not
 	 * recognize these, they are treated as unprintable characters)
 	 */
-	private static final String HTML_WHITESPACE_REGEX = "[ \t\r\n\f\u200B]+";
-	private static final Pattern HTML_WHITESPACE_PATTERN = Pattern.compile(HTML_WHITESPACE_REGEX);
-	
-	private boolean collapseWhitespace = true;
+	private static final String WHITESPACE_REGEX = "[ \t\r\n\f\u200B]+";
+	private static final Pattern WHITESPACE_PATTERN = Pattern.compile(WHITESPACE_REGEX);
+		
 	private boolean useCodeFinder = false;
 	private InlineCodeFinder codeFinder;
 	
-	public AbstractMarkupEventBuilder () {
+	public AbstractMarkupEventBuilder() {
+		super();		
 		codeFinder = new InlineCodeFinder();
-	}
-	
-	/**
-	 * @return the collapseWhitespace
-	 */
-	public boolean isCollapseWhitespace() {
-		return collapseWhitespace;
-	}
-
-	/**
-	 * @param collapseWhitespace the collapseWhitespace to set
-	 */
-	public void setCollapseWhitespace(boolean collapseWhitespace) {
-		this.collapseWhitespace = collapseWhitespace;
 	}
 	
 	/**
@@ -81,7 +67,7 @@ public class AbstractMarkupEventBuilder extends EventBuilder {
 		// We can use getFirstPartContent() because nothing is segmented
 		TextFragment text = textUnit.getSource().getFirstContent();
 		// Treat the white spaces
-		text.setCodedText(normalizeHtmlText(text.getCodedText(), false, isCollapseWhitespace()));
+		text.setCodedText(normalizeHtmlText(text.getCodedText(), false, isPreserveWhitespace()));
 		// Apply the in-line codes rules if needed
 		if ( useCodeFinder ) {
 			codeFinder.process(text);
@@ -89,11 +75,11 @@ public class AbstractMarkupEventBuilder extends EventBuilder {
 		return textUnit;
 	}
 	
-	public String normalizeHtmlText(String text, boolean insideAttribute, boolean collapseWhitespace) {
+	public String normalizeHtmlText(String text, boolean insideAttribute, boolean preserveWhitespace) {
 		// convert all entities to Unicode
 		String decodedValue = CharacterReference.decode(text, insideAttribute);
 		
-		if (collapseWhitespace) {
+		if (!preserveWhitespace) {
 			decodedValue = collapseWhitespace(decodedValue);
 			decodedValue = decodedValue.trim();
 		}
@@ -103,6 +89,6 @@ public class AbstractMarkupEventBuilder extends EventBuilder {
 	}
 	
 	private String collapseWhitespace(String text) {
-		return HTML_WHITESPACE_PATTERN.matcher(text).replaceAll(" ");
+		return WHITESPACE_PATTERN.matcher(text).replaceAll(" ");
 	}
 }

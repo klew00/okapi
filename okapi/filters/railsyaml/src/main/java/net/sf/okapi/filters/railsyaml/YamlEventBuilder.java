@@ -33,7 +33,7 @@ public class YamlEventBuilder extends EventBuilder {
 //	private static final Pattern YAML_WHITESPACE_PATTERN = Pattern.compile(YAML_WHITESPACE_REGEX);
 
 	public YamlEventBuilder() {
-		// TODO Auto-generated constructor stub
+		super();
 	}
 	
 	/**
