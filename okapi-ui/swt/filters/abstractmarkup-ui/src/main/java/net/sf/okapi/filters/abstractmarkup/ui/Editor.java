@@ -20,7 +20,6 @@
 
 package net.sf.okapi.filters.abstractmarkup.ui;
 
-import java.util.ArrayList;
 import java.util.Map;
 
 import net.sf.okapi.common.EditorFor;
@@ -57,6 +56,12 @@ import org.eclipse.swt.widgets.Text;
 
 @EditorFor(AbstractMarkupParameters.class)
 public class Editor implements IParametersEditor {
+
+	private static final int ATTRULES_TRANS = 0;
+	private static final int ATTRULES_WRITABLE = 1;
+	private static final int ATTRULES_READONLY = 2;
+	private static final int ATTRULES_ID = 3;
+	private static final int ATTRULES_PRESERVE_WHITESPACE = 4;
 	
 	private Shell shell;
 	private boolean result = false;
@@ -64,11 +69,11 @@ public class Editor implements IParametersEditor {
 	private IHelp help;
 	private List lbAtt;
 	private Table tblAttRules;
-	private Button chkAttrAllElements;
-	private Button chkAttOnlyThese;
-	private Button chkAttExceptThese;
+	private Button rdAttrAllElements;
+	private Button rdAttOnlyThese;
+	private Button rdAttExceptThese;
 	private Text edAttScopeElements;
-	private ArrayList<Attribute> attributes;
+	private Attribute currentAtt;
 
 	public boolean edit (IParameters options,
 		boolean readOnly,
@@ -153,6 +158,11 @@ public class Editor implements IParametersEditor {
 		gdTmp.verticalSpan = 2;
 		gdTmp.widthHint = 130;
 		lbAtt.setLayoutData(gdTmp);
+		lbAtt.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				updateAttribute();
+			};
+		});
 
 		tblAttRules = new Table(cmpTmp, SWT.BORDER | SWT.CHECK | SWT.FULL_SELECTION);
 		tblAttRules.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
@@ -174,27 +184,27 @@ public class Editor implements IParametersEditor {
 		Group grpScope = new Group(cmpTmp, SWT.NONE);
 		grpScope.setLayout(new GridLayout());
 		grpScope.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING | GridData.FILL_HORIZONTAL));
-		grpScope.setText("Scope of the selected rule:");
+		grpScope.setText("Scope:");
 		
-		chkAttrAllElements = new Button(grpScope, SWT.RADIO); 
-		chkAttrAllElements.setText("Applies to all elements");
-		chkAttrAllElements.addSelectionListener(new SelectionAdapter() {
+		rdAttrAllElements = new Button(grpScope, SWT.RADIO); 
+		rdAttrAllElements.setText("Applies to all elements");
+		rdAttrAllElements.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				updateScopeElements();
 			};
 		});
 		
-		chkAttOnlyThese = new Button(grpScope, SWT.RADIO);
-		chkAttOnlyThese.setText("Apply only for the following elements:");
-		chkAttOnlyThese.addSelectionListener(new SelectionAdapter() {
+		rdAttOnlyThese = new Button(grpScope, SWT.RADIO);
+		rdAttOnlyThese.setText("Apply only for the following elements:");
+		rdAttOnlyThese.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				updateScopeElements();
 			};
 		});
 		
-		chkAttExceptThese = new Button(grpScope, SWT.RADIO);
-		chkAttExceptThese.setText("Apply to all elements excepted for the following ones:");
-		chkAttExceptThese.addSelectionListener(new SelectionAdapter() {
+		rdAttExceptThese = new Button(grpScope, SWT.RADIO);
+		rdAttExceptThese.setText("Apply to all elements excepted for the following ones:");
+		rdAttExceptThese.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				updateScopeElements();
 			};
@@ -244,7 +254,52 @@ public class Editor implements IParametersEditor {
 	}
 	
 	private void updateScopeElements () {
-		edAttScopeElements.setEnabled(!chkAttrAllElements.getSelection());
+		edAttScopeElements.setEnabled(!rdAttrAllElements.getSelection());
+	}
+
+	private boolean saveAttribute () {
+		if ( currentAtt == null ) return true;
+		currentAtt.rules.clear();
+		if ( tblAttRules.getItem(ATTRULES_TRANS).getChecked() ) currentAtt.rules.add(RULE_TYPE.ATTRIBUTE_TRANS);
+		if ( tblAttRules.getItem(ATTRULES_WRITABLE).getChecked() ) currentAtt.rules.add(RULE_TYPE.ATTRIBUTE_WRITABLE);
+		if ( tblAttRules.getItem(ATTRULES_READONLY).getChecked() ) currentAtt.rules.add(RULE_TYPE.ATTRIBUTE_READONLY);
+		if ( tblAttRules.getItem(ATTRULES_ID).getChecked() ) currentAtt.rules.add(RULE_TYPE.ATTRIBUTE_ID);
+		if ( tblAttRules.getItem(ATTRULES_PRESERVE_WHITESPACE).getChecked() ) currentAtt.rules.add(RULE_TYPE.ATTRIBUTE_PRESERVE_WHITESPACE);
+		// Scope
+		if ( rdAttExceptThese.getSelection() ) currentAtt.scope = Attribute.SCOPE_ALLEXCEPT;
+		else if ( rdAttOnlyThese.getSelection() ) currentAtt.scope = Attribute.SCOPE_ONLY;
+		else currentAtt.scope = Attribute.SCOPE_ALL;
+		currentAtt.scopeElements = edAttScopeElements.getText();
+		return true;
+	}
+	
+	private boolean updateAttribute () {
+		if ( !saveAttribute() ) {
+			
+			return false;
+		}
+		int n = lbAtt.getSelectionIndex();
+		if ( n < 0 ) {
+			for ( TableItem item : tblAttRules.getItems() ) {
+				item.setChecked(false);
+			}
+			currentAtt = null;
+		}
+		else {
+			Attribute att = (Attribute)lbAtt.getData(lbAtt.getItem(n));
+			tblAttRules.getItem(ATTRULES_TRANS).setChecked(att.rules.contains(RULE_TYPE.ATTRIBUTE_TRANS));
+			tblAttRules.getItem(ATTRULES_WRITABLE).setChecked(att.rules.contains(RULE_TYPE.ATTRIBUTE_WRITABLE));
+			tblAttRules.getItem(ATTRULES_READONLY).setChecked(att.rules.contains(RULE_TYPE.ATTRIBUTE_READONLY));
+			tblAttRules.getItem(ATTRULES_ID).setChecked(att.rules.contains(RULE_TYPE.ATTRIBUTE_ID));
+			tblAttRules.getItem(ATTRULES_PRESERVE_WHITESPACE).setChecked(att.rules.contains(RULE_TYPE.ATTRIBUTE_PRESERVE_WHITESPACE));
+			rdAttrAllElements.setSelection(att.scope==Attribute.SCOPE_ALL);
+			rdAttExceptThese.setSelection(att.scope==Attribute.SCOPE_ALLEXCEPT);
+			rdAttOnlyThese.setSelection(att.scope==Attribute.SCOPE_ONLY);
+			edAttScopeElements.setText(att.scopeElements);
+			updateScopeElements();
+			currentAtt = att;
+		}
+		return true;
 	}
 	
 	private boolean showDialog () {
@@ -257,18 +312,44 @@ public class Editor implements IParametersEditor {
 	}
 	
 	private void setData () {
-		attributes = new ArrayList<Attribute>();
 		TaggedFilterConfiguration tfg = params.getTaggedConfig();
 
 		Map<String, Object> map = tfg.getAttributeRules();
-		for ( String name : map.keySet() ) {
+		for ( String attName : map.keySet() ) {
 			Attribute att = new Attribute();
-			att.name = name;
-			Map<String, Object> rules = (Map<String, Object>)map.get(name);
+			att.name = attName;
 			
+			@SuppressWarnings("unchecked")
+			Map<String, Object> items = (Map<String, Object>)map.get(attName);
+			for ( String itemName : items.keySet() ) {
+				
+				// Get the list of ruleTypes
+				if ( itemName.equals(TaggedFilterConfiguration.RULETYPES) ) {
+					@SuppressWarnings("unchecked")
+					java.util.List<String> list = (java.util.List<String>)items.get(itemName);
+					for ( String tmp : list ) {
+						att.rules.add(tfg.convertRuleAsStringToRuleType(tmp));
+					}
+				}
+				else if ( itemName.equals(TaggedFilterConfiguration.ALL_ELEMENTS_EXCEPT) ) {
+					att.scope = Attribute.SCOPE_ALLEXCEPT;
+					att.scopeElements = items.get(itemName).toString();
+					if ( att.scopeElements.length() > 2 ) {
+						att.scopeElements = att.scopeElements.substring(1, att.scopeElements.length()-1);
+					}
+				}
+				else if ( itemName.equals(TaggedFilterConfiguration.ONLY_THESE_ELEMENTS) ) {
+					att.scope = Attribute.SCOPE_ONLY;
+					att.scopeElements = items.get(itemName).toString();
+					if ( att.scopeElements.length() > 2 ) {
+						att.scopeElements = att.scopeElements.substring(1, att.scopeElements.length()-1);
+					}
+				}
+			}
 		
-			attributes.add(att);
-			lbAtt.add(name);
+			lbAtt.add(attName);
+			lbAtt.setData(attName, att);
+
 		}
 	}
 	

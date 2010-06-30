@@ -20,11 +20,27 @@
 
 package net.sf.okapi.filters.abstractmarkup.ui;
 
+import java.util.ArrayList;
 import java.util.List;
 
-class Attribute {
+import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
 
-	String name;
-	List<AttributeRule> rules;
+class Attribute {
 	
+	public static final int SCOPE_ALL = 0;
+	public static final int SCOPE_ONLY = 1;
+	public static final int SCOPE_ALLEXCEPT = 2;
+
+	public Attribute () {
+		rules = new ArrayList<RULE_TYPE>();
+		scope = SCOPE_ALL;
+		scopeElements = "";
+	}
+	
+	String name;
+	List<RULE_TYPE> rules;
+	int scope;
+	String scopeElements;
+	List<Condition> conditions;
+
 }

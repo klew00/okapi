@@ -68,6 +68,7 @@ import net.sf.okapi.filters.abstractmarkup.AbstractMarkupFilter;
  */
 public class TaggedFilterConfiguration {
 	public static final String COLLAPSE_WHITSPACE = "collapse_whitespace";
+	public static final String RULETYPES = "ruleTypes";
 	public static final String INLINE = "INLINE";
 	public static final String GROUP = "GROUP";
 	public static final String EXCLUDE = "EXCLUDE";
@@ -422,7 +423,6 @@ public class TaggedFilterConfiguration {
 				return RULE_TYPE.ATTRIBUTE_PRESERVE_WHITESPACE;
 			}
 		}
-
 		return RULE_TYPE.RULE_NOT_FOUND;
 	}
 
@@ -544,7 +544,7 @@ public class TaggedFilterConfiguration {
 		return findMatchingAttributeRule(tag, attributes, attribute) == RULE_TYPE.ATTRIBUTE_ID;
 	}
 
-	private RULE_TYPE convertRuleAsStringToRuleType(String ruleType) {
+	public RULE_TYPE convertRuleAsStringToRuleType (String ruleType) {
 		if (ruleType.equalsIgnoreCase(INLINE)) {
 			return RULE_TYPE.INLINE_ELEMENT;
 		} else if (ruleType.equalsIgnoreCase(GROUP)) {
