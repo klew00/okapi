@@ -86,7 +86,7 @@ public class HtmlConfigurationTest {
 	}
 
 	@Test
-	public void preserveWhileSpace() {
+	public void preserveWhiteSpace() {
 		URL url = HtmlFilter.class
 				.getResource("/net/sf/okapi/filters/html/nonwellformedConfiguration.yml");
 		TaggedFilterConfiguration rules = new TaggedFilterConfiguration(url);

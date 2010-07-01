@@ -91,7 +91,7 @@ public class TaggedFilterConfiguration {
 
 	public static final String EQUALS = "EQUALS";
 	public static final String NOT_EQUALS = "NOT_EQUALS";
-	public static final String MATCH = "MATCH";
+	public static final String MATCHES = "MATCHES";
 
 	public static final String ELEMENT_TYPE = "elementType";
 	public static final String WELLFORMED = "assumeWellformed";
@@ -650,7 +650,7 @@ public class TaggedFilterConfiguration {
 			return attributeValue.equalsIgnoreCase(conditionValue);
 		} else if (compareType.equalsIgnoreCase(NOT_EQUALS)) {
 			return attributeValue.equalsIgnoreCase(conditionValue);
-		} else if (compareType.equalsIgnoreCase(MATCH)) {
+		} else if (compareType.equalsIgnoreCase(MATCHES)) {
 			boolean result = false;
 			Pattern matchPattern = Pattern.compile(conditionValue);
 			try {

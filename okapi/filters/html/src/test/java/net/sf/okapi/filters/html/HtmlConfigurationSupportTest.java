@@ -183,6 +183,19 @@ public class HtmlConfigurationSupportTest {
 	}
 
 	@Test
+	public void test_MATCHES() {
+		String config = 
+			"elements:\n" +
+			"  p:\n" +
+			"    ruleTypes: [EXCLUDE]\n" +
+			"    conditions: [x, MATCHES, 'ABZ']";
+		filter.setParameters(new Parameters(config));
+		String snippet = "<p x='ABZ'>t1</p><p x='ZBA'>t2</p>";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		assertEquals("t2", tu.toString());		
+	}
+	
+	@Test
 	public void test_allElementsExcept () {
 		String config = 
 			"attributes:\n" +
