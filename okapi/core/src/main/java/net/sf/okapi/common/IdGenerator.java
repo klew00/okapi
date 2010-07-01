@@ -29,6 +29,12 @@ import java.security.InvalidParameterException;
  * <li>The sequential identifier starting at 1, with a fixed prefix if one was provided.  
  */
 public class IdGenerator {
+	public static final String START_GROUP = "sg"; //$NON-NLS-1$
+	public static final String END_GROUP = "eg"; //$NON-NLS-1$
+	public static final String TEXT_UNIT = "tu"; //$NON-NLS-1$
+	public static final String DOCUMENT_PART = "dp"; //$NON-NLS-1$
+	public static final String START_SUBDOCUMENT = "ssd"; //$NON-NLS-1$
+	public static final String END_SUBDOCUMENT = "esd"; //$NON-NLS-1$
 	
 	private long seq = 0;
 	private String rootId;
@@ -98,8 +104,24 @@ public class IdGenerator {
 	}
 	
 	/**
-	 * Reset the IDGenerator with a new root id. 
-	 * Use the same prefix and set the seq count to 0.
+	 * Set the sequence from outside. Useful to renumber.
+	 * @param sequence
+	 */
+	public void setSequence(long sequence) {
+		seq = sequence;
+	}
+	
+	/**
+	 * Get the current sequence number.
+	 * @return the sequence
+	 */
+	public long getSequence() {
+		return seq;
+	}
+	
+	/**
+	 * Reset the {@link IdGenerator} with a new root id. 
+	 * Use the same prefix and set the sequence count to 0.
 	 * @param rootId new root id
 	 */
 	public void reset(String rootId) {

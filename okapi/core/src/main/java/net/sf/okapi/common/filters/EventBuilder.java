@@ -59,31 +59,19 @@ import net.sf.okapi.common.skeleton.GenericSkeleton;
 public class EventBuilder {
 	private static final Logger LOGGER = Logger.getLogger(EventBuilder.class.getName());
 
-	private static final String START_GROUP = "sg"; //$NON-NLS-1$
-	private static final String END_GROUP = "eg"; //$NON-NLS-1$
-	private static final String TEXT_UNIT = "tu"; //$NON-NLS-1$
-	private static final String DOCUMENT_PART = "dp"; //$NON-NLS-1$
-	private static final String START_SUBDOCUMENT = "ssd"; //$NON-NLS-1$
-	private static final String END_SUBDOCUMENT = "esd"; //$NON-NLS-1$
-
 	private String mimeType;
-
-	private int startGroupId = 0;
-	private int endGroupId = 0;
-	private int textUnitId = 0;
-	private int subDocumentId = 0;
-	private int documentPartId = 0;
+	private IdGenerator startGroupId;
+	private IdGenerator endGroupId;
+	private IdGenerator textUnitId;
+	private IdGenerator startSubDocumentId;
+	private IdGenerator endSubDocumentId;
+	private IdGenerator documentPartId;
 	
-	private IdGenerator idGen;
-
 	private Stack<Event> tempFilterEventStack;
-
 	private List<Event> filterEvents;
 	private List<Event> referencableFilterEvents;
-
 	private boolean done = false;
 	private boolean preserveWhitespace;
-
 	private GenericSkeleton currentSkeleton;
 	private Code currentCode;
 	private DocumentPart currentDocumentPart;
@@ -147,26 +135,6 @@ public class EventBuilder {
 
 		Event event = new Event(EventType.CANCELED);
 		filterEvents.add(event);
-	}
-
-	/**
-	 * Sets the root of the identifiers for this event builder.
-	 * @param idRoot the root (cannot be null or empty)
-	 */
-	public void setIdRoot (String idRoot) {
-		idGen = new IdGenerator(idRoot);
-	}
-	
-	/*
-	 * Create a formatted ID for named resources.
-	 */
-	private String createId(String name, int number) {
-		if ( idGen == null ) {
-			return String.format("%s%d", name, number); //$NON-NLS-1$
-		}
-		else {
-			return idGen.createId();
-		}
 	}
 
 	/*
@@ -363,12 +331,18 @@ public class EventBuilder {
 	 */
 	public void reset(String rootId) {
 		this.rootId = rootId;
-		startGroupId = 0;
-		endGroupId = 0;
-		textUnitId = 0;
-		documentPartId = 0;
-		subDocumentId = 0;
-
+		
+		if (rootId == null) {
+			rootId = "noDocName";			
+		}
+		
+		startGroupId = new IdGenerator(rootId, IdGenerator.START_GROUP);
+		endGroupId = new IdGenerator(rootId, IdGenerator.END_GROUP);
+		textUnitId = new IdGenerator(rootId, IdGenerator.TEXT_UNIT);
+		documentPartId = new IdGenerator(rootId, IdGenerator.DOCUMENT_PART);
+		startSubDocumentId = new IdGenerator(rootId, IdGenerator.START_SUBDOCUMENT);
+		endSubDocumentId = new IdGenerator(rootId, IdGenerator.END_SUBDOCUMENT);
+		
 		done = false;
 		this.preserveWhitespace = true;
 
@@ -394,7 +368,7 @@ public class EventBuilder {
 			endDocumentPart();
 		}
 
-		StartSubDocument startSubDocument = new StartSubDocument(createId(START_SUBDOCUMENT, ++subDocumentId));
+		StartSubDocument startSubDocument = new StartSubDocument(startSubDocumentId.createId());
 		Event event = new Event(EventType.START_SUBDOCUMENT, startSubDocument);
 		filterEvents.add(event);
 		LOGGER.log(Level.FINE, "Start Sub-Document for " + startSubDocument.getId());
@@ -404,7 +378,7 @@ public class EventBuilder {
 	 * Add the END_SUBDOCUMENT {@link Event} to the event queue.
 	 */
 	public void endSubDocument() {
-		Ending endDocument = new Ending(createId(END_SUBDOCUMENT, ++subDocumentId));
+		Ending endDocument = new Ending(endSubDocumentId.createId());
 		Event event = new Event(EventType.END_SUBDOCUMENT, endDocument);
 		filterEvents.add(event);
 		LOGGER.log(Level.FINE, "End Sub-Document for " + endDocument.getId());
@@ -416,7 +390,7 @@ public class EventBuilder {
 	// ////////////////////////////////////////////////////////////////////////
 
 	private TextUnit embeddedTextUnit(PropertyTextUnitPlaceholder propOrText, String tag) {
-		TextUnit tu = new TextUnit(createId(TEXT_UNIT, ++textUnitId), propOrText.getValue());
+		TextUnit tu = new TextUnit(textUnitId.createId(), propOrText.getValue());
 		tu.setPreserveWhitespaces(this.preserveWhitespace);
 
 		tu.setMimeType(propOrText.getMimeType());
@@ -497,7 +471,7 @@ public class EventBuilder {
 			if (textPlaceholdersOnly) {
 				resource = parentTu;
 			} else {
-				resource = new DocumentPart(createId(DOCUMENT_PART, ++documentPartId), inlineCode);
+				resource = new DocumentPart(documentPartId.createId(), inlineCode);
 			}
 		} else {
 			if (parentTu != null) {
@@ -653,7 +627,7 @@ public class EventBuilder {
 		}
 
 		TextUnit tu;
-		tu = new TextUnit(createId(TEXT_UNIT, ++textUnitId), text);
+		tu = new TextUnit(textUnitId.createId(), text);
 		tu.setMimeType(this.mimeType);
 		tu.setPreserveWhitespaces(this.preserveWhitespace);
 
@@ -781,7 +755,7 @@ public class EventBuilder {
 					"Trying to add a TextUnit to a TextUnit that does not exist.");
 		}
 
-		TextUnit tu = new TextUnit(createId(TEXT_UNIT, ++textUnitId));
+		TextUnit tu = new TextUnit(textUnitId.createId());
 		tu.setPreserveWhitespaces(this.preserveWhitespace);
 		tu.setMimeType(this.mimeType);
 		tu.setIsReferent(true);
@@ -909,13 +883,16 @@ public class EventBuilder {
 			processAllEmbedded(startMarker.toString(), locale, propertyTextUnitPlaceholders, false);
 		}
 
-		String parentId = createId(START_SUBDOCUMENT, subDocumentId);
+		String parentId = null;
+		if (startSubDocumentId.getSequence() > 0) {
+			parentId = startSubDocumentId.getLastId();
+		} 
 		StartGroup parentGroup = peekMostRecentGroup();
 		if (parentGroup != null) {
 			parentId = parentGroup.getId();
 		}
 
-		String gid = createId(START_GROUP, ++startGroupId);
+		String gid = startGroupId.createId();
 		StartGroup g = new StartGroup(parentId, gid);
 
 		GenericSkeleton skel = new GenericSkeleton((GenericSkeleton) startMarker);
@@ -976,7 +953,7 @@ public class EventBuilder {
 		}
 
 		popTempEvent();
-		Ending eg = new Ending(createId(END_GROUP, ++endGroupId));
+		Ending eg = new Ending(endGroupId.createId());
 		filterEvents.add(new Event(EventType.END_GROUP, eg, skel));
 	}
 
@@ -1036,7 +1013,7 @@ public class EventBuilder {
 		}
 
 		currentSkeleton = new GenericSkeleton(part);
-		currentDocumentPart = new DocumentPart(createId(DOCUMENT_PART, ++documentPartId), false);
+		currentDocumentPart = new DocumentPart(documentPartId.createId(), false);
 		currentDocumentPart.setSkeleton(currentSkeleton);
 	}
 
@@ -1078,7 +1055,7 @@ public class EventBuilder {
 		}
 
 		currentSkeleton = new GenericSkeleton();
-		currentDocumentPart = new DocumentPart(createId(DOCUMENT_PART, ++documentPartId), false);
+		currentDocumentPart = new DocumentPart(documentPartId.createId(), false);
 		currentDocumentPart.setSkeleton(currentSkeleton);
 
 		processAllEmbedded(part, locale, propertyTextUnitPlaceholders, false);
@@ -1153,8 +1130,8 @@ public class EventBuilder {
 	 * 
 	 * @return the textUnitId
 	 */
-	public int getTextUnitId() {
-		return textUnitId;
+	public long getTextUnitId() {
+		return textUnitId.getSequence();
 	}
 
 	/**
@@ -1164,8 +1141,8 @@ public class EventBuilder {
 	 * @param id
 	 *            the initial value for the textUnitId
 	 */
-	public void setTextUnitId(int id) {
-		this.textUnitId = id;
+	public void setTextUnitId(long id) {
+		this.textUnitId.setSequence(id);
 	}
 
 	/**
@@ -1201,8 +1178,8 @@ public class EventBuilder {
 	 * 
 	 * @return the id
 	 */
-	public int getDocumentPartId() {
-		return documentPartId;
+	public long getDocumentPartId() {
+		return documentPartId.getSequence();
 	}
 
 	/**
@@ -1212,8 +1189,16 @@ public class EventBuilder {
 	 * @param id
 	 *            the initial value for the textUnitId
 	 */
-	public void setDocumentPartId(int id) {
-		this.documentPartId = id;
+	public void setDocumentPartId(long id) {
+		documentPartId.setSequence(id);
+	}
+
+	/**
+	 * Get the current root id
+	 * @return the rootId
+	 */
+	public String getRootId() {
+		return rootId;
 	}
 
 	/**

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -69,15 +69,13 @@ import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
 
 /**
- * Abstract class useful for creating an {@link IFilter} around the Jericho
- * parser. Jericho can parse non-wellformed HTML, XHTML, XML and various server
- * side scripting languages such as PHP, Mason, Perl (all configurable from
- * Jericho). AbstractMarkupFilter takes care of the parser initialization and
- * provides default handlers for each token type returned by the parser.
+ * Abstract class useful for creating an {@link IFilter} around the Jericho parser. Jericho can parse non-wellformed
+ * HTML, XHTML, XML and various server side scripting languages such as PHP, Mason, Perl (all configurable from
+ * Jericho). AbstractMarkupFilter takes care of the parser initialization and provides default handlers for each token
+ * type returned by the parser.
  * <p>
- * Handling of translatable text, inline tags, translatable and read-only
- * attributes are configurable through a user defined YAML file. See the Okapi
- * HtmlFilter with defaultConfiguration.yml and OpenXml filters for examples.
+ * Handling of translatable text, inline tags, translatable and read-only attributes are configurable through a user
+ * defined YAML file. See the Okapi HtmlFilter with defaultConfiguration.yml and OpenXml filters for examples.
  * 
  */
 public abstract class AbstractMarkupFilter extends AbstractFilter {
@@ -92,6 +90,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	private EventBuilder eventBuilder;
 	private RawDocument currentRawDocument;
 	private ExtractionRuleState ruleState;
+	private String rootId;
 
 	static {
 		Config.ConvertNonBreakingSpaces = false;
@@ -100,29 +99,26 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	}
 
 	/**
-	 * Default constructor for {@link AbstractMarkupFilter} using default
-	 * {@link EventBuilder}
+	 * Default constructor for {@link AbstractMarkupFilter} using default {@link EventBuilder}
 	 */
-	public AbstractMarkupFilter() {		
+	public AbstractMarkupFilter() {
 		this.bufferedWhitespace = new StringBuilder();
 		this.hasUtf8Bom = false;
-		this.hasUtf8Encoding = false;		
+		this.hasUtf8Encoding = false;
 	}
 
 	/**
-	 * Default constructor for {@link AbstractMarkupFilter} using default
-	 * {@link EventBuilder}
+	 * Default constructor for {@link AbstractMarkupFilter} using default {@link EventBuilder}
 	 */
 	public AbstractMarkupFilter(EventBuilder eventBuilder) {
-		this.eventBuilder = eventBuilder;		
+		this.eventBuilder = eventBuilder;
 		this.bufferedWhitespace = new StringBuilder();
 		this.hasUtf8Bom = false;
-		this.hasUtf8Encoding = false;		
+		this.hasUtf8Encoding = false;
 	}
-	
+
 	/**
-	 * Get the current {@link TaggedFilterConfiguration}. A
-	 * TaggedFilterConfiguration is the result of reading in a YAML
+	 * Get the current {@link TaggedFilterConfiguration}. A TaggedFilterConfiguration is the result of reading in a YAML
 	 * configuration file and converting it into Java Objects.
 	 * 
 	 * @return a {@link TaggedFilterConfiguration}
@@ -133,15 +129,15 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 * Close the filter and all used resources.
 	 */
 	public void close() {
-		
+
 		if (ruleState != null) {
 			ruleState.reset(!getConfig().isGlobalPreserveWhitespace());
 		}
-		
+
 		if (currentRawDocument != null) {
 			currentRawDocument.close();
 		}
-		
+
 		try {
 			if (document != null) {
 				document.close();
@@ -154,11 +150,10 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	}
 
 	/*
-	 * Get PREVIEW_BYTE_COUNT bytes so we can sniff out any encoding information
-	 * in XML or HTML files
+	 * Get PREVIEW_BYTE_COUNT bytes so we can sniff out any encoding information in XML or HTML files
 	 */
 	private Source getParsedHeader(final InputStream inputStream) {
-		try {			
+		try {
 			final byte[] bytes = new byte[PREVIEW_BYTE_COUNT];
 			int i;
 			for (i = 0; i < PREVIEW_BYTE_COUNT; i++) {
@@ -184,30 +179,36 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 * Start a new {@link IFilter} using the supplied {@link RawDocument}.
 	 * 
 	 * @param input
-	 *            - input to the {@link IFilter} (can be a {@link CharSequence},
-	 *            {@link URI} or {@link InputStream})
+	 *            - input to the {@link IFilter} (can be a {@link CharSequence}, {@link URI} or {@link InputStream})
 	 */
 	public void open(RawDocument input) {
 		open(input, true);
 		LOGGER.log(Level.FINE, getName() + " has opened an input document");
 	}
 
-	// TRY for IdGenerator implementation
-	public void open (RawDocument input, boolean generateSkeleton, String idRoot) {
-		eventBuilder.setIdRoot(idRoot);
+	/**
+	 * Use this open when the rootId must be different from the document name. Used mostly when filter 
+	 * is called as a sub-filters.
+	 * 
+	 * @param input
+	 *            - input to the {@link IFilter} (can be a {@link CharSequence}, {@link URI} or {@link InputStream})
+	 * @param generateSkeleton
+	 *            - true if the {@link IFilter} should store non-translatble blocks (aka skeleton), false otherwise.
+	 * @param rootId
+	 *            - id root used to give resources a unique id
+	 */
+	public void open(RawDocument input, boolean generateSkeleton, String rootId) {
+		this.rootId = rootId;
 		open(input, generateSkeleton);
 	}
-	
-	
+
 	/**
 	 * Start a new {@link IFilter} using the supplied {@link RawDocument}.
 	 * 
 	 * @param input
-	 *            - input to the {@link IFilter} (can be a {@link CharSequence},
-	 *            {@link URI} or {@link InputStream})
+	 *            - input to the {@link IFilter} (can be a {@link CharSequence}, {@link URI} or {@link InputStream})
 	 * @param generateSkeleton
-	 *            - true if the {@link IFilter} should store non-translatble
-	 *            blocks (aka skeleton), false otherwise.
+	 *            - true if the {@link IFilter} should store non-translatble blocks (aka skeleton), false otherwise.
 	 * 
 	 * @throws OkapiBadFilterInputException
 	 * @throws OkapiIOException
@@ -217,12 +218,13 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		close();
 
 		currentRawDocument = input;
-		
+
 		if (input.getInputURI() != null) {
 			setDocumentName(input.getInputURI().getPath());
 		}
 
-		BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input.getStream(), input.getEncoding());
+		BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input.getStream(),
+				input.getEncoding());
 		detector.detectBom();
 
 		setEncoding(detector.getEncoding());
@@ -235,18 +237,21 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 
 		if (detectedEncoding == null && getEncoding() != null) {
 			detectedEncoding = getEncoding();
-			LOGGER.log(Level.FINE, String.format("Cannot auto-detect encoding. Using the default encoding (%s)",
-					getEncoding()));
+			LOGGER.log(Level.FINE, String.format(
+					"Cannot auto-detect encoding. Using the default encoding (%s)", getEncoding()));
 		} else if (getEncoding() == null) {
 			detectedEncoding = parsedHeader.getEncoding(); // get best guess
-			LOGGER.log(Level.FINE, String.format(
-					"Default encoding and detected encoding not found. Using best guess encoding (%s)",
-					detectedEncoding));
+			LOGGER.log(
+					Level.FINE,
+					String.format(
+							"Default encoding and detected encoding not found. Using best guess encoding (%s)",
+							detectedEncoding));
 		}
 
 		try {
 			input.setEncoding(detectedEncoding);
-			setOptions(input.getSourceLocale(), input.getTargetLocale(), detectedEncoding, generateSkeleton);
+			setOptions(input.getSourceLocale(), input.getTargetLocale(), detectedEncoding,
+					generateSkeleton);
 			document = new StreamedSource(input.getReader());
 		} catch (IOException e) {
 			throw new OkapiIOException("Filter could not open input stream", e);
@@ -260,8 +265,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	}
 
 	/**
-	 * Queue up Jericho tokens until we can build an Okapi {@link Event} and
-	 * return it.
+	 * Queue up Jericho tokens until we can build an Okapi {@link Event} and return it.
 	 */
 	public Event next() {
 		while (eventBuilder.hasQueuedEvents()) {
@@ -272,13 +276,15 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 			Segment segment = nodeIterator.next();
 
 			preProcess(segment);
-			
+
 			if (segment instanceof Tag) {
 				final Tag tag = (Tag) segment;
 
-				if (tag.getTagType() == StartTagType.NORMAL || tag.getTagType() == StartTagType.UNREGISTERED) {
-					handleStartTag((StartTag)tag);					
-				} else if (tag.getTagType() == EndTagType.NORMAL || tag.getTagType() == EndTagType.UNREGISTERED) {
+				if (tag.getTagType() == StartTagType.NORMAL
+						|| tag.getTagType() == StartTagType.UNREGISTERED) {
+					handleStartTag((StartTag) tag);
+				} else if (tag.getTagType() == EndTagType.NORMAL
+						|| tag.getTagType() == EndTagType.UNREGISTERED) {
 					handleEndTag((EndTag) tag);
 				} else if (tag.getTagType() == StartTagType.DOCTYPE_DECLARATION) {
 					handleDocTypeDeclaration(tag);
@@ -298,7 +304,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 					handleServerCommonEscaped(tag);
 				} else { // not classified explicitly by Jericho
 					if (tag instanceof StartTag) {
-						handleStartTag((StartTag) tag);						
+						handleStartTag((StartTag) tag);
 					} else if (tag instanceof EndTag) {
 						handleEndTag((EndTag) tag);
 					} else {
@@ -328,22 +334,23 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	}
 
 	/**
-	 * Initialize the filter for every input and send the {@link StartDocument}
-	 * {@link Event}
+	 * Initialize the filter for every input and send the {@link StartDocument} {@link Event}
 	 */
 	protected void startFilter() {
 		// order of execution matters
-		
+
 		// create EventBuilder with document name as rootId
 		if (eventBuilder == null) {
-			eventBuilder = new AbstractMarkupEventBuilder(getDocumentName());
+			eventBuilder = new AbstractMarkupEventBuilder((rootId == null) ? getDocumentName() : rootId);
 			eventBuilder.setMimeType(getMimeType());
 		} else {
 			eventBuilder.reset(getDocumentName());
 		}
+		// reset rootId for next run
+		rootId = null;
 		
 		eventBuilder.addFilterEvent(createStartDocumentEvent());
-		
+
 		// default is to preserve whitespace
 		boolean preserveWhitespace = true;
 		if (getConfig() != null) {
@@ -357,8 +364,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	}
 
 	/**
-	 * End the current filter processing and send the {@link Ending}
-	 * {@link Event}
+	 * End the current filter processing and send the {@link Ending} {@link Event}
 	 */
 	protected void endFilter() {
 		eventBuilder.flushRemainingEvents();
@@ -366,8 +372,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	}
 
 	/**
-	 * Do any handling needed before the current Segment is processed. Default
-	 * is to do nothing.
+	 * Do any handling needed before the current Segment is processed. Default is to do nothing.
 	 * 
 	 * @param segment
 	 */
@@ -394,10 +399,9 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	}
 
 	/**
-	 * Do any required post-processing on the TextUnit before the {@link Event}
-	 * leaves the {@link IFilter}. Default implementation leaves Event
-	 * unchanged. Override this method if you need to do format specific handing
-	 * such as collapsing whitespace.
+	 * Do any required post-processing on the TextUnit before the {@link Event} leaves the {@link IFilter}. Default
+	 * implementation leaves Event unchanged. Override this method if you need to do format specific handing such as
+	 * collapsing whitespace.
 	 */
 	protected void postProcessTextUnit(TextUnit textUnit) {
 	}
@@ -508,12 +512,11 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 			startTextUnit(text.toString());
 		} else {
 			addToTextUnit(text.toString());
-		}				
+		}
 	}
 
 	/**
-	 * Handle all Character entities. Default implementation converts entity to
-	 * Unicode character.
+	 * Handle all Character entities. Default implementation converts entity to Unicode character.
 	 * 
 	 * @param entity
 	 *            - the character entity
@@ -527,8 +530,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	}
 
 	/**
-	 * Handle all numeric entities. Default implementation converts entity to
-	 * Unicode character.
+	 * Handle all numeric entities. Default implementation converts entity to Unicode character.
 	 * 
 	 * @param entity
 	 *            - the numeric entity
@@ -550,8 +552,10 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		Map<String, String> attributes = new HashMap<String, String>();
 		attributes = startTag.getAttributes().populateMap(attributes, true);
 		String idValue = null;
-		RULE_TYPE ruleType = getConfig().getConditionalElementRuleType(startTag.getName(), attributes);;
-		
+		RULE_TYPE ruleType = getConfig().getConditionalElementRuleType(startTag.getName(),
+				attributes);
+		;
+
 		try {
 			// if in excluded state everything is skeleton including text
 			if (ruleState.isExludedState()) {
@@ -562,9 +566,9 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders;
 			propertyTextUnitPlaceholders = createPropertyTextUnitPlaceholders(startTag);
-			
-			updateStartTagRuleState(startTag.getName(), ruleType, idValue);			
-			
+
+			updateStartTagRuleState(startTag.getName(), ruleType, idValue);
+
 			switch (ruleType) {
 			case INLINE_ELEMENT:
 				if (canStartNewTextUnit()) {
@@ -594,17 +598,17 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 						break;
 					}
 				}
-				
+
 				handleAttributesThatAppearAnywhere(propertyTextUnitPlaceholders, startTag);
-				
+
 				setTextUnitName(idValue);
 				setTextUnitType(getConfig().getElementType(startTag));
 				break;
-			default:				
-				handleAttributesThatAppearAnywhere(propertyTextUnitPlaceholders, startTag);								
+			default:
+				handleAttributesThatAppearAnywhere(propertyTextUnitPlaceholders, startTag);
 			}
 		} finally {
-			
+
 			// A TextUnit may have already been created. Update its preserveWS field
 			if (eventBuilder.isCurrentTextUnit()) {
 				TextUnit tu = eventBuilder.peekMostRecentTextUnit();
@@ -612,9 +616,9 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 			}
 		}
 	}
-	
+
 	protected void updateStartTagRuleState(String tag, RULE_TYPE ruleType, String idValue) {
-		switch(getConfig().getElementRuleType(tag)) {
+		switch (getConfig().getElementRuleType(tag)) {
 		case INLINE_ELEMENT:
 			ruleState.pushInlineRule(tag, ruleType);
 			break;
@@ -633,10 +637,10 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		case TEXT_UNIT_ELEMENT:
 			ruleState.pushTextUnitRule(tag, ruleType, idValue);
 			break;
-		default:				
+		default:
 			break;
-		}	
-		
+		}
+
 		// TODO: add conditional support for PRESERVE_WHITESPACE rules
 		// does this tag have a PRESERVE_WHITESPACE rule?
 		if (getConfig().isRuleType(tag, RULE_TYPE.PRESERVE_WHITESPACE)) {
@@ -646,10 +650,10 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	}
 
 	protected RULE_TYPE updateEndTagRuleState(EndTag endTag) {
-		RULE_TYPE ruleType = getConfig().getElementRuleType(endTag.getName()); 
+		RULE_TYPE ruleType = getConfig().getElementRuleType(endTag.getName());
 		RuleType currentState = null;
-		
-		switch(ruleType) {
+
+		switch (ruleType) {
 		case INLINE_ELEMENT:
 			currentState = ruleState.popInlineRule();
 			ruleType = currentState.ruleType;
@@ -673,32 +677,32 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 			currentState = ruleState.popTextUnitRule();
 			ruleType = currentState.ruleType;
 			break;
-		default:				
+		default:
 			break;
-		}	
-		
+		}
+
 		if (currentState != null) {
 			// if the end tag is not the same as what we found on the stack all bets are off
 			if (!currentState.ruleName.equalsIgnoreCase(endTag.getName())) {
-				String character = Integer.toString(endTag.getBegin());		
-				throw new OkapiBadFilterInputException(
-						"End tag " + endTag.getName() + " and start tag " + currentState.ruleName 
+				String character = Integer.toString(endTag.getBegin());
+				throw new OkapiBadFilterInputException("End tag " + endTag.getName()
+						+ " and start tag " + currentState.ruleName
 						+ " do not match at character number " + character);
 			}
 		}
-				
+
 		return ruleType;
 	}
-	
+
 	/*
 	 * catch tags which are not listed in the config but have attributes that require processing
 	 */
-	private void handleAttributesThatAppearAnywhere(List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders,
-			StartTag tag) {	
-		
+	private void handleAttributesThatAppearAnywhere(
+			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders, StartTag tag) {
+
 		HashMap<String, String> attributeMap = new HashMap<String, String>();
-		
-		switch (getConfig().getConditionalElementRuleType(tag.getName(), 
+
+		switch (getConfig().getConditionalElementRuleType(tag.getName(),
 				tag.getAttributes().populateMap(attributeMap, true))) {
 
 		case TEXT_UNIT_ELEMENT:
@@ -710,8 +714,8 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 			break;
 		case GROUP_ELEMENT:
 			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
-				startGroup(new GenericSkeleton(tag.toString()), getConfig().getElementType(tag), getSrcLoc(),
-						propertyTextUnitPlaceholders);
+				startGroup(new GenericSkeleton(tag.toString()), getConfig().getElementType(tag),
+						getSrcLoc(), propertyTextUnitPlaceholders);
 			} else {
 				// no attributes that need processing - just treat as skeleton
 				startGroup(new GenericSkeleton(tag.toString()), getConfig().getElementType(tag));
@@ -727,7 +731,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 			}
 
 			break;
-		}		
+		}
 	}
 
 	/**
@@ -737,14 +741,14 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 */
 	protected void handleEndTag(EndTag endTag) {
 		RULE_TYPE ruleType = RULE_TYPE.RULE_NOT_FOUND;
-				
+
 		// if in excluded state everything is skeleton including text
 		if (ruleState.isExludedState()) {
 			addToDocumentPart(endTag.toString());
 			updateEndTagRuleState(endTag);
 			return;
 		}
-		
+
 		ruleType = updateEndTagRuleState(endTag);
 
 		switch (ruleType) {
@@ -769,16 +773,17 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		default:
 			addToDocumentPart(endTag.toString());
 			break;
-		} 
-		
+		}
+
 		// TODO: add conditional support for PRESERVE_WHITESPACE rules
 		// does this tag have a PRESERVE_WHITESPACE rule?
 		if (getConfig().isRuleType(endTag.getName(), RULE_TYPE.PRESERVE_WHITESPACE)) {
 			ruleState.popPreserverWhitespaceRule();
 			setPreserveWhitespace(ruleState.isPreserveWhitespaceState());
-		// handle cases such as xml:space where we popped on an element while
-		// processing the attributes
-		} else if (ruleState.peekPreserverWhitespaceRule().ruleName.equalsIgnoreCase(endTag.getName())) {
+			// handle cases such as xml:space where we popped on an element while
+			// processing the attributes
+		} else if (ruleState.peekPreserverWhitespaceRule().ruleName.equalsIgnoreCase(endTag
+				.getName())) {
 			ruleState.popPreserverWhitespaceRule();
 			setPreserveWhitespace(ruleState.isPreserveWhitespaceState());
 		}
@@ -794,8 +799,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	}
 
 	/**
-	 * Some attributes names are converted to Okapi standards such as HTML
-	 * charset to "encoding" and lang to "language"
+	 * Some attributes names are converted to Okapi standards such as HTML charset to "encoding" and lang to "language"
 	 * 
 	 * @param attrName
 	 *            - the attribute name
@@ -803,18 +807,15 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 *            - the attribute value
 	 * @param tag
 	 *            - the Jericho {@link Tag} that contains the attribute
-	 * @return the attribute name after it as passe through the normalization
-	 *         rules
+	 * @return the attribute name after it as passe through the normalization rules
 	 */
 	abstract protected String normalizeAttributeName(String attrName, String attrValue, Tag tag);
 
 	/**
-	 * Add an {@link Code} to the current {@link TextUnit}. Throws an exception
-	 * if there is no current {@link TextUnit}.
+	 * Add an {@link Code} to the current {@link TextUnit}. Throws an exception if there is no current {@link TextUnit}.
 	 * 
 	 * @param tag
-	 *            - the Jericho {@link Tag} that is converted to a Okpai
-	 *            {@link Code}
+	 *            - the Jericho {@link Tag} that is converted to a Okpai {@link Code}
 	 */
 	protected void addCodeToCurrentTextUnit(Tag tag) {
 		List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders;
@@ -822,7 +823,8 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		TextFragment.TagType codeType;
 
 		// start tag or empty tag
-		if (tag.getTagType() == StartTagType.NORMAL || tag.getTagType() == StartTagType.UNREGISTERED) {
+		if (tag.getTagType() == StartTagType.NORMAL
+				|| tag.getTagType() == StartTagType.UNREGISTERED) {
 			StartTag startTag = ((StartTag) tag);
 
 			// is this an empty tag?
@@ -849,7 +851,8 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 				addToTextUnit(new Code(codeType, getConfig().getElementType(tag), literalTag));
 			}
 		} else { // end or unknown tag
-			if (tag.getTagType() == EndTagType.NORMAL || tag.getTagType() == EndTagType.UNREGISTERED) {
+			if (tag.getTagType() == EndTagType.NORMAL
+					|| tag.getTagType() == EndTagType.UNREGISTERED) {
 				codeType = TextFragment.TagType.CLOSING;
 			} else {
 				codeType = TextFragment.TagType.PLACEHOLDER;
@@ -859,76 +862,75 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	}
 
 	/**
-	 * For the given Jericho {@link StartTag} parse out all the actionable
-	 * attributes and and store them as {@link PropertyTextUnitPlaceholder}.
-	 * {@link PlaceholderAccessType} are set based on the filter configuration for
+	 * For the given Jericho {@link StartTag} parse out all the actionable attributes and and store them as
+	 * {@link PropertyTextUnitPlaceholder}. {@link PlaceholderAccessType} are set based on the filter configuration for
 	 * each attribute. for the attribute name and value.
 	 * 
 	 * @param startTag
 	 *            - Jericho {@link StartTag}
-	 * @return all actionable (translatable, writable or read-only) attributes
-	 *         found in the {@link StartTag}
+	 * @return all actionable (translatable, writable or read-only) attributes found in the {@link StartTag}
 	 */
 	protected List<PropertyTextUnitPlaceholder> createPropertyTextUnitPlaceholders(StartTag startTag) {
 		// list to hold the properties or TextUnits
 		List<PropertyTextUnitPlaceholder> propertyOrTextUnitPlaceholders = new LinkedList<PropertyTextUnitPlaceholder>();
-		HashMap<String, String> attributeMap = new HashMap<String,String>();
+		HashMap<String, String> attributeMap = new HashMap<String, String>();
 		for (Attribute attribute : startTag.parseAttributes()) {
 			attributeMap.clear();
-			
-			switch (getConfig().findMatchingAttributeRule(startTag.getName(), 
-					startTag.getAttributes().populateMap(attributeMap, true), 
-					attribute.getName())) {
+
+			switch (getConfig().findMatchingAttributeRule(startTag.getName(),
+					startTag.getAttributes().populateMap(attributeMap, true), attribute.getName())) {
 			case ATTRIBUTE_TRANS:
-				propertyOrTextUnitPlaceholders.add(createPropertyTextUnitPlaceholder(PlaceholderAccessType.TRANSLATABLE,
-						attribute.getName(), attribute.getValue(), startTag, attribute));
+				propertyOrTextUnitPlaceholders.add(createPropertyTextUnitPlaceholder(
+						PlaceholderAccessType.TRANSLATABLE, attribute.getName(),
+						attribute.getValue(), startTag, attribute));
 				break;
 			case ATTRIBUTE_WRITABLE:
 				propertyOrTextUnitPlaceholders.add(createPropertyTextUnitPlaceholder(
-						PlaceholderAccessType.WRITABLE_PROPERTY, attribute.getName(), attribute.getValue(), startTag,
-						attribute));
+						PlaceholderAccessType.WRITABLE_PROPERTY, attribute.getName(),
+						attribute.getValue(), startTag, attribute));
 				break;
 			case ATTRIBUTE_READONLY:
 				propertyOrTextUnitPlaceholders.add(createPropertyTextUnitPlaceholder(
-						PlaceholderAccessType.READ_ONLY_PROPERTY, attribute.getName(), attribute.getValue(), startTag,
-						attribute));
+						PlaceholderAccessType.READ_ONLY_PROPERTY, attribute.getName(),
+						attribute.getValue(), startTag, attribute));
 				break;
 			case ATTRIBUTE_ID:
 				propertyOrTextUnitPlaceholders.add(createPropertyTextUnitPlaceholder(
-						PlaceholderAccessType.NAME, attribute.getName(), attribute.getValue(), startTag,
-						attribute));
+						PlaceholderAccessType.NAME, attribute.getName(), attribute.getValue(),
+						startTag, attribute));
 				break;
 			case ATTRIBUTE_PRESERVE_WHITESPACE:
-				boolean preserveWS = getConfig().isPreserveWhitespaceCondition(attribute.getName(), attributeMap);
-				boolean defaultWS = getConfig().isDefaultWhitespaceCondition(attribute.getName(), attributeMap);
+				boolean preserveWS = getConfig().isPreserveWhitespaceCondition(attribute.getName(),
+						attributeMap);
+				boolean defaultWS = getConfig().isDefaultWhitespaceCondition(attribute.getName(),
+						attributeMap);
 				// if its not reserve or default then the rule doesn't apply
-				if (preserveWS || defaultWS) {					
+				if (preserveWS || defaultWS) {
 					if (preserveWS) {
 						ruleState.pushPreserverWhitespaceRule(startTag.getName(), true);
 					} else if (defaultWS) {
 						ruleState.pushPreserverWhitespaceRule(startTag.getName(), false);
 					}
-					setPreserveWhitespace(ruleState.isPreserveWhitespaceState());				
+					setPreserveWhitespace(ruleState.isPreserveWhitespaceState());
 					propertyOrTextUnitPlaceholders.add(createPropertyTextUnitPlaceholder(
-							PlaceholderAccessType.WRITABLE_PROPERTY, attribute.getName(), attribute.getValue(), startTag,
-							attribute));
+							PlaceholderAccessType.WRITABLE_PROPERTY, attribute.getName(),
+							attribute.getValue(), startTag, attribute));
 				}
 				break;
 			default:
 				break;
 			}
 		}
-			
+
 		return propertyOrTextUnitPlaceholders;
 	}
 
 	/**
-	 * Create a {@link PropertyTextUnitPlaceholder} given the supplied type,
-	 * name and Jericho {@link Tag} and {@link Attribute}.
+	 * Create a {@link PropertyTextUnitPlaceholder} given the supplied type, name and Jericho {@link Tag} and
+	 * {@link Attribute}.
 	 * 
 	 * @param type
-	 *            - {@link PlaceholderAccessType} is one of TRANSLATABLE,
-	 *            READ_ONLY_PROPERTY, WRITABLE_PROPERTY
+	 *            - {@link PlaceholderAccessType} is one of TRANSLATABLE, READ_ONLY_PROPERTY, WRITABLE_PROPERTY
 	 * @param name
 	 *            - attribute name
 	 * @param value
@@ -939,8 +941,8 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 *            - attribute as a Jericho {@link Attribute}
 	 * @return a {@link PropertyTextUnitPlaceholder} representing the attribute
 	 */
-	protected PropertyTextUnitPlaceholder createPropertyTextUnitPlaceholder(PlaceholderAccessType type, String name,
-			String value, Tag tag, Attribute attribute) {
+	protected PropertyTextUnitPlaceholder createPropertyTextUnitPlaceholder(
+			PlaceholderAccessType type, String name, String value, Tag tag, Attribute attribute) {
 		// offset of attribute
 		int mainStartPos = attribute.getBegin() - tag.getBegin();
 		int mainEndPos = attribute.getEnd() - tag.getBegin();
@@ -949,8 +951,8 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		int valueStartPos = attribute.getValueSegment().getBegin() - tag.getBegin();
 		int valueEndPos = attribute.getValueSegment().getEnd() - tag.getBegin();
 
-		return new PropertyTextUnitPlaceholder(type, normalizeAttributeName(name, value, tag), value, mainStartPos,
-				mainEndPos, valueStartPos, valueEndPos);
+		return new PropertyTextUnitPlaceholder(type, normalizeAttributeName(name, value, tag),
+				value, mainStartPos, mainEndPos, valueStartPos, valueEndPos);
 	}
 
 	/**
@@ -981,7 +983,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		return ruleState.isPreserveWhitespaceState();
 	}
 
-	protected void setPreserveWhitespace(boolean preserveWhitespace) {		
+	protected void setPreserveWhitespace(boolean preserveWhitespace) {
 		eventBuilder.setPreserveWhitespace(preserveWhitespace);
 	}
 
@@ -996,7 +998,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	protected void startTextUnit(String text) {
 		eventBuilder.startTextUnit(text);
 	}
-	
+
 	protected void setTextUnitName(String name) {
 		eventBuilder.setTextUnitName(name);
 	}
@@ -1004,7 +1006,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	protected void setTextUnitType(String type) {
 		eventBuilder.setTextUnitType(type);
 	}
-	
+
 	protected boolean canStartNewTextUnit() {
 		return eventBuilder.canStartNewTextUnit();
 	}
@@ -1017,7 +1019,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		eventBuilder.addToTextUnit(code);
 	}
 
-	protected void addToTextUnit(Code code, 
+	protected void addToTextUnit(Code code,
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
 		eventBuilder.addToTextUnit(code, propertyTextUnitPlaceholders);
 	}
@@ -1035,11 +1037,8 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		eventBuilder.startGroup(startMarker, commonTagType);
 	}
 
-	protected void startGroup(GenericSkeleton startMarker,
-		String commonTagType,
-		LocaleId locale,
-		List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders)
-	{
+	protected void startGroup(GenericSkeleton startMarker, String commonTagType, LocaleId locale,
+			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
 		eventBuilder.startGroup(startMarker, commonTagType, locale, propertyTextUnitPlaceholders);
 	}
 
@@ -1063,32 +1062,31 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	protected void startTextUnit() {
 		eventBuilder.startTextUnit();
 	}
-	
-	protected int getTextUnitId() {
+
+	protected long getTextUnitId() {
 		return eventBuilder.getTextUnitId();
 	}
 
-	protected void setTextUnitId(int id) {
+	protected void setTextUnitId(long id) {
 		eventBuilder.setTextUnitId(id);
 	}
 
-	protected int getDocumentPartId() {
+	protected long getDocumentPartId() {
 		return eventBuilder.getDocumentPartId();
 	}
 
-	protected void setDocumentPartId(int id) {
+	protected void setDocumentPartId(long id) {
 		eventBuilder.setDocumentPartId(id);
 	}
-	
-	protected void appendToFirstSkeletonPart(String text)
-	{
+
+	protected void appendToFirstSkeletonPart(String text) {
 		eventBuilder.appendToFirstSkeletonPart(text);
 	}
 
 	protected void addFilterEvent(Event event) {
 		eventBuilder.addFilterEvent(event);
 	}
-	
+
 	protected ExtractionRuleState getRuleState() {
 		return ruleState;
 	}
@@ -1099,7 +1097,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	public EventBuilder getEventBuilder() {
 		return eventBuilder;
 	}
-	
+
 	/**
 	 * Sets the input document mime type.
 	 * 
@@ -1108,9 +1106,9 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 */
 	@Override
 	public void setMimeType(String mimeType) {
-		super.setMimeType(mimeType);	
+		super.setMimeType(mimeType);
 	}
-	
+
 	public StringBuilder getBufferedWhiteSpace() {
 		return bufferedWhitespace;
 	}

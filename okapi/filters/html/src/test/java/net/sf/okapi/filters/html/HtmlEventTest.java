@@ -72,7 +72,7 @@ public class HtmlEventTest {
 
 		// Build the input
 		GenericSkeleton skel = new GenericSkeleton();
-		TextUnit tu = new TextUnit("tu1", "keyword text");
+		TextUnit tu = new TextUnit("N9033D6E2-tu1", "keyword text");
 		skel.add("content=\"");
 		skel.addContentPlaceholder(tu);
 		skel.add("\"");
@@ -82,7 +82,7 @@ public class HtmlEventTest {
 		events.add(new Event(EventType.TEXT_UNIT, tu));
 
 		skel = new GenericSkeleton();
-		DocumentPart dp = new DocumentPart("dp1", false);
+		DocumentPart dp = new DocumentPart("N9033D6E2-dp1", false);
 		skel.add("<meta http-equiv=\"keywords\" ");
 		skel.addReference(tu);
 		skel.add("/>");
@@ -105,7 +105,7 @@ public class HtmlEventTest {
 
 		// Build the input
 		GenericSkeleton skel = new GenericSkeleton();
-		TextUnit tu = new TextUnit("tu1", "one,two,three");
+		TextUnit tu = new TextUnit("N9033D6E2-tu1", "one,two,three");
 		skel.add("content=\"");
 		skel.addContentPlaceholder(tu);
 		skel.add("\"");
@@ -115,7 +115,7 @@ public class HtmlEventTest {
 		events.add(new Event(EventType.TEXT_UNIT, tu));
 
 		skel = new GenericSkeleton();
-		DocumentPart dp = new DocumentPart("dp1", false);
+		DocumentPart dp = new DocumentPart("N9033D6E2-dp1", false);
 		skel.add("<meta http-equiv=\"keywords\" ");
 		skel.addReference(tu);
 		skel.add("/>");
@@ -136,7 +136,7 @@ public class HtmlEventTest {
 
 		// Build the input
 		GenericSkeleton skel = new GenericSkeleton();
-		TextUnit tu2 = new TextUnit("tu2", "my title");
+		TextUnit tu2 = new TextUnit("N9033D6E2-tu2", "my title");
 		skel.add("title='");
 		skel.addContentPlaceholder(tu2);
 		skel.add("'");
@@ -146,7 +146,7 @@ public class HtmlEventTest {
 		events.add(new Event(EventType.TEXT_UNIT, tu2));
 
 		skel = new GenericSkeleton();
-		TextUnit tu1 = new TextUnit("tu1", "Text of p");
+		TextUnit tu1 = new TextUnit("N9033D6E2-tu1", "Text of p");
 		tu1.setType("paragraph");
 		skel.add("<p ");
 		skel.addReference(tu2);
@@ -172,7 +172,7 @@ public class HtmlEventTest {
 
 		// Build the input
 		GenericSkeleton skel = new GenericSkeleton();
-		DocumentPart dp1 = new DocumentPart("dp1", false);
+		DocumentPart dp1 = new DocumentPart("N9033D6E2-dp1", false);
 		skel.add("<dummy lang=\"");
 		dp1.setSourceProperty(new Property("language", "en", false));
 		skel.addValuePlaceholder(dp1, "language", null);		
@@ -238,7 +238,7 @@ public class HtmlEventTest {
 
 		// Build the input
 		GenericSkeleton skel = new GenericSkeleton();
-		DocumentPart dp1 = new DocumentPart("dp1", false);
+		DocumentPart dp1 = new DocumentPart("N9033D6E2-dp1", false);
 		skel.add("<yyy xml:lang=\"");
 		dp1.setSourceProperty(new Property("language", "en", false));
 		skel.addValuePlaceholder(dp1, "language", null);		
@@ -263,7 +263,7 @@ public class HtmlEventTest {
 
 		// Build the input
 		GenericSkeleton skel = new GenericSkeleton();
-		TextUnit tu = new TextUnit("tu1", "tu1");
+		TextUnit tu = new TextUnit("N9033D6E2-tu1", "tu1");
 		skel.add("trans=\"");
 		skel.addContentPlaceholder(tu);
 		skel.add("\"");
@@ -273,7 +273,7 @@ public class HtmlEventTest {
 		events.add(new Event(EventType.TEXT_UNIT, tu));
 
 		skel = new GenericSkeleton();
-		DocumentPart dp = new DocumentPart("dp1", false);
+		DocumentPart dp = new DocumentPart("N9033D6E2-dp1", false);
 		skel.add("<dummy write=\"");
 		dp.setSourceProperty(new Property("write", "w", false));
 		skel.addValuePlaceholder(dp, "write", null);
@@ -299,7 +299,7 @@ public class HtmlEventTest {
 		addStartEvents(events);
 
 		GenericSkeleton skel = new GenericSkeleton();
-		DocumentPart dp1 = new DocumentPart("dp1", true);
+		DocumentPart dp1 = new DocumentPart("N9033D6E2-dp1", true);
 		skel.add("<a href=\"");
 		skel.addValuePlaceholder(dp1, "href", null);
 		dp1.setSourceProperty(new Property("href", "there", false));
@@ -309,7 +309,7 @@ public class HtmlEventTest {
 		events.add(new Event(EventType.DOCUMENT_PART, dp1));
 
 		skel = new GenericSkeleton();
-		TextUnit tu1 = new TextUnit("tu1", "Before ");
+		TextUnit tu1 = new TextUnit("N9033D6E2-tu1", "Before ");
 		tu1.setType("paragraph");
 		TextFragment tf = tu1.getSource().getFirstContent();
 		Code code = new Code(TagType.OPENING, "b", "<b>");
@@ -322,7 +322,7 @@ public class HtmlEventTest {
 		tf.append(" ");
 		code = new Code(TagType.PLACEHOLDER, "a");
 		code.setType(Code.TYPE_LINK);
-		code.appendReference("dp1");
+		code.appendReference("N9033D6E2-dp1");
 		tf.append(code);
 		tf.append(" after.");
 		skel.add("<p>");
@@ -399,7 +399,7 @@ public class HtmlEventTest {
 		addStartEvents(events);
 
 		GenericSkeleton skel = new GenericSkeleton();
-		DocumentPart dp = new DocumentPart("dp1", false);
+		DocumentPart dp = new DocumentPart("N9033D6E2-dp1", false);
 		skel.add("<meta http-equiv=\"Content-Language\" content=\"");
 		skel.addValuePlaceholder(dp, "language", null);
 		skel.add("\"/>");
@@ -420,7 +420,7 @@ public class HtmlEventTest {
 		addStartEvents(events);
 
 		GenericSkeleton skel = new GenericSkeleton();
-		DocumentPart dp = new DocumentPart("dp1", false);
+		DocumentPart dp = new DocumentPart("N9033D6E2-dp1", false);
 		skel.add("<meta http-equiv=\"Content-Type\" content=\"");
 		skel.add("text/html; charset=");
 		skel.addValuePlaceholder(dp, "encoding", null);
@@ -442,7 +442,7 @@ public class HtmlEventTest {
 		addStartEvents(events);
 
 		GenericSkeleton skel = new GenericSkeleton();
-		TextUnit tu2 = new TextUnit("tu2", "text");
+		TextUnit tu2 = new TextUnit("N9033D6E2-tu2", "text");
 		skel.add("alt=\"");
 		skel.addContentPlaceholder(tu2);
 		skel.add("\"");
@@ -452,7 +452,7 @@ public class HtmlEventTest {
 		events.add(new Event(EventType.TEXT_UNIT, tu2));
 
 		skel = new GenericSkeleton();
-		DocumentPart dp1 = new DocumentPart("dp1", true);
+		DocumentPart dp1 = new DocumentPart("N9033D6E2-dp1", true);
 		skel.add("<img href=\"");
 		dp1.setSourceProperty(new Property("href", "there", false));
 		skel.addValuePlaceholder(dp1, "href", null);
@@ -465,7 +465,7 @@ public class HtmlEventTest {
 		events.add(new Event(EventType.DOCUMENT_PART, dp1));
 
 		skel = new GenericSkeleton();
-		TextUnit tu1 = new TextUnit("tu1", "Before ");
+		TextUnit tu1 = new TextUnit("N9033D6E2-tu1", "Before ");
 		tu1.setType("paragraph");
 		TextFragment tf = tu1.getSource().getFirstContent();
 		Code code = new Code(TagType.OPENING, "b", "<b>");
@@ -478,7 +478,7 @@ public class HtmlEventTest {
 		tf.append(" ");
 		code = new Code(TagType.PLACEHOLDER, "img");
 		code.setType(Code.TYPE_IMAGE);
-		code.appendReference("dp1");
+		code.appendReference("N9033D6E2-dp1");
 		tf.append(code);
 		tf.append(" after.");
 		skel.add("<p>");
@@ -543,24 +543,24 @@ public class HtmlEventTest {
 		addStartEvents(events);
 
 		GenericSkeleton tu3skel = new GenericSkeleton("<p>");
-		TextUnit tu3 = new TextUnit("tu3", "Text before list:");
+		TextUnit tu3 = new TextUnit("N9033D6E2-tu3", "Text before list:");
 		tu3.setSkeleton(tu3skel);
 		tu3skel.addContentPlaceholder(tu3);
 		tu3.setType("paragraph");
 				
 		// embedded list
-		StartGroup g1 = new StartGroup(tu3.getId(), "sg1");
+		StartGroup g1 = new StartGroup(tu3.getId(), "N9033D6E2-sg1");
 		g1.setIsReferent(true);
 		g1.setSkeleton(new GenericSkeleton("<ul>"));		
 
 		TextFragment tf = tu3.getSource().getFirstContent();
-		Code c = new Code(TagType.PLACEHOLDER, "ul", TextFragment.makeRefMarker("sg1"));
+		Code c = new Code(TagType.PLACEHOLDER, "ul", TextFragment.makeRefMarker("N9033D6E2-sg1"));
 		c.setReferenceFlag(true);
 		tf.append(c);		
 		events.add(new Event(EventType.START_GROUP, g1));
 
 		GenericSkeleton tu1skel = new GenericSkeleton();
-		TextUnit tu1 = new TextUnit("tu1", "Text of item 1");		
+		TextUnit tu1 = new TextUnit("N9033D6E2-tu1", "Text of item 1");		
 		tu1.setType("li");		
 		tu1skel.append("<li>");
 		tu1skel.addContentPlaceholder(tu1);
@@ -569,7 +569,7 @@ public class HtmlEventTest {
 		events.add(new Event(EventType.TEXT_UNIT, tu1));
 				
 		GenericSkeleton tu2skel = new GenericSkeleton();
-		TextUnit tu2 = new TextUnit("tu2", "Text of item 2");		
+		TextUnit tu2 = new TextUnit("N9033D6E2-tu2", "Text of item 2");		
 		tu2.setType("li");
 		tu2skel.append("<li>");
 		tu2skel.addContentPlaceholder(tu2);
@@ -577,7 +577,7 @@ public class HtmlEventTest {
 		tu2.setSkeleton(tu2skel);
 		events.add(new Event(EventType.TEXT_UNIT, tu2));
 
-		Ending e3 = new Ending("eg3");
+		Ending e3 = new Ending("N9033D6E2-eg3");
 		e3.setSkeleton(new GenericSkeleton("</ul>"));
 		events.add(new Event(EventType.END_GROUP, e3));
 				
