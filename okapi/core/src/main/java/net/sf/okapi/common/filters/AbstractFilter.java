@@ -72,6 +72,7 @@ public abstract class AbstractFilter implements IFilter {
 		// defaults
 		setNewlineType("\n"); //$NON-NLS-1$
 		setMultilingual(false);
+		fcMapper = new FilterConfigurationMapper();
 	}
 
 	/**
