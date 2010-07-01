@@ -105,8 +105,8 @@ public class TaggedFilterConfiguration {
 	public static final String ELEMENT_WRITABLE_ATTRIBUTES = "writableLocalizableAttributes";
 	public static final String ELEMENT_READ_ONLY_ATTRIBUTES = "readOnlyLocalizableAttributes";
 	public static final String ELEMENT_ID_ATTRIBUTES = "idAttributes";
-	private static final Object PRESERVE_CONDITION = "preserve";
-	private static final Object DEFAULT_CONDITION = "default";
+	public static final Object PRESERVE_CONDITION = "preserve";
+	public static final Object DEFAULT_CONDITION = "default";
 
 	/**
 	 * {@link AbstractMarkupFilter} rule types. These rules are listed in YAML configuration files 

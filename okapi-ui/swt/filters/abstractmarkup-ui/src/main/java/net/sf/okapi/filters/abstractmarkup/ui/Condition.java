@@ -23,7 +23,7 @@ package net.sf.okapi.filters.abstractmarkup.ui;
 class Condition {
 
 	String part1;
-	int operator;
+	String operator;
 	String part2;
 
 }

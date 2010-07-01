@@ -20,7 +20,10 @@
 
 package net.sf.okapi.filters.abstractmarkup.ui;
 
+import java.util.ArrayList;
 import java.util.Map;
+
+import javax.sound.sampled.spi.FormatConversionProvider;
 
 import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.IContext;
@@ -31,6 +34,7 @@ import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.InputDialog;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
+import net.sf.okapi.common.ui.filters.InlineCodeFinderPanel;
 import net.sf.okapi.filters.abstractmarkup.AbstractMarkupParameters;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
@@ -44,6 +48,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
@@ -77,6 +82,11 @@ public class Editor implements IParametersEditor {
 	private Text edAttScopeElements;
 	private Attribute currentAtt;
 	private Button btRemoveAtt;
+	private Group grpWS;
+	private Text edPreserveWS;
+	private Text edDefaultWS;
+	private Button chkUseCodeFinder;
+	private InlineCodeFinderPanel pnlCodeFinder;
 
 	public boolean edit (IParameters options,
 		boolean readOnly,
@@ -158,7 +168,7 @@ public class Editor implements IParametersEditor {
 		
 		lbAtt = new List(cmpTmp, SWT.BORDER | SWT.V_SCROLL);
 		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.verticalSpan = 2;
+		gdTmp.verticalSpan = 3;
 		lbAtt.setLayoutData(gdTmp);
 		lbAtt.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -194,18 +204,16 @@ public class Editor implements IParametersEditor {
 				}
             }
 		});
-
 		
 		//--- Scope group
 		
-		Group grpScope = new Group(cmpTmp, SWT.NONE);
-		grpScope.setLayout(new GridLayout());
+		Group grpTmp = new Group(cmpTmp, SWT.NONE);
+		grpTmp.setLayout(new GridLayout());
 		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING | GridData.FILL_HORIZONTAL);
-		gdTmp.verticalSpan = 2;
-		grpScope.setLayoutData(gdTmp);
-		grpScope.setText("Scope:");
+		grpTmp.setLayoutData(gdTmp);
+		grpTmp.setText("Scope:");
 		
-		rdAttrAllElements = new Button(grpScope, SWT.RADIO); 
+		rdAttrAllElements = new Button(grpTmp, SWT.RADIO); 
 		rdAttrAllElements.setText("Applies to all elements");
 		rdAttrAllElements.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -213,7 +221,7 @@ public class Editor implements IParametersEditor {
 			};
 		});
 		
-		rdAttOnlyThese = new Button(grpScope, SWT.RADIO);
+		rdAttOnlyThese = new Button(grpTmp, SWT.RADIO);
 		rdAttOnlyThese.setText("Apply only for the following elements:");
 		rdAttOnlyThese.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -221,7 +229,7 @@ public class Editor implements IParametersEditor {
 			};
 		});
 		
-		rdAttExceptThese = new Button(grpScope, SWT.RADIO);
+		rdAttExceptThese = new Button(grpTmp, SWT.RADIO);
 		rdAttExceptThese.setText("Apply to all elements excepted for the following ones:");
 		rdAttExceptThese.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -229,9 +237,37 @@ public class Editor implements IParametersEditor {
 			};
 		});
 		
-		edAttScopeElements = new Text(grpScope, SWT.BORDER);
+		edAttScopeElements = new Text(grpTmp, SWT.BORDER);
 		edAttScopeElements.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
+		//--- White spaces group
+		
+		grpWS = new Group(cmpTmp, SWT.NONE);
+		grpWS.setLayout(new GridLayout(3, false));
+		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING | GridData.FILL_HORIZONTAL);
+		gdTmp.verticalSpan = 2;
+		grpWS.setLayoutData(gdTmp);
+		grpWS.setText("White spaces:");
+		
+		Label stTmp = new Label(grpWS, SWT.NONE);
+		stTmp.setText("Preserve:");
+		
+		edPreserveWS = new Text(grpWS, SWT.BORDER);
+		edPreserveWS.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		edPreserveWS.setEditable(false);
+		
+		Button btTmp = new Button(grpWS, SWT.PUSH);
+		btTmp.setText("Edit...");
+		
+		stTmp = new Label(grpWS, SWT.NONE);
+		stTmp.setText("Default:");
+		
+		edDefaultWS = new Text(grpWS, SWT.BORDER);
+		edDefaultWS.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		edDefaultWS.setEditable(false);
+		
+		btTmp = new Button(grpWS, SWT.PUSH);
+		btTmp.setText("Edit...");
 		
 		//--- Add/Remove buttons for the list of attributes
 		
@@ -258,6 +294,28 @@ public class Editor implements IParametersEditor {
 		
 		tiTmp = new TabItem(tabs, SWT.NONE);
 		tiTmp.setText("Attributes");
+		tiTmp.setControl(cmpTmp);
+		
+
+		//=== Inline codes tab
+		
+		cmpTmp = new Composite(tabs, SWT.NONE);
+		layTmp = new GridLayout();
+		cmpTmp.setLayout(layTmp);
+		
+		chkUseCodeFinder = new Button(cmpTmp, SWT.CHECK);
+		chkUseCodeFinder.setText("Has inline codes as defined below:");
+		chkUseCodeFinder.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				updateInlineCodes();
+			};
+		});
+		
+		pnlCodeFinder = new InlineCodeFinderPanel(cmpTmp, SWT.NONE);
+		pnlCodeFinder.setLayoutData(new GridData(GridData.FILL_BOTH));
+		
+		tiTmp = new TabItem(tabs, SWT.NONE);
+		tiTmp.setText("Inline Codes");
 		tiTmp.setControl(cmpTmp);
 		
 		
@@ -335,13 +393,25 @@ public class Editor implements IParametersEditor {
 		}
 	}
 	
+	private void updateInlineCodes () {
+		pnlCodeFinder.setEnabled(chkUseCodeFinder.getSelection());
+	}
+
 	private void updateAttributesButtons () {
 		btRemoveAtt.setEnabled(lbAtt.getItemCount()>0);
 	}
 	
 	// Determine which rules to enable/disable based on the one just being set
 	private void updateAttributeRules (TableItem item) {
-		if ( !item.getChecked() ) return; // Un-checking is fine for all
+		if ( (Integer)item.getData() == ATTRULES_PRESERVE_WHITESPACE ) {
+			updateWhiteSpaces();
+			return;
+		}
+		if ( !item.getChecked() ) {
+			// Otherwise un-checking has no effect
+			return;
+		}
+		// Effects for checking
 		switch ( (Integer)item.getData() ) {
 		case ATTRULES_TRANS:
 			tblAttRules.getItem(ATTRULES_WRITABLE).setChecked(false);
@@ -355,6 +425,14 @@ public class Editor implements IParametersEditor {
 			tblAttRules.getItem(ATTRULES_WRITABLE).setChecked(false);
 			tblAttRules.getItem(ATTRULES_TRANS).setChecked(false);
 			break;
+		}
+	}
+	
+	private void updateWhiteSpaces () {
+		boolean enabled = tblAttRules.getItem(ATTRULES_PRESERVE_WHITESPACE).getChecked();
+		grpWS.setEnabled(enabled);
+		for ( Control ctrl : grpWS.getChildren() ) {
+			ctrl.setEnabled(enabled);
 		}
 	}
 	
@@ -408,9 +486,36 @@ public class Editor implements IParametersEditor {
 			updateScopeElements();
 			currentAtt = att;
 		}
+		
+		edPreserveWS.setText(formatConditions(currentAtt.wsPreserve));
+		edDefaultWS.setText(formatConditions(currentAtt.wsDefault));
+		updateWhiteSpaces();
+		
 		return true;
 	}
 	
+	// Formats a list of conditions for display
+	private String formatConditions (java.util.List<Condition> list) {
+		if ( list == null ) {
+			return "";
+		}
+		// Else: build a display for the list
+		StringBuilder tmp = new StringBuilder();
+		if ( list.size() > 1 ) tmp.append("[");
+		for ( Condition cond : list ) {
+			if ( tmp.length() > 1 ) tmp.append(", ");
+			tmp.append(String.format("%s %s ", cond.part1, cond.operator));
+			if ( cond.part2.indexOf(',') != -1 ) {
+				tmp.append("["+cond.part2+"]");
+			}
+			else {
+				tmp.append(cond.part2);
+			}
+		}
+		if ( list.size() > 1 ) tmp.append("]");
+		return tmp.toString();
+	}
+
 	private boolean showDialog () {
 		shell.open();
 		while ( !shell.isDisposed() ) {
@@ -450,53 +555,109 @@ public class Editor implements IParametersEditor {
 	}
 	
 	private void setData () {
-		TaggedFilterConfiguration tfg = params.getTaggedConfig();
+		try {
+			TaggedFilterConfiguration tfg = params.getTaggedConfig();
 
-		Map<String, Object> map = tfg.getAttributeRules();
-		for ( String attName : map.keySet() ) {
-			Attribute att = new Attribute();
-			att.name = attName;
+			//tfg.isGlobalPreserveWhitespace();
 			
-			@SuppressWarnings("unchecked")
-			Map<String, Object> items = (Map<String, Object>)map.get(attName);
-			for ( String itemName : items.keySet() ) {
-				
-				// Get the list of ruleTypes
-				if ( itemName.equals(TaggedFilterConfiguration.RULETYPES) ) {
-					@SuppressWarnings("unchecked")
-					java.util.List<String> list = (java.util.List<String>)items.get(itemName);
-					for ( String tmp : list ) {
-						att.rules.add(tfg.convertRuleAsStringToRuleType(tmp));
+			chkUseCodeFinder.setSelection(tfg.isUseCodeFinder());
+			pnlCodeFinder.setRules(tfg.getCodeFinderRules());
+			
+			//--- Read the attributes
+			
+			Map<String, Object> map = tfg.getAttributeRules();
+			for ( String attName : map.keySet() ) {
+				Attribute att = new Attribute();
+				att.name = attName;
+				@SuppressWarnings("unchecked")
+				Map<String, Object> items = (Map<String, Object>)map.get(attName);
+				for ( String itemName : items.keySet() ) {
+					// Get the list of ruleTypes
+					if ( itemName.equals(TaggedFilterConfiguration.RULETYPES) ) {
+						@SuppressWarnings("unchecked")
+						java.util.List<String> list = (java.util.List<String>)items.get(itemName);
+						for ( String tmp : list ) {
+							att.rules.add(tfg.convertRuleAsStringToRuleType(tmp));
+						}
+					}
+					else if ( itemName.equals(TaggedFilterConfiguration.ALL_ELEMENTS_EXCEPT) ) {
+						att.scope = Attribute.SCOPE_ALLEXCEPT;
+						att.scopeElements = makeStringList(items.get(itemName).toString());
+					}
+					else if ( itemName.equals(TaggedFilterConfiguration.ONLY_THESE_ELEMENTS) ) {
+						att.scope = Attribute.SCOPE_ONLY;
+						att.scopeElements = makeStringList(items.get(itemName).toString());
+					}
+					else if ( itemName.equals(TaggedFilterConfiguration.PRESERVE_CONDITION) ) {
+						att.wsPreserve = parseConditions(items.get(itemName));
+					}
+					else if ( itemName.equals(TaggedFilterConfiguration.DEFAULT_CONDITION) ) {
+						att.wsDefault = parseConditions(items.get(itemName));
+					}
+					else if ( itemName.equals(TaggedFilterConfiguration.CONDITIONS) ) {
+						att.conditions = parseConditions(items.get(itemName));
 					}
 				}
-				else if ( itemName.equals(TaggedFilterConfiguration.ALL_ELEMENTS_EXCEPT) ) {
-					att.scope = Attribute.SCOPE_ALLEXCEPT;
-					att.scopeElements = items.get(itemName).toString();
-					if ( att.scopeElements.length() > 2 ) {
-						att.scopeElements = att.scopeElements.substring(1, att.scopeElements.length()-1);
-					}
-				}
-				else if ( itemName.equals(TaggedFilterConfiguration.ONLY_THESE_ELEMENTS) ) {
-					att.scope = Attribute.SCOPE_ONLY;
-					att.scopeElements = items.get(itemName).toString();
-					if ( att.scopeElements.length() > 2 ) {
-						att.scopeElements = att.scopeElements.substring(1, att.scopeElements.length()-1);
-					}
-				}
+				// Attribute is read, add it
+				lbAtt.add(attName);
+				lbAtt.setData(attName, att);
 			}
-		
-			lbAtt.add(attName);
-			lbAtt.setData(attName, att);
+			// Select default and update all
+			if ( lbAtt.getItemCount() > 0 ) lbAtt.setSelection(0);
+			updateAttribute();
+			updateAttributesButtons();
 		}
-		
-		if ( lbAtt.getItemCount() > 0 ) {
-			lbAtt.setSelection(0);
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, "Error when loading the configuration.\n"+e.getMessage(), null);
 		}
-		
-		updateAttribute();
-		updateAttributesButtons();
+	}
+	
+	private java.util.List<Condition> parseConditions (Object rawObject) {
+		java.util.List<Condition> list = new ArrayList<Condition>(1);
+		// The conditions entry is either a single condition statement or a list of conditions
+		@SuppressWarnings("unchecked")
+		java.util.List<Object> objs = (java.util.List<Object>)rawObject;
+		if ( objs.get(0) instanceof String ) { // This is a condition statement
+			parseCondition(list, objs);
+		}
+		else { // Otherwise it has to be a list of conditions
+			for ( Object obj : objs ) {
+				parseCondition(list, obj);
+			}
+		}
+		return list;
+	}
+	
+	private void parseCondition (java.util.List<Condition> conditions,
+		Object rawObject)
+	{
+		// We should have three objects: name, operator, value(s)
+		@SuppressWarnings("unchecked")
+		java.util.List<Object> objs = (java.util.List<Object>)rawObject;
+		Condition condition = new Condition();
+		condition.part1 = (String)objs.get(0);
+		condition.operator = (String)objs.get(1);
+		// The value(s) can be one string or a list of strings
+		if ( objs.get(2) instanceof String ) {
+			condition.part2 = (String)objs.get(2);
+		}
+		else { // List of values
+			condition.part2 = makeStringList(objs.get(2).toString());
+		}
+		// Add the condition
+		conditions.add(condition);
 	}
 
+	// Converts a YAML representation of a list, or a string into a simple list
+	private String makeStringList (String yamlList) {
+		String res = yamlList.trim();
+		// If it's a list: remove the brackets
+		if (( res.length() > 2 ) && ( res.charAt(0) == '[' )) {
+			res = res.substring(1, res.length()-1);
+		}
+		return res.trim();
+	}
+	
 	private String ensureValidName (String name) {
 		name = name.toLowerCase().trim();
 		name = name.replaceAll("\\s", "");

@@ -59,10 +59,10 @@ class IssuesTableModel {
 		for ( Issue issue : list ) {
 			// Select the type of items to show
 			switch ( displayType ) {
-			case 1: // Enabled
+			case QualityCheckEditor.ISSUETYPE_ENABLED: // Enabled
 				if ( !issue.enabled ) continue;
 				break;
-			case 2: // Disabled
+			case QualityCheckEditor.ISSUETYPE_DISABLED: // Disabled
 				if ( issue.enabled ) continue;
 				break;
 			}

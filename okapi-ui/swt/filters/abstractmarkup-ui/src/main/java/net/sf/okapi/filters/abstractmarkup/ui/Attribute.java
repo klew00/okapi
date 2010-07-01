@@ -42,5 +42,7 @@ class Attribute {
 	int scope;
 	String scopeElements;
 	List<Condition> conditions;
+	List<Condition> wsPreserve;
+	List<Condition> wsDefault;
 
 }

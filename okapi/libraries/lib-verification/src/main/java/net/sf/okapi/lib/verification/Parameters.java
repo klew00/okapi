@@ -277,7 +277,7 @@ public class Parameters extends BaseParameters {
 		doubledWord = true;
 		
 		checkMaxCharLength = true;
-		maxCharLength = 150;
+		maxCharLength = 170;
 		checkMinCharLength = true;
 		minCharLength = 50;
 

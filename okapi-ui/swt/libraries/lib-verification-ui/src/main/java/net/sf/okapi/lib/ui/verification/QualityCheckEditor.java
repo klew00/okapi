@@ -73,6 +73,10 @@ import org.eclipse.swt.widgets.Text;
 
 public class QualityCheckEditor implements IQualityCheckEditor {
 
+	static final int ISSUETYPE_ALL = 0;
+	static final int ISSUETYPE_ENABLED = 1;
+	static final int ISSUETYPE_DISABLED = 2;
+	
 	private static final String APPNAME = "CheckMate"; //$NON-NLS-1$
 	private static final String CFG_SOURCELOCALE = "sourceLocale"; //$NON-NLS-1$
 	private static final String CFG_TARGETLOCALE = "targetLocale"; //$NON-NLS-1$
@@ -310,6 +314,14 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				editOptions();
+            }
+		});
+		
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "issues.resetdisabledissues"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				resetDisabledIssues();
             }
 		});
 		
@@ -753,6 +765,16 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		}
 	}
 
+	private void resetDisabledIssues () {
+		MessageBox dlg = new MessageBox(shell, SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
+		dlg.setText(shell.getText());
+		dlg.setMessage("This command will re-enabled all issues that have been disabled.\nDo you want to proceed?");
+		if  ( dlg.open() != SWT.YES ) return;
+		// Proceed
+		session.resetDisabledIssues();
+		issuesModel.updateTable(0, displayType, issueType);
+	}
+	
 	private void checkAll () {
 		try {
 			startWaiting("Checking all documents...");

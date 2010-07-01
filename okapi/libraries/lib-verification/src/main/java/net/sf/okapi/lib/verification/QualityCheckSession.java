@@ -130,6 +130,12 @@ public class QualityCheckSession {
 		checker = new QualityChecker();
 	}
 	
+	public void resetDisabledIssues () {
+		for ( Issue issue : issues ) {
+			issue.enabled = true;
+		}
+	}
+	
 	public int getDocumentCount () {
 		return rawDocs.size();
 	}
