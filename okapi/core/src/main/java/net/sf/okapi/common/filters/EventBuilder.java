@@ -333,7 +333,7 @@ public class EventBuilder {
 		this.rootId = rootId;
 		
 		if (rootId == null) {
-			rootId = "noDocName";			
+			rootId = IdGenerator.DEFAULT_ROOT_ID;			
 		}
 		
 		startGroupId = new IdGenerator(rootId, IdGenerator.START_GROUP);

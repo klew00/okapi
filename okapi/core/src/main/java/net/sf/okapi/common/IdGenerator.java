@@ -29,12 +29,13 @@ import java.security.InvalidParameterException;
  * <li>The sequential identifier starting at 1, with a fixed prefix if one was provided.  
  */
 public class IdGenerator {
-	public static final String START_GROUP = "sg"; //$NON-NLS-1$
-	public static final String END_GROUP = "eg"; //$NON-NLS-1$
-	public static final String TEXT_UNIT = "tu"; //$NON-NLS-1$
-	public static final String DOCUMENT_PART = "dp"; //$NON-NLS-1$
-	public static final String START_SUBDOCUMENT = "ssd"; //$NON-NLS-1$
-	public static final String END_SUBDOCUMENT = "esd"; //$NON-NLS-1$
+	public static final String START_GROUP = "sg";
+	public static final String END_GROUP = "eg";
+	public static final String TEXT_UNIT = "tu";
+	public static final String DOCUMENT_PART = "dp";
+	public static final String START_SUBDOCUMENT = "ssd";
+	public static final String END_SUBDOCUMENT = "esd";
+	public static final String DEFAULT_ROOT_ID = "noDocName";
 	
 	private long seq = 0;
 	private String rootId;

@@ -342,7 +342,7 @@ public class VignetteFilter implements IFilter {
 		readAllData();
 		
 		if ( docName != null ) rootId = docName;
-		else rootId = "noDocName";
+		else rootId = IdGenerator.DEFAULT_ROOT_ID;
 
 		tuId = 0;
 		subDocId = new IdGenerator(rootId, IdGenerator.START_SUBDOCUMENT);
