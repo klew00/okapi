@@ -60,7 +60,7 @@
             <groupId>net.sf.okapi.filters</groupId>
             <artifactId>okapi-filter-openxml</artifactId>
             <version>${project.version}</version>
-            <classifier>tests</classifier>
+            <scope>tests</scope>
         </dependency>
         <dependency>
             <groupId>net.sf.okapi.filters</groupId>
