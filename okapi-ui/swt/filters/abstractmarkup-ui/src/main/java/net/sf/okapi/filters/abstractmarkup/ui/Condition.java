@@ -20,10 +20,44 @@
 
 package net.sf.okapi.filters.abstractmarkup.ui;
 
+import net.sf.okapi.common.ListUtil;
+
 class Condition {
 
 	String part1;
 	String operator;
 	String part2;
+
+	@Override
+	public Condition clone () {
+		Condition newCond = new Condition();
+		newCond.part1 = part1;
+		newCond.operator = operator;
+		newCond.part2 = part2;
+		return newCond;
+	}
+	
+	@Override
+	public String toString () {
+		StringBuilder tmp = new StringBuilder();
+		tmp.append(String.format("'%s', %s, ", part1, operator));
+		if ( part2.indexOf(',') != -1 ) {
+			java.util.List<String> list = ListUtil.stringAsList(part2);
+			tmp.append("[");
+			for ( int i=0; i<list.size(); i++ ) {
+				if ( i > 0 ) tmp.append(", ");
+				tmp.append(quotedValue(list.get(i)));
+			}
+			tmp.append("]");
+		}
+		else {
+			tmp.append(quotedValue(part2));
+		}
+		return tmp.toString();
+	}
+	
+	private String quotedValue (String value) {
+		return "'"+value.replace("'", "''")+"'";
+	}
 
 }

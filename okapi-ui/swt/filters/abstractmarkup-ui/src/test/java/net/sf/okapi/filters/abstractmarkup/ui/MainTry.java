@@ -15,7 +15,7 @@ public class MainTry {
 		IParameters params = new AbstractMarkupParameters();
 
 		String root = TestUtil.getParentDir(MainTry.class, "/testConfig.yml");
-		File file = new File(root+"dita.yml");
+		File file = new File(root+"testConfig.yml");
 		params.load(file.toURI(), false);
 		
 		BaseContext context = new BaseContext();

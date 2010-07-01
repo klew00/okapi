@@ -23,13 +23,12 @@ package net.sf.okapi.filters.abstractmarkup.ui;
 import java.util.ArrayList;
 import java.util.Map;
 
-import javax.sound.sampled.spi.FormatConversionProvider;
-
 import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.InputDialog;
 import net.sf.okapi.common.ui.OKCancelPanel;
@@ -69,11 +68,15 @@ public class Editor implements IParametersEditor {
 	private static final int ATTRULES_ID = 3;
 	private static final int ATTRULES_PRESERVE_WHITESPACE = 4;
 	
+	private static final int TAB_ATTRIBUTES = 1;
+	
 	private Shell shell;
 	private boolean result = false;
 	private AbstractMarkupParameters params;
 	private TabFolder tabs;
 	private IHelp help;
+	private Button chkWellformed;
+	private Button chkGlobalPreserveWS;
 	private List lbAtt;
 	private Table tblAttRules;
 	private Button rdAttrAllElements;
@@ -83,6 +86,8 @@ public class Editor implements IParametersEditor {
 	private Attribute currentAtt;
 	private Button btRemoveAtt;
 	private Group grpWS;
+	private Group grpAttCond;
+	private Text edAttConditions;
 	private Text edPreserveWS;
 	private Text edDefaultWS;
 	private Button chkUseCodeFinder;
@@ -119,7 +124,7 @@ public class Editor implements IParametersEditor {
 	private void create (Shell parent,
 		boolean readOnly)
 	{
-		shell.setText("AbstractMarkup Filter Parameters");
+		shell.setText(params.getEditorTitle());
 		if ( parent != null ) UIUtil.inheritIcon(shell, parent);
 		GridLayout layTmp = new GridLayout();
 		layTmp.marginBottom = 0;
@@ -130,7 +135,7 @@ public class Editor implements IParametersEditor {
 		GridData gdTmp = new GridData(GridData.FILL_BOTH);
 		tabs.setLayoutData(gdTmp);
 
-		//=== General tab
+		//=== Elements tab
 		
 		Composite cmpTmp = new Composite(tabs, SWT.NONE);
 		layTmp = new GridLayout();
@@ -138,18 +143,6 @@ public class Editor implements IParametersEditor {
 		
 
 		TabItem tiTmp = new TabItem(tabs, SWT.NONE);
-		tiTmp.setText("General");
-		tiTmp.setControl(cmpTmp);
-		
-		
-		//=== Elements tab
-		
-		cmpTmp = new Composite(tabs, SWT.NONE);
-		layTmp = new GridLayout();
-		cmpTmp.setLayout(layTmp);
-		
-
-		tiTmp = new TabItem(tabs, SWT.NONE);
 		tiTmp.setText("Elements");
 		tiTmp.setControl(cmpTmp);
 		
@@ -168,7 +161,7 @@ public class Editor implements IParametersEditor {
 		
 		lbAtt = new List(cmpTmp, SWT.BORDER | SWT.V_SCROLL);
 		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.verticalSpan = 3;
+		gdTmp.verticalSpan = 4;
 		lbAtt.setLayoutData(gdTmp);
 		lbAtt.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -205,13 +198,37 @@ public class Editor implements IParametersEditor {
             }
 		});
 		
+		//--- Conditions group
+		
+		grpAttCond = new Group(cmpTmp, SWT.NONE);
+		grpAttCond.setLayout(new GridLayout(3, false));
+		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING | GridData.FILL_HORIZONTAL);
+		grpAttCond.setLayoutData(gdTmp);
+		grpAttCond.setText("Conditions");
+		
+		edAttConditions = new Text(grpAttCond, SWT.BORDER);
+		edAttConditions.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		edAttConditions.setEditable(false);
+		
+		Button btTmp = new Button(grpAttCond, SWT.PUSH);
+		btTmp.setText("Edit...");
+		btTmp.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				if ( currentAtt == null ) return;
+				if ( currentAtt.conditions == null ) {
+					currentAtt.conditions = new ArrayList<Condition>();
+				}
+				editConditions(edAttConditions, currentAtt.conditions);
+            }
+		});
+
 		//--- Scope group
 		
 		Group grpTmp = new Group(cmpTmp, SWT.NONE);
 		grpTmp.setLayout(new GridLayout());
 		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING | GridData.FILL_HORIZONTAL);
 		grpTmp.setLayoutData(gdTmp);
-		grpTmp.setText("Scope:");
+		grpTmp.setText("Scope");
 		
 		rdAttrAllElements = new Button(grpTmp, SWT.RADIO); 
 		rdAttrAllElements.setText("Applies to all elements");
@@ -247,7 +264,7 @@ public class Editor implements IParametersEditor {
 		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING | GridData.FILL_HORIZONTAL);
 		gdTmp.verticalSpan = 2;
 		grpWS.setLayoutData(gdTmp);
-		grpWS.setText("White spaces:");
+		grpWS.setText("White spaces");
 		
 		Label stTmp = new Label(grpWS, SWT.NONE);
 		stTmp.setText("Preserve:");
@@ -256,8 +273,17 @@ public class Editor implements IParametersEditor {
 		edPreserveWS.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		edPreserveWS.setEditable(false);
 		
-		Button btTmp = new Button(grpWS, SWT.PUSH);
+		btTmp = new Button(grpWS, SWT.PUSH);
 		btTmp.setText("Edit...");
+		btTmp.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				if ( currentAtt == null ) return;
+				if ( currentAtt.conditions == null ) {
+					currentAtt.wsPreserve = new ArrayList<Condition>();
+				}
+				editConditions(edPreserveWS, currentAtt.wsPreserve);
+            }
+		});
 		
 		stTmp = new Label(grpWS, SWT.NONE);
 		stTmp.setText("Default:");
@@ -268,6 +294,15 @@ public class Editor implements IParametersEditor {
 		
 		btTmp = new Button(grpWS, SWT.PUSH);
 		btTmp.setText("Edit...");
+		btTmp.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				if ( currentAtt == null ) return;
+				if ( currentAtt.conditions == null ) {
+					currentAtt.wsDefault = new ArrayList<Condition>();
+				}
+				editConditions(edDefaultWS, currentAtt.wsDefault);
+            }
+		});
 		
 		//--- Add/Remove buttons for the list of attributes
 		
@@ -290,7 +325,6 @@ public class Editor implements IParametersEditor {
 				removeAttribute();
             }
 		});
-		
 		
 		tiTmp = new TabItem(tabs, SWT.NONE);
 		tiTmp.setText("Attributes");
@@ -316,6 +350,26 @@ public class Editor implements IParametersEditor {
 		
 		tiTmp = new TabItem(tabs, SWT.NONE);
 		tiTmp.setText("Inline Codes");
+		tiTmp.setControl(cmpTmp);
+		
+		
+		//=== General tab
+		
+		cmpTmp = new Composite(tabs, SWT.NONE);
+		layTmp = new GridLayout();
+		cmpTmp.setLayout(layTmp);
+
+		chkWellformed = new Button(cmpTmp, SWT.CHECK);
+		chkWellformed.setText("Assumes the documents are well-formed");
+		gdTmp = new GridData();
+		gdTmp.verticalIndent = 16;
+		chkWellformed.setLayoutData(gdTmp);
+
+		chkGlobalPreserveWS = new Button(cmpTmp, SWT.CHECK);
+		chkGlobalPreserveWS.setText("Preserve white-spaces unless otherwise specified");
+		
+		tiTmp = new TabItem(tabs, SWT.NONE);
+		tiTmp.setText("General");
 		tiTmp.setControl(cmpTmp);
 		
 		
@@ -401,30 +455,29 @@ public class Editor implements IParametersEditor {
 		btRemoveAtt.setEnabled(lbAtt.getItemCount()>0);
 	}
 	
-	// Determine which rules to enable/disable based on the one just being set
+	// Actions to do when a rule type is being checked or un-checked
 	private void updateAttributeRules (TableItem item) {
+		// Treat case for preserve white-spaces first
 		if ( (Integer)item.getData() == ATTRULES_PRESERVE_WHITESPACE ) {
 			updateWhiteSpaces();
 			return;
 		}
-		if ( !item.getChecked() ) {
-			// Otherwise un-checking has no effect
-			return;
-		}
-		// Effects for checking
-		switch ( (Integer)item.getData() ) {
-		case ATTRULES_TRANS:
-			tblAttRules.getItem(ATTRULES_WRITABLE).setChecked(false);
-			tblAttRules.getItem(ATTRULES_READONLY).setChecked(false);
-			break;
-		case ATTRULES_WRITABLE:
-			tblAttRules.getItem(ATTRULES_TRANS).setChecked(false);
-			tblAttRules.getItem(ATTRULES_READONLY).setChecked(false);
-			break;
-		case ATTRULES_READONLY:
-			tblAttRules.getItem(ATTRULES_WRITABLE).setChecked(false);
-			tblAttRules.getItem(ATTRULES_TRANS).setChecked(false);
-			break;
+		// Other cases are affected only when checking the option
+		if ( item.getChecked() ) {
+			switch ( (Integer)item.getData() ) {
+			case ATTRULES_TRANS:
+				tblAttRules.getItem(ATTRULES_WRITABLE).setChecked(false);
+				tblAttRules.getItem(ATTRULES_READONLY).setChecked(false);
+				break;
+			case ATTRULES_WRITABLE:
+				tblAttRules.getItem(ATTRULES_TRANS).setChecked(false);
+				tblAttRules.getItem(ATTRULES_READONLY).setChecked(false);
+				break;
+			case ATTRULES_READONLY:
+				tblAttRules.getItem(ATTRULES_WRITABLE).setChecked(false);
+				tblAttRules.getItem(ATTRULES_TRANS).setChecked(false);
+				break;
+			}
 		}
 	}
 	
@@ -470,6 +523,9 @@ public class Editor implements IParametersEditor {
 			rdAttExceptThese.setSelection(false);
 			rdAttOnlyThese.setSelection(false);
 			edAttScopeElements.setText("");
+			edAttConditions.setText("");
+			edPreserveWS.setText("");
+			edDefaultWS.setText("");
 			currentAtt = null;
 		}
 		else {
@@ -483,37 +539,23 @@ public class Editor implements IParametersEditor {
 			rdAttExceptThese.setSelection(att.scope==Attribute.SCOPE_ALLEXCEPT);
 			rdAttOnlyThese.setSelection(att.scope==Attribute.SCOPE_ONLY);
 			edAttScopeElements.setText(att.scopeElements);
-			updateScopeElements();
+			edAttConditions.setText(formatConditions(att.conditions));
+			edPreserveWS.setText(formatConditions(att.wsPreserve));
+			edDefaultWS.setText(formatConditions(att.wsDefault));
+			updateWhiteSpaces();
 			currentAtt = att;
 		}
-		
-		edPreserveWS.setText(formatConditions(currentAtt.wsPreserve));
-		edDefaultWS.setText(formatConditions(currentAtt.wsDefault));
+		updateScopeElements();
 		updateWhiteSpaces();
-		
 		return true;
 	}
 	
 	// Formats a list of conditions for display
 	private String formatConditions (java.util.List<Condition> list) {
-		if ( list == null ) {
+		if ( Util.isEmpty(list) ) {
 			return "";
 		}
-		// Else: build a display for the list
-		StringBuilder tmp = new StringBuilder();
-		if ( list.size() > 1 ) tmp.append("[");
-		for ( Condition cond : list ) {
-			if ( tmp.length() > 1 ) tmp.append(", ");
-			tmp.append(String.format("%s %s ", cond.part1, cond.operator));
-			if ( cond.part2.indexOf(',') != -1 ) {
-				tmp.append("["+cond.part2+"]");
-			}
-			else {
-				tmp.append(cond.part2);
-			}
-		}
-		if ( list.size() > 1 ) tmp.append("]");
-		return tmp.toString();
+		return list.toString();
 	}
 
 	private boolean showDialog () {
@@ -532,7 +574,7 @@ public class Editor implements IParametersEditor {
 			if ( !name.equals(ensureValidName(name)) ) {
 				Dialogs.showError(shell,
 					String.format("The attribute name \"%s\" is invalid.", lbAtt.getItem(i)), null);
-				tabs.setSelection(2);
+				tabs.setSelection(TAB_ATTRIBUTES);
 				return false;
 			}
 			Attribute att = (Attribute)lbAtt.getData(name);
@@ -540,17 +582,22 @@ public class Editor implements IParametersEditor {
 			if ( att.rules.isEmpty() ) {
 				Dialogs.showError(shell,
 					String.format("The attribute \"%s\" has no rule defined.", name), null);
-				tabs.setSelection(2);
+				tabs.setSelection(TAB_ATTRIBUTES);
 				return false;
 			}
 			// Check the scope
 			if (( att.scope != Attribute.SCOPE_ALL ) && att.scopeElements.isEmpty() ) {
 				Dialogs.showError(shell,
 					String.format("The attribute \"%s\" has no elements defined for its scope.", name), null);
-				tabs.setSelection(2);
+				tabs.setSelection(TAB_ATTRIBUTES);
 				return false;
 			}
 		}
+		
+		// check inline codes
+		String tmp = pnlCodeFinder.getRules();
+		if ( tmp == null ) return false;
+
 		return true;
 	}
 	
@@ -558,7 +605,8 @@ public class Editor implements IParametersEditor {
 		try {
 			TaggedFilterConfiguration tfg = params.getTaggedConfig();
 
-			//tfg.isGlobalPreserveWhitespace();
+			chkWellformed.setSelection(tfg.isWellformed());
+			chkGlobalPreserveWS.setSelection(tfg.isGlobalPreserveWhitespace());
 			
 			chkUseCodeFinder.setSelection(tfg.isUseCodeFinder());
 			pnlCodeFinder.setRules(tfg.getCodeFinderRules());
@@ -667,7 +715,70 @@ public class Editor implements IParametersEditor {
 	private boolean saveData () {
 		if ( !validate() ) return false;
 		
+		StringBuilder tmp = new StringBuilder();
+		
+		//--- General
+		tmp.append(String.format("%s: %s\n",
+			TaggedFilterConfiguration.WELLFORMED,
+			chkWellformed.getSelection()));
+		tmp.append(String.format("%s: %s\n",
+			TaggedFilterConfiguration.GLOBAL_PRESERVE_WHITESPACE,
+			chkGlobalPreserveWS.getSelection()));
+		
+		//--- Inline codes
+		tmp.append(String.format("\n%s: %s\n",
+			TaggedFilterConfiguration.USECODEFINDER,
+			chkUseCodeFinder.getSelection()));
+		String rules = pnlCodeFinder.getRules().replace("\\", "\\\\");
+		rules = rules.replace("\n", "\\n");
+		tmp.append(String.format("%s: %s\n",
+			TaggedFilterConfiguration.CODEFINDERRULES,
+			"\""+rules+"\""));
+		
+		//--- Attribute
+		tmp.append("\nattributes:\n");
+		for ( int i=0; i<lbAtt.getItemCount(); i++ ) {
+			Attribute att = (Attribute)lbAtt.getData(lbAtt.getItem(i));
+			tmp.append("  '"+att.name+"':\n    ruleTypes: ");
+			tmp.append(att.rules.toString());
+			// White-spaces
+			if ( att.rules.contains(RULE_TYPE.ATTRIBUTE_PRESERVE_WHITESPACE) ) {
+				if ( !Util.isEmpty(att.wsPreserve) ) {
+					tmp.append(String.format("\n    %s: ", TaggedFilterConfiguration.PRESERVE_CONDITION));
+					tmp.append(att.wsPreserve.toString());
+				}
+				if ( !Util.isEmpty(att.wsDefault) ) {
+					tmp.append(String.format("\n    %s: ", TaggedFilterConfiguration.DEFAULT_CONDITION));
+					tmp.append(att.wsDefault.toString());
+				}
+			}
+			// Conditions
+			if ( !Util.isEmpty(att.conditions) ) {
+				tmp.append(String.format("\n    %s: ", TaggedFilterConfiguration.CONDITIONS));
+				tmp.append(att.conditions.toString());
+			}
+			tmp.append("\n");
+		}
+		
+System.out.print(tmp.toString());		
+System.out.print("\n---\n");		
+		params.fromString(tmp.toString());
+System.out.print(params.toString());		
 		return true;
 	}
-	
+
+	private void editConditions (Text ctrlDisplay,
+		java.util.List<Condition> conditions)
+	{
+		try {
+			ConditionsDialog dlg = new ConditionsDialog(shell, null, conditions);
+			if ( !dlg.showDialog() ) return;
+			// Else: update the display
+			ctrlDisplay.setText(formatConditions(conditions));
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, "Error when editing conditions.\n"+e.getMessage(), null);
+		}
+	}
+
 }

@@ -31,6 +31,7 @@ import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
 public class AbstractMarkupParameters extends BaseParameters {
 	
 	private TaggedFilterConfiguration taggedConfig;
+	private String title = "Parameters Editor";
 
 	public AbstractMarkupParameters () {
 		reset();
@@ -49,6 +50,22 @@ public class AbstractMarkupParameters extends BaseParameters {
 	@Override
 	public void reset () {		
 		taggedConfig = new TaggedFilterConfiguration("collapse_whitespace: false\nassumeWellformed: true");
+	}
+
+	/**
+	 * Gets the title to use with the parameter editor.
+	 * @return the title to use with the parameter editor.
+	 */
+	public String getEditorTitle () {
+		return title;
+	}
+	
+	/**
+	 * Sets the title to use with the parameters editor.
+	 * @param title the title to use with the parameters editor.
+	 */
+	public void setEditorTitle (String title) {
+		this.title = title;
 	}
 
 	/**
