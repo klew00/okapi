@@ -345,8 +345,8 @@ public class VignetteFilter implements IFilter {
 		else rootId = "noDocName";
 
 		tuId = 0;
-		subDocId = new IdGenerator(rootId, "sd");
-		groupId = new IdGenerator(rootId, "g");
+		subDocId = new IdGenerator(rootId, IdGenerator.START_SUBDOCUMENT);
+		groupId = new IdGenerator(rootId, IdGenerator.START_GROUP);
 		otherId = 0;
 		
 		// Set the start event
