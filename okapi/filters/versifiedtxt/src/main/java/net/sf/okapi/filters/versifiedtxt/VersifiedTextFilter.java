@@ -73,8 +73,7 @@ public class VersifiedTextFilter extends AbstractFilter {
 	public VersifiedTextFilter() {
 		super();
 		this.currentChapter = "";
-		this.currentBook = "";
-		eventBuilder = new EventBuilder();
+		this.currentBook = "";		
 
 		setMimeType(VERSIFIED_TXT_MIME_TYPE);
 		setFilterWriter(createFilterWriter());
@@ -135,7 +134,13 @@ public class VersifiedTextFilter extends AbstractFilter {
 
 		versifiedFileReader = new BufferedReader(input.getReader());
 
-		eventBuilder.reset();
+		// create EventBuilder with document name as rootId
+		if (eventBuilder == null) {
+			eventBuilder = new EventBuilder(getDocumentName());
+		} else {
+			eventBuilder.reset(getDocumentName());
+		}
+		
 		eventBuilder.addFilterEvent(createStartDocumentEvent());
 	}
 

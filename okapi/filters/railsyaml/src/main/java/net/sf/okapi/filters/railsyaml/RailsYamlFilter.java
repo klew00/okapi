@@ -93,8 +93,7 @@ public class RailsYamlFilter extends AbstractFilter {
 		}
 	}
 	
-	public RailsYamlFilter () {
-		eventBuilder = new YamlEventBuilder();
+	public RailsYamlFilter () {		
 		setMimeType(YAML_MIME_TYPE);
 		setFilterWriter(createFilterWriter());
 		
@@ -330,6 +329,7 @@ public class RailsYamlFilter extends AbstractFilter {
 			setDocumentName(input.getInputURI().getPath());
 		}
 		
+		
 		setOptions(input.getSourceLocale(), input.getTargetLocale(), encoding, generateSkeleton);
 		
 		// Get a Reader on the RawDocument
@@ -341,7 +341,13 @@ public class RailsYamlFilter extends AbstractFilter {
 		}
 		
 		// Start the EventBuilder
-		getEventBuilder().reset();
+		// create EventBuilder with document name as rootId
+		if (eventBuilder == null) {
+			eventBuilder = new YamlEventBuilder(getDocumentName());
+		} else {
+			eventBuilder.reset(getDocumentName());
+		}
+		
 		getEventBuilder().addFilterEvent(createStartDocumentEvent());
 	}
 

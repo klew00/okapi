@@ -41,8 +41,8 @@ public class AbstractMarkupEventBuilder extends EventBuilder {
 	private boolean useCodeFinder = false;
 	private InlineCodeFinder codeFinder;
 	
-	public AbstractMarkupEventBuilder() {
-		super();		
+	public AbstractMarkupEventBuilder(String rootId) {
+		super(rootId);		
 		codeFinder = new InlineCodeFinder();
 	}
 	

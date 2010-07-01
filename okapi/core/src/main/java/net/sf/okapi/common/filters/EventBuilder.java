@@ -87,12 +87,13 @@ public class EventBuilder {
 	private GenericSkeleton currentSkeleton;
 	private Code currentCode;
 	private DocumentPart currentDocumentPart;
+	private String rootId;
 
 	/**
 	 * Instantiates a new EventBuilder.
 	 */
-	public EventBuilder() {
-		reset();
+	public EventBuilder(String rootId) {
+		reset(rootId);
 	}
 
 	/**
@@ -360,7 +361,8 @@ public class EventBuilder {
 	/**
 	 * Reset {@link IFilter} for a new input. Callers should reset the EventBuilder for each input.
 	 */
-	public void reset() {
+	public void reset(String rootId) {
+		this.rootId = rootId;
 		startGroupId = 0;
 		endGroupId = 0;
 		textUnitId = 0;
@@ -420,7 +422,7 @@ public class EventBuilder {
 		tu.setMimeType(propOrText.getMimeType());
 		tu.setIsReferent(true);
 		tu.setName(propOrText.getName());
-		// TODO: tu.setType(propOrText.getElementType());
+		tu.setType(propOrText.getElementType());
 
 		GenericSkeleton skel = new GenericSkeleton();
 

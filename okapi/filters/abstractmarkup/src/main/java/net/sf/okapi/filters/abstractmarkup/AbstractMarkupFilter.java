@@ -103,8 +103,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 * Default constructor for {@link AbstractMarkupFilter} using default
 	 * {@link EventBuilder}
 	 */
-	public AbstractMarkupFilter() {
-		this.eventBuilder = new AbstractMarkupEventBuilder();		 
+	public AbstractMarkupFilter() {		
 		this.bufferedWhitespace = new StringBuilder();
 		this.hasUtf8Bom = false;
 		this.hasUtf8Encoding = false;		
@@ -195,7 +194,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 
 	// TRY for IdGenerator implementation
 	public void open (RawDocument input, boolean generateSkeleton, String idRoot) {
-		getEventBuilder().setIdRoot(idRoot);
+		eventBuilder.setIdRoot(idRoot);
 		open(input, generateSkeleton);
 	}
 	
@@ -257,7 +256,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	}
 
 	public boolean hasNext() {
-		return getEventBuilder().hasNext();
+		return eventBuilder.hasNext();
 	}
 
 	/**
@@ -265,8 +264,8 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 * return it.
 	 */
 	public Event next() {
-		while (getEventBuilder().hasQueuedEvents()) {
-			return getEventBuilder().next();
+		while (eventBuilder.hasQueuedEvents()) {
+			return eventBuilder.next();
 		}
 
 		while (nodeIterator.hasNext() && !isCanceled()) {
@@ -315,7 +314,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 				handleText(segment);
 			}
 
-			if (getEventBuilder().hasQueuedEvents()) {
+			if (eventBuilder.hasQueuedEvents()) {
 				break;
 			}
 		}
@@ -325,7 +324,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		}
 
 		// return one of the waiting events
-		return getEventBuilder().next();
+		return eventBuilder.next();
 	}
 
 	/**
@@ -333,9 +332,17 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 * {@link Event}
 	 */
 	protected void startFilter() {
-		// order of execution matters	
-		getEventBuilder().reset();
-		getEventBuilder().addFilterEvent(createStartDocumentEvent());
+		// order of execution matters
+		
+		// create EventBuilder with document name as rootId
+		if (eventBuilder == null) {
+			eventBuilder = new AbstractMarkupEventBuilder(getDocumentName());
+			eventBuilder.setMimeType(getMimeType());
+		} else {
+			eventBuilder.reset(getDocumentName());
+		}
+		
+		eventBuilder.addFilterEvent(createStartDocumentEvent());
 		
 		// default is to preserve whitespace
 		boolean preserveWhitespace = true;
@@ -354,8 +361,8 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 * {@link Event}
 	 */
 	protected void endFilter() {
-		getEventBuilder().flushRemainingEvents();
-		getEventBuilder().addFilterEvent(createEndDocumentEvent());
+		eventBuilder.flushRemainingEvents();
+		eventBuilder.addFilterEvent(createEndDocumentEvent());
 	}
 
 	/**
@@ -513,10 +520,10 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 */
 	protected void handleNumericEntity(Segment entity) {
 		String decodedText = CharacterReference.decode(entity.toString(), false);
-		if (!getEventBuilder().isCurrentTextUnit()) {
-			getEventBuilder().startTextUnit();
+		if (!eventBuilder.isCurrentTextUnit()) {
+			eventBuilder.startTextUnit();
 		}
-		getEventBuilder().addToTextUnit(decodedText);
+		eventBuilder.addToTextUnit(decodedText);
 	}
 
 	/**
@@ -528,10 +535,10 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 */
 	protected void handleCharacterEntity(Segment entity) {
 		String decodedText = CharacterReference.decode(entity.toString(), false);
-		if (!getEventBuilder().isCurrentTextUnit()) {
-			getEventBuilder().startTextUnit();
+		if (!eventBuilder.isCurrentTextUnit()) {
+			eventBuilder.startTextUnit();
 		}
-		getEventBuilder().addToTextUnit(decodedText);
+		eventBuilder.addToTextUnit(decodedText);
 	}
 
 	/**
@@ -599,8 +606,8 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		} finally {
 			
 			// A TextUnit may have already been created. Update its preserveWS field
-			if (getEventBuilder().isCurrentTextUnit()) {
-				TextUnit tu = getEventBuilder().peekMostRecentTextUnit();
+			if (eventBuilder.isCurrentTextUnit()) {
+				TextUnit tu = eventBuilder.peekMostRecentTextUnit();
 				tu.setPreserveWhitespaces(ruleState.isPreserveWhitespaceState());
 			}
 		}
@@ -975,57 +982,57 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	}
 
 	protected void setPreserveWhitespace(boolean preserveWhitespace) {		
-		getEventBuilder().setPreserveWhitespace(preserveWhitespace);
+		eventBuilder.setPreserveWhitespace(preserveWhitespace);
 	}
 
 	protected void addToDocumentPart(String part) {
-		getEventBuilder().addToDocumentPart(part);
+		eventBuilder.addToDocumentPart(part);
 	}
 
 	protected void addToTextUnit(String text) {
-		getEventBuilder().addToTextUnit(text);
+		eventBuilder.addToTextUnit(text);
 	}
 
 	protected void startTextUnit(String text) {
-		getEventBuilder().startTextUnit(text);
+		eventBuilder.startTextUnit(text);
 	}
 	
 	protected void setTextUnitName(String name) {
-		getEventBuilder().setTextUnitName(name);
+		eventBuilder.setTextUnitName(name);
 	}
 
 	protected void setTextUnitType(String type) {
-		getEventBuilder().setTextUnitType(type);
+		eventBuilder.setTextUnitType(type);
 	}
 	
 	protected boolean canStartNewTextUnit() {
-		return getEventBuilder().canStartNewTextUnit();
+		return eventBuilder.canStartNewTextUnit();
 	}
 
 	protected boolean isInsideTextRun() {
-		return getEventBuilder().isInsideTextRun();
+		return eventBuilder.isInsideTextRun();
 	}
 
 	protected void addToTextUnit(Code code) {
-		getEventBuilder().addToTextUnit(code);
+		eventBuilder.addToTextUnit(code);
 	}
 
 	protected void addToTextUnit(Code code, 
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
-		getEventBuilder().addToTextUnit(code, propertyTextUnitPlaceholders);
+		eventBuilder.addToTextUnit(code, propertyTextUnitPlaceholders);
 	}
 
 	protected void endDocumentPart() {
-		getEventBuilder().endDocumentPart();
+		eventBuilder.endDocumentPart();
 	}
 
 	protected void startDocumentPart(String part, String name,
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
-		getEventBuilder().startDocumentPart(part, name, propertyTextUnitPlaceholders);
+		eventBuilder.startDocumentPart(part, name, propertyTextUnitPlaceholders);
 	}
 
 	protected void startGroup(GenericSkeleton startMarker, String commonTagType) {
-		getEventBuilder().startGroup(startMarker, commonTagType);
+		eventBuilder.startGroup(startMarker, commonTagType);
 	}
 
 	protected void startGroup(GenericSkeleton startMarker,
@@ -1033,53 +1040,53 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		LocaleId locale,
 		List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders)
 	{
-		getEventBuilder().startGroup(startMarker, commonTagType, locale, propertyTextUnitPlaceholders);
+		eventBuilder.startGroup(startMarker, commonTagType, locale, propertyTextUnitPlaceholders);
 	}
 
 	protected void startTextUnit(GenericSkeleton startMarker) {
-		getEventBuilder().startTextUnit(startMarker);
+		eventBuilder.startTextUnit(startMarker);
 	}
 
 	protected void startTextUnit(GenericSkeleton startMarker,
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
-		getEventBuilder().startTextUnit(startMarker, propertyTextUnitPlaceholders);
+		eventBuilder.startTextUnit(startMarker, propertyTextUnitPlaceholders);
 	}
 
 	protected void endTextUnit(GenericSkeleton endMarker) {
-		getEventBuilder().endTextUnit(endMarker);
+		eventBuilder.endTextUnit(endMarker);
 	}
 
 	protected void endGroup(GenericSkeleton endMarker) {
-		getEventBuilder().endGroup(endMarker);
+		eventBuilder.endGroup(endMarker);
 	}
 
 	protected void startTextUnit() {
-		getEventBuilder().startTextUnit();
+		eventBuilder.startTextUnit();
 	}
 	
 	protected int getTextUnitId() {
-		return getEventBuilder().getTextUnitId();
+		return eventBuilder.getTextUnitId();
 	}
 
 	protected void setTextUnitId(int id) {
-		getEventBuilder().setTextUnitId(id);
+		eventBuilder.setTextUnitId(id);
 	}
 
 	protected int getDocumentPartId() {
-		return getEventBuilder().getDocumentPartId();
+		return eventBuilder.getDocumentPartId();
 	}
 
 	protected void setDocumentPartId(int id) {
-		getEventBuilder().setDocumentPartId(id);
+		eventBuilder.setDocumentPartId(id);
 	}
 	
 	protected void appendToFirstSkeletonPart(String text)
 	{
-		getEventBuilder().appendToFirstSkeletonPart(text);
+		eventBuilder.appendToFirstSkeletonPart(text);
 	}
 
 	protected void addFilterEvent(Event event) {
-		getEventBuilder().addFilterEvent(event);
+		eventBuilder.addFilterEvent(event);
 	}
 	
 	protected ExtractionRuleState getRuleState() {
@@ -1101,8 +1108,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 */
 	@Override
 	public void setMimeType(String mimeType) {
-		super.setMimeType(mimeType);
-		eventBuilder.setMimeType(mimeType);
+		super.setMimeType(mimeType);	
 	}
 	
 	public StringBuilder getBufferedWhiteSpace() {

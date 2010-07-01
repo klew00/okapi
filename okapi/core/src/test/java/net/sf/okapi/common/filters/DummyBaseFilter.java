@@ -39,7 +39,7 @@ public class DummyBaseFilter extends AbstractFilter {
 	private EventBuilder eventBuilder;
 	
 	public DummyBaseFilter() {
-		eventBuilder = new EventBuilder();
+		eventBuilder = new EventBuilder("rootId");
 	}
 	
 	public void close() {
@@ -82,7 +82,7 @@ public class DummyBaseFilter extends AbstractFilter {
 	private void createCase1 () {
 		setMimeType("text/xml");
 		
-		eventBuilder.reset();
+		eventBuilder.reset("rootId");
 		eventBuilder.addFilterEvent(createStartDocumentEvent());
 		
 		eventBuilder.startTextUnit("Text.");
@@ -99,7 +99,7 @@ public class DummyBaseFilter extends AbstractFilter {
 		setMimeType("text/xml");
 		setNewlineType("\n");
 
-		eventBuilder.reset();
+		eventBuilder.reset("rootId");
 		eventBuilder.addFilterEvent(createStartDocumentEvent());
 
 		ArrayList<PropertyTextUnitPlaceholder> list = new ArrayList<PropertyTextUnitPlaceholder>();

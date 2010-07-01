@@ -97,6 +97,16 @@ public class IdGenerator {
 		return rootId;
 	}
 	
+	/**
+	 * Reset the IDGenerator with a new root id. 
+	 * Use the same prefix and set the seq count to 0.
+	 * @param rootId new root id
+	 */
+	public void reset(String rootId) {
+		seq = 0;
+		create(rootId, prefix);
+	}
+	
 	private void create (String root,
 		String prefix)
 	{
@@ -111,5 +121,4 @@ public class IdGenerator {
 		if ( prefix == null ) this.prefix = "";
 		else this.prefix = prefix;
 	}
-	
 }
