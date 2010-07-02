@@ -53,7 +53,7 @@ public class XLIFFKitReaderTest {
 //	private static final LocaleId ITIT = new LocaleId("it", "it");
 	
 	// DEBUG 		
-	@Test
+	//@Test
 	public void testReader() {
 		
 		new Pipeline(
@@ -77,7 +77,7 @@ public class XLIFFKitReaderTest {
 	}
 	
 	// DEBUG 		
-	@Test
+	//@Test
 	public void testReader2() {
 		
 		new Pipeline(
@@ -101,7 +101,7 @@ public class XLIFFKitReaderTest {
 	}
 
 	// DEBUG 		
-	@Test
+	//@Test
 	public void testReader4() {
 		
 		new Pipeline(
@@ -149,7 +149,7 @@ public class XLIFFKitReaderTest {
 	}
 
 	// DEBUG 		
-	@Test
+	//@Test
 	public void testReader6() {
 		
 		new Pipeline(

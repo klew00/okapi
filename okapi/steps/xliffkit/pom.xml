@@ -16,17 +16,22 @@
 		</dependency>
 		
 		<dependency>
-			<groupId>org.apache.poi</groupId>
-			<artifactId>poi-ooxml</artifactId>
-			<version>3.6</version>
-			<scope>test</scope>
+			<groupId>net.sf.okapi</groupId>
+			<artifactId>okapi-core</artifactId>
+			<version>${project.version}</version>
+			<classifier>tests</classifier>
 		</dependency>
 		
 		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>1.4</version>
-			<scope>test</scope>
+			<groupId>net.sf.okapi.filters</groupId>
+			<artifactId>okapi-filter-xliff</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>net.sf.okapi.filters</groupId>
+			<artifactId>okapi-filter-openxml</artifactId>
+			<version>${project.version}</version>				
 		</dependency>
 		
 		<dependency>
@@ -37,9 +42,14 @@
 		
 		<dependency>
 			<groupId>net.sf.okapi.steps</groupId>
-			<artifactId>okapi-step-wordcount</artifactId>
+			<artifactId>okapi-step-tokenization</artifactId>
 			<version>${project.version}</version>
-			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>net.sf.okapi.steps</groupId>
+			<artifactId>okapi-step-wordcount</artifactId>
+			<version>${project.version}</version>			
 		</dependency>
 		
 		<dependency>
@@ -51,23 +61,8 @@
 		
 		<dependency>
 			<groupId>net.sf.okapi.filters</groupId>
-			<artifactId>okapi-filter-openxml</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		
-		<dependency>
-			<groupId>net.sf.okapi.filters</groupId>
 			<artifactId>okapi-filter-vignette</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-		
-		<dependency>
-			<groupId>net.sf.okapi.filters</groupId>
-			<artifactId>okapi-filter-openxml</artifactId>
-			<version>${project.version}</version>
-			<scope>tests</scope>
+			<version>${project.version}</version>			
 		</dependency>
 		
 		<dependency>
@@ -80,13 +75,13 @@
 		<dependency>
 			<groupId>net.sf.okapi.filters</groupId>
 			<artifactId>okapi-filter-po</artifactId>
-			<version>${project.version}</version>
+			<version>${project.version}</version>			
 		</dependency>
 		
 		<dependency>
 			<groupId>net.sf.okapi.filters</groupId>
 			<artifactId>okapi-filter-pensieve</artifactId>
-			<version>${project.version}</version>
+			<version>${project.version}</version>			
 		</dependency>
 		
 		<dependency>
@@ -113,8 +108,7 @@
 		<dependency>
 			<groupId>net.sf.okapi.filters</groupId>
 			<artifactId>okapi-filter-table</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
+			<version>${project.version}</version>			
 		</dependency>
 		
 		<dependency>
@@ -139,9 +133,23 @@
 		</dependency>
 		
 		<dependency>
-			<groupId>net.sf.okapi.filters</groupId>
-			<artifactId>okapi-filter-xliff</artifactId>
+			<groupId>net.sf.okapi.steps</groupId>
+			<artifactId>okapi-step-textmodification</artifactId>
 			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>net.sf.okapi.steps</groupId>
+			<artifactId>okapi-step-searchandreplace</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>net.sf.okapi.steps</groupId>
+			<artifactId>okapi-step-formatconversion</artifactId>
+			<version>${project.version}</version>			
 		</dependency>
 		
 		<dependency>
@@ -166,23 +174,16 @@
 		</dependency>
 		
 		<dependency>
-			<groupId>net.sf.okapi.steps</groupId>
-			<artifactId>okapi-step-textmodification</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>3.6</version>	
 		</dependency>
 		
 		<dependency>
-			<groupId>net.sf.okapi.steps</groupId>
-			<artifactId>okapi-step-searchandreplace</artifactId>
-			<version>${project.version}</version>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>1.4</version>
 			<scope>test</scope>
-		</dependency>
-		
-		<dependency>
-			<groupId>net.sf.okapi.steps</groupId>
-			<artifactId>okapi-step-formatconversion</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+		</dependency>				
 	</dependencies>
 </project>
