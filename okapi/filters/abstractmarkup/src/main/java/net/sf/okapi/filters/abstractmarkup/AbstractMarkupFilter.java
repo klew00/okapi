@@ -340,11 +340,12 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		// order of execution matters
 
 		// create EventBuilder with document name as rootId
+		String rid = (rootId == null) ? getDocumentName() : rootId;
 		if (eventBuilder == null) {
-			eventBuilder = new AbstractMarkupEventBuilder((rootId == null) ? getDocumentName() : rootId);
+			eventBuilder = new AbstractMarkupEventBuilder(rid);
 			eventBuilder.setMimeType(getMimeType());
 		} else {
-			eventBuilder.reset(getDocumentName());
+			eventBuilder.reset(rid);
 		}
 		// reset rootId for next run
 		rootId = null;
