@@ -20,9 +20,6 @@
 
 package net.sf.okapi.persistence.beans.v1;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.persistence.IPersistenceSession;

@@ -20,14 +20,17 @@
 
 package net.sf.okapi.persistence.beans.v1;
 
+import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.persistence.IPersistenceSession;
+import net.sf.okapi.persistence.beans.FactoryBean;
 
 public class SegmentBean extends TextPartBean {
 	
 	private String id;
+	private AnnotationsBean annotations = new AnnotationsBean();
 
 	@Override
 	protected TextPart createObject(IPersistenceSession session) {
@@ -49,12 +52,18 @@ public class SegmentBean extends TextPartBean {
 		if (obj instanceof Segment) {			
 			Segment seg = (Segment) obj;
 			id = seg.getId();
+			annotations.set(seg.getAnnotations(), session);
 		}
 	}
 
 	@Override
 	protected void setObject(TextPart obj, IPersistenceSession session) {
 		super.setObject(obj, session);
+		if (obj instanceof Segment) {			
+			Segment seg = (Segment) obj;
+			for (FactoryBean annotationBean : annotations.getItems())
+				seg.setAnnotation(annotationBean.get(IAnnotation.class, session));
+		}
 	}
 
 	
@@ -64,5 +73,13 @@ public class SegmentBean extends TextPartBean {
 
 	public void setSegment(String id) {
 		this.id = id;
+	}
+
+	public void setAnnotations(AnnotationsBean annotations) {
+		this.annotations = annotations;
+	}
+
+	public AnnotationsBean getAnnotations() {
+		return annotations;
 	}
 }

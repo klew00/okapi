@@ -22,8 +22,6 @@ package net.sf.okapi.persistence.beans.v1;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;

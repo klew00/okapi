@@ -24,11 +24,14 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartSubDocument;
+import net.sf.okapi.steps.xliffkit.common.persistence.sessions.OkapiJsonSession;
+//import net.sf.okapi.steps.xliffkit.common.persistence.sessions.OkapiJsonSession;
 
 public class EventLogger extends BasePipelineStep {
 
 	private int indent = 0;
 	private boolean increasing = true;
+	private OkapiJsonSession session = new OkapiJsonSession();
 	
 	@Override
 	public String getDescription() {
@@ -52,10 +55,13 @@ public class EventLogger extends BasePipelineStep {
 			case START_SUBDOCUMENT:
 				res +=  "  " + ((StartSubDocument) event.getResource()).getName();
 				break;
+//			case TEXT_UNIT:
+//				if ("30".equals(event.getResource().getId()))
+//						res += "\n" + session.writeObject(event); 
 		}
 		return res;
 	}
-	
+		
 	private void printEvent(Event event) {
 		String indentStr = "";
 		for (int i = 0; i < indent; i++) 
@@ -97,6 +103,10 @@ public class EventLogger extends BasePipelineStep {
 		
 		
 		return super.handleEvent(event);
+	}
+
+	public OkapiJsonSession getSession() {
+		return session;
 	}
 
 }

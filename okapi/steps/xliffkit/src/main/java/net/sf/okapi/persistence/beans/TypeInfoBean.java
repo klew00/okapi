@@ -20,6 +20,8 @@
 
 package net.sf.okapi.persistence.beans;
 
+import java.util.logging.Logger;
+
 import net.sf.okapi.common.ClassUtil;
 import net.sf.okapi.persistence.IPersistenceSession;
 import net.sf.okapi.persistence.PersistenceBean;
@@ -27,6 +29,7 @@ import net.sf.okapi.persistence.PersistenceBean;
 public class TypeInfoBean extends PersistenceBean<Object> {
 
 	private String className;
+	private final Logger LOGGER = Logger.getLogger(this.getClass().getName());
 
 	@Override
 	protected Object createObject(IPersistenceSession session) {
@@ -41,7 +44,8 @@ public class TypeInfoBean extends PersistenceBean<Object> {
 
 	@Override
 	protected void fromObject(Object srcObj, IPersistenceSession session) {
-		className = ClassUtil.getQualifiedClassName(srcObj);		
+		className = ClassUtil.getQualifiedClassName(srcObj);
+		LOGGER.warning(String.format("No bean class registered for %s", className));
 	}
 
 	@Override
