@@ -30,6 +30,7 @@ public class LanguageList {
 
 	// The map keys are ICU locale ID's 
 	private static TreeMap<String, ULocale> map = new TreeMap<String, ULocale>();
+	private static final ULocale EN = new ULocale("en");
 	
 	static {
 		ULocale[] locales = ULocale.getAvailableLocales();
@@ -42,7 +43,8 @@ public class LanguageList {
 	protected static String formatLanguageInfo(ULocale locale) {
 		
 		if (locale == null) return "";
-		return StringUtil.titleCase(locale.getDisplayName());
+		//return StringUtil.titleCase(locale.getDisplayName());
+		return StringUtil.titleCase(locale.getDisplayLanguage(EN));
 	}
 	
 	public static String[] getLanguages() {

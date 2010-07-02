@@ -20,6 +20,7 @@
 
 package net.sf.okapi.steps.wordcount;
 
+import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
@@ -27,6 +28,9 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.steps.tokenization.Tokenizer;
 import net.sf.okapi.steps.tokenization.tokens.Tokens;
 import net.sf.okapi.steps.wordcount.common.BaseCounter;
+import net.sf.okapi.steps.wordcount.common.GMX;
+import net.sf.okapi.steps.wordcount.common.Metrics;
+import net.sf.okapi.steps.wordcount.common.MetricsAnnotation;
 import net.sf.okapi.steps.wordcount.common.StructureParameters;
 
 /**
@@ -86,6 +90,18 @@ public class WordCounter extends BaseCounter {
 		
 		if (params == null) return "";
 		return params.getTokenName();
+	}
+	
+	public static void setCount(IResource res, long count) {
+		MetricsAnnotation ma = res.getAnnotation(MetricsAnnotation.class);
+		
+		if (ma == null) {			
+			ma = new MetricsAnnotation();
+			res.setAnnotation(ma);
+		}
+		
+		Metrics m = ma.getMetrics();		
+		m.setMetric(GMX.TotalWordCount, count);
 	}
 
 }
