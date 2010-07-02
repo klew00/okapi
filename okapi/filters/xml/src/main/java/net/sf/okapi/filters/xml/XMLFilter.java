@@ -329,13 +329,15 @@ public class XMLFilter implements IFilter {
 
 		// Add the XML declaration
 		skel = new GenericSkeleton();
-		skel.add("<?xml version=\"" + doc.getXmlVersion() + "\"");
-		skel.add(" encoding=\"");
-		skel.addValuePlaceholder(startDoc, Property.ENCODING, LocaleId.EMPTY);
-		skel.add("\"");
-		startDoc.setProperty(new Property(Property.ENCODING, encoding, false));
-		if ( doc.getXmlStandalone() ) skel.add(" standalone=\"true\"");
-		skel.add("?>"+lineBreak);
+		if ( !params.omitXMLDeclaration ) {
+			skel.add("<?xml version=\"" + doc.getXmlVersion() + "\"");
+			skel.add(" encoding=\"");
+			skel.addValuePlaceholder(startDoc, Property.ENCODING, LocaleId.EMPTY);
+			skel.add("\"");
+			startDoc.setProperty(new Property(Property.ENCODING, encoding, false));
+			if ( doc.getXmlStandalone() ) skel.add(" standalone=\"true\"");
+			skel.add("?>"+lineBreak);
+		}
 
 		// Add the DTD if needed
 		DocumentType dt = doc.getDoctype();

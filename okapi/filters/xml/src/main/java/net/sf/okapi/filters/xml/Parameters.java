@@ -66,6 +66,7 @@ public class Parameters implements IParameters {
 	private static final String PROTECTENTITYREF = "protectEntityRef";
 	private static final String LINEBREAKASCODE = "lineBreakAsCode";
 	private static final String USECODEFINDER = "useCodeFinder";
+	private static final String OMITXMLDECLARATION = "omitXMLDeclaration";
 
 	private static final String OKP_NS_PREFIX = "okp";
 	private static final String OKP_NS_URI = "okapi-framework:xmlfilter-options";
@@ -93,6 +94,7 @@ public class Parameters implements IParameters {
 	public boolean protectEntityRef;
 	public boolean escapeLineBreak;
 	public boolean lineBreakAsCode;
+	public boolean omitXMLDeclaration;
 	
 	public Parameters () {
 		reset();
@@ -231,6 +233,7 @@ public class Parameters implements IParameters {
 		protectEntityRef = true;
 		escapeLineBreak = false;
 		lineBreakAsCode = false;
+		omitXMLDeclaration = false;
 	}
 
 	@Override
@@ -282,6 +285,7 @@ public class Parameters implements IParameters {
 		if ( name.equals(PROTECTENTITYREF) ) return protectEntityRef;
 		if ( name.equals(XMLEncoder.ESCAPELINEBREAK) ) return escapeLineBreak;
 		if ( name.equals(LINEBREAKASCODE) ) return lineBreakAsCode;
+		if ( name.equals(OMITXMLDECLARATION) ) return omitXMLDeclaration;
 		return false;
 	}
 
@@ -325,6 +329,10 @@ public class Parameters implements IParameters {
 			tmp = elem.getAttribute(PROTECTENTITYREF);
 			if ( !Util.isEmpty(tmp) ) {
 				protectEntityRef = tmp.equals("yes");
+			}
+			tmp = elem.getAttribute(OMITXMLDECLARATION);
+			if ( !Util.isEmpty(tmp) ) {
+				omitXMLDeclaration = tmp.equals("yes");
 			}
 		}
 		// Get the code finder data

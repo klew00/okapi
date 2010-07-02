@@ -197,6 +197,7 @@ embedded or linked ITS rules will have no effect.</p>
 <ul>
 	<li><a href="#lineBreakAsCode">lineBreakAsCode</a></li>
 	<li><a href="#codeFinder">codeFinder</a></li>
+	<li><a href="#omitXMLDeclaration">omitXMLDeclaration</a></li>
 </ul>
 <h3><a name="lineBreakAsCode"></a>lineBreakAsCode</h3>
 <p>In some cases the content of element includes line-breaks that need to be 
@@ -255,6 +256,22 @@ rule0=&amp;lt;(/?)\w[^&amp;lt;]*?&amp;gt;
 	<li>Do not put spaces before <code>count.i</code> or <code>ruleN</code>, and 
 	not after your expressions.</li>
 </ul>
+<h3><a name="omitXMLDeclaration"></a>omitXMLDeclaration</h3>
+<p>By default an XML declaration is always set at the top of the output document 
+(regardless wether the original document has one or not). It is an important 
+part of the XML document and it is especially needed when the encoding of the 
+output document is not UTF-8, UTF-16 or UTF-32, as its name must be specified in 
+the XML declaration. However, there are a few special cases when the declaration 
+is better left off. To hanlde those rare cases, you can use the omitXMLDeclation 
+to not output the XML declaration.</p>
+<p>For example:</p>
+<pre>&lt;its:rules version=&quot;1.0&quot;
+ xmlns:its=&quot;http://www.w3.org/2005/11/its&quot;
+ xmlns:okp=&quot;okapi-framework:xmlfilter-options&quot;&gt;
+ &lt;okp:options omitXMLDeclaration=&quot;yes&quot;/&gt;
+&lt;/its:rules&gt;</pre>
+<p>Remember that XML documents without an XML declaration may be read 
+incorrectly if the encoding of the document is not UTF-8, UTF-16 or UTF-32.</p>
 <h2><a name="processing"></a>Processing Details</h2>
 <h3>Input Encoding</h3>
 <p>The filter decides which encoding to use for the input document using the 
