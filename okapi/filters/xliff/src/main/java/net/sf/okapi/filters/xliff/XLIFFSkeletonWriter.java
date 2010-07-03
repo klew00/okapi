@@ -46,6 +46,11 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 	
 	private Parameters params;
 
+	// For serialization
+	public XLIFFSkeletonWriter () {
+		params = new Parameters();
+	}
+	
 	public XLIFFSkeletonWriter (Parameters params) {
 		this.params = params;
 	}

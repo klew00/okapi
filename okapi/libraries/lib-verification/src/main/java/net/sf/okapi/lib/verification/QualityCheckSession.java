@@ -45,6 +45,9 @@ import net.sf.okapi.common.resource.TextUnit;
 
 public class QualityCheckSession {
 
+	private static final String serialSignature = "OQCS";
+	private static final long serialVersionUID = 1L;
+
 	public static String FILE_EXTENSION = ".qcs";
 	
 	Map<URI, RawDocument> rawDocs; // Temporary solution waiting for the DB
@@ -140,15 +143,17 @@ public class QualityCheckSession {
 		return rawDocs.size();
 	}
 	
-	public void recheckAll () {
+	public void recheckAll (List<String> sigList) {
 		if ( rawDocs.size() == 0 ) return;
 		startProcess(targetLocale, null);
 		for ( RawDocument rd : rawDocs.values() ) {
-			executeRecheck(rd);
+			executeRecheck(rd, sigList);
 		}
 	}
 	
-	private void executeRecheck (RawDocument rd) {
+	private void executeRecheck (RawDocument rd,
+		List<String> sigList)
+	{
 		try {
 			// Process the document
 			filter = fcMapper.createFilter(rd.getFilterConfigId(), filter);
@@ -161,7 +166,13 @@ public class QualityCheckSession {
 				switch ( event.getEventType() ) {
 				case START_DOCUMENT:
 					StartDocument sd = (StartDocument)event.getResource();
-					List<String> sigList = clearIssues(Util.makeId(sd.getName()), true);
+					// If signatures exists, don't create the list from the current issues
+					if ( sigList == null ) {
+						sigList = clearIssues(rd.getInputURI(), true);
+					}
+					else {
+						clearIssues(rd.getInputURI(), false);
+					}
 					processStartDocument(sd, sigList);
 					break;
 				case TEXT_UNIT:
@@ -175,7 +186,20 @@ public class QualityCheckSession {
 		}
 	}
 	
-	private List<String> clearIssues (String docId,
+	// Gets all signatures 
+	private List<String> getAllSignatures () {
+		ArrayList<String> list = new ArrayList<String>();
+		Iterator<Issue> iter = issues.iterator();
+		while ( iter.hasNext() ) {
+			Issue issue = iter.next();
+			if ( !issue.enabled ) {
+				list.add(issue.getSignature());
+			}
+		}
+		return list;
+	}
+	
+	private List<String> clearIssues (URI docId,
 		boolean generateSigList)
 	{
 		ArrayList<String> sigList = null;
@@ -204,14 +228,31 @@ public class QualityCheckSession {
 		DataOutputStream dos = null;
 		try {
 			dos = new DataOutputStream(new FileOutputStream(path));
+			
+			// Header
+			dos.writeBytes(serialSignature);
+			dos.writeLong(serialVersionUID);
+			
+			// Locales
 			dos.writeUTF(sourceLocale.toBCP47());
 			dos.writeUTF(targetLocale.toBCP47());
+			
+			// Parameters
 			dos.writeUTF(params.toString());
+			
+			// Document list
 			dos.writeInt(rawDocs.size());
 			for ( RawDocument rd : rawDocs.values() ) {
 				dos.writeUTF(rd.getInputURI().toString());
 				dos.writeUTF(rd.getFilterConfigId());
 				dos.writeUTF(rd.getEncoding());
+			}
+			
+			// Issues to keep disabled
+			List<String> list = getAllSignatures();
+			dos.writeInt(list.size());
+			for ( String sig : list ) {
+				dos.writeUTF(sig);
 			}
 			modified = false;
 		}
@@ -236,12 +277,31 @@ public class QualityCheckSession {
 		DataInputStream dis = null;
 		try {
 			dis = new DataInputStream(new FileInputStream(path));
-			String tmp = dis.readUTF(); // Source
+
+			// Header
+			byte[] buf = new byte[4];
+			dis.read(buf, 0, 4);
+			String tmp = new String(buf);
+			if ( !tmp.equals(serialSignature) ) {
+				throw new OkapiIOException("Invalid signature: This file is not a QCS file, or is corrupted.");
+			}
+			long version = dis.readLong();
+			if ( version != serialVersionUID ) {
+				// For now just check the number, later we may have different ways of reading
+				throw new OkapiIOException("Invalid version number: This file is not a QCS file, or is corrupted.");
+			}
+			
+			// Locales
+			tmp = dis.readUTF(); // Source
 			sourceLocale = LocaleId.fromBCP47(tmp);
 			tmp = dis.readUTF(); // Target
 			targetLocale = LocaleId.fromBCP47(tmp);
-			tmp = dis.readUTF(); // Parameters
+			
+			// Parameters
+			tmp = dis.readUTF();
 			params.fromString(tmp);
+			
+			// Document list
 			int count = dis.readInt();
 			for ( int i=0; i<count; i++ ) {
 				tmp = dis.readUTF();
@@ -252,10 +312,18 @@ public class QualityCheckSession {
 				rd.setFilterConfigId(configId);
 				rawDocs.put(uri, rd);
 			}
+			
+			// Signatures of issues to keep disabled
+			List<String> sigList = new ArrayList<String>(); 
+			count = dis.readInt();
+			for ( int i=0; i<count; i++ ) {
+				sigList.add(dis.readUTF());
+			}
+			recheckAll(sigList);
 			modified = false;
 		}
 		catch ( Throwable e ) {
-			throw new OkapiIOException("Error reading session file.", e);
+			throw new OkapiIOException("Error reading session file.\n"+e.getMessage(), e);
 		}
 		finally {
 			if ( dis != null ) {
@@ -311,16 +379,16 @@ public class QualityCheckSession {
 			writer.writeElementString("h1", "Quality Check Report");
 
 			// Process the issues
-			String docId = "";
+			URI docId = null;
 			for ( Issue issue : issues ) {
 				// Skip disabled issues
 				if ( !issue.enabled ) continue;
 				// Do we start a new input document?
-				if ( !docId.equals(issue.docId) ) {
+				if (( docId == null ) || !docId.equals(issue.docId) ) {
 					// Ruler only after first input document
-					if ( !docId.isEmpty() ) writer.writeRawXML("<hr />");
-					writer.writeElementString("p", "Input: "+docId);
+					if ( docId != null ) writer.writeRawXML("<hr />");
 					docId = issue.docId;
+					writer.writeElementString("p", "Input: "+docId.toString());
 				}
 
 				String position = String.format("ID=%s", issue.tuId);

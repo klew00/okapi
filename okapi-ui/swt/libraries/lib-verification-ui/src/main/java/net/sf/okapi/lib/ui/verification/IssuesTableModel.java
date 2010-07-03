@@ -25,6 +25,7 @@ import java.util.List;
 import net.sf.okapi.lib.verification.Issue;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -34,15 +35,25 @@ class IssuesTableModel {
 	Table table;
 	List<Issue> list;
 
-	void linkTable (Table newTable) {
+	void linkTable (Table newTable,
+		Listener sortListener)
+	{
 		table = newTable;
+		
 		TableColumn col = new TableColumn(table, SWT.NONE);
+		col.addListener(SWT.Selection, sortListener);
+		
 		col = new TableColumn(table, SWT.NONE);
-		col.setText("TU");
+		col.setText("Text Unit");
+		col.addListener(SWT.Selection, sortListener);
+
 		col = new TableColumn(table, SWT.NONE);
 		col.setText("Seg");
+		col.addListener(SWT.Selection, sortListener);
+		
 		col = new TableColumn(table, SWT.NONE);
 		col.setText("Description");
+		col.addListener(SWT.Selection, sortListener);
 	}
 	
 	void setIssues (List<Issue> list) {

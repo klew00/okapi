@@ -20,12 +20,13 @@
 
 package net.sf.okapi.lib.verification;
 
+import java.io.File;
+import java.net.URI;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.StartDocument;
@@ -39,7 +40,7 @@ class QualityChecker {
 	private LanguageToolConnector ltConn;
 	private Parameters params;
 	private List<Issue> issues;
-	private String currentDocId;
+	private URI currentDocId;
 	private List<String> sigList;
 	private Pattern patDoubledWords;
 
@@ -75,7 +76,7 @@ class QualityChecker {
 	void processStartDocument (StartDocument sd,
 		List<String> sigList)
 	{
-		currentDocId = Util.makeId(sd.getName());
+		currentDocId = (new File(sd.getName())).toURI();
 		this.sigList = sigList;
 	}
 	

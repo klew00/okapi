@@ -22,6 +22,7 @@ package net.sf.okapi.lib.ui.verification;
 
 import java.io.File;
 import java.net.URI;
+import java.util.Collections;
 
 import net.sf.okapi.common.BaseContext;
 import net.sf.okapi.common.IHelp;
@@ -36,6 +37,7 @@ import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.common.ui.UserConfiguration;
 import net.sf.okapi.lib.verification.IQualityCheckEditor;
 import net.sf.okapi.lib.verification.Issue;
+import net.sf.okapi.lib.verification.IssueComparator;
 import net.sf.okapi.lib.verification.QualityCheckSession;
 
 import org.eclipse.swt.SWT;
@@ -63,11 +65,14 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
@@ -88,6 +93,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 	private ResourceManager rm;
 	private Table tblIssues;
 	private Text edMessage;
+	private Text edDocument;
 	private Text edSource;
 	private Text edTarget;
 	private Font displayFont;
@@ -497,8 +503,14 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		cmpTmp.setLayout(layTmp);
 		cmpTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
-		edMessage = new Text(cmpTmp, SWT.BORDER);
+		edDocument = new Text(cmpTmp, SWT.BORDER);
 		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalSpan = 4;
+		edDocument.setLayoutData(gdTmp);
+		edDocument.setEditable(false);
+
+		edMessage = new Text(cmpTmp, SWT.BORDER);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalSpan = 4;
 		edMessage.setLayoutData(gdTmp);
 		edMessage.setEditable(false);
@@ -555,19 +567,19 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		cbTypes.select(issueType);
 		cbTypes.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				updateDisplayType();
+				refreshTableDisplay();
 			};
 		});
 		
 		cbDisplay = new Combo(cmpTmp, SWT.DROP_DOWN | SWT.READ_ONLY);
-		cbDisplay.add("Show enabled and disabled issues");
-		cbDisplay.add("Show only enabled issues");
-		cbDisplay.add("Show only disabled issues");
+		cbDisplay.add("Enabled and disabled issues");
+		cbDisplay.add("Only enabled issues");
+		cbDisplay.add("Only disabled issues");
 		cbDisplay.setLayoutData(new GridData()); //GridData.FILL_HORIZONTAL));
 		cbDisplay.select(displayType);
 		cbDisplay.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				updateDisplayType();
+				refreshTableDisplay();
 			};
 		});
 		
@@ -576,7 +588,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		UIUtil.ensureWidth(btRefreshDisplay, UIUtil.BUTTON_DEFAULT_WIDTH);
 		btRefreshDisplay.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				updateDisplayType();
+				refreshTableDisplay();
 			}
 		});
 
@@ -626,8 +638,37 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 			}
 		});
 
+		// Sort listener for the table
+		Listener sortListener = new Listener() {
+			public void handleEvent(Event event) {
+				// Determine new sort column and direction
+				TableColumn sortCol = tblIssues.getSortColumn();
+				TableColumn curCol = (TableColumn)event.widget;
+				int dir = tblIssues.getSortDirection();
+				if ( sortCol == curCol ) {
+					// Same column as before? then reverse sort direction
+					dir = (dir == SWT.UP ? SWT.DOWN : SWT.UP);
+				}
+				else { // Other column? the set the new column
+					tblIssues.setSortColumn(curCol);
+					dir = SWT.UP;
+				}
+				// Select the issue part to sort
+				int type = IssueComparator.TYPE_ENABLED;
+				if ( tblIssues.indexOf(curCol) == 1 ) type = IssueComparator.TYPE_TU;
+				else if ( tblIssues.indexOf(curCol) == 2 ) type = IssueComparator.TYPE_SEG;
+				else if ( tblIssues.indexOf(curCol) == 3 ) type = IssueComparator.TYPE_MESSAGE;
+				// Perform the sort
+				Collections.sort(session.getIssues(),
+					new IssueComparator(type, dir==SWT.UP ? IssueComparator.DIR_ASC : IssueComparator.DIR_DESC));
+				// Set direction
+				tblIssues.setSortDirection(dir);
+				refreshTableDisplay();
+			}
+		};
+		
 		issuesModel = new IssuesTableModel();
-		issuesModel.linkTable(tblIssues);
+		issuesModel.linkTable(tblIssues, sortListener);
 
 		sashMain.setWeights(new int[]{30, 70});
 		
@@ -643,10 +684,19 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		shell.setSize(startSize);
 		
 		updateCaption();
-		updateDisplayType();
+		refreshTableDisplay();
 	}
 
-	private void updateDisplayType () {
+	private void resetTableDisplay () {
+		issuesModel.setIssues(session.getIssues());
+		tblIssues.setSortColumn(null); // reset the sort column
+		displayType = cbDisplay.getSelectionIndex();
+		issueType = cbTypes.getSelectionIndex();
+		issuesModel.updateTable(0, displayType, issueType);
+		updateCurrentIssue();
+	}
+
+	private void refreshTableDisplay () {
 		displayType = cbDisplay.getSelectionIndex();
 		issueType = cbTypes.getSelectionIndex();
 		issuesModel.updateTable(tblIssues.getSelectionIndex(), displayType, issueType);
@@ -712,12 +762,14 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 	private void updateCurrentIssue () {
 		int n = tblIssues.getSelectionIndex();
 		if ( n == -1 ) {
+			edDocument.setText("");
 			edMessage.setText("");
 			edSource.setText("");
 			edTarget.setText("");
 		}
 		else {
 			Issue issue = (Issue)tblIssues.getItem(n).getData();
+			edDocument.setText(issue.docId.toString());
 			edMessage.setText(issue.message);
 			String tmp = issue.oriSource;
 			edSource.setText(tmp);
@@ -778,9 +830,9 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 	private void checkAll () {
 		try {
 			startWaiting("Checking all documents...");
-			session.recheckAll();
-			issuesModel.setIssues(session.getIssues());
-			issuesModel.updateTable(0, displayType, issueType);
+			// Recheck all using the signatures of the current issue lists
+			session.recheckAll(null);
+			resetTableDisplay();
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, "Error while running the verification.\n"+e.getMessage(), null);
@@ -837,9 +889,8 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 			if ( !saveSessionIfNeeded() ) return;
 			session.reset();
 			qcsPath = null;
-			issuesModel.setIssues(session.getIssues());
-			issuesModel.updateTable(0, displayType, issueType);
 			updateCaption();
+			resetTableDisplay();
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
@@ -858,9 +909,9 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 			}
 			startWaiting("Loading session...");
 			session.loadSession(path);
-			issuesModel.updateTable(0, displayType, issueType);
 			qcsPath = path;
 			updateCaption();
+			resetTableDisplay();
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, "Error while loading.\n"+e.getMessage(), null);

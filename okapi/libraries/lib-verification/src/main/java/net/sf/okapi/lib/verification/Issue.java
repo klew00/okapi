@@ -20,9 +20,11 @@
 
 package net.sf.okapi.lib.verification;
 
+import java.net.URI;
+
 public class Issue {
 
-	public String docId;
+	public URI docId;
 	public IssueType issueType;
 	public String tuId;
 	public String segId;
@@ -36,7 +38,7 @@ public class Issue {
 	public String oriSource;
 	public String oriTarget;
 	
-	public Issue (String docId,
+	public Issue (URI docId,
 		IssueType issueType,
 		String tuId,
 		String segId,

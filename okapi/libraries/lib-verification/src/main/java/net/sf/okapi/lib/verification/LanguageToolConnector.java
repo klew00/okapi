@@ -21,6 +21,7 @@
 package net.sf.okapi.lib.verification;
 
 import java.net.ConnectException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
@@ -92,7 +93,7 @@ public class LanguageToolConnector {
 		return issues;
 	}
 
-	public int checkSegment (String docId,
+	public int checkSegment (URI docId,
 		Segment seg,
 		TextUnit tu)
 	{
