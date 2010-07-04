@@ -137,6 +137,7 @@ public class QualityCheckSession {
 		for ( Issue issue : issues ) {
 			issue.enabled = true;
 		}
+		modified = true;
 	}
 	
 	public int getDocumentCount () {

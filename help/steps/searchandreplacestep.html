@@ -64,7 +64,13 @@ contains saved options for this step.</p>
 <p><cite>Export</cite> -- Click this button to export to a file the current 
 options for this step.</p>
 <p><cite>Use regular expressions</cite> -- Set this option to enable the 
-<a href="http://java.sun.com/j2se/1.6.0/docs/api/java/util/regex/Pattern.html">Regular Expressions</a> mode.</p>
+<a href="http://java.sun.com/j2se/1.6.0/docs/api/java/util/regex/Pattern.html">Regular Expressions</a> mode. 
+Note that the placeholders to use in the replacement string for the search group 
+are <code>$1</code>, <code>$2</code>, etc. (<code>$1</code> corresponds to the 
+part matching the first group of the search expression, etc.) See the 
+documentation on <code>
+<a href="http://java.sun.com/javase/6/docs/api/java/util/regex/Matcher.html#replaceAll(java.lang.String)">
+Matcher.replaceAll()</a></code> for more details.</p>
 <h4>Regular expression options</h4>
 <p>When this option is checked several regular expression options are accessible. They apply to all expressions, not just the selected one:</p>
 <p><cite>Ignore case</cite> -- Set this option to ignore the cases in the matches. for example "bear" matches "<span style="background-color: #FFFF00">Bear</span>cat", "<span style="background-color: #FFFF00">BEAR</span>CAT", and "<span style="background-color: #FFFF00">bear</span>cat".</p>

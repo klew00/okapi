@@ -23,6 +23,7 @@ package net.sf.okapi.lib.ui.verification;
 import java.io.File;
 import java.net.URI;
 import java.util.Collections;
+import java.util.Iterator;
 
 import net.sf.okapi.common.BaseContext;
 import net.sf.okapi.common.IHelp;
@@ -32,6 +33,7 @@ import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.ui.AboutDialog;
 import net.sf.okapi.common.ui.Dialogs;
+import net.sf.okapi.common.ui.MRUList;
 import net.sf.okapi.common.ui.ResourceManager;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.common.ui.UserConfiguration;
@@ -82,12 +84,16 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 	static final int ISSUETYPE_ENABLED = 1;
 	static final int ISSUETYPE_DISABLED = 2;
 	
+	private static final String OPT_BOUNDS = "bounds"; //$NON-NLS-1$
+	private static final String OPT_MAXIMIZED = "maximized"; //$NON-NLS-1$
 	private static final String APPNAME = "CheckMate"; //$NON-NLS-1$
 	private static final String CFG_SOURCELOCALE = "sourceLocale"; //$NON-NLS-1$
 	private static final String CFG_TARGETLOCALE = "targetLocale"; //$NON-NLS-1$
 
 	private String qcsPath;
 	private UserConfiguration config;
+	private MRUList mruList;
+	private MenuItem miMRU;
 	private IHelp help;
 	private Shell shell;
 	private ResourceManager rm;
@@ -142,6 +148,8 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		help = helpParam;
 		config = new UserConfiguration();
 		config.load(APPNAME);
+		mruList = new MRUList(9);
+		mruList.getFromProperties(config);
 		
 		// If no parent is defined, create a new display and shell
 		if ( parent == null ) {
@@ -278,6 +286,19 @@ public class QualityCheckEditor implements IQualityCheckEditor {
             }
 		});
 
+		new MenuItem(dropMenu, SWT.SEPARATOR);
+
+		miMRU = new MenuItem(dropMenu, SWT.CASCADE);
+		rm.setCommand(miMRU, "file.mru"); //$NON-NLS-1$
+		
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "file.clearmru"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+            	clearMRU();
+            }
+		});
+		
 		new MenuItem(dropMenu, SWT.SEPARATOR);
 
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
@@ -619,6 +640,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 					// Do not force the selection: tblIssues.setSelection((TableItem)event.item);
 					Issue issue = (Issue)event.item.getData();
 					issue.enabled = !issue.enabled;
+					session.setModified(true);
 				}
 				updateCurrentIssue();
             }
@@ -633,6 +655,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 						Issue issue = (Issue)ti.getData();
 						issue.enabled = !issue.enabled;
 						ti.setChecked(issue.enabled);
+						session.setModified(true);
 					}
 				}
 			}
@@ -673,6 +696,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		sashMain.setWeights(new int[]{30, 70});
 		
 		statusBar = new StatusBar(shell, SWT.NONE);
+		updateMRU();
 		
 		// Set minimum and start sizes
 		Point defaultSize = shell.getSize();
@@ -682,6 +706,21 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		if ( startSize.x < 700 ) startSize.x = 700; 
 		if ( startSize.y < 600 ) startSize.y = 600; 
 		shell.setSize(startSize);
+		
+		// Maximize if requested
+		if ( config.getBoolean(OPT_MAXIMIZED) ) { //$NON-NLS-1$
+			shell.setMaximized(true);
+		}
+		else { // Or try to re-use the bounds of the previous session
+			Rectangle ar = UIUtil.StringToRectangle(config.getProperty(OPT_BOUNDS));
+			if ( ar != null ) {
+				Rectangle dr = shell.getDisplay().getBounds();
+				if ( dr.contains(ar.x+ar.width, ar.y+ar.height)
+					&& dr.contains(ar.x, ar.y) ) {
+					shell.setBounds(ar);
+				}
+			}
+		}
 		
 		updateCaption();
 		refreshTableDisplay();
@@ -717,7 +756,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 	
 	private boolean addDocumentFromUI (String path) {
 		try {
-			InputDocumentDialog dlg = new InputDocumentDialog(shell, "Add document",
+			InputDocumentDialog dlg = new InputDocumentDialog(shell, "Add Document",
 				session.getFilterConfigurationMapper());
 			// Set default data
 			dlg.setData(path, null, "UTF-8", session.getSourceLocale(), session.getTargetLocale());
@@ -871,6 +910,8 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 					String.format("*%s\t*.*", QualityCheckSession.FILE_EXTENSION));
 				if ( path == null ) return;
 				qcsPath = path;
+				mruList.add(path);
+				updateMRU();
 			}
 			startWaiting("Saving session...");
 			session.saveSession(qcsPath);
@@ -907,11 +948,23 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 				if ( paths == null ) return;
 				path = paths[0];
 			}
+			
+			// Check if the file exists
+			if ( !(new File(path)).exists() ) {
+				Dialogs.showError(shell, "The settings file cannot be found:\n"+path, null);
+				mruList.remove(path);
+				updateMRU();
+				return;
+			}
+			
 			startWaiting("Loading session...");
 			session.loadSession(path);
 			qcsPath = path;
 			updateCaption();
 			resetTableDisplay();
+
+			mruList.add(path);
+			updateMRU();
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, "Error while loading.\n"+e.getMessage(), null);
@@ -929,7 +982,14 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 	private boolean saveSessionIfNeeded () {
 		config.setProperty(CFG_SOURCELOCALE, session.getSourceLocale().toBCP47());
 		config.setProperty(CFG_TARGETLOCALE, session.getTargetLocale().toBCP47());
-		config.save(APPNAME, "N/A"); //$NON-NLS-1$
+		// Set the window placement
+		config.setProperty(OPT_MAXIMIZED, shell.getMaximized());
+		Rectangle r = shell.getBounds();
+		config.setProperty(OPT_BOUNDS, String.format("%d,%d,%d,%d", r.x, r.y, r.width, r.height)); //$NON-NLS-1$
+		// Set the MRU list
+		mruList.copyToProperties(config);
+		// Save to the user home directory as ".appname" file
+		config.save(APPNAME, getClass().getPackage().getImplementationVersion());
 		
 		if ( session.isModified() ) {
 			MessageBox dlg = new MessageBox(shell, SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
@@ -943,6 +1003,56 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 			}
 		}
 		return true;
+	}
+
+	private void clearMRU () {
+		try {
+			mruList.clear();
+			updateMRU();
+		}
+		catch ( Exception e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+	}
+	
+	private void updateMRU () {
+		try {
+			// miMRU is the MenuItem where to attached the sub-menu
+			// Remove and dispose of the previous sub-menu
+			Menu oldMenu = miMRU.getMenu();
+			miMRU.setMenu(null);
+			if ( oldMenu != null ) oldMenu.dispose();
+
+			// Set the new one
+			if ( mruList.getfirst() == null ) {
+				// No items to set: it's disabled
+				miMRU.setEnabled(false);
+			}
+			else { // One or more items
+				// Create the menu
+				Menu submenu = new Menu(shell, SWT.DROP_DOWN);
+				int i = 0;
+				String path;
+				MenuItem menuItem;
+				Iterator<String> iter = mruList.getIterator();
+				while ( iter.hasNext() ) {
+					menuItem = new MenuItem(submenu, SWT.PUSH);
+					path = iter.next();
+					menuItem.setText(String.format("&%d %s", ++i, path)); //$NON-NLS-1$
+					menuItem.setData(path);
+					menuItem.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent event) {
+							loadSession((String)((MenuItem)event.getSource()).getData());
+						}
+					});
+				}
+				miMRU.setMenu(submenu);
+				miMRU.setEnabled(true);
+			}
+		}
+		catch ( Exception e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
 	}
 
 }

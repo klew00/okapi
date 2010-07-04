@@ -22,6 +22,9 @@
 		<li><a href="#Open">Open Session</a></li>
 		<li><a href="#Save">Save Session</a></li>
 		<li><a href="#SaveAs">Save Session As</a></li>
+		<li><a href="#RecentSessionFiles">Recent Session Files</a></li>
+		<li><a href="#ClearRecentSessionFilesList">Clear Recent Session Files 
+		List</a></li>
 		<li><a href="#AddDocument">Add Document</a></li>
 		<li><a href="#SessionSettings">Session Settings</a></li>
 		<li><a href="#Exit">Exit</a></li>
@@ -29,6 +32,7 @@
 	</li>
 	<li><a href="#Issues">Issues</a><ul>
 		<li><a href="#IssuesOptions">Options</a></li>
+		<li><a href="#ResetAllDisabledIssues">Reset All Disabled Issues</a></li>
 		<li><a href="#CheckAll">Check All</a></li>
 		<li><a href="#GenerateReport">Generate Report</a></li>
 	</ul>
@@ -62,14 +66,25 @@ you to choose one.</p>
 <p>Shortcut: <kbd>Ctrl+S</kbd></p>
 <h3><a name="SaveAs"></a>Save Session As</h3>
 <p>Saves the current session under a new name.</p>
+<h3><a name="RecentSessionFiles"></a>Recent Session Files</h3>
+<p>Opens the session selected in the list of most recently used sessions. If the 
+current session has been modified but not saved, you will be asked if you want 
+to save the changes.</p>
+<h3><a name="ClearRecentSessionFilesList"></a>Clear Recent Session Files List</h3>
+<p>Removes all sessions from the list of most recently used sessions.</p>
 <h3><a name="AddDocument"></a>Add Document</h3>
-<p>Adds a document to the list of documents to check in this session. You can 
+<p>Adds a document to the list of documents to check in this session. </p>
+<p>Shortcut: <kbd>Ctrl+Insert</kbd></p>
+<p>You can 
 also add a document by:</p>
 <ul>
 	<li>dropping the file onto the issue list of the main window.</li>
 	<li>opening the <cite><a href="sessionsettings.html">Session Settings</a></cite> 
 	dialog box and use the <cite>Add</cite> button there.</li>
 </ul>
+<p>Note:
+	All documents in the session must be for the same language pair. All 
+documents must be bilingual translated documents.</p>
 <h3><a name="SessionSettings"></a>Session Settings</h3>
 <p>Opens the <cite><a href="sessionsettings.html">Session Settings</a></cite> 
 dialog box, where you can set the documents to process and other options.</p>
@@ -81,6 +96,8 @@ the tool will ask you if you want to save your changes before.</p>
 <h3><a name="IssuesOptions"></a>Options</h3>
 <p>Opens the <cite><a href="parameterseditor.html">Quality Check Options</a></cite> 
 dialog box, where you specify the types of checks to perform.</p>
+<h3><a name="ResetAllDisabledIssues"></a>Reset All Disabled Issues</h3>
+<p>Resets to enabled all issues currently set as disabled, on all documents.</p>
 <h3><a name="CheckAll"></a>Check All</h3>
 <p>Perform all the checked currently selected for all the documents currently in 
 the session.</p>
