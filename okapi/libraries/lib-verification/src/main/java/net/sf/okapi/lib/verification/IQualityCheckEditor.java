@@ -48,6 +48,14 @@ public interface IQualityCheckEditor {
 	public void addRawDocument (RawDocument rawDoc);
 	
 	/**
+	 * Gets the session associated with this editor. You want to call this method
+	 * only after {@link #initialize(Object, boolean, IHelp, IFilterConfigurationMapper, QualityCheckSession)}
+	 * has been called.
+	 * @return the session associated with this editor.
+	 */
+	public QualityCheckSession getSession ();
+	
+	/**
 	 * Runs an editing session with this IQualityCheckEditor object.
 	 * You must have called {@link #initialize(Object, boolean, IHelp, IFilterConfigurationMapper)}
 	 * once before calling this method.

@@ -1055,4 +1055,9 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		}
 	}
 
+	@Override
+	public QualityCheckSession getSession() {
+		return session;
+	}
+
 }

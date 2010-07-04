@@ -23,16 +23,10 @@
 	<li>The lower part shows the list of issues detected. Which issues are 
 	displayed depends on several options.</li>
 </ul>
-<p><cite>Check All</cite> -- Click this button to run the verification on all 
-documents in the session.</p>
-<p><cite>Settings</cite> -- Click this button to open the <cite>
-<a href="sessionsettings.html">Session Settings</a></cite> 
-dialog box, where you can add or removed the documents in the session, and edit 
-other parameters.</p>
-<p><cite>Options</cite> -- Click this button to open the <cite>
-<a href="parameterseditor.html">Quality Check Options</a></cite> 
-dialog box, where you can specify what kind of verifications to perform.</p>
-<p>Which issues are displayed in the list is decided by two filters:</p>
+<p>The table displays the issues found with the documents in the session. Use
+<cite>Check All</cite> to re-process the documents if you fix or modify one.</p>
+<p>Which issues are displayed in the table is driven by the two list-boxes below 
+the table on the right-hand side:</p>
 <ul>
 	<li>The first one selects the types of issue to display: Choose <cite>&lt;All 
 	types of issues&gt;</cite> to display issues of any types.</li>
@@ -49,7 +43,20 @@ or select the issue and press the <kbd>Space</kbd> key. You can select multiple
 issues at the same time by holding the <kbd>Shift</kbd> key pressed while moving 
 the cursor up or down.</p>
 <p>You can sort the issues in the table by clicking on the header of each 
-column.</p>
+column. Note that the <cite>Text Unit</cite> and <cite>Seg</cite> columns are 
+sorted by IDs and those IDs are alphanumeric, not numeric (e.g. the ID can be 
+&quot;tu1&quot; not always &quot;1&quot;). When the IDs happend to be using only numbers, the sort 
+may look strange as &quot;101&quot; comes after &quot;1001&quot; (where you may expect to see 101 to 
+come before 1001).</p>
+<p><cite>Check All</cite> -- Click this button to run the verification on all 
+documents in the session.</p>
+<p><cite>Settings</cite> -- Click this button to open the <cite>
+<a href="sessionsettings.html">Session Settings</a></cite> 
+dialog box, where you can add or removed the documents in the session, and edit 
+other parameters.</p>
+<p><cite>Options</cite> -- Click this button to open the <cite>
+<a href="parameterseditor.html">Quality Check Options</a></cite> 
+dialog box, where you can specify what kind of verifications to perform.</p>
 <p><cite>Refresh</cite> -- Click this button to refresh the display of the list 
 of issues. This does not re-process the documents, just refresh the list. This 
 action is done automatically when you change the selection of one of the two 

@@ -277,15 +277,19 @@ public class Parameters extends BaseParameters {
 		doubledWord = true;
 		
 		checkMaxCharLength = true;
-		maxCharLength = 170;
+		maxCharLength = 190;
 		checkMinCharLength = true;
 		minCharLength = 50;
 
 		patterns = new ArrayList<PatternItem>();
-		// Enclosing marks
+		// Parentheses
 		patterns.add(new PatternItem(
-			"[\\(\\[{}\\]\\)]", "<same>",
-			true, "Enclosing characters"));
+			"[\\(\\)]", "<same>",
+			true, "Parentheses"));
+		// Bracketing characters (except parentheses)
+		patterns.add(new PatternItem(
+			"[\\p{Ps}\\p{Pe}&&[^\\(\\)]]", "<same>",
+			true, "Bracketing characters (except parentheses)"));
 		// Email addresses
 		patterns.add(new PatternItem(
 			"[\\w\\.\\-]+@[\\w\\.\\-]+", "<same>",

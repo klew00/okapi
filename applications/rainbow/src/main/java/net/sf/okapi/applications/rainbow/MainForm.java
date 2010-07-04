@@ -2197,8 +2197,10 @@ public class MainForm { //implements IParametersProvider {
 				case SWT.CANCEL:
 					return; // Stop here
 				case SWT.YES:
+					// Set the source and target locales
+					dlg.getSession().setSourceLocale(prj.getSourceLanguage());
+					dlg.getSession().setTargetLocale(prj.getTargetLanguage());
 					// Load the documents
-					//TODO: init session
 					for ( Input item : prj.getList(0) ) {
 						String inputPath = prj.getInputRoot(0) + File.separator + item.relativePath;
 						File f = new File(inputPath);
