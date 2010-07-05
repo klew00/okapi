@@ -234,8 +234,8 @@ public class QualityCheckerTest {
 		TextUnit tu = new TextUnit("id", "src text !? %s");
 		tu.setTarget(locFR, new TextContainer("trg text"));
 		ArrayList<PatternItem> list = new ArrayList<PatternItem>();
-		list.add(new PatternItem("[!\\?]", PatternItem.SAME, true));
-		list.add(new PatternItem("%s", PatternItem.SAME, true));
+		list.add(new PatternItem("[!\\?]", PatternItem.SAME, true, Issue.SEVERITY_LOW));
+		list.add(new PatternItem("%s", PatternItem.SAME, true, Issue.SEVERITY_HIGH));
 
 		session.getParameters().setPatterns(list);
 		session.startProcess(locFR, null); // Make sure we re-initialize

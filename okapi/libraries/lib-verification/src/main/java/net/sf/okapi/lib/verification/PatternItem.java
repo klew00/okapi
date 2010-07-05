@@ -54,10 +54,17 @@ public class PatternItem {
 				if ( line.trim().length() == 0 ) continue;
 				if ( line.startsWith("#") ) continue;
 				String[] parts = line.split("\t", -2);
-				if ( parts.length < 4 ) {
+				if ( parts.length < 5 ) {
 					throw new OkapiIOException("Missing one or more tabs in line:\n"+line);
 				}
-				list.add(new PatternItem(parts[1], parts[2], parts[0].equals("1"), parts[3]));
+				int severity = Issue.SEVERITY_MEDIUM;
+				try {
+					severity = Integer.valueOf(parts[1]);
+				}
+				catch ( Throwable e ) {
+					// Just use medium
+				}
+				list.add(new PatternItem(parts[2], parts[3], parts[0].equals("1"), severity, parts[4]));
 				line = br.readLine();
 			}
 		}
@@ -87,6 +94,7 @@ public class PatternItem {
 			pr = new PrintWriter(path);
 			for ( PatternItem item : list ) {
 				pr.write((item.enabled ? "1" : "0")
+					+ "\t" + String.valueOf(item.severity)
 					+ "\t" + item.source
 					+ "\t" + item.target
 					+ "\t" + item.description
@@ -107,24 +115,26 @@ public class PatternItem {
 	
 	public PatternItem (String source,
 		String target,
-		boolean enabled)
+		boolean enabled,
+		int severity)
 	{
-		create(source, target, enabled, null, Issue.SEVERITY_MEDIUM);
+		create(source, target, enabled, severity, null);
 	}
 
 	public PatternItem (String source,
 		String target,
 		boolean enabled,
+		int severity,
 		String message)
 	{
-		create(source, target, enabled, message, Issue.SEVERITY_MEDIUM);
+		create(source, target, enabled, severity, message);
 	}
 
 	private void create (String source,
 		String target,
 		boolean enabled,
-		String message,
-		int severity)
+		int severity,
+		String message)
 	{
 		this.source = source;
 		this.target = target;

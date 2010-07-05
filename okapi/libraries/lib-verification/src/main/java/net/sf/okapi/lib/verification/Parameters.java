@@ -38,8 +38,10 @@ public class Parameters extends BaseParameters {
 	private static final String CHECKPATTERNS = "checkPatterns";
 	private static final String PATTERNCOUNT = "patternCount";
 	private static final String USEPATTERN = "usePattern";
+	private static final String SEVERITYPATTERN = "severityPattern";
 	private static final String SOURCEPATTERN = "sourcePattern";
 	private static final String TARGETPATTERN = "targetPattern";
+	private static final String DESCPATTERN = "descPattern";
 	private static final String CHECKWITHLT = "checkWithLT";
 	private static final String SERVERURL = "serverURL";
 	private static final String TRANSLATELTMSG = "translateLTMsg";
@@ -319,28 +321,27 @@ public class Parameters extends BaseParameters {
 		// Parentheses
 		patterns.add(new PatternItem(
 			"[\\(\\)]", "<same>",
-			true, "Parentheses"));
+			true, Issue.SEVERITY_LOW, "Parentheses"));
 		// Bracketing characters (except parentheses)
 		patterns.add(new PatternItem(
 			"[\\p{Ps}\\p{Pe}&&[^\\(\\)]]", "<same>",
-			true, "Bracketing characters (except parentheses)"));
+			true, Issue.SEVERITY_LOW, "Bracketing characters (except parentheses)"));
 		// Email addresses
 		patterns.add(new PatternItem(
 			"[\\w\\.\\-]+@[\\w\\.\\-]+", "<same>",
-			true, "Email addresses"));
+			true, Issue.SEVERITY_MEDIUM, "Email addresses"));
 		// URLs
 		patterns.add(new PatternItem( //TODO: file URL
 			"https?:[\\w/\\.:;+\\-~\\%#\\$?=&,()]+|www\\.[\\w/\\.:;+\\-~\\%#\\$?=&,()]+|ftp:[\\w/\\.:;+\\-~\\%#?=&,]+", "<same>",
-			true, "URLs"));
+			true, Issue.SEVERITY_MEDIUM, "URLs"));
 		// IP addresses
 		patterns.add(new PatternItem(
 			"\\b(?:\\d{1,3}\\.){3}\\d{1,3}\\b", "<same>",
-			true, "IP addresses"));
+			true, Issue.SEVERITY_HIGH, "IP addresses"));
 		// C-style printf 
 		patterns.add(new PatternItem(
 			"%(([-0+#]?)[-0+#]?)((\\d\\$)?)(([\\d\\*]*)(\\.[\\d\\*]*)?)[dioxXucsfeEgGpn]", "<same>",
-			true, "C-style printf codes"));
-		
+			true, Issue.SEVERITY_HIGH, "C-style printf codes"));
 	}
 
 	@Override
@@ -378,9 +379,11 @@ public class Parameters extends BaseParameters {
 		if ( count > 0 ) patterns.clear(); // Clear the defaults
 		for ( int i=0; i<count; i++ ) {
 			boolean enabled = buffer.getBoolean(String.format("%s%d", USEPATTERN, i), true);
+			int severity = buffer.getInteger(String.format("%s%d", SEVERITYPATTERN, i), Issue.SEVERITY_MEDIUM);
 			String source = buffer.getString(String.format("%s%d", SOURCEPATTERN, i), "");
 			String target = buffer.getString(String.format("%s%d", TARGETPATTERN, i), PatternItem.SAME);
-			patterns.add(new PatternItem(source, target, enabled));
+			String desc = buffer.getString(String.format("%s%d", DESCPATTERN, i), "");
+			patterns.add(new PatternItem(source, target, enabled, severity, desc));
 		}
 	}
 
@@ -417,8 +420,10 @@ public class Parameters extends BaseParameters {
 		buffer.setInteger(PATTERNCOUNT, patterns.size());
 		for ( int i=0; i<patterns.size(); i++ ) {
 			buffer.setBoolean(String.format("%s%d", USEPATTERN, i), patterns.get(i).enabled);
+			buffer.setInteger(String.format("%s%d", SEVERITYPATTERN, i), patterns.get(i).severity);
 			buffer.setString(String.format("%s%d", SOURCEPATTERN, i), patterns.get(i).source);
 			buffer.setString(String.format("%s%d", TARGETPATTERN, i), patterns.get(i).target);
+			buffer.setString(String.format("%s%d", DESCPATTERN, i), patterns.get(i).description);
 		}
 		return buffer.toString();
 	}

@@ -34,6 +34,7 @@ import net.sf.okapi.common.ui.ISWTEmbeddableParametersEditor;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.TextAndBrowsePanel;
 import net.sf.okapi.common.ui.UIUtil;
+import net.sf.okapi.lib.verification.Issue;
 import net.sf.okapi.lib.verification.Parameters;
 import net.sf.okapi.lib.verification.PatternItem;
 import net.sf.okapi.lib.verification.QualityCheckSession;
@@ -46,6 +47,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
@@ -68,6 +70,10 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private static final int TAB_CHARACTERS = 2;
 	private static final int TAB_LANGUAGETOOL = 3;
 	private static final int TAB_OUTPUT = 4;
+
+	private static final String[] severityNames = new String[] {
+		"LOW", "MEDIUM", "HIGH"
+	};
 	
 	private Shell shell;
 	private boolean result = false;
@@ -97,6 +103,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Text edSource;
 	private Text edTarget;
 	private Text edDescription;
+	private Combo cbSeverity;
 	private Shell dialog;
 	private TableItem editItem;
 	private boolean addMode;
@@ -366,14 +373,13 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			public void controlResized(ControlEvent e) {
 				int tableWidth = table.getClientArea().width;
 				int remaining = tableWidth - table.getColumn(0).getWidth();
-				//remaining += (remaining % 3);
 				table.getColumn(1).setWidth(remaining/3);
 				table.getColumn(2).setWidth(remaining/3);
 				table.getColumn(3).setWidth(remaining/3);
 			}
 		});
 
-		String[] titles = {"Use", "Source Pattern", "Expected Target Pattern", "Description"};
+		String[] titles = {"Use/Severity", "Source Pattern", "Expected Target Pattern", "Description"};
 		for ( int i=0; i<titles.length; i++ ) {
 			TableColumn column = new TableColumn(table, SWT.LEFT);
 			column.setText(titles[i]);
@@ -611,7 +617,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		label = new Label(dialog, SWT.NONE);
 		label.setText(String.format("Expected corresponding target pattern (use '%s' if same as source):", PatternItem.SAME));
 
-		edTarget = new Text(dialog, SWT.BORDER | SWT.WRAP);
+		edTarget = new Text(dialog, SWT.BORDER);
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		edTarget.setLayoutData(gdTmp);
 
@@ -619,9 +625,18 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		label = new Label(dialog, SWT.NONE);
 		label.setText(String.format("Description:", PatternItem.SAME));
 
-		edDescription = new Text(dialog, SWT.BORDER | SWT.WRAP);
+		edDescription = new Text(dialog, SWT.BORDER);
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		edDescription.setLayoutData(gdTmp);
+		
+		// Severity
+		label = new Label(dialog, SWT.NONE);
+		label.setText(String.format("Severity:", PatternItem.SAME));
+		
+		cbSeverity = new Combo(dialog, SWT.DROP_DOWN | SWT.READ_ONLY);
+		for ( String string : severityNames ) {
+			cbSeverity.add(string);
+		}
 		
 		// Set the text in the edit fields
 		if ( add ) {
@@ -634,6 +649,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			edSource.setText(editItem.getText(1));
 			edTarget.setText(editItem.getText(2));
 			edDescription.setText(editItem.getText(3));
+			cbSeverity.select(getSeverityFromString(editItem.getText(0)));
 		}
 
 		//  Dialog buttons
@@ -671,10 +687,10 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 					// Update the table
 					if ( addMode ) { // Add a new item if needed
 						editItem = new TableItem(table, SWT.NONE);
-						editItem.setText(2, PatternItem.SAME);
 						editItem.setChecked(true);
 						table.setSelection(table.getItemCount()-1);
 					}
+					editItem.setText(0, cbSeverity.getText());
 					editItem.setText(1, edSource.getText());
 					editItem.setText(2, edTarget.getText());
 					editItem.setText(3, edDescription.getText());
@@ -866,6 +882,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		for ( PatternItem item : list ) {
 			TableItem row = new TableItem(table, SWT.NONE);
 			row.setChecked(item.enabled);
+			row.setText(0, severityNames[item.severity]);
 			row.setText(1, item.source);
 			row.setText(2, item.target);
 			// Handle null for old sessions
@@ -989,10 +1006,18 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private List<PatternItem> savePatternsData () {
 		List<PatternItem> list = new ArrayList<PatternItem>();
 		for ( int i=0; i<table.getItemCount(); i++ ) {
+			// Get the severity
+			int severity = getSeverityFromString(table.getItem(i).getText(0));
+			// Add the pattern
 			list.add(new PatternItem(table.getItem(i).getText(1), table.getItem(i).getText(2),
-				table.getItem(i).getChecked(), table.getItem(i).getText(3)));
+				table.getItem(i).getChecked(), severity, table.getItem(i).getText(3)));
 		}
 		return list;
 	}
 	
+	private int getSeverityFromString (String value) {
+		if ( value.equals(severityNames[Issue.SEVERITY_LOW]) ) return Issue.SEVERITY_LOW;
+		if ( value.equals(severityNames[Issue.SEVERITY_MEDIUM]) ) return Issue.SEVERITY_MEDIUM;
+		return Issue.SEVERITY_HIGH;
+	}
 }

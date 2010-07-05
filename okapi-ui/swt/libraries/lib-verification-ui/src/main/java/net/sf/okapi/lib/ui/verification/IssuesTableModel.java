@@ -39,13 +39,27 @@ class IssuesTableModel {
 	Color[] colors;
 
 	public IssuesTableModel (Display display) {
+		// This array must be in the same size/order as the Issue.SEVERITY_??? flags
 		colors = new Color[] {
 			display.getSystemColor(SWT.COLOR_YELLOW),
-			display.getSystemColor(SWT.COLOR_GRAY),
+			new Color(null, 255, 153, 0), // Make sure we dispose of it on close
 			display.getSystemColor(SWT.COLOR_RED)
 		};
 	}
 	
+	@Override
+	protected void finalize () {
+		dispose();
+	}
+	
+	public void dispose () {
+		// Dispose of the non-system resources
+		if ( colors != null ) {
+			colors[1].dispose();
+			colors[1] = null;
+		}
+	}
+
 	void linkTable (Table newTable,
 		Listener sortListener)
 	{

@@ -614,7 +614,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 			}
 		});
 
-		tblIssues = new Table(cmpTmp, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION | SWT.CHECK);
+		tblIssues = new Table(cmpTmp, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION | SWT.CHECK | SWT.V_SCROLL);
 		tblIssues.setHeaderVisible(true);
 		tblIssues.setLinesVisible(true);
 		gdTmp = new GridData(GridData.FILL_BOTH);

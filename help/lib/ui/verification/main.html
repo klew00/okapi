@@ -25,17 +25,33 @@
 </ul>
 <p>The table displays the issues found with the documents in the session. Use
 <cite>Check All</cite> to re-process the documents if you fix or modify one.</p>
+<ul>
+	<li>Column 1 indicates if the issue is <b>enabled</b> (check mark set) or <b>
+	disabled</b> (check mark not set). An issue that is enabled is 
+	concidered valid (i.e. a real problem), while an issue that is disabled is, in the context where 
+	it occurs, not a problem (i.e. a non-issue), a false 
+	positive. Checkmate remembers the issues you have disabled, so it keeps them 
+	disabled each time you re-process the documents.</li>
+	<li>Column 2 indicates the potential severity of the warning: Reg: high, 
+	Orange: medium, Yellow: low. This information is a mix of how confident the 
+	tool is about the error and how dangerous this type of error is. For 
+	example: missing a pattern like &quot;%s&quot; is both easy to detect and certainly 
+	dangerous, so its severity can be rated &quot;high&quot;. On the other hand, a 
+	translation missing parentheses is easy to detect, but may or may not 
+	correspond to a translation problem, so its severity should be rated &quot;low&quot;.</li>
+	<li>Column 3 (<cite>Text Unit</cite>) displays the ID of the text unit where 
+	the issue occurs.</li>
+	<li>Column 4 (<cite>Seg</cite>) displays the ID of the segment where the 
+	issue occurs, or nothing if the warning is for the whole text unit.</li>
+	<li>Column 5 (<cite>Description</cite>) shows the warning message for the 
+	issue.</li>
+</ul>
 <p>Which issues are displayed in the table is driven by the two list-boxes below 
 the table on the right-hand side:</p>
 <ul>
 	<li>The first one selects the types of issue to display: Choose <cite>&lt;All 
 	types of issues&gt;</cite> to display issues of any types.</li>
-	<li>The second one selects where to display enabled and disabled issues. An
-	<b>enabled issue</b> (an <b>issue with a check mark</b>) is an issue that is 
-	concidered valid (i.e. a real problem), while a <b>disabled issue</b> (an 
-	issue <b>without check mark</b>) is an issue that is, in the context where 
-	it occurs, not a problem (i.e. a non-issue), in other words: a false 
-	positive. usually you want to display only the issues that are enabled.</li>
+	<li>The second one selects where to display enabled and disabled issues. Usually you want to display only the issues that are enabled.</li>
 </ul>
 <p>To toggle the status of a given issue between enabled or disabled, simply 
 check or uncheck its corresponding check mark. You can click on the check box, 
