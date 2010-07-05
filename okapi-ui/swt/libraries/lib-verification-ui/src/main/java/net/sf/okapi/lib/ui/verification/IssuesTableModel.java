@@ -25,6 +25,8 @@ import java.util.List;
 import net.sf.okapi.lib.verification.Issue;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -34,7 +36,16 @@ class IssuesTableModel {
 	
 	Table table;
 	List<Issue> list;
+	Color[] colors;
 
+	public IssuesTableModel (Display display) {
+		colors = new Color[] {
+			display.getSystemColor(SWT.COLOR_YELLOW),
+			display.getSystemColor(SWT.COLOR_GRAY),
+			display.getSystemColor(SWT.COLOR_RED)
+		};
+	}
+	
 	void linkTable (Table newTable,
 		Listener sortListener)
 	{
@@ -43,6 +54,9 @@ class IssuesTableModel {
 		TableColumn col = new TableColumn(table, SWT.NONE);
 		col.addListener(SWT.Selection, sortListener);
 		
+		col = new TableColumn(table, SWT.NONE);
+		col.addListener(SWT.Selection, sortListener);
+
 		col = new TableColumn(table, SWT.NONE);
 		col.setText("Text Unit");
 		col.addListener(SWT.Selection, sortListener);
@@ -116,8 +130,11 @@ class IssuesTableModel {
 				case TARGET_LENGTH:
 					if ( issueType != 10 ) continue;
 					break;
-				case LANGUAGETOOL_ERROR:
+				case ALLOWED_CHARACTERS:
 					if ( issueType != 11 ) continue;
+					break;
+				case LANGUAGETOOL_ERROR:
+					if ( issueType != 12 ) continue;
 					break;
 				default:
 					continue;
@@ -126,9 +143,11 @@ class IssuesTableModel {
 			// Display the item
 			TableItem item = new TableItem(table, SWT.NONE);
 			item.setChecked(issue.enabled);
-			item.setText(1, issue.tuId);
-			item.setText(2, (issue.segId == null ? "" : issue.segId));
-			item.setText(3, issue.message);
+			item.setForeground(1, colors[issue.severity]);
+			item.setText(1, "\u2588");
+			item.setText(2, issue.tuId);
+			item.setText(3, (issue.segId == null ? "" : issue.segId));
+			item.setText(4, issue.message);
 			item.setData(issue);
 		}
 		

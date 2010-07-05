@@ -62,12 +62,19 @@ import org.eclipse.swt.widgets.Text;
 
 @EditorFor(Parameters.class)
 public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParametersEditor {
+
+	//private static final int TAB_GENERAL = 0;
+	//private static final int TAB_PATTERN = 1;
+	private static final int TAB_CHARACTERS = 2;
+	private static final int TAB_LANGUAGETOOL = 3;
+	private static final int TAB_OUTPUT = 4;
 	
 	private Shell shell;
 	private boolean result = false;
 	private OKCancelPanel pnlActions;
 	private Parameters params;
 	private IHelp help;
+	private TabFolder tabs;
 	private Button chkAutoOpen;
 	private Button chkLeadingWS;
 	private Button chkTrailingWS;
@@ -102,6 +109,11 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Spinner spMaxCharLength;
 	private Button chkMinCharLength;
 	private Spinner spMinCharLength;
+	private Button chkCheckCharacters;
+	private Text edCharset;
+	private Label stExtraCharsAllowed;
+	private Text edExtraCharsAllowed;
+	
 	// Flag to indicate the editor is use for step parameters
 	// We default to true because the step cannot set this option
 	private boolean stepMode = false; // Disabled for now
@@ -184,7 +196,9 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 					if ( help != null ) help.showTopic(this, "parameterseditor");
 					return;
 				}
-				if ( e.widget.getData().equals("o") ) saveData();
+				if ( e.widget.getData().equals("o") ) {
+					if ( !saveData() ) return;
+				}
 				shell.close();
 			};
 		};
@@ -206,16 +220,16 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		mainComposite.setLayout(new GridLayout());
 		mainComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-		TabFolder tfTmp = new TabFolder(mainComposite, SWT.NONE);
-		tfTmp.setLayout(new GridLayout());
+		tabs = new TabFolder(mainComposite, SWT.NONE);
+		tabs.setLayout(new GridLayout());
 		GridData gdTmp = new GridData(GridData.FILL_BOTH);
 		// Auto-size is too high, we need to fix it manually
 		gdTmp.heightHint = 430;
-		tfTmp.setLayoutData(gdTmp);
+		tabs.setLayoutData(gdTmp);
 
 		//--- General tab
 		
-		Composite cmpTmp = new Composite(tfTmp, SWT.NONE);
+		Composite cmpTmp = new Composite(tabs, SWT.NONE);
 		cmpTmp.setLayout(new GridLayout());
 
 		Group grpTU = new Group(cmpTmp, SWT.NONE);
@@ -307,14 +321,14 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		spMinCharLength.setMaximum(999);
 		spMinCharLength.setMinimum(1);
 		
-		TabItem tiTmp = new TabItem(tfTmp, SWT.NONE);
+		TabItem tiTmp = new TabItem(tabs, SWT.NONE);
 		tiTmp.setText("General");
 		tiTmp.setControl(cmpTmp);
 
 		
 		//--- Patterns tab
 		
-		cmpTmp = new Composite(tfTmp, SWT.NONE);
+		cmpTmp = new Composite(tabs, SWT.NONE);
 		cmpTmp.setLayout(new GridLayout());
 		cmpTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
 
@@ -422,14 +436,42 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			}
 		});
 
-		tiTmp = new TabItem(tfTmp, SWT.NONE);
+		tiTmp = new TabItem(tabs, SWT.NONE);
 		tiTmp.setText("Patterns");
+		tiTmp.setControl(cmpTmp);
+
+		
+		//--- Characters tab
+		
+		cmpTmp = new Composite(tabs, SWT.NONE);
+		cmpTmp.setLayout(new GridLayout());
+		cmpTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
+		
+		chkCheckCharacters = new Button(cmpTmp, SWT.CHECK);
+		chkCheckCharacters.setText("Warn if a character is not included in the following character set encoding:");
+		chkCheckCharacters.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				updateCharacters();
+			};
+		});
+		
+		edCharset = new Text(cmpTmp, SWT.BORDER);
+		edCharset.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		
+		stExtraCharsAllowed = new Label(cmpTmp, SWT.NONE);
+		stExtraCharsAllowed.setText("Allow the characters matching the following regular expression pattern:");
+		
+		edExtraCharsAllowed = new Text(cmpTmp, SWT.BORDER);
+		edExtraCharsAllowed.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+		tiTmp = new TabItem(tabs, SWT.NONE);
+		tiTmp.setText("Characters");
 		tiTmp.setControl(cmpTmp);
 
 		
 		//--- Language Tool tab
 		
-		cmpTmp = new Composite(tfTmp, SWT.NONE);
+		cmpTmp = new Composite(tabs, SWT.NONE);
 		cmpTmp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		cmpTmp.setLayout(new GridLayout());
 
@@ -482,14 +524,14 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		gdTmp.widthHint = 80;
 		edLTTranslationTarget.setLayoutData(gdTmp);
 
-		tiTmp = new TabItem(tfTmp, SWT.NONE);
+		tiTmp = new TabItem(tabs, SWT.NONE);
 		tiTmp.setText("LanguageTool");
 		tiTmp.setControl(cmpTmp);
 
 
 		//--- Output tab
 		
-		cmpTmp = new Composite(tfTmp, SWT.NONE);
+		cmpTmp = new Composite(tabs, SWT.NONE);
 		layTmp = new GridLayout();
 		cmpTmp.setLayout(layTmp);
 
@@ -526,7 +568,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			pnlSessionPath.setLayoutData(gdTmp);
 		}
 		
-		tiTmp = new TabItem(tfTmp, SWT.NONE);
+		tiTmp = new TabItem(tabs, SWT.NONE);
 		tiTmp.setText("Output");
 		tiTmp.setControl(cmpTmp);
 		
@@ -540,6 +582,12 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 				shell.getDisplay().sleep();
 		}
 		return result;
+	}
+	
+	private void updateCharacters () {
+		edCharset.setEnabled(chkCheckCharacters.getSelection());
+		stExtraCharsAllowed.setEnabled(chkCheckCharacters.getSelection());
+		edExtraCharsAllowed.setEnabled(chkCheckCharacters.getSelection());
 	}
 	
 	private void editPattern (boolean add) {
@@ -793,12 +841,18 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		spMaxCharLength.setSelection(params.getMaxCharLength());
 		chkMinCharLength.setSelection(params.getCheckMinCharLength());
 		spMinCharLength.setSelection(params.getMinCharLength());
+		
+		chkCheckCharacters.setSelection(params.getCheckCharacters());
+		edCharset.setText(params.getCharset());
+		edExtraCharsAllowed.setText(params.getExtraCharsAllowed());
+		
 		setPatternsData(params.getPatterns());
 		updateTargetSameAsSourceWithCodes();
 		updatePatterns();
 		updateLTOptions();
 		updateMaxCharLength();
 		updateMinCharLength();
+		updateCharacters();
 		// Step-mode fields
 		if ( stepMode ) {
 			chkSaveSession.setSelection(params.getSaveSession());
@@ -825,12 +879,14 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private boolean saveData () {
 		if ( pnlOutputPath.getText().trim().length() == 0 ) {
 			Dialogs.showError(shell, "Please, enter a path for the report.", null);
+			tabs.setSelection(TAB_OUTPUT);
 			pnlOutputPath.setFocus();
 			return false;
 		}
 		if ( chkCheckWithLT.getSelection() ) {
 			if ( edServerURL.getText().trim().length() == 0 ) {
 				Dialogs.showError(shell, "Please, enter a server URL.", null);
+				tabs.setSelection(TAB_LANGUAGETOOL);
 				edServerURL.setFocus();
 				return false;
 			}
@@ -838,16 +894,40 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 				if ( edLTTranslationSource.getText().trim().length() == 0 ) {
 					Dialogs.showError(shell, "Please, enter the language code of the messages returned by LanguageTool (e.g. fr).", null);
 					edLTTranslationSource.setFocus();
+					tabs.setSelection(TAB_LANGUAGETOOL);
 					return false;
 					
 				}
 				if ( edLTTranslationTarget.getText().trim().length() == 0 ) {
 					Dialogs.showError(shell, "Please, enter the language to translate the LanguageTool messages into (e.g. en).", null);
 					edLTTranslationTarget.setFocus();
+					tabs.setSelection(TAB_LANGUAGETOOL);
 					return false;
 				}
 			}
 		}
+		// Characters
+		if ( chkCheckCharacters.getSelection() ) {
+			String tmp = edExtraCharsAllowed.getText();
+			if ( tmp.isEmpty() && edCharset.getText().trim().isEmpty() ) {
+				Dialogs.showError(shell, "You must defined a character set encoding, or a list of allowed characters, or both.", null);
+				tabs.setSelection(TAB_CHARACTERS);
+				edCharset.setFocus();
+				return false;
+			}
+			if ( !tmp.isEmpty() ) {
+				try {
+					Pattern.compile(tmp);
+				}
+				catch ( Throwable e ) {
+					Dialogs.showError(shell, "Regular expression error:\n"+e.getMessage(), null);
+					tabs.setSelection(TAB_CHARACTERS);
+					edExtraCharsAllowed.setFocus();
+					return false;
+				}
+			}
+		}
+		
 		if ( stepMode ) {
 			if ( chkSaveSession.getSelection() ) {
 				if ( pnlSessionPath.getText().trim().length() == 0 ) {
@@ -887,6 +967,13 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 				params.setLtTranslationTarget(edLTTranslationTarget.getText());
 			}
 		}
+		
+		params.setCheckCharacters(chkCheckCharacters.getSelection());
+		if ( chkCheckCharacters.getSelection() ) {
+			params.setCharset(edCharset.getText().trim());
+			params.setExtraCharsAllowed(edExtraCharsAllowed.getText());
+		}
+		
 		if ( stepMode ) {
 			params.setSaveSession(chkSaveSession.getSelection());
 			if ( chkSaveSession.getSelection() ) {

@@ -46,5 +46,7 @@ public enum IssueType {
 	
 	TARGET_LENGTH,
 	
+	ALLOWED_CHARACTERS,
+	
 	LANGUAGETOOL_ERROR
 }

@@ -121,7 +121,7 @@ public class LanguageToolConnector {
 				}
 				int start = Integer.valueOf(error.getAttribute("fromx"));
 				int end = Integer.valueOf(error.getAttribute("tox"));
-				issues.add(new Issue(docId, IssueType.LANGUAGETOOL_ERROR, tu.getId(), seg.getId(), msg, 0, 0, start, end));
+				issues.add(new Issue(docId, IssueType.LANGUAGETOOL_ERROR, tu.getId(), seg.getId(), msg, 0, 0, start, end, Issue.SEVERITY_MEDIUM));
 			}
 		}
 		catch ( ConnectException e ) {

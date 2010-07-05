@@ -24,6 +24,10 @@ import java.net.URI;
 
 public class Issue {
 
+	public static final int SEVERITY_LOW = 0;
+	public static final int SEVERITY_MEDIUM = 1;
+	public static final int SEVERITY_HIGH = 2;
+	
 	public URI docId;
 	public IssueType issueType;
 	public String tuId;
@@ -34,6 +38,7 @@ public class Issue {
 	public int trgStart;
 	public int trgEnd;
 	public boolean enabled;
+	public int severity;
 	// Temporary waiting for DB
 	public String oriSource;
 	public String oriTarget;
@@ -46,7 +51,8 @@ public class Issue {
 		int srcStart, 
 		int srcEnd, 
 		int trgStart, 
-		int trgEnd)
+		int trgEnd,
+		int severity)
 	{
 		this.docId = docId;
 		this.issueType = issueType;
@@ -57,6 +63,7 @@ public class Issue {
 		this.srcEnd = srcEnd;
 		this.trgStart = trgStart;
 		this.trgEnd = trgEnd;
+		this.severity = severity;
 	}
 
 	String getSignature () {

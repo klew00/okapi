@@ -28,9 +28,10 @@ public class IssueComparator implements Comparator<Issue> {
 	public static final int DIR_DESC = -1;
 	
 	public static final int TYPE_ENABLED = 0;
-	public static final int TYPE_TU = 1;
-	public static final int TYPE_SEG = 2;
-	public static final int TYPE_MESSAGE = 3;
+	public static final int TYPE_SEVERITY = 1;
+	public static final int TYPE_TU = 2;
+	public static final int TYPE_SEG = 3;
+	public static final int TYPE_MESSAGE = 4;
 	
 	private int type = 0;
 	private int direction = 1;
@@ -43,8 +44,9 @@ public class IssueComparator implements Comparator<Issue> {
 	}
 	
 	@Override
-	public int compare (Issue issue1, Issue issue2) {
-	
+	public int compare (Issue issue1,
+		Issue issue2)
+	{
 		switch ( type ) {
 		case TYPE_ENABLED:
 			if ( issue1.enabled == issue2.enabled ) return 0;
@@ -52,6 +54,13 @@ public class IssueComparator implements Comparator<Issue> {
 				return issue1.enabled ? 1 : -1;
 			}
 			return issue1.enabled ? -1 : 1;
+
+		case TYPE_SEVERITY:
+			if ( issue1.severity == issue2.severity ) return 0;
+			if ( direction == DIR_ASC ) {
+				return (issue1.severity > issue2.severity) ? 1 : -1;
+			}
+			return (issue1.severity > issue2.severity) ? -1 : 1;
 
 		case TYPE_TU:
 			String key1 = issue1.docId.toString()+issue1.tuId;
@@ -77,9 +86,7 @@ public class IssueComparator implements Comparator<Issue> {
 				return issue1.message.compareTo(issue2.message);
 			}
 			return issue2.message.compareTo(issue1.message);
-			
 		}
-
 		return 0;
 	}
 

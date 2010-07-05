@@ -582,6 +582,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		cbTypes.add("Unexpected patterns"); // UNEXPECTED_PATTERN
 		cbTypes.add("Suspect patterns"); // SUSPECT_PATTERN
 		cbTypes.add("Target length"); // TARGET_LENGTH
+		cbTypes.add("Allowed characters"); // ALLOWED_CHARACTERS
 		cbTypes.add("LanguageTool checker warnings"); // LANGUAGETOOL_ERROR
 		cbTypes.setVisibleItemCount(12);
 		cbTypes.setLayoutData(new GridData());
@@ -625,12 +626,14 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		    public void controlResized(ControlEvent e) {
 		    	Rectangle rect = tblIssues.getClientArea();
 		    	int checkColWidth = 32;
-				int part = (int)((rect.width-checkColWidth) / 100);
-				int remainder = (int)((rect.width-checkColWidth) % 100);
+		    	int severityColWidth = 28;
+				int part = (int)((rect.width-(checkColWidth+severityColWidth)) / 100);
+				int remainder = (int)((rect.width-(checkColWidth+severityColWidth)) % 100);
 				tblIssues.getColumn(0).setWidth(checkColWidth);
-				tblIssues.getColumn(1).setWidth(part*10);
-				tblIssues.getColumn(2).setWidth(part*5);
-				tblIssues.getColumn(3).setWidth(remainder+(part*85));
+				tblIssues.getColumn(1).setWidth(severityColWidth);
+				tblIssues.getColumn(2).setWidth(part*10);
+				tblIssues.getColumn(3).setWidth(part*5);
+				tblIssues.getColumn(4).setWidth(remainder+(part*85));
 		    }
 		});
 		
@@ -678,9 +681,10 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 				}
 				// Select the issue part to sort
 				int type = IssueComparator.TYPE_ENABLED;
-				if ( tblIssues.indexOf(curCol) == 1 ) type = IssueComparator.TYPE_TU;
-				else if ( tblIssues.indexOf(curCol) == 2 ) type = IssueComparator.TYPE_SEG;
-				else if ( tblIssues.indexOf(curCol) == 3 ) type = IssueComparator.TYPE_MESSAGE;
+				if ( tblIssues.indexOf(curCol) == 1 ) type = IssueComparator.TYPE_SEVERITY;
+				else if ( tblIssues.indexOf(curCol) == 2 ) type = IssueComparator.TYPE_TU;
+				else if ( tblIssues.indexOf(curCol) == 3 ) type = IssueComparator.TYPE_SEG;
+				else if ( tblIssues.indexOf(curCol) == 4 ) type = IssueComparator.TYPE_MESSAGE;
 				// Perform the sort
 				Collections.sort(session.getIssues(),
 					new IssueComparator(type, dir==SWT.UP ? IssueComparator.DIR_ASC : IssueComparator.DIR_DESC));
@@ -690,7 +694,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 			}
 		};
 		
-		issuesModel = new IssuesTableModel();
+		issuesModel = new IssuesTableModel(shell.getDisplay());
 		issuesModel.linkTable(tblIssues, sortListener);
 
 		sashMain.setWeights(new int[]{30, 70});
@@ -799,23 +803,28 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 	}
 
 	private void updateCurrentIssue () {
-		int n = tblIssues.getSelectionIndex();
-		if ( n == -1 ) {
-			edDocument.setText("");
-			edMessage.setText("");
-			edSource.setText("");
-			edTarget.setText("");
+		try {
+			int n = tblIssues.getSelectionIndex();
+			if ( n == -1 ) {
+				edDocument.setText("");
+				edMessage.setText("");
+				edSource.setText("");
+				edTarget.setText("");
+			}
+			else {
+				Issue issue = (Issue)tblIssues.getItem(n).getData();
+				edDocument.setText(issue.docId.toString());
+				edMessage.setText(issue.message);
+				String tmp = issue.oriSource;
+				edSource.setText(tmp);
+				tmp = issue.oriTarget;
+				edTarget.setText(tmp);
+			}
+			statusBar.setCounter(n, tblIssues.getItemCount(), session.getIssues().size());
 		}
-		else {
-			Issue issue = (Issue)tblIssues.getItem(n).getData();
-			edDocument.setText(issue.docId.toString());
-			edMessage.setText(issue.message);
-			String tmp = issue.oriSource;
-			edSource.setText(tmp);
-			tmp = issue.oriTarget;
-			edTarget.setText(tmp);
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, "Error while updating table.\n"+e.getMessage(), null);
 		}
-		statusBar.setCounter(n, tblIssues.getItemCount(), session.getIssues().size());
 	}
 
 	private void startWaiting (String text) {

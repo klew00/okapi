@@ -39,6 +39,7 @@ public class PatternItem {
 	public String target;
 	public boolean enabled;
 	public String description;
+	public int severity;
 	
 	private Pattern srcPat;
 	private Pattern trgPat;
@@ -108,7 +109,7 @@ public class PatternItem {
 		String target,
 		boolean enabled)
 	{
-		create(source, target, enabled, null);
+		create(source, target, enabled, null, Issue.SEVERITY_MEDIUM);
 	}
 
 	public PatternItem (String source,
@@ -116,18 +117,20 @@ public class PatternItem {
 		boolean enabled,
 		String message)
 	{
-		create(source, target, enabled, message);
+		create(source, target, enabled, message, Issue.SEVERITY_MEDIUM);
 	}
 
 	private void create (String source,
 		String target,
 		boolean enabled,
-		String message)
+		String message,
+		int severity)
 	{
 		this.source = source;
 		this.target = target;
 		this.enabled = enabled;
 		this.description = message;
+		this.severity = severity;
 	}
 
 	public void compile () {

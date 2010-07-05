@@ -52,6 +52,9 @@ public class Parameters extends BaseParameters {
 	private static final String MAXCHARLENGTH = "maxCharLength";
 	private static final String CHECKMINCHARLENGTH = "checkMinCharLength";
 	private static final String MINCHARLENGTH = "minCharLength";
+	private static final String CHECKCHARACTERS = "checkCharacters";
+	private static final String CHARSET = "charset";
+	private static final String EXTRACHARSALLOWED = "extraCharsAllowed";
 
 	String outputPath;
 	boolean autoOpen;
@@ -75,11 +78,38 @@ public class Parameters extends BaseParameters {
 	int maxCharLength;
 	boolean checkMinCharLength;
 	int minCharLength;
+	boolean checkCharacters;
+	String charset;
+	String extraCharsAllowed;
 
 	public Parameters () {
 		reset();
 	}
 	
+	public boolean getCheckCharacters () {
+		return checkCharacters;
+	}
+
+	public void setCheckCharacters (boolean checkCharacters) {
+		this.checkCharacters = checkCharacters;
+	}
+
+	public String getCharset () {
+		return charset;
+	}
+
+	public void setCharset (String charset) {
+		this.charset = charset;
+	}
+
+	public String getExtraCharsAllowed () {
+		return extraCharsAllowed;
+	}
+
+	public void setExtraCharsAllowed (String extraCharsAllowed) {
+		this.extraCharsAllowed = extraCharsAllowed;
+	}
+
 	public boolean getCheckMaxCharLength () {
 		return checkMaxCharLength;
 	}
@@ -280,6 +310,10 @@ public class Parameters extends BaseParameters {
 		maxCharLength = 190;
 		checkMinCharLength = true;
 		minCharLength = 50;
+		
+		checkCharacters = false;
+		charset = "ISO-8859-1";
+		extraCharsAllowed = "";
 
 		patterns = new ArrayList<PatternItem>();
 		// Parentheses
@@ -329,10 +363,15 @@ public class Parameters extends BaseParameters {
 		saveSession = buffer.getBoolean(SAVESESSION, saveSession);
 		sessionPath = buffer.getString(SESSIONPATH, sessionPath);
 		doubledWord = buffer.getBoolean(DOUBLEDWORD, doubledWord);
+		// Length
 		checkMaxCharLength = buffer.getBoolean(CHECKMAXCHARLENGTH, checkMaxCharLength);
 		maxCharLength = buffer.getInteger(MAXCHARLENGTH, maxCharLength);
 		checkMinCharLength = buffer.getBoolean(CHECKMINCHARLENGTH, checkMinCharLength);
 		minCharLength = buffer.getInteger(MINCHARLENGTH, minCharLength);
+		// Characters
+		checkCharacters = buffer.getBoolean(CHECKCHARACTERS, checkCharacters);
+		charset = buffer.getString(CHARSET, charset);
+		extraCharsAllowed = buffer.getString(EXTRACHARSALLOWED, extraCharsAllowed);
 		// Patterns
 		checkPatterns = buffer.getBoolean(CHECKPATTERNS, checkPatterns);
 		int count = buffer.getInteger(PATTERNCOUNT, 0);
@@ -364,10 +403,15 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean(SAVESESSION, saveSession);
 		buffer.setString(SESSIONPATH, sessionPath);
 		buffer.setBoolean(DOUBLEDWORD, doubledWord);
+		// Length
 		buffer.setBoolean(CHECKMAXCHARLENGTH, checkMaxCharLength);
 		buffer.setInteger(MAXCHARLENGTH, maxCharLength);
 		buffer.setBoolean(CHECKMINCHARLENGTH, checkMinCharLength);
 		buffer.setInteger(MINCHARLENGTH, minCharLength);
+		// Characters
+		buffer.setBoolean(CHECKCHARACTERS, checkCharacters);
+		buffer.setString(CHARSET, charset);
+		buffer.setString(EXTRACHARSALLOWED, extraCharsAllowed);
 		// Patterns
 		buffer.setBoolean(CHECKPATTERNS, checkPatterns);
 		buffer.setInteger(PATTERNCOUNT, patterns.size());
