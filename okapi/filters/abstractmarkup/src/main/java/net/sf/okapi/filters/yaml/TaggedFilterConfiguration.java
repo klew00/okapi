@@ -712,4 +712,8 @@ public class TaggedFilterConfiguration {
 	public Map<String, Object> getAttributeRules () {
 		return configReader.getAttributeRules();
 	}
+
+	public Map<String, Object> getElementRules () {
+		return configReader.getElementRules();
+	}
 }

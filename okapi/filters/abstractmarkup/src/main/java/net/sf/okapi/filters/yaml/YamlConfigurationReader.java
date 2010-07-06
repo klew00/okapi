@@ -258,4 +258,8 @@ public class YamlConfigurationReader {
 		return attributeRules;
 	}
 
+	public 	Map<String, Object> getElementRules () {
+		return elementRules;
+	}
+
 }

@@ -65,6 +65,10 @@ comparison done when verifying if the target is the same as the source should
 take inline codes into account. If this option is set and the only difference 
 between the source and the translation is the inline code, the segment will not 
 be flagged as having the target the same as the source.</p>
+<p>Note that when a target is found to be the same as its source, the tool 
+checks <a href="#PatternsTab">the list of patterns</a> that have their expected 
+target set to &quot;<code>&lt;same&gt;</code>&quot;. If the string matches one of those patterns 
+no warning is generated as the target is expected to be the same.</p>
 <p><cite>Warn if there is a code differences between source and target segments</cite> -- Set this option to 
 verify that the target content has the same inline codes as the source content.</p>
 <p><cite>Warn on doubled words</cite> -- Set this option to flag the target 
@@ -85,7 +89,7 @@ enter 50%: If a source text is 40 characters long and its translation is less
 than 20 characters long, it will be flagged. The length is based on the number 
 of characters without counting the inline codes. This value must be tuned for 
 each source/target language pair.</p>
-<h3>Patterns Tab</h3>
+<h3><a name="PatternsTab"></a>Patterns Tab</h3>
 <p><cite>Verify that the following source patterns are translated as expected</cite> 
 -- Set this option to verify that each source pattern defined in the list has 
 its corresponding expected part in the target content.</p>

@@ -174,9 +174,25 @@ class QualityChecker {
 			if ( params.getTargetSameAsSource() ) {
 				if ( srcSeg.text.hasText() ) {
 					if ( srcSeg.text.compareTo(trgSeg.text, params.getTargetSameAsSourceWithCodes()) == 0 ) {
-						reportIssue(IssueType.TARGET_SAME_AS_SOURCE, tu, srcSeg.getId(),
-							"Translation is the same as the source.",
-							0, -1, 0, -1, Issue.SEVERITY_MEDIUM, srcSeg.toString(), trgSeg.toString());
+						// Is the string of the cases where target should be the same? (URL, etc.)
+						boolean warn = true;
+						if ( patterns != null ) {
+							for ( PatternItem item : patterns ) {
+								String ctext = srcSeg.text.getCodedText();
+								if ( item.target.equals(PatternItem.SAME) ) {
+									Matcher m = item.getSourcePattern().matcher(ctext);
+									if ( m.find() ) {
+										warn = !ctext.equals(m.group());
+										break;
+									}
+								}
+							}
+						}
+						if ( warn ) {
+							reportIssue(IssueType.TARGET_SAME_AS_SOURCE, tu, srcSeg.getId(),
+								"Translation is the same as the source.",
+								0, -1, 0, -1, Issue.SEVERITY_MEDIUM, srcSeg.toString(), trgSeg.toString());
+						}
 					}
 				}
 			}

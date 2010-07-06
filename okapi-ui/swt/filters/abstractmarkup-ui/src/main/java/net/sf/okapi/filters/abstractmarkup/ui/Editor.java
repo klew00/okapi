@@ -29,10 +29,13 @@ import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.filters.IFilterConfigurationListEditor;
+import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.InputDialog;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
+import net.sf.okapi.common.ui.filters.FilterConfigurationEditor;
 import net.sf.okapi.common.ui.filters.InlineCodeFinderPanel;
 import net.sf.okapi.filters.abstractmarkup.AbstractMarkupParameters;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
@@ -70,6 +73,7 @@ public class Editor implements IParametersEditor {
 	
 	private static final int TAB_ATTRIBUTES = 1;
 	
+	private IFilterConfigurationMapper fcMapper;
 	private Shell shell;
 	private boolean result = false;
 	private AbstractMarkupParameters params;
@@ -83,6 +87,7 @@ public class Editor implements IParametersEditor {
 	private Button rdAttOnlyThese;
 	private Button rdAttExceptThese;
 	private Text edAttScopeElements;
+	private Element currentElem;
 	private Attribute currentAtt;
 	private Button btRemoveAtt;
 	private Group grpWS;
@@ -92,12 +97,21 @@ public class Editor implements IParametersEditor {
 	private Text edDefaultWS;
 	private Button chkUseCodeFinder;
 	private InlineCodeFinderPanel pnlCodeFinder;
+	private List lbElem;
+	private Group grpElemContentFilter;
+	private Text edElemFilterConfig;
+	private Button btGetElemFilterConfig;
+	private Group grpElemCond;
+	private Text edElemConditions;
 
+	@Override
 	public boolean edit (IParameters options,
 		boolean readOnly,
 		IContext context)
 	{
 		help = (IHelp)context.getObject("help");
+		fcMapper = (IFilterConfigurationMapper)context.getObject("fcMapper");
+		
 		boolean bRes = false;
 		shell = null;
 		params = (AbstractMarkupParameters)options;
@@ -138,10 +152,62 @@ public class Editor implements IParametersEditor {
 		//=== Elements tab
 		
 		Composite cmpTmp = new Composite(tabs, SWT.NONE);
-		layTmp = new GridLayout();
+		layTmp = new GridLayout(2, false);
 		cmpTmp.setLayout(layTmp);
 		
+		lbElem = new List(cmpTmp, SWT.BORDER | SWT.V_SCROLL);
+		gdTmp = new GridData(GridData.FILL_BOTH);
+		gdTmp.verticalSpan = 2;
+		lbElem.setLayoutData(gdTmp);
+		lbElem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				updateElement();
+			};
+		});
+		
+		//--- Element content filter group 
+		
+		grpElemContentFilter = new Group(cmpTmp, SWT.NONE);
+		grpElemContentFilter.setText("Process the content using the following filter configuration:");
+		grpElemContentFilter.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		grpElemContentFilter.setLayout(new GridLayout(2, false));
+		
+		edElemFilterConfig = new Text(grpElemContentFilter, SWT.BORDER);
+		edElemFilterConfig.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		
+		btGetElemFilterConfig = new Button(grpElemContentFilter, SWT.PUSH);
+		btGetElemFilterConfig.setText("...");
+		btGetElemFilterConfig.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				browserFilterConfiguration(edElemFilterConfig);
+			};
+		});
 
+		//--- Attribute conditions group
+		
+		grpElemCond = new Group(cmpTmp, SWT.NONE);
+		grpElemCond.setLayout(new GridLayout(3, false));
+		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING | GridData.FILL_HORIZONTAL);
+		grpElemCond.setLayoutData(gdTmp);
+		grpElemCond.setText("Conditions");
+		
+		edElemConditions = new Text(grpElemCond, SWT.BORDER);
+		edElemConditions.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		edElemConditions.setEditable(false);
+		
+		Button btTmp = new Button(grpElemCond, SWT.PUSH);
+		btTmp.setText("Edit...");
+		btTmp.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				if ( currentElem == null ) return;
+				if ( currentElem.conditions == null ) {
+					currentElem.conditions = new ArrayList<Condition>();
+				}
+				editConditions(edElemConditions, currentElem.conditions);
+            }
+		});
+
+		
 		TabItem tiTmp = new TabItem(tabs, SWT.NONE);
 		tiTmp.setText("Elements");
 		tiTmp.setControl(cmpTmp);
@@ -153,15 +219,9 @@ public class Editor implements IParametersEditor {
 		layTmp = new GridLayout(2, false);
 		cmpTmp.setLayout(layTmp);
 		
-		Label label = new Label(cmpTmp, SWT.NONE);
-		label.setText("Attributes:");
-		
-		label = new Label(cmpTmp, SWT.NONE);
-		label.setText("Rules for the selected attribute:");
-		
 		lbAtt = new List(cmpTmp, SWT.BORDER | SWT.V_SCROLL);
 		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.verticalSpan = 4;
+		gdTmp.verticalSpan = 5;
 		lbAtt.setLayoutData(gdTmp);
 		lbAtt.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -169,6 +229,9 @@ public class Editor implements IParametersEditor {
 			};
 		});
 
+		Label label = new Label(cmpTmp, SWT.NONE);
+		label.setText("Rules for the selected attribute:");
+		
 		tblAttRules = new Table(cmpTmp, SWT.BORDER | SWT.CHECK | SWT.FULL_SELECTION);
 		tblAttRules.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
 		TableColumn col1 = new TableColumn(tblAttRules, SWT.NONE);
@@ -198,7 +261,7 @@ public class Editor implements IParametersEditor {
             }
 		});
 		
-		//--- Conditions group
+		//--- Attribute conditions group
 		
 		grpAttCond = new Group(cmpTmp, SWT.NONE);
 		grpAttCond.setLayout(new GridLayout(3, false));
@@ -210,7 +273,7 @@ public class Editor implements IParametersEditor {
 		edAttConditions.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		edAttConditions.setEditable(false);
 		
-		Button btTmp = new Button(grpAttCond, SWT.PUSH);
+		btTmp = new Button(grpAttCond, SWT.PUSH);
 		btTmp.setText("Edit...");
 		btTmp.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
@@ -222,7 +285,7 @@ public class Editor implements IParametersEditor {
             }
 		});
 
-		//--- Scope group
+		//--- Attribute scope group
 		
 		Group grpTmp = new Group(cmpTmp, SWT.NONE);
 		grpTmp.setLayout(new GridLayout());
@@ -408,6 +471,21 @@ public class Editor implements IParametersEditor {
 		setData();
 	}
 	
+	private void browserFilterConfiguration (Text edField) {
+		try {
+			IFilterConfigurationListEditor fcEditor = new FilterConfigurationEditor();
+			String res = fcEditor.editConfigurations(fcMapper, edField.getText());
+			if ( res != null ) {
+				edField.setText(res);
+				edField.selectAll();
+				edField.setFocus();
+			}
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getLocalizedMessage(), null);
+		}
+	}
+	
 	private void removeAttribute () {
 		int n = lbAtt.getSelectionIndex();
 		if ( n < 0 ) return;
@@ -493,6 +571,13 @@ public class Editor implements IParametersEditor {
 		edAttScopeElements.setEnabled(!rdAttrAllElements.getSelection());
 	}
 
+	private boolean saveElement () {
+		if ( currentElem == null ) return true;
+		currentElem.rules.clear();
+		currentElem.subFilter = edElemFilterConfig.getText().trim();
+		return true;
+	}
+	
 	private boolean saveAttribute () {
 		if ( currentAtt == null ) return true;
 		currentAtt.rules.clear();
@@ -509,9 +594,27 @@ public class Editor implements IParametersEditor {
 		return true;
 	}
 	
+	private boolean updateElement () {
+		if ( !saveElement() ) {
+			return false;
+		}
+		int n = lbElem.getSelectionIndex();
+		if ( n < 0 ) {
+			edElemConditions.setText("");
+			edElemFilterConfig.setText("");
+			currentElem = null;
+		}
+		else {
+			Element elem = (Element)lbElem.getData(lbElem.getItem(n));
+			edElemConditions.setText(formatConditions(elem.conditions));
+			edElemFilterConfig.setText(elem.subFilter);
+			currentElem = elem;
+		}
+		return true;
+	}
+	
 	private boolean updateAttribute () {
 		if ( !saveAttribute() ) {
-			
 			return false;
 		}
 		int n = lbAtt.getSelectionIndex();
@@ -611,9 +714,43 @@ public class Editor implements IParametersEditor {
 			chkUseCodeFinder.setSelection(tfg.isUseCodeFinder());
 			pnlCodeFinder.setRules(tfg.getCodeFinderRules());
 			
+			
+			//--- Read elements
+
+			Map<String, Object> map = tfg.getElementRules();
+			for ( String name : map.keySet() ) {
+				Element elem = new Element();
+				elem.name = name;
+				@SuppressWarnings("unchecked")
+				Map<String, Object> items = (Map<String, Object>)map.get(name);
+				for ( String itemName : items.keySet() ) {
+					if ( itemName.equals(TaggedFilterConfiguration.RULETYPES) ) {
+						@SuppressWarnings("unchecked")
+						java.util.List<String> list = (java.util.List<String>)items.get(itemName);
+						for ( String tmp : list ) {
+							elem.rules.add(tfg.convertRuleAsStringToRuleType(tmp));
+						}
+					}
+					else if ( itemName.equals(TaggedFilterConfiguration.CONDITIONS) ) {
+						elem.conditions = parseConditions(items.get(itemName));
+					}
+					else if ( itemName.equals(TaggedFilterConfiguration.SUBFILTER) ) {
+						elem.subFilter = (String)items.get(itemName);
+					}
+					
+				}				
+				// Attribute is read, add it
+				lbElem.add(name);
+				lbElem.setData(name, elem);
+			}
+			// Select default and update all
+			if ( lbElem.getItemCount() > 0 ) lbElem.setSelection(0);
+			updateElement();
+			//updateElementsButtons();
+			
 			//--- Read the attributes
 			
-			Map<String, Object> map = tfg.getAttributeRules();
+			map = tfg.getAttributeRules();
 			for ( String attName : map.keySet() ) {
 				Attribute att = new Attribute();
 				att.name = attName;
@@ -760,10 +897,11 @@ public class Editor implements IParametersEditor {
 			tmp.append("\n");
 		}
 		
-System.out.print(tmp.toString());		
-System.out.print("\n---\n");		
+//System.out.print(tmp.toString());		
+//System.out.print("\n---\n");		
 		params.fromString(tmp.toString());
-System.out.print(params.toString());		
+//System.out.print(params.toString());
+		
 		return true;
 	}
 

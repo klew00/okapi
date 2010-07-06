@@ -25,24 +25,15 @@ import java.util.List;
 
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
 
-class Attribute {
+class Element {
 	
-	public static final int SCOPE_ALL = 0;
-	public static final int SCOPE_ONLY = 1;
-	public static final int SCOPE_ALLEXCEPT = 2;
-
 	String name;
 	List<RULE_TYPE> rules;
-	int scope;
-	String scopeElements;
 	List<Condition> conditions;
-	List<Condition> wsPreserve;
-	List<Condition> wsDefault;
+	String subFilter = "";
 
-	public Attribute () {
+	public Element () {
 		rules = new ArrayList<RULE_TYPE>();
-		scope = SCOPE_ALL;
-		scopeElements = "";
 	}
-	
+
 }
