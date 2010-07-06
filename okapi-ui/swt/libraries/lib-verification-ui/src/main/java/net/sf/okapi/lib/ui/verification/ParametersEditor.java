@@ -85,6 +85,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Button chkLeadingWS;
 	private Button chkTrailingWS;
 	private Button chkEmptyTarget;
+	private Button chkEmptySource;
 	private Button chkTargetSameAsSource;
 	private Button chkTargetSameAsSourceWithCodes;
 	private Composite mainComposite;
@@ -273,8 +274,20 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			};
 		});
 		
+		chkTmp = new Button(grpSeg, SWT.CHECK);
+		chkTmp.setText("[Always On] Warn if there is an extra target segment");
+		chkTmp.setSelection(true);
+		chkTmp.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				((Button)e.getSource()).setSelection(true);
+			};
+		});
+		
 		chkEmptyTarget = new Button(grpSeg, SWT.CHECK);
-		chkEmptyTarget.setText("Warn if a target segment is empty (and its source is not)");
+		chkEmptyTarget.setText("Warn if a target segment is empty when its source is not empty");
+
+		chkEmptySource = new Button(grpSeg, SWT.CHECK);
+		chkEmptySource.setText("Warn if a target segment is not empty when its source is empty");
 
 		chkTargetSameAsSource = new Button(grpSeg, SWT.CHECK);
 		chkTargetSameAsSource.setText("Warn if a target segment is the same as its source (for segments with text)");
@@ -296,7 +309,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		chkCodeDifference.setText("Warn if there is a code difference between source and target segments");
 
 		chkDoubledWord = new Button(grpSeg, SWT.CHECK);
-		chkDoubledWord.setText("Warn on doubled words (e.g. \"This is is an example\")");
+		chkDoubledWord.setText("Warn on doubled words (e.g. \"is is\" in \"This is is an example\")");
 		
 		chkMaxCharLength = new Button(grpSeg, SWT.CHECK);
 		chkMaxCharLength.setText("Warn if a target is longer than the following percentage of the character length of its source:");
@@ -845,6 +858,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		chkLeadingWS.setSelection(params.getLeadingWS());
 		chkTrailingWS.setSelection(params.getTrailingWS());
 		chkEmptyTarget.setSelection(params.getEmptyTarget());
+		chkEmptySource.setSelection(params.getEmptySource());
 		chkTargetSameAsSource.setSelection(params.getTargetSameAsSource());
 		chkTargetSameAsSourceWithCodes.setSelection(params.getTargetSameAsSourceWithCodes());
 		chkCheckWithLT.setSelection(params.getCheckWithLT());
@@ -971,6 +985,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		params.setLeadingWS(chkLeadingWS.getSelection());
 		params.setTrailingWS(chkTrailingWS.getSelection());
 		params.setEmptyTarget(chkEmptyTarget.getSelection());
+		params.setEmptySource(chkEmptySource.getSelection());
 		params.setTargetSameAsSource(chkTargetSameAsSource.getSelection());
 		params.setDoubledWord(chkDoubledWord.getSelection());
 		if ( chkTargetSameAsSourceWithCodes.isEnabled() ) {

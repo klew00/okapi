@@ -45,8 +45,13 @@ text unit being seen as having a single segment):</p>
 This verification is always done. It checks if all source segments have a 
 corresponding target segment. That is a source segment is identified with a 
 segment ID that does not exist in the target text unit.</p>
-<p><cite>Warn if a target segment is empty</cite> -- Set this option to flag the segments for 
+<p><cite>Warn if there is an extra target segment</cite> -- This verification is 
+always done. It checks if all target segments correspond to an existing source 
+segment.</p>
+<p><cite>Warn if a target segment is empty when its source is not empty</cite> -- Set this option to flag the segments for 
 which the translation is empty (if the corresponding source is not empty).</p>
+<p><cite>Warn if a target segment is not empty when its source is empty</cite> -- Set this option to flag the segments for 
+which the target is not empty while its source is empty.</p>
 <p><cite>Warn if a target segment is the same as its source</cite> -- Set this option to flag the 
 segments where the translation is the same as the source. This check is done 
 only if the source segment contain text.</p>

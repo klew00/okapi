@@ -537,17 +537,17 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		cmpTmp.setLayout(layTmp);
 		cmpTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
-		edDocument = new Text(cmpTmp, SWT.BORDER);
-		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.horizontalSpan = 4;
-		edDocument.setLayoutData(gdTmp);
-		edDocument.setEditable(false);
-
 		edMessage = new Text(cmpTmp, SWT.BORDER);
-		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalSpan = 4;
 		edMessage.setLayoutData(gdTmp);
 		edMessage.setEditable(false);
+
+		edDocument = new Text(cmpTmp, SWT.BORDER);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalSpan = 4;
+		edDocument.setLayoutData(gdTmp);
+		edDocument.setEditable(false);
 
 		Composite cmpButtons = new Composite(cmpTmp, SWT.NONE);
 		layTmp = new GridLayout(4, true);
@@ -586,8 +586,8 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		cbTypes = new Combo(cmpTmp, SWT.DROP_DOWN | SWT.READ_ONLY);
 		cbTypes.add("<All types of issues>"); // All types
 		cbTypes.add("Missing target"); // MISSING_TARGETTU
-		cbTypes.add("Missing target segment"); // MISSING_TARGETSEG
-		cbTypes.add("Empty target segment"); // EMPTY_TARGETSEG
+		cbTypes.add("Missing and extra segments"); // All missing and extra segments issues
+		cbTypes.add("Empty segments"); // All empty segment issues
 		cbTypes.add("Target same as source"); // TARGET_SAME_AS_SOURCE
 		cbTypes.add("Missing white spaces"); // All missing whitespace-related issues
 		cbTypes.add("Extra white spaces"); // All extra whitespace-related issues

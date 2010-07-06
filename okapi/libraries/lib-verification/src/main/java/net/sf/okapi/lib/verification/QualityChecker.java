@@ -126,11 +126,12 @@ class QualityChecker {
 		tu.synchronizeSourceSegmentation(trgLoc);
 		ISegments srcSegs = srcCont.getSegments();
 		ISegments trgSegs = trgCont.getSegments();
+		
 		for ( Segment srcSeg : srcSegs ) {
 			Segment trgSeg = trgSegs.get(srcSeg.getId());
 			if ( trgSeg == null ) {
 				reportIssue(IssueType.MISSING_TARGETSEG, tu, srcSeg.getId(),
-					"Missing translation.",
+					"The source segment has no corresponding target segment.",
 					0, -1, 0, -1, Issue.SEVERITY_HIGH, srcSeg.toString(), "");
 				continue; // Cannot go further for that segment
 			}
@@ -139,9 +140,18 @@ class QualityChecker {
 			if ( params.getEmptyTarget() ) {
 				if ( trgSeg.text.isEmpty() && !srcSeg.text.isEmpty() ) {
 					reportIssue(IssueType.EMPTY_TARGETSEG, tu, srcSeg.getId(),
-						"Empty translation.",
+						"The target segment is empty, but its source is not empty.",
 						0, -1, 0, -1, Issue.SEVERITY_HIGH, srcSeg.toString(), "");
 					continue; // No need to check more if it's empty
+				}
+			}
+			// Check for empty source when target is not empty, if requested
+			if ( params.getEmptySource() ) {
+				if ( srcSeg.text.isEmpty() && !trgSeg.text.isEmpty() ) {
+					reportIssue(IssueType.EMPTY_SOURCESEG, tu, srcSeg.getId(),
+						"The target segment is not empty, but its source is empty.",
+						0, -1, 0, -1, Issue.SEVERITY_HIGH, srcSeg.toString(), "");
+					continue; // No need to check more if the source is empty
 				}
 			}
 			
@@ -188,6 +198,17 @@ class QualityChecker {
 		
 		}
 
+		// Check for orphan target segments
+		for ( Segment trgSeg : trgSegs ) {
+			Segment srcSeg = srcSegs.get(trgSeg.getId());
+			if ( srcSeg == null ) {
+				reportIssue(IssueType.EXTRA_TARGETSEG, tu, trgSeg.getId(),
+					String.format("Extra target segment (id=%s).", trgSeg.getId()),
+					0, -1, 0, -1, Issue.SEVERITY_HIGH, "", trgSeg.toString());
+				continue; // Cannot go further for that segment
+			}
+		}
+		
 		String srcOri = null;
 		if ( srcCont.contentIsOneSegment() ) {
 			srcOri = srcCont.toString();

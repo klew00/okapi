@@ -71,6 +71,19 @@ public class QualityCheckerTest {
 	}
 
 	@Test
+	public void testEMPTY_SOURCESEG () {
+		// Create TU with source of non-empty segment
+		// and target of empty segment
+		TextUnit tu = new TextUnit("id", "");
+		tu.setTarget(locFR, new TextContainer("target"));
+		
+		session.processTextUnit(tu);
+		List<Issue> issues = session.getIssues();
+		assertEquals(1, issues.size());
+		assertEquals(IssueType.EMPTY_SOURCESEG, issues.get(0).issueType);
+	}
+
+	@Test
 	public void testMISSING_TARGETSEG () {
 		// Create TU with source of two segments
 		// and target of one segment
@@ -253,8 +266,8 @@ public class QualityCheckerTest {
 
 	@Test
 	public void testNoIssues () {
-		TextUnit tu = new TextUnit("id", "  Text with 123. ");
-		tu.setTarget(locFR, new TextContainer("  Texte avec 123. "));
+		TextUnit tu = new TextUnit("id", "  Text {with} (123). ");
+		tu.setTarget(locFR, new TextContainer("  Texte {avec} (123). "));
 		
 		session.processTextUnit(tu);
 		List<Issue> issues = session.getIssues();

@@ -32,6 +32,7 @@ public class Parameters extends BaseParameters {
 	private static final String LEADINGWS = "leadingWS";
 	private static final String TRAILINGWS = "trailingWS";
 	private static final String EMPTYTARGET = "emptyTarget";
+	private static final String EMPTYSOURCE = "emptySource";
 	private static final String TARGETSAMEASSOURCE = "targetSameAsSource";
 	private static final String TARGETSAMEASSOURCE_WITHCODES = "targetSameAsSourceWithCodes";
 	private static final String CODEDIFFERENCE = "codeDifference";
@@ -63,6 +64,7 @@ public class Parameters extends BaseParameters {
 	boolean leadingWS;
 	boolean trailingWS;
 	boolean emptyTarget;
+	boolean emptySource;
 	boolean targetSameAsSource;
 	boolean targetSameAsSourceWithCodes;
 	boolean codeDifference;
@@ -208,6 +210,14 @@ public class Parameters extends BaseParameters {
 		this.emptyTarget = emptyTarget;
 	}
 
+	public boolean getEmptySource () {
+		return emptySource;
+	}
+
+	public void setEmptySource (boolean emptySource) {
+		this.emptySource = emptySource;
+	}
+
 	public boolean getTargetSameAsSource () {
 		return targetSameAsSource;
 	}
@@ -295,6 +305,7 @@ public class Parameters extends BaseParameters {
 		leadingWS = true;
 		trailingWS = true;
 		emptyTarget = true;
+		emptySource = true;
 		targetSameAsSource = true;
 		targetSameAsSourceWithCodes = true;
 		codeDifference = true;
@@ -353,6 +364,7 @@ public class Parameters extends BaseParameters {
 		leadingWS = buffer.getBoolean(LEADINGWS, leadingWS);
 		trailingWS = buffer.getBoolean(TRAILINGWS, trailingWS);
 		emptyTarget = buffer.getBoolean(EMPTYTARGET, emptyTarget);
+		emptySource = buffer.getBoolean(EMPTYSOURCE, emptySource);
 		targetSameAsSource = buffer.getBoolean(TARGETSAMEASSOURCE, targetSameAsSource);
 		targetSameAsSourceWithCodes = buffer.getBoolean(TARGETSAMEASSOURCE_WITHCODES, targetSameAsSourceWithCodes);
 		codeDifference = buffer.getBoolean(CODEDIFFERENCE, codeDifference);
@@ -395,6 +407,7 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean(LEADINGWS, leadingWS);
 		buffer.setBoolean(TRAILINGWS, trailingWS);
 		buffer.setBoolean(EMPTYTARGET, emptyTarget);
+		buffer.setBoolean(EMPTYSOURCE, emptySource);
 		buffer.setBoolean(TARGETSAMEASSOURCE, targetSameAsSource);
 		buffer.setBoolean(TARGETSAMEASSOURCE_WITHCODES, targetSameAsSourceWithCodes);
 		buffer.setBoolean(CODEDIFFERENCE, codeDifference);

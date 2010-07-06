@@ -112,9 +112,11 @@ class IssuesTableModel {
 					if ( issueType != 1 ) continue;
 					break;
 				case MISSING_TARGETSEG:
+				case EXTRA_TARGETSEG:
 					if ( issueType != 2 ) continue;
 					break;
 				case EMPTY_TARGETSEG:
+				case EMPTY_SOURCESEG:
 					if ( issueType != 3 ) continue;
 					break;
 				case TARGET_SAME_AS_SOURCE:

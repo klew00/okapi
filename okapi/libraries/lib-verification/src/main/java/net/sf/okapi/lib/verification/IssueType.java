@@ -23,9 +23,12 @@ package net.sf.okapi.lib.verification;
 public enum IssueType {
 
 	MISSING_TARGETTU,
+	
 	MISSING_TARGETSEG,
+	EXTRA_TARGETSEG,
 	
 	EMPTY_TARGETSEG,
+	EMPTY_SOURCESEG,
 	
 	MISSING_LEADINGWS,
 	MISSINGORDIFF_LEADINGWS,
