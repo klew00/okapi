@@ -58,8 +58,8 @@ public class Main {
 			// Initialize the editor
 			editor.initialize(shlMain, false, help, fcMapper, null);
 			// start the application
-			if ( args.length > 0 ) editor.showDialog(args[0]);
-			else editor.showDialog(null);
+			if ( args.length > 0 ) editor.showDialog(args[0], true);
+			else editor.showDialog(null, false);
 		}
 		catch ( Throwable e ) {
 			e.printStackTrace();

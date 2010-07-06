@@ -30,10 +30,12 @@ import java.util.regex.Pattern;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 
 class QualityChecker {
@@ -117,7 +119,7 @@ class QualityChecker {
 			// No translation available
 			reportIssue(IssueType.MISSING_TARGETTU, tu, null,
 				"Missing translation.",
-				0, 0, 0, 0, Issue.SEVERITY_HIGH, srcCont.toString(), "");
+				0, -1, 0, -1, Issue.SEVERITY_HIGH, srcCont.toString(), "");
 			return;
 		}
 		
@@ -129,7 +131,7 @@ class QualityChecker {
 			if ( trgSeg == null ) {
 				reportIssue(IssueType.MISSING_TARGETSEG, tu, srcSeg.getId(),
 					"Missing translation.",
-					0, 0, 0, 0, Issue.SEVERITY_HIGH, srcSeg.toString(), "");
+					0, -1, 0, -1, Issue.SEVERITY_HIGH, srcSeg.toString(), "");
 				continue; // Cannot go further for that segment
 			}
 			
@@ -138,7 +140,7 @@ class QualityChecker {
 				if ( trgSeg.text.isEmpty() && !srcSeg.text.isEmpty() ) {
 					reportIssue(IssueType.EMPTY_TARGETSEG, tu, srcSeg.getId(),
 						"Empty translation.",
-						0, 0, 0, 0, Issue.SEVERITY_HIGH, srcSeg.toString(), "");
+						0, -1, 0, -1, Issue.SEVERITY_HIGH, srcSeg.toString(), "");
 					continue; // No need to check more if it's empty
 				}
 			}
@@ -154,7 +156,7 @@ class QualityChecker {
 					if ( srcSeg.text.compareTo(trgSeg.text, params.getTargetSameAsSourceWithCodes()) == 0 ) {
 						reportIssue(IssueType.TARGET_SAME_AS_SOURCE, tu, srcSeg.getId(),
 							"Translation is the same as the source.",
-							0, 0, 0, 0, Issue.SEVERITY_MEDIUM, srcSeg.toString(), trgSeg.toString());
+							0, -1, 0, -1, Issue.SEVERITY_MEDIUM, srcSeg.toString(), trgSeg.toString());
 					}
 				}
 			}
@@ -171,12 +173,15 @@ class QualityChecker {
 			checkSuspectPatterns(srcSeg, trgSeg, tu);
 			
 			// Run a check with LanguageTool connector
-			if ( params.getCheckWithLT() ) {
+			if ( ltConn != null ) {
 				if ( ltConn.checkSegment(currentDocId, trgSeg, tu) > 0 ) {
 					for ( Issue issue : ltConn.getIssues() ) {
 						reportIssue(issue.issueType, tu, issue.segId, issue.message, issue.srcStart, issue.srcEnd,
-							issue.trgStart, issue.trgEnd, Issue.SEVERITY_MEDIUM,
-							srcSeg.toString(), trgSeg.toString());
+							issue.trgStart, issue.trgEnd, issue.severity, srcSeg.toString(), trgSeg.toString());
+						if ( issue.srcEnd == -99 ) {
+							// Special marker indicating a server error
+							ltConn = null; // Do not check it again until next re-processing
+						}
 					}
 				}
 			}
@@ -331,14 +336,14 @@ class QualityChecker {
 						if ( trgOri.charAt(i) != srcOri.charAt(i) ) {
 							reportIssue(IssueType.MISSINGORDIFF_LEADINGWS, tu, null,
 								String.format("Missing or different leading white space at position %d.", i),
-								i, i+1, -1, 0, Issue.SEVERITY_LOW, srcOri, trgOri);
+								i, i+1, 0, -1, Issue.SEVERITY_LOW, srcOri, trgOri);
 							break;
 						}
 					}
 					else {
 						reportIssue(IssueType.MISSING_LEADINGWS, tu, null,
 							String.format("Missing leading white space at position %d.", i),
-							i, i+1, -1, 0, Issue.SEVERITY_LOW, srcOri, trgOri);
+							i, i+1, 0, -1, Issue.SEVERITY_LOW, srcOri, trgOri);
 					}
 				}
 				else break;
@@ -351,14 +356,14 @@ class QualityChecker {
 						if ( srcOri.charAt(i) != trgOri.charAt(i) ) {
 							reportIssue(IssueType.EXTRAORDIFF_LEADINGWS, tu, null,
 								String.format("Extra or different leading white space at position %d.", i),
-								-1, 0, i, i+1, Issue.SEVERITY_LOW, srcOri, trgOri);
+								0, -1, i, i+1, Issue.SEVERITY_LOW, srcOri, trgOri);
 							break;
 						}
 					}
 					else {
 						reportIssue(IssueType.EXTRA_LEADINGWS, tu, null,
 							String.format("Extra leading white space at position %d.", i),
-							-1, 0, i, i+1, Issue.SEVERITY_LOW, srcOri, trgOri);
+							0, -1, i, i+1, Issue.SEVERITY_LOW, srcOri, trgOri);
 					}
 				}
 				else break;
@@ -376,14 +381,14 @@ class QualityChecker {
 						if ( trgOri.charAt(j) != srcOri.charAt(i) ) {
 							reportIssue(IssueType.MISSINGORDIFF_TRAILINGWS, tu, null,
 								String.format("Missing or different trailing white space at position %d", i),
-								i, i+1, -1, 0, Issue.SEVERITY_LOW, srcOri, trgOri);
+								i, i+1, 0, -1, Issue.SEVERITY_LOW, srcOri, trgOri);
 							break;
 						}
 					}
 					else {
 						reportIssue(IssueType.MISSING_TRAILINGWS, tu, null,
 							String.format("Missing trailing white space at position %d.", i),
-							i, i+1, -1, 0, Issue.SEVERITY_LOW, srcOri, trgOri);
+							i, i+1, 0, -1, Issue.SEVERITY_LOW, srcOri, trgOri);
 					}
 				}
 				else break;
@@ -398,14 +403,14 @@ class QualityChecker {
 						if ( srcOri.charAt(j) != trgOri.charAt(i) ) {
 							reportIssue(IssueType.EXTRAORDIFF_TRAILINGWS, tu, null,
 								String.format("Extra or different trailing white space at position %d.", i),
-								-1, 0, i, i+1, Issue.SEVERITY_LOW, srcOri, trgOri);
+								0, -1, i, i+1, Issue.SEVERITY_LOW, srcOri, trgOri);
 							break;
 						}
 					}
 					else {
 						reportIssue(IssueType.EXTRA_TRAILINGWS, tu, null,
 							String.format("Extra white trailing space at position %d.", i),
-							-1, 0, i, i+1, Issue.SEVERITY_LOW, srcOri, trgOri);
+							0, -1, i, i+1, Issue.SEVERITY_LOW, srcOri, trgOri);
 					}
 				}
 				else break;
@@ -451,7 +456,10 @@ class QualityChecker {
 			while ( m.find() ) {
 				reportIssue(IssueType.SUSPECT_PATTERN, tu, srcSeg.getId(),
 					String.format("Double word: \"%s\" found in the target.", m.group()),
-					0, -1, m.start(), m.end(), Issue.SEVERITY_HIGH, 
+					0, -1,
+					fromFragmentToString(trgSeg.text, m.start()),
+					fromFragmentToString(trgSeg.text, m.end()),
+					Issue.SEVERITY_HIGH, 
 					srcSeg.toString(), trgSeg.toString());
 			}
 		}
@@ -505,8 +513,10 @@ class QualityChecker {
 					else {
 						msg = String.format("The source part \"%s\" has no correspondance in the target.", srcPart);
 					}
-					reportIssue(IssueType.UNEXPECTED_PATTERN, tu, srcSeg.getId(),
-						msg, srcM.start(), -1, start, -1, item.severity,
+					reportIssue(IssueType.UNEXPECTED_PATTERN, tu, srcSeg.getId(), msg,
+						fromFragmentToString(srcSeg.text, srcM.start()),
+						fromFragmentToString(srcSeg.text, srcM.end()),
+						0, -1, item.severity,
 						srcSeg.toString(), trgSeg.toString());
 				}
 			}
@@ -538,4 +548,31 @@ class QualityChecker {
 		}
 	}
 
+	/**
+	 * Gets the position in the string representation of a fragment of a given
+	 * position in that fragment. 
+	 * @param frag the fragment where the poistion is located.
+	 * @param pos the position.
+	 * @return the same position, but in the string representation of the fragment.
+	 */
+	private int fromFragmentToString (TextFragment frag,
+		int pos)
+	{
+		int len = 0;
+		String text = frag.getCodedText();
+		for ( int i=0; i<text.length(); i++ ) {
+			if ( i >= pos ) {
+				return len;
+			}
+			if ( TextFragment.isMarker(text.charAt(i)) ) {
+				Code code = frag.getCode(text.charAt(++i));
+				len += code.getData().length();
+				continue;
+			}
+			else {
+				len++;
+			}
+		}
+		return len;
+	}
 }

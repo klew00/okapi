@@ -23,7 +23,7 @@ public class ManualTry {
 	    	BaseHelp help = new BaseHelp("dummyRoot");
 			
 			qce.initialize(shlMain, false, help, fcMapper, null);
-			qce.edit();
+			qce.edit(false);
 		}
 		catch ( Throwable e ) {
 			e.printStackTrace();

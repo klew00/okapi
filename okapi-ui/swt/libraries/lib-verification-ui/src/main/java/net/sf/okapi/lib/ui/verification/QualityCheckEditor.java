@@ -44,6 +44,8 @@ import net.sf.okapi.lib.verification.QualityCheckSession;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.custom.StyleRange;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DropTarget;
 import org.eclipse.swt.dnd.DropTargetAdapter;
@@ -100,8 +102,8 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 	private Table tblIssues;
 	private Text edMessage;
 	private Text edDocument;
-	private Text edSource;
-	private Text edTarget;
+	private StyledText edSource;
+	private StyledText edTarget;
 	private Font displayFont;
 	private IssuesTableModel issuesModel;
 	private StatusBar statusBar;
@@ -125,8 +127,8 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 	}
 	
 	@Override
-	public void edit () {
-		showDialog(null);
+	public void edit (boolean processOnStart) {
+		showDialog(null, processOnStart);
 	}
 	
 	/**
@@ -199,6 +201,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		tblIssues.setFocus();
 	}
 	
+	@Override
 	public void addRawDocument (RawDocument rawDoc) {
 		session.addRawDocument(rawDoc);
 	}
@@ -222,18 +225,28 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 	/**
 	 * Opens the dialog box, loads an QC session if one is specified.
 	 * @param path Optional QC session to load. Use null to load nothing.
+	 * @param processOnStart true to trigger the verification process when the editor is opened.
 	 */
-	public void showDialog (String path) {
+	public void showDialog (String path,
+		boolean processOnStart)
+	{
 		shell.open();
 		if ( path != null ) {
 			String ext = Util.getExtension(path);
 			if ( ext.equalsIgnoreCase(QualityCheckSession.FILE_EXTENSION) ) {
 				loadSession(path);
+				// Loading a session always trigger a re-processing
+				// So don't call it here again
 			}
 			else {
 				addDocumentFromUI(path);
+				if ( processOnStart ) checkAll();
 			}
 		}
+		else {
+			if ( processOnStart ) checkAll();
+		}
+		
 		while ( !shell.isDisposed() ) {
 			if ( !shell.getDisplay().readAndDispatch() )
 				shell.getDisplay().sleep();
@@ -502,11 +515,11 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		sashEdit.setLayoutData(new GridData(GridData.FILL_BOTH));
 		sashEdit.setSashWidth(2);
 		
-		edSource = new Text(sashEdit, SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
+		edSource = new StyledText(sashEdit, SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
 		edSource.setLayoutData(new GridData(GridData.FILL_BOTH));
 		edSource.setEditable(false);
 
-		edTarget = new Text(sashEdit, SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
+		edTarget = new StyledText(sashEdit, SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
 		edTarget.setLayoutData(new GridData(GridData.FILL_BOTH));
 		edTarget.setEditable(false);
 		
@@ -776,12 +789,6 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 			RawDocument rd = new RawDocument(uri, (String)data[2], (LocaleId)data[3], (LocaleId)data[4]);
 			rd.setFilterConfigId((String)data[1]);
 			session.addRawDocument(rd);
-			
-			// If it is the first document: its locales become the default
-			if ( session.getDocumentCount() == 1 ) {
-				session.setSourceLocale((LocaleId)data[3]);
-				session.setTargetLocale((LocaleId)data[4]);
-			}
 			return true;
 		}
 		catch ( Throwable e ) {
@@ -815,15 +822,31 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 				Issue issue = (Issue)tblIssues.getItem(n).getData();
 				edDocument.setText(issue.docId.toString());
 				edMessage.setText(issue.message);
-				String tmp = issue.oriSource;
-				edSource.setText(tmp);
-				tmp = issue.oriTarget;
-				edTarget.setText(tmp);
+				setTexts(issue);
 			}
 			statusBar.setCounter(n, tblIssues.getItemCount(), session.getIssues().size());
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, "Error while updating table.\n"+e.getMessage(), null);
+		}
+	}
+	
+	private void setTexts (Issue issue) {
+		edSource.setText(issue.oriSource);
+		edTarget.setText(issue.oriTarget);
+		if ( issue.srcEnd > 0 ) {
+			StyleRange sr = new StyleRange();
+			sr.background = shell.getDisplay().getSystemColor(SWT.COLOR_YELLOW);
+			sr.start = issue.srcStart;
+			sr.length = issue.srcEnd-issue.srcStart;
+			edSource.setStyleRange(sr);
+		}
+		if ( issue.trgEnd > 0 ) {
+			StyleRange sr = new StyleRange();
+			sr.background = shell.getDisplay().getSystemColor(SWT.COLOR_YELLOW);
+			sr.start = issue.trgStart;
+			sr.length = issue.trgEnd-issue.trgStart;
+			edTarget.setStyleRange(sr);
 		}
 	}
 

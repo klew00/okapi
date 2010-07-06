@@ -40,6 +40,14 @@ target of text units.</p>
 <p>Takes: Filter events or raw documents<br>
 Sends: Filter events or raw documents</p>
 <p>No check is done on the entries set as non-translatable.</p>
+<p><b>With the input as filter events</b>: The events are processed and are sent 
+to the next step. The quality check report is generated at the end of the batch 
+of input files. No interactive UI is provided.</p>
+<p><b>With the input as raw documents</b>: The documents are added to a new 
+quality check session and are sent to the next step. At the end of the batch the 
+session is open in CheckMate, the documents are processed and the user can 
+browse through the issues found, disabled some and generate the report if 
+necessary.</p>
 <h2><a name="parameters"></a>Parameters</h2>
 <p>This step uses the same module as CheckMate and shares the same parameters.</p>
 <p><a href="../lib/ui/verification/parameterseditor.html">See the possible 

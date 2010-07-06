@@ -2213,7 +2213,7 @@ public class MainForm { //implements IParametersProvider {
 				}
 			}
 			// Start the dialog
-			dlg.edit();
+			dlg.edit(true);
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getMessage(), null);

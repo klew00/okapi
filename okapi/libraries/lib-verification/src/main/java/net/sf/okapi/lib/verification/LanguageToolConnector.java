@@ -20,7 +20,6 @@
 
 package net.sf.okapi.lib.verification;
 
-import java.net.ConnectException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
@@ -120,15 +119,14 @@ public class LanguageToolConnector {
 					}
 				}
 				int start = Integer.valueOf(error.getAttribute("fromx"));
-				int end = Integer.valueOf(error.getAttribute("tox"));
+				int end = start+Integer.valueOf(error.getAttribute("errorlength"));
 				issues.add(new Issue(docId, IssueType.LANGUAGETOOL_ERROR, tu.getId(), seg.getId(), msg, 0, 0, start, end, Issue.SEVERITY_MEDIUM));
 			}
 		}
-		catch ( ConnectException e ) {
-			throw new RuntimeException("Connection error with the LanguageTool server.", e);
-		}
 		catch ( Throwable e ) {
-			throw new RuntimeException("Error while verifying a segment with the LanguageTool server.", e);
+			// -99 for srcEnd special marker
+			issues.add(new Issue(docId, IssueType.LANGUAGETOOL_ERROR, tu.getId(), seg.getId(),
+				"ERROR WITH LanguageTool SERVER: All LT checks are skipped from this text unit on.", 0, -99, 0, -1, Issue.SEVERITY_HIGH));
 		}
 		
 		return issues.size();

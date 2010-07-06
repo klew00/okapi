@@ -42,8 +42,11 @@ public interface IQualityCheckEditor {
 		QualityCheckSession session);
 
 	/**
-	 * Adds a raw document to the session.
-	 * @param rawDoc the raw document to add.
+	 * Adds a raw document to the session. If this is the
+	 * first document added to the session, the locales of the session are automatically
+	 * set to the source and target locale of this document.
+	 * @param rawDoc the raw document to add (it must have an input URI and its
+	 * source and target locale set).
 	 */
 	public void addRawDocument (RawDocument rawDoc);
 	
@@ -59,8 +62,9 @@ public interface IQualityCheckEditor {
 	 * Runs an editing session with this IQualityCheckEditor object.
 	 * You must have called {@link #initialize(Object, boolean, IHelp, IFilterConfigurationMapper)}
 	 * once before calling this method.
+	 * @param processOnStart true to trigger the verification process when the editor is opened.
 	 */
-	public void edit ();
+	public void edit (boolean processOnStart);
 
 }
 

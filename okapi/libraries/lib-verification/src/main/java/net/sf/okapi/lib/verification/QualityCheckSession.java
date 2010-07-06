@@ -85,10 +85,22 @@ public class QualityCheckSession {
 	public void setParameters (Parameters params) {
 		this.params = params;
 	}
-	
+
+	/**
+	 * Adds a raw document to the session. If this is the
+	 * first document added to the session, the locales of the session are automatically
+	 * set to the source and target locale of this document.
+	 * @param rawDoc the raw document to add (it must have an input URI and its
+	 * source and target locale set).
+	 */
 	public void addRawDocument (RawDocument rawDoc) {
 		URI uri = rawDoc.getInputURI();
 		rawDocs.put(uri, rawDoc);
+		// If it is the first document: its locales become the default
+		if ( rawDocs.size() == 1 ) {
+			sourceLocale = rawDoc.getSourceLocale();
+			targetLocale = rawDoc.getTargetLocale();
+		}
 		modified = true;
 	}
 	

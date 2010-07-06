@@ -158,7 +158,7 @@ public class QualityCheckStep extends BasePipelineStep {
 	@Override
 	protected Event handleEndBatch (Event event) {
 		if ( RawDocumentMode ) {
-			editor.edit();
+			editor.edit(true);
 			// Make sure next batch will be re-initialized
 			editor = null;
 		}

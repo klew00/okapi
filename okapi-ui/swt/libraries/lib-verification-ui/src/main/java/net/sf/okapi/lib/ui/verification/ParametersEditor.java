@@ -756,6 +756,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 				"Patterns Files (*.txt)\tAll Files (*.*)", "*.txt\t*.*");
 			if ( paths == null ) return;
 			setPatternsData(PatternItem.loadFile(paths[0]));
+			updatePatternsButtons();
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
