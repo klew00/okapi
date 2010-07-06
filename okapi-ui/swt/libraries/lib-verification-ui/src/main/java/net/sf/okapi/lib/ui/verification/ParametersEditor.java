@@ -93,6 +93,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Button chkCodeDifference;
 	private Button chkPatterns;
 	private Button chkDoubledWord;
+	private Button chkCorruptedChars;
 	private Table table;
 	private Button btAdd;
 	private Button btEdit;
@@ -253,6 +254,9 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 				((Button)e.getSource()).setSelection(true);
 			};
 		});
+		
+		chkCorruptedChars = new Button(grpTU, SWT.CHECK);
+		chkCorruptedChars.setText("Warn if some possibly corrupted characters are found in the target entry");
 		
 		chkLeadingWS = new Button(grpTU, SWT.CHECK);
 		chkLeadingWS.setText("Warn if a target entry has a difference in leading white spaces");
@@ -868,6 +872,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		edLTTranslationTarget.setText(params.getLtTranslationTarget());
 		chkPatterns.setSelection(params.getCheckPatterns());
 		chkDoubledWord.setSelection(params.getDoubledWord());
+		chkCorruptedChars.setSelection(params.getCorruptedCharacters());
 		chkMaxCharLength.setSelection(params.getCheckMaxCharLength());
 		spMaxCharLength.setSelection(params.getMaxCharLength());
 		chkMinCharLength.setSelection(params.getCheckMinCharLength());
@@ -988,6 +993,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		params.setEmptySource(chkEmptySource.getSelection());
 		params.setTargetSameAsSource(chkTargetSameAsSource.getSelection());
 		params.setDoubledWord(chkDoubledWord.getSelection());
+		params.setCorruptedCharacters(chkCorruptedChars.getSelection());
 		if ( chkTargetSameAsSourceWithCodes.isEnabled() ) {
 			params.setTargetSameAsSourceWithCodes(chkTargetSameAsSourceWithCodes.getSelection());
 		}

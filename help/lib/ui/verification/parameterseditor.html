@@ -34,6 +34,11 @@ verification is always done. It checks if each entry has a corresponding
 translation. That is there is no entry for the given target language 
 corresponding to the source entry. Empty translations are chcked in the option:
 <cite>Warn if a target segment is empty</cite>.</p>
+<p><cite>Warn if some possibly corrupted characters are found in the target 
+entry</cite> -- Set this option to check for special patterns that often 
+indicate a file with corrupted characters. For example a UTF-8 file opens as 
+ISO-8859-1, etc. This feature does not found all possible cases of corrupted 
+characters, only some of the frequent ones.</p>
 <p><cite>Warn if a target entry has a difference in leading white spaces</cite> -- Set this option&nbsp; to flag the text 
 units where the leading white spaces are different between source and target.</p>
 <p><cite>Warn if a target entry has a difference in trailing white spaces</cite> -- Set this option to flag the text units 

@@ -58,6 +58,7 @@ public class Parameters extends BaseParameters {
 	private static final String CHECKCHARACTERS = "checkCharacters";
 	private static final String CHARSET = "charset";
 	private static final String EXTRACHARSALLOWED = "extraCharsAllowed";
+	private static final String CORRUPTEDCHARACTERS = "corruptedCharacters";
 
 	String outputPath;
 	boolean autoOpen;
@@ -85,11 +86,20 @@ public class Parameters extends BaseParameters {
 	boolean checkCharacters;
 	String charset;
 	String extraCharsAllowed;
+	boolean corruptedCharacters;
 
 	public Parameters () {
 		reset();
 	}
 	
+	public boolean getCorruptedCharacters () {
+		return corruptedCharacters;
+	}
+
+	public void setCorruptedCharacters (boolean corruptedCharacters) {
+		this.corruptedCharacters = corruptedCharacters;
+	}
+
 	public boolean getCheckCharacters () {
 		return checkCharacters;
 	}
@@ -318,6 +328,7 @@ public class Parameters extends BaseParameters {
 		saveSession = true;
 		sessionPath = "${rootDir}/qa-session"+QualityCheckSession.FILE_EXTENSION;
 		doubledWord = true;
+		corruptedCharacters = true;
 		
 		checkMaxCharLength = true;
 		maxCharLength = 190;
@@ -376,6 +387,7 @@ public class Parameters extends BaseParameters {
 		saveSession = buffer.getBoolean(SAVESESSION, saveSession);
 		sessionPath = buffer.getString(SESSIONPATH, sessionPath);
 		doubledWord = buffer.getBoolean(DOUBLEDWORD, doubledWord);
+		corruptedCharacters = buffer.getBoolean(CORRUPTEDCHARACTERS, corruptedCharacters);
 		// Length
 		checkMaxCharLength = buffer.getBoolean(CHECKMAXCHARLENGTH, checkMaxCharLength);
 		maxCharLength = buffer.getInteger(MAXCHARLENGTH, maxCharLength);
@@ -419,6 +431,7 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean(SAVESESSION, saveSession);
 		buffer.setString(SESSIONPATH, sessionPath);
 		buffer.setBoolean(DOUBLEDWORD, doubledWord);
+		buffer.setBoolean(CORRUPTEDCHARACTERS, corruptedCharacters);
 		// Length
 		buffer.setBoolean(CHECKMAXCHARLENGTH, checkMaxCharLength);
 		buffer.setInteger(MAXCHARLENGTH, maxCharLength);

@@ -50,6 +50,7 @@ class QualityChecker {
 	private Pattern patDoubledWords;
 	private CharsetEncoder encoder;
 	private Pattern extraCharsAllowed;
+	private Pattern corruption;
 
 	void startProcess (LocaleId targetLocale,
 		Parameters params,
@@ -80,6 +81,15 @@ class QualityChecker {
 		if ( params.getDoubledWord() ) {
 			patDoubledWords = Pattern.compile("\\b([\\p{Ll}\\p{Lu}\\p{Lt}\\p{Lo}\\p{Nd}]+)[\\t\\n\\f\\r\\p{Z}]+\\1\\b",
 				Pattern.CASE_INSENSITIVE);
+		}
+		corruption = null;
+		if ( params.getCorruptedCharacters() ) {
+			// Some of the most frequent patterns of corrupted characters
+			corruption = Pattern.compile("\\u00C3\\u00A4"
+				+ "|\\u00C3\\u00B6"
+				+ "|\\u00C3\\u00A9"
+				+ "|\\u00C3\\u00A1"
+			);
 		}
 		
 		// Character check
@@ -225,6 +235,10 @@ class QualityChecker {
 			trgOri = trgCont.getUnSegmentedContentCopy().toString();
 		}
 
+		if ( params.getCorruptedCharacters() ) {
+			checkCorruptedCharacters(srcOri, trgOri, tu);
+		}
+		
 		checkWhiteSpaces(srcOri, trgOri, tu);
 		
 		if ( params.getCheckCharacters() ) {
@@ -341,6 +355,18 @@ class QualityChecker {
 //				}
 //			}
 //		}
+	}
+	
+	private void checkCorruptedCharacters (String srcOri,
+		String trgOri,
+		TextUnit tu)
+	{
+		Matcher m = corruption.matcher(trgOri);
+		if ( m.find() ) { // Getting one match is enough
+			reportIssue(IssueType.SUSPECT_PATTERN, tu, null,
+				String.format("Possible corrupted characters in the target (for example: \"%s\").", m.group()),
+				0, -1, m.start(), m.end(), Issue.SEVERITY_HIGH, srcOri, trgOri);
+		}
 	}
 	
 	private void checkWhiteSpaces (String srcOri,
