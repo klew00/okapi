@@ -340,7 +340,9 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		// order of execution matters
 
 		// create EventBuilder with document name as rootId
-		String rid = (rootId == null) ? getDocumentName() : rootId;
+		//YS: change to allow use of no root: String rid = (rootId == null) ? getDocumentName() : rootId;
+		String rid = rootId;
+		
 		if (eventBuilder == null) {
 			eventBuilder = new AbstractMarkupEventBuilder(rid);
 			eventBuilder.setMimeType(getMimeType());

@@ -85,10 +85,10 @@ class QualityChecker {
 		corruption = null;
 		if ( params.getCorruptedCharacters() ) {
 			// Some of the most frequent patterns of corrupted characters
-			corruption = Pattern.compile("\\u00C3\\u00A4"
-				+ "|\\u00C3\\u00B6"
-				+ "|\\u00C3\\u00A9"
-				+ "|\\u00C3\\u00A1"
+			corruption = Pattern.compile("\\u00C3[\\u00A4-\\u00B6]"
+				+ "|\\u00C3\\u201E"
+				+ "|\\u00C3\\u2026"
+				+ "|\\u00C3\\u2013"
 			);
 		}
 		
@@ -618,9 +618,13 @@ class QualityChecker {
 	 * @param pos the position.
 	 * @return the same position, but in the string representation of the fragment.
 	 */
-	private int fromFragmentToString (TextFragment frag,
+	public static int fromFragmentToString (TextFragment frag,
 		int pos)
 	{
+		// No codes means no correction
+		if ( !frag.hasCode() ) return pos;
+
+		// Else: correct the position
 		int len = 0;
 		String text = frag.getCodedText();
 		for ( int i=0; i<text.length(); i++ ) {

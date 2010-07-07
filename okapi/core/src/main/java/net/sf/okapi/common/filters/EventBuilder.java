@@ -80,6 +80,13 @@ public class EventBuilder {
 	/**
 	 * Instantiates a new EventBuilder.
 	 */
+	public EventBuilder () {
+		reset(null);
+	}
+
+	/**
+	 * Instantiates a new EventBuilder with a root ID.
+	 */
 	public EventBuilder(String rootId) {
 		reset(rootId);
 	}
@@ -332,9 +339,10 @@ public class EventBuilder {
 	public void reset(String rootId) {
 		this.rootId = rootId;
 		
-		if (rootId == null) {
-			rootId = IdGenerator.DEFAULT_ROOT_ID;			
-		}
+//Allow null/empty root
+//		if (rootId == null) {
+//			rootId = IdGenerator.DEFAULT_ROOT_ID;			
+//		}
 		
 		startGroupId = new IdGenerator(rootId, IdGenerator.START_GROUP);
 		endGroupId = new IdGenerator(rootId, IdGenerator.END_GROUP);

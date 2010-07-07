@@ -53,7 +53,7 @@ public class IdGenerator {
 	/**
 	 * Creates a generator with a given root and a given prefix.
 	 * @param root
-	 * 	the root to use (case-sensitive and cannot be null or empty)
+	 * 	the root to use (case-sensitive, can be null or empty)
 	 * @param prefix
 	 * 	the prefix to use (case-sensitive)
 	 */
@@ -77,7 +77,13 @@ public class IdGenerator {
 	 *  the new identifier.
 	 */
 	public String createId () {
-		return rootId + "-" + prefix + Long.toString(++seq);
+		if ( rootId == null ) {
+			return prefix + Long.toString(++seq);
+		}
+		else {
+			return rootId + "-" + prefix + Long.toString(++seq);
+		}
+		
 	}
 	
 	/**
@@ -93,12 +99,17 @@ public class IdGenerator {
 		if ( seq <= 0 ) {
 			throw new RuntimeException("The method createId() has not been called yet.");
 		}
-		return rootId + "-" + prefix + Long.toString(seq);
+		if ( rootId == null ) {
+			return prefix + Long.toString(seq);
+		}
+		else {
+			return rootId + "-" + prefix + Long.toString(seq);
+		}
 	}
 
 	/**
 	 * Gets the id generated from the root string given when creating this object.
-	 * @return the if of the root for this object.
+	 * @return the id of the root for this object (can be null)
 	 */
 	public String getRootId () {
 		return rootId;
@@ -123,9 +134,9 @@ public class IdGenerator {
 	/**
 	 * Reset the {@link IdGenerator} with a new root id. 
 	 * Use the same prefix and set the sequence count to 0.
-	 * @param rootId new root id
+	 * @param rootId new root id (can be null or empty)
 	 */
-	public void reset(String rootId) {
+	public void reset (String rootId) {
 		seq = 0;
 		create(rootId, prefix);
 	}
@@ -135,13 +146,17 @@ public class IdGenerator {
 	{
 		// Set the root part
 		if ( Util.isEmpty(root) ) {
-			throw new InvalidParameterException("The root argument must not be null or empty.");
+			// Use null for empty or null
+			rootId = null;
 		}
-		// makeId() uses the String.hashCode which should be reproducible across VM and sessions
-		this.rootId = Util.makeId(root);
+		else {
+			// makeId() uses the String.hashCode which should be reproducible across VM and sessions
+			rootId = Util.makeId(root);
+		}
 	
 		// Set the prefix part (empty is OK)
 		if ( prefix == null ) this.prefix = "";
 		else this.prefix = prefix;
 	}
+
 }

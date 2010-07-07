@@ -120,7 +120,10 @@ public class LanguageToolConnector {
 				}
 				int start = Integer.valueOf(error.getAttribute("fromx"));
 				int end = start+Integer.valueOf(error.getAttribute("errorlength"));
-				issues.add(new Issue(docId, IssueType.LANGUAGETOOL_ERROR, tu.getId(), seg.getId(), msg, 0, 0, start, end, Issue.SEVERITY_MEDIUM));
+				issues.add(new Issue(docId, IssueType.LANGUAGETOOL_ERROR, tu.getId(), seg.getId(), msg, 0, 0,
+					QualityChecker.fromFragmentToString(seg.text, start),
+					QualityChecker.fromFragmentToString(seg.text, end),
+					Issue.SEVERITY_MEDIUM));
 			}
 		}
 		catch ( Throwable e ) {

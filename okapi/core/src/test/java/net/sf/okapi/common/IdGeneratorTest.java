@@ -24,14 +24,18 @@ public class IdGeneratorTest {
 		assertTrue(idGen.createId().length()>0);
 	}
 
-	@Test (expected=InvalidParameterException.class)
+	@Test
 	public void testCreationWithNullRoot () {
 		idGen = new IdGenerator(null);
+		assertEquals("1", idGen.createId());
+		assertEquals("1", idGen.getLastId());
 	}
 	
-	@Test (expected=InvalidParameterException.class)
+	@Test
 	public void testCreationWithEmptyRoot () {
 		idGen = new IdGenerator("");
+		assertEquals("1", idGen.createId());
+		assertEquals("1", idGen.getLastId());
 	}
 	
 	@Test

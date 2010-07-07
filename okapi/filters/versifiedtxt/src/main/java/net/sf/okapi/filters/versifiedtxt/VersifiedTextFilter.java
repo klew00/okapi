@@ -136,9 +136,9 @@ public class VersifiedTextFilter extends AbstractFilter {
 
 		// create EventBuilder with document name as rootId
 		if (eventBuilder == null) {
-			eventBuilder = new EventBuilder(getDocumentName());
+			eventBuilder = new EventBuilder();
 		} else {
-			eventBuilder.reset(getDocumentName());
+			eventBuilder.reset(null);
 		}
 		
 		eventBuilder.addFilterEvent(createStartDocumentEvent());
