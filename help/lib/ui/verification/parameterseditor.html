@@ -34,11 +34,6 @@ verification is always done. It checks if each entry has a corresponding
 translation. That is there is no entry for the given target language 
 corresponding to the source entry. Empty translations are chcked in the option:
 <cite>Warn if a target segment is empty</cite>.</p>
-<p><cite>Warn if some possibly corrupted characters are found in the target 
-entry</cite> -- Set this option to check for special patterns that often 
-indicate a file with corrupted characters. For example a UTF-8 file opens as 
-ISO-8859-1, etc. This feature does not found all possible cases of corrupted 
-characters, only some of the frequent ones.</p>
 <p><cite>Warn if a target entry has a difference in leading white spaces</cite> -- Set this option&nbsp; to flag the text 
 units where the leading white spaces are different between source and target.</p>
 <p><cite>Warn if a target entry has a difference in trailing white spaces</cite> -- Set this option to flag the text units 
@@ -118,6 +113,24 @@ selected downward in the table.</p>
 table.</p>
 <p><cite>Export</cite> -- Click this button to export the patterns in the table 
 to a tab-delimited file.</p>
+<h3>Characters Tab</h3>
+<p><cite>Warn if some possibly corrupted characters are found in the target 
+entry</cite> -- Set this option to check for special patterns that often 
+indicate a file with corrupted characters. For example a UTF-8 file opens as 
+ISO-8859-1, etc. This feature does not found all possible cases of corrupted 
+characters, only some of the frequent ones.</p>
+<p><cite>Warn if a character is not included in the following character set 
+encoding</cite> -- Set this option to check the characters of the text against a 
+given character set encoding. Enter the name of a valid character set encoding, 
+such as ISO-8859-1. You can also leave this field empty to use only the given 
+list of characters provided in the field below this one.</p>
+<p><cite>Allow the characters matching the following regular expression</cite> 
+-- Optionally enter a regular expression that matches a list of allowed 
+characters. The characters specified here will be allowed even if they are part 
+of the character set encoding specified above. Leave this field empty to not use 
+any regular expression.</p>
+<p>You can enter: only a character set encoding, or only a regular expression, 
+or both.</p>
 <h3>LanguageTool Tab</h3>
 <p><cite>Perform the verifications provided by the LanguageTool server</cite> 
 -- Set this option to run the verifications provided by a LanguageTool server. 

@@ -40,7 +40,7 @@ class Condition {
 	@Override
 	public String toString () {
 		StringBuilder tmp = new StringBuilder();
-		tmp.append(String.format("'%s', %s, ", part1, operator));
+		tmp.append(String.format("['%s', %s, ", part1, operator));
 		if ( part2.indexOf(',') != -1 ) {
 			java.util.List<String> list = ListUtil.stringAsList(part2);
 			tmp.append("[");
@@ -53,6 +53,7 @@ class Condition {
 		else {
 			tmp.append(quotedValue(part2));
 		}
+		tmp.append("]");
 		return tmp.toString();
 	}
 	

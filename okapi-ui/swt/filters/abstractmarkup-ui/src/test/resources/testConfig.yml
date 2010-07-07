@@ -31,6 +31,10 @@ attributes:
     conditions: [translate, EQUALS, ['yes', indeed, absolutely, 'joe''s value']]
 
 elements:
+  test-element:
+    ruleTypes: [EXCLUDE]
+    conditions: [[translate, EQUALS, no], ['its:translate', EQUALS, 'no']]
+
   # translatable attributes
   othermeta:
     ruleTypes: [ATTRIBUTES_ONLY]
@@ -80,7 +84,7 @@ elements:
   stylesheet:
     ruleTypes: [EXCLUDE]
   
-  coords::
+  coords:
     ruleTypes: [EXCLUDE]
     
   draft-comment:

@@ -65,8 +65,6 @@ import org.eclipse.swt.widgets.Text;
 @EditorFor(Parameters.class)
 public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParametersEditor {
 
-	//private static final int TAB_GENERAL = 0;
-	//private static final int TAB_PATTERN = 1;
 	private static final int TAB_CHARACTERS = 2;
 	private static final int TAB_LANGUAGETOOL = 3;
 	private static final int TAB_OUTPUT = 4;
@@ -254,9 +252,6 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 				((Button)e.getSource()).setSelection(true);
 			};
 		});
-		
-		chkCorruptedChars = new Button(grpTU, SWT.CHECK);
-		chkCorruptedChars.setText("Warn if some possibly corrupted characters are found in the target entry");
 		
 		chkLeadingWS = new Button(grpTU, SWT.CHECK);
 		chkLeadingWS.setText("Warn if a target entry has a difference in leading white spaces");
@@ -470,6 +465,9 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		cmpTmp.setLayout(new GridLayout());
 		cmpTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
+		chkCorruptedChars = new Button(cmpTmp, SWT.CHECK);
+		chkCorruptedChars.setText("Warn if some possibly corrupted characters are found in the target entry");
+		
 		chkCheckCharacters = new Button(cmpTmp, SWT.CHECK);
 		chkCheckCharacters.setText("Warn if a character is not included in the following character set encoding:");
 		chkCheckCharacters.addSelectionListener(new SelectionAdapter() {
@@ -478,13 +476,19 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			};
 		});
 		
-		edCharset = new Text(cmpTmp, SWT.BORDER);
+		Composite cmpChars = new Composite(cmpTmp, SWT.BORDER);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalIndent = 8;
+		cmpChars.setLayoutData(gdTmp);
+		cmpChars.setLayout(new GridLayout());
+		
+		edCharset = new Text(cmpChars, SWT.NONE);
 		edCharset.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
-		stExtraCharsAllowed = new Label(cmpTmp, SWT.NONE);
+		stExtraCharsAllowed = new Label(cmpChars, SWT.NONE);
 		stExtraCharsAllowed.setText("Allow the characters matching the following regular expression pattern:");
 		
-		edExtraCharsAllowed = new Text(cmpTmp, SWT.BORDER);
+		edExtraCharsAllowed = new Text(cmpChars, SWT.BORDER);
 		edExtraCharsAllowed.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		tiTmp = new TabItem(tabs, SWT.NONE);
@@ -524,25 +528,21 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			};
 		});
 		
-		Composite grpTmp = new Composite(cmpTmp, SWT.NONE);
-		grpTmp.setLayout(new GridLayout(2, false));
+		Composite cmpLTTrans = new Composite(cmpTmp, SWT.NONE);
+		cmpLTTrans.setLayout(new GridLayout(2, false));
 		
-		label = new Label(grpTmp, SWT.NONE);
+		label = new Label(cmpLTTrans, SWT.NONE);
 		label.setText("From:");
-		gdTmp = new GridData();
-		label.setLayoutData(gdTmp);
 		
-		edLTTranslationSource = new Text(grpTmp, SWT.BORDER);
+		edLTTranslationSource = new Text(cmpLTTrans, SWT.BORDER);
 		gdTmp = new GridData();
 		gdTmp.widthHint = 80;
 		edLTTranslationSource.setLayoutData(gdTmp);
 		
-		label = new Label(grpTmp, SWT.NONE);
+		label = new Label(cmpLTTrans, SWT.NONE);
 		label.setText("Into:");
-		gdTmp = new GridData();
-		label.setLayoutData(gdTmp);
 
-		edLTTranslationTarget = new Text(grpTmp, SWT.BORDER);
+		edLTTranslationTarget = new Text(cmpLTTrans, SWT.BORDER);
 		gdTmp = new GridData();
 		gdTmp.widthHint = 80;
 		edLTTranslationTarget.setLayoutData(gdTmp);

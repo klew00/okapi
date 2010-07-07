@@ -143,7 +143,7 @@ class SessionSettingsDialog {
 		if ( n < 0 ) return;
 		lbDocs.remove(n);
 		if ( n >= lbDocs.getItemCount() ) n = lbDocs.getItemCount()-1;
-		lbDocs.select(n);
+		lbDocs.setSelection(n);
 		updateFileButtons();
 	}
 	
@@ -165,7 +165,7 @@ class SessionSettingsDialog {
 			rd.setFilterConfigId((String)data[1]);
 			// Add to list
 			lbDocs.add(formatDocument(rd));
-			lbDocs.select(lbDocs.getItemCount()-1);
+			lbDocs.setSelection(lbDocs.getItemCount()-1);
 			
 			// If it is the first document: its locales become the default
 			if ( lbDocs.getItemCount() == 1 ) {

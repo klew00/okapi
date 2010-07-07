@@ -71,6 +71,16 @@ public class Editor implements IParametersEditor {
 	private static final int ATTRULES_ID = 3;
 	private static final int ATTRULES_PRESERVE_WHITESPACE = 4;
 	
+	private static final int ELEMENTS_TEXTUNIT = 0;
+	private static final int ELEMENTS_EXCLUDED = 1;
+	private static final int ELEMENTS_INCLUDED = 2;
+	private static final int ELEMENTS_INLINE = 3;
+	private static final int ELEMENTS_ATTRIBUTESONLY = 4;
+	private static final int ELEMENTS_GROUP = 5;
+	private static final int ELEMENTS_SCRIPT = 6;
+	private static final int ELEMENTS_SERVER = 7;
+	
+	private static final int TAB_ELEMENTS = 0;
 	private static final int TAB_ATTRIBUTES = 1;
 	
 	private IFilterConfigurationMapper fcMapper;
@@ -90,6 +100,7 @@ public class Editor implements IParametersEditor {
 	private Element currentElem;
 	private Attribute currentAtt;
 	private Button btRemoveAtt;
+	private Button btRemoveElem;
 	private Group grpWS;
 	private Group grpAttCond;
 	private Text edAttConditions;
@@ -98,11 +109,18 @@ public class Editor implements IParametersEditor {
 	private Button chkUseCodeFinder;
 	private InlineCodeFinderPanel pnlCodeFinder;
 	private List lbElem;
+	private Table tblElemRules;
 	private Group grpElemContentFilter;
 	private Text edElemFilterConfig;
 	private Button btGetElemFilterConfig;
 	private Group grpElemCond;
 	private Text edElemConditions;
+	private Label stElemTransAtt;
+	private Text edElemTransAtt;
+	private Label stElemWriteableAtt;
+	private Text edElemWriteableAtt;
+	private Label stElemReadOnlyAtt;
+	private Text edElemReadOnlyAtt;
 
 	@Override
 	public boolean edit (IParameters options,
@@ -157,12 +175,53 @@ public class Editor implements IParametersEditor {
 		
 		lbElem = new List(cmpTmp, SWT.BORDER | SWT.V_SCROLL);
 		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.verticalSpan = 2;
+		gdTmp.verticalSpan = 9;
 		lbElem.setLayoutData(gdTmp);
 		lbElem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				updateElement();
 			};
+		});
+		
+		Label label = new Label(cmpTmp, SWT.NONE);
+		label.setText("Rules for the selected element:");
+		
+		tblElemRules = new Table(cmpTmp, SWT.BORDER | SWT.CHECK | SWT.FULL_SELECTION);
+		tblElemRules.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING | GridData.FILL_HORIZONTAL));
+		TableColumn col1 = new TableColumn(tblElemRules, SWT.NONE);
+		TableColumn col2 = new TableColumn(tblElemRules, SWT.NONE);
+		TableItem item = new TableItem(tblElemRules, SWT.NONE);
+		item.setData(ELEMENTS_TEXTUNIT);
+		item.setText(0, "Translatable Text unit"); item.setText(1, RULE_TYPE.TEXT_UNIT_ELEMENT.toString());
+		item = new TableItem(tblElemRules, SWT.NONE);
+		item.setData(ELEMENTS_EXCLUDED);
+		item.setText(0, "Not translatable"); item.setText(1, RULE_TYPE.EXCLUDED_ELEMENT.toString());
+		item = new TableItem(tblElemRules, SWT.NONE);
+		item.setData(ELEMENTS_INCLUDED);
+		item.setText(0, "Translatable (inside non-translatable)"); item.setText(1, RULE_TYPE.INCLUDED_ELEMENT.toString());
+		item = new TableItem(tblElemRules, SWT.NONE);
+		item.setData(ELEMENTS_INLINE);
+		item.setText(0, "In-line (internal tag)"); item.setText(1, RULE_TYPE.INLINE_ELEMENT.toString());
+		item = new TableItem(tblElemRules, SWT.NONE);
+		item.setData(ELEMENTS_ATTRIBUTESONLY);
+		item.setText(0, "Some attributes need processing"); item.setText(1, RULE_TYPE.ATTRIBUTES_ONLY.toString());
+		item = new TableItem(tblElemRules, SWT.NONE);
+		item.setData(ELEMENTS_GROUP);
+		item.setText(0, "Group"); item.setText(1, RULE_TYPE.GROUP_ELEMENT.toString());
+		item = new TableItem(tblElemRules, SWT.NONE);
+		item.setData(ELEMENTS_SCRIPT);
+		item.setText(0, "Script"); item.setText(1, RULE_TYPE.SCRIPT_ELEMENT.toString());
+		item = new TableItem(tblElemRules, SWT.NONE);
+		item.setData(ELEMENTS_SERVER);
+		item.setText(0, "Server-side"); item.setText(1, RULE_TYPE.SERVER_ELEMENT.toString());
+		col1.pack();
+		col2.pack();
+		tblElemRules.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				if ( event.detail == SWT.CHECK ) {
+					updateElementRules((TableItem)event.item);
+				}
+            }
 		});
 		
 		//--- Element content filter group 
@@ -183,13 +242,13 @@ public class Editor implements IParametersEditor {
 			};
 		});
 
-		//--- Attribute conditions group
+		//--- Element conditions group
 		
 		grpElemCond = new Group(cmpTmp, SWT.NONE);
 		grpElemCond.setLayout(new GridLayout(3, false));
 		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING | GridData.FILL_HORIZONTAL);
 		grpElemCond.setLayoutData(gdTmp);
-		grpElemCond.setText("Conditions");
+		grpElemCond.setText("Conditions:");
 		
 		edElemConditions = new Text(grpElemCond, SWT.BORDER);
 		edElemConditions.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -207,6 +266,46 @@ public class Editor implements IParametersEditor {
             }
 		});
 
+		stElemTransAtt = new Label(cmpTmp, SWT.NONE);
+		stElemTransAtt.setText("Translatable attributes:");
+
+		edElemTransAtt = new Text(cmpTmp, SWT.BORDER);
+		edElemTransAtt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		
+		stElemWriteableAtt = new Label(cmpTmp, SWT.NONE);
+		stElemWriteableAtt.setText("Attributes that are modifiable properties:");
+
+		edElemWriteableAtt = new Text(cmpTmp, SWT.BORDER);
+		edElemWriteableAtt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		
+		stElemReadOnlyAtt = new Label(cmpTmp, SWT.NONE);
+		stElemReadOnlyAtt.setText("Attributes that are read-only properties");
+		// edit field if after add/remove buttons
+		
+		//--- Add/Remove buttons for the list of elements
+		
+		Composite cmpButtons = new Composite(cmpTmp, SWT.NONE);
+		GridLayout layout = new GridLayout(2, false);
+		layout.marginHeight = layout.marginWidth = 0;
+		cmpButtons.setLayout(layout);
+		cmpButtons.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_END));
+		
+		Button btAdd = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Add...", UIUtil.BUTTON_DEFAULT_WIDTH, 1);
+		btAdd.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				//addElement();
+            }
+		});
+		
+		btRemoveElem = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Remove", UIUtil.BUTTON_DEFAULT_WIDTH, 1);
+		btRemoveElem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				//removeElement();
+            }
+		});
+		
+		edElemReadOnlyAtt = new Text(cmpTmp, SWT.BORDER);
+		edElemReadOnlyAtt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
 		TabItem tiTmp = new TabItem(tabs, SWT.NONE);
 		tiTmp.setText("Elements");
@@ -229,14 +328,14 @@ public class Editor implements IParametersEditor {
 			};
 		});
 
-		Label label = new Label(cmpTmp, SWT.NONE);
+		label = new Label(cmpTmp, SWT.NONE);
 		label.setText("Rules for the selected attribute:");
 		
 		tblAttRules = new Table(cmpTmp, SWT.BORDER | SWT.CHECK | SWT.FULL_SELECTION);
-		tblAttRules.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
-		TableColumn col1 = new TableColumn(tblAttRules, SWT.NONE);
-		TableColumn col2 = new TableColumn(tblAttRules, SWT.NONE);
-		TableItem item = new TableItem(tblAttRules, SWT.NONE);
+		tblAttRules.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING | GridData.FILL_HORIZONTAL));
+		col1 = new TableColumn(tblAttRules, SWT.NONE);
+		col2 = new TableColumn(tblAttRules, SWT.NONE);
+		item = new TableItem(tblAttRules, SWT.NONE);
 		item.setData(ATTRULES_TRANS);
 		item.setText(0, "Translatable text"); item.setText(1, RULE_TYPE.ATTRIBUTE_TRANS.toString());
 		item = new TableItem(tblAttRules, SWT.NONE);
@@ -369,13 +468,13 @@ public class Editor implements IParametersEditor {
 		
 		//--- Add/Remove buttons for the list of attributes
 		
-		Composite cmpButtons = new Composite(cmpTmp, SWT.NONE);
-		GridLayout layout = new GridLayout(2, false);
+		cmpButtons = new Composite(cmpTmp, SWT.NONE);
+		layout = new GridLayout(2, false);
 		layout.marginHeight = layout.marginWidth = 0;
 		cmpButtons.setLayout(layout);
 		cmpButtons.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_END));
 		
-		Button btAdd = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Add...", UIUtil.BUTTON_DEFAULT_WIDTH, 1);
+		btAdd = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Add...", UIUtil.BUTTON_DEFAULT_WIDTH, 1);
 		btAdd.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				addAttribute();
@@ -516,7 +615,7 @@ public class Editor implements IParametersEditor {
 			att.name = name;
 			lbAtt.add(name);
 			lbAtt.setData(name, att);
-			lbAtt.select(lbAtt.getItemCount()-1);
+			lbAtt.setSelection(lbAtt.getItemCount()-1);
 			updateAttributesButtons();
 			updateAttribute();
 		}
@@ -531,6 +630,21 @@ public class Editor implements IParametersEditor {
 
 	private void updateAttributesButtons () {
 		btRemoveAtt.setEnabled(lbAtt.getItemCount()>0);
+	}
+	
+	// Actions to do when a rule type is being checked or un-checked
+	private void updateElementRules (TableItem item) {
+		// Other cases are affected only when checking the option
+		if ( item.getChecked() ) {
+			switch ( (Integer)item.getData() ) {
+			case ELEMENTS_EXCLUDED:
+				tblElemRules.getItem(ELEMENTS_INCLUDED).setChecked(false);
+				break;
+			case ELEMENTS_INCLUDED:
+				tblElemRules.getItem(ELEMENTS_EXCLUDED).setChecked(false);
+				break;
+			}
+		}
 	}
 	
 	// Actions to do when a rule type is being checked or un-checked
@@ -574,7 +688,16 @@ public class Editor implements IParametersEditor {
 	private boolean saveElement () {
 		if ( currentElem == null ) return true;
 		currentElem.rules.clear();
+		if ( tblElemRules.getItem(ELEMENTS_TEXTUNIT).getChecked() ) currentElem.rules.add(RULE_TYPE.TEXT_UNIT_ELEMENT);
+		if ( tblElemRules.getItem(ELEMENTS_EXCLUDED).getChecked() ) currentElem.rules.add(RULE_TYPE.EXCLUDED_ELEMENT);
+		if ( tblElemRules.getItem(ELEMENTS_INCLUDED).getChecked() ) currentElem.rules.add(RULE_TYPE.INCLUDED_ELEMENT);
+		if ( tblElemRules.getItem(ELEMENTS_INLINE).getChecked() ) currentElem.rules.add(RULE_TYPE.INLINE_ELEMENT);
+		if ( tblElemRules.getItem(ELEMENTS_ATTRIBUTESONLY).getChecked() ) currentElem.rules.add(RULE_TYPE.ATTRIBUTES_ONLY);
+		if ( tblElemRules.getItem(ELEMENTS_GROUP).getChecked() ) currentElem.rules.add(RULE_TYPE.GROUP_ELEMENT);
+		if ( tblElemRules.getItem(ELEMENTS_SCRIPT).getChecked() ) currentElem.rules.add(RULE_TYPE.SCRIPT_ELEMENT);
+		if ( tblElemRules.getItem(ELEMENTS_SERVER).getChecked() ) currentElem.rules.add(RULE_TYPE.SERVER_ELEMENT);
 		currentElem.subFilter = edElemFilterConfig.getText().trim();
+		// Conditions are saved when editing
 		return true;
 	}
 	
@@ -591,6 +714,7 @@ public class Editor implements IParametersEditor {
 		else if ( rdAttOnlyThese.getSelection() ) currentAtt.scope = Attribute.SCOPE_ONLY;
 		else currentAtt.scope = Attribute.SCOPE_ALL;
 		currentAtt.scopeElements = edAttScopeElements.getText().trim();
+		// Conditions are saved when editing
 		return true;
 	}
 	
@@ -600,12 +724,23 @@ public class Editor implements IParametersEditor {
 		}
 		int n = lbElem.getSelectionIndex();
 		if ( n < 0 ) {
+			for ( TableItem item : tblElemRules.getItems() ) {
+				item.setChecked(false);
+			}
 			edElemConditions.setText("");
 			edElemFilterConfig.setText("");
 			currentElem = null;
 		}
 		else {
 			Element elem = (Element)lbElem.getData(lbElem.getItem(n));
+			tblElemRules.getItem(ELEMENTS_TEXTUNIT).setChecked(elem.rules.contains(RULE_TYPE.TEXT_UNIT_ELEMENT));
+			tblElemRules.getItem(ELEMENTS_EXCLUDED).setChecked(elem.rules.contains(RULE_TYPE.EXCLUDED_ELEMENT));
+			tblElemRules.getItem(ELEMENTS_INCLUDED).setChecked(elem.rules.contains(RULE_TYPE.INCLUDED_ELEMENT));
+			tblElemRules.getItem(ELEMENTS_INLINE).setChecked(elem.rules.contains(RULE_TYPE.INLINE_ELEMENT));
+			tblElemRules.getItem(ELEMENTS_ATTRIBUTESONLY).setChecked(elem.rules.contains(RULE_TYPE.ATTRIBUTES_ONLY));
+			tblElemRules.getItem(ELEMENTS_GROUP).setChecked(elem.rules.contains(RULE_TYPE.GROUP_ELEMENT));
+			tblElemRules.getItem(ELEMENTS_SCRIPT).setChecked(elem.rules.contains(RULE_TYPE.SCRIPT_ELEMENT));
+			tblElemRules.getItem(ELEMENTS_SERVER).setChecked(elem.rules.contains(RULE_TYPE.SERVER_ELEMENT));
 			edElemConditions.setText(formatConditions(elem.conditions));
 			edElemFilterConfig.setText(elem.subFilter);
 			currentElem = elem;
@@ -658,6 +793,10 @@ public class Editor implements IParametersEditor {
 		if ( Util.isEmpty(list) ) {
 			return "";
 		}
+		if ( list.size() == 1 ) {
+			return list.get(0).toString();
+		}
+		// Else:
 		return list.toString();
 	}
 
@@ -672,12 +811,40 @@ public class Editor implements IParametersEditor {
 	
 	private boolean validate () {
 		saveAttribute();
+		saveElement();
+		
+		// Validate the elements
+		for ( int i=0; i<lbElem.getItemCount(); i++ ) {
+			String name = lbElem.getItem(i);
+			if ( !name.equals(ensureValidName(name)) ) {
+				Dialogs.showError(shell,
+					String.format("The element name \"%s\" is invalid.", lbElem.getItem(i)), null);
+				tabs.setSelection(TAB_ELEMENTS);
+				lbElem.setSelection(i);
+				updateElement();
+				return false;
+			}
+			Element elem = (Element)lbElem.getData(name);
+			// We need at least one rule
+			if ( elem.rules.isEmpty() ) {
+				Dialogs.showError(shell,
+					String.format("The element \"%s\" has no rule defined.", name), null);
+				tabs.setSelection(TAB_ELEMENTS);
+				lbElem.setSelection(i);
+				updateElement();
+				return false;
+			}
+		}
+		
+		// Validate the attributes
 		for ( int i=0; i<lbAtt.getItemCount(); i++ ) {
 			String name = lbAtt.getItem(i);
 			if ( !name.equals(ensureValidName(name)) ) {
 				Dialogs.showError(shell,
 					String.format("The attribute name \"%s\" is invalid.", lbAtt.getItem(i)), null);
 				tabs.setSelection(TAB_ATTRIBUTES);
+				lbAtt.setSelection(i);
+				updateAttribute();
 				return false;
 			}
 			Attribute att = (Attribute)lbAtt.getData(name);
@@ -686,6 +853,8 @@ public class Editor implements IParametersEditor {
 				Dialogs.showError(shell,
 					String.format("The attribute \"%s\" has no rule defined.", name), null);
 				tabs.setSelection(TAB_ATTRIBUTES);
+				lbAtt.setSelection(i);
+				updateAttribute();
 				return false;
 			}
 			// Check the scope
@@ -693,6 +862,8 @@ public class Editor implements IParametersEditor {
 				Dialogs.showError(shell,
 					String.format("The attribute \"%s\" has no elements defined for its scope.", name), null);
 				tabs.setSelection(TAB_ATTRIBUTES);
+				lbAtt.setSelection(i);
+				updateAttribute();
 				return false;
 			}
 		}
@@ -720,7 +891,7 @@ public class Editor implements IParametersEditor {
 			Map<String, Object> map = tfg.getElementRules();
 			for ( String name : map.keySet() ) {
 				Element elem = new Element();
-				elem.name = name;
+				elem.name = name.toLowerCase();
 				@SuppressWarnings("unchecked")
 				Map<String, Object> items = (Map<String, Object>)map.get(name);
 				for ( String itemName : items.keySet() ) {
@@ -740,8 +911,8 @@ public class Editor implements IParametersEditor {
 					
 				}				
 				// Attribute is read, add it
-				lbElem.add(name);
-				lbElem.setData(name, elem);
+				lbElem.add(elem.name);
+				lbElem.setData(elem.name, elem);
 			}
 			// Select default and update all
 			if ( lbElem.getItemCount() > 0 ) lbElem.setSelection(0);
@@ -753,7 +924,7 @@ public class Editor implements IParametersEditor {
 			map = tfg.getAttributeRules();
 			for ( String attName : map.keySet() ) {
 				Attribute att = new Attribute();
-				att.name = attName;
+				att.name = attName.toLowerCase();
 				@SuppressWarnings("unchecked")
 				Map<String, Object> items = (Map<String, Object>)map.get(attName);
 				for ( String itemName : items.keySet() ) {
@@ -784,8 +955,8 @@ public class Editor implements IParametersEditor {
 					}
 				}
 				// Attribute is read, add it
-				lbAtt.add(attName);
-				lbAtt.setData(attName, att);
+				lbAtt.add(att.name);
+				lbAtt.setData(att.name, att);
 			}
 			// Select default and update all
 			if ( lbAtt.getItemCount() > 0 ) lbAtt.setSelection(0);
