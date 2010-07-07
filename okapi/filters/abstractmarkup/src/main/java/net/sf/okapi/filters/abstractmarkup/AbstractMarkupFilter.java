@@ -91,6 +91,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	private RawDocument currentRawDocument;
 	private ExtractionRuleState ruleState;
 	private String rootId;
+	private IFilter cdataSubfilter;
 
 	static {
 		Config.ConvertNonBreakingSpaces = false;
@@ -364,6 +365,13 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 
 		// This optimizes memory at the expense of performance
 		nodeIterator = document.iterator();
+		
+		// initialize sub-filter
+		if (getConfig().getGlobalCDATASubfilter() != null) {
+			cdataSubfilter =  getFilterConfigurationMapper().
+				createFilter(getConfig().getGlobalCDATASubfilter(), cdataSubfilter);
+			getEncoderManager().mergeMappings(cdataSubfilter.getEncoderManager());
+		}		
 	}
 
 	/**
@@ -486,7 +494,12 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 * @param tag
 	 */
 	protected void handleCdataSection(Tag tag) {
-		addToDocumentPart(tag.toString());
+		if (cdataSubfilter != null) {
+			
+		} 
+		else {
+			addToDocumentPart(tag.toString());
+		}
 	}
 
 	/**
