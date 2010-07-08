@@ -203,7 +203,9 @@ class QualityChecker {
 			}
 			
 			// Check length
-			checkLengths(srcSeg, trgSeg, tu);
+			if ( params.getCheckMaxCharLength() || params.getCheckMinCharLength() ) {
+				checkLengths(srcSeg, trgSeg, tu);
+			}
 			
 			// Check all suspect patterns
 			checkSuspectPatterns(srcSeg, trgSeg, tu);
@@ -489,22 +491,28 @@ class QualityChecker {
 	{
 		int srcLen = srcSeg.text.getCodedText().length();
 		int trgLen = trgSeg.text.getCodedText().length();
-		int n = (srcLen==0 ? 0 : (int)((srcLen*params.getMaxCharLength())/100));
-		if ( trgLen > n ) {
-			double d = (((float)trgLen)/(srcLen==0 ? 1.0 : ((float)srcLen)))*100.0;
-			reportIssue(IssueType.TARGET_LENGTH, tu, srcSeg.getId(),
-				String.format("The target is suspiciously longer than its source (%.2f%% of the source).", d),
-				0, -1, 0, -1, Issue.SEVERITY_LOW, 
-				srcSeg.toString(), trgSeg.toString());
-		}
+		int n;
 		
-		n = (srcLen==0 ? 0 : (int)((srcLen*params.getMinCharLength())/100));
-		if ( trgSeg.text.getCodedText().length() < n ) {
-			double d = (((float)trgLen)/(srcLen==0 ? 1.0 : ((float)srcLen)))*100.0;
-			reportIssue(IssueType.TARGET_LENGTH, tu, srcSeg.getId(),
-				String.format("The target is suspiciously shorter than its source (%.2f%% of the source).", d),
-				0, -1, 0, -1, Issue.SEVERITY_LOW, 
-				srcSeg.toString(), trgSeg.toString());
+		if ( params.getCheckMaxCharLength() ) {
+			n = (srcLen==0 ? 0 : (int)((srcLen*params.getMaxCharLength())/100));
+			if ( trgLen > n ) {
+				double d = (((float)trgLen)/(srcLen==0 ? 1.0 : ((float)srcLen)))*100.0;
+				reportIssue(IssueType.TARGET_LENGTH, tu, srcSeg.getId(),
+					String.format("The target is suspiciously longer than its source (%.2f%% of the source).", d),
+					0, -1, 0, -1, Issue.SEVERITY_LOW, 
+					srcSeg.toString(), trgSeg.toString());
+			}
+		}
+
+		if ( params.getCheckMinCharLength() ) {
+			n = (srcLen==0 ? 0 : (int)((srcLen*params.getMinCharLength())/100));
+			if ( trgSeg.text.getCodedText().length() < n ) {
+				double d = (((float)trgLen)/(srcLen==0 ? 1.0 : ((float)srcLen)))*100.0;
+				reportIssue(IssueType.TARGET_LENGTH, tu, srcSeg.getId(),
+					String.format("The target is suspiciously shorter than its source (%.2f%% of the source).", d),
+					0, -1, 0, -1, Issue.SEVERITY_LOW, 
+					srcSeg.toString(), trgSeg.toString());
+			}
 		}
 	}
 	
@@ -528,6 +536,8 @@ class QualityChecker {
 		}
 	}
 
+	/* working before fromSource addition
+	 * 
 	private void checkPatterns (Segment srcSeg,
 		Segment trgSeg,
 		TextUnit tu)
@@ -585,7 +595,119 @@ class QualityChecker {
 			}
 		}
 	}
+*/
+	
+	private void checkPatterns (Segment srcSeg,
+		Segment trgSeg,
+		TextUnit tu)
+	{
+		// Get the source text
+		String srcCText = srcSeg.text.getCodedText();
+		
+		// Search for any enabled pattern in the source
+		for ( PatternItem item : patterns ) {
+			// Skip disabled items and items that use the target as the base
+			if ( !item.enabled || !item.fromSource ) continue;
+			
+			Matcher srcM = item.getSourcePattern().matcher(srcCText);
+			
+			// Use a copy for the target: it may get modified for the search
+			StringBuilder trgCTextCopy = new StringBuilder(trgSeg.text.getCodedText());
 
+			while ( srcM.find() ) {
+				// Get the source text corresponding to the match
+				String srcPart = srcCText.substring(srcM.start(), srcM.end());
+				int start, end;
+				boolean found = false;
+				boolean expectSame = item.target.equals(PatternItem.SAME);
+				// Try to get the corresponding part in the target
+				if ( expectSame ) {
+					// If the target pattern is defined as being the same as the source
+					// Look for the same text in the source.
+					found = ((start = trgCTextCopy.indexOf(srcPart)) != -1);
+					end = start + srcPart.length();
+				}
+				else { // Target part has its own pattern
+					Matcher trgM = item.getTargetPattern().matcher(trgCTextCopy);
+					found = trgM.find();
+					start = trgM.start();
+					end = trgM.end();
+				}
+				// Process result
+				if ( found ) { // Remove that match in case source has several occurrences to match
+					trgCTextCopy.delete(start, end);
+				}
+				else { // Generate an issue
+					String msg;
+					if ( expectSame ) {
+						msg = String.format("The source part \"%s\" is not in the target.", srcPart);
+					}
+					else {
+						msg = String.format("The source part \"%s\" has no correspondance in the target.", srcPart);
+					}
+					reportIssue(IssueType.UNEXPECTED_PATTERN, tu, srcSeg.getId(), msg,
+						fromFragmentToString(srcSeg.text, srcM.start()),
+						fromFragmentToString(srcSeg.text, srcM.end()),
+						0, -1, item.severity,
+						srcSeg.toString(), trgSeg.toString());
+				}
+			}
+		}
+		
+		// Search for any enabled pattern in the target
+		// Get the source text
+		String trgCText = trgSeg.text.getCodedText();
+		for ( PatternItem item : patterns ) {
+			// Skip disabled items and items that use the source as the base
+			if ( !item.enabled || item.fromSource ) continue;
+			
+			Matcher trgM = item.getTargetPattern().matcher(trgCText);
+			
+			// Use a copy for the target: it may get modified for the search
+			StringBuilder srcCTextCopy = new StringBuilder(srcSeg.text.getCodedText());
+
+			while ( trgM.find() ) {
+				// Get the source text corresponding to the match
+				String trgPart = trgCText.substring(trgM.start(), trgM.end());
+				int start, end;
+				boolean found = false;
+				boolean expectSame = item.source.equals(PatternItem.SAME);
+				// Try to get the corresponding part in the target
+				if ( expectSame ) {
+					// If the target pattern is defined as being the same as the source
+					// Look for the same text in the source.
+					found = ((start = srcCTextCopy.indexOf(trgPart)) != -1);
+					end = start + trgPart.length();
+				}
+				else { // Target part has its own pattern
+					Matcher srcM = item.getSourcePattern().matcher(srcCTextCopy);
+					found = srcM.find();
+					start = srcM.start();
+					end = srcM.end();
+				}
+				// Process result
+				if ( found ) { // Remove that match in case source has several occurrences to match
+					srcCTextCopy.delete(start, end);
+				}
+				else { // Generate an issue
+					String msg;
+					if ( expectSame ) {
+						msg = String.format("The target part \"%s\" is not in the source.", trgPart);
+					}
+					else {
+						msg = String.format("The target part \"%s\" has no correspondance in the source.", trgPart);
+					}
+					reportIssue(IssueType.UNEXPECTED_PATTERN, tu, srcSeg.getId(), msg, 0, -1,
+						fromFragmentToString(trgSeg.text, trgM.start()),
+						fromFragmentToString(trgSeg.text, trgM.end()),
+						item.severity,
+						srcSeg.toString(), trgSeg.toString());
+				}
+			}
+		}
+		
+	}
+	
 	private void reportIssue (IssueType issueType,
 		TextUnit tu,
 		String segId,

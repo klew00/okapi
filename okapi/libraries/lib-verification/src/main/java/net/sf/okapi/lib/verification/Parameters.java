@@ -39,6 +39,7 @@ public class Parameters extends BaseParameters {
 	private static final String CHECKPATTERNS = "checkPatterns";
 	private static final String PATTERNCOUNT = "patternCount";
 	private static final String USEPATTERN = "usePattern";
+	private static final String FROMSOURCEPATTERN = "fromSourcePattern";
 	private static final String SEVERITYPATTERN = "severityPattern";
 	private static final String SOURCEPATTERN = "sourcePattern";
 	private static final String TARGETPATTERN = "targetPattern";
@@ -404,10 +405,11 @@ public class Parameters extends BaseParameters {
 		for ( int i=0; i<count; i++ ) {
 			boolean enabled = buffer.getBoolean(String.format("%s%d", USEPATTERN, i), true);
 			int severity = buffer.getInteger(String.format("%s%d", SEVERITYPATTERN, i), Issue.SEVERITY_MEDIUM);
+			boolean fromSource = buffer.getBoolean(String.format("%s%d", FROMSOURCEPATTERN, i), true);
 			String source = buffer.getString(String.format("%s%d", SOURCEPATTERN, i), "");
 			String target = buffer.getString(String.format("%s%d", TARGETPATTERN, i), PatternItem.SAME);
 			String desc = buffer.getString(String.format("%s%d", DESCPATTERN, i), "");
-			patterns.add(new PatternItem(source, target, enabled, severity, desc));
+			patterns.add(new PatternItem(source, target, enabled, severity, fromSource, desc));
 		}
 	}
 
@@ -446,6 +448,7 @@ public class Parameters extends BaseParameters {
 		buffer.setInteger(PATTERNCOUNT, patterns.size());
 		for ( int i=0; i<patterns.size(); i++ ) {
 			buffer.setBoolean(String.format("%s%d", USEPATTERN, i), patterns.get(i).enabled);
+			buffer.setBoolean(String.format("%s%d", FROMSOURCEPATTERN, i), patterns.get(i).fromSource);
 			buffer.setInteger(String.format("%s%d", SEVERITYPATTERN, i), patterns.get(i).severity);
 			buffer.setString(String.format("%s%d", SOURCEPATTERN, i), patterns.get(i).source);
 			buffer.setString(String.format("%s%d", TARGETPATTERN, i), patterns.get(i).target);

@@ -40,6 +40,7 @@ public class PatternItem {
 	public boolean enabled;
 	public String description;
 	public int severity;
+	public boolean fromSource;
 	
 	private Pattern srcPat;
 	private Pattern trgPat;
@@ -54,17 +55,17 @@ public class PatternItem {
 				if ( line.trim().length() == 0 ) continue;
 				if ( line.startsWith("#") ) continue;
 				String[] parts = line.split("\t", -2);
-				if ( parts.length < 5 ) {
+				if ( parts.length < 6 ) {
 					throw new OkapiIOException("Missing one or more tabs in line:\n"+line);
 				}
 				int severity = Issue.SEVERITY_MEDIUM;
 				try {
-					severity = Integer.valueOf(parts[1]);
+					severity = Integer.valueOf(parts[2]);
 				}
 				catch ( Throwable e ) {
 					// Just use medium
 				}
-				list.add(new PatternItem(parts[2], parts[3], parts[0].equals("1"), severity, parts[4]));
+				list.add(new PatternItem(parts[3], parts[4], parts[0].equals("1"), severity, parts[1].equals("1"), parts[5]));
 				line = br.readLine();
 			}
 		}
@@ -88,12 +89,15 @@ public class PatternItem {
 		List<PatternItem> list)
 	{
 //TODO: UTF-8		
+		// Format:
+		// Use?<t>fromSource?<t>severity<t>source<t>target<t>decsription
 		PrintWriter pr = null;
 		final String lineBreak = System.getProperty("line.separator");
 		try {
 			pr = new PrintWriter(path);
 			for ( PatternItem item : list ) {
 				pr.write((item.enabled ? "1" : "0")
+					+ "\t" + (item.fromSource ? "1" : "0")
 					+ "\t" + String.valueOf(item.severity)
 					+ "\t" + item.source
 					+ "\t" + item.target
@@ -118,7 +122,7 @@ public class PatternItem {
 		boolean enabled,
 		int severity)
 	{
-		create(source, target, enabled, severity, null);
+		create(source, target, enabled, severity, true, null);
 	}
 
 	public PatternItem (String source,
@@ -127,13 +131,24 @@ public class PatternItem {
 		int severity,
 		String message)
 	{
-		create(source, target, enabled, severity, message);
+		create(source, target, enabled, severity, true, message);
+	}
+
+	public PatternItem (String source,
+		String target,
+		boolean enabled,
+		int severity,
+		boolean fromSource,
+		String message)
+	{
+		create(source, target, enabled, severity, fromSource, message);
 	}
 
 	private void create (String source,
 		String target,
 		boolean enabled,
 		int severity,
+		boolean fromSource,
 		String message)
 	{
 		this.source = source;
@@ -141,10 +156,13 @@ public class PatternItem {
 		this.enabled = enabled;
 		this.description = message;
 		this.severity = severity;
+		this.fromSource = fromSource;
 	}
 
 	public void compile () {
-		srcPat = Pattern.compile(source);
+		if ( !source.equals(SAME) ) {
+			srcPat = Pattern.compile(source);
+		}
 		if ( !target.equals(SAME) ) {
 			trgPat = Pattern.compile(target);
 		}

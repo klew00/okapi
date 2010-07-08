@@ -157,7 +157,10 @@ public class QualityCheckSession {
 	}
 	
 	public void recheckAll (List<String> sigList) {
-		if ( rawDocs.size() == 0 ) return;
+		if ( rawDocs.size() == 0 ) {
+			issues.clear();
+			return;
+		}
 		startProcess(targetLocale, null);
 		for ( RawDocument rd : rawDocs.values() ) {
 			executeRecheck(rd, sigList);

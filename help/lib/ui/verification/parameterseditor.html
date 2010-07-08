@@ -89,9 +89,16 @@ each source/target language pair.</p>
 -- Set this option to verify that each source pattern defined in the list has 
 its corresponding expected part in the target content.</p>
 <ul>
-	<li>The first column of the table indicates if the pattern should be 
-	verified or not, and indicates the potential level of severity for this 
-	check.</li>
+	<li>The first column shows three options associated with this item:<ul>
+	<li>If the item should be used (un-check the item to disable it)</li>
+	<li>if the item goes from source to target (&quot;<code>Src</code>&quot; indicator). 
+	That is if the source pattern is looked at first, and if found, the 
+	corresponding pattern is searched in the target. Otherwise (&quot;<code>Trg</code>&quot; 
+	indicator) the target pattern is looked at first, and then searched in the 
+	source. This allows for example to detect extra patterns in the target.</li>
+	<li>The severity of the warning.</li>
+</ul>
+	</li>
 	<li>The second column is the regular expression of the pattern to look for in 
 the source.</li>
 	<li>The third column is the target pattern corresponding to the part 

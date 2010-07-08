@@ -68,6 +68,11 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private static final int TAB_CHARACTERS = 2;
 	private static final int TAB_LANGUAGETOOL = 3;
 	private static final int TAB_OUTPUT = 4;
+	
+	private static final int INFOCOLWIDTH = 120;
+	
+	private static final String FROMSOURCE = "Src";
+	private static final String FROMTARGET = "Trg";
 
 	private static final String[] severityNames = new String[] {
 		"LOW", "MEDIUM", "HIGH"
@@ -104,6 +109,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Text edTarget;
 	private Text edDescription;
 	private Combo cbSeverity;
+	private Button chkFromSource;
 	private Shell dialog;
 	private TableItem editItem;
 	private boolean addMode;
@@ -384,14 +390,15 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		table.addControlListener(new ControlAdapter() {
 			public void controlResized(ControlEvent e) {
 				int tableWidth = table.getClientArea().width;
-				int remaining = tableWidth - table.getColumn(0).getWidth();
+				table.getColumn(0).setWidth(INFOCOLWIDTH);
+				int remaining = tableWidth - INFOCOLWIDTH;
 				table.getColumn(1).setWidth(remaining/3);
 				table.getColumn(2).setWidth(remaining/3);
 				table.getColumn(3).setWidth(remaining/3);
 			}
 		});
 
-		String[] titles = {"Use/Severity", "Source Pattern", "Expected Target Pattern", "Description"};
+		String[] titles = {"Options", "Source Pattern", "Target Pattern", "Description"};
 		for ( int i=0; i<titles.length; i++ ) {
 			TableColumn column = new TableColumn(table, SWT.LEFT);
 			column.setText(titles[i]);
@@ -655,9 +662,14 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			cbSeverity.add(string);
 		}
 		
+		chkFromSource = new Button(dialog, SWT.CHECK);
+		chkFromSource.setText("Perform the comparison from the source to the target");
+		
 		// Set the text in the edit fields
 		if ( add ) {
 			edTarget.setText(PatternItem.SAME);
+			cbSeverity.select(Issue.SEVERITY_MEDIUM);
+			chkFromSource.setSelection(true);
 		}
 		else {
 			int index = table.getSelectionIndex();
@@ -667,6 +679,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			edTarget.setText(editItem.getText(2));
 			edDescription.setText(editItem.getText(3));
 			cbSeverity.select(getSeverityFromString(editItem.getText(0)));
+			chkFromSource.setSelection(isFromSource(editItem.getText(0)));
 		}
 
 		//  Dialog buttons
@@ -707,7 +720,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 						editItem.setChecked(true);
 						table.setSelection(table.getItemCount()-1);
 					}
-					editItem.setText(0, cbSeverity.getText());
+					editItem.setText(0, (chkFromSource.getSelection() ? FROMSOURCE : FROMTARGET) + "/" + cbSeverity.getText());
 					editItem.setText(1, edSource.getText());
 					editItem.setText(2, edTarget.getText());
 					editItem.setText(3, edDescription.getText());
@@ -902,7 +915,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		for ( PatternItem item : list ) {
 			TableItem row = new TableItem(table, SWT.NONE);
 			row.setChecked(item.enabled);
-			row.setText(0, severityNames[item.severity]);
+			row.setText(0, (item.fromSource ? FROMSOURCE : FROMTARGET) + "/" + severityNames[item.severity]);
 			row.setText(1, item.source);
 			row.setText(2, item.target);
 			// Handle null for old sessions
@@ -1028,18 +1041,27 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private List<PatternItem> savePatternsData () {
 		List<PatternItem> list = new ArrayList<PatternItem>();
 		for ( int i=0; i<table.getItemCount(); i++ ) {
-			// Get the severity
+			// Get the info
 			int severity = getSeverityFromString(table.getItem(i).getText(0));
+			PatternItem pattern = new PatternItem(table.getItem(i).getText(1), table.getItem(i).getText(2),
+				table.getItem(i).getChecked(), severity, table.getItem(i).getText(3));
+			pattern.fromSource = isFromSource(table.getItem(i).getText(0));
 			// Add the pattern
-			list.add(new PatternItem(table.getItem(i).getText(1), table.getItem(i).getText(2),
-				table.getItem(i).getChecked(), severity, table.getItem(i).getText(3)));
+			list.add(pattern);
 		}
 		return list;
 	}
 	
+	private boolean isFromSource (String value) {
+		// "SRC/SEVERITY" direction==source if start text==FROMSOURCE 
+		return value.subSequence(0, 3).equals(FROMSOURCE);
+	}
+	
 	private int getSeverityFromString (String value) {
-		if ( value.equals(severityNames[Issue.SEVERITY_LOW]) ) return Issue.SEVERITY_LOW;
-		if ( value.equals(severityNames[Issue.SEVERITY_MEDIUM]) ) return Issue.SEVERITY_MEDIUM;
+		// "SRC/SEVERITY" severity start at index 4;
+		String tmp = value.substring(4);
+		if ( tmp.equals(severityNames[Issue.SEVERITY_LOW]) ) return Issue.SEVERITY_LOW;
+		if ( tmp.equals(severityNames[Issue.SEVERITY_MEDIUM]) ) return Issue.SEVERITY_MEDIUM;
 		return Issue.SEVERITY_HIGH;
 	}
 }
