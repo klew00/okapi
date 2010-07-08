@@ -284,6 +284,7 @@ public class TmxFilter implements IFilter {
 			hasNext=true;
 			queue = new LinkedList<Event>();
 			skipUtWarning = false;
+			tuvTrgType = TuvXmlLang.UNDEFINED;
 			
 			//--attempt encoding detection--
 			//if(reader.getEncoding()!=null){
