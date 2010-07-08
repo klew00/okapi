@@ -189,7 +189,7 @@ public class VignetteFilter implements IFilter {
 
 	@Override
 	public String getDisplayName () {
-		return "Vignette Filter (BETA)";
+		return "Vignette Filter";
 	}
 
 	@Override

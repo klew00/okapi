@@ -253,14 +253,14 @@ class SessionSettingsDialog {
 		for ( String item : lbDocs.getItems() ) {
 			String[] res = explodeDocument(item);
 			try {
-				URI uri = new URI(res[0]);
+				URI uri = (new File(res[0])).toURI();
 				RawDocument rd = new RawDocument(uri, res[2], srcLoc, trgLoc);
 				rd.setFilterConfigId(res[1]);
 				session.addRawDocument(rd);
 			}
-			catch ( URISyntaxException e ) {
+			catch ( Throwable e ) {
 				Dialogs.showError(dialog,
-					String.format("Invalid URI: %s", res[0]), null);
+					String.format("Error with: %s", res[0]), null);
 				return false;
 			}
 		}

@@ -364,6 +364,8 @@ public class QualityCheckEditor implements IQualityCheckEditor {
             }
 		});
 		
+		new MenuItem(dropMenu, SWT.SEPARATOR);
+
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
 		rm.setCommand(menuItem, "issues.checkall"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
@@ -372,6 +374,16 @@ public class QualityCheckEditor implements IQualityCheckEditor {
             }
 		});
 		
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "issues.checkdocument"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				checkCurrentDocument();
+            }
+		});
+		
+		new MenuItem(dropMenu, SWT.SEPARATOR);
+
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
 		rm.setCommand(menuItem, "issues.generatereport"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
@@ -751,12 +763,18 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 	}
 
 	private void resetTableDisplay () {
-		issuesModel.setIssues(session.getIssues());
-		tblIssues.setSortColumn(null); // reset the sort column
-		displayType = cbDisplay.getSelectionIndex();
-		issueType = cbTypes.getSelectionIndex();
-		issuesModel.updateTable(0, displayType, issueType);
-		updateCurrentIssue();
+		try {
+			issuesModel.setIssues(session.getIssues());
+			tblIssues.setSortColumn(null); // reset the sort column
+			displayType = cbDisplay.getSelectionIndex();
+			issueType = cbTypes.getSelectionIndex();
+			issuesModel.updateTable(0, displayType, issueType);
+			updateCurrentIssue();
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, "Error resetting the table.\n"+e.getMessage(), null);
+		}
+		
 	}
 
 	private void refreshTableDisplay () {
@@ -915,13 +933,12 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 			Issue issue = (Issue)tblIssues.getItem(n).getData();
 			startWaiting("Checking current document...");
 			session.recheckDocument(issue.docId);
-			resetTableDisplay();
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, "Error while running the verification.\n"+e.getMessage(), null);
 		}
 		finally {
-			updateCurrentIssue();
+			resetTableDisplay();
 			stopWaiting();
 		}
 	}
@@ -931,13 +948,12 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 			startWaiting("Checking all documents...");
 			// Recheck all using the signatures of the current issue lists
 			session.recheckAll(null);
-			resetTableDisplay();
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, "Error while running the verification.\n"+e.getMessage(), null);
 		}
 		finally {
-			updateCurrentIssue();
+			resetTableDisplay();
 			stopWaiting();
 		}
 	}
@@ -1021,8 +1037,6 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 			session.loadSession(path);
 			qcsPath = path;
 			updateCaption();
-			resetTableDisplay();
-
 			mruList.add(path);
 			updateMRU();
 		}
@@ -1030,6 +1044,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 			Dialogs.showError(shell, "Error while loading.\n"+e.getMessage(), null);
 		}
 		finally {
+			resetTableDisplay();
 			stopWaiting();
 		}
 	}
