@@ -156,6 +156,14 @@ public class QualityCheckSession {
 		return rawDocs.size();
 	}
 	
+	public void recheckDocument (URI docId) {
+		startProcess(targetLocale, null);
+		RawDocument rd = rawDocs.get(docId);
+		if ( rd != null ) {
+			executeRecheck(rd, null);
+		}
+	}
+	
 	public void recheckAll (List<String> sigList) {
 		if ( rawDocs.size() == 0 ) {
 			issues.clear();
@@ -408,13 +416,17 @@ public class QualityCheckSession {
 				}
 
 				String position = String.format("ID=%s", issue.tuId);
-//				if ( issue.tuName != null ) {
-//					position += (" ("+issue.tuName+")");
-//				}
+				if ( issue.tuName != null ) {
+					position += (" ("+issue.tuName+")");
+				}
 				if ( issue.segId != null ) {
 					position += String.format(", segment=%s", issue.segId);
 				}
-				writer.writeElementString("p", position+": "+issue.message);
+				writer.writeStartElement("p");
+				writer.writeString(position+":");
+				writer.writeRawXML("<br />");
+				writer.writeString(issue.message);
+				writer.writeEndElement(); // p
 				writer.writeRawXML("<p class=\"item\">");
 				writer.writeString("Source: ["+issue.oriSource+"]");
 				writer.writeRawXML("<br />");

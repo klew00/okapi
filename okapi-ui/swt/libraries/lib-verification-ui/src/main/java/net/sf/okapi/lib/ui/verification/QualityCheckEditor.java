@@ -108,7 +108,6 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 	private IssuesTableModel issuesModel;
 	private StatusBar statusBar;
 	private QualityCheckSession session;
-	private Button btCheckAll;
 	private Combo cbDisplay;
 	private Button btRefreshDisplay;
 	private Combo cbTypes;
@@ -556,12 +555,21 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		cmpButtons.setLayout(layTmp);
 		cmpButtons.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
-		btCheckAll = new Button(cmpButtons, SWT.PUSH);
+		Button btCheckAll = new Button(cmpButtons, SWT.PUSH);
 		btCheckAll.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		btCheckAll.setText("Check All");
 		btCheckAll.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				checkAll();
+			}
+		});
+		
+		Button btCheckDoc = new Button(cmpButtons, SWT.PUSH);
+		btCheckDoc.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		btCheckDoc.setText("Check Document");
+		btCheckDoc.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				checkCurrentDocument();
 			}
 		});
 		
@@ -589,15 +597,14 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		cbTypes.add("Missing and extra segments"); // All missing and extra segments issues
 		cbTypes.add("Empty segments"); // All empty segment issues
 		cbTypes.add("Target same as source"); // TARGET_SAME_AS_SOURCE
-		cbTypes.add("Missing white spaces"); // All missing whitespace-related issues
-		cbTypes.add("Extra white spaces"); // All extra whitespace-related issues
-		cbTypes.add("Inline codes difference"); // CODE_DIFFERENCE
+		cbTypes.add("White spaces differences"); // All whitespace-related issues
+		cbTypes.add("Inline codes differences"); // CODE_DIFFERENCE
 		cbTypes.add("Unexpected patterns"); // UNEXPECTED_PATTERN
 		cbTypes.add("Suspect patterns"); // SUSPECT_PATTERN
 		cbTypes.add("Target length"); // TARGET_LENGTH
 		cbTypes.add("Allowed characters"); // ALLOWED_CHARACTERS
 		cbTypes.add("LanguageTool checker warnings"); // LANGUAGETOOL_ERROR
-		cbTypes.setVisibleItemCount(12);
+		cbTypes.setVisibleItemCount(cbTypes.getItemCount());
 		cbTypes.setLayoutData(new GridData());
 		cbTypes.select(issueType);
 		cbTypes.addSelectionListener(new SelectionAdapter() {
@@ -820,7 +827,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 			}
 			else {
 				Issue issue = (Issue)tblIssues.getItem(n).getData();
-				edDocument.setText(issue.docId.toString());
+				edDocument.setText(issue.docId.getPath());
 				edMessage.setText(issue.message);
 				setTexts(issue);
 			}
@@ -840,6 +847,8 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 			sr.start = issue.srcStart;
 			sr.length = issue.srcEnd-issue.srcStart;
 			edSource.setStyleRange(sr);
+			edSource.setCaretOffset(issue.srcEnd);
+			edSource.showSelection();
 		}
 		if ( issue.trgEnd > 0 ) {
 			StyleRange sr = new StyleRange();
@@ -847,6 +856,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 			sr.start = issue.trgStart;
 			sr.length = issue.trgEnd-issue.trgStart;
 			edTarget.setStyleRange(sr);
+			edTarget.setCaretOffset(issue.trgEnd);
 		}
 	}
 
@@ -896,6 +906,24 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		// Proceed
 		session.resetDisabledIssues();
 		issuesModel.updateTable(0, displayType, issueType);
+	}
+	
+	private void checkCurrentDocument () {
+		try {
+			int n = tblIssues.getSelectionIndex();
+			if ( n < 0 ) return;
+			Issue issue = (Issue)tblIssues.getItem(n).getData();
+			startWaiting("Checking current document...");
+			session.recheckDocument(issue.docId);
+			resetTableDisplay();
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, "Error while running the verification.\n"+e.getMessage(), null);
+		}
+		finally {
+			updateCurrentIssue();
+			stopWaiting();
+		}
 	}
 	
 	private void checkAll () {
@@ -989,7 +1017,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 				return;
 			}
 			
-			startWaiting("Loading session...");
+			startWaiting("Loading session and processing documents...");
 			session.loadSession(path);
 			qcsPath = path;
 			updateCaption();

@@ -123,13 +123,14 @@ public class LanguageToolConnector {
 				issues.add(new Issue(docId, IssueType.LANGUAGETOOL_ERROR, tu.getId(), seg.getId(), msg, 0, 0,
 					QualityChecker.fromFragmentToString(seg.text, start),
 					QualityChecker.fromFragmentToString(seg.text, end),
-					Issue.SEVERITY_MEDIUM));
+					Issue.SEVERITY_MEDIUM, tu.getName()));
 			}
 		}
 		catch ( Throwable e ) {
 			// -99 for srcEnd special marker
 			issues.add(new Issue(docId, IssueType.LANGUAGETOOL_ERROR, tu.getId(), seg.getId(),
-				"ERROR WITH LanguageTool SERVER: All LT checks are skipped from this text unit on.", 0, -99, 0, -1, Issue.SEVERITY_HIGH));
+				"ERROR WITH LanguageTool SERVER: All LT checks are skipped from this text unit on.", 0, -99, 0, -1,
+				Issue.SEVERITY_HIGH, tu.getName()));
 		}
 		
 		return issues.size();

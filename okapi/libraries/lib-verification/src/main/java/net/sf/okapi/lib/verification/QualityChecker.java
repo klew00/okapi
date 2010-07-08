@@ -67,7 +67,8 @@ class QualityChecker {
 				item.compile();
 			}
 		}
-		
+
+		ltConn = null;
 		if ( params.getCheckWithLT() ) {
 			ltConn = new LanguageToolConnector();
 			ltConn.initialize(targetLocale, params.getServerURL(), params.translateLTMsg,
@@ -721,7 +722,7 @@ class QualityChecker {
 		String trgOri)
 	{
 		Issue issue = new Issue(currentDocId, issueType, tu.getId(), segId, message,
-			srcStart, srcEnd, trgStart, trgEnd, severity);
+			srcStart, srcEnd, trgStart, trgEnd, severity, tu.getName());
 		issues.add(issue);
 		issue.enabled = true;
 		issue.oriSource = srcOri;

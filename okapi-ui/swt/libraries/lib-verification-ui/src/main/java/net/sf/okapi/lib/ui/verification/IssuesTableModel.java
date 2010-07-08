@@ -126,31 +126,29 @@ class IssuesTableModel {
 				case MISSINGORDIFF_LEADINGWS:
 				case MISSING_TRAILINGWS:
 				case MISSINGORDIFF_TRAILINGWS:
-					if ( issueType != 5 ) continue;
-					break;
 				case EXTRA_LEADINGWS:
 				case EXTRAORDIFF_LEADINGWS:
 				case EXTRA_TRAILINGWS:
 				case EXTRAORDIFF_TRAILINGWS:
-					if ( issueType != 6 ) continue;
+					if ( issueType != 5 ) continue;
 					break;
 				case CODE_DIFFERENCE:
-					if ( issueType != 7 ) continue;
+					if ( issueType != 6 ) continue;
 					break;
 				case UNEXPECTED_PATTERN:
-					if ( issueType != 8 ) continue;
+					if ( issueType != 7 ) continue;
 					break;
 				case SUSPECT_PATTERN:
-					if ( issueType != 9 ) continue;
+					if ( issueType != 8 ) continue;
 					break;
 				case TARGET_LENGTH:
-					if ( issueType != 10 ) continue;
+					if ( issueType != 9 ) continue;
 					break;
 				case ALLOWED_CHARACTERS:
-					if ( issueType != 11 ) continue;
+					if ( issueType != 10 ) continue;
 					break;
 				case LANGUAGETOOL_ERROR:
-					if ( issueType != 12 ) continue;
+					if ( issueType != 11 ) continue;
 					break;
 				default:
 					continue;

@@ -689,28 +689,43 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 					// Validate entries
 					if ( edSource.getText().trim().length() < 1 ) {
 						Dialogs.showError(shell, "You must enter a pattern for the source.", null);
+						edSource.selectAll();
 						edSource.setFocus();
 						return;
 					}
 					if ( edTarget.getText().trim().length() < 1 ) {
 						Dialogs.showError(shell, "You must enter a corresponding part for the target.", null);
+						edTarget.selectAll();
 						edTarget.setFocus();
 						return;
 					}
 					if ( edDescription.getText().trim().length() < 1 ) {
 						Dialogs.showError(shell, "You must enter a description for the pattern.", null);
+						edDescription.selectAll();
 						edDescription.setFocus();
 						return;
 					}
 					// Try patterns
 					try {
-						Pattern.compile(edSource.getText());
+						if ( !edSource.getText().equals(PatternItem.SAME) ) {
+							Pattern.compile(edSource.getText());
+						}
+					}
+					catch ( Exception e ) {
+						Dialogs.showError(shell, "Pattern error:\n" + e.getLocalizedMessage(), null);
+						edSource.selectAll();
+						edSource.setFocus();
+						return;
+					}
+					try {
 						if ( !edTarget.getText().equals(PatternItem.SAME) ) {
 							Pattern.compile(edTarget.getText());
 						}
 					}
 					catch ( Exception e ) {
 						Dialogs.showError(shell, "Pattern error:\n" + e.getLocalizedMessage(), null);
+						edTarget.selectAll();
+						edTarget.setFocus();
 						return;
 					}
 

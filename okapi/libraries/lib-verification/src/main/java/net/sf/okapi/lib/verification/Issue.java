@@ -40,6 +40,7 @@ public class Issue {
 	public boolean enabled;
 	public int severity;
 	// Temporary waiting for DB
+	public String tuName;
 	public String oriSource;
 	public String oriTarget;
 	
@@ -52,7 +53,8 @@ public class Issue {
 		int srcEnd, 
 		int trgStart, 
 		int trgEnd,
-		int severity)
+		int severity,
+		String tuName)
 	{
 		this.docId = docId;
 		this.issueType = issueType;
@@ -64,6 +66,7 @@ public class Issue {
 		this.trgStart = trgStart;
 		this.trgEnd = trgEnd;
 		this.severity = severity;
+		this.tuName = tuName;
 	}
 
 	String getSignature () {

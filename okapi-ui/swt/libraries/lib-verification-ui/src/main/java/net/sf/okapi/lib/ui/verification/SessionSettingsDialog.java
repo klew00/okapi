@@ -182,7 +182,7 @@ class SessionSettingsDialog {
 	}
 	
 	private String formatDocument (RawDocument rd) {
-		return String.format("%s    \t(%s,  %s)", rd.getInputURI().toString(), rd.getFilterConfigId(), rd.getEncoding());
+		return String.format("%s    \t(%s,  %s)", rd.getInputURI().getPath(), rd.getFilterConfigId(), rd.getEncoding());
 	}
 	
 	private String[] explodeDocument (String doc) {
