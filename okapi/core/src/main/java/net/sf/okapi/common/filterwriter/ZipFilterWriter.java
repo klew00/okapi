@@ -250,6 +250,13 @@ public class ZipFilterWriter implements IFilterWriter {
 		}
 	}
 
+	protected IFilterWriter createSubDocumentWriter (StartSubDocument res) {
+        IFilterWriter writer = new GenericFilterWriter(new GenericSkeletonWriter(), getEncoderManager());
+        writer.setOptions(outLoc, "UTF-8");
+        writer.setOutput(tempFile.getAbsolutePath());
+        return writer;
+	}
+	
 	private void processStartSubDocument (StartSubDocument res) {
 		ZipSkeleton skel = (ZipSkeleton)res.getSkeleton();
 		subDocEntry = skel.getEntry();
@@ -263,10 +270,7 @@ public class ZipFilterWriter implements IFilterWriter {
 		}
 		
 		// Instantiate the filter writer for that entry
-		//TODO: replace this by transparent call
-		subDocWriter = new GenericFilterWriter(new GenericSkeletonWriter(), getEncoderManager());
-		subDocWriter.setOptions(outLoc, "UTF-8");
-		subDocWriter.setOutput(tempFile.getAbsolutePath());
+		subDocWriter = createSubDocumentWriter(res); 
 		
 		StartDocument sd = new StartDocument("sd");
 		sd.setLineBreak("\n");
