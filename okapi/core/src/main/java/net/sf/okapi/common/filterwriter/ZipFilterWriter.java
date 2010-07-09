@@ -252,8 +252,7 @@ public class ZipFilterWriter implements IFilterWriter {
 
 	protected IFilterWriter createSubDocumentWriter (StartSubDocument res) {
         IFilterWriter writer = new GenericFilterWriter(new GenericSkeletonWriter(), getEncoderManager());
-        writer.setOptions(outLoc, "UTF-8");
-        writer.setOutput(tempFile.getAbsolutePath());
+        writer.setOptions(outLoc, "UTF-8");        
         return writer;
 	}
 	
@@ -270,7 +269,8 @@ public class ZipFilterWriter implements IFilterWriter {
 		}
 		
 		// Instantiate the filter writer for that entry
-		subDocWriter = createSubDocumentWriter(res); 
+		subDocWriter = createSubDocumentWriter(res);
+		subDocWriter.setOutput(tempFile.getAbsolutePath());
 		
 		StartDocument sd = new StartDocument("sd");
 		sd.setLineBreak("\n");
