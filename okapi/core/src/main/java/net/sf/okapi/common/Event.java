@@ -234,5 +234,9 @@ public class Event {
 		}
 		throw new OkapiUnexpectedResourceTypeException("Event resource is not a RawDocument");
 	}
-
+	
+	@Override
+	public String toString() {
+		return filterEventType.toString();
+	}
 }

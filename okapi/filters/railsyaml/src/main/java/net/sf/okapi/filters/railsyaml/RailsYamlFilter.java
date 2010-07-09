@@ -177,7 +177,7 @@ public class RailsYamlFilter extends AbstractFilter {
 		
 		if(parseState == PARSE_STOP) {
 			getEventBuilder().flushRemainingEvents();
-			getEventBuilder().addFilterEvent(createEndDocumentEvent());
+			getEventBuilder().addFilterEvent(createEndFilterEvent());
 		}
 
 		return getEventBuilder().next();
@@ -343,12 +343,12 @@ public class RailsYamlFilter extends AbstractFilter {
 		// Start the EventBuilder
 		// create EventBuilder with document name as rootId
 		if (eventBuilder == null) {
-			eventBuilder = new YamlEventBuilder(getDocumentName());
+			eventBuilder = new YamlEventBuilder(getDocumentName(), isSubFilter());
 		} else {
-			eventBuilder.reset(getDocumentName());
+			eventBuilder.reset(getDocumentName(), isSubFilter());
 		}
 		
-		getEventBuilder().addFilterEvent(createStartDocumentEvent());
+		getEventBuilder().addFilterEvent(createStartFilterEvent());
 	}
 
 	@Override

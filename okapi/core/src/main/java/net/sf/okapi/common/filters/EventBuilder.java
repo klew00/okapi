@@ -60,11 +60,9 @@ public class EventBuilder {
 	private static final Logger LOGGER = Logger.getLogger(EventBuilder.class.getName());
 
 	private String mimeType;
-	private IdGenerator startGroupId;
-	private IdGenerator endGroupId;
+	private IdGenerator groupId;
 	private IdGenerator textUnitId;
-	private IdGenerator startSubDocumentId;
-	private IdGenerator endSubDocumentId;
+	private IdGenerator subDocumentId;
 	private IdGenerator documentPartId;
 	
 	private Stack<Event> tempFilterEventStack;
@@ -76,19 +74,20 @@ public class EventBuilder {
 	private Code currentCode;
 	private DocumentPart currentDocumentPart;
 	private String rootId;
+	private boolean subFilter;
 
 	/**
 	 * Instantiates a new EventBuilder.
 	 */
-	public EventBuilder () {
-		reset(null);
+	public EventBuilder() {
+		reset(null, false);
 	}
 
 	/**
 	 * Instantiates a new EventBuilder with a root ID.
 	 */
-	public EventBuilder(String rootId) {
-		reset(rootId);
+	public EventBuilder(String rootId, boolean subFilter) {
+		reset(rootId, subFilter);
 	}
 
 	/**
@@ -113,8 +112,13 @@ public class EventBuilder {
 				return referencableFilterEvents.remove(0);
 			} else if (!filterEvents.isEmpty()) {
 				event = filterEvents.remove(0);
-				if (event.getEventType() == EventType.END_DOCUMENT)
+				if (event.getEventType() == EventType.END_DOCUMENT) {
 					done = true;
+				}
+				// handle case if called by a subfilter
+				if (subFilter && event.getEventType() == EventType.END_GROUP) {
+					done = true;
+				}
 				return event;
 			}
 		}
@@ -126,12 +130,29 @@ public class EventBuilder {
 	 * Add an {@link Event} at the end of the current {@link Event} queue.
 	 * 
 	 * @param event
-	 *            THe {@link Event} to be added
+	 *            The {@link Event} to be added
 	 */
-	public void addFilterEvent(Event event) {
-		filterEvents.add(event);
+	public void addFilterEvent(Event event) {		
+		switch (event.getEventType()) {
+		case START_GROUP:
+			if (isCurrentComplexTextUnit()) {
+				StartGroup sg = event.getStartGroup();
+				sg.setIsReferent(true);
+				Code c = new Code(TagType.PLACEHOLDER, sg.getName(), TextFragment.makeRefMarker(sg.getId()));
+				c.setReferenceFlag(true);
+				startCode(c);
+				endCode();
+				referencableFilterEvents.add(event);
+			} else {
+				filterEvents.add(event);
+			}
+			break;
+		default:
+			filterEvents.add(event);
+			break;
+		}		
 	}
-
+	
 	/**
 	 * Cancel current processing and add the CANCELED {@link Event} to the event queue.
 	 */
@@ -259,6 +280,24 @@ public class EventBuilder {
 		return true;
 	}
 
+	public String findMostRecentParentId() {	
+		if (isCurrentComplexTextUnit()) {
+			return peekMostRecentTextUnit().getId(); 
+		}
+		
+		if (isCurrentGroup()) {
+			StartGroup parentGroup = peekMostRecentGroup();			
+			return parentGroup.getId();
+		}
+		
+		StartSubDocument parentSubDocument = peekMostRecentSubDocument();
+		if (parentSubDocument != null) {
+			return parentSubDocument.getId();
+		}
+		
+		return null;	
+	}
+	
 	/**
 	 * Peek at the most recently created {@link StartGroup}.
 	 * 
@@ -268,13 +307,34 @@ public class EventBuilder {
 		if (tempFilterEventStack.isEmpty()) {
 			return null;
 		}
-		// the normal stack iterator gives the elements in the
+		// the normal stack iterator gives the elements in the wrong order
 		int lastIndex = tempFilterEventStack.size() - 1;
 		for (int i = lastIndex; i >= 0; i--) {
 			Event fe = tempFilterEventStack.get(i);
 			if (fe.getEventType() == EventType.START_GROUP) {
 				StartGroup g = (StartGroup) fe.getResource();
 				return g;
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * Peek at the most recently created {@link StartSubDocument}
+	 * 
+	 * @return the filter event
+	 */
+	public StartSubDocument peekMostRecentSubDocument() {
+		if (tempFilterEventStack.isEmpty()) {
+			return null;
+		}
+		// the normal stack iterator gives the elements in the wrong order
+		int lastIndex = tempFilterEventStack.size() - 1;
+		for (int i = lastIndex; i >= 0; i--) {
+			Event fe = tempFilterEventStack.get(i);
+			if (fe.getEventType() == EventType.START_SUBDOCUMENT) {
+				StartSubDocument sd = (StartSubDocument) fe.getResource();
+				return sd;
 			}
 		}
 		return null;
@@ -336,20 +396,13 @@ public class EventBuilder {
 	/**
 	 * Reset {@link IFilter} for a new input. Callers should reset the EventBuilder for each input.
 	 */
-	public void reset(String rootId) {
+	public void reset(String rootId, boolean subFilter) {
 		this.rootId = rootId;
-		
-//Allow null/empty root
-//		if (rootId == null) {
-//			rootId = IdGenerator.DEFAULT_ROOT_ID;			
-//		}
-		
-		startGroupId = new IdGenerator(rootId, IdGenerator.START_GROUP);
-		endGroupId = new IdGenerator(rootId, IdGenerator.END_GROUP);
+		this.subFilter = subFilter;
+		groupId = new IdGenerator(rootId, IdGenerator.START_GROUP);		
 		textUnitId = new IdGenerator(rootId, IdGenerator.TEXT_UNIT);
 		documentPartId = new IdGenerator(rootId, IdGenerator.DOCUMENT_PART);
-		startSubDocumentId = new IdGenerator(rootId, IdGenerator.START_SUBDOCUMENT);
-		endSubDocumentId = new IdGenerator(rootId, IdGenerator.END_SUBDOCUMENT);
+		subDocumentId = new IdGenerator(rootId, IdGenerator.START_SUBDOCUMENT);		
 		
 		done = false;
 		this.preserveWhitespace = true;
@@ -372,24 +425,28 @@ public class EventBuilder {
 	 * Add the START_SUBDOCUMENT {@link Event} to the event queue.
 	 */
 	public void startSubDocument() {
-		if (hasUnfinishedSkeleton()) {
-			endDocumentPart();
+		if (!subFilter) {
+			if (hasUnfinishedSkeleton()) {
+				endDocumentPart();
+			}
+	
+			StartSubDocument startSubDocument = new StartSubDocument(subDocumentId.createId());
+			Event event = new Event(EventType.START_SUBDOCUMENT, startSubDocument);
+			filterEvents.add(event);
+			LOGGER.log(Level.FINE, "Start Sub-Document for " + startSubDocument.getId());
 		}
-
-		StartSubDocument startSubDocument = new StartSubDocument(startSubDocumentId.createId());
-		Event event = new Event(EventType.START_SUBDOCUMENT, startSubDocument);
-		filterEvents.add(event);
-		LOGGER.log(Level.FINE, "Start Sub-Document for " + startSubDocument.getId());
 	}
 
 	/**
 	 * Add the END_SUBDOCUMENT {@link Event} to the event queue.
 	 */
 	public void endSubDocument() {
-		Ending endDocument = new Ending(endSubDocumentId.createId());
-		Event event = new Event(EventType.END_SUBDOCUMENT, endDocument);
-		filterEvents.add(event);
-		LOGGER.log(Level.FINE, "End Sub-Document for " + endDocument.getId());
+		if (!subFilter) {
+			Ending endDocument = new Ending(subDocumentId.createId(IdGenerator.END_SUBDOCUMENT));
+			Event event = new Event(EventType.END_SUBDOCUMENT, endDocument);
+			filterEvents.add(event);
+			LOGGER.log(Level.FINE, "End Sub-Document for " + endDocument.getId());
+		}
 	}
 
 	// ////////////////////////////////////////////////////////////////////////
@@ -891,17 +948,8 @@ public class EventBuilder {
 			processAllEmbedded(startMarker.toString(), locale, propertyTextUnitPlaceholders, false);
 		}
 
-		String parentId = null;
-		if (startSubDocumentId.getSequence() > 0) {
-			parentId = startSubDocumentId.getLastId();
-		} 
-		StartGroup parentGroup = peekMostRecentGroup();
-		if (parentGroup != null) {
-			parentId = parentGroup.getId();
-		}
-
-		String gid = startGroupId.createId();
-		StartGroup g = new StartGroup(parentId, gid);
+		String gid = groupId.createId();
+		StartGroup g = new StartGroup(findMostRecentParentId(), gid);
 
 		GenericSkeleton skel = new GenericSkeleton((GenericSkeleton) startMarker);
 
@@ -961,7 +1009,7 @@ public class EventBuilder {
 		}
 
 		popTempEvent();
-		Ending eg = new Ending(endGroupId.createId());
+		Ending eg = new Ending(groupId.getLastId(IdGenerator.END_GROUP));
 		filterEvents.add(new Event(EventType.END_GROUP, eg, skel));
 	}
 
@@ -1233,5 +1281,21 @@ public class EventBuilder {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Get the {@link IdGenerator} for Groups
+	 * @return the {@link IdGenerator}
+	 */
+	public IdGenerator getGroupId() {
+		return groupId;
+	}
+
+	/**
+	 * Get the {@link IdGenerator} for SubDocuments
+	 * @return the {@link IdGenerator}
+	 */
+	public IdGenerator getSubDocumentId() {
+		return subDocumentId;
 	}
 }

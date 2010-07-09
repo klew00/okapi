@@ -138,10 +138,10 @@ public class VersifiedTextFilter extends AbstractFilter {
 		if (eventBuilder == null) {
 			eventBuilder = new EventBuilder();
 		} else {
-			eventBuilder.reset(null);
+			eventBuilder.reset(null, isSubFilter());
 		}
 		
-		eventBuilder.addFilterEvent(createStartDocumentEvent());
+		eventBuilder.addFilterEvent(createStartFilterEvent());
 	}
 
 	@Override
@@ -222,7 +222,7 @@ public class VersifiedTextFilter extends AbstractFilter {
 		// reached the end of the file
 		if (currentLine == null) {
 			eventBuilder.flushRemainingEvents();
-			eventBuilder.addFilterEvent(createEndDocumentEvent());
+			eventBuilder.addFilterEvent(createEndFilterEvent());
 		}
 
 		return eventBuilder.next();

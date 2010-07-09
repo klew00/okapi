@@ -32,8 +32,8 @@ public class YamlEventBuilder extends EventBuilder {
 //	private static final String YAML_WHITESPACE_REGEX = "[ ]+";
 //	private static final Pattern YAML_WHITESPACE_PATTERN = Pattern.compile(YAML_WHITESPACE_REGEX);
 
-	public YamlEventBuilder(String rootId) {
-		super(rootId);
+	public YamlEventBuilder(String rootId, boolean subFilter) {
+		super(rootId, subFilter);
 	}
 	
 	/**

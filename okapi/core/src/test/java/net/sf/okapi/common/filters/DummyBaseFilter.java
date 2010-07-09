@@ -39,7 +39,7 @@ public class DummyBaseFilter extends AbstractFilter {
 	private EventBuilder eventBuilder;
 	
 	public DummyBaseFilter() {
-		eventBuilder = new EventBuilder("rootId");
+		eventBuilder = new EventBuilder("rootId", isSubFilter());
 	}
 	
 	public void close() {
@@ -82,8 +82,8 @@ public class DummyBaseFilter extends AbstractFilter {
 	private void createCase1 () {
 		setMimeType("text/xml");
 		
-		eventBuilder.reset("rootId");
-		eventBuilder.addFilterEvent(createStartDocumentEvent());
+		eventBuilder.reset("rootId", isSubFilter());
+		eventBuilder.addFilterEvent(createStartFilterEvent());
 		
 		eventBuilder.startTextUnit("Text.");
 		eventBuilder.endTextUnit();
@@ -92,15 +92,15 @@ public class DummyBaseFilter extends AbstractFilter {
 		eventBuilder.endDocumentPart();
 		
 		eventBuilder.flushRemainingEvents();
-		eventBuilder.addFilterEvent(createEndDocumentEvent());
+		eventBuilder.addFilterEvent(createEndFilterEvent());
 	}
 
 	private void createCase2 () {
 		setMimeType("text/xml");
 		setNewlineType("\n");
 
-		eventBuilder.reset("rootId");
-		eventBuilder.addFilterEvent(createStartDocumentEvent());
+		eventBuilder.reset("rootId", isSubFilter());
+		eventBuilder.addFilterEvent(createStartFilterEvent());
 
 		ArrayList<PropertyTextUnitPlaceholder> list = new ArrayList<PropertyTextUnitPlaceholder>();
 		list.add(new PropertyTextUnitPlaceholder(PlaceholderAccessType.WRITABLE_PROPERTY, "attr", "val1", 10, 14));
@@ -112,7 +112,7 @@ public class DummyBaseFilter extends AbstractFilter {
 		eventBuilder.addToTextUnit(new Code(TagType.CLOSING, "bold", "</b>"));
 		
 		eventBuilder.flushRemainingEvents();
-		eventBuilder.addFilterEvent(createEndDocumentEvent());
+		eventBuilder.addFilterEvent(createEndFilterEvent());
 	}
 
 	public List<FilterConfiguration> getConfigurations() {

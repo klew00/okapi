@@ -732,36 +732,47 @@ public class VignetteFilter implements IFilter {
 			groupId.createId(); // Create new Id for this group
 			if ( subFilter instanceof HtmlFilter ) { // For IdGenerator try-out
 				// The root id of is made of: rootId + subDocId + groupId
-				((HtmlFilter)subFilter).open(new RawDocument(data, srcLoc), true, rootId+subDocId+groupId);
+				Event event;
+				((HtmlFilter)subFilter).setStartSubFilterSkeleton(new GenericSkeleton("<![CDATA["));
+				((HtmlFilter)subFilter).setEndSubFilterSkeleton(new GenericSkeleton("]]>"));
+				((HtmlFilter)subFilter).openAsSubfilter(new RawDocument(data, srcLoc), 
+						rootId+subDocId+groupId, 
+						subDocId.getLastId(), 
+						groupId);
+				while ( subFilter.hasNext() ) {
+					event = subFilter.next();
+					queue.add(event);
+				}
+				subFilter.close();
 			}
 			else {
 				subFilter.open(new RawDocument(data, srcLoc));
-			}
-			
-			// Change the START_DOCUMENT to START_GROUP
-			Event event = subFilter.next(); // START_DOCUMENT
-			StartDocument sd = (StartDocument)event.getResource();
-			StartGroup sg = new StartGroup(subDocId.getLastId(), groupId.getLastId()); // Group id already created
-			sg.setType("x-"+partName);
-			sg.setMimeType(sd.getMimeType());
-			sg.setSkeleton(sd.getSkeleton());
-			sg.setAnnotation(new SubFilterAnnotation());
-			queue.add(new Event(EventType.START_GROUP, sg));
-			
-			while ( subFilter.hasNext() ) {
-				event = subFilter.next();
-				if ( event.getEventType() == EventType.END_DOCUMENT ) {
-					break;
+					
+				// Change the START_DOCUMENT to START_GROUP
+				Event event = subFilter.next(); // START_DOCUMENT
+				StartDocument sd = (StartDocument)event.getResource();
+				StartGroup sg = new StartGroup(subDocId.getLastId(), groupId.getLastId()); // Group id already created
+				sg.setType("x-"+partName);
+				sg.setMimeType(sd.getMimeType());
+				sg.setSkeleton(sd.getSkeleton());
+				sg.setAnnotation(new SubFilterAnnotation());
+				queue.add(new Event(EventType.START_GROUP, sg));
+				
+				while ( subFilter.hasNext() ) {
+					event = subFilter.next();
+					if ( event.getEventType() == EventType.END_DOCUMENT ) {
+						break;
+					}
+					queue.add(event);
 				}
-				queue.add(event);
+				subFilter.close();
+	
+				// Change the END_DOCUMENT to END_GROUP
+				Ending ending = new Ending(groupId.createId());
+				ending.setSkeleton(event.getResource().getSkeleton());
+				ending.setAnnotation(new SubFilterAnnotation());
+				queue.add(new Event(EventType.END_GROUP, ending));
 			}
-			subFilter.close();
-
-			// Change the END_DOCUMENT to END_GROUP
-			Ending ending = new Ending(groupId.createId());
-			ending.setSkeleton(event.getResource().getSkeleton());
-			ending.setAnnotation(new SubFilterAnnotation());
-			queue.add(new Event(EventType.END_GROUP, ending));
 		}
 	}
 	

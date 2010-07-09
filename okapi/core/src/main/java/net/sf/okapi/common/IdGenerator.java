@@ -20,8 +20,6 @@
 
 package net.sf.okapi.common;
 
-import java.security.InvalidParameterException;
-
 /**
  * Provides a common way to generate sequential ID that are unique for a given root.
  * <p>Each value generated is made of two main parts separated by a '-':
@@ -29,6 +27,8 @@ import java.security.InvalidParameterException;
  * <li>The sequential identifier starting at 1, with a fixed prefix if one was provided.  
  */
 public class IdGenerator {
+	public static final String START_DOCUMENT = "sd";
+	public static final String END_DOCUMENT = "ed";
 	public static final String START_GROUP = "sg";
 	public static final String END_GROUP = "eg";
 	public static final String TEXT_UNIT = "tu";
@@ -87,6 +87,27 @@ public class IdGenerator {
 	}
 	
 	/**
+	 * Creates a new identifier with the given prefix
+	 * @param prefix the prefix to be used  with this id
+	 * @return
+	 *  the new identifier.
+	 */
+	public String createId(String prefix) {
+		String orginalPrefix = this.prefix;
+		this.prefix = prefix;
+		try {
+			if ( rootId == null ) {
+				return prefix + Long.toString(++seq);
+			}
+			else {
+				return rootId + "-" + prefix + Long.toString(++seq);
+			} 
+		} finally {
+			this.prefix = orginalPrefix;
+		}		
+	}
+	
+	/**
 	 * Gets the last identifier generated.
 	 * This method allows you to get the last identifier that was returned by {@link #createId()}.
 	 * @return
@@ -107,6 +128,35 @@ public class IdGenerator {
 		}
 	}
 
+	/**
+	 * Gets the last identifier generated with the given prefix
+	 * This method allows you to get the last identifier that was returned by {@link #createId()}.
+	 * @param prefix prefix to be used with this id
+	 * @return
+	 *  the last identifier generated.
+	 * @throws
+	 *  RuntimeException if the method {@link #createId()} has not been called at least once
+	 *  before call this method. 
+	 */
+	public String getLastId (String prefix) {
+		String orginalPrefix = this.prefix;
+		this.prefix = prefix;
+
+		try {
+			if ( seq <= 0 ) {
+				throw new RuntimeException("The method createId() has not been called yet.");
+			}
+			if ( rootId == null ) {
+				return prefix + Long.toString(seq);
+			}
+			else {
+				return rootId + "-" + prefix + Long.toString(seq);
+			}
+		} finally {
+			this.prefix = orginalPrefix;
+		}
+	}
+	
 	/**
 	 * Gets the id generated from the root string given when creating this object.
 	 * @return the id of the root for this object (can be null)

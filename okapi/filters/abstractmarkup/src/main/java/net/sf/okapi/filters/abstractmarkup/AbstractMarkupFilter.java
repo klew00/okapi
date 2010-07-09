@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import net.htmlparser.jericho.Attribute;
 import net.htmlparser.jericho.CharacterEntityReference;
@@ -80,6 +81,10 @@ import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
  */
 public abstract class AbstractMarkupFilter extends AbstractFilter {
 	private static final Logger LOGGER = Logger.getLogger(AbstractMarkupFilter.class.getName());
+	private static final String CDATA_START_REGEX = "<\\!\\[CDATA\\[";
+	private static final String CDATA_END_REGEX = "\\]\\]>";
+	private static final Pattern CDATA_START_PATTERN = Pattern.compile(CDATA_START_REGEX);
+	private static final Pattern CDATA_END_PATTERN = Pattern.compile(CDATA_END_REGEX);
 	private static final int PREVIEW_BYTE_COUNT = 1024;
 
 	private StringBuilder bufferedWhitespace;
@@ -90,9 +95,9 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	private EventBuilder eventBuilder;
 	private RawDocument currentRawDocument;
 	private ExtractionRuleState ruleState;
-	private String rootId;
-	private IFilter cdataSubfilter;
-
+	//private String rootId;
+	private AbstractFilter cdataSubfilter;
+	
 	static {
 		Config.ConvertNonBreakingSpaces = false;
 		Config.NewLine = BOMNewlineEncodingDetector.NewlineType.LF.toString();
@@ -129,8 +134,9 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	/**
 	 * Close the filter and all used resources.
 	 */
-	public void close() {
-
+	public void close() {	
+		super.close();
+		
 		if (ruleState != null) {
 			ruleState.reset(!getConfig().isGlobalPreserveWhitespace());
 		}
@@ -188,8 +194,8 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	}
 
 	/**
-	 * Use this open when the rootId must be different from the document name. Used mostly when filter 
-	 * is called as a sub-filters.
+	 * Use this open when the rootId must be different from the document name. Used mostly when filter is called as a
+	 * sub-filters.
 	 * 
 	 * @param input
 	 *            - input to the {@link IFilter} (can be a {@link CharSequence}, {@link URI} or {@link InputStream})
@@ -197,11 +203,11 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 *            - true if the {@link IFilter} should store non-translatble blocks (aka skeleton), false otherwise.
 	 * @param rootId
 	 *            - id root used to give resources a unique id
-	 */
-	public void open(RawDocument input, boolean generateSkeleton, String rootId) {
-		this.rootId = rootId;
+	 *
+	public void open(RawDocument input, boolean generateSkeleton, String rootId) {		
 		open(input, generateSkeleton);
-	}
+		this.rootId = rootId;
+	}*/
 
 	/**
 	 * Start a new {@link IFilter} using the supplied {@link RawDocument}.
@@ -339,21 +345,14 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 */
 	protected void startFilter() {
 		// order of execution matters
-
-		// create EventBuilder with document name as rootId
-		//YS: change to allow use of no root: String rid = (rootId == null) ? getDocumentName() : rootId;
-		String rid = rootId;
-		
 		if (eventBuilder == null) {
-			eventBuilder = new AbstractMarkupEventBuilder(rid);
+			eventBuilder = new AbstractMarkupEventBuilder(getRootId(), isSubFilter());
 			eventBuilder.setMimeType(getMimeType());
 		} else {
-			eventBuilder.reset(rid);
-		}
-		// reset rootId for next run
-		rootId = null;
-		
-		eventBuilder.addFilterEvent(createStartDocumentEvent());
+			eventBuilder.reset(getRootId(), isSubFilter());
+		}		
+
+		eventBuilder.addFilterEvent(createStartFilterEvent());		
 
 		// default is to preserve whitespace
 		boolean preserveWhitespace = true;
@@ -365,21 +364,21 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 
 		// This optimizes memory at the expense of performance
 		nodeIterator = document.iterator();
-		
+
 		// initialize sub-filter
 		if (getConfig().getGlobalCDATASubfilter() != null) {
-			cdataSubfilter =  getFilterConfigurationMapper().
-				createFilter(getConfig().getGlobalCDATASubfilter(), cdataSubfilter);
+			cdataSubfilter = (AbstractFilter)getFilterConfigurationMapper().createFilter(
+					getConfig().getGlobalCDATASubfilter(), cdataSubfilter);
 			getEncoderManager().mergeMappings(cdataSubfilter.getEncoderManager());
-		}		
+		}
 	}
 
 	/**
 	 * End the current filter processing and send the {@link Ending} {@link Event}
 	 */
 	protected void endFilter() {
-		eventBuilder.flushRemainingEvents();
-		eventBuilder.addFilterEvent(createEndDocumentEvent());
+		eventBuilder.flushRemainingEvents();	
+		eventBuilder.addFilterEvent(createEndFilterEvent());
 	}
 
 	/**
@@ -494,10 +493,24 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 * @param tag
 	 */
 	protected void handleCdataSection(Tag tag) {
-		if (cdataSubfilter != null) {
-			
-		} 
-		else {
+		if (cdataSubfilter != null) {				
+			String parentId = eventBuilder.findMostRecentParentId();
+			String cdataWithoutMarkers = CDATA_START_PATTERN.matcher(tag.toString()).replaceFirst("");
+			cdataWithoutMarkers = CDATA_END_PATTERN.matcher(cdataWithoutMarkers).replaceFirst("");
+			cdataSubfilter.close();
+			cdataSubfilter.setStartSubFilterSkeleton(new GenericSkeleton("<![CDATA["));
+			cdataSubfilter.setEndSubFilterSkeleton(new GenericSkeleton("]]>"));
+			cdataSubfilter.openAsSubfilter(new RawDocument(cdataWithoutMarkers, getSrcLoc()), 
+					// TODO fully set root id??
+					getDocumentId().getLastId(),
+					parentId == null ? getDocumentId().getLastId() : parentId, 
+					eventBuilder.getGroupId());	
+			while (cdataSubfilter.hasNext()) {
+				Event event = cdataSubfilter.next();
+				eventBuilder.addFilterEvent(event);
+			}
+			cdataSubfilter.close();
+		} else {
 			addToDocumentPart(tag.toString());
 		}
 	}
@@ -570,7 +583,6 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		String idValue = null;
 		RULE_TYPE ruleType = getConfig().getConditionalElementRuleType(startTag.getName(),
 				attributes);
-		;
 
 		try {
 			// if in excluded state everything is skeleton including text

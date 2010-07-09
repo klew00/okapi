@@ -732,9 +732,10 @@ public class FilterTestDriver {
 				return true;
 			}
 		}
-		catch ( Throwable e ) {
-			System.err.println(e.getMessage());
-		}
+// JEH Better to get the real exception for diagnostic info
+//		catch ( Throwable e ) {
+//			System.err.println(e.getMessage());
+//		}
 		finally {
 			if ( filter != null ) filter.close();
 		}
