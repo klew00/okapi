@@ -58,7 +58,6 @@ public class QualityCheckSession {
 	private LocaleId sourceLocale = LocaleId.ENGLISH;
 	private LocaleId targetLocale = LocaleId.FRENCH;
 	private IFilter filter;
-	private String rootDir;
 	private boolean modified;
 	
 	public QualityCheckSession () {
@@ -157,7 +156,7 @@ public class QualityCheckSession {
 	}
 	
 	public void recheckDocument (URI docId) {
-		startProcess(targetLocale, null);
+		startProcess(targetLocale);
 		RawDocument rd = rawDocs.get(docId);
 		if ( rd != null ) {
 			executeRecheck(rd, null);
@@ -169,7 +168,7 @@ public class QualityCheckSession {
 			issues.clear();
 			return;
 		}
-		startProcess(targetLocale, null);
+		startProcess(targetLocale);
 		for ( RawDocument rd : rawDocs.values() ) {
 			executeRecheck(rd, sigList);
 		}
@@ -361,10 +360,7 @@ public class QualityCheckSession {
 		}
 	}
 
-	public void startProcess (LocaleId locId,
-		String rootDir)
-	{
-		this.rootDir = rootDir;
+	public void startProcess (LocaleId locId) {
 		checker.startProcess(locId, params, issues);
 	}
 	
@@ -378,7 +374,7 @@ public class QualityCheckSession {
 		checker.processTextUnit(textUnit);
 	}
 
-	public void generateReport () {
+	public void generateReport (String rootDir) {
 		XMLWriter writer = null;
 		try {
 			// Create the output file
@@ -392,10 +388,10 @@ public class QualityCheckSession {
 				+ "h1 { font-size: 110%; }"
 				+ "h2 { font-size: 100%; }"
 				+ "h3 { font-size: 100%; }"
-				+ "p.item { font-family: Courier New, courier; font-size: 100%; white-space: pre;"
-				+ "   border: solid 1px; padding: 0.5em; border-color: silver; background-color: whitesmoke; }"
-	      		+ "pre { font-family: Courier New, courier; font-size: 100%;"
-	      		+ "   border: solid 1px; padding: 0.5em; border-color: silver; background-color: whitesmoke; }"
+				+ "p.s { font-family: Courier New, courier; font-size: 100%;"
+				+ "   border: solid 1px; padding: 0.5em; margin-top:-0.7em; border-color: silver; background-color: #C0FFFF; }"
+				+ "p.t { font-family: Courier New, courier; font-size: 100%; margin-top:-1.1em;"
+				+ "   border: solid 1px; padding: 0.5em; border-color: silver; background-color: #C0FFC0; }"
 				+ "span.hi { background-color: #FFFF00; }"
 				+ "</style></head>");
 			writer.writeStartElement("body");
@@ -426,11 +422,11 @@ public class QualityCheckSession {
 				writer.writeString(position+":");
 				writer.writeRawXML("<br />");
 				writer.writeString(issue.message);
-				writer.writeEndElement(); // p
-				writer.writeRawXML("<p class=\"item\">");
-				writer.writeString("Source: ["+issue.oriSource+"]");
-				writer.writeRawXML("<br />");
-				writer.writeString("Target: ["+issue.oriTarget+"]");
+				writer.writeEndElementLineBreak(); // p
+				writer.writeRawXML("<p class='s'>");
+				writer.writeRawXML("S: '"+highlight(issue.oriSource, issue.srcStart, issue.srcEnd)+"'");
+				writer.writeRawXML("<p><p class='t'>");
+				writer.writeRawXML("T: '"+highlight(issue.oriTarget, issue.trgStart, issue.trgEnd)+"'");
 				writer.writeRawXML("</p>");
 				writer.writeLineBreak();
 
@@ -446,4 +442,22 @@ public class QualityCheckSession {
 		}
 	}
 
+	private String highlight (String text,
+		int start,
+		int end)
+	{
+		if ( end > 0 ) {
+			// Add placeholder for the highlights
+			StringBuilder buf = new StringBuilder(text);
+			buf.insert(start, '\u0017');
+			buf.insert(end+1, '\u0018');
+			String tmp = Util.escapeToXML(buf.toString(), 0, false, null);
+			tmp = tmp.replace("\u0017", "<span class='hi'>");
+			tmp = tmp.replace("\u0018", "</span>");
+			return tmp.replace("\n", "<br/>");
+		}
+		// Else: just escape the string
+		return Util.escapeToXML(text, 0, false, null).replace("\n", "<br/>");
+	}
+	
 }

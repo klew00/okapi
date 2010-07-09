@@ -22,7 +22,6 @@ package net.sf.okapi.lib.ui.verification;
 
 import java.io.File;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Map;
 
 import net.sf.okapi.common.IHelp;

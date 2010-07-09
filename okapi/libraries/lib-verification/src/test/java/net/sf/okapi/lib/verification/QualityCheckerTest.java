@@ -42,7 +42,7 @@ public class QualityCheckerTest {
 	@Before
 	public void setUp() {
 		session = new QualityCheckSession();
-		session.startProcess(locFR, null);
+		session.startProcess(locFR);
 	}
 
 	@Test
@@ -206,7 +206,7 @@ public class QualityCheckerTest {
 		tu.getTarget(locFR).getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<CODE/>");
 		
 		session.getParameters().setCodeDifference(false);
-		session.startProcess(locFR, null);
+		session.startProcess(locFR);
 		
 		session.processTextUnit(tu);
 		List<Issue> issues = session.getIssues();
@@ -223,7 +223,7 @@ public class QualityCheckerTest {
 		
 		session.getParameters().setCodeDifference(false);
 		session.getParameters().setTargetSameAsSourceWithCodes(false);
-		session.startProcess(locFR, null);
+		session.startProcess(locFR);
 		
 		session.processTextUnit(tu);
 		List<Issue> issues = session.getIssues();
@@ -251,7 +251,7 @@ public class QualityCheckerTest {
 		list.add(new PatternItem("%s", PatternItem.SAME, true, Issue.SEVERITY_HIGH));
 
 		session.getParameters().setPatterns(list);
-		session.startProcess(locFR, null); // Make sure we re-initialize
+		session.startProcess(locFR); // Make sure we re-initialize
 		
 		session.processTextUnit(tu);
 		List<Issue> issues = session.getIssues();

@@ -93,7 +93,7 @@ class QualityChecker {
 			);
 		}
 		
-		// Character check
+		// Characters check
 		encoder = null;
 		extraCharsAllowed = null;
 		if ( params.getCheckCharacters() ) {
@@ -307,7 +307,9 @@ class QualityChecker {
 		
 			// The character is not allowed: add the error
 			if ( ++count > 1 ) {
-				badChars.append(ch);
+				if ( badChars.indexOf(String.valueOf(ch)) == -1 ) { 
+					badChars.append(ch);
+				}
 			}
 			else {
 				pos = i;

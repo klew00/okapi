@@ -875,6 +875,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 			sr.length = issue.trgEnd-issue.trgStart;
 			edTarget.setStyleRange(sr);
 			edTarget.setCaretOffset(issue.trgEnd);
+			edTarget.showSelection();
 		}
 	}
 
@@ -901,9 +902,9 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 	private void generateReport () {
 		try {
 			startWaiting("Generating report...");
-			session.generateReport();
-			//TODO: get a rootDir
-			String finalPath = Util.fillRootDirectoryVariable(session.getParameters().getOutputPath(), null);
+			String rootDir = (qcsPath==null ? null : Util.getDirectoryName(qcsPath));
+			session.generateReport(rootDir);
+			String finalPath = Util.fillRootDirectoryVariable(session.getParameters().getOutputPath(), rootDir);
 			if ( session.getParameters().getAutoOpen() ) {
 				Util.openURL((new File(finalPath)).getAbsolutePath());
 			}

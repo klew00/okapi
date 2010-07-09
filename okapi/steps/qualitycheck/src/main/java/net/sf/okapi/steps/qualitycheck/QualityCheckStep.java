@@ -141,7 +141,7 @@ public class QualityCheckStep extends BasePipelineStep {
 		RawDocumentMode = false;
 		isDone = true;
 		if ( !initDone ) {
-			session.startProcess(targetLocale, rootDir);
+			session.startProcess(targetLocale);
 			initDone = true;
 		}
 		// No pre-existing disabled issues: sigList = null
@@ -164,7 +164,7 @@ public class QualityCheckStep extends BasePipelineStep {
 		}
 		else {
 			// Generate the report
-			session.generateReport();
+			session.generateReport(rootDir);
 			String finalPath = Util.fillRootDirectoryVariable(session.getParameters().getOutputPath(), rootDir);
 			
 			// save the session if requested

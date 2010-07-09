@@ -21,7 +21,9 @@
 package net.sf.okapi.filters.abstractmarkup.ui;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
 
@@ -31,9 +33,11 @@ class Element {
 	List<RULE_TYPE> rules;
 	List<Condition> conditions;
 	String subFilter = "";
-
+	Map<String, List<Condition>> transAttr;
+	
 	public Element () {
 		rules = new ArrayList<RULE_TYPE>();
+		transAttr = new Hashtable<String, List<Condition>>();
 	}
 
 }
