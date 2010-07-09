@@ -194,8 +194,25 @@ public class QualityCheckerTest {
 		
 		session.processTextUnit(tu);
 		List<Issue> issues = session.getIssues();
-		assertEquals(1, issues.size());
+		assertEquals(2, issues.size());
 		assertEquals(IssueType.CODE_DIFFERENCE, issues.get(0).issueType);
+		assertEquals(IssueType.CODE_DIFFERENCE, issues.get(1).issueType);
+	}
+
+	@Test
+	public void testCODE_DIFFERENCE_OrderDiffIsOK () {
+		TextUnit tu = new TextUnit("id", "src ");
+		tu.getSource().getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<code1/>");
+		tu.getSource().getSegments().get(0).text.append(" and ");
+		tu.getSource().getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<code2/>");
+		tu.setTarget(locFR, new TextContainer("trg "));
+		tu.getTarget(locFR).getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<code2/>");
+		tu.getTarget(locFR).getSegments().get(0).text.append(" et ");
+		tu.getTarget(locFR).getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<code1/>");
+		
+		session.processTextUnit(tu);
+		List<Issue> issues = session.getIssues();
+		assertEquals(0, issues.size());
 	}
 
 	@Test

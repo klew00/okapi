@@ -65,7 +65,11 @@ checks <a href="#PatternsTab">the list of patterns</a> that have their expected
 target set to &quot;<code>&lt;same&gt;</code>&quot;. If the string matches one of those patterns 
 no warning is generated as the target is expected to be the same.</p>
 <p><cite>Warn if there is a code differences between source and target segments</cite> -- Set this option to 
-verify that the target content has the same inline codes as the source content.</p>
+verify that the target content has the same inline codes as the source content. 
+This function compares the content of the codes between the source and target. 
+Both missing codes (codes in the source but not in the target) and extra codes 
+(codes in the target but not in the source) are indicated. Differences only in 
+the order of the codes do not trigger a warning.</p>
 <p><cite>Warn on doubled words</cite> -- Set this option to flag the target 
 segments where there is a sequential repetition of the same word, for example 
 &quot;is is&quot; in &quot;this is is an example&quot;. The check is not case-sensitive, for example 

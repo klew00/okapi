@@ -24,6 +24,8 @@ import java.io.File;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -334,47 +336,89 @@ class QualityChecker {
 		
 	}
 	
+	// Create a copy of the codes and strip out any that has empty data.
+	// They correspond to process-only codes like <df> in TTX or <mrk> in XLIFF
+	private List<Code> stripNoiseCodes (Segment seg) {
+		List<Code> list = new ArrayList<Code>(seg.text.getCodes());
+		Iterator<Code> iter = list.iterator();
+		while ( iter.hasNext() ) {
+			Code code = iter.next();
+			if ( Util.isEmpty(code.getData()) ) {
+				iter.remove();
+			}
+		}
+		return list;
+	}
+	
+	private String buildCodeList (List<Code> list) {
+		StringBuilder tmp = new StringBuilder();
+		for ( Code code : list ) {
+			if ( tmp.length() > 0 ) tmp.append(", ");
+			tmp.append("\""+code.getData()+"\"");
+		}
+		return tmp.toString();
+	}
+	
 	private void checkInlineCodes (Segment srcSeg,
 		Segment trgSeg,
 		TextUnit tu)
 	{
-		String srcCodes = srcSeg.text.getCodes().toString();
-		String trgCodes = trgSeg.text.getCodes().toString();
-		if ( !srcCodes.equals(trgCodes) ) {
+		List<Code> srcList = stripNoiseCodes(srcSeg);
+		List<Code> trgList = stripNoiseCodes(trgSeg);
+
+		// If no codes: don't check
+		if (( srcList.size() == 0 ) && ( trgList.size() == 0 )) return;
+
+		// Quick check: if strings are the same, no differneces
+		if ( srcList.toString().equals(trgList.toString()) ) return;
+		
+//		//--- temporary way of verifying the codes
+//		String srcCodes = srcList.toString();
+//		String trgCodes = trgList.toString();
+//		if ( !srcCodes.equals(trgCodes) ) {
+//			reportIssue(IssueType.CODE_DIFFERENCE, tu, srcSeg.getId(),
+//				"The translation does not have the same codes as the source.",
+//				0, -1, 0, -1, Issue.SEVERITY_MEDIUM, srcSeg.toString(), trgSeg.toString());
+//		}
+//		//if ( true ) return;
+//		//--- end temp way
+	
+		// Check codes missing in target
+		Iterator<Code> srcIter = srcList.iterator();
+		while ( srcIter.hasNext() ) {
+			Code srcCode = srcIter.next();
+			Iterator<Code> trgIter = trgList.iterator();
+			while ( trgIter.hasNext() ) {
+				Code trgCode = trgIter.next();
+				if ( trgCode.getData().equals(srcCode.getData()) ) {
+					// Found: remove them from lists
+					trgIter.remove();
+					srcIter.remove();
+					break;
+				}
+			}
+		}
+
+		// What is left in the source list are the codes missing in the target
+		if ( !srcList.isEmpty() ) {
 			reportIssue(IssueType.CODE_DIFFERENCE, tu, srcSeg.getId(),
-				"The translation does not have the same codes as the source.",
+				"Codes in the source but missing in the target: "+buildCodeList(srcList),
 				0, -1, 0, -1, Issue.SEVERITY_MEDIUM, srcSeg.toString(), trgSeg.toString());
 		}
 		
-//		List<Code> srcCodes = new ArrayList<Code>();
-//		for ( Code code: srcSeg.text.getCodes() ) {
-//			srcCodes.add(code.clone());
-//		}
-//		List<Code> trgCodes = new ArrayList<Code>();
-//		for ( Code code: trgSeg.text.getCodes() ) {
-//			trgCodes.add(code.clone());
-//		}
-//		
-//		for ( Code srcCode : srcCodes ) {
-//			for ( int j=0; j<trgCodes.size(); j++ ) {
-//				if ( srcCode.getId() == trgCodes.get(j).getId() ) {
-//					if ( srcCode.getTagType() == trgCodes.get(j).getTagType() ) {
-//						String srcData = srcCode.getData();
-//						String trgData = trgCodes.get(j).getData();
-//						if (( srcData != null ) && ( trgData != null )) {
-//							if ( !srcData.equals(trgData) ) {
-//								
-//							}
-//						}
-//						// Else: either one or both are null
-//						if (( srcData == null ) && ( trgData == null )) {
-//							continue; // No difference
-//						}
-//						reportIssue(IssueType.EMPTY_TARGETSEG, tu, srcSeg.getId(),
-//							"Code difference: source='%s' "
-//					}
-//				}
-//			}
+		// What is left in the target list are the extra codes in the target
+		if ( !trgList.isEmpty() ) {
+			reportIssue(IssueType.CODE_DIFFERENCE, tu, srcSeg.getId(),
+				"Extra codes in the target not in the source: "+buildCodeList(trgList),
+				0, -1, 0, -1, Issue.SEVERITY_MEDIUM, srcSeg.toString(), trgSeg.toString());
+		}
+		
+//		// If both list are empty but we get here:
+//		// This means the codes are the same but in a different order
+//		if ( srcList.isEmpty() && trgList.isEmpty() ) {
+//			reportIssue(IssueType.CODE_DIFFERENCE, tu, srcSeg.getId(),
+//				"Codes are in a different order in the source and target.",
+//				0, -1, 0, -1, Issue.SEVERITY_MEDIUM, srcSeg.toString(), trgSeg.toString());
 //		}
 	}
 	
@@ -539,74 +583,13 @@ class QualityChecker {
 		}
 	}
 
-	/* working before fromSource addition
-	 * 
 	private void checkPatterns (Segment srcSeg,
 		Segment trgSeg,
 		TextUnit tu)
 	{
+		//--- Source-based search
 		// Get the source text
 		String srcCText = srcSeg.text.getCodedText();
-		
-		// Search for any enabled pattern in the source
-		for ( PatternItem item : patterns ) {
-			// Skip disabled items
-			if ( !item.enabled ) continue;
-			
-			Matcher srcM = item.getSourcePattern().matcher(srcCText);
-			
-			// Use a copy for the target: it may get modified for the search
-			StringBuilder trgCText = new StringBuilder(trgSeg.text.getCodedText());
-
-			while ( srcM.find() ) {
-				// Get the source text corresponding to the match
-				String srcPart = srcCText.substring(srcM.start(), srcM.end());
-				int start, end;
-				boolean found = false;
-				boolean expectSame = item.target.equals(PatternItem.SAME);
-				// Try to get the corresponding part in the target
-				if ( expectSame ) {
-					// If the target pattern is defined as being the same as the source
-					// Look for the same text in the source.
-					found = ((start = trgCText.indexOf(srcPart)) != -1);
-					end = start + srcPart.length();
-				}
-				else { // Target part has its own pattern
-					Matcher trgM = item.getTargetPattern().matcher(trgCText);
-					found = trgM.find();
-					start = trgM.start();
-					end = trgM.end();
-				}
-				// Process result
-				if ( found ) { // Remove that match in case source has several occurrences to match
-					trgCText.delete(start, end);
-				}
-				else { // Generate an issue
-					String msg;
-					if ( expectSame ) {
-						msg = String.format("The source part \"%s\" is not in the target.", srcPart);
-					}
-					else {
-						msg = String.format("The source part \"%s\" has no correspondance in the target.", srcPart);
-					}
-					reportIssue(IssueType.UNEXPECTED_PATTERN, tu, srcSeg.getId(), msg,
-						fromFragmentToString(srcSeg.text, srcM.start()),
-						fromFragmentToString(srcSeg.text, srcM.end()),
-						0, -1, item.severity,
-						srcSeg.toString(), trgSeg.toString());
-				}
-			}
-		}
-	}
-*/
-	
-	private void checkPatterns (Segment srcSeg,
-		Segment trgSeg,
-		TextUnit tu)
-	{
-		// Get the source text
-		String srcCText = srcSeg.text.getCodedText();
-		
 		// Search for any enabled pattern in the source
 		for ( PatternItem item : patterns ) {
 			// Skip disabled items and items that use the target as the base
@@ -656,17 +639,18 @@ class QualityChecker {
 				}
 			}
 		}
-		
-		// Search for any enabled pattern in the target
-		// Get the source text
+
+		//--- Target-based search
+		// Get the target text
 		String trgCText = trgSeg.text.getCodedText();
+		// Search for any enabled pattern in the source
 		for ( PatternItem item : patterns ) {
 			// Skip disabled items and items that use the source as the base
 			if ( !item.enabled || item.fromSource ) continue;
 			
 			Matcher trgM = item.getTargetPattern().matcher(trgCText);
 			
-			// Use a copy for the target: it may get modified for the search
+			// Use a copy for the source: it may get modified for the search
 			StringBuilder srcCTextCopy = new StringBuilder(srcSeg.text.getCodedText());
 
 			while ( trgM.find() ) {
@@ -675,21 +659,21 @@ class QualityChecker {
 				int start, end;
 				boolean found = false;
 				boolean expectSame = item.source.equals(PatternItem.SAME);
-				// Try to get the corresponding part in the target
+				// Try to get the corresponding part in the source
 				if ( expectSame ) {
-					// If the target pattern is defined as being the same as the source
+					// If the source pattern is defined as being the same as the target
 					// Look for the same text in the source.
 					found = ((start = srcCTextCopy.indexOf(trgPart)) != -1);
 					end = start + trgPart.length();
 				}
-				else { // Target part has its own pattern
+				else { // Source part has its own pattern
 					Matcher srcM = item.getSourcePattern().matcher(srcCTextCopy);
 					found = srcM.find();
 					start = srcM.start();
 					end = srcM.end();
 				}
 				// Process result
-				if ( found ) { // Remove that match in case source has several occurrences to match
+				if ( found ) { // Remove that match in case target has several occurrences to match
 					srcCTextCopy.delete(start, end);
 				}
 				else { // Generate an issue
