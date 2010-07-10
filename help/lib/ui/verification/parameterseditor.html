@@ -52,14 +52,26 @@ segment.</p>
 which the translation is empty (if the corresponding source is not empty).</p>
 <p><cite>Warn if a target segment is not empty when its source is empty</cite> -- Set this option to flag the segments for 
 which the target is not empty while its source is empty.</p>
-<p><cite>Warn if a target segment is the same as its source</cite> -- Set this option to flag the 
-segments where the translation is the same as the source. This check is done 
-only if the source segment contain text.</p>
+<p><cite>Warn if a target segment is the same as its source</cite> -- Set this 
+option to flag the segments where the translation is the same as the source. 
+This check is done only if the source segment contain in its text at least one 
+word-character (a character included in the regular expression: &quot;<code>[\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}]</code>&quot;, 
+which is basically: any Unicode letter or digit. Note also that the inline codes 
+are not part of the text of the entry.<br>
+For example (with codes in gray):</p>
+<ul>
+	<li>The entry &quot;<code><span style="background-color: #C0C0C0">&lt;b&gt;%s&lt;/b&gt;</span> 
+	: <span style="background-color: #C0C0C0">%d</span></code>&quot; is not checked 
+	because it has no character that could be part of a word.</li>
+	<li>The entry &quot;<code>-------- S= <span style="background-color: #C0C0C0">%d</span></code>&quot; 
+	is checked because the character 'S' could be part of a word.</li>
+</ul>
 <p><cite>Include the codes in the comparison</cite> -- Set this option if the 
 comparison done when verifying if the target is the same as the source should 
 take inline codes into account. If this option is set and the only difference 
-between the source and the translation is the inline code, the segment will not 
-be flagged as having the target the same as the source.</p>
+between the source and the translation is an inline code, the segment will not 
+be flagged as having the target the same as the source (because the will have at 
+least one code different).</p>
 <p>Note that when a target is found to be the same as its source, the tool 
 checks <a href="#PatternsTab">the list of patterns</a> that have their expected 
 target set to &quot;<code>&lt;same&gt;</code>&quot;. If the string matches one of those patterns 
@@ -165,7 +177,20 @@ and displayed along with the original messages.</p>
 po</code> for Polish).</p>
 <p><cite>Into</cite> -- Enter the code of the language into which you want to 
 translate the messages (e.g. <code>en</code> for English)</p>
-<h3>Output Tab</h3>
+<h3>Other Settings Tab</h3>
+<h3>Scope</h3>
+<p>Note that entries flagged as non-translatable are never processed, regardless 
+of the choice for the scope. When the scope is not set to all entries, it is 
+determined by the value of the <i>Approved</i> property The setting of this 
+property is specific to each&nbsp; file format.</p>
+<p><cite>Process all entries</cite> -- Select this option to process all 
+entries.</p>
+<p><cite>Process only approved entries</cite> -- Select this option to process 
+only the entries that have the property <i>Approved</i> set to &quot;yes&quot;.</p>
+<p><cite>Process only non-approved entries</cite> -- Select this option to 
+process only the entries that do not have a property <i>Approved</i>, or that 
+have one not set to &quot;yes&quot;.</p>
+<h3>Report output</h3>
 <p><cite>Path of the report file</cite> -- Enter the full path of the HTML 
 report to generate. You can use the variable <code>${rootDir}</code> in the 
 path.</p>

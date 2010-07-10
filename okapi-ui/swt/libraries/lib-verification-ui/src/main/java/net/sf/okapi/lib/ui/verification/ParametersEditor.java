@@ -126,6 +126,9 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Text edCharset;
 	private Label stExtraCharsAllowed;
 	private Text edExtraCharsAllowed;
+	private Button rdScopeAllEntries;
+	private Button rdScopeApprovedOnly;
+	private Button rdScopeNotApprovedOnly;
 	
 	// Flag to indicate the editor is use for step parameters
 	// We default to true because the step cannot set this option
@@ -559,15 +562,35 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		tiTmp.setControl(cmpTmp);
 
 
-		//--- Output tab
+		//--- Other Settings tab
 		
 		cmpTmp = new Composite(tabs, SWT.NONE);
 		layTmp = new GridLayout();
 		cmpTmp.setLayout(layTmp);
+		
+		Group grpScope = new Group(cmpTmp, SWT.NONE);
+		grpScope.setText("Scope");
+		grpScope.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		grpScope.setLayout(new GridLayout());
+		
+		rdScopeAllEntries = new Button(grpScope, SWT.RADIO);
+		rdScopeAllEntries.setText("Process all entries");
 
-		label = new Label(cmpTmp, SWT.NONE);
+		rdScopeApprovedOnly = new Button(grpScope, SWT.RADIO);
+		rdScopeApprovedOnly.setText("Process only approved entries (e.g. \"approved\" entries in TS files)");
+
+		rdScopeNotApprovedOnly = new Button(grpScope, SWT.RADIO);
+		rdScopeNotApprovedOnly.setText("Process only entries not approved (e.g. \"fuzzy\" entries in PO files)");
+
+		Group grpOut = new Group(cmpTmp, SWT.NONE);
+		grpOut.setText("Report output");
+		grpOut.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		grpOut.setLayout(new GridLayout());
+
+		label = new Label(grpOut, SWT.NONE);
 		label.setText("Path of the report file:");
-		pnlOutputPath = new TextAndBrowsePanel(cmpTmp, SWT.NONE, false);
+		
+		pnlOutputPath = new TextAndBrowsePanel(grpOut, SWT.NONE, false);
 		pnlOutputPath.setSaveAs(true);
 		pnlOutputPath.setTitle("Quality Check Report");
 		pnlOutputPath.setBrowseFilters("HTML Files (*.html;*.htm)\tAll Files (*.*)", "*.html;*.htm\t*.*");
@@ -575,7 +598,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		pnlOutputPath.setLayoutData(gdTmp);
 
-		chkAutoOpen = new Button(cmpTmp, SWT.CHECK);
+		chkAutoOpen = new Button(grpOut, SWT.CHECK);
 		chkAutoOpen.setText("Open the report after completion");
 
 		if ( stepMode ) {
@@ -599,7 +622,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		}
 		
 		tiTmp = new TabItem(tabs, SWT.NONE);
-		tiTmp.setText("Output");
+		tiTmp.setText("Other Settings");
 		tiTmp.setControl(cmpTmp);
 		
 		mainComposite.pack();
@@ -906,6 +929,10 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		chkMinCharLength.setSelection(params.getCheckMinCharLength());
 		spMinCharLength.setSelection(params.getMinCharLength());
 		
+		rdScopeAllEntries.setSelection(params.getScope()==Parameters.SCOPE_ALL);
+		rdScopeApprovedOnly.setSelection(params.getScope()==Parameters.SCOPE_APPROVEDONLY);
+		rdScopeNotApprovedOnly.setSelection(params.getScope()==Parameters.SCOPE_NOTAPPROVEDONLY);
+		
 		chkCheckCharacters.setSelection(params.getCheckCharacters());
 		edCharset.setText(params.getCharset());
 		edExtraCharsAllowed.setText(params.getExtraCharsAllowed());
@@ -1012,6 +1039,16 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			params.setMinCharLength(spMinCharLength.getSelection());
 		}
 
+		if ( rdScopeApprovedOnly.getSelection() ) {
+			params.setScope(Parameters.SCOPE_APPROVEDONLY);
+		}
+		else if ( rdScopeNotApprovedOnly.getSelection() ) {
+			params.setScope(Parameters.SCOPE_NOTAPPROVEDONLY);
+		}
+		else {
+			params.setScope(Parameters.SCOPE_ALL);
+		}
+		
 		params.setOutputPath(pnlOutputPath.getText());
 		params.setCodeDifference(chkCodeDifference.getSelection());
 		params.setAutoOpen(chkAutoOpen.getSelection());

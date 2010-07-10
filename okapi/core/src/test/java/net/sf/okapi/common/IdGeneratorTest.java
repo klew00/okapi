@@ -2,8 +2,6 @@ package net.sf.okapi.common;
 
 import static org.junit.Assert.*;
 
-import java.security.InvalidParameterException;
-
 import org.junit.Test;
 
 public class IdGeneratorTest {
@@ -156,6 +154,27 @@ public class IdGeneratorTest {
 			bis  = idGen.getLastId();
 		}
 		assertEquals(id, bis);
+	}
+
+	@Test
+	public void testCreateIdWithPrefix () {
+		idGen = new IdGenerator(null, "p");
+		String id = idGen.createId();
+		assertEquals("p1", id);
+		id = idGen.createId("xyz");
+		assertEquals("xyz2", id);
+		id = idGen.createId();
+		assertEquals("p3", id);
+	}
+
+	@Test
+	public void testLastIdWithPrefix () {
+		idGen = new IdGenerator(null, "p");
+		String id = idGen.createId("zxc");
+		assertEquals("zxc1", id);
+		assertEquals("zxc1", idGen.getLastId("zxc"));
+		assertEquals("p2", idGen.createId());
+//Not working or not logical		assertEquals("zxc1", idGen.getLastId("zxc"));
 	}
 
 	@Test

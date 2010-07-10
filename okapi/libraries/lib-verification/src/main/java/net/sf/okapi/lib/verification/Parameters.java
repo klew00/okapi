@@ -27,6 +27,10 @@ import net.sf.okapi.common.BaseParameters;
 
 public class Parameters extends BaseParameters {
 	
+	public static final int SCOPE_ALL = 0;
+	public static final int SCOPE_APPROVEDONLY = 1;
+	public static final int SCOPE_NOTAPPROVEDONLY = 2;
+	
 	private static final String OUTPUTPATH = "outputPath";
 	private static final String AUTOOPEN = "autoOpen";
 	private static final String LEADINGWS = "leadingWS";
@@ -60,6 +64,7 @@ public class Parameters extends BaseParameters {
 	private static final String CHARSET = "charset";
 	private static final String EXTRACHARSALLOWED = "extraCharsAllowed";
 	private static final String CORRUPTEDCHARACTERS = "corruptedCharacters";
+	private static final String SCOPE = "scope";
 
 	String outputPath;
 	boolean autoOpen;
@@ -88,11 +93,20 @@ public class Parameters extends BaseParameters {
 	String charset;
 	String extraCharsAllowed;
 	boolean corruptedCharacters;
+	int scope;
 
 	public Parameters () {
 		reset();
 	}
 	
+	public int getScope () {
+		return scope;
+	}
+
+	public void setScope (int scope) {
+		this.scope = scope;
+	}
+
 	public boolean getCorruptedCharacters () {
 		return corruptedCharacters;
 	}
@@ -330,6 +344,7 @@ public class Parameters extends BaseParameters {
 		sessionPath = "${rootDir}/qa-session"+QualityCheckSession.FILE_EXTENSION;
 		doubledWord = true;
 		corruptedCharacters = true;
+		scope = SCOPE_ALL;
 		
 		checkMaxCharLength = true;
 		maxCharLength = 190;
@@ -389,6 +404,7 @@ public class Parameters extends BaseParameters {
 		sessionPath = buffer.getString(SESSIONPATH, sessionPath);
 		doubledWord = buffer.getBoolean(DOUBLEDWORD, doubledWord);
 		corruptedCharacters = buffer.getBoolean(CORRUPTEDCHARACTERS, corruptedCharacters);
+		scope = buffer.getInteger(SCOPE, scope);
 		// Length
 		checkMaxCharLength = buffer.getBoolean(CHECKMAXCHARLENGTH, checkMaxCharLength);
 		maxCharLength = buffer.getInteger(MAXCHARLENGTH, maxCharLength);
@@ -434,6 +450,7 @@ public class Parameters extends BaseParameters {
 		buffer.setString(SESSIONPATH, sessionPath);
 		buffer.setBoolean(DOUBLEDWORD, doubledWord);
 		buffer.setBoolean(CORRUPTEDCHARACTERS, corruptedCharacters);
+		buffer.setInteger(SCOPE, scope);
 		// Length
 		buffer.setBoolean(CHECKMAXCHARLENGTH, checkMaxCharLength);
 		buffer.setInteger(MAXCHARLENGTH, maxCharLength);

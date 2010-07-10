@@ -34,6 +34,7 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.ISegments;
+import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
@@ -53,6 +54,8 @@ class QualityChecker {
 	private CharsetEncoder encoder;
 	private Pattern extraCharsAllowed;
 	private Pattern corruption;
+	
+	private final static Pattern WORDCHARS = Pattern.compile("[\\p{Ll}\\p{Lu}\\p{Lt}\\p{Lo}\\p{Nd}]");
 
 	void startProcess (LocaleId targetLocale,
 		Parameters params,
@@ -119,6 +122,12 @@ class QualityChecker {
 		this.sigList = sigList;
 	}
 	
+	private boolean hasMeaningfullText (TextFragment frag) {
+		// Do we have at least one character that is part of the character set for a "word"
+		// Note: digits are considered part of a "word"
+		return WORDCHARS.matcher(frag.getCodedText()).find();
+	}
+	
 	void processTextUnit (TextUnit tu) {
 		// Skip non-translatable entries
 		if ( !tu.isTranslatable() ) return;
@@ -134,6 +143,17 @@ class QualityChecker {
 				"Missing translation.",
 				0, -1, 0, -1, Issue.SEVERITY_HIGH, srcCont.toString(), "");
 			return;
+		}
+		
+		// Skip non-approved entries if requested
+		if ( params.getScope() != Parameters.SCOPE_ALL ) {
+			Property prop = trgCont.getProperty(Property.APPROVED);
+			if (( prop != null ) && prop.getValue().equals("yes") ) { // Approved
+				if ( params.getScope() == Parameters.SCOPE_NOTAPPROVEDONLY ) return;
+			}
+			else { // Not approved
+				if ( params.getScope() == Parameters.SCOPE_APPROVEDONLY ) return;
+			}
 		}
 		
 		tu.synchronizeSourceSegmentation(trgLoc);
@@ -172,17 +192,17 @@ class QualityChecker {
 			if ( params.getCodeDifference() ) {
 				checkInlineCodes(srcSeg, trgSeg, tu);
 			}
-			
+
 			// Check for target is the same as source, if requested
 			if ( params.getTargetSameAsSource() ) {
-				if ( srcSeg.text.hasText() ) {
+				if ( hasMeaningfullText(srcSeg.text) ) {
 					if ( srcSeg.text.compareTo(trgSeg.text, params.getTargetSameAsSourceWithCodes()) == 0 ) {
 						// Is the string of the cases where target should be the same? (URL, etc.)
 						boolean warn = true;
 						if ( patterns != null ) {
 							for ( PatternItem item : patterns ) {
 								String ctext = srcSeg.text.getCodedText();
-								if ( item.target.equals(PatternItem.SAME) ) {
+								if ( item.enabled && item.target.equals(PatternItem.SAME) ) {
 									Matcher m = item.getSourcePattern().matcher(ctext);
 									if ( m.find() ) {
 										warn = !ctext.equals(m.group());
@@ -692,7 +712,6 @@ class QualityChecker {
 				}
 			}
 		}
-		
 	}
 	
 	private void reportIssue (IssueType issueType,

@@ -173,6 +173,16 @@ public class QualityCheckerTest {
 	}
 	
 	@Test
+	public void testTARGET_SAME_AS_SOURCE_withoutWords () {
+		TextUnit tu = new TextUnit("id", ":?%$#@#_~`()[]{}=+-");
+		tu.setTarget(locFR, new TextContainer(":?%$#@#_~`()[]{}=+-"));
+
+		session.processTextUnit(tu);
+		List<Issue> issues = session.getIssues();
+		assertEquals(0, issues.size());
+	}
+	
+	@Test
 	public void testTARGET_SAME_AS_SOURCE_WithSameCodes () {
 		TextUnit tu = new TextUnit("id", "src text");
 		tu.getSource().getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<code/>");
@@ -183,6 +193,38 @@ public class QualityCheckerTest {
 		List<Issue> issues = session.getIssues();
 		assertEquals(1, issues.size());
 		assertEquals(IssueType.TARGET_SAME_AS_SOURCE, issues.get(0).issueType);
+	}
+	
+	@Test
+	public void testTARGET_SAME_AS_SOURCE_WithDiffCodes () {
+		TextUnit tu = new TextUnit("id", "src text");
+		tu.getSource().getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<code/>");
+		tu.setTarget(locFR, new TextContainer("src text"));
+		tu.getTarget(locFR).getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<etc/>");
+		
+		session.processTextUnit(tu);
+		List<Issue> issues = session.getIssues();
+		// We have code difference warnings but no target==source warning
+		assertEquals(2, issues.size());
+		assertEquals(IssueType.CODE_DIFFERENCE, issues.get(0).issueType);
+		assertEquals(IssueType.CODE_DIFFERENCE, issues.get(1).issueType);
+	}
+	
+	@Test
+	public void testTARGET_SAME_AS_SOURCE_WithDiffCodesTurnedOff () {
+		TextUnit tu = new TextUnit("id", "src text");
+		tu.getSource().getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<code/>");
+		tu.setTarget(locFR, new TextContainer("src text"));
+		tu.getTarget(locFR).getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<etc/>");
+		
+		session.getParameters().setTargetSameAsSourceWithCodes(false);
+		session.processTextUnit(tu);
+		List<Issue> issues = session.getIssues();
+		// We have code difference and target==source warnings
+		assertEquals(3, issues.size());
+		assertEquals(IssueType.CODE_DIFFERENCE, issues.get(0).issueType);
+		assertEquals(IssueType.CODE_DIFFERENCE, issues.get(1).issueType);
+		assertEquals(IssueType.TARGET_SAME_AS_SOURCE, issues.get(2).issueType);
 	}
 	
 	@Test
