@@ -50,6 +50,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private static final String FORMATOPTIONS = "formatOptions";
 	private static final String USEGENERICCODES = "useGenericCodes";
 	private static final String SKIPENTRIESWITHOUTTEXT = "skipEntriesWithoutText";
+	private static final String APPROVEDENTRIESONLY = "approvedEntriesOnly";
 	
 	private boolean singleOutput;
 	private boolean autoExtensions;
@@ -59,6 +60,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private boolean useGenericCodes;
 	private String formatOptions;
 	private boolean skipEntriesWithoutText;
+	private boolean approvedEntriesOnly;
 	
 	public Parameters () {
 		reset();
@@ -116,6 +118,10 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		return formatOptions;
 	}
 
+	public void setFormatOptions (String formatOptions) {
+		this.formatOptions = formatOptions;
+	}
+
 	public boolean getSkipEntriesWithoutText () {
 		return skipEntriesWithoutText;
 	}
@@ -124,8 +130,12 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.skipEntriesWithoutText = skipEntriesWithoutText;
 	}
 
-	public void setFormatOptions (String formatOptions) {
-		this.formatOptions = formatOptions;
+	public boolean getApprovedEntriesOnly () {
+		return approvedEntriesOnly;
+	}
+
+	public void setApprovedEntriesOnly (boolean approvedEntriesOnly) {
+		this.approvedEntriesOnly = approvedEntriesOnly;
 	}
 
 	public void reset () {
@@ -137,6 +147,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		formatOptions = null;
 		useGenericCodes = false;
 		skipEntriesWithoutText = true;
+		approvedEntriesOnly = false;
 	}
 
 	public void fromString (String data) {
@@ -150,6 +161,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		formatOptions = buffer.getGroup(FORMATOPTIONS, formatOptions);
 		useGenericCodes = buffer.getBoolean(USEGENERICCODES, useGenericCodes);
 		skipEntriesWithoutText = buffer.getBoolean(SKIPENTRIESWITHOUTTEXT, skipEntriesWithoutText);
+		approvedEntriesOnly = buffer.getBoolean(APPROVEDENTRIESONLY, approvedEntriesOnly);
 	}
 
 	public String toString() {
@@ -162,6 +174,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.setGroup(FORMATOPTIONS, formatOptions);
 		buffer.setBoolean(USEGENERICCODES, useGenericCodes);
 		buffer.setBoolean(SKIPENTRIESWITHOUTTEXT, skipEntriesWithoutText);
+		buffer.setBoolean(APPROVEDENTRIESONLY, approvedEntriesOnly);
 		return buffer.toString();
 	}
 
@@ -175,6 +188,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.add(USEGENERICCODES, "Output generic inline codes", null);
 		desc.add(TARGETSTYLE, "Target content", "Type of content to put in the target");
 		desc.add(SKIPENTRIESWITHOUTTEXT, "Do not output entries without text", null);
+		desc.add(APPROVEDENTRIESONLY, "Output only approved entries", null);
 		desc.add(FORMATOPTIONS, "Format options", null); // Not used for display 
 		return desc;
 	}
@@ -189,6 +203,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		ListSelectionPart lsp = desc.addListSelectionPart(paramDesc.get(OUTPUTFORMAT), choices);
 		lsp.setChoicesLabels(choicesLabels);
 		
+		desc.addCheckboxPart(paramDesc.get(APPROVEDENTRIESONLY));
 		desc.addCheckboxPart(paramDesc.get(USEGENERICCODES));
 
 		CheckboxPart cbp1 = desc.addCheckboxPart(paramDesc.get(SINGLEOUTPUT));

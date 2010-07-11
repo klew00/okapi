@@ -80,6 +80,12 @@ public final class LocaleId implements Comparable<Object> {
 	 */
     static public final LocaleId SPANISH = new LocaleId("es", false);
 
+    /**
+     * Pattern to match the BCP-47 codes of the locales that use bidirectional scripts.
+     * Note that this is not perfect as some languages use several scripts.
+     */
+	private static final Pattern BIDILOCALES = Pattern.compile("(ar|he|dv|fa|ur).*", Pattern.CASE_INSENSITIVE);
+
 	private String locId;
 	
 	private static final int ID_LANGUAGE = 5;
@@ -647,6 +653,16 @@ public final class LocaleId implements Comparable<Object> {
 			parts[1] = "";
 		}
 		return parts;
+	}
+
+	/**
+	 * Indicates if a given locale usually uses a bi-directional script.
+	 * <p>Note that this is not perfect as some languages use several scripts.
+	 * @param locId the locale to check.
+	 * @return true if the locale uses a bi-directional script.
+	 */
+	public static boolean isBidirectional (LocaleId locId) {
+		return BIDILOCALES.matcher(locId.toBCP47()).matches();
 	}
 
 }

@@ -347,9 +347,9 @@ public class Parameters extends BaseParameters {
 		scope = SCOPE_ALL;
 		
 		checkMaxCharLength = true;
-		maxCharLength = 190;
+		maxCharLength = 250;
 		checkMinCharLength = true;
-		minCharLength = 50;
+		minCharLength = 45;
 		
 		checkCharacters = false;
 		charset = "ISO-8859-1";
@@ -369,8 +369,9 @@ public class Parameters extends BaseParameters {
 			"[\\w\\.\\-]+@[\\w\\.\\-]+", "<same>",
 			true, Issue.SEVERITY_MEDIUM, "Email addresses"));
 		// URLs
-		patterns.add(new PatternItem( //TODO: file URL
-			"https?:[\\w/\\.:;+\\-~\\%#\\$?=&,()]+|www\\.[\\w/\\.:;+\\-~\\%#\\$?=&,()]+|ftp:[\\w/\\.:;+\\-~\\%#?=&,]+", "<same>",
+		patterns.add(new PatternItem(
+			//"((http|https|ftp|sftp)\\:\\/\\/([-_a-z0-9]+\\@)?)?(([-_a-z0-9]+\\.)+[-_a-z0-9]+(\\:[0-9]+)?)((\\/([-_.:;+~%#$?=&,()\\w]*[-_:;+~%#$?=&,()\\w])?))*", "<same>",
+			"https?:[\\w/\\.:;+\\-~\\%#\\$?=&,()]+[\\w/:;+\\-~\\%#\\$?=&,()]+|www\\.[\\w/\\.:;+\\-~\\%#\\$?=&,()]+|ftp:[\\w/\\.:;+\\-~\\%#?=&,]+", "<same>",
 			true, Issue.SEVERITY_MEDIUM, "URLs"));
 		// IP addresses
 		patterns.add(new PatternItem(

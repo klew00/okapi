@@ -45,6 +45,7 @@ public interface IQualityCheckEditor {
 	 * Adds a raw document to the session. If this is the
 	 * first document added to the session, the locales of the session are automatically
 	 * set to the source and target locale of this document.
+	 * This method can be called without the UI being setup yet.
 	 * @param rawDoc the raw document to add (it must have an input URI and its
 	 * source and target locale set).
 	 */

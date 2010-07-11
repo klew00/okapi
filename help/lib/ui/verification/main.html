@@ -23,6 +23,7 @@
 	<li>The lower part shows the list of issues detected. Which issues are 
 	displayed depends on several options.</li>
 </ul>
+<h3>Table</h3>
 <p>The table displays the issues found with the documents in the session. Use
 <cite>Check All</cite> to re-process the documents if you fix or modify one.</p>
 <ul>
@@ -40,12 +41,21 @@
 	translation missing parentheses is easy to detect, but may or may not 
 	correspond to a translation problem, so its severity should be rated &quot;low&quot;.</li>
 	<li>Column 3 (<cite>Text Unit</cite>) displays the ID of the text unit where 
-	the issue occurs.</li>
+	the issue occurs. If the text unit has a native name (e.g. an ID in a 
+	propertis file) it is also displayed between parentheses.</li>
 	<li>Column 4 (<cite>Seg</cite>) displays the ID of the segment where the 
 	issue occurs, or nothing if the warning is for the whole text unit.</li>
 	<li>Column 5 (<cite>Description</cite>) shows the warning message for the 
 	issue.</li>
 </ul>
+<p>Sort -- You can sort the issues in the table by clicking on the header of each 
+column. Note that the <cite>Text Unit</cite> and <cite>Seg</cite> columns are 
+sorted by a combination of the document ID, the text unit ID and the segment ID. 
+These IDs are alphanumeric, not numeric (e.g. the ID can be 
+&quot;tu1&quot; not always &quot;1&quot;). When the IDs happend to be using only numbers, the sort 
+may look strange as &quot;101&quot; comes after &quot;1001&quot; (where you may expect to see 101 to 
+come before 1001).</p>
+<h3>Enabling/Disabling Issues</h3>
 <p>Which issues are displayed in the table is driven by the two list-boxes below 
 the table on the right-hand side:</p>
 <ul>
@@ -58,12 +68,15 @@ check or uncheck its corresponding check mark. You can click on the check box,
 or select the issue and press the <kbd>Space</kbd> key. You can select multiple 
 issues at the same time by holding the <kbd>Shift</kbd> key pressed while moving 
 the cursor up or down.</p>
-<p>You can sort the issues in the table by clicking on the header of each 
-column. Note that the <cite>Text Unit</cite> and <cite>Seg</cite> columns are 
-sorted by IDs and those IDs are alphanumeric, not numeric (e.g. the ID can be 
-&quot;tu1&quot; not always &quot;1&quot;). When the IDs happend to be using only numbers, the sort 
-may look strange as &quot;101&quot; comes after &quot;1001&quot; (where you may expect to see 101 to 
-come before 1001).</p>
+<p>You can re-enabled all issues with the command <cite>Reset All Disabled 
+Issues</cite> from the <cite>Issues</cite> menu.</p>
+<h3>List of the Documents</h3>
+<p>The list of the documents for which there is one or more issues is displayed 
+above the table. The list is always set to the document of the issue currently 
+selected.</p>
+<p>You can select another document in the list to move to the first issue for 
+that document in the issues currently displayed.</p>
+<h3>Buttons</h3>
 <p><cite>Check All</cite> -- Click this button to run the verification on all 
 documents in the session.</p>
 <p><cite>Check Document</cite> - Click this button to run the verification on 
@@ -79,6 +92,7 @@ dialog box, where you can specify what kind of verifications to perform.</p>
 of issues. This does not re-process the documents, just refresh the list. This 
 action is done automatically when you change the selection of one of the two 
 list-boxes used to filter what issues are displayed.</p>
+<h3>Status Bar</h3>
 
 <p>At the bottom of the main window, the status bar indicates:</p>
 <ul>

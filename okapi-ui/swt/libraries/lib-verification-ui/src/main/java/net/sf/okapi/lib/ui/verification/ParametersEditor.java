@@ -129,6 +129,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Button rdScopeAllEntries;
 	private Button rdScopeApprovedOnly;
 	private Button rdScopeNotApprovedOnly;
+	private Button btStartLT;
 	
 	// Flag to indicate the editor is use for step parameters
 	// We default to true because the step cannot set this option
@@ -486,13 +487,13 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			};
 		});
 		
-		Composite cmpChars = new Composite(cmpTmp, SWT.BORDER);
+		Composite cmpChars = new Composite(cmpTmp, SWT.NONE);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalIndent = 8;
 		cmpChars.setLayoutData(gdTmp);
 		cmpChars.setLayout(new GridLayout());
 		
-		edCharset = new Text(cmpChars, SWT.NONE);
+		edCharset = new Text(cmpChars, SWT.BORDER);
 		edCharset.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
 		stExtraCharsAllowed = new Label(cmpChars, SWT.NONE);
@@ -557,11 +558,36 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		gdTmp.widthHint = 80;
 		edLTTranslationTarget.setLayoutData(gdTmp);
 
+		btStartLT = new Button(cmpTmp, SWT.PUSH);
+		gdTmp = new GridData();
+		gdTmp.verticalIndent = 16;
+		btStartLT.setLayoutData(gdTmp);
+		btStartLT.setText("Start LanguageTool from the Web");
+		btStartLT.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				startLT();
+			};
+		});
+		
 		tiTmp = new TabItem(tabs, SWT.NONE);
 		tiTmp.setText("LanguageTool");
 		tiTmp.setControl(cmpTmp);
 
 
+		//--- Terms tab
+		
+		cmpTmp = new Composite(tabs, SWT.NONE);
+		layTmp = new GridLayout();
+		cmpTmp.setLayout(layTmp);
+		
+		label = new Label(cmpTmp, SWT.NONE);
+		label.setText("UNDER CONSTRUCTION");
+		
+		tiTmp = new TabItem(tabs, SWT.NONE);
+		tiTmp.setText("Terms");
+		tiTmp.setControl(cmpTmp);
+
+		
 		//--- Other Settings tab
 		
 		cmpTmp = new Composite(tabs, SWT.NONE);
@@ -637,6 +663,18 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		return result;
 	}
 	
+	private void startLT () {
+		try {
+			UIUtil.start("http://www.languagetool.org/webstart/web/LanguageTool.jnlp"); //$NON-NLS-1$
+			// Note: Bug on Windows-7: the security dialog box prompt for launching the
+			// WebStart application causes the set of controls for the languageTool tab
+			// to shift down out of the tab. It comes back when the tab is re-activated.
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, "Error starting languageTool from the Web.\n"+e.getMessage(), null);
+		}
+	}
+	
 	private void updateCharacters () {
 		edCharset.setEnabled(chkCheckCharacters.getSelection());
 		stExtraCharsAllowed.setEnabled(chkCheckCharacters.getSelection());
@@ -654,7 +692,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 
 		// Source pattern
 		Label label = new Label(dialog, SWT.NONE | SWT.WRAP);
-		label.setText("Pattern for the source:");
+		label.setText(String.format("Pattern for the source (use '%s' if expecting the same as the target):", PatternItem.SAME));
 		
 		edSource = new Text(dialog, SWT.BORDER);
 		GridData gdTmp = new GridData(GridData.FILL_BOTH);
@@ -662,7 +700,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		
 		// Target correspondence
 		label = new Label(dialog, SWT.NONE);
-		label.setText(String.format("Expected corresponding target pattern (use '%s' if same as source):", PatternItem.SAME));
+		label.setText(String.format("Pattern for the target (use '%s' if expecting the same as the source):", PatternItem.SAME));
 
 		edTarget = new Text(dialog, SWT.BORDER);
 		gdTmp = new GridData(GridData.FILL_BOTH);

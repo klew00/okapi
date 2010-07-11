@@ -119,7 +119,10 @@ class SessionSettingsDialog {
 					if ( help != null ) help.showTopic(this, "sessionsettings");
 					return;
 				}
-				if ( e.widget.getData().equals("o") ) saveData();
+				if ( e.widget.getData().equals("o") ) {
+					if ( !saveData() ) return;
+					result = true;
+				}
 				dialog.close();
 			};
 		};

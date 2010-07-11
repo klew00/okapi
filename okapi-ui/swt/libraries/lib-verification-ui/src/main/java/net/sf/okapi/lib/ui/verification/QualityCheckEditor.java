@@ -22,6 +22,7 @@ package net.sf.okapi.lib.ui.verification;
 
 import java.io.File;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 
@@ -91,7 +92,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 	private static final String APPNAME = "CheckMate"; //$NON-NLS-1$
 	private static final String CFG_SOURCELOCALE = "sourceLocale"; //$NON-NLS-1$
 	private static final String CFG_TARGETLOCALE = "targetLocale"; //$NON-NLS-1$
-
+	
 	private String qcsPath;
 	private UserConfiguration config;
 	private MRUList mruList;
@@ -101,7 +102,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 	private ResourceManager rm;
 	private Table tblIssues;
 	private Text edMessage;
-	private Text edDocument;
+	private Combo cbDocument;
 	private StyledText edSource;
 	private StyledText edTarget;
 	private Font displayFont;
@@ -554,11 +555,15 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		edMessage.setLayoutData(gdTmp);
 		edMessage.setEditable(false);
 
-		edDocument = new Text(cmpTmp, SWT.BORDER);
+		cbDocument = new Combo(cmpTmp, SWT.DROP_DOWN | SWT.READ_ONLY);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalSpan = 4;
-		edDocument.setLayoutData(gdTmp);
-		edDocument.setEditable(false);
+		cbDocument.setLayoutData(gdTmp);
+		cbDocument.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				updateCurrentDocument();
+			}
+		});
 
 		Composite cmpButtons = new Composite(cmpTmp, SWT.NONE);
 		layTmp = new GridLayout(4, true);
@@ -759,16 +764,31 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		}
 		
 		updateCaption();
-		refreshTableDisplay();
+		resetTextFieldOrientation();
+		resetTableDisplay();
 	}
 
+	private void resetTextFieldOrientation () {
+		// Source field
+		edSource.setOrientation(
+			LocaleId.isBidirectional(session.getSourceLocale()) ?
+			SWT.RIGHT_TO_LEFT :
+			SWT.LEFT_TO_RIGHT);
+		// Target field
+		edTarget.setOrientation(
+			LocaleId.isBidirectional(session.getTargetLocale()) ?
+			SWT.RIGHT_TO_LEFT :
+			SWT.LEFT_TO_RIGHT);
+	}
+	
 	private void resetTableDisplay () {
 		try {
 			issuesModel.setIssues(session.getIssues());
-			tblIssues.setSortColumn(null); // reset the sort column
+			tblIssues.setSortColumn(null); // Reset the sort column
 			displayType = cbDisplay.getSelectionIndex();
 			issueType = cbTypes.getSelectionIndex();
-			issuesModel.updateTable(0, displayType, issueType);
+			
+			issuesModel.updateTable(null, 0, displayType, issueType);
 			updateCurrentIssue();
 		}
 		catch ( Throwable e ) {
@@ -780,16 +800,90 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 	private void refreshTableDisplay () {
 		displayType = cbDisplay.getSelectionIndex();
 		issueType = cbTypes.getSelectionIndex();
-		issuesModel.updateTable(tblIssues.getSelectionIndex(), displayType, issueType);
+		issuesModel.updateTable(null, tblIssues.getSelectionIndex(), displayType, issueType);
+		updateCurrentIssue();
+	}
+
+	ArrayList<URI> getDocumentIds () {
+		ArrayList<URI> list = new ArrayList<URI>();
+		for ( String path : cbDocument.getItems() ) {
+			list.add((URI)cbDocument.getData(path));
+		}
+		return list;
+	}
+
+	/**
+	 * Fills the documents' combo box.
+	 * @param docId optional docId of the document to select, use null to select first.
+	 * If the given docId does not exists anymore, the first document is selected.
+	 */
+	private void fillDocumentCombo (URI docId) {
+		URI requested = docId;
+		docId = null;
+		// Update the list of documents
+		cbDocument.removeAll();
+		for ( RawDocument rd : session.getDocuments() ) {
+			String path = rd.getInputURI().getPath();
+			cbDocument.add(path);
+			cbDocument.setData(path, rd.getInputURI());
+			// Check if the requested document is in the list
+			if ( requested != null ) {
+				if ( requested.equals(rd.getInputURI()) ) {
+					docId = requested;
+				}
+			}
+		}
+		
+		// If no previous requested document, set the first document, if we can
+		if ( docId == null ) {
+			if ( cbDocument.getItemCount() > 0 ) {
+				docId = (URI)cbDocument.getData(cbDocument.getItem(0));
+			}
+		}
+		if ( docId != null ) {
+			cbDocument.setText(docId.getPath());
+		}
 		updateCurrentIssue();
 	}
 	
 	private void editSessionSettings () {
 		try {
+			// Remember data before edit
+			ArrayList<URI> prevList = getDocumentIds();
+
+			// Edit the settings, stop there if the user cancel
 			SessionSettingsDialog dlg = new SessionSettingsDialog(shell, help);
 			dlg.setData(session);
 			if ( !dlg.showDialog() ) return;
+
+			// Update the orientation if needed
+			resetTextFieldOrientation();
 			
+			// Update the content of the documents list
+			fillDocumentCombo(null);
+			
+			// Clean up issues list
+			// Remove all current documents from the previous list
+			// What is left are the documents to remove
+			prevList.removeAll(getDocumentIds());
+			for ( URI uri : prevList ) {
+//				if ( currentDoc != null ) {
+//					// Check if current document is still available
+//					if ( currentDoc.equals(uri) ) currentDoc = null;
+//				}
+				session.clearIssues(uri, false);
+			}
+			
+			// Update the current selection
+//			if ( currentDoc == null ) {
+//				// Previous document no longer available
+//				if ( cbDocument.getItemCount() > 0 ) {
+//					cbDocument.select(0);
+//				}
+//			}
+
+			// Update the table of issues
+			refreshTableDisplay();
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, "Error adding document.\n"+e.getMessage(), null);
@@ -803,7 +897,8 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 			// Set default data
 			dlg.setData(path, null, "UTF-8", session.getSourceLocale(), session.getTargetLocale());
 			// Lock the locales if we have already documents in the session
-			dlg.setLocalesEditable(session.getDocumentCount()==0);
+			boolean canChangeLocales = session.getDocumentCount()==0;
+			dlg.setLocalesEditable(canChangeLocales);
 
 			// Edit
 			Object[] data = dlg.showDialog();
@@ -814,6 +909,11 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 			RawDocument rd = new RawDocument(uri, (String)data[2], (LocaleId)data[3], (LocaleId)data[4]);
 			rd.setFilterConfigId((String)data[1]);
 			session.addRawDocument(rd);
+			
+			if ( canChangeLocales ) { // In case the locales have changed
+				resetTextFieldOrientation();
+			}
+			fillDocumentCombo(null);
 			return true;
 		}
 		catch ( Throwable e ) {
@@ -834,18 +934,36 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		shell.setText(filename + " - " + text); //$NON-NLS-1$
 	}
 
+	private void updateCurrentDocument () {
+		int n = cbDocument.getSelectionIndex();
+		if ( n == -1 ) return;
+		// Get the document id for the new selected document
+		URI uri = (URI)cbDocument.getData(cbDocument.getItem(n));
+		// Find the first issue for that document in from the top of the displayed issues
+		for ( int i=0; i<tblIssues.getItemCount(); i++ ) {
+			Issue issue = (Issue)tblIssues.getItem(i).getData();
+			if ( uri.equals(issue.docId) ) {
+				tblIssues.setTopIndex(i);
+				tblIssues.setSelection(i);
+				updateCurrentIssue();
+				return;
+			}
+		}
+		// Else: No issue for that document: do nothing
+	}
+	
 	private void updateCurrentIssue () {
 		try {
 			int n = tblIssues.getSelectionIndex();
 			if ( n == -1 ) {
-				edDocument.setText("");
+				cbDocument.setText("");
 				edMessage.setText("");
 				edSource.setText("");
 				edTarget.setText("");
 			}
 			else {
 				Issue issue = (Issue)tblIssues.getItem(n).getData();
-				edDocument.setText(issue.docId.getPath());
+				cbDocument.setText(issue.docId.getPath());
 				edMessage.setText(issue.message);
 				setTexts(issue);
 			}
@@ -924,7 +1042,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		if  ( dlg.open() != SWT.YES ) return;
 		// Proceed
 		session.resetDisabledIssues();
-		issuesModel.updateTable(0, displayType, issueType);
+		issuesModel.updateTable(null, 0, displayType, issueType);
 	}
 	
 	private void checkCurrentDocument () {
@@ -1008,6 +1126,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 			session.reset();
 			qcsPath = null;
 			updateCaption();
+			fillDocumentCombo(null);
 			resetTableDisplay();
 		}
 		catch ( Throwable e ) {
@@ -1045,6 +1164,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 			Dialogs.showError(shell, "Error while loading.\n"+e.getMessage(), null);
 		}
 		finally {
+			fillDocumentCombo(null);
 			resetTableDisplay();
 			stopWaiting();
 		}

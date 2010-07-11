@@ -20,6 +20,7 @@
 
 package net.sf.okapi.lib.ui.verification;
 
+import java.net.URI;
 import java.util.List;
 
 import net.sf.okapi.lib.verification.Issue;
@@ -89,7 +90,8 @@ class IssuesTableModel {
 	}
 
 	// displayType: 0=all, 1=enabled 2=disabled
-	void updateTable (int selection,
+	void updateTable (URI currentDoc,
+		int selection,
 		int displayType,
 		int issueType)
 	{
@@ -159,7 +161,12 @@ class IssuesTableModel {
 			item.setChecked(issue.enabled);
 			item.setForeground(1, colors[issue.severity]);
 			item.setText(1, "\u2588");
-			item.setText(2, issue.tuId);
+			if ( issue.tuName == null ) {
+				item.setText(2, issue.tuId);
+			}
+			else {
+				item.setText(2, issue.tuId + " (" + issue.tuName + ")");
+			}
 			item.setText(3, (issue.segId == null ? "" : issue.segId));
 			item.setText(4, issue.message);
 			item.setData(issue);

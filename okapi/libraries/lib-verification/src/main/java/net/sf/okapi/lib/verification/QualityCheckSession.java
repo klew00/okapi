@@ -222,7 +222,7 @@ public class QualityCheckSession {
 		return list;
 	}
 	
-	private List<String> clearIssues (URI docId,
+	public List<String> clearIssues (URI docId,
 		boolean generateSigList)
 	{
 		ArrayList<String> sigList = null;

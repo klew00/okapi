@@ -389,20 +389,9 @@ class QualityChecker {
 		// If no codes: don't check
 		if (( srcList.size() == 0 ) && ( trgList.size() == 0 )) return;
 
-		// Quick check: if strings are the same, no differneces
+		// Quick check: If strings representations are the same, there is no difference
 		if ( srcList.toString().equals(trgList.toString()) ) return;
 		
-//		//--- temporary way of verifying the codes
-//		String srcCodes = srcList.toString();
-//		String trgCodes = trgList.toString();
-//		if ( !srcCodes.equals(trgCodes) ) {
-//			reportIssue(IssueType.CODE_DIFFERENCE, tu, srcSeg.getId(),
-//				"The translation does not have the same codes as the source.",
-//				0, -1, 0, -1, Issue.SEVERITY_MEDIUM, srcSeg.toString(), trgSeg.toString());
-//		}
-//		//if ( true ) return;
-//		//--- end temp way
-	
 		// Check codes missing in target
 		Iterator<Code> srcIter = srcList.iterator();
 		while ( srcIter.hasNext() ) {

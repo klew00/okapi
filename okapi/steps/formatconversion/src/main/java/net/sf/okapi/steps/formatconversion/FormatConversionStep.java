@@ -36,6 +36,7 @@ import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.pensieve.PensieveFilterWriter;
 import net.sf.okapi.filters.po.POFilterWriter;
@@ -196,6 +197,15 @@ public class FormatConversionStep extends BasePipelineStep {
 		// Skip empty or code-only entries
 		if ( params.getSkipEntriesWithoutText() ) {
 			if ( !tu.getSource().hasText(true, false) ) return;
+		}
+		
+		// Skip non-approved entries if requested
+		if ( params.getApprovedEntriesOnly() ) {
+			boolean approved = false;
+			if ( tu.hasTargetProperty(targetLocale, Property.APPROVED) ) {
+				approved = tu.getTargetProperty(targetLocale, Property.APPROVED).getBoolean();
+			}
+			if ( !approved ) return;
 		}
 		
 		// If requested, overwrite the target
