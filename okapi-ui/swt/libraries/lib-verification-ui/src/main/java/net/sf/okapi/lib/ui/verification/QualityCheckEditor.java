@@ -105,7 +105,8 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 	private Combo cbDocument;
 	private StyledText edSource;
 	private StyledText edTarget;
-	private Font displayFont;
+	private TextOptions srcTextOpt;
+	private TextOptions trgTextOpt;
 	private IssuesTableModel issuesModel;
 	private StatusBar statusBar;
 	private QualityCheckSession session;
@@ -212,9 +213,13 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 	}
 
 	private void dispose () {
-		if ( displayFont != null ) {
-			displayFont.dispose();
-			displayFont = null;
+		if ( srcTextOpt != null ) {
+			srcTextOpt.dispose();
+			srcTextOpt = null;
+		}
+		if ( trgTextOpt != null ) {
+			trgTextOpt.dispose();
+			trgTextOpt = null;
 		}
 		if ( rm != null ) {
 			rm.dispose();
@@ -329,6 +334,14 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				editSessionSettings();
+            }
+		});
+
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "file.preferences"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				editPreferences();
             }
 		});
 
@@ -535,13 +548,22 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		edTarget.setLayoutData(new GridData(GridData.FILL_BOTH));
 		edTarget.setEditable(false);
 		
-		Font font = edSource.getFont();
-		FontData[] fontData = font.getFontData();
+		// Create a copy of the default text field options for the source
+		srcTextOpt = new TextOptions(shell.getDisplay(), edSource);
+		Font tmp = srcTextOpt.font;
+		// Make the font a bit larger by default
+		FontData[] fontData = tmp.getFontData();
 		fontData[0].setHeight(fontData[0].getHeight()+2);
-		displayFont = new Font(font.getDevice(), fontData[0]);
-		edSource.setFont(displayFont);
-		edTarget.setFont(displayFont);
+		srcTextOpt.font = new Font(shell.getDisplay(), fontData[0]);
+		// And apply them to the source control to allow clean disposal later
+		srcTextOpt.applyTo(edSource);
 		
+		// Create a copy of the default text field options for the target
+		// Use the same as the source by default
+		trgTextOpt = new TextOptions(shell.getDisplay(), srcTextOpt);
+		// And apply them to the target control to allow clean disposal later
+		trgTextOpt.applyTo(edTarget);
+
 		//--- Issues panel
 		
 		cmpTmp = new Composite(sashMain, SWT.BORDER);
@@ -769,16 +791,13 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 	}
 
 	private void resetTextFieldOrientation () {
+		// Update orientation, making sure the TextOptions are also updated
 		// Source field
-		edSource.setOrientation(
-			LocaleId.isBidirectional(session.getSourceLocale()) ?
-			SWT.RIGHT_TO_LEFT :
-			SWT.LEFT_TO_RIGHT);
+		srcTextOpt.isBidirectional = LocaleId.isBidirectional(session.getSourceLocale());
+		edSource.setOrientation(srcTextOpt.isBidirectional ? SWT.RIGHT_TO_LEFT : SWT.LEFT_TO_RIGHT);
 		// Target field
-		edTarget.setOrientation(
-			LocaleId.isBidirectional(session.getTargetLocale()) ?
-			SWT.RIGHT_TO_LEFT :
-			SWT.LEFT_TO_RIGHT);
+		trgTextOpt.isBidirectional = LocaleId.isBidirectional(session.getTargetLocale());
+		edTarget.setOrientation(trgTextOpt.isBidirectional ? SWT.RIGHT_TO_LEFT : SWT.LEFT_TO_RIGHT);
 	}
 	
 	private void resetTableDisplay () {
@@ -846,6 +865,30 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		updateCurrentIssue();
 	}
 	
+	private void editPreferences () {
+		try {
+			PreferencesDialog dlg = new PreferencesDialog(shell, help);
+			dlg.setData(srcTextOpt, trgTextOpt);
+			// Call the dialog. A null return means the user canceled
+			Object[] res = dlg.showDialog();
+			if ( res == null ) return;
+			
+			// Else: set the modified options for the source
+			TextOptions tmp = srcTextOpt; // With StyledText we cannot free the old before we set the new
+			srcTextOpt = (TextOptions)res[0];
+			srcTextOpt.applyTo(edSource);
+			tmp.dispose();
+			// And the target
+			tmp = trgTextOpt;
+			trgTextOpt = (TextOptions)res[1];
+			trgTextOpt.applyTo(edTarget);
+			tmp.dispose();
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, "Error editing preferences.\n"+e.getMessage(), null);
+		}
+	}
+	
 	private void editSessionSettings () {
 		try {
 			// Remember data before edit
@@ -886,7 +929,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 			refreshTableDisplay();
 		}
 		catch ( Throwable e ) {
-			Dialogs.showError(shell, "Error adding document.\n"+e.getMessage(), null);
+			Dialogs.showError(shell, "Error editing session settings.\n"+e.getMessage(), null);
 		}
 	}
 	

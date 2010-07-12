@@ -112,9 +112,11 @@ public class UIUtil {
 		Button newButton = new Button(parent, style);
 		newButton.setText(label);
 		GridData gdTmp = new GridData();
-		if ( width > -1 ) gdTmp.widthHint = width;
 		if ( horizontalSpan > 0 ) gdTmp.horizontalSpan = horizontalSpan;
 		newButton.setLayoutData(gdTmp);
+		if ( width > -1 ) {
+			ensureWidth(newButton, width);
+		}
 		return newButton;
 	}
 	
