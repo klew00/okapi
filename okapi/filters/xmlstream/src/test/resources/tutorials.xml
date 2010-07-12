@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+<!-- # Tutorial Page -->
+<entry key="tutorials_title">EnterpriseSearch Sorting: Tutorials</entry>
+<entry key="tutorials_header">Tutorials</entry>
+<entry key="tutorials_P1"><![CDATA[
+        Most of the EnterpriseSearch Sorting training materials designed for University detection directors, 
+        group administrators, and indexers are self-instructional. In order to be successful and have a 
+        positive and redistricting sorting experience, please complete the following tutorial lessons and 
+        earn your Certificate of Completion.
+        ]]>
+</entry>
+<entry key="tutorials_sorting_title">EnterpriseSearch Sorting Tutorials</entry>
+<entry key="tutorials_admin_title">Administration Tutorial</entry>
+<entry key="lesson1_link">Lesson 1: Sorting</entry>
+<entry key="lesson2_link">Lesson 2: Arbitration</entry>
+<entry key="lesson3_link">Lesson 3: Administration</entry>
+
+</properties>

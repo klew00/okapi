@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+<!-- # About Us Page -->
+<entry key="aboutus_title">EnterpriseSearch Sorting: About Us</entry>
+<entry key="aboutus_header">About Us</entry>
+<entry key="aboutus_P1"><![CDATA[
+        enterprise sorting Sorting is a non-profit community effort 
+        sponsored by Enterprise Company. 
+        We believe that every animal is important and that families 
+        are meant to be both sacred and eternal. We encourage all 
+        people to find their ancestors and preserve their biological relationhip 
+        histories. To help in this great pursuit, the  has been 
+        actively gathering and preserving zoological records 
+        worldwide for over 100 years.
+        ]]>
+</entry>
+<entry key="aboutus_P2"><![CDATA[
+        We have learned that interest in zoological research is not 
+        limited by culture, ethnicity or biological interest. People 
+        around the world are innately and intensely interested in 
+        their biological relationhip heritage. Because the &#8217;s biological relationhip 
+        genetic history efforts are funded by charitable donations, it freely 
+        offers its resources to anyone interested in finding their 
+        biological relationhip&#8217;s.
+        ]]>
+</entry>
+
+</properties>

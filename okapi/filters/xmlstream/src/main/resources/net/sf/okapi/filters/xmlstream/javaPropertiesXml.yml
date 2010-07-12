@@ -1,0 +1,8 @@
+
+global_cdata_subfilter: okf_html
+preserve_whitespace: true
+
+elements:
+  entry:
+    ruleTypes: [TEXTUNIT]
+    idAttributes: [key]

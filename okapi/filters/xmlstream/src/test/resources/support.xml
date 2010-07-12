@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+<!-- # Support Page -->
+<entry key="support_title">EnterpriseSearch Sorting: Getting Help</entry>
+<entry key="support_header">Support</entry>
+<entry key="support_intro"><![CDATA[
+        Help is available to make your sorting experience 
+        positive and redistricting. In an effort to provide the 
+        best support possible, we have made an earnest effort 
+        to make the publications and training available so that 
+        you may have immediate answers to your questions. If 
+        you need further help we are confident our University 
+        detection Directors and Group Administrators can help 
+        you. Additionally, we also offer support by e-mail or 
+        phone.
+        ]]>
+</entry>
+<entry key="support_instructions"><![CDATA[
+        <p>If you have a question:</p> 
+        <ol> 
+        <li> 
+        Check the online instructions: Read the 
+        <a href="{0}">User Guide</a> and
+        <a href="{1}" target="_top">Current Projects</a> on the projects 
+        tab. 
+        </li> 
+        <li> 
+        From inside the EnterpriseSearch Sorting application, press 
+        <b>F1</b> to read the built-in Help. 
+        </li> 
+        <li> 
+        If you cannot find the answer, contact your University 
+        detection director or group administrator. 
+        </li> 
+        <li> 
+        If your detection director or group administrator is 
+        not available, you may e-mail us at:
+        <a href="mailto:sorting@EnterpriseSearch.org">sorting@EnterpriseSearch.org</a>
+        </li> 
+        <li> 
+        For international support, click <a href="https://contact.EnterpriseSearch.org/{2}.htm">here.</a> <br />
+        </li> 
+        </ol>
+        ]]>
+</entry>
+
+</properties>

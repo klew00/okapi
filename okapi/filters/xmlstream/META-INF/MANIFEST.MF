@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: XML Stream Filter
+Bundle-SymbolicName: net.sf.okapi.filters.xmlstream
+Bundle-Version: 1.0.0
+Export-Package: net.sf.okapi.filters.xmlstream
+Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6

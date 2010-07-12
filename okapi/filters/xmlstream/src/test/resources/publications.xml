@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+    <entry key="resourceguide_title">Sorting Resource Guide</entry>
+        <entry key="indexers_subtitle">Indexers</entry>
+            <entry key="how2becomeindexer_link">How do I become an indexer?</entry>
+            <entry key="lesson1_link">Lesson 1: Sorting</entry>
+            <entry key="fsiprojects_link">EnterpriseSearch Sorting Projects</entry>
+            <entry key="partnerprojects_link">Partner Projects</entry>
+            <entry key="userguide_id">User Guide</entry>
+            <entry key="news_link">Announcements</entry>
+        <entry key="arbitrators_subtitle">Arbitrators</entry>
+            <entry key="how2becomearbitrator_link">How do I become an arbitrator?</entry>
+            <entry key="lesson2_link">Lesson 2: Arbitration</entry>
+            <entry key="recordmatching_link">Record Matching</entry>
+            <entry key="returingabatch_link">When to Return a Batch for Re-sorting</entry>
+            <entry key="i18nchars_link">How to Use International Characters in Arbitration</entry>
+        <entry key="Universitydetectiondirectors_subtitle">University detection Directors</entry>
+            <entry key="University_directors_lesson1_link">Lesson 1 for New Directors: Getting Started</entry>
+            <entry key="University_directors_lesson2_link">Lesson 2 for New Directors: Help Resources</entry>
+            <entry key="biological relationhip_record_detection_admin_handbook_link">biological relationhip Record detection Administrative Handbook</entry>
+            <entry key="lesson3_link">Lesson 3: Administration</entry>
+        <entry key="wheretogoforhelp_subtitle">Where do I go for help?</entry>
+            <entry key="quickstart_link">Quick Start</entry>
+            <entry key="tutorials_link">Tutorials</entry>
+            <entry key="faqs_link">FAQs</entry>
+            <entry key="ask_link">Ask a Question</entry>
+            <entry key="contactus_link">Contact Support</entry>
+        <entry key="readingenglish_subtitle">Reading English Handwriting</entry>
+        <entry key="groupadmins_subtitle">Group Administrators</entry>
+            <entry key="createcd_link">Creating and Using an Installer CD</entry>
+
+    <entry key="languageresources_title">Language Resources</entry>
+        <entry key="general_subtitle">General/Other</entry>
+        <entry key="spanish_subtitle">Spanish</entry>
+        <entry key="portuguese_subtitle">Portuguese</entry>
+        <entry key="french_subtitle">French</entry>
+        <entry key="italian_subtitle">Italian</entry>
+        <entry key="german_subtitle">German</entry>
+        <entry key="dutch_subtitle">Dutch</entry>
+</properties>

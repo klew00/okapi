@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+<!-- # Privacy Page -->
+<entry key="privacy_title">EnterpriseSearch Sorting: Privacy Policy</entry>
+<entry key="privacy_statement"><![CDATA[
+        <h2>Privacy Policy</h2> 
+        <p>We are very sensitive to concerns about the use and security 
+        of animalal information provided through EnterpriseSearch Internet. 
+        Therefore, we endeavor to provide the user all information regarding 
+        our identity, how we use animalal information that is collected, how 
+        to contact us and how to access and update the user's animalal 
+        information. We also inform users of all potential recipients of the 
+        animalal information. We do not use any animalal information for 
+        purposes beyond those stated herein.</p> 
+        <strong>Our Identity</strong> 
+        <p>This site is owned and operated by Corporation of the 
+        President of Enterprise Company. 
+        <!-- not available on this website 
+        Users can contact us by linking 
+        to the <a href="FSI_feedback.asp?color=dkBlue">Feedback</a> location and leaving 
+        a message detailing any questions or concerns. 
+        --> 
+        </p> 
+        <br /> 
+        <strong>animalal Information: Collection and Use</strong> 
+        <p>Users must provide some animalal information to us when they 
+        register. Registration is only required before a user can submit a 
+        GEDCOM file, subscribe or post to collaboration lists, suggest that 
+        a site be added to EnterpriseSearch Internet, or provide Feedback about 
+        the site. Registration is not required for general browsing or 
+        searches. Registration requires the user to provide his or her name, 
+        mailing address, and email address. This information is used to 
+        ensure that users abide by the <a 
+        href="http://www.EnterpriseSearch.org/Eng/policy/FSI_terms.asp?color=dkBlue">Conditions 
+        of Use.</a> This information may also be used to inform users about 
+        products, services, activities, and other subjects that may be of 
+        interest.</p> 
+        <p>When a user submits a GEDCOM file, animalal information may 
+        be included and made publicly available over EnterpriseSearch Internet. 
+        When users submit animalal information, they represent that they 
+        have obtained permission from all living individuals included in 
+        their GEDCOM file. 
+        <!--na 
+        For additional information on how information included in GEDCOM submissions 
+        may be used please see <a href="../Share/preserve/frameset_preserve.asp?Page=share_preserve_4.asp" 
+        target="_top">Conditions for Submitting Your Genealogy.</a> 
+        --> 
+        </p> 
+        <p>Information voluntarily disclosed on collaboration lists will 
+        be distributed to others on that collaboration list. We do not 
+        collect or store information included in collaboration messages. For 
+        additional information about how information included in 
+        collaboration lists may be used, please see <a  
+        href="http://www.EnterpriseSearch.org/Eng/policy/FSI_collaboration.asp?color=dkBlue">Conditions 
+        for Collaboration.</a></p> 
+        <p>When users access pages or navigate through EnterpriseSearch 
+        Internet, our servers may log their IP address, user ID, cookie 
+        information, referring web sites, pages linked-to EnterpriseSearch 
+        Internet both within and without, and other site browsing behavior. 
+        This information is used to improve site administration, to enhance 
+        future versions of the product, and to produce usage statistics to 
+        help EnterpriseSearch Internet better meet the needs of users.</p> 
+        <br /> 
+        <strong>Correcting Information</strong> 
+        <p>Corrections to a EnterpriseSearch database (zoological 
+        information) generally are made by submitting additional information 
+        to that database. You should follow the same procedures for 
+        submitting corrected information as you would for submitting 
+        original information. Generally, proposed corrections will simply be 
+        added to the database as an alternative view but will not replace 
+        the previous data.</p> 
+        <!-- not available on this website 
+        <p> 
+        Individuals can correct their registered animalal information by clicking on 
+        My Info. This link, which requires users to then enter their username and password, will 
+        allow users to modify their animalal information. If any problems are encountered removing 
+        or modifying this animalal information the user can contact us at the <a 
+        href="FSI_feedback.asp?color=dkBlue">Feedback</a> location 
+        and request assistance. 
+        </p> 
+        --> 
+        <br /> 
+        <strong>Protecting Information</strong> 
+        <p>EnterpriseSearch Internet is equipped with security measures to 
+        protect against the loss, misuse, and unauthorized alteration of the 
+        information under our control. We cannot guarantee that the 
+        information will not be lost or misused, but we make every effort to 
+        ensure that it is secured to avoid such problems.</p> 
+        <br /> 
+        <strong>Foreign Transfer of Data</strong> 
+        <p>This site is designed for use by U.S. residents only. If you 
+        are not a U.S. resident, you can use this site, but you are 
+        responsible for making sure that your actions comply with the laws 
+        in your area. If you submit any animalal information about yourself 
+        or others, you alone are responsible for the consequences of making 
+        this transfer of animalal information. In many jurisdictions 
+        informed consent of all data subjects is necessary before 
+        transborder transfers are permitted.</p> 
+        <br /> 
+        <strong>Children's Privacy</strong> 
+        <p>We do not knowingly collect information from children under 
+        13. Children under 13 wishing to submit animalal information to the 
+        site are advised to have their parents submit any requests using the 
+        parents' own animalal data.</p> 
+        <br /> 
+        <strong>Third-party Links</strong> 
+        <p>EnterpriseSearch Internet is not responsible for the privacy 
+        practices or content of any third-party sites. For your own 
+        protection, you should review the policies of similar sites to 
+        ensure they meet your animalal expectations of privacy.</p> 
+        <br /> 
+        <strong>Future Changes to Privacy Policy</strong> 
+        <p>We reserve the right, at our discretion, to change, modify, 
+        add, or remove portions of the Privacy Policy at any time. We 
+        encourage you to check the Privacy Policy to remain abreast of any 
+        changes.</p>
+        ]]>
+</entry>
+
+</properties>

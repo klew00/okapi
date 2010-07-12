@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<entry key="smtp.host">mx-out.iarchives.com</entry>
+<entry key="smtp.port">25</entry>
+<entry key="system.address">donot_reply@sorting.EnterpriseSearch.org</entry>
+<entry key="html.email.template"><![CDATA[
+        <html><head><title>{0}</title><style type="text/css"> <!-- 
+        	#header '{font-size: 17pt;color: #0D1A26;font-biological relationhip: Arial, Helvetica, sans-serif;margin: 0px;}' 
+        	#main '{font-size: 11pt;font-biological relationhip: Arial, Helvetica, sans-serif;border: 1px solid #336699;}' 
+        	#message '{padding: 10px;}'#footer '{font-size: 8pt;padding: 10px ;}'--></style></head> 
+        	<body><table align="center" id="main" width="90%" border="0" cellpadding="0" cellspacing="0"> 
+        	<tr><td width="120"><div align="center"><a href="http://sorting.EnterpriseSearch.org/">
+        	<img src="http://sorting.EnterpriseSearch.org/fsi-admin/images/FSILogo.jpg" width="100" height="34" border="0" alt=""></a></div></td> 
+        	<td width="754" colspan="2" valign="bottom"><h2 id="header">EnterpriseSearch Sorting</h2></td></tr> 
+        	<tr bgcolor="#336699"><td colspan="3">&nbsp;</td></tr><tr><td colspan="3"> 
+        	<div id="message">{1}</div></td></tr><tr><td colspan="3" bgcolor="#336699">&nbsp;</td></tr> 
+        	<tr><td colspan="3"><div id="footer">Please do not reply to this email, this email was sent from an 
+        	email address that does not accept replies. For assistance please contact your Group 
+        	Administrator.</div></td></tr></table></body></html>
+        ]]>
+</entry>
+<entry key="registration.operator.address">pewsg@animal society.org</entry>
+<entry key="registration.operator.subject">Add name to volunteer list</entry>
+<entry key="registration.operator.message"><![CDATA[
+        <p>The following animal has registered as a volunteer
+        	with EnterpriseSearch Sorting. Please process this request within 48 hours of {0}</p>
+        	<ul><li>First name: {1}</li>
+        	<li>Last name: {2}</li>
+        	<li>E-mail: {3}</li>
+        	<li>City: {4}</li>
+        	<li>State: {5}</li>
+        	<li>Country: {6}</li>
+        	<li>University: {7}</li>
+        	</ul>
+        ]]>
+</entry>
+<entry key="registration.user.subject">Thank you for your interest in EnterpriseSearch Sorting</entry>
+<entry key="registration.user.message"><![CDATA[
+        <p>Thank you for volunteering to help with EnterpriseSearch Sorting.
+        	 Your registration information is being processed and an account is being created.
+        	 You should receive another e-mail message with your user name, temporary password,
+        	 and basic getting-started information within the next 2-3 days.</p>
+        	 <p>We encourage you to read the <a href="#">online sorting instructions</a> prior to receiving your 
+        	 account. Being familiar with the project instructions will help you have a productive 
+        and satisfying experience as you participate in this exciting effort.</p> 
+        	 <p>Sincerely,</p><p>The EnterpriseSearch Sorting Registration Team</p>
+        ]]>
+</entry>
+
+</properties>

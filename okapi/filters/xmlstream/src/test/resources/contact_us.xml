@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+<!-- # Contact Us Page -->
+<entry key="contactus_title">EnterpriseSearch Sorting: Contact Us</entry>
+<entry key="contactus_header">Contact Us</entry>
+<entry key="contactus_P1"><![CDATA[
+        <strong>Address:</strong><br /><br/> 
+        EnterpriseSearch Sorting<br />Enterprise Company<br/>JSMB<br /> 
+        100 West Central<br />Central City, TX 00000
+        ]]>
+</entry>
+<entry key="contactus_P2"><![CDATA[
+        If you have a question which the <a href="{0}" target="_top">on-line help</a> cannot answer:
+        ]]>
+</entry>
+<entry key="contactus_li1"><![CDATA[
+        Please contact your local group administrator (Group Sponsor or University detection Director).
+        ]]>
+</entry>
+<entry key="contactus_li2"><![CDATA[
+        If your detection director or group administrator is not 
+        available, you may e-mail us at:&nbsp;
+        <a href="mailto:sorting@EnterpriseSearch.org">sorting@EnterpriseSearch.org</a>
+        ]]>
+</entry>
+<entry key="contactus_li3"><![CDATA[
+        For international support, click <a href="https://contact.EnterpriseSearch.org/{0}.htm">here.</a>
+        ]]>
+</entry>
+
+</properties>

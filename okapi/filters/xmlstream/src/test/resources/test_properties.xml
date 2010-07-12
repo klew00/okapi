@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<properties>
+    <comment>Database Configuration</comment>
+    <entry key="database.password">root</entry>
+    <entry key="database.url">jdbc:mysql://localhost/mydb</entry>
+    <entry key="database.type">mysql</entry>
+    <entry key="database.username">root</entry>
+</properties>
+
