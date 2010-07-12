@@ -366,7 +366,9 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		nodeIterator = document.iterator();
 
 		// initialize sub-filter
-		if (getConfig().getGlobalCDATASubfilter() != null) {
+		TaggedFilterConfiguration figgy=getConfig(); // DWH to fix crash in OpenXML
+		if (figgy!=null && figgy.getGlobalCDATASubfilter() != null) {
+//	if (getConfig().getGlobalCDATASubfilter() != null) {
 			cdataSubfilter = (AbstractFilter)getFilterConfigurationMapper().createFilter(
 					getConfig().getGlobalCDATASubfilter(), cdataSubfilter);
 			getEncoderManager().mergeMappings(cdataSubfilter.getEncoderManager());
