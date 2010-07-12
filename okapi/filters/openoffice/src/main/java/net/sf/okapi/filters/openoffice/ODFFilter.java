@@ -60,7 +60,7 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
  * This class implements IFilter for XML documents in Open-Document format (ODF).
  * The expected input is the XML document itself. It can be used on ODF documents
  * that are not in Open-Office.org files (i.e. directly on the content.xml of the .odt).
- * For processing ODT, ODS, etc. documents, use the OpenDocumentFilter class,
+ * For processing ODT, ODS, etc. documents, use the OpenOfficeFilter class,
  * which calls this filter as needed.
  */
 public class ODFFilter implements IFilter {

@@ -261,6 +261,13 @@ public class ZipFilterWriter implements IFilterWriter {
         return writer;
 	}
 	
+	protected StartDocument convertToStartDocument(StartSubDocument res) {
+		StartDocument sd = new StartDocument("sd");
+		sd.setLineBreak("\n");
+		sd.setSkeleton(res.getSkeleton());
+		return sd;
+	}
+	
 	private void processStartSubDocument (StartSubDocument res) {
 		ZipSkeleton skel = (ZipSkeleton)res.getSkeleton();
 		subDocEntry = skel.getEntry();
@@ -276,10 +283,8 @@ public class ZipFilterWriter implements IFilterWriter {
 		// Instantiate the filter writer for that entry
 		subDocWriter = createSubDocumentFilterWriter(res);
 		subDocWriter.setOutput(tempFile.getAbsolutePath());
-		
-		StartDocument sd = new StartDocument("sd");
-		sd.setLineBreak("\n");
-		sd.setSkeleton(res.getSkeleton());
+				
+		StartDocument sd = convertToStartDocument(res);
 		subDocWriter.handleEvent(new Event(EventType.START_DOCUMENT, sd));
 	}
 	
