@@ -86,7 +86,7 @@ public class OpenXMLRoundTripTest {
 		themfiles.add("Hidden.docx");
 		themfiles.add("ExcelColors.xlsx");
 		themfiles.add("UTF8.docx");
-		//FIXME: This file now fails after the latest changes to whitespace handling in AbstractMarkupFilter and ExtractionRuleState 6/30/2010 themfiles.add("commentTable.xlsx");
+		themfiles.add("commentTable.xlsx");
 		themfiles.add("InsertText.pptx");
 		themfiles.add("Endpara.pptx");
 		themfiles.add("TestDako2.docx");
@@ -96,7 +96,7 @@ public class OpenXMLRoundTripTest {
 		themfiles.add("EndGroup.docx");
 		themfiles.add("Practice2.docx");
 		themfiles.add("Hangs.docx");
-		
+
 //		themfiles.add("2008FinancialsDecember.xlsx");
 //		themfiles.add("welfarelesson_new_skin_Mar3.pptx");	
 //		themfiles.add("glorp.docx");
@@ -104,7 +104,7 @@ public class OpenXMLRoundTripTest {
 		for(String s : themfiles)
 		{
 //   	runOneTest(s,false,false); // English
-			runOneTest(s,true,false);  // PigLatin
+  		runOneTest(s,true,false);  // PigLatin
 // 		runOneTest(s,false,true);  // Tags
 // 		runOneTest(s,true,true);   // Codes
 		}
