@@ -1,8 +1,11 @@
 package net.sf.okapi.filters.xmlstream.integration;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -45,10 +48,9 @@ public class PropertyXmlExtractionComparisionTest {
 		fcMapper.addConfigurations("net.sf.okapi.filters.html.HtmlFilter");
 		xmlStreamFilter.setFilterConfigurationMapper(fcMapper);
 
-		propertyXmlFileList = XmlstreamUtils.getTestFiles("/about.xml", ".xml");
+		propertyXmlFileList = XmlStreamTestUtils.getTestFiles("/about.xml", ".xml");
 
-		URL propertyXmlUrl = PropertyXmlExtractionComparisionTest.class
-				.getResource("/about.xml");
+		URL propertyXmlUrl = PropertyXmlExtractionComparisionTest.class.getResource("/about.xml");
 		propertyXmlRoot = Util.getDirectoryName(propertyXmlUrl.getPath()) + File.separator;
 	}
 
@@ -89,18 +91,32 @@ public class PropertyXmlExtractionComparisionTest {
 		}
 		assertTrue(rtc.executeCompare(xmlStreamFilter, list, "UTF-8", locEN, locEN));
 	}
+
+	@Test
+	public void testAsSnippetWithCdata() throws URISyntaxException, IOException {
+		InputStream s = PropertyXmlExtractionComparisionTest.class.getResourceAsStream("/simple_cdata.xml");
+		String snippet = XmlStreamTestUtils.convertStreamToString(s).trim();
+		assertEquals(snippet, XmlStreamTestUtils.generateOutput(
+				XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter,
+						XmlStreamFilter.class.getResource("javaPropertiesXml.yml")), snippet, locEN, xmlStreamFilter));
+	}
 	
-	//@Test
-	public void testAsSnippet() throws URISyntaxException {		
+	@Test
+	public void testAsSnippetNoCdata() throws URISyntaxException, IOException {
+		InputStream s = PropertyXmlExtractionComparisionTest.class.getResourceAsStream("/test_drive.xml");
+		String snippet = XmlStreamTestUtils.convertStreamToString(s).trim();
+		assertEquals(snippet, XmlStreamTestUtils.generateOutput(
+				XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter,
+						XmlStreamFilter.class.getResource("javaPropertiesXml.yml")), snippet, locEN, xmlStreamFilter));
 	}
 
-	//@Test
+	// @Test
 	public void testPrintTextUnits() {
 		GenericSkeletonWriter writer = new GenericSkeletonWriter();
 		StringBuilder tmp = new StringBuilder();
-		
+
 		// Open the document to process
-		xmlStreamFilter.open(new RawDocument(new File(propertyXmlRoot + "about.xml").toURI(), 
+		xmlStreamFilter.open(new RawDocument(new File(propertyXmlRoot + "about.xml").toURI(),
 				"UTF-8", new LocaleId("en")));
 
 		// process the input document
@@ -108,8 +124,8 @@ public class PropertyXmlExtractionComparisionTest {
 			Event event = xmlStreamFilter.next();
 			switch (event.getEventType()) {
 			case START_DOCUMENT:
-				writer.processStartDocument(LocaleId.SPANISH, "utf-8", null, xmlStreamFilter.getEncoderManager(), 
-						(StartDocument) event.getResource());
+				writer.processStartDocument(LocaleId.SPANISH, "utf-8", null,
+						xmlStreamFilter.getEncoderManager(), (StartDocument) event.getResource());
 				break;
 			case TEXT_UNIT:
 				TextUnit tu = (TextUnit) event.getResource();
