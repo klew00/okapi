@@ -45,10 +45,10 @@ public class PropertyXmlExtractionComparisionTest {
 		fcMapper.addConfigurations("net.sf.okapi.filters.html.HtmlFilter");
 		xmlStreamFilter.setFilterConfigurationMapper(fcMapper);
 
-		propertyXmlFileList = TestUtils.getTestFiles("/about_us.xml", ".xml");
+		propertyXmlFileList = XmlstreamUtils.getTestFiles("/about.xml", ".xml");
 
 		URL propertyXmlUrl = PropertyXmlExtractionComparisionTest.class
-				.getResource("/about_us.xml");
+				.getResource("/about.xml");
 		propertyXmlRoot = Util.getDirectoryName(propertyXmlUrl.getPath()) + File.separator;
 	}
 
@@ -59,12 +59,12 @@ public class PropertyXmlExtractionComparisionTest {
 	@Test
 	public void testStartDocument() {
 		assertTrue("Problem in StartDocument", FilterTestDriver.testStartDocument(xmlStreamFilter,
-				new InputDocument(propertyXmlRoot + "about_us.xml", null), "UTF-8", locEN, locEN));
+				new InputDocument(propertyXmlRoot + "about.xml", null), "UTF-8", locEN, locEN));
 	}
 
 	@Test
 	public void testOpenTwice() throws URISyntaxException {
-		File file = new File(propertyXmlRoot + "about_us.xml");
+		File file = new File(propertyXmlRoot + "about.xml");
 		RawDocument rawDoc = new RawDocument(file.toURI(), "UTF-8", locEN);
 		xmlStreamFilter.open(rawDoc);
 		xmlStreamFilter.close();
@@ -76,7 +76,7 @@ public class PropertyXmlExtractionComparisionTest {
 	public void testDoubleExtractionSingle() throws URISyntaxException, MalformedURLException {
 		RoundTripComparison rtc = new RoundTripComparison();
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
-		list.add(new InputDocument(propertyXmlRoot + "about_us.xml", null));
+		list.add(new InputDocument(propertyXmlRoot + "about.xml", null));
 		assertTrue(rtc.executeCompare(xmlStreamFilter, list, "UTF-8", locEN, locEN));
 	}
 
@@ -90,14 +90,17 @@ public class PropertyXmlExtractionComparisionTest {
 		assertTrue(rtc.executeCompare(xmlStreamFilter, list, "UTF-8", locEN, locEN));
 	}
 	
+	//@Test
+	public void testAsSnippet() throws URISyntaxException {		
+	}
 
-	@Test
+	//@Test
 	public void testPrintTextUnits() {
 		GenericSkeletonWriter writer = new GenericSkeletonWriter();
 		StringBuilder tmp = new StringBuilder();
 		
 		// Open the document to process
-		xmlStreamFilter.open(new RawDocument(new File(propertyXmlRoot + "about_us.xml").toURI(), 
+		xmlStreamFilter.open(new RawDocument(new File(propertyXmlRoot + "about.xml").toURI(), 
 				"UTF-8", new LocaleId("en")));
 
 		// process the input document

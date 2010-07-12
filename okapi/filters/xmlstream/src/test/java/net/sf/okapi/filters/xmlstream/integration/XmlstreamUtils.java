@@ -15,7 +15,7 @@ import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 
-public final class TestUtils {
+public final class XmlstreamUtils {
 	public static String[] getTestFiles(final String aFile, final String suffix) throws URISyntaxException {
 		// read all files in the test xmlstream directory
 		URL url = DitaExtractionComparisionTest.class.getResource(aFile);

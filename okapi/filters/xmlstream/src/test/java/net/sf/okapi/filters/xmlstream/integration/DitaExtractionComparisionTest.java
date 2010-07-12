@@ -33,7 +33,7 @@ public class DitaExtractionComparisionTest {
 		xmlStreamFilter.setParametersFromURL(XmlStreamFilter.class.getResource("dita.yml"));
 		URL ditaUrl = DitaExtractionComparisionTest.class.getResource("/bookmap-readme.dita");				
 		ditaRoot = Util.getDirectoryName(ditaUrl.getPath()) + File.separator;
-		ditaFileList = TestUtils.getTestFiles("/bookmap-readme.dita", ".dita");		
+		ditaFileList = XmlstreamUtils.getTestFiles("/bookmap-readme.dita", ".dita");		
 	}
 
 	@After
