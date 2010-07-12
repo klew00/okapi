@@ -493,4 +493,19 @@ public class LocaleIdTest {
 		assertEquals(null, locId.getUserPart());
 	}
 
+	@Test
+	public void testIsBidirectional () {
+		// True
+		assertTrue(LocaleId.isBidirectional(LocaleId.fromBCP47("ar")));
+		assertTrue(LocaleId.isBidirectional(LocaleId.fromBCP47("he")));
+		assertTrue(LocaleId.isBidirectional(LocaleId.fromBCP47("ar-SA")));
+		assertTrue(LocaleId.isBidirectional(LocaleId.fromBCP47("ur-pk")));
+		assertTrue(LocaleId.isBidirectional(LocaleId.fromBCP47("syc")));
+		assertTrue(LocaleId.isBidirectional(LocaleId.fromBCP47("dv")));
+		assertTrue(LocaleId.isBidirectional(LocaleId.fromPOSIXLocale("ar_EG")));
+		// False
+		assertFalse(LocaleId.isBidirectional(LocaleId.fromBCP47("en-ar")));
+		assertFalse(LocaleId.isBidirectional(LocaleId.fromBCP47("arn")));
+		assertFalse(LocaleId.isBidirectional(LocaleId.fromBCP47("tr")));
+	}		
 }

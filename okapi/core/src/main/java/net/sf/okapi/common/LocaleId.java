@@ -84,7 +84,7 @@ public final class LocaleId implements Comparable<Object> {
      * Pattern to match the BCP-47 codes of the locales that use bidirectional scripts.
      * Note that this is not perfect as some languages use several scripts.
      */
-	private static final Pattern BIDILOCALES = Pattern.compile("(ar|he|dv|fa|ur).*", Pattern.CASE_INSENSITIVE);
+	private static final Pattern BIDILOCALES = Pattern.compile("(ar|he|fa|ur|dv|syr|syc)(-.*)?", Pattern.CASE_INSENSITIVE);
 
 	private String locId;
 	
