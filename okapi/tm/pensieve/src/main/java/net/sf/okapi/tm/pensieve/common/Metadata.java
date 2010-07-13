@@ -20,13 +20,13 @@
 
 package net.sf.okapi.tm.pensieve.common;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * A class that keeps track of the metadata of a TU
  * @author HaslamJD
  */
-public class Metadata extends HashMap<MetadataType, String> {
+public class Metadata extends LinkedHashMap<MetadataType, String> {
 	private static final long serialVersionUID = -1049971493479356457L;
 
 }

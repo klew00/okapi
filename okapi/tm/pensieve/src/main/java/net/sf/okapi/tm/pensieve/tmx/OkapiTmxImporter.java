@@ -89,7 +89,6 @@ public class OkapiTmxImporter implements ITmxImporter {
         }
     }
 
-
     private void indexEvent(LocaleId targetLang, ITmWriter tmWriter, Event event) throws IOException {
         TranslationUnit tu;
         if (event.getEventType() == EventType.TEXT_UNIT) {

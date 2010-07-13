@@ -39,8 +39,8 @@ public class TmxHandlerExportTest {
                 "srclang=\"en\" datatype=\"unknown\"></header>" +
                 "<body>" +
                 "<tu tuid=\"hello123\">" +                
-                "<prop type=\"Txt::FileName\">GeorgeInTheJungle.hdf</prop>" +
                 "<prop type=\"Txt::GroupName\">ImAGroupie</prop>" +
+                "<prop type=\"Txt::FileName\">GeorgeInTheJungle.hdf</prop>" +
                 "<tuv xml:lang=\"en\"><seg>hello</seg></tuv>" +
                 "<tuv xml:lang=\"it\"><seg>ciao</seg></tuv></tu>" + 
                 "<tu tuid=\"world\">" +

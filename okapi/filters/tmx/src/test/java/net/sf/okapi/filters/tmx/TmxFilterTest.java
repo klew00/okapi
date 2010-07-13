@@ -146,12 +146,22 @@ public class TmxFilterTest {
 	public void testSpecialChars () {
 		String snippet = "<?xml version=\"1.0\"?>\r"
 			+ "<tmx version=\"1.4\"><header creationtool=\"undefined_creationtool\" creationtoolversion=\"undefined_creationversion\" segtype=\"undefined_segtype\" o-tmf=\"undefined_unknown\" adminlang=\"undefined_adminlang\" srclang=\"en-us\" datatype=\"unknown\"></header>\r<body>\r"
-			+ "<tu tuid=\"tuid_1\">\r<tuv xml:lang=\"en-us\">\r<seg>&amp;&lt;&quot;&apos;</seg>\r</tuv>\r<tuv xml:lang=\"fr-fr\">\r<seg>&amp;&lt;&quot;&apos;</seg>\r</tuv>\r</tu>\r"
+			+ "<tu tuid=\"tuid_1\">\r"
+			+ "<prop type=\"p2\">val2</prop>\r"
+			+ "<prop type=\"p1\">val1</prop>\r"
+			+ "<prop type=\"p4\">val4</prop>\r"
+			+ "<prop type=\"p3\">val3</prop>\r"
+			+ "<tuv xml:lang=\"en-us\">\r<seg>&amp;&lt;&quot;&apos;</seg>\r</tuv>\r<tuv xml:lang=\"fr-fr\">\r<seg>&amp;&lt;&quot;&apos;</seg>\r</tuv>\r</tu>\r"
 			+ "<tu>\r<tuv xml:lang=\"en-us\">\r<seg>t2</seg>\r</tuv>\r<tuv xml:lang=\"fr-fr\">\r<seg>t2-fr</seg>\r</tuv>\r</tu>"
 			+ "</body>\r</tmx>";
 		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
 			+ "<tmx version=\"1.4\"><header creationtool=\"undefined_creationtool\" creationtoolversion=\"undefined_creationversion\" segtype=\"undefined_segtype\" o-tmf=\"undefined_unknown\" adminlang=\"undefined_adminlang\" srclang=\"en-us\" datatype=\"unknown\"></header>\r<body>\r"
-			+ "<tu tuid=\"tuid_1\">\r<tuv xml:lang=\"en-us\">\r<seg>&amp;&lt;&quot;&apos;</seg>\r</tuv>\r<tuv xml:lang=\"fr-fr\">\r<seg>&amp;&lt;&quot;&apos;</seg>\r</tuv>\r</tu>\r"
+			+ "<tu tuid=\"tuid_1\">\r"
+			+ "<prop type=\"p2\">val2</prop>\r"
+			+ "<prop type=\"p1\">val1</prop>\r"
+			+ "<prop type=\"p4\">val4</prop>\r"
+			+ "<prop type=\"p3\">val3</prop>\r"
+			+ "<tuv xml:lang=\"en-us\">\r<seg>&amp;&lt;&quot;&apos;</seg>\r</tuv>\r<tuv xml:lang=\"fr-fr\">\r<seg>&amp;&lt;&quot;&apos;</seg>\r</tuv>\r</tu>\r"
 			+ "<tu>\r<tuv xml:lang=\"en-us\">\r<seg>t2</seg>\r</tuv>\r<tuv xml:lang=\"fr-fr\">\r<seg>t2-fr</seg>\r</tuv>\r</tu>"
 			+ "</body>\r</tmx>";
 		
