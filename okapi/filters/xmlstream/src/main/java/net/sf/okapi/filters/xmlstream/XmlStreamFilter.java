@@ -49,7 +49,7 @@ public class XmlStreamFilter extends AbstractMarkupFilter {
 		setFilterWriter(createFilterWriter());
 		setParameters(new Parameters());
 		setName("okf_xmlstream"); //$NON-NLS-1$
-		setDisplayName("XML Stream Filter"); //$NON-NLS-1$
+		setDisplayName("XML Stream Filter (BETA)"); //$NON-NLS-1$
 		addConfiguration(new FilterConfiguration(getName(), MimeTypeMapper.XML_MIME_TYPE,
 				getClass().getName(), "XML Stream", "Large XML Documents", //$NON-NLS-1$
 				Parameters.DEFAULT_PARAMETERS));
