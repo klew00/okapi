@@ -38,9 +38,9 @@ public class TmxHandlerExportTest {
                 "segtype=\"sentence\" o-tmf=\"pensieve\" adminlang=\"en\" " +
                 "srclang=\"en\" datatype=\"unknown\"></header>" +
                 "<body>" +
-                "<tu tuid=\"hello123\">" +
-                "<prop type=\"Txt::GroupName\">ImAGroupie</prop>" +
+                "<tu tuid=\"hello123\">" +                
                 "<prop type=\"Txt::FileName\">GeorgeInTheJungle.hdf</prop>" +
+                "<prop type=\"Txt::GroupName\">ImAGroupie</prop>" +
                 "<tuv xml:lang=\"en\"><seg>hello</seg></tuv>" +
                 "<tuv xml:lang=\"it\"><seg>ciao</seg></tuv></tu>" + 
                 "<tu tuid=\"world\">" +
