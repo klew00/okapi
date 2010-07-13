@@ -51,7 +51,7 @@ class StatusBar extends Composite {
 		
 		counterLabel = new CLabel(this, SWT.BORDER | SWT.CENTER);
 		gdTmp = new GridData();
-		gdTmp.widthHint = 160;
+		gdTmp.widthHint = 180;
 		counterLabel.setLayoutData(gdTmp);
 
 		infoLabel = new CLabel(this, SWT.BORDER);

@@ -329,7 +329,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		});
 		spMaxCharLength = new Spinner(grpSeg, SWT.BORDER);
 		gdTmp = new GridData();
-		gdTmp.widthHint = 40;
+		gdTmp.widthHint = 70;
 		gdTmp.horizontalIndent = horizIndent;
 		spMaxCharLength.setLayoutData(gdTmp);
 		spMaxCharLength.setMaximum(999);
@@ -344,7 +344,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		});
 		spMinCharLength = new Spinner(grpSeg, SWT.BORDER);
 		gdTmp = new GridData();
-		gdTmp.widthHint = 40;
+		gdTmp.widthHint = 70;
 		gdTmp.horizontalIndent = horizIndent;
 		spMinCharLength.setLayoutData(gdTmp);
 		spMinCharLength.setMaximum(999);
@@ -547,7 +547,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		
 		edLTTranslationSource = new Text(cmpLTTrans, SWT.BORDER);
 		gdTmp = new GridData();
-		gdTmp.widthHint = 80;
+		gdTmp.widthHint = 100;
 		edLTTranslationSource.setLayoutData(gdTmp);
 		
 		label = new Label(cmpLTTrans, SWT.NONE);
@@ -555,7 +555,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 
 		edLTTranslationTarget = new Text(cmpLTTrans, SWT.BORDER);
 		gdTmp = new GridData();
-		gdTmp.widthHint = 80;
+		gdTmp.widthHint = 100;
 		edLTTranslationTarget.setLayoutData(gdTmp);
 
 		btStartLT = new Button(cmpTmp, SWT.PUSH);

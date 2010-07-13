@@ -139,6 +139,7 @@ public class InputDocumentPanel extends Composite {
 		
 		edSourceLocale = new Text(this, SWT.BORDER);
 		gdTmp = new GridData();
+		gdTmp.widthHint = 100;
 		gdTmp.horizontalSpan = 2;
 		edSourceLocale.setLayoutData(gdTmp);
 		
@@ -149,6 +150,7 @@ public class InputDocumentPanel extends Composite {
 		
 		edTargetLocale = new Text(this, SWT.BORDER);
 		gdTmp = new GridData();
+		gdTmp.widthHint = 100;
 		gdTmp.horizontalSpan = 2;
 		edTargetLocale.setLayoutData(gdTmp);
 	}

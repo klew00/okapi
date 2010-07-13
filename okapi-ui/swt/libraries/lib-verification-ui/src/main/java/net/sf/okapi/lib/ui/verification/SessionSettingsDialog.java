@@ -103,12 +103,18 @@ class SessionSettingsDialog {
 		label.setText("Source locale:");
 		
 		edSourceLocale = new Text(grpLocales, SWT.BORDER);
+		gdTmp = new GridData();
+		gdTmp.widthHint = 100;
+		edSourceLocale.setLayoutData(gdTmp);
+		
 		
 		label = new Label(grpLocales, SWT.NONE);
 		label.setText("Target locale:");
 		
 		edTargetLocale = new Text(grpLocales, SWT.BORDER);
-		
+		gdTmp = new GridData();
+		gdTmp.widthHint = 100;
+		edTargetLocale.setLayoutData(gdTmp);
 		
 		//--- Dialog-level buttons
 

@@ -113,7 +113,6 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 	private StatusBar statusBar;
 	private QualityCheckSession session;
 	private Combo cbDisplay;
-	private Button btRefreshDisplay;
 	private Combo cbTypes;
 	private int waitCount;
 	
@@ -594,19 +593,19 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		//--- Issues panel
 		
 		cmpTmp = new Composite(sashMain, SWT.BORDER);
-		layTmp = new GridLayout(4, false);
+		layTmp = new GridLayout(3, false);
 		cmpTmp.setLayout(layTmp);
 		cmpTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
 		edMessage = new Text(cmpTmp, SWT.BORDER);
 		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.horizontalSpan = 4;
+		gdTmp.horizontalSpan = 3;
 		edMessage.setLayoutData(gdTmp);
 		edMessage.setEditable(false);
 
 		cbDocument = new Combo(cmpTmp, SWT.DROP_DOWN | SWT.READ_ONLY);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.horizontalSpan = 4;
+		gdTmp.horizontalSpan = 3;
 		cbDocument.setLayoutData(gdTmp);
 		cbDocument.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -691,20 +690,11 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 			};
 		});
 		
-		btRefreshDisplay = new Button(cmpTmp, SWT.PUSH);
-		btRefreshDisplay.setText("Refresh");
-		UIUtil.ensureWidth(btRefreshDisplay, UIUtil.BUTTON_DEFAULT_WIDTH);
-		btRefreshDisplay.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				refreshTableDisplay();
-			}
-		});
-
 		tblIssues = new Table(cmpTmp, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION | SWT.CHECK | SWT.V_SCROLL);
 		tblIssues.setHeaderVisible(true);
 		tblIssues.setLinesVisible(true);
 		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.horizontalSpan = 4;
+		gdTmp.horizontalSpan = 3;
 		//gdTmp.minimumHeight = 250;
 		tblIssues.setLayoutData(gdTmp);
 		
@@ -1000,7 +990,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		else {
 			filename = "Untitled";
 		}
-		String text = "CheckMate [ALPHA]";
+		String text = "CheckMate (BETA)";
 		shell.setText(filename + " - " + text); //$NON-NLS-1$
 	}
 
