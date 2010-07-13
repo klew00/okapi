@@ -20,7 +20,7 @@
 
 package net.sf.okapi.persistence.beans.v1;
 
-import java.util.Hashtable;
+import java.util.LinkedHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import net.sf.okapi.common.LocaleId;
@@ -31,8 +31,8 @@ import net.sf.okapi.persistence.PersistenceBean;
 
 public class TargetPropertiesAnnotationBean extends PersistenceBean<TargetPropertiesAnnotation> {
 
-	private ConcurrentHashMap<String, Hashtable<String, PropertyBean>> targets = 
-		new ConcurrentHashMap<String, Hashtable<String, PropertyBean>>();
+	private ConcurrentHashMap<String, LinkedHashMap<String, PropertyBean>> targets = 
+		new ConcurrentHashMap<String, LinkedHashMap<String, PropertyBean>>();
 
 	@Override
 	protected TargetPropertiesAnnotation createObject(IPersistenceSession session) {
@@ -42,8 +42,8 @@ public class TargetPropertiesAnnotationBean extends PersistenceBean<TargetProper
 	@Override
 	protected void fromObject(TargetPropertiesAnnotation obj, IPersistenceSession session) {
 		for (LocaleId locId : obj) {
-			Hashtable<String, PropertyBean> propBeans = new Hashtable<String, PropertyBean>();
-			Hashtable<String, Property> props = obj.get(locId);
+			LinkedHashMap<String, PropertyBean> propBeans = new LinkedHashMap<String, PropertyBean>();
+			LinkedHashMap<String, Property> props = obj.get(locId);
 			
 			for (String key : props.keySet()) {
 				Property prop = props.get(key);
@@ -58,8 +58,8 @@ public class TargetPropertiesAnnotationBean extends PersistenceBean<TargetProper
 	@Override
 	protected void setObject(TargetPropertiesAnnotation obj, IPersistenceSession session) {
 		for (String locTag : targets.keySet()) {
-			Hashtable<String, PropertyBean> propBeans = targets.get(locTag);
-			Hashtable<String, Property> props = new Hashtable<String, Property>();
+			LinkedHashMap<String, PropertyBean> propBeans = targets.get(locTag);
+			LinkedHashMap<String, Property> props = new LinkedHashMap<String, Property>();
 			
 			for (String key : propBeans.keySet()) {
 				PropertyBean propBean = propBeans.get(key);
