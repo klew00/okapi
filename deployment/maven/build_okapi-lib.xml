@@ -128,6 +128,8 @@
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi/filters/xml/target/classes"
 			 excludes="**/META-INF/**"/>
+			<fileset dir="../../okapi/filters/xmlstream/target/classes"
+			 excludes="**/META-INF/**"/>
 			 
 			<!-- lib -->
 			<fileset dir="../../okapi/libraries/lib-segmentation/target/classes"

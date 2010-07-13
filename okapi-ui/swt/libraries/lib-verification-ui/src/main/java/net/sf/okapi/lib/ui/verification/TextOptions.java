@@ -35,7 +35,7 @@ public class TextOptions {
 	public Color background;
 	public boolean isBidirectional;
 	
-	private static final String SEPARATOR = "\u0029";
+	private static final String SEPARATOR = "\t";
 
 	/**
 	 * Creates a new object based on the data saved in the given string.
@@ -57,7 +57,7 @@ public class TextOptions {
 			foreground = new Color(device, Integer.valueOf(values[0]),
 				Integer.valueOf(values[1]), Integer.valueOf(values[2]));
 			// Background color
-			values = parts[2].split(",");
+			values = parts[3].split(",");
 			background = new Color(device, Integer.valueOf(values[0]),
 				Integer.valueOf(values[1]), Integer.valueOf(values[2]));
 		}

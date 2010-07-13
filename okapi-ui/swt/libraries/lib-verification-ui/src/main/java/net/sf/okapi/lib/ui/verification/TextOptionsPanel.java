@@ -137,7 +137,7 @@ public class TextOptionsPanel extends Composite {
 				dlg.setRGB(opt.foreground.getRGB());
 				dlg.setText("Select Text Color");
 			}
-			// Open the selction dialog
+			// Open the selection dialog
 			RGB rgb = dlg.open();
 			if ( rgb == null ) return;
 			// If no user cancellation we set the new color

@@ -92,6 +92,8 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 	private static final String APPNAME = "CheckMate"; //$NON-NLS-1$
 	private static final String CFG_SOURCELOCALE = "sourceLocale"; //$NON-NLS-1$
 	private static final String CFG_TARGETLOCALE = "targetLocale"; //$NON-NLS-1$
+	private static final String CFG_SOURCETEXTOPTIONS = "sourceTextOptions"; //$NON-NLS-1$
+	private static final String CFG_TARGETTEXTOPTIONS = "targetTextOptions"; //$NON-NLS-1$
 	
 	private String qcsPath;
 	private UserConfiguration config;
@@ -547,20 +549,45 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		edTarget = new StyledText(sashEdit, SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
 		edTarget.setLayoutData(new GridData(GridData.FILL_BOTH));
 		edTarget.setEditable(false);
-		
-		// Create a copy of the default text field options for the source
-		srcTextOpt = new TextOptions(shell.getDisplay(), edSource);
-		Font tmp = srcTextOpt.font;
-		// Make the font a bit larger by default
-		FontData[] fontData = tmp.getFontData();
-		fontData[0].setHeight(fontData[0].getHeight()+2);
-		srcTextOpt.font = new Font(shell.getDisplay(), fontData[0]);
+
+		// Get the source text option from the user configuration if possible
+		String data = config.getProperty(CFG_SOURCETEXTOPTIONS, "");
+		if ( !Util.isEmpty(data) ) {
+			try {
+				srcTextOpt = new TextOptions(shell.getDisplay(), data);
+			}
+			catch ( Throwable e ) {
+				// Error: Keep it silent, just use the default
+				data = null;
+			}
+		}
+		if ( Util.isEmpty(data) ) { // Default
+			// Create a copy of the default text field options for the source
+			srcTextOpt = new TextOptions(shell.getDisplay(), edSource);
+			Font tmp = srcTextOpt.font;
+			// Make the font a bit larger by default
+			FontData[] fontData = tmp.getFontData();
+			fontData[0].setHeight(fontData[0].getHeight()+2);
+			srcTextOpt.font = new Font(shell.getDisplay(), fontData[0]);
+		}
 		// And apply them to the source control to allow clean disposal later
 		srcTextOpt.applyTo(edSource);
 		
-		// Create a copy of the default text field options for the target
-		// Use the same as the source by default
-		trgTextOpt = new TextOptions(shell.getDisplay(), srcTextOpt);
+		// Get the target text option from the user configuration if possible
+		data = config.getProperty(CFG_TARGETTEXTOPTIONS, "");
+		if ( !Util.isEmpty(data) ) {
+			try {
+				trgTextOpt = new TextOptions(shell.getDisplay(), data);
+			}
+			catch ( Throwable e ) {
+				// Error: Keep it silent, just use the default
+				data = null;
+			}
+		}
+		if ( Util.isEmpty(data) ) { // Default
+			// Use the same as the source by default
+			trgTextOpt = new TextOptions(shell.getDisplay(), srcTextOpt);
+		}
 		// And apply them to the target control to allow clean disposal later
 		trgTextOpt.applyTo(edTarget);
 
@@ -1219,12 +1246,15 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 	 * @return False if the user cancel, true if a decision is made. 
 	 */
 	private boolean saveSessionIfNeeded () {
+		// Save user preferences and configuration
 		config.setProperty(CFG_SOURCELOCALE, session.getSourceLocale().toBCP47());
 		config.setProperty(CFG_TARGETLOCALE, session.getTargetLocale().toBCP47());
 		// Set the window placement
 		config.setProperty(OPT_MAXIMIZED, shell.getMaximized());
 		Rectangle r = shell.getBounds();
 		config.setProperty(OPT_BOUNDS, String.format("%d,%d,%d,%d", r.x, r.y, r.width, r.height)); //$NON-NLS-1$
+		config.setProperty(CFG_SOURCETEXTOPTIONS, srcTextOpt.toString());
+		config.setProperty(CFG_TARGETTEXTOPTIONS, trgTextOpt.toString());
 		// Set the MRU list
 		mruList.copyToProperties(config);
 		// Save to the user home directory as ".appname" file
