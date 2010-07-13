@@ -21,15 +21,15 @@
 package net.sf.okapi.common.resource;
 
 import java.util.Collections;
-import java.util.Hashtable;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.ISkeleton;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.annotation.Annotations;
 import net.sf.okapi.common.annotation.IAnnotation;
-import net.sf.okapi.common.LocaleId;
 
 /**
  * Implements a nameable resource.
@@ -43,9 +43,9 @@ public class BaseNameable implements INameable {
 	protected String mimeType;
 	protected boolean isTranslatable = true; // Default for all resources
 	protected boolean preserveWS = false; // Default for all resources
-	protected Hashtable<String, Property> properties;
+	protected LinkedHashMap<String, Property> properties;
 	protected Annotations annotations;
-	protected Hashtable<String, Property> sourceProperties;
+	protected LinkedHashMap<String, Property> sourceProperties;
 	
 	@Override
 	public String getId () {
@@ -117,7 +117,7 @@ public class BaseNameable implements INameable {
 
 	@Override
 	public Property setProperty (Property property) {
-		if ( properties == null ) properties = new Hashtable<String, Property>();
+		if ( properties == null ) properties = new LinkedHashMap<String, Property>();
 		properties.put(property.getName(), property);
 		return property;
 	}
@@ -131,7 +131,7 @@ public class BaseNameable implements INameable {
 	
 	@Override
 	public Set<String> getPropertyNames () {
-		if ( properties == null ) properties = new Hashtable<String, Property>();
+		if ( properties == null ) properties = new LinkedHashMap<String, Property>();
 		return properties.keySet();
 	}
 
@@ -149,7 +149,7 @@ public class BaseNameable implements INameable {
 
 	@Override
 	public Property setSourceProperty (Property property) {
-		if ( sourceProperties == null ) sourceProperties = new Hashtable<String, Property>();
+		if ( sourceProperties == null ) sourceProperties = new LinkedHashMap<String, Property>();
 		sourceProperties.put(property.getName(), property);
 		return property;
 	}
@@ -163,7 +163,7 @@ public class BaseNameable implements INameable {
 	
 	@Override
 	public Set<String> getSourcePropertyNames () {
-		if ( sourceProperties == null ) sourceProperties = new Hashtable<String, Property>();
+		if ( sourceProperties == null ) sourceProperties = new LinkedHashMap<String, Property>();
 		return sourceProperties.keySet();
 	}
 
@@ -197,7 +197,7 @@ public class BaseNameable implements INameable {
 		}
 		Map<String, Property> trgProps = tpa.get(locId);
 		if ( trgProps == null ) {
-			tpa.set(locId, new Hashtable<String, Property>());
+			tpa.set(locId, new LinkedHashMap<String, Property>());
 			trgProps = tpa.get(locId);
 		}
 		trgProps.put(property.getName(), property);
@@ -214,7 +214,7 @@ public class BaseNameable implements INameable {
 		}
 		Map<String, Property> trgProps = tpa.get(locId);
 		if ( trgProps == null ) {
-			tpa.set(locId, new Hashtable<String, Property>());
+			tpa.set(locId, new LinkedHashMap<String, Property>());
 			trgProps = tpa.get(locId);
 		}
 		return trgProps.keySet();
@@ -270,7 +270,7 @@ public class BaseNameable implements INameable {
 		}
 		Map<String, Property> trgProps = tpa.get(locId);
 		if ( trgProps == null ) {
-			tpa.set(locId, new Hashtable<String, Property>());
+			tpa.set(locId, new LinkedHashMap<String, Property>());
 			trgProps = tpa.get(locId);
 		}
 		Property trgProp = trgProps.get(name);

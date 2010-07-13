@@ -20,7 +20,7 @@
 
 package net.sf.okapi.common;
 
-import java.util.Hashtable;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import net.sf.okapi.common.annotation.Annotations;
@@ -45,7 +45,7 @@ public class BaseContext implements IContext {
 	 * @param properties the map of properties to copy.
 	 */
 	public BaseContext (Map<String, Object> properties) {
-		this.properties = new Hashtable<String, Object>(properties);
+		this.properties = new LinkedHashMap<String, Object>(properties);
 	}
 	
 	public String getString (String name) {
@@ -57,7 +57,7 @@ public class BaseContext implements IContext {
 		String value)
 	{
 		if ( properties == null ) {
-			properties = new Hashtable<String, Object>();
+			properties = new LinkedHashMap<String, Object>();
 		}
 		properties.put(name, value);
 	}
@@ -71,7 +71,7 @@ public class BaseContext implements IContext {
 		boolean value)
 	{
 		if ( properties == null ) {
-			properties = new Hashtable<String, Object>();
+			properties = new LinkedHashMap<String, Object>();
 		}
 		properties.put(name, value);
 	}
@@ -85,7 +85,7 @@ public class BaseContext implements IContext {
 		int value)
 	{
 		if ( properties == null ) {
-			properties = new Hashtable<String, Object>();
+			properties = new LinkedHashMap<String, Object>();
 		}
 		properties.put(name, value);
 	}
@@ -99,7 +99,7 @@ public class BaseContext implements IContext {
 		Object value)
 	{
 		if ( properties == null ) {
-			properties = new Hashtable<String, Object>();
+			properties = new LinkedHashMap<String, Object>();
 		}
 		properties.put(name, value);
 	}
@@ -112,7 +112,7 @@ public class BaseContext implements IContext {
 	
 	public Map<String, Object> getProperties () {
 		if ( properties == null ) {
-			properties = new Hashtable<String, Object>();
+			properties = new LinkedHashMap<String, Object>();
 		}
 		return properties;
 	}

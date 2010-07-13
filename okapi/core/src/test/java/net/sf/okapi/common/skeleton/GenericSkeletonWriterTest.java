@@ -1,7 +1,8 @@
 package net.sf.okapi.common.skeleton;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
-import java.util.Locale;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -19,7 +20,6 @@ import net.sf.okapi.common.resource.TextUnit;
 
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 public class GenericSkeletonWriterTest {
 

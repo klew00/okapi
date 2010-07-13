@@ -21,7 +21,7 @@
 package net.sf.okapi.common.resource;
 
 import java.util.Collections;
-import java.util.Hashtable;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -30,10 +30,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.ISegmenter;
 import net.sf.okapi.common.ISkeleton;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Range;
 import net.sf.okapi.common.annotation.Annotations;
 import net.sf.okapi.common.annotation.IAnnotation;
-import net.sf.okapi.common.LocaleId;
 
 /**
  * Basic unit of extraction from a filter and also the resource associated with the filter event TEXT_UNIT.
@@ -56,7 +56,7 @@ public class TextUnit implements INameable, IReferenceable {
 	private boolean isTranslatable = true;
 	private boolean preserveWS;
 	private ISkeleton skeleton;
-	private Hashtable<String, Property> properties;
+	private LinkedHashMap<String, Property> properties;
 	private Annotations annotations;
 	private TextContainer source;
 	private String mimeType;
@@ -231,7 +231,7 @@ public class TextUnit implements INameable, IReferenceable {
 	}
 
 	public Property setProperty (Property property) {
-		if ( properties == null ) properties = new Hashtable<String, Property>();
+		if ( properties == null ) properties = new LinkedHashMap<String, Property>();
 		properties.put(property.getName(), property);
 		return property;
 	}
@@ -243,7 +243,7 @@ public class TextUnit implements INameable, IReferenceable {
 	}
 	
 	public Set<String> getPropertyNames () {
-		if ( properties == null ) properties = new Hashtable<String, Property>();
+		if ( properties == null ) properties = new LinkedHashMap<String, Property>();
 		return properties.keySet();
 	}
 

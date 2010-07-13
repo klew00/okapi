@@ -21,8 +21,8 @@
 package net.sf.okapi.common.resource;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -45,7 +45,7 @@ public class TextContainer implements Iterable<TextPart> {
 	private static final String PARTSEP2 = "\u0092";
 	private static final char PARTSEP1CHAR = 0x0091;
 
-	private Hashtable<String, Property> properties;
+	private LinkedHashMap<String, Property> properties;
 	private Annotations annotations;
 	private List<TextPart> parts;
 	private boolean segApplied;
@@ -934,7 +934,7 @@ public class TextContainer implements Iterable<TextPart> {
 		newCont.segApplied = segApplied; 
 		// Clone the properties
 		if ( cloneProperties && ( properties != null )) {
-			newCont.properties = new Hashtable<String, Property>();
+			newCont.properties = new LinkedHashMap<String, Property>();
 			for ( Property prop : properties.values() ) {
 				newCont.properties.put(prop.getName(), prop.clone()); 
 			}
@@ -1052,7 +1052,7 @@ public class TextContainer implements Iterable<TextPart> {
 	}
 
 	public Property setProperty (Property property) {
-		if ( properties == null ) properties = new Hashtable<String, Property>();
+		if ( properties == null ) properties = new LinkedHashMap<String, Property>();
 		properties.put(property.getName(), property);
 		return property;
 	}
@@ -1064,7 +1064,7 @@ public class TextContainer implements Iterable<TextPart> {
 	}
 	
 	public Set<String> getPropertyNames () {
-		if ( properties == null ) properties = new Hashtable<String, Property>();
+		if ( properties == null ) properties = new LinkedHashMap<String, Property>();
 		return properties.keySet();
 	}
 

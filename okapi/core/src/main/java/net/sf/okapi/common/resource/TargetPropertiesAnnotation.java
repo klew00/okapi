@@ -20,14 +20,14 @@
 
 package net.sf.okapi.common.resource;
 
-import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.annotation.IterableEnumeration;
-import net.sf.okapi.common.LocaleId;
 
 /**
  * The target properties associated to a set of source properties
@@ -35,13 +35,13 @@ import net.sf.okapi.common.LocaleId;
  */
 public class TargetPropertiesAnnotation implements IAnnotation, Iterable<LocaleId> {
 
-	private ConcurrentHashMap<LocaleId, Hashtable<String, Property>> targets;
+	private ConcurrentHashMap<LocaleId, LinkedHashMap<String, Property>> targets;
 
 	/**
 	 * Creates a new TargetPropertiesAnnotation object.
 	 */
 	public TargetPropertiesAnnotation () {
-		targets = new ConcurrentHashMap<LocaleId, Hashtable<String, Property>>();
+		targets = new ConcurrentHashMap<LocaleId, LinkedHashMap<String, Property>>();
 	}
 
 	/**
@@ -50,7 +50,7 @@ public class TargetPropertiesAnnotation implements IAnnotation, Iterable<LocaleI
 	 * @param properties The properties to set.
 	 */
 	public void set (LocaleId locId,
-		Hashtable<String, Property> properties)
+		LinkedHashMap<String, Property> properties)
 	{
 		targets.put(locId, properties);
 	}
@@ -60,7 +60,7 @@ public class TargetPropertiesAnnotation implements IAnnotation, Iterable<LocaleI
 	 * @param locId Code of the target locale of the properties to retrieve. 
 	 * @return The properties, or null if none has been found.
 	 */
-	public Hashtable<String, Property> get (LocaleId locId) {
+	public LinkedHashMap<String, Property> get (LocaleId locId) {
 		return targets.get(locId);
 	}
 
