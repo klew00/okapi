@@ -24,6 +24,7 @@ import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.UIUtil;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -64,6 +65,13 @@ public class TextOptionsPanel extends Composite {
 		gdTmp.horizontalSpan = 4;
 		label.setLayoutData(gdTmp);
 		
+		Button btFont = UIUtil.createGridButton(this, SWT.PUSH, "Font...", UIUtil.BUTTON_DEFAULT_WIDTH, 1);
+		btFont.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				selectFont();
+			};
+		});
+		
 		Button btTextColor = UIUtil.createGridButton(this, SWT.PUSH, "Text Color...", UIUtil.BUTTON_DEFAULT_WIDTH, 1);
 		btTextColor.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -78,13 +86,6 @@ public class TextOptionsPanel extends Composite {
 			};
 		});
 
-		Button btFont = UIUtil.createGridButton(this, SWT.PUSH, "Font...", UIUtil.BUTTON_DEFAULT_WIDTH, 1);
-		btFont.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				selectFont();
-			};
-		});
-		
 		chkBidi = new Button(this, SWT.CHECK);
 		chkBidi.setText("Right to left script");
 		chkBidi.addSelectionListener(new SelectionAdapter() {
@@ -95,6 +96,12 @@ public class TextOptionsPanel extends Composite {
 
 		edExample = new StyledText(this, SWT.BORDER | SWT.SINGLE);
 		edExample.setText("Example of text");
+		StyleRange sr = new StyleRange();
+		sr.background = getDisplay().getSystemColor(SWT.COLOR_YELLOW);
+		sr.start = 11;
+		sr.length = 4;
+		edExample.setStyleRange(sr);
+		
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalSpan = 4;
 		gdTmp.heightHint = 50;
