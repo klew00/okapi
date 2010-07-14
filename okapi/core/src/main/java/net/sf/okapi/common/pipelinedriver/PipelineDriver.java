@@ -85,19 +85,22 @@ public class PipelineDriver implements IPipelineDriver {
 
 	@Override
 	public void setPipeline (IPipeline pipeline) {
-		if (this.pipeline != null)
-			this.pipeline.cancel();	// Cancel processing of the current pipeline
+		if ( this.pipeline != null ) {
+			this.pipeline.cancel(); // Cancel processing of the current pipeline
+		}
 		
-		if (pipeline != null)
-			pipeline.cancel();		// Cancel processing of the new pipeline
+		if ( pipeline != null ) {
+			pipeline.cancel(); // Cancel processing of the new pipeline
+		}
 				
 		this.pipeline = new Pipeline();
 		clearSteps();
 		
-		if (pipeline != null)
-			for (IPipelineStep step : pipeline.getSteps()) 	// Steps are added to the newly created pipeline to be later 
-				addStep(step);								// lost, but the goal is to populate paramList.
-             		
+		if ( pipeline != null ) {
+			for (IPipelineStep step : pipeline.getSteps()) { // Steps are added to the newly created pipeline to be later 
+				addStep(step); // lost, but the goal is to populate paramList.
+			}
+		}
 		this.pipeline = pipeline; 	// The newly created pipeline with added steps is lost, but the 
 									// references in paramList are valid (referencing the given pipline's steps).
 									// Also observers of the given pipeline are in place.
@@ -282,6 +285,9 @@ public class PipelineDriver implements IPipelineDriver {
 						break;
 					case UI_PARENT:
 						method.invoke(p.getStep(), uiParent);
+						break;
+					case BATCH_INPUT_COUNT:
+						method.invoke(p.getStep(), batchItems.size());
 						break;
 					default:
 						throw new OkapiBadStepInputException(String.format(

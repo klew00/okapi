@@ -83,6 +83,10 @@ public enum StepParameterType {
 	/**
 	 * UI parent object of the calling application (shell, main window, etc.)
 	 */
-	UI_PARENT
+	UI_PARENT,
 
+	/**
+	 * Number of input documents in the current batch.
+	 */
+	BATCH_INPUT_COUNT
 }
