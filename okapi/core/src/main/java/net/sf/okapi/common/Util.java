@@ -1183,5 +1183,18 @@ public class Util {
 		}
 		return original.replace("${rootDir}", rootDir);
 	}
-	
+
+	/**
+	 * Returns the smallest value in a given array of values.
+	 * @param values - the given array
+	 * @return - the smallest value in the array
+	 */
+	public static int min(int... values) {
+		int res = Integer.MAX_VALUE;
+		
+		for (int value : values) {
+			res = Math.min(res, value);
+		}
+		return (values.length > 0) ? res : 0;		
+	}
 }

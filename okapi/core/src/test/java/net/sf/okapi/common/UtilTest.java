@@ -278,6 +278,14 @@ public class UtilTest {
 		assertEquals("", Util.getTextContent(elem));
 	}
 	
+	@Test
+	public void testMin () {
+		assertEquals(-10, Util.min(10, 20, 30, -10, 0, 5));		
+		assertEquals(-100, Util.min(-99, -98, -100, 1000));
+		assertEquals(10, Util.min(10, 20, 30, 40, 15));
+		assertEquals(0, Util.min());
+	}
+	
 // Unused
 //	@Test
 //	public void generateRandomId() {
