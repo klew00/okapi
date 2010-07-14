@@ -27,7 +27,6 @@ import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
-import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.IdGenerator;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.BOMNewlineEncodingDetector.NewlineType;
@@ -36,9 +35,7 @@ import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Ending;
-import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
-import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
@@ -64,12 +61,7 @@ public abstract class AbstractFilter implements IFilter {
 	private String displayName;
 	private EncoderManager encoderManager;
 	private IFilterConfigurationMapper fcMapper;
-	private boolean subFilter;
-	private String rootId;
-	private IdGenerator groupId;
 	private String parentId;
-	private ISkeleton startSubFilterSkeleton;
-	private ISkeleton endSubFilterSkeleton;
 
 	/**
 	 * Default constructor
@@ -103,62 +95,31 @@ public abstract class AbstractFilter implements IFilter {
 		setGenerateSkeleton(generateSkeleton);
 	}
 
-	public void openAsSubfilter(RawDocument input, String rootId, String parentId, IdGenerator groupId) {
-		openAsSubfilter(input, true, rootId, parentId, groupId);
-	}
-
-	public void openAsSubfilter(RawDocument input, boolean generateSkeleton, String rootId,
-			String parentId, IdGenerator groupId) {
-		this.subFilter = true;
-		this.rootId = rootId;
-		this.parentId = parentId;
-		this.groupId = groupId;		
-		open(input, generateSkeleton);				
-	}
-	
-	public void close() {
-	}
-
 	/**
 	 * create a START_DOCUMENT {@link Event}
 	 */
 	protected Event createStartFilterEvent() {
-		if (isSubFilter()) {
-			StartGroup startGroup = new StartGroup(parentId, groupId.createId()); 
-			startGroup.setMimeType(getMimeType());
-			startGroup.setSkeleton(startSubFilterSkeleton);
-			startGroup.setName("sub-filter:"+getName());
-			return new Event(EventType.START_GROUP, startGroup);
-		} else {
-			StartDocument startDocument = new StartDocument(documentId.createId(IdGenerator.START_DOCUMENT));
-			startDocument.setEncoding(getEncoding(), isUtf8Encoding() && isUtf8Bom());
-			startDocument.setLocale(getSrcLoc());
-			startDocument.setMimeType(getMimeType());
-			startDocument.setLineBreak(getNewlineType());
-			startDocument.setFilterParameters(getParameters());
-			startDocument.setFilterWriter(getFilterWriter());
-			startDocument.setName(getDocumentName());
-			startDocument.setMultilingual(isMultilingual());
-			startDocument.setSkeleton(startSubFilterSkeleton);
-			LOGGER.log(Level.FINE, "Start Document for " + startDocument.getId()); //$NON-NLS-1$
-			return new Event(EventType.START_DOCUMENT, startDocument);
-		}
+		StartDocument startDocument = new StartDocument(
+				documentId.createId(IdGenerator.START_DOCUMENT));
+		startDocument.setEncoding(getEncoding(), isUtf8Encoding() && isUtf8Bom());
+		startDocument.setLocale(getSrcLoc());
+		startDocument.setMimeType(getMimeType());
+		startDocument.setLineBreak(getNewlineType());
+		startDocument.setFilterParameters(getParameters());
+		startDocument.setFilterWriter(getFilterWriter());
+		startDocument.setName(getDocumentName());
+		startDocument.setMultilingual(isMultilingual());
+		LOGGER.log(Level.FINE, "Start Document for " + startDocument.getId()); //$NON-NLS-1$
+		return new Event(EventType.START_DOCUMENT, startDocument);
 	}
 
 	/**
 	 * create a END_DOCUMENT {@link Event}
 	 */
 	protected Event createEndFilterEvent() {
-		if (isSubFilter()) {
-			Ending endGroup = new Ending(groupId.getLastId(IdGenerator.END_GROUP));
-			endGroup.setSkeleton(endSubFilterSkeleton);
-			return new Event(EventType.END_GROUP, endGroup);
-		} else {
-			Ending endDocument = new Ending(documentId.getLastId(IdGenerator.END_DOCUMENT));
-			endDocument.setSkeleton(endSubFilterSkeleton);
-			LOGGER.log(Level.FINE, "End Document for " + endDocument.getId()); //$NON-NLS-1$
-			return new Event(EventType.END_DOCUMENT, endDocument);
-		}
+		Ending endDocument = new Ending(documentId.getLastId(IdGenerator.END_DOCUMENT));
+		LOGGER.log(Level.FINE, "End Document for " + endDocument.getId()); //$NON-NLS-1$
+		return new Event(EventType.END_DOCUMENT, endDocument);
 	}
 
 	public boolean addConfigurations(List<FilterConfiguration> configs) {
@@ -435,30 +396,19 @@ public abstract class AbstractFilter implements IFilter {
 		this.displayName = displayName;
 	}
 
-	/**
-	 * @return the subFilter
-	 */
-	public boolean isSubFilter() {
-		return subFilter;
-	}
-
-	public void setSubFilter(boolean subFilter) {
-		this.subFilter = subFilter;
-	}
-
-	public String getRootId() {		
-		return rootId;
-	}
-	
 	public IdGenerator getDocumentId() {
 		return documentId;
 	}
-
-	public void setStartSubFilterSkeleton(ISkeleton startFilterSkeleton) {
-		this.startSubFilterSkeleton = startFilterSkeleton;
+	
+	public boolean isSubFilter() {
+		return this.getClass().isAnnotationPresent(SubFilter.class);
 	}
-
-	public void setEndSubFilterSkeleton(ISkeleton endFilterSkeleton) {
-		this.endSubFilterSkeleton = endFilterSkeleton;
+	
+	public String getParentId() {
+		return parentId;
+	}
+	
+	public void setParentId(String parentId) {
+		this.parentId = parentId;
 	}
 }

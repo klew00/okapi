@@ -135,7 +135,7 @@ public class EventBuilder {
 	public void addFilterEvent(Event event) {		
 		switch (event.getEventType()) {
 		case START_GROUP:
-			if (isCurrentComplexTextUnit()) {
+			if (isCurrentTextUnit()) {
 				StartGroup sg = event.getStartGroup();
 				sg.setIsReferent(true);
 				Code c = new Code(TagType.PLACEHOLDER, sg.getName(), TextFragment.makeRefMarker(sg.getId()));

@@ -55,9 +55,12 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
+import net.sf.okapi.common.filters.AbstractFilter;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
+import net.sf.okapi.common.filters.SubFilter;
+import net.sf.okapi.common.filters.SubFilterEventConverter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.DocumentPart;
@@ -93,6 +96,7 @@ public class VignetteFilter implements IFilter {
 	private boolean hasNext;
 	private EncoderManager encoderManager;
 	private BufferedReader reader;
+	@SubFilter()
 	private IFilter subFilter;
 	private LocaleId srcLoc;
 	private LocaleId trgLoc;
@@ -733,14 +737,16 @@ public class VignetteFilter implements IFilter {
 			if ( subFilter instanceof HtmlFilter ) { // For IdGenerator try-out
 				// The root id of is made of: rootId + subDocId + groupId
 				Event event;
-				((HtmlFilter)subFilter).setStartSubFilterSkeleton(new GenericSkeleton("<![CDATA["));
-				((HtmlFilter)subFilter).setEndSubFilterSkeleton(new GenericSkeleton("]]>"));
-				((HtmlFilter)subFilter).openAsSubfilter(new RawDocument(data, srcLoc), 
-						rootId+subDocId+groupId, 
-						subDocId.getLastId(), 
-						groupId);
+				// convert to true SubFilter
+				SubFilterEventConverter converter = 
+					new SubFilterEventConverter(subDocId.getLastId(), 
+							new GenericSkeleton("<![CDATA["), 
+							new GenericSkeleton("]]>"));
+			
+				((AbstractFilter)subFilter).setParentId(subDocId.getLastId());
+				subFilter.open(new RawDocument(data, srcLoc));
 				while ( subFilter.hasNext() ) {
-					event = subFilter.next();
+					event = converter.convertEvent(subFilter.next());
 					queue.add(event);
 				}
 				subFilter.close();

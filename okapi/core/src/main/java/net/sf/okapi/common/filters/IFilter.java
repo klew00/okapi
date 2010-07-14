@@ -43,6 +43,7 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
  * </pre>
  */
 public interface IFilter {	
+	public static String SUB_FILTER = "sub-filter:"; 
 
 	/**
 	 * Gets the name/identifier of this filter.

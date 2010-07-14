@@ -57,6 +57,8 @@ import net.sf.okapi.common.filters.EventBuilder;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderAccessType;
+import net.sf.okapi.common.filters.SubFilter;
+import net.sf.okapi.common.filters.SubFilterEventConverter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Ending;
@@ -95,8 +97,8 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	private EventBuilder eventBuilder;
 	private RawDocument currentRawDocument;
 	private ExtractionRuleState ruleState;
-	//private String rootId;
-	private AbstractFilter cdataSubfilter;
+	@SubFilter()
+	private IFilter cdataSubfilter;
 	
 	static {
 		Config.ConvertNonBreakingSpaces = false;
@@ -134,9 +136,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	/**
 	 * Close the filter and all used resources.
 	 */
-	public void close() {	
-		super.close();
-		
+	public void close() {			
 		if (ruleState != null) {
 			ruleState.reset(!getConfig().isGlobalPreserveWhitespace());
 		}
@@ -346,10 +346,10 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	protected void startFilter() {
 		// order of execution matters
 		if (eventBuilder == null) {
-			eventBuilder = new AbstractMarkupEventBuilder(getRootId(), isSubFilter());
+			eventBuilder = new AbstractMarkupEventBuilder(getParentId(), isSubFilter());
 			eventBuilder.setMimeType(getMimeType());
 		} else {
-			eventBuilder.reset(getRootId(), isSubFilter());
+			eventBuilder.reset(getParentId(), isSubFilter());
 		}		
 
 		eventBuilder.addFilterEvent(createStartFilterEvent());		
@@ -368,8 +368,8 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		// initialize sub-filter
 		TaggedFilterConfiguration config = getConfig(); 
 		if (config != null && config.getGlobalCDATASubfilter() != null) {
-			cdataSubfilter = (AbstractFilter)getFilterConfigurationMapper().createFilter(
-					getConfig().getGlobalCDATASubfilter(), cdataSubfilter);
+			cdataSubfilter = getFilterConfigurationMapper().createFilter(
+					getConfig().getGlobalCDATASubfilter(), cdataSubfilter); 
 			getEncoderManager().mergeMappings(cdataSubfilter.getEncoderManager());
 		}
 	}
@@ -499,15 +499,17 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 			String cdataWithoutMarkers = CDATA_START_PATTERN.matcher(tag.toString()).replaceFirst("");
 			cdataWithoutMarkers = CDATA_END_PATTERN.matcher(cdataWithoutMarkers).replaceFirst("");
 			cdataSubfilter.close();
-			cdataSubfilter.setStartSubFilterSkeleton(new GenericSkeleton("<![CDATA["));
-			cdataSubfilter.setEndSubFilterSkeleton(new GenericSkeleton("]]>"));
-			cdataSubfilter.openAsSubfilter(new RawDocument(cdataWithoutMarkers, getSrcLoc()), 
-					// TODO fully set root id??
-					getDocumentId().getLastId(),
-					parentId == null ? getDocumentId().getLastId() : parentId, 
-					eventBuilder.getGroupId());	
+			
+			SubFilterEventConverter converter = 
+				new SubFilterEventConverter(parentId == null ? getDocumentId().getLastId() : parentId, 
+						new GenericSkeleton("<![CDATA["), 
+						new GenericSkeleton("]]>"));
+		
+			// TODO: only AbstractFilter subclasses can be used as subflters!!!
+			((AbstractFilter)cdataSubfilter).setParentId(parentId);
+			cdataSubfilter.open(new RawDocument(cdataWithoutMarkers, getSrcLoc()));	
 			while (cdataSubfilter.hasNext()) {
-				Event event = cdataSubfilter.next();
+				Event event = converter.convertEvent(cdataSubfilter.next());
 				eventBuilder.addFilterEvent(event);
 			}
 			cdataSubfilter.close();
