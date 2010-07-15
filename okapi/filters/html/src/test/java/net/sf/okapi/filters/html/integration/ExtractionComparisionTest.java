@@ -84,7 +84,7 @@ public class ExtractionComparisionTest {
 		assertTrue(rtc.executeCompare(htmlFilter, list, "UTF-8", locEN, locEN));
 	}
 	
-	@Test
+	//@Test
 	public void testReconstructFile() {
 		GenericSkeletonWriter writer = new GenericSkeletonWriter();
 		StringBuilder tmp = new StringBuilder();
