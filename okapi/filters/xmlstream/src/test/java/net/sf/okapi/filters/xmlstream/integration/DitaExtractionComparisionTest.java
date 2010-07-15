@@ -8,13 +8,20 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 
+import net.sf.okapi.common.Event;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.filters.xmlstream.XmlStreamFilter;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
+import net.sf.okapi.common.resource.DocumentPart;
+import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.common.resource.StartGroup;
+import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.filters.xmlstream.XmlStreamFilter;
 
 import org.junit.After;
 import org.junit.Before;
@@ -74,5 +81,44 @@ public class DitaExtractionComparisionTest {
 			list.add(new InputDocument(ditaRoot + f, null));			
 		}
 		assertTrue(rtc.executeCompare(xmlStreamFilter, list, "UTF-8", locEN, locEN));
+	}
+	
+	//@Test
+	public void testReconstructFile() {
+		GenericSkeletonWriter writer = new GenericSkeletonWriter();
+		StringBuilder tmp = new StringBuilder();
+
+		// Open the document to process
+		xmlStreamFilter.open(new RawDocument(new File(ditaRoot + "bookmap-readme.dita").toURI(),
+				"UTF-8", new LocaleId("en")));
+
+		// process the input document
+		while (xmlStreamFilter.hasNext()) {
+			Event event = xmlStreamFilter.next();
+			switch (event.getEventType()) {
+			case START_DOCUMENT:
+				writer.processStartDocument(LocaleId.SPANISH, "utf-8", null,
+						xmlStreamFilter.getEncoderManager(), (StartDocument) event.getResource());
+				break;
+			case TEXT_UNIT:
+				TextUnit tu = (TextUnit) event.getResource();
+				tmp.append(writer.processTextUnit(tu));
+				break;
+			case DOCUMENT_PART:
+				DocumentPart dp = (DocumentPart) event.getResource();
+				tmp.append(writer.processDocumentPart(dp));
+				break;
+			case START_GROUP:
+				StartGroup startGroup = (StartGroup) event.getResource();
+				tmp.append(writer.processStartGroup(startGroup));
+				break;
+			case END_GROUP:
+				Ending ending = (Ending) event.getResource();
+				tmp.append(writer.processEndGroup(ending));
+				break;
+			}
+		}
+		writer.close();
+		System.out.println(tmp.toString());
 	}
 }

@@ -24,6 +24,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -591,15 +592,19 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 			// if in excluded state everything is skeleton including text
 			if (ruleState.isExludedState()) {
 				addToDocumentPart(startTag.toString());
-				updateStartTagRuleState(startTag.getName(), ruleType, idValue);
+				if (!startTag.isSyntacticalEmptyElementTag()) {
+					updateStartTagRuleState(startTag.getName(), ruleType, idValue);
+				}
 				return;
 			}
 
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders;
 			propertyTextUnitPlaceholders = createPropertyTextUnitPlaceholders(startTag);
 
-			updateStartTagRuleState(startTag.getName(), ruleType, idValue);
-
+			if (!startTag.isSyntacticalEmptyElementTag()) {
+				updateStartTagRuleState(startTag.getName(), ruleType, idValue);
+			}
+			
 			switch (ruleType) {
 			case INLINE_ELEMENT:
 				if (canStartNewTextUnit()) {
@@ -649,7 +654,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	}
 
 	protected void updateStartTagRuleState(String tag, RULE_TYPE ruleType, String idValue) {
-		switch (getConfig().getElementRuleType(tag)) {
+		switch (getConfig().getElementRuleType(tag)) {		
 		case INLINE_ELEMENT:
 			ruleState.pushInlineRule(tag, ruleType);
 			break;
@@ -679,7 +684,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 			setPreserveWhitespace(ruleState.isPreserveWhitespaceState());
 		}
 	}
-
+	
 	protected RULE_TYPE updateEndTagRuleState(EndTag endTag) {
 		RULE_TYPE ruleType = getConfig().getElementRuleType(endTag.getName());
 		RuleType currentState = null;
@@ -724,7 +729,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 
 		return ruleType;
 	}
-
+	
 	/*
 	 * catch tags which are not listed in the config but have attributes that require processing
 	 */
@@ -813,8 +818,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 			setPreserveWhitespace(ruleState.isPreserveWhitespaceState());
 			// handle cases such as xml:space where we popped on an element while
 			// processing the attributes
-		} else if (ruleState.peekPreserverWhitespaceRule().ruleName.equalsIgnoreCase(endTag
-				.getName())) {
+		} else if (ruleState.peekPreserverWhitespaceRule().ruleName.equalsIgnoreCase(endTag.getName())) {
 			ruleState.popPreserverWhitespaceRule();
 			setPreserveWhitespace(ruleState.isPreserveWhitespaceState());
 		}

@@ -324,6 +324,15 @@ public class HtmlSnippetsTest {
 	}
 	
 	@Test
+	public void twoTextUnitsInARowNonWellformedWithNonWellFromedConfig() {
+		URL originalParameters = parameters;
+		parameters = HtmlSnippetsTest.class.getResource("nonwellformedConfiguration.yml");
+		String snippet = "<td><p><h1>para text in a table element</td>";
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, locEN));
+		parameters = originalParameters;
+	}
+	
+	@Test
 	public void textUnitName() {
 		String snippet = "<p id=\"logo\">para text in a table element</p>";
 		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, locEN));

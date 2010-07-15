@@ -40,7 +40,6 @@ import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderAccessType;
 import net.sf.okapi.common.resource.Property;
-import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.filters.abstractmarkup.AbstractMarkupEventBuilder;
 import net.sf.okapi.filters.abstractmarkup.AbstractMarkupFilter;
 import net.sf.okapi.filters.abstractmarkup.ExtractionRuleState.RuleType;
@@ -55,7 +54,7 @@ public class HtmlFilter extends AbstractMarkupFilter {
 	private Parameters parameters;
 
 	public HtmlFilter() {
-		super();		
+		super();
 		setMimeType(MimeTypeMapper.HTML_MIME_TYPE);
 		setFilterWriter(createFilterWriter());
 		setParameters(new Parameters());
@@ -75,7 +74,7 @@ public class HtmlFilter extends AbstractMarkupFilter {
 	 */
 	@Override
 	protected void startFilter() {
-		super.startFilter();		
+		super.startFilter();
 		if (!getConfig().isGlobalPreserveWhitespace()) {
 			LOGGER.log(Level.FINE,
 					"By default the HTML filter will collapse whitespace unless overridden in the configuration"); //$NON-NLS-1$
@@ -109,61 +108,7 @@ public class HtmlFilter extends AbstractMarkupFilter {
 			}
 		}
 	}
-	
-	@Override
-	protected void handleStartTag(StartTag startTag) {
-		super.handleStartTag(startTag);		
-	}
 
-	@Override
-	protected void handleEndTag(EndTag endTag) {
-		RULE_TYPE ruleType = RULE_TYPE.RULE_NOT_FOUND;
-		
-		// if in excluded state everything is skeleton including text
-		if (getRuleState().isExludedState()) {
-			addToDocumentPart(endTag.toString());
-			updateEndTagRuleState(endTag);
-			return;
-		}
-		
-		ruleType = updateEndTagRuleState(endTag);
-
-		switch (ruleType) {
-		case INLINE_ELEMENT:
-			if (canStartNewTextUnit()) {
-				startTextUnit();
-			}
-			addCodeToCurrentTextUnit(endTag);
-			break;
-		case GROUP_ELEMENT:
-			endGroup(new GenericSkeleton(endTag.toString()));
-			break;
-		case EXCLUDED_ELEMENT:
-			addToDocumentPart(endTag.toString());
-			break;
-		case INCLUDED_ELEMENT:
-			addToDocumentPart(endTag.toString());
-			break;
-		case TEXT_UNIT_ELEMENT:
-			endTextUnit(new GenericSkeleton(endTag.toString()));
-			break;
-		default:
-			addToDocumentPart(endTag.toString());
-			break;
-		} 		
-		
-		// does this tag have a PRESERVE_WHITESPACE rule?
-		if (getConfig().isRuleType(endTag.getName(), RULE_TYPE.PRESERVE_WHITESPACE)) {
-			getRuleState().popPreserverWhitespaceRule();
-			setPreserveWhitespace(getRuleState().isPreserveWhitespaceState());
-		// handle cases such as xml:space where we popped on an element while
-		// processing the attributes
-		} else if (getRuleState().peekPreserverWhitespaceRule().ruleName.equalsIgnoreCase(endTag.getName())) {
-			getRuleState().popPreserverWhitespaceRule();
-			setPreserveWhitespace(getRuleState().isPreserveWhitespaceState());
-		}		
-	}
-	
 	@Override
 	/**
 	 * Overridden to support non-wellformed (unbalanced tag exceptions in HTML)
@@ -231,7 +176,7 @@ public class HtmlFilter extends AbstractMarkupFilter {
 		
 		return ruleType;
 	}
-
+	
 	@Override
 	protected PropertyTextUnitPlaceholder createPropertyTextUnitPlaceholder(
 			PlaceholderAccessType type, String name, String value, Tag tag, Attribute attribute) {
@@ -260,8 +205,8 @@ public class HtmlFilter extends AbstractMarkupFilter {
 		}
 
 		// name is normalized in super-class
-		return super.createPropertyTextUnitPlaceholder(type, name, getEventBuilder().normalizeHtmlText(
-				value, true, isPreserveWhitespace()), tag, attribute);
+		return super.createPropertyTextUnitPlaceholder(type, name, getEventBuilder()
+				.normalizeHtmlText(value, true, isPreserveWhitespace()), tag, attribute);
 	}
 
 	/*

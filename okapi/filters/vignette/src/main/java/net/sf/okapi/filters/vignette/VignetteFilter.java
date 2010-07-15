@@ -73,6 +73,7 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
+import net.sf.okapi.filters.abstractmarkup.AbstractMarkupFilter;
 import net.sf.okapi.filters.html.HtmlFilter;
 
 /**
@@ -734,7 +735,7 @@ public class VignetteFilter implements IFilter {
 			encoderManager.mergeMappings(subFilter.getEncoderManager());
 			subFilter.close();
 			groupId.createId(); // Create new Id for this group
-			if ( subFilter instanceof HtmlFilter ) { // For IdGenerator try-out
+			if ( subFilter instanceof AbstractMarkupFilter ) { // For IdGenerator try-out
 				// The root id of is made of: rootId + subDocId + groupId
 				Event event;
 				// convert to true SubFilter

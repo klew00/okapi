@@ -23,7 +23,6 @@ package net.sf.okapi.common.filters;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,124 +45,103 @@ public class RoundTripComparison {
 	private LocaleId srcLoc;
 	private LocaleId trgLoc;
 
-	public RoundTripComparison () {
+	public RoundTripComparison() {
 		extraction1Events = new ArrayList<Event>();
 		extraction2Events = new ArrayList<Event>();
 	}
 
-	public boolean executeCompare (IFilter filter,
-		List<InputDocument> inputDocs,
-		String defaultEncoding,
-		LocaleId srcLoc,
-		LocaleId trgLoc)
-	{
+	public boolean executeCompare(IFilter filter, List<InputDocument> inputDocs,
+			String defaultEncoding, LocaleId srcLoc, LocaleId trgLoc) {
 		String path = null;
-		try {
-			this.filter = filter;
-			this.defaultEncoding = defaultEncoding;
-			this.srcLoc = srcLoc;
-			this.trgLoc = trgLoc;
-		
-			// Create the filter-writer for the provided filter
-			writer = filter.createFilterWriter();
-		
-			for ( InputDocument doc : inputDocs ) {
-				path = doc.path;
-				// DEBUG: System.out.println(doc.path);
-				// Reset the event lists
-				extraction1Events.clear();
-				extraction2Events.clear();
-				// Load parameters if needed
-				if  (doc.paramFile == null  || doc.paramFile == "")  {
-					IParameters params = filter.getParameters();
-					if ( params != null ) params.reset();
-				}
-				else {
-					String root = Util.getDirectoryName(doc.path);
-					IParameters params = filter.getParameters();
-					if ( params != null ) params.load(Util.toURI(root+File.separator+doc.paramFile), false);
-				}
-				// Execute the first extraction and the re-writing
-				executeFirstExtraction(doc);
-				// Execute the second extraction from the output of the first
-				executeSecondExtraction();
-				// Compare the events
-				if ( !FilterTestDriver.compareEvents(extraction1Events, extraction2Events) ) {
-					throw new RuntimeException("Events are different for "+doc.path);
-				}
-			}
-		}
-		catch ( Throwable e ) {
-			System.err.println(path);
-			e.printStackTrace();
-			return false;
-		}
-		return true;
-	}
-	
-	public boolean executeCompare (IFilter filter,
-		List<InputDocument> inputDocs,
-		String defaultEncoding,
-		LocaleId srcLoc,
-		LocaleId trgLoc,
-		String outputDir)
-	{
-		try {
-			this.filter = filter;
-			this.defaultEncoding = defaultEncoding;
-			this.srcLoc = srcLoc;
-			this.trgLoc = trgLoc;
-		
-			// Create the filter-writer for the provided filter
-			writer = filter.createFilterWriter();
-		
-			for ( InputDocument doc : inputDocs ) {
-				// Reset the event lists
-				extraction1Events.clear();
-				extraction2Events.clear();
-				// Load parameters if needed
-				if ( doc.paramFile == null ) {
-					IParameters params = filter.getParameters();
-					if ( params != null ) params.reset();
-				}
-				else {
-					String root = Util.getDirectoryName(doc.path);
-					IParameters params = filter.getParameters();
-					if ( params != null ) params.load(Util.toURI(root+File.separator+doc.paramFile), false);
-				}
-				// Execute the first extraction and the re-writing
-				String outPath = executeFirstExtractionToFile(doc, outputDir);
-				// Execute the second extraction from the output of the first
-				executeSecondExtractionFromFile(outPath);
-				// Compare the events
-				if ( !FilterTestDriver.compareEvents(extraction1Events, extraction2Events) ) {
-					throw new RuntimeException("Events are different for "+doc.path);
-				}
-			}
-		}
-		catch ( Throwable e ) {
-			System.err.println(e.getMessage());
-			return false;
-		}
-		return true;
-	}
-		
 
-	private void executeFirstExtraction (InputDocument doc) throws URISyntaxException {
+		this.filter = filter;
+		this.defaultEncoding = defaultEncoding;
+		this.srcLoc = srcLoc;
+		this.trgLoc = trgLoc;
+
+		// Create the filter-writer for the provided filter
+		writer = filter.createFilterWriter();
+
+		for (InputDocument doc : inputDocs) {
+			path = doc.path;
+			// DEBUG: System.out.println(doc.path);
+			// Reset the event lists
+			extraction1Events.clear();
+			extraction2Events.clear();
+			// Load parameters if needed
+			if (doc.paramFile != null && !doc.paramFile.equals("")) {
+				String root = Util.getDirectoryName(doc.path);
+				IParameters params = filter.getParameters();
+				if (params != null) {
+					params.load(Util.toURI(root + File.separator + doc.paramFile), false);
+				}
+			}
+			// Execute the first extraction and the re-writing
+			executeFirstExtraction(doc);
+			// Execute the second extraction from the output of the first
+			executeSecondExtraction();
+			// Compare the events
+			if (!FilterTestDriver.compareEvents(extraction1Events, extraction2Events)) {
+				throw new RuntimeException("Events are different for " + doc.path);
+			}
+		}
+		return true;
+	}
+
+	public boolean executeCompare(IFilter filter, List<InputDocument> inputDocs,
+			String defaultEncoding, LocaleId srcLoc, LocaleId trgLoc, String outputDir) {
+
+		this.filter = filter;
+		this.defaultEncoding = defaultEncoding;
+		this.srcLoc = srcLoc;
+		this.trgLoc = trgLoc;
+
+		// Create the filter-writer for the provided filter
+		writer = filter.createFilterWriter();
+
+		for (InputDocument doc : inputDocs) {
+			// Reset the event lists
+			extraction1Events.clear();
+			extraction2Events.clear();
+			// Load parameters if needed
+			if (doc.paramFile == null) {
+				IParameters params = filter.getParameters();
+				if (params != null)
+					params.reset();
+			} else {
+				String root = Util.getDirectoryName(doc.path);
+				IParameters params = filter.getParameters();
+				if (params != null)
+					params.load(Util.toURI(root + File.separator + doc.paramFile), false);
+			}
+			// Execute the first extraction and the re-writing
+			String outPath = executeFirstExtractionToFile(doc, outputDir);
+			// Execute the second extraction from the output of the first
+			executeSecondExtractionFromFile(outPath);
+			// Compare the events
+			if (!FilterTestDriver.compareEvents(extraction1Events, extraction2Events)) {
+				throw new RuntimeException("Events are different for " + doc.path);
+			}
+		}
+		return true;
+	}
+
+	private void executeFirstExtraction(InputDocument doc) {
 		try {
 			// Open the input
-			filter.open(new RawDocument((new File(doc.path)).toURI(), defaultEncoding, srcLoc, trgLoc));
-			
+			filter.open(new RawDocument((new File(doc.path)).toURI(), defaultEncoding, srcLoc,
+					trgLoc));
+
 			// Prepare the output
 			writer.setOptions(trgLoc, "UTF-16");
 			writerBuffer = new ByteArrayOutputStream();
 			writer.setOutput(writerBuffer);
-			
+
 			// Process the document
 			Event event;
-			while ( filter.hasNext() ) {
+			while (filter.hasNext()) {
 				event = filter.next();
-				switch ( event.getEventType() ) {
+				switch (event.getEventType()) {
 				case START_DOCUMENT:
 				case END_DOCUMENT:
 				case START_SUBDOCUMENT:
@@ -176,25 +154,31 @@ public class RoundTripComparison {
 					break;
 				}
 				writer.handleEvent(event);
-			}
 		}
-		finally {
-			if ( filter != null ) filter.close();
-			if ( writer != null ) writer.close();
+		} finally {
+			if (filter != null)
+				filter.close();
+			if (writer != null)
+				writer.close();
 		}
 	}
 
-	private void executeSecondExtraction () throws UnsupportedEncodingException {
+	private void executeSecondExtraction() {
 		try {
 			// Set the input (from the output of first extraction)
-			String input = new String(writerBuffer.toByteArray(), "UTF-16");
+			String input;
+			try {
+				input = new String(writerBuffer.toByteArray(), "UTF-16");
+			} catch (UnsupportedEncodingException e) {
+				throw new RuntimeException(e);
+			}
 			filter.open(new RawDocument(input, srcLoc, trgLoc));
-			
+
 			// Process the document
 			Event event;
-			while ( filter.hasNext() ) {
+			while (filter.hasNext()) {
 				event = filter.next();
-				switch ( event.getEventType() ) {
+				switch (event.getEventType()) {
 				case START_DOCUMENT:
 				case END_DOCUMENT:
 				case START_SUBDOCUMENT:
@@ -207,31 +191,31 @@ public class RoundTripComparison {
 					break;
 				}
 			}
-		}
-		finally {
-			if ( filter != null ) filter.close();
+		} finally {
+			if (filter != null)
+				filter.close();
 		}
 	}
 
-	private String executeFirstExtractionToFile (InputDocument doc,
-		String outputDir) throws URISyntaxException
-	{
+	private String executeFirstExtractionToFile(InputDocument doc, String outputDir) {
 		String outPath = null;
 		try {
 			// Open the input
-			filter.open(new RawDocument((new File(doc.path)).toURI(), defaultEncoding, srcLoc, trgLoc));
-			
+			filter.open(new RawDocument((new File(doc.path)).toURI(), defaultEncoding, srcLoc,
+					trgLoc));
+
 			// Prepare the output
 			writer.setOptions(trgLoc, "UTF-8");
 			outPath = Util.getDirectoryName(doc.path);
-			outPath += (File.separator + outputDir + File.separator + Util.getFilename(doc.path, true));
+			outPath += (File.separator + outputDir + File.separator + Util.getFilename(doc.path,
+					true));
 			writer.setOutput(outPath);
-			
+
 			// Process the document
 			Event event;
-			while ( filter.hasNext() ) {
+			while (filter.hasNext()) {
 				event = filter.next();
-				switch ( event.getEventType() ) {
+				switch (event.getEventType()) {
 				case START_DOCUMENT:
 				case END_DOCUMENT:
 				case START_SUBDOCUMENT:
@@ -245,25 +229,26 @@ public class RoundTripComparison {
 				}
 				writer.handleEvent(event);
 			}
-		}
-		finally {
-			if ( filter != null ) filter.close();
-			if ( writer != null ) writer.close();
+		} finally {
+			if (filter != null)
+				filter.close();
+			if (writer != null)
+				writer.close();
 		}
 		return outPath;
 	}
 
-	private void executeSecondExtractionFromFile (String input) throws UnsupportedEncodingException {
+	private void executeSecondExtractionFromFile(String input) {
 		try {
 			// Set the input (from the output of first extraction)
 			File file = new File(input);
 			filter.open(new RawDocument(file.toURI(), "UTF-8", srcLoc, trgLoc));
-			
+
 			// Process the document
 			Event event;
-			while ( filter.hasNext() ) {
+			while (filter.hasNext()) {
 				event = filter.next();
-				switch ( event.getEventType() ) {
+				switch (event.getEventType()) {
 				case START_DOCUMENT:
 				case END_DOCUMENT:
 				case START_SUBDOCUMENT:
@@ -276,9 +261,9 @@ public class RoundTripComparison {
 					break;
 				}
 			}
-		}
-		finally {
-			if ( filter != null ) filter.close();
+		} finally {
+			if (filter != null)
+				filter.close();
 		}
 	}
 

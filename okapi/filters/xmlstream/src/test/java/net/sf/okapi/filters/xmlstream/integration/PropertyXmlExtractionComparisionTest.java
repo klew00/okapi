@@ -110,8 +110,8 @@ public class PropertyXmlExtractionComparisionTest {
 						XmlStreamFilter.class.getResource("javaPropertiesXml.yml")), snippet, locEN, xmlStreamFilter));
 	}
 
-	@Test
-	public void testPrintTextUnits() {
+	//@Test
+	public void testReconstructFile() {
 		GenericSkeletonWriter writer = new GenericSkeletonWriter();
 		StringBuilder tmp = new StringBuilder();
 
