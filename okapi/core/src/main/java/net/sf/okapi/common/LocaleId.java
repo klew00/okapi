@@ -132,6 +132,9 @@ public final class LocaleId implements Comparable<Object> {
     	+ "(([\\x2d]([a-wyzA-WYZ](?=\\x2d))([\\x2d](\\p{Alnum}{2,8})+)*))*"
     	+ "([\\x2d][xX]([\\x2d]\\p{Alnum}{1,8})*)?)\\z");
 
+	// Pattern for allowed characters in string-based locale
+	private static final Pattern ALLOWED_CHARS = Pattern.compile("[\\-a-zA-Z0-9]+");
+	
 	/**
 	 * Creates a new LocaleId object from a locale identifier.
 	 * @param locId a LocaleId string
@@ -319,6 +322,10 @@ public final class LocaleId implements Comparable<Object> {
 		if ((( n != 2 ) && ( n != 3 ) && ( n != -1)) || (tmp.length() < 2 )) {
 			throw new IllegalArgumentException(String.format(
 				"The locale identifier '%s' is invalid.", tmp));
+		}
+		if ( !ALLOWED_CHARS.matcher(tmp).matches() ) {
+			throw new IllegalArgumentException(String.format(
+				"The locale identifier '%s' contains at least one invalid character.", tmp));
 		}
 		return tmp;
 	}

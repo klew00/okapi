@@ -177,8 +177,8 @@ class SessionSettingsDialog {
 			
 			// If it is the first document: its locales become the default
 			if ( lbDocs.getItemCount() == 1 ) {
-				edSourceLocale.setText(((LocaleId)data[3]).toBCP47());
-				edTargetLocale.setText(((LocaleId)data[4]).toBCP47());
+				edSourceLocale.setText(((LocaleId)data[3]).toString());
+				edTargetLocale.setText(((LocaleId)data[4]).toString());
 			}
 		}
 		catch ( Throwable e ) {
@@ -216,8 +216,8 @@ class SessionSettingsDialog {
 		if ( lbDocs.getItemCount() > 0 ) {
 			lbDocs.setSelection(0);
 		}
-		edSourceLocale.setText(session.getSourceLocale().toBCP47());
-		edTargetLocale.setText(session.getTargetLocale().toBCP47());
+		edSourceLocale.setText(session.getSourceLocale().toString());
+		edTargetLocale.setText(session.getTargetLocale().toString());
 		updateFileButtons();
 	}
 	
@@ -225,9 +225,9 @@ class SessionSettingsDialog {
 		// Check source locale
 		LocaleId srcLoc;
 		LocaleId trgLoc;
-		String tmp = edSourceLocale.getText();
+		String tmp = edSourceLocale.getText().trim();
 		try {
-			srcLoc = LocaleId.fromBCP47(tmp);
+			srcLoc = LocaleId.fromString(tmp);
 		}
 		catch ( Throwable e ) {
 			// Invalid BCP-47 tag
@@ -240,7 +240,7 @@ class SessionSettingsDialog {
 		// Check target locale
 		tmp = edTargetLocale.getText();
 		try {
-			trgLoc = LocaleId.fromBCP47(tmp);
+			trgLoc = LocaleId.fromString(tmp);
 		}
 		catch ( Throwable e ) {
 			// Invalid BCP-47 tag

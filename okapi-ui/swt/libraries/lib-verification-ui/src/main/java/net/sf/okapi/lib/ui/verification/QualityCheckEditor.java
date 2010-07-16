@@ -171,9 +171,9 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		}
 		session.setFilterConfigurationMapper(fcMapper);
 		try {
-			LocaleId tmpLoc = LocaleId.fromBCP47(config.getProperty(CFG_SOURCELOCALE, "en"));
+			LocaleId tmpLoc = LocaleId.fromString(config.getProperty(CFG_SOURCELOCALE, "en"));
 			session.setSourceLocale(tmpLoc);
-			tmpLoc = LocaleId.fromBCP47(config.getProperty(CFG_TARGETLOCALE, "fr"));
+			tmpLoc = LocaleId.fromString(config.getProperty(CFG_TARGETLOCALE, "fr"));
 			session.setTargetLocale(tmpLoc);
 			session.setModified(false);
 		}
@@ -954,11 +954,11 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		try {
 			InputDocumentDialog dlg = new InputDocumentDialog(shell, "Add Document",
 				session.getFilterConfigurationMapper());
-			// Set default data
-			dlg.setData(path, null, "UTF-8", session.getSourceLocale(), session.getTargetLocale());
 			// Lock the locales if we have already documents in the session
 			boolean canChangeLocales = session.getDocumentCount()==0;
 			dlg.setLocalesEditable(canChangeLocales);
+			// Set default data
+			dlg.setData(path, null, "UTF-8", session.getSourceLocale(), session.getTargetLocale());
 
 			// Edit
 			Object[] data = dlg.showDialog();
@@ -1237,8 +1237,8 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 	 */
 	private boolean saveSessionIfNeeded () {
 		// Save user preferences and configuration
-		config.setProperty(CFG_SOURCELOCALE, session.getSourceLocale().toBCP47());
-		config.setProperty(CFG_TARGETLOCALE, session.getTargetLocale().toBCP47());
+		config.setProperty(CFG_SOURCELOCALE, session.getSourceLocale().toString());
+		config.setProperty(CFG_TARGETLOCALE, session.getTargetLocale().toString());
 		// Set the window placement
 		config.setProperty(OPT_MAXIMIZED, shell.getMaximized());
 		Rectangle r = shell.getBounds();

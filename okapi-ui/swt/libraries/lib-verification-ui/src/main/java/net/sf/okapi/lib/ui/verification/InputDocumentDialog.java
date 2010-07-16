@@ -108,8 +108,11 @@ public class InputDocumentDialog {
 		pnlMain.setSourceLocale(srcLoc);
 		pnlMain.setTargetLocale(trgLoc);
 		// If no configuration is given, but we have a path: try to guess the configuration
-		if ( pnlMain.getFilterConfigurationId().isEmpty() || !pnlMain.getDocumentPath().isEmpty() ) {
+		if ( pnlMain.getFilterConfigurationId().isEmpty() && !pnlMain.getDocumentPath().isEmpty() ) {
 			pnlMain.guessConfiguration();
+		}
+		if ( !pnlMain.getDocumentPath().isEmpty() ) {
+			pnlMain.guessLocales();
 		}
 	}
 	

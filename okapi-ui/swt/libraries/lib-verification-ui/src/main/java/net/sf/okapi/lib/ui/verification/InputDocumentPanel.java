@@ -21,6 +21,7 @@
 package net.sf.okapi.lib.ui.verification;
 
 import java.nio.charset.Charset;
+import java.util.List;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
@@ -58,6 +59,7 @@ public class InputDocumentPanel extends Composite {
 	private String filterNames;
 	private String filterExtensions;
 	private IFilterConfigurationMapper fcMapper;
+	private LanguageCodesDetector langDetector;
 
 	public InputDocumentPanel (Composite parent,
 		int flags,
@@ -66,6 +68,7 @@ public class InputDocumentPanel extends Composite {
 		IFilterConfigurationMapper fcMapper)
 	{
 		super(parent, flags);
+		langDetector = new LanguageCodesDetector();
 		createContent(documentLabel, getDocumentLabel, fcMapper);
 	}
 	
@@ -138,10 +141,8 @@ public class InputDocumentPanel extends Composite {
 		stSourceLocale.setText("Source locale:");
 		
 		edSourceLocale = new Text(this, SWT.BORDER);
-		gdTmp = new GridData();
-		gdTmp.widthHint = 100;
-		gdTmp.horizontalSpan = 2;
-		edSourceLocale.setLayoutData(gdTmp);
+		edSourceLocale.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		new Label(this, SWT.NONE); // Fill extra cell rather than stretching edit field
 		
 		//--- Target locale
 		
@@ -149,10 +150,8 @@ public class InputDocumentPanel extends Composite {
 		stTargetLocale.setText("Target locale:");
 		
 		edTargetLocale = new Text(this, SWT.BORDER);
-		gdTmp = new GridData();
-		gdTmp.widthHint = 100;
-		gdTmp.horizontalSpan = 2;
-		edTargetLocale.setLayoutData(gdTmp);
+		edTargetLocale.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		new Label(this, SWT.NONE); // Fill extra cell rather than stretching edit field
 	}
 
 	public String getDocumentPath () {
@@ -180,26 +179,52 @@ public class InputDocumentPanel extends Composite {
 	}
 	
 	public LocaleId getSourceLocale () {
-		return LocaleId.fromBCP47(edSourceLocale.getText());
+		if ( edSourceLocale.getText().isEmpty() ) return LocaleId.EMPTY;
+		return LocaleId.fromString(edSourceLocale.getText());
 	}
 
 	public void setSourceLocale (LocaleId sourceLocale) {
-		edSourceLocale.setText(sourceLocale == null ? "" : sourceLocale.toBCP47());
+		edSourceLocale.setText(sourceLocale == null ? "" : sourceLocale.toString());
 	}
 	
 	public LocaleId getTargetLocale () {
-		return LocaleId.fromBCP47(edTargetLocale.getText());
+		if ( edTargetLocale.getText().isEmpty() ) return LocaleId.EMPTY;
+		return LocaleId.fromString(edTargetLocale.getText());
 	}
 
 	public void setTargetLocale (LocaleId targetLocale) {
-		edTargetLocale.setText(targetLocale == null ? "" :targetLocale.toBCP47());
+		edTargetLocale.setText(targetLocale == null ? "" :targetLocale.toString());
 	}
 	
 	public void guessConfiguration () {
 		String ext = Util.getExtension(edDocument.getText());
 		FilterConfiguration fc = fcMapper.getDefaultConfigurationFromExtension(ext);
+		// Special case for TTX: not the normal default
+		if ( ext.equalsIgnoreCase(".ttx") ) {
+			fc = fcMapper.getConfiguration("okf_ttx-noForcedTuv");
+		}
 		if ( fc != null ) {
 			edConfigId.setText(fc.configId);
+		}
+	}
+	
+	public void guessLocales () {
+		// Guess the languages if possible
+		if ( edSourceLocale.getEditable() ) {
+			List<String> list = langDetector.guessLanguages(edDocument.getText());
+			if ( list.size() > 0 ) {
+				edSourceLocale.setText(list.get(0));
+			}
+			if ( list.size() == 2 ) {
+				edTargetLocale.setText(list.get(1));
+			}
+			else if ( list.size() > 2 ) {
+				StringBuilder tmp = new StringBuilder(list.get(1));
+				for ( int i=2; i<list.size(); i++ ) {
+					tmp.append(" or "+list.get(i));
+				}
+				edTargetLocale.setText(tmp.toString());
+			}
 		}
 	}
 	
@@ -285,6 +310,9 @@ public class InputDocumentPanel extends Composite {
 					edConfigId.setText(fc.configId);
 				}
 			}
+
+			// Guess the languages if possible
+			guessLocales();
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(getShell(), e.getLocalizedMessage(), null);
@@ -332,10 +360,9 @@ public class InputDocumentPanel extends Composite {
 		// Check source locale
 		tmp = edSourceLocale.getText();
 		try {
-			LocaleId.fromBCP47(tmp);
+			LocaleId.fromString(tmp);
 		}
 		catch ( Throwable e ) {
-			// Invalid BCP-47 tag
 			if ( showError ) {
 				Dialogs.showError(getShell(),
 					String.format("The source locale '%s' is not a valid locale.", tmp), null);
@@ -347,7 +374,7 @@ public class InputDocumentPanel extends Composite {
 		// Check target locale
 		tmp = edTargetLocale.getText();
 		try {
-			LocaleId.fromBCP47(tmp);
+			LocaleId.fromString(tmp);
 		}
 		catch ( Throwable e ) {
 			// Invalid BCP-47 tag
