@@ -21,6 +21,7 @@
 package net.sf.okapi.steps.imagemodification;
 
 import java.awt.AlphaComposite;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -131,8 +132,27 @@ public class ImageModificationStep extends BasePipelineStep {
 				}
 
 				// Convert
-				BufferedImage img1 = ImageIO.read(inputFile);
-				BufferedImage img2 = createResizedCopy(img1);
+				BufferedImage imgOri = ImageIO.read(inputFile);
+				BufferedImage imgTmp;
+				BufferedImage imgOut;
+				
+				// Convert the size if requested
+				if (( params.getScaleHeight() != 100 ) || ( params.getScaleWidth() != 100 )) {
+					imgTmp = createResizedCopy(imgOri);
+				}
+				else {
+					imgTmp = imgOri;
+				}
+				
+				if ( params.getMakeGray() ) {
+					imgOut = new BufferedImage(imgTmp.getWidth(), imgTmp.getHeight(), BufferedImage.TYPE_BYTE_GRAY);  
+					Graphics g = imgOut.getGraphics();  
+					g.drawImage(imgTmp, 0, 0, null);  
+					g.dispose();  				
+				}
+				else {
+					imgOut = imgTmp;
+				}
 				
 				// Save the output
 				File outFile;
@@ -149,7 +169,7 @@ public class ImageModificationStep extends BasePipelineStep {
 					}
 					outFile.deleteOnExit();
 				}
-			    ImageIO.write(img2, newFormat, outFile);
+			    ImageIO.write(imgOut, newFormat, outFile);
 			}
 			else {
 				throw new OkapiIOException("Input type not supported (must be URI).");

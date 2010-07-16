@@ -29,6 +29,7 @@ import javax.imageio.ImageIO;
 import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.ParametersDescription;
+import net.sf.okapi.common.uidescription.CheckboxPart;
 import net.sf.okapi.common.uidescription.EditorDescription;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 import net.sf.okapi.common.uidescription.ListSelectionPart;
@@ -40,10 +41,12 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private static final String SCALEWIDTH = "scaleWidth";
 	private static final String SCALEHEIGHT = "scaleHeight";
 	private static final String FORMAT = "format";
+	private static final String MAKEGRAY = "makeGray";
 
 	private int scaleWidth;
 	private int scaleHeight;
 	private String format;
+	private boolean makeGray;
 
 	public Parameters () {
 		reset();
@@ -73,11 +76,20 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.format = format;
 	}
 
+	public boolean getMakeGray () {
+		return makeGray;
+	}
+
+	public void setMakeGray (boolean makeGray) {
+		this.makeGray = makeGray;
+	}
+
 	@Override
 	public void reset () {
 		scaleHeight = 50;
 		scaleWidth = 50;
 		format = ""; // Same as original
+		makeGray = false;
 	}
 
 	@Override
@@ -87,6 +99,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		scaleHeight = buffer.getInteger(SCALEHEIGHT, scaleHeight);
 		scaleWidth = buffer.getInteger(SCALEWIDTH, scaleWidth);
 		format = buffer.getString(FORMAT, format);
+		makeGray = buffer.getBoolean(MAKEGRAY, makeGray);
 	}
 
 	@Override
@@ -95,6 +108,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.setInteger(SCALEHEIGHT, scaleHeight);
 		buffer.setInteger(SCALEWIDTH, scaleWidth);
 		buffer.setString(FORMAT, format);
+		buffer.setBoolean(MAKEGRAY, makeGray);
 		return buffer.toString();
 	}
 	
@@ -103,17 +117,22 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		ParametersDescription desc = new ParametersDescription(this);
 		desc.add(SCALEHEIGHT, "Percentage of the original height", "Height percentage (must be greater than 0.");		
 		desc.add(SCALEWIDTH, "Percentage of the original width", "Width percentage (must be greater than 0.");
+		desc.add(MAKEGRAY, "Convert to gray scale", null);
 		desc.add(FORMAT, "Output format", "Format of the output files.");
 		return desc;
 	}
 	
 	@Override
 	public EditorDescription createEditorDescription(ParametersDescription paramsDesc) {
-		EditorDescription desc = new EditorDescription("Image Modification", false, true);	
+		EditorDescription desc = new EditorDescription("Image Modification", false, false);	
+		
 		SpinInputPart sip = desc.addSpinInputPart(paramsDesc.get(SCALEWIDTH));
 		sip.setRange(1, 1000);
 		sip = desc.addSpinInputPart(paramsDesc.get(SCALEHEIGHT));
 		sip.setRange(1, 1000);
+	
+		CheckboxPart cbp = desc.addCheckboxPart(paramsDesc.get(MAKEGRAY));
+		cbp.setVertical(true);
 		
 		// List of the output formats
 		List<String> available = new ArrayList<String>(Arrays.asList(ImageIO.getWriterFileSuffixes()));
