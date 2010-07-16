@@ -28,9 +28,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.exceptions.OkapiBadStepInputException;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
-import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.IPipeline;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipeline.Pipeline;
@@ -249,7 +249,8 @@ public class PipelineDriver implements IPipelineDriver {
 					if ( method == null ) continue;
 					switch ( p.getParameterType() ) {
 					case OUTPUT_URI:
-						method.invoke(p.getStep(), item.getOutputURI(0));
+						if (item.getOutputURI(0) != null)
+							method.invoke(p.getStep(), item.getOutputURI(0));
 						break;
 					case TARGET_LOCALE:
 						method.invoke(p.getStep(), input.getTargetLocale());
