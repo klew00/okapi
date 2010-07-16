@@ -60,7 +60,7 @@ elements:
   # exclusion rules
   '.*':
     ruleTypes: [EXCLUDE]
-    conditions: [translate, EQUALS, no]
+    conditions: [translate, EQUALS, 'no']
   
   stylesheet:
     ruleTypes: [EXCLUDE]
