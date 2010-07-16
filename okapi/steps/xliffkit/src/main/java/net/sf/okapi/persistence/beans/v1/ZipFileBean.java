@@ -33,6 +33,7 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.persistence.IPersistenceSession;
 import net.sf.okapi.persistence.PersistenceBean;
 
@@ -40,9 +41,7 @@ public class ZipFileBean extends PersistenceBean<ZipFile> {
 
 	private String name;  // ZIP file short name
 	private List<ZipEntryBean> entries = new ArrayList<ZipEntryBean>(); // enumeration of the ZIP file entries
-	private boolean empty = true;
-	
-	private static ZipFile zipFile;
+	private boolean empty = true;	
 
 	@Override
 	protected ZipFile createObject(IPersistenceSession session) {
@@ -52,8 +51,7 @@ public class ZipFileBean extends PersistenceBean<ZipFile> {
 		try {
 			tempZip = File.createTempFile("~temp", ".zip");
 		} catch (IOException e) {
-			// TODO Handle exception
-			e.printStackTrace();
+			throw new OkapiIOException(e);
 		}
 		if (tempZip.exists()) tempZip.delete();			
 		tempZip.deleteOnExit();
@@ -70,21 +68,18 @@ public class ZipFileBean extends PersistenceBean<ZipFile> {
 			}
 			zipOut.close();
 		} catch (FileNotFoundException e1) {
-			// TODO Handle exception
-			e1.printStackTrace();
+			throw new RuntimeException(e1);
 		} catch (IOException e) {
-			// TODO Handle exception
-			e.printStackTrace();
+			throw new OkapiIOException(e);
 		}
 		
+		ZipFile zipFile = null;
 		try {
 			zipFile = new ZipFile(tempZip);
 		} catch (ZipException e) {
-			// TODO Handle exception
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		} catch (IOException e) {
-			// TODO Handle exception
-			e.printStackTrace();
+			throw new OkapiIOException(e);
 		}
 		return zipFile;
 	}
@@ -105,8 +100,7 @@ public class ZipFileBean extends PersistenceBean<ZipFile> {
 			try {
 				isBean.set(obj.getInputStream(entry), session);
 			} catch (IOException e1) {
-				// TODO Handle exception
-				e1.printStackTrace();
+				throw new OkapiIOException(e1);
 			}
 			entries.add(entryBean);
 		}
@@ -131,10 +125,6 @@ public class ZipFileBean extends PersistenceBean<ZipFile> {
 
 	public void setEntries(List<ZipEntryBean> entries) {
 		this.entries = entries;
-	}
-
-	public static ZipFile getZipFile() {
-		return zipFile;
 	}
 
 	public boolean isEmpty() {

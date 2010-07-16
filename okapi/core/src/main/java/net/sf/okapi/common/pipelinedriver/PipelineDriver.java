@@ -249,9 +249,7 @@ public class PipelineDriver implements IPipelineDriver {
 					if ( method == null ) continue;
 					switch ( p.getParameterType() ) {
 					case OUTPUT_URI:
-						if ( lastOutputStep == p.getStep() ) {
-							method.invoke(p.getStep(), item.getOutputURI(0));
-						}
+						method.invoke(p.getStep(), item.getOutputURI(0));
 						break;
 					case TARGET_LOCALE:
 						method.invoke(p.getStep(), input.getTargetLocale());

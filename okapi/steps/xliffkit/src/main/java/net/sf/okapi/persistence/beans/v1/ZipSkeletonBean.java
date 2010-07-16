@@ -20,7 +20,6 @@
 
 package net.sf.okapi.persistence.beans.v1;
 
-import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -28,40 +27,25 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.ZipSkeleton;
 import net.sf.okapi.persistence.IPersistenceSession;
+import net.sf.okapi.persistence.beans.FactoryBean;
 
 public class ZipSkeletonBean extends GenericSkeletonBean {
-
-	private ZipFileBean original = new ZipFileBean();
+	
+	//private ZipFileBean original = new ZipFileBean();
+	private FactoryBean original = new FactoryBean();
 	private String entry;
 
 	@Override
 	protected GenericSkeleton createObject(IPersistenceSession session) {
-		ZipSkeleton skel = null;
-		ZipFile zf = null;
-		ZipEntry ze = null;
-		List<GenericSkeletonPartBean> parts = super.getParts();
+		ZipFile zipFile = null;
+		ZipEntry zipEntry = null;
+		//List<GenericSkeletonPartBean> parts = super.getParts();
 		
-		zf = original.get(ZipFile.class, session);		
-		if (zf != null && entry != null)
-			ze = zf.getEntry(entry);
+		zipFile = original.get(ZipFile.class, session);		
+		if (zipFile != null && !Util.isEmpty(entry))
+			zipEntry = zipFile.getEntry(entry);
 		
-		if (!Util.isEmpty(entry))
-			if (zf != null) 
-				ze = zf.getEntry(entry);
-			else {
-				ZipFile extZip = ZipFileBean.getZipFile();
-				if (extZip != null) 
-					ze = extZip.getEntry(entry);
-			}
-						
-		if (!Util.isEmpty(parts))
-			skel = new ZipSkeleton(super.createObject(session), ze);
-		else if (zf != null)
-			skel = new ZipSkeleton(zf);
-		else //if (ze != null)
-			skel = new ZipSkeleton(ze);
-		
-		return skel;
+		return new ZipSkeleton(this.get(GenericSkeleton.class, session), zipFile, zipEntry);
 	}
 
 	@Override
@@ -84,11 +68,11 @@ public class ZipSkeletonBean extends GenericSkeletonBean {
 		super.setObject(obj, session);
 	}
 	
-	public ZipFileBean getOriginal() {
+	public FactoryBean getOriginal() {
 		return original;
 	}
 
-	public void setOriginal(ZipFileBean original) {
+	public void setOriginal(FactoryBean original) {
 		this.original = original;
 	}
 

@@ -34,19 +34,14 @@ public class ZipSkeleton extends GenericSkeleton {
 	private ZipFile original;
 	private ZipEntry entry;
 	
-	public ZipSkeleton (GenericSkeleton skel,
-		ZipEntry entry)
-	{
-		add(skel);
-		this.entry = entry;
-	}
-	
-	public ZipSkeleton (ZipEntry entry) {
-		this.entry = entry;
-	}
-	
-	public ZipSkeleton (ZipFile original) {
+	public ZipSkeleton (ZipFile original, ZipEntry entry) {
 		this.original = original;
+		this.entry = entry;
+	}
+	
+	public ZipSkeleton (GenericSkeleton skel, ZipFile original, ZipEntry entry) {
+		this(original, entry);
+		add(skel);		
 	}
 	
 	public ZipFile getOriginal () {

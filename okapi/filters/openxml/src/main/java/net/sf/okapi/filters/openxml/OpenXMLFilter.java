@@ -567,7 +567,7 @@ public class OpenXMLFilter implements IFilter {
 			startDoc.setFilterParameters(getParameters());
 			startDoc.setLineBreak("\n");
 			startDoc.setEncoding(encoding, false);  // Office 2007 files don't have UTF8BOM
-			ZipSkeleton skel = new ZipSkeleton(zipFile);
+			ZipSkeleton skel = new ZipSkeleton(zipFile, null);
 			return new Event(EventType.START_DOCUMENT, startDoc, skel);
 		}
 		catch ( ZipException e )
@@ -729,7 +729,7 @@ public class OpenXMLFilter implements IFilter {
 				yparams = (YamlParameters)openXMLContentFilter.getParameters();
 				  // DWH 6-15-09 fully specified Parameters
 				DocumentPart dp = new DocumentPart(entry.getName(), false);
-				ZipSkeleton skel = new ZipSkeleton(entry);
+				ZipSkeleton skel = new ZipSkeleton(zipFile, entry);
 				Event ually = new Event(EventType.DOCUMENT_PART, dp, skel); // DWH 6-25-09 save the event
 				resetExcel(); // DWH 6-25-09 if Excel and excluding colors or columns, start through zips again if done with worksheets
 				return ually; // DWH 6-25-09 now return the event
@@ -811,7 +811,7 @@ public class OpenXMLFilter implements IFilter {
 //		sd.setEncoding(encoding,false)); // subdoc doesn't have this
 		nextAction = NextAction.NEXTINSUBDOC;
 		ZipSkeleton skel = new ZipSkeleton(
-			(GenericSkeleton)event.getResource().getSkeleton(), entry);
+			(GenericSkeleton)event.getResource().getSkeleton(), zipFile, entry);
 		return new Event(EventType.START_SUBDOCUMENT, sd, skel);
 	}
 	
@@ -853,7 +853,7 @@ public class OpenXMLFilter implements IFilter {
 					Ending ending = new Ending(String.valueOf(subDocId));
 					nextAction = NextAction.NEXTINZIP;
 					ZipSkeleton skel = new ZipSkeleton(
-						(GenericSkeleton)event.getResource().getSkeleton(), entry);
+						(GenericSkeleton)event.getResource().getSkeleton(), zipFile, entry);
 					return new Event(EventType.END_SUBDOCUMENT, ending, skel);				
 				case DOCUMENT_PART:
 				case START_GROUP:

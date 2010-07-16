@@ -29,8 +29,8 @@ import net.sf.okapi.persistence.beans.v0.IPersistenceSession;
 public class ZipSkeletonBean implements IPersistenceBean {
 
 	private String zipFileName;
-	private byte[] bytes = new byte[] {3, 5, 120, 127};
-	private TextContainerBean testBean = new TextContainerBean();
+	//private byte[] bytes = new byte[] {3, 5, 120, 127};
+	//private TextContainerBean testBean = new TextContainerBean();
 	
 	@Override
 	public void init(IPersistenceSession session) {
@@ -44,7 +44,7 @@ public class ZipSkeletonBean implements IPersistenceBean {
 
 	@Override
 	public <T> T get(Class<T> classRef) {
-		ZipSkeleton skel = new ZipSkeleton(new ZipEntry(""));
+		ZipSkeleton skel = new ZipSkeleton(null, new ZipEntry(""));
 		
 		return classRef.cast(skel);
 	}
@@ -57,20 +57,20 @@ public class ZipSkeletonBean implements IPersistenceBean {
 		return zipFileName;
 	}
 
-	public byte[] getBytes() {
-		return bytes;
-	}
-
-	public void setBytes(byte[] bytes) {
-		this.bytes = bytes;
-	}
-
-	public void setTestBean(TextContainerBean testBean) {
-		this.testBean = testBean;
-	}
-
-	public TextContainerBean getTestBean() {
-		return testBean;
-	}	
+//	public byte[] getBytes() {
+//		return bytes;
+//	}
+//
+//	public void setBytes(byte[] bytes) {
+//		this.bytes = bytes;
+//	}
+//
+//	public void setTestBean(TextContainerBean testBean) {
+//		this.testBean = testBean;
+//	}
+//
+//	public TextContainerBean getTestBean() {
+//		return testBean;
+//	}	
 
 }

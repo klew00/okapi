@@ -56,7 +56,7 @@ public class TestVersions {
 		TextUnit tu1 = TextUnitUtil.buildTU("source-text1" + (char) 2 + '"' + " : " + '"' + 
 				'{' + '"' + "ssssss " + ':' + '"' + "ddddd" + "}:" + '<' + '>' + "sssddd: <>dsdd");
 		String zipName = this.getClass().getResource("sample1.en.fr.zip").getFile();
-		tu1.setSkeleton(new ZipSkeleton(new ZipFile(new File(zipName))));
+		tu1.setSkeleton(new ZipSkeleton(new ZipFile(new File(zipName)), null));
 		event1.setResource(tu1);
 		tu1.setTarget(LocaleId.FRENCH, new TextContainer("french-text1"));
 		tu1.setTarget(LocaleId.TAIWAN_CHINESE, new TextContainer("chinese-text1"));
@@ -64,7 +64,7 @@ public class TestVersions {
 		Event event2 = new Event(EventType.TEXT_UNIT);
 		TextUnit tu2 = TextUnitUtil.buildTU("source-text2" + (char) 2 + '"' + " : " + '"' + 
 				'{' + '"' + "ssssss " + ':' + '"' + "ddddd" + "}:" + '<' + '>' + "sssddd: <>dsdd");
-		tu2.setSkeleton(new ZipSkeleton(new ZipEntry("aa1/content/content.gmx")));
+		tu2.setSkeleton(new ZipSkeleton(null, new ZipEntry("aa1/content/content.gmx")));
 		event2.setResource(tu2);
 		tu2.setTarget(LocaleId.FRENCH, new TextContainer("french-text2"));
 		tu2.setTarget(LocaleId.TAIWAN_CHINESE, new TextContainer("chinese-text2"));

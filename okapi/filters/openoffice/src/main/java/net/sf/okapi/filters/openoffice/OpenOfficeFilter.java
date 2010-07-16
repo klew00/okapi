@@ -242,7 +242,7 @@ public class OpenOfficeFilter implements IFilter {
 			startDoc.setFilterWriter(createFilterWriter());
 			startDoc.setLineBreak("\n"); // forced
 			startDoc.setEncoding("UTF-8", false); // Forced
-			ZipSkeleton skel = new ZipSkeleton(zipFile);
+			ZipSkeleton skel = new ZipSkeleton(zipFile, null);
 			return new Event(EventType.START_DOCUMENT, startDoc, skel);
 		}
 		catch ( ZipException e ) {
@@ -264,7 +264,7 @@ public class OpenOfficeFilter implements IFilter {
 			}
 			else {
 				DocumentPart dp = new DocumentPart(entry.getName(), false);
-				ZipSkeleton skel = new ZipSkeleton(entry);
+				ZipSkeleton skel = new ZipSkeleton(zipFile, entry);
 				return new Event(EventType.DOCUMENT_PART, dp, skel);
 			}
 		}
@@ -292,7 +292,7 @@ public class OpenOfficeFilter implements IFilter {
 		sd.setName(docURI.getPath() + "/" + entry.getName()); // Use '/'
 		nextAction = NextAction.NEXTINSUBDOC;
 		ZipSkeleton skel = new ZipSkeleton(
-			(GenericSkeleton)event.getResource().getSkeleton(), entry);
+			(GenericSkeleton)event.getResource().getSkeleton(), zipFile, entry);
 		return new Event(EventType.START_SUBDOCUMENT, sd, skel);
 	}
 	
@@ -306,7 +306,7 @@ public class OpenOfficeFilter implements IFilter {
 				Ending ending = new Ending(String.valueOf(subDocId));
 				nextAction = NextAction.NEXTINZIP;
 				ZipSkeleton skel = new ZipSkeleton(
-					(GenericSkeleton)event.getResource().getSkeleton(), entry);
+					(GenericSkeleton)event.getResource().getSkeleton(), zipFile, entry);
 				return new Event(EventType.END_SUBDOCUMENT, ending, skel);
 			
 			default: // Else: just pass the event through

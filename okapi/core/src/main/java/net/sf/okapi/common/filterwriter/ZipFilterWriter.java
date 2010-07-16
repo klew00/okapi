@@ -57,7 +57,7 @@ public class ZipFilterWriter implements IFilterWriter {
 	private ZipOutputStream zipOut;
 	private byte[] buffer;
 	private LocaleId outLoc;
-	private ZipEntry subDocEntry;
+	private String entryName;
 	private IFilterWriter subDocWriter;
 	private File tempFile;
 	private File tempZip;
@@ -69,9 +69,11 @@ public class ZipFilterWriter implements IFilterWriter {
 	
 	public void cancel () {
 		//TODO: implement cancel()
+		zipOriginal = null;
 	}
 	
 	public void close () {
+		zipOriginal = null;
 		if ( zipOut == null ) return;
 		IOException err = null;
 		InputStream orig = null;
@@ -190,10 +192,13 @@ public class ZipFilterWriter implements IFilterWriter {
 	private void processStartDocument (StartDocument res) {
 		try {
 			buffer = new byte[2048];
-			ZipSkeleton skel = (ZipSkeleton)res.getSkeleton();
-			zipOriginal = skel.getOriginal();
+			zipOriginal = null;
 			
-			tempZip = null;
+			ZipSkeleton skel = (ZipSkeleton)res.getSkeleton();
+			if (skel != null)
+				zipOriginal = skel.getOriginal();
+			
+			tempZip = null;			
 			// Create the output stream from the path provided
 			boolean useTemp = false;
 			File f = new File(outputPath);
@@ -230,11 +235,14 @@ public class ZipFilterWriter implements IFilterWriter {
 		DocumentPart res = (DocumentPart)event.getResource();
 		if ( res.getSkeleton() instanceof ZipSkeleton ) {
 			ZipSkeleton skel = (ZipSkeleton)res.getSkeleton();
+			ZipFile original = skel.getOriginal();
+			if (original == null)
+				original = zipOriginal;
 			ZipEntry entry = skel.getEntry();
 			// Copy the entry data
 			try {
 				zipOut.putNextEntry(new ZipEntry(entry.getName()));
-				InputStream input = zipOriginal.getInputStream(entry); 
+				InputStream input = original.getInputStream(entry); 
 				int len;
 				while ( (len = input.read(buffer)) > 0 ) {
 					zipOut.write(buffer, 0, len);
@@ -270,7 +278,8 @@ public class ZipFilterWriter implements IFilterWriter {
 	
 	private void processStartSubDocument (StartSubDocument res) {
 		ZipSkeleton skel = (ZipSkeleton)res.getSkeleton();
-		subDocEntry = skel.getEntry();
+		ZipEntry entry = skel.getEntry();
+		entryName = entry.getName();
 
 		// Set the temporary path and create it
 		try {
@@ -295,7 +304,7 @@ public class ZipFilterWriter implements IFilterWriter {
 			subDocWriter.close();
 
 			// Create the new entry from the temporary output file
-			zipOut.putNextEntry(new ZipEntry(subDocEntry.getName()));
+			zipOut.putNextEntry(new ZipEntry(entryName));
 			InputStream input = new FileInputStream(tempFile); 
 			int len;
 			while ( (len = input.read(buffer)) > 0 ) {
