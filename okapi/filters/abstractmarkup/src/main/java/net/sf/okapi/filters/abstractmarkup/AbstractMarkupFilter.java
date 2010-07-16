@@ -232,7 +232,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 
 		BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input.getStream(),
 				input.getEncoding());
-		detector.detectBom();
+		detector.detectAndRemoveBom();
 
 		setEncoding(detector.getEncoding());
 		hasUtf8Bom = detector.hasUtf8Bom();
