@@ -113,10 +113,11 @@ public class Document  {
 			LocaleId targetLocale) {
 		try {
 			setRawDocument(new RawDocument(inputURL.toURI(), defaultEncoding, sourceLocale,	targetLocale));
-			documentData.outputURI = outputURL.toURI();
+			documentData.outputURI = (outputURL == null) ? null : outputURL.toURI();
 			documentData.outputEncoding = outputEncoding;
 		} catch (URISyntaxException e) {
-			// TODO Handle exception
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 	
