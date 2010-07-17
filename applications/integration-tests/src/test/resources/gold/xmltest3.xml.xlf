@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2"><file original="xmltest3.xml" source-language="en" target-language="fr" datatype="xml" xmlns:x="http://net.sf.okapi/ns/xliff-extensions" x:inputEncoding="UTF-8" x:configId="">
+<body>
+<trans-unit id="tu1">
+<source xml:lang="en">Text of paragraph 1 with &amp;=amp, "=quot, &lt;=lt, >=gt, '=apos.</source>
+<target xml:lang="fr">Text of paragraph 1 with &amp;=amp, "=quot, &lt;=lt, >=gt, '=apos.</target>
+</trans-unit>
+<trans-unit id="tu2">
+<source xml:lang="en">Text of paragraph 2.<x id="1"/></source>
+<target xml:lang="fr">Text of paragraph 2.<x id="1"/></target>
+</trans-unit>
+<trans-unit id="tu3">
+<source xml:lang="en">Text of paragraph 3.<x id="1"/></source>
+<target xml:lang="fr">Text of paragraph 3.<x id="1"/></target>
+</trans-unit>
+</body>
+</file>
+</xliff>

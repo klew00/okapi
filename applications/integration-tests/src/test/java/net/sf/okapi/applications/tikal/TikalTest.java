@@ -253,6 +253,19 @@ public class TikalTest {
     }
 
     @Test
+    public void testExtractMergeStreamedXML () throws IOException, InterruptedException {
+    	// Delete previous output
+    	assertTrue(deleteOutputFile("xmltest3.xml.xlf"));
+    	assertTrue(deleteOutputFile("xmltest3.out.xml"));
+    	// Extract
+    	assertEquals(0, runTikal("-x -sl en -tl fr xmltest3.xml -fc okf_xmlstream -ie UTF-8"));
+    	assertTrue("File different from gold", compareWithGoldFile("xmltest3.xml.xlf", "UTF-8"));
+    	// Merge
+    	assertEquals(0, runTikal("-m -sl en -tl fr xmltest3.xml.xlf -fc okf_xmlstream -oe UTF-8"));
+    	assertTrue("File different from gold", compareWithGoldFile("xmltest3.out.xml", "UTF-8"));
+    }
+
+    @Test
     public void testExtractMergeTSV () throws IOException, InterruptedException {
     	// Delete previous output
     	assertTrue(deleteOutputFile("tsvtest.txt.xlf"));

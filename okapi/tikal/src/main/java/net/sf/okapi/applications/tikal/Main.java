@@ -535,6 +535,7 @@ public class Main {
 		filtersMap.put("okf_railsyaml", "net.sf.okapi.filters.railsyaml.RailsYamlFilter");
 
 		filtersMap.put("okf_versifiedtxt", "net.sf.okapi.filters.versifiedtxt.VersifiedTextFilter");
+		filtersMap.put("okf_xmlstream", "net.sf.okapi.filters.xmlstream.XmlStreamFilter");
 	}
 	
 	private String getConfigurationId (String ext) {

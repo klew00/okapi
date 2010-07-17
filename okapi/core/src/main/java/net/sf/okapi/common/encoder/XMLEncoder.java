@@ -53,7 +53,7 @@ public class XMLEncoder implements IEncoder {
 	/**
 	 * Sets the options for this encoder. This encoder supports the following
 	 * parameters:
-	 * <ul><li>escapeGt=true to converts '>' characters to to <code>&amp;gt;</code>.</li>
+	 * <ul><li>escapeGT=true to converts '>' characters to to <code>&amp;gt;</code>.</li>
 	 * <li>escapeNbsp=true to converts non-breaking space to <code>&amp;#x00a0;</code>.</li>
 	 * <li>escapeLineBreak=true to converts line-breaks to <code>&amp;#10;</code>.</li>
 	 * </ul>
