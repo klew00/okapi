@@ -1,4 +1,5 @@
 /*===========================================================================
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -92,6 +93,7 @@ public class ITSEngine implements IProcessor, ITraversal
 	private boolean startTraversal;
 	private Stack<ITSTrace> trace;
 	private boolean backTracking;
+	private boolean translatableAttributeRuleTriggered;
 	
 	public ITSEngine (Document doc,
 		URI docURI)
@@ -115,6 +117,15 @@ public class ITSEngine implements IProcessor, ITraversal
 		xpath.setNamespaceContext(nsContext);
 	}
 
+	/**
+	 * Indicates if the processed document has triggered a rule for a translatable attribute.
+	 * This must be called only after {@link #applyRules(int)}.
+	 * @return true if the document has triggered a rule for a translatable attribute.
+	 */
+	public boolean getTranslatableAttributeRuleTriggered () {
+		return translatableAttributeRuleTriggered;
+	}
+	
 	public void addExternalRules (URI docURI) {
 		try {
 			if ( fact == null ) { 
@@ -464,6 +475,7 @@ public class ITSEngine implements IProcessor, ITraversal
 	}
 
 	public void applyRules (int dataCategories) {
+		translatableAttributeRuleTriggered = false;
 		processGlobalRules(dataCategories);
 		processLocalRules(dataCategories);
 	}
@@ -480,6 +492,7 @@ public class ITSEngine implements IProcessor, ITraversal
 	
 	public void disapplyRules () {
 		removeFlag(doc.getDocumentElement());
+		translatableAttributeRuleTriggered = false;
 	}
 
 	public boolean backTracking () {
@@ -641,6 +654,11 @@ public class ITSEngine implements IProcessor, ITraversal
 					switch ( rule.ruleType ) {
 					case IProcessor.DC_TRANSLATE:
 						setFlag(NL.item(i), FP_TRANSLATE, (rule.flag ? 'y' : 'n'), true);
+						// Set the hasTranslatabledattribute flag if it is an attribute node
+						if ( NL.item(i).getNodeType() == Node.ATTRIBUTE_NODE ) {
+							if ( rule.flag ) translatableAttributeRuleTriggered = true; 
+						}
+						// Set other info for the node
 						if ( rule.infoType == TRANSLATE_TRGPOINTER ) {
 							setFlag(NL.item(i), FP_TRGPOINTER_DATA, rule.info, true);							
 						}
@@ -719,6 +737,7 @@ public class ITSEngine implements IProcessor, ITraversal
 					}
 					// Set the flag
 					setFlag(attr.getOwnerElement(), FP_TRANSLATE, value.charAt(0), attr.getSpecified());
+					// No need to update hasTranslatabledattribute here because all nodes have to be elements in locale rules
 				}
 			}
 			

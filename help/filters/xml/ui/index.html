@@ -191,13 +191,16 @@ For example, in the following example, the white spaces in the content of <code>
 <p>The filter supports also options in addition to ITS and ITS extension. These 
 options use 
 the namespace URI <code>okapi-framework:xmlfilter-options</code>.</p>
-<p>The filter options must be placed in the parameters file (<code>.fprm</code>) 
+<p><b>Important:</b> The filter <b>options must be placed in the parameters file</b> (<code>.fprm</code>) 
 used with the filter, not in embedded or linked ITS rules. Options placed in 
 embedded or linked ITS rules will have no effect.</p>
 <ul>
 	<li><a href="#lineBreakAsCode">lineBreakAsCode</a></li>
 	<li><a href="#codeFinder">codeFinder</a></li>
 	<li><a href="#omitXMLDeclaration">omitXMLDeclaration</a></li>
+	<li><a href="#escapeQuotes">escapeQuotes</a></li>
+	<li><a href="#escapeGT">escapeGT</a></li>
+	<li><a href="#escapeNbsp">escapeNbsp</a></li>
 </ul>
 <h3><a name="lineBreakAsCode"></a>lineBreakAsCode</h3>
 <p>In some cases the content of element includes line-breaks that need to be 
@@ -272,6 +275,55 @@ to not output the XML declaration.</p>
 &lt;/its:rules&gt;</pre>
 <p>Remember that XML documents without an XML declaration may be read 
 incorrectly if the encoding of the document is not UTF-8, UTF-16 or UTF-32.</p>
+<h3><a name="escapeQuotes"></a>escapeQuotes</h3>
+<p>By default, when processing the document, the filter uses double-quotes to 
+enclose all attributes (transltable or not) and use the following rules for 
+escaping/not-escaping the litteral quotes:</p>
+<ul>
+	<li>Inside the attribute values:<ul>
+		<li>Single-quotes (=apostrophes) are never escaped</li>
+		<li>Double-quotes are always escaped</li>
+	</ul>
+	</li>
+	<li>In element content:<ul>
+		<li>Single-quotes (=apostrophes) are not escaped</li>
+		<li>Double-quotes are escaped escaped by default</li>
+	</ul>
+	</li>
+</ul>
+<p>You cannot change the escaping rules for attributes.</p>
+<p>For element content: If the document is processed without triggering any rule 
+that allow the translation of an attribute, then (and only then) the filter 
+takes into account the <code>escapeQuotes</code> option to escape or not 
+double-quotes in the translatable content.</p>
+<p>For example, the following parameters file allows to not escape double-quotes 
+in element content (for the documents where there is no rule for translatable 
+attributes are triggered).</p>
+<pre>&lt;its:rules version=&quot;1.0&quot;
+ xmlns:its=&quot;http://www.w3.org/2005/11/its&quot;
+ xmlns:okp=&quot;okapi-framework:xmlfilter-options&quot;&gt;
+ &lt;okp:options escapeQuotes=&quot;no&quot;/&gt;
+&lt;/its:rules&gt;</pre>
+<h3><a name="escapeGT"></a>escapeGT</h3>
+<p>By default the character &#39;&gt;&#39; is escaped. You can indicate to the filter to 
+not escape it using the <code>escapeGT</code> option.</p>
+<p>For example, the following parameters file indicates to not escape 
+greater-than characters.</p>
+<pre>&lt;its:rules version=&quot;1.0&quot;
+ xmlns:its=&quot;http://www.w3.org/2005/11/its&quot;
+ xmlns:okp=&quot;okapi-framework:xmlfilter-options&quot;&gt;
+ &lt;okp:options escapeGT=&quot;no&quot;/&gt;
+&lt;/its:rules&gt;</pre>
+<h3><a name="escapeNbsp"></a>escapeNbsp</h3>
+<p>By default the non-breaking space character is escaped (in the form <code>&amp;#x00a0;</code>). You can indicate 
+to the filter to not escape it using the <code>escapeNbsp</code> option.</p>
+<p>For example, the following parameters file indicates to not escape the 
+non-breaking space characters.</p>
+<pre>&lt;its:rules version=&quot;1.0&quot;
+ xmlns:its=&quot;http://www.w3.org/2005/11/its&quot;
+ xmlns:okp=&quot;okapi-framework:xmlfilter-options&quot;&gt;
+ &lt;okp:options escapeNbsp=&quot;no&quot;/&gt;
+&lt;/its:rules&gt;</pre>
 <h2><a name="processing"></a>Processing Details</h2>
 <h3>Input Encoding</h3>
 <p>The filter decides which encoding to use for the input document using the 

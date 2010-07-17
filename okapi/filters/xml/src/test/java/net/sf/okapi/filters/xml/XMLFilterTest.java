@@ -60,12 +60,34 @@ public class XMLFilterTest {
 	public void testSpecialEntities () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc>"
-			+ "<p>&lt;=lt &gt;=gt &quot;=quot &apos;=apos</p>"
+			+ "<p>&lt;=lt &gt;=gt &quot;=quot &apos;=apos, &#x00a0;=nbsp</p>"
 			+ "</doc>";
 		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 			+ "<doc>"
-			+ "<p>&lt;=lt &gt;=gt &quot;=quot &apos;=apos</p>"
+			+ "<p>&lt;=lt &gt;=gt &quot;=quot '=apos, &#x00a0;=nbsp</p>"
 			+ "</doc>";
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), locEN));
+	}
+	
+	@Test
+	public void testSpecialEntitiesWithOptions () {
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc>"
+			+ "<p>&lt;=lt &gt;=gt &quot;=quot &apos;=apos, &#x00a0;=nbsp</p>"
+			+ "</doc>";
+		// No translatable -> allow to not escape apos and quot.
+		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			+ "<doc>"
+			+ "<p>&lt;=lt >=gt \"=quot '=apos, \u00a0=nbsp</p>"
+			+ "</doc>";
+		String paramData = "<?xml version=\"1.0\"?>\n"
+			+ "<its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\""
+			+ " xmlns:zzz=\"okapi-framework:xmlfilter-options\">"
+			+ "<zzz:options escapeQuotes='no' escapeGT='no' escapeNbsp='no'/>"
+			+ "</its:rules>";
+		filter.getParameters().fromString(paramData);
+		
 		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
 			filter.getEncoderManager(), locEN));
 	}
@@ -319,6 +341,7 @@ public class XMLFilterTest {
 	public void testOutputSimpleContent_WithEscapes () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc><p>&amp;=amp, &lt;=lt, &quot;=quot..</p></doc>";
+		// No translatable attributes -> allow not escaped apos and quote
 		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 			+ "<doc><p>&amp;=amp, &lt;=lt, &quot;=quot..</p></doc>";
 		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
@@ -465,6 +488,69 @@ public class XMLFilterTest {
 		TextUnit tu = FilterTestDriver.getTextUnit(list, 1);
 		assertNotNull(tu);
 		assertEquals("value 1", tu.getSource().toString());
+	}
+	
+	@Test
+	public void testTranslatableAttributes2 () {
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc><its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "<its:translateRule selector=\"//*/@text\" translate=\"yes\"/></its:rules>"
+			+ "<p text=\"value 1 &quot;=quot\">text 1</p><p>text 2 &quot;=quot</p><p>text 3</p></doc>";
+		ArrayList<Event> list = getEvents(snippet);
+		TextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertNotNull(tu);
+		assertEquals("value 1 \"=quot", tu.getSource().toString());
+	}
+	
+	@Test
+	public void testTranslatableAttributesOutput () {
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc><its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "<its:translateRule selector=\"//*/@text\" translate=\"yes\"/></its:rules>"
+			+ "<p NOTtext=\"&apos;=apos\" text=\"value 1 &apos;=apos, &quot;=quot\">text 1</p><p>text 2 &quot;=quot</p><p>text 3 &apos;=apos</p></doc>";
+		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			+ "<doc><its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "<its:translateRule selector=\"//*/@text\" translate=\"yes\"/></its:rules>"
+			+ "<p NOTtext=\"'=apos\" text=\"value 1 '=apos, &quot;=quot\">text 1</p><p>text 2 &quot;=quot</p><p>text 3 '=apos</p></doc>";
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), locEN));
+	}
+
+	@Test
+	public void testTranslatableAttributesOutputAllowUnescapedQuoteButEscape () {
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc><its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "<its:translateRule selector=\"//*/@text\" translate=\"yes\"/></its:rules>"
+			+ "<p NOTtext='value 1 &apos;=apos, &quot;=quot'>text 1</p><p>text 2 &quot;=quot</p><p>text 3 &apos;=apos</p></doc>";
+		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			+ "<doc><its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "<its:translateRule selector=\"//*/@text\" translate=\"yes\"/></its:rules>"
+			+ "<p NOTtext=\"value 1 '=apos, &quot;=quot\">text 1</p><p>text 2 &quot;=quot</p><p>text 3 '=apos</p></doc>";
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), locEN));
+	}
+	
+	@Test
+	public void testTranslatableAttributesOutputAllowUnescapedQuote () {
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc><its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "<its:translateRule selector=\"//*/@text\" translate=\"yes\"/>"
+			+ "</its:rules>"
+			+ "<p NOTtext='value 1 &apos;=apos, &quot;=quot'>text 1</p><p>text 2 &quot;=quot</p><p>text 3 &apos;=apos</p></doc>";
+		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			+ "<doc><its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "<its:translateRule selector=\"//*/@text\" translate=\"yes\"/>"
+			+ "</its:rules>"
+			+ "<p NOTtext=\"value 1 '=apos, &quot;=quot\">text 1</p><p>text 2 \"=quot</p><p>text 3 '=apos</p></doc>";
+		
+		String paramData = "<?xml version=\"1.0\"?>\n"
+			+ "<its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\""
+			+ " xmlns:zzz=\"okapi-framework:xmlfilter-options\">"
+			+ "<zzz:options escapeQuotes=\"no\"/></its:rules>";
+		filter.getParameters().fromString(paramData);
+		
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), locEN));
 	}
 	
 	@Test

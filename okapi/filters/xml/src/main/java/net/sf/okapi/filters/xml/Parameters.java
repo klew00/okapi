@@ -67,6 +67,7 @@ public class Parameters implements IParameters {
 	private static final String LINEBREAKASCODE = "lineBreakAsCode";
 	private static final String USECODEFINDER = "useCodeFinder";
 	private static final String OMITXMLDECLARATION = "omitXMLDeclaration";
+	private static final String ESCAPEQUOTES = "escapeQuotes";
 
 	private static final String OKP_NS_PREFIX = "okp";
 	private static final String OKP_NS_URI = "okapi-framework:xmlfilter-options";
@@ -95,6 +96,10 @@ public class Parameters implements IParameters {
 	public boolean escapeLineBreak;
 	public boolean lineBreakAsCode;
 	public boolean omitXMLDeclaration;
+	public boolean escapeQuotes;
+	// Write-only parameters
+	public boolean quoteModeDefined;
+	public int quoteMode;
 	
 	public Parameters () {
 		reset();
@@ -234,6 +239,11 @@ public class Parameters implements IParameters {
 		escapeLineBreak = false;
 		lineBreakAsCode = false;
 		omitXMLDeclaration = false;
+		// Forced write-only default options
+		quoteModeDefined = true;
+		quoteMode = 3; // escape quot, not apos
+		// Quote escaping option
+		escapeQuotes = true;
 	}
 
 	@Override
@@ -286,6 +296,8 @@ public class Parameters implements IParameters {
 		if ( name.equals(XMLEncoder.ESCAPELINEBREAK) ) return escapeLineBreak;
 		if ( name.equals(LINEBREAKASCODE) ) return lineBreakAsCode;
 		if ( name.equals(OMITXMLDECLARATION) ) return omitXMLDeclaration;
+		if ( name.equals(XMLEncoder.QUOTEMODEDEFINED) ) return quoteModeDefined;
+		if ( name.equals(ESCAPEQUOTES) ) return escapeQuotes;
 		return false;
 	}
 
@@ -296,6 +308,7 @@ public class Parameters implements IParameters {
 
 	@Override
 	public int getInteger (String name) {
+		if ( name.equals(XMLEncoder.QUOTEMODE) ) return quoteMode;
 		return 0;
 	}
 
@@ -325,6 +338,10 @@ public class Parameters implements IParameters {
 			tmp = elem.getAttribute(XMLEncoder.ESCAPEGT);
 			if ( !Util.isEmpty(tmp) ) {
 				escapeGT = tmp.equals("yes");
+			}
+			tmp = elem.getAttribute(ESCAPEQUOTES);
+			if ( !Util.isEmpty(tmp) ) {
+				escapeQuotes = tmp.equals("yes");
 			}
 			tmp = elem.getAttribute(PROTECTENTITYREF);
 			if ( !Util.isEmpty(tmp) ) {

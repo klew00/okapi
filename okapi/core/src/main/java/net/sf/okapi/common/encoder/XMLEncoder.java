@@ -43,6 +43,16 @@ public class XMLEncoder implements IEncoder {
 	 */
 	public static final String ESCAPELINEBREAK = "escapeLineBreak";
 	
+	/**
+	 * Parameter flag for indicating that the {@link #QUOTEMODE} is defined. 
+	 */
+	public static final String QUOTEMODEDEFINED = "quoteModeDefined";
+	
+	/**
+	 * Parameter flag for defining the quote mode.
+	 */
+	public static final String QUOTEMODE = "quoteMode";
+	
 	private CharsetEncoder chsEnc;
 	private String lineBreak;
 	private boolean escapeGT = false;
@@ -85,8 +95,8 @@ public class XMLEncoder implements IEncoder {
 			escapeGT = params.getBoolean(ESCAPEGT);
 			escapeNbsp = params.getBoolean(ESCAPENBSP);
 			escapeLineBreak = params.getBoolean(ESCAPELINEBREAK);
-			if ( params.getBoolean("quoteModeDefined") ) {
-				quoteMode = params.getInteger("quoteMode");
+			if ( params.getBoolean(QUOTEMODEDEFINED) ) {
+				quoteMode = params.getInteger(QUOTEMODE);
 			}
 		}
 	}

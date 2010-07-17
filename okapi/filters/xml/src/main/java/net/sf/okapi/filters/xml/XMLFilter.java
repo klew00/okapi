@@ -322,7 +322,18 @@ public class XMLFilter implements IFilter {
 		startDoc.setEncoding(encoding, hasUTF8BOM);
 		startDoc.setLineBreak(lineBreak);
 		startDoc.setLocale(srcLang);
-		startDoc.setFilterParameters(getParameters());
+
+		// Change the escapeQuotes option depending on whether translatable attributes rule
+		// was triggered or not
+		if ( !itsEng.getTranslatableAttributeRuleTriggered() ) {
+			// Allow to not escape quotes only if there is no translatable attributes
+			if ( !params.escapeQuotes ) {
+				params.quoteModeDefined = true;
+				params.quoteMode = 0; // quote and apos not escaped
+			}
+		}
+		startDoc.setFilterParameters(params);
+		
 		startDoc.setFilterWriter(createFilterWriter());
 		startDoc.setType(MimeTypeMapper.XML_MIME_TYPE);
 		startDoc.setMimeType(MimeTypeMapper.XML_MIME_TYPE);

@@ -5,7 +5,7 @@
   <its:translateRule itsx:whiteSpaces="preserve" selector="//pre" translate="yes"/>
  </its:rules>
 
- <p id="p1">Text of paragraph 1 with &amp;=amp, &quot;=quot, &lt;=lt, &gt;=gt, &apos;=apos.</p>
+ <p id="p1">Text of paragraph 1 with &amp;=amp, &quot;=quot, &lt;=lt, &gt;=gt, '=apos.</p>
  <p id="p2">Text of paragraph 2.<!-- comments --></p>
  <p id="p3">Text of paragraph 3.<?somepi piarg1=val1 piarg2 = val2?></p>
  <p attr="&amp;=amp, &quot;=quot, &lt;=lt, >=gt, '=apos." its:translate="no">No trans with &amp;=amp, "=quot, &lt;=lt, >=gt, '=apos,  =nbsp.</p>
