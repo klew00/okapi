@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -20,12 +20,20 @@
 
 package net.sf.okapi.filters.rtf;
 
-import java.io.InputStream;
+import static org.junit.Assert.*;
 
+import java.io.InputStream;
+import java.util.ArrayList;
+
+import net.sf.okapi.common.Event;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.rtf.RTFFilter;
 import net.sf.okapi.common.filters.FilterTestDriver;
+import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.filterwriter.GenericContent;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -33,30 +41,22 @@ import org.junit.Test;
 
 public class RTFFilterTest {
 
-	private LocaleId locEN = LocaleId.fromString("en");
-	private LocaleId locFR = LocaleId.fromString("fr");
+	private LocaleId locEN = LocaleId.ENGLISH;
+	private LocaleId locFR = LocaleId.FRENCH;
+	private GenericContent fmt;
 
 	@Before
-	public void setUp() {
+	public void setUp () {
+		fmt = new GenericContent();
 	}
-
+	
 	@Test
-	public void runTest () {
+	public void testBasicProcessing () {
 		FilterTestDriver testDriver = new FilterTestDriver();
 		RTFFilter filter = null;		
 		try {
 			filter = new RTFFilter();
 			InputStream input = RTFFilterTest.class.getResourceAsStream("/Test01.rtf");
-			filter.open(new RawDocument(input, "windows-1252", locEN, locFR));
-//TODO: replace with non-visual test			process1(filter);
-			filter.close();
-			
-			input = RTFFilterTest.class.getResourceAsStream("/Test01.rtf");
-			filter.open(new RawDocument(input, "windows-1252", locEN, locFR));
-//TODO: replace with non-visual test			process2(filter);
-			filter.close();
-
-			input = RTFFilterTest.class.getResourceAsStream("/Test01.rtf");
 			filter.open(new RawDocument(input, "windows-1252", locEN, locFR));
 			if ( !testDriver.process(filter) ) Assert.fail();
 			filter.close();
@@ -70,23 +70,42 @@ public class RTFFilterTest {
 		}
 	}
 	
-//	private void process1 (RTFFilter filter) {
-//		System.out.println("===== 1 ===========================================");
-//		StringBuilder buf = new StringBuilder();
-//		while ( filter.getTextUntil(buf, -1, 0) == 0 ) {
-//			System.out.println(buf.toString());
-//		}
-//	}
-//
-//	private void process2 (RTFFilter filter) {
-//		System.out.println("===== 2 ===========================================");
-//		TextUnit tu = new TextUnit("testid"); 
-//		while ( filter.getSegment(tu) ) {
-//			System.out.println("S="+tu.toString());
-//			if ( tu.hasTarget(locFR) ) {
-//				System.out.println("T="+tu.getTargetContent(locFR).toString());
-//			}
-//		}
-//	}
+	@Test
+	public void testSimpleTU () {
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents("Test01.rtf", locEN, locFR), 1);
+		assertNotNull(tu);
+		assertEquals("Text (to) translate.", tu.getSource().toString());
+		TextContainer tc = tu.getTarget(locFR);
+		assertNotNull(tc);
+		assertEquals("Texte \u00e0 traduire.", tc.toString());
+
+		tu = FilterTestDriver.getTextUnit(getEvents("Test01.rtf", locEN, locFR), 2);
+		assertNotNull(tu);
+		assertEquals("[Text with <1>bold</1>.]", fmt.printSegmentedContent(tu.getSource(), true));
+		tc = tu.getTarget(locFR);
+		assertNotNull(tc);
+		assertEquals("[Texte avec du <1>gras</1>.]", fmt.printSegmentedContent(tc, true));
+	}
+	
+	private ArrayList<Event> getEvents (String file, LocaleId srcLoc, LocaleId trgLoc) {
+		IFilter filter = null;
+		ArrayList<Event> list = new ArrayList<Event>();
+		try {
+			filter = new RTFFilter();
+			InputStream input = RTFFilterTest.class.getResourceAsStream("/"+file);
+			filter.open(new RawDocument(input, "windows-1252", srcLoc, trgLoc));
+			while ( filter.hasNext() ) {
+				list.add(filter.next());
+			}
+		}
+		catch ( Throwable e ) {
+			e.printStackTrace();
+			Assert.fail("Exception occured: "+e.getLocalizedMessage());
+		}
+		finally {
+			if ( filter != null ) filter.close();
+		}
+		return list;
+	}	
 
 }

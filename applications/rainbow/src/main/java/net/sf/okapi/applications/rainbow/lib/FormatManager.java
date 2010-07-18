@@ -41,7 +41,7 @@ public class FormatManager {
 		pairs.put(".lang", "okf_properties-skypeLang");
 		pairs.put(".tmx", "okf_tmx");
 		pairs.put(".mif", "okf_mif");
-		pairs.put(".rtf", "okf_rtf");
+		pairs.put(".rtf", "okf_tradosrtf");
 		pairs.put(".idml", "okf_idml");
 		pairs.put(".po", "okf_po");
 		pairs.put(".pot", "okf_po");

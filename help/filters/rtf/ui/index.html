@@ -1,0 +1,56 @@
+﻿<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Filters - Trados RTF Filter</title>
+<link rel="stylesheet" type="text/css" href="../../../help.css">
+</head>
+<body>
+
+<table border="0" width="100%" cellspacing="0" cellpadding="0">
+	<tr class="head">
+		<td class="head" colspan="2"><h1 class="head">Okapi Framework - Filters</h1>
+		<h2 class="head2">Trados RTF Filter</h2></td>
+	</tr>
+	<tr>
+		<td class="smalltoc"><p>
+			- <a href="#overview">Overview</a><br>
+			- <a href="#processing">Processing Details</a><br>
+			- <a href="#limitations">Limitations</a><td class="hmenu">
+			<div class="hmenu"><table align="right"><tr>
+				<td><a href="../../index.html">Filters</a></td>
+				<td><a href="http://okapi.opentag.com/devguide/index.html">Developer's Guide</a></td>
+				<td><a href="http://okapi.opentag.com">Okapi Framework</a></td>
+			</tr></table></div>
+		</td>
+	</tr>
+</table>
+
+<h2><a name="overview"></a>Overview</h2>
+<p>The Trados RTF Filter is an Okapi component that implements the <code>IFilter</code> interface for 
+RTF files prepared with the Trados translation layer of styles. The filter is implement in the class <code>
+net.sf.okapi.filters.rtf.RTFFilter</code> of the Okapi library.</p>
+<p>This is a filter for READING ONLY.</p>
+
+<h2><a name="processing"></a>Processing Details</h2>
+<h3>Input Encoding</h3>
+<p>The filter decides which encoding to use for the input document using the 
+following logic:</p>
+<ul>
+	<li>The document has encoding information defined for each font in the 
+	document. The default encoding is also normally declared in the document.</li>
+	<li>If there is no default encoding declared, the encoding specified by the 
+	user is used as the default.</li>
+</ul>
+<h3>Segmentation</h3>
+<p>Only the text marked by the Trados segmentation markers is taken into 
+account. Any text outside the segments markers are ignored. </p>
+<p>he file may or may not contain translation.</p>
+
+<h2><a name="limitations"></a>Limitations</h2>
+<p>This is a READING ONLY filter. This filter does not generate an output 
+corresponding to the input. It must be used for input only.</p>
+
+<p>&nbsp;</p>
+
+</body>
+</html>

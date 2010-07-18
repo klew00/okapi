@@ -197,6 +197,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		
 		createMenus();
 		createContent();
+		
 		if ( asDialog ) {
 			Dialogs.centerWindow(shell, (Shell)parent);
 		}
@@ -488,7 +489,39 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 				dlg.showDialog();
             }
 		});
+	}
 
+	private Menu createIssuesContextMenu () {
+		// Context menu for the input list
+		Menu contextMenu = new Menu(shell, SWT.POP_UP);
+		
+		MenuItem menuItem = new MenuItem(contextMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "file.adddocument"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				addDocumentFromUI(null);
+            }
+		});
+		
+		new MenuItem(contextMenu, SWT.SEPARATOR);
+
+		menuItem = new MenuItem(contextMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "issues.checkall"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				checkAll();
+            }
+		});
+		
+		menuItem = new MenuItem(contextMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "issues.checkdocument"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				checkCurrentDocument();
+            }
+		});
+
+		return contextMenu;
 	}
 	
 	private void createContent () {
@@ -697,6 +730,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		gdTmp.horizontalSpan = 3;
 		//gdTmp.minimumHeight = 250;
 		tblIssues.setLayoutData(gdTmp);
+		tblIssues.setMenu(createIssuesContextMenu());
 		
 		tblIssues.addControlListener(new ControlAdapter() {
 		    public void controlResized(ControlEvent e) {

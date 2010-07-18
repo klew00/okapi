@@ -305,11 +305,11 @@ public class RTFFilter implements IFilter {
 	}
 
 	public String getName () {
-		return "okf_rtf";
+		return "okf_tradosrtf";
 	}
 	
 	public String getDisplayName () {
-		return "RTF Filter (BETA)";
+		return "Trados RTF Filter - READING ONLY (BETA)";
 	}
 
 	public String getMimeType () {
@@ -321,8 +321,10 @@ public class RTFFilter implements IFilter {
 		list.add(new FilterConfiguration(getName(),
 			MimeTypeMapper.RTF_MIME_TYPE,
 			getClass().getName(),
-			"RTF",
-			"Configuration for Rich Text Format (RTF) files."));
+			"Trados RTF",
+			"Configuration for Trados RTF files - READING ONLY.",
+			null,
+			".rtf;"));
 		return list;
 	}
 	

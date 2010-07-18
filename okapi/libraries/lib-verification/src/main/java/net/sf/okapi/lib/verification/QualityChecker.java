@@ -40,6 +40,7 @@ import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextUnitUtil;
 
 class QualityChecker {
 
@@ -545,8 +546,9 @@ class QualityChecker {
 		Segment trgSeg,
 		TextUnit tu)
 	{
-		int srcLen = srcSeg.text.getCodedText().length();
-		int trgLen = trgSeg.text.getCodedText().length();
+		// Strip inline code markers to look at text only
+		int srcLen = TextUnitUtil.getText(srcSeg.text, null).length();
+		int trgLen = TextUnitUtil.getText(trgSeg.text, null).length();
 		int n;
 		
 		if ( params.getCheckMaxCharLength() ) {

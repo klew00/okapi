@@ -356,31 +356,44 @@ public class Parameters extends BaseParameters {
 		extraCharsAllowed = "";
 
 		patterns = new ArrayList<PatternItem>();
+		
 		// Parentheses
 		patterns.add(new PatternItem(
 			"[\\(\\)]", "<same>",
 			true, Issue.SEVERITY_LOW, "Parentheses"));
+		
 		// Bracketing characters (except parentheses)
 		patterns.add(new PatternItem(
 			"[\\p{Ps}\\p{Pe}&&[^\\(\\)]]", "<same>",
 			true, Issue.SEVERITY_LOW, "Bracketing characters (except parentheses)"));
+		
 		// Email addresses
 		patterns.add(new PatternItem(
 			"[\\w\\.\\-]+@[\\w\\.\\-]+", "<same>",
 			true, Issue.SEVERITY_MEDIUM, "Email addresses"));
+		
 		// URLs
 		patterns.add(new PatternItem(
 			//"((http|https|ftp|sftp)\\:\\/\\/([-_a-z0-9]+\\@)?)?(([-_a-z0-9]+\\.)+[-_a-z0-9]+(\\:[0-9]+)?)((\\/([-_.:;+~%#$?=&,()\\w]*[-_:;+~%#$?=&,()\\w])?))*", "<same>",
 			"https?:[\\w/\\.:;+\\-~\\%#\\$?=&,()]+[\\w/:;+\\-~\\%#\\$?=&,()]+|www\\.[\\w/\\.:;+\\-~\\%#\\$?=&,()]+|ftp:[\\w/\\.:;+\\-~\\%#?=&,]+", "<same>",
 			true, Issue.SEVERITY_MEDIUM, "URLs"));
+		
 		// IP addresses
 		patterns.add(new PatternItem(
 			"\\b(?:\\d{1,3}\\.){3}\\d{1,3}\\b", "<same>",
 			true, Issue.SEVERITY_HIGH, "IP addresses"));
+		
 		// C-style printf 
 		patterns.add(new PatternItem(
 			"%(([-0+#]?)[-0+#]?)((\\d\\$)?)(([\\d\\*]*)(\\.[\\d\\*]*)?)[dioxXucsfeEgGpn]", "<same>",
 			true, Issue.SEVERITY_HIGH, "C-style printf codes"));
+		
+		// Triple letter
+		PatternItem item = new PatternItem(
+			"<same>", "([\\p{Ll}\\p{Lu}\\p{Lt}\\p{Lo}])\\1\\1",
+			true, Issue.SEVERITY_MEDIUM, "Tripled letter");
+		item.fromSource = false;
+		patterns.add(item);
 	}
 
 	@Override
