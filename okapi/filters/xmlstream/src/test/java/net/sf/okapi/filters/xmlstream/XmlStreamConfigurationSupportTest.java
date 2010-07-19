@@ -319,5 +319,4 @@ public class XmlStreamConfigurationSupportTest {
 		filter.close();
 		return list;
 	}
-
 }
