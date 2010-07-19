@@ -410,7 +410,7 @@ class QualityChecker {
 		}
 
 		//--- Missing codes
-		// Check if any of the missing code is one of the code allowed to be extra
+		// Check if any of the missing code is one of the code allowed to be missing
 		if ( !srcList.isEmpty() ) {
 			Iterator<Code> iter = srcList.iterator();
 			while ( iter.hasNext() ) {
@@ -421,10 +421,10 @@ class QualityChecker {
 		}
 		// What is left in the source list are the codes missing in the target
 		if ( !srcList.isEmpty() ) {
-			reportIssue(IssueType.CODE_DIFFERENCE, tu, srcSeg.getId(),
-				"Codes in the source but missing in the target: "+buildCodeList(srcList),
+			reportIssue(IssueType.MISSING_CODE, tu, srcSeg.getId(),
+				"Missing codes in the target: "+buildCodeList(srcList),
 				0, -1, 0, -1, Issue.SEVERITY_MEDIUM, srcSeg.toString(), trgSeg.toString(),
-				null); //TODO: object for menu
+				srcList);
 		}
 		
 		//--- Extra codes
@@ -439,8 +439,8 @@ class QualityChecker {
 		}
 		// What is left in the target list are the extra codes in the target
 		if ( !trgList.isEmpty() ) {
-			reportIssue(IssueType.CODE_DIFFERENCE, tu, srcSeg.getId(),
-				"Extra codes in the target not in the source: "+buildCodeList(trgList),
+			reportIssue(IssueType.EXTRA_CODE, tu, srcSeg.getId(),
+				"Extra codes in the target: "+buildCodeList(trgList),
 				0, -1, 0, -1, Issue.SEVERITY_MEDIUM, srcSeg.toString(), trgSeg.toString(),
 				trgList);
 		}

@@ -134,7 +134,8 @@ class IssuesTableModel {
 				case EXTRAORDIFF_TRAILINGWS:
 					if ( issueType != 5 ) continue;
 					break;
-				case CODE_DIFFERENCE:
+				case MISSING_CODE:
+				case EXTRA_CODE:
 					if ( issueType != 6 ) continue;
 					break;
 				case UNEXPECTED_PATTERN:

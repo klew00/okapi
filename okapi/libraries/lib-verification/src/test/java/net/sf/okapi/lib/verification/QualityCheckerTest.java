@@ -206,8 +206,8 @@ public class QualityCheckerTest {
 		List<Issue> issues = session.getIssues();
 		// We have code difference warnings but no target==source warning
 		assertEquals(2, issues.size());
-		assertEquals(IssueType.CODE_DIFFERENCE, issues.get(0).issueType);
-		assertEquals(IssueType.CODE_DIFFERENCE, issues.get(1).issueType);
+		assertEquals(IssueType.MISSING_CODE, issues.get(0).issueType);
+		assertEquals(IssueType.EXTRA_CODE, issues.get(1).issueType);
 	}
 	
 	@Test
@@ -222,8 +222,8 @@ public class QualityCheckerTest {
 		List<Issue> issues = session.getIssues();
 		// We have code difference and target==source warnings
 		assertEquals(3, issues.size());
-		assertEquals(IssueType.CODE_DIFFERENCE, issues.get(0).issueType);
-		assertEquals(IssueType.CODE_DIFFERENCE, issues.get(1).issueType);
+		assertEquals(IssueType.MISSING_CODE, issues.get(0).issueType);
+		assertEquals(IssueType.EXTRA_CODE, issues.get(1).issueType);
 		assertEquals(IssueType.TARGET_SAME_AS_SOURCE, issues.get(2).issueType);
 	}
 	
@@ -237,8 +237,8 @@ public class QualityCheckerTest {
 		session.processTextUnit(tu);
 		List<Issue> issues = session.getIssues();
 		assertEquals(2, issues.size());
-		assertEquals(IssueType.CODE_DIFFERENCE, issues.get(0).issueType);
-		assertEquals(IssueType.CODE_DIFFERENCE, issues.get(1).issueType);
+		assertEquals(IssueType.MISSING_CODE, issues.get(0).issueType);
+		assertEquals(IssueType.EXTRA_CODE, issues.get(1).issueType);
 	}
 
 	@Test

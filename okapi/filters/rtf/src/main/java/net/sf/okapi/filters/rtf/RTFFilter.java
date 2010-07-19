@@ -51,6 +51,7 @@ import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
@@ -126,6 +127,9 @@ public class RTFFilter implements IFilter {
 	public static final int CW_AFTNSEPC          = 55;
 
 	private final Logger logger = Logger.getLogger(getClass().getName());
+	
+	// Tags from S-Tagger that are open/close, all other are place-holders
+	private static final String STAGSTART = ":fc:cd:b:i:s:bi:c:c1:c2:cns:el:elf:ti:";
 	
 	private BufferedReader reader;
 	private boolean canceled;
@@ -285,6 +289,7 @@ public class RTFFilter implements IFilter {
 		controlWords.put("ftnsepc", CW_FTNSEPC);
 		controlWords.put("aftnsep", CW_AFTNSEP);
 		controlWords.put("aftnsepc", CW_AFTNSEPC);
+		
 	}
 	
 	public void cancel () {
@@ -693,46 +698,83 @@ public class RTFFilter implements IFilter {
 	 * @return The guessed TagType for the given in-line code.
 	 */
 	private void addInlineCode (TextFragment frag,
-		String data)
+		String oriData)
 	{
-		// By default we assume it's a place-holder
-		String type = null;
-		TagType tagType = TagType.PLACEHOLDER;
-		int last = data.length()-1;
-		int extra = 0;
+		ArrayList<String> list = new ArrayList<String>();
+		// Check if we have several possible codes in one run
+		int pos = oriData.indexOf("><");
+		if ( pos > -1 ) {
+			int start = 0;
+			while ( pos > -1 ) {
+				list.add(oriData.substring(start, pos+1));
+				start = pos+1;
+				pos = oriData.indexOf("><", start);
+			}
+			list.add(oriData.substring(start));
+		}
+		else { // Just one entry
+			list.add(oriData);
+		}
 		
-		// Long enough to be an XML/HTML tag?
-		if ( last > 1 ) { 
-			// Starts with the proper character?
-			if ( data.charAt(0) == '<' ) {
-				// Ends with the proper character?
-				if ( data.charAt(last) == '>' ) {
-					// Has no more than one tag?
-					if ( data.indexOf('<', 1) == -1 ) {
-						// Is like "</...>", but not "</>", so that's a closing tag
-						if (( data.charAt(1) == '/' ) && ( last > 2 )) {
-							tagType = TagType.CLOSING;
-							extra = 1;
-						}
-						else if ( data.charAt(last-1) != '/' ) {
-							// Is like "<...>, that's an opening tag
-							tagType = TagType.OPENING;
-						}
-						// Else it's likely a empty tag, or it can also be something
-						// non XML/HTML, so it's a place-holder
-					}
+		// Check if previous this is the next part of an incomplete previous code
+		// Do we have a code just before
+		String ct = frag.getCodedText();
+		if ( ct.length() >= 2 ) {
+			// Is the last part of the fragment is a code?
+			if ( TextFragment.isMarker(ct.charAt(ct.length()-2)) ) {
+				Code code = frag.getCode(TextFragment.toIndex(ct.charAt(ct.length()-1)));
+				if ( code.getData().startsWith("<") && !code.getData().endsWith(">") ) {
+					// Start with a start-tag looking char, but does not end like a tag
+					// We assume it's an incomplete code
+					// And add the code to the previous code
+					code.setData(code.getData()+list.get(0));
+					list.remove(0);
+					// Remove that code from the list and move on to process the remain of the list
 				}
 			}
 		}
-
-		// Set the type of opening and closing tags
-		if ( tagType != TagType.PLACEHOLDER ) {
-			int n = data.indexOf(' ');
-			if ( n > -1 ) type = data.substring(1+extra, n);
-			else type = data.substring(1+extra, last);
+		
+		// Process all entries
+		for ( String data : list ) {
+			// By default we assume it's a place-holder
+			String type = null;
+			TagType tagType = TagType.PLACEHOLDER;
+			int last = data.length()-1;
+			int extra = 0;
+			
+			// Long enough to be an XML/HTML tag? (3 chars at least)
+			if ( last > 1 ) { 
+				// Starts with the proper character?
+				if ( data.charAt(0) == '<' ) {
+					// Ends with the proper character?
+					if ( data.charAt(last) == '>' ) {
+						// Has no more than one tag?
+						if ( data.indexOf('<', 1) == -1 ) {
+							// Is like "</...>", but not "</>", so that's a closing tag
+							if (( data.charAt(1) == '/' ) && ( last > 2 )) {
+								tagType = TagType.CLOSING;
+								extra = 1;
+							}
+							else if ( data.charAt(last-1) != '/' ) {
+								// Is like "<...>, that's an opening tag
+								tagType = TagType.OPENING;
+							}
+							// Else it's likely a empty tag, or it can also be something
+							// non XML/HTML, so it's a place-holder
+						}
+					}
+				}
+			}
+	
+			// Set the type of opening and closing tags
+			if ( tagType != TagType.PLACEHOLDER ) {
+				int n = data.indexOf(' ');
+				if ( n > -1 ) type = data.substring(1+extra, n);
+				else type = data.substring(1+extra, last);
+			}
+			// Add the guessed in-line code
+			frag.append(tagType, type, data);
 		}
-		// Add the guessed in-line code
-		frag.append(tagType, type, data);
 	}
 	
 	/**

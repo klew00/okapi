@@ -43,6 +43,7 @@ import net.sf.okapi.common.ui.UserConfiguration;
 import net.sf.okapi.lib.verification.IQualityCheckEditor;
 import net.sf.okapi.lib.verification.Issue;
 import net.sf.okapi.lib.verification.IssueComparator;
+import net.sf.okapi.lib.verification.IssueType;
 import net.sf.okapi.lib.verification.QualityCheckSession;
 
 import org.eclipse.swt.SWT;
@@ -578,18 +579,27 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 			@SuppressWarnings("unchecked")
 			@Override
 			public void menuShown(MenuEvent arg0) {
+				// Clear possible previous menu entries
 				clearContextMenu();
 				int n = tblIssues.getSelectionIndex();
 				if ( n == -1 ) return;
 				Issue issue = (Issue)tblIssues.getItem(n).getData();
 				if ( issue.extra == null ) return;
 				if ( ((ArrayList<Code>)issue.extra).size() == 0 ) return;
+				// If we have extra data attached to the issue:
+				// Add actions to the menu
 				new MenuItem(contextMenu, SWT.SEPARATOR);
 				for ( Code code : (ArrayList<Code>)issue.extra ) {
 					MenuItem item = new MenuItem(contextMenu, SWT.PUSH);
-					item.setText(String.format("Allow \"%s\" as an Extra Code in This Session", code.getData()));
 					item.setData(code.getData());
-					item.addSelectionListener(allowExtraCodesAdapter);
+					if ( issue.issueType == IssueType.EXTRA_CODE ) {
+						item.setText(String.format("Allow \"%s\" as an Extra Code", code.getData()));
+						item.addSelectionListener(allowExtraCodesAdapter);
+					}
+					else {
+						item.setText(String.format("Allow \"%s\" as a Missing Code", code.getData()));
+						item.addSelectionListener(allowMissingCodesAdapter);
+					}
 				}
 			}
 			@Override
