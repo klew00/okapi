@@ -45,6 +45,15 @@ public class SubFilterEventConverter {
 		this.endGroupSkeleton = endGroupSkeleton;
 	}
 
+	public SubFilterEventConverter(String parentId, ISkeleton startGroupSkeleton,
+			ISkeleton endGroupSkeleton, IdGenerator idGenerator) {
+		idGenerator.reset(parentId);
+		this.groupIdGenerator = idGenerator; 
+		this.parentId = parentId;
+		this.startGroupSkeleton = startGroupSkeleton;
+		this.endGroupSkeleton = endGroupSkeleton;
+	}
+	
 	public Event convertEvent(Event event) {
 		// we convert start-document to start group
 		// and end document to end group
