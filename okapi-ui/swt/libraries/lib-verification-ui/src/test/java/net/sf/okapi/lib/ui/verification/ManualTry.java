@@ -3,7 +3,6 @@ package net.sf.okapi.lib.ui.verification;
 import net.sf.okapi.common.filters.DefaultFilters;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.ui.BaseHelp;
-import net.sf.okapi.filters.rtf.RTFFilter;
 
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;

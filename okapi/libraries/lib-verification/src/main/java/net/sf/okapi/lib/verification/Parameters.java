@@ -65,6 +65,8 @@ public class Parameters extends BaseParameters {
 	private static final String EXTRACHARSALLOWED = "extraCharsAllowed";
 	private static final String CORRUPTEDCHARACTERS = "corruptedCharacters";
 	private static final String SCOPE = "scope";
+	private static final String EXTRACODESALLOWED = "extraCodesAllowed";
+	private static final String MISSINGCODESALLOWED = "missingCodesAllowed";
 
 	String outputPath;
 	boolean autoOpen;
@@ -94,11 +96,21 @@ public class Parameters extends BaseParameters {
 	String extraCharsAllowed;
 	boolean corruptedCharacters;
 	int scope;
+	List<String> extraCodesAllowed;
+	List<String> missingCodesAllowed;
 
 	public Parameters () {
 		reset();
 	}
-	
+
+	public List<String> getExtraCodesAllowed () {
+		return extraCodesAllowed;
+	}
+
+	public List<String> getMissingCodesAllowed () {
+		return missingCodesAllowed;
+	}
+
 	public int getScope () {
 		return scope;
 	}
@@ -394,6 +406,9 @@ public class Parameters extends BaseParameters {
 			true, Issue.SEVERITY_MEDIUM, "Tripled letter");
 		item.fromSource = false;
 		patterns.add(item);
+		
+		extraCodesAllowed = new ArrayList<String>();
+		missingCodesAllowed = new ArrayList<String>();
 	}
 
 	@Override
@@ -441,6 +456,19 @@ public class Parameters extends BaseParameters {
 			String desc = buffer.getString(String.format("%s%d", DESCPATTERN, i), "");
 			patterns.add(new PatternItem(source, target, enabled, severity, fromSource, desc));
 		}
+		
+		// Allowed extra codes
+		count = buffer.getInteger(EXTRACODESALLOWED, 0);
+		if ( count > 0 ) extraCodesAllowed.clear();
+		for ( int i=0; i<count; i++ ) {
+			extraCodesAllowed.add(buffer.getString(String.format("%s%d", EXTRACODESALLOWED, i), ""));
+		}
+		// Allowed missing codes
+		count = buffer.getInteger(MISSINGCODESALLOWED, 0);
+		if ( count > 0 ) missingCodesAllowed.clear();
+		for ( int i=0; i<count; i++ ) {
+			missingCodesAllowed.add(buffer.getString(String.format("%s%d", MISSINGCODESALLOWED, i), ""));
+		}
 	}
 
 	@Override
@@ -485,6 +513,16 @@ public class Parameters extends BaseParameters {
 			buffer.setString(String.format("%s%d", TARGETPATTERN, i), patterns.get(i).target);
 			buffer.setString(String.format("%s%d", DESCPATTERN, i), patterns.get(i).description);
 		}
+		
+		buffer.setInteger(EXTRACODESALLOWED, extraCodesAllowed.size());
+		for ( int i=0; i<extraCodesAllowed.size(); i++ ) {
+			buffer.setString(String.format("%s%d", EXTRACODESALLOWED, i), extraCodesAllowed.get(i));
+		}		
+		buffer.setInteger(MISSINGCODESALLOWED, missingCodesAllowed.size());
+		for ( int i=0; i<missingCodesAllowed.size(); i++ ) {
+			buffer.setString(String.format("%s%d", MISSINGCODESALLOWED, i), missingCodesAllowed.get(i));
+		}		
+		
 		return buffer.toString();
 	}
 	

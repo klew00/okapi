@@ -39,6 +39,7 @@ public class Issue {
 	public int trgEnd;
 	public boolean enabled;
 	public int severity;
+	public Object extra;
 	// Temporary waiting for DB
 	public String tuName;
 	public String oriSource;

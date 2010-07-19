@@ -25,12 +25,14 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 import net.sf.okapi.common.BaseContext;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.ui.AboutDialog;
 import net.sf.okapi.common.ui.Dialogs;
@@ -56,6 +58,8 @@ import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.ShellEvent;
@@ -66,6 +70,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -86,6 +91,8 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 	static final int ISSUETYPE_ALL = 0;
 	static final int ISSUETYPE_ENABLED = 1;
 	static final int ISSUETYPE_DISABLED = 2;
+	
+	static final int CONTEXTMENU_COUNT = 7;
 	
 	private static final String OPT_BOUNDS = "bounds"; //$NON-NLS-1$
 	private static final String OPT_MAXIMIZED = "maximized"; //$NON-NLS-1$
@@ -115,6 +122,9 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 	private Combo cbDisplay;
 	private Combo cbTypes;
 	private int waitCount;
+	private Menu contextMenu;
+	private SelectionAdapter allowExtraCodesAdapter;
+	private SelectionAdapter allowMissingCodesAdapter;
 	
 	private int displayType = 1;
 	private int issueType = 0;
@@ -493,9 +503,27 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 
 	private Menu createIssuesContextMenu () {
 		// Context menu for the input list
-		Menu contextMenu = new Menu(shell, SWT.POP_UP);
+		contextMenu = new Menu(shell, SWT.POP_UP);
 		
 		MenuItem menuItem = new MenuItem(contextMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "context.opendocument"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				openDocument();
+            }
+		});
+
+		menuItem = new MenuItem(contextMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "context.openfolder"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				openContainingFolder();
+            }
+		});
+
+		new MenuItem(contextMenu, SWT.SEPARATOR);
+
+		menuItem = new MenuItem(contextMenu, SWT.PUSH);
 		rm.setCommand(menuItem, "file.adddocument"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
@@ -521,7 +549,72 @@ public class QualityCheckEditor implements IQualityCheckEditor {
             }
 		});
 
+		// Adapter that add extra codes to exception list
+		allowExtraCodesAdapter = new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				// The menu item has a data object that contains the string to add
+				List<String> list = session.getParameters().getExtraCodesAllowed();
+				String code = (String)((MenuItem)event.getSource()).getData();
+				if ( list.contains(code) ) return;
+				list.add(code);
+				session.setModified(true); // We have modified the session data
+            }
+		};
+		
+		// Adapter that add missing codes to exception list
+		allowMissingCodesAdapter = new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				// The menu item has a data object that contains the string to add
+				List<String> list = session.getParameters().getMissingCodesAllowed();
+				String code = (String)((MenuItem)event.getSource()).getData();
+				if ( list.contains(code) ) return;
+				list.add(code);
+				session.setModified(true); // We have modified the session data
+            }
+		};
+		
+		// Add listener to manage the actions
+		contextMenu.addMenuListener(new MenuListener() {
+			@SuppressWarnings("unchecked")
+			@Override
+			public void menuShown(MenuEvent arg0) {
+				clearContextMenu();
+				int n = tblIssues.getSelectionIndex();
+				if ( n == -1 ) return;
+				Issue issue = (Issue)tblIssues.getItem(n).getData();
+				if ( issue.extra == null ) return;
+				if ( ((ArrayList<Code>)issue.extra).size() == 0 ) return;
+				new MenuItem(contextMenu, SWT.SEPARATOR);
+				for ( Code code : (ArrayList<Code>)issue.extra ) {
+					MenuItem item = new MenuItem(contextMenu, SWT.PUSH);
+					item.setText(String.format("Allow \"%s\" as an Extra Code in This Session", code.getData()));
+					item.setData(code.getData());
+					item.addSelectionListener(allowExtraCodesAdapter);
+				}
+			}
+			@Override
+			public void menuHidden(MenuEvent arg0) {
+				// Done by clearContextMenu() at the next display of the menu
+			}
+		});
+
 		return contextMenu;
+	}
+
+	/**
+	 * Clears the extra items of the context menu.
+	 * Extra items need to stay after the menu is closed so if one is selected it
+	 * can be acted upon. So the clear is done before showing the NEXT time around.
+	 */
+	private void clearContextMenu () {
+		MenuItem[] list = contextMenu.getItems();
+		if ( list.length <= CONTEXTMENU_COUNT ) return;
+		// Else: remove extra items
+		int i = list.length-1;
+		while ( i >= CONTEXTMENU_COUNT ) {
+			contextMenu.getItem(i).dispose();
+			i--;
+		}
 	}
 	
 	private void createContent () {
@@ -850,6 +943,31 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		trgTextOpt.isBidirectional = LocaleId.isBidirectional(session.getTargetLocale());
 		edTarget.setOrientation(trgTextOpt.isBidirectional ? SWT.RIGHT_TO_LEFT : SWT.LEFT_TO_RIGHT);
 	}
+
+	private void openDocument () {
+		try {
+			String path = cbDocument.getText();
+			if ( Util.isEmpty(path) ) return;
+			path = (new File(path)).getPath();
+			Program.launch(path);
+		}
+		catch ( Exception e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+	}
+	
+	private void openContainingFolder () {
+		try {
+			String path = cbDocument.getText();
+			if ( Util.isEmpty(path) ) return;
+			path = (new File(path)).getPath();
+			Program.launch(Util.getDirectoryName(path));
+		}
+		catch ( Exception e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+	}
+	
 	
 	private void resetTableDisplay () {
 		try {

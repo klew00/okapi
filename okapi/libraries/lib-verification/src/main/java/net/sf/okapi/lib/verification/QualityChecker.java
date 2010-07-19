@@ -142,7 +142,7 @@ class QualityChecker {
 			// No translation available
 			reportIssue(IssueType.MISSING_TARGETTU, tu, null,
 				"Missing translation.",
-				0, -1, 0, -1, Issue.SEVERITY_HIGH, srcCont.toString(), "");
+				0, -1, 0, -1, Issue.SEVERITY_HIGH, srcCont.toString(), "", null);
 			return;
 		}
 		
@@ -166,7 +166,7 @@ class QualityChecker {
 			if ( trgSeg == null ) {
 				reportIssue(IssueType.MISSING_TARGETSEG, tu, srcSeg.getId(),
 					"The source segment has no corresponding target segment.",
-					0, -1, 0, -1, Issue.SEVERITY_HIGH, srcSeg.toString(), "");
+					0, -1, 0, -1, Issue.SEVERITY_HIGH, srcSeg.toString(), "", null);
 				continue; // Cannot go further for that segment
 			}
 			
@@ -175,7 +175,7 @@ class QualityChecker {
 				if ( trgSeg.text.isEmpty() && !srcSeg.text.isEmpty() ) {
 					reportIssue(IssueType.EMPTY_TARGETSEG, tu, srcSeg.getId(),
 						"The target segment is empty, but its source is not empty.",
-						0, -1, 0, -1, Issue.SEVERITY_HIGH, srcSeg.toString(), "");
+						0, -1, 0, -1, Issue.SEVERITY_HIGH, srcSeg.toString(), "", null);
 					continue; // No need to check more if it's empty
 				}
 			}
@@ -184,7 +184,7 @@ class QualityChecker {
 				if ( srcSeg.text.isEmpty() && !trgSeg.text.isEmpty() ) {
 					reportIssue(IssueType.EMPTY_SOURCESEG, tu, srcSeg.getId(),
 						"The target segment is not empty, but its source is empty.",
-						0, -1, 0, -1, Issue.SEVERITY_HIGH, srcSeg.toString(), "");
+						0, -1, 0, -1, Issue.SEVERITY_HIGH, srcSeg.toString(), "", null);
 					continue; // No need to check more if the source is empty
 				}
 			}
@@ -215,7 +215,7 @@ class QualityChecker {
 						if ( warn ) {
 							reportIssue(IssueType.TARGET_SAME_AS_SOURCE, tu, srcSeg.getId(),
 								"Translation is the same as the source.",
-								0, -1, 0, -1, Issue.SEVERITY_MEDIUM, srcSeg.toString(), trgSeg.toString());
+								0, -1, 0, -1, Issue.SEVERITY_MEDIUM, srcSeg.toString(), trgSeg.toString(), null);
 						}
 					}
 				}
@@ -239,7 +239,7 @@ class QualityChecker {
 				if ( ltConn.checkSegment(currentDocId, trgSeg, tu) > 0 ) {
 					for ( Issue issue : ltConn.getIssues() ) {
 						reportIssue(issue.issueType, tu, issue.segId, issue.message, issue.srcStart, issue.srcEnd,
-							issue.trgStart, issue.trgEnd, issue.severity, srcSeg.toString(), trgSeg.toString());
+							issue.trgStart, issue.trgEnd, issue.severity, srcSeg.toString(), trgSeg.toString(), null);
 						if ( issue.srcEnd == -99 ) {
 							// Special marker indicating a server error
 							ltConn = null; // Do not check it again until next re-processing
@@ -256,7 +256,7 @@ class QualityChecker {
 			if ( srcSeg == null ) {
 				reportIssue(IssueType.EXTRA_TARGETSEG, tu, trgSeg.getId(),
 					String.format("Extra target segment (id=%s).", trgSeg.getId()),
-					0, -1, 0, -1, Issue.SEVERITY_HIGH, "", trgSeg.toString());
+					0, -1, 0, -1, Issue.SEVERITY_HIGH, "", trgSeg.toString(), null);
 				continue; // Cannot go further for that segment
 			}
 		}
@@ -346,12 +346,12 @@ class QualityChecker {
 				reportIssue(IssueType.ALLOWED_CHARACTERS, tu, null,
 					String.format("The character '%c' (U+%04X) is not allowed in the target text."
 						+ " Other forbidden characters found: ", badChar, (int)badChar)+badChars.toString(),
-						0, -1, pos, pos+1, Issue.SEVERITY_MEDIUM, srcOri, trgOri);
+						0, -1, pos, pos+1, Issue.SEVERITY_MEDIUM, srcOri, trgOri, null);
 			}
 			else {
 				reportIssue(IssueType.ALLOWED_CHARACTERS, tu, null,
 					String.format("The character '%c' (U+%04X) is not allowed in the target text.", badChar, (int)badChar),
-					0, -1, pos, pos+1, Issue.SEVERITY_MEDIUM, srcOri, trgOri);
+					0, -1, pos, pos+1, Issue.SEVERITY_MEDIUM, srcOri, trgOri, null);
 			}
 		}
 		
@@ -359,8 +359,8 @@ class QualityChecker {
 	
 	// Create a copy of the codes and strip out any that has empty data.
 	// They correspond to process-only codes like <df> in TTX or <mrk> in XLIFF
-	private List<Code> stripNoiseCodes (Segment seg) {
-		List<Code> list = new ArrayList<Code>(seg.text.getCodes());
+	private ArrayList<Code> stripNoiseCodes (Segment seg) {
+		ArrayList<Code> list = new ArrayList<Code>(seg.text.getCodes());
 		Iterator<Code> iter = list.iterator();
 		while ( iter.hasNext() ) {
 			Code code = iter.next();
@@ -384,8 +384,8 @@ class QualityChecker {
 		Segment trgSeg,
 		TextUnit tu)
 	{
-		List<Code> srcList = stripNoiseCodes(srcSeg);
-		List<Code> trgList = stripNoiseCodes(trgSeg);
+		ArrayList<Code> srcList = stripNoiseCodes(srcSeg);
+		ArrayList<Code> trgList = stripNoiseCodes(trgSeg);
 
 		// If no codes: don't check
 		if (( srcList.size() == 0 ) && ( trgList.size() == 0 )) return;
@@ -409,18 +409,40 @@ class QualityChecker {
 			}
 		}
 
+		//--- Missing codes
+		// Check if any of the missing code is one of the code allowed to be extra
+		if ( !srcList.isEmpty() ) {
+			Iterator<Code> iter = srcList.iterator();
+			while ( iter.hasNext() ) {
+				if ( params.missingCodesAllowed.contains(iter.next().getData()) ) {
+					iter.remove();
+				}
+			}
+		}
 		// What is left in the source list are the codes missing in the target
 		if ( !srcList.isEmpty() ) {
 			reportIssue(IssueType.CODE_DIFFERENCE, tu, srcSeg.getId(),
 				"Codes in the source but missing in the target: "+buildCodeList(srcList),
-				0, -1, 0, -1, Issue.SEVERITY_MEDIUM, srcSeg.toString(), trgSeg.toString());
+				0, -1, 0, -1, Issue.SEVERITY_MEDIUM, srcSeg.toString(), trgSeg.toString(),
+				null); //TODO: object for menu
 		}
 		
+		//--- Extra codes
+		// Check if any of the extra code is one of the code allowed to be extra
+		if ( !trgList.isEmpty() ) {
+			Iterator<Code> iter = trgList.iterator();
+			while ( iter.hasNext() ) {
+				if ( params.extraCodesAllowed.contains(iter.next().getData()) ) {
+					iter.remove();
+				}
+			}
+		}
 		// What is left in the target list are the extra codes in the target
 		if ( !trgList.isEmpty() ) {
 			reportIssue(IssueType.CODE_DIFFERENCE, tu, srcSeg.getId(),
 				"Extra codes in the target not in the source: "+buildCodeList(trgList),
-				0, -1, 0, -1, Issue.SEVERITY_MEDIUM, srcSeg.toString(), trgSeg.toString());
+				0, -1, 0, -1, Issue.SEVERITY_MEDIUM, srcSeg.toString(), trgSeg.toString(),
+				trgList);
 		}
 		
 //		// If both list are empty but we get here:
@@ -440,7 +462,7 @@ class QualityChecker {
 		if ( m.find() ) { // Getting one match is enough
 			reportIssue(IssueType.SUSPECT_PATTERN, tu, null,
 				String.format("Possible corrupted characters in the target (for example: \"%s\").", m.group()),
-				0, -1, m.start(), m.end(), Issue.SEVERITY_HIGH, srcOri, trgOri);
+				0, -1, m.start(), m.end(), Issue.SEVERITY_HIGH, srcOri, trgOri, null);
 		}
 	}
 	
@@ -458,14 +480,14 @@ class QualityChecker {
 						if ( trgOri.charAt(i) != srcOri.charAt(i) ) {
 							reportIssue(IssueType.MISSINGORDIFF_LEADINGWS, tu, null,
 								String.format("Missing or different leading white space at position %d.", i),
-								i, i+1, 0, -1, Issue.SEVERITY_LOW, srcOri, trgOri);
+								i, i+1, 0, -1, Issue.SEVERITY_LOW, srcOri, trgOri, null);
 							break;
 						}
 					}
 					else {
 						reportIssue(IssueType.MISSING_LEADINGWS, tu, null,
 							String.format("Missing leading white space at position %d.", i),
-							i, i+1, 0, -1, Issue.SEVERITY_LOW, srcOri, trgOri);
+							i, i+1, 0, -1, Issue.SEVERITY_LOW, srcOri, trgOri, null);
 					}
 				}
 				else break;
@@ -478,14 +500,14 @@ class QualityChecker {
 						if ( srcOri.charAt(i) != trgOri.charAt(i) ) {
 							reportIssue(IssueType.EXTRAORDIFF_LEADINGWS, tu, null,
 								String.format("Extra or different leading white space at position %d.", i),
-								0, -1, i, i+1, Issue.SEVERITY_LOW, srcOri, trgOri);
+								0, -1, i, i+1, Issue.SEVERITY_LOW, srcOri, trgOri, null);
 							break;
 						}
 					}
 					else {
 						reportIssue(IssueType.EXTRA_LEADINGWS, tu, null,
 							String.format("Extra leading white space at position %d.", i),
-							0, -1, i, i+1, Issue.SEVERITY_LOW, srcOri, trgOri);
+							0, -1, i, i+1, Issue.SEVERITY_LOW, srcOri, trgOri, null);
 					}
 				}
 				else break;
@@ -503,14 +525,14 @@ class QualityChecker {
 						if ( trgOri.charAt(j) != srcOri.charAt(i) ) {
 							reportIssue(IssueType.MISSINGORDIFF_TRAILINGWS, tu, null,
 								String.format("Missing or different trailing white space at position %d", i),
-								i, i+1, 0, -1, Issue.SEVERITY_LOW, srcOri, trgOri);
+								i, i+1, 0, -1, Issue.SEVERITY_LOW, srcOri, trgOri, null);
 							break;
 						}
 					}
 					else {
 						reportIssue(IssueType.MISSING_TRAILINGWS, tu, null,
 							String.format("Missing trailing white space at position %d.", i),
-							i, i+1, 0, -1, Issue.SEVERITY_LOW, srcOri, trgOri);
+							i, i+1, 0, -1, Issue.SEVERITY_LOW, srcOri, trgOri, null);
 					}
 				}
 				else break;
@@ -525,14 +547,14 @@ class QualityChecker {
 						if ( srcOri.charAt(j) != trgOri.charAt(i) ) {
 							reportIssue(IssueType.EXTRAORDIFF_TRAILINGWS, tu, null,
 								String.format("Extra or different trailing white space at position %d.", i),
-								0, -1, i, i+1, Issue.SEVERITY_LOW, srcOri, trgOri);
+								0, -1, i, i+1, Issue.SEVERITY_LOW, srcOri, trgOri, null);
 							break;
 						}
 					}
 					else {
 						reportIssue(IssueType.EXTRA_TRAILINGWS, tu, null,
 							String.format("Extra white trailing space at position %d.", i),
-							0, -1, i, i+1, Issue.SEVERITY_LOW, srcOri, trgOri);
+							0, -1, i, i+1, Issue.SEVERITY_LOW, srcOri, trgOri, null);
 					}
 				}
 				else break;
@@ -558,7 +580,7 @@ class QualityChecker {
 				reportIssue(IssueType.TARGET_LENGTH, tu, srcSeg.getId(),
 					String.format("The target is suspiciously longer than its source (%.2f%% of the source).", d),
 					0, -1, 0, -1, Issue.SEVERITY_LOW, 
-					srcSeg.toString(), trgSeg.toString());
+					srcSeg.toString(), trgSeg.toString(), null);
 			}
 		}
 
@@ -569,7 +591,7 @@ class QualityChecker {
 				reportIssue(IssueType.TARGET_LENGTH, tu, srcSeg.getId(),
 					String.format("The target is suspiciously shorter than its source (%.2f%% of the source).", d),
 					0, -1, 0, -1, Issue.SEVERITY_LOW, 
-					srcSeg.toString(), trgSeg.toString());
+					srcSeg.toString(), trgSeg.toString(), null);
 			}
 		}
 	}
@@ -589,7 +611,7 @@ class QualityChecker {
 					fromFragmentToString(trgSeg.text, m.start()),
 					fromFragmentToString(trgSeg.text, m.end()),
 					Issue.SEVERITY_HIGH, 
-					srcSeg.toString(), trgSeg.toString());
+					srcSeg.toString(), trgSeg.toString(), null);
 			}
 		}
 	}
@@ -646,7 +668,7 @@ class QualityChecker {
 						fromFragmentToString(srcSeg.text, srcM.start()),
 						fromFragmentToString(srcSeg.text, srcM.end()),
 						0, -1, item.severity,
-						srcSeg.toString(), trgSeg.toString());
+						srcSeg.toString(), trgSeg.toString(), null);
 				}
 			}
 		}
@@ -699,7 +721,7 @@ class QualityChecker {
 						fromFragmentToString(trgSeg.text, trgM.start()),
 						fromFragmentToString(trgSeg.text, trgM.end()),
 						item.severity,
-						srcSeg.toString(), trgSeg.toString());
+						srcSeg.toString(), trgSeg.toString(), null);
 				}
 			}
 		}
@@ -715,10 +737,12 @@ class QualityChecker {
 		int trgEnd,
 		int severity,
 		String srcOri,
-		String trgOri)
+		String trgOri,
+		Object extra)
 	{
 		Issue issue = new Issue(currentDocId, issueType, tu.getId(), segId, message,
 			srcStart, srcEnd, trgStart, trgEnd, severity, tu.getName());
+		issue.extra = extra;
 		issues.add(issue);
 		issue.enabled = true;
 		issue.oriSource = srcOri;
