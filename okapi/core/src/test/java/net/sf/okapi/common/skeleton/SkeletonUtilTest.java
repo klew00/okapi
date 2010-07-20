@@ -229,7 +229,7 @@ public class SkeletonUtilTest {
 		assertTrue(SkeletonUtil.isExtValuePlaceholder(tu2, p4));
 		assertFalse(SkeletonUtil.isReference(p4));
 		
-		p5 = SkeletonUtil.getPart(skel2, 3); 
+		p5 = SkeletonUtil.getPart(skel2, 4); 
 		assertFalse(SkeletonUtil.isSourcePlaceholder(tu2, p5));
 		assertFalse(SkeletonUtil.isTargetPlaceholder(tu2, p5));
 		assertFalse(SkeletonUtil.isValuePlaceholder(tu2, p5));
