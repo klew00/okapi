@@ -96,5 +96,34 @@ public class RegexUtil {
 		
 		return countMatches(string, "\\b" + qualifier + "+", qualifier.length());
 	}
+
+	/**
+	 * Escapes a given string for regex.
+	 * @param str the given string
+	 * @return escaped string
+	 */
+	public static String escape(String str) {
+		str = str.replace("[", "\\[");
+		str = str.replace("]", "\\]");
+		str = str.replace("\"", "\\\"");
+		str = str.replace("^", "\\^");
+		str = str.replace("$", "\\$");
+		str = str.replace(".", "\\.");
+		str = str.replace("|", "\\|");
+		str = str.replace("?", "\\?");
+		str = str.replace("*", "\\*");
+		str = str.replace("+", "\\+");
+		str = str.replace("(", "\\(");
+		str = str.replace(")", "\\)");
+		str = str.replace("{", "\\{");
+		str = str.replace("}", "\\}");
+        
+        return str;
+	}
+
+	public static boolean matches(String st, Pattern pattern) {
+		Matcher matcher = pattern.matcher(st);
+		return matcher.matches();
+	}
 	
 }
