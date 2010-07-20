@@ -163,10 +163,47 @@ public class YamlConfigurationReader {
 
 	@SuppressWarnings("unchecked")
 	/*
+	 * Find regex element rules only
+	 */
+	public Map getRegexElementRule(String ruleName) {
+		Map rule = null;
+		// check our element regex patterns
+		if (rule == null && !elementRegexRules.isEmpty()) {
+			for (String r : elementRegexRules.keySet()) {
+				Matcher m = elementCompiledRegexRules.get(r).matcher(ruleName);
+				if (m.matches()) {
+					rule = (Map) elementRegexRules.get(r);
+				}
+			}
+		}
+		return rule;
+	}
+
+	@SuppressWarnings("unchecked")
+	/*
 	 * Find attribute rules only (including regex)
 	 */
 	public Map getAttributeRule(String ruleName) {
 		Map rule = (Map)attributeRules.get(ruleName);
+
+		// check our element regex patterns
+		if (rule == null && !attributeRegexRules.isEmpty()) {
+			for (String r : attributeRegexRules.keySet()) {
+				Matcher m = attributeCompiledRegexRules.get(r).matcher(ruleName);
+				if (m.matches()) {
+					rule = (Map) attributeRegexRules.get(r);
+				}
+			}
+		}
+		return rule;
+	}
+
+	@SuppressWarnings("unchecked")
+	/*
+	 * Find attribute rules only (including regex)
+	 */
+	public Map getRegexAttributeRule(String ruleName) {
+		Map rule = null;
 
 		// check our element regex patterns
 		if (rule == null && !attributeRegexRules.isEmpty()) {

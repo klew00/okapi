@@ -97,7 +97,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	private EventBuilder eventBuilder;
 	private RawDocument currentRawDocument;
 	private ExtractionRuleState ruleState;
-	@SubFilter()
+	@SubFilter() // make this IFilter a subfilter 
 	private IFilter cdataSubfilter;
 	
 	static {
@@ -365,7 +365,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		// This optimizes memory at the expense of performance
 		nodeIterator = document.iterator();
 
-		// initialize sub-filter
+		// initialize cdata sub-filter
 		TaggedFilterConfiguration config = getConfig(); 
 		if (config != null && config.getGlobalCDATASubfilter() != null) {
 			cdataSubfilter = getFilterConfigurationMapper().createFilter(
@@ -529,6 +529,12 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 			addToDocumentPart(text.toString());
 			return;
 		}
+		
+		if (ruleState.isInlineExcludedState()) {
+			eventBuilder.appendCodeData(text.toString());
+			eventBuilder.appendCodeOuterData(text.toString());
+			return;
+		}
 
 		// check for ignorable whitespace and add it to the skeleton
 		if (text.isWhiteSpace() && !isInsideTextRun()) {
@@ -599,13 +605,33 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders;
 			propertyTextUnitPlaceholders = createPropertyTextUnitPlaceholders(startTag);
-
+			
 			if (!startTag.isSyntacticalEmptyElementTag()) {
 				updateStartTagRuleState(startTag.getName(), ruleType, idValue);
 			}
 			
 			switch (ruleType) {
+			case INLINE_EXCLUDED_ELEMENT:
+				// special code like: "<ph translate='no'>some protected text with </ph>"
+				// where the start tag, text and end tag are all one code
+				if (canStartNewTextUnit()) {
+					startTextUnit();
+				}
+				addCodeToCurrentTextUnit(startTag, false);
+				// addCodeToCurrentTextUnit puts tag in Code.data by default. 
+				// Move data to Code.outerData
+				String d = eventBuilder.getCurrentCode().getData();
+				eventBuilder.getCurrentCode().setData("");
+				eventBuilder.getCurrentCode().setOuterData(d);
+				break;
 			case INLINE_ELEMENT:
+				// check to see if we are inside a inline run that is excluded 
+				if (ruleState.isInlineExcludedState()) {
+					eventBuilder.appendCodeOuterData(startTag.toString());
+					eventBuilder.appendCodeData(startTag.toString());
+					break;
+				}
+				
 				if (canStartNewTextUnit()) {
 					startTextUnit();
 				}
@@ -653,7 +679,9 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	}
 
 	protected void updateStartTagRuleState(String tag, RULE_TYPE ruleType, String idValue) {
-		switch (getConfig().getElementRuleType(tag)) {		
+		RULE_TYPE r = getConfig().getElementRuleType(tag);
+		switch (r) {	
+		case INLINE_EXCLUDED_ELEMENT:
 		case INLINE_ELEMENT:
 			ruleState.pushInlineRule(tag, ruleType);
 			break;
@@ -689,6 +717,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		RuleType currentState = null;
 
 		switch (ruleType) {
+		case INLINE_EXCLUDED_ELEMENT:
 		case INLINE_ELEMENT:
 			currentState = ruleState.popInlineRule();
 			ruleType = currentState.ruleType;
@@ -783,11 +812,21 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 			updateEndTagRuleState(endTag);
 			return;
 		}
-
+		
 		ruleType = updateEndTagRuleState(endTag);
 
 		switch (ruleType) {
+		case INLINE_EXCLUDED_ELEMENT:
+			eventBuilder.endCode(endTag.toString());
+			break;
 		case INLINE_ELEMENT:
+			// check to see if we are inside a inline run that is excluded 
+			if (ruleState.isInlineExcludedState()) {
+				eventBuilder.appendCodeOuterData(endTag.toString());
+				eventBuilder.appendCodeData(endTag.toString());
+				break;
+			}
+			
 			if (canStartNewTextUnit()) {
 				startTextUnit();
 			}
@@ -852,6 +891,20 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 *            - the Jericho {@link Tag} that is converted to a Okpai {@link Code}
 	 */
 	protected void addCodeToCurrentTextUnit(Tag tag) {
+		addCodeToCurrentTextUnit(tag, true);
+	}
+	
+	
+	/**
+	 * Add an {@link Code} to the current {@link TextUnit}. Throws an exception if there is no current {@link TextUnit}.
+	 * 
+	 * @param tag
+	 *            - the Jericho {@link Tag} that is converted to a Okpai {@link Code}
+	 * @param endCodeNow 
+	 *            - do we end the code now or delay so we can add more content to the code?  
+	 * 				
+	 */
+	protected void addCodeToCurrentTextUnit(Tag tag, boolean endCodeNow) {
 		List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders;
 		String literalTag = tag.toString();
 		TextFragment.TagType codeType;
@@ -865,7 +918,11 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 			if (startTag.isSyntacticalEmptyElementTag()) {
 				codeType = TextFragment.TagType.PLACEHOLDER;
 			} else if (startTag.isEndTagRequired()) {
-				codeType = TextFragment.TagType.OPENING;
+				if (ruleState.isInlineExcludedState()) {
+					codeType = TextFragment.TagType.PLACEHOLDER;
+				} else {
+					codeType = TextFragment.TagType.OPENING;
+				}
 			} else {
 				codeType = TextFragment.TagType.PLACEHOLDER;
 			}
@@ -878,11 +935,13 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 			propertyTextUnitPlaceholders = createPropertyTextUnitPlaceholders(startTag);
 			if (propertyTextUnitPlaceholders != null && !propertyTextUnitPlaceholders.isEmpty()) {
 				// add code and process actionable attributes
-				addToTextUnit(new Code(codeType, getConfig().getElementType(tag), literalTag),
+				addToTextUnit(new Code(codeType, getConfig().getElementType(tag), literalTag), 
+						endCodeNow,
 						propertyTextUnitPlaceholders);
 			} else {
 				// no actionable attributes, just add the code as-is
-				addToTextUnit(new Code(codeType, getConfig().getElementType(tag), literalTag));
+				addToTextUnit(new Code(codeType, getConfig().getElementType(tag), literalTag), 
+						endCodeNow);
 			}
 		} else { // end or unknown tag
 			if (tag.getTagType() == EndTagType.NORMAL
@@ -1040,6 +1099,10 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	protected void setTextUnitType(String type) {
 		eventBuilder.setTextUnitType(type);
 	}
+	
+	protected void setTextUnitTranslatable(boolean translatable) {
+		eventBuilder.setTextUnitTranslatable(translatable);
+	}
 
 	protected boolean canStartNewTextUnit() {
 		return eventBuilder.canStartNewTextUnit();
@@ -1049,13 +1112,22 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		return eventBuilder.isInsideTextRun();
 	}
 
+	protected void addToTextUnit(Code code, boolean endCodeNow) {
+		eventBuilder.addToTextUnit(code, endCodeNow);
+	}
+
 	protected void addToTextUnit(Code code) {
 		eventBuilder.addToTextUnit(code);
 	}
-
+	
+	protected void addToTextUnit(Code code, boolean endCodeNow, 
+			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
+		eventBuilder.addToTextUnit(code, endCodeNow, propertyTextUnitPlaceholders);
+	}
+	
 	protected void addToTextUnit(Code code,
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
-		eventBuilder.addToTextUnit(code, propertyTextUnitPlaceholders);
+		eventBuilder.addToTextUnit(code, true, propertyTextUnitPlaceholders);
 	}
 
 	protected void endDocumentPart() {

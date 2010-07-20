@@ -21,6 +21,7 @@
 package net.sf.okapi.common.filters;
 
 import java.util.Collections;
+import java.util.EmptyStackException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -66,12 +67,12 @@ public class EventBuilder {
 	private IdGenerator documentPartId;
 	
 	private Stack<Event> tempFilterEventStack;
+	private Stack<Code> codeStack;
 	private List<Event> filterEvents;
 	private List<Event> referencableFilterEvents;
 	private boolean done = false;
 	private boolean preserveWhitespace;
 	private GenericSkeleton currentSkeleton;
-	private Code currentCode;
 	private DocumentPart currentDocumentPart;
 	private String rootId;
 	private boolean subFilter;
@@ -360,6 +361,25 @@ public class EventBuilder {
 		}
 		return null;
 	}
+	
+	/**
+	 * Peek at the most recently created {@link StartGroup}.
+	 * 
+	 * @return the filter event
+	 */
+	public Code peekMostRecentCode() {
+		if (codeStack.isEmpty()) {
+			return null;
+		}
+		
+		Code c = null;
+		try {
+			c = codeStack.peek();
+		} catch(EmptyStackException e) {
+			// ignore exception, we return a null value
+		}
+		return c;
+	}
 
 	/**
 	 * Is there an unfinished {@link DocumentPart} (aka skeleton)?
@@ -412,7 +432,7 @@ public class EventBuilder {
 
 		tempFilterEventStack = new Stack<Event>();
 
-		currentCode = null;
+		codeStack = new Stack<Code>();
 		currentSkeleton = null;
 		currentDocumentPart = null;
 	}
@@ -527,8 +547,9 @@ public class EventBuilder {
 
 		// we need to clear out the current Code data as we will append the new
 		// skeleton below
-		if (currentCode != null) {
-			currentCode.setData("");
+		Code c = peekMostRecentCode();
+		if (c != null) {
+			c.setData("");
 		}
 
 		// set the resource that will hold all the references
@@ -584,8 +605,8 @@ public class EventBuilder {
 
 		// setup references based on type
 		if (inlineCode) {
-			if (!textPlaceholdersOnly) {
-				currentCode.appendReference(resource.getId());
+			if (!textPlaceholdersOnly) {				
+				peekMostRecentCode().appendReference(resource.getId());
 				resource.setSkeleton(currentSkeleton);
 				// we needed to create a document part to hold the
 				// writable/localizables
@@ -593,8 +614,8 @@ public class EventBuilder {
 			} else {
 				// all text - the parent TU hold the references instead of a
 				// DocumentPart
-				currentCode.append(currentSkeleton.toString());
-				currentCode.setReferenceFlag(true);
+				peekMostRecentCode().append(currentSkeleton.toString());
+				peekMostRecentCode().setReferenceFlag(true);
 			}
 		}
 
@@ -844,25 +865,45 @@ public class EventBuilder {
 	 * @throws OkapiIllegalFilterOperationException
 	 */
 	public void addToTextUnit(Code code) {
+		addToTextUnit(code, true);
+	}
+
+	/**
+	 * Add a {@link Code} to the current {@link TextUnit}. Nothing is actionable within the tag (i.e., no properties or
+	 * translatable, localizable text)
+	 * 
+	 * @param code
+	 *            the code type
+	 * 
+	 * @param
+	 *            do we end the code now or delay?
+	 * 
+	 * @throws OkapiIllegalFilterOperationException
+	 */
+	public void addToTextUnit(Code code, boolean endCodeNow) {
 		if (!isCurrentTextUnit()) {
 			throw new OkapiIllegalFilterOperationException("Trying to add a Code to a TextUnit that does not exist.");
 		}
 
 		startCode(code);
-		endCode();
+		if (endCodeNow) {
+			endCode();
+		}
 	}
-
+	
 	/**
 	 * Add a {@link Code} to the current {@link TextUnit}. The Code contains actionable (i.e., translatable,
 	 * localizable) attributes.
 	 * 
 	 * @param code
 	 *            the code
+	 * @param
+	 *            do we end the code now or delay?
 	 * @param propertyTextUnitPlaceholders
 	 *            the list of actionable {@link TextUnit} or {@link Properties} with offset information into the tag.
 	 */
-	public void addToTextUnit(Code code, List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
-		addToTextUnit(code, null, propertyTextUnitPlaceholders);
+	public void addToTextUnit(Code code, boolean endCodeNow, List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
+		addToTextUnit(code, endCodeNow, null, propertyTextUnitPlaceholders);
 	}
 
 	/**
@@ -871,13 +912,15 @@ public class EventBuilder {
 	 * 
 	 * @param code
 	 *            the code
+	 * @param
+	 *            do we end the code now or delay?
 	 * @param locale
 	 *            the language of the text
 	 * @param propertyTextUnitPlaceholders
 	 *            the list of actionable {@link TextUnit} or {@link Properties} with offset information into the tag.
 	 * @throws OkapiIllegalFilterOperationException
 	 */
-	public void addToTextUnit(Code code, LocaleId locale, List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
+	public void addToTextUnit(Code code, boolean endCodeNow, LocaleId locale, List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
 
 		if (!isCurrentTextUnit()) {
 			throw new OkapiIllegalFilterOperationException("Trying to add Codes to a TextUnit that does not exist.");
@@ -887,7 +930,9 @@ public class EventBuilder {
 		TextUnit tu = peekMostRecentTextUnit();
 		startCode(code);
 		processAllEmbedded(code.toString(), locale, propertyTextUnitPlaceholders, true, tu);
-		endCode();
+		if (endCodeNow) {
+			endCode();
+		}
 
 		currentSkeleton = null;
 	}
@@ -1020,23 +1065,63 @@ public class EventBuilder {
 	/*
 	 * Create a Code and store it for later processing.
 	 */
-	private void startCode(Code code) {
-		currentCode = code;
+	public void startCode(Code code) {
+		codeStack.push(code);
 	}
 
 	/*
-	 * End the COde and add it to the TextUnit.
+	 * End the Code and add it to the TextUnit.
 	 */
-	private void endCode() {
-		if (currentCode == null) {
+	public void endCode() {
+		Code c = null;
+		
+		try {
+			c = codeStack.pop();
+		} catch (EmptyStackException e) {
 			throw new OkapiIllegalFilterOperationException(
-					"Trying to end a Code that does not exist. Did you call startCode?");
+			"Trying to end a Code that does not exist. Did you call startCode?", e);
 		}
 
 		TextUnit tu = peekMostRecentTextUnit();
 		// We can use the first part as nothing is segment at this point
-		tu.getSource().getFirstContent().append(currentCode);
-		currentCode = null;
+		tu.getSource().getFirstContent().append(c);		
+	}
+	
+	/*
+	 * End the Code and add it to the TextUnit.
+	 * @param tag - the final part of the original native tag 
+	 */
+	public void endCode(String tag) {
+	Code c = null;
+		
+		try {
+			c = codeStack.pop();
+		} catch (EmptyStackException e) {
+			throw new OkapiIllegalFilterOperationException(
+			"Trying to end a Code that does not exist. Did you call startCode?", e);
+		}
+
+		c.appendOuterData(tag);
+		TextUnit tu = peekMostRecentTextUnit();
+		// We can use the first part as nothing is segment at this point
+		tu.getSource().getFirstContent().append(c);	}
+	
+	/**
+	 * append to the current {@link Code}'s outerData
+	 * @param outerData
+	 */
+	public void appendCodeOuterData(String outerData) {
+		Code c = peekMostRecentCode();
+		c.appendOuterData(outerData);
+	}
+	
+	/**
+	 * append to the current {@link Code}'s data
+	 * @param data
+	 */
+	public void appendCodeData(String data) {
+		Code c = peekMostRecentCode();
+		c.append(data);
 	}
 
 	// ////////////////////////////////////////////////////////////////////////
@@ -1189,6 +1274,14 @@ public class EventBuilder {
 	public long getTextUnitId() {
 		return textUnitId.getSequence();
 	}
+	
+	/**
+	 * Get the current {@link Code}. COuld be null.
+	 * @return the {@link Code}
+	 */
+	public Code getCurrentCode() {
+		return peekMostRecentCode();
+	}
 
 	/**
 	 * Set the current textUnitId. Note that using this method overrides the built-in id creation algorithm. Useful for
@@ -1226,6 +1319,19 @@ public class EventBuilder {
 		TextUnit tu = peekMostRecentTextUnit();
 		if (tu != null) {
 			tu.setType(type);
+		}
+	}
+	
+	/**
+	 * Set the current {@link TextUnit} translatable flag. 
+	 * 
+	 * @param translatable
+	 *            - the TextUnit translatable flag.
+	 */
+	public void setTextUnitTranslatable(boolean translatable) {
+		TextUnit tu = peekMostRecentTextUnit();
+		if (tu != null) {
+			tu.setIsTranslatable(translatable);
 		}
 	}
 

@@ -48,7 +48,8 @@ public class ExtractionRuleState {
 		public RuleType(String ruleName, RULE_TYPE ruleType, String idValue) {
 			this.ruleName = ruleName;
 			this.ruleType = ruleType;
-			this.idValue = idValue;			
+			this.idValue = idValue;	
+			this.ruleApplies = true;
 		}
 		
 		public RuleType(String ruleName, RULE_TYPE ruleType, boolean ruleApplies) {
@@ -113,6 +114,19 @@ public class ExtractionRuleState {
 		return false;
 	}
 
+	public boolean isInlineExcludedState() {
+		if (inlineRuleStack.isEmpty()) {
+			return false;
+		}
+
+		for (RuleType rt : inlineRuleStack) {
+			if (rt.ruleType == RULE_TYPE.INLINE_EXCLUDED_ELEMENT) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public boolean isPreserveWhitespaceState() {
 		if (preserveWhiteSpaceRuleStack.isEmpty()) {
 			return false;
@@ -207,7 +221,7 @@ public class ExtractionRuleState {
 	public RuleType peekInlineRule() {		
 		return inlineRuleStack.peek();
 	}
-
+	
 	public void clearTextUnitRules() {
 		textUnitRuleStack.clear();
 	}
@@ -215,7 +229,7 @@ public class ExtractionRuleState {
 	public void clearInlineRules() {
 		inlineRuleStack.clear();
 	}
-	
+		
 	public String getTextUnitElementName() {
 		String n = "";
 		try {

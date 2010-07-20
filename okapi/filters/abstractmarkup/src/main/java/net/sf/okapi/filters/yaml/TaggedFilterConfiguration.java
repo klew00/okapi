@@ -109,31 +109,36 @@ public class TaggedFilterConfiguration {
 	public static final Object DEFAULT_CONDITION = "default";
 
 	/**
-	 * {@link AbstractMarkupFilter} rule types. These rules are listed in YAML configuration files 
-	 * and interpreted by the {@link TaggedFilterConfiguration} class. 
+	 * {@link AbstractMarkupFilter} rule types. These rules are listed in YAML configuration files and interpreted by
+	 * the {@link TaggedFilterConfiguration} class.
+	 * 
 	 * @author HargraveJE
-	 *
+	 * 
 	 */
 	public static enum RULE_TYPE {
 		/**
 		 * Tag that exists inside a text run, i.e., bold, underline etc..
 		 */
-		INLINE_ELEMENT, 
+		INLINE_ELEMENT,
 		/**
-		 * Marks the beginning of an excluded block - 
-		 * all content in this block will be filtered as {@link DocumentPart}s
+		 * Tag that exists inside a text run, i.e., bold, underline etc.. but has been excluded based on another
+		 * conditional rule. Treat as a standalone inline code
 		 */
-		EXCLUDED_ELEMENT, 
+		INLINE_EXCLUDED_ELEMENT,
 		/**
-		 * Used inside EXCLUDED_ELEMENTs to mark exceptions to 
-		 * the excluded rule. Anything marked as INCLUDED_ELEMENT will be filtered normally 
-		 * (i.e, not excluded)   
+		 * Marks the beginning of an excluded block - all content in this block will be filtered as {@link DocumentPart}
+		 * s
 		 */
-		INCLUDED_ELEMENT, 
+		EXCLUDED_ELEMENT,
+		/**
+		 * Used inside EXCLUDED_ELEMENTs to mark exceptions to the excluded rule. Anything marked as INCLUDED_ELEMENT
+		 * will be filtered normally (i.e, not excluded)
+		 */
+		INCLUDED_ELEMENT,
 		/**
 		 * Marks a tag that is converted to an Okapi Group resource.
 		 */
-		GROUP_ELEMENT, 
+		GROUP_ELEMENT,
 		/**
 		 * Marks a tag that is converted to an Okapi TextUnit resource.
 		 */
@@ -157,7 +162,7 @@ public class TaggedFilterConfiguration {
 		/**
 		 * Marks a tag that begins or ends a server side content (SSI)
 		 */
-		SERVER_ELEMENT, 
+		SERVER_ELEMENT,
 		/**
 		 * Attribute rule that defines the attribute as translatable.
 		 */
@@ -165,7 +170,7 @@ public class TaggedFilterConfiguration {
 		/**
 		 * Attribute rule that defines the attribute as writable (or localizable).
 		 */
-		ATTRIBUTE_WRITABLE, 
+		ATTRIBUTE_WRITABLE,
 		/**
 		 * Attribute rule that defines the attribute as read-only.
 		 */
@@ -177,15 +182,15 @@ public class TaggedFilterConfiguration {
 		/**
 		 * Element rule specifies a tag where only the attributes require processing.
 		 */
-		ATTRIBUTES_ONLY, 
+		ATTRIBUTES_ONLY,
 		/**
 		 * Attribute rule that specifies the attribyte has an ID.
 		 */
-		ATTRIBUTE_ID, 
+		ATTRIBUTE_ID,
 		/**
 		 * Rule was found but some condition of the rule failed
 		 */
-		RULE_FAILED, 
+		RULE_FAILED,
 		/**
 		 * Rule was not found - default rule.
 		 */
@@ -269,7 +274,7 @@ public class TaggedFilterConfiguration {
 	public boolean isRuleType(String ruleName, RULE_TYPE ruleType) {
 		List<Map> rules = configReader.getRules(ruleName.toLowerCase());
 		for (Map rule : rules) {
-			List<String> ruleTypes = (List<String>)rule.get("ruleTypes");
+			List<String> ruleTypes = (List<String>) rule.get("ruleTypes");
 			for (String r : ruleTypes) {
 				if (convertRuleAsStringToRuleType(r).equals(ruleType)) {
 					return true;
@@ -318,7 +323,7 @@ public class TaggedFilterConfiguration {
 		}
 
 		// check attribute rules (including regex)
-		return findMatchingElementOnAttributeRule(tag, attribute, attributes, 
+		return findMatchingElementOnAttributeRule(tag, attribute, attributes,
 				getAttributeRuleType(attribute.toLowerCase()));
 	}
 
@@ -332,10 +337,10 @@ public class TaggedFilterConfiguration {
 		if (elementRule == null) {
 			return RULE_TYPE.RULE_NOT_FOUND;
 		}
-		
+
 		// test for a conditional rule on this element
 		if (!doesElementRuleConditionApply(elementRule, attributes)) {
-			return RULE_TYPE.RULE_FAILED; 
+			return RULE_TYPE.RULE_FAILED;
 		}
 
 		// these attribute rules are mutually exclusive
@@ -397,15 +402,17 @@ public class TaggedFilterConfiguration {
 		return RULE_TYPE.RULE_NOT_FOUND;
 	}
 
-	public RULE_TYPE getConditionalAttributeRuleType(String attribute, Map<String, String> attributes) {
+	public RULE_TYPE getConditionalAttributeRuleType(String attribute,
+			Map<String, String> attributes) {
 		RULE_TYPE type = getAttributeRuleType(attribute);
 		if (type != RULE_TYPE.RULE_NOT_FOUND) {
-			if (doesAttributeRuleConditionApply(configReader.getAttributeRule(attribute), attributes)) {
+			if (doesAttributeRuleConditionApply(configReader.getAttributeRule(attribute),
+					attributes)) {
 				return type;
 			} else {
 				return RULE_TYPE.RULE_FAILED;
 			}
-		}		
+		}
 		return type;
 	}
 
@@ -435,9 +442,8 @@ public class TaggedFilterConfiguration {
 	 * @return
 	 */
 	@SuppressWarnings("rawtypes")
-	private RULE_TYPE findMatchingElementOnAttributeRule(String tag, String attribute, 
-			Map<String, String> attributes,
-			RULE_TYPE ruleType) {
+	private RULE_TYPE findMatchingElementOnAttributeRule(String tag, String attribute,
+			Map<String, String> attributes, RULE_TYPE ruleType) {
 		List excludedElements;
 		List onlyTheseElements;
 		Map attrRule = configReader.getAttributeRule(attribute.toLowerCase());
@@ -445,10 +451,10 @@ public class TaggedFilterConfiguration {
 		if (attrRule == null) {
 			return RULE_TYPE.RULE_NOT_FOUND;
 		}
-		
+
 		// test for a conditional rule on this attribute
 		if (!doesAttributeRuleConditionApply(attrRule, attributes)) {
-			return RULE_TYPE.RULE_FAILED; 
+			return RULE_TYPE.RULE_FAILED;
 		}
 
 		excludedElements = (List) attrRule.get(ALL_ELEMENTS_EXCEPT);
@@ -484,21 +490,31 @@ public class TaggedFilterConfiguration {
 	}
 
 	public RULE_TYPE getConditionalElementRuleType(String tag, Map<String, String> attributes) {
-		RULE_TYPE type = getElementRuleType(tag);
+		RULE_TYPE type = getElementRuleType(tag.toLowerCase());
 		if (type != RULE_TYPE.RULE_NOT_FOUND) {
+			
+			if (type == RULE_TYPE.INLINE_EXCLUDED_ELEMENT) {
+				if (doesElementRuleConditionApply(configReader.getElementRule(tag), attributes) &&
+						doesElementRuleConditionApply(configReader.getRegexElementRule(tag), attributes)) {
+					return RULE_TYPE.INLINE_EXCLUDED_ELEMENT;
+				} else {
+					return RULE_TYPE.INLINE_ELEMENT;
+				}
+			}
+			
 			if (doesElementRuleConditionApply(configReader.getElementRule(tag), attributes)) {
 				return type;
 			} else {
 				return RULE_TYPE.RULE_FAILED;
 			}
-		}		
+		}
 		return type;
 	}
-	
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public RULE_TYPE getElementRuleType(String tag) {
 		Map rule = configReader.getElementRule(tag.toLowerCase());
-		if (rule != null) {			
+		if (rule != null) {
 			List<String> ruleTypes = (List<String>) rule.get("ruleTypes");
 			// ORDER is important!!! These are matched in priority order
 			if (isRuleType(tag, RULE_TYPE.EXCLUDED_ELEMENT, ruleTypes)) {
@@ -508,6 +524,14 @@ public class TaggedFilterConfiguration {
 			} else if (isRuleType(tag, RULE_TYPE.INCLUDED_ELEMENT, ruleTypes)) {
 				return RULE_TYPE.INCLUDED_ELEMENT;
 			} else if (isRuleType(tag, RULE_TYPE.INLINE_ELEMENT, ruleTypes)) {
+				// handle case where inline is excluded by a more general rule
+				Map r = configReader.getRegexElementRule(tag.toLowerCase());
+				if (r != null) {
+					List<String> rt = (List<String>) r.get("ruleTypes");
+					if (isRuleType(tag, RULE_TYPE.EXCLUDED_ELEMENT, rt)) {
+						return RULE_TYPE.INLINE_EXCLUDED_ELEMENT;
+					}
+				}
 				return RULE_TYPE.INLINE_ELEMENT;
 			} else if (isRuleType(tag, RULE_TYPE.SCRIPT_ELEMENT, ruleTypes)) {
 				return RULE_TYPE.SCRIPT_ELEMENT;
@@ -638,8 +662,8 @@ public class TaggedFilterConfiguration {
 			return applyCondition(attributes.get(conditionalAttribute.toLowerCase()), compareType,
 					conditionValue);
 		} else {
-			throw new RuntimeException("Error reading conditions. " +
-					"Have you quoted values such as 'true', 'false', 'yes', and 'no'?");
+			throw new RuntimeException("Error reading conditions. "
+					+ "Have you quoted values such as 'true', 'false', 'yes', and 'no'?");
 		}
 
 		return false;
@@ -667,53 +691,54 @@ public class TaggedFilterConfiguration {
 
 	@SuppressWarnings("rawtypes")
 	private boolean doesElementRuleConditionApply(Map elementRule, Map<String, String> attributes) {
-		List conditions = (List)elementRule.get(CONDITIONS);
+		List conditions = (List) elementRule.get(CONDITIONS);
 		if (conditions != null) {
 			return applyConditions(conditions, attributes);
 		}
-		
+
 		return true;
 	}
-	
+
 	@SuppressWarnings("rawtypes")
-	private boolean doesAttributeRuleConditionApply(Map attributeRule, Map<String, String> attributes) {
-		List conditions = (List)attributeRule.get(CONDITIONS);
+	private boolean doesAttributeRuleConditionApply(Map attributeRule,
+			Map<String, String> attributes) {
+		List conditions = (List) attributeRule.get(CONDITIONS);
 		if (conditions != null) {
 			return applyConditions(conditions, attributes);
 		}
-		
+
 		return true;
 	}
-	
+
 	@SuppressWarnings("rawtypes")
 	public boolean isPreserveWhitespaceCondition(String attribute, Map<String, String> attributes) {
 		Map attributeRule = configReader.getAttributeRule(attribute);
 		if (doesAttributeRuleConditionApply(attributeRule, attributes)) {
-			List preserveWhiteSpace = (List)attributeRule.get(PRESERVE_CONDITION);
+			List preserveWhiteSpace = (List) attributeRule.get(PRESERVE_CONDITION);
 			if (preserveWhiteSpace != null) {
 				return applyConditions(preserveWhiteSpace, attributes);
 			}
-		}		
+		}
 		return false;
-	}	
-	
+	}
+
 	@SuppressWarnings("rawtypes")
 	public boolean isDefaultWhitespaceCondition(String attribute, Map<String, String> attributes) {
 		Map attributeRule = configReader.getAttributeRule(attribute);
 		if (doesAttributeRuleConditionApply(attributeRule, attributes)) {
-			List defaultWhiteSpace = (List)attributeRule.get(DEFAULT_CONDITION);
+			List defaultWhiteSpace = (List) attributeRule.get(DEFAULT_CONDITION);
 			if (defaultWhiteSpace != null) {
 				return applyConditions(defaultWhiteSpace, attributes);
 			}
-		}		
+		}
 		return false;
 	}
-	
-	public Map<String, Object> getAttributeRules () {
+
+	public Map<String, Object> getAttributeRules() {
 		return configReader.getAttributeRules();
 	}
 
-	public Map<String, Object> getElementRules () {
+	public Map<String, Object> getElementRules() {
 		return configReader.getElementRules();
 	}
 }

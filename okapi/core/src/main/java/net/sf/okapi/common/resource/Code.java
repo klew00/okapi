@@ -42,6 +42,8 @@ public class Code {
 	public static final String TYPE_XML_PROCESSING_INSTRUCTION = "processing-instruction";
 	public static final String TYPE_REFERENCE = "ref";
 	
+	private static final int DATA_DEFAULT_SIZE = 20;
+	
 	/** Initial capacity for creating annotations maps.
 	 * Keeping it small to save space.
 	 */
@@ -65,8 +67,8 @@ public class Code {
 	protected TagType tagType;
 	protected int id;
 	protected String type;
-	protected String data;
-	protected String outerData;
+	protected StringBuilder data;
+	protected StringBuilder outerData;
 	protected int flag;
 	protected LinkedHashMap<String, InlineAnnotation> annotations;
 
@@ -164,7 +166,13 @@ public class Code {
 				Code code = new Code(TagType.valueOf(tmpFields[0]), tmpFields[2], tmpFields[3]);
 				code.id = Integer.valueOf(tmpFields[1]);
 				code.flag = Integer.valueOf(tmpFields[4]);
-				if ( !tmpFields[5].equals("null") ) code.outerData = tmpFields[5];
+				if ( !tmpFields[5].equals("null") ) {
+					if (code.outerData == null) {
+						code.outerData = new StringBuilder(DATA_DEFAULT_SIZE);
+					}
+					code.outerData.setLength(0);
+					code.outerData.append(tmpFields[5]);
+				}
 				if ( tmpFields.length > 6 ) {
 					code.annotations = stringToAnnotations(tmpFields[6]);
 				}
@@ -212,11 +220,31 @@ public class Code {
 		// Never let the type to be null
 		if ( type == null ) this.type = "null";
 		else this.type = type;
+		
+		// initialize data
+		this.data = new StringBuilder(DATA_DEFAULT_SIZE);		
+	
 		// Use "" for null data
-		if ( data == null ) this.data = "";
-		this.data = data;
+		if (data == null) {
+			data =  "";
+		}
+		this.data.append(data);
 	}
-
+	
+	/**
+	 * Creates a new code. By default codes can be both deleted and cloned.
+	 * @param tagType the tag type.
+	 * @param type the type of code (e.g. the name of the tag). The type must be
+	 * exactly the same between the opening and closing codes.
+	 * @param data the content of the code.
+	 */
+	private Code (TagType tagType,
+		String type,
+		StringBuilder data)
+	{
+		this(tagType, type, data.toString());
+	}
+	
 	/**
 	 * Creates a new code with empty data.
 	 * @param tagType the tag type.
@@ -240,9 +268,19 @@ public class Code {
 	 * Appends data to the current code data
 	 * @param data the data to append.
 	 */
-	public void append (String data) {
-		// TODO: Make this.data a StringBuilder for speed? But this method is probably not used often
-		this.data += data;
+	public void append (String data) {		
+		this.data.append(data);
+	}
+	
+	/**
+	 * Appends data to the current code outerData
+	 * @param outerData the data to append.
+	 */
+	public void appendOuterData(String outerData) {		
+		if (this.outerData == null) {
+			this.outerData = new StringBuilder(DATA_DEFAULT_SIZE);
+		}
+		this.outerData.append(outerData);
 	}
 	
 	/**
@@ -250,7 +288,7 @@ public class Code {
 	 * @param id the identifier of the referent resource.
 	 */
 	public void appendReference (String id) {
-		this.data += TextFragment.makeRefMarker(id);
+		this.data.append(TextFragment.makeRefMarker(id));
 		setReferenceFlag(true);
 	}
 	
@@ -262,7 +300,7 @@ public class Code {
 	public void appendReference (String id,
 		String propertyName)
 	{
-		this.data += TextFragment.makeRefMarker(id, propertyName);
+		this.data.append(TextFragment.makeRefMarker(id, propertyName));
 		setReferenceFlag(true);
 	}
 	
@@ -272,7 +310,7 @@ public class Code {
 	 */
 	@Override
 	public String toString () {
-		return data;
+		return data.toString();
 	}
 
 	/**
@@ -365,7 +403,7 @@ public class Code {
 	 * @return the raw data of the code.
 	 */
 	public String getData () {
-		return data;
+		return data.toString();
 	}
 	
 	/**
@@ -373,7 +411,8 @@ public class Code {
 	 * @param value the new raw data of the code.
 	 */
 	public void setData (String value) {
-		data = value;
+		data.setLength(0);
+		data.append(value);
 	}
 	
 	/**
@@ -422,7 +461,11 @@ public class Code {
 	 * @param value the data to set (can be null).
 	 */
 	public void setOuterData (String value) {
-		outerData = value;
+		if (this.outerData == null) {
+			this.outerData = new StringBuilder(DATA_DEFAULT_SIZE);
+		}
+		outerData.setLength(0);
+		outerData.append(value);
 	}
 	
 	/**
@@ -431,8 +474,8 @@ public class Code {
 	 * @return the outer data or, if there is none, the inner data.
 	 */
 	public String getOuterData () {
-		if ( outerData != null ) return outerData;
-		else return data; // Returns data if no outer-data is set
+		if ( outerData != null ) return outerData.toString();
+		else return data.toString(); // Returns data if no outer-data is set
 	}
 
 	/**

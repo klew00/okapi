@@ -1033,7 +1033,7 @@ public class TextContainerTest {
 	public void testCompareTo_TwoOnTwoDifferenceInCodes () {
 		TextContainer tc1 = createMultiSegmentContentWithCodes();
 		TextContainer tc2 = createMultiSegmentContentWithCodes();
-		tc2.get(0).getContent().getCode(0).data = "<XYZ/>";
+		tc2.get(0).getContent().getCode(0).data = new StringBuilder("<XYZ/>");
 		assertFalse(0==tc1.compareTo(tc2, true)); // Code sensitive
 		assertTrue(0==tc1.compareTo(tc2, false));
 	}
