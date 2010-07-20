@@ -384,6 +384,22 @@ public class XmlSnippetsTest {
 	}
 	
 	@Test
+	public void testInlineAndExcludeWithTwoExcludes() {
+		URL originalParameters = parameters;
+		parameters = XmlSnippetsTest.class.getResource("dita.yml");
+		String snippet = "this is text with <ph translate=\"no\">inline</ph> exclusions <ph translate=\"no\">inline2</ph>";
+		TextUnit tu = FilterTestDriver.getTextUnit(XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters), 1);
+		assertEquals("<ph translate=\"no\">inline</ph>", tu.getSource().getFirstContent().getCode(0).getOuterData());
+		assertEquals("inline", tu.getSource().getFirstContent().getCode(0).getData());
+		assertEquals("<ph translate=\"no\">inline2</ph>", tu.getSource().getFirstContent().getCode(1).getOuterData());
+		assertEquals("inline2", tu.getSource().getFirstContent().getCode(1).getData());
+		assertEquals(snippet, XmlStreamTestUtils.generateOutput(
+				XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters), snippet, locEN,
+				xmlStreamFilter));
+		parameters = originalParameters;
+	}
+	
+	@Test
 	public void testInlineAndNotExclude() {
 		URL originalParameters = parameters;
 		parameters = XmlSnippetsTest.class.getResource("dita.yml");
