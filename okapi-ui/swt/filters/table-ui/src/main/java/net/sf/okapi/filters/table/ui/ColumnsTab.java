@@ -444,6 +444,7 @@ public class ColumnsTab extends Composite implements IDialogPage {
 			net.sf.okapi.filters.table.base.Parameters params =
 				(net.sf.okapi.filters.table.base.Parameters) data;
 		
+			params.reset();
 			params.numColumns = num.getSelection();
 		
 			// -----------------

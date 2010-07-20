@@ -294,6 +294,8 @@ public class BaseTableFilter extends BasePlainTextFilter {
 		// Send only listed cells (id, source, target, comment)
 		else if (sendListedMode) {
 							
+			String recordId = "";
+			
 			// Add content of other columns to the created sources
 			for (int i = 0; i < cells.size(); i++)	{
 				
@@ -305,6 +307,9 @@ public class BaseTableFilter extends BasePlainTextFilter {
 				String trimmedCell = TextUnitUtil.getSourceText(temp);
 				
 				int colNumber = i + 1;
+				
+				if (isRecordId(colNumber))
+					recordId = trimmedCell;
 				
 				if (isSourceId(colNumber)) {
 					
@@ -346,7 +351,7 @@ public class BaseTableFilter extends BasePlainTextFilter {
 				if (isSource(colNumber)) {
 					
 					if (cell == null) continue;
-
+					
 					cell.setSourceProperty(new Property(AbstractLineFilter.LINE_NUMBER, String.valueOf(lineNum), true));				
 					cell.setSourceProperty(new Property(COLUMN_NUMBER, String.valueOf(colNumber), true));
 					cell.setSourceProperty(new Property(ROW_NUMBER, String.valueOf(rowNumber), true));  // rowNumber = 0 for header rows
@@ -493,6 +498,8 @@ public class BaseTableFilter extends BasePlainTextFilter {
 					
 					if (cell == null) continue;
 
+					if (Util.isEmpty(cell.getName()) && sendListedMode && !Util.isEmpty(recordId))
+						cell.setName(recordId + getSuffix(colNumber));
 //					if (sendAsSource(cell) != TextProcessingResult.ACCEPTED) {
 //						
 //						sendAsSkeleton(cell);
@@ -593,6 +600,7 @@ public class BaseTableFilter extends BasePlainTextFilter {
 	private boolean isSourceId(int colNumber) {return (sourceIdColumns == null) ? null : sourceIdColumns.contains(colNumber);}	
 	private boolean isTarget(int colNumber) {return (targetColumns == null) ? null : targetColumns.contains(colNumber);}
 	private boolean isComment(int colNumber) {return (commentColumns == null) ? null : commentColumns.contains(colNumber);}	
+	private boolean isRecordId(int colNumber) {return params.recordIdColumn > 0 && colNumber == params.recordIdColumn;}
 
 	private TextUnit getSource(List<TextUnit> cells, int colNum, List<Integer> columnsList, List<Integer> refList) {
 		
@@ -643,6 +651,15 @@ public class BaseTableFilter extends BasePlainTextFilter {
 		
 		if (sourceIdColumns == null) return "";		
 		int index = sourceIdColumns.indexOf(colNum);
+		
+		if (!Util.checkIndex(index, sourceIdSuffixes)) return "";
+		return sourceIdSuffixes.get(index);
+	}
+	
+	private String getSuffix(int colNum) {
+		
+		if (sourceColumns == null) return "";		
+		int index = sourceColumns.indexOf(colNum);
 		
 		if (!Util.checkIndex(index, sourceIdSuffixes)) return "";
 		return sourceIdSuffixes.get(index);

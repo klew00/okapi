@@ -213,7 +213,7 @@ public class CommaSeparatedValuesFilterTest {
 		testEvent(EventType.END_GROUP, null);
 		
 		testEvent(EventType.END_DOCUMENT, null);
-				filter.close();
+		filter.close();
 		
 	}
 	
@@ -1660,6 +1660,131 @@ public class CommaSeparatedValuesFilterTest {
 		
 		RoundTripComparison rtc = new RoundTripComparison();
 		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, locFR));
+	}
+	
+	@Test
+	public void testRecordId() {
+		IParameters params = filter.getParameters();
+		try {
+			String st = "file:" + getFullFileName("okf_table@record_id.fprm");
+			params.load(new URI(st), false);
+		} catch (URISyntaxException e) {
+		}
+		
+		InputStream input = TableFilterTest.class.getResourceAsStream("/csv_testd.txt");
+		assertNotNull(input);
+		
+		filter.open(new RawDocument(input, "UTF-8", locEN));
+		testEvent(EventType.START_DOCUMENT, null);		
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "source1 row1", "00001_src1", "target1 row1", locEN, null);
+		testEvent(EventType.TEXT_UNIT, "source2 row1", "00001_src2", "target2 row1", locEN, null);
+		testEvent(EventType.DOCUMENT_PART, "00001, [#$$self$], [#$$self$], [#$$self$], [#$$self$]");
+		testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "source1 row2", "00002_src1", "target1 row2", locEN, null);
+		testEvent(EventType.TEXT_UNIT, "source2 row2", "00002_src2", "target2 row2", locEN, null);
+		testEvent(EventType.DOCUMENT_PART, "00002, [#$$self$], [#$$self$], [#$$self$], [#$$self$]");
+		testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "source1 row3", "00003_src1", "target1 row3", locEN, null);
+		testEvent(EventType.TEXT_UNIT, "source2 row3", "00003_src2", "target2 row3", locEN, null);
+		testEvent(EventType.DOCUMENT_PART, "00003, [#$$self$], [#$$self$], [#$$self$], [#$$self$]");
+		testEvent(EventType.END_GROUP, null);
+		filter.close();
+	}
+	
+	@Test
+	public void testSourceId() {
+		IParameters params = filter.getParameters();
+		try {
+			String st = "file:" + getFullFileName("okf_table@source_id.fprm");
+			params.load(new URI(st), false);
+		} catch (URISyntaxException e) {
+		}
+		
+		InputStream input = TableFilterTest.class.getResourceAsStream("/csv_teste.txt");
+		assertNotNull(input);
+		
+		filter.open(new RawDocument(input, "UTF-8", locEN));
+		testEvent(EventType.START_DOCUMENT, null);		
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "source1 row1", "source1 ID row1", "target1 row1", locEN, null);
+		testEvent(EventType.TEXT_UNIT, "source2 row1", "source2 ID row1", "target2 row1", locEN, null);
+		testEvent(EventType.DOCUMENT_PART, "[#$$self$], [#$$self$], [#$$self$], [#$$self$], source2 ID row1, source1 ID row1");
+		testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "source1 row2", "source1 ID row2", "target1 row2", locEN, null);
+		testEvent(EventType.TEXT_UNIT, "source2 row2", "source2 ID row2", "target2 row2", locEN, null);
+		testEvent(EventType.DOCUMENT_PART, "[#$$self$], [#$$self$], [#$$self$], [#$$self$], source2 ID row2, source1 ID row2");
+		testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "source1 row3", "source1 ID row3", "target1 row3", locEN, null);
+		testEvent(EventType.TEXT_UNIT, "source2 row3", "source2 ID row3", "target2 row3", locEN, null);
+		testEvent(EventType.DOCUMENT_PART, "[#$$self$], [#$$self$], [#$$self$], [#$$self$], source2 ID row3, source1 ID row3");
+		testEvent(EventType.END_GROUP, null);
+		filter.close();
+	}
+	
+	@Test
+	public void testEmptySourceId() {
+		// 1. No suffix
+		IParameters params = filter.getParameters();
+		try {
+			String st = "file:" + getFullFileName("okf_table@record_id2.fprm");
+			params.load(new URI(st), false);
+		} catch (URISyntaxException e) {
+		}
+		
+		InputStream input = TableFilterTest.class.getResourceAsStream("/csv_testf.txt");
+		assertNotNull(input);
+		
+		filter.open(new RawDocument(input, "UTF-8", locEN));
+		testEvent(EventType.START_DOCUMENT, null);		
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "source1 row1", "source1 ID row1", "target1 row1", locEN, null);
+		testEvent(EventType.TEXT_UNIT, "source2 row1", "source2 ID row1", "target2 row1", locEN, null);
+		testEvent(EventType.DOCUMENT_PART, "00001, [#$$self$], [#$$self$], [#$$self$], source1 ID row1, [#$$self$], source2 ID row1");
+		testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "source1 row2", "source1 ID row2", "target1 row2", locEN, null);
+		testEvent(EventType.TEXT_UNIT, "source2 row2", "00002", "target2 row2", locEN, null);
+		testEvent(EventType.DOCUMENT_PART, "00002, [#$$self$], [#$$self$], [#$$self$], source1 ID row2, [#$$self$]");
+		testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "source1 row3", "00003", "target1 row3", locEN, null);
+		testEvent(EventType.TEXT_UNIT, "source2 row3", "source2 ID row3", "target2 row3", locEN, null);
+		testEvent(EventType.DOCUMENT_PART, "00003, [#$$self$], [#$$self$], [#$$self$],, [#$$self$], source2 ID row3");
+		testEvent(EventType.END_GROUP, null);
+		filter.close();
+		
+		// 2. With suffix
+		try {
+			String st = "file:" + getFullFileName("okf_table@record_id3.fprm");
+			params.load(new URI(st), false);
+		} catch (URISyntaxException e) {
+		}
+		input = TableFilterTest.class.getResourceAsStream("/csv_testf.txt");
+		assertNotNull(input);
+		
+		filter.open(new RawDocument(input, "UTF-8", locEN));
+		testEvent(EventType.START_DOCUMENT, null);		
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "source1 row1", "source1 ID row1", "target1 row1", locEN, null);
+		testEvent(EventType.TEXT_UNIT, "source2 row1", "source2 ID row1", "target2 row1", locEN, null);
+		testEvent(EventType.DOCUMENT_PART, "00001, [#$$self$], [#$$self$], [#$$self$], source1 ID row1, [#$$self$], source2 ID row1");
+		testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "source1 row2", "source1 ID row2", "target1 row2", locEN, null);
+		testEvent(EventType.TEXT_UNIT, "source2 row2", "00002_tu2", "target2 row2", locEN, null);
+		testEvent(EventType.DOCUMENT_PART, "00002, [#$$self$], [#$$self$], [#$$self$], source1 ID row2, [#$$self$]");
+		testEvent(EventType.END_GROUP, null);
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "source1 row3", "00003_tu1", "target1 row3", locEN, null);
+		testEvent(EventType.TEXT_UNIT, "source2 row3", "source2 ID row3", "target2 row3", locEN, null);
+		testEvent(EventType.DOCUMENT_PART, "00003, [#$$self$], [#$$self$], [#$$self$],, [#$$self$], source2 ID row3");
+		testEvent(EventType.END_GROUP, null);
+		filter.close();
 	}
 	
 	// Helpers
