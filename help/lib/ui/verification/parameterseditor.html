@@ -76,12 +76,6 @@ least one code different).</p>
 checks <a href="#PatternsTab">the list of patterns</a> that have their expected 
 target set to &quot;<code>&lt;same&gt;</code>&quot;. If the string matches one of those patterns 
 no warning is generated as the target is expected to be the same.</p>
-<p><cite>Warn if there is a code differences between source and target segments</cite> -- Set this option to 
-verify that the target content has the same inline codes as the source content. 
-This function compares the content of the codes between the source and target. 
-Both missing codes (codes in the source but not in the target) and extra codes 
-(codes in the target but not in the source) are indicated. Differences only in 
-the order of the codes do not trigger a warning.</p>
 <p><cite>Warn on doubled words</cite> -- Set this option to flag the target 
 segments where there is a sequential repetition of the same word, for example 
 &quot;is is&quot; in &quot;this is is an example&quot;. The check is not case-sensitive, for example 
@@ -100,6 +94,26 @@ enter 50%: If a source text is 40 characters long and its translation is less
 than 20 characters long, it will be flagged. The length is based on the number 
 of characters without counting the inline codes. This value must be tuned for 
 each source/target language pair.</p>
+<h3><a name="InlineCodesTab"></a>Inline Codes Tab</h3>
+<p><cite>Warn if there is a code differences between source and target segments</cite> -- Set this option to 
+verify that the target content has the same inline codes as the source content. 
+This function compares the content of the codes between the source and target. 
+Both missing codes (codes in the source but not in the target) and extra codes 
+(codes in the target but not in the source) are indicated. A difference only in 
+the order of the codes does not trigger a warning.</p>
+<p><cite><a name="MissingCodesAllowed"></a>Codes allowed to be missing from the 
+target</cite> -- List of the codes that are allowed to be missing in the 
+translation. The strings listed here are codes that are in the source segment 
+and not in its translation, and are allowed to be missing. The list applies to 
+all entries of the input documents. The strings are case-sensitive.</p>
+<p><cite><a name="ExtraCodesAllowed"></a>Codes allowed to be extra in the target</cite> 
+-- List of the codes that are allowed to be extra in the translation. The 
+strings listed here are codes that are in the translation segment but not in its 
+source, and are allowed to be extra. The list applies to all entries of the 
+input documents. The strings are case-sensitive.</p>
+<p>For both lists: Use <cite>Add</cite> to add a new string, <cite>Remove</cite> 
+to remove the selected string from the list, and <cite>Remove All</cite> to 
+clear the list.</p>
 <h3><a name="PatternsTab"></a>Patterns Tab</h3>
 <p><cite>Verify that the following source patterns are translated as expected</cite> 
 -- Set this option to verify that each source pattern defined in the list has 

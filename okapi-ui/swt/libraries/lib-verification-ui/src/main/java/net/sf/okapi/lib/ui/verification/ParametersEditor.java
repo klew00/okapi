@@ -21,7 +21,6 @@
 package net.sf.okapi.lib.ui.verification;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.regex.Pattern;
 
 import net.sf.okapi.common.EditorFor;
@@ -52,7 +51,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
@@ -130,12 +128,9 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Button rdScopeApprovedOnly;
 	private Button rdScopeNotApprovedOnly;
 	private Button btStartLT;
-	
 	private Button chkCodeDifference;
-	private List lbMissingCodesAllowed;
-	private Button btClearMissingCodesAllowed;
-	private List lbExtraCodesAllowed;
-	private Button btClearExtraCodesAllowed;
+	private StringListPanel pnlMissingCodesAllowed;
+	private StringListPanel pnlExtraCodesAllowed;
 	
 	// Flag to indicate the editor is use for step parameters
 	// We default to true because the step cannot set this option
@@ -361,45 +356,20 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		
 		cmpTmp = new Composite(tabs, SWT.NONE);
 		cmpTmp.setLayout(new GridLayout(2, true));
-		cmpTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
+		gdTmp = new GridData(GridData.FILL_BOTH);
+		cmpTmp.setLayoutData(gdTmp);
 
 		chkCodeDifference = new Button(cmpTmp, SWT.CHECK);
 		chkCodeDifference.setText("Warn if there is a code difference between source and target segments");
 		gdTmp = new GridData();
 		gdTmp.horizontalSpan = 2;
 		chkCodeDifference.setLayoutData(gdTmp);
-
-		Label label = new Label(cmpTmp, SWT.NONE);
-		label.setText("Codes allowed to be missing from the target:");
 		
-		label = new Label(cmpTmp, SWT.NONE);
-		label.setText("Codes allowed to be extra in the target:");
-
-		lbMissingCodesAllowed = new List(cmpTmp, SWT.BORDER | SWT.V_SCROLL);
-		gdTmp = new GridData(GridData.FILL_BOTH);
-		lbMissingCodesAllowed.setLayoutData(gdTmp);
+		pnlMissingCodesAllowed = new StringListPanel(cmpTmp, SWT.NONE, "Codes allowed to be missing from the target:");
+		pnlMissingCodesAllowed.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
-		lbExtraCodesAllowed = new List(cmpTmp, SWT.BORDER | SWT.V_SCROLL);
-		gdTmp = new GridData(GridData.FILL_BOTH);
-		lbExtraCodesAllowed.setLayoutData(gdTmp);
-		
-		btClearMissingCodesAllowed = new Button(cmpTmp, SWT.PUSH);
-		btClearMissingCodesAllowed.setText("Clear List of Missing Codes Allowed");
-		btClearMissingCodesAllowed.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		btClearMissingCodesAllowed.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				clearMissingCodesAllowed();
-			};
-		});
-		
-		btClearExtraCodesAllowed = new Button(cmpTmp, SWT.PUSH);
-		btClearExtraCodesAllowed.setText("Clear List of Extra Codes Allowed");
-		btClearExtraCodesAllowed.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		btClearExtraCodesAllowed.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				clearExtraCodesAllowed();
-			};
-		});
+		pnlExtraCodesAllowed = new StringListPanel(cmpTmp, SWT.NONE, "Codes allowed to be extra in the target:");
+		pnlExtraCodesAllowed.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
 		tiTmp = new TabItem(tabs, SWT.NONE);
 		tiTmp.setText("Inline Codes");
@@ -573,7 +543,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			};
 		});
 		
-		label = new Label(cmpTmp, SWT.NONE);
+		Label label = new Label(cmpTmp, SWT.NONE);
 		label.setText("Server URL (e.g. http://localhost:8081/):");
 		edServerURL = new Text(cmpTmp, SWT.BORDER);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
@@ -714,14 +684,6 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		return result;
 	}
 	
-	private void clearMissingCodesAllowed () {
-		lbMissingCodesAllowed.removeAll();
-	}
-
-	private void clearExtraCodesAllowed () {
-		lbExtraCodesAllowed.removeAll();
-	}
-
 	private void startLT () {
 		try {
 			UIUtil.start("http://www.languagetool.org/webstart/web/LanguageTool.jnlp"); //$NON-NLS-1$
@@ -1033,16 +995,9 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		chkCheckCharacters.setSelection(params.getCheckCharacters());
 		edCharset.setText(params.getCharset());
 		edExtraCharsAllowed.setText(params.getExtraCharsAllowed());
-		
-		lbExtraCodesAllowed.removeAll();
-		for ( String code : params.getExtraCodesAllowed() ) {
-			lbExtraCodesAllowed.add(code);
-		}
-		
-		lbMissingCodesAllowed.removeAll();
-		for ( String code : params.getMissingCodesAllowed() ) {
-			lbMissingCodesAllowed.add(code);
-		}
+
+		pnlMissingCodesAllowed.fillList(params.getMissingCodesAllowed());
+		pnlExtraCodesAllowed.fillList(params.getExtraCodesAllowed());
 		
 		setPatternsData(params.getPatterns());
 		updateTargetSameAsSourceWithCodes();
@@ -1148,11 +1103,11 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		
 		java.util.List<String> list = params.getMissingCodesAllowed();
 		list.clear();
-		list.addAll(Arrays.asList(lbMissingCodesAllowed.getItems()));
+		list.addAll(pnlMissingCodesAllowed.getList());
 
 		list = params.getExtraCodesAllowed();
 		list.clear();
-		list.addAll(Arrays.asList(lbExtraCodesAllowed.getItems()));
+		list.addAll(pnlExtraCodesAllowed.getList());
 
 		if ( rdScopeApprovedOnly.getSelection() ) {
 			params.setScope(Parameters.SCOPE_APPROVEDONLY);

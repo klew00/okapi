@@ -93,7 +93,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 	static final int ISSUETYPE_ENABLED = 1;
 	static final int ISSUETYPE_DISABLED = 2;
 	
-	static final int CONTEXTMENU_COUNT = 7;
+	static final int CONTEXTMENU_COUNT = 8;
 	
 	private static final String OPT_BOUNDS = "bounds"; //$NON-NLS-1$
 	private static final String OPT_MAXIMIZED = "maximized"; //$NON-NLS-1$
@@ -525,14 +525,12 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		new MenuItem(contextMenu, SWT.SEPARATOR);
 
 		menuItem = new MenuItem(contextMenu, SWT.PUSH);
-		rm.setCommand(menuItem, "file.adddocument"); //$NON-NLS-1$
+		rm.setCommand(menuItem, "issues.options"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				addDocumentFromUI(null);
+				editOptions();
             }
 		});
-		
-		new MenuItem(contextMenu, SWT.SEPARATOR);
 
 		menuItem = new MenuItem(contextMenu, SWT.PUSH);
 		rm.setCommand(menuItem, "issues.checkall"); //$NON-NLS-1$
@@ -550,6 +548,16 @@ public class QualityCheckEditor implements IQualityCheckEditor {
             }
 		});
 
+		new MenuItem(contextMenu, SWT.SEPARATOR);
+
+		menuItem = new MenuItem(contextMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "file.adddocument"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				addDocumentFromUI(null);
+            }
+		});
+		
 		// Adapter that add extra codes to exception list
 		allowExtraCodesAdapter = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {

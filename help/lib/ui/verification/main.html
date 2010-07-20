@@ -55,6 +55,35 @@ These IDs are alphanumeric, not numeric (e.g. the ID can be
 &quot;tu1&quot; not always &quot;1&quot;). When the IDs happend to be using only numbers, the sort 
 may look strange as &quot;101&quot; comes after &quot;1001&quot; (where you may expect to see 101 to 
 come before 1001).</p>
+<h3>Context Menu</h3>
+<p>You can right-click on an issue listed in the table to obtain a context menu. 
+It offers the following commands:</p>
+<p><cite>Open Document</cite> -- Select this command to open the document where 
+the selected issue is located. This opens the file using whatever program is 
+associated by the system with the type of the input document.</p>
+<p><cite>Open Containing Folder</cite> -- Select this command to open the folder 
+containing the document where the selected issue is located.</p>
+<p><cite>Options</cite> -- Select this command to edit the parameters for the 
+verification.</p>
+<p><cite>Check All</cite> -- Select this command to run the verification on all 
+documents in the session.</p>
+<p><cite>Check Current Document</cite> -- Select this command to run the 
+verification only on the current document.</p>
+<p><cite>Add Document</cite> -- Select this command to add an input document to 
+the session.</p>
+<p>In addition, depending on the issue currently selected you may have 
+additional commands available:</p>
+<p><cite>Allow &quot;&lt;code&gt;&quot; as a Missing Code</cite> -- If the issue indicates one 
+or more codes missing in the target, the menu shows this command for each 
+missing code. Select this command to add the given code to the list of codes 
+that are allowed to be missing from the target segments. You can manage the 
+complete list in the <cite><a href="parameterseditor.html#InlineCodesTab">Quality Check Options</a></cite> dialog.</p>
+<p><cite>Allow &quot;&lt;code&gt;&quot; as an Extra Code</cite> -- If the issue indicates one or 
+more extra codes in the target, the menu shows this command for each extra code. 
+Select this command to add the given code to the list of codes that are allowed 
+to be extra in the target segments. You can manage the complete list in the
+<cite><a href="parameterseditor.html#InlineCodesTab">Quality Check Options</a></cite> 
+dialog.</p>
 <h3>Enabling/Disabling Issues</h3>
 <p>Which issues are displayed in the table is driven by the two list-boxes below 
 the table on the right-hand side:</p>
@@ -79,7 +108,7 @@ that document in the issues currently displayed.</p>
 <h3>Buttons</h3>
 <p><cite>Check All</cite> -- Click this button to run the verification on all 
 documents in the session.</p>
-<p><cite>Check Document</cite> - Click this button to run the verification on 
+<p><cite>Check Document</cite> - Click this button to run the verification only on 
 the current document.</p>
 <p><cite>Settings</cite> -- Click this button to open the <cite>
 <a href="sessionsettings.html">Session Settings</a></cite> 
