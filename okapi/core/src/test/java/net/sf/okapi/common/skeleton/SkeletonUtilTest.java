@@ -24,17 +24,19 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 
 import org.junit.Test;
 
-@SuppressWarnings("unused")
 public class SkeletonUtilTest {
 
 	private static final LocaleId ENUS = new LocaleId("en", "us");
 	private static final LocaleId ESES = new LocaleId("es", "es");
+	private static final LocaleId FRFR = new LocaleId("fr", "fr");
 	
 	@Test
 	public void testParts() {
@@ -246,5 +248,300 @@ public class SkeletonUtilTest {
 		assertFalse(SkeletonUtil.isExtTargetPlaceholder(tu2, p6));
 		assertFalse(SkeletonUtil.isExtValuePlaceholder(tu2, p6));
 		assertTrue(SkeletonUtil.isReference(p6));
+	}
+	
+	@Test
+	public void testGenericSkeletonWriter() {
+		GenericSkeletonWriter writer = new GenericSkeletonWriter();
+		
+		TextUnit tu1 = new TextUnit("tu1");
+		TextUnit tu2 = new TextUnit("tu2");
+		
+		GenericSkeleton skel1;
+		GenericSkeleton skel2;
+		
+		tu1.setSourceContent(new TextFragment("source"));
+		tu1.setTargetContent(ESES, new TextFragment("target"));
+		
+		tu2.setSourceContent(new TextFragment("source2"));
+		tu2.setTargetContent(ESES, new TextFragment("target2"));
+		
+		tu1.setProperty(new Property("res_prop", "res_prop_value"));
+		tu1.setSourceProperty(new Property("src_prop", "src_prop_value"));
+		tu1.setTargetProperty(ESES, new Property("trg_prop", "trg_prop_value"));
+		
+		tu2.setProperty(new Property("res_prop", "res_prop_value2"));
+		tu2.setSourceProperty(new Property("src_prop", "src_prop_value2"));
+		tu2.setTargetProperty(ESES, new Property("trg_prop", "trg_prop_value2"));
+		
+		// Init skel writer
+		StartDocument sd = new StartDocument("sd");
+		sd.setLocale(ENUS);
+		sd.setLineBreak("\n");
+		
+		// Test a skeleton-less TU
+		writer.processStartDocument(ENUS, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("source", writer.processTextUnit(tu1));
+		
+		writer.processStartDocument(FRFR, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("source", writer.processTextUnit(tu1));
+		
+		writer.processStartDocument(ESES, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("target", writer.processTextUnit(tu1));
+		
+		// Src
+		skel1 = new GenericSkeleton();
+		skel2 = new GenericSkeleton();
+		
+		tu1.setSkeleton(skel1);
+		tu2.setSkeleton(skel2);
+		
+		skel1.add("text before_");
+		skel1.addContentPlaceholder(tu1);
+		skel1.add("_text after");
+		
+		writer.processStartDocument(ENUS, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before_source_text after", writer.processTextUnit(tu1));
+		
+		writer.processStartDocument(FRFR, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before_source_text after", writer.processTextUnit(tu1));
+		
+		writer.processStartDocument(ESES, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before_target_text after", writer.processTextUnit(tu1));
+		
+		// Trg 1
+		skel1 = new GenericSkeleton();
+		skel2 = new GenericSkeleton();
+		
+		tu1.setSkeleton(skel1);
+		tu2.setSkeleton(skel2);
+		
+		skel1.add("text before_");
+		skel1.addContentPlaceholder(tu1, ENUS);
+		skel1.add("_text after");
+		
+		writer.processStartDocument(ENUS, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before_source_text after", writer.processTextUnit(tu1));
+		
+		writer.processStartDocument(FRFR, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before_source_text after", writer.processTextUnit(tu1));
+		
+		writer.processStartDocument(ESES, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before_source_text after", writer.processTextUnit(tu1));
+		
+		// Trg 2
+		skel1 = new GenericSkeleton();
+		skel2 = new GenericSkeleton();
+		
+		tu1.setSkeleton(skel1);
+		tu2.setSkeleton(skel2);
+		
+		skel1.add("text before_");
+		skel1.addContentPlaceholder(tu1, FRFR);
+		skel1.add("_text after");
+		
+		writer.processStartDocument(ENUS, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before_source_text after", writer.processTextUnit(tu1));
+		
+		writer.processStartDocument(FRFR, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before_source_text after", writer.processTextUnit(tu1));
+		
+		writer.processStartDocument(ESES, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before_source_text after", writer.processTextUnit(tu1));
+		
+		// Trg 3
+		skel1 = new GenericSkeleton();
+		skel2 = new GenericSkeleton();
+		
+		tu1.setSkeleton(skel1);
+		tu2.setSkeleton(skel2);
+		
+		skel1.add("text before_");
+		skel1.addContentPlaceholder(tu1, ESES);
+		skel1.add("_text after");
+		
+		writer.processStartDocument(ENUS, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before_target_text after", writer.processTextUnit(tu1));
+		
+		writer.processStartDocument(FRFR, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before_target_text after", writer.processTextUnit(tu1));
+		
+		writer.processStartDocument(ESES, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before_target_text after", writer.processTextUnit(tu1));
+		
+		// Ext src 1
+		skel1 = new GenericSkeleton();
+		skel2 = new GenericSkeleton();
+		
+		tu1.setSkeleton(skel1);
+		tu2.setSkeleton(skel2);
+		
+		skel1.add("text before_");
+		skel1.addContentPlaceholder(tu1);
+		skel1.changeSelfReferents(tu2);
+		skel1.add("_text after");
+		
+		skel2.add("text before2_");
+		skel2.addContentPlaceholder(tu2);
+		skel2.add("_text after2");
+		
+		// Ext src - tu1
+		writer.processStartDocument(ENUS, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before_source2_text after", writer.processTextUnit(tu1));
+		
+		writer.processStartDocument(FRFR, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before_source2_text after", writer.processTextUnit(tu1));
+		
+		writer.processStartDocument(ESES, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before_target2_text after", writer.processTextUnit(tu1));
+		
+		// Ext src - tu2
+		writer.processStartDocument(ENUS, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before2_source2_text after2", writer.processTextUnit(tu2));
+		
+		writer.processStartDocument(FRFR, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before2_source2_text after2", writer.processTextUnit(tu2));
+		
+		writer.processStartDocument(ESES, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before2_target2_text after2", writer.processTextUnit(tu2));
+		
+		// Ext src 2
+		skel1 = new GenericSkeleton();
+		skel2 = new GenericSkeleton();
+		
+		tu1.setSkeleton(skel1);
+		tu2.setSkeleton(skel2);
+		
+		skel1.add("text before_");
+		skel1.addContentPlaceholder(tu2);
+		skel1.add("_text after");
+		
+		skel2.add("text before2_");
+		skel2.addContentPlaceholder(tu2);
+		skel2.add("_text after2");
+		
+		// Ext src 2 - tu1
+		writer.processStartDocument(ENUS, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before_source2_text after", writer.processTextUnit(tu1));
+		
+		writer.processStartDocument(FRFR, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before_source2_text after", writer.processTextUnit(tu1));
+		
+		writer.processStartDocument(ESES, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before_target2_text after", writer.processTextUnit(tu1));
+		
+		// Ext src 2 - tu2
+		writer.processStartDocument(ENUS, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before2_source2_text after2", writer.processTextUnit(tu2));
+		
+		writer.processStartDocument(FRFR, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before2_source2_text after2", writer.processTextUnit(tu2));
+		
+		writer.processStartDocument(ESES, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before2_target2_text after2", writer.processTextUnit(tu2));
+		
+		// Ext trg 1
+		skel1 = new GenericSkeleton();
+		skel2 = new GenericSkeleton();
+		
+		tu1.setSkeleton(skel1);
+		tu2.setSkeleton(skel2);
+		
+		skel1.add("text before_");
+		skel1.addContentPlaceholder(tu2, ENUS);
+		skel1.add("_text after");
+		
+		skel2.add("text before2_");
+		skel2.addContentPlaceholder(tu2);
+		skel2.add("_text after2");
+		
+		writer.processStartDocument(ENUS, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before_source2_text after", writer.processTextUnit(tu1));
+		
+		writer.processStartDocument(FRFR, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before_source2_text after", writer.processTextUnit(tu1));
+		
+		writer.processStartDocument(ESES, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before_source2_text after", writer.processTextUnit(tu1));
+		
+		// Ext trg 2
+		skel1 = new GenericSkeleton();
+		skel2 = new GenericSkeleton();
+		
+		tu1.setSkeleton(skel1);
+		tu2.setSkeleton(skel2);
+		
+		skel1.add("text before_");
+		skel1.addContentPlaceholder(tu2, FRFR);
+		skel1.add("_text after");
+		
+		skel2.add("text before2_");
+		skel2.addContentPlaceholder(tu2);
+		skel2.add("_text after2");
+		
+		writer.processStartDocument(ENUS, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before_source2_text after", writer.processTextUnit(tu1));
+		
+		writer.processStartDocument(FRFR, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before_source2_text after", writer.processTextUnit(tu1));
+		
+		writer.processStartDocument(ESES, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before_source2_text after", writer.processTextUnit(tu1));
+		
+		// Ext trg 3
+		skel1 = new GenericSkeleton();
+		skel2 = new GenericSkeleton();
+		
+		tu1.setSkeleton(skel1);
+		tu2.setSkeleton(skel2);
+		
+		skel1.add("text before_");
+		skel1.addContentPlaceholder(tu2, ESES);
+		skel1.add("_text after");
+		
+		skel2.add("text before2_");
+		skel2.addContentPlaceholder(tu2);
+		skel2.add("_text after2");
+		
+		writer.processStartDocument(ENUS, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before_target2_text after", writer.processTextUnit(tu1));
+		
+		writer.processStartDocument(FRFR, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before_target2_text after", writer.processTextUnit(tu1));
+		
+		writer.processStartDocument(ESES, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before_target2_text after", writer.processTextUnit(tu1));
+		
+		// Ext ref
+		skel1 = new GenericSkeleton();
+		skel2 = new GenericSkeleton();
+		
+		tu1.setSkeleton(skel1);
+		tu2.setSkeleton(skel2);
+		
+		skel1.add("text before_");
+		skel1.addReference(tu2);
+		skel1.add("_text after");
+		
+		skel2.add("text before2_");
+		skel2.addContentPlaceholder(tu2);
+		skel2.add("_text after2");
+		
+		tu2.setIsReferent(true);		
+		writer.processStartDocument(ENUS, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("", writer.processTextUnit(tu2));		
+		assertEquals("text before_text before2_source2_text after2_text after", writer.processTextUnit(tu1));				
+		
+		tu2.setIsReferent(true);		
+		writer.processStartDocument(ESES, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("", writer.processTextUnit(tu2));		
+		assertEquals("text before_text before2_target2_text after2_text after", writer.processTextUnit(tu1));
+		
+		// Res prop value 
+		// Src prop value
+		// Trg prop value
+		// Ext res prop value 
+		// Ext src prop value
+		// Ext trg prop value
 	}
 }
