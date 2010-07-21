@@ -128,8 +128,8 @@ public class RTFFilter implements IFilter {
 
 	private final Logger logger = Logger.getLogger(getClass().getName());
 	
-	// Tags from S-Tagger that are open/close, all other are place-holders
-	private static final String STAGSTART = ":fc:cd:b:i:s:bi:c:c1:c2:cns:el:elf:ti:";
+	// Tags from S-Tagger that are open/close, all other are isolated
+	private static final String PAIREDTAGS = ":fc:cs:b:i:s:bi:c:c1:c2:cns:el:elf:ti:";
 	
 	private BufferedReader reader;
 	private boolean canceled;
@@ -741,11 +741,37 @@ public class RTFFilter implements IFilter {
 			TagType tagType = TagType.PLACEHOLDER;
 			int last = data.length()-1;
 			int extra = 0;
+			boolean detected = false;
 			
 			// Long enough to be an XML/HTML tag? (3 chars at least)
-			if ( last > 1 ) { 
+			if ( last > 1 ) {
+				
+				// Check S-tagger cases "<:[/]tag[ ...]>"
+				if (( last > 3 ) && data.startsWith("<:") ) {
+					if ( data.charAt(2) == '/' ) extra = 1;
+					// Get end of tag
+					int n = data.indexOf(' ');
+					if ( n == -1 ) n = data.indexOf('>');
+					// Handle the tag name
+					if ( n > -1 ) {
+						String tag = ":"+data.substring(2+extra, n)+":";
+						if ( PAIREDTAGS.contains(tag) ) {
+							if ( extra == 0 ) {
+								tagType = TagType.OPENING;
+								extra = 1;
+							}
+							else { // Extra == 1: closing
+								tagType = TagType.CLOSING;
+								extra = 2;
+							}
+						}
+						detected = true;
+					}
+				}
+				
+				// Continue trying to detect the type if we have still a placeholder
 				// Starts with the proper character?
-				if ( data.charAt(0) == '<' ) {
+				if ( !detected && ( data.charAt(0) == '<' )) {
 					// Ends with the proper character?
 					if ( data.charAt(last) == '>' ) {
 						// Has no more than one tag?
