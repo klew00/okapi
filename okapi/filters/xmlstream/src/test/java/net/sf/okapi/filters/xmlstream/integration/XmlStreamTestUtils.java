@@ -25,7 +25,7 @@ public final class XmlStreamTestUtils {
 	public static String[] getTestFiles(final String aFile, final String suffix)
 			throws URISyntaxException {
 		// read all files in the test xmlstream directory
-		URL url = DitaExtractionComparisionTest.class.getResource(aFile);
+		URL url = XmlStreamTestUtils.class.getResource(aFile);
 		File dir = new File(url.toURI()).getParentFile();
 
 		FilenameFilter filter = new FilenameFilter() {
