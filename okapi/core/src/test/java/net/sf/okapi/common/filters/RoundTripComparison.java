@@ -129,7 +129,7 @@ public class RoundTripComparison {
 	private void executeFirstExtraction(InputDocument doc) {
 		try {
 			// Open the input
-			filter.open(new RawDocument((new File(doc.path)).toURI(), defaultEncoding, srcLoc,
+			filter.open(new RawDocument(Util.toURI(doc.path), defaultEncoding, srcLoc,
 					trgLoc));
 
 			// Prepare the output
@@ -265,5 +265,4 @@ public class RoundTripComparison {
 				filter.close();
 		}
 	}
-
 }
