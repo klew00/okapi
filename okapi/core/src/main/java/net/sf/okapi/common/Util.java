@@ -682,7 +682,9 @@ public class Util {
 			return pathOrUri;
 		// If not that, then assume it's a file
 		try {
-			String tmp = URLEncoder.encode(pathOrUri, "UTF-8");
+			if (pathOrUri.startsWith("/"))
+				pathOrUri = pathOrUri.substring(1);
+			String tmp = URLEncoder.encode(pathOrUri, "UTF-8");			
 			// Use '%20' instead of '+': '+ not working with File(uri) it seems
 			return "file:///" + tmp.replace("+", "%20");
 		}

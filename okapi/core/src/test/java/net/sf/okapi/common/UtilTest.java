@@ -286,6 +286,13 @@ public class UtilTest {
 		assertEquals(0, Util.min());
 	}
 	
+	@Test
+	public void testToURI () {
+		assertEquals("/C:/test", Util.toURI("C:\\test").getPath());		
+		assertEquals("/C:/test", Util.toURI("file:///C:/test").getPath());		
+		assertEquals("/C:/test", Util.toURI("/C:/test").getPath());
+	}
+	
 // Unused
 //	@Test
 //	public void generateRandomId() {

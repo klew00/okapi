@@ -96,41 +96,33 @@ public class Document  {
 		try {
 			setRawDocument(new RawDocument(inputURL.toURI(), defaultEncoding, sourceLocale));
 		} catch (URISyntaxException e) {
-			// TODO Handle exception
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
 	public Document(URL inputURL, String defaultEncoding, LocaleId sourceLocale,
 			LocaleId targetLocale) {
-		try {
-			setRawDocument(new RawDocument(inputURL.toURI(), defaultEncoding, sourceLocale,	targetLocale));
-		} catch (URISyntaxException e) {
-			// TODO Handle exception
-		}
+		setRawDocument(new RawDocument(Util.toURI(inputURL.getPath()), defaultEncoding, sourceLocale,	targetLocale));
 	}
 	
 	public Document(URL inputURL, String defaultEncoding, URL outputURL, String outputEncoding, LocaleId sourceLocale,
 			LocaleId targetLocale) {
 		try {
-			setRawDocument(new RawDocument(inputURL.toURI(), defaultEncoding, sourceLocale,	targetLocale));
+			setRawDocument(new RawDocument(Util.toURI(inputURL.getPath()), defaultEncoding, sourceLocale,	targetLocale));
 			documentData.outputURI = (outputURL == null) ? null : outputURL.toURI();
 			documentData.outputEncoding = outputEncoding;
 		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
+			// TODO Auto-generated catch block Util.toURI(inputURL.getPath()).getPath()
 			e.printStackTrace();
 		}
 	}
 	
 	public Document(URL inputURL, String defaultEncoding, String outputPath, String outputEncoding, LocaleId sourceLocale,
 			LocaleId targetLocale) {
-			try {
-				setRawDocument(new RawDocument(inputURL.toURI(), defaultEncoding, sourceLocale,	targetLocale));
-				documentData.outputURI = Util.toURI(outputPath);
-				documentData.outputEncoding = outputEncoding;
-			} catch (URISyntaxException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}			
+			setRawDocument(new RawDocument(Util.toURI(inputURL.getPath()), defaultEncoding, sourceLocale,	targetLocale));
+			documentData.outputURI = Util.toURI(outputPath);
+			documentData.outputEncoding = outputEncoding;			
 	}
 	
 	public Document(InputStream inputStream, String defaultEncoding, LocaleId sourceLocale) {
