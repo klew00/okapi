@@ -682,6 +682,8 @@ public class Util {
 			return pathOrUri;
 		// If not that, then assume it's a file
 		try {
+			if (pathOrUri.startsWith("file:/"))
+				pathOrUri = pathOrUri.substring(6);
 			if (pathOrUri.startsWith("/"))
 				pathOrUri = pathOrUri.substring(1);
 			String tmp = URLEncoder.encode(pathOrUri, "UTF-8");			

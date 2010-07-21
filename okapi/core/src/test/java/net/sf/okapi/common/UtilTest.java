@@ -291,6 +291,7 @@ public class UtilTest {
 		assertEquals("/C:/test", Util.toURI("C:\\test").getPath());		
 		assertEquals("/C:/test", Util.toURI("file:///C:/test").getPath());		
 		assertEquals("/C:/test", Util.toURI("/C:/test").getPath());
+		assertEquals("/C:/test", Util.toURI("file:/C:/test").getPath()); 
 	}
 	
 // Unused
