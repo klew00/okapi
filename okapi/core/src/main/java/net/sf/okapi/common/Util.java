@@ -30,6 +30,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -166,6 +167,24 @@ public class Util {
 		else {
 			return "";
 		}
+	}
+	
+	/**
+	 * Return a list of files based on suffix (i.e, .xml, .html etc.)
+	 * @param directory - directory where files are located
+	 * @param suffix - the sufix used to filter files
+	 * @return - list of files matching the suffix 
+	 * @throws URISyntaxException
+	 */
+	public static String[] getFilteredFiles(final String directory, final String suffix)
+			throws URISyntaxException {
+		File dir = new File(directory);
+		FilenameFilter filter = new FilenameFilter() {
+			public boolean accept(File dir, String name) {
+				return name.endsWith(suffix);
+			}
+		};
+		return dir.list(filter);
 	}
 
 	/**
