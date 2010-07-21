@@ -89,4 +89,16 @@ public class CodeTest {
     	assertEquals("bold", code.getType());
     }
 
+    @Test
+    public void testCodeData () {
+    	Code code = new Code(TagType.PLACEHOLDER, "type", null);
+    	assertEquals("", code.toString());
+    	
+    	code = new Code(TagType.PLACEHOLDER, "type", null);
+    	code.setOuterData("<x id=\"1\">");
+    	assertEquals("", code.toString());
+    	code.setOuterData(null);
+    	assertEquals("", code.toString());
+    }
+
 }

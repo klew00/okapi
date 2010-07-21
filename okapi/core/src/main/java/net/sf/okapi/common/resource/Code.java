@@ -225,8 +225,8 @@ public class Code {
 		this.data = new StringBuilder(DATA_DEFAULT_SIZE);		
 	
 		// Use "" for null data
-		if (data == null) {
-			data =  "";
+		if ( data == null ) {
+			data = "";
 		}
 		this.data.append(data);
 	}
@@ -274,13 +274,15 @@ public class Code {
 	
 	/**
 	 * Appends data to the current code outerData
-	 * @param outerData the data to append.
+	 * @param outerData the outer data to append.
 	 */
-	public void appendOuterData(String outerData) {		
-		if (this.outerData == null) {
+	public void appendOuterData (String outerData) {		
+		if ( this.outerData == null ) {
 			this.outerData = new StringBuilder(DATA_DEFAULT_SIZE);
 		}
-		this.outerData.append(outerData);
+		if ( outerData != null ) {
+			this.outerData.append(outerData);
+		}
 	}
 	
 	/**
@@ -461,11 +463,13 @@ public class Code {
 	 * @param value the data to set (can be null).
 	 */
 	public void setOuterData (String value) {
-		if (this.outerData == null) {
+		if ( this.outerData == null ) {
 			this.outerData = new StringBuilder(DATA_DEFAULT_SIZE);
 		}
 		outerData.setLength(0);
-		outerData.append(value);
+		if ( value != null ) {
+			outerData.append(value);
+		}
 	}
 	
 	/**

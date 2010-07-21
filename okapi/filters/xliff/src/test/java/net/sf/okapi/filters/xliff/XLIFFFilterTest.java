@@ -650,6 +650,20 @@ public class XLIFFFilterTest {
 		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, locES));
 	}
 
+	@Test
+	public void testEmptyCodes () {
+		String snippet = "<?xml version=\"1.0\"?>\r"
+			+ "<xliff version=\"1.2\">\r"
+			+ "<file source-language=\"en\" datatype=\"plaintext\" original=\"file.ext\" build-num=\"13\">"
+			+ "<body><trans-unit id=\"1\" resname=\"13\" extradata=\"xd\"><source>code=<x id=\"1\"/></source></trans-unit></body>"
+			+ "</file></xliff>";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertEquals("code=", tu.getSource().toString());
+		tu.setTarget(LocaleId.FRENCH, tu.getSource());
+		assertEquals("code=", tu.getTarget(LocaleId.FRENCH).toString());
+		assertNotNull(tu);
+	}
+
 	private ArrayList<Event> createSimpleXLIFF () {
 		String snippet = "<?xml version=\"1.0\"?>\r"
 			+ "<xliff version=\"1.2\">\r"
