@@ -42,7 +42,11 @@ public class Code {
 	public static final String TYPE_XML_PROCESSING_INSTRUCTION = "processing-instruction";
 	public static final String TYPE_REFERENCE = "ref";
 	
-	private static final int DATA_DEFAULT_SIZE = 20;
+	/**
+	 * Initial capacity for data and outerData objects.
+	 * Keeping it small to save space.
+	 */
+	private static final int DATA_DEFAULT_SIZE = 10;
 	
 	/** Initial capacity for creating annotations maps.
 	 * Keeping it small to save space.
@@ -66,9 +70,9 @@ public class Code {
 	
 	protected TagType tagType;
 	protected int id;
-	protected String type;
-	protected StringBuilder data;
-	protected StringBuilder outerData;
+	protected String type; // Must not be null (so internal compare can be fast), null is mapped to "null"
+	protected StringBuilder data; // Used by toString() except if outerData is not null
+	protected StringBuilder outerData; // Must be null (not just empty) to be unused
 	protected int flag;
 	protected LinkedHashMap<String, InlineAnnotation> annotations;
 
@@ -221,7 +225,7 @@ public class Code {
 		if ( type == null ) this.type = "null";
 		else this.type = type;
 		
-		// initialize data
+		// Initialize data
 		this.data = new StringBuilder(DATA_DEFAULT_SIZE);		
 	
 		// Use "" for null data
@@ -242,7 +246,7 @@ public class Code {
 		String type,
 		StringBuilder data)
 	{
-		this(tagType, type, data.toString());
+		this(tagType, type, (data==null ? "" : data.toString()));
 	}
 	
 	/**
@@ -268,21 +272,23 @@ public class Code {
 	 * Appends data to the current code data
 	 * @param data the data to append.
 	 */
-	public void append (String data) {		
-		this.data.append(data);
+	public void append (String data) {
+		if ( data != null ) {
+			this.data.append(data);
+		}
 	}
 	
 	/**
 	 * Appends data to the current code outerData
 	 * @param outerData the outer data to append.
 	 */
-	public void appendOuterData (String outerData) {		
+	public void appendOuterData (String outerData) {
+		if ( outerData == null ) return;
+		// Else: append the value
 		if ( this.outerData == null ) {
 			this.outerData = new StringBuilder(DATA_DEFAULT_SIZE);
 		}
-		if ( outerData != null ) {
-			this.outerData.append(outerData);
-		}
+		this.outerData.append(outerData);
 	}
 	
 	/**
@@ -392,7 +398,7 @@ public class Code {
 	/**
 	 * Sets the abstract type of the code. This member is used to match up
 	 * together opening and closing codes.
-	 * @param value the new abstract type of the code.
+	 * @param value the new abstract type of the code. Null is mapped to "null".
 	 */
 	public void setType (String value) {
 		if ( value == null ) type = "null";
@@ -414,7 +420,9 @@ public class Code {
 	 */
 	public void setData (String value) {
 		data.setLength(0);
-		data.append(value);
+		if ( value != null ) {
+			data.append(value);
+		}
 	}
 	
 	/**
@@ -463,13 +471,16 @@ public class Code {
 	 * @param value the data to set (can be null).
 	 */
 	public void setOuterData (String value) {
+		if ( value == null ) {
+			this.outerData = null;
+			return;
+		}
+		// Else: the value needs to be set
 		if ( this.outerData == null ) {
 			this.outerData = new StringBuilder(DATA_DEFAULT_SIZE);
 		}
 		outerData.setLength(0);
-		if ( value != null ) {
-			outerData.append(value);
-		}
+		outerData.append(value);
 	}
 	
 	/**
