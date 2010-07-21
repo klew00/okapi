@@ -201,7 +201,7 @@ public class RoundTripComparison {
 		String outPath = null;
 		try {
 			// Open the input
-			filter.open(new RawDocument((new File(doc.path)).toURI(), defaultEncoding, srcLoc,
+			filter.open(new RawDocument(Util.toURI(doc.path), defaultEncoding, srcLoc,
 					trgLoc));
 
 			// Prepare the output
@@ -241,8 +241,7 @@ public class RoundTripComparison {
 	private void executeSecondExtractionFromFile(String input) {
 		try {
 			// Set the input (from the output of first extraction)
-			File file = new File(input);
-			filter.open(new RawDocument(file.toURI(), "UTF-8", srcLoc, trgLoc));
+			filter.open(new RawDocument(Util.toURI(input), "UTF-8", srcLoc, trgLoc));
 
 			// Process the document
 			Event event;
