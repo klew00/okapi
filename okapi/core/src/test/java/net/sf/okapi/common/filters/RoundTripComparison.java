@@ -207,8 +207,12 @@ public class RoundTripComparison {
 			// Prepare the output
 			writer.setOptions(trgLoc, "UTF-8");
 			outPath = Util.getDirectoryName(doc.path);
-			outPath += (File.separator + outputDir + File.separator + Util.getFilename(doc.path,
-					true));
+			if ( Util.isEmpty(outputDir) ) {
+				outPath += (File.separator + Util.getFilename(doc.path, true));
+			}
+			else {
+				outPath += (File.separator + outputDir + File.separator + Util.getFilename(doc.path, true));
+			}
 			writer.setOutput(outPath);
 
 			// Process the document
