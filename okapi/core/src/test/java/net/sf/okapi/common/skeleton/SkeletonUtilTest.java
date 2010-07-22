@@ -538,10 +538,127 @@ public class SkeletonUtilTest {
 		assertEquals("text before_text before2_target2_text after2_text after", writer.processTextUnit(tu1));
 		
 		// Res prop value 
+		skel1 = new GenericSkeleton();
+		skel2 = new GenericSkeleton();
+		
+		tu1.setSkeleton(skel1);
+		tu2.setSkeleton(skel2);
+		
+		skel1.add("text before_");
+		skel1.addValuePlaceholder(tu1, "res_prop", LocaleId.EMPTY);
+		skel1.add("_text after");
+		
+		writer.processStartDocument(ENUS, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before_res_prop_value_text after", writer.processTextUnit(tu1));
+		
+		writer.processStartDocument(FRFR, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before_res_prop_value_text after", writer.processTextUnit(tu1));
+		
+		writer.processStartDocument(ESES, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before_res_prop_value_text after", writer.processTextUnit(tu1));
+		
 		// Src prop value
+		skel1 = new GenericSkeleton();
+		skel2 = new GenericSkeleton();
+		
+		tu1.setSkeleton(skel1);
+		tu2.setSkeleton(skel2);
+		
+		skel1.add("text before_");
+		skel1.addValuePlaceholder(tu1, "src_prop", null);
+		skel1.add("_text after");
+		
+		writer.processStartDocument(ENUS, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before_src_prop_value_text after", writer.processTextUnit(tu1));
+		
+		writer.processStartDocument(FRFR, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before_src_prop_value_text after", writer.processTextUnit(tu1));
+		
+		writer.processStartDocument(ESES, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before_src_prop_value_text after", writer.processTextUnit(tu1));
+		
 		// Trg prop value
-		// Ext res prop value 
+		skel1 = new GenericSkeleton();
+		skel2 = new GenericSkeleton();
+		
+		tu1.setSkeleton(skel1);
+		tu2.setSkeleton(skel2);
+		
+		skel1.add("text before_");
+		skel1.addValuePlaceholder(tu1, "trg_prop", ESES);
+		skel1.add("_text after");
+		
+		writer.processStartDocument(ENUS, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before_trg_prop_value_text after", writer.processTextUnit(tu1));
+		
+		writer.processStartDocument(FRFR, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before_trg_prop_value_text after", writer.processTextUnit(tu1));
+		
+		writer.processStartDocument(ESES, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before_trg_prop_value_text after", writer.processTextUnit(tu1));
+		
+		// Ext res prop value
+		skel1 = new GenericSkeleton();
+		skel2 = new GenericSkeleton();
+		
+		tu1.setSkeleton(skel1);
+		tu2.setSkeleton(skel2);
+		
+		skel1.add("text before_");
+		skel1.addValuePlaceholder(tu1, "res_prop", LocaleId.EMPTY);
+		skel1.changeSelfReferents(tu2);
+		skel1.add("_text after");
+		
+		writer.processStartDocument(ENUS, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before_res_prop_value2_text after", writer.processTextUnit(tu1));
+		
+		writer.processStartDocument(FRFR, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before_res_prop_value2_text after", writer.processTextUnit(tu1));
+		
+		writer.processStartDocument(ESES, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before_res_prop_value2_text after", writer.processTextUnit(tu1));
+		
 		// Ext src prop value
+		skel1 = new GenericSkeleton();
+		skel2 = new GenericSkeleton();
+		
+		tu1.setSkeleton(skel1);
+		tu2.setSkeleton(skel2);
+		
+		skel1.add("text before_");
+		skel1.addValuePlaceholder(tu1, "src_prop", null);
+		skel1.changeSelfReferents(tu2);
+		skel1.add("_text after");
+		
+		writer.processStartDocument(ENUS, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before_src_prop_value2_text after", writer.processTextUnit(tu1));
+		
+		writer.processStartDocument(FRFR, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before_src_prop_value2_text after", writer.processTextUnit(tu1));
+		
+		writer.processStartDocument(ESES, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before_src_prop_value2_text after", writer.processTextUnit(tu1));
+		
 		// Ext trg prop value
+		skel1 = new GenericSkeleton();
+		skel2 = new GenericSkeleton();
+		
+		tu1.setSkeleton(skel1);
+		tu2.setSkeleton(skel2);
+		
+		skel1.add("text before_");
+		skel1.addValuePlaceholder(tu1, "trg_prop", ESES);		
+		skel1.add("_text after");
+		skel1.changeSelfReferents(tu2);
+		
+		writer.processStartDocument(ENUS, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before_trg_prop_value2_text after", writer.processTextUnit(tu1));
+		
+		writer.processStartDocument(FRFR, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before_trg_prop_value2_text after", writer.processTextUnit(tu1));
+		
+		writer.processStartDocument(ESES, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before_trg_prop_value2_text after", writer.processTextUnit(tu1));
+		
 	}
 }
