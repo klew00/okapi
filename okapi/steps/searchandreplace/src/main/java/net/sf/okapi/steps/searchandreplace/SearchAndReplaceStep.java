@@ -201,19 +201,20 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 				outFile.deleteOnExit();
 			}
 
-        	if ( params.regEx ){
-        		for(int i=0; i<params.rules.size();i++){
+        	if ( params.regEx ) {
+        		for ( int i=0; i<params.rules.size();i++ ) {
             		String s[] = params.rules.get(i);
      	           	if ( s[0].equals("true") ) {
-		        		
      	           		matcher = patterns[i].matcher(result);
-		        		result = matcher.replaceAll(s[2]);
+		        		result = matcher.replaceAll(unescapeReplace(s[2]));
     	        	}
     	        }
-        	}else{
+        	}
+        	else {
     	        for ( String[] s : params.rules ) {
     	        	if ( s[0].equals("true") ) {
-    	        		result = result.replace(s[1],s[2]);
+    	        		// If not a regular expression we apply the un-escaping to both search and replace
+    	        		result = result.replace(s[1], s[2]);
     	        	}
     	        }
         	}
@@ -253,6 +254,13 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 		return event;
 	}
 
+	// Replace \\ \n \r, \t and \N for the replacement string
+	private String unescapeReplace (String text) {
+		String res = text.replace("\\n", "\n");
+		res = res.replace("\\r", "\r");
+		res = res.replace("\\t", "\t");
+		return res.replace("\\N", System.getProperty("line.separator"));
+	}
 	
 	@Override
 	protected Event handleTextUnit (Event event) {

@@ -70,7 +70,11 @@ are <code>$1</code>, <code>$2</code>, etc. (<code>$1</code> corresponds to the
 part matching the first group of the search expression, etc.) See the 
 documentation on <code>
 <a href="http://java.sun.com/javase/6/docs/api/java/util/regex/Matcher.html#replaceAll(java.lang.String)">
-Matcher.replaceAll()</a></code> for more details.</p>
+Matcher.replaceAll()</a></code> for more details. In addition, in the 
+replacement field you can specify &quot;<code>\n</code>&quot;, &quot;<code>\r</code>&quot;, and &quot;<code>\t</code>&quot; 
+for for line-feed, carriage-return, and tab; as well as &quot;<code>\N</code>&quot; to 
+replace by the line-break type of the current platform, for example &quot;<code>\r\n</code>&quot; 
+for Windows.</p>
 <h4>Regular expression options</h4>
 <p>When this option is checked several regular expression options are accessible. They apply to all expressions, not just the selected one:</p>
 <p><cite>Ignore case</cite> -- Set this option to ignore the cases in the matches. for example "bear" matches "<span style="background-color: #FFFF00">Bear</span>cat", "<span style="background-color: #FFFF00">BEAR</span>CAT", and "<span style="background-color: #FFFF00">bear</span>cat".</p>

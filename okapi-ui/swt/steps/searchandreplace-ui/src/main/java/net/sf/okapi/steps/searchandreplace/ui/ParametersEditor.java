@@ -39,6 +39,7 @@ import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -437,16 +438,14 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private boolean showAddItemsDialog () {
 		dialog = new Shell (mainComposite.getShell(), SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		dialog.setText ("Search And Replace Item");
-		dialog.setMinimumSize (400, 200);
-		dialog.setSize(dialog.getMinimumSize());
 
 		dialog.setLayout(new GridLayout());
 
 		// start - content
 		Label label = new Label(dialog, SWT.NONE);
-		label.setText("Search Expression:");
+		label.setText("Search expression:");
 		
-		searchText = new Text(dialog, SWT.BORDER | SWT.WRAP | SWT.MULTI | SWT.V_SCROLL);
+		searchText = new Text(dialog, SWT.BORDER | SWT.WRAP | SWT.H_SCROLL);
 		GridData gridData = new GridData();
 		gridData.horizontalAlignment = SWT.FILL;
 		gridData.grabExcessHorizontalSpace = true;
@@ -455,9 +454,9 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		searchText.setLayoutData(gridData);		
 		
 		label = new Label(dialog, SWT.NONE);
-		label.setText("Replacement Expression:");
+		label.setText("Replacement expression (You can use \\\\, \\t, \\n, \\r and \\N with regular expressions on):");
 
-		replacementText = new Text(dialog, SWT.BORDER | SWT.WRAP | SWT.MULTI | SWT.V_SCROLL);
+		replacementText = new Text(dialog, SWT.BORDER | SWT.WRAP | SWT.H_SCROLL);
 		gridData = new GridData();
 		gridData.horizontalAlignment = SWT.FILL;
 		gridData.grabExcessHorizontalSpace = true;
@@ -522,6 +521,8 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		}
 		// end - initialize edit fields
 		
+		dialog.pack();
+		dialog.setMinimumSize(dialog.getSize());
 		Dialogs.centerWindow(dialog, shell);
 		dialog.open ();
 		while ( !dialog.isDisposed() ) {

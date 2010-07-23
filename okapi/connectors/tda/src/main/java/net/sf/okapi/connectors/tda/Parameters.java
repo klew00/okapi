@@ -67,7 +67,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	@Override
 	public void reset () {
 		// Default
-		server = "";
+		server = "http://www.tausdata.org/api";
 		appKey = "";
 		username = "";
 		password = "";
