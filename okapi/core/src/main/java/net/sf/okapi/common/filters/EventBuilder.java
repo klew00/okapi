@@ -875,7 +875,7 @@ public class EventBuilder {
 	 * @param code
 	 *            the code type
 	 * 
-	 * @param
+	 * @param endCodeNow
 	 *            do we end the code now or delay?
 	 * 
 	 * @throws OkapiIllegalFilterOperationException
@@ -897,7 +897,7 @@ public class EventBuilder {
 	 * 
 	 * @param code
 	 *            the code
-	 * @param
+	 * @param endCodeNow
 	 *            do we end the code now or delay?
 	 * @param propertyTextUnitPlaceholders
 	 *            the list of actionable {@link TextUnit} or {@link Properties} with offset information into the tag.
@@ -912,7 +912,7 @@ public class EventBuilder {
 	 * 
 	 * @param code
 	 *            the code
-	 * @param
+	 * @param endCodeNow
 	 *            do we end the code now or delay?
 	 * @param locale
 	 *            the language of the text
@@ -941,7 +941,7 @@ public class EventBuilder {
 	 * Appends text to the first data part of the skeleton.
 	 * 
 	 * @param text
-	 *            the text
+	 *            the text to happend.
 	 * 
 	 * @throws OkapiIllegalFilterOperationException
 	 */

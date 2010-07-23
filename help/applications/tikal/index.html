@@ -823,13 +823,11 @@ a public Search facility on a large corpus of translations. Okapi provides a
 connector for the REST API provided by TDA. The TDA Web Search is accessible 
 from here: <a href="http://www.tausdata.org/index.php/taus-search">
 http://www.tausdata.org/index.php/taus-search</a>.</p>
-<p><span style="background-color: #FFFF00">Note: this documentation is 
-preliminary and will be completed when the connector is ready.</span></p>
 <p>This resource is indicated by the option <code>-tda</code> in Tikal and takes 
 one argument: a configuration file that contains the information to access the 
 TDA search service. The configuration file must look like this:</p>
 <pre>#v1
-server=URL of the server to use
+server=http://www.tausdata.org/api
 appKey=myAppKey
 username=myTDAUsername
 password=myTDAPassword
