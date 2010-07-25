@@ -50,11 +50,14 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DropTarget;
 import org.eclipse.swt.dnd.DropTargetAdapter;
 import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.FileTransfer;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.KeyAdapter;
@@ -93,7 +96,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 	static final int ISSUETYPE_ENABLED = 1;
 	static final int ISSUETYPE_DISABLED = 2;
 	
-	static final int CONTEXTMENU_COUNT = 8;
+	static final int CONTEXTMENU_COUNT = 8; // All the "fix" entries 
 	
 	private static final String OPT_BOUNDS = "bounds"; //$NON-NLS-1$
 	private static final String OPT_MAXIMIZED = "maximized"; //$NON-NLS-1$
@@ -126,6 +129,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 	private Menu contextMenu;
 	private SelectionAdapter allowExtraCodesAdapter;
 	private SelectionAdapter allowMissingCodesAdapter;
+	private SelectionAdapter copyItemDataAdapter;
 	
 	private int displayType = 1;
 	private int issueType = 0;
@@ -582,6 +586,15 @@ public class QualityCheckEditor implements IQualityCheckEditor {
             }
 		};
 		
+		copyItemDataAdapter = new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				// The menu item has a data object that we need to put into the Clipboard
+				String data = (String)((MenuItem)event.getSource()).getData();
+				Clipboard cb = new Clipboard(shell.getDisplay());
+				cb.setContents(new Object[] {data}, new Transfer[] {TextTransfer.getInstance()});
+            }
+		};
+		
 		// Add listener to manage the actions
 		contextMenu.addMenuListener(new MenuListener() {
 			@SuppressWarnings("unchecked")
@@ -592,13 +605,29 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 				int n = tblIssues.getSelectionIndex();
 				if ( n == -1 ) return;
 				Issue issue = (Issue)tblIssues.getItem(n).getData();
+				
+				// Copy TU id
+				MenuItem item = new MenuItem(contextMenu, SWT.PUSH);
+				item.setText(String.format("Copy Text Unit Extraction ID (\"%s\")", issue.tuId));
+				item.setData(issue.tuId);
+				item.addSelectionListener(copyItemDataAdapter);
+				
+				// Copy resource name (if available)
+				if ( !Util.isEmpty(issue.tuName) ) {
+					item = new MenuItem(contextMenu, SWT.PUSH);
+					item.setText(String.format("Copy Text Unit Resource ID/Name (\"%s\")", issue.tuName));
+					item.setData(issue.tuName);
+					item.addSelectionListener(copyItemDataAdapter);
+				}
+
+				// Extra data cases
 				if ( issue.extra == null ) return;
 				if ( ((ArrayList<Code>)issue.extra).size() == 0 ) return;
 				// If we have extra data attached to the issue:
 				// Add actions to the menu
 				new MenuItem(contextMenu, SWT.SEPARATOR);
 				for ( Code code : (ArrayList<Code>)issue.extra ) {
-					MenuItem item = new MenuItem(contextMenu, SWT.PUSH);
+					item = new MenuItem(contextMenu, SWT.PUSH);
 					item.setData(code.getData());
 					if ( issue.issueType == IssueType.EXTRA_CODE ) {
 						item.setText(String.format("Allow \"%s\" as an Extra Code", code.getData()));

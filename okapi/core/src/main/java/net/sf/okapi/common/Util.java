@@ -319,24 +319,23 @@ public class Util {
 		CharsetEncoder encoder)
 	{
 		try {
-			if (text == null)
-				return "";
+			if ( text == null ) return "";
 			StringBuffer tmp = new StringBuffer(text.length());
 			CharBuffer tmpBuf = CharBuffer.allocate(1);
 			ByteBuffer encBuf;
 
-			for (int i = 0; i < text.length(); i++) {
-				switch (text.charAt(i)) {
+			for ( int i=0; i<text.length(); i++ ) {
+				switch ( text.charAt(i) ) {
 				case '{':
 				case '}':
 				case '\\':
 					tmp.append("\\").append(text.charAt(i));
 					break;
-				case '\r': // to skip
+				case '\r': // Skip
 					break;
 				case '\n':
-					if (convertLineBreaks) {
-						switch (lineBreakStyle) {
+					if ( convertLineBreaks ) {
+						switch ( lineBreakStyle ) {
 						case 1: // Outside external
 							tmp.append(RTF_ENDCODE);
 							tmp.append("\r\n\\par ");
@@ -352,8 +351,10 @@ public class Util {
 							tmp.append("\r\n\\par ");
 							continue;
 						}
-					} else
+					}
+					else {
 						tmp.append("\n");
+					}
 					break;
 				case '\u00a0': // Non-breaking space
 					tmp.append("\\~"); // No extra space (it's a control word)
@@ -396,35 +397,40 @@ public class Util {
 					break;
 
 				default:
-					if (text.charAt(i) > 127) {
-						if (encoder.canEncode(text.charAt(i))) {
+					if ( text.charAt(i) > 127 ) {
+						if ( encoder.canEncode(text.charAt(i)) ) {
 							tmpBuf.put(0, text.charAt(i));
 							tmpBuf.position(0);
 							encBuf = encoder.encode(tmpBuf);
-							if (encBuf.limit() > 1) {
+							if ( encBuf.limit() > 1 ) {
 								tmp.append(String.format("{\\uc%d", encBuf.limit()));
 								tmp.append(String.format("\\u%d", (int) text.charAt(i)));
 								for (int j = 0; j < encBuf.limit(); j++) {
 									tmp.append(String.format("\\'%x", (encBuf.get(j) < 0 ? (0xFF ^ ~encBuf.get(j))
-											: encBuf.get(j))));
+										: encBuf.get(j))));
 								}
 								tmp.append("}");
-							} else {
-								tmp.append(String.format("\\u%d", (int) text.charAt(i)));
-								tmp.append(String.format("\\'%x", (encBuf.get(0) < 0 ? (0xFF ^ ~encBuf.get(0)) : encBuf
-										.get(0))));
 							}
-						} else { // Cannot encode in the RTF encoding, so use
-							// just Unicode
+							else {
+								tmp.append(String.format("\\u%d", (int) text.charAt(i)));
+								tmp.append(String.format("\\'%x", (encBuf.get(0) < 0 ? (0xFF ^ ~encBuf.get(0))
+									: encBuf.get(0))));
+							}
+						}
+						else { // Cannot encode in the RTF encoding, so use
+							// Just Unicode
 							tmp.append(String.format("\\u%d ?", (int) text.charAt(i)));
 						}
-					} else
+					}
+					else {
 						tmp.append(text.charAt(i));
+					}
 					break;
 				}
 			}
 			return tmp.toString();
-		} catch (CharacterCodingException e) {
+		}
+		catch ( CharacterCodingException e ) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -435,7 +441,7 @@ public class Util {
 	 * @param outChannel the output Channel.
 	 * @throws OkapiIOException if an error occurs.
 	 */
-	public static void copy(ReadableByteChannel inChannel,
+	public static void copy (ReadableByteChannel inChannel,
 		WritableByteChannel outChannel)
 	{
 		final ByteBuffer buffer = ByteBuffer.allocateDirect(16 * 1024);

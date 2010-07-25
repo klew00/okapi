@@ -338,7 +338,7 @@ public class Parameters extends BaseParameters {
 	@Override
 	public void reset () {
 		outputPath = "${rootDir}/qa-report.html";
-		autoOpen = false;
+		autoOpen = true;
 		leadingWS = true;
 		trailingWS = true;
 		emptyTarget = true;
