@@ -596,6 +596,10 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		RULE_TYPE ruleType = getConfig().getConditionalElementRuleType(startTag.getName(),
 				attributes);
 
+		// reset after each start tag so that we never 
+		// set a TextUnit name that id from a far out tag
+		currentId = null;
+		
 		try {
 			// if in excluded state everything is skeleton including text
 			if (ruleState.isExludedState()) {
@@ -655,17 +659,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 				handleAttributesThatAppearAnywhere(propertyTextUnitPlaceholders, startTag);
 				break;
 			case TEXT_UNIT_ELEMENT:
-//				// search for an idAttribute and set it on the newly created TextUnit if found
-//				for (PropertyTextUnitPlaceholder propOrText : propertyTextUnitPlaceholders) {
-//					if (propOrText.getAccessType() == PlaceholderAccessType.NAME) {
-//						this.currentId = propOrText.getValue();
-//						break;
-//					}
-//				}
-
 				handleAttributesThatAppearAnywhere(propertyTextUnitPlaceholders, startTag);
-
-//				setTextUnitName(this.currentId);
 				setTextUnitType(getConfig().getElementType(startTag));
 				break;
 			default:
