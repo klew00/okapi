@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
@@ -35,6 +36,7 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.RawDocument;
 
 public class RoundTripComparison {
+	private static final Logger LOGGER = Logger.getLogger(RoundTripComparison.class.getName());
 
 	private IFilter filter;
 	private ArrayList<Event> extraction1Events;
@@ -63,8 +65,8 @@ public class RoundTripComparison {
 		writer = filter.createFilterWriter();
 
 		for (InputDocument doc : inputDocs) {
+			LOGGER.fine("Processing Document: " + doc.path);
 			path = doc.path;
-			// DEBUG: System.out.println(doc.path);
 			// Reset the event lists
 			extraction1Events.clear();
 			extraction2Events.clear();
@@ -100,6 +102,7 @@ public class RoundTripComparison {
 		writer = filter.createFilterWriter();
 
 		for (InputDocument doc : inputDocs) {
+			LOGGER.fine("Processing Document: " + doc.path);
 			// Reset the event lists
 			extraction1Events.clear();
 			extraction2Events.clear();
