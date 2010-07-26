@@ -99,6 +99,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	private ExtractionRuleState ruleState;
 	@SubFilter() // make this IFilter a subfilter 
 	private IFilter cdataSubfilter;
+	private String currentId;
 	
 	static {
 		Config.ConvertNonBreakingSpaces = false;
@@ -113,6 +114,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		this.bufferedWhitespace = new StringBuilder();
 		this.hasUtf8Bom = false;
 		this.hasUtf8Encoding = false;
+		this.currentId = null;
 	}
 
 	/**
@@ -123,6 +125,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		this.bufferedWhitespace = new StringBuilder();
 		this.hasUtf8Bom = false;
 		this.hasUtf8Encoding = false;
+		this.currentId = null;
 	}
 
 	/**
@@ -547,7 +550,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		}
 
 		if (canStartNewTextUnit()) {
-			startTextUnit(text.toString());
+			startTextUnit(text.toString());			
 		} else {
 			addToTextUnit(text.toString());
 		}
@@ -652,24 +655,23 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 				handleAttributesThatAppearAnywhere(propertyTextUnitPlaceholders, startTag);
 				break;
 			case TEXT_UNIT_ELEMENT:
-				// search for an idAttribute and set it on the newly created TextUnit if found
-				for (PropertyTextUnitPlaceholder propOrText : propertyTextUnitPlaceholders) {
-					if (propOrText.getAccessType() == PlaceholderAccessType.NAME) {
-						idValue = propOrText.getValue();
-						break;
-					}
-				}
+//				// search for an idAttribute and set it on the newly created TextUnit if found
+//				for (PropertyTextUnitPlaceholder propOrText : propertyTextUnitPlaceholders) {
+//					if (propOrText.getAccessType() == PlaceholderAccessType.NAME) {
+//						this.currentId = propOrText.getValue();
+//						break;
+//					}
+//				}
 
 				handleAttributesThatAppearAnywhere(propertyTextUnitPlaceholders, startTag);
 
-				setTextUnitName(idValue);
+//				setTextUnitName(this.currentId);
 				setTextUnitType(getConfig().getElementType(startTag));
 				break;
 			default:
 				handleAttributesThatAppearAnywhere(propertyTextUnitPlaceholders, startTag);
 			}
 		} finally {
-
 			// A TextUnit may have already been created. Update its preserveWS field
 			if (eventBuilder.isCurrentTextUnit()) {
 				TextUnit tu = eventBuilder.peekMostRecentTextUnit();
@@ -991,6 +993,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 				propertyOrTextUnitPlaceholders.add(createPropertyTextUnitPlaceholder(
 						PlaceholderAccessType.NAME, attribute.getName(), attribute.getValue(),
 						startTag, attribute));
+				currentId = attribute.getValue();
 				break;
 			case ATTRIBUTE_PRESERVE_WHITESPACE:
 				boolean preserveWS = getConfig().isPreserveWhitespaceCondition(attribute.getName(),
@@ -1090,6 +1093,8 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 
 	protected void startTextUnit(String text) {
 		eventBuilder.startTextUnit(text);
+		setTextUnitName(currentId);
+		currentId = null;
 	}
 
 	protected void setTextUnitName(String name) {
@@ -1150,11 +1155,15 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 
 	protected void startTextUnit(GenericSkeleton startMarker) {
 		eventBuilder.startTextUnit(startMarker);
+		setTextUnitName(currentId);
+		currentId = null;
 	}
 
 	protected void startTextUnit(GenericSkeleton startMarker,
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
 		eventBuilder.startTextUnit(startMarker, propertyTextUnitPlaceholders);
+		setTextUnitName(currentId);
+		currentId = null;
 	}
 
 	protected void endTextUnit(GenericSkeleton endMarker) {
@@ -1167,6 +1176,8 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 
 	protected void startTextUnit() {
 		eventBuilder.startTextUnit();
+		setTextUnitName(currentId);
+		currentId = null;
 	}
 
 	protected long getTextUnitId() {

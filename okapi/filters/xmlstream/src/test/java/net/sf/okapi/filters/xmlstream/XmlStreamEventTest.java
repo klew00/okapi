@@ -60,7 +60,7 @@ public class XmlStreamEventTest {
 		skel.addContentPlaceholder(tu);
 		skel.add("\"");
 		tu.setIsReferent(true);
-		tu.setName("content");
+		tu.setType("content");
 		tu.setSkeleton(skel);
 		events.add(new Event(EventType.TEXT_UNIT, tu));
 
@@ -91,7 +91,7 @@ public class XmlStreamEventTest {
 		skel.addContentPlaceholder(tu2);
 		skel.add("'");
 		tu2.setIsReferent(true);
-		tu2.setName("title");
+		tu2.setType("title");
 		tu2.setSkeleton(skel);
 		events.add(new Event(EventType.TEXT_UNIT, tu2));
 
@@ -314,7 +314,7 @@ public class XmlStreamEventTest {
 		skel.addContentPlaceholder(tu2);
 		skel.add("\"");
 		tu2.setIsReferent(true);
-		tu2.setName("alt");
+		tu2.setType("alt");
 		tu2.setSkeleton(skel);
 		events.add(new Event(EventType.TEXT_UNIT, tu2));
 
@@ -327,7 +327,7 @@ public class XmlStreamEventTest {
 		skel.addReference(tu2);
 		skel.add("/>");
 		dp1.setIsReferent(true);
-		dp1.setName("img");
+		dp1.setType("img");
 		dp1.setSkeleton(skel);
 		events.add(new Event(EventType.DOCUMENT_PART, dp1));
 

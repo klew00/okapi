@@ -480,8 +480,7 @@ public class EventBuilder {
 
 		tu.setMimeType(propOrText.getMimeType());
 		tu.setIsReferent(true);
-		tu.setName(propOrText.getName());
-		tu.setType(propOrText.getElementType());
+		tu.setType(propOrText.getElementType() == null ? propOrText.getName() : propOrText.getElementType());
 
 		GenericSkeleton skel = new GenericSkeleton();
 
@@ -503,6 +502,7 @@ public class EventBuilder {
 
 	private void embeddedReadonlyProp(INameable resource, PropertyTextUnitPlaceholder propOrText, String tag,
 			LocaleId locId) {
+		
 		setPropertyBasedOnLocale(resource, locId, new Property(propOrText.getName(), propOrText.getValue(), true));
 		currentSkeleton.add(tag.substring(propOrText.getMainStartPos(), propOrText.getMainEndPos()));
 	}
@@ -593,6 +593,7 @@ public class EventBuilder {
 			} else if (propOrText.getAccessType() == PlaceholderAccessType.READ_ONLY_PROPERTY) {
 				embeddedReadonlyProp(resource, propOrText, tag, locale);
 			} else if (propOrText.getAccessType() == PlaceholderAccessType.NAME) {
+				resource.setName(propOrText.getValue());
 				embeddedReadonlyProp(resource, propOrText, tag, locale);
 			} else {
 				throw new OkapiIllegalFilterOperationException("Unkown Property or TextUnit type");

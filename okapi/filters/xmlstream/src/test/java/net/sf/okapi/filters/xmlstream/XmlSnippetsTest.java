@@ -444,4 +444,18 @@ public class XmlSnippetsTest {
 				xmlStreamFilter)));
 		parameters = originalParameters;
 	}
+	
+	@Test
+	public void testXmlIdResname() {
+		URL originalParameters = parameters;
+		parameters = XmlSnippetsTest.class.getResource("dita.yml");
+		String snippet = "<note id=\"v512165_fr-fr\" type=\"other\" othertype=\"WARNING\">Some text here... </note>";
+		TextUnit tu = FilterTestDriver.getTextUnit(XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters), 1);
+		assertNull(tu.getName());
+		
+		snippet = "<note xml:id=\"v512165_fr-fr\" type=\"other\" othertype=\"WARNING\">Some text here... </note>";
+		tu = FilterTestDriver.getTextUnit(XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters), 2);
+		assertEquals("v512165_fr-fr", tu.getName());
+		parameters = originalParameters;
+	}
 }
