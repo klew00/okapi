@@ -323,13 +323,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 			}
 		}
 
-		if (!nodeIterator.hasNext()) {
-			// make sure we flush out any whitespace at the end of the file
-			if (bufferedWhitespace.length() > 0) {
-				eventBuilder.addDocumentPart(bufferedWhitespace.toString());
-				bufferedWhitespace.setLength(0);
-				bufferedWhitespace.trimToSize();
-			}
+		if (!nodeIterator.hasNext()) {			
 			endFilter(); // we are done
 		}
 
@@ -375,7 +369,17 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 * End the current filter processing and send the {@link Ending} {@link Event}
 	 */
 	protected void endFilter() {
-		eventBuilder.flushRemainingEvents();	
+		// clear out all unended temp events
+		eventBuilder.flushRemainingTempEvents();
+		
+		// make sure we flush out any whitespace at the end of the file
+		if (bufferedWhitespace.length() > 0) {
+			eventBuilder.addDocumentPart(bufferedWhitespace.toString());
+			bufferedWhitespace.setLength(0);
+			bufferedWhitespace.trimToSize();
+		}
+		
+		// add the final endDocument event
 		eventBuilder.addFilterEvent(createEndFilterEvent());
 	}
 

@@ -176,7 +176,7 @@ public class RailsYamlFilter extends AbstractFilter {
 		} while (result != RESULT_END);
 		
 		if(parseState == PARSE_STOP) {
-			getEventBuilder().flushRemainingEvents();
+			getEventBuilder().flushRemainingTempEvents();
 			getEventBuilder().addFilterEvent(createEndFilterEvent());
 		}
 

@@ -91,7 +91,7 @@ public class DummyBaseFilter extends AbstractFilter {
 		eventBuilder.addToDocumentPart("<secondPart/>");
 		eventBuilder.endDocumentPart();
 		
-		eventBuilder.flushRemainingEvents();
+		eventBuilder.flushRemainingTempEvents();
 		eventBuilder.addFilterEvent(createEndFilterEvent());
 	}
 
@@ -111,7 +111,7 @@ public class DummyBaseFilter extends AbstractFilter {
 		eventBuilder.addToTextUnit("Text");
 		eventBuilder.addToTextUnit(new Code(TagType.CLOSING, "bold", "</b>"));
 		
-		eventBuilder.flushRemainingEvents();
+		eventBuilder.flushRemainingTempEvents();
 		eventBuilder.addFilterEvent(createEndFilterEvent());
 	}
 

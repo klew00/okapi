@@ -221,7 +221,7 @@ public class VersifiedTextFilter extends AbstractFilter {
 
 		// reached the end of the file
 		if (currentLine == null) {
-			eventBuilder.flushRemainingEvents();
+			eventBuilder.flushRemainingTempEvents();
 			eventBuilder.addFilterEvent(createEndFilterEvent());
 		}
 

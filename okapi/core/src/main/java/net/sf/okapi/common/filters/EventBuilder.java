@@ -191,7 +191,7 @@ public class EventBuilder {
 	/**
 	 * Flush all remaining events from the {@link Event} queues
 	 */
-	public void flushRemainingEvents() {
+	public void flushRemainingTempEvents() {
 		if (hasUnfinishedSkeleton()) {
 			endDocumentPart();
 		} else if (!tempFilterEventStack.isEmpty()) {
