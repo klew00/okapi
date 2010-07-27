@@ -34,6 +34,8 @@ import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
 public class Parameters extends BaseParameters {
 	
 	public static final String DEFAULT_PARAMETERS = "default.yml";
+	public static final String DITA_PARAMETERS = "dita.yml";
+	public static final String PROPERTY_XML_PARAMETERS = "javaPropertiesXml.yml";
 			
 	private TaggedFilterConfiguration taggedConfig;
 

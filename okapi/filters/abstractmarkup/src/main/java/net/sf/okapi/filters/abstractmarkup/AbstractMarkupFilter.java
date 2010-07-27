@@ -139,7 +139,11 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	/**
 	 * Close the filter and all used resources.
 	 */
-	public void close() {			
+	public void close() {		
+		this.hasUtf8Bom = false;
+		this.hasUtf8Encoding = false;
+		this.currentId = null;
+
 		if (ruleState != null) {
 			ruleState.reset(!getConfig().isGlobalPreserveWhitespace());
 		}
@@ -336,6 +340,12 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		}
 
 		if (!nodeIterator.hasNext()) {
+			// make sure we flush out any whitespace at the end of the file
+			if (bufferedWhitespace.length() > 0) {
+				eventBuilder.addDocumentPart(bufferedWhitespace.toString());
+				bufferedWhitespace.setLength(0);
+				bufferedWhitespace.trimToSize();
+			}
 			endFilter(); // we are done
 		}
 
