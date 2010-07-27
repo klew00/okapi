@@ -1,4 +1,4 @@
-package net.sf.okapi.filters.vignette;
+package net.sf.okapi.common.filters;
 
 import net.sf.okapi.common.annotation.IAnnotation;
 

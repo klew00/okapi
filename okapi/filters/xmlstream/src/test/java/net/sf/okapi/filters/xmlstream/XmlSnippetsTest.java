@@ -455,7 +455,7 @@ public class XmlSnippetsTest {
 		
 		snippet = "<note xml:id=\"v512165_fr-fr\" type=\"other\" othertype=\"WARNING\">Some text here... </note>";
 		tu = FilterTestDriver.getTextUnit(XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters), 2);
-		assertEquals("v512165_fr-fr", tu.getName());
+		assertEquals("v512165_fr-fr-xml:id", tu.getName());
 		parameters = originalParameters;
 	}
 }

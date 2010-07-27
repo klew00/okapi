@@ -20,6 +20,7 @@
 
 package net.sf.okapi.filters.vignette;
 
+import net.sf.okapi.common.filters.SubFilterAnnotation;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;

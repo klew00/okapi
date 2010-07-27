@@ -63,12 +63,14 @@ public class SubFilterEventConverter {
 			startGroup.setMimeType(((StartDocument) event.getResource()).getMimeType());
 			startGroup.setSkeleton(startGroupSkeleton);
 			startGroup.setName(IFilter.SUB_FILTER + ((StartDocument) event.getResource()).getName());
+			startGroup.setAnnotation(new SubFilterAnnotation());			
 			event = new Event(EventType.START_GROUP, startGroup);
 			break;
 
 		case END_DOCUMENT:
 			Ending endGroup = new Ending(groupIdGenerator.getLastId(IdGenerator.END_GROUP));
 			endGroup.setSkeleton(endGroupSkeleton);
+			endGroup.setAnnotation(new SubFilterAnnotation());
 			event = new Event(EventType.END_GROUP, endGroup);
 			break;
 

@@ -201,22 +201,6 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	}
 
 	/**
-	 * Use this open when the rootId must be different from the document name. Used mostly when filter is called as a
-	 * sub-filters.
-	 * 
-	 * @param input
-	 *            - input to the {@link IFilter} (can be a {@link CharSequence}, {@link URI} or {@link InputStream})
-	 * @param generateSkeleton
-	 *            - true if the {@link IFilter} should store non-translatble blocks (aka skeleton), false otherwise.
-	 * @param rootId
-	 *            - id root used to give resources a unique id
-	 *
-	public void open(RawDocument input, boolean generateSkeleton, String rootId) {		
-		open(input, generateSkeleton);
-		this.rootId = rootId;
-	}*/
-
-	/**
 	 * Start a new {@link IFilter} using the supplied {@link RawDocument}.
 	 * 
 	 * @param input
@@ -997,7 +981,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 				propertyOrTextUnitPlaceholders.add(createPropertyTextUnitPlaceholder(
 						PlaceholderAccessType.NAME, attribute.getName(), attribute.getValue(),
 						startTag, attribute));
-				currentId = attribute.getValue();
+				currentId = attribute.getValue() + "-" + attribute.getName();
 				break;
 			case ATTRIBUTE_PRESERVE_WHITESPACE:
 				boolean preserveWS = getConfig().isPreserveWhitespaceCondition(attribute.getName(),

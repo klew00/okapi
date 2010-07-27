@@ -59,7 +59,7 @@ import net.sf.okapi.filters.openxml.ConditionalParameters;
 import net.sf.okapi.filters.openxml.OpenXMLZipFilterWriter;
 import net.sf.okapi.filters.pensieve.PensieveFilterWriter;
 import net.sf.okapi.filters.po.POFilterWriter;
-import net.sf.okapi.filters.vignette.SubFilterAnnotation;
+import net.sf.okapi.common.filters.SubFilterAnnotation;
 import net.sf.okapi.persistence.BeanMapper;
 import net.sf.okapi.persistence.IVersionDriver;
 import net.sf.okapi.persistence.NamespaceMapper;

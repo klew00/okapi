@@ -60,6 +60,7 @@ import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filters.SubFilter;
+import net.sf.okapi.common.filters.SubFilterAnnotation;
 import net.sf.okapi.common.filters.SubFilterEventConverter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -74,7 +75,6 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 import net.sf.okapi.filters.abstractmarkup.AbstractMarkupFilter;
-import net.sf.okapi.filters.html.HtmlFilter;
 
 /**
  * Implements the IFilter interface for Vignette export/import content.
@@ -741,8 +741,9 @@ public class VignetteFilter implements IFilter {
 				// convert to true SubFilter
 				SubFilterEventConverter converter = 
 					new SubFilterEventConverter(subDocId.getLastId(), 
-							new GenericSkeleton("<![CDATA["), 
-							new GenericSkeleton("]]>"));
+							// we don't add CDATA markers because this filter 
+							// uses a special skeleton writer to output them
+							null, null);
 			
 				((AbstractFilter)subFilter).setParentId(subDocId.getLastId());
 				subFilter.open(new RawDocument(data, srcLoc));

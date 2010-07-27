@@ -170,10 +170,10 @@ public class XmlStreamConfigurationSupportTest {
 		String snippet = "<p id='id1'>t1</p><pre id='id2'>t2</pre>";
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
 		assertEquals("t1", tu.getSource().toString());
-		assertEquals("id1", tu.getName());
+		assertEquals("id1-id", tu.getName());
 		tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 2);
 		assertEquals("t2", tu.getSource().toString());
-		assertEquals("id2", tu.getName());
+		assertEquals("id2-id", tu.getName());
 	}
 
 	@Test
@@ -187,10 +187,10 @@ public class XmlStreamConfigurationSupportTest {
 		String snippet = "<p id='id1'>t1</p><p xml:id='id2'>t2</p>";
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
 		assertEquals("t1", tu.getSource().toString());
-		assertEquals("id1", tu.getName());
+		assertEquals("id1-id", tu.getName());
 		tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 2);
 		assertEquals("t2", tu.getSource().toString());
-		assertEquals("id2", tu.getName());
+		assertEquals("id2-xml:id", tu.getName());
 	}
 
 	@Test

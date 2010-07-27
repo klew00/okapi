@@ -1,6 +1,5 @@
-
 global_cdata_subfilter: okf_html
-preserve_whitespace: true
+preserve_whitespace: false
 
 elements:
   entry:

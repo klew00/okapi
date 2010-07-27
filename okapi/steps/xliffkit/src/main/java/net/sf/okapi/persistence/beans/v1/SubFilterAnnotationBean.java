@@ -20,7 +20,7 @@
 
 package net.sf.okapi.persistence.beans.v1;
 
-import net.sf.okapi.filters.vignette.SubFilterAnnotation;
+import net.sf.okapi.common.filters.SubFilterAnnotation;
 import net.sf.okapi.persistence.IPersistenceSession;
 import net.sf.okapi.persistence.PersistenceBean;
 

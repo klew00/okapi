@@ -118,7 +118,9 @@ public class EventBuilder {
 				}
 				// handle case if called by a subfilter
 				if (subFilter && event.getEventType() == EventType.END_GROUP) {
-					done = true;
+					if (event.getEndGroup().getAnnotation(SubFilterAnnotation.class) != null) {
+						done = true;
+					}
 				}
 				return event;
 			}
@@ -593,7 +595,7 @@ public class EventBuilder {
 			} else if (propOrText.getAccessType() == PlaceholderAccessType.READ_ONLY_PROPERTY) {
 				embeddedReadonlyProp(resource, propOrText, tag, locale);
 			} else if (propOrText.getAccessType() == PlaceholderAccessType.NAME) {
-				resource.setName(propOrText.getValue());
+				resource.setName(propOrText.getValue() + "-" + propOrText.getName());
 				embeddedReadonlyProp(resource, propOrText, tag, locale);
 			} else {
 				throw new OkapiIllegalFilterOperationException("Unkown Property or TextUnit type");

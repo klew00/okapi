@@ -144,7 +144,7 @@ public class XmlStreamEventTest {
 
 		// Build the input
 		TextUnit tu1 = new TextUnit("tu1", "");		
-		tu1.setName("foo");
+		tu1.setName("foo-id");
 		tu1.setType("paragraph");
 		tu1.setMimeType(MimeTypeMapper.XML_MIME_TYPE);
 		tu1.setSourceProperty(new Property("id", "foo", true));
