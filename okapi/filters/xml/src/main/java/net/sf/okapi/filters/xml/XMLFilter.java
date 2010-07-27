@@ -145,7 +145,7 @@ public class XMLFilter implements IFilter {
 		list.add(new FilterConfiguration(getName()+"-JavaProperties",
 			MimeTypeMapper.XML_MIME_TYPE,
 			getClass().getName(),
-			"Java Properties in XML",
+			"Java Properties XML",
 			"Configuration for Java Properties files in XML.",
 			"JavaProperties.fprm"));
 		list.add(new FilterConfiguration(getName()+"-AndroidStrings",
