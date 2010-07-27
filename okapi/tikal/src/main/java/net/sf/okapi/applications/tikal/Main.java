@@ -629,7 +629,7 @@ public class Main {
 				fcMapper.addConfigurations(filtersMap.get(configId));
 				// Hard code case: okf_vignette requires okgf_html to be also loaded
 				//TODO: Find a better way to handle sub-filter cases
-				if ( configId.equals("okf_vignette") ) {
+				if ( configId.equals("okf_vignette") || configId.equals("okf_xmlstream") ) {
 					fcMapper.addConfigurations(filtersMap.get("okf_html"));
 				}
 				return true;
