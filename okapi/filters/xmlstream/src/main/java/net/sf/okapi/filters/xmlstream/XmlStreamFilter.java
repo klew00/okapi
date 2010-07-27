@@ -54,7 +54,7 @@ public class XmlStreamFilter extends AbstractMarkupFilter {
 				getClass().getName(), "XML Stream", "Large XML Documents", //$NON-NLS-1$
 				Parameters.DEFAULT_PARAMETERS));
 		addConfiguration(new FilterConfiguration(getName(), MimeTypeMapper.XML_MIME_TYPE,
-				getClass().getName(), "DITA", "DITA Filter", //$NON-NLS-1$
+				getClass().getName(), "DITA", "DITA XML", //$NON-NLS-1$
 				Parameters.DITA_PARAMETERS));
 		addConfiguration(new FilterConfiguration(getName(), MimeTypeMapper.XML_MIME_TYPE,
 				getClass().getName(), "Java Properties XML", "Java Properties XML with Embedded HTML", //$NON-NLS-1$
