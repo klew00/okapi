@@ -38,6 +38,7 @@ import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.IdGenerator;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
@@ -71,7 +72,7 @@ public class TmxFilter implements IFilter {
 	private XMLStreamReader reader;	
 	private String docName;
 	private int tuId;
-	private int otherId; 
+	private IdGenerator otherId;
 	private LocaleId srcLang;
 	private LocaleId trgLang;
 	private LinkedList<Event> queue;	
@@ -172,7 +173,7 @@ public class TmxFilter implements IFilter {
 			// Parse next if nothing in the queue
 			if ( queue.isEmpty() ) {
 				if ( !read() ) {
-					Ending ending = new Ending(String.valueOf(++otherId));
+					Ending ending = new Ending(otherId.createId());
 					ending.setSkeleton(skel);
 					queue.add(new Event(EventType.END_DOCUMENT, ending));
 				}
@@ -280,7 +281,7 @@ public class TmxFilter implements IFilter {
 			preserveSpaces = new Stack<Boolean>();
 			preserveSpaces.push(false);
 			tuId = 0;
-			otherId = 0;			
+			otherId = new IdGenerator(null, "d");			
 			hasNext=true;
 			queue = new LinkedList<Event>();
 			skipUtWarning = false;
@@ -291,7 +292,7 @@ public class TmxFilter implements IFilter {
 			//	encoding = reader.getEncoding();
 			//}
 			
-			StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
+			StartDocument startDoc = new StartDocument(otherId.createId());
 			startDoc.setName(docName);
 			startDoc.setEncoding(encoding, hasUTF8BOM); //TODO: UTF8 BOM detection
 			startDoc.setLocale(srcLang);
@@ -347,7 +348,7 @@ public class TmxFilter implements IFilter {
 					// Spaces can go with trans-unit to reduce the number of events.
 					// This allows to have only the trans-unit skeleton parts with the TextUnit event
 					if ( !skel.isEmpty(false) ) {
-						DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false, skel);
+						DocumentPart dp = new DocumentPart(otherId.createId(), false, skel);
 						skel = new GenericSkeleton(); // And create a new skeleton for the next event
 						queue.add(new Event(EventType.DOCUMENT_PART, dp));
 					}
@@ -356,7 +357,7 @@ public class TmxFilter implements IFilter {
 				}else{
 					storeStartElement();
 					if (!params.consolidateDpSkeleton) {
-						DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false, skel);
+						DocumentPart dp = new DocumentPart(otherId.createId(), false, skel);
 						skel = new GenericSkeleton();
 						queue.add(new Event(EventType.DOCUMENT_PART, dp));
 					}
@@ -366,7 +367,7 @@ public class TmxFilter implements IFilter {
 			case XMLStreamConstants.END_ELEMENT:
 				storeEndElement();
 				if (!params.consolidateDpSkeleton) {
-					DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false, skel);
+					DocumentPart dp = new DocumentPart(otherId.createId(), false, skel);
 					skel = new GenericSkeleton();
 					queue.add(new Event(EventType.DOCUMENT_PART, dp));
 				}

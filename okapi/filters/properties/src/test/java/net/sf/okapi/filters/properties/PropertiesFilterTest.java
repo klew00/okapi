@@ -42,8 +42,8 @@ import static org.junit.Assert.*;
 public class PropertiesFilterTest {
 	
 	private PropertiesFilter filter;
-	private LocaleId locEN = LocaleId.fromString("en");
-	private LocaleId locFR = LocaleId.fromString("fr");
+	private LocaleId locEN = LocaleId.ENGLISH;
+	private LocaleId locFR = LocaleId.FRENCH;
 
 	@Before
 	public void setUp() {
@@ -173,6 +173,15 @@ public class PropertiesFilterTest {
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu); // Convert the \n
 		assertEquals("Text1\n=lf, \t=tab, \\w=w, \\r=cr, \\\\=bs", tu.getSource().toString());
+	}
+
+	@Test
+	public void testSpecialCharsInKey () {
+		String snippet = "Key\\ \\:\\\\:Text1\n";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertNotNull(tu);
+		assertEquals("Key\\ \\:\\\\", tu.getName());
+		assertEquals("Text1", tu.getSource().toString());
 	}
 
 	@Test
