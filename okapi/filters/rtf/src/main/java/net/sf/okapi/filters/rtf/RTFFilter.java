@@ -125,6 +125,7 @@ public class RTFFilter implements IFilter {
 	public static final int CW_FTNSEPC           = 53;
 	public static final int CW_AFTNSEP           = 54;
 	public static final int CW_AFTNSEPC          = 55;
+	public static final int CW_RTF               = 56;
 
 	private final Logger logger = Logger.getLogger(getClass().getName());
 	
@@ -155,8 +156,9 @@ public class RTFFilter implements IFilter {
 	private int noReset;
 	private byte byteData;
 	private char uChar;
-	int internalStyle;
-	int doNotTranslateStyle;
+	private int internalStyle;
+	private boolean rtfDetected;
+	private int doNotTranslateStyle;
 	private CharsetDecoder currentCSDec;
 	private int currentDBCSCodepage;
 	private String currentCSName;
@@ -289,7 +291,7 @@ public class RTFFilter implements IFilter {
 		controlWords.put("ftnsepc", CW_FTNSEPC);
 		controlWords.put("aftnsep", CW_AFTNSEP);
 		controlWords.put("aftnsepc", CW_AFTNSEPC);
-		
+		controlWords.put("rtf", CW_RTF);
 	}
 	
 	public void cancel () {
@@ -435,6 +437,7 @@ public class RTFFilter implements IFilter {
 		close();
 		canceled = false;
 		
+		rtfDetected = false;
 		chCurrent = (char)0;
 		reParse = false;
 		chReParseChar = (char)0;
@@ -485,6 +488,9 @@ public class RTFFilter implements IFilter {
 		while ( true ) {
 			switch ( getNextToken() ) {
 			case TOKEN_ENDINPUT:
+				if ( !rtfDetected ) {
+					logger.warning("The input does not seem to be an RTF document.");
+				}
 				return false;
 
 			case TOKEN_CHAR:
@@ -1208,6 +1214,10 @@ public class RTFFilter implements IFilter {
 
 		case CW_PARD: // Reset properties
 			// TODO?
+			break;
+			
+		case CW_RTF:
+			rtfDetected = true;
 			break;
 
 		case CW_F:

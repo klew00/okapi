@@ -52,10 +52,20 @@ elements:
     ruleTypes: [ATTRIBUTES_ONLY]
     translatableAttributes: [value]
   
+  data:
+    ruleTypes: [ATTRIBUTES_ONLY]
+    translatableAttributes: [label]
+  
   vrm:
     ruleTypes: [ATTRIBUTES_ONLY]
     translatableAttributes: [version]
     
+  # pre-formatted elements
+  pre:
+    ruleTypes: [PRESERVE_WHITESPACE]
+  lines:
+    ruleTypes: [PRESERVE_WHITESPACE]
+
   # exclusion rules
   '.*':
     ruleTypes: [EXCLUDE]

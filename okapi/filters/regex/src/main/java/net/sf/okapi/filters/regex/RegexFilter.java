@@ -116,7 +116,7 @@ public class RegexFilter implements IFilter {
 		list.add(new FilterConfiguration(getName()+"-srt",
 			MIMETYPE,
 			getClass().getName(),
-			"STR Sub-Titles",
+			"SRT Sub-Titles",
 			"Configuration for SRT (Sub-Rip Text) sub-titles files.",
 			"srt.fprm"));
 		list.add(new FilterConfiguration(getName()+"-textLine",

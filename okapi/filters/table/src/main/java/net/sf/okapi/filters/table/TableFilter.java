@@ -51,7 +51,7 @@ public class TableFilter extends CompoundFilter {
 
 		addConfiguration(true, 
 				FILTER_CONFIG,
-				"Table Filter",
+				"Table Files",
 				"Table-like files such as tab-delimited, CSV, fixed-width columns, etc.", 
 				null);
 	

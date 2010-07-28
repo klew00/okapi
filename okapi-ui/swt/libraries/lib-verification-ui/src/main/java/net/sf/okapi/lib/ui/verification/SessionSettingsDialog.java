@@ -56,6 +56,7 @@ class SessionSettingsDialog {
 	private Text edTargetLocale;
 	private List lbDocs;
 	private Button btRemove;
+	private Button btRemoveAll;
 	
 	public SessionSettingsDialog (Shell parent, IHelp paramHelp) {
 
@@ -70,12 +71,12 @@ class SessionSettingsDialog {
 		
 		Group grpDocs = new Group(dialog, SWT.NONE);
 		grpDocs.setText("Documents");
-		grpDocs.setLayout(new GridLayout(2, false));
+		grpDocs.setLayout(new GridLayout(3, false));
 		grpDocs.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
 		lbDocs = new List(grpDocs, SWT.BORDER | SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 		GridData gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.horizontalSpan = 2;
+		gdTmp.horizontalSpan = 3;
 		lbDocs.setLayoutData(gdTmp);
 		
 		Button btAdd = UIUtil.createGridButton(grpDocs, SWT.PUSH, "Add...", UIUtil.BUTTON_DEFAULT_WIDTH, 1);
@@ -89,6 +90,13 @@ class SessionSettingsDialog {
 		btRemove.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				removeDocument();
+			}
+		});
+		
+		btRemoveAll = UIUtil.createGridButton(grpDocs, SWT.PUSH, "Remove All", UIUtil.BUTTON_DEFAULT_WIDTH, 1);
+		btRemoveAll.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				removeAll();
 			}
 		});
 		
@@ -155,6 +163,11 @@ class SessionSettingsDialog {
 		updateFileButtons();
 	}
 	
+	private void removeAll () {
+		lbDocs.removeAll();
+		updateFileButtons();
+	}
+	
 	private void addDocument () {
 		try {
 			InputDocumentDialog dlg = new InputDocumentDialog(dialog, "Add document",
@@ -206,6 +219,7 @@ class SessionSettingsDialog {
 	
 	private void updateFileButtons () {
 		btRemove.setEnabled(lbDocs.getSelectionIndex()>-1);
+		btRemoveAll.setEnabled(lbDocs.getItemCount()>0);
 	}
 	
 	public void setData (QualityCheckSession session) {

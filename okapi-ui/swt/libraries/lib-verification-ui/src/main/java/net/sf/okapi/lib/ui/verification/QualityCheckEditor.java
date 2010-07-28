@@ -1189,7 +1189,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		else {
 			filename = "Untitled";
 		}
-		String text = "CheckMate (BETA)";
+		String text = "CheckMate";
 		shell.setText(filename + " - " + text); //$NON-NLS-1$
 	}
 

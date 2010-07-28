@@ -68,19 +68,19 @@ public class SplicedLinesFilter extends BasePlainTextFilter {
 		addConfiguration(false, 
 				FILTER_CONFIG_BACKSLASH,
 				"Spliced Lines (Backslash)",
-				"Sliced lines filter with the backslash character (\\) used as the splicer.", 
+				"Spliced lines filter with the backslash character (\\) used as the splicer.", 
 				"okf_plaintext_spliced_backslash.fprm");
 
 		addConfiguration(false, 
 				FILTER_CONFIG_UNDERSCORE,
 				"Spliced Lines (Underscore)",
-				"Sliced lines filter with the underscore character (_) used as the splicer.", 
+				"Spliced lines filter with the underscore character (_) used as the splicer.", 
 				"okf_plaintext_spliced_underscore.fprm");
 		
 		addConfiguration(false, 
 				FILTER_CONFIG_CUSTOM,
 				"Spliced Lines (Custom)",
-				"Sliced lines filter with a user-defined splicer.", 
+				"Spliced lines filter with a user-defined splicer.", 
 				"okf_plaintext_spliced_custom.fprm");
 	}
 	

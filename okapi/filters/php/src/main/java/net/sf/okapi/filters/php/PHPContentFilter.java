@@ -134,7 +134,7 @@ public class PHPContentFilter implements IFilter {
 	}
 	
 	public String getDisplayName () {
-		return "PHP Content Filter (ALPHA)";
+		return "PHP Content Filter (BETA)";
 	}
 
 	public String getMimeType () {
