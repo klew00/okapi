@@ -25,7 +25,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -204,7 +203,7 @@ public class FilterTestDriver {
 		return true;
 	}
 
-	static public boolean laxCompareEvents(ArrayList<Event> manual, ArrayList<Event> generated) {
+	static public boolean laxCompareEvents(List<Event> manual, List<Event> generated) {
 		if (manual.size() != generated.size()) {
 			return false;
 		}
@@ -309,7 +308,7 @@ public class FilterTestDriver {
 		return true;
 	}
 
-	static public boolean compareEvents(ArrayList<Event> list1, ArrayList<Event> list2) {
+	static public boolean compareEvents(List<Event> list1, List<Event> list2) {
 		int i = 0;
 		Event event1, event2;
 		while (i < list1.size()) {
@@ -333,7 +332,7 @@ public class FilterTestDriver {
 		return true;
 	}
 
-	static public boolean compareEventTypesOnly(ArrayList<Event> manual, ArrayList<Event> generated) {
+	static public boolean compareEventTypesOnly(List<Event> manual, List<Event> generated) {
 		if (manual.size() != generated.size()) {
 			return false;
 		}
@@ -546,7 +545,7 @@ public class FilterTestDriver {
 	 *            Code of the target (output) language.
 	 * @return The generated output string
 	 */
-	public static String generateOutput(ArrayList<Event> list, EncoderManager encoderManager,
+	public static String generateOutput(List<Event> list, EncoderManager encoderManager,
 			LocaleId trgLang) {
 		GenericSkeletonWriter writer = new GenericSkeletonWriter();
 		return generateOutput(list, trgLang, writer, encoderManager, false);
@@ -563,7 +562,7 @@ public class FilterTestDriver {
 	 *            Code of the target (output) language.
 	 * @return The generated output string
 	 */
-	public static String generateChangedOutput(ArrayList<Event> list,
+	public static String generateChangedOutput(List<Event> list,
 			EncoderManager encoderManager, LocaleId trgLang) {
 		GenericSkeletonWriter writer = new GenericSkeletonWriter();
 		return generateOutput(list, trgLang, writer, encoderManager, true);
@@ -582,7 +581,7 @@ public class FilterTestDriver {
 	 *            encoder manager.
 	 * @return The generated output string.
 	 */
-	public static String generateOutput(ArrayList<Event> list, LocaleId trgLang,
+	public static String generateOutput(List<Event> list, LocaleId trgLang,
 			ISkeletonWriter skelWriter, EncoderManager encoderManager) {
 		return generateOutput(list, trgLang, skelWriter, encoderManager, false);
 	}
@@ -602,7 +601,7 @@ public class FilterTestDriver {
 	 *            true to change the content of the target TU.
 	 * @return The generated output string.
 	 */
-	public static String generateOutput(ArrayList<Event> list, LocaleId trgLang,
+	public static String generateOutput(List<Event> list, LocaleId trgLang,
 			ISkeletonWriter skelWriter, EncoderManager encoderManager, boolean changeTarget) {
 		StringBuilder tmp = new StringBuilder();
 		for (Event event : list) {
@@ -736,7 +735,7 @@ public class FilterTestDriver {
 	 *            The number of the unit to return: 1 for the first one, 2 for the second, etc.
 	 * @return The text unit found, or null.
 	 */
-	public static TextUnit getTextUnit(ArrayList<Event> list, int tuNumber) {
+	public static TextUnit getTextUnit(List<Event> list, int tuNumber) {
 		int n = 0;
 		for (Event event : list) {
 			if (event.getEventType() == EventType.TEXT_UNIT) {
@@ -757,7 +756,7 @@ public class FilterTestDriver {
 	 *            The number of the group to return: 1 for the first one, 2 for the second, etc.
 	 * @return The group found, or null.
 	 */
-	public static StartGroup getGroup(ArrayList<Event> list, int tuNumber) {
+	public static StartGroup getGroup(List<Event> list, int tuNumber) {
 		int n = 0;
 		for (Event event : list) {
 			if (event.getEventType() == EventType.START_GROUP) {
@@ -776,7 +775,7 @@ public class FilterTestDriver {
 	 *            The list of events
 	 * @return The start document found, or null.
 	 */
-	public static StartDocument getStartDocument(ArrayList<Event> list) {
+	public static StartDocument getStartDocument(List<Event> list) {
 		for (Event event : list) {
 			if (event.getEventType() == EventType.START_DOCUMENT) {
 				return (StartDocument) event.getResource();
@@ -794,7 +793,7 @@ public class FilterTestDriver {
 	 *            the number of the sub-document to return 1 for first, 2 for second, etc.
 	 * @return the sub-document found or null.
 	 */
-	public static StartSubDocument getStartSubDocument(ArrayList<Event> list, int subDocNumber) {
+	public static StartSubDocument getStartSubDocument(List<Event> list, int subDocNumber) {
 		int n = 0;
 		for (Event event : list) {
 			if (event.getEventType() == EventType.START_SUBDOCUMENT) {
@@ -815,7 +814,7 @@ public class FilterTestDriver {
 	 *            The number of the document part to return: 1 for the first one, 2 for the second, etc.
 	 * @return The document part found, or null.
 	 */
-	public static DocumentPart getDocumentPart(ArrayList<Event> list, int dpNumber) {
+	public static DocumentPart getDocumentPart(List<Event> list, int dpNumber) {
 		int n = 0;
 		for (Event event : list) {
 			if (event.getEventType() == EventType.DOCUMENT_PART) {

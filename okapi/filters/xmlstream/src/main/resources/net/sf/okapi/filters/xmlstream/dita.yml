@@ -122,6 +122,7 @@ elements:
   
   image:
     ruleTypes: [INLINE]
+    translatableAttributes: [alt]
     conditions: [placement, NOT_EQUALS, break]
   
   itemgroup:

@@ -15,6 +15,7 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.beans.EventSetDescriptor;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -456,6 +457,28 @@ public class XmlSnippetsTest {
 		snippet = "<note xml:id=\"v512165_fr-fr\" type=\"other\" othertype=\"WARNING\">Some text here... </note>";
 		tu = FilterTestDriver.getTextUnit(XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters), 2);
 		assertEquals("v512165_fr-fr-xml:id", tu.getName());
+		parameters = originalParameters;
+	}
+	
+	@Test
+	public void testConditionalInlineWithAttribute() {
+		URL originalParameters = parameters;
+		parameters = XmlSnippetsTest.class.getResource("dita.yml");
+		String snippet = "<p>TEST: <image href=\"bike.gif\" alt=\"text in alt\"/> more text</p>";
+		List<Event> events = XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters);
+		TextUnit tu1 = FilterTestDriver.getTextUnit(events, 1);		
+		TextUnit tu2 = FilterTestDriver.getTextUnit(events, 2);		
+		TextUnit tu3 = FilterTestDriver.getTextUnit(events, 3);
+		assertEquals("text in alt", tu1.toString());
+		assertEquals("TEST:", tu2.toString());		
+		assertEquals("more text", tu3.toString());
+		
+		snippet = "<p>TEST: <image placement=\"break\" href=\"bike.gif\" alt=\"text in alt\"/> more text</p>";
+		events = XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters);
+		tu1 = FilterTestDriver.getTextUnit(events, 1);
+		tu2 = FilterTestDriver.getTextUnit(events, 2);
+		assertEquals("text in alt", tu1.toString());
+		assertEquals("TEST: <image placement=\"break\" href=\"bike.gif\" [#$tu2]/> more text", tu2.toString());				
 		parameters = originalParameters;
 	}
 }

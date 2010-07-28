@@ -339,9 +339,10 @@ public class TaggedFilterConfiguration {
 		}
 
 		// test for a conditional rule on this element
-		if (!doesElementRuleConditionApply(elementRule, attributes)) {
-			return RULE_TYPE.RULE_FAILED;
-		}
+// Do we want to include attributes on elements whose rules don't apply?
+//		if (!doesElementRuleConditionApply(elementRule, attributes)) {
+//			return RULE_TYPE.RULE_FAILED;
+//		}
 
 		// these attribute rules are mutually exclusive
 		String[] elementRuleNames = { ELEMENT_TRANSLATABLE_ATTRIBUTES, ELEMENT_WRITABLE_ATTRIBUTES,
@@ -493,12 +494,15 @@ public class TaggedFilterConfiguration {
 		RULE_TYPE type = getElementRuleType(tag.toLowerCase());
 		if (type != RULE_TYPE.RULE_NOT_FOUND) {
 			
+			// handle case where a regex rule may override the normal rule
 			if (type == RULE_TYPE.INLINE_EXCLUDED_ELEMENT) {
 				if (doesElementRuleConditionApply(configReader.getElementRule(tag), attributes) &&
 						doesElementRuleConditionApply(configReader.getRegexElementRule(tag), attributes)) {
 					return RULE_TYPE.INLINE_EXCLUDED_ELEMENT;
-				} else {
+				} else if (doesElementRuleConditionApply(configReader.getElementRule(tag), attributes)) {
 					return RULE_TYPE.INLINE_ELEMENT;
+				} else {
+					return RULE_TYPE.RULE_FAILED;
 				}
 			}
 			
