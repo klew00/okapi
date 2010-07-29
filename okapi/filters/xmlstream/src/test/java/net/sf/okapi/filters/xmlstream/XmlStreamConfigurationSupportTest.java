@@ -140,6 +140,18 @@ public class XmlStreamConfigurationSupportTest {
 	}
 	
 	@Test
+	public void test_EXCLUDE2() {
+		String config = 
+			    "elements:\n" +
+				"  prolog: \n" +
+			    "    ruleTypes: [EXCLUDE]";
+		filter.setParameters(new Parameters(config));
+		String snippet = "<prolog><author>xyz</author></prolog>";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		assertNull(tu);
+	}
+	
+	@Test
 	public void test_INCLUDE () {
 		String config = 
 			"elements:\n" +

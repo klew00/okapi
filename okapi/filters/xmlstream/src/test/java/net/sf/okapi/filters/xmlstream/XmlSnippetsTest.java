@@ -94,8 +94,7 @@ public class XmlSnippetsTest {
 	@Test
 	public void testExtractValueInInput() {
 		String snippet = "<input type=\"other\" value=\"Text\"/>.";
-		ArrayList<Event> events = XmlStreamTestUtils
-				.getEvents(snippet, xmlStreamFilter, parameters);
+		List<Event> events = XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters);
 		TextUnit tu = FilterTestDriver.getTextUnit(events, 1);
 		assertNotNull(tu);
 		assertEquals("Text", tu.toString());
@@ -468,17 +467,29 @@ public class XmlSnippetsTest {
 		List<Event> events = XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters);
 		TextUnit tu1 = FilterTestDriver.getTextUnit(events, 1);		
 		TextUnit tu2 = FilterTestDriver.getTextUnit(events, 2);		
-		TextUnit tu3 = FilterTestDriver.getTextUnit(events, 3);
 		assertEquals("text in alt", tu1.toString());
-		assertEquals("TEST:", tu2.toString());		
-		assertEquals("more text", tu3.toString());
+		assertEquals("TEST: <image href=\"bike.gif\" [#$tu2]/> more text", tu2.toString());
 		
 		snippet = "<p>TEST: <image placement=\"break\" href=\"bike.gif\" alt=\"text in alt\"/> more text</p>";
 		events = XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters);
 		tu1 = FilterTestDriver.getTextUnit(events, 1);
 		tu2 = FilterTestDriver.getTextUnit(events, 2);
+		TextUnit tu3 = FilterTestDriver.getTextUnit(events, 3);
 		assertEquals("text in alt", tu1.toString());
-		assertEquals("TEST: <image placement=\"break\" href=\"bike.gif\" [#$tu2]/> more text", tu2.toString());				
+		assertEquals("TEST:", tu2.toString());		
+		assertEquals("more text", tu3.toString());
+
+		parameters = originalParameters;
+	}
+	
+	@Test
+	public void testExclude() {
+		URL originalParameters = parameters;
+		parameters = XmlSnippetsTest.class.getResource("dita.yml");
+		String snippet = "<prolog><author>xyz</author></prolog>";
+		List<Event> events = XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters);
+		TextUnit tu1 = FilterTestDriver.getTextUnit(events, 1);		
+		assertNull(tu1);
 		parameters = originalParameters;
 	}
 }

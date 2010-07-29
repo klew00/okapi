@@ -629,9 +629,9 @@ public class TaggedFilterConfiguration {
 
 		// we didn't find the conditional test attribute - we assume no
 		// extraction
-		if (attributes.get(conditionalAttribute.toLowerCase()) == null) {
-			return false;
-		}
+//		if (attributes.get(conditionalAttribute.toLowerCase()) == null) {
+//			return false;
+//		}
 
 		// '=', '!=' or regex
 		String compareType = (String) condition.get(1);
@@ -643,7 +643,7 @@ public class TaggedFilterConfiguration {
 			if (compareType.equalsIgnoreCase(NOT_EQUALS)) {
 				for (Iterator<String> i = conditionValues.iterator(); i.hasNext();) {
 					String value = i.next();
-					if (applyCondition(attributes.get(conditionalAttribute.toLowerCase()),
+					if (!applyCondition(attributes.get(conditionalAttribute.toLowerCase()),
 							compareType, value)) {
 						return false;
 					}
@@ -675,9 +675,9 @@ public class TaggedFilterConfiguration {
 
 	private boolean applyCondition(String attributeValue, String compareType, String conditionValue) {
 		if (compareType.equalsIgnoreCase(EQUALS)) {
-			return attributeValue.equalsIgnoreCase(conditionValue);
+			return conditionValue.equalsIgnoreCase(attributeValue);
 		} else if (compareType.equalsIgnoreCase(NOT_EQUALS)) {
-			return attributeValue.equalsIgnoreCase(conditionValue);
+			return !conditionValue.equalsIgnoreCase(attributeValue);
 		} else if (compareType.equalsIgnoreCase(MATCHES)) {
 			boolean result = false;
 			Pattern matchPattern = Pattern.compile(conditionValue);
