@@ -1090,12 +1090,28 @@ public class TextContainerTest {
 		segments.append(new TextFragment("t2"));
 		tc1.append(new TextFragment("  "));
 		segments.append(new TextFragment(" t3\n\n"));
+		tc1.append(new TextFragment("  "));
 		TextContainer tc2 = tc1.clone();
-		assertEquals("[ \tt1 ]   [t2]  [ t3\n\n]", fmt.printSegmentedContent(tc1, true));
+		assertEquals("[ \tt1 ]   [t2]  [ t3\n\n]  ", fmt.printSegmentedContent(tc1, true));
 		tc1.unwrap(true);
 		assertEquals("[t1 ][t2] [t3]", fmt.printSegmentedContent(tc1, true));
 		tc2.unwrap(false);
 		assertEquals("[ t1 ][t2] [t3 ]", fmt.printSegmentedContent(tc2, true));
+	}
+	
+	@Test
+	public void testUnwrap_MixedPartsWithText2 () {
+		TextContainer tc1 = new TextContainer();
+		ISegments segments = tc1.getSegments();		
+		segments.append(new TextFragment("t1"));
+		tc1.append(new TextFragment(" "));
+		TextContainer tc2 = tc1.clone();
+		assertEquals(2, tc1.count());
+		assertEquals("[t1] ", fmt.printSegmentedContent(tc1, true));
+		tc1.unwrap(true);
+		assertEquals("[t1]", fmt.printSegmentedContent(tc1, true));
+		tc2.unwrap(false);
+		assertEquals("[t1] ", fmt.printSegmentedContent(tc2, true));
 	}
 	
 	@Test

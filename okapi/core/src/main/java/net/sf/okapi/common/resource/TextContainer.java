@@ -876,7 +876,7 @@ public class TextContainer implements Iterable<TextPart> {
 					if ( part.text.text.length() == 0 ) {
 						if ( !parts.get(i).isSegment() ) {
 							parts.remove(i);
-							i++; // Adjust
+							// No need to adjust when going backward
 						}
 					}
 					else break;
