@@ -480,16 +480,5 @@ public class XmlSnippetsTest {
 		assertEquals("more text", tu3.toString());
 
 		parameters = originalParameters;
-	}
-	
-	@Test
-	public void testExclude() {
-		URL originalParameters = parameters;
-		parameters = XmlSnippetsTest.class.getResource("dita.yml");
-		String snippet = "<prolog><author>xyz</author></prolog>";
-		List<Event> events = XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters);
-		TextUnit tu1 = FilterTestDriver.getTextUnit(events, 1);		
-		assertNull(tu1);
-		parameters = originalParameters;
-	}
+	}	
 }

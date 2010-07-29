@@ -144,7 +144,10 @@ public class XmlStreamConfigurationSupportTest {
 		String config = 
 			    "elements:\n" +
 				"  prolog: \n" +
-			    "    ruleTypes: [EXCLUDE]";
+			    "    ruleTypes: [EXCLUDE]\n" +
+				"  '.*':\n" +
+				    "ruleTypes: [EXCLUDE]\n" +
+				    "conditions: [translate, EQUALS, 'no']";
 		filter.setParameters(new Parameters(config));
 		String snippet = "<prolog><author>xyz</author></prolog>";
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
