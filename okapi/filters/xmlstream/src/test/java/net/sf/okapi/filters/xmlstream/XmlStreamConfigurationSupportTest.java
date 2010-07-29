@@ -140,17 +140,36 @@ public class XmlStreamConfigurationSupportTest {
 	}
 	
 	@Test
-	public void test_EXCLUDE2() {
+	public void test_EXCLUDEWithRegexExcludeWithoutAttribute() {
 		String config = 
 			    "elements:\n" +
 				"  prolog: \n" +
 			    "    ruleTypes: [EXCLUDE]\n" +
 				"  '.*':\n" +
-				    "ruleTypes: [EXCLUDE]\n" +
-				    "conditions: [translate, EQUALS, 'no']";
+				"    ruleTypes: [EXCLUDE]\n" +
+				"    conditions: [translate, EQUALS, 'no']";
 		filter.setParameters(new Parameters(config));
 		String snippet = "<prolog><author>xyz</author></prolog>";
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		assertNull(tu);
+	}
+	
+	@Test
+	public void test_EXCLUDEWithRegexExcludeWithAttribute() {
+		String config = 
+			    "elements:\n" +
+				"  prolog: \n" +
+			    "    ruleTypes: [EXCLUDE]\n" +
+				"  '.*':\n" +
+				"    ruleTypes: [INCLUDE]\n" +
+				"    conditions: [translate, EQUALS, 'yes']";
+		filter.setParameters(new Parameters(config));
+		String snippet = "<prolog><author translate=\"yes\">xyz</author></prolog>";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		assertNotNull(tu);
+		
+		snippet = "<prolog><author translate=\"no\">xyz</author></prolog>";
+		tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
 		assertNull(tu);
 	}
 	

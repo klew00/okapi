@@ -46,7 +46,7 @@ public class XmlStreamEventTest {
 		parameters = XmlStreamEventTest.class.getResource("/wellformedConfiguration.yml");
 	}
 	
-		@Test
+	@Test
 	public void testMetaTagContent() {
 		String snippet = "<meta http-equiv=\"keywords\" content=\"one,two,three\"/>";
 		ArrayList<Event> events = new ArrayList<Event>();

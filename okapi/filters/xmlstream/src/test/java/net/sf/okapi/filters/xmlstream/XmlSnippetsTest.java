@@ -429,7 +429,7 @@ public class XmlSnippetsTest {
 		parameters = originalParameters;
 	}
 	
-	// TODO: Handle embedded translate=no/yes elements @Test
+	// FIXME: Handle embedded translate=no/yes elements @Test
 	public void testInlineAndNotExcludeEmbedded() {
 		URL originalParameters = parameters;
 		parameters = XmlSnippetsTest.class.getResource("dita.yml");

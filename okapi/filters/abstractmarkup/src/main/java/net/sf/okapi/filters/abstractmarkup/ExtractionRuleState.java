@@ -23,6 +23,7 @@ package net.sf.okapi.filters.abstractmarkup;
 import java.util.EmptyStackException;
 import java.util.Stack;
 
+import net.sf.okapi.common.ReversedIterator;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
 
 /**
@@ -84,33 +85,23 @@ public class ExtractionRuleState {
 		inlineRuleStack = new Stack<RuleType>();
 	}
 
-	public boolean isGroupState() {
-		if (groupRuleStack.isEmpty()) {
-			return false;
-		}
-		if (groupRuleStack.peek().ruleType == RULE_TYPE.GROUP_ELEMENT) {
-			return true;
-		}
-		return false;
-	}
-
-	public boolean isTextUnitState() {
-		if (textUnitRuleStack.isEmpty()) {
-			return false;
-		}
-		if (textUnitRuleStack.peek().ruleType == RULE_TYPE.TEXT_UNIT_ELEMENT) {
-			return true;
-		}
-		return false;
-	}
-
 	public boolean isExludedState() {
 		if (excludedIncludedRuleStack.isEmpty()) {
 			return false;
 		}
-		if (excludedIncludedRuleStack.peek().ruleType == RULE_TYPE.EXCLUDED_ELEMENT) {
-			return true;
+		
+		// reverse the stack as we want to see the most recently added first
+		ReversedIterator<RuleType> ri = new ReversedIterator<RuleType>(excludedIncludedRuleStack);
+		for (RuleType rt : ri) {
+			if (rt.ruleType == RULE_TYPE.EXCLUDED_ELEMENT) {
+				return true;
+			}
+			
+			if (rt.ruleType == RULE_TYPE.INCLUDED_ELEMENT) {
+				return false;
+			}
 		}
+		
 		return false;
 	}
 
@@ -119,7 +110,9 @@ public class ExtractionRuleState {
 			return false;
 		}
 
-		for (RuleType rt : inlineRuleStack) {
+		// reverse the stack as we want to see the most recently added first
+		ReversedIterator<RuleType> ri = new ReversedIterator<RuleType>(inlineRuleStack);
+		for (RuleType rt : ri) {
 			if (rt.ruleType == RULE_TYPE.INLINE_EXCLUDED_ELEMENT) {
 				return true;
 			}
