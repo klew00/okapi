@@ -63,6 +63,7 @@ Okapi Applications for Macintosh Cocoa 64-bit (Includes Libraries)
 Okapi Applications for Macintosh Cocoa (Includes Libraries)
 Okapi Applications for Linux 64-bit (Includes Libraries)
 Okapi Applications for Linux (Includes Libraries)
+Okapi Applications for Windows 64-bit (Includes Libraries)
 Okapi Applications for Windows (Includes Libraries)
 
 --- 8) Make sure all files of the Web site are modified if needed (trunk/website).
@@ -83,16 +84,16 @@ The structure in the okapi directory is the same as in trunk/website
 This revision is the one for this release.
 
 
---- 10) Post notification that a new release is available.
-At least here: http://tech.groups.yahoo.com/group/okapitools/
-
-
---- 11) Update the versions numbers in the files for the next version
+--- 10) Update the versions numbers in the files for the next version
 - All the POM.XML files
 - trunk/deployment/shared/release.properties
 - trunk/deployment/shared/changes.html (make the Changes Log ready for next set of changes)
 
 Now any new build will be a snapshot of the next release
+
+
+--- 11) Post notification that a new release is available.
+At least here: http://tech.groups.yahoo.com/group/okapitools/
 
 
 -end-

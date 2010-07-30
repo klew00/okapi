@@ -42,9 +42,8 @@ function CheckVersions ()
 	//=============================================================
 	// These variables must be set to the latest released versions
 	//-------------------------------------------------------------
-	var sRainbowVersion = "6.0.7";
-	var sRatelVersion = "1.0.7";
-	var sOkapiLibUIVersion = "0.7";
+	var sRainbowVersion = "6.0.8";
+	var sOkapiLibUIVersion = "0.8";
 	//=============================================================
 
 	var sParam, aParams;
@@ -55,13 +54,7 @@ function CheckVersions ()
 	sParam = sParam.slice(1);
 	aParams = sParam.split('=');
 	
-	if ( aParams[0] == "ratel" )
-	{
-		sBuf1 = document.getElementById('placeholder').innerHTML;
-		document.getElementById('placeholder').innerHTML
-			= sBuf1 + CheckVersion("ratel", aParams[1], sRatelVersion);
-	}
-	else if ( aParams[0] == "rainbow" )
+	if ( aParams[0] == "rainbow" )
 	{
 		sBuf1 = document.getElementById('placeholder').innerHTML;
 		document.getElementById('placeholder').innerHTML
