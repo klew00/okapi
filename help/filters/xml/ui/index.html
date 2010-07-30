@@ -239,8 +239,9 @@ treated as codes. Use the <code>codeFinder</code> element for this.</p>
  xmlns:its=&quot;http://www.w3.org/2005/11/its&quot;
  xmlns:okp=&quot;okapi-framework:xmlfilter-options&quot;&gt;
  &lt;okp:codeFinder useCodeFinder=&quot;yes&quot;&gt;#v1
-count.i=1
+count.i=2
 rule0=&amp;lt;(/?)\w[^&amp;lt;]*?&amp;gt;
+rule1=<code>(#\w+?\#)|(%\d+?%)</code>
  &lt;/okp:codeFinder&gt;
 &lt;/its:rules&gt;</pre>
 <p>Some important details:</p>

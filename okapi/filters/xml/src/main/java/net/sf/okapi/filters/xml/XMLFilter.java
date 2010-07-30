@@ -605,6 +605,20 @@ public class XMLFilter implements IFilter {
 	{
 		String id = String.valueOf(++tuId);
 		TextUnit tu = new TextUnit(id, attr.getValue(), true, MimeTypeMapper.XML_MIME_TYPE);
+
+		// Deal with inline codes if needed
+		if ( params.useCodeFinder ) {
+			TextFragment tf = tu.getSource().getFirstContent();
+			params.codeFinder.process(tf);
+			// Escape inline code content
+			List<Code> codes = tf.getCodes();
+			for ( Code code : codes ) {
+				if ( code.getData().equals("&#10;") ) continue; // Do not re-escape escaped line-breaks
+				code.setData(Util.escapeToXML(code.getData(), 0, params.escapeGT, null));
+			}
+			tf.setCodedText(tf.getCodedText(), codes);
+		}
+		
 		queue.add(new Event(EventType.TEXT_UNIT, tu));
 		if ( addToSkeleton ) skel.addReference(tu);
 		return id;
@@ -732,7 +746,6 @@ public class XMLFilter implements IFilter {
 		tu.setMimeType(MimeTypeMapper.XML_MIME_TYPE);
 		
 		// Deal with inline codes if needed
-		
 		if ( params.useCodeFinder ) {
 			params.codeFinder.process(frag);
 			// Escape inline code content
