@@ -217,7 +217,6 @@ public class GenericContent {
 				codedPos += 2;
 				break;
 			case TextFragment.MARKER_ISOLATED:
-//			case TextFragment.MARKER_SEGMENT:
 				index = TextFragment.toIndex(codedText.charAt(++i));
 				if ( codes.get(index).getTagType() == TagType.OPENING ) {
 					genericPos += String.format("<b%d/>", codes.get(index).getId()).length();
