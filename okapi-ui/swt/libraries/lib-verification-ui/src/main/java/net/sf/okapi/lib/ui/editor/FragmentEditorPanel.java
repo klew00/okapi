@@ -21,6 +21,7 @@
 package net.sf.okapi.lib.ui.editor;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import net.sf.okapi.common.resource.Code;
@@ -36,6 +37,8 @@ import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.custom.VerifyKeyListener;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.VerifyEvent;
@@ -62,11 +65,17 @@ public class FragmentEditorPanel {
 	private ArrayList<StyleRange> ranges;
 	private boolean updateCodeRanges = false;
 	private int prevPos = 0;
-	private boolean shiftMode = false;
+	private boolean shiftDown = false;
+	private boolean mouseDown = false;
+	private boolean targetMode = false;
+	private FragmentEditorPanel source;
+	private int nextCodeForCopy = -1;
 	
 	public FragmentEditorPanel (Composite parent,
-		int flag)
+		int flag,
+		boolean paramTargetMode)
 	{
+		targetMode = paramTargetMode;
 		if ( flag < 0 ) { // Use the default styles if requested
 			flag = SWT.WRAP | SWT.V_SCROLL | SWT.BORDER;
 		}
@@ -75,47 +84,34 @@ public class FragmentEditorPanel {
 		edit.setLayoutData(gdTmp);
 		
 		codeStyle = new TextStyle();
-		//codeStyle.foreground = parent.getDisplay().getSystemColor(SWT.COLOR_RED);
-		codeStyle.background = parent.getDisplay().getSystemColor(SWT.COLOR_CYAN);
-
+		codeStyle.foreground = parent.getDisplay().getSystemColor(SWT.COLOR_RED);
+		//codeStyle.background = parent.getDisplay().getSystemColor(SWT.COLOR_CYAN);
+		//codeStyle.foreground = parent.getDisplay().getSystemColor(SWT.COLOR_GREEN);
+		
 		createContextMenu();
 		edit.setMenu(contextMenu);
-		
-//		edit.addVerifyKeyListener(new VerifyKeyListener() {
-//			@Override
-//			public void verifyKey(VerifyEvent e) {
-//				Point pt = edit.getSelectionRange();
-//				if ( pt.x < 0 ) return;
-//				if ( pt.y == 0 ) {
-//					if ( e.character == '\u0008' ) {
-//						if ( --pt.x < 0) {
-//							return;
-//						}
-//						if ( edit.getStyleRangeAtOffset(pt.x) != null ) {
-//							e.doit = false;
-//						}
-//					}
-//					else if ( e.character == '\u007f' ) {
-//						if ( pt.x >= edit.getCharCount() ) return;
-//						if ( edit.getStyleRangeAtOffset(pt.x) != null ) {
-//							e.doit = false;
-//						}
-//					}
-//				}
-//				// Else: length > 0
-//			}
-//		});
 		
 		edit.addCaretListener(new CaretListener() {
 			@Override
 			public void caretMoved(CaretEvent e) {
 				for ( StyleRange range : ranges ) {
 					if (( e.caretOffset > range.start ) && ( e.caretOffset < range.start+range.length )) {
+						boolean backward = false;
 						if ( prevPos < e.caretOffset ) prevPos = range.start+range.length;
-						else prevPos = range.start;
-						if ( shiftMode ) {
-							Point pt = edit.getSelection(); pt.y = prevPos;
-							edit.setSelection(pt);
+						else {
+							prevPos = range.start;
+							backward = true;
+						}
+						if ( shiftDown || mouseDown ) {
+							Point pt = edit.getSelection();
+							if ( backward ) {
+								pt.x = pt.y; pt.y = prevPos;
+								edit.setSelection(pt);
+							}
+							else {
+								pt.y = prevPos;
+								edit.setSelection(pt);
+							}
 						}
 						else {
 							edit.setCaretOffset(prevPos);
@@ -128,17 +124,31 @@ public class FragmentEditorPanel {
 			}
 		});
 		
+		edit.addMouseListener(new MouseListener() {
+			@Override
+			public void mouseUp(MouseEvent e) {
+				mouseDown = false;
+			}
+			@Override
+			public void mouseDown(MouseEvent e) {
+				mouseDown = true;
+			}
+			@Override
+			public void mouseDoubleClick(MouseEvent e) {
+			}
+		});
+		
 		edit.addKeyListener(new KeyListener() {
 			@Override
 			public void keyReleased(KeyEvent e) {
 				if ( e.keyCode == SWT.SHIFT ) {
-					shiftMode = false;
+					shiftDown = false;
 				}
 			}
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if ( e.keyCode == SWT.SHIFT ) {
-					shiftMode = true;
+					shiftDown = true;
 				}
 			}
 		});
@@ -154,10 +164,19 @@ public class FragmentEditorPanel {
 					case SWT.ARROW_LEFT:
 						selectPreviousCode(edit.getCaretOffset(), true);
 						break;
+					case SWT.ARROW_DOWN: // Target-mode command
+						setNextSourceCode();
+						break;
+					case SWT.ARROW_UP: // Target-mode command
+						setPreviousSourceCode();
+						break;
 					case SWT.HOME:
 						selectFirstCode();
 						break;
 					}
+				}
+				else if (( e.stateMask == SWT.CTRL ) && ( e.keyCode == 'd' )) {
+					cycleDisplayMode();
 				}
 			}
 		});
@@ -189,7 +208,7 @@ public class FragmentEditorPanel {
 			}
 		});
 
-		edit.setMargins(4, 4, 4, 4);
+		edit.setMargins(2, 2, 2, 2);
 		edit.setKeyBinding(SWT.CTRL|'a', ST.SELECT_ALL);
 		
 		// Create a copy of the default text field options for the source
@@ -197,7 +216,7 @@ public class FragmentEditorPanel {
 		Font tmp = textOptions.font;
 		// Make the font a bit larger by default
 		FontData[] fontData = tmp.getFontData();
-		fontData[0].setHeight(fontData[0].getHeight()+2);
+		fontData[0].setHeight(fontData[0].getHeight()+4);
 		textOptions.font = new Font(parent.getDisplay(), fontData[0]);
 
 		applyTextOptions(textOptions);
@@ -208,11 +227,27 @@ public class FragmentEditorPanel {
 		dispose();
 	}
 
-	private void dispose () {
+	public void dispose () {
 		if ( textOptions != null ) {
 			textOptions.dispose();
 			textOptions = null;
 		}
+	}
+
+	/**
+	 * Sets the fragment editor for the corresponding source. This must be set when this control is in target mode.
+	 * @param source the fragment editor for the source.
+	 */
+	public void setSource (FragmentEditorPanel source) {
+		this.source = source;
+	}
+	
+	public void setEnabled (boolean enabled) {
+		edit.setEnabled(enabled);
+	}
+	
+	public void setEditable (boolean editable) {
+		edit.setEditable(editable);
 	}
 
 	public void applyTextOptions (TextOptions textOptions) {
@@ -225,31 +260,44 @@ public class FragmentEditorPanel {
 	private void createContextMenu () {
 		contextMenu = new Menu(edit.getShell(), SWT.POP_UP);
 		MenuItem item = new MenuItem(contextMenu, SWT.PUSH);
-		item.setText("Show/Hide Codes Content");
+		item.setText("Change Code Display Mode");
 		item.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				if ( !cacheContent() ) return;
-				mode = (mode==0 ? 1 : 0);
-				updateText();
+				cycleDisplayMode();
             }
 		});
 	}
 	
+	private void cycleDisplayMode () {
+		Point pt = cacheContent(edit.getSelection());
+		if ( pt == null ) return;
+		mode = (mode==0 ? 1 : (mode==2 ? 0 : 2));
+		updateText(pt);
+	}
+	
 	public void setText (TextFragment oriFrag) {
-		frag = oriFrag; // TODO: clone or not???
+		frag = oriFrag;
 		codedText = frag.getCodedText();
-		codes = frag.getCodes();
-		updateText();
+		// Make a copy of the list, as getCodes() gives an un-modifiable list
+		//TODO: do we need a deep-copy in case we modify the actual codes data?
+		codes = new ArrayList<Code>(frag.getCodes());
+		updateText(null);
 	}
 
 	/**
 	 * Gets the text in the edit control to a coded-text string with the proper code
 	 * markers. This also makes basic validation.
-	 * @return true if the text was cached without error. False if an error occurred
+	 * @param sel optional selection to re-compute. Use null to not use.
+	 * @return a Point corresponding to the converted selection passed as parameter. Will be 0 and 0
+	 * if the given selection was null. Return null if an error occurred
 	 * and the text could not be cached.
 	 */
-	private boolean cacheContent () {
+	private Point cacheContent (Point sel) {
 		try {
+			Point pt = new Point(0, 0);
+			if ( sel != null ) {
+				pt.x = sel.x; pt.y = sel.y;
+			}
 			Code code = null;
 			StringBuilder tmp = new StringBuilder(edit.getText());
 			//TODO: deal with empty string
@@ -272,13 +320,19 @@ public class FragmentEditorPanel {
 					break;
 				}
 				diff += (2-range.length);
+
+				// Compute new selection if needed
+				if ( sel != null ) {
+					if ( sel.x >= range.start+range.length ) pt.x += (2-range.length);
+					if ( sel.y >= range.start+range.length ) pt.y += (2-range.length);
+				}
 			}
 			codedText = tmp.toString();
-			return true;
+			return pt;
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(edit.getShell(), "Error when retrieving edited text.\n"+e.getLocalizedMessage(), null);
-			return false;
+			return null;
 		}
 	}
 
@@ -304,19 +358,80 @@ public class FragmentEditorPanel {
 		// the text is set in the control.
 		if ( !updateCodeRanges ) return;
 		
-		// For now, assumes a code range is not modifiable
-		
 		// If length is zero, it's a deletion
 		if ( length == 0 ) {
 			length = -1*(end-start);
 		}
+
 		// Update ranges after the end
-		for ( StyleRange range : ranges ) {
-			// Is the range after or at the end of the new text?
+		Iterator<StyleRange> iter = ranges.iterator();
+		StyleRange range;
+		while ( iter.hasNext() ) {
+			range = iter.next();
+			// Is the range is after or at the end of the modified text
 			if ( end <= range.start ) {
 				range.start += length;
 			}
+			// Otherwise, for deletion: check if the range is not included in the selection
+			else if (( length < 0 ) && ( start <= range.start ) && ( end >= range.start+range.length )) {
+				// Remove the code and the range
+				codes.remove((Code)range.data);
+				iter.remove();
+			}
 		}
+	}
+	
+	/**
+	 * Moves the select in this editor to the next code and returns it.
+	 * @return the next code in this editor, or null if no code was found.
+	 */
+	public FragmentData getNextCode () {
+		if ( codes.isEmpty() ) return null;
+		nextCodeForCopy++;
+		if ( nextCodeForCopy >= codes.size() ) {
+			nextCodeForCopy = 0;
+		}
+		return getCode(nextCodeForCopy);
+	}
+
+	public FragmentData getPreviousCode () {
+		if ( codes.isEmpty() ) return null;
+		nextCodeForCopy--;
+		if ( nextCodeForCopy < 0 ) {
+			nextCodeForCopy = codes.size()-1;
+		}
+		return getCode(nextCodeForCopy);
+	}
+
+	private FragmentData getCode (int index) {
+		// Get the code
+		FragmentData data = new FragmentData();
+		data.codes = new ArrayList<Code>();
+		Code code = codes.get(index);
+		data.codes.add(code.clone());
+		
+		// Construct the coded text
+		switch ( code.getTagType() ) {
+		case OPENING:
+			data.codedText = String.format("%c%c", (char)TextFragment.MARKER_OPENING, TextFragment.toChar(0));
+			break;
+		case CLOSING:
+			data.codedText = String.format("%c%c", (char)TextFragment.MARKER_CLOSING, TextFragment.toChar(0));
+			break;
+		case PLACEHOLDER:
+			data.codedText = String.format("%c%c", (char)TextFragment.MARKER_ISOLATED, TextFragment.toChar(0));
+			break;
+		}
+		
+		// Select the corresponding location in the editor
+		for ( StyleRange range : ranges ) {
+			if ( code == (Code)range.data ) {
+				edit.setSelection(range.start, range.start+range.length);
+				break;
+			}
+		}
+		
+		return data;
 	}
 	
 	/**
@@ -351,19 +466,19 @@ public class FragmentEditorPanel {
 	private boolean breakRange (int start,
 		int end)
 	{
-		end--; // Look at position just before the end of the selection
+		//end--; // Look at position just before the end of the selection
 		for ( StyleRange range : ranges ) {
-			if (( start >= range.start ) && ( start < range.start+range.length )) {
+			if (( start > range.start ) && ( start < range.start+range.length )) {
 				return true;
 			}
-			if (( end >= range.start ) && ( end < range.start+range.length )) {
+			if (( end > range.start ) && ( end < range.start+range.length )) {
 				return true;
 			}
 		}
 		return false;
 	}
 	
-	private void updateText () {
+	private void updateText (Point sel) {
 		try {
 			updateCodeRanges = false;
 			StringBuilder tmp = new StringBuilder();
@@ -371,6 +486,10 @@ public class FragmentEditorPanel {
 			int pos = 0;
 			StyleRange sr;
 			String disp = null;
+			Point pt = new Point(0, 0);
+			if ( sel != null ) {
+				pt.x = sel.x; pt.y = sel.y;
+			}
 			Code code;
 			for ( int i=0; i<codedText.length(); i++ ) {
 				if ( TextFragment.isMarker(codedText.charAt(i)) ) {
@@ -378,14 +497,17 @@ public class FragmentEditorPanel {
 					switch ( code.getTagType() ) {
 					case OPENING:
 						if ( mode == 1 ) disp = code.getData();
+						else if ( mode == 2 ) disp = "["+code.getData()+"]";
 						else disp = String.format("<%d>", code.getId());
 						break;
 					case CLOSING:
 						if ( mode == 1 ) disp = code.getData();
+						else if ( mode == 2 ) disp = "["+code.getData()+"]";
 						else disp = String.format("</%d>", code.getId());
 						break;
 					case PLACEHOLDER:
 						if ( mode == 1 ) disp = code.getData();
+						else if ( mode == 2 ) disp = "["+code.getData()+"]";
 						else disp = String.format("<%d/>", code.getId());
 						break;
 					}
@@ -396,6 +518,12 @@ public class FragmentEditorPanel {
 					sr.data = code;
 					ranges.add(sr);
 					pos += disp.length();
+
+					// Update the selection if needed
+					if ( sel != null ) {
+						if ( sel.x >= i ) pt.x += (disp.length()-2);
+						if ( sel.y >= i ) pt.y += (disp.length()-2);
+					}
 				}
 				else {
 					tmp.append(codedText.charAt(i));
@@ -403,19 +531,133 @@ public class FragmentEditorPanel {
 				}
 			}
 			
+			nextCodeForCopy = -1;
 			edit.setText(tmp.toString());
 			for ( StyleRange range : ranges ) {
 				edit.setStyleRange(range);
 			}
+			if ( sel != null ) {
+				edit.setSelection(pt);
+			}
 		}
 		catch ( Throwable e ) {
-			e.printStackTrace();
+			Dialogs.showError(edit.getShell(), "Error when updating text.\n"+e.getLocalizedMessage(), null);
 		}
 		finally {
 			updateCodeRanges = true;
 		}
 	}
+	
+//	private FragmentData copySelection () {
+//		Point pt = edit.getSelection();
+//		if ( pt.x == pt.y ) return null; // Nothing to copy
+//		
+//		String text = edit.getText(pt.x, pt.y);
+//		
+////		for ( StyleRange range : ranges ) {
+////			if (( pt.x >= range.start ) && ( position < range.start+range.length )) {
+////				
+////			}
+////		}
+//		
+//		return null;
+//	}
+	
+	private void setNextSourceCode () {
+		if ( !targetMode ) return;
+		setFragmentData(source.getNextCode());
+	}
 
+	private void setPreviousSourceCode () {
+		if ( !targetMode ) return;
+		setFragmentData(source.getPreviousCode());
+		
+	}
+
+	/**
+	 * Sets a FragmentData into this editor. The fragment replaces the current selection.
+	 * @param data the fragment data to set.
+	 */
+	private void setFragmentData (FragmentData data) {
+		if ( data == null ) return; // Nothing to do
+		
+		// Remove the current selection
+		// This removes any underlying ranges and codes
+		Point sel = edit.getSelection();
+		remove(sel);
+		
+		// Find if there is a code just after or at the insertion point
+		int index = 0; // Default if there are no codes 
+		for ( StyleRange range : ranges ) {
+			if (( sel.x == range.start ) && ( sel.x < range.start+range.length )) {
+				index = getCodeIndex((Code)range.data);
+				break;
+			}
+		}
+
+		// Insert the new codes and ranges and build the display text
+		StringBuilder tmp = new StringBuilder();
+		String disp = null;
+		Code code;
+		int pos = sel.x;
+		StyleRange sr;
+		ArrayList<StyleRange> newRanges = new ArrayList<StyleRange>();
+		int insPos = index;
+		for ( int i=0; i<data.codedText.length(); i++ ) {
+			if ( TextFragment.isMarker(data.codedText.charAt(i)) ) {
+				code = data.codes.get(TextFragment.toIndex(data.codedText.charAt(++i))).clone();
+				switch ( code.getTagType() ) {
+				case OPENING:
+					if ( mode == 1 ) disp = code.getData();
+					else if ( mode == 2 ) disp = "["+code.getData()+"]";
+					else disp = String.format("<%d>", code.getId());
+					break;
+				case CLOSING:
+					if ( mode == 1 ) disp = code.getData();
+					else if ( mode == 2 ) disp = "["+code.getData()+"]";
+					else disp = String.format("</%d>", code.getId());
+					break;
+				case PLACEHOLDER:
+					if ( mode == 1 ) disp = code.getData();
+					else if ( mode == 2 ) disp = "["+code.getData()+"]";
+					else disp = String.format("<%d/>", code.getId());
+					break;
+				}
+				tmp.append(disp);
+				sr = new StyleRange(codeStyle);
+				sr.start = pos;
+				sr.length = disp.length();
+				sr.data = code;
+				pos += disp.length();
+				
+				// Do not set the range immediately, so the text update can be done properly
+				newRanges.add(sr);
+				codes.add(insPos++, code);
+			}
+			else {
+				tmp.append(codedText.charAt(i));
+				pos++;
+			}
+		}
+		
+		// Insert the display text. This will update 
+		edit.replaceTextRange(sel.x, 0, tmp.toString());
+		// Set the ranges, and now add them to the list
+		for ( StyleRange newRange : newRanges ) {
+			edit.setStyleRange(newRange);
+			ranges.add(index++, newRange);
+		}
+		
+		// Select the new fragment part we just set
+		edit.setSelection(sel.x, sel.x+tmp.length());
+	}
+	
+	private void remove (Point selection) {
+		if ( selection.x == selection.y ) return; // Nothing to remove
+		// Delete the text from the control
+		edit.replaceTextRange(selection.x, selection.y-selection.x, "");
+	}
+	
 	private void selectFirstCode () {
 		if ( ranges.size() == 0 ) return;
 		StyleRange sr = ranges.get(0);
