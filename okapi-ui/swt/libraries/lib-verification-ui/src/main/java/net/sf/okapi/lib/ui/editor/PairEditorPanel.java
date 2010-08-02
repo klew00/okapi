@@ -22,27 +22,42 @@ package net.sf.okapi.lib.ui.editor;
 
 import net.sf.okapi.common.resource.TextFragment;
 
+import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
-public class PairEditorPanel extends Composite {
+public class PairEditorPanel extends SashForm {
 
 	private FragmentEditorPanel edSource;
 	private FragmentEditorPanel edTarget;
-	
+
+	/**
+	 * Creates a new PairEditorPanel object.
+	 * @param parent the parent of this panel.
+	 * @param flag the style flag: SWT.VERTICAL or SWT.HORIZONTAL 
+	 */
 	public PairEditorPanel (Composite parent,
 		int flag)
 	{
 		super(parent, flag);
 		setLayout(new GridLayout());
+		setLayoutData(new GridData(GridData.FILL_BOTH));
 		
-		edSource = new FragmentEditorPanel(parent, -1, false);
-		edTarget = new FragmentEditorPanel(parent, -1, true);
+		edSource = new FragmentEditorPanel(this, -1, false);
+		edTarget = new FragmentEditorPanel(this, -1, true);
 		
 		edSource.setEditable(false);
 		edTarget.setSource(edSource);
+		
+		edTarget.setFocus();
 	}
 
+	/**
+	 * Sets the pair of fragments to edit.
+	 * @param source the source content (read-only).
+	 * @param target the target content.
+	 */
 	public void setText (TextFragment source,
 		TextFragment target)
 	{
@@ -56,4 +71,5 @@ public class PairEditorPanel extends Composite {
 		edSource.setEnabled(enabled);
 		edTarget.setEnabled(enabled);
 	}
+
 }

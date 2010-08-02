@@ -234,6 +234,10 @@ public class FragmentEditorPanel {
 		}
 	}
 
+	public boolean setFocus () {
+		return edit.setFocus();
+	}
+	
 	/**
 	 * Sets the fragment editor for the corresponding source. This must be set when this control is in target mode.
 	 * @param source the fragment editor for the source.
@@ -259,6 +263,7 @@ public class FragmentEditorPanel {
 	
 	private void createContextMenu () {
 		contextMenu = new Menu(edit.getShell(), SWT.POP_UP);
+
 		MenuItem item = new MenuItem(contextMenu, SWT.PUSH);
 		item.setText("Change Code Display Mode");
 		item.addSelectionListener(new SelectionAdapter() {
@@ -266,6 +271,35 @@ public class FragmentEditorPanel {
 				cycleDisplayMode();
             }
 		});
+		
+		if ( targetMode ) {
+			new MenuItem(contextMenu, SWT.SEPARATOR);
+		
+			item = new MenuItem(contextMenu, SWT.PUSH);
+			item.setText("Remove All Codes");
+			item.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent event) {
+					clearCodes();
+	            }
+			});
+
+			item = new MenuItem(contextMenu, SWT.PUSH);
+			item.setText("Copy Source");
+			item.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent event) {
+					pasteSource();
+	            }
+			});
+
+			item = new MenuItem(contextMenu, SWT.PUSH);
+			item.setText("Copy All Source Codes");
+			item.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent event) {
+					pasteAllSourceCodes();
+	            }
+			});
+		}
+	
 	}
 	
 	private void cycleDisplayMode () {
@@ -403,6 +437,39 @@ public class FragmentEditorPanel {
 		return getCode(nextCodeForCopy);
 	}
 
+	public FragmentData getAllContent () {
+		FragmentData data = new FragmentData();
+		
+		return data;
+	}
+	
+	public FragmentData getAllCodes () {
+		// Get the code
+		FragmentData data = new FragmentData();
+		data.codes = new ArrayList<Code>();
+		StringBuilder tmp = new StringBuilder();
+		for ( Code code : codes ) {
+			data.codes.add(code.clone());
+			// Construct the coded text
+			switch ( code.getTagType() ) {
+			case OPENING:
+				tmp.append(String.format("%c%c", (char)TextFragment.MARKER_OPENING,
+					TextFragment.toChar(data.codes.size()-1)));
+				break;
+			case CLOSING:
+				tmp.append(String.format("%c%c", (char)TextFragment.MARKER_CLOSING,
+					TextFragment.toChar(data.codes.size()-1)));
+				break;
+			case PLACEHOLDER:
+				tmp.append(String.format("%c%c", (char)TextFragment.MARKER_ISOLATED,
+					TextFragment.toChar(data.codes.size()-1)));
+				break;
+			}
+		}
+		data.codedText = tmp.toString();
+		return data;
+	}
+	
 	private FragmentData getCode (int index) {
 		// Get the code
 		FragmentData data = new FragmentData();
@@ -563,99 +630,135 @@ public class FragmentEditorPanel {
 //		return null;
 //	}
 	
+	private void pasteSource () {
+		if ( !targetMode ) return;
+		setFragmentData(source.getAllContent(), 1);
+	}
+	
+	private void pasteAllSourceCodes () {
+		if ( !targetMode ) return;
+		setFragmentData(source.getAllCodes(), 1);
+	}
+	
 	private void setNextSourceCode () {
 		if ( !targetMode ) return;
-		setFragmentData(source.getNextCode());
+		setFragmentData(source.getNextCode(), 0);
 	}
 
 	private void setPreviousSourceCode () {
 		if ( !targetMode ) return;
-		setFragmentData(source.getPreviousCode());
-		
+		setFragmentData(source.getPreviousCode(), 0);
 	}
 
 	/**
 	 * Sets a FragmentData into this editor. The fragment replaces the current selection.
 	 * @param data the fragment data to set.
+	 * @param positionAfter Indicates how to place the caret after:
+	 * <ul><li>1=place the caret just before
+	 * <li>2=place the caret just after
+	 * <li>0 or other=select the part placed
 	 */
-	private void setFragmentData (FragmentData data) {
-		if ( data == null ) return; // Nothing to do
-		
-		// Remove the current selection
-		// This removes any underlying ranges and codes
-		Point sel = edit.getSelection();
-		remove(sel);
-		
-		// Find if there is a code just after or at the insertion point
-		int index = 0; // Default if there are no codes 
-		for ( StyleRange range : ranges ) {
-			if (( sel.x == range.start ) && ( sel.x < range.start+range.length )) {
-				index = getCodeIndex((Code)range.data);
-				break;
+	private void setFragmentData (FragmentData data,
+		int positionAfter)
+	{
+		try {
+			if ( data == null ) return; // Nothing to do
+	
+			// Remove the current selection
+			// This removes any underlying ranges and codes
+			Point sel = edit.getSelection();
+			remove(sel.x, sel.y);
+	
+			// Find if there is a code just after or at the insertion point
+			// Get the index of the first range after the insertion position
+			int index = 0;
+			for ( StyleRange range : ranges ) {
+				if ( range.start >= sel.x ) break;
+				index++;
 			}
-		}
-
-		// Insert the new codes and ranges and build the display text
-		StringBuilder tmp = new StringBuilder();
-		String disp = null;
-		Code code;
-		int pos = sel.x;
-		StyleRange sr;
-		ArrayList<StyleRange> newRanges = new ArrayList<StyleRange>();
-		int insPos = index;
-		for ( int i=0; i<data.codedText.length(); i++ ) {
-			if ( TextFragment.isMarker(data.codedText.charAt(i)) ) {
-				code = data.codes.get(TextFragment.toIndex(data.codedText.charAt(++i))).clone();
-				switch ( code.getTagType() ) {
-				case OPENING:
-					if ( mode == 1 ) disp = code.getData();
-					else if ( mode == 2 ) disp = "["+code.getData()+"]";
-					else disp = String.format("<%d>", code.getId());
-					break;
-				case CLOSING:
-					if ( mode == 1 ) disp = code.getData();
-					else if ( mode == 2 ) disp = "["+code.getData()+"]";
-					else disp = String.format("</%d>", code.getId());
-					break;
-				case PLACEHOLDER:
-					if ( mode == 1 ) disp = code.getData();
-					else if ( mode == 2 ) disp = "["+code.getData()+"]";
-					else disp = String.format("<%d/>", code.getId());
-					break;
+	
+			// Insert the new codes and ranges and build the display text
+			StringBuilder tmp = new StringBuilder();
+			String disp = null;
+			Code code;
+			int pos = sel.x;
+			StyleRange sr;
+			ArrayList<StyleRange> newRanges = new ArrayList<StyleRange>();
+			int insPos = index;
+			for ( int i=0; i<data.codedText.length(); i++ ) {
+				if ( TextFragment.isMarker(data.codedText.charAt(i)) ) {
+					code = data.codes.get(TextFragment.toIndex(data.codedText.charAt(++i))).clone();
+					switch ( code.getTagType() ) {
+					case OPENING:
+						if ( mode == 1 ) disp = code.getData();
+						else if ( mode == 2 ) disp = "["+code.getData()+"]";
+						else disp = String.format("<%d>", code.getId());
+						break;
+					case CLOSING:
+						if ( mode == 1 ) disp = code.getData();
+						else if ( mode == 2 ) disp = "["+code.getData()+"]";
+						else disp = String.format("</%d>", code.getId());
+						break;
+					case PLACEHOLDER:
+						if ( mode == 1 ) disp = code.getData();
+						else if ( mode == 2 ) disp = "["+code.getData()+"]";
+						else disp = String.format("<%d/>", code.getId());
+						break;
+					}
+					tmp.append(disp);
+					sr = new StyleRange(codeStyle);
+					sr.start = pos;
+					sr.length = disp.length();
+					sr.data = code;
+					pos += disp.length();
+					
+					// Do not set the range immediately, so the text update can be done properly
+					newRanges.add(sr);
+					codes.add(insPos++, code);
 				}
-				tmp.append(disp);
-				sr = new StyleRange(codeStyle);
-				sr.start = pos;
-				sr.length = disp.length();
-				sr.data = code;
-				pos += disp.length();
-				
-				// Do not set the range immediately, so the text update can be done properly
-				newRanges.add(sr);
-				codes.add(insPos++, code);
+				else {
+					tmp.append(codedText.charAt(i));
+					pos++;
+				}
 			}
-			else {
-				tmp.append(codedText.charAt(i));
-				pos++;
+			
+			// Insert the display text. This will update 
+			edit.replaceTextRange(sel.x, 0, tmp.toString());
+			// Set the ranges, and now add them to the list
+			for ( StyleRange newRange : newRanges ) {
+				edit.setStyleRange(newRange);
+				ranges.add(index++, newRange);
+			}
+	
+	//debug
+	//cacheContent(null);
+	//TextFragment tf1 = new TextFragment();
+	//tf1.setCodedText(codedText, codes);
+	//System.out.println(tf1.toString());
+	
+			// Place the caret
+			switch ( positionAfter ) {
+			case 1:
+				edit.setCaretOffset(sel.x);
+				break;
+			case 2:
+				edit.setCaretOffset(sel.x+tmp.length());
+				break;
+			default:
+				edit.setSelection(sel.x, sel.x+tmp.length());
 			}
 		}
-		
-		// Insert the display text. This will update 
-		edit.replaceTextRange(sel.x, 0, tmp.toString());
-		// Set the ranges, and now add them to the list
-		for ( StyleRange newRange : newRanges ) {
-			edit.setStyleRange(newRange);
-			ranges.add(index++, newRange);
+		catch ( Throwable e ) {
+			Dialogs.showError(edit.getShell(), "Error when placing fragment data.\n"+e.getLocalizedMessage(), null);
 		}
-		
-		// Select the new fragment part we just set
-		edit.setSelection(sel.x, sel.x+tmp.length());
 	}
 	
-	private void remove (Point selection) {
-		if ( selection.x == selection.y ) return; // Nothing to remove
+	private void remove (int start,
+		int end)
+	{
+		if ( start == end ) return; // Nothing to remove
 		// Delete the text from the control
-		edit.replaceTextRange(selection.x, selection.y-selection.x, "");
+		edit.replaceTextRange(start, end-start, "");
 	}
 	
 	private void selectFirstCode () {
@@ -679,6 +782,26 @@ public class FragmentEditorPanel {
 			if ( !cycle ) return;
 			position = 0; // Otherwise: re-start from front
 		}
+	}
+	
+	private void clearCodes () {
+		if ( !edit.getEditable() ) return;
+
+		cacheContent(null);
+		StringBuilder tmp = new StringBuilder();
+		for ( int i=0; i<codedText.length(); i++ ) {
+			if ( TextFragment.isMarker(codedText.charAt(i)) ) {
+				i++; // Skip
+			}
+			else {
+				tmp.append(codedText.charAt(i));
+			}
+		}
+		codes.clear();
+		codedText = tmp.toString();
+		// Ranges will get cleared in updateText()
+		updateText(null);
+		edit.setCaretOffset(0);
 	}
 	
 	private void selectPreviousCode (int position,

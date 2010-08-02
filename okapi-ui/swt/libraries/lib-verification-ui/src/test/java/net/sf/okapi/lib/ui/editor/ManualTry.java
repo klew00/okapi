@@ -26,7 +26,7 @@ public class ManualTry {
 			comp.setLayout(new GridLayout());
 			comp.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-			PairEditorPanel panel = new PairEditorPanel(comp, SWT.NONE);
+			PairEditorPanel panel = new PairEditorPanel(comp, SWT.VERTICAL);
 			
 			shlMain.setMinimumSize(600, 400);
 			shlMain.pack();
@@ -35,7 +35,7 @@ public class ManualTry {
 			srcFrag.append(TagType.OPENING, "style1", "<span style='color:red;'>");
 			srcFrag.append("bold");
 			srcFrag.append(TagType.PLACEHOLDER, "X", "X");
-			srcFrag.append("and more bold");
+			srcFrag.append(" and more bold");
 			srcFrag.append(TagType.CLOSING, "style1", "</span>");
 			srcFrag.append(" with a line-break here:");
 			srcFrag.append(TagType.PLACEHOLDER, "SomeCode", "<code attribute='dataStuff' more='data'/>");
@@ -47,12 +47,12 @@ public class ManualTry {
 			trgFrag.append(TagType.OPENING, "style1", "<span style='color:red;'>");
 			trgFrag.append("gras");
 			trgFrag.append(TagType.PLACEHOLDER, "X", "X");
-			trgFrag.append("et plus de gras");
+			trgFrag.append(" et plus de gras");
 			trgFrag.append(TagType.CLOSING, "style1", "</span>");
 			trgFrag.append(" avec un saut-de-ligne ici\u00a0:");
 			trgFrag.append(TagType.PLACEHOLDER, "SomeCode", "<code attribute='dataStuff' more='data'/>");
 			trgFrag.append(" et d'autre texte apr\u00e8s; ");
-			trgFrag.append(TagType.OPENING, "span2", "<span style='color:red;'>");
+			trgFrag.append(TagType.OPENING, "span2", "<span stuff='value'>");
 			trgFrag.append(" et encore d'autre.");
 			
 			panel.setText(srcFrag, trgFrag);
