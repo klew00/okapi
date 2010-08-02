@@ -66,15 +66,17 @@ public class TestJsonSession {
 		System.out.println("===== TextUnit");
 		TextUnit tu1 = TextUnitUtil.buildTU("source-text1" + (char) 2 + '"' + " : " + '"' + 
 				'{' + '"' + "ssssss " + ':' + '"' + "ddddd" + "}:" + '<' + '>' + "sssddd: <>dsdd");
-		
+		//tu1.setSkeleton(new GenericSkeleton());
+		//------------
 		GenericSkeleton gs = new GenericSkeleton("before");
 		//--ClassCastException if using addContentPlaceholder
-		//gs.addContentPlaceholder(tu1);
+		gs.addContentPlaceholder(tu1);
 		gs.append("after");
 		
 		System.out.println(gs);
 		
 		tu1.setSkeleton(gs);
+		//------------
 		tu1.setTarget(LocaleId.FRENCH, new TextContainer("french-text1"));
 		tu1.setTarget(LocaleId.TAIWAN_CHINESE, new TextContainer("chinese-text1"));
 		String st2 = session.writeObject(tu1);

@@ -436,12 +436,14 @@ public abstract class PersistenceSession implements IPersistenceSession, IObserv
 	
 	@Override
 	public <T> T readObject(String content, Class<T> classRef) {
+		refResolver.reset(); // Clear caches
 		beanClass = beanMapper.getBeanClass(classRef);		
 		if (beanClass == null)
 			throw new RuntimeException("PersistenceSession: no bean class found");
 		
 		IPersistenceBean<?> bean = readBeanFromString(content, beanClass);
 		notifyObservers(bean);
+		refResolver.cacheBean(bean);
 		
 		return classRef.cast(bean.get(classRef, this));		
 	}
@@ -455,6 +457,8 @@ public abstract class PersistenceSession implements IPersistenceSession, IObserv
 		// Throws an exception if fails
 		IPersistenceBean<Object> bean = (IPersistenceBean<Object>) refResolver.createBean(obj.getClass());
 
+		refResolver.setRootId(bean.getRefId());
+		refResolver.setRefIdForObject(obj, bean.getRefId());
 		bean.set(obj, this);
 	
 		notifyObservers(bean);
