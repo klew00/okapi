@@ -32,27 +32,27 @@ public class ManualTry {
 			shlMain.pack();
 
 			TextFragment srcFrag = new TextFragment("Text in ");
-			srcFrag.append(TagType.OPENING, "style1", "<span style='color:red;'>");
+			srcFrag.append(TagType.OPENING, "style1", "<span1>");
 			srcFrag.append("bold");
-			srcFrag.append(TagType.PLACEHOLDER, "X", "X");
+			srcFrag.append(TagType.PLACEHOLDER, "z", "z");
 			srcFrag.append(" and more bold");
-			srcFrag.append(TagType.CLOSING, "style1", "</span>");
+			srcFrag.append(TagType.CLOSING, "style1", "</span1>");
 			srcFrag.append(" with a line-break here:");
-			srcFrag.append(TagType.PLACEHOLDER, "SomeCode", "<code attribute='dataStuff' more='data'/>");
+			srcFrag.append(TagType.PLACEHOLDER, "SomeCode", "<code3/>");
 			srcFrag.append(" and more text after; ");
-			srcFrag.append(TagType.OPENING, "span2", "<span style='color:red;'>");
+			srcFrag.append(TagType.OPENING, "span2", "<span4>");
 			srcFrag.append(" and more.");
 			
 			TextFragment trgFrag = new TextFragment("Texte en ");
-			trgFrag.append(TagType.OPENING, "style1", "<span style='color:red;'>");
+			trgFrag.append(TagType.OPENING, "style1", "<SPAN1>");
 			trgFrag.append("gras");
-			trgFrag.append(TagType.PLACEHOLDER, "X", "X");
+			trgFrag.append(TagType.PLACEHOLDER, "Z", "Z");
 			trgFrag.append(" et plus de gras");
-			trgFrag.append(TagType.CLOSING, "style1", "</span>");
+			trgFrag.append(TagType.CLOSING, "style1", "</SPAN1>");
 			trgFrag.append(" avec un saut-de-ligne ici\u00a0:");
-			trgFrag.append(TagType.PLACEHOLDER, "SomeCode", "<code attribute='dataStuff' more='data'/>");
+			trgFrag.append(TagType.PLACEHOLDER, "SomeCode", "<CODE3/>");
 			trgFrag.append(" et d'autre texte apr\u00e8s; ");
-			trgFrag.append(TagType.OPENING, "span2", "<span stuff='value'>");
+			trgFrag.append(TagType.OPENING, "span2", "<SPAN4>");
 			trgFrag.append(" et encore d'autre.");
 			
 			panel.setText(srcFrag, trgFrag);

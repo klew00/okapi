@@ -48,7 +48,7 @@ public class PairEditorPanel extends SashForm {
 		edTarget = new FragmentEditorPanel(this, -1, true);
 		
 		edSource.setEditable(false);
-		edTarget.setSource(edSource);
+		edTarget.setTargetRelations(edSource, this);
 		
 		edTarget.setFocus();
 	}

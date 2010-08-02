@@ -69,6 +69,7 @@ public class FragmentEditorPanel {
 	private boolean mouseDown = false;
 	private boolean targetMode = false;
 	private FragmentEditorPanel source;
+	private PairEditorPanel parentPanel;
 	private int nextCodeForCopy = -1;
 	
 	public FragmentEditorPanel (Composite parent,
@@ -242,8 +243,11 @@ public class FragmentEditorPanel {
 	 * Sets the fragment editor for the corresponding source. This must be set when this control is in target mode.
 	 * @param source the fragment editor for the source.
 	 */
-	public void setSource (FragmentEditorPanel source) {
+	public void setTargetRelations (FragmentEditorPanel source,
+		PairEditorPanel parentPanel)
+	{
 		this.source = source;
+		this.parentPanel = parentPanel;
 	}
 	
 	public void setEnabled (boolean enabled) {
@@ -284,7 +288,7 @@ public class FragmentEditorPanel {
 			});
 
 			item = new MenuItem(contextMenu, SWT.PUSH);
-			item.setText("Copy Source");
+			item.setText("Copy Source Into Target");
 			item.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent event) {
 					pasteSource();
@@ -292,10 +296,20 @@ public class FragmentEditorPanel {
 			});
 
 			item = new MenuItem(contextMenu, SWT.PUSH);
-			item.setText("Copy All Source Codes");
+			item.setText("Copy All Source Codes Into Target");
 			item.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent event) {
 					pasteAllSourceCodes();
+	            }
+			});
+			
+			new MenuItem(contextMenu, SWT.SEPARATOR);
+			
+			item = new MenuItem(contextMenu, SWT.PUSH);
+			item.setText("Switch Panel Orientation");
+			item.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent event) {
+					parentPanel.setOrientation(parentPanel.getOrientation() == SWT.VERTICAL ? SWT.HORIZONTAL : SWT.VERTICAL);
 	            }
 			});
 		}
@@ -334,11 +348,10 @@ public class FragmentEditorPanel {
 			}
 			Code code = null;
 			StringBuilder tmp = new StringBuilder(edit.getText());
-			//TODO: deal with empty string
 			int diff = 0;
 			for ( StyleRange range : ranges ) {
 				code = (Code)range.data;
-				int index = getCodeIndex(code);
+				int index = getCodeObjectIndex(code);
 				switch ( code.getTagType() ) {
 				case OPENING:
 					tmp.replace(diff+range.start, diff+(range.start+range.length),
@@ -370,14 +383,16 @@ public class FragmentEditorPanel {
 		}
 	}
 
-	private int getCodeIndex (Code codeToSearch) {
+	/**
+	 * Gets the index in the codes array of the given code object.
+	 * @param codeToSearch the code to search for.
+	 * @return the index of the given code in the codes array, or -1 if not found.
+	 */
+	private int getCodeObjectIndex (Code codeToSearch) {
 		Code code;
 		for ( int i=0; i<codes.size(); i++ ) {
-			code = codes.get(i);
-			if ( code.getId() == codeToSearch.getId() ) {
-				if ( code.getTagType() == codeToSearch.getTagType() ) {
-					return i;
-				}
+			if ( codeToSearch == codes.get(i) ) {
+				return i;
 			}
 		}
 		return -1; // Not found
@@ -392,10 +407,8 @@ public class FragmentEditorPanel {
 		// the text is set in the control.
 		if ( !updateCodeRanges ) return;
 		
-		// If length is zero, it's a deletion
-		if ( length == 0 ) {
-			length = -1*(end-start);
-		}
+		// Compute the length difference between the selection part and the replacement
+		length = length-(end-start);
 
 		// Update ranges after the end
 		Iterator<StyleRange> iter = ranges.iterator();
@@ -406,8 +419,9 @@ public class FragmentEditorPanel {
 			if ( end <= range.start ) {
 				range.start += length;
 			}
-			// Otherwise, for deletion: check if the range is not included in the selection
-			else if (( length < 0 ) && ( start <= range.start ) && ( end >= range.start+range.length )) {
+			// Otherwise, if the range is included in the selection it's deletion or replacement
+			// So that range needs to be removed, along with its code
+			else if (( start <= range.start ) && ( end >= range.start+range.length )) {
 				// Remove the code and the range
 				codes.remove((Code)range.data);
 				iter.remove();
@@ -439,7 +453,9 @@ public class FragmentEditorPanel {
 
 	public FragmentData getAllContent () {
 		FragmentData data = new FragmentData();
-		
+		cacheContent(null);
+		data.codedText = codedText;
+		data.codes = new ArrayList<Code>(codes);
 		return data;
 	}
 	
@@ -717,7 +733,7 @@ public class FragmentEditorPanel {
 					codes.add(insPos++, code);
 				}
 				else {
-					tmp.append(codedText.charAt(i));
+					tmp.append(data.codedText.charAt(i));
 					pos++;
 				}
 			}
