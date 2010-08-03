@@ -20,13 +20,13 @@
 
 package net.sf.okapi.lib.ui.editor;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import net.sf.okapi.common.resource.Code;
 
 public class FragmentData {
 
 	public String codedText;
-	public ArrayList<Code> codes;
+	public List<Code> codes;
 
 }

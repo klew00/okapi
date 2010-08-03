@@ -41,6 +41,8 @@ public class PairEditorPanel extends SashForm {
 		int flag)
 	{
 		super(parent, flag);
+
+		// Default layout
 		setLayout(new GridLayout());
 		setLayoutData(new GridData(GridData.FILL_BOTH));
 		

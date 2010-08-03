@@ -35,6 +35,10 @@ import org.eclipse.swt.custom.ST;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.custom.VerifyKeyListener;
+import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseEvent;
@@ -176,8 +180,28 @@ public class FragmentEditorPanel {
 						break;
 					}
 				}
-				else if (( e.stateMask == SWT.CTRL ) && ( e.keyCode == 'd' )) {
-					cycleDisplayMode();
+				else if ( e.stateMask == SWT.CTRL ) {
+					switch ( e.keyCode ) {
+					case 'd':
+						cycleDisplayMode();
+						break;
+					case 'c':
+						copyToClipboard(edit.getSelection());
+						break;
+					case 'v':
+						pasteFromClipboard();
+						break;
+					}
+				}
+				else if ( e.stateMask == SWT.SHIFT ) {
+					switch ( e.keyCode ) {
+					case SWT.DEL:
+						cutToClipboard(edit.getSelection());
+						break;
+					case SWT.INSERT:
+						pasteFromClipboard();
+						break;
+					}
 				}
 			}
 		});
@@ -210,7 +234,14 @@ public class FragmentEditorPanel {
 		});
 
 		edit.setMargins(2, 2, 2, 2);
+
 		edit.setKeyBinding(SWT.CTRL|'a', ST.SELECT_ALL);
+
+		// Disable Cut/Copy/Paste commands to override them
+		edit.setKeyBinding(SWT.CTRL|'c', SWT.NULL);
+		edit.setKeyBinding(SWT.CTRL|'v', SWT.NULL);
+		edit.setKeyBinding(SWT.SHIFT|SWT.DEL, SWT.NULL);
+		edit.setKeyBinding(SWT.SHIFT|SWT.INSERT, SWT.NULL);
 		
 		// Create a copy of the default text field options for the source
 		textOptions = new TextOptions(parent.getDisplay(), edit);
@@ -746,12 +777,6 @@ public class FragmentEditorPanel {
 				ranges.add(index++, newRange);
 			}
 	
-	//debug
-	//cacheContent(null);
-	//TextFragment tf1 = new TextFragment();
-	//tf1.setCodedText(codedText, codes);
-	//System.out.println(tf1.toString());
-	
 			// Place the caret
 			switch ( positionAfter ) {
 			case 1:
@@ -840,6 +865,84 @@ public class FragmentEditorPanel {
 			position = edit.getCharCount()-1; // Otherwise: re-start from the end
 		}
 	}
-		
+
+	private FragmentData getSelection (Point selection) {
+		FragmentData data = new FragmentData();
+		StringBuilder tmp = new StringBuilder(edit.getText(selection.x, selection.y-1));
+		data.codes = new ArrayList<Code>();
+		int diff = -1*selection.x;
+		Code code;
+		for ( StyleRange range : ranges ) {
+			// Only if the range is within the selection
+			if ( range.start >= selection.y ) break; // Any after is not within
+			if ( range.start+range.length <= selection.x ) continue; // Any after may be within
+			// If the range is within the selection:
+			code = (Code)range.data;
+			switch ( code.getTagType() ) {
+			case OPENING:
+				tmp.replace(diff+range.start, diff+(range.start+range.length),
+					String.format("%c%c", (char)TextFragment.MARKER_OPENING, TextFragment.toChar(data.codes.size())));
+				break;
+			case CLOSING:
+				tmp.replace(diff+range.start, diff+(range.start+range.length),
+					String.format("%c%c", (char)TextFragment.MARKER_CLOSING, TextFragment.toChar(data.codes.size())));
+				break;
+			case PLACEHOLDER:
+				tmp.replace(diff+range.start, diff+(range.start+range.length),
+					String.format("%c%c", (char)TextFragment.MARKER_ISOLATED, TextFragment.toChar(data.codes.size())));
+				break;
+			}
+			data.codes.add(code.clone());
+			diff += (2-range.length);
+		}
+		data.codedText = tmp.toString();
+		return data;
+	}
 	
+	private void cutToClipboard (Point selection) {
+		FragmentData data = getSelection(selection);
+		String plainText = edit.getText(selection.x, selection.y-1);
+		remove(selection.x, selection.y);
+		placeIntoClipboard(data, plainText);
+	}
+	
+	private void copyToClipboard (Point selection) {
+		placeIntoClipboard(getSelection(selection), edit.getText(selection.x, selection.y-1));
+	}
+	
+	private void pasteFromClipboard () {
+		Clipboard clipboard = new Clipboard(edit.getDisplay());
+		try {
+			TransferData[] transferDatas = clipboard.getAvailableTypes();
+			for ( TransferData transData : transferDatas ) {
+				if ( FragmentDataTransfer.getInstance().isSupportedType(transData) ) {
+					FragmentData data = (FragmentData)clipboard.getContents(FragmentDataTransfer.getInstance());
+					setFragmentData(data, 2);
+					break;
+				}
+			}
+		}
+		finally {
+			if ( clipboard != null ) {
+				clipboard.dispose();
+			}
+		}
+	}
+	
+	private void placeIntoClipboard (FragmentData data,
+		String plainText)
+	{
+		Clipboard clipboard = new Clipboard(edit.getDisplay());
+		try {
+			FragmentDataTransfer dataTrans = FragmentDataTransfer.getInstance();  
+			TextTransfer textTrans = TextTransfer.getInstance();
+			// Create the clipboard entry
+			clipboard.setContents(new Object[]{data, plainText}, new Transfer[]{dataTrans, textTrans});
+		}
+		finally {
+			if ( clipboard != null ) {
+				clipboard.dispose();
+			}
+		}
+	}
 }
