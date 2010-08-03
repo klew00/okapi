@@ -20,22 +20,15 @@
 
 package net.sf.okapi.common.skeleton;
 
-import java.security.InvalidParameterException;
 import java.util.List;
 import java.util.regex.Pattern;
-
-import net.sf.okapi.common.Event;
-import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IResource;
-import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.ListUtil;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.RegexUtil;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.INameable;
-import net.sf.okapi.common.resource.MultiEvent;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
 
 /**
  * Helper methods to manipulate skeleton objects. 
@@ -53,8 +46,6 @@ public class SkeletonUtil {
 	private static final Pattern REF_REGEX = Pattern.compile(String.format("%s.+%s", 
 			RegexUtil.escape(TextFragment.REFMARKER_START), 
 			RegexUtil.escape(TextFragment.REFMARKER_END)));
-	
-	private static GenericSkeletonWriter writer = new GenericSkeletonWriter();
 	
 	/**
 	 * Finds source reference in the skeleton.
@@ -139,12 +130,6 @@ public class SkeletonUtil {
 		return true;
 	}
 
-	private static Event wrapEvent(Event event) {
-		MultiEvent me = new MultiEvent();
-		me.addEvent(event);
-		return new Event(EventType.MULTI_EVENT, me);
-	}
-	
 	public static int getNumParts(GenericSkeleton skel) {
 		return skel.getParts().size();
 	}
@@ -169,33 +154,35 @@ public class SkeletonUtil {
 		return !isTuRef(part) && RegexUtil.matches(st, PROPERTY_REGEX);
 	}
 	
-	public static boolean isSourcePlaceholder(TextUnit resource, GenericSkeletonPart part) {
+	public static boolean isSourcePlaceholder(IResource resource, GenericSkeletonPart part) {
 		if (resource == null || part == null) return false;
 		return isTuRef(part) && part.getParent() == resource && part.getLocale() == null;		
 	}
 	
-	public static boolean isTargetPlaceholder(TextUnit resource, GenericSkeletonPart part) {
+	public static boolean isTargetPlaceholder(IResource resource, GenericSkeletonPart part) {
 		if (resource == null || part == null) return false;
 		return isTuRef(part) && part.getParent() == resource && part.getLocale() != null;		
 	}
 	
-	public static boolean isValuePlaceholder(INameable resource, GenericSkeletonPart part) {
+	public static boolean isValuePlaceholder(IResource resource, GenericSkeletonPart part) {		 
 		if (resource == null || part == null) return false;
+		if (!(resource instanceof INameable)) return false;
 		return isPropRef(part) && part.getParent() == resource;		
 	}
 	
-	public static boolean isExtSourcePlaceholder(TextUnit resource, GenericSkeletonPart part) {
+	public static boolean isExtSourcePlaceholder(IResource resource, GenericSkeletonPart part) {
 		if (resource == null || part == null) return false;
 		return isTuRef(part) && part.getParent() != resource && part.getParent() != null && part.getLocale() == null;		
 	}
 	
-	public static boolean isExtTargetPlaceholder(TextUnit resource, GenericSkeletonPart part) {
+	public static boolean isExtTargetPlaceholder(IResource resource, GenericSkeletonPart part) {
 		if (resource == null || part == null) return false;
 		return isTuRef(part) && part.getParent() != resource && part.getParent() != null && part.getLocale() != null;		
 	}
 	
-	public static boolean isExtValuePlaceholder(INameable resource, GenericSkeletonPart part) {
+	public static boolean isExtValuePlaceholder(IResource resource, GenericSkeletonPart part) {
 		if (resource == null || part == null) return false;
+		if (!(resource instanceof INameable)) return false;
 		return isPropRef(part) && part.getParent() != resource && part.getParent() != null;
 	}
 	
@@ -204,37 +191,13 @@ public class SkeletonUtil {
 		return isRef(part) && part.getParent() == null && part.getLocale() == null;
 	}
 	
-	public static Event toMultiEvent(Event event) {
-		if (event == null)
-			throw new InvalidParameterException("Event cannot be null");
-		
-		IResource res = event.getResource();
-		if (res == null)
-			return wrapEvent(event);
-		
-		ISkeleton skel = res.getSkeleton();
-		if (!(skel instanceof GenericSkeleton)) {
-			// TODO log
-			return wrapEvent(event);
-		}
-		
-		List<GenericSkeletonPart> parts = ((GenericSkeleton) skel).getParts();
-		
-		switch (event.getEventType()) {
-		case TEXT_UNIT:
-		}
-		
-		return null;		
-	}
-
-	public static Event fromMultiEvent(Event event) {
-		if (event == null)
-			throw new InvalidParameterException("Event cannot be null");
-		if (event.getEventType() != EventType.MULTI_EVENT)
-			throw new InvalidParameterException("MULTI_EVENT type is expected");
-		MultiEvent me = (MultiEvent) event.getResource();
-		//if (me.iterator().)
-		
-		return null;		
+	public static boolean isText(GenericSkeletonPart part) {
+		if (part == null) return false;
+		return !isTuRef(part) && !isPropRef(part) && !isRef(part);
+	}	
+	
+	public static String getRefId(GenericSkeletonPart part) {
+		Object[] marker = TextFragment.getRefMarker(part.getData());
+		return (String) marker[0];
 	}
 }
