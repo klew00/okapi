@@ -37,9 +37,15 @@ import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.ui.Dialogs;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.DropTarget;
+import org.eclipse.swt.dnd.DropTargetAdapter;
+import org.eclipse.swt.dnd.DropTargetEvent;
+import org.eclipse.swt.dnd.FileTransfer;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -59,6 +65,8 @@ public class PairEditorUserTest {
 	private IFilterConfigurationMapper fcMapper;
 	private PairEditorPanel editPanel;
 	private Text edInfo;
+	private Button btFirst;
+	private Button btLast;
 	private Button btNext;
 	private Button btPrevious;
 	private Button btSave;
@@ -109,11 +117,11 @@ public class PairEditorUserTest {
 	
 	private void createContent () {
 		Composite comp = new Composite(shell, SWT.BORDER);
-		comp.setLayout(new GridLayout(4, true));
+		comp.setLayout(new GridLayout(6, true));
 		comp.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
 		Button btOpen = new Button(comp, SWT.PUSH);
-		btOpen.setText("&Open Document...");
+		btOpen.setText("&Open File...");
 		btOpen.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		btOpen.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -121,6 +129,15 @@ public class PairEditorUserTest {
 			};
 		});
 
+		btFirst = new Button(comp, SWT.PUSH);
+		btFirst.setText("&First");
+		btFirst.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		btFirst.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				displayFirst();
+			};
+		});
+		
 		btPrevious = new Button(comp, SWT.PUSH);
 		btPrevious.setText("&Previous");
 		btPrevious.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -139,6 +156,15 @@ public class PairEditorUserTest {
 			};
 		});
 
+		btLast = new Button(comp, SWT.PUSH);
+		btLast.setText("&Last");
+		btLast.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		btLast.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				displayLast();
+			};
+		});
+		
 		btSave = new Button(comp, SWT.PUSH);
 		btSave.setText("&Save Output");
 		btSave.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -151,30 +177,49 @@ public class PairEditorUserTest {
 		edInfo = new Text(comp, SWT.BORDER);
 		edInfo.setEditable(false);
 		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.horizontalSpan = 4;
+		gdTmp.horizontalSpan = 6;
 		edInfo.setLayoutData(gdTmp);
 		
 		editPanel = new PairEditorPanel(comp, SWT.VERTICAL);
 		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.horizontalSpan = 4;
+		gdTmp.horizontalSpan = 6;
 		editPanel.setLayoutData(gdTmp);
 		editPanel.clear();
 		
+		// Drop target for the table
+		DropTarget dropTarget = new DropTarget(shell, DND.DROP_DEFAULT | DND.DROP_COPY | DND.DROP_MOVE);
+		dropTarget.setTransfer(new FileTransfer[]{FileTransfer.getInstance()}); 
+		dropTarget.addDropListener(new DropTargetAdapter() {
+			public void drop (DropTargetEvent e) {
+				FileTransfer FT = FileTransfer.getInstance();
+				if ( FT.isSupportedType(e.currentDataType) ) {
+					String[] paths = (String[])e.data;
+					if ( paths != null ) {
+						for ( String path : paths ) {
+							if ( !openDocument(path) ) {
+								break; // Stop now
+							}
+						}
+					}
+				}
+			}
+		});
+
 		// Set minimum and start sizes
 		shell.pack();
 		shell.setMinimumSize(shell.getSize());
 		shell.setSize(680, 400);
 	}
 
-	private void openDocument (String path) {
+	private boolean openDocument (String path) {
 		IFilter filter = null;
 		try {
-			InputDocumentDialog dlg = new InputDocumentDialog(shell, "Open Document", fcMapper);
+			InputDocumentDialog dlg = new InputDocumentDialog(shell, "Open File", fcMapper);
 			dlg.setData(path, null, "UTF-8", srcLoc, trgLoc);
 
 			// Edit
 			Object[] data = dlg.showDialog();
-			if ( data == null ) return;
+			if ( data == null ) return false;
 			
 			// Create the raw document to add to the session
 			URI uri = (new File((String)data[0])).toURI();
@@ -202,6 +247,7 @@ public class PairEditorUserTest {
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, "Error when opening document.\n"+e.getMessage(), null);
+			return false;
 		}
 		finally {
 			if ( filter != null ) {
@@ -209,12 +255,15 @@ public class PairEditorUserTest {
 			}
 			displayFirst();
 		}
+		return true;
 	}
 	
 	private void updateButtons () {
 		btSave.setEnabled(( rawDoc != null ) && ( textUnits.size() > 0 ));
 		btPrevious.setEnabled(( textUnits.size() > 0 ) && ( current > 0 ));
 		btNext.setEnabled(( textUnits.size() > 0 ) && ( current < (textUnits.size()-1) ));
+		btFirst.setEnabled(btPrevious.getEnabled());
+		btLast.setEnabled(btNext.getEnabled());
 	}
 	
 	private void displayTU (int index) {
@@ -252,6 +301,12 @@ public class PairEditorUserTest {
 	
 	private void displayFirst () {
 		if ( textUnits.size() > 0 ) current = 0;
+		else current = -1;
+		displayTU(current);
+	}
+	
+	private void displayLast () {
+		if ( textUnits.size() > 0 ) current = textUnits.size()-1;
 		else current = -1;
 		displayTU(current);
 	}
@@ -301,40 +356,40 @@ public class PairEditorUserTest {
 		}
 	}
 	
-//	private void createTestTextUnit () {
-//		rawDoc = null;
-//		textUnits = new ArrayList<TextUnit>();
-//		
-//		TextFragment srcFrag = new TextFragment("Text in ");
-//		srcFrag.append(TagType.OPENING, "style1", "<span1>");
-//		srcFrag.append("bold");
-//		srcFrag.append(TagType.PLACEHOLDER, "z", "z");
-//		srcFrag.append(" and more bold");
-//		srcFrag.append(TagType.CLOSING, "style1", "</span1>");
-//		srcFrag.append(" with a line-break here:");
-//		srcFrag.append(TagType.PLACEHOLDER, "SomeCode", "<code3/>");
-//		srcFrag.append(" and more text after; ");
-//		srcFrag.append(TagType.OPENING, "span2", "<span4>");
-//		srcFrag.append(" and more.");
-//		
-//		TextFragment trgFrag = new TextFragment("Texte en ");
-//		trgFrag.append(TagType.OPENING, "style1", "<SPAN1>");
-//		trgFrag.append("gras");
-//		trgFrag.append(TagType.PLACEHOLDER, "Z", "Z");
-//		trgFrag.append(" et plus de gras");
-//		trgFrag.append(TagType.CLOSING, "style1", "</SPAN1>");
-//		trgFrag.append(" avec un saut-de-ligne ici\u00a0:");
-//		trgFrag.append(TagType.PLACEHOLDER, "SomeCode", "<CODE3/>");
-//		trgFrag.append(" et d'autre texte apr\u00e8s; ");
-//		trgFrag.append(TagType.OPENING, "span2", "<SPAN4>");
-//		trgFrag.append(" et encore d'autre.");
-//		
-//		TextUnit tu = new TextUnit("id");
-//		tu.setSource(new TextContainer(srcFrag));
-//		tu.setTargetContent(trgLoc, trgFrag);
-//		textUnits.add(tu);
-//		
-//		displayFirst();
-//	}
+	private void createTestTextUnit () {
+		rawDoc = null;
+		textUnits = new ArrayList<TextUnit>();
+		
+		TextFragment srcFrag = new TextFragment("Text in ");
+		srcFrag.append(TagType.OPENING, "style1", "<span1>");
+		srcFrag.append("bold");
+		srcFrag.append(TagType.PLACEHOLDER, "z", "z");
+		srcFrag.append(" and more bold");
+		srcFrag.append(TagType.CLOSING, "style1", "</span1>");
+		srcFrag.append(" with a line-break here:");
+		srcFrag.append(TagType.PLACEHOLDER, "SomeCode", "<code3/>");
+		srcFrag.append(" and more text after; ");
+		srcFrag.append(TagType.OPENING, "span2", "<span4>");
+		srcFrag.append(" and more.");
+		
+		TextFragment trgFrag = new TextFragment("Texte en ");
+		trgFrag.append(TagType.OPENING, "style1", "<SPAN1>");
+		trgFrag.append("gras");
+		trgFrag.append(TagType.PLACEHOLDER, "Z", "Z");
+		trgFrag.append(" et plus de gras");
+		trgFrag.append(TagType.CLOSING, "style1", "</SPAN1>");
+		trgFrag.append(" avec un saut-de-ligne ici\u00a0:");
+		trgFrag.append(TagType.PLACEHOLDER, "SomeCode", "<CODE3/>");
+		trgFrag.append(" et d'autre texte apr\u00e8s; ");
+		trgFrag.append(TagType.OPENING, "span2", "<SPAN4>");
+		trgFrag.append(" et encore d'autre.");
+		
+		TextUnit tu = new TextUnit("id");
+		tu.setSource(new TextContainer(srcFrag));
+		tu.setTargetContent(trgLoc, trgFrag);
+		textUnits.add(tu);
+		
+		displayFirst();
+	}
 
 }

@@ -73,6 +73,7 @@ import net.sf.okapi.common.ui.UserConfiguration;
 import net.sf.okapi.common.ui.filters.FilterConfigurationsDialog;
 import net.sf.okapi.common.plugins.PluginsManager;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.lib.ui.editor.PairEditorUserTest;
 import net.sf.okapi.lib.ui.segmentation.SRXEditor;
 import net.sf.okapi.lib.ui.verification.QualityCheckEditor;
 import net.sf.okapi.lib.verification.IQualityCheckEditor;
@@ -562,6 +563,17 @@ public class MainForm { //implements IParametersProvider {
 				filterConfigurations();
 			}
 		});
+
+		//=== For user test
+		new MenuItem(dropMenu, SWT.SEPARATOR);
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		menuItem.setText("FOR TESTERS - Test Fragment Editor");
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				runFragmentEditorTestingConsole();
+			}
+		});
+		//=== end of block for user test
 
 		// Help menu
 		miHelp = new MenuItem(menuBar, SWT.CASCADE);
@@ -2214,6 +2226,23 @@ public class MainForm { //implements IParametersProvider {
 			}
 			// Start the dialog
 			dlg.edit(true);
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+		finally {
+			if ( dlg != null ) dlg = null;
+		}
+	}
+	
+	private void runFragmentEditorTestingConsole () {
+		PairEditorUserTest dlg = null;
+		try {
+			saveSurfaceData();
+			// Create the dialog
+			dlg = new PairEditorUserTest(shell, fcMapper);
+			// Start the dialog
+			dlg.showDialog();
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getMessage(), null);

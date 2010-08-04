@@ -75,8 +75,9 @@ public class FragmentEditorPanel {
 	private ArrayList<StyleRange> ranges;
 	private boolean updateCodeRanges = false;
 	private int prevPos = 0;
-	private boolean shiftDown = false;
-	private boolean mouseDown = false;
+	private int selAnchor = -1;
+//	private boolean shiftDown = false;
+//	private boolean mouseDown = false;
 	private boolean targetMode = false;
 	private FragmentEditorPanel source;
 	private PairEditorPanel parentPanel;
@@ -108,27 +109,51 @@ public class FragmentEditorPanel {
 			public void caretMoved(CaretEvent e) {
 				for ( StyleRange range : ranges ) {
 					if (( e.caretOffset > range.start ) && ( e.caretOffset < range.start+range.length )) {
-						boolean backward = false;
+
 						if ( prevPos < e.caretOffset ) prevPos = range.start+range.length;
-						else {
-							prevPos = range.start;
-							backward = true;
-						}
-						if ( shiftDown || mouseDown ) {
+						else prevPos = range.start;
+						
+						if ( selAnchor != -1 ) { // Selection mode
 							Point pt = edit.getSelection();
-							if ( backward ) {
-								pt.x = pt.y; pt.y = prevPos;
+							if ( selAnchor < e.caretOffset ) {
+								pt.x = selAnchor;
+								pt.y = prevPos; //range.start+range.length;
 								edit.setSelection(pt);
 							}
 							else {
-								pt.y = prevPos;
+								pt.x = selAnchor; 
+								pt.y = prevPos; //range.start;
 								edit.setSelection(pt);
 							}
 						}
-						else {
+						else { // Movement mode
 							edit.setCaretOffset(prevPos);
 						}
 						return;
+						
+//------------------------------------------
+//						boolean backward = false;
+//						if ( prevPos < e.caretOffset ) prevPos = range.start+range.length;
+//						else {
+//							prevPos = range.start;
+//							backward = true;
+//						}
+//						if ( shiftDown || mouseDown ) {
+//							Point pt = edit.getSelection();
+//							if ( backward ) {
+//								pt.x = pt.y; pt.y = prevPos;
+//								edit.setSelection(pt);
+//							}
+//							else {
+//								pt.y = prevPos;
+//								edit.setSelection(pt);
+//							}
+//						}
+//						else {
+//							edit.setCaretOffset(prevPos);
+//						}
+//						return;
+//------------------------------------------
 					}
 				}
 				// Else: No in a code range: just remember the position
@@ -139,14 +164,28 @@ public class FragmentEditorPanel {
 		edit.addMouseListener(new MouseListener() {
 			@Override
 			public void mouseUp(MouseEvent e) {
-				mouseDown = false;
+				//mouseDown = false;
+				selAnchor = -1;
 			}
 			@Override
 			public void mouseDown(MouseEvent e) {
-				mouseDown = true;
+				//mouseDown = true;
+//				int pos = edit.getCaretOffset();
+//				StyleRange sr = getCodeRangeIfInside(pos);
+//				if ( sr != null ) {
+//					edit.setSelection(sr.start, sr.start+sr.length);
+//				}
+				Point pt = edit.getSelection();
+				if ( pt.y == edit.getCaretOffset() ) selAnchor = pt.x;
+				else selAnchor = pt.y;
 			}
 			@Override
-			public void mouseDoubleClick(MouseEvent e) {
+			public void mouseDoubleClick (MouseEvent e) {
+				int pos = edit.getCaretOffset();
+				StyleRange sr = getCodeRangeIfInside(pos);
+				if ( sr != null ) {
+					edit.setSelection(sr.start, sr.start+sr.length);
+				}
 			}
 		});
 		
@@ -154,13 +193,17 @@ public class FragmentEditorPanel {
 			@Override
 			public void keyReleased(KeyEvent e) {
 				if ( e.keyCode == SWT.SHIFT ) {
-					shiftDown = false;
+					//shiftDown = false;
+					selAnchor = -1;
 				}
 			}
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if ( e.keyCode == SWT.SHIFT ) {
-					shiftDown = true;
+					//shiftDown = true;
+					Point pt = edit.getSelection();
+					if ( pt.y == edit.getCaretOffset() ) selAnchor = pt.x;
+					else selAnchor = pt.y;
 				}
 			}
 		});
@@ -184,10 +227,6 @@ public class FragmentEditorPanel {
 						break;
 					case SWT.ARROW_UP: // Target-mode command
 						setPreviousSourceCode();
-						e.doit = false;
-						break;
-					case SWT.HOME:
-						selectFirstCode();
 						e.doit = false;
 						break;
 					}
@@ -355,7 +394,7 @@ public class FragmentEditorPanel {
 			});
 
 			item = new MenuItem(contextMenu, SWT.PUSH);
-			item.setText("Copy All Source Codes Into Target");
+			item.setText("Copy Source Codes Into Target");
 			item.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent event) {
 					pasteAllSourceCodes();
@@ -603,15 +642,15 @@ public class FragmentEditorPanel {
 		}
 		return -1;
 	}
-
-//	private StyleRange getCodeRange (int position) {
-//		for ( StyleRange range : ranges ) {
-//			if (( position >= range.start ) && ( position < range.start+range.length )) {
-//				return range;
-//			}
-//		}
-//		return null;
-//	}
+	
+	private StyleRange getCodeRangeIfInside (int position) {
+		for ( StyleRange range : ranges ) {
+			if (( position >= range.start ) && ( position < range.start+range.length )) {
+				return range;
+			}
+		}
+		return null;
+	}
 
 	/**
 	 * Indicates if the given selection does break one of the code ranges.
@@ -842,12 +881,6 @@ public class FragmentEditorPanel {
 		if ( start == end ) return; // Nothing to remove
 		// Delete the text from the control
 		edit.replaceTextRange(start, end-start, "");
-	}
-	
-	private void selectFirstCode () {
-		if ( ranges.size() == 0 ) return;
-		StyleRange sr = ranges.get(0);
-		edit.setSelection(sr.start, sr.start+sr.length);
 	}
 	
 	private void selectNextCode (int position,
