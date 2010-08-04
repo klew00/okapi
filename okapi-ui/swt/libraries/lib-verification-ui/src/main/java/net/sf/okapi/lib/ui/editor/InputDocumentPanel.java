@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.lib.ui.verification;
+package net.sf.okapi.lib.ui.editor;
 
 import java.nio.charset.Charset;
 import java.util.List;

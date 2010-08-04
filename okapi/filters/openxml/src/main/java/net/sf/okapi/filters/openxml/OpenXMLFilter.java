@@ -251,7 +251,9 @@ public class OpenXMLFilter implements IFilter {
 			MIMETYPE,
 			getClass().getName(),
 			"Microsoft Office Document",
-			"Microsoft Office documents (DOCX, XLSX, PPTX)."));
+			"Microsoft Office documents (DOCX, XLSX, PPTX).",
+			null,
+			".docx;.pptx;.xslx;"));
 		return list;
 	}
 

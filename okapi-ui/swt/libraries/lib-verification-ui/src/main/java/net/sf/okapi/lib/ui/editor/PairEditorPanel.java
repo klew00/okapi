@@ -66,7 +66,16 @@ public class PairEditorPanel extends SashForm {
 		edSource.setText(source);
 		edTarget.setText(target);
 	}
+	
+	public void clear () {
+		edSource.setText(null);
+		edTarget.setText(null);
+	}
 
+	public TextFragment applyChanges () {
+		return edTarget.applyChanges();
+	}
+	
 	@Override
 	public void setEnabled (boolean enabled) {
 		super.setEnabled(enabled);

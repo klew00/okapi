@@ -153,7 +153,7 @@ public abstract class AbstractFilter implements IFilter {
 
 		for (FilterConfiguration fc : configList)
 			configs.add(new FilterConfiguration(fc.configId, getMimeType(), getClass().getName(),
-					fc.name, fc.description, fc.parametersLocation));
+					fc.name, fc.description, fc.parametersLocation, fc.extensions));
 
 		return configs;
 	}

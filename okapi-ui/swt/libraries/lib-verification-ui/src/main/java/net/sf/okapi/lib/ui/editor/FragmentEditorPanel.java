@@ -58,6 +58,12 @@ import org.eclipse.swt.widgets.MenuItem;
 
 public class FragmentEditorPanel {
 
+//	private final static String[][] ACCENTS = {
+//		{"`aAeEiIoOuU", "\u00e0\u00c0\u00e8\u00c8\u00cc\u00ec\u00d2\u00f2\u00d9\u00f9"},
+//		//                    a     A     e     E     i     I     o     O     u     U
+//		{"'aAeEiIoOuU", ""}
+//	};
+	
 	private String codedText;
 	private List<Code> codes;
 	private TextFragment frag;
@@ -75,6 +81,7 @@ public class FragmentEditorPanel {
 	private FragmentEditorPanel source;
 	private PairEditorPanel parentPanel;
 	private int nextCodeForCopy = -1;
+	private boolean modified;
 	
 	public FragmentEditorPanel (Composite parent,
 		int flag,
@@ -165,18 +172,23 @@ public class FragmentEditorPanel {
 					switch ( e.keyCode ) {
 					case SWT.ARROW_RIGHT:
 						selectNextCode(edit.getCaretOffset(), true);
+						e.doit = false;
 						break;
 					case SWT.ARROW_LEFT:
 						selectPreviousCode(edit.getCaretOffset(), true);
+						e.doit = false;
 						break;
 					case SWT.ARROW_DOWN: // Target-mode command
 						setNextSourceCode();
+						e.doit = false;
 						break;
 					case SWT.ARROW_UP: // Target-mode command
 						setPreviousSourceCode();
+						e.doit = false;
 						break;
 					case SWT.HOME:
 						selectFirstCode();
+						e.doit = false;
 						break;
 					}
 				}
@@ -184,12 +196,19 @@ public class FragmentEditorPanel {
 					switch ( e.keyCode ) {
 					case 'd':
 						cycleDisplayMode();
+						e.doit = false;
 						break;
 					case 'c':
 						copyToClipboard(edit.getSelection());
+						e.doit = false;
 						break;
 					case 'v':
 						pasteFromClipboard();
+						e.doit = false;
+						break;
+					case ' ':
+						placeText("\u00a0");
+						e.doit = false;
 						break;
 					}
 				}
@@ -197,9 +216,11 @@ public class FragmentEditorPanel {
 					switch ( e.keyCode ) {
 					case SWT.DEL:
 						cutToClipboard(edit.getSelection());
+						e.doit = false;
 						break;
 					case SWT.INSERT:
 						pasteFromClipboard();
+						e.doit = false;
 						break;
 					}
 				}
@@ -229,6 +250,7 @@ public class FragmentEditorPanel {
 					}
 				}
 				// Modification is allowed: Update the code ranges
+				modified = true;
 				updateRanges(e.start, e.end, e.text.length());
 			}
 		});
@@ -289,6 +311,12 @@ public class FragmentEditorPanel {
 		edit.setEditable(editable);
 	}
 
+	private void placeText (String text) {
+		Point pt = edit.getSelection();
+		edit.replaceTextRange(pt.x, pt.y-pt.x, text);
+		edit.setCaretOffset(pt.x+text.length());
+	}
+	
 	public void applyTextOptions (TextOptions textOptions) {
 		edit.setBackground(textOptions.background);
 		edit.setForeground(textOptions.foreground);
@@ -355,12 +383,27 @@ public class FragmentEditorPanel {
 	}
 	
 	public void setText (TextFragment oriFrag) {
+		modified = false;
 		frag = oriFrag;
-		codedText = frag.getCodedText();
-		// Make a copy of the list, as getCodes() gives an un-modifiable list
-		//TODO: do we need a deep-copy in case we modify the actual codes data?
-		codes = new ArrayList<Code>(frag.getCodes());
-		updateText(null);
+		edit.setEnabled(oriFrag != null);
+		if ( oriFrag == null ) {
+			edit.setText("");
+		}
+		else {
+			codedText = frag.getCodedText();
+			// Make a copy of the list, as getCodes() gives an un-modifiable list
+			//TODO: do we need a deep-copy in case we modify the actual codes data?
+			codes = new ArrayList<Code>(frag.getCodes());
+			updateText(null);
+		}
+	}
+	
+	public TextFragment applyChanges () {
+		if ( !modified ) return frag;
+		cacheContent(null);
+		frag.setCodedText(codedText, codes, true);
+		modified = false;
+		return null;
 	}
 
 	/**
@@ -420,7 +463,6 @@ public class FragmentEditorPanel {
 	 * @return the index of the given code in the codes array, or -1 if not found.
 	 */
 	private int getCodeObjectIndex (Code codeToSearch) {
-		Code code;
 		for ( int i=0; i<codes.size(); i++ ) {
 			if ( codeToSearch == codes.get(i) ) {
 				return i;
@@ -827,7 +869,6 @@ public class FragmentEditorPanel {
 	
 	private void clearCodes () {
 		if ( !edit.getEditable() ) return;
-
 		cacheContent(null);
 		StringBuilder tmp = new StringBuilder();
 		for ( int i=0; i<codedText.length(); i++ ) {

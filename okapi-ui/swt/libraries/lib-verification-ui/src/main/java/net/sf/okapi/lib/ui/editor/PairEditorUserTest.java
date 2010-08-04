@@ -28,20 +28,20 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
+import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.ui.Dialogs;
-import net.sf.okapi.lib.ui.verification.InputDocumentDialog;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -67,6 +67,8 @@ public class PairEditorUserTest {
 	private RawDocument rawDoc;
 	private ArrayList<TextUnit> textUnits = new ArrayList<TextUnit>();
 	private int current = -1;
+	private String outEncoding;
+	private String outPath;
 
 	public PairEditorUserTest (Object parent,
 		IFilterConfigurationMapper fcMapper)
@@ -140,6 +142,11 @@ public class PairEditorUserTest {
 		btSave = new Button(comp, SWT.PUSH);
 		btSave.setText("&Save Output");
 		btSave.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		btSave.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				saveOutput();
+			};
+		});
 		
 		edInfo = new Text(comp, SWT.BORDER);
 		edInfo.setEditable(false);
@@ -151,6 +158,7 @@ public class PairEditorUserTest {
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.horizontalSpan = 4;
 		editPanel.setLayoutData(gdTmp);
+		editPanel.clear();
 		
 		// Set minimum and start sizes
 		shell.pack();
@@ -176,9 +184,13 @@ public class PairEditorUserTest {
 			rawDoc.setFilterConfigId((String)data[1]);
 			
 			filter = fcMapper.createFilter(rawDoc.getFilterConfigId());
+
+			// Reset
+			outEncoding = null;
+			outPath = null;
+			current = -1;
 			
 			// Load the document
-			current = -1; // Ensure empty display on error
 			textUnits = new ArrayList<TextUnit>();
 			filter.open(rawDoc);
 			while ( filter.hasNext() ) {
@@ -206,29 +218,35 @@ public class PairEditorUserTest {
 	}
 	
 	private void displayTU (int index) {
-		if ( index > -1 ) {
-			TextUnit tu = textUnits.get(index);
-			TextFragment srcFrag = tu.getSource().getFirstContent();
-			TextFragment trgFrag = tu.createTarget(trgLoc, false, IResource.COPY_ALL).getFirstContent();
-			//TODO: deal with segmented content
-			editPanel.setText(srcFrag, trgFrag);
-			edInfo.setText(String.format("TU ID=%s  (%d of %d)", tu.getId(), current+1, textUnits.size()));
+		try {
+			if ( index > -1 ) {
+				TextUnit tu = textUnits.get(index);
+				TextFragment srcFrag = tu.getSource().getFirstContent();
+				TextFragment trgFrag = tu.createTarget(trgLoc, false, IResource.COPY_ALL).getFirstContent();
+				//TODO: deal with segmented content
+				editPanel.setText(srcFrag, trgFrag);
+				edInfo.setText(String.format("TU ID=%s  (%d of %d)", tu.getId(), current+1, textUnits.size()));
+			}
+			else {
+				editPanel.clear();
+				edInfo.setText("");
+			}
+			updateButtons();
 		}
-		else {
-			//TODO: editPanel.clear();
-			edInfo.setText("");
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, "Error when displaying text unit.\n"+e.getMessage(), null);
 		}
-		
-		updateButtons();
 	}
 
 	private void displayPrevious () {
 		if ( current <= 0 ) return;
+		saveCurrent();
 		displayTU(--current);
 	}
 	
 	private void displayNext () {
 		if (( current < 0 ) || ( current >= textUnits.size()-1 )) return;
+		saveCurrent();
 		displayTU(++current);
 	}
 	
@@ -237,40 +255,86 @@ public class PairEditorUserTest {
 		else current = -1;
 		displayTU(current);
 	}
-
-	private void createTestTextUnit () {
-		rawDoc = null;
-		textUnits = new ArrayList<TextUnit>();
-		
-		TextFragment srcFrag = new TextFragment("Text in ");
-		srcFrag.append(TagType.OPENING, "style1", "<span1>");
-		srcFrag.append("bold");
-		srcFrag.append(TagType.PLACEHOLDER, "z", "z");
-		srcFrag.append(" and more bold");
-		srcFrag.append(TagType.CLOSING, "style1", "</span1>");
-		srcFrag.append(" with a line-break here:");
-		srcFrag.append(TagType.PLACEHOLDER, "SomeCode", "<code3/>");
-		srcFrag.append(" and more text after; ");
-		srcFrag.append(TagType.OPENING, "span2", "<span4>");
-		srcFrag.append(" and more.");
-		
-		TextFragment trgFrag = new TextFragment("Texte en ");
-		trgFrag.append(TagType.OPENING, "style1", "<SPAN1>");
-		trgFrag.append("gras");
-		trgFrag.append(TagType.PLACEHOLDER, "Z", "Z");
-		trgFrag.append(" et plus de gras");
-		trgFrag.append(TagType.CLOSING, "style1", "</SPAN1>");
-		trgFrag.append(" avec un saut-de-ligne ici\u00a0:");
-		trgFrag.append(TagType.PLACEHOLDER, "SomeCode", "<CODE3/>");
-		trgFrag.append(" et d'autre texte apr\u00e8s; ");
-		trgFrag.append(TagType.OPENING, "span2", "<SPAN4>");
-		trgFrag.append(" et encore d'autre.");
-		
-		TextUnit tu = new TextUnit("id");
-		tu.setSource(new TextContainer(srcFrag));
-		tu.setTargetContent(trgLoc, trgFrag);
-		textUnits.add(tu);
-		
-		displayFirst();
+	
+	private void saveCurrent () {
+		if ( current == -1 ) return;
+		editPanel.applyChanges();
 	}
+
+	private void saveOutput () {
+		saveCurrent();
+		IFilter filter = null;
+		IFilterWriter writer = null;
+		try {
+			filter = fcMapper.createFilter(rawDoc.getFilterConfigId());
+			filter.open(rawDoc);
+			int tuIndex = 0;
+			while ( filter.hasNext() ) {
+				Event event = filter.next();
+				switch ( event.getEventType() ) {
+				case START_DOCUMENT:
+					StartDocument sd = (StartDocument)event.getResource();
+					outEncoding = rawDoc.getEncoding();
+					outPath = new File(rawDoc.getInputURI()).getPath();
+					outPath = Util.getDirectoryName(outPath) + File.separator + Util.getFilename(outPath, false) + ".out" + Util.getExtension(outPath);
+					writer = sd.getFilterWriter();
+					writer.setOptions(trgLoc, outEncoding);
+					writer.setOutput(outPath);
+					break;
+				case TEXT_UNIT:
+					TextUnit oriTU = event.getTextUnit();
+					TextUnit updTU = textUnits.get(tuIndex);
+					// make sure they are in sync (just to be sure)
+					if ( !oriTU.getId().equals(updTU.getId()) ) {
+						throw new RuntimeException("Text units de-synchronized: the underlying file has changed.");
+					}
+					TextContainer tc = updTU.getTarget(trgLoc);
+					if ( tc != null ) oriTU.setTarget(trgLoc, tc);
+					tuIndex++;
+					break;
+				}
+				writer.handleEvent(event);
+			}
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, "Error when saving document.\n"+e.getMessage(), null);
+		}
+	}
+	
+//	private void createTestTextUnit () {
+//		rawDoc = null;
+//		textUnits = new ArrayList<TextUnit>();
+//		
+//		TextFragment srcFrag = new TextFragment("Text in ");
+//		srcFrag.append(TagType.OPENING, "style1", "<span1>");
+//		srcFrag.append("bold");
+//		srcFrag.append(TagType.PLACEHOLDER, "z", "z");
+//		srcFrag.append(" and more bold");
+//		srcFrag.append(TagType.CLOSING, "style1", "</span1>");
+//		srcFrag.append(" with a line-break here:");
+//		srcFrag.append(TagType.PLACEHOLDER, "SomeCode", "<code3/>");
+//		srcFrag.append(" and more text after; ");
+//		srcFrag.append(TagType.OPENING, "span2", "<span4>");
+//		srcFrag.append(" and more.");
+//		
+//		TextFragment trgFrag = new TextFragment("Texte en ");
+//		trgFrag.append(TagType.OPENING, "style1", "<SPAN1>");
+//		trgFrag.append("gras");
+//		trgFrag.append(TagType.PLACEHOLDER, "Z", "Z");
+//		trgFrag.append(" et plus de gras");
+//		trgFrag.append(TagType.CLOSING, "style1", "</SPAN1>");
+//		trgFrag.append(" avec un saut-de-ligne ici\u00a0:");
+//		trgFrag.append(TagType.PLACEHOLDER, "SomeCode", "<CODE3/>");
+//		trgFrag.append(" et d'autre texte apr\u00e8s; ");
+//		trgFrag.append(TagType.OPENING, "span2", "<SPAN4>");
+//		trgFrag.append(" et encore d'autre.");
+//		
+//		TextUnit tu = new TextUnit("id");
+//		tu.setSource(new TextContainer(srcFrag));
+//		tu.setTargetContent(trgLoc, trgFrag);
+//		textUnits.add(tu);
+//		
+//		displayFirst();
+//	}
+
 }
