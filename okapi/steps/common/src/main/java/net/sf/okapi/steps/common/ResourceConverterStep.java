@@ -68,7 +68,18 @@ public class ResourceConverterStep extends BasePipelineStep {
 		case START_DOCUMENT:
 			StartDocument sd = (StartDocument) event.getResource();
 			converter = new ResourceConverter(sd.isMultilingual(), targetLocale, outputEncoding);
+			break;
+		case END_DOCUMENT:
+		case START_SUBDOCUMENT:
+		case END_SUBDOCUMENT:
+		case START_GROUP:
+		case END_GROUP:
+		case TEXT_UNIT:
+		case DOCUMENT_PART:
+			return converter.convert(event);
+		default:
+			return event;
 		}
-		return converter.convert(event);
+		return event;
 	}
 }

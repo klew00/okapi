@@ -54,9 +54,9 @@ public class ResourceConverter {
 		this.trgLoc = trgLoc;
 		writer = new GenericSkeletonWriter();
 		newSkel = new GenericSkeleton();
-		StartDocument sd = new StartDocument("");
-		sd.setMultilingual(false); // !!! 
-		writer.processStartDocument(trgLoc, outEncoding, null, null, sd); // sets writer fields
+//		StartDocument sd = new StartDocument("");
+//		sd.setMultilingual(false); // !!! 
+//		writer.processStartDocument(trgLoc, outEncoding, null, null, sd); // sets writer fields
 	}
 
 //	public void setMultilingual(boolean isMultilingual) {
@@ -111,9 +111,9 @@ public class ResourceConverter {
 	
 	/**
 	 * Converts a given event into a multi-event if it contains references in its skeleton, or passes it on if 
-	 * either the skeleton is not an instance of GenericSkeleton, contains no references, or the resource is referent.
+	 * either the skeleton is no instance of GenericSkeleton, contains no references, or the resource is referent.
 	 * @param event the given event
-	 * @return the given event of a newly created multi-event
+	 * @return the given event or a newly created multi-event
 	 */
 	public Event convert(Event event) {
 		if (event == null)
@@ -124,19 +124,62 @@ public class ResourceConverter {
 			return event;
 		
 		ISkeleton skel = res.getSkeleton();
+		if (!(skel == null)) {
+			return event;
+		}		
 		if (!(skel instanceof GenericSkeleton)) {
 			return event;
 		}
 		
-		if (res instanceof IReferenceable) {
+		if (res instanceof IReferenceable) {			
 			if  (((IReferenceable) res).isReferent()) {
 				writer.addToReferents(event);
+				// The referent is not processed at this point (only later from an event referencing it)
 				return event;
 			}
 		}
 		
+//		switch (event.getEventType()) {
+//		case START_DOCUMENT:
+//		case END_DOCUMENT:
+//		case START_SUBDOCUMENT:
+//		case END_SUBDOCUMENT:
+//		case START_GROUP:
+//		case END_GROUP:
+//		case TEXT_UNIT:
+//		case DOCUMENT_PART:
+//			break;
+//		default:
+//			return event; // All other events with a skeleton are not processed
+//		}
+		
+		// Process the resource's skeleton
 		MultiEvent me = new MultiEvent();
-		processResource(res, me);		
+		processResource(res, me);
+		
+		// Different event types are processed differently
+		switch (event.getEventType()) {
+		case START_DOCUMENT:
+			StartDocument sd = (StartDocument) res;
+			sd.setMultilingual(false); // Simple resources 
+			// No break here
+		case END_DOCUMENT:
+		case START_SUBDOCUMENT:
+		case END_SUBDOCUMENT:
+		case START_GROUP:
+		case END_GROUP:
+			// The original event (the skeleton should be deleted) precedes in the resulting multi-event DPs/TUs 
+			// created from its original skeleton parts
+			res.setSkeleton(null);
+			me.addEvent(event, 0);  
+			break;
+		case TEXT_UNIT:
+		case DOCUMENT_PART:
+			break;
+		default:
+			return event;
+		}
+								
 		return new Event(EventType.MULTI_EVENT, packMultiEvent(me));
 	}
 		
@@ -228,7 +271,8 @@ public class ResourceConverter {
 		
 		for (GenericSkeletonPart part : parts) {
 			if (SkeletonUtil.isText(part)) {
-				newSkel.add(part.toString());
+				//newSkel.add(part.toString());
+				newSkel.add(writer.getString(part, 1));
 			}				
 			else if (SkeletonUtil.isReference(part)) {
 				flushSkeleton(resId, ++dpCounter, me);				
@@ -237,42 +281,73 @@ public class ResourceConverter {
 				if (referent instanceof IResource)
 					processResource((IResource) referent, me);
 			}
-			else if (SkeletonUtil.isSourcePlaceholder(resource, part)) {
-				if (isMultilingual) {
-					newSkel.add(part.toString()); // Source goes to skeleton
-				}
-				else {
-					flushSkeleton(resId, ++dpCounter, me);
-					addTU(me, resId, ++tuCounter, (TextUnit) resource);
-				}
+			else if (SkeletonUtil.isSourcePlaceholder(part, resource)) {
+				processSourcePlaceholder(part, resource, me, resId, tuCounter, dpCounter);
 			}
-			else if (SkeletonUtil.isTargetPlaceholder(resource, part)) {
-				if (isMultilingual) {
-					if (part.getLocale() == trgLoc) {
-						flushSkeleton(resId, ++dpCounter, me);
-						addTU(me, resId, ++tuCounter, (TextUnit) resource);
-					}
-					else {
-						newSkel.add(writer.getContent((TextUnit) resource, trgLoc, 1));
-					}
-				}
-				else {
-					newSkel.add(writer.getContent((TextUnit) resource, trgLoc, 1));
-				}
+			else if (SkeletonUtil.isTargetPlaceholder(part, resource)) {
+				processTargetPlaceholder(part, resource, me, resId, tuCounter, dpCounter);
 			}
-			else if (SkeletonUtil.isValuePlaceholder(resource, part)) {
-				
+			else if (SkeletonUtil.isValuePlaceholder(part, resource)) {
+				// For both isMultilingual true/false
+				newSkel.add(writer.getString(part, 1));
 			}
-			else if (SkeletonUtil.isExtSourcePlaceholder(resource, part)) {
-				
+			else if (SkeletonUtil.isExtSourcePlaceholder(part, resource)) {
+				checkExtParent(part.getParent(), resId);
+				processSourcePlaceholder(part, resource, me, resId, tuCounter, dpCounter);
 			}
-			else if (SkeletonUtil.isExtTargetPlaceholder(resource, part)) {
-				
+			else if (SkeletonUtil.isExtTargetPlaceholder(part, resource)) {
+				checkExtParent(part.getParent(), resId);
+				processTargetPlaceholder(part, resource, me, resId, tuCounter, dpCounter);
 			}
-			else if (SkeletonUtil.isExtValuePlaceholder(resource, part)) {
-				
+			else if (SkeletonUtil.isExtValuePlaceholder(part, resource)) {
+				// For both isMultilingual true/false
+				checkExtParent(part.getParent(), resId);
+				newSkel.add(writer.getString(part, 1));
 			}
 		}
 		flushSkeleton(resId, ++dpCounter, me); // Flush remaining skeleton tail
+	}
+
+	private void processSourcePlaceholder(GenericSkeletonPart part, IResource resource, 
+			MultiEvent me, String resId, int tuCounter, int dpCounter) {
+		if (isMultilingual) {
+			if (part.parent instanceof TextUnit)
+				newSkel.add(writer.getContent((TextUnit) part.parent, null, 0)); // Source goes to skeleton
+			else {
+				logger.warning("The self-reference must be a text-unit: " + resId);
+				newSkel.add(part.parent.toString());
+			}
+		}
+		else {
+			flushSkeleton(resId, ++dpCounter, me);
+			addTU(me, resId, ++tuCounter, (TextUnit) resource);
+		}
+	}	
+	
+	private void processTargetPlaceholder(GenericSkeletonPart part, IResource resource, 
+			MultiEvent me, String resId, int tuCounter, int dpCounter) {
+		// For both isMultilingual true/false
+		if (part.getLocale() == trgLoc) {
+			flushSkeleton(resId, ++dpCounter, me);
+			addTU(me, resId, ++tuCounter, (TextUnit) resource);
+		}
+		else {
+			newSkel.add(writer.getContent((TextUnit) resource, trgLoc, 1));
+		}
+	}
+	
+	private boolean checkExtParent(IResource parent, String resId) {
+		if (parent instanceof IReferenceable) {
+			IReferenceable r = (IReferenceable) parent;
+			if (!r.isReferent()) {
+				logger.warning("Referent flag is not set in parent: " + resId);
+				return false;
+			}
+			return true;
+		}
+		else {
+			logger.warning("Invalid parent type: " + resId);
+			return false;
+		}
 	}
 }

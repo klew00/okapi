@@ -154,33 +154,33 @@ public class SkeletonUtil {
 		return !isTuRef(part) && RegexUtil.matches(st, PROPERTY_REGEX);
 	}
 	
-	public static boolean isSourcePlaceholder(IResource resource, GenericSkeletonPart part) {
+	public static boolean isSourcePlaceholder(GenericSkeletonPart part, IResource resource) {
 		if (resource == null || part == null) return false;
 		return isTuRef(part) && part.getParent() == resource && part.getLocale() == null;		
 	}
 	
-	public static boolean isTargetPlaceholder(IResource resource, GenericSkeletonPart part) {
+	public static boolean isTargetPlaceholder(GenericSkeletonPart part, IResource resource) {
 		if (resource == null || part == null) return false;
 		return isTuRef(part) && part.getParent() == resource && part.getLocale() != null;		
 	}
 	
-	public static boolean isValuePlaceholder(IResource resource, GenericSkeletonPart part) {		 
+	public static boolean isValuePlaceholder(GenericSkeletonPart part, IResource resource) {		 
 		if (resource == null || part == null) return false;
 		if (!(resource instanceof INameable)) return false;
 		return isPropRef(part) && part.getParent() == resource;		
 	}
 	
-	public static boolean isExtSourcePlaceholder(IResource resource, GenericSkeletonPart part) {
+	public static boolean isExtSourcePlaceholder(GenericSkeletonPart part, IResource resource) {
 		if (resource == null || part == null) return false;
 		return isTuRef(part) && part.getParent() != resource && part.getParent() != null && part.getLocale() == null;		
 	}
 	
-	public static boolean isExtTargetPlaceholder(IResource resource, GenericSkeletonPart part) {
+	public static boolean isExtTargetPlaceholder(GenericSkeletonPart part, IResource resource) {
 		if (resource == null || part == null) return false;
 		return isTuRef(part) && part.getParent() != resource && part.getParent() != null && part.getLocale() != null;		
 	}
 	
-	public static boolean isExtValuePlaceholder(IResource resource, GenericSkeletonPart part) {
+	public static boolean isExtValuePlaceholder(GenericSkeletonPart part, IResource resource) {
 		if (resource == null || part == null) return false;
 		if (!(resource instanceof INameable)) return false;
 		return isPropRef(part) && part.getParent() != resource && part.getParent() != null;

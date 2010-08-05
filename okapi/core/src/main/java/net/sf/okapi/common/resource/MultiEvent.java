@@ -67,6 +67,15 @@ public class MultiEvent implements IResource, Iterable<Event> {
 	public void addEvent (Event event) {
 		events.add(event);
 	}
+	
+	/**
+	 * Inserts an event in this object at the specified position.
+	 * @param event the event to insert.
+	 * @param index index at which the event is to be inserted.
+	 */
+	public void addEvent (Event event, int index) {
+		events.add(index, event);
+	}
 
 	@Override
 	public <A extends IAnnotation> A getAnnotation(Class<A> annotationType) {

@@ -112,12 +112,12 @@ public class SkeletonUtilTest {
 		assertEquals(1, SkeletonUtil.getNumParts(skel1));
 				
 		GenericSkeletonPart p1 = SkeletonUtil.getPart(skel1, 0); 
-		assertTrue(SkeletonUtil.isSourcePlaceholder(tu1, p1));
-		assertFalse(SkeletonUtil.isTargetPlaceholder(tu1, p1));
-		assertFalse(SkeletonUtil.isValuePlaceholder(tu1, p1));
-		assertFalse(SkeletonUtil.isExtSourcePlaceholder(tu1, p1));
-		assertFalse(SkeletonUtil.isExtTargetPlaceholder(tu1, p1));
-		assertFalse(SkeletonUtil.isExtValuePlaceholder(tu1, p1));
+		assertTrue(SkeletonUtil.isSourcePlaceholder(p1, tu1));
+		assertFalse(SkeletonUtil.isTargetPlaceholder(p1, tu1));
+		assertFalse(SkeletonUtil.isValuePlaceholder(p1, tu1));
+		assertFalse(SkeletonUtil.isExtSourcePlaceholder(p1, tu1));
+		assertFalse(SkeletonUtil.isExtTargetPlaceholder(p1, tu1));
+		assertFalse(SkeletonUtil.isExtValuePlaceholder(p1, tu1));
 		assertFalse(SkeletonUtil.isReference(p1));
 		
 		assertEquals(0, SkeletonUtil.getNumParts(skel2));
@@ -144,143 +144,143 @@ public class SkeletonUtilTest {
 		assertEquals(7, SkeletonUtil.getNumParts(skel2));
 		
 		p1 = SkeletonUtil.getPart(skel2, 0); 
-		assertTrue(SkeletonUtil.isSourcePlaceholder(tu2, p1));
-		assertFalse(SkeletonUtil.isTargetPlaceholder(tu2, p1));
-		assertFalse(SkeletonUtil.isValuePlaceholder(tu2, p1));
-		assertFalse(SkeletonUtil.isExtSourcePlaceholder(tu2, p1));
-		assertFalse(SkeletonUtil.isExtTargetPlaceholder(tu2, p1));
-		assertFalse(SkeletonUtil.isExtValuePlaceholder(tu2, p1));
+		assertTrue(SkeletonUtil.isSourcePlaceholder(p1, tu2));
+		assertFalse(SkeletonUtil.isTargetPlaceholder(p1, tu2));
+		assertFalse(SkeletonUtil.isValuePlaceholder(p1, tu2));
+		assertFalse(SkeletonUtil.isExtSourcePlaceholder(p1, tu2));
+		assertFalse(SkeletonUtil.isExtTargetPlaceholder(p1, tu2));
+		assertFalse(SkeletonUtil.isExtValuePlaceholder(p1, tu2));
 		assertFalse(SkeletonUtil.isReference(p1));
 		assertFalse(SkeletonUtil.isText(p1));
 		
 		GenericSkeletonPart p2 = SkeletonUtil.getPart(skel2, 1); 
-		assertFalse(SkeletonUtil.isSourcePlaceholder(tu2, p2));
-		assertTrue(SkeletonUtil.isTargetPlaceholder(tu2, p2));
-		assertFalse(SkeletonUtil.isValuePlaceholder(tu2, p2));
-		assertFalse(SkeletonUtil.isExtSourcePlaceholder(tu2, p2));
-		assertFalse(SkeletonUtil.isExtTargetPlaceholder(tu2, p2));
-		assertFalse(SkeletonUtil.isExtValuePlaceholder(tu2, p2));
+		assertFalse(SkeletonUtil.isSourcePlaceholder(p2, tu2));
+		assertTrue(SkeletonUtil.isTargetPlaceholder(p2, tu2));
+		assertFalse(SkeletonUtil.isValuePlaceholder(p2, tu2));
+		assertFalse(SkeletonUtil.isExtSourcePlaceholder(p2, tu2));
+		assertFalse(SkeletonUtil.isExtTargetPlaceholder(p2, tu2));
+		assertFalse(SkeletonUtil.isExtValuePlaceholder(p2, tu2));
 		assertFalse(SkeletonUtil.isReference(p2));
 		assertFalse(SkeletonUtil.isText(p2));
 		
 		GenericSkeletonPart p3 = SkeletonUtil.getPart(skel2, 2); 
-		assertFalse(SkeletonUtil.isSourcePlaceholder(tu2, p3));
-		assertFalse(SkeletonUtil.isTargetPlaceholder(tu2, p3));
-		assertTrue(SkeletonUtil.isValuePlaceholder(tu2, p3));
-		assertFalse(SkeletonUtil.isExtSourcePlaceholder(tu2, p3));
-		assertFalse(SkeletonUtil.isExtTargetPlaceholder(tu2, p3));
-		assertFalse(SkeletonUtil.isExtValuePlaceholder(tu2, p3));
+		assertFalse(SkeletonUtil.isSourcePlaceholder(p3, tu2));
+		assertFalse(SkeletonUtil.isTargetPlaceholder(p3, tu2));
+		assertTrue(SkeletonUtil.isValuePlaceholder(p3, tu2));
+		assertFalse(SkeletonUtil.isExtSourcePlaceholder(p3, tu2));
+		assertFalse(SkeletonUtil.isExtTargetPlaceholder(p3, tu2));
+		assertFalse(SkeletonUtil.isExtValuePlaceholder(p3, tu2));
 		assertFalse(SkeletonUtil.isReference(p3));
 		assertFalse(SkeletonUtil.isText(p3));
 		
 		GenericSkeletonPart p4 = SkeletonUtil.getPart(skel2, 3); 
-		assertFalse(SkeletonUtil.isSourcePlaceholder(tu2, p4));
-		assertFalse(SkeletonUtil.isTargetPlaceholder(tu2, p4));
-		assertTrue(SkeletonUtil.isValuePlaceholder(tu2, p4));
-		assertFalse(SkeletonUtil.isExtSourcePlaceholder(tu2, p4));
-		assertFalse(SkeletonUtil.isExtTargetPlaceholder(tu2, p4));
-		assertFalse(SkeletonUtil.isExtValuePlaceholder(tu2, p4));
+		assertFalse(SkeletonUtil.isSourcePlaceholder(p4, tu2));
+		assertFalse(SkeletonUtil.isTargetPlaceholder(p4, tu2));
+		assertTrue(SkeletonUtil.isValuePlaceholder(p4, tu2));
+		assertFalse(SkeletonUtil.isExtSourcePlaceholder(p4, tu2));
+		assertFalse(SkeletonUtil.isExtTargetPlaceholder(p4, tu2));
+		assertFalse(SkeletonUtil.isExtValuePlaceholder(p4, tu2));
 		assertFalse(SkeletonUtil.isReference(p4));
 		assertFalse(SkeletonUtil.isText(p4));
 		
 		GenericSkeletonPart p5 = SkeletonUtil.getPart(skel2, 4); 
-		assertFalse(SkeletonUtil.isSourcePlaceholder(tu2, p5));
-		assertFalse(SkeletonUtil.isTargetPlaceholder(tu2, p5));
-		assertTrue(SkeletonUtil.isValuePlaceholder(tu2, p5));
-		assertFalse(SkeletonUtil.isExtSourcePlaceholder(tu2, p5));
-		assertFalse(SkeletonUtil.isExtTargetPlaceholder(tu2, p5));
-		assertFalse(SkeletonUtil.isExtValuePlaceholder(tu2, p5));
+		assertFalse(SkeletonUtil.isSourcePlaceholder(p5, tu2));
+		assertFalse(SkeletonUtil.isTargetPlaceholder(p5, tu2));
+		assertTrue(SkeletonUtil.isValuePlaceholder(p5, tu2));
+		assertFalse(SkeletonUtil.isExtSourcePlaceholder(p5, tu2));
+		assertFalse(SkeletonUtil.isExtTargetPlaceholder(p5, tu2));
+		assertFalse(SkeletonUtil.isExtValuePlaceholder(p5, tu2));
 		assertFalse(SkeletonUtil.isReference(p5));
 		assertFalse(SkeletonUtil.isText(p5));
 		
 		GenericSkeletonPart p6 = SkeletonUtil.getPart(skel2, 5); 
-		assertFalse(SkeletonUtil.isSourcePlaceholder(tu2, p6));
-		assertFalse(SkeletonUtil.isTargetPlaceholder(tu2, p6));
-		assertFalse(SkeletonUtil.isValuePlaceholder(tu2, p6));
-		assertFalse(SkeletonUtil.isExtSourcePlaceholder(tu2, p6));
-		assertFalse(SkeletonUtil.isExtTargetPlaceholder(tu2, p6));
-		assertFalse(SkeletonUtil.isExtValuePlaceholder(tu2, p6));
+		assertFalse(SkeletonUtil.isSourcePlaceholder(p6, tu2));
+		assertFalse(SkeletonUtil.isTargetPlaceholder(p6, tu2));
+		assertFalse(SkeletonUtil.isValuePlaceholder(p6, tu2));
+		assertFalse(SkeletonUtil.isExtSourcePlaceholder(p6, tu2));
+		assertFalse(SkeletonUtil.isExtTargetPlaceholder(p6, tu2));
+		assertFalse(SkeletonUtil.isExtValuePlaceholder(p6, tu2));
 		assertTrue(SkeletonUtil.isReference(p6));
 		assertFalse(SkeletonUtil.isText(p6));
 		
 		GenericSkeletonPart p7 = SkeletonUtil.getPart(skel2, 6); 
-		assertFalse(SkeletonUtil.isSourcePlaceholder(tu2, p7));
-		assertFalse(SkeletonUtil.isTargetPlaceholder(tu2, p7));
-		assertFalse(SkeletonUtil.isValuePlaceholder(tu2, p7));
-		assertFalse(SkeletonUtil.isExtSourcePlaceholder(tu2, p7));
-		assertFalse(SkeletonUtil.isExtTargetPlaceholder(tu2, p7));
-		assertFalse(SkeletonUtil.isExtValuePlaceholder(tu2, p7));
+		assertFalse(SkeletonUtil.isSourcePlaceholder(p7, tu2));
+		assertFalse(SkeletonUtil.isTargetPlaceholder(p7, tu2));
+		assertFalse(SkeletonUtil.isValuePlaceholder(p7, tu2));
+		assertFalse(SkeletonUtil.isExtSourcePlaceholder(p7, tu2));
+		assertFalse(SkeletonUtil.isExtTargetPlaceholder(p7, tu2));
+		assertFalse(SkeletonUtil.isExtValuePlaceholder(p7, tu2));
 		assertFalse(SkeletonUtil.isReference(p7));
 		assertTrue(SkeletonUtil.isText(p7));
 		
 		skel2.changeSelfReferents(tu1); // @@@
 		p1 = SkeletonUtil.getPart(skel2, 0); 
-		assertFalse(SkeletonUtil.isSourcePlaceholder(tu2, p1));
-		assertFalse(SkeletonUtil.isTargetPlaceholder(tu2, p1));
-		assertFalse(SkeletonUtil.isValuePlaceholder(tu2, p1));
-		assertTrue(SkeletonUtil.isExtSourcePlaceholder(tu2, p1));
-		assertFalse(SkeletonUtil.isExtTargetPlaceholder(tu2, p1));
-		assertFalse(SkeletonUtil.isExtValuePlaceholder(tu2, p1));
+		assertFalse(SkeletonUtil.isSourcePlaceholder(p1, tu2));
+		assertFalse(SkeletonUtil.isTargetPlaceholder(p1, tu2));
+		assertFalse(SkeletonUtil.isValuePlaceholder(p1, tu2));
+		assertTrue(SkeletonUtil.isExtSourcePlaceholder(p1, tu2));
+		assertFalse(SkeletonUtil.isExtTargetPlaceholder(p1, tu2));
+		assertFalse(SkeletonUtil.isExtValuePlaceholder(p1, tu2));
 		assertFalse(SkeletonUtil.isReference(p1));
 		assertFalse(SkeletonUtil.isText(p1));
 		
 		p2 = SkeletonUtil.getPart(skel2, 1); 
-		assertFalse(SkeletonUtil.isSourcePlaceholder(tu2, p2));
-		assertFalse(SkeletonUtil.isTargetPlaceholder(tu2, p2));
-		assertFalse(SkeletonUtil.isValuePlaceholder(tu2, p2));
-		assertFalse(SkeletonUtil.isExtSourcePlaceholder(tu2, p2));
-		assertTrue(SkeletonUtil.isExtTargetPlaceholder(tu2, p2));
-		assertFalse(SkeletonUtil.isExtValuePlaceholder(tu2, p2));
+		assertFalse(SkeletonUtil.isSourcePlaceholder(p2, tu2));
+		assertFalse(SkeletonUtil.isTargetPlaceholder(p2, tu2));
+		assertFalse(SkeletonUtil.isValuePlaceholder(p2, tu2));
+		assertFalse(SkeletonUtil.isExtSourcePlaceholder(p2, tu2));
+		assertTrue(SkeletonUtil.isExtTargetPlaceholder(p2, tu2));
+		assertFalse(SkeletonUtil.isExtValuePlaceholder(p2, tu2));
 		assertFalse(SkeletonUtil.isReference(p2));
 		assertFalse(SkeletonUtil.isText(p2));
 		
 		p3 = SkeletonUtil.getPart(skel2, 2); 
-		assertFalse(SkeletonUtil.isSourcePlaceholder(tu2, p3));
-		assertFalse(SkeletonUtil.isTargetPlaceholder(tu2, p3));
-		assertFalse(SkeletonUtil.isValuePlaceholder(tu2, p3));
-		assertFalse(SkeletonUtil.isExtSourcePlaceholder(tu2, p3));
-		assertFalse(SkeletonUtil.isExtTargetPlaceholder(tu2, p3));
-		assertTrue(SkeletonUtil.isExtValuePlaceholder(tu2, p3));
+		assertFalse(SkeletonUtil.isSourcePlaceholder(p3, tu2));
+		assertFalse(SkeletonUtil.isTargetPlaceholder(p3, tu2));
+		assertFalse(SkeletonUtil.isValuePlaceholder(p3, tu2));
+		assertFalse(SkeletonUtil.isExtSourcePlaceholder(p3, tu2));
+		assertFalse(SkeletonUtil.isExtTargetPlaceholder(p3, tu2));
+		assertTrue(SkeletonUtil.isExtValuePlaceholder(p3, tu2));
 		assertFalse(SkeletonUtil.isReference(p3));
 		assertFalse(SkeletonUtil.isText(p3));
 		
 		p4 = SkeletonUtil.getPart(skel2, 3); 
-		assertFalse(SkeletonUtil.isSourcePlaceholder(tu2, p4));
-		assertFalse(SkeletonUtil.isTargetPlaceholder(tu2, p4));
-		assertFalse(SkeletonUtil.isValuePlaceholder(tu2, p4));
-		assertFalse(SkeletonUtil.isExtSourcePlaceholder(tu2, p4));
-		assertFalse(SkeletonUtil.isExtTargetPlaceholder(tu2, p4));
-		assertTrue(SkeletonUtil.isExtValuePlaceholder(tu2, p4));
+		assertFalse(SkeletonUtil.isSourcePlaceholder(p4, tu2));
+		assertFalse(SkeletonUtil.isTargetPlaceholder(p4, tu2));
+		assertFalse(SkeletonUtil.isValuePlaceholder(p4, tu2));
+		assertFalse(SkeletonUtil.isExtSourcePlaceholder(p4, tu2));
+		assertFalse(SkeletonUtil.isExtTargetPlaceholder(p4, tu2));
+		assertTrue(SkeletonUtil.isExtValuePlaceholder(p4, tu2));
 		assertFalse(SkeletonUtil.isReference(p4));
 		assertFalse(SkeletonUtil.isText(p4));
 		
 		p5 = SkeletonUtil.getPart(skel2, 4); 
-		assertFalse(SkeletonUtil.isSourcePlaceholder(tu2, p5));
-		assertFalse(SkeletonUtil.isTargetPlaceholder(tu2, p5));
-		assertFalse(SkeletonUtil.isValuePlaceholder(tu2, p5));
-		assertFalse(SkeletonUtil.isExtSourcePlaceholder(tu2, p5));
-		assertFalse(SkeletonUtil.isExtTargetPlaceholder(tu2, p5));
-		assertTrue(SkeletonUtil.isExtValuePlaceholder(tu2, p5));
+		assertFalse(SkeletonUtil.isSourcePlaceholder(p5, tu2));
+		assertFalse(SkeletonUtil.isTargetPlaceholder(p5, tu2));
+		assertFalse(SkeletonUtil.isValuePlaceholder(p5, tu2));
+		assertFalse(SkeletonUtil.isExtSourcePlaceholder(p5, tu2));
+		assertFalse(SkeletonUtil.isExtTargetPlaceholder(p5, tu2));
+		assertTrue(SkeletonUtil.isExtValuePlaceholder(p5, tu2));
 		assertFalse(SkeletonUtil.isReference(p5));
 		assertFalse(SkeletonUtil.isText(p5));
 		
 		p6 = SkeletonUtil.getPart(skel2, 5); 
-		assertFalse(SkeletonUtil.isSourcePlaceholder(tu2, p6));
-		assertFalse(SkeletonUtil.isTargetPlaceholder(tu2, p6));
-		assertFalse(SkeletonUtil.isValuePlaceholder(tu2, p6));
-		assertFalse(SkeletonUtil.isExtSourcePlaceholder(tu2, p6));
-		assertFalse(SkeletonUtil.isExtTargetPlaceholder(tu2, p6));
-		assertFalse(SkeletonUtil.isExtValuePlaceholder(tu2, p6));
+		assertFalse(SkeletonUtil.isSourcePlaceholder(p6, tu2));
+		assertFalse(SkeletonUtil.isTargetPlaceholder(p6, tu2));
+		assertFalse(SkeletonUtil.isValuePlaceholder(p6, tu2));
+		assertFalse(SkeletonUtil.isExtSourcePlaceholder(p6, tu2));
+		assertFalse(SkeletonUtil.isExtTargetPlaceholder(p6, tu2));
+		assertFalse(SkeletonUtil.isExtValuePlaceholder(p6, tu2));
 		assertTrue(SkeletonUtil.isReference(p6));
 		assertFalse(SkeletonUtil.isText(p6));
 		
 		p7 = SkeletonUtil.getPart(skel2, 6); 
-		assertFalse(SkeletonUtil.isSourcePlaceholder(tu2, p7));
-		assertFalse(SkeletonUtil.isTargetPlaceholder(tu2, p7));
-		assertFalse(SkeletonUtil.isValuePlaceholder(tu2, p7));
-		assertFalse(SkeletonUtil.isExtSourcePlaceholder(tu2, p7));
-		assertFalse(SkeletonUtil.isExtTargetPlaceholder(tu2, p7));
-		assertFalse(SkeletonUtil.isExtValuePlaceholder(tu2, p7));
+		assertFalse(SkeletonUtil.isSourcePlaceholder(p7, tu2));
+		assertFalse(SkeletonUtil.isTargetPlaceholder(p7, tu2));
+		assertFalse(SkeletonUtil.isValuePlaceholder(p7, tu2));
+		assertFalse(SkeletonUtil.isExtSourcePlaceholder(p7, tu2));
+		assertFalse(SkeletonUtil.isExtTargetPlaceholder(p7, tu2));
+		assertFalse(SkeletonUtil.isExtValuePlaceholder(p7, tu2));
 		assertFalse(SkeletonUtil.isReference(p7));
 		assertTrue(SkeletonUtil.isText(p7));
 	}
@@ -341,6 +341,11 @@ public class SkeletonUtilTest {
 		
 		writer.processStartDocument(FRFR, "UTF-8", null, new EncoderManager(), sd);
 		assertEquals("text before_source_text after", writer.processTextUnit(tu1));
+		
+		tu1.setTargetContent(FRFR, new TextFragment("target_fr"));
+		writer.processStartDocument(FRFR, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before_target_fr_text after", writer.processTextUnit(tu1));
+		tu1.removeTarget(FRFR);
 		
 		writer.processStartDocument(ESES, "UTF-8", null, new EncoderManager(), sd);
 		assertEquals("text before_target_text after", writer.processTextUnit(tu1)); // !!! Diff
@@ -793,6 +798,11 @@ public class SkeletonUtilTest {
 		
 		writer.processStartDocument(FRFR, "UTF-8", null, new EncoderManager(), sd);
 		assertEquals("text before_source_text after", writer.processTextUnit(tu1));
+		
+		tu1.setTargetContent(FRFR, new TextFragment("target_fr"));
+		writer.processStartDocument(FRFR, "UTF-8", null, new EncoderManager(), sd);
+		assertEquals("text before_source_text after", writer.processTextUnit(tu1));
+		tu1.removeTarget(FRFR);
 		
 		writer.processStartDocument(ESES, "UTF-8", null, new EncoderManager(), sd);
 		assertEquals("text before_source_text after", writer.processTextUnit(tu1)); // !!! Diff
