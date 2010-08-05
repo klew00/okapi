@@ -58,12 +58,6 @@ import org.eclipse.swt.widgets.MenuItem;
 
 public class FragmentEditorPanel {
 
-//	private final static String[][] ACCENTS = {
-//		{"`aAeEiIoOuU", "\u00e0\u00c0\u00e8\u00c8\u00cc\u00ec\u00d2\u00f2\u00d9\u00f9"},
-//		//                    a     A     e     E     i     I     o     O     u     U
-//		{"'aAeEiIoOuU", ""}
-//	};
-	
 	private String codedText;
 	private List<Code> codes;
 	private TextFragment frag;
@@ -83,6 +77,10 @@ public class FragmentEditorPanel {
 	private PairEditorPanel parentPanel;
 	private int nextCodeForCopy = -1;
 	private boolean modified;
+	
+	private final int frontChars = 6;
+	private final int tailChars = 3;
+	private final int maxChars = frontChars+3+tailChars;
 	
 	public FragmentEditorPanel (Composite parent,
 		int flag,
@@ -459,6 +457,9 @@ public class FragmentEditorPanel {
 			if ( sel != null ) {
 				pt.x = sel.x; pt.y = sel.y;
 			}
+			
+			if (( sel == null ) && ( !modified )) return pt;
+			
 			Code code = null;
 			StringBuilder tmp = new StringBuilder(edit.getText());
 			int diff = 0;
@@ -673,6 +674,32 @@ public class FragmentEditorPanel {
 		return false;
 	}
 	
+	private String makeDisplayCode (Code code) {
+		if ( mode == 0 ) { // Generic code
+			switch ( code.getTagType() ) {
+			case OPENING:
+				return String.format("<%d>", code.getId());
+			case CLOSING:
+				return String.format("</%d>", code.getId());
+			case PLACEHOLDER:
+				return String.format("<%d/>", code.getId());
+			}
+			// This should never reach this point, but just in case:
+			return "</OTHER/>";
+		}
+		else if ( mode == 1 ) { // Full code
+			return code.getData();
+		}
+		
+		// Otherwise: Partial code
+		String data = code.getData();
+		int len = data.length();
+		if ( len > maxChars ) {
+			return String.format("%s...%s", data.subSequence(0, frontChars), data.subSequence(len-tailChars, len));
+		}
+		else return data;
+	}
+	
 	private void updateText (Point sel) {
 		try {
 			updateCodeRanges = false;
@@ -689,23 +716,7 @@ public class FragmentEditorPanel {
 			for ( int i=0; i<codedText.length(); i++ ) {
 				if ( TextFragment.isMarker(codedText.charAt(i)) ) {
 					code = codes.get(TextFragment.toIndex(codedText.charAt(++i)));
-					switch ( code.getTagType() ) {
-					case OPENING:
-						if ( mode == 1 ) disp = code.getData();
-						else if ( mode == 2 ) disp = "["+code.getData()+"]";
-						else disp = String.format("<%d>", code.getId());
-						break;
-					case CLOSING:
-						if ( mode == 1 ) disp = code.getData();
-						else if ( mode == 2 ) disp = "["+code.getData()+"]";
-						else disp = String.format("</%d>", code.getId());
-						break;
-					case PLACEHOLDER:
-						if ( mode == 1 ) disp = code.getData();
-						else if ( mode == 2 ) disp = "["+code.getData()+"]";
-						else disp = String.format("<%d/>", code.getId());
-						break;
-					}
+					disp = makeDisplayCode(code);
 					tmp.append(disp);
 					sr = new StyleRange(codeStyle);
 					sr.start = pos;
@@ -816,23 +827,7 @@ public class FragmentEditorPanel {
 			for ( int i=0; i<data.codedText.length(); i++ ) {
 				if ( TextFragment.isMarker(data.codedText.charAt(i)) ) {
 					code = data.codes.get(TextFragment.toIndex(data.codedText.charAt(++i))).clone();
-					switch ( code.getTagType() ) {
-					case OPENING:
-						if ( mode == 1 ) disp = code.getData();
-						else if ( mode == 2 ) disp = "["+code.getData()+"]";
-						else disp = String.format("<%d>", code.getId());
-						break;
-					case CLOSING:
-						if ( mode == 1 ) disp = code.getData();
-						else if ( mode == 2 ) disp = "["+code.getData()+"]";
-						else disp = String.format("</%d>", code.getId());
-						break;
-					case PLACEHOLDER:
-						if ( mode == 1 ) disp = code.getData();
-						else if ( mode == 2 ) disp = "["+code.getData()+"]";
-						else disp = String.format("<%d/>", code.getId());
-						break;
-					}
+					disp = makeDisplayCode(code);
 					tmp.append(disp);
 					sr = new StyleRange(codeStyle);
 					sr.start = pos;
@@ -857,7 +852,8 @@ public class FragmentEditorPanel {
 				edit.setStyleRange(newRange);
 				ranges.add(index++, newRange);
 			}
-	
+			modified = true;
+
 			// Place the caret
 			switch ( positionAfter ) {
 			case 1:
@@ -1019,4 +1015,18 @@ public class FragmentEditorPanel {
 			}
 		}
 	}
+
+	private boolean verifyTarget () {
+		try {
+			cacheContent(null);
+
+	//		frag.setCodedText(codedText, codes, true);
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(edit.getShell(), "Error in target text.\n"+e.getLocalizedMessage(), null);
+			return false;
+		}
+		return true;
+	}
+	
 }
