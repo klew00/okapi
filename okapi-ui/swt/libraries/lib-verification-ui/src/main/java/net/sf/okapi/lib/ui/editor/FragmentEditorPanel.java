@@ -63,6 +63,7 @@ public class FragmentEditorPanel {
 	private TextFragment frag;
 	private StyledText edit;
 	private TextStyle codeStyle;
+	private TextStyle markStyle;
 	private int mode = 0;
 	private Menu contextMenu;
 	private TextOptions textOptions;
@@ -96,8 +97,9 @@ public class FragmentEditorPanel {
 		
 		codeStyle = new TextStyle();
 		codeStyle.foreground = parent.getDisplay().getSystemColor(SWT.COLOR_RED);
-		//codeStyle.background = parent.getDisplay().getSystemColor(SWT.COLOR_CYAN);
-		//codeStyle.foreground = parent.getDisplay().getSystemColor(SWT.COLOR_GREEN);
+		
+		markStyle = new TextStyle();
+		markStyle.foreground = parent.getDisplay().getSystemColor(SWT.COLOR_GRAY);
 		
 		createContextMenu();
 		edit.setMenu(contextMenu);
@@ -115,12 +117,12 @@ public class FragmentEditorPanel {
 							Point pt = edit.getSelection();
 							if ( selAnchor < e.caretOffset ) {
 								pt.x = selAnchor;
-								pt.y = prevPos; //range.start+range.length;
+								pt.y = prevPos;
 								edit.setSelection(pt);
 							}
 							else {
 								pt.x = selAnchor; 
-								pt.y = prevPos; //range.start;
+								pt.y = prevPos;
 								edit.setSelection(pt);
 							}
 						}
@@ -128,7 +130,6 @@ public class FragmentEditorPanel {
 							edit.setCaretOffset(prevPos);
 						}
 						return;
-						
 //------------------------------------------
 //						boolean backward = false;
 //						if ( prevPos < e.caretOffset ) prevPos = range.start+range.length;
@@ -307,7 +308,7 @@ public class FragmentEditorPanel {
 		Font tmp = textOptions.font;
 		// Make the font a bit larger by default
 		FontData[] fontData = tmp.getFontData();
-		fontData[0].setHeight(fontData[0].getHeight()+4);
+		fontData[0].setHeight(fontData[0].getHeight()+3);
 		textOptions.font = new Font(parent.getDisplay(), fontData[0]);
 
 		applyTextOptions(textOptions);
@@ -676,28 +677,49 @@ public class FragmentEditorPanel {
 	
 	private String makeDisplayCode (Code code) {
 		if ( mode == 0 ) { // Generic code
-			switch ( code.getTagType() ) {
-			case OPENING:
-				return String.format("<%d>", code.getId());
-			case CLOSING:
-				return String.format("</%d>", code.getId());
-			case PLACEHOLDER:
-				return String.format("<%d/>", code.getId());
+			if ( code.getData().isEmpty() ) {
+				switch ( code.getTagType() ) {
+				case OPENING:
+					return String.format("{%d}", code.getId());
+				case CLOSING:
+					return String.format("{/%d}", code.getId());
+				case PLACEHOLDER:
+					return String.format("{%d/}", code.getId());
+				}
 			}
-			// This should never reach this point, but just in case:
-			return "</OTHER/>";
+			else { // Normal code
+				switch ( code.getTagType() ) {
+				case OPENING:
+					return String.format("<%d>", code.getId());
+				case CLOSING:
+					return String.format("</%d>", code.getId());
+				case PLACEHOLDER:
+					return String.format("<%d/>", code.getId());
+				}
+				// This should never reach this point, but just in case:
+				return "</OTHER/>";
+			}
 		}
-		else if ( mode == 1 ) { // Full code
-			return code.getData();
+
+		// OOther mode use the data
+		String data = code.getData();
+		if ( data.isEmpty() ) {
+			data = code.getOuterData();
+			if ( data.isEmpty() ) data = "<>";
+		}
+		
+		if ( mode == 1 ) { // Full code
+			return data;
 		}
 		
 		// Otherwise: Partial code
-		String data = code.getData();
 		int len = data.length();
 		if ( len > maxChars ) {
 			return String.format("%s...%s", data.subSequence(0, frontChars), data.subSequence(len-tailChars, len));
 		}
-		else return data;
+		else {
+			return data;
+		}
 	}
 	
 	private void updateText (Point sel) {
@@ -718,7 +740,7 @@ public class FragmentEditorPanel {
 					code = codes.get(TextFragment.toIndex(codedText.charAt(++i)));
 					disp = makeDisplayCode(code);
 					tmp.append(disp);
-					sr = new StyleRange(codeStyle);
+					sr = new StyleRange(code.getData().isEmpty() ? markStyle : codeStyle);
 					sr.start = pos;
 					sr.length = disp.length();
 					sr.data = code;
@@ -829,7 +851,7 @@ public class FragmentEditorPanel {
 					code = data.codes.get(TextFragment.toIndex(data.codedText.charAt(++i))).clone();
 					disp = makeDisplayCode(code);
 					tmp.append(disp);
-					sr = new StyleRange(codeStyle);
+					sr = new StyleRange(code.getData().isEmpty() ? markStyle : codeStyle);
 					sr.start = pos;
 					sr.length = disp.length();
 					sr.data = code;
