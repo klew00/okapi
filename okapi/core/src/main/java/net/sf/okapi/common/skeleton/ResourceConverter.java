@@ -124,7 +124,7 @@ public class ResourceConverter {
 			return event;
 		
 		ISkeleton skel = res.getSkeleton();
-		if (!(skel == null)) {
+		if (skel == null) {
 			return event;
 		}		
 		if (!(skel instanceof GenericSkeleton)) {
