@@ -22,6 +22,8 @@ package net.sf.okapi.common.skeleton;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Iterator;
@@ -32,12 +34,13 @@ import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.MultiEvent;
+import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 
 import org.junit.Test;
 
-public class ResourceConverterTest {
+public class ResourceSimplifierTest {
 
 	private static final LocaleId ENUS = new LocaleId("en", "us");
 	private static final LocaleId ESES = new LocaleId("es", "es");
@@ -45,7 +48,7 @@ public class ResourceConverterTest {
 	
 	@Test
 	public void testMonolingual() {
-		ResourceConverter conv = new ResourceConverter(false, ESES, "UTF-8");
+		ResourceSimplifier conv = new ResourceSimplifier(false, ESES, "UTF-8");
 		
 		TextUnit tu1 = new TextUnit("tu1");
 		tu1.setSource(new TextContainer("text1"));
@@ -121,7 +124,7 @@ public class ResourceConverterTest {
 		me.addEvent(new Event(EventType.DOCUMENT_PART, new DocumentPart("dp2", false, skel2)));
 		me.addEvent(new Event(EventType.DOCUMENT_PART, new DocumentPart("dp3", false, skel3)));
 		
-		MultiEvent packedME = ResourceConverter.packMultiEvent(me);
+		MultiEvent packedME = ResourceSimplifier.packMultiEvent(me);
 		
 		Iterator<Event> itr = packedME.iterator(); 
 		assertTrue(itr.hasNext());
@@ -145,7 +148,7 @@ public class ResourceConverterTest {
 		me.addEvent(new Event(EventType.TEXT_UNIT, tu1));
 		me.addEvent(new Event(EventType.DOCUMENT_PART, new DocumentPart("dp3", false, skel3)));
 		
-		packedME = ResourceConverter.packMultiEvent(me);
+		packedME = ResourceSimplifier.packMultiEvent(me);
 		itr = packedME.iterator();
 		assertTrue(itr.hasNext());
 		event = itr.next(); 
@@ -175,7 +178,7 @@ public class ResourceConverterTest {
 		me.addEvent(new Event(EventType.DOCUMENT_PART, new DocumentPart("dp2", false, skel2)));		
 		me.addEvent(new Event(EventType.DOCUMENT_PART, new DocumentPart("dp3", false, skel3)));
 		
-		packedME = ResourceConverter.packMultiEvent(me);
+		packedME = ResourceSimplifier.packMultiEvent(me);
 		itr = packedME.iterator();
 		assertTrue(itr.hasNext());
 		event = itr.next(); 
@@ -201,7 +204,7 @@ public class ResourceConverterTest {
 		me.addEvent(new Event(EventType.DOCUMENT_PART, new DocumentPart("dp3", false, skel3)));
 		me.addEvent(new Event(EventType.TEXT_UNIT, tu1));
 		
-		packedME = ResourceConverter.packMultiEvent(me);
+		packedME = ResourceSimplifier.packMultiEvent(me);
 		itr = packedME.iterator();
 		assertTrue(itr.hasNext());
 		event = itr.next(); 
@@ -224,7 +227,7 @@ public class ResourceConverterTest {
 		tu1.setSkeleton(skel4);
 		me.addEvent(new Event(EventType.TEXT_UNIT, tu1));
 		
-		packedME = ResourceConverter.packMultiEvent(me);
+		packedME = ResourceSimplifier.packMultiEvent(me);
 		itr = packedME.iterator();
 		assertTrue(itr.hasNext());
 		event = itr.next(); 
@@ -234,8 +237,141 @@ public class ResourceConverterTest {
 		
 		// Empty
 		me = new MultiEvent();		
-		packedME = ResourceConverter.packMultiEvent(me);
+		packedME = ResourceSimplifier.packMultiEvent(me);
 		itr = packedME.iterator();
 		assertFalse(itr.hasNext());
 	}
+
+	@Test
+	public void testConversion() {
+		GenericSkeleton skel = new GenericSkeleton();
+		TextUnit tu1 = new TextUnit("tu1");
+		tu1.setSource(new TextContainer("English text"));
+		tu1.setTarget(FRFR, new TextContainer("Texte en langue Francaise"));
+		tu1.setSkeleton(skel);
+		
+		TextUnit tu2 = new TextUnit("tu2");
+		tu2.setSource(new TextContainer("English text"));
+		tu2.setTarget(ESES, new TextContainer("Texto en Espanol"));
+		tu2.setIsReferent(true);
+		
+		skel.add("part1");
+		skel.addContentPlaceholder(tu1);
+		skel.add("part2");
+		skel.addContentPlaceholder(tu1, FRFR);
+		skel.add("part3");
+		skel.addContentPlaceholder(tu2, ESES);
+		skel.add("part4");
+		
+		ResourceSimplifier rs = new ResourceSimplifier(false, ENUS, "UTF-8");
+		Event event = rs.convert(new Event(EventType.TEXT_UNIT, tu1));
+		assertNotNull(event);
+		assertTrue(event.getResource() instanceof MultiEvent);
+		MultiEvent me = (MultiEvent) event.getResource();
+		Iterator<Event> itr = me.iterator();
+		
+		assertTrue(itr.hasNext());
+		event = itr.next();
+		IResource res = event.getResource();
+		assertEquals("dp_tu1", res.getId());
+		assertTrue(res instanceof DocumentPart);
+		assertEquals("part1", res.getSkeleton().toString());
+		
+		assertTrue(itr.hasNext());
+		event = itr.next();
+		res = event.getResource();
+		assertEquals("tu1", res.getId());
+		assertTrue(res instanceof TextUnit);
+		assertNull(res.getSkeleton());
+		
+		assertTrue(itr.hasNext());
+		event = itr.next();
+		res = event.getResource();
+		assertEquals("dp_tu1_2", res.getId());
+		assertTrue(res instanceof DocumentPart);
+		assertEquals("part2Texte en langue Francaisepart3English textpart4", res.getSkeleton().toString());
+		
+		assertFalse(itr.hasNext());
+	}		
+	
+	@Test
+	public void testConversion2() {
+		GenericSkeleton skel = new GenericSkeleton();
+		TextUnit tu1 = new TextUnit("tu1");
+		tu1.setSource(new TextContainer("English text"));
+		tu1.setTarget(FRFR, new TextContainer("Texte en langue Francaise"));
+		tu1.setSkeleton(skel);
+		
+		TextUnit tu2 = new TextUnit("tu2");
+		tu2.setSource(new TextContainer("English text"));
+		tu2.setTarget(ESES, new TextContainer("Texto en Espanol"));
+		tu2.setIsReferent(true);
+		
+		skel.add("part1");
+		skel.addContentPlaceholder(tu1);
+		skel.add("part2");
+		skel.addContentPlaceholder(tu1, FRFR);
+		skel.add("part3");
+		skel.addReference(tu2);
+		skel.add("part4");
+		
+		ResourceSimplifier rs = new ResourceSimplifier(false, ENUS, "UTF-8");
+		Event complexEvent = new Event(EventType.TEXT_UNIT, tu1);
+		rs.convert(new Event(EventType.TEXT_UNIT, tu2)); // Ref
+		Event simpleEvent = rs.convert(complexEvent);
+		assertNotNull(simpleEvent);
+		assertTrue(simpleEvent.getResource() instanceof MultiEvent);
+		MultiEvent me = (MultiEvent) simpleEvent.getResource();
+		Iterator<Event> itr = me.iterator();
+		
+		assertTrue(itr.hasNext());
+		Event event = itr.next();
+		IResource res = event.getResource();
+		assertEquals("dp_tu1", res.getId());
+		assertTrue(res instanceof DocumentPart);
+		assertEquals("part1", res.getSkeleton().toString());
+		
+		assertTrue(itr.hasNext());
+		event = itr.next();
+		res = event.getResource();
+		assertEquals("tu1", res.getId());
+		assertTrue(res instanceof TextUnit);
+		assertNull(res.getSkeleton());
+		
+		assertTrue(itr.hasNext());
+		event = itr.next();
+		res = event.getResource();
+		assertEquals("dp_tu1_2", res.getId());
+		assertTrue(res instanceof DocumentPart);
+		assertEquals("part2Texte en langue Francaisepart3English textpart4", res.getSkeleton().toString());
+		
+		assertFalse(itr.hasNext());
+		
+		GenericSkeletonWriter gsw = new GenericSkeletonWriter();
+		StartDocument sd = new StartDocument("sd");
+		gsw.processStartDocument(ENUS, "UTF-8", null, null, sd);
+		gsw.processTextUnit(tu2); // Ref
+		checkTUConversion(tu1, simpleEvent, gsw);
+	}
+	
+	private void checkTUConversion(TextUnit tu, Event simpleEvent, GenericSkeletonWriter gsw) {
+		assertNotNull(simpleEvent);
+		assertTrue(simpleEvent.getResource() instanceof MultiEvent);
+		MultiEvent me = (MultiEvent) simpleEvent.getResource();
+
+		String st1 = gsw.processTextUnit(tu);
+		StringBuilder sb = new StringBuilder();
+		for (Event event : me) {
+			switch (event.getEventType()) {
+			case DOCUMENT_PART:
+				sb.append(gsw.processDocumentPart((DocumentPart) event.getResource()));
+				break;
+			case TEXT_UNIT:
+				sb.append(gsw.processTextUnit((TextUnit) event.getResource()));
+				break;
+			}			
+		}		
+		assertEquals(st1, sb.toString());
+	}
+	
 }

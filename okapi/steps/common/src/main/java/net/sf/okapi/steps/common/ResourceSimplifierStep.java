@@ -27,7 +27,7 @@ import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.StartDocument;
-import net.sf.okapi.common.skeleton.ResourceConverter;
+import net.sf.okapi.common.skeleton.ResourceSimplifier;
 
 /**
  * Converts events, i.e. splits the generic skeleton of a given event resource into parts to contain no references.
@@ -36,9 +36,9 @@ import net.sf.okapi.common.skeleton.ResourceConverter;
  * The sequence of DOCUMENT_PART and TEXT_UNIT events is packed into a single MULTI_EVENT event.
  */
 @UsingParameters() // No parameters
-public class ResourceConverterStep extends BasePipelineStep {
+public class ResourceSimplifierStep extends BasePipelineStep {
 	
-	private ResourceConverter converter;
+	private ResourceSimplifier simplifier;
 	private LocaleId targetLocale;
 	private String outputEncoding;
 	
@@ -49,7 +49,7 @@ public class ResourceConverterStep extends BasePipelineStep {
 
 	@Override
 	public String getName() {
-		return "Event Converter";
+		return "Event Simplifier";
 	}
 	
 	@StepParameterMapping(parameterType = StepParameterType.TARGET_LOCALE)
@@ -67,8 +67,8 @@ public class ResourceConverterStep extends BasePipelineStep {
 		switch (event.getEventType()) {
 		case START_DOCUMENT:
 			StartDocument sd = (StartDocument) event.getResource();
-			converter = new ResourceConverter(sd.isMultilingual(), targetLocale, outputEncoding);
-			break;
+			simplifier = new ResourceSimplifier(sd.isMultilingual(), targetLocale, outputEncoding);
+			//break;
 		case END_DOCUMENT:
 		case START_SUBDOCUMENT:
 		case END_SUBDOCUMENT:
@@ -76,10 +76,10 @@ public class ResourceConverterStep extends BasePipelineStep {
 		case END_GROUP:
 		case TEXT_UNIT:
 		case DOCUMENT_PART:
-			return converter.convert(event);
+			return simplifier.convert(event);
 		default:
 			return event;
 		}
-		return event;
+		//return event;
 	}
 }

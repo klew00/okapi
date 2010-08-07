@@ -26,6 +26,7 @@ import java.util.List;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.INameable;
 import net.sf.okapi.common.resource.IReferenceable;
 import net.sf.okapi.common.resource.TextFragment;
@@ -107,6 +108,7 @@ public class GenericSkeleton implements ISkeleton {
 	 * @param data the data to add.
 	 */
 	public void add (String data) {
+		if ( Util.isEmpty(data) ) return;
 		if ( data.length() == 0 ) return;
 		GenericSkeletonPart part = new GenericSkeletonPart(data);
 		list.add(part);

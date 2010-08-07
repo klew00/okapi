@@ -33,6 +33,7 @@ import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.IReferenceable;
 import net.sf.okapi.common.resource.MultiEvent;
 import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextUnit;
 
 /**
@@ -41,22 +42,24 @@ import net.sf.okapi.common.resource.TextUnit;
  * Original references are converted either to skeleton parts, or TEXT_UNIT events.
  * The sequence of DOCUMENT_PART and TEXT_UNIT events is packed into a single MULTI_EVENT event.
  */
-public class ResourceConverter {
+public class ResourceSimplifier {
 	private final Logger logger = Logger.getLogger(getClass().getName());
 	private boolean isMultilingual;
 	private LocaleId trgLoc;
+	private String outEncoding;
 	private GenericSkeletonWriter writer;
 	private GenericSkeleton newSkel;
 	
-	public ResourceConverter(boolean isMultilingual, LocaleId trgLoc, String outEncoding) {
+	public ResourceSimplifier(boolean isMultilingual, LocaleId trgLoc, String outEncoding) {
 		super();
 		this.isMultilingual = isMultilingual;
 		this.trgLoc = trgLoc;
+		this.outEncoding = outEncoding;
 		writer = new GenericSkeletonWriter();
 		newSkel = new GenericSkeleton();
 //		StartDocument sd = new StartDocument("");
 //		sd.setMultilingual(false); // !!! 
-//		writer.processStartDocument(trgLoc, outEncoding, null, null, sd); // sets writer fields
+//		writer.processStartDocument(trgLoc, outEncoding, null, null, sd); // Sets writer fields + activates ref tracking mechanism of GSW 
 	}
 
 //	public void setMultilingual(boolean isMultilingual) {
@@ -120,16 +123,6 @@ public class ResourceConverter {
 			throw new InvalidParameterException("Event cannot be null");
 		
 		IResource res = event.getResource();
-		if (res == null)
-			return event;
-		
-		ISkeleton skel = res.getSkeleton();
-		if (skel == null) {
-			return event;
-		}		
-		if (!(skel instanceof GenericSkeleton)) {
-			return event;
-		}
 		
 		if (res instanceof IReferenceable) {			
 			if  (((IReferenceable) res).isReferent()) {
@@ -137,6 +130,10 @@ public class ResourceConverter {
 				// The referent is not processed at this point (only later from an event referencing it)
 				return event;
 			}
+		}
+		
+		if (!isComplex(res)) {
+			return event;
 		}
 		
 //		switch (event.getEventType()) {
@@ -161,13 +158,18 @@ public class ResourceConverter {
 		switch (event.getEventType()) {
 		case START_DOCUMENT:
 			StartDocument sd = (StartDocument) res;
-			sd.setMultilingual(false); // Simple resources 
+			sd.setMultilingual(false); // Simple resources
+			writer.processStartDocument(trgLoc, outEncoding, null, null, sd); // Sets writer fields + activates ref tracking mechanism of GSW
 			// No break here
 		case END_DOCUMENT:
+			writer.close(); // Clears the referents cache
+			// No break here
 		case START_SUBDOCUMENT:
 		case END_SUBDOCUMENT:
 		case START_GROUP:
 		case END_GROUP:
+			// Referents are sent to the GSW cache and are accessed there as refs are processed.
+			// Here we deal with non-referents only.
 			// The original event (the skeleton should be deleted) precedes in the resulting multi-event DPs/TUs 
 			// created from its original skeleton parts
 			res.setSkeleton(null);
@@ -180,9 +182,54 @@ public class ResourceConverter {
 			return event;
 		}
 								
-		return new Event(EventType.MULTI_EVENT, packMultiEvent(me));
+		return new Event(EventType.MULTI_EVENT, assignIDs(packMultiEvent(me), res));
 	}
 		
+	private MultiEvent assignIDs(MultiEvent me, IResource resource) {
+		int counter = 0;
+		for (Event event : me) {
+			IResource res = event.getResource();
+			String resId = resource.getId();
+			
+			if (res instanceof DocumentPart && !(resource instanceof DocumentPart)) {
+				String id = "";
+				if (counter++ == 0) id = resId;
+				else
+					id = String.format("%s_%d", resId, counter++);
+				
+				res.setId("" + String.format("dp_%s", id));
+			}
+			else
+				res.setId(resId);
+			
+//			if (res instanceof DocumentPart && resource instanceof DocumentPart)
+//				res.setId(id);
+//			else
+//				res.setId("" + String.format("dp_%s", resId));
+		}
+		return me;
+	}
+
+	private boolean isComplex(IResource res) {
+		if (res == null)
+			return false;
+		
+		ISkeleton skel = res.getSkeleton();
+		if (skel == null) {
+			return false;
+		}		
+		if (!(skel instanceof GenericSkeleton)) {
+			return false;
+		}
+		
+		List<GenericSkeletonPart> parts = ((GenericSkeleton) skel).getParts();
+		for (GenericSkeletonPart part : parts)
+			if (!SkeletonUtil.isText(part)) 
+				return true;
+		
+		return false;
+	}
+
 //	public Event toMultiEvent(Event event, LocaleId targetLocale) {
 //		if (event == null)
 //			throw new InvalidParameterException("Event cannot be null");
@@ -229,7 +276,8 @@ public class ResourceConverter {
 	private void flushSkeleton(String resId, int dpIndex, MultiEvent me) {
 		if (newSkel.isEmpty()) return;
 			
-		me.addEvent(new Event(EventType.DOCUMENT_PART, new DocumentPart(String.format("%s_%d", resId, dpIndex), false, newSkel)));
+		//me.addEvent(new Event(EventType.DOCUMENT_PART, new DocumentPart(String.format("%s_%d", resId, dpIndex), false, newSkel)));
+		me.addEvent(new Event(EventType.DOCUMENT_PART, new DocumentPart("", false, newSkel))); // IDs are set in packMultiEvent()
 		newSkel = new GenericSkeleton(); // newSkel.clear() would damage an already sent skeleton
 	}
 	
@@ -248,7 +296,6 @@ public class ResourceConverter {
 		
 		me.addEvent(new Event(EventType.TEXT_UNIT, newTU));
 	}
-
 	
 	/**
 	 * Creates events from skeleton parts of a given resource, adds created events to a given multi-event resource.
@@ -260,7 +307,15 @@ public class ResourceConverter {
 			throw new InvalidParameterException("MultiEvent object cannot be null");
 		
 		ISkeleton skel = resource.getSkeleton();
-		if (!(skel instanceof GenericSkeleton)) return;
+		if (!(skel instanceof GenericSkeleton)) {
+			// Process as the whole and return
+			if (resource instanceof TextUnit) {
+				newSkel.add(writer.getString((TextUnit)resource, trgLoc, 1));
+			}
+			
+			// Skeleton-less DocumentPart and StartGroup don't produce any text 
+			return;
+		}
 		List<GenericSkeletonPart> parts = ((GenericSkeleton) skel).getParts();
 		
 		int dpCounter = 0;
@@ -332,7 +387,8 @@ public class ResourceConverter {
 			addTU(me, resId, ++tuCounter, (TextUnit) resource);
 		}
 		else {
-			newSkel.add(writer.getContent((TextUnit) resource, trgLoc, 1));
+			//newSkel.add(writer.getContent((TextUnit) resource, trgLoc, 1));
+			newSkel.add(writer.getContent((TextUnit) resource, part.getLocale(), 1));			
 		}
 	}
 	
