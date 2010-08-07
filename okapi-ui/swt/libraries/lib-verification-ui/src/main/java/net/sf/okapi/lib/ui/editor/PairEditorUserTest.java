@@ -35,9 +35,7 @@ import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.ui.Dialogs;
 
 import org.eclipse.swt.SWT;
@@ -270,10 +268,16 @@ public class PairEditorUserTest {
 		try {
 			if ( index > -1 ) {
 				TextUnit tu = textUnits.get(index);
-				TextFragment srcFrag = tu.getSource().getFirstContent();
-				TextFragment trgFrag = tu.createTarget(trgLoc, false, IResource.COPY_ALL).getFirstContent();
-				//TODO: deal with segmented content
-				editPanel.setText(srcFrag, trgFrag);
+				
+//				TextFragment srcFrag = tu.getSource().getFirstContent();
+//				TextFragment trgFrag = tu.createTarget(trgLoc, false, IResource.COPY_ALL).getFirstContent();
+//				//TODO: deal with segmented content
+//				editPanel.setText(srcFrag, trgFrag);
+				
+				TextContainer srcCont = tu.getSource();
+				TextContainer trgCont = tu.createTarget(trgLoc, false, IResource.COPY_ALL);
+				editPanel.setTextContainers(srcCont, trgCont);
+
 				edInfo.setText(String.format("TU ID=%s  (%d of %d)", tu.getId(), current+1, textUnits.size()));
 			}
 			else {
@@ -289,13 +293,13 @@ public class PairEditorUserTest {
 
 	private void displayPrevious () {
 		if ( current <= 0 ) return;
-		saveCurrent();
+		if ( !saveCurrent() ) return;
 		displayTU(--current);
 	}
 	
 	private void displayNext () {
 		if (( current < 0 ) || ( current >= textUnits.size()-1 )) return;
-		saveCurrent();
+		if ( !saveCurrent() ) return;
 		displayTU(++current);
 	}
 	
@@ -311,13 +315,13 @@ public class PairEditorUserTest {
 		displayTU(current);
 	}
 	
-	private void saveCurrent () {
-		if ( current == -1 ) return;
-		editPanel.applyChanges();
+	private boolean saveCurrent () {
+		if ( current == -1 ) return true;
+		return editPanel.applyChanges();
 	}
 
 	private void saveOutput () {
-		saveCurrent();
+		if ( !saveCurrent() ) return;
 		IFilter filter = null;
 		IFilterWriter writer = null;
 		try {
@@ -356,40 +360,40 @@ public class PairEditorUserTest {
 		}
 	}
 	
-	private void createTestTextUnit () {
-		rawDoc = null;
-		textUnits = new ArrayList<TextUnit>();
-		
-		TextFragment srcFrag = new TextFragment("Text in ");
-		srcFrag.append(TagType.OPENING, "style1", "<span1>");
-		srcFrag.append("bold");
-		srcFrag.append(TagType.PLACEHOLDER, "z", "z");
-		srcFrag.append(" and more bold");
-		srcFrag.append(TagType.CLOSING, "style1", "</span1>");
-		srcFrag.append(" with a line-break here:");
-		srcFrag.append(TagType.PLACEHOLDER, "SomeCode", "<code3/>");
-		srcFrag.append(" and more text after; ");
-		srcFrag.append(TagType.OPENING, "span2", "<span4>");
-		srcFrag.append(" and more.");
-		
-		TextFragment trgFrag = new TextFragment("Texte en ");
-		trgFrag.append(TagType.OPENING, "style1", "<SPAN1>");
-		trgFrag.append("gras");
-		trgFrag.append(TagType.PLACEHOLDER, "Z", "Z");
-		trgFrag.append(" et plus de gras");
-		trgFrag.append(TagType.CLOSING, "style1", "</SPAN1>");
-		trgFrag.append(" avec un saut-de-ligne ici\u00a0:");
-		trgFrag.append(TagType.PLACEHOLDER, "SomeCode", "<CODE3/>");
-		trgFrag.append(" et d'autre texte apr\u00e8s; ");
-		trgFrag.append(TagType.OPENING, "span2", "<SPAN4>");
-		trgFrag.append(" et encore d'autre.");
-		
-		TextUnit tu = new TextUnit("id");
-		tu.setSource(new TextContainer(srcFrag));
-		tu.setTargetContent(trgLoc, trgFrag);
-		textUnits.add(tu);
-		
-		displayFirst();
-	}
+//	private void createTestTextUnit () {
+//		rawDoc = null;
+//		textUnits = new ArrayList<TextUnit>();
+//		
+//		TextFragment srcFrag = new TextFragment("Text in ");
+//		srcFrag.append(TagType.OPENING, "style1", "<span1>");
+//		srcFrag.append("bold");
+//		srcFrag.append(TagType.PLACEHOLDER, "z", "z");
+//		srcFrag.append(" and more bold");
+//		srcFrag.append(TagType.CLOSING, "style1", "</span1>");
+//		srcFrag.append(" with a line-break here:");
+//		srcFrag.append(TagType.PLACEHOLDER, "SomeCode", "<code3/>");
+//		srcFrag.append(" and more text after; ");
+//		srcFrag.append(TagType.OPENING, "span2", "<span4>");
+//		srcFrag.append(" and more.");
+//		
+//		TextFragment trgFrag = new TextFragment("Texte en ");
+//		trgFrag.append(TagType.OPENING, "style1", "<SPAN1>");
+//		trgFrag.append("gras");
+//		trgFrag.append(TagType.PLACEHOLDER, "Z", "Z");
+//		trgFrag.append(" et plus de gras");
+//		trgFrag.append(TagType.CLOSING, "style1", "</SPAN1>");
+//		trgFrag.append(" avec un saut-de-ligne ici\u00a0:");
+//		trgFrag.append(TagType.PLACEHOLDER, "SomeCode", "<CODE3/>");
+//		trgFrag.append(" et d'autre texte apr\u00e8s; ");
+//		trgFrag.append(TagType.OPENING, "span2", "<SPAN4>");
+//		trgFrag.append(" et encore d'autre.");
+//		
+//		TextUnit tu = new TextUnit("id");
+//		tu.setSource(new TextContainer(srcFrag));
+//		tu.setTargetContent(trgLoc, trgFrag);
+//		textUnits.add(tu);
+//		
+//		displayFirst();
+//	}
 
 }

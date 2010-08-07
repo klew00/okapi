@@ -105,11 +105,11 @@ public class GenericSkeleton implements ISkeleton {
 
 	/**
 	 * Adds a new part to this skeleton, and set a string data to it.
+	 * Empty or null data has no effect.
 	 * @param data the data to add.
 	 */
 	public void add (String data) {
 		if ( Util.isEmpty(data) ) return;
-		if ( data.length() == 0 ) return;
 		GenericSkeletonPart part = new GenericSkeletonPart(data);
 		list.add(part);
 		createNew = false;

@@ -20,6 +20,7 @@
 
 package net.sf.okapi.lib.ui.editor;
 
+import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 
 import org.eclipse.swt.custom.SashForm;
@@ -29,8 +30,10 @@ import org.eclipse.swt.widgets.Composite;
 
 public class PairEditorPanel extends SashForm {
 
-	private FragmentEditorPanel edSource;
-	private FragmentEditorPanel edTarget;
+//	private FragmentEditorPanel edSource;
+//	private FragmentEditorPanel edTarget;
+	private TextContainerEditorPanel edSource;
+	private TextContainerEditorPanel edTarget;
 
 	/**
 	 * Creates a new PairEditorPanel object.
@@ -46,8 +49,8 @@ public class PairEditorPanel extends SashForm {
 		setLayout(new GridLayout());
 		setLayoutData(new GridData(GridData.FILL_BOTH));
 		
-		edSource = new FragmentEditorPanel(this, -1, false);
-		edTarget = new FragmentEditorPanel(this, -1, true);
+		edSource = new TextContainerEditorPanel(this, -1, false);
+		edTarget = new TextContainerEditorPanel(this, -1, true);
 		
 		edSource.setEditable(false);
 		edTarget.setTargetRelations(edSource, this);
@@ -55,27 +58,29 @@ public class PairEditorPanel extends SashForm {
 		edTarget.setFocus();
 	}
 
-	/**
-	 * Sets the pair of fragments to edit.
-	 * @param source the source content (read-only).
-	 * @param target the target content.
-	 */
-	public void setText (TextFragment source,
+	public void setTextFragments (TextFragment source,
 		TextFragment target)
 	{
 		edSource.setText(source);
 		edTarget.setText(target);
 	}
-	
+		
+	public void setTextContainers (TextContainer source,
+		TextContainer target)
+	{
+		edSource.setText(source);
+		edTarget.setText(target);
+	}
+		
 	public void clear () {
-		edSource.setText(null);
-		edTarget.setText(null);
+		edSource.clear();
+		edTarget.clear();
 	}
 
-	public TextFragment applyChanges () {
+	public boolean applyChanges () {
 		return edTarget.applyChanges();
 	}
-	
+
 	@Override
 	public void setEnabled (boolean enabled) {
 		super.setEnabled(enabled);

@@ -25,7 +25,12 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.ISegments;
+import net.sf.okapi.common.resource.Segment;
+import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextPart;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.ui.Dialogs;
 
 import org.eclipse.swt.SWT;
@@ -56,11 +61,14 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
-public class FragmentEditorPanel {
+public class TextContainerEditorPanel {
 
+	private static final String SEGTYPECHAR = "\uFFF9";
+	
 	private String codedText;
 	private List<Code> codes;
-	private TextFragment frag;
+	private TextContainer textCont;
+	private TextFragment textFrag;
 	private StyledText edit;
 	private TextStyle codeStyle;
 	private TextStyle markStyle;
@@ -71,10 +79,8 @@ public class FragmentEditorPanel {
 	private boolean updateCodeRanges = false;
 	private int prevPos = 0;
 	private int selAnchor = -1;
-//	private boolean shiftDown = false;
-//	private boolean mouseDown = false;
 	private boolean targetMode = false;
-	private FragmentEditorPanel source;
+	private TextContainerEditorPanel source;
 	private PairEditorPanel parentPanel;
 	private int nextCodeForCopy = -1;
 	private boolean modified;
@@ -83,7 +89,7 @@ public class FragmentEditorPanel {
 	private final int tailChars = 3;
 	private final int maxChars = frontChars+3+tailChars;
 	
-	public FragmentEditorPanel (Composite parent,
+	public TextContainerEditorPanel (Composite parent,
 		int flag,
 		boolean paramTargetMode)
 	{
@@ -130,29 +136,6 @@ public class FragmentEditorPanel {
 							edit.setCaretOffset(prevPos);
 						}
 						return;
-//------------------------------------------
-//						boolean backward = false;
-//						if ( prevPos < e.caretOffset ) prevPos = range.start+range.length;
-//						else {
-//							prevPos = range.start;
-//							backward = true;
-//						}
-//						if ( shiftDown || mouseDown ) {
-//							Point pt = edit.getSelection();
-//							if ( backward ) {
-//								pt.x = pt.y; pt.y = prevPos;
-//								edit.setSelection(pt);
-//							}
-//							else {
-//								pt.y = prevPos;
-//								edit.setSelection(pt);
-//							}
-//						}
-//						else {
-//							edit.setCaretOffset(prevPos);
-//						}
-//						return;
-//------------------------------------------
 					}
 				}
 				// Else: No in a code range: just remember the position
@@ -163,17 +146,10 @@ public class FragmentEditorPanel {
 		edit.addMouseListener(new MouseListener() {
 			@Override
 			public void mouseUp(MouseEvent e) {
-				//mouseDown = false;
 				selAnchor = -1;
 			}
 			@Override
 			public void mouseDown(MouseEvent e) {
-				//mouseDown = true;
-//				int pos = edit.getCaretOffset();
-//				StyleRange sr = getCodeRangeIfInside(pos);
-//				if ( sr != null ) {
-//					edit.setSelection(sr.start, sr.start+sr.length);
-//				}
 				Point pt = edit.getSelection();
 				if ( pt.y == edit.getCaretOffset() ) selAnchor = pt.x;
 				else selAnchor = pt.y;
@@ -192,14 +168,12 @@ public class FragmentEditorPanel {
 			@Override
 			public void keyReleased(KeyEvent e) {
 				if ( e.keyCode == SWT.SHIFT ) {
-					//shiftDown = false;
 					selAnchor = -1;
 				}
 			}
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if ( e.keyCode == SWT.SHIFT ) {
-					//shiftDown = true;
 					Point pt = edit.getSelection();
 					if ( pt.y == edit.getCaretOffset() ) selAnchor = pt.x;
 					else selAnchor = pt.y;
@@ -330,11 +304,7 @@ public class FragmentEditorPanel {
 		return edit.setFocus();
 	}
 	
-	/**
-	 * Sets the fragment editor for the corresponding source. This must be set when this control is in target mode.
-	 * @param source the fragment editor for the source.
-	 */
-	public void setTargetRelations (FragmentEditorPanel source,
+	public void setTargetRelations (TextContainerEditorPanel source,
 		PairEditorPanel parentPanel)
 	{
 		this.source = source;
@@ -420,28 +390,162 @@ public class FragmentEditorPanel {
 		updateText(pt);
 	}
 	
+	private void createContainerFromFragment () {
+		textCont.clear();
+		Code code;
+		ISegments segs = textCont.getSegments();
+		Segment seg = null;
+		ArrayList<Code> tmpCodes = new ArrayList<Code>();
+		StringBuilder tmp = new StringBuilder();
+		
+		for ( int i=0; i<codedText.length(); i++ ) {
+			if ( TextFragment.isMarker(codedText.charAt(i)) ) {
+				code = codes.get(TextFragment.toIndex(codedText.charAt(++i)));
+				
+				if ( code.getType().equals(SEGTYPECHAR) ) { // A segment marker
+					if ( code.getTagType() == TagType.OPENING ) {
+						if ( seg != null ) {
+							throw new RuntimeException("Invalid opening segment marker: "+code.getOuterData());
+						}
+						// Add previous part if needed
+						if ( tmp.length() > 0 ) {
+							textCont.append(new TextFragment(tmp.toString(), tmpCodes));
+						}
+						// Create new segment
+						seg = new Segment();
+						seg.id = code.getOuterData().substring(1, code.getOuterData().length()-1);
+					}
+					else { // Closing marker: add the segment, start a new one
+						if ( seg == null ) {
+							throw new RuntimeException("Invalid closing segment marker: "+code.getOuterData());
+						}
+						seg.text = new TextFragment(tmp.toString(), tmpCodes);
+						segs.append(seg);
+						seg = null;
+					}
+					// In both cases: reset the fragment building variables
+					tmp  = new StringBuilder();
+					tmpCodes = new ArrayList<Code>();
+				}
+				else { // A normal code: add it to the fragment being build
+					tmpCodes.add(code); // No need to clone
+					tmp.append(String.format("%c%c", codedText.charAt(i-1),
+						TextFragment.toChar(tmpCodes.size()-1)));
+				}
+			}
+			else { // Part is either a text-part or a segment here
+				tmp.append(codedText.charAt(i));
+			}
+		}
+		
+		if ( seg != null ) {
+			throw new RuntimeException("Missing closing segment marker.");
+		}
+		// Ensure we add any extra ending part
+		if ( tmp.length() > 0 ) {
+			textCont.append(new TextFragment(tmp.toString(), tmpCodes));
+		}
+	}
+	
+	private void createFragmentFromContainer () {
+		StringBuilder tmp = new StringBuilder();
+		codes = new ArrayList<Code>();
+		Code segCode;
+		StringBuilder tmpPart = new StringBuilder();
+		
+		for ( TextPart part : textCont ) {
+			// Add start-segment marker 
+			if ( part.isSegment() ) {
+				segCode = new Code(TagType.OPENING, SEGTYPECHAR);
+				segCode.setOuterData("{"+((Segment)part).getId()+">");
+				codes.add(segCode);
+				tmp.append(String.format("%c%c", (char)TextFragment.MARKER_OPENING,
+					TextFragment.toChar(codes.size()-1)));
+			}
+			
+			
+			// Adjust the marker indices
+			tmpPart.setLength(0);
+			tmpPart.append(part.text.getCodedText());
+			int newIndex = codes.size(); // Start at the last code
+			for ( int j=0; j<tmpPart.length(); j++ ) {
+				if ( TextFragment.isMarker(tmpPart.charAt(j)) ) {
+					tmpPart.setCharAt(++j, TextFragment.toChar(newIndex++));
+				}
+			}
+			// Add the part
+			tmp.append(tmpPart);
+			codes.addAll(part.text.getCodes());
+			
+			// Add end-segment marker
+			if ( part.isSegment() ) {
+				segCode = new Code(TagType.CLOSING, SEGTYPECHAR);
+				segCode.setOuterData("<"+((Segment)part).getId()+"}");
+				codes.add(segCode);
+				tmp.append(String.format("%c%c", (char)TextFragment.MARKER_CLOSING,
+					TextFragment.toChar(codes.size()-1)));
+			}
+		}
+		// Adjust the index for the segments
+		
+		// Set the final coded text
+		codedText = tmp.toString();
+	}
+	
 	public void setText (TextFragment oriFrag) {
 		modified = false;
-		frag = oriFrag;
+		textCont = null;
+		textFrag = oriFrag;
 		edit.setEnabled(oriFrag != null);
 		if ( oriFrag == null ) {
 			edit.setText("");
 		}
 		else {
-			codedText = frag.getCodedText();
+			codedText = textFrag.getCodedText();
 			// Make a copy of the list, as getCodes() gives an un-modifiable list
-			//TODO: do we need a deep-copy in case we modify the actual codes data?
-			codes = new ArrayList<Code>(frag.getCodes());
+			codes = new ArrayList<Code>(textFrag.getCodes());
 			updateText(null);
 		}
 	}
 	
-	public TextFragment applyChanges () {
-		if ( !modified ) return frag;
-		cacheContent(null);
-		frag.setCodedText(codedText, codes, true);
+	public void setText (TextContainer oriCont) {
 		modified = false;
-		return frag;
+		textFrag = null;
+		textCont = oriCont;
+		edit.setEnabled(oriCont != null);
+		if ( oriCont == null ) {
+			edit.setText("");
+			return;
+		}
+		// Otherwise: set the content
+		createFragmentFromContainer();
+		updateText(null);
+	}
+	
+	public void clear () {
+		textFrag = null;
+		textCont = null;
+		edit.setText("");
+	}
+	
+	public boolean applyChanges () {
+		try {
+			if ( !modified ) return true;
+			cacheContent(null);
+			if ( textFrag != null ) {
+				textFrag.setCodedText(codedText, codes, true);
+			}
+			else {
+				createContainerFromFragment();
+			}
+			modified = false;
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(edit.getShell(), "Error when applying changes.\n"+e.getLocalizedMessage(), null);
+			edit.setFocus();
+			return false;
+		}
+		return true;
 	}
 
 	/**
@@ -494,6 +598,7 @@ public class FragmentEditorPanel {
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(edit.getShell(), "Error when retrieving edited text.\n"+e.getLocalizedMessage(), null);
+			edit.setFocus();
 			return null;
 		}
 	}
@@ -678,6 +783,9 @@ public class FragmentEditorPanel {
 	private String makeDisplayCode (Code code) {
 		if ( mode == 0 ) { // Generic code
 			if ( code.getData().isEmpty() ) {
+				if ( code.getType().equals(SEGTYPECHAR) ) {
+					return code.getOuterData();
+				}
 				switch ( code.getTagType() ) {
 				case OPENING:
 					return String.format("{%d}", code.getId());
@@ -770,26 +878,12 @@ public class FragmentEditorPanel {
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(edit.getShell(), "Error when updating text.\n"+e.getLocalizedMessage(), null);
+			edit.setFocus();
 		}
 		finally {
 			updateCodeRanges = true;
 		}
 	}
-	
-//	private FragmentData copySelection () {
-//		Point pt = edit.getSelection();
-//		if ( pt.x == pt.y ) return null; // Nothing to copy
-//		
-//		String text = edit.getText(pt.x, pt.y);
-//		
-////		for ( StyleRange range : ranges ) {
-////			if (( pt.x >= range.start ) && ( position < range.start+range.length )) {
-////				
-////			}
-////		}
-//		
-//		return null;
-//	}
 	
 	private void pasteSource () {
 		if ( !targetMode ) return;
@@ -890,6 +984,7 @@ public class FragmentEditorPanel {
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(edit.getShell(), "Error when placing fragment data.\n"+e.getLocalizedMessage(), null);
+			edit.setFocus();
 		}
 	}
 	
@@ -1038,17 +1133,4 @@ public class FragmentEditorPanel {
 		}
 	}
 
-//	private boolean verifyTarget () {
-//		try {
-//			cacheContent(null);
-//
-//	//		frag.setCodedText(codedText, codes, true);
-//		}
-//		catch ( Throwable e ) {
-//			Dialogs.showError(edit.getShell(), "Error in target text.\n"+e.getLocalizedMessage(), null);
-//			return false;
-//		}
-//		return true;
-//	}
-	
 }
