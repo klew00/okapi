@@ -233,6 +233,16 @@ public class PipelineWrapper {
 			availableSteps.put(step.id, step);
 
 			ps = (IPipelineStep)Class.forName(
+				"net.sf.okapi.steps.common.ResourceSimplifierStep").newInstance();
+			step = new StepInfo(ps.getClass().getSimpleName(),
+				ps.getName(), ps.getDescription(), ps.getClass().getName(), null, null);
+			params = ps.getParameters();
+			if ( params != null ) {
+				step.paramsData = params.toString();
+			}
+			availableSteps.put(step.id, step);
+			
+			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.externalcommand.ExternalCommandStep").newInstance();
 			params = ps.getParameters();
 			step = new StepInfo(ps.getClass().getSimpleName(),
