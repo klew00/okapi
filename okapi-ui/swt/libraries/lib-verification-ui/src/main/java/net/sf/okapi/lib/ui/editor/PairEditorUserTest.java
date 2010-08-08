@@ -32,9 +32,12 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.ui.Dialogs;
 
@@ -68,11 +71,19 @@ public class PairEditorUserTest {
 	private Button btNext;
 	private Button btPrevious;
 	private Button btSave;
+	private Button chkSegmentMode;
 	private LocaleId srcLoc = LocaleId.ENGLISH;
 	private LocaleId trgLoc = LocaleId.FRENCH;
 	private RawDocument rawDoc;
 	private ArrayList<TextUnit> textUnits = new ArrayList<TextUnit>();
 	private int current = -1;
+	private int curSeg = -1;
+	private ISegments srcSegs;
+	private ISegments trgSegs;
+	private TextUnit tu;
+	private TextContainer srcCont;
+	private TextContainer trgCont;
+	private boolean segmentMode = true;
 	private String outEncoding;
 	private String outPath;
 
@@ -171,11 +182,21 @@ public class PairEditorUserTest {
 				saveOutput();
 			};
 		});
+
+		chkSegmentMode = new Button(comp, SWT.CHECK);
+		chkSegmentMode.setText("&Segment mode");
+		chkSegmentMode.setSelection(segmentMode);
+		chkSegmentMode.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				switchMode(!segmentMode);
+			};
+		});
+		
 		
 		edInfo = new Text(comp, SWT.BORDER);
 		edInfo.setEditable(false);
 		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.horizontalSpan = 6;
+		gdTmp.horizontalSpan = 5;
 		edInfo.setLayoutData(gdTmp);
 		
 		editPanel = new PairEditorPanel(comp, SWT.VERTICAL);
@@ -232,6 +253,9 @@ public class PairEditorUserTest {
 			outEncoding = null;
 			outPath = null;
 			current = -1;
+			curSeg = -1;
+			srcSegs = null;
+			trgSegs = null;
 			
 			// Load the document
 			textUnits = new ArrayList<TextUnit>();
@@ -258,61 +282,167 @@ public class PairEditorUserTest {
 	
 	private void updateButtons () {
 		btSave.setEnabled(( rawDoc != null ) && ( textUnits.size() > 0 ));
-		btPrevious.setEnabled(( textUnits.size() > 0 ) && ( current > 0 ));
-		btNext.setEnabled(( textUnits.size() > 0 ) && ( current < (textUnits.size()-1) ));
+		
+		if ( segmentMode ) {
+			btPrevious.setEnabled(( current > 0 ) && (( curSeg > 0 ) || ( textUnits.size() > 0 )));
+			btNext.setEnabled(( textUnits.size() > 0 ) && (( curSeg < srcSegs.count()-1 ) || ( current < (textUnits.size()-1) )));
+		}
+		else {
+			btPrevious.setEnabled(( current > 0 ) && ( textUnits.size() > 0 ));
+			btNext.setEnabled(( textUnits.size() > 0 ) && ( current < (textUnits.size()-1) ));
+		}
+		
 		btFirst.setEnabled(btPrevious.getEnabled());
 		btLast.setEnabled(btNext.getEnabled());
 	}
 	
-	private void displayTU (int index) {
+	private void getNewCurrent (int index,
+		boolean firstSegment)
+	{
 		try {
-			if ( index > -1 ) {
-				TextUnit tu = textUnits.get(index);
-				
-//				TextFragment srcFrag = tu.getSource().getFirstContent();
-//				TextFragment trgFrag = tu.createTarget(trgLoc, false, IResource.COPY_ALL).getFirstContent();
-//				//TODO: deal with segmented content
-//				editPanel.setText(srcFrag, trgFrag);
-				
-				TextContainer srcCont = tu.getSource();
-				TextContainer trgCont = tu.createTarget(trgLoc, false, IResource.COPY_ALL);
-				editPanel.setTextContainers(srcCont, trgCont);
-
-				edInfo.setText(String.format("TU ID=%s  (%d of %d)", tu.getId(), current+1, textUnits.size()));
+			if ( index < 0 ) return;
+			
+			// Get the text unit
+			tu = textUnits.get(index);
+			
+			// Get the source
+			srcCont = tu.getSource();
+			if ( segmentMode ) {
+				srcSegs = srcCont.getSegments();
 			}
-			else {
-				editPanel.clear();
-				edInfo.setText("");
+			
+			// Get the existing target, or create an empty one, segmented if needed
+			trgCont = tu.getTarget(trgLoc);
+			if ( trgCont == null ) {
+				// Create a copy
+				trgCont = tu.createTarget(trgLoc, false, IResource.COPY_ALL);
+				trgSegs = trgCont.getSegments();
+				// And empty the content of each segment
+				for ( Segment seg : trgSegs ) {
+					seg.text.clear();
+				}
 			}
-			updateButtons();
+			else if ( segmentMode ) {
+				trgSegs = trgCont.getSegments();
+			}
+			
+			// Set current segment
+			if ( segmentMode ) {
+				if ( firstSegment ) curSeg = 0;
+				else curSeg = srcSegs.count()-1;
+			}
 		}
 		catch ( Throwable e ) {
-			Dialogs.showError(shell, "Error when displaying text unit.\n"+e.getMessage(), null);
+			Dialogs.showError(shell, "Error when accessing text unit.\n"+e.getMessage(), null);
 		}
 	}
-
+	
+	private void displayCurrent () {
+		if ( current < 0 ) {
+			editPanel.clear();
+			edInfo.setText("");
+		}
+		else {
+			if ( segmentMode ) {
+				Segment srcSeg = srcSegs.get(curSeg);
+				Segment trgSeg = trgSegs.get(srcSeg.getId());
+				if ( trgSeg == null ) {
+					//TODO: Handle inter-segment before this segment
+					trgSeg = new Segment(srcSeg.getId(), new TextFragment());
+					trgSegs.append(trgSeg);
+				}
+				editPanel.setTextFragments(srcSeg.text, trgSeg.text);
+				edInfo.setText(String.format("TU ID=%s / %d of %d / seg=%s",
+					tu.getId(), current+1, textUnits.size(), srcSeg.getId()));
+			}
+			else { // Show the text containers
+				editPanel.setTextContainers(srcCont, trgCont);
+				edInfo.setText(String.format("TU ID=%s / %d of %d / full content",
+					tu.getId(), current+1, textUnits.size()));
+			}
+		}
+		updateButtons();
+	}
+	
 	private void displayPrevious () {
-		if ( current <= 0 ) return;
+		if ( current < 0 ) return;
 		if ( !saveCurrent() ) return;
-		displayTU(--current);
+
+		if ( segmentMode ) {
+			if ( curSeg == 0 ) {
+				if ( current == 0 ) return; // No more
+				else getNewCurrent(--current, false); // Get previous text unit
+			}
+			else curSeg--; // Move to previous segment 
+		}
+		else { // Non-segment mode
+			if ( current == 0 ) return; // No more
+			else getNewCurrent(--current, false); // Get previous text unit
+		}
+		displayCurrent();
 	}
 	
 	private void displayNext () {
-		if (( current < 0 ) || ( current >= textUnits.size()-1 )) return;
+		if ( current < 0 ) return;
 		if ( !saveCurrent() ) return;
-		displayTU(++current);
+
+		if ( segmentMode ) {
+			if ( curSeg >= srcSegs.count()-1 ) {
+				if ( current >= textUnits.size()-1 ) return; // No more
+				else getNewCurrent(++current, true); // Get next text unit 
+			}
+			else curSeg++; // Move to next segment
+		}
+		else { // Non-segment mode
+			if ( current >= textUnits.size()-1 ) return; // No more
+			else getNewCurrent(++current, true); // Get next text unit
+		}
+		displayCurrent();
 	}
 	
 	private void displayFirst () {
-		if ( textUnits.size() > 0 ) current = 0;
-		else current = -1;
-		displayTU(current);
+		if ( !saveCurrent() ) return;
+		if ( textUnits.size() > 0 ) {
+			current = 0;
+			getNewCurrent(current, true);
+		}
+		else {
+			current = -1;
+		}
+		displayCurrent();
+	}
+
+	private void switchMode (boolean newSegmentMode) {
+		if ( current < 0 ) {
+			segmentMode = newSegmentMode;
+			return;
+		}
+		if ( !saveCurrent() ) return;
+
+		if ( segmentMode ) { // If it was in segment mode we just re-display
+			segmentMode = newSegmentMode;
+		}
+		else { // If it was in non-segment mode we re-get the text unit to update the segments info
+			segmentMode = newSegmentMode;
+			getNewCurrent(current, true);
+		}
+		
+		// Refresh the display with the new mode
+		
+		displayCurrent();
 	}
 	
 	private void displayLast () {
-		if ( textUnits.size() > 0 ) current = textUnits.size()-1;
-		else current = -1;
-		displayTU(current);
+		if ( current < 0 ) return;
+		if ( !saveCurrent() ) return;
+		if ( textUnits.size() > 0 ) {
+			current = textUnits.size()-1;
+			getNewCurrent(current, false);
+		}
+		else {
+			current = -1;
+		}
+		displayCurrent();
 	}
 	
 	private boolean saveCurrent () {
