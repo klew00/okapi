@@ -132,8 +132,7 @@ public class TextOptionsPanel extends Composite {
 		return new TextOptions(getDisplay(), opt);
 	}
 	
-	private void selectColor (boolean background)
-	{
+	private void selectColor (boolean background) {
 		try {
 			ColorDialog dlg = new ColorDialog(getShell());
 			if ( background ) {

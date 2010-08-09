@@ -24,9 +24,13 @@ import java.io.IOException;
 import java.net.URL;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Device;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Button;
@@ -254,5 +258,26 @@ public class UIUtil {
 			gdTmp.widthHint = min;
 		}
 	}
-	
+
+	/**
+	 * Disposes the font and colors of a given TextStyle object.
+	 * @param ts the object to clear.
+	 */
+	public static void disposeTextStyle (TextStyle ts) {
+		if ( ts != null ) {
+			if ( ts.background != null ) ts.background.dispose();
+			if ( ts.foreground != null ) ts.foreground.dispose();
+			if ( ts.font != null ) ts.font.dispose();
+		}
+	}
+
+	public static TextStyle cloneTextStyle (Device device, TextStyle ts) {
+		if ( ts == null ) return null;
+		TextStyle newTS = new TextStyle(ts);
+		// In addition: clone the font and color, which are just copied otherwise
+		if ( ts.background != null ) newTS.background = new Color(device, ts.background.getRGB());
+		if ( ts.foreground != null ) newTS.foreground = new Color(device, ts.foreground.getRGB());
+		if ( ts.font != null ) newTS.font = new Font(device, ts.font.getFontData());
+		return newTS;
+	}
 }

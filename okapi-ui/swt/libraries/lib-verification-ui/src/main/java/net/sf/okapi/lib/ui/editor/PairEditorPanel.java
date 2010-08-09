@@ -28,10 +28,12 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
+/**
+ * Allows to display or work on editing the target text for a bilingual text.
+ * This class can edit either a segment or a text container.
+ */
 public class PairEditorPanel extends SashForm {
 
-//	private FragmentEditorPanel edSource;
-//	private FragmentEditorPanel edTarget;
 	private TextContainerEditorPanel edSource;
 	private TextContainerEditorPanel edTarget;
 
@@ -87,5 +89,5 @@ public class PairEditorPanel extends SashForm {
 		edSource.setEnabled(enabled);
 		edTarget.setEnabled(enabled);
 	}
-
+	
 }

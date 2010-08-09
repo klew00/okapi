@@ -360,6 +360,12 @@ public class PairEditorUserTest {
 				edInfo.setText(String.format("TU ID=%s / %d of %d / full content",
 					tu.getId(), current+1, textUnits.size()));
 			}
+			
+			// Translatable?
+			editPanel.setEnabled(tu.isTranslatable());
+			if ( !editPanel.getEnabled() ) {
+				edInfo.setText(edInfo.getText()+" NOT TRANSLATABLE!");
+			}
 		}
 		updateButtons();
 	}

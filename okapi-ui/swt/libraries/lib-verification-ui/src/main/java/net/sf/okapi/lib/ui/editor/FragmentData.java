@@ -24,6 +24,9 @@ import java.util.List;
 
 import net.sf.okapi.common.resource.Code;
 
+/**
+ * Helper class for the date to hold in the Clipboard.
+ */
 public class FragmentData {
 
 	public String codedText;

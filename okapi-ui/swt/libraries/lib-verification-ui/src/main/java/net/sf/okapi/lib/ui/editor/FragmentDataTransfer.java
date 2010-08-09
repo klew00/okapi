@@ -32,6 +32,9 @@ import org.eclipse.swt.dnd.ByteArrayTransfer;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.TransferData;
 
+/**
+ * Helper class to handle clipboard transfer of extracted text.
+ */
 public class FragmentDataTransfer extends ByteArrayTransfer {
 
 	static private final String MIME_TYPE = "application/okapi-fragment"; // $NON-NLS-1$

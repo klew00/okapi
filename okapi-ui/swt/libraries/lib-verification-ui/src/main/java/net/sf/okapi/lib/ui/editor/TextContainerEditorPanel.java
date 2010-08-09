@@ -32,6 +32,7 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.ui.Dialogs;
+import net.sf.okapi.common.ui.UIUtil;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CaretEvent;
@@ -61,6 +62,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
+/**
+ * Editing panel for a section of extracted text.
+ * This editor can edit either a segment or a text container.
+ */
 public class TextContainerEditorPanel {
 
 	private static final String SEGTYPECHAR = "\uFFF9";
@@ -84,7 +89,6 @@ public class TextContainerEditorPanel {
 	private PairEditorPanel parentPanel;
 	private int nextCodeForCopy = -1;
 	private boolean modified;
-	
 	private final int frontChars = 6;
 	private final int tailChars = 3;
 	private final int maxChars = frontChars+3+tailChars;
@@ -299,6 +303,8 @@ public class TextContainerEditorPanel {
 			textOptions.dispose();
 			textOptions = null;
 		}
+		UIUtil.disposeTextStyle(codeStyle);
+		UIUtil.disposeTextStyle(markStyle);
 	}
 
 	public boolean setFocus () {
@@ -381,7 +387,15 @@ public class TextContainerEditorPanel {
 	            }
 			});
 		}
-	
+
+		new MenuItem(contextMenu, SWT.SEPARATOR);
+		item = new MenuItem(contextMenu, SWT.PUSH);
+		item.setText("Options...");
+		item.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				editOptions();
+            }
+		});
 	}
 	
 	private void cycleDisplayMode () {
@@ -391,106 +405,122 @@ public class TextContainerEditorPanel {
 		updateText(pt);
 	}
 	
+	private void refresh () {
+		Point pt = cacheContent(edit.getSelection());
+		if ( pt == null ) return;
+		updateText(pt);
+	}
+	
 	private void createContainerFromFragment () {
-		textCont.clear();
-		Code code;
-		ISegments segs = textCont.getSegments();
-		Segment seg = null;
-		ArrayList<Code> tmpCodes = new ArrayList<Code>();
-		StringBuilder tmp = new StringBuilder();
-		
-		for ( int i=0; i<codedText.length(); i++ ) {
-			if ( TextFragment.isMarker(codedText.charAt(i)) ) {
-				code = codes.get(TextFragment.toIndex(codedText.charAt(++i)));
-				
-				if ( code.getType().equals(SEGTYPECHAR) ) { // A segment marker
-					if ( code.getTagType() == TagType.OPENING ) {
-						if ( seg != null ) {
-							throw new RuntimeException("Invalid opening segment marker: "+code.getOuterData());
+		try {
+			textCont.clear();
+			Code code;
+			ISegments segs = textCont.getSegments();
+			Segment seg = null;
+			ArrayList<Code> tmpCodes = new ArrayList<Code>();
+			StringBuilder tmp = new StringBuilder();
+			
+			for ( int i=0; i<codedText.length(); i++ ) {
+				if ( TextFragment.isMarker(codedText.charAt(i)) ) {
+					code = codes.get(TextFragment.toIndex(codedText.charAt(++i)));
+					
+					if ( code.getType().equals(SEGTYPECHAR) ) { // A segment marker
+						if ( code.getTagType() == TagType.OPENING ) {
+							if ( seg != null ) {
+								throw new RuntimeException("Invalid opening segment marker: "+code.getOuterData());
+							}
+							// Add previous part if needed
+							if ( tmp.length() > 0 ) {
+								textCont.append(new TextFragment(tmp.toString(), tmpCodes));
+							}
+							// Create new segment
+							seg = new Segment();
+							seg.id = code.getOuterData().substring(1, code.getOuterData().length()-1);
 						}
-						// Add previous part if needed
-						if ( tmp.length() > 0 ) {
-							textCont.append(new TextFragment(tmp.toString(), tmpCodes));
+						else { // Closing marker: add the segment, start a new one
+							if ( seg == null ) {
+								throw new RuntimeException("Invalid closing segment marker: "+code.getOuterData());
+							}
+							seg.text = new TextFragment(tmp.toString(), tmpCodes);
+							segs.append(seg);
+							seg = null;
 						}
-						// Create new segment
-						seg = new Segment();
-						seg.id = code.getOuterData().substring(1, code.getOuterData().length()-1);
+						// In both cases: reset the fragment building variables
+						tmp  = new StringBuilder();
+						tmpCodes = new ArrayList<Code>();
 					}
-					else { // Closing marker: add the segment, start a new one
-						if ( seg == null ) {
-							throw new RuntimeException("Invalid closing segment marker: "+code.getOuterData());
-						}
-						seg.text = new TextFragment(tmp.toString(), tmpCodes);
-						segs.append(seg);
-						seg = null;
+					else { // A normal code: add it to the fragment being build
+						tmpCodes.add(code); // No need to clone
+						tmp.append(String.format("%c%c", codedText.charAt(i-1),
+							TextFragment.toChar(tmpCodes.size()-1)));
 					}
-					// In both cases: reset the fragment building variables
-					tmp  = new StringBuilder();
-					tmpCodes = new ArrayList<Code>();
 				}
-				else { // A normal code: add it to the fragment being build
-					tmpCodes.add(code); // No need to clone
-					tmp.append(String.format("%c%c", codedText.charAt(i-1),
-						TextFragment.toChar(tmpCodes.size()-1)));
+				else { // Part is either a text-part or a segment here
+					tmp.append(codedText.charAt(i));
 				}
 			}
-			else { // Part is either a text-part or a segment here
-				tmp.append(codedText.charAt(i));
+		
+			if ( seg != null ) {
+				throw new RuntimeException("Missing closing segment marker.");
+			}
+			// Ensure we add any extra ending part
+			if ( tmp.length() > 0 ) {
+				textCont.append(new TextFragment(tmp.toString(), tmpCodes));
 			}
 		}
-		
-		if ( seg != null ) {
-			throw new RuntimeException("Missing closing segment marker.");
-		}
-		// Ensure we add any extra ending part
-		if ( tmp.length() > 0 ) {
-			textCont.append(new TextFragment(tmp.toString(), tmpCodes));
-		}
+		catch ( Throwable e ) {
+			Dialogs.showError(edit.getShell(), "Error creating fragment.\n"+e.getLocalizedMessage(), null);
+		}		
 	}
 	
 	private void createFragmentFromContainer () {
-		StringBuilder tmp = new StringBuilder();
-		codes = new ArrayList<Code>();
-		Code segCode;
-		StringBuilder tmpPart = new StringBuilder();
-		
-		for ( TextPart part : textCont ) {
-			// Add start-segment marker 
-			if ( part.isSegment() ) {
-				segCode = new Code(TagType.OPENING, SEGTYPECHAR);
-				segCode.setOuterData("{"+((Segment)part).getId()+">");
-				codes.add(segCode);
-				tmp.append(String.format("%c%c", (char)TextFragment.MARKER_OPENING,
-					TextFragment.toChar(codes.size()-1)));
-			}
+		try {
+			StringBuilder tmp = new StringBuilder();
+			codes = new ArrayList<Code>();
+			Code segCode;
+			StringBuilder tmpPart = new StringBuilder();
 			
-			
-			// Adjust the marker indices
-			tmpPart.setLength(0);
-			tmpPart.append(part.text.getCodedText());
-			int newIndex = codes.size(); // Start at the last code
-			for ( int j=0; j<tmpPart.length(); j++ ) {
-				if ( TextFragment.isMarker(tmpPart.charAt(j)) ) {
-					tmpPart.setCharAt(++j, TextFragment.toChar(newIndex++));
+			for ( TextPart part : textCont ) {
+				// Add start-segment marker 
+				if ( part.isSegment() ) {
+					segCode = new Code(TagType.OPENING, SEGTYPECHAR);
+					segCode.setOuterData("{"+((Segment)part).getId()+">");
+					codes.add(segCode);
+					tmp.append(String.format("%c%c", (char)TextFragment.MARKER_OPENING,
+						TextFragment.toChar(codes.size()-1)));
+				}
+				
+				
+				// Adjust the marker indices
+				tmpPart.setLength(0);
+				tmpPart.append(part.text.getCodedText());
+				int newIndex = codes.size(); // Start at the last code
+				for ( int j=0; j<tmpPart.length(); j++ ) {
+					if ( TextFragment.isMarker(tmpPart.charAt(j)) ) {
+						tmpPart.setCharAt(++j, TextFragment.toChar(newIndex++));
+					}
+				}
+				// Add the part
+				tmp.append(tmpPart);
+				codes.addAll(part.text.getCodes());
+				
+				// Add end-segment marker
+				if ( part.isSegment() ) {
+					segCode = new Code(TagType.CLOSING, SEGTYPECHAR);
+					segCode.setOuterData("<"+((Segment)part).getId()+"}");
+					codes.add(segCode);
+					tmp.append(String.format("%c%c", (char)TextFragment.MARKER_CLOSING,
+						TextFragment.toChar(codes.size()-1)));
 				}
 			}
-			// Add the part
-			tmp.append(tmpPart);
-			codes.addAll(part.text.getCodes());
+			// Adjust the index for the segments
 			
-			// Add end-segment marker
-			if ( part.isSegment() ) {
-				segCode = new Code(TagType.CLOSING, SEGTYPECHAR);
-				segCode.setOuterData("<"+((Segment)part).getId()+"}");
-				codes.add(segCode);
-				tmp.append(String.format("%c%c", (char)TextFragment.MARKER_CLOSING,
-					TextFragment.toChar(codes.size()-1)));
-			}
+			// Set the final coded text
+			codedText = tmp.toString();
 		}
-		// Adjust the index for the segments
-		
-		// Set the final coded text
-		codedText = tmp.toString();
+		catch ( Throwable e ) {
+			Dialogs.showError(edit.getShell(), "Error creating container back.\n"+e.getLocalizedMessage(), null);
+		}		
 	}
 	
 	public void setText (TextFragment oriFrag) {
@@ -527,6 +557,8 @@ public class TextContainerEditorPanel {
 		textFrag = null;
 		textCont = null;
 		edit.setText("");
+		codedText = null;
+		modified = false;
 	}
 	
 	public boolean applyChanges () {
@@ -564,7 +596,7 @@ public class TextContainerEditorPanel {
 				pt.x = sel.x; pt.y = sel.y;
 			}
 			
-			if (( sel == null ) && ( !modified )) return pt;
+			if ((( sel == null ) && ( !modified )) || ( codedText == null )) return pt;
 			
 			Code code = null;
 			StringBuilder tmp = new StringBuilder(edit.getText());
@@ -833,6 +865,7 @@ public class TextContainerEditorPanel {
 	
 	private void updateText (Point sel) {
 		try {
+			if ( codedText == null ) return;
 			updateCodeRanges = false;
 			StringBuilder tmp = new StringBuilder();
 			ranges = new ArrayList<StyleRange>();
@@ -969,8 +1002,8 @@ public class TextContainerEditorPanel {
 				edit.setStyleRange(newRange);
 				ranges.add(index++, newRange);
 			}
-			modified = true;
 
+			modified = true;
 			// Place the caret
 			switch ( positionAfter ) {
 			case 1:
@@ -1131,6 +1164,37 @@ public class TextContainerEditorPanel {
 			if ( clipboard != null ) {
 				clipboard.dispose();
 			}
+		}
+	}
+
+	private void editOptions () {
+		try {
+			OptionsDialog dlg = new OptionsDialog(edit.getShell(), null);
+			dlg.setData(textOptions, codeStyle, markStyle);
+			// Call the dialog. A null return means the user canceled
+			if ( !dlg.showDialog() ) return;
+
+			// Else: set the modified options for the source
+			TextOptions tmpTO = textOptions; // With StyledText we cannot free the old before we set the new
+			textOptions = dlg.getTextOptions();
+			
+			TextStyle tmpTS1 = codeStyle;
+			codeStyle = dlg.getCodeStyle();
+			
+			TextStyle tmpTS2 = markStyle;
+			markStyle = dlg.getMarkStyle();
+			
+			// Re set the styles
+			applyTextOptions(textOptions);
+			refresh();
+			
+			// Dispose only after redrawing
+			tmpTO.dispose();
+			UIUtil.disposeTextStyle(tmpTS1);
+			UIUtil.disposeTextStyle(tmpTS2);
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(edit.getShell(), "Error editing options.\n"+e.getMessage(), null);
 		}
 	}
 
