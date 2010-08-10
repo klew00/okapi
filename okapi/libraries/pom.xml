@@ -17,5 +17,6 @@
         <module>lib-search</module>
         <module>lib-extra</module>
         <module>lib-verification</module>
+        <module>lib-terminology</module>
     </modules>
 </project>
