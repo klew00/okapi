@@ -108,6 +108,8 @@ public class Editor implements IParametersEditor {
 	private Text edDefaultWS;
 	private Button chkUseCodeFinder;
 	private InlineCodeFinderPanel pnlCodeFinder;
+	private Text edCDATAFilterConfig;
+	private Button btGetCDATAFilterConfig;
 	private List lbElem;
 	private Table tblElemRules;
 	private Group grpElemContentFilter;
@@ -530,6 +532,22 @@ public class Editor implements IParametersEditor {
 		chkGlobalPreserveWS = new Button(cmpTmp, SWT.CHECK);
 		chkGlobalPreserveWS.setText("Preserve white-spaces unless otherwise specified");
 		
+		grpTmp = new Group(cmpTmp, SWT.NONE);
+		grpTmp.setText("Process CDATA sections using this filter configuration (leave empty for none):");
+		grpTmp.setLayout(new GridLayout(2, false));
+		grpTmp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		
+		edCDATAFilterConfig = new Text(grpTmp, SWT.BORDER);
+		edCDATAFilterConfig.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		
+		btGetCDATAFilterConfig = new Button(grpTmp, SWT.PUSH);
+		btGetCDATAFilterConfig.setText("...");
+		btGetCDATAFilterConfig.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				browserFilterConfiguration(edCDATAFilterConfig);
+			};
+		});
+		
 		tiTmp = new TabItem(tabs, SWT.NONE);
 		tiTmp.setText("General");
 		tiTmp.setControl(cmpTmp);
@@ -885,6 +903,8 @@ public class Editor implements IParametersEditor {
 			chkUseCodeFinder.setSelection(tfg.isUseCodeFinder());
 			pnlCodeFinder.setRules(tfg.getCodeFinderRules());
 			
+			String sf = tfg.getGlobalCDATASubfilter();
+			edCDATAFilterConfig.setText(sf==null ? "" : sf);
 			
 			//--- Read elements
 
@@ -1032,6 +1052,9 @@ public class Editor implements IParametersEditor {
 		tmp.append(String.format("%s: %s\n",
 			TaggedFilterConfiguration.GLOBAL_PRESERVE_WHITESPACE,
 			chkGlobalPreserveWS.getSelection()));
+		tmp.append(String.format("%s: %s\n",
+			TaggedFilterConfiguration.GLOBAL_CDATA_SUBFILTER,
+			edCDATAFilterConfig.getSelection()));
 		
 		//--- Inline codes
 		tmp.append(String.format("\n%s: %s\n",

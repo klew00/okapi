@@ -39,6 +39,7 @@ import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.ui.Dialogs;
 
 import org.eclipse.swt.SWT;
@@ -103,6 +104,9 @@ public class PairEditorUserTest {
 		shell.setLayout(new GridLayout());
 
 		createContent();
+		
+		createInitialExtractedText();
+		
 		updateButtons();
 		
 		Dialogs.centerWindow(shell, (Shell)parent);
@@ -496,40 +500,35 @@ public class PairEditorUserTest {
 		}
 	}
 	
-//	private void createTestTextUnit () {
-//		rawDoc = null;
-//		textUnits = new ArrayList<TextUnit>();
-//		
-//		TextFragment srcFrag = new TextFragment("Text in ");
-//		srcFrag.append(TagType.OPENING, "style1", "<span1>");
-//		srcFrag.append("bold");
-//		srcFrag.append(TagType.PLACEHOLDER, "z", "z");
-//		srcFrag.append(" and more bold");
-//		srcFrag.append(TagType.CLOSING, "style1", "</span1>");
-//		srcFrag.append(" with a line-break here:");
-//		srcFrag.append(TagType.PLACEHOLDER, "SomeCode", "<code3/>");
-//		srcFrag.append(" and more text after; ");
-//		srcFrag.append(TagType.OPENING, "span2", "<span4>");
-//		srcFrag.append(" and more.");
-//		
-//		TextFragment trgFrag = new TextFragment("Texte en ");
-//		trgFrag.append(TagType.OPENING, "style1", "<SPAN1>");
-//		trgFrag.append("gras");
-//		trgFrag.append(TagType.PLACEHOLDER, "Z", "Z");
-//		trgFrag.append(" et plus de gras");
-//		trgFrag.append(TagType.CLOSING, "style1", "</SPAN1>");
-//		trgFrag.append(" avec un saut-de-ligne ici\u00a0:");
-//		trgFrag.append(TagType.PLACEHOLDER, "SomeCode", "<CODE3/>");
-//		trgFrag.append(" et d'autre texte apr\u00e8s; ");
-//		trgFrag.append(TagType.OPENING, "span2", "<SPAN4>");
-//		trgFrag.append(" et encore d'autre.");
-//		
-//		TextUnit tu = new TextUnit("id");
-//		tu.setSource(new TextContainer(srcFrag));
-//		tu.setTargetContent(trgLoc, trgFrag);
-//		textUnits.add(tu);
-//		
-//		displayFirst();
-//	}
+	private void createInitialExtractedText () {
+		rawDoc = null;
+		textUnits = new ArrayList<TextUnit>();
+		
+		TextFragment srcFrag = new TextFragment("This is a dummy entry of ");
+		srcFrag.append(TagType.OPENING, "emph", "<em>");
+		srcFrag.append("extracted text");
+		srcFrag.append(TagType.CLOSING, "emph", "</em>");
+		srcFrag.append(". But you can also test REAL files too.");
+		srcFrag.append(TagType.PLACEHOLDER, "SomeCode", "<br/>");
+		srcFrag.append("Click ");
+		srcFrag.append(TagType.OPENING, "bold", "<b>");
+		srcFrag.append("Next");
+		srcFrag.append(TagType.CLOSING, "emph", "</b>");
+		srcFrag.append(" to learn how.");
+		TextUnit tu = new TextUnit("id1");
+		tu.setSource(new TextContainer(srcFrag));
+		textUnits.add(tu);
+		
+		srcFrag = new TextFragment("To get the text of a file: Click");
+		srcFrag.append(TagType.OPENING, "bold", "<b>");
+		srcFrag.append("Open File");
+		srcFrag.append(TagType.CLOSING, "bold", "</b>");
+		srcFrag.append(". Then select the document to open, the filter configuration to use, and the default encoding.");
+		tu = new TextUnit("id2");
+		tu.setSource(new TextContainer(srcFrag));
+		textUnits.add(tu);
+
+		displayFirst();
+	}
 
 }
