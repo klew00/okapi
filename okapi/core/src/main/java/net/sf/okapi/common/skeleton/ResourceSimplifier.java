@@ -33,7 +33,6 @@ import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.IReferenceable;
 import net.sf.okapi.common.resource.MultiEvent;
 import net.sf.okapi.common.resource.StartDocument;
-import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextUnit;
 
 /**
