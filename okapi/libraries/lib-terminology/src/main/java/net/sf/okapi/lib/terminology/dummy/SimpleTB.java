@@ -41,21 +41,20 @@ public class SimpleTB {
 	
 	public SimpleTB () {
 		entries = new ArrayList<GlossaryEntry>();
-		createTerms();
 	}
 	
-	private void createTerms () {
-		LocaleId srcLoc = LocaleId.ENGLISH;
-		LocaleId trgLoc = LocaleId.FRENCH;
-		
-		createEntry(srcLoc, "watch").addTerm(trgLoc, "montre");
-		createEntry(srcLoc, "scale").addTerm(trgLoc, "balance");
-		createEntry(srcLoc, "weather").addTerm(trgLoc, "temps");
-		createEntry(srcLoc, "time").addTerm(trgLoc, "temps");
-		createEntry(srcLoc, "channel").addTerm(trgLoc, "chaine");
-	}
+//	private void createTerms () {
+//		LocaleId srcLoc = LocaleId.ENGLISH;
+//		LocaleId trgLoc = LocaleId.FRENCH;
+//		
+//		createEntry(srcLoc, "watch").addTerm(trgLoc, "montre");
+//		createEntry(srcLoc, "scale").addTerm(trgLoc, "balance");
+//		createEntry(srcLoc, "weather").addTerm(trgLoc, "temps");
+//		createEntry(srcLoc, "time").addTerm(trgLoc, "temps");
+//		createEntry(srcLoc, "channel").addTerm(trgLoc, "chaine");
+//	}
 	
-	public GlossaryEntry createEntry (LocaleId locId,
+	public GlossaryEntry addEntry (LocaleId locId,
 		String term)
 	{
 		GlossaryEntry gent = new GlossaryEntry();

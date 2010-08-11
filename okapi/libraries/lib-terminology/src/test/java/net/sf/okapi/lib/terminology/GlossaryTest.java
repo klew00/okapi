@@ -45,14 +45,34 @@ public class GlossaryTest {
 
 	@Test
 	public void testTBAccess () {
-		ITermAccess ta = new SimpleTBConnector();
+		SimpleTBConnector ta = new SimpleTBConnector();
 		ta.open();
-		TextFragment srcFrag = new TextFragment("This watch is about time");
-		List<TermHit> found = ta.getExistingTerms(srcFrag, locEN, locFR);
-		assertEquals(2, found.size());
-		assertEquals("watch", found.get(0).sourceTerm.getText());
-		assertEquals("time", found.get(1).sourceTerm.getText());
+		ta.addEntry(locEN, "watch").addTerm(locFR, "montre");
+		ta.addEntry(locEN, "time").addTerm(locFR, "temps");
+		
+		TextFragment srcFrag = new TextFragment("This watch shows a time");
+		List<TermHit> found1 = ta.getExistingTerms(srcFrag, locEN, locFR);
+		assertEquals(2, found1.size());
+		assertEquals("watch", found1.get(0).sourceTerm.getText());
+		assertEquals("time", found1.get(1).sourceTerm.getText());
+		
+		TextFragment trgFrag = new TextFragment("Cette montre marque une heure");
+		List<TermHit> found2 = ta.getExistingTerms(trgFrag, locFR, locEN);
+		assertEquals(1, found2.size());
+		assertEquals("montre", found2.get(0).sourceTerm.getText());
+
 		ta.close();
 	}
 
+//	private List<TermHit> getMissingTerms (LocaleId sourceLoc,
+//		List<TermHit> sourceTerms,
+//		LocaleId targetLoc,
+//		List<TermHit> targetTerms)
+//	{
+//		for ( int s=0; s<sourceTerms.size(); s++ ) {
+//			TermHit srcHit = sourceTerms.get(s);
+//			
+//		}
+//		return null;
+//	}
 }

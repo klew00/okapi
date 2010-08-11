@@ -42,4 +42,8 @@ public class BaseEntry {
 		this.props = props;
 	}
 
+	public Iterable<String> propertiesKeys () {
+		return props.keySet();
+	}
+
 }
