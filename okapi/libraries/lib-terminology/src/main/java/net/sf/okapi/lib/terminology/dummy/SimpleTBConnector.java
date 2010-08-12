@@ -26,7 +26,7 @@ public class SimpleTBConnector implements ITermAccess {
 
 	@Override
 	public void open () {
-		tb = new SimpleTB();
+		tb = new SimpleTB(null);
 	}
 
 	@Override

@@ -27,29 +27,37 @@ import net.sf.okapi.common.LocaleId;
 
 public class GlossaryEntry extends BaseEntry {
 	
-	Map<String, LangEntry> langs;
+	String id;
+	Map<LocaleId, LangEntry> langs;
 
 	public GlossaryEntry () {
-		langs = new HashMap<String, LangEntry>();
+		langs = new HashMap<LocaleId, LangEntry>();
 	}
 
 	public boolean hasLocale (LocaleId locId) {
-		return (langs.get(locId.toString()) != null);
+		return (langs.get(locId) != null);
 	}
 
 	public LangEntry getEntries (LocaleId locId) {
-		return langs.get(locId.toString());
+		return langs.get(locId);
 	}
 
 	public void addTerm (LocaleId locId,
 		String term)
 	{
+		// Get the existing language entry if possible
 		LangEntry lent = getEntries(locId);
+		// Create one if there is none yet
 		if ( lent == null ) {
-			lent = new LangEntry(); 
-			langs.put(locId.toString(), lent);
+			lent = new LangEntry(locId); 
+			langs.put(locId, lent);
 		}
+		// Add the term
 		lent.addTerm(term);
+	}
+
+	public void addLangEntry (LangEntry lent) {
+		langs.put(lent.locId, lent);
 	}
 
 }

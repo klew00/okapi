@@ -30,7 +30,7 @@ public class TermEntry extends BaseEntry {
 	String term;
 
 	public TermEntry (String term) {
-		this.term = term;
+		this.term = ((term==null) ? "" : term);
 	}
 
 	@Override

@@ -23,11 +23,15 @@ package net.sf.okapi.lib.terminology;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.okapi.common.LocaleId;
+
 public class LangEntry extends BaseEntry {
 	
+	LocaleId locId;
 	List<TermEntry> terms;
 
-	public LangEntry () {
+	public LangEntry (LocaleId locId) {
+		this.locId = locId;
 		terms = new ArrayList<TermEntry>();
 	}
 	
@@ -38,6 +42,10 @@ public class LangEntry extends BaseEntry {
 	
 	public void addTerm (String term) {
 		terms.add(new TermEntry(term));
+	}
+	
+	public void addTerm (TermEntry term) {
+		terms.add(term);
 	}
 	
 	public boolean hasTerm () {

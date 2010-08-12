@@ -24,8 +24,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.filters.IFilterConfigurationMapper;
+import net.sf.okapi.common.resource.ISegments;
+import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.terminology.GlossaryEntry;
 import net.sf.okapi.lib.terminology.LangEntry;
 import net.sf.okapi.lib.terminology.TermHit;
@@ -36,11 +44,43 @@ import net.sf.okapi.lib.terminology.TermHit;
  */
 public class SimpleTB {
 	
+	private IFilterConfigurationMapper fcMapper;
 	private List<GlossaryEntry> entries;
 	
 	
-	public SimpleTB () {
+	public SimpleTB (IFilterConfigurationMapper fcMapper) {
+		this.fcMapper = fcMapper;
 		entries = new ArrayList<GlossaryEntry>();
+	}
+	
+	public void importDocument (RawDocument rawDoc) {
+		IFilter filter = null;
+		try {
+			filter = fcMapper.createFilter(rawDoc.getFilterConfigId());
+			filter.open(rawDoc);
+			LocaleId srcLoc = rawDoc.getSourceLocale();
+			LocaleId trgLoc = rawDoc.getTargetLocale();
+			while ( filter.hasNext() ) {
+				Event event = filter.next();
+				if ( event.getEventType() == EventType.TEXT_UNIT ) {
+					TextUnit tu = event.getTextUnit();
+					if ( !tu.isTranslatable() ) continue;
+					if ( !tu.hasTarget(trgLoc) ) continue;
+					ISegments srcSegs = tu.getSource().getSegments();
+					ISegments trgSegs = tu.getTarget(trgLoc).getSegments();
+					for ( Segment seg : srcSegs ) {
+						Segment trgSeg = trgSegs.get(seg.id);
+						if ( trgSeg == null ) continue;
+						GlossaryEntry gent = addEntry(srcLoc, seg.text.toString());
+						gent.addTerm(trgLoc, trgSeg.text.toString());
+						entries.add(gent);
+					}
+				}
+			}
+		}
+		finally {
+			if ( filter != null ) filter.close();
+		}
 	}
 	
 //	private void createTerms () {
