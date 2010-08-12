@@ -107,6 +107,7 @@ public class TBXReader implements IGlossaryReader {
 					String name = reader.getLocalName();
 					if ( "termEntry".equals(name) ) {
 						processTermEntry();
+						return; // Done for this entry
 					}
 					break;
 				}
@@ -159,6 +160,9 @@ public class TBXReader implements IGlossaryReader {
 				if ( "tig".equals(name) ) {
 					processTig();
 				}
+				else if ( "ntig".equals(name) ) {
+					processNtig();
+				}
 				break;
 			case XMLStreamConstants.END_ELEMENT:
 				name = reader.getLocalName();
@@ -192,17 +196,56 @@ public class TBXReader implements IGlossaryReader {
 		}
 	}
 
-	private void processTerm () throws XMLStreamException {
-		StringBuilder tmp = new StringBuilder();
+	private void processNtig () throws XMLStreamException {
 		String name;
 		while ( reader.hasNext() ) {
 			int eventType = reader.next();
 			switch ( eventType ) {
 			case XMLStreamConstants.START_ELEMENT:
+				name = reader.getLocalName();
+				if ( "termGrp".equals(name) ) {
+					processTermGrp();
+				}
 				break;
 			case XMLStreamConstants.END_ELEMENT:
 				name = reader.getLocalName();
+				if ( "ntig".equals(name) ) {
+					return; // This ntig is done
+				}
+				break;
+			}
+		}
+	}
+
+	private void processTermGrp () throws XMLStreamException {
+		String name;
+		while ( reader.hasNext() ) {
+			int eventType = reader.next();
+			switch ( eventType ) {
+			case XMLStreamConstants.START_ELEMENT:
+				name = reader.getLocalName();
 				if ( "term".equals(name) ) {
+					processTerm();
+				}
+				break;
+			case XMLStreamConstants.END_ELEMENT:
+				name = reader.getLocalName();
+				if ( "termGrp".equals(name) ) {
+					return; // This termGrp is done
+				}
+				break;
+			}
+		}
+	}
+
+	private void processTerm () throws XMLStreamException {
+		// We do not read the <hi> element, but just get its content
+		StringBuilder tmp = new StringBuilder();
+		while ( reader.hasNext() ) {
+			int eventType = reader.next();
+			switch ( eventType ) {
+			case XMLStreamConstants.END_ELEMENT:
+				if ( "term".equals(reader.getLocalName()) ) {
 					TermEntry term = new TermEntry(tmp.toString());
 					lent.addTerm(term);
 					return;

@@ -37,6 +37,7 @@ import static org.junit.Assert.*;
 public class TBXReaderTest {
 
 	private LocaleId locEN = LocaleId.ENGLISH;
+	private LocaleId locFR = LocaleId.FRENCH;
 	private LocaleId locHU = LocaleId.fromString("hu");
 	
 	@Test
@@ -48,6 +49,7 @@ public class TBXReaderTest {
 			+ "</sourceDesc></fileDesc>"
 			+ "<encodingDesc><p type=\"XCSURI\">http://www.lisa.org/fileadmin/standards/tbx/TBXXCSV02.XCS</p></encodingDesc>"
 			+ "</martifHeader><text><body>"
+			
 			+ "<termEntry id=\"eid-Oracle-67\">"
 			+ "<descrip type=\"subjectField\">manufacturing</descrip>"
 			+ "<descrip type=\"definition\">def text</descrip>"
@@ -61,24 +63,60 @@ public class TBXReaderTest {
 			+ "<term id=\"tid-Oracle-67-hu1\">hu text</term>"
 			+ "<termNote type=\"partOfSpeech\">noun-hu</termNote>"
 			+ "</tig></langSet>"
-			+ "</termEntry></body></text></martif>";
+			+ "</termEntry>"
+			
+			+ "<termEntry id=\"ent2\">"
+			+ "<langSet xml:lang=\"en\">"
+			+ "<ntig><termGrp>"
+			+ "<term id=\"ent2-1\">en text2</term>"
+			+ "</termGrp></ntig></langSet>"
+			+ "<langSet xml:lang=\"fr\">"
+			+ "<tig>"
+			+ "<term id=\"ent2-2\">fr text2</term>"
+			+ "</tig></langSet>"
+			+ "</termEntry>"
+
+			+ "</body></text></martif>";
 
 		List<GlossaryEntry> list = getEntries(snippet);
 		assertNotNull(list);
-		assertEquals(1, list.size());
+		assertEquals(2, list.size());
+		
 		GlossaryEntry gent = list.get(0);
 		assertTrue(gent.hasLocale(locEN));
 		LangEntry lent = gent.getEntries(locEN);
 		TermEntry tent = lent.getTerm(0);
 		assertEquals("en text", tent.getText());
+		
 		assertTrue(gent.hasLocale(locHU));
 		lent = gent.getEntries(locHU);
 		tent = lent.getTerm(0);
 		assertEquals("hu text", tent.getText());
+
+		gent = list.get(1);
+		assertTrue(gent.hasLocale(locFR));
+		lent = gent.getEntries(locFR);
+		tent = lent.getTerm(0);
+		assertEquals("fr text2", tent.getText());
 	}
 
+	@Test
+	public void testNoTerms () {
+		String snippet = "<?xml version='1.0'?>"
+			+ "<!DOCTYPE martif SYSTEM \"TBXcoreStructV02.dtd\">"
+			+ "<martif type=\"TBX\" xml:lang=\"en\"><martifHeader><fileDesc><sourceDesc>"
+			+ "<p>From an Oracle corporation termbase</p>"
+			+ "</sourceDesc></fileDesc>"
+			+ "<encodingDesc><p type=\"XCSURI\">http://www.lisa.org/fileadmin/standards/tbx/TBXXCSV02.XCS</p></encodingDesc>"
+			+ "</martifHeader><text><body>"
+			+ "</body></text></martif>";
+
+		List<GlossaryEntry> list = getEntries(snippet);
+		assertNotNull(list);
+		assertEquals(0, list.size());
+	}
+	
 	List<GlossaryEntry> getEntries (String snippet) {
-//		long startTime = System.currentTimeMillis();
 		try {
 			ArrayList<GlossaryEntry> list = new ArrayList<GlossaryEntry>();
 			
@@ -97,8 +135,6 @@ public class TBXReaderTest {
 			e.printStackTrace();
 			throw new RuntimeException(e.getMessage());
 		}
-//		long endTime = System.currentTimeMillis();
-//		float seconds = (endTime - startTime)		
 	}
 	
 }
