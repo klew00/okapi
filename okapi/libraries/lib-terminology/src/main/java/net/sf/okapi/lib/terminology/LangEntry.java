@@ -27,14 +27,18 @@ import net.sf.okapi.common.LocaleId;
 
 public class LangEntry extends BaseEntry {
 	
-	LocaleId locId;
-	List<TermEntry> terms;
+	private LocaleId locId;
+	private List<TermEntry> terms;
 
 	public LangEntry (LocaleId locId) {
 		this.locId = locId;
 		terms = new ArrayList<TermEntry>();
 	}
 	
+	public LocaleId getLocale () {
+		return locId;
+	}
+
 	public LangEntry (TermEntry term) {
 		terms = new ArrayList<TermEntry>();
 		terms.add(term);

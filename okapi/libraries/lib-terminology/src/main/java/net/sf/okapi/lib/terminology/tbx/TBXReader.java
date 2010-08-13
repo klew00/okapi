@@ -120,13 +120,8 @@ public class TBXReader implements IGlossaryReader {
 	}
 
 	private void processTermEntry () throws XMLStreamException {
-		String id = reader.getAttributeValue(null, "id");
-		if ( Util.isEmpty(id) ) {
-			throw new OkapiIOException("Missing or empty id for termEntry.");
-		}
 		gent = new GlossaryEntry();
-		gent.setId(id);
-		
+		gent.setId(reader.getAttributeValue(null, "id"));
 		String name;
 		while ( reader.hasNext() ) {
 			int eventType = reader.next();
@@ -245,6 +240,7 @@ public class TBXReader implements IGlossaryReader {
 	}
 
 	private void processTerm () throws XMLStreamException {
+		String id = reader.getAttributeValue(null, "id");
 		// We do not read the <hi> element, but just get its content
 		StringBuilder tmp = new StringBuilder();
 		while ( reader.hasNext() ) {
@@ -253,6 +249,7 @@ public class TBXReader implements IGlossaryReader {
 			case XMLStreamConstants.END_ELEMENT:
 				if ( "term".equals(reader.getLocalName()) ) {
 					TermEntry term = new TermEntry(tmp.toString());
+					term.setId(id);
 					lent.addTerm(term);
 					return;
 				}

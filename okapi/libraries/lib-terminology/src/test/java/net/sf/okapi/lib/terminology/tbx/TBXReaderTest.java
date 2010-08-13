@@ -96,17 +96,20 @@ public class TBXReaderTest {
 		assertTrue(gent.hasLocale(locEN));
 		LangEntry lent = gent.getEntries(locEN);
 		TermEntry tent = lent.getTerm(0);
+		assertEquals("eid1-en1", tent.getId());
 		assertEquals("en text", tent.getText());
 		
 		assertTrue(gent.hasLocale(locHU));
 		lent = gent.getEntries(locHU);
 		tent = lent.getTerm(0);
+		assertEquals("eid1-hu1", tent.getId());
 		assertEquals("hu special text", tent.getText());
 
 		gent = list.get(1);
 		assertTrue(gent.hasLocale(locFR));
 		lent = gent.getEntries(locFR);
 		tent = lent.getTerm(0);
+		assertEquals("ent2-2", tent.getId());
 		assertEquals("fr text2", tent.getText());
 	}
 

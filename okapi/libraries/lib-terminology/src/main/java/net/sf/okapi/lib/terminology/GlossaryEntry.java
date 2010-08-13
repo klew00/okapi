@@ -81,7 +81,7 @@ public class GlossaryEntry extends BaseEntry {
 	}
 
 	public void addLangEntry (LangEntry lent) {
-		langs.put(lent.locId, lent);
+		langs.put(lent.getLocale(), lent);
 	}
 	
 	public void removeEntries (LocaleId locId) {

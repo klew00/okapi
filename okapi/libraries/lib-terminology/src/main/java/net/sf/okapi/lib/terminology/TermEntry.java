@@ -22,12 +22,8 @@ package net.sf.okapi.lib.terminology;
 
 public class TermEntry extends BaseEntry {
 	
-	public static final String DEFINITION = "definition";
-	public static final String DEFINITION_SOURCE = "def-source";
-	public static final String POS = "pos";
-	public static final String NOTE = "note";
-	
-	String term;
+	private String id;
+	private String term;
 
 	public TermEntry (String term) {
 		this.term = ((term==null) ? "" : term);
@@ -36,6 +32,14 @@ public class TermEntry extends BaseEntry {
 	@Override
 	public String toString () {
 		return term;
+	}
+
+	public String getId () {
+		return id;
+	}
+	
+	public void setId (String id) {
+		this.id = id;
 	}
 	
 	public String getText () {
