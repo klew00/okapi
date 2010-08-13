@@ -41,6 +41,11 @@ public class GlossaryTest {
 		gent.addTerm(locEN, "test-en");
 		assertTrue(gent.hasLocale(locEN));
 		assertEquals("test-en", gent.getEntries(locEN).getTerm(0).getText());
+		
+		gent.removeEntries(locFR); // No effect;
+		assertTrue(gent.hasLocale(locEN));
+		gent.removeEntries(locEN); // Remove
+		assertFalse(gent.hasLocale(locEN));
 	}
 
 	@Test
@@ -64,15 +69,4 @@ public class GlossaryTest {
 		ta.close();
 	}
 
-//	private List<TermHit> getMissingTerms (LocaleId sourceLoc,
-//		List<TermHit> sourceTerms,
-//		LocaleId targetLoc,
-//		List<TermHit> targetTerms)
-//	{
-//		for ( int s=0; s<sourceTerms.size(); s++ ) {
-//			TermHit srcHit = sourceTerms.get(s);
-//			
-//		}
-//		return null;
-//	}
 }

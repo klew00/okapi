@@ -21,11 +21,14 @@
 package net.sf.okapi.lib.terminology.tbx;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.lib.terminology.GlossaryEntry;
 import net.sf.okapi.lib.terminology.IGlossaryReader;
 import net.sf.okapi.lib.terminology.LangEntry;
@@ -39,6 +42,12 @@ public class TBXReaderTest {
 	private LocaleId locEN = LocaleId.ENGLISH;
 	private LocaleId locFR = LocaleId.FRENCH;
 	private LocaleId locHU = LocaleId.fromString("hu");
+	private String root;
+	
+	public TBXReaderTest () {
+		URL url = TBXReaderTest.class.getResource("/test01.tbx");
+		root = Util.getDirectoryName(url.getPath()) + File.separator;
+	}
 	
 	@Test
 	public void testSimpleTBX () {
@@ -50,17 +59,17 @@ public class TBXReaderTest {
 			+ "<encodingDesc><p type=\"XCSURI\">http://www.lisa.org/fileadmin/standards/tbx/TBXXCSV02.XCS</p></encodingDesc>"
 			+ "</martifHeader><text><body>"
 			
-			+ "<termEntry id=\"eid-Oracle-67\">"
+			+ "<termEntry id=\"eid1\">"
 			+ "<descrip type=\"subjectField\">manufacturing</descrip>"
 			+ "<descrip type=\"definition\">def text</descrip>"
 			+ "<langSet xml:lang=\"en\">"
 			+ "<tig>"
-			+ "<term id=\"tid-Oracle-67-en1\">en text</term>"
+			+ "<term id=\"eid1-en1\">en text</term>"
 			+ "<termNote type=\"partOfSpeech\">noun-en</termNote>"
 			+ "</tig></langSet>"
 			+ "<langSet xml:lang=\"hu\">"
 			+ "<tig>"
-			+ "<term id=\"tid-Oracle-67-hu1\">hu text</term>"
+			+ "<term id=\"eid1-hu1\">hu <hi>special</hi> text</term>"
 			+ "<termNote type=\"partOfSpeech\">noun-hu</termNote>"
 			+ "</tig></langSet>"
 			+ "</termEntry>"
@@ -78,11 +87,12 @@ public class TBXReaderTest {
 
 			+ "</body></text></martif>";
 
-		List<GlossaryEntry> list = getEntries(snippet);
+		List<GlossaryEntry> list = getEntries(snippet, null);
 		assertNotNull(list);
 		assertEquals(2, list.size());
 		
 		GlossaryEntry gent = list.get(0);
+		assertEquals("eid1", gent.getId());
 		assertTrue(gent.hasLocale(locEN));
 		LangEntry lent = gent.getEntries(locEN);
 		TermEntry tent = lent.getTerm(0);
@@ -91,7 +101,7 @@ public class TBXReaderTest {
 		assertTrue(gent.hasLocale(locHU));
 		lent = gent.getEntries(locHU);
 		tent = lent.getTerm(0);
-		assertEquals("hu text", tent.getText());
+		assertEquals("hu special text", tent.getText());
 
 		gent = list.get(1);
 		assertTrue(gent.hasLocale(locFR));
@@ -111,20 +121,70 @@ public class TBXReaderTest {
 			+ "</martifHeader><text><body>"
 			+ "</body></text></martif>";
 
-		List<GlossaryEntry> list = getEntries(snippet);
+		List<GlossaryEntry> list = getEntries(snippet, null);
 		assertNotNull(list);
 		assertEquals(0, list.size());
 	}
-	
-	List<GlossaryEntry> getEntries (String snippet) {
+
+	@Test
+	public void testFromFiles () {
+		File file = new File(root+"test01.tbx");
+		List<GlossaryEntry> list = getEntries(null, file);
+		assertEquals(1, list.size());
+		assertEquals("eid-Oracle-67", list.get(0).getId());
+
+		file = new File(root+"sdl_tbx.tbx");
+		list = getEntries(null, file);
+		assertEquals(223, list.size());
+		assertEquals("c228", list.get(list.size()-1).getId());
+
+		file = new File(root+"ibm_tbx.tbx");
+		list = getEntries(null, file);
+		assertEquals(5, list.size());
+		assertEquals("c5", list.get(list.size()-1).getId());
+		
+		file = new File(root+"maryland.tbx");
+		list = getEntries(null, file);
+		assertEquals(1, list.size());
+		assertEquals("eid-VocCod-211.01", list.get(list.size()-1).getId());
+		
+		file = new File(root+"medtronic_TBX.tbx");
+		list = getEntries(null, file);
+		assertEquals(3, list.size());
+		assertEquals("c7333", list.get(list.size()-1).getId());
+		
+		file = new File(root+"oracle_TBX.tbx");
+		list = getEntries(null, file);
+		assertEquals(2, list.size());
+		assertEquals("c2", list.get(list.size()-1).getId());
+	}
+
+	// Comment out for SVN
+//	@Test
+//	public void testBigFile () {
+//		File file = new File(root+"MicrosoftTermCollection_FR.tbx");
+//		List<GlossaryEntry> list = getEntries(null, file);
+//		assertNotNull(list);
+//		GlossaryEntry gent = list.get(list.size()-1);
+//		assertEquals(17133, list.size());
+//		assertEquals("27766_1436100", gent.getId());
+//	}
+
+	// Use either snippet or file
+	List<GlossaryEntry> getEntries (String snippet, File file) {
 		try {
 			ArrayList<GlossaryEntry> list = new ArrayList<GlossaryEntry>();
 			
 			//IGlossaryReader tbx = new TBXJaxbReader();
 			IGlossaryReader tbx = new TBXReader();
 			
-			InputStream is = new ByteArrayInputStream(snippet.getBytes("UTF-8"));
-			tbx.open(is);
+			if ( file == null ) {
+				InputStream is = new ByteArrayInputStream(snippet.getBytes("UTF-8"));
+				tbx.open(is);
+			}
+			else {
+				tbx.open(file);
+			}
 			while ( tbx.hasNext() ) {
 				list.add(tbx.next());
 			}

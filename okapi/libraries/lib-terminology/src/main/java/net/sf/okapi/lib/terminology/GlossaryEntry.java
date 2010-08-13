@@ -27,13 +27,37 @@ import net.sf.okapi.common.LocaleId;
 
 public class GlossaryEntry extends BaseEntry {
 	
-	String id;
-	Map<LocaleId, LangEntry> langs;
+	private String id;
+	private Map<LocaleId, LangEntry> langs;
 
+	/**
+	 * Creates a new GlossaryEntry object.
+	 */
 	public GlossaryEntry () {
 		langs = new HashMap<LocaleId, LangEntry>();
 	}
+	
+	/**
+	 * Gets the ID for this glossary entry.
+	 * @return the ID for this glossary entry.
+	 */
+	public String getId () {
+		return id;
+	}
+	
+	/**
+	 * Sets the ID for this glossary entry.
+	 * @param id the ID for this glossary entry.
+	 */
+	public void setId (String id) {
+		this.id = id;
+	}
 
+	/**
+	 * Indicates if there is a set of terms defined for a given locale.
+	 * @param locId the locale to query.
+	 * @return true if there is a set of terms defined for the given locale.
+	 */
 	public boolean hasLocale (LocaleId locId) {
 		return (langs.get(locId) != null);
 	}
@@ -58,6 +82,10 @@ public class GlossaryEntry extends BaseEntry {
 
 	public void addLangEntry (LangEntry lent) {
 		langs.put(lent.locId, lent);
+	}
+	
+	public void removeEntries (LocaleId locId) {
+		langs.remove(locId);
 	}
 
 }

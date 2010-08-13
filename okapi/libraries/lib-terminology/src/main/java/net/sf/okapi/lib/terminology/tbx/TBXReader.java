@@ -31,6 +31,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.lib.terminology.GlossaryEntry;
 import net.sf.okapi.lib.terminology.IGlossaryReader;
@@ -119,7 +120,12 @@ public class TBXReader implements IGlossaryReader {
 	}
 
 	private void processTermEntry () throws XMLStreamException {
+		String id = reader.getAttributeValue(null, "id");
+		if ( Util.isEmpty(id) ) {
+			throw new OkapiIOException("Missing or empty id for termEntry.");
+		}
 		gent = new GlossaryEntry();
+		gent.setId(id);
 		
 		String name;
 		while ( reader.hasNext() ) {
@@ -144,12 +150,12 @@ public class TBXReader implements IGlossaryReader {
 
 	private void processLangSet () throws XMLStreamException {
 		// Get the language information
-		String tmp = reader.getAttributeValue(XMLConstants.XML_NS_URI, "lang");
-		if ( tmp == null ) {
-			throw new OkapiIOException("Missing xml;lang attribute.");
+		String lang = reader.getAttributeValue(XMLConstants.XML_NS_URI, "lang");
+		if ( Util.isEmpty(lang) ) {
+			throw new OkapiIOException("Missing or empty xml:lang attribute.");
 		}
 		// Create the new language entry
-		lent = new LangEntry(LocaleId.fromString(tmp));
+		lent = new LangEntry(LocaleId.fromString(lang));
 
 		String name;
 		while ( reader.hasNext() ) {
