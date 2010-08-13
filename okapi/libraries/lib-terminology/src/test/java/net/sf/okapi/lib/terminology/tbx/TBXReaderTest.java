@@ -42,6 +42,7 @@ public class TBXReaderTest {
 	private LocaleId locEN = LocaleId.ENGLISH;
 	private LocaleId locFR = LocaleId.FRENCH;
 	private LocaleId locHU = LocaleId.fromString("hu");
+	private LocaleId locTR = LocaleId.fromString("tr");
 	private String root;
 	
 	public TBXReaderTest () {
@@ -129,6 +130,17 @@ public class TBXReaderTest {
 		assertEquals(0, list.size());
 	}
 
+	@Test
+	public void testEncoding () {
+		File file = new File(root+"test02_win1254.tbx");
+		List<ConceptEntry> list = getConcepts(null, file);
+		assertEquals(1, list.size());
+		ConceptEntry cent = list.get(0);
+		assertEquals("id1", cent.getId());
+		assertEquals("term with: \u00e9\u00e1 and \u0130\u0131", cent.getEntries(locEN).getTerm(0).getText());
+		assertEquals("tr term with: \u00e9\u00e1 and \u0130\u0131", cent.getEntries(locTR).getTerm(0).getText());
+	}
+	
 	@Test
 	public void testFromFiles () {
 		File file = new File(root+"test01.tbx");
