@@ -15,7 +15,6 @@
   <icon>checkmate.ico</icon>
   <classPath>
     <mainClass>net.sf.okapi.applications.checkmate.Main</mainClass>
-    <cp>swt.jar</cp>
     <cp>checkmate.jar</cp>
   </classPath>
   <jre>

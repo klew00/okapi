@@ -29,7 +29,7 @@ import java.util.List;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.lib.terminology.GlossaryEntry;
+import net.sf.okapi.lib.terminology.ConceptEntry;
 import net.sf.okapi.lib.terminology.IGlossaryReader;
 import net.sf.okapi.lib.terminology.LangEntry;
 import net.sf.okapi.lib.terminology.TermEntry;
@@ -87,11 +87,11 @@ public class TBXReaderTest {
 
 			+ "</body></text></martif>";
 
-		List<GlossaryEntry> list = getEntries(snippet, null);
+		List<ConceptEntry> list = getConcepts(snippet, null);
 		assertNotNull(list);
 		assertEquals(2, list.size());
 		
-		GlossaryEntry gent = list.get(0);
+		ConceptEntry gent = list.get(0);
 		assertEquals("eid1", gent.getId());
 		assertTrue(gent.hasLocale(locEN));
 		LangEntry lent = gent.getEntries(locEN);
@@ -124,7 +124,7 @@ public class TBXReaderTest {
 			+ "</martifHeader><text><body>"
 			+ "</body></text></martif>";
 
-		List<GlossaryEntry> list = getEntries(snippet, null);
+		List<ConceptEntry> list = getConcepts(snippet, null);
 		assertNotNull(list);
 		assertEquals(0, list.size());
 	}
@@ -132,32 +132,32 @@ public class TBXReaderTest {
 	@Test
 	public void testFromFiles () {
 		File file = new File(root+"test01.tbx");
-		List<GlossaryEntry> list = getEntries(null, file);
+		List<ConceptEntry> list = getConcepts(null, file);
 		assertEquals(1, list.size());
 		assertEquals("eid-Oracle-67", list.get(0).getId());
 
 		file = new File(root+"sdl_tbx.tbx");
-		list = getEntries(null, file);
+		list = getConcepts(null, file);
 		assertEquals(223, list.size());
 		assertEquals("c228", list.get(list.size()-1).getId());
 
 		file = new File(root+"ibm_tbx.tbx");
-		list = getEntries(null, file);
+		list = getConcepts(null, file);
 		assertEquals(5, list.size());
 		assertEquals("c5", list.get(list.size()-1).getId());
 		
 		file = new File(root+"maryland.tbx");
-		list = getEntries(null, file);
+		list = getConcepts(null, file);
 		assertEquals(1, list.size());
 		assertEquals("eid-VocCod-211.01", list.get(list.size()-1).getId());
 		
 		file = new File(root+"medtronic_TBX.tbx");
-		list = getEntries(null, file);
+		list = getConcepts(null, file);
 		assertEquals(3, list.size());
 		assertEquals("c7333", list.get(list.size()-1).getId());
 		
 		file = new File(root+"oracle_TBX.tbx");
-		list = getEntries(null, file);
+		list = getConcepts(null, file);
 		assertEquals(2, list.size());
 		assertEquals("c2", list.get(list.size()-1).getId());
 	}
@@ -174,9 +174,9 @@ public class TBXReaderTest {
 //	}
 
 	// Use either snippet or file
-	List<GlossaryEntry> getEntries (String snippet, File file) {
+	List<ConceptEntry> getConcepts (String snippet, File file) {
 		try {
-			ArrayList<GlossaryEntry> list = new ArrayList<GlossaryEntry>();
+			ArrayList<ConceptEntry> list = new ArrayList<ConceptEntry>();
 			
 			//IGlossaryReader tbx = new TBXJaxbReader();
 			IGlossaryReader tbx = new TBXReader();

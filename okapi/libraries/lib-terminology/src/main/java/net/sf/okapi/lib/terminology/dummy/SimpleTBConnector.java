@@ -5,7 +5,7 @@ import java.util.List;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.lib.terminology.GlossaryEntry;
+import net.sf.okapi.lib.terminology.ConceptEntry;
 import net.sf.okapi.lib.terminology.ITermAccess;
 import net.sf.okapi.lib.terminology.TermHit;
 
@@ -42,7 +42,7 @@ public class SimpleTBConnector implements ITermAccess {
 		return tb.getExistingTerms(fragment, sourceLocId, targetLocId);
 	}
 	
-	public GlossaryEntry addEntry (LocaleId locId,
+	public ConceptEntry addEntry (LocaleId locId,
 		String term)
 	{
 		return tb.addEntry(locId, term);

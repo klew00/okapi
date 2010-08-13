@@ -33,15 +33,15 @@ import javax.xml.stream.XMLStreamReader;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiIOException;
-import net.sf.okapi.lib.terminology.GlossaryEntry;
+import net.sf.okapi.lib.terminology.ConceptEntry;
 import net.sf.okapi.lib.terminology.IGlossaryReader;
 import net.sf.okapi.lib.terminology.LangEntry;
 import net.sf.okapi.lib.terminology.TermEntry;
 
 public class TBXReader implements IGlossaryReader {
 
-	private GlossaryEntry entry;
-	private GlossaryEntry gent;
+	private ConceptEntry nextEntry;
+	private ConceptEntry cent;
 	private LangEntry lent;
 	private XMLStreamReader reader;
 
@@ -74,7 +74,7 @@ public class TBXReader implements IGlossaryReader {
 
 	@Override
 	public void close () {
-		entry = null;
+		nextEntry = null;
 		try {
 			if ( reader != null ) {
 				reader.close();
@@ -88,19 +88,19 @@ public class TBXReader implements IGlossaryReader {
 
 	@Override
 	public boolean hasNext () {
-		return (entry != null);
+		return (nextEntry != null);
 	}
 
 	@Override
-	public GlossaryEntry next () {
-		GlossaryEntry toSend = entry;
-		readNext(); // Parse the next entry
-		return toSend;
+	public ConceptEntry next () {
+		ConceptEntry currentEntry = nextEntry; // Next entry becomes the current one
+		readNext(); // Parse the new next entry
+		return currentEntry; // Send the current entry
 	}
 
 	private void readNext () {
 		try {
-			entry = gent = null;
+			nextEntry = cent = null;
 			while ( reader.hasNext() ) {
 				int eventType = reader.next();
 				switch ( eventType ) {
@@ -120,8 +120,8 @@ public class TBXReader implements IGlossaryReader {
 	}
 
 	private void processTermEntry () throws XMLStreamException {
-		gent = new GlossaryEntry();
-		gent.setId(reader.getAttributeValue(null, "id"));
+		cent = new ConceptEntry();
+		cent.setId(reader.getAttributeValue(null, "id"));
 		String name;
 		while ( reader.hasNext() ) {
 			int eventType = reader.next();
@@ -135,7 +135,7 @@ public class TBXReader implements IGlossaryReader {
 			case XMLStreamConstants.END_ELEMENT:
 				name = reader.getLocalName();
 				if ( "termEntry".equals(name) ) {
-					entry = gent; // No error, we can set the real entry
+					nextEntry = cent; // No error, we can set the real entry
 					return; // This termEntry is done
 				}
 				break;
@@ -168,7 +168,7 @@ public class TBXReader implements IGlossaryReader {
 			case XMLStreamConstants.END_ELEMENT:
 				name = reader.getLocalName();
 				if ( "langSet".equals(name) ) {
-					gent.addLangEntry(lent);
+					cent.addLangEntry(lent);
 					return; // This langSet is done
 				}
 				break;

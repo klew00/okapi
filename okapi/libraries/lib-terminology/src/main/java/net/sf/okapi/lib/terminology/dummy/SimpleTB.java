@@ -34,7 +34,7 @@ import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.lib.terminology.GlossaryEntry;
+import net.sf.okapi.lib.terminology.ConceptEntry;
 import net.sf.okapi.lib.terminology.LangEntry;
 import net.sf.okapi.lib.terminology.TermHit;
 
@@ -45,12 +45,12 @@ import net.sf.okapi.lib.terminology.TermHit;
 public class SimpleTB {
 	
 	private IFilterConfigurationMapper fcMapper;
-	private List<GlossaryEntry> entries;
+	private List<ConceptEntry> entries;
 	
 	
 	public SimpleTB (IFilterConfigurationMapper fcMapper) {
 		this.fcMapper = fcMapper;
-		entries = new ArrayList<GlossaryEntry>();
+		entries = new ArrayList<ConceptEntry>();
 	}
 	
 	public void importDocument (RawDocument rawDoc) {
@@ -71,7 +71,7 @@ public class SimpleTB {
 					for ( Segment seg : srcSegs ) {
 						Segment trgSeg = trgSegs.get(seg.id);
 						if ( trgSeg == null ) continue;
-						GlossaryEntry gent = addEntry(srcLoc, seg.text.toString());
+						ConceptEntry gent = addEntry(srcLoc, seg.text.toString());
 						gent.addTerm(trgLoc, trgSeg.text.toString());
 						entries.add(gent);
 					}
@@ -94,10 +94,10 @@ public class SimpleTB {
 //		createEntry(srcLoc, "channel").addTerm(trgLoc, "chaine");
 //	}
 	
-	public GlossaryEntry addEntry (LocaleId locId,
+	public ConceptEntry addEntry (LocaleId locId,
 		String term)
 	{
-		GlossaryEntry gent = new GlossaryEntry();
+		ConceptEntry gent = new ConceptEntry();
 		gent.addTerm(locId, term);
 		entries.add(gent);
 		return gent;
@@ -115,10 +115,10 @@ public class SimpleTB {
 		
 		List<TermHit> res = new ArrayList<TermHit>();
 	
-		for ( GlossaryEntry gent : entries ) {
-			LangEntry srcLent = gent.getEntries(srcLoc);
+		for ( ConceptEntry cent : entries ) {
+			LangEntry srcLent = cent.getEntries(srcLoc);
 			if ( srcLent == null ) continue;
-			LangEntry trgLent = gent.getEntries(trgLoc);
+			LangEntry trgLent = cent.getEntries(trgLoc);
 			if ( trgLent == null ) continue;
 			if ( !srcLent.hasTerm() || !trgLent.hasTerm() ) continue;
 			

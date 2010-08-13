@@ -35,6 +35,6 @@ public interface IGlossaryReader {
 	 * Gets the next entry in this glossary.
 	 * @return the next entry in this glossary.
 	 */
-	public GlossaryEntry next ();
+	public ConceptEntry next ();
 	
 }

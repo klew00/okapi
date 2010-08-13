@@ -25,15 +25,15 @@ import java.util.Map;
 
 import net.sf.okapi.common.LocaleId;
 
-public class GlossaryEntry extends BaseEntry {
+public class ConceptEntry extends BaseEntry {
 	
 	private String id;
 	private Map<LocaleId, LangEntry> langs;
 
 	/**
-	 * Creates a new GlossaryEntry object.
+	 * Creates a new ConceptEntry object.
 	 */
-	public GlossaryEntry () {
+	public ConceptEntry () {
 		langs = new HashMap<LocaleId, LangEntry>();
 	}
 	

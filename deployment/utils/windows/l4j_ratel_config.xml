@@ -15,7 +15,6 @@
   <icon>ratel.ico</icon>
   <classPath>
     <mainClass>net.sf.okapi.applications.ratel.Main</mainClass>
-    <cp>swt.jar</cp>
     <cp>ratel.jar</cp>
   </classPath>
   <jre>

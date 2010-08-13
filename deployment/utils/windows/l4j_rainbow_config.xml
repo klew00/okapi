@@ -15,7 +15,7 @@
   <icon>rainbow.ico</icon>
   <classPath>
     <mainClass>net.sf.okapi.applications.rainbow.Main</mainClass>
-    <cp>swt.jar</cp>
+    <cp>rainbow.jar</cp>
   </classPath>
   <jre>
     <path></path>

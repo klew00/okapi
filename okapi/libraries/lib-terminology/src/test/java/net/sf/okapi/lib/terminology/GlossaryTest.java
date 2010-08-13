@@ -36,16 +36,16 @@ public class GlossaryTest {
 	
 	@Test
 	public void testTermAccess () {
-		GlossaryEntry gent = new GlossaryEntry();
-		assertFalse(gent.hasLocale(locEN));
-		gent.addTerm(locEN, "test-en");
-		assertTrue(gent.hasLocale(locEN));
-		assertEquals("test-en", gent.getEntries(locEN).getTerm(0).getText());
+		ConceptEntry cent = new ConceptEntry();
+		assertFalse(cent.hasLocale(locEN));
+		cent.addTerm(locEN, "test-en");
+		assertTrue(cent.hasLocale(locEN));
+		assertEquals("test-en", cent.getEntries(locEN).getTerm(0).getText());
 		
-		gent.removeEntries(locFR); // No effect;
-		assertTrue(gent.hasLocale(locEN));
-		gent.removeEntries(locEN); // Remove
-		assertFalse(gent.hasLocale(locEN));
+		cent.removeEntries(locFR); // No effect;
+		assertTrue(cent.hasLocale(locEN));
+		cent.removeEntries(locEN); // Remove
+		assertFalse(cent.hasLocale(locEN));
 	}
 
 	@Test
