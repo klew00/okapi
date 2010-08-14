@@ -27,6 +27,8 @@ import net.sf.okapi.common.BaseParameters;
 
 public class Parameters extends BaseParameters {
 	
+	public static final String FILE_EXTENSION = ".cfg";
+
 	public static final int SCOPE_ALL = 0;
 	public static final int SCOPE_APPROVEDONLY = 1;
 	public static final int SCOPE_NOTAPPROVEDONLY = 2;

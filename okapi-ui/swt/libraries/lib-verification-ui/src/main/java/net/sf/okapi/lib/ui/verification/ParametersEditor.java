@@ -196,7 +196,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private void create (Shell parent,
 		boolean readOnly)
 	{
-		shell.setText("Quality Check Options");
+		shell.setText("Quality Check Configuration");
 		if ( parent != null ) UIUtil.inheritIcon(shell, parent);
 		GridLayout layTmp = new GridLayout();
 		layTmp.marginBottom = 0;

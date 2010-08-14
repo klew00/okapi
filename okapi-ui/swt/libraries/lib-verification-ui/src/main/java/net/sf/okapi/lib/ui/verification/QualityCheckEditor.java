@@ -46,6 +46,7 @@ import net.sf.okapi.lib.verification.IQualityCheckEditor;
 import net.sf.okapi.lib.verification.Issue;
 import net.sf.okapi.lib.verification.IssueComparator;
 import net.sf.okapi.lib.verification.IssueType;
+import net.sf.okapi.lib.verification.Parameters;
 import net.sf.okapi.lib.verification.QualityCheckSession;
 
 import org.eclipse.swt.SWT;
@@ -382,14 +383,6 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		topItem.setMenu(dropMenu);
 		
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(menuItem, "issues.options"); //$NON-NLS-1$
-		menuItem.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent event) {
-				editOptions();
-            }
-		});
-		
-		menuItem = new MenuItem(dropMenu, SWT.PUSH);
 		rm.setCommand(menuItem, "issues.resetdisabledissues"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
@@ -399,6 +392,32 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		
 		new MenuItem(dropMenu, SWT.SEPARATOR);
 
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "issues.editConfiguration"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				editConfiguration();
+            }
+		});
+		
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "issues.saveConfiguration"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				saveConfiguration();
+            }
+		});
+
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "issues.loadConfiguration"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				loadConfiguration();
+            }
+		});
+
+		new MenuItem(dropMenu, SWT.SEPARATOR);
+		
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
 		rm.setCommand(menuItem, "issues.checkall"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
@@ -531,10 +550,10 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		new MenuItem(contextMenu, SWT.SEPARATOR);
 
 		menuItem = new MenuItem(contextMenu, SWT.PUSH);
-		rm.setCommand(menuItem, "issues.options"); //$NON-NLS-1$
+		rm.setCommand(menuItem, "issues.editConfiguration"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				editOptions();
+				editConfiguration();
             }
 		});
 
@@ -824,10 +843,10 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		
 		Button btOptions = new Button(cmpButtons, SWT.PUSH);
 		btOptions.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		btOptions.setText("Options...");
+		btOptions.setText("Configuration...");
 		btOptions.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				editOptions();
+				editConfiguration();
 			}
 		});
 		
@@ -1338,7 +1357,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		}
 	}
 
-	private void editOptions () {
+	private void editConfiguration () {
 		try {
 			ParametersEditor editor = new ParametersEditor();
 			BaseContext context = new BaseContext();
@@ -1355,6 +1374,42 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, "Error editing options.\n"+e.getMessage(), null);
+		}
+	}
+
+	private void saveConfiguration () {
+		try {
+			String path = Dialogs.browseFilenamesForSave(shell, "Save Configuration", null,
+				String.format("Quality Check Configurations (*%s)\tAll Files (*.*)", Parameters.FILE_EXTENSION),
+				String.format("*%s\t*.*", Parameters.FILE_EXTENSION));
+				if ( path == null ) return;
+			startWaiting("Saving configuration...");
+			Parameters params = session.getParameters();
+			params.save(path);
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, "Error while saving configuration.\n"+e.getMessage(), null);
+		}
+		finally {
+			stopWaiting();
+		}
+	}
+
+	private void loadConfiguration () {
+		try {
+			String[] paths = Dialogs.browseFilenames(shell, "Load Configuration", false, null,
+				String.format("Quality Check Sessions (*%s)\tAll Files (*.*)", Parameters.FILE_EXTENSION),
+				String.format("*%s\t*.*", Parameters.FILE_EXTENSION));
+			if ( paths == null ) return;
+			startWaiting("Loading configuration...");
+			Parameters params = session.getParameters();
+			params.load((new File(paths[0])).toURI(), false);
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, "Error while saving configuration.\n"+e.getMessage(), null);
+		}
+		finally {
+			stopWaiting();
 		}
 	}
 
