@@ -22,17 +22,6 @@ public class ManualTry {
 	    	BaseHelp help = new BaseHelp("dummyRoot");
 			qce.initialize(shlMain, false, help, fcMapper, null);
 			qce.edit(false);
-			
-		    shlMain.open();
-		    
-		    // Set up the event loop.
-		    while (!shlMain.isDisposed()) {
-		    	if (!dispMain.readAndDispatch()) {
-		    		// If no more entries in event queue
-		    		dispMain.sleep();
-		    	}
-		    }
-
 		}
 		catch ( Throwable e ) {
 			e.printStackTrace();

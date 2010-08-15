@@ -20,6 +20,7 @@
 
 package net.sf.okapi.lib.ui.verification;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
@@ -64,9 +65,9 @@ import org.eclipse.swt.widgets.Text;
 @EditorFor(Parameters.class)
 public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParametersEditor {
 
-	private static final int TAB_CHARACTERS = 2;
-	private static final int TAB_LANGUAGETOOL = 3;
-	private static final int TAB_OUTPUT = 4;
+	private static final int TAB_CHARACTERS = 3;
+	private static final int TAB_LANGUAGETOOL = 4;
+	private static final int TAB_OTHER = 6;
 	
 	private static final int INFOCOLWIDTH = 120;
 	
@@ -629,15 +630,15 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		rdScopeNotApprovedOnly = new Button(grpScope, SWT.RADIO);
 		rdScopeNotApprovedOnly.setText("Process only entries not approved (e.g. \"fuzzy\" entries in PO files)");
 
-		Group grpOut = new Group(cmpTmp, SWT.NONE);
-		grpOut.setText("Report output");
-		grpOut.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		grpOut.setLayout(new GridLayout());
+		Group grpTmp = new Group(cmpTmp, SWT.NONE);
+		grpTmp.setText("Report output");
+		grpTmp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		grpTmp.setLayout(new GridLayout());
 
-		label = new Label(grpOut, SWT.NONE);
+		label = new Label(grpTmp, SWT.NONE);
 		label.setText("Path of the report file:");
 		
-		pnlOutputPath = new TextAndBrowsePanel(grpOut, SWT.NONE, false);
+		pnlOutputPath = new TextAndBrowsePanel(grpTmp, SWT.NONE, false);
 		pnlOutputPath.setSaveAs(true);
 		pnlOutputPath.setTitle("Quality Check Report");
 		pnlOutputPath.setBrowseFilters("HTML Files (*.html;*.htm)\tAll Files (*.*)", "*.html;*.htm\t*.*");
@@ -645,9 +646,30 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		pnlOutputPath.setLayoutData(gdTmp);
 
-		chkAutoOpen = new Button(grpOut, SWT.CHECK);
+		chkAutoOpen = new Button(grpTmp, SWT.CHECK);
 		chkAutoOpen.setText("Open the report after completion");
 
+		// Save/Load buttons
+		
+		grpTmp = new Group(cmpTmp, SWT.NONE);
+		grpTmp.setText("Configuration Import / Export");
+		grpTmp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		grpTmp.setLayout(new GridLayout(2, false));
+		
+		Button btTmp = UIUtil.createGridButton(grpTmp, SWT.PUSH, "Import...", UIUtil.BUTTON_DEFAULT_WIDTH, 1);
+		btTmp.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				importConfiguration();
+			};
+		});
+
+		btTmp = UIUtil.createGridButton(grpTmp, SWT.PUSH, "Export...", UIUtil.BUTTON_DEFAULT_WIDTH, 1);
+		btTmp.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				exportConfiguration();
+			};
+		});
+		
 		if ( stepMode ) {
 			chkSaveSession = new Button(cmpTmp, SWT.CHECK);
 			chkSaveSession.setText("Save the session using the following path:");
@@ -682,6 +704,34 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 				shell.getDisplay().sleep();
 		}
 		return result;
+	}
+	
+	private void exportConfiguration () {
+		try {
+			if ( !saveData() ) return;
+			String path = Dialogs.browseFilenamesForSave(shell, "Export Configuration", null,
+				String.format("Quality Check Configurations (*%s)\tAll Files (*.*)", Parameters.FILE_EXTENSION),
+				String.format("*%s\t*.*", Parameters.FILE_EXTENSION));
+				if ( path == null ) return;
+			params.save(path);
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, "Error while saving configuration.\n"+e.getMessage(), null);
+		}
+	}
+	
+	private void importConfiguration () {
+		try {
+			String[] paths = Dialogs.browseFilenames(shell, "Import Configuration", false, null,
+				String.format("Quality Check Sessions (*%s)\tAll Files (*.*)", Parameters.FILE_EXTENSION),
+				String.format("*%s\t*.*", Parameters.FILE_EXTENSION));
+			if ( paths == null ) return;
+			params.load((new File(paths[0])).toURI(), false);
+			setData();
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, "Error while saving configuration.\n"+e.getMessage(), null);
+		}
 	}
 	
 	private void startLT () {
@@ -1033,7 +1083,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private boolean saveData () {
 		if ( pnlOutputPath.getText().trim().length() == 0 ) {
 			Dialogs.showError(shell, "Please, enter a path for the report.", null);
-			tabs.setSelection(TAB_OUTPUT);
+			tabs.setSelection(TAB_OTHER);
 			pnlOutputPath.setFocus();
 			return false;
 		}
