@@ -983,7 +983,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		shell.setSize(startSize);
 		
 		// Maximize if requested
-		if ( config.getBoolean(OPT_MAXIMIZED) ) { //$NON-NLS-1$
+		if ( config.getBoolean(OPT_MAXIMIZED) ) {
 			shell.setMaximized(true);
 		}
 		else { // Or try to re-use the bounds of the previous session
@@ -1398,7 +1398,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 	private void loadConfiguration () {
 		try {
 			String[] paths = Dialogs.browseFilenames(shell, "Load Configuration", false, null,
-				String.format("Quality Check Sessions (*%s)\tAll Files (*.*)", Parameters.FILE_EXTENSION),
+				String.format("Quality Check Configurations (*%s)\tAll Files (*.*)", Parameters.FILE_EXTENSION),
 				String.format("*%s\t*.*", Parameters.FILE_EXTENSION));
 			if ( paths == null ) return;
 			startWaiting("Loading configuration...");

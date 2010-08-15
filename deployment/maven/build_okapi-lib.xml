@@ -275,6 +275,7 @@
 		   <fileset dir="../shared/licenses" includes="**/h2-*"/>
 		</copy>
 
+<!-- Not needed anymore (opentra using rest api)
 		<property name="dep006" value="${mavenStore}/org/apache/ws/commons/util/ws-commons-util/1.0.2"/>
 		<fileset id="list.contents" dir="${dep006}"
 		 includes="**/ws-commons-util-1.0.2.jar"/>
@@ -291,7 +292,7 @@
 		<property name="jar007" refid="list.contents"/>
 		<echo file="tmpJars" append="yes"> ${jar007}</echo>
 		<copy todir="${distLib}" file="${dep007}/${jar007}"/>
-		<!-- + -->
+		+
 		<property name="dep008" value="${mavenStore}/org/apache/xmlrpc/xmlrpc-common/3.1"/>
 		<fileset id="list.contents" dir="${dep008}"
 		 includes="**/xmlrpc-common-3.1.jar"/>
@@ -301,6 +302,7 @@
 		<copy todir="${distLicenses}">
 		   <fileset dir="../shared/licenses" includes="**/xmlrpc-*"/>
 		</copy>
+-->
 
 		<property name="dep009" value="${mavenStore}/com/googlecode/json-simple/json-simple/1.1"/>
 		<fileset id="list.contents" dir="${dep009}"
@@ -394,7 +396,7 @@
 		<echo file="tmpJars" append="yes"> ${jar021}</echo>
 		<copy todir="${distLib}" file="${dep021}/${jar021}"/>
 		<copy todir="${distLicenses}">
-		   <fileset dir="../shared/licenses" includes="**/trove-*"/>
+		   <fileset dir="../shared/licenses" includes="**/trove*"/>
 		</copy>
 		
 		<property name="dep022" value="${mavenStore}/org/apache/commons/commons-exec/1.0.1"/>

@@ -83,8 +83,13 @@ import org.eclipse.swt.widgets.Text;
 
 public class SRXEditor {
 
+	private static final String OPT_BOUNDS = "bounds"; //$NON-NLS-1$
+	private static final String OPT_MAXIMIZED = "maximized"; //$NON-NLS-1$
 	private static final String APPNAME = "Ratel"; //$NON-NLS-1$
-	
+	private static final String CFG_TESTINPUTPATH = "testInputPath"; //$NON-NLS-1$
+	private static final String CFG_TESTOUTPUTPATH = "testOutputPath"; //$NON-NLS-1$
+	private static final String CFG_HTMLOUTPUT = "htmlOutput"; //$NON-NLS-1$
+
 	private Shell shell;
 	private Text edSampleText;
 	private Text edResults;
@@ -130,9 +135,9 @@ public class SRXEditor {
 	{
 		config = new UserConfiguration();
 		config.load(APPNAME);
-		testInputPath = config.getProperty("testInputPath"); //$NON-NLS-1$
-		testOutputPath = config.getProperty("testOutputPath"); //$NON-NLS-1$
-		htmlOutput = config.getBoolean("htmlOutput"); //$NON-NLS-1$
+		testInputPath = config.getProperty(CFG_TESTINPUTPATH);
+		testOutputPath = config.getProperty(CFG_TESTOUTPUTPATH);
+		htmlOutput = config.getBoolean(CFG_HTMLOUTPUT);
 
 		help = helpParam;
 		srxDoc = new SRXDocument();
@@ -414,10 +419,26 @@ public class SRXEditor {
 		if ( startSize.x < 700 ) startSize.x = 700; 
 		if ( startSize.y < 600 ) startSize.y = 600; 
 		shell.setSize(startSize);
-		if ( asDialog ) {
-			Dialogs.centerWindow(shell, parent);
-		}
 		
+		// Maximize if requested
+		if ( config.getBoolean(OPT_MAXIMIZED) ) {
+			shell.setMaximized(true);
+		}
+		else { // Or try to re-use the bounds of the previous session
+			Rectangle ar = UIUtil.StringToRectangle(config.getProperty(OPT_BOUNDS));
+			if ( ar != null ) {
+				Rectangle dr = shell.getDisplay().getBounds();
+				if ( dr.contains(ar.x+ar.width, ar.y+ar.height)
+					&& dr.contains(ar.x, ar.y) ) {
+					shell.setBounds(ar);
+				}
+			}
+			else if ( asDialog ) {
+				Dialogs.centerWindow(shell, parent);
+			}
+		}
+
+
 		updateCaption();
 		updateAll();
 	}
@@ -1020,10 +1041,15 @@ public class SRXEditor {
 	 * @return False if the user cancel, true if a decision is made. 
 	 */
 	private boolean checkIfRulesNeedSaving () {
-		config.setProperty("testInputPath", testInputPath); //$NON-NLS-1$
-		config.setProperty("testOutputPath", testOutputPath); //$NON-NLS-1$
-		config.setProperty("htmlOutput", htmlOutput); //$NON-NLS-1$
-		config.save(APPNAME, "N/A"); //$NON-NLS-1$
+		config.setProperty(CFG_TESTINPUTPATH, testInputPath);
+		config.setProperty(CFG_TESTOUTPUTPATH, testOutputPath);
+		config.setProperty(CFG_HTMLOUTPUT, htmlOutput);
+		// Set the window placement
+		config.setProperty(OPT_MAXIMIZED, shell.getMaximized());
+		Rectangle r = shell.getBounds();
+		config.setProperty(OPT_BOUNDS, String.format("%d,%d,%d,%d", r.x, r.y, r.width, r.height)); //$NON-NLS-1$
+		// Save
+		config.save(APPNAME, getClass().getPackage().getImplementationVersion());
 		
 		getSurfaceData();
 		if ( srxDoc.isModified() ) {

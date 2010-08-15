@@ -723,7 +723,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private void importConfiguration () {
 		try {
 			String[] paths = Dialogs.browseFilenames(shell, "Import Configuration", false, null,
-				String.format("Quality Check Sessions (*%s)\tAll Files (*.*)", Parameters.FILE_EXTENSION),
+				String.format("Quality Check Configurations (*%s)\tAll Files (*.*)", Parameters.FILE_EXTENSION),
 				String.format("*%s\t*.*", Parameters.FILE_EXTENSION));
 			if ( paths == null ) return;
 			params.load((new File(paths[0])).toURI(), false);

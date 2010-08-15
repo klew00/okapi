@@ -38,22 +38,17 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
 import net.sf.okapi.lib.translation.TextMatcher;
 
-import org.apache.xmlrpc.XmlRpcException;
-import org.apache.xmlrpc.client.XmlRpcClient;
-import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 public class OpenTranTMConnector implements ITMQuery {
 
-	private static boolean useREST = false;
-	
-	private XmlRpcClient client;
 	private String srcCode;
 	private String trgCode;
 	private List<QueryResult> results;
@@ -76,21 +71,12 @@ public class OpenTranTMConnector implements ITMQuery {
 
 	@Override
 	public String getSettingsDisplay () {
-		if ( useREST ) {
-			return "REST services at http://open-tran.eu";
-		}
-		else {
-			return "Web services at http://open-tran.eu/RPC2";
-		}
+		return "REST services at http://open-tran.eu";
 	}
 	
 	@Override
 	public void close () {
-		if ( !useREST ) {
-			if ( client != null ) {
-				client = null; // Free to garbage collect
-			}
-		}
+		// Nothing to do
 	}
 
 	@Override
@@ -125,27 +111,17 @@ public class OpenTranTMConnector implements ITMQuery {
 
 	@Override
 	public void open () {
-		if ( useREST ) return;
-		// Else:
-		try {
-			//TODO: use the connection string
-			XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
-			config.setServerURL(new URL("http://open-tran.eu/RPC2"));
-			client = new XmlRpcClient();
-			client.setConfig(config);
-		}
-		catch ( MalformedURLException e ) {
-			throw new RuntimeException(e);
-		}
+		// Nothing to do
 	}
 	
 	@Override
 	public int query (String plainText) {
-		if ( useREST ) return restQuery(plainText);
-		else return rpcQuery(plainText);
+		return restQuery(plainText, false);
 	}
 
-	private int restQuery (String plainText) {
+	private int restQuery (String plainText,
+		boolean hasCode)
+	{
 		results = new ArrayList<QueryResult>();
 		current = -1;
 		try {
@@ -172,87 +148,38 @@ public class OpenTranTMConnector implements ITMQuery {
 	        		qr = new QueryResult();
 	        		qr.target = new TextFragment(text);
 	        		qr.source = new TextFragment((String)pairs.get("orig_phrase"));
+					String tmp = (String)pairs.get("path");
+					if ( !Util.isEmpty(tmp) ) {
+						qr.origin = tmp;
+					}
 		        	results.add(qr);
 					if ( ++count == maxHits ) break mainLoop;
 	        	}
 	        }
+
+			// Adjust scores
+			fixupResults(plainText, hasCode);
+
 			if ( results.size() > 0 ) current = 0;
 			return results.size();
 		}
 		catch ( MalformedURLException e ) {
-			throw new RuntimeException("Error when querying.", e);
+			throw new RuntimeException("URL error when querying.", e);
 		}
 		catch ( UnsupportedEncodingException e ) {
-			throw new RuntimeException("Error when querying.", e);
+			throw new RuntimeException("Encoding error when querying.", e);
 		}
 		catch ( IOException e ) {
-			throw new RuntimeException("Error when querying.", e);
+			throw new RuntimeException("IO error when querying.", e);
 		}
 		catch ( ParseException e ) {
 			throw new RuntimeException("Error when parsing JSON results.", e);
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	private int rpcQuery (String plainText) {
-		try {
-			current = -1;
-			results = new ArrayList<QueryResult>();
-			// Prepare the parameters
-			Object[] params = new Object[] {
-				new String(plainText),
-				new String(srcCode),
-				new String(trgCode),
-				new Integer(maxHits)};
-			
-			// Do the query
-			Object[] array = (Object[])client.execute("suggest3", params);
-			if (( array == null ) || ( array.length == 0 )) return 0;
-			
-			// Convert the results
-			QueryResult qr;
-			int count = 0;
-			mainLoop:
-			for ( Object obj1 : array ) {
-				Map<String, Object> map1 = (Map<String, Object>)obj1;
-				String trgText = (String)map1.get("text");
-				//int value = (Integer)map1.get("value");
-				//int count = (Integer)map1.get("count");
-				Object[] projects = (Object[])map1.get("projects");
-				for ( Object obj2 : projects ) {
-					Map<String, Object> map2 = (Map<String, Object>)obj2;
-					qr = new QueryResult();
-					qr.target = new TextFragment();
-					qr.target.append(trgText);
-					String tmp = (String)map2.get("orig_phrase");
-					qr.source = new TextFragment();
-					qr.source.append(tmp);
-					tmp = (String)map2.get("path");
-					if ( !Util.isEmpty(tmp) ) {
-						qr.origin = tmp;
-					}
-					results.add(qr);
-					// suggest3 maximum parameters limits the number of
-					// level-1 object returned, not the total number
-					if ( ++count == maxHits ) break mainLoop;
-				}
-			}
-
-			// Adjust scores
-			//TODO: re-order and re-filter results
-			fixupResults(plainText);
-			
-			current = 0;
-			return results.size();
-		}
-		catch ( XmlRpcException e ) {
-			throw new RuntimeException(e);
-		}
-	}
-
 	@Override
 	public int query (TextFragment text) {
-		return query(text.getCodedText());
+		return restQuery(TextUnitUtil.getText(text, null), text.hasCode());
 	}
 
 	@Override
@@ -330,7 +257,9 @@ public class OpenTranTMConnector implements ITMQuery {
 	 * more meaning full comparisons.
 	 * @param plainText the original text query.
 	 */
-	private void fixupResults (String plainText) {
+	private void fixupResults (String plainText,
+		boolean hasCodes)
+	{
 		if ( results.size() == 0 ) return;
 		List<String> tokens = matcher.prepareBaseTokens(plainText);
 		// Loop through the results
@@ -338,10 +267,12 @@ public class OpenTranTMConnector implements ITMQuery {
 			QueryResult qr = iter.next();
 			// Compute the adjusted score
 			qr.score = matcher.compareToBaseTokens(plainText, tokens, qr.source);
+			// Make sure we don't get exact if there are codes
+			if ( hasCodes && ( qr.score > 99 )) qr.score--;
 			// Remove the item if lower than the threshold 
 			if ( qr.score < threshold ) iter.remove();
 		}
-		// Re-order the list from the 
+		// Re-order the list based on the scores 
 		Collections.sort(results, scorComp);
 	}
 }
