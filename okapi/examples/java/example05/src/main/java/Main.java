@@ -18,15 +18,10 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-import java.util.Scanner;
-
-import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.IQuery;
 import net.sf.okapi.lib.translation.QueryResult;
-import net.sf.okapi.connectors.globalsight.GlobalSightTMConnector;
-import net.sf.okapi.connectors.globalsight.Parameters;
 import net.sf.okapi.connectors.opentran.OpenTranTMConnector;
 import net.sf.okapi.connectors.apertium.ApertiumMTConnector;
 
