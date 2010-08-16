@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.TextFragment;
 
 /**
@@ -67,7 +68,7 @@ public class AltTranslationsAnnotation implements IAnnotation, Iterable<AltTrans
 		TextFragment originalSource,
 		TextFragment alternateSource,
 		TextFragment alternateTarget,
-		AltTranslationType type,
+		MatchType type,
 		int score,
 		String origin)
 	{

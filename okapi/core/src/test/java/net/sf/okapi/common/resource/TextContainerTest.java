@@ -22,9 +22,9 @@ package net.sf.okapi.common.resource;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Range;
-import net.sf.okapi.common.annotation.AltTranslationType;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.filterwriter.GenericContent;
+import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import static org.junit.Assert.*;
 import org.junit.Test;
@@ -208,7 +208,7 @@ public class TextContainerTest {
         tc.setProperty(p1);
         AltTranslationsAnnotation ann1 = new AltTranslationsAnnotation();
         ann1.add(LocaleId.ENGLISH, LocaleId.FRENCH, null, new TextFragment("src"),
-        	new TextFragment("trg"), AltTranslationType.EXACT, 99, "origin");
+        	new TextFragment("trg"), MatchType.EXACT, 99, "origin");
         tc.setAnnotation(ann1);
 		TextContainer tc2 = tc.clone();
 		assertEquals(tc.getFirstContent().toString(), tc2.getFirstContent().toString());

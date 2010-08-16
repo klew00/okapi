@@ -30,11 +30,11 @@ import java.util.logging.Logger;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.AltTranslation;
-import net.sf.okapi.common.annotation.AltTranslationType;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.filterwriter.TMXWriter;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
@@ -509,8 +509,8 @@ public class QueryManager {
 						leveraged++;
 						// Temporary code for alt-trans annotation
 						AltTranslation at = new AltTranslation(srcLoc, trgLoc, seg.text, qr.source,
-								qr.target, AltTranslationType.UKNOWN,	qr.score, qr.origin);
-						at.setType((qr.fromMT ? AltTranslationType.MT : AltTranslationType.UKNOWN));
+								qr.target, MatchType.UKNOWN,	qr.score, qr.origin);
+						at.setType((qr.fromMT ? MatchType.MT : MatchType.UKNOWN));
 						addAltTranslation(seg, at);
 						continue;
 					}
@@ -523,8 +523,8 @@ public class QueryManager {
 					// temporary code for alt-trans annotation
 					// Temporary code for alt-trans annotation
 					AltTranslation at = new AltTranslation(srcLoc, trgLoc, seg.text, qr.source,
-							qr.target, AltTranslationType.UKNOWN,	qr.score, qr.origin);
-					at.setType((qr.fromMT ? AltTranslationType.MT : AltTranslationType.UKNOWN));
+							qr.target, MatchType.UKNOWN,	qr.score, qr.origin);
+					at.setType((qr.fromMT ? MatchType.MT : MatchType.UKNOWN));
 					addAltTranslation(seg, at);
 					continue;
 				}
@@ -537,8 +537,8 @@ public class QueryManager {
 				// temporary code for alt-trans annotation
 				// Temporary code for alt-trans annotation
 				AltTranslation at = new AltTranslation(srcLoc, trgLoc, seg.text, qr.source,
-						qr.target, AltTranslationType.UKNOWN,	qr.score, qr.origin);
-				at.setType((qr.fromMT ? AltTranslationType.MT : AltTranslationType.UKNOWN));
+						qr.target, MatchType.UKNOWN,	qr.score, qr.origin);
+				at.setType((qr.fromMT ? MatchType.MT : MatchType.UKNOWN));
 				addAltTranslation(seg, at);
 			}
 		}

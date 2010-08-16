@@ -42,7 +42,6 @@ import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.AltTranslation;
-import net.sf.okapi.common.annotation.AltTranslationType;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
@@ -53,6 +52,7 @@ import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
@@ -711,7 +711,7 @@ public class XLIFFFilter implements IFilter {
 					else {
 						// Add the source, no target yet
 						AltTranslation alt = altTrans.add(lang, null, null, tc.getFirstContent(), null,
-							AltTranslationType.UKNOWN, 0, AltTranslation.ORIGIN_SOURCEDOC);
+							MatchType.UKNOWN, 0, AltTranslation.ORIGIN_SOURCEDOC);
 						alt.getEntry().setPreserveWhitespaces(preserveSpaces.peek());
 						if ( altTransQuality > 0 ) {
 							alt.setScore(altTransQuality);
@@ -771,7 +771,7 @@ public class XLIFFFilter implements IFilter {
 						alt = null; // Behave like it's a first entry
 					}
 					if ( alt == null ) {
-						alt = altTrans.add(srcLang, null, null, null, null, AltTranslationType.UKNOWN, 0, AltTranslation.ORIGIN_SOURCEDOC);
+						alt = altTrans.add(srcLang, null, null, null, null, MatchType.UKNOWN, 0, AltTranslation.ORIGIN_SOURCEDOC);
 					}
 					if ( tc.contentIsOneSegment() ) {
 						alt.setTarget(lang, tc.getFirstContent());

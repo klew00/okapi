@@ -24,6 +24,7 @@ import java.util.UUID;
 
 import net.sf.okapi.common.HashCodeUtil;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
@@ -43,7 +44,7 @@ public class AltTranslation implements Comparable<AltTranslation> {
 	LocaleId srcLocId;
 	LocaleId trgLocId;
 	TextUnit tu;
-	AltTranslationType type;
+	MatchType type;
 	int score;
 	String origin;
 
@@ -72,7 +73,7 @@ public class AltTranslation implements Comparable<AltTranslation> {
 		TextFragment originalSource,
 		TextFragment alternateSource,
 		TextFragment alternateTarget,
-		AltTranslationType type,
+		MatchType type,
 		int score,
 		String origin)
 	{
@@ -173,15 +174,15 @@ public class AltTranslation implements Comparable<AltTranslation> {
 	}
 
 	/**
-	 * Gets the type of this alternate translation. The value is on of the {@link AltTranslationType} values.
+	 * Gets the type of this alternate translation. The value is on of the {@link MatchType} values.
 	 * 
 	 * @return the type of this alternate translation.
 	 */
-	public AltTranslationType getType () {
+	public MatchType getType () {
 		return type;
 	}
 
-	public void setType (AltTranslationType type) {
+	public void setType (MatchType type) {
 		this.type = type;
 	}
 
@@ -193,8 +194,8 @@ public class AltTranslation implements Comparable<AltTranslation> {
 		this.origin = origin;
 	}
 	
-	private boolean isExact (AltTranslationType type) {
-		if ( type.ordinal() <= AltTranslationType.EXACT.ordinal() ) {
+	private boolean isExact (MatchType type) {
+		if ( type.ordinal() <= MatchType.EXACT.ordinal() ) {
 			return true;
 		}
 		return false;

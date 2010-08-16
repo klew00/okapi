@@ -18,14 +18,14 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.common.annotation;
+package net.sf.okapi.common.query;
 
 /**
  * Enumeration of the different match types possible for an alternate translation entry.
  * <p>
  * <h2>Matches are in ranked order from highest to lowest. Please maintain ranked order when adding new entries.</h2>
  */
-public enum AltTranslationType {
+public enum MatchType {
 
 	/**
 	 * Matches EXACT and matches a unique id

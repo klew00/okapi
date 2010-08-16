@@ -38,7 +38,6 @@ import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.AltTranslation;
-import net.sf.okapi.common.annotation.AltTranslationType;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiIOException;
@@ -48,6 +47,7 @@ import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
@@ -483,7 +483,7 @@ public class TTXFilter implements IFilter {
 								}
 							}
 							if ( value > 0 ) {
-								altTrans = new AltTranslation(srcLoc, trgLoc, null, null, null, AltTranslationType.UKNOWN,
+								altTrans = new AltTranslation(srcLoc, trgLoc, null, null, null, MatchType.UKNOWN,
 									value, ((origin==null) ? AltTranslation.ORIGIN_SOURCEDOC : origin));
 							}
 						}

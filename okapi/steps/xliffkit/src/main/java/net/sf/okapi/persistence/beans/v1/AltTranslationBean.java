@@ -23,7 +23,7 @@ package net.sf.okapi.persistence.beans.v1;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.AltTranslation;
-import net.sf.okapi.common.annotation.AltTranslationType;
+import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.persistence.IPersistenceSession;
@@ -34,7 +34,7 @@ public class AltTranslationBean extends PersistenceBean<AltTranslation> {
 	private String srcLocId;
 	private String trgLocId;
 	private TextUnitBean tu = new TextUnitBean();
-	private AltTranslationType type;
+	private MatchType type;
 	private int score;
 	private String origin;
 	
@@ -99,11 +99,11 @@ public class AltTranslationBean extends PersistenceBean<AltTranslation> {
 		this.tu = tu;
 	}
 
-	public AltTranslationType getType() {
+	public MatchType getType() {
 		return type;
 	}
 
-	public void setType(AltTranslationType type) {
+	public void setType(MatchType type) {
 		this.type = type;
 	}
 

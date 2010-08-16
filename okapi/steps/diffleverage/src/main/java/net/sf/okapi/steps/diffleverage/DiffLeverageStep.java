@@ -31,7 +31,6 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.UsingParameters;
-import net.sf.okapi.common.annotation.AltTranslationType;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.exceptions.OkapiBadStepInputException;
 import net.sf.okapi.common.filters.IFilter;
@@ -39,6 +38,7 @@ import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
+import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.MultiEvent;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextContainer;
@@ -328,8 +328,8 @@ public class DiffLeverageStep extends BasePipelineStep {
 					altAnno.add(sourceLocale, targetLocale, 
 							newTu.getSource().getUnSegmentedContentCopy(), 
 							oldTu.getSource().getUnSegmentedContentCopy(), t.getFirstContent(), 
-							params.getFuzzyThreshold() >= 100 ? AltTranslationType.EXACT_PREVIOUS_VERSION
-									: AltTranslationType.FUZZY_PREVIOUS_VERSION, score, getName());
+							params.getFuzzyThreshold() >= 100 ? MatchType.EXACT_PREVIOUS_VERSION
+									: MatchType.FUZZY_PREVIOUS_VERSION, score, getName());
 
 					// add the annotation to the source paragraph
 					newTu.setAnnotation(altAnno);
