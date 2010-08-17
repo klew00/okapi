@@ -20,6 +20,8 @@
 
 package net.sf.okapi.lib.translation;
 
+import net.sf.okapi.common.HashCodeUtil;
+import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.TextFragment;
 
 /**
@@ -30,12 +32,18 @@ public class QueryResult implements Comparable<QueryResult> {
 	/**
 	 * Weight for this result.
 	 */
-	public int weight;
+	public int weight = 0;
 	
 	/**
 	 * Score of this result (a value between 0 and 100).
 	 */
-	public int score;
+	public int score = 0;
+	
+	
+	/**
+	 * {@link MatchType} of this result.
+	 */
+	public MatchType matchType = MatchType.UKNOWN;
 	
 	/**
 	 * Text of the source for this result.
@@ -65,16 +73,94 @@ public class QueryResult implements Comparable<QueryResult> {
 	public boolean fromMT;
 	
 	/**
-	 * Compares this QueryResult with another one.
-	 * The weight is used for the comparison.
-	 * @param other The other QueryResult to compare this one with.
-	 * @return 0 if both are equal, 1 if this one is greater than the other one,
-	 * -1 if this one is lesser than the other one.
+	 * This method implements a four way sort on (1) weight (2) {@link MatchType} (3) Score (4)
+	 * source string match. Weight is the primary key, {@link MatchType} secondary, score tertiary
+	 * and source string quaternary.
+	 * @param other the QueryResult we are comparing against.
+	 * @return the comparison result (0 if both object are equal).
 	 */
+	@Override
 	public int compareTo (QueryResult other) {
-		if ( weight > other.weight ) return 1;
-		if ( weight < other.weight ) return -1; 
-		return 0;
+		final int EQUAL = 0;
+
+		if ( this == other ) {
+			return EQUAL;
+		}
+
+		String thisSource = this.source.toString();
+		String otherSource = other.source.toString();
+		int comparison;
+		
+		// compare weight
+		comparison = Float.compare(this.weight, other.weight);
+		if ( comparison != EQUAL ) {
+			return comparison;
+		}
+		
+		// only sort by match type if this or other is some kind of exact match
+		if ( isExact(this.matchType) || isExact(other.matchType) ) {					
+			// compare MatchType
+			comparison = this.matchType.compareTo(other.matchType);
+			if ( comparison != EQUAL ) {
+				return comparison;
+			}
+		}
+		
+		// compare score
+		comparison = Float.compare(this.score, other.score);
+		if ( comparison != EQUAL ) {
+			return comparison * -1; // we want to reverse the normal score sort
+		}
+
+		// compare source strings with codes
+		comparison = thisSource.compareTo(otherSource);
+		if ( comparison != EQUAL ) {
+			return comparison;
+		}
+
+		// default
+		return EQUAL;
 	}
 
+	/**
+	 * Define equality of state.
+	 * @param other the object to compare with.
+	 * @return true if the objects are equal, false otherwise.
+	 */
+	@Override
+	public boolean equals (Object other) {
+		if ( this == other ) {
+			return true;
+		}
+		if ( !(other instanceof QueryResult) ) {
+			return false;
+		}
+
+		QueryResult otherHit = (QueryResult) other;
+		return  (this.weight == otherHit.weight)
+				&& (this.matchType == otherHit.matchType)
+				&& (this.source.toString().equals(otherHit.source.toString()))
+				&& (this.target.toString().equals(otherHit.target.toString()));
+	}
+
+	/**
+	 * A class that overrides equals must also override hashCode.
+	 * @return the has code for this object.
+	 */
+	@Override
+	public int hashCode () {
+		int result = HashCodeUtil.SEED;
+		result = HashCodeUtil.hash(result, this.weight);
+		result = HashCodeUtil.hash(result, this.matchType);
+		result = HashCodeUtil.hash(result, this.source.toString());
+		result = HashCodeUtil.hash(result, this.target.toString());
+		return result;
+	}
+	
+	private boolean isExact (MatchType type) {
+		if ( type.ordinal() <= MatchType.EXACT.ordinal() ) {
+			return true;
+		}
+		return false;
+	}
 }
