@@ -45,6 +45,7 @@ public class QualityCheckStep extends BasePipelineStep {
 
 	private QualityCheckSession session;
 	private IQualityCheckEditor editor;
+	private LocaleId sourceLocale;
 	private LocaleId targetLocale;
 	private boolean isDone;
 	private boolean initDone;
@@ -87,6 +88,11 @@ public class QualityCheckStep extends BasePipelineStep {
 	@StepParameterMapping(parameterType = StepParameterType.TARGET_LOCALE)
 	public void setTargetLocale (LocaleId targetLocale) {
 		this.targetLocale = targetLocale;
+	}
+	
+	@StepParameterMapping(parameterType = StepParameterType.SOURCE_LOCALE)
+	public void setSourceLocale (LocaleId sourceLocale) {
+		this.sourceLocale = sourceLocale;
 	}
 	
 	@StepParameterMapping(parameterType = StepParameterType.FILTER_CONFIGURATION_MAPPER)
@@ -141,7 +147,7 @@ public class QualityCheckStep extends BasePipelineStep {
 		RawDocumentMode = false;
 		isDone = true;
 		if ( !initDone ) {
-			session.startProcess(targetLocale);
+			session.startProcess(sourceLocale, targetLocale);
 			initDone = true;
 		}
 		// No pre-existing disabled issues: sigList = null

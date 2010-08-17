@@ -20,14 +20,22 @@
 
 package net.sf.okapi.lib.terminology.simpletb;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.lib.terminology.ConceptEntry;
 import net.sf.okapi.lib.terminology.IGlossaryReader;
+import net.sf.okapi.lib.terminology.LangEntry;
 import net.sf.okapi.lib.terminology.TermEntry;
 import net.sf.okapi.lib.terminology.TermHit;
 import net.sf.okapi.lib.terminology.tbx.TBXReader;
@@ -38,6 +46,8 @@ import net.sf.okapi.lib.terminology.tbx.TBXReader;
  */
 public class SimpleTB {
 	
+	private static final String SIGNATURE = "SimpleTB-v1";
+	
 	LocaleId srcLoc;
 	LocaleId trgLoc;
 	private List<Entry> entries;
@@ -47,7 +57,11 @@ public class SimpleTB {
 	{
 		this.srcLoc = srcLoc;
 		this.trgLoc = trgLoc;
-		this.entries = new ArrayList<Entry>();
+		reset();
+	}
+	
+	private void reset () {
+		entries = new ArrayList<Entry>();
 	}
 	
 	public void importTBX (File file) {
@@ -60,7 +74,14 @@ public class SimpleTB {
 		try {
 			reader.open(file);
 			while ( reader.hasNext() ) {
-//				ConceptEntry cent = reader.next();
+				ConceptEntry cent = reader.next();
+				if ( !cent.hasLocale(srcLoc) || !cent.hasLocale(trgLoc) ) continue;
+				LangEntry srcLent = cent.getEntries(srcLoc);
+				LangEntry trgLent = cent.getEntries(trgLoc);
+				if ( !srcLent.hasTerm() || !trgLent.hasTerm() ) continue;
+				Entry ent = new Entry(srcLent.getTerm(0).getText());
+				ent.setTargetTerm(trgLent.getTerm(0).getText());
+				entries.add(ent);
 			}
 		}
 		finally {
@@ -122,5 +143,82 @@ public class SimpleTB {
 		
 		return res;
 	}
+
+	public void save (String path) {
+		DataOutputStream dos = null;
+		try {
+			dos = new DataOutputStream(new FileOutputStream(path));
+			// Version (just in case)
+			dos.writeUTF(SIGNATURE);
+			
+			// Locales
+			dos.writeUTF(srcLoc.toString());
+			dos.writeUTF(trgLoc.toString());
+			
+			// Entries
+			dos.writeInt(entries.size());
+			for ( Entry ent : entries ) {
+				dos.writeUTF(ent.srcTerm);
+				dos.writeUTF(ent.trgTerm);
+				dos.writeUTF(ent.definition);
+			}
+		}
+		catch ( IOException e ) {
+			throw new OkapiIOException("Error while saving.", e);
+		}
+		finally {
+			if ( dos != null ) {
+				try {
+					dos.close();
+				}
+				catch ( IOException e ) {
+					throw new OkapiIOException("Error closing file.", e);
+				}
+			}
+		}
+	}
 	
+	public void load (String path) {
+		reset();
+		// Temporary code, waiting for DB
+		DataInputStream dis = null;
+		try {
+			dis = new DataInputStream(new FileInputStream(path));
+
+			// version
+			String tmp = dis.readUTF();
+			if ( !tmp.equals(SIGNATURE) ) {
+				throw new OkapiIOException("Invalid signature: This file is not a SimpleTB files, or is corrupted.");
+			}
+
+			// Locales
+			tmp = dis.readUTF(); // Source
+			srcLoc = LocaleId.fromString(tmp);
+			tmp = dis.readUTF(); // Target
+			trgLoc = LocaleId.fromString(tmp);
+			
+			// Entries
+			int count = dis.readInt();
+			for ( int i=0; i<count; i++ ) {
+				Entry ent = new Entry(dis.readUTF());
+				ent.setTargetTerm(dis.readUTF());
+				ent.setdefinition(dis.readUTF());
+				entries.add(ent);
+			}
+		}
+		catch ( Throwable e ) {
+			throw new OkapiIOException("Error reading.\n"+e.getMessage(), e);
+		}
+		finally {
+			if ( dis != null ) {
+				try {
+					dis.close();
+				}
+				catch ( IOException e ) {
+					throw new OkapiIOException("Error closing file.", e);
+				}
+			}
+		}
+	}
+
 }

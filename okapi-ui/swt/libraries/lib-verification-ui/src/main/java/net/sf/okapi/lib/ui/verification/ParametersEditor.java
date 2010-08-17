@@ -67,6 +67,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 
 	private static final int TAB_CHARACTERS = 3;
 	private static final int TAB_LANGUAGETOOL = 4;
+	private static final int TAB_TERMS = 5;
 	private static final int TAB_OTHER = 6;
 	
 	private static final int INFOCOLWIDTH = 120;
@@ -132,6 +133,9 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Button chkCodeDifference;
 	private StringListPanel pnlMissingCodesAllowed;
 	private StringListPanel pnlExtraCodesAllowed;
+	private Button chkCheckTerms;
+	private Label stTermPath;
+	private TextAndBrowsePanel pnlTermsPath;
 	
 	// Flag to indicate the editor is use for step parameters
 	// We default to true because the step cannot set this option
@@ -603,7 +607,23 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		cmpTmp.setLayout(layTmp);
 		
 		label = new Label(cmpTmp, SWT.NONE);
-		label.setText("UNDER CONSTRUCTION");
+		label.setText("*** THIS FEATURE IS EXPERIMENTAL AND UNDER CONSTRUCTION ***");
+		
+		chkCheckTerms = new Button(cmpTmp, SWT.CHECK);
+		chkCheckTerms.setText("Verify terminology");
+		chkCheckTerms.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				updateCheckTerms();
+			};
+		});
+
+		stTermPath = new Label(cmpTmp, SWT.NONE);
+		stTermPath.setText("Full path of the glossary file to use:");
+		
+		pnlTermsPath = new TextAndBrowsePanel(cmpTmp, SWT.NONE, false);
+		pnlTermsPath.setBrowseFilters("TBX Documents (*.tbx)\tAll Files (*.*)", "*.tbx\t*.*");
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		pnlTermsPath.setLayoutData(gdTmp);
 		
 		tiTmp = new TabItem(tabs, SWT.NONE);
 		tiTmp.setText("Terms");
@@ -750,6 +770,11 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		edCharset.setEnabled(chkCheckCharacters.getSelection());
 		stExtraCharsAllowed.setEnabled(chkCheckCharacters.getSelection());
 		edExtraCharsAllowed.setEnabled(chkCheckCharacters.getSelection());
+	}
+	
+	private void updateCheckTerms () {
+		stTermPath.setEnabled(chkCheckTerms.getSelection());
+		pnlTermsPath.setEnabled(chkCheckTerms.getSelection());
 	}
 	
 	private void editPattern (boolean add) {
@@ -1049,6 +1074,9 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		pnlMissingCodesAllowed.fillList(params.getMissingCodesAllowed());
 		pnlExtraCodesAllowed.fillList(params.getExtraCodesAllowed());
 		
+		chkCheckTerms.setSelection(params.getCheckTerms());
+		pnlTermsPath.setText(params.getTermsPath());
+		
 		setPatternsData(params.getPatterns());
 		updateTargetSameAsSourceWithCodes();
 		updatePatterns();
@@ -1056,6 +1084,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		updateMaxCharLength();
 		updateMinCharLength();
 		updateCharacters();
+		updateCheckTerms();
 		// Step-mode fields
 		if ( stepMode ) {
 			chkSaveSession.setSelection(params.getSaveSession());
@@ -1132,6 +1161,16 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			}
 		}
 		
+		if ( chkCheckTerms.getSelection() ) {
+			String tmp = pnlTermsPath.getText().trim();
+			if ( tmp.isEmpty() ) {
+				Dialogs.showError(shell, "You must specify a glossary file.", null);
+				tabs.setSelection(TAB_TERMS);
+				pnlTermsPath.setFocus();
+				return false;
+			}
+		}
+		
 		if ( stepMode ) {
 			if ( chkSaveSession.getSelection() ) {
 				if ( pnlSessionPath.getText().trim().length() == 0 ) {
@@ -1197,6 +1236,9 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			params.setCharset(edCharset.getText().trim());
 			params.setExtraCharsAllowed(edExtraCharsAllowed.getText());
 		}
+		
+		params.setCheckTerms(chkCheckTerms.getSelection());
+		params.setTermsPath(pnlTermsPath.getText());
 		
 		if ( stepMode ) {
 			params.setSaveSession(chkSaveSession.getSelection());

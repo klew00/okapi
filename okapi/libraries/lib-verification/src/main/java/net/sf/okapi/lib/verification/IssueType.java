@@ -52,5 +52,7 @@ public enum IssueType {
 	
 	ALLOWED_CHARACTERS,
 	
+	TERMINOLOGY,
+	
 	LANGUAGETOOL_ERROR
 }

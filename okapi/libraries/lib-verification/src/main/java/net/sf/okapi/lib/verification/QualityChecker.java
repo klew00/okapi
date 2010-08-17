@@ -41,12 +41,15 @@ import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
+import net.sf.okapi.lib.terminology.simpletb.SimpleTB;
 
 class QualityChecker {
 
+	private LocaleId srcLoc;
 	private LocaleId trgLoc;
 	private List<PatternItem> patterns;
 	private LanguageToolConnector ltConn;
+	private TermChecker termChecker;
 	private Parameters params;
 	private List<Issue> issues;
 	private URI currentDocId;
@@ -58,10 +61,12 @@ class QualityChecker {
 	
 	private final static Pattern WORDCHARS = Pattern.compile("[\\p{Ll}\\p{Lu}\\p{Lt}\\p{Lo}\\p{Nd}]");
 
-	void startProcess (LocaleId targetLocale,
+	void startProcess (LocaleId sourceLocale,
+		LocaleId targetLocale,
 		Parameters params,
 		List<Issue> issues)
 	{
+		this.srcLoc = sourceLocale;
 		this.trgLoc = targetLocale;
 		this.params = params;
 		this.issues = issues;
@@ -114,6 +119,16 @@ class QualityChecker {
 			}
 		}
 
+		// Terminology check
+		termChecker = null;
+		if ( params.getCheckTerms() ) {
+			// Direct use of SimpleTB for now
+			termChecker = new TermChecker();
+			SimpleTB ta = new SimpleTB(srcLoc, trgLoc);
+			ta.importTBX(new File(params.getTermsPath()));
+			termChecker.initialize(ta, srcLoc, trgLoc);
+		}
+		
 	}
 
 	void processStartDocument (StartDocument sd,
@@ -224,6 +239,15 @@ class QualityChecker {
 			// Check for patterns, if requested
 			if ( params.getCheckPatterns() ) {
 				checkPatterns(srcSeg, trgSeg, tu);
+			}
+			
+			if ( termChecker != null ) {
+				if ( termChecker.verifyTerms(currentDocId, tu, srcSeg, trgSeg) > 0 ) {
+					for ( Issue issue : termChecker.getIssues() ) {
+						reportIssue(issue.issueType, tu, issue.segId, issue.message, issue.srcStart, issue.srcEnd,
+							issue.trgStart, issue.trgEnd, issue.severity, srcSeg.toString(), trgSeg.toString(), null);
+					}
+				}
 			}
 			
 			// Check length

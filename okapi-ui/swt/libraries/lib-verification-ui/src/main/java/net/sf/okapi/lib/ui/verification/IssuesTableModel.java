@@ -150,8 +150,11 @@ class IssuesTableModel {
 				case ALLOWED_CHARACTERS:
 					if ( issueType != 10 ) continue;
 					break;
-				case LANGUAGETOOL_ERROR:
+				case TERMINOLOGY:
 					if ( issueType != 11 ) continue;
+					break;
+				case LANGUAGETOOL_ERROR:
+					if ( issueType != 12 ) continue;
 					break;
 				default:
 					continue;

@@ -55,7 +55,6 @@ public class GlossaryTest {
 		Parameters params = (Parameters)ta.getParameters();
 		params.setSourceLocale(locEN);
 		params.setTargetLocale(locFR);
-		
 		ta.open();
 		ta.addEntry("watch", "montre");
 		ta.addEntry("time", "temps");
@@ -74,4 +73,5 @@ public class GlossaryTest {
 		ta.close();
 	}
 
+	
 }

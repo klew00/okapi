@@ -69,6 +69,9 @@ public class Parameters extends BaseParameters {
 	private static final String SCOPE = "scope";
 	private static final String EXTRACODESALLOWED = "extraCodesAllowed";
 	private static final String MISSINGCODESALLOWED = "missingCodesAllowed";
+	
+	private static final String CHECKTERMS = "checkTerms";
+	private static final String TERMSPATH = "termsPath";
 
 	String outputPath;
 	boolean autoOpen;
@@ -100,6 +103,8 @@ public class Parameters extends BaseParameters {
 	int scope;
 	List<String> extraCodesAllowed;
 	List<String> missingCodesAllowed;
+	boolean checkTerms;
+	String termsPath;
 
 	public Parameters () {
 		reset();
@@ -337,6 +342,22 @@ public class Parameters extends BaseParameters {
 		this.ltTranslationTarget = ltTranslationTarget;
 	}
 
+	public boolean getCheckTerms () {
+		return checkTerms;
+	}
+
+	public void setCheckTerms (boolean checkTerms) {
+		this.checkTerms = checkTerms;
+	}
+	
+	public String getTermsPath () {
+		return termsPath;
+	}
+
+	public void setTermsPath (String termsPath) {
+		this.termsPath = termsPath;
+	}
+	
 	@Override
 	public void reset () {
 		outputPath = "${rootDir}/qa-report.html";
@@ -368,6 +389,9 @@ public class Parameters extends BaseParameters {
 		checkCharacters = false;
 		charset = "ISO-8859-1";
 		extraCharsAllowed = "";
+		
+		checkTerms = false;
+		termsPath = "";
 
 		patterns = new ArrayList<PatternItem>();
 		
@@ -445,6 +469,10 @@ public class Parameters extends BaseParameters {
 		checkCharacters = buffer.getBoolean(CHECKCHARACTERS, checkCharacters);
 		charset = buffer.getString(CHARSET, charset);
 		extraCharsAllowed = buffer.getString(EXTRACHARSALLOWED, extraCharsAllowed);
+		// Terms
+		checkTerms = buffer.getBoolean(CHECKTERMS, checkTerms);
+		termsPath = buffer.getString(TERMSPATH, termsPath);
+		
 		// Patterns
 		checkPatterns = buffer.getBoolean(CHECKPATTERNS, checkPatterns);
 		int count = buffer.getInteger(PATTERNCOUNT, 0);
@@ -504,6 +532,9 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean(CHECKCHARACTERS, checkCharacters);
 		buffer.setString(CHARSET, charset);
 		buffer.setString(EXTRACHARSALLOWED, extraCharsAllowed);
+		// Terms
+		buffer.setBoolean(CHECKTERMS, checkTerms);
+		buffer.setString(TERMSPATH, termsPath);
 		// Patterns
 		buffer.setBoolean(CHECKPATTERNS, checkPatterns);
 		buffer.setInteger(PATTERNCOUNT, patterns.size());

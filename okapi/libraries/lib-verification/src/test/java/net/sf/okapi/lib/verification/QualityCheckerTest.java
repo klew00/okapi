@@ -37,12 +37,13 @@ import static org.junit.Assert.*;
 public class QualityCheckerTest {
 	
 	private QualityCheckSession session;
+	private LocaleId locEN = LocaleId.ENGLISH;
 	private LocaleId locFR = LocaleId.FRENCH;
 	
 	@Before
 	public void setUp() {
 		session = new QualityCheckSession();
-		session.startProcess(locFR);
+		session.startProcess(locEN, locFR);
 	}
 
 	@Test
@@ -265,7 +266,7 @@ public class QualityCheckerTest {
 		tu.getTarget(locFR).getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<CODE/>");
 		
 		session.getParameters().setCodeDifference(false);
-		session.startProcess(locFR);
+		session.startProcess(locEN, locFR);
 		
 		session.processTextUnit(tu);
 		List<Issue> issues = session.getIssues();
@@ -282,7 +283,7 @@ public class QualityCheckerTest {
 		
 		session.getParameters().setCodeDifference(false);
 		session.getParameters().setTargetSameAsSourceWithCodes(false);
-		session.startProcess(locFR);
+		session.startProcess(locEN, locFR);
 		
 		session.processTextUnit(tu);
 		List<Issue> issues = session.getIssues();
@@ -310,7 +311,7 @@ public class QualityCheckerTest {
 		list.add(new PatternItem("%s", PatternItem.SAME, true, Issue.SEVERITY_HIGH));
 
 		session.getParameters().setPatterns(list);
-		session.startProcess(locFR); // Make sure we re-initialize
+		session.startProcess(locEN, locFR); // Make sure we re-initialize
 		
 		session.processTextUnit(tu);
 		List<Issue> issues = session.getIssues();

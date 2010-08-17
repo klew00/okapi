@@ -862,6 +862,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		cbTypes.add("Suspect patterns"); // SUSPECT_PATTERN
 		cbTypes.add("Target length"); // TARGET_LENGTH
 		cbTypes.add("Allowed characters"); // ALLOWED_CHARACTERS
+		cbTypes.add("Terminology"); // TERMINOLOGY
 		cbTypes.add("LanguageTool checker warnings"); // LANGUAGETOOL_ERROR
 		cbTypes.setVisibleItemCount(cbTypes.getItemCount());
 		cbTypes.setLayoutData(new GridData());

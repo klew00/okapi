@@ -156,7 +156,7 @@ public class QualityCheckSession {
 	}
 	
 	public void recheckDocument (URI docId) {
-		startProcess(targetLocale);
+		startProcess(sourceLocale, targetLocale);
 		RawDocument rd = rawDocs.get(docId);
 		if ( rd != null ) {
 			executeRecheck(rd, null);
@@ -168,7 +168,7 @@ public class QualityCheckSession {
 			issues.clear();
 			return;
 		}
-		startProcess(targetLocale);
+		startProcess(sourceLocale, targetLocale);
 		for ( RawDocument rd : rawDocs.values() ) {
 			executeRecheck(rd, sigList);
 		}
@@ -360,8 +360,10 @@ public class QualityCheckSession {
 		}
 	}
 
-	public void startProcess (LocaleId locId) {
-		checker.startProcess(locId, params, issues);
+	public void startProcess (LocaleId srcLoc,
+		LocaleId trgLoc)
+	{
+		checker.startProcess(srcLoc, trgLoc, params, issues);
 	}
 	
 	public void processStartDocument (StartDocument startDoc,
