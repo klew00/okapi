@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.lib.terminology.dummy;
+package net.sf.okapi.lib.terminology.simpletb;
 
 import java.util.ArrayList;
 import java.util.Arrays;
