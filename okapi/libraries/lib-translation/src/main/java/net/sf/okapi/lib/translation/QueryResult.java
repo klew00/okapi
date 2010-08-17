@@ -32,18 +32,18 @@ public class QueryResult implements Comparable<QueryResult> {
 	/**
 	 * Weight for this result.
 	 */
-	public int weight = 0;
+	public int weight;
 	
 	/**
 	 * Score of this result (a value between 0 and 100).
 	 */
-	public int score = 0;
+	public int score;
 	
 	
 	/**
 	 * {@link MatchType} of this result.
 	 */
-	public MatchType matchType = MatchType.UKNOWN;
+	public MatchType matchType;
 	
 	/**
 	 * Text of the source for this result.
