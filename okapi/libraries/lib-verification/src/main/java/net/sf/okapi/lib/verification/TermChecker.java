@@ -22,11 +22,13 @@ package net.sf.okapi.lib.verification;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Segment;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.terminology.TermHit;
 import net.sf.okapi.lib.terminology.simpletb.SimpleTB;
@@ -56,14 +58,17 @@ public class TermChecker {
 		issues.clear();
 		// Get the list of the terms in the source text
 		List<TermHit> srcList = ta.getExistingTerms(srcSeg.text, srcLoc, trgLoc);
-		// Get the list of the terms in the target text
-		List<TermHit> trgList = ta.getExistingTerms(trgSeg.text, trgLoc, srcLoc);
-		// Remove correspondences 
+		
+		// Get the list of the terms in the target text (based on the source list)
+		List<TermHit> trgList = getExistingTargetTerms(trgSeg.text, srcList);
+		
+		// Remove proper correspondences 
 		removeMatches(srcList, trgList);
-		//  What is left in source list is orphan source terms
+		
+		//  The source list has now only orphan source terms
 		for ( TermHit th : srcList ) {
 			Issue issue = new Issue(docId, IssueType.TERMINOLOGY, tu.getId(), srcSeg.getId(),
-				String.format("The term \"%s\" seems not to be translated by \"%s\".", th.sourceTerm.getText(), th.targetTerm.getText()),
+				String.format("In the glossary \"%s\" is translated \"%s\".", th.sourceTerm.getText(), th.targetTerm.getText()),
 				-1, 0, -1, 0, Issue.SEVERITY_LOW, tu.getName());
 			issues.add(issue);
 		}
@@ -73,6 +78,37 @@ public class TermChecker {
 	public List<Issue> getIssues () {
 		return issues;
 	}
+	
+	/**
+	 * Get a list of existing target term in a given fragment based on a list of
+	 * TermHit object for the source.
+	 * Use this method to find the target terms in a text from a list of source term
+	 * found in a source text. This allows to go faster as only the terms for which we
+	 * have source matches are looked at.
+	 * @param frag the fragment to process.
+	 * @param sourceHits the list of TermHit objects found in the source.
+	 * @return a list of existing target term in a given fragment based on a list
+	 * of TermHit objects.
+	 */
+	public static List<TermHit> getExistingTargetTerms (TextFragment frag,
+		List<TermHit> sourceHits)
+	{
+		String text = frag.getCodedText();
+		List<String> parts = Arrays.asList(text.split("\\s"));
+		List<TermHit> res = new ArrayList<TermHit>();
+	
+		for ( TermHit th : sourceHits) {
+			if ( parts.contains(th.targetTerm.getText()) ) {
+				TermHit hit = new TermHit();
+				hit.sourceTerm = th.targetTerm;
+				hit.targetTerm = th.sourceTerm;
+				res.add(hit);
+			}
+		}
+		
+		return res;
+	}
+
 	
 	/**
 	 * Removes from both list all the entries that are found in the source list and have their
@@ -108,7 +144,8 @@ public class TermChecker {
 				}
 			}
 		}
-		
+
 		return srcList;
 	}
+
 }

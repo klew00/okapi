@@ -55,12 +55,12 @@ public interface ITermAccess {
 	 * Gets the list of all terms of the termbase that exist in a given fragment
 	 * for a given source/target pair of locales. 
 	 * @param fragment the fragment to examine.
-	 * @param sourceLocId the source locale.
-	 * @param targetLocId the target locale.
+	 * @param fragmentLoc the locale of the fragment.
+	 * @param otherLoc the other (source or target) locale.
 	 * @return the list of all terms of the termbase that exist in the given fragment.
 	 */
 	public List<TermHit> getExistingTerms (TextFragment fragment,
-		LocaleId sourceLocId,
-		LocaleId targetLocId);
+		LocaleId fragmentLoc,
+		LocaleId otherLoc);
 
 }
