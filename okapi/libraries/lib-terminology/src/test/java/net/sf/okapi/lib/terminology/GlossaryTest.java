@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2010 by the Okapi Framework contributors
+  Copyright (C) 2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -24,7 +24,8 @@ import java.util.List;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.lib.terminology.dummy.SimpleTBConnector;
+import net.sf.okapi.lib.terminology.simpletb.Parameters;
+import net.sf.okapi.lib.terminology.simpletb.SimpleTBConnector;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -51,9 +52,13 @@ public class GlossaryTest {
 	@Test
 	public void testTBAccess () {
 		SimpleTBConnector ta = new SimpleTBConnector();
+		Parameters params = (Parameters)ta.getParameters();
+		params.setSourceLocale(locEN);
+		params.setTargetLocale(locFR);
+		
 		ta.open();
-		ta.addEntry(locEN, "watch").addTerm(locFR, "montre");
-		ta.addEntry(locEN, "time").addTerm(locFR, "temps");
+		ta.addEntry("watch", "montre");
+		ta.addEntry("time", "temps");
 		
 		TextFragment srcFrag = new TextFragment("This watch shows a time");
 		List<TermHit> found1 = ta.getExistingTerms(srcFrag, locEN, locFR);

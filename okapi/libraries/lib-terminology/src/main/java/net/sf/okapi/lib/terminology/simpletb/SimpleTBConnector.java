@@ -20,69 +20,61 @@
 
 package net.sf.okapi.lib.terminology.simpletb;
 
+import java.io.File;
 import java.util.List;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.lib.terminology.ConceptEntry;
 import net.sf.okapi.lib.terminology.ITermAccess;
 import net.sf.okapi.lib.terminology.TermHit;
 
 public class SimpleTBConnector implements ITermAccess {
 
+	private Parameters params;
 	private SimpleTB tb;
 	
+	public SimpleTBConnector () {
+		params = new Parameters();
+	}
+
 	@Override
 	public IParameters getParameters () {
-		// Nothing to do
-		return null;
+		return params;
 	}
 
 	@Override
 	public void setParameters (IParameters params) {
-		// Nothing to do
+		this.params = (Parameters)params;
 	}
 
 	@Override
 	public void open () {
-		tb = new SimpleTB(null);
+		tb = new SimpleTB(params.getSourceLocale(), params.getTargetLocale());
+		// Import from file, if a path is defined
+		if ( !Util.isEmpty(params.getGlossaryPath()) ) {
+			tb.importTBX(new File(params.getGlossaryPath()));
+		}
 	}
 
 	@Override
 	public void close() {
-		// Nothing to do
+		tb.removeAll();
 	}
 
 	@Override
 	public List<TermHit> getExistingTerms (TextFragment fragment,
-		LocaleId sourceLocId,
-		LocaleId targetLocId)
+		LocaleId fragmentLocId,
+		LocaleId otherLocId)
 	{
-		return tb.getExistingTerms(fragment, sourceLocId, targetLocId);
+		return tb.getExistingTerms(fragment, fragmentLocId, otherLocId);
 	}
 	
-	public ConceptEntry addEntry (LocaleId locId,
-		String term)
+	public Entry addEntry (String srcTerm,
+		String trgTerm)
 	{
-		return tb.addEntry(locId, term);
+		return tb.addEntry(srcTerm, trgTerm);
 	}
-
-//	public List<TermHit> getMissingTerms (TextFragment fragment,
-//		List<TermHit> termsToCheck)
-//	{
-//
-//		String text = fragment.getCodedText();
-//		List<String> parts = Arrays.asList(text.split("\\s"));
-//		List<TermHit> res = new ArrayList<TermHit>();
-//	
-//		for ( TermHit th : termsToCheck ) {
-//			String term = th.targetTerm.getText();
-//			if ( !parts.contains(term) ) {
-//				res.add(th);
-//			}
-//		}
-//		return res;
-//	}
 
 }

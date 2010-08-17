@@ -20,23 +20,17 @@
 
 package net.sf.okapi.lib.terminology.simpletb;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import net.sf.okapi.common.Event;
-import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.filters.IFilter;
-import net.sf.okapi.common.filters.IFilterConfigurationMapper;
-import net.sf.okapi.common.resource.ISegments;
-import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.lib.terminology.ConceptEntry;
-import net.sf.okapi.lib.terminology.LangEntry;
+import net.sf.okapi.lib.terminology.IGlossaryReader;
+import net.sf.okapi.lib.terminology.TermEntry;
 import net.sf.okapi.lib.terminology.TermHit;
+import net.sf.okapi.lib.terminology.tbx.TBXReader;
 
 /**
  * Very basic memory-only simple termbase.
@@ -44,95 +38,89 @@ import net.sf.okapi.lib.terminology.TermHit;
  */
 public class SimpleTB {
 	
-	private IFilterConfigurationMapper fcMapper;
-	private List<ConceptEntry> entries;
+	LocaleId srcLoc;
+	LocaleId trgLoc;
+	private List<Entry> entries;
 	
-	
-	public SimpleTB (IFilterConfigurationMapper fcMapper) {
-		this.fcMapper = fcMapper;
-		entries = new ArrayList<ConceptEntry>();
+	public SimpleTB (LocaleId srcLoc,
+		LocaleId trgLoc)
+	{
+		this.srcLoc = srcLoc;
+		this.trgLoc = trgLoc;
+		this.entries = new ArrayList<Entry>();
 	}
 	
-	public void importDocument (RawDocument rawDoc) {
-		IFilter filter = null;
+	public void importTBX (File file) {
+		importGlossary(new TBXReader(), file);
+	}
+	
+	private void importGlossary (IGlossaryReader reader,
+		File file)
+	{
 		try {
-			filter = fcMapper.createFilter(rawDoc.getFilterConfigId());
-			filter.open(rawDoc);
-			LocaleId srcLoc = rawDoc.getSourceLocale();
-			LocaleId trgLoc = rawDoc.getTargetLocale();
-			while ( filter.hasNext() ) {
-				Event event = filter.next();
-				if ( event.getEventType() == EventType.TEXT_UNIT ) {
-					TextUnit tu = event.getTextUnit();
-					if ( !tu.isTranslatable() ) continue;
-					if ( !tu.hasTarget(trgLoc) ) continue;
-					ISegments srcSegs = tu.getSource().getSegments();
-					ISegments trgSegs = tu.getTarget(trgLoc).getSegments();
-					for ( Segment seg : srcSegs ) {
-						Segment trgSeg = trgSegs.get(seg.id);
-						if ( trgSeg == null ) continue;
-						ConceptEntry gent = addEntry(srcLoc, seg.text.toString());
-						gent.addTerm(trgLoc, trgSeg.text.toString());
-						entries.add(gent);
-					}
-				}
+			reader.open(file);
+			while ( reader.hasNext() ) {
+//				ConceptEntry cent = reader.next();
 			}
 		}
 		finally {
-			if ( filter != null ) filter.close();
+			if ( reader != null ) reader.close();
 		}
 	}
 	
-//	private void createTerms () {
-//		LocaleId srcLoc = LocaleId.ENGLISH;
-//		LocaleId trgLoc = LocaleId.FRENCH;
-//		
-//		createEntry(srcLoc, "watch").addTerm(trgLoc, "montre");
-//		createEntry(srcLoc, "scale").addTerm(trgLoc, "balance");
-//		createEntry(srcLoc, "weather").addTerm(trgLoc, "temps");
-//		createEntry(srcLoc, "time").addTerm(trgLoc, "temps");
-//		createEntry(srcLoc, "channel").addTerm(trgLoc, "chaine");
-//	}
-	
-	public ConceptEntry addEntry (LocaleId locId,
-		String term)
+	public void removeAll () {
+		entries.clear();
+	}
+
+	public Entry addEntry (String srcTerm,
+		String trgTerm)
 	{
-		ConceptEntry gent = new ConceptEntry();
-		gent.addTerm(locId, term);
-		entries.add(gent);
-		return gent;
+		Entry ent = new Entry(srcTerm);
+		ent.setTargetTerm(trgTerm);
+		entries.add(ent);
+		return ent;
 	}
 
 	/*
 	 * Very crude implementation of the search terms function.
 	 */
 	public List<TermHit> getExistingTerms (TextFragment frag,
-		LocaleId srcLoc,
-		LocaleId trgLoc)
+		LocaleId fragmentLoc,
+		LocaleId otherLoc)
 	{
 		String text = frag.getCodedText();
 		List<String> parts = Arrays.asList(text.split("\\s"));
-		
 		List<TermHit> res = new ArrayList<TermHit>();
 	
-		for ( ConceptEntry cent : entries ) {
-			LangEntry srcLent = cent.getEntries(srcLoc);
-			if ( srcLent == null ) continue;
-			LangEntry trgLent = cent.getEntries(trgLoc);
-			if ( trgLent == null ) continue;
-			if ( !srcLent.hasTerm() || !trgLent.hasTerm() ) continue;
-			
-			String term = srcLent.getTerm(0).getText();
-			if ( parts.contains(term) ) {
+		// Determine if the termbase has the searched locale
+		boolean searchSource = fragmentLoc.equals(srcLoc);
+		if ( !searchSource ) {
+			if ( !fragmentLoc.equals(trgLoc) ) {
+				return res; // Nothing
+			}
+		}
+
+		String termToMatch;
+		String otherTerm;
+		for ( Entry ent : entries ) {
+			if ( searchSource ) {
+				termToMatch = ent.getSourceTerm();
+				otherTerm = ent.getTargetTerm();
+			}
+			else {
+				termToMatch = ent.getTargetTerm();
+				otherTerm = ent.getSourceTerm();
+			}
+			if (( termToMatch == null ) || ( otherTerm == null )) continue;
+			if ( parts.contains(termToMatch) ) {
 				TermHit th = new TermHit();
-				th.sourceTerm = srcLent.getTerm(0);
-				th.targetTerm = trgLent.getTerm(0);
+				th.sourceTerm = new TermEntry(termToMatch);
+				th.targetTerm = new TermEntry(otherTerm);
 				res.add(th);
 			}
 		}
 		
 		return res;
 	}
-
 	
 }
