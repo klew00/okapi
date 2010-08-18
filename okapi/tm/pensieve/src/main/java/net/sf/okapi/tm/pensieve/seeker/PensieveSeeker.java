@@ -34,6 +34,7 @@ import java.util.logging.Logger;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.exceptions.OkapiIOException;
+import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.search.lucene.analysis.NgramAnalyzer;
@@ -42,7 +43,6 @@ import net.sf.okapi.lib.search.lucene.query.TmFuzzyQuery;
 import net.sf.okapi.tm.pensieve.common.Metadata;
 import net.sf.okapi.tm.pensieve.common.MetadataType;
 import net.sf.okapi.tm.pensieve.common.TmHit;
-import net.sf.okapi.tm.pensieve.common.TmMatchType;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
 import net.sf.okapi.tm.pensieve.common.TranslationUnitField;
 import net.sf.okapi.tm.pensieve.common.TranslationUnitVariant;
@@ -285,7 +285,7 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 
 			for (TmHit tmHit : tmHitCandidates) {
 				tmHit.setScore(100.0f);
-				tmHit.setMatchType(TmMatchType.EXACT);
+				tmHit.setMatchType(MatchType.EXACT);
 			}
 
 			/*
@@ -293,7 +293,7 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 			 * System.out.println(tmHit.getTu().toString()); System.out.println();
 			 */
 
-			// sort TmHits on TmMatchType, Score and Source String
+			// sort TmHits on MatchType, Score and Source String
 			Collections.sort(tmHitCandidates);
 		} catch (IOException e) {
 			throw new OkapiIOException("Could not complete query.", e);
@@ -417,7 +417,7 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 				// remove codes so we can compare text only
 				String sourceTextOnly = TextFragment.getText(tmCodedText);
 
-				TmMatchType matchType = TmMatchType.FUZZY;
+				MatchType matchType = MatchType.FUZZY;
 				Float score = tmHit.getScore();
 				tmHit.setCodeMismatch(false);
 				if (queryCodes.size() != tmCodes.size()) {
@@ -427,9 +427,9 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 				// These are 100%, adjust match type and penalize for whitespace
 				// and case difference
 				if (score >= 100.0f && tmCodedText.equals(queryFrag.getCodedText())) {
-					matchType = TmMatchType.EXACT;
+					matchType = MatchType.EXACT;
 				} else if (score >= 100.0f && sourceTextOnly.equals(queryFrag.getText())) {
-					matchType = TmMatchType.FUZZY_FULL_TEXT_MATCH;
+					matchType = MatchType.FUZZY_EXACT_TEXT;
 				} else if (score >= 100.0f) {
 					// must be a whitespace or case difference
 					score -= WHITESPACE_OR_CASE_PENALTY;
@@ -460,7 +460,7 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 			 * System.out.println();
 			 */
 
-			// sort TmHits on TmMatchType, Score and Source String
+			// sort TmHits on MatchType, Score and Source String
 			Collections.sort(tmHitCandidates);
 		} catch (IOException e) {
 			throw new OkapiIOException("Could not complete query.", e);
@@ -494,7 +494,7 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 			tmHitCandidates = getTopHits(query, metadata);
 			for (TmHit tmHit : tmHitCandidates) {
 				tmHit.setScore(tmHit.getScore());
-				tmHit.setMatchType(TmMatchType.SIMPLE_CONCORDANCE);
+				tmHit.setMatchType(MatchType.CONCORDANCE);
 			}
 
 			/*
@@ -503,7 +503,7 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 			 * System.out.println();
 			 */
 
-			// sort TmHits on TmMatchType, Score and Source String
+			// sort TmHits on MatchType, Score and Source String
 			Collections.sort(tmHitCandidates);
 
 		} catch (IOException e) {

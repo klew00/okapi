@@ -102,6 +102,11 @@ public enum MatchType {
 	MT,
 
 	/**
+	 * TM concordance or phrase match (usually a word or term only)
+	 */
+	CONCORDANCE,
+	
+	/**
 	 * Unknown match type. A UNKOWN type always sorts below all other matches. Make sure this type is the last in the list.
 	 */
 	UKNOWN

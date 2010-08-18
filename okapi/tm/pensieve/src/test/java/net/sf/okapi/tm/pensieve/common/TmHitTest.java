@@ -23,6 +23,7 @@ package net.sf.okapi.tm.pensieve.common;
 import static org.junit.Assert.*;
 
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.TextFragment;
 
 import org.junit.Before;
@@ -52,8 +53,8 @@ public class TmHitTest {
 				"prueba2"));
 		tu2 = new TranslationUnit(tuvSource2, tuvTarget2);
 
-		h1 = new TmHit(tu1, TmMatchType.EXACT, 100.0f);
-		h2 = new TmHit(tu2, TmMatchType.EXACT, 100.0f);
+		h1 = new TmHit(tu1, MatchType.EXACT, 100.0f);
+		h2 = new TmHit(tu2, MatchType.EXACT, 100.0f);
 	}
 
 	@Test
@@ -61,7 +62,7 @@ public class TmHitTest {
 		TmHit tmh = new TmHit();
 		assertNull(tmh.getTu());
 		assertEquals(0.0f, tmh.getScore(), 0.001f);
-		assertTrue(TmMatchType.NONE == tmh.getMatchType());
+		assertTrue(MatchType.UKNOWN == tmh.getMatchType());
 	}
 
 	@Test
@@ -83,7 +84,7 @@ public class TmHitTest {
 		TmHit h = new TmHit();
 		h.setTu(tu1);
 		h.setScore(80.0f);
-		h.setMatchType(TmMatchType.EXACT);
+		h.setMatchType(MatchType.EXACT);
 		assertTrue("equals", h1.equals(h));
 	}
 
@@ -97,7 +98,7 @@ public class TmHitTest {
 		TmHit h = new TmHit();
 		h.setTu(tu1);
 		h.setScore(100.0f);
-		h.setMatchType(TmMatchType.EXACT);
+		h.setMatchType(MatchType.EXACT);
 		assertEquals(0, h1.compareTo(h1));
 	}
 	
@@ -106,7 +107,7 @@ public class TmHitTest {
 		TmHit h = new TmHit();
 		h.setTu(tu1);
 		h.setScore(50.0f);
-		h.setMatchType(TmMatchType.EXACT);
+		h.setMatchType(MatchType.EXACT);
 		assertTrue(h1.compareTo(h) < 0);
 	}
 	
@@ -115,7 +116,7 @@ public class TmHitTest {
 		TmHit h = new TmHit();
 		h.setTu(tu1);
 		h.setScore(80.0f);
-		h.setMatchType(TmMatchType.EXACT);
+		h.setMatchType(MatchType.EXACT);
 		assertTrue(h1.compareTo(h) < 0);
 	}
 	
@@ -124,7 +125,7 @@ public class TmHitTest {
 		TmHit h = new TmHit();
 		h.setTu(tu1);
 		h.setScore(80.0f);
-		h.setMatchType(TmMatchType.FUZZY);
+		h.setMatchType(MatchType.FUZZY);
 		assertTrue(h1.compareTo(h) < 0);
 	}
 	
@@ -133,7 +134,7 @@ public class TmHitTest {
 		TmHit h = new TmHit();
 		h.setTu(tu1);
 		h.setScore(80.0f);
-		h.setMatchType(TmMatchType.EXACT_LOCAL_CONEXT);
+		h.setMatchType(MatchType.EXACT_LOCAL_CONEXT);
 		assertTrue(h1.compareTo(h) > 0);
 	}
 	
@@ -146,7 +147,7 @@ public class TmHitTest {
 		
 		h.setTu(tu);
 		h.setScore(80.0f);
-		h.setMatchType(TmMatchType.FUZZY);
+		h.setMatchType(MatchType.FUZZY);
 		assertTrue(h1.compareTo(h) < 0);
 	}
 	
@@ -160,7 +161,7 @@ public class TmHitTest {
 		
 		h.setTu(tu);
 		h.setScore(80.0f);
-		h.setMatchType(TmMatchType.EXACT_LOCAL_CONEXT);
+		h.setMatchType(MatchType.EXACT_LOCAL_CONEXT);
 		assertTrue(h1.compareTo(h) > 0);
 	}
 }

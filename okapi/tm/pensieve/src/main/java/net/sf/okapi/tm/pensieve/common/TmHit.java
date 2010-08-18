@@ -21,12 +21,13 @@
 package net.sf.okapi.tm.pensieve.common;
 
 import net.sf.okapi.common.HashCodeUtil;
+import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
 
 /**
  * Represents a TM Hit. This stores a reference to the TranslationUnit and its
- * score and {@link TmMatchType}
+ * score and {@link MatchType}
  * 
  * @author HaslamJD
  * @author HARGRAVEJE
@@ -34,15 +35,15 @@ import net.sf.okapi.common.resource.TextFragment;
 public class TmHit implements Comparable<TmHit> {
 	private TranslationUnit tu;
 	private float score;
-	private TmMatchType matchType;
+	private MatchType matchType;
 	private boolean codeMismatch;
 	private int docId;
 
 	/**
-	 * Default constructor which sets the TmMatchType to NONE. 
+	 * Default constructor which sets the MatchType to NONE. 
 	 */
 	public TmHit() {
-		setMatchType(TmMatchType.NONE);
+		setMatchType(MatchType.UKNOWN);
 		setCodeMismatch(false);
 	}
 
@@ -52,7 +53,7 @@ public class TmHit implements Comparable<TmHit> {
 	 * @param matchType
 	 * @param score
 	 */
-	public TmHit(TranslationUnit tu, TmMatchType matchType, float score) {
+	public TmHit(TranslationUnit tu, MatchType matchType, float score) {
 		setTu(tu);
 		setMatchType(matchType);
 		setScore(score);
@@ -92,18 +93,18 @@ public class TmHit implements Comparable<TmHit> {
 	}
 
 	/**
-	 * Set the Tmhit's {@link TmMatchType}
+	 * Set the Tmhit's {@link MatchType}
 	 * @param matchType
 	 */
-	public void setMatchType(TmMatchType matchType) {
+	public void setMatchType(MatchType matchType) {
 		this.matchType = matchType;
 	}
 
 	/**
-	 * Get the Tmhit's {@link TmMatchType}
-	 * @return a {@link TmMatchType}
+	 * Get the Tmhit's {@link MatchType}
+	 * @return a {@link MatchType}
 	 */
-	public TmMatchType getMatchType() {
+	public MatchType getMatchType() {
 		return matchType;
 	}
 
@@ -140,8 +141,8 @@ public class TmHit implements Comparable<TmHit> {
 	}
 
 	/**
-	 * This method implements a three way sort on (1) TmMatchType (2) score (3)
-	 * source string. TmMatchType is the primary key, score secondary and source
+	 * This method implements a three way sort on (1) MatchType (2) score (3)
+	 * source string. MatchType is the primary key, score secondary and source
 	 * string tertiary.
 	 * 
 	 * @param other - the TmHit we are comparing against.
@@ -154,11 +155,15 @@ public class TmHit implements Comparable<TmHit> {
 
 		String thisSource = this.tu.getSource().getContent().toString();
 		String otherSource = other.tu.getSource().getContent().toString();
-
-		// compare TmMatchType
-		int comparison = this.matchType.compareTo(other.getMatchType());
-		if (comparison != EQUAL)
-			return comparison;
+		
+		// only sort by match type if this or other is some kind of exact match
+		int comparison;
+		if ( isExact(this.matchType) || isExact(other.matchType) ) {		
+			// compare MatchType
+			comparison = this.matchType.compareTo(other.getMatchType());
+			if (comparison != EQUAL)
+				return comparison;
+		}
 
 		// compare score
 		comparison = Float.compare(this.score, other.getScore());
@@ -204,5 +209,12 @@ public class TmHit implements Comparable<TmHit> {
 		result = HashCodeUtil.hash(result, tu.getTarget().getContent()
 				.toString());
 		return result;
+	}
+	
+	private boolean isExact (MatchType type) {
+		if ( type.ordinal() <= MatchType.EXACT_REPAIRED.ordinal() ) {
+			return true;
+		}
+		return false;
 	}
 }
