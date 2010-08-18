@@ -52,6 +52,7 @@ import net.sf.okapi.common.DefaultEntityResolver;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.IQuery;
 import net.sf.okapi.lib.translation.QueryResult;
@@ -247,7 +248,7 @@ public class ProMTConnector implements IQuery {
 	        		
 	        		result.score = 95; // Arbitrary score for MT
 	        		result.origin = getName();
-	        		result.fromMT = true;
+	        		result.matchType = MatchType.MT;
 	    			current = 0;
 	        	}
 	        }

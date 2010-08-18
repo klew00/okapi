@@ -504,41 +504,41 @@ public class QueryManager {
 					}
 					else {
 						// If threshold is below 100: Use the first one and lower the score to 99%
-						scores.add(99, (qr.fromMT ? Util.MTFLAG : qr.origin));
+						scores.add(99, (qr.fromMT() ? Util.MTFLAG : qr.origin));
 						seg.text = adjustNewFragment(seg.text, qr.source, qr.target, qr.score, tu);
 						leveraged++;
 						// Temporary code for alt-trans annotation
 						AltTranslation at = new AltTranslation(srcLoc, trgLoc, seg.text, qr.source,
 								qr.target, MatchType.UKNOWN,	qr.score, qr.origin);
-						at.setType((qr.fromMT ? MatchType.MT : MatchType.UKNOWN));
+						at.setType((qr.fromMT() ? MatchType.MT : MatchType.UKNOWN));
 						addAltTranslation(seg, at);
 						continue;
 					}
 				}
 				else {
 					// Else: First is 100%, possibly several that have the same translations
-					scores.add(qr.score, (qr.fromMT ? Util.MTFLAG : qr.origin)); // That's 100% then
+					scores.add(qr.score, (qr.fromMT() ? Util.MTFLAG : qr.origin)); // That's 100% then
 					seg.text = adjustNewFragment(seg.text, qr.source, qr.target, qr.score, tu);
 					leveraged++;
 					// temporary code for alt-trans annotation
 					// Temporary code for alt-trans annotation
 					AltTranslation at = new AltTranslation(srcLoc, trgLoc, seg.text, qr.source,
 							qr.target, MatchType.UKNOWN,	qr.score, qr.origin);
-					at.setType((qr.fromMT ? MatchType.MT : MatchType.UKNOWN));
+					at.setType((qr.fromMT() ? MatchType.MT : MatchType.UKNOWN));
 					addAltTranslation(seg, at);
 					continue;
 				}
 			}
 			else {
 				// First is not 100%: use it and move on
-				scores.add(qr.score, (qr.fromMT ? Util.MTFLAG : qr.origin));
+				scores.add(qr.score, (qr.fromMT() ? Util.MTFLAG : qr.origin));
 				seg.text = adjustNewFragment(seg.text, qr.source, qr.target, qr.score, tu);
 				leveraged++;
 				// temporary code for alt-trans annotation
 				// Temporary code for alt-trans annotation
 				AltTranslation at = new AltTranslation(srcLoc, trgLoc, seg.text, qr.source,
 						qr.target, MatchType.UKNOWN,	qr.score, qr.origin);
-				at.setType((qr.fromMT ? MatchType.MT : MatchType.UKNOWN));
+				at.setType((qr.fromMT() ? MatchType.MT : MatchType.UKNOWN));
 				addAltTranslation(seg, at);
 			}
 		}

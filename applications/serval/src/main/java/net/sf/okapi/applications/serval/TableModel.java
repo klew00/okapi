@@ -39,7 +39,7 @@ public class TableModel {
 		QueryResult qr;
 		while ( qm.hasNext() ) {
 			qr = qm.next();
-			String mt = (qr.fromMT ? "MT! " : "");
+			String mt = (qr.fromMT() ? "MT! " : "");
 			TableItem item = new TableItem(table, SWT.NONE);
 			item.setText(0, String.format("%d", qr.score));
 			item.setText(1, (qr.origin==null ? mt : mt+qr.origin));

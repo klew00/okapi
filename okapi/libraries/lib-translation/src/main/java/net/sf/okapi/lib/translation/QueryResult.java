@@ -70,7 +70,12 @@ public class QueryResult implements Comparable<QueryResult> {
 	/**
 	 * Indicator telling if the result is coming from a machine translation engine or not.
 	 */
-	public boolean fromMT;
+	public boolean fromMT() {
+		if (matchType == MatchType.MT) {
+			return true;
+		}		
+		return false;
+	}
 	
 	/**
 	 * This method implements a four way sort on (1) weight (2) {@link MatchType} (3) Score (4)

@@ -34,6 +34,7 @@ import org.tempuri.Query;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
@@ -136,7 +137,7 @@ public class MyMemoryTMConnector implements ITMQuery {
 					res = new QueryResult();
 					if ( match.getTranslator().equals("MT!") ) {
 						res.origin = getName();
-						res.fromMT = true;
+						res.matchType = MatchType.MT;
 						res.score = 95; // Standard score for MT
 					}
 					else res.score = match.getScore();
