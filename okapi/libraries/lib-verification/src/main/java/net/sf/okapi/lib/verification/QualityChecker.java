@@ -125,10 +125,9 @@ class QualityChecker {
 			// Direct use of SimpleTB for now
 			termChecker = new TermChecker();
 			SimpleTB ta = new SimpleTB(srcLoc, trgLoc);
-			ta.importTBX(new File(params.getTermsPath()));
+			ta.guessAndImport(new File(params.getTermsPath()));
 			termChecker.initialize(ta, srcLoc, trgLoc);
 		}
-		
 	}
 
 	void processStartDocument (StartDocument sd,

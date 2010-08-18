@@ -31,6 +31,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.terminology.ConceptEntry;
@@ -39,6 +40,7 @@ import net.sf.okapi.lib.terminology.LangEntry;
 import net.sf.okapi.lib.terminology.TermEntry;
 import net.sf.okapi.lib.terminology.TermHit;
 import net.sf.okapi.lib.terminology.tbx.TBXReader;
+import net.sf.okapi.lib.terminology.tsv.TSVReader;
 
 /**
  * Very basic memory-only simple termbase.
@@ -64,8 +66,22 @@ public class SimpleTB {
 		entries = new ArrayList<Entry>();
 	}
 	
+	public void guessAndImport (File file) {
+		String ext = Util.getExtension(file.getPath());
+		if ( ext.equalsIgnoreCase(".tbx") ) {
+			importTBX(file);
+		}
+		else { // Try tab-delimited
+			importTSV(file);
+		}
+	}
+	
 	public void importTBX (File file) {
 		importGlossary(new TBXReader(), file);
+	}
+	
+	public void importTSV (File file) {
+		importGlossary(new TSVReader(srcLoc, trgLoc), file);
 	}
 	
 	private void importGlossary (IGlossaryReader reader,
@@ -109,7 +125,7 @@ public class SimpleTB {
 		LocaleId fragmentLoc,
 		LocaleId otherLoc)
 	{
-		String text = frag.getCodedText();
+		String text = frag.getCodedText().toLowerCase();
 		List<String> parts = Arrays.asList(text.split("\\s"));
 		List<TermHit> res = new ArrayList<TermHit>();
 	
@@ -133,7 +149,7 @@ public class SimpleTB {
 				otherTerm = ent.getSourceTerm();
 			}
 			if (( termToMatch == null ) || ( otherTerm == null )) continue;
-			if ( parts.contains(termToMatch) ) {
+			if ( parts.contains(termToMatch.toLowerCase()) ) {
 				TermHit th = new TermHit();
 				th.sourceTerm = new TermEntry(termToMatch);
 				th.targetTerm = new TermEntry(otherTerm);

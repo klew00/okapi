@@ -93,12 +93,12 @@ public class TermChecker {
 	public static List<TermHit> getExistingTargetTerms (TextFragment frag,
 		List<TermHit> sourceHits)
 	{
-		String text = frag.getCodedText();
+		String text = frag.getCodedText().toLowerCase();
 		List<String> parts = Arrays.asList(text.split("\\s"));
 		List<TermHit> res = new ArrayList<TermHit>();
 	
 		for ( TermHit th : sourceHits) {
-			if ( parts.contains(th.targetTerm.getText()) ) {
+			if ( parts.contains(th.targetTerm.getText().toLowerCase()) ) {
 				TermHit hit = new TermHit();
 				hit.sourceTerm = th.targetTerm;
 				hit.targetTerm = th.sourceTerm;

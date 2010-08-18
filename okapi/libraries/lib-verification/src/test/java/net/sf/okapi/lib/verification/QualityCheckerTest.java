@@ -20,10 +20,13 @@
 
 package net.sf.okapi.lib.verification;
 
+import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
@@ -39,6 +42,12 @@ public class QualityCheckerTest {
 	private QualityCheckSession session;
 	private LocaleId locEN = LocaleId.ENGLISH;
 	private LocaleId locFR = LocaleId.FRENCH;
+	private String root;
+
+	public QualityCheckerTest () {
+		URL url = QualityCheckerTest.class.getResource("/test01.tsv");
+		root = Util.getDirectoryName(url.getPath()) + File.separator;
+	}
 	
 	@Before
 	public void setUp() {
@@ -332,6 +341,21 @@ public class QualityCheckerTest {
 		session.processTextUnit(tu);
 		List<Issue> issues = session.getIssues();
 		assertEquals(0, issues.size());
+	}
+
+	@Test
+	public void testTERMINOLOGY () {
+		TextUnit tu = new TextUnit("id", "summer and WINTER");
+		tu.setTarget(locFR, new TextContainer("\u00e9T\u00e9 et printemps"));
+		
+		session.getParameters().setCheckTerms(true);
+		session.getParameters().setTermsPath(root+"test01.tsv");
+		session.startProcess(locEN, locFR); // Make sure we re-initialize
+
+		session.processTextUnit(tu);
+		List<Issue> issues = session.getIssues();
+		assertEquals(1, issues.size());
+		assertEquals(IssueType.TERMINOLOGY, issues.get(0).issueType);
 	}
 
 }

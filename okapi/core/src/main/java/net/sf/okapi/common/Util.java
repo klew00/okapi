@@ -663,6 +663,7 @@ public class Util {
 	 * @return the last extension of the filename (including the period), or
 	 *         empty if there is no period in the filename. If the filename ends
 	 *         with a period, the return is a period.
+	 *         Never returns null.
 	 */
 	static public String getExtension (String path) {
 		// Get the extension
