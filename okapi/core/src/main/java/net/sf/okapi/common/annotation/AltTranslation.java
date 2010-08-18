@@ -195,7 +195,7 @@ public class AltTranslation implements Comparable<AltTranslation> {
 	}
 	
 	private boolean isExact (MatchType type) {
-		if ( type.ordinal() <= MatchType.EXACT.ordinal() ) {
+		if ( type.ordinal() <= MatchType.EXACT_REPAIRED.ordinal() ) {
 			return true;
 		}
 		return false;

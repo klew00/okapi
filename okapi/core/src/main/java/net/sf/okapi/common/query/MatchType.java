@@ -58,6 +58,13 @@ public enum MatchType {
 	EXACT,
 
 	/**
+	 * Matches text and codes exactly, but only after the result 
+	 * of some automated repair (i.e., number replacement, code repair, 
+	 * capitalization, punctuation etc..)
+	 */
+	EXACT_REPAIRED,
+	
+	/**
 	 * Matches FUZZY with a unique id
 	 */
 	FUZZY_UNIQUE_ID,
@@ -76,6 +83,13 @@ public enum MatchType {
 	 * Matches both text and/or codes partially.
 	 */
 	FUZZY,
+	
+	/**
+	 * Matches both text and/or codes partially and some automated repair 
+	 * (i.e., number replacement, code repair, capitalization, punctuation etc..) 
+	 * was applied to the target
+	 */
+	FUZZY_REPAIRED,
 
 	/**
 	 * Matches assembled from phrases in the TM.
