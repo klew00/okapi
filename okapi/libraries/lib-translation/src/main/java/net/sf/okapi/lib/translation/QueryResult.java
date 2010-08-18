@@ -158,7 +158,7 @@ public class QueryResult implements Comparable<QueryResult> {
 	}
 	
 	private boolean isExact (MatchType type) {
-		if ( type.ordinal() <= MatchType.EXACT.ordinal() ) {
+		if ( type.ordinal() <= MatchType.EXACT_REPAIRED.ordinal() ) {
 			return true;
 		}
 		return false;
