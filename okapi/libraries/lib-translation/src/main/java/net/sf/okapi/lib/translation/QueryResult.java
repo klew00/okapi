@@ -69,12 +69,10 @@ public class QueryResult implements Comparable<QueryResult> {
 	
 	/**
 	 * Indicator telling if the result is coming from a machine translation engine or not.
+	 * @return true if the result is coming from a machine translation engine, false otherwise.
 	 */
 	public boolean fromMT() {
-		if (matchType == MatchType.MT) {
-			return true;
-		}		
-		return false;
+		return (matchType == MatchType.MT);
 	}
 	
 	/**

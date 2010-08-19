@@ -34,6 +34,7 @@ import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.IdGenerator;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
@@ -79,7 +80,7 @@ public class TTXFilter implements IFilter {
 	private XMLStreamReader reader;
 	private String docName;
 	private int tuId;
-	private int otherId;
+	private IdGenerator otherId;
 	private LocaleId srcLoc;
 	private LocaleId trgLoc;
 	private String srcLangCode;
@@ -181,7 +182,7 @@ public class TTXFilter implements IFilter {
 			// Parse next if nothing in the queue
 			if ( queue.isEmpty() ) {
 				if ( !read() ) {
-					Ending ending = new Ending(String.valueOf(++otherId));
+					Ending ending = new Ending(otherId.createId());
 					ending.setSkeleton(skel);
 					queue.add(new Event(EventType.END_DOCUMENT, ending));
 				}
@@ -254,7 +255,7 @@ public class TTXFilter implements IFilter {
 
 			insideContent = false;
 			tuId = 0;
-			otherId = 0;
+			otherId = new IdGenerator(null, "o");
 			// Set the start event
 			hasNext = true;
 			queue = new LinkedList<Event>();
@@ -269,7 +270,7 @@ public class TTXFilter implements IFilter {
 //				useDF = true;
 //			}
 			
-			StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
+			StartDocument startDoc = new StartDocument(otherId.createId());
 			startDoc.setName(docName);
 			startDoc.setEncoding(encoding, hasUTF8BOM);
 			startDoc.setLocale(srcLoc);
@@ -886,7 +887,7 @@ public class TTXFilter implements IFilter {
 		// Spaces can go with Tu to reduce the number of events.
 		// This allows to have only the Tu skeleton parts with the TextUnit event
 		if ( !skel.isEmpty(true) ) {
-			DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false, skel);
+			DocumentPart dp = new DocumentPart(otherId.createId(), false, skel);
 			queue.add(new Event(EventType.DOCUMENT_PART, dp));
 			skel = new GenericSkeleton(); // And create a new skeleton for the next event
 		}

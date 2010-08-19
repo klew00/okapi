@@ -35,6 +35,7 @@ import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.IdGenerator;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
@@ -69,7 +70,7 @@ public class RegexFilter implements IFilter {
 	private String inputText;
 	private Stack<StartGroup> groupStack;
 	private int tuId;
-	private int otherId;
+	private IdGenerator otherId;
 	private String docName;
 	private TextUnit tuRes;
 	private LinkedList<Event> queue;
@@ -221,14 +222,14 @@ public class RegexFilter implements IFilter {
 		
 		// End finally set the end
 		// Set the ending call
-		Ending ending = new Ending(String.format("%d", ++otherId));
+		Ending ending = new Ending(otherId.createId());
 		queue.add(new Event(EventType.END_DOCUMENT, ending));
 		return nextEvent();
 	}
 	
 	private void closeGroups () {
 		if ( groupStack.size() > 0 ) {
-			Ending ending = new Ending(String.format("%d", ++otherId));
+			Ending ending = new Ending(otherId.createId());
 			queue.add(new Event(EventType.END_GROUP, ending));
 			groupStack.pop();
 		}
@@ -311,14 +312,14 @@ public class RegexFilter implements IFilter {
 		startSearch = 0;
 		startSkl = 0;
 		tuId = 0;
-		otherId = 0;
+		otherId = new IdGenerator(null, "o");
 
 		// Prepare the filter rules
 		params.compileRules();
 
 		// Set the start event
 		queue = new LinkedList<Event>();
-		StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
+		StartDocument startDoc = new StartDocument(otherId.createId());
 		startDoc.setName(docName);
 		startDoc.setEncoding(encoding, hasUTF8BOM);
 		startDoc.setLocale(input.getSourceLocale());
@@ -351,7 +352,7 @@ public class RegexFilter implements IFilter {
 			}
 			// Then just return one skeleton event
 			return new Event(EventType.DOCUMENT_PART,
-				new DocumentPart(String.format("%d", ++otherId), false, skel));
+				new DocumentPart(otherId.createId(), false, skel));
 			
 		case Rule.RULETYPE_OPENGROUP:
 		case Rule.RULETYPE_CLOSEGROUP:
@@ -368,7 +369,7 @@ public class RegexFilter implements IFilter {
 				}
 				// Start the new one
 				StartGroup startGroup = new StartGroup(null);
-				startGroup.setId(String.valueOf(++otherId));
+				startGroup.setId(otherId.createId());
 				startGroup.setSkeleton(skel);
 				if ( rule.nameGroup != -1 ) {
 					String name = result.group(rule.nameGroup);
@@ -385,7 +386,7 @@ public class RegexFilter implements IFilter {
 					throw new OkapiIllegalFilterOperationException("Rule for closing a group detected, but no group is open.");
 				}
 				groupStack.pop();
-				Ending ending = new Ending(String.valueOf(++otherId));  
+				Ending ending = new Ending(otherId.createId());  
 				ending.setSkeleton(skel);
 				return new Event(EventType.END_GROUP, ending);
 				
@@ -663,7 +664,7 @@ public class RegexFilter implements IFilter {
 		// Else: create a new skeleton entry
 		skel = new GenericSkeleton(data.replace("\n", lineBreak));
 		queue.add(new Event(EventType.DOCUMENT_PART,
-			new DocumentPart(String.valueOf(++otherId), false, skel)));
+			new DocumentPart(otherId.createId(), false, skel)));
 	}
 
 	private Event nextEvent () {
