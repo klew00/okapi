@@ -51,8 +51,7 @@ public class XMLWriterTest {
 	private static final LocaleId DEDE = new LocaleId("de", "de");	
 	private static final LocaleId ITIT = new LocaleId("it", "it");
 	
-	// DEBUG 		
-	@Test
+	// DEBUG @Test
 	public void testPackageFormat4xml() throws URISyntaxException, MalformedURLException {
 
 		int loops = 1;
@@ -155,8 +154,7 @@ public class XMLWriterTest {
 		System.out.println(" Total: " + (System.currentTimeMillis() - start) + " milliseconds.");
 	}
 	
-	// DEBUG 		
-	@Test
+	// DEBUG @Test
 	public void testPackageFormat5xml() throws URISyntaxException, MalformedURLException {
 
 		int loops = 10;

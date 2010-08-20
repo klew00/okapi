@@ -57,8 +57,7 @@ public class XstreamWriterTest {
 		
 	}
 	
-	// DEBUG 
-	@Test
+	// DEBUG @Test
 	public void testPackageFormat4xstream() throws URISyntaxException, MalformedURLException {
 
 		int loops = 1;
@@ -161,8 +160,7 @@ public class XstreamWriterTest {
 		System.out.println(" Total: " + (System.currentTimeMillis() - start) + " milliseconds.");
 	}
 	
-	// DEBUG 
-	@Test
+	// DEBUG @Test
 	public void testPackageFormat5xstream() throws URISyntaxException, MalformedURLException {
 
 		int loops = 10;

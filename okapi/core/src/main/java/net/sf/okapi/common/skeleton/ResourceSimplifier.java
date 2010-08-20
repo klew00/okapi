@@ -45,20 +45,21 @@ public class ResourceSimplifier {
 	private final Logger logger = Logger.getLogger(getClass().getName());
 	private boolean isMultilingual;
 	private LocaleId trgLoc;
-	private String outEncoding;
+	private String outEncoding = "UTF-16BE";
 	private GenericSkeletonWriter writer;
 	private GenericSkeleton newSkel;
 	
-	public ResourceSimplifier(boolean isMultilingual, LocaleId trgLoc, String outEncoding) {
+	public ResourceSimplifier(boolean isMultilingual, LocaleId trgLoc) {
 		super();
 		this.isMultilingual = isMultilingual;
 		this.trgLoc = trgLoc;
-		this.outEncoding = outEncoding;
 		writer = new GenericSkeletonWriter();
 		newSkel = new GenericSkeleton();
-//		StartDocument sd = new StartDocument("");
+		StartDocument sd = new StartDocument("");
 //		sd.setMultilingual(false); // !!! 
-//		writer.processStartDocument(trgLoc, outEncoding, null, null, sd); // Sets writer fields + activates ref tracking mechanism of GSW 
+//		writer.processStartDocument(trgLoc, outEncoding, null, null, sd); // Sets writer fields + activates ref tracking mechanism of GSW
+		sd.setMultilingual(false); // Simple resources
+		writer.processStartDocument(trgLoc, outEncoding, null, null, sd); // Sets writer fields + activates ref tracking mechanism of GSW
 	}
 
 //	public void setMultilingual(boolean isMultilingual) {
@@ -128,10 +129,19 @@ public class ResourceSimplifier {
 				writer.addToReferents(event);
 				// The referent is not processed at this point (only later from an event referencing it)
 				return event;
+				//return Event.NOOP_EVENT;
 			}
 		}
 		
+//		if (event.getEventType() == EventType.START_DOCUMENT) {
+//			StartDocument sd = (StartDocument) res;
+//			sd.setMultilingual(false); // Simple resources
+//			writer.processStartDocument(trgLoc, outEncoding, null, null, sd); // Sets writer fields + activates ref tracking mechanism of GSW
+//		}
+				
 		if (!isComplex(res)) {
+			if (event.getEventType() == EventType.END_DOCUMENT)
+				writer.close(); // Clears the referents cache
 			return event;
 		}
 		
@@ -155,14 +165,10 @@ public class ResourceSimplifier {
 		
 		// Different event types are processed differently
 		switch (event.getEventType()) {
-		case START_DOCUMENT:
-			StartDocument sd = (StartDocument) res;
-			sd.setMultilingual(false); // Simple resources
-			writer.processStartDocument(trgLoc, outEncoding, null, null, sd); // Sets writer fields + activates ref tracking mechanism of GSW
-			// No break here
 		case END_DOCUMENT:
 			writer.close(); // Clears the referents cache
 			// No break here
+		case START_DOCUMENT:
 		case START_SUBDOCUMENT:
 		case END_SUBDOCUMENT:
 		case START_GROUP:
@@ -292,6 +298,7 @@ public class ResourceSimplifier {
 		TextUnit newTU = tu.clone();
 		newTU.setId(id);
 		newTU.setSkeleton(null);
+		newTU.setIsReferent(false); //!!! to have GSW write it out
 		
 		me.addEvent(new Event(EventType.TEXT_UNIT, newTU));
 	}

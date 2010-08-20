@@ -49,22 +49,27 @@ public abstract class PersistenceBean<PutCoreClassHere> implements IPersistenceB
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T get(Class<T> classRef, IPersistenceSession session) {
+		if (busy) {
+			throw new RuntimeException(String.format("PersistenceBean: recursive get() in %s", 
+					ClassUtil.getQualifiedClassName(this.getClass())));
+		}
+		
 		// Try to get one created by ReferenceBean.createObject()
 		PutCoreClassHere obj = (PutCoreClassHere) session.getObject(refId); 
 		if (obj == null) {			
-			if (busy) {
-				Class<?> objRef = session.getObjectClass((Class<? extends IPersistenceBean<?>>) this.getClass());
-				if (objRef == classRef)
-					throw new RuntimeException(String.format("PersistenceBean: recursive object creation in %s.%s", 
-						ClassUtil.getQualifiedClassName(this.getClass()),
-						"createObject()"));
-				else {
-					IPersistenceBean<?> proxy = session.getProxy(classRef);
-					if (proxy != null)
-						obj = (PutCoreClassHere) proxy.get(classRef, session);
-				}
-			}
-			else {
+//			if (busy) {
+//				Class<?> objRef = session.getObjectClass((Class<? extends IPersistenceBean<?>>) this.getClass());
+//				if (objRef == classRef)
+//					throw new RuntimeException(String.format("PersistenceBean: recursive object creation in %s.%s", 
+//						ClassUtil.getQualifiedClassName(this.getClass()),
+//						"createObject()"));
+//				else {
+//					IPersistenceBean<?> proxy = session.getProxy(classRef);
+//					if (proxy != null)
+//						obj = (PutCoreClassHere) proxy.get(classRef, session);
+//				}
+//			}
+//			else {
 				busy = true; // recursion protection
 				try {
 					obj = createObject(session);
@@ -73,7 +78,7 @@ public abstract class PersistenceBean<PutCoreClassHere> implements IPersistenceB
 				finally {
 					busy = false;
 				}
-			}			
+			//}			
 		}					
 		if (obj != null && refId != 0) { // not for proxies
 			session.setRefIdForObject(obj, refId);		

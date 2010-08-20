@@ -45,7 +45,8 @@ public class ZipSkeletonBean extends GenericSkeletonBean {
 		if (zipFile != null && !Util.isEmpty(entry))
 			zipEntry = zipFile.getEntry(entry);
 		
-		return new ZipSkeleton(this.get(GenericSkeleton.class, session), zipFile, zipEntry);
+		//return new ZipSkeleton(this.get(GenericSkeleton.class, session), zipFile, zipEntry);  
+		return new ZipSkeleton(super.createObject(session), zipFile, zipEntry);
 	}
 
 	@Override

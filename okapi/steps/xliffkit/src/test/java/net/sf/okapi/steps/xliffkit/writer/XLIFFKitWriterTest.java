@@ -431,8 +431,7 @@ public class XLIFFKitWriterTest {
 		).execute();
 	}
 	
-	// DEBUG 		
-	@Test
+	// DEBUG @Test
 	public void testPackageFormat4() throws URISyntaxException, MalformedURLException {
 
 		int loops = 1;
@@ -531,8 +530,7 @@ public class XLIFFKitWriterTest {
 		System.out.println(" Total: " + (System.currentTimeMillis() - start) + " milliseconds.");
 	}
 
-	// DEBUG 		
-	@Test
+	// DEBUG @Test
 	public void testPackageFormat5() throws URISyntaxException, MalformedURLException {
 
 		int loops = 1;

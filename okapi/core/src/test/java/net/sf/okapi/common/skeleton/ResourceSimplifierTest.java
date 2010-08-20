@@ -48,7 +48,7 @@ public class ResourceSimplifierTest {
 	
 	@Test
 	public void testMonolingual() {
-		ResourceSimplifier conv = new ResourceSimplifier(false, ESES, "UTF-8");
+		ResourceSimplifier conv = new ResourceSimplifier(false, ESES);
 		
 		TextUnit tu1 = new TextUnit("tu1");
 		tu1.setSource(new TextContainer("text1"));
@@ -263,7 +263,7 @@ public class ResourceSimplifierTest {
 		skel.addContentPlaceholder(tu2, ESES);
 		skel.add("part4");
 		
-		ResourceSimplifier rs = new ResourceSimplifier(false, ENUS, "UTF-8");
+		ResourceSimplifier rs = new ResourceSimplifier(false, ENUS);
 		Event event = rs.convert(new Event(EventType.TEXT_UNIT, tu1));
 		assertNotNull(event);
 		assertTrue(event.getResource() instanceof MultiEvent);
@@ -315,7 +315,7 @@ public class ResourceSimplifierTest {
 		skel.addReference(tu2);
 		skel.add("part4");
 		
-		ResourceSimplifier rs = new ResourceSimplifier(false, ENUS, "UTF-8");
+		ResourceSimplifier rs = new ResourceSimplifier(false, ENUS);
 		Event complexEvent = new Event(EventType.TEXT_UNIT, tu1);
 		rs.convert(new Event(EventType.TEXT_UNIT, tu2)); // Ref
 		Event simpleEvent = rs.convert(complexEvent);
@@ -373,5 +373,4 @@ public class ResourceSimplifierTest {
 		}		
 		assertEquals(st1, sb.toString());
 	}
-	
 }

@@ -40,6 +40,7 @@ import net.sf.okapi.common.exceptions.OkapiFileNotFoundException;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.MultiEvent;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubDocument;
@@ -176,6 +177,11 @@ public class GenericFilterWriter implements IFilterWriter {
 				break;
 			case DOCUMENT_PART:
 				processDocumentPart((DocumentPart)event.getResource());
+				break;
+			case MULTI_EVENT:
+				for (Event e : (MultiEvent) event.getResource()) {
+					handleEvent(e);
+				}
 				break;
 			}
 		}

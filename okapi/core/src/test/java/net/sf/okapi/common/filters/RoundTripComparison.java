@@ -29,10 +29,10 @@ import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.Util;
-import net.sf.okapi.common.filters.IFilter;
-import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.Util;
+import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.resource.RawDocument;
 
 public class RoundTripComparison {
@@ -54,8 +54,6 @@ public class RoundTripComparison {
 
 	public boolean executeCompare(IFilter filter, List<InputDocument> inputDocs,
 			String defaultEncoding, LocaleId srcLoc, LocaleId trgLoc) {
-		String path = null;
-
 		this.filter = filter;
 		this.defaultEncoding = defaultEncoding;
 		this.srcLoc = srcLoc;
@@ -66,7 +64,7 @@ public class RoundTripComparison {
 
 		for (InputDocument doc : inputDocs) {
 			LOGGER.fine("Processing Document: " + doc.path);
-			path = doc.path;
+			
 			// Reset the event lists
 			extraction1Events.clear();
 			extraction2Events.clear();
@@ -118,7 +116,7 @@ public class RoundTripComparison {
 					params.load(Util.toURI(root + File.separator + doc.paramFile), false);
 			}
 			// Execute the first extraction and the re-writing
-			String outPath = executeFirstExtractionToFile(doc, outputDir);
+			String outPath = executeFirstExtractionToFile(doc, outputDir, (IPipelineStep[]) null);
 			// Execute the second extraction from the output of the first
 			executeSecondExtractionFromFile(outPath);
 			// Compare the events
@@ -129,6 +127,50 @@ public class RoundTripComparison {
 		return true;
 	}
 
+	public boolean executeCompare(IFilter filter, List<InputDocument> inputDocs,
+			String defaultEncoding, LocaleId srcLoc, LocaleId trgLoc, String outputDir, IPipelineStep... steps) {
+		
+		this.filter = filter;
+		this.defaultEncoding = defaultEncoding;
+		this.srcLoc = srcLoc;
+		this.trgLoc = trgLoc;
+		
+//		Pipeline pipeline = new Pipeline();
+//		for (IPipelineStep step : steps) {
+//			pipeline.addStep(step);
+//		}
+		
+		// Create the filter-writer for the provided filter
+		writer = filter.createFilterWriter();
+
+		for (InputDocument doc : inputDocs) {
+			LOGGER.fine("Processing Document: " + doc.path);
+			// Reset the event lists
+			extraction1Events.clear();
+			extraction2Events.clear();
+			// Load parameters if needed
+			if (doc.paramFile == null) {
+				IParameters params = filter.getParameters();
+				if (params != null)
+					params.reset();
+			} else {
+				String root = Util.getDirectoryName(doc.path);
+				IParameters params = filter.getParameters();
+				if (params != null)
+					params.load(Util.toURI(root + File.separator + doc.paramFile), false);
+			}
+			// Execute the first extraction and the re-writing
+			String outPath = executeFirstExtractionToFile(doc, outputDir, steps);
+			// Execute the second extraction from the output of the first
+			executeSecondExtractionFromFile(outPath);
+			// Compare the events
+			if (!FilterTestDriver.compareEvents(extraction1Events, extraction2Events)) {
+				throw new RuntimeException("Events are different for " + doc.path);
+			}
+		}
+		return true;
+	}
+	
 	private void executeFirstExtraction(InputDocument doc) {
 		try {
 			// Open the input
@@ -200,7 +242,7 @@ public class RoundTripComparison {
 		}
 	}
 
-	private String executeFirstExtractionToFile(InputDocument doc, String outputDir) {
+	private String executeFirstExtractionToFile(InputDocument doc, String outputDir, IPipelineStep... steps) {
 		String outPath = null;
 		try {
 			// Open the input
@@ -217,7 +259,7 @@ public class RoundTripComparison {
 				outPath += (File.separator + outputDir + File.separator + Util.getFilename(doc.path, true));
 			}
 			writer.setOutput(outPath);
-
+			
 			// Process the document
 			Event event;
 			while (filter.hasNext()) {
@@ -234,7 +276,13 @@ public class RoundTripComparison {
 					extraction1Events.add(event);
 					break;
 				}
-				writer.handleEvent(event);
+				if (steps != null)
+					for (IPipelineStep step : steps) {
+						event = step.handleEvent(event);
+						writer.handleEvent(event);
+					}
+				else
+					writer.handleEvent(event);
 			}
 		} finally {
 			if (filter != null)

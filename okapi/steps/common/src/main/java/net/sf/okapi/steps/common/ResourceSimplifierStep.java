@@ -40,7 +40,6 @@ public class ResourceSimplifierStep extends BasePipelineStep {
 	
 	private ResourceSimplifier simplifier;
 	private LocaleId targetLocale;
-	private String outputEncoding;
 	
 	@Override
 	public String getDescription() {
@@ -57,17 +56,12 @@ public class ResourceSimplifierStep extends BasePipelineStep {
 		this.targetLocale = targetLocale;
 	}
 
-	@StepParameterMapping(parameterType = StepParameterType.OUTPUT_ENCODING)
-	public void setOutputEncoding (String outputEncoding) {
-		this.outputEncoding = outputEncoding;
-	}
-	
 	@Override
 	public Event handleEvent(Event event) {
 		switch (event.getEventType()) {
 		case START_DOCUMENT:
 			StartDocument sd = (StartDocument) event.getResource();
-			simplifier = new ResourceSimplifier(sd.isMultilingual(), targetLocale, outputEncoding);
+			simplifier = new ResourceSimplifier(sd.isMultilingual(), targetLocale);
 			//break;
 		case END_DOCUMENT:
 		case START_SUBDOCUMENT:
