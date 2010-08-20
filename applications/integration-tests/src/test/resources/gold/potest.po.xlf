@@ -29,7 +29,7 @@
 <source xml:lang="en">Special chars: \"=quot, &amp;=amp, &lt;=lt, >=gt, '=apos, Ą=U+0104</source>
 <target xml:lang="fr">Characters spéciaux : \"=quot, &amp;=amp, &lt;=lt, >=gt, '=apos, Ą=U+0104</target>
 </trans-unit>
-<group id="3" restype="x-gettext-plurals">
+<group id="o3" restype="x-gettext-plurals">
 <trans-unit id="8" resname="N90CD1911-0" approved="yes" xml:space="preserve">
 <source xml:lang="en"><x id="1"/> file</source>
 <target xml:lang="fr"><x id="1"/> fichier</target>
@@ -39,7 +39,7 @@
 <target xml:lang="fr"><x id="1"/> fichiers</target>
 </trans-unit>
 </group>
-<group id="5" restype="x-gettext-plurals">
+<group id="o5" restype="x-gettext-plurals">
 <trans-unit id="10" resname="N8C072106-0" xml:space="preserve">
 <source xml:lang="en"><x id="1"/> file left to delete</source>
 <target xml:lang="fr">Encore <x id="1"/> fichier à détruire</target>
@@ -49,7 +49,7 @@
 <target xml:lang="fr">Encore <x id="1"/> fichiers à détruire</target>
 </trans-unit>
 </group>
-<group id="7" restype="x-gettext-plurals">
+<group id="o7" restype="x-gettext-plurals">
 <trans-unit id="12" resname="P68A1DB2F-0" xml:space="preserve">
 <source xml:lang="en"><x id="1"/> directory left</source>
 <target xml:lang="fr"><x id="1"/> directory left</target>
