@@ -752,12 +752,16 @@ public class H2Access implements IDBAccess {
 	public void removeDocument (IVDocument doc) {
 		PreparedStatement pstm = null;
 		try {
-			// Delete the items
+			// Delete the related items
 			pstm = conn.prepareStatement(String.format("delete from %s where %s=?",
 				ITMS_TBLNAME, ITMS_DKEY));
 			pstm.setLong(1, ((H2Document)doc).key);
 			pstm.execute();
-			pstm.close();
+			// Delete the document entry itself
+			pstm = conn.prepareStatement(String.format("delete from %s where %s=?",
+				ITMS_TBLNAME, ITMS_KEY));
+			pstm.setLong(1, ((H2Document)doc).key);
+			pstm.execute();
 		}
 		catch ( SQLException e ) {
 			throw new RuntimeException(e);
