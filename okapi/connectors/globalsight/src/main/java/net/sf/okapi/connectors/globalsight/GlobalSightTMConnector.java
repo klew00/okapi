@@ -49,6 +49,7 @@ import com.globalsight.www.webservices.AmbassadorWebServiceSoapBindingStub;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
@@ -227,6 +228,11 @@ public class GlobalSightTMConnector implements ITMQuery {
 		return results.size();
 	}
 
+	@Override
+	public List<List<QueryResult>> batchQuery (List<TextFragment> fragments) {
+		throw new OkapiNotImplementedException();
+	}
+	
 //	public int queryV5 (TextFragment frag) {
 //		/* The GlobalSight TM Web service does not support query with inline codes
 //		 * for the time being (v7.1.3), so we query plain text to get the best match 

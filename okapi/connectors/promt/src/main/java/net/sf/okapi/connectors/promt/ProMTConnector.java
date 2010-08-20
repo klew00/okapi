@@ -33,6 +33,7 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -52,6 +53,7 @@ import net.sf.okapi.common.DefaultEntityResolver;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.IQuery;
@@ -183,6 +185,11 @@ public class ProMTConnector implements IQuery {
 	public int query (TextFragment frag) {
 		if ( !frag.hasText(false) ) return 0;
 		return queryUsingPOST(frag, null);
+	}
+	
+	@Override
+	public List<List<QueryResult>> batchQuery (List<TextFragment> fragments) {
+		throw new OkapiNotImplementedException();
 	}
 	
 	// Either frag or plainText must be null

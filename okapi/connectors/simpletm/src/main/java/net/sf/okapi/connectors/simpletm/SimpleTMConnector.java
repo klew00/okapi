@@ -26,6 +26,7 @@ import java.util.List;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
@@ -119,6 +120,11 @@ public class SimpleTMConnector implements ITMQuery {
 		if ( results == null ) return 0;
 		current = 0;
 		return results.size();
+	}
+	
+	@Override
+	public List<List<QueryResult>> batchQuery (List<TextFragment> fragments) {
+		throw new OkapiNotImplementedException();
 	}
 	
 	@Override

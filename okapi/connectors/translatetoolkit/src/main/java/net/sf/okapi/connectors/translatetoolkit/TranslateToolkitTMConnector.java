@@ -38,6 +38,7 @@ import org.json.simple.parser.ParseException;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
@@ -159,6 +160,11 @@ public class TranslateToolkitTMConnector implements ITMQuery {
 		//TODO: Deal with inline codes, maybe using generic codes
 		String tmp = text.getCodedText();
 		return query(tmp);
+	}
+	
+	@Override
+	public List<List<QueryResult>> batchQuery (List<TextFragment> fragments) {
+		throw new OkapiNotImplementedException();
 	}
 
 	@Override

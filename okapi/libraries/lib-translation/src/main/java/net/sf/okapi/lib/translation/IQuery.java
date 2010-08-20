@@ -20,6 +20,8 @@
 
 package net.sf.okapi.lib.translation;
 
+import java.util.List;
+
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextFragment;
@@ -120,6 +122,16 @@ public interface IQuery {
 	 */
 	public int query (TextFragment text);
 	
+	
+	/**
+	 * Starts a batch query for a given list of {@link TextFragment}s.
+	 * Some {@link IQuery} implementations are significantly faster when 
+	 * a using batch query.
+	 * @param fragments the list of {@link TextFragment}s to query.
+	 * @return a list of lists of {@link QueryResult}s.
+	 */
+	public List<List<QueryResult>> batchQuery (List<TextFragment> fragments);
+
 	/**
 	 * Indicates of there is a hit available.
 	 * @return True if a hit is available, false if not.

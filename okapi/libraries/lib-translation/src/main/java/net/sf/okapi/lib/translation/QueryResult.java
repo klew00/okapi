@@ -39,7 +39,6 @@ public class QueryResult implements Comparable<QueryResult> {
 	 */
 	public int score;
 	
-	
 	/**
 	 * {@link MatchType} of this result.
 	 */
@@ -80,7 +79,7 @@ public class QueryResult implements Comparable<QueryResult> {
 	 * source string match. Weight is the primary key, {@link MatchType} secondary, score tertiary
 	 * and source string quaternary.
 	 * @param other the QueryResult we are comparing against.
-	 * @return the comparison result (0 if both object are equal).
+	 * @return the comparison result (0 if both objects are equal).
 	 */
 	@Override
 	public int compareTo (QueryResult other) {
@@ -148,7 +147,7 @@ public class QueryResult implements Comparable<QueryResult> {
 
 	/**
 	 * A class that overrides equals must also override hashCode.
-	 * @return the has code for this object.
+	 * @return the hash code for this object.
 	 */
 	@Override
 	public int hashCode () {

@@ -37,6 +37,7 @@ import java.util.Map;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.lib.translation.ITMQuery;
@@ -180,6 +181,11 @@ public class OpenTranTMConnector implements ITMQuery {
 	@Override
 	public int query (TextFragment text) {
 		return restQuery(TextUnitUtil.getText(text, null), text.hasCode());
+	}
+	
+	@Override
+	public List<List<QueryResult>> batchQuery (List<TextFragment> fragments) {
+		throw new OkapiNotImplementedException();
 	}
 
 	@Override

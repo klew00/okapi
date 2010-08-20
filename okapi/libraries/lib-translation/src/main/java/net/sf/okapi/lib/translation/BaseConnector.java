@@ -20,8 +20,12 @@
 
 package net.sf.okapi.lib.translation;
 
+import java.util.List;
+
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
+import net.sf.okapi.common.resource.TextFragment;
 
 /**
  * Abstract implementation of the {@link IQuery} interface.
@@ -98,6 +102,11 @@ public abstract class BaseConnector implements IQuery {
 	public void setParameters (IParameters params) {
 		// No parameters by default
 	}
+	
+	@Override
+	public List<List<QueryResult>> batchQuery (List<TextFragment> fragments) {
+		throw new OkapiNotImplementedException();
+	}
 
 	/**
 	 * Converts a locale identifier to the internal string value for a language/locale code
@@ -107,6 +116,5 @@ public abstract class BaseConnector implements IQuery {
 	 */
 	protected String toInternalCode (LocaleId locId) {
 		return locId.toString();
-	}
-
+	}	
 }

@@ -34,6 +34,7 @@ import org.tempuri.Query;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.ITMQuery;
@@ -169,6 +170,11 @@ public class MyMemoryTMConnector implements ITMQuery {
 	@Override
 	public int query (String plainText) {
 		return query(new TextFragment(plainText));
+	}
+	
+	@Override
+	public List<List<QueryResult>> batchQuery (List<TextFragment> fragments) {
+		throw new OkapiNotImplementedException();
 	}
 
 	@Override

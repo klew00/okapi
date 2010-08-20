@@ -23,6 +23,7 @@ package net.sf.okapi.connectors.pensieve;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
@@ -163,6 +164,11 @@ public class PensieveTMConnector implements ITMQuery {
 		else {
 			return queryDirectory(text);
 		}
+	}
+	
+	@Override
+	public List<List<QueryResult>> batchQuery (List<TextFragment> fragments) {
+		throw new OkapiNotImplementedException();
 	}
 	
 	// Direct query, using the seeker

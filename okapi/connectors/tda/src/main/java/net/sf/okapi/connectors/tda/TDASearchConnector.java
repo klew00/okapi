@@ -39,6 +39,7 @@ import org.json.simple.parser.JSONParser;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
@@ -135,6 +136,11 @@ public class TDASearchConnector implements ITMQuery {
 		current = -1;
 		if ( !frag.hasText(false) ) return 0;
 		return doTDAQuery(qutil.separateCodesFromText(frag), frag.toString());
+	}
+	
+	@Override
+	public List<List<QueryResult>> batchQuery (List<TextFragment> fragments) {
+		throw new OkapiNotImplementedException();
 	}
 	
 	private int doTDAQuery (String query,
