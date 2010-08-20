@@ -1196,6 +1196,26 @@ public class TextContainerTest {
 	}
 
 	@Test
+	public void testSplitStorage_WithoutCodes () {
+		TextContainer tc1 = createMultiSegmentContent();
+		String data[] = TextContainer.contentToSplitStorage(tc1);
+		TextContainer tc2 = TextContainer.splitStorageToContent(data[0], data[1]);
+		assertEquals("[text1] [text2]", fmt.printSegmentedContent(tc2, true));
+		assertTrue(tc2.hasBeenSegmented());
+		assertEquals("text1 text2", tc2.toString());
+	}
+	
+	@Test
+	public void testSplitStorage_WithCodes () {
+		TextContainer tc1 = createMultiSegmentContentWithCodes();
+		String data[] = TextContainer.contentToSplitStorage(tc1);
+		TextContainer tc2 = TextContainer.splitStorageToContent(data[0], data[1]);
+		assertEquals("[text1<1/>] [text2<2/>]", fmt.printSegmentedContent(tc2, true));
+		assertTrue(tc2.hasBeenSegmented());
+		assertEquals("text1<br/> text2<br/>", tc2.toString());
+	}
+
+	@Test
 	public void testAppendPart_AsPart () {
 		TextContainer tc = new TextContainer();
 		tc.append(new TextPart("n0"));

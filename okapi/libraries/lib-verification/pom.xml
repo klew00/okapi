@@ -30,5 +30,19 @@
 			<artifactId>okapi-connector-google</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <!-- <version>1.1.103</version>-->
+            <version>1.2.135</version>
+        </dependency>
+
+		<!-- For tests -->
+        <dependency>
+        	<groupId>net.sf.okapi.filters</groupId>
+        	<artifactId>okapi-filter-xliff</artifactId>
+        	<version>${project.version}</version>
+        	<scope>test</scope>
+        </dependency>
     </dependencies>
 </project>

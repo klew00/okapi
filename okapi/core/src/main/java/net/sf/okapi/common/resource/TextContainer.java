@@ -373,9 +373,9 @@ public class TextContainer implements Iterable<TextPart> {
 	}
 	
 	/**
-	 * Creates a string that stores the content of a given container. Only the content is saved (not
-	 * the properties, annotations, etc.). Use {@link #stringToContent(String)} to create the container
-	 * back from the string.
+	 * Creates a string that stores the content of a given container.
+	 * Use {@link #stringToContent(String)} to create the container back from the string.
+	 * <p><b>IMPORTANT:</b> Only the content is saved (not the properties, annotations, etc.). 
 	 * @param tc the container holding the content to store. 
 	 * @return a string representing the content of the given container.
 	 */
@@ -419,7 +419,73 @@ public class TextContainer implements Iterable<TextPart> {
 		}
 		return tc;
 	}
-	
+
+	/**
+	 * Create two storage strings to serialize a given {@link TextContainer}.
+	 * Use {@link #splitStorageToContent(String, String)} to create the container back from the strings.
+	 * <p><b>IMPORTANT:</b> Only the content is saved (not the properties, annotations, etc.). 
+	 * @param tc the text container to store.
+	 * @return An array of two {@link String} objects: The first one contains the coded text
+	 * parts, the second one contains the codes.
+	 * @see #splitStorageToContent(String, String)
+	 */
+	static public String[] contentToSplitStorage (TextContainer tc) {
+		String res[] = new String[2];
+		StringBuilder tmp1 = new StringBuilder();
+		StringBuilder tmp2 = new StringBuilder();
+		tmp1.append(tc.hasBeenSegmented() ? '1' : '0');
+		for ( TextPart part : tc ) {
+			tmp1.append(part.isSegment() ? '1' : '0');
+			tmp1.append(part.text.getCodedText());
+			tmp1.append(PARTSEP1);
+			if ( part.isSegment() ) {
+				tmp1.append(((Segment)part).id);
+			}
+			// end of part to string: next part
+			tmp1.append(PARTSEP2);
+			// Store the corresponding codes
+			tmp2.append(Code.codesToString(part.text.getCodes()));
+			tmp2.append(PARTSEP2);
+		}
+		res[0] = tmp1.toString();
+		res[1] = tmp2.toString(); 
+		return res;
+	}
+
+	/**
+	 * Creates a new {@link TextContainer} object from two strings generated with {@link #contentToSplitStorage(TextContainer)}.
+	 * @param ctext the string holding the coded text parts.
+	 * @param codes the string holding the codes.
+	 * @return a new {@link TextContainer} object created from the strings.
+	 * @see #contentToSplitStorage(TextContainer)
+	 */
+	static public TextContainer splitStorageToContent (String ctext,
+		String codes)
+	{
+		TextContainer tc = new TextContainer();
+		tc.parts.clear(); // Make sure the default empty part is removed
+		// Un-encode the codes
+		String[] codesParts = codes.split(PARTSEP2, -2);
+		// Un-code the coded text and the segment info
+		// <segmented?0|1>(<segment?0|1><codedtext><sep1>[<segId>]<sep2>)*
+		tc.setHasBeenSegmentedFlag((ctext.charAt(0)=='1'));
+		String[] chunks = ctext.substring(1).split(PARTSEP2, 0);
+		// Now we have: <segment?0|1><codedtext><sep1>[<segId>]
+		int i = 0;
+		for ( String chunk : chunks ) {
+			int n = chunk.indexOf(PARTSEP1CHAR);
+			TextFragment tf = new TextFragment(chunk.substring(1, n), Code.stringToCodes(codesParts[i]));
+			if ( (chunk.charAt(0)=='1') ) { // It is a segment
+				tc.parts.add(new Segment(chunk.substring(n+1), tf));
+			}
+			else {
+				tc.parts.add(new TextPart(tf));
+			}
+			i++;
+		}
+		return tc;
+	}
+
 	/**
 	 * Creates a new empty TextContainer object.
 	 */

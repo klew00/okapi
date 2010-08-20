@@ -561,6 +561,10 @@ public class TextContainerEditorPanel {
 		modified = false;
 	}
 	
+	public boolean isModified () {
+		return modified;
+	}
+
 	public boolean applyChanges () {
 		try {
 			if ( !modified ) return true;

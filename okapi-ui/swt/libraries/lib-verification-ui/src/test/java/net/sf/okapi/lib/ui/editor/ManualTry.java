@@ -19,7 +19,7 @@ public class ManualTry {
 			IFilterConfigurationMapper fcMapper = new FilterConfigurationMapper();
 			DefaultFilters.setMappings(fcMapper, false, true);
 			// Initialize the editor
-			PairEditorUserTest editor = new PairEditorUserTest(shlMain, fcMapper); 
+			PairEditorUserTest editor = new PairEditorUserTest(shlMain, fcMapper, true); 
 			// Start
 			editor.showDialog();
 		}

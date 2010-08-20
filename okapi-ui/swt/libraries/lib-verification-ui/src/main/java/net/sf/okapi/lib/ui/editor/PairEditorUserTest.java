@@ -41,6 +41,11 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.ui.Dialogs;
+import net.sf.okapi.virtualdb.IVDocument;
+import net.sf.okapi.virtualdb.IVRepository;
+import net.sf.okapi.virtualdb.IVTextUnit;
+import net.sf.okapi.virtualdb.jdbc.Repository;
+import net.sf.okapi.virtualdb.jdbc.h2.H2Access;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DND;
@@ -76,7 +81,6 @@ public class PairEditorUserTest {
 	private LocaleId srcLoc = LocaleId.ENGLISH;
 	private LocaleId trgLoc = LocaleId.FRENCH;
 	private RawDocument rawDoc;
-	private ArrayList<TextUnit> textUnits = new ArrayList<TextUnit>();
 	private int current = -1;
 	private int curSeg = -1;
 	private ISegments srcSegs;
@@ -87,9 +91,17 @@ public class PairEditorUserTest {
 	private boolean segmentMode = true;
 	private String outEncoding;
 	private String outPath;
+	private int TUCount;
+	private ArrayList<TextUnit> textUnits = new ArrayList<TextUnit>();
+	private ArrayList<String> ids = new ArrayList<String>();
+	private IVRepository repo;
+	private IVDocument vdoc;
+	private IVTextUnit vtu;
+	private boolean useRepository;
 
 	public PairEditorUserTest (Object parent,
-		IFilterConfigurationMapper fcMapper)
+		IFilterConfigurationMapper fcMapper,
+		boolean useRepository)
 	{
 		// If no parent is defined, create a new display and shell
 		if ( parent == null ) {
@@ -103,10 +115,21 @@ public class PairEditorUserTest {
 		shell.setText("Fragment Editor Testing Console");
 		shell.setLayout(new GridLayout());
 
+		this.useRepository = useRepository;
+		if ( useRepository ) {
+			H2Access h2db = new H2Access();
+			h2db.setFilterConfigurationMapper(fcMapper);
+			h2db.create("tmpRepo");
+			repo = new Repository(h2db);
+		}
+		
 		createContent();
-		
-		createInitialExtractedText();
-		
+
+		// Extra feature when using the in-memory list
+		if ( !useRepository ) {
+			createInitialExtractedText();
+		}
+
 		updateButtons();
 		
 		Dialogs.centerWindow(shell, (Shell)parent);
@@ -262,13 +285,31 @@ public class PairEditorUserTest {
 			trgSegs = null;
 			
 			// Load the document
-			textUnits = new ArrayList<TextUnit>();
-			filter.open(rawDoc);
-			while ( filter.hasNext() ) {
-				Event event = filter.next();
-				if ( event.getEventType() == EventType.TEXT_UNIT ) {
-					textUnits.add(event.getTextUnit());
+			TUCount = 0;
+			if ( useRepository ) {
+				// Remove existing document
+				if ( vdoc != null ) {
+					repo.removeDocument(vdoc);
 				}
+				// Import new one
+				repo.importDocument(rawDoc);
+				vdoc = repo.getFirstDocument();
+				ids = new ArrayList<String>();
+				for ( IVTextUnit vtu : vdoc.textUnits() ) {
+					ids.add(vtu.getId());
+				}
+				TUCount = ids.size();
+			}
+			else {
+				textUnits = new ArrayList<TextUnit>();
+				filter.open(rawDoc);
+				while ( filter.hasNext() ) {
+					Event event = filter.next();
+					if ( event.getEventType() == EventType.TEXT_UNIT ) {
+						textUnits.add(event.getTextUnit());
+					}
+				}
+				TUCount = textUnits.size();
 			}
 		}
 		catch ( Throwable e ) {
@@ -285,15 +326,15 @@ public class PairEditorUserTest {
 	}
 	
 	private void updateButtons () {
-		btSave.setEnabled(( rawDoc != null ) && ( textUnits.size() > 0 ));
+		btSave.setEnabled(( rawDoc != null ) && ( TUCount > 0 ));
 		
 		if ( segmentMode ) {
-			btPrevious.setEnabled(( current > 0 ) && (( curSeg > 0 ) || ( textUnits.size() > 0 )));
-			btNext.setEnabled(( textUnits.size() > 0 ) && (( curSeg < srcSegs.count()-1 ) || ( current < (textUnits.size()-1) )));
+			btPrevious.setEnabled(( current > 0 ) && (( curSeg > 0 ) || ( TUCount > 0 )));
+			btNext.setEnabled(( TUCount > 0 ) && (( curSeg < srcSegs.count()-1 ) || ( current < (TUCount-1) )));
 		}
 		else {
-			btPrevious.setEnabled(( current > 0 ) && ( textUnits.size() > 0 ));
-			btNext.setEnabled(( textUnits.size() > 0 ) && ( current < (textUnits.size()-1) ));
+			btPrevious.setEnabled(( current > 0 ) && ( TUCount > 0 ));
+			btNext.setEnabled(( TUCount > 0 ) && ( current < (TUCount-1) ));
 		}
 		
 		btFirst.setEnabled(btPrevious.getEnabled());
@@ -307,7 +348,13 @@ public class PairEditorUserTest {
 			if ( index < 0 ) return;
 			
 			// Get the text unit
-			tu = textUnits.get(index);
+			if ( useRepository ) {
+				vtu = (IVTextUnit)vdoc.getItem(ids.get(index));
+				tu = vtu.getTextUnit();
+			}
+			else {
+				tu = textUnits.get(index);
+			}
 			
 			// Get the source
 			srcCont = tu.getSource();
@@ -357,12 +404,12 @@ public class PairEditorUserTest {
 				}
 				editPanel.setTextFragments(srcSeg.text, trgSeg.text);
 				edInfo.setText(String.format("TU ID=%s / %d of %d / seg=%s",
-					tu.getId(), current+1, textUnits.size(), srcSeg.getId()));
+					tu.getId(), current+1, TUCount, srcSeg.getId()));
 			}
 			else { // Show the text containers
 				editPanel.setTextContainers(srcCont, trgCont);
 				edInfo.setText(String.format("TU ID=%s / %d of %d / full content",
-					tu.getId(), current+1, textUnits.size()));
+					tu.getId(), current+1, TUCount));
 			}
 			
 			// Translatable?
@@ -398,13 +445,13 @@ public class PairEditorUserTest {
 
 		if ( segmentMode ) {
 			if ( curSeg >= srcSegs.count()-1 ) {
-				if ( current >= textUnits.size()-1 ) return; // No more
+				if ( current >= TUCount-1 ) return; // No more
 				else getNewCurrent(++current, true); // Get next text unit 
 			}
 			else curSeg++; // Move to next segment
 		}
 		else { // Non-segment mode
-			if ( current >= textUnits.size()-1 ) return; // No more
+			if ( current >= TUCount-1 ) return; // No more
 			else getNewCurrent(++current, true); // Get next text unit
 		}
 		displayCurrent();
@@ -412,7 +459,7 @@ public class PairEditorUserTest {
 	
 	private void displayFirst () {
 		if ( !saveCurrent() ) return;
-		if ( textUnits.size() > 0 ) {
+		if ( TUCount > 0 ) {
 			current = 0;
 			getNewCurrent(current, true);
 		}
@@ -445,8 +492,8 @@ public class PairEditorUserTest {
 	private void displayLast () {
 		if ( current < 0 ) return;
 		if ( !saveCurrent() ) return;
-		if ( textUnits.size() > 0 ) {
-			current = textUnits.size()-1;
+		if ( TUCount > 0 ) {
+			current = TUCount-1;
 			getNewCurrent(current, false);
 		}
 		else {
@@ -457,7 +504,15 @@ public class PairEditorUserTest {
 	
 	private boolean saveCurrent () {
 		if ( current == -1 ) return true;
-		return editPanel.applyChanges();
+		// Anything has changed?
+//Always save for now (to detect more errors), later we can do:		if ( !editPanel.isModified() ) return true;
+		// Apply the changes from the edit box to the text container
+		if ( !editPanel.applyChanges() ) return false;
+		// Save the changes
+		if ( vtu != null ) {
+			vtu.save();
+		}
+		return true;
 	}
 
 	private void saveOutput () {
@@ -482,8 +537,15 @@ public class PairEditorUserTest {
 					break;
 				case TEXT_UNIT:
 					TextUnit oriTU = event.getTextUnit();
-					TextUnit updTU = textUnits.get(tuIndex);
-					// make sure they are in sync (just to be sure)
+					TextUnit updTU;
+					if ( useRepository ) {
+						IVTextUnit updVTU = (IVTextUnit)vdoc.getItem(ids.get(tuIndex));
+						updTU = updVTU.getTextUnit();
+					}
+					else {
+						updTU = textUnits.get(tuIndex);
+					}
+					// Make sure they are in sync (just to be sure)
 					if ( !oriTU.getId().equals(updTU.getId()) ) {
 						throw new RuntimeException("Text units de-synchronized: the underlying file has changed.");
 					}
@@ -528,6 +590,7 @@ public class PairEditorUserTest {
 		tu.setSource(new TextContainer(srcFrag));
 		textUnits.add(tu);
 
+		TUCount = textUnits.size();
 		displayFirst();
 	}
 

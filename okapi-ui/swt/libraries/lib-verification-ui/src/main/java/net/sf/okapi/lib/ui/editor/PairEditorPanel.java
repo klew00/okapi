@@ -79,6 +79,10 @@ public class PairEditorPanel extends SashForm {
 		edTarget.clear();
 	}
 
+	public boolean isModified () {
+		return (edTarget.isModified() || edSource.isModified());
+	}
+	
 	public boolean applyChanges () {
 		return edTarget.applyChanges();
 	}
