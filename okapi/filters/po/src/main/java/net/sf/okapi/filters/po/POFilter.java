@@ -35,6 +35,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
+import net.sf.okapi.common.IdGenerator;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
@@ -101,7 +102,7 @@ public class POFilter implements IFilter {
 	private boolean autoDetected;
 	private String textLine;
 	private int tuId;
-	private int otherId;
+	private IdGenerator otherId;
 	private String lineBreak;
 	private int parseState = 0;
 	private GenericSkeleton skel;
@@ -233,7 +234,7 @@ public class POFilter implements IFilter {
 		// Initializes the variables
 		nPlurals = DEFAULT_NPLURALS;
 		tuId = 0;
-		otherId = 0;
+		otherId = new IdGenerator(null, "o");
 		pluralMode = 0;
 		pluralCount = 0;
 		readLine = true;
@@ -284,7 +285,7 @@ public class POFilter implements IFilter {
 	
 	private Event start () {
 		parseState = 2;
-		StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
+		StartDocument startDoc = new StartDocument(otherId.createId());
 		startDoc.setName(docName);
 		startDoc.setEncoding(encoding, hasUTF8BOM);
 		startDoc.setLocale(srcLang);
@@ -317,7 +318,7 @@ public class POFilter implements IFilter {
 			pluralCount = 0;
 			// Close the group
 			level--;
-			Ending ending = new Ending(String.valueOf(++otherId));
+			Ending ending = new Ending(otherId.createId());
 			ending.setSkeleton(skel);
 			return new Event(EventType.END_GROUP, ending);
 		}
@@ -339,7 +340,7 @@ public class POFilter implements IFilter {
 					// No more lines
 					if ( level > 0 ) { // Check if a group is open
 						level--;
-						Ending ending = new Ending(String.valueOf(++otherId));
+						Ending ending = new Ending(otherId.createId());
 						ending.setSkeleton(skel);
 						return new Event(EventType.END_GROUP, ending);
 					}
@@ -423,13 +424,13 @@ public class POFilter implements IFilter {
 					readLine = false; // Do not re-read this line next call
 					level--;
 					domain = DOMAIN_NONE; // Default
-					Ending ending = new Ending(String.valueOf(++otherId));
+					Ending ending = new Ending(otherId.createId());
 					ending.setSkeleton(skel);
 					return new Event(EventType.END_GROUP, ending);
 				}
 				// Else: Start of domain group
 				skel.append(textLine);
-				StartGroup startGroup = new StartGroup(null, String.valueOf(++otherId));
+				StartGroup startGroup = new StartGroup(null, otherId.createId());
 				startGroup.setSkeleton(skel);
 				skel.append(lineBreak);
 				startGroup.setType("x-gettext-domain");
@@ -443,7 +444,7 @@ public class POFilter implements IFilter {
 				pluralMode = 1;
 				msgIDPlural = getQuotedString(true);
 				// Start a plural group
-				StartGroup startGroup = new StartGroup(null, String.valueOf(++otherId));
+				StartGroup startGroup = new StartGroup(null, otherId.createId());
 				// Copy the text unit info to the group if needed
 				if ( tu != null ) {
 					Property prop = tu.getTargetProperty(trgLang, Property.APPROVED);
@@ -523,7 +524,7 @@ public class POFilter implements IFilter {
 		// Check for header entry, and update it if required
 		if ( msgID.length() == 0 ) {
 			// Initialize the header and its string
-			String id = String.valueOf(++otherId);
+			String id = otherId.createId();
 			DocumentPart dp = new DocumentPart(id, false, skel);
 			dp.setMimeType(getMimeType());
 			tmp.insert(0, "\""+lineBreak+"\"");
@@ -681,7 +682,7 @@ public class POFilter implements IFilter {
 		
 		// Check for header entry, and update it if required
 		if ( msgID.length() == 0 ) {
-			String id = String.valueOf(++otherId);
+			String id = otherId.createId();
 			DocumentPart dp = new DocumentPart(id, false, skel);
 			String part1 = "\""+lineBreak+"\""+tmp;
 			String part2 = "\""+lineBreak;

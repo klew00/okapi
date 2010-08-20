@@ -35,6 +35,7 @@ import net.sf.okapi.common.DefaultEntityResolver;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.IdGenerator;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
@@ -80,7 +81,7 @@ public class XMLFilter implements IFilter {
 	private ITraversal trav;
 	private LinkedList<Event> queue;
 	private int tuId;
-	private int otherId;
+	private IdGenerator otherId;
 	private TextFragment frag;
 	private GenericSkeleton skel;
 	private Stack<ContextItem> context;
@@ -228,7 +229,7 @@ public class XMLFilter implements IFilter {
 		// Initializes the variables
 		canceled = false;
 		tuId = 0;
-		otherId = 0;
+		otherId = new IdGenerator(null, "o");
 
 		// Create the document builder factory
 		DocumentBuilderFactory fact = DocumentBuilderFactory.newInstance();
@@ -315,7 +316,7 @@ public class XMLFilter implements IFilter {
 		// Set the start event
 		queue = new LinkedList<Event>();
 
-		StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
+		StartDocument startDoc = new StartDocument(otherId.createId());
 		startDoc.setName(docName);
 		String realEnc = doc.getInputEncoding();
 		if ( realEnc != null ) encoding = realEnc;
@@ -408,7 +409,7 @@ public class XMLFilter implements IFilter {
 		while ( true ) {
 			node = trav.nextNode();
 			if ( node == null ) { // No more node: we stop
-				Ending ending = new Ending(String.valueOf(++otherId));
+				Ending ending = new Ending(otherId.createId());
 				if (( skel != null ) && ( !skel.isEmpty() )) {
 					ending.setSkeleton(skel);
 				}

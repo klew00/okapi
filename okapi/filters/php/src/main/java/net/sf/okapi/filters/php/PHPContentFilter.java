@@ -74,7 +74,6 @@ public class PHPContentFilter implements IFilter {
 	private String lineBreak;
 	private String inputText;
 	private int tuId;
-	private int otherId;
 	private LinkedList<Event> queue;
 	private boolean hasNext;
 	private int current;
@@ -223,7 +222,6 @@ public class PHPContentFilter implements IFilter {
 		inputText = tmp.toString().replace(lineBreak, "\n");
 		current = -1;
 		tuId = 0;
-		otherId = 0;
 		// Compile code finder rules
 		if ( params.getUseCodeFinder() ) {
 			params.getCodeFinder().compile();
@@ -231,7 +229,7 @@ public class PHPContentFilter implements IFilter {
 
 		// Set the start event
 		queue = new LinkedList<Event>();
-		StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
+		StartDocument startDoc = new StartDocument("sd");
 		startDoc.setName(docName);
 		startDoc.setEncoding(encoding, hasUTF8BOM);
 		startDoc.setLocale(input.getSourceLocale());
@@ -274,7 +272,7 @@ public class PHPContentFilter implements IFilter {
 			if ( current+1 >= inputText.length() ) {
 				processTextUnit();
 				// End of input
-				Ending ending = new Ending(String.valueOf(++otherId));
+				Ending ending = new Ending("ed");
 				if ( skelStart < inputText.length() ) {
 					GenericSkeleton skl = new GenericSkeleton(inputText.substring(skelStart).replace("\n", lineBreak));
 					ending.setSkeleton(skl);

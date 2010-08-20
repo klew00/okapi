@@ -78,7 +78,6 @@ public class PropertiesFilter implements IFilter {
 	private long lineSince;
 	private long position;
 	private int tuId;
-	private int otherId;
 	private Pattern keyConditionPattern;
 	private String lineBreak;
 	private int parseState = 0;
@@ -194,7 +193,7 @@ public class PropertiesFilter implements IFilter {
 		} while ( n > RESULT_END );
 		
 		// Set the ending call
-		Ending ending = new Ending(String.valueOf(++otherId));
+		Ending ending = new Ending("ed");
 		ending.setSkeleton(skel);
 		parseState = 0;
 		return new Event(EventType.END_DOCUMENT, ending);
@@ -248,7 +247,6 @@ public class PropertiesFilter implements IFilter {
 		
 		// Initializes the variables
 		tuId = 0;
-		otherId = 0;
 		lineNumber = 0;
 		lineSince = 0;
 		position = 0;
@@ -266,7 +264,7 @@ public class PropertiesFilter implements IFilter {
 		// Set the start event
 		queue = new LinkedList<Event>();
 
-		StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
+		StartDocument startDoc = new StartDocument("sd");
 		startDoc.setName(docName);
 		startDoc.setEncoding(encoding, hasUTF8BOM);
 		startDoc.setLocale(input.getSourceLocale());

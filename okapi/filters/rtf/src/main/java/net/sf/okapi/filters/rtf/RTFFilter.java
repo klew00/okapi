@@ -167,7 +167,6 @@ public class RTFFilter implements IFilter {
 	private boolean hasNext;
 	private String docName;
 	private int tuId;
-	private int otherId;
 	private EncoderManager encoderManager;
 	
 	public RTFFilter () {
@@ -376,7 +375,7 @@ public class RTFFilter implements IFilter {
 		if ( !getSegment(textUnit) ) {
 			// Send the end-document event
 			queue.add(new Event(EventType.END_DOCUMENT,
-				new Ending(String.valueOf(++otherId))));
+				new Ending(String.valueOf("ed"))));
 		}
 		else {
 			queue.add(new Event(EventType.TEXT_UNIT, textUnit));
@@ -401,7 +400,7 @@ public class RTFFilter implements IFilter {
 			reader = new BufferedReader(
 				new InputStreamReader(input.getStream(), passedEncoding));
 	
-			StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
+			StartDocument startDoc = new StartDocument("sd");
 			startDoc.setName(docName);
 			startDoc.setEncoding(passedEncoding, false);
 			startDoc.setLocale(input.getSourceLocale());
@@ -469,7 +468,6 @@ public class RTFFilter implements IFilter {
 
 		hasNext = true;
 		tuId = 0;
-		otherId = 0;
 		queue = new LinkedList<Event>();
 	}
 
