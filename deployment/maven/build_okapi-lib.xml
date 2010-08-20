@@ -277,6 +277,16 @@
 		   <fileset dir="../shared/licenses" includes="**/h2-*"/>
 		</copy>
 
+		<property name="dep005bis" value="${mavenStore}/com/h2database/h2/1.2.135"/>
+		<fileset id="list.contents" dir="${dep005bis}"
+		 includes="**/h2-1.2.135.jar"/>
+		<property name="jar005bis" refid="list.contents"/>
+		<echo file="tmpJars" append="yes"> ${jar005bis}</echo>
+		<copy todir="${distLib}" file="${dep005bis}/${jar005bis}"/>
+		<copy todir="${distLicenses}">
+		   <fileset dir="../shared/licenses" includes="**/h2-*"/>
+		</copy>
+
 <!-- Not needed anymore (opentra using rest api)
 		<property name="dep006" value="${mavenStore}/org/apache/ws/commons/util/ws-commons-util/1.0.2"/>
 		<fileset id="list.contents" dir="${dep006}"
