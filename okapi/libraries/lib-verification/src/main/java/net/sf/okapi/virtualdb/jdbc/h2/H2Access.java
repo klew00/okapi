@@ -22,7 +22,6 @@ package net.sf.okapi.virtualdb.jdbc.h2;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.net.URL;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -55,7 +54,6 @@ public class H2Access implements IDBAccess {
 	public static final int ITEMKIND_TEXTUNIT = 3;
 
 	public static final String H2DB_EXT = ".h2.db";
-	//public static final String H2DB_EXT = ".data.db"; // new version for later: ".h2.db";
 	
 	public static final String DOCS_TBLNAME = "DOCS";
 	public static final String DOCS_KEY = "KEY";
@@ -91,36 +89,44 @@ public class H2Access implements IDBAccess {
 	
 	// Variables used during import
 	private IFilterConfigurationMapper fcMapper;
-	
+
 	/**
 	 * Creates the repository in memory.
+	 * @param fcMapper the filter configuration mapper to use for importing files. Can be null
+	 * if no file is imported during the session.
 	 */
-	public H2Access () {
-		initialize(RepositoryType.INMEMORY);
+	public H2Access (IFilterConfigurationMapper fcMapper) {
+		initialize(RepositoryType.INMEMORY, fcMapper);
 	}
 	
 	/**
 	 * Creates the repository to work in a given folder.
 	 * @param baseDirectory the folder where to work for this repository.
+	 * @param fcMapper the filter configuration mapper to use for importing files. Can be null
+	 * if no file is imported during the session.
 	 */
-	public H2Access (String baseDirectory) {
-		initialize(RepositoryType.LOCAL);
+	public H2Access (String baseDirectory,
+		IFilterConfigurationMapper fcMapper)
+	{
+		initialize(RepositoryType.LOCAL, fcMapper);
 		baseDir = baseDirectory;
 		if ( !baseDir.endsWith("/") || !baseDir.endsWith("\\") ) {
 			baseDir += "/";
 		}
 	}
+
+	// Not tested
+//	public H2Access (URL baseURL,
+//		IFilterConfigurationMapper fcMapper)
+//	{
+//		initialize(RepositoryType.REMOTE, fcMapper);
+//	}
 	
-	public H2Access (URL baseURL) {
-		initialize(RepositoryType.REMOTE);
-	}
-	
-	public void setFilterConfigurationMapper (IFilterConfigurationMapper fcMapper) {
-		this.fcMapper = fcMapper;
-	}
-	
-	private void initialize (RepositoryType repositoryType) {
+	private void initialize (RepositoryType repositoryType,
+		IFilterConfigurationMapper fcMapper)
+	{
 		this.repoType = repositoryType;
+		this.fcMapper = fcMapper;
 		self = this;
 		try {
 			// Initialize the driver
@@ -147,7 +153,7 @@ public class H2Access implements IDBAccess {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	@Override
 	public void open (String name) {
 		// Close existing connection
@@ -232,36 +238,38 @@ public class H2Access implements IDBAccess {
 	
 	@Override
 	public void delete () {
+		//TODO: delete repository
+		throw new UnsupportedOperationException("delete()");
 	}
 
-	@Override
-	public IVDocument getDocument (String docId) {
-		Statement stm = null;
-		IVDocument doc = null;
-		try {
-			stm = conn.createStatement();
-			ResultSet rs = stm.executeQuery(String.format(
-				"SELECT * FROM %s WHERE %s='%s'", DOCS_TBLNAME, DOCS_XID, docId));
-			if ( rs.first() ) {
-				doc = new H2Document(this, rs.getLong(DOCS_KEY), rs.getString(DOCS_XID), rs.getString(DOCS_NAME), rs.getString(DOCS_TYPE));
-			}
-		}
-		catch ( SQLException e ) {
-			throw new RuntimeException(e);
-		}
-		finally {
-			try {
-				if ( stm != null ) {
-					stm.close();
-					stm = null;
-				}
-			}
-			catch ( SQLException e ) {
-				throw new RuntimeException(e);
-			}
-		}
-		return doc;
-	}
+//	@Override
+//	public IVDocument getDocument (String docId) {
+//		Statement stm = null;
+//		IVDocument doc = null;
+//		try {
+//			stm = conn.createStatement();
+//			ResultSet rs = stm.executeQuery(String.format(
+//				"SELECT * FROM %s WHERE %s='%s'", DOCS_TBLNAME, DOCS_XID, docId));
+//			if ( rs.first() ) {
+//				doc = new H2Document(this, rs.getLong(DOCS_KEY), rs.getString(DOCS_XID), rs.getString(DOCS_NAME), rs.getString(DOCS_TYPE));
+//			}
+//		}
+//		catch ( SQLException e ) {
+//			throw new RuntimeException(e);
+//		}
+//		finally {
+//			try {
+//				if ( stm != null ) {
+//					stm.close();
+//					stm = null;
+//				}
+//			}
+//			catch ( SQLException e ) {
+//				throw new RuntimeException(e);
+//			}
+//		}
+//		return doc;
+//	}
 
 	@Override
 	public Iterable<IVDocument> documents () {
@@ -273,7 +281,11 @@ public class H2Access implements IDBAccess {
 		};
 	}
 	
-	public List<Long> getDocumentsKeys () {
+	/**
+	 * Gets the list of the keys to all the documents in this repository.
+	 * @return a list of the keys to all the documents in this repository.
+	 */
+	List<Long> getDocumentsKeys () {
 		Statement stm = null;
 		try {
 			stm = conn.createStatement();
@@ -306,7 +318,7 @@ public class H2Access implements IDBAccess {
 	 * @param tuOnly true to get only the text unit items.
 	 * @return the list of keys for the given document
 	 */
-	public List<Long> getItemsKeys (long docKey,
+	List<Long> getItemsKeys (long docKey,
 		boolean tuOnly)
 	{
 		Statement stm = null;
@@ -351,47 +363,9 @@ public class H2Access implements IDBAccess {
 
 	@Override
 	public String importDocument (RawDocument rd) {
-//long start = System.currentTimeMillis();
 		H2Importer imp = new H2Importer(this, fcMapper);
 		imp.importDocument(rd);
-// Get elapsed time
-//long elapsedTimeMillis = System.currentTimeMillis()-start;
-//float elapsedTimeSec = elapsedTimeMillis/1000F;
-//System.out.println("Import time: "+elapsedTimeSec);
 		return null;
-//		
-//		
-//long start = System.currentTimeMillis();
-//long count = 0;
-//		// Temp test
-//		if ( rd == null ) {
-//			tryAddDocument();
-//			return null;
-//		}
-//		
-//		// Import the document
-//		IFilter filter = null;
-//		try {
-//			filter = fcMapper.createFilter(rd.getFilterConfigId());
-//			filter.open(rd);
-//			while ( filter.hasNext() ) {
-//				Event event = filter.next();
-//				if ( event.getEventType() == EventType.TEXT_UNIT ) count++;
-//				handleEventForImport(event);
-//			}
-//		}
-//		finally {
-//			if ( filter != null ) {
-//				filter.close();
-//			}
-//		}
-//
-//// Get elapsed time
-//long elapsedTimeMillis = System.currentTimeMillis()-start;
-//float elapsedTimeSec = elapsedTimeMillis/1000F;
-//System.out.println("Number of entries: "+count);
-//System.out.println("Import time: "+elapsedTimeSec);
-//		return impDocId;
 	}
 
 	private void createTables () {
@@ -749,18 +723,39 @@ public class H2Access implements IDBAccess {
 	}
 
 	@Override
-	public void removeDocument (IVDocument doc) {
+	public void removeDocument (IVDocument vdoc) {
 		PreparedStatement pstm = null;
 		try {
-			// Delete the related items
+			H2Document doc = (H2Document)vdoc;
+
+			// The new next sibling of the document's previous sibling is now the document's next sibling
+			if ( doc.previous > -1 ) {
+				pstm = conn.prepareStatement(String.format("UPDATE %s SET %s=? WHERE %s=?", ITMS_TBLNAME,
+					ITMS_NEXT, ITMS_KEY));
+				pstm.setLong(1, doc.next);
+				pstm.setLong(2, doc.previous);
+				pstm.execute();
+			}
+			
+			// The new previous sibling of the document's next sibling is now the document's previous sibling
+			if ( doc.next > -1 ) {
+				pstm = conn.prepareStatement(String.format("UPDATE %s SET %s=? WHERE %s=?", ITMS_TBLNAME,
+					ITMS_PREV, ITMS_KEY));
+				pstm.setLong(1, doc.previous);
+				pstm.setLong(2, doc.next);
+				pstm.execute();
+			}
+			
+			// Delete all items related the document
 			pstm = conn.prepareStatement(String.format("delete from %s where %s=?",
 				ITMS_TBLNAME, ITMS_DKEY));
-			pstm.setLong(1, ((H2Document)doc).key);
+			pstm.setLong(1, doc.key);
 			pstm.execute();
+			
 			// Delete the document entry itself
 			pstm = conn.prepareStatement(String.format("delete from %s where %s=?",
 				ITMS_TBLNAME, ITMS_KEY));
-			pstm.setLong(1, ((H2Document)doc).key);
+			pstm.setLong(1, doc.key);
 			pstm.execute();
 		}
 		catch ( SQLException e ) {

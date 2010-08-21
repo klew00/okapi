@@ -49,6 +49,6 @@ public interface IVDocument extends IVSet {
 	 * @param extractionId the extraction id of the text unit to retrieve.
 	 * @return the virtual text unit for a given extraction id.
 	 */
-	public IVTextUnit getVTextUnit (String extractionId);
+	public IVTextUnit getTextUnit (String extractionId);
 	
 }

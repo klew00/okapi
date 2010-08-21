@@ -22,9 +22,7 @@ package net.sf.okapi.virtualdb.jdbc;
 
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.virtualdb.IVDocument;
-import net.sf.okapi.virtualdb.IVItem;
 import net.sf.okapi.virtualdb.IVRepository;
-import net.sf.okapi.virtualdb.IVTextUnit;
 
 public class Repository implements IVRepository {
 
@@ -34,10 +32,22 @@ public class Repository implements IVRepository {
 		db = engine;
 	}
 	
+	@Override
 	protected void finalize ()
 		throws Throwable
 	{
 		close();
+		super.finalize();
+	}
+	
+	@Override
+	public void create (String name) {
+		db.create(name);
+	}
+	
+	@Override
+	public void open (String name) {
+		db.open(name);
 	}
 	
 	@Override
@@ -53,27 +63,21 @@ public class Repository implements IVRepository {
 		return db.documents();
 	}
 
-	@Override
-	public IVDocument getDocument (String docId) {
-		return db.getDocument(docId);
-	}
+//	@Override
+//	public IVDocument getDocument (String docId) {
+//		return db.getDocument(docId);
+//	}
 
-	@Override
-	public Iterable<IVItem> items () {
-//		return new Iterable<IVItem>() {
-//			@Override
-//			public Iterator<IVItem> iterator() {
-//				return new H2ItemIterator<IVItem>(this, null, false);
-//			}
-//		};
-		return null;
-	}
+//	@Override
+//	public Iterable<IVItem> items () {
+//		return null;
+//	}
 
-	@Override
-	public Iterable<IVTextUnit> textUnits () {
-		// TODO Auto-generated method stub
-		return null;
-	}
+//	@Override
+//	public Iterable<IVTextUnit> textUnits () {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
 
 	@Override
 	public String importDocument (RawDocument rawDoc) {

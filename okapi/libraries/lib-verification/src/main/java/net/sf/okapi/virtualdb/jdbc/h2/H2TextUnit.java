@@ -104,11 +104,6 @@ public class H2TextUnit implements IVTextUnit {
 	}
 
 	@Override
-	public void reload () {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
 	public void save () {
 		doc.db.saveTextUnit(this);
 	}

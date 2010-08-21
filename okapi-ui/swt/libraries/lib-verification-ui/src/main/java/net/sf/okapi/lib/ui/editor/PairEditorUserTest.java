@@ -117,10 +117,9 @@ public class PairEditorUserTest {
 
 		this.useRepository = useRepository;
 		if ( useRepository ) {
-			H2Access h2db = new H2Access("~");
-			h2db.setFilterConfigurationMapper(fcMapper);
-			h2db.create("tmpRepo");
+			H2Access h2db = new H2Access("~", fcMapper);
 			repo = new Repository(h2db);
+			h2db.create("tmpRepository");
 		}
 		
 		createContent();

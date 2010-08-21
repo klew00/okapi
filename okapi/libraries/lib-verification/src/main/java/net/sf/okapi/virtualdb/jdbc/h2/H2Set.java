@@ -106,14 +106,8 @@ public class H2Set implements IVSet {
 	}
 
 	@Override
-	public void reload() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void save() {
-		// TODO Auto-generated method stub
+	public void save () {
+		// No modifiable data to save
 	}
 
 }

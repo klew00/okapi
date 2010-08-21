@@ -120,13 +120,8 @@ public class H2SubDocument extends H2Navigator implements IVSubDocument {
 	}
 
 	@Override
-	public void reload () {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
 	public void save () {
-		throw new UnsupportedOperationException("save");
+		// No modifiable data to save
 	}
 
 }

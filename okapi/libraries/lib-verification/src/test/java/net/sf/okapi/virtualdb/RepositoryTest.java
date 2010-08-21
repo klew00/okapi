@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.virtualdb.jdbc;
+package net.sf.okapi.virtualdb;
 
 import java.io.File;
 import java.net.URL;
@@ -26,7 +26,6 @@ import java.util.ArrayList;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.filters.DefaultFilters;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextContainer;
@@ -34,6 +33,7 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.virtualdb.IVDocument;
 import net.sf.okapi.virtualdb.IVRepository;
 import net.sf.okapi.virtualdb.IVTextUnit;
+import net.sf.okapi.virtualdb.jdbc.Repository;
 import net.sf.okapi.virtualdb.jdbc.h2.H2Access;
 
 import static org.junit.Assert.*;
@@ -41,7 +41,6 @@ import org.junit.Test;
 
 public class RepositoryTest {
 	
-	private IDBAccess db;
 	private FilterConfigurationMapper fcMapper;
 	private LocaleId locEN = LocaleId.fromBCP47("en");
 	private LocaleId locFR = LocaleId.fromBCP47("fr");
@@ -56,12 +55,10 @@ public class RepositoryTest {
 	public void testImportTwoFiles () {
 		fcMapper = new FilterConfigurationMapper();
 		fcMapper.addConfigurations("net.sf.okapi.filters.xliff.XLIFFFilter");
-		// Create the underlying database
-		db = new H2Access(root);
-		((H2Access)db).setFilterConfigurationMapper(fcMapper);
-		db.create("myRepo");
-		// Create the repository
-		IVRepository repo = new Repository(db);
+		// Create the repository object
+		IVRepository repo = new Repository(new H2Access(root, fcMapper));
+		// Create the repository database
+		repo.create("myRepo");
 
 		// Import file 1
 		RawDocument rd = new RawDocument((new File(root+"/test01.xlf")).toURI(), "UTF-8", locEN, locFR);
@@ -71,24 +68,48 @@ public class RepositoryTest {
 		rd = new RawDocument((new File(root+"/test02.xlf")).toURI(), "UTF-8", locEN, locFR);
 		rd.setFilterConfigId("okf_xliff");
 		repo.importDocument(rd);
+		// Import file 3
+		rd = new RawDocument((new File(root+"/test03.xlf")).toURI(), "UTF-8", locEN, locFR);
+		rd.setFilterConfigId("okf_xliff");
+		repo.importDocument(rd);
 		
+		// Check first document
 		IVDocument vdoc1 = repo.getFirstDocument();
-		IVTextUnit vtu = vdoc1.getVTextUnit("1");
+		IVTextUnit vtu = vdoc1.getTextUnit("1");
 		assertEquals("Texte de l'attribute", vtu.getTextUnit().getTarget(locFR).toString());
 		
+		// Check next document
 		IVDocument vdoc2 = (IVDocument)vdoc1.getNextSibling();
-		vtu = vdoc2.getVTextUnit("1");
+		vtu = vdoc2.getTextUnit("1");
 		assertNotNull(vtu);
 		assertEquals("test02 - Texte de l'attribute", vtu.getTextUnit().getTarget(locFR).toString());
+		// Test previous doc
+//		assertEquals(vdoc1, vdoc2.getPreviousSibling());
 		
-		// Delete first document
-		repo.removeDocument(vdoc1);
-		
-		IVDocument vdoc3 = repo.getFirstDocument();
-		vtu = vdoc2.getVTextUnit("1");
+		// Check third document
+		IVDocument vdoc3 = (IVDocument)vdoc2.getNextSibling();
+		vtu = vdoc3.getTextUnit("1");
 		assertNotNull(vtu);
-		assertEquals("test02 - Texte de l'attribute", vtu.getTextUnit().getTarget(locFR).toString());
+		assertEquals("test03 - Texte de l'attribute", vtu.getTextUnit().getTarget(locFR).toString());
+		// Test previous doc
+//		assertEquals(vdoc2, vdoc3.getPreviousSibling());
 		
+		// Delete the second document
+		repo.removeDocument(vdoc2);
+		
+		// First document is the same
+		IVDocument nvdoc1 = repo.getFirstDocument();
+		vtu = nvdoc1.getTextUnit("1");
+		assertNotNull(vtu);
+		assertEquals("Texte de l'attribute", vtu.getTextUnit().getTarget(locFR).toString());
+		// Next document should be the test03 one
+		IVDocument nvdoc2 = (IVDocument)nvdoc1.getNextSibling();
+		vtu = nvdoc2.getTextUnit("1");
+		assertNotNull(vtu);
+		assertEquals("test03 - Texte de l'attribute", vtu.getTextUnit().getTarget(locFR).toString());
+		// Test previous doc
+//		assertEquals(nvdoc1, nvdoc2.getPreviousSibling());
+
 		repo.close();
 	}
 	
@@ -96,12 +117,10 @@ public class RepositoryTest {
 	public void testCreate () {
 		fcMapper = new FilterConfigurationMapper();
 		fcMapper.addConfigurations("net.sf.okapi.filters.xliff.XLIFFFilter");
-		// Create the underlying database
-		db = new H2Access(root);
-		((H2Access)db).setFilterConfigurationMapper(fcMapper);
-		db.create("myRepo");
-		// Create the repository
-		IVRepository repo = new Repository(db);
+		// Create the repository object
+		IVRepository repo = new Repository(new H2Access(root, fcMapper));
+		// Create the repository database
+		repo.create("myRepo");
 
 		// Import data
 		RawDocument rd = new RawDocument((new File(root+"/test01.xlf")).toURI(), "UTF-8", locEN, locFR);
@@ -133,12 +152,10 @@ public class RepositoryTest {
 
 	@Test
 	public void testRetrieve () {
-		// Create the underlying database
-		db = new H2Access(root);
-		db.open("myRepo");
-
-		// Create the repository
-		IVRepository repo = new Repository(db);
+		// Create the repository object
+		IVRepository repo = new Repository(new H2Access(root, null));
+		// Open the existing repository database
+		repo.open("myRepo");
 		
 		// Get the documents
 		ArrayList<IVDocument> docs = new ArrayList<IVDocument>();
@@ -161,11 +178,11 @@ public class RepositoryTest {
 	
 	@Test
 	public void testSaveAndRetrieve () {
-		// Create the underlying database
-		db = new H2Access(root);
-		db.open("myRepo");
-		// Create the repository
-		IVRepository repo = new Repository(db);
+		// Create the repository object
+		IVRepository repo = new Repository(new H2Access(root, null));
+		// Open the existing repository database
+		repo.open("myRepo");
+
 		IVDocument doc = repo.getFirstDocument();
 
 		IVTextUnit vtu = (IVTextUnit)doc.getItem("1");

@@ -82,8 +82,10 @@ public interface IVItem {
 	 * @return one of the ItemType values.
 	 */
 	public ItemType getItemType ();
-	
-	public void save();
-	public void reload();
+
+	/**
+	 * Saves into the repository the modifiable data associated with this virtual item.
+	 */
+	public void save ();
 
 }

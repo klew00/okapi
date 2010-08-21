@@ -23,7 +23,7 @@ package net.sf.okapi.virtualdb.jdbc.h2;
 import net.sf.okapi.virtualdb.IVDocument;
 import net.sf.okapi.virtualdb.IVItem;
 
-public class H2Item extends H2Navigator implements IVItem {
+public abstract class H2Item extends H2Navigator implements IVItem {
 
 	protected H2Document doc;
 	protected String id;
@@ -67,16 +67,6 @@ public class H2Item extends H2Navigator implements IVItem {
 	@Override
 	public String getType () {
 		return type;
-	}
-
-	@Override
-	public void reload () {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void save () {
-		// TODO Auto-generated method stub
 	}
 
 }

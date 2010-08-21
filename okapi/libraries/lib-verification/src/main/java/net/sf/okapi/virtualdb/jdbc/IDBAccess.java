@@ -43,7 +43,7 @@ public interface IDBAccess {
 	
 	public void removeDocument (IVDocument doc);
 	
-	public IVDocument getDocument (String docId);
+//	public IVDocument getDocument (String docId);
 
 	public IVDocument getDocument (long key);
 

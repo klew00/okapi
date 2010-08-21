@@ -127,7 +127,7 @@ public class H2Importer {
 		if ( doc != null ) {
 			doc.next = item.key;
 			item.previous = doc.key;
-			doc.save(); // Don't forget to save the changes in the former last document
+			db.saveDocument(doc); // Don't forget to save the changes in the former last document
 		}
 		items.put(item.key, item);
 		parents.add(item);

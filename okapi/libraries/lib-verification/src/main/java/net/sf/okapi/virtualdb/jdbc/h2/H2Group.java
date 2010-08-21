@@ -120,13 +120,8 @@ public class H2Group extends H2Navigator implements IVGroup {
 	}
 
 	@Override
-	public void reload() {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void save() {
-		// TODO Auto-generated method stub
+	public void save () {
+		// No modifiable data to save
 	}
 
 }

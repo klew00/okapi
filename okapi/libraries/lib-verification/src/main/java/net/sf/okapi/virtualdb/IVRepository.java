@@ -25,11 +25,29 @@ import net.sf.okapi.common.resource.RawDocument;
 public interface IVRepository {
 
 	/**
-	 * Gets the document associated with a given id.
-	 * @param docId the id of the document to retrieve.
-	 * @return the document associated with the given id.
+	 * Creates a new physical repository.
+	 * @param name the name of the repository.
 	 */
-	public IVDocument getDocument (String docId);
+	public void create (String name);
+	
+	/**
+	 * Opens an existing physical repository.
+	 * @param name the name of the repository.
+	 */
+	public void open (String name);
+	
+	/** 
+	 * Closes the repository.
+	 */
+	public void close ();
+	
+//	/**
+//	 * Gets the document associated with a given id.
+//	 * @param docId the id of the document to retrieve.
+//	 * @return the document associated with the given id.
+//	 */
+//	//TODO: fix this type of access: docId is not useable in a transparent way
+//	public IVDocument getDocument (String docId);
 	
 	/**
 	 * Creates an iterable object for all the documents contained into this repository.
@@ -37,17 +55,17 @@ public interface IVRepository {
 	 */
 	public Iterable<IVDocument> documents ();
 
-	/**
-	 * Creates an iterable object for all the items contained into this repository.
-	 * @return an new iterable object for all the items contained into this repository.
-	 */
-	public Iterable<IVItem> items ();
+//	/**
+//	 * Creates an iterable object for all the items contained into this repository.
+//	 * @return an new iterable object for all the items contained into this repository.
+//	 */
+//	public Iterable<IVItem> items ();
 
-	/**
-	 * Creates an iterable object for all the virtual text units contained into this document.
-	 * @return an new iterable object for all the virtual text units contained into this document.
-	 */
-	public Iterable<IVTextUnit> textUnits ();
+//	/**
+//	 * Creates an iterable object for all the virtual text units contained into this document.
+//	 * @return an new iterable object for all the virtual text units contained into this document.
+//	 */
+//	public Iterable<IVTextUnit> textUnits ();
 
 	/**
 	 * Imports a document into this repository.
@@ -58,6 +76,10 @@ public interface IVRepository {
 
 	/**
 	 * Removes a given document from this repository.
+	 * <p>Calling this method may invalidate any current iterator created by {@link #documents()},
+	 * as well as the sibling relationships for any current {@link IVDocument} corresponding to 
+	 * the previous and next documents of this one.
+	 * <p>To remove all documents from a repository it may be simpler to re-create the repository.
 	 * @param doc the virtual document to remove.
 	 */
 	public void removeDocument (IVDocument doc);
@@ -67,7 +89,5 @@ public interface IVRepository {
 	 * @return the first virtual document in this repository or null.
 	 */
 	public IVDocument getFirstDocument ();
-	
-	public void close ();
 
 }

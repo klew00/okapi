@@ -82,7 +82,7 @@ public class H2Document extends H2Navigator implements IVDocument {
 	}
 
 	@Override
-	public IVTextUnit getVTextUnit (String extractionId) {
+	public IVTextUnit getTextUnit (String extractionId) {
 		IVItem item = db.getItemFromExtractionId(this, extractionId);
 		if ( item instanceof IVTextUnit ) {
 			return (IVTextUnit)item;
@@ -152,13 +152,8 @@ public class H2Document extends H2Navigator implements IVDocument {
 	}
 
 	@Override
-	public void reload () {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
 	public void save () {
-		db.saveDocument(this);
+		// No modifiable data to save
 	}
 
 }
