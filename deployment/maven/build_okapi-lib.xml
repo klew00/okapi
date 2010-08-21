@@ -267,7 +267,7 @@
 		   <fileset dir="../shared/licenses" includes="**/snakeyaml-*"/>
 		</copy>
 
-		<property name="dep005" value="${mavenStore}/com/h2database/h2/1.1.103"/>
+<!--		<property name="dep005" value="${mavenStore}/com/h2database/h2/1.1.103"/>
 		<fileset id="list.contents" dir="${dep005}"
 		 includes="**/h2-1.1.103.jar"/>
 		<property name="jar005" refid="list.contents"/>
@@ -276,7 +276,7 @@
 		<copy todir="${distLicenses}">
 		   <fileset dir="../shared/licenses" includes="**/h2-*"/>
 		</copy>
-
+-->
 		<property name="dep005bis" value="${mavenStore}/com/h2database/h2/1.2.135"/>
 		<fileset id="list.contents" dir="${dep005bis}"
 		 includes="**/h2-1.2.135.jar"/>

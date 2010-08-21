@@ -71,7 +71,7 @@ public class Database {
 	public static final int  FILENAME     = 8;
 	public static final String NFILENAME  = "FileName";
 	
-	public static final String DATAFILE_EXT = ".data.db";
+	public static final String DATAFILE_EXT = ".h2.db"; //".data.db";
 
 	private Connection  conn = null;
 	private PreparedStatement qstm = null;

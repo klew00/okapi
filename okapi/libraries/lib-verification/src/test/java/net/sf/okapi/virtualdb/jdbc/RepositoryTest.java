@@ -55,7 +55,7 @@ public class RepositoryTest {
 	@Test
 	public void testImportTwoFiles () {
 		fcMapper = new FilterConfigurationMapper();
-		DefaultFilters.setMappings(fcMapper, true, true);
+		fcMapper.addConfigurations("net.sf.okapi.filters.xliff.XLIFFFilter");
 		// Create the underlying database
 		db = new H2Access(root);
 		((H2Access)db).setFilterConfigurationMapper(fcMapper);
@@ -89,19 +89,17 @@ public class RepositoryTest {
 		assertNotNull(vtu);
 		assertEquals("test02 - Texte de l'attribute", vtu.getTextUnit().getTarget(locFR).toString());
 		
-		db.close();
+		repo.close();
 	}
 	
 	@Test
 	public void testCreate () {
 		fcMapper = new FilterConfigurationMapper();
-		DefaultFilters.setMappings(fcMapper, true, true);
-
+		fcMapper.addConfigurations("net.sf.okapi.filters.xliff.XLIFFFilter");
 		// Create the underlying database
 		db = new H2Access(root);
 		((H2Access)db).setFilterConfigurationMapper(fcMapper);
 		db.create("myRepo");
-
 		// Create the repository
 		IVRepository repo = new Repository(db);
 

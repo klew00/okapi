@@ -32,9 +32,20 @@ distribution.</p>
 </ul>
 	</li>
 	<li>Translation resources:<ul>
+	<li>Added <code>batchQuery</code> method to the IQuery interface.</li>
 	<li>OpenTran connector:<ul>
 	<li>Changed implementation to use the REST API instead of the XML-RPC.</li>
 	<li>Improved support for queries with inline codes.</li>
+</ul>
+	</li>
+	<li>SimpleTM connector:<ul>
+	<li><u><b>IMPORTANT</b></u>: Changed the H2 database dependency from version 
+	1.1.103 (.data.db files) to 1.2.135 (.h2.db files), this breaks backward 
+	compatibility: the new SimpleTM connector cannot open the old .data.db 
+	files. To convert an older TM: Use a M8 or prior version of Rainbow to run 
+	the <b>SimpleTM to TMX</b> step to export your database to TMX. Then, Use 
+	this version of Rainbow to run the <b>Generate SimpleTM</b> step to convert 
+	your TMX document into a new .h2.data file.</li>
 </ul>
 	</li>
 </ul>

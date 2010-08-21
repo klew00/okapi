@@ -91,8 +91,8 @@ public class RainbowTest {
 		// Delete output of pass 3
 		assertTrue(deleteOutputFile("pipelines/tm/test01.out3.html"));
 		// Delete output of pass 4
-		assertTrue(deleteOutputFile("pipelines/tm/out4.data.db"));
-		assertTrue(deleteOutputFile("pipelines/tm/out4.index.db"));
+		assertTrue(deleteOutputFile("pipelines/tm/out4.h2.db")); //data.db"));
+		//assertTrue(deleteOutputFile("pipelines/tm/out4.index.db"));
 		// Delete output of pass 5
 		assertTrue(deleteOutputFile("pipelines/tm/test01.out5.html"));
 		
