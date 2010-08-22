@@ -121,7 +121,6 @@ public class RepositoryTest {
 		IVRepository repo = new Repository(new H2Access(root, fcMapper));
 		// Create the repository database
 		repo.create("myRepo");
-
 		// Import data
 		RawDocument rd = new RawDocument((new File(root+"/test01.xlf")).toURI(), "UTF-8", locEN, locFR);
 		rd.setFilterConfigId("okf_xliff");
@@ -152,10 +151,16 @@ public class RepositoryTest {
 
 	@Test
 	public void testRetrieve () {
+		fcMapper = new FilterConfigurationMapper();
+		fcMapper.addConfigurations("net.sf.okapi.filters.xliff.XLIFFFilter");
 		// Create the repository object
-		IVRepository repo = new Repository(new H2Access(root, null));
-		// Open the existing repository database
-		repo.open("myRepo");
+		IVRepository repo = new Repository(new H2Access(root, fcMapper));
+		// Create the repository database
+		repo.create("myRepo");
+		// Import data
+		RawDocument rd = new RawDocument((new File(root+"/test01.xlf")).toURI(), "UTF-8", locEN, locFR);
+		rd.setFilterConfigId("okf_xliff");
+		repo.importDocument(rd);
 		
 		// Get the documents
 		ArrayList<IVDocument> docs = new ArrayList<IVDocument>();
@@ -174,14 +179,22 @@ public class RepositoryTest {
 		TextUnit tu = vtus.get(0).getTextUnit();
 		assertEquals("1", tu.getId());
 		assertEquals("Texte de l'attribute", tu.getTarget(locFR).toString());
+
+		repo.close();
 	}
 	
 	@Test
 	public void testSaveAndRetrieve () {
+		fcMapper = new FilterConfigurationMapper();
+		fcMapper.addConfigurations("net.sf.okapi.filters.xliff.XLIFFFilter");
 		// Create the repository object
-		IVRepository repo = new Repository(new H2Access(root, null));
-		// Open the existing repository database
-		repo.open("myRepo");
+		IVRepository repo = new Repository(new H2Access(root, fcMapper));
+		// Create the repository database
+		repo.create("myRepo");
+		// Import data
+		RawDocument rd = new RawDocument((new File(root+"/test01.xlf")).toURI(), "UTF-8", locEN, locFR);
+		rd.setFilterConfigId("okf_xliff");
+		repo.importDocument(rd);
 
 		IVDocument doc = repo.getFirstDocument();
 
@@ -195,6 +208,8 @@ public class RepositoryTest {
 		vtu = (IVTextUnit)doc.getItem("1");
 		tu = vtu.getTextUnit();
 		assertEquals("new target text", tu.getTarget(locFR).toString());
+
+		repo.close();
 	}
 
 }

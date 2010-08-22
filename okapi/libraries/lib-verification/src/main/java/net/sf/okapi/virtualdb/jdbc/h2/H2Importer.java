@@ -42,6 +42,7 @@ public class H2Importer {
 	private IFilterConfigurationMapper fcMapper;
 	private LinkedHashMap<Long, H2Navigator> items;
 	private Stack<H2Navigator> parents;
+	private Stack<H2Navigator> prevItems;
 	private long docItemKey;
 	private H2Navigator prevItem;
 	private int level;
@@ -56,6 +57,7 @@ public class H2Importer {
 	public void importDocument (RawDocument rd) {
 		items = new LinkedHashMap<Long, H2Navigator>();
 		parents = new Stack<H2Navigator>();
+		prevItems = new Stack<H2Navigator>();
 		IFilter filter = null;
 		try {
 			filter = fcMapper.createFilter(rd.getFilterConfigId());
@@ -88,8 +90,8 @@ public class H2Importer {
 				case END_SUBDOCUMENT:
 				case END_GROUP:
 					parents.pop();
-					prevItem = parents.peek();
 					level--;
+					prevItem = prevItems.pop();
 					break;
 					
 				case TEXT_UNIT:
@@ -130,7 +132,6 @@ public class H2Importer {
 			db.saveDocument(doc); // Don't forget to save the changes in the former last document
 		}
 		items.put(item.key, item);
-		parents.add(item);
 		prevItem = item;
 	}
 	
@@ -155,6 +156,7 @@ public class H2Importer {
 		item.parent = prevItem.key;
 		prevItem.firstChild = key;
 		parents.push(prevItem);
+		prevItems.push(prevItem);
 		prevItem = item;
 	}
 	
