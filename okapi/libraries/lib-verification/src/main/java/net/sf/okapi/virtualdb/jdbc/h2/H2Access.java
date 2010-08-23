@@ -22,6 +22,7 @@ package net.sf.okapi.virtualdb.jdbc.h2;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -54,12 +55,18 @@ public class H2Access implements IDBAccess {
 	public static final int ITEMKIND_TEXTUNIT = 3;
 
 	public static final String H2DB_EXT = ".h2.db";
+	public static final int VERSION = 100;
 	
-	public static final String DOCS_TBLNAME = "DOCS";
-	public static final String DOCS_KEY = "KEY";
-	public static final String DOCS_XID = "XID";
-	public static final String DOCS_NAME = "NAME";
-	public static final String DOCS_TYPE = "TYPE";
+	public static final String INFO_TBLNAME = "INFO";
+	public static final String INFO_KEY = "KEY";
+	public static final String INFO_VERSION = "VERSION";
+	public static final String INFO_EXTRA1 = "EXTRA1";
+
+//	public static final String DOCS_TBLNAME = "DOCS";
+//	public static final String DOCS_KEY = "KEY";
+//	public static final String DOCS_XID = "XID";
+//	public static final String DOCS_NAME = "NAME";
+//	public static final String DOCS_TYPE = "TYPE";
 
 	public static final String ITMS_TBLNAME = "ITMS";
 	public static final String ITMS_KEY = "KEY";
@@ -372,13 +379,26 @@ public class H2Access implements IDBAccess {
 		Statement stm = null;
 		try {
 			stm = conn.createStatement();
-			/* Create the table of documents
-			CREATE TABLE DOCS (
+			
+			/* Create the table of information
+			CREATE TABLE INFO (
 				KEY INTEGER IDENTITY PRIMARY KEY,
-				XID VARCHAR,
-				NAME VARCHAR,
-				TYPE VARCHAR)
+				VERSION INTEGER,
+				EXTRA1 BLOB)
 			*/
+			stm.execute("CREATE TABLE " + INFO_TBLNAME + " ("
+				+ INFO_KEY + " INTEGER PRIMARY KEY,"
+				+ INFO_VERSION + " INTEGER,"
+				+ INFO_EXTRA1 + " BLOB"
+				+ ")");
+			
+//			/* Create the table of documents
+//			CREATE TABLE DOCS (
+//				KEY INTEGER IDENTITY PRIMARY KEY,
+//				XID VARCHAR,
+//				NAME VARCHAR,
+//				TYPE VARCHAR)
+//			*/
 //			stm.execute("CREATE TABLE " + DOCS_TBLNAME + " ("
 //				+ DOCS_KEY + " INTEGER IDENTITY PRIMARY KEY,"
 //				+ DOCS_XID + " VARCHAR,"
@@ -431,6 +451,10 @@ public class H2Access implements IDBAccess {
 				+ TUNS_TRGCTEXT + " VARCHAR,"
 				+ TUNS_TRGCODES + " VARCHAR"
 				+ ")");
+			
+			stm.execute(String.format("INSERT INTO %s (%s,%s) VALUES(%d,%d)",
+				INFO_TBLNAME, INFO_KEY, INFO_VERSION, 1, VERSION));
+			
 		}	
 		catch ( SQLException e ) {
 			throw new RuntimeException(e);
@@ -901,6 +925,29 @@ public class H2Access implements IDBAccess {
 		List<Long> list = getDocumentsKeys();
 		if ( list.size() < 1 ) return null;
 		return getDocument(list.get(0));
+	}
+
+	public void saveExtra1 (Object object) {
+		PreparedStatement pstm = null;
+		try {
+			pstm = conn.prepareStatement(String.format("update %s set %s=? where %s=1",
+				INFO_TBLNAME, INFO_EXTRA1, INFO_KEY));
+			//pstm.setBlob(1, )
+		}
+		catch ( SQLException e ) {
+			throw new RuntimeException(e);
+		}
+		finally {
+			try {
+				if ( pstm != null ) {
+					pstm.close();
+					pstm = null;
+				}
+			}
+			catch ( SQLException e ) {
+				throw new RuntimeException(e);
+			}
+		}
 	}
 
 }

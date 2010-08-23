@@ -2240,7 +2240,7 @@ public class MainForm { //implements IParametersProvider {
 		try {
 			saveSurfaceData();
 			// Create the dialog
-			dlg = new PairEditorUserTest(shell, fcMapper, false);
+			dlg = new PairEditorUserTest(shell, fcMapper, true);
 			// Start the dialog
 			dlg.showDialog();
 		}

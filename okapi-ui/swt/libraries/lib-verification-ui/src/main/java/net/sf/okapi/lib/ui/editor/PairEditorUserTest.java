@@ -117,7 +117,8 @@ public class PairEditorUserTest {
 
 		this.useRepository = useRepository;
 		if ( useRepository ) {
-			H2Access h2db = new H2Access("~", fcMapper);
+			String home = System.getProperty("user.home");
+			H2Access h2db = new H2Access(home, fcMapper);
 			repo = new Repository(h2db);
 			h2db.create("tmpRepository");
 		}

@@ -41,9 +41,9 @@ import net.sf.okapi.common.annotation.IAnnotation;
  */
 public class TextContainer implements Iterable<TextPart> {
 
-	private static final String PARTSEP1 = "\u0091";
-	private static final String PARTSEP2 = "\u0092";
-	private static final char PARTSEP1CHAR = 0x0091;
+	private static final String PARTSEP1 = "\uE091";
+	private static final String PARTSEP2 = "\uE092";
+	private static final char PARTSEP1CHAR = 0xE091;
 
 	private LinkedHashMap<String, Property> properties;
 	private Annotations annotations;
@@ -474,12 +474,17 @@ public class TextContainer implements Iterable<TextPart> {
 		int i = 0;
 		for ( String chunk : chunks ) {
 			int n = chunk.indexOf(PARTSEP1CHAR);
+			try {
 			TextFragment tf = new TextFragment(chunk.substring(1, n), Code.stringToCodes(codesParts[i]));
 			if ( (chunk.charAt(0)=='1') ) { // It is a segment
 				tc.parts.add(new Segment(chunk.substring(n+1), tf));
 			}
 			else {
 				tc.parts.add(new TextPart(tf));
+			}
+			}
+			catch ( Throwable e ) {
+				e.printStackTrace();
 			}
 			i++;
 		}
