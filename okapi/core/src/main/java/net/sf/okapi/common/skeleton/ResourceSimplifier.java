@@ -48,18 +48,32 @@ public class ResourceSimplifier {
 	private String outEncoding = "UTF-16BE";
 	private GenericSkeletonWriter writer;
 	private GenericSkeleton newSkel;
+	private boolean useSDEncoding;
+	private boolean useSDLocale;
 	
-	public ResourceSimplifier(boolean isMultilingual, LocaleId trgLoc) {
+	public ResourceSimplifier() {
 		super();
-		this.isMultilingual = isMultilingual;
-		this.trgLoc = trgLoc;
+		useSDEncoding = true;
+		useSDLocale = true;
+		
 		writer = new GenericSkeletonWriter();
 		newSkel = new GenericSkeleton();
+		
 		StartDocument sd = new StartDocument("");
-//		sd.setMultilingual(false); // !!! 
-//		writer.processStartDocument(trgLoc, outEncoding, null, null, sd); // Sets writer fields + activates ref tracking mechanism of GSW
 		sd.setMultilingual(false); // Simple resources
 		writer.processStartDocument(trgLoc, outEncoding, null, null, sd); // Sets writer fields + activates ref tracking mechanism of GSW
+	}
+	
+	public ResourceSimplifier(LocaleId trgLoc) {
+		this();
+		this.trgLoc = trgLoc;
+		useSDLocale = false;
+	}
+	
+	public ResourceSimplifier(LocaleId trgLoc, String outEncoding) {
+		this(trgLoc);		
+		this.outEncoding = outEncoding;
+		useSDEncoding = false;
 	}
 
 //	public void setMultilingual(boolean isMultilingual) {
@@ -133,11 +147,12 @@ public class ResourceSimplifier {
 			}
 		}
 		
-//		if (event.getEventType() == EventType.START_DOCUMENT) {
-//			StartDocument sd = (StartDocument) res;
-//			sd.setMultilingual(false); // Simple resources
-//			writer.processStartDocument(trgLoc, outEncoding, null, null, sd); // Sets writer fields + activates ref tracking mechanism of GSW
-//		}
+		if (event.getEventType() == EventType.START_DOCUMENT) {
+			StartDocument sd = (StartDocument) res;
+			isMultilingual = sd.isMultilingual();
+			if (useSDEncoding) this.outEncoding = sd.getEncoding(); // Default setting output encoding = input encoding
+			if (useSDLocale) this.trgLoc = sd.getLocale();
+		}
 				
 		if (!isComplex(res)) {
 			if (event.getEventType() == EventType.END_DOCUMENT)
