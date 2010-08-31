@@ -113,7 +113,7 @@ public class TsFilterTest {
 	public void StartDocument() {
 		StartDocument sd = FilterTestDriver.getStartDocument(getEvents(completeTs, locENUS, locFRFR));
 		
-		assertEquals("Incorrect id","1", sd.getId());
+		assertEquals("Incorrect id","o1", sd.getId());
 		assertEquals("Incorrect mimeType",MimeTypeMapper.TS_MIME_TYPE, sd.getMimeType());
 		assertNull("Name should be null", sd.getName());
 		assertEquals("Incorrect encoding", "utf-8", sd.getEncoding());
@@ -133,7 +133,7 @@ public class TsFilterTest {
 	public void DocumentPartTsPart() {
 		DocumentPart dp = FilterTestDriver.getDocumentPart(getEvents(completeTs, locENUS, locFRFR), 1);
 		
-		assertEquals("2", dp.getId());
+		assertEquals("o2", dp.getId());
 		assertEquals("4.5.1", dp.getProperty("version").getValue());
 		assertEquals(locENUS, dp.getProperty("sourcelanguage").getValue());
 		assertEquals(locFRFR, dp.getProperty("language").getValue());
@@ -152,7 +152,7 @@ public class TsFilterTest {
 	public void StartGroupContextPart() {
 		StartGroup sg = FilterTestDriver.getGroup(getEvents(completeTs, locENUS, locFRFR), 1);
 
-		assertEquals("3", sg.getId());
+		assertEquals("o3", sg.getId());
 		assertEquals("utf-8", sg.getProperty("encoding").getValue());
 		//assertEquals("context name 1", sg.getProperty("name").getValue());
 		//assertEquals("context comment 1", sg.getProperty("comment").getValue());
@@ -165,7 +165,7 @@ public class TsFilterTest {
 		
 		sg = FilterTestDriver.getGroup(getEvents(completeTs, locENUS, locFRFR), 2);
 
-		assertEquals("4", sg.getId());
+		assertEquals("o4", sg.getId());
 		assertEquals("utf-8", sg.getProperty("encoding").getValue());
 		//assertEquals("context name 2", sg.getProperty("name").getValue());
 		//assertEquals("context comment 2", sg.getProperty("comment").getValue());
@@ -500,7 +500,7 @@ public class TsFilterTest {
 	@Test
 	public void StartDocument_FromFile() {
 		StartDocument sd = FilterTestDriver.getStartDocument(getEventsFromFile("Complete_valid_utf8_bom_crlf.ts"));
-		assertEquals("Incorrect id","1", sd.getId());
+		assertEquals("Incorrect id","o1", sd.getId());
 		assertEquals("Incorrect mimeType",MimeTypeMapper.TS_MIME_TYPE, sd.getMimeType());
 		assertTrue(sd.getName().startsWith(root));
 		assertTrue(sd.getName().endsWith("/Complete_valid_utf8_bom_crlf.ts"));
@@ -522,7 +522,7 @@ public class TsFilterTest {
 	public void DocumentPartTsPart_FromFile() {
 		DocumentPart dp = FilterTestDriver.getDocumentPart(getEventsFromFile("Complete_valid_utf8_bom_crlf.ts"), 1);
 		
-		assertEquals("2", dp.getId());
+		assertEquals("o2", dp.getId());
 		assertEquals("4.5.1", dp.getProperty("version").getValue());
 		assertEquals(locENUS, dp.getProperty("sourcelanguage").getValue());
 		assertEquals(locFRFR, dp.getProperty("language").getValue());
@@ -540,7 +540,7 @@ public class TsFilterTest {
 	public void StartGroupContextPart_FromFile() {
 		StartGroup sg = FilterTestDriver.getGroup(getEventsFromFile("Complete_valid_utf8_bom_crlf.ts"), 1);
 
-		assertEquals("3", sg.getId());
+		assertEquals("o3", sg.getId());
 		assertEquals("utf-8", sg.getProperty("encoding").getValue());
 		//assertEquals("context name 1", sg.getProperty("name").getValue());
 		//assertEquals("context comment 1", sg.getProperty("comment").getValue());
@@ -554,7 +554,7 @@ public class TsFilterTest {
 		
 		sg = FilterTestDriver.getGroup(getEventsFromFile("Complete_valid_utf8_bom_crlf.ts"), 2);
 
-		assertEquals("4", sg.getId());
+		assertEquals("o4", sg.getId());
 		assertEquals("utf-8", sg.getProperty("encoding").getValue());
 		//assertEquals("context name 2", sg.getProperty("name").getValue());
 		//assertEquals("context comment 2", sg.getProperty("comment").getValue());
@@ -630,7 +630,7 @@ public class TsFilterTest {
 		
 		DocumentPart dp = FilterTestDriver.getDocumentPart(getEventsFromFile("Complete_valid_utf8_bom_crlf.ts"), 2);
 	
-		assertEquals("5", dp.getId());
+		assertEquals("o5", dp.getId());
 		assertEquals(0, dp.getPropertyNames().size());
 		assertEquals(0, dp.getSourcePropertyNames().size());
 		assertEquals(0, dp.getTargetPropertyNames(locFRFR).size());
@@ -686,7 +686,7 @@ public class TsFilterTest {
 		
 		DocumentPart dp = FilterTestDriver.getDocumentPart(getEventsFromFile("Complete_valid_utf8_bom_crlf.ts"), 3);
 	
-		assertEquals("6", dp.getId());
+		assertEquals("o6", dp.getId());
 		assertEquals(0, dp.getPropertyNames().size());
 		assertEquals(0, dp.getSourcePropertyNames().size());
 		assertEquals(0, dp.getTargetPropertyNames(locFRFR).size());
@@ -709,7 +709,7 @@ public class TsFilterTest {
 		DocumentPart dp = FilterTestDriver.getDocumentPart(getEventsFromFile("Complete_valid_utf8_bom_crlf.ts"), 4);
 
 		
-		assertEquals("7", dp.getId());
+		assertEquals("o7", dp.getId());
 		assertEquals(0, dp.getPropertyNames().size());
 		assertEquals(0, dp.getSourcePropertyNames().size());
 		assertEquals(0, dp.getTargetPropertyNames(locFRFR).size());
@@ -732,7 +732,7 @@ public class TsFilterTest {
 		
 		DocumentPart dp = FilterTestDriver.getDocumentPart(getEventsFromFile("Complete_valid_utf8_bom_crlf.ts"), 5);
 			
-		assertEquals("8", dp.getId());
+		assertEquals("o8", dp.getId());
 		assertEquals(0, dp.getPropertyNames().size());
 		assertEquals(0, dp.getSourcePropertyNames().size());
 		assertEquals(0, dp.getTargetPropertyNames(locFRFR).size());
@@ -786,7 +786,7 @@ public class TsFilterTest {
 	public void StartGroupNumerusPart_FromFile() {
 		StartGroup sg = FilterTestDriver.getGroup(getEventsFromFile("Complete_valid_utf8_bom_crlf.ts"), 3);
 		
-		assertEquals("9", sg.getId());
+		assertEquals("o9", sg.getId());
 		assertEquals("9", sg.getName());
 		assertEquals("yes", sg.getTargetProperty(locFRFR, "approved").getValue());
 	

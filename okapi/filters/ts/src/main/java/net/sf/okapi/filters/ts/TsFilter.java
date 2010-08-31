@@ -45,6 +45,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
+import net.sf.okapi.common.IdGenerator;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
@@ -92,11 +93,11 @@ public class TsFilter implements IFilter {
 		int approved = 0;
 		int unfinished = 0;
 		int other = 0;
-		
-		int resourceId = 0;
+
+		private IdGenerator otherId = new IdGenerator(null, "o");
 		int tuId = 0;
 		
-		Stack<Integer> contextStack = new Stack<Integer>();
+		Stack<String> contextStack = new Stack<String>();
 		
 		public void resetAll(){
 			currentDocumentLocation = DocumentLocation.TS;
@@ -115,7 +116,7 @@ public class TsFilter implements IFilter {
 			unfinished = 0;
 			other = 0;
 			
-			resourceId = 0;
+			otherId = new IdGenerator(null, "o");
 			tuId = 0;
 			
 			contextStack.clear();
@@ -387,7 +388,7 @@ public class TsFilter implements IFilter {
 			// Parse next if nothing in the queue
 			if ( queue.isEmpty() ) {
 				if ( !read() ) {
-					Ending ending = new Ending(String.valueOf(++ts.resourceId));
+					Ending ending = new Ending(ts.otherId.createId());
 					ending.setSkeleton(skel);
 					queue.add(new Event(EventType.END_DOCUMENT, ending));
 				}
@@ -450,6 +451,8 @@ public class TsFilter implements IFilter {
 			
 			
 			ts.resetAll();
+			
+			
 
 			// Set the start event
 			hasNext = true;
@@ -460,7 +463,7 @@ public class TsFilter implements IFilter {
 				params.codeFinder.compile();
 			}
 			
-			StartDocument startDoc = new StartDocument(String.valueOf(++ts.resourceId));
+			StartDocument startDoc = new StartDocument(ts.otherId.createId());
 			startDoc.setName(docName);
 			startDoc.setEncoding(encoding, hasUTF8BOM);
 			startDoc.setLocale(srcLang);
@@ -683,7 +686,7 @@ public class TsFilter implements IFilter {
 		boolean nextIsSkippableEmpty = false;
 		DocumentPart resource;
 		
-		resource = new DocumentPart(String.valueOf(++ts.resourceId),false);
+		resource = new DocumentPart(ts.otherId.createId(),false);
 		skel = new GenericSkeleton();
 		
 		for(XMLEvent event: eventList){
@@ -742,16 +745,16 @@ public class TsFilter implements IFilter {
 
 		skel = new GenericSkeleton();
 
-		ts.resourceId++;
+		String otherId = ts.otherId.createId();
 
 		if(start){
 			
-			ts.contextStack.push(ts.resourceId);
-			resource = new StartGroup(null,String.valueOf(ts.resourceId));
+			ts.contextStack.push(otherId);
+			resource = new StartGroup(null,String.valueOf(otherId));
 		}else{
 			
 			ts.contextStack.pop();
-			resource = new Ending(String.valueOf(ts.resourceId));
+			resource = new Ending(String.valueOf(otherId));
 		}
 		
 		for(XMLEvent event: eventList){
@@ -914,8 +917,8 @@ public class TsFilter implements IFilter {
 		boolean nextIsSkippableEmpty = false;
 
 		TextFragment source = new TextFragment();
-		StartGroup sg = new StartGroup(null,String.valueOf(++ts.resourceId));
-		Ending end = new Ending(String.valueOf(++ts.resourceId));
+		StartGroup sg = new StartGroup(null,ts.otherId.createId());
+		Ending end = new Ending(ts.otherId.createId());
 		TextUnit tf_target = null; 
 		
 		int numerus_counter = 0;
@@ -1100,7 +1103,7 @@ public class TsFilter implements IFilter {
 		boolean nextIsSkippableEmpty = false;
 		
 		skel = new GenericSkeleton();
-		DocumentPart dp = new DocumentPart(String.valueOf(++ts.resourceId), false);
+		DocumentPart dp = new DocumentPart(ts.otherId.createId(), false);
 		
 		for(XMLEvent event: eventList){
 			
