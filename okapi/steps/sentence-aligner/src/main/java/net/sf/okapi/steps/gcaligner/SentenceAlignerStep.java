@@ -46,8 +46,8 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.segmentation.SRXDocument;
 
 /**
- * Align sentences between source and target paragraphs (TextUnits) and produce a TMX file with aligned sentences.
- * This {@link IPipelineStep} (via configuration) can also output aligned (multilingual {@link TextUnit}s)
+ * Align sentences between source and target paragraphs (TextUnits) and produce a TMX file with aligned sentences. This
+ * {@link IPipelineStep} (via configuration) can also output aligned (multilingual {@link TextUnit}s)
  * 
  * @author HARGRAVEJE
  * 
@@ -57,13 +57,13 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 	private static final Logger LOGGER = Logger.getLogger(SentenceAlignerStep.class.getName());
 
 	private Parameters params;
-	private IFilter filter=null; // DWH 5-19-10 initialize it
+	private IFilter filter = null;
 	private XMLWriter writer;
 	private TMXWriter tmx;
 	private IFilterConfigurationMapper fcMapper;
 	private LocaleId targetLocale;
 	private LocaleId sourceLocale;
-	private RawDocument targetInput=null; // DWH 5-19-10 added = null; null unless set externally
+	private RawDocument targetInput = null; 
 	private SentenceAligner sentenceAligner;
 	private ISegmenter sourceSegmenter;
 	private ISegmenter targetSegmenter;
@@ -119,65 +119,63 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 		SRXDocument srxDocument = new SRXDocument();
 
 		// Prepare source segmentation if needed
-		if ( params.getSegmentSource() ) {
+		if (params.getSegmentSource()) {
 			// Load default or custom rules
-			if ( params.getUseCustomSourceRules() ) {
+			if (params.getUseCustomSourceRules()) {
 				try {
 					srxDocument.loadRules(params.getCustomSourceRulesPath());
 					loadDefault = false;
-				}
-				catch ( Exception e ) {
-					LOGGER.warning(String.format(
-						"Custom source segmentation rules file '%s' cannot be read.\nUsing the default rules instead.",
-						params.getCustomSourceRulesPath()));
+				} catch (Exception e) {
+					LOGGER.warning(String
+							.format("Custom source segmentation rules file '%s' cannot be read.\nUsing the default rules instead.",
+									params.getCustomSourceRulesPath()));
 				}
 			}
-			if ( loadDefault ) {
+			if (loadDefault) {
 				InputStream is = SentenceAlignerStep.class.getResourceAsStream("default.srx");
 				srxDocument.loadRules(is);
 			}
-			//TODO: decide how we deal with leading/trailing spaces
-			//srxDocument.setTrimLeadingWhitespaces(false);
+			// TODO: decide how we deal with leading/trailing spaces
+			// srxDocument.setTrimLeadingWhitespaces(false);
 			sourceSegmenter = srxDocument.compileLanguageRules(sourceLocale, null);
 		}
-		
+
 		// Prepare target segmentation if needed
-		if ( params.getSegmentTarget() ) {
+		if (params.getSegmentTarget()) {
 			loadDefault = true;
 			// Load default or custom rules
-			if ( params.getUseCustomTargetRules() ) {
+			if (params.getUseCustomTargetRules()) {
 				try {
 					srxDocument.loadRules(params.getCustomTargetRulesPath());
 					loadDefault = false;
-				}
-				catch ( Exception e ) {
-					LOGGER.warning(String.format(
-						"Custom target segmentation rules file '%s' cannot be read.\nUsing the default rules instead.",
-						params.getCustomTargetRulesPath()));
+				} catch (Exception e) {
+					LOGGER.warning(String
+							.format("Custom target segmentation rules file '%s' cannot be read.\nUsing the default rules instead.",
+									params.getCustomTargetRulesPath()));
 				}
 			}
-			if ( loadDefault ) {
+			if (loadDefault) {
 				InputStream is = SentenceAlignerStep.class.getResourceAsStream("default.srx");
 				srxDocument.loadRules(is);
 			}
-			//TODO: decide how we deal with leading/trailing spaces
-			//srxDocument.setTrimLeadingWhitespaces(false);
+			// TODO: decide how we deal with leading/trailing spaces
+			// srxDocument.setTrimLeadingWhitespaces(false);
 			targetSegmenter = srxDocument.compileLanguageRules(targetLocale, null);
 		}
 
 		// Start TMX writer (one for all input documents)
-		if ( params.getGenerateTMX() ) {
+		if (params.getGenerateTMX()) {
 			tmx = new TMXWriter(params.getTmxOutputPath());
 			// TODO: How to get filter mime type here???
 			tmx.writeStartDocument(sourceLocale, targetLocale, getClass().getName(), null,
-				"sentence", null, "text/plain");
+					"sentence", null, "text/plain");
 		}
 
 		return event;
 	}
 
 	protected Event handleEndBatch(Event event) {
-		if ( tmx != null ) {
+		if (tmx != null) {
 			tmx.writeEndDocument();
 			tmx.close();
 			tmx = null;
@@ -186,16 +184,16 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 	}
 
 	@Override
-	protected Event handleStartDocument (Event event) {
-		if ( targetInput != null ) {
+	protected Event handleStartDocument(Event event) {
+		if (targetInput != null) {
 			initializeFilter();
 		}
 		return event;
 	}
 
 	@Override
-	protected Event handleEndDocument (Event event) {
-		if ( filter != null ) {
+	protected Event handleEndDocument(Event event) {
+		if (filter != null) {
 			filter.close();
 		}
 		return event;
@@ -205,25 +203,24 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 	protected Event handleTextUnit(Event sourceEvent) {
 		TextUnit sourceTu = sourceEvent.getTextUnit();
 		TextUnit targetTu = null; // DWH 5-19-10 moved declaration here
-		
+
 		// Skip non-translatable
-		if ( !sourceTu.isTranslatable() ) {
+		if (!sourceTu.isTranslatable()) {
 			return sourceEvent;
 		}
 
 		// Segment the source if requested
-		if ( params.getSegmentSource() ) {
+		if (params.getSegmentSource()) {
 			sourceTu.createSourceSegmentation(sourceSegmenter);
 		}
 
 		// Move to the next target TU
-		if ( targetInput != null ) {
+		if (targetInput != null) {
 			Event targetEvent = synchronize(EventType.TEXT_UNIT);
 			targetTu = targetEvent.getTextUnit();
-		}
-		else { // DWH 5-19-10 grab target text from target in sourceTu
+		} else { // DWH 5-19-10 grab target text from target in sourceTu
 			TextContainer targetTextContainer = sourceTu.getTarget(targetLocale);
-			if (targetTextContainer==null || targetTextContainer.getCodedText().length()==0) {
+			if (targetTextContainer == null || targetTextContainer.getCodedText().length() == 0) {
 				return sourceEvent;
 			}
 			targetTu = new TextUnit(UUID.randomUUID().toString());
@@ -231,7 +228,7 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 		}
 
 		// Segment the target if requested
-		if ( params.getSegmentTarget() ) {
+		if (params.getSegmentTarget()) {
 			targetTu.createSourceSegmentation(targetSegmenter);
 		}
 
@@ -242,13 +239,12 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 		}
 
 		TextUnit alignedTextUnit = sentenceAligner.align(sourceTu, targetTu, sourceLocale,
-			targetLocale);
+				targetLocale);
 
 		// Send the aligned TU to the TMX file
-		if ( params.getGenerateTMX() ) {
+		if (params.getGenerateTMX()) {
 			tmx.writeTUFull(alignedTextUnit);
-		}
-		else { // Otherwise send each aligned TextUnit downstream as a multi-event
+		} else { // Otherwise send each aligned TextUnit downstream as a multi-event
 			return new Event(EventType.TEXT_UNIT, alignedTextUnit);
 		}
 
