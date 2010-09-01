@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2"><file original="tstest.ts" source-language="en-us" target-language="fr-fr" datatype="x-application/x-ts" xmlns:x="http://net.sf.okapi/ns/xliff-extensions" x:inputEncoding="UTF-8" x:configId="">
 <body>
-<group id="3">
-<group id="4">
+<group id="o3">
+<group id="o4">
 <trans-unit id="1" resname="1">
 <source xml:lang="en-us">hello &lt;byte value="79"/>world</source>
 <target xml:lang="fr-fr">hejsan &lt;byte value="79"/>varlden</target>
