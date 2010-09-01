@@ -344,6 +344,64 @@ public class QualityCheckerTest {
 	}
 
 	@Test
+	public void testMaxLength () {
+		session.getParameters().setMaxCharLengthBreak(9);
+		session.getParameters().setMaxCharLengthAbove(149);
+		session.getParameters().setMaxCharLengthBelow(200);
+
+		TextUnit tu = new TextUnit("id", "abcdefghij"); // 10 chars -> use above
+		tu.setTarget(locFR, new TextContainer("123456789012345")); // 15 chars
+		session.startProcess(locEN, locFR);
+		session.processTextUnit(tu);
+		List<Issue> issues = session.getIssues();
+		assertEquals(1, issues.size());
+		assertEquals(IssueType.TARGET_LENGTH, issues.get(0).issueType);
+
+		tu = new TextUnit("id", "abcdefghi"); // 9 chars -> use below
+		tu.setTarget(locFR, new TextContainer("123456789012345678")); // 18 chars (==200% of src)
+		session.getIssues().clear();
+		session.startProcess(locEN, locFR);
+		session.processTextUnit(tu);
+		issues = session.getIssues();
+		assertEquals(0, issues.size());
+		
+		tu.setTarget(locFR, new TextContainer("1234567890123456789")); // 19 chars (>200% of src)
+		session.processTextUnit(tu);
+		issues = session.getIssues();
+		assertEquals(1, issues.size());
+		assertEquals(IssueType.TARGET_LENGTH, issues.get(0).issueType);
+	}
+
+	@Test
+	public void testMinLength () {
+		session.getParameters().setMinCharLengthBreak(9);
+		session.getParameters().setMinCharLengthAbove(100);
+		session.getParameters().setMinCharLengthBelow(50);
+
+		TextUnit tu = new TextUnit("id", "abcdefghij"); // 10 chars -> use above
+		tu.setTarget(locFR, new TextContainer("123456789")); // 10 chars (<100% of src)
+		session.startProcess(locEN, locFR);
+		session.processTextUnit(tu);
+		List<Issue> issues = session.getIssues();
+		assertEquals(1, issues.size());
+		assertEquals(IssueType.TARGET_LENGTH, issues.get(0).issueType);
+
+		tu = new TextUnit("id", "abcdefghi"); // 9 chars -> use below
+		tu.setTarget(locFR, new TextContainer("12345")); // 5 chars (==50% of src)
+		session.getIssues().clear();
+		session.startProcess(locEN, locFR);
+		session.processTextUnit(tu);
+		issues = session.getIssues();
+		assertEquals(0, issues.size());
+		
+		tu.setTarget(locFR, new TextContainer("123")); // 4 chars (<50% of src)
+		session.processTextUnit(tu);
+		issues = session.getIssues();
+		assertEquals(1, issues.size());
+		assertEquals(IssueType.TARGET_LENGTH, issues.get(0).issueType);
+	}
+
+	@Test
 	public void testTERMINOLOGY () {
 		TextUnit tu = new TextUnit("id", "summer and WINTER");
 		tu.setTarget(locFR, new TextContainer("\u00e9T\u00e9 et printemps"));

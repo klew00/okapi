@@ -49,6 +49,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
@@ -65,10 +66,10 @@ import org.eclipse.swt.widgets.Text;
 @EditorFor(Parameters.class)
 public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParametersEditor {
 
-	private static final int TAB_CHARACTERS = 3;
-	private static final int TAB_LANGUAGETOOL = 4;
-	private static final int TAB_TERMS = 5;
-	private static final int TAB_OTHER = 6;
+	private static final int TAB_CHARACTERS = 4;
+	private static final int TAB_LANGUAGETOOL = 5;
+	private static final int TAB_TERMS = 6;
+	private static final int TAB_OTHER = 7;
 	
 	private static final int INFOCOLWIDTH = 120;
 	
@@ -119,9 +120,15 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Text edLTTranslationSource;
 	private Text edLTTranslationTarget;
 	private Button chkMaxCharLength;
-	private Spinner spMaxCharLength;
+	private Composite cmpMaxCharLength;
+	private Spinner spMaxCharLengthBreak;
+	private Spinner spMaxCharLengthAbove;
+	private Spinner spMaxCharLengthBelow;
 	private Button chkMinCharLength;
-	private Spinner spMinCharLength;
+	private Composite cmpMinCharLength;
+	private Spinner spMinCharLengthBreak;
+	private Spinner spMinCharLengthAbove;
+	private Spinner spMinCharLengthBelow;
 	private Button chkCheckCharacters;
 	private Text edCharset;
 	private Label stExtraCharsAllowed;
@@ -323,39 +330,117 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		chkDoubledWord = new Button(grpSeg, SWT.CHECK);
 		chkDoubledWord.setText("Warn on doubled words (e.g. \"is is\" in \"This is is an example\")");
 		
-		chkMaxCharLength = new Button(grpSeg, SWT.CHECK);
-		chkMaxCharLength.setText("Warn if a target is longer than the following percentage of the character length of its source:");
+		TabItem tiTmp = new TabItem(tabs, SWT.NONE);
+		tiTmp.setText("General");
+		tiTmp.setControl(cmpTmp);
+
+
+		//--- Length tab
+		
+		cmpTmp = new Composite(tabs, SWT.NONE);
+		cmpTmp.setLayout(new GridLayout());
+		gdTmp = new GridData(GridData.FILL_BOTH);
+		cmpTmp.setLayoutData(gdTmp);
+
+		chkMaxCharLength = new Button(cmpTmp, SWT.CHECK);
+		chkMaxCharLength.setText("Warn if a target is longer than the given percentage of the character length of its source:");
 		chkMaxCharLength.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				updateMaxCharLength();
 			};
 		});
-		spMaxCharLength = new Spinner(grpSeg, SWT.BORDER);
+		
+		cmpMaxCharLength = new Composite(cmpTmp, SWT.NONE);
+		cmpMaxCharLength.setLayout(new GridLayout(2, false));
+
+		Label stTmp = new Label(cmpMaxCharLength, SWT.NONE);
+		stTmp.setText("Character length above which a text is considered \"long\":");
+		stTmp.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END));
+		
+		spMaxCharLengthBreak = new Spinner(cmpMaxCharLength, SWT.BORDER);
 		gdTmp = new GridData();
 		gdTmp.widthHint = 70;
 		gdTmp.horizontalIndent = horizIndent;
-		spMaxCharLength.setLayoutData(gdTmp);
-		spMaxCharLength.setMaximum(999);
-		spMaxCharLength.setMinimum(1);
+		spMaxCharLengthBreak.setLayoutData(gdTmp);
+		spMaxCharLengthBreak.setMaximum(999);
+		spMaxCharLengthBreak.setMinimum(1);
 		
-		chkMinCharLength = new Button(grpSeg, SWT.CHECK);
-		chkMinCharLength.setText("Warn if a target is shorter than the following percentage of the character length of its source:");
+		stTmp = new Label(cmpMaxCharLength, SWT.NONE);
+		stTmp.setText("Percentage for \"short\" text:");
+		stTmp.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END));
+		
+		spMaxCharLengthBelow = new Spinner(cmpMaxCharLength, SWT.BORDER);
+		gdTmp = new GridData();
+		gdTmp.widthHint = 70;
+		gdTmp.horizontalIndent = horizIndent;
+		spMaxCharLengthBelow.setLayoutData(gdTmp);
+		spMaxCharLengthBelow.setMaximum(999);
+		spMaxCharLengthBelow.setMinimum(1);
+
+		stTmp = new Label(cmpMaxCharLength, SWT.NONE);
+		stTmp.setText("Percentage for \"long\" text:");
+		stTmp.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END));
+		
+		spMaxCharLengthAbove = new Spinner(cmpMaxCharLength, SWT.BORDER);
+		gdTmp = new GridData();
+		gdTmp.widthHint = 70;
+		gdTmp.horizontalIndent = horizIndent;
+		spMaxCharLengthAbove.setLayoutData(gdTmp);
+		spMaxCharLengthAbove.setMaximum(999);
+		spMaxCharLengthAbove.setMinimum(1);
+		
+		
+		chkMinCharLength = new Button(cmpTmp, SWT.CHECK);
+		chkMinCharLength.setText("Warn if a target is shorter than the given percentage of the character length of its source:");
 		chkMinCharLength.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				updateMinCharLength();
 			};
 		});
-		spMinCharLength = new Spinner(grpSeg, SWT.BORDER);
+
+		cmpMinCharLength = new Composite(cmpTmp, SWT.NONE);
+		cmpMinCharLength.setLayout(new GridLayout(2, false));
+
+		stTmp = new Label(cmpMinCharLength, SWT.NONE);
+		stTmp.setText("Character length above which a text is considered \"long\":");
+		stTmp.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END));
+		
+		spMinCharLengthBreak = new Spinner(cmpMinCharLength, SWT.BORDER);
 		gdTmp = new GridData();
 		gdTmp.widthHint = 70;
 		gdTmp.horizontalIndent = horizIndent;
-		spMinCharLength.setLayoutData(gdTmp);
-		spMinCharLength.setMaximum(999);
-		spMinCharLength.setMinimum(1);
+		spMinCharLengthBreak.setLayoutData(gdTmp);
+		spMinCharLengthBreak.setMaximum(999);
+		spMinCharLengthBreak.setMinimum(1);
 		
-		TabItem tiTmp = new TabItem(tabs, SWT.NONE);
-		tiTmp.setText("General");
+		stTmp = new Label(cmpMinCharLength, SWT.NONE);
+		stTmp.setText("Percentage for \"short\" text:");
+		stTmp.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END));
+		
+		spMinCharLengthBelow = new Spinner(cmpMinCharLength, SWT.BORDER);
+		gdTmp = new GridData();
+		gdTmp.widthHint = 70;
+		gdTmp.horizontalIndent = horizIndent;
+		spMinCharLengthBelow.setLayoutData(gdTmp);
+		spMinCharLengthBelow.setMaximum(999);
+		spMinCharLengthBelow.setMinimum(1);
+
+		stTmp = new Label(cmpMinCharLength, SWT.NONE);
+		stTmp.setText("Percentage for \"long\" text:");
+		stTmp.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END));
+		
+		spMinCharLengthAbove = new Spinner(cmpMinCharLength, SWT.BORDER);
+		gdTmp = new GridData();
+		gdTmp.widthHint = 70;
+		gdTmp.horizontalIndent = horizIndent;
+		spMinCharLengthAbove.setLayoutData(gdTmp);
+		spMinCharLengthAbove.setMaximum(999);
+		spMinCharLengthAbove.setMinimum(1);
+		
+		tiTmp = new TabItem(tabs, SWT.NONE);
+		tiTmp.setText("Length");
 		tiTmp.setControl(cmpTmp);
+
 
 		//--- Inline codes tab
 		
@@ -1000,11 +1085,17 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	}
 
 	private void updateMaxCharLength () {
-		spMaxCharLength.setEnabled(chkMaxCharLength.getSelection());
+		boolean enabled = chkMaxCharLength.getSelection();
+		for ( Control ctrl : cmpMaxCharLength.getChildren() ) {
+			ctrl.setEnabled(enabled);
+		}
 	}
 
 	private void updateMinCharLength () {
-		spMinCharLength.setEnabled(chkMinCharLength.getSelection());
+		boolean enabled = chkMinCharLength.getSelection();
+		for ( Control ctrl : cmpMinCharLength.getChildren() ) {
+			ctrl.setEnabled(enabled);
+		}
 	}
 
 	private void updatePatterns () {
@@ -1058,10 +1149,15 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		chkPatterns.setSelection(params.getCheckPatterns());
 		chkDoubledWord.setSelection(params.getDoubledWord());
 		chkCorruptedChars.setSelection(params.getCorruptedCharacters());
+
 		chkMaxCharLength.setSelection(params.getCheckMaxCharLength());
-		spMaxCharLength.setSelection(params.getMaxCharLength());
+		spMaxCharLengthBreak.setSelection(params.getMaxCharLengthBreak());
+		spMaxCharLengthAbove.setSelection(params.getMaxCharLengthAbove());
+		spMaxCharLengthBelow.setSelection(params.getMaxCharLengthBelow());
 		chkMinCharLength.setSelection(params.getCheckMinCharLength());
-		spMinCharLength.setSelection(params.getMinCharLength());
+		spMinCharLengthBreak.setSelection(params.getMinCharLengthBreak());
+		spMinCharLengthAbove.setSelection(params.getMinCharLengthAbove());
+		spMinCharLengthBelow.setSelection(params.getMinCharLengthBelow());
 		
 		rdScopeAllEntries.setSelection(params.getScope()==Parameters.SCOPE_ALL);
 		rdScopeApprovedOnly.setSelection(params.getScope()==Parameters.SCOPE_APPROVEDONLY);
@@ -1183,11 +1279,15 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 
 		params.setCheckMaxCharLength(chkMaxCharLength.getSelection());
 		if ( chkMaxCharLength.getSelection() ) {
-			params.setMaxCharLength(spMaxCharLength.getSelection());
+			params.setMaxCharLengthBreak(spMaxCharLengthBreak.getSelection());
+			params.setMaxCharLengthAbove(spMaxCharLengthAbove.getSelection());
+			params.setMaxCharLengthBelow(spMaxCharLengthBelow.getSelection());
 		}
 		params.setCheckMinCharLength(chkMinCharLength.getSelection());
 		if ( chkMinCharLength.getSelection() ) {
-			params.setMinCharLength(spMinCharLength.getSelection());
+			params.setMinCharLengthBreak(spMinCharLengthBreak.getSelection());
+			params.setMinCharLengthAbove(spMinCharLengthAbove.getSelection());
+			params.setMinCharLengthBelow(spMinCharLengthBelow.getSelection());
 		}
 		
 		java.util.List<String> list = params.getMissingCodesAllowed();

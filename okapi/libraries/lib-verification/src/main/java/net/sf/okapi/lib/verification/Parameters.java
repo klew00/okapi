@@ -59,9 +59,13 @@ public class Parameters extends BaseParameters {
 	private static final String SESSIONPATH = "sessionPath";
 	private static final String DOUBLEDWORD = "doubledWord";
 	private static final String CHECKMAXCHARLENGTH = "checkMaxCharLength";
-	private static final String MAXCHARLENGTH = "maxCharLength";
+	private static final String MAXCHARLENGTHBREAK = "maxCharLengthBreak";
+	private static final String MAXCHARLENGTHABOVE = "maxCharLengthAbove";
+	private static final String MAXCHARLENGTHBELOW = "maxCharLengthBelow";
 	private static final String CHECKMINCHARLENGTH = "checkMinCharLength";
-	private static final String MINCHARLENGTH = "minCharLength";
+	private static final String MINCHARLENGTHBREAK = "minCharLengthBreak";
+	private static final String MINCHARLENGTHABOVE = "minCharLengthAbove";
+	private static final String MINCHARLENGTHBELOW = "minCharLengthBelow";
 	private static final String CHECKCHARACTERS = "checkCharacters";
 	private static final String CHARSET = "charset";
 	private static final String EXTRACHARSALLOWED = "extraCharsAllowed";
@@ -93,9 +97,13 @@ public class Parameters extends BaseParameters {
 	String sessionPath;
 	boolean doubledWord;
 	boolean checkMaxCharLength;
-	int maxCharLength;
+	int maxCharLengthBreak;
+	int maxCharLengthAbove;
+	int maxCharLengthBelow;
 	boolean checkMinCharLength;
-	int minCharLength;
+	int minCharLengthBreak;
+	int minCharLengthAbove;
+	int minCharLengthBelow;
 	boolean checkCharacters;
 	String charset;
 	String extraCharsAllowed;
@@ -166,15 +174,31 @@ public class Parameters extends BaseParameters {
 		this.checkMaxCharLength = checkMaxCharLength;
 	}
 
-	public int getMaxCharLength () {
-		return maxCharLength;
+	public int getMaxCharLengthBreak () {
+		return maxCharLengthBreak;
 	}
 
-	public void setMaxCharLength (int maxCharLength) {
-		this.maxCharLength = maxCharLength;
+	public void setMaxCharLengthBreak (int maxCharLengthBreak) {
+		this.maxCharLengthBreak = maxCharLengthBreak;
 	}
 
-	public boolean getCheckMinCharLength() {
+	public int getMaxCharLengthAbove () {
+		return maxCharLengthAbove;
+	}
+
+	public void setMaxCharLengthAbove (int maxCharLengthAbove) {
+		this.maxCharLengthAbove = maxCharLengthAbove;
+	}
+
+	public int getMaxCharLengthBelow () {
+		return maxCharLengthBelow;
+	}
+
+	public void setMaxCharLengthBelow (int maxCharLengthBelow) {
+		this.maxCharLengthBelow = maxCharLengthBelow;
+	}
+
+	public boolean getCheckMinCharLength () {
 		return checkMinCharLength;
 	}
 
@@ -182,12 +206,28 @@ public class Parameters extends BaseParameters {
 		this.checkMinCharLength = checkMinCharLength;
 	}
 
-	public int getMinCharLength() {
-		return minCharLength;
+	public int getMinCharLengthBreak () {
+		return minCharLengthBreak;
 	}
 
-	public void setMinCharLength(int minCharLength) {
-		this.minCharLength = minCharLength;
+	public void setMinCharLengthBreak (int minCharLengthBreak) {
+		this.minCharLengthBreak = minCharLengthBreak;
+	}
+
+	public int getMinCharLengthAbove () {
+		return minCharLengthAbove;
+	}
+
+	public void setMinCharLengthAbove (int minCharLengthAbove) {
+		this.minCharLengthAbove = minCharLengthAbove;
+	}
+
+	public int getMinCharLengthBelow () {
+		return minCharLengthBelow;
+	}
+
+	public void setMinCharLengthBelow (int minCharLengthBelow) {
+		this.minCharLengthBelow = minCharLengthBelow;
 	}
 
 	public boolean getDoubledWord () {
@@ -382,9 +422,13 @@ public class Parameters extends BaseParameters {
 		scope = SCOPE_ALL;
 		
 		checkMaxCharLength = true;
-		maxCharLength = 250;
+		maxCharLengthBreak = 20;
+		maxCharLengthAbove = 200;
+		maxCharLengthBelow = 350;
 		checkMinCharLength = true;
-		minCharLength = 45;
+		minCharLengthBreak = 20;
+		minCharLengthAbove = 45;
+		minCharLengthBelow = 30;
 		
 		checkCharacters = false;
 		charset = "ISO-8859-1";
@@ -462,9 +506,13 @@ public class Parameters extends BaseParameters {
 		scope = buffer.getInteger(SCOPE, scope);
 		// Length
 		checkMaxCharLength = buffer.getBoolean(CHECKMAXCHARLENGTH, checkMaxCharLength);
-		maxCharLength = buffer.getInteger(MAXCHARLENGTH, maxCharLength);
+		maxCharLengthBreak = buffer.getInteger(MAXCHARLENGTHBREAK, maxCharLengthBreak);
+		maxCharLengthAbove = buffer.getInteger(MAXCHARLENGTHABOVE, maxCharLengthAbove);
+		maxCharLengthBelow = buffer.getInteger(MAXCHARLENGTHBELOW, maxCharLengthBelow);
 		checkMinCharLength = buffer.getBoolean(CHECKMINCHARLENGTH, checkMinCharLength);
-		minCharLength = buffer.getInteger(MINCHARLENGTH, minCharLength);
+		minCharLengthBreak = buffer.getInteger(MINCHARLENGTHBREAK, minCharLengthBreak);
+		minCharLengthAbove = buffer.getInteger(MINCHARLENGTHABOVE, minCharLengthAbove);
+		minCharLengthBelow = buffer.getInteger(MINCHARLENGTHBELOW, minCharLengthBelow);
 		// Characters
 		checkCharacters = buffer.getBoolean(CHECKCHARACTERS, checkCharacters);
 		charset = buffer.getString(CHARSET, charset);
@@ -525,9 +573,13 @@ public class Parameters extends BaseParameters {
 		buffer.setInteger(SCOPE, scope);
 		// Length
 		buffer.setBoolean(CHECKMAXCHARLENGTH, checkMaxCharLength);
-		buffer.setInteger(MAXCHARLENGTH, maxCharLength);
+		buffer.setInteger(MAXCHARLENGTHBREAK, maxCharLengthBreak);
+		buffer.setInteger(MAXCHARLENGTHABOVE, maxCharLengthAbove);
+		buffer.setInteger(MAXCHARLENGTHBELOW, maxCharLengthBelow);
 		buffer.setBoolean(CHECKMINCHARLENGTH, checkMinCharLength);
-		buffer.setInteger(MINCHARLENGTH, minCharLength);
+		buffer.setInteger(MINCHARLENGTHBREAK, minCharLengthBreak);
+		buffer.setInteger(MINCHARLENGTHABOVE, minCharLengthAbove);
+		buffer.setInteger(MINCHARLENGTHBELOW, minCharLengthBelow);
 		// Characters
 		buffer.setBoolean(CHECKCHARACTERS, checkCharacters);
 		buffer.setString(CHARSET, charset);

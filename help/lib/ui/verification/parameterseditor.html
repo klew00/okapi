@@ -80,19 +80,39 @@ no warning is generated as the target is expected to be the same.</p>
 segments where there is a sequential repetition of the same word, for example 
 &quot;is is&quot; in &quot;this is is an example&quot;. The check is not case-sensitive, for example 
 &quot;This this an example&quot; is flagged.</p>
-<p><cite>Warn if a target is longer than the following percentage of the 
+<h3>Length Tab</h3>
+<p><cite>Warn if a target is longer than the given percentage of the 
 character length of its source</cite> -- Set this option to flag any target text 
-that is longer than a given percentage of its source text. For example, if you 
-enter 150%: If a source text is 20 characters long and its translation is more 
-than 30 characters long, it will be flagged. The length is based on the number 
-of characters without counting the inline codes. This value must be tuned for 
+that is longer than a given percentage of its source text.</p>
+<p><cite>Character length above which a text is considered &quot;long&quot;</cite> -- 
+Enter the number of characters above which you consider a text to be a long text 
+(vs. a short one). This allows you to set different percentages for short and 
+longer text.</p>
+<p><cite>Percentage for &quot;short&quot; text</cite> -- Enter the percentage to use when 
+the text is shorter or equal to the character length above which a text is 
+considered long.</p>
+<p><cite>Percentage for &quot;long&quot; text</cite> -- Enter the percentage to use when 
+the text is longer than the character length above which a text is considered 
+long.</p>
+<p>The length is based on the number 
+of characters without counting the inline codes. These values must be tuned for 
 each source/target language pair.</p>
 <p><cite>Warn if a target is shorter than the following percentage of the 
 character length of its source</cite> -- Set this option to flag any target text 
-that is shorter than a given percentage of its source text. For example, if you 
-enter 50%: If a source text is 40 characters long and its translation is less 
-than 20 characters long, it will be flagged. The length is based on the number 
-of characters without counting the inline codes. This value must be tuned for 
+that is shorter than a given percentage of its source text. This allows you to 
+set different percentages for short and longer text.</p>
+<p><cite>Character length above which a text is considered &quot;long&quot;</cite> -- 
+Enter the number of characters above which you consider a text to be a long text 
+(vs. a short one). This allows you to set different percentages for short and 
+longer text.</p>
+<p><cite>Percentage for &quot;short&quot; text</cite> -- Enter the percentage to use when 
+the text is shorter or equal to the character length above which a text is 
+considered long.</p>
+<p><cite>Percentage for &quot;long&quot; text</cite> -- Enter the percentage to use when 
+the text is longer than the character length above which a text is considered 
+long.</p>
+<p>The length is based on the number 
+of characters without counting the inline codes. These values must be tuned for 
 each source/target language pair.</p>
 <h3><a name="InlineCodesTab"></a>Inline Codes Tab</h3>
 <p><cite>Warn if there is a code differences between source and target segments</cite> -- Set this option to 

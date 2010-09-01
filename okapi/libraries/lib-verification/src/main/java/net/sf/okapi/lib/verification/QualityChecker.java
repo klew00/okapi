@@ -597,7 +597,12 @@ class QualityChecker {
 		int n;
 		
 		if ( params.getCheckMaxCharLength() ) {
-			n = (srcLen==0 ? 0 : (int)((srcLen*params.getMaxCharLength())/100));
+			if ( srcLen <= params.getMaxCharLengthBreak() ) {
+				n = (srcLen==0 ? 0 : (int)((srcLen*params.getMaxCharLengthBelow())/100));
+			}
+			else {
+				n = (srcLen==0 ? 0 : (int)((srcLen*params.getMaxCharLengthAbove())/100));
+			}
 			if ( trgLen > n ) {
 				double d = (((float)trgLen)/(srcLen==0 ? 1.0 : ((float)srcLen)))*100.0;
 				reportIssue(IssueType.TARGET_LENGTH, tu, srcSeg.getId(),
@@ -608,7 +613,12 @@ class QualityChecker {
 		}
 
 		if ( params.getCheckMinCharLength() ) {
-			n = (srcLen==0 ? 0 : (int)((srcLen*params.getMinCharLength())/100));
+			if ( srcLen <= params.getMinCharLengthBreak() ) {
+				n = (srcLen==0 ? 0 : (int)((srcLen*params.getMinCharLengthBelow())/100));
+			}
+			else {
+				n = (srcLen==0 ? 0 : (int)((srcLen*params.getMinCharLengthAbove())/100));
+			}
 			if ( trgSeg.text.getCodedText().length() < n ) {
 				double d = (((float)trgLen)/(srcLen==0 ? 1.0 : ((float)srcLen)))*100.0;
 				reportIssue(IssueType.TARGET_LENGTH, tu, srcSeg.getId(),
