@@ -136,7 +136,7 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 				srxDocument.loadRules(is);
 			}
 			// TODO: decide how we deal with leading/trailing spaces
-			// srxDocument.setTrimLeadingWhitespaces(false);
+			//srxDocument.setTrimLeadingWhitespaces(false);
 			sourceSegmenter = srxDocument.compileLanguageRules(sourceLocale, null);
 		}
 
@@ -159,7 +159,7 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 				srxDocument.loadRules(is);
 			}
 			// TODO: decide how we deal with leading/trailing spaces
-			// srxDocument.setTrimLeadingWhitespaces(false);
+			//srxDocument.setTrimLeadingWhitespaces(false);
 			targetSegmenter = srxDocument.compileLanguageRules(targetLocale, null);
 		}
 
@@ -202,7 +202,7 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 	@Override
 	protected Event handleTextUnit(Event sourceEvent) {
 		TextUnit sourceTu = sourceEvent.getTextUnit();
-		TextUnit targetTu = null; // DWH 5-19-10 moved declaration here
+		TextUnit targetTu = null; 
 
 		// Skip non-translatable
 		if (!sourceTu.isTranslatable()) {
@@ -218,7 +218,7 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 		if (targetInput != null) {
 			Event targetEvent = synchronize(EventType.TEXT_UNIT);
 			targetTu = targetEvent.getTextUnit();
-		} else { // DWH 5-19-10 grab target text from target in sourceTu
+		} else { // grab target text from target in sourceTu
 			TextContainer targetTextContainer = sourceTu.getTarget(targetLocale);
 			if (targetTextContainer == null || targetTextContainer.getCodedText().length() == 0) {
 				return sourceEvent;
