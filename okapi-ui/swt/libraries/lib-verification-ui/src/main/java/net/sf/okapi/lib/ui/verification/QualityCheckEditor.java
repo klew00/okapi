@@ -1045,7 +1045,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 			displayType = cbDisplay.getSelectionIndex();
 			issueType = cbTypes.getSelectionIndex();
 			
-			issuesModel.updateTable(null, 0, displayType, issueType);
+			issuesModel.updateTable(0, displayType, issueType);
 			updateCurrentIssue();
 		}
 		catch ( Throwable e ) {
@@ -1057,7 +1057,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 	private void refreshTableDisplay () {
 		displayType = cbDisplay.getSelectionIndex();
 		issueType = cbTypes.getSelectionIndex();
-		issuesModel.updateTable(null, tblIssues.getSelectionIndex(), displayType, issueType);
+		issuesModel.updateTable(tblIssues.getSelectionIndex(), displayType, issueType);
 		updateCurrentIssue();
 	}
 
@@ -1148,21 +1148,9 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 			// What is left are the documents to remove
 			prevList.removeAll(getDocumentIds());
 			for ( URI uri : prevList ) {
-//				if ( currentDoc != null ) {
-//					// Check if current document is still available
-//					if ( currentDoc.equals(uri) ) currentDoc = null;
-//				}
 				session.clearIssues(uri, false);
 			}
 			
-			// Update the current selection
-//			if ( currentDoc == null ) {
-//				// Previous document no longer available
-//				if ( cbDocument.getItemCount() > 0 ) {
-//					cbDocument.select(0);
-//				}
-//			}
-
 			// Update the table of issues
 			refreshTableDisplay();
 		}
@@ -1323,22 +1311,33 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		if  ( dlg.open() != SWT.YES ) return;
 		// Proceed
 		session.resetDisabledIssues();
-		issuesModel.updateTable(null, 0, displayType, issueType);
+		issuesModel.updateTable(0, displayType, issueType);
 	}
 	
 	private void checkCurrentDocument () {
 		try {
 			int n = tblIssues.getSelectionIndex();
 			if ( n < 0 ) return;
-			Issue issue = (Issue)tblIssues.getItem(n).getData();
+			URI uri = ((Issue)tblIssues.getItem(n).getData()).docId;
 			startWaiting("Checking current document...");
-			session.recheckDocument(issue.docId);
+			session.recheckDocument(uri);
+			resetTableDisplay();
+			// Select the re-checked document
+			String curPath = uri.getPath();
+			n = 0;
+			for ( String path : cbDocument.getItems() ) {
+				if ( path.equals(curPath) ) {
+					cbDocument.select(n);
+					updateCurrentDocument();
+					break;
+				}
+				n++;
+			}
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, "Error while running the verification.\n"+e.getMessage(), null);
 		}
 		finally {
-			resetTableDisplay();
 			stopWaiting();
 		}
 	}

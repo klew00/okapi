@@ -666,7 +666,8 @@ class QualityChecker {
 			// Use a copy for the target: it may get modified for the search
 			StringBuilder trgCTextCopy = new StringBuilder(trgSeg.text.getCodedText());
 
-			while ( srcM.find() ) {
+			int from = 0;
+			while ( srcM.find(from) ) {
 				// Get the source text corresponding to the match
 				String srcPart = srcCText.substring(srcM.start(), srcM.end());
 				int start, end;
@@ -703,6 +704,8 @@ class QualityChecker {
 						0, -1, item.severity,
 						srcSeg.toString(), trgSeg.toString(), null);
 				}
+				
+				from = srcM.end();
 			}
 		}
 

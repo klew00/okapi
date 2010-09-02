@@ -334,6 +334,19 @@ public class QualityCheckerTest {
 	}
 
 	@Test
+	public void testMISSING_PATTERN_ForURL () {
+		TextUnit tu = new TextUnit("id", "test: http://thisisatest.com.");
+		tu.setTarget(locFR, new TextContainer("test: http://thisBADtest.com"));
+		session.startProcess(locEN, locFR); // Make sure we re-initialize
+		session.processTextUnit(tu);
+		List<Issue> issues = session.getIssues();
+		assertEquals(1, issues.size());
+		assertEquals(IssueType.UNEXPECTED_PATTERN, issues.get(0).issueType);
+		assertEquals(6, issues.get(0).srcStart); 
+		assertEquals(28, issues.get(0).srcEnd); 
+	}
+
+	@Test
 	public void testNoIssues () {
 		TextUnit tu = new TextUnit("id", "  Text {with} (123). ");
 		tu.setTarget(locFR, new TextContainer("  Texte {avec} (123). "));

@@ -20,7 +20,6 @@
 
 package net.sf.okapi.lib.ui.verification;
 
-import java.net.URI;
 import java.util.List;
 
 import net.sf.okapi.lib.verification.Issue;
@@ -90,8 +89,7 @@ class IssuesTableModel {
 	}
 
 	// displayType: 0=all, 1=enabled 2=disabled
-	void updateTable (URI currentDoc,
-		int selection,
+	void updateTable (int selection,
 		int displayType,
 		int issueType)
 	{
