@@ -145,8 +145,8 @@ public class XLIFFMergingStep {
 		// in the original and the merging files
 		if ( !tu.isTranslatable() ) return;
 
-		// Get item from the package document
-		// Skip also the read-only ones
+		// Try to get the corresponding translated item
+		// They are expected to be in the same order with the same id
 		TextUnit tuFromTrans;
 		while ( true ) {
 			tuFromTrans = getTextUnitFromXLIFF();
@@ -157,16 +157,39 @@ public class XLIFFMergingStep {
 				// Keep the source
 				return;
 			}
-			if ( !tuFromTrans.isTranslatable() ) continue;
-			else break; // Found next translatable (and likely translated) item
+			if ( !tu.getId().equals(tuFromTrans.getId()) ) {
+				// This should be a case where the original TU is translatable 
+				// but the XLIFF is flagged as not-translatable because of leveraging or other
+				// manipulation
+				// If it's a case of bad original file, they will desynchronize fast anyway
+				// and we will get a warning.
+				continue;
+			}
+			else break;
 		}
-		
-		if ( !tu.getId().equals(tuFromTrans.getId()) ) {
-			// Problem: different IDs
-			logger.warning(String.format("ID mismatch: Original item id=\"%s\" package item id=\"%s\".",
-				tu.getId(), tuFromTrans.getId()));
-			return; // Use the source
-		}
+
+//		// Get item from the package document
+//		// Skip also the read-only ones
+//		TextUnit tuFromTrans;
+//		while ( true ) {
+//			tuFromTrans = getTextUnitFromXLIFF();
+//			if ( tuFromTrans == null ) {
+//				// Problem: 
+//				logger.log(Level.WARNING,
+//					String.format("There is no more items in the package to merge with id=\"%s\".", tu.getId()));
+//				// Keep the source
+//				return;
+//			}
+//			if ( !tuFromTrans.isTranslatable() ) continue;
+//			else break; // Found next translatable (and likely translated) item
+//		}
+//		
+//		if ( !tu.getId().equals(tuFromTrans.getId()) ) {
+//			// Problem: different IDs
+//			logger.warning(String.format("ID mismatch: Original item id=\"%s\" package item id=\"%s\".",
+//				tu.getId(), tuFromTrans.getId()));
+//			return; // Use the source
+//		}
 
 		if ( !tuFromTrans.hasTarget(trgLoc) ) {
 			// No translation in package

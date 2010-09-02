@@ -25,6 +25,8 @@ import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,6 +44,9 @@ import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.virtualdb.IVRepository;
+import net.sf.okapi.virtualdb.jdbc.Repository;
+import net.sf.okapi.virtualdb.jdbc.h2.H2Access;
 
 public class QualityCheckSession {
 
@@ -59,7 +64,7 @@ public class QualityCheckSession {
 	private LocaleId targetLocale = LocaleId.FRENCH;
 	private IFilter filter;
 	private boolean modified;
-	
+
 	public QualityCheckSession () {
 		reset();
 	}
@@ -247,18 +252,26 @@ public class QualityCheckSession {
 	}
 	
 	public void saveSession (String path) {
-		// Temporary code, waiting for DB
+		try {
+			saveSessionToStream(new FileOutputStream(path));
+		}
+		catch ( IOException e ) {
+			throw new OkapiIOException("Error while saving session.", e);
+		}
+	}
+	
+	private void saveSessionToStream (OutputStream outputStream) {
 		DataOutputStream dos = null;
 		try {
-			dos = new DataOutputStream(new FileOutputStream(path));
+			dos = new DataOutputStream(outputStream);
 			
 			// Header
 			dos.writeBytes(serialSignature);
 			dos.writeLong(serialVersionUID);
 			
 			// Locales
-			dos.writeUTF(sourceLocale.toBCP47());
-			dos.writeUTF(targetLocale.toBCP47());
+			dos.writeUTF(sourceLocale.toString());
+			dos.writeUTF(targetLocale.toString());
 			
 			// Parameters
 			dos.writeUTF(params.toString());
@@ -295,11 +308,21 @@ public class QualityCheckSession {
 	}
 	
 	public void loadSession (String path) {
+		try {
+			loadSessionFromStream(new FileInputStream(path));
+			//TEST
+			
+		}
+		catch ( Throwable e ) {
+			throw new OkapiIOException("Error reading session file.\n"+e.getMessage(), e);
+		}
+	}
+
+	private void loadSessionFromStream (InputStream inputStream) {
 		reset();
-		// Temporary code, waiting for DB
 		DataInputStream dis = null;
 		try {
-			dis = new DataInputStream(new FileInputStream(path));
+			dis = new DataInputStream(inputStream);
 
 			// Header
 			byte[] buf = new byte[4];
@@ -316,9 +339,9 @@ public class QualityCheckSession {
 			
 			// Locales
 			tmp = dis.readUTF(); // Source
-			sourceLocale = LocaleId.fromBCP47(tmp);
+			sourceLocale = LocaleId.fromString(tmp);
 			tmp = dis.readUTF(); // Target
-			targetLocale = LocaleId.fromBCP47(tmp);
+			targetLocale = LocaleId.fromString(tmp);
 			
 			// Parameters
 			tmp = dis.readUTF();

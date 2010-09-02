@@ -20,6 +20,8 @@
 
 package net.sf.okapi.virtualdb.jdbc;
 
+import java.io.InputStream;
+
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.virtualdb.IVDocument;
 
@@ -51,4 +53,7 @@ public interface IDBAccess {
 
 	public IVDocument getFirstDocument();
 
+	public void saveExtraData1 (InputStream inputStream);
+
+	public InputStream loadExtraData1 ();
 }

@@ -20,6 +20,8 @@
 
 package net.sf.okapi.virtualdb.jdbc;
 
+import java.io.InputStream;
+
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.virtualdb.IVDocument;
 import net.sf.okapi.virtualdb.IVRepository;
@@ -90,8 +92,18 @@ public class Repository implements IVRepository {
 	}
 	
 	@Override
-	public IVDocument getFirstDocument() {
+	public IVDocument getFirstDocument () {
 		return db.getFirstDocument();
+	}
+
+	@Override
+	public void saveExtraData1 (InputStream inputStream) {
+		db.saveExtraData1(inputStream);
+	}
+
+	@Override
+	public InputStream loadExtraData1 () {
+		return db.loadExtraData1();
 	}
 
 }

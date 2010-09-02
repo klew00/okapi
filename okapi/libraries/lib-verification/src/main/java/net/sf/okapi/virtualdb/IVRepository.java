@@ -20,6 +20,8 @@
 
 package net.sf.okapi.virtualdb;
 
+import java.io.InputStream;
+
 import net.sf.okapi.common.resource.RawDocument;
 
 public interface IVRepository {
@@ -89,5 +91,13 @@ public interface IVRepository {
 	 * @return the first virtual document in this repository or null.
 	 */
 	public IVDocument getFirstDocument ();
+
+	/**
+	 * Saves a block of extra data into the repository.
+	 * @param inputStream the input stream of the object to save.
+	 */
+	public void saveExtraData1 (InputStream inputStream);
+
+	public InputStream loadExtraData1 ();
 
 }

@@ -20,7 +20,9 @@
 
 package net.sf.okapi.virtualdb.jdbc.h2;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 
 import net.sf.okapi.common.LocaleId;
@@ -49,6 +51,25 @@ public class H2ImplementationTest {
 		root = Util.getDirectoryName(url.getPath());
 	}
 
+	@Test
+	public void testExtraData1 () throws IOException {
+		// Create the repository object
+		IVRepository repo = new Repository(new H2Access(root, null));
+		// Create the repository database
+		repo.create("myRepo");
+
+		String data = "this is a test";
+		byte[] buffer = data.getBytes("UTF-8");
+		repo.saveExtraData1(new ByteArrayInputStream(buffer));
+		ByteArrayInputStream bais = (ByteArrayInputStream)repo.loadExtraData1();
+		byte [] buf = new byte[bais.available()];
+		bais.read(buf);
+		String out = new String(buf);
+		assertEquals(data, out);
+		
+		repo.close();
+	}
+	
 	@Test
 	public void testItemNavigation () {
 		fcMapper = new FilterConfigurationMapper();

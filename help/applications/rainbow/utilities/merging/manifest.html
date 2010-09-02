@@ -9,7 +9,7 @@
 <h2 class="dlgmain2">Translation Package Manifest</h2>
 <p>This dialog box is open for each manifest document, before the 
 post-processing for the given manifest starts.</p>
-<h3>Documents</h3>
+<h3>Documents Tab</h3>
 <p>This tab lists all the documents that are in the manifest. the table as the 
 following columns:</p>
 <ul>
@@ -26,7 +26,21 @@ following columns:</p>
 are checked will be processed.</p>
 <p>Click <cite>Execute</cite> to start the process, or <cite>Cancel</cite> to 
 stop.</p>
-<h3>Information</h3>
+<h3>Options Tab</h3>
+<p>This tab lists the options available for the post-processing extracted text. 
+They have no effect when post-processing RTF files.</p>
+<p><b>IMPORTANT: THESE OPTIONS ARE RESET TO THEIR DEFAULT VALUES EACH TIME YOU 
+RUN A POST-PROCESS.</b></p>
+<p><cite>Merge the translation only if it is approved</cite> -- Set this option 
+to merge the available translation only if the text unit has a property <i>
+approved</i> set to <code>yes</code>. If this option is set and the text unit 
+does not have the property set to <code>yes</code>, the source is merged and a 
+warning is displayed.</p>
+<p><cite>Set the &#39;approved&#39; flag on the merged translations</cite> -- Set this 
+option to automatically set the property approved to yes if it is going to be 
+merged. This for example to update the flags in file format such as PO, XLIFF or 
+TS where the property may need to be modified for further processing.</p>
+<h3>Information Tab</h3>
 <p>This tab displays various information found in the manifest.</p>
 <p><cite>Package type</cite> -- Shows the type of package for this manifest.</p>
 <p><cite>Package ID</cite> -- Shows unique identifier associate with this 

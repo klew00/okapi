@@ -22,7 +22,7 @@ package net.sf.okapi.virtualdb.jdbc.h2;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.sql.Blob;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -927,12 +927,14 @@ public class H2Access implements IDBAccess {
 		return getDocument(list.get(0));
 	}
 
-	public void saveExtra1 (Object object) {
+	@Override
+	public void saveExtraData1 (InputStream inputStream) {
 		PreparedStatement pstm = null;
 		try {
 			pstm = conn.prepareStatement(String.format("update %s set %s=? where %s=1",
 				INFO_TBLNAME, INFO_EXTRA1, INFO_KEY));
-			//pstm.setBlob(1, )
+			pstm.setBinaryStream(1, inputStream); 
+			pstm.executeUpdate(); 
 		}
 		catch ( SQLException e ) {
 			throw new RuntimeException(e);
@@ -950,4 +952,31 @@ public class H2Access implements IDBAccess {
 		}
 	}
 
+	public InputStream loadExtraData1 () {
+		PreparedStatement pstm = null;
+		try {
+			pstm = conn.prepareStatement(String.format("select %s from %s where %s=1",
+				INFO_EXTRA1, INFO_TBLNAME, INFO_KEY));
+			ResultSet rs = pstm.executeQuery();
+			// Return null if nothing found
+			if ( !rs.first() ) return null;
+			// Otherwise: return the stream
+			return rs.getBlob(1).getBinaryStream();
+		}
+		catch ( SQLException e ) {
+			throw new RuntimeException(e);
+		}
+		finally {
+			try {
+				if ( pstm != null ) {
+					pstm.close();
+					pstm = null;
+				}
+			}
+			catch ( SQLException e ) {
+				throw new RuntimeException(e);
+			}
+		}
+	}
+	
 }
