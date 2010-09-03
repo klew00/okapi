@@ -532,6 +532,23 @@ public class TextUnit implements INameable, IReferenceable {
 	}
 	
 	/**
+	 * Segment the specified target content based on the rules provided by a given ISegmenter.
+	 * <p>This methods also stores the boundaries for the segments so they can be re-applied later.
+	 * for example when calling {@link #synchronizeSourceSegmentation(LocaleId)}.
+	 * @param segmenter the segmenter to use to create the segments.
+	 * @param targetLocale {@link LocaleId} of the target we want to segment.
+	 */
+	public void createTargetSegmentation (ISegmenter segmenter, LocaleId targetLocale) {
+		if ( trgSegRanges == null ) {
+			trgSegRanges = new ConcurrentHashMap<LocaleId, List<Range>>();
+		}
+		segmenter.computeSegments(getTarget(targetLocale));
+		trgSegRanges.put(targetLocale, segmenter.getRanges());
+		getTarget(targetLocale).getSegments().create(trgSegRanges.get(targetLocale));
+		// TODO: how to set this for target? syncLoc = null;
+	}
+	
+	/**
 	 * Saves the current segment boundaries for the source.
 	 * <p>This methods stores the boundaries for the segments so they can be re-applied later,
 	 * for example when calling {@link #synchronizeSourceSegmentation(LocaleId)}.
@@ -587,7 +604,7 @@ public class TextUnit implements INameable, IReferenceable {
 			// No target-specific ranges available: use the source
 			ranges = srcSegRanges;
 		}
-		source.getSegments().create(ranges); // Ranges can be null: no segmentation occures then
+		source.getSegments().create(ranges); // Ranges can be null: no segmentation occurs then
 		syncLoc = locId;
 	}
 
