@@ -21,7 +21,6 @@
 package net.sf.okapi.steps.gcaligner;
 
 import java.io.InputStream;
-import java.util.UUID;
 import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
@@ -41,7 +40,6 @@ import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.segmentation.SRXDocument;
 
@@ -63,7 +61,7 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 	private IFilterConfigurationMapper fcMapper;
 	private LocaleId targetLocale;
 	private LocaleId sourceLocale;
-	private RawDocument targetInput = null; 
+	private RawDocument targetInput = null;
 	private SentenceAligner sentenceAligner;
 	private ISegmenter sourceSegmenter;
 	private ISegmenter targetSegmenter;
@@ -136,7 +134,7 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 				srxDocument.loadRules(is);
 			}
 			// TODO: decide how we deal with leading/trailing spaces
-			//srxDocument.setTrimLeadingWhitespaces(false);
+			// srxDocument.setTrimLeadingWhitespaces(false);
 			sourceSegmenter = srxDocument.compileLanguageRules(sourceLocale, null);
 		}
 
@@ -159,7 +157,7 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 				srxDocument.loadRules(is);
 			}
 			// TODO: decide how we deal with leading/trailing spaces
-			//srxDocument.setTrimLeadingWhitespaces(false);
+			// srxDocument.setTrimLeadingWhitespaces(false);
 			targetSegmenter = srxDocument.compileLanguageRules(targetLocale, null);
 		}
 
@@ -202,7 +200,7 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 	@Override
 	protected Event handleTextUnit(Event sourceEvent) {
 		TextUnit sourceTu = sourceEvent.getTextUnit();
-		TextUnit targetTu = null; 
+		TextUnit targetTu = null;
 
 		// Skip non-translatable
 		if (!sourceTu.isTranslatable()) {
@@ -218,33 +216,32 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 		if (targetInput != null) {
 			Event targetEvent = synchronize(EventType.TEXT_UNIT);
 			targetTu = targetEvent.getTextUnit();
-		} else { // grab target text from target in sourceTu
-			TextContainer targetTextContainer = sourceTu.getTarget(targetLocale);
-			if (targetTextContainer == null || targetTextContainer.getCodedText().length() == 0) {
-				return sourceEvent;
-			}
-			targetTu = new TextUnit(UUID.randomUUID().toString());
-			targetTu.setSource(targetTextContainer);
 		}
 
 		// Segment the target if requested
 		if (params.getSegmentTarget()) {
-			targetTu.createSourceSegmentation(targetSegmenter);
+			if (targetTu == null) {
+				// TextUnit is bilingual
+				sourceTu.createTargetSegmentation(targetSegmenter, targetLocale);
+			} else {
+				// separate target TextUnit
+				targetTu.createSourceSegmentation(targetSegmenter);
+			}			
 		}
 
-		if (!sourceTu.getSource().hasBeenSegmented() || !targetTu.getSource().hasBeenSegmented()) {
-			// We must have hit some empty content that did not segment
-			LOGGER.warning("Found unsegmented TextUnit. Possibly a TextUnit with empty content.");
-			return sourceEvent;
+		TextUnit alignedTextUnit;
+		if (targetInput == null) {
+			// case where the TextUnit is already bilingual
+			alignedTextUnit = sentenceAligner.align(sourceTu, sourceLocale, targetLocale);
+		} else {
+			// case where we have separate source and target TextUnits
+			alignedTextUnit = sentenceAligner.align(sourceTu, targetTu, sourceLocale, targetLocale);
 		}
-
-		TextUnit alignedTextUnit = sentenceAligner.align(sourceTu, targetTu, sourceLocale,
-				targetLocale);
 
 		// Send the aligned TU to the TMX file
 		if (params.getGenerateTMX()) {
 			tmx.writeTUFull(alignedTextUnit);
-		} else { // Otherwise send each aligned TextUnit downstream as a multi-event
+		} else { // Otherwise send each aligned TextUnit downstream
 			return new Event(EventType.TEXT_UNIT, alignedTextUnit);
 		}
 
