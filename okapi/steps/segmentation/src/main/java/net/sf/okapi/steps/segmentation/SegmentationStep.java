@@ -107,6 +107,9 @@ public class SegmentationStep extends BasePipelineStep {
 			if ( srxDoc.hasWarning() ) {
 				logger.warning(srxDoc.getWarning());
 			}
+			
+			srxDoc.setTrimLeadingWhitespaces(params.trimSrcLeadingWS);
+			srxDoc.setTrimTrailingWhitespaces(params.trimSrcTrailingWS);			
 			srcSeg = srxDoc.compileLanguageRules(sourceLocale, null);
 		}
 		if ( params.segmentTarget ) {
@@ -119,8 +122,11 @@ public class SegmentationStep extends BasePipelineStep {
 				}
 				if ( srxDoc.hasWarning() ) logger.warning(srxDoc.getWarning());
 			}
-		}
-		trgSeg = srxDoc.compileLanguageRules(targetLocale, null);
+			
+			srxDoc.setTrimLeadingWhitespaces(params.trimTrgLeadingWS);
+			srxDoc.setTrimTrailingWhitespaces(params.trimTrgTrailingWS);			
+			trgSeg = srxDoc.compileLanguageRules(targetLocale, null);
+		}		
 		
 		return event;
 	}

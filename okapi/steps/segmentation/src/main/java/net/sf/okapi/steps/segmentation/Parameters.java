@@ -30,6 +30,10 @@ public class Parameters extends BaseParameters {
 	public String targetSrxPath;
 	public boolean copySource;
 	public boolean checkSegments;
+	public boolean trimSrcLeadingWS;
+	public boolean trimSrcTrailingWS;
+	public boolean trimTrgLeadingWS;
+	public boolean trimTrgTrailingWS;
 	
 	public Parameters () {
 		reset();
@@ -42,6 +46,10 @@ public class Parameters extends BaseParameters {
 		targetSrxPath = "";
 		copySource = true;
 		checkSegments = false;
+		trimSrcLeadingWS = false;
+		trimSrcTrailingWS = false;
+		trimTrgLeadingWS = false;
+		trimTrgTrailingWS = false;
 	}
 
 	public void fromString (String data) {
@@ -53,6 +61,10 @@ public class Parameters extends BaseParameters {
 		targetSrxPath = buffer.getString("targetSrxPath", targetSrxPath);
 		copySource = buffer.getBoolean("copySource", copySource);
 		checkSegments = buffer.getBoolean("checkSegments", checkSegments);
+		trimSrcLeadingWS = buffer.getBoolean("trimSrcLeadingWS", trimSrcLeadingWS);
+		trimSrcTrailingWS = buffer.getBoolean("trimSrcTrailingWS", trimSrcTrailingWS);
+		trimTrgLeadingWS = buffer.getBoolean("trimTrgLeadingWS", trimTrgLeadingWS);
+		trimTrgTrailingWS = buffer.getBoolean("trimTrgTrailingWS", trimTrgTrailingWS);
 	}
 
 	@Override
@@ -64,7 +76,10 @@ public class Parameters extends BaseParameters {
 		buffer.setString("targetSrxPath", targetSrxPath);
 		buffer.setBoolean("copySource", copySource);
 		buffer.setBoolean("checkSegments", checkSegments);
+		buffer.setBoolean("trimSrcLeadingWS", trimSrcLeadingWS);
+		buffer.setBoolean("trimSrcTrailingWS", trimSrcTrailingWS);
+		buffer.setBoolean("trimTrgLeadingWS", trimTrgLeadingWS);
+		buffer.setBoolean("trimTrgTrailingWS", trimTrgTrailingWS);
 		return buffer.toString();
-	}
-	
+	}	
 }
