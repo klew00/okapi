@@ -161,14 +161,6 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 			targetSegmenter = srxDocument.compileLanguageRules(targetLocale, null);
 		}
 
-		// Start TMX writer (one for all input documents)
-		if (params.getGenerateTMX()) {
-			tmx = new TMXWriter(params.getTmxOutputPath());
-			// TODO: How to get filter mime type here???
-			tmx.writeStartDocument(sourceLocale, targetLocale, getClass().getName(), null,
-					"sentence", null, "text/plain");
-		}
-
 		return event;
 	}
 
@@ -186,6 +178,15 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 		if (targetInput != null) {
 			initializeFilter();
 		}
+		
+		// Start TMX writer (one for all input documents)
+		if (tmx == null && params.getGenerateTMX()) {
+			String mimeType = event.getStartDocument().getMimeType();
+			tmx = new TMXWriter(params.getTmxOutputPath());
+			tmx.writeStartDocument(sourceLocale, targetLocale, getClass().getName(), null,
+					"sentence", null, mimeType);
+		}
+		
 		return event;
 	}
 
