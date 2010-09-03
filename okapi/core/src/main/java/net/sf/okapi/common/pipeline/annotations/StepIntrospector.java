@@ -21,6 +21,7 @@
 package net.sf.okapi.common.pipeline.annotations;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -44,14 +45,14 @@ public final class StepIntrospector {
 	{
 		List<ConfigurationParameter> parameters = new LinkedList<ConfigurationParameter>();
 
-		// get all the declared fields (skipping any inherited ones) of the
-		// object including protected and private
-		Method[] methods = step.getClass().getDeclaredMethods();
+		// get all the public member methods of the class or interface represented by this step object,
+		// including those declared by the IPipelineStep interface and its implementation classes 
+		Method[] methods = step.getClass().getMethods();
 
 		// iterate over the fields and pull out the ones that have
 		// StepConfigurationParameter or StepExternalParameter annotations
 		for (Method m : methods) {
-			if (m.isAnnotationPresent(StepParameterMapping.class)) {
+			if (Modifier.isPublic(m.getModifiers()) && m.isAnnotationPresent(StepParameterMapping.class)) {
 				StepParameterMapping a = m
 						.getAnnotation(StepParameterMapping.class);
 				parameters.add(new ConfigurationParameter(m, a.parameterType(),
