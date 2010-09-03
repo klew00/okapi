@@ -33,83 +33,83 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 
 	private static final String GENERATETMX = "generateTMX";
 	private static final String TMXOUTPUTPATH = "tmxOutputPath";
-		
+
 	private boolean generateTMX;
 	private String tmxOutputPath;
-	
+
 	private boolean segmentSource;
 	private boolean useCustomSourceRules;
 	private String customSourceRulesPath;
-	
+
 	private boolean segmentTarget;
 	private boolean useCustomTargetRules;
 	private String customTargetRulesPath;
 
-	public Parameters () {
+	public Parameters() {
 		reset();
 	}
-	
+
 	public boolean getGenerateTMX() {
 		return generateTMX;
 	}
-	
-	public void setGenerateTMX (boolean generateTMX) {
+
+	public void setGenerateTMX(boolean generateTMX) {
 		this.generateTMX = generateTMX;
 	}
 
-	public String getTmxOutputPath () {
+	public String getTmxOutputPath() {
 		return tmxOutputPath;
 	}
 
-	public void setTmxOutputPath (String tmxOutputPath) {
+	public void setTmxOutputPath(String tmxOutputPath) {
 		this.tmxOutputPath = tmxOutputPath;
 	}
 
-	public boolean getSegmentSource () {
+	public boolean getSegmentSource() {
 		return segmentSource;
 	}
 
-	public void setSegmentSource (boolean segmentSource) {
+	public void setSegmentSource(boolean segmentSource) {
 		this.segmentSource = segmentSource;
 	}
 
-	public boolean getUseCustomSourceRules () {
+	public boolean getUseCustomSourceRules() {
 		return useCustomSourceRules;
 	}
 
-	public void setUseCustomSourceRules (boolean useCustomSourceRules) {
+	public void setUseCustomSourceRules(boolean useCustomSourceRules) {
 		this.useCustomSourceRules = useCustomSourceRules;
 	}
 
-	public String getCustomSourceRulesPath () {
+	public String getCustomSourceRulesPath() {
 		return customSourceRulesPath;
 	}
 
-	public void setCustomSourceRulesPath (String customSourceRulesPath) {
+	public void setCustomSourceRulesPath(String customSourceRulesPath) {
 		this.customSourceRulesPath = customSourceRulesPath;
 	}
 
-	public boolean getSegmentTarget () {
+	public boolean getSegmentTarget() {
 		return segmentTarget;
 	}
 
-	public void setSegmentTarget (boolean segmentTarget) {
+	public void setSegmentTarget(boolean segmentTarget) {
 		this.segmentTarget = segmentTarget;
 	}
 
-	public boolean getUseCustomTargetRules () {
+	public boolean getUseCustomTargetRules() {
 		return useCustomTargetRules;
 	}
 
-	public void setUseCustomTargetRules (boolean useCustomTargetRules) {
+	public void setUseCustomTargetRules(boolean useCustomTargetRules) {
 		this.useCustomTargetRules = useCustomTargetRules;
 	}
 
-	public String getCustomTargetRulesPath () {
+	public String getCustomTargetRulesPath() {
 		return customTargetRulesPath;
 	}
 
-	public void setCustomTargetRulesPath (String customTargetRulesPath) {
+	public void setCustomTargetRulesPath(String customTargetRulesPath) {
 		this.customTargetRulesPath = customTargetRulesPath;
 	}
 
@@ -126,7 +126,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	}
 
 	@Override
-	public void fromString (String data) {
+	public void fromString(String data) {
 		reset();
 		buffer.fromString(data);
 		generateTMX = buffer.getBoolean(GENERATETMX, generateTMX);
@@ -145,7 +145,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.reset();
 		buffer.setBoolean(GENERATETMX, generateTMX);
 		buffer.setParameter(TMXOUTPUTPATH, tmxOutputPath);
-		
+
 		buffer.setBoolean("segmentSource", segmentSource);
 		buffer.setBoolean("useCustomSourceRules", useCustomSourceRules);
 		buffer.setParameter("customSourceRulesPath", customSourceRulesPath);
@@ -157,45 +157,55 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	}
 
 	@Override
-	public ParametersDescription getParametersDescription () {
+	public ParametersDescription getParametersDescription() {
 		ParametersDescription desc = new ParametersDescription(this);
-		desc.add(GENERATETMX, "Generate the following TMX document:", "If generateTMX is false generate bilingual TextUnits, otherwise (true) output a TMX file");		
+		desc.add(GENERATETMX, "Generate the following TMX document:",
+				"If generateTMX is false generate bilingual TextUnits, otherwise (true) output a TMX file");
 		desc.add(TMXOUTPUTPATH, "TMX output path", "Full path of the output TMX file");
-		
-		desc.add("segmentSource", "Segment the source content (overriding possible existing segmentation)", null);
-		desc.add("useCustomSourceRules", "Use custom source segmentation rules (instead of the default ones)", null);
-		desc.add("customSourceRulesPath", "SRX path for the source", "Full path of the SRX document to use for the source");
-		desc.add("segmentTarget", "Segment the target content (overriding possible existing segmentation)", null);
-		desc.add("useCustomTargetRules", "Use custom target segmentation rules (instead of the default ones)", null);
-		desc.add("customTargetRulesPath", "SRX path for the target", "Full path of the SRX document to use for the target");
+
+		desc.add("segmentSource",
+				"Segment the source content (overriding possible existing segmentation)", null);
+		desc.add("useCustomSourceRules",
+				"Use custom source segmentation rules (instead of the default ones)", null);
+		desc.add("customSourceRulesPath", "SRX path for the source",
+				"Full path of the SRX document to use for the source");
+		desc.add("segmentTarget",
+				"Segment the target content (overriding possible existing segmentation)", null);
+		desc.add("useCustomTargetRules",
+				"Use custom target segmentation rules (instead of the default ones)", null);
+		desc.add("customTargetRulesPath", "SRX path for the target",
+				"Full path of the SRX document to use for the target");
 		return desc;
 	}
-	
+
 	@Override
 	public EditorDescription createEditorDescription(ParametersDescription paramsDesc) {
-		EditorDescription desc = new EditorDescription("Sentence Aligner", true, false);	
+		EditorDescription desc = new EditorDescription("Sentence Aligner", true, false);
 		CheckboxPart cbp = desc.addCheckboxPart(paramsDesc.get(GENERATETMX));
-		PathInputPart pip = desc.addPathInputPart(paramsDesc.get(TMXOUTPUTPATH), "TMX Document to Generate", true);
+		PathInputPart pip = desc.addPathInputPart(paramsDesc.get(TMXOUTPUTPATH),
+				"TMX Document to Generate", true);
 		pip.setBrowseFilters("TMX Documents (*.tmx)\tAll Files (*.*)", "*.tmx\t*.*");
 		pip.setWithLabel(false);
 		pip.setMasterPart(cbp, true);
-		
+
 		desc.addSeparatorPart();
 
 		CheckboxPart cbp1 = desc.addCheckboxPart(paramsDesc.get("segmentSource"));
 		CheckboxPart cbp2 = desc.addCheckboxPart(paramsDesc.get("useCustomSourceRules"));
 		cbp2.setMasterPart(cbp1, true);
-		pip = desc.addPathInputPart(paramsDesc.get("customSourceRulesPath"), "Segmentation Rules for Source", false);
+		pip = desc.addPathInputPart(paramsDesc.get("customSourceRulesPath"),
+				"Segmentation Rules for Source", false);
 		pip.setBrowseFilters("SRX Documents (*.srx)\tAll Files (*.*)", "*.srx\t*.*");
 		pip.setWithLabel(false);
 		pip.setMasterPart(cbp2, true);
-		
+
 		desc.addSeparatorPart();
 
 		cbp1 = desc.addCheckboxPart(paramsDesc.get("segmentTarget"));
 		cbp2 = desc.addCheckboxPart(paramsDesc.get("useCustomTargetRules"));
 		cbp2.setMasterPart(cbp1, true);
-		pip = desc.addPathInputPart(paramsDesc.get("customTargetRulesPath"), "Segmentation Rules for Target", false);
+		pip = desc.addPathInputPart(paramsDesc.get("customTargetRulesPath"),
+				"Segmentation Rules for Target", false);
 		pip.setBrowseFilters("SRX Documents (*.srx)\tAll Files (*.*)", "*.srx\t*.*");
 		pip.setWithLabel(false);
 		pip.setMasterPart(cbp2, true);
