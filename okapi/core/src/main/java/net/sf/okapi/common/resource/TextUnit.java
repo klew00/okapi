@@ -519,7 +519,7 @@ public class TextUnit implements INameable, IReferenceable {
 	}
 
 	/**
-	 * Segment the source content based on the rules provided by a given ISegmenter.
+	 * Segments the source content based on the rules provided by a given ISegmenter.
 	 * <p>This methods also stores the boundaries for the segments so they can be re-applied later.
 	 * for example when calling {@link #synchronizeSourceSegmentation(LocaleId)}.
 	 * @param segmenter the segmenter to use to create the segments.
@@ -532,20 +532,23 @@ public class TextUnit implements INameable, IReferenceable {
 	}
 	
 	/**
-	 * Segment the specified target content based on the rules provided by a given ISegmenter.
-	 * <p>This methods also stores the boundaries for the segments so they can be re-applied later.
-	 * for example when calling {@link #synchronizeSourceSegmentation(LocaleId)}.
+	 * Segments the specified target content based on the rules provided by a given ISegmenter.
+	 * <p>This method may cause the source and target segments to be desynchronized, that is:
+	 * That each source segment may or may not be aligned with a corresponding target segment.
+	 * You can associate a target-specific segmentation for the source using
+	 * {@link #setSourceSegmentationForTarget(LocaleId, List)}.
 	 * @param segmenter the segmenter to use to create the segments.
 	 * @param targetLocale {@link LocaleId} of the target we want to segment.
 	 */
-	public void createTargetSegmentation (ISegmenter segmenter, LocaleId targetLocale) {
-		if ( trgSegRanges == null ) {
-			trgSegRanges = new ConcurrentHashMap<LocaleId, List<Range>>();
+	public void createTargetSegmentation (ISegmenter segmenter,
+		LocaleId targetLocale)
+	{
+		TextContainer tc = getTarget(targetLocale);
+		if ( tc == null ) {
+			throw new RuntimeException(String.format("There is no target content for '%s'", targetLocale.toString()));
 		}
-		segmenter.computeSegments(getTarget(targetLocale));
-		trgSegRanges.put(targetLocale, segmenter.getRanges());
-		getTarget(targetLocale).getSegments().create(trgSegRanges.get(targetLocale));
-		// TODO: how to set this for target? syncLoc = null;
+		segmenter.computeSegments(tc);
+		tc.getSegments().create(segmenter.getRanges());
 	}
 	
 	/**

@@ -40,7 +40,7 @@ public interface ISegmenter {
 	
 	/**
 	 * Calculates the segmentation of a given TextContainer object.
-	 * If the content is already segmented, itis un-segmented automatically before
+	 * If the content is already segmented, it is un-segmented automatically before
 	 * being processed.
 	 * @param container the object to segment.
 	 * @return the number of segments calculated.
