@@ -44,9 +44,6 @@ import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.virtualdb.IVRepository;
-import net.sf.okapi.virtualdb.jdbc.Repository;
-import net.sf.okapi.virtualdb.jdbc.h2.H2Access;
 
 public class QualityCheckSession {
 

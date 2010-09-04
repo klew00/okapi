@@ -246,9 +246,10 @@ public class TextContainerEditorPanel {
 		edit.addVerifyListener(new VerifyListener() {
 			@Override
 			public void verifyText(VerifyEvent e) {
-				if ( !updateCodeRanges || ( e.start == edit.getCharCount() )) {
+				if ( !updateCodeRanges ) return; // Not a modification
+				if ( e.start == edit.getCharCount() ) {
 					modified = true;
-					return; // OK in all cases, and no need to update code ranges
+					return; // No need to update code ranges
 				}
 				int len = e.end-e.start;
 				if ( len == 0 ) {

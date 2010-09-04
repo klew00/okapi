@@ -505,9 +505,9 @@ public class PairEditorUserTest {
 	private boolean saveCurrent () {
 		if ( current == -1 ) return true;
 		// Anything has changed?
-//Always save for now (to detect more errors), later we can do:		if ( !editPanel.isModified() ) return true;
+		if ( !editPanel.isModified() ) return true;
 		// Apply the changes from the edit box to the text container
-		if ( !editPanel.applyChanges() ) return false;
+		if ( !editPanel.applyChanges() ) return false; // Error occurred
 		// Save the changes
 		if ( vtu != null ) {
 			vtu.save();

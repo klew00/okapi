@@ -93,6 +93,8 @@ public class H2Access implements IDBAccess {
 	private RepositoryType repoType;
 	private String baseDir;
 	private Connection conn = null;
+	private PreparedStatement pstmItemByKey;
+	private PreparedStatement pstmItemById;
 	
 	// Variables used during import
 	private IFilterConfigurationMapper fcMapper;
@@ -147,10 +149,14 @@ public class H2Access implements IDBAccess {
 	@Override
 	public void close () {
 		try {
-//			if ( qstm != null ) {
-//				qstm.close();
-//				qstm = null;
-//			}
+			if ( pstmItemByKey != null ) {
+				pstmItemByKey.close();
+				pstmItemByKey = null;
+			}
+			if ( pstmItemById != null ) {
+				pstmItemById.close();
+				pstmItemById = null;
+			}
 			if ( conn != null ) {
 				conn.close();
 				conn = null;
@@ -161,6 +167,15 @@ public class H2Access implements IDBAccess {
 		}
 	}
 
+	private void initGlobal ()
+		throws SQLException
+	{
+		if ( conn == null ) return;
+		pstmItemByKey = conn.prepareStatement("select * from ITMS left join TUNS on ITMS.KEY=TUNS.IKEY WHERE ITMS.KEY=?");
+		pstmItemById = conn.prepareStatement("select * from ITMS left join TUNS on ITMS.KEY=TUNS.IKEY where ITMS.XID=? and ITMS.DKEY=?");
+
+	}
+	
 	@Override
 	public void open (String name) {
 		// Close existing connection
@@ -181,6 +196,7 @@ public class H2Access implements IDBAccess {
 		try {
 			conn = DriverManager.getConnection(connStr, "sa", "");
 			conn.setAutoCommit(true);
+			initGlobal();
 		}
 		catch (SQLException e) {
 			throw new RuntimeException(e);
@@ -216,11 +232,12 @@ public class H2Access implements IDBAccess {
 		// Create the connection
 		try {
 			conn = DriverManager.getConnection(connStr, "sa", "");
+			createTables();
+			initGlobal();
 		}
 		catch (SQLException e) {
 			throw new RuntimeException(e);
 		}
-		createTables();
 	}
 
 	private void deleteFiles (String path) {
@@ -532,31 +549,18 @@ public class H2Access implements IDBAccess {
 	IVItem getItemFromExtractionId (H2Document doc,
 		String id)
 	{
-		PreparedStatement pstm = null;
 		try {
 			// Always left-join with the TUNS table so we get extra text unit info in one call
 			// This is ok because most calls are for text units.
-			pstm = conn.prepareStatement("select * from ITMS left join TUNS on ITMS.KEY=TUNS.IKEY where ITMS.XID=? and ITMS.DKEY=?");
-			pstm.setString(1, id);
-			pstm.setLong(2, doc.key);
-			ResultSet rs = pstm.executeQuery();
+			pstmItemById.setString(1, id);
+			pstmItemById.setLong(2, doc.key);
+			ResultSet rs = pstmItemById.executeQuery();
 			// Return null if nothing found
 			if ( !rs.first() ) return null;
 			return fillItem(doc, rs);
 		}
 		catch ( Throwable e ) {
 			throw new RuntimeException("Error reading an item.\n"+e.getMessage());
-		}
-		finally {
-			try {
-				if ( pstm != null ) {
-					pstm.close();
-					pstm = null;
-				}
-			}
-			catch ( SQLException e ) {
-				throw new RuntimeException(e);
-			}
 		}
 	}
 	
@@ -566,11 +570,13 @@ public class H2Access implements IDBAccess {
 		if ( itemKey == -1 ) return null;
 		Statement stm = null;
 		try {
-			stm = conn.createStatement();
 			// Always left-join with the TUNS table so we get extr text unit info in one call
 			// This is ok because most calls are for text units.
-			String query = String.format("select * from ITMS left join TUNS on ITMS.KEY=TUNS.IKEY WHERE ITMS.KEY=%d", itemKey);
-			ResultSet rs = stm.executeQuery(query);
+//			stm = conn.createStatement();
+//			String query = String.format("select * from ITMS left join TUNS on ITMS.KEY=TUNS.IKEY WHERE ITMS.KEY=%d", itemKey);
+//			ResultSet rs = stm.executeQuery(query);
+			pstmItemByKey.setLong(1, itemKey);
+			ResultSet rs = pstmItemByKey.executeQuery();
 			// Return null if nothing found
 			if ( !rs.first() ) return null;
 			return fillItem(doc, rs);
