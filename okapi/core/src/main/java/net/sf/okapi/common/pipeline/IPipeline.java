@@ -81,7 +81,7 @@ public interface IPipeline {
 	public void startBatch();
 
 	/**
-	 * Finishes a batch of inputs and return the final {@link Event}
+	 * Finishes a batch of inputs.
 	 * 
 	 */
 	public void endBatch();
