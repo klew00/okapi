@@ -23,6 +23,7 @@ package net.sf.okapi.common.pipeline;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -36,6 +37,7 @@ import net.sf.okapi.common.resource.RawDocument;
  * Default implementations of the {@link IPipeline} interface.
  */
 public class Pipeline implements IPipeline, IObservable, IObserver {
+	private static final Logger LOGGER = Logger.getLogger(Pipeline.class.getName());
 	public static final String DEFAULT_ID = "DEFAULT ID";
 
 	private LinkedList<IPipelineStep> steps;
@@ -108,7 +110,7 @@ public class Pipeline implements IPipeline, IObservable, IObserver {
 	private Event execute(Event event) {
 		boolean notifiedObserver = false;
 		state = PipelineReturnValue.RUNNING;
-		
+
 		// loop through the events until we run out of steps or hit cancel
 		while (!steps.isEmpty() && !(state == PipelineReturnValue.CANCELLED)) {
 			// cycle through the steps in order, pulling off steps that run out
@@ -117,12 +119,12 @@ public class Pipeline implements IPipeline, IObservable, IObserver {
 				// go to each active step and call handleEvent
 				// the event returned is used as input to the next pass
 				notifiedObserver = false;
-				for (IPipelineStep step : steps) {		
+				for (IPipelineStep step : steps) {
 					event = step.handleEvent(event);
 					// We send each of the events in MULTI_EVENT down the pipeline before
 					// processing any other events but only if the event is configured for multi-event propagation
 					if (event.getEventType() == EventType.MULTI_EVENT
-							&& !(((MultiEvent)event.getResource()).isPropagateAsSingleEvent())) {
+							&& !(((MultiEvent) event.getResource()).isPropagateAsSingleEvent())) {
 						// add the remaining steps to a temp list - these are the steps that will receive the expanded
 						// MULT_EVENTS
 						List<IPipelineStep> remainingSteps = steps.subList(steps.indexOf(step) + 1,
@@ -138,15 +140,21 @@ public class Pipeline implements IPipeline, IObservable, IObserver {
 							notifiedObserver = true;
 						}
 						break;
-					}										
+					}
 				}
 
 				// notify observers that the final step has sent an Event
 				if (!notifiedObserver) {
 					notifyObservers(event);
-					
-				// Deadlock protection for the cases when the final step fails to set the isDone flag
-				if (steps.size() == 1) break;
+
+					// Deadlock protection for the cases when the final step fails to set the isDone flag
+					// FIXME: There may be cases where a final step could send multiple events (i.e., pipeline chaining),
+					// in that case we will end prematurely with this check
+					if (steps.size() == 1) {
+						LOGGER.warning("Only one step left in the pipleline and that step has sent an event. Has the isDone flag been set properly for "
+								+ steps.getFirst().getName() + "?");
+						break;
+					}
 				}
 			}
 			// As each step exhausts its events remove it from the list and move
