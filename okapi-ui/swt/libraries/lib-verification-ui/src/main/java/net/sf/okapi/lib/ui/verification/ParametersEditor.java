@@ -97,6 +97,8 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private TextAndBrowsePanel pnlOutputPath;
 	private Button chkPatterns;
 	private Button chkDoubledWord;
+	private Label stDoubledWordExceptions;
+	private Text edDoubledWordExceptions;
 	private Button chkCorruptedChars;
 	private Table table;
 	private Button btAdd;
@@ -329,6 +331,22 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		
 		chkDoubledWord = new Button(grpSeg, SWT.CHECK);
 		chkDoubledWord.setText("Warn on doubled words (e.g. \"is is\" in \"This is is an example\")");
+		chkDoubledWord.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				updateDoubledWord();
+			};
+		});
+		
+		stDoubledWordExceptions = new Label(grpSeg, SWT.NONE);
+		stDoubledWordExceptions.setText("Exceptions (words separated by ';' e.g. \"vous;nous\"):");
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalIndent = horizIndent;
+		stDoubledWordExceptions.setLayoutData(gdTmp);
+
+		edDoubledWordExceptions = new Text(grpSeg, SWT.BORDER);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalIndent = horizIndent;
+		edDoubledWordExceptions.setLayoutData(gdTmp);
 		
 		TabItem tiTmp = new TabItem(tabs, SWT.NONE);
 		tiTmp.setText("General");
@@ -1080,6 +1098,12 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		edLTTranslationTarget.setEnabled(chkTranslateLTMsg.getSelection());
 	}
 	
+	private void updateDoubledWord () {
+		stDoubledWordExceptions.setEnabled(chkDoubledWord.getSelection());
+		edDoubledWordExceptions.setEnabled(chkDoubledWord.getSelection());
+	}
+
+	
 	private void updateTargetSameAsSourceWithCodes () {
 		chkTargetSameAsSourceWithCodes.setEnabled(chkTargetSameAsSource.getSelection());
 	}
@@ -1148,6 +1172,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		edLTTranslationTarget.setText(params.getLtTranslationTarget());
 		chkPatterns.setSelection(params.getCheckPatterns());
 		chkDoubledWord.setSelection(params.getDoubledWord());
+		edDoubledWordExceptions.setText(params.getDoubledWordExceptions());
 		chkCorruptedChars.setSelection(params.getCorruptedCharacters());
 
 		chkMaxCharLength.setSelection(params.getCheckMaxCharLength());
@@ -1176,6 +1201,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		setPatternsData(params.getPatterns());
 		updateTargetSameAsSourceWithCodes();
 		updatePatterns();
+		updateDoubledWord();
 		updateLTOptions();
 		updateMaxCharLength();
 		updateMinCharLength();
@@ -1317,6 +1343,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		params.setEmptySource(chkEmptySource.getSelection());
 		params.setTargetSameAsSource(chkTargetSameAsSource.getSelection());
 		params.setDoubledWord(chkDoubledWord.getSelection());
+		params.setDoubledWordExceptions(edDoubledWordExceptions.getText());
 		params.setCorruptedCharacters(chkCorruptedChars.getSelection());
 		if ( chkTargetSameAsSourceWithCodes.isEnabled() ) {
 			params.setTargetSameAsSourceWithCodes(chkTargetSameAsSourceWithCodes.getSelection());

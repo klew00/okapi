@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.okapi.common.ListUtil;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.Code;
@@ -55,6 +56,7 @@ class QualityChecker {
 	private URI currentDocId;
 	private List<String> sigList;
 	private Pattern patDoubledWords;
+	private String doubledWordExceptions;
 	private CharsetEncoder encoder;
 	private Pattern extraCharsAllowed;
 	private Pattern corruption;
@@ -93,7 +95,12 @@ class QualityChecker {
 		if ( params.getDoubledWord() ) {
 			patDoubledWords = Pattern.compile("\\b([\\p{Ll}\\p{Lu}\\p{Lt}\\p{Lo}\\p{Nd}]+)[\\t\\n\\f\\r\\p{Z}]+\\1\\b",
 				Pattern.CASE_INSENSITIVE);
+			// Construct the string of doubled-words that are not errors
+			// The working patter is the list like this: ";word1;word2;word3;"
+			doubledWordExceptions = ";"+params.getDoubledWordExceptions().toLowerCase()+";";
 		}
+		
+		// Pattern for corrupted characters
 		corruption = null;
 		if ( params.getCorruptedCharacters() ) {
 			// Some of the most frequent patterns of corrupted characters
@@ -638,13 +645,18 @@ class QualityChecker {
 		if ( params.getDoubledWord() ) {
 			Matcher m = patDoubledWords.matcher(trgCText);
 			while ( m.find() ) {
-				reportIssue(IssueType.SUSPECT_PATTERN, tu, srcSeg.getId(),
-					String.format("Double word: \"%s\" found in the target.", m.group()),
-					0, -1,
-					fromFragmentToString(trgSeg.text, m.start()),
-					fromFragmentToString(trgSeg.text, m.end()),
-					Issue.SEVERITY_HIGH, 
-					srcSeg.toString(), trgSeg.toString(), null);
+				// Check against the exceptions
+				// Use the lowercase of the word enclosed in ';' to match against the list
+				if ( doubledWordExceptions.indexOf(";"+m.group(1).toLowerCase()+";") == -1 ) {
+					// Not in the list: Not an exception, so we report it
+					reportIssue(IssueType.SUSPECT_PATTERN, tu, srcSeg.getId(),
+						String.format("Double word: \"%s\" found in the target.", m.group()),
+						0, -1,
+						fromFragmentToString(trgSeg.text, m.start()),
+						fromFragmentToString(trgSeg.text, m.end()),
+						Issue.SEVERITY_HIGH, 
+						srcSeg.toString(), trgSeg.toString(), null);
+				}
 			}
 		}
 	}

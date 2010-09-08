@@ -78,8 +78,13 @@ target set to &quot;<code>&lt;same&gt;</code>&quot;. If the string matches one o
 no warning is generated as the target is expected to be the same.</p>
 <p><cite>Warn on doubled words</cite> -- Set this option to flag the target 
 segments where there is a sequential repetition of the same word, for example 
-&quot;is is&quot; in &quot;this is is an example&quot;. The check is not case-sensitive, for example 
-&quot;This this an example&quot; is flagged.</p>
+&quot;<code>is is</code>&quot; in &quot;<code>this is is an example</code>&quot;. The check is not case-sensitive, for example 
+&quot;<code>This this an example</code>&quot; is flagged.</p>
+<p><cite>Exceptions</cite> -- Enter the list of words that can be repeated. For 
+example, in French some sentences may have the expressions &quot;<code>vous vous</code>&quot; 
+or &quot;<code>nous nous</code>&quot;. To allow this, enter &quot;<code>vous;nous</code>&quot;: Each 
+word for which repetition is allowed separated by semi-colons. You must not 
+leave any space around the semi-colon. The exceptions are not case-sensitive.</p>
 <h3>Length Tab</h3>
 <p><cite>Warn if a target is longer than the given percentage of the 
 character length of its source</cite> -- Set this option to flag any target text 

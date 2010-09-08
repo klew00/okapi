@@ -58,6 +58,7 @@ public class Parameters extends BaseParameters {
 	private static final String SAVESESSION = "saveSession";
 	private static final String SESSIONPATH = "sessionPath";
 	private static final String DOUBLEDWORD = "doubledWord";
+	private static final String DOUBLEDWORDEXCEPTIONS = "doubledWordExceptions";
 	private static final String CHECKMAXCHARLENGTH = "checkMaxCharLength";
 	private static final String MAXCHARLENGTHBREAK = "maxCharLengthBreak";
 	private static final String MAXCHARLENGTHABOVE = "maxCharLengthAbove";
@@ -96,6 +97,7 @@ public class Parameters extends BaseParameters {
 	boolean saveSession;
 	String sessionPath;
 	boolean doubledWord;
+	String doubledWordExceptions;
 	boolean checkMaxCharLength;
 	int maxCharLengthBreak;
 	int maxCharLengthAbove;
@@ -236,6 +238,14 @@ public class Parameters extends BaseParameters {
 
 	public void setDoubledWord (boolean doubledWord) {
 		this.doubledWord = doubledWord;
+	}
+
+	public String getDoubledWordExceptions () {
+		return doubledWordExceptions;
+	}
+
+	public void setDoubledWordExceptions (String doubledWordExceptions) {
+		this.doubledWordExceptions = doubledWordExceptions;
 	}
 
 	public boolean getSaveSession () {
@@ -418,6 +428,7 @@ public class Parameters extends BaseParameters {
 		saveSession = true;
 		sessionPath = "${rootDir}/qa-session"+QualityCheckSession.FILE_EXTENSION;
 		doubledWord = true;
+		doubledWordExceptions = "sie;vous";
 		corruptedCharacters = true;
 		scope = SCOPE_ALL;
 		
@@ -502,6 +513,7 @@ public class Parameters extends BaseParameters {
 		saveSession = buffer.getBoolean(SAVESESSION, saveSession);
 		sessionPath = buffer.getString(SESSIONPATH, sessionPath);
 		doubledWord = buffer.getBoolean(DOUBLEDWORD, doubledWord);
+		doubledWordExceptions = buffer.getString(DOUBLEDWORDEXCEPTIONS, doubledWordExceptions);
 		corruptedCharacters = buffer.getBoolean(CORRUPTEDCHARACTERS, corruptedCharacters);
 		scope = buffer.getInteger(SCOPE, scope);
 		// Length
@@ -569,6 +581,7 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean(SAVESESSION, saveSession);
 		buffer.setString(SESSIONPATH, sessionPath);
 		buffer.setBoolean(DOUBLEDWORD, doubledWord);
+		buffer.setString(DOUBLEDWORDEXCEPTIONS, doubledWordExceptions);
 		buffer.setBoolean(CORRUPTEDCHARACTERS, corruptedCharacters);
 		buffer.setInteger(SCOPE, scope);
 		// Length
