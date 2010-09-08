@@ -24,16 +24,20 @@ import net.sf.okapi.common.BaseParameters;
 
 public class Parameters extends BaseParameters {
 	
+	public static int TRIM_DEFAULT = -1;
+	public static int TRIM_NO = 0;
+	public static int TRIM_YES = 1;
+	
 	public boolean segmentSource;
 	public boolean segmentTarget;
 	public String sourceSrxPath;
 	public String targetSrxPath;
 	public boolean copySource;
 	public boolean checkSegments;
-	public boolean trimSrcLeadingWS;
-	public boolean trimSrcTrailingWS;
-	public boolean trimTrgLeadingWS;
-	public boolean trimTrgTrailingWS;
+	public int trimSrcLeadingWS;
+	public int trimSrcTrailingWS;
+	public int trimTrgLeadingWS;
+	public int trimTrgTrailingWS;
 	
 	public Parameters () {
 		reset();
@@ -46,10 +50,10 @@ public class Parameters extends BaseParameters {
 		targetSrxPath = "";
 		copySource = true;
 		checkSegments = false;
-		trimSrcLeadingWS = false;
-		trimSrcTrailingWS = false;
-		trimTrgLeadingWS = false;
-		trimTrgTrailingWS = false;
+		trimSrcLeadingWS = TRIM_DEFAULT;
+		trimSrcTrailingWS = TRIM_DEFAULT;
+		trimTrgLeadingWS = TRIM_DEFAULT;
+		trimTrgTrailingWS = TRIM_DEFAULT;
 	}
 
 	public void fromString (String data) {
@@ -61,10 +65,10 @@ public class Parameters extends BaseParameters {
 		targetSrxPath = buffer.getString("targetSrxPath", targetSrxPath);
 		copySource = buffer.getBoolean("copySource", copySource);
 		checkSegments = buffer.getBoolean("checkSegments", checkSegments);
-		trimSrcLeadingWS = buffer.getBoolean("trimSrcLeadingWS", trimSrcLeadingWS);
-		trimSrcTrailingWS = buffer.getBoolean("trimSrcTrailingWS", trimSrcTrailingWS);
-		trimTrgLeadingWS = buffer.getBoolean("trimTrgLeadingWS", trimTrgLeadingWS);
-		trimTrgTrailingWS = buffer.getBoolean("trimTrgTrailingWS", trimTrgTrailingWS);
+		trimSrcLeadingWS = buffer.getInteger("trimSrcLeadingWS", trimSrcLeadingWS);
+		trimSrcTrailingWS = buffer.getInteger("trimSrcTrailingWS", trimSrcTrailingWS);
+		trimTrgLeadingWS = buffer.getInteger("trimTrgLeadingWS", trimTrgLeadingWS);
+		trimTrgTrailingWS = buffer.getInteger("trimTrgTrailingWS", trimTrgTrailingWS);
 	}
 
 	@Override
@@ -76,10 +80,10 @@ public class Parameters extends BaseParameters {
 		buffer.setString("targetSrxPath", targetSrxPath);
 		buffer.setBoolean("copySource", copySource);
 		buffer.setBoolean("checkSegments", checkSegments);
-		buffer.setBoolean("trimSrcLeadingWS", trimSrcLeadingWS);
-		buffer.setBoolean("trimSrcTrailingWS", trimSrcTrailingWS);
-		buffer.setBoolean("trimTrgLeadingWS", trimTrgLeadingWS);
-		buffer.setBoolean("trimTrgTrailingWS", trimTrgTrailingWS);
+		buffer.setInteger("trimSrcLeadingWS", trimSrcLeadingWS);
+		buffer.setInteger("trimSrcTrailingWS", trimSrcTrailingWS);
+		buffer.setInteger("trimTrgLeadingWS", trimTrgLeadingWS);
+		buffer.setInteger("trimTrgTrailingWS", trimTrgTrailingWS);
 		return buffer.toString();
 	}	
 }

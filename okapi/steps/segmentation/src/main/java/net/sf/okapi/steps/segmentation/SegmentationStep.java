@@ -107,9 +107,14 @@ public class SegmentationStep extends BasePipelineStep {
 			if ( srxDoc.hasWarning() ) {
 				logger.warning(srxDoc.getWarning());
 			}
-			
-			srxDoc.setTrimLeadingWhitespaces(params.trimSrcLeadingWS);
-			srxDoc.setTrimTrailingWhitespaces(params.trimSrcTrailingWS);			
+			// Change trimming options if requested
+			if ( params.trimSrcLeadingWS != Parameters.TRIM_DEFAULT ) {
+				srxDoc.setTrimLeadingWhitespaces(params.trimSrcLeadingWS==Parameters.TRIM_YES);
+			}
+			if ( params.trimSrcTrailingWS != Parameters.TRIM_DEFAULT ) {
+				srxDoc.setTrimTrailingWhitespaces(params.trimSrcTrailingWS==Parameters.TRIM_YES);
+			}
+			// Instantiate the segmenter
 			srcSeg = srxDoc.compileLanguageRules(sourceLocale, null);
 		}
 		if ( params.segmentTarget ) {
@@ -122,9 +127,14 @@ public class SegmentationStep extends BasePipelineStep {
 				}
 				if ( srxDoc.hasWarning() ) logger.warning(srxDoc.getWarning());
 			}
-			
-			srxDoc.setTrimLeadingWhitespaces(params.trimTrgLeadingWS);
-			srxDoc.setTrimTrailingWhitespaces(params.trimTrgTrailingWS);			
+			// Change trimming options if requested
+			if ( params.trimTrgLeadingWS != Parameters.TRIM_DEFAULT ) {
+				srxDoc.setTrimLeadingWhitespaces(params.trimTrgLeadingWS==Parameters.TRIM_YES);
+			}
+			if ( params.trimTrgTrailingWS != Parameters.TRIM_DEFAULT ) {
+				srxDoc.setTrimTrailingWhitespaces(params.trimTrgTrailingWS==Parameters.TRIM_YES);
+			}
+			// Instantiate the segmenter
 			trgSeg = srxDoc.compileLanguageRules(targetLocale, null);
 		}		
 		
