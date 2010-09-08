@@ -112,10 +112,8 @@ public class FilterEventsToRawDocumentStep extends BasePipelineStep {
 			// handle all the events between START_DOCUMENT and END_DOCUMENT
 			filterWriter.handleEvent(event);
 			return Event.NOOP_EVENT;
-		case NO_OP:
-			isDone = true; // Deadlock protection
 		}
-			
+		
 		// Else, just return the event
 		return event;
 	}

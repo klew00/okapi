@@ -44,6 +44,19 @@ public class OPCPackageUtil {
 			}			
 		return res;
 	}
+	
+	public static PackagePart getCorePart(OPCPackage pack) {
+		List<PackagePart> res = new ArrayList<PackagePart>();
+		
+		for (PackageRelationship rel : pack.getRelationshipsByType(TKitRelationshipTypes.CORE_DOCUMENT))
+			try {
+				res.add(pack.getPart(PackagingURIHelper.createPartName(rel.getTargetURI())));
+			} catch (InvalidFormatException e) {
+				// TODO Handle exception
+				e.printStackTrace();
+			}			
+		return res.size() > 0 ? res.get(0) : null;
+	}
 
 	private static PackagePart getPartByRelationshipType(PackagePart part, String relationshipType) {
 		try {

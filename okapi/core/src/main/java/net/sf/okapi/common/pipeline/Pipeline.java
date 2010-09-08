@@ -138,12 +138,15 @@ public class Pipeline implements IPipeline, IObservable, IObserver {
 							notifiedObserver = true;
 						}
 						break;
-					}
+					}										
 				}
 
 				// notify observers that the final step has sent an Event
 				if (!notifiedObserver) {
 					notifyObservers(event);
+					
+				// Deadlock protection for the cases when the final step fails to set the isDone flag
+				if (steps.size() == 1) break;
 				}
 			}
 			// As each step exhausts its events remove it from the list and move

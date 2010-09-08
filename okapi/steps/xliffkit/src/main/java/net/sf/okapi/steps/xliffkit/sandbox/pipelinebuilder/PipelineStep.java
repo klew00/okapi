@@ -36,12 +36,17 @@ public class PipelineStep implements IPipelineStep{
 	private ParametersString parametersString = new ParametersString(); 
 	
 	public PipelineStep(IPipelineStep step, IParameters parameters) {	
-		this.step = step;
+		this(step);
 		step.setParameters(parameters);
 	}
 
-	public PipelineStep(IPipelineStep step, Parameter... parameters) {	
+	@Deprecated
+	public PipelineStep(IPipelineStep step) {
 		this.step = step;
+	}
+	
+	public PipelineStep(IPipelineStep step, Parameter... parameters) {	
+		this(step);
 		
 		parametersString.reset();
 		for (Parameter parameter : parameters) {
