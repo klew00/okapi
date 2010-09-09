@@ -279,7 +279,8 @@ public class ZipFilterWriter implements IFilterWriter {
 	private void processStartSubDocument (StartSubDocument res) {
 		ZipSkeleton skel = (ZipSkeleton)res.getSkeleton();
 		ZipEntry entry = skel.getEntry();
-		entryName = entry.getName();
+		if (entry != null)
+			entryName = entry.getName();
 
 		// Set the temporary path and create it
 		try {

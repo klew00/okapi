@@ -20,23 +20,27 @@
 
 package net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder;
 
+import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.pipelinedriver.IBatchItemContext;
 
 public class Batch extends BatchItem {
 
 	private List<IBatchItemContext> items;
 	
-	public Batch(BatchItem... items) {		
+	public Batch() {
+		super();
 		this.items = new ArrayList<IBatchItemContext>();
-		
-		for (BatchItem item : items)
-			if (item instanceof Batch) 
-				this.items.addAll(((Batch)item).getItems());
-			else
-				this.items.add(item.getContext());
+	}
+	
+	public Batch(BatchItem... items) {		
+		this();		
+		addItems(items);
 	}
 
 	public void setItems(List<IBatchItemContext> items) {
@@ -45,5 +49,31 @@ public class Batch extends BatchItem {
 
 	public List<IBatchItemContext> getItems() {
 		return items;
+	}
+
+	public Batch addItems(BatchItem... items) {
+		for (BatchItem item : items)
+			if (item instanceof Batch) 
+				this.items.addAll(((Batch)item).getItems());
+			else
+				this.items.add(item.getContext());
+		return this;
+	}
+			
+	public Batch addItems(String dir, String[] fileList, 
+			String defaultEncoding, LocaleId sourceLocale, LocaleId targetLocale) {		
+		for (String file : fileList) {
+			this.items.add(new BatchItem(Util.toURI(dir + file), defaultEncoding, sourceLocale, targetLocale).getContext());
+		}
+		return this;
+	}
+	
+	public Batch addItems(String dir, String[] fileList, 
+			String defaultEncoding, URI outputURI, String outputEncoding, LocaleId sourceLocale, LocaleId targetLocale) {		
+		for (String file : fileList) {
+			this.items.add(new BatchItem(Util.toURI(dir + file), defaultEncoding, outputURI, outputEncoding,
+					sourceLocale, targetLocale).getContext());
+		}
+		return this;
 	}
 }

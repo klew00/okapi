@@ -137,5 +137,14 @@ public class XMLWriterTest {
         xml = xml.replaceAll("\r","");
         assertEquals("writer's contents", "<?xml version=\"1.0\" encoding=\"UTF-8\"?>", xml);
     }
+    
+    @Test
+    public void writeLeadingSpaces() {
+    	writer.writeStartElement("w:t");
+		writer.writeAttributeString("xml:space", "preserve");
+		writer.writeString(" (");
+		writer.writeEndElement(); // w:t
+		assertEquals("<w:t xml:space=\"preserve\"> (</w:t>", sWriter.toString());
+    }
 
 }

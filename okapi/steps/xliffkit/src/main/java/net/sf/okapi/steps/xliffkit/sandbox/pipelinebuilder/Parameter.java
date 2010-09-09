@@ -20,7 +20,10 @@
 
 package net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder;
 
+import net.sf.okapi.common.pipeline.annotations.StepParameterType;
+
 public class Parameter {
+	private StepParameterType type = null;
 	private String name;
 	private Object value;
 
@@ -36,6 +39,36 @@ public class Parameter {
 	public Parameter(String name, boolean value) {
 		setParameter(name, value);
 	}
+	
+//	public Parameter(StepParameterType type, RawDocument value) {
+//		this(type);
+//	}
+//	
+//	public Parameter(StepParameterType type, URI value) {
+//		this(type);
+//	}
+//	
+//	public Parameter(StepParameterType type, LocaleId value) {
+//		this(type);
+//	}
+//	
+//	public Parameter(StepParameterType type, String value) {
+//		this(type);
+//	}
+//	
+//	public Parameter(StepParameterType type, IFilterConfigurationMapper value) {
+//		this(type);
+//	}
+	
+	public Parameter(StepParameterType type, Object value) {
+		super();
+		this.type = type;
+		this.value = value;
+	}
+	
+//	public Parameter(StepParameterType type, int value) {
+//		this(type);
+//	}
 
 	private void setParameter(String name, Object value) {
 		this.name = name;
@@ -53,5 +86,9 @@ public class Parameter {
 	@Override
 	public String toString() {
 		return super.toString();
+	}
+
+	public StepParameterType getType() {
+		return type;
 	}	
 }

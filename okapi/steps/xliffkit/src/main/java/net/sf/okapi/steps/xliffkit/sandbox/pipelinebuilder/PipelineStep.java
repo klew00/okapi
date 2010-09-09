@@ -50,20 +50,28 @@ public class PipelineStep implements IPipelineStep{
 		
 		parametersString.reset();
 		for (Parameter parameter : parameters) {
+			if (parameter.getType() == null) {
+				Object value = parameter.getValue();
+				
+				if (value instanceof Integer)
+					parametersString.setParameter(parameter.getName(), Integer.class.cast(value));
+				
+				else if (value instanceof Boolean)
+					parametersString.setParameter(parameter.getName(), Boolean.class.cast(value));
+				
+				else if (value instanceof String)
+					parametersString.setParameter(parameter.getName(), String.class.cast(value));
+			}
+			else
+				switch (parameter.getType()) {
+				case OUTPUT_URI:
+					
+				}
 			
-			Object value = parameter.getValue();
-			
-			if (value instanceof Integer)
-				parametersString.setParameter(parameter.getName(), Integer.class.cast(value));
-			
-			else if (value instanceof Boolean)
-				parametersString.setParameter(parameter.getName(), Boolean.class.cast(value));
-			
-			else if (value instanceof String)
-				parametersString.setParameter(parameter.getName(), String.class.cast(value));
 		}
 		IParameters params = step.getParameters();
-		params.fromString(parametersString.toString());
+		if (params != null)
+			params.fromString(parametersString.toString());
 	}
 	
 	public PipelineStep(Class<? extends IPipelineStep> stepClass, IParameters parameters) {		
