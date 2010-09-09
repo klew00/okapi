@@ -115,6 +115,7 @@ public class VignetteFilter implements IFilter {
 	private String currentVFullPath;
 	private List<String> listOfPaths;
 	private String rootId;
+	private boolean monolingual;
 	
 	public VignetteFilter () {
 		params = new Parameters();
@@ -247,7 +248,14 @@ public class VignetteFilter implements IFilter {
 	public void open (RawDocument input,
 		boolean generateSkeleton)
 	{
-		logger.info("- Pre-processing pass");
+		monolingual = params.getMonolingual();
+		if ( monolingual ) {
+			logger.info("- Monolingual processing");
+		}
+		else {
+			logger.info("- Pre-processing pass");
+		}
+
 		partsNames = params.getPartsNamesAsList();
 		partsConfigurations = params.getPartsConfigurationsAsList();
 		if ( !params.checkData() ) {
@@ -259,8 +267,17 @@ public class VignetteFilter implements IFilter {
 		if ( trgLoc == null ) {
 			throw new RuntimeException("You must specify a target locale.");
 		}
-		
 		listOfPaths = new ArrayList<String>();
+		
+		// Just one pass for monolingual mode
+		if ( monolingual ) {
+			preprocessing = false;
+			internalOpen(input);
+			return;
+		}
+		
+		//--- Else: Normal bilingual mode with two passes
+		
 		store = new TemporaryStore();
 		try {
 			storeFile = File.createTempFile("vgnflt_", null);
@@ -474,13 +491,17 @@ public class VignetteFilter implements IFilter {
 			NodeList nodes = doc.getElementsByTagName("contentInstance");
 			Element elem = (Element)nodes.item(0);
 			currentVFullPath = elem.getAttribute("vcmLogicalPath") + "/" + elem.getAttribute("vcmName");
-			if ( !preprocessing ) {
-				logger.info("contentInstance vcmLogicalPath="+currentVFullPath);
-			}
 
-			// Get all 'attribute' elements in 'contentInstance' 
-			if ( processList(elem, content) ) eventFound = true;
-			
+			// Get all 'attribute' elements in 'contentInstance'
+			if ( monolingual ) {
+				if ( processListForMonolingual(elem, content) ) eventFound = true;
+			}
+			else {
+				if ( !preprocessing ) {
+					logger.info("contentInstance vcmLogicalPath="+currentVFullPath);
+				}
+				if ( processList(elem, content) ) eventFound = true;
+			}
 		}
 		catch ( Throwable e ) {
 			throw new OkapiIOException(
@@ -489,6 +510,69 @@ public class VignetteFilter implements IFilter {
 		return eventFound;
 	}
 	
+	
+	private boolean processListForMonolingual (Element elem,
+		String content) throws SAXException, IOException
+	{
+		// Parse the block into a DOM-tree
+		String tmp = content;
+
+		// Parse the source content
+		Document oriDoc = docBuilder.parse(new InputSource(new StringReader(tmp)));
+		// Get first 'contentInstance' element
+		NodeList oriNodes = oriDoc.getElementsByTagName("contentInstance");
+		elem = (Element)oriNodes.item(0);
+
+		// Get all 'attribute' elements in 'contentInstance' 
+		oriNodes = elem.getElementsByTagName("attribute");
+		int last = 0;
+		int[] pos;
+		listOfPaths.add(currentVFullPath);
+		
+		// Start of sub-document
+		StartSubDocument ssd = new StartSubDocument(subDocId.createId());
+		ssd.setName(subDocId.toString());
+		queue.add(new Event(EventType.START_SUBDOCUMENT, ssd));
+		
+		for ( int i=0; i<oriNodes.getLength(); i++ ) {
+			Element tmpElem = (Element)oriNodes.item(i);
+			String name = tmpElem.getAttribute("name");
+			
+			// See if the name is in the list of the parts to extract
+			//TODO: We could have a faster way to detect if the name is listed and get j
+			boolean found = false;
+			int j;
+			for ( j=0; j<partsNames.length; j++ ) {
+				if ( name.equals(partsNames[j]) ) {
+					found = true;
+					break;
+				}
+			}
+			if ( !found ) continue; // Not an attribute element to extract
+			
+			tmpElem = getFirstElement(tmpElem);
+			String data = tmpElem.getTextContent();
+			if ( Util.isEmpty(data) ) continue;
+			
+			// Get the range of the content in the target block
+			pos = getRange(content, last, partsNames[j]);
+			// Create the document part skeleton for the data before
+			DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false);
+			dp.setSkeleton(new GenericSkeleton(content.substring(last, pos[0]).replace("\n", lineBreak)));
+			queue.add(new Event(EventType.DOCUMENT_PART, dp));
+			last = pos[1]; // For next part
+			// Create the event from the original block
+			processContent(data, partsNames[j], partsConfigurations[j]);
+
+		}
+		
+		// End of group, and attached the skeleton for the end too
+		Ending ending = new Ending(String.valueOf(++otherId));
+		ending.setSkeleton(new GenericSkeleton(content.substring(last).replace("\n", lineBreak)));			
+		queue.add(new Event(EventType.END_SUBDOCUMENT, ending));
+		return true;
+	}
+
 	private boolean processList (Element elem,
 		String content) throws SAXException, IOException
 	{

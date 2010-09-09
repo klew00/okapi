@@ -24,6 +24,7 @@ import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.ListUtil;
 import net.sf.okapi.common.ParametersDescription;
+import net.sf.okapi.common.uidescription.CheckboxPart;
 import net.sf.okapi.common.uidescription.EditorDescription;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 import net.sf.okapi.common.uidescription.TextInputPart;
@@ -37,11 +38,13 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	static final String LOCALEID = "localeId";
 	static final String QUOTEMODEDEFINED = "quoteModeDefined";
 	static final String QUOTEMODE = "quoteMode";
+	static final String MONOLINGUAL = "monolingual";
 	
 	private String partsConfigurations;
 	private String partsNames;
 	private String sourceId;
 	private String localeId;
+	private boolean monolingual;
 
 	public String getPartsNames () {
 		return partsNames;
@@ -83,6 +86,14 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.localeId = localeId;
 	}
 
+	public boolean getMonolingual () {
+		return monolingual;
+	}
+
+	public void setMonolingual (boolean monolingual) {
+		this.monolingual = monolingual;
+	}
+
 	public boolean checkData () {
 		String[] tmp1 = ListUtil.stringAsArray(partsNames);
 		String[] tmp2 = ListUtil.stringAsArray(partsConfigurations);
@@ -106,6 +117,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 			+ "default, okf_html, okf_html, default";
 		sourceId = "SOURCE_ID";
 		localeId = "LOCALE_ID";
+		monolingual = false;
 	}
 
 	@Override
@@ -115,6 +127,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.setString(PARTSCONFIGURATIONS, partsConfigurations);
 		buffer.setString(SOURCEID, sourceId);
 		buffer.setString(LOCALEID, localeId);
+		buffer.setBoolean(MONOLINGUAL, monolingual);
 		// Plus two *write-only* parameters: always set to true and 0
 		// This is used by the encoder to know how it needs to escape the quotes
 		// It must not be 0 if one of the data part to extract is an attribute
@@ -132,6 +145,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		partsConfigurations = buffer.getString(PARTSCONFIGURATIONS, partsConfigurations);
 		sourceId = buffer.getString(SOURCEID, sourceId);
 		localeId = buffer.getString(LOCALEID, localeId);
+		monolingual = buffer.getBoolean(MONOLINGUAL, monolingual);
 	}
 
 	@Override
@@ -141,6 +155,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 			"Comma-separated list of the names of the <attribute> elements to extract.");
 		desc.add(PARTSCONFIGURATIONS, "Corresponding filter configurations (or 'default')",
 			"Comma-separated list of the filter configurations to use, use 'default' for none");
+		desc.add(MONOLINGUAL, "Monolingual mode", null);
 		desc.add(SOURCEID, "Name for source ID element",
 			"Name of the <attribute> element containing the source ID");
 		desc.add(LOCALEID, "Name for locale ID element",
@@ -157,12 +172,16 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		
 		tip = desc.addTextInputPart(paramDesc.get(Parameters.PARTSCONFIGURATIONS));
 		tip.setHeight(60);
+
+		CheckboxPart mono = desc.addCheckboxPart(paramDesc.get(MONOLINGUAL));
 		
 		tip = desc.addTextInputPart(paramDesc.get(Parameters.SOURCEID));
 		tip.setVertical(false);
+		tip.setMasterPart(mono, false);
 		
 		tip = desc.addTextInputPart(paramDesc.get(Parameters.LOCALEID));
 		tip.setVertical(false);
+		tip.setMasterPart(mono, false);
 		
 		return desc;
 	}
