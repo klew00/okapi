@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -38,7 +37,6 @@ import net.sf.okapi.common.resource.RawDocument;
  * Default implementations of the {@link IPipeline} interface.
  */
 public class Pipeline implements IPipeline, IObservable, IObserver {
-	private static final Logger LOGGER = Logger.getLogger(Pipeline.class.getName());
 	public static final String DEFAULT_ID = "DEFAULT ID";
 
 	private LinkedList<IPipelineStep> steps;
