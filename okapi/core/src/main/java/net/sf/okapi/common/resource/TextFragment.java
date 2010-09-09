@@ -1725,5 +1725,22 @@ public class TextFragment implements Appendable, Comparable<Object> {
 		if ( csq == null ) csq = "null";
 		return append(csq.subSequence(start, end));
 	}
-	
+
+	/**
+	 * Returns the character at the specified index in the coded text.
+	 * Each code in the coded text string take 2 characters, regardless of the size of the code. 
+	 * <p>For example: if the fragment is "A[xy]B" and "[xy]" is a code, charAt(3) return 'B' not 'x'.
+	 * <p>If the specified index falls on a code placeholder, the character returned is either a marker
+	 * (first character of the placeholder) or a special index to access the underlying code (second
+	 * character of the placeholder). Markers can be identified using {@link #isMarker(char)}.
+	 * @param index the index of the character to be returned.
+	 * @return the specified character.
+	 * @throws IndexOutOfBoundsException if the if the index argument is negative or not less than the length
+	 * of the coded text.
+	 * @see #isMarker(char)
+	 */
+	public char charAt (int index) {
+		return text.charAt(index);
+	}
+
 }

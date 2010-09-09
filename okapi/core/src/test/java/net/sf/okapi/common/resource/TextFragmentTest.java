@@ -307,6 +307,48 @@ public class TextFragmentTest {
 	}
 
 	@Test
+	public void testSubSequenceSimple () {
+		TextFragment tf = new TextFragment("abc");
+		assertEquals("a", tf.subSequence(0, 1).toString());
+		assertEquals("b", tf.subSequence(1, 2).toString());
+		assertEquals("c", tf.subSequence(2, 3).toString());
+		assertEquals("bc", tf.subSequence(1, 3).toString());
+		assertEquals("abc", tf.subSequence(0, -1).toString());
+		TextFragment res = tf.subSequence(1, -1);
+		assertEquals("bc", res.toString());
+	}
+	
+	@Test
+	public void testSubSequenceWithCodes () {
+		TextFragment tf = makeFragment1();
+		// [b]A[br/]B[/b]C == xxAxxBxxC
+		//                    012345678
+		assertEquals("[b]A", tf.subSequence(0, 3).toString());
+		TextFragment res = tf.subSequence(3, -1);
+		assertEquals("[br/]B[/b]C", res.toString());
+		assertEquals(2, res.getCodes().size());
+	}
+
+	@Test(expected=IndexOutOfBoundsException.class)
+	public void testSubSequenceError () { 
+		TextFragment tf = new TextFragment("abc");
+		tf.subSequence(3, 4);
+	}
+
+	@Test
+	public void testCharAt () {
+		TextFragment tf = new TextFragment("abc");
+		assertEquals('a', tf.charAt(0));
+		assertEquals('c', tf.charAt(2));
+	}
+	
+	@Test(expected=IndexOutOfBoundsException.class)
+	public void testCharAtError () { 
+		TextFragment tf = new TextFragment("");
+		tf.charAt(1);
+	}
+
+	@Test
 	public void testAppendableSeparated () {
 		TextFragment tf = new TextFragment();
 		StringBuilder csq1 = new StringBuilder("bc");
