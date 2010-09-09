@@ -50,7 +50,6 @@ import net.sf.okapi.common.resource.StartDocument;
 public class FilterEventsToRawDocumentStep extends BasePipelineStep {
 
 	private IFilterWriter filterWriter;
-	private boolean isDone;
 	private File outputFile;
 	private URI outputURI;
 	private LocaleId targetLocale;
@@ -127,7 +126,6 @@ public class FilterEventsToRawDocumentStep extends BasePipelineStep {
 		// Note that the source locale is now set to the 'target locale' value since it is an output
 		// We also set the target to the same value to have a value
 		RawDocument input = new RawDocument(outputFile.toURI(), outputEncoding, targetLocale, targetLocale);
-		isDone = true;
 		return new Event(EventType.RAW_DOCUMENT, input);
 	}
 	
@@ -156,14 +154,6 @@ public class FilterEventsToRawDocumentStep extends BasePipelineStep {
 		
 		filterWriter.setOutput(outputFile.getAbsolutePath());
 		filterWriter.handleEvent(event);
-		isDone = false;
-		
 		return event;
 	}
-
-	@Override
-	public boolean isDone() {
-		return isDone;
-	}
-
 }

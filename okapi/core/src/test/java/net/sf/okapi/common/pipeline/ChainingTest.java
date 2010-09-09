@@ -55,6 +55,31 @@ public class ChainingTest {
 	}
 	
 	@Test
+	public void pipelineObserverWithMoreThanOneFinalEvent() {		
+		IPipeline p = new Pipeline();
+		
+		// add our event observer
+		EventObserver o = new EventObserver();
+		((IObservable)p).addObserver(o);
+		
+		p.addStep(new DummyMultiCustomEventStep());
+		p.addStep(new DummyCustomEventStep());
+		
+		p.startBatch();
+		p.process(new Event(EventType.CUSTOM));		
+		p.endBatch();
+		
+		// test we observed the correct events
+		List<Event> el = o.getResult();  
+		assertEquals(EventType.START_BATCH, el.remove(0).getEventType());
+		assertEquals(EventType.START_BATCH_ITEM, el.remove(0).getEventType());
+		assertEquals(EventType.CUSTOM, el.remove(0).getEventType());
+		assertEquals(EventType.CUSTOM, el.remove(0).getEventType());
+		assertEquals(EventType.END_BATCH_ITEM, el.remove(0).getEventType());
+		assertEquals(EventType.END_BATCH, el.remove(0).getEventType());
+	}
+	
+	@Test
 	public void pipelineObserverWithMultiEvent() {		
 		IPipeline p = new Pipeline();
 		

@@ -266,4 +266,11 @@ public class Event {
 	public String toString() {
 		return filterEventType.toString();
 	}
+
+	public boolean isNoop() {
+		if (filterEventType == EventType.NO_OP) {
+			return true;
+		}		
+		return false;
+	}
 }

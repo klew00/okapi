@@ -23,6 +23,7 @@ package net.sf.okapi.common.pipeline;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
@@ -115,7 +116,7 @@ public class Pipeline implements IPipeline, IObservable, IObserver {
 		while (!steps.isEmpty() && !(state == PipelineReturnValue.CANCELLED)) {
 			// cycle through the steps in order, pulling off steps that run out
 			// of events.
-			while (!steps.getFirst().isDone() && !(state == PipelineReturnValue.CANCELLED)) {
+			do {
 				// go to each active step and call handleEvent
 				// the event returned is used as input to the next pass
 				notifiedObserver = false;
@@ -136,30 +137,34 @@ public class Pipeline implements IPipeline, IObservable, IObserver {
 								event = remainingStep.handleEvent(event);
 							}
 							// notify observers that the final step has sent an Event
-							notifyObservers(event);
+							// always filter out NO_OP events
+							if (!event.isNoop()) {
+								notifyObservers(event);
+							}
 							notifiedObserver = true;
 						}
+						
+						// the previous event has already been sent to all steps
+						// start the next cycle with a NO_OP event
+						event = Event.NOOP_EVENT;
 						break;
 					}
 				}
 
 				// notify observers that the final step has sent an Event
-				if (!notifiedObserver) {
+				if (!notifiedObserver && !event.isNoop()) {					
 					notifyObservers(event);
-
-					// Deadlock protection for the cases when the final step fails to set the isDone flag
-					// FIXME: There may be cases where a final step could send multiple events (i.e., pipeline chaining),
-					// in that case we will end prematurely with this check
-					if (steps.size() == 1) {
-						LOGGER.warning("Only one step left in the pipleline and that step has sent an event. Has the isDone flag been set properly for "
-								+ steps.getFirst().getName() + "?");
-						break;
-					}
 				}
-			}
+			} while (!steps.getFirst().isDone() && !(state == PipelineReturnValue.CANCELLED));
 			// As each step exhausts its events remove it from the list and move
 			// on to the next
-			finishedSteps.add(steps.remove());
+			try {
+				while (steps.getFirst().isDone()) {
+					finishedSteps.add(steps.remove());
+				}
+			} catch (NoSuchElementException e) {	
+				// ignore
+			}
 		}
 
 		return event;

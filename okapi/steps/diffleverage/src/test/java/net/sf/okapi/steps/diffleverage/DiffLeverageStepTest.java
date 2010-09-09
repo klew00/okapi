@@ -78,12 +78,6 @@ public class DiffLeverageStepTest {
 		assertEquals(EventType.START_BATCH, el.remove(0).getEventType());
 		assertEquals(EventType.START_BATCH_ITEM, el.remove(0).getEventType());
 		assertEquals(EventType.START_DOCUMENT, el.remove(0).getEventType());
-
-		assertEquals(EventType.NO_OP, el.remove(0).getEventType());
-		assertEquals(EventType.NO_OP, el.remove(0).getEventType());
-		assertEquals(EventType.NO_OP, el.remove(0).getEventType());
-		assertEquals(EventType.NO_OP, el.remove(0).getEventType());
-
 		assertEquals(EventType.DOCUMENT_PART, el.remove(0).getEventType());
 
 		Event tue1 = el.remove(0);
@@ -134,12 +128,6 @@ public class DiffLeverageStepTest {
 		assertEquals(EventType.START_BATCH, el.remove(0).getEventType());
 		assertEquals(EventType.START_BATCH_ITEM, el.remove(0).getEventType());
 		assertEquals(EventType.START_DOCUMENT, el.remove(0).getEventType());
-
-		assertEquals(EventType.NO_OP, el.remove(0).getEventType());
-		assertEquals(EventType.NO_OP, el.remove(0).getEventType());
-		assertEquals(EventType.NO_OP, el.remove(0).getEventType());
-		assertEquals(EventType.NO_OP, el.remove(0).getEventType());
-
 		assertEquals(EventType.DOCUMENT_PART, el.remove(0).getEventType());
 
 		Event tue1 = el.remove(0);
@@ -185,12 +173,6 @@ public class DiffLeverageStepTest {
 		assertEquals(EventType.START_BATCH, el.remove(0).getEventType());
 		assertEquals(EventType.START_BATCH_ITEM, el.remove(0).getEventType());
 		assertEquals(EventType.START_DOCUMENT, el.remove(0).getEventType());
-
-		assertEquals(EventType.NO_OP, el.remove(0).getEventType());
-		assertEquals(EventType.NO_OP, el.remove(0).getEventType());
-		assertEquals(EventType.NO_OP, el.remove(0).getEventType());
-		assertEquals(EventType.NO_OP, el.remove(0).getEventType());
-		assertEquals(EventType.NO_OP, el.remove(0).getEventType());
 
 		Event tue1 = el.remove(0);
 		assertEquals(EventType.TEXT_UNIT, tue1.getEventType());
@@ -253,12 +235,6 @@ public class DiffLeverageStepTest {
 		assertEquals(EventType.START_BATCH, el.remove(0).getEventType());
 		assertEquals(EventType.START_BATCH_ITEM, el.remove(0).getEventType());
 		assertEquals(EventType.START_DOCUMENT, el.remove(0).getEventType());
-
-		assertEquals(EventType.NO_OP, el.remove(0).getEventType());
-		assertEquals(EventType.NO_OP, el.remove(0).getEventType());
-		assertEquals(EventType.NO_OP, el.remove(0).getEventType());
-		assertEquals(EventType.NO_OP, el.remove(0).getEventType());
-
 		assertEquals(EventType.DOCUMENT_PART, el.remove(0).getEventType());
 
 		Event tue1 = el.remove(0);

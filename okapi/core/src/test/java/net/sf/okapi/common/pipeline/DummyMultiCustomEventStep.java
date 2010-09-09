@@ -13,7 +13,7 @@ public class DummyMultiCustomEventStep extends BasePipelineStep {
 	}
 
 	public String getName() {
-		return "DummyStep";
+		return "DummyMultiEventStep";
 	}
 	
 	protected Event handleCustom(Event event) {
