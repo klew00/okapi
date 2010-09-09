@@ -203,8 +203,8 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 		TextUnit sourceTu = sourceEvent.getTextUnit();
 		TextUnit targetTu = null;
 
-		// Skip non-translatable
-		if (!sourceTu.isTranslatable()) {
+		// Skip non-translatable and empty
+		if ( !sourceTu.isTranslatable() || sourceTu.isEmpty() ) {
 			return sourceEvent;
 		}
 
