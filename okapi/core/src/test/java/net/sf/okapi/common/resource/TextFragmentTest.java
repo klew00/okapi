@@ -20,6 +20,7 @@
 
 package net.sf.okapi.common.resource;
 
+import java.io.IOException;
 import java.util.List;
 
 import net.sf.okapi.common.filterwriter.GenericContent;
@@ -305,6 +306,34 @@ public class TextFragmentTest {
 		assertTrue(tf1.hasCode());
 	}
 
+	@Test
+	public void testAppendableSeparated () {
+		TextFragment tf = new TextFragment();
+		StringBuilder csq1 = new StringBuilder("bc");
+		StringBuilder csq2 = new StringBuilder("[d]");
+		tf.append('a');
+		tf.append(csq1);
+		tf.append(csq2, 1, 2);
+		assertEquals("abcd", tf.toString());
+	}
+	
+	@Test
+	public void testAppendableTogether () throws IOException {
+		TextFragment tf = new TextFragment();
+		StringBuilder csq1 = new StringBuilder("bc");
+		StringBuilder csq2 = new StringBuilder("[d]");
+		tf.append('a').append(csq1).append(csq2, 1, 2);
+		assertEquals("abcd", tf.toString());
+	}
+	
+	@Test
+	public void testAppendableNull () throws IOException {
+		TextFragment tf = new TextFragment();
+		StringBuilder csq1 = null;
+		tf.append('a').append(csq1).append(csq1, 1, 2);
+		assertEquals("anullu", tf.toString());
+	}
+	
 	@Test
 	public void testTextCodesChanges () {
 		TextFragment tf1 = new TextFragment("<b>New file:</b> %s");

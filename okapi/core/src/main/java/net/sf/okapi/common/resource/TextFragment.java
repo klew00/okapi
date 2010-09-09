@@ -55,7 +55,7 @@ import java.util.regex.Pattern;
  * <li>changing a section of existing text to code with
  * {@link #changeToCode(int, int, TagType, String)}<ul>
  */
-public class TextFragment implements Comparable<Object> {
+public class TextFragment implements Appendable, Comparable<Object> {
 	
 	/**
 	 * Special character marker for a opening inline code.
@@ -92,12 +92,6 @@ public class TextFragment implements Comparable<Object> {
 	 */
 	public static final String REFMARKER_SEP   = "@%";
 
-//Not used anymore
-//	/**
-//	 * Code type name for segment place-holder.
-//	 */
-//	public static final String CODETYPE_SEGMENT  = "$seg$";
-	
 	/*
 	 * Compiled regex for all TextFragment markers
 	 */
@@ -110,7 +104,6 @@ public class TextFragment implements Comparable<Object> {
 		OPENING,
 		CLOSING,
 		PLACEHOLDER
-//Not used anymore		SEGMENTHOLDER
 	};
 	
 	/**
@@ -463,14 +456,6 @@ public class TextFragment implements Comparable<Object> {
 	}
 	
 	/**
-	 * Appends a character to the fragment.
-	 * @param value the character to append.
-	 */
-	public void append (char value) {
-		text.append(value);
-	}
-
-	/**
 	 * Appends a string to the fragment. If the string is null, it is ignored.
 	 * @param text the string to append.
 	 */
@@ -491,6 +476,7 @@ public class TextFragment implements Comparable<Object> {
 	/**
 	 * Appends an existing code to this fragment.
 	 * @param code the existing code to append.
+	 * @return the code that was added to this text.
 	 */
 	public Code append (Code code) {
 		if ( codes == null ) codes = new ArrayList<Code>();
@@ -1698,6 +1684,46 @@ public class TextFragment implements Comparable<Object> {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Appends a character to the fragment.
+	 * @param value the character to append.
+	 * @return a reference to this fragment.
+	 */
+	@Override
+	public Appendable append (char value) {
+		text.append(value);
+		return this;
+	}
+
+	/**
+	 * Appends the specified character sequence to this fragment.
+	 * @param csq the character sequence to append.
+	 * If the parameter is null, the string "null" is appended.
+	 * @return a reference to this fragment.
+	 */
+	@Override
+	public Appendable append (CharSequence csq) {
+		text.append(csq);
+		return this;
+	}
+
+	/**
+	 * Appends a subsequence of the specified character sequence to this fragment.
+	 * @param csq the character sequence to append.
+	 * If csq is null, then characters will be appended as if csq contained the string "null".
+	 * @param start the index of the first character in the subsequence.
+	 * @param end the index of the character following the last character in the subsequence.
+	 * @return a reference to this fragment.
+	 */
+	@Override
+	public Appendable append (CharSequence csq,
+		int start,
+		int end)
+	{
+		if ( csq == null ) csq = "null";
+		return append(csq.subSequence(start, end));
 	}
 	
 }
