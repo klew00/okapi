@@ -177,7 +177,7 @@ public class Editor implements IParametersEditor {
 		
 		lbElem = new List(cmpTmp, SWT.BORDER | SWT.V_SCROLL);
 		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.verticalSpan = 9;
+		gdTmp.verticalSpan = 10;
 		lbElem.setLayoutData(gdTmp);
 		lbElem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -281,8 +281,10 @@ public class Editor implements IParametersEditor {
 		edElemWriteableAtt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
 		stElemReadOnlyAtt = new Label(cmpTmp, SWT.NONE);
-		stElemReadOnlyAtt.setText("Attributes that are read-only properties");
-		// edit field if after add/remove buttons
+		stElemReadOnlyAtt.setText("Attributes that are read-only properties:");
+		
+		edElemReadOnlyAtt = new Text(cmpTmp, SWT.BORDER);
+		edElemReadOnlyAtt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.VERTICAL_ALIGN_BEGINNING));
 		
 		//--- Add/Remove buttons for the list of elements
 		
@@ -295,19 +297,16 @@ public class Editor implements IParametersEditor {
 		Button btAdd = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Add...", UIUtil.BUTTON_DEFAULT_WIDTH, 1);
 		btAdd.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				//addElement();
+				addElement();
             }
 		});
 		
 		btRemoveElem = UIUtil.createGridButton(cmpButtons, SWT.PUSH, "Remove", UIUtil.BUTTON_DEFAULT_WIDTH, 1);
 		btRemoveElem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				//removeElement();
+				removeElement();
             }
 		});
-		
-		edElemReadOnlyAtt = new Text(cmpTmp, SWT.BORDER);
-		edElemReadOnlyAtt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
 		TabItem tiTmp = new TabItem(tabs, SWT.NONE);
 		tiTmp.setText("Elements");
@@ -428,7 +427,7 @@ public class Editor implements IParametersEditor {
 		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING | GridData.FILL_HORIZONTAL);
 		gdTmp.verticalSpan = 2;
 		grpWS.setLayoutData(gdTmp);
-		grpWS.setText("White spaces");
+		grpWS.setText("White spaces conditions");
 		
 		Label stTmp = new Label(grpWS, SWT.NONE);
 		stTmp.setText("Preserve:");
@@ -603,6 +602,16 @@ public class Editor implements IParametersEditor {
 		}
 	}
 	
+	private void removeElement () {
+		int n = lbElem.getSelectionIndex();
+		if ( n < 0 ) return;
+		lbElem.remove(n);
+		if ( n >= lbElem.getItemCount() ) n = lbElem.getItemCount()-1;
+		if ( n > -1 ) lbElem.setSelection(n);
+		updateElementsButtons();
+		updateElement();
+	}
+	
 	private void removeAttribute () {
 		int n = lbAtt.getSelectionIndex();
 		if ( n < 0 ) return;
@@ -611,6 +620,35 @@ public class Editor implements IParametersEditor {
 		if ( n > -1 ) lbAtt.setSelection(n);
 		updateAttributesButtons();
 		updateAttribute();
+	}
+	
+	private void addElement () {
+		try {
+			InputDialog dlg = new InputDialog(shell, "Add Element", "Name of the element to add:", null, null, 0, -1, -1);
+			String name = dlg.showDialog();
+			if ( name == null ) return;
+			name = ensureValidName(name);
+			if ( name.isEmpty() ) return;
+			
+			for ( String tmp : lbElem.getItems() ) {
+				if ( tmp.equals(name) ) {
+					Dialogs.showError(shell,
+						String.format("The element \"%s\" is already listed.", name), null);
+					return;
+				}
+			}
+			// Else: add the element
+			Element elem = new Element();
+			elem.name = name;
+			lbElem.add(name);
+			lbElem.setData(name, elem);
+			lbElem.setSelection(lbElem.getItemCount()-1);
+			updateElementsButtons();
+			updateElement();
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, "Error when adding an attribute.\n"+e.getMessage(), null);
+		}
 	}
 	
 	private void addAttribute () {
@@ -646,6 +684,10 @@ public class Editor implements IParametersEditor {
 		pnlCodeFinder.setEnabled(chkUseCodeFinder.getSelection());
 	}
 
+	private void updateElementsButtons () {
+		btRemoveElem.setEnabled(lbElem.getItemCount()>0);
+	}
+	
 	private void updateAttributesButtons () {
 		btRemoveAtt.setEnabled(lbAtt.getItemCount()>0);
 	}
@@ -1081,12 +1123,30 @@ public class Editor implements IParametersEditor {
 			tmp.append("\n");
 		}
 		
+		//-- Elements
+		tmp.append("\nelements:\n");
+		for ( int i=0; i<lbElem.getItemCount(); i++ ) {
+			Element elem = (Element)lbElem.getData(lbElem.getItem(i));
+			tmp.append("  '"+elem.name+"':\n    ruleTypes: ");
+			tmp.append(elem.rules.toString());
+			// Conditions
+			if ( !Util.isEmpty(elem.conditions) ) {
+				tmp.append(String.format("\n    %s: ", TaggedFilterConfiguration.CONDITIONS));
+				tmp.append(elem.conditions.toString());
+			}
+			if ( !Util.isEmpty(elem.subFilter) ) {
+				tmp.append(String.format("\n    %s: '%s'",
+					TaggedFilterConfiguration.SUBFILTER, elem.subFilter));
+			}
+			tmp.append("\n");
+		}		
+		
 		//--- Inline codes
 		tmp.append(String.format("\n%s: %s\n",
 			TaggedFilterConfiguration.USECODEFINDER,
 			chkUseCodeFinder.getSelection()));
 		String rules = pnlCodeFinder.getRules().replace("\\", "\\\\");
-		rules = rules.replace("\n", "\\n");
+		rules = rules.replace("\n", "\\\\n");
 		tmp.append(String.format("%s: %s\n",
 			TaggedFilterConfiguration.CODEFINDERRULES,
 			"\""+rules+"\""));
@@ -1095,7 +1155,9 @@ System.out.print(tmp.toString());
 System.out.print("\n---\n");		
 		params.fromString(tmp.toString());
 System.out.print(params.toString());
-		
+
+		params.save(params.getPath()+".outtest.txt");
+
 		return true;
 	}
 

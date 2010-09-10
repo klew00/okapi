@@ -17,7 +17,7 @@ public class MainTry {
 		IParameters params = new AbstractMarkupParameters();
 
 		String root = TestUtil.getParentDir(MainTry.class, "/testConfig.yml");
-		File file = new File(root+"javaPropertiesXml.yml"); //"testConfig.yml");
+		File file = new File(root+"testConfig.yml");
 		params.load(file.toURI(), false);
 		
 		FilterConfigurationMapper fcMapper = new FilterConfigurationMapper();
