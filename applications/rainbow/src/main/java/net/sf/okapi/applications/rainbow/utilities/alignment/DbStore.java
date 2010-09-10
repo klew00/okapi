@@ -72,7 +72,7 @@ public class DbStore {
 	public static final int  TARGET_TEXT    = 0;
 	public static final int  TARGET_CODES   = 0;
 	
-	private static final String DATAFILE_EXT = ".data.db";
+	private static final String DATAFILE_EXT = ".h2.db";
 
 	private Connection  conn = null;
 

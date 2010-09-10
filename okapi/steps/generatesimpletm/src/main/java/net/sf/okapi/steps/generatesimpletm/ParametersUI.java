@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -32,7 +32,8 @@ public class ParametersUI implements IEditorDescriptionProvider {
 	public EditorDescription createEditorDescription (ParametersDescription paramDesc) {
 		EditorDescription desc = new EditorDescription("Simple TM Generation", true, false);
 		PathInputPart part = desc.addPathInputPart(paramDesc.get("tmPath"), "TM to Create", true);
-		part.setBrowseFilters("SimpleTM Files (*.data.db)\tAll Files (*.*)", "*.data.db\t*.*");
+		part.setBrowseFilters(String.format("SimpleTM Files (*%s)\tAll Files (*.*)", net.sf.okapi.tm.simpletm.Database.DATAFILE_EXT),
+			String.format("*%s\t*.*", net.sf.okapi.tm.simpletm.Database.DATAFILE_EXT));
 		return desc;
 	}
 

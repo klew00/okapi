@@ -25,13 +25,14 @@ import net.sf.okapi.common.ParametersDescription;
 
 public class Parameters extends BaseParameters {
 
+	static final String DB_EXTENSION = ".h2.db";
 	static final String DBPATH = "dbPath";
 	static final String PENALIZETARGETWITHDIFFERENTCODES = "penalizeTargetWithDifferentCodes";
 	static final String PENALIZESOURCEWITHDIFFERENTCODES = "penalizeSourceWithDifferentCodes";
 	
 	 /** 
 	  * The full path of the database name to open.
-	  * The path can have the extension ".data.db" or not extension.
+	  * The path can have the extension {@link #DB_EXTENSION} or not extension.
 	  */
 	private String dbPath;
 	private boolean penalizeTargetWithDifferentCodes;
@@ -99,7 +100,8 @@ public class Parameters extends BaseParameters {
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
 		desc.add(DBPATH,
-			"Path of the Database file", "Full path of the database file (.data.db)");
+			"Path of the Database file",
+			String.format("Full path of the database file (%s)", DB_EXTENSION));
 		desc.add(PENALIZESOURCEWITHDIFFERENTCODES,
 			"Penalize exact matches when the source has different codes than the query", null);
 		desc.add(PENALIZETARGETWITHDIFFERENTCODES,

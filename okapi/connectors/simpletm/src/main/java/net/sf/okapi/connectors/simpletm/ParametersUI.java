@@ -31,7 +31,8 @@ public class ParametersUI implements IEditorDescriptionProvider {
 		EditorDescription desc = new EditorDescription("SimpleTM Connector Settings", true, false);
 
 		PathInputPart part = desc.addPathInputPart(paramDesc.get(Parameters.DBPATH), "Database File", false);
-		part.setBrowseFilters("Database Files (*.data.db)\tAll Files (*.*)", "*.data.db\t*.*");
+		part.setBrowseFilters(String.format("Database Files (*%s)\tAll Files (*.*)", Parameters.DB_EXTENSION),
+			String.format("*%s\t*.*", Parameters.DB_EXTENSION));
 		
 		desc.addCheckboxPart(paramDesc.get(Parameters.PENALIZESOURCEWITHDIFFERENTCODES));
 		desc.addCheckboxPart(paramDesc.get(Parameters.PENALIZETARGETWITHDIFFERENTCODES));

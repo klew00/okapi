@@ -347,6 +347,23 @@ public class TextFragmentTest {
 		TextFragment tf = new TextFragment("");
 		tf.charAt(1);
 	}
+	
+	@Test
+	public void testLengthSimple () {
+		TextFragment tf = new TextFragment();
+		assertEquals(0, tf.length());
+		tf.append("abc");
+		assertEquals(3, tf.length());
+		assertEquals(tf.length(), tf.toString().length());
+	}
+
+	@Test
+	public void testLengthWithCodes () {
+		TextFragment tf = makeFragment1();
+		// [b]A[br/]B[/b]C == xxAxxAxxC
+		assertEquals(9, tf.length());
+		assertEquals(15, tf.toString().length());
+	}
 
 	@Test
 	public void testAppendableSeparated () {

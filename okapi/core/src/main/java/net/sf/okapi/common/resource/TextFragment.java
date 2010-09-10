@@ -1727,9 +1727,9 @@ public class TextFragment implements Appendable, Comparable<Object> {
 	}
 
 	/**
-	 * Returns the character at the specified index in the coded text.
+	 * Returns the character at the specified index in the coded text of this fragment.
 	 * Each code in the coded text string take 2 characters, regardless of the size of the code. 
-	 * <p>For example: if the fragment is "A[xy]B" and "[xy]" is a code, charAt(3) return 'B' not 'x'.
+	 * <p>For example: If the fragment is "A[xy]B" and "[xy]" is a code, charAt(3) returns 'B' not 'x'.
 	 * <p>If the specified index falls on a code placeholder, the character returned is either a marker
 	 * (first character of the placeholder) or a special index to access the underlying code (second
 	 * character of the placeholder). Markers can be identified using {@link #isMarker(char)}.
@@ -1741,6 +1741,20 @@ public class TextFragment implements Appendable, Comparable<Object> {
 	 */
 	public char charAt (int index) {
 		return text.charAt(index);
+	}
+
+	/**
+	 * Returns the number of character in the coded text of this fragment.
+	 * <p>This is not the length of the content with all its codes. In the coded text,
+	 * each code is represented by a placeholder made of two characters regardless
+	 * of the size of the code. For example: If the fragment is "A[xy]B" and "[xy]" is a 
+	 * code, length() returns 4, not 6.
+	 * <p>To get the length of the content including codes use <code>{@link #toString()}.length()</code>.
+	 * Note that codes with referenced are not expanded by {@link #toString()}.
+	 * @return the number of character in the coded text of this fragment.
+	 */
+	public int length () {
+		return text.length();
 	}
 
 }

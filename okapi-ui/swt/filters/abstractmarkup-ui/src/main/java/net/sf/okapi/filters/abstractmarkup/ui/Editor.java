@@ -442,7 +442,7 @@ public class Editor implements IParametersEditor {
 		btTmp.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				if ( currentAtt == null ) return;
-				if ( currentAtt.conditions == null ) {
+				if ( currentAtt.wsPreserve == null ) {
 					currentAtt.wsPreserve = new ArrayList<Condition>();
 				}
 				editConditions(edPreserveWS, currentAtt.wsPreserve);
@@ -461,7 +461,7 @@ public class Editor implements IParametersEditor {
 		btTmp.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				if ( currentAtt == null ) return;
-				if ( currentAtt.conditions == null ) {
+				if ( currentAtt.wsDefault == null ) {
 					currentAtt.wsDefault = new ArrayList<Condition>();
 				}
 				editConditions(edDefaultWS, currentAtt.wsDefault);
@@ -1054,17 +1054,7 @@ public class Editor implements IParametersEditor {
 			chkGlobalPreserveWS.getSelection()));
 		tmp.append(String.format("%s: %s\n",
 			TaggedFilterConfiguration.GLOBAL_CDATA_SUBFILTER,
-			edCDATAFilterConfig.getSelection()));
-		
-		//--- Inline codes
-		tmp.append(String.format("\n%s: %s\n",
-			TaggedFilterConfiguration.USECODEFINDER,
-			chkUseCodeFinder.getSelection()));
-		String rules = pnlCodeFinder.getRules().replace("\\", "\\\\");
-		rules = rules.replace("\n", "\\n");
-		tmp.append(String.format("%s: %s\n",
-			TaggedFilterConfiguration.CODEFINDERRULES,
-			"\""+rules+"\""));
+			edCDATAFilterConfig.getText()));
 		
 		//--- Attribute
 		tmp.append("\nattributes:\n");
@@ -1091,10 +1081,20 @@ public class Editor implements IParametersEditor {
 			tmp.append("\n");
 		}
 		
-//System.out.print(tmp.toString());		
-//System.out.print("\n---\n");		
+		//--- Inline codes
+		tmp.append(String.format("\n%s: %s\n",
+			TaggedFilterConfiguration.USECODEFINDER,
+			chkUseCodeFinder.getSelection()));
+		String rules = pnlCodeFinder.getRules().replace("\\", "\\\\");
+		rules = rules.replace("\n", "\\n");
+		tmp.append(String.format("%s: %s\n",
+			TaggedFilterConfiguration.CODEFINDERRULES,
+			"\""+rules+"\""));
+		
+System.out.print(tmp.toString());		
+System.out.print("\n---\n");		
 		params.fromString(tmp.toString());
-//System.out.print(params.toString());
+System.out.print(params.toString());
 		
 		return true;
 	}
