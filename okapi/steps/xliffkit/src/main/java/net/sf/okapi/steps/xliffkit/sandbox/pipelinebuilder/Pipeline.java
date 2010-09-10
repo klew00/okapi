@@ -22,6 +22,7 @@ package net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.filters.DefaultFilters;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.pipeline.IPipeline;
 import net.sf.okapi.common.pipeline.IPipelineStep;
@@ -39,16 +40,7 @@ public class Pipeline extends net.sf.okapi.common.pipeline.Pipeline implements I
 	
 	{
 		fcMapper = new FilterConfigurationMapper();
-		
-		// TODO Registration of filter configs in the FilterConfigurationMapper, not here
-		fcMapper.addConfigurations("net.sf.okapi.filters.xml.XMLFilter");
-		fcMapper.addConfigurations("net.sf.okapi.filters.html.HtmlFilter");
-		fcMapper.addConfigurations("net.sf.okapi.filters.openoffice.OpenOfficeFilter");
-		fcMapper.addConfigurations("net.sf.okapi.filters.openxml.OpenXMLFilter");
-		fcMapper.addConfigurations("net.sf.okapi.filters.openxml.OpenXMLContentFilter");
-		fcMapper.addConfigurations("net.sf.okapi.filters.properties.PropertiesFilter");				
-		fcMapper.addConfigurations(net.sf.okapi.filters.plaintext.PlainTextFilter.class.getName());
-		fcMapper.addConfigurations(net.sf.okapi.filters.table.TableFilter.class.getName());
+		DefaultFilters.setMappings(fcMapper, true, true);		
 	}
 	
 	public Pipeline(String description, IPipeline pipeline) {
