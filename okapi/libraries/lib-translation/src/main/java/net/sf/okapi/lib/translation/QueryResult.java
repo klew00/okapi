@@ -89,8 +89,8 @@ public class QueryResult implements Comparable<QueryResult> {
 			return EQUAL;
 		}
 
-		String thisSource = this.source.toString();
-		String otherSource = other.source.toString();
+		String thisSource = this.source.toText();
+		String otherSource = other.source.toText();
 		int comparison;
 		
 		// compare weight
@@ -141,8 +141,8 @@ public class QueryResult implements Comparable<QueryResult> {
 		QueryResult otherHit = (QueryResult) other;
 		return  (this.weight == otherHit.weight)
 				&& (this.matchType == otherHit.matchType)
-				&& (this.source.toString().equals(otherHit.source.toString()))
-				&& (this.target.toString().equals(otherHit.target.toString()));
+				&& (this.source.toText().equals(otherHit.source.toText()))
+				&& (this.target.toText().equals(otherHit.target.toText()));
 	}
 
 	/**
@@ -154,8 +154,8 @@ public class QueryResult implements Comparable<QueryResult> {
 		int result = HashCodeUtil.SEED;
 		result = HashCodeUtil.hash(result, this.weight);
 		result = HashCodeUtil.hash(result, this.matchType);
-		result = HashCodeUtil.hash(result, this.source.toString());
-		result = HashCodeUtil.hash(result, this.target.toString());
+		result = HashCodeUtil.hash(result, this.source.toText());
+		result = HashCodeUtil.hash(result, this.target.toText());
 		return result;
 	}
 	

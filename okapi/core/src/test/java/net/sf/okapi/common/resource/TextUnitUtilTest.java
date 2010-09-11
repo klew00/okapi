@@ -49,9 +49,9 @@ public class TextUnitUtilTest {
 	public void testAdjustTargetFragment () {
 		TextFragment toTransSrc = makeFragment1();
 		TextFragment proposalTrg = makeFragment1Bis("trg");
-		assertEquals("{B}A{/B}B{BR/}C trg", proposalTrg.toString());
+		assertEquals("{B}A{/B}B{BR/}C trg", proposalTrg.toText());
 		TextUnitUtil.adjustTargetCodes(toTransSrc, proposalTrg, true, true, null, null);
-		assertEquals("[b]A[/b]B[br/]C trg", proposalTrg.toString());
+		assertEquals("[b]A[/b]B[br/]C trg", proposalTrg.toText());
 	}
 	
 	@Test
@@ -59,9 +59,9 @@ public class TextUnitUtilTest {
 		TextFragment toTransSrc = makeFragment1();
 		TextFragment proposalTrg = makeFragment1Bis("trg");
 		proposalTrg.remove(6, 8); // "xxAxxBxxC trg"
-		assertEquals("{B}A{/B}BC trg", proposalTrg.toString());
+		assertEquals("{B}A{/B}BC trg", proposalTrg.toText());
 		TextUnitUtil.adjustTargetCodes(toTransSrc, proposalTrg, true, true, null, null);
-		assertEquals("[b]A[/b]BC trg[br/]", proposalTrg.toString());
+		assertEquals("[b]A[/b]BC trg[br/]", proposalTrg.toText());
 	}
 	
 	@Test
@@ -69,9 +69,9 @@ public class TextUnitUtilTest {
 		TextFragment toTransSrc = makeFragment1();
 		TextFragment proposalTrg = makeFragment1Bis("with warning");
 		proposalTrg.remove(6, 8); // "xxAxxBxxC with warning"
-		assertEquals("{B}A{/B}BC with warning", proposalTrg.toString());
+		assertEquals("{B}A{/B}BC with warning", proposalTrg.toText());
 		TextUnitUtil.adjustTargetCodes(toTransSrc, proposalTrg, true, false, null, null);
-		assertEquals("[b]A[/b]BC with warning", proposalTrg.toString());
+		assertEquals("[b]A[/b]BC with warning", proposalTrg.toText());
 	}
 	
 	@Test
@@ -88,21 +88,21 @@ public class TextUnitUtilTest {
 		st = "  1234   ";
 		TextFragment tf = new TextFragment(st);
 		TextUnitUtil.trimLeading(tf, null);
-		assertEquals("1234   ", tf.toString());
+		assertEquals("1234   ", tf.toText());
 		TextUnitUtil.trimTrailing(tf, null);
-		assertEquals("1234", tf.toString());
+		assertEquals("1234", tf.toText());
 
 		st = "     ";
 		tf = new TextFragment(st);
 		TextUnitUtil.trimLeading(tf, null);
-		assertEquals("", tf.toString());
+		assertEquals("", tf.toText());
 		TextUnitUtil.trimTrailing(tf, null);
-		assertEquals("", tf.toString());
+		assertEquals("", tf.toText());
 
 		st = "     ";
 		tf = new TextFragment(st);
 		TextUnitUtil.trimTrailing(tf, null);
-		assertEquals("", tf.toString());
+		assertEquals("", tf.toText());
 
 		TextFragment tc = new TextFragment("test");
 

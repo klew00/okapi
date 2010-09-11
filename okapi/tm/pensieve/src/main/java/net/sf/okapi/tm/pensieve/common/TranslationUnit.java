@@ -133,8 +133,8 @@ public class TranslationUnit {
 
 	@Override
 	public String toString() {
-		return "Source: " + getSource().getContent().toString() + 
-			   "\nTarget: " + getTarget().getContent().toString();
+		return "Source: " + getSource().getContent().toText() + 
+			   "\nTarget: " + getTarget().getContent().toText();
 
 	}
 }

@@ -79,7 +79,7 @@ public class TextContainerTest {
 		ISegments segments = tc.getSegments();
 		assertFalse(tc.hasBeenSegmented());
 		assertTrue(tc.contentIsOneSegment());
-		assertEquals("xyz", tc.getFirstContent().toString());
+		assertEquals("xyz", tc.getFirstContent().toText());
 		assertEquals("qwerty", segments.get(0).id);
 		assertSame(seg.text, segments.getFirstContent());
     }
@@ -92,7 +92,7 @@ public class TextContainerTest {
 		ISegments segments = tc.getSegments();
 		assertFalse(tc.hasBeenSegmented());
 		assertTrue(tc.contentIsOneSegment());
-		assertEquals("", tc.getFirstContent().toString());
+		assertEquals("", tc.getFirstContent().toText());
 		assertEquals("0", segments.get(0).id);
 		assertSame(seg.text, segments.getFirstContent());
     }
@@ -126,15 +126,15 @@ public class TextContainerTest {
 			i++;
 			switch ( i ) {
 			case 0:
-				assertEquals("text1", part.text.toString());
+				assertEquals("text1", part.text.toText());
 				assertTrue(part.isSegment());
 				break;
 			case 1:
-				assertEquals(" ", part.text.toString());
+				assertEquals(" ", part.text.toText());
 				assertFalse(part.isSegment());
 				break;
 			case 2:
-				assertEquals("text2", part.text.toString());
+				assertEquals("text2", part.text.toText());
 				assertTrue(part.isSegment());
 				break;
 			}
@@ -146,7 +146,7 @@ public class TextContainerTest {
 		TextContainer tc = new TextContainer("[s1]");
 		for ( Iterator<Segment> iter = tc.getSegments().iterator(); iter.hasNext(); ) {
 			Segment seg = iter.next();
-			assertEquals("[s1]", seg.text.toString());
+			assertEquals("[s1]", seg.text.toText());
 		}
 		ISegments segments = tc.getSegments();
 		segments.append(new TextFragment("[s2]"));
@@ -155,7 +155,7 @@ public class TextContainerTest {
 		StringBuilder tmp = new StringBuilder();
 		for ( Iterator<Segment> iter = tc.getSegments().iterator(); iter.hasNext(); ) {
 			Segment seg = iter.next();
-			tmp.append(seg.text.toString());
+			tmp.append(seg.text.toText());
 		}
 		assertEquals("[s1][s2][s3][s4]", tmp.toString());
 	}
@@ -211,7 +211,7 @@ public class TextContainerTest {
         	new TextFragment("trg"), MatchType.EXACT, 99, "origin");
         tc.setAnnotation(ann1);
 		TextContainer tc2 = tc.clone();
-		assertEquals(tc.getFirstContent().toString(), tc2.getFirstContent().toString());
+		assertEquals(tc.getFirstContent().toText(), tc2.getFirstContent().toText());
 		assertNotSame(tc.getFirstContent(), tc2.getFirstContent());
         assertEquals("name property", p1.getValue(), tc2.getProperty("name").getValue());
         assertNotSame("properties should not be the same reference due to clone", p1, tc2.getProperty("name"));
@@ -237,7 +237,7 @@ public class TextContainerTest {
 	@Test
 	public void testGetFirstSegmentContent () {
 		TextContainer tc = new TextContainer("text");
-		assertEquals("text", tc.getSegments().getFirstContent().toString());
+		assertEquals("text", tc.getSegments().getFirstContent().toText());
 	}
 	
 	@Test
@@ -434,7 +434,7 @@ public class TextContainerTest {
 	public void testSameFirstAndLastSegments () {
 		TextContainer tc = new TextContainer("text");
 		ISegments segments = tc.getSegments();
-		assertEquals("text", segments.getFirstContent().toString());
+		assertEquals("text", segments.getFirstContent().toText());
 		assertSame(segments.getFirstContent(), segments.getLastContent());
 		assertFalse(tc.hasBeenSegmented());
 	}
@@ -443,7 +443,7 @@ public class TextContainerTest {
 	public void testGetSameSegment () {
 		TextContainer tc = createMultiSegmentContent();
 		ISegments segments = tc.getSegments();
-		assertEquals("text1", segments.getFirstContent().toString());
+		assertEquals("text1", segments.getFirstContent().toText());
 		assertSame(segments.getFirstContent(), segments.get(0).text);
 	}
 	
@@ -451,7 +451,7 @@ public class TextContainerTest {
 	public void testGetLastSegment () {
 		TextContainer tc = createMultiSegmentContent();
 		ISegments segments = tc.getSegments();
-		assertEquals("text2", segments.getLastContent().toString());
+		assertEquals("text2", segments.getLastContent().toText());
 		assertSame(segments.getLastContent(), segments.get(1).text);
 	}
 
@@ -722,8 +722,8 @@ public class TextContainerTest {
 		assertSame(segments.get(0), segments.get("s1"));
 		assertSame(segments.get(1), segments.get("0")); // Inserted
 		assertSame(segments.get(2), segments.get("s2"));
-		assertEquals("text2", segments.get("s2").text.toString());
-		assertEquals(" ", segments.get("0").text.toString());
+		assertEquals("text2", segments.get("s2").text.toText());
+		assertEquals(" ", segments.get("0").text.toText());
 	}
 
 	@Test
@@ -829,7 +829,7 @@ public class TextContainerTest {
 		assertEquals(1, segments.count());
 		TextFragment tf = segments.getFirstContent();
 		assertEquals("text1<br/> text2<br/>", tc.toString());
-		assertEquals("text1<br/> text2<br/>", tf.toString());
+		assertEquals("text1<br/> text2<br/>", tf.toText());
 		List<Code> codes = tf.getCodes();
 		assertEquals(2, codes.size());
 		assertEquals(1, codes.get(0).id);

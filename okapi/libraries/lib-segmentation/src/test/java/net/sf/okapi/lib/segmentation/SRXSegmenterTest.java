@@ -122,9 +122,9 @@ public class SRXSegmenterTest {
 		// Nothing is segmented now
 		ISegments segs = tu.getSource().getSegments();
 		assertEquals(1, segs.count());
-		assertEquals("Part 1. Part 2. Part 3.", tu.getSource().getLastContent().toString());
+		assertEquals("Part 1. Part 2. Part 3.", tu.getSource().getLastContent().toText());
 		tu.synchronizeSourceSegmentation(LocaleId.FRENCH);
-		assertEquals("Part 1. Part 2. Part 3.", tu.getSource().getLastContent().toString());
+		assertEquals("Part 1. Part 2. Part 3.", tu.getSource().getLastContent().toText());
 	}
 	
 	private ISegmenter createSegmenterWithRules (LocaleId locId) {

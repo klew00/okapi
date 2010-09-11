@@ -325,8 +325,8 @@ public class ServalForm {
 		}
 		// Else: set the new current data
 		QueryResult qr = queryMgt.getResults().get(n);
-		edTarget.setText(qr.target.toString());
-		edSource.setText(qr.source.toString());
+		edTarget.setText(qr.target.toText());
+		edSource.setText(qr.source.toText());
 	}
 	
 	public void run () {

@@ -270,7 +270,7 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 				if ( srcSeg == null ) {
 					// A target segment without a corresponding source: give warning
 					logger.warning(String.format("No source segment found for target segment id='%s':\n\"%s\".",
-						trgSeg.id, trgSeg.text.toString()));
+						trgSeg.id, trgSeg.text.toText()));
 				}
 
 				// Opening marker

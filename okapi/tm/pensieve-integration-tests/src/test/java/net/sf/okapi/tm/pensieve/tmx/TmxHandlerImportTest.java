@@ -183,7 +183,7 @@ public class TmxHandlerImportTest {
 		assertEquals(
 				"tu target content",
 				"Pumpen wurden 3 Minuten lang angehalten, ggf. NaCl-Infusion starten",
-				tu.getTarget().getContent().toString());
+				tu.getTarget().getContent().toText());
 	}
 
 	@Test
@@ -200,14 +200,14 @@ public class TmxHandlerImportTest {
 		TranslationUnit tu = seeker
 				.searchExact(new TextFragment("hello"), null).get(0).getTu();
 		assertEquals("tu target content", "ciao", tu.getTarget().getContent()
-				.toString());
+				.toText());
 		assertEquals("tu source content", "hello", tu.getSource().getContent()
-				.toString());
+				.toText());
 		tu = seeker.searchExact(new TextFragment("world"), null).get(0).getTu();
 		assertEquals("tu target content", "mondo", tu.getTarget().getContent()
-				.toString());
+				.toText());
 		assertEquals("tu source content", "world", tu.getSource().getContent()
-				.toString());
+				.toText());
 	}
 
 	@Test

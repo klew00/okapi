@@ -92,7 +92,11 @@ distribution.</p>
 </ul>
 	</li>
 	<li>Libraries:<ul>
-	<li>Implemented the Appendable interface for TextFragment.</li>
+	<li>Implemented the Appendable and CharSequence interfaces for TextFragment.</li>
+	<li><u><b>IMPORTANT:</b></u> Changed <code>TextFragment.toString()</code> to 
+	return the coded text instead of the original content of the fragment. The 
+	previous behavior of <code>toString()</code> is now accessible using <code>
+	text()</code>.</li>
 </ul>
 	</li>
 </ul>

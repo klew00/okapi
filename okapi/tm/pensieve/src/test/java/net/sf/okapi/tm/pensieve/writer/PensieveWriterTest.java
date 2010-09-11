@@ -136,9 +136,9 @@ public class PensieveWriterTest {
         writer.commit();
         Document doc1 = findDocument(MetadataType.ID.fieldName(), "1");
         Document doc2 = findDocument(MetadataType.ID.fieldName(), "2");
-        assertEquals("source text", tu1.getSource().getContent().toString(), doc1.getField(TranslationUnitField.SOURCE_EXACT.name()).stringValue());
-        assertEquals("target text", tu1.getTarget().getContent().toString(), doc1.getField(TranslationUnitField.TARGET.name()).stringValue());
-        assertEquals("target text", tu2.getTarget().getContent().toString(), doc2.getField(TranslationUnitField.TARGET.name()).stringValue());
+        assertEquals("source text", tu1.getSource().getContent().toText(), doc1.getField(TranslationUnitField.SOURCE_EXACT.name()).stringValue());
+        assertEquals("target text", tu1.getTarget().getContent().toText(), doc1.getField(TranslationUnitField.TARGET.name()).stringValue());
+        assertEquals("target text", tu2.getTarget().getContent().toText(), doc2.getField(TranslationUnitField.TARGET.name()).stringValue());
     }
 
     @Test(expected = IllegalArgumentException.class)

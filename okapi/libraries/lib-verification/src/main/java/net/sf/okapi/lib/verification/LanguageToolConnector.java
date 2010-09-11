@@ -115,7 +115,7 @@ public class LanguageToolConnector {
 				String msg = error.getAttribute("msg");
 				if ( mt != null ) {
 					if ( mt.query(msg) > 0 ) {
-						msg = String.format("%s  (--> %s)", msg, mt.next().target.toString());
+						msg = String.format("%s  (--> %s)", msg, mt.next().target.toText());
 					}
 				}
 				int start = Integer.valueOf(error.getAttribute("fromx"));

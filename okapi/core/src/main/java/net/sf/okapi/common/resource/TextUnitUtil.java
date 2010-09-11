@@ -180,7 +180,7 @@ public class TextUnitUtil {
 									(parent.getName()==null ? "" : parent.getName()));
 							}
 							LOGGER.warning(msg);
-							LOGGER.info(String.format("Source='%s'\nTarget='%s'", oriSrc.toString(), newTrg.toString()));
+							LOGGER.info(String.format("Source='%s'\nTarget='%s'", oriSrc.toText(), newTrg.toText()));
 						}
 					}
 				}
@@ -218,7 +218,7 @@ public class TextUnitUtil {
 		if (skelTF == null)
 			return;
 
-		st = skelTF.toString();
+		st = skelTF.toText();
 		if (!Util.isEmpty(st))
 			skel.append(st); // Codes get removed
 	}
@@ -263,7 +263,7 @@ public class TextUnitUtil {
 		if (skelTF == null)
 			return;
 
-		st = skelTF.toString();
+		st = skelTF.toText();
 		if (!Util.isEmpty(st))
 			skel.append(st); // Codes get removed
 	}

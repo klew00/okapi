@@ -793,7 +793,7 @@ public class Aligner {
 		boolean useGeneric = chkShowInlineCodes.getSelection();
 		for ( Segment seg : target.getSegments() ) {
 			if ( useGeneric ) trgList.add(genericCont.setContent(seg.text).toString());
-			else trgList.add(seg.text.toString());
+			else trgList.add(seg.text.toText());
 		}
 		if (( trgList.getItemCount() > 0 ) && ( selection < trgList.getItemCount() )) 
 			trgList.setSelection(selection);
@@ -1280,8 +1280,8 @@ public class Aligner {
 			mtQuery.query(oriFrag);
 			String text;
 			if ( mtQuery.hasNext() ) {
-				text = "Original segment:\n" + oriFrag.toString()
-					+ "\n\nPossible translation:\n" + mtQuery.next().target.toString();
+				text = "Original segment:\n" + oriFrag.toText()
+					+ "\n\nPossible translation:\n" + mtQuery.next().target.toText();
 			}
 			else {
 				text = "No translation found for the select segment.";

@@ -18,13 +18,13 @@ public class Manual {
 		conn.query("The big red and blue car. This is a simple test");
 		if ( conn.hasNext() ) {
 			QueryResult qr = conn.next();
-			System.out.println("\n"+qr.source.toString()+"\n"+qr.target.toString());
+			System.out.println("\n"+qr.source.toText()+"\n"+qr.target.toText());
 		}
 		
 		conn.query("The <span id='1'>big</span> red and blue car. This <span id='2'>is a simple</span> test");
 		if ( conn.hasNext() ) {
 			QueryResult qr = conn.next();
-			System.out.println("\n"+qr.source.toString()+"\n"+qr.target.toString());
+			System.out.println("\n"+qr.source.toText()+"\n"+qr.target.toText());
 		}
 		
 		TextFragment tf = new TextFragment("The ");
@@ -36,7 +36,7 @@ public class Manual {
 		conn.query(tf);
 		if ( conn.hasNext() ) {
 			QueryResult qr = conn.next();
-			System.out.println("\n"+qr.source.toString()+"\n"+qr.target.toString());
+			System.out.println("\n"+qr.source.toText()+"\n"+qr.target.toText());
 		}
 	}
 

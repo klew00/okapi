@@ -342,7 +342,7 @@ public class TableFilterWriter implements IFilterWriter {
 			tmp = xliffFmt.setContent(frag).toString(true);
 			break;
 		default:
-			tmp = frag.toString();
+			tmp = frag.toText();
 			break;
 		}
 		if ( useDQ ) {

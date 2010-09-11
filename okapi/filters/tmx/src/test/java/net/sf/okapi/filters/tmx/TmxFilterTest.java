@@ -363,7 +363,7 @@ public class TmxFilterTest {
 		TextUnit tu = FilterTestDriver.getTextUnit(
 			getEvents(simpleSnippetWithDTD, locENUS, locFRFR), 2);
 		assertNotNull(tu);
-		assertEquals("Hello Universe!", tu.getSource().getFirstContent().toString());
+		assertEquals("Hello Universe!", tu.getSource().getFirstContent().toText());
 	}
 	
 	@Test

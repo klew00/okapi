@@ -23,6 +23,7 @@ package net.sf.okapi.common.resource;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -55,7 +56,7 @@ import java.util.regex.Pattern;
  * <li>changing a section of existing text to code with
  * {@link #changeToCode(int, int, TagType, String)}<ul>
  */
-public class TextFragment implements Appendable, Comparable<Object> {
+public class TextFragment implements Appendable, CharSequence, Comparable<Object> {
 	
 	/**
 	 * Special character marker for a opening inline code.
@@ -468,9 +469,11 @@ public class TextFragment implements Appendable, Comparable<Object> {
 	 * Appends a TextFragment object to this fragment. If the fragment is null,
 	 * it is ignored.
 	 * @param fragment the TextFragment to append.
+	 * @return this fragment.
 	 */
-	public void append (TextFragment fragment) {
+	public TextFragment append (TextFragment fragment) {
 		insert(-1, fragment);
+		return this;
 	}
 	
 	/**
@@ -922,6 +925,7 @@ public class TextFragment implements Appendable, Comparable<Object> {
 	 * You can use -1 for ending the section at the end of the fragment.
 	 * @return a new TextContainer object with a copy of the given sub-sequence.
 	 */
+	@Override
 	public TextFragment subSequence (int start,
 		int end)
 	{
@@ -1056,9 +1060,29 @@ public class TextFragment implements Appendable, Comparable<Object> {
 			}
 		}
 	}
+
+	private static final Logger LOGGER = Logger.getLogger(TextFragment.class.getName());
 	
+	/**
+	 * Gets the coded text for this fragment. This method returns the same data as {@link #getCodedText()}.
+	 * <p>Each code is represented by a placeholder made of two special characters.
+	 * To get the content with the codes expanded as their original data use {@link #toText()}.
+	 * @return the coded text for this fragment.
+	 */
 	@Override
 	public String toString () {
+		//throw new RuntimeException("***** CALL TO TOSTRING()");
+		LOGGER.warning("***** CALL TO TEXTFRAGMENT.TOSTRING");
+		return text.toString();
+	}
+	
+	/**
+	 * Returns the content of this fragment, including the original codes whenever
+	 * possible. To get the coded text for this fragment use {@link #getCodedText()}
+	 * or {@link #toString()}.
+	 * @return the content of this fragment.
+	 */
+	public String toText () {
 		if (( codes == null ) || ( codes.size() == 0 )) return text.toString();
 		if ( !isBalanced ) balanceMarkers();
 		StringBuilder tmp = new StringBuilder();
@@ -1066,13 +1090,7 @@ public class TextFragment implements Appendable, Comparable<Object> {
 		for ( int i=0; i<text.length(); i++ ) {
 			switch ( text.charAt(i) ) {
 			case MARKER_OPENING:
-				code = codes.get(toIndex(text.charAt(++i)));
-				tmp.append(code.data);
-				break;
 			case MARKER_CLOSING:
-				code = codes.get(toIndex(text.charAt(++i)));
-				tmp.append(code.data);
-				break;
 			case MARKER_ISOLATED:
 				code = codes.get(toIndex(text.charAt(++i)));
 				tmp.append(code.data);
@@ -1100,7 +1118,7 @@ public class TextFragment implements Appendable, Comparable<Object> {
 			return compareTo((TextFragment)object, false);
 		}
 		// Else, compare string representation
-		return toString().compareTo(object.toString());
+		return toText().compareTo(object.toString());
 	}
 
 	/**
@@ -1165,7 +1183,7 @@ public class TextFragment implements Appendable, Comparable<Object> {
 		// Store the length of the coded text before the operation
 		int before = text.length();
 		// Create the new code, using the text of the subsequence as the data
-		Code code = new Code(tagType, type, sub.toString());
+		Code code = new Code(tagType, type, sub.toText());
 		if ( codes == null ) codes = new ArrayList<Code>();
 		// Remove the section that will be code, this takes care of the codes too
 		remove(start, end);
@@ -1749,8 +1767,8 @@ public class TextFragment implements Appendable, Comparable<Object> {
 	 * each code is represented by a placeholder made of two characters regardless
 	 * of the size of the code. For example: If the fragment is "A[xy]B" and "[xy]" is a 
 	 * code, length() returns 4, not 6.
-	 * <p>To get the length of the content including codes use <code>{@link #toString()}.length()</code>.
-	 * Note that codes with referenced are not expanded by {@link #toString()}.
+	 * <p>To get the length of the content including codes use <code>{@link #toText()}.length()</code>.
+	 * Note that codes with referenced are not expanded by {@link #toText()}.
 	 * @return the number of character in the coded text of this fragment.
 	 */
 	public int length () {

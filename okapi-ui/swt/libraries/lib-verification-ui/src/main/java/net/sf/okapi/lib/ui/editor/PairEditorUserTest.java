@@ -422,6 +422,7 @@ public class PairEditorUserTest {
 	}
 	
 	private void displayPrevious () {
+long start = System.currentTimeMillis();
 		if ( current < 0 ) return;
 		if ( !saveCurrent() ) return;
 
@@ -437,9 +438,11 @@ public class PairEditorUserTest {
 			else getNewCurrent(--current, false); // Get previous text unit
 		}
 		displayCurrent();
+System.out.println(String.format("displayPrevious = %d", System.currentTimeMillis()-start));
 	}
 	
 	private void displayNext () {
+long start = System.currentTimeMillis();
 		if ( current < 0 ) return;
 		if ( !saveCurrent() ) return;
 
@@ -455,6 +458,7 @@ public class PairEditorUserTest {
 			else getNewCurrent(++current, true); // Get next text unit
 		}
 		displayCurrent();
+System.out.println(String.format("displayNext = %d", System.currentTimeMillis()-start));
 	}
 	
 	private void displayFirst () {

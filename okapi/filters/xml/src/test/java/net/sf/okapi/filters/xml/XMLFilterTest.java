@@ -375,7 +375,7 @@ public class XMLFilterTest {
 			+ "<doc><p><![CDATA[&=amp, <=lt, &#xaaa;=not-a-ncr]]></p></doc>";
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
-		assertEquals(tu.getSource().getFirstContent().toString(), "&=amp, <=lt, &#xaaa;=not-a-ncr");
+		assertEquals(tu.getSource().getFirstContent().toText(), "&=amp, <=lt, &#xaaa;=not-a-ncr");
 	}
 
 	@Test

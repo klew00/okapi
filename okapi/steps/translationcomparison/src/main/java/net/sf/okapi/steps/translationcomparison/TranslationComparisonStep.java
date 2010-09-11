@@ -363,7 +363,7 @@ public class TranslationComparisonStep extends BasePipelineStep {
 				writer.writeString("Src:");
 				writer.writeRawXML("</td>"); //$NON-NLS-1$
 				writer.writeRawXML("<td class='p'>"); //$NON-NLS-1$
-				writer.writeString(srcFrag.toString());
+				writer.writeString(srcFrag.toText());
 				writer.writeRawXML("</td></tr>\n"); //$NON-NLS-1$
 				writer.writeRawXML("<tr><td>"); //$NON-NLS-1$
 			}
@@ -371,20 +371,20 @@ public class TranslationComparisonStep extends BasePipelineStep {
 			writer.writeRawXML("</td>"); //$NON-NLS-1$
 			if ( srcFrag != null ) writer.writeRawXML("<td>"); //$NON-NLS-1$
 			else writer.writeRawXML("<td class='p'>"); //$NON-NLS-1$
-			writer.writeString(trgFrag1.toString());
+			writer.writeString(trgFrag1.toText());
 			writer.writeRawXML("</td></tr>"); //$NON-NLS-1$
 			// T2
 			writer.writeRawXML("<tr><td>"); //$NON-NLS-1$
 			writer.writeString(params.getDocument2Label()+":");
 			writer.writeRawXML("</td><td>"); //$NON-NLS-1$
-			writer.writeString(trgFrag2.toString());
+			writer.writeString(trgFrag2.toText());
 			writer.writeRawXML("</td></tr>"); //$NON-NLS-1$
 			// T3
 			if ( filter3 != null ) {
 				writer.writeRawXML("<tr><td>"); //$NON-NLS-1$
 				writer.writeString(params.getDocument3Label()+":");
 				writer.writeRawXML("</td><td>"); //$NON-NLS-1$
-				writer.writeString(trgFrag3.toString());
+				writer.writeString(trgFrag3.toText());
 				writer.writeRawXML("</td></tr>"); //$NON-NLS-1$
 			}
 			writer.writeRawXML("<tr><td>"); //$NON-NLS-1$

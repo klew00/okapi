@@ -46,8 +46,8 @@ public class Main {
 			mtConnector.query("Open the file");
 			if ( mtConnector.hasNext() ) {
 				res = mtConnector.next();
-				System.out.println("   Original: " + res.source.toString());
-				System.out.println("Translation: " + res.target.toString());
+				System.out.println("   Original: " + res.source.toText());
+				System.out.println("Translation: " + res.target.toText());
 			}
 
 			/* OpenTran (http://en.fr.open-tran.eu/) is a repository of translations
@@ -66,8 +66,8 @@ public class Main {
 			System.out.println(String.format("OpenTran-TM results for \"%s\":", query));
 			while ( connector.hasNext() ) {
 				res = connector.next();
-				System.out.println("- Source: " + res.source.toString());
-				System.out.println("  Target: " + res.target.toString());
+				System.out.println("- Source: " + res.source.toText());
+				System.out.println("  Target: " + res.target.toText());
 			}
 
 // Example with globalSight connector, for those who can access a GloablSight server

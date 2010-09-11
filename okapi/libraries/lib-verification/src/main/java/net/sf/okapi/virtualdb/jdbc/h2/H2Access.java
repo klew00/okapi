@@ -549,6 +549,7 @@ public class H2Access implements IDBAccess {
 	IVItem getItemFromExtractionId (H2Document doc,
 		String id)
 	{
+long start = System.currentTimeMillis();
 		try {
 			// Always left-join with the TUNS table so we get extra text unit info in one call
 			// This is ok because most calls are for text units.
@@ -557,7 +558,9 @@ public class H2Access implements IDBAccess {
 			ResultSet rs = pstmItemById.executeQuery();
 			// Return null if nothing found
 			if ( !rs.first() ) return null;
-			return fillItem(doc, rs);
+			IVItem it= fillItem(doc, rs);
+System.out.println(String.format("getItemFromExtractionId = %d", System.currentTimeMillis()-start));
+			return it;
 		}
 		catch ( Throwable e ) {
 			throw new RuntimeException("Error reading an item.\n"+e.getMessage());

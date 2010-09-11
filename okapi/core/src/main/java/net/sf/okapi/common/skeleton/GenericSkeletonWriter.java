@@ -425,7 +425,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 				if ( srcSeg == null ) {
 					// A target segment without a corresponding source: give warning
 					logger.warning(String.format("No source segment found for target segment id='%s':\n\"%s\".",
-						trgSeg.id, trgSeg.text.toString()));
+						trgSeg.id, trgSeg.text.toText()));
 				}
 
 				// Write the segment (note: srcSeg can be null)
@@ -696,19 +696,19 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		if ( !tf.hasCode() ) {
 			if ( encoderManager == null ) {
 				if ( layer == null ) {
-					return tf.toString();
+					return tf.toText();
 				}
 				else {
-					return layer.encode(tf.toString(), context);
+					return layer.encode(tf.toText(), context);
 				}
 			}
 			else {
 				if ( layer == null ) {
-					return encoderManager.encode(tf.toString(), context);
+					return encoderManager.encode(tf.toText(), context);
 				}
 				else {
 					return layer.encode(
-						encoderManager.encode(tf.toString(), context), context);
+						encoderManager.encode(tf.toText(), context), context);
 				}
 			}
 		}

@@ -183,7 +183,7 @@ public class PensieveWriter implements ITmWriter {
 
 	Field createField(TranslationUnitField field, TextFragment frag, Field.Store store,
 			Field.Index index) {
-		return new Field(field.name(), frag.toString(), store, index);
+		return new Field(field.name(), frag.toText(), store, index);
 	}
 
 	Field createField(TranslationUnitField field, TranslationUnitVariant tuv, Field.Store store,

@@ -135,7 +135,7 @@ public class TDASearchConnector implements ITMQuery {
 		results = new ArrayList<QueryResult>();
 		current = -1;
 		if ( !frag.hasText(false) ) return 0;
-		return doTDAQuery(qutil.separateCodesFromText(frag), frag.toString());
+		return doTDAQuery(qutil.separateCodesFromText(frag), frag.toText());
 	}
 	
 	@Override

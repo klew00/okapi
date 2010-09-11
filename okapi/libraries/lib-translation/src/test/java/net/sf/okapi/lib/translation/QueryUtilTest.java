@@ -43,22 +43,22 @@ public class QueryUtilTest {
 	public void testEmptyFragment () {
 		TextFragment tf = new TextFragment();
 		assertEquals("", qu.separateCodesFromText(tf));
-		assertEquals("", qu.createNewFragmentWithCodes("").toString());
+		assertEquals("", qu.createNewFragmentWithCodes("").toText());
 	}
 	
 	@Test
 	public void testFragmentWithoutCodes () {
 		TextFragment tf = new TextFragment("text");
 		assertEquals("text", qu.separateCodesFromText(tf));
-		assertEquals("new", qu.createNewFragmentWithCodes("new").toString());
+		assertEquals("new", qu.createNewFragmentWithCodes("new").toText());
 	}
 	
 	@Test
 	public void testFragmentWithCodes () {
 		TextFragment tf = makeFragment();
-		assertEquals("a & < > \" \' <b>bold</b> t <br/> z", tf.toString());
+		assertEquals("a & < > \" \' <b>bold</b> t <br/> z", tf.toText());
 		assertEquals("a & < > \" \' bold t  z", qu.separateCodesFromText(tf));
-		assertEquals("new<b></b><br/>", qu.createNewFragmentWithCodes("new").toString());
+		assertEquals("new<b></b><br/>", qu.createNewFragmentWithCodes("new").toText());
 	}
 	
 	@Test
@@ -85,7 +85,7 @@ public class QueryUtilTest {
 		String codedText = qu.fromCodedHTML(htmlText, tf);
 		codedText = codedText.toUpperCase();
 		TextFragment resFrag = new TextFragment(codedText, tf.getCodes());
-		assertEquals("A & < > \" \' <b>BOLD</b> T <br/> Z", resFrag.toString());
+		assertEquals("A & < > \" \' <b>BOLD</b> T <br/> Z", resFrag.toText());
 	}
 	
 	@Test
@@ -98,7 +98,7 @@ public class QueryUtilTest {
 		String codedText = qu.fromCodedHTML(htmlText, tf);
 		TextFragment resFrag = new TextFragment(codedText, tf.getCodes());
 		assertEquals("a <1>b</1> c<2/>", fmt.setContent(resFrag).toString());
-		assertEquals("a <b>b</b> c<br/>", resFrag.toString());
+		assertEquals("a <b>b</b> c<br/>", resFrag.toText());
 	}
 	
 	@Test
@@ -121,7 +121,7 @@ public class QueryUtilTest {
 		String codedText = qu.fromCodedHTML(htmlText, tf);
 		TextFragment resFrag = new TextFragment(codedText, tf.getCodes());
 		assertEquals("t1<2><3><1>t2</1></3>t3</2>", fmt.setContent(resFrag).toString());
-		assertEquals("t1<s><b><b>t2</b></b>t3</s>", resFrag.toString());
+		assertEquals("t1<s><b><b>t2</b></b>t3</s>", resFrag.toText());
 	}
 	
 	@Test
@@ -135,7 +135,7 @@ public class QueryUtilTest {
 		String codedText = qu.fromCodedHTML(htmlText, tf);
 		TextFragment resFrag = new TextFragment(codedText, tf.getCodes());
 		assertEquals("t1<2><1>t2</1>t3</2><3></3>", fmt.setContent(resFrag).toString());
-		assertEquals("t1<s><b>t2</b>t3</s><b></b>", resFrag.toString());
+		assertEquals("t1<s><b>t2</b>t3</s><b></b>", resFrag.toText());
 	}
 	
 	@Test
@@ -145,7 +145,7 @@ public class QueryUtilTest {
 		htmlText = htmlText + "&aacute;&amp;&#39;&#x0152;&apos;";
 		String codedText = qu.fromCodedHTML(htmlText, tf);
 		TextFragment resFrag = new TextFragment(codedText, tf.getCodes());
-		assertEquals("a & < > \" \' <b>bold</b> t <br/> z\u00e1&'\u0152'", resFrag.toString());
+		assertEquals("a & < > \" \' <b>bold</b> t <br/> z\u00e1&'\u0152'", resFrag.toText());
 	}
 	
 	private TextFragment makeFragment () {

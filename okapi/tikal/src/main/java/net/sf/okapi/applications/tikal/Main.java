@@ -920,8 +920,8 @@ public class Main {
 			while ( conn.hasNext() ) {
 				qr = conn.next();
 				ps.println(String.format("score: %d, origin: '%s'", qr.score, (qr.origin==null ? "" : qr.origin)));
-				ps.println(String.format("  Source: \"%s\"", qr.source.toString()));
-				ps.println(String.format("  Target: \"%s\"", qr.target.toString()));
+				ps.println(String.format("  Source: \"%s\"", qr.source.toText()));
+				ps.println(String.format("  Target: \"%s\"", qr.target.toText()));
 			}
 		}
 		else {

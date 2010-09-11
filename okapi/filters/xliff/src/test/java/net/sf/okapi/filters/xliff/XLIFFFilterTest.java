@@ -113,9 +113,9 @@ public class XLIFFFilterTest {
 		ISegments segments = cont.getSegments();
 		assertEquals("[t1.] [t2]", fmt.printSegmentedContent(cont, true));
 		assertEquals(2, segments.count());
-		assertEquals("t1.", segments.get(0).text.toString());
+		assertEquals("t1.", segments.get(0).text.toText());
 		assertEquals("i2", segments.get(1).id);
-		assertEquals("t2", segments.get(1).text.toString());
+		assertEquals("t2", segments.get(1).text.toText());
 		assertEquals("i2", segments.get(1).id);
 	}
 
@@ -141,11 +141,11 @@ public class XLIFFFilterTest {
 		ISegments segments = cont.getSegments();
 		assertEquals("[t1. t2]", fmt.printSegmentedContent(cont, true));
 		assertEquals(1, segments.count());
-		assertEquals("t1. t2", segments.get(0).text.toString());
+		assertEquals("t1. t2", segments.get(0).text.toText());
 		assertEquals("0", segments.get(0).id);
 		tu = FilterTestDriver.getTextUnit(getEvents(snippet, noInSegFilter), 2);
 		assertNotNull(tu);
-		assertEquals("t1. t2", segments.get(0).text.toString());
+		assertEquals("t1. t2", segments.get(0).text.toText());
 	}
 
 	@Test
@@ -167,8 +167,8 @@ public class XLIFFFilterTest {
 		assertNotNull(tu);
 		assertEquals("[t1.] [t2]", fmt.printSegmentedContent(cont, true));
 		assertEquals(2, segments.count());
-		assertEquals("t1.", segments.get(0).text.toString());
-		assertEquals("t2", segments.get(1).text.toString());
+		assertEquals("t1.", segments.get(0).text.toText());
+		assertEquals("t2", segments.get(1).text.toText());
 	}
 
 	@Test
@@ -391,8 +391,8 @@ public class XLIFFFilterTest {
 	public void testApprovedTU () {
 		TextUnit tu = FilterTestDriver.getTextUnit(createApprovedTU(), 1);
 		assertNotNull(tu);
-		assertEquals("t1", tu.getSource().getFirstContent().toString());
-		assertEquals("translated t1", tu.getTarget(locFR).getFirstContent().toString());
+		assertEquals("t1", tu.getSource().getFirstContent().toText());
+		assertEquals("translated t1", tu.getTarget(locFR).getFirstContent().toText());
 		Property prop = tu.getTargetProperty(locFR, Property.APPROVED);
 		assertNotNull(prop);
 		assertEquals("yes", prop.getValue());

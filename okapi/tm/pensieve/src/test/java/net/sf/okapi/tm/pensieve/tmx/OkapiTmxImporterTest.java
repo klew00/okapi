@@ -183,8 +183,8 @@ public class OkapiTmxImporterTest {
     public void sourceAndTargetForExistingLang() throws IOException {
         tmxImporter.importTmx(sampleTMX, locIT, mockTmWriter);
         ArgumentCaptor<TranslationUnit> tuCapture = verifyIndexTU();
-        assertEquals("first match source", "hello", tuCapture.getAllValues().get(0).getSource().getContent().toString());
-        assertEquals("first match target", "ciao", tuCapture.getAllValues().get(0).getTarget().getContent().toString());
+        assertEquals("first match source", "hello", tuCapture.getAllValues().get(0).getSource().getContent().toText());
+        assertEquals("first match target", "ciao", tuCapture.getAllValues().get(0).getTarget().getContent().toText());
     }
 
     @Test
@@ -192,7 +192,7 @@ public class OkapiTmxImporterTest {
         tmxImporter.importTmx(sampleTMX, locFR, mockTmWriter);
         ArgumentCaptor<TranslationUnit> tuCapture = verifyIndexTU();
         assertEquals("first match source", "hello",
-                tuCapture.getAllValues().get(0).getSource().getContent().toString());
+                tuCapture.getAllValues().get(0).getSource().getContent().toText());
         assertNull("target for non-existant language should be null",
                 tuCapture.getAllValues().get(0).getTarget().getContent());
     }

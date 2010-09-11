@@ -296,7 +296,7 @@ class QualityChecker {
 			srcOri = srcCont.toString();
 		}
 		else {
-			srcOri = srcCont.getUnSegmentedContentCopy().toString();
+			srcOri = srcCont.getUnSegmentedContentCopy().toText();
 		}
 		
 		String trgOri = null;
@@ -304,7 +304,7 @@ class QualityChecker {
 			trgOri = trgCont.toString();
 		}
 		else {
-			trgOri = trgCont.getUnSegmentedContentCopy().toString();
+			trgOri = trgCont.getUnSegmentedContentCopy().toText();
 		}
 
 		if ( params.getCorruptedCharacters() ) {

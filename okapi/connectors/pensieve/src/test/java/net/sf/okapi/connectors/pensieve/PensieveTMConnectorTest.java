@@ -137,8 +137,8 @@ public class PensieveTMConnectorTest {
 		assertTrue(connector.hasNext());
 		QueryResult qr = connector.next();
 		assertNotNull(qr);
-		assertEquals(input, qr.source.toString());
-		assertEquals("Les \u00e9l\u00e9phants ne peuvent pas voler.", qr.target.toString());
+		assertEquals(input, qr.source.toText());
+		assertEquals("Les \u00e9l\u00e9phants ne peuvent pas voler.", qr.target.toText());
 	}
 
 	@Test
@@ -165,8 +165,8 @@ public class PensieveTMConnectorTest {
 		connector.setThreshold(100);
 		assertTrue(connector.query(input) > 0);
 		QueryResult qr = connector.next();
-		assertEquals(input, qr.source.toString());
-		assertEquals("Les \u00e9l\u00e9phants ne peuvent pas voler.", qr.target.toString());
+		assertEquals(input, qr.source.toText());
+		assertEquals("Les \u00e9l\u00e9phants ne peuvent pas voler.", qr.target.toText());
 		assertEquals(100, qr.score);
 	}
 
@@ -176,8 +176,8 @@ public class PensieveTMConnectorTest {
 		connector.setThreshold(100);
 		assertTrue(connector.query(tf) > 0);
 		QueryResult qr = connector.next();
-		assertEquals(tf.toString(), qr.source.toString());
-		assertEquals("Les \u00e9l\u00e9phants <b>ne peuvent pas</b> voler.", qr.target.toString());
+		assertEquals(tf.toText(), qr.source.toText());
+		assertEquals("Les \u00e9l\u00e9phants <b>ne peuvent pas</b> voler.", qr.target.toText());
 		assertEquals(100, qr.score);
 	}
 

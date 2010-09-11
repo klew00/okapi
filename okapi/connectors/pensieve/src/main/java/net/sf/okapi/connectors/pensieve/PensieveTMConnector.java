@@ -203,7 +203,7 @@ public class PensieveTMConnector implements ITMQuery {
 			if ( !fragment.hasText(false) ) return 0;
 
 			//TODO: deal with inline codes
-			String qtext = fragment.toString();
+			String qtext = fragment.toText();
 			
 			// Create the connection and query
 			URL url = new URL(basePart + String.format("?q=%s", URLEncoder.encode(qtext, "UTF-8")));

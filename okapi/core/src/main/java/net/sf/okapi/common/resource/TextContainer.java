@@ -549,10 +549,10 @@ public class TextContainer implements Iterable<TextPart> {
 	@Override
 	public String toString () {
 		if ( parts.size() == 1 ) {
-			return parts.get(0).getContent().toString();
+			return parts.get(0).getContent().toText();
 		}
 		// Else: merge to a temporary content
-		return createJoinedContent(null).toString();
+		return createJoinedContent(null).toText();
 	}
 	
 	/**

@@ -64,7 +64,7 @@ public class TextPart {
 	@Override
 	public String toString () {
 		if ( text == null ) return null;
-		return text.toString();
+		return text.toText();
 	}
 
 	/**

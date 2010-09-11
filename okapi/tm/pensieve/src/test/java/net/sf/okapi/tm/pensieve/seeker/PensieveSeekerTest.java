@@ -110,8 +110,8 @@ public class PensieveSeekerTest {
             tus.add(tuIterator.next());
         }
         assertEquals("number of tus", 13, tus.size());
-        assertEquals("first document", "patents are evil0", tus.get(0).getSource().getContent().toString());
-        assertEquals("second document", "patents are evil1", tus.get(1).getSource().getContent().toString());
+        assertEquals("first document", "patents are evil0", tus.get(0).getSource().getContent().toText());
+        assertEquals("second document", "patents are evil1", tus.get(1).getSource().getContent().toText());
     }
 
     @Test
@@ -228,8 +228,8 @@ public class PensieveSeekerTest {
         writer.close();
         tmhits = seeker.searchFuzzy(new TextFragment(STR), 80, 10, null);
         assertEquals("number of docs found", 2, tmhits.size());
-        assertEquals("1st match", "watch out for the killer rabbit", tmhits.get(0).getTu().getSource().getContent().toString());
-        assertEquals("2nd match", "watch for the killer rabbit", tmhits.get(1).getTu().getSource().getContent().toString());
+        assertEquals("1st match", "watch out for the killer rabbit", tmhits.get(0).getTu().getSource().getContent().toText());
+        assertEquals("2nd match", "watch for the killer rabbit", tmhits.get(1).getTu().getSource().getContent().toText());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -262,8 +262,8 @@ public class PensieveSeekerTest {
         writer.close();
         tmhits = seeker.searchFuzzy(new TextFragment(STR), 80, 10, null);
         assertEquals("number of docs found", 2, tmhits.size());
-        assertEquals("1st match", "watch out for the killer rabbit", tmhits.get(0).getTu().getSource().getContent().toString());
-        assertEquals("2nd match", "watch for the killer rabbit", tmhits.get(1).getTu().getSource().getContent().toString());
+        assertEquals("1st match", "watch out for the killer rabbit", tmhits.get(0).getTu().getSource().getContent().toText());
+        assertEquals("2nd match", "watch for the killer rabbit", tmhits.get(1).getTu().getSource().getContent().toText());
     }
 
     @Test
@@ -283,8 +283,8 @@ public class PensieveSeekerTest {
         md.put(MetadataType.TYPE, "nachotype");
         tmhits = seeker.searchFuzzy(new TextFragment(STR), 80, 10, md);
         assertEquals("number of docs found", 2, tmhits.size());
-        assertEquals("1st match", "watch out for the killer rabbit", tmhits.get(0).getTu().getSource().getContent().toString());
-        assertEquals("2nd match", "watch for the killer rabbit", tmhits.get(1).getTu().getSource().getContent().toString());
+        assertEquals("1st match", "watch out for the killer rabbit", tmhits.get(0).getTu().getSource().getContent().toText());
+        assertEquals("2nd match", "watch for the killer rabbit", tmhits.get(1).getTu().getSource().getContent().toText());
     }
 
     @Test
@@ -305,14 +305,14 @@ public class PensieveSeekerTest {
         tmhits = seeker.searchFuzzy(new TextFragment(STR), 0, 10, null);
 
         assertEquals("number of docs found", 4, tmhits.size());
-        assertEquals("first match", testStrings[0], tmhits.get(0).getTu().getSource().getContent().toString());
+        assertEquals("first match", testStrings[0], tmhits.get(0).getTu().getSource().getContent().toText());
 
         //Verify sort order
         Float previous = tmhits.get(0).getScore();
 
         for (int i = 1; i < tmhits.size(); i++) {
             Float currentScore = tmhits.get(i).getScore();
-            assertEquals(i + " match", testStrings[i], tmhits.get(i).getTu().getSource().getContent().toString());
+            assertEquals(i + " match", testStrings[i], tmhits.get(i).getTu().getSource().getContent().toText());
             assertTrue("results should be sorted descending by score", currentScore < previous);
             previous = currentScore;
         }
@@ -463,7 +463,7 @@ public class PensieveSeekerTest {
     	
     	tmhits = seeker.searchExact(frag, null);
     	assertEquals("number of docs found", 1, tmhits.size());
-    	assertEquals("watch out for <b>the killer</b> rabbit", tmhits.get(0).getTu().getSource().getContent().toString());
+    	assertEquals("watch out for <b>the killer</b> rabbit", tmhits.get(0).getTu().getSource().getContent().toText());
     }
     
     @Test
@@ -483,7 +483,7 @@ public class PensieveSeekerTest {
     	frag = new TextFragment("watch out for the killer rabbit");
     	tmhits = seeker.searchExact(frag, null);
     	assertEquals("number of docs found", 1, tmhits.size());
-    	assertEquals("watch out for the killer rabbit", tmhits.get(0).getTu().getSource().getContent().toString());
+    	assertEquals("watch out for the killer rabbit", tmhits.get(0).getTu().getSource().getContent().toText());
     }
     
     @Test
@@ -504,8 +504,8 @@ public class PensieveSeekerTest {
     	
     	tmhits = seeker.searchFuzzy(frag, 5, 10, null);
     	assertEquals("number of docs found", 2, tmhits.size());
-    	assertEquals("watch out for <b>the killer</b> rabbit", tmhits.get(0).getTu().getSource().getContent().toString());
-    	assertEquals("watch out for the killer rabbit", tmhits.get(1).getTu().getSource().getContent().toString());
+    	assertEquals("watch out for <b>the killer</b> rabbit", tmhits.get(0).getTu().getSource().getContent().toText());
+    	assertEquals("watch out for the killer rabbit", tmhits.get(1).getTu().getSource().getContent().toText());
     }
     
     @Test
@@ -526,7 +526,7 @@ public class PensieveSeekerTest {
     	
     	tmhits = seeker.searchSimpleConcordance(" killer rabbits ", 70, 10, null);
     	assertEquals("number of docs found", 3, tmhits.size());
-    	assertEquals(str2, tmhits.get(0).getTu().getSource().getContent().toString());
+    	assertEquals(str2, tmhits.get(0).getTu().getSource().getContent().toText());
     }
     
     //TODO support metadata
@@ -548,9 +548,9 @@ public class PensieveSeekerTest {
         doc.add(new Field(TranslationUnitField.TARGET_LANG.name(), targetLang.toString(),
                 Field.Store.YES, Field.Index.ANALYZED));
         TranslationUnit tu = seeker.getTranslationUnit(doc);
-        assertEquals("source field", source, tu.getSource().getContent().toString());
+        assertEquals("source field", source, tu.getSource().getContent().toText());
         assertEquals("source lang", sourceLang, tu.getSource().getLanguage());
-        assertEquals("target field", target, tu.getTarget().getContent().toString());
+        assertEquals("target field", target, tu.getTarget().getContent().toText());
         assertEquals("target lang", targetLang, tu.getTarget().getLanguage());
     }
 

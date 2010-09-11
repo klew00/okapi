@@ -63,7 +63,7 @@ public class QueryManagerTest {
 		TextFragment newSrc = new TextFragment("src");
 		TextFragment newTrg = new TextFragment("trg");
 		qm.adjustNewFragment(tu.getSource().getSegments().getFirstContent(), newSrc, newTrg, 99, tu);
-		assertEquals(locTrg, newTrg.toString());
+		assertEquals(locTrg, newTrg.toText());
 	}
 
 	@Test
@@ -76,7 +76,7 @@ public class QueryManagerTest {
 		tf.append(" T ");
 		tf.append(TagType.PLACEHOLDER, "br", "<PH/>");
 		qm.adjustNewFragment(tu.getSource().getSegments().getFirstContent(), tf, tf, 99, tu);
-		assertEquals("T <b>BOLD</b> T <br/>", tf.toString());
+		assertEquals("T <b>BOLD</b> T <br/>", tf.toText());
 		fmt.setContent(tf);
 		assertEquals("T <1>BOLD</1> T <2/>", fmt.toString());
 	}
@@ -92,7 +92,7 @@ public class QueryManagerTest {
 		tf.append(TagType.PLACEHOLDER, "br", "<PH/>");
 		tf.append(TagType.PLACEHOLDER, "extra", "<EXTRA/>");
 		qm.adjustNewFragment(tu.getSource().getSegments().getFirstContent(), tf, tf, 99, tu);
-		assertEquals("T <b>BOLD</b> T <br/><EXTRA/>", tf.toString());
+		assertEquals("T <b>BOLD</b> T <br/><EXTRA/>", tf.toText());
 		fmt.setContent(tf);
 		assertEquals("T <1>BOLD</1> T <2/><3/>", fmt.toString());
 	}
@@ -107,7 +107,7 @@ public class QueryManagerTest {
 		tf.append(TagType.PLACEHOLDER, "br", "<PH/>");
 		tf.append(TagType.PLACEHOLDER, "extra", "<EXTRA/>");
 		qm.adjustNewFragment(tu.getSource().getSegments().getFirstContent(), tf, tf, 99, tu);
-		assertEquals("T <b>BOLD T <br/><EXTRA/>", tf.toString());
+		assertEquals("T <b>BOLD T <br/><EXTRA/>", tf.toText());
 		fmt.setContent(tf);
 		assertEquals("T <b1/>BOLD T <2/><3/>", fmt.toString());
 	}
@@ -123,7 +123,7 @@ public class QueryManagerTest {
 		tf.append(TagType.PLACEHOLDER, "br", "<br/>");
 		// Fuzzy match but codes are the same
 		qm.adjustNewFragment(tu.getSource().getFirstContent(), tf, tf, 88, tu);
-		assertEquals("U <b>BOLD</b> U <br/>", tf.toString());
+		assertEquals("U <b>BOLD</b> U <br/>", tf.toText());
 		assertEquals("U <1>BOLD</1> U <2/>", fmt.setContent(tf).toString());
 	}
 

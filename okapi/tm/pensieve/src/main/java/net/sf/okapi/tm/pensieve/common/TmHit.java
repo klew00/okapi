@@ -153,8 +153,8 @@ public class TmHit implements Comparable<TmHit> {
 		if (this == other)
 			return EQUAL;
 
-		String thisSource = this.tu.getSource().getContent().toString();
-		String otherSource = other.tu.getSource().getContent().toString();
+		String thisSource = this.tu.getSource().getContent().toText();
+		String otherSource = other.tu.getSource().getContent().toText();
 		
 		// only sort by match type if this or other is some kind of exact match
 		int comparison;
@@ -191,10 +191,10 @@ public class TmHit implements Comparable<TmHit> {
 
 		TmHit otherHit = (TmHit) other;
 		return (this.matchType == otherHit.getMatchType())
-				&& (this.tu.getSource().getContent().toString().equals(otherHit
-						.getTu().getSource().getContent().toString()))
-				&& (this.tu.getTarget().getContent().toString().equals(otherHit
-						.getTu().getTarget().getContent().toString()));
+				&& (this.tu.getSource().getContent().toText().equals(otherHit
+						.getTu().getSource().getContent().toText()))
+				&& (this.tu.getTarget().getContent().toText().equals(otherHit
+						.getTu().getTarget().getContent().toText()));
 	}
 
 	/**
@@ -205,9 +205,9 @@ public class TmHit implements Comparable<TmHit> {
 		int result = HashCodeUtil.SEED;
 		result = HashCodeUtil.hash(result, matchType);
 		result = HashCodeUtil.hash(result, tu.getSource().getContent()
-				.toString());
+				.toText());
 		result = HashCodeUtil.hash(result, tu.getTarget().getContent()
-				.toString());
+				.toText());
 		return result;
 	}
 	

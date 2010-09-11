@@ -691,7 +691,7 @@ public class QueryManager {
 					if ( !code.isDeleteable() ) {
 						logger.warning(String.format("The code id='%d' (%s) is missing in target (item id='%s', name='%s')",
 							code.getId(), code.getData(), parent.getId(), (parent.getName()==null ? "" : parent.getName())));
-						logger.info(String.format("Source='%s'\nTarget='%s'", oriSrc.toString(), newTrg.toString()));
+						logger.info(String.format("Source='%s'\nTarget='%s'", oriSrc.toText(), newTrg.toText()));
 					}
 				}
 			}

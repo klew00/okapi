@@ -61,9 +61,9 @@ public class PensieveUtilTest {
         textUnit.setTargetContent(LocaleId.fromString("kr"), new TextFragment("some great text in Korean"));
         TranslationUnit tu = PensieveUtil.convertToTranslationUnit(LocaleId.fromString("en"), LocaleId.fromString("kr"), textUnit);
         assertEquals("sourceLang", "en", tu.getSource().getLanguage().toString());
-        assertEquals("source content", "some great text", tu.getSource().getContent().toString());
+        assertEquals("source content", "some great text", tu.getSource().getContent().toText());
         assertEquals("targetLang", "kr", tu.getTarget().getLanguage().toString());
-        assertEquals("target content", "some great text in Korean", tu.getTarget().getContent().toString());
+        assertEquals("target content", "some great text in Korean", tu.getTarget().getContent().toText());
     }
 
     @Test
@@ -71,8 +71,8 @@ public class PensieveUtilTest {
         TranslationUnit tu = Helper.createTU(LocaleId.fromString("EN"), LocaleId.fromString("KR"), "bipity bopity boo", "something in korean", null);
         tu.setMetadataValue(MetadataType.GROUP_NAME, "groupie");
         TextUnit textUnit = PensieveUtil.convertToTextUnit(tu);
-        assertEquals("source content", "bipity bopity boo", textUnit.getSource().getFirstContent().toString());
-        assertEquals("target content", "something in korean", textUnit.getTarget(LocaleId.fromString("KR")).getFirstContent().toString());
+        assertEquals("source content", "bipity bopity boo", textUnit.getSource().getFirstContent().toText());
+        assertEquals("target content", "something in korean", textUnit.getTarget(LocaleId.fromString("KR")).getFirstContent().toText());
         assertEquals("tuid", null, textUnit.getId());
         assertEquals("name", null, textUnit.getName());
         assertEquals("group attribute", "groupie", textUnit.getProperty(MetadataType.GROUP_NAME.fieldName()).getValue());
@@ -83,8 +83,8 @@ public class PensieveUtilTest {
         TranslationUnit tu = Helper.createTU(LocaleId.fromString("EN"), LocaleId.fromString("KR"), "bipity bopity boo", "something in korean", "1");
         tu.setMetadataValue(MetadataType.GROUP_NAME, "groupie");
         TextUnit textUnit = PensieveUtil.convertToTextUnit(tu);
-        assertEquals("source content", "bipity bopity boo", textUnit.getSource().getFirstContent().toString());
-        assertEquals("target content", "something in korean", textUnit.getTarget(LocaleId.fromString("KR")).getFirstContent().toString());
+        assertEquals("source content", "bipity bopity boo", textUnit.getSource().getFirstContent().toText());
+        assertEquals("target content", "something in korean", textUnit.getTarget(LocaleId.fromString("KR")).getFirstContent().toText());
         assertEquals("tuid", "1", textUnit.getId());
         assertEquals("name", "1", textUnit.getName());
         assertEquals("group attribute", "groupie", textUnit.getProperty(MetadataType.GROUP_NAME.fieldName()).getValue());
