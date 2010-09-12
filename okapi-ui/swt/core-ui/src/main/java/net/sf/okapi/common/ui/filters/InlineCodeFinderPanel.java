@@ -23,6 +23,7 @@ package net.sf.okapi.common.ui.filters;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.InlineCodeFinder;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.TextFragment;
@@ -209,10 +210,7 @@ public class InlineCodeFinderPanel extends Composite {
 			public void widgetSelected(SelectionEvent e) {
 				//TODO: Implement real insert
 				//Dialogs.showError(getShell(), Res.getString("InlineCodeFinderPanel.8"), null); //$NON-NLS-1$
-				try {
-					UIUtil.start(new URL("http://java.sun.com/j2se/1.5.0/docs/api/java/util/regex/Pattern.html"));
-				}
-				catch ( MalformedURLException ignore ) {}
+				Util.openURL("http://java.sun.com/j2se/1.5.0/docs/api/java/util/regex/Pattern.html");
 			};
 		});
 		

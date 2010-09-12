@@ -25,6 +25,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import net.sf.okapi.common.IHelp;
+import net.sf.okapi.common.Util;
 
 /**
  * Default implementation of the {@link IHelp} interface.
@@ -74,7 +75,8 @@ public class BaseHelp implements IHelp {
 		if ( query != null ) path += ("?" + query); //$NON-NLS-1$
 		// Call the URL
 		try {
-			UIUtil.start(new URL(path));
+			Util.openURL(new URL(path).toString());
+			//UIUtil.start(new URL(path));
 		}
 		catch ( MalformedURLException e ) {
 			e.printStackTrace();

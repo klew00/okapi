@@ -56,15 +56,16 @@ public class UIUtil {
 		Program.launch(command);
 	}
 
-	/**
-	 * Finds the browser for this system and invoke it with a given URL.
-	 * @param url URL of the resource to open with its associated program (can be a file) 
-	 */
-	static public void start (URL url) {
-		if ( url == null ) return;
-		Program p = Program.findProgram(".html");
-		if ( p!=null ) p.execute(url.toString());
-	}
+	// Use Util.openURL() instead: works better across platforms.
+//	/**
+//	 * Finds the browser for this system and invoke it with a given URL.
+//	 * @param url URL of the resource to open with its associated program (can be a file) 
+//	 */
+//	static public void start (URL url) {
+//		if ( url == null ) return;
+//		Program p = Program.findProgram(".html");
+//		if ( p!=null ) p.execute(url.toString());
+//	}
 	
 	/**
 	 * Executes a given program with a given parameter.
