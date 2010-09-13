@@ -308,7 +308,8 @@ public class Reconciler extends AbstractLexer {
 		}
 		
 		for (Integer key : sameScoreMap.keySet()) {
-			
+			//System.out.println(key);
+			if (!Util.checkIndex(key, tokens)) continue;
 			Token token = tokens.get(key);
 			if (token == null) continue;
 			if (token.isDeleted()) continue;
@@ -328,6 +329,7 @@ public class Reconciler extends AbstractLexer {
 			int size = 0;
 			for (Integer index : list) {
 				
+				if (!Util.checkIndex(index, tokens)) continue;
 				Token token = tokens.get(index);
 				if (token == null) continue;
 				if (token.isDeleted()) continue;
@@ -348,6 +350,7 @@ public class Reconciler extends AbstractLexer {
 		// Step 3. Fix same-score groups
 		for (Integer index : sameScoreMap.keySet()) {
 			
+			if (!Util.checkIndex(index, tokens)) continue;
 			Token token = tokens.get(index);
 			if (token == null) continue;
 			//if (token.isDeleted()) continue;

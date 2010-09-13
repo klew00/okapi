@@ -21,7 +21,6 @@
 package net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder;
 
 import java.net.URI;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
