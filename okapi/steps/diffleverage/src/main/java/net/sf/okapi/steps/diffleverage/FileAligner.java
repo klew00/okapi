@@ -1,6 +1,5 @@
 package net.sf.okapi.steps.diffleverage;
 
-import java.io.File;
 import java.net.URI;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -9,8 +8,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * Take to lists of file paths and align them so that files with the same name
- * and paths match.
+ * Take to lists of file paths and align them so that files with the same name and paths match.
  * 
  * @author HARGRAVEJE
  * @param <T>
@@ -18,34 +16,50 @@ import java.util.TreeMap;
  */
 public class FileAligner<T> implements Iterable<FileAlignment<T>> {
 	private List<FileLikeThing<T>> newFiles;
-	private List<FileLikeThing<T>> oldFiles;	
 	private URI newRootUri;
-	private URI oldRootUri;
-	private Map<String, FileLikeThing<T>> filesMappedToFileName;
+	private Map<String, FileLikeThing<T>> oldSrcFilesMap;
+	private Map<String, FileLikeThing<T>> oldTrgFilesMap;
 	private List<FileAlignment<T>> alignedFiles;
 
+	public FileAligner(List<FileLikeThing<T>> newFiles, List<FileLikeThing<T>> oldSrcFiles, List<FileLikeThing<T>> oldTrgFiles,
+			URI newRootUri, URI oldSrcRootUri, URI oldTrgRootUri) {
+		this(newFiles, oldSrcFiles, newRootUri, oldSrcRootUri);
+		
+		oldTrgFilesMap = new TreeMap<String, FileLikeThing<T>>();
+
+		// put old files into our sorted map
+		for (FileLikeThing<T> f : oldTrgFiles) {
+			String key = getRealtivePath(f.getPath(), oldTrgRootUri);
+			if (oldTrgFilesMap.containsKey(key)) {
+				// FIXME: somehow we have a duplicate, throw an exception for now
+				throw new RuntimeException("Duplicate path entry: " + key);
+			} else {
+				oldTrgFilesMap.put(key, f);
+			}
+		}
+
+	}
+	
 	/**
 	 * 
 	 * @param newFiles
 	 * @param oldFiles
 	 */
-	public FileAligner(List<FileLikeThing<T>> newFiles,
-			List<FileLikeThing<T>> oldFiles, URI newRootUri, URI oldRootUri) {
+	public FileAligner(List<FileLikeThing<T>> newFiles, List<FileLikeThing<T>> oldSrcFiles,
+			URI newRootUri, URI oldSrcRootUri) {
 		this.newFiles = newFiles;
-		this.oldFiles = oldFiles;		
 		this.newRootUri = newRootUri;
-		this.oldRootUri = oldRootUri;
 
-		filesMappedToFileName = new TreeMap<String, FileLikeThing<T>>();
+		oldSrcFilesMap = new TreeMap<String, FileLikeThing<T>>();
 
 		// put old files into our sorted map
-		for (FileLikeThing<T> f : oldFiles) {
-			String key = getRealtivePath(f.getPath(), oldRootUri);
-			if (filesMappedToFileName.containsKey(key)) {
+		for (FileLikeThing<T> f : oldSrcFiles) {
+			String key = getRealtivePath(f.getPath(), oldSrcRootUri);
+			if (oldSrcFilesMap.containsKey(key)) {
 				// FIXME: somehow we have a duplicate, throw an exception for now
-				throw new RuntimeException("Duplicate path entry");
+				throw new RuntimeException("Duplicate path entry: " + key);
 			} else {
-				filesMappedToFileName.put(key, f);
+				oldSrcFilesMap.put(key, f);
 			}
 		}
 	}
@@ -54,9 +68,14 @@ public class FileAligner<T> implements Iterable<FileAlignment<T>> {
 		alignedFiles = new LinkedList<FileAlignment<T>>();
 		for (FileLikeThing<T> f : newFiles) {
 			String key = getRealtivePath(f.getPath(), newRootUri);
-			FileLikeThing<T> o = filesMappedToFileName.get(key);
+			FileLikeThing<T> o = oldSrcFilesMap.get(key);
 			if (o != null) {
-				alignedFiles.add(new FileAlignment<T>(f, o));
+				if (oldTrgFilesMap != null) {
+					FileLikeThing<T> t = oldTrgFilesMap.get(key);
+					alignedFiles.add(new FileAlignment<T>(f, o, t));
+				} else {
+					alignedFiles.add(new FileAlignment<T>(f, o));
+				}
 			}
 		}
 	}
@@ -65,10 +84,15 @@ public class FileAligner<T> implements Iterable<FileAlignment<T>> {
 		return alignedFiles.iterator();
 	}
 
+	public List<FileAlignment<T>> getAlignments() {
+		return alignedFiles;
+	}
+
 	/*
 	 * Return path minus the root
 	 */
-	private String getRealtivePath(URI path, URI root) {
-		return path.relativize(root).toString();
+	public static String getRealtivePath(URI path, URI root) {
+		String r = path.relativize(root).toString();
+		return path.toString().replaceFirst(r, "");
 	}
 }

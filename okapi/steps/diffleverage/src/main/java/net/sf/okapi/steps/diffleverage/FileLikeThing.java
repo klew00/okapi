@@ -25,4 +25,9 @@ public class FileLikeThing<T> {
 	public T getFileLikeThing() {
 		return fileLikeThing;
 	}	
+	
+	@Override
+	public String toString() {
+		return path.toString();
+	}
 }
