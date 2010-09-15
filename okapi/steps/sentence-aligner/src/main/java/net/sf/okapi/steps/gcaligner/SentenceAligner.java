@@ -67,12 +67,6 @@ public class SentenceAligner {
 	private TextUnit alignSegments(TextUnit sourceParagraph, TextUnit targetParagraph,
 			LocaleId srcLocale, LocaleId trgLocale, SegmentAlignmentFunction alignmentFunction) {
 
-		// make sure the paragraphs have been segmented
-		if (!(sourceParagraph.getSource().hasBeenSegmented() || targetParagraph.getSource()
-				.hasBeenSegmented())) {
-			throw new OkapiBadStepInputException("Source and target TextUnits must be segmented.");
-		}
-
 		// To prevent OutOfMemory exception, simply don't perform the
 		// alignment for a block with a lot of segments. TEMPORARY FIX
 		if (sourceParagraph.getSource().getSegments().count()
@@ -118,12 +112,6 @@ public class SentenceAligner {
 
 	private TextUnit alignSegments(TextUnit bilingualParagraph, LocaleId srcLocale,
 			LocaleId trgLocale, SegmentAlignmentFunction alignmentFunction) {
-
-		// make sure the paragraphs have been segmented
-		if (!(bilingualParagraph.getSource().hasBeenSegmented() || bilingualParagraph.getTarget(
-				trgLocale).hasBeenSegmented())) {
-			throw new OkapiBadStepInputException("Source and target TextUnits must be segmented.");
-		}
 
 		// To prevent OutOfMemory exception, simply don't perform the
 		// alignment for a block with a lot of segments. TEMPORARY FIX
