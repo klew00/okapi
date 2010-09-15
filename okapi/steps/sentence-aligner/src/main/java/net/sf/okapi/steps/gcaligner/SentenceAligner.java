@@ -25,7 +25,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.exceptions.OkapiBadStepInputException;
 import net.sf.okapi.common.resource.AlignedPair;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextPart;
