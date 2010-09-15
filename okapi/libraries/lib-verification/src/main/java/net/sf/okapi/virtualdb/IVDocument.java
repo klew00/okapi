@@ -45,6 +45,13 @@ public interface IVDocument extends IVSet {
 	public IVItem getItem (String extractionId);
 	
 	/**
+	 * Gets the item for a given key.
+	 * @param key the key for the item to retrieve.
+	 * @return the item retrieved for the given key.
+	 */
+	public IVItem getItem (long key);
+	
+	/**
 	 * Gets the virtual text unit for a given extraction id.
 	 * @param extractionId the extraction id of the text unit to retrieve.
 	 * @return the virtual text unit for a given extraction id.

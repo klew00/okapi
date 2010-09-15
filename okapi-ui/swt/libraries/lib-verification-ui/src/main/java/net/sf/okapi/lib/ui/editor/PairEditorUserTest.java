@@ -93,7 +93,7 @@ public class PairEditorUserTest {
 	private String outPath;
 	private int TUCount;
 	private ArrayList<TextUnit> textUnits = new ArrayList<TextUnit>();
-	private ArrayList<String> ids = new ArrayList<String>();
+	private ArrayList<Long> keys = new ArrayList<Long>();
 	private IVRepository repo;
 	private IVDocument vdoc;
 	private IVTextUnit vtu;
@@ -294,11 +294,11 @@ public class PairEditorUserTest {
 				// Import new one
 				repo.importDocument(rawDoc);
 				vdoc = repo.getFirstDocument();
-				ids = new ArrayList<String>();
+				keys = new ArrayList<Long>();
 				for ( IVTextUnit vtu : vdoc.textUnits() ) {
-					ids.add(vtu.getId());
+					keys.add(vtu.getKey());
 				}
-				TUCount = ids.size();
+				TUCount = keys.size();
 			}
 			else {
 				textUnits = new ArrayList<TextUnit>();
@@ -349,7 +349,7 @@ public class PairEditorUserTest {
 			
 			// Get the text unit
 			if ( useRepository ) {
-				vtu = (IVTextUnit)vdoc.getItem(ids.get(index));
+				vtu = (IVTextUnit)vdoc.getItem(keys.get(index));
 				tu = vtu.getTextUnit();
 			}
 			else {
@@ -543,7 +543,7 @@ System.out.println(String.format("displayNext = %d", System.currentTimeMillis()-
 					TextUnit oriTU = event.getTextUnit();
 					TextUnit updTU;
 					if ( useRepository ) {
-						IVTextUnit updVTU = (IVTextUnit)vdoc.getItem(ids.get(tuIndex));
+						IVTextUnit updVTU = (IVTextUnit)vdoc.getItem(keys.get(tuIndex));
 						updTU = updVTU.getTextUnit();
 					}
 					else {

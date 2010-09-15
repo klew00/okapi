@@ -63,5 +63,9 @@ class H2Navigator {
 	public ItemType getItemType () {
 		return itemType;
 	}
+	
+	public long getKey () {
+		return key;
+	}
 
 }

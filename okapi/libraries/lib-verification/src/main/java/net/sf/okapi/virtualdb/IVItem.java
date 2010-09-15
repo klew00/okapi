@@ -36,6 +36,12 @@ public interface IVItem {
 	public String getId ();
 	
 	/**
+	 * Gets the storage key for this item. This key is unique for each virtual repository.
+	 * @return the key for this item.
+	 */
+	public long getKey ();
+	
+	/**
 	 * Gets the resource name of this item. This name depends on the type of item and can be null.
 	 * @return the resource name of the item (can be null).
 	 */

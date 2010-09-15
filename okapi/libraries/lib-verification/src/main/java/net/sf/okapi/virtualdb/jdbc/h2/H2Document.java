@@ -77,6 +77,11 @@ public class H2Document extends H2Navigator implements IVDocument {
 	}
 
 	@Override
+	public IVItem getItem (long key) {
+		return db.getItemFromItemKey(this, key);
+	}
+
+	@Override
 	public StartDocument getStartDocument () {
 		throw new UnsupportedOperationException("getStartDocument");
 	}

@@ -27,8 +27,7 @@ import net.sf.okapi.virtualdb.IVTextUnit;
 
 public class H2TextUnit implements IVTextUnit {
 
-	long itemKey;
-
+	private long itemKey;
 	private H2Document doc;
 	private long parent;
 	private long previous;
@@ -126,6 +125,11 @@ public class H2TextUnit implements IVTextUnit {
 	@Override
 	public String getType () {
 		return tu.getType();
+	}
+
+	@Override
+	public long getKey () {
+		return itemKey;
 	}
 
 }

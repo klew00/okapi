@@ -110,4 +110,9 @@ public class H2Set implements IVSet {
 		// No modifiable data to save
 	}
 
+	@Override
+	public long getKey () {
+		return -1L; // TODO
+	}
+
 }

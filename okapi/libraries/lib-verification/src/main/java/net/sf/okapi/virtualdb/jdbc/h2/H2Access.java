@@ -527,7 +527,7 @@ public class H2Access implements IDBAccess {
 			String[] trgData = targetsToStorage(htu.getTextUnit());
 			pstm.setString(1, trgData[0]); // Targets coded-text
 			pstm.setString(2, trgData[1]); // Targets codes
-			pstm.setLong(3, htu.itemKey);
+			pstm.setLong(3, htu.getKey());
 			pstm.execute();
 		}
 		catch ( SQLException e ) {
@@ -549,7 +549,6 @@ public class H2Access implements IDBAccess {
 	IVItem getItemFromExtractionId (H2Document doc,
 		String id)
 	{
-long start = System.currentTimeMillis();
 		try {
 			// Always left-join with the TUNS table so we get extra text unit info in one call
 			// This is ok because most calls are for text units.
@@ -559,7 +558,6 @@ long start = System.currentTimeMillis();
 			// Return null if nothing found
 			if ( !rs.first() ) return null;
 			IVItem it= fillItem(doc, rs);
-System.out.println(String.format("getItemFromExtractionId = %d", System.currentTimeMillis()-start));
 			return it;
 		}
 		catch ( Throwable e ) {
