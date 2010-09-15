@@ -54,7 +54,7 @@ import java.util.regex.Pattern;
 /**
  * Collection of various all-purpose helper functions.
  */
-public class Util {
+public final class Util {
 		
 	/**
 	 * Enumeration of supported OS's	 	 
@@ -186,7 +186,7 @@ public class Util {
 		};
 		return dir.list(filter);
 	}
-
+	
 	/**
 	 * Creates the directory tree for the give full path (dir+filename)
 	 * 
