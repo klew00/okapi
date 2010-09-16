@@ -28,7 +28,104 @@ import net.sf.okapi.common.Util;
 /**
  * Helper methods to manipulate strings.
  */
-public class StringUtil {
+public final class StringUtil {
+	
+	/**
+	 * edit distance trace back class
+	 * @author HargraveJE
+	 *
+	 */
+	private static class TraceBack {
+		public int i;
+		public int j;
+
+		public TraceBack(int i, int j) {
+			this.i = i;
+			this.j = j;
+		}
+	}
+	
+	private static int max(int x1, int x2) {
+		return (x1 > x2 ? x1 : x2);
+	}
+
+	private static int max(int x1, int x2, int x3, int x4) {
+		return max(max(x1, x2), max(x3, x4));
+	}
+
+	private static TraceBack next(TraceBack tb, TraceBack[][] tba) {
+		TraceBack tb2 = tb;
+		return tba[tb2.i][tb2.j];
+	}
+	
+	private static float calculateDiceCoefficient(int intersection, int size1, int size2) {
+		return (float) ((2.0f * (float) intersection)) / (float) (size1 + size2) * 100.0f;
+	}
+	
+	/**
+	 * Longest Common Subsequence algorithm on {@link CharSequence}s.
+	 * 
+	 * @param seq1
+	 *            {@link CharSequence} one
+	 * @param seq2
+	 *            {@link CharSequence} two
+	 * @return the score based on the length of the common subsequence and the input sequences
+	 */
+	public static float LcsEditDistance(CharSequence seq1, CharSequence seq2) {
+		int matches = 0;
+		int d = 1;
+		int n = seq1.length(), m = seq2.length();
+		int[][] F = new int[n + 1][m + 1]; // Accumulate scores
+		TraceBack[][] T = new TraceBack[n + 1][m + 1]; // path traceback
+		int s = 0;
+		int maxi = n, maxj = m;
+		int maxval = Integer.MIN_VALUE;
+		TraceBack start;
+
+		for (int i = 1; i <= n; i++) {
+			for (int j = 1; j <= m; j++) {
+				s = 0;
+				if (seq1.charAt(i - 1) == seq2.charAt(j - 1))
+					s = 2;
+
+				int val = max(0, F[i - 1][j - 1] + s, F[i - 1][j] - d, F[i][j - 1] - d);
+				F[i][j] = val;
+				if (val == 0) {
+					T[i][j] = null;
+				}
+				else if (val == F[i - 1][j - 1] + s) {
+					T[i][j] = new TraceBack(i - 1, j - 1);
+				}
+				else if (val == F[i - 1][j] - d) {
+					T[i][j] = new TraceBack(i - 1, j);
+				}
+				else if (val == F[i][j - 1] - d) {
+					T[i][j] = new TraceBack(i, j - 1);
+				}
+				if (val > maxval) {
+					maxval = val;
+					maxi = i;
+					maxj = j;
+				}
+			}
+		}
+		start = new TraceBack(maxi, maxj);
+
+		// retrace the optimal path and calculate score
+		matches = 0;
+		TraceBack tb = start;
+		int i = tb.i;
+		int j = tb.j;
+		while ((tb = next(tb, T)) != null) {
+			i = tb.i;
+			j = tb.j;
+			if (seq1.charAt(i) == seq2.charAt(j)) {
+				matches++;
+			}
+		}
+		
+		return calculateDiceCoefficient(matches, seq1.length(), seq2.length());
+	}
 
 	// String formatting
 	
