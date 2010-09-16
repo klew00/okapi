@@ -62,10 +62,10 @@ import net.sf.okapi.lib.search.lucene.scorer.Util;
 public class DiffLeverageStep extends BasePipelineStep {
 	private static final int NGRAM_SIZE = 3;
 
-	private Parameters params;
-	private IFilter filter;
+	private Parameters params;	
 	private IFilterConfigurationMapper fcMapper;
-	private RawDocument targetInput;
+	private RawDocument oldSource;
+	private RawDocument oldTarget;
 	private List<TextUnit> newTextUnits;
 	private List<TextUnit> oldTextUnits;
 	private List<Event> newDocumentEvents;
@@ -113,7 +113,12 @@ public class DiffLeverageStep extends BasePipelineStep {
 	 */
 	@StepParameterMapping(parameterType = StepParameterType.SECOND_INPUT_RAWDOC)
 	public void setSecondInput(final RawDocument secondInput) {
-		targetInput = secondInput;
+		this.oldSource = secondInput;
+	}
+	
+	@StepParameterMapping(parameterType = StepParameterType.THIRD_INPUT_RAWDOC)
+	public void setTertiaryInput (RawDocument tertiaryInput) {
+		this.oldTarget = tertiaryInput;
 	}
 
 	@Override
@@ -167,7 +172,7 @@ public class DiffLeverageStep extends BasePipelineStep {
 	@Override
 	protected Event handleStartDocument(final Event event) {
 		// test if we have an alignment at the document level
-		if (targetInput != null) {
+		if (oldSource != null) {
 			done = false;
 			// intialize buffers for a new document
 			newTextUnits = new ArrayList<TextUnit>();
@@ -183,7 +188,7 @@ public class DiffLeverageStep extends BasePipelineStep {
 	@Override
 	protected Event handleEndDocument(final Event event) {
 		done = true;
-		if (targetInput != null) {
+		if (oldSource != null) {
 			// diff and leverage (copy target segments) the old and new lists of TextUnits
 			diffLeverage();
 
@@ -207,7 +212,7 @@ public class DiffLeverageStep extends BasePipelineStep {
 
 	@Override
 	protected Event handleStartSubDocument(final Event event) {
-		if (targetInput != null) {
+		if (oldSource != null) {
 			newDocumentEvents.add(event);
 			return Event.NOOP_EVENT;
 		} else {
@@ -217,7 +222,7 @@ public class DiffLeverageStep extends BasePipelineStep {
 
 	@Override
 	protected Event handleEndSubDocument(final Event event) {
-		if (targetInput != null) {
+		if (oldSource != null) {
 			newDocumentEvents.add(event);
 			return Event.NOOP_EVENT;
 		} else {
@@ -227,7 +232,7 @@ public class DiffLeverageStep extends BasePipelineStep {
 
 	@Override
 	protected Event handleStartGroup(final Event event) {
-		if (targetInput != null) {
+		if (oldSource != null) {
 			newDocumentEvents.add(event);
 			return Event.NOOP_EVENT;
 		} else {
@@ -237,7 +242,7 @@ public class DiffLeverageStep extends BasePipelineStep {
 
 	@Override
 	protected Event handleEndGroup(final Event event) {
-		if (targetInput != null) {
+		if (oldSource != null) {
 			newDocumentEvents.add(event);
 			return Event.NOOP_EVENT;
 		} else {
@@ -247,7 +252,7 @@ public class DiffLeverageStep extends BasePipelineStep {
 
 	@Override
 	protected Event handleTextUnit(final Event event) {
-		if (targetInput != null) {
+		if (oldSource != null) {
 			newTextUnits.add(event.getTextUnit());
 			newDocumentEvents.add(event);
 			return Event.NOOP_EVENT;
@@ -258,7 +263,7 @@ public class DiffLeverageStep extends BasePipelineStep {
 
 	@Override
 	protected Event handleDocumentPart(final Event event) {
-		if (targetInput != null) {
+		if (oldSource != null) {
 			newDocumentEvents.add(event);
 			return Event.NOOP_EVENT;
 		} else {
@@ -272,23 +277,54 @@ public class DiffLeverageStep extends BasePipelineStep {
 	}
 
 	private void getOldDocumentTextUnits() {
+		IFilter srcFilter = null;
+		IFilter trgFilter = null;
 		try {
+			
+			if (oldTarget != null) {
+				trgFilter = fcMapper.createFilter(oldSource.getFilterConfigId(), null);
+				// Open the tertiary input for this batch item (old target)
+				trgFilter.open(oldTarget);
+			}			
+			
 			// Initialize the filter to read the translation to compare
-			filter = fcMapper.createFilter(targetInput.getFilterConfigId(), null);
-			// Open the second input for this batch item
-			filter.open(targetInput);
+			srcFilter = fcMapper.createFilter(oldSource.getFilterConfigId(), null);
+			// Open the second input for this batch item (old source)
+			srcFilter.open(oldSource);
 
-			while (filter.hasNext()) {
-				final Event event = filter.next();
+			while (srcFilter.hasNext()) {
+				final Event event = srcFilter.next();
 				if (event.getEventType() == EventType.TEXT_UNIT) {
-					oldTextUnits.add(event.getTextUnit());
+					TextUnit tu = event.getTextUnit();
+					if (oldTarget != null) {
+						Event e = synchronize(trgFilter, EventType.TEXT_UNIT);							
+						tu.setTarget(targetLocale, e.getTextUnit().getSource());
+					}
+					oldTextUnits.add(tu);
 				}
 			}
 		} finally {
-			if (filter != null) {
-				filter.close();
+			if (srcFilter != null) {
+				srcFilter.close();
+			}			
+			if (trgFilter != null) {
+				trgFilter.close();
 			}
 		}
+	}
+	
+	private Event synchronize(IFilter filter, EventType untilType) {
+		boolean found = false;
+		Event event = null;
+		while (!found && filter.hasNext()) {
+			event = filter.next();
+			found = (event.getEventType() == untilType);
+		}
+		if (!found) {
+			throw new RuntimeException(
+					"Different number of source or target TextUnits. The source and target documents are not paragraph aligned.");
+		}
+		return event;
 	}
 
 	private void diffLeverage() {
