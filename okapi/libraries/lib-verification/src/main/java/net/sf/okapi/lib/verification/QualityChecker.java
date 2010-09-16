@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.okapi.common.ListUtil;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.Code;
@@ -317,7 +316,7 @@ class QualityChecker {
 			checkCharacters(srcOri, trgOri, tu);
 		}
 	}
-
+	
 	private void checkCharacters (String srcOri,
 		String trgOri,
 		TextUnit tu)

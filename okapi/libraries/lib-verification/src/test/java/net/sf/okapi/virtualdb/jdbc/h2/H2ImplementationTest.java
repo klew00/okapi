@@ -24,14 +24,19 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.Segment;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.virtualdb.IVDocument;
 import net.sf.okapi.virtualdb.IVItem;
 import net.sf.okapi.virtualdb.IVRepository;
+import net.sf.okapi.virtualdb.IVTextUnit;
+import net.sf.okapi.virtualdb.KeyAndSegId;
 import net.sf.okapi.virtualdb.IVItem.ItemType;
 import net.sf.okapi.virtualdb.jdbc.Repository;
 import net.sf.okapi.virtualdb.jdbc.h2.H2Access;
@@ -193,4 +198,98 @@ public class H2ImplementationTest {
 		repo.close();
 	}
 	
+	@Test
+	public void testSameSourceDifferentTarget () {
+		fcMapper = new FilterConfigurationMapper();
+		fcMapper.addConfigurations("net.sf.okapi.filters.xliff.XLIFFFilter");
+		// Create the repository object
+		H2Access acc = new H2Access(root, fcMapper);
+		IVRepository repo = new Repository(acc);
+		// Create the repository database
+		repo.create("myRepo");
+		// Import file
+		RawDocument rd = new RawDocument((new File(root+"/testWithDup.xlf")).toURI(), "UTF-8", locEN, locFR);
+		rd.setFilterConfigId("okf_xliff");
+		repo.importDocument(rd);
+		IVDocument vdoc = repo.getFirstDocument();
+		
+		List<List<KeyAndSegId>> list = acc.getSameSourceWithDifferentTarget();
+		assertEquals(2, list.size());
+		
+//		for ( List<Long> group : list ) {
+//			System.out.println("===");
+//			for ( long key : group ) {
+//				TextUnit y = ((IVTextUnit)vdoc.getItem(key)).getTextUnit();
+//				System.out.println(y.toString());
+//			}
+//		}
+
+		// "source text"
+		long key = list.get(0).get(0).key;
+		TextUnit tu = ((IVTextUnit)vdoc.getItem(key)).getTextUnit();
+		assertEquals("source text", tu.toString());
+		assertEquals(3, list.get(0).size());
+		
+		// "source text type 3"
+		key = list.get(1).get(0).key;
+		tu = ((IVTextUnit)vdoc.getItem(key)).getTextUnit();
+		assertEquals("source text type 3", tu.toString());
+		assertEquals(2, list.get(1).size());
+
+		repo.close();
+	}
+	
+	@Test
+	public void testSameSourceDifferentTarget_ForSegment () {
+		fcMapper = new FilterConfigurationMapper();
+		fcMapper.addConfigurations("net.sf.okapi.filters.xliff.XLIFFFilter");
+		// Create the repository object
+		H2Access acc = new H2Access(root, fcMapper);
+		IVRepository repo = new Repository(acc);
+		// Create the repository database
+		repo.create("myRepo");
+		// Import file
+		RawDocument rd = new RawDocument((new File(root+"/testWithDup.xlf")).toURI(), "UTF-8", locEN, locFR);
+		rd.setFilterConfigId("okf_xliff");
+		repo.importDocument(rd);
+		IVDocument vdoc = repo.getFirstDocument();
+		
+		List<List<KeyAndSegId>> list = acc.getSegmentsWithSameSourceButDifferentTarget(locFR);
+		assertEquals(3, list.size());
+		
+//		for ( List<KeyAndSegId> group : list ) {
+//			System.out.println("===");
+//			for ( KeyAndSegId tmp : group ) {
+//				TextUnit y = ((IVTextUnit)vdoc.getItem(tmp.key)).getTextUnit();
+//				System.out.println("---");
+//				for ( Segment seg : y.getSource().getSegments() ) {
+//					System.out.println(seg.toString());
+//				}
+//			}
+//		}
+
+		// "sourceA"
+		int index = 0;
+		KeyAndSegId ksid = list.get(index).get(0);
+		TextUnit tu = ((IVTextUnit)vdoc.getItem(ksid.key)).getTextUnit();
+		Segment seg = tu.getSource().getSegments().get(ksid.segId);
+		assertEquals("sourceA", seg.toString());
+		assertEquals(2, list.get(index).size());
+
+		// "source text type 3"
+		index = 1;
+		long key = list.get(index).get(0).key;
+		tu = ((IVTextUnit)vdoc.getItem(key)).getTextUnit();
+		assertEquals("source text type 3", tu.toString());
+		assertEquals(2, list.get(index).size());
+
+		// "source text"
+		index = 2;
+		key = list.get(index).get(0).key;
+		tu = ((IVTextUnit)vdoc.getItem(key)).getTextUnit();
+		assertEquals("source text", tu.toString());
+		assertEquals(3, list.get(index).size());
+
+		repo.close();
+	}	
 }

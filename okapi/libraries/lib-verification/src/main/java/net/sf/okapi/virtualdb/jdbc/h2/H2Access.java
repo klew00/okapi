@@ -30,20 +30,25 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.resource.INameable;
+import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.virtualdb.IVDocument;
 import net.sf.okapi.virtualdb.IVItem;
+import net.sf.okapi.virtualdb.KeyAndSegId;
 import net.sf.okapi.virtualdb.IVItem.ItemType;
 import net.sf.okapi.virtualdb.jdbc.IDBAccess;
 
@@ -88,6 +93,14 @@ public class H2Access implements IDBAccess {
 	public static final String TUNS_CODES = "CODES";
 	public static final String TUNS_TRGCTEXT = "TRGCTEXT";
 	public static final String TUNS_TRGCODES = "TRGCODES";
+
+	// Temporary table
+	public static final String SEGS_TBLNAME = "SEGS";
+	public static final String SEGS_KEY = "KEY"; // Index for the table
+	public static final String SEGS_IKEY = "IKEY"; // Key of the item for this segment
+	public static final String SEGS_SID = "SID"; // Id of this segment
+	public static final String SEGS_CTEXT = "CTEXT";
+	public static final String SEGS_TRGCTEXT = "TRGCTEXT";
 
 	private H2Access self;
 	private RepositoryType repoType;
@@ -569,13 +582,9 @@ public class H2Access implements IDBAccess {
 		long itemKey)
 	{
 		if ( itemKey == -1 ) return null;
-		Statement stm = null;
 		try {
 			// Always left-join with the TUNS table so we get extr text unit info in one call
 			// This is ok because most calls are for text units.
-//			stm = conn.createStatement();
-//			String query = String.format("select * from ITMS left join TUNS on ITMS.KEY=TUNS.IKEY WHERE ITMS.KEY=%d", itemKey);
-//			ResultSet rs = stm.executeQuery(query);
 			pstmItemByKey.setLong(1, itemKey);
 			ResultSet rs = pstmItemByKey.executeQuery();
 			// Return null if nothing found
@@ -584,17 +593,6 @@ public class H2Access implements IDBAccess {
 		}
 		catch ( Throwable e ) {
 			throw new RuntimeException("Error reading an item.\n"+e.getMessage());
-		}
-		finally {
-			try {
-				if ( stm != null ) {
-					stm.close();
-					stm = null;
-				}
-			}
-			catch ( SQLException e ) {
-				throw new RuntimeException(e);
-			}
 		}
 	}
 
@@ -985,5 +983,238 @@ public class H2Access implements IDBAccess {
 			}
 		}
 	}
+
+	public List<List<KeyAndSegId>> getSegmentsWithSameSourceButDifferentTarget (LocaleId trgLoc) {
+		List<List<KeyAndSegId>> list = Collections.emptyList();
+		Statement stm = null;
+		PreparedStatement pstm = null;
+		try {
+			// Create a temporary table for the segments
+			stm = conn.createStatement();
+			// Drop the table if it exists already
+			stm.execute("DROP TABLE IF EXISTS " + SEGS_TBLNAME);
+			// Create the table
+			stm.execute("CREATE TEMPORARY TABLE " + SEGS_TBLNAME + " ("
+				+ SEGS_KEY + " INTEGER IDENTITY PRIMARY KEY,"
+				+ SEGS_IKEY + " INTEGER,"
+				+ SEGS_SID + " VARCHAR,"
+				+ SEGS_CTEXT + " VARCHAR,"
+				+ SEGS_TRGCTEXT + " VARCHAR"
+				+ ")");
+			
+			//--- Fill the temporary table
+			
+			// Get all text units
+			String query = String.format("select ITMS.KEY, %s, %s from ITMS left join TUNS on ITMS.KEY=TUNS.IKEY "
+				+ "where ITMS.KIND=%d",
+				TUNS_CTEXT, TUNS_TRGCTEXT, ITEMKIND_TEXTUNIT);
+			ResultSet rs = stm.executeQuery(query);
+			
+			// For each text unit, get its segments and fill the temporary table
+			pstm = conn.prepareStatement(String.format("INSERT INTO %s (%s,%s,%s,%s) VALUES(?,?,?,?)",
+				SEGS_TBLNAME, SEGS_IKEY, SEGS_SID, SEGS_CTEXT, SEGS_TRGCTEXT));
+			
+			while ( rs.next() ) {
+				TextUnit tu = ((H2TextUnit)getItemFromItemKey(null, rs.getLong(1))).getTextUnit();
+				ISegments srcSegs = tu.getSource().getSegments();
+				// Get the target or create an empty one, then get the segments
+				ISegments trgSegs = tu.createTarget(trgLoc, false, IResource.CREATE_EMPTY).getSegments();
+				for ( Segment seg : srcSegs ) {
+					Segment trgSeg = trgSegs.get(seg.id);
+					pstm.setLong(1, rs.getLong(1));
+					pstm.setString(2, seg.id);
+					pstm.setString(3, seg.text.toString());
+					pstm.setString(4, trgSeg==null ? "" : trgSeg.text.toString());
+					pstm.execute();
+				}
+			}
+			rs.close();
+			rs = null; // Free as soon as possible
+
+			// Now Get the sorted list of segments
+			query = String.format("select %s, %s, %s, %s from %s order by %s DESC, %s",
+				SEGS_IKEY, SEGS_SID, SEGS_CTEXT, SEGS_TRGCTEXT, SEGS_TBLNAME, SEGS_CTEXT, SEGS_TRGCTEXT);
+			rs = stm.executeQuery(query);
+			
+			// Process the segments
+			list = processSameSourceDifferentTarget(rs, 1, 2, 3, 4);
+			
+			// Drop the temporary table
+			stm.execute("DROP TABLE IF EXISTS " + SEGS_TBLNAME);
+		}
+		catch ( Throwable e ) {
+			throw new RuntimeException("Error when looking for groups of items.\n"+e.getMessage());
+		}
+		finally {
+			try {
+				if ( pstm != null ) {
+					pstm.close();
+					pstm = null;
+				}
+				if ( stm != null ) {
+					stm.close();
+					stm = null;
+				}
+			}
+			catch ( SQLException e ) {
+				throw new RuntimeException(e);
+			}
+		}
+		return list;
+	}
 	
+	
+	private List<List<KeyAndSegId>> processSameSourceDifferentTarget (ResultSet rs,
+		int itemKeyCol,
+		int segIdCol,
+		int srcCol,
+		int trgCol)
+		throws SQLException
+	{
+		List<List<KeyAndSegId>> list = new ArrayList<List<KeyAndSegId>>();
+
+		// Loop through the results
+		long prevKey = -1;
+		String prevSegId = null;
+		String prevSrc = "";
+		String prevTrg = "";
+		boolean hasDiff = false;
+		List<KeyAndSegId> group = new ArrayList<KeyAndSegId>();
+		while ( rs.next() ) {
+			// Treat first entry case
+			if ( prevKey == -1 ) {
+				prevKey = rs.getLong(itemKeyCol);
+				if ( segIdCol > 0 ) prevSegId = rs.getString(segIdCol);
+				prevSrc = rs.getString(srcCol);
+				prevTrg = rs.getString(trgCol);
+				continue;
+			}
+			// Treat the entries after the first one
+			// Check if the sources are the same
+			if ( prevSrc.equals(rs.getString(srcCol)) ) {
+				// We have at least two entries with the same source
+				// Add the initial key of this group if not done yet
+				if ( prevKey != -2 ) {
+					group.add(new KeyAndSegId(prevKey, prevSegId));
+					prevKey = -2; // Used now
+				}
+				// Add the current key
+				group.add(new KeyAndSegId(
+					rs.getLong(itemKeyCol),
+					(segIdCol>0 ? rs.getString(segIdCol) : null))
+				);
+				// Compare targets if we have not detected already a difference
+				if ( !hasDiff ) {
+					if ( !prevTrg.equals(rs.getString(trgCol)) ) {
+						hasDiff = true;
+					}
+				}
+			}
+			else { // New source
+				// Add this group of entries with the same sources
+				// to the results if they have at least one difference in targets
+				if ( hasDiff ) {
+					list.add(new ArrayList<KeyAndSegId>(group));
+				}
+				// Set the new base for the next comparisons
+				hasDiff = false;
+				group.clear();
+				prevKey = rs.getLong(itemKeyCol);
+				if ( segIdCol > 0 ) prevSegId = rs.getString(segIdCol);
+				prevSrc = rs.getString(srcCol);
+				prevTrg = rs.getString(trgCol);
+			}
+		}
+		// Make sure we add the last group if needed
+		if ( hasDiff ) {
+			list.add(group);
+		}
+		
+		return list;
+	}
+	
+	public List<List<KeyAndSegId>> getSameSourceWithDifferentTarget () {
+		List<List<KeyAndSegId>> list = Collections.emptyList();
+		Statement stm = null;
+		try {
+			// Sort all entries by source
+			stm = conn.createStatement();
+			String query = String.format("select ITMS.KEY, %s, %s from ITMS left join TUNS on ITMS.KEY=TUNS.IKEY "
+				+ "where ITMS.KIND=%d order by %s DESC, %s",
+				TUNS_CTEXT, TUNS_TRGCTEXT, ITEMKIND_TEXTUNIT, TUNS_CTEXT, TUNS_TRGCTEXT);
+
+			// Get the results
+			ResultSet rs = stm.executeQuery(query);
+			
+			list = processSameSourceDifferentTarget(rs, 1, -1, 2, 3);
+
+//			// Loop through the results
+//			long prevKey = -1;
+//			String prevSrc = "";
+//			String prevTrg = "";
+//			boolean hasDiff = false;
+//			List<Long> group = new ArrayList<Long>();
+//			while ( rs.next() ) {
+//				// Treat first entry case
+//				if ( prevKey == -1 ) {
+//					prevKey = rs.getLong(1);
+//					prevSrc = rs.getString(2);
+//					prevTrg = rs.getString(3);
+//					continue;
+//				}
+//				// Treat the entries after the first one
+//				// Check if the sources are the same
+//				String test = rs.getString(2);
+//				if ( prevSrc.equals(rs.getString(2)) ) {
+//					// We have at least two entries with the same source
+//					// Add the initial key of this group if not done yet
+//					if ( prevKey != -2 ) {
+//						group.add(prevKey);
+//						prevKey = -2; // Used now
+//					}
+//					// Add the current key
+//					group.add(rs.getLong(1));
+//					// Compare targets if we have not detected already a difference
+//					if ( !hasDiff ) {
+//						if ( !prevTrg.equals(rs.getString(3)) ) {
+//							hasDiff = true;
+//						}
+//					}
+//				}
+//				else { // New source
+//					// Add this group of entries with the same sources
+//					// to the results if they have at least one difference in targets
+//					if ( hasDiff ) {
+//						list.add(new ArrayList<Long>(group));
+//					}
+//					// Set the new base for the next comparisons
+//					hasDiff = false;
+//					group.clear();
+//					prevKey = rs.getLong(1);
+//					prevSrc = rs.getString(2);
+//					prevTrg = rs.getString(3);
+//				}
+//			}
+//			// Make sure we add the last group if needed
+//			if ( hasDiff ) {
+//				list.add(group);
+//			}
+		}
+		catch ( Throwable e ) {
+			throw new RuntimeException("Error when looking for groups of items.\n"+e.getMessage());
+		}
+		finally {
+			try {
+				if ( stm != null ) {
+					stm.close();
+					stm = null;
+				}
+			}
+			catch ( SQLException e ) {
+				throw new RuntimeException(e);
+			}
+		}
+		return list;
+	}
+
 }

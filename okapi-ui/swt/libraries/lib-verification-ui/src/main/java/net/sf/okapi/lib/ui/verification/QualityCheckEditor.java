@@ -832,21 +832,21 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 			}
 		});
 		
-		Button btSession = new Button(cmpButtons, SWT.PUSH);
-		btSession.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		btSession.setText("Session...");
-		btSession.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				editSessionSettings();
-			}
-		});
-		
 		Button btOptions = new Button(cmpButtons, SWT.PUSH);
 		btOptions.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		btOptions.setText("Configuration...");
 		btOptions.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				editConfiguration();
+			}
+		});
+		
+		Button btSession = new Button(cmpButtons, SWT.PUSH);
+		btSession.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		btSession.setText("Session...");
+		btSession.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				editSessionSettings();
 			}
 		});
 		

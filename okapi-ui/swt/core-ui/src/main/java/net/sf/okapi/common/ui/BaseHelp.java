@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -46,12 +46,27 @@ public class BaseHelp implements IHelp {
 		}
 	}
 
+	@Override
+	public void showWiki (String topic) {
+		try {
+			// Resolve spaces
+			topic = topic.replace(' ', '_');
+			//TODO: get the base URL from a properties file
+			Util.openURL(new URL(String.format("http://www.opentag.com/okapi/wiki/index.php?title=%s", topic)).toString());
+		}
+		catch ( MalformedURLException e ) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Override
 	public void showTopic (Object object,
 		String filename)
 	{
 		showTopic(object, filename, null);
 	}
 	
+	@Override
 	public void showTopic (Object object,
 		String filename,
 		String query)

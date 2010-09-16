@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -25,6 +25,13 @@ package net.sf.okapi.common;
  * (for example: eclipse application or simple Java application).
  */
 public interface IHelp {
+
+	/**
+	 * Shows a given topic of the Okapi Wiki.
+	 * @param topic the name of the topic. Any space will be replaced
+	 * automatically by '_'.
+	 */
+	public void showWiki (String topic);
 
 	/**
 	 * Shows the help for a given topic.
