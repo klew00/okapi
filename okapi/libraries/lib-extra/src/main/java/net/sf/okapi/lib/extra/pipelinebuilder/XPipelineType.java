@@ -18,28 +18,19 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder;
+package net.sf.okapi.lib.extra.pipelinebuilder;
 
-import net.sf.okapi.common.pipeline.BasePipelineStep;
+public enum XPipelineType {
 
-/**
- * Pipeline as step delegate. Helper class implementing a pipeline's functionality as a pipeline step.
- * This class allows a pipeline to be inserted in another pipeline as a step.
- * Pipeline step method calls are delegated to an instance of this class instantiated inside the pipeline.
- */
-public class PipelineAsStepImpl extends BasePipelineStep {
-
-	private String description;
+	/**
+	 * Steps are connected sequentially, e.g. the output of a previous step connected with 
+	 * the input of a next step.
+	 */
+	SEQUENTIAL,
 	
-	public String getName() {
-		return "Pipeline as step delegate.";
-	}
-	public String getDescription() {
-
-		return description;
-	}
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
+	/**
+	 * Steps are connected in parallel, e.g. inputs of all steps are joined together, 
+	 * and the outputs are joined together.
+	 */
+	PARALLEL
 }

@@ -59,11 +59,11 @@ import net.sf.okapi.persistence.beans.v1.EventBean;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 import net.sf.okapi.steps.leveraging.LeveragingStep;
 import net.sf.okapi.steps.xliffkit.reader.EventLogger;
-import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.Batch;
-import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.BatchItem;
-import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.Parameter;
-import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.Pipeline;
-import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.PipelineStep;
+import net.sf.okapi.lib.extra.pipelinebuilder.XBatch;
+import net.sf.okapi.lib.extra.pipelinebuilder.XBatchItem;
+import net.sf.okapi.lib.extra.pipelinebuilder.XParameter;
+import net.sf.okapi.lib.extra.pipelinebuilder.XPipeline;
+import net.sf.okapi.lib.extra.pipelinebuilder.XPipelineStep;
 
 import org.junit.Test;
 
@@ -85,7 +85,7 @@ public class XLIFFKitWriterTest {
 	WriteObserver writeObserver = new WriteObserver();
 	List<IPersistenceBean<?>> beans = new ArrayList<IPersistenceBean<?>>(); 
 		
-	private Pipeline buildPipeline(String inPath1, String inPath2) {
+	private XPipeline buildPipeline(String inPath1, String inPath2) {
 		
 //		XLIFFKitWriterStep step1 = new XLIFFKitWriterStep();
 //		// TODO Create outPath parameter, move to constructor
@@ -102,9 +102,9 @@ public class XLIFFKitWriterTest {
 //		step3.setTargetLocale(LocaleId.FRENCH);
 		
 		return
-			new Pipeline(
+			new XPipeline(
 					"Test pipeline for XLIFFKitWriterStep",
-					new Batch(
+					new XBatch(
 //							new BatchItem(
 //									this.getClass().getResource(inPath1),
 //									"UTF-8",
@@ -114,7 +114,7 @@ public class XLIFFKitWriterTest {
 //									LocaleId.ENGLISH,
 //									LocaleId.FRENCH),
 									
-							new BatchItem(
+							new XBatchItem(
 									this.getClass().getResource(inPath2),
 									"UTF-8",
 									Util.getDirectoryName(this.getClass().getResource(inPath2).getPath()) + 
@@ -136,11 +136,11 @@ public class XLIFFKitWriterTest {
 									
 					new RawDocumentToFilterEventsStep(),
 					
-					new PipelineStep(new LeveragingStep(), 
+					new XPipelineStep(new LeveragingStep(), 
 							//new Parameter("resourceClassName", net.sf.okapi.connectors.opentran.OpenTranTMConnector.class.getName()),
-							new Parameter("resourceClassName", net.sf.okapi.connectors.google.GoogleMTConnector.class.getName()),
-							new Parameter("threshold", 80),
-							new Parameter("fillTarget", true)
+							new XParameter("resourceClassName", net.sf.okapi.connectors.google.GoogleMTConnector.class.getName()),
+							new XParameter("threshold", 80),
+							new XParameter("fillTarget", true)
 					),
 //					new PipelineStep(new TextModificationStep(), 
 //							new Parameter("type", 0),
@@ -153,9 +153,9 @@ public class XLIFFKitWriterTest {
 //							new Parameter("addID", true),
 //							new Parameter("markSegments", false)
 //					),
-					new PipelineStep(
+					new XPipelineStep(
 							new XLIFFKitWriterStep(),								
-							new Parameter("gMode", true))
+							new XParameter("gMode", true))
 			);
 	}
 	
@@ -213,9 +213,9 @@ public class XLIFFKitWriterTest {
 		String src2Path = pathBase + "src2/";
 		//System.out.println(pathBase);
 		
-		new Pipeline(
+		new XPipeline(
 				"Test pipeline for XLIFFKitWriterStep",
-				new Batch(
+				new XBatch(
 //						new BatchItem(
 //								new URL("file", null, src1Path + "test5.txt"),
 //								"UTF-8",
@@ -252,14 +252,14 @@ public class XLIFFKitWriterTest {
 //								ITIT,
 //								DEDE)
 //						,
-						new BatchItem(
+						new XBatchItem(
 								new URL("file", null, src2Path + "test9.odt"),
 								"UTF-8",
 								ENUS,
 								DEDE)
 						,
 								
-						new BatchItem(
+						new XBatchItem(
 								new URL("file", null, src1Path + "test10.html"),
 								"UTF-8",
 								ENUS,
@@ -271,7 +271,7 @@ public class XLIFFKitWriterTest {
 //								ENUS,
 //								DEDE)
 //						
-						new BatchItem(
+						new XBatchItem(
 								(new URL("file", null, src1Path + "test11.docx")).toURI(),
 								"UTF-8",
 								"okf_openxml",
@@ -286,19 +286,19 @@ public class XLIFFKitWriterTest {
 				,				
 				new EventLogger()
 				,
-				new PipelineStep(new LeveragingStep(), 
-						new Parameter("resourceClassName", net.sf.okapi.connectors.google.GoogleMTConnector.class.getName()),
-						new Parameter("threshold", 80),
-						new Parameter("fillTarget", true)
+				new XPipelineStep(new LeveragingStep(), 
+						new XParameter("resourceClassName", net.sf.okapi.connectors.google.GoogleMTConnector.class.getName()),
+						new XParameter("threshold", 80),
+						new XParameter("fillTarget", true)
 				),
 				
-				new PipelineStep(
+				new XPipelineStep(
 						new XLIFFKitWriterStep(),								
-						new Parameter("gMode", true),
-						new Parameter("includeOriginal", true),
-						new Parameter("message", "This document is a part of the test t-kit, generated from net.sf.okapi.steps.xliffkit.writer.testPackageFormat()"),
+						new XParameter("gMode", true),
+						new XParameter("includeOriginal", true),
+						new XParameter("message", "This document is a part of the test t-kit, generated from net.sf.okapi.steps.xliffkit.writer.testPackageFormat()"),
 						//new Parameter("outputURI", this.getClass().getResource("draft4.xliff.kit").toURI().toString()))
-						new Parameter("outputURI", new URL("file", null, pathBase + "testPackageFormat.xliff.kit").toURI().toString()))
+						new XParameter("outputURI", new URL("file", null, pathBase + "testPackageFormat.xliff.kit").toURI().toString()))
 		).execute();
 	}
 	
@@ -311,10 +311,10 @@ public class XLIFFKitWriterTest {
 		String src2Path = pathBase + "src2/";
 		//System.out.println(pathBase);
 		
-		new Pipeline(
+		new XPipeline(
 				"Test pipeline for XLIFFKitWriterStep",
-				new Batch(
-						new BatchItem(
+				new XBatch(
+						new XBatchItem(
 								new URL("file", null, src2Path + "test5.txt"),
 								"UTF-8",
 								ENUS,
@@ -357,7 +357,7 @@ public class XLIFFKitWriterTest {
 //								DEDE)
 //						,
 //								
-						new BatchItem(
+						new XBatchItem(
 								new URL("file", null, src1Path + "test12.html"),
 								"UTF-8",
 								ENUS,
@@ -374,19 +374,19 @@ public class XLIFFKitWriterTest {
 								
 						new RawDocumentToFilterEventsStep()
 				,				
-				new PipelineStep(new LeveragingStep(), 
-						new Parameter("resourceClassName", net.sf.okapi.connectors.google.GoogleMTConnector.class.getName()),
-						new Parameter("threshold", 80),
-						new Parameter("fillTarget", true)
+				new XPipelineStep(new LeveragingStep(), 
+						new XParameter("resourceClassName", net.sf.okapi.connectors.google.GoogleMTConnector.class.getName()),
+						new XParameter("threshold", 80),
+						new XParameter("fillTarget", true)
 				),
 				
-				new PipelineStep(
+				new XPipelineStep(
 						new XLIFFKitWriterStep(),								
-						new Parameter("gMode", true),
-						new Parameter("includeOriginal", true),
-						new Parameter("message", "This document is a part of the test t-kit, generated from net.sf.okapi.steps.xliffkit.writer.testPackageFormat()"),
-						//new Parameter("outputURI", this.getClass().getResource("draft4.xliff.kit").toURI().toString()))
-						new Parameter("outputURI", new URL("file", null, pathBase + "testPackageFormat2.xliff.kit").toURI().toString()))
+						new XParameter("gMode", true),
+						new XParameter("includeOriginal", true),
+						new XParameter("message", "This document is a part of the test t-kit, generated from net.sf.okapi.steps.xliffkit.writer.testPackageFormat()"),
+						//new XParameter("outputURI", this.getClass().getResource("draft4.xliff.kit").toURI().toString()))
+						new XParameter("outputURI", new URL("file", null, pathBase + "testPackageFormat2.xliff.kit").toURI().toString()))
 		).execute();
 	}
 	
@@ -403,10 +403,10 @@ public class XLIFFKitWriterTest {
 		rd2fe.setFilter(filter);
 		filter.getParameters().load((new URL("file", null, src1Path + "okf_table@copy-of-csv_97.fprm")).toURI(), true);
 		
-		new Pipeline(
+		new XPipeline(
 				"Test pipeline for XLIFFKitWriterStep",
-				new Batch(
-						new BatchItem(
+				new XBatch(
+						new XBatchItem(
 								(new URL("file", null, src2Path + "CSVTest_97.txt")).toURI(),
 								"UTF-8",
 								ENUS,
@@ -415,19 +415,19 @@ public class XLIFFKitWriterTest {
 								
 				rd2fe
 				,				
-				new PipelineStep(new LeveragingStep(), 
-						new Parameter("resourceClassName", net.sf.okapi.connectors.google.GoogleMTConnector.class.getName()),
-						new Parameter("threshold", 80),
-						new Parameter("fillTarget", true)
+				new XPipelineStep(new LeveragingStep(), 
+						new XParameter("resourceClassName", net.sf.okapi.connectors.google.GoogleMTConnector.class.getName()),
+						new XParameter("threshold", 80),
+						new XParameter("fillTarget", true)
 				),
 				
-				new PipelineStep(
+				new XPipelineStep(
 						new XLIFFKitWriterStep(),								
-						new Parameter("gMode", true),
-						new Parameter("includeOriginal", true),
-						new Parameter("message", "This document is a part of the test t-kit, generated from net.sf.okapi.steps.xliffkit.writer.testPackageFormat()"),
-						//new Parameter("outputURI", this.getClass().getResource("draft4.xliff.kit").toURI().toString()))
-						new Parameter("outputURI", new URL("file", null, pathBase + "testPackageFormat3.xliff.kit").toURI().toString()))
+						new XParameter("gMode", true),
+						new XParameter("includeOriginal", true),
+						new XParameter("message", "This document is a part of the test t-kit, generated from net.sf.okapi.steps.xliffkit.writer.testPackageFormat()"),
+						//new XParameter("outputURI", this.getClass().getResource("draft4.xliff.kit").toURI().toString()))
+						new XParameter("outputURI", new URL("file", null, pathBase + "testPackageFormat3.xliff.kit").toURI().toString()))
 		).execute();
 	}
 	
@@ -442,9 +442,9 @@ public class XLIFFKitWriterTest {
 		String src2Path = pathBase + "src2/";
 		//System.out.println(pathBase);
 		
-		new Pipeline(
+		new XPipeline(
 				"Test pipeline for XLIFFKitWriterStep",
-				new Batch(
+				new XBatch(
 //						new BatchItem(
 //								new URL("file", null, src1Path + "test5.txt"),
 //								"UTF-8",
@@ -500,7 +500,7 @@ public class XLIFFKitWriterTest {
 //								ENUS,
 //								DEDE)
 //						
-						new BatchItem(
+						new XBatchItem(
 								(new URL("file", null, src1Path + "BoldWorld.docx")).toURI(),
 								"UTF-8",
 								"okf_openxml",
@@ -513,19 +513,19 @@ public class XLIFFKitWriterTest {
 								
 				new RawDocumentToFilterEventsStep()
 				,				
-				new PipelineStep(new LeveragingStep(), 
-						new Parameter("resourceClassName", net.sf.okapi.connectors.google.GoogleMTConnector.class.getName()),
-						new Parameter("threshold", 80),
-						new Parameter("fillTarget", true)
+				new XPipelineStep(new LeveragingStep(), 
+						new XParameter("resourceClassName", net.sf.okapi.connectors.google.GoogleMTConnector.class.getName()),
+						new XParameter("threshold", 80),
+						new XParameter("fillTarget", true)
 				),
 				
-				new PipelineStep(
+				new XPipelineStep(
 						new XLIFFKitWriterStep(),								
-						new Parameter("gMode", true),
-						new Parameter("includeOriginal", true),
-						new Parameter("message", "This document is a part of the test t-kit, generated from net.sf.okapi.steps.xliffkit.writer.testPackageFormat()"),
-						//new Parameter("outputURI", this.getClass().getResource("draft4.xliff.kit").toURI().toString()))
-						new Parameter("outputURI", new URL("file", null, pathBase + "testPackageFormat4.xliff.kit").toURI().toString()))
+						new XParameter("gMode", true),
+						new XParameter("includeOriginal", true),
+						new XParameter("message", "This document is a part of the test t-kit, generated from net.sf.okapi.steps.xliffkit.writer.testPackageFormat()"),
+						//new XParameter("outputURI", this.getClass().getResource("draft4.xliff.kit").toURI().toString()))
+						new XParameter("outputURI", new URL("file", null, pathBase + "testPackageFormat4.xliff.kit").toURI().toString()))
 		).execute();
 		System.out.println(" Total: " + (System.currentTimeMillis() - start) + " milliseconds.");
 	}
@@ -542,10 +542,10 @@ public class XLIFFKitWriterTest {
 		//System.out.println(pathBase);
 		
 		for(int i = 0; i < loops; i++) {
-		new Pipeline(
+		new XPipeline(
 				"Test pipeline for XLIFFKitWriterStep",
-				new Batch(
-						new BatchItem(
+				new XBatch(
+						new XBatchItem(
 								new URL("file", null, src1Path + "test5.txt"),
 								"UTF-8",
 								ENUS,
@@ -613,19 +613,19 @@ public class XLIFFKitWriterTest {
 								
 				new RawDocumentToFilterEventsStep()
 				,				
-				new PipelineStep(new LeveragingStep(), 
-						new Parameter("resourceClassName", net.sf.okapi.connectors.google.GoogleMTConnector.class.getName()),
-						new Parameter("threshold", 80),
-						new Parameter("fillTarget", true)
+				new XPipelineStep(new LeveragingStep(), 
+						new XParameter("resourceClassName", net.sf.okapi.connectors.google.GoogleMTConnector.class.getName()),
+						new XParameter("threshold", 80),
+						new XParameter("fillTarget", true)
 				),
 				
-				new PipelineStep(
+				new XPipelineStep(
 						new XLIFFKitWriterStep(),								
-						new Parameter("gMode", true),
-						new Parameter("includeOriginal", true),
-						new Parameter("message", "This document is a part of the test t-kit, generated from net.sf.okapi.steps.xliffkit.writer.testPackageFormat()"),
-						//new Parameter("outputURI", this.getClass().getResource("draft4.xliff.kit").toURI().toString()))
-						new Parameter("outputURI", new URL("file", null, pathBase + "testPackageFormat5.xliff.kit").toURI().toString()))
+						new XParameter("gMode", true),
+						new XParameter("includeOriginal", true),
+						new XParameter("message", "This document is a part of the test t-kit, generated from net.sf.okapi.steps.xliffkit.writer.testPackageFormat()"),
+						//new XParameter("outputURI", this.getClass().getResource("draft4.xliff.kit").toURI().toString()))
+						new XParameter("outputURI", new URL("file", null, pathBase + "testPackageFormat5.xliff.kit").toURI().toString()))
 		).execute();
 		}
 		System.out.println(" Total: " + (System.currentTimeMillis() - start) + " milliseconds.");
@@ -640,9 +640,9 @@ public class XLIFFKitWriterTest {
 		String src2Path = pathBase + "src2/";
 		//System.out.println(pathBase);
 		
-		new Pipeline(
+		new XPipeline(
 				"Test pipeline for XLIFFKitWriterStep",
-				new Batch(
+				new XBatch(
 //						new BatchItem(
 //								new URL("file", null, src2Path + "test5.txt"),
 //								"UTF-8",
@@ -686,7 +686,7 @@ public class XLIFFKitWriterTest {
 //								DEDE)
 //						,
 //								
-						new BatchItem(
+						new XBatchItem(
 								new URL("file", null, src1Path + "test12.html"),
 								"UTF-8",
 								ENUS,
@@ -703,19 +703,19 @@ public class XLIFFKitWriterTest {
 								
 						new RawDocumentToFilterEventsStep()
 				,				
-				new PipelineStep(new LeveragingStep(), 
-						new Parameter("resourceClassName", net.sf.okapi.connectors.google.GoogleMTConnector.class.getName()),
-						new Parameter("threshold", 80),
-						new Parameter("fillTarget", true)
+				new XPipelineStep(new LeveragingStep(), 
+						new XParameter("resourceClassName", net.sf.okapi.connectors.google.GoogleMTConnector.class.getName()),
+						new XParameter("threshold", 80),
+						new XParameter("fillTarget", true)
 				),
 				
-				new PipelineStep(
+				new XPipelineStep(
 						new XLIFFKitWriterStep(),								
-						new Parameter("gMode", true),
-						new Parameter("includeOriginal", true),
-						new Parameter("message", "This document is a part of the test t-kit, generated from net.sf.okapi.steps.xliffkit.writer.testPackageFormat()"),
-						//new Parameter("outputURI", this.getClass().getResource("draft4.xliff.kit").toURI().toString()))
-						new Parameter("outputURI", new URL("file", null, pathBase + "testPackageFormat6.xliff.kit").toURI().toString()))
+						new XParameter("gMode", true),
+						new XParameter("includeOriginal", true),
+						new XParameter("message", "This document is a part of the test t-kit, generated from net.sf.okapi.steps.xliffkit.writer.testPackageFormat()"),
+						//new XParameter("outputURI", this.getClass().getResource("draft4.xliff.kit").toURI().toString()))
+						new XParameter("outputURI", new URL("file", null, pathBase + "testPackageFormat6.xliff.kit").toURI().toString()))
 		).execute();
 	}
 

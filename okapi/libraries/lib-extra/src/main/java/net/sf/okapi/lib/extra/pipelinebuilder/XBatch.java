@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder;
+package net.sf.okapi.lib.extra.pipelinebuilder;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -28,16 +28,16 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.pipelinedriver.IBatchItemContext;
 
-public class Batch extends BatchItem {
+public class XBatch extends XBatchItem {
 
 	private List<IBatchItemContext> items;
 	
-	public Batch() {
+	public XBatch() {
 		super();
 		this.items = new ArrayList<IBatchItemContext>();
 	}
 	
-	public Batch(BatchItem... items) {		
+	public XBatch(XBatchItem... items) {		
 		this();		
 		addItems(items);
 	}
@@ -50,27 +50,27 @@ public class Batch extends BatchItem {
 		return items;
 	}
 
-	public Batch addItems(BatchItem... items) {
-		for (BatchItem item : items)
-			if (item instanceof Batch) 
-				this.items.addAll(((Batch)item).getItems());
+	public XBatch addItems(XBatchItem... items) {
+		for (XBatchItem item : items)
+			if (item instanceof XBatch) 
+				this.items.addAll(((XBatch)item).getItems());
 			else
 				this.items.add(item.getContext());
 		return this;
 	}
 			
-	public Batch addItems(String dir, String[] fileList, 
+	public XBatch addItems(String dir, String[] fileList, 
 			String defaultEncoding, LocaleId sourceLocale, LocaleId targetLocale) {		
 		for (String file : fileList) {
-			this.items.add(new BatchItem(Util.toURI(dir + file), defaultEncoding, sourceLocale, targetLocale).getContext());
+			this.items.add(new XBatchItem(Util.toURI(dir + file), defaultEncoding, sourceLocale, targetLocale).getContext());
 		}
 		return this;
 	}
 	
-	public Batch addItems(String dir, String[] fileList, 
+	public XBatch addItems(String dir, String[] fileList, 
 			String defaultEncoding, URI outputURI, String outputEncoding, LocaleId sourceLocale, LocaleId targetLocale) {		
 		for (String file : fileList) {
-			this.items.add(new BatchItem(Util.toURI(dir + file), defaultEncoding, outputURI, outputEncoding,
+			this.items.add(new XBatchItem(Util.toURI(dir + file), defaultEncoding, outputURI, outputEncoding,
 					sourceLocale, targetLocale).getContext());
 		}
 		return this;

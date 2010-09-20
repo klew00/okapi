@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder;
+package net.sf.okapi.lib.extra.pipelinebuilder;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
@@ -30,11 +30,11 @@ import net.sf.okapi.common.pipeline.PipelineReturnValue;
 import net.sf.okapi.common.pipelinedriver.IBatchItemContext;
 import net.sf.okapi.common.pipelinedriver.PipelineDriver;
 
-public class Pipeline extends net.sf.okapi.common.pipeline.Pipeline implements IPipelineStep {
+public class XPipeline extends net.sf.okapi.common.pipeline.Pipeline implements IPipelineStep {
 
-	private PipelineAsStepImpl stepImpl = new PipelineAsStepImpl();
-	private PipelineType type;
-	private Batch batch;
+	private XPipelineAsStepImpl stepImpl = new XPipelineAsStepImpl();
+	private XPipelineType type;
+	private XBatch batch;
 	private PipelineDriver pd;
 	private FilterConfigurationMapper fcMapper;
 	
@@ -43,20 +43,20 @@ public class Pipeline extends net.sf.okapi.common.pipeline.Pipeline implements I
 		DefaultFilters.setMappings(fcMapper, true, true);		
 	}
 	
-	public Pipeline(String description, IPipeline pipeline) {
+	public XPipeline(String description, IPipeline pipeline) {
 		this(description, pipeline.getSteps().toArray(new IPipelineStep[] {}));
 		this.setId(pipeline.getId());
 	}
 	
-	public Pipeline(String description, IPipelineStep... steps) {		
-		this(description, PipelineType.SEQUENTIAL, steps);
+	public XPipeline(String description, IPipelineStep... steps) {		
+		this(description, XPipelineType.SEQUENTIAL, steps);
 	}
 	
-	public Pipeline(String description, PipelineType type, IPipelineStep... steps) {
+	public XPipeline(String description, XPipelineType type, IPipelineStep... steps) {
 		this(description, type, true, steps);
 	}
 	
-	private Pipeline(String description, PipelineType type, boolean buildPipeline, IPipelineStep... steps) {
+	private XPipeline(String description, XPipelineType type, boolean buildPipeline, IPipelineStep... steps) {
 		stepImpl.setDescription(description);
 		this.type = type;
 		
@@ -67,11 +67,11 @@ public class Pipeline extends net.sf.okapi.common.pipeline.Pipeline implements I
 			recreatePipeline();
 	}
 	
-	public Pipeline(String description, Batch batch, IPipelineStep... steps) {		
-		this(description, batch, PipelineType.SEQUENTIAL, steps);
+	public XPipeline(String description, XBatch batch, IPipelineStep... steps) {		
+		this(description, batch, XPipelineType.SEQUENTIAL, steps);
 	}
 	
-	public Pipeline(String description, Batch batch, PipelineType type, IPipelineStep... steps) {
+	public XPipeline(String description, XBatch batch, XPipelineType type, IPipelineStep... steps) {
 		this(description, type, false, steps);
 		setBatch(batch);		
 	}
@@ -81,8 +81,8 @@ public class Pipeline extends net.sf.okapi.common.pipeline.Pipeline implements I
 		//pd.setPipeline(this); // Commented, need to handle PipelineStep class to get annotations of the internal class, not the wraper's
 		
 		for (IPipelineStep step : this.getSteps())
-			if (step instanceof PipelineStep)
-				pd.addStep(((PipelineStep) step).getStep());
+			if (step instanceof XPipelineStep)
+				pd.addStep(((XPipelineStep) step).getStep());
 			else
 				pd.addStep(step);
 						
@@ -114,7 +114,7 @@ public class Pipeline extends net.sf.okapi.common.pipeline.Pipeline implements I
 	}
 
 	public Event handleEvent(Event event) {
-		if (type == PipelineType.SEQUENTIAL) {}
+		if (type == XPipelineType.SEQUENTIAL) {}
 		return stepImpl.handleEvent(event);
 	}
 
@@ -134,11 +134,11 @@ public class Pipeline extends net.sf.okapi.common.pipeline.Pipeline implements I
 		stepImpl.setParameters(params);
 	}
 
-	public Batch getBatch() {
+	public XBatch getBatch() {
 		return batch;
 	}
 
-	public void setBatch(Batch batch) {
+	public void setBatch(XBatch batch) {
 		this.batch = batch;
 		recreatePipeline();
 	}

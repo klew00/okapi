@@ -28,6 +28,11 @@ import java.io.InputStream;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.lib.extra.pipelinebuilder.XBatch;
+import net.sf.okapi.lib.extra.pipelinebuilder.XBatchItem;
+import net.sf.okapi.lib.extra.pipelinebuilder.XParameter;
+import net.sf.okapi.lib.extra.pipelinebuilder.XPipeline;
+import net.sf.okapi.lib.extra.pipelinebuilder.XPipelineStep;
 import net.sf.okapi.persistence.BeanMapper;
 import net.sf.okapi.persistence.NamespaceMapper;
 import net.sf.okapi.persistence.beans.FactoryBean;
@@ -36,11 +41,6 @@ import net.sf.okapi.persistence.beans.v0.TestEventBean;
 import net.sf.okapi.persistence.beans.v0.TestEventBean2;
 import net.sf.okapi.persistence.json.jackson.JSONPersistenceSession;
 import net.sf.okapi.steps.xliffkit.common.persistence.sessions.OkapiJsonSession;
-import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.Batch;
-import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.BatchItem;
-import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.Parameter;
-import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.Pipeline;
-import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.PipelineStep;
 
 import org.junit.Test;
 
@@ -56,10 +56,10 @@ public class XLIFFKitReaderTest {
 	@Test
 	public void testReader() {
 		
-		new Pipeline(
+		new XPipeline(
 				"Test pipeline for XLIFFKitReaderStep",
-				new Batch(
-						new BatchItem(
+				new XBatch(
+						new XBatchItem(
 								this.getClass().getResource("testPackageFormat.xliff.kit"),
 								"UTF-8",
 								Util.getTempDirectory() + "/testPackageFormat",
@@ -80,10 +80,10 @@ public class XLIFFKitReaderTest {
 	@Test
 	public void testReader2() {
 		
-		new Pipeline(
+		new XPipeline(
 				"Test pipeline for XLIFFKitReaderStep",
-				new Batch(
-						new BatchItem(
+				new XBatch(
+						new XBatchItem(
 								this.getClass().getResource("testPackageFormat2.xliff.kit"),
 								"UTF-8",
 								Util.getTempDirectory() + "/testPackageFormat2",
@@ -104,10 +104,10 @@ public class XLIFFKitReaderTest {
 	@Test
 	public void testReader4() {
 		
-		new Pipeline(
+		new XPipeline(
 				"Test pipeline for XLIFFKitReaderStep",
-				new Batch(
-						new BatchItem(
+				new XBatch(
+						new XBatchItem(
 								this.getClass().getResource("testPackageFormat4.xliff.kit"),
 								"UTF-8",
 								Util.getTempDirectory() + "/testPackageFormat4",
@@ -128,10 +128,10 @@ public class XLIFFKitReaderTest {
 	@Test
 	public void testReader5() {
 		
-		new Pipeline(
+		new XPipeline(
 				"Test pipeline for XLIFFKitReaderStep",
-				new Batch(
-						new BatchItem(
+				new XBatch(
+						new XBatchItem(
 								this.getClass().getResource("testPackageFormat5.xliff.kit"),
 								"UTF-8",
 								Util.getTempDirectory() + "/testPackageFormat4",
@@ -152,10 +152,10 @@ public class XLIFFKitReaderTest {
 	@Test
 	public void testReader6() {
 		
-		new Pipeline(
+		new XPipeline(
 				"Test pipeline for XLIFFKitReaderStep",
-				new Batch(
-						new BatchItem(
+				new XBatch(
+						new XBatchItem(
 								this.getClass().getResource("testPackageFormat6.xliff.kit"),
 								"UTF-8",
 								Util.getTempDirectory() + "/testPackageFormat2",
@@ -176,10 +176,10 @@ public class XLIFFKitReaderTest {
 	// DEBUG 	@Test
 	public void testReferences() {
 		
-		new Pipeline(
+		new XPipeline(
 				"Test pipeline for XLIFFKitReaderStep",
-				new Batch(
-						new BatchItem(
+				new XBatch(
+						new XBatchItem(
 								this.getClass().getResource("testReferences.xliff.kit"),
 								"UTF-8",
 								Util.getTempDirectory() + "/testReferences.xliff.kit",
@@ -187,9 +187,9 @@ public class XLIFFKitReaderTest {
 								ENUS,
 								ENUS)
 						),
-				new PipelineStep(
+				new XPipelineStep(
 						new XLIFFKitReaderStep(),
-						new Parameter("generateTargets", false))
+						new XParameter("generateTargets", false))
 				,				
 				new EventLogger()
 //				,
@@ -201,10 +201,10 @@ public class XLIFFKitReaderTest {
 // DEBUG @Test
 	public void testReferences2() {
 		
-		new Pipeline(
+		new XPipeline(
 				"Test pipeline for XLIFFKitReaderStep",
-				new Batch(
-						new BatchItem(
+				new XBatch(
+						new XBatchItem(
 								this.getClass().getResource("testReferences2.xliff.kit"),
 								"UTF-8",
 								Util.getTempDirectory() + "/testReferences2.xliff.kit",
@@ -212,9 +212,9 @@ public class XLIFFKitReaderTest {
 								ENUS,
 								ENUS)
 						),
-				new PipelineStep(
+				new XPipelineStep(
 						new XLIFFKitReaderStep(),
-						new Parameter("generateTargets", false))
+						new XParameter("generateTargets", false))
 				,				
 				new EventLogger()
 //				,

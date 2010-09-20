@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder;
+package net.sf.okapi.lib.extra.pipelinebuilder;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -30,26 +30,26 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.ParametersString;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 
-public class PipelineStep implements IPipelineStep{
+public class XPipelineStep implements IPipelineStep{
 
 	private IPipelineStep step;
 	private ParametersString parametersString = new ParametersString(); 
 	
-	public PipelineStep(IPipelineStep step, IParameters parameters) {	
+	public XPipelineStep(IPipelineStep step, IParameters parameters) {	
 		this(step);
 		step.setParameters(parameters);
 	}
 
 	@Deprecated
-	public PipelineStep(IPipelineStep step) {
+	public XPipelineStep(IPipelineStep step) {
 		this.step = step;
 	}
 	
-	public PipelineStep(IPipelineStep step, Parameter... parameters) {	
+	public XPipelineStep(IPipelineStep step, XParameter... parameters) {	
 		this(step);
 		
 		parametersString.reset();
-		for (Parameter parameter : parameters) {
+		for (XParameter parameter : parameters) {
 			if (parameter.getType() == null) {
 				Object value = parameter.getValue();
 				
@@ -74,12 +74,12 @@ public class PipelineStep implements IPipelineStep{
 			params.fromString(parametersString.toString());
 	}
 	
-	public PipelineStep(Class<? extends IPipelineStep> stepClass, IParameters parameters) {		
+	public XPipelineStep(Class<? extends IPipelineStep> stepClass, IParameters parameters) {		
 		step = instantiateStep(stepClass);
 		step.setParameters(parameters);
 	}
 	
-	public PipelineStep(Class<? extends IPipelineStep> stepClass, Parameter... parameters) {		
+	public XPipelineStep(Class<? extends IPipelineStep> stepClass, XParameter... parameters) {		
 		this(instantiateStep(stepClass), parameters);
 	}
 	
@@ -98,19 +98,19 @@ public class PipelineStep implements IPipelineStep{
 		return res;
 	}
 
-	public PipelineStep(IPipelineStep step, URI parametersURI, boolean ignoreErrors) {		
+	public XPipelineStep(IPipelineStep step, URI parametersURI, boolean ignoreErrors) {		
 		this.step = step;
 		IParameters params = step.getParameters();
 		params.load(parametersURI, ignoreErrors);
 	}
 	
-	public PipelineStep(Class<? extends IPipelineStep> stepClass, URI parametersURI, boolean ignoreErrors) {	
+	public XPipelineStep(Class<? extends IPipelineStep> stepClass, URI parametersURI, boolean ignoreErrors) {	
 		this.step = instantiateStep(stepClass);
 		IParameters params = step.getParameters();
 		params.load(parametersURI, ignoreErrors);			
 	}
 	
-	public PipelineStep(Class<? extends IPipelineStep> stepClass, URL parametersURL, boolean ignoreErrors){		
+	public XPipelineStep(Class<? extends IPipelineStep> stepClass, URL parametersURL, boolean ignoreErrors){		
 		try {
 			URI parametersURI = parametersURL.toURI();
 			step = instantiateStep(stepClass);

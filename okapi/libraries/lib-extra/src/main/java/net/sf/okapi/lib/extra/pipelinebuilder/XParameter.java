@@ -18,55 +18,55 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder;
+package net.sf.okapi.lib.extra.pipelinebuilder;
 
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 
-public class Parameter {
+public class XParameter {
 	private StepParameterType type = null;
 	private String name;
 	private Object value;
 
 	// Type safety constructors
-	public Parameter(String name, String value) {
+	public XParameter(String name, String value) {
 		setParameter(name, value);
 	}
 
-	public Parameter(String name, int value) {
+	public XParameter(String name, int value) {
 		setParameter(name, value);
 	}
 	
-	public Parameter(String name, boolean value) {
+	public XParameter(String name, boolean value) {
 		setParameter(name, value);
 	}
 	
-//	public Parameter(StepParameterType type, RawDocument value) {
+//	public XParameter(StepParameterType type, RawDocument value) {
 //		this(type);
 //	}
 //	
-//	public Parameter(StepParameterType type, URI value) {
+//	public XParameter(StepParameterType type, URI value) {
 //		this(type);
 //	}
 //	
-//	public Parameter(StepParameterType type, LocaleId value) {
+//	public XParameter(StepParameterType type, LocaleId value) {
 //		this(type);
 //	}
 //	
-//	public Parameter(StepParameterType type, String value) {
+//	public XParameter(StepParameterType type, String value) {
 //		this(type);
 //	}
 //	
-//	public Parameter(StepParameterType type, IFilterConfigurationMapper value) {
+//	public XParameter(StepParameterType type, IFilterConfigurationMapper value) {
 //		this(type);
 //	}
 	
-	public Parameter(StepParameterType type, Object value) {
+	public XParameter(StepParameterType type, Object value) {
 		super();
 		this.type = type;
 		this.value = value;
 	}
 	
-//	public Parameter(StepParameterType type, int value) {
+//	public XParameter(StepParameterType type, int value) {
 //		this(type);
 //	}
 

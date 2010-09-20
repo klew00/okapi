@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder;
+package net.sf.okapi.lib.extra.pipelinebuilder;
 
 import java.io.InputStream;
 import java.net.URI;
@@ -33,7 +33,7 @@ import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.pipelinedriver.DocumentData;
 import net.sf.okapi.common.resource.RawDocument;
 
-public class Document  {
+public class XDocument  {
 
 	private DocumentData documentData;
 	private FilterConfigurationMapper fcMapper;
@@ -48,25 +48,25 @@ public class Document  {
 		fcMapper.addConfigurations("net.sf.okapi.filters.openxml.OpenXMLFilter");
 		fcMapper.addConfigurations("net.sf.okapi.filters.openxml.OpenXMLContentFilter");
 		fcMapper.addConfigurations("net.sf.okapi.filters.properties.PropertiesFilter");						
-		fcMapper.addConfigurations(net.sf.okapi.filters.plaintext.PlainTextFilter.class.getName());
-		fcMapper.addConfigurations(net.sf.okapi.filters.table.TableFilter.class.getName());
+		fcMapper.addConfigurations("net.sf.okapi.filters.plaintext.PlainTextFilter");
+		fcMapper.addConfigurations("net.sf.okapi.filters.table.TableFilter");
 	}
 	
-	public Document(URI inputURI, String defaultEncoding, String filterConfigId,
+	public XDocument(URI inputURI, String defaultEncoding, String filterConfigId,
 			URI outputURI, String outputEncoding, LocaleId sourceLocale, LocaleId targetLocale) {
 		this(new RawDocument(inputURI, defaultEncoding, sourceLocale,	targetLocale), outputURI, outputEncoding);
 		getRawDocument().setFilterConfigId(filterConfigId);
 	}
 	
-	public Document(RawDocument rawDocument) {
+	public XDocument(RawDocument rawDocument) {
 		setRawDocument(rawDocument);
 	}
 	
-	public Document(DocumentData documentData) {
+	public XDocument(DocumentData documentData) {
 		setDocumentData(documentData);
 	}
 	
-	public Document(RawDocument rawDoc,
+	public XDocument(RawDocument rawDoc,
 			URI outputURI,
 			String outputEncoding) {
 		setRawDocument(rawDoc);
@@ -74,25 +74,25 @@ public class Document  {
 		documentData.outputEncoding = outputEncoding;
 	}
 	
-	public Document(CharSequence inputCharSequence, LocaleId sourceLocale) {
+	public XDocument(CharSequence inputCharSequence, LocaleId sourceLocale) {
 		setRawDocument(new RawDocument(inputCharSequence, sourceLocale));
 	}
 	
-	public Document(URI inputURI, String defaultEncoding, LocaleId sourceLocale) {
+	public XDocument(URI inputURI, String defaultEncoding, LocaleId sourceLocale) {
 		setRawDocument(new RawDocument(inputURI, defaultEncoding, sourceLocale));
 	}
 
-	public Document(URI inputURI, String defaultEncoding, URI outputURI, String outputEncoding, LocaleId sourceLocale,
+	public XDocument(URI inputURI, String defaultEncoding, URI outputURI, String outputEncoding, LocaleId sourceLocale,
 			LocaleId targetLocale) {
 		this(inputURI, defaultEncoding, null, outputURI, outputEncoding, sourceLocale, targetLocale);
 	}
 	
-	public Document(URI inputURI, String defaultEncoding, LocaleId sourceLocale,
+	public XDocument(URI inputURI, String defaultEncoding, LocaleId sourceLocale,
 			LocaleId targetLocale) {
 		setRawDocument(new RawDocument(inputURI, defaultEncoding, sourceLocale,	targetLocale));
 	}
 	
-	public Document(URL inputURL, String defaultEncoding, LocaleId sourceLocale) {
+	public XDocument(URL inputURL, String defaultEncoding, LocaleId sourceLocale) {
 		try {
 			setRawDocument(new RawDocument(inputURL.toURI(), defaultEncoding, sourceLocale));
 		} catch (URISyntaxException e) {
@@ -101,12 +101,12 @@ public class Document  {
 		}
 	}
 
-	public Document(URL inputURL, String defaultEncoding, LocaleId sourceLocale,
+	public XDocument(URL inputURL, String defaultEncoding, LocaleId sourceLocale,
 			LocaleId targetLocale) {
 		setRawDocument(new RawDocument(Util.toURI(inputURL.getPath()), defaultEncoding, sourceLocale,	targetLocale));
 	}
 	
-	public Document(URL inputURL, String defaultEncoding, URL outputURL, String outputEncoding, LocaleId sourceLocale,
+	public XDocument(URL inputURL, String defaultEncoding, URL outputURL, String outputEncoding, LocaleId sourceLocale,
 			LocaleId targetLocale) {
 		try {
 			setRawDocument(new RawDocument(Util.toURI(inputURL.getPath()), defaultEncoding, sourceLocale,	targetLocale));
@@ -118,23 +118,23 @@ public class Document  {
 		}
 	}
 	
-	public Document(URL inputURL, String defaultEncoding, String outputPath, String outputEncoding, LocaleId sourceLocale,
+	public XDocument(URL inputURL, String defaultEncoding, String outputPath, String outputEncoding, LocaleId sourceLocale,
 			LocaleId targetLocale) {
 			setRawDocument(new RawDocument(Util.toURI(inputURL.getPath()), defaultEncoding, sourceLocale,	targetLocale));
 			documentData.outputURI = Util.toURI(outputPath);
 			documentData.outputEncoding = outputEncoding;			
 	}
 	
-	public Document(InputStream inputStream, String defaultEncoding, LocaleId sourceLocale) {
+	public XDocument(InputStream inputStream, String defaultEncoding, LocaleId sourceLocale) {
 		setRawDocument(new RawDocument(inputStream, defaultEncoding, sourceLocale));
 	}
 	
-	public Document(InputStream inputStream, String defaultEncoding, LocaleId sourceLocale,
+	public XDocument(InputStream inputStream, String defaultEncoding, LocaleId sourceLocale,
 			LocaleId targetLocale) {
 		setRawDocument(new RawDocument(inputStream, defaultEncoding, sourceLocale, targetLocale));
 	}
 	
-	protected Document() {
+	protected XDocument() {
 		super();
 	}
 

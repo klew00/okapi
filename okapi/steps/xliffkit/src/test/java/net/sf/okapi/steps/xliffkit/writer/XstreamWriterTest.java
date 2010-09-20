@@ -36,11 +36,11 @@ import net.sf.okapi.persistence.beans.v0.TestEventBean;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 import net.sf.okapi.steps.xliffkit.common.persistence.sessions.OkapiXmlSession;
 import net.sf.okapi.steps.xliffkit.common.persistence.sessions.OkapiXstreamSession;
-import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.Batch;
-import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.BatchItem;
-import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.Parameter;
-import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.Pipeline;
-import net.sf.okapi.steps.xliffkit.sandbox.pipelinebuilder.PipelineStep;
+import net.sf.okapi.lib.extra.pipelinebuilder.XBatch;
+import net.sf.okapi.lib.extra.pipelinebuilder.XBatchItem;
+import net.sf.okapi.lib.extra.pipelinebuilder.XParameter;
+import net.sf.okapi.lib.extra.pipelinebuilder.XPipeline;
+import net.sf.okapi.lib.extra.pipelinebuilder.XPipelineStep;
 
 import org.junit.Test;
 
@@ -73,9 +73,9 @@ public class XstreamWriterTest {
 		writerStep.setSession(session);
 		writerStep.setResourcesFileExt(".xml");
 		
-		new Pipeline(
+		new XPipeline(
 				"Test pipeline for XLIFFKitWriterStep",
-				new Batch(
+				new XBatch(
 //						new BatchItem(
 //								new URL("file", null, src1Path + "test5.txt"),
 //								"UTF-8",
@@ -131,7 +131,7 @@ public class XstreamWriterTest {
 //								ENUS,
 //								DEDE)
 //						
-						new BatchItem(
+						new XBatchItem(
 								(new URL("file", null, src1Path + "BoldWorld.docx")).toURI(),
 								"UTF-8",
 								"okf_openxml",
@@ -149,13 +149,13 @@ public class XstreamWriterTest {
 //						new Parameter("fillTarget", true)
 //				),
 				
-				new PipelineStep(
+				new XPipelineStep(
 						writerStep,								
-						new Parameter("gMode", true),
-						new Parameter("includeOriginal", true),
-						new Parameter("message", "This document is a part of the test t-kit, generated from net.sf.okapi.steps.xliffkit.writer.testPackageFormat()"),
-						//new Parameter("outputURI", this.getClass().getResource("draft4.xliff.kit").toURI().toString()))
-						new Parameter("outputURI", new URL("file", null, pathBase + "testPackageFormat4.xstream.kit").toURI().toString()))
+						new XParameter("gMode", true),
+						new XParameter("includeOriginal", true),
+						new XParameter("message", "This document is a part of the test t-kit, generated from net.sf.okapi.steps.xliffkit.writer.testPackageFormat()"),
+						//new XParameter("outputURI", this.getClass().getResource("draft4.xliff.kit").toURI().toString()))
+						new XParameter("outputURI", new URL("file", null, pathBase + "testPackageFormat4.xstream.kit").toURI().toString()))
 		).execute();
 		System.out.println(" Total: " + (System.currentTimeMillis() - start) + " milliseconds.");
 	}
@@ -176,10 +176,10 @@ public class XstreamWriterTest {
 		writerStep.setSession(session);
 		writerStep.setResourcesFileExt(".xml");
 		for(int i = 0; i < loops; i++) {
-		new Pipeline(
+		new XPipeline(
 				"Test pipeline for XLIFFKitWriterStep",
-				new Batch(
-						new BatchItem(
+				new XBatch(
+						new XBatchItem(
 								new URL("file", null, src1Path + "test5.txt"),
 								"UTF-8",
 								ENUS,
@@ -252,13 +252,13 @@ public class XstreamWriterTest {
 //						new Parameter("fillTarget", true)
 //				),
 				
-				new PipelineStep(
+				new XPipelineStep(
 						writerStep,								
-						new Parameter("gMode", true),
-						new Parameter("includeOriginal", true),
-						new Parameter("message", "This document is a part of the test t-kit, generated from net.sf.okapi.steps.xliffkit.writer.testPackageFormat()"),
-						//new Parameter("outputURI", this.getClass().getResource("draft4.xliff.kit").toURI().toString()))
-						new Parameter("outputURI", new URL("file", null, pathBase + "testPackageFormat5.xstream.kit").toURI().toString()))
+						new XParameter("gMode", true),
+						new XParameter("includeOriginal", true),
+						new XParameter("message", "This document is a part of the test t-kit, generated from net.sf.okapi.steps.xliffkit.writer.testPackageFormat()"),
+						//new XParameter("outputURI", this.getClass().getResource("draft4.xliff.kit").toURI().toString()))
+						new XParameter("outputURI", new URL("file", null, pathBase + "testPackageFormat5.xstream.kit").toURI().toString()))
 		).execute();
 		}
 		System.out.println(" Total: " + (System.currentTimeMillis() - start) + " milliseconds.");
