@@ -41,6 +41,7 @@ public class XDocument  {
 	{
 		fcMapper = new FilterConfigurationMapper();
 	
+		// Used in XLIFFKitReaderTest
 		// TODO Registration of filter configs in the FilterConfigurationMapper, not here
 		fcMapper.addConfigurations("net.sf.okapi.filters.xml.XMLFilter");
 		fcMapper.addConfigurations("net.sf.okapi.filters.html.HtmlFilter");
