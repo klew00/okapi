@@ -704,10 +704,14 @@ class QualityChecker {
 				else { // Generate an issue
 					String msg;
 					if ( expectSame ) {
-						msg = String.format("The source part \"%s\" is not in the target.", srcPart);
+						msg = String.format("The source part \"%s\" is not in the target", srcPart);
 					}
 					else {
-						msg = String.format("The source part \"%s\" has no correspondance in the target.", srcPart);
+						msg = String.format("The source part \"%s\" has no correspondance in the target", srcPart);
+					}
+					// Add the description of the rule triggering the warning
+					if ( !Util.isEmpty(item.description) ) {
+						msg += " (from rule: "+item.description+").";
 					}
 					reportIssue(IssueType.UNEXPECTED_PATTERN, tu, srcSeg.getId(), msg,
 						fromFragmentToString(srcSeg.text, srcM.start()),
