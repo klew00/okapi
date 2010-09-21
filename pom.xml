@@ -28,6 +28,15 @@
 					<target>1.6</target>
 				</configuration>
 			</plugin>
+			<!-- We need this for jython scripting - shouldn't bother other users -->
+			<plugin>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<configuration>
+					<additionalProjectnatures>
+						<projectnature>org.python.pydev.pythonNature</projectnature>
+					</additionalProjectnatures>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 	
