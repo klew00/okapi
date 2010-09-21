@@ -44,6 +44,8 @@ public class Pipeline implements IPipeline, IObservable, IObserver {
 	private volatile PipelineReturnValue state;
 	private String id;
 
+	private boolean notifiedObserver;
+
 	/**
 	 * Creates a new Pipeline object.
 	 */
@@ -107,7 +109,7 @@ public class Pipeline implements IPipeline, IObservable, IObserver {
 	}
 
 	private Event execute(Event event) {
-		boolean notifiedObserver = false;
+		notifiedObserver = false;
 		state = PipelineReturnValue.RUNNING;
 
 		// loop through the events until we run out of steps or hit cancel
@@ -120,37 +122,12 @@ public class Pipeline implements IPipeline, IObservable, IObserver {
 				notifiedObserver = false;
 				for (IPipelineStep step : steps) {
 					event = step.handleEvent(event);
-					// We send each of the events in MULTI_EVENT down the pipeline before
-					// processing any other events but only if the event is configured for multi-event propagation
-					if (event.getEventType() == EventType.MULTI_EVENT
-							&& !(((MultiEvent) event.getResource()).isPropagateAsSingleEvent())) {
-						// add the remaining steps to a temp list - these are the steps that will receive the expanded
-						// MULT_EVENTS
-						List<IPipelineStep> remainingSteps = steps.subList(steps.indexOf(step) + 1,
-								steps.size());
-						for (Event e : ((MultiEvent) event.getResource())) {
-							event = e;
-							// send the current event from MULTI_EVENT down the remaining steps in the pipeline
-							for (IPipelineStep remainingStep : remainingSteps) {
-								event = remainingStep.handleEvent(event);
-							}
-							// notify observers that the final step has sent an Event
-							// always filter out NO_OP events
-							if (!event.isNoop()) {
-								notifyObservers(event);
-							}
-							notifiedObserver = true;
-						}
-						
-						// the previous event has already been sent to all steps
-						// start the next cycle with a NO_OP event
-						event = Event.NOOP_EVENT;
-						break;
-					}
+					// Recursively expand the event if needed
+					event = expandEvent(event, step);
 				}
 
 				// notify observers that the final step has sent an Event
-				if (!notifiedObserver && !event.isNoop()) {					
+				if (!notifiedObserver && !event.isNoop()) {
 					notifyObservers(event);
 				}
 			} while (!steps.getFirst().isDone() && !(state == PipelineReturnValue.CANCELLED));
@@ -160,11 +137,44 @@ public class Pipeline implements IPipeline, IObservable, IObserver {
 				while (steps.getFirst().isDone()) {
 					finishedSteps.add(steps.remove());
 				}
-			} catch (NoSuchElementException e) {	
+			} catch (NoSuchElementException e) {
 				// ignore
 			}
 		}
 
+		return event;
+	}
+
+	/*
+	 * Test the event and if it is a MULTI_EVENT then expand it and process each contained Event.
+	 * We must do this recursively.
+	 */
+	private Event expandEvent(Event event, IPipelineStep currentStep) {
+		// We send each of the events in MULTI_EVENT down the pipeline before
+		// processing any other events but only if the event is configured for multi-event propagation
+		if (event.getEventType() == EventType.MULTI_EVENT
+				&& !(((MultiEvent) event.getResource()).isPropagateAsSingleEvent())) {
+
+			// add the remaining steps to a temp list - these are the steps that will receive the expanded
+			// MULT_EVENTS
+			List<IPipelineStep> remainingSteps = steps.subList(steps.indexOf(currentStep) + 1,
+					steps.size());
+			for (Event e : ((MultiEvent) event.getResource())) {
+				event = e;
+				// send the current event from MULTI_EVENT down the remaining steps in the pipeline
+				for (IPipelineStep remainingStep : remainingSteps) {
+					event = remainingStep.handleEvent(event);
+					event = expandEvent(event, remainingStep);
+				}
+				// notify observers that the final step has sent an Event
+				// always filter out NO_OP events
+				if (!event.isNoop()) {
+					notifyObservers(event);
+					notifiedObserver = true;
+				}				
+			}
+		}
+		
 		return event;
 	}
 
