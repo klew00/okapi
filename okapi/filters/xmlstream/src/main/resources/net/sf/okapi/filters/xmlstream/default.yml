@@ -8,6 +8,8 @@ attributes:
   # This rule will not apply unless TEXT_UNIT element rules are defined which may have an id
   'xml:id':
     ruleTypes: [ATTRIBUTE_ID]
+  'id':
+    ruleTypes: [ATTRIBUTE_ID]
   
   'xml:space':
     ruleTypes: [ATTRIBUTE_PRESERVE_WHITESPACE]
