@@ -427,7 +427,7 @@ public class TextFragmentTest {
 	}
 	
 	@Test
-	public void testAppendableSelft () {
+	public void testAppendableSelf () {
 		TextFragment tf = makeFragment1();
 		assertEquals("[b]A[br/]B[/b]C[b]A[br/]B[/b]C", tf.append(tf).toText());
 		Code c1 = tf.codes.get(1);
