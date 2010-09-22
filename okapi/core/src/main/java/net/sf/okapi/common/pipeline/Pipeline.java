@@ -111,7 +111,7 @@ public class Pipeline implements IPipeline, IObservable, IObserver {
 	private Event execute(Event event) {
 		notifiedObserver = false;
 		state = PipelineReturnValue.RUNNING;
-
+		
 		// loop through the events until we run out of steps or hit cancel
 		while (!steps.isEmpty() && !(state == PipelineReturnValue.CANCELLED)) {
 			// cycle through the steps in order, pulling off steps that run out
@@ -159,8 +159,8 @@ public class Pipeline implements IPipeline, IObservable, IObserver {
 			// MULT_EVENTS
 			List<IPipelineStep> remainingSteps = steps.subList(steps.indexOf(currentStep) + 1,
 					steps.size());
-			for (Event e : ((MultiEvent) event.getResource())) {
-				event = e;
+			for (Event me : ((MultiEvent)event.getResource())) {
+				event = me;
 				// send the current event from MULTI_EVENT down the remaining steps in the pipeline
 				for (IPipelineStep remainingStep : remainingSteps) {
 					event = remainingStep.handleEvent(event);
@@ -200,8 +200,26 @@ public class Pipeline implements IPipeline, IObservable, IObserver {
 		}
 		notifyObservers(e);
 
+		Event finalEvent = Event.NOOP_EVENT;
+		
 		// Prime the pipeline with the input Event and run it to completion.
-		Event finalEvent = execute(input);
+		
+		// catch case where the first event is MULTI_EVENT
+		if (input.getEventType() == EventType.MULTI_EVENT && 
+				!(((MultiEvent)input.getResource()).isPropagateAsSingleEvent())) {
+			for (Event me : ((MultiEvent) input.getResource())) {
+				finalEvent = execute(me);
+				// Copy any remaining steps into finishedSteps - makes initialization
+				// process easier down the road if we use the pipeline again
+				for (IPipelineStep step : steps) {
+					finishedSteps.add(step);
+				}
+				steps.clear();
+				initialize();
+			}
+		} else {
+			finalEvent = execute(input);
+		}
 
 		// Copy any remaining steps into finishedSteps - makes initialization
 		// process easier down the road if we use the pipeline again

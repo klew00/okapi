@@ -28,6 +28,7 @@ import static org.junit.Assert.*;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.observer.IObservable;
+import net.sf.okapi.common.resource.MultiEvent;
 
 public class ChainingTest {
 
@@ -97,6 +98,35 @@ public class ChainingTest {
 		List<Event> el = o.getResult();  
 		assertEquals(EventType.START_BATCH, el.remove(0).getEventType());
 		assertEquals(EventType.START_BATCH_ITEM, el.remove(0).getEventType());
+		assertEquals(EventType.CUSTOM, el.remove(0).getEventType());
+		assertEquals(EventType.CUSTOM, el.remove(0).getEventType());		
+		assertEquals(EventType.END_BATCH_ITEM, el.remove(0).getEventType());
+		assertEquals(EventType.END_BATCH, el.remove(0).getEventType());
+	}
+	
+	@Test
+	public void pipelineObserverWithMultiEventAsInput() {		
+		IPipeline p = new Pipeline();
+		
+		// add our event observer
+		EventObserver o = new EventObserver();
+		((IObservable)p).addObserver(o);
+		
+		p.addStep(new DummyMultiCustomEventStep());
+		
+		p.startBatch();		
+		MultiEvent me = new MultiEvent();
+		me.addEvent(new Event(EventType.CUSTOM));
+		me.addEvent(new Event(EventType.CUSTOM));
+		p.process(new Event(EventType.MULTI_EVENT, me));				
+		p.endBatch();
+		
+		// test we observed the correct events
+		List<Event> el = o.getResult();  
+		assertEquals(EventType.START_BATCH, el.remove(0).getEventType());
+		assertEquals(EventType.START_BATCH_ITEM, el.remove(0).getEventType());
+		assertEquals(EventType.CUSTOM, el.remove(0).getEventType());
+		assertEquals(EventType.CUSTOM, el.remove(0).getEventType());
 		assertEquals(EventType.CUSTOM, el.remove(0).getEventType());
 		assertEquals(EventType.CUSTOM, el.remove(0).getEventType());		
 		assertEquals(EventType.END_BATCH_ITEM, el.remove(0).getEventType());
