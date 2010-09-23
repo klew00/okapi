@@ -22,10 +22,14 @@ package net.sf.okapi.steps.wordcount;
 
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.resource.ISegments;
+import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.steps.tokenization.Tokenizer;
+import net.sf.okapi.steps.tokenization.common.TokensAnnotation;
 import net.sf.okapi.steps.tokenization.tokens.Tokens;
 import net.sf.okapi.steps.wordcount.common.BaseCounter;
 import net.sf.okapi.steps.wordcount.common.GMX;
@@ -54,7 +58,7 @@ public class WordCounter extends BaseCounter {
 	}
 	
 	@Override
-	protected long doGetCount(String text, LocaleId language) {
+	protected long doCount(String text, LocaleId language) {
 		
 		Tokens tokens = Tokenizer.tokenize(text, language, getTokenName());		
 		if (tokens == null) return 0;
@@ -68,24 +72,48 @@ public class WordCounter extends BaseCounter {
 		return tokens.size();
 	}
 	
-	public static long getCount(TextUnit textUnit, LocaleId language) {
-		return getCount(WordCounter.class, textUnit, language);		
+	public static long count(TextUnit textUnit, LocaleId language) {
+		return count(WordCounter.class, textUnit, language);		
 	}
 	
-	public static long getCount(TextContainer textContainer, LocaleId language) {
-		return getCount(WordCounter.class, textContainer, language);		
+	public static long count(TextContainer textContainer, LocaleId language) {
+		return count(WordCounter.class, textContainer, language);		
 	}
 
-	public static long getCount(TextFragment textFragment, LocaleId language) {
-		return getCount(WordCounter.class, textFragment, language);		
+	public static long count(TextFragment textFragment, LocaleId language) {
+		return count(WordCounter.class, textFragment, language);		
 	}
 	
-	public static long getCount(String string, LocaleId language) {
-		return getCount(WordCounter.class, string, language);		
+	public static long count(String string, LocaleId language) {
+		return count(WordCounter.class, string, language);		
 	}
 	
-	public static String getTokenName() {
+	public static long getCount(TextUnit tu) {
+		MetricsAnnotation ma = TextUnitUtil.getSourceAnnotation(tu, MetricsAnnotation.class);
+		if (ma == null) return 0;
 		
+		Metrics m = ma.getMetrics();
+		if (m == null) return 0;
+		
+		return m.getMetric(GMX.TotalWordCount);
+	}
+	
+	public static long getCount(TextUnit tu, int segIndex) {
+		ISegments segments = tu.getSource().getSegments();
+		return getCount(segments.get(segIndex));		
+	}
+	
+	public static long getCount(Segment segment) {
+		MetricsAnnotation ma = segment.getAnnotation(MetricsAnnotation.class);
+		if (ma == null) return 0;
+		
+		Metrics m = ma.getMetrics();
+		if (m == null) return 0;
+		
+		return m.getMetric(GMX.TotalWordCount);		
+	}
+	
+	public static String getTokenName() {		
 		loadParameters();
 		
 		if (params == null) return "";

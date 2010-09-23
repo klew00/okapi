@@ -43,9 +43,9 @@ abstract public class BaseCounter {
 	private static BaseCounter counter = null;	
 	private static Logger logger = null;
 	
-	abstract protected long doGetCount(String text, LocaleId language);
+	abstract protected long doCount(String text, LocaleId language);
 	
-	protected static long getCount(Class<? extends BaseCounter> classRef, Object text, LocaleId language) {
+	protected static long count(Class<? extends BaseCounter> classRef, Object text, LocaleId language) {
 	
 		if (text == null) return 0L;
 		if (Util.isNullOrEmpty(language)) return 0L;
@@ -55,16 +55,16 @@ abstract public class BaseCounter {
 			TextUnit tu = (TextUnit) text;
 			
 			if (tu.hasTarget(language))
-				return getCount(classRef, tu.getTarget(language), language);
+				return count(classRef, tu.getTarget(language), language);
 			else
-				return getCount(classRef, tu.getSource(), language);
+				return count(classRef, tu.getSource(), language);
 		} 
 		else if (text instanceof TextContainer) {
 			// This work on segments' content (vs. parts' content)
 			TextContainer tc = (TextContainer)text;
 			long res = 0;
 			for ( Segment seg : tc.getSegments() ) {
-				res += getCount(classRef, seg.getContent(), language);
+				res += count(classRef, seg.getContent(), language);
 			}
 			return res;
 		}
@@ -72,14 +72,14 @@ abstract public class BaseCounter {
 			
 			TextFragment tf = (TextFragment) text;
 			
-			return getCount(classRef, TextUnitUtil.getText(tf), language);
+			return count(classRef, TextUnitUtil.getText(tf), language);
 		}
 		else if (text instanceof String) {
 			
 			instantiateCounter(classRef);
 			if (counter == null) return 0L;
 			
-			return counter.doGetCount((String) text, language);
+			return counter.doCount((String) text, language);
 		}
 		
 		return 0;		
