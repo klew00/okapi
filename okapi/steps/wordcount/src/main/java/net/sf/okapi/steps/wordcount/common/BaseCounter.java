@@ -50,32 +50,34 @@ abstract public class BaseCounter {
 		if (text == null) return 0L;
 		if (Util.isNullOrEmpty(language)) return 0L;
 		
-		if (text instanceof TextUnit) {
-		
+		if (text instanceof TextUnit) {		
 			TextUnit tu = (TextUnit) text;
 			
-			if (tu.hasTarget(language))
-				return count(classRef, tu.getTarget(language), language);
-			else
-				return count(classRef, tu.getSource(), language);
+//			if (tu.hasTarget(language))
+//				return count(classRef, tu.getTarget(language), language);
+//			else
+			// Only words in the source are counted
+			return count(classRef, tu.getSource(), language);
 		} 
+		else if (text instanceof Segment) {
+			Segment seg = (Segment) text;
+			return count(classRef, seg.getContent(), language);
+		}
 		else if (text instanceof TextContainer) {
 			// This work on segments' content (vs. parts' content)
-			TextContainer tc = (TextContainer)text;
+			TextContainer tc = (TextContainer) text;
 			long res = 0;
 			for ( Segment seg : tc.getSegments() ) {
-				res += count(classRef, seg.getContent(), language);
+				res += count(classRef, seg, language);
 			}
 			return res;
 		}
-		else if (text instanceof TextFragment) {
-			
+		else if (text instanceof TextFragment) {			
 			TextFragment tf = (TextFragment) text;
 			
 			return count(classRef, TextUnitUtil.getText(tf), language);
 		}
-		else if (text instanceof String) {
-			
+		else if (text instanceof String) {			
 			instantiateCounter(classRef);
 			if (counter == null) return 0L;
 			

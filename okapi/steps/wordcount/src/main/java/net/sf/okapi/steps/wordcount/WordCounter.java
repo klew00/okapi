@@ -70,23 +70,62 @@ public class WordCounter extends BaseCounter {
 		
 		return tokens.size();
 	}
-	
+
+	/**
+	 * Counts words in the source part of a given text unit.
+	 * @param textUnit the given text unit
+	 * @param language the language of the source
+	 * @return number of words
+	 */	
 	public static long count(TextUnit textUnit, LocaleId language) {
 		return count(WordCounter.class, textUnit, language);		
 	}
 	
+	/**
+	 * Counts words in a given text container.
+	 * @param textContainer the given text container
+	 * @param language the language of the text
+	 * @return number of words
+	 */
 	public static long count(TextContainer textContainer, LocaleId language) {
 		return count(WordCounter.class, textContainer, language);		
 	}
+	
+	/**
+	 * Counts words in a given segment.
+	 * @param segment the given segment
+	 * @param language the language of the text
+	 * @return number of words
+	 */
+	public static long count(Segment segment, LocaleId language) {
+		return count(WordCounter.class, segment, language);		
+	}
 
+	/**
+	 * Counts words in a given text fragment.
+	 * @param textFragment the given text fragment
+	 * @param language the language of the text
+	 * @return number of words
+	 */
 	public static long count(TextFragment textFragment, LocaleId language) {
 		return count(WordCounter.class, textFragment, language);		
 	}
 	
+	/**
+	 * Counts words in a given string.
+	 * @param string the given string
+	 * @param language the language of the text
+	 * @return number of words
+	 */
 	public static long count(String string, LocaleId language) {
 		return count(WordCounter.class, string, language);		
 	}
 	
+	/**
+	 * Returns the word count information stored by WordCountStep in the source part of a given text unit. 
+	 * @param tu the given text unit
+	 * @return number of words (0 if no word count information found)
+	 */
 	public static long getCount(TextUnit tu) {
 		MetricsAnnotation ma = TextUnitUtil.getSourceAnnotation(tu, MetricsAnnotation.class);
 		if (ma == null) return 0;
@@ -97,11 +136,22 @@ public class WordCounter extends BaseCounter {
 		return m.getMetric(GMX.TotalWordCount);
 	}
 	
+	/**
+	 * Returns the word count information stored by WordCountStep in a given segment of the source part of a given text unit.
+	 * @param tu the given tu
+	 * @param segIndex index of the segment in the source
+	 * @return number of words (0 if no word count information found)
+	 */
 	public static long getCount(TextUnit tu, int segIndex) {
 		ISegments segments = tu.getSource().getSegments();
 		return getCount(segments.get(segIndex));		
 	}
 	
+	/**
+	 * Returns the word count information stored by WordCountStep in a given segment of the source part of a given text unit.
+	 * @param segment the given segment
+	 * @return number of words (0 if no word count information found)
+	 */
 	public static long getCount(Segment segment) {
 		MetricsAnnotation ma = segment.getAnnotation(MetricsAnnotation.class);
 		if (ma == null) return 0;
