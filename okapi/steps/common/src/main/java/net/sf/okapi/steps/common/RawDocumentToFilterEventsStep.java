@@ -89,7 +89,7 @@ public class RawDocumentToFilterEventsStep extends BasePipelineStep {
 	}
 	
 	public String getName() {
-		return "RawDocument to Filter Events";
+		return "Raw Document to Filter Events";
 	}
 
 	public String getDescription() {

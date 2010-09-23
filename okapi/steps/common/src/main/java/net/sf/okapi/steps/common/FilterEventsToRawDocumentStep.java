@@ -78,7 +78,7 @@ public class FilterEventsToRawDocumentStep extends BasePipelineStep {
 	
 	@Override
 	public String getName() {
-		return "Filter Events to RawDocument";
+		return "Filter Events to Raw Document";
 	}
 
 	@Override
