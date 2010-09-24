@@ -37,6 +37,7 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
 import net.sf.okapi.lib.translation.QueryUtil;
@@ -263,5 +264,10 @@ public class MyMemoryTMConnector implements ITMQuery {
 	@Override
 	public void setRootDirectory (String rootDir) {
 		// Not used
+	}
+	
+	@Override
+	public void leverage(TextUnit tu, boolean fillTarget) {
+		throw new OkapiNotImplementedException();		
 	}
 }

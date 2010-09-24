@@ -25,6 +25,7 @@ import java.util.List;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextUnit;
 
 /**
  * Provides the methods common to all query engines of translation resources 
@@ -122,6 +123,13 @@ public interface IQuery {
 	 */
 	public int query (TextFragment text);
 	
+	/**
+	 * Leverages a text unit (segmented or not) based on the current settings.
+	 * Any options or attributes needed must be set before calling this method.
+	 * @param tu the text unit to leverage.
+	 * @param fillTarget true to put the leveraged text into the target, false to not.
+	 */
+	public void leverage(TextUnit tu, boolean fillTarget);
 	
 	/**
 	 * Starts a batch query for a given list of {@link TextFragment}s.
@@ -146,7 +154,7 @@ public interface IQuery {
 	public QueryResult next ();
 
 	/**
-	 * Sets the root directory that may be used to replace the valiable ${rootDir} in the
+	 * Sets the root directory that may be used to replace the available ${rootDir} in the
 	 * parameters of this object.
 	 * @param rootDir the root directory.
 	 */

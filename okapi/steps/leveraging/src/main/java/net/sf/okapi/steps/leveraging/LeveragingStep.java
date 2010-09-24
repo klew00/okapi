@@ -27,6 +27,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.ScoresAnnotation;
+import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.filterwriter.TMXWriter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
@@ -35,6 +36,7 @@ import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.lib.translation.IQuery;
 import net.sf.okapi.lib.translation.QueryManager;
 import net.sf.okapi.lib.translation.ResourceItem;
 
@@ -50,9 +52,13 @@ public class LeveragingStep extends BasePipelineStep {
 	private TMXWriter tmxWriter;
 	private String rootDir;
 	private boolean initDone;
+	private boolean useQueryManagerLeverage;
+
+	private int iQueryId;
 
 	public LeveragingStep () {
 		params = new Parameters();
+		useQueryManagerLeverage = false;
 	}
 	
 	@StepParameterMapping(parameterType = StepParameterType.SOURCE_LOCALE)
@@ -104,7 +110,7 @@ public class LeveragingStep extends BasePipelineStep {
 	@Override
 	protected Event handleStartDocument (Event event) {
 		if ( !params.getLeverage() ) return event;
-		if ( !initDone ) {
+		if ( !initDone ) {			
 			initialize();
 		}
 		qm.setLanguages(sourceLocale, targetLocale);
@@ -143,7 +149,15 @@ public class LeveragingStep extends BasePipelineStep {
     	}
 //end of to be deleted 
     	// Leverage
-		qm.leverage(tu, tmxWriter, params.getFillTarget());
+    	if (useQueryManagerLeverage) {
+    		qm.leverage(tu, tmxWriter, params.getFillTarget());
+    	} else {
+    		IQuery q = qm.getInterface(iQueryId);
+    		q.leverage(tu, params.getFillTarget());
+    		if ( tmxWriter != null ) {
+				tmxWriter.writeItem(tu, null);
+			}
+    	}
 		
 		return event;
 	}
@@ -172,9 +186,19 @@ public class LeveragingStep extends BasePipelineStep {
 		qm = new QueryManager();
 		qm.setThreshold(params.getThreshold());
 		qm.setRootDirectory(rootDir);
-		int id = qm.addAndInitializeResource(params.getResourceClassName(), null,
+		iQueryId = qm.addAndInitializeResource(params.getResourceClassName(), null,
 			params.getResourceParameters());
-		ResourceItem res = qm.getResource(id);
+
+		// test to see if the IQuery object implements leverage
+		IQuery q = qm.getInterface(iQueryId);
+		useQueryManagerLeverage = false;
+		try {
+			q.leverage(null, false);
+		} catch (OkapiNotImplementedException e) {
+			useQueryManagerLeverage = true;
+		}
+		
+		ResourceItem res = qm.getResource(iQueryId);
 		logger.info("Leveraging settings: "+res.name);
 		logger.info(res.query.getSettingsDisplay());
 			

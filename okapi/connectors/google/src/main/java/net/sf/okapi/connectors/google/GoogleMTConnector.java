@@ -32,8 +32,10 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.translation.BaseConnector;
 import net.sf.okapi.lib.translation.QueryResult;
 import net.sf.okapi.lib.translation.QueryUtil;
@@ -144,5 +146,9 @@ public class GoogleMTConnector extends BaseConnector {
 		}
 		return code;
 	}
-
+	
+	@Override
+	public void leverage(TextUnit tu, boolean fillTarget) {
+		throw new OkapiNotImplementedException();		
+	}
 }

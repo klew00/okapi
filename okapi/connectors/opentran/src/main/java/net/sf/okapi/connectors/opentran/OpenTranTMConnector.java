@@ -39,6 +39,7 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
@@ -256,6 +257,11 @@ public class OpenTranTMConnector implements ITMQuery {
 	@Override
 	public void setRootDirectory (String rootDir) {
 		// Not used
+	}
+	
+	@Override
+	public void leverage(TextUnit tu, boolean fillTarget) {
+		throw new OkapiNotImplementedException();		
 	}
 
 	/**

@@ -40,6 +40,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
 
@@ -210,6 +211,11 @@ public class TranslateToolkitTMConnector implements ITMQuery {
 	@Override
 	public int getThreshold () {
 		return threshold;
+	}
+	
+	@Override
+	public void leverage(TextUnit tu, boolean fillTarget) {
+		throw new OkapiNotImplementedException();		
 	}
 
 	private String toInternalCode (LocaleId standardCode) {
