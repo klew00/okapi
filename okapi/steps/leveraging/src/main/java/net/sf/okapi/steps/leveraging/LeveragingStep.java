@@ -190,6 +190,7 @@ public class LeveragingStep extends BasePipelineStep {
 			params.getResourceParameters());
 
 		// test to see if the IQuery object implements leverage
+		// FIXME: We will clean this up in a subsequent refactor
 		IQuery q = qm.getInterface(iQueryId);
 		useQueryManagerLeverage = false;
 		try {
