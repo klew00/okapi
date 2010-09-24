@@ -21,6 +21,8 @@
 package net.sf.okapi.lib.translation;
 
 import net.sf.okapi.common.HashCodeUtil;
+import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.TextFragment;
 
@@ -28,6 +30,27 @@ import net.sf.okapi.common.resource.TextFragment;
  * Stores one result of a query.
  */
 public class QueryResult implements Comparable<QueryResult> {
+	
+	/**
+	 * Convert a QueryResult to an {@link AltTranslation}
+	 * @param originalSource
+	 *            the original source content.
+  	 * @param sourceLocId
+	 *            the {@link LocaleId} of the source.
+	 * @param targetLocId
+	 *            the {@link LocaleId} of the target.
+	 * @return an {@link AltTranslation} corresponding to this QueryResult
+	 */
+	public AltTranslation toAltTranslation(TextFragment originalSource, LocaleId sourceLocId, LocaleId targetLocId) {
+		return new AltTranslation(sourceLocId,
+				targetLocId, 
+				originalSource, 
+				source, 
+				target, 
+				matchType, 
+				score, 
+				origin);		
+	}
 
 	/**
 	 * Weight for this result.
