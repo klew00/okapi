@@ -113,7 +113,7 @@ public class MyMemoryTMConnector implements ITMQuery {
 			otms = new OtmsSoapStub(url, null);
 		}
 		catch ( AxisFault e ) {
-			throw new RuntimeException("Error creating the myMemory Web services.", e);
+			throw new RuntimeException("Error creating the MyMemory Web services.", e);
 		}
 		catch ( MalformedURLException e ) {
 			throw new RuntimeException("Invalid server URL.", e);

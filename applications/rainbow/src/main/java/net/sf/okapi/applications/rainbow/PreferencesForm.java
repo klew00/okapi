@@ -45,6 +45,7 @@ class PreferencesForm {
 	private Button rdStartPrjDoNotLoad;
 	private Button rdStartPrjAsk;
 	private Button rdStartPrjLoad;
+	private Button chkAlwaysOpenLog;
 	private Button chkAllowDuplicateInputs;
 	private Combo cbLogLevel;
 	private UserConfiguration config;
@@ -77,9 +78,15 @@ class PreferencesForm {
 		grpTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
 		grpTmp.setLayout(new GridLayout(2, false));
 		
+		chkAlwaysOpenLog = new Button(grpTmp, SWT.CHECK);
+		chkAlwaysOpenLog.setText(Res.getString("PreferencesForm.alwaysOpenLog")); //$NON-NLS-1$
+		GridData gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		chkAlwaysOpenLog.setLayoutData(gdTmp);
+		
 		chkAllowDuplicateInputs = new Button(grpTmp, SWT.CHECK);
 		chkAllowDuplicateInputs.setText(Res.getString("PreferencesForm.allowDuplicated")); //$NON-NLS-1$
-		GridData gdTmp = new GridData();
+		gdTmp = new GridData();
 		gdTmp.horizontalSpan = 2;
 		chkAllowDuplicateInputs.setLayoutData(gdTmp);
 		
@@ -126,6 +133,7 @@ class PreferencesForm {
 
 	void setData (UserConfiguration config) {
 		this.config = config;
+		chkAlwaysOpenLog.setSelection(config.getBoolean(MainForm.OPT_ALWAYSOPENLOG));
 		chkAllowDuplicateInputs.setSelection(config.getBoolean(MainForm.OPT_ALLOWDUPINPUT));
 		int n = config.getInteger(MainForm.OPT_LOADMRU);
 		if ( n == 1 ) rdStartPrjAsk.setSelection(true);
@@ -138,6 +146,7 @@ class PreferencesForm {
 
 	private boolean saveData () {
 		try {
+			config.setProperty(MainForm.OPT_ALWAYSOPENLOG, chkAlwaysOpenLog.getSelection());
 			config.setProperty(MainForm.OPT_ALLOWDUPINPUT, chkAllowDuplicateInputs.getSelection());
 			if ( rdStartPrjAsk.getSelection() ) config.setProperty(MainForm.OPT_LOADMRU, 1);
 			else if ( rdStartPrjLoad.getSelection() ) config.setProperty(MainForm.OPT_LOADMRU, 2);
