@@ -72,5 +72,26 @@ public class GlossaryTest {
 
 		ta.close();
 	}
+	
+	@Test
+	public void testGetExistingStrings () {
+		SimpleTBConnector ta = new SimpleTBConnector();
+		Parameters params = (Parameters)ta.getParameters();
+		params.setSourceLocale(locEN);
+		params.setTargetLocale(locFR);
+		ta.open();
+		ta.addEntry("src", "trg");
+		ta.addEntry("src2", "trg2");
+		ta.addEntry("Src1 src2", "Trg1 trg2");
+		ta.addEntry("src5", "trg5");
+		ta.initializeSearch(true);
+		
+		TextFragment srcFrag = new TextFragment(">src2< and Src1 src2. Also: WithiWordsrcWord");
+		List<TermHit> found1 = ta.getExistingStrings(srcFrag, locEN, locFR);
+		assertEquals(2, found1.size());
+		assertEquals("Src1 src2", found1.get(0).sourceTerm.getText());
+		assertEquals("src2", found1.get(1).sourceTerm.getText());
+		
+	}
 
 }

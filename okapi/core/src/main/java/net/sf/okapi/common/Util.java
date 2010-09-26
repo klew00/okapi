@@ -35,8 +35,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.ByteBuffer;
@@ -1154,6 +1156,22 @@ public final class Util {
 		}
 		catch ( Throwable e ) {
 			throw new RuntimeException("Error attempting to launch web browser.", e);
+		}
+	}
+	
+	/**
+	 * Opens a given topic of the OkapiWiki.
+	 * @param topic the title of the topic/page.
+	 */
+	public static void openWikiTopic (String topic) {
+		try {
+			// Resolve spaces
+			topic = topic.replace(' ', '_');
+			//TODO: get the base URL from a properties file
+			Util.openURL(new URL(String.format("http://www.opentag.com/okapi/wiki/index.php?title=%s", topic)).toString());
+		}
+		catch ( MalformedURLException e ) {
+			e.printStackTrace();
 		}
 	}
 

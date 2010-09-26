@@ -63,4 +63,8 @@ public interface ITermAccess {
 		LocaleId fragmentLoc,
 		LocaleId otherLoc);
 
+	public List<TermHit> getExistingStrings (TextFragment fragment,
+		LocaleId fragmentLoc,
+		LocaleId otherLoc);
+
 }

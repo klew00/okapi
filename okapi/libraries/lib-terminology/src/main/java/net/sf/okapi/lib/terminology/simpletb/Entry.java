@@ -20,7 +20,7 @@
 
 package net.sf.okapi.lib.terminology.simpletb;
 
-public class Entry {
+public class Entry implements Comparable<Entry> {
 
 	String srcTerm;
 	String trgTerm;
@@ -29,7 +29,11 @@ public class Entry {
 	public Entry (String srcTerm) {
 		this.srcTerm = srcTerm;
 	}
-	
+
+	@Override
+	public String toString() {
+		return srcTerm + ":" + trgTerm;
+	}
 	public void setSourceTerm (String term) {
 		srcTerm = term;
 	}
@@ -52,6 +56,18 @@ public class Entry {
 
 	public String getDefinition () {
 		return definition;
+	}
+
+	@Override
+	/**
+	 * This method compare by length then by character, always in reverse order.
+	 */
+	public int compareTo (Entry other) {
+		if ( srcTerm.length() > other.srcTerm.length() ) return -1;
+		if ( srcTerm.length() == other.srcTerm.length() ) {
+			return other.srcTerm.compareTo(srcTerm);
+		}
+		return 1;
 	}
 	
 }

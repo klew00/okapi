@@ -798,6 +798,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		edMessage.setEditable(false);
 
 		cbDocument = new Combo(cmpTmp, SWT.DROP_DOWN | SWT.READ_ONLY);
+		cbDocument.setVisibleItemCount(20);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalSpan = 3;
 		cbDocument.setLayoutData(gdTmp);

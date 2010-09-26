@@ -132,7 +132,7 @@ class QualityChecker {
 			termChecker = new TermChecker();
 			SimpleTB ta = new SimpleTB(srcLoc, trgLoc);
 			ta.guessAndImport(new File(params.getTermsPath()));
-			termChecker.initialize(ta, srcLoc, trgLoc);
+			termChecker.initialize(ta, srcLoc, trgLoc, true); //TODO: option for stringSearch or not
 		}
 	}
 
@@ -247,7 +247,7 @@ class QualityChecker {
 			}
 			
 			if ( termChecker != null ) {
-				if ( termChecker.verifyTerms(currentDocId, tu, srcSeg, trgSeg) > 0 ) {
+				if ( termChecker.verify(currentDocId, tu, srcSeg, trgSeg) > 0 ) {
 					for ( Issue issue : termChecker.getIssues() ) {
 						reportIssue(issue.issueType, tu, issue.segId, issue.message, issue.srcStart, issue.srcEnd,
 							issue.trgStart, issue.trgEnd, issue.severity, srcSeg.toString(), trgSeg.toString(), null);

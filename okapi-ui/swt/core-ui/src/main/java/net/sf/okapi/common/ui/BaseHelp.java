@@ -48,15 +48,7 @@ public class BaseHelp implements IHelp {
 
 	@Override
 	public void showWiki (String topic) {
-		try {
-			// Resolve spaces
-			topic = topic.replace(' ', '_');
-			//TODO: get the base URL from a properties file
-			Util.openURL(new URL(String.format("http://www.opentag.com/okapi/wiki/index.php?title=%s", topic)).toString());
-		}
-		catch ( MalformedURLException e ) {
-			e.printStackTrace();
-		}
+		Util.openWikiTopic(topic);
 	}
 	
 	@Override

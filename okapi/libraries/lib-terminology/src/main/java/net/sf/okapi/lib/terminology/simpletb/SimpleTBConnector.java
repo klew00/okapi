@@ -71,6 +71,18 @@ public class SimpleTBConnector implements ITermAccess {
 		return tb.getExistingTerms(fragment, fragmentLocId, otherLocId);
 	}
 	
+	@Override
+	public List<TermHit> getExistingStrings (TextFragment fragment,
+		LocaleId fragmentLocId,
+		LocaleId otherLocId)
+	{
+		return tb.getExistingStrings(fragment, fragmentLocId, otherLocId);
+	}
+	
+	public void initializeSearch(boolean stringSearch) {
+		tb.initialize(stringSearch);
+	}
+	
 	public Entry addEntry (String srcTerm,
 		String trgTerm)
 	{

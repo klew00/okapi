@@ -28,9 +28,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.Range;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.resource.TextFragment;
@@ -64,6 +66,11 @@ public class SimpleTB {
 	
 	private void reset () {
 		entries = new ArrayList<Entry>();
+	}
+	
+	public void initialize (boolean stringSearch) {
+		// In case of a string-based search: we sort the source terms: longer first
+		Collections.sort(entries);
 	}
 	
 	public void guessAndImport (File file) {
@@ -118,6 +125,71 @@ public class SimpleTB {
 		return ent;
 	}
 
+	public List<TermHit> getExistingStrings (TextFragment frag,
+		LocaleId fragmentLoc,
+		LocaleId otherLoc)
+	{
+		List<TermHit> res = new ArrayList<TermHit>();
+		
+		// Determine if the termbase has the searched locale
+		boolean searchSource = fragmentLoc.equals(srcLoc);
+		if ( !searchSource ) {
+			if ( !fragmentLoc.equals(trgLoc) ) {
+				return res; // Nothing
+			}
+		}
+
+		String stringToMatch;
+		String otherString;
+		StringBuilder text = new StringBuilder(frag);
+		
+		// For each term in the list
+		for ( Entry ent : entries ) {
+			// Select the source and target terms to search for
+			if ( searchSource ) {
+				stringToMatch = ent.getSourceTerm();
+				otherString = ent.getTargetTerm();
+			}
+			else {
+				stringToMatch = ent.getTargetTerm();
+				otherString = ent.getSourceTerm();
+			}
+			
+			if (( stringToMatch == null ) || ( otherString == null )) continue;
+			while ( true ) {
+				int n = text.indexOf(stringToMatch);
+				if ( n == -1 ) break; // No more of that term
+				// Check "word boundaries"
+				if ( n > 0 ) {
+					if ( Character.isLetterOrDigit(text.codePointAt(n-1)) ) {
+						// If the preceding character is a letter, it's not a "word"
+						break;
+					}
+				}
+				int last = n+stringToMatch.length();
+				if ( last < text.length() ) {
+					if ( Character.isLetterOrDigit(text.codePointAt(last)) ) {
+						// If the following character is a letter, it's not a "word"
+						break;
+					}
+				}
+				
+				// Else: Save the term
+				TermHit th = new TermHit();
+				th.sourceTerm = new TermEntry(stringToMatch);
+				th.targetTerm = new TermEntry(otherString);
+				th.range = new Range(n, last);
+				res.add(th);
+				// Obliterate the match so we don't re-match it 
+				for ( int i=n; i<last; i++ ) {
+					text.setCharAt(i, '`');
+				}
+			}
+		}
+		
+		return res;
+	}
+	
 	/*
 	 * Very crude implementation of the search terms function.
 	 */

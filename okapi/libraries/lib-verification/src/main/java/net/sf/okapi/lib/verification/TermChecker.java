@@ -30,6 +30,7 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.lib.terminology.TermEntry;
 import net.sf.okapi.lib.terminology.TermHit;
 import net.sf.okapi.lib.terminology.simpletb.SimpleTB;
 
@@ -39,18 +40,35 @@ public class TermChecker {
 	private LocaleId srcLoc;
 	private LocaleId trgLoc;
 	private SimpleTB ta;
+	private boolean stringSearch;
 	
 	public void initialize (SimpleTB termAccess,
 		LocaleId srcLoc,
-		LocaleId trgLoc)
+		LocaleId trgLoc,
+		boolean stringSearch)
 	{
 		issues = new ArrayList<Issue>();
 		this.ta = termAccess;
 		this.srcLoc = srcLoc;
 		this.trgLoc = trgLoc;
+		this.stringSearch = stringSearch;
+		ta.initialize(stringSearch);
 	}
 	
-	public int verifyTerms (URI docId,
+	public int verify (URI docId,
+		TextUnit tu,
+		Segment srcSeg,
+		Segment trgSeg)
+	{
+		if ( stringSearch ) {
+			return verifyStrings(docId, tu, srcSeg, trgSeg);
+		}
+		else {
+			return verifyTerms(docId, tu, srcSeg, trgSeg);
+		}
+	}
+	
+	private int verifyTerms (URI docId,
 		TextUnit tu,
 		Segment srcSeg,
 		Segment trgSeg)
@@ -69,7 +87,33 @@ public class TermChecker {
 		for ( TermHit th : srcList ) {
 			Issue issue = new Issue(docId, IssueType.TERMINOLOGY, tu.getId(), srcSeg.getId(),
 				String.format("In the glossary \"%s\" is translated \"%s\".", th.sourceTerm.getText(), th.targetTerm.getText()),
-				-1, 0, -1, 0, Issue.SEVERITY_LOW, tu.getName());
+				th.range.start, th.range.end, -1, 0, Issue.SEVERITY_LOW, tu.getName());
+			issues.add(issue);
+		}
+		return issues.size();
+	}
+
+	private int verifyStrings (URI docId,
+		TextUnit tu,
+		Segment srcSeg,
+		Segment trgSeg)
+	{
+		issues.clear();
+		// Get the list of the terms in the source text
+		List<TermHit> srcList = ta.getExistingStrings(srcSeg.text, srcLoc, trgLoc);
+		
+		// Get the list of the terms in the target text (based on the source list)
+		List<TermHit> trgList = getExistingTargetStrings(trgSeg.text, srcList);
+		
+		// Remove proper correspondences 
+		removeMatches(srcList, trgList);
+		
+		//  The source list has now only orphan source terms
+		for ( TermHit th : srcList ) {
+			Issue issue = new Issue(docId, IssueType.TERMINOLOGY, tu.getId(), srcSeg.getId(),
+				String.format("In the glossary \"%s\" is translated \"%s\".", th.sourceTerm.getText(), th.targetTerm.getText()),
+				QualityChecker.fromFragmentToString(srcSeg.text, th.range.start), QualityChecker.fromFragmentToString(srcSeg.text, th.range.end),
+				-1, 0, Issue.SEVERITY_LOW, tu.getName());
 			issues.add(issue);
 		}
 		return issues.size();
@@ -109,9 +153,48 @@ public class TermChecker {
 		return res;
 	}
 
+	public static List<TermHit> getExistingTargetStrings (TextFragment frag,
+		List<TermHit> sourceHits)
+	{
+		StringBuilder text = new StringBuilder(frag);
+		List<TermHit> res = new ArrayList<TermHit>();
+		
+		for ( TermHit th : sourceHits) {
+			String term = th.targetTerm.getText();
+			int n = text.indexOf(term);
+			if ( n == -1 ) continue; // No more of that term
+			// Check "word boundaries"
+			if ( n > 0 ) {
+				if ( Character.isLetterOrDigit(text.codePointAt(n-1)) ) {
+					// If the preceding character is a letter, it's not a "word"
+					continue; // Next term
+				}
+			}
+			int last = n+term.length();
+			if ( last < text.length() ) {
+				if ( Character.isLetterOrDigit(text.codePointAt(last)) ) {
+					// If the following character is a letter, it's not a "word"
+					continue; // Next term
+				}
+			}
+			
+			// Else: Save the term
+			TermHit hit = new TermHit();
+			hit.sourceTerm = th.targetTerm;
+			hit.targetTerm = th.sourceTerm;
+			res.add(hit);
+			// Obliterate the match so we don't re-match it 
+			for ( int i=n; i<last; i++ ) {
+				text.setCharAt(i, '`');
+			}
+		}
+		
+			
+		return res;
+	}
 	
 	/**
-	 * Removes from both list all the entries that are found in the source list and have their
+	 * Removes from both lists all the entries that are found in the source list and have their
 	 * corresponding entry in the target list.
 	 * <p>Assuming the source list comes from a source text and the target list from its
 	 * corresponding translation: The resulting source list indicates the terms that are likely
