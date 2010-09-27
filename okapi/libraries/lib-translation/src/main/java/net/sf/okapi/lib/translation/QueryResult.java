@@ -65,7 +65,7 @@ public class QueryResult implements Comparable<QueryResult> {
 	/**
 	 * {@link MatchType} of this result.
 	 */
-	public MatchType matchType;
+	public MatchType matchType = MatchType.UKNOWN;
 	
 	/**
 	 * Text of the source for this result.
