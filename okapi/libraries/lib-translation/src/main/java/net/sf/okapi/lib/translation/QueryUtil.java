@@ -21,6 +21,7 @@
 package net.sf.okapi.lib.translation;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Stack;
 import java.util.regex.Matcher;
@@ -404,6 +405,15 @@ public class QueryUtil {
 		return new TextFragment(buffer.toString(), original.getCodes());
 	}
 
+	/**
+	 * Remove duplicates based on the Equals method of {@link QueryResult}
+	 * @param queryResults -list of QueryResults
+	 * @return queryResults without duplicates
+	 */
+	public static List<QueryResult> removeDuplicates(List<QueryResult> queryResults) {
+		return new ArrayList<QueryResult>(new LinkedHashSet<QueryResult>(queryResults));
+	}
+	
 	private int getRawIndex (int lastIndex, Node attr) {
 		if ( attr == null ) return ++lastIndex;
 		return Integer.valueOf(attr.getNodeValue());
