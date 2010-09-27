@@ -74,9 +74,9 @@ public class Parameters extends BaseParameters {
 	private static final String SCOPE = "scope";
 	private static final String EXTRACODESALLOWED = "extraCodesAllowed";
 	private static final String MISSINGCODESALLOWED = "missingCodesAllowed";
-	
 	private static final String CHECKTERMS = "checkTerms";
 	private static final String TERMSPATH = "termsPath";
+	private static final String STRINGMODE = "stringMode";
 
 	String outputPath;
 	boolean autoOpen;
@@ -115,6 +115,7 @@ public class Parameters extends BaseParameters {
 	List<String> missingCodesAllowed;
 	boolean checkTerms;
 	String termsPath;
+	boolean stringMode;
 
 	public Parameters () {
 		reset();
@@ -400,6 +401,14 @@ public class Parameters extends BaseParameters {
 		this.checkTerms = checkTerms;
 	}
 	
+	public boolean getStringMode () {
+		return stringMode;
+	}
+
+	public void setStringMode (boolean stringMode) {
+		this.stringMode = stringMode;
+	}
+	
 	public String getTermsPath () {
 		return termsPath;
 	}
@@ -447,6 +456,7 @@ public class Parameters extends BaseParameters {
 		
 		checkTerms = false;
 		termsPath = "";
+		stringMode = false;
 
 		patterns = new ArrayList<PatternItem>();
 		
@@ -532,6 +542,7 @@ public class Parameters extends BaseParameters {
 		// Terms
 		checkTerms = buffer.getBoolean(CHECKTERMS, checkTerms);
 		termsPath = buffer.getString(TERMSPATH, termsPath);
+		stringMode = buffer.getBoolean(STRINGMODE, stringMode);
 		
 		// Patterns
 		checkPatterns = buffer.getBoolean(CHECKPATTERNS, checkPatterns);
@@ -600,6 +611,7 @@ public class Parameters extends BaseParameters {
 		// Terms
 		buffer.setBoolean(CHECKTERMS, checkTerms);
 		buffer.setString(TERMSPATH, termsPath);
+		buffer.setBoolean(STRINGMODE, stringMode);
 		// Patterns
 		buffer.setBoolean(CHECKPATTERNS, checkPatterns);
 		buffer.setInteger(PATTERNCOUNT, patterns.size());

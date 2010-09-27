@@ -87,7 +87,7 @@ public class TermChecker {
 		for ( TermHit th : srcList ) {
 			Issue issue = new Issue(docId, IssueType.TERMINOLOGY, tu.getId(), srcSeg.getId(),
 				String.format("In the glossary \"%s\" is translated \"%s\".", th.sourceTerm.getText(), th.targetTerm.getText()),
-				th.range.start, th.range.end, -1, 0, Issue.SEVERITY_LOW, tu.getName());
+				-1, 0, -1, 0, Issue.SEVERITY_LOW, tu.getName());
 			issues.add(issue);
 		}
 		return issues.size();

@@ -35,6 +35,7 @@ distribution.</p>
 	<li>Fixed the bug in the Merge command where pre-translated XLIFF entries 
 	with translate=&#39;no&#39; could not be merged back properly, for example for PO 
 	files.</li>
+	<li>Switched help to use the wiki.</li>
 </ul>
 	</li>
 	<li>Ratel:<ul>
@@ -48,11 +49,13 @@ distribution.</p>
 	Length tab)</li>
 	<li>Added experimental support for terminology verification.</li>
 	<li>Added support for exceptions in verification of double-words.</li>
+	<li>Added some limited support for string-based term verification.</li>
 </ul>
 	</li>
 	<li>Translation resources:<ul>
-	<li>Added <code>batchQuery</code> method to the IQuery interface.</li>
-	<li>OpenTran connector:<ul>
+	<li>Added <code>batchQuery</code> method to the <code>IQuery</code> interface.</li>
+	<li>Added <code>leverage</code> method to the <code>IQuery</code> interface.</li>
+	<li>Open-Tran connector:<ul>
 	<li>Changed implementation to use the REST API instead of the XML-RPC.</li>
 	<li>Improved support for queries with inline codes.</li>
 </ul>

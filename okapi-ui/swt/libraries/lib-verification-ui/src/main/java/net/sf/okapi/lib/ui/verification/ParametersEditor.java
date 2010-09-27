@@ -145,6 +145,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Button chkCheckTerms;
 	private Label stTermPath;
 	private TextAndBrowsePanel pnlTermsPath;
+	private Button chkStringMode;
 	
 	// Flag to indicate the editor is use for step parameters
 	// We default to true because the step cannot set this option
@@ -728,6 +729,9 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		pnlTermsPath.setLayoutData(gdTmp);
 		
+		chkStringMode = new Button(cmpTmp, SWT.CHECK);
+		chkStringMode.setText("Verify using strings matching");
+
 		tiTmp = new TabItem(tabs, SWT.NONE);
 		tiTmp.setText("Terms");
 		tiTmp.setControl(cmpTmp);
@@ -878,6 +882,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private void updateCheckTerms () {
 		stTermPath.setEnabled(chkCheckTerms.getSelection());
 		pnlTermsPath.setEnabled(chkCheckTerms.getSelection());
+		chkStringMode.setEnabled(chkCheckTerms.getSelection());
 	}
 	
 	private void editPattern (boolean add) {
@@ -1197,6 +1202,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		
 		chkCheckTerms.setSelection(params.getCheckTerms());
 		pnlTermsPath.setText(params.getTermsPath());
+		chkStringMode.setSelection(params.getStringMode());
 		
 		setPatternsData(params.getPatterns());
 		updateTargetSameAsSourceWithCodes();
@@ -1366,6 +1372,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		
 		params.setCheckTerms(chkCheckTerms.getSelection());
 		params.setTermsPath(pnlTermsPath.getText());
+		params.setStringMode(chkStringMode.getSelection());
 		
 		if ( stepMode ) {
 			params.setSaveSession(chkSaveSession.getSelection());

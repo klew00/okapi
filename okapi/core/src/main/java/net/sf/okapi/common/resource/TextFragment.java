@@ -23,7 +23,6 @@ package net.sf.okapi.common.resource;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -1061,8 +1060,6 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 		}
 	}
 
-	private static final Logger LOGGER = Logger.getLogger(TextFragment.class.getName());
-	
 	/**
 	 * Gets the coded text for this fragment. This method returns the same data as {@link #getCodedText()}.
 	 * <p>Each code is represented by a placeholder made of two special characters.
@@ -1071,8 +1068,6 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 	 */
 	@Override
 	public String toString () {
-		//throw new RuntimeException("***** CALL TO TOSTRING()");
-		LOGGER.warning("***** CALL TO TEXTFRAGMENT.TOSTRING");
 		return text.toString();
 	}
 	
