@@ -42,13 +42,13 @@ public class ResourceSimplifierStep extends BasePipelineStep {
 	
 	@Override
 	public String getDescription() {
-		return "Simplify events by converting references in generic skeleton parts. " +
+		return "Simplify resources by converting references in generic skeleton parts. " +
 				"Expects: filter events. Sends back: filter events.";
 	}
 
 	@Override
 	public String getName() {
-		return "Event Simplifier";
+		return "Resource Simplifier";
 	}
 	
 	@StepParameterMapping(parameterType = StepParameterType.TARGET_LOCALE)
