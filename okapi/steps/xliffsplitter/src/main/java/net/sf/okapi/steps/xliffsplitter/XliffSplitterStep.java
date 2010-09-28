@@ -1,3 +1,23 @@
+/*===========================================================================
+  Copyright (C) 2010 by the Okapi Framework contributors
+-----------------------------------------------------------------------------
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
+
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+===========================================================================*/
+
 package net.sf.okapi.steps.xliffsplitter;
 
 import java.io.BufferedOutputStream;
@@ -31,8 +51,8 @@ import net.sf.okapi.common.resource.RawDocument;
 /**
  * Splits a single XLIFF file into multiple files, split on the file element. All other content (outside the file
  * element) is copied as-is to each split file. Expects a {@link RawDocument} as input and sends the {@link RawDocument}
- * {@link Event} unaltered. Will output multiple split XLIFF files in the set output path. An XLIFF file with only one file element is
- * written out unaltered.
+ * {@link Event} unaltered. Will output multiple split XLIFF files in the set output path.
+ * An XLIFF file with only one file element is written out unaltered.
  *
  * @author Greg Perkins
  * @author HargraveJE
@@ -56,12 +76,12 @@ public class XliffSplitterStep extends BasePipelineStep {
 
 	@Override
 	public String getDescription() {
-		return "Split a WorldServer Xliff file into separate files for each <file> object.";
+		return "Split an XLIFF document into separate files for each <file> element. Expects: raw document. Sends back: raw document.";
 	}
 
 	@Override
 	public String getName() {
-		return "Xliff Splitter";
+		return "XLIFF Splitter";
 	}
 
 	@Override
@@ -158,8 +178,8 @@ public class XliffSplitterStep extends BasePipelineStep {
 	}
 
 	private String updateTranslationStatus(final String file) {
-		// lets now take the xliff with a single file element and update some attributes
-		// TODO: is there an easier way than to reparse the new document?
+		// lets now take the XLIFF with a single file element and update some attributes
+		// TODO: is there an easier way than to re-parse the new document?
 		final Source s = new Source(file);
 		// Create an output document for modification and writing
 		final OutputDocument outputFile = new OutputDocument(s);

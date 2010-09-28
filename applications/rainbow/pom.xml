@@ -393,6 +393,11 @@
 			<artifactId>okapi-step-wordcount</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+        <dependency>
+			<groupId>net.sf.okapi.steps</groupId>
+			<artifactId>okapi-step-xliffsplitter</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 	</dependencies>
 </project>

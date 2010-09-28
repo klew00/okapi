@@ -1,12 +1,34 @@
+/*===========================================================================
+  Copyright (C) 2010 by the Okapi Framework contributors
+-----------------------------------------------------------------------------
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
+
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+===========================================================================*/
+
 package net.sf.okapi.steps.xliffsplitter;
 
 import net.sf.okapi.common.BaseParameters;
+import net.sf.okapi.common.ParametersDescription;
+import net.sf.okapi.common.uidescription.EditorDescription;
+import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 
-public class Parameters extends BaseParameters {
+public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
-	/*
-	 * Hidden option - only used for special internal projects. False by default.
-	 */
+	private static final String UPDATESDLTRANSLATIONSTATUS = "updateSDLTranslationStatus";
+
 	public boolean updateSDLTranslationStatus;
 
 	public Parameters() {
@@ -20,13 +42,13 @@ public class Parameters extends BaseParameters {
 	public void fromString(String data) {
 		reset();
 		buffer.fromString(data);
-		updateSDLTranslationStatus = buffer.getBoolean("updateSDLTranslationStatus",
+		updateSDLTranslationStatus = buffer.getBoolean(UPDATESDLTRANSLATIONSTATUS,
 				updateSDLTranslationStatus);
 	}
 
 	public String toString() {
 		buffer.reset();
-		buffer.setBoolean("updateSDLTranslationStatus", updateSDLTranslationStatus);
+		buffer.setBoolean(UPDATESDLTRANSLATIONSTATUS, updateSDLTranslationStatus);
 		return buffer.toString();
 	}
 
@@ -37,4 +59,19 @@ public class Parameters extends BaseParameters {
 	public void setUpdateSDLTranslationStatus(boolean updateSDLTranslationStatus) {
 		this.updateSDLTranslationStatus = updateSDLTranslationStatus;
 	}
+
+	@Override
+	public ParametersDescription getParametersDescription() {
+		ParametersDescription desc = new ParametersDescription(this);
+		desc.add(UPDATESDLTRANSLATIONSTATUS, "Update SDL translation status attributes", null);
+		return desc;
+	}
+	
+	@Override
+	public EditorDescription createEditorDescription (ParametersDescription paramsDesc) {
+		EditorDescription desc = new EditorDescription("XLIFF Splitter", true, false);
+		desc.addCheckboxPart(paramsDesc.get(UPDATESDLTRANSLATIONSTATUS));
+		return desc;
+	}
+
 }
