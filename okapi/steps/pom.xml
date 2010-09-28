@@ -41,5 +41,6 @@
 		<module>xliffkit</module>
 		<module>xliffsplitter</module>
 		<module>idbasedaligner</module>
+		<module>xmlvalidation</module>
     </modules>
 </project>
