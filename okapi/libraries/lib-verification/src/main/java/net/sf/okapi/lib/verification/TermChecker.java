@@ -164,15 +164,26 @@ public class TermChecker {
 			int n = text.indexOf(term);
 			if ( n == -1 ) continue; // No more of that term
 			// Check "word boundaries"
+			// Note that within OTHER_LETTER is OK (e.g. Chinese characters)
 			if ( n > 0 ) {
-				if ( Character.isLetterOrDigit(text.codePointAt(n-1)) ) {
+				int cp = text.codePointAt(n-1);
+				if (( Character.getType(cp) == Character.LOWERCASE_LETTER ) ||
+					( Character.getType(cp) == Character.UPPERCASE_LETTER ) ||
+					( Character.getType(cp) == Character.TITLECASE_LETTER ) ||
+					( Character.getType(cp) == Character.DECIMAL_DIGIT_NUMBER ))
+				{
 					// If the preceding character is a letter, it's not a "word"
 					continue; // Next term
 				}
 			}
 			int last = n+term.length();
 			if ( last < text.length() ) {
-				if ( Character.isLetterOrDigit(text.codePointAt(last)) ) {
+				int cp = text.codePointAt(last);
+				if (( Character.getType(cp) == Character.LOWERCASE_LETTER ) ||
+					( Character.getType(cp) == Character.UPPERCASE_LETTER ) ||
+					( Character.getType(cp) == Character.TITLECASE_LETTER ) ||
+					( Character.getType(cp) == Character.DECIMAL_DIGIT_NUMBER ))
+				{
 					// If the following character is a letter, it's not a "word"
 					continue; // Next term
 				}
