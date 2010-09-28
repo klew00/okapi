@@ -34,6 +34,7 @@ import net.sf.okapi.common.resource.RawDocument;
  * {@link Event} unaltered. Will output multiple split XLIFF files in the set output path. An XLIFF file with only one file element is
  * written out unaltered.
  *
+ * @author Greg Perkins
  * @author HargraveJE
  * 
  */
