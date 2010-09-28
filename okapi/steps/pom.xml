@@ -40,5 +40,6 @@
         <module>xsltransform</module>
 		<module>xliffkit</module>
 		<module>xliffsplitter</module>
+		<module>idbasedaligner</module>
     </modules>
 </project>
