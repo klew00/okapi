@@ -20,6 +20,8 @@
 
 package net.sf.okapi.lib.translation;
 
+import java.util.Date;
+
 import net.sf.okapi.common.HashCodeUtil;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.annotation.AltTranslation;
@@ -76,6 +78,16 @@ public class QueryResult implements Comparable<QueryResult> {
 	 * Text of the target for this result.
 	 */
 	public TextFragment target;
+	
+	/**
+	 * Creation date of TM entry
+	 */
+	public Date creationDate = new Date(0);
+	
+	/**
+	 * Unique id of this TM entry. Can be null.
+	 */
+	public String entryId = null;
 	
 	/**
 	 * ID of the connector that generated this result.

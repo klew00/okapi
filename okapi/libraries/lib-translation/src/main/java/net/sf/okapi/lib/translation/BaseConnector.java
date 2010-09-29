@@ -24,7 +24,11 @@ import java.util.List;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.annotation.AltTranslation;
+import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
+import net.sf.okapi.common.resource.Segment;
+import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 
 /**
@@ -117,4 +121,26 @@ public abstract class BaseConnector implements IQuery {
 	protected String toInternalCode (LocaleId locId) {
 		return locId.toString();
 	}	
+	
+	protected AltTranslationsAnnotation addAltTranslation (TextContainer targetContainer, AltTranslation alt) {
+		AltTranslationsAnnotation altTrans = targetContainer.getAnnotation(AltTranslationsAnnotation.class);
+		if ( altTrans == null ) {
+			altTrans = new AltTranslationsAnnotation();
+			targetContainer.setAnnotation(altTrans);
+		}
+		altTrans.add(alt);
+		
+		return altTrans;
+	}
+	
+	protected AltTranslationsAnnotation addAltTranslation (Segment seg, AltTranslation alt) {
+		AltTranslationsAnnotation altTrans = seg.getAnnotation(AltTranslationsAnnotation.class);
+		if ( altTrans == null ) {
+			altTrans = new AltTranslationsAnnotation();
+			seg.setAnnotation(altTrans);
+		}
+		altTrans.add(alt);
+		
+		return altTrans;
+	}
 }
