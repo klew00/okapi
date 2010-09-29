@@ -39,6 +39,12 @@ public class SubFilterEventConverter {
 	private ISkeleton startGroupSkeleton;
 	private ISkeleton endGroupSkeleton;
 
+	/**
+	 * Creates a new SubFilterEventConverter object.
+	 * @param parentId the parent id to use for the group where the sub-filter events are to be stored.
+	 * @param startGroupSkeleton the optional skeleton to put with the start group.
+	 * @param endGroupSkeleton the optional skeleton to put with the end group.
+	 */
 	public SubFilterEventConverter(String parentId, ISkeleton startGroupSkeleton,
 			ISkeleton endGroupSkeleton) {
 		this.groupIdGenerator = new IdGenerator(parentId);
@@ -47,6 +53,13 @@ public class SubFilterEventConverter {
 		this.endGroupSkeleton = endGroupSkeleton;
 	}
 
+	/**
+	 * Creates a new SubFilterEventConverter object using a given id generator.
+	 * @param parentId the parent id to use for the group where the sub-filter events are to be stored.
+	 * @param startGroupSkeleton the optional skeleton to put with the start group.
+	 * @param endGroupSkeleton the optional skeleton to put with the end group.
+	 * @param idGenerator the id generator to use.
+	 */
 	public SubFilterEventConverter(String parentId, ISkeleton startGroupSkeleton,
 			ISkeleton endGroupSkeleton, IdGenerator idGenerator) {
 		idGenerator.reset(parentId);
@@ -56,6 +69,11 @@ public class SubFilterEventConverter {
 		this.endGroupSkeleton = endGroupSkeleton;
 	}
 	
+	/**
+	 * Converts an event.
+	 * @param event the event coming from the sub-filter.
+	 * @return the event after possible conversion.
+	 */
 	public Event convertEvent(Event event) {
 		// we convert start-document to start group
 		// and end document to end group

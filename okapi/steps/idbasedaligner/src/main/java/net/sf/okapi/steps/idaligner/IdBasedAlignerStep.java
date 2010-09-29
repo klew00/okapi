@@ -164,12 +164,13 @@ public class IdBasedAlignerStep extends BasePipelineStep {
 			if (targetTextUnitMap.containsKey(sourceTu.getName())) {
 				targetTu = targetTextUnitMap.get(sourceTu.getName());
 				alignedTextUnit.setTarget(targetLocale, targetTu.getSource());
-			} else if (params.getReplaceWithSource()) {
-				// Use the source text if there is no target
+			}
+			else {
 				logger.warning("String is missing from the target: " + sourceTu.getName());
-				alignedTextUnit.setTarget(targetLocale, sourceTu.getSource());
-			} else {
-				logger.warning("String is missing from the target: " + sourceTu.getName());
+				if ( params.getReplaceWithSource()) {
+					// Use the source text if there is no target
+					alignedTextUnit.setTarget(targetLocale, sourceTu.getSource());
+				}
 			}
 		}
 
