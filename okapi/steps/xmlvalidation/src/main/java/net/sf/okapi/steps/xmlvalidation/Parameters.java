@@ -99,7 +99,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
 		desc.add(VALIDATE,
-				"Validate the files [Well-formedness is checked regardless]", null);
+				"Validate the documents structure [Well-formedness always checked]", null);
 		
 		desc.add(VALIDATIONTYPE, "Type of validation", "Indicates which validation to use");
 

@@ -73,15 +73,19 @@ distribution.</p>
 </ul>
 	</li>
 	<li>Steps:<ul>
-	<li>Added the &quot;Resource Simplifier&quot; step. This allows to modified normal 
+	<li>Added the Resource Simplifier Step. It modifies normal 
 	reources of filter events into simpler resources for some third-party tools.</li>
-	<li>Added the &quot;XLIFF Spitter&quot; step. This allows to split several <code>
+	<li>Added the XLIFF Spitter Step. It splits several <code>
 	&lt;file&gt;</code> inside an XLIFF documents into separate documents.</li>
+	<li>Added the Id-Based Aligner Step. It aligns text units from two input 
+	files, based on their unique IDs (resname).</li>
+	<li>Added the XML Validation Step. It performs well-formness XML 
+	verification and optionally, DTD or schema validation.</li>
 	<li>Sentence Aligner Step:<ul>
 	<li>Updated so entries with empty text are skipped and don&#39;t cause an error.</li>
 </ul>
 	</li>
-	<li>Diff Leverage step:<ul>
+	<li>Diff Leverage Step:<ul>
 	<li>Added support for 3 input files: new source, old source, old 
 	translation. The second and third files must have the same text units (same 
 	number and same order).</li>

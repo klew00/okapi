@@ -67,7 +67,8 @@ public class IdBasedAlignerStep extends BasePipelineStep {
 
 	@Override
 	public String getDescription() {
-		return "Align text units in two id-based files (e.g. Java properties).";
+		return "Align text units in two id-based files (e.g. Java properties)."
+			+ " Expects: filter events. Sends back: filter events.";
 	}
 
 	@Override
