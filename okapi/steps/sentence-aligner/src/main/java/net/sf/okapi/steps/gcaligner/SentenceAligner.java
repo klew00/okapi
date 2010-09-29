@@ -23,6 +23,7 @@ package net.sf.okapi.steps.gcaligner;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.AlignedPair;
@@ -37,7 +38,14 @@ import net.sf.okapi.common.resource.TextUnitUtil;
  */
 
 public class SentenceAligner {
+	private static final Logger LOGGER = Logger.getLogger(SentenceAligner.class.getName());
+	
 	private static final long MAX_CELL_SIZE = 80000L;
+
+	/*
+	 * TODO: set value for what we consider low scoring matches 
+	 */
+	private static final int LOW_SCORE_THRESHOLD = 0;
 
 	public TextUnit align(TextUnit sourceParagraph, TextUnit targetParagraph, LocaleId srcLocale,
 			LocaleId trgLocale) {
@@ -83,15 +91,20 @@ public class SentenceAligner {
 		// record the result in a list of AlignedPairs
 		List<AlignedPair> alignedPairs = new LinkedList<AlignedPair>();
 
+		String srcTuid = sourceParagraph.getName();				
 		Iterator<DpMatrixCell> it = result.iterator();
 		while (it.hasNext()) {
 			DpMatrixCell cell = it.next();
 			if (cell.getState() == DpMatrixCell.DELETED) {
 				Segment sourceSegment = matrix.getAlignmentElementX(cell.getXindex());
 				alignedPairs.add(new AlignedPair(sourceSegment, null, trgLocale));
+				LOGGER.warning(sourceSegment.toString() + 
+						"\nTarget segment deleted (TU ID: " + srcTuid + "): Non 1-1 match. Please confirm alignment.");
 			} else if (cell.getState() == DpMatrixCell.INSERTED) {
 				Segment targetSegment = matrix.getAlignmentElementY(cell.getYindex());
 				alignedPairs.add(new AlignedPair(null, targetSegment, trgLocale));
+				LOGGER.warning(targetSegment.toString() + 
+						"\nSource segment deleted (TU ID: " + srcTuid + "): Non 1-1 match. Please confirm alignment.");
 			} else if (cell.getState() == DpMatrixCell.MATCH) {
 				Segment sourceSegment = matrix.getAlignmentElementX(cell.getXindex());
 				Segment targetSegment = matrix.getAlignmentElementY(cell.getYindex());
@@ -103,6 +116,14 @@ public class SentenceAligner {
 						cell.getMultiMatchYIndexBegin(), cell.getMultiMatchYIndexEnd());
 				alignedPairs.add(new AlignedPair(new LinkedList<TextPart>(sourceSegments),
 						new LinkedList<TextPart>(targetSegments), trgLocale));
+				Segment s = null;
+				try {
+					s = sourceSegments.get(0);
+				} catch (IndexOutOfBoundsException e) {
+					s = targetSegments.get(0);
+				}
+				LOGGER.warning(s.toString() 
+						+ "\nMulti-Segment Match (TU ID: " + srcTuid + "): Non 1-1 match. Please confirm alignment.");
 			}
 		}
 
