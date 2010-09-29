@@ -21,15 +21,26 @@
 package net.sf.okapi.steps.xliffsplitter;
 
 import net.sf.okapi.common.BaseParameters;
+import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.ParametersDescription;
+import net.sf.okapi.common.uidescription.CheckboxPart;
 import net.sf.okapi.common.uidescription.EditorDescription;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
+import net.sf.okapi.common.uidescription.TextInputPart;
 
+@EditorFor(Parameters.class)
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
+	public static final String TRANSLATIONTYPE = "translation_type";
+	public static final String TRANSLATIONSTATUS = "translation_status";
+	
 	private static final String UPDATESDLTRANSLATIONSTATUS = "updateSDLTranslationStatus";
+	private static final String TRANSLATIONTYPEVALUE = "translationTypeValue";
+	private static final String TRANSLATIONSTATUSVALUE = "translationStatusValue";
 
-	public boolean updateSDLTranslationStatus;
+	private boolean updateSDLTranslationStatus;
+	private String translationTypeValue;
+	private String translationStatusValue;
 
 	public Parameters() {
 		reset();
@@ -37,18 +48,24 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 
 	public void reset() {
 		updateSDLTranslationStatus = false;
+		translationTypeValue = "manual_translation";
+		translationStatusValue = "finished";
 	}
 
 	public void fromString(String data) {
 		reset();
 		buffer.fromString(data);
 		updateSDLTranslationStatus = buffer.getBoolean(UPDATESDLTRANSLATIONSTATUS,
-				updateSDLTranslationStatus);
+			updateSDLTranslationStatus);
+		translationTypeValue = buffer.getString(TRANSLATIONTYPEVALUE, translationTypeValue);
+		translationStatusValue = buffer.getString(TRANSLATIONSTATUSVALUE, translationStatusValue);
 	}
 
 	public String toString() {
 		buffer.reset();
 		buffer.setBoolean(UPDATESDLTRANSLATIONSTATUS, updateSDLTranslationStatus);
+		buffer.setString(TRANSLATIONTYPEVALUE, translationTypeValue);
+		buffer.setString(TRANSLATIONSTATUSVALUE, translationStatusValue);
 		return buffer.toString();
 	}
 
@@ -59,18 +76,50 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public void setUpdateSDLTranslationStatus(boolean updateSDLTranslationStatus) {
 		this.updateSDLTranslationStatus = updateSDLTranslationStatus;
 	}
+	
+	public String getTranslationTypeValue () {
+		return translationTypeValue;
+	}
+	
+	public void setTranslationTypeValue (String translationTypeValue) {
+		this.translationTypeValue = translationTypeValue;
+	}
+
+	public String getTranslationStatusValue () {
+		return translationStatusValue;
+	}
+	
+	public void setTranslationStatusValue (String translationStatusValue) {
+		this.translationStatusValue = translationStatusValue;
+	}
 
 	@Override
 	public ParametersDescription getParametersDescription() {
 		ParametersDescription desc = new ParametersDescription(this);
-		desc.add(UPDATESDLTRANSLATIONSTATUS, "Update SDL translation status attributes", null);
+		desc.add(UPDATESDLTRANSLATIONSTATUS, "Update the <iws:status> translation status (WorldServer-specific)", null);
+		desc.add(TRANSLATIONTYPEVALUE, String.format("Value for '%s'", TRANSLATIONTYPE),
+			String.format("Value to set for the %s attribute.", TRANSLATIONTYPE));
+		desc.add(TRANSLATIONSTATUSVALUE, String.format("Value for '%s'", TRANSLATIONSTATUS),
+			String.format("Value to set for the %s attribute.", TRANSLATIONSTATUS));
 		return desc;
 	}
 	
 	@Override
 	public EditorDescription createEditorDescription (ParametersDescription paramsDesc) {
 		EditorDescription desc = new EditorDescription("XLIFF Splitter", true, false);
-		desc.addCheckboxPart(paramsDesc.get(UPDATESDLTRANSLATIONSTATUS));
+		
+		CheckboxPart cbp = desc.addCheckboxPart(paramsDesc.get(UPDATESDLTRANSLATIONSTATUS));
+		
+		// translation_type
+		TextInputPart tip = desc.addTextInputPart(paramsDesc.get(TRANSLATIONTYPEVALUE));
+		tip.setVertical(false);
+		tip.setMasterPart(cbp, true);
+		
+		// translation_status
+		tip = desc.addTextInputPart(paramsDesc.get(TRANSLATIONSTATUSVALUE));
+		tip.setVertical(false);
+		tip.setMasterPart(cbp, true);
+		
 		return desc;
 	}
 

@@ -192,8 +192,10 @@ public class XliffSplitterStep extends BasePipelineStep {
 			for (final StartTag statusTag : statusTags) {
 				final Attributes attributes = statusTag.getAttributes();
 				final Map<String, String> attributesMap = outputFile.replace(attributes, true);
-				attributesMap.put("translation_type", "manual_translation");
-				attributesMap.put("translation_status", "finished");
+				//Before, hard-coded: attributesMap.put("translation_type", "manual_translation");
+				//Before, hard-coded: attributesMap.put("translation_status", "finished");
+				attributesMap.put(Parameters.TRANSLATIONTYPE, params.getTranslationTypeValue());
+				attributesMap.put(Parameters.TRANSLATIONSTATUS, params.getTranslationStatusValue());
 				attributesMap.remove("target_content");
 			}
 		}

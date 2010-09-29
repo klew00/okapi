@@ -202,6 +202,8 @@
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi/steps/generatesimpletm/target/classes"
 			 excludes="**/META-INF/**"/>
+			<fileset dir="../../okapi/steps/idbasedaligner/target/classes"
+			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi/steps/imagemodification/target/classes"
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi/steps/linebreakconversion/target/classes"
@@ -229,6 +231,8 @@
 			<fileset dir="../../okapi/steps/wordcount/target/classes"
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi/steps/xsltransform/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../okapi/steps/xmlvalidation/target/classes"
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi/steps/xliffsplitter/target/classes"
 			 excludes="**/META-INF/**"/>

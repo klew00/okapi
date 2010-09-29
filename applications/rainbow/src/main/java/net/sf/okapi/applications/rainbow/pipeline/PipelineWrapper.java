@@ -291,6 +291,18 @@ public class PipelineWrapper {
 			availableSteps.put(step.id, step);
 
 			ps = (IPipelineStep)Class.forName(
+				"net.sf.okapi.steps.idaligner.IdBasedAlignerStep").newInstance();
+			params = ps.getParameters();
+			step = new StepInfo(ps.getClass().getSimpleName(),
+				ps.getName(), ps.getDescription(), ps.getClass().getName(), null,
+				params.getClass().getName());
+			if ( params != null ) {
+				step.paramsData = params.toString();
+				peMapper.addDescriptionProvider("net.sf.okapi.steps.idaligner.Parameters", step.paramsClass);
+			}
+			availableSteps.put(step.id, step);
+			
+			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.imagemodification.ImageModificationStep").newInstance();
 			params = ps.getParameters();
 			step = new StepInfo(ps.getClass().getSimpleName(),
@@ -477,19 +489,6 @@ public class PipelineWrapper {
 				peMapper.addDescriptionProvider("net.sf.okapi.steps.xliffsplitter.Parameters", step.paramsClass);
 			}
 			availableSteps.put(step.id, step);
-			
-			ps = (IPipelineStep)Class.forName(
-				"net.sf.okapi.steps.xsltransform.XSLTransformStep").newInstance();
-			params = ps.getParameters();
-			step = new StepInfo(ps.getClass().getSimpleName(),
-				ps.getName(), ps.getDescription(), ps.getClass().getName(), null,
-				params.getClass().getName());
-			if ( params != null ) {
-				step.paramsData = params.toString();
-				peMapper.addEditor("net.sf.okapi.steps.xsltransform.ui.ParametersEditor", step.paramsClass);
-			}
-			availableSteps.put(step.id, step);
-
 
 			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.xmlvalidation.XMLValidationStep").newInstance();
@@ -500,7 +499,18 @@ public class PipelineWrapper {
 			if ( params != null ) {
 				step.paramsData = params.toString();
 				peMapper.addDescriptionProvider("net.sf.okapi.steps.xmlvalidation.Parameters", step.paramsClass);
-				//peMapper.addEditor("net.sf.okapi.steps.xmlvalidation.ui.ParametersEditor", step.paramsClass);
+			}
+			availableSteps.put(step.id, step);
+			
+			ps = (IPipelineStep)Class.forName(
+				"net.sf.okapi.steps.xsltransform.XSLTransformStep").newInstance();
+			params = ps.getParameters();
+			step = new StepInfo(ps.getClass().getSimpleName(),
+				ps.getName(), ps.getDescription(), ps.getClass().getName(), null,
+				params.getClass().getName());
+			if ( params != null ) {
+				step.paramsData = params.toString();
+				peMapper.addEditor("net.sf.okapi.steps.xsltransform.ui.ParametersEditor", step.paramsClass);
 			}
 			availableSteps.put(step.id, step);
 

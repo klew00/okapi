@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -31,8 +31,6 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Source;
-import javax.xml.validation.Schema;
-import javax.xml.validation.Validator;
 
 import org.xml.sax.EntityResolver;
 import org.xml.sax.ErrorHandler;
@@ -53,13 +51,11 @@ public class XMLValidationStep extends BasePipelineStep {
 
 	private final Logger logger = Logger.getLogger(getClass().getName());
 
-	XMLInputFactory xmlInputFact;
-
-    Schema schema;
-    Validator validator;
-    InputSource source;
-    String currentFileDir;
-	
+	private XMLInputFactory xmlInputFact;
+//	private Schema schema;
+//	private Validator validator;
+//	private InputSource source;
+	private String currentFileDir;
 	private Parameters params;
 	
 	public XMLValidationStep () {
@@ -72,8 +68,8 @@ public class XMLValidationStep extends BasePipelineStep {
 	}
 	
 	public String getDescription () {
-		return "Validate XML file."
-			+ " Expects: raw XML document. Sends back: raw document.";
+		return "Validate XML documents."
+			+ " Expects: raw XML document. Sends back: raw XML document.";
 	}
 
 	public String getName () {

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -23,6 +23,7 @@ package net.sf.okapi.steps.xmlvalidation;
 import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.ParametersDescription;
+import net.sf.okapi.common.uidescription.CheckboxPart;
 import net.sf.okapi.common.uidescription.EditorDescription;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 import net.sf.okapi.common.uidescription.ListSelectionPart;
@@ -113,17 +114,19 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public EditorDescription createEditorDescription(ParametersDescription paramDesc) {
 		EditorDescription desc = new EditorDescription("XML Validation", true, false);
 
-		desc.addCheckboxPart(paramDesc.get(VALIDATE));
+		CheckboxPart cbp = desc.addCheckboxPart(paramDesc.get(VALIDATE));
 
 		String[] values = {
 				"DTD",
 				"XML Schema",
 			};
 		ListSelectionPart lsp = desc.addListSelectionPart(paramDesc.get(VALIDATIONTYPE), values);
+		lsp.setMasterPart(cbp, true);
 		
 		PathInputPart part = desc.addPathInputPart(paramDesc.get(SCHEMAPATH), "Schema", false);
 		part.setBrowseFilters("Schema Files (*.xsd)\tAll Files (*.*)", "*.xsd\t*.*");
 		part.setAllowEmpty(true);
+		part.setMasterPart(cbp, true);
 	
 		return desc;
 	}
