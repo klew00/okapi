@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -17,6 +17,7 @@
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
+
 package net.sf.okapi.common.filters;
 
 import net.sf.okapi.common.Event;
@@ -28,10 +29,11 @@ import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 
 /**
+ * Helper class to start and stop a sub-filter called from a parent filter.
  * @author HargraveJE
- * 
  */
 public class SubFilterEventConverter {
+
 	private String parentId;
 	private IdGenerator groupIdGenerator;
 	private ISkeleton startGroupSkeleton;
