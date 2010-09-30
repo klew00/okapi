@@ -156,4 +156,11 @@ public class MultiEvent implements IResource, Iterable<Event> {
 		return annotations;
 	}
 
+	/**
+	 * Returns the number of events in this object.
+	 * @return number of events
+	 */
+	public int size() {
+		return events.size();
+	}
 }

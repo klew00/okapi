@@ -21,6 +21,7 @@
 package net.sf.okapi.common.skeleton;
 
 import java.security.InvalidParameterException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -29,10 +30,16 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.IReferenceable;
 import net.sf.okapi.common.resource.MultiEvent;
+import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.common.resource.StartGroup;
+import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.common.resource.TextUnit;
 
 /**
@@ -137,11 +144,14 @@ public class ResourceSimplifier {
 			throw new InvalidParameterException("Event cannot be null");
 		
 		IResource res = event.getResource();
+		//if (res instanceof StartGroup)
+//		if (res.getId().equals("tu4"))
+//			System.out.println(res.getClass().getName());
 		
 		if (res instanceof IReferenceable) {			
 			if  (((IReferenceable) res).isReferent()) {
 				writer.addToReferents(event);
-				// The referent is not processed at this point (only later from an event referencing it)
+				// The referent is not processed at this point (only later from a resource referencing it)
 				return event;
 				//return Event.NOOP_EVENT;
 			}
@@ -175,7 +185,7 @@ public class ResourceSimplifier {
 //		}
 		
 		// Process the resource's skeleton
-		MultiEvent me = new MultiEvent();
+		MultiEvent me = new MultiEvent();		
 		processResource(res, me);
 		
 		// Different event types are processed differently
@@ -201,8 +211,13 @@ public class ResourceSimplifier {
 		default:
 			return event;
 		}
-								
-		return new Event(EventType.MULTI_EVENT, assignIDs(packMultiEvent(me), res));
+
+		if (me.size() == 0) 
+			return event;
+		else if (me.size() == 1)
+			return me.iterator().next();
+		else
+			return new Event(EventType.MULTI_EVENT, assignIDs(packMultiEvent(me), res));
 	}
 		
 	private MultiEvent assignIDs(MultiEvent me, IResource resource) {
@@ -233,6 +248,14 @@ public class ResourceSimplifier {
 	private boolean isComplex(IResource res) {
 		if (res == null)
 			return false;
+		
+		if (res instanceof TextUnit) {
+			TextUnit tu = (TextUnit) res;
+			TextFragment tf = tu.getSource().getUnSegmentedContentCopy();
+			for (Code code : tf.getCodes()) {
+				if (code.hasReference()) return true;
+			}
+		}
 		
 		ISkeleton skel = res.getSkeleton();
 		if (skel == null) {
@@ -319,29 +342,52 @@ public class ResourceSimplifier {
 	}
 	
 	/**
-	 * Creates events from skeleton parts of a given resource, adds created events to a given multi-event resource.
+	 * Creates events from references of a given resource, adds created events to a given multi-event resource.
 	 */
 	private void processResource(IResource resource, MultiEvent me) {
 		if (resource == null)
-			throw new InvalidParameterException("Resource cannot be null");
+			throw new InvalidParameterException("Resource parameter cannot be null");
 		if (me == null)
-			throw new InvalidParameterException("MultiEvent object cannot be null");
-		
-		ISkeleton skel = resource.getSkeleton();
-		if (!(skel instanceof GenericSkeleton)) {
-			// Process as the whole and return
-			if (resource instanceof TextUnit) {
-				newSkel.add(writer.getString((TextUnit)resource, trgLoc, 1));
-			}
-			
-			// Skeleton-less DocumentPart and StartGroup don't produce any text 
-			return;
-		}
-		List<GenericSkeletonPart> parts = ((GenericSkeleton) skel).getParts();
+			throw new InvalidParameterException("MultiEvent parameter cannot be null");
 		
 		int dpCounter = 0;
 		int tuCounter = 0;
 		String resId = resource.getId();
+		ISkeleton skel = resource.getSkeleton();		
+		boolean hasGenericSkeleton = skel instanceof GenericSkeleton; 
+		
+		if (resource instanceof TextUnit) {
+			TextUnit tu = (TextUnit) resource;
+			if (tu.isReferent()) {
+				// Referenced TU, we got here from recursion (see *** below)
+				if (!hasGenericSkeleton) {
+					newSkel.add(writer.getString(tu, trgLoc, 1));
+					return;
+				}
+				// Otherwise the skeleton is analyzed below
+			}
+			else {
+				// Regular TU
+				TextContainer tc = tu.getSource();
+				
+				for (Iterator<TextPart> iter = tc.iterator(); iter.hasNext();) {
+					TextPart part = iter.next();
+					TextFragment tf = part.getContent();
+					for (Code code : tf.getCodes()) {
+						if (code.hasReference()) {
+							// Resolve reference(s) with GSW, replace the original data
+							code.setData(writer.expandCodeContent(code, trgLoc, 0));
+						}
+					}
+				}			
+				if (!hasGenericSkeleton)
+					addTU(me, resId, ++tuCounter, tu);
+			}
+		}
+		
+		if (!hasGenericSkeleton) return;
+		
+		List<GenericSkeletonPart> parts = ((GenericSkeleton) skel).getParts();				
 //		if (resource instanceof INameable)
 //			mimeType = ((INameable) resource).getMimeType();
 		
@@ -355,7 +401,7 @@ public class ResourceSimplifier {
 				
 				IReferenceable referent = writer.getReference(SkeletonUtil.getRefId(part));
 				if (referent instanceof IResource)
-					processResource((IResource) referent, me);
+					processResource((IResource) referent, me); // ***
 			}
 			else if (SkeletonUtil.isSourcePlaceholder(part, resource)) {
 				processSourcePlaceholder(part, resource, me, resId, tuCounter, dpCounter);

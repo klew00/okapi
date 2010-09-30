@@ -26,17 +26,27 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Iterator;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.MultiEvent;
+import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 
 import org.junit.Test;
 
@@ -372,5 +382,198 @@ public class ResourceSimplifierTest {
 			}			
 		}		
 		assertEquals(st1, sb.toString());
+	}
+	
+	private ZipSkeleton createZipSkeleton() throws IOException {
+		File tempZip = File.createTempFile("~temp.zip", null);
+		tempZip.deleteOnExit();
+		
+		ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(tempZip));
+		zos.putNextEntry(new ZipEntry("test"));
+		zos.close();
+		
+		return new ZipSkeleton(new ZipFile(tempZip), new ZipEntry("test"));
+	}
+	
+	@Test // + No refs, the original DP is returned
+	public void testDp_GenericSkeleton() {
+		DocumentPart dp1 = new DocumentPart("P1C1D3-dp1", true);
+		GenericSkeleton skel = new GenericSkeleton();
+		dp1.setSkeleton(skel);
+		
+		ResourceSimplifier rs = new ResourceSimplifier(ENUS);
+		Event event = rs.convert(new Event(EventType.DOCUMENT_PART, dp1));
+		assertNotNull(event);
+		assertTrue(event.getResource() instanceof DocumentPart);
+	}
+		
+	@Test // + No refs, the original DP is returned
+	public void testDp_NonGenericSkeleton() throws IOException {
+		DocumentPart dp1 = new DocumentPart("P1C1D3-dp1", true);				
+		dp1.setSkeleton(createZipSkeleton());
+		
+		ResourceSimplifier rs = new ResourceSimplifier(ENUS);
+		Event event = rs.convert(new Event(EventType.DOCUMENT_PART, dp1));
+		assertNotNull(event);
+		assertTrue(event.getResource() instanceof DocumentPart);
+	}
+	
+	@Test // No refs, the original TU is returned
+	public void testTu_NoSkeleton() {
+		TextUnit tu1 = new TextUnit("P1C1D3-tu1");
+		tu1.setSource(new TextContainer("Source"));
+		
+		ResourceSimplifier rs = new ResourceSimplifier(ENUS);
+		Event event = rs.convert(new Event(EventType.TEXT_UNIT, tu1));
+		assertNotNull(event);
+		assertTrue(event.getResource() instanceof TextUnit);
+	}
+	
+	@Test // No refs, the original TU is returned
+	public void testTu_GenericSkeleton() {
+		TextUnit tu1 = new TextUnit("P1C1D3-tu1");
+		tu1.setSource(new TextContainer("Source"));
+		
+		GenericSkeleton skel2 = new GenericSkeleton();
+		tu1.setSkeleton(skel2);
+		skel2.add("Prefix");
+		skel2.addContentPlaceholder(tu1);
+		skel2.add("Suffix");
+		
+		ResourceSimplifier rs = new ResourceSimplifier(ENUS);
+		Event event = rs.convert(new Event(EventType.TEXT_UNIT, tu1));
+		assertNotNull(event);
+		assertTrue(event.getResource() instanceof MultiEvent);
+		MultiEvent me = (MultiEvent) event.getResource();
+		assertEquals(3, me.size());
+		Iterator<Event> itr = me.iterator();		
+		Event ev;
+		
+		ev = itr.next();
+		assertTrue(ev.getResource() instanceof DocumentPart);
+		assertEquals("Prefix", ev.getResource().toString());
+		
+		ev = itr.next();
+		assertTrue(ev.getResource() instanceof TextUnit);
+		assertEquals("Source", ev.getResource().toString());
+		
+		ev = itr.next();
+		assertTrue(ev.getResource() instanceof DocumentPart);
+		assertEquals("Suffix", ev.getResource().toString());
+	}
+	
+	@Test // No refs, the original TU is returned
+	public void testTu_NonGenericSkeleton() throws IOException {
+		TextUnit tu1 = new TextUnit("P1C1D3-tu1");
+		tu1.setSource(new TextContainer("Source"));		
+		tu1.setSkeleton(createZipSkeleton());
+		
+		ResourceSimplifier rs = new ResourceSimplifier(ENUS);
+		Event event = rs.convert(new Event(EventType.TEXT_UNIT, tu1));
+		assertNotNull(event);
+		assertTrue(event.getResource() instanceof TextUnit);
+	}
+	
+	@Test
+	public void testReferencesInTuCodes_NoSkeleton() {
+		DocumentPart dp1 = new DocumentPart("P1C1D3-dp1", true);
+		GenericSkeleton skel = new GenericSkeleton();
+		dp1.setSkeleton(skel);
+		skel.add("<a id=\"jsHelplink\" ");
+		skel.add("href=\"");
+		skel.addValuePlaceholder(dp1, "href", null);
+		skel.add("\"");
+		skel.add(">");
+		dp1.setSourceProperty(new Property("href", "{0}"));
+		
+		TextUnit tu1 = new TextUnit("P1C1D3-tu1");
+		TextContainer tc = new TextContainer();
+		tu1.setSource(tc);
+		TextFragment tf = new TextFragment();
+		tc.setContent(tf);
+		tf.append(TagType.OPENING, Code.TYPE_BOLD, "<b>", 1);
+		tf.append("Javascript is not enabled on your internet browser.");
+		tf.append(TagType.CLOSING, Code.TYPE_BOLD, "</b>", 1);
+		tf.append(TagType.PLACEHOLDER, "br", "<br/>", 2);
+		tf.append(TagType.PLACEHOLDER, "br", "<br/>", 3);
+		tf.append("FamilySearch Indexing requires Javascript to operate properly.  Please click");
+		tf.append(TagType.OPENING, Code.TYPE_LINK, "", 4).appendReference(dp1.getId());
+		tf.append("here ");
+		tf.append(TagType.CLOSING, Code.TYPE_LINK, "</a>", 4);
+		tf.append(" for instructions on enabling this browser feature.");
+		
+		ResourceSimplifier rs = new ResourceSimplifier(ENUS);
+		rs.convert(new Event(EventType.DOCUMENT_PART, dp1)); // To register the referent
+		Event event = rs.convert(new Event(EventType.TEXT_UNIT, tu1));
+		assertNotNull(event);
+		assertTrue(event.getResource() instanceof TextUnit);
+		TextUnit tu = (TextUnit) event.getResource();
+		assertEquals("<b>Javascript is not enabled on your internet browser.</b>" +
+				"<br/><br/>FamilySearch Indexing requires Javascript to operate properly.  Please click" +
+				"<a id=\"jsHelplink\" href=\"{0}\">here </a> for instructions on enabling this browser feature.", 
+				tu.toString());
+		assertEquals(6, tu.getSource().getUnSegmentedContentCopy().getCodes().size());
+		Code code = tu.getSource().getUnSegmentedContentCopy().getCode(4); // The a-element start tag
+		assertEquals(TagType.OPENING, code.getTagType());
+	}
+	
+	@Test
+	public void testReferencesInTuCodes_WithSkeleton() {
+		DocumentPart dp1 = new DocumentPart("P1C1D3-dp1", true);
+		GenericSkeleton skel1 = new GenericSkeleton();
+		dp1.setSkeleton(skel1);
+		skel1.add("<a id=\"jsHelplink\" ");
+		skel1.add("href=\"");
+		skel1.addValuePlaceholder(dp1, "href", null);
+		skel1.add("\"");
+		skel1.add(">");
+		dp1.setSourceProperty(new Property("href", "{0}"));
+		
+		TextUnit tu1 = new TextUnit("P1C1D3-tu1");
+		GenericSkeleton skel2 = new GenericSkeleton();
+		tu1.setSkeleton(skel2);
+		skel2.add("Prefix");
+		skel2.addContentPlaceholder(tu1);
+		skel2.add("Suffix");
+		
+		TextContainer tc = new TextContainer();
+		tu1.setSource(tc);
+		TextFragment tf = new TextFragment();
+		tc.setContent(tf);
+		tf.append(TagType.OPENING, Code.TYPE_BOLD, "<b>", 1);
+		tf.append("Javascript is not enabled on your internet browser.");
+		tf.append(TagType.CLOSING, Code.TYPE_BOLD, "</b>", 1);
+		tf.append(TagType.PLACEHOLDER, "br", "<br/>", 2);
+		tf.append(TagType.PLACEHOLDER, "br", "<br/>", 3);
+		tf.append("FamilySearch Indexing requires Javascript to operate properly.  Please click");
+		tf.append(TagType.OPENING, Code.TYPE_LINK, "", 4).appendReference(dp1.getId());
+		tf.append("here ");
+		tf.append(TagType.CLOSING, Code.TYPE_LINK, "</a>", 4);
+		tf.append(" for instructions on enabling this browser feature.");
+		
+		ResourceSimplifier rs = new ResourceSimplifier(ENUS);
+		rs.convert(new Event(EventType.DOCUMENT_PART, dp1)); // To register the referent
+		Event event = rs.convert(new Event(EventType.TEXT_UNIT, tu1));
+		assertNotNull(event);
+		assertTrue(event.getResource() instanceof MultiEvent);
+		MultiEvent me = (MultiEvent) event.getResource();
+		assertEquals(3, me.size());
+		Iterator<Event> itr = me.iterator();		
+		Event ev;
+		
+		ev = itr.next();
+		assertTrue(ev.getResource() instanceof DocumentPart);
+		assertEquals("Prefix", ev.getResource().toString());
+		
+		ev = itr.next();
+		assertTrue(ev.getResource() instanceof TextUnit);
+		assertEquals("<b>Javascript is not enabled on your internet browser.</b>" +
+				"<br/><br/>FamilySearch Indexing requires Javascript to operate properly.  Please click" +
+				"<a id=\"jsHelplink\" href=\"{0}\">here </a> for instructions on enabling this browser feature.", 
+				ev.getResource().toString());
+		
+		ev = itr.next();
+		assertTrue(ev.getResource() instanceof DocumentPart);
+		assertEquals("Suffix", ev.getResource().toString());
 	}
 }
