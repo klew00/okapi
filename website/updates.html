@@ -19,17 +19,39 @@ function CheckVersion (p_sName, p_sUserVersion, p_sLatestVersion)
 	sBuf += "<tr><td align='right'>Latest version:</td><td>" + p_sLatestVersion + "</td></tr>";
 	sBuf += "<tr><td align='right'>Recommendation:</td><td>";
 
-	if ( p_sUserVersion == p_sLatestVersion )
-	{
-		sBuf += "No upgrade is needed at this time.";
+	userParts = p_sUserVersion.split(".");
+	u1 = parseInt(userParts[0]);
+	u2 = parseInt(userParts[1]);
+	tmp = userParts[2].split("-");
+	u3 = parseInt(tmp[0]);
+	u4 = 1;
+	if ( tmp[1] == "SNAPSHOT" ) u4 = 0;
+	
+	latestParts = p_sLatestVersion.split(".");
+	l1 = parseInt(latestParts[0]);
+	l2 = parseInt(latestParts[1]);
+	tmp = latestParts[2].split("-");
+	l3 = parseInt(tmp[0]);
+	l4 = 1;
+	if ( tmp[1] == "SNAPSHOT" ) l4 = 0;
+
+	update = false;
+	if ( u1 < l1 ) update = true;
+	else if ( u1 == l1 ) {
+	   if ( u2 < l2 ) update = true;
+	   else if ( u2 == l2 ) {
+	      if ( u3 < l3 ) update = true;
+	      else if ( u3 == l3 ) {
+	         if ( u4 < l4 ) update = true;
+	      }
+	   }
 	}
-	else if ( p_sUserVersion > p_sLatestVersion )
-	{
-		sBuf += "No upgrade is needed at this time.";
-	}
-	else if ( p_sUserVersion < p_sLatestVersion )
-	{
+
+	if ( update ) {
 		sBuf += "<b>We recommend you to upgrade to the latest released version.</b><br />";
+	}
+	else {
+		sBuf += "No upgrade is needed at this time.";
 	}
 	
 	sBuf += "</td></tr></table>";
@@ -93,8 +115,8 @@ function CheckVersions ()
 <div id="placeholder"></div>
 
 <ul>
-	<li><a href="downloads.html">Downloads</a></li>
-	<li><a href="index.html">Overview</a></li>
+	<li><a href="http://code.google.com/p/okapi/downloads/list">All Downloads</a></li>
+	<li><a href="http://www.opentag.com/okapi/wiki/index.php?title=Main_Page">Okapi Main Page</a></li>
 </ul>
 <p>&nbsp;</p>
 
