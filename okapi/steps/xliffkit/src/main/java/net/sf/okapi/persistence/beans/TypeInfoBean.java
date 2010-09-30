@@ -45,7 +45,6 @@ public class TypeInfoBean extends PersistenceBean<Object> {
 	@Override
 	protected void fromObject(Object srcObj, IPersistenceSession session) {
 		className = ClassUtil.getQualifiedClassName(srcObj);
-		LOGGER.warning(String.format("No bean class registered for %s", className));
 	}
 
 	@Override

@@ -147,6 +147,8 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 	public Event handleEvent (Event event) {
 		//System.out.println(event.getEventType());
 		switch ( event.getEventType() ) {
+		case NO_OP:
+			return event;
 		case START_BATCH:			
 			processStartBatch();
 			break;
