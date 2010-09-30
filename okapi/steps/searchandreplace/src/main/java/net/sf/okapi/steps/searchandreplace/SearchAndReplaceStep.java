@@ -29,6 +29,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.URI;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -48,7 +51,6 @@ import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 
 /**
@@ -143,9 +145,8 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 	}
 
 	@Override
-	protected Event handleStartBatch(Event event) {
+	protected Event handleStartBatch(Event event) {		
 		if (params.regEx) {
-
 			int flags = 0;
 			patterns = new Pattern[params.rules.size()];
 
@@ -176,7 +177,6 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 
 	@Override
 	protected Event handleRawDocument(Event event) {
-
 		// --first event determines processing type--
 		if (!firstEventDone) {
 			procType = ProcType.PLAINTEXT;
@@ -225,22 +225,7 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 				outFile.deleteOnExit();
 			}
 
-			if (params.regEx) {
-				for (int i = 0; i < params.rules.size(); i++) {
-					String s[] = params.rules.get(i);
-					if (s[0].equals("true")) {
-						matcher = patterns[i].matcher(result);
-						result = matcher.replaceAll(unescapeReplace(s[2]));
-					}
-				}
-			} else {
-				for (String[] s : params.rules) {
-					if (s[0].equals("true")) {
-						// If not a regular expression we apply the un-escaping to both search and replace
-						result = result.replace(s[1], s[2]);
-					}
-				}
-			}
+			result = searchAndReplace(result);
 
 			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFile),
 					encoding));
@@ -274,12 +259,34 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 		return event;
 	}
 
-	// Replace \\ \n \r, \t and \N for the replacement string
-	private String unescapeReplace(String text) {
-		String res = text.replace("\\n", "\n");
-		res = res.replace("\\r", "\r");
-		res = res.replace("\\t", "\t");
-		return res.replace("\\N", System.getProperty("line.separator"));
+	/*
+	 * un-escape unicode escape sequences and other things.
+	 * TODO: add more escape patterns like in Properties.loadConvert(char[], int, int, char[])??
+	 */
+	private String unescape(String s) {		
+		s = s.replace("\\N", System.getProperty("line.separator"));
+		s = s.replace("\\n", "\n");
+		s = s.replace("\\r", "\r");
+		s = s.replace("\\t", "\t");
+		
+		int i = 0, len = s.length();
+		char c;
+		StringBuffer sb = new StringBuffer(len);
+		while (i < len) {
+			c = s.charAt(i++);
+			if (c == '\\') {
+				if (i < len) {
+					c = s.charAt(i++);
+					if (c == 'u') {
+						c = (char) Integer.parseInt(s.substring(i, i + 4), 16);
+						i += 4;
+					} // add other cases here as desired...
+				}
+			} // fall through: \ escapes itself, quotes any character but u
+			sb.append(c);
+		}
+		
+		return sb.toString();
 	}
 
 	@Override
@@ -328,13 +335,13 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 				String s[] = params.rules.get(i);
 				if (s[0].equals("true")) {
 					matcher = patterns[i].matcher(result);
-					result = matcher.replaceAll(unescapeReplace(s[2]));
+					result = matcher.replaceAll(unescape(s[2]));
 				}
 			}
 		} else {
 			for (String[] s : params.rules) {
 				if (s[0].equals("true")) {
-					result = result.replace(s[1], s[2]);
+					result = result.replace(unescape(s[1]), unescape(s[2]));
 				}
 			}
 		}
