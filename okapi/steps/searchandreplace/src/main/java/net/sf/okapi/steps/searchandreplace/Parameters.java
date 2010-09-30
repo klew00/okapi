@@ -30,6 +30,8 @@ public class Parameters extends BaseParameters {
 	public boolean dotAll;
 	public boolean ignoreCase;
 	public  boolean multiLine;
+	public boolean target;
+	public boolean source;
 	public ArrayList<String[]> rules;
 	
 	public Parameters () {
@@ -41,6 +43,8 @@ public class Parameters extends BaseParameters {
 		dotAll = false;
 		ignoreCase = false;
 		multiLine = false;
+		target = true;
+		source = false;
 		rules = new ArrayList<String[]>();
 	}
 
@@ -61,6 +65,8 @@ public class Parameters extends BaseParameters {
 		dotAll = buffer.getBoolean("dotAll", dotAll);
 		ignoreCase = buffer.getBoolean("ignoreCase", ignoreCase);
 		multiLine = buffer.getBoolean("multiLine", multiLine);
+		target = buffer.getBoolean("target", target);
+		source = buffer.getBoolean("source", source);
 		
 		int count = buffer.getInteger("count", 0);
 		for ( int i=0; i<count; i++ ) {
@@ -80,6 +86,9 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean("ignoreCase", ignoreCase);
 		buffer.setBoolean("multiLine", multiLine);
 		buffer.setInteger("count", rules.size());
+		buffer.setBoolean("target", target);
+		buffer.setBoolean("source", source);
+		
 		int i = 0;
 
 		for ( String[] temp : rules ) {
@@ -90,5 +99,4 @@ public class Parameters extends BaseParameters {
 		}
 		return buffer.toString();
 	}
-	
 }

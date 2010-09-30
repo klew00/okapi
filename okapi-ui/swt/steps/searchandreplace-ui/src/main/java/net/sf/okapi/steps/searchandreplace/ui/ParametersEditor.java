@@ -39,7 +39,6 @@ import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -74,6 +73,8 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Button btnExport;
 	private Button btMoveUp;
 	private Button btMoveDown;
+	private Button chkSource;
+	private Button chkTarget;
 	private Button chkRegEx;
 	private Button chkDotAll;
 	private Button chkIgnoreCase;
@@ -356,8 +357,16 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			}
 		});			
 
+		chkSource = new Button(mainComposite, SWT.CHECK);
+		chkSource.setText("Search and Replace Source?");
+		chkSource.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 4, 1));	
+		
+		chkTarget = new Button(mainComposite, SWT.CHECK);
+		chkTarget.setText("Search and Replace Target?");
+		chkTarget.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 4, 1));		
+		
 		chkRegEx = new Button(mainComposite, SWT.CHECK);
-		chkRegEx.setText("Use regular expression");
+		chkRegEx.setText("Use regular expression?");
 		chkRegEx.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 4, 1));
 		chkRegEx.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -538,6 +547,8 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		chkDotAll.setSelection(fromParams.dotAll);
 		chkIgnoreCase.setSelection(fromParams.ignoreCase);
 		chkMultiLine.setSelection(fromParams.multiLine);
+		chkTarget.setSelection(fromParams.target);
+		chkSource.setSelection(fromParams.source);
 
 		chkDotAll.setEnabled(chkRegEx.getSelection());
 		chkMultiLine.setEnabled(chkRegEx.getSelection());
@@ -581,6 +592,8 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		destParams.dotAll = chkDotAll.getSelection();		
 		destParams.ignoreCase = chkIgnoreCase.getSelection();
 		destParams.multiLine = chkMultiLine.getSelection();
+		destParams.target = chkTarget.getSelection();
+		destParams.source = chkSource.getSelection();
 
 		result = true;
 		return result;
@@ -601,5 +614,4 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		};
 		return true;
 	}
-
 }
