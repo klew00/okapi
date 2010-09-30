@@ -75,6 +75,7 @@ public class FormatManager {
 		pairs.put(".ttx", "okf_ttx");
 		pairs.put(".pentm", "okf_pensieve");
 		pairs.put(".yml", "okf_railsyaml");
+    pairs.put(".vrsz", "okf_versified");
 	}
 	
 	/**
