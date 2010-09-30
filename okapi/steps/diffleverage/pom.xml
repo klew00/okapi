@@ -4,7 +4,7 @@
     <parent>
         <artifactId>build-steps</artifactId>
         <groupId>net.sf.okapi.steps</groupId>
-        <version>0.9</version>
+        <version>0.10-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>okapi-step-diffleverage</artifactId>
@@ -31,14 +31,14 @@
         <dependency>
 			<groupId>net.sf.okapi.steps</groupId>
 			<artifactId>okapi-step-common</artifactId>
-			<version>0.9</version>
+			<version>0.10-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
 		   
         <dependency>
 			<groupId>net.sf.okapi.filters</groupId>
 			<artifactId>okapi-filter-po</artifactId>
-			<version>0.9</version>
+			<version>0.10-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>       
     </dependencies>
