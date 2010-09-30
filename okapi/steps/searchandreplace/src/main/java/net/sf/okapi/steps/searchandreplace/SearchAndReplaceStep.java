@@ -302,7 +302,7 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 				// search and replace source
 				TextContainer tc = tu.getSource();
 				for (Segment seg : tc.getSegments()) {
-					String r = searchAndReplace(seg.text);
+					String r = searchAndReplace(seg.text.toString());
 					seg.text.setCodedText(r);
 				}
 			}
@@ -311,7 +311,7 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 				// search and replace source
 				TextContainer tc = tu.createTarget(targetLocale, false, IResource.COPY_ALL);
 				for (Segment seg : tc.getSegments()) {
-					String r = searchAndReplace(seg.text);
+					String r = searchAndReplace(seg.text.toString());
 					seg.text.setCodedText(r);
 				}
 			}
@@ -322,13 +322,12 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 		return event;
 	}
 
-	private String searchAndReplace(TextFragment f) {
-		String result = f.toString();
+	private String searchAndReplace(String result) {
 		if (params.regEx) {
 			for (int i = 0; i < params.rules.size(); i++) {
 				String s[] = params.rules.get(i);
 				if (s[0].equals("true")) {
-					matcher = patterns[i].matcher(f);
+					matcher = patterns[i].matcher(result);
 					result = matcher.replaceAll(unescapeReplace(s[2]));
 				}
 			}
