@@ -50,7 +50,7 @@ public class SearchAndReplaceTest {
 	}
 
 	@Test
-	public void replaceSourceCharacterPatterns() {		
+	public void replaceSourceCharacter() {		
 		Parameters p = (Parameters)searchAndReplace.getParameters();
 		p.reset();
 		p.regEx = true;
@@ -84,7 +84,39 @@ public class SearchAndReplaceTest {
 	}
 
 	@Test
-	public void replaceTargetCharacterPatterns() {
+	public void replaceSourceCharacterWithUnicodeChar() {		
+		Parameters p = (Parameters)searchAndReplace.getParameters();
+		p.reset();
+		p.regEx = true;
+		String pattern[] = new String[3];
+		pattern[0] = Boolean.toString(true);
+		pattern[1] = "\\{nb\\}|\\{tab\\}|\\{em\\}|\\{en\\}|\\{emsp\\}|\\{ensp\\}";
+		pattern[2] = "\u0045";
+		p.addRule(pattern);
+		
+		p.target = false;
+		p.source = true;
+		
+		pipeline.startBatch();
+		TextUnit tu = new TextUnit("1", "{nb}{tab}{em}{en}{emsp}{ensp}");		
+		Event e = new Event(EventType.TEXT_UNIT, tu);
+		pipeline.process(e);
+		pipeline.endBatch();
+
+		// test we observed the correct events
+		List<Event> el = eventObserver.getResult();
+		assertEquals(EventType.START_BATCH, el.remove(0).getEventType());
+		assertEquals(EventType.START_BATCH_ITEM, el.remove(0).getEventType());
+		tu = el.get(0).getTextUnit();
+		assertEquals("\u0045\u0045\u0045\u0045\u0045\u0045", tu.getSource().getFirstContent().toString());	
+		assertEquals(EventType.TEXT_UNIT, el.remove(0).getEventType());
+		assertEquals(EventType.END_BATCH_ITEM, el.remove(0).getEventType());
+		assertEquals(EventType.END_BATCH, el.remove(0).getEventType());
+		searchAndReplace.setTargetLocale(LocaleId.SPANISH);
+	}
+
+	@Test
+	public void replaceTargetCharacter() {
 		searchAndReplace.setTargetLocale(LocaleId.SPANISH);
 		Parameters p = (Parameters)searchAndReplace.getParameters();
 		p.reset();
@@ -113,4 +145,5 @@ public class SearchAndReplaceTest {
 		assertEquals(EventType.END_BATCH_ITEM, el.remove(0).getEventType());
 		assertEquals(EventType.END_BATCH, el.remove(0).getEventType());
 	}
-}
+	
+	}
