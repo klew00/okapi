@@ -1035,7 +1035,7 @@ public class XLIFFKitWriterTest {
 		writerStep.handleEvent(new Event(EventType.END_BATCH));
 	}
 	
-	//@Test
+	@Test
 	public void testReferences6() throws MalformedURLException, URISyntaxException {
 		XLIFFKitWriterStep writerStep = new XLIFFKitWriterStep();
 		IPersistenceSession session = writerStep.getSession();

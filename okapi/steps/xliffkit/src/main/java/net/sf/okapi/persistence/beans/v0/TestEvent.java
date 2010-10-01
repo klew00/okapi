@@ -30,7 +30,7 @@ public class TestEvent extends Event{
 	private EventType type;
 	
 	public TestEvent(String id) {
-		super(EventType.NO_OP);
+		super(EventType.DOCUMENT_PART);
 		this.setId(id);
 	}
 
