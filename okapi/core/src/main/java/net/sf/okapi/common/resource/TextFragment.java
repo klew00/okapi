@@ -673,6 +673,20 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 		text = new StringBuilder(text.toString().trim());
 	}
 	
+	 /**
+	  *  Remove leading whitespace from this fragment
+	  */
+    public void ltrim() {
+    	text = new StringBuilder(text.toString().replaceAll("^\\s+", ""));
+    }
+
+    /**
+     *  Remove trailing whitespace from this fragment
+     */
+    public void rtrim() {
+    	text = new StringBuilder(text.toString().replaceAll("\\s+$", ""));
+    }
+	
 	/**
 	 * Get the text of the fragment (all codes are removed)
 	 * @return the content of fragment without codes
