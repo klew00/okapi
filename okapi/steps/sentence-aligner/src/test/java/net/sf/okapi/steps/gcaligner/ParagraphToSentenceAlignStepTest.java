@@ -36,6 +36,7 @@ public class ParagraphToSentenceAlignStepTest {
 		Parameters p = new Parameters();
 		p.setGenerateTMX(true);
 		p.setSegmentTarget(true);
+		p.setSegmentSource(true);
 		p.setUseCustomTargetRules(true);
 		p.setCustomTargetRulesPath(this.getClass().getResource("default.srx").getPath());
 		aligner.setParameters(p);

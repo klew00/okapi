@@ -40,6 +40,7 @@ import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.segmentation.SRXDocument;
 
@@ -238,7 +239,18 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 			// case where we have separate source and target TextUnits
 			alignedTextUnit = sentenceAligner.align(sourceTu, targetTu, sourceLocale, targetLocale);
 		}
-
+		
+		// remove leading and trailing whitespace in the aligned TextUnit 
+		// for both source and target
+		for (TextPart p : alignedTextUnit.getSource().getSegments()) {
+			p.text.ltrim();
+			p.text.rtrim();
+		}
+		for (TextPart p : alignedTextUnit.getTarget(targetLocale).getSegments()) {
+			p.text.ltrim();
+			p.text.rtrim();
+		}
+		
 		// Send the aligned TU to the TMX file
 		if (params.getGenerateTMX()) {
 			tmx.writeTUFull(alignedTextUnit);
