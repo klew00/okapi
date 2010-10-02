@@ -132,7 +132,7 @@ class QualityChecker {
 			termChecker = new TermChecker();
 			SimpleTB ta = new SimpleTB(srcLoc, trgLoc);
 			ta.guessAndImport(new File(params.getTermsPath()));
-			termChecker.initialize(ta, srcLoc, trgLoc, params.getStringMode());
+			termChecker.initialize(ta, srcLoc, trgLoc, params.getStringMode(), params.getBetweenCodes());
 		}
 	}
 

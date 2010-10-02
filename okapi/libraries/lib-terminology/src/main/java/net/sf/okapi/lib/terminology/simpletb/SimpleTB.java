@@ -55,6 +55,7 @@ public class SimpleTB {
 	LocaleId srcLoc;
 	LocaleId trgLoc;
 	private List<Entry> entries;
+	private boolean betweenCodes;
 	
 	public SimpleTB (LocaleId srcLoc,
 		LocaleId trgLoc)
@@ -68,9 +69,14 @@ public class SimpleTB {
 		entries = new ArrayList<Entry>();
 	}
 	
-	public void initialize (boolean stringSearch) {
+	public void initialize (boolean stringSearch,
+		boolean betweenCodes)
+	{
+		this.betweenCodes = betweenCodes;
 		// In case of a string-based search: we sort the source terms: longer first
-		Collections.sort(entries);
+		if ( stringSearch ) {
+			Collections.sort(entries);
+		}
 	}
 	
 	public void guessAndImport (File file) {
@@ -142,6 +148,7 @@ public class SimpleTB {
 		String stringToMatch;
 		String otherString;
 		StringBuilder text = new StringBuilder(frag);
+		Range location = new Range(0, 0);
 		
 		// For each term in the list
 		for ( Entry ent : entries ) {
@@ -156,48 +163,80 @@ public class SimpleTB {
 			}
 			
 			if (( stringToMatch == null ) || ( otherString == null )) continue;
+			
 			while ( true ) {
-				int n = text.indexOf(stringToMatch);
-				if ( n == -1 ) break; // No more of that term
-				// Check "word boundaries"
-				if ( n > 0 ) {
-					int cp = text.codePointAt(n-1);
-					if (( Character.getType(cp) == Character.LOWERCASE_LETTER ) ||
-						( Character.getType(cp) == Character.UPPERCASE_LETTER ) ||
-						( Character.getType(cp) == Character.TITLECASE_LETTER ) ||
-						( Character.getType(cp) == Character.DECIMAL_DIGIT_NUMBER ))
-					{
-						// If the preceding character is a letter, it's not a "word"
-						break;
-					}
-				}
-				int last = n+stringToMatch.length();
-				if ( last < text.length() ) {
-					int cp = text.codePointAt(last);
-					if (( Character.getType(cp) == Character.LOWERCASE_LETTER ) ||
-						( Character.getType(cp) == Character.UPPERCASE_LETTER ) ||
-						( Character.getType(cp) == Character.TITLECASE_LETTER ) ||
-						( Character.getType(cp) == Character.DECIMAL_DIGIT_NUMBER ))
-					{
-						// If the following character is a letter, it's not a "word"
-						break;
-					}
-				}
-				
+				if ( !isValidMatch(text, stringToMatch, location, betweenCodes) ) break;
 				// Else: Save the term
 				TermHit th = new TermHit();
 				th.sourceTerm = new TermEntry(stringToMatch);
 				th.targetTerm = new TermEntry(otherString);
-				th.range = new Range(n, last);
+				th.range = new Range(location.start, location.end);
 				res.add(th);
 				// Obliterate the match so we don't re-match it 
-				for ( int i=n; i<last; i++ ) {
+				for ( int i=location.start; i<location.end; i++ ) {
 					text.setCharAt(i, '`');
 				}
 			}
 		}
 		
 		return res;
+	}
+
+	/**
+	 * Searches for a given string in a text. The location parameter is updated with the position of the first 
+	 * character and the one of the character after the last one.
+	 * @param text Text where to search the strings.
+	 * @param stringToMatch the string to search for.
+	 * @param location location of the term.
+	 * @return true if it's a match, false otherwise. If the return is true, the values in location are updated.
+	 */
+	public static boolean isValidMatch (StringBuilder text,
+		String stringToMatch,
+		Range location,
+		boolean betweenCodes)
+	{
+		int n = text.indexOf(stringToMatch);
+		if ( n == -1 ) return false; // No more of that term
+		// Check "word boundaries"
+		if ( n > 0 ) {
+			int cp = text.codePointAt(n-1);
+			if (( Character.getType(cp) == Character.LOWERCASE_LETTER ) ||
+				( Character.getType(cp) == Character.UPPERCASE_LETTER ) ||
+				( Character.getType(cp) == Character.TITLECASE_LETTER ) ||
+				( Character.getType(cp) == Character.DECIMAL_DIGIT_NUMBER ))
+			{
+				// If the preceding character is a letter, it's not a "word"
+				return false;
+			}
+		}
+		if ( betweenCodes ) {
+			// If it must be between codes: check the previous previous char, it should be a marker.
+			if (( n <= 1 ) || !TextFragment.isMarker(text.charAt(n-2)) ) {
+				return false;
+			}
+		}
+		
+		int last = n+stringToMatch.length();
+		if ( last < text.length() ) {
+			int cp = text.codePointAt(last);
+			if (( Character.getType(cp) == Character.LOWERCASE_LETTER ) ||
+				( Character.getType(cp) == Character.UPPERCASE_LETTER ) ||
+				( Character.getType(cp) == Character.TITLECASE_LETTER ) ||
+				( Character.getType(cp) == Character.DECIMAL_DIGIT_NUMBER ))
+			{
+				// If the following character is a letter, it's not a "word"
+				return false;
+			}
+		}
+		if ( betweenCodes ) {
+			// If must be between codes: check the next character
+			if (( last+1 > text.length() ) || !TextFragment.isMarker(text.charAt(last)) ) {
+				return false;
+			}
+		}
+		location.start = n;
+		location.end = last;
+		return true;
 	}
 	
 	/*

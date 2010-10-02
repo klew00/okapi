@@ -77,6 +77,7 @@ public class Parameters extends BaseParameters {
 	private static final String CHECKTERMS = "checkTerms";
 	private static final String TERMSPATH = "termsPath";
 	private static final String STRINGMODE = "stringMode";
+	private static final String BETWEENCODES = "betweenCodes";
 
 	String outputPath;
 	boolean autoOpen;
@@ -116,6 +117,7 @@ public class Parameters extends BaseParameters {
 	boolean checkTerms;
 	String termsPath;
 	boolean stringMode;
+	boolean betweenCodes;
 
 	public Parameters () {
 		reset();
@@ -409,6 +411,14 @@ public class Parameters extends BaseParameters {
 		this.stringMode = stringMode;
 	}
 	
+	public boolean getBetweenCodes () {
+		return betweenCodes;
+	}
+
+	public void setBetweenCodes (boolean betweenCodes) {
+		this.betweenCodes = betweenCodes;
+	}
+	
 	public String getTermsPath () {
 		return termsPath;
 	}
@@ -457,6 +467,7 @@ public class Parameters extends BaseParameters {
 		checkTerms = false;
 		termsPath = "";
 		stringMode = false;
+		betweenCodes = false;
 
 		patterns = new ArrayList<PatternItem>();
 		
@@ -543,6 +554,7 @@ public class Parameters extends BaseParameters {
 		checkTerms = buffer.getBoolean(CHECKTERMS, checkTerms);
 		termsPath = buffer.getString(TERMSPATH, termsPath);
 		stringMode = buffer.getBoolean(STRINGMODE, stringMode);
+		betweenCodes = buffer.getBoolean(BETWEENCODES, betweenCodes);
 		
 		// Patterns
 		checkPatterns = buffer.getBoolean(CHECKPATTERNS, checkPatterns);
@@ -612,6 +624,7 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean(CHECKTERMS, checkTerms);
 		buffer.setString(TERMSPATH, termsPath);
 		buffer.setBoolean(STRINGMODE, stringMode);
+		buffer.setBoolean(BETWEENCODES, betweenCodes);
 		// Patterns
 		buffer.setBoolean(CHECKPATTERNS, checkPatterns);
 		buffer.setInteger(PATTERNCOUNT, patterns.size());

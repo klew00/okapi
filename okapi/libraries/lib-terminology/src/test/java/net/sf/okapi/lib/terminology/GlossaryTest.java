@@ -84,7 +84,7 @@ public class GlossaryTest {
 		ta.addEntry("src2", "trg2");
 		ta.addEntry("Src1 src2", "Trg1 trg2");
 		ta.addEntry("src5", "trg5");
-		ta.initializeSearch(true);
+		ta.initializeSearch(true, false);
 		
 		TextFragment srcFrag = new TextFragment(">src2< and Src1 src2. Also: WithiWordsrcWord");
 		List<TermHit> found1 = ta.getExistingStrings(srcFrag, locEN, locFR);

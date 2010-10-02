@@ -79,8 +79,10 @@ public class SimpleTBConnector implements ITermAccess {
 		return tb.getExistingStrings(fragment, fragmentLocId, otherLocId);
 	}
 	
-	public void initializeSearch(boolean stringSearch) {
-		tb.initialize(stringSearch);
+	public void initializeSearch(boolean stringSearch,
+		boolean betweenCodes)
+	{
+		tb.initialize(stringSearch, betweenCodes);
 	}
 	
 	public Entry addEntry (String srcTerm,

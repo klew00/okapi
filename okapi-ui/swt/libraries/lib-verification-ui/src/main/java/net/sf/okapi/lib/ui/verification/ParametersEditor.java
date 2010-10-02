@@ -146,6 +146,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Label stTermPath;
 	private TextAndBrowsePanel pnlTermsPath;
 	private Button chkStringMode;
+	private Button chkBetweenCodes;
 	
 	// Flag to indicate the editor is use for step parameters
 	// We default to true because the step cannot set this option
@@ -731,6 +732,14 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		
 		chkStringMode = new Button(cmpTmp, SWT.CHECK);
 		chkStringMode.setText("Verify using strings matching");
+		chkStringMode.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				updateStringMode();
+			};
+		});
+		
+		chkBetweenCodes = new Button(cmpTmp, SWT.CHECK);
+		chkBetweenCodes.setText("Strings must be between inline codes to match");
 
 		tiTmp = new TabItem(tabs, SWT.NONE);
 		tiTmp.setText("Terms");
@@ -883,6 +892,11 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		stTermPath.setEnabled(chkCheckTerms.getSelection());
 		pnlTermsPath.setEnabled(chkCheckTerms.getSelection());
 		chkStringMode.setEnabled(chkCheckTerms.getSelection());
+		updateStringMode();
+	}
+	
+	private void updateStringMode () {
+		chkBetweenCodes.setEnabled(chkStringMode.isEnabled() ? chkStringMode.getSelection() : false);
 	}
 	
 	private void editPattern (boolean add) {
@@ -1203,6 +1217,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		chkCheckTerms.setSelection(params.getCheckTerms());
 		pnlTermsPath.setText(params.getTermsPath());
 		chkStringMode.setSelection(params.getStringMode());
+		chkBetweenCodes.setSelection(params.getBetweenCodes());
 		
 		setPatternsData(params.getPatterns());
 		updateTargetSameAsSourceWithCodes();
@@ -1373,6 +1388,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		params.setCheckTerms(chkCheckTerms.getSelection());
 		params.setTermsPath(pnlTermsPath.getText());
 		params.setStringMode(chkStringMode.getSelection());
+		params.setBetweenCodes(chkBetweenCodes.getSelection());
 		
 		if ( stepMode ) {
 			params.setSaveSession(chkSaveSession.getSelection());

@@ -27,10 +27,10 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.Range;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.lib.terminology.TermEntry;
 import net.sf.okapi.lib.terminology.TermHit;
 import net.sf.okapi.lib.terminology.simpletb.SimpleTB;
 
@@ -41,18 +41,21 @@ public class TermChecker {
 	private LocaleId trgLoc;
 	private SimpleTB ta;
 	private boolean stringSearch;
+	private boolean betweenCodes;
 	
 	public void initialize (SimpleTB termAccess,
 		LocaleId srcLoc,
 		LocaleId trgLoc,
-		boolean stringSearch)
+		boolean stringSearch,
+		boolean betweenCodes)
 	{
 		issues = new ArrayList<Issue>();
 		this.ta = termAccess;
 		this.srcLoc = srcLoc;
 		this.trgLoc = trgLoc;
 		this.stringSearch = stringSearch;
-		ta.initialize(stringSearch);
+		this.betweenCodes = betweenCodes;
+		ta.initialize(stringSearch, betweenCodes);
 	}
 	
 	public int verify (URI docId,
@@ -103,7 +106,7 @@ public class TermChecker {
 		List<TermHit> srcList = ta.getExistingStrings(srcSeg.text, srcLoc, trgLoc);
 		
 		// Get the list of the terms in the target text (based on the source list)
-		List<TermHit> trgList = getExistingTargetStrings(trgSeg.text, srcList);
+		List<TermHit> trgList = getExistingTargetStrings(trgSeg.text, srcList, betweenCodes);
 		
 		// Remove proper correspondences 
 		removeMatches(srcList, trgList);
@@ -154,48 +157,22 @@ public class TermChecker {
 	}
 
 	public static List<TermHit> getExistingTargetStrings (TextFragment frag,
-		List<TermHit> sourceHits)
+		List<TermHit> sourceHits,
+		boolean betweenCodes)
 	{
 		StringBuilder text = new StringBuilder(frag);
 		List<TermHit> res = new ArrayList<TermHit>();
+		Range location = new Range(0, 0);
 		
 		for ( TermHit th : sourceHits) {
-			String term = th.targetTerm.getText();
-			int n = text.indexOf(term);
-			if ( n == -1 ) continue; // No more of that term
-			// Check "word boundaries"
-			// Note that within OTHER_LETTER is OK (e.g. Chinese characters)
-			if ( n > 0 ) {
-				int cp = text.codePointAt(n-1);
-				if (( Character.getType(cp) == Character.LOWERCASE_LETTER ) ||
-					( Character.getType(cp) == Character.UPPERCASE_LETTER ) ||
-					( Character.getType(cp) == Character.TITLECASE_LETTER ) ||
-					( Character.getType(cp) == Character.DECIMAL_DIGIT_NUMBER ))
-				{
-					// If the preceding character is a letter, it's not a "word"
-					continue; // Next term
-				}
-			}
-			int last = n+term.length();
-			if ( last < text.length() ) {
-				int cp = text.codePointAt(last);
-				if (( Character.getType(cp) == Character.LOWERCASE_LETTER ) ||
-					( Character.getType(cp) == Character.UPPERCASE_LETTER ) ||
-					( Character.getType(cp) == Character.TITLECASE_LETTER ) ||
-					( Character.getType(cp) == Character.DECIMAL_DIGIT_NUMBER ))
-				{
-					// If the following character is a letter, it's not a "word"
-					continue; // Next term
-				}
-			}
-			
+			if ( !SimpleTB.isValidMatch(text, th.targetTerm.getText(), location, betweenCodes) ) continue;
 			// Else: Save the term
 			TermHit hit = new TermHit();
 			hit.sourceTerm = th.targetTerm;
 			hit.targetTerm = th.sourceTerm;
 			res.add(hit);
 			// Obliterate the match so we don't re-match it 
-			for ( int i=n; i<last; i++ ) {
+			for ( int i=location.start; i<location.end; i++ ) {
 				text.setCharAt(i, '`');
 			}
 		}
