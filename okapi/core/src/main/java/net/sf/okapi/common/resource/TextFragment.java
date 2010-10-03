@@ -97,6 +97,14 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 	 */
 	private static final Pattern MARKERS_REGEX = Pattern.compile("[\uE101\uE102\uE103\uE104].");
 
+	/*
+	 * Typical whitespace space (U+0020) tab (U+0009) form feed (U+000C) line feed
+	 * (U+000A) carriage return (U+000D) zero-width space (U+200B) (IE6 does not
+	 * recognize these, they are treated as unprintable characters)
+	 */
+	private static final String WHITESPACE_REGEX = "[ \t\r\n\f\u200B]+";
+	private static final Pattern WHITESPACE_PATTERN = Pattern.compile(WHITESPACE_REGEX);
+
 	/**
 	 * List of the types of tag usable for in-line codes.
 	 */
@@ -685,6 +693,13 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
      */
     public void rtrim() {
     	text = new StringBuilder(text.toString().replaceAll("\\s+$", ""));
+    }
+    
+    /**
+     *  Collapse all whitespace to a single space character.
+     */
+    public void collapseWhitespace() {
+    	text = new StringBuilder(WHITESPACE_PATTERN.matcher(text).replaceAll(" "));
     }
 	
 	/**
