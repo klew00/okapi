@@ -54,7 +54,7 @@ import net.sf.okapi.lib.segmentation.SRXDocument;
 @UsingParameters(Parameters.class)
 public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 	private static final Logger LOGGER = Logger.getLogger(SentenceAlignerStep.class.getName());
-
+	
 	private Parameters params;
 	private IFilter filter = null;
 	private XMLWriter writer;
@@ -118,9 +118,9 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 		SRXDocument srxDocument = new SRXDocument();
 
 		// Prepare source segmentation if needed
-		if (params.getSegmentSource()) {
+		if (params.isSegmentSource()) {
 			// Load default or custom rules
-			if (params.getUseCustomSourceRules()) {
+			if (params.isUseCustomSourceRules()) {
 				try {
 					srxDocument.loadRules(params.getCustomSourceRulesPath());
 					loadDefault = false;
@@ -140,10 +140,10 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 		}
 
 		// Prepare target segmentation if needed
-		if (params.getSegmentTarget()) {
+		if (params.isSegmentTarget()) {
 			loadDefault = true;
 			// Load default or custom rules
-			if (params.getUseCustomTargetRules()) {
+			if (params.isUseCustomTargetRules()) {
 				try {
 					srxDocument.loadRules(params.getCustomTargetRulesPath());
 					loadDefault = false;
@@ -181,7 +181,7 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 		}
 		
 		// Start TMX writer (one for all input documents)
-		if (tmx == null && params.getGenerateTMX()) {
+		if (tmx == null && params.isGenerateTMX()) {
 			String mimeType = event.getStartDocument().getMimeType();
 			tmx = new TMXWriter(params.getTmxOutputPath());
 			tmx.writeStartDocument(sourceLocale, targetLocale, getClass().getName(), null,
@@ -210,7 +210,7 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 		}
 
 		// Segment the source if requested
-		if (params.getSegmentSource()) {
+		if (params.isSegmentSource()) {
 			sourceTu.createSourceSegmentation(sourceSegmenter);
 		}
 
@@ -221,7 +221,7 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 		}
 
 		// Segment the target if requested
-		if (params.getSegmentTarget()) {
+		if (params.isSegmentTarget()) {
 			if (targetTu == null) {
 				// TextUnit is bilingual
 				sourceTu.createTargetSegmentation(targetSegmenter, targetLocale);
@@ -229,6 +229,22 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 				// separate target TextUnit
 				targetTu.createSourceSegmentation(targetSegmenter);
 			}			
+		}
+		
+		// collapse whitespace if needed *before* alignment
+		if (params.isCollapseWhitespace()) {
+			for (TextPart p : sourceTu.getSource().getSegments()) {
+				p.text.collapseWhitespace();
+			}
+			if (targetInput == null) {
+				for (TextPart p : sourceTu.getTarget(targetLocale).getSegments()) {
+					p.text.collapseWhitespace();
+				}
+			} else {
+				for (TextPart p : targetTu.getSource().getSegments()) {
+					p.text.collapseWhitespace();
+				}
+			}
 		}
 
 		TextUnit alignedTextUnit;
@@ -252,7 +268,7 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 		}
 		
 		// Send the aligned TU to the TMX file
-		if (params.getGenerateTMX()) {
+		if (params.isGenerateTMX()) {
 			tmx.writeTUFull(alignedTextUnit);
 		} else { // Otherwise send each aligned TextUnit downstream
 			return new Event(EventType.TEXT_UNIT, alignedTextUnit);
@@ -281,7 +297,7 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 			found = (event.getEventType() == untilType);
 		}
 		if (!found) {
-			if (params.getGenerateTMX() && (tmx != null)) {
+			if (params.isGenerateTMX() && (tmx != null)) {
 				tmx.writeEndDocument();
 				tmx.close();
 				tmx = null;

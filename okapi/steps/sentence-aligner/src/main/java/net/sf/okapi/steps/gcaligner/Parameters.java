@@ -33,7 +33,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 
 	private static final String GENERATETMX = "generateTMX";
 	private static final String TMXOUTPUTPATH = "tmxOutputPath";
-
+	private static final String COLLAPSEWHITESPACE = "collapseWhitespace"; 
+	
 	private boolean generateTMX;
 	private String tmxOutputPath;
 
@@ -44,12 +45,14 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private boolean segmentTarget;
 	private boolean useCustomTargetRules;
 	private String customTargetRulesPath;
+	
+	private boolean collapseWhitespace;
 
 	public Parameters() {
 		reset();
 	}
 
-	public boolean getGenerateTMX() {
+	public boolean isGenerateTMX() {
 		return generateTMX;
 	}
 
@@ -65,7 +68,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.tmxOutputPath = tmxOutputPath;
 	}
 
-	public boolean getSegmentSource() {
+	public boolean isSegmentSource() {
 		return segmentSource;
 	}
 
@@ -73,7 +76,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.segmentSource = segmentSource;
 	}
 
-	public boolean getUseCustomSourceRules() {
+	public boolean isUseCustomSourceRules() {
 		return useCustomSourceRules;
 	}
 
@@ -89,7 +92,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.customSourceRulesPath = customSourceRulesPath;
 	}
 
-	public boolean getSegmentTarget() {
+	public boolean isSegmentTarget() {
 		return segmentTarget;
 	}
 
@@ -97,7 +100,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.segmentTarget = segmentTarget;
 	}
 
-	public boolean getUseCustomTargetRules() {
+	public boolean isUseCustomTargetRules() {
 		return useCustomTargetRules;
 	}
 
@@ -113,6 +116,14 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.customTargetRulesPath = customTargetRulesPath;
 	}
 
+	public boolean isCollapseWhitespace() {
+		return collapseWhitespace;
+	}
+
+	public void setCollapseWhitespace(boolean collapseWhitespace) {
+		this.collapseWhitespace = collapseWhitespace;
+	}
+
 	@Override
 	public void reset() {
 		tmxOutputPath = "aligned.tmx";
@@ -123,6 +134,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		segmentTarget = true;
 		useCustomTargetRules = false;
 		customTargetRulesPath = "";
+		collapseWhitespace = false;
 	}
 
 	@Override
@@ -138,6 +150,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		segmentTarget = buffer.getBoolean("segmentTarget", segmentTarget);
 		useCustomTargetRules = buffer.getBoolean("useCustomTargetRules", useCustomTargetRules);
 		customTargetRulesPath = buffer.getString("customTargetRulesPath", customTargetRulesPath);
+		collapseWhitespace = buffer.getBoolean(COLLAPSEWHITESPACE, collapseWhitespace);
 	}
 
 	@Override
@@ -152,7 +165,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.setBoolean("segmentTarget", segmentTarget);
 		buffer.setBoolean("useCustomTargetRules", useCustomTargetRules);
 		buffer.setString("customTargetRulesPath", customTargetRulesPath);
-
+		buffer.setBoolean(COLLAPSEWHITESPACE, collapseWhitespace);
+		
 		return buffer.toString();
 	}
 
@@ -175,6 +189,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 				"Use custom target segmentation rules (instead of the default ones)", null);
 		desc.add("customTargetRulesPath", "SRX path for the target",
 				"Full path of the SRX document to use for the target");
+		desc.add(COLLAPSEWHITESPACE, "Collapse Whitspace?", 
+				"Collapse whitespace (space, newline etc.) to a single space?");
 		return desc;
 	}
 
@@ -209,8 +225,11 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		pip.setBrowseFilters("SRX Documents (*.srx)\tAll Files (*.*)", "*.srx\t*.*");
 		pip.setWithLabel(false);
 		pip.setMasterPart(cbp2, true);
+		
+		desc.addSeparatorPart();
 
+		desc.addCheckboxPart(paramsDesc.get(COLLAPSEWHITESPACE));
+		
 		return desc;
 	}
-
 }

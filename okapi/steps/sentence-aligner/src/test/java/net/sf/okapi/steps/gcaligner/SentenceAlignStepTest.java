@@ -109,6 +109,47 @@ public class SentenceAlignStepTest {
 		assertEquals(EventType.START_BATCH_ITEM, el.remove(0).getEventType());
 		assertEquals(EventType.START_DOCUMENT, el.remove(0).getEventType());
 		Event tue = el.remove(0);
+		assertEquals("The First Darlek  \tEmpire has written: \"The simplest statement we know of is the " +
+				"statement of Davross himself, namely, that the members of the empire should destroy " +
+				"'all life forms,' which is understood to mean universal destruction." 
+				,tue.getTextUnit().getSource().get(0).toString());
+		assertEquals(
+				"No one is justified " +
+				"in making any other statement than this\" (First Darlek Empire letter, Mar. 12, 3035; see " +
+				"also DE 11:4).",
+				tue.getTextUnit().getSource().get(1).toString());
+		assertEquals(EventType.TEXT_UNIT, tue.getEventType());
+		assertEquals(EventType.END_DOCUMENT, el.remove(0).getEventType());
+		assertEquals(EventType.END_BATCH_ITEM, el.remove(0).getEventType());
+		assertEquals(EventType.END_BATCH, el.remove(0).getEventType());
+	}
+	
+	@Test
+	public void sentenceAlignMultimatchCollpasewhitespace() throws URISyntaxException {
+		URL url = SentenceAlignStepTest.class.getResource("/trgMultimatch.txt");
+		RawDocument t = new RawDocument(url.toURI(), "UTF-8", LocaleId.fromString("pt"));
+		t.setFilterConfigId("okf_plaintext");
+
+		aligner.setSecondInput(t);
+		aligner.setSourceLocale(LocaleId.ENGLISH);
+		aligner.setTargetLocale(LocaleId.PORTUGUESE);
+		Parameters p = (Parameters)aligner.getParameters();
+		p.setCollapseWhitespace(true);
+		aligner.setParameters(p);
+		
+		pipeline.startBatch();
+
+		pipeline.process(new RawDocument(this.getClass().getResourceAsStream("/srcMultimatch.txt"),
+				"UTF-8", LocaleId.ENGLISH));
+
+		pipeline.endBatch();
+
+		// test we observed the correct events
+		List<Event> el = eventObserver.getResult();
+		assertEquals(EventType.START_BATCH, el.remove(0).getEventType());
+		assertEquals(EventType.START_BATCH_ITEM, el.remove(0).getEventType());
+		assertEquals(EventType.START_DOCUMENT, el.remove(0).getEventType());
+		Event tue = el.remove(0);
 		assertEquals("The First Darlek Empire has written: \"The simplest statement we know of is the " +
 				"statement of Davross himself, namely, that the members of the empire should destroy " +
 				"'all life forms,' which is understood to mean universal destruction." 
