@@ -29,9 +29,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.URI;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -40,7 +37,6 @@ import java.util.regex.Pattern;
 import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiIOException;
@@ -321,11 +317,13 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 			}
 
 			if (params.target) {
-				// search and replace source
-				TextContainer tc = tu.createTarget(targetLocale, false, IResource.COPY_ALL);
-				for (Segment seg : tc.getSegments()) {
-					String r = searchAndReplace(seg.text.toString());
-					seg.text.setCodedText(r);
+				// search and replace existing target
+				TextContainer tc = tu.getTarget(targetLocale);
+				if(tc != null){
+					for (Segment seg : tc.getSegments()) {
+						String r = searchAndReplace(seg.text.toString());
+						seg.text.setCodedText(r);
+					}
 				}
 			}
 		} catch (Exception e) {
