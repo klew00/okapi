@@ -197,7 +197,7 @@ public class VersifiedTextFilter extends AbstractFilter {
 		try {
 			while (((currentLine = versifiedFileReader.readLine()) != null) && !isCanceled()) {
 				if (currentLine.matches(VERSE)) {
-					handleDocumentPart(currentLine + newline);
+					handleDocumentPart(currentLine + newline);					
 					handleVerse(versifiedFileReader, currentLine, currentLine.substring(2));
 				} else if (currentLine.matches(BOOK)) {
 					currentBook = currentLine.substring(2);
@@ -242,15 +242,15 @@ public class VersifiedTextFilter extends AbstractFilter {
 			throws IOException {
 		String line = null;
 		StringBuilder source = new StringBuilder(3200);
-
+		
+		verse.mark(3200);
 		while ((line = verse.readLine()) != null) {
 			if (line.matches(VERSE) || line.matches(BOOK) || line.matches(CHAPTER)) {
 				verse.reset();
 				break;
 			}
 			// Need to capture all line-breaks between lines, even empty (they can be between lines)
-			source.append(line + "\n"); // But use standard line-break in content
-			
+			source.append(line + "\n"); // But use standard line-break in content			
 			verse.mark(3200);
 		}
 

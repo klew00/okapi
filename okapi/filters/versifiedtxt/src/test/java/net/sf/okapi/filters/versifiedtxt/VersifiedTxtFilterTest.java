@@ -113,6 +113,18 @@ public class VersifiedTxtFilterTest {
 	}
 	
 	@Test
+	public void testEmptyVerses() {
+		String snippet = "|bbook\n|cchapter\n|v1\n|v2\n";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertNotNull(tu);
+		assertEquals("", tu.getSource().toString());
+		
+		tu = FilterTestDriver.getTextUnit(getEvents(snippet), 2);
+		assertNotNull(tu);
+		assertEquals("", tu.getSource().toString());
+	}
+	
+	@Test
 	public void testDoubleExtraction() throws URISyntaxException {
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
 		list.add(new InputDocument(root+"part1.txt", null));		
