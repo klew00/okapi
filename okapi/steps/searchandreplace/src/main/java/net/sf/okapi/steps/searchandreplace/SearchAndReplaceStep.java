@@ -263,7 +263,7 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 	 * un-escape unicode escape sequences and other things.
 	 * TODO: add more escape patterns like in Properties.loadConvert(char[], int, int, char[])??
 	 */
-	private String unescape(String s) {		
+	private String unescape(String s, boolean isRegex) {		
 		s = s.replace("\\N", System.getProperty("line.separator"));
 		s = s.replace("\\n", "\n");
 		s = s.replace("\\r", "\r");
@@ -280,7 +280,13 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 					if (c == 'u') {
 						c = (char) Integer.parseInt(s.substring(i, i + 4), 16);
 						i += 4;
-					} // add other cases here as desired...
+					}else if (c == '\\'){
+						if(isRegex){
+							//--add both slashes to the regex
+							sb.append(c);							
+						}
+					}// add other cases here as desired...
+					 // perhaps throw exception here to notify incomplete escaping?
 				}
 			} // fall through: \ escapes itself, quotes any character but u
 			sb.append(c);
@@ -335,13 +341,13 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 				String s[] = params.rules.get(i);
 				if (s[0].equals("true")) {
 					matcher = patterns[i].matcher(result);
-					result = matcher.replaceAll(unescape(s[2]));
+					result = matcher.replaceAll(unescape(s[2], true));
 				}
 			}
 		} else {
 			for (String[] s : params.rules) {
 				if (s[0].equals("true")) {
-					result = result.replace(unescape(s[1]), unescape(s[2]));
+					result = result.replace(unescape(s[1], false), unescape(s[2], false));
 				}
 			}
 		}
