@@ -140,7 +140,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			public void widgetSelected(SelectionEvent e) {
 				result = false;
 				if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
-					if ( help != null ) help.showTopic(this, "index"); //$NON-NLS-1$
+					if ( help != null ) help.showWiki("XSL Transformation Step");
 					return;
 				}
 				if ( e.widget.getData().equals("o") ) { //$NON-NLS-1$

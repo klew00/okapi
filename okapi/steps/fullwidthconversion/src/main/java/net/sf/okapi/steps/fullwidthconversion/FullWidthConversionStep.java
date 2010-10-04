@@ -49,7 +49,7 @@ public class FullWidthConversionStep extends BasePipelineStep {
 	}
 	
 	public String getName () {
-		return "Full Width Conversion";
+		return "Full-Width Conversion";
 	}
 
 	public String getDescription () {

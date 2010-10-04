@@ -112,7 +112,7 @@ public class XSLTransformStep extends BasePipelineStep {
 	}
 
 	public String getName () {
-		return "XSLT Transformation";
+		return "XSL Transformation";
 	}
 
 	@Override

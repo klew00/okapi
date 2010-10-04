@@ -51,6 +51,7 @@ class StepPicker {
 	private Text edDescription;
 	private String result;
 	private ArrayList<StepInfo> availableSteps;
+	private IHelp help;
 	
 	public StepPicker (Shell parent,
 		Map<String, StepInfo> steps,
@@ -61,6 +62,8 @@ class StepPicker {
 		shell.setText("Add Step");
 		UIUtil.inheritIcon(shell, parent);
 		shell.setLayout(new GridLayout());
+		
+		help = helpParam;
 		
 		Label label = new Label(shell, SWT.None);
 		label.setText("Available steps:");
@@ -143,11 +146,25 @@ class StepPicker {
 			else {
 				step = (IPipelineStep)Class.forName(si.stepClass, true, si.loader).newInstance();
 			}
-			String path = Util.getClassLocation(step.getClass());
-			if ( Util.isEmpty(path) ) return; // No help available
-			path += File.separator + step.getHelpLocation() + File.separator;
-			n = si.stepClass.lastIndexOf('.');
-			Util.openURL(path+si.stepClass.substring(n+1).toLowerCase()+".html");
+			
+			String stepHelp = step.getHelpLocation();
+			if ( Util.isEmpty(stepHelp) ) return;
+			if ( stepHelp.startsWith(".") ) {
+				// Use old method: Local help
+				String path = Util.getClassLocation(step.getClass());
+				if ( Util.isEmpty(path) ) return; // No help available
+				path += File.separator + stepHelp + File.separator;
+				n = si.stepClass.lastIndexOf('.');
+				Util.openURL(path+si.stepClass.substring(n+1).toLowerCase()+".html");
+			}
+			else if ( stepHelp.endsWith(".html") ) {
+				// Third-party step
+				Util.openURL(stepHelp);
+			}
+			else {
+				// Go to OkapiWiki
+				help.showWiki(stepHelp);
+			}
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getMessage(), null);

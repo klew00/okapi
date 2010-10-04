@@ -118,7 +118,7 @@ public class Editor implements IParametersEditor {
 			public void widgetSelected(SelectionEvent e) {
 				result = false;
 				if ( e.widget.getData().equals("h") ) {
-					if ( help != null ) help.showTopic(this, "index");
+					if ( help != null ) help.showWiki("OpenOffice Filter");
 					return;
 				}
 				if ( e.widget.getData().equals("o") ) {

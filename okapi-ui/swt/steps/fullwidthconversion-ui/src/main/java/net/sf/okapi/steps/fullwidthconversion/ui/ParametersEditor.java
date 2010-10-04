@@ -108,7 +108,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private void create (Shell parent,
 		boolean readOnly)
 	{
-		shell.setText("Fullwidth Conversion");
+		shell.setText("Full-Width Conversion");
 		if ( parent != null ) UIUtil.inheritIcon(shell, parent);
 		GridLayout layTmp = new GridLayout();
 		layTmp.marginBottom = 0;
@@ -123,7 +123,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			public void widgetSelected(SelectionEvent e) {
 				result = false;
 				if ( e.widget.getData().equals("h") ) {
-					if ( help != null ) help.showTopic(this, "fullwidthconversionstep");
+					if ( help != null ) help.showWiki("Full-Width Conversion Step");
 					return;
 				}
 				if ( e.widget.getData().equals("o") ) saveData();

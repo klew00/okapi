@@ -142,7 +142,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			public void widgetSelected(SelectionEvent e) {
 				result = false;
 				if ( e.widget.getData().equals("h") ) {
-					if ( help != null ) help.showTopic(this, "index");
+					if ( help != null ) help.showWiki("Leveraging Step");
 					return;
 				}
 				if ( e.widget.getData().equals("o") ) saveData();

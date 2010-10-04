@@ -394,7 +394,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private void create (Shell parent,
 		boolean readOnly)
 	{
-		shell.setText("Search And Replace");
+		shell.setText("Search and Replace");
 		if ( parent != null ) UIUtil.inheritIcon(shell, parent);
 
 		GridLayout layTmp = new GridLayout();
@@ -410,7 +410,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			public void widgetSelected(SelectionEvent e) {
 				result = false;
 				if ( e.widget.getData().equals("h") ) {
-					if ( help != null ) help.showTopic(this, "index");
+					if ( help != null ) help.showWiki("Search and Replace Step");
 					return;
 				}
 				if ( e.widget.getData().equals("o") ){

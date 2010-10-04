@@ -338,7 +338,7 @@ public class PipelineEditor {
 				result = RESULT_CANCEL;
 				if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
 					if ( help != null ) {
-						help.showTopic(this, "../index", "pipeline/editOrExecutePipeline.html"); //$NON-NLS-1$ //$NON-NLS-2$
+						help.showWiki("Rainbow - Edit / Execute Pipeline"); //$NON-NLS-1$
 					}
 					return;
 				}
@@ -485,11 +485,25 @@ public class PipelineEditor {
 			else {
 				step = (IPipelineStep)Class.forName(si.stepClass, true, si.loader).newInstance();
 			}
-			String path = Util.getClassLocation(step.getClass());
-			if ( Util.isEmpty(path) ) return; // No help available
-			path += File.separator + step.getHelpLocation() + File.separator;
-			n = si.stepClass.lastIndexOf('.');
-			Util.openURL(path+si.stepClass.substring(n+1).toLowerCase()+".html");
+			
+			String stepHelp = step.getHelpLocation();
+			if ( Util.isEmpty(stepHelp) ) return;
+			if ( stepHelp.startsWith(".") ) {
+				// Use old method: Local help
+				String path = Util.getClassLocation(step.getClass());
+				if ( Util.isEmpty(path) ) return; // No help available
+				path += File.separator + stepHelp + File.separator;
+				n = si.stepClass.lastIndexOf('.');
+				Util.openURL(path+si.stepClass.substring(n+1).toLowerCase()+".html");
+			}
+			else if ( stepHelp.endsWith(".html") ) {
+				// Third-party step
+				Util.openURL(stepHelp);
+			}
+			else {
+				// Go to OkapiWiki
+				help.showWiki(stepHelp);
+			}
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getMessage(), null);

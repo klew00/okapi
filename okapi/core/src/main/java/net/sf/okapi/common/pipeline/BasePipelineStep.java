@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -19,8 +19,6 @@
 ===========================================================================*/
 
 package net.sf.okapi.common.pipeline;
-
-import java.io.File;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -50,7 +48,9 @@ public abstract class BasePipelineStep implements IPipelineStep {
 
 	@Override
 	public String getHelpLocation() {
-		return ".." + File.separator + "help" + File.separator + "steps";
+		// Title of the wiki help page is the name of the step + " Step"
+		return getName() + " Step";
+		//return ".." + File.separator + "help" + File.separator + "steps";
 	}
 
 	@Override

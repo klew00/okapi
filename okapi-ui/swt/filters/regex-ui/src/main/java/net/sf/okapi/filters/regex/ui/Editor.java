@@ -376,7 +376,7 @@ chkExtractOuterStrings.setEnabled(false); // NOT WORKING YET
 		SelectionAdapter okCancelActions = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
-					if ( help != null ) help.showTopic(this, "index");
+					if ( help != null ) help.showWiki("Regex Filter");
 					return;
 				}
 				if ( e.widget.getData().equals("o") ) saveData(); //$NON-NLS-1$

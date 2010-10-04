@@ -57,7 +57,7 @@ public class Editor implements IParametersEditor, SelectionListener {
 		result = false;
 		if ( e.widget==ed.btnHelp)
 		{
-			if ( help != null ) help.showTopic(this, "index");
+			if ( help != null ) help.showWiki("OpenXML Filter");
 			return;
 		}
 		else if ( e.widget==ed.btnOk)
