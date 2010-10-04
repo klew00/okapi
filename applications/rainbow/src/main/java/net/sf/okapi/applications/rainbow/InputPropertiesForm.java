@@ -98,7 +98,7 @@ class InputPropertiesForm {
 			public void widgetSelected(SelectionEvent e) {
 				results = null;
 				if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
-					if ( help != null ) help.showTopic(this, "index", "inputDocProp.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					if ( help != null ) help.showWiki("Rainbow - Input Document Properties"); //$NON-NLS-1$
 					return;
 				}
 				if ( e.widget.getData().equals("o") ) { //$NON-NLS-1$

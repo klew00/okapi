@@ -102,7 +102,7 @@ class PreferencesForm {
 		SelectionAdapter OKCancelActions = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
-					if ( help != null ) help.showTopic(this, "index", "preferences.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					if ( help != null ) help.showWiki("Rainbow - User Preferences"); //$NON-NLS-1$
 					return;
 				}
 				if ( e.widget.getData().equals("o") ) { //$NON-NLS-1$

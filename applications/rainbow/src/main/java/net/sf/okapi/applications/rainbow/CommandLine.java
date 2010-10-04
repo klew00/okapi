@@ -118,7 +118,7 @@ public class CommandLine {
 				promptForOptions = false;
 			}
 			else if (( "-h".equals(arg) ) || ( "-?".equals(arg) )) { // Help //$NON-NLS-1$ //$NON-NLS-2$
-				help.showTopic(this, "index", "commandLine.html"); //$NON-NLS-1$ //$NON-NLS-2$
+				help.showWiki("Rainbow Help#Rainbow - Command Line"); //$NON-NLS-1$
 			}
 			else if ( "-se".equals(arg) ) { // Source encoding //$NON-NLS-1$
 				prj.setSourceEncoding(nextArg(args, ++i));
