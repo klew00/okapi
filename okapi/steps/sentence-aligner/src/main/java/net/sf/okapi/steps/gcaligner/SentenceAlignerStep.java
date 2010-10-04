@@ -209,29 +209,14 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 			return sourceEvent;
 		}
 
-		// Segment the source if requested
-		if (params.isSegmentSource()) {
-			sourceTu.createSourceSegmentation(sourceSegmenter);
-		}
-
 		// Move to the next target TU
 		if (targetInput != null) {
-			Event targetEvent = synchronize(EventType.TEXT_UNIT);
+			Event targetEvent = synchronize(EventType.TEXT_UNIT, sourceTu);
 			targetTu = targetEvent.getTextUnit();
 		}
 
-		// Segment the target if requested
-		if (params.isSegmentTarget()) {
-			if (targetTu == null) {
-				// TextUnit is bilingual
-				sourceTu.createTargetSegmentation(targetSegmenter, targetLocale);
-			} else {
-				// separate target TextUnit
-				targetTu.createSourceSegmentation(targetSegmenter);
-			}			
-		}
-		
-		// collapse whitespace if needed *before* alignment
+		// collapse whitespace if needed *before* segmentation and alignment
+		// FIXME: When we get parallel pipelines we should move this to a step!!!
 		if (params.isCollapseWhitespace()) {
 			for (TextPart p : sourceTu.getSource().getSegments()) {
 				p.text.collapseWhitespace();
@@ -247,6 +232,22 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 			}
 		}
 
+		// Segment the source if requested
+		if (params.isSegmentSource()) {
+			sourceTu.createSourceSegmentation(sourceSegmenter);
+		}
+
+		// Segment the target if requested
+		if (params.isSegmentTarget()) {
+			if (targetTu == null) {
+				// TextUnit is bilingual
+				sourceTu.createTargetSegmentation(targetSegmenter, targetLocale);
+			} else {
+				// separate target TextUnit
+				targetTu.createSourceSegmentation(targetSegmenter);
+			}			
+		}
+		
 		TextUnit alignedTextUnit;
 		if (targetInput == null) {
 			// case where the TextUnit is already bilingual
@@ -289,7 +290,7 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 		}
 	}
 
-	private Event synchronize(EventType untilType) {
+	private Event synchronize(EventType untilType, TextUnit sourceTu) {
 		boolean found = false;
 		Event event = null;
 		while (!found && filter.hasNext()) {
@@ -302,8 +303,12 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 				tmx.close();
 				tmx = null;
 			}
+			String targetDoc = (targetInput == null) ? "null" : targetInput.getInputURI().toString();
 			throw new RuntimeException(
-					"Different number of source or target TextUnits. The source and target documents are not paragraph aligned.");
+					"Different number of source or target TextUnits. " +
+					"The source and target documents are not paragraph aligned at:\n" +
+					"Source: " + sourceTu.getName() + " <> " + sourceTu.getSource().toString() +
+					"\nTarget Document: " + targetDoc);
 		}
 		return event;
 	}
