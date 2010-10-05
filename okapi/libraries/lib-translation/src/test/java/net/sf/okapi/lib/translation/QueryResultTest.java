@@ -105,7 +105,7 @@ public class QueryResultTest {
 		
 		at9 = new QueryResult();
 		at9.matchType = MatchType.FUZZY;
-		at9.score = 99;
+		at9.score = 98;
 		at8.creationDate = new Date(2);
 		at9.source = source3;
 		at9.target = target3;
