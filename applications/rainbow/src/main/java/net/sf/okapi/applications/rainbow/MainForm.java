@@ -587,7 +587,7 @@ public class MainForm { //implements IParametersProvider {
 		rm.setCommand(menuItem, "help.topics"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				if ( help != null ) help.showWiki("Rainbow Help"); //$NON-NLS-1$
+				if ( help != null ) help.showWiki("Rainbow"); //$NON-NLS-1$
 			}
 		});
 		menuItem.setImage(rm.getImage("help")); //$NON-NLS-1$
@@ -596,7 +596,7 @@ public class MainForm { //implements IParametersProvider {
 		rm.setCommand(menuItem, "help.howtouse"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				if ( help != null ) help.showWiki("Rainbow Help#Usage"); //$NON-NLS-1$
+				if ( help != null ) help.showWiki("Rainbow - Usage"); //$NON-NLS-1$
 			}
 		});
 		
