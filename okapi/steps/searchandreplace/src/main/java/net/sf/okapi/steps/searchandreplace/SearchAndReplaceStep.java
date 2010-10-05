@@ -29,6 +29,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.URI;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -37,6 +40,7 @@ import java.util.regex.Pattern;
 import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiIOException;
@@ -307,7 +311,7 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 
 		String tmp = null;
 		try {
-			if (params.source) {
+			if ( params.source ) {
 				// search and replace source
 				TextContainer tc = tu.getSource();
 				for (Segment seg : tc.getSegments()) {
@@ -315,18 +319,26 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 					seg.text.setCodedText(r);
 				}
 			}
-
-			if (params.target) {
-				// search and replace existing target
-				TextContainer tc = tu.getTarget(targetLocale);
-				if(tc != null){
+			if ( params.target ) {
+				// Avoid to replace twice if the target is a copy of the source
+				boolean doReplace = true;
+				if ( params.source ) {
+					// If there is no target yet, we will copy from the source
+					// so the replacement is done already
+					doReplace = tu.hasTarget(targetLocale);
+				}
+				// Get the target
+				TextContainer tc = tu.createTarget(targetLocale, false, IResource.COPY_ALL);
+				// search and replace target if needed
+				if ( doReplace ) {
 					for (Segment seg : tc.getSegments()) {
 						String r = searchAndReplace(seg.text.toString());
 						seg.text.setCodedText(r);
 					}
 				}
 			}
-		} catch (Exception e) {
+		} 
+		catch ( Exception e ) {
 			logger.log(Level.WARNING, String.format("Error when updating content: '%s'.", tmp), e);
 		}
 
