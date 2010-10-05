@@ -110,9 +110,9 @@ public class QueryResult implements Comparable<QueryResult> {
 	}
 	
 	/**
-	 * This method implements a four way sort on (1) weight (2) {@link MatchType} (3) Score (4)
-	 * source string match. Weight is the primary key, {@link MatchType} secondary, score tertiary
-	 * and source string quaternary.
+	 * This method implements a five way sort on (1) weight (2) {@link MatchType} (3) Score (4)
+	 * source string match and (5) creation date. Weight is the primary key, 
+	 * {@link MatchType} secondary, score tertiary and source string quaternary.
 	 * @param other the QueryResult we are comparing against.
 	 * @return the comparison result (0 if both objects are equal).
 	 */
@@ -142,7 +142,7 @@ public class QueryResult implements Comparable<QueryResult> {
 				return comparison;
 			}
 		}
-		
+				
 		// compare score
 		comparison = Float.compare(this.score, other.score);
 		if ( comparison != EQUAL ) {
@@ -154,13 +154,20 @@ public class QueryResult implements Comparable<QueryResult> {
 		if ( comparison != EQUAL ) {
 			return comparison;
 		}
+		
+		// compare creation dates
+		comparison = this.creationDate.compareTo(other.creationDate);
+		if ( comparison != EQUAL ) {
+			return comparison;
+		}
 
 		// default
 		return EQUAL;
 	}
 
 	/**
-	 * Define equality of state.
+	 * Define equality of state. 
+	 * <b>Note: this class has a natural ordering that is inconsistent with equals.</b>
 	 * @param other the object to compare with.
 	 * @return true if the objects are equal, false otherwise.
 	 */
