@@ -134,7 +134,7 @@ public class TmHitTest {
 		TmHit h = new TmHit();
 		h.setTu(tu1);
 		h.setScore(80.0f);
-		h.setMatchType(MatchType.EXACT_LOCAL_CONEXT);
+		h.setMatchType(MatchType.EXACT_LOCAL_CONTEXT);
 		assertTrue(h1.compareTo(h) > 0);
 	}
 	
@@ -161,7 +161,7 @@ public class TmHitTest {
 		
 		h.setTu(tu);
 		h.setScore(80.0f);
-		h.setMatchType(MatchType.EXACT_LOCAL_CONEXT);
+		h.setMatchType(MatchType.EXACT_LOCAL_CONTEXT);
 		assertTrue(h1.compareTo(h) > 0);
 	}
 }
