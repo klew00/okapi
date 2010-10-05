@@ -40,7 +40,7 @@ public enum MatchType {
 	/**
 	 * Matches EXACT and a small number of segments before and/or after.
 	 */
-	EXACT_LOCAL_CONEXT,
+	EXACT_LOCAL_CONTEXT,
 
 	/**
 	 * Matches EXACT and comes from a repeated segment in the same document
