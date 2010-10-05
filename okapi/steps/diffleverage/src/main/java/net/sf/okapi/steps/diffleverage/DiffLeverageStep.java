@@ -367,8 +367,8 @@ public class DiffLeverageStep extends BasePipelineStep {
 							params.getFuzzyThreshold() >= 100 ? MatchType.EXACT_PREVIOUS_VERSION
 									: MatchType.FUZZY_PREVIOUS_VERSION, score, getName());
 
-					// add the annotation to the source paragraph
-					newTu.setAnnotation(altAnno);
+					// add the annotation to the target container
+					newTu.getTarget(targetLocale).setAnnotation(altAnno);
 				}
 				// set the DiffLeverageAnnotation which marks the new TextUnit as a match with the old TextUnit
 				newTu.setAnnotation(new DiffMatchAnnotation());
