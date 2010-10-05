@@ -316,7 +316,7 @@ public class QueryResultTest {
 		h2.source = new TextFragment("B");
 		h2.target = target2;
 		
-		assertTrue(h2.compareTo(h1) < 0);
+		assertTrue(h2.compareTo(h1) > 0);
 	}
 	
 	@Test 
