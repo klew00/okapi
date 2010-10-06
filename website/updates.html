@@ -19,18 +19,35 @@ function CheckVersion (p_sName, p_sUserVersion, p_sLatestVersion)
 	sBuf += "<tr><td align='right'>Latest version:</td><td>" + p_sLatestVersion + "</td></tr>";
 	sBuf += "<tr><td align='right'>Recommendation:</td><td>";
 
+    // 1.1.3-SNAPSHOT = app
+    // 1.2-SNAPSHOT = lib
 	userParts = p_sUserVersion.split(".");
-	u1 = parseInt(userParts[0]);
-	u2 = parseInt(userParts[1]);
-	tmp = userParts[2].split("-");
+	if ( userParts.length == 2 ) {
+	   u1 = 0;
+	   u2 = parseInt(userParts[0]);
+	   tmp = userParts[1].split("-");
+	}
+	else {
+	   u1 = parseInt(userParts[0]);
+	   u2 = parseInt(userParts[1]);
+	   tmp = userParts[2].split("-");
+	}
 	u3 = parseInt(tmp[0]);
 	u4 = 1;
 	if ( tmp[1] == "SNAPSHOT" ) u4 = 0;
 	
+	// Latest version
 	latestParts = p_sLatestVersion.split(".");
-	l1 = parseInt(latestParts[0]);
-	l2 = parseInt(latestParts[1]);
-	tmp = latestParts[2].split("-");
+	if ( latestParts.length == 2 ) {
+	   l1 = 0;
+	   l2 = parseInt(latestParts[0]);
+	   tmp = latestParts[1].split("-");
+	}
+	else {
+	   l1 = parseInt(latestParts[0]);
+	   l2 = parseInt(latestParts[1]);
+	   tmp = latestParts[2].split("-");
+	}
 	l3 = parseInt(tmp[0]);
 	l4 = 1;
 	if ( tmp[1] == "SNAPSHOT" ) l4 = 0;
@@ -112,6 +129,7 @@ function CheckVersions ()
 	</tr>
 </table>
 
+<p>&nbsp;</p>
 <div id="placeholder"></div>
 
 <ul>
