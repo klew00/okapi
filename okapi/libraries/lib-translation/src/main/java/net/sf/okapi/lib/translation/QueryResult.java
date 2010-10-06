@@ -158,7 +158,7 @@ public class QueryResult implements Comparable<QueryResult> {
 		// compare creation dates
 		comparison = this.creationDate.compareTo(other.creationDate);
 		if ( comparison != EQUAL ) {
-			return comparison;
+			return comparison * -1; // we want more recent dates first
 		}
 
 		// default

@@ -7,7 +7,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 
 import junit.framework.Assert;
@@ -99,14 +98,14 @@ public class QueryResultTest {
 		at8 = new QueryResult();
 		at8.matchType = MatchType.FUZZY;
 		at8.score = 98;
-		at8.creationDate = new Date(1);
+		at8.creationDate = new Date(2);
 		at8.source = source3;
 		at8.target = target3;
 		
 		at9 = new QueryResult();
 		at9.matchType = MatchType.FUZZY;
 		at9.score = 98;
-		at8.creationDate = new Date(2);
+		at8.creationDate = new Date(1);
 		at9.source = source3;
 		at9.target = target3;
 		
@@ -136,9 +135,9 @@ public class QueryResultTest {
 		ats.add(at2);
 		ats.add(at3);
 		Collections.sort(ats);
-		Assert.assertEquals(at3, ats.get(0));
-		Assert.assertEquals(at2, ats.get(1));
-		Assert.assertEquals(at1, ats.get(2));
+		Assert.assertSame(at3, ats.get(0));
+		Assert.assertSame(at2, ats.get(1));
+		Assert.assertSame(at1, ats.get(2));
 	}
 	
 	@Test
@@ -148,21 +147,21 @@ public class QueryResultTest {
 		ats.add(at5);
 		ats.add(at6);
 		Collections.sort(ats);
-		Assert.assertEquals(at6, ats.get(0));
-		Assert.assertEquals(at5, ats.get(1));
-		Assert.assertEquals(at4, ats.get(2));
+		Assert.assertSame(at6, ats.get(0));
+		Assert.assertSame(at5, ats.get(1));
+		Assert.assertSame(at4, ats.get(2));
 	}
 	
 	@Test
 	public void QueryResultCreationDateSortedList() {
 		List<QueryResult> ats = new ArrayList<QueryResult>();
-		ats.add(at7);
-		ats.add(at8);
 		ats.add(at9);
+		ats.add(at8);
+		ats.add(at7);
 		Collections.sort(ats);
-		Assert.assertEquals(at7, ats.get(0));
-		Assert.assertEquals(at9, ats.get(1));
-		Assert.assertEquals(at8, ats.get(2));
+		Assert.assertSame(at7, ats.get(0));
+		Assert.assertSame(at8, ats.get(1));
+		Assert.assertSame(at9, ats.get(2));
 	}
 	
 	@Test
@@ -172,9 +171,9 @@ public class QueryResultTest {
 		ats.add(at11);
 		ats.add(at12);
 		Collections.sort(ats);
-		Assert.assertEquals(at10, ats.get(0));
-		Assert.assertEquals(at11, ats.get(1));
-		Assert.assertEquals(at12, ats.get(2));
+		Assert.assertSame(at10, ats.get(0));
+		Assert.assertSame(at11, ats.get(1));
+		Assert.assertSame(at12, ats.get(2));
 	}
 	
 	@Test
@@ -336,6 +335,6 @@ public class QueryResultTest {
 		h2.creationDate = new Date(1);
 		
 		// h2 > h1
-		assertTrue(h2.compareTo(h1) > 0);
+		assertTrue(h2.compareTo(h1) < 0);
 	}
 }
