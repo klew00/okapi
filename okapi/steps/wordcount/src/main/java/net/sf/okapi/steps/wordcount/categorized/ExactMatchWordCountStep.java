@@ -44,7 +44,7 @@ public class ExactMatchWordCountStep extends AltAnnotationBasedCountStep {
 
 	@Override
 	protected boolean accept(MatchType type) {
-		return (type == MatchType.EXACT_LOCAL_CONEXT ||				
+		return (type == MatchType.EXACT_LOCAL_CONTEXT ||				
 				type == MatchType.EXACT_PREVIOUS_VERSION ||
 				type == MatchType.EXACT_STRUCTURAL);
 	}

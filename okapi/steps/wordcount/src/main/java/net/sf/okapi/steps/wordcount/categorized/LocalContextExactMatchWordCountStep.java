@@ -43,6 +43,6 @@ public class LocalContextExactMatchWordCountStep extends AltAnnotationBasedCount
 
 	@Override
 	protected boolean accept(MatchType type) {
-		return type == MatchType.EXACT_LOCAL_CONEXT;
+		return type == MatchType.EXACT_LOCAL_CONTEXT;
 	}
 }
