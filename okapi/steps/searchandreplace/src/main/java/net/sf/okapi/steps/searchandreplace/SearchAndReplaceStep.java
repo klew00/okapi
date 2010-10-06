@@ -83,6 +83,8 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 	private Pattern patterns[];
 	private URI outputURI;
 	private LocaleId targetLocale;
+	private String search[];
+	private String replace[];
 
 	public enum ProcType {
 		UNSPECIFIED, PLAINTEXT, FILTER;
@@ -142,25 +144,34 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 	}
 
 	@Override
-	protected Event handleStartBatch(Event event) {		
-		if (params.regEx) {
+	protected Event handleStartBatch(Event event) {
+		// Compile the search patterns
+		// As regex patterns if regex is on
+		if ( params.regEx ) {
 			int flags = 0;
 			patterns = new Pattern[params.rules.size()];
-
-			// --initialize patterns--
-			if (params.dotAll)
-				flags |= Pattern.DOTALL;
-			if (params.ignoreCase)
-				flags |= Pattern.CASE_INSENSITIVE;
-			if (params.multiLine)
-				flags |= Pattern.MULTILINE;
-
+			if ( params.dotAll ) flags |= Pattern.DOTALL;
+			if ( params.ignoreCase ) flags |= Pattern.CASE_INSENSITIVE;
+			if ( params.multiLine ) flags |= Pattern.MULTILINE;
 			for (int i = 0; i < params.rules.size(); i++) {
 				String s[] = params.rules.get(i);
 				if (params.regEx) {
 					patterns[i] = Pattern.compile(s[1], flags);
 				}
 			}
+		}
+		else {
+			// As normal search if regex is off
+			search = new String[params.rules.size()];
+			for (int i = 0; i < params.rules.size(); i++) {
+				search[i] = unescape(params.rules.get(i)[1], false);
+			}
+		}
+
+		// Compile the replacement strings
+		replace = new String[params.rules.size()];
+		for (int i = 0; i < params.rules.size(); i++) {
+			replace[i] = unescape(params.rules.get(i)[2], params.regEx);
 		}
 
 		return event;
@@ -173,9 +184,9 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 	}
 
 	@Override
-	protected Event handleRawDocument(Event event) {
+	protected Event handleRawDocument (Event event) {
 		// --first event determines processing type--
-		if (!firstEventDone) {
+		if ( !firstEventDone ) {
 			procType = ProcType.PLAINTEXT;
 			firstEventDone = true;
 		}
@@ -224,31 +235,35 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 
 			result = searchAndReplace(result);
 
-			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFile),
-					encoding));
+			writer = new BufferedWriter(
+				new OutputStreamWriter(
+					new FileOutputStream(outFile), encoding));
 			Util.writeBOMIfNeeded(writer, detector.hasUtf8Bom(), encoding);
-
 			writer.write(result);
 			writer.close();
 
-			event.setResource(new RawDocument(outFile.toURI(), encoding, rawDoc.getSourceLocale(),
-					rawDoc.getTargetLocale()));
-		} catch (FileNotFoundException e) {
+			event.setResource(new RawDocument(outFile.toURI(), encoding,
+				rawDoc.getSourceLocale(), rawDoc.getTargetLocale()));
+		}
+		catch ( FileNotFoundException e ) {
 			throw new RuntimeException(e);
-		} catch (IOException e) {
+		}
+		catch ( IOException e ) {
 			throw new RuntimeException(e);
-		} finally {
+		}
+		finally {
 			isDone = true;
 			try {
-				if (writer != null) {
+				if ( writer != null ) {
 					writer.close();
 					writer = null;
 				}
-				if (reader != null) {
+				if ( reader != null ) {
 					reader.close();
 					reader = null;
 				}
-			} catch (IOException e) {
+			}
+			catch ( IOException e ) {
 				throw new RuntimeException(e);
 			}
 		}
@@ -256,39 +271,55 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 		return event;
 	}
 
-	/*
-	 * un-escape unicode escape sequences and other things.
-	 * TODO: add more escape patterns like in Properties.loadConvert(char[], int, int, char[])??
+	/** Un-escapes Unicode escape sequences and other special constructs.
+	 * @param s The string to un-escape
+	 * @param isRegex true if the expression is to be used with either a search or a replace using 
+	 * the regular expressions mode on. If this is true, only \n, \r, \t, (backslash)uHHHH and \N
+	 * should be un-escape to leave the other constructs intact.
+	 * @return the un-escaped string.
 	 */
-	private String unescape(String s, boolean isRegex) {		
-		s = s.replace("\\N", System.getProperty("line.separator"));
-		s = s.replace("\\n", "\n");
-		s = s.replace("\\r", "\r");
-		s = s.replace("\\t", "\t");
-		
-		int i = 0, len = s.length();
+	private String unescape (String s,
+		boolean isRegex)
+	{		
+		int i=0, len=s.length();
 		char c;
 		StringBuffer sb = new StringBuffer(len);
-		while (i < len) {
+		while ( i < len ) {
 			c = s.charAt(i++);
-			if (c == '\\') {
-				if (i < len) {
+			if ( c == '\\' ) {
+				if ( i < len ) {
 					c = s.charAt(i++);
-					if (c == 'u') {
-						c = (char) Integer.parseInt(s.substring(i, i + 4), 16);
+					switch ( c ) {
+					case 'u':
+						c = (char)Integer.parseInt(s.substring(i, i+4), 16);
+						sb.append(c);
 						i += 4;
-					}else if (c == '\\'){
-						if(isRegex){
-							//--add both slashes to the regex
-							sb.append(c);							
+						continue;
+					case 'N':
+						sb.append(System.getProperty("line.separator"));
+						continue;
+					case 'n':
+						sb.append('\n');
+						continue;
+					case 'r':
+						sb.append('\r');
+						continue;
+					case 't':
+						sb.append('\t');
+						break;
+					default:
+						if ( isRegex ) {
+							// Leave the sequence as it
+							sb.append('\\');
 						}
-					}// add other cases here as desired...
-					 // perhaps throw exception here to notify incomplete escaping?
+						// Else: skip the backslash,
+						// Fall back to append the escaped character
+					}
 				}
-			} // fall through: \ escapes itself, quotes any character but u
+			}
+			// Fall back for all cases without 'continue'
 			sb.append(c);
 		}
-		
 		return sb.toString();
 	}
 
@@ -312,8 +343,8 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 				// search and replace source
 				TextContainer tc = tu.getSource();
 				for (Segment seg : tc.getSegments()) {
-					String r = searchAndReplace(seg.text.toString());
-					seg.text.setCodedText(r);
+					tmp = searchAndReplace(seg.text.toString());
+					seg.text.setCodedText(tmp);
 				}
 			}
 			if ( params.target ) {
@@ -329,32 +360,33 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 				// search and replace target if needed
 				if ( doReplace ) {
 					for (Segment seg : tc.getSegments()) {
-						String r = searchAndReplace(seg.text.toString());
-						seg.text.setCodedText(r);
+						tmp = searchAndReplace(seg.text.toString());
+						seg.text.setCodedText(tmp);
 					}
 				}
 			}
 		} 
 		catch ( Exception e ) {
-			logger.log(Level.WARNING, String.format("Error when updating content: '%s'.", tmp), e);
+			logger.log(Level.WARNING, String.format("Error when updating content: '%s'.\n"+ e.getMessage(), tmp), e);
 		}
 
 		return event;
 	}
 
-	private String searchAndReplace(String result) {
-		if (params.regEx) {
-			for (int i = 0; i < params.rules.size(); i++) {
+	private String searchAndReplace (String result) {
+		if ( params.regEx ) {
+			for ( int i=0; i<params.rules.size(); i++ ) {
 				String s[] = params.rules.get(i);
-				if (s[0].equals("true")) {
+				if ( s[0].equals("true") ) {
 					matcher = patterns[i].matcher(result);
-					result = matcher.replaceAll(unescape(s[2], true));
+					result = matcher.replaceAll(replace[i]);
 				}
 			}
-		} else {
-			for (String[] s : params.rules) {
-				if (s[0].equals("true")) {
-					result = result.replace(unescape(s[1], false), unescape(s[2], false));
+		}
+		else {
+			for ( int i=0; i<params.rules.size(); i++ ) {
+				if ( params.rules.get(i)[0].equals("true") ) {
+					result = result.replace(search[i], replace[i]);
 				}
 			}
 		}

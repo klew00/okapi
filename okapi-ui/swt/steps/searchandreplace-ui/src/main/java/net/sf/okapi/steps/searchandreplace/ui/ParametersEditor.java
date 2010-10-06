@@ -138,21 +138,25 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		int index = table.getSelectionIndex();
 		int items = table.getItemCount();
 		
-        if(items>1){
-        	if (index==-1){
+        if ( items > 1 ) {
+        	if ( index == -1 ) {
 	        	btMoveDown.setEnabled(false);
 	        	btMoveUp.setEnabled(false);
-        	}else if (index==0){
+        	}
+        	else if ( index == 0 ) {
 	        	btMoveUp.setEnabled(false);
 	        	btMoveDown.setEnabled(true);
-	        }else if((index+1)==items){
+	        }
+        	else if(( index+1 ) == items ) {
 	        	btMoveDown.setEnabled(false);
 	        	btMoveUp.setEnabled(true);
-	        }else{
+	        }
+        	else {
 	        	btMoveDown.setEnabled(true);
 	        	btMoveUp.setEnabled(true);
 	        }
-        }else{
+        }
+        else {
         	btMoveDown.setEnabled(false);
         	btMoveUp.setEnabled(false);
         }
@@ -161,13 +165,15 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private void createComposite (Composite parent) {
 		mainComposite = new Composite(parent, SWT.BORDER);
 		mainComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
-		mainComposite.setLayout(new GridLayout());
+		mainComposite.setLayout(new GridLayout(2, false));
 		
 		// Search and replace grid items
 		table = new Table (mainComposite, SWT.CHECK | SWT.FULL_SELECTION | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
 		table.setHeaderVisible (true);
 		table.setLinesVisible (true);
-		table.setLayoutData(new GridData(GridData.FILL_BOTH));
+		GridData gdTmp = new GridData(GridData.FILL_BOTH);
+		gdTmp.horizontalSpan = 2;
+		table.setLayoutData(gdTmp);
 
 		// Click updates button states
 		table.addListener (SWT.Selection, new Listener () {
@@ -214,10 +220,13 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		GridLayout layTmp = new GridLayout(5, true);
 		layTmp.marginHeight = layTmp.marginWidth = 0;
 		cmpTmp.setLayout(layTmp);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalSpan = 2;
+		cmpTmp.setLayoutData(gdTmp);
 		
 		Button btAdd = new Button(cmpTmp, SWT.PUSH);
 		btAdd.setText("Add...");
-		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		btAdd.setLayoutData(gdTmp);
 		UIUtil.ensureWidth(btAdd, standardWidth);
 		btAdd.addSelectionListener(new SelectionAdapter() {
@@ -357,17 +366,9 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			}
 		});			
 
-		chkSource = new Button(mainComposite, SWT.CHECK);
-		chkSource.setText("Search and Replace Source?");
-		chkSource.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 4, 1));	
-		
-		chkTarget = new Button(mainComposite, SWT.CHECK);
-		chkTarget.setText("Search and Replace Target?");
-		chkTarget.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 4, 1));		
-		
+		// Regular expression option flag
 		chkRegEx = new Button(mainComposite, SWT.CHECK);
-		chkRegEx.setText("Use regular expression?");
-		chkRegEx.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false, 4, 1));
+		chkRegEx.setText("Use regular expressions");
 		chkRegEx.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				chkDotAll.setEnabled(chkRegEx.getSelection());
@@ -376,10 +377,13 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			}
 		});
 		
+		// Placeholder
+		new Label(mainComposite, SWT.NONE);
+		
+		//--- Regular expression options group
 		Group group = new Group(mainComposite, SWT.NONE);
 		group.setLayout(new GridLayout(2, false));
 		group.setText("Regular expression options");
-		group.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		chkDotAll = new Button(group, SWT.CHECK);
 		chkDotAll.setText("Dot also matches line-feed");
@@ -389,6 +393,17 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		
 		chkIgnoreCase = new Button(group, SWT.CHECK);
 		chkIgnoreCase.setText("Ignore case differences");
+
+		//--- Filter event options group
+		group = new Group(mainComposite, SWT.NONE);
+		group.setLayout(new GridLayout());
+		group.setText("When processing text units (i.e. using a filter)");
+
+		chkSource = new Button(group, SWT.CHECK);
+		chkSource.setText("Search and replace the source content");
+		
+		chkTarget = new Button(group, SWT.CHECK);
+		chkTarget.setText("Search and replace the target content");
 	}
 	
 	private void create (Shell parent,
@@ -454,24 +469,14 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		Label label = new Label(dialog, SWT.NONE);
 		label.setText("Search expression:");
 		
-		searchText = new Text(dialog, SWT.BORDER | SWT.WRAP | SWT.H_SCROLL);
-		GridData gridData = new GridData();
-		gridData.horizontalAlignment = SWT.FILL;
-		gridData.grabExcessHorizontalSpace = true;
-		gridData.verticalAlignment = SWT.FILL;
-		gridData.grabExcessVerticalSpace = true;
-		searchText.setLayoutData(gridData);		
+		searchText = new Text(dialog, SWT.BORDER);
+		searchText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));		
 		
 		label = new Label(dialog, SWT.NONE);
-		label.setText("Replacement expression (You can use \\\\, \\t, \\n, \\r and \\N with regular expressions on):");
+		label.setText("Replacement expression:");
 
-		replacementText = new Text(dialog, SWT.BORDER | SWT.WRAP | SWT.H_SCROLL);
-		gridData = new GridData();
-		gridData.horizontalAlignment = SWT.FILL;
-		gridData.grabExcessHorizontalSpace = true;
-		gridData.verticalAlignment = SWT.FILL;
-		gridData.grabExcessVerticalSpace = true;
-		replacementText.setLayoutData(gridData);		
+		replacementText = new Text(dialog, SWT.BORDER);
+		replacementText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		// end - content		
 
 		// start - dialog level buttons
