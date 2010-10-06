@@ -605,7 +605,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			TableItem ti = table.getItem(i);
 			try{
 				Pattern.compile(ti.getText(1));
-				Pattern.compile(ti.getText(1));
+				Pattern.compile(ti.getText(2));
 
 			}catch(Exception ex){
 				Dialogs.showError(shell, ex.getLocalizedMessage(), null);
