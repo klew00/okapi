@@ -50,6 +50,8 @@ public abstract class BaseCountStep extends AbstractPipelineStep {
 		super();
 		params = new Parameters();
 		setParameters(params);
+		setName(getName());
+		setDescription(getName());
 	}
 	
 	@Override
@@ -63,6 +65,7 @@ public abstract class BaseCountStep extends AbstractPipelineStep {
 		subDocumentCount = 0;
 		groupCount = 0;
 		textUnitCount = 0;
+		segmentCount = 0;
 	}
 
 	//-------------------------
@@ -70,9 +73,12 @@ public abstract class BaseCountStep extends AbstractPipelineStep {
 //	abstract protected void saveCount(Metrics metrics, long count);
 	
 //	abstract protected String getToken();
+	abstract public String getName();
+	abstract public String getDescription();
 	abstract protected String getMetric();
 	abstract protected long count(TextUnit textUnit);
 	abstract protected long count(Segment segment);
+	abstract protected boolean countOnlyTranslatable();
 
 	protected void saveCount(Metrics metrics, long count) {
 		if (metrics == null) return;
@@ -102,6 +108,10 @@ public abstract class BaseCountStep extends AbstractPipelineStep {
 
 	public long getTextUnitCount() {
 		return textUnitCount;
+	}
+	
+	public long getSegmentCount() {
+		return segmentCount;
 	}
 	
 	protected void saveToMetrics(Event event, long count) {
@@ -241,7 +251,7 @@ public abstract class BaseCountStep extends AbstractPipelineStep {
 		TextUnit tu = (TextUnit) event.getResource();
 		
 		if (tu.isEmpty()) return;
-		if (!tu.isTranslatable()) return;
+		if (!tu.isTranslatable() && countOnlyTranslatable()) return;
 		
 		TextContainer source = tu.getSource();
 		// Individual segments metrics
@@ -264,6 +274,5 @@ public abstract class BaseCountStep extends AbstractPipelineStep {
 		if (params.countInDocuments) documentCount += textUnitCount;
 		if (params.countInSubDocuments) subDocumentCount += textUnitCount;
 		if (params.countInGroups) groupCount += textUnitCount;		
-	}
-
+	}		
 }

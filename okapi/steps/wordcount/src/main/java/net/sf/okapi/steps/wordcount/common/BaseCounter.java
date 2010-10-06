@@ -112,5 +112,21 @@ abstract public class BaseCounter {
 		if (logger != null)
 			logger.log(level, text);
 	}
+
+	private static long getValue(MetricsAnnotation ma, String metricName) {
+		if (ma == null) return 0;
+		
+		Metrics m = ma.getMetrics();
+		if (m == null) return 0;
+		
+		return m.getMetric(metricName);
+	}
 	
+	public static long getCount(Segment segment, String metricName) {
+		return getValue(segment.getAnnotation(MetricsAnnotation.class), metricName);
+	}
+	
+	public static long getCount(TextUnit tu, String metricName) {
+		return getValue(TextUnitUtil.getSourceAnnotation(tu, MetricsAnnotation.class), metricName);
+	}
 }

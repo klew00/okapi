@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -20,44 +20,28 @@
 
 package net.sf.okapi.steps.wordcount.common;
 
+import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.common.resource.TextUnitUtil;
-import net.sf.okapi.steps.tokenization.Tokenizer;
-import net.sf.okapi.steps.tokenization.common.TokensAnnotation;
-import net.sf.okapi.steps.tokenization.tokens.Tokens;
 
-public abstract class TokenCountStep extends BaseCountStep {
+public abstract class AltAnnotationBasedCountStep extends BaseCountStep {
 
-	protected abstract String getTokenName();
+	abstract protected boolean accept(MatchType type); 
 	
 	@Override
-	protected long count(TextUnit textUnit) {		
-		TokensAnnotation ta = TextUnitUtil.getSourceAnnotation(textUnit, TokensAnnotation.class);
-		Tokens tokens = null;
-		
-		if (ta != null)			
-			tokens = ta.getFilteredList(getTokenName());			
-		else
-			tokens = Tokenizer.tokenize(textUnit.getSource(), getLanguage(), getTokenName());
-		
-		if (tokens == null) return 0;
-		
-		return tokens.size();		
+	protected long count(TextUnit textUnit) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
-			
+
 	@Override
-	protected long count(Segment segment) {		
-		TokensAnnotation ta = segment.getAnnotation(TokensAnnotation.class);
-		Tokens tokens = null;
-		
-		if (ta != null)			
-			tokens = ta.getFilteredList(getTokenName());			
-		else
-			tokens = Tokenizer.tokenize(segment.getContent(), getLanguage(), getTokenName());
-		
-		if (tokens == null) return 0;
-		
-		return tokens.size();		
+	protected long count(Segment segment) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	
+	@Override
+	protected boolean countOnlyTranslatable() {
+		return true;
 	}
 }

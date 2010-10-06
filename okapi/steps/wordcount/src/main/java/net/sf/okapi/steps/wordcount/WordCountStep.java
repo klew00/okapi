@@ -36,25 +36,30 @@ import net.sf.okapi.steps.wordcount.common.TokenCountStep;
 @UsingParameters(Parameters.class)
 public class WordCountStep extends TokenCountStep {
 	
-	public WordCountStep() {
-		
-		super();
-		
-		setName("Word Count");
-		setDescription("Count the number of words in the text units of a set of documents or/and in its parts. "
-			+ "Expects: filter events. Sends back: filter events.");		
-	}
-
 	@Override
-	protected String getMetric() {
-		
+	protected String getMetric() {		
 		return GMX.TotalWordCount;
 	}
 
 	@Override
 	protected String getTokenName() {
-
 		return WordCounter.getTokenName();
+	}
+
+	@Override
+	protected boolean countOnlyTranslatable() {
+		return false;
+	}
+
+	@Override
+	public String getDescription() {
+		return "Count the number of words in the text units of a set of documents or/and in its parts."
+		+ " Expects: filter events. Sends back: filter events.";
+	}
+
+	@Override
+	public String getName() {
+		return "Word Count";
 	}
 
 // Currently the getHelpLocation() in AbstractPipelineStep provides the default 
@@ -62,7 +67,5 @@ public class WordCountStep extends TokenCountStep {
 //	public String getHelpLocation() {
 //		// TODO Auto-generated method stub
 //		return null;
-//	}
-
-			
+//	}			
 }

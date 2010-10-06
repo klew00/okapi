@@ -27,7 +27,6 @@ import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.steps.tokenization.Tokenizer;
 import net.sf.okapi.steps.tokenization.tokens.Tokens;
 import net.sf.okapi.steps.wordcount.common.BaseCounter;
@@ -127,13 +126,7 @@ public class WordCounter extends BaseCounter {
 	 * @return number of words (0 if no word count information found)
 	 */
 	public static long getCount(TextUnit tu) {
-		MetricsAnnotation ma = TextUnitUtil.getSourceAnnotation(tu, MetricsAnnotation.class);
-		if (ma == null) return 0;
-		
-		Metrics m = ma.getMetrics();
-		if (m == null) return 0;
-		
-		return m.getMetric(GMX.TotalWordCount);
+		return BaseCounter.getCount(tu, GMX.TotalWordCount);
 	}
 	
 	/**
@@ -153,13 +146,7 @@ public class WordCounter extends BaseCounter {
 	 * @return number of words (0 if no word count information found)
 	 */
 	public static long getCount(Segment segment) {
-		MetricsAnnotation ma = segment.getAnnotation(MetricsAnnotation.class);
-		if (ma == null) return 0;
-		
-		Metrics m = ma.getMetrics();
-		if (m == null) return 0;
-		
-		return m.getMetric(GMX.TotalWordCount);		
+		return BaseCounter.getCount(segment, GMX.TotalWordCount);
 	}
 	
 	public static String getTokenName() {		
@@ -180,5 +167,4 @@ public class WordCounter extends BaseCounter {
 		Metrics m = ma.getMetrics();		
 		m.setMetric(GMX.TotalWordCount, count);
 	}
-
 }
