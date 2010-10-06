@@ -20,24 +20,38 @@
 
 package net.sf.okapi.steps.wordcount.common;
 
+import net.sf.okapi.common.annotation.AltTranslation;
+import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextUnitUtil;
 
 public abstract class AltAnnotationBasedCountStep extends BaseCountStep {
 
 	abstract protected boolean accept(MatchType type); 
 	
+	private long countInATA(AltTranslationsAnnotation ata) {
+		if (ata == null) return 0;
+		long res = 0;
+		
+		for (AltTranslation at : ata) {
+			if (at == null) continue;
+			
+			if (accept(at.getType()))
+				res += at.getScore();
+		}
+		return res;		
+	}
+	
 	@Override
 	protected long count(TextUnit textUnit) {
-		// TODO Auto-generated method stub
-		return 0;
+		return countInATA(TextUnitUtil.getSourceAnnotation(textUnit, AltTranslationsAnnotation.class));
 	}
 
 	@Override
 	protected long count(Segment segment) {
-		// TODO Auto-generated method stub
-		return 0;
+		return countInATA(segment.getAnnotation(AltTranslationsAnnotation.class));
 	}
 	
 	@Override
