@@ -85,7 +85,7 @@ public class Parameters extends BaseParameters{
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
 		desc.add(XMLEncoder.ESCAPEGT, "Escape the greater-than characters", null);
-		desc.add("processAllTargets", "Read all traget entries", null);
+		desc.add("processAllTargets", "Read all target entries", null);
 		desc.add("consolidateDpSkeleton", "Group all document parts skeleton into one", null);
 		return desc;
 	}
