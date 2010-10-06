@@ -83,7 +83,7 @@ public class DiffLeverageStepTest {
 		Event tue1 = el.remove(0);
 		assertEquals(EventType.TEXT_UNIT, tue1.getEventType());
 		// TU target copied from old TU
-		Assert.assertNotNull(tue1.getTextUnit().getAnnotation(DiffMatchAnnotation.class));
+		Assert.assertNotNull(tue1.getTextUnit().getTarget(LocaleId.FRENCH).getAnnotation(DiffMatchAnnotation.class));
 		Assert.assertEquals("Message pour l'identificateur name100 (old)", tue1.getTextUnit()
 				.getTarget(LocaleId.FRENCH).toString());
 
@@ -97,7 +97,7 @@ public class DiffLeverageStepTest {
 		Event tue3 = el.remove(0);
 		assertEquals(EventType.TEXT_UNIT, tue3.getEventType());
 		// TU target copied from old TU
-		Assert.assertNotNull(tue3.getTextUnit().getAnnotation(DiffMatchAnnotation.class));
+		Assert.assertNotNull(tue3.getTextUnit().getTarget(LocaleId.FRENCH).getAnnotation(DiffMatchAnnotation.class));
 		Assert.assertEquals("Message pour l'identificateur name300 (old)", tue3.getTextUnit()
 				.getTarget(LocaleId.FRENCH).toString());
 
@@ -133,7 +133,7 @@ public class DiffLeverageStepTest {
 		Event tue1 = el.remove(0);
 		assertEquals(EventType.TEXT_UNIT, tue1.getEventType());
 		// TU target copied from old TU
-		Assert.assertNotNull(tue1.getTextUnit().getAnnotation(DiffMatchAnnotation.class));
+		Assert.assertNotNull(tue1.getTextUnit().getTarget(LocaleId.FRENCH).getAnnotation(DiffMatchAnnotation.class));
 		Assert.assertEquals("Message pour l'identificateur name100 (old)", getAltTransTarget(tue1.getTextUnit(), LocaleId.FRENCH));
 
 		Event tue2 = el.remove(0);
@@ -145,7 +145,7 @@ public class DiffLeverageStepTest {
 		Event tue3 = el.remove(0);
 		assertEquals(EventType.TEXT_UNIT, tue3.getEventType());
 		// TU target copied from old TU
-		Assert.assertNotNull(tue3.getTextUnit().getAnnotation(DiffMatchAnnotation.class));
+		Assert.assertNotNull(tue3.getTextUnit().getTarget(LocaleId.FRENCH).getAnnotation(DiffMatchAnnotation.class));
 		Assert.assertEquals("Message pour l'identificateur name300 (old)", getAltTransTarget(tue3.getTextUnit(), LocaleId.FRENCH));
 
 		assertEquals(EventType.END_DOCUMENT, el.remove(0).getEventType());
@@ -177,35 +177,35 @@ public class DiffLeverageStepTest {
 		Event tue1 = el.remove(0);
 		assertEquals(EventType.TEXT_UNIT, tue1.getEventType());
 		// TU target copied from old TU
-		Assert.assertNotNull(tue1.getTextUnit().getAnnotation(DiffMatchAnnotation.class));
+		Assert.assertNotNull(tue1.getTextUnit().getTarget(LocaleId.ENGLISH).getAnnotation(DiffMatchAnnotation.class));
 		Assert.assertEquals("text 2 to translate", tue1.getTextUnit()
 				.getTarget(LocaleId.ENGLISH).toString());
 
 		Event tue2 = el.remove(0);
 		assertEquals(EventType.TEXT_UNIT, tue2.getEventType());
 		// TU target was *not* copied from the old TU
-		Assert.assertNotNull(tue2.getTextUnit().getAnnotation(DiffMatchAnnotation.class));
+		Assert.assertNotNull(tue2.getTextUnit().getTarget(LocaleId.ENGLISH).getAnnotation(DiffMatchAnnotation.class));
 		Assert.assertEquals("text 4 to translate", tue2.getTextUnit().getTarget(
 				LocaleId.ENGLISH).toString());
 
 		Event tue3 = el.remove(0);
 		assertEquals(EventType.TEXT_UNIT, tue3.getEventType());
 		// TU target copied from old TU
-		Assert.assertNotNull(tue3.getTextUnit().getAnnotation(DiffMatchAnnotation.class));
+		Assert.assertNotNull(tue3.getTextUnit().getTarget(LocaleId.ENGLISH).getAnnotation(DiffMatchAnnotation.class));
 		Assert.assertEquals("text 6 to translate", tue3.getTextUnit()
 				.getTarget(LocaleId.ENGLISH).toString());
 		
 		Event tue4 = el.remove(0);
 		assertEquals(EventType.TEXT_UNIT, tue3.getEventType());
 		// TU target copied from old TU
-		Assert.assertNotNull(tue4.getTextUnit().getAnnotation(DiffMatchAnnotation.class));
+		Assert.assertNotNull(tue4.getTextUnit().getTarget(LocaleId.ENGLISH).getAnnotation(DiffMatchAnnotation.class));
 		Assert.assertEquals("text 8 to translate", tue4.getTextUnit()
 				.getTarget(LocaleId.ENGLISH).toString());
 
 		Event tue5 = el.remove(0);
 		assertEquals(EventType.TEXT_UNIT, tue3.getEventType());
 		// TU target copied from old TU
-		Assert.assertNotNull(tue4.getTextUnit().getAnnotation(DiffMatchAnnotation.class));
+		Assert.assertNotNull(tue4.getTextUnit().getTarget(LocaleId.ENGLISH).getAnnotation(DiffMatchAnnotation.class));
 		Assert.assertEquals("text 10 to translate", tue5.getTextUnit()
 				.getTarget(LocaleId.ENGLISH).toString());
 
@@ -240,21 +240,21 @@ public class DiffLeverageStepTest {
 		Event tue1 = el.remove(0);
 		assertEquals(EventType.TEXT_UNIT, tue1.getEventType());
 		// TU target copied from old TU
-		Assert.assertNotNull(tue1.getTextUnit().getAnnotation(DiffMatchAnnotation.class));
+		Assert.assertNotNull(tue1.getTextUnit().getTarget(LocaleId.FRENCH).getAnnotation(DiffMatchAnnotation.class));
 		Assert.assertEquals("Message pour l'identificateur name100 (old)", tue1.getTextUnit()
 				.getTarget(LocaleId.FRENCH).toString());
 
 		Event tue2 = el.remove(0);
 		assertEquals(EventType.TEXT_UNIT, tue2.getEventType());
 		// TU target was copied from the old TU
-		Assert.assertNotNull(tue2.getTextUnit().getAnnotation(DiffMatchAnnotation.class));
+		Assert.assertNotNull(tue2.getTextUnit().getTarget(LocaleId.FRENCH).getAnnotation(DiffMatchAnnotation.class));
 		Assert.assertEquals("Message pour l'identificateur name200 (old)", tue2.getTextUnit().getTarget(
 				LocaleId.FRENCH).toString());
 
 		Event tue3 = el.remove(0);
 		assertEquals(EventType.TEXT_UNIT, tue3.getEventType());
 		// TU target copied from old TU
-		Assert.assertNotNull(tue3.getTextUnit().getAnnotation(DiffMatchAnnotation.class));
+		Assert.assertNotNull(tue3.getTextUnit().getTarget(LocaleId.FRENCH).getAnnotation(DiffMatchAnnotation.class));
 		Assert.assertEquals("Message pour l'identificateur name300 (old)", tue3.getTextUnit()
 				.getTarget(LocaleId.FRENCH).toString());
 

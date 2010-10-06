@@ -29,9 +29,11 @@ import java.util.Map;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
+import net.sf.okapi.common.annotation.Annotations;
 import net.sf.okapi.common.exceptions.OkapiBadStepInputException;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
@@ -54,6 +56,10 @@ import net.sf.okapi.lib.search.lucene.scorer.Util;
  * (http://en.wikipedia.org/wiki/Diff). The result is a new document with the translations from the old document copied
  * into it. This allows translations between different document versions to be preserved while still maintaining the
  * newer source document modifications.
+ * 
+ * </br></br>Adds these {@link Annotations}:
+ * <li> {@link AltTranslationsAnnotation} on the target container.
+ * <li> {@link DiffMatchAnnotation} on the target container (only applied if diffOnly is true)</br>
  * 
  * @author HARGRAVEJE
  * 
@@ -366,12 +372,17 @@ public class DiffLeverageStep extends BasePipelineStep {
 							oldTu.getSource().getUnSegmentedContentCopy(), t.getFirstContent(), 
 							params.getFuzzyThreshold() >= 100 ? MatchType.EXACT_PREVIOUS_VERSION
 									: MatchType.FUZZY_PREVIOUS_VERSION, score, getName());
-
+									
 					// add the annotation to the target container
-					newTu.getTarget(targetLocale).setAnnotation(altAnno);
+					// we may need to create the target if it doesn't exist
+					TextContainer tc = newTu.createTarget(targetLocale, false, IResource.COPY_PROPERTIES);
+					tc.setAnnotation(altAnno);
 				}
-				// set the DiffLeverageAnnotation which marks the new TextUnit as a match with the old TextUnit
-				newTu.setAnnotation(new DiffMatchAnnotation());
+				
+				// set the DiffLeverageAnnotation
+				// we may need to create the target if it doesn't exist
+				TextContainer tc = newTu.createTarget(targetLocale, false, IResource.COPY_PROPERTIES);
+				tc.setAnnotation(new DiffMatchAnnotation());
 			}
 		}
 	}
