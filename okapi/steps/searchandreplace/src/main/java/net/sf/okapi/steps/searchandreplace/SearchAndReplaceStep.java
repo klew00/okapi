@@ -356,7 +356,8 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 					doReplace = tu.hasTarget(targetLocale);
 				}
 				// Get the target
-				TextContainer tc = tu.createTarget(targetLocale, false, IResource.COPY_ALL);
+				TextContainer tc = tu.createTarget(targetLocale, false, IResource.COPY_PROPERTIES);
+				
 				// search and replace target if needed
 				if ( doReplace ) {
 					for (Segment seg : tc.getSegments()) {
