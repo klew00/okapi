@@ -134,7 +134,7 @@ public class DiffLeverageStepTest {
 		assertEquals(EventType.TEXT_UNIT, tue1.getEventType());
 		// TU target copied from old TU
 		Assert.assertNotNull(tue1.getTextUnit().getAnnotation(DiffMatchAnnotation.class));
-		Assert.assertEquals("Message pour l'identificateur name100 (old)", getAltTransTarget(tue1.getTextUnit()));
+		Assert.assertEquals("Message pour l'identificateur name100 (old)", getAltTransTarget(tue1.getTextUnit(), LocaleId.FRENCH));
 
 		Event tue2 = el.remove(0);
 		assertEquals(EventType.TEXT_UNIT, tue2.getEventType());
@@ -146,7 +146,7 @@ public class DiffLeverageStepTest {
 		assertEquals(EventType.TEXT_UNIT, tue3.getEventType());
 		// TU target copied from old TU
 		Assert.assertNotNull(tue3.getTextUnit().getAnnotation(DiffMatchAnnotation.class));
-		Assert.assertEquals("Message pour l'identificateur name300 (old)", getAltTransTarget(tue3.getTextUnit()));
+		Assert.assertEquals("Message pour l'identificateur name300 (old)", getAltTransTarget(tue3.getTextUnit(), LocaleId.FRENCH));
 
 		assertEquals(EventType.END_DOCUMENT, el.remove(0).getEventType());
 		assertEquals(EventType.END_BATCH_ITEM, el.remove(0).getEventType());
@@ -263,8 +263,8 @@ public class DiffLeverageStepTest {
 		assertEquals(EventType.END_BATCH, el.remove(0).getEventType());
 	}
 	
-	private String getAltTransTarget(TextUnit tu) {
-		AltTranslationsAnnotation ata = tu.getAnnotation(AltTranslationsAnnotation.class); 
+	private String getAltTransTarget(TextUnit tu, LocaleId targetLocale) {
+		AltTranslationsAnnotation ata = tu.getTarget(targetLocale).getAnnotation(AltTranslationsAnnotation.class); 
 		return ata.getFirst().getTarget().toString();
 	}
 }
