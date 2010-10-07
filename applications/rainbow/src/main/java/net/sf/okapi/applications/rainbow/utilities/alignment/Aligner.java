@@ -483,7 +483,7 @@ public class Aligner {
 		SelectionAdapter CloseActions = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if ( e.widget.getData().equals("h") ) {
-					if ( help != null ) help.showTopic(this, "aligner");
+					if ( help != null ) help.showWiki("Rainbow - Alignment Verification");
 					return;
 				}
 				if ( e.widget.getData().equals("c") ) {

@@ -1039,7 +1039,7 @@ public class XLIFFFilter implements IFilter {
 						int count = reader.getNamespaceCount();
 						for ( int i=0; i<count; i++ ) {
 							prefix = reader.getNamespacePrefix(i);
-							tmpg.append(String.format(" xmlns:%s=\"%s\"",
+							tmpg.append(String.format(" xmlns%s=\"%s\"",
 								((prefix!=null) ? ":"+prefix : ""),
 								reader.getNamespaceURI(i)));
 						}
@@ -1185,7 +1185,7 @@ public class XLIFFFilter implements IFilter {
 					count = reader.getNamespaceCount();
 					for ( int i=0; i<count; i++ ) {
 						prefix = reader.getNamespacePrefix(i);
-						tmpg.append(String.format(" xmlns:%s=\"%s\"",
+						tmpg.append(String.format(" xmlns%s=\"%s\"",
 							((prefix!=null) ? ":"+prefix : ""),
 							reader.getNamespaceURI(i)));
 					}

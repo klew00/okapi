@@ -156,7 +156,7 @@ public class CharacterInfoDialog {
 		SelectionAdapter CloseActions = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
-					if ( help != null ) help.showTopic(this, "charinfo");
+					if ( help != null ) help.showWiki("Character Information");
 					return;
 				}
 				shell.close();

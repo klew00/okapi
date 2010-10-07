@@ -109,7 +109,7 @@ public class FilterConfigurationsDialog {
 				result = null;
 				if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
 					if ( help != null ) {
-						help.showTopic(this, "filterConfigurations"); //$NON-NLS-1$
+						help.showWiki("Filter Configurations");
 					}
 					return;
 				}
