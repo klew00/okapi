@@ -131,7 +131,7 @@ class SessionSettingsDialog {
 			public void widgetSelected(SelectionEvent e) {
 				result = false;
 				if ( e.widget.getData().equals("h") ) {
-					if ( help != null ) help.showTopic(this, "sessionsettings");
+					if ( help != null ) help.showWiki("CheckMate - Session Settings");
 					return;
 				}
 				if ( e.widget.getData().equals("o") ) {

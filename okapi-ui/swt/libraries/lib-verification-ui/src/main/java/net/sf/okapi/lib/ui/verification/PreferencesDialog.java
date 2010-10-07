@@ -71,7 +71,7 @@ class PreferencesDialog {
 			public void widgetSelected(SelectionEvent e) {
 				result = null;
 				if ( e.widget.getData().equals("h") ) {
-					if ( help != null ) help.showTopic(this, "preferences");
+					if ( help != null ) help.showWiki("CheckMate - User Preferences");
 					return;
 				}
 				if ( e.widget.getData().equals("o") ) {
