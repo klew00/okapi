@@ -37,7 +37,6 @@ import java.util.regex.Pattern;
 import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiIOException;
@@ -78,7 +77,6 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 	private final Logger logger = Logger.getLogger(getClass().getName());
 
 	private Parameters params;
-	private boolean isDone;
 	private Matcher matcher;
 	private Pattern patterns[];
 	private URI outputURI;
@@ -91,7 +89,6 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 	}
 
 	private boolean firstEventDone = false;
-	private ProcType procType = ProcType.UNSPECIFIED;
 
 	@Override
 	public void destroy() {
@@ -119,18 +116,6 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 
 	public String getName() {
 		return "Search and Replace";
-	}
-
-	@Override
-	public boolean isDone() {
-
-		if (procType == ProcType.UNSPECIFIED) {
-			return false;
-		} else if (procType == ProcType.PLAINTEXT) { // Expects RawDocument
-			return isDone;
-		} else {
-			return true;
-		}
 	}
 
 	@Override
@@ -178,16 +163,14 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 	}
 
 	@Override
-	protected Event handleStartBatchItem(Event event) {
-		isDone = false;
+	protected Event handleStartBatchItem(Event event) {		
 		return event;
 	}
 
 	@Override
 	protected Event handleRawDocument (Event event) {
 		// --first event determines processing type--
-		if ( !firstEventDone ) {
-			procType = ProcType.PLAINTEXT;
+		if ( !firstEventDone ) {			
 			firstEventDone = true;
 		}
 
@@ -251,8 +234,7 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 		catch ( IOException e ) {
 			throw new RuntimeException(e);
 		}
-		finally {
-			isDone = true;
+		finally {			
 			try {
 				if ( writer != null ) {
 					writer.close();
@@ -327,8 +309,7 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 	protected Event handleTextUnit(Event event) {
 
 		// --first event determines processing type--
-		if (!firstEventDone) {
-			procType = ProcType.FILTER;
+		if (!firstEventDone) {			
 			firstEventDone = true;
 		}
 
@@ -339,31 +320,24 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 
 		String tmp = null;
 		try {
+			
+			// search and replace on source
 			if ( params.source ) {
-				// search and replace source
 				TextContainer tc = tu.getSource();
 				for (Segment seg : tc.getSegments()) {
 					tmp = searchAndReplace(seg.text.toString());
 					seg.text.setCodedText(tmp);
 				}
 			}
-			if ( params.target ) {
-				// Avoid to replace twice if the target is a copy of the source
-				boolean doReplace = true;
-				if ( params.source ) {
-					// If there is no target yet, we will copy from the source
-					// so the replacement is done already
-					doReplace = tu.hasTarget(targetLocale);
-				}
-				// Get the target
-				TextContainer tc = tu.createTarget(targetLocale, false, IResource.COPY_PROPERTIES);
-				
-				// search and replace target if needed
-				if ( doReplace ) {
+			
+			// search and replace on target
+			if ( params.target ) {							
+				TextContainer tc = tu.getTarget(targetLocale);
+				if (tc != null) {
 					for (Segment seg : tc.getSegments()) {
 						tmp = searchAndReplace(seg.text.toString());
 						seg.text.setCodedText(tmp);
-					}
+					}		
 				}
 			}
 		} 

@@ -21,33 +21,83 @@
 package net.sf.okapi.steps.copysourcetotarget;
 
 import net.sf.okapi.common.BaseParameters;
-import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.Util;
+import net.sf.okapi.common.EditorFor;
+import net.sf.okapi.common.ParametersDescription;
+import net.sf.okapi.common.uidescription.EditorDescription;
+import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 
-public class Parameters extends BaseParameters {
+@EditorFor(Parameters.class)
+public class Parameters extends BaseParameters implements IEditorDescriptionProvider {	
+	private boolean copyProperties;
+	private boolean copyContent;	
+	private boolean overwriteExisting;
 
-	public LocaleId targetLocale;
-	
-	public Parameters () {
+	public Parameters() {
 		reset();
 	}
 
-	public void reset () {
-		targetLocale = LocaleId.EMPTY;
+	public void reset() {
+		copyProperties = true;
+		copyContent = true;
+		overwriteExisting = false;
 	}
 
-	public void fromString (String data) {
+	public void fromString(String data) {
 		reset();
 		// Read the file content as a set of fields
-		buffer.fromString(data);
-		String tmp = buffer.getString("targetLocale");
-		if ( Util.isEmpty(tmp) ) targetLocale = LocaleId.EMPTY;
-		else targetLocale = LocaleId.fromString(tmp);
+		copyProperties = buffer.getBoolean("copyProperties", copyProperties);
+		copyContent = buffer.getBoolean("copyContent", copyContent);
+		overwriteExisting = buffer.getBoolean("overwriteExisting", overwriteExisting);
 	}
 
 	public String toString() {
-		buffer.reset();
-		buffer.setString("targetLocale", targetLocale.toString());				
+		buffer.reset();		
+		buffer.setBoolean("copyProperties", copyProperties);
+		buffer.setBoolean("copyContent", copyContent);
+		buffer.setBoolean("overwriteExisting", overwriteExisting);
 		return buffer.toString();
+	}
+
+	public boolean isCopyProperties() {
+		return copyProperties;
+	}
+
+	public void setCopyProperties(boolean copyProperties) {
+		this.copyProperties = copyProperties;
+	}
+
+	public boolean isCopyContent() {
+		return copyContent;
+	}
+
+	public void setCopyContent(boolean copyContent) {
+		this.copyContent = copyContent;
+	}
+
+	public boolean isOverwriteExisting() {
+		return overwriteExisting;
+	}
+
+	public void setOverwriteExisting(boolean overwriteExisting) {
+		this.overwriteExisting = overwriteExisting;
+	}
+
+	@Override
+	public ParametersDescription getParametersDescription() {
+		ParametersDescription desc = new ParametersDescription(this);
+		desc.add("copyProperties", "Copy Source Properties to Target?", "Copy Source Properties to Target?");
+		desc.add("copyContent", "Copy Source Content to Target?", "Copy Source Content to Target?");
+		desc.add("overwriteExisting", "Overwrite the current target content?", "Overwrite the current target content");
+		return desc;
+	}
+
+	@Override
+	public EditorDescription createEditorDescription(ParametersDescription paramsDesc) {
+		EditorDescription desc = new EditorDescription("Copy Source Content To Target", true, false);		
+		desc.addCheckboxPart(paramsDesc.get("copyProperties"));
+		desc.addCheckboxPart(paramsDesc.get("copyContent"));
+		desc.addSeparatorPart();
+		desc.addCheckboxPart(paramsDesc.get("overwriteExisting"));
+		return desc;
 	}
 }

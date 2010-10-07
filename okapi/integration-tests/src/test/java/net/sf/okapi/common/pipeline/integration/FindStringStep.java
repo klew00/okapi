@@ -4,7 +4,6 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.IPipelineStep;
-import net.sf.okapi.common.resource.TextUnit;
 
 class FindStringStep extends BasePipelineStep implements IPipelineStep {
 
@@ -28,11 +27,10 @@ class FindStringStep extends BasePipelineStep implements IPipelineStep {
 	
 	@Override
 	protected Event handleTextUnit(Event event) {
-		String text = ((TextUnit)event.getResource()).getTarget(locFR).toString();		
+		String text = event.getTextUnit().getTarget(locFR).toString();		
 		if (text.contains(lookupString)) {			
 			found = true;
-		}
-		
+		}		
 		return event;
 	};
 

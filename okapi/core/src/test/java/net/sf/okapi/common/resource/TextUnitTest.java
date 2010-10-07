@@ -134,6 +134,24 @@ public class TextUnitTest {
         assertNotSame("Target should not have been modified", tc2, tu1.getTarget(locFR));
 	}
 
+    @Test
+    public void createTargetEmptyOption () {
+        tu1.setSource(tc1);
+        tu1.createTarget(locFR, false, IResource.CREATE_EMPTY);
+        assertTrue(tu1.hasTarget(locFR));
+        assertEquals("Empty target created", "", tu1.getTarget(locFR).toString());
+	}
+    
+    @Test
+    public void createTargetPropertiesOption () {
+        tu1.setSource(tc1);
+        tu1.getSource().setProperty(new Property("test", "value"));
+        tu1.createTarget(locFR, false, IResource.COPY_PROPERTIES);
+        assertTrue(tu1.hasTarget(locFR));
+        assertEquals("Empty target created", "", tu1.getTarget(locFR).toString());
+        assertTrue(tu1.getTarget(locFR).getProperty("test") != null);
+	}
+    
 	@Test
 	public void getSetId () {
 		assertEquals(tu1.getId(), TU1);

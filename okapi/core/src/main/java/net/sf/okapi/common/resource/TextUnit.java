@@ -457,10 +457,9 @@ public class TextUnit implements INameable, IReferenceable {
 	{
 		TextContainer trgCont = targets.get(locId);
 		if (( trgCont == null ) || overwriteExisting ) {
-			trgCont = getSource().clone(
-                 // /TODO: find or write a test for this. I only see this one case (what happened to copy_all and copy_content?).
-				(creationOptions & COPY_PROPERTIES) == COPY_PROPERTIES);
-			if ( creationOptions == CREATE_EMPTY ) {
+			trgCont = getSource().clone((creationOptions & COPY_PROPERTIES) == COPY_PROPERTIES);
+			if ((creationOptions == CREATE_EMPTY || creationOptions == COPY_PROPERTIES) 
+					&& !overwriteExisting) {
 				trgCont.clear();
 			}
 			targets.put(locId, trgCont);

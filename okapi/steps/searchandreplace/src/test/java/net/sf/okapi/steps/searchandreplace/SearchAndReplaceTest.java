@@ -185,5 +185,4 @@ public class SearchAndReplaceTest {
 		assertEquals(EventType.END_BATCH_ITEM, el.remove(0).getEventType());
 		assertEquals(EventType.END_BATCH, el.remove(0).getEventType());
 	}
-	
 }

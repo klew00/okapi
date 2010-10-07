@@ -109,10 +109,10 @@ public class MultistepPipelineTest {
 		IPipelineStep step2 = new SearchAndReplaceStep();
 		((net.sf.okapi.steps.searchandreplace.Parameters) step2.getParameters()).addRule(new String[] { "true",
 				"Okapi Framework", "Big Foot" });
-//		((net.sf.okapi.steps.searchandreplace.Parameters) step2.getParameters()).plainText = false;
 		FindStringStep step3 = new FindStringStep("Big Foot");
 
 		driver.addStep(step1);
+		driver.addStep(new CopySourceToTargetStep());
 		driver.addStep(step2);
 		driver.addStep(step3);
 
@@ -138,9 +138,9 @@ public class MultistepPipelineTest {
 		driver.addStep(new RawDocumentToFilterEventsStep());
 		
 		IPipelineStep searchReplaceStep = new SearchAndReplaceStep();
-//		((net.sf.okapi.steps.searchandreplace.Parameters) searchReplaceStep.getParameters()).plainText = false;
 		((net.sf.okapi.steps.searchandreplace.Parameters) searchReplaceStep.getParameters()).addRule(new String[] { "true",
 				"Okapi Framework", "Big Foot" });
+		driver.addStep(new CopySourceToTargetStep());
 		driver.addStep(searchReplaceStep);
 		
 		FindStringStep findStep = new FindStringStep("Big Foot");
@@ -163,20 +163,20 @@ public class MultistepPipelineTest {
 	public void copySourceToTargetPipeline() throws URISyntaxException {			
 		driver.addStep(new RawDocumentToFilterEventsStep());
 		CopySourceToTargetStep copySourceToTargetStep = new CopySourceToTargetStep();
-		copySourceToTargetStep.getParameters().targetLocale = locEUES;
+		copySourceToTargetStep.setTargetLocale(locEUES);
 		driver.addStep(copySourceToTargetStep);
 		driver.addStep(new FilterEventsWriterStep());
 						
 		// Set the info for the input and output
-		RawDocument rawDoc = new RawDocument(getUri("Test01.properties"), "UTF-8", locEN);
+		RawDocument rawDoc = new RawDocument(getUri("Test01.properties"), "UTF-8", locEN, locEUES);
 		rawDoc.setFilterConfigId("okf_properties");
 		driver.addBatchItem(rawDoc, getOutputUri("Test01.properties"), "UTF-8");
 		
-		rawDoc = new RawDocument(getUri("Test02.properties"), "UTF-8", locEN);
+		rawDoc = new RawDocument(getUri("Test02.properties"), "UTF-8", locEN, locEUES);
 		rawDoc.setFilterConfigId("okf_properties");
 		driver.addBatchItem(rawDoc, getOutputUri("Test02.properties"), "UTF-8");
 		
-		rawDoc = new RawDocument(getUri("Test03.properties"), "UTF-8", locEN);
+		rawDoc = new RawDocument(getUri("Test03.properties"), "UTF-8", locEN, locEUES);
 		rawDoc.setFilterConfigId("okf_properties");
 		driver.addBatchItem(rawDoc, getOutputUri("Test03.properties"), "UTF-8");
 		
