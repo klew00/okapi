@@ -458,8 +458,7 @@ public class TextUnit implements INameable, IReferenceable {
 		TextContainer trgCont = targets.get(locId);
 		if (( trgCont == null ) || overwriteExisting ) {
 			trgCont = getSource().clone((creationOptions & COPY_PROPERTIES) == COPY_PROPERTIES);
-			if ((creationOptions == CREATE_EMPTY || creationOptions == COPY_PROPERTIES) 
-					&& !overwriteExisting) {
+			if (( creationOptions == CREATE_EMPTY ) || ( creationOptions == COPY_PROPERTIES )) {
 				trgCont.clear();
 			}
 			targets.put(locId, trgCont);

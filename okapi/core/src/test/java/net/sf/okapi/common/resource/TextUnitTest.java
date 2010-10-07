@@ -143,6 +143,16 @@ public class TextUnitTest {
 	}
     
     @Test
+    public void createTargetEmptyOptionOverwriteExisting () {
+        tu1.setSource(tc1);
+        TextContainer tc2 = new TextContainer("unique fr text");
+        tu1.setTarget(locFR, tc2);
+        tu1.createTarget(locFR, true, IResource.CREATE_EMPTY);
+        assertTrue(tu1.hasTarget(locFR));
+        assertEquals("Empty target created", "", tu1.getTarget(locFR).toString());
+	}
+    
+    @Test
     public void createTargetPropertiesOption () {
         tu1.setSource(tc1);
         tu1.getSource().setProperty(new Property("test", "value"));
@@ -150,6 +160,30 @@ public class TextUnitTest {
         assertTrue(tu1.hasTarget(locFR));
         assertEquals("Empty target created", "", tu1.getTarget(locFR).toString());
         assertTrue(tu1.getTarget(locFR).getProperty("test") != null);
+	}
+    
+    @Test
+    public void createTargetPropertiesOptionOverwriteExisting () {
+        tu1.setSource(tc1);
+        tu1.getSource().setProperty(new Property("test", "value"));
+        TextContainer tc2 = new TextContainer("unique fr text");
+        tu1.setTarget(locFR, tc2);
+        tu1.createTarget(locFR, true, IResource.COPY_PROPERTIES);
+        assertTrue(tu1.hasTarget(locFR));
+        assertEquals("Empty target created", "", tu1.getTarget(locFR).toString());
+        assertTrue(tu1.getTarget(locFR).getProperty("test") != null);
+	}
+    
+    @Test
+    public void createTargetPropertiesOptionNotOverwriteExisting () {
+        tu1.setSource(tc1);
+        tu1.getSource().setProperty(new Property("test", "value"));
+        TextContainer tc2 = new TextContainer("unique fr text");
+        tu1.setTarget(locFR, tc2);
+        tu1.createTarget(locFR, false, IResource.COPY_PROPERTIES);
+        assertTrue(tu1.hasTarget(locFR));
+        assertEquals("unique fr text", tu1.getTarget(locFR).toString());
+        assertTrue(tu1.getTarget(locFR).getProperty("test") == null);
 	}
     
 	@Test
