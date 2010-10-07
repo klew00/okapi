@@ -1191,7 +1191,7 @@ public class MainForm { //implements IParametersProvider {
 	    item.setToolTipText(Res.getString("MainForm.helpTip")); //$NON-NLS-1$
 		item.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				if ( help != null ) help.showTopic(this, "index"); //$NON-NLS-1$
+				if ( help != null ) help.showWiki("Rainbow");
 			}
 		});
 	}
