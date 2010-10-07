@@ -156,7 +156,7 @@ public class ManifestDialog {
 		CloseActions = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
-					if ( help != null ) help.showTopic(this, "manifest"); //$NON-NLS-1$
+					if ( help != null ) help.showWiki("Rainbow - Translation Package Manifest");
 					return;
 				}
 				if ( e.widget.getData().equals("o") ) {
