@@ -22,6 +22,7 @@ package net.sf.okapi.applications.rainbow.pipeline;
 
 import net.sf.okapi.steps.common.FilterEventsToRawDocumentStep;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
+import net.sf.okapi.steps.copysourcetotarget.CopySourceToTargetStep;
 import net.sf.okapi.steps.searchandreplace.SearchAndReplaceStep;
 
 public class SnRWithFilterPipeline extends PredefinedPipeline {
@@ -30,6 +31,7 @@ public class SnRWithFilterPipeline extends PredefinedPipeline {
 		super("SnRWithFilterPipeline",
 			"Search and Replace - With Filter");
 		addStep(new RawDocumentToFilterEventsStep());
+		addStep(new CopySourceToTargetStep());
 		addStep(new SearchAndReplaceStep());
 		addStep(new FilterEventsToRawDocumentStep());
 	}

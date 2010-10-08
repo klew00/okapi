@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -22,6 +22,7 @@ package net.sf.okapi.applications.rainbow.pipeline;
 
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.pipeline.IPipeline;
@@ -30,6 +31,8 @@ import net.sf.okapi.common.pipeline.Pipeline;
 
 public abstract class PredefinedPipeline extends Pipeline implements IPredefinedPipeline {
 	
+	private static final Logger LOGGER = Logger.getLogger(PredefinedPipeline.class.getName());
+
 	private String id;
 	private String title;
 	private String paramData;
@@ -69,16 +72,26 @@ public abstract class PredefinedPipeline extends Pipeline implements IPredefined
 		if ( Util.isEmpty(data) ) return; // Nothing to read
 		PipelineStorage store = new PipelineStorage(availableSteps, (CharSequence)data);
 		IPipeline tmp = store.read();
-		if ( tmp.getSteps().size() != getSteps().size() ) {
-			throw new RuntimeException("The pipeline created from the data does not match the expected one.");
-		}
+		
+		// Else: Fill the pre-defined steps with the saved data
 		List<IPipelineStep> steps = getSteps();
 		List<IPipelineStep> tmpSteps = tmp.getSteps();
 		// Loop through the steps and assign the parameters of the steps
-		// of the temporary pipeline to their equivalent
+		// of the temporary pipeline (the stored data) to their equivalent.
+		// Allows for the rare case where the pipeline may be different (e.g. changes in pre-defined pipelines)
 		for ( int i=0; i<steps.size(); i++ ) {
-			//TODO: More validation would be nice
-			steps.get(i).setParameters(tmpSteps.get(i).getParameters());
+			// Search for the corresponding step
+			int found = -1;
+			for ( int j=0; j<tmpSteps.size(); j++ ) {
+				if ( steps.get(i).getName().equals(tmpSteps.get(j).getName()) ) {
+					found = j;
+				}
+			}
+			// If found: Use the data, then remove it
+			if ( found != -1 ) {
+				steps.get(i).setParameters(tmpSteps.get(found).getParameters());
+				tmpSteps.remove(found);
+			}
 		}
 	}
 
