@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -27,7 +27,8 @@ import net.sf.okapi.common.uidescription.EditorDescription;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 
 @EditorFor(Parameters.class)
-public class Parameters extends BaseParameters implements IEditorDescriptionProvider {	
+public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
+	
 	private boolean copyProperties;
 	private boolean copyContent;	
 	private boolean overwriteExisting;
@@ -93,7 +94,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 
 	@Override
 	public EditorDescription createEditorDescription(ParametersDescription paramsDesc) {
-		EditorDescription desc = new EditorDescription("Copy Source Content To Target", true, false);		
+		EditorDescription desc = new EditorDescription("Copy Source To Target", true, false);		
 		desc.addCheckboxPart(paramsDesc.get("copyProperties"));
 		desc.addCheckboxPart(paramsDesc.get("copyContent"));
 		desc.addSeparatorPart();

@@ -551,7 +551,7 @@ public class SRXEditor {
 		rm.setCommand(menuItem, "help.topics"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				if ( help != null ) help.showTopic(this, "index"); //$NON-NLS-1$
+				if ( help != null ) help.showWiki("Ratel");
             }
 		});
 		
@@ -559,7 +559,7 @@ public class SRXEditor {
 		rm.setCommand(menuItem, "help.howtouse"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				if ( help != null ) help.showTopic(this, "index", "howTo.html"); //$NON-NLS-1$ //$NON-NLS-2$
+				if ( help != null ) help.showWiki("Ratel - Usage");
 			}
 		});
 
