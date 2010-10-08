@@ -84,7 +84,7 @@ public class LanguageMapDialog {
 			public void widgetSelected(SelectionEvent e) {
 				result = null;
 				if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
-					if ( help != null ) help.showTopic(this, "index", "editLangMap.html"); //$NON-NLS-1$ //$NON-NLS-2$
+					if ( help != null ) help.showWiki("Ratel - Edit Language Map");
 					return;
 				}
 				if ( e.widget.getData().equals("o") ) { //$NON-NLS-1$

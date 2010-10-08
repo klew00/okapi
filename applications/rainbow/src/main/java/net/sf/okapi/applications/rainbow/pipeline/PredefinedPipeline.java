@@ -22,7 +22,6 @@ package net.sf.okapi.applications.rainbow.pipeline;
 
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.pipeline.IPipeline;
@@ -31,8 +30,6 @@ import net.sf.okapi.common.pipeline.Pipeline;
 
 public abstract class PredefinedPipeline extends Pipeline implements IPredefinedPipeline {
 	
-	private static final Logger LOGGER = Logger.getLogger(PredefinedPipeline.class.getName());
-
 	private String id;
 	private String title;
 	private String paramData;
