@@ -13,6 +13,7 @@ Export-Package: net.sf.okapi.common,
  net.sf.okapi.common.pipeline,
  net.sf.okapi.common.pipeline.annotations,
  net.sf.okapi.common.pipelinedriver,
+ net.sf.okapi.common.query,
  net.sf.okapi.common.resource,
  net.sf.okapi.common.skeleton,
  net.sf.okapi.common.uidescription
