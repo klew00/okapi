@@ -296,7 +296,8 @@ public class CommandLine {
 			PipelineEditor dlg = new PipelineEditor();
 			int res = dlg.edit(shell, wrapper.getAvailableSteps(), wrapper,
 				(predefinedPipeline==null) ? null : predefinedPipeline.getTitle(),
-				help, null);
+				help, null,
+				(predefinedPipeline==null) ? -1 : predefinedPipeline.getInitialStepIndex());
 		
 			if ( res == PipelineEditor.RESULT_CANCEL ) {
 				return; // No execution, no save

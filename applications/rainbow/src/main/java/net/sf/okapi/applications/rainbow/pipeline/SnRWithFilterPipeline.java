@@ -34,6 +34,7 @@ public class SnRWithFilterPipeline extends PredefinedPipeline {
 		addStep(new CopySourceToTargetStep());
 		addStep(new SearchAndReplaceStep());
 		addStep(new FilterEventsToRawDocumentStep());
+		setInitialStepIndex(2);
 	}
 	
 }

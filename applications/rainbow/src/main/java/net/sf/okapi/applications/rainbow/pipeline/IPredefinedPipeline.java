@@ -34,5 +34,7 @@ public interface IPredefinedPipeline extends IPipeline {
 	
 	public void setParameters (Map<String, StepInfo> availableSteps,
 		String data);
+	
+	public int getInitialStepIndex ();
 
 }

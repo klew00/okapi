@@ -320,7 +320,6 @@
 		<!-- Copy help -->
 		<copy todir="${dist}/help" overwrite="true">
 			<fileset dir="../../help">
-				<include name="**/applications/rainbow/**"/>
 				<include name="**/tutorials/**"/>
 			</fileset>
 		</copy>

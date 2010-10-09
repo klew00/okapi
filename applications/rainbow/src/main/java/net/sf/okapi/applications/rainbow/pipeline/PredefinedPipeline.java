@@ -33,6 +33,7 @@ public abstract class PredefinedPipeline extends Pipeline implements IPredefined
 	private String id;
 	private String title;
 	private String paramData;
+	private int initialStepIndex = -1;
 
 	public PredefinedPipeline (String id,
 		String title)
@@ -49,6 +50,15 @@ public abstract class PredefinedPipeline extends Pipeline implements IPredefined
 	@Override
 	public String getTitle() {
 		return title;
+	}
+	
+	@Override
+	public int getInitialStepIndex () {
+		return initialStepIndex;
+	}
+	
+	public void setInitialStepIndex (int index) {
+		initialStepIndex = index;
 	}
 
 	@Override

@@ -504,14 +504,17 @@
 			</fileset>
 		</copy>
 
-		<!-- Copy help -->
+		<!-- Copy help
 		<copy todir="${dist}/help">
 			<fileset dir="../../help">
-				<exclude name="**/applications/rainbow/**"/>
+				<exclude name="**/applications/**"/>
+				<exclude name="**/common/**"/>
+				<exclude name="**/filters/**"/>
+				<exclude name="**/lib/**"/>
+				<exclude name="**/steps/**"/>
 				<exclude name="**/tutorials/**"/>
-				<exclude name="**/plugins/**"/>
 			</fileset>
-		</copy>
+		</copy>-->
 
 		<!-- locaweb -->
 		<copy todir="${dist}/localweb/devguide">

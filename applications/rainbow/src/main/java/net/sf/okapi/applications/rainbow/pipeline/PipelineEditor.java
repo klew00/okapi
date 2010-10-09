@@ -93,7 +93,8 @@ public class PipelineEditor {
 		PipelineWrapper wrapper,
 		String predefined, // null if not predefined, title otherwise
 		IHelp helpParam,
-		String projectDir)
+		String projectDir,
+		int initialSelectedStep) // -1 for default
 	{
 		context = new BaseContext();
 		context.setObject("shell", parent);
@@ -112,15 +113,19 @@ public class PipelineEditor {
 			if ( lbSteps.getItemCount() > 0 ) {
 				lbSteps.setFocus();
 			}
-			// Select the first step with parameters if possible
-			for ( int i=0; i<workSteps.size(); i++ ) {
-				if ( workSteps.get(i).paramsData != null ) {
-					lbSteps.select(i);
-					updateStepDisplay();
-					break;
+			// Set the initial step if one is defined
+			if (( initialSelectedStep > -1 ) && ( initialSelectedStep < lbSteps.getItemCount() )) {
+				lbSteps.select(initialSelectedStep);
+			}
+			else { // Select the first step with parameters if possible
+				for ( int i=0; i<workSteps.size(); i++ ) {
+					if ( workSteps.get(i).paramsData != null ) {
+						lbSteps.select(i);
+						break;
+					}
 				}
 			}
-			
+			updateStepDisplay();
 			result = showDialog();
 		}
 		catch ( Exception e ) {
