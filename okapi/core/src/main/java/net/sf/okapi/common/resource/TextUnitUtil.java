@@ -26,6 +26,8 @@ import java.util.logging.Logger;
 
 import net.sf.okapi.common.ReversedIterator;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.annotation.AltTranslation;
+import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
@@ -1028,5 +1030,27 @@ public class TextUnitUtil {
 		tu.getTarget(trgLocaleId).setHasBeenSegmentedFlag(true);
 
 		return tu;
+	}
+	
+	public static AltTranslationsAnnotation addAltTranslation (TextContainer targetContainer, AltTranslation alt) {
+		AltTranslationsAnnotation altTrans = targetContainer.getAnnotation(AltTranslationsAnnotation.class);
+		if ( altTrans == null ) {
+			altTrans = new AltTranslationsAnnotation();
+			targetContainer.setAnnotation(altTrans);
+		}
+		altTrans.add(alt);
+		
+		return altTrans;
+	}
+	
+	public static AltTranslationsAnnotation addAltTranslation (Segment seg, AltTranslation alt) {
+		AltTranslationsAnnotation altTrans = seg.getAnnotation(AltTranslationsAnnotation.class);
+		if ( altTrans == null ) {
+			altTrans = new AltTranslationsAnnotation();
+			seg.setAnnotation(altTrans);
+		}
+		altTrans.add(alt);
+		
+		return altTrans;
 	}
 }
