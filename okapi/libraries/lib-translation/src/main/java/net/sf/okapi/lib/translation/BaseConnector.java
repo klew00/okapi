@@ -120,27 +120,5 @@ public abstract class BaseConnector implements IQuery {
 	 */
 	protected String toInternalCode (LocaleId locId) {
 		return locId.toString();
-	}	
-	
-	protected AltTranslationsAnnotation addAltTranslation (TextContainer targetContainer, AltTranslation alt) {
-		AltTranslationsAnnotation altTrans = targetContainer.getAnnotation(AltTranslationsAnnotation.class);
-		if ( altTrans == null ) {
-			altTrans = new AltTranslationsAnnotation();
-			targetContainer.setAnnotation(altTrans);
-		}
-		altTrans.add(alt);
-		
-		return altTrans;
-	}
-	
-	protected AltTranslationsAnnotation addAltTranslation (Segment seg, AltTranslation alt) {
-		AltTranslationsAnnotation altTrans = seg.getAnnotation(AltTranslationsAnnotation.class);
-		if ( altTrans == null ) {
-			altTrans = new AltTranslationsAnnotation();
-			seg.setAnnotation(altTrans);
-		}
-		altTrans.add(alt);
-		
-		return altTrans;
-	}
+	}		
 }
