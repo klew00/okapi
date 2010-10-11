@@ -16,7 +16,6 @@
 		<module>charlisting</module>
         <module>codeshandling</module>
 		<module>common</module>
-		<module>copysourcetotarget</module>
         <module>diffleverage</module>
 		<module>encodingconversion</module>
         <module>external-command</module>
