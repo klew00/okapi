@@ -1262,6 +1262,14 @@ public class TextContainerTest {
 		assertEquals("0", segments.get(1).id);
 	}
 	
+	@Test
+    public void getFirstSegment () {
+    	Segment seg = new Segment("qwerty", new TextFragment("xyz"));
+		TextContainer tc = new TextContainer(seg);
+		assertNotNull(tc.getFirstSegment());
+		assertSame(seg, tc.getFirstSegment());
+    }
+
 	private TextContainer createMultiSegmentContent () {
 		TextFragment tf = new TextFragment("text1 text2");
 		TextContainer tc = new TextContainer(tf);
@@ -1285,5 +1293,4 @@ public class TextContainerTest {
 		tc.getSegments().append(tf);
 		return tc;
 	}
-
 }
