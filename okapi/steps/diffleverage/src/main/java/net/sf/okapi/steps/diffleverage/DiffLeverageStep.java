@@ -32,6 +32,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.UsingParameters;
+import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.annotation.Annotations;
 import net.sf.okapi.common.exceptions.OkapiBadStepInputException;
@@ -104,7 +105,7 @@ public class DiffLeverageStep extends BasePipelineStep {
 	}
 
 	/**
-	 * 
+	 * Target locale.
 	 * @param targetLocale
 	 */
 	@StepParameterMapping(parameterType = StepParameterType.TARGET_LOCALE)
@@ -122,6 +123,10 @@ public class DiffLeverageStep extends BasePipelineStep {
 		this.oldSource = secondInput;
 	}
 	
+	/**
+	 * If set this is the old target that will be paragraph aligned with the  old source.
+	 * @param tertiaryInput
+	 */
 	@StepParameterMapping(parameterType = StepParameterType.THIRD_INPUT_RAWDOC)
 	public void setTertiaryInput (RawDocument tertiaryInput) {
 		this.oldTarget = tertiaryInput;
@@ -129,8 +134,9 @@ public class DiffLeverageStep extends BasePipelineStep {
 
 	@Override
 	public String getDescription() {
-		return "Compare two bilingual documents. "
-				+ "Copy the old target segments into the new document's "
+		return "Compare two documents (old source and new source) and "
+				+ "copy the old target segments (either a bi-lingual document or paragraph " 
+				+ "aligned source and target documents) into the new document's "
 				+ "text units based on contextual matching of the source segments";
 	}
 
@@ -258,6 +264,10 @@ public class DiffLeverageStep extends BasePipelineStep {
 
 	@Override
 	protected Event handleTextUnit(final Event event) {
+		if (event.getTextUnit().getSource().hasBeenSegmented()) {
+			throw new OkapiBadStepInputException("TextUnits are segmented. Diff Leverage only runs on paragraphs");
+		}
+		
 		if (oldSource != null) {
 			newTextUnits.add(event.getTextUnit());
 			newDocumentEvents.add(event);
@@ -328,7 +338,8 @@ public class DiffLeverageStep extends BasePipelineStep {
 		}
 		if (!found) {
 			throw new RuntimeException(
-					"Different number of source or target TextUnits. The source and target documents are not paragraph aligned.");
+					"Different number of source or target TextUnits. " +
+					"The source and target documents are not paragraph aligned.");
 		}
 		return event;
 	}
@@ -353,30 +364,33 @@ public class DiffLeverageStep extends BasePipelineStep {
 				// only copy the old target if diffOnly is false
 				if (!params.isDiffOnly()) {
 					if (params.getFuzzyThreshold() < 100) {
-						score = (int) Util.calculateNgramDiceCoefficient(oldTu.getSource()
-								.getUnSegmentedContentCopy().getText(), newTu.getSource()
-								.getUnSegmentedContentCopy().getText(), tokenizer);
+						score = (int) Util.calculateNgramDiceCoefficient(
+								oldTu.getSource().getUnSegmentedContentCopy().toString(), 
+								newTu.getSource().getUnSegmentedContentCopy().toString(), tokenizer);
 					}
-					TextFragment tf = t.getFirstContent();
-					TextUnitUtil.adjustTargetCodes(newTu.getSource().getFirstContent(),
+					
+					// we assume this is a paragraph!!
+					TextFragment tf = t.getUnSegmentedContentCopy();
+					TextUnitUtil.adjustTargetCodes(newTu.getSource().getUnSegmentedContentCopy(),
 							tf, true, true, null, newTu);
 
 					if (params.isCopyToTarget()) {
 						newTu.setTarget(targetLocale, t);
 					}
 
-					// make an AltTranslationAnnotation and attach to Source TextContainer
-					AltTranslationsAnnotation altAnno = new AltTranslationsAnnotation();
-					altAnno.add(sourceLocale, targetLocale, 
+					// make an AltTranslation and attach to the target container
+					AltTranslation alt = new AltTranslation(sourceLocale, targetLocale, 
 							newTu.getSource().getUnSegmentedContentCopy(), 
 							oldTu.getSource().getUnSegmentedContentCopy(), t.getFirstContent(), 
 							params.getFuzzyThreshold() >= 100 ? MatchType.EXACT_PREVIOUS_VERSION
 									: MatchType.FUZZY_PREVIOUS_VERSION, score, getName());
 									
-					// add the annotation to the target container
+					// add the annotation to the target container since we are diffing paragraphs only
 					// we may need to create the target if it doesn't exist
 					TextContainer tc = newTu.createTarget(targetLocale, false, IResource.COPY_PROPERTIES);
-					tc.setAnnotation(altAnno);
+					AltTranslationsAnnotation alta = TextUnitUtil.addAltTranslation(tc, alt);
+					// resort AltTranslation in case we already had some in  the list
+					alta.sort();
 				}
 				
 				// set the DiffLeverageAnnotation
