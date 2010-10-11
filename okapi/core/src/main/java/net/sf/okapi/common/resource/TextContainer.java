@@ -970,6 +970,19 @@ public class TextContainer implements Iterable<TextPart> {
 	}
 	
 	/**
+	 * Returns the first {@link Segment} of this container.
+	 * @return the first {@link Segment} of this container or null if there is no {@link Segment}
+	 */
+	public Segment getFirstSegment () {
+		for ( TextPart part : parts ) {
+			if (part.isSegment()) {
+				return (Segment) part;
+			}
+		}
+		return null;
+	}	
+	
+	/**
 	 * Gets the content of the last part (segment or non-segment) of this container. 
 	 * <p>This method always returns the same result as {@link ISegments#getLastContent()} if {@link #contentIsOneSegment()}.
 	 * @return the content of the last part (segment or non-segment) of this container.
