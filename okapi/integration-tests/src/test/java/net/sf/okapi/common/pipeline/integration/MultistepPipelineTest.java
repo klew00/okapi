@@ -16,7 +16,7 @@ import net.sf.okapi.steps.common.FilterEventsToRawDocumentStep;
 import net.sf.okapi.steps.common.FilterEventsWriterStep;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 import net.sf.okapi.steps.common.RawDocumentWriterStep;
-import net.sf.okapi.steps.copysourcetotarget.CopySourceToTargetStep;
+import net.sf.okapi.steps.common.createtarget.CreateTargetStep;
 import net.sf.okapi.steps.searchandreplace.SearchAndReplaceStep;
 import net.sf.okapi.steps.segmentation.Parameters;
 import net.sf.okapi.steps.segmentation.SegmentationStep;
@@ -112,7 +112,7 @@ public class MultistepPipelineTest {
 		FindStringStep step3 = new FindStringStep("Big Foot");
 
 		driver.addStep(step1);
-		driver.addStep(new CopySourceToTargetStep());
+		driver.addStep(new CreateTargetStep());
 		driver.addStep(step2);
 		driver.addStep(step3);
 
@@ -140,7 +140,7 @@ public class MultistepPipelineTest {
 		IPipelineStep searchReplaceStep = new SearchAndReplaceStep();
 		((net.sf.okapi.steps.searchandreplace.Parameters) searchReplaceStep.getParameters()).addRule(new String[] { "true",
 				"Okapi Framework", "Big Foot" });
-		driver.addStep(new CopySourceToTargetStep());
+		driver.addStep(new CreateTargetStep());
 		driver.addStep(searchReplaceStep);
 		
 		FindStringStep findStep = new FindStringStep("Big Foot");
@@ -162,7 +162,7 @@ public class MultistepPipelineTest {
 	@Test
 	public void copySourceToTargetPipeline() throws URISyntaxException {			
 		driver.addStep(new RawDocumentToFilterEventsStep());
-		CopySourceToTargetStep copySourceToTargetStep = new CopySourceToTargetStep();
+		CreateTargetStep copySourceToTargetStep = new CreateTargetStep();
 		copySourceToTargetStep.setTargetLocale(locEUES);
 		driver.addStep(copySourceToTargetStep);
 		driver.addStep(new FilterEventsWriterStep());
