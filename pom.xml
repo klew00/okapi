@@ -5,24 +5,75 @@
 	<version>0.10-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<modelVersion>4.0.0</modelVersion>
-	<name>Okapi Root</name>
+	<name>Okapi Build Root</name>
+	<url>http://code.google.com/p/okapi</url>
+	<issueManagement>
+		<system>Google Code</system>
+		<url>http://code.google.com/p/okapi/issues</url>
+	</issueManagement>
+
+	<scm>
+		<connection>scm:svn:http://okapi.googlecode.com/svn/trunk/</connection>
+		<developerConnection>scm:svn:https://okapi.googlecode.com/svn/trunk/</developerConnection>
+		<url>http://code.google.com/p/okapi/source/browse/</url>
+	</scm>
+
+	<repositories>
+		<repository>
+			<id>okapi</id>
+			<name>okapi-repository</name>
+			<url>http://okapi.googlecode.com/svn/maven2</url>
+			<layout>default</layout>
+		</repository>
+	</repositories>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
-	
 	<modules>
 		<module>okapi</module>
 		<module>okapi-ui/swt</module>
-		<module>applications</module>
+		<module>applications</module>		
 	</modules>
-	
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.felix</groupId>
+			<artifactId>org.osgi.core</artifactId>
+			<version>1.4.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.8.1</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
 	<build>
 		<plugins>
+			<!--<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.6</version>
+				<configuration>
+					<parallel>classes</parallel>
+					<useUnlimitedThreads>true</useUnlimitedThreads>
+				</configuration>
+			</plugin>
+			-->
+			<plugin>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.3.1</version>
+				<configuration>
+					<archive>
+						<manifestFile>${basedir}/META-INF/MANIFEST.MF</manifestFile>
+					</archive>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.0.2</version>
+				<version>2.3.2</version>
 				<configuration>
 					<source>1.6</source>
 					<target>1.6</target>
@@ -37,7 +88,29 @@
 					</additionalProjectnatures>
 				</configuration>
 			</plugin>
+
 		</plugins>
 	</build>
-	
+	<profiles>
+		<profile>
+			<id>release</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
+						<version>2.1.2</version>
+						<executions>
+							<execution>
+								<id>attach-sources</id>
+								<goals>
+									<goal>jar-no-fork</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
