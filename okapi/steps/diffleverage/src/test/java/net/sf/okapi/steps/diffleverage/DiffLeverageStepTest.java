@@ -16,6 +16,7 @@ import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.pipeline.Pipeline;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.filters.html.HtmlFilter;
 import net.sf.okapi.filters.po.POFilter;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 
@@ -34,9 +35,12 @@ public class DiffLeverageStepTest {
 		pipeline = new Pipeline();
 		eventObserver = new EventObserver();
 		pipeline.addObserver(eventObserver);
-
+	}
+	
+	private void initializePipeline(IFilter filter) {
+		pipeline.clearSteps();
+		
 		// add filter step
-		IFilter filter = new POFilter();
 		pipeline.addStep(new RawDocumentToFilterEventsStep(filter));
 
 		// add DiffLeverage step
@@ -48,6 +52,7 @@ public class DiffLeverageStepTest {
 		
 		FilterConfigurationMapper fcMapper = new FilterConfigurationMapper();
 		fcMapper.addConfigurations("net.sf.okapi.filters.po.POFilter");
+		fcMapper.addConfigurations("net.sf.okapi.filters.html.HtmlFilter");
 		diffLeverage.setFilterConfigurationMapper(fcMapper);
 		pipeline.addStep(diffLeverage);
 
@@ -60,6 +65,8 @@ public class DiffLeverageStepTest {
 
 	@Test
 	public void diffLeverageSimplePOFiles() throws URISyntaxException {
+		initializePipeline(new POFilter());
+		
 		URL url = DiffLeverageStepTest.class.getResource("/Test_en_fr_old.po");
 		RawDocument t = new RawDocument(url.toURI(), "UTF-8", LocaleId.ENGLISH, LocaleId.FRENCH);
 		t.setFilterConfigId("okf_po");
@@ -107,7 +114,63 @@ public class DiffLeverageStepTest {
 	}
 
 	@Test
+	public void diffLeverageThreeWayHtml() throws URISyntaxException {
+		initializePipeline(new HtmlFilter());
+		
+		URL url = DiffLeverageStepTest.class.getResource("/oldSrc.html");
+		RawDocument os = new RawDocument(url.toURI(), "UTF-8", LocaleId.ENGLISH);
+		os.setFilterConfigId("okf_html");
+		diffLeverage.setSecondInput(os);
+		
+		url = DiffLeverageStepTest.class.getResource("/oldTrg.html");
+		RawDocument ot = new RawDocument(url.toURI(), "UTF-8", LocaleId.ENGLISH);
+		ot.setFilterConfigId("okf_html");
+		diffLeverage.setTertiaryInput(ot);
+		
+		diffLeverage.setTargetLocale(LocaleId.ENGLISH);
+		
+		pipeline.startBatch();
+
+		pipeline.process(new RawDocument(this.getClass().getResourceAsStream("/newSrc.html"),
+				"UTF-8", LocaleId.ENGLISH));
+
+		pipeline.endBatch();
+
+		// test we observed the correct events
+		List<Event> el = eventObserver.getResult();
+		assertEquals(EventType.START_BATCH, el.remove(0).getEventType());
+		assertEquals(EventType.START_BATCH_ITEM, el.remove(0).getEventType());
+		assertEquals(EventType.START_DOCUMENT, el.remove(0).getEventType());
+		
+		Event tue1 = el.remove(0);
+		assertEquals(EventType.TEXT_UNIT, tue1.getEventType());
+		Assert.assertNotNull(tue1.getTextUnit().getTarget(LocaleId.ENGLISH).getAnnotation(DiffMatchAnnotation.class));
+		Assert.assertEquals("Target Paragraph <b>one</b> is here", tue1.getTextUnit().getTarget(LocaleId.ENGLISH).toString());
+
+		
+		Event tue2 = el.remove(0);
+		assertEquals(EventType.TEXT_UNIT, tue2.getEventType());
+		Assert.assertNotNull(tue2.getTextUnit().getTarget(LocaleId.ENGLISH).getAnnotation(DiffMatchAnnotation.class));
+		Assert.assertEquals("Target Paragraph <i>two</i> is here", tue2.getTextUnit().getTarget(LocaleId.ENGLISH).toString());
+		
+		Event tue3 = el.remove(0);
+		assertEquals(EventType.TEXT_UNIT, tue3.getEventType());
+		Assert.assertNotNull(tue3.getTextUnit().getTarget(LocaleId.ENGLISH).getAnnotation(DiffMatchAnnotation.class));
+		Assert.assertEquals("Target Paragraph <u>three</u> is here", tue3.getTextUnit().getTarget(LocaleId.ENGLISH).toString());
+		
+		Event tue4 = el.remove(0);
+		assertEquals(EventType.TEXT_UNIT, tue4.getEventType());
+		Assert.assertNull(tue4.getTextUnit().getTarget(LocaleId.ENGLISH));
+		
+		assertEquals(EventType.END_DOCUMENT, el.remove(0).getEventType());
+		assertEquals(EventType.END_BATCH_ITEM, el.remove(0).getEventType());
+		assertEquals(EventType.END_BATCH, el.remove(0).getEventType());
+	}
+
+	@Test
 	public void diffLeverageSimplePOFilesWithAltTranslationAnnotation() throws URISyntaxException {
+		initializePipeline(new POFilter());
+		
 		URL url = DiffLeverageStepTest.class.getResource("/Test_en_fr_old.po");
 		RawDocument t = new RawDocument(url.toURI(), "UTF-8", LocaleId.ENGLISH, LocaleId.FRENCH);
 		t.setFilterConfigId("okf_po");
@@ -155,6 +218,8 @@ public class DiffLeverageStepTest {
 
 	@Test
 	public void diffLeverageMediumPOFiles() throws URISyntaxException {
+		initializePipeline(new POFilter());
+		
 		URL url = DiffLeverageStepTest.class.getResource("/Test_en_en_old.po");
 		RawDocument t = new RawDocument(url.toURI(), "UTF-8", LocaleId.ENGLISH, LocaleId.ENGLISH);
 		t.setFilterConfigId("okf_po");
@@ -216,6 +281,8 @@ public class DiffLeverageStepTest {
 	
 	@Test
 	public void diffLeverageFuzzySimplePOFiles() throws URISyntaxException {
+		initializePipeline(new POFilter());
+		
 		URL url = DiffLeverageStepTest.class.getResource("/Test_en_fr_old.po");
 		RawDocument t = new RawDocument(url.toURI(), "UTF-8", LocaleId.ENGLISH, LocaleId.FRENCH);
 		t.setFilterConfigId("okf_po");

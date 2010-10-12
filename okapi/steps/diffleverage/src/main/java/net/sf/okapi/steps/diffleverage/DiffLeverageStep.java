@@ -53,7 +53,7 @@ import net.sf.okapi.lib.search.lucene.analysis.AlphabeticNgramTokenizer;
 import net.sf.okapi.lib.search.lucene.scorer.Util;
 
 /**
- * Contextually match source segments between two documents using a standard diff algorithm
+ * Contextually match source "paragraphs" (full content of the TextUnit source) between two documents using a standard diff algorithm
  * (http://en.wikipedia.org/wiki/Diff). The result is a new document with the translations from the old document copied
  * into it. This allows translations between different document versions to be preserved while still maintaining the
  * newer source document modifications.
@@ -134,10 +134,10 @@ public class DiffLeverageStep extends BasePipelineStep {
 
 	@Override
 	public String getDescription() {
-		return "Compare two documents (old source and new source) and "
-				+ "copy the old target segments (either a bi-lingual document or paragraph " 
-				+ "aligned source and target documents) into the new document's "
-				+ "text units based on contextual matching of the source segments";
+		return "Compare two source documents (i.e., different versions) and " +
+				"copy the old target content when we find a match. Can be a monolingual " +
+				"and bi-lingual input or three monolingual inputs. Paragraphs (TextUnits) " +
+				"must align in all cases";
 	}
 
 	@Override
@@ -264,10 +264,6 @@ public class DiffLeverageStep extends BasePipelineStep {
 
 	@Override
 	protected Event handleTextUnit(final Event event) {
-		if (event.getTextUnit().getSource().hasBeenSegmented()) {
-			throw new OkapiBadStepInputException("TextUnits are segmented. Diff Leverage only runs on paragraphs");
-		}
-		
 		if (oldSource != null) {
 			newTextUnits.add(event.getTextUnit());
 			newDocumentEvents.add(event);
@@ -359,8 +355,8 @@ public class DiffLeverageStep extends BasePipelineStep {
 			int score = 100;
 
 			// copy the old translation to the new TextUnit
-			TextContainer t = null;
-			if ((t = oldTu.getTarget(targetLocale)) != null) {
+			TextContainer otc = null;
+			if ((otc = oldTu.getTarget(targetLocale)) != null) {
 				// only copy the old target if diffOnly is false
 				if (!params.isDiffOnly()) {
 					if (params.getFuzzyThreshold() < 100) {
@@ -369,26 +365,31 @@ public class DiffLeverageStep extends BasePipelineStep {
 								newTu.getSource().getUnSegmentedContentCopy().toString(), tokenizer);
 					}
 					
-					// We assume this is a paragraph!!
-					TextFragment tf = t.getFirstContent(); // We need the fragment itself, not a copy
-					TextUnitUtil.adjustTargetCodes(newTu.getSource().getUnSegmentedContentCopy(),
-							tf, true, true, null, newTu);
-
+					// We force this to be a paragraph!! We use getUnSegmentedContentCopy
+					// to make sure we get *all* TextParts (just in case segmentation has been applied
+					// or  somehow extra TextParts were added in an external process)
+					TextFragment atf = TextUnitUtil.adjustTargetCodes(
+							newTu.getSource().getUnSegmentedContentCopy(),
+							otc.getUnSegmentedContentCopy(), 
+							true, false, null, newTu);
+					otc.setContent(atf);
+					
 					if (params.isCopyToTarget()) {
-						newTu.setTarget(targetLocale, t);
+						newTu.setTarget(targetLocale, otc);
 					}
 
 					// make an AltTranslation and attach to the target container
 					AltTranslation alt = new AltTranslation(sourceLocale, targetLocale, 
 							newTu.getSource().getUnSegmentedContentCopy(), 
-							oldTu.getSource().getUnSegmentedContentCopy(), t.getFirstContent(), 
+							oldTu.getSource().getUnSegmentedContentCopy(), 
+							otc.getUnSegmentedContentCopy(), 
 							params.getFuzzyThreshold() >= 100 ? MatchType.EXACT_PREVIOUS_VERSION
 									: MatchType.FUZZY_PREVIOUS_VERSION, score, getName());
 									
 					// add the annotation to the target container since we are diffing paragraphs only
 					// we may need to create the target if it doesn't exist
-					TextContainer tc = newTu.createTarget(targetLocale, false, IResource.COPY_PROPERTIES);
-					AltTranslationsAnnotation alta = TextUnitUtil.addAltTranslation(tc, alt);
+					TextContainer ntc = newTu.createTarget(targetLocale, false, IResource.COPY_PROPERTIES);
+					AltTranslationsAnnotation alta = TextUnitUtil.addAltTranslation(ntc, alt);
 					// resort AltTranslation in case we already had some in  the list
 					alta.sort();
 				}

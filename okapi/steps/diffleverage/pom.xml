@@ -31,15 +31,21 @@
         <dependency>
 			<groupId>net.sf.okapi.steps</groupId>
 			<artifactId>okapi-step-common</artifactId>
-			<version>0.10-SNAPSHOT</version>
-			<scope>compile</scope>
+			<version>${project.version}</version>
+			<scope>test</scope>
 		</dependency>
 		   
         <dependency>
 			<groupId>net.sf.okapi.filters</groupId>
 			<artifactId>okapi-filter-po</artifactId>
-			<version>0.10-SNAPSHOT</version>
-			<scope>compile</scope>
-		</dependency>       
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>		
+		<dependency>
+			<groupId>net.sf.okapi.filters</groupId>
+			<artifactId>okapi-filter-html</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>              
     </dependencies>
 </project>
