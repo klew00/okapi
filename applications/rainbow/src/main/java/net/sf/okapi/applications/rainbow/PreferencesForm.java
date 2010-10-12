@@ -20,9 +20,12 @@
 
 package net.sf.okapi.applications.rainbow;
 
+import java.io.File;
+
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
+import net.sf.okapi.common.ui.TextAndBrowsePanel;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.common.ui.UserConfiguration;
 
@@ -49,6 +52,7 @@ class PreferencesForm {
 	private Button chkAllowDuplicateInputs;
 	private Combo cbLogLevel;
 	private UserConfiguration config;
+	private TextAndBrowsePanel pnlDropinsDir;
 
 	PreferencesForm (Shell p_Parent,
 		IHelp helpParam)
@@ -99,6 +103,19 @@ class PreferencesForm {
 		cbLogLevel.add(Res.getString("PreferencesForm.logFiner")); //$NON-NLS-1$
 		cbLogLevel.add(Res.getString("PreferencesForm.logFinest")); //$NON-NLS-1$
 		
+		grpTmp = new Group(shell, SWT.NONE);
+		grpTmp.setText("Plugins Location");
+		grpTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
+		grpTmp.setLayout(new GridLayout(1, false));
+		
+		label = new Label(grpTmp, SWT.NONE);
+		label.setText("Enter the directory for the plugins (leave empty to use the default)");
+		pnlDropinsDir = new TextAndBrowsePanel(grpTmp, SWT.NONE, true);
+		pnlDropinsDir.setTitle("Select the Plugins Location");
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.minimumWidth = 500;
+		pnlDropinsDir.setLayoutData(gdTmp);
+
 		SelectionAdapter OKCancelActions = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
@@ -135,6 +152,7 @@ class PreferencesForm {
 		this.config = config;
 		chkAlwaysOpenLog.setSelection(config.getBoolean(MainForm.OPT_ALWAYSOPENLOG));
 		chkAllowDuplicateInputs.setSelection(config.getBoolean(MainForm.OPT_ALLOWDUPINPUT));
+		
 		int n = config.getInteger(MainForm.OPT_LOADMRU);
 		if ( n == 1 ) rdStartPrjAsk.setSelection(true);
 		else if ( n == 2 ) rdStartPrjLoad.setSelection(true);
@@ -142,12 +160,38 @@ class PreferencesForm {
 		n = config.getInteger(MainForm.OPT_LOGLEVEL);
 		if (( n < 0 ) || ( n > 3)) n = 0;
 		cbLogLevel.select(n);
+		
+		String tmp = config.getProperty(MainForm.OPT_DROPINSDIR, "");
+		if ( tmp.endsWith("/") || tmp.endsWith("\\") ) {
+			tmp = tmp.substring(0, tmp.length()-1);
+		}
+		pnlDropinsDir.setText(tmp);
 	}
 
 	private boolean saveData () {
 		try {
+			String tmp = pnlDropinsDir.getText().trim();
+			if ( tmp.length() > 0 ) {
+				if ( tmp.endsWith("/") || tmp.endsWith("\\") ) {
+					tmp = tmp.substring(0, tmp.length()-1);
+				}
+				File file = new File(tmp);
+				if ( !file.exists() ) {
+					Dialogs.showError(shell, "The directory for the plugins does not exists.", null);
+					pnlDropinsDir.setFocus();
+					return false;
+				}
+				if ( !file.isDirectory() ) {
+					Dialogs.showError(shell, "The path for the plugins location is not a directory.", null);
+					pnlDropinsDir.setFocus();
+					return false;
+				}
+			}
+			config.setProperty(MainForm.OPT_DROPINSDIR, tmp);
+			
 			config.setProperty(MainForm.OPT_ALWAYSOPENLOG, chkAlwaysOpenLog.getSelection());
 			config.setProperty(MainForm.OPT_ALLOWDUPINPUT, chkAllowDuplicateInputs.getSelection());
+			
 			if ( rdStartPrjAsk.getSelection() ) config.setProperty(MainForm.OPT_LOADMRU, 1);
 			else if ( rdStartPrjLoad.getSelection() ) config.setProperty(MainForm.OPT_LOADMRU, 2);
 			else config.setProperty(MainForm.OPT_LOADMRU, 0);

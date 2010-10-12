@@ -71,6 +71,7 @@ import net.sf.okapi.common.ui.ResourceManager;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.common.ui.UserConfiguration;
 import net.sf.okapi.common.ui.filters.FilterConfigurationsDialog;
+import net.sf.okapi.common.ui.plugins.PluginsManagerDialog;
 import net.sf.okapi.common.plugins.PluginsManager;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.lib.ui.editor.PairEditorUserTest;
@@ -128,6 +129,7 @@ public class MainForm { //implements IParametersProvider {
 	public static final String OPT_BOUNDS = "bounds"; //$NON-NLS-1$
 	public static final String OPT_LOGLEVEL = "logLevel"; //$NON-NLS-1$
 	public static final String OPT_ALWAYSOPENLOG = "alwaysOpenLog"; //$NON-NLS-1$
+	public static final String OPT_DROPINSDIR = "dropinsDir"; //$NON-NLS-1$
 	
 	protected static final String PRJPIPELINEID = "currentProjectPipeline"; //$NON-NLS-1$
 	protected static final String NOEXPAND_EXTENSIONS = ";.pentm;"; //$NON-NLS-1$
@@ -144,6 +146,7 @@ public class MainForm { //implements IParametersProvider {
 	private String sharedFolder;
 	private BaseHelp help;
 	private Project prj;
+	private PluginsManager pm;
 	private PipelineWrapper wrapper; 
 	private StatusBar statusBar;
 	private TabFolder tabFolder;
@@ -252,6 +255,16 @@ public class MainForm { //implements IParametersProvider {
 		}
 	}
 
+	public String getDropinsDirectory () {
+		String tmp = config.getProperty(OPT_DROPINSDIR, "");
+		if ( tmp.endsWith("/") || tmp.endsWith("\\") ) {
+			tmp = tmp.substring(0, tmp.length()-1);
+		}
+		if ( tmp.length() > 0 ) return tmp;
+		// Else: Use default
+		return appRootFolder+File.separator+"dropins";
+	}
+	
 	private void createContent ()
 		throws Exception
 	{
@@ -281,10 +294,8 @@ public class MainForm { //implements IParametersProvider {
 		// Get pre-defined configurations
 		DefaultFilters.setMappings(fcMapper, false, true);
 		// Discover and add plug-ins
-		PluginsManager mgt = new PluginsManager();
-		mgt.discover(new File(appRootFolder+File.separator+"dropins"), true);
-		fcMapper.addFromPlugins(mgt);
-		customFilterConfigsNeedUpdate = true;
+		pm = new PluginsManager();
+		updatePluginsAndDependencies();
 		
 		// Toolbar
 		createToolbar();
@@ -566,13 +577,21 @@ public class MainForm { //implements IParametersProvider {
 			}
 		});
 
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "tools.pluginsmanager"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				pluginsManager();
+			}
+		});
+
 		//=== For user test
 		new MenuItem(dropMenu, SWT.SEPARATOR);
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
-		menuItem.setText("FOR TESTERS - Test Fragment Editor");
+		menuItem.setText("FOR TESTERS");
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				runFragmentEditorTestingConsole();
+				runTestingConsole();
 			}
 		});
 		//=== end of block for user test
@@ -1074,6 +1093,20 @@ public class MainForm { //implements IParametersProvider {
 		}
 	}
 
+	private void updatePluginsAndDependencies () {
+		// Re-discover the plugins
+		pm.discover(new File(getDropinsDirectory()), true);
+		
+		// Update the filters
+		fcMapper.addFromPlugins(pm); //TODO: Need to remove as well!!!
+		customFilterConfigsNeedUpdate = true;
+		
+		// Update the steps
+		if ( wrapper != null ) {
+			wrapper.refreshAvailableStepsList();
+		}
+	}
+	
 	private void setLogLevel () {
 		int n = config.getInteger(MainForm.OPT_LOGLEVEL);
 		switch ( n ) {
@@ -1222,7 +1255,7 @@ public class MainForm { //implements IParametersProvider {
 			saveSurfaceData();
 			updateCustomConfigurations();
 			if ( wrapper == null ) {
-				wrapper = new PipelineWrapper(fcMapper, appRootFolder, prj.getProjectFolder(), shell);
+				wrapper = new PipelineWrapper(fcMapper, appRootFolder, pm, prj.getProjectFolder(), shell);
 			}
 
 			if ( predefinedPipeline == null ) {
@@ -1729,7 +1762,10 @@ public class MainForm { //implements IParametersProvider {
 			PreferencesForm dlg = new PreferencesForm(shell, help);
 			dlg.setData(config);
 			dlg.showDialog();
+			
+			// Update dependent data
 			setLogLevel();
+			updatePluginsAndDependencies();
 		}
 		catch ( Exception e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
@@ -2243,13 +2279,11 @@ public class MainForm { //implements IParametersProvider {
 		}
 	}
 	
-	private void runFragmentEditorTestingConsole () {
+	private void runTestingConsole () {
 		PairEditorUserTest dlg = null;
 		try {
 			saveSurfaceData();
-			// Create the dialog
 			dlg = new PairEditorUserTest(shell, fcMapper, true);
-			// Start the dialog
 			dlg.showDialog();
 		}
 		catch ( Throwable e ) {
@@ -2265,9 +2299,23 @@ public class MainForm { //implements IParametersProvider {
 			saveSurfaceData();
 			updateCustomConfigurations();
 			FilterConfigurationsDialog dlg = new FilterConfigurationsDialog(shell, false, fcMapper, help); 
-			//FilterConfigMapperDialog dlg = new FilterConfigMapperDialog(shell, false, prj, fcMapper, help);
 			updateCustomConfigurations();
 			dlg.showDialog(null);
+		}
+		catch ( Exception e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+	}
+	
+	private void pluginsManager () {
+		try {
+			saveSurfaceData();
+			File dir = new File(getDropinsDirectory());
+			PluginsManagerDialog dlg = new PluginsManagerDialog(shell, help, dir, null);
+			if ( !dlg.showDialog() ) return; // Nothing was changed
+			// Otherwise; make sure to update the dependencies
+	//TODO: update pm dependant objects
+			pm.discover(dir, false);
 		}
 		catch ( Exception e ) {
 			Dialogs.showError(shell, e.getMessage(), null);

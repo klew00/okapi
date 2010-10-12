@@ -54,19 +54,21 @@ public class PluginsManager {
 	/**
 	 * Explores the given file or directory for plug-ins and add them to
 	 * this manager.
-	 * @param input the directory or file to inspect. If a directory
-	 * is specified, all .jar files of that directory will be inspected.
-	 * If the specified file or directory does not exist, nothing happens.
+	 * @param pluginsDir the directory where the plugins are located.
 	 * @param append true to preserve any plug-ins already existing in this
 	 * manager, false to reset and start with no plug-in.
 	 */
-	public void discover (File input,
+	public void discover (File pluginsDir,
 		boolean append)
 	{
 		try {
 			if ( plugins == null ) {
 				plugins = new ArrayList<PluginItem>();
 			}
+			
+			if ( pluginsDir == null ) return;
+			if ( !pluginsDir.isDirectory() ) return;
+
 			ArrayList<URL> existingUrls = new ArrayList<URL>();
 			if ( append && ( urls != null )) {
 				existingUrls.addAll(urls);
@@ -74,15 +76,17 @@ public class PluginsManager {
 			urls = new ArrayList<URL>();
 			loader = null;
 	
-			// Inspect either all the .jar files if input is a directory
-			if ( input.isDirectory() ) {
-				File[] files = input.listFiles(new DefaultFilenameFilter(".jar"));
+			// Inspect all the first level sub-directories in the plugins folder
+			// The plugins directory should have just plugins sub-directories entries
+			File[] dirs = pluginsDir.listFiles();
+			for ( File dir : dirs ) {
+				// Skip over any file at that level
+				if ( !dir.isDirectory() ) continue;
+				// Else explore all .jar just under the sub-folder
+				File[] files = dir.listFiles(new DefaultFilenameFilter(".jar"));
 				for ( File file : files ) {
 					inspectFile(file);
 				}
-			}
-			else { // Or inspect the given file itself
-				inspectFile(input);
 			}
 
 			// Add existing URLs, make sure they are unique 
@@ -129,18 +133,23 @@ public class PluginsManager {
 									item1.editorDescriptionProvider = new ClassInfo(item2.className, loader);
 								}
 							}
+							cls2 = null; // Try to help unlocking the file
 							break;
 						}
 					}
 					break;
 				}
+				cls1 = null; // Try to help unlocking the file
 			}
 		}
-		catch (ClassNotFoundException e) {
+		catch ( ClassNotFoundException e ) {
 			throw new RuntimeException("Class not found", e);
 		}
 		catch ( SecurityException e ) {
 			throw new RuntimeException("Error when looking for getParameters() method.", e);
+		}
+		finally {
+			System.gc(); // Try freeing locks as soon as possible
 		}
 	}
 	
@@ -193,13 +202,15 @@ public class PluginsManager {
 			// Introspect the classes
 			JarInputStream jarFile = new JarInputStream(new FileInputStream(file));
 			JarEntry entry;
+			Class<?> cls = null;
 			while ( true ) {
+				cls = null; // Try to help unlocking the file
 				if ( (entry = jarFile.getNextJarEntry()) == null ) break;
 				String name = entry.getName();
 				if ( name.endsWith(".class") ) {
 					name = name.substring(0, name.length()-6).replace('/', '.');
 					try {
-						Class<?> cls = Class.forName(name, false, loader);
+						cls = Class.forName(name, false, loader);
 						// Skip interfaces
 						if ( cls.isInterface() ) continue;
 						// Skip abstract
@@ -241,6 +252,11 @@ public class PluginsManager {
 					}
 				}
 			}
+			if ( jarFile != null ) {
+				jarFile.close();
+				jarFile = null;
+			}
+			loader = null; // Try to help unlocking the file
 		}
 		catch ( IOException e ) {
 			throw new RuntimeException("IO error when inspecting a file for plugins.", e);

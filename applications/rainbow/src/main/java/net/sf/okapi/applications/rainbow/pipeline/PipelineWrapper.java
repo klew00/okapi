@@ -56,7 +56,32 @@ public class PipelineWrapper {
 	private IPipelineDriver driver;
 	private IFilterConfigurationMapper fcMapper;
 	private IParametersEditorMapper peMapper;
+	private PluginsManager pm;
 
+	public PipelineWrapper (IFilterConfigurationMapper fcMapper,
+		String appFolder,
+		PluginsManager pm,
+		String rootDir,
+		Object uiParent)
+	{
+		this.fcMapper = fcMapper;
+		this.pm = pm;
+		steps = new ArrayList<StepInfo>();
+		driver = new PipelineDriver();
+		driver.setFilterConfigurationMapper(this.fcMapper);
+		driver.setRootDirectory(rootDir);
+		driver.setUIParent(uiParent);
+		
+		refreshAvailableStepsList();
+	}
+	
+	public void refreshAvailableStepsList () {
+		// Hard-wired steps
+		buildStepList();
+		// Discover and add plug-ins
+		addFromPlugins(pm);
+	}
+	
 	public void addFromPlugins (PluginsManager pm) {
 		try {
 			List<PluginItem> plugins = pm.getList();
@@ -209,14 +234,14 @@ public class PipelineWrapper {
 			availableSteps.put(step.id, step);
 
 			ps = (IPipelineStep)Class.forName(
-				"net.sf.okapi.steps.copysourcetotarget.CopySourceToTargetStep").newInstance();
+				"net.sf.okapi.steps.common.createtarget.CreateTargetStep").newInstance();
 			params = ps.getParameters();
 			step = new StepInfo(ps.getClass().getSimpleName(),
 				ps.getName(), ps.getDescription(), ps.getClass().getName(), null,
 				params.getClass().getName());
 			if ( params != null ) {
 				step.paramsData = params.toString();
-				peMapper.addDescriptionProvider("net.sf.okapi.steps.copysourcetotarget.Parameters", step.paramsClass);
+				peMapper.addDescriptionProvider("net.sf.okapi.steps.common.createtarget.Parameters", step.paramsClass);
 			}
 			availableSteps.put(step.id, step);
 
@@ -502,17 +527,18 @@ public class PipelineWrapper {
 			}
 			availableSteps.put(step.id, step);
 
-			ps = (IPipelineStep)Class.forName(
-				"net.sf.okapi.steps.xmlvalidation.XMLValidationStep").newInstance();
-			params = ps.getParameters();
-			step = new StepInfo(ps.getClass().getSimpleName(),
-				ps.getName(), ps.getDescription(), ps.getClass().getName(), null,
-				params.getClass().getName());
-			if ( params != null ) {
-				step.paramsData = params.toString();
-				peMapper.addDescriptionProvider("net.sf.okapi.steps.xmlvalidation.Parameters", step.paramsClass);
-			}
-			availableSteps.put(step.id, step);
+//TEST as plugin
+//			ps = (IPipelineStep)Class.forName(
+//				"net.sf.okapi.steps.xmlvalidation.XMLValidationStep").newInstance();
+//			params = ps.getParameters();
+//			step = new StepInfo(ps.getClass().getSimpleName(),
+//				ps.getName(), ps.getDescription(), ps.getClass().getName(), null,
+//				params.getClass().getName());
+//			if ( params != null ) {
+//				step.paramsData = params.toString();
+//				peMapper.addDescriptionProvider("net.sf.okapi.steps.xmlvalidation.Parameters", step.paramsClass);
+//			}
+//			availableSteps.put(step.id, step);
 			
 			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.xsltransform.XSLTransformStep").newInstance();
@@ -564,27 +590,6 @@ public class PipelineWrapper {
 		catch ( ClassNotFoundException e ) {
 			LOGGER.warning("Step class not found.\n" + e.getMessage());
 		}		
-	}
-	
-	public PipelineWrapper (IFilterConfigurationMapper fcMapper,
-		String appFolder,
-		String rootDir,
-		Object uiParent)
-	{
-		this.fcMapper = fcMapper;
-		steps = new ArrayList<StepInfo>();
-		driver = new PipelineDriver();
-		driver.setFilterConfigurationMapper(this.fcMapper);
-		driver.setRootDirectory(rootDir);
-		driver.setUIParent(uiParent);
-		
-		// Hard-wired steps
-		buildStepList();
-
-		// Discover and add plug-ins
-		PluginsManager mgt = new PluginsManager();
-		mgt.discover(new File(appFolder+File.separator+"dropins"), true);
-		addFromPlugins(mgt);
 	}
 	
 	public void clear () {

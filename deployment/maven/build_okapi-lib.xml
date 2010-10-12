@@ -188,8 +188,6 @@
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi/steps/common/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../okapi/steps/copysourcetotarget/target/classes"
-			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi/steps/diffleverage/target/classes"
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi/steps/encodingconversion/target/classes"

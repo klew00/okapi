@@ -1,0 +1,492 @@
+/*===========================================================================
+  Copyright (C) 2010 by the Okapi Framework contributors
+-----------------------------------------------------------------------------
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
+
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+===========================================================================*/
+
+package net.sf.okapi.common.ui.plugins;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import net.sf.okapi.common.IHelp;
+import net.sf.okapi.common.Util;
+import net.sf.okapi.common.ui.ClosePanel;
+import net.sf.okapi.common.ui.Dialogs;
+import net.sf.okapi.common.ui.UIUtil;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.Text;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+
+/**
+ * Dialog to manage plugins.
+ */
+public class PluginsManagerDialog {
+	
+	private final static int BUFFERSIZE = 2048;
+	
+	private Shell shell;
+	private IHelp help;
+	private Text edURL;
+	private Button btRefreshURL;
+	private Text edDir;
+	private Button btInstall;
+	private Button btRemove;
+	private TableModel modAvailable;
+	private Table tblAvailable;
+	private TableModel modCurrent;
+	private Table tblCurrent;
+	private URL repository;
+	private File dropinsDir;
+	private Label stStatus;
+	private boolean actionHasBeenCalled = false;
+
+	/**
+	 * Creates a new PluginsManagerDialog object.
+	 * @param parent the parent of this dialog.
+	 * @param helpParam the help engine.
+	 * @param dropinsDir the directory where the plugins are located.
+	 * @param repository the URL of the repository where the available plugins are located.
+	 * Use null to use the default remote repository.
+	 */
+	public PluginsManagerDialog (Shell parent,
+		IHelp helpParam,
+		File dropinsDir,
+		URL repository)
+	{
+		this.repository = repository;
+		this.dropinsDir = dropinsDir;
+		help = helpParam;
+		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
+		shell.setText("Plugins Manager");
+		UIUtil.inheritIcon(shell, parent);
+		shell.setLayout(new GridLayout());
+		final int longButtonsWidth = 200;
+
+		//--- Current plugins group
+		
+		Group grpCurrent = new Group(shell, SWT.NONE);
+		grpCurrent.setText("Plugins Currently Installed");
+		GridData gdTmp = new GridData(GridData.FILL_BOTH);
+		grpCurrent.setLayoutData(gdTmp);
+		grpCurrent.setLayout(new GridLayout(2, false));
+
+		tblCurrent = createTable(false, grpCurrent, 2);
+		modCurrent = new TableModel(tblCurrent, false);
+
+		btRemove = UIUtil.createGridButton(grpCurrent, SWT.PUSH, "Remove Checked Plugins...", longButtonsWidth, 1);
+		btRemove.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				remove();
+			}
+		});
+
+		edDir = new Text(grpCurrent, SWT.BORDER);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		edDir.setLayoutData(gdTmp);
+		edDir.setEditable(false);
+		
+		//--- Remote plugins group
+		
+		Group grpAvailable = new Group(shell, SWT.NONE);
+		grpAvailable.setText("Plugins Available for Installation");
+		gdTmp = new GridData(GridData.FILL_BOTH);
+		grpAvailable.setLayoutData(gdTmp);
+		grpAvailable.setLayout(new GridLayout(2, false));
+
+		edURL = new Text(grpAvailable, SWT.BORDER);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		edURL.setLayoutData(gdTmp);
+		
+		btRefreshURL = UIUtil.createGridButton(grpAvailable, SWT.PUSH, "Refresh", UIUtil.BUTTON_DEFAULT_WIDTH, 1);
+		btRefreshURL.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				refresh();
+			}
+		});
+
+		tblAvailable = createTable(true, grpAvailable, 2);
+		modAvailable = new TableModel(tblAvailable, true);
+
+		btInstall = UIUtil.createGridButton(grpAvailable, SWT.PUSH, "Install Checked Plugins...", longButtonsWidth, 2);
+		btInstall.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				install();
+			}
+		});
+		
+		// Status
+		stStatus = new Label(shell, SWT.NONE);
+		stStatus.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_CENTER));
+		
+		//--- Bottom buttons
+		SelectionAdapter CloseActions = new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
+					if ( help != null ) help.showWiki("Plugins Manager");
+					return;
+				}
+				if ( e.widget.getData().equals("c") ) {//$NON-NLS-1$
+					shell.close();
+				}
+			};
+		};
+		ClosePanel pnlActions = new ClosePanel(shell, SWT.NONE, CloseActions, true);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		pnlActions.setLayoutData(gdTmp);
+		
+		shell.pack();
+		Rectangle rect = shell.getBounds();
+		shell.setMinimumSize(rect.width, rect.height);
+		if ( rect.width < 750 ) rect.width = 750;
+		if ( rect.height < 480 ) rect.height = 480;
+		shell.setSize(rect.width, rect.height);
+		Dialogs.centerWindow(shell, parent);
+
+		setData();
+	}
+
+	/**
+	 * Opens the dialog box. All the removal/installation is done while the dialog box is opened.
+	 * The caller is responsible for updating any objects dependent on the plugins directory that
+	 * was passed as argument.
+	 * @return true if any remove or install operation has been called (even if they failed).
+	 */
+	public boolean showDialog () {
+		shell.open();
+		while ( !shell.isDisposed() ) {
+			if ( !shell.getDisplay().readAndDispatch() )
+				shell.getDisplay().sleep();
+		}
+		return actionHasBeenCalled;
+	}
+	
+	private Table createTable (boolean maxMode,
+		Composite parent,
+		int horizontalSpan)
+	{
+		final Table table = new Table(parent, SWT.BORDER | SWT.FULL_SELECTION | SWT.CHECK);
+		GridData gdTmp = new GridData(GridData.FILL_BOTH);
+		gdTmp.horizontalSpan = horizontalSpan;
+		gdTmp.minimumHeight = 40;
+		gdTmp.minimumWidth = 350;
+		table.setLayoutData(gdTmp);
+		table.setHeaderVisible(true);
+		table.setLinesVisible(true);
+
+		if ( maxMode ) {
+			table.addControlListener(new ControlAdapter() {
+			    public void controlResized(ControlEvent e) {
+			    	Rectangle rect = table.getClientArea();
+					int part = (int)(rect.width / 100);
+					int remain = (int)(rect.width % 100);
+					table.getColumn(0).setWidth(remain+(part*60));
+					table.getColumn(1).setWidth(part*30);
+					table.getColumn(2).setWidth(part*10);
+			    }
+			});
+		}
+		else {
+			table.addControlListener(new ControlAdapter() {
+			    public void controlResized(ControlEvent e) {
+			    	Rectangle rect = table.getClientArea();
+		    		table.getColumn(0).setWidth(rect.width);
+			    }
+			});
+		}
+		
+		return table;
+	}
+	
+	private void setStatus (String text) {
+		if ( text == null ) stStatus.setText("");
+		else stStatus.setText(text);
+		
+		// Would expect calling:
+		// stStatus.redraw(); stStatus.update()
+		// to update the status text, but it seem we have to
+		// call layout() on the parent, and update() on the display
+		// layout() causes controls to resize: annoying
+		shell.layout();
+		Display.getCurrent().update();
+	}
+	
+	private void setData () {
+		//String tmp = "http://okapi.opentag.com/plugins"; // Default
+		String tmp = "file:///C:/OkapiJava/trunk/TestPlugins";
+		if ( repository != null ) {
+			tmp = repository.toString();
+		}
+		edURL.setText(tmp);
+		edDir.setText(dropinsDir.getPath());
+		refreshCurrentPlugins();
+	}
+
+	private void refresh () {
+		try {
+			setStatus("Refreshing lists...");
+			// Get the list of all current plugins
+			refreshCurrentPlugins();
+
+			// Get the URL of the repository
+			String tmp = edURL.getText().trim();
+			if ( tmp.endsWith("/") ) tmp = tmp.substring(0, tmp.length()-1);
+			repository = new URL(tmp);
+			edURL.setText(tmp.toString()); // Proper form
+			
+			// Get the list of available plugins
+			int index = tblAvailable.getSelectionIndex();
+			URL url = new URL(repository + "/pluginsDeployment.xml");
+			modAvailable.updateTable(loadInfoList(url), index);
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+		finally {
+			setStatus(null);
+		}
+	}
+	
+	private void refreshCurrentPlugins () {
+		try {
+			int index = tblCurrent.getSelectionIndex();
+			ArrayList<PluginInfo> list = new ArrayList<PluginInfo>();
+			// Get the list of all current plugins
+			File[] files = dropinsDir.listFiles();
+			if ( files == null ) {
+				throw new RuntimeException(String.format("Invalid location for the installed plugins (%s)", dropinsDir));
+			}
+			for ( File file : files ) {
+				if ( file.isDirectory() ) {
+					list.add(new PluginInfo(file.getName(), null, null, null, 0));
+				}
+			}
+			modCurrent.updateTable(list, index);
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+	}
+
+	private List<String> getCheckedItems (Table table) {
+		// Gather the checked items
+		ArrayList<String> list = new ArrayList<String>();
+		for ( int i=0; i<table.getItemCount(); i++ ) {
+			if ( table.getItem(i).getChecked() ) {
+				list.add(table.getItem(i).getText(0));
+			}
+		}
+		return list;
+	}
+
+	private void install () {
+		boolean finalRefresh = false;
+		try {
+			// Get the list of plugins to install
+			List<String> list = getCheckedItems(tblAvailable);
+			if ( list.isEmpty() ) return;
+			
+			// Ask confirmation
+			MessageBox dlg = new MessageBox(shell, SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
+			dlg.setMessage("This command will install the plugins you have checked in the list.\n"
+				+"Do you want to proceed?");
+			dlg.setText("Installing Plugins");
+			if ( dlg.open() != SWT.YES ) return;
+
+			actionHasBeenCalled = true; // Something has been changed
+			// Install each plugin in the list
+			finalRefresh = true;
+			for ( String name : list ) {
+				installPlugin(name);
+			}
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+		finally {
+			setStatus(null);
+			if ( finalRefresh ) refresh();
+		}
+	}
+
+	private void remove () {
+		boolean finalRefresh = false;
+		try {
+			// Get the list of plugins to remove
+			List<String> list = getCheckedItems(tblCurrent);
+			if ( list.isEmpty() ) return;
+
+			// Ask confirmation
+			MessageBox dlg = new MessageBox(shell, SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
+			dlg.setMessage("This command will remove the plugins you have checked in the list.\n"
+				+"Do you want to proceed?");
+			dlg.setText("Removing Plugins");
+			if ( dlg.open() != SWT.YES ) return;
+
+			actionHasBeenCalled = true; // Something has been changed
+			// Remove each plugin in the list
+			finalRefresh = true;
+			for ( String name : list ) {
+				removePlugin(name);
+			}
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+		finally {
+			setStatus(null);
+			if ( finalRefresh ) refresh();
+		}
+		
+	}
+	
+	private void removePlugin (String pluginName) {
+		try {
+			setStatus(String.format("Removing %s...", pluginName));
+			// Compute the directory of the plugin
+			String subDir = dropinsDir + "/" + pluginName;
+			// Delete it (content and the directory itself)
+			Util.deleteDirectory(subDir, false);
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+	}
+
+	private void installPlugin (String pluginName) {
+		ZipInputStream zis = null;
+		FileOutputStream fos = null;
+		BufferedOutputStream bos = null;
+		try {
+			setStatus(String.format("Installing %s...", pluginName));
+			// Compute the plugin sub-directory
+			String subDir = dropinsDir + "/" + pluginName + "/";
+			
+			// Get the zip file corresponding to the plugin
+			URL url = new URL(repository+"/"+pluginName+".zip");
+			URLConnection urlConnection = url.openConnection();
+			zis = new ZipInputStream(new BufferedInputStream(urlConnection.getInputStream()));
+			ZipEntry entry = null;
+
+			// Unzip each component of the zip file into the sub-directory
+			int count;
+			byte data[] = new byte[BUFFERSIZE];
+			while (( entry = zis.getNextEntry() ) != null ) {
+				String outPath = subDir + entry.getName();
+				// Make sure to create the proper directories as needed
+				Util.createDirectories(outPath);
+				// Unzip
+				fos = new FileOutputStream(outPath);
+				bos = new BufferedOutputStream(fos, BUFFERSIZE);
+	            while (( count = zis.read(data, 0, BUFFERSIZE) ) != -1 ) {
+	            	bos.write(data, 0, count);
+	            }
+	            bos.flush();
+	            bos.close();
+	            fos.close();
+			}
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+		finally {
+			if ( zis != null ) {
+				try {
+					zis.close();
+				}
+				catch ( IOException e ) {
+					// Discard error
+				}
+			}
+		}
+	}
+	
+	private List<PluginInfo> loadInfoList (URL url) {
+		ArrayList<PluginInfo> list = new ArrayList<PluginInfo>();
+		try {
+			DocumentBuilderFactory Fact = DocumentBuilderFactory.newInstance();
+			Fact.setValidating(false);
+			
+			URLConnection urlConnection = url.openConnection();
+			Document doc = Fact.newDocumentBuilder().parse(urlConnection.getInputStream());
+			
+			Element rootElem = doc.getDocumentElement();
+			if ( !rootElem.getNodeName().equals("pluginsDeployment") ) { //$NON-NLS-1$
+				throw new RuntimeException("Invalid description file.");
+			}
+			
+			NodeList nodes = doc.getElementsByTagName("plugin");
+			Element elem;
+			for ( int i=0; i<nodes.getLength(); i++ ) {
+				elem = (Element)nodes.item(i);
+				String name = elem.getAttribute("name");
+				if ( Util.isEmpty(name) ) {
+					throw new RuntimeException("Invalid description file: missing name attribute.");
+				}
+				String description = null;
+				
+				String tmp = elem.getAttribute("size");
+				int size = 0;
+				if ( !Util.isEmpty(tmp) ) {
+					try {
+						size = Integer.parseInt(tmp);
+					}
+					catch ( NumberFormatException e ) {
+						size = 0;
+					}
+				}
+				
+				list.add(new PluginInfo(name, elem.getAttribute("provider"), description, elem.getAttribute("helpURL"), size));
+			}
+			
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+		return list;
+	}
+	
+}

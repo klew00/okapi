@@ -313,11 +313,6 @@
 		</dependency>
 	 	<dependency>
 			<groupId>net.sf.okapi.steps</groupId>
-			<artifactId>okapi-step-copysourcetotarget</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-	 	<dependency>
-			<groupId>net.sf.okapi.steps</groupId>
 			<artifactId>okapi-step-qualitycheck</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -403,11 +398,12 @@
 			<artifactId>okapi-step-xliffsplitter</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
+<!--TEST as plugin		<dependency>
 			<groupId>net.sf.okapi.steps</groupId>
 			<artifactId>okapi-step-xmlvalidation</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+-->
 		<dependency>
 			<groupId>net.sf.okapi.steps</groupId>
 			<artifactId>okapi-step-idbasedaligner</artifactId>

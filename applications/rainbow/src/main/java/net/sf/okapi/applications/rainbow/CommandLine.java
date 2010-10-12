@@ -58,6 +58,7 @@ public class CommandLine {
 	private String optionsFile;
 	private boolean promptForOptions = true;
 	private BaseHelp help;
+	private PluginsManager pm;
 	
 	public void execute (Shell shell,
 		String[] args)
@@ -233,9 +234,9 @@ public class CommandLine {
 		// Get pre-defined configurations
 		DefaultFilters.setMappings(fcMapper, false, true);
 		// Discover and add plug-ins
-		PluginsManager mgt = new PluginsManager();
-		mgt.discover(new File(appRootFolder+File.separator+"dropins"), true);
-		fcMapper.addFromPlugins(mgt);
+		pm = new PluginsManager();
+		pm.discover(new File(appRootFolder+File.separator+"dropins"), true);
+		fcMapper.addFromPlugins(pm);
 
 		utilitiesAccess = new UtilitiesAccess();
 		utilitiesAccess.loadMenu(sharedFolder+File.separator+"rainbowUtilities.xml");
@@ -279,7 +280,7 @@ public class CommandLine {
 		// Save any pending data
 		fcMapper.setCustomConfigurationsDirectory(prj.getParametersFolder());
 		fcMapper.updateCustomConfigurations();
-		PipelineWrapper wrapper = new PipelineWrapper(fcMapper, appRootFolder, prj.getParametersFolder(), null);
+		PipelineWrapper wrapper = new PipelineWrapper(fcMapper, appRootFolder, pm, prj.getParametersFolder(), null);
 
 		IPredefinedPipeline predefinedPipeline = null;
 		
