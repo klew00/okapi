@@ -332,7 +332,7 @@ public class PipelineEditor {
 
 		edDescription = new Text(cmpTmp, SWT.WRAP | SWT.BORDER | SWT.V_SCROLL);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.heightHint = 36;
+		gdTmp.heightHint = 48; //36;
 		gdTmp.horizontalSpan = 3;
 		edDescription.setLayoutData(gdTmp);
 		edDescription.setEditable(false);
@@ -380,8 +380,8 @@ public class PipelineEditor {
 	private void updateStepDisplay () {
 		int n = lbSteps.getSelectionIndex();
 		Control ctrl = ((StackLayout)optionsHolder.getLayout()).topControl;
+		edDescription.setText(""); // Reset so content does not affect layout
 		if ( n < 0 ) {
-			edDescription.setText("");
 			if ( predefined == null ) {
 				btAddStep.setEnabled(true);
 				btRemoveStep.setEnabled(false);
@@ -398,7 +398,6 @@ public class PipelineEditor {
 			return; 
 		}
 		StepInfo step = workSteps.get(n);
-		edDescription.setText(step.description);
 		if ( predefined == null ) {
 			btAddStep.setEnabled(true);
 			btRemoveStep.setEnabled(true);
@@ -435,6 +434,9 @@ public class PipelineEditor {
 				//shell.setMinimumSize(minSize);
 			}
 		}
+		// Set the description last to avoid that long text
+		// to cause too wide resizing.
+		edDescription.setText(step.description);
 	}
 	
 	private void populate (int index) {
