@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rainbowPipeline version="1"><step class="net.sf.okapi.steps.common.RawDocumentToFilterEventsStep"></step>
-<step class="net.sf.okapi.steps.copysourcetotarget.CopySourceToTargetStep">#v1
+<step class="net.sf.okapi.steps.common.createtarget.CreateTargetStep">#v1
 copyProperties.b=true
 copyContent.b=true
 overwriteExisting.b=false</step>

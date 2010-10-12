@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rainbowProject version="4"><fileSet id="1"><root useCustom="0">C:/Users/Yves</root><fi fs="okf_html" fo="" se="" te="">input01.html</fi></fileSet><fileSet id="2"><root useCustom="0">C:/Users/Yves</root></fileSet><fileSet id="3"><root useCustom="0">C:/Users/Yves</root></fileSet><output><root use="0"></root><subFolder use="0"></subFolder><extension use="1" style="0">.out</extension><replace use="0" oldText="" newText=""></replace><prefix use="0"></prefix><suffix use="0"></suffix></output><options sourceLanguage="en-us" sourceEncoding="UTF-8" targetLanguage="fr-fr" targetEncoding="UTF-8"></options><parametersFolder useCustom="0">C:/Users/Yves</parametersFolder><utilities xml:spaces="preserve"><params id="currentProjectPipeline">&lt;?xml version="1.0" encoding="UTF-8"?>
 &lt;rainbowPipeline version="1">&lt;step class="net.sf.okapi.steps.common.RawDocumentToFilterEventsStep">&lt;/step>
-&lt;step class="net.sf.okapi.steps.copysourcetotarget.CopySourceToTargetStep">#v1
+&lt;step class="net.sf.okapi.steps.common.createtarget.CreateTargetStep">#v1
 copyProperties.b=true
 copyContent.b=true
 overwriteExisting.b=false&lt;/step>
