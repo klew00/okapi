@@ -36,9 +36,11 @@ import net.sf.okapi.steps.wordcount.common.TokenCountStep;
 @UsingParameters(Parameters.class)
 public class WordCountStep extends TokenCountStep {
 	
+	public static final String METRIC = GMX.TotalWordCount; 
+	
 	@Override
 	protected String getMetric() {		
-		return GMX.TotalWordCount;
+		return METRIC;
 	}
 
 	@Override

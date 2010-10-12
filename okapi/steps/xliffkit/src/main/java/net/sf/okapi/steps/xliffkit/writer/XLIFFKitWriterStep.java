@@ -32,7 +32,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
@@ -56,13 +55,12 @@ import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.persistence.IPersistenceSession;
-import net.sf.okapi.persistence.PersistenceSession;
-import net.sf.okapi.persistence.beans.v1.OkapiBeans;
+import net.sf.okapi.lib.persistence.IPersistenceSession;
+import net.sf.okapi.lib.persistence.PersistenceSession;
+import net.sf.okapi.lib.beans.v1.OkapiBeans;
 import net.sf.okapi.persistence.json.jackson.JSONPersistenceSession;
-import net.sf.okapi.steps.xliffkit.common.persistence.sessions.OkapiJsonSession;
+import net.sf.okapi.lib.beans.sessions.OkapiJsonSession;
 import net.sf.okapi.steps.xliffkit.opc.TKitRelationshipTypes;
-
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackagePart;

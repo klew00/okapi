@@ -25,9 +25,11 @@ import net.sf.okapi.steps.wordcount.common.AltAnnotationBasedCountStep;
 
 public class RepeatedSegmentExactMatchWordCountStep extends AltAnnotationBasedCountStep {
 
+	public static final String METRIC = "x-RepeatedSegmentExactMatchedWordCount"; 
+		
 	@Override
 	protected String getMetric() {
-		return "x-RepeatedSegmentExactMatchedWordCount";
+		return METRIC;
 	}
 
 	@Override

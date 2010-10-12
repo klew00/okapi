@@ -30,16 +30,16 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.resource.StartDocument;
-import net.sf.okapi.persistence.PersistenceSession;
-import net.sf.okapi.persistence.beans.v0.TestEvent;
-import net.sf.okapi.persistence.beans.v0.TestEventBean;
+import net.sf.okapi.lib.beans.v0.TestEvent;
+import net.sf.okapi.lib.beans.v0.TestEventBean;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
-import net.sf.okapi.steps.xliffkit.common.persistence.sessions.OkapiXmlSession;
+import net.sf.okapi.lib.beans.sessions.OkapiXmlSession;
 import net.sf.okapi.lib.extra.pipelinebuilder.XBatch;
 import net.sf.okapi.lib.extra.pipelinebuilder.XBatchItem;
 import net.sf.okapi.lib.extra.pipelinebuilder.XParameter;
 import net.sf.okapi.lib.extra.pipelinebuilder.XPipeline;
 import net.sf.okapi.lib.extra.pipelinebuilder.XPipelineStep;
+import net.sf.okapi.lib.persistence.PersistenceSession;
 
 
 import org.junit.Test;

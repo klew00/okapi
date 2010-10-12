@@ -26,9 +26,11 @@ import net.sf.okapi.steps.wordcount.common.GMX;
 
 public class LeveragedWordCountStep extends AltAnnotationBasedCountStep {
 
+	public static final String METRIC = GMX.LeveragedMatchedWordCount; 
+		
 	@Override
 	protected String getMetric() {
-		return GMX.LeveragedMatchedWordCount;
+		return METRIC;
 	}
 
 	@Override

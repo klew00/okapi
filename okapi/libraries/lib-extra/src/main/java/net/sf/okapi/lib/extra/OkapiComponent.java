@@ -42,12 +42,10 @@ public abstract class OkapiComponent extends Component implements IConfigurable 
 	}
 
 	public IParameters getParameters() {
-		
 		return params;
 	}
 	
 	public void setParameters(IParameters params) {
-		
 		this.params = (BaseParameters) params;
 		
 		if (params instanceof INotifiable)
@@ -64,7 +62,6 @@ public abstract class OkapiComponent extends Component implements IConfigurable 
 	}
 
 	protected <A> A getParameters(Class<A> expectedClass) {
-		
 		if (params == null) {
 			throw new OkapiBadFilterParametersException("Filter parameters object is null.");			
 		}
@@ -83,7 +80,6 @@ public abstract class OkapiComponent extends Component implements IConfigurable 
 	}
 
 	public String getParametersClassName() {
-		
 		return parametersClassName;
 	}
 

@@ -26,7 +26,7 @@ import java.util.logging.Logger;
 import net.sf.okapi.common.Util;
 
 /**
- * Base class for Okapi framework components like ports, filters and pipeline steps.
+ * 
  * 
  * @version 0.1 08.07.2009
  */
@@ -39,12 +39,10 @@ public class Component implements IComponent, INotifiable {
 	private final Logger logger = Logger.getLogger(this.getClass().getName());
 	
 	public Component() {
-		
 		super();		
 	}
 
 	public Component(String name, String description) {
-		
 		super();
 		
 		this.name = name;
@@ -52,35 +50,29 @@ public class Component implements IComponent, INotifiable {
 	}
 
 	protected void logMessage (Level level, String text) {
-		
 		if (logger != null)
 			logger.log(level, text);
 	}
 	
 	protected void setName(String name) {
-		
 		this.name = name;
 	}
 	
 	public String getName() {
-		
 		return name;
 	}
 	
 	protected void setDescription(String description) {
-		
 		this.description = description;
 	}
 
 	public String getDescription() {
-		
 		//return this.getClass().getName();
 		return description;
 	}
 
 	@Override
 	public String toString() {
-
 		if (!Util.isEmpty(name) && !Util.isEmpty(description))
 			return String.format("%s [%s]", name, description);
 		else if (!Util.isEmpty(name))
@@ -90,7 +82,6 @@ public class Component implements IComponent, INotifiable {
 	}
 
 	public boolean exec(Object sender, String command, Object info) {
-
 		return false;
 	}
 

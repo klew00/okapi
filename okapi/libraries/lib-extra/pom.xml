@@ -4,9 +4,10 @@
     <parent>
         <artifactId>build-libraries</artifactId>
         <groupId>net.sf.okapi.lib</groupId>
-        <version>0.10-SNAPSHOT</version>
+        <version>0.10-SNAPSHOT</version>        
     </parent>
     <modelVersion>4.0.0</modelVersion>
+    <groupId>net.sf.okapi.lib</groupId>
     <artifactId>okapi-lib-extra</artifactId>
     <name>Okapi Library with Helper Classes for Filters and Steps</name>
     <dependencies>
@@ -16,5 +17,26 @@
             <version>${project.version}</version>
         </dependency>
         
+        <dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-core-lgpl</artifactId>
+			<version>1.4.3</version>
+			<scope>compile</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-mapper-lgpl</artifactId>
+			<version>1.4.3</version>
+			<scope>compile</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>xstream</groupId>
+			<artifactId>xstream</artifactId>
+			<version>1.2.2</version>
+			<scope>compile</scope>
+		</dependency>        
+		
     </dependencies>
 </project>

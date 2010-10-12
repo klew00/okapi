@@ -82,7 +82,6 @@ public class TokenizationStep extends AbstractPipelineStep {
 	private LinkedList<Lexem> rawtextLexems = new LinkedList<Lexem>();
 	
 	public TokenizationStep() {
-		
 		super();
 				
 		setName("Tokenization");
@@ -93,7 +92,6 @@ public class TokenizationStep extends AbstractPipelineStep {
 	}
 	
 	public void setConfiguration(Class<?> classRef, String configLocation) {
-				
 		if (config == null) 
 			config = new Config();
 		
@@ -114,7 +112,6 @@ public class TokenizationStep extends AbstractPipelineStep {
 	}
 
 	private void instantiateLexers() {
-
 		if (lexers == null) return;
 		
 		lexers.clear();
@@ -168,19 +165,16 @@ public class TokenizationStep extends AbstractPipelineStep {
 	
 	@Override
 	protected void component_init() {
-		
 		updateParameters();		
 		setFilters();
 	}
 				
 	private void updateParameters() {
-
 		params = getParameters(Parameters.class);
 	}
 
 	@Override
 	public boolean exec(Object sender, String command, Object info) {
-		
 		if (super.exec(sender, command, info)) return true;
 		
 		if (command.equalsIgnoreCase(Notification.PARAMETERS_CHANGED)) {
@@ -202,7 +196,6 @@ public class TokenizationStep extends AbstractPipelineStep {
 	 * Called every time after the step parameters are changed.  
 	 */
 	private void setFilters() {
-		
 		if (params == null) return;
 		if (idleRules == null) return;
 		
@@ -230,26 +223,25 @@ public class TokenizationStep extends AbstractPipelineStep {
 	}
 
 	@Override
-	protected void handleTextUnit(Event event) {
-		
-		super.handleTextUnit(event);
-		if (event == null) return;
+	protected Event handleTextUnit(Event event) {
+		event = super.handleTextUnit(event);
+		if (event == null) return event;
 		
 		TextUnit tu = (TextUnit) event.getResource();
-		if (tu == null) return;
+		if (tu == null) return event;
 		
-		if (tu.isEmpty()) return;
-		if (!tu.isTranslatable()) return;
+		if (tu.isEmpty()) return event;
+		if (!tu.isTranslatable()) return event;
 		
 		if (params.tokenizeSource)
 			tokenizeSource(tu);
 		
 		if (params.tokenizeTargets)			
 			tokenizeTargets(tu);
+		return event;
 	}
 	
 	private void processLexem(Lexem lexem, ILexer lexer, LocaleId language, Tokens tokens, int textShift) {
-		
 		if (lexem == null) return;
 		
 		if (lexem.getId() == RAWTEXT) {
@@ -284,7 +276,6 @@ public class TokenizationStep extends AbstractPipelineStep {
 	}
 	
 	private void runLexers(List<ILexer> lexers, String text, LocaleId language, Tokens tokens, int textShift) {
-	
 		for (ILexer lexer : lexers) {
 			
 			if (lexer == null) continue;
@@ -378,7 +369,6 @@ public class TokenizationStep extends AbstractPipelineStep {
 	}
 	
 	private void tokenizeSource(TextUnit tu) {
-		
 		if (tu == null) return;
 		
 		Tokens tokens = tokenize(tu.getSource(), getLanguage());		
@@ -394,7 +384,6 @@ public class TokenizationStep extends AbstractPipelineStep {
 	}	
 	
 	private void tokenizeTargets(TextUnit tu) {
-		
 		if (tu == null) return;
 		
 		for (LocaleId language : tu.getTargetLocales()) {
@@ -413,22 +402,18 @@ public class TokenizationStep extends AbstractPipelineStep {
 	}
 
 	public List<LexerRule> getIdleRules() {
-		
 		return idleRules;
 	}
 
 	public void setLexers(List<ILexer> lexers) {
-		
 		this.lexers = lexers;
 	}
 
 	public List<ILexer> getLexers() {
-		
 		return lexers;
 	}
 
 	public String getConfigInfo() {
-		
 		if (config == null) return "";
 		
 		return config.getEngineConfig();

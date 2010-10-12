@@ -25,9 +25,11 @@ import net.sf.okapi.steps.wordcount.common.AltAnnotationBasedCountStep;
 
 public class PrevVersionExactMatchWordCountStep extends AltAnnotationBasedCountStep {
 
+	public static final String METRIC = "x-PrevVersionExactMatchedWordCount"; 
+		
 	@Override
 	protected String getMetric() {
-		return "x-PrevVersionExactMatchedWordCount";
+		return METRIC;
 	}
 
 	@Override

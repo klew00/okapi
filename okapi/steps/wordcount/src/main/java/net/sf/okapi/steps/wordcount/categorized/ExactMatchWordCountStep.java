@@ -26,9 +26,11 @@ import net.sf.okapi.steps.wordcount.common.GMX;
 
 public class ExactMatchWordCountStep extends AltAnnotationBasedCountStep {
 
+	public static final String METRIC = GMX.ExactMatchedWordCount; 
+		
 	@Override
 	protected String getMetric() {
-		return GMX.ExactMatchedWordCount;
+		return METRIC;
 	}
 
 	@Override

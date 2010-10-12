@@ -20,6 +20,7 @@
 
 package net.sf.okapi.common;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,7 +28,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 
 import net.sf.okapi.common.exceptions.OkapiFileNotFoundException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
@@ -104,4 +107,26 @@ public class StreamUtil {
 			throw new OkapiFileNotFoundException(e);
 		}
 	}
+	
+	public static String streamAsString(InputStream in, String encoding) {
+		BufferedReader reader;
+		StringBuilder tmp = null;
+		try {
+			reader = new BufferedReader(new InputStreamReader(in, encoding));
+			tmp = new StringBuilder();
+			char[] buf = new char[2048];
+			int count = 0;
+			while (( count = reader.read(buf)) != -1 ) {
+				tmp.append(buf, 0, count);
+			}		
+		} catch (IOException e) {
+			throw new OkapiIOException(e);
+		}
+		
+        return Util.normalizeNewlines(tmp.toString());
+    }
+	
+	public static String streamAsString(InputStream in) {
+        return streamAsString(in, "UTF-8");
+    }
 }

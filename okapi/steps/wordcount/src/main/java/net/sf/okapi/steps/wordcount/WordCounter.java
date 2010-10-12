@@ -121,6 +121,15 @@ public class WordCounter extends BaseCounter {
 	}
 	
 	/**
+	 * Returns the word count information stored by WordCountStep in annotations of a given resource. 
+	 * @param tu the given resource
+	 * @return number of words (0 if no word count information found)
+	 */
+	public static long getCount(IResource res) {
+		return BaseCounter.getCount(res, GMX.TotalWordCount);
+	}
+	
+	/**
 	 * Returns the word count information stored by WordCountStep in the source part of a given text unit. 
 	 * @param tu the given text unit
 	 * @return number of words (0 if no word count information found)

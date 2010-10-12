@@ -24,7 +24,6 @@ import java.security.InvalidParameterException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
-
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IResource;
@@ -34,9 +33,7 @@ import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.IReferenceable;
 import net.sf.okapi.common.resource.MultiEvent;
-import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.StartDocument;
-import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextPart;
@@ -57,9 +54,11 @@ public class ResourceSimplifier {
 	private GenericSkeleton newSkel;
 	private boolean useSDEncoding;
 	private boolean useSDLocale;
+	private boolean resolveCodeRefs;
 	
 	public ResourceSimplifier() {
 		super();
+		resolveCodeRefs = true;
 		useSDEncoding = true;
 		useSDLocale = true;
 		
@@ -376,7 +375,8 @@ public class ResourceSimplifier {
 					for (Code code : tf.getCodes()) {
 						if (code.hasReference()) {
 							// Resolve reference(s) with GSW, replace the original data
-							code.setData(writer.expandCodeContent(code, trgLoc, 0));
+							if (resolveCodeRefs)
+								code.setData(writer.expandCodeContent(code, trgLoc, 0));
 						}
 					}
 				}			
@@ -472,5 +472,13 @@ public class ResourceSimplifier {
 			logger.warning("Invalid parent type: " + resId);
 			return false;
 		}
+	}
+
+	public void setResolveCodeRefs(boolean resolve) {
+		this.resolveCodeRefs = resolve;
+	}
+
+	public boolean getResolveCodeRefs() {
+		return resolveCodeRefs;
 	}
 }

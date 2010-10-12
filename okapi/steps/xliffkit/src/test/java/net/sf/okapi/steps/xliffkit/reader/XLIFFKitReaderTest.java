@@ -33,14 +33,15 @@ import net.sf.okapi.lib.extra.pipelinebuilder.XBatchItem;
 import net.sf.okapi.lib.extra.pipelinebuilder.XParameter;
 import net.sf.okapi.lib.extra.pipelinebuilder.XPipeline;
 import net.sf.okapi.lib.extra.pipelinebuilder.XPipelineStep;
-import net.sf.okapi.persistence.BeanMapper;
-import net.sf.okapi.persistence.NamespaceMapper;
-import net.sf.okapi.persistence.beans.FactoryBean;
-import net.sf.okapi.persistence.beans.v0.TestEvent;
-import net.sf.okapi.persistence.beans.v0.TestEventBean;
-import net.sf.okapi.persistence.beans.v0.TestEventBean2;
+import net.sf.okapi.lib.extra.steps.EventLogger;
+import net.sf.okapi.lib.persistence.BeanMapper;
+import net.sf.okapi.lib.persistence.NamespaceMapper;
+import net.sf.okapi.lib.persistence.beans.FactoryBean;
+import net.sf.okapi.lib.beans.v0.TestEvent;
+import net.sf.okapi.lib.beans.v0.TestEventBean;
+import net.sf.okapi.lib.beans.v0.TestEventBean2;
 import net.sf.okapi.persistence.json.jackson.JSONPersistenceSession;
-import net.sf.okapi.steps.xliffkit.common.persistence.sessions.OkapiJsonSession;
+import net.sf.okapi.lib.beans.sessions.OkapiJsonSession;
 
 import org.junit.Test;
 

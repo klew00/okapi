@@ -29,9 +29,11 @@ import net.sf.okapi.steps.wordcount.common.GMX;
 
 public class RepetitionWordCountStep extends AltAnnotationBasedCountStep {
 
+	public static final String METRIC = GMX.RepetitionMatchedWordCount; 
+		
 	@Override
 	protected String getMetric() {
-		return GMX.RepetitionMatchedWordCount;
+		return METRIC;
 	}
 
 	@Override

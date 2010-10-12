@@ -38,7 +38,7 @@ import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.xliff.XLIFFFilter;
-import net.sf.okapi.steps.xliffkit.common.persistence.sessions.OkapiJsonSession;
+import net.sf.okapi.lib.beans.sessions.OkapiJsonSession;
 import net.sf.okapi.steps.xliffkit.reader.TextUnitMerger;
 
 import org.apache.poi.openxml4j.opc.OPCPackage;

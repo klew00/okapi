@@ -31,8 +31,7 @@ public class RegexUtil {
 	
 	private static HashMap<String, Pattern> patternCache = new HashMap<String, Pattern>();
 
-	public static Pattern getPattern(String regex) {
-		
+	public static Pattern getPattern(String regex) {		
 		Pattern pattern = patternCache.get(regex);
 		if (pattern == null) {
 			
@@ -43,9 +42,7 @@ public class RegexUtil {
 		return pattern;
 	}
 	
-	public static String replaceAll(String string, String regex, int group, String replacement) {
-	
-		Pattern pattern = getPattern(regex);
+	public static String replaceAll(String string, Pattern pattern, int group, String replacement) {	
 	    Matcher matcher = pattern.matcher(string);
 	    
 	    // Replace all occurrences of pattern in input
@@ -66,13 +63,15 @@ public class RegexUtil {
 	    return buf.toString();
 	}
 	
-	public static int countMatches(String string, String regex) {
-				
+	public static String replaceAll(String string, String regex, int group, String replacement) {		
+		return replaceAll(string, getPattern(regex), group, replacement);
+	}
+	
+	public static int countMatches(String string, String regex) {				
 	    return countMatches(string, regex, 0);
 	}
 	
-	public static int countMatches(String string, String regex, int matchLen) {
-	
+	public static int countMatches(String string, String regex, int matchLen) {	
 		Pattern pattern = getPattern(regex);
 	    Matcher matcher = pattern.matcher(string);
 	    
@@ -87,13 +86,11 @@ public class RegexUtil {
 	    return count;
 	}
 	
-	public static int countLeadingQualifiers(String string, String qualifier) {
-		
+	public static int countLeadingQualifiers(String string, String qualifier) {		
 		return countMatches(string, qualifier + "+\\b", qualifier.length());
 	}
 	
-	public static int countTrailingQualifiers(String string, String qualifier) {
-		
+	public static int countTrailingQualifiers(String string, String qualifier) {		
 		return countMatches(string, "\\b" + qualifier + "+", qualifier.length());
 	}
 

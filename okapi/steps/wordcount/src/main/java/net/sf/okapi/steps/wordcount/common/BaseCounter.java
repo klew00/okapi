@@ -24,6 +24,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.okapi.common.ClassUtil;
+import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.Segment;
@@ -128,5 +129,9 @@ abstract public class BaseCounter {
 	
 	public static long getCount(TextUnit tu, String metricName) {
 		return getValue(TextUnitUtil.getSourceAnnotation(tu, MetricsAnnotation.class), metricName);
+	}
+	
+	public static long getCount(IResource res, String metricName) {
+		return getValue(res.getAnnotation(MetricsAnnotation.class), metricName);
 	}
 }

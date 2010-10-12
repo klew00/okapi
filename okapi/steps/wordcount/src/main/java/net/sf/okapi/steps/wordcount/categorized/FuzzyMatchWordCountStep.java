@@ -26,9 +26,11 @@ import net.sf.okapi.steps.wordcount.common.GMX;
 
 public class FuzzyMatchWordCountStep extends AltAnnotationBasedCountStep {
 
+	public static final String METRIC = GMX.FuzzyMatchedWordCount; 
+		
 	@Override
 	protected String getMetric() {
-		return GMX.FuzzyMatchedWordCount;
+		return METRIC;
 	}
 
 	@Override

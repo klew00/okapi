@@ -22,6 +22,8 @@ package net.sf.okapi.steps.wordcount.common;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IResource;
+import net.sf.okapi.common.IdGenerator;
+import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
@@ -36,7 +38,8 @@ import net.sf.okapi.lib.extra.steps.AbstractPipelineStep;
 
 public abstract class BaseCountStep extends AbstractPipelineStep {
 
-	private Parameters params;	
+	private Parameters params;
+	private IdGenerator gen = new IdGenerator("ending"); 
 	
 	private long batchCount;
 	private long batchItemCount;
@@ -119,6 +122,9 @@ public abstract class BaseCountStep extends AbstractPipelineStep {
 		if (count == 0) return;
 		
 		IResource res = event.getResource();
+		if (res == null) {
+			res = createResource(event);
+		}
 		if (res == null) return;
 		
 		MetricsAnnotation ma = res.getAnnotation(MetricsAnnotation.class);
@@ -136,6 +142,26 @@ public abstract class BaseCountStep extends AbstractPipelineStep {
 		saveCount(m, count);
 	}
 	
+	private IResource createResource(Event event) {
+		if (event == null) return null;
+		
+		IResource res = event.getResource();
+		if (res != null) return res;
+		
+		switch (event.getEventType()) {
+		case END_BATCH:
+		case END_BATCH_ITEM:
+		case END_DOCUMENT:
+		case END_SUBDOCUMENT:
+		case END_GROUP:
+			res = new Ending(gen.createId());
+			event.setResource(res);
+			break;			
+		}
+		
+		return res;
+	}
+
 	protected void saveToMetrics(TextContainer textContainer, long count) {
 		if (textContainer == null) return;
 		if (count == 0) return;
@@ -176,82 +202,91 @@ public abstract class BaseCountStep extends AbstractPipelineStep {
 	
 	//-------------------------	
 	@Override
-	protected void handleStartBatch(Event event) {
+	protected Event handleStartBatch(Event event) {
 		batchCount = 0;
+		return event;
 	}
 	
 	@Override
-	protected void handleEndBatch(Event event) {
-		if (!params.countInBatch) return;
-		if (batchCount == 0) return;
+	protected Event handleEndBatch(Event event) {
+		if (!params.countInBatch) return event;
+		if (batchCount == 0) return event;
 		
 		saveToMetrics(event, batchCount);
+		return event;
 	}
 
 	//-------------------------	
 	@Override
-	protected void handleStartBatchItem(Event event) {
+	protected Event handleStartBatchItem(Event event) {
 		batchItemCount = 0;
+		return event;
 	}
 	
 	@Override
-	protected void handleEndBatchItem(Event event) {
-		if (!params.countInBatchItems) return;
-		if (batchItemCount == 0) return;
+	protected Event handleEndBatchItem(Event event) {
+		if (!params.countInBatchItems) return event;
+		if (batchItemCount == 0) return event;
 		
 		saveToMetrics(event, batchItemCount);
+		return event;
 	}
 
 	//-------------------------	
 	@Override
-	protected void handleStartDocument(Event event) {
+	protected Event handleStartDocument(Event event) {
 		documentCount = 0;
-		super.handleStartDocument(event); // Sets language						
+		return super.handleStartDocument(event); // Sets language						
 	}
 	
 	@Override
-	protected void handleEndDocument(Event event) {
-		if (!params.countInDocuments) return;
-		if (documentCount == 0) return;
+	protected Event handleEndDocument(Event event) {
+		if (!params.countInDocuments) return event;
+		if (documentCount == 0) return event;
 		
 		saveToMetrics(event, documentCount);
+		return event;
 	}
 
 	//-------------------------
 	@Override
-	protected void handleStartSubDocument(Event event) {
+	protected Event handleStartSubDocument(Event event) {
 		subDocumentCount = 0;
+		return event;
 	}
 	
 	@Override
-	protected void handleEndSubDocument(Event event) {
-		if (!params.countInSubDocuments) return;
-		if (subDocumentCount == 0) return;
+	protected Event handleEndSubDocument(Event event) {
+		if (!params.countInSubDocuments) return event;
+		if (subDocumentCount == 0) return event;
 		
 		saveToMetrics(event, subDocumentCount);
+		return event;
 	}
 	
 	//-------------------------
 	@Override
-	protected void handleStartGroup(Event event) {
+	protected Event handleStartGroup(Event event) {
 		groupCount = 0;
+		return event;
 	}
 	
 	@Override
-	protected void handleEndGroup(Event event) {		
-		if (!params.countInGroups) return;
-		if (groupCount == 0) return;
+	protected Event handleEndGroup(Event event) {		
+		if (!params.countInGroups) return event;
+		if (groupCount == 0) return event;
 		
 		saveToMetrics(event, groupCount);
+		return event;
 	}
 
 	//-------------------------
 	@Override
-	protected void handleTextUnit(Event event) {		
+	protected Event handleTextUnit(Event event) {		
 		TextUnit tu = (TextUnit) event.getResource();
 		
-		if (tu.isEmpty()) return;
-		if (!tu.isTranslatable() && countOnlyTranslatable()) return;
+		if (tu.isEmpty()) return event;
+		if (!tu.isTranslatable() && countOnlyTranslatable()) return event;
 		
 		TextContainer source = tu.getSource();
 		// Individual segments metrics
@@ -265,7 +300,7 @@ public abstract class BaseCountStep extends AbstractPipelineStep {
 		
 		// Whole TU metrics
 		textUnitCount = count(tu);
-		if (textUnitCount == 0) return;
+		if (textUnitCount == 0) return event;
 				
 		saveToMetrics(source, textUnitCount);
 				
@@ -273,6 +308,7 @@ public abstract class BaseCountStep extends AbstractPipelineStep {
 		if (params.countInBatchItems) batchItemCount += textUnitCount;
 		if (params.countInDocuments) documentCount += textUnitCount;
 		if (params.countInSubDocuments) subDocumentCount += textUnitCount;
-		if (params.countInGroups) groupCount += textUnitCount;		
+		if (params.countInGroups) groupCount += textUnitCount;
+		return event;
 	}		
 }

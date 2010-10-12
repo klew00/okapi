@@ -24,10 +24,12 @@ import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.steps.wordcount.common.AltAnnotationBasedCountStep;
 
 public class LocalContextExactMatchWordCountStep extends AltAnnotationBasedCountStep {
+	
+	public static final String METRIC = "x-LocalContextExactMatchedWordCount"; 
 
 	@Override
 	protected String getMetric() {
-		return "x-LocalContextExactMatchedWordCount";
+		return METRIC;
 	}
 
 	@Override

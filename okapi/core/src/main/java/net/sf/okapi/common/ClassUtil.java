@@ -145,6 +145,10 @@ public class ClassUtil {
 		
 		return pkg.getName();
 	}
+
+	public static String getTargetPath(Class<?> cls) {
+		return cls.getResource("").getPath();
+	}
 	
 	/**
 	 * Extracts the package name part of a qualified class name.

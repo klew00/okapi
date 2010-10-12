@@ -20,8 +20,6 @@
 
 package net.sf.okapi.lib.extra.steps;
 
-import java.io.File;
-
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.IPipelineStep;
@@ -66,60 +64,60 @@ abstract public class AbstractPipelineStep extends OkapiComponent implements IPi
 		
 		case START_BATCH:
 			component_init();
-			handleStartBatch(event);
+			event = handleStartBatch(event);
 			break;
 			
 		case END_BATCH:
 			component_done();
-			handleEndBatch(event);
+			event = handleEndBatch(event);
 			break;
 			
 		case START_BATCH_ITEM:
-			handleStartBatchItem(event);
+			event = handleStartBatchItem(event);
 			break;
 			
 		case END_BATCH_ITEM:
-			handleEndBatchItem(event);
+			event = handleEndBatchItem(event);
 			break;
 			
 		case RAW_DOCUMENT:
-			handleRawDocument(event);
+			event = handleRawDocument(event);
 			break;
 			
 		case START_DOCUMENT:
-			handleStartDocument(event);
+			event = handleStartDocument(event);
 			break;
 			
 		case END_DOCUMENT:
-			handleEndDocument(event);
+			event = handleEndDocument(event);
 			break;
 			
 		case START_SUBDOCUMENT:
-			handleStartSubDocument(event);
+			event = handleStartSubDocument(event);
 			break;
 			
 		case END_SUBDOCUMENT:
-			handleEndSubDocument(event);
+			event = handleEndSubDocument(event);
 			break;
 			
 		case START_GROUP:
-			handleStartGroup(event);
+			event = handleStartGroup(event);
 			break;
 			
 		case END_GROUP:
-			handleEndGroup(event);
+			event = handleEndGroup(event);
 			break;
 			
 		case TEXT_UNIT:
-			handleTextUnit(event);
+			event = handleTextUnit(event);
 			break;
 			
 		case DOCUMENT_PART:
-			handleDocumentPart(event);
+			event = handleDocumentPart(event);
 			break;
 			
 		case CUSTOM:
-			handleCustom(event);
+			event = handleCustom(event);
 			break;
 			
 		// default:
@@ -147,102 +145,115 @@ abstract public class AbstractPipelineStep extends OkapiComponent implements IPi
 	 * Handles the {@link net.sf.okapi.common.EventType#START_BATCH} event.
 	 * @param event the event itself. 
 	 */
-	protected void handleStartBatch (Event event) {
+	protected Event handleStartBatch (Event event) {
+		return event;
 	}
 	
 	/**
 	 * Handles the {@link net.sf.okapi.common.EventType#END_BATCH} event.
 	 * @param event the event itself. 
 	 */
-	protected void handleEndBatch (Event event) {
+	protected Event handleEndBatch (Event event) {
+		return event;
 	}
 	
 	/**
 	 * Handles the {@link net.sf.okapi.common.EventType#START_BATCH_ITEM} event.
 	 * @param event the event itself. 
 	 */
-	protected void handleStartBatchItem (Event event) {
+	protected Event handleStartBatchItem (Event event) {
+		return event;
 	}
 	
 	/**
 	 * Handles the {@link net.sf.okapi.common.EventType#END_BATCH_ITEM} event.
 	 * @param event the event itself. 
 	 */
-	protected void handleEndBatchItem (Event event) {
+	protected Event handleEndBatchItem (Event event) {
+		return event;
 	}
 	
 	/**
 	 * Handles the {@link net.sf.okapi.common.EventType#RAW_DOCUMENT} event.
 	 * @param event the event itself. 
 	 */
-	protected void handleRawDocument (Event event) {
+	protected Event handleRawDocument (Event event) {
+		return event;
 	}
 
 	/**
 	 * Handles the {@link net.sf.okapi.common.EventType#START_DOCUMENT} event.
 	 * @param event the event itself. 
 	 */
-	protected void handleStartDocument (Event event) {
+	protected Event handleStartDocument (Event event) {
 		
 		StartDocument sd = (StartDocument) event.getResource();
 		
 		if (sd != null) language = sd.getLocale();
+		return event;
 	}
 
 	/**
 	 * Handles the {@link net.sf.okapi.common.EventType#END_DOCUMENT} event.
 	 * @param event the event itself. 
 	 */
-	protected void handleEndDocument (Event event) {
+	protected Event handleEndDocument (Event event) {
+		return event;
 	}
 
 	/**
 	 * Handles the {@link net.sf.okapi.common.EventType#START_SUBDOCUMENT} event.
 	 * @param event the event itself. 
 	 */
-	protected void handleStartSubDocument (Event event) {
+	protected Event handleStartSubDocument (Event event) {
+		return event;
 	}
 
 	/**
 	 * Handles the {@link net.sf.okapi.common.EventType#END_SUBDOCUMENT} event.
 	 * @param event the event itself. 
 	 */
-	protected void handleEndSubDocument (Event event) {
+	protected Event handleEndSubDocument (Event event) {
+		return event;
 	}
 
 	/**
 	 * Handles the {@link net.sf.okapi.common.EventType#START_GROUP} event.
 	 * @param event the event itself. 
 	 */
-	protected void handleStartGroup (Event event) {
+	protected Event handleStartGroup (Event event) {
+		return event;
 	}
 
 	/**
 	 * Handles the {@link net.sf.okapi.common.EventType#END_GROUP} event.
 	 * @param event the event itself. 
 	 */
-	protected void handleEndGroup (Event event) {
+	protected Event handleEndGroup (Event event) {
+		return event;
 	}
 
 	/**
 	 * Handles the {@link net.sf.okapi.common.EventType#TEXT_UNIT} event.
 	 * @param event the event itself. 
 	 */
-	protected void handleTextUnit (Event event) {
+	protected Event handleTextUnit (Event event) {
+		return event;
 	}
 
 	/**
 	 * Handles the {@link net.sf.okapi.common.EventType#DOCUMENT_PART} event.
 	 * @param event the event itself. 
 	 */
-	protected void handleDocumentPart (Event event) {
+	protected Event handleDocumentPart (Event event) {
+		return event;
 	}
 
 	/**
 	 * Handles the {@link net.sf.okapi.common.EventType#CUSTOM} event.
 	 * @param event the event itself. 
 	 */
-	protected void handleCustom (Event event) {
+	protected Event handleCustom (Event event) {
+		return event;
 	}
-
 }

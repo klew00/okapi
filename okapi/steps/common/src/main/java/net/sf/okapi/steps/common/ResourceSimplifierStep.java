@@ -39,7 +39,18 @@ public class ResourceSimplifierStep extends BasePipelineStep {
 	
 	private ResourceSimplifier simplifier;
 	private LocaleId targetLocale;
+	private boolean resolveCodeRefs;
 	
+	public ResourceSimplifierStep() {
+		super();
+		this.resolveCodeRefs = true;
+	}
+	
+	public ResourceSimplifierStep(boolean resolveCodeRefs) {
+		this();
+		this.resolveCodeRefs = resolveCodeRefs;
+	}
+
 	@Override
 	public String getDescription() {
 		return "Simplify resources by converting references in generic skeleton parts. " +
@@ -61,6 +72,7 @@ public class ResourceSimplifierStep extends BasePipelineStep {
 		switch (event.getEventType()) {
 		case START_DOCUMENT:
 			simplifier = new ResourceSimplifier(targetLocale);
+			simplifier.setResolveCodeRefs(resolveCodeRefs);
 		case END_DOCUMENT:
 		case START_SUBDOCUMENT:
 		case END_SUBDOCUMENT:
