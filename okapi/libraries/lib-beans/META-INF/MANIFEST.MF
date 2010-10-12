@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: okapi_lib_beans
-Bundle-SymbolicName: okapi_lib_beans
+Bundle-Name: okapi.lib.beans
+Bundle-SymbolicName: okapi.lib.beans
 Bundle-Version: 1.0.0.qualifier
 Export-Package: net.sf.okapi.lib.beans.sessions,
  net.sf.okapi.lib.beans.v0,
