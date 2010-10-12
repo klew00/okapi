@@ -1,0 +1,57 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>build-libraries</artifactId>
+    <groupId>net.sf.okapi.lib</groupId>
+    <version>0.10-SNAPSHOT</version>
+  </parent>
+  <groupId>net.sf.okapi.lib</groupId>
+  <artifactId>okapi-lib-beans</artifactId>
+  <version>0.10-SNAPSHOT</version>
+  <name>Okapi Library for Persistence Beans</name>
+  <dependencies>
+  	<dependency>
+  		<groupId>net.sf.okapi.lib</groupId>
+  		<artifactId>okapi-lib-persistence</artifactId>
+  		<version>0.10-SNAPSHOT</version>
+  		<type>jar</type>
+  		<scope>compile</scope>
+  	</dependency>
+  	
+  	<dependency>
+		<groupId>net.sf.okapi.filters</groupId>
+		<artifactId>okapi-filter-openxml</artifactId>
+		<version>${project.version}</version>				
+	</dependency>
+
+	<dependency>
+		<groupId>net.sf.okapi.steps</groupId>
+		<artifactId>okapi-step-tokenization</artifactId>
+		<version>${project.version}</version>
+	</dependency>
+	
+	<dependency>
+		<groupId>net.sf.okapi.steps</groupId>
+		<artifactId>okapi-step-wordcount</artifactId>
+		<version>${project.version}</version>			
+	</dependency>
+	
+	<dependency>
+		<groupId>net.sf.okapi.filters</groupId>
+		<artifactId>okapi-filter-po</artifactId>
+		<version>${project.version}</version>			
+	</dependency>
+	
+	<dependency>
+		<groupId>net.sf.okapi.filters</groupId>
+		<artifactId>okapi-filter-pensieve</artifactId>
+		<version>${project.version}</version>			
+	</dependency>
+
+	<dependency>
+		<groupId>net.sf.okapi.steps</groupId>
+		<artifactId>okapi-step-formatconversion</artifactId>
+		<version>${project.version}</version>			
+	</dependency>
+  </dependencies>
+</project>

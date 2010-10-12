@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: okapi_step_scopingreport
+Bundle-SymbolicName: okapi_step_scopingreport
+Bundle-Version: 1.0.0.qualifier
+Export-Package: net.sf.okapi.steps.scopingreport
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
