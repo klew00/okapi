@@ -18,5 +18,8 @@
         <module>lib-extra</module>
         <module>lib-verification</module>
         <module>lib-terminology</module>
+        <module>lib-persistence</module>
+        <module>lib-beans</module>
+        <module>lib-reporting</module>
     </modules>
 </project>
