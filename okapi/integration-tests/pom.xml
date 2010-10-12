@@ -43,11 +43,6 @@
         </dependency>
         <dependency>
             <groupId>net.sf.okapi.steps</groupId>
-            <artifactId>okapi-step-copysourcetotarget</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>net.sf.okapi.steps</groupId>
             <artifactId>okapi-step-searchandreplace</artifactId>
             <version>${project.version}</version>
         </dependency>

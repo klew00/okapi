@@ -291,11 +291,6 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<artifactId>okapi-step-copysourcetotarget</artifactId>
-			<groupId>net.sf.okapi.steps</groupId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
 			<artifactId>okapi-step-diffleverage</artifactId>
 			<groupId>net.sf.okapi.steps</groupId>
 			<version>${project.version}</version>
