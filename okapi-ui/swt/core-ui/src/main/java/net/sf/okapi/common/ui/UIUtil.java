@@ -21,7 +21,6 @@
 package net.sf.okapi.common.ui;
 
 import java.io.IOException;
-import java.net.URL;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;

@@ -1,8 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: BOM Conversion
-Bundle-SymbolicName: net.sf.okapi.steps.bomconversion
-Bundle-Version: 1.0.0
-Export-Package: net.sf.okapi.steps.bomconversion
-Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0"
+Bundle-Name: Dummy Manifest File For Maven
+Bundle-SymbolicName: net.sf.okapi
+Bundle-Version: 0.0.1
+Export-Package: net.sf.okapi 
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

@@ -588,7 +588,7 @@ public class MainForm { //implements IParametersProvider {
 		//=== For user test
 		new MenuItem(dropMenu, SWT.SEPARATOR);
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
-		menuItem.setText("FOR TESTERS");
+		menuItem.setText("For Testing...");
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				runTestingConsole();

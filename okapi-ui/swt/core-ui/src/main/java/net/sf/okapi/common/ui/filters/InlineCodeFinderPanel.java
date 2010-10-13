@@ -20,9 +20,6 @@
 
 package net.sf.okapi.common.ui.filters;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.InlineCodeFinder;
 import net.sf.okapi.common.filterwriter.GenericContent;
