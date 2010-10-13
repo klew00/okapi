@@ -78,7 +78,9 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.add("fuzzyThreshold", "Leverage only if the match is equal or above this score", "Fuzzy Thresholds are between 1 and 100. A score of 100 emans exact match (codes and text) only");		
 		desc.add("codesensitive", "Include inline codes in the comparison", "Use codes to compare contents");
 		desc.add("diffOnly", "Diff only and mark the TextUnit as matched", "Diff only and do not copy the match or create a leverage annotation");
-		desc.add("copyToTarget", "Copy to/over the target?", "Copy to/over the target (a leverage annotation will still be created)");
+		desc.add("copyToTarget", 
+				"Copy to/over the target? (WARNING: Copied target will not be segmented!)", "Copy to/over the target (a leverage annotation " +
+				"will still be created). WARNING: Copied target will not be segmented and any exisiting target will be lost.");
 		//desc.add("diffOnSentences", "Diff on sentences or paragraphs (if sentences then source and target must be aligned)?", "Diff On Sentences?");
 		return desc;
 	}
