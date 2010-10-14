@@ -1312,6 +1312,12 @@ SU-ID|SU|SUN|1|Sundanese|-1|windows-1252|flg_ID|ansi
  <language code='uk-PK' lcid='1056' encoding='windows-1256' macEncoding='MacArabic' unixEncoding='iso-8859-6' flag='flagPK'>
   <name>Urdu (*Pakistan)</name>
  </language>
+ <language code='ug' lcid='1152' encoding='windows-1256' macEncoding='MacArabic' unixEncoding='iso-8859-6'>
+  <name>Uighur</name>
+ </language>
+ <language code='ug-CN' lcid='1152' encoding='windows-1256' macEncoding='MacArabic' unixEncoding='iso-8859-6'>
+  <name>Uighur (*China)</name>
+ </language>
 
  <language code='zu' lcid='1077' encoding='windows-1252' macEncoding='MacRoman' unixEncoding='iso-8859-1'>
   <name>Zulu</name>
