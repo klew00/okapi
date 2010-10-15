@@ -121,15 +121,15 @@
   <name>Aymara (*Bolivia)</name>
  </language>
 
- <language code='az' lcid='1068' encoding='windows-1254'>
-  <name>Azerbaijani</name>
- </language>
- <language code='az-AZ' lcid='1068' encoding='windows-1254' flag='flagAZ'>
-  <name>Azerbaijani (*Azerbaijan)</name>
- </language>
- <language code='x-az-AZ-Cyrillic' lcid='2092' encoding='windows-1251' macEncoding='MacCyrillic' unixEncoding='iso-8859-5' flag='flagAZ'>
-  <name>Azerbaijani (Azerbaijan, Cyrillic)</name>
- </language>
+<language code='az' lcid='1068' encoding='windows-1254' macEncoding='MacTurkish' unixEncoding='iso-8859-9'>
+ <name>Azerbaijani</name>
+</language>
+<language code='az-AZ' lcid='1068' encoding='windows-1254' macEncoding='MacTurkish' unixEncoding='iso-8859-9'>
+ <name>Azerbaijani (*Azerbaijan)</name>
+</language>
+<language code='az-Cyrl-AZ' lcid='2092' encoding='windows-1251' macEncoding='MacCyrillic' unixEncoding='iso-8859-5'>
+ <name>Azerbaijani (Azerbaijan, Cyrillic)</name>
+</language>
 
  <language code='ba' lcid='-1' encoding='windows-1251' macEncoding='MacCyrillic' unixEncoding='iso-8859-5'>
   <name>Bashkir</name>

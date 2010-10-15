@@ -255,8 +255,7 @@ public class PluginsManagerDialog {
 	}
 	
 	private void setData () {
-		//String tmp = "http://okapi.opentag.com/plugins"; // Default
-		String tmp = "file:///C:/OkapiJava/trunk/TestPlugins";
+		String tmp = "http://okapi.opentag.com/plugins"; // Default
 		if ( repository != null ) {
 			tmp = repository.toString();
 		}

@@ -2313,9 +2313,10 @@ public class MainForm { //implements IParametersProvider {
 			File dir = new File(getDropinsDirectory());
 			PluginsManagerDialog dlg = new PluginsManagerDialog(shell, help, dir, null);
 			if ( !dlg.showDialog() ) return; // Nothing was changed
+
 			// Otherwise; make sure to update the dependencies
-	//TODO: update pm dependant objects
 			pm.discover(dir, false);
+			updatePluginsAndDependencies();
 		}
 		catch ( Exception e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
