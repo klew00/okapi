@@ -125,6 +125,16 @@ public class RainbowTest {
 			compareWithGoldFile("pipelines/diffleverage/myFile_en_new.out.html"));
 	}
 
+	@Test
+	public void testEncodingConversion () throws IOException, InterruptedException {
+		// Delete previous output
+		assertTrue(deleteOutputFile("pipelines/testForEncoding1.out.html"));
+		assertTrue(deleteOutputFile("pipelines/testForEncoding2.out.html"));
+		assertEquals(0, runRainbow("-np -p pipelines/encodingConversion.rnb -pln pipelines/encodingConversion.pln"));
+		assertTrue("File different from gold", compareWithGoldFile("pipelines/testForEncoding1.out.html"));
+		assertTrue("File different from gold", compareWithGoldFile("pipelines/testForEncoding2.out.html"));
+	}
+
     private boolean compareWithGoldFile (String outputBase) {
     	String outputPath = root + File.separator + outputBase;
     	String goldPath = root + File.separator + "gold" + File.separator + outputBase; 

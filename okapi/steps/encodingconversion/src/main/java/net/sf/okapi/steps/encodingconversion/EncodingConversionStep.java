@@ -204,28 +204,22 @@ public class EncodingConversionStep extends BasePipelineStep {
 			//=== Try to detect the encoding
 			
 			InputStream is = rawDoc.getStream();
-			if ( is.markSupported() ) {
-				// First: guess from a possible BOM
-				BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(is, rawDoc.getEncoding());
-				detector.detectAndRemoveBom();
-				rawDoc.setEncoding(detector.getEncoding());
-				
-				// Then try to detect internal declaration
-				
-//				is.mark(MAXBUF);
-				
-				
-			}
-			
-			// Then try internal detection for XML/HTML type files
-			reader = new BufferedReader(rawDoc.getReader());
+			// First: guess from a possible BOM
+			BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(is, rawDoc.getEncoding());
+			detector.detectAndRemoveBom();
+			rawDoc.setEncoding(detector.getEncoding());
+
 			String inputEncoding = rawDoc.getEncoding();
-			reader.read(buffer);
-			String detectedEncoding = checkDeclaration(inputEncoding);
-			if ( !detectedEncoding.equalsIgnoreCase(inputEncoding) ) {
-				inputEncoding = detectedEncoding;
+			// Then try internal detection for XML/HTML type files
+			if ( !detector.isAutodetected() ) {
+				reader = new BufferedReader(rawDoc.getReader());
+				reader.read(buffer);
+				String detectedEncoding = checkDeclaration(inputEncoding);
+				if ( !detectedEncoding.equalsIgnoreCase(inputEncoding) ) {
+					inputEncoding = detectedEncoding;
+				}
+				reader.close();
 			}
-			reader.close();
 
 			// Open the input document 
 			//TODO: Where did we reset the reader - cann't call this twice unless we reset it
@@ -511,7 +505,7 @@ public class EncodingConversionStep extends BasePipelineStep {
 				// Character entity reference: &NAME;
 				seq = seq.substring(1, seq.length()-1);
 				// Unidentified is -1: leave it like that
-				value = entities.lookupReference(seq);
+				value = entities.lookupName(seq);
 			}
 
 			// Append the parsed escape
