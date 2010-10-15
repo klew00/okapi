@@ -46,12 +46,15 @@ class TableModel {
 			col = new TableColumn(table, SWT.NONE);
 			col.setText("Size (KB)");
 		}
-		
+		else {
+			col = new TableColumn(table, SWT.NONE);
+			col.setText("Locked?");
+		}
 		col.pack();
-		
 	}
 
 	void updateTable (List<PluginInfo> list,
+		List<String> lockedPlugins,
 		int index)
 	{
 		table.removeAll();
@@ -62,6 +65,11 @@ class TableModel {
 				item.setText(1, info.getProvider());
 				if ( info.getSize() > 0 ) {
 					item.setText(2, String.format("%d", info.getSize()));
+				}
+			}
+			else {
+				if ( lockedPlugins.contains(info.getName()) ) {
+					item.setText(1, "Locked");
 				}
 			}
 		}

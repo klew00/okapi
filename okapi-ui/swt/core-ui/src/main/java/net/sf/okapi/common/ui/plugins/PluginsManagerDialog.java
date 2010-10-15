@@ -83,6 +83,7 @@ public class PluginsManagerDialog {
 	private File dropinsDir;
 	private Label stStatus;
 	private boolean actionHasBeenCalled = false;
+	private ArrayList<String> lockedPlugins;
 
 	/**
 	 * Creates a new PluginsManagerDialog object.
@@ -187,6 +188,7 @@ public class PluginsManagerDialog {
 		Dialogs.centerWindow(shell, parent);
 
 		setData();
+		btRefreshURL.setFocus();
 	}
 
 	/**
@@ -233,7 +235,10 @@ public class PluginsManagerDialog {
 			table.addControlListener(new ControlAdapter() {
 			    public void controlResized(ControlEvent e) {
 			    	Rectangle rect = table.getClientArea();
-		    		table.getColumn(0).setWidth(rect.width);
+					int part = (int)(rect.width / 100);
+					int remain = (int)(rect.width % 100);
+					table.getColumn(0).setWidth(remain+(part*90));
+					table.getColumn(1).setWidth(part*10);
 			    }
 			});
 		}
@@ -261,6 +266,14 @@ public class PluginsManagerDialog {
 		}
 		edURL.setText(tmp);
 		edDir.setText(dropinsDir.getPath());
+
+		// Locked plugins are the ones installed when opening the dialog box
+		List<PluginInfo> list = getCurrentPluginsFromDirectory();
+		lockedPlugins = new ArrayList<String>();
+		for ( PluginInfo pi : list ) {
+			lockedPlugins.add(pi.getName());
+		}
+		// Display the current plugins
 		refreshCurrentPlugins();
 	}
 
@@ -279,7 +292,7 @@ public class PluginsManagerDialog {
 			// Get the list of available plugins
 			int index = tblAvailable.getSelectionIndex();
 			URL url = new URL(repository + "/pluginsDeployment.xml");
-			modAvailable.updateTable(loadInfoList(url), index);
+			modAvailable.updateTable(loadInfoList(url), null, index);
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
@@ -289,11 +302,9 @@ public class PluginsManagerDialog {
 		}
 	}
 	
-	private void refreshCurrentPlugins () {
+	private List<PluginInfo> getCurrentPluginsFromDirectory () {
+		ArrayList<PluginInfo> list = new ArrayList<PluginInfo>();
 		try {
-			int index = tblCurrent.getSelectionIndex();
-			ArrayList<PluginInfo> list = new ArrayList<PluginInfo>();
-			// Get the list of all current plugins
 			File[] files = dropinsDir.listFiles();
 			if ( files == null ) {
 				throw new RuntimeException(String.format("Invalid location for the installed plugins (%s)", dropinsDir));
@@ -303,7 +314,18 @@ public class PluginsManagerDialog {
 					list.add(new PluginInfo(file.getName(), null, null, null, 0));
 				}
 			}
-			modCurrent.updateTable(list, index);
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+		return list;
+	}
+	
+	private void refreshCurrentPlugins () {
+		try {
+			int index = tblCurrent.getSelectionIndex();
+			List<PluginInfo> list = getCurrentPluginsFromDirectory();
+			modCurrent.updateTable(list, lockedPlugins, index);
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
@@ -360,7 +382,7 @@ public class PluginsManagerDialog {
 
 			// Ask confirmation
 			MessageBox dlg = new MessageBox(shell, SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
-			dlg.setMessage("This command will remove the plugins you have checked in the list.\n"
+			dlg.setMessage("This command will remove the unlocked plugins you have checked in the list.\n"
 				+"Do you want to proceed?");
 			dlg.setText("Removing Plugins");
 			if ( dlg.open() != SWT.YES ) return;
