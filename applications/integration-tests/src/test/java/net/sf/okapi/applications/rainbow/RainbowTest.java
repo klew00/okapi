@@ -135,6 +135,16 @@ public class RainbowTest {
 		assertTrue("File different from gold", compareWithGoldFile("pipelines/testForEncoding2.out.html"));
 	}
 
+	@Test
+	public void testBOMLBConversion () throws IOException, InterruptedException {
+		// Delete previous output
+		assertTrue(deleteOutputFile("pipelines/bomlbConversion1_utf8.out.txt"));
+		assertTrue(deleteOutputFile("pipelines/bomlbConversion2_utf16BE.out.txt"));
+		assertEquals(0, runRainbow("-np -p pipelines/bomlbConversion.rnb -pln pipelines/bomlbConversion.pln"));
+		assertTrue("File different from gold", compareWithGoldFile("pipelines/bomlbConversion1_utf8.out.txt"));
+		assertTrue("File different from gold", compareWithGoldFile("pipelines/bomlbConversion2_utf16BE.out.txt"));
+	}
+
     private boolean compareWithGoldFile (String outputBase) {
     	String outputPath = root + File.separator + outputBase;
     	String goldPath = root + File.separator + "gold" + File.separator + outputBase; 

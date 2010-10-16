@@ -31,29 +31,6 @@
   </info>
  </plugin>
 
-<!--  <plugin type="separator"/> -->
-  
-<!-- <plugin type="utility"
-  id="oku_textrewriting"
-  version="1.0"
-  pluginClass="net.sf.okapi.applications.rainbow.utilities.textrewriting.Utility"
-  editorClass="net.sf.okapi.applications.rainbow.utilities.textrewriting.Editor"
-  updateUri="http://okapi.opentag.com/updates.html">
-  <info>
-   <name>Text Rewriting</name>
-   <description>Re-writes documents with different changes, for
-    example: masking translatable text, etc.</description>
-   <provider>Okapi Framework</provider>
-  </info>
-  <info xml:lang="fr">
-   <name>Re-écriture de Text</name>
-   <description>Re-écrit les documents en faisant differentes
-    modifications. Par exemple, masquer le text traduisible, etc.</description>
-   <provider>Okapi Framework</provider>
-  </info>
- </plugin>
--->
-
  <plugin type="utility"
   id="oku_alignment"
   version="1.0"
@@ -67,23 +44,7 @@
   </info>
  </plugin>
 
- <!--  <plugin type="utility"
-  id="oku_searchandreplace"
-  version="1.0"
-  pluginClass="net.sf.okapi.applications.rainbow.utilities.searchandreplace.Utility"
-  editorClass="net.sf.okapi.applications.rainbow.utilities.searchandreplace.Editor"
-  updateUri="http://okapi.opentag.com/updates.html">
-  <info>
-   <name>Search And Replace</name>
-   <description>Performs a search and replace on the input file.</description>
-   <provider>Okapi Framework</provider>
-  </info>
- </plugin>
--->
-
-<!--  <plugin type="separator"/> -->
-  
- <plugin type="utility"
+<!-- <plugin type="utility"
   id="oku_encodingconversion"
   version="1.0"
   pluginClass="net.sf.okapi.applications.rainbow.utilities.encodingconversion.Utility"
@@ -95,8 +56,9 @@
    <provider>Okapi Framework</provider>
   </info>
  </plugin>
+-->
 
- <plugin type="utility"
+<!-- <plugin type="utility"
   id="oku_bomconversion"
   version="1.0"
   pluginClass="net.sf.okapi.applications.rainbow.utilities.bomconversion.Utility"
@@ -108,19 +70,7 @@
    <provider>Okapi Framework</provider>
   </info>
  </plugin>
-
-<!-- <plugin type="utility"
-  id="oku_uriconversion"
-  version="1.0"
-  pluginClass="net.sf.okapi.applications.rainbow.utilities.uriconversion.Utility"
-  editorClass="net.sf.okapi.applications.rainbow.utilities.uriconversion.Editor"
-  updateUri="http://okapi.opentag.com/updates.html">
-  <info>
-   <name>URI Conversion</name>
-   <description>Performs a URI conversion on the input file.</description>
-   <provider>Okapi Framework</provider>
-  </info>
- </plugin> -->
+-->
 
  <plugin type="utility"
    id="oku_rtfconversion"
@@ -133,8 +83,6 @@
     <provider>Okapi Framework</provider>
    </info>
   </plugin>
-
- <!--  <plugin type="separator"/> -->
 
  <!-- <plugin type="utility"
    id="oku_ttxchecker"

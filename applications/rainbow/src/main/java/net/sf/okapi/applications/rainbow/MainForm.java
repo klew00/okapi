@@ -40,8 +40,10 @@ import net.sf.okapi.applications.rainbow.lib.LanguageManager;
 import net.sf.okapi.applications.rainbow.lib.LogForm;
 import net.sf.okapi.applications.rainbow.lib.PathBuilderPanel;
 import net.sf.okapi.applications.rainbow.lib.Utils;
+import net.sf.okapi.applications.rainbow.pipeline.BOMConversionPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.BatchTranslationPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.CharListingPipeline;
+import net.sf.okapi.applications.rainbow.pipeline.EncodingConversionPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.FormatConversionPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.IPredefinedPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.ImageModificationPipeline;
@@ -1467,26 +1469,42 @@ public class MainForm { //implements IParametersProvider {
 		});
 		
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(menuItem, "utilities.charlisting"); //$NON-NLS-1$
+		rm.setCommand(menuItem, "utilities.formatconversion"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				executePipeline(new CharListingPipeline());
+				executePipeline(new FormatConversionPipeline());
 			}
 		});
 		
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(menuItem, "utilities.termextraction"); //$NON-NLS-1$
+		rm.setCommand(menuItem, "utilities.encodingconversion"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				executePipeline(new TermExtractionPipeline());
+				executePipeline(new EncodingConversionPipeline());
 			}
 		});
 		
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(menuItem, "utilities.qualitycheck"); //$NON-NLS-1$
+		rm.setCommand(menuItem, "utilities.linebreakconversion"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				executePipeline(new QualityCheckPipeline());
+				executePipeline(new LineBreakConversionPipeline());
+			}
+		});
+		
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "utilities.bomconversion"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				executePipeline(new BOMConversionPipeline());
+			}
+		});
+		
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "utilities.uriconversion"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				executePipeline(new URIConversionPipeline());
 			}
 		});
 		
@@ -1507,26 +1525,18 @@ public class MainForm { //implements IParametersProvider {
 		});
 		
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(menuItem, "utilities.linebreakconversion"); //$NON-NLS-1$
+		rm.setCommand(menuItem, "utilities.imagemodification"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				executePipeline(new LineBreakConversionPipeline());
+				executePipeline(new ImageModificationPipeline());
 			}
 		});
 		
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(menuItem, "utilities.uriconversion"); //$NON-NLS-1$
+		rm.setCommand(menuItem, "utilities.termextraction"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				executePipeline(new URIConversionPipeline());
-			}
-		});
-		
-		menuItem = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(menuItem, "utilities.formatconversion"); //$NON-NLS-1$
-		menuItem.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent event) {
-				executePipeline(new FormatConversionPipeline());
+				executePipeline(new TermExtractionPipeline());
 			}
 		});
 		
@@ -1539,6 +1549,23 @@ public class MainForm { //implements IParametersProvider {
 		});
 		
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "utilities.batchtranslation"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				executePipeline(new BatchTranslationPipeline());
+			}
+		});
+		
+		
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "utilities.qualitycheck"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				executePipeline(new QualityCheckPipeline());
+			}
+		});
+		
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
 		rm.setCommand(menuItem, "utilities.transcomparison"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
@@ -1547,21 +1574,12 @@ public class MainForm { //implements IParametersProvider {
 		});
 		
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(menuItem, "utilities.batchtranslation"); //$NON-NLS-1$
+		rm.setCommand(menuItem, "utilities.charlisting"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				executePipeline(new BatchTranslationPipeline());
+				executePipeline(new CharListingPipeline());
 			}
 		});
-		
-		menuItem = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(menuItem, "utilities.imagemodification"); //$NON-NLS-1$
-		menuItem.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent event) {
-				executePipeline(new ImageModificationPipeline());
-			}
-		});
-		
 	}
 
 	public void run () {
