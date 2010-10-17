@@ -28,6 +28,11 @@ import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 
 @EditorFor(Parameters.class)
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
+
+	private static final String COPYCONTENT = "copyContent";
+	private static final String COPYPROPERTIES = "copyProperties";
+	private static final String OVERWRITEEXISTING = "overwriteExisting";
+	private static final String CREATEONNONTRANSLATABLE = "createOnNonTranslatable";
 	
 	private boolean copyProperties;
 	private boolean copyContent;	
@@ -48,18 +53,18 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public void fromString(String data) {
 		reset();
 		// Read the file content as a set of fields
-		copyProperties = buffer.getBoolean("copyProperties", copyProperties);
-		copyContent = buffer.getBoolean("copyContent", copyContent);
-		overwriteExisting = buffer.getBoolean("overwriteExisting", overwriteExisting);
-		createOnNonTranslatable = buffer.getBoolean("createOnNonTranslatable", createOnNonTranslatable);
+		copyProperties = buffer.getBoolean(COPYPROPERTIES, copyProperties);
+		copyContent = buffer.getBoolean(COPYCONTENT, copyContent);
+		overwriteExisting = buffer.getBoolean(OVERWRITEEXISTING, overwriteExisting);
+		createOnNonTranslatable = buffer.getBoolean(CREATEONNONTRANSLATABLE, createOnNonTranslatable);
 	}
 
 	public String toString() {
 		buffer.reset();		
-		buffer.setBoolean("copyProperties", copyProperties);
-		buffer.setBoolean("copyContent", copyContent);
-		buffer.setBoolean("overwriteExisting", overwriteExisting);
-		buffer.setBoolean("createOnNonTranslatable", createOnNonTranslatable);
+		buffer.setBoolean(COPYPROPERTIES, copyProperties);
+		buffer.setBoolean(COPYCONTENT, copyContent);
+		buffer.setBoolean(OVERWRITEEXISTING, overwriteExisting);
+		buffer.setBoolean(CREATEONNONTRANSLATABLE, createOnNonTranslatable);
 		return buffer.toString();
 	}
 
@@ -87,16 +92,6 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.overwriteExisting = overwriteExisting;
 	}
 
-	@Override
-	public ParametersDescription getParametersDescription() {
-		ParametersDescription desc = new ParametersDescription(this);
-		desc.add("copyProperties", "Copy Source Properties to Target?", "Copy Source Properties to Target?");
-		desc.add("copyContent", "Copy Source Content to Target?", "Copy Source Content to Target?");
-		desc.add("overwriteExisting", "Overwrite the current target content?", "Overwrite the current target content");
-		desc.add("createOnNonTranslatable", "Create target on nontranslatable TextUnits?", "Create target on nontranslatable TextUnits?");
-		return desc;
-	}
-
 	public boolean isCreateOnNonTranslatable() {
 		return createOnNonTranslatable;
 	}
@@ -106,14 +101,24 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	}
 
 	@Override
+	public ParametersDescription getParametersDescription() {
+		ParametersDescription desc = new ParametersDescription(this);
+		desc.add(COPYCONTENT, "Copy the source content to the target", null);
+		desc.add(COPYPROPERTIES, "Copy the source properties to the target", null);
+		desc.add(OVERWRITEEXISTING, "Overwrite the current target content", null);
+		desc.add(CREATEONNONTRANSLATABLE, "Creates target for non-translatable text units", null);
+		return desc;
+	}
+
+	@Override
 	public EditorDescription createEditorDescription(ParametersDescription paramsDesc) {
-		EditorDescription desc = new EditorDescription("Copy Source To Target", true, false);		
-		desc.addCheckboxPart(paramsDesc.get("copyProperties"));
-		desc.addCheckboxPart(paramsDesc.get("copyContent"));
+		EditorDescription desc = new EditorDescription("Create Target", true, false);		
+		desc.addCheckboxPart(paramsDesc.get(COPYCONTENT));
+		desc.addCheckboxPart(paramsDesc.get(COPYPROPERTIES));
 		desc.addSeparatorPart();
-		desc.addCheckboxPart(paramsDesc.get("overwriteExisting"));
+		desc.addCheckboxPart(paramsDesc.get(OVERWRITEEXISTING));
 		desc.addSeparatorPart();
-		desc.addCheckboxPart(paramsDesc.get("createOnNonTranslatable"));
+		desc.addCheckboxPart(paramsDesc.get(CREATEONNONTRANSLATABLE));
 		return desc;
 	}
 }

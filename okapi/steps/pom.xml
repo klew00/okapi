@@ -30,6 +30,7 @@
 		<module>segmentation</module>
         <module>sentence-aligner</module>
         <module>simplekit</module>
+        <module>rtfconversion</module>
         <module>termextraction</module>
 		<module>textmodification</module>
         <module>tokenization</module>

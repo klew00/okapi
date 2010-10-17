@@ -52,6 +52,7 @@ import net.sf.okapi.applications.rainbow.pipeline.LineBreakConversionPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.PipelineEditor;
 import net.sf.okapi.applications.rainbow.pipeline.PipelineWrapper;
 import net.sf.okapi.applications.rainbow.pipeline.QualityCheckPipeline;
+import net.sf.okapi.applications.rainbow.pipeline.RTFConversionPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.SnRWithFilterPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.TermExtractionPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.TextRewritingPipeline;
@@ -1497,6 +1498,14 @@ public class MainForm { //implements IParametersProvider {
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				executePipeline(new BOMConversionPipeline());
+			}
+		});
+		
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "utilities.rtfconversion"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				executePipeline(new RTFConversionPipeline());
 			}
 		});
 		

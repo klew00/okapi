@@ -47,7 +47,7 @@ public class CreateTargetStep extends BasePipelineStep {
 	}
 
 	public String getName() {
-		return "Create Target Segment Container";
+		return "Create Target";
 	}
 
 	@Override

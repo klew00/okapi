@@ -145,7 +145,15 @@ public class RainbowTest {
 		assertTrue("File different from gold", compareWithGoldFile("pipelines/bomlbConversion2_utf16BE.out.txt"));
 	}
 
-    private boolean compareWithGoldFile (String outputBase) {
+	@Test
+	public void testRTFConversion () throws IOException, InterruptedException {
+		// Delete previous output
+		assertTrue(deleteOutputFile("pipelines/rtfConversion1.out.rtf"));
+		assertEquals(0, runRainbow("-np -p pipelines/rtfConversion.rnb -pln pipelines/rtfConversion.pln"));
+		assertTrue("File different from gold", compareWithGoldFile("pipelines/rtfConversion1.out.rtf"));
+	}
+
+	private boolean compareWithGoldFile (String outputBase) {
     	String outputPath = root + File.separator + outputBase;
     	String goldPath = root + File.separator + "gold" + File.separator + outputBase; 
     	return fc.filesExactlyTheSame(outputPath, goldPath);
