@@ -25,6 +25,7 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -66,7 +67,7 @@ import org.w3c.dom.NodeList;
  */
 public class PluginsManagerDialog {
 	
-	private final static int BUFFERSIZE = 2048;
+	private final static int BUFFERSIZE = 5120;
 	
 	private Shell shell;
 	private IHelp help;
@@ -77,6 +78,8 @@ public class PluginsManagerDialog {
 	private Button btRemove;
 	private TableModel modAvailable;
 	private Table tblAvailable;
+	private Text edDescription;
+	private Button btPluginHelp;
 	private TableModel modCurrent;
 	private Table tblCurrent;
 	private URL repository;
@@ -148,14 +151,50 @@ public class PluginsManagerDialog {
 				refresh();
 			}
 		});
+		shell.setDefaultButton(btRefreshURL);
 
 		tblAvailable = createTable(true, grpAvailable, 2);
 		modAvailable = new TableModel(tblAvailable, true);
+		tblAvailable.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				updateAvailable();
+            }
+		});
 
-		btInstall = UIUtil.createGridButton(grpAvailable, SWT.PUSH, "Install Checked Plugins...", longButtonsWidth, 2);
+		Composite cmpTmp = new Composite(grpAvailable, SWT.NONE);
+		gdTmp = new GridData(GridData.FILL_BOTH);
+		gdTmp.horizontalSpan = 2;
+		cmpTmp.setLayoutData(gdTmp);
+		GridLayout layTmp = new GridLayout(2, false);
+		layTmp.marginWidth = 0;
+		layTmp.marginHeight = 0;
+		cmpTmp.setLayout(layTmp);
+		
+		btInstall = new Button(cmpTmp, SWT.PUSH);
+		btInstall.setText("Install Checked Plugins...");
+		gdTmp = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING | GridData.VERTICAL_ALIGN_BEGINNING);
+		gdTmp.widthHint = longButtonsWidth;
+		btInstall.setLayoutData(gdTmp);
 		btInstall.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				install();
+			}
+		});
+		
+		edDescription = new Text(cmpTmp, SWT.BORDER);
+		gdTmp = new GridData(GridData.FILL_BOTH);
+		gdTmp.verticalSpan = 2;
+		edDescription.setLayoutData(gdTmp);
+		edDescription.setEditable(false);
+		
+		btPluginHelp = new Button(cmpTmp, SWT.PUSH);
+		btPluginHelp.setText("Plugin Help");
+		gdTmp = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING | GridData.VERTICAL_ALIGN_BEGINNING);
+		gdTmp.widthHint = longButtonsWidth;
+		btPluginHelp.setLayoutData(gdTmp);
+		btPluginHelp.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				callPluginHelp();
 			}
 		});
 		
@@ -206,6 +245,32 @@ public class PluginsManagerDialog {
 		return actionHasBeenCalled;
 	}
 	
+	private void callPluginHelp () {
+		String tmp = (String)btPluginHelp.getData();
+		if ( tmp == null ) return;
+		try {
+			Util.openURL(new URL(tmp).toString());
+		}
+		catch ( MalformedURLException e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+	}
+	
+	private void updateAvailable () {
+		int n = tblAvailable.getSelectionIndex();
+		String helpString = null;
+		if ( n == -1 ) {
+			edDescription.setText("");
+		}
+		else {
+			PluginInfo pi = (PluginInfo)tblAvailable.getItem(n).getData();
+			edDescription.setText(pi.getDescription()==null ? "" : pi.getDescription());
+			helpString = pi.getHelpURL();
+		}
+		btPluginHelp.setData(helpString);
+		btPluginHelp.setEnabled(helpString!=null);
+	}
+	
 	private Table createTable (boolean maxMode,
 		Composite parent,
 		int horizontalSpan)
@@ -225,9 +290,8 @@ public class PluginsManagerDialog {
 			    	Rectangle rect = table.getClientArea();
 					int part = (int)(rect.width / 100);
 					int remain = (int)(rect.width % 100);
-					table.getColumn(0).setWidth(remain+(part*60));
-					table.getColumn(1).setWidth(part*30);
-					table.getColumn(2).setWidth(part*10);
+					table.getColumn(0).setWidth(remain+(part*67));
+					table.getColumn(1).setWidth(part*33);
 			    }
 			});
 		}
@@ -275,6 +339,7 @@ public class PluginsManagerDialog {
 		}
 		// Display the current plugins
 		refreshCurrentPlugins();
+		updateAvailable();
 	}
 
 	private void refresh () {
@@ -293,6 +358,7 @@ public class PluginsManagerDialog {
 			int index = tblAvailable.getSelectionIndex();
 			URL url = new URL(repository + "/pluginsDeployment.xml");
 			modAvailable.updateTable(loadInfoList(url), null, index);
+			updateAvailable();
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
@@ -311,7 +377,7 @@ public class PluginsManagerDialog {
 			}
 			for ( File file : files ) {
 				if ( file.isDirectory() ) {
-					list.add(new PluginInfo(file.getName(), null, null, null, 0));
+					list.add(new PluginInfo(file.getName(), null, null, null));
 				}
 			}
 		}
@@ -439,6 +505,10 @@ public class PluginsManagerDialog {
 				String outPath = subDir + entry.getName();
 				// Make sure to create the proper directories as needed
 				Util.createDirectories(outPath);
+				if ( outPath.endsWith("\\") || outPath.endsWith("/") ) {
+					// Move on to next for directories
+					continue;
+				}
 				// Unzip
 				fos = new FileOutputStream(outPath);
 				bos = new BufferedOutputStream(fos, BUFFERSIZE);
@@ -452,6 +522,7 @@ public class PluginsManagerDialog {
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
+			removePlugin(pluginName);
 		}
 		finally {
 			if ( zis != null ) {
@@ -488,19 +559,13 @@ public class PluginsManagerDialog {
 					throw new RuntimeException("Invalid description file: missing name attribute.");
 				}
 				String description = null;
-				
-				String tmp = elem.getAttribute("size");
-				int size = 0;
-				if ( !Util.isEmpty(tmp) ) {
-					try {
-						size = Integer.parseInt(tmp);
-					}
-					catch ( NumberFormatException e ) {
-						size = 0;
-					}
+				NodeList list2 = elem.getElementsByTagName("description");
+				if ( list2.getLength() > 0 ) {
+					description = Util.getTextContent(list2.item(0));
 				}
-				
-				list.add(new PluginInfo(name, elem.getAttribute("provider"), description, elem.getAttribute("helpURL"), size));
+				String helpURL = elem.getAttribute("helpURL");
+				if ( Util.isEmpty(helpURL) ) helpURL = null;
+				list.add(new PluginInfo(name, elem.getAttribute("provider"), description, helpURL));
 			}
 			
 		}

@@ -43,8 +43,6 @@ class TableModel {
 		if ( maxMode ) {
 			col = new TableColumn(table, SWT.NONE);
 			col.setText("Provider");
-			col = new TableColumn(table, SWT.NONE);
-			col.setText("Size (KB)");
 		}
 		else {
 			col = new TableColumn(table, SWT.NONE);
@@ -63,15 +61,13 @@ class TableModel {
 			item.setText(0, info.getName());
 			if ( maxMode ) {
 				item.setText(1, info.getProvider());
-				if ( info.getSize() > 0 ) {
-					item.setText(2, String.format("%d", info.getSize()));
-				}
 			}
 			else {
 				if ( lockedPlugins.contains(info.getName()) ) {
 					item.setText(1, "Locked");
 				}
 			}
+			item.setData(info);
 		}
 		if ( table.getItemCount() > 0 ) {
 			if ( index > -1 ) {

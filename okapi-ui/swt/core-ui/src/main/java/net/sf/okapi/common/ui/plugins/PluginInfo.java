@@ -26,7 +26,6 @@ public class PluginInfo {
 	private String provider;
 	private String description;
 	private String helpURL;
-	private int size;
 
 	/**
 	 * Creates a new PluginInfo object.
@@ -34,19 +33,16 @@ public class PluginInfo {
 	 * @param provider the provider name (can be null).
 	 * @param description a description of what the plugin does (can be null).
 	 * @param helpURL a URL to an help page (can be null).
-	 * @param int size the size of the download in KB.
 	 */
 	public PluginInfo (String name,
 		String provider,
 		String description,
-		String helpURL,
-		int size)
+		String helpURL)
 	{
 		this.name = name;
 		this.provider = provider;
 		this.description = description;
 		this.helpURL = helpURL;
-		this.size = size;
 	}
 	
 	public String getName () {
@@ -63,10 +59,6 @@ public class PluginInfo {
 
 	public String getHelpURL () {
 		return helpURL;
-	}
-
-	public int getSize () {
-		return size;
 	}
 
 }
