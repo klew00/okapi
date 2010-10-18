@@ -181,7 +181,7 @@ public class PluginsManagerDialog {
 			}
 		});
 		
-		edDescription = new Text(cmpTmp, SWT.BORDER);
+		edDescription = new Text(cmpTmp, SWT.BORDER | SWT.WRAP);
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.verticalSpan = 2;
 		edDescription.setLayoutData(gdTmp);

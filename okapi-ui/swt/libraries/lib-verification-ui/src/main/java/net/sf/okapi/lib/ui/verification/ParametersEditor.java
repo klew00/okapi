@@ -54,6 +54,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.TabFolder;
@@ -788,9 +789,9 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		// Save/Load buttons
 		
 		grpTmp = new Group(cmpTmp, SWT.NONE);
-		grpTmp.setText("Configuration Import / Export");
+		grpTmp.setText("Overall Configuration");
 		grpTmp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		grpTmp.setLayout(new GridLayout(2, false));
+		grpTmp.setLayout(new GridLayout(3, false));
 		
 		Button btTmp = UIUtil.createGridButton(grpTmp, SWT.PUSH, "Import...", UIUtil.BUTTON_DEFAULT_WIDTH, 1);
 		btTmp.addSelectionListener(new SelectionAdapter() {
@@ -803,6 +804,13 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		btTmp.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				exportConfiguration();
+			};
+		});
+		
+		btTmp = UIUtil.createGridButton(grpTmp, SWT.PUSH, "Reset to Defaults...", UIUtil.BUTTON_DEFAULT_WIDTH*2, 1);
+		btTmp.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				resetToDefaults();
 			};
 		});
 		
@@ -867,6 +875,26 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, "Error while saving configuration.\n"+e.getMessage(), null);
+		}
+	}
+	
+	private void resetToDefaults () {
+		try {
+			// Ask confirmation
+			MessageBox msgDlg = new MessageBox(shell, SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
+			msgDlg.setMessage("This command will reset all the configuration settings to their defaults.\n"
+				+ "Do you want to proceed?");
+			msgDlg.setText("Reset to Defaults");
+			switch ( msgDlg.open() ) {
+			case SWT.CANCEL:
+			case SWT.NO:
+				return; // Stop here
+			}
+			params.fromString("");
+			setData();
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, "Error while resetting configuration.\n"+e.getMessage(), null);
 		}
 	}
 	
