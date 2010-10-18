@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Java Vignette Filter
+Bundle-Name: Vignette Filter
 Bundle-SymbolicName: net.sf.okapi.filters.vignette
 Bundle-Version: 1.0.0
 Export-Package: net.sf.okapi.filters.vignette
