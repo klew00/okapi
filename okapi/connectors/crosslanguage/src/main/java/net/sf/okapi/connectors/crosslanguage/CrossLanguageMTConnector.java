@@ -34,10 +34,8 @@ import com.crosslang.clgateway.ws.gateway.impl.ClGatewayPortBindingStub;
 
 import net.sf.okapi.common.Base64;
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.translation.BaseConnector;
 import net.sf.okapi.lib.translation.QueryResult;
 import net.sf.okapi.lib.translation.QueryUtil;
@@ -106,11 +104,6 @@ public class CrossLanguageMTConnector extends BaseConnector {
 		return queryFile(text);
 	}
 
-	@Override
-	public void leverage(TextUnit tu, boolean fillTarget) {
-		throw new OkapiNotImplementedException();		
-	}
-
 	private int queryString (String text) {
 		current = -1;
 		try {
@@ -121,6 +114,7 @@ public class CrossLanguageMTConnector extends BaseConnector {
 			
 			// Process the result
 			result = new QueryResult();
+			result.weight = getWeight();
 			result.source = new TextFragment(text);
 			result.target = new TextFragment(res);
 			result.score = 95; // Arbitrary score for MT

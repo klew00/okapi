@@ -41,6 +41,7 @@ import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
+import net.sf.okapi.lib.translation.BaseConnector;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
 import net.sf.okapi.lib.translation.TextMatcher;
@@ -49,7 +50,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-public class OpenTranTMConnector implements ITMQuery {
+public class OpenTranTMConnector extends BaseConnector implements ITMQuery {
 
 	private String srcCode;
 	private String trgCode;
@@ -148,6 +149,7 @@ public class OpenTranTMConnector implements ITMQuery {
 	        		@SuppressWarnings("unchecked")
 	        		Map<String, Object> pairs = (Map<String, Object>)projects.get(p);
 	        		qr = new QueryResult();
+	        		qr.weight = getWeight();
 	        		qr.target = new TextFragment(text);
 	        		qr.source = new TextFragment((String)pairs.get("orig_phrase"));
 					String tmp = (String)pairs.get("path");
@@ -235,7 +237,8 @@ public class OpenTranTMConnector implements ITMQuery {
 		return threshold;
 	}
 
-	private String toInternalCode (LocaleId locale) {
+	@Override
+	protected String toInternalCode (LocaleId locale) {
 		String code = locale.toPOSIXLocaleId();
 		if ( !code.startsWith("zh") && ( code.length() > 2 )) {
 			code = code.substring(0, 2);
@@ -259,11 +262,6 @@ public class OpenTranTMConnector implements ITMQuery {
 		// Not used
 	}
 	
-	@Override
-	public void leverage(TextUnit tu, boolean fillTarget) {
-		throw new OkapiNotImplementedException();		
-	}
-
 	/**
 	 * Re-calculates the scores, re-orders and filters the results based on
 	 * more meaning full comparisons.

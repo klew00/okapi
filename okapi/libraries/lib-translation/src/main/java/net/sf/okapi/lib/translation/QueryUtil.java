@@ -409,13 +409,14 @@ public class QueryUtil {
 	/**
 	 * Remove duplicates based on the Equals method of {@link QueryResult}. 
 	 * Preserve the highest ranked query results.
-	 * For example, duplicate results with the newest creation date are always retained.
+	 * For example, duplicate results with the newest creation date are always retained.<br/>
+	 * <b>WARNING:</b> order is not preserved!
 	 * 
 	 * @param queryResults
 	 *            -list of QueryResults
 	 * @return queryResults without duplicates
 	 */
-	public static List<QueryResult> removeDuplicates(List<QueryResult> queryResults) {
+	public static ArrayList<QueryResult> removeDuplicates(List<QueryResult> queryResults) {
 		// add QueryResults to linked hash in ranked order
 		// to make sure we keep the highest ranked duplicates
 		LinkedHashSet<QueryResult> dupRemove = new LinkedHashSet<QueryResult>(queryResults.size());

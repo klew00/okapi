@@ -52,12 +52,12 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
+import net.sf.okapi.lib.translation.BaseConnector;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
 
-public class GlobalSightTMConnector implements ITMQuery {
+public class GlobalSightTMConnector extends BaseConnector implements ITMQuery {
 
 	private String srcLang;
 	private String trgLang;
@@ -194,6 +194,7 @@ public class GlobalSightTMConnector implements ITMQuery {
 				elem = (Element)list1.item(i);
 				list2 = elem.getElementsByTagName("percentage");
 				res = new QueryResult();
+				res.weight = getWeight();
 				res.score = Integer.valueOf(Util.getTextContent(list2.item(0)).replace("%", ""));
 				if ( res.score < threshold ) continue;
 				
@@ -328,6 +329,7 @@ public class GlobalSightTMConnector implements ITMQuery {
 				elem = (Element)list1.item(i);
 				list2 = elem.getElementsByTagName("percentage");
 				res = new QueryResult();
+				res.weight = getWeight();
 				res.score = Integer.valueOf(Util.getTextContent(list2.item(0)).replace("%", ""));
 				if ( res.score < threshold ) continue;
 				list2 = elem.getElementsByTagName("source");
@@ -461,7 +463,8 @@ public class GlobalSightTMConnector implements ITMQuery {
 		trgLang = toInternalCode(targetLocale);
 	}
 
-	private String toInternalCode (LocaleId locale) {
+	@Override
+	protected String toInternalCode (LocaleId locale) {
 		//TODO: Do we need to adjust the code to always have the country?
 		String code = locale.toPOSIXLocaleId();
 		return code;
@@ -510,10 +513,5 @@ public class GlobalSightTMConnector implements ITMQuery {
 	@Override
 	public void setRootDirectory (String rootDir) {
 		// Not used
-	}
-	
-	@Override
-	public void leverage(TextUnit tu, boolean fillTarget) {
-		throw new OkapiNotImplementedException();		
 	}
 }

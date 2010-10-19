@@ -28,12 +28,12 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.lib.translation.BaseConnector;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
 import net.sf.okapi.tm.simpletm.Database;
 
-public class SimpleTMConnector implements ITMQuery {
+public class SimpleTMConnector extends BaseConnector implements ITMQuery {
 	
 	private Database db;
 	private int maxHits = 5;
@@ -196,10 +196,5 @@ public class SimpleTMConnector implements ITMQuery {
 	@Override
 	public void setRootDirectory (String rootDir) {
 		this.rootDir = rootDir;
-	}
-	
-	@Override
-	public void leverage(TextUnit tu, boolean fillTarget) {
-		throw new OkapiNotImplementedException();		
 	}
 }

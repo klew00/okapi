@@ -41,13 +41,13 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.lib.translation.BaseConnector;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
 import net.sf.okapi.lib.translation.QueryUtil;
 import net.sf.okapi.lib.translation.TextMatcher;
 
-public class TDASearchConnector implements ITMQuery {
+public class TDASearchConnector extends BaseConnector implements ITMQuery {
 
 	// Language code to TDA code, except for reg=lang cases (fr-fr)
 	private static final String[][] LANGSMAP = {
@@ -173,6 +173,7 @@ public class TDASearchConnector implements ITMQuery {
 	    		@SuppressWarnings("unchecked")
 	    		Map<String, Object> entry = (Map<String, Object>)array.get(i);
 	    		QueryResult result = new QueryResult();
+	    		result.weight = getWeight();
 	    		result.source = new TextFragment((String)entry.get("source"));
 	    		result.target = new TextFragment((String)entry.get("target"));
 	    		result.origin = "TDA";
@@ -206,7 +207,8 @@ public class TDASearchConnector implements ITMQuery {
 		this.params = (Parameters)params;
 	}
 	
-	private String toInternalCode (LocaleId locale) {
+	@Override
+	protected String toInternalCode (LocaleId locale) {
 		String code = locale.toBCP47(); 
 		String lang = locale.getLanguage();
 		if ( locale.getRegion() == null ) {
@@ -344,11 +346,6 @@ public class TDASearchConnector implements ITMQuery {
 		// Not used
 	}
 	
-	@Override
-	public void leverage(TextUnit tu, boolean fillTarget) {
-		throw new OkapiNotImplementedException();		
-	}
-
 	/**
 	 * Re-calculates the scores, re-orders and filters the results based on
 	 * more meaning full comparisons.

@@ -37,12 +37,12 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.lib.translation.BaseConnector;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
 import net.sf.okapi.lib.translation.QueryUtil;
 
-public class MyMemoryTMConnector implements ITMQuery {
+public class MyMemoryTMConnector extends BaseConnector implements ITMQuery {
 
 	private static final String SERVER_URL = "http://mymemory.translated.net/otms/";
 	
@@ -137,6 +137,7 @@ public class MyMemoryTMConnector implements ITMQuery {
 				for ( Match match : matches ) {
 					if ( ++i > maxHits ) break; // Maximum reached
 					res = new QueryResult();
+					res.weight = getWeight();
 					if ( match.getTranslator().equals("MT!") ) {
 						res.origin = getName();
 						res.matchType = MatchType.MT;
@@ -203,7 +204,8 @@ public class MyMemoryTMConnector implements ITMQuery {
 		trgLang = toInternalCode(targetLang);
 	}
 
-	private String toInternalCode (LocaleId standardCode) {
+	@Override
+	protected String toInternalCode (LocaleId standardCode) {
 		// The expected language code is language-Region with region mandatory
 		String lang = standardCode.getLanguage();
 		String reg = standardCode.getRegion();
@@ -264,10 +266,5 @@ public class MyMemoryTMConnector implements ITMQuery {
 	@Override
 	public void setRootDirectory (String rootDir) {
 		// Not used
-	}
-	
-	@Override
-	public void leverage(TextUnit tu, boolean fillTarget) {
-		throw new OkapiNotImplementedException();		
-	}
+	}	
 }

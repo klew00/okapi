@@ -90,7 +90,8 @@ public class Utility extends BaseFilterDrivenUtility {
 			qm.addAndInitializeResource(params.transResClass, null, params.transResParams);
 			if ( params.useTransRes2 ) {
 				qm.addAndInitializeResource(params.transResClass2, null, params.transResParams2);
-				qm.setReorder(false); // Keep results grouped by resources
+				// TODO: We now accomplish this via connector weights  
+				// qm.setReorder(false); // Keep results grouped by resources
 			}
 		}
 		
@@ -255,7 +256,7 @@ public class Utility extends BaseFilterDrivenUtility {
 			if ( params.useGroupName && ( tu.getName() != null )) {
 				qm.setAttribute("GroupName", tu.getName());
 			}
-			qm.leverage(tu, null, true);
+			qm.leverage(tu, true);
 			cont = tu.getTarget(trgLang);
 
 			// Compute statistics

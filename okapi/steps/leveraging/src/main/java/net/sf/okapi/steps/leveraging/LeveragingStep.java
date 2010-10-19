@@ -27,7 +27,6 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.ScoresAnnotation;
-import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.filterwriter.TMXWriter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
@@ -36,7 +35,6 @@ import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.lib.translation.IQuery;
 import net.sf.okapi.lib.translation.QueryManager;
 import net.sf.okapi.lib.translation.ResourceItem;
 
@@ -52,13 +50,11 @@ public class LeveragingStep extends BasePipelineStep {
 	private TMXWriter tmxWriter;
 	private String rootDir;
 	private boolean initDone;
-	private boolean useQueryManagerLeverage;
 
 	private int iQueryId;
 
 	public LeveragingStep () {
 		params = new Parameters();
-		useQueryManagerLeverage = false;
 	}
 	
 	@StepParameterMapping(parameterType = StepParameterType.SOURCE_LOCALE)
@@ -149,15 +145,13 @@ public class LeveragingStep extends BasePipelineStep {
     	}
 //end of to be deleted 
     	// Leverage
-    	if (useQueryManagerLeverage) {
-    		qm.leverage(tu, tmxWriter, params.getFillTarget());
-    	} else {
-    		IQuery q = qm.getInterface(iQueryId);
-    		q.leverage(tu, params.getFillTarget());
-    		if ( tmxWriter != null ) {
-				tmxWriter.writeItem(tu, null);
-			}
-    	}
+    	
+    	qm.leverage(tu, params.getFillTarget());
+    	
+    	// optionally write out this TU
+		if ( tmxWriter != null ) {
+			tmxWriter.writeItem(tu, null);
+		}
 		
 		return event;
 	}
@@ -188,16 +182,6 @@ public class LeveragingStep extends BasePipelineStep {
 		qm.setRootDirectory(rootDir);
 		iQueryId = qm.addAndInitializeResource(params.getResourceClassName(), null,
 			params.getResourceParameters());
-
-		// test to see if the IQuery object implements leverage
-		// FIXME: We will clean this up in a subsequent refactor
-		IQuery q = qm.getInterface(iQueryId);
-		useQueryManagerLeverage = false;
-		try {
-			q.leverage(null, false);
-		} catch (OkapiNotImplementedException e) {
-			useQueryManagerLeverage = true;
-		}
 		
 		ResourceItem res = qm.getResource(iQueryId);
 		logger.info("Leveraging settings: "+res.name);

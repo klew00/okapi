@@ -40,11 +40,11 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.lib.translation.BaseConnector;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
 
-public class TranslateToolkitTMConnector implements ITMQuery {
+public class TranslateToolkitTMConnector extends BaseConnector implements ITMQuery {
 
 	private Parameters params;
 	private String baseURL;
@@ -133,6 +133,7 @@ public class TranslateToolkitTMConnector implements ITMQuery {
 	        	@SuppressWarnings("unchecked")
 	        	Map<String, Object> map = (Map<String, Object>)array.get(i);
 	        	qr = new QueryResult();
+	        	qr.weight = getWeight();
 	        	qr.score = ((Double)map.get("quality")).intValue();
 	        	if ( qr.score < threshold ) break; // Done
 	        	qr.source = new TextFragment((String)map.get("source"));
@@ -214,11 +215,7 @@ public class TranslateToolkitTMConnector implements ITMQuery {
 	}
 	
 	@Override
-	public void leverage(TextUnit tu, boolean fillTarget) {
-		throw new OkapiNotImplementedException();		
-	}
-
-	private String toInternalCode (LocaleId standardCode) {
+	protected String toInternalCode (LocaleId standardCode) {
 		return standardCode.toPOSIXLocaleId();
 	}
 

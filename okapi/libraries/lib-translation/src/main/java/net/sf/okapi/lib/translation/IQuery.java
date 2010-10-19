@@ -127,9 +127,8 @@ public interface IQuery {
 	 * Leverages a text unit (segmented or not) based on the current settings.
 	 * Any options or attributes needed must be set before calling this method.
 	 * @param tu the text unit to leverage.
-	 * @param fillTarget true to put the leveraged text into the target, false to not.
 	 */
-	public void leverage(TextUnit tu, boolean fillTarget);
+	public void leverage(TextUnit tu);
 	
 	/**
 	 * Starts a batch query for a given list of {@link TextFragment}s.
@@ -160,4 +159,16 @@ public interface IQuery {
 	 */
 	public void setRootDirectory (String rootDir);
 	
+	/**
+	 * Set the relative weight of this {@link IQuery} connector as compared to 
+	 * other connectors. Used to set {@link QueryResult#weight}.    
+	 * @param weight
+	 */
+	public void setWeight(int weight);
+	
+	/**
+	 * Get the weight for this connector.
+	 * @return the weight for this connector
+	 */
+	public int getWeight();
 }

@@ -32,13 +32,9 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.annotation.ScoresAnnotation;
-import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
-import net.sf.okapi.common.filterwriter.TMXWriter;
 import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Segment;
-import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 
@@ -60,8 +56,7 @@ public class QueryManager {
 	private int threshold = 75;
 	private int maxHits = 5;
 	private int totalSegments;
-	private int leveragedSegments;
-	private boolean reorder = true;
+	private int leveragedSegments;	
 	private String rootDir;
 	
 	/**
@@ -70,27 +65,7 @@ public class QueryManager {
 	public QueryManager () {
 		resList = new LinkedHashMap<Integer, ResourceItem>();
 		results = new ArrayList<QueryResult>();
-		attributes = new LinkedHashMap<String, String>();
-	}
-	
-	/**
-	 * Sets the option to re-order the results of the queries when querying
-	 * multiple resources. 
-	 * @param reorder true to re-order the matches, false, to let them grouped
-	 * by resource.
-	 */
-	public void setReorder (boolean reorder) {
-		this.reorder = reorder;
-	}
-	
-	/**
-	 * Gets if this query manager re-order the results of the queries when
-	 * querying multiple resources.
-	 * @return true if the results are re-ordered, false if they are left 
-	 * grouped by resource. 
-	 */
-	public boolean getReorder () {
-		return reorder;
+		attributes = new LinkedHashMap<String, String>();		
 	}
 	
 	/**
@@ -311,10 +286,12 @@ public class QueryManager {
 				if ( res != null ) resources++;
 			}
 		}
-		if ( results.size() > 0 ) current = 0;
-		if (( resources > 1 ) && reorder ) {
-			Collections.sort(results); // Sort by weights
-		}
+		
+		// remove duplicates based on QueryResult.equals
+		// remove duplicates also sorts in ranked order
+		results = QueryUtil.removeDuplicates(results); 
+		
+		if ( results.size() > 0 ) current = 0;		
 		return results.size();
 	}
 
@@ -341,10 +318,12 @@ public class QueryManager {
 				if ( res != null ) resources++;
 			}
 		}
-		if ( results.size() > 0 ) current = 0;
-		if (( resources > 1 ) && reorder ) {
-			Collections.sort(results); // Sort by weights
-		}
+		
+		// remove duplicates based on QueryResult.equals
+		// remove duplicates also sorts in ranked order
+		results = QueryUtil.removeDuplicates(results);
+		
+		if ( results.size() > 0 ) current = 0;		
 		return results.size();
 	}
 
@@ -457,121 +436,80 @@ public class QueryManager {
 			ri.query.setRootDirectory(this.rootDir);
 		}
 	}
-	
+
 	/**
 	 * Leverages a text unit (segmented or not) based on the current settings.
 	 * Any options or attributes needed must be set before calling this method.
 	 * @param tu the text unit to leverage.
-	 * @param tmxWriter TMX writer object where to also write the results (can be null).
 	 * @param fillTarget true to put the leveraged text into the target, false to not.
 	 */
-	public void leverage (TextUnit tu,
-		TMXWriter tmxWriter,
-		boolean fillTarget)
+	public void leverage (TextUnit tu, boolean fillTarget)
 	{
-		if ( !tu.isTranslatable() ) return;
+		if ( !tu.isTranslatable() ) {
+			return;
+		} 
 		
-		TextContainer tc = tu.getSource().clone();
-		ScoresAnnotation scores = new ScoresAnnotation();
-		QueryResult qr;
-		int count;
-		int leveraged = 0;
+		for ( int id : resList.keySet() ) {
+			ResourceItem ri = resList.get(id);
+			if ( !ri.enabled ) continue; // Skip disabled entries
+			ri.query.leverage(tu);				
+		}		
 		
-		// For each segment
-		for ( Segment seg : tc.getSegments() ) {
-			// Query if needed
-			if ( seg.text.hasText(false) ) {
-				totalSegments++;
-				count = query(seg.text);
-			}
-			else count = 0;
+		// sort annotations added across IQuery.leverage calls
+		// and fill in best matching target if needed
+		AltTranslationsAnnotation altTrans = null;
+		AltTranslation bestMatch = null;
+		for (LocaleId loc : tu.getTargetLocales()) {
+			ScoresAnnotation scores = new ScoresAnnotation();
 			
-			// Process results
-			if ( count == 0 ) {
-				scores.add(0, null);
-				continue;
-			}
-
-			qr = next();
-			// It's a 100% match
-			if ( qr.score == 100 ) {
-				// Check if they are several and if they have the same translation
-				if ( !exactsHaveSameTranslation() ) {
-					if ( threshold >= 100 ) {
-						// several hits without same translation is like fuzzy matches
-						// So if the threshold is 100: don't leverage
-						scores.add(0, null);
-						continue;
-					}
-					else {
-						// If threshold is below 100: Use the first one and lower the score to 99%
-						scores.add(99, (qr.fromMT() ? Util.MTFLAG : qr.origin));
-						seg.text = adjustNewFragment(seg.text, qr.source, qr.target, qr.score, tu);
-						leveraged++;
-						// Temporary code for alt-trans annotation
-						addAltTranslation(seg, qr.toAltTranslation(seg.text, srcLoc, trgLoc));
-						continue;
+			// check target container first
+			altTrans = tu.getTarget(loc).getAnnotation(AltTranslationsAnnotation.class);
+			if (altTrans != null) {
+				altTrans.sort();
+				
+				// TODO: Remove deprecated ScoresAnnotation code
+				accumulateScoresAnnotation(scores, altTrans);
+				/////////////////////
+				
+				if (fillTarget) {
+					if ((bestMatch = altTrans.getFirst()) != null) {
+						tu.setTargetContent(getTargetLanguage(), bestMatch.getTarget().getUnSegmentedContentCopy());
 					}
 				}
-				else {
-					// Else: First is 100%, possibly several that have the same translations
-					scores.add(qr.score, (qr.fromMT() ? Util.MTFLAG : qr.origin)); // That's 100% then
-					seg.text = adjustNewFragment(seg.text, qr.source, qr.target, qr.score, tu);
-					leveraged++;
-					// temporary code for alt-trans annotation
-					addAltTranslation(seg, qr.toAltTranslation(seg.text, srcLoc, trgLoc));
-					continue;
+			} else {
+				// check each target segment
+				for (Segment ts : tu.getTarget(loc).getSegments()) {
+					altTrans = ts.getAnnotation(AltTranslationsAnnotation.class);
+					if (altTrans != null) {
+						altTrans.sort();
+						
+						// TODO: Remove deprecated ScoresAnnotation code
+						accumulateScoresAnnotation(scores, altTrans);
+						/////////////////////
+						
+						if (fillTarget) {
+							if ((bestMatch = altTrans.getFirst()) != null) {
+								ts.text = bestMatch.getTarget().getUnSegmentedContentCopy();
+							}
+						}
+					}		
 				}
 			}
-			else {
-				// First is not 100%: use it and move on
-				scores.add(qr.score, (qr.fromMT() ? Util.MTFLAG : qr.origin));
-				seg.text = adjustNewFragment(seg.text, qr.source, qr.target, qr.score, tu);
-				leveraged++;
-				// temporary code for alt-trans annotation
-				addAltTranslation(seg, qr.toAltTranslation(seg.text, srcLoc, trgLoc));
+			
+			// TODO: Remove deprecated ScoresAnnotation code
+			if (!scores.isEmpty()) {
+				tu.getTarget(loc).setAnnotation(scores);
 			}
+			/////////////////////////
+		}
+	}
+		
+	private void accumulateScoresAnnotation(ScoresAnnotation scores,
+			AltTranslationsAnnotation altTrans) {
+		for (AltTranslation at : altTrans) {
+			scores.add(at.getScore(), (at.fromMT() ? Util.MTFLAG : at.getOrigin()));
 		}
 		
-		// Set the scores only if there is something to report
-		if ( leveraged > 0 ) {
-			rewind();
-			// Set the target and attach the score
-			tc.setAnnotation(scores);
-			tu.setTarget(trgLoc, tc);
-			leveragedSegments += leveraged;
-			if ( tmxWriter != null ) {
-				tmxWriter.writeItem(tu, null);
-			}
-			// If the option to fill the target is not set, we clear the text
-			// But we keep the annotations: TODO
-			if ( !fillTarget ) {
-				tu.removeTarget(trgLoc);
-			}
-		}
-	}
-	
-	private void addAltTranslation (Segment seg, AltTranslation alt) {
-		AltTranslationsAnnotation altTrans = seg.getAnnotation(AltTranslationsAnnotation.class);
-		if ( altTrans == null ) {
-			altTrans = new AltTranslationsAnnotation();
-			seg.setAnnotation(altTrans);
-		}
-		altTrans.add(alt);
-	}
-	
-	private boolean exactsHaveSameTranslation () {
-		rewind();
-		QueryResult qr = next();
-		if ( qr == null ) return false;
-		if ( qr.score < 100 ) return false;
-		TextFragment firstFrag = qr.target;
-		while ( hasNext() ) {
-			qr = next();
-			if ( qr.score < 100 ) return true;
-			if ( qr.target.compareTo(firstFrag, true) != 0 ) return false;
-		}
-		return true;
 	}
 
 	/**

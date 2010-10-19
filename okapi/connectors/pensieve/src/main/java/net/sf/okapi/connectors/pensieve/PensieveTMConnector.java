@@ -25,7 +25,7 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.lib.translation.BaseConnector;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
 import net.sf.okapi.tm.pensieve.common.Metadata;
@@ -45,7 +45,7 @@ import java.util.Map;
 import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
 
-public class PensieveTMConnector implements ITMQuery {
+public class PensieveTMConnector extends BaseConnector implements ITMQuery {
 
 	private int maxHits = 25;
 	private int threshold = 95;
@@ -186,6 +186,7 @@ public class PensieveTMConnector implements ITMQuery {
 		for ( TmHit hit : list ) {
 			Float f = hit.getScore();
 			QueryResult qr = new QueryResult();
+			qr.weight = getWeight();
 			qr.score = f.intValue();
 			qr.source = hit.getTu().getSource().getContent();
 			qr.target = hit.getTu().getTarget().getContent();
@@ -216,6 +217,7 @@ public class PensieveTMConnector implements ITMQuery {
 			List<Map<String, Object>> list = (List<Map<String, Object>>)array;
 			for ( Map<String, Object> map : list ) {
 				QueryResult result = new QueryResult();
+				result.weight = getWeight();
 				result.source = new TextFragment((String)map.get("source"));
 				result.target = new TextFragment((String)map.get("target"));
 				result.score = ((Double)map.get("score")).intValue();
@@ -316,10 +318,5 @@ public class PensieveTMConnector implements ITMQuery {
 	@Override
 	public void setRootDirectory (String rootDir) {
 		this.rootDir = rootDir;
-	}
-	
-	@Override
-	public void leverage(TextUnit tu, boolean fillTarget) {
-		throw new OkapiNotImplementedException();		
-	}
+	}	
 }

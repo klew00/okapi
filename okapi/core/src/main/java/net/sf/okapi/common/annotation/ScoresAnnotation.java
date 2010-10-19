@@ -101,4 +101,7 @@ public class ScoresAnnotation implements IAnnotation {
 		return list;
 	}
 
+	public boolean isEmpty() {
+		return list.isEmpty();
+	}
 }

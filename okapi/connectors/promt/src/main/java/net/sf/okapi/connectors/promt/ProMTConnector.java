@@ -56,12 +56,12 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.lib.translation.BaseConnector;
 import net.sf.okapi.lib.translation.IQuery;
 import net.sf.okapi.lib.translation.QueryResult;
 import net.sf.okapi.lib.translation.QueryUtil;
 
-public class ProMTConnector implements IQuery {
+public class ProMTConnector extends BaseConnector implements IQuery {
 
 	private static final String PTS8_SERVICE = "pts8/services/ptservice.asmx/";
 //	private static final String TRANSLATETEXT = "TranslateText";
@@ -244,6 +244,7 @@ public class ProMTConnector implements IQuery {
 	        	buffer = m.group(2);
 	        	if ( !Util.isEmpty(buffer) ) {
 	        		result = new QueryResult();
+	        		result.weight = getWeight();
 
 	        		if ( frag != null ) {
 	        			result.source = frag;
@@ -351,7 +352,8 @@ public class ProMTConnector implements IQuery {
 		setDirectionId();
 	}
 		
-	private String toInternalCode (LocaleId locale) {
+	@Override
+	protected String toInternalCode (LocaleId locale) {
 		// Reduce the locale code to its base language part
 		return locale.getLanguage();
 	}
@@ -478,11 +480,6 @@ public class ProMTConnector implements IQuery {
 		// Not used
 	}
 	
-	@Override
-	public void leverage(TextUnit tu, boolean fillTarget) {
-		throw new OkapiNotImplementedException();		
-	}
-
 //	public static void main (String args[]) {
 //		ProMTConnector con = new ProMTConnector();
 //		con.setLanguages(LocaleId.fromString("en"), LocaleId.fromString("fr"));

@@ -195,12 +195,21 @@ public class AltTranslation implements Comparable<AltTranslation> {
 	}
 	
 	private boolean isExact (MatchType type) {
-		if ( type.ordinal() <= MatchType.EXACT_REPAIRED.ordinal() ) {
+		// EXACT_REPAIRED considered a fuzzy match
+		if ( type.ordinal() < MatchType.EXACT_REPAIRED.ordinal() ) {
 			return true;
 		}
 		return false;
 	}
 
+	/**
+	 * Indicator telling if the result is coming from a machine translation engine or not.
+	 * @return true if the result is coming from a machine translation engine, false otherwise.
+	 */
+	public boolean fromMT() {
+		return (type == MatchType.MT);
+	}
+	
 	/**
 	 * This method implements a three way sort on (1) AltTranslationType (2) Score (3)
 	 * source string match. AltTranslationType is the primary key, score secondary and source
