@@ -34,6 +34,7 @@ public class Parameters extends BaseParameters {
 	public static final int SCOPE_NOTAPPROVEDONLY = 2;
 	
 	private static final String OUTPUTPATH = "outputPath";
+	private static final String OUTPUTTYPE = "outputType";
 	private static final String AUTOOPEN = "autoOpen";
 	private static final String LEADINGWS = "leadingWS";
 	private static final String TRAILINGWS = "trailingWS";
@@ -80,6 +81,7 @@ public class Parameters extends BaseParameters {
 	private static final String BETWEENCODES = "betweenCodes";
 
 	String outputPath;
+	int outputType;
 	boolean autoOpen;
 	boolean leadingWS;
 	boolean trailingWS;
@@ -275,6 +277,14 @@ public class Parameters extends BaseParameters {
 		this.outputPath = outputPath;
 	}
 
+	public int getOutputType () {
+		return outputType;
+	}
+
+	public void setOutputType (int outputType) {
+		this.outputType = outputType;
+	}
+
 	public boolean getAutoOpen () {
 		return autoOpen;
 	}
@@ -430,6 +440,7 @@ public class Parameters extends BaseParameters {
 	@Override
 	public void reset () {
 		outputPath = "${rootDir}/qa-report.html";
+		outputType = 0;
 		autoOpen = true;
 		leadingWS = true;
 		trailingWS = true;
@@ -518,6 +529,7 @@ public class Parameters extends BaseParameters {
 		reset();
 		buffer.fromString(data);
 		outputPath = buffer.getString(OUTPUTPATH, outputPath);
+		outputType = buffer.getInteger(OUTPUTTYPE, outputType);
 		autoOpen = buffer.getBoolean(AUTOOPEN, autoOpen);
 		leadingWS = buffer.getBoolean(LEADINGWS, leadingWS);
 		trailingWS = buffer.getBoolean(TRAILINGWS, trailingWS);
@@ -588,6 +600,7 @@ public class Parameters extends BaseParameters {
 	public String toString() {
 		buffer.reset();
 		buffer.setString(OUTPUTPATH, outputPath);
+		buffer.setInteger(OUTPUTTYPE, outputType);
 		buffer.setBoolean(AUTOOPEN, autoOpen);
 		buffer.setBoolean(LEADINGWS, leadingWS);
 		buffer.setBoolean(TRAILINGWS, trailingWS);

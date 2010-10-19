@@ -24,6 +24,7 @@ import java.io.InputStream;
 
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.virtualdb.IVDocument;
+import net.sf.okapi.virtualdb.IVRepository.OpeningMode;
 
 public interface IDBAccess {
 
@@ -32,6 +33,9 @@ public interface IDBAccess {
 		LOCAL,
 		REMOTE
 	}
+	
+	public void open (String name,
+		OpeningMode mode);
 
 	public void open (String name);
 	
@@ -42,6 +46,8 @@ public interface IDBAccess {
 	public void delete ();
 
 	public String importDocument (RawDocument rawDoc);
+	
+	public long importDocumentReturnKey (RawDocument rawDoc);
 	
 	public void removeDocument (IVDocument doc);
 	

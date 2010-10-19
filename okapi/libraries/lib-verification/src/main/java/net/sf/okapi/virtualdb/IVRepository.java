@@ -26,6 +26,15 @@ import net.sf.okapi.common.resource.RawDocument;
 
 public interface IVRepository {
 
+	public enum OpeningMode {
+		MUST_EXIST,
+		CREATE_IF_NEEDED,
+		OVERWRITE
+	}
+
+	public void open (String name,
+		OpeningMode mode);
+	
 	/**
 	 * Creates a new physical repository.
 	 * @param name the name of the repository.
@@ -76,6 +85,8 @@ public interface IVRepository {
 	 */
 	public String importDocument (RawDocument rawDoc);
 
+	public long importDocumentReturnKey (RawDocument rawDoc);
+
 	/**
 	 * Removes a given document from this repository.
 	 * <p>Calling this method may invalidate any current iterator created by {@link #documents()},
@@ -91,6 +102,13 @@ public interface IVRepository {
 	 * @return the first virtual document in this repository or null.
 	 */
 	public IVDocument getFirstDocument ();
+
+	/**
+	 * Gets the virtual document for a given document key.
+	 * @param docKey the key of the document to retrieve.
+	 * @return the virtual document for the given key, or null if no document could be retrieve.
+	 */
+	IVDocument getDocument (long docKey);
 
 	/**
 	 * Saves a block of extra data into the repository.

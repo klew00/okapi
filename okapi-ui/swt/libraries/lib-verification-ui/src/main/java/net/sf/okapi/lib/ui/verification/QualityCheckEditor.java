@@ -264,7 +264,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 				// So don't call it here again
 			}
 			else {
-				addDocumentFromUI(path);
+				addDocumentFromUI(path, false, false);
 				if ( processOnStart ) checkAll();
 			}
 		}
@@ -343,7 +343,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		rm.setCommand(menuItem, "file.adddocument"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				addDocumentFromUI(null);
+				addDocumentFromUI(null, false, false);
             }
 		});
 
@@ -579,7 +579,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		rm.setCommand(menuItem, "file.adddocument"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				addDocumentFromUI(null);
+				addDocumentFromUI(null, false, false);
             }
 		});
 		
@@ -712,10 +712,14 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 				if ( FT.isSupportedType(e.currentDataType) ) {
 					String[] paths = (String[])e.data;
 					if ( paths != null ) {
+						boolean acceptAll = false;
 						for ( String path : paths ) {
-							if ( !addDocumentFromUI(path) ) {
-								break; // Stop now
+							Boolean res;
+							if ((res = addDocumentFromUI(path, paths.length>1, acceptAll)) == null ) {
+								return; // Stop now
 							}
+							// Else use the result to set the next value of the accept-all button
+							acceptAll = res;
 						}
 					}
 				}
@@ -1062,7 +1066,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		updateCurrentIssue();
 	}
 
-	ArrayList<URI> getDocumentIds () {
+	ArrayList<URI> getDocumentURIs () {
 		ArrayList<URI> list = new ArrayList<URI>();
 		for ( String path : cbDocument.getItems() ) {
 			list.add((URI)cbDocument.getData(path));
@@ -1072,12 +1076,12 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 
 	/**
 	 * Fills the documents' combo box.
-	 * @param docId optional docId of the document to select, use null to select first.
-	 * If the given docId does not exists anymore, the first document is selected.
+	 * @param docURI optional URI of the document to select, use null to select first.
+	 * If the given URI does not exists anymore, the first document is selected.
 	 */
-	private void fillDocumentCombo (URI docId) {
-		URI requested = docId;
-		docId = null;
+	private void fillDocumentCombo (URI docURI) {
+		URI requested = docURI;
+		docURI = null;
 		// Update the list of documents
 		cbDocument.removeAll();
 		for ( RawDocument rd : session.getDocuments() ) {
@@ -1087,19 +1091,19 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 			// Check if the requested document is in the list
 			if ( requested != null ) {
 				if ( requested.equals(rd.getInputURI()) ) {
-					docId = requested;
+					docURI = requested;
 				}
 			}
 		}
 		
 		// If no previous requested document, set the first document, if we can
-		if ( docId == null ) {
+		if ( docURI == null ) {
 			if ( cbDocument.getItemCount() > 0 ) {
-				docId = (URI)cbDocument.getData(cbDocument.getItem(0));
+				docURI = (URI)cbDocument.getData(cbDocument.getItem(0));
 			}
 		}
-		if ( docId != null ) {
-			cbDocument.setText(docId.getPath());
+		if ( docURI != null ) {
+			cbDocument.setText(docURI.getPath());
 		}
 		updateCurrentIssue();
 	}
@@ -1131,7 +1135,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 	private void editSessionSettings () {
 		try {
 			// Remember data before edit
-			ArrayList<URI> prevList = getDocumentIds();
+			ArrayList<URI> prevList = getDocumentURIs();
 
 			// Edit the settings, stop there if the user cancel
 			SessionSettingsDialog dlg = new SessionSettingsDialog(shell, help);
@@ -1147,7 +1151,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 			// Clean up issues list
 			// Remove all current documents from the previous list
 			// What is left are the documents to remove
-			prevList.removeAll(getDocumentIds());
+			prevList.removeAll(getDocumentURIs());
 			for ( URI uri : prevList ) {
 				session.clearIssues(uri, false);
 			}
@@ -1160,19 +1164,34 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		}
 	}
 	
-	private boolean addDocumentFromUI (String path) {
+	/**
+	 * Adds a document using the UI dialog.
+	 * @param path the path of the document to add.
+	 * @param batchMode true if the check box to accept all next documents should be displayed.
+	 * @param acceptAll value of the check box to accept all.
+	 * @return Null if the user cancel the operation, otherwise: true if the accept-all button was checked,
+	 * or false if we are not in batch mode or if the accept-all button was not checked.
+	 */
+	private Boolean addDocumentFromUI (String path,
+		boolean batchMode,
+		boolean acceptAll)
+	{
 		try {
 			InputDocumentDialog dlg = new InputDocumentDialog(shell, "Add Document",
-				session.getFilterConfigurationMapper());
+				session.getFilterConfigurationMapper(), batchMode);
 			// Lock the locales if we have already documents in the session
 			boolean canChangeLocales = session.getDocumentCount()==0;
 			dlg.setLocalesEditable(canChangeLocales);
 			// Set default data
 			dlg.setData(path, null, "UTF-8", session.getSourceLocale(), session.getTargetLocale());
+			
+			if ( batchMode && ( path != null )) {
+				dlg.setAcceptAll(acceptAll);
+			}
 
 			// Edit
 			Object[] data = dlg.showDialog();
-			if ( data == null ) return false;
+			if ( data == null ) return null;
 			
 			// Create the raw document to add to the session
 			URI uri = (new File((String)data[0])).toURI();
@@ -1184,11 +1203,13 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 				resetTextFieldOrientation();
 			}
 			fillDocumentCombo(null);
-			return true;
+			
+			// If dialog return OK, we return value of accept all
+			return (Boolean)data[5];
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, "Error adding document.\n"+e.getMessage(), null);
-			return false;
+			return null;
 		}
 	}
 	
@@ -1212,7 +1233,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		// Find the first issue for that document in from the top of the displayed issues
 		for ( int i=0; i<tblIssues.getItemCount(); i++ ) {
 			Issue issue = (Issue)tblIssues.getItem(i).getData();
-			if ( uri.equals(issue.docId) ) {
+			if ( uri.equals(issue.docURI) ) {
 				tblIssues.setTopIndex(i);
 				tblIssues.setSelection(i);
 				updateCurrentIssue();
@@ -1233,7 +1254,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 			}
 			else {
 				Issue issue = (Issue)tblIssues.getItem(n).getData();
-				cbDocument.setText(issue.docId.getPath());
+				cbDocument.setText(issue.docURI.getPath());
 				edMessage.setText(issue.message);
 				setTexts(issue);
 			}
@@ -1319,7 +1340,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		try {
 			int n = tblIssues.getSelectionIndex();
 			if ( n < 0 ) return;
-			URI uri = ((Issue)tblIssues.getItem(n).getData()).docId;
+			URI uri = ((Issue)tblIssues.getItem(n).getData()).docURI;
 			startWaiting("Checking current document...");
 			session.recheckDocument(uri);
 			resetTableDisplay();

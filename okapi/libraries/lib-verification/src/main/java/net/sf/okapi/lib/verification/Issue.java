@@ -28,7 +28,7 @@ public class Issue {
 	public static final int SEVERITY_MEDIUM = 1;
 	public static final int SEVERITY_HIGH = 2;
 	
-	public URI docId;
+	public URI docURI;
 	public IssueType issueType;
 	public String tuId;
 	public String segId;
@@ -44,6 +44,9 @@ public class Issue {
 	public String tuName;
 	public String oriSource;
 	public String oriTarget;
+	// DB
+	public long tuKey;
+	public long docKey;
 	
 	public Issue (URI docId,
 		IssueType issueType,
@@ -57,7 +60,7 @@ public class Issue {
 		int severity,
 		String tuName)
 	{
-		this.docId = docId;
+		this.docURI = docId;
 		this.issueType = issueType;
 		this.tuId = tuId;
 		this.segId = segId;
@@ -71,7 +74,7 @@ public class Issue {
 	}
 
 	String getSignature () {
-		return String.format("%s-%s-%s-%d-%s", docId, tuId, (segId==null) ? "" : segId, srcStart, issueType);
+		return String.format("%s-%s-%s-%d-%s", docURI, tuId, (segId==null) ? "" : segId, srcStart, issueType);
 	}
 
 }

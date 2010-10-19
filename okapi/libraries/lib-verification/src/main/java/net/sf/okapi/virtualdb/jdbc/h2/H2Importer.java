@@ -54,11 +54,12 @@ public class H2Importer {
 		this.fcMapper = fcMapper;
 	}
 	
-	public void importDocument (RawDocument rd) {
+	public long importDocument (RawDocument rd) {
 		items = new LinkedHashMap<Long, H2Navigator>();
 		parents = new Stack<H2Navigator>();
 		prevItems = new Stack<H2Navigator>();
 		IFilter filter = null;
+		docItemKey = -1;
 		try {
 			filter = fcMapper.createFilter(rd.getFilterConfigId());
 			filter.open(rd);
@@ -111,6 +112,7 @@ public class H2Importer {
 				filter.close();
 			}
 		}
+		return docItemKey;
 	}
 	
 	private void processStartDocument  (StartDocument sd) {

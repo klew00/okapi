@@ -63,8 +63,8 @@ public class IssueComparator implements Comparator<Issue> {
 			return (issue1.severity > issue2.severity) ? -1 : 1;
 
 		case TYPE_TU:
-			String key1 = issue1.docId.toString()+issue1.tuId;
-			String key2 = issue2.docId.toString()+issue2.tuId;
+			String key1 = issue1.docURI.toString()+issue1.tuId;
+			String key2 = issue2.docURI.toString()+issue2.tuId;
 			if ( key1.equals(key2) ) return 0;
 			if ( direction == DIR_ASC ) {
 				return key1.compareTo(key2);
@@ -72,8 +72,8 @@ public class IssueComparator implements Comparator<Issue> {
 			return key2.compareTo(key1);
 
 		case TYPE_SEG:
-			key1 = issue1.docId.toString()+issue1.tuId + (issue1.segId==null ? "" : issue1.segId);
-			key2 = issue2.docId.toString()+issue2.tuId + (issue2.segId==null ? "" : issue2.segId);
+			key1 = issue1.docURI.toString()+issue1.tuId + (issue1.segId==null ? "" : issue1.segId);
+			key2 = issue2.docURI.toString()+issue2.tuId + (issue2.segId==null ? "" : issue2.segId);
 			if ( key1.equals(key2) ) return 0;
 			if ( direction == DIR_ASC ) {
 				return key1.compareTo(key2);

@@ -32,6 +32,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
@@ -41,27 +42,37 @@ public class InputDocumentDialog {
 	private Object[] result;
 	private String help;
 	private InputDocumentPanel pnlMain;
+	private Button chkAcceptAll;
 	private OKCancelPanel pnlActions;
 
 	public InputDocumentDialog (Shell parent,
 		String captionText,
-		IFilterConfigurationMapper fcMapper)
+		IFilterConfigurationMapper fcMapper,
+		boolean batchMode)
 	{
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		if ( captionText != null ) shell.setText(captionText);
 		UIUtil.inheritIcon(shell, parent);
 		shell.setLayout(new GridLayout());
-		
-		//--- Panel
-		
+
 		Composite cmpTmp = new Composite(shell, SWT.BORDER);
 		cmpTmp.setLayout(new GridLayout());
-		cmpTmp.setLayoutData(new GridData(GridData.FILL_BOTH));
+		GridData gdTmp = new GridData(GridData.FILL_BOTH);
+		cmpTmp.setLayoutData(gdTmp);
 
-		pnlMain = new InputDocumentPanel(cmpTmp, SWT.NONE, "Input document:", null, fcMapper);
+		// Panel
+		pnlMain = new InputDocumentPanel(cmpTmp, SWT.NONE, 1, "Input document:", null, fcMapper);
+
+		// Optional accept-all check box
+		if ( batchMode ) {
+			chkAcceptAll = new Button(cmpTmp, SWT.CHECK);
+			chkAcceptAll.setText("Accept all next documents with their defaults.");
+			gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+			gdTmp.verticalIndent = 8;
+			chkAcceptAll.setLayoutData(gdTmp);
+		}
 		
 		//--- Dialog-level buttons
-
 		SelectionAdapter OKCancelActions = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				result = null;
@@ -88,7 +99,20 @@ public class InputDocumentDialog {
 	}
 
 	public Object[] showDialog () {
+		// Open the dialog box
 		shell.open();
+		// If accept-all is active, checks its value
+		if ( chkAcceptAll != null ) {
+			if ( chkAcceptAll.getSelection() ) {
+				// And auto-save and auto-OK if we can
+				if ( saveData() ) {
+					shell.close();
+					return result;
+				}
+			}
+		}
+		
+		// Else: start the event loop
 		while ( !shell.isDisposed() ) {
 			if ( !shell.getDisplay().readAndDispatch() )
 				shell.getDisplay().sleep();
@@ -96,6 +120,12 @@ public class InputDocumentDialog {
 		return result;
 	}
 
+	public void setAcceptAll (boolean acceptAll) {
+		if ( chkAcceptAll != null ) {
+			chkAcceptAll.setSelection(acceptAll);
+		}
+	}
+	
 	public void setData (String path,
 		String configId,
 		String encoding,
@@ -123,12 +153,13 @@ public class InputDocumentDialog {
 	private boolean saveData () {
 		result = null;
 		if ( !pnlMain.validate(true) ) return false;
-		result = new Object[5];
+		result = new Object[6];
 		result[0] = pnlMain.getDocumentPath();
 		result[1] = pnlMain.getFilterConfigurationId();
 		result[2] = pnlMain.getEncoding();
 		result[3] = pnlMain.getSourceLocale();
 		result[4] = pnlMain.getTargetLocale();
+		result[5] = chkAcceptAll==null ? false : chkAcceptAll.getSelection(); 
 		return true;
 	}
 

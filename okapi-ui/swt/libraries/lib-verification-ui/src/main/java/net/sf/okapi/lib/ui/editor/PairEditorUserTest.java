@@ -260,7 +260,7 @@ public class PairEditorUserTest {
 	private boolean openDocument (String path) {
 		IFilter filter = null;
 		try {
-			InputDocumentDialog dlg = new InputDocumentDialog(shell, "Open File", fcMapper);
+			InputDocumentDialog dlg = new InputDocumentDialog(shell, "Open File", fcMapper, false);
 			dlg.setData(path, null, "UTF-8", srcLoc, trgLoc);
 
 			// Edit

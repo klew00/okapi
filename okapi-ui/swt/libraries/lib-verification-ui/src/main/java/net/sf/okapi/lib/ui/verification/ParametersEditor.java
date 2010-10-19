@@ -29,6 +29,7 @@ import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.ISWTEmbeddableParametersEditor;
 import net.sf.okapi.common.ui.OKCancelPanel;
@@ -96,6 +97,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Button chkTargetSameAsSourceWithCodes;
 	private Composite mainComposite;
 	private TextAndBrowsePanel pnlOutputPath;
+	private Combo cbOutputType;
 	private Button chkPatterns;
 	private Button chkDoubledWord;
 	private Label stDoubledWordExceptions;
@@ -770,21 +772,39 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		Group grpTmp = new Group(cmpTmp, SWT.NONE);
 		grpTmp.setText("Report output");
 		grpTmp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		grpTmp.setLayout(new GridLayout());
+		grpTmp.setLayout(new GridLayout(2, false));
 
 		label = new Label(grpTmp, SWT.NONE);
 		label.setText("Path of the report file:");
+		gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		label.setLayoutData(gdTmp);
 		
 		pnlOutputPath = new TextAndBrowsePanel(grpTmp, SWT.NONE, false);
 		pnlOutputPath.setSaveAs(true);
 		pnlOutputPath.setTitle("Quality Check Report");
 		pnlOutputPath.setBrowseFilters("HTML Files (*.html;*.htm)\tAll Files (*.*)", "*.html;*.htm\t*.*");
-		gdTmp = new GridData();
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalSpan = 2;
 		pnlOutputPath.setLayoutData(gdTmp);
+		
+		label = new Label(grpTmp, SWT.NONE);
+		label.setText("Format of the report:");
 
+		cbOutputType = new Combo(grpTmp, SWT.READ_ONLY | SWT.DROP_DOWN);
+		cbOutputType.add("HTML file");
+		cbOutputType.add("Tab-delimited file");
+		cbOutputType.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				updateOutputPathExtension();
+			};
+		});
+		
 		chkAutoOpen = new Button(grpTmp, SWT.CHECK);
 		chkAutoOpen.setText("Open the report after completion");
+		gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		chkAutoOpen.setLayoutData(gdTmp);
 
 		// Save/Load buttons
 		
@@ -848,6 +868,21 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 				shell.getDisplay().sleep();
 		}
 		return result;
+	}
+	
+	private void updateOutputPathExtension () {
+		String tmp = pnlOutputPath.getText();
+		String ext = ".html";
+		if ( cbOutputType.getSelectionIndex() == 1 ) ext = ".txt";
+		if ( tmp.endsWith(ext) ) return;
+		
+		// Change the extension
+		int n = tmp.lastIndexOf('.');
+		if ( n > -1 ) {
+			tmp = tmp .substring(0, n);
+		}
+		tmp += ext;
+		pnlOutputPath.setText(tmp);
 	}
 	
 	private void exportConfiguration () {
@@ -1204,7 +1239,9 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 
 	private void setData () {
 		pnlOutputPath.setText(params.getOutputPath());
+		cbOutputType.select(params.getOutputType());
 		chkAutoOpen.setSelection(params.getAutoOpen());
+		
 		chkCodeDifference.setSelection(params.getCodeDifference());
 		chkLeadingWS.setSelection(params.getLeadingWS());
 		chkTrailingWS.setSelection(params.getTrailingWS());
@@ -1384,6 +1421,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		}
 		
 		params.setOutputPath(pnlOutputPath.getText());
+		params.setOutputType(cbOutputType.getSelectionIndex());
 		params.setCodeDifference(chkCodeDifference.getSelection());
 		params.setAutoOpen(chkAutoOpen.getSelection());
 		params.setLeadingWS(chkLeadingWS.getSelection());

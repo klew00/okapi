@@ -23,6 +23,7 @@ package net.sf.okapi.virtualdb.jdbc.h2;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.InputStream;
+import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -50,6 +51,7 @@ import net.sf.okapi.virtualdb.IVDocument;
 import net.sf.okapi.virtualdb.IVItem;
 import net.sf.okapi.virtualdb.KeyAndSegId;
 import net.sf.okapi.virtualdb.IVItem.ItemType;
+import net.sf.okapi.virtualdb.IVRepository.OpeningMode;
 import net.sf.okapi.virtualdb.jdbc.IDBAccess;
 
 public class H2Access implements IDBAccess {
@@ -159,6 +161,14 @@ public class H2Access implements IDBAccess {
 		}
 	}
 	
+	/**
+	 * Sets the filter configuration mapper.
+	 * @param fcMapper the new filter configuration mapper to use.
+	 */
+	public void setFilterConfigurationMapper (IFilterConfigurationMapper fcMapper) {
+		this.fcMapper = fcMapper;
+	}
+
 	@Override
 	public void close () {
 		try {
@@ -186,9 +196,61 @@ public class H2Access implements IDBAccess {
 		if ( conn == null ) return;
 		pstmItemByKey = conn.prepareStatement("select * from ITMS left join TUNS on ITMS.KEY=TUNS.IKEY WHERE ITMS.KEY=?");
 		pstmItemById = conn.prepareStatement("select * from ITMS left join TUNS on ITMS.KEY=TUNS.IKEY where ITMS.XID=? and ITMS.DKEY=?");
+	}
 
+	public void open (String name,
+		OpeningMode mode)
+	{
+		// Close existing connection
+		close();
+		
+		if ( name.endsWith(H2DB_EXT) ) {
+			name = name.substring(0, name.length()-H2DB_EXT.length());
+		}
+		// Create the connection string
+		String connStr = null;
+		switch ( repoType ) {
+		case INMEMORY:
+			connStr = "jdbc:h2:"+name;
+			if ( mode == OpeningMode.MUST_EXIST ) {
+				connStr += ";IFEXISTS=TRUE";
+			}
+			break;
+			
+		case LOCAL:
+			String path = baseDir+name;
+			// In OVERWRITE mode we always delete existing database
+			if ( mode == OpeningMode.OVERWRITE ) {
+				File file = new File(path+H2DB_EXT);
+				if ( file.exists() ) {
+					deleteFiles(path);
+				}
+			}
+			// In all case we check/create the path
+			Util.createDirectories(path);
+			connStr = "jdbc:h2:"+baseDir+name;
+			if ( mode == OpeningMode.MUST_EXIST ) {
+				connStr += ";IFEXISTS=TRUE";
+			}
+			break;
+			
+		default:
+			throw new RuntimeException("Unsupported repository type.");
+		}
+		
+		// Create the connection
+		try {
+			conn = DriverManager.getConnection(connStr, "sa", "");
+			conn.setAutoCommit(true);
+			createTables();
+			initGlobal();
+		}
+		catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
+	//TODO: remove this method
 	@Override
 	public void open (String name) {
 		// Close existing connection
@@ -216,6 +278,7 @@ public class H2Access implements IDBAccess {
 		}
 	}
 
+	//TODO: remove this method
 	@Override
 	public void create (String name) {
 		// Close existing connection
@@ -405,9 +468,23 @@ public class H2Access implements IDBAccess {
 		return null;
 	}
 
+	@Override
+	public long importDocumentReturnKey (RawDocument rd) {
+		H2Importer imp = new H2Importer(this, fcMapper);
+		return imp.importDocument(rd);
+//TODO: get real key		
+//		return rd.getInputURI().getPath().hashCode();
+	}
+
 	private void createTables () {
 		Statement stm = null;
 		try {
+			// First: make sure we don't have already the tables
+			// We do that be looking if INFO exists
+			ResultSet rs = conn.getMetaData().getTables(null, null, INFO_TBLNAME, null);
+			if ( rs.next() ) return; // Done
+
+			// Else: Create the tables
 			stm = conn.createStatement();
 			
 			/* Create the table of information
@@ -583,7 +660,7 @@ public class H2Access implements IDBAccess {
 	{
 		if ( itemKey == -1 ) return null;
 		try {
-			// Always left-join with the TUNS table so we get extr text unit info in one call
+			// Always left-join with the TUNS table so we get extra text unit info in one call
 			// This is ok because most calls are for text units.
 			pstmItemByKey.setLong(1, itemKey);
 			ResultSet rs = pstmItemByKey.executeQuery();
@@ -966,7 +1043,9 @@ public class H2Access implements IDBAccess {
 			// Return null if nothing found
 			if ( !rs.first() ) return null;
 			// Otherwise: return the stream
-			return rs.getBlob(1).getBinaryStream();
+			Blob blob = rs.getBlob(1);
+			if ( blob == null ) return null;
+			return blob.getBinaryStream();
 		}
 		catch ( SQLException e ) {
 			throw new RuntimeException(e);

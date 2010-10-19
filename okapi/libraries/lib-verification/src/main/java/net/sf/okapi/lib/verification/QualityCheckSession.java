@@ -20,13 +20,19 @@
 
 package net.sf.okapi.lib.verification;
 
+import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -236,7 +242,7 @@ public class QualityCheckSession {
 		Iterator<Issue> iter = issues.iterator();
 		while ( iter.hasNext() ) {
 			Issue issue = iter.next();
-			if ( issue.docId.equals(docId) ) {
+			if ( issue.docURI.equals(docId) ) {
 				// Generate signature if the issue is disabled
 				if ( generateSigList && !issue.enabled ) {
 					sigList.add(issue.getSignature());
@@ -397,10 +403,19 @@ public class QualityCheckSession {
 	}
 
 	public void generateReport (String rootDir) {
+		String finalPath = Util.fillRootDirectoryVariable(params.getOutputPath(), rootDir);
+		if ( params.getOutputType() == 1 ) {
+			generateTabDelimitedReport(finalPath);
+		}
+		else {
+			generateHTMLReport(finalPath);
+		}
+	}
+	
+	private void generateHTMLReport (String finalPath) {
 		XMLWriter writer = null;
 		try {
 			// Create the output file
-			String finalPath = Util.fillRootDirectoryVariable(params.getOutputPath(), rootDir);
 			writer = new XMLWriter(finalPath);
 			writer.writeStartDocument();
 			writer.writeStartElement("html");
@@ -426,10 +441,10 @@ public class QualityCheckSession {
 				// Skip disabled issues
 				if ( !issue.enabled ) continue;
 				// Do we start a new input document?
-				if (( docId == null ) || !docId.equals(issue.docId) ) {
+				if (( docId == null ) || !docId.equals(issue.docURI) ) {
 					// Ruler only after first input document
 					if ( docId != null ) writer.writeRawXML("<hr />");
-					docId = issue.docId;
+					docId = issue.docURI;
 					writer.writeElementString("p", "Input: "+docId.toString());
 				}
 
@@ -464,6 +479,52 @@ public class QualityCheckSession {
 		}
 	}
 
+	private void generateTabDelimitedReport (String finalPath) {
+		PrintWriter writer = null;
+		try {
+			// Create the output file
+			writer = new PrintWriter(new File(finalPath), "UTF-8");
+			writer.println("Quality Check Report\t\t\t");
+
+			// Process the issues
+			URI docId = null;
+			for ( Issue issue : issues ) {
+				// Skip disabled issues
+				if ( !issue.enabled ) continue;
+				// Do we start a new input document?
+				if (( docId == null ) || !docId.equals(issue.docURI) ) {
+					// Ruler only after first input document
+					docId = issue.docURI;
+					writer.println(docId.toString()+"\t\t\t");
+				}
+
+				String position = String.format("ID=%s", issue.tuId);
+				if ( issue.tuName != null ) {
+					position += (" ("+issue.tuName+")");
+				}
+				if ( issue.segId != null ) {
+					position += String.format(", segment=%s", issue.segId);
+				}
+				// position<tab>message<tab>source<tab>target
+				writer.print(position+"\t");
+				writer.print(issue.message+"\t");
+				writer.print(escape(issue.oriSource)+"\t");
+				writer.println(escape(issue.oriTarget));
+
+			} // End of for issues
+		}
+		catch ( Throwable e ) {
+			throw new OkapiIOException("Error when creating the report.\n"+e.getMessage(), e);
+		}
+		finally {
+			if ( writer != null ) writer.close();
+		}
+	}
+
+	private String escape (String text) {
+		return text.replaceAll("\t", "\\t");
+	}
+	
 	private String highlight (String text,
 		int start,
 		int end)

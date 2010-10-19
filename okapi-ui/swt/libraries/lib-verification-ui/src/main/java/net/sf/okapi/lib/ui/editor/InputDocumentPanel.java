@@ -63,16 +63,18 @@ public class InputDocumentPanel extends Composite {
 
 	public InputDocumentPanel (Composite parent,
 		int flags,
+		int horizontalSpan,
 		String documentLabel,
 		String getDocumentLabel,
 		IFilterConfigurationMapper fcMapper)
 	{
 		super(parent, flags);
 		langDetector = new LanguageCodesDetector();
-		createContent(documentLabel, getDocumentLabel, fcMapper);
+		createContent(horizontalSpan, documentLabel, getDocumentLabel, fcMapper);
 	}
 	
-	private void createContent (String docLabel,
+	private void createContent (int horizontalSpan,
+		String docLabel,
 		String getDocLabel,
 		IFilterConfigurationMapper fcMapper)
 	{
@@ -84,6 +86,7 @@ public class InputDocumentPanel extends Composite {
 		layTmp.marginWidth = 0;
 		setLayout(layTmp);
 		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalSpan = horizontalSpan;
 		setLayoutData(gdTmp);
 
 		//--- Document path

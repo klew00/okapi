@@ -43,6 +43,13 @@ public class Repository implements IVRepository {
 	}
 	
 	@Override
+	public void open (String name,
+		OpeningMode mode)
+	{
+		db.open(name, mode);
+	}
+
+	@Override
 	public void create (String name) {
 		db.create(name);
 	}
@@ -65,10 +72,10 @@ public class Repository implements IVRepository {
 		return db.documents();
 	}
 
-//	@Override
-//	public IVDocument getDocument (String docId) {
-//		return db.getDocument(docId);
-//	}
+	@Override
+	public IVDocument getDocument (long docKey) {
+		return db.getDocument(docKey);
+	}
 
 //	@Override
 //	public Iterable<IVItem> items () {
@@ -84,6 +91,11 @@ public class Repository implements IVRepository {
 	@Override
 	public String importDocument (RawDocument rawDoc) {
 		return db.importDocument(rawDoc);
+	}
+	
+	@Override
+	public long importDocumentReturnKey (RawDocument rawDoc) {
+		return db.importDocumentReturnKey(rawDoc);
 	}
 
 	@Override

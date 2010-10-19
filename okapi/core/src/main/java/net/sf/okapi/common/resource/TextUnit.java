@@ -608,7 +608,7 @@ public class TextUnit implements INameable, IReferenceable {
 		source.getSegments().create(ranges); // Ranges can be null: no segmentation occurs then
 		syncLoc = locId;
 	}
-
+	
 	/**
 	 * Removes all segmentations (source and targets) in this text unit.
 	 * All entries are converted to non-segmented entries.
