@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -32,6 +32,7 @@ public class ParametersUI implements IEditorDescriptionProvider {
 		EditorDescription desc = new EditorDescription("TMX Filter Parameters", true, false);
 		desc.addCheckboxPart(paramDesc.get("processAllTargets"));
 		desc.addCheckboxPart(paramDesc.get("consolidateDpSkeleton"));
+		desc.addSeparatorPart();
 		desc.addCheckboxPart(paramDesc.get("escapeGT"));
 		return desc;
 	}

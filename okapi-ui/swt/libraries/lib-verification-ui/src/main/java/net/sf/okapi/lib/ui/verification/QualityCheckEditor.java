@@ -1177,7 +1177,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		boolean acceptAll)
 	{
 		try {
-			InputDocumentDialog dlg = new InputDocumentDialog(shell, "Add Document",
+			InputDocumentDialog dlg = new InputDocumentDialog(shell, "Input Document",
 				session.getFilterConfigurationMapper(), batchMode);
 			// Lock the locales if we have already documents in the session
 			boolean canChangeLocales = session.getDocumentCount()==0;

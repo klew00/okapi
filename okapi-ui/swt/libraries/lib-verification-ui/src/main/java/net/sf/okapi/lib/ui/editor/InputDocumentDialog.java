@@ -21,6 +21,7 @@
 package net.sf.okapi.lib.ui.editor;
 
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
@@ -40,7 +41,6 @@ public class InputDocumentDialog {
 	
 	private Shell shell;
 	private Object[] result;
-	private String help;
 	private InputDocumentPanel pnlMain;
 	private Button chkAcceptAll;
 	private OKCancelPanel pnlActions;
@@ -77,7 +77,7 @@ public class InputDocumentDialog {
 			public void widgetSelected(SelectionEvent e) {
 				result = null;
 				if ( e.widget.getData().equals("h") ) {
-					UIUtil.start(help);
+					Util.openWikiTopic("Input Document");
 					return;
 				}
 				if ( e.widget.getData().equals("o") ) {
@@ -86,7 +86,7 @@ public class InputDocumentDialog {
 				shell.close();
 			};
 		};
-		pnlActions = new OKCancelPanel(shell, SWT.NONE, OKCancelActions, false);
+		pnlActions = new OKCancelPanel(shell, SWT.NONE, OKCancelActions, true);
 		pnlActions.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		shell.setDefaultButton(pnlActions.btOK);
 

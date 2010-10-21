@@ -171,7 +171,7 @@ class SessionSettingsDialog {
 	
 	private void addDocument () {
 		try {
-			InputDocumentDialog dlg = new InputDocumentDialog(dialog, "Add document",
+			InputDocumentDialog dlg = new InputDocumentDialog(dialog, "Input Document",
 				session.getFilterConfigurationMapper(), false);
 			// Set default data
 			dlg.setData(null, null, "UTF-8", session.getSourceLocale(), session.getTargetLocale());
