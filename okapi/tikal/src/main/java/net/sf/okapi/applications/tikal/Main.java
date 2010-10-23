@@ -46,6 +46,7 @@ import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.filters.IFilterConfigurationEditor;
 import net.sf.okapi.common.filters.IFilterConfigurationListEditor;
+import net.sf.okapi.common.filterwriter.XLIFFWriter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipelinedriver.PipelineDriver;

@@ -20,21 +20,32 @@
 
 package net.sf.okapi.common.filterwriter;
 
+import java.io.OutputStream;
+
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
+import net.sf.okapi.common.encoder.EncoderManager;
+import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
 import net.sf.okapi.common.filterwriter.XLIFFContent;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.query.MatchType;
+import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.Segment;
+import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.common.resource.StartGroup;
+import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 
 /**
  * Writer for creating XLIFF document.
  */
-public class XLIFFWriter {
+public class XLIFFWriter implements IFilterWriter {
 	
 	private static final String RESTYPEVALUES = 
 		";auto3state;autocheckbox;autoradiobutton;bedit;bitmap;button;caption;cell;"
@@ -56,6 +67,10 @@ public class XLIFFWriter {
 	private LocaleId trgLoc;
 	private String dataType;
 	private String original;
+	
+	private String fwOutputPath; // Used in IFilterWriter mode
+	private String fwConfigId; // Used in IFilterWriter mode
+	private String fwInputEncoding; // Used in IFilterWriter mode
 
 	private boolean inFile;
 	private boolean copySource = true;
@@ -63,6 +78,7 @@ public class XLIFFWriter {
 	private boolean setApprovedAsNoTranslate = false;
 	private boolean includeNoTranslate = true;
 	private boolean useSourceForTranslated = false;
+	private boolean includeAltTrans = true;
 
 	public XLIFFWriter () {
 		xliffCont = new XLIFFContent();
@@ -95,6 +111,14 @@ public class XLIFFWriter {
 	 */
 	public void setIncludeNoTranslate (boolean includeNoTranslate) {
 		this.includeNoTranslate = includeNoTranslate;
+	}
+	
+	/**
+	 * Sets the flag indicating if alt-trans elements should be output or not.
+	 * @param includeAltTrans true to include alt-trans element in the output.
+	 */
+	public void setIncludeAltTrans (boolean includeAltTrans) {
+		this.includeAltTrans = includeAltTrans;
 	}
 
 	/**
@@ -129,6 +153,7 @@ public class XLIFFWriter {
 		writer.writeStartElement("xliff");
 		writer.writeAttributeString("version", "1.2");
 		writer.writeAttributeString("xmlns", "urn:oasis:names:tc:xliff:document:1.2");
+		writer.writeAttributeString("xmlns:okp", "okapi-framework:xliff-extensions"); 
 
 		if ( !Util.isEmpty(message) ) {
 			writer.writeLineBreak();
@@ -151,6 +176,9 @@ public class XLIFFWriter {
 			writer.close();
 			writer = null;
 		}
+		fwConfigId = null;
+		fwInputEncoding = null;
+		skeletonPath = null;
 	}
 
 	/**
@@ -164,6 +192,25 @@ public class XLIFFWriter {
 	public void writeStartFile (String original,
 		String dataType,
 		String skeletonPath)
+	{
+		writeStartFile(original, dataType, skeletonPath, null, null);
+	}
+	
+	/**
+	 * Internal method to write the start of a &lt;file> element.
+	 * <p>each call to this method must have a corresponding call to {@link #writeEndFile()}.
+	 * @param original the value for the <code>original</code> attribute. If null: "unknown" is used.
+	 * @param dataType the value ofr the <code>datatype</code> attribute. If null: "x-undefined" is used. 
+	 * @param skeletonPath external skeleton information (can be null).
+	 * @param configId the optional filter configuration id used to extract the original (IFilterWriter mode), or null.
+	 * @param inputEncoding the optional encoding of the input file (IFilterWriter mode), or null.
+	 * @see #writeEndFile()
+	 */
+	private void writeStartFile (String original,
+		String dataType,
+		String skeletonPath,
+		String configId,
+		String inputEncoding)
 	{
 		writer.writeStartElement("file");
 		writer.writeAttributeString("original",
@@ -179,6 +226,13 @@ public class XLIFFWriter {
 		// TODO: other standard XLIFF content types
 		else dataType = "x-"+dataType;
 		writer.writeAttributeString("datatype", dataType);
+
+		if ( !Util.isEmpty(inputEncoding) ) {
+			writer.writeAttributeString("okp:inputEncoding", inputEncoding);
+		}
+		if ( !Util.isEmpty(configId) ) {
+			writer.writeAttributeString("okp:configId", configId);
+		}
 		writer.writeLineBreak();
 		
 		// Write out external skeleton info if available 
@@ -221,7 +275,7 @@ public class XLIFFWriter {
 		String resType)
 	{
 		if ( !inFile ) {
-			writeStartFile(original, dataType, skeletonPath);
+			writeStartFile(original, dataType, skeletonPath, fwConfigId, fwInputEncoding);
 		}
 		writer.writeStartElement("group");
 		writer.writeAttributeString("id", id);
@@ -252,20 +306,23 @@ public class XLIFFWriter {
 	 * @param tu the text unit to output.
 	 */
 	public void writeTextUnit (TextUnit tu) {
-		// Check if we need to set the entry as non-translatable
-		if ( setApprovedAsNoTranslate ) {
-			Property prop = tu.getTargetProperty(trgLoc, Property.APPROVED);
-			if (( prop != null ) && prop.getValue().equals("yes") ) {
-				tu.setIsTranslatable(false);
+		// Avoid writing out some entries in non-IFilterWriter mode
+		if ( fwConfigId == null ) {
+			// Check if we need to set the entry as non-translatable
+			if ( setApprovedAsNoTranslate ) {
+				Property prop = tu.getTargetProperty(trgLoc, Property.APPROVED);
+				if (( prop != null ) && prop.getValue().equals("yes") ) {
+					tu.setIsTranslatable(false);
+				}
 			}
-		}
-		// Check if we need to skip non-translatable entries
-		if ( !includeNoTranslate && !tu.isTranslatable() ) {
-			return;
+			// Check if we need to skip non-translatable entries
+			if ( !includeNoTranslate && !tu.isTranslatable() ) {
+				return;
+			}
 		}
 
 		if ( !inFile ) {
-			writeStartFile(original, dataType, skeletonPath);
+			writeStartFile(original, dataType, skeletonPath, fwConfigId, fwInputEncoding);
 		}
 
 		writer.writeStartElement("trans-unit");
@@ -342,14 +399,16 @@ public class XLIFFWriter {
 			}
 
 			// Possible alternate translations
-			// We re-get the target because tc could be coming from the source
-			TextContainer altCont = tu.getTarget(trgLoc);
-			if ( altCont != null ) {
-				// From the target container
-				writeAltTranslations(altCont.getAnnotation(AltTranslationsAnnotation.class), null);
-				// From the segments
-				for ( Segment seg : altCont.getSegments() ) {
-					writeAltTranslations(seg.getAnnotation(AltTranslationsAnnotation.class), seg);
+			if ( includeAltTrans ) {
+				// We re-get the target because tc could be coming from the source
+				TextContainer altCont = tu.getTarget(trgLoc);
+				if ( altCont != null ) {
+					// From the target container
+					writeAltTranslations(altCont.getAnnotation(AltTranslationsAnnotation.class), null);
+					// From the segments
+					for ( Segment seg : altCont.getSegments() ) {
+						writeAltTranslations(seg.getAnnotation(AltTranslationsAnnotation.class), seg);
+					}
 				}
 			}
 		}
@@ -387,6 +446,9 @@ public class XLIFFWriter {
 			if ( !Util.isEmpty(alt.getOrigin()) ) {
 				writer.writeAttributeString("origin", alt.getOrigin());
 			}
+			if ( alt.getType() != MatchType.UKNOWN ) {
+				writer.writeAttributeString("okp:matchType", alt.getType().toString());
+			}
 			TextContainer cont = alt.getSource();
 			if ( !cont.isEmpty() ) {
 				writer.writeStartElement("source");
@@ -403,4 +465,127 @@ public class XLIFFWriter {
 		}
 	}
 
+	@Override
+	public void cancel () {
+		// Nothing for now
+	}
+
+	@Override
+	public EncoderManager getEncoderManager () {
+		// None
+		return null;
+	}
+
+	@Override
+	public String getName () {
+		return getClass().getName();
+	}
+
+	@Override
+	public IParameters getParameters () {
+		// Not used for now
+		return null;
+	}
+
+	@Override
+	public Event handleEvent (Event event) {
+		switch ( event.getEventType() ) {
+		case START_DOCUMENT:
+			processStartDocument((StartDocument)event.getResource());
+			break;
+		case END_DOCUMENT:
+			processEndDocument();
+			break;
+		case START_SUBDOCUMENT:
+			processStartSubDocument((StartSubDocument)event.getResource());
+			break;
+		case END_SUBDOCUMENT:
+			processEndSubDocument((Ending)event.getResource());
+			break;
+		case START_GROUP:
+			processStartGroup((StartGroup)event.getResource());
+			break;
+		case END_GROUP:
+			processEndGroup((Ending)event.getResource());
+			break;
+		case TEXT_UNIT:
+			processTextUnit((TextUnit)event.getResource());
+			break;
+		}
+		return event;
+	}
+
+	@Override
+	public void setOptions (LocaleId locale,
+		String defaultEncoding)
+	{
+		trgLoc = locale;
+		// Ignore encoding as we always use UTF-8
+	}
+
+	@Override
+	public void setOutput (String path) {
+		fwOutputPath = path;
+	}
+
+	@Override
+	public void setOutput (OutputStream output) {
+		// Not supported
+		throw new OkapiUnsupportedEncodingException("Stream-based output not supported.");
+		
+	}
+
+	@Override
+	public void setParameters (IParameters params) {
+		// Not used for now
+		// Options are set individually
+	}
+
+	// Use for IFilterWriter mode
+	private void processStartDocument (StartDocument resource) {
+		// trgLoc was set before
+		// fwOutputPath was set before
+		create(fwOutputPath, null, resource.getLocale(), trgLoc, resource.getMimeType(), resource.getName(), null);
+
+		// Output options for IFilterWriter mode
+		placeholderMode = true;
+		
+		// Additional variables specific to IFilterWriter mode
+		fwInputEncoding = resource.getEncoding();
+		IParameters params = resource.getFilterParameters();
+		if ( params == null ) fwConfigId = null;
+		else fwConfigId = params.getPath();
+	}
+
+	// Use for IFilterWriter mode
+	private void processEndDocument () {
+		// All is done in close() (used by both modes)
+		close();
+	}
+
+	// Use for IFilterWriter mode
+	private void processStartSubDocument (StartSubDocument resource) {
+		writeStartFile(resource.getName(), resource.getMimeType(), null,
+			fwConfigId, fwInputEncoding);		
+	}
+
+	// Use for IFilterWriter mode
+	private void processEndSubDocument (Ending resource) {
+		writeEndFile();
+	}
+
+	// Use for IFilterWriter mode
+	private void processStartGroup (StartGroup resource) {
+		writeStartGroup(resource.getId(), resource.getName(), resource.getType());
+	}
+
+	// Use for IFilterWriter mode
+	private void processEndGroup (Ending resource) {
+		writer.writeEndElementLineBreak(); // group
+	}
+
+	// Use for IFilterWriter mode
+	private void processTextUnit (TextUnit tu) {
+		writeTextUnit(tu);
+	}
 }

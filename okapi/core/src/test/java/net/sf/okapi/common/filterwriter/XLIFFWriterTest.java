@@ -58,7 +58,7 @@ public class XLIFFWriterTest {
 		
 		String result = readFile(root+"out.xlf");
 		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\">\n"
+			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\">\n"
 			+ "<file original=\"unknown\" source-language=\"en\" datatype=\"x-undefined\">\n"
 			+ "<body>\n</body>\n</file>\n</xliff>\n", result);
 	}
@@ -74,7 +74,7 @@ public class XLIFFWriterTest {
 
 		String result = readFile(root+"out.xlf");
 		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\">\n"
+			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\">\n"
 			+ "<file original=\"original.ext\" source-language=\"en\" datatype=\"x-undefined\">\n"
 			+ "<body>\n"
 			+ "<trans-unit id=\"tu1\">\n"
@@ -95,7 +95,7 @@ public class XLIFFWriterTest {
 
 		String result = readFile(root+"out.xlf");
 		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\">\n"
+			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\">\n"
 			+ "<file original=\"original.ext\" source-language=\"en\" target-language=\"fr\" datatype=\"x-undefined\">\n"
 			+ "<body>\n"
 			+ "<trans-unit id=\"tu1\">\n"
@@ -117,7 +117,7 @@ public class XLIFFWriterTest {
 
 		String result = readFile(root+"out.xlf");
 		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\">\n"
+			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\">\n"
 			+ "<!--messageValue-->\n"
 			+ "<file original=\"original.ext\" source-language=\"en\" target-language=\"fr\" datatype=\"x-dtValue\">\n"
 			+ "<header><skl><external-file href=\"skel.skl\"></external-file></skl></header>\n"

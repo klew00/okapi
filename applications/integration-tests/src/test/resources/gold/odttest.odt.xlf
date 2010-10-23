@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2"><file original="odttest.odt/content.xml" source-language="en" target-language="fr" datatype="x-undefined" xmlns:x="http://net.sf.okapi/ns/xliff-extensions" x:inputEncoding="UTF-8" x:configId="">
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:okp="okapi-framework:xliff-extensions">
+<file original="odttest.odt/content.xml" source-language="en" target-language="fr" datatype="x-undefined" okp:inputEncoding="UTF-8">
 <body>
 <trans-unit id="1" restype="x-text:h">
 <source xml:lang="en">Heading 1</source>
@@ -211,7 +212,7 @@
 </trans-unit>
 </body>
 </file>
-<file original="odttest.odt/styles.xml" source-language="en" target-language="fr" datatype="x-undefined" xmlns:x="http://net.sf.okapi/ns/xliff-extensions" x:inputEncoding="UTF-8" x:configId="">
+<file original="odttest.odt/styles.xml" source-language="en" target-language="fr" datatype="x-undefined" okp:inputEncoding="UTF-8">
 <body>
 <trans-unit id="1" restype="x-text:p">
 <source xml:lang="en">Text of the header</source>
@@ -223,7 +224,7 @@
 </trans-unit>
 </body>
 </file>
-<file original="odttest.odt/meta.xml" source-language="en" target-language="fr" datatype="x-undefined" xmlns:x="http://net.sf.okapi/ns/xliff-extensions" x:inputEncoding="UTF-8" x:configId="">
+<file original="odttest.odt/meta.xml" source-language="en" target-language="fr" datatype="x-undefined" okp:inputEncoding="UTF-8">
 <body>
 <trans-unit id="1" restype="x-dc:title">
 <source xml:lang="en">Title of the Document</source>

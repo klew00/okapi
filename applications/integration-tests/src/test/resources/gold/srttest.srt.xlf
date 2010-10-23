@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2"><file original="srttest.srt" source-language="en" target-language="fr" datatype="x-text/plain" xmlns:x="http://net.sf.okapi/ns/xliff-extensions" x:inputEncoding="windows-1252" x:configId="">
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:okp="okapi-framework:xliff-extensions">
+<file original="srttest.srt" source-language="en" target-language="fr" datatype="x-text/plain" okp:inputEncoding="windows-1252">
 <body>
 <trans-unit id="1" xml:space="preserve">
 <source xml:lang="en">In connection with a dramatic increase

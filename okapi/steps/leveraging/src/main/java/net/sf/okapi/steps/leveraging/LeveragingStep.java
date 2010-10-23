@@ -116,7 +116,8 @@ public class LeveragingStep extends BasePipelineStep {
 	protected Event handleEndDocument (Event event) {
 		if ( !params.getLeverage() ) return event;
 		logger.info(String.format("Segments with text = %d", qm.getTotalSegments()));
-		logger.info(String.format("Segments leveraged = %d", qm.getLeveragedSegments()));
+		logger.info(String.format("Best match that are exact = %d", qm.getExactBestMatches()));
+		logger.info(String.format("Best match that are fuzzy = %d", qm.getFuzzyBestMatches()));
 		return event;
 	}
 	

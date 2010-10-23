@@ -53,7 +53,8 @@ public class QueryManager {
 	private int threshold = 75;
 	private int maxHits = 5;
 	private int totalSegments;
-	private int leveragedSegments;	
+	private int exactBestMatches;
+	private int fuzzyBestMatches;
 	private String rootDir;
 	
 	/**
@@ -449,6 +450,8 @@ public class QueryManager {
 			return;
 		} 
 
+		totalSegments += tu.getSource().getSegments().count();
+		
 		// Query each translation resource
 		for ( int id : resList.keySet() ) {
 			ResourceItem ri = resList.get(id);
@@ -466,6 +469,10 @@ public class QueryManager {
 			if ( altTrans != null ) {
 				altTrans.sort();
 				if ( (bestMatch = altTrans.getFirst()) != null ) {
+					// Count best match
+					if ( bestMatch.getScore() >= 100 ) exactBestMatches++;
+					else if ( bestMatch.getScore() > 0 ) fuzzyBestMatches++;
+					// Fill is needed
 					if ( bestMatch.getScore() >= thresholdToFill ) {
 						// Alternate translation content is expected to always be un-segmented
 						// We can use getFirstContent() here
@@ -480,6 +487,10 @@ public class QueryManager {
 					if ( altTrans != null ) {
 						altTrans.sort();
 						if ( (bestMatch = altTrans.getFirst()) != null ) {
+							// Count best match
+							if ( bestMatch.getScore() >= 100 ) exactBestMatches++;
+							else if ( bestMatch.getScore() > 0 ) fuzzyBestMatches++;
+							// Fill is needed
 							if ( bestMatch.getScore() >= thresholdToFill ) {
 								ts.text = bestMatch.getTarget().getFirstContent();
 							}
@@ -612,7 +623,8 @@ public class QueryManager {
 	 */
 	public void resetCounters () {
 		totalSegments = 0;
-		leveragedSegments = 0;
+		exactBestMatches = 0;
+		fuzzyBestMatches = 0;
 	}
 	
 	/**
@@ -624,11 +636,20 @@ public class QueryManager {
 	}
 	
 	/**
-	 * Gets the number of segments leveraged since the last call to {@link #resetCounters()}.
-	 * @return the number of segments leveraged.
+	 * Gets the number of best matches that are exact (100%) since the last call to {@link #resetCounters()}.
+	 * @return the number of best matches that are exact.
 	 */
-	public int getLeveragedSegments () {
-		return leveragedSegments;
+	public int getExactBestMatches () {
+		return exactBestMatches;
+	}
+
+	/**
+	 * Gets the number of best matches that are fuzzy (less that 100%, more than 0%) since the last call
+	 * to {@link #resetCounters()}.
+	 * @return the number of best matches that are fuzzy.
+	 */
+	public int getFuzzyBestMatches () {
+		return exactBestMatches;
 	}
 
 //	/**

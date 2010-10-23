@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2"><file original="[Content_Types].xml" source-language="en" target-language="fr" datatype="x-undefined" xmlns:x="http://net.sf.okapi/ns/xliff-extensions" x:inputEncoding="windows-1252" x:configId="">
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:okp="okapi-framework:xliff-extensions">
+<file original="[Content_Types].xml" source-language="en" target-language="fr" datatype="x-undefined" okp:inputEncoding="windows-1252">
 <body>
 </body>
 </file>
-<file original="word/styles.xml" source-language="en" target-language="fr" datatype="x-undefined" xmlns:x="http://net.sf.okapi/ns/xliff-extensions" x:inputEncoding="windows-1252" x:configId="">
+<file original="word/styles.xml" source-language="en" target-language="fr" datatype="x-undefined" okp:inputEncoding="windows-1252">
 <body>
 </body>
 </file>
-<file original="word/document.xml" source-language="en" target-language="fr" datatype="x-undefined" xmlns:x="http://net.sf.okapi/ns/xliff-extensions" x:inputEncoding="windows-1252" x:configId="">
+<file original="word/document.xml" source-language="en" target-language="fr" datatype="x-undefined" okp:inputEncoding="windows-1252">
 <body>
 <trans-unit id="tu1" xml:space="preserve">
 <source xml:lang="en"><x id="1"/><x id="2"/><x id="3"/><x id="4"/><g id="5">Text of Heading 1</g><x id="6"/><x id="7"/><x id="8"/><x id="9"/><x id="10"/><g id="11">1</g><x id="12"/><x id="13"/></source>
@@ -96,7 +97,7 @@
 </trans-unit>
 </body>
 </file>
-<file original="word/footnotes.xml" source-language="en" target-language="fr" datatype="x-undefined" xmlns:x="http://net.sf.okapi/ns/xliff-extensions" x:inputEncoding="windows-1252" x:configId="">
+<file original="word/footnotes.xml" source-language="en" target-language="fr" datatype="x-undefined" okp:inputEncoding="windows-1252">
 <body>
 <trans-unit id="tu1" xml:space="preserve">
 <source xml:lang="en"><x id="1"/></source>
@@ -120,7 +121,7 @@
 </trans-unit>
 </body>
 </file>
-<file original="word/endnotes.xml" source-language="en" target-language="fr" datatype="x-undefined" xmlns:x="http://net.sf.okapi/ns/xliff-extensions" x:inputEncoding="windows-1252" x:configId="">
+<file original="word/endnotes.xml" source-language="en" target-language="fr" datatype="x-undefined" okp:inputEncoding="windows-1252">
 <body>
 <trans-unit id="tu1" xml:space="preserve">
 <source xml:lang="en"><x id="1"/></source>
@@ -134,7 +135,7 @@
 </trans-unit>
 </body>
 </file>
-<file original="word/comments.xml" source-language="en" target-language="fr" datatype="x-undefined" xmlns:x="http://net.sf.okapi/ns/xliff-extensions" x:inputEncoding="windows-1252" x:configId="">
+<file original="word/comments.xml" source-language="en" target-language="fr" datatype="x-undefined" okp:inputEncoding="windows-1252">
 <body>
 <trans-unit id="tu1" xml:space="preserve">
 <source xml:lang="en"><x id="1"/><g id="2">This is a </g><g id="3">comment</g><g id="4"> for the paragraph with the footnote.</g></source>
@@ -143,11 +144,11 @@
 </trans-unit>
 </body>
 </file>
-<file original="word/settings.xml" source-language="en" target-language="fr" datatype="x-undefined" xmlns:x="http://net.sf.okapi/ns/xliff-extensions" x:inputEncoding="windows-1252" x:configId="">
+<file original="word/settings.xml" source-language="en" target-language="fr" datatype="x-undefined" okp:inputEncoding="windows-1252">
 <body>
 </body>
 </file>
-<file original="docProps/core.xml" source-language="en" target-language="fr" datatype="x-undefined" xmlns:x="http://net.sf.okapi/ns/xliff-extensions" x:inputEncoding="windows-1252" x:configId="">
+<file original="docProps/core.xml" source-language="en" target-language="fr" datatype="x-undefined" okp:inputEncoding="windows-1252">
 <body>
 <trans-unit id="tu1" xml:space="preserve">
 <source xml:lang="en">Title of the document</source>
