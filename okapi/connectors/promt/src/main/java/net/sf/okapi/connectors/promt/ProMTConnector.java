@@ -72,10 +72,8 @@ public class ProMTConnector extends BaseConnector implements IQuery {
 
 	private static final Pattern RESULTPATTERN = Pattern.compile("<string(.*?)>(.*?)</string>");
 
-	private String srcLang;
-	private Locale srcLoc;
-	private String trgLang;
-	private Locale trgLoc;
+	private Locale srcJavaLoc;
+	private Locale trgJavaLoc;
 	private QueryResult result;
 	private int current = -1;
 	private Parameters params;
@@ -111,16 +109,6 @@ public class ProMTConnector extends BaseConnector implements IQuery {
 	@Override
 	public void close () {
 		// Nothing to do
-	}
-
-	@Override
-	public LocaleId getSourceLanguage () {
-		return LocaleId.fromString(srcLang);
-	}
-	
-	@Override
-	public LocaleId getTargetLanguage () {
-		return LocaleId.fromString(trgLang);
 	}
 
 	@Override
@@ -330,10 +318,10 @@ public class ProMTConnector extends BaseConnector implements IQuery {
 		if ( dirIdentifiers == null ) return;
 		
 		// Create the name to lookup
-		if (( srcLoc != null ) && ( trgLoc != null )) {
+		if (( srcJavaLoc != null ) && ( trgJavaLoc != null )) {
 			// getDisplayLanguage will not return null
-			String pair = srcLoc.getDisplayLanguage(Locale.ENGLISH)
-				+ "-" + trgLoc.getDisplayLanguage(Locale.ENGLISH);
+			String pair = srcJavaLoc.getDisplayLanguage(Locale.ENGLISH)
+				+ "-" + trgJavaLoc.getDisplayLanguage(Locale.ENGLISH);
 			// Get the dirId (or null if not found)
 			dirId = dirIdentifiers.get(pair);
 		}
@@ -343,11 +331,10 @@ public class ProMTConnector extends BaseConnector implements IQuery {
 	public void setLanguages (LocaleId sourceLocale,
 		LocaleId targetLocale)
 	{
+		super.setLanguages(sourceLocale, targetLocale);
 		// Convert the codes
-		srcLang = toInternalCode(sourceLocale);
-		trgLang = toInternalCode(targetLocale);
-		srcLoc = sourceLocale.toJavaLocale();
-		trgLoc = targetLocale.toJavaLocale();
+		srcJavaLoc = sourceLocale.toJavaLocale();
+		trgJavaLoc = targetLocale.toJavaLocale();
 		// Try to set the direction
 		setDirectionId();
 	}

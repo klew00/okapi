@@ -345,13 +345,12 @@ public class XLIFFWriter {
 			// We re-get the target because tc could be coming from the source
 			TextContainer altCont = tu.getTarget(trgLoc);
 			if ( altCont != null ) {
+				// From the target container
+				writeAltTranslations(altCont.getAnnotation(AltTranslationsAnnotation.class), null);
 				// From the segments
 				for ( Segment seg : altCont.getSegments() ) {
-					writeAltTranslations(seg.getAnnotation(AltTranslationsAnnotation.class),
-						altCont.hasBeenSegmented(), seg);
+					writeAltTranslations(seg.getAnnotation(AltTranslationsAnnotation.class), seg);
 				}
-				// From the target container
-				writeAltTranslations(altCont.getAnnotation(AltTranslationsAnnotation.class), false, null);
 			}
 		}
 		
@@ -368,13 +367,10 @@ public class XLIFFWriter {
 	/**
 	 * Writes possible alternate translations
 	 * @param ann the annotation with the alternate translations (can be null)
-	 * @param hasBeenSegmented indicates if the annotation comes from a segmented container
-	 * (this is needed because a non-segmented container is still  with a Segment). 
 	 * @param segment the segment where the annotation comes from, or null  if the
 	 * annotation comes from the container.
 	 */
 	private void writeAltTranslations (AltTranslationsAnnotation ann,
-		boolean hasBeenSegmented,
 		Segment segment)
 	{
 		if ( ann == null ) {
@@ -382,7 +378,7 @@ public class XLIFFWriter {
 		}
 		for ( AltTranslation alt : ann ) {
 			writer.writeStartElement("alt-trans");
-			if (( segment != null ) && hasBeenSegmented ) {
+			if ( segment != null ) {
 				writer.writeAttributeString("mid", segment.getId());
 			}
 			if ( alt.getScore() > 0 ) {
@@ -391,12 +387,12 @@ public class XLIFFWriter {
 			if ( !Util.isEmpty(alt.getOrigin()) ) {
 				writer.writeAttributeString("origin", alt.getOrigin());
 			}
-			TextUnit altTu = alt.getEntry();
-			if ( !altTu.isEmpty() ) {
+			TextContainer cont = alt.getSource();
+			if ( !cont.isEmpty() ) {
 				writer.writeStartElement("source");
 				writer.writeAttributeString("xml:lang", alt.getSourceLocale().toBCP47());
 				// Write full source content (always without segments markers
-				writer.writeRawXML(xliffCont.toSegmentedString(alt.getSource(), 0, false, false, placeholderMode));
+				writer.writeRawXML(xliffCont.toSegmentedString(cont, 0, false, false, placeholderMode));
 				writer.writeEndElementLineBreak(); // source
 			}
 			writer.writeStartElement("target");

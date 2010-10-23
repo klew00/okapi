@@ -32,6 +32,7 @@ import net.sf.okapi.common.resource.TextUnit;
 /**
  * Stores the data representing an alternate translation.
  * <p>This object is used with the {@link AltTranslationsAnnotation} annotation.
+ * <p>Note that the content of the source and target is always un-segmented.
  */
 public class AltTranslation implements Comparable<AltTranslation> {
 
@@ -139,7 +140,8 @@ public class AltTranslation implements Comparable<AltTranslation> {
 
 	/**
 	 * Gets the source content of this entry (can be empty)
-	 * 
+	 * If the result is empty, it means the source is the same as the source of the object (segment or text container)
+	 * is attached to.
 	 * @return the source content of this entry (can be empty)
 	 */
 	public TextContainer getSource () {

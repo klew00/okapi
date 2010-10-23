@@ -163,4 +163,21 @@ public class AltTranslationTest {
 				target2, MatchType.MT, 90, "");
 		assertTrue(h2.compareTo(h1) > 0);
 	}
+
+	@Test 
+	public void testHasSeveralBestMatches () {
+		AltTranslation at1 = new AltTranslation(LocaleId.ENGLISH, LocaleId.SPANISH, null,
+			source1, target1, MatchType.EXACT, 100, "");
+		AltTranslation at2 = new AltTranslation(LocaleId.ENGLISH, LocaleId.SPANISH, null,
+			source1, target1, MatchType.EXACT, 100, "");
+		AltTranslationsAnnotation atAnn = new AltTranslationsAnnotation();
+		atAnn.add(at1);
+		atAnn.add(at2);
+		assertFalse(atAnn.hasSeveralBestMatches(true));
+		
+		AltTranslation at3 = new AltTranslation(LocaleId.ENGLISH, LocaleId.SPANISH, null,
+			source1, target2, MatchType.EXACT, 100, ""); // Different target
+		atAnn.add(at3);
+		assertTrue(atAnn.hasSeveralBestMatches(true));
+	}
 }

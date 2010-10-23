@@ -26,6 +26,7 @@ public class Parameters extends BaseParameters {
 
 	private static final String LEVERAGE = "leverage";
 	private static final String FILLTARGET = "fillTarget";
+	private static final String FILLTARGETTHRESHOLD = "fillTargetThreshold";
 	private static final String MAKETMX = "makeTMX";
 	private static final String TMXPATH = "tmxPath";
 	private static final String USEMTPREFIX = "useMTPrefix";
@@ -34,6 +35,7 @@ public class Parameters extends BaseParameters {
 	private String resourceParameters;
 	private int threshold;
 	private boolean fillTarget;
+	private int fillTargetThreshold;
 	private boolean makeTMX;
 	private String tmxPath;
 	private boolean useMTPrefix;
@@ -83,6 +85,14 @@ public class Parameters extends BaseParameters {
 		this.fillTarget = fillTarget;
 	}
 
+	public int getFillTargetThreshold () {
+		return fillTargetThreshold;
+	}
+
+	public void setFillTargetThreshold (int fillTargetThreshold) {
+		this.fillTargetThreshold = fillTargetThreshold;
+	}
+
 	public boolean getMakeTMX () {
 		return makeTMX;
 	}
@@ -114,6 +124,7 @@ public class Parameters extends BaseParameters {
 		resourceParameters = null;
 		threshold = 95;
 		fillTarget = true;
+		fillTargetThreshold = 95;
 		makeTMX = false;
 		tmxPath = "";
 		useMTPrefix = true;
@@ -127,6 +138,7 @@ public class Parameters extends BaseParameters {
 		resourceParameters = buffer.getGroup("resourceParameters", resourceParameters);
 		threshold = buffer.getInteger("threshold", threshold);
 		fillTarget = buffer.getBoolean(FILLTARGET, fillTarget);
+		fillTargetThreshold = buffer.getInteger(FILLTARGETTHRESHOLD, fillTargetThreshold);
 		makeTMX = buffer.getBoolean(MAKETMX, makeTMX);
 		tmxPath = buffer.getString(TMXPATH, tmxPath);
 		useMTPrefix = buffer.getBoolean(USEMTPREFIX, useMTPrefix);
@@ -140,6 +152,7 @@ public class Parameters extends BaseParameters {
 		buffer.setGroup("resourceParameters", resourceParameters);
 		buffer.setInteger("threshold", threshold);
 		buffer.setBoolean(FILLTARGET, fillTarget);
+		buffer.setInteger(FILLTARGETTHRESHOLD, fillTargetThreshold);
 		buffer.setBoolean(MAKETMX, makeTMX);
 		buffer.setString(TMXPATH, tmxPath);
 		buffer.setBoolean(USEMTPREFIX, useMTPrefix);

@@ -30,6 +30,11 @@
 		<ant antfile="build_okapi-apps.xml">
 			<property name="platform" value="cocoa-macosx-x86_64"/>
 		</ant>
+
+		<!-- Plugins -->
+		<ant antfile="build_okapi-plugins.xml">
+		</ant>
+
 	</target>
 
 </project>

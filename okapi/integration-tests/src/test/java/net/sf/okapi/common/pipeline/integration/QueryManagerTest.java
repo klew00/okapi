@@ -2,12 +2,16 @@ package net.sf.okapi.common.pipeline.integration;
 
 import java.net.URL;
 
+import static org.junit.Assert.*;
+
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
+import net.sf.okapi.common.resource.ISegments;
+import net.sf.okapi.common.resource.Segment;
+import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.connectors.google.GoogleMTConnector;
 import net.sf.okapi.connectors.pensieve.PensieveTMConnector;
 import net.sf.okapi.filters.tmx.TmxFilter;
 import net.sf.okapi.lib.translation.QueryManager;
@@ -48,16 +52,9 @@ public class QueryManagerTest {
 		net.sf.okapi.connectors.pensieve.Parameters p = new net.sf.okapi.connectors.pensieve.Parameters();
 		p.setDbDirectory("${rootDir}");		
 		qm.addAndInitializeResource(
-				pensieveConnector, 
-				"Pensieve",
-				p);
-		
-		/*
-		qm.addAndInitializeResource(
-				new GoogleMTConnector(), 
-				"Google MT",
-				null);
-		*/
+			pensieveConnector, 
+			"Pensieve",
+			p);
 	}
 	
 	@After
@@ -74,32 +71,53 @@ public class QueryManagerTest {
 		Assert.assertTrue(qm.hasNext());		
 		Assert.assertEquals("Elephants cannot fly.", qm.next().source.toText());
 		// FIXME: Pensieve should return the match without codes first!!!
-		Assert.assertEquals("Les éléphants <b>ne peuvent pas</b> voler.", qm.next().target.toText());
+		Assert.assertEquals("Les \u00e9l\u00e9phants <b>ne peuvent pas</b> voler.", qm.next().target.toText());
 	}
 	
 	@Test
 	public void leverageNoFill() {
 		TextUnit tu = new TextUnit("1");
 		tu.setSourceContent(new TextFragment("Elephants cannot fly."));
-		qm.leverage(tu, false);
+		qm.leverage(tu, 999);
 		
 		Assert.assertEquals("", tu.getTarget(locFRFR).toString());
 		
 		AltTranslationsAnnotation a = tu.getTarget(locFRFR).getAnnotation(AltTranslationsAnnotation.class);
 		Assert.assertNotNull(a);		
-		Assert.assertEquals("Les éléphants ne peuvent pas voler.", a.getFirst().getTarget().toString());
+		Assert.assertEquals("Les \u00e9l\u00e9phants ne peuvent pas voler.", a.getFirst().getTarget().toString());
 	}
 	
 	@Test
 	public void leverageFill() {
 		TextUnit tu = new TextUnit("1");
 		tu.setSourceContent(new TextFragment("Elephants cannot fly."));
-		qm.leverage(tu, true);
+		qm.leverage(tu, 1);
 		
-		Assert.assertEquals("Les éléphants ne peuvent pas voler.", tu.getTarget(locFRFR).toString());
+		Assert.assertEquals("Les \u00e9l\u00e9phants ne peuvent pas voler.", tu.getTarget(locFRFR).toString());
 		
 		AltTranslationsAnnotation a = tu.getTarget(locFRFR).getAnnotation(AltTranslationsAnnotation.class);
 		Assert.assertNotNull(a);		
-		Assert.assertEquals("Les éléphants ne peuvent pas voler.", a.getFirst().getTarget().toString());
+		Assert.assertEquals("Les \u00e9l\u00e9phants ne peuvent pas voler.", a.getFirst().getTarget().toString());
+	}
+
+	@Test
+	public void leverageFillSeveralSegments () {
+		TextUnit tu = new TextUnit("1");
+		TextContainer tc = new TextContainer("Elephants cannot fly.");
+		tc.getSegments().append(new Segment("s2", new TextFragment("Except Dumbo!")), " ");
+		tu.setSource(tc);
+		ISegments segs = tu.getSource().getSegments();
+		assertEquals(2, segs.count());
+		
+		qm.leverage(tu, 1);
+		
+		segs = tu.getTarget(locFRFR).getSegments();
+		assertEquals(2, segs.count());
+		assertEquals("Les \u00e9l\u00e9phants ne peuvent pas voler.", segs.get(0).text.toText());
+		assertEquals("", segs.get(1).text.toText());
+		
+		AltTranslationsAnnotation a = segs.get(0).getAnnotation(AltTranslationsAnnotation.class);
+		assertNotNull(a);
+		assertEquals("Les \u00e9l\u00e9phants ne peuvent pas voler.", a.getFirst().getTarget().toString());
 	}
 }

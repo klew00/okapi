@@ -64,6 +64,8 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Label stThreshold;
 	private Spinner spnThreshold;
 	private Button chkFillTarget;
+	private Label stFillTargetThreshold;
+	private Spinner spnFillTargetThreshold;
 	private Button chkMakeTMX;
 	private TextAndBrowsePanel pnlTMXPath;
 	private Button chkUseMTPrefix;
@@ -172,7 +174,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		mainComposite.setLayout(new GridLayout(2, false));
 
 		chkLeverage = new Button(mainComposite, SWT.CHECK);
-		chkLeverage.setText("Leverage the text units with existing translations");
+		chkLeverage.setText("Leverage the text units");
 		GridData gdTmp = new GridData();
 		gdTmp.horizontalSpan = 2;
 		chkLeverage.setLayoutData(gdTmp);
@@ -188,7 +190,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		pnlConnector.setLayoutData(gdTmp);
 		
 		stThreshold = new Label(mainComposite, SWT.NONE);
-		stThreshold.setText("Leverage only if the match is equal or above this score:");
+		stThreshold.setText("Accept matches that are equal or above this score:");
 		
 		spnThreshold = new Spinner(mainComposite, SWT.BORDER);
 		spnThreshold.setMinimum(0);
@@ -201,6 +203,25 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		gdTmp = new GridData();
 		gdTmp.horizontalSpan = 2;
 		chkFillTarget.setLayoutData(gdTmp);
+		chkFillTarget.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				stFillTargetThreshold.setEnabled(chkFillTarget.getSelection());
+				spnFillTargetThreshold.setEnabled(chkFillTarget.getSelection());
+			}
+		});
+		
+		stFillTargetThreshold = new Label(mainComposite, SWT.NONE);
+		stFillTargetThreshold.setText("When the best match is equal or above this score:");
+		gdTmp = new GridData();
+		final int indent = 16;
+		gdTmp.horizontalIndent = indent;
+		stFillTargetThreshold.setLayoutData(gdTmp);
+		
+		spnFillTargetThreshold = new Spinner(mainComposite, SWT.BORDER);
+		spnFillTargetThreshold.setMinimum(0);
+		spnFillTargetThreshold.setMaximum(100);
+		spnFillTargetThreshold.setIncrement(1);
+		spnFillTargetThreshold.setPageIncrement(10);
 
 		chkMakeTMX = new Button(mainComposite, SWT.CHECK);
 		chkMakeTMX.setText("Generate a TMX document");
@@ -219,12 +240,14 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		pnlTMXPath.setBrowseFilters("TMX Documents (*.tmx)\tAll Files (*.*)", "*.tmx\t*.*");
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalSpan = 2;
+		gdTmp.horizontalIndent = indent;
 		pnlTMXPath.setLayoutData(gdTmp);
 		
 		chkUseMTPrefix = new Button(mainComposite, SWT.CHECK);
-		chkUseMTPrefix.setText("Add a prefix to the source text");
+		chkUseMTPrefix.setText("If needed, add a MT prefix to the source text");
 		gdTmp = new GridData();
 		gdTmp.horizontalSpan = 2;
+		gdTmp.horizontalIndent = indent;
 		chkUseMTPrefix.setLayoutData(gdTmp);
 	}
 	
@@ -247,10 +270,14 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		if ( enabled ) {
 			pnlTMXPath.setEnabled(chkMakeTMX.getSelection());
 			chkUseMTPrefix.setEnabled(chkMakeTMX.getSelection());
+			stFillTargetThreshold.setEnabled(chkFillTarget.getSelection());
+			spnFillTargetThreshold.setEnabled(chkFillTarget.getSelection());
 		}
 		else {
 			pnlTMXPath.setEnabled(false);
 			chkUseMTPrefix.setEnabled(false);
+			stFillTargetThreshold.setEnabled(false);
+			spnFillTargetThreshold.setEnabled(false);
 		}
 	}
 
@@ -259,13 +286,11 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		pnlConnector.setData(params.getResourceClassName(), params.getResourceParameters());
 		spnThreshold.setSelection(params.getThreshold());
 		chkFillTarget.setSelection(params.getFillTarget());
+		spnFillTargetThreshold.setSelection(params.getFillTargetThreshold());
 		chkMakeTMX.setSelection(params.getMakeTMX());
 		pnlTMXPath.setText(params.getTMXPath());
 		chkUseMTPrefix.setSelection(params.getUseMTPrefix());
-		
 		updateOptionsDisplay();
-//		pnlTMXPath.setEnabled(chkMakeTMX.getSelection());
-//		chkUseMTPrefix.setEnabled(chkMakeTMX.getSelection());
 	}
 
 	private boolean saveData () {
@@ -286,6 +311,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		params.setResourceParameters(pnlConnector.getConnectorParameters());
 		params.setThreshold(spnThreshold.getSelection());
 		params.setFillTarget(chkFillTarget.getSelection());
+		params.setFillTargetThreshold(spnFillTargetThreshold.getSelection());
 		params.setMakeTMX(chkMakeTMX.getSelection());
 		params.setTMXPath(pnlTMXPath.getText());
 		params.setUseMTPrefix(chkUseMTPrefix.getSelection());

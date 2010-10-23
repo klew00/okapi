@@ -17,6 +17,7 @@ public class ManualTry {
 			Shell shlMain = new Shell(dispMain);
 			
 			QualityCheckEditor qce = new QualityCheckEditor();
+//			QualityCheckEditor2 qce = new QualityCheckEditor2();
 			FilterConfigurationMapper fcMapper = new FilterConfigurationMapper();
 			DefaultFilters.setMappings(fcMapper, true, true);
 	    	BaseHelp help = new BaseHelp("dummyRoot");

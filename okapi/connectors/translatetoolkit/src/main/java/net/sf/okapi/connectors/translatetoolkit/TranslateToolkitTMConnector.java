@@ -48,8 +48,6 @@ public class TranslateToolkitTMConnector extends BaseConnector implements ITMQue
 
 	private Parameters params;
 	private String baseURL;
-	private String srcLang;
-	private String trgLang;
 	private List<QueryResult> results;
 	private int current = -1;
 	private int maxHits = 25;
@@ -74,16 +72,6 @@ public class TranslateToolkitTMConnector extends BaseConnector implements ITMQue
 	@Override
 	public void close () {
 		// Nothing to do
-	}
-
-	@Override
-	public LocaleId getSourceLanguage () {
-		return LocaleId.fromString(srcLang);
-	}
-
-	@Override
-	public LocaleId getTargetLanguage () {
-		return LocaleId.fromString(trgLang);
 	}
 
 	@Override
@@ -121,7 +109,7 @@ public class TranslateToolkitTMConnector extends BaseConnector implements ITMQue
 			return 0;
 		}
 		try {
-			URL url = new URL(baseURL + srcLang + "/" + trgLang + "/unit/"
+			URL url = new URL(baseURL + srcCode + "/" + trgCode + "/unit/"
 				+ URLEncoder.encode(plainText, "UTF-8").replace("+", "%20"));
 			URLConnection conn = url.openConnection();
 
@@ -184,14 +172,6 @@ public class TranslateToolkitTMConnector extends BaseConnector implements ITMQue
 		String value)
 	{
 		// Not used with this connector
-	}
-
-	@Override
-	public void setLanguages (LocaleId sourceLang,
-		LocaleId targetLang)
-	{
-		srcLang = toInternalCode(sourceLang);
-		trgLang = toInternalCode(targetLang);
 	}
 
 	@Override

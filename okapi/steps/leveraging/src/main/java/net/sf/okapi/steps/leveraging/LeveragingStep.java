@@ -26,14 +26,12 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.filterwriter.TMXWriter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.Property;
-import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.translation.QueryManager;
 import net.sf.okapi.lib.translation.ResourceItem;
@@ -126,6 +124,8 @@ public class LeveragingStep extends BasePipelineStep {
 	protected Event handleTextUnit (Event event) {
 		if ( !params.getLeverage() ) return event;
 		TextUnit tu = event.getTextUnit();
+		
+		// Do not leverage non-translatable entries
 		if ( !tu.isTranslatable() ) return event;
 
     	boolean approved = false;
@@ -133,24 +133,15 @@ public class LeveragingStep extends BasePipelineStep {
     	if ( prop != null ) {
     		if ( "yes".equals(prop.getValue()) ) approved = true;
     	}
-    	if ( approved ) return event; // Do not leverage pre-approved entries
+    	// Do not leverage pre-approved entries
+    	if ( approved ) return event;
     	
-//TODO To be deleted (multi-matches allowed with the new annotation
-    	// Check if this entry has been leveraged once already
-    	// (this allows to have several Leveraging steps in the same pipeline)
-    	TextContainer tc = tu.getTarget(targetLocale);
-    	if ( tc != null ) {
-    		ScoresAnnotation scores = tc.getAnnotation(ScoresAnnotation.class);
-    		if ( scores != null ) return event; // Don't overwrite existing leverage
-    	}
-//end of to be deleted 
     	// Leverage
+    	qm.leverage(tu, params.getFillTarget() ? params.getFillTargetThreshold() : Integer.MAX_VALUE);
     	
-    	qm.leverage(tu, params.getFillTarget());
-    	
-    	// optionally write out this TU
+    	// Optionally write out this TU
 		if ( tmxWriter != null ) {
-			tmxWriter.writeItem(tu, null);
+			tmxWriter.writeAlternates(tu, targetLocale);
 		}
 		
 		return event;

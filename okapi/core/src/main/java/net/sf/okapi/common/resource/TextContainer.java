@@ -959,7 +959,8 @@ public class TextContainer implements Iterable<TextPart> {
 	
 	/**
 	 * Gets the content of the first part (segment or non-segment) of this container.
-	 * <p>This method always returns the same result as {@link ISegments#getFirstContent()} if {@link #contentIsOneSegment()}.
+	 * <p>This method always returns the same result as {@link ISegments#getFirstContent()}
+	 * if {@link #contentIsOneSegment()} is true.
 	 * @return the content of the first part (segment or non-segment) of this container.
 	 * @see ISegments#getFirstContent()
 	 * @see #getLastContent()
@@ -1032,8 +1033,9 @@ public class TextContainer implements Iterable<TextPart> {
 	}
 	
 	/**
-	 * Gets a new TextFragment representing the un-segmented content of this container. 
-	 * @return the un-segmented content of this container.
+	 * Gets a new TextFragment representing the un-segmented content of this container.
+	 * <p><b>Important:</b> This is an expensive method. 
+	 * @return an un-segmented copy of the content of this container.
 	 */
 	public TextFragment getUnSegmentedContentCopy () {
 		return createJoinedContent(null);

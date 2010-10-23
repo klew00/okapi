@@ -51,8 +51,6 @@ public class PensieveTMConnector extends BaseConnector implements ITMQuery {
 	private int threshold = 95;
 	private List<QueryResult> results;
 	private int current = -1;
-	private LocaleId srcLoc;
-	private LocaleId trgLoc;
 	private Parameters params;
 	private ITmSeeker seeker;
 	private Metadata attrs;
@@ -275,24 +273,13 @@ public class PensieveTMConnector extends BaseConnector implements ITMQuery {
 	public void setLanguages (LocaleId sourceLocale,
 		LocaleId targetLocale)
 	{
-		srcLoc = sourceLocale;
-		trgLoc = targetLocale;
+		super.setLanguages(sourceLocale, targetLocale);
 		
 		String host = params.getHost();
 		if ( host.endsWith("/") || host.endsWith("\\") ) {
 			host = host.substring(0, host.length()-1);
 		}
 		basePart = String.format("%s/search/%s/%s/", host, srcLoc.toBCP47(), trgLoc.toBCP47());
-	}
-
-	@Override
-	public LocaleId getSourceLanguage () {
-		return srcLoc;
-	}
-
-	@Override
-	public LocaleId getTargetLanguage () {
-		return trgLoc;
 	}
 
 	@Override
@@ -319,4 +306,5 @@ public class PensieveTMConnector extends BaseConnector implements ITMQuery {
 	public void setRootDirectory (String rootDir) {
 		this.rootDir = rootDir;
 	}	
+
 }

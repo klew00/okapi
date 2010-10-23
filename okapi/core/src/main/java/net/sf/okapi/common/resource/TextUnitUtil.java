@@ -47,8 +47,7 @@ public class TextUnitUtil {
 	 * @param textFragment
 	 *            the text fragment which leading whitespaces are to be removed.
 	 */
-	public static void trimLeading(TextFragment textFragment) {
-
+	public static void trimLeading (TextFragment textFragment) {
 		trimLeading(textFragment, null);
 	}
 
@@ -199,8 +198,9 @@ public class TextUnitUtil {
 	 * @param skel
 	 *            the skeleton to put the removed whitespaces.
 	 */
-	public static void trimLeading(TextFragment textFragment, GenericSkeleton skel) {
-
+	public static void trimLeading (TextFragment textFragment,
+		GenericSkeleton skel)
+	{
 		if (textFragment == null)
 			return;
 		String st = textFragment.getCodedText();
@@ -231,7 +231,7 @@ public class TextUnitUtil {
 	 * @param textFragment
 	 *            the text fragment which trailing whitespaces are to be removed.
 	 */
-	public static void trimTrailing(TextFragment textFragment) {
+	public static void trimTrailing (TextFragment textFragment) {
 		trimTrailing(textFragment, null);
 	}
 
@@ -243,8 +243,9 @@ public class TextUnitUtil {
 	 * @param skel
 	 *            the skeleton to put the removed whitespaces.
 	 */
-	public static void trimTrailing(TextFragment textFragment, GenericSkeleton skel) {
-
+	public static void trimTrailing (TextFragment textFragment,
+		GenericSkeleton skel)
+	{
 		if (textFragment == null)
 			return;
 
@@ -279,8 +280,9 @@ public class TextUnitUtil {
 	 *            the text to lookup.
 	 * @return true if the given text fragment ends with the given sub-string.
 	 */
-	public static boolean endsWith(TextFragment textFragment, String substr) {
-
+	public static boolean endsWith (TextFragment textFragment,
+		String substr)
+	{
 		if (textFragment == null)
 			return false;
 		if (Util.isEmpty(substr))
@@ -302,7 +304,7 @@ public class TextUnitUtil {
 	 *            the text unit to check.
 	 * @return true if the given text unit resource is null, or its source part is null or empty.
 	 */
-	public static boolean isEmpty(TextUnit textUnit) {
+	public static boolean isEmpty (TextUnit textUnit) {
 		return ((textUnit == null) || textUnit.getSource().isEmpty());
 	}
 
@@ -314,7 +316,7 @@ public class TextUnitUtil {
 	 *            the text unit to check.
 	 * @return true if the given text unit resource is null, or its source part is null or empty.
 	 */
-	public static boolean hasSource(TextUnit textUnit) {
+	public static boolean hasSource (TextUnit textUnit) {
 		return !isEmpty(textUnit, true);
 	}
 
@@ -328,7 +330,9 @@ public class TextUnitUtil {
 	 *            if true and the text unit contains only whitespaces, then the text unit is considered empty.
 	 * @return true if the given text unit resource is null, or its source part is null or empty.
 	 */
-	public static boolean isEmpty(TextUnit textUnit, boolean ignoreWS) {
+	public static boolean isEmpty (TextUnit textUnit,
+		boolean ignoreWS)
+	{
 		return ((textUnit == null) || Util.isEmpty(getSourceText(textUnit), ignoreWS));
 	}
 
@@ -339,7 +343,7 @@ public class TextUnitUtil {
 	 *            the text unit resource which source text should be returned.
 	 * @return the source part of the given text unit resource.
 	 */
-	public static String getSourceText(TextUnit textUnit) {
+	public static String getSourceText (TextUnit textUnit) {
 		// if ( textUnit == null ) return "";
 		// return getCodedText(textUnit.getSourceContent());
 		return textUnit.getSource().getFirstContent().getCodedText();
@@ -355,7 +359,9 @@ public class TextUnitUtil {
 	 *            true if possible inline codes should be removed.
 	 * @return the source part of the given text unit resource.
 	 */
-	public static String getSourceText(TextUnit textUnit, boolean removeCodes) {
+	public static String getSourceText (TextUnit textUnit,
+		boolean removeCodes)
+	{
 		if (textUnit == null)
 			return "";
 		if (removeCodes) {
@@ -375,7 +381,9 @@ public class TextUnitUtil {
 	 * @return the target part of the given text unit resource in the given loacle, or an empty string if the text unit
 	 *         doesn't contain one.
 	 */
-	public static String getTargetText(TextUnit textUnit, LocaleId locId) {
+	public static String getTargetText (TextUnit textUnit,
+		LocaleId locId)
+	{
 		if (textUnit == null)
 			return "";
 		if (Util.isNullOrEmpty(locId))
@@ -391,7 +399,7 @@ public class TextUnitUtil {
 	 *            the given text fragment object.
 	 * @return the text of the given text fragment object possibly containing inline codes.
 	 */
-	public static String getCodedText(TextFragment textFragment) {
+	public static String getCodedText (TextFragment textFragment) {
 		if (textFragment == null)
 			return "";
 		return textFragment.getCodedText();
@@ -407,7 +415,9 @@ public class TextUnitUtil {
 	 *            List to store initial positions of removed code markers. use null to not store the markers.
 	 * @return The copy of the string, contained in TextFragment, but without code markers
 	 */
-	public static String getText(TextFragment textFragment, List<Integer> markerPositions) {
+	public static String getText (TextFragment textFragment,
+		List<Integer> markerPositions)
+	{
 		if (textFragment == null)
 			return "";
 
@@ -450,7 +460,7 @@ public class TextUnitUtil {
 	 *            TextFragment object with possible codes inside
 	 * @return The copy of the string, contained in TextFragment, but w/o code markers
 	 */
-	public static String getText(TextFragment textFragment) {
+	public static String getText (TextFragment textFragment) {
 		return getText(textFragment, null);
 	}
 
@@ -461,8 +471,7 @@ public class TextUnitUtil {
 	 *            the text fragment to examin.
 	 * @return the last character of the given text fragment, or '\0'.
 	 */
-	public static char getLastChar(TextFragment textFragment) {
-
+	public static char getLastChar (TextFragment textFragment) {
 		if (textFragment == null)
 			return '\0';
 
@@ -481,8 +490,7 @@ public class TextUnitUtil {
 	 * @param textFragment
 	 *            the text fragment to examine.
 	 */
-	public static void deleteLastChar(TextFragment textFragment) {
-
+	public static void deleteLastChar (TextFragment textFragment) {
 		if (textFragment == null)
 			return;
 		String st = textFragment.getCodedText();
@@ -505,8 +513,9 @@ public class TextUnitUtil {
 	 *         first character of the last such substring is returned. If it does not occur as a substring,
 	 *         <code>-1</code> is returned.
 	 */
-	public static int lastIndexOf(TextFragment textFragment, String findWhat) {
-
+	public static int lastIndexOf (TextFragment textFragment,
+		String findWhat)
+	{
 		if (textFragment == null)
 			return -1;
 		if (Util.isEmpty(findWhat))
@@ -524,7 +533,7 @@ public class TextUnitUtil {
 	 *            the text fragment to examine.
 	 * @return true if the given text fragment object is null, or the text it contains is null or empty.
 	 */
-	public static boolean isEmpty(TextFragment textFragment) {
+	public static boolean isEmpty (TextFragment textFragment) {
 		return (textFragment == null || (textFragment != null && textFragment.isEmpty()));
 	}
 
@@ -536,7 +545,7 @@ public class TextUnitUtil {
 	 *            the given text container becoming the source part of the text unit.
 	 * @return a new text unit resource with the given text container object being its source part.
 	 */
-	public static TextUnit buildTU(TextContainer source) {
+	public static TextUnit buildTU (TextContainer source) {
 		return buildTU(null, "", source, null, LocaleId.EMPTY, "");
 	}
 
@@ -547,7 +556,7 @@ public class TextUnitUtil {
 	 *            the given string becoming the source text of the text unit.
 	 * @return a new text unit resource with the given string being its source text.
 	 */
-	public static TextUnit buildTU(String source) {
+	public static TextUnit buildTU (String source) {
 		return buildTU(new TextContainer(source));
 	}
 
@@ -562,8 +571,9 @@ public class TextUnitUtil {
 	 * @return a new text unit resource with the given string being its source text, and the skeleton string in the
 	 *         skeleton.
 	 */
-	public static TextUnit buildTU(String srcPart, String skelPart) {
-
+	public static TextUnit buildTU (String srcPart,
+		String skelPart)
+	{
 		TextUnit res = buildTU(srcPart);
 		if (res == null)
 			return null;
@@ -596,8 +606,13 @@ public class TextUnitUtil {
 	 *            the optional comment becoming a NOTE property of the text unit.
 	 * @return a reference to the original or newly created text unit.
 	 */
-	public static TextUnit buildTU(TextUnit textUnit, String name, TextContainer source,
-			TextContainer target, LocaleId locId, String comment) {
+	public static TextUnit buildTU (TextUnit textUnit,
+		String name,
+		TextContainer source,
+		TextContainer target,
+		LocaleId locId,
+		String comment)
+	{
 		if (textUnit == null) {
 			textUnit = new TextUnit("");
 		}
@@ -630,8 +645,7 @@ public class TextUnitUtil {
 	 *            the given text unit to have a skeleton.
 	 * @return the skeleton of the text unit.
 	 */
-	public static GenericSkeleton forceSkeleton(TextUnit tu) {
-
+	public static GenericSkeleton forceSkeleton (TextUnit tu) {
 		if (tu == null)
 			return null;
 
@@ -656,8 +670,7 @@ public class TextUnitUtil {
 	 *            the text unit to be copied into a skeleton.
 	 * @return the newly created skeleton, which contents reflect the given text unit.
 	 */
-	public static GenericSkeleton convertToSkeleton(TextUnit textUnit) {
-
+	public static GenericSkeleton convertToSkeleton (TextUnit textUnit) {
 		if (textUnit == null)
 			return null;
 
@@ -709,8 +722,9 @@ public class TextUnitUtil {
 	 *            reference to the requested annotation type.
 	 * @return the annotation or null if not found.
 	 */
-	public static <A extends IAnnotation> A getSourceAnnotation(TextUnit textUnit, Class<A> type) {
-
+	public static <A extends IAnnotation> A getSourceAnnotation (TextUnit textUnit,
+		Class<A> type)
+	{
 		if (textUnit == null)
 			return null;
 		if (textUnit.getSource() == null)
@@ -727,8 +741,9 @@ public class TextUnitUtil {
 	 * @param annotation
 	 *            the annotation to be attached to the source part of the text unit.
 	 */
-	public static void setSourceAnnotation(TextUnit textUnit, IAnnotation annotation) {
-
+	public static void setSourceAnnotation (TextUnit textUnit,
+		IAnnotation annotation)
+	{
 		if (textUnit == null)
 			return;
 		if (textUnit.getSource() == null)
@@ -748,9 +763,10 @@ public class TextUnitUtil {
 	 *            reference to the requested annotation type.
 	 * @return the annotation or null if not found.
 	 */
-	public static <A extends IAnnotation> A getTargetAnnotation(TextUnit textUnit, LocaleId locId,
-			Class<A> type) {
-
+	public static <A extends IAnnotation> A getTargetAnnotation (TextUnit textUnit,
+		LocaleId locId,
+		Class<A> type)
+	{
 		if (textUnit == null)
 			return null;
 		if (Util.isNullOrEmpty(locId))
@@ -771,8 +787,10 @@ public class TextUnitUtil {
 	 * @param annotation
 	 *            the annotation to be attached to the target part of the text unit.
 	 */
-	public static void setTargetAnnotation(TextUnit textUnit, LocaleId locId, IAnnotation annotation) {
-
+	public static void setTargetAnnotation (TextUnit textUnit,
+		LocaleId locId,
+		IAnnotation annotation)
+	{
 		if (textUnit == null)
 			return;
 		if (Util.isNullOrEmpty(locId))
@@ -791,7 +809,9 @@ public class TextUnitUtil {
 	 * @param text
 	 *            the text to be set.
 	 */
-	public static void setSourceText(TextUnit textUnit, String text) {
+	public static void setSourceText (TextUnit textUnit,
+		String text)
+	{
 		// fail fast if ( textUnit == null ) return;
 		TextFragment source = textUnit.getSource().getFirstContent();
 		// fail fast if ( source == null ) return;
@@ -808,7 +828,10 @@ public class TextUnitUtil {
 	 * @param text
 	 *            the text to be set.
 	 */
-	public static void setTargetText(TextUnit textUnit, LocaleId locId, String text) {
+	public static void setTargetText (TextUnit textUnit,
+		LocaleId locId,
+		String text)
+	{
 		// fail fast if ( textUnit == null ) return;
 		// fail fast if ( Util.isNullOrEmpty(locId) ) return;
 		TextFragment target = textUnit.getTarget(locId).getFirstContent();
@@ -826,7 +849,10 @@ public class TextUnitUtil {
 	 * @param trimTrailing
 	 *            true to remove trailing whitespaces if there are any.
 	 */
-	public static void trimTU(TextUnit textUnit, boolean trimLeading, boolean trimTrailing) {
+	public static void trimTU (TextUnit textUnit,
+		boolean trimLeading,
+		boolean trimTrailing)
+	{
 		if (textUnit == null)
 			return;
 		if (!trimLeading && !trimTrailing)
@@ -864,9 +890,10 @@ public class TextUnitUtil {
 	 * @param endQualifier
 	 *            the qualifier to be removed after source text.
 	 */
-	public static void removeQualifiers(TextUnit textUnit, String startQualifier,
-			String endQualifier) {
-
+	public static void removeQualifiers (TextUnit textUnit,
+		String startQualifier,
+		String endQualifier)
+	{
 		if (textUnit == null)
 			return;
 		if (Util.isEmpty(startQualifier))
@@ -909,7 +936,9 @@ public class TextUnitUtil {
 	 * @param qualifier
 	 *            the qualifier to be removed before and after source text.
 	 */
-	public static void removeQualifiers(TextUnit textUnit, String qualifier) {
+	public static void removeQualifiers (TextUnit textUnit,
+		String qualifier)
+	{
 		removeQualifiers(textUnit, qualifier, qualifier);
 	}
 
@@ -1032,25 +1061,44 @@ public class TextUnitUtil {
 		return tu;
 	}
 	
-	public static AltTranslationsAnnotation addAltTranslation (TextContainer targetContainer, AltTranslation alt) {
+	/**
+	 * Adds an {@link #AltTranslation} object to a given {@link #TextContainer}. The {@link #AltTranslationsAnnotation}
+	 * annotation is created if it does not exist already.
+	 * @param targetContainer the container where to add the object.
+	 * @param alt alternate translation to add.
+	 * @return the annotation where the object was added,
+	 * it may be a new annotation or the one already associated with the container.  
+	 */
+	public static AltTranslationsAnnotation addAltTranslation (TextContainer targetContainer,
+		AltTranslation alt)
+	{
 		AltTranslationsAnnotation altTrans = targetContainer.getAnnotation(AltTranslationsAnnotation.class);
 		if ( altTrans == null ) {
 			altTrans = new AltTranslationsAnnotation();
 			targetContainer.setAnnotation(altTrans);
 		}
 		altTrans.add(alt);
-		
 		return altTrans;
 	}
 	
-	public static AltTranslationsAnnotation addAltTranslation (Segment seg, AltTranslation alt) {
+	/**
+	 * Adds an {@link #AltTranslation} object to a given {@link #Segment}. The {@link #AltTranslationsAnnotation}
+	 * annotation is created if it does not exist already.
+	 * @param seg the segment where to add the object.
+	 * @param alt alternate translation to add.
+	 * @return the annotation where the object was added,
+	 * it may be a new annotation or the one already associated with the segment.  
+	 */
+	public static AltTranslationsAnnotation addAltTranslation (Segment seg,
+		AltTranslation alt)
+	{
 		AltTranslationsAnnotation altTrans = seg.getAnnotation(AltTranslationsAnnotation.class);
 		if ( altTrans == null ) {
 			altTrans = new AltTranslationsAnnotation();
 			seg.setAnnotation(altTrans);
 		}
 		altTrans.add(alt);
-		
 		return altTrans;
 	}
+
 }

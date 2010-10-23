@@ -41,7 +41,7 @@ public class AltTranslationsAnnotation implements IAnnotation, Iterable<AltTrans
 	/**
 	 * Creates a new empty AltTranslationsAnnotation object.
 	 */
-	public AltTranslationsAnnotation() {
+	public AltTranslationsAnnotation () {
 		list = new ArrayList<AltTranslation>(2);
 	}
 
@@ -51,7 +51,7 @@ public class AltTranslationsAnnotation implements IAnnotation, Iterable<AltTrans
 	 * @param alt
 	 *            the {@link AltTranslation} object to add.
 	 */
-	public void add(AltTranslation alt) {
+	public void add (AltTranslation alt) {
 		list.add(alt);
 	}
 
@@ -73,15 +73,21 @@ public class AltTranslationsAnnotation implements IAnnotation, Iterable<AltTrans
 	 * @param score
 	 *            the score for this alternate translation (must be between 0 and 100).
 	 * @param origin
-	 *            an option identifier for the origin of this alternate translation.
+	 *            an optional identifier for the origin of this alternate translation.
 	 * @return the {@link AltTranslation} object created and added to this annotation.
 	 */
-	public AltTranslation add(LocaleId sourceLocId, LocaleId targetLocId,
-			TextFragment originalSource, TextFragment alternateSource,
-			TextFragment alternateTarget, MatchType type, int score, String origin) {
+	public AltTranslation add (LocaleId sourceLocId,
+		LocaleId targetLocId,
+		TextFragment originalSource,
+		TextFragment alternateSource,
+		TextFragment alternateTarget,
+		MatchType type,
+		int score,
+		String origin)
+	{
 		list.add(new AltTranslation(sourceLocId, targetLocId, originalSource, alternateSource,
-				alternateTarget, type, score, origin));
-		return list.get(list.size() - 1);
+			alternateTarget, type, score, origin));
+		return list.get(list.size()-1);
 	}
 
 	/**
@@ -90,7 +96,7 @@ public class AltTranslationsAnnotation implements IAnnotation, Iterable<AltTrans
 	 * @return a new iterator for the entries in this annotations.
 	 */
 	@Override
-	public Iterator<AltTranslation> iterator() {
+	public Iterator<AltTranslation> iterator () {
 		return new Iterator<AltTranslation>() {
 			int current = 0;
 
@@ -119,8 +125,8 @@ public class AltTranslationsAnnotation implements IAnnotation, Iterable<AltTrans
 	 * 
 	 * @return the first alternate translation entry or null if the list is empty.
 	 */
-	public AltTranslation getFirst() {
-		if (list.isEmpty()) {
+	public AltTranslation getFirst () {
+		if ( list.isEmpty() ) {
 			return null;
 		}
 		return list.get(0);
@@ -131,8 +137,8 @@ public class AltTranslationsAnnotation implements IAnnotation, Iterable<AltTrans
 	 * 
 	 * @return the last alternate translation entry or null if the list is empty.
 	 */
-	public AltTranslation getLast() {
-		if (list.isEmpty()) {
+	public AltTranslation getLast () {
+		if ( list.isEmpty() ) {
 			return null;
 		}
 		return list.get(list.size() - 1);
@@ -143,7 +149,7 @@ public class AltTranslationsAnnotation implements IAnnotation, Iterable<AltTrans
 	 * 
 	 * @return true if the list is empty.
 	 */
-	public boolean isEmpty() {
+	public boolean isEmpty () {
 		return list.isEmpty();
 	}
 
@@ -152,14 +158,66 @@ public class AltTranslationsAnnotation implements IAnnotation, Iterable<AltTrans
 	 * 
 	 * @return the number of alternate translations available.
 	 */
-	public int size() {
+	public int size () {
 		return list.size();
 	}
 
 	/**
-	 * Sort the list of {@link AltTranslation}s in the order defined by {@link AltTranslation#compareTo(AltTranslation)}
+	 * Sorts the list of {@link AltTranslation}s in the order defined by {@link AltTranslation#compareTo(AltTranslation)}.
 	 */
-	public void sort() {
+	public void sort () {
 		Collections.sort(list);
 	}
+
+	/**
+	 * Indicates if a) there are several matches with identical rank
+	 * and at least two of them have different translations.
+	 * @param forceSort true to force the entries to be sorted. If set to false, the
+	 * code assumes the entries have been sorted already.
+	 * @return true if the conditions above are true.
+	 */
+	public boolean hasSeveralBestMatches (boolean forceSort) {
+		if ( list.size() < 2 ) return false;
+		
+		// Make sure it's sorted if needed
+		if ( forceSort ) sort();
+		
+		// Get the best match
+		AltTranslation best = list.get(0);
+		
+		// Compare it to the next ones
+		for ( int i=1; i<list.size(); i++ ) {
+			// Loop through all other results until either:
+			// - the match is different from the first
+			// - or the match is identical but has a different translation
+			AltTranslation res = list.get(i);
+			if ( best.type != res.type ) return false;
+			if ( best.score != res.score ) return false;
+			if ( !best.getSource().toString().equals(res.getSource().toString()) ) return false;
+			// Different target? (if yes -> return true)
+			if ( !best.getTarget().toString().equals(res.getTarget().toString()) ) return true;
+		}
+		return false;
+	}
+	
+	public void downgradeIdenticalBestMatches (boolean forceSort) {
+		if ( list.size() < 2 ) return;
+		if ( !hasSeveralBestMatches(forceSort) ) return;
+		
+		// Get the best match
+		AltTranslation best = list.get(0);
+		// Compare it to the next ones
+		for ( int i=1; i<list.size(); i++ ) {
+			// Loop through all other results until either:
+			// - the match is different from the first
+			// - or the match is identical but has a different translation
+			AltTranslation res = list.get(i);
+			if ( best.type != res.type ) break;
+			if ( best.score != res.score ) break;
+			if ( !best.getSource().toString().equals(res.getSource().toString()) ) break;
+			res.score--;
+		}
+		best.score--;
+	}
+
 }

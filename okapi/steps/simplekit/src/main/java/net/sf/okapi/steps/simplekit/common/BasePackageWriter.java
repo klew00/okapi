@@ -327,18 +327,19 @@ public abstract class BasePackageWriter implements IPackageWriter {
 					done = true;
 				}
 			}
-			if ( !done ) {
-				ScoresAnnotation scores = tu.getTarget(trgLoc).getAnnotation(ScoresAnnotation.class);
-				if ( scores != null ) {
-					writeScoredItem(tu, scores);
-				}
-				else { // Has some text in target, but not approved
-					// Output to un-approved TMX only it's different from source
-					if ( tc.compareTo(tu.getSource(), true) != 0 ) {
-						tmxWriterUnApproved.writeItem(tu, null);
-					}
-				}
-			}
+//TODO			
+//			if ( !done ) {
+//				ScoresAnnotation scores = tu.getTarget(trgLoc).getAnnotation(ScoresAnnotation.class);
+//				if ( scores != null ) {
+//					writeScoredItem(tu);
+//				}
+//				else { // Has some text in target, but not approved
+//					// Output to un-approved TMX only it's different from source
+//					if ( tc.compareTo(tu.getSource(), true) != 0 ) {
+//						tmxWriterUnApproved.writeItem(tu, null);
+//					}
+//				}
+//			}
 		}
 
 		// Check for alternates
@@ -375,9 +376,7 @@ public abstract class BasePackageWriter implements IPackageWriter {
 	}
 
 	@Override
-	public void writeScoredItem (TextUnit item,
-		ScoresAnnotation scores)
-	{
+	public void writeScoredItem (TextUnit item) {
 		// By default, matches go in the leverage TM
 		tmxWriterLeverage.writeItem(item, null);
 	}

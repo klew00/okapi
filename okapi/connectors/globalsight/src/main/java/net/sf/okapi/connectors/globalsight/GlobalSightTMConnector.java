@@ -59,8 +59,6 @@ import net.sf.okapi.lib.translation.QueryResult;
 
 public class GlobalSightTMConnector extends BaseConnector implements ITMQuery {
 
-	private String srcLang;
-	private String trgLang;
 	private List<QueryResult> results;
 	private int current = -1;
 	private int maxHits = 25;
@@ -96,16 +94,6 @@ public class GlobalSightTMConnector extends BaseConnector implements ITMQuery {
 	
 	@Override
 	public void close () {
-	}
-
-	@Override
-	public LocaleId getSourceLanguage () {
-		return LocaleId.fromPOSIXLocale(srcLang);
-	}
-
-	@Override
-	public LocaleId getTargetLanguage () {
-		return LocaleId.fromPOSIXLocale(trgLang);
 	}
 
 	@Override
@@ -182,7 +170,7 @@ public class GlobalSightTMConnector extends BaseConnector implements ITMQuery {
 				text = tmp.toString();
 			}
 
-			String xmlRes = gsWS.searchEntries(gsToken, gsTmProfile, text, srcLang);
+			String xmlRes = gsWS.searchEntries(gsToken, gsTmProfile, text, srcCode);
 			Document doc = docBuilder.parse(new InputSource(new StringReader(xmlRes)));
 			NodeList list1 = doc.getElementsByTagName("entry");
 			Element elem;
@@ -317,7 +305,7 @@ public class GlobalSightTMConnector extends BaseConnector implements ITMQuery {
 	public int query (String plainText) {
 		try {
 			results.clear();
-			String xmlRes = gsWS.searchEntries(gsToken, gsTmProfile, plainText, srcLang);
+			String xmlRes = gsWS.searchEntries(gsToken, gsTmProfile, plainText, srcCode);
 			Document doc = docBuilder.parse(new InputSource(new StringReader(xmlRes)));
 			NodeList list1 = doc.getElementsByTagName("entry");
 			Element elem;
@@ -456,18 +444,9 @@ public class GlobalSightTMConnector extends BaseConnector implements ITMQuery {
 	}
 
 	@Override
-	public void setLanguages (LocaleId sourceLocale,
-		LocaleId targetLocale)
-	{
-		srcLang = toInternalCode(sourceLocale);
-		trgLang = toInternalCode(targetLocale);
-	}
-
-	@Override
 	protected String toInternalCode (LocaleId locale) {
 		//TODO: Do we need to adjust the code to always have the country?
-		String code = locale.toPOSIXLocaleId();
-		return code;
+		return locale.toPOSIXLocaleId();
 	}
 
 	/**

@@ -28,8 +28,8 @@ import java.util.logging.Logger;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.ISkeleton;
+import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
-import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filterwriter.ILayerProvider;
 import net.sf.okapi.common.LocaleId;
@@ -351,7 +351,10 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		TextContainer srcCont = tu.getSource();
 		TextContainer trgCont = null;
 		if ( locToUse != null ) { // Expects a target output
-			if ( (trgCont = tu.getTarget(locToUse)) == null ) {
+			trgCont = tu.getTarget(locToUse);
+			// If we do not have target
+			// or if the target is empty (regardless the source)
+			if (( trgCont == null ) || trgCont.isEmpty() ) {
 				// If there is no target available
 				// We fall back to source
 				trgCont = srcCont;
@@ -368,7 +371,6 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		}
 		
 		if ( srcCont.hasBeenSegmented() || !srcCont.contentIsOneSegment()
-			|| ( trgCont.getAnnotation(ScoresAnnotation.class) != null )
 			|| ( trgCont.getAnnotation(AltTranslationsAnnotation.class) != null ))
 		{
 			return getSegmentedText(srcCont, trgCont, locToUse, context, tu.isReferent());
@@ -398,7 +400,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		}
 	}
 
-	// This method assumes bi-lingual pairs are 1-1 and in the same order
+
 	private String getSegmentedText (TextContainer srcCont,
 		TextContainer trgCont,
 		LocaleId locToUse,
@@ -407,31 +409,46 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	{
 		StringBuilder tmp = new StringBuilder();
 
-		// Get the scores if they are available
-		ScoresAnnotation scores = null;
-		if ( trgCont != null ) {
-			scores = trgCont.getAnnotation(ScoresAnnotation.class);
-		}
+		// Get the alternate-translations if available
+		AltTranslationsAnnotation atAnn = null;
+//		atAnn = trgCont.getAnnotation(AltTranslationsAnnotation.class);
 		
 		// The output is driven by the target, not the source, so the interstices parts
 		// are the ones of the target, no the one of the source
-		int scoreIndex = -1;
 		for ( TextPart part : trgCont ) {
 			if ( part.isSegment() ) {
-				scoreIndex++;
-				int lev = (( scores != null ) ? scores.getScore(scoreIndex) : 0 );
 				Segment trgSeg = (Segment)part;
+				TextFragment trgFrag = trgSeg.text;
+
+				// Compute the leverage score
+				int lev = 0;
+				AltTranslation at = null;
+				atAnn = trgSeg.getAnnotation(AltTranslationsAnnotation.class);
+				if ( atAnn != null ) {
+					at = atAnn.getFirst();
+					if ( at != null ) {
+						lev = at.getScore();
+					}
+				}
+				
+				// Fall-back on the source if needed
 				Segment srcSeg = srcCont.getSegments().get(trgSeg.id);
 				if ( srcSeg == null ) {
 					// A target segment without a corresponding source: give warning
 					logger.warning(String.format("No source segment found for target segment id='%s':\n\"%s\".",
-						trgSeg.id, trgSeg.text.toText()));
+						trgSeg.id, trgFrag.toText()));
+				}
+				else {
+					if ( trgFrag.isEmpty() && !srcSeg.text.isEmpty() ) {
+						trgFrag = srcSeg.text;
+						lev = 0; // Nothing leverage (target was not copied apparently)
+					}
 				}
 
 				// Write the segment (note: srcSeg can be null)
 				if ( layer == null ) {
 					// If no layer: just write the target
-					tmp.append(getContent(trgSeg.text, locToUse, context));
+					tmp.append(getContent(trgFrag, locToUse, context));
 				}
 				else { // If layer: write the bilingual entry
 					switch ( context ) {
@@ -440,7 +457,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 							+ layer.startSegment()
 							+ ((srcSeg==null) ? "" : getContent(srcSeg.text, locToUse, 0))
 							+ layer.midSegment(lev)
-							+ getContent(trgSeg.text, locToUse, 0)
+							+ getContent(trgFrag, locToUse, 0)
 							+ layer.endSegment()
 							+ layer.startCode());
 						break;
@@ -449,7 +466,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 							+ layer.startSegment()
 							+ ((srcSeg==null) ? "" : getContent(srcSeg.text, locToUse, 0))
 							+ layer.midSegment(lev)
-							+ getContent(trgSeg.text, locToUse, 0)
+							+ getContent(trgFrag, locToUse, 0)
 							+ layer.endSegment()
 							+ layer.startInline());
 						break;
@@ -457,7 +474,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 						tmp.append(layer.startSegment()
 							+ ((srcSeg==null) ? "" : getContent(srcSeg.text, locToUse, 0))
 							+ layer.midSegment(lev)
-							+ getContent(trgSeg.text, locToUse, 0)
+							+ getContent(trgFrag, locToUse, 0)
 							+ layer.endSegment());
 						break;
 					}
@@ -471,6 +488,80 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 
 		return tmp.toString();
 	}
+
+	// This method assumes bi-lingual pairs are 1-1 and in the same order
+//	private String getSegmentedText_OLD (TextContainer srcCont,
+//		TextContainer trgCont,
+//		LocaleId locToUse,
+//		int context,
+//		boolean isReferent)
+//	{
+//		StringBuilder tmp = new StringBuilder();
+//
+//		// Get the scores if they are available
+//		ScoresAnnotation scores = null;
+//		if ( trgCont != null ) {
+//			scores = trgCont.getAnnotation(ScoresAnnotation.class);
+//		}
+//		
+//		// The output is driven by the target, not the source, so the interstices parts
+//		// are the ones of the target, no the one of the source
+//		int scoreIndex = -1;
+//		for ( TextPart part : trgCont ) {
+//			if ( part.isSegment() ) {
+//				scoreIndex++;
+//				int lev = (( scores != null ) ? scores.getScore(scoreIndex) : 0 );
+//				Segment trgSeg = (Segment)part;
+//				Segment srcSeg = srcCont.getSegments().get(trgSeg.id);
+//				if ( srcSeg == null ) {
+//					// A target segment without a corresponding source: give warning
+//					logger.warning(String.format("No source segment found for target segment id='%s':\n\"%s\".",
+//						trgSeg.id, trgSeg.text.toText()));
+//				}
+//
+//				// Write the segment (note: srcSeg can be null)
+//				if ( layer == null ) {
+//					// If no layer: just write the target
+//					tmp.append(getContent(trgSeg.text, locToUse, context));
+//				}
+//				else { // If layer: write the bilingual entry
+//					switch ( context ) {
+//					case 1:
+//						tmp.append(layer.endCode()
+//							+ layer.startSegment()
+//							+ ((srcSeg==null) ? "" : getContent(srcSeg.text, locToUse, 0))
+//							+ layer.midSegment(lev)
+//							+ getContent(trgSeg.text, locToUse, 0)
+//							+ layer.endSegment()
+//							+ layer.startCode());
+//						break;
+//					case 2:
+//						tmp.append(layer.endInline()
+//							+ layer.startSegment()
+//							+ ((srcSeg==null) ? "" : getContent(srcSeg.text, locToUse, 0))
+//							+ layer.midSegment(lev)
+//							+ getContent(trgSeg.text, locToUse, 0)
+//							+ layer.endSegment()
+//							+ layer.startInline());
+//						break;
+//					default:
+//						tmp.append(layer.startSegment()
+//							+ ((srcSeg==null) ? "" : getContent(srcSeg.text, locToUse, 0))
+//							+ layer.midSegment(lev)
+//							+ getContent(trgSeg.text, locToUse, 0)
+//							+ layer.endSegment());
+//						break;
+//					}
+//				}
+//			}
+//			else { // Normal text fragment
+//				// Target fragment is used
+//				tmp.append(getContent(part.text, locToUse, context));
+//			}
+//		}
+//
+//		return tmp.toString();
+//	}
 
 //	/**
 //	 * Gets the original content of a given text unit.
@@ -796,17 +887,6 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		if ( !code.hasReference() ) {
 			return codeTmp;
 		}
-//Not used anymore		// Check for segment
-//		if ( code.getType().equals(TextFragment.CODETYPE_SEGMENT) ) {
-//			if ( layer == null ) {
-//				return "[SEG-"+code.getData()+"]";
-//			}
-//			else {
-//				return layer.startInline()
-//					+ layer.encode("[SEG-"+code.getData()+"]", 2)
-//					+ layer.endInline();
-//			}
-//		}
 		// Else: look for place-holders
 		StringBuilder tmp = new StringBuilder(codeTmp);
 		Object[] marker = null;

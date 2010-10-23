@@ -390,8 +390,8 @@ public class TextUnit implements INameable, IReferenceable {
     /**
 	 * Gets the target object for this TextUnit for a given locale.
 	 * @param locId the locale to query.
-	 * @return the target object for this TextUnit for the given locale, or null if
-	 * it does not exist.
+	 * @return the target object for this text unit for the given locale,
+	 * or null if it does not exist.
 	 */
 	public TextContainer getTarget (LocaleId locId) {
 		return targets.get(locId);

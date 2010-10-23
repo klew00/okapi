@@ -21,7 +21,6 @@
 package net.sf.okapi.applications.rainbow.packages;
 
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.LocaleId;
@@ -81,9 +80,7 @@ public interface IWriter extends IFilterWriter {
 	/**
 	 * Helper method to output scored entries. This method is called by {@link #writeTMXEntries(TextUnit)}.
 	 * @param item the text unit to process.
-	 * @param scores the optional annotation holding the scores (can be null).
 	 */
-	public void writeScoredItem (TextUnit item,
-		ScoresAnnotation scores);
+	public void writeScoredItem (TextUnit item);
 
 }

@@ -26,9 +26,12 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
+import net.sf.okapi.common.annotation.AltTranslation;
+import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filterwriter.XLIFFContent;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.*;
 
 import java.io.File;
@@ -197,6 +200,7 @@ public class Writer extends BaseWriter {
 		writer.writeStartElement("xliff");
 		writer.writeAttributeString("version", "1.2");
 		writer.writeAttributeString("xmlns", "urn:oasis:names:tc:xliff:document:1.2");
+		writer.writeAttributeString("xmlns:okp", "okapi-framework:xliff-extensions"); 
 		docMimeType = resource.getMimeType();
 		if (( options.message != null ) && ( options.message.length() > 0 )) {
 			writer.writeComment(options.message);
@@ -221,6 +225,7 @@ public class Writer extends BaseWriter {
 	private void writeStartFile (String original,
 		String contentType)
 	{
+		writer.writeLineBreak();
 		writer.writeStartElement("file");
 		writer.writeAttributeString("original",
 			(original!=null) ? original : "unknown");
@@ -370,8 +375,66 @@ public class Writer extends BaseWriter {
 			writer.writeString(tu.getProperty(Property.NOTE).getValue());
 			writer.writeEndElementLineBreak(); // note
 		}
+		
+		// Alt-trans
+		if ( options.includeAltTrans ) {
+			tc = tu.getTarget(trgLoc);
+			if ( tc != null ) {
+				writeAlternates(tc.getAnnotation(AltTranslationsAnnotation.class), null);
+				for ( Segment seg : tc.getSegments() ) {
+					writeAlternates(seg.getAnnotation(AltTranslationsAnnotation.class), seg);
+				}
+			}
+		}
 
 		writer.writeEndElementLineBreak(); // trans-unit
+	}
+	
+	/**
+	 * Writes an <at-trans> element.
+	 * @param atAnn the annotation to write out.
+	 * @param seg Segment to which the annotation is attached, or null if the
+	 * annotation is attached to a text container.
+	 */
+	private void writeAlternates (AltTranslationsAnnotation atAnn,
+		Segment seg)
+	{
+		if ( atAnn == null ) {
+			return;
+		}
+		for ( AltTranslation at : atAnn ) {
+			writer.writeStartElement("alt-trans");
+			if ( seg != null ) {
+				writer.writeAttributeString("mid", seg.id);
+			}
+			if ( at.getScore() > 0 ) {
+				writer.writeAttributeString("match-quality", at.getScore()+"%");
+			}
+			if ( !Util.isEmpty(at.getOrigin()) ) {
+				writer.writeAttributeString("origin", at.getOrigin());
+			}
+			if ( at.getType() != MatchType.UKNOWN ) {
+				writer.writeAttributeString("okp:matchType", at.getType().toString());
+			}
+			writer.writeLineBreak();
+			// alt-trans source
+			TextContainer cont = at.getSource();
+			if ( !cont.isEmpty() ) {
+				writer.writeStartElement("source");
+				writer.writeAttributeString("xml:lang", at.getSourceLocale().toBCP47());
+				writer.writeRawXML(xliffCont.toSegmentedString(cont, 0, false, false, options.gMode));
+				writer.writeEndElementLineBreak(); // alt-trans
+			}
+			// alt-trans target
+			writer.writeStartElement("target");
+			writer.writeAttributeString("xml:lang", at.getTargetLocale().toBCP47());
+			cont = at.getTarget();
+			writer.writeRawXML(xliffCont.toSegmentedString(cont, 0, false, false, options.gMode));
+			writer.writeEndElementLineBreak(); // target
+			// End of alt-trans
+			writer.writeEndElementLineBreak();
+		}
+		
 	}
 
 }

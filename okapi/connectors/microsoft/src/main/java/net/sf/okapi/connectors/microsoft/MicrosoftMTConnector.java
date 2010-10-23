@@ -125,4 +125,5 @@ public class MicrosoftMTConnector extends BaseConnector {
 	public void setParameters (IParameters params) {
 		this.params = (Parameters)params;
 	}
+
 }

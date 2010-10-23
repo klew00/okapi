@@ -46,8 +46,6 @@ public class MyMemoryTMConnector extends BaseConnector implements ITMQuery {
 
 	private static final String SERVER_URL = "http://mymemory.translated.net/otms/";
 	
-	private String srcLang;
-	private String trgLang;
 	private List<QueryResult> results;
 	private int current = -1;
 	private int maxHits = 25;
@@ -74,16 +72,6 @@ public class MyMemoryTMConnector extends BaseConnector implements ITMQuery {
 	
 	@Override
 	public void close () {
-	}
-
-	@Override
-	public LocaleId getSourceLanguage () {
-		return LocaleId.fromString(srcLang);
-	}
-
-	@Override
-	public LocaleId getTargetLanguage () {
-		return LocaleId.fromString(trgLang);
 	}
 
 	@Override
@@ -128,7 +116,7 @@ public class MyMemoryTMConnector extends BaseConnector implements ITMQuery {
 		if ( !frag.hasText(false) ) return 0;
 		try {
 			String text = qutil.separateCodesFromText(frag);
-			Query query = new Query(null, text, srcLang, trgLang, null, params.getUseMT());
+			Query query = new Query(null, text, srcCode, trgCode, null, params.getUseMT());
 			GetResponse gresp = otms.otmsGet(params.getKey(), query);
 			if ( gresp.isSuccess() ) {
 				QueryResult res;
@@ -197,18 +185,10 @@ public class MyMemoryTMConnector extends BaseConnector implements ITMQuery {
 	}
 
 	@Override
-	public void setLanguages (LocaleId sourceLang,
-		LocaleId targetLang)
-	{
-		srcLang = toInternalCode(sourceLang);
-		trgLang = toInternalCode(targetLang);
-	}
-
-	@Override
-	protected String toInternalCode (LocaleId standardCode) {
+	protected String toInternalCode (LocaleId locale) {
 		// The expected language code is language-Region with region mandatory
-		String lang = standardCode.getLanguage();
-		String reg = standardCode.getRegion();
+		String lang = locale.getLanguage();
+		String reg = locale.getRegion();
 		
 		//TODO: Use a lookup table and a more complete one
 		if ( lang.equals("en") ) reg = "us";
@@ -267,4 +247,5 @@ public class MyMemoryTMConnector extends BaseConnector implements ITMQuery {
 	public void setRootDirectory (String rootDir) {
 		// Not used
 	}	
+
 }

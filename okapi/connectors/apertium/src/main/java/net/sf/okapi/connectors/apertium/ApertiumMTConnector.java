@@ -141,14 +141,6 @@ public class ApertiumMTConnector extends BaseConnector {
 	}
 	
 	@Override
-	public void setLanguages (LocaleId sourceLocale,
-		LocaleId targetLocale)
-	{
-		srcCode = toInternalCode(sourceLocale);
-		trgCode = toInternalCode(targetLocale);
-	}
-
-	@Override
 	protected String toInternalCode (LocaleId standardCode) {
 		String lang = standardCode.getLanguage();
 		String reg = standardCode.getRegion();
@@ -170,4 +162,5 @@ public class ApertiumMTConnector extends BaseConnector {
 	public void setParameters (IParameters params) {
 		this.params = (Parameters)params;
 	}
+
 }

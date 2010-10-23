@@ -24,10 +24,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
+import net.sf.okapi.common.resource.Segment;
+import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.translation.BaseConnector;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
@@ -40,8 +43,6 @@ public class SimpleTMConnector extends BaseConnector implements ITMQuery {
 	private int threshold = 98;
 	private List<QueryResult> results;
 	private int current = -1;
-	private LocaleId srcLoc;
-	private LocaleId trgLoc;
 	private LinkedHashMap<String, String> attributes;
 	private Parameters params;
 	private String rootDir;
@@ -156,24 +157,6 @@ public class SimpleTMConnector extends BaseConnector implements ITMQuery {
 	}
 
 	@Override
-	public void setLanguages (LocaleId sourceLang,
-		LocaleId targetLang)
-	{
-		srcLoc = sourceLang;
-		trgLoc = targetLang;
-	}
-
-	@Override
-	public LocaleId getSourceLanguage () {
-		return srcLoc;
-	}
-	
-	@Override
-	public LocaleId getTargetLanguage () {
-		return trgLoc;
-	}
-
-	@Override
 	public int getMaximumHits () {
 		return maxHits;
 	}
@@ -197,4 +180,31 @@ public class SimpleTMConnector extends BaseConnector implements ITMQuery {
 	public void setRootDirectory (String rootDir) {
 		this.rootDir = rootDir;
 	}
+
+	/**
+	 * Leverages a text unit using the SimpleTM.
+	 * This uses the base leverage method, but add one extra step:
+	 * It downgrade best matches that are identical.
+	 */
+	//TODO: Should this extra process be in the base leverage with an option to do it or not?
+	@Override
+	public void leverage (TextUnit tu) {
+		// Call the default
+		super.leverage(tu);
+
+		// Check that we have results
+		TextContainer tc = tu.getTarget(getTargetLanguage());
+		if ( tc == null ) return;
+
+		// Proceed to downgrade the identical best matches
+		// Treat the container annotations
+		AltTranslationsAnnotation atAnn = tc.getAnnotation(AltTranslationsAnnotation.class);
+		if ( atAnn != null ) atAnn.downgradeIdenticalBestMatches(false);
+		// Treat each segment
+		for ( Segment seg : tc.getSegments() ) {
+			atAnn = seg.getAnnotation(AltTranslationsAnnotation.class);
+			if ( atAnn != null ) atAnn.downgradeIdenticalBestMatches(false);
+		}
+	}
+	
 }

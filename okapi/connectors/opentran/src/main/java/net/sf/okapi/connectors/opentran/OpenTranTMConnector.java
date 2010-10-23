@@ -39,7 +39,6 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.lib.translation.BaseConnector;
 import net.sf.okapi.lib.translation.ITMQuery;
@@ -52,8 +51,6 @@ import org.json.simple.parser.ParseException;
 
 public class OpenTranTMConnector extends BaseConnector implements ITMQuery {
 
-	private String srcCode;
-	private String trgCode;
 	private List<QueryResult> results;
 	private int current = -1;
 	private int maxHits = 12;
@@ -80,16 +77,6 @@ public class OpenTranTMConnector extends BaseConnector implements ITMQuery {
 	@Override
 	public void close () {
 		// Nothing to do
-	}
-
-	@Override
-	public LocaleId getSourceLanguage () {
-		return LocaleId.fromPOSIXLocale(srcCode);
-	}
-
-	@Override
-	public LocaleId getTargetLanguage () {
-		return LocaleId.fromPOSIXLocale(trgCode);
 	}
 
 	@Override
@@ -212,9 +199,8 @@ public class OpenTranTMConnector extends BaseConnector implements ITMQuery {
 	public void setLanguages (LocaleId sourceLocale,
 		LocaleId targetLocale)
 	{
+		super.setLanguages(sourceLocale, targetLocale);
 		matcher = new TextMatcher(sourceLocale, sourceLocale);
-		srcCode = toInternalCode(sourceLocale);
-		trgCode = toInternalCode(targetLocale);
 	}
 
 	@Override
@@ -285,4 +271,5 @@ public class OpenTranTMConnector extends BaseConnector implements ITMQuery {
 		// Re-order the list based on the scores 
 		Collections.sort(results, scorComp);
 	}
+
 }

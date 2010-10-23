@@ -29,9 +29,11 @@ import java.util.regex.Pattern;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.annotation.AltTranslation;
-import net.sf.okapi.common.annotation.ScoreInfo;
-import net.sf.okapi.common.annotation.ScoresAnnotation;
+import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
+//import net.sf.okapi.common.annotation.ScoreInfo;
+//import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
@@ -276,14 +278,8 @@ public class TMXWriter {
     	}
 
     	//TODO: Output only the items with real match or translations (not copy of source)		
-    	ScoresAnnotation scores = null;
-    	if ( trgTC != null ) {
-    		scores = trgTC.getAnnotation(ScoresAnnotation.class);
-    	}
-
-    	int i = -1;
+    	AltTranslationsAnnotation atAnn = null;
 		for ( Segment srcSeg : srcTC.getSegments() ) {
-    		i++;
     		TextFragment tf = srcSeg.text;
 			Segment trgSeg = null;
 			if ( trgTC != null ) {
@@ -293,14 +289,15 @@ public class TMXWriter {
 	       		writeTU(tf, null, String.format("%s_s%s", tuid, srcSeg.id), attributes);
 				continue;
 			}
-    		if ( scores != null ) { // If the TU is scored
-    			ScoreInfo si = scores.get(i); // Try to get the score for this segment
-				if ( si.score == 0 ) {
-					// Not score: in a scored-TU: skip this segment
-					continue;
-				}
-				// Scored properly. Now see if we need to alter the source text
-				if (( si.origin != null ) && si.origin.equals(Util.MTFLAG) ) {
+			// Get annotation
+			AltTranslation at = null;
+			atAnn = trgSeg.getAnnotation(AltTranslationsAnnotation.class);
+			if ( atAnn != null ) {
+				at = atAnn.getFirst();
+			}
+    		if ( at != null ) {
+				// Now see if we need to alter the source text
+				if ( at.fromMT() ) {
 					// Set the MT flag attribute
 		        	if ( attributes != null ) {
 		        		if ( !attributes.containsKey(CREATIONID) ) {
@@ -310,7 +307,6 @@ public class TMXWriter {
 		        	else {
 		        		attributes = MTattribute;
 		        	}
-		        	
 		        	// Add the flag prefix if requested (that's why we clone)
 		        	if ( useMTPrefix ) {
 		        		tf = srcSeg.text.clone();
@@ -324,6 +320,137 @@ public class TMXWriter {
     	}
     }
 
+//    /**
+//     * Writes a given text unit.
+//     * @param item the text unit to output.
+//     * @param attributes the optional set of attribute to put along with the entry.
+//     * @param alternate indicates if this item is an 'alternate'. If it is an alternate, if the
+//     * target locale does not have any entry in this item, the first found entry is used
+//     * instead. This is to allow getting for example FR-CA translations for an FR project.
+//     * @deprecated This method will be removed soon, to write alternates use
+//     * {@link #writeAlternate(AltTranslation, TextFragment)}.
+//     */
+//    public void writeItem_OLD (TextUnit item,
+//   		Map<String, String> attributes,
+//   		boolean alternate)
+//    {
+//    	String tuid = item.getName();
+//    	if ( Util.isEmpty(tuid) ) {
+//    		// itemCount will be incremented in writeTU, so do a +1 here to take that in account
+//    		tuid = String.format("autoID%d", itemCount + 1);
+//    	}
+//
+//    	TextContainer srcTC = item.getSource();
+//    	TextContainer trgTC = item.getTarget(trgLoc);
+//
+//    	if (( trgTC == null ) && alternate ) {
+//    		// If we don't have a target but are in alternate mode: get the first
+//    		// available locale in the list
+//    		Iterator<LocaleId> iter = item.getTargetLocales().iterator();
+//    		if ( iter.hasNext() ) {
+//    			trgTC = item.getTarget(iter.next());
+//    		}
+//    	}
+//
+//    	//TODO: Output only the items with real match or translations (not copy of source)		
+//    	ScoresAnnotation scores = null;
+//    	if ( trgTC != null ) {
+//    		scores = trgTC.getAnnotation(ScoresAnnotation.class);
+//    	}
+//
+//    	int i = -1;
+//		for ( Segment srcSeg : srcTC.getSegments() ) {
+//    		i++;
+//    		TextFragment tf = srcSeg.text;
+//			Segment trgSeg = null;
+//			if ( trgTC != null ) {
+//				trgSeg = trgTC.getSegments().get(srcSeg.id);
+//			}
+//			if ( trgSeg == null ) {
+//	       		writeTU(tf, null, String.format("%s_s%s", tuid, srcSeg.id), attributes);
+//				continue;
+//			}
+//    		if ( scores != null ) { // If the TU is scored
+//    			ScoreInfo si = scores.get(i); // Try to get the score for this segment
+//				if ( si.score == 0 ) {
+//					// Not score: in a scored-TU: skip this segment
+//					continue;
+//				}
+//				// Scored properly. Now see if we need to alter the source text
+//				if (( si.origin != null ) && si.origin.equals(Util.MTFLAG) ) {
+//					// Set the MT flag attribute
+//		        	if ( attributes != null ) {
+//		        		if ( !attributes.containsKey(CREATIONID) ) {
+//		        			attributes.put(CREATIONID, Util.MTFLAG);
+//		        		}
+//		        	}
+//		        	else {
+//		        		attributes = MTattribute;
+//		        	}
+//		        	
+//		        	// Add the flag prefix if requested (that's why we clone)
+//		        	if ( useMTPrefix ) {
+//		        		tf = srcSeg.text.clone();
+//		        		tf.setCodedText(Util.MTFLAG+" "+tf.getCodedText());
+//		        	}
+//				}
+//    		}
+//    		// Write out the segment
+//       		writeTU(tf, trgSeg.text,
+//   				String.format("%s_s%s", tuid, srcSeg.id), attributes);
+//    	}
+//    }
+
+    /**
+     * Writes the entries of an {@link #AltTranslationsAnnotation} annotation(s) of
+     * a given text unit to the TMX document.
+     * @param tu text unit to use.
+     */
+    public void writeAlternates (TextUnit tu,
+    	LocaleId trgLoc)
+    {
+    	TextContainer tc = tu.getTarget(trgLoc);
+    	if ( tc == null ) return; // No target
+    	AltTranslationsAnnotation atAnn;
+    	
+    	// Treat case of un-segmented entry
+    	if ( !tc.hasBeenSegmented() ) {
+    		atAnn = tc.getAnnotation(AltTranslationsAnnotation.class);
+    		if ( atAnn != null ) {
+    			for ( AltTranslation at : atAnn ) {
+    				TextFragment srcFrag = at.getSource().getFirstContent();
+    				if ( srcFrag.isEmpty() ) {
+    					srcFrag = tu.getSource().getFirstContent();
+    				}
+    				TextFragment trgFrag = at.getTarget().getFirstContent();
+    				// Write out the segment
+    				writeTU(srcFrag, trgFrag, null, null, trgLoc);
+    			}
+    		}
+    		return; // Done
+    	}
+    	
+   		// Else: Treat case of segmented 
+    	for ( Segment seg : tc.getSegments() ) {
+    		// Check for the annotation
+    		atAnn = seg.getAnnotation(AltTranslationsAnnotation.class);
+    		if ( atAnn == null ) continue;
+    		// If available: process it
+    		for ( AltTranslation at : atAnn ) {
+    			// Alternates are expected to be un-segmented
+    	    	TextFragment srcFrag = at.getSource().getFirstContent();
+    	    	if ( srcFrag.isEmpty() ) {
+    	    		Segment srcSeg = tu.getSource().getSegments().get(seg.id);
+    	    		if ( srcSeg == null ) continue; // No source: skip it
+    	   			srcFrag = srcSeg.text;
+    	    	}
+    	    	TextFragment trgFrag = at.getTarget().getFirstContent();
+    			// Write out the segment
+    	   		writeTU(srcFrag, trgFrag, null, null, trgLoc);
+    		}
+    	}
+    }
+    
     /**
      * Writes the data of an {@link AltTranslation} to this TMX output.
      * @param alt the alternate translation.

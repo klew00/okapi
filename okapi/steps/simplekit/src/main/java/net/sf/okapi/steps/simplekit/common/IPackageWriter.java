@@ -79,9 +79,7 @@ public interface IPackageWriter extends IFilterWriter {
 	/**
 	 * Helper method to output scored entries. This method is called by {@link #writeTMXEntries(TextUnit)}.
 	 * @param item the text unit to process.
-	 * @param scores the optional annotation holding the scores (can be null).
 	 */
-	public void writeScoredItem (TextUnit item,
-		ScoresAnnotation scores);
+	public void writeScoredItem (TextUnit item);
 
 }

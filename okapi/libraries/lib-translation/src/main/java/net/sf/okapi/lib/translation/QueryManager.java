@@ -21,17 +21,14 @@
 package net.sf.okapi.lib.translation;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
-import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Segment;
@@ -40,7 +37,7 @@ import net.sf.okapi.common.resource.TextUnit;
 
 /**
  * Provides a wrapper to manage and query several translation resources at the 
- * same time. For example, a local TM, a remote TM and a MT server.
+ * same time. For example, a local TM, a remote TM and a Machine Translation server.
  */
 public class QueryManager {
 
@@ -319,7 +316,7 @@ public class QueryManager {
 			}
 		}
 		
-		// remove duplicates based on QueryResult.equals
+		// Remove duplicates based on QueryResult.equals
 		// remove duplicates also sorts in ranked order
 		results = QueryUtil.removeDuplicates(results);
 		
@@ -441,77 +438,58 @@ public class QueryManager {
 	 * Leverages a text unit (segmented or not) based on the current settings.
 	 * Any options or attributes needed must be set before calling this method.
 	 * @param tu the text unit to leverage.
-	 * @param fillTarget true to put the leveraged text into the target, false to not.
+	 * @param thresholdToFillTarget if the first match has a score equal or above this value,
+	 * the target text of the match is placed in the target content. To avoid any filling of
+	 * the target: simply use a high value (e.g. <code>Integer.MAX_VALUE</code>).
 	 */
-	public void leverage (TextUnit tu, boolean fillTarget)
+	public void leverage (TextUnit tu,
+		int thresholdToFill)
 	{
 		if ( !tu.isTranslatable() ) {
 			return;
 		} 
-		
+
+		// Query each translation resource
 		for ( int id : resList.keySet() ) {
 			ResourceItem ri = resList.get(id);
 			if ( !ri.enabled ) continue; // Skip disabled entries
 			ri.query.leverage(tu);				
-		}		
+		}
 		
-		// sort annotations added across IQuery.leverage calls
+		// Sort annotations added across IQuery.leverage calls
 		// and fill in best matching target if needed
 		AltTranslationsAnnotation altTrans = null;
 		AltTranslation bestMatch = null;
-		for (LocaleId loc : tu.getTargetLocales()) {
-			ScoresAnnotation scores = new ScoresAnnotation();
-			
-			// check target container first
+		for ( LocaleId loc : tu.getTargetLocales() ) {
+			// Check target container first
 			altTrans = tu.getTarget(loc).getAnnotation(AltTranslationsAnnotation.class);
-			if (altTrans != null) {
+			if ( altTrans != null ) {
 				altTrans.sort();
-				
-				// TODO: Remove deprecated ScoresAnnotation code
-				accumulateScoresAnnotation(scores, altTrans);
-				/////////////////////
-				
-				if (fillTarget) {
-					if ((bestMatch = altTrans.getFirst()) != null) {
-						tu.setTargetContent(getTargetLanguage(), bestMatch.getTarget().getUnSegmentedContentCopy());
+				if ( (bestMatch = altTrans.getFirst()) != null ) {
+					if ( bestMatch.getScore() >= thresholdToFill ) {
+						// Alternate translation content is expected to always be un-segmented
+						// We can use getFirstContent() here
+						tu.setTargetContent(getTargetLanguage(), bestMatch.getTarget().getFirstContent());
 					}
 				}
-			} else {
-				// check each target segment
-				for (Segment ts : tu.getTarget(loc).getSegments()) {
+			}
+			else {
+				// Check each target segment
+				for ( Segment ts : tu.getTarget(loc).getSegments() ) {
 					altTrans = ts.getAnnotation(AltTranslationsAnnotation.class);
-					if (altTrans != null) {
+					if ( altTrans != null ) {
 						altTrans.sort();
-						
-						// TODO: Remove deprecated ScoresAnnotation code
-						accumulateScoresAnnotation(scores, altTrans);
-						/////////////////////
-						
-						if (fillTarget) {
-							if ((bestMatch = altTrans.getFirst()) != null) {
-								ts.text = bestMatch.getTarget().getUnSegmentedContentCopy();
+						if ( (bestMatch = altTrans.getFirst()) != null ) {
+							if ( bestMatch.getScore() >= thresholdToFill ) {
+								ts.text = bestMatch.getTarget().getFirstContent();
 							}
 						}
-					}		
+					}
 				}
 			}
-			
-			// TODO: Remove deprecated ScoresAnnotation code
-			if (!scores.isEmpty()) {
-				tu.getTarget(loc).setAnnotation(scores);
-			}
-			/////////////////////////
 		}
 	}
 		
-	private void accumulateScoresAnnotation(ScoresAnnotation scores,
-			AltTranslationsAnnotation altTrans) {
-		for (AltTranslation at : altTrans) {
-			scores.add(at.getScore(), (at.fromMT() ? Util.MTFLAG : at.getOrigin()));
-		}
-		
-	}
-
 	/**
 	 * Adjusts the inline codes of a new text fragment based on an original one.
 	 * @param oriSrc the original source text fragment.
@@ -572,7 +550,6 @@ public class QueryManager {
 		
 		int done = 0;
 		Code newCode, oriCode;
-//		int oriIndex = -1;
 
 		for ( int i=0; i<newCodes.size(); i++ ) {
 			newCode = newCodes.get(i);
@@ -653,4 +630,32 @@ public class QueryManager {
 	public int getLeveragedSegments () {
 		return leveragedSegments;
 	}
+
+//	/**
+//	 * Indicates if a) there are several matches with identical rank
+//	 * and at least two of them have different translations.
+//	 * <p><b>This assume the results are sorted</b>
+//	 * @return true if the conditions above are true.
+//	 */
+//	private boolean hasSeveralBestMatches () {
+//		if ( results.size() < 2 ) return false;
+//		
+//		// Get the best match
+//		QueryResult best = results.get(0);
+//		
+//		// Compare it to the next ones
+//		for ( int i=1; i<results.size(); i++ ) {
+//			// Loop through all other results until either:
+//			// - the match is different from the first
+//			// - or the match is identical but has a different translation
+//			QueryResult res = results.get(i);
+//			if ( best.matchType != res.matchType ) return false;
+//			if ( best.score != res.score ) return false;
+//			if ( !best.source.toString().equals(res.source.toString()) ) return false;
+//			// Different target? (if yes -> return true)
+//			if ( !best.target.toString().equals(res.target.toString()) ) return true;
+//		}
+//		return false;
+//	}
+
 }

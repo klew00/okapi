@@ -53,10 +53,18 @@ public class XLIFFContentTest {
 	}
 
 	@Test
-	public void testMisOrderedGX () {
-		TextFragment tf = createMisOrderedTextUnit();
+	public void testMisOrderedGX1 () {
+		TextFragment tf = createMisOrderedTextUnit1();
 		assertEquals(tf.getCodes().size(), 4);
 		assertEquals("t1<bx id=\"1\"/>t2<bx id=\"2\"/>t3<ex id=\"1\"/>t4<ex id=\"2\"/>t5",
+			fmt.setContent(tf).toString(true));
+	}
+	
+	@Test
+	public void testMisOrderedGX2 () {
+		TextFragment tf = createMisOrderedTextUnit2();
+		assertEquals(tf.getCodes().size(), 4);
+		assertEquals("<ex id=\"3\"/><g id=\"1\"></g><bx id=\"2\"/>",
 			fmt.setContent(tf).toString(true));
 	}
 	
@@ -66,6 +74,14 @@ public class XLIFFContentTest {
 		assertEquals(tf.getCodes().size(), 8);
 		assertEquals("<bx id=\"1\"/><bx id=\"2\"/><g id=\"3\"></g><ex id=\"1\"/><bx id=\"4\"/><ex id=\"2\"/><ex id=\"4\"/>",
 			fmt.setContent(tf).toString(true));
+	}
+	
+	@Test
+	public void testMisOrderedComplexBPT () {
+		TextFragment tf = createMisOrderedComplexTextUnit();
+		assertEquals(tf.getCodes().size(), 8);
+		assertEquals("<it id=\"1\" pos=\"open\">&lt;b1&gt;</it><it id=\"2\" pos=\"open\">&lt;b2&gt;</it><bpt id=\"3\">&lt;b2&gt;</bpt><ept id=\"3\">&lt;/b2&gt;</ept><it id=\"1\" pos=\"close\">&lt;/b1&gt;</it><it id=\"4\" pos=\"open\">&lt;b3&gt;</it><it id=\"2\" pos=\"close\">&lt;/b2&gt;</it><it id=\"4\" pos=\"close\">&lt;/b3&gt;</it>",
+			fmt.setContent(tf).toString(false));
 	}
 	
 	private TextFragment createTextUnit () {
@@ -81,7 +97,7 @@ public class XLIFFContentTest {
 		return tf;
 	}
 	
-	private TextFragment createMisOrderedTextUnit () {
+	private TextFragment createMisOrderedTextUnit1 () {
 		TextFragment tf = new TextFragment();
 		tf.append("t1");
 		tf.append(TagType.OPENING, "b1", "<b1>");
@@ -92,6 +108,15 @@ public class XLIFFContentTest {
 		tf.append("t4");
 		tf.append(TagType.CLOSING, "b2", "</b2>");
 		tf.append("t5");
+		return tf;
+	}
+
+	private TextFragment createMisOrderedTextUnit2 () {
+		TextFragment tf = new TextFragment();
+		tf.append(TagType.CLOSING, "b1", "</b1>");
+		tf.append(TagType.OPENING, "b2", "<b2>");
+		tf.append(TagType.CLOSING, "b2", "</b2>");
+		tf.append(TagType.OPENING, "b3", "<b3>");
 		return tf;
 	}
 

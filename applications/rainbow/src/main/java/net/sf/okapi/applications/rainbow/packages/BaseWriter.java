@@ -24,7 +24,6 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
-import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filterwriter.TMXWriter;
 import net.sf.okapi.common.LocaleId;
@@ -287,28 +286,28 @@ public abstract class BaseWriter implements IWriter {
 	}
 
 	public void writeTMXEntries (TextUnit tu) {
-		// Write the items in the TM if needed
+		// Write the items text in the TM if needed
+		// (case of existing translations)
 		TextContainer tc = tu.getTarget(trgLoc);
 		if (( tc != null ) && ( !tc.isEmpty() )) {
 			if ( tu.getSource().isEmpty() ||
 				( tu.getSource().hasText(false) && !tc.hasText(false) )) {
 				return; // Target has code and/or spaces only
 			}
+			
 			boolean done = false;
 			if ( tu.hasTargetProperty(trgLoc, Property.APPROVED) ) {
 				if ( tu.getTargetProperty(trgLoc, Property.APPROVED).getValue().equals("yes") ) {
+					// Write existing translation that was approved
 					tmxWriterApproved.writeItem(tu, null);
 					done = true;
 				}
 			}
 			if ( !done ) {
-				ScoresAnnotation scores = tu.getTarget(trgLoc).getAnnotation(ScoresAnnotation.class);
-				if ( scores != null ) {
-					writeScoredItem(tu, scores);
-				}
-				else {
-					tmxWriterUnApproved.writeItem(tu, null);
-				}
+				// Write leveraged data
+				writeScoredItem(tu);
+				// Write existing translation not yet approved
+				tmxWriterUnApproved.writeItem(tu, null);
 			}
 		}
 
@@ -335,6 +334,21 @@ public abstract class BaseWriter implements IWriter {
 		
 	}
 
+//	/**
+//	 * Indicates if a text unit has {@link #AltTranslationAnnotation} or not.
+//	 * @param tu the text unit to look at.
+//	 * @return true if the given text unit has one or more annotations.
+//	 */
+//	boolean hasAltTranslations (TextUnit tu) {
+//		TextContainer tc = tu.getTarget(trgLoc);
+//		if ( tc.getAnnotation(AltTranslationsAnnotation.class) != null ) return true;
+//		// Else, check the segments
+//		for ( Segment seg : tc.getSegments() ) {
+//			if ( seg.getAnnotation(AltTranslationsAnnotation.class) != null ) return true;
+//		}
+//		return false;
+//	}
+	
 	private void writeAltTranslations (AltTranslationsAnnotation ann,
 		TextFragment srcOriginal)
 	{
@@ -346,9 +360,8 @@ public abstract class BaseWriter implements IWriter {
 		}
 	}
 
-	public void writeScoredItem (TextUnit item,
-		ScoresAnnotation scores)
-	{
+	@Override
+	public void writeScoredItem (TextUnit item) {
 		// By default, matches go in the leverage TM
 		tmxWriterLeverage.writeItem(item, null);
 	}

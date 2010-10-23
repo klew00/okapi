@@ -47,6 +47,7 @@ public class OptionsEditor implements IParametersEditor {
 	private Button chkIncludeNoTranslate;
 	private Button chkSetApprovedAsNoTranslate;
 	private Button chkCopySource;
+	private Button chkIncludeAltTrans;
 	private Options params;
 	private IHelp help;
 
@@ -116,7 +117,10 @@ public class OptionsEditor implements IParametersEditor {
 
 		chkCopySource = new Button(cmpTmp, SWT.CHECK);
 		chkCopySource.setText("Copy source text in target if no target is available");
-
+		
+		chkIncludeAltTrans = new Button(cmpTmp, SWT.CHECK);
+		chkIncludeAltTrans.setText("Inciude <alt-trans> elements");
+		
 		//--- Dialog-level buttons
 
 		SelectionAdapter OKCancelActions = new SelectionAdapter() {
@@ -166,6 +170,7 @@ public class OptionsEditor implements IParametersEditor {
 		chkIncludeNoTranslate.setSelection(params.includeNoTranslate);
 		chkSetApprovedAsNoTranslate.setSelection(params.setApprovedAsNoTranslate);
 		chkCopySource.setSelection(params.copySource);
+		chkIncludeAltTrans.setSelection(params.includeAltTrans);
 		updateNoTranslateCases();
 	}
 	
@@ -174,6 +179,7 @@ public class OptionsEditor implements IParametersEditor {
 		params.includeNoTranslate = chkIncludeNoTranslate.getSelection();
 		params.setApprovedAsNoTranslate = chkSetApprovedAsNoTranslate.getSelection();
 		params.copySource = chkCopySource.getSelection();
+		params.includeAltTrans = chkIncludeAltTrans.getSelection();
 		return true;
 	}
 	

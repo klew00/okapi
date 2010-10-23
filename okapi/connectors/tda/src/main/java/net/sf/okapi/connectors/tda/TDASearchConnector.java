@@ -74,8 +74,6 @@ public class TDASearchConnector extends BaseConnector implements ITMQuery {
 	private Parameters params;
 	private String baseURL;
 	private String authKey;
-	private String srcCode;
-	private String trgCode;
 	private int current = -1;
 	private int maxHits = 20;
 	private List<QueryResult> results;
@@ -228,10 +226,6 @@ public class TDASearchConnector extends BaseConnector implements ITMQuery {
 		return code;
 	}
 	
-	private LocaleId fromInternalCode (String code) {
-		return LocaleId.fromString(code);
-	}
-	
 	private void loginIfNeeded () {
 		if ( authKey != null ) return;
 		try {
@@ -291,16 +285,6 @@ public class TDASearchConnector extends BaseConnector implements ITMQuery {
 	}
 
 	@Override
-	public LocaleId getSourceLanguage () {
-		return fromInternalCode(srcCode);
-	}
-
-	@Override
-	public LocaleId getTargetLanguage () {
-		return fromInternalCode(trgCode);
-	}
-
-	@Override
 	public boolean hasNext () {
 		if ( results == null ) return false;
 		if ( current >= results.size() ) {
@@ -336,9 +320,8 @@ public class TDASearchConnector extends BaseConnector implements ITMQuery {
 	public void setLanguages (LocaleId sourceLocale,
 		LocaleId targetLocale)
 	{
+		super.setLanguages(sourceLocale, targetLocale);
 		matcher = new TextMatcher(sourceLocale, sourceLocale);
-		srcCode = toInternalCode(sourceLocale);
-		trgCode = toInternalCode(targetLocale);
 	}
 
 	@Override

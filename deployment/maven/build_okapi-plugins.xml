@@ -1,0 +1,97 @@
+<?xml version="1.0"?> 
+<project name="okapi-lib" default="all" basedir="."> 
+
+	<!-- Guess the platform if this build file is not called with the platform already set -->
+	<condition property="platform" value="win32-x86">
+		<os family="windows"/>
+	</condition>
+	<condition property="platform" value="cocoa-macosx">
+		<os family="mac"/>
+	</condition>
+	<condition property="platform" value="gtk2-linux-x86">
+		<os name="Linux" arch="x86"/>
+	</condition>
+	<condition property="platform" value="gtk2-linux-x86_64">
+		<os name="Linux" arch="x86_64"/>
+	</condition>
+
+	<!-- Set flags for what dstribution is being built -->
+	<condition property="building-windows">
+		<equals arg1="${platform}" arg2="win32-x86"/>
+	</condition>
+	<condition property="building-mac">
+		<equals arg1="${platform}" arg2="cacoa-macosx"/>
+	</condition>
+	<condition property="building-linux">
+		<or>
+			<equals arg1="${platform}" arg2="gtk2-linux-x86"/>
+			<equals arg1="${platform}" arg2="gtk2-linux-x86_64"/>
+		</or>
+	</condition>
+
+	<!-- Get the version information to use from file -->
+	<property file="../shared/release.properties" />
+	<property name="okapilibStamp" value="${okapilibVersion}${releaseInfo}" />
+
+ 	<property name="tmp" value="tmp"/>
+	<property name="dist_plugins" value="dist_plugins"/>
+	<property name="mavenStore" value="${user.home}/.m2/repository"/>
+
+	<tstamp>
+	 <format property="TODAY" pattern="MMM-dd-yyyy"/>
+	</tstamp>
+
+	<!-- Initialization -->
+	<target name="init">
+
+		<delete includeEmptyDirs="true" failonerror="false">
+			<fileset dir="${dist_plugins}"/>
+		</delete>
+		<mkdir dir="${dist_plugins}"/>
+
+		<copy todir="${dist_plugins}" file="data/okapi-plugins/pluginsDeployment.xml" overwrite="true"/>
+		<replace file="${dist_plugins}/pluginsDeployment.xml" token="@version@" value="${okapilibStamp}"/>
+
+	</target>
+	
+
+	<!-- Make the zip files -->
+	<target name="makeZips"> 
+
+		<!-- ============== okapi-step-xmlvalidation -->
+		<property name="plg001" value="okapi-step-xmlvalidation-${okapilibStamp}"/>
+		<delete includeEmptyDirs="true" failonerror="false">
+			<fileset dir="${tmp}"/>
+		</delete>
+		<mkdir dir="${tmp}"/>
+		<copy todir="${tmp}" file="../../okapi/steps/xmlvalidation/target/${plg001}.jar"/>
+		<mkdir dir="${tmp}/lib"/>
+		<copy todir="${tmp}/lib"> <!-- Add dependencies for tests -->
+		   <fileset dir="${mavenStore}/dtdparser/dtdparser/1.21" includes="**/dtdparser-1.21.jar"/>
+		   <fileset dir="../shared/licenses" includes="**/dtdparser-*"/>
+		</copy>
+		<zip destfile="${dist_plugins}/${plg001}.zip" basedir="${tmp}"/>
+
+		<!-- ============== okapi-filter-vignette -->
+		<property name="plg002" value="okapi-filter-vignette-${okapilibStamp}"/>
+		<delete includeEmptyDirs="true" failonerror="false">
+			<fileset dir="${tmp}"/>
+		</delete>
+		<mkdir dir="${tmp}"/>
+		<copy todir="${tmp}" file="../../okapi/filters/vignette/target/${plg002}.jar"/>
+		<zip destfile="${dist_plugins}/${plg002}.zip" basedir="${tmp}"/>
+
+		<!-- ============== okapi-filter-versifiedtxt -->
+		<property name="plg003" value="okapi-filter-versifiedtxt-${okapilibStamp}"/>
+		<delete includeEmptyDirs="true" failonerror="false">
+			<fileset dir="${tmp}"/>
+		</delete>
+		<mkdir dir="${tmp}"/>
+		<copy todir="${tmp}" file="../../okapi/filters/versifiedtxt/target/${plg003}.jar"/>
+		<zip destfile="${dist_plugins}/${plg003}.zip" basedir="${tmp}"/>
+
+	</target>
+	
+	<target name="all" depends="init, makeZips"/>
+
+</project>

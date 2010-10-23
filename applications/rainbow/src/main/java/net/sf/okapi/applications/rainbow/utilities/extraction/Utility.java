@@ -28,11 +28,12 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.ISegmenter;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.annotation.ScoreInfo;
-import net.sf.okapi.common.annotation.ScoresAnnotation;
+import net.sf.okapi.common.annotation.AltTranslation;
+import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
@@ -248,7 +249,6 @@ public class Utility extends BaseFilterDrivenUtility {
 		
 		// Compute the statistics
 		int n = tu.getSource().getSegments().count();
-		//TODO: Redo the report based on leveraging counts
 		htmlRpt.addSegmentCount(n==0 ? 1 : n);
 
 		// Leverage if requested
@@ -256,20 +256,28 @@ public class Utility extends BaseFilterDrivenUtility {
 			if ( params.useGroupName && ( tu.getName() != null )) {
 				qm.setAttribute("GroupName", tu.getName());
 			}
-			qm.leverage(tu, true);
-			cont = tu.getTarget(trgLang);
-
+			qm.leverage(tu, params.threshold);
+			
 			// Compute statistics
+			cont = tu.getTarget(trgLang);
 			if ( cont != null ) {
-				ScoresAnnotation scores = cont.getAnnotation(ScoresAnnotation.class);
-				if ( scores != null ) {
-					for ( ScoreInfo si : scores.getList() ) {
-						if ( si.score > 99 ) htmlRpt.addExactMatch(1);
-						else if ( si.score != 0 ) htmlRpt.addFuzzyMatch(1);
-					}
+				tallyResults(cont.getAnnotation(AltTranslationsAnnotation.class));
+				for ( Segment seg : cont.getSegments() ) {
+					tallyResults(seg.getAnnotation(AltTranslationsAnnotation.class));
 				}
 			}
 		}
 	}
 
+    private void tallyResults (AltTranslationsAnnotation atAnn) {
+    	if ( atAnn == null ) {
+    		return;
+    	}
+    	// Counting only the top matches, so we can get percentages
+    	AltTranslation best = atAnn.getFirst();
+    	if ( best != null ) {
+    		if ( best.getScore() > 99 ) htmlRpt.addExactMatch(1);
+    		else if ( best.getScore() != 0 ) htmlRpt.addFuzzyMatch(1);
+    	}
+    }
 }
