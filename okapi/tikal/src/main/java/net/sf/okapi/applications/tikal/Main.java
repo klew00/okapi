@@ -841,13 +841,7 @@ public class Main {
 	}
 	
 	private void showHelp () throws MalformedURLException {
-//		// Get the path/URL of the help file 
-//		String path = getAppRootDirectory();
-//		path += "/help/applications/tikal/index.html"; //$NON-NLS-1$
-//		// Opens the file
-//		ps.println("Help: "+path);
-//		Util.openURL((new File(path)).toURI().toURL().toString());
-		Util.openWikiTopic("Tikal Help");
+		Util.openWikiTopic("Tikal");
 	}
 	
 	private void printUsage () {
