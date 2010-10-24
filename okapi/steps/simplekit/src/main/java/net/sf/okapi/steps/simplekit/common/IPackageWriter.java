@@ -21,7 +21,6 @@
 package net.sf.okapi.steps.simplekit.common;
 
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.LocaleId;
