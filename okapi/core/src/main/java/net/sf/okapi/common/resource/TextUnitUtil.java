@@ -172,18 +172,18 @@ public class TextUnitUtil {
 					if ( addMissingCodes ) {
 						newTrg.append(code.clone());
 					}
-					else {
-						if ( !code.isDeleteable() ) {
-							String msg = String.format("The code id='%d' (%s) is missing in target.",
-								code.getId(), code.getData());
-							if ( parent != null ) {
-								msg += String.format(" (item id='%s', name='%s')", parent.getId(),
-									(parent.getName()==null ? "" : parent.getName()));
-							}
-							LOGGER.warning(msg);
-							LOGGER.info(String.format("Source='%s'\nTarget='%s'", oriSrc.toText(), newTrg.toText()));
-						}
-					}
+//					else {
+//						if ( !code.isDeleteable() ) {
+//							String msg = String.format("The code id='%d' (%s) is missing in target.",
+//								code.getId(), code.getData());
+//							if ( parent != null ) {
+//								msg += String.format(" (item id='%s', name='%s')", parent.getId(),
+//									(parent.getName()==null ? "" : parent.getName()));
+//							}
+//							LOGGER.warning(msg);
+//							LOGGER.info(String.format("Source='%s'\nTarget='%s'", oriSrc.toText(), newTrg.toText()));
+//						}
+//					}
 				}
 			}
 		}

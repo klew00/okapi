@@ -510,7 +510,7 @@ public class QueryManager {
 	 * @param parent the parent text unit (used for error information only)
 	 * @return the newTrg parameter adjusted
 	 */
-	public TextFragment  adjustNewFragment (TextFragment oriSrc,
+	public TextFragment adjustNewFragment (TextFragment oriSrc,
 		TextFragment newSrc,
 		TextFragment newTrg,
 		int score,
@@ -649,7 +649,7 @@ public class QueryManager {
 	 * @return the number of best matches that are fuzzy.
 	 */
 	public int getFuzzyBestMatches () {
-		return exactBestMatches;
+		return fuzzyBestMatches;
 	}
 
 //	/**

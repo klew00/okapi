@@ -23,6 +23,7 @@ package net.sf.okapi.tm.simpletm;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filterwriter.TMXWriter;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.ISegments;
@@ -78,6 +79,8 @@ public class Database {
 	private LocaleId trgLoc;
 	private boolean penalizeSourceWithDifferentCodes = true;
 	private boolean penalizeTargetWithDifferentCodes = true;
+	private MatchType exactMatchType;
+	private MatchType fuzzyMatchType;
 
 	public Database () {
 		try {
@@ -286,11 +289,14 @@ public class Database {
 	}
 	
 	public void clearAttributes () {
-		setAttributes(null);
+		createStatement(null);
 	}
 	
-	public void setAttributes (LinkedHashMap<String, String> attributes) {
+	public void createStatement (LinkedHashMap<String, String> attributes) {
 		try {
+			// Default match types
+			exactMatchType = MatchType.EXACT;
+			fuzzyMatchType = MatchType.FUZZY;
 			// prepare the query with or without context condition
 			if ( attributes == null ) {
 				qstm = conn.prepareStatement(String.format("SELECT %s,%s,%s,%s FROM %s WHERE %s=?",
@@ -302,6 +308,10 @@ public class Database {
 					NSRCTEXT, NSRCCODES, NTRGTEXT, NTRGCODES, TBLNAME, NSRCTEXT));
 				for ( String name : attributes.keySet() ) {
 					tmp.append(" AND ").append(name).append("=?");
+					if ( name.equals(NGRPNAME) ) {
+						exactMatchType = MatchType.EXACT_UNIQUE_ID;
+						fuzzyMatchType = MatchType.FUZZY_UNIQUE_ID;
+					}
 				}
 				qstm = conn.prepareStatement(tmp.toString());
 			}
@@ -320,7 +330,7 @@ public class Database {
 			// prepare the query with or without context condition
 			if ( qstm == null ) {
 				// Create the statement if needed
-				setAttributes(attributes);
+				createStatement(attributes);
 			}
 			// Fill the parameters
 			if ( attributes != null ) {
@@ -345,16 +355,19 @@ public class Database {
 					Code.stringToCodes(result.getString(4)), false);
 				// Non-code text is exactly the same
 				qr.score = 100;
+				qr.matchType = exactMatchType;
 				// Check the codes between query source and found source, if requested
 				if ( penalizeSourceWithDifferentCodes ) {
 					if ( !queryCodes.equals(qr.source.getCodes().toString()) ) {
 						qr.score--; // 99 if there are code difference between codes in query and codes in source
+						qr.matchType = fuzzyMatchType;
 					}
 				}
 				// Check the codes between query source and found target, if requested
 				if ( penalizeTargetWithDifferentCodes ) {
 					if ( !queryCodes.equals(qr.target.getCodes().toString()) ) {
 						qr.score--;
+						qr.matchType = fuzzyMatchType;
 					}
 				}
 				

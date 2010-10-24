@@ -48,6 +48,9 @@ public class LeveragingStep extends BasePipelineStep {
 	private TMXWriter tmxWriter;
 	private String rootDir;
 	private boolean initDone;
+	private int totalCount;
+	private int exactCount;
+	private int fuzzyCount;
 
 	private int iQueryId;
 
@@ -91,12 +94,18 @@ public class LeveragingStep extends BasePipelineStep {
 
 	@Override
 	protected Event handleStartBatch (Event event) {
+		totalCount = 0;
+		exactCount = 0;
+		fuzzyCount = 0;
 		initDone = false;
 		return event;
 	}
 	
 	@Override
 	protected Event handleEndBatch (Event event) {
+		logger.info(String.format("\nTotals:\nProcesseed segments = %d", totalCount));
+		logger.info(String.format("Best matches that are exact = %d", exactCount));
+		logger.info(String.format("Best matches that are fuzzy = %d", fuzzyCount));
 		destroy();
 		return event;
 	}
@@ -115,17 +124,20 @@ public class LeveragingStep extends BasePipelineStep {
 	@Override
 	protected Event handleEndDocument (Event event) {
 		if ( !params.getLeverage() ) return event;
-		logger.info(String.format("Segments with text = %d", qm.getTotalSegments()));
-		logger.info(String.format("Best match that are exact = %d", qm.getExactBestMatches()));
-		logger.info(String.format("Best match that are fuzzy = %d", qm.getFuzzyBestMatches()));
+		totalCount += qm.getTotalSegments();
+		exactCount += qm.getExactBestMatches();
+		fuzzyCount += qm.getFuzzyBestMatches();
+		logger.info(String.format("Processeed segments = %d", qm.getTotalSegments()));
+		logger.info(String.format("Best matches that are exact = %d", qm.getExactBestMatches()));
+		logger.info(String.format("Best matches that are fuzzy = %d", qm.getFuzzyBestMatches()));
 		return event;
 	}
-	
+
 	@Override
 	protected Event handleTextUnit (Event event) {
 		if ( !params.getLeverage() ) return event;
 		TextUnit tu = event.getTextUnit();
-		
+
 		// Do not leverage non-translatable entries
 		if ( !tu.isTranslatable() ) return event;
 

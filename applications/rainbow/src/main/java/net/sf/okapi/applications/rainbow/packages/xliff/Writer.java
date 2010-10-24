@@ -127,6 +127,9 @@ public class Writer extends BaseWriter {
 			// Make sure to copy the source on empty target
 			options.copySource = true;
 			
+			// No alt-trans in the XLIFF
+			options.includeAltTrans = false;
+			
 			// If translated found: replace the target text by the source.
 			// Trusting the target will be gotten from the TMX from original
 			// This to allow editing of pre-translated items in XLIFF editors

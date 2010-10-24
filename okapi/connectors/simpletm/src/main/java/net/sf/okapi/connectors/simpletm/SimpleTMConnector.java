@@ -138,7 +138,7 @@ public class SimpleTMConnector extends BaseConnector implements ITMQuery {
 		if ( "restype".equals(name) ) name = Database.NTYPE;
 		if ( attributes.put(name, value) == null ) {
 			// Update the query if this attribute did not exist yet
-			db.setAttributes(attributes);
+			db.createStatement(attributes);
 		}
 	}
 	
@@ -152,7 +152,7 @@ public class SimpleTMConnector extends BaseConnector implements ITMQuery {
 	public void removeAttribute (String name) {
 		if ( attributes.containsKey(name) ) {
 			attributes.remove(name);
-			db.setAttributes(attributes);
+			db.createStatement(attributes);
 		}
 	}
 
