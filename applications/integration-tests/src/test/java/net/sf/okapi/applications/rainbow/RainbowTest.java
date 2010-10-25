@@ -126,6 +126,24 @@ public class RainbowTest {
 	}
 
 	@Test
+	public void testLeverage () throws IOException, InterruptedException {
+		// Delete previous output
+		assertTrue(deleteOutputFile("pipelines/leverage/test01.out.html"));
+		assertTrue(deleteOutputFile("pipelines/leverage/test01.out.po"));
+		assertTrue(deleteOutputFile("pipelines/leverage/simpleTM.h2.db"));
+		assertTrue(deleteOutputDir("pipelines/leverage/pensieveTM.pentm", true));
+		
+		// Create the SimpleTM TM
+		assertEquals(0, runRainbow("-np -p pipelines/leverage/createSimpleTM.rnb -pln pipelines/leverage/createSimpleTM.pln"));
+		// Create the Pensieve TM
+		assertEquals(0, runRainbow("-np -p pipelines/leverage/createPensieveTM.rnb -pln pipelines/leverage/createPensieveTM.pln"));
+		// Execute first preparation
+		assertEquals(0, runRainbow("-np -p pipelines/leverage/prepare1.rnb -pln pipelines/leverage/prepare1.pln"));
+//		assertTrue("File different from gold",
+//			compareWithGoldFile("pipelines/diffleverage/myFile_en_new.out.html"));
+	}
+
+	@Test
 	public void testEncodingConversion () throws IOException, InterruptedException {
 		// Delete previous output
 		assertTrue(deleteOutputFile("pipelines/testForEncoding1.out.html"));

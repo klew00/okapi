@@ -26,6 +26,7 @@ public class Parameters extends BaseParameters {
 
 	private static final String LEVERAGE = "leverage";
 	private static final String FILLTARGET = "fillTarget";
+	private static final String DOWNGRADEIDENTICALBESTMATCHES = "downgradeIdenticalBestMatches";
 	private static final String FILLTARGETTHRESHOLD = "fillTargetThreshold";
 	private static final String MAKETMX = "makeTMX";
 	private static final String TMXPATH = "tmxPath";
@@ -36,6 +37,7 @@ public class Parameters extends BaseParameters {
 	private int threshold;
 	private boolean fillTarget;
 	private int fillTargetThreshold;
+	private boolean downgradeIdenticalBestMatches;
 	private boolean makeTMX;
 	private String tmxPath;
 	private boolean useMTPrefix;
@@ -93,6 +95,14 @@ public class Parameters extends BaseParameters {
 		this.fillTargetThreshold = fillTargetThreshold;
 	}
 
+	public boolean getDowngradeIdenticalBestMatches () {
+		return downgradeIdenticalBestMatches;
+	}
+
+	public void setDowngradeIdenticalBestMatches (boolean downgradeIdenticalBestMatches) {
+		this.downgradeIdenticalBestMatches = downgradeIdenticalBestMatches;
+	}
+
 	public boolean getMakeTMX () {
 		return makeTMX;
 	}
@@ -125,6 +135,7 @@ public class Parameters extends BaseParameters {
 		threshold = 95;
 		fillTarget = true;
 		fillTargetThreshold = 95;
+		downgradeIdenticalBestMatches = false;
 		makeTMX = false;
 		tmxPath = "";
 		useMTPrefix = true;
@@ -139,6 +150,7 @@ public class Parameters extends BaseParameters {
 		threshold = buffer.getInteger("threshold", threshold);
 		fillTarget = buffer.getBoolean(FILLTARGET, fillTarget);
 		fillTargetThreshold = buffer.getInteger(FILLTARGETTHRESHOLD, fillTargetThreshold);
+		downgradeIdenticalBestMatches = buffer.getBoolean(DOWNGRADEIDENTICALBESTMATCHES, downgradeIdenticalBestMatches);
 		makeTMX = buffer.getBoolean(MAKETMX, makeTMX);
 		tmxPath = buffer.getString(TMXPATH, tmxPath);
 		useMTPrefix = buffer.getBoolean(USEMTPREFIX, useMTPrefix);
@@ -153,6 +165,7 @@ public class Parameters extends BaseParameters {
 		buffer.setInteger("threshold", threshold);
 		buffer.setBoolean(FILLTARGET, fillTarget);
 		buffer.setInteger(FILLTARGETTHRESHOLD, fillTargetThreshold);
+		buffer.setBoolean(DOWNGRADEIDENTICALBESTMATCHES, downgradeIdenticalBestMatches);
 		buffer.setBoolean(MAKETMX, makeTMX);
 		buffer.setString(TMXPATH, tmxPath);
 		buffer.setBoolean(USEMTPREFIX, useMTPrefix);

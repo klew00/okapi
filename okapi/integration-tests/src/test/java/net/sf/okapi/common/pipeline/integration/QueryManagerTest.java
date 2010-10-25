@@ -78,7 +78,7 @@ public class QueryManagerTest {
 	public void leverageNoFill() {
 		TextUnit tu = new TextUnit("1");
 		tu.setSourceContent(new TextFragment("Elephants cannot fly."));
-		qm.leverage(tu, 999);
+		qm.leverage(tu, 999, false);
 		
 		Assert.assertEquals("", tu.getTarget(locFRFR).toString());
 		
@@ -91,7 +91,7 @@ public class QueryManagerTest {
 	public void leverageFill() {
 		TextUnit tu = new TextUnit("1");
 		tu.setSourceContent(new TextFragment("Elephants cannot fly."));
-		qm.leverage(tu, 1);
+		qm.leverage(tu, 1, false);
 		
 		Assert.assertEquals("Les \u00e9l\u00e9phants ne peuvent pas voler.", tu.getTarget(locFRFR).toString());
 		
@@ -109,7 +109,7 @@ public class QueryManagerTest {
 		ISegments segs = tu.getSource().getSegments();
 		assertEquals(2, segs.count());
 		
-		qm.leverage(tu, 1);
+		qm.leverage(tu, 1, false);
 		
 		segs = tu.getTarget(locFRFR).getSegments();
 		assertEquals(2, segs.count());

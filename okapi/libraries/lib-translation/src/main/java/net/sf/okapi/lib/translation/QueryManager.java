@@ -32,6 +32,7 @@ import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Segment;
+import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 
@@ -444,7 +445,8 @@ public class QueryManager {
 	 * the target: simply use a high value (e.g. <code>Integer.MAX_VALUE</code>).
 	 */
 	public void leverage (TextUnit tu,
-		int thresholdToFill)
+		int thresholdToFill,
+		boolean downgradeIdenticalBestMatches)
 	{
 		if ( !tu.isTranslatable() ) {
 			return;
@@ -464,40 +466,53 @@ public class QueryManager {
 		AltTranslationsAnnotation altTrans = null;
 		AltTranslation bestMatch = null;
 		for ( LocaleId loc : tu.getTargetLocales() ) {
+			
+			TextContainer tc = tu.getTarget(loc);
+			if ( tc == null ) continue;
+			
 			// Check target container first
-			altTrans = tu.getTarget(loc).getAnnotation(AltTranslationsAnnotation.class);
+			altTrans = tc.getAnnotation(AltTranslationsAnnotation.class);
 			if ( altTrans != null ) {
 				altTrans.sort();
 				if ( (bestMatch = altTrans.getFirst()) != null ) {
 					// Count best match
 					if ( bestMatch.getScore() >= 100 ) exactBestMatches++;
 					else if ( bestMatch.getScore() > 0 ) fuzzyBestMatches++;
-					// Fill is needed
+					// Fill target is requested
 					if ( bestMatch.getScore() >= thresholdToFill ) {
 						// Alternate translation content is expected to always be un-segmented
 						// We can use getFirstContent() here
 						tu.setTargetContent(getTargetLanguage(), bestMatch.getTarget().getFirstContent());
 					}
+					// Downgrade identical best matches if requested
+					if ( downgradeIdenticalBestMatches ) {
+						altTrans.downgradeIdenticalBestMatches(false, threshold);
+					}
 				}
 			}
-			else {
-				// Check each target segment
-				for ( Segment ts : tu.getTarget(loc).getSegments() ) {
-					altTrans = ts.getAnnotation(AltTranslationsAnnotation.class);
-					if ( altTrans != null ) {
-						altTrans.sort();
-						if ( (bestMatch = altTrans.getFirst()) != null ) {
-							// Count best match
-							if ( bestMatch.getScore() >= 100 ) exactBestMatches++;
-							else if ( bestMatch.getScore() > 0 ) fuzzyBestMatches++;
-							// Fill is needed
-							if ( bestMatch.getScore() >= thresholdToFill ) {
-								ts.text = bestMatch.getTarget().getFirstContent();
-							}
+
+			// Then check each target segment
+			// A customized leverage method may fill both container and segments, so we have to check both
+			for ( Segment ts : tc.getSegments() ) {
+				altTrans = ts.getAnnotation(AltTranslationsAnnotation.class);
+				if ( altTrans != null ) {
+					altTrans.sort();
+					if ( (bestMatch = altTrans.getFirst()) != null ) {
+						// Count best match
+						if ( bestMatch.getScore() >= 100 ) exactBestMatches++;
+						else if ( bestMatch.getScore() > 0 ) fuzzyBestMatches++;
+						// Fill target if requested
+						if ( bestMatch.getScore() >= thresholdToFill ) {
+							ts.text = bestMatch.getTarget().getFirstContent();
+						}
+						// Downgrade identical best matches if requested
+						if ( downgradeIdenticalBestMatches ) {
+							altTrans.downgradeIdenticalBestMatches(false, threshold);
 						}
 					}
 				}
 			}
+
 		}
 	}
 		
@@ -510,6 +525,7 @@ public class QueryManager {
 	 * @param parent the parent text unit (used for error information only)
 	 * @return the newTrg parameter adjusted
 	 */
+	// To unified with TextUnitUtil equivalent method
 	public TextFragment adjustNewFragment (TextFragment oriSrc,
 		TextFragment newSrc,
 		TextFragment newTrg,

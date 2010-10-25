@@ -25,12 +25,8 @@ import java.util.List;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
-import net.sf.okapi.common.resource.Segment;
-import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.translation.BaseConnector;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.lib.translation.QueryResult;
@@ -181,30 +177,30 @@ public class SimpleTMConnector extends BaseConnector implements ITMQuery {
 		this.rootDir = rootDir;
 	}
 
-	/**
-	 * Leverages a text unit using the SimpleTM.
-	 * This uses the base leverage method, but add one extra step:
-	 * It downgrade best matches that are identical.
-	 */
-	//TODO: Should this extra process be in the base leverage with an option to do it or not?
-	@Override
-	public void leverage (TextUnit tu) {
-		// Call the default
-		super.leverage(tu);
-
-		// Check that we have results
-		TextContainer tc = tu.getTarget(getTargetLanguage());
-		if ( tc == null ) return;
-
-		// Proceed to downgrade the identical best matches
-		// Treat the container annotations
-		AltTranslationsAnnotation atAnn = tc.getAnnotation(AltTranslationsAnnotation.class);
-		if ( atAnn != null ) atAnn.downgradeIdenticalBestMatches(false);
-		// Treat each segment
-		for ( Segment seg : tc.getSegments() ) {
-			atAnn = seg.getAnnotation(AltTranslationsAnnotation.class);
-			if ( atAnn != null ) atAnn.downgradeIdenticalBestMatches(false);
-		}
-	}
+//	/**
+//	 * Leverages a text unit using the SimpleTM.
+//	 * This uses the base leverage method, but add one extra step:
+//	 * It downgrade best matches that are identical.
+//	 */
+//	//TODO: Should this extra process be in the base leverage with an option to do it or not?
+//	@Override
+//	public void leverage (TextUnit tu) {
+//		// Call the default
+//		super.leverage(tu);
+//
+//		// Check that we have results
+//		TextContainer tc = tu.getTarget(getTargetLanguage());
+//		if ( tc == null ) return;
+//
+//		// Proceed to downgrade the identical best matches
+//		// Treat the container annotations
+//		AltTranslationsAnnotation atAnn = tc.getAnnotation(AltTranslationsAnnotation.class);
+//		if ( atAnn != null ) atAnn.downgradeIdenticalBestMatches(false);
+//		// Treat each segment
+//		for ( Segment seg : tc.getSegments() ) {
+//			atAnn = seg.getAnnotation(AltTranslationsAnnotation.class);
+//			if ( atAnn != null ) atAnn.downgradeIdenticalBestMatches(false);
+//		}
+//	}
 	
 }

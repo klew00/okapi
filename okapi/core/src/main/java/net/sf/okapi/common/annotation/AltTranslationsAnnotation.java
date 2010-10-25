@@ -170,7 +170,7 @@ public class AltTranslationsAnnotation implements IAnnotation, Iterable<AltTrans
 	}
 
 	/**
-	 * Indicates if a) there are several matches with identical rank
+	 * Indicates if a) there are several matches of 100% with identical rank
 	 * and at least two of them have different translations.
 	 * @param forceSort true to force the entries to be sorted. If set to false, the
 	 * code assumes the entries have been sorted already.
@@ -184,6 +184,7 @@ public class AltTranslationsAnnotation implements IAnnotation, Iterable<AltTrans
 		
 		// Get the best match
 		AltTranslation best = list.get(0);
+		if ( best.score < 100 ) return false;
 		
 		// Compare it to the next ones
 		for ( int i=1; i<list.size(); i++ ) {
@@ -191,7 +192,7 @@ public class AltTranslationsAnnotation implements IAnnotation, Iterable<AltTrans
 			// - the match is different from the first
 			// - or the match is identical but has a different translation
 			AltTranslation res = list.get(i);
-			if ( best.type != res.type ) return false;
+			//TODO: Cannot use matchType as not all connectors set it: if ( best.type != res.type ) return false;
 			if ( best.score != res.score ) return false;
 			if ( !best.getSource().toString().equals(res.getSource().toString()) ) return false;
 			// Different target? (if yes -> return true)
@@ -200,8 +201,20 @@ public class AltTranslationsAnnotation implements IAnnotation, Iterable<AltTrans
 		return false;
 	}
 	
-	public void downgradeIdenticalBestMatches (boolean forceSort) {
-		if ( list.size() < 2 ) return;
+	/**
+	 * Downgrades, and possibly removes, all the 100% best matches that are identical.
+	 * <p>A set of matches may have entries that have the same source but different targets, they
+	 * are not duplicated. Some callers may need to treat exact matches like that as fuzzy matches
+	 * to avoid triggering automated processes.
+	 * <p>This methods examine the set of alternate translations here and downgrade by 1% the score
+	 * of any top entry fall into that category. 
+	 * @param forceSort true to re-sort the annotations. If you set this option to false the entries
+	 * are expected to be already properly sorted to have the best matches first.
+	 * @param threshold threshold under which the matches should be removed.
+	 */
+	public void downgradeIdenticalBestMatches (boolean forceSort,
+		int threshold)
+	{
 		if ( !hasSeveralBestMatches(forceSort) ) return;
 		
 		// Get the best match
@@ -212,12 +225,21 @@ public class AltTranslationsAnnotation implements IAnnotation, Iterable<AltTrans
 			// - the match is different from the first
 			// - or the match is identical but has a different translation
 			AltTranslation res = list.get(i);
-			if ( best.type != res.type ) break;
+			//TODO: Settle the matchType issue: Can't use it here as not all connector set it if ( best.type != res.type ) break;
 			if ( best.score != res.score ) break;
 			if ( !best.getSource().toString().equals(res.getSource().toString()) ) break;
 			res.score--;
 		}
 		best.score--;
+		
+		// Remove any annotation below the threshold
+		// Assumes the list is sorted
+		Iterator<AltTranslation> iter = list.iterator();
+		while ( iter.hasNext() ) {
+			AltTranslation at = iter.next();
+			if ( at.score >= threshold ) break; // Done
+			iter.remove(); // Or remove
+		}
 	}
 
 }

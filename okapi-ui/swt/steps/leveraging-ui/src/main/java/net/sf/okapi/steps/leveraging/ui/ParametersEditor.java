@@ -63,6 +63,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private IContext context;
 	private Label stThreshold;
 	private Spinner spnThreshold;
+	private Button chkDowngradeIBM;
 	private Button chkFillTarget;
 	private Label stFillTargetThreshold;
 	private Spinner spnFillTargetThreshold;
@@ -198,6 +199,12 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		spnThreshold.setIncrement(1);
 		spnThreshold.setPageIncrement(10);
 
+		chkDowngradeIBM = new Button(mainComposite, SWT.CHECK);
+		chkDowngradeIBM.setText("Downgrade identical best exact matches");
+		gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		chkDowngradeIBM.setLayoutData(gdTmp);
+		
 		chkFillTarget = new Button(mainComposite, SWT.CHECK);
 		chkFillTarget.setText("Fill the target with the leveraged translation");
 		gdTmp = new GridData();
@@ -265,6 +272,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		pnlConnector.setEnabled(enabled);
 		stThreshold.setEnabled(enabled);
 		spnThreshold.setEnabled(enabled);
+		chkDowngradeIBM.setEnabled(enabled);
 		chkFillTarget.setEnabled(enabled);
 		chkMakeTMX.setEnabled(enabled);
 		if ( enabled ) {
@@ -285,6 +293,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		chkLeverage.setSelection(params.getLeverage());
 		pnlConnector.setData(params.getResourceClassName(), params.getResourceParameters());
 		spnThreshold.setSelection(params.getThreshold());
+		chkDowngradeIBM.setSelection(params.getDowngradeIdenticalBestMatches());
 		chkFillTarget.setSelection(params.getFillTarget());
 		spnFillTargetThreshold.setSelection(params.getFillTargetThreshold());
 		chkMakeTMX.setSelection(params.getMakeTMX());
@@ -310,6 +319,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		params.setResourceClassName(pnlConnector.getConnectorClass());
 		params.setResourceParameters(pnlConnector.getConnectorParameters());
 		params.setThreshold(spnThreshold.getSelection());
+		params.setDowngradeIdenticalBestMatches(chkDowngradeIBM.getSelection());
 		params.setFillTarget(chkFillTarget.getSelection());
 		params.setFillTargetThreshold(spnFillTargetThreshold.getSelection());
 		params.setMakeTMX(chkMakeTMX.getSelection());

@@ -50,6 +50,7 @@ public class Utility extends BaseFilterDrivenUtility {
 	private QueryManager qm;
 	private String resolvedOutputDir;
 	private HTMLReporter htmlRpt;
+	private boolean downgradeIdenticalBestMatches;
 	
 	private static final String HTML_REPORT_NAME = "report.html";
 	
@@ -96,14 +97,17 @@ public class Utility extends BaseFilterDrivenUtility {
 			}
 		}
 		
+		downgradeIdenticalBestMatches = false;
 		if ( params.pkgType.equals("xliff") ) {
 			writer = new net.sf.okapi.applications.rainbow.packages.xliff.Writer();
 			writer.setParameters(params.xliffOptions);
 		}
 		else if ( params.pkgType.equals("omegat") )
 			writer = new net.sf.okapi.applications.rainbow.packages.omegat.Writer();
-		else if ( params.pkgType.equals("rtf") )
+		else if ( params.pkgType.equals("rtf") ) {
 			writer = new net.sf.okapi.applications.rainbow.packages.rtf.Writer();
+			downgradeIdenticalBestMatches = true;
+		}
 		else
 			throw new RuntimeException("Unknown package type: " + params.pkgType);
 		
@@ -256,7 +260,7 @@ public class Utility extends BaseFilterDrivenUtility {
 			if ( params.useGroupName && ( tu.getName() != null )) {
 				qm.setAttribute("GroupName", tu.getName());
 			}
-			qm.leverage(tu, params.threshold);
+			qm.leverage(tu, params.threshold, downgradeIdenticalBestMatches);
 			
 			// Compute statistics
 			cont = tu.getTarget(trgLang);
