@@ -469,10 +469,21 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 * @param tag
 	 */
 	protected void handleProcessingInstruction(Tag tag) {
-		if (!isInsideTextRun()) {
-			handleDocumentPart(tag);
+		if (ruleState.isExludedState()) {
+			addToDocumentPart(tag.toString());
+			return;
+		}
+		
+		if (isInsideTextRun()) {
+			if (ruleState.isInlineExcludedState()) {
+				eventBuilder.appendCodeData(tag.toString());
+				eventBuilder.appendCodeOuterData(tag.toString());
+				return;
+			} else {
+				addCodeToCurrentTextUnit(tag);
+			}
 		} else {
-			addCodeToCurrentTextUnit(tag);
+			handleDocumentPart(tag);
 		}
 	}
 
@@ -482,10 +493,20 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 * @param tag
 	 */
 	protected void handleComment(Tag tag) {
-		if (!isInsideTextRun()) {
-			handleDocumentPart(tag);
+		if (ruleState.isExludedState()) {
+			addToDocumentPart(tag.toString());
+			return;
+		}
+		if (isInsideTextRun()) {
+			if (ruleState.isInlineExcludedState()) {
+				eventBuilder.appendCodeData(tag.toString());
+				eventBuilder.appendCodeOuterData(tag.toString());
+				return;
+			} else {
+				addCodeToCurrentTextUnit(tag);
+			}
 		} else {
-			addCodeToCurrentTextUnit(tag);
+			handleDocumentPart(tag);
 		}
 	}
 
