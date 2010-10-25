@@ -139,8 +139,10 @@ public class RainbowTest {
 		assertEquals(0, runRainbow("-np -p pipelines/leverage/createPensieveTM.rnb -pln pipelines/leverage/createPensieveTM.pln"));
 		// Execute first preparation
 		assertEquals(0, runRainbow("-np -p pipelines/leverage/prepare1.rnb -pln pipelines/leverage/prepare1.pln"));
-//		assertTrue("File different from gold",
-//			compareWithGoldFile("pipelines/diffleverage/myFile_en_new.out.html"));
+		assertTrue("File different from gold",
+			compareWithGoldFile("pipelines/leverage/test01.out.html"));
+		assertTrue("File different from gold",
+			compareWithGoldFile("pipelines/leverage/test01.out.po"));
 	}
 
 	@Test
