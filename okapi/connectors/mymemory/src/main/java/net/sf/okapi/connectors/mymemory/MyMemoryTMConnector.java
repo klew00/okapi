@@ -135,6 +135,10 @@ public class MyMemoryTMConnector extends BaseConnector implements ITMQuery {
 					// To workaround bug in score calculation
 					// Score > 100 should be treated as 100 per Alberto's info.
 					if (res.score > 100 ) res.score = 100;
+					// Set match type
+					if ( res.score >= 100 ) res.matchType = MatchType.EXACT;
+					else if ( res.score > 0 ) res.matchType = MatchType.FUZZY;
+
 					if ( res.score < getThreshold() ) break;
 					if ( qutil.hasCode() ) {
 						res.score--;

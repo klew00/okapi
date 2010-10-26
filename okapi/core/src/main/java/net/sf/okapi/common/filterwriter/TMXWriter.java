@@ -436,6 +436,8 @@ public class TMXWriter {
     		for ( AltTranslation at : atAnn ) {
     			// Alternates are expected to be un-segmented
     	    	TextFragment srcFrag = at.getSource().getFirstContent();
+    	    	// If we have no source it's because the source is the same as the content where
+    	    	// the annotation is attached too.
     	    	if ( srcFrag.isEmpty() ) {
     	    		Segment srcSeg = tu.getSource().getSegments().get(seg.id);
     	    		if ( srcSeg == null ) continue; // No source: skip it

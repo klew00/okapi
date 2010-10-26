@@ -38,6 +38,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
+import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.lib.translation.BaseConnector;
@@ -266,7 +267,13 @@ public class OpenTranTMConnector extends BaseConnector implements ITMQuery {
 			// Make sure we don't get exact if there are codes
 			if ( hasCodes && ( qr.score > 99 )) qr.score--;
 			// Remove the item if lower than the threshold 
-			if ( qr.score < threshold ) iter.remove();
+			if ( qr.score < threshold ) {
+				iter.remove();
+			}
+			else { // Set match type
+				if ( qr.score >= 100 ) qr.matchType = MatchType.EXACT;
+				else if ( qr.score > 0 ) qr.matchType = MatchType.FUZZY;
+			}
 		}
 		// Re-order the list based on the scores 
 		Collections.sort(results, scorComp);

@@ -132,6 +132,7 @@ public class RainbowTest {
 		assertTrue(deleteOutputFile("pipelines/leverage/test01.out.po"));
 		assertTrue(deleteOutputFile("pipelines/leverage/simpleTM.h2.db"));
 		assertTrue(deleteOutputDir("pipelines/leverage/pensieveTM.pentm", true));
+		assertTrue(deleteOutputFile("pipelines/leverage/output1.tmx"));
 		
 		// Create the SimpleTM TM
 		assertEquals(0, runRainbow("-np -p pipelines/leverage/createSimpleTM.rnb -pln pipelines/leverage/createSimpleTM.pln"));
@@ -143,6 +144,8 @@ public class RainbowTest {
 			compareWithGoldFile("pipelines/leverage/test01.out.html"));
 		assertTrue("File different from gold",
 			compareWithGoldFile("pipelines/leverage/test01.out.po"));
+		assertTrue("File different from gold",
+			compareWithGoldFile("pipelines/leverage/output1.tmx"));
 	}
 
 	@Test

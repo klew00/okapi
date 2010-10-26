@@ -52,14 +52,14 @@ public class TextUnitUtil {
 	}
 
 	/**
-	 * <b>TEMPORARY</b>: Adjusts the inline codes of a new target text based on an original source.
+	 * Adjusts the inline codes of a new target text based on an original source.
 	 * <p>This method compares an original source with a new target, and transfer the codes of the original source
 	 * at their equivalent places in the new target. The text of the new target is left untouched.</p>
 	 * <p>If the option alwaysCopyCodes is false, the codes are copied only if it the original source codes
 	 * have references or if the new target codes are empty.
 	 * @param oriSrc the original source text fragment.
-	 * @param newTrg the new target text fragment (this is the fragment that will be adjusted).
-	 * @param alwaysCopyCodes indicates the adjustment of the codes is always done. Set this option to false to only
+	 * @param newTrg the new target text fragment (This is the fragment that will be adjusted).
+	 * @param alwaysCopyCodes indicates the adjustment of the codes is always done.
 	 * @param addMissingCodes indicates if codes that are in the original source but not in the new target should be
 	 * automatically added at the end of the new target (even if they are removable)
 	 * copy if there are references in the original source and/or empty codes in the new target.

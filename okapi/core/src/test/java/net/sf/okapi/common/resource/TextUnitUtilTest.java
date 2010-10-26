@@ -44,6 +44,7 @@ import org.junit.Test;
 public class TextUnitUtilTest {
 
 	private GenericContent fmt = new GenericContent();
+	private LocaleId locTrg = LocaleId.fromString("trg");
 
 	@Test
 	public void testAdjustTargetFragment () {
@@ -72,6 +73,76 @@ public class TextUnitUtilTest {
 		assertEquals("{B}A{/B}BC with warning", proposalTrg.toText());
 		TextUnitUtil.adjustTargetCodes(toTransSrc, proposalTrg, true, false, null, null);
 		assertEquals("[b]A[/b]BC with warning", proposalTrg.toText());
+	}
+	
+	@Test
+	public void testAdjustNoCodes () {
+		TextUnit tu = new TextUnit("1", "src");
+		TextFragment newSrc = new TextFragment("src");
+		TextFragment newTrg = new TextFragment("trg");
+		TextUnitUtil.adjustTargetCodes(tu.getSource().getSegments().getFirstContent(), newTrg, true, false, newSrc, tu);
+		assertEquals(locTrg, newTrg.toText());
+	}
+	
+	@Test
+	public void testAdjustSameMarkers () {
+		TextUnit tu = createTextUnit1();
+		TextFragment tf = new TextFragment("T ");
+		tf.append(TagType.OPENING, "b", "<T>");
+		tf.append("BOLD");
+		tf.append(TagType.CLOSING, "b", "</T>");
+		tf.append(" T ");
+		tf.append(TagType.PLACEHOLDER, "br", "<PH/>");
+		TextUnitUtil.adjustTargetCodes(tu.getSource().getSegments().getFirstContent(), tf, true, false, null, tu);
+		assertEquals("T <b>BOLD</b> T <br/>", tf.toText());
+		fmt.setContent(tf);
+		assertEquals("T <1>BOLD</1> T <2/>", fmt.toString());
+	}
+
+	@Test
+	public void testAdjustExtraMarkers () {
+		TextUnit tu = createTextUnit1();
+		TextFragment tf = new TextFragment("T ");
+		tf.append(TagType.OPENING, "b", "<T>");
+		tf.append("BOLD");
+		tf.append(TagType.CLOSING, "b", "</T>");
+		tf.append(" T ");
+		tf.append(TagType.PLACEHOLDER, "br", "<PH/>");
+		tf.append(TagType.PLACEHOLDER, "extra", "<EXTRA/>");
+		TextUnitUtil.adjustTargetCodes(tu.getSource().getSegments().getFirstContent(), tf, true, false, null, tu);
+		assertEquals("T <b>BOLD</b> T <br/><EXTRA/>", tf.toText());
+		fmt.setContent(tf);
+		assertEquals("T <1>BOLD</1> T <2/><3/>", fmt.toString());
+	}
+	
+	@Test
+	public void testAdjustMissingMarker () {
+		TextUnit tu = createTextUnit1();
+		TextFragment tf = new TextFragment("T ");
+		tf.append(TagType.OPENING, "b", "<T>");
+		tf.append("BOLD");
+		tf.append(" T ");
+		tf.append(TagType.PLACEHOLDER, "br", "<PH/>");
+		tf.append(TagType.PLACEHOLDER, "extra", "<EXTRA/>");
+		TextUnitUtil.adjustTargetCodes(tu.getSource().getSegments().getFirstContent(), tf, true, false, null, tu);
+		assertEquals("T <b>BOLD T <br/><EXTRA/>", tf.toText());
+		fmt.setContent(tf);
+		assertEquals("T <b1/>BOLD T <2/><3/>", fmt.toString());
+	}
+	
+	@Test
+	public void testAdjustDifferentTextSameMarkers () {
+		TextUnit tu = createTextUnit1();
+		TextFragment tf = new TextFragment("U ");
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append("BOLD");
+		tf.append(TagType.CLOSING, "b", "</b>");
+		tf.append(" U ");
+		tf.append(TagType.PLACEHOLDER, "br", "<br/>");
+		// Fuzzy match but codes are the same
+		TextUnitUtil.adjustTargetCodes(tu.getSource().getFirstContent(), tf, true, false, null, tu);
+		assertEquals("U <b>BOLD</b> U <br/>", tf.toText());
+		assertEquals("U <1>BOLD</1> U <2/>", fmt.setContent(tf).toString());
 	}
 	
 	@Test
@@ -367,6 +438,17 @@ public class TextUnitUtilTest {
 		tf.append(TagType.PLACEHOLDER, "br", "{BR/}");
 		tf.append("C "+extra);
 		return tf;
+	}
+
+	private TextUnit createTextUnit1 () {
+		TextUnit tu = new TextUnit("1", "t ");
+		TextFragment tf = tu.getSource().getSegments().getFirstContent();
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append("bold");
+		tf.append(TagType.CLOSING, "b", "</b>");
+		tf.append(" t ");
+		tf.append(TagType.PLACEHOLDER, "br", "<br/>");
+		return tu;
 	}
 
 }

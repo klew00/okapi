@@ -39,6 +39,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
+import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.BaseConnector;
 import net.sf.okapi.lib.translation.ITMQuery;
@@ -126,6 +127,9 @@ public class TranslateToolkitTMConnector extends BaseConnector implements ITMQue
 	        	if ( qr.score < threshold ) break; // Done
 	        	qr.source = new TextFragment((String)map.get("source"));
 	        	qr.target = new TextFragment((String)map.get("target"));
+	        	// Set match type
+				if ( qr.score >= 100 ) qr.matchType = MatchType.EXACT;
+				else if ( qr.score > 0 ) qr.matchType = MatchType.FUZZY;
 	        	results.add(qr);
 	        }
 			if ( results.size() > 0 ) current = 0;

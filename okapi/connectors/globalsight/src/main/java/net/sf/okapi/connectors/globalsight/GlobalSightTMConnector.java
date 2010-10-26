@@ -50,6 +50,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
+import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
@@ -185,6 +186,9 @@ public class GlobalSightTMConnector extends BaseConnector implements ITMQuery {
 				res.weight = getWeight();
 				res.score = Integer.valueOf(Util.getTextContent(list2.item(0)).replace("%", ""));
 				if ( res.score < threshold ) continue;
+				
+				if ( res.score >= 100 ) res.matchType = MatchType.EXACT;
+				else if ( res.score > 0 ) res.matchType = MatchType.FUZZY;
 				
 				list2 = elem.getElementsByTagName("tm");
 				res.origin = Util.getTextContent(list2.item(0));

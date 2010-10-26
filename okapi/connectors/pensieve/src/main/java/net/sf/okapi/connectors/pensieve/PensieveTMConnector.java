@@ -188,6 +188,7 @@ public class PensieveTMConnector extends BaseConnector implements ITMQuery {
 			qr.score = f.intValue();
 			qr.source = hit.getTu().getSource().getContent();
 			qr.target = hit.getTu().getTarget().getContent();
+			qr.matchType = hit.getMatchType();
 			results.add(qr);
 		}
 		if ( results.size() > 0 ) {

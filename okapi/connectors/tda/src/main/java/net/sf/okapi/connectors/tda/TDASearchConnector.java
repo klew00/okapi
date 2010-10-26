@@ -40,6 +40,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
+import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.BaseConnector;
 import net.sf.okapi.lib.translation.ITMQuery;
@@ -343,7 +344,13 @@ public class TDASearchConnector extends BaseConnector implements ITMQuery {
 			// Compute the adjusted score
 			qr.score = matcher.compareToBaseTokens(plainText, tokens, qr.source);
 			// Remove the item if lower than the threshold 
-			if ( qr.score < threshold ) iter.remove();
+			if ( qr.score < threshold ) {
+				iter.remove();
+			}
+			else { // Set match type
+				if ( qr.score >= 100 ) qr.matchType = MatchType.EXACT;
+				else if ( qr.score > 0 ) qr.matchType = MatchType.FUZZY;
+			}
 		}
 		// Re-order the list from the 
 		Collections.sort(results, scorComp);

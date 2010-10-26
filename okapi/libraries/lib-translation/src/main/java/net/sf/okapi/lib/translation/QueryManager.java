@@ -24,13 +24,11 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
@@ -42,8 +40,6 @@ import net.sf.okapi.common.resource.TextUnit;
  */
 public class QueryManager {
 
-	private final Logger logger = Logger.getLogger(getClass().getName());
-	
 	private LinkedHashMap<Integer, ResourceItem> resList;
 	private ArrayList<QueryResult> results;
 	private int current = -1;
@@ -516,121 +512,121 @@ public class QueryManager {
 		}
 	}
 		
-	/**
-	 * Adjusts the inline codes of a new text fragment based on an original one.
-	 * @param oriSrc the original source text fragment.
-	 * @param newSrc the new source text fragment.
-	 * @param newTrg the new target text fragment (this is the fragment that will be adjusted).
-	 * @param score the score for the match: >=100 means no adjustment is made.
-	 * @param parent the parent text unit (used for error information only)
-	 * @return the newTrg parameter adjusted
-	 */
-	// To unified with TextUnitUtil equivalent method
-	public TextFragment adjustNewFragment (TextFragment oriSrc,
-		TextFragment newSrc,
-		TextFragment newTrg,
-		int score,
-		TextUnit parent)
-	{
-		List<Code> newCodes = newTrg.getCodes();
-		List<Code> oriCodes = oriSrc.getCodes();
-		
-		// If score is 100 or more: no reason to adjust anything: use the target as-it
-		// This allows targets with only code differences to be used as-it
-		boolean needAdjustment = false;
-		if ( score >= 100 ) {
-			// Check if we need to adjust even if it's ann exact match
-			// when we have empty codes in the new target
-			for ( Code code : newCodes ) {
-				if ( !code.hasData() ) {
-					needAdjustment = true;
-					break;
-				}
-			}
-			// Or reference in the original
-			if ( !needAdjustment ) {
-				for ( Code code : oriCodes ) {
-					if ( code.hasReference() ) {
-						needAdjustment = true;
-						break;
-					}
-				}
-			}
-			if ( !needAdjustment ) {
-				return newTrg;
-			}
-		}
-		// If both new and original have no code, return the new fragment
-		if ( !newTrg.hasCode() && !oriSrc.hasCode() ) {
-			return newTrg;
-		}
-		
-		
-		// If the codes of the original sources and the matched one are the same: no need to adjust
-		if ( !needAdjustment && oriCodes.toString().equals(newSrc.getCodes().toString()) ) {
-			return newTrg;
-		}
-
-		// Else: try to adjust
-		int[] oriIndices = new int[oriCodes.size()];
-		for ( int i=0; i<oriIndices.length; i++ ) oriIndices[i] = i;
-		
-		int done = 0;
-		Code newCode, oriCode;
-
-		for ( int i=0; i<newCodes.size(); i++ ) {
-			newCode = newCodes.get(i);
-			newCode.setOuterData(null); // Remove XLIFF outer codes if needed
-
-			// Get the data from the original code (match on id)
-			oriCode = null;
-			for ( int j=0; j<oriIndices.length; j++ ) {
-				if ( oriIndices[j] == -1) continue; // Used already
-				//if (( oriCodes.get(oriIndices[j]).getId() == newCode.getId() ))
-					//TOFIX && ( oriCodes.get(oriIndices[j]).getTagType() == newCode.getTagType() ))
-				if ( oriCodes.get(oriIndices[j]).getTagType() == newCode.getTagType() ) {
-					//oriIndex = oriIndices[j];
-					oriCode = oriCodes.get(oriIndices[j]);
-					oriIndices[j] = -1;
-					done++;
-					break;
-				}
-			}
-			
-			if ( oriCode == null ) { // Not found in original (extra in target)
-				if (( newCode.getData() == null )
-					|| ( newCode.getData().length() == 0 )) {
-					// Leave it like that
-					logger.warning(String.format("The extra target code id='%d' does not have corresponding data (item id='%s', name='%s')",
-						newCode.getId(), parent.getId(), (parent.getName()==null ? "" : parent.getName())));
-				}
-				// Else: This is a new code: keep it
-			}
-			else { // A code with same ID existed in the original
-				// Get the data from the original
-				newCode.setData(oriCode.getData());
-				newCode.setOuterData(oriCode.getOuterData());
-				newCode.setReferenceFlag(oriCode.hasReference());
-			}
-		}
-		
-		// If needed, check for missing codes in new fragment
-		if ( oriCodes.size() > done ) {
-			// Any index > -1 in source means it was was deleted in target
-			for ( int i=0; i<oriIndices.length; i++ ) {
-				if ( oriIndices[i] != -1 ) {
-					Code code = oriCodes.get(oriIndices[i]);
-					if ( !code.isDeleteable() ) {
-						logger.warning(String.format("The code id='%d' (%s) is missing in target (item id='%s', name='%s')",
-							code.getId(), code.getData(), parent.getId(), (parent.getName()==null ? "" : parent.getName())));
-						logger.info(String.format("Source='%s'\nTarget='%s'", oriSrc.toText(), newTrg.toText()));
-					}
-				}
-			}
-		}
-		
-		return newTrg;
-	}
+//	/**
+//	 * Adjusts the inline codes of a new text fragment based on an original one.
+//	 * @param oriSrc the original source text fragment.
+//	 * @param newSrc the new source text fragment.
+//	 * @param newTrg the new target text fragment (this is the fragment that will be adjusted).
+//	 * @param score the score for the match: >=100 means no adjustment is made.
+//	 * @param parent the parent text unit (used for error information only)
+//	 * @return the newTrg parameter adjusted
+//	 */
+//	// To unified with TextUnitUtil equivalent method
+//	public TextFragment adjustNewFragment (TextFragment oriSrc,
+//		TextFragment newSrc,
+//		TextFragment newTrg,
+//		int score,
+//		TextUnit parent)
+//	{
+//		List<Code> newCodes = newTrg.getCodes();
+//		List<Code> oriCodes = oriSrc.getCodes();
+//		
+//		// If score is 100 or more: no reason to adjust anything: use the target as-it
+//		// This allows targets with only code differences to be used as-it
+//		boolean needAdjustment = false;
+//		if ( score >= 100 ) {
+//			// Check if we need to adjust even if it's ann exact match
+//			// when we have empty codes in the new target
+//			for ( Code code : newCodes ) {
+//				if ( !code.hasData() ) {
+//					needAdjustment = true;
+//					break;
+//				}
+//			}
+//			// Or reference in the original
+//			if ( !needAdjustment ) {
+//				for ( Code code : oriCodes ) {
+//					if ( code.hasReference() ) {
+//						needAdjustment = true;
+//						break;
+//					}
+//				}
+//			}
+//			if ( !needAdjustment ) {
+//				return newTrg;
+//			}
+//		}
+//		// If both new and original have no code, return the new fragment
+//		if ( !newTrg.hasCode() && !oriSrc.hasCode() ) {
+//			return newTrg;
+//		}
+//		
+//		
+//		// If the codes of the original sources and the matched one are the same: no need to adjust
+//		if ( !needAdjustment && oriCodes.toString().equals(newSrc.getCodes().toString()) ) {
+//			return newTrg;
+//		}
+//
+//		// Else: try to adjust
+//		int[] oriIndices = new int[oriCodes.size()];
+//		for ( int i=0; i<oriIndices.length; i++ ) oriIndices[i] = i;
+//		
+//		int done = 0;
+//		Code newCode, oriCode;
+//
+//		for ( int i=0; i<newCodes.size(); i++ ) {
+//			newCode = newCodes.get(i);
+//			newCode.setOuterData(null); // Remove XLIFF outer codes if needed
+//
+//			// Get the data from the original code (match on id)
+//			oriCode = null;
+//			for ( int j=0; j<oriIndices.length; j++ ) {
+//				if ( oriIndices[j] == -1) continue; // Used already
+//				//if (( oriCodes.get(oriIndices[j]).getId() == newCode.getId() ))
+//					//TOFIX && ( oriCodes.get(oriIndices[j]).getTagType() == newCode.getTagType() ))
+//				if ( oriCodes.get(oriIndices[j]).getTagType() == newCode.getTagType() ) {
+//					//oriIndex = oriIndices[j];
+//					oriCode = oriCodes.get(oriIndices[j]);
+//					oriIndices[j] = -1;
+//					done++;
+//					break;
+//				}
+//			}
+//			
+//			if ( oriCode == null ) { // Not found in original (extra in target)
+//				if (( newCode.getData() == null )
+//					|| ( newCode.getData().length() == 0 )) {
+//					// Leave it like that
+//					logger.warning(String.format("The extra target code id='%d' does not have corresponding data (item id='%s', name='%s')",
+//						newCode.getId(), parent.getId(), (parent.getName()==null ? "" : parent.getName())));
+//				}
+//				// Else: This is a new code: keep it
+//			}
+//			else { // A code with same ID existed in the original
+//				// Get the data from the original
+//				newCode.setData(oriCode.getData());
+//				newCode.setOuterData(oriCode.getOuterData());
+//				newCode.setReferenceFlag(oriCode.hasReference());
+//			}
+//		}
+//		
+//		// If needed, check for missing codes in new fragment
+//		if ( oriCodes.size() > done ) {
+//			// Any index > -1 in source means it was was deleted in target
+//			for ( int i=0; i<oriIndices.length; i++ ) {
+//				if ( oriIndices[i] != -1 ) {
+//					Code code = oriCodes.get(oriIndices[i]);
+//					if ( !code.isDeleteable() ) {
+//						logger.warning(String.format("The code id='%d' (%s) is missing in target (item id='%s', name='%s')",
+//							code.getId(), code.getData(), parent.getId(), (parent.getName()==null ? "" : parent.getName())));
+//						logger.info(String.format("Source='%s'\nTarget='%s'", oriSrc.toText(), newTrg.toText()));
+//					}
+//				}
+//			}
+//		}
+//		
+//		return newTrg;
+//	}
 	
 	/**
 	 * Resets the counters used to calculate the number of segments leveraged.

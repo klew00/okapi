@@ -197,7 +197,8 @@ public class LeveragingStep extends BasePipelineStep {
 			tmxWriter = new TMXWriter(Util.fillRootDirectoryVariable(params.getTMXPath(), rootDir));
 			tmxWriter.setUseMTPrefix(params.getUseMTPrefix());
 			tmxWriter.writeStartDocument(sourceLocale, targetLocale,
-				getClass().getName(), "", "sentence", "undefined", "undefined");
+				getClass().getName(), "1", // Version is irrelevant here
+				"sentence", "undefined", "undefined");
 		}
 		initDone = true;
 	}

@@ -167,11 +167,7 @@ public abstract class BaseConnector implements IQuery {
 			while ( hasNext() ) {
 				qr = next();
 				qr.weight = getWeight(); // Set weight based on connector weight
-				// Set the match type if it's not set yet
-				if ( qr.matchType == MatchType.UKNOWN ) {
-					if ( qr.score >= 100 ) qr.matchType = MatchType.EXACT;
-					else if ( qr.score > 0 ) qr.matchType = MatchType.FUZZY;
-				}
+				// Match type should already be set in query()
 					
 				// Adjust codes so that leveraged target matches the source
 				TextUnitUtil.adjustTargetCodes(srcSeg.text, qr.target, true, false, null, tu);
