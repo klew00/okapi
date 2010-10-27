@@ -305,6 +305,14 @@ public class UtilTest {
 		assertEquals("/C:/test" + File.separator, Util.ensureSeparator("/C:/test"));
 	}
 	
+	@Test
+	public void testFixFilename() {
+		assertEquals("", Util.fixFilename(null));
+		assertEquals("", Util.fixFilename(null, null));
+		assertEquals("abs:def", Util.fixFilename("abs:def", null));
+		assertEquals("a_bc_de_fgh_ijk{l};mn_op_qr (s) t_uvw!x_y[z]", Util.fixFilename("a*bc:de<fgh>ijk{l};mn?op\\qr (s) t|uvw!x/y[z]"));
+	}
+	
 // Unused
 //	@Test
 //	public void generateRandomId() {

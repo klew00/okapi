@@ -186,6 +186,29 @@ public final class Util {
 	}
 	
 	/**
+	 * Replaces unsupported characters in a given short file name (no directory path) with a given replacer.
+	 * @param fileName the given short file name
+	 * @param replacer the given replacer
+	 * @return the given file name with fixed unsupported characters
+	 */
+	public static String fixFilename(String fileName, String replacer) {
+		if (Util.isEmpty(fileName)) return "";
+		if (Util.isEmpty(replacer)) return fileName;
+		String regex = "[*:<>?\\\\/|]"; // TODO This regex is for Windows, add for Linux/Mac OS
+		replacer = replacer.replaceAll(regex, "_"); // In case replacer contains unsupported chars
+        return fileName.replaceAll(regex, replacer);
+    }
+	
+	/**
+	 * Replaces unsupported characters in a given short file name (no directory path) with underscore.
+	 * @param fileName the given short file name
+	 * @return the given file name with fixed unsupported characters
+	 */
+	public static String fixFilename(String fileName) {
+		return fixFilename(fileName, "_");
+	}	
+	
+	/**
 	 * Return a list of files based on suffix (i.e, .xml, .html etc.)
 	 * @param directory - directory where files are located
 	 * @param suffix - the sufix used to filter files
