@@ -31,6 +31,8 @@ import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.charset.Charset;
@@ -292,6 +294,15 @@ public class UtilTest {
 		assertEquals("/C:/test", Util.toURI("file:///C:/test").getPath());		
 		assertEquals("/C:/test", Util.toURI("/C:/test").getPath());
 		assertEquals("/C:/test", Util.toURI("file:/C:/test").getPath()); 
+	}
+
+	@Test
+	public void testEnsureSeparator() {
+		assertEquals(null, Util.ensureSeparator(null));
+		assertEquals("", Util.ensureSeparator(""));
+		assertEquals("/C:/test/", Util.ensureSeparator("/C:/test/"));
+		assertEquals("/C:/test" + File.separator, Util.ensureSeparator("/C:/test" + File.separator));
+		assertEquals("/C:/test" + File.separator, Util.ensureSeparator("/C:/test"));
 	}
 	
 // Unused

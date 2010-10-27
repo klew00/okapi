@@ -41,6 +41,8 @@ public class RoundTripComparison {
 	private IFilter filter;
 	private ArrayList<Event> extraction1Events;
 	private ArrayList<Event> extraction2Events;
+	private ArrayList<Event> subDocEvents;
+	private Event subDocEvent;
 	private IFilterWriter writer;
 	private ByteArrayOutputStream writerBuffer;
 	private String defaultEncoding;
@@ -50,6 +52,7 @@ public class RoundTripComparison {
 	public RoundTripComparison() {
 		extraction1Events = new ArrayList<Event>();
 		extraction2Events = new ArrayList<Event>();
+		subDocEvents = new ArrayList<Event>();
 	}
 
 	public boolean executeCompare(IFilter filter, List<InputDocument> inputDocs,
@@ -68,6 +71,7 @@ public class RoundTripComparison {
 			// Reset the event lists
 			extraction1Events.clear();
 			extraction2Events.clear();
+			subDocEvents.clear();
 			// Load parameters if needed
 			if (doc.paramFile != null && !doc.paramFile.equals("")) {
 				String root = Util.getDirectoryName(doc.path);
@@ -104,6 +108,7 @@ public class RoundTripComparison {
 			// Reset the event lists
 			extraction1Events.clear();
 			extraction2Events.clear();
+			subDocEvents.clear();
 			// Load parameters if needed
 			if (doc.paramFile == null) {
 				IParameters params = filter.getParameters();
@@ -120,7 +125,7 @@ public class RoundTripComparison {
 			// Execute the second extraction from the output of the first
 			executeSecondExtractionFromFile(outPath);
 			// Compare the events
-			if (!FilterTestDriver.compareEvents(extraction1Events, extraction2Events)) {
+			if (!FilterTestDriver.compareEvents(extraction1Events, extraction2Events, subDocEvents)) {
 				throw new RuntimeException("Events are different for " + doc.path);
 			}
 		}
@@ -148,6 +153,7 @@ public class RoundTripComparison {
 			// Reset the event lists
 			extraction1Events.clear();
 			extraction2Events.clear();
+			subDocEvents.clear();
 			// Load parameters if needed
 			if (doc.paramFile == null) {
 				IParameters params = filter.getParameters();
@@ -188,14 +194,17 @@ public class RoundTripComparison {
 				event = filter.next();
 				switch (event.getEventType()) {
 				case START_DOCUMENT:
-				case END_DOCUMENT:
-				case START_SUBDOCUMENT:
+				case END_DOCUMENT:				
 				case END_SUBDOCUMENT:
+					break;
+				case START_SUBDOCUMENT:
+					subDocEvent = event;
 					break;
 				case START_GROUP:
 				case END_GROUP:
 				case TEXT_UNIT:
 					extraction1Events.add(event);
+					subDocEvents.add(subDocEvent);
 					break;
 				}
 				writer.handleEvent(event);
@@ -267,13 +276,16 @@ public class RoundTripComparison {
 				switch (event.getEventType()) {
 				case START_DOCUMENT:
 				case END_DOCUMENT:
-				case START_SUBDOCUMENT:
 				case END_SUBDOCUMENT:
+					break;
+				case START_SUBDOCUMENT:
+					subDocEvent = event;
 					break;
 				case START_GROUP:
 				case END_GROUP:
 				case TEXT_UNIT:
 					extraction1Events.add(event);
+					subDocEvents.add(subDocEvent);
 					break;
 				}
 				if (steps != null)

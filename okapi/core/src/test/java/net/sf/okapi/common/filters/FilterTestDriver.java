@@ -331,6 +331,36 @@ public class FilterTestDriver {
 
 		return true;
 	}
+	
+	static public boolean compareEvents(List<Event> list1, List<Event> list2, List<Event> subDocEvents) {
+		int i = 0;
+		Event event1, event2;
+		while (i < list1.size()) {
+			event1 = list1.get(i);
+			if (i >= list2.size()) {
+				System.err.println("Less events in second list");
+				return false;
+			}
+			event2 = list2.get(i);
+			if (!compareEvent(event1, event2)) {
+				Event subDocEvent = subDocEvents.get(i);
+				if (subDocEvent != null) {
+					StartSubDocument ssd = (StartSubDocument) subDocEvent.getResource();
+					if (ssd != null)
+						System.err.println("Sub-document: " + ssd.getName());
+				}				
+				return false;
+			}
+			i++;
+		}
+
+		if (list1.size() != list2.size()) {
+			System.err.println("Less events in first list");
+			return false;
+		}
+
+		return true;
+	}
 
 	static public boolean compareEventTypesOnly(List<Event> manual, List<Event> generated) {
 		if (manual.size() != generated.size()) {

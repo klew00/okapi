@@ -172,6 +172,20 @@ public final class Util {
 	}
 	
 	/**
+	 * Determines if a given path ends with a file name separator for the current platform.
+	 * If not, the file separator is appended to the path.
+	 * @param path the given path
+	 * @return the given path ending with the file name separator
+	 */
+	static public String ensureSeparator (String path) {
+		if (isEmpty(path)) return path;
+		if (path.endsWith(File.separator)) return path;
+		if (path.endsWith("/")) return path;
+		
+		return path + File.separator; 
+	}
+	
+	/**
 	 * Return a list of files based on suffix (i.e, .xml, .html etc.)
 	 * @param directory - directory where files are located
 	 * @param suffix - the sufix used to filter files
