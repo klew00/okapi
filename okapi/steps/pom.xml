@@ -42,5 +42,6 @@
 		<module>xliffsplitter</module>
 		<module>idbasedaligner</module>
 		<module>xmlvalidation</module>
+		<module>scopingreport</module>
     </modules>
 </project>

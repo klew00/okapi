@@ -11,38 +11,37 @@
   	<dependency>
   		<groupId>net.sf.okapi</groupId>
   		<artifactId>okapi-core</artifactId>
-  		<version>0.10-SNAPSHOT</version>
+  		<version>${project.version}</version>
   		<scope>compile</scope>
   	</dependency>
   	<dependency>
   		<groupId>net.sf.okapi.lib</groupId>
   		<artifactId>okapi-lib-extra</artifactId>
-  		<version>0.10-SNAPSHOT</version>
+  		<version>${project.version}</version>
   		<scope>compile</scope>
   	</dependency>
   	<dependency>
   		<groupId>net.sf.okapi.steps</groupId>
   		<artifactId>okapi-step-wordcount</artifactId>
-  		<version>0.10-SNAPSHOT</version>
+  		<version>${project.version}</version>
   		<scope>compile</scope>
   	</dependency>
   	<dependency>
   		<groupId>net.sf.okapi.filters</groupId>
   		<artifactId>okapi-filter-html</artifactId>
-  		<version>0.10-SNAPSHOT</version>
+  		<version>${project.version}</version>
   		<scope>test</scope>
   	</dependency>
   	<dependency>
   		<groupId>net.sf.okapi.steps</groupId>
   		<artifactId>okapi-step-common</artifactId>
-  		<version>0.10-SNAPSHOT</version>
+  		<version>${project.version}</version>
   		<scope>test</scope>
   	</dependency>
   	<dependency>
   		<groupId>net.sf.okapi.lib</groupId>
   		<artifactId>okapi-lib-reporting</artifactId>
-  		<version>0.10-SNAPSHOT</version>
-  		<type>jar</type>
+  		<version>${project.version}</version>  		
   		<scope>compile</scope>
   	</dependency>
   </dependencies>
