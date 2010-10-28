@@ -60,6 +60,10 @@ public final class FileUtil {
 		// Get files / directories in the directory
 		File[] entries = directory.listFiles();
 	
+		if (entries == null) {
+			return files;
+		}
+		
 		// Go over entries
 		for (File entry : entries) {
 			// If there is no filter or the filter accepts the
