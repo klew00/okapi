@@ -728,7 +728,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		stTermPath.setText("Full path of the glossary file to use:");
 		
 		pnlTermsPath = new TextAndBrowsePanel(cmpTmp, SWT.NONE, false);
-		pnlTermsPath.setBrowseFilters("TBX Documents (*.tbx)\tAll Files (*.*)", "*.tbx\t*.*");
+		pnlTermsPath.setBrowseFilters("TBX Documents (*.tbx)\tCSV Files (*.csv)\tAll Files (*.*)", "*.tbx\t*.csv\t*.*");
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		pnlTermsPath.setLayoutData(gdTmp);
 		

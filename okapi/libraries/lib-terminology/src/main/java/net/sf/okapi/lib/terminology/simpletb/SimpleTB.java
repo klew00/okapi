@@ -41,6 +41,7 @@ import net.sf.okapi.lib.terminology.IGlossaryReader;
 import net.sf.okapi.lib.terminology.LangEntry;
 import net.sf.okapi.lib.terminology.TermEntry;
 import net.sf.okapi.lib.terminology.TermHit;
+import net.sf.okapi.lib.terminology.csv.CSVReader;
 import net.sf.okapi.lib.terminology.tbx.TBXReader;
 import net.sf.okapi.lib.terminology.tsv.TSVReader;
 
@@ -84,6 +85,9 @@ public class SimpleTB {
 		if ( ext.equalsIgnoreCase(".tbx") ) {
 			importTBX(file);
 		}
+		if ( ext.equalsIgnoreCase(".csv") ) {
+			importCSV(file);
+		}
 		else { // Try tab-delimited
 			importTSV(file);
 		}
@@ -91,6 +95,10 @@ public class SimpleTB {
 	
 	public void importTBX (File file) {
 		importGlossary(new TBXReader(), file);
+	}
+	
+	public void importCSV (File file) {
+		importGlossary(new CSVReader(srcLoc, srcLoc), file);
 	}
 	
 	public void importTSV (File file) {
