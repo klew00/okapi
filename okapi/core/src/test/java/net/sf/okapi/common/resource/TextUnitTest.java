@@ -252,7 +252,7 @@ public class TextUnitTest {
 		tu1.setTargetProperty(locFR, p1);
         assertSame("Properties should be the same", p1, tu1.getTargetProperty(locFR, "name"));
 	}
-    
+
 //	@Test
 //	public void testGetSetSourceContent () {
 //		TextFragment tf1 = new TextFragment("source text");

@@ -44,7 +44,7 @@ public class IdGenerator {
 	/**
 	 * Creates a generator with a given root and no prefix.
 	 * @param root
-	 * 	the root to use (case-sensitive and cannot be null or empty)
+	 * 	the root to use (case-sensitive)
 	 */
 	public IdGenerator (String root) {
 		create(root, "");
@@ -53,7 +53,7 @@ public class IdGenerator {
 	/**
 	 * Creates a generator with a given root and a given prefix.
 	 * @param root
-	 * 	the root to use (case-sensitive, can be null or empty)
+	 * 	the root to use (case-sensitive)
 	 * @param prefix
 	 * 	the prefix to use (case-sensitive)
 	 */
@@ -92,7 +92,7 @@ public class IdGenerator {
 	 * @return
 	 *  the new identifier.
 	 */
-	public String createId(String prefix) {
+	public String createId (String prefix) {
 		String orginalPrefix = this.prefix;
 		this.prefix = prefix;
 		try {
@@ -102,7 +102,8 @@ public class IdGenerator {
 			else {
 				return rootId + "-" + prefix + Long.toString(++seq);
 			} 
-		} finally {
+		}
+		finally {
 			this.prefix = orginalPrefix;
 		}		
 	}
@@ -190,6 +191,15 @@ public class IdGenerator {
 		seq = 0;
 		create(rootId, prefix);
 	}
+
+	/**
+	 * Sets the prefix to use when creating the id.
+	 * @param prefix the new prefix to use (can be null).
+	 */
+	public void setPrefix (String prefix) {
+		if ( prefix == null ) this.prefix = "";
+		else this.prefix = prefix;
+	}
 	
 	private void create (String root,
 		String prefix)
@@ -205,8 +215,7 @@ public class IdGenerator {
 		}
 	
 		// Set the prefix part (empty is OK)
-		if ( prefix == null ) this.prefix = "";
-		else this.prefix = prefix;
+		setPrefix(prefix);
 	}
 
 }

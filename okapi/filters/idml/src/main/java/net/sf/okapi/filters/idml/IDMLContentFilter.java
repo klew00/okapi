@@ -178,6 +178,7 @@ public class IDMLContentFilter implements IFilter {
 		canceled = false;
 
 		XMLInputFactory fact = XMLInputFactory.newInstance();
+		fact.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, true);
 		fact.setProperty(XMLInputFactory.IS_COALESCING, true);
 
 		try {
@@ -200,16 +201,16 @@ public class IDMLContentFilter implements IFilter {
 		checkForEmpty = false;
 		
 		StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
+		startDoc.setLocale(input.getSourceLocale());
 		startDoc.setName(docName);
+		startDoc.setMimeType(MimeTypeMapper.XML_MIME_TYPE);
+		startDoc.setType(startDoc.getMimeType());
 		//TODO: Fix the encoding as it is  not necessarily correct as the encoding is not retrieve from XMLStreamReader
 		// We should use reader.getEncoding() when it's set
 		startDoc.setEncoding("UTF-8", false); //TODO: UTF8BOM detection
-		startDoc.setLocale(input.getSourceLocale());
+		startDoc.setLineBreak("\n");
 		startDoc.setFilterParameters(params);
 		startDoc.setFilterWriter(createFilterWriter());
-		startDoc.setType(MimeTypeMapper.XML_MIME_TYPE);
-		startDoc.setMimeType(MimeTypeMapper.XML_MIME_TYPE);
-		startDoc.setLineBreak("\n");
 		queue.add(new Event(EventType.START_DOCUMENT, startDoc));
 
 		// The XML declaration is not reported by the parser, so we need to

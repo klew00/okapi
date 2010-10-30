@@ -48,14 +48,20 @@ public class RoundTripComparison {
 	private String defaultEncoding;
 	private LocaleId srcLoc;
 	private LocaleId trgLoc;
+	private boolean includeSkeleton;
 
-	public RoundTripComparison() {
+	public RoundTripComparison (boolean includeSkeleton) {
 		extraction1Events = new ArrayList<Event>();
 		extraction2Events = new ArrayList<Event>();
 		subDocEvents = new ArrayList<Event>();
+		this.includeSkeleton = includeSkeleton;
 	}
 
-	public boolean executeCompare(IFilter filter, List<InputDocument> inputDocs,
+	public RoundTripComparison () {
+		this(true);
+	}
+
+	public boolean executeCompare (IFilter filter, List<InputDocument> inputDocs,
 			String defaultEncoding, LocaleId srcLoc, LocaleId trgLoc) {
 		this.filter = filter;
 		this.defaultEncoding = defaultEncoding;
@@ -85,16 +91,20 @@ public class RoundTripComparison {
 			// Execute the second extraction from the output of the first
 			executeSecondExtraction();
 			// Compare the events
-			if (!FilterTestDriver.compareEvents(extraction1Events, extraction2Events)) {
+			if ( !FilterTestDriver.compareEvents(extraction1Events, extraction2Events, includeSkeleton) ) {
 				throw new RuntimeException("Events are different for " + doc.path);
 			}
 		}
 		return true;
 	}
 
-	public boolean executeCompare(IFilter filter, List<InputDocument> inputDocs,
-			String defaultEncoding, LocaleId srcLoc, LocaleId trgLoc, String outputDir) {
-
+	public boolean executeCompare (IFilter filter,
+		List<InputDocument> inputDocs,
+		String defaultEncoding,
+		LocaleId srcLoc,
+		LocaleId trgLoc,
+		String outputDir)
+	{
 		this.filter = filter;
 		this.defaultEncoding = defaultEncoding;
 		this.srcLoc = srcLoc;
@@ -125,7 +135,7 @@ public class RoundTripComparison {
 			// Execute the second extraction from the output of the first
 			executeSecondExtractionFromFile(outPath);
 			// Compare the events
-			if (!FilterTestDriver.compareEvents(extraction1Events, extraction2Events, subDocEvents)) {
+			if (!FilterTestDriver.compareEvents(extraction1Events, extraction2Events, subDocEvents, includeSkeleton)) {
 				throw new RuntimeException("Events are different for " + doc.path);
 			}
 		}
@@ -170,7 +180,7 @@ public class RoundTripComparison {
 			// Execute the second extraction from the output of the first
 			executeSecondExtractionFromFile(outPath);
 			// Compare the events
-			if (!FilterTestDriver.compareEvents(extraction1Events, extraction2Events)) {
+			if ( !FilterTestDriver.compareEvents(extraction1Events, extraction2Events, includeSkeleton) ) {
 				throw new RuntimeException("Events are different for " + doc.path);
 			}
 		}

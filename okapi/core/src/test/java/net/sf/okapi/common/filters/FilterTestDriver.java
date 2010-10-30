@@ -254,7 +254,10 @@ public class FilterTestDriver {
 		}
 	}
 
-	static public boolean compareEvent(Event manual, Event generated) {
+	static public boolean compareEvent(Event manual,
+		Event generated,
+		boolean includeSkeleton)
+	{
 		if (generated.getEventType() != manual.getEventType()) {
 			System.err.println("Event type difference: " + generated.getEventType().toString()
 					+ " and " + manual.getEventType().toString());
@@ -265,7 +268,7 @@ public class FilterTestDriver {
 		case DOCUMENT_PART:
 			DocumentPart mdp = (DocumentPart) manual.getResource();
 			DocumentPart gdp = (DocumentPart) generated.getResource();
-			if (!compareIResource(mdp, gdp)) {
+			if (!compareIResource(mdp, gdp, includeSkeleton)) {
 				return false;
 			}
 			if (!compareINameable(mdp, gdp)) {
@@ -279,7 +282,7 @@ public class FilterTestDriver {
 		case START_GROUP:
 			StartGroup sg1 = (StartGroup) manual.getResource();
 			StartGroup sg2 = (StartGroup) generated.getResource();
-			if (!compareIResource(sg1, sg2)) {
+			if (!compareIResource(sg1, sg2, includeSkeleton)) {
 				return false;
 			}
 			if (!compareINameable(sg1, sg2)) {
@@ -291,7 +294,7 @@ public class FilterTestDriver {
 			break;
 
 		case END_GROUP:
-			if (!compareIResource(manual.getResource(), generated.getResource())) {
+			if (!compareIResource(manual.getResource(), generated.getResource(), includeSkeleton)) {
 				return false;
 			}
 			break;
@@ -308,7 +311,16 @@ public class FilterTestDriver {
 		return true;
 	}
 
-	static public boolean compareEvents(List<Event> list1, List<Event> list2) {
+	static public boolean compareEvents (List<Event> list1,
+		List<Event> list2)
+	{
+		return compareEvents(list1, list2, true);
+	}
+	
+	static public boolean compareEvents (List<Event> list1,
+		List<Event> list2,
+		boolean includeSkeleton)
+	{
 		int i = 0;
 		Event event1, event2;
 		while (i < list1.size()) {
@@ -318,7 +330,7 @@ public class FilterTestDriver {
 				return false;
 			}
 			event2 = list2.get(i);
-			if (!compareEvent(event1, event2)) {
+			if (!compareEvent(event1, event2, includeSkeleton)) {
 				return false;
 			}
 			i++;
@@ -332,7 +344,11 @@ public class FilterTestDriver {
 		return true;
 	}
 	
-	static public boolean compareEvents(List<Event> list1, List<Event> list2, List<Event> subDocEvents) {
+	static public boolean compareEvents (List<Event> list1,
+		List<Event> list2,
+		List<Event> subDocEvents,
+		boolean includeSkeleton)
+	{
 		int i = 0;
 		Event event1, event2;
 		while (i < list1.size()) {
@@ -342,7 +358,7 @@ public class FilterTestDriver {
 				return false;
 			}
 			event2 = list2.get(i);
-			if (!compareEvent(event1, event2)) {
+			if ( !compareEvent(event1, event2, includeSkeleton) ) {
 				Event subDocEvent = subDocEvents.get(i);
 				if (subDocEvent != null) {
 					StartSubDocument ssd = (StartSubDocument) subDocEvent.getResource();
@@ -362,7 +378,9 @@ public class FilterTestDriver {
 		return true;
 	}
 
-	static public boolean compareEventTypesOnly(List<Event> manual, List<Event> generated) {
+	static public boolean compareEventTypesOnly (List<Event> manual,
+		List<Event> generated)
+	{
 		if (manual.size() != generated.size()) {
 			return false;
 		}
@@ -878,7 +896,10 @@ public class FilterTestDriver {
 		return true;
 	}
 
-	public static boolean compareIResource(IResource item1, IResource item2) {
+	public static boolean compareIResource(IResource item1,
+		IResource item2,
+		boolean includeSkeleton)
+	{
 		if (item1 == null) {
 			return (item2 == null);
 		}
@@ -899,12 +920,17 @@ public class FilterTestDriver {
 		}
 
 		// Skeleton
+		if ( !includeSkeleton ) {
+			return true;
+		}
+		
 		ISkeleton skl1 = item1.getSkeleton();
 		ISkeleton skl2 = item2.getSkeleton();
 		if (skl1 == null) {
 			if (skl2 != null)
 				return false;
-		} else {
+		}
+		else {
 			if (skl2 == null)
 				return false;
 			tmp1 = skl1.toString();

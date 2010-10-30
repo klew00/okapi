@@ -33,6 +33,7 @@ import java.util.LinkedList;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IResource;
+import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.pipeline.IPipelineStep;
@@ -49,6 +50,7 @@ import net.sf.okapi.steps.wordcount.categorized.RepetitionWordCountStep;
 import net.sf.okapi.steps.wordcount.common.BaseCounter;
 import net.sf.okapi.steps.wordcount.common.GMX;
 
+@UsingParameters(Parameters.class)
 public class ScopingReportStep extends CompoundStep {
 
 	private Parameters params;

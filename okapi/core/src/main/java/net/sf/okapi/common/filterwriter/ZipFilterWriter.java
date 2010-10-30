@@ -137,8 +137,7 @@ public class ZipFilterWriter implements IFilterWriter {
 	}
 	
 	public IParameters getParameters () {
-		// TODO Auto-generated method stub
-		return null;
+		return null; // Not used
 	}
 
 	public Event handleEvent (Event event) {
@@ -186,7 +185,7 @@ public class ZipFilterWriter implements IFilterWriter {
 	}
 
 	public void setParameters (IParameters params) {
-		// TODO Auto-generated method stub
+		// Not used
 	}
 
 	private void processStartDocument (StartDocument res) {
@@ -209,7 +208,7 @@ public class ZipFilterWriter implements IFilterWriter {
 			if ( useTemp ) {
 				// Use a temporary output if we can overwrite for now
 				// If it's the input file, IFilter.close() will free it before we
-				// call close() here (that is if IFilter.close() is called correctly
+				// call close() here (that is if IFilter.close() is called correctly!)
 				tempZip = File.createTempFile("zfwTmpZip", null);
 				zipOut = new ZipOutputStream(new FileOutputStream(tempZip.getAbsolutePath()));
 			}
