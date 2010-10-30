@@ -145,7 +145,7 @@ public class RainbowTest {
 		assertTrue("test01.out.po different from gold",
 			compareWithGoldFile("pipelines/leverage/test01.out.po"));
 		assertTrue("output1.tmx different from gold",
-			compareWithGoldFile("pipelines/leverage/output1.tmx"));
+			compareWithGoldFilePerLine("pipelines/leverage/output1.tmx", "UTF-8"));
 	}
 
 	@Test
@@ -180,6 +180,14 @@ public class RainbowTest {
     	String outputPath = root + File.separator + outputBase;
     	String goldPath = root + File.separator + "gold" + File.separator + outputBase; 
     	return fc.filesExactlyTheSame(outputPath, goldPath);
+    }
+
+	private boolean compareWithGoldFilePerLine (String outputBase,
+		String encoding)
+	{
+    	String outputPath = root + File.separator + outputBase;
+    	String goldPath = root + File.separator + "gold" + File.separator + outputBase; 
+    	return fc.compareFilesPerLines(outputPath, goldPath, encoding);
     }
 
     private boolean compareWithGoldFile (String outputBase,
