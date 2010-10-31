@@ -34,6 +34,7 @@ import java.util.Stack;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -77,7 +78,7 @@ public class IDMLFilter implements IFilter {
 	private final static String SPREADTYPE = "spread";
 	private final static String STORYTYPE = "story";
 	
-	final private DocumentBuilderFactory docFact;
+	final private DocumentBuilder docBuilder;
 	private URI docURI;
 	private LinkedList<Event> queue;
 	private LocaleId srcLoc;
@@ -96,9 +97,15 @@ public class IDMLFilter implements IFilter {
 	private Stack<IDMLContext> ctx;
 
 	public IDMLFilter () {
-		params = new Parameters();
-		docFact = DocumentBuilderFactory.newInstance();
-		docFact.setValidating(false);
+		try {
+			params = new Parameters();
+			DocumentBuilderFactory docFact = DocumentBuilderFactory.newInstance();
+			docFact.setValidating(false);
+			docBuilder = docFact.newDocumentBuilder();
+		}
+		catch ( Throwable e ) {
+			throw new OkapiIOException("Error initializing.\n"+e.getMessage(), e);
+		}
 	}
 
 	@Override
@@ -332,7 +339,7 @@ public class IDMLFilter implements IFilter {
 		throws SAXException, IOException, ParserConfigurationException
 	{
 		ArrayList<String> storyList = new ArrayList<String>();
-		Document doc = docFact.newDocumentBuilder().parse(zipFile.getInputStream(entry));
+		Document doc = docBuilder.parse(zipFile.getInputStream(entry));
 
 		String name = entry.getName();
 		
@@ -360,7 +367,7 @@ public class IDMLFilter implements IFilter {
 		}
 		try {
 			// Read the document in memory
-			Document doc = docFact.newDocumentBuilder().parse(zipFile.getInputStream(entry));
+			Document doc = docBuilder.parse(zipFile.getInputStream(entry));
 			
 			// Real story id
 			
@@ -416,7 +423,7 @@ public class IDMLFilter implements IFilter {
 				continue;
 			}
 			else if ( name.equals("ParagraphStyleRange") ) {
-				ctx.push(new IDMLContext(nodeCount));
+				ctx.push(new IDMLContext(node, nodeCount));
 			}
 			else {
 				if ( !ctx.isEmpty() ) {

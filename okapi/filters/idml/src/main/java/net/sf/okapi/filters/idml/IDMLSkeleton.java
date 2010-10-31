@@ -24,14 +24,16 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 import net.sf.okapi.common.ISkeleton;
 
 public class IDMLSkeleton implements ISkeleton {
 
-	private ZipFile original;
-	private ZipEntry entry;
-	private Document doc;
+	private ZipFile original; // Used for startDocument
+	private ZipEntry entry; // Used for Startgroup of story
+	private Document doc; // Used for Startgroup of story
+	private Node node; // Used for TextUnit
 	
 	public IDMLSkeleton (ZipFile original) {
 		this.original = original;
@@ -44,6 +46,10 @@ public class IDMLSkeleton implements ISkeleton {
 		this.doc = doc;
 	}
 	
+	public IDMLSkeleton (Node node) {
+		this.node = node;
+	}
+	
 	public ZipFile getOriginal () {
 		return original;
 	}
@@ -54,6 +60,10 @@ public class IDMLSkeleton implements ISkeleton {
 
 	public Document getDocument () {
 		return doc;
+	}
+
+	public Node getNode () {
+		return node;
 	}
 
 }

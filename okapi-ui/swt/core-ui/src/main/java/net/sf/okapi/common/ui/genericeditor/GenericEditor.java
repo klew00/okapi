@@ -21,6 +21,7 @@
 package net.sf.okapi.common.ui.genericeditor;
 
 import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
@@ -45,6 +46,7 @@ import org.eclipse.swt.widgets.Text;
 import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.ParametersDescription;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.uidescription.AbstractPart;
 import net.sf.okapi.common.uidescription.CheckboxPart;
 import net.sf.okapi.common.uidescription.CodeFinderPart;
@@ -544,7 +546,9 @@ public class GenericEditor {
 		return true;
 	}
 	
-	private boolean saveInputControl (Text text, TextInputPart desc) {
+	private boolean saveInputControl (Text text,
+		TextInputPart desc)
+	{
 		try {
 			if ( !text.isEnabled() ) return true; // Don't save disabled input
 			if ( !desc.isAllowEmpty() ) {
@@ -602,7 +606,9 @@ public class GenericEditor {
 		return true;
 	}
 	
-	private boolean saveCheckboxControl (Button button, CheckboxPart desc) {
+	private boolean saveCheckboxControl (Button button,
+		CheckboxPart desc)
+	{
 		try {
 			if ( !button.isEnabled() ) return true; // Don't save disabled input
 			if ( desc.getType().equals(boolean.class) ) {
@@ -634,17 +640,35 @@ public class GenericEditor {
 		return true;
 	}
 	
-	private boolean saveTextAndBrowseControl (TextAndBrowsePanel ctrl, PathInputPart desc) {
+	private boolean saveTextAndBrowseControl (TextAndBrowsePanel ctrl,
+		PathInputPart desc)
+	{
 		try {
 			if ( !ctrl.isEnabled() ) return true; // Don't save disabled input
-			if ( desc.getType().equals(String.class) ) {
+			if ( desc.getType().equals(String.class) || desc.getType().equals(URI.class) ) {
 				if ( !desc.isAllowEmpty() && ( ctrl.getText().length() == 0 )) {
 					Dialogs.showError(shell, String.format("You must specify a path for '%s'.",
 						desc.getDisplayName()), null);
 					ctrl.setFocus();
 					return false;
 				}
-				desc.getWriteMethod().invoke(desc.getParent(), ctrl.getText());
+				if ( desc.getType().equals(URI.class) ) {
+					String tmp = ctrl.getText();
+					URI uri = null;
+					try {
+						uri = Util.toURI(tmp);
+					}
+					catch ( Throwable e ) {
+						Dialogs.showError(shell, String.format("You must specify a valid URI '%s'.",
+							desc.getDisplayName()), null);
+						ctrl.setFocus();
+						return false;
+					}
+					desc.getWriteMethod().invoke(desc.getParent(), uri);
+				}
+				else { // String
+					desc.getWriteMethod().invoke(desc.getParent(), ctrl.getText());
+				}
 			}
 			else {
 				throw new OkapiEditorCreationException(String.format(
@@ -666,7 +690,9 @@ public class GenericEditor {
 		return true;
 	}
 	
-	private boolean saveFolderControl (TextAndBrowsePanel ctrl, FolderInputPart desc) {
+	private boolean saveFolderControl (TextAndBrowsePanel ctrl,
+		FolderInputPart desc)
+	{
 		try {
 			if ( !ctrl.isEnabled() ) return true; // Don't save disabled input
 			if ( desc.getType().equals(String.class) ) {
@@ -698,7 +724,9 @@ public class GenericEditor {
 		return true;
 	}
 	
-	private boolean saveCodeFinderControl (InlineCodeFinderPanel ctrl, CodeFinderPart desc) {
+	private boolean saveCodeFinderControl (InlineCodeFinderPanel ctrl,
+		CodeFinderPart desc)
+	{
 		try {
 			if ( !ctrl.isEnabled() ) return true; // Don't save disabled input
 			if ( desc.getType().equals(String.class) ) {
@@ -725,7 +753,9 @@ public class GenericEditor {
 		return true;
 	}
 	
-	private boolean saveListControl (List list, ListSelectionPart desc) {
+	private boolean saveListControl (List list,
+		ListSelectionPart desc)
+	{
 		try {
 			if ( !list.isEnabled() ) return true; // Don't save disabled input
 			int n = list.getSelectionIndex();
@@ -757,7 +787,9 @@ public class GenericEditor {
 		return true;
 	}
 
-	private boolean saveComboControl (Combo combo, ListSelectionPart desc) {
+	private boolean saveComboControl (Combo combo,
+		ListSelectionPart desc)
+	{
 		try {
 			if ( !combo.isEnabled() ) return true; // Don't save disabled input
 			int n = combo.getSelectionIndex();
@@ -791,7 +823,9 @@ public class GenericEditor {
 		return true;
 	}
 	
-	private void setInputControl (Text text, TextInputPart desc) {
+	private void setInputControl (Text text,
+		TextInputPart desc)
+	{
 		try {
 			String tmp = "";
 			if ( desc.getType().equals(String.class) ) {
@@ -818,7 +852,9 @@ public class GenericEditor {
 		}
 	}
 	
-	private void setCodeFinderControl (InlineCodeFinderPanel panel, CodeFinderPart desc) {
+	private void setCodeFinderControl (InlineCodeFinderPanel
+		panel, CodeFinderPart desc)
+	{
 		try {
 			String tmp = "";
 			if ( desc.getType().equals(String.class) ) {
@@ -842,7 +878,9 @@ public class GenericEditor {
 		}
 	}
 	
-	private boolean saveSpinnerControl (Spinner ctrl, SpinInputPart desc) {
+	private boolean saveSpinnerControl (Spinner ctrl,
+		SpinInputPart desc)
+	{
 		try {
 			if ( !ctrl.isEnabled() ) return true; // Don't save disabled input
 			if ( desc.getType().equals(int.class) ) {
@@ -868,7 +906,9 @@ public class GenericEditor {
 		return true;
 	}
 
-	private void setListControl (List list, ListSelectionPart desc) {
+	private void setListControl (List list,
+		ListSelectionPart desc)
+	{
 		try {
 			String[] labels = desc.getChoicesLabels();
 			String[] values = desc.getChoicesValues();
@@ -928,7 +968,9 @@ public class GenericEditor {
 		}
 	}
 	
-	private void setComboControl (Combo combo, ListSelectionPart desc) {
+	private void setComboControl (Combo combo,
+		ListSelectionPart desc)
+	{
 		try {
 			String[] labels = desc.getChoicesLabels();
 			String[] values = desc.getChoicesValues();
@@ -985,7 +1027,9 @@ public class GenericEditor {
 		}
 	}
 	
-	private void setCheckboxControl (Button button, CheckboxPart desc) {
+	private void setCheckboxControl (Button button,
+		CheckboxPart desc)
+	{
 		try {
 			if ( desc.getType().equals(boolean.class) ) {
 				button.setSelection((Boolean)desc.getReadMethod().invoke(desc.getParent()));
@@ -1014,11 +1058,17 @@ public class GenericEditor {
 		}
 	}
 	
-	private void setPathControl (TextAndBrowsePanel ctrl, PathInputPart desc) {
+	private void setPathControl (TextAndBrowsePanel ctrl,
+		PathInputPart desc)
+	{
 		try {
 			if ( desc.getType().equals(String.class) ) {
 				String tmp = (String)desc.getReadMethod().invoke(desc.getParent());
 				ctrl.setText((tmp==null) ? "" : tmp);
+			}
+			else if ( desc.getType().equals(URI.class) ) {
+				URI uri = (URI)desc.getReadMethod().invoke(desc.getParent());
+				ctrl.setText(uri.toString());
 			}
 			else {
 				throw new OkapiEditorCreationException(String.format(
@@ -1036,7 +1086,9 @@ public class GenericEditor {
 		}
 	}
 	
-	private void setSpinnerControl (Spinner spinner, SpinInputPart desc) {
+	private void setSpinnerControl (Spinner spinner,
+		SpinInputPart desc)
+	{
 		try {
 			if ( desc.getType().equals(int.class) ) {
 				int n = (Integer)desc.getReadMethod().invoke(desc.getParent());
@@ -1058,7 +1110,9 @@ public class GenericEditor {
 		}
 	}
 	
-	private void setFolderControl (TextAndBrowsePanel ctrl, FolderInputPart desc) {
+	private void setFolderControl (TextAndBrowsePanel ctrl,
+		FolderInputPart desc)
+	{
 		try {
 			if ( desc.getType().equals(String.class) ) {
 				String tmp = (String)desc.getReadMethod().invoke(desc.getParent());

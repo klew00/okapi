@@ -20,18 +20,24 @@
 
 package net.sf.okapi.filters.idml.tests;
 
+import net.sf.okapi.common.Event;
 import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
+import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.filters.idml.IDMLFilter;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,6 +61,14 @@ public class IDMLFilterTest {
 		assertNotNull(list);
 		assertTrue(list.size()>0);
 	}
+	
+	@Test
+	public void testSimpleEntry () {
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(root+"helloworld-1.idml"), 1);
+		assertNotNull(tu);
+		String text = TextFragment.getText(tu.getSource().getFirstContent().getCodedText());
+		assertEquals("Hello World!", text);
+	}
 
 	@Test
 	public void testStartDocument () {
@@ -67,13 +81,26 @@ public class IDMLFilterTest {
 	public void testDoubleExtraction () {
 		// Read all files in the data directory
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
+//		list.add(new InputDocument(root+"Test01.idml", null));
 		list.add(new InputDocument(root+"Test00.idml", null));
-		list.add(new InputDocument(root+"Test01.idml", null));
 		list.add(new InputDocument(root+"helloworld-1.idml", null));
 		list.add(new InputDocument(root+"ConditionalText.idml", null));
 		
+		
 		RoundTripComparison rtc = new RoundTripComparison(false); // Do not compare skeleton
 		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, locEN, "output"));
+	}
+
+	private ArrayList<Event> getEvents (String path) {
+		ArrayList<Event> list = new ArrayList<Event>();
+		RawDocument rd = new RawDocument(new File(path).toURI(), "UTF-8", locEN);
+		filter.open(rd);
+		while (filter.hasNext()) {
+			Event event = filter.next();
+			list.add(event);
+		}
+		filter.close();
+		return list;
 	}
 
 }

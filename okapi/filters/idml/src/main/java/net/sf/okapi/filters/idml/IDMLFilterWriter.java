@@ -26,11 +26,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.StringReader;
 import java.util.Enumeration;
+import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -42,6 +46,9 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
+import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
@@ -53,10 +60,15 @@ import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
+import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 
 public class IDMLFilterWriter implements IFilterWriter {
 
+	private final Logger logger = Logger.getLogger(getClass().getName());
+
+	private final DocumentBuilder docBuilder;
 	private String outputPath;
 	private LocaleId trgLoc;
 	private ZipFile zipOriginal;
@@ -70,10 +82,13 @@ public class IDMLFilterWriter implements IFilterWriter {
 	
 	public IDMLFilterWriter () {
         try {
+        	DocumentBuilderFactory docFact = DocumentBuilderFactory.newInstance();
+    		docFact.setValidating(false);
+    		docBuilder = docFact.newDocumentBuilder();
 			xformer = TransformerFactory.newInstance().newTransformer();
 		}
 		catch ( Throwable e ) {
-			throw new OkapiIOException("Error creating IDMLFilterWriter.\n"+e.getMessage(), e);
+			throw new OkapiIOException("Error initializing.\n"+e.getMessage(), e);
 		}
 	}
 	
@@ -229,6 +244,47 @@ public class IDMLFilterWriter implements IFilterWriter {
 	}
 
 	private void processTextUnit (TextUnit tu) {
+		IDMLSkeleton skel = (IDMLSkeleton)tu.getSkeleton();
+		Node node = skel.getNode();
+		
+		// Get the target content, or fall back to the source
+		// Make a copy to not change the original in the resource
+		TextContainer tc = tu.getTarget(trgLoc);
+		if ( tc == null ) tc = tu.getSource();
+		TextFragment tf = tc.getUnSegmentedContentCopy();
+		if ( tf.isEmpty() && !tu.getSource().isEmpty() ) {
+			tf = tu.getSource().getUnSegmentedContentCopy();
+		}
+		
+		// Escape the text of the content to XML
+		// inline codes are still in XML so we don't touch them
+		String ctext = tf.getCodedText();
+		ctext = Util.escapeToXML(ctext, 3, false, null);
+		// Set the modified coded text
+		tf.setCodedText(ctext);
+		
+		// Now the whole content is true XML, it can be parsed as a fragment
+		String xml = "<r>"+tf.toText()+"</r>";
+		try {
+			Document tmpDoc =  docBuilder.parse(new InputSource(new StringReader(xml)));
+			DocumentFragment docFrag = doc.createDocumentFragment();
+			Node imp = doc.importNode(tmpDoc.getDocumentElement(), true);
+			while ( imp.hasChildNodes() ) {
+				docFrag.appendChild(imp.removeChild(imp.getFirstChild()));
+			}
+			
+			// Remove the old content
+			while( node.hasChildNodes() ) {
+				node.removeChild(node.getFirstChild());  
+			}
+			// attache the new content
+			node.appendChild(docFrag);
+		}
+		catch ( Throwable e ) {
+			logger.severe(String.format("Error when parsing XML of text unit id='%s'.\n"+e.getMessage(), tu.getId()));
+		}
+		
+		// And re-injected into the DOM 
 		//TODO
 		
 	}

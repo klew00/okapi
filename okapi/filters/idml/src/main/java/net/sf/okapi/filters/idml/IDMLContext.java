@@ -36,10 +36,14 @@ import net.sf.okapi.common.resource.TextFragment.TagType;
 
 class IDMLContext {
 	
-	private int startNode;
+	private int nodeCount;
+	private Node startNode;
 	private TextFragment tf;
 
-	public IDMLContext (int startNode) {
+	public IDMLContext (Node startNode,
+		int nodeCount)
+	{
+		this.nodeCount = nodeCount;
 		this.startNode = startNode;
 		tf = new TextFragment();
 	}
@@ -55,8 +59,9 @@ class IDMLContext {
 		if ( tf.isEmpty() ) return; // Skip empty entries
 		// Otherwise the fragment contains text and possibly codes as needed
 		// Just create the text unit
-		TextUnit tu = new TextUnit(tuIdPrefix+startNode);
+		TextUnit tu = new TextUnit(tuIdPrefix+nodeCount);
 		tu.setSourceContent(tf);
+		tu.setSkeleton(new IDMLSkeleton(startNode));
 		// And add the new event to the queue
 		queue.add(new Event(EventType.TEXT_UNIT, tu));
 		// This object should not be called again
@@ -91,7 +96,9 @@ class IDMLContext {
 	}
 	
 	public void addEndTag (Element elem) {
-		tf.append(TagType.CLOSING, elem.getNodeName(), buildEndTag(elem));
+		if ( elem.hasChildNodes() ) {
+			tf.append(TagType.CLOSING, elem.getNodeName(), buildEndTag(elem));
+		}
 	}
 	
 	public String buildStartTag (Element elem) {

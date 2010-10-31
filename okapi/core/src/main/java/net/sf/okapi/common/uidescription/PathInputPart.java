@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -20,11 +20,13 @@
 
 package net.sf.okapi.common.uidescription;
 
+import java.net.URI;
+
 import net.sf.okapi.common.ParameterDescriptor;
 
 /**
  * UI part descriptor for a path. This UI part supports the following types:
- * String.
+ * String and URI.
  * <p>Use {@link #setForSaveAs(boolean)} to specify if the path is for saving
  * a file (by default it is assumed the path is for saving a file). That choice
  * affect which browsing dialog is invoked when using the browse button.
@@ -58,6 +60,7 @@ public class PathInputPart extends AbstractPart {
 	protected void checkType () {
 		// Check type support
 		if ( getType().equals(String.class) ) return;
+		if ( getType().equals(URI.class) ) return;
 		// Otherwise: call the base method.
 		super.checkType();
 	}
