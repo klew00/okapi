@@ -22,19 +22,28 @@ package net.sf.okapi.steps.scopingreport;
 
 import java.net.URI;
 
+import net.sf.okapi.common.EditorFor;
+import net.sf.okapi.common.ParametersDescription;
 import net.sf.okapi.common.ParametersString;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.uidescription.EditorDescription;
+import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
+import net.sf.okapi.common.uidescription.PathInputPart;
 import net.sf.okapi.lib.extra.AbstractParameters;
 
-public class Parameters extends AbstractParameters {
+@EditorFor(Parameters.class)
+public class Parameters extends AbstractParameters implements IEditorDescriptionProvider {
+
+	private static final String PROJECTNAME = "projectName";
+	private static final String OUTPUTURI = "outputURI";
 
 	private String projectName;
 	private URI outputURI;
 	
 	@Override
 	protected void parameters_load(ParametersString buffer) {
-		projectName = buffer.getString("projectName", "");
-		outputURI = Util.toURI(buffer.getString("outputURI", ""));
+		projectName = buffer.getString(PROJECTNAME, "");
+		outputURI = Util.toURI(buffer.getString(OUTPUTURI, ""));
 	}
 
 	@Override
@@ -45,8 +54,8 @@ public class Parameters extends AbstractParameters {
 
 	@Override
 	protected void parameters_save(ParametersString buffer) {
-		buffer.setString("projectName", projectName);
-		buffer.setString("outputURI", outputURI == null ? "" : outputURI.toString());
+		buffer.setString(PROJECTNAME, projectName);
+		buffer.setString(OUTPUTURI, outputURI == null ? "" : outputURI.toString());
 	}
 
 	public String getProjectName() {
@@ -63,5 +72,28 @@ public class Parameters extends AbstractParameters {
 
 	public void setOutputURI(URI outputURI) {
 		this.outputURI = outputURI;
+	}
+
+	@Override
+	public ParametersDescription getParametersDescription() {
+		ParametersDescription desc = new ParametersDescription(this);
+		desc.add(PROJECTNAME,
+			"Name of the project", "Name of the project to be display in the report");
+		desc.add(OUTPUTURI,
+			"Output URI", "Full path of the report to generate");
+		return desc;
+	}
+
+	@Override
+	public EditorDescription createEditorDescription(ParametersDescription paramsDesc) {
+		EditorDescription desc = new EditorDescription("Scope Reporting", true, false);
+		
+		desc.addTextInputPart(paramsDesc.get(PROJECTNAME));
+		
+		PathInputPart pip = desc.addPathInputPart(paramsDesc.get(OUTPUTURI),
+			"Report to Generate", true);
+		pip.setBrowseFilters("HTML Files (*.htm;*.html)\tAll Files (*.*)", "*.htm;*.html\t*.*");
+		
+		return desc;
 	}
 }
