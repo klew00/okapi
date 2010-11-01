@@ -42,9 +42,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.w3c.dom.traversal.DocumentTraversal;
-import org.w3c.dom.traversal.NodeFilter;
-import org.w3c.dom.traversal.TreeWalker;
+import org.w3c.dom.ProcessingInstruction;
 import org.xml.sax.SAXException;
 
 import net.sf.okapi.common.Event;
@@ -66,6 +64,9 @@ import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
+import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 @UsingParameters(Parameters.class)
@@ -379,16 +380,10 @@ public class IDMLFilter implements IFilter {
 			queue.add(new Event(EventType.START_GROUP, sg));
 			
 			// Prepare for traversal
-			DocumentTraversal dt = (DocumentTraversal)doc;
-			// Note: some TreeWalker implementations seem to always send text nodes, no matter
-			// what the 'whatToShow' parameter says here. So we do include text nodes.
-			TreeWalker tw = dt.createTreeWalker(doc.getDocumentElement(),
-				NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT,
-				null, true);
 			nodeCount = 0;
 			tuIdPrefix = storyId+"-";
 			// Traverse the story
-			processNodes((Element)tw.getRoot());
+			processNodes(doc.getDocumentElement());
 			
 			// End the story group
 			Ending ending = new Ending(storyIdGen.getLastId()+ENDID);
@@ -423,7 +418,11 @@ public class IDMLFilter implements IFilter {
 				continue;
 			}
 			else if ( name.equals("ParagraphStyleRange") ) {
-				ctx.push(new IDMLContext(node, nodeCount));
+				// Process the start, and continue or move on depending on the return
+				if ( doStartPSR(elem) ) {
+					node = elem.getNextSibling();
+					continue;
+				}
 			}
 			else {
 				if ( !ctx.isEmpty() ) {
@@ -451,5 +450,61 @@ public class IDMLFilter implements IFilter {
 			node = elem.getNextSibling();
 		}
 	}
-	
+
+	/**
+	 * Processes the start of a ParagraphStyleRange
+	 * @param node the node of the current element.
+	 * @return true if the element has been dealt with, and the caller method should continue the loop with the next sibling,
+	 * false if the caller need to just continue down. 
+	 */
+	private boolean doStartPSR (Node node) {
+		NodeList list = ((Element)node).getElementsByTagName("Content");
+		if ( list.getLength() > 1 ) {
+			// Several content: no shortcut
+			ctx.push(new IDMLContext(node, nodeCount));
+			return false;
+		}
+		if ( list.getLength() == 1 ) {
+			// We have a single Content element
+			Element cnt = (Element)list.item(0);
+			// Create the text unit
+			TextUnit tu = new TextUnit(tuIdPrefix+nodeCount);
+			tu.setSourceContent(processContent(cnt, null));
+			tu.setSkeleton(new IDMLSkeleton(cnt)); // Merge directly on Content
+			// And add the new event to the queue
+			queue.add(new Event(EventType.TEXT_UNIT, tu));
+		}
+		// Else: we have no content
+		// In both case: move on to the next node
+		return true;
+	}
+
+	/**
+	 * Processes the content of a Content element.
+	 * @param content the Content node.
+	 * @param tf the text fragment where to put the content. Use null to create one.
+	 * @return the modified text fragment (may be a new one).
+	 */
+	static TextFragment processContent (Element content,
+		TextFragment tf)
+	{
+		if ( tf == null ) tf = new TextFragment();
+		// We assume only TEXT and PI nodes, no inner elements!
+		Node node = content.getFirstChild();
+		while ( node != null ) {
+			switch ( node.getNodeType() ) {
+			case Node.TEXT_NODE:
+				tf.append(node.getNodeValue());
+				break;
+			case Node.PROCESSING_INSTRUCTION_NODE:
+				ProcessingInstruction pi = (ProcessingInstruction)node;
+				tf.append(TagType.PLACEHOLDER, "pi", String.format("<?%s %s?>", pi.getTarget(), pi.getTextContent()));
+				break;
+			default:
+				throw new OkapiIOException("Unexpected content in <Content>: "+node.getNodeType());
+			}
+			node = node.getNextSibling();
+		}
+		return tf;
+	}
 }

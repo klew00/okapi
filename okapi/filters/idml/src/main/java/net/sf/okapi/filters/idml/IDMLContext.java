@@ -38,7 +38,11 @@ class IDMLContext {
 	
 	private int nodeCount;
 	private Node startNode;
+	private Node contentNode;
 	private TextFragment tf;
+	private int status;
+	private StringBuilder startTags;
+	private String endTags;
 
 	public IDMLContext (Node startNode,
 		int nodeCount)
@@ -46,6 +50,9 @@ class IDMLContext {
 		this.nodeCount = nodeCount;
 		this.startNode = startNode;
 		tf = new TextFragment();
+		status = 0;
+		startTags = new StringBuilder();
+		endTags = "";
 	}
 	
 	/**
@@ -57,8 +64,16 @@ class IDMLContext {
 		String tuIdPrefix)
 	{
 		if ( tf.isEmpty() ) return; // Skip empty entries
-		// Otherwise the fragment contains text and possibly codes as needed
-		// Just create the text unit
+		
+		if ( status == 1 ) {
+			// Only one content: no need for inline codes
+			// Reset the fragment to just the text
+			tf = new TextFragment(TextFragment.getText(tf.getCodedText()));
+			// Make the Content the start node
+			startNode = contentNode;
+		}
+		
+		// Create the text unit
 		TextUnit tu = new TextUnit(tuIdPrefix+nodeCount);
 		tu.setSourceContent(tf);
 		tu.setSkeleton(new IDMLSkeleton(startNode));
@@ -72,10 +87,16 @@ class IDMLContext {
 	 * @param elem the Content element node.
 	 */
 	public void addContent (Element elem) {
-		String text = Util.getTextContent(elem);
 		tf.append(TagType.OPENING, "code", buildStartTag(elem));
-		tf.append(text);
+startTags.append(buildStartTag(elem));
+		IDMLFilter.processContent(elem, tf);
 		tf.append(TagType.CLOSING, "code", buildEndTag(elem));
+endTags = buildEndTag(elem) + endTags;
+		status++;
+		contentNode = elem;
+		
+		startTags.setLength(0);
+		//endTags = "";
 	}
 	
 	public void addCode (Node node) {
@@ -84,6 +105,7 @@ class IDMLContext {
 		for ( int i=0; i<text.length(); i++ ) {
 			if ( !Character.isWhitespace(text.charAt(i)) ) {
 				tf.append(TagType.PLACEHOLDER, "text", text);
+				startTags.append(text);
 				return;
 			}
 		}
@@ -93,11 +115,13 @@ class IDMLContext {
 	public void addStartTag (Element elem) {
 		tf.append(elem.hasChildNodes() ? TagType.OPENING : TagType.PLACEHOLDER,
 			elem.getNodeName(), buildStartTag(elem));
+		startTags.append(buildStartTag(elem));
 	}
 	
 	public void addEndTag (Element elem) {
 		if ( elem.hasChildNodes() ) {
 			tf.append(TagType.CLOSING, elem.getNodeName(), buildEndTag(elem));
+			endTags = buildEndTag(elem) + endTags;
 		}
 	}
 	
