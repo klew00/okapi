@@ -72,11 +72,9 @@ public class ScopingReportStep extends CompoundStep {
 
 	@Override
 	protected void addSteps(LinkedList<IPipelineStep> list) {
-		WordCountStep wcs = new WordCountStep();
-		
 		list.add(
 				new XPipelineStep(
-						wcs,
+						new WordCountStep(),
 						new XParameter("countInBatchItems", true),
 						new XParameter("countInBatch", true)
 						)
