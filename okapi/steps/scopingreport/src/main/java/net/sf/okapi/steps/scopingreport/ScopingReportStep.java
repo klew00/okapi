@@ -60,7 +60,7 @@ public class ScopingReportStep extends CompoundStep {
 		super();
 		params = new Parameters();
 		setParameters(params);
-		setName("Scoping Report Step");
+		setName("Scoping Report");
 		setDescription("Create a template-based scoping report based on word count and leverage annotations."
 			+" Expects: filter events. Sends back: filter events.");
 		gen = new ReportGenerator(getTemplateStream());

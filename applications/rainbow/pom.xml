@@ -398,6 +398,11 @@
 			<artifactId>okapi-step-xliffsplitter</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+        <dependency>
+			<groupId>net.sf.okapi.steps</groupId>
+			<artifactId>okapi-step-scopingreport</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 <!--TEST as plugin		<dependency>
 			<groupId>net.sf.okapi.steps</groupId>
 			<artifactId>okapi-step-xmlvalidation</artifactId>
