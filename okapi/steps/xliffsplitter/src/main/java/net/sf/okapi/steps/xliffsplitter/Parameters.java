@@ -33,11 +33,16 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 
 	public static final String TRANSLATIONTYPE = "translation_type";
 	public static final String TRANSLATIONSTATUS = "translation_status";
-	
+
+	private static final String BIGFILE = "bigFile";
+	private static final String FILEMARKER = "fileMarker";
+
 	private static final String UPDATESDLTRANSLATIONSTATUS = "updateSDLTranslationStatus";
 	private static final String TRANSLATIONTYPEVALUE = "translationTypeValue";
 	private static final String TRANSLATIONSTATUSVALUE = "translationStatusValue";
 
+	private boolean bigFile;
+	private String fileMarker;
 	private boolean updateSDLTranslationStatus;
 	private String translationTypeValue;
 	private String translationStatusValue;
@@ -47,6 +52,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	}
 
 	public void reset() {
+		bigFile = false;
+		fileMarker = "_PART";
 		updateSDLTranslationStatus = false;
 		translationTypeValue = "manual_translation";
 		translationStatusValue = "finished";
@@ -55,6 +62,9 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public void fromString(String data) {
 		reset();
 		buffer.fromString(data);
+		
+		bigFile = buffer.getBoolean(BIGFILE, bigFile);
+		fileMarker = buffer.getString(FILEMARKER, fileMarker);
 		updateSDLTranslationStatus = buffer.getBoolean(UPDATESDLTRANSLATIONSTATUS,
 			updateSDLTranslationStatus);
 		translationTypeValue = buffer.getString(TRANSLATIONTYPEVALUE, translationTypeValue);
@@ -63,12 +73,30 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 
 	public String toString() {
 		buffer.reset();
+		buffer.setBoolean(BIGFILE, bigFile);
+		buffer.setString(FILEMARKER, fileMarker);
 		buffer.setBoolean(UPDATESDLTRANSLATIONSTATUS, updateSDLTranslationStatus);
 		buffer.setString(TRANSLATIONTYPEVALUE, translationTypeValue);
 		buffer.setString(TRANSLATIONSTATUSVALUE, translationStatusValue);
 		return buffer.toString();
 	}
 
+	public boolean isBigFile() {
+		return bigFile;
+	}
+
+	public void setBigFile(boolean bigFile) {
+		this.bigFile = bigFile;
+	}
+
+	public String getFileMarker() {
+		return fileMarker;
+	}
+	
+	public void setFileMarker (String fileMarker) {
+		this.fileMarker = fileMarker;
+	}
+	
 	public boolean isUpdateSDLTranslationStatus() {
 		return updateSDLTranslationStatus;
 	}
@@ -96,6 +124,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	@Override
 	public ParametersDescription getParametersDescription() {
 		ParametersDescription desc = new ParametersDescription(this);
+		desc.add(BIGFILE, "Process big file", null);
+		desc.add(FILEMARKER, "File marker", null);
 		desc.add(UPDATESDLTRANSLATIONSTATUS, "Update the <iws:status> translation status (WorldServer-specific)", null);
 		desc.add(TRANSLATIONTYPEVALUE, String.format("Value for '%s'", TRANSLATIONTYPE),
 			String.format("Value to set for the %s attribute.", TRANSLATIONTYPE));
@@ -108,10 +138,17 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public EditorDescription createEditorDescription (ParametersDescription paramsDesc) {
 		EditorDescription desc = new EditorDescription("XLIFF Splitter", true, false);
 		
-		CheckboxPart cbp = desc.addCheckboxPart(paramsDesc.get(UPDATESDLTRANSLATIONSTATUS));
+		CheckboxPart cbp = desc.addCheckboxPart(paramsDesc.get(BIGFILE));
+		TextInputPart tip = desc.addTextInputPart(paramsDesc.get(FILEMARKER));
+		tip.setVertical(false);
+		tip.setMasterPart(cbp, true);
+
+		desc.addSeparatorPart();
+		
+		cbp = desc.addCheckboxPart(paramsDesc.get(UPDATESDLTRANSLATIONSTATUS));
 		
 		// translation_type
-		TextInputPart tip = desc.addTextInputPart(paramsDesc.get(TRANSLATIONTYPEVALUE));
+		tip = desc.addTextInputPart(paramsDesc.get(TRANSLATIONTYPEVALUE));
 		tip.setVertical(false);
 		tip.setMasterPart(cbp, true);
 		

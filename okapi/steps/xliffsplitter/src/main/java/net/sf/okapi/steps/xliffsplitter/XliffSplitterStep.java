@@ -21,28 +21,46 @@
 package net.sf.okapi.steps.xliffsplitter;
 
 import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
+
+import javax.xml.stream.XMLEventFactory;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLEventWriter;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.Attribute;
+import javax.xml.stream.events.StartElement;
+import javax.xml.stream.events.XMLEvent;
 
 import net.htmlparser.jericho.Attributes;
 import net.htmlparser.jericho.Element;
 import net.htmlparser.jericho.OutputDocument;
 import net.htmlparser.jericho.Source;
 import net.htmlparser.jericho.StartTag;
+import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.exceptions.OkapiBadStepInputException;
 import net.sf.okapi.common.exceptions.OkapiFileNotFoundException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
+import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
@@ -61,10 +79,12 @@ import net.sf.okapi.common.resource.RawDocument;
 @UsingParameters(Parameters.class)
 public class XliffSplitterStep extends BasePipelineStep {
 
+	private final Logger logger = Logger.getLogger(getClass().getName());
+	
 	private Parameters params;
 	private boolean done = false;
 	private URI outputURI;
-
+	
 	public XliffSplitterStep() {
 		params = new Parameters();
 	}
@@ -114,67 +134,158 @@ public class XliffSplitterStep extends BasePipelineStep {
 	@Override
 	protected Event handleRawDocument(final Event event) {
 		final RawDocument rawDoc = event.getRawDocument();
-		final List<Element> fileElements = new ArrayList<Element>();
+		
+		if(!params.isBigFile()){
+		
+			final List<Element> fileElements = new ArrayList<Element>();
 
-		Source source;
-		try {
-			source = new Source(rawDoc.getReader());
-		} catch (final IOException e) {
-			throw new OkapiIOException("Error creating Jericho Source object", e);
-		}
-
-		// Find all <file> elements
-		// TODO: Are there any <file> elements that aren't children of <xliff>? Don't want to get too many.
-		fileElements.addAll(source.getAllElements("file"));
-
-		// Mark the insertion point
-		final int insertPosition = fileElements.get(0).getBegin();
-
-		// Write out a separate xliff file for each <file>
-		int count = 1;
-		for (final Element element : fileElements) {
-			// Create an output document for modification and writing
-			final OutputDocument skeletonDocument = new OutputDocument(source);
-
-			// Remove all <file> elements from the document
-			skeletonDocument.remove(fileElements);
-
-			// Update the translation status in the current <file>
-			String file;
-			if (params.isUpdateSDLTranslationStatus()) {
-				file = updateTranslationStatus(element.toString());
-			} else {
-				file = element.toString();
+			Source source;
+			try {
+				source = new Source(rawDoc.getReader());
+			} catch (final IOException e) {
+				throw new OkapiIOException("Error creating Jericho Source object", e);
 			}
 
-			// Add the <file> element
-			skeletonDocument.insert(insertPosition, file);
+			// Find all <file> elements
+			// TODO: Are there any <file> elements that aren't children of <xliff>? Don't want to get too many.
+			fileElements.addAll(source.getAllElements("file"));
 
-			String filename = Util.getDirectoryName(outputURI.getPath()) + File.separator
-					+ Util.getFilename(outputURI.getPath(), false);
-			filename += "." + String.valueOf(count++) + Util.getExtension(outputURI.getPath());
+			// Mark the insertion point
+			final int insertPosition = fileElements.get(0).getBegin();
 
-			PrintWriter writer = null;
-			try {
-				// Open a writer for the new file
-				Util.createDirectories(filename);
-				final OutputStream output = new BufferedOutputStream(new FileOutputStream(filename));
-				writer = new PrintWriter(new OutputStreamWriter(output, "UTF-8"));
-				skeletonDocument.writeTo(writer);
-			} catch (final IOException e) {
-				throw new OkapiIOException(e);
-			} catch (final NullPointerException e) {
-				throw new OkapiFileNotFoundException(e);
-			} finally {
-				done = true;
-				if (writer != null) {
-					writer.close();
-					writer = null;
+			// Write out a separate xliff file for each <file>
+			int count = 1;
+			for (final Element element : fileElements) {
+				// Create an output document for modification and writing
+				final OutputDocument skeletonDocument = new OutputDocument(source);
+
+				// Remove all <file> elements from the document
+				skeletonDocument.remove(fileElements);
+
+				// Update the translation status in the current <file>
+				String file;
+				if (params.isUpdateSDLTranslationStatus()) {
+					file = updateTranslationStatus(element.toString());
+				} else {
+					file = element.toString();
+				}
+
+				// Add the <file> element
+				skeletonDocument.insert(insertPosition, file);
+
+				String filename = Util.getDirectoryName(outputURI.getPath()) + File.separator
+				+ Util.getFilename(outputURI.getPath(), false);
+				filename += "." + String.valueOf(count++) + Util.getExtension(outputURI.getPath());
+
+				PrintWriter writer = null;
+				try {
+					// Open a writer for the new file
+					Util.createDirectories(filename);
+					final OutputStream output = new BufferedOutputStream(new FileOutputStream(filename));
+					writer = new PrintWriter(new OutputStreamWriter(output, "UTF-8"));
+					skeletonDocument.writeTo(writer);
+				} catch (final IOException e) {
+					throw new OkapiIOException(e);
+				} catch (final NullPointerException e) {
+					throw new OkapiFileNotFoundException(e);
+				} finally {
+					done = true;
+					if (writer != null) {
+						writer.close();
+						writer = null;
+					}
 				}
 			}
-		}
 
-		return event;
+			return event;
+		
+		}else{
+
+			//--file properties--
+			String encoding;
+			String lineBreak;
+			boolean hasUTF8BOM;
+			
+			//--for output filename--
+			String outputDir = Util.getDirectoryName(outputURI.getPath());
+			String inputFileName = Util.getFilename(rawDoc.getInputURI().getPath(), false);
+			String inputFileExtension = Util.getExtension(rawDoc.getInputURI().getPath());
+
+			//--detect file properties-
+			BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(rawDoc.getStream(),"utf-8");
+			detector.detectBom();
+			
+			encoding = detector.getEncoding();
+			hasUTF8BOM = detector.hasUtf8Bom();
+			lineBreak = detector.getNewlineType().toString();
+
+			XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+			XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
+			XMLEventFactory  eventFactory = XMLEventFactory.newInstance();
+
+			XMLEventReader eventReader;
+
+			try {
+				if ( detector.isAutodetected() ) {
+					eventReader = inputFactory.createXMLEventReader(rawDoc.getStream(), encoding);
+				}
+				else {
+					logger.info("Encoding could not be auto-detected. Using default encoding: "+encoding);
+					eventReader = inputFactory.createXMLEventReader(rawDoc.getStream());
+				}
+			} catch (XMLStreamException e) {
+				throw new OkapiBadStepInputException(e);
+			}
+
+			boolean collectBeforeFirstFileElem = true;
+			int fileCount = 0;
+			ArrayList<XMLEvent> elemsBeforeFirstFileElem = new ArrayList<XMLEvent>();
+		
+			XMLEvent xmlEvent;
+			
+			while (eventReader.hasNext()) {
+
+				try {
+					xmlEvent = eventReader.nextEvent();
+				} catch (XMLStreamException e) {
+					throw new OkapiBadStepInputException(e);
+				}
+
+				/*-intercept start_document to add a linebreak
+				 * optionally create a custom StartDocument 
+				 * and/or check StartDocuments getCharacterEncodingScheme() */
+				if (xmlEvent.getEventType() == XMLEvent.START_DOCUMENT){
+					
+					elemsBeforeFirstFileElem.add(xmlEvent);
+					elemsBeforeFirstFileElem.add(eventFactory.createSpace(lineBreak));
+					
+					continue;
+				}
+
+				//--process the file element--
+				if (xmlEvent.getEventType() == XMLEvent.START_ELEMENT && xmlEvent.asStartElement().getName().getLocalPart().equals("file")){
+
+					fileCount++;
+
+					String outputFileUri = outputDir + File.separator + inputFileName 
+					    + params.getFileMarker() + String.format("%04d",fileCount) + inputFileExtension;
+
+					collectBeforeFirstFileElem = false;
+
+					writeFilePart(xmlEvent, eventReader, fileCount, outputFileUri, elemsBeforeFirstFileElem,outputFactory, eventFactory, lineBreak, encoding, hasUTF8BOM);
+				}
+
+				//--collects any content before the first <file> elem but nothing in between or after following ones--
+				if(collectBeforeFirstFileElem){
+					elemsBeforeFirstFileElem.add(xmlEvent);
+				}
+			
+				done = true;
+			}
+			
+			return event;
+			
+		}
 	}
 
 	private String updateTranslationStatus(final String file) {
@@ -201,5 +312,94 @@ public class XliffSplitterStep extends BasePipelineStep {
 		}
 
 		return outputFile.toString();
+	}
+	
+	
+	
+	private void writeFilePart(XMLEvent startFileEvent, XMLEventReader eventReader, int fileCount, String outputFileUri, ArrayList<XMLEvent> elemsBeforeFirstFileElem, XMLOutputFactory outputFactory, XMLEventFactory eventFactory, String lineBreak, String encoding, boolean hasUTF8BOM){
+        
+        XMLEventWriter eventWriter = null;
+        BufferedWriter bw = null;
+        
+		try {
+			
+			//--this section is for writing the bom--
+			bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFileUri),encoding));
+			Util.writeBOMIfNeeded(bw, hasUTF8BOM, encoding);
+			
+			eventWriter = outputFactory.createXMLEventWriter(bw);
+
+			boolean insideSegmentMetadata = false;
+			
+			//--write the collected elems-- 
+			for (XMLEvent ev : elemsBeforeFirstFileElem){
+				eventWriter.add(ev);
+			}
+
+			eventWriter.add(startFileEvent);
+
+			while (eventReader.hasNext()) {
+				XMLEvent xmlEvent = eventReader.nextEvent();
+
+				//--remove the target_content attributes and set the update attributes 
+				if(params.isUpdateSDLTranslationStatus()){
+
+					if (xmlEvent.getEventType() == XMLEvent.START_ELEMENT && xmlEvent.asStartElement().getName().getLocalPart().equals("segment-metadata") && xmlEvent.asStartElement().getName().getPrefix().equals("iws")){
+						insideSegmentMetadata = true;
+					}else if (xmlEvent.getEventType() == XMLEvent.END_ELEMENT && xmlEvent.asEndElement().getName().getLocalPart().equals("segment-metadata") && xmlEvent.asEndElement().getName().getPrefix().equals("iws")){
+						insideSegmentMetadata = false;
+					}else if (xmlEvent.getEventType() == XMLEvent.START_ELEMENT && xmlEvent.asStartElement().getName().getLocalPart().equals("status") && xmlEvent.asStartElement().getName().getPrefix().equals("iws")){
+
+						if(insideSegmentMetadata){
+
+							List<Attribute> modifiedList = new ArrayList<Attribute>();
+
+							StartElement se = xmlEvent.asStartElement();
+							Iterator<?> attributes = se.getAttributes();
+
+							while ( attributes.hasNext() ){
+								Attribute attr = (Attribute) attributes.next();
+								
+								if(!attr.getName().getLocalPart().equals("target_content") && !attr.getName().getLocalPart().equals("translation_type") && !attr.getName().getLocalPart().equals("translation_status")){
+									modifiedList.add(attr);
+								}
+							}
+
+							modifiedList.add(eventFactory.createAttribute("translation_type", params.getTranslationTypeValue()));
+							modifiedList.add(eventFactory.createAttribute("translation_status", params.getTranslationStatusValue()));
+
+							xmlEvent = eventFactory.createStartElement(se.getName().getPrefix(), se.getName().getNamespaceURI(), se.getName().getLocalPart(), modifiedList.iterator(), se.getNamespaces());
+						}
+					}
+				}
+				eventWriter.add(xmlEvent);
+
+				if (xmlEvent.getEventType() == XMLEvent.END_ELEMENT && xmlEvent.asEndElement().getName().getLocalPart().equals("file")){
+
+					eventWriter.add(eventFactory.createSpace(lineBreak));
+					eventWriter.add(eventFactory.createEndDocument());
+					eventWriter.flush();
+					eventWriter.close();
+
+					return;
+				}
+			}
+		}catch (UnsupportedEncodingException e) {
+			throw new OkapiUnsupportedEncodingException(e);
+		}catch (FileNotFoundException e) {
+			throw new OkapiFileNotFoundException(e);
+		} catch (XMLStreamException e) {
+			throw new OkapiBadStepInputException(e);			
+		}finally{
+			if (eventWriter != null) {
+				try {
+					eventWriter.close();
+				} catch (XMLStreamException e) {
+					throw new OkapiBadStepInputException(e);
+				}finally{
+					eventWriter = null;	
+				}
+			}
+		}
 	}
 }
