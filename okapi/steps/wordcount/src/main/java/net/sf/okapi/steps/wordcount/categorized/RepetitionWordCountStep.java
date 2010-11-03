@@ -22,7 +22,7 @@ package net.sf.okapi.steps.wordcount.categorized;
 
 import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.Segment;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.steps.wordcount.common.AltAnnotationBasedCountStep;
 import net.sf.okapi.steps.wordcount.common.BaseCounter;
 import net.sf.okapi.steps.wordcount.common.GMX;
@@ -59,8 +59,9 @@ public class RepetitionWordCountStep extends AltAnnotationBasedCountStep {
 	}
 
 	@Override
-	protected long count(TextUnit textUnit) {
-		return super.count(textUnit) - (BaseCounter.getCount(textUnit, GMX.ExactMatchedWordCount) + 
-				BaseCounter.getCount(textUnit, GMX.LeveragedMatchedWordCount));
+	protected long count(TextContainer textContainer) {
+		long res = super.count(textContainer) - (BaseCounter.getCount(textContainer, GMX.ExactMatchedWordCount) + 
+				BaseCounter.getCount(textContainer, GMX.LeveragedMatchedWordCount)); 
+		return res > 0 ? res : 0;
 	}
 }

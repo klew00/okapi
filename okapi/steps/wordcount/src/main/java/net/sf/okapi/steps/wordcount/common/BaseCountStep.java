@@ -23,6 +23,7 @@ package net.sf.okapi.steps.wordcount.common;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.IdGenerator;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.Segment;
@@ -38,16 +39,19 @@ import net.sf.okapi.lib.extra.steps.AbstractPipelineStep;
 
 public abstract class BaseCountStep extends AbstractPipelineStep {
 
+	protected enum CountContext {
+		CC_SOURCE,
+		CC_TARGET
+	}
 	private Parameters params;
-	private IdGenerator gen = new IdGenerator("ending"); 
+	private IdGenerator gen = new IdGenerator("ending");
+	private TextContainer source;
 	
 	private long batchCount;
 	private long batchItemCount;
 	private long documentCount;
 	private long subDocumentCount;
-	private long groupCount;
-	private long textUnitCount;
-	private long segmentCount;
+	private long groupCount;	
 	
 	public BaseCountStep() {
 		super();
@@ -67,21 +71,16 @@ public abstract class BaseCountStep extends AbstractPipelineStep {
 		documentCount = 0;
 		subDocumentCount = 0;
 		groupCount = 0;
-		textUnitCount = 0;
-		segmentCount = 0;
 	}
 
 	//-------------------------
-//	abstract protected long getCount(TextUnit textUnit);
-//	abstract protected void saveCount(Metrics metrics, long count);
-	
-//	abstract protected String getToken();
 	abstract public String getName();
 	abstract public String getDescription();
 	abstract protected String getMetric();
-	abstract protected long count(TextUnit textUnit);
+	abstract protected long count(TextContainer textContainer);
 	abstract protected long count(Segment segment);
 	abstract protected boolean countOnlyTranslatable();
+	abstract protected CountContext getCountContext();
 
 	protected void saveCount(Metrics metrics, long count) {
 		if (metrics == null) return;
@@ -109,14 +108,6 @@ public abstract class BaseCountStep extends AbstractPipelineStep {
 		return groupCount;
 	}
 
-	public long getTextUnitCount() {
-		return textUnitCount;
-	}
-	
-	public long getSegmentCount() {
-		return segmentCount;
-	}
-	
 	protected void saveToMetrics(Event event, long count) {
 		if (event == null) return;
 		if (count == 0) return;
@@ -281,6 +272,40 @@ public abstract class BaseCountStep extends AbstractPipelineStep {
 	}
 
 	//-------------------------
+	
+	private long countInContainer(TextContainer tc) {
+		if (tc == null) return 0;
+		
+		// Individual segments metrics
+		long segmentCount;
+		long textContainerCount;
+		ISegments segs = tc.getSegments();
+		if (segs != null) {
+			for (Segment seg : segs) {
+				segmentCount = count(seg);
+				saveToMetrics(seg, segmentCount);
+			}
+		}
+		// TC metrics
+		textContainerCount = count(tc);
+		saveToMetrics(tc, textContainerCount);
+		return textContainerCount; 
+	}
+	
+	protected TextContainer getSource() {
+		return source;
+	}
+	
+	protected LocaleId getLocale() {
+		switch (getCountContext()) {
+		default:
+			return getSourceLocale();
+			
+		case CC_TARGET:
+			return getTargetLocale();
+		}
+	}
+	
 	@Override
 	protected Event handleTextUnit(Event event) {		
 		TextUnit tu = (TextUnit) event.getResource();
@@ -288,21 +313,23 @@ public abstract class BaseCountStep extends AbstractPipelineStep {
 		if (tu.isEmpty()) return event;
 		if (!tu.isTranslatable() && countOnlyTranslatable()) return event;
 		
-		TextContainer source = tu.getSource();
-		// Individual segments metrics
-		ISegments segs = source.getSegments();
-		if (segs != null) {
-			for (Segment seg : segs) {
-				segmentCount = count(seg);
-				saveToMetrics(seg, segmentCount);
-			}
-		}
+		long textUnitCount = 0;
+		source = tu.getSource();
+		
+		switch (getCountContext()) {
+		case CC_SOURCE:
+			textUnitCount = countInContainer(source);
+			break;
+			
+		case CC_TARGET:
+			textUnitCount = countInContainer(tu.getTarget(getTargetLocale()));
+			break;
+		}		
 		
 		// Whole TU metrics
-		textUnitCount = count(tu);
 		if (textUnitCount == 0) return event;
 				
-		saveToMetrics(source, textUnitCount);
+		saveToMetrics(event, textUnitCount); // Saves in annotations of the whole TU
 				
 		if (params.countInBatch) batchCount += textUnitCount;
 		if (params.countInBatchItems) batchItemCount += textUnitCount;

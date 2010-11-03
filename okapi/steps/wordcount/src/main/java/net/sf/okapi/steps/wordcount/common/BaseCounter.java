@@ -127,8 +127,8 @@ abstract public class BaseCounter {
 		return getValue(segment.getAnnotation(MetricsAnnotation.class), metricName);
 	}
 	
-	public static long getCount(TextUnit tu, String metricName) {
-		return getValue(TextUnitUtil.getSourceAnnotation(tu, MetricsAnnotation.class), metricName);
+	public static long getCount(TextContainer tc, String metricName) {
+		return getValue(tc.getAnnotation(MetricsAnnotation.class), metricName);
 	}
 	
 	public static long getCount(IResource res, String metricName) {

@@ -20,27 +20,46 @@
 
 package net.sf.okapi.lib.extra.steps;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.IPipelineStep;
+import net.sf.okapi.common.pipeline.annotations.ConfigurationParameter;
+import net.sf.okapi.common.pipeline.annotations.StepIntrospector;
+import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
+import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.MultiEvent;
+import net.sf.okapi.lib.extra.pipelinebuilder.XPipelineStep;
 
 public abstract class CompoundStep extends AbstractPipelineStep {
 
 	protected LinkedList<IPipelineStep> steps = new LinkedList<IPipelineStep>();
+	private LinkedList<List<ConfigurationParameter>> paramList;
 
 	protected abstract void addSteps(LinkedList<IPipelineStep> list);
 	
 	public CompoundStep() {
 		super();
+		paramList = new LinkedList<List<ConfigurationParameter>>();
 		addSteps(steps);
+		for (IPipelineStep step : steps) {
+			List<ConfigurationParameter> pList = null;
+			if (step instanceof XPipelineStep)
+				pList = StepIntrospector.getStepParameters(((XPipelineStep)step).getStep());
+			else
+				pList = StepIntrospector.getStepParameters(step);
+			paramList.add(pList);
+		}		
 	}
 
 	@Override
 	protected void component_init() {
+		// Stub not to implement in subclasses as would've been required otherwise
 	}
 
 	private Event expandEvent(Event event, IPipelineStep currentStep) {
@@ -73,5 +92,36 @@ public abstract class CompoundStep extends AbstractPipelineStep {
 		}
 		
 		return super.handleEvent(event);
+	}
+	
+	private void invokeParameterMethods(StepParameterType type, Object value) {
+		for ( List<ConfigurationParameter> pList : paramList ) {
+			// For each exposed parameter
+			for ( ConfigurationParameter p : pList ) {
+				Method method = p.getMethod();
+				if ( method == null ) continue;
+				if ( p.getParameterType() == type) {
+					try {
+						method.invoke(p.getStep(), value);
+					} 
+					catch ( IllegalArgumentException e ) {
+						throw new RuntimeException("Error when assigning runtime parameters.", e);
+					}
+					catch ( IllegalAccessException e ) {
+						throw new RuntimeException("Error when assigning runtime parameters.", e);
+					}
+					catch ( InvocationTargetException e ) {
+						throw new RuntimeException("Error when assigning runtime parameters.", e);
+					}
+				}
+			}
+		}
+	}
+	
+	@StepParameterMapping(parameterType = StepParameterType.TARGET_LOCALE)
+	@Override
+	public void setTargetLocale (LocaleId targetLocale) {
+		super.setTargetLocale(targetLocale);
+		invokeParameterMethods(StepParameterType.TARGET_LOCALE, targetLocale);		
 	}
 }

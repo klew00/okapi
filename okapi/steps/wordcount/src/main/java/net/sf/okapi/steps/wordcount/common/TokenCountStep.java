@@ -21,8 +21,7 @@
 package net.sf.okapi.steps.wordcount.common;
 
 import net.sf.okapi.common.resource.Segment;
-import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.common.resource.TextUnitUtil;
+import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.steps.tokenization.Tokenizer;
 import net.sf.okapi.steps.tokenization.common.TokensAnnotation;
 import net.sf.okapi.steps.tokenization.tokens.Tokens;
@@ -32,14 +31,14 @@ public abstract class TokenCountStep extends BaseCountStep {
 	protected abstract String getTokenName();
 	
 	@Override
-	protected long count(TextUnit textUnit) {		
-		TokensAnnotation ta = TextUnitUtil.getSourceAnnotation(textUnit, TokensAnnotation.class);
+	protected long count(TextContainer textContainer) {		
+		TokensAnnotation ta = textContainer.getAnnotation(TokensAnnotation.class);
 		Tokens tokens = null;
 		
 		if (ta != null)			
 			tokens = ta.getFilteredList(getTokenName());			
 		else
-			tokens = Tokenizer.tokenize(textUnit.getSource(), getLanguage(), getTokenName());
+			tokens = Tokenizer.tokenize(textContainer, getLocale(), getTokenName());
 		
 		if (tokens == null) return 0;
 		
@@ -54,7 +53,7 @@ public abstract class TokenCountStep extends BaseCountStep {
 		if (ta != null)			
 			tokens = ta.getFilteredList(getTokenName());			
 		else
-			tokens = Tokenizer.tokenize(segment.getContent(), getLanguage(), getTokenName());
+			tokens = Tokenizer.tokenize(segment.getContent(), getLocale(), getTokenName());
 		
 		if (tokens == null) return 0;
 		

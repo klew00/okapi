@@ -371,7 +371,7 @@ public class TokenizationStep extends AbstractPipelineStep {
 	private void tokenizeSource(TextUnit tu) {
 		if (tu == null) return;
 		
-		Tokens tokens = tokenize(tu.getSource(), getLanguage());		
+		Tokens tokens = tokenize(tu.getSource(), getSourceLocale());		
 		if (tokens == null) return;
 		
 		// Attach to TU		

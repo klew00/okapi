@@ -23,6 +23,8 @@ package net.sf.okapi.lib.extra.steps;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.IPipelineStep;
+import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
+import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.lib.extra.OkapiComponent;
 
@@ -31,15 +33,20 @@ import net.sf.okapi.lib.extra.OkapiComponent;
  */
 abstract public class AbstractPipelineStep extends OkapiComponent implements IPipelineStep {
 
-	private LocaleId language;
+	private LocaleId srcLoc;
+	private LocaleId trgLoc;
 	private boolean isLastOutputStep = false;
 
 	public AbstractPipelineStep() {
 		super();
 	}
 
-	protected LocaleId  getLanguage() {
-		return language;
+	protected LocaleId  getSourceLocale() {
+		return srcLoc;
+	}
+	
+	protected LocaleId  getTargetLocale() {
+		return trgLoc;
 	}
 	
 	public void cancel() {
@@ -189,8 +196,13 @@ abstract public class AbstractPipelineStep extends OkapiComponent implements IPi
 		
 		StartDocument sd = (StartDocument) event.getResource();
 		
-		if (sd != null) language = sd.getLocale();
+		if (sd != null) srcLoc = sd.getLocale();
 		return event;
+	}
+	
+	@StepParameterMapping(parameterType = StepParameterType.TARGET_LOCALE)
+	public void setTargetLocale (LocaleId targetLocale) {
+		this.trgLoc = targetLocale;
 	}
 
 	/**

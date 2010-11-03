@@ -43,7 +43,6 @@ public class Parameters extends AbstractParameters {
 
 	@Override
 	protected void parameters_load(ParametersString buffer) {
-
 		countInBatch = buffer.getBoolean("countInBatch", false);
 		countInBatchItems = buffer.getBoolean("countInBatchItems", false);
 		countInDocuments = buffer.getBoolean("countInDocuments", false);
@@ -53,7 +52,6 @@ public class Parameters extends AbstractParameters {
 
 	@Override
 	protected void parameters_reset() {
-
 		countInBatch = false;
 		countInBatchItems = false;
 		countInDocuments = false;
@@ -63,12 +61,10 @@ public class Parameters extends AbstractParameters {
 
 	@Override
 	protected void parameters_save(ParametersString buffer) {
-
 		buffer.setBoolean("countInBatch", countInBatch);
 		buffer.setBoolean("countInBatchItems", countInBatchItems);
 		buffer.setBoolean("countInDocuments", countInDocuments);
 		buffer.setBoolean("countInSubDocuments", countInSubDocuments);
 		buffer.setBoolean("countInGroups", countInGroups);
 	}
-
 }

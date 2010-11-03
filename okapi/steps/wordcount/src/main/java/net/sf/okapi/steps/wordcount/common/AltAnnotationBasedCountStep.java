@@ -24,8 +24,8 @@ import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.Segment;
-import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.common.resource.TextUnitUtil;
+import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.steps.wordcount.WordCounter;
 
 public abstract class AltAnnotationBasedCountStep extends BaseCountStep {
 
@@ -33,20 +33,20 @@ public abstract class AltAnnotationBasedCountStep extends BaseCountStep {
 	
 	private long countInATA(AltTranslationsAnnotation ata) {
 		if (ata == null) return 0;
-		long res = 0;
 		
 		for (AltTranslation at : ata) {
 			if (at == null) continue;
 			
-			if (accept(at.getType()))
-				res += at.getScore();
+			if (accept(at.getType())) {
+				return WordCounter.count(getSource(), getSourceLocale()); // Word Count metrics are based on counting in source
+			}				
 		}
-		return res;		
+		return 0;		
 	}
 	
 	@Override
-	protected long count(TextUnit textUnit) {
-		return countInATA(TextUnitUtil.getSourceAnnotation(textUnit, AltTranslationsAnnotation.class));
+	protected long count(TextContainer textContainer) {
+		return countInATA(textContainer.getAnnotation(AltTranslationsAnnotation.class));
 	}
 
 	@Override
@@ -57,5 +57,10 @@ public abstract class AltAnnotationBasedCountStep extends BaseCountStep {
 	@Override
 	protected boolean countOnlyTranslatable() {
 		return true;
+	}
+
+	@Override
+	protected CountContext getCountContext() {
+		return CountContext.CC_TARGET;
 	}
 }

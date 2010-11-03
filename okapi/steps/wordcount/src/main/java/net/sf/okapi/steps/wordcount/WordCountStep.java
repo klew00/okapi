@@ -39,7 +39,7 @@ public class WordCountStep extends TokenCountStep {
 	public static final String METRIC = GMX.TotalWordCount; 
 	
 	@Override
-	protected String getMetric() {		
+	protected String getMetric() {
 		return METRIC;
 	}
 
@@ -64,10 +64,8 @@ public class WordCountStep extends TokenCountStep {
 		return "Word Count";
 	}
 
-// Currently the getHelpLocation() in AbstractPipelineStep provides the default 
-//	@Override
-//	public String getHelpLocation() {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}			
+	@Override
+	protected CountContext getCountContext() {
+		return CountContext.CC_SOURCE;
+	}
 }
