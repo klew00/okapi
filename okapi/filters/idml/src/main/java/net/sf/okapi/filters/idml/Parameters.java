@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -21,10 +21,17 @@
 package net.sf.okapi.filters.idml;
 
 import net.sf.okapi.common.BaseParameters;
+import net.sf.okapi.common.EditorFor;
+import net.sf.okapi.common.ParametersDescription;
+import net.sf.okapi.common.uidescription.EditorDescription;
+import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 
-public class Parameters extends BaseParameters {
+@EditorFor(Parameters.class)
+public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
-	public boolean breakAtContent;
+	private static final String EXTRACTNOTES = "extractNotes";
+
+	private boolean extractNotes;
 
 	public Parameters () {
 		reset();
@@ -32,20 +39,44 @@ public class Parameters extends BaseParameters {
 	}
 	
 	public void reset () {
-		breakAtContent = false;
+		extractNotes = false;
 	}
 
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
-		breakAtContent = buffer.getBoolean("breakAtContent", breakAtContent);
+		extractNotes = buffer.getBoolean(EXTRACTNOTES, extractNotes);
 	}
 	
 	@Override
 	public String toString () {
 		buffer.reset();
-		buffer.setBoolean("breakAtContent", breakAtContent);
+		buffer.setBoolean(EXTRACTNOTES, extractNotes);
 		return buffer.toString();
+	}
+
+	public boolean getExtractNotes () {
+		return extractNotes;
+	}
+	
+	public void setExtractNotes (boolean extractNotes) {
+		this.extractNotes = extractNotes;
+	}
+
+	@Override
+	public ParametersDescription getParametersDescription() {
+		ParametersDescription desc = new ParametersDescription(this);
+		desc.add(EXTRACTNOTES, "Extract notes", null);
+		return desc;
+	}
+
+	@Override
+	public EditorDescription createEditorDescription(ParametersDescription paramsDesc) {
+		EditorDescription desc = new EditorDescription("IDML Filter", true, false);
+		
+		desc.addCheckboxPart(paramsDesc.get(EXTRACTNOTES));
+		
+		return desc;
 	}
 
 }

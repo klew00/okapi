@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<idPkg:Story xmlns:idPkg="http://ns.adobe.com/AdobeInDesign/idml/1.0/packaging" DOMVersion="6.0">
-   <Story Self="story1">
-      <Content>Hello World!</Content>
-   </Story>
-</idPkg:Story>

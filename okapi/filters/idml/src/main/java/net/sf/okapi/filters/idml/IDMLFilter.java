@@ -60,6 +60,7 @@ import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
@@ -74,7 +75,6 @@ public class IDMLFilter implements IFilter {
 
 	private final static String MIMETYPE = "application/vnd.adobe.indesign-idml-package";
 	private final static String DOCID = "sd";
-	
 	private final static String ENDID = "end";
 	private final static String SPREADTYPE = "spread";
 	private final static String STORYTYPE = "story";
@@ -96,13 +96,21 @@ public class IDMLFilter implements IFilter {
 	private int nodeCount;
 	private String tuIdPrefix;
 	private Stack<IDMLContext> ctx;
-
+	private HashMap<String, Boolean> embeddedElements;
+	private IdGenerator refGen;
+	private IdGenerator tuIdGen;
+	
 	public IDMLFilter () {
 		try {
 			params = new Parameters();
 			DocumentBuilderFactory docFact = DocumentBuilderFactory.newInstance();
 			docFact.setValidating(false);
 			docBuilder = docFact.newDocumentBuilder();
+			
+			embeddedElements = new HashMap<String, Boolean>();
+			embeddedElements.put("Table", true);
+			embeddedElements.put("Footnote", true);
+			embeddedElements.put("Note", true);
 		}
 		catch ( Throwable e ) {
 			throw new OkapiIOException("Error initializing.\n"+e.getMessage(), e);
@@ -219,8 +227,10 @@ public class IDMLFilter implements IFilter {
 		srcLoc = input.getSourceLocale();
 		spreadIdGen = new IdGenerator(null, "spr");
 		storyIdGen = new IdGenerator(null, "sto");
-		ctx = new Stack<IDMLContext>();
 
+		// Adjust options
+		embeddedElements.put("Note", this.params.getExtractNotes());
+		
 		// Gather the spreads
 		gatherStories();
 
@@ -382,8 +392,13 @@ public class IDMLFilter implements IFilter {
 			// Prepare for traversal
 			nodeCount = 0;
 			tuIdPrefix = storyId+"-";
+			ctx = new Stack<IDMLContext>();
+			refGen = new IdGenerator(null);
+			tuIdGen = new IdGenerator(null);
+			Node topNode = doc.getDocumentElement();
+			ctx.push(new IDMLContext(false, topNode));
 			// Traverse the story
-			processNodes(doc.getDocumentElement());
+			processNodes(topNode);
 			
 			// End the story group
 			Ending ending = new Ending(storyIdGen.getLastId()+ENDID);
@@ -397,10 +412,16 @@ public class IDMLFilter implements IFilter {
 	private void processNodes (Node node) {
 		while ( node != null ) {
 			
-			switch ( node.getNodeType() ) {
-			case Node.TEXT_NODE:
-				if ( !ctx.isEmpty() ) {
-					ctx.peek().addCode(node);
+			if ( node.getNodeType() != Node.ELEMENT_NODE ) {
+				if ( ctx.peek().inScope() ) {
+					// Add to current entry if needed
+					switch ( node.getNodeType() ) {
+					case Node.TEXT_NODE:
+						ctx.peek().addCode(node);
+						break;
+					default:
+						throw new OkapiIOException("Unexpected node type: "+node.getNodeType());
+					}
 				}
 				node = node.getNextSibling();
 				continue;
@@ -408,8 +429,8 @@ public class IDMLFilter implements IFilter {
 			
 			// Else: it's an element
 			Element elem = (Element)node;
-			nodeCount++;
 			String name = elem.getNodeName();
+			nodeCount++;
 			
 			// Process before the children
 			if ( name.equals("Content") ) {
@@ -424,8 +445,39 @@ public class IDMLFilter implements IFilter {
 					continue;
 				}
 			}
+			else if ( embeddedElements.containsKey(name) ) {
+				if ( ctx.peek().inScope() ) {
+					if ( embeddedElements.get(name) ) {
+						//TODO: extract
+						// Create the inline code that holds the reference
+//						String tuId = makeTuId();
+//						ctx.peek().addCode(new Code(TagType.PLACEHOLDER, name,
+//							TextFragment.makeRefMarker(tuId)));
+						String key = refGen.createId();
+						ctx.peek().addCode(new Code(TagType.PLACEHOLDER, name,
+							String.format("<%s id=\"%s\"/>", IDMLSkeleton.NODEREMARKER, key)));
+						ctx.peek().addReference(key, makeNodeReference(ctx.peek().getScopeNode(), node));
+						// Create the new context
+						ctx.push(new IDMLContext(true, node));
+					}
+					else { // Do not extract: Just use a node reference
+						String key = refGen.createId();
+						ctx.peek().addCode(new Code(TagType.PLACEHOLDER, name,
+							String.format("<%s id=\"%s\"/>", IDMLSkeleton.NODEREMARKER, key)));
+						ctx.peek().addReference(key, makeNodeReference(ctx.peek().getScopeNode(), node));
+						// Moves to the next sibling
+						node = elem.getNextSibling();
+						continue;
+					}
+				}
+				else { // Not in scope
+					// Move to the next sibling
+					node = elem.getNextSibling();
+					continue;
+				}
+			}
 			else {
-				if ( !ctx.isEmpty() ) {
+				if ( ctx.peek().inScope() ) {
 					ctx.peek().addStartTag(elem);
 				}
 			}
@@ -437,11 +489,18 @@ public class IDMLFilter implements IFilter {
 			
 			// When coming back from the children
 			if ( name.equals("ParagraphStyleRange") ) {
-				// Trigger the text unit (and pop the current context)
-				ctx.pop().addToQueue(queue, tuIdPrefix);
+				// Trigger the text unit
+				ctx.peek().addToQueue(queue);
+				ctx.peek().leaveScope();
+			}
+			else if ( embeddedElements.containsKey(name) ) {
+				if ( ctx.peek().inScope() ) {
+					//TODO
+				}
+				ctx.pop();
 			}
 			else {
-				if ( !ctx.isEmpty() ) {
+				if ( ctx.peek().inScope() ) {
 					ctx.peek().addEndTag(elem);
 				}
 			}
@@ -449,6 +508,32 @@ public class IDMLFilter implements IFilter {
 			// Then move on to the next sibling
 			node = elem.getNextSibling();
 		}
+	}
+	
+	private NodeReference makeNodeReference (Node scopeNode,
+		Node targetNode)
+	{
+		Node node = targetNode;
+		String name = targetNode.getNodeName();
+		int pos = 0;
+
+		while ( true ) {
+			Node tmp = node.getPreviousSibling();
+			if ( tmp == null ) node = node.getParentNode();
+			else node = tmp;
+			if ( node == scopeNode ) {
+				return new NodeReference(name, pos); // Done
+			}
+			if ( node.getNodeType() == Node.ELEMENT_NODE ) {
+				if ( node.getNodeName().equals(name) ) {
+					pos++;
+				}
+			}
+		}
+	}
+	
+	private String makeTuId () {
+		return tuIdPrefix+tuIdGen.createId();
 	}
 
 	/**
@@ -461,16 +546,16 @@ public class IDMLFilter implements IFilter {
 		NodeList list = ((Element)node).getElementsByTagName("Content");
 		if ( list.getLength() > 1 ) {
 			// Several content: no shortcut
-			ctx.push(new IDMLContext(node, nodeCount));
+			ctx.peek().enterScope(node, makeTuId());
 			return false;
 		}
 		if ( list.getLength() == 1 ) {
 			// We have a single Content element
 			Element cnt = (Element)list.item(0);
 			// Create the text unit
-			TextUnit tu = new TextUnit(tuIdPrefix+nodeCount);
+			TextUnit tu = new TextUnit(makeTuId());
 			tu.setSourceContent(processContent(cnt, null));
-			tu.setSkeleton(new IDMLSkeleton(cnt)); // Merge directly on Content
+			tu.setSkeleton(new IDMLSkeleton(ctx.peek().getTopNode(), cnt)); // Merge directly on Content
 			// And add the new event to the queue
 			queue.add(new Event(EventType.TEXT_UNIT, tu));
 		}

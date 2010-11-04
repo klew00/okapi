@@ -20,6 +20,7 @@
 
 package net.sf.okapi.filters.idml;
 
+import java.util.HashMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -30,10 +31,14 @@ import net.sf.okapi.common.ISkeleton;
 
 public class IDMLSkeleton implements ISkeleton {
 
+	public final static String NODEREMARKER = "SKLREF";
+
 	private ZipFile original; // Used for startDocument
 	private ZipEntry entry; // Used for Startgroup of story
 	private Document doc; // Used for Startgroup of story
-	private Node node; // Used for TextUnit
+	private Node topNode; // Used for TextUnit
+	private Node scopeNode; // Used for TextUnit
+	private HashMap<String, NodeReference> refs; // Used for TextUnit
 	
 	public IDMLSkeleton (ZipFile original) {
 		this.original = original;
@@ -46,8 +51,28 @@ public class IDMLSkeleton implements ISkeleton {
 		this.doc = doc;
 	}
 	
-	public IDMLSkeleton (Node node) {
-		this.node = node;
+	public IDMLSkeleton (Node topNode,
+		Node scopeNode)
+	{
+		this.topNode = topNode;
+		this.scopeNode = scopeNode;
+	}
+	
+	public void addReferenceNode (String id,
+		NodeReference ref)
+	{
+		if ( refs == null ) {
+			refs = new HashMap<String, NodeReference>();
+		}
+		refs.put(id, ref);
+	}
+	
+	public boolean hasReferences () {
+		return (( refs != null ) && ( refs.size() > 0 ));
+	}
+	
+	public HashMap<String, NodeReference> getReferences () {
+		return refs;
 	}
 	
 	public ZipFile getOriginal () {
@@ -62,8 +87,12 @@ public class IDMLSkeleton implements ISkeleton {
 		return doc;
 	}
 
-	public Node getNode () {
-		return node;
+	public Node getTopNode () {
+		return topNode;
+	}
+
+	public Node getScopeNode () {
+		return scopeNode;
 	}
 
 }

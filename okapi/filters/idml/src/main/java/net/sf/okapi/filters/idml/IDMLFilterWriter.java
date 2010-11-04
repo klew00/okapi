@@ -28,6 +28,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Stack;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -47,7 +49,9 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 import net.sf.okapi.common.Event;
@@ -58,6 +62,7 @@ import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.IReferenceable;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextContainer;
@@ -79,6 +84,7 @@ public class IDMLFilterWriter implements IFilterWriter {
 	private ZipEntry entry;
 	private Document doc;
 	private int group;
+	private Stack<IReferenceable> referents;
 	
 	public IDMLFilterWriter () {
         try {
@@ -189,6 +195,7 @@ public class IDMLFilterWriter implements IFilterWriter {
 			IDMLSkeleton skel = (IDMLSkeleton)res.getSkeleton();
 			zipOriginal = skel.getOriginal();
 			group = 0;
+			referents = new Stack<IReferenceable>();
 		
 			// Create the output stream from the path provided
 			tempFile = null;			
@@ -244,8 +251,21 @@ public class IDMLFilterWriter implements IFilterWriter {
 	}
 
 	private void processTextUnit (TextUnit tu) {
+		// If it's a referent, just store it for now.
+		// It'll be merged when the inline code with the reference to it is merged
+		if ( tu.isReferent() ) {
+			referents.push(tu);
+		}
+		else { // Otherwise: merge the text unit now
+			while ( !referents.isEmpty() ) {
+				mergeTextUnit((TextUnit)referents.pop());
+			}
+			mergeTextUnit(tu);
+		}
+	}
+	
+	private void mergeTextUnit (TextUnit tu) {
 		IDMLSkeleton skel = (IDMLSkeleton)tu.getSkeleton();
-		Node node = skel.getNode();
 		
 		// Get the target content, or fall back to the source
 		// Make a copy to not change the original in the resource
@@ -272,21 +292,74 @@ public class IDMLFilterWriter implements IFilterWriter {
 			while ( imp.hasChildNodes() ) {
 				docFrag.appendChild(imp.removeChild(imp.getFirstChild()));
 			}
+
+			// Get live nodes
+			HashMap<String, Node> map = collectLiveReferents(skel); 
 			
 			// Remove the old content
+			// (Reference nodes have been cloned in the skeleton)
+			Node node = skel.getScopeNode();
 			while( node.hasChildNodes() ) {
 				node.removeChild(node.getFirstChild());  
 			}
-			// attache the new content
+			// Attach the new content
 			node.appendChild(docFrag);
+			
+			// If needed, re-inject the nodes referenced in the inline codes.
+			if ( map != null ) {
+				// Re-inject the reference nodes using the skeleton copies
+				NodeList list = ((Element)node).getElementsByTagName(IDMLSkeleton.NODEREMARKER);
+				// The list is dynamic, so replacing the node, decrease the list
+				while ( list.getLength() > 0 ) {
+					Element marker = (Element)list.item(0);
+					String key = marker.getAttribute("id");
+					Node original = map.get(key);
+					if ( original == null ) {
+						logger.severe(String.format("Missing original node for a reference in text unit id='%s'.", tu.getId()));
+						break; // Break now or we'll be in an infinite loop
+					}
+					Element parent = (Element)marker.getParentNode();
+					parent.replaceChild(original, marker);
+				}
+			}
+//			// If needed, re-inject the nodes referenced in the inline codes.
+//			if ( skel.hasReferences() ) {
+//				HashMap<String, NodeReference> map = skel.getReferences();
+//				// Re-inject the reference nodes using the skeleton copies
+//				NodeList list = ((Element)node).getElementsByTagName(IDMLSkeleton.NODEREMARKER);
+//				// The list is dynamic, so replacing the node, decrease the list
+//				while ( list.getLength() > 0 ) {
+//					Element marker = (Element)list.item(0);
+//					String key = marker.getAttribute("id");
+//					Node original = map.get(key);
+//					if ( original == null ) {
+//						logger.severe(String.format("Missing original node for a reference in text unit id='%s'.", tu.getId()));
+//						break; // Break now or we'll be in an infinite loop
+//					}
+//					Element parent = (Element)marker.getParentNode();
+//					parent.replaceChild(original, marker);
+//				}
+//			}
 		}
 		catch ( Throwable e ) {
 			logger.severe(String.format("Error when parsing XML of text unit id='%s'.\n"+e.getMessage(), tu.getId()));
 		}
-		
-		// And re-injected into the DOM 
-		//TODO
-		
+	}
+	
+	private HashMap<String, Node> collectLiveReferents (IDMLSkeleton skel) {
+		if ( !skel.hasReferences() ) return null;
+		// Create an empty list to store the live nodes
+		HashMap<String, Node> map = new HashMap<String, Node>();
+		Element elem = (Element)skel.getTopNode();
+		// Get the list of references
+		HashMap<String, NodeReference> refs = skel.getReferences();
+		for ( String key : refs.keySet() ) {
+			NodeReference ref = refs.get(key);
+			NodeList list = elem.getElementsByTagName(ref.name);
+			Node ori = list.item(ref.position).cloneNode(true);
+			map.put(key, ori);
+		}
+		return map;
 	}
 	
 	private void processStartGroup (StartGroup res) {

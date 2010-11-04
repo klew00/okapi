@@ -30,53 +30,83 @@ import org.w3c.dom.Node;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 
 class IDMLContext {
 	
-	private int nodeCount;
-	private Node startNode;
+	private boolean inScope;
+	private Node topNode;
+	private Node scopeNode;
 	private Node contentNode;
 	private TextFragment tf;
 	private int status;
-	private StringBuilder startTags;
-	private String endTags;
+	private boolean isReferent;
+	private IDMLSkeleton skel;
+	private String tuId;
 
-	public IDMLContext (Node startNode,
-		int nodeCount)
+	/**
+	 * Create a new context.
+	 * @param rootNode Node when starting embedded context. Should be null for the top-level context.
+	 */
+	public IDMLContext (boolean isReferent,
+		Node topNode)
 	{
-		this.nodeCount = nodeCount;
-		this.startNode = startNode;
+		this.isReferent = isReferent;
+		this.topNode = topNode;
+	}
+	
+	public void enterScope (Node scopeNode,
+		String tuId)
+	{
+		this.scopeNode = scopeNode;
+		this.tuId = tuId;
 		tf = new TextFragment();
 		status = 0;
-		startTags = new StringBuilder();
-		endTags = "";
+		inScope = true;
+	}
+
+	public Node getTopNode () {
+		return topNode;
+	}
+	
+	public Node getScopeNode () {
+		return scopeNode;
+	}
+	
+	public void leaveScope () {
+		inScope = false;
+		skel = null;
+	}
+	
+	public boolean inScope () {
+		return inScope;
 	}
 	
 	/**
 	 * Adds the text unit to the given queue.
 	 * @param queue the event queue where to add the event.
-	 * @param tuIdPrefix the prefix to use for the text unit ID.
 	 */
-	public void addToQueue (List<Event> queue,
-		String tuIdPrefix)
-	{
+	public void addToQueue (List<Event> queue) {
 		if ( tf.isEmpty() ) return; // Skip empty entries
 		
 		if ( status == 1 ) {
 			// Only one content: no need for inline codes
 			// Reset the fragment to just the text
 			tf = new TextFragment(TextFragment.getText(tf.getCodedText()));
-			// Make the Content the start node
-			startNode = contentNode;
+			// Make the Content the top node
+			scopeNode = contentNode;
 		}
 		
 		// Create the text unit
-		TextUnit tu = new TextUnit(tuIdPrefix+nodeCount);
+		TextUnit tu = new TextUnit(tuId, null, isReferent);
 		tu.setSourceContent(tf);
-		tu.setSkeleton(new IDMLSkeleton(startNode));
+		if ( skel == null ) {
+			skel = new IDMLSkeleton(topNode, scopeNode);
+		}
+		tu.setSkeleton(skel);
 		// And add the new event to the queue
 		queue.add(new Event(EventType.TEXT_UNIT, tu));
 		// This object should not be called again
@@ -88,40 +118,46 @@ class IDMLContext {
 	 */
 	public void addContent (Element elem) {
 		tf.append(TagType.OPENING, "code", buildStartTag(elem));
-startTags.append(buildStartTag(elem));
 		IDMLFilter.processContent(elem, tf);
 		tf.append(TagType.CLOSING, "code", buildEndTag(elem));
-endTags = buildEndTag(elem) + endTags;
 		status++;
 		contentNode = elem;
-		
-		startTags.setLength(0);
-		//endTags = "";
 	}
 	
+	public void addCode (Code code) {
+		tf.append(code);
+	}
+
 	public void addCode (Node node) {
 		// Assume text node
 		String text = node.getNodeValue();
 		for ( int i=0; i<text.length(); i++ ) {
 			if ( !Character.isWhitespace(text.charAt(i)) ) {
 				tf.append(TagType.PLACEHOLDER, "text", text);
-				startTags.append(text);
 				return;
 			}
 		}
 		// Otherwise: just white spaces: no output
 	}
 	
+	public void addReference (String key,
+		NodeReference ref)
+	{
+		if ( skel == null ) {
+			skel = new IDMLSkeleton(topNode, scopeNode);
+		}
+		// Clone the node, so it's not deleted when merging the surrounding content
+		skel.addReferenceNode(key, ref);
+	}
+	
 	public void addStartTag (Element elem) {
 		tf.append(elem.hasChildNodes() ? TagType.OPENING : TagType.PLACEHOLDER,
 			elem.getNodeName(), buildStartTag(elem));
-		startTags.append(buildStartTag(elem));
 	}
 	
 	public void addEndTag (Element elem) {
 		if ( elem.hasChildNodes() ) {
 			tf.append(TagType.CLOSING, elem.getNodeName(), buildEndTag(elem));
-			endTags = buildEndTag(elem) + endTags;
 		}
 	}
 	

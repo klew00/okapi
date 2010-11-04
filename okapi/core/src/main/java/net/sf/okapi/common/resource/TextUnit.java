@@ -89,7 +89,7 @@ public class TextUnit implements INameable, IReferenceable {
 	/**
 	 * Creates a new TextUnit object with its ID, a text, and a flag indicating if it is a referent or not.
 	 * @param id the identifier of this resource.
-	 * @param sourceText the initial text of the source.
+	 * @param sourceText the initial text of the source (can be null).
 	 * @param isReferent indicates if this resource is a referent (i.e. is referred to
 	 * by another resource) or not.
 	 */
@@ -104,7 +104,7 @@ public class TextUnit implements INameable, IReferenceable {
 	 * Creates a new TextUnit object with its identifier, a text, a flag indicating 
 	 * if it is a referent or not, and a given MIME type.
 	 * @param id the identifier of this resource.
-	 * @param sourceText the initial text of the source.
+	 * @param sourceText the initial text of the source (can be null).
 	 * @param isReferent indicates if this resource is a referent (i.e. is referred to
 	 * by another resource) or not.
 	 * @param mimeType the MIME type identifier for the content of this TextUnit.

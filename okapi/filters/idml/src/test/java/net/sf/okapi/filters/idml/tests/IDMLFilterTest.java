@@ -81,11 +81,12 @@ public class IDMLFilterTest {
 	public void testDoubleExtraction () {
 		// Read all files in the data directory
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
-//		list.add(new InputDocument(root+"Test01.idml", null));
-		list.add(new InputDocument(root+"Test00.idml", null));
-		list.add(new InputDocument(root+"helloworld-1.idml", null));
-		list.add(new InputDocument(root+"ConditionalText.idml", null));
-		
+		list.add(new InputDocument(root+"Test00.idml", "okf_idml@ExtractAll.fprm"));
+		list.add(new InputDocument(root+"Test01.idml", "okf_idml@ExtractAll.fprm"));
+		list.add(new InputDocument(root+"Test02.idml", "okf_idml@ExtractAll.fprm"));
+		list.add(new InputDocument(root+"helloworld-1.idml", "okf_idml@ExtractAll.fprm"));
+		list.add(new InputDocument(root+"ConditionalText.idml", "okf_idml@ExtractAll.fprm"));
+		list.add(new InputDocument(root+"Test03.idml", "okf_idml@ExtractAll.fprm"));
 		
 		RoundTripComparison rtc = new RoundTripComparison(false); // Do not compare skeleton
 		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, locEN, "output"));
