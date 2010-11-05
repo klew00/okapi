@@ -124,7 +124,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	@Override
 	public ParametersDescription getParametersDescription() {
 		ParametersDescription desc = new ParametersDescription(this);
-		desc.add(BIGFILE, "Process big file", null);
+		desc.add(BIGFILE, "Process large file", null);
 		desc.add(FILEMARKER, "File marker", null);
 		desc.add(UPDATESDLTRANSLATIONSTATUS, "Update the <iws:status> translation status (WorldServer-specific)", null);
 		desc.add(TRANSLATIONTYPEVALUE, String.format("Value for '%s'", TRANSLATIONTYPE),
@@ -138,14 +138,16 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public EditorDescription createEditorDescription (ParametersDescription paramsDesc) {
 		EditorDescription desc = new EditorDescription("XLIFF Splitter", true, false);
 		
-		CheckboxPart cbp = desc.addCheckboxPart(paramsDesc.get(BIGFILE));
+		CheckboxPart cbpBF = desc.addCheckboxPart(paramsDesc.get(BIGFILE));
 		TextInputPart tip = desc.addTextInputPart(paramsDesc.get(FILEMARKER));
 		tip.setVertical(false);
-		tip.setMasterPart(cbp, true);
+		tip.setMasterPart(cbpBF, true);
 
 		desc.addSeparatorPart();
 		
-		cbp = desc.addCheckboxPart(paramsDesc.get(UPDATESDLTRANSLATIONSTATUS));
+		CheckboxPart cbp = desc.addCheckboxPart(paramsDesc.get(UPDATESDLTRANSLATIONSTATUS));
+		// This option is not supported when using 'big files' mode (for now)
+		cbp.setMasterPart(cbpBF, false);
 		
 		// translation_type
 		tip = desc.addTextInputPart(paramsDesc.get(TRANSLATIONTYPEVALUE));
