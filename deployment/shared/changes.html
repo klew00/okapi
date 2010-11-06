@@ -72,6 +72,10 @@ distribution.</p>
 	<li>Added support for \uHHHH notation on all modes</li>
 </ul>
 	</li>
+	<li>XLIFF Splitter Step:<ul>
+	<li>Improved support for large documents. This fixes issues #146 and #147.</li>
+</ul>
+	</li>
 </ul>
 	</li>
 	<li>Filters:<ul>
@@ -79,11 +83,18 @@ distribution.</p>
 	<li>Fixed issue #145 about PI being moved.</li>
 </ul>
 	</li>
+	<li>IDML Filter:<ul>
+	<li>Refactored the filter completely. The filter is still alpha, but has 
+	been improved significantly.</li>
+</ul>
+	</li>
 </ul>
 	</li>
 	<li>Libraries:<ul>
 	<li>Completely refactored the IQuery, QueryResult, QueryManager and related 
 	classes.</li>
+	<li>Removed the ScoreAnnotation and ScoreInfo classes that were deprecated 
+	in M7. Use AltTranslationsAnnotation instead.</li>
 </ul>
 	</li>
 </ul>

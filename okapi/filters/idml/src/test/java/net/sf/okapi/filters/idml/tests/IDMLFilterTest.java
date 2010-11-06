@@ -29,6 +29,7 @@ import net.sf.okapi.common.filters.RoundTripComparison;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.filters.idml.IDMLFilter;
 import static org.junit.Assert.assertEquals;
@@ -87,6 +88,10 @@ public class IDMLFilterTest {
 		list.add(new InputDocument(root+"helloworld-1.idml", "okf_idml@ExtractAll.fprm"));
 		list.add(new InputDocument(root+"ConditionalText.idml", "okf_idml@ExtractAll.fprm"));
 		list.add(new InputDocument(root+"Test03.idml", "okf_idml@ExtractAll.fprm"));
+
+// For local test only, comment out for SVN		
+//		list.add(new InputDocument(root+"private/enlaso_001.idml", "../okf_idml@ExtractAll.fprm"));
+//		list.add(new InputDocument(root+"private/enlaso_002.idml", "../okf_idml@ExtractAll.fprm"));
 		
 		RoundTripComparison rtc = new RoundTripComparison(false); // Do not compare skeleton
 		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, locEN, "output"));

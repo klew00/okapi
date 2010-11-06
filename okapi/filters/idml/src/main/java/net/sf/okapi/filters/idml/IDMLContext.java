@@ -35,7 +35,7 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 
-class IDMLContext {
+public class IDMLContext {
 	
 	private boolean inScope;
 	private Node topNode;
