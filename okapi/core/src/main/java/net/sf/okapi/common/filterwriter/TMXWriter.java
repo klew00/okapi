@@ -311,6 +311,7 @@ public class TMXWriter {
 		        	}
 				}
     		}
+    		if ( trgSeg.text.isEmpty() ) continue; // Skip possible empty entries
     		// Write out the segment
        		writeTU(tf, trgSeg.text,
    				String.format("%s_s%s", tuid, srcSeg.id), attributes);
@@ -420,6 +421,7 @@ public class TMXWriter {
     					srcFrag = tu.getSource().getFirstContent();
     				}
     				TextFragment trgFrag = at.getTarget().getFirstContent();
+    				if ( trgFrag.isEmpty() ) continue; // Skip possible empty entries
     				// Write out the segment
     				writeTU(srcFrag, trgFrag, null, null, trgLoc);
     			}
@@ -444,6 +446,7 @@ public class TMXWriter {
     	   			srcFrag = srcSeg.text;
     	    	}
     	    	TextFragment trgFrag = at.getTarget().getFirstContent();
+    	    	if ( trgFrag.isEmpty() ) continue; // Skip possible empty entries
     			// Write out the segment
     	   		writeTU(srcFrag, trgFrag, null, null, trgLoc);
     		}

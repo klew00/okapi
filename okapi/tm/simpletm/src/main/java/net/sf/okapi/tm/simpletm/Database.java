@@ -81,6 +81,7 @@ public class Database {
 	private boolean penalizeTargetWithDifferentCodes = true;
 	private MatchType exactMatchType;
 	private MatchType fuzzyMatchType;
+	private String origin;
 
 	public Database () {
 		try {
@@ -149,6 +150,7 @@ public class Database {
 			
 			// Open the connection, this creates the DB if none exists
 			conn = DriverManager.getConnection("jdbc:h2:"+pathNoExt, "sa", "");
+			origin = Util.getFilename(path, true);
 	
 			// Create the source table
 			stm = conn.createStatement();
@@ -190,6 +192,7 @@ public class Database {
 			}
 			if ( !(new File(pathNoExt+DATAFILE_EXT)).exists() ) return;
 			conn = DriverManager.getConnection("jdbc:h2:"+pathNoExt, "sa", "");
+			origin = Util.getFilename(path, true);
 		}
 		catch ( SQLException e ) {
 			throw new RuntimeException(e);
@@ -347,6 +350,7 @@ public class Database {
 			String queryCodes = query.getCodes().toString();
 			do {
 				QueryResult qr = new QueryResult();
+				qr.origin = origin;
 				qr.source = new TextFragment();
 				qr.source.setCodedText(result.getString(1),
 					Code.stringToCodes(result.getString(2)), false);

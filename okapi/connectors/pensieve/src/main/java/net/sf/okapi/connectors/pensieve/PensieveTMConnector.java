@@ -57,6 +57,7 @@ public class PensieveTMConnector extends BaseConnector implements ITMQuery {
 	private String rootDir;
 	private JSONParser parser;
 	private String basePart;
+	private String origin;
 	
 	public PensieveTMConnector () {
 		params = new Parameters();
@@ -132,12 +133,16 @@ public class PensieveTMConnector extends BaseConnector implements ITMQuery {
 	public void open () {
 		if ( params.getUseServer() ) {
 			parser = new JSONParser();
+			// tmName is set when setting languages for the server
+			origin = null;
 		}
 		else {
 			// Create a seeker (the TM must exist: we are just querying)
 			if ( seeker != null ) seeker.close();
-			seeker = TmSeekerFactory.createFileBasedTmSeeker(
-				Util.fillRootDirectoryVariable(params.getDbDirectory(), rootDir));
+			origin = Util.fillRootDirectoryVariable(params.getDbDirectory(), rootDir); 
+			seeker = TmSeekerFactory.createFileBasedTmSeeker(origin);
+			// For the real origin value, keep just the filename
+			origin = Util.getFilename(origin, true);
 		}
 	}
 
@@ -189,6 +194,7 @@ public class PensieveTMConnector extends BaseConnector implements ITMQuery {
 			qr.source = hit.getTu().getSource().getContent();
 			qr.target = hit.getTu().getTarget().getContent();
 			qr.matchType = hit.getMatchType();
+			qr.origin = origin;
 			results.add(qr);
 		}
 		if ( results.size() > 0 ) {
@@ -220,7 +226,7 @@ public class PensieveTMConnector extends BaseConnector implements ITMQuery {
 				result.source = new TextFragment((String)map.get("source"));
 				result.target = new TextFragment((String)map.get("target"));
 				result.score = ((Double)map.get("score")).intValue();
-				result.origin = getName();
+				result.origin = origin;
 				results.add(result);
 			}
 			if ( !Util.isEmpty(list) ) current = 0;
@@ -275,12 +281,15 @@ public class PensieveTMConnector extends BaseConnector implements ITMQuery {
 		LocaleId targetLocale)
 	{
 		super.setLanguages(sourceLocale, targetLocale);
-		
-		String host = params.getHost();
-		if ( host.endsWith("/") || host.endsWith("\\") ) {
-			host = host.substring(0, host.length()-1);
+	
+		if ( params.getUseServer() ) {
+			String host = params.getHost();
+			if ( host.endsWith("/") || host.endsWith("\\") ) {
+				host = host.substring(0, host.length()-1);
+			}
+			basePart = String.format("%s/search/%s/%s/", host, srcLoc.toBCP47(), trgLoc.toBCP47());
+			origin = host;
 		}
-		basePart = String.format("%s/search/%s/%s/", host, srcLoc.toBCP47(), trgLoc.toBCP47());
 	}
 
 	@Override
