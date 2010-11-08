@@ -46,6 +46,7 @@ import net.sf.okapi.steps.wordcount.WordCountStep;
 import net.sf.okapi.steps.wordcount.categorized.ExactMatchWordCountStep;
 import net.sf.okapi.steps.wordcount.categorized.FuzzyMatchWordCountStep;
 import net.sf.okapi.steps.wordcount.categorized.LocalContextExactMatchWordCountStep;
+import net.sf.okapi.steps.wordcount.categorized.PrevVersionExactMatchWordCountStep;
 import net.sf.okapi.steps.wordcount.categorized.RepetitionWordCountStep;
 import net.sf.okapi.steps.wordcount.common.BaseCounter;
 import net.sf.okapi.steps.wordcount.common.GMX;
@@ -86,6 +87,13 @@ public class ScopingReportStep extends CompoundStep {
 						new XParameter("countInBatch", true)
 						)
 				);
+		list.add(
+				new XPipelineStep(
+						new PrevVersionExactMatchWordCountStep(),
+						new XParameter("countInBatchItems", true),
+						new XParameter("countInBatch", true)
+						)
+				);		
 		list.add(
 				new XPipelineStep(
 						new ExactMatchWordCountStep(),
