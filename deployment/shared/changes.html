@@ -29,7 +29,7 @@ distribution.</p>
 	<li>Added the &quot;Plugins Location&quot; option in the &quot;User Preferences&quot; dialog 
 	box.</li>
 	<li>Create Translation package:<ul>
-	<li>Refactored the leveraging mechanism (e.g. Added &lt;alt-trans&gt; output in 
+	<li>Refactored heavily the leveraging mechanism and the output (e.g. added &lt;alt-trans&gt; output in 
 	Generic XLIFF)</li>
 </ul>
 	</li>
@@ -43,6 +43,7 @@ distribution.</p>
 	adding documents to the session.</li>
 	<li>Implemented tab-delimited format for the report, and added choice 
 	between HTML or tab-delimited in Configuration dialog.</li>
+	<li>Added support for term list in CSV format.</li>
 </ul>
 	</li>
 	<li>Steps:<ul>
@@ -56,6 +57,8 @@ distribution.</p>
 	target from the source).</span></li>
 	<li><span class="str">Added the Scoping Report Step (generates word-count 
 	reports)</span></li>
+	<li><span class="str">Added the XML Characters Fixing Step (replaces invalid 
+	XML characters by markers)</span></li>
 	<li><span class="str">Leveraging Step:</span><ul>
 	<li><span class="str">Added the threshold option for the match to copy into 
 	the target.</span></li>
@@ -70,6 +73,15 @@ distribution.</p>
 	<li>Added option to replace on source and or target when using filter 
 	events.</li>
 	<li>Added support for \uHHHH notation on all modes</li>
+	<li><u><b>IMPORTANT:</b></u> The behavior of this step has changed when no 
+	target is in the text unit (in filter event mode):<ul>
+	<li>Before M10: A copy of the source was automatically copied as the target 
+	and the sreach and replaced performed on that text.</li>
+	<li>Starting with M10: text unit with empty target are simply not processed. 
+	You must now have a Create Target step before this step to copy the source 
+	into the target.</li>
+</ul>
+	</li>
 </ul>
 	</li>
 	<li>XLIFF Splitter Step:<ul>

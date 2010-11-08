@@ -97,7 +97,6 @@ public class QueryResult implements Comparable<QueryResult> {
 	/**
 	 * String indicating the origin of the result (e.g. name of a TM).
 	 * This value can be null and depends on each type of resource.
-	 * It should be set to <code>Util.ORIGIN_MT</code> for results of machine translation. 
 	 */
 	public String origin;
 	

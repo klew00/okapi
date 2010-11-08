@@ -538,6 +538,18 @@ public class PipelineWrapper {
 			availableSteps.put(step.id, step);
 
 			ps = (IPipelineStep)Class.forName(
+				"net.sf.okapi.steps.xmlcharfixing.XMLCharFixingStep").newInstance();
+			params = ps.getParameters();
+			step = new StepInfo(ps.getClass().getSimpleName(),
+				ps.getName(), ps.getDescription(), ps.getClass().getName(), null,
+				params.getClass().getName());
+			if ( params != null ) {
+				step.paramsData = params.toString();
+				peMapper.addDescriptionProvider("net.sf.okapi.steps.xmlcharfixing.Parameters", step.paramsClass);
+			}
+			availableSteps.put(step.id, step);
+			
+			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.xliffsplitter.XliffSplitterStep").newInstance();
 			params = ps.getParameters();
 			step = new StepInfo(ps.getClass().getSimpleName(),
@@ -549,18 +561,17 @@ public class PipelineWrapper {
 			}
 			availableSteps.put(step.id, step);
 
-//TEST as plugin
-//			ps = (IPipelineStep)Class.forName(
-//				"net.sf.okapi.steps.xmlvalidation.XMLValidationStep").newInstance();
-//			params = ps.getParameters();
-//			step = new StepInfo(ps.getClass().getSimpleName(),
-//				ps.getName(), ps.getDescription(), ps.getClass().getName(), null,
-//				params.getClass().getName());
-//			if ( params != null ) {
-//				step.paramsData = params.toString();
-//				peMapper.addDescriptionProvider("net.sf.okapi.steps.xmlvalidation.Parameters", step.paramsClass);
-//			}
-//			availableSteps.put(step.id, step);
+			ps = (IPipelineStep)Class.forName(
+				"net.sf.okapi.steps.xmlvalidation.XMLValidationStep").newInstance();
+			params = ps.getParameters();
+			step = new StepInfo(ps.getClass().getSimpleName(),
+				ps.getName(), ps.getDescription(), ps.getClass().getName(), null,
+				params.getClass().getName());
+			if ( params != null ) {
+				step.paramsData = params.toString();
+				peMapper.addDescriptionProvider("net.sf.okapi.steps.xmlvalidation.Parameters", step.paramsClass);
+			}
+			availableSteps.put(step.id, step);
 			
 			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.xsltransform.XSLTransformStep").newInstance();

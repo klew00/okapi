@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2010 by the Okapi Framework contributors
+  Copyright (C) 2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.linebreakconversion;
+package net.sf.okapi.steps.xmlcharfixing;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -26,9 +26,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.URI;
+import java.util.IllegalFormatException;
+import java.util.logging.Logger;
 
 import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
@@ -42,29 +43,25 @@ import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.RawDocument;
 
 @UsingParameters(Parameters.class)
-public class LineBreakConversionStep extends BasePipelineStep {
+public class XMLCharFixingStep extends BasePipelineStep {
 
-	private static final int BUFFER_SIZE = 1024;
+	private final Logger LOGGER = Logger.getLogger(getClass().getName());
 	
 	private Parameters params;
 	private URI outputURI;
+	private int count;
 
-	public LineBreakConversionStep () {
+	public XMLCharFixingStep () {
 		params = new Parameters();
 	}
 	
-	@StepParameterMapping(parameterType = StepParameterType.OUTPUT_URI)
-	public void setOutputURI (URI outputURI) {
-		this.outputURI = outputURI;
-	}
-	
 	public String getDescription () {
-		return "Convert the type of line-breaks in a text-based file."
+		return "Fixes invalid characters in XML documents."
 			+ " Expects: raw document. Sends back: raw document.";
 	}
 
 	public String getName () {
-		return "Line-Break Conversion";
+		return "XML Characters Fixing";
 	}
 
 	@Override
@@ -77,18 +74,38 @@ public class LineBreakConversionStep extends BasePipelineStep {
 		this.params = (Parameters)params;
 	}
  
+	@StepParameterMapping(parameterType = StepParameterType.OUTPUT_URI)
+	public void setOutputURI (URI outputURI) {
+		this.outputURI = outputURI;
+	}
+	
+	@Override
+	protected Event handleStartBatch (Event event) {
+		count = 0;
+		return event;
+	}
+	
+	@Override
+	protected Event handleEndBatch (Event event) {
+		LOGGER.info(String.format("Number of invalid characters replaced = %d", count));
+		return event;
+	}
+	
 	@Override
 	protected Event handleRawDocument (Event event) {
-		RawDocument rawDoc;
+		FileOutputStream output = null;
 		BufferedReader reader = null;
 		OutputStreamWriter writer = null;
+		
 		try {
-			rawDoc = (RawDocument)event.getResource();
-			
-			BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(rawDoc.getStream(), rawDoc.getEncoding());
+			RawDocument rd = event.getRawDocument();
+
+			// Open the input
+			BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(rd.getStream(), rd.getEncoding());
 			detector.detectAndRemoveBom();
-			rawDoc.setEncoding(detector.getEncoding());
-			reader = new BufferedReader(new InputStreamReader(detector.getInputStream(), rawDoc.getEncoding()));
+			rd.setEncoding(detector.getEncoding());
+			String lineBreak = detector.getNewlineType().toString();
+			reader = new BufferedReader(new InputStreamReader(detector.getInputStream(), rd.getEncoding()));
 			
 			// Open the output
 			File outFile;
@@ -98,72 +115,70 @@ public class LineBreakConversionStep extends BasePipelineStep {
 			}
 			else {
 				try {
-					outFile = File.createTempFile("okp-lbc_", ".tmp");
+					outFile = File.createTempFile("okp-xcf_", ".tmp");
 				}
 				catch ( Throwable e ) {
 					throw new OkapiIOException("Cannot create temporary output.", e);
 				}
 				outFile.deleteOnExit();
 			}
-			OutputStream output = new FileOutputStream(outFile);
-			
-			writer = new OutputStreamWriter(new BufferedOutputStream(output), rawDoc.getEncoding());
+			output = new FileOutputStream(outFile);
+			writer = new OutputStreamWriter(new BufferedOutputStream(output), rd.getEncoding());
 			// Write BOM if there was one
-			Util.writeBOMIfNeeded(writer, detector.hasUtf8Bom(), rawDoc.getEncoding());
-			
-			// Set the variables
-			char[] buf = new char[BUFFER_SIZE];
-			int length = 0;
-			int i;
-			int done = 0;
-			
-			// Process the file
-			while ( (length = reader.read(buf, 0, BUFFER_SIZE-1)) > 0 ) {
-				// Check if you need to read the next char to avoid splitting cases
-				if ( buf[length-1] == '\r'  ) {
-					int count = reader.read(buf, length, 1);
-					if ( count > -1 ) length++;
-				}
-				// Reset 'done' flag on second pass after it was set
-				if ( done == 1 ) done++; else done = 0;
-				// Replace line-breaks
-				int start = 0;
-				for ( i=0; i<length; i++ ) {
-					if ( buf[i] == '\n') {
-						if (( i != 0 ) || ( done == 0 )) {
-							writer.write(buf, start, i-start);
-							writer.write(params.getLineBreak());
+			Util.writeBOMIfNeeded(writer, detector.hasUtf8Bom(), rd.getEncoding());
+
+			// In XML 1.0 the valid characters are:
+			// #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
+
+			// Process
+			StringBuilder tmp = new StringBuilder();
+			String line;
+			while ( (line = reader.readLine()) != null ) {;
+				// Process that line
+				tmp.setLength(0);
+				tmp.append(line);
+				int ch;
+				for ( int i=0; i<tmp.length(); i++ ) {
+					switch ( (ch = tmp.codePointAt(i)) ) {
+					case 0x0009: // Tab is allowed
+					case 0x000A: // Line-feed is allowed
+					case 0x000D: // Carriage-return is allowed
+						continue;
+					default:
+						if (( ch >= 0x0020 ) && ( ch <= 0xD7FF )) {
+							continue; // Valid
 						}
-						start = i+1;
-					}
-					else if ( buf[i] == '\r') {
-						writer.write(buf, start, i-start);
-						writer.write(params.getLineBreak());
-						// Check if it's a \r\n
-						if ( i+1 < length ) {
-							if ( buf[i+1] == '\n' ) {
-								i++; // Skip it
-							}
+						if (( ch >= 0xE000 ) && ( ch <= 0xFFFF )) {
+							continue; // Valid
 						}
-						start = i+1;
-						// We could be splitting a \r\n, so let's remember
-						done = 1;
+						if (( ch >= 0x10000 ) && ( ch <= 0x10FFFF )) {
+							i++; // Skip extra character for the code-point
+							continue; // Valid
+						}
+						// Else: it's an invalid character
+						String repl = String.format(params.getReplacement(), ch);
+						tmp.replace(i, i+(ch>0xFFFF ? 2 : 1), repl);
+						i += (repl.length()-1); // Move cursor just before next
+						count++;
+						continue;
 					}
 				}
-				// Write out the remainder of the buffer
-				if ( length-start > 0 ) {
-					writer.write(buf, start, length-start);
-				}
+				
+				// Line has been processed, write it back
+				writer.write(tmp.toString()+lineBreak);
 			}
-			
+
 			// Done: close the output
 			writer.close();
 			// Creates the new RawDocument
-			event.setResource(new RawDocument(outFile.toURI(), rawDoc.getEncoding(), 
-				rawDoc.getSourceLocale(), rawDoc.getTargetLocale()));
+			event.setResource(new RawDocument(outFile.toURI(), rd.getEncoding(), 
+				rd.getSourceLocale(), rd.getTargetLocale()));
 		}
-		catch ( IOException e ) {
-			throw new OkapiIOException("IO error while converting.", e);
+		catch ( IllegalFormatException e ) {
+			LOGGER.severe(String.format("Invalid replacement format: '%s'", params.getReplacement()));
+		}
+		catch ( Exception e ) {
+			LOGGER.severe("Error while processing XML for invalid characters.");
 		}
 		finally {
 			try {
@@ -178,7 +193,8 @@ public class LineBreakConversionStep extends BasePipelineStep {
 				throw new OkapiIOException("IO error while closing.", e);
 			}
 		}
-		
+
 		return event;
 	}
+
 }

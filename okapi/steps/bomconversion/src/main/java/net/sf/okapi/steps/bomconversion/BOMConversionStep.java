@@ -46,7 +46,6 @@ public class BOMConversionStep extends BasePipelineStep {
 	private final byte[] BOM_UTF16BE = {(byte)0xFE,(byte)0xFF};
 	private final byte[] BOM_UTF16LE = {(byte)0xFF,(byte)0xFE};
 
-	private boolean isDone;
 	private Parameters params;
 	private byte[] buffer;
 	private URI outputURI;
@@ -70,11 +69,6 @@ public class BOMConversionStep extends BasePipelineStep {
 	}
 
 	@Override
-	public boolean isDone () {
-		return isDone;
-	}
-
-	@Override
 	public IParameters getParameters () {
 		return params;
 	}
@@ -87,7 +81,6 @@ public class BOMConversionStep extends BasePipelineStep {
 	@Override
 	protected Event handleStartBatchItem (Event event) {
 		buffer = new byte[1024*2];
-		isDone = false;
 		return event;
 	}
 
@@ -196,7 +189,6 @@ public class BOMConversionStep extends BasePipelineStep {
 			throw new OkapiIOException("IO error while converting.", e);
 		}
 		finally {
-			isDone = true;
 			try { // Close the files
 				if ( output != null ) {
 					output.close();

@@ -403,12 +403,11 @@
 			<artifactId>okapi-step-scopingreport</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-<!--TEST as plugin		<dependency>
+		<dependency>
 			<groupId>net.sf.okapi.steps</groupId>
 			<artifactId>okapi-step-xmlvalidation</artifactId>
 			<version>${project.version}</version>
 		</dependency>
--->
 		<dependency>
 			<groupId>net.sf.okapi.steps</groupId>
 			<artifactId>okapi-step-idbasedaligner</artifactId>

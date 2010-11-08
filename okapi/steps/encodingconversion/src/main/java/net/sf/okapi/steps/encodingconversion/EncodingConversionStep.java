@@ -69,7 +69,6 @@ public class EncodingConversionStep extends BasePipelineStep {
 	private String prevBuf;
 	private boolean isXML;
 	private boolean isHTML;
-	private boolean isDone;
 	private URI outputURI;
 	private URI inputURI;
 	private String outputEncoding;
@@ -102,11 +101,6 @@ public class EncodingConversionStep extends BasePipelineStep {
 
 	public String getName () {
 		return "Encoding Conversion";
-	}
-
-	@Override
-	public boolean isDone () {
-		return isDone;
 	}
 
 	@Override
@@ -181,12 +175,6 @@ public class EncodingConversionStep extends BasePipelineStep {
 	}
 	
 	@Override
-	protected Event handleStartBatchItem (Event event) {
-		isDone = false;
-		return event;
-	}
-
-	@Override
 	protected Event handleRawDocument (Event event) {
 		RawDocument rawDoc = (RawDocument)event.getResource();
 		BufferedReader reader = null;
@@ -222,7 +210,7 @@ public class EncodingConversionStep extends BasePipelineStep {
 			}
 
 			// Open the input document 
-			//TODO: Where did we reset the reader - cann't call this twice unless we reset it
+			//TODO: Where did we reset the reader - can't call this twice unless we reset it
 			reader = new BufferedReader(rawDoc.getReader());
 			logger.info("Input encoding: " + inputEncoding);
 			
@@ -347,7 +335,6 @@ public class EncodingConversionStep extends BasePipelineStep {
 			throw new RuntimeException(e);
 		}
 		finally {
-			isDone = true;
 			try {
 				if ( writer != null ) {
 					writer.close();
