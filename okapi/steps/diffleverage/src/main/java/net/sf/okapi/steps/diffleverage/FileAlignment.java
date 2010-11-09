@@ -18,6 +18,10 @@ public class FileAlignment<T> {
 		this.oldTrgFile = oldTrgFile;
 	}
 
+	public FileAlignment(FileLikeThing<T> newFile) {
+		this.newFile = newFile;
+	}
+
 	public FileLikeThing<T> getNew() {
 		return newFile;
 	}

@@ -95,10 +95,15 @@ public class FileAligner<T> implements Iterable<FileAlignment<T>> {
 			if (o != null) {
 				if (oldTrgFilesMap != null) {
 					FileLikeThing<T> t = oldTrgFilesMap.get(key);
+					// we found an old source and matching target
 					alignedFiles.add(new FileAlignment<T>(f, o, t));
 				} else {
+					// we found an old source file without a matching target
 					alignedFiles.add(new FileAlignment<T>(f, o));
 				}
+			} else {
+				// this is a new file not found in the old source
+				alignedFiles.add(new FileAlignment<T>(f));
 			}
 		}
 	}
