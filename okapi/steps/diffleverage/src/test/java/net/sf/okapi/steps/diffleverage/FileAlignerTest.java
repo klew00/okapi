@@ -65,8 +65,13 @@ public class FileAlignerTest {
 		Assert.assertTrue(a1.getNew().getFileLikeThing().equals("C:/yyy/one"));
 		Assert.assertTrue(a1.getOldTrg().getFileLikeThing().equals("C:/xxx/one"));
 
+		FileAlignment<String> a2 = alignments.get(1);
+		Assert.assertTrue(a2.getNew().getFileLikeThing().equals("C:/yyy/two"));
+		Assert.assertNull(a2.getOldSrc());
+		Assert.assertNull(a2.getOldTrg());
+		
 		FileAlignment<String> a3 = alignments.get(2);
 		Assert.assertTrue(a3.getNew().getFileLikeThing().equals("C:/yyy/yyy/three"));
-		Assert.assertTrue(a3.getOldTrg().getFileLikeThing().equals("C:/xxx/yyy/three"));
+		Assert.assertTrue(a3.getOldTrg().getFileLikeThing().equals("C:/xxx/yyy/three"));				
 	}
 }
