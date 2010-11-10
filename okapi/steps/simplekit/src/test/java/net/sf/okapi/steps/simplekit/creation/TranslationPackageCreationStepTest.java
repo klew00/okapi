@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.simplekit.writer;
+package net.sf.okapi.steps.simplekit.creation;
 
 import static org.junit.Assert.*;
 
@@ -41,7 +41,7 @@ import net.sf.okapi.steps.simplekit.creation.TranslationPackageCreationStep;
 import org.junit.Before;
 import org.junit.Test;
 
-public class SimpleKitWriterStepTest {
+public class TranslationPackageCreationStepTest {
 	
 	private String root;
 	private LocaleId locEN = LocaleId.fromString("en");

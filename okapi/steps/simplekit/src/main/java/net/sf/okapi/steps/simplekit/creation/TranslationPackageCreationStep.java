@@ -34,12 +34,12 @@ import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.StartDocument;
-import net.sf.okapi.steps.simplekit.xliff.XLIFFPackageWriter;
+import net.sf.okapi.steps.simplekit.common.IPackageWriter;
 
 @UsingParameters(Parameters.class)
 public class TranslationPackageCreationStep extends BasePipelineStep {
 
-	private XLIFFPackageWriter writer;
+	private IPackageWriter writer;
 	private Parameters params;
 	private LocaleId srcLoc;
 	private LocaleId trgLoc;
@@ -109,7 +109,7 @@ public class TranslationPackageCreationStep extends BasePipelineStep {
 			handleStartBatch(event);
 			break;
 		case END_BATCH:
-//			writer.writeEndPackage(false);
+			writer.writeEndPackage(false);
 			break;
 		case START_DOCUMENT:
 			handleStartDocument(event);
@@ -122,22 +122,36 @@ public class TranslationPackageCreationStep extends BasePipelineStep {
 	
 	@Override
 	protected Event handleStartBatch (Event event) {
-//		writer = new SimpleKitWriter();
-//		writer.setParameters(params);
-//		docId = 0;
-////TODO: input/output roots
-//inputRoot = rootDir;
-//outputRoot = rootDir;
-//
-//		String resolvedOutputDir = params.getPackageDirectory() + File.separator + params.getPackageName();
-//		resolvedOutputDir = Util.fillRootDirectoryVariable(resolvedOutputDir, rootDir);
-//		Util.deleteDirectory(resolvedOutputDir, false);
-//		
-//		String pkgId = UUID.randomUUID().toString();
-//		// Use the hash code of the input root for project ID, just to have one
-//		writer.setInformation(srcLoc, trgLoc, Util.makeId(inputRoot),
-//			resolvedOutputDir, pkgId, inputRoot, getClass().getName());
-//		writer.writeStartPackage();
+		try {
+			// Get the format (class name)
+			String writerClass = params.getWriterClass();
+			writer = (IPackageWriter)Class.forName(writerClass).newInstance();
+			writer.setParameters(params);
+			docId = 0;
+
+//TODO: input/output roots
+inputRoot = rootDir;
+outputRoot = rootDir;
+
+			String resolvedOutputDir = params.getPackageDirectory() + File.separator + params.getPackageName();
+			resolvedOutputDir = Util.fillRootDirectoryVariable(resolvedOutputDir, rootDir);
+			Util.deleteDirectory(resolvedOutputDir, false);
+			
+			String pkgId = UUID.randomUUID().toString();
+			// Use the hash code of the input root for project ID, just to have one
+			writer.setInformation(srcLoc, trgLoc, Util.makeId(inputRoot),
+				resolvedOutputDir, pkgId, inputRoot, getClass().getName());
+			writer.writeStartPackage();
+		}
+		catch ( InstantiationException e ) {
+			throw new RuntimeException("Error creating writer class.", e);
+		}
+		catch ( IllegalAccessException e ) {
+			throw new RuntimeException("Error creating writer class.", e);
+		}
+		catch ( ClassNotFoundException e ) {
+			throw new RuntimeException("Error creating writer class.", e);
+		}
 		return event;
 	}
 	

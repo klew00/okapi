@@ -21,14 +21,19 @@
 package net.sf.okapi.steps.simplekit.creation;
 
 import net.sf.okapi.common.BaseParameters;
+import net.sf.okapi.common.IParameters;
 
 public class Parameters extends BaseParameters {
 
+	static final String WRITERCLASS = "writerClass"; //$NON-NLS-1$
+	static final String WRITEROPTIONS = "writerOptions"; //$NON-NLS-1$
 	static final String PACKAGENAME = "packageName"; //$NON-NLS-1$
 	static final String PACKAGEDIRECTORY = "packageDirectory"; //$NON-NLS-1$ 
 	static final String MESSAGE = "message"; //$NON-NLS-1$
 	static final String USEMANIFEST = "useManifest"; //$NON-NLS-1$
 	
+	private String writerClass;
+	private String writerOptions;
 	private String packageName;
 	private String packageDirectory;
 	private String message;
@@ -40,6 +45,8 @@ public class Parameters extends BaseParameters {
 	
 	@Override
 	public void reset() {
+		writerClass = "net.sf.okapi.steps.simplekit.xliff.XLIFFPackageWriter";
+		writerOptions = "";
 		packageName = "pack1";
 		packageDirectory = "${rootDir}";
 		// Internal
@@ -51,10 +58,10 @@ public class Parameters extends BaseParameters {
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
-		
+		writerClass = buffer.getString(WRITERCLASS, writerClass);
+		writerOptions = buffer.getGroup(WRITEROPTIONS);
 		packageName = buffer.getString(PACKAGENAME, packageName);
 		packageDirectory = buffer.getString(PACKAGEDIRECTORY, packageDirectory);
-
 		// Internal
 		message = buffer.getString(MESSAGE, message);
 		useManifest = buffer.getBoolean(USEMANIFEST, useManifest);
@@ -63,6 +70,8 @@ public class Parameters extends BaseParameters {
 	@Override
 	public String toString () {
 		buffer.reset();
+		buffer.setParameter(WRITERCLASS, writerClass);
+		buffer.setGroup(WRITEROPTIONS, writerOptions);
 		buffer.setParameter(PACKAGENAME, packageName);
 		buffer.setParameter(PACKAGEDIRECTORY, packageDirectory);
 		// Internal
@@ -71,10 +80,30 @@ public class Parameters extends BaseParameters {
 		return buffer.toString();
 	}
 
+	public String getWriterClass () {
+		return writerClass;
+	}
+
+	public void setWriterClass (String writerClass) {
+		this.writerClass = writerClass;
+	}
+
+	public String getWriterOptions () {
+		return writerOptions;
+	}
+
+	public void setWriterOptions (String writerOptions) {
+		this.writerOptions = writerOptions;
+	}
+	
 	public String getMessage () {
 		return message;
 	}
 
+	public void setMessage (String message) {
+		this.message = message;
+	}
+	
 	public String getPackageName () {
 		return packageName;
 	}
@@ -91,16 +120,12 @@ public class Parameters extends BaseParameters {
 		this.packageDirectory = packageDirectory;
 	}
 	
-	public void setMessage (String message) {
-		this.message = message;
-	}
-	
-	public void setUseManifest (boolean useManifest) {
-		this.useManifest = useManifest;
-	}
-
 	public boolean getUseManifest () {
 		return useManifest;
+	}
+
+	public void setUseManifest (boolean useManifest) {
+		this.useManifest = useManifest;
 	}
 
 }
