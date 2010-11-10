@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.simplekit.writer;
+package net.sf.okapi.steps.simplekit.xliff;
 
 import java.io.File;
 import java.net.URI;
