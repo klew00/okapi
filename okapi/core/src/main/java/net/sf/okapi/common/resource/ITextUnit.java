@@ -45,13 +45,50 @@ public interface ITextUnit extends INameable, IReferenceable {
 		Segment trgSeg,
 		LocaleId trgLoc);
 	
-	//addSegment(int index, Segment srcSeg) - inserts the given segment at the specified position in the list, empty target segments are created at the same position in targets 
-	//addSegment(int index, Segment srcSeg, Segment trgSeg, LocaleId? trgLoc) 
-	//setSrcSegment(int index, Segment src) - replaces the segment at given index with the given segment 
-	//Maybe not: setSrcSegment(int index, TextFragment? tf) - replaces the content of the segment at index with the given TF 
+	/**
+	 * Inserts a given source segment at the specified position in the list of segments.
+	 * A corresponding empty segment is created at the same position in each target.
+	 * @param index the segment index position.
+	 * @param srcSeg the segment to insert.
+	 */
+	public void addSegment (int index,
+		Segment srcSeg);
 	
-	//setTrgSegment(int index, Segment src, LocaleId? trgLoc) - same for the target segment 
-	//setTrgSegment(int index, TextFragment? tf, LocaleId? trgLoc)
+	/**
+	 * Inserts a given source segment and its corresponding target at a given position.
+	 * A corresponding empty segment is created at the same position in each of the remaining targets.
+	 * @param index  the segment index position.
+	 * @param srcSeg the source segment to insert.
+	 * @param trgSeg the corresponding target segment.
+	 * @param trgLoc the locale of the target segment.
+	 */
+	public void addSegment (int index,
+		Segment srcSeg,
+		Segment trgSeg,
+		LocaleId trgLoc);
+	
+	/**
+	 * Replaces a source segment at a given position.
+	 * @param index the index position.
+	 * @param srcSeg the new source segment to place at the position.
+	 */
+//What if the position is out-of-bounds?
+//What is the segment ID is different from the ID of the current segment?
+	public void setSourceSegment (int index,
+		Segment srcSeg);
+
+	/**
+	 * Replaces a target segment at a given position.
+	 * @param index the index position.
+	 * @param trgSeg the new target segment to place at the position.
+	 * @param trgLoc the locale of the target segment.
+	 */
+//What if the locale does not exists?
+//What if the position is out-of-bounds?
+//What is the segment ID is different from the ID of the current segment?
+	public void setTargetSegment (int index,
+		Segment trgSeg,
+		LocaleId trgLoc);
 
 	/**
 	 * Removes the given segment and its corresponding matches from the source and all the targets.
@@ -157,6 +194,7 @@ public interface ITextUnit extends INameable, IReferenceable {
 	 * @return the target object for this text unit for the given locale,
 	 * or null if it does not exist.
 	 */
+//Many methods rely of the null return	
 	public TextContainer getTarget (LocaleId locId);
 
     /**

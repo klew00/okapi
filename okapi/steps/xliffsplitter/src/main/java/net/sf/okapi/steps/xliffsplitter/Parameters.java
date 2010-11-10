@@ -146,8 +146,6 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.addSeparatorPart();
 		
 		CheckboxPart cbp = desc.addCheckboxPart(paramsDesc.get(UPDATESDLTRANSLATIONSTATUS));
-		// This option is not supported when using 'big files' mode (for now)
-		cbp.setMasterPart(cbpBF, false);
 		
 		// translation_type
 		tip = desc.addTextInputPart(paramsDesc.get(TRANSLATIONTYPEVALUE));

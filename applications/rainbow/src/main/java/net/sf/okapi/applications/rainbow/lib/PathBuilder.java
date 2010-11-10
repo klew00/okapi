@@ -61,16 +61,16 @@ public class PathBuilder {
 
 		if ( input.indexOf("${SrcLoc") != -1 ) {
 			String[] res = LocaleId.splitLanguageCode(srcLang);
-			input = input.replace("${SrcLoc}", srcLang.replace('-', '_'));
-			input = input.replace("${SrcLocLang}", res[0]);
-			input = input.replace("${SrcLocReg}", res[1]);
+			input = input.replace("${SrcLoc}", String.format("%s_%s", res[0].toLowerCase(), res[1].toUpperCase()));
+			input = input.replace("${SrcLocLang}", res[0].toLowerCase());
+			input = input.replace("${SrcLocReg}", res[1].toUpperCase());
 		}
 		
 		if ( input.indexOf("${TrgLoc") != -1 ) {
 			String[] res = LocaleId.splitLanguageCode(trgLang);
-			input = input.replace("${TrgLoc}", trgLang.replace('-', '_'));
-			input = input.replace("${TrgLocLang}", res[0]);
-			input = input.replace("${TrgLocReg}", res[1]);
+			input = input.replace("${TrgLoc}", String.format("%s_%s", res[0].toLowerCase(), res[1].toUpperCase()));
+			input = input.replace("${TrgLocLang}", res[0].toLowerCase());
+			input = input.replace("${TrgLocReg}", res[1].toUpperCase());
 		}
 
 		return input;
