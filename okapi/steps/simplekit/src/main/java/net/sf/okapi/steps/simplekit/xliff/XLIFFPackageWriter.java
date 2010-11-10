@@ -25,6 +25,7 @@ import java.io.File;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filterwriter.XLIFFWriter;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
@@ -37,26 +38,30 @@ import net.sf.okapi.steps.simplekit.creation.Parameters;
 /**
  * Implements {@link IPackageWriter} for generic XLIFF translation packages.
  */
-class XLIFFPackageWriter extends BasePackageWriter {
+public class XLIFFPackageWriter extends BasePackageWriter {
+
+	private static final String EXTENSION = ".xlf";
 
 	private Parameters params;
+	private Options options;
 	private XLIFFWriter xlfWriter;
 	
 	public XLIFFPackageWriter () {
 		super();
 		params = new Parameters();
+		options = new Options();
+		xlfWriter = new XLIFFWriter();
 	}
 	
 	@Override
 	public String getPackageType () {
-		// TODO Auto-generated method stub
-		return null;
+		return "xliff";
 	}
 
 	@Override
 	public String getReaderClass () {
-		// TODO Auto-generated method stub
-		return null;
+		// TODO: set reader class
+		return "TODO";
 	}
 
 	@Override
@@ -75,6 +80,71 @@ class XLIFFPackageWriter extends BasePackageWriter {
 	@Override
 	public IParameters getParameters () {
 		return params;
+	}
+
+	@Override
+	public void writeStartPackage () {
+		// Set source and target if they are not set yet
+		// This allow other package types to be derived from this one.
+		String tmp = manifest.getSourceLocation();
+		if ( Util.isEmpty(tmp) ) {
+			manifest.setSourceLocation("work");
+		}
+		tmp = manifest.getTargetLocation();
+		if ( Util.isEmpty(tmp) ) {
+			manifest.setTargetLocation("work");
+		}
+		tmp = manifest.getSkeletonLocation();
+		if ( Util.isEmpty(tmp) ) {
+			manifest.setSkeletonLocation("skeleton");
+		}
+		tmp = manifest.getDoneLocation();
+		if ( Util.isEmpty(tmp) ) {
+			manifest.setDoneLocation("done");
+		}
+		super.writeStartPackage();
+	}
+
+	@Override
+	public void createOutput (int docID,
+		String relativeSourcePath,
+		String relativeTargetPath,
+		String sourceEncoding,
+		String targetEncoding,
+		String filterId,
+		IParameters filterParams,
+		EncoderManager encoderManager)
+	{
+		relativeWorkPath = relativeSourcePath;
+		
+        close();
+        xlfWriter = new XLIFFWriter();
+        xlfWriter.setCopySource(options.getCopySource());
+        xlfWriter.setPlaceholderMode(options.getGMode());
+
+        // OmegaT specific options
+		if ( manifest.getPackageType().equals("omegat") ) {
+			// OmegaT does not support sub-folder, so we flatten the structure
+			// and make sure identical filename do not clash
+			relativeWorkPath = String.format("%d.%s", docID,
+				Util.getFilename(relativeSourcePath, true));
+			
+			// Do not export items with translate='no'
+			options.setIncludeNoTranslate(false);
+			xlfWriter.setIncludeNoTranslate(false);
+			
+			// If translated found: replace the target text by the source.
+			// Trusting the target will be gotten from the TMX from original
+			// This to allow editing of pre-translated items in XLIFF editors
+			// that use directly the <target> element.
+			xlfWriter.setUseSourceForTranslated(true);
+		}
+		params.setUseManifest(true);
+
+		relativeWorkPath += EXTENSION;
+		setUseManifest(params.getUseManifest());
+		super.createOutput(docID, relativeSourcePath, relativeTargetPath,
+			sourceEncoding, targetEncoding, filterId, filterParams, encoderManager);
 	}
 
 	@Override
@@ -107,7 +177,9 @@ class XLIFFPackageWriter extends BasePackageWriter {
 
 	@Override
 	public void setParameters (IParameters params) {
-		params = (Parameters)params;
+		this.params = (Parameters)params;
+		// Get the writer-specific parameters
+		options.fromString(this.params.getWriterOptions());
 	}
 	
 	private void processStartDocument (StartDocument resource) {

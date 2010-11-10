@@ -326,19 +326,12 @@ public abstract class BasePackageWriter implements IPackageWriter {
 					done = true;
 				}
 			}
-//TODO			
-//			if ( !done ) {
-//				ScoresAnnotation scores = tu.getTarget(trgLoc).getAnnotation(ScoresAnnotation.class);
-//				if ( scores != null ) {
-//					writeScoredItem(tu);
-//				}
-//				else { // Has some text in target, but not approved
-//					// Output to un-approved TMX only it's different from source
-//					if ( tc.compareTo(tu.getSource(), true) != 0 ) {
-//						tmxWriterUnApproved.writeItem(tu, null);
-//					}
-//				}
-//			}
+			if ( !done ) {
+				// Write leveraged data
+				writeScoredItem(tu);
+				// Write existing translation not yet approved
+				tmxWriterUnApproved.writeItem(tu, null);
+			}
 		}
 
 		// Check for alternates

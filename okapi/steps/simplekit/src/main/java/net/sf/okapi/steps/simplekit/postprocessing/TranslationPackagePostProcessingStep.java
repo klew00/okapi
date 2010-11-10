@@ -30,7 +30,7 @@ public class TranslationPackagePostProcessingStep extends BasePipelineStep {
 	}
 
 	public String getName () {
-		return "Translation Package Post-Processing";
+		return "Translation Package Post-Processing (EXPERIMENTAL)";
 	}
 
 }

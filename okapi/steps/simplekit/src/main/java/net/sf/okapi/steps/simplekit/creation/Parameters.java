@@ -21,7 +21,6 @@
 package net.sf.okapi.steps.simplekit.creation;
 
 import net.sf.okapi.common.BaseParameters;
-import net.sf.okapi.common.IParameters;
 
 public class Parameters extends BaseParameters {
 

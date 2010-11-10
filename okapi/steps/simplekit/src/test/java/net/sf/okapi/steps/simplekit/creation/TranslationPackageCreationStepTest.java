@@ -76,12 +76,12 @@ public class TranslationPackageCreationStepTest {
 		outputURI = new URI(inputURI.getPath().replace("test01.", "test01.out."));
 		pdriver.addBatchItem(new BatchItemContext(inputURI, "UTF-8", "okf_openoffice", outputURI, "UTF-8", locEN, locFR));
 		
-//		pdriver.processBatch();
-//
-//		File file = new File(root+"pack1/work/test01.properties.xlf");
-//		assertTrue(file.exists());
-//		file = new File(root+"pack1/work/subDir/test01.odt.xlf");
-//		assertTrue(file.exists());
+		pdriver.processBatch();
+
+		File file = new File(root+"pack1/work/test01.properties.xlf");
+		assertTrue(file.exists());
+		file = new File(root+"pack1/work/subDir/test01.odt.xlf");
+		assertTrue(file.exists());
 		
 	}
 	

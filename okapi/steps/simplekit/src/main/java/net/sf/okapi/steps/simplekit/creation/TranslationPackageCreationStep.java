@@ -54,6 +54,7 @@ public class TranslationPackageCreationStep extends BasePipelineStep {
 
 	public TranslationPackageCreationStep () {
 		super();
+		params = new Parameters();
 	}
 
 	@Override
@@ -64,7 +65,7 @@ public class TranslationPackageCreationStep extends BasePipelineStep {
 
 	@Override
 	public String getName () {
-		return "Translation Package Creation";
+		return "Translation Package Creation (EXPERIMENTAL)";
 	}
 
 	@StepParameterMapping(parameterType = StepParameterType.SOURCE_LOCALE)
@@ -116,7 +117,7 @@ public class TranslationPackageCreationStep extends BasePipelineStep {
 			break;
 		}
 		// All events then go to the actual writer
-		return event; //writer.handleEvent(event);
+		return writer.handleEvent(event);
 	}
 
 	

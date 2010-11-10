@@ -142,7 +142,6 @@ public class CSVReaderTest {
 			return list;
 		}
 		catch ( Throwable e ) {
-			e.printStackTrace();
 			throw new RuntimeException(e.getMessage());
 		}
 	}
