@@ -45,12 +45,12 @@ public class FileAlignerTest {
 				oldSrcFilesRoot);
 		aligner.align();
 		List<FileAlignment<String>> alignments = aligner.getAlignments();
-		Assert.assertTrue(alignments.size() == 2);
+		Assert.assertTrue(alignments.size() == 3);
 		FileAlignment<String> a1 = alignments.get(0);
 		Assert.assertTrue(a1.getNew().getFileLikeThing().equals("C:/yyy/one"));
 
-		FileAlignment<String> a2 = alignments.get(1);
-		Assert.assertTrue(a2.getNew().getFileLikeThing().equals("C:/yyy/yyy/three"));
+		FileAlignment<String> a3 = alignments.get(2);
+		Assert.assertTrue(a3.getNew().getFileLikeThing().equals("C:/yyy/yyy/three"));
 	}
 	
 	@Test
@@ -59,14 +59,14 @@ public class FileAlignerTest {
 				oldSrcFilesRoot, oldTrgFilesRoot);
 		aligner.align();
 		List<FileAlignment<String>> alignments = aligner.getAlignments();
-		Assert.assertTrue(alignments.size() == 2);
+		Assert.assertTrue(alignments.size() == 3);
 		
 		FileAlignment<String> a1 = alignments.get(0);
 		Assert.assertTrue(a1.getNew().getFileLikeThing().equals("C:/yyy/one"));
 		Assert.assertTrue(a1.getOldTrg().getFileLikeThing().equals("C:/xxx/one"));
 
-		FileAlignment<String> a2 = alignments.get(1);
-		Assert.assertTrue(a2.getNew().getFileLikeThing().equals("C:/yyy/yyy/three"));
-		Assert.assertTrue(a2.getOldTrg().getFileLikeThing().equals("C:/xxx/yyy/three"));
+		FileAlignment<String> a3 = alignments.get(2);
+		Assert.assertTrue(a3.getNew().getFileLikeThing().equals("C:/yyy/yyy/three"));
+		Assert.assertTrue(a3.getOldTrg().getFileLikeThing().equals("C:/xxx/yyy/three"));
 	}
 }
