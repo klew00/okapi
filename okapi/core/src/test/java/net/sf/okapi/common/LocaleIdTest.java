@@ -56,6 +56,16 @@ public class LocaleIdTest {
 		new LocaleId("", true);
 	}
 	
+    @Test(expected = IllegalArgumentException.class)
+    public void testConstructorFrombadXIdentifier () {
+		new LocaleId("z-test", true);
+	}
+	
+    @Test
+    public void testConstructorFromGoodXIdentifier () {
+		new LocaleId("x-custom", true);
+	}
+	
     @Test //(expected = IllegalArgumentException.class)
     public void testConstructorFromBadIdentifier () {
 		// Try without normalization

@@ -319,9 +319,17 @@ public final class LocaleId implements Comparable<Object> {
 		// Basic validation: at least two characters long
 		// and starting with "cc" or "ccc" or "cc-" or "ccc-"
 		int n = tmp.indexOf('-');
-		if ((( n != 2 ) && ( n != 3 ) && ( n != -1)) || (tmp.length() < 2 )) {
-			throw new IllegalArgumentException(String.format(
-				"The locale identifier '%s' is invalid.", tmp));
+		if ( n == 1 ) {
+			if ( tmp.charAt(0) != 'x' ) {
+				throw new IllegalArgumentException(String.format(
+					"The locale identifier '%s' is invalid.", tmp));
+			}
+		}
+		else {
+			if ((( n != 2 ) && ( n != 3 ) && ( n != -1)) || (tmp.length() < 2 )) {
+				throw new IllegalArgumentException(String.format(
+					"The locale identifier '%s' is invalid.", tmp));
+			}
 		}
 		if ( !ALLOWED_CHARS.matcher(tmp).matches() ) {
 			throw new IllegalArgumentException(String.format(
