@@ -46,6 +46,14 @@ public class Segment extends TextPart {
 	}
 	
 	/**
+	 * Creates an empty Segment object with a given identifier.
+	 */
+	public Segment (String id) {
+		super(new TextFragment());
+		this.id = id;
+	}
+	
+	/**
 	 * Creates a Segment object with a given identifier and a given
 	 * text fragment.
 	 * @param id identifier for the new segment (Can be null).

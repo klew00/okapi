@@ -32,7 +32,7 @@ public interface ITextUnit extends INameable, IReferenceable {
 	 * Empty corresponding segments are created in all target in this text unit.
 	 * @param srcSeg the source segment to add.
 	 */
-	public void addSegment (Segment srcSeg);
+	public void appendSegment (Segment srcSeg);
 	
 	/**
 	 * Adds a segment at the end of the source content, along with a corresponding target segment.
@@ -41,7 +41,7 @@ public interface ITextUnit extends INameable, IReferenceable {
 	 * @param trgSeg the corresponding segment for the given target. 
 	 * @param trgLoc the locale id of the target.
 	 */
-	public void addSegment (Segment srcSeg,
+	public void appendSegment (Segment srcSeg,
 		Segment trgSeg,
 		LocaleId trgLoc);
 	
@@ -51,7 +51,7 @@ public interface ITextUnit extends INameable, IReferenceable {
 	 * @param index the segment index position.
 	 * @param srcSeg the segment to insert.
 	 */
-	public void addSegment (int index,
+	public void insertSegment (int index,
 		Segment srcSeg);
 	
 	/**
@@ -62,7 +62,7 @@ public interface ITextUnit extends INameable, IReferenceable {
 	 * @param trgSeg the corresponding target segment.
 	 * @param trgLoc the locale of the target segment.
 	 */
-	public void addSegment (int index,
+	public void insertSegment (int index,
 		Segment srcSeg,
 		Segment trgSeg,
 		LocaleId trgLoc);
@@ -72,8 +72,10 @@ public interface ITextUnit extends INameable, IReferenceable {
 	 * @param index the index position.
 	 * @param srcSeg the new source segment to place at the position.
 	 */
-//What if the position is out-of-bounds?
+//What if the position is out-of-bounds? -> exception
 //What is the segment ID is different from the ID of the current segment?
+//	-> replace with new one, also in targets
+// if new id exists, then change it so it's unique
 	public void setSourceSegment (int index,
 		Segment srcSeg);
 
@@ -83,7 +85,7 @@ public interface ITextUnit extends INameable, IReferenceable {
 	 * @param trgSeg the new target segment to place at the position.
 	 * @param trgLoc the locale of the target segment.
 	 */
-//What if the locale does not exists?
+//What if the locale does not exists? -> create it
 //What if the position is out-of-bounds?
 //What is the segment ID is different from the ID of the current segment?
 	public void setTargetSegment (int index,
@@ -92,9 +94,10 @@ public interface ITextUnit extends INameable, IReferenceable {
 
 	/**
 	 * Removes the given segment and its corresponding matches from the source and all the targets.
-	 * @param seg the segment to remove. 
+	 * @param seg the segment to remove.
+	 * @return true if remove success 
 	 */
-	public void removeSegment (Segment seg);
+	public boolean removeSegment (Segment seg);
 	
 	/**
 	 * Gets the target segment corresponding to a given source segment.
@@ -106,19 +109,14 @@ public interface ITextUnit extends INameable, IReferenceable {
 	public Segment getCorrespondingTarget (Segment srcSeg,
 		LocaleId trgLoc);
 	
-//TODO: what about the cases where we have s0-t1?
-//Do we create an empty source segment 9and corresponding ones in all other targets?	
+//TODO: what about the cases where we have s0-t1? -> 0-1 = empty - non-empty
+//Do we create an empty source segment (and corresponding ones in all other targets?	
 	/**
 	 * Gets the source segment corresponding to a given target segment.
 	 * @param trgSeg the target segment of the corresponding source segment to look for. 
 	 * @return the corresponding source segment.
 	 */
 	public Segment getCorrespondingSource (Segment trgSeg);
-	
-	/**
-	 * Joins all segments for all source and target contents.
-	 */
-	public void joinAll ();
 	
 	/**
 	 * Collapses all the segments listed in the aligned pairs for given locale.
@@ -156,15 +154,15 @@ public interface ITextUnit extends INameable, IReferenceable {
 	 * @param srcSeg1 the first segment to merge. This segment keeps it's ID. 
 	 * @param srcSeg2 the second segment to merge with the first.
 	 */
+	// exception -> if out-of-order in between
 	public void mergeSource (Segment srcSeg1,
 		Segment srcSeg2);
 
 	/**
-	 * Collapses all segments in source and all targets.
-	 * The remaining segment keep the information of the previous first one.
+	 * Joins all segments for all source and target contents.
 	 */
-	public void collapseAll ();
-
+	public void joinAll ();
+	
 	/** 
 	 * Gets the status of the alignment for this text unit.
 	 * @return the status of the alignment for this text unit.
@@ -174,6 +172,12 @@ public interface ITextUnit extends INameable, IReferenceable {
 	
 	
 	//==== Existing method
+
+	/**
+	 * Indicates if the source text of this TextUnit is empty.
+	 * @return true if the source text of this TextUnit is empty, false otherwise.
+	 */
+	public boolean isEmpty ();
 	
 	/**
 	 * Gets the source object for this TextUnit (a {@link TextContainer} object).
@@ -195,7 +199,7 @@ public interface ITextUnit extends INameable, IReferenceable {
 	 * or null if it does not exist.
 	 */
 //Many methods rely of the null return	
-	public TextContainer getTarget (LocaleId locId);
+	public TextContainer getTarget_DIFF (LocaleId locId);
 
     /**
 	 * Sets the target object for this TextUnit for a given locale.
@@ -260,7 +264,7 @@ public interface ITextUnit extends INameable, IReferenceable {
 	 * for example when calling {@link #synchronizeSourceSegmentation(LocaleId)}.
 	 * @param segmenter the segmenter to use to create the segments.
 	 */
-	public void createSourceSegments (ISegmenter segmenter);
+	public void segmentSource (ISegmenter segmenter);
 	
 	/**
 	 * Segments the specified target content based on the rules provided by a given ISegmenter.
@@ -271,7 +275,7 @@ public interface ITextUnit extends INameable, IReferenceable {
 	 * @param segmenter the segmenter to use to create the segments.
 	 * @param targetLocale {@link LocaleId} of the target we want to segment.
 	 */
-	public void createTargetSegments (ISegmenter segmenter,
+	public void segmentTarget (ISegmenter segmenter,
 		LocaleId targetLocale);
 	
 
