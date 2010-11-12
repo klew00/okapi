@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.text.DateFormat;
 import java.util.Date;
 import java.util.LinkedList;
 
@@ -129,7 +130,8 @@ public class ScopingReportStep extends CompoundStep {
 	protected Event handleStartBatch(Event event) {
 		params = getParameters(Parameters.class);
 		gen.reset();
-		gen.setField("DATE", (new Date()).toString());
+		DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
+		gen.setField("DATE", df.format(new Date()));
 		gen.setField("PROJECT_NAME", params.getProjectName());
 		return super.handleStartBatch(event);
 	}
