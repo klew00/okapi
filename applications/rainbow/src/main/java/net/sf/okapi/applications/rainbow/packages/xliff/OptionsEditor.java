@@ -119,7 +119,7 @@ public class OptionsEditor implements IParametersEditor {
 		chkCopySource.setText("Copy source text in target if no target is available");
 		
 		chkIncludeAltTrans = new Button(cmpTmp, SWT.CHECK);
-		chkIncludeAltTrans.setText("Inciude <alt-trans> elements");
+		chkIncludeAltTrans.setText("Include <alt-trans> elements");
 		
 		//--- Dialog-level buttons
 

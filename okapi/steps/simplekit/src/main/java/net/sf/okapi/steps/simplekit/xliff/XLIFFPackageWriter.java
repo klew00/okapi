@@ -120,7 +120,7 @@ public class XLIFFPackageWriter extends BasePackageWriter {
         close();
         xlfWriter = new XLIFFWriter();
         xlfWriter.setCopySource(options.getCopySource());
-        xlfWriter.setPlaceholderMode(options.getGMode());
+        xlfWriter.setPlaceholderMode(options.getPlaceholderMode());
 
         // OmegaT specific options
 		if ( manifest.getPackageType().equals("omegat") ) {

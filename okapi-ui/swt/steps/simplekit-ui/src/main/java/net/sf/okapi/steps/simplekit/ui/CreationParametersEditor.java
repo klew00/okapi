@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -20,6 +20,8 @@
 
 package net.sf.okapi.steps.simplekit.ui;
 
+import java.util.ArrayList;
+
 import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.IHelp;
@@ -30,6 +32,8 @@ import net.sf.okapi.common.ui.ISWTEmbeddableParametersEditor;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.TextAndBrowsePanel;
 import net.sf.okapi.common.ui.UIUtil;
+import net.sf.okapi.common.ui.genericeditor.GenericEditor;
+import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 import net.sf.okapi.steps.simplekit.creation.Parameters;
 
 import org.eclipse.swt.SWT;
@@ -61,6 +65,11 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 	private List lbTypes;
 	private Button btOptions;
 	private Text edDescription;
+	private GenericEditor gedit;
+	private ArrayList<String> optEditors;
+	private ArrayList<String> writers;
+	private ArrayList<IParameters> optStrings;
+	private IContext context;
 	
 	public boolean edit (IParameters params,
 		boolean readOnly,
@@ -69,8 +78,10 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		boolean bRes = false;
 		try {
 			shell = null;
+			this.context = context;
 			help = (IHelp)context.getObject("help");
 			this.params = (Parameters)params;
+			
 			shell = new Shell((Shell)context.getObject("shell"), SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 			create((Shell)context.getObject("shell"), readOnly);
 			return showDialog();
@@ -100,8 +111,11 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		IParameters paramsObject,
 		IContext context)
 	{
-		params = (Parameters)paramsObject; 
 		shell = (Shell)context.getObject("shell");
+		help = (IHelp)context.getObject("help");
+		this.context = context;
+		params = (Parameters)paramsObject; 
+
 		createComposite(parent);
 		setData();
 	}
@@ -151,6 +165,14 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 	}
 	
 	private void createComposite (Composite parent) {
+		optEditors = new ArrayList<String>();
+		optStrings = new ArrayList<IParameters>();
+		writers = new ArrayList<String>();
+		// XLIFF options
+		optEditors.add("net.sf.okapi.steps.simplekit.xliff.Options");
+		optStrings.add(createParameters(optEditors.get(0)));
+		writers.add("net.sf.okapi.steps.simplekit.xliff.XLIFFPackageWriter");
+
 		mainComposite = new Composite(parent, SWT.BORDER);
 		mainComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
 		GridLayout layout = new GridLayout();
@@ -183,8 +205,8 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		lbTypes.add("Generic XLIFF");
 		//lbTypes.add("OmegaT");
 		//lbTypes.add("Original + RTF layer");
-		// Access the list through key rather than index
-		lbTypes.setData("xliff"); //\tomegat\trtf");
+		// Data of the list matches the writer's name.
+		lbTypes.setData("net.sf.okapi.steps.simplekit.xliff.XLIFFPackageWriter"); //\tomegat\trtf");
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.heightHint = 70;
 		gdTmp.horizontalSpan = 2;
@@ -241,7 +263,7 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		}
 		switch ( n ) {
 		case 0: // XLIFF
-			btOptions.setEnabled(true);
+			btOptions.setEnabled(optEditors.get(n)!=null);
 			edDescription.setText("Simple package where all files to translate are extracted to XLIFF. You can translate this package with any XLIFF editor.");
 			break;
 //		case 1: // OmegaT
@@ -255,15 +277,38 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		}
 	}
 
+	private IParameters createParameters (String className) {
+		IParameters p = null;
+		try {
+			p = (IParameters)Class.forName(className).newInstance();
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getLocalizedMessage(), null);
+		}
+		return p;
+	}
+	
 	private void editOptions () {
-		int n = lbTypes.getSelectionIndex();
-		if ( n == -1 ) return;
-		switch ( n ) {
-		case 0: // XLIFF
-//			OptionsEditor dlg = new OptionsEditor();
-//			context.setObject("shell", shell);
-//			dlg.edit(xliffOptions, false, context);
-			break;
+		try {
+			int n = lbTypes.getSelectionIndex();
+			if ( n == -1 ) return;
+			// Create the editor description
+			IEditorDescriptionProvider descProv = (IEditorDescriptionProvider)Class.forName(
+				optEditors.get(n)).newInstance();
+			// Create the generic editor if needed
+			if ( gedit == null ) {
+				gedit = new GenericEditor();
+			}
+			// Get the parameters
+			IParameters p = optStrings.get(n);
+			if ( !gedit.edit(p, descProv, false, context) ) {
+				return; // Cancel
+			}
+			// Else: Save the data
+			optStrings.set(n, p);
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
 		}
 	}
 	
@@ -279,6 +324,15 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 	private void setData () {
 		pnlPackageDir.setText(params.getPackageDirectory());
 		edPackageName.setText(params.getPackageName());
+
+		String current = params.getWriterClass();
+		int n = 0;
+		for ( String str : writers ) {
+			if ( str.equals(current) ) break; // Found it
+			else n++;
+		}
+		lbTypes.setSelection(n);
+		updatePackageType();
 	}
 
 	private boolean saveData () {

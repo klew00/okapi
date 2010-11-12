@@ -21,16 +21,20 @@
 package net.sf.okapi.steps.simplekit.xliff;
 
 import net.sf.okapi.common.BaseParameters;
+import net.sf.okapi.common.ParametersDescription;
+import net.sf.okapi.common.uidescription.CheckboxPart;
+import net.sf.okapi.common.uidescription.EditorDescription;
+import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 
-public class Options extends BaseParameters {
+public class Options extends BaseParameters implements IEditorDescriptionProvider {
 
-	private static final String GMODE = "gMode"; //$NON-NLS-1$
+	private static final String PLACEHOLDERMODE = "placeholderMode"; //$NON-NLS-1$
 	private static final String INCLUDENOTRANSLATE = "includeNoTranslate"; //$NON-NLS-1$ 
 	private static final String SETAPPROVEDASNOTRANSLATE = "setApprovedAsNoTranslate"; //$NON-NLS-1$
 	private static final String COPYSOURCE = "copySource"; //$NON-NLS-1$
 	private static final String INCLUDEALTTRANS = "includeAltTrans"; //$NON-NLS-1$
 	
-	private boolean gMode;
+	private boolean placeholderMode;
 	private boolean includeNoTranslate;
 	private boolean setApprovedAsNoTranslate;
 	private boolean copySource;
@@ -42,7 +46,7 @@ public class Options extends BaseParameters {
 	
 	@Override
 	public void reset() {
-		gMode = false;
+		placeholderMode = false;
 		includeNoTranslate = true;
 		setApprovedAsNoTranslate = false;
 		copySource = true;
@@ -53,7 +57,7 @@ public class Options extends BaseParameters {
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
-		gMode = buffer.getBoolean(GMODE, gMode);
+		placeholderMode = buffer.getBoolean(PLACEHOLDERMODE, placeholderMode);
 		includeNoTranslate = buffer.getBoolean(INCLUDENOTRANSLATE, includeNoTranslate);
 		setApprovedAsNoTranslate = buffer.getBoolean(SETAPPROVEDASNOTRANSLATE, setApprovedAsNoTranslate);
 		copySource = buffer.getBoolean(COPYSOURCE, copySource);
@@ -68,7 +72,7 @@ public class Options extends BaseParameters {
 	@Override
 	public String toString () {
 		buffer.reset();
-		buffer.setParameter(GMODE, gMode);
+		buffer.setParameter(PLACEHOLDERMODE, placeholderMode);
 		buffer.setBoolean(INCLUDENOTRANSLATE, includeNoTranslate);
 		buffer.setBoolean(SETAPPROVEDASNOTRANSLATE, setApprovedAsNoTranslate);
 		buffer.setBoolean(COPYSOURCE, copySource);
@@ -76,12 +80,12 @@ public class Options extends BaseParameters {
 		return buffer.toString();
 	}
 
-	public boolean getGMode () {
-		return gMode;
+	public boolean getPlaceholderMode () {
+		return placeholderMode;
 	}
 
-	public void setGMode (boolean gMode) {
-		this.gMode = gMode;
+	public void setPlaceholderMode (boolean placeholderMode) {
+		this.placeholderMode = placeholderMode;
 	}
 	
 	public boolean getIncludeNoTranslate () {
@@ -114,6 +118,29 @@ public class Options extends BaseParameters {
 
 	public void setIncludeAltTrans (boolean includeAltTrans) {
 		this.includeAltTrans = includeAltTrans;
+	}
+
+	@Override
+	public ParametersDescription getParametersDescription() {
+		ParametersDescription desc = new ParametersDescription(this);
+		desc.add(PLACEHOLDERMODE, "Use <g></g> and <x/> notation", null);
+		desc.add(INCLUDENOTRANSLATE, "Include non-translatable text units", null);
+		desc.add(SETAPPROVEDASNOTRANSLATE, "Set approved entries as non-translatable", null);
+		desc.add(COPYSOURCE, "Copy source text in target if no traget is available", null);
+		desc.add(INCLUDEALTTRANS, "Include <alt-trans> elements", null);
+		return desc;
+	}
+
+	@Override
+	public EditorDescription createEditorDescription(ParametersDescription paramsDesc) {
+		EditorDescription desc = new EditorDescription("Generic XLIFF Package", true, false);
+		CheckboxPart cbp1 = desc.addCheckboxPart(paramsDesc.get(INCLUDENOTRANSLATE));
+		CheckboxPart cbp2 = desc.addCheckboxPart(paramsDesc.get(SETAPPROVEDASNOTRANSLATE));
+		cbp2.setMasterPart(cbp1, true);
+		desc.addCheckboxPart(paramsDesc.get(PLACEHOLDERMODE));
+		desc.addCheckboxPart(paramsDesc.get(COPYSOURCE));
+		desc.addCheckboxPart(paramsDesc.get(INCLUDEALTTRANS));
+		return desc;
 	}
 
 }
