@@ -37,6 +37,8 @@ import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.pipeline.IPipelineStep;
+import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
+import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.lib.extra.pipelinebuilder.XParameter;
 import net.sf.okapi.lib.extra.pipelinebuilder.XPipelineStep;
@@ -56,6 +58,7 @@ public class ScopingReportStep extends CompoundStep {
 
 	private Parameters params;
 	private ReportGenerator gen;
+	private String rootDir;
 	
 	public ScopingReportStep() {
 		super();
@@ -67,6 +70,11 @@ public class ScopingReportStep extends CompoundStep {
 		gen = new ReportGenerator(getTemplateStream());
 	}
 	
+	@StepParameterMapping(parameterType = StepParameterType.ROOT_DIRECTORY)
+	public void setRootDirectory (String rootDir) {
+		this.rootDir = rootDir;
+	}
+
 	protected InputStream getTemplateStream() {
 		return this.getClass().getResourceAsStream("scoping_report.html");
 	}
@@ -140,7 +148,7 @@ public class ScopingReportStep extends CompoundStep {
 		}		
 		// Generate report
 		String report = gen.generate();
-		File outFile = new File(params.getOutputURI());
+		File outFile = new File(Util.fillRootDirectoryVariable(params.getOutputPath(), rootDir));
 		Util.createDirectories(outFile.getAbsolutePath());
 		
 		BufferedWriter writer;

@@ -22,7 +22,6 @@ package net.sf.okapi.steps.scopingreport;
 
 import java.io.File;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
@@ -80,7 +79,7 @@ public class ScopingReportTest {
 						new ScopingReportStep(),
 						new XParameter("projectName", "Test Scoping Report"),
 						//new XParameter("outputURI", this.getClass().getResource("").toString() + "out/test_scoping_report.html")
-						new XParameter("outputURI", "file:" + pathBase + "out/test_scoping_report.html")
+						new XParameter("outputPath", pathBase + "out/test_scoping_report.html")
 						)
 		).execute();
 		
@@ -99,7 +98,7 @@ public class ScopingReportTest {
 		ScopingReportStep srs = new ScopingReportStep();
 		Parameters params = (Parameters) srs.getParameters();
 		params.setProjectName("Test scoping report");
-		params.setOutputURI(new URI("file:" + pathBase + "out/test_scoping_report2.html"));
+		params.setOutputPath(pathBase + "out/test_scoping_report2.html");
 		
 		srs.handleEvent(new Event(EventType.START_BATCH));
 		srs.handleEvent(new Event(EventType.START_DOCUMENT, sd1));
