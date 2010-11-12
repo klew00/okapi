@@ -276,7 +276,7 @@ public class TextUnit2 implements ITextUnit {
 	public Property setTargetProperty (LocaleId locId,
 		Property property)
 	{
-		return createTarget(locId, false, IResource.CREATE_EMPTY).setProperty(property);
+		return createTarget(locId, false, IResource.COPY_SEGMENTS).setProperty(property);
 	}
 
 	public void removeTargetProperty (LocaleId locId,
@@ -436,27 +436,23 @@ public class TextUnit2 implements ITextUnit {
 	 * <ul><li>CREATE_EMPTY: Create an empty target object.</li>
 	 * <li>COPY_CONTENT: Copy the text of the source (and any associated in-line code).</li>
 	 * <li>COPY_PROPERTIES: Copy the source properties.</li>
-	 * <li>COPY_ALL: Same as (COPY_CONTENT|COPY_PROPERTIES).</li></ul>
+	 * <li>COPY_SEGMENTS: Copy the source segmentation.</li>
+	 * <li>COPY_ALL: Same as (COPY_CONTENT|COPY_PROPERTIES|COPY_SEGMENTS).</li></ul>
 	 * @return the target object that was created, or retrieved.
 	 */
 	public TextContainer createTarget (LocaleId locId,
 		boolean overwriteExisting,
 		int creationOptions)
 	{
-//TODO: need to create empty/segments if needed for CREATE_EMPTY		
 		TextContainer trgCont = targets.get(locId);
 		if (( trgCont == null ) || overwriteExisting ) {
 			trgCont = getSource().clone((creationOptions & COPY_PROPERTIES) == COPY_PROPERTIES);
-			if (( creationOptions == CREATE_EMPTY ) || ( creationOptions == COPY_PROPERTIES )) {
-				// Remove content, but keep segments
-				if ( trgCont.contentIsOneSegment() ) {
-					trgCont.clear();
-				}
-				else { // Remove the content of the segments
-					// Note that inter-segment parts are still not 
-					for ( Segment seg : trgCont.getSegments() ) {
-						seg.text.clear();
-					}
+			if ( (creationOptions & COPY_SEGMENTS) != COPY_SEGMENTS ) {
+				trgCont.joinAll();
+			}
+			if ( (creationOptions & COPY_CONTENT) != COPY_CONTENT ) {
+				for ( Segment seg : trgCont.getSegments() ) {
+					seg.text.clear();
 				}
 			}
 			targets.put(locId, trgCont);
@@ -611,8 +607,12 @@ public class TextUnit2 implements ITextUnit {
 
 	@Override
 	public Segment getCorrespondingSource (Segment trgSeg) {
-		// TODO Auto-generated method stub
-		return null;
+		Segment res = source.getSegments().get(trgSeg.id);
+		if ( res == null ) { // If no corresponding segment found: create one
+			res = new Segment(trgSeg.id);
+			source.getSegments().append(res);
+		}
+		return res;
 	}
 
 	@Override
@@ -648,7 +648,9 @@ public class TextUnit2 implements ITextUnit {
 
 	@Override
 	public boolean removeSegment (Segment seg) {
-		// TODO Auto-generated method stub
+		ISegments srcSegs = source.getSegments();
+		// TODO: need remove on ISegments
+		
 		return false;
 	}
 
@@ -656,6 +658,8 @@ public class TextUnit2 implements ITextUnit {
 	public void setSourceSegment (int index,
 		Segment srcSeg)
 	{
+		ISegments srcSegs = source.getSegments();
+		srcSegs.asList().set(index, srcSeg);
 		// TODO Auto-generated method stub
 	}
 

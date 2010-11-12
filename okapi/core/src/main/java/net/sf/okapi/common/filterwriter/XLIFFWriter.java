@@ -185,7 +185,7 @@ public class XLIFFWriter implements IFilterWriter {
 	 * Writes the start of a &lt;file> element.
 	 * <p>each call to this method must have a corresponding call to {@link #writeEndFile()}.
 	 * @param original the value for the <code>original</code> attribute. If null: "unknown" is used.
-	 * @param dataType the value ofr the <code>datatype</code> attribute. If null: "x-undefined" is used. 
+	 * @param dataType the value for the <code>datatype</code> attribute. If null: "x-undefined" is used. 
 	 * @param skeletonPath external skeleton information (can be null).
 	 * @see #writeEndFile()
 	 */

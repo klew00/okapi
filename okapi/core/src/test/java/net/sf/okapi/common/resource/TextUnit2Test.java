@@ -102,6 +102,30 @@ public class TextUnit2Test {
     }
 
     @Test
+    public void createTargetCase1 (){
+    	tu1 = createSegmentedTU();
+        tu1.createTarget(locFR, false, IResource.COPY_ALL);
+        assertEquals(tu1.getSource().toString(), tu1.getTarget_DIFF(locFR).toString());
+        assertEquals(tu1.getSource().getSegments().count(), tu1.getTarget_DIFF(locFR).getSegments().count());
+    }
+
+    @Test
+    public void createTargetCase2 (){
+    	tu1 = createSegmentedTU();
+        tu1.createTarget(locFR, false, IResource.COPY_SEGMENTS);
+        assertEquals(tu1.getSource().getSegments().count(), tu1.getTarget_DIFF(locFR).getSegments().count());
+        assertEquals(" a ", tu1.getTarget_DIFF(locFR).toString());
+    }
+
+    @Test
+    public void createTargetCase3 (){
+    	tu1 = createSegmentedTU();
+        tu1.createTarget(locFR, false, IResource.COPY_CONTENT);
+        assertEquals(1, tu1.getTarget_DIFF(locFR).getSegments().count());
+        assertEquals("Part 1. a Part 2.", tu1.getTarget_DIFF(locFR).toString());
+    }
+
+    @Test
     public void createTargetSourceContentAndTargetContentSame(){
         tu1.setSource(tc1);
         tu1.createTarget(locFR, false, IResource.COPY_ALL);
@@ -276,4 +300,9 @@ public class TextUnit2Test {
 //        assertEquals("target content", tf1, tf2);
 //	}
 
+    private ITextUnit createSegmentedTU () {
+    	ITextUnit tu = new TextUnit2("id", "Part 1.");
+    	tu.getSource().getSegments().append(new Segment("s2", new TextFragment("Part 2.")), " a ");
+    	return tu;
+    }
 }

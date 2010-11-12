@@ -68,11 +68,12 @@ public interface ITextUnit extends INameable, IReferenceable {
 		LocaleId trgLoc);
 	
 	/**
-	 * Replaces a source segment at a given position.
+	 * Replaces a source segment at a given position by a clone of a given segment.
+	 * If the id of the new segment is different from the current one, the id... TODO 
 	 * @param index the index position.
 	 * @param srcSeg the new source segment to place at the position.
+	 * @throws IndexOutOfBoundsException if the index is out of bounds.
 	 */
-//What if the position is out-of-bounds? -> exception
 //What is the segment ID is different from the ID of the current segment?
 //	-> replace with new one, also in targets
 // if new id exists, then change it so it's unique

@@ -30,7 +30,8 @@ public interface IResource {
 	public static final int CREATE_EMPTY = 0;
 	public static final int COPY_CONTENT = 0x01;
 	public static final int COPY_PROPERTIES = 0x02;
-	public static final int COPY_ALL = (COPY_CONTENT | COPY_PROPERTIES);
+	public static final int COPY_SEGMENTS = 0x04;
+	public static final int COPY_ALL = (COPY_CONTENT | COPY_PROPERTIES | COPY_SEGMENTS);
 
 	/**
 	 * Gets the identifier of the resource. This identifier is unique per extracted document and by type of resource.
