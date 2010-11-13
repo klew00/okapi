@@ -82,12 +82,14 @@ public interface IFilter {
 
 	/**
 	 * Indicates if there is an event to process.
+	 * <p>Implementer Note: The caller must be able to call this method several times without changing state.
 	 * @return True if there is at least one event to process, false if not.
 	 */
 	public boolean hasNext ();
 
 	/**
 	 * Gets the next event available.
+	 * Calling this method can be done only once on each event.
 	 * @return The next event available or null if there are no events.
 	 */
 	public Event next ();	

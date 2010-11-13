@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -34,8 +34,10 @@ public class ManifestItem {
 	private boolean selected;
 	private String postProcessingType;
 	private boolean exists;
+	private int docId;
 
-	public ManifestItem (String relativeWorkPath,
+	public ManifestItem (int docId,
+		String relativeWorkPath,
 		String relativeInputPath,
 		String relativeOutputPath,
 		String inputEncoding,
@@ -52,6 +54,7 @@ public class ManifestItem {
 		if ( filterID == null ) throw new NullPointerException();
 		if ( postProcessingType == null ) throw new NullPointerException();
 		
+		this.docId = docId;
 		this.relativeWorkPath = relativeWorkPath;
 		this.relativeInputPath = relativeInputPath;
 		this.relativeOutputPath = relativeOutputPath;
@@ -107,4 +110,8 @@ public class ManifestItem {
 		return postProcessingType;
 	}
 	
+	public int getDocId () {
+		return docId;
+	}
+
 }

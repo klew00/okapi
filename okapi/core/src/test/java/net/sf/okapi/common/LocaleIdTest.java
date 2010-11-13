@@ -518,4 +518,21 @@ public class LocaleIdTest {
 		assertFalse(LocaleId.isBidirectional(LocaleId.fromBCP47("arn")));
 		assertFalse(LocaleId.isBidirectional(LocaleId.fromBCP47("tr")));
 	}		
+
+    @Test
+    public void testVariables () {
+    	String srcLoc = new LocaleId("de", "CH").toString();
+    	String trgLoc = new LocaleId("en", "IE").toString();
+    	assertEquals("", LocaleId.replaceVariables("", srcLoc, trgLoc));
+    	assertEquals("de-ch,en-ie", LocaleId.replaceVariables("${srcLang},${trgLang}", srcLoc, trgLoc));
+    	assertEquals("DE-CH,EN-IE", LocaleId.replaceVariables("${srcLangU},${trgLangU}", srcLoc, trgLoc));
+    	assertEquals("de-ch,en-ie", LocaleId.replaceVariables("${srcLangL},${trgLangL}", srcLoc, trgLoc));
+    	assertEquals("de_CH,en_IE", LocaleId.replaceVariables("${srcLoc},${trgLoc}", srcLoc, trgLoc));
+    	assertEquals("de,en", LocaleId.replaceVariables("${srcLocLang},${trgLocLang}", srcLoc, trgLoc));
+    	assertEquals("CH,IE", LocaleId.replaceVariables("${srcLocReg},${trgLocReg}", srcLoc, trgLoc));
+    	// With null
+    	assertEquals("CH,", LocaleId.replaceVariables("${srcLocReg},${trgLocReg}", srcLoc, null));
+    	assertEquals(",en-ie", LocaleId.replaceVariables("${srcLang},${trgLang}", null, trgLoc));
+	}
+	
 }

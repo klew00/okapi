@@ -60,8 +60,7 @@ public class XLIFFPackageWriter extends BasePackageWriter {
 
 	@Override
 	public String getReaderClass () {
-		// TODO: set reader class
-		return "TODO";
+		return "net.sf.okapi.steps.simplekit.xliff.XLIFFPackageReader";
 	}
 
 	@Override

@@ -134,6 +134,52 @@ public final class LocaleId implements Comparable<Object> {
 
 	// Pattern for allowed characters in string-based locale
 	private static final Pattern ALLOWED_CHARS = Pattern.compile("[\\-a-zA-Z0-9]+");
+
+	/**
+	 * Replaces the locale/language variables in a given input string by their runtime values.
+	 * If one of the locale passed is null, its corresponding variables are replaced by an empty string.
+	 * @param input the string with the variables.
+	 * @param srcLoc the source locale code (can be null).
+	 * @param trgLoc the target locale code (can be null).
+	 * @return the modified string.
+	 */
+	static public String replaceVariables (String input,
+		String srcLoc,
+		String trgLoc)
+	{
+		// No variables: no changes
+		if ( input.indexOf("${") == -1 ) return input;
+		
+		// Make the variables backward compatible
+		input = input.replace("${Src", "${src");
+		input = input.replace("${Trg", "${trg");
+
+		if ( srcLoc == null ) srcLoc = "";
+		if ( trgLoc == null ) trgLoc = "";
+		
+		input = input.replace("${srcLangU}", srcLoc.toUpperCase());
+		input = input.replace("${srcLangL}", srcLoc.toLowerCase());
+		input = input.replace("${srcLang}", srcLoc);
+		input = input.replace("${trgLangU}", trgLoc.toUpperCase());
+		input = input.replace("${trgLangL}", trgLoc.toLowerCase());
+		input = input.replace("${trgLang}", trgLoc);
+
+		if ( input.indexOf("${srcLoc") != -1 ) {
+			String[] res = LocaleId.splitLanguageCode(srcLoc);
+			input = input.replace("${srcLoc}", String.format("%s_%s", res[0].toLowerCase(), res[1].toUpperCase()));
+			input = input.replace("${srcLocLang}", res[0].toLowerCase());
+			input = input.replace("${srcLocReg}", res[1].toUpperCase());
+		}
+		
+		if ( input.indexOf("${trgLoc") != -1 ) {
+			String[] res = LocaleId.splitLanguageCode(trgLoc);
+			input = input.replace("${trgLoc}", String.format("%s_%s", res[0].toLowerCase(), res[1].toUpperCase()));
+			input = input.replace("${trgLocLang}", res[0].toLowerCase());
+			input = input.replace("${trgLocReg}", res[1].toUpperCase());
+		}
+
+		return input;
+	}
 	
 	/**
 	 * Creates a new LocaleId object from a locale identifier.
@@ -654,9 +700,13 @@ public final class LocaleId implements Comparable<Object> {
 	 * @return an array of two strings: 0=language, 1=region/country (or empty)
 	 */
 	public static String[] splitLanguageCode (String language) {
-		if ((language == null) || (language.length() == 0))
-			return null;
 		String[] parts = new String[2];
+		parts[0] = "";
+		parts[1] = "";
+
+		if ((language == null) || (language.length() == 0))
+			return parts;
+		
 		language = language.replace('_', '-');
 		int n = language.indexOf('-');
 		if (n > -1) {
@@ -665,7 +715,6 @@ public final class LocaleId implements Comparable<Object> {
 		}
 		else {
 			parts[0] = language;
-			parts[1] = "";
 		}
 		return parts;
 	}

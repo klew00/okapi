@@ -45,37 +45,6 @@ public class PathBuilder {
 	private String search;
 	private String replace;
 
-	static public String replaceVariables (String input,
-		String srcLang,
-		String trgLang)
-	{
-		// Macros
-		if ( input.indexOf("${") == -1 ) return input;
-
-		input = input.replace("${SrcLangU}", srcLang.toUpperCase());
-		input = input.replace("${SrcLangL}", srcLang.toLowerCase());
-		input = input.replace("${SrcLang}", srcLang);
-		input = input.replace("${TrgLangU}", trgLang.toUpperCase());
-		input = input.replace("${TrgLangL}", trgLang.toLowerCase());
-		input = input.replace("${TrgLang}", trgLang);
-
-		if ( input.indexOf("${SrcLoc") != -1 ) {
-			String[] res = LocaleId.splitLanguageCode(srcLang);
-			input = input.replace("${SrcLoc}", String.format("%s_%s", res[0].toLowerCase(), res[1].toUpperCase()));
-			input = input.replace("${SrcLocLang}", res[0].toLowerCase());
-			input = input.replace("${SrcLocReg}", res[1].toUpperCase());
-		}
-		
-		if ( input.indexOf("${TrgLoc") != -1 ) {
-			String[] res = LocaleId.splitLanguageCode(trgLang);
-			input = input.replace("${TrgLoc}", String.format("%s_%s", res[0].toLowerCase(), res[1].toUpperCase()));
-			input = input.replace("${TrgLocLang}", res[0].toLowerCase());
-			input = input.replace("${TrgLocReg}", res[1].toUpperCase());
-		}
-
-		return input;
-	}
-
 	public PathBuilder () {
 		reset();
 	}
@@ -287,6 +256,6 @@ public class PathBuilder {
 		if ( useReplace() && ( getSearch().length() != 0 ))
 			sTmp = sTmp.replace(getSearch(), getReplace());
 
-		return replaceVariables(sTmp, srcLang, trgLang);
+		return LocaleId.replaceVariables(sTmp, srcLang, trgLang);
 	}
 }

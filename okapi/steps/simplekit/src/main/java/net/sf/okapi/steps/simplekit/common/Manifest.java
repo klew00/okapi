@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -202,11 +202,11 @@ public class Manifest {
 	
 	/**
 	 * Adds a document to the manifest.
-	 * @param docID Key of the document. Must be unique within the manifest.
+	 * @param docId Key of the document. Must be unique within the manifest.
 	 * @param relativeInputPath Relative path of the input document.
 	 * @param relativeOutputPath Relative path of the output document.
 	 */
-	public void addDocument (int docID,
+	public void addDocument (int docId,
 		String relativeWorkPath,
 		String relativeInputPath,
 		String relativeOutputPath,
@@ -215,9 +215,9 @@ public class Manifest {
 		String filterID,
 		String postProcessingType)
 	{
-		docs.put(docID, new ManifestItem(relativeWorkPath,
-			relativeInputPath, relativeOutputPath,
-			inputEncoding, outputEncoding, filterID, postProcessingType, true));
+		docs.put(docId, new ManifestItem(docId, relativeWorkPath,
+			relativeInputPath, relativeOutputPath, inputEncoding,
+			outputEncoding, filterID, postProcessingType, true));
 	}
 
 	public String getFileToMergePath (int docID) {
@@ -293,11 +293,11 @@ public class Manifest {
 		}
 	}
 
-	public void load (String path) {
+	public void load (File inputFile) {
 		try {
 			DocumentBuilderFactory docFac = DocumentBuilderFactory.newInstance();
 		    // Not needed in this case: DFac.setNamespaceAware(true);
-		    Document doc = docFac.newDocumentBuilder().parse("file:///"+path);
+		    Document doc = docFac.newDocumentBuilder().parse(inputFile);
 		    
 		    NodeList NL = doc.getElementsByTagName("rainbowManifest");
 		    if ( NL == null ) throw new RuntimeException("Invalid manifest file.");
@@ -393,13 +393,13 @@ public class Manifest {
 			    	postProcessingType = "default";	
 			    }
 			    
-		    	docs.put(id, new ManifestItem(tmp.replace('/', File.separatorChar),
+		    	docs.put(id, new ManifestItem(id, tmp.replace('/', File.separatorChar),
 		    		inPath.replace('/', File.separatorChar),
 		    		outPath.replace('/', File.separatorChar),
 		    		inEnc, outEnc, filterID, postProcessingType, true));
 		    }
 
-		    rootFolder = Util.getDirectoryName(path);
+		    rootFolder = Util.getDirectoryName(inputFile.getAbsolutePath());
 		}
 		catch ( SAXException e ) {
 			throw new RuntimeException(e);

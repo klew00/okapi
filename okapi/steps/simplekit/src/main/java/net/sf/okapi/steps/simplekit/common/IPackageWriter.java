@@ -32,7 +32,11 @@ import net.sf.okapi.common.resource.TextUnit;
 public interface IPackageWriter extends IFilterWriter {
 
 	public String getPackageType ();
-	
+
+	/**
+	 * Gets the name of the class to use to read this type of package. 
+	 * @return the name of the class to use to read this type of package.
+	 */
 	public String getReaderClass ();
 	
 	/**

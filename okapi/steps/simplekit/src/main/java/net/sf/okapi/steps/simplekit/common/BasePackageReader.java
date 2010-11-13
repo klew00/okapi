@@ -32,7 +32,7 @@ public abstract class BasePackageReader implements IPackageReader {
 		LocaleId sourceLocale,
 		LocaleId targetLocale)
 	{
-		
+		// Do nothing by default
 	}
 
 	protected abstract void postProcessPackageItem (String path,
