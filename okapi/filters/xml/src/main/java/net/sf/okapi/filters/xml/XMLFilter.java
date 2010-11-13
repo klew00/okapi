@@ -44,6 +44,7 @@ import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
+import net.sf.okapi.common.filters.InlineCodeFinder;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.LocaleId;
@@ -608,10 +609,11 @@ public class XMLFilter implements IFilter {
 			// Escape inline code content
 			List<Code> codes = tf.getCodes();
 			for ( Code code : codes ) {
-				if ( code.getData().equals("&#10;") ) continue; // Do not re-escape escaped line-breaks
-				code.setData(Util.escapeToXML(code.getData(), 0, params.escapeGT, null));
+				// Escape the data of the new inline code (and only them)
+				if ( code.getType().equals(InlineCodeFinder.TAGTYPE) ) { 
+					code.setData(Util.escapeToXML(code.getData(), 0, params.escapeGT, null));
+				}
 			}
-			tf.setCodedText(tf.getCodedText(), codes);
 		}
 		
 		queue.add(new Event(EventType.TEXT_UNIT, tu));
@@ -746,10 +748,11 @@ public class XMLFilter implements IFilter {
 			// Escape inline code content
 			List<Code> codes = frag.getCodes();
 			for ( Code code : codes ) {
-				if ( code.getData().equals("&#10;") ) continue; // Do not re-escape escaped line-breaks
-				code.setData(Util.escapeToXML(code.getData(), 0, params.escapeGT, null));
+				// Escape the data of the new inline code (and only them)
+				if ( code.getType().equals(InlineCodeFinder.TAGTYPE) ) { 
+					code.setData(Util.escapeToXML(code.getData(), 0, params.escapeGT, null));
+				}
 			}
-			frag.setCodedText(frag.getCodedText(), codes);
 		}
 		
 		tu.setSourceContent(frag);

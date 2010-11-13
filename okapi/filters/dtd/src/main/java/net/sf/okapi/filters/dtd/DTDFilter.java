@@ -49,6 +49,7 @@ import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
+import net.sf.okapi.common.filters.InlineCodeFinder;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.LocaleId;
@@ -276,7 +277,7 @@ public class DTDFilter implements IFilter {
 					// Now escape any parts that was changed to code
 					List<Code> codes = tf.getCodes();
 					for ( Code code : codes ) {
-						if ( code.getType().equals("null") ) {
+						if ( code.getType().equals(InlineCodeFinder.TAGTYPE) ) {
 							code.setData(encoder.encode(code.getData(), 0));
 						}
 					}

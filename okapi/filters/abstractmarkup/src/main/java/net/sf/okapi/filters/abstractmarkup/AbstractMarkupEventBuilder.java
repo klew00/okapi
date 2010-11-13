@@ -20,12 +20,14 @@
 
 package net.sf.okapi.filters.abstractmarkup;
 
+import java.util.List;
 import java.util.regex.Pattern;
 
 import net.htmlparser.jericho.CharacterReference;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.EventBuilder;
 import net.sf.okapi.common.filters.InlineCodeFinder;
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 
@@ -71,6 +73,15 @@ public class AbstractMarkupEventBuilder extends EventBuilder {
 		// Apply the in-line codes rules if needed
 		if ( useCodeFinder ) {
 			codeFinder.process(text);
+			// Escape inline code content
+			List<Code> codes = text.getCodes();
+			for ( Code code : codes ) {
+				// Escape the data of the new inline code (and only them)
+				if ( code.getType().equals(InlineCodeFinder.TAGTYPE) ) { 
+					code.setData(Util.escapeToXML(code.getData(), 0, false, null));
+				}
+			}
+			
 		}
 		return textUnit;
 	}

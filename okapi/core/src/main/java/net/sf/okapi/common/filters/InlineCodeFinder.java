@@ -35,6 +35,11 @@ import net.sf.okapi.common.resource.TextFragment.TagType;
  */
 public class InlineCodeFinder {
 
+	/**
+	 * Type representing an inline code created with this class.
+	 */
+	public static final String TAGTYPE = "regxph";
+	
 	private ArrayList<String> rules;
 	private String sample;
 	private boolean useAllRulesWhenTesting;
@@ -139,7 +144,9 @@ public class InlineCodeFinder {
 
 	/**
 	 * Applies the rules to a given content and converts all matching sections
-	 * into in-line codes.
+	 * into in-line codes. The new codes have the type {@link #TAGTYPE}.
+	 * <p>Note that the data of the new may need to be escaped as they are now part of the
+	 * fragment skeleton and are not escaped back to the original format when merging.
 	 * @param fragment The fragment where to apply the rules.
 	 */
 	public void process (TextFragment fragment) {
@@ -150,7 +157,7 @@ public class InlineCodeFinder {
 		int diff = 0;
 		while ( m.find(start) ) {
 			diff += fragment.changeToCode(m.start()+diff, m.end()+diff,
-				TagType.PLACEHOLDER, null);
+				TagType.PLACEHOLDER, TAGTYPE);
 			start = m.end();
 			// Check the case where the last match was at the end
 			// which makes the next start invalid for find().
