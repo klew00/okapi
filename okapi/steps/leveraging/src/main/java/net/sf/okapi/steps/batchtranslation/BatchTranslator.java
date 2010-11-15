@@ -137,7 +137,9 @@ public class BatchTranslator {
 	// Call this method at the first document
 	private void initialize () {
 		if ( params.getMakeTMX() ) {
-			tmxWriter = new TMXWriter(Util.fillRootDirectoryVariable(params.getTmxPath(), rootDir));
+			String tmxOutputPath = Util.fillRootDirectoryVariable(params.getTmxPath(), rootDir);
+			tmxOutputPath = LocaleId.replaceVariables(tmxOutputPath, srcLoc.toString(), trgLoc.toString());
+			tmxWriter = new TMXWriter(tmxOutputPath);
 			tmxWriter.writeStartDocument(srcLoc, trgLoc, getClass().getCanonicalName(), "1", "sentence",
 				(params.getMarkAsMT() ? "MT-based" : null), "unknown");
 		}
@@ -158,14 +160,17 @@ public class BatchTranslator {
 
 		// Initialize existing TM if needed
 		if ( params.getCheckExistingTm() ) {
-			existingTm = TmSeekerFactory.createFileBasedTmSeeker(
-				Util.fillRootDirectoryVariable(params.getExistingTm(), rootDir));
+			String existingTMPath = Util.fillRootDirectoryVariable(params.getExistingTm(), rootDir);
+			existingTMPath = LocaleId.replaceVariables(existingTMPath, srcLoc.toString(), trgLoc.toString());
+			existingTm = TmSeekerFactory.createFileBasedTmSeeker(existingTMPath);
 		}
 		
 		segmenter = null;
 		if ( params.getSegment() ) {
 			SRXDocument srxDoc = new SRXDocument();
-			srxDoc.loadRules(Util.fillRootDirectoryVariable(params.getSrxPath(), rootDir));
+			String srxPath = Util.fillRootDirectoryVariable(params.getSrxPath(), rootDir);
+			srxPath = LocaleId.replaceVariables(srxPath, srcLoc.toString(), trgLoc.toString());
+			srxDoc.loadRules(srxPath);
 			//if ( srxDoc.hasWarning() ) logger.warning(srxDoc.getWarning());
 			segmenter = srxDoc.compileLanguageRules(srcLoc, null);
 		}
@@ -209,6 +214,7 @@ public class BatchTranslator {
 			}
 			if ( params.getMakeTM() ) {
 				String tmDir = Util.fillRootDirectoryVariable(params.getTmDirectory(), rootDir);
+				tmDir = LocaleId.replaceVariables(tmDir, srcLoc.toString(), trgLoc.toString());
 				Util.createDirectories(tmDir+File.separator);
 				//TODO: Move this check at the pensieve package level
 				File file = new File(tmDir+File.separator+"segments.gen");
@@ -407,11 +413,10 @@ public class BatchTranslator {
 			
 			Locale loc = rawDoc.getSourceLocale().toJavaLocale();
 			cmd = cmd.replace("${srcLangName}", loc.getDisplayLanguage(Locale.ENGLISH));
-			cmd = cmd.replace("${srcLang}", rawDoc.getSourceLocale().getLanguage());
-			
 			loc = rawDoc.getTargetLocale().toJavaLocale();
 			cmd = cmd.replace("${trgLangName}", loc.getDisplayLanguage(Locale.ENGLISH));
-			cmd = cmd.replace("${trgLang}", rawDoc.getTargetLocale().getLanguage());
+			
+			cmd = LocaleId.replaceVariables(cmd, srcLoc.toString(), trgLoc.toString());
 			
 			LOGGER.info("Command line: "+cmd);
 			Process p = Runtime.getRuntime().exec(cmd);

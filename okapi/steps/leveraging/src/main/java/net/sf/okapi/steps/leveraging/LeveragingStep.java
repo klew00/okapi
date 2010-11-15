@@ -194,7 +194,11 @@ public class LeveragingStep extends BasePipelineStep {
 		logger.info(res.query.getSettingsDisplay());
 			
 		if ( params.getMakeTMX() ) {
-			tmxWriter = new TMXWriter(Util.fillRootDirectoryVariable(params.getTMXPath(), rootDir));
+			// Resolve the variables
+			String realPath = Util.fillRootDirectoryVariable(params.getTMXPath(), rootDir);
+			realPath = LocaleId.replaceVariables(realPath, sourceLocale.toString(), targetLocale.toString());
+			// Create the output
+			tmxWriter = new TMXWriter(realPath);
 			tmxWriter.setUseMTPrefix(params.getUseMTPrefix());
 			tmxWriter.writeStartDocument(sourceLocale, targetLocale,
 				getClass().getName(), "1", // Version is irrelevant here

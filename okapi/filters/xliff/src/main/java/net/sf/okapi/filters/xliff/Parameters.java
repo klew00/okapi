@@ -37,12 +37,14 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 
 	private static final String FALLBACKTOID = "fallbackToID";
 	private static final String ADDTARGETLANGUAGE = "addTargetLanguage";
+	private static final String OVERRIDETARGETLANGUAGE = "overrideTargetLanguage";
 	private static final String OUTPUTSEGMENTATIONTYPE = "outputSegmentationType";
 	private static final String IGNOREINPUTSEGMENTATION = "ignoreInputSegmentation";
 	
 	private boolean fallbackToID;
 	private boolean escapeGT;
 	private boolean addTargetLanguage;
+	private boolean overrideTargetLanguage;
 	private int outputSegmentationType;
 	private boolean ignoreInputSegmentation;
 	
@@ -113,6 +115,14 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.addTargetLanguage = addTargetLanguage;
 	}
 	
+	public boolean getOverrideTargetLanguage () {
+		return overrideTargetLanguage;
+	}
+
+	public void setOverrideTargetLanguage (boolean overrideTargetLanguage) {
+		this.overrideTargetLanguage = overrideTargetLanguage;
+	}
+	
 	public int getOutputSegmentationType () {
 		return this.outputSegmentationType;
 	}
@@ -137,6 +147,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		fallbackToID = false;
 		escapeGT = false;
 		addTargetLanguage = true;
+		overrideTargetLanguage = false;
 		outputSegmentationType = SEGMENTATIONTYPE_ORIGINAL;
 		ignoreInputSegmentation = false;
 	}
@@ -151,6 +162,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		fallbackToID = buffer.getBoolean(FALLBACKTOID, fallbackToID);
 		escapeGT = buffer.getBoolean(XMLEncoder.ESCAPEGT, escapeGT);
 		addTargetLanguage = buffer.getBoolean(ADDTARGETLANGUAGE, addTargetLanguage);
+		overrideTargetLanguage = buffer.getBoolean(OVERRIDETARGETLANGUAGE, overrideTargetLanguage);
 		outputSegmentationType = buffer.getInteger(OUTPUTSEGMENTATIONTYPE, outputSegmentationType);
 		ignoreInputSegmentation = buffer.getBoolean(IGNOREINPUTSEGMENTATION, ignoreInputSegmentation);
 	}
@@ -165,6 +177,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.setBoolean(FALLBACKTOID, fallbackToID);
 		buffer.setBoolean(XMLEncoder.ESCAPEGT, escapeGT);
 		buffer.setBoolean(ADDTARGETLANGUAGE, addTargetLanguage);
+		buffer.setBoolean(OVERRIDETARGETLANGUAGE, overrideTargetLanguage);
 		buffer.setInteger(OUTPUTSEGMENTATIONTYPE, outputSegmentationType);
 		buffer.setBoolean(IGNOREINPUTSEGMENTATION, ignoreInputSegmentation);
 		return buffer.toString();
@@ -177,6 +190,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.add(IGNOREINPUTSEGMENTATION, "Ignore the segmentation information in the input", null);
 		desc.add(XMLEncoder.ESCAPEGT, "Escape the greater-than characters", null);
 		desc.add(ADDTARGETLANGUAGE, "Add the target-language attribute if not present", null);
+		desc.add(OVERRIDETARGETLANGUAGE, "Override the target language of the XLIFF document", null);
 		desc.add(OUTPUTSEGMENTATIONTYPE, "Type of output segmentation", "Indicates wether to segment or not the text content in output");
 		return desc;
 	}
@@ -190,6 +204,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		
 		desc.addCheckboxPart(paramDesc.get(XMLEncoder.ESCAPEGT));
 		desc.addCheckboxPart(paramDesc.get(ADDTARGETLANGUAGE));
+		desc.addCheckboxPart(paramDesc.get(OVERRIDETARGETLANGUAGE));
 
 		String[] values = {
 			String.valueOf(SEGMENTATIONTYPE_ORIGINAL),

@@ -349,6 +349,48 @@ public class XLIFFFilterTest {
 	}
 
 	@Test
+	public void testOutputOverrideTargetlanguage () {
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+			+ "<xliff version=\"1.2\">\r"
+			+ "<file source-language=\"en\" target-language=\"fr\" datatype=\"x-test\" original=\"file.ext\">"
+			+ "\r<body>"
+			+ "<trans-unit id=\"1\">"
+			+ "<source xml:lang=\"en\">s1</source>"
+			+ "<target xml:lang=\"fr\">t1</target>"
+			+ "</trans-unit>"
+			+ "<trans-unit id=\"2\">"
+			+ "<source xml:lang=\"en\">s2</source>"
+			+ "<target>t2</target>"
+			+ "</trans-unit>"
+			+ "<trans-unit id=\"3\">"
+			+ "<source xml:lang=\"en\">s3</source>"
+			+ "</trans-unit></body></file></xliff>";
+		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+			+ "<xliff version=\"1.2\">\r"
+			+ "<file source-language=\"en\" target-language=\"de\" datatype=\"x-test\" original=\"file.ext\">"
+			+ "\r<body>"
+			+ "<trans-unit id=\"1\">"
+			+ "<source xml:lang=\"en\">s1</source>"
+			+ "<target xml:lang=\"de\">t1</target>"
+			+ "</trans-unit>"
+			+ "<trans-unit id=\"2\">"
+			+ "<source xml:lang=\"en\">s2</source>"
+			+ "<target>t2</target>" // xml:lang is not added if not present
+			+ "</trans-unit>"
+			+ "<trans-unit id=\"3\">"
+			+ "<source xml:lang=\"en\">s3</source>" // Line-break added
+			+ "<target xml:lang=\"de\">s3</target>\r"
+			+ "</trans-unit></body></file></xliff>";
+		
+		XLIFFFilter overrideTrgFilter = new XLIFFFilter();
+		Parameters p = (Parameters)overrideTrgFilter.getParameters();
+		p.setOverrideTargetLanguage(true);
+		
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet, overrideTrgFilter, locDE),
+			locDE, overrideTrgFilter.createSkeletonWriter(), overrideTrgFilter.getEncoderManager()));
+	}
+
+	@Test
 	public void testMixedAlTrans () {
 		TextUnit tu = FilterTestDriver.getTextUnit(createTUWithMixedAltTrans(), 1);
 		assertNotNull(tu);
@@ -843,6 +885,20 @@ public class XLIFFFilterTest {
 	{
 		ArrayList<Event> list = new ArrayList<Event>();
 		filterToUse.open(new RawDocument(snippet, locEN, locFR));
+		while ( filterToUse.hasNext() ) {
+			Event event = filterToUse.next();
+			list.add(event);
+		}
+		filterToUse.close();
+		return list;
+	}
+	
+	private ArrayList<Event> getEvents(String snippet,
+		XLIFFFilter filterToUse,
+		LocaleId trgToUse)
+	{
+		ArrayList<Event> list = new ArrayList<Event>();
+		filterToUse.open(new RawDocument(snippet, locEN, trgToUse));
 		while ( filterToUse.hasNext() ) {
 			Event event = filterToUse.next();
 			list.add(event);
