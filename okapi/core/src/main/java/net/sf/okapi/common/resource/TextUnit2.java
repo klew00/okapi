@@ -171,7 +171,7 @@ public class TextUnit2 implements ITextUnit {
 	 * Used by TextUnit clone method to copy over all annotations at once. 
 	 * @param annotations
 	 */
-	protected void setAnnotations(Annotations annotations) {
+	protected void setAnnotations (Annotations annotations) {
 		this.annotations = annotations;
 	}
 	
@@ -384,12 +384,16 @@ public class TextUnit2 implements ITextUnit {
 
     /**
 	 * Gets the target object for this TextUnit for a given locale. If the target does not exists
-	 * one is created automatically.
+	 * one is created automatically, and contains a copy of the source with all segments empty.
 	 * @param locId the locale to query.
-	 * @return the target object for this text unit for the given locale. Never returns null.
+	 * @return the target object for this text unit for the given locale. Never returns null
+	 * (Before M10 the return was null if the target did not exist).
+	 * @see #createTarget(LocaleId, boolean, int)
 	 */
+//TODO: Change name after integration
+// The name is different so we safely detect any place in the code where it's call and can fix the behavior if needed. 
 	public TextContainer getTarget_DIFF (LocaleId locId) {
-		return createTarget(locId, false, IResource.CREATE_EMPTY);
+		return createTarget(locId, false, IResource.COPY_SEGMENTS);
 	}
 
     /**
@@ -405,6 +409,7 @@ public class TextUnit2 implements ITextUnit {
 		TextContainer text)
 	{
 		targets.put(locId, text);
+		//TODO: invalidate the seg status
 		return text;
 	}
 
@@ -469,8 +474,7 @@ public class TextUnit2 implements ITextUnit {
         source.setContent(content);
         // We can use this because the setContent() removed any segmentation
         TextFragment tf = source.getSegments().getFirstContent();
-        // Remove segmentation on all targets
-//TODO: do we really want to do that? This has possibly a lot of side effects!!!        
+        //TODO: Invalidate targets segmentation
         return tf;
 	}
 
@@ -516,7 +520,7 @@ public class TextUnit2 implements ITextUnit {
 	public void segmentSource (ISegmenter segmenter) {
 		segmenter.computeSegments(source);
 		source.getSegments().create(segmenter.getRanges());
-		//TODO: invalidate targets
+		//TODO: invalidate targets seg
 	}
 	
 	/**
@@ -527,7 +531,8 @@ public class TextUnit2 implements ITextUnit {
 		LocaleId targetLocale)
 	{
 //TODO: what do we do if target doesn't exist?
-		// Exception or just create empty segmented copy from source?
+// Exception or just create empty segmented copy from source?
+//for now: exception
 		if ( !hasTarget(targetLocale) ) {
 			throw new RuntimeException(String.format("There is no target content for '%s'", targetLocale.toString()));
 		}
@@ -535,8 +540,8 @@ public class TextUnit2 implements ITextUnit {
 		TextContainer tc = getTarget_DIFF(targetLocale);
 		segmenter.computeSegments(tc);
 		tc.getSegments().create(segmenter.getRanges());
-//TODO: reset all other segmentations?
-		
+//TODO: invalidate source and other targets? or this one.
+// but then there is no way to call segmentTarget and get all in synch
 	}
 	
 	/**
@@ -568,7 +573,7 @@ public class TextUnit2 implements ITextUnit {
 	public void align (List<AlignedPair> alignedSegmentPairs,
 		LocaleId trgLoc)
 	{
-		// TODO Auto-generated method stub
+		//TODO: for Jim :-)
 	}
 
 	@Override
@@ -659,8 +664,19 @@ public class TextUnit2 implements ITextUnit {
 		Segment srcSeg)
 	{
 		ISegments srcSegs = source.getSegments();
-		srcSegs.asList().set(index, srcSeg);
-		// TODO Auto-generated method stub
+		List<Segment> srcList = srcSegs.asList();
+		// Get the existing segment's ID 
+		String oldId = srcList.get(index).id;
+		// Set the new segment. its ID is updated internally if needed
+		srcList.set(index, srcSeg);
+		if ( !oldId.equals(srcSeg.id) ) {
+			// If needed update the target IDs for that segment
+			for ( LocaleId loc : getTargetLocales() ) {
+				ISegments trgSegs = targets.get(loc).getSegments();
+				Segment trgSeg = trgSegs.get(oldId);
+				trgSeg.id = srcSeg.id;
+			}
+		}
 	}
 
 	@Override
@@ -668,14 +684,32 @@ public class TextUnit2 implements ITextUnit {
 		Segment trgSeg,
 		LocaleId trgLoc)
 	{
-		// TODO Auto-generated method stub
+		ISegments trgSegs = getTarget_DIFF(trgLoc).getSegments();
+		List<Segment> trgList = trgSegs.asList();
+		// Get the existing segment's ID 
+		String oldId = trgList.get(index).id;
+		// Set the new segment. its ID is updated internally if needed
+		trgList.set(index, trgSeg);
+		if ( !oldId.equals(trgSeg.id) ) {
+			// Change the source ID too
+			Segment srcSeg = getCorrespondingSource(trgSeg);
+			srcSeg.id = trgSeg.id;
+			// If needed update the target IDs for that segment
+			for ( LocaleId loc : getTargetLocales() ) {
+				if ( loc.equals(trgLoc) ) continue;
+				ISegments otherSegs = targets.get(loc).getSegments();
+				Segment otherSeg = otherSegs.get(oldId);
+				otherSeg.id = trgSeg.id;
+			}
+		}
 	}
 
 	@Override
 	public void splitSource (Segment srcSeg,
 		int splitPos)
 	{
-		// TODO Auto-generated method stub
+		ISegments srcSegs = source.getSegments();
+		//TODO: split in ISegmsnts
 	}
 
 	@Override
@@ -686,4 +720,39 @@ public class TextUnit2 implements ITextUnit {
 		// TODO Auto-generated method stub
 	}
 
+	//=== Possible additions
+	
+	public ISegments getSourceSegments () {
+		return source.getSegments();
+	}
+
+	public Segment getTargetSegment (LocaleId trgLoc,
+		String segId,
+		boolean createIfNeeded)
+	{
+		Segment seg = getTarget_DIFF(trgLoc).getSegments().get(segId);
+		if (( seg == null ) && createIfNeeded ) {
+			// If the segment does not exists: create a new one if requested
+			seg = new Segment(segId);
+			getTarget_DIFF(trgLoc).getSegments().append(seg);
+		}
+		return seg;
+	}
+
+	public ISegments getTargetSegments (LocaleId trgLoc) {
+		return getTarget_DIFF(trgLoc).getSegments();
+	}
+	
+	public Segment getSourceSegment (String segId,
+		boolean createIfNeeded)
+	{
+		Segment seg = source.getSegments().get(segId);
+		if (( seg == null ) && createIfNeeded ) {
+			// If the segment does not exists: create a new one if requested
+			seg = new Segment(segId);
+			source.getSegments().append(seg);
+		}
+		return seg;
+	}
+	
 }
