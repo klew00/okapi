@@ -515,15 +515,21 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 * 
 	 * @param tag
 	 */
-	protected void handleCdataSection(Tag tag) {
-		if (cdataSubfilter != null) {				
+	protected void handleCdataSection(Tag tag) {	
+		if (cdataSubfilter != null) {	
+			// end any skeleton so we can start CDATA section with subfilter
+			if (eventBuilder.hasUnfinishedSkeleton()) {
+				endDocumentPart();
+			}
+			
 			String parentId = eventBuilder.findMostRecentParentId();
 			String cdataWithoutMarkers = CDATA_START_PATTERN.matcher(tag.toString()).replaceFirst("");
 			cdataWithoutMarkers = CDATA_END_PATTERN.matcher(cdataWithoutMarkers).replaceFirst("");
 			cdataSubfilter.close();
 			
+			parentId = (parentId == null ? getDocumentId().getLastId() : parentId); 
 			SubFilterEventConverter converter = 
-				new SubFilterEventConverter(parentId == null ? getDocumentId().getLastId() : parentId, 
+				new SubFilterEventConverter(parentId, 
 						new GenericSkeleton("<![CDATA["), 
 						new GenericSkeleton("]]>"));
 		
@@ -533,8 +539,8 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 			while (cdataSubfilter.hasNext()) {
 				Event event = converter.convertEvent(cdataSubfilter.next());
 				eventBuilder.addFilterEvent(event);
-			}
-			cdataSubfilter.close();
+			}			
+			cdataSubfilter.close();			
 		} else {
 			addToDocumentPart(tag.toString());
 		}
