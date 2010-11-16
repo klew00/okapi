@@ -2060,7 +2060,7 @@ public class MainForm { //implements IParametersProvider {
 				+ Res.getString("MainForm.38"); //$NON-NLS-1$
 		}
 		pnlPathBuilder.setData(prj.pathBuilder, prj.getInputRoot(0), sampleInput,
-			prj.getOutputRoot(), prj.getSourceLanguage().toString(), prj.getSourceEncoding());
+			prj.getOutputRoot(), prj.getSourceLanguage().toString(), prj.getTargetLanguage().toString());
 	}
 	
 	/**
