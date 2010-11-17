@@ -186,14 +186,31 @@ public class XLIFFWriter implements IFilterWriter {
 	 * <p>each call to this method must have a corresponding call to {@link #writeEndFile()}.
 	 * @param original the value for the <code>original</code> attribute. If null: "unknown" is used.
 	 * @param dataType the value for the <code>datatype</code> attribute. If null: "x-undefined" is used. 
-	 * @param skeletonPath external skeleton information (can be null).
+	 * @param skeletonPath optional external skeleton information, or null.
 	 * @see #writeEndFile()
 	 */
 	public void writeStartFile (String original,
 		String dataType,
 		String skeletonPath)
 	{
-		writeStartFile(original, dataType, skeletonPath, null, null);
+		writeStartFile(original, dataType, skeletonPath, null, null, null);
+	}
+	
+	/**
+	 * Writes the start of a &lt;file> element.
+	 * <p>each call to this method must have a corresponding call to {@link #writeEndFile()}.
+	 * @param original the value for the <code>original</code> attribute. If null: "unknown" is used.
+	 * @param dataType the value for the <code>datatype</code> attribute. If null: "x-undefined" is used. 
+	 * @param skeletonPath optional external skeleton information, or null.
+	 * @param extraForHeader optional extra raw valid XLIFF to place in the header, or null.
+	 * @see #writeEndFile()
+	 */
+	public void writeStartFile (String original,
+		String dataType,
+		String skeletonPath,
+		String extraForHeader)
+	{
+		writeStartFile(original, dataType, skeletonPath, null, null, extraForHeader);
 	}
 	
 	/**
@@ -204,13 +221,15 @@ public class XLIFFWriter implements IFilterWriter {
 	 * @param skeletonPath external skeleton information (can be null).
 	 * @param configId the optional filter configuration id used to extract the original (IFilterWriter mode), or null.
 	 * @param inputEncoding the optional encoding of the input file (IFilterWriter mode), or null.
+	 * @param extraForHeader optional extra raw valid XLIFF to place in the header, or null.
 	 * @see #writeEndFile()
 	 */
 	private void writeStartFile (String original,
 		String dataType,
 		String skeletonPath,
 		String configId,
-		String inputEncoding)
+		String inputEncoding,
+		String extraForHeader)
 	{
 		writer.writeStartElement("file");
 		writer.writeAttributeString("original",
@@ -236,13 +255,18 @@ public class XLIFFWriter implements IFilterWriter {
 		writer.writeLineBreak();
 		
 		// Write out external skeleton info if available 
-		if ( !Util.isEmpty(skeletonPath) ) {
+		if ( !Util.isEmpty(skeletonPath) || !Util.isEmpty(extraForHeader) ) {
 			writer.writeStartElement("header");
-			writer.writeStartElement("skl");
-			writer.writeStartElement("external-file");
-			writer.writeAttributeString("href", skeletonPath);
-			writer.writeEndElement(); // external-file
-			writer.writeEndElement(); // skl
+			if ( !Util.isEmpty(skeletonPath) ) {
+				writer.writeStartElement("skl");
+				writer.writeStartElement("external-file");
+				writer.writeAttributeString("href", skeletonPath);
+				writer.writeEndElement(); // external-file
+				writer.writeEndElement(); // skl
+			}
+			if ( !Util.isEmpty(extraForHeader) ) {
+				writer.writeRawXML(extraForHeader);
+			}
 			writer.writeEndElementLineBreak(); // header
 		}
 
@@ -275,7 +299,7 @@ public class XLIFFWriter implements IFilterWriter {
 		String resType)
 	{
 		if ( !inFile ) {
-			writeStartFile(original, dataType, skeletonPath, fwConfigId, fwInputEncoding);
+			writeStartFile(original, dataType, skeletonPath, fwConfigId, fwInputEncoding, null);
 		}
 		writer.writeStartElement("group");
 		writer.writeAttributeString("id", id);
@@ -306,6 +330,16 @@ public class XLIFFWriter implements IFilterWriter {
 	 * @param tu the text unit to output.
 	 */
 	public void writeTextUnit (TextUnit tu) {
+		writeTextUnit(tu, null);
+	}
+	
+	/**
+	 * Writes a text unit as a &lt;trans-unit> element.
+	 * @param tu the text unit to output.
+	 */
+	public void writeTextUnit (TextUnit tu,
+		String phaseName)
+	{
 		// Avoid writing out some entries in non-IFilterWriter mode
 		if ( fwConfigId == null ) {
 			// Check if we need to set the entry as non-translatable
@@ -322,7 +356,7 @@ public class XLIFFWriter implements IFilterWriter {
 		}
 
 		if ( !inFile ) {
-			writeStartFile(original, dataType, skeletonPath, fwConfigId, fwInputEncoding);
+			writeStartFile(original, dataType, skeletonPath, fwConfigId, fwInputEncoding, null);
 		}
 
 		writer.writeStartElement("trans-unit");
@@ -342,6 +376,9 @@ public class XLIFFWriter implements IFilterWriter {
 		}
 		if ( !tu.isTranslatable() ) {
 			writer.writeAttributeString("translate", "no");
+		}
+		if ( phaseName != null ) {
+			writer.writeAttributeString("phase-name", phaseName);
 		}
 
 		if ( trgLoc != null ) {
@@ -566,7 +603,7 @@ public class XLIFFWriter implements IFilterWriter {
 	// Use for IFilterWriter mode
 	private void processStartSubDocument (StartSubDocument resource) {
 		writeStartFile(resource.getName(), resource.getMimeType(), null,
-			fwConfigId, fwInputEncoding);		
+			fwConfigId, fwInputEncoding, null);		
 	}
 
 	// Use for IFilterWriter mode

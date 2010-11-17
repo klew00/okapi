@@ -30,6 +30,7 @@ distribution.</p>
 	box.</li>
 	<li>Fixed locale variables (${TrgLoc}, etc.) to get a consistant casing 
 	regardless of the casing of the value in the Languages and Encodings tab.</li>
+	<li>Fixed corrupted path when dropping file on output using ${TrgLoc}.</li>
 	<li>Create Translation package:<ul>
 	<li>Refactored heavily the leveraging mechanism and the output (e.g. added &lt;alt-trans&gt; output in 
 	Generic XLIFF)</li>
@@ -118,6 +119,8 @@ distribution.</p>
 	classes.</li>
 	<li>Removed the ScoreAnnotation and ScoreInfo classes that were deprecated 
 	in M7. Use AltTranslationsAnnotation instead.</li>
+	<li>Added capability to write extra data in header and phase-name in 
+	trans-unit for XLIFFWriter class.</li>
 </ul>
 	</li>
 </ul>

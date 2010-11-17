@@ -5,6 +5,7 @@ import java.util.List;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.MimeTypeMapper;
+import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.filters.IFilter;
@@ -35,6 +36,18 @@ public class FilterConfigurationTest {
 		fc2.custom = true;
 	}
 	
+	@Test
+	public void simpleOverrideTest () {
+		IFilterConfigurationMapper fcm = new FilterConfigurationMapper();
+		fcm.addConfiguration(fc1);
+		FilterConfiguration cfg = fcm.getDefaultConfiguration(MimeTypeMapper.PROPERTIES_MIME_TYPE);
+		assertEquals(cfg.configId, "config1");
+		fcm.removeConfiguration(cfg.configId);
+		fcm.addConfiguration(fc2);
+		cfg = fcm.getDefaultConfiguration(MimeTypeMapper.PROPERTIES_MIME_TYPE);
+		assertEquals(cfg.configId, "config2");
+	}
+
 	@Test
 	public void simpleConfigTest () {
 		IFilterConfigurationMapper fcm = new FilterConfigurationMapper();

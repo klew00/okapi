@@ -64,6 +64,23 @@ public class XLIFFWriterTest {
 	}
 
 	@Test
+	public void testWithExtra ()
+		throws IOException
+	{
+		writer.create(root+"out.xlf", null, locEN, null, null, "original.ext", null);
+		writer.writeStartFile(null, null, null, "<phase-group phase-name=\"a\" process-name=\"b\"/>");
+		writer.writeEndFile();
+		writer.close();
+		
+		String result = readFile(root+"out.xlf");
+		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\">\n"
+			+ "<file original=\"unknown\" source-language=\"en\" datatype=\"x-undefined\">\n"
+			+ "<header><phase-group phase-name=\"a\" process-name=\"b\"/></header>\n"
+			+ "<body>\n</body>\n</file>\n</xliff>\n", result);
+	}
+
+	@Test
 	public void testBasicSourceOnly ()
 		throws IOException
 	{
