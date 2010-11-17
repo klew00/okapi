@@ -261,6 +261,15 @@ public class XmlSnippetsTest {
 						XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters),
 						snippet, locEN, xmlStreamFilter));
 	}
+	
+	@Test
+	public void testEscapes2() {
+		String snippet = "<p>&lt;=lt, &amp;=amp, etc. but &amp;amp=escaped amp</p>";
+		assertEquals("<p>&lt;=lt, &amp;=amp, etc. but &amp;amp=escaped amp</p>",
+				XmlStreamTestUtils.generateOutput(
+						XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters),
+						snippet, locEN, xmlStreamFilter));
+	}
 
 	@Test
 	public void testEscapedEntities() {
@@ -374,53 +383,63 @@ public class XmlSnippetsTest {
 		URL originalParameters = parameters;
 		parameters = XmlSnippetsTest.class.getResource("dita.yml");
 		String snippet = "this is text with <ph translate=\"no\"><b>inline</b></ph> exclusions";
-		TextUnit tu = FilterTestDriver.getTextUnit(XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters), 1);
-		assertEquals("<ph translate=\"no\"><b>inline</b></ph>", tu.getSource().getFirstContent().getCode(0).getOuterData());
+		TextUnit tu = FilterTestDriver.getTextUnit(
+				XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters), 1);
+		assertEquals("<ph translate=\"no\"><b>inline</b></ph>", tu.getSource().getFirstContent()
+				.getCode(0).getOuterData());
 		assertEquals("<b>inline</b>", tu.getSource().getFirstContent().getCode(0).getData());
 		assertEquals(snippet, XmlStreamTestUtils.generateOutput(
 				XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters), snippet, locEN,
 				xmlStreamFilter));
 		parameters = originalParameters;
 	}
-	
+
 	@Test
 	public void testInlineAndExcludeWithTwoExcludes() {
 		URL originalParameters = parameters;
 		parameters = XmlSnippetsTest.class.getResource("dita.yml");
 		String snippet = "this is text with <ph translate=\"no\">inline</ph> exclusions <ph translate=\"no\">inline2</ph>";
-		TextUnit tu = FilterTestDriver.getTextUnit(XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters), 1);
-		assertEquals("<ph translate=\"no\">inline</ph>", tu.getSource().getFirstContent().getCode(0).getOuterData());
+		TextUnit tu = FilterTestDriver.getTextUnit(
+				XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters), 1);
+		assertEquals("<ph translate=\"no\">inline</ph>", tu.getSource().getFirstContent()
+				.getCode(0).getOuterData());
 		assertEquals("inline", tu.getSource().getFirstContent().getCode(0).getData());
-		assertEquals("<ph translate=\"no\">inline2</ph>", tu.getSource().getFirstContent().getCode(1).getOuterData());
+		assertEquals("<ph translate=\"no\">inline2</ph>",
+				tu.getSource().getFirstContent().getCode(1).getOuterData());
 		assertEquals("inline2", tu.getSource().getFirstContent().getCode(1).getData());
 		assertEquals(snippet, XmlStreamTestUtils.generateOutput(
 				XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters), snippet, locEN,
 				xmlStreamFilter));
 		parameters = originalParameters;
 	}
-	
+
 	@Test
 	public void testInlineAndNotExclude() {
 		URL originalParameters = parameters;
 		parameters = XmlSnippetsTest.class.getResource("dita.yml");
 		String snippet = "this is text with <ph translate=\"yes\">inline</ph> exclusions";
-		TextUnit tu = FilterTestDriver.getTextUnit(XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters), 1);
-		assertEquals("<ph translate=\"yes\">", tu.getSource().getFirstContent().getCode(0).toString());
+		TextUnit tu = FilterTestDriver.getTextUnit(
+				XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters), 1);
+		assertEquals("<ph translate=\"yes\">", tu.getSource().getFirstContent().getCode(0)
+				.toString());
 		assertEquals("</ph>", tu.getSource().getFirstContent().getCode(1).toString());
 		assertEquals(snippet, XmlStreamTestUtils.generateOutput(
 				XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters), snippet, locEN,
 				xmlStreamFilter));
 		parameters = originalParameters;
 	}
-	
+
 	@Test
 	public void testInlineAndExcludeEmbedded() {
 		URL originalParameters = parameters;
 		parameters = XmlSnippetsTest.class.getResource("dita.yml");
 		String snippet = "<ph translate=\"yes\">this is text with <ph translate=\"no\">inline</ph> exclusions</ph>";
-		TextUnit tu = FilterTestDriver.getTextUnit(XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters), 1);
-		assertEquals("<ph translate=\"yes\">", tu.getSource().getFirstContent().getCode(0).toString());
-		assertEquals("<ph translate=\"no\">inline</ph>", tu.getSource().getFirstContent().getCode(1).getOuterData());
+		TextUnit tu = FilterTestDriver.getTextUnit(
+				XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters), 1);
+		assertEquals("<ph translate=\"yes\">", tu.getSource().getFirstContent().getCode(0)
+				.toString());
+		assertEquals("<ph translate=\"no\">inline</ph>", tu.getSource().getFirstContent()
+				.getCode(1).getOuterData());
 		assertEquals("inline", tu.getSource().getFirstContent().getCode(1).getData());
 		assertEquals("</ph>", tu.getSource().getFirstContent().getCode(2).toString());
 		assertEquals(snippet, XmlStreamTestUtils.generateOutput(
@@ -428,15 +447,18 @@ public class XmlSnippetsTest {
 				xmlStreamFilter));
 		parameters = originalParameters;
 	}
-	
+
 	// FIXME: Handle embedded translate=no/yes elements @Test
 	public void testInlineAndNotExcludeEmbedded() {
 		URL originalParameters = parameters;
 		parameters = XmlSnippetsTest.class.getResource("dita.yml");
 		String snippet = "<ph translate=\"no\">this is text with <ph translate=\"yes\">inline</ph> exclusions</ph>";
-		TextUnit tu = FilterTestDriver.getTextUnit(XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters), 1);
-		assertEquals("<ph translate=\"no\">this is text with ", tu.getSource().getFirstContent().getCode(0).getOuterData());
-		assertEquals("<ph translate=\"yes\">", tu.getSource().getFirstContent().getCode(1).getOuterData());
+		TextUnit tu = FilterTestDriver.getTextUnit(
+				XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters), 1);
+		assertEquals("<ph translate=\"no\">this is text with ", tu.getSource().getFirstContent()
+				.getCode(0).getOuterData());
+		assertEquals("<ph translate=\"yes\">", tu.getSource().getFirstContent().getCode(1)
+				.getOuterData());
 		assertEquals("</ph>", tu.getSource().getFirstContent().getCode(2).getOuterData());
 		assertEquals(" exclusions</ph>", tu.getSource().getFirstContent().getCode(3).getOuterData());
 		assertFalse(snippet.equals(XmlStreamTestUtils.generateOutput(
@@ -444,41 +466,43 @@ public class XmlSnippetsTest {
 				xmlStreamFilter)));
 		parameters = originalParameters;
 	}
-	
+
 	@Test
 	public void testXmlIdResname() {
 		URL originalParameters = parameters;
 		parameters = XmlSnippetsTest.class.getResource("dita.yml");
 		String snippet = "<note id=\"v512165_fr-fr\" type=\"other\" othertype=\"WARNING\">Some text here... </note>";
-		TextUnit tu = FilterTestDriver.getTextUnit(XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters), 1);
+		TextUnit tu = FilterTestDriver.getTextUnit(
+				XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters), 1);
 		assertNull(tu.getName());
-		
+
 		snippet = "<note xml:id=\"v512165_fr-fr\" type=\"other\" othertype=\"WARNING\">Some text here... </note>";
-		tu = FilterTestDriver.getTextUnit(XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters), 2);
+		tu = FilterTestDriver.getTextUnit(
+				XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters), 2);
 		assertEquals("v512165_fr-fr-xml:id", tu.getName());
 		parameters = originalParameters;
 	}
-	
+
 	@Test
 	public void testConditionalInlineWithAttribute() {
 		URL originalParameters = parameters;
 		parameters = XmlSnippetsTest.class.getResource("dita.yml");
 		String snippet = "<p>TEST: <image href=\"bike.gif\" alt=\"text in alt\"/> more text</p>";
 		List<Event> events = XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters);
-		TextUnit tu1 = FilterTestDriver.getTextUnit(events, 1);		
-		TextUnit tu2 = FilterTestDriver.getTextUnit(events, 2);		
+		TextUnit tu1 = FilterTestDriver.getTextUnit(events, 1);
+		TextUnit tu2 = FilterTestDriver.getTextUnit(events, 2);
 		assertEquals("text in alt", tu1.toString());
 		assertEquals("TEST: <image href=\"bike.gif\" [#$tu2]/> more text", tu2.toString());
-		
+
 		snippet = "<p>TEST: <image placement=\"break\" href=\"bike.gif\" alt=\"text in alt\"/> more text</p>";
 		events = XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters);
 		tu1 = FilterTestDriver.getTextUnit(events, 1);
 		tu2 = FilterTestDriver.getTextUnit(events, 2);
 		TextUnit tu3 = FilterTestDriver.getTextUnit(events, 3);
 		assertEquals("text in alt", tu1.toString());
-		assertEquals("TEST:", tu2.toString());		
+		assertEquals("TEST:", tu2.toString());
 		assertEquals("more text", tu3.toString());
 
 		parameters = originalParameters;
-	}	
+	}
 }

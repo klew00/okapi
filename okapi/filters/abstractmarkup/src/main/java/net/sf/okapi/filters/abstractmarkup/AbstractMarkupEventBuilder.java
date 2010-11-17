@@ -88,7 +88,7 @@ public class AbstractMarkupEventBuilder extends EventBuilder {
 	
 	public String normalizeHtmlText(String text, boolean insideAttribute, boolean preserveWhitespace) {
 		// convert all entities to Unicode
-		String decodedValue = CharacterReference.decode(text, insideAttribute);
+		String decodedValue = text;
 		
 		if (!preserveWhitespace) {
 			decodedValue = collapseWhitespace(decodedValue);
