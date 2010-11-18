@@ -25,6 +25,8 @@ public class XliffSplitterTest {
 					+ File.separator;
 		xlfFileList = Util.getFilteredFiles(xlfRoot, ".xlf");
 		splitPath = xlfRoot + "/split";
+
+		Util.createDirectories(splitPath+"/");
 		
 		// create pipeline
 		pipeline = new Pipeline();
@@ -58,7 +60,7 @@ public class XliffSplitterTest {
 	}
 	
 	@Test
-	public void splitBigXliffWithMultipleInputFiles() {
+	public void splitXliffWithMultipleInputFiles() {
 			pipeline.startBatch();		
 			for (String file : xlfFileList) {
 				splitter.setOutputURI(Util.toURI(splitPath + "/" + file));
@@ -69,7 +71,7 @@ public class XliffSplitterTest {
 	
 	@Test
 	public void splitBigXliffWithOneFile() {
-		Parameters params = new Parameters();
+		XliffSplitterParameters params = new XliffSplitterParameters();
 		params.setBigFile(true);
 		splitter.setParameters(params);
 		pipeline.startBatch();		
@@ -81,7 +83,7 @@ public class XliffSplitterTest {
 	
 	@Test
 	public void splitBigXliffWithMultipleFiles() {
-		Parameters params = new Parameters();
+		XliffSplitterParameters params = new XliffSplitterParameters();
 		params.setBigFile(true);
 		splitter.setParameters(params);
 		pipeline.startBatch();		
@@ -92,11 +94,12 @@ public class XliffSplitterTest {
 	}
 	
 	@Test
-	public void splitXliffWithMultipleInputFiles() {
-		Parameters params = new Parameters();
+	public void splitBigXliffWithMultipleInputFiles() {
+		XliffSplitterParameters params = new XliffSplitterParameters();
 		params.setBigFile(true);
 		splitter.setParameters(params);
 		pipeline.startBatch();		
+		
 		for (String file : xlfFileList) {
 			splitter.setOutputURI(Util.toURI(splitPath + "/" + file));
 			pipeline.process(new RawDocument(Util.toURI(xlfRoot + file), "UTF-8", LocaleId.ENGLISH));

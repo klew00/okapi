@@ -550,6 +550,18 @@ public class PipelineWrapper {
 			availableSteps.put(step.id, step);
 			
 			ps = (IPipelineStep)Class.forName(
+			"net.sf.okapi.steps.xliffsplitter.XliffJoinerStep").newInstance();
+			params = ps.getParameters();
+			step = new StepInfo(ps.getClass().getSimpleName(),
+					ps.getName(), ps.getDescription(), ps.getClass().getName(), null,
+					params.getClass().getName());
+			if ( params != null ) {
+				step.paramsData = params.toString();
+				peMapper.addDescriptionProvider("net.sf.okapi.steps.xliffsplitter.XliffJoinerParameters", step.paramsClass);
+			}
+			availableSteps.put(step.id, step);
+
+			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.xliffsplitter.XliffSplitterStep").newInstance();
 			params = ps.getParameters();
 			step = new StepInfo(ps.getClass().getSimpleName(),
@@ -557,10 +569,10 @@ public class PipelineWrapper {
 				params.getClass().getName());
 			if ( params != null ) {
 				step.paramsData = params.toString();
-				peMapper.addDescriptionProvider("net.sf.okapi.steps.xliffsplitter.Parameters", step.paramsClass);
+				peMapper.addDescriptionProvider("net.sf.okapi.steps.xliffsplitter.XliffSplitterParameters", step.paramsClass);
 			}
 			availableSteps.put(step.id, step);
-
+			
 			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.xmlvalidation.XMLValidationStep").newInstance();
 			params = ps.getParameters();

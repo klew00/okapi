@@ -76,17 +76,17 @@ import net.sf.okapi.common.resource.RawDocument;
  * @author HargraveJE
  * 
  */
-@UsingParameters(Parameters.class)
+@UsingParameters(XliffSplitterParameters.class)
 public class XliffSplitterStep extends BasePipelineStep {
 
 	private final Logger logger = Logger.getLogger(getClass().getName());
 	
-	private Parameters params;
+	private XliffSplitterParameters params;
 	private boolean done = false;
 	private URI outputURI;
 	
 	public XliffSplitterStep() {
-		params = new Parameters();
+		params = new XliffSplitterParameters();
 	}
 
 	@StepParameterMapping(parameterType = StepParameterType.OUTPUT_URI)
@@ -111,7 +111,7 @@ public class XliffSplitterStep extends BasePipelineStep {
 
 	@Override
 	public void setParameters(final IParameters params) {
-		this.params = (Parameters) params;
+		this.params = (XliffSplitterParameters) params;
 	}
 
 	@Override
@@ -305,8 +305,8 @@ public class XliffSplitterStep extends BasePipelineStep {
 				final Map<String, String> attributesMap = outputFile.replace(attributes, true);
 				//Before, hard-coded: attributesMap.put("translation_type", "manual_translation");
 				//Before, hard-coded: attributesMap.put("translation_status", "finished");
-				attributesMap.put(Parameters.TRANSLATIONTYPE, params.getTranslationTypeValue());
-				attributesMap.put(Parameters.TRANSLATIONSTATUS, params.getTranslationStatusValue());
+				attributesMap.put(XliffSplitterParameters.TRANSLATIONTYPE, params.getTranslationTypeValue());
+				attributesMap.put(XliffSplitterParameters.TRANSLATIONSTATUS, params.getTranslationStatusValue());
 				attributesMap.remove("target_content");
 			}
 		}

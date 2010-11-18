@@ -28,8 +28,8 @@ import net.sf.okapi.common.uidescription.EditorDescription;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 import net.sf.okapi.common.uidescription.TextInputPart;
 
-@EditorFor(Parameters.class)
-public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
+@EditorFor(XliffSplitterParameters.class)
+public class XliffSplitterParameters extends BaseParameters implements IEditorDescriptionProvider {
 
 	public static final String TRANSLATIONTYPE = "translation_type";
 	public static final String TRANSLATIONSTATUS = "translation_status";
@@ -47,7 +47,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private String translationTypeValue;
 	private String translationStatusValue;
 
-	public Parameters() {
+	public XliffSplitterParameters() {
 		reset();
 	}
 
@@ -124,7 +124,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	@Override
 	public ParametersDescription getParametersDescription() {
 		ParametersDescription desc = new ParametersDescription(this);
-		desc.add(BIGFILE, "Process large file", null);
+		desc.add(BIGFILE, "Process big file", null);
 		desc.add(FILEMARKER, "File marker", null);
 		desc.add(UPDATESDLTRANSLATIONSTATUS, "Update the <iws:status> translation status (WorldServer-specific)", null);
 		desc.add(TRANSLATIONTYPEVALUE, String.format("Value for '%s'", TRANSLATIONTYPE),
@@ -138,14 +138,14 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public EditorDescription createEditorDescription (ParametersDescription paramsDesc) {
 		EditorDescription desc = new EditorDescription("XLIFF Splitter", true, false);
 		
-		CheckboxPart cbpBF = desc.addCheckboxPart(paramsDesc.get(BIGFILE));
+		CheckboxPart cbp = desc.addCheckboxPart(paramsDesc.get(BIGFILE));
 		TextInputPart tip = desc.addTextInputPart(paramsDesc.get(FILEMARKER));
 		tip.setVertical(false);
-		tip.setMasterPart(cbpBF, true);
+		tip.setMasterPart(cbp, true);
 
 		desc.addSeparatorPart();
 		
-		CheckboxPart cbp = desc.addCheckboxPart(paramsDesc.get(UPDATESDLTRANSLATIONSTATUS));
+		cbp = desc.addCheckboxPart(paramsDesc.get(UPDATESDLTRANSLATIONSTATUS));
 		
 		// translation_type
 		tip = desc.addTextInputPart(paramsDesc.get(TRANSLATIONTYPEVALUE));
