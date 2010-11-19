@@ -255,7 +255,7 @@ public class FilterConfigurationsPanel extends Composite {
 			cachedFilter = mapper.createFilter(config.configId, cachedFilter);
 			
 			IFilterConfigurationEditor editor = new FilterConfigurationEditor();
-			editor.editConfiguration(config.configId, mapper, cachedFilter, getShell());
+			editor.editConfiguration(config.configId, mapper, cachedFilter, getShell(), new BaseContext());
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(getShell(), e.getMessage(), null);

@@ -136,6 +136,7 @@ outputRoot = rootDir;
 
 			String resolvedOutputDir = params.getPackageDirectory() + File.separator + params.getPackageName();
 			resolvedOutputDir = Util.fillRootDirectoryVariable(resolvedOutputDir, rootDir);
+			resolvedOutputDir = LocaleId.replaceVariables(resolvedOutputDir, srcLoc.toString(), trgLoc.toString());
 			Util.deleteDirectory(resolvedOutputDir, false);
 			
 			String pkgId = UUID.randomUUID().toString();

@@ -45,7 +45,7 @@ public class SimplifierTest {
 		tf.append("T1");
 		tf.append(TagType.CLOSING, "b", "</b>");
 		tf.append(TagType.CLOSING, "a", "</a>");
-	
+		
 		simp.simplify(tf);
 	}
 }

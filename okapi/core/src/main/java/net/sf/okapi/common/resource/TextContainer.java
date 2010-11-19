@@ -118,7 +118,9 @@ public class TextContainer implements Iterable<TextPart> {
 		}
 		
 		@Override
-		public void append (Segment segment, String textBefore) {
+		public void append (Segment segment,
+			String textBefore)
+		{
 			// Add the text before if needed
 			if ( !Util.isEmpty(textBefore) ) {
 				if (( parts.get(parts.size()-1).getContent().isEmpty() )
@@ -214,7 +216,9 @@ public class TextContainer implements Iterable<TextPart> {
 		}
 	
 		@Override
-		public int create (int start, int end) {
+		public int create (int start,
+			int end)
+		{
 			ArrayList<Range> range = new ArrayList<Range>();
 			range.add(new Range(start, end));
 			return create(range); 
@@ -365,7 +369,6 @@ public class TextContainer implements Iterable<TextPart> {
 	
 	/**
 	 * Creates a new {@link ISegments} object to access the segments of this container.
-	 * <p><b>Do not call this method</b> inside loops, as the object is created for each call.
 	 * @return a new {@link ISegments} object.
 	 */
 	public ISegments getSegments () {

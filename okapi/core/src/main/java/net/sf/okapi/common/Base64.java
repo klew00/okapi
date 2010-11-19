@@ -11,7 +11,7 @@
   Please contact the author if you need another license.
   This module is provided "as is", without warranties of any kind.
 ----------------------------------------------------------------------------
-  Modified the Okapi Framework project
+  Modified by the Okapi Framework project
 ===========================================================================*/
 
 package net.sf.okapi.common;

@@ -61,6 +61,212 @@ public class TextUnit2 implements ITextUnit {
 	private String mimeType;
 	private ConcurrentHashMap<LocaleId, TextContainer> targets;
 	
+	private final IAlignedSegments segments = new IAlignedSegments () {
+		
+		@Override
+		public void splitTarget (LocaleId trgLoc,
+			Segment trgSeg,
+			int splitPos)
+		{
+			// TODO Auto-generated method stub
+		}
+		
+		@Override
+		public void splitSource (Segment srcSeg,
+			int splitPos)
+		{
+			// TODO Auto-generated method stub
+		}
+		
+		@Override
+		public void setTarget (int index,
+			Segment trgSeg,
+			LocaleId trgLoc)
+		{
+			ISegments trgSegs = getTarget_DIFF(trgLoc).getSegments();
+			List<Segment> trgList = trgSegs.asList();
+			// Get the existing segment's ID 
+			String oldId = trgList.get(index).id;
+			// Set the new segment. its ID is updated internally if needed
+			trgList.set(index, trgSeg);
+			if ( !oldId.equals(trgSeg.id) ) {
+				// Change the source ID too
+				Segment srcSeg = getCorrespondingSource(trgSeg);
+				srcSeg.id = trgSeg.id;
+				// If needed update the target IDs for that segment
+				for ( LocaleId loc : getTargetLocales() ) {
+					if ( loc.equals(trgLoc) ) continue;
+					ISegments otherSegs = targets.get(loc).getSegments();
+					Segment otherSeg = otherSegs.get(oldId);
+					otherSeg.id = trgSeg.id;
+				}
+			}
+		}
+		
+		@Override
+		public void setSource (int index,
+			Segment srcSeg)
+		{
+			ISegments srcSegs = source.getSegments();
+			List<Segment> srcList = srcSegs.asList();
+			// Get the existing segment's ID 
+			String oldId = srcList.get(index).id;
+			// Set the new segment. its ID is updated internally if needed
+			srcList.set(index, srcSeg);
+			if ( !oldId.equals(srcSeg.id) ) {
+				// If needed update the target IDs for that segment
+				for ( LocaleId loc : getTargetLocales() ) {
+					ISegments trgSegs = targets.get(loc).getSegments();
+					Segment trgSeg = trgSegs.get(oldId);
+					trgSeg.id = srcSeg.id;
+				}
+			}
+		}
+		
+		@Override
+		public void segmentTarget (ISegmenter segmenter,
+			LocaleId targetLocale)
+		{
+	//TODO: what do we do if target doesn't exist?
+	// Exception or just create empty segmented copy from source?
+	//for now: exception
+			if ( !hasTarget(targetLocale) ) {
+				throw new RuntimeException(String.format("There is no target content for '%s'", targetLocale.toString()));
+			}
+			// else: segment
+			TextContainer tc = getTarget_DIFF(targetLocale);
+			segmenter.computeSegments(tc);
+			tc.getSegments().create(segmenter.getRanges());
+	//TODO: invalidate source and other targets? or this one.
+	// but then there is no way to call segmentTarget and get all in synch
+		}
+		
+		@Override
+		public void segmentSource (ISegmenter segmenter) {
+			segmenter.computeSegments(source);
+			source.getSegments().create(segmenter.getRanges());
+		}
+		
+		@Override
+		public boolean remove (Segment seg) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+		
+		@Override
+		public void mergeSource (Segment srcSeg1, Segment srcSeg2) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		@Override
+		public void joinAll () {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		@Override
+		public void insert (int index, Segment srcSeg, Segment trgSeg,
+			LocaleId trgLoc) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		@Override
+		public void insert (int index, Segment srcSeg) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		@Override
+		public ISegments getTargetSegments (LocaleId trgLoc) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+		
+		@Override
+		public Segment getTargetSegment (LocaleId trgLoc,
+			String segId,
+			boolean createIfNeeded)
+		{
+			// TODO Auto-generated method stub
+			return null;
+		}
+		
+		@Override
+		public ISegments getSourceSegments () {
+			// TODO Auto-generated method stub
+			return null;
+		}
+		
+		@Override
+		public Segment getSourceSegment (String segId,
+			boolean createIfNeeded)
+		{
+			// TODO Auto-generated method stub
+			return null;
+		}
+		
+		@Override
+		public Segment getCorrespondingTarget (Segment srcSeg,
+			LocaleId trgLoc)
+		{
+			// TODO Auto-generated method stub
+			return null;
+		}
+		
+		@Override
+		public Segment getCorrespondingSource (Segment trgSeg) {
+			Segment res = source.getSegments().get(trgSeg.id);
+			if ( res == null ) { // If no corresponding segment found: create one
+				res = new Segment(trgSeg.id);
+				source.getSegments().append(res);
+			}
+			return res;
+		}
+		
+		@Override
+		public int getAlignmentStatus () {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+		
+		@Override
+		public void append (Segment srcSeg,
+			Segment trgSeg,
+			LocaleId trgLoc)
+		{
+			// Append the segment to the source
+			source.getSegments().append(srcSeg);
+			// Make sure the target segment id matches the source
+			trgSeg.id = srcSeg.id;
+			// Append a new empty segment to all targets
+			for ( LocaleId loc : getTargetLocales() ) {
+				ISegments trgSegs = targets.get(loc).getSegments();
+				if ( loc.equals(trgLoc) ) trgSegs.append(trgSeg);
+				else trgSegs.append(new Segment(srcSeg.id));
+			}
+		}
+		
+		@Override
+		public void append (Segment srcSeg) {
+			// Append the segment to the source
+			source.getSegments().append(srcSeg);
+			// Append a new empty segment to all targets
+			for ( LocaleId loc : getTargetLocales() ) {
+				ISegments trgSegs = targets.get(loc).getSegments();
+				trgSegs.append(new Segment(srcSeg.id));
+			}
+		}
+		
+		@Override
+		public void align (List<AlignedPair> alignedSegmentPairs,
+			LocaleId trgLoc)
+		{
+			//TODO: for Jim :-)
+		}
+	};
+
 	/**
 	 * Creates a new TextUnit object with its identifier.
 	 * @param id the identifier of this resource.
@@ -175,43 +381,53 @@ public class TextUnit2 implements ITextUnit {
 		this.annotations = annotations;
 	}
 	
+	@Override
 	public String getId () {
 		return id;
 	}
 
+	@Override
 	public void setId (String id) {
 		this.id = id;
 	}
 
+	@Override
 	public ISkeleton getSkeleton () {
 		return skeleton;
 	}
 
+	@Override
 	public void setSkeleton (ISkeleton skeleton) {
 		this.skeleton = skeleton;
 	}
 
+	@Override
 	public String getName () {
 		return name;
 	}
 
+	@Override
 	public void setName (String name) {
 		this.name = name;
 	}
 
+	@Override
 	public String getType () {
 		return type;
 	}
 	
+	@Override
 	public void setType (String value) {
 		type = value;
 	}
 	
+	@Override
 	public <A extends IAnnotation> A getAnnotation (Class<A> annotationType) {
 		if ( annotations == null ) return null;
 		return annotationType.cast(annotations.get(annotationType) );
 	}
 
+	@Override
 	public void setAnnotation (IAnnotation annotation) {
 		if ( annotations == null ) {
 			annotations = new Annotations();
@@ -219,53 +435,64 @@ public class TextUnit2 implements ITextUnit {
 		annotations.set(annotation);
 	}
 
+	@Override
 	public Property getProperty (String name) {
 		if ( properties == null ) return null;
 		return properties.get(name);
 	}
 
+	@Override
 	public Property setProperty (Property property) {
 		if ( properties == null ) properties = new LinkedHashMap<String, Property>();
 		properties.put(property.getName(), property);
 		return property;
 	}
 	
+	@Override
 	public void removeProperty (String name) {
 		if ( properties != null ) {
 			properties.remove(name);
 		}
 	}
 	
+	@Override
 	public Set<String> getPropertyNames () {
 		if ( properties == null ) properties = new LinkedHashMap<String, Property>();
 		return properties.keySet();
 	}
 
+	@Override
 	public boolean hasProperty (String name) {
 		if ( properties == null ) return false;
 		return properties.containsKey(name);
 	}
 
+	@Override
 	public Property getSourceProperty (String name) {
 		return source.getProperty(name);
 	}
 
+	@Override
 	public Property setSourceProperty (Property property) {
 		return source.setProperty(property);
 	}
 	
+	@Override
 	public Set<String> getSourcePropertyNames () {
 		return source.getPropertyNames();
 	}
 	
+	@Override
 	public void removeSourceProperty (String name) {
 		source.removeProperty(name);
 	}
 	
+	@Override
 	public boolean hasSourceProperty (String name) {
 		return source.hasProperty(name);
 	}
 
+	@Override
 	public Property getTargetProperty (LocaleId locId,
 		String name)
 	{
@@ -273,12 +500,14 @@ public class TextUnit2 implements ITextUnit {
 		return getTarget_DIFF(locId).getProperty(name);
 	}
 
+	@Override
 	public Property setTargetProperty (LocaleId locId,
 		Property property)
 	{
 		return createTarget(locId, false, IResource.COPY_SEGMENTS).setProperty(property);
 	}
 
+	@Override
 	public void removeTargetProperty (LocaleId locId,
 		String name)
 	{
@@ -287,6 +516,7 @@ public class TextUnit2 implements ITextUnit {
 		}
 	}
 	
+	@Override
 	public Set<String> getTargetPropertyNames (LocaleId locId) {
 		if ( hasTarget(locId) ) {
 			return getTarget_DIFF(locId).getPropertyNames();
@@ -295,6 +525,7 @@ public class TextUnit2 implements ITextUnit {
 		return Collections.emptySet();
 	}
 
+	@Override
 	public boolean hasTargetProperty (LocaleId locId,
 		String name)
 	{
@@ -303,10 +534,12 @@ public class TextUnit2 implements ITextUnit {
 		return (tc.getProperty(name) != null);
 	}
 
+	@Override
 	public Set<LocaleId> getTargetLocales () {
 		return targets.keySet();
 	}
 
+	@Override
 	public Property createTargetProperty (LocaleId locId,
 		String name,
 		boolean overwriteExisting,
@@ -337,26 +570,32 @@ public class TextUnit2 implements ITextUnit {
 		return prop;
 	}
 
+	@Override
 	public boolean isTranslatable () {
 		return isTranslatable;
 	}
 	
+	@Override
 	public void setIsTranslatable (boolean value) {
 		isTranslatable = value;
 	}
 
+	@Override
 	public boolean isReferent () {
 		return (refCount > 0);
 	}
 
+	@Override
 	public void setIsReferent (boolean value) {
 		refCount = (value ? 1 : 0 );
 	}
 	
+	@Override
 	public int getReferenceCount () {
 		return refCount;
 	}
 	
+	@Override
 	public void setReferenceCount (int value) {
 		refCount = value;
 	}
@@ -432,19 +671,7 @@ public class TextUnit2 implements ITextUnit {
 		return (targets.get(locId) != null);
 	}
 
-    /**
-	 * Creates or get the target for this TextUnit.
-	 * @param locId the target locale.
-	 * @param overwriteExisting true to overwrite any existing target for the given locale.
-	 * False to not create a new target object if one already exists for the given locale.
-	 * @param creationOptions creation options:
-	 * <ul><li>CREATE_EMPTY: Create an empty target object.</li>
-	 * <li>COPY_CONTENT: Copy the text of the source (and any associated in-line code).</li>
-	 * <li>COPY_PROPERTIES: Copy the source properties.</li>
-	 * <li>COPY_SEGMENTS: Copy the source segmentation.</li>
-	 * <li>COPY_ALL: Same as (COPY_CONTENT|COPY_PROPERTIES|COPY_SEGMENTS).</li></ul>
-	 * @return the target object that was created, or retrieved.
-	 */
+	@Override
 	public TextContainer createTarget (LocaleId locId,
 		boolean overwriteExisting,
 		int creationOptions)
@@ -493,30 +720,44 @@ public class TextUnit2 implements ITextUnit {
 		return tc.getSegments().getFirstContent();
 	}
 
+	@Override
 	public String getMimeType () {
 		return mimeType;
 	}
-	
+
+	@Override
 	public void setMimeType (String mimeType) {
 		this.mimeType = mimeType;
 	}	
 
+	@Override
 	public boolean isEmpty () {
 		return source.isEmpty();
 	}
 
+	@Override
 	public boolean preserveWhitespaces () {
 		return preserveWS;
 	}
-	
+
+	@Override
 	public void setPreserveWhitespaces (boolean value) {
 		preserveWS = value;
 	}
 
+	@Override
+	public IAlignedSegments getSegments () {
+		return segments;
+	}
+	
+	
+	//========== TODO
+	
 	/**
 	 * Segments the source content based on the rules provided by a given ISegmenter.
 	 * @param segmenter the segmenter to use to create the segments.
 	 */
+//TODO: in ITextUnit already	
 	public void segmentSource (ISegmenter segmenter) {
 		segmenter.computeSegments(source);
 		source.getSegments().create(segmenter.getRanges());
@@ -544,23 +785,6 @@ public class TextUnit2 implements ITextUnit {
 // but then there is no way to call segmentTarget and get all in synch
 	}
 	
-	/**
-	 * Removes all segmentations (source and targets) in this text unit.
-	 * All entries are converted to non-segmented entries.
-	 */
-	public void joinAll () {
-		// Desegment the source if needed
-		if ( getSource().hasBeenSegmented() ) {
-			getSource().joinAll();
-		}
-		// Desegment all targets as needed
-		for ( Entry<LocaleId, TextContainer> entry : targets.entrySet() ) {
-			if ( entry.getValue().hasBeenSegmented() ) {
-				entry.getValue().joinAll();
-			}
-		}
-	}
-
 	@Override
 	public Iterable<IAnnotation> getAnnotations () {
 		if ( annotations == null ) {
@@ -569,163 +793,14 @@ public class TextUnit2 implements ITextUnit {
 		return annotations;
 	}
 
-	@Override
-	public void align (List<AlignedPair> alignedSegmentPairs,
-		LocaleId trgLoc)
-	{
-		//TODO: for Jim :-)
-	}
-
-	@Override
-	public void appendSegment (Segment srcSeg) {
-		// Append the segment to the source
-		source.getSegments().append(srcSeg);
-		// Append a new empty segment to all targets
-		for ( LocaleId loc : getTargetLocales() ) {
-			ISegments trgSegs = targets.get(loc).getSegments();
-			trgSegs.append(new Segment(srcSeg.id));
-		}
-	}
-
-	@Override
-	public void appendSegment (Segment srcSeg,
-		Segment trgSeg,
-		LocaleId trgLoc)
-	{
-		// Append the segment to the source
-		source.getSegments().append(srcSeg);
-		// Make sure the target segment id matches the source
-		trgSeg.id = srcSeg.id;
-		// Append a new empty segment to all targets
-		for ( LocaleId loc : getTargetLocales() ) {
-			ISegments trgSegs = targets.get(loc).getSegments();
-			if ( loc.equals(trgLoc) ) trgSegs.append(trgSeg);
-			else trgSegs.append(new Segment(srcSeg.id));
-		}
-	}
-
-	@Override
-	public int getAlignemntStatus () {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public Segment getCorrespondingSource (Segment trgSeg) {
-		Segment res = source.getSegments().get(trgSeg.id);
-		if ( res == null ) { // If no corresponding segment found: create one
-			res = new Segment(trgSeg.id);
-			source.getSegments().append(res);
-		}
-		return res;
-	}
-
-	@Override
-	public Segment getCorrespondingTarget (Segment srcSeg,
-		LocaleId trgLoc)
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void insertSegment (int index,
-		Segment srcSeg)
-	{
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void insertSegment (int index,
-		Segment srcSeg,
-		Segment trgSeg,
-		LocaleId trgLoc)
-	{
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void mergeSource (Segment srcSeg1,
-		Segment srcSeg2)
-	{
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public boolean removeSegment (Segment seg) {
-		ISegments srcSegs = source.getSegments();
-		// TODO: need remove on ISegments
-		
-		return false;
-	}
-
-	@Override
-	public void setSourceSegment (int index,
-		Segment srcSeg)
-	{
-		ISegments srcSegs = source.getSegments();
-		List<Segment> srcList = srcSegs.asList();
-		// Get the existing segment's ID 
-		String oldId = srcList.get(index).id;
-		// Set the new segment. its ID is updated internally if needed
-		srcList.set(index, srcSeg);
-		if ( !oldId.equals(srcSeg.id) ) {
-			// If needed update the target IDs for that segment
-			for ( LocaleId loc : getTargetLocales() ) {
-				ISegments trgSegs = targets.get(loc).getSegments();
-				Segment trgSeg = trgSegs.get(oldId);
-				trgSeg.id = srcSeg.id;
-			}
-		}
-	}
-
-	@Override
-	public void setTargetSegment (int index,
-		Segment trgSeg,
-		LocaleId trgLoc)
-	{
-		ISegments trgSegs = getTarget_DIFF(trgLoc).getSegments();
-		List<Segment> trgList = trgSegs.asList();
-		// Get the existing segment's ID 
-		String oldId = trgList.get(index).id;
-		// Set the new segment. its ID is updated internally if needed
-		trgList.set(index, trgSeg);
-		if ( !oldId.equals(trgSeg.id) ) {
-			// Change the source ID too
-			Segment srcSeg = getCorrespondingSource(trgSeg);
-			srcSeg.id = trgSeg.id;
-			// If needed update the target IDs for that segment
-			for ( LocaleId loc : getTargetLocales() ) {
-				if ( loc.equals(trgLoc) ) continue;
-				ISegments otherSegs = targets.get(loc).getSegments();
-				Segment otherSeg = otherSegs.get(oldId);
-				otherSeg.id = trgSeg.id;
-			}
-		}
-	}
-
-	@Override
-	public void splitSource (Segment srcSeg,
-		int splitPos)
-	{
-		ISegments srcSegs = source.getSegments();
-		//TODO: split in ISegmsnts
-	}
-
-	@Override
-	public void splitTarget (LocaleId trgLoc,
-		Segment trgSeg,
-		int splitPos)
-	{
-		// TODO Auto-generated method stub
-	}
-
 	//=== Possible additions
 	
+	@Override
 	public ISegments getSourceSegments () {
 		return source.getSegments();
 	}
 
+	@Override
 	public Segment getTargetSegment (LocaleId trgLoc,
 		String segId,
 		boolean createIfNeeded)
@@ -739,10 +814,12 @@ public class TextUnit2 implements ITextUnit {
 		return seg;
 	}
 
+	@Override
 	public ISegments getTargetSegments (LocaleId trgLoc) {
 		return getTarget_DIFF(trgLoc).getSegments();
 	}
 	
+	@Override
 	public Segment getSourceSegment (String segId,
 		boolean createIfNeeded)
 	{

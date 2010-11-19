@@ -25,6 +25,7 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 
 import net.sf.okapi.common.BaseContext;
+import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
 import net.sf.okapi.common.filters.FilterConfiguration;
@@ -46,14 +47,15 @@ public class FilterConfigurationEditor implements IFilterConfigurationEditor, IF
 	public boolean editConfiguration (String configId,
 		IFilterConfigurationMapper fcMapper)
 	{
-		return editConfiguration(configId, fcMapper, null, null);
+		return editConfiguration(configId, fcMapper, null, null, new BaseContext());
 	}
 	
 	@Override
 	public boolean editConfiguration (String configId,
 		IFilterConfigurationMapper fcMapper,
 		IFilter cachedFilter,
-		Object parent)
+		Object parent,
+		IContext context)
 	{
 		FilterConfiguration config = fcMapper.getConfiguration(configId);
 		if ( config == null ) {
@@ -75,7 +77,7 @@ public class FilterConfigurationEditor implements IFilterConfigurationEditor, IF
 
 		IParametersEditor editor = fcMapper.createConfigurationEditor(configId, cachedFilter);
 		if ( editor != null ) {
-			if ( !editor.edit(params, !config.custom, new BaseContext()) ) {
+			if ( !editor.edit(params, !config.custom, context) ) {
 				return false; // Cancel
 			}
 		}
@@ -85,7 +87,7 @@ public class FilterConfigurationEditor implements IFilterConfigurationEditor, IF
 			if ( descProv != null ) {
 				// Edit the data
 				GenericEditor genEditor = new GenericEditor();
-				if ( !genEditor.edit(params, descProv, !config.custom, new BaseContext()) ) {
+				if ( !genEditor.edit(params, descProv, !config.custom, context) ) {
 					return false; // Cancel
 				}
 				// The params object gets updated if edit not canceled.

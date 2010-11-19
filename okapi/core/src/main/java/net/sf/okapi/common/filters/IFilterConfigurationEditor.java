@@ -20,6 +20,8 @@
 
 package net.sf.okapi.common.filters;
 
+import net.sf.okapi.common.IContext;
+
 /**
  * Interface to edit the parameters of a filter configuration.
  * <p>There are different ways the parameters for a filter configuration can be edited
@@ -35,6 +37,7 @@ public interface IFilterConfigurationEditor {
 	 * @param cachedFilter an optional cached filter (can be null). If not null
 	 * the call will try to re-use it to load the parameters and the appropriate editor.
 	 * @param parent optional parent object used to place the dialog box (can be null).
+	 * @param context optional context from the caller (help, etc.)
 	 * The type of the object can be different depending on the implementations. 
 	 * @return true if the configuration was done, false if it could not be done or was canceled.
 	 * @throws RuntimeException if the configuration cannot be found, or if the parameters 
@@ -43,7 +46,8 @@ public interface IFilterConfigurationEditor {
 	public boolean editConfiguration (String configId,
 		IFilterConfigurationMapper fcMapper,
 		IFilter cachedFilter,
-		Object parent);
+		Object parent,
+		IContext context);
 
 	/**
 	 * Edits a given filter configuration.
