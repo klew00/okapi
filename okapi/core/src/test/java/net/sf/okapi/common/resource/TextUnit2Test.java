@@ -278,6 +278,13 @@ public class TextUnit2Test {
         assertSame("Properties should be the same", p1, tu1.getTargetProperty(locFR, "name"));
 	}
 
+    @Test
+    public void getSegmentsTest () {
+    	tu1.setSourceContent(new TextFragment("text"));
+    	IAlignedSegments as = tu1.getSegments();
+    	assertNotNull(as);
+    }
+    
 //	@Test
 //	public void testGetSetSourceContent () {
 //		TextFragment tf1 = new TextFragment("source text");

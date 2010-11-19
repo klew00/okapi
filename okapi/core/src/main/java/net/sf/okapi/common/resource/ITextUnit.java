@@ -20,9 +20,6 @@
 
 package net.sf.okapi.common.resource;
 
-import java.util.List;
-
-import net.sf.okapi.common.ISegmenter;
 import net.sf.okapi.common.LocaleId;
 
 public interface ITextUnit extends INameable, IReferenceable {
@@ -34,8 +31,8 @@ public interface ITextUnit extends INameable, IReferenceable {
 	public boolean isEmpty ();
 	
 	/**
-	 * Gets the source object for this TextUnit (a {@link TextContainer} object).
-	 * @return the source object for this TextUnit.
+	 * Gets the source object for this text unit (a {@link TextContainer} object).
+	 * @return the source object for this text unit.
 	 */
 	public TextContainer getSource ();
 
@@ -47,34 +44,38 @@ public interface ITextUnit extends INameable, IReferenceable {
 	public TextContainer setSource (TextContainer textContainer);
 
     /**
-	 * Gets the target object for this TextUnit for a given locale.
+	 * Gets the target object for this text unit for a given locale.
+	 * If the target does not exists one is created automatically, and contains a copy 
+	 * of the source with all segments empty.
+	 * <p>Calling this method is the same as calling <code>createTarget(locId, false, IResource.COPY_SEGMENTS)</code>  
 	 * @param locId the locale to query.
-	 * @return the target object for this text unit for the given locale,
-	 * or null if it does not exist.
+	 * @return the target object for this text unit for the given locale. Never returns null.
+	 * (Before M10 if the target did not exist none was created and the return was null).
+	 * @see #createTarget(LocaleId, boolean, int)
 	 */
-//Many methods rely of the null return	
 	public TextContainer getTarget_DIFF (LocaleId locId);
 
     /**
-	 * Sets the target object for this TextUnit for a given locale.
-	 * Any existing target object for the given locale is overwritten.
+	 * Sets the target object for this text unit for a given locale.
+	 * Any existing content for the given locale is overwritten.
 	 * To set a target object based on the source, use the
 	 * {@link #createTarget(LocaleId, boolean, int)} method.
 	 * @param locId the target locale.
-	 * @param text the target object to set.
-	 * @return the target object that has been set.
+	 * @param text the target content to set.
+	 * @return the target content that has been set.
 	 */
 	public TextContainer setTarget (LocaleId locId,
 		TextContainer text);
 
     /**
-	 * Removes a given target object from this TextUnit.
+	 * Removes a given target object from this text unit.
+	 * If the given locale does not exist in this text unit nothing happens.  
 	 * @param locId the target locale to remove.
 	 */
 	public void removeTarget (LocaleId locId);
 
     /**
-	 * Indicates if there is a target object for a given locale for this TextUnit.
+	 * Indicates if there is a target object for a given locale for this text unit.
 	 * @param locId the locale to query.
 	 * @return true if a target object exists for the given locale, false otherwise.
 	 */
@@ -119,27 +120,9 @@ public interface ITextUnit extends INameable, IReferenceable {
 	 */
 	IAlignedSegments getSegments ();
 	
-	/**
-	 * Segments the source content based on the rules provided by a given ISegmenter.
-	 * <p>This methods also stores the boundaries for the segments so they can be re-applied later.
-	 * for example when calling {@link #synchronizeSourceSegmentation(LocaleId)}.
-	 * @param segmenter the segmenter to use to create the segments.
-	 */
-	public void segmentSource (ISegmenter segmenter);
 	
-	/**
-	 * Segments the specified target content based on the rules provided by a given ISegmenter.
-	 * <p>This method may cause the source and target segments to be desynchronized, that is:
-	 * That each source segment may or may not be aligned with a corresponding target segment.
-	 * You can associate a target-specific segmentation for the source using
-	 * {@link #setSourceSegmentationForTarget(LocaleId, List)}.
-	 * @param segmenter the segmenter to use to create the segments.
-	 * @param targetLocale {@link LocaleId} of the target we want to segment.
-	 */
-	public void segmentTarget (ISegmenter segmenter,
-		LocaleId targetLocale);
+	//=== Possible additions
 	
-
 	/**
 	 * Gets the segments for the source. Un-segmented content return a single segment.
 	 * @return an object implementing ISegments for the source content. 

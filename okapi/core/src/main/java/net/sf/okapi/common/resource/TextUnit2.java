@@ -21,6 +21,7 @@
 package net.sf.okapi.common.resource;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
@@ -264,6 +265,11 @@ public class TextUnit2 implements ITextUnit {
 			LocaleId trgLoc)
 		{
 			//TODO: for Jim :-)
+		}
+
+		@Override
+		public Iterator<Segment> iterator () {
+			return source.getSegments().iterator();
 		}
 	};
 
@@ -600,10 +606,7 @@ public class TextUnit2 implements ITextUnit {
 		refCount = value;
 	}
 
-	/**
-	 * Gets the source object for this TextUnit (a {@link TextContainer} object).
-	 * @return the source object for this TextUnit.
-	 */
+	@Override
 	public TextContainer getSource () {
 		return source;
 	}
@@ -618,32 +621,18 @@ public class TextUnit2 implements ITextUnit {
 			throw new NullPointerException("The source container of a TextUnit cannot be null.");
 		}
 		source = textContainer;
+		//TODO: invalidate targets status???
 		return source;
 	}
 
-    /**
-	 * Gets the target object for this TextUnit for a given locale. If the target does not exists
-	 * one is created automatically, and contains a copy of the source with all segments empty.
-	 * @param locId the locale to query.
-	 * @return the target object for this text unit for the given locale. Never returns null
-	 * (Before M10 the return was null if the target did not exist).
-	 * @see #createTarget(LocaleId, boolean, int)
-	 */
 //TODO: Change name after integration
-// The name is different so we safely detect any place in the code where it's call and can fix the behavior if needed. 
+// The name is different so we safely detect any place in the code where it's call and can fix the behavior if needed.
+	@Override
 	public TextContainer getTarget_DIFF (LocaleId locId) {
 		return createTarget(locId, false, IResource.COPY_SEGMENTS);
 	}
 
-    /**
-	 * Sets the target object for this TextUnit for a given locale.
-	 * Any existing target object for the given locale is overwritten.
-	 * To set a target object based on the source, use the
-	 * {@link #createTarget(LocaleId, boolean, int)} method.
-	 * @param locId the target locale.
-	 * @param text the target object to set.
-	 * @return the target object that has been set.
-	 */
+	@Override
 	public TextContainer setTarget (LocaleId locId,
 		TextContainer text)
 	{
@@ -652,21 +641,14 @@ public class TextUnit2 implements ITextUnit {
 		return text;
 	}
 
-    /**
-	 * Removes a given target object from this TextUnit.
-	 * @param locId the target locale to remove.
-	 */
+	@Override
 	public void removeTarget (LocaleId locId) {
 		if ( hasTarget(locId) ) {
 			targets.remove(locId);
 		}
 	}
 
-    /**
-	 * Indicates if there is a target object for a given locale for this TextUnit.
-	 * @param locId the locale to query.
-	 * @return true if a target object exists for the given locale, false otherwise.
-	 */
+	@Override
 	public boolean hasTarget (LocaleId locId) {
 		return (targets.get(locId) != null);
 	}
@@ -746,46 +728,6 @@ public class TextUnit2 implements ITextUnit {
 	}
 
 	@Override
-	public IAlignedSegments getSegments () {
-		return segments;
-	}
-	
-	
-	//========== TODO
-	
-	/**
-	 * Segments the source content based on the rules provided by a given ISegmenter.
-	 * @param segmenter the segmenter to use to create the segments.
-	 */
-//TODO: in ITextUnit already	
-	public void segmentSource (ISegmenter segmenter) {
-		segmenter.computeSegments(source);
-		source.getSegments().create(segmenter.getRanges());
-		//TODO: invalidate targets seg
-	}
-	
-	/**
-	 * Segments the specified target content based on the rules provided by a given ISegmenter.
-	 * @param targetLocale {@link LocaleId} of the target we want to segment.
-	 */
-	public void segmentTarget (ISegmenter segmenter,
-		LocaleId targetLocale)
-	{
-//TODO: what do we do if target doesn't exist?
-// Exception or just create empty segmented copy from source?
-//for now: exception
-		if ( !hasTarget(targetLocale) ) {
-			throw new RuntimeException(String.format("There is no target content for '%s'", targetLocale.toString()));
-		}
-		// else: segment
-		TextContainer tc = getTarget_DIFF(targetLocale);
-		segmenter.computeSegments(tc);
-		tc.getSegments().create(segmenter.getRanges());
-//TODO: invalidate source and other targets? or this one.
-// but then there is no way to call segmentTarget and get all in synch
-	}
-	
-	@Override
 	public Iterable<IAnnotation> getAnnotations () {
 		if ( annotations == null ) {
 			return Collections.emptyList();
@@ -793,6 +735,12 @@ public class TextUnit2 implements ITextUnit {
 		return annotations;
 	}
 
+	@Override
+	public IAlignedSegments getSegments () {
+		return segments;
+	}
+
+	
 	//=== Possible additions
 	
 	@Override

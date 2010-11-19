@@ -20,16 +20,31 @@
 
 package net.sf.okapi.common.resource;
 
+import java.util.Iterator;
 import java.util.List;
 
 import net.sf.okapi.common.ISegmenter;
 import net.sf.okapi.common.LocaleId;
 
-public interface IAlignedSegments {
+/**
+ * Provides the methods to access all the source and target segments of a {@link ITextUnit}.
+ * The methods of this interface try to automatically preserve the one-to-one match between
+ * source segments and all the target segments.
+ * To create an instance of this interface, use the method {@link ITextUnit#getSegments()}.
+ */
+public interface IAlignedSegments extends Iterable<Segment> {
+
+	/**
+	 * Gets an iterator for the source segments of this text unit.
+	 * This iterator does not iterate through non-segment parts of the content.
+	 * @return an iterator for the source segments of this text unit.
+	 */
+	@Override
+	public Iterator<Segment> iterator();
 
 	/**
 	 * Adds a segment at the end of the source content.
-	 * Empty corresponding segments are created in all target in this text unit.
+	 * Empty corresponding segments are created in all targets in this text unit.
 	 * @param srcSeg the source segment to add.
 	 */
 	public void append (Segment srcSeg);
@@ -70,7 +85,7 @@ public interface IAlignedSegments {
 	/**
 	 * Replaces a source segment at a given position by a clone of a given segment.
 	 * If the id of the new segment is different from the current one, the id... TODO 
-	 * @param index the index position.
+	 * @param index the segment index position.
 	 * @param srcSeg the new source segment to place at the position.
 	 * @throws IndexOutOfBoundsException if the index is out of bounds.
 	 */
@@ -102,11 +117,12 @@ public interface IAlignedSegments {
 	
 	/**
 	 * Gets the target segment corresponding to a given source segment.
-	 * This always returns a segment: if the segment does not exists it is created in target content.
+	 * This always returns a segment: If the segment does not exists it is created at the end of the target content.
 	 * @param srcSeg the source segment of the corresponding segment to look up.
 	 * @param trgLoc the target to look up.
 	 * @return the corresponding target segment (may be empty).
 	 */
+//TODO: creating randomly a new segment at the end is not really useable: what about the possible inter-segment space(s)? 	
 	public Segment getCorrespondingTarget (Segment srcSeg,
 		LocaleId trgLoc);
 	
