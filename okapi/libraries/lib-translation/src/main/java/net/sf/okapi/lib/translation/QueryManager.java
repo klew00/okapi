@@ -121,14 +121,14 @@ public class QueryManager {
 	 * attributes that is set, and the current threshold and maximum hits if it is relevant.
 	 * @param connectorClass the name of the class for the connector.
 	 * @param resourceName the name of the translation resource (can be null).
-	 * @param paramsClass the name of the class for the parameters for this connector.
+	 * @param connectorParams connector parameters stored in a string.
 	 * @return The identifier for the added translation resource. This identifier
 	 * can be used later to access specifically the added translation resource.
 	 * @throws RuntimeException if an error occurs.
 	 */
 	public int addAndInitializeResource (String connectorClass,
 		String resourceName,
-		String paramsClass)
+		String connectorParams)
 	{
 		IQuery conn;
 		try {
@@ -145,7 +145,7 @@ public class QueryManager {
 		}
 		IParameters tmParams = conn.getParameters();
 		if ( tmParams != null ) { // Set the parameters only if the connector take some
-			tmParams.fromString(paramsClass);
+			tmParams.fromString(connectorParams);
 		}
 		return addAndInitializeResource(conn, ((resourceName==null) ? conn.getName() : resourceName), tmParams);
 	}
