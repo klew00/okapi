@@ -48,8 +48,10 @@ import net.sf.okapi.lib.reporting.ReportGenerator;
 import net.sf.okapi.steps.wordcount.WordCountStep;
 import net.sf.okapi.steps.wordcount.categorized.ExactMatchWordCountStep;
 import net.sf.okapi.steps.wordcount.categorized.FuzzyMatchWordCountStep;
+import net.sf.okapi.steps.wordcount.categorized.LeveragedWordCountStep;
 import net.sf.okapi.steps.wordcount.categorized.LocalContextExactMatchWordCountStep;
 import net.sf.okapi.steps.wordcount.categorized.PrevVersionExactMatchWordCountStep;
+import net.sf.okapi.steps.wordcount.categorized.RepeatedSegmentExactMatchWordCountStep;
 import net.sf.okapi.steps.wordcount.categorized.RepetitionWordCountStep;
 import net.sf.okapi.steps.wordcount.common.BaseCounter;
 import net.sf.okapi.steps.wordcount.common.GMX;
@@ -112,11 +114,25 @@ public class ScopingReportStep extends CompoundStep {
 				);
 		list.add(
 				new XPipelineStep(
+						new LeveragedWordCountStep(),
+						new XParameter("countInBatchItems", true),
+						new XParameter("countInBatch", true)
+						)
+				);
+		list.add(
+				new XPipelineStep(
 						new FuzzyMatchWordCountStep(),
 						new XParameter("countInBatchItems", true),
 						new XParameter("countInBatch", true)
 						)
 				);
+		list.add(
+				new XPipelineStep(
+						new RepeatedSegmentExactMatchWordCountStep(),
+						new XParameter("countInBatchItems", true),
+						new XParameter("countInBatch", true)
+						)
+				);		
 		list.add(
 				new XPipelineStep(
 						new RepetitionWordCountStep(),
@@ -142,7 +158,7 @@ public class ScopingReportStep extends CompoundStep {
 		if (res != null) {
 			gen.setField("PROJECT_TOTAL", BaseCounter.getCount(res, GMX.TotalWordCount));
 			gen.setField("PROJECT_LCEXACT", BaseCounter.getCount(res, LocalContextExactMatchWordCountStep.METRIC));
-			gen.setField("PROJECT_EXACT", BaseCounter.getCount(res, GMX.ExactMatchedWordCount));
+			gen.setField("PROJECT_EXACT", BaseCounter.getCount(res, GMX.LeveragedMatchedWordCount));
 			gen.setField("PROJECT_FUZZY", BaseCounter.getCount(res, GMX.FuzzyMatchedWordCount));
 			gen.setField("PROJECT_REP", BaseCounter.getCount(res, GMX.RepetitionMatchedWordCount));
 			

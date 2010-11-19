@@ -39,6 +39,8 @@ import net.sf.okapi.lib.extra.pipelinebuilder.XPipeline;
 import net.sf.okapi.lib.extra.pipelinebuilder.XPipelineStep;
 import net.sf.okapi.lib.extra.steps.EventLogger;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
+import net.sf.okapi.steps.leveraging.LeveragingStep;
+import net.sf.okapi.steps.segmentation.SegmentationStep;
 import net.sf.okapi.steps.wordcount.categorized.LocalContextExactMatchWordCountStep;
 import net.sf.okapi.steps.wordcount.common.GMX;
 import net.sf.okapi.steps.wordcount.common.Metrics;
@@ -83,7 +85,7 @@ public class ScopingReportTest {
 						)
 		).execute();
 		
-		testPath(pathBase + "out/test_scoping_report.html");
+		testPath(pathBase + "out");
 	}
 	
 	@Test
@@ -112,11 +114,59 @@ public class ScopingReportTest {
 		m.setMetric(GMX.TotalWordCount, 1273);
 		m.setMetric(LocalContextExactMatchWordCountStep.METRIC, 72);
 		m.setMetric(GMX.ExactMatchedWordCount, 120);
+		m.setMetric(GMX.LeveragedMatchedWordCount, 132);
 		m.setMetric(GMX.FuzzyMatchedWordCount, 781);
 		m.setMetric(GMX.RepetitionMatchedWordCount, 112);
 		
 		srs.handleEvent(new Event(EventType.END_BATCH, res));
 		testPath(pathBase + "out/test_scoping_report2.html");
 	}
+	
+	@Test
+	public void testLeveraging() throws MalformedURLException {
+
+		String pathBase = Util.getDirectoryName(this.getClass().getResource("aa324.html").getPath()) + "/";
+		
+		new XPipeline(
+				"HTML report test",
+				new XBatch(
+//						new XBatchItem(
+//								new URL("file", null, pathBase + "aa324.html"),
+//								"UTF-8",
+//								EN,
+//								ES),								
+						new XBatchItem(
+								new URL("file", null, pathBase + "form.html"),
+								"UTF-8",
+								EN,
+								ES)
+						),
+				new RawDocumentToFilterEventsStep(new HtmlFilter()),
+				new EventLogger(),
+				new XPipelineStep(
+						new SegmentationStep(),
+						//new Parameter("sourceSrxPath", pathBase + "test.srx")
+						new XParameter("sourceSrxPath", pathBase + "default.srx"),
+						//new Parameter("sourceSrxPath", pathBase + "myRules.srx")
+						new XParameter("trimSrcLeadingWS", net.sf.okapi.steps.segmentation.Parameters.TRIM_YES),
+						new XParameter("trimSrcTrailingWS", net.sf.okapi.steps.segmentation.Parameters.TRIM_YES)
+				),
+				new XPipelineStep(new LeveragingStep(), 
+						//new XParameter("resourceClassName", net.sf.okapi.connectors.opentran.OpenTranTMConnector.class.getName()),
+						new XParameter("resourceClassName", net.sf.okapi.connectors.google.GoogleMTConnector.class.getName()),
+						new XParameter("threshold", 80),
+						new XParameter("fillTarget", true)
+				),
+				new XPipelineStep(
+						new ScopingReportStep(),
+						new XParameter("projectName", "Test Scoping Report"),
+						//new XParameter("outputURI", this.getClass().getResource("").toString() + "out/test_scoping_report.html")
+						new XParameter("outputPath", pathBase + "out/test_scoping_report3.html")
+						)
+		).execute();
+		
+		testPath(pathBase + "out");
+	}
+	
 }
 

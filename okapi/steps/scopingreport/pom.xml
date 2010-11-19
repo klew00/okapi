@@ -44,5 +44,29 @@
   		<version>${project.version}</version>  		
   		<scope>compile</scope>
   	</dependency>
+  	<dependency>
+  		<groupId>net.sf.okapi.steps</groupId>
+  		<artifactId>okapi-step-leveraging</artifactId>
+  		<version>0.10-SNAPSHOT</version>
+  		<scope>test</scope>
+  	</dependency>
+  	<dependency>
+  		<groupId>net.sf.okapi.connectors</groupId>
+  		<artifactId>okapi-connector-google</artifactId>
+  		<version>0.10-SNAPSHOT</version>
+  		<scope>test</scope>
+  	</dependency>
+  	<dependency>
+  		<groupId>net.sf.okapi.connectors</groupId>
+  		<artifactId>okapi-connector-pensieve</artifactId>
+  		<version>0.10-SNAPSHOT</version>
+  		<scope>test</scope>
+  	</dependency>
+  	<dependency>
+  		<groupId>net.sf.okapi.steps</groupId>
+  		<artifactId>okapi-step-segmentation</artifactId>
+  		<version>0.10-SNAPSHOT</version>
+  		<scope>test</scope>
+  	</dependency>
   </dependencies>
 </project>
