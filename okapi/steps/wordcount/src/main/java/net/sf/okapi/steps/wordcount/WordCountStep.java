@@ -64,8 +64,4 @@ public class WordCountStep extends TokenCountStep {
 		return "Word Count";
 	}
 
-	@Override
-	protected CountContext getCountContext() {
-		return CountContext.CC_SOURCE;
-	}
 }

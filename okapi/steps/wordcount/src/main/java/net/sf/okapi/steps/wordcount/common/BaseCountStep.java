@@ -25,7 +25,6 @@ import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.IdGenerator;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Ending;
-import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
@@ -77,10 +76,11 @@ public abstract class BaseCountStep extends AbstractPipelineStep {
 	abstract public String getName();
 	abstract public String getDescription();
 	abstract protected String getMetric();
-	abstract protected long count(TextContainer textContainer);
-	abstract protected long count(Segment segment);
+	abstract protected long count(TextContainer textContainer, LocaleId locale);
+	abstract protected long count(Segment segment, LocaleId locale);
+	abstract protected long countInTextUnit(TextUnit textUnit);
 	abstract protected boolean countOnlyTranslatable();
-	abstract protected CountContext getCountContext();
+//	abstract protected CountContext getCountContext();
 
 	protected void saveCount(Metrics metrics, long count) {
 		if (metrics == null) return;
@@ -273,38 +273,77 @@ public abstract class BaseCountStep extends AbstractPipelineStep {
 
 	//-------------------------
 	
-	private long countInContainer(TextContainer tc) {
-		if (tc == null) return 0;
-		
-		// Individual segments metrics
-		long segmentCount;
-		long textContainerCount;
-		ISegments segs = tc.getSegments();
-		if (segs != null) {
-			for (Segment seg : segs) {
-				segmentCount = count(seg);
-				saveToMetrics(seg, segmentCount);
-			}
-		}
-		// TC metrics
-		textContainerCount = count(tc);
-		saveToMetrics(tc, textContainerCount);
-		return textContainerCount; 
-	}
+//	private long countInContainer(TextContainer tc) {
+//		if (tc == null) return 0;
+//		
+//		// Individual segments metrics
+//		long segmentCount;
+//		long textContainerCount;
+//		ISegments segs = tc.getSegments();
+//		if (segs != null) {
+//			for (Segment seg : segs) {
+//				segmentCount = count(seg);
+//				saveToMetrics(seg, segmentCount);
+//			}
+//		}
+//		// TC metrics
+//		textContainerCount = count(tc);
+//		saveToMetrics(tc, textContainerCount);
+//		return textContainerCount; 
+//	}
+	
+//	private long countInSource(TextUnit tu) {
+//		if (tu == null) return 0;
+//		
+//		// Individual segments metrics
+//		long segmentCount;
+//		long textContainerCount;
+//		ISegments segs = tc.getSegments();
+//		if (segs != null) {
+//			for (Segment seg : segs) {
+//				segmentCount = count(seg);
+//				saveToMetrics(seg, segmentCount);
+//			}
+//		}
+//		// TC metrics
+//		textContainerCount = count(tc);
+//		saveToMetrics(tc, textContainerCount);
+//		return textContainerCount; 
+//	}
+//	
+//	private long countInTarget(TextUnit tu, LocaleId targetLocale) {
+//		if (tu == null) return 0;
+//		
+//		// Individual segments metrics
+//		long segmentCount;
+//		long textContainerCount;
+//		ISegments segs = tc.getSegments();
+//		if (segs != null) {
+//			for (Segment seg : segs) {
+//				segmentCount = count(seg);
+//				saveToMetrics(seg, segmentCount);
+//			}
+//		}
+//		// TC metrics
+//		textContainerCount = count(tc);
+//		saveToMetrics(tc, textContainerCount);
+//		return textContainerCount; 
+//	}
+	
 	
 	protected TextContainer getSource() {
 		return source;
 	}
 	
-	protected LocaleId getLocale() {
-		switch (getCountContext()) {
-		default:
-			return getSourceLocale();
-			
-		case CC_TARGET:
-			return getTargetLocale();
-		}
-	}
+//	protected LocaleId getLocale() {
+//		switch (getCountContext()) {
+//		default:
+//			return getSourceLocale();
+//			
+//		case CC_TARGET:
+//			return getTargetLocale();
+//		}
+//	}
 	
 	@Override
 	protected Event handleTextUnit(Event event) {		
@@ -316,15 +355,17 @@ public abstract class BaseCountStep extends AbstractPipelineStep {
 		long textUnitCount = 0;
 		source = tu.getSource();
 		
-		switch (getCountContext()) {
-		case CC_SOURCE:
-			textUnitCount = countInContainer(source);
-			break;
-			
-		case CC_TARGET:
-			textUnitCount = countInContainer(tu.getTarget(getTargetLocale()));
-			break;
-		}		
+//		switch (getCountContext()) {
+//		case CC_SOURCE:
+//			textUnitCount = countInSource(tu);
+//			break;
+//			
+//		case CC_TARGET:
+//			textUnitCount = countInTarget(tu, getTargetLocale());
+//			break;
+//		}		
+		
+		textUnitCount = countInTextUnit(tu);
 		
 		// Whole TU metrics
 		if (textUnitCount == 0) return event;

@@ -139,6 +139,15 @@ public class WordCounter extends BaseCounter {
 	}
 	
 	/**
+	 * Returns the word count information stored by WordCountStep in the given text container. 
+	 * @param tc the given text container
+	 * @return number of words (0 if no word count information found)
+	 */
+	public static long getCount(TextContainer tc) {
+		return BaseCounter.getCount(tc, GMX.TotalWordCount);
+	}
+	
+	/**
 	 * Returns the word count information stored by WordCountStep in a given segment of the source part of a given text unit.
 	 * @param tu the given tu
 	 * @param segIndex index of the segment in the source

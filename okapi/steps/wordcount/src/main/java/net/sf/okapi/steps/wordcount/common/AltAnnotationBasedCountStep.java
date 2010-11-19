@@ -20,47 +20,101 @@
 
 package net.sf.okapi.steps.wordcount.common;
 
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.query.MatchType;
+import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.steps.wordcount.WordCounter;
 
 public abstract class AltAnnotationBasedCountStep extends BaseCountStep {
 
 	abstract protected boolean accept(MatchType type); 
 	
-	private long countInATA(AltTranslationsAnnotation ata) {
-		if (ata == null) return 0;
+	private boolean acceptATA(AltTranslationsAnnotation ata) {
+		if (ata == null) return false;
 		
 		for (AltTranslation at : ata) {
 			if (at == null) continue;
 			
-			if (accept(at.getType())) {
-				return WordCounter.count(getSource(), getSourceLocale()); // Word Count metrics are based on counting in source
-			}				
+			MatchType type = at.getType();
+			if (type == MatchType.MT) { // TODO Remove when MatchType to GMX mapping is done
+				if (at.getScore() < 100)
+					type = MatchType.FUZZY;
+				else
+					type = MatchType.EXACT;
+			}
+			if (accept(type)) return true;
 		}
-		return 0;		
-	}
-	
-	@Override
-	protected long count(TextContainer textContainer) {
-		return countInATA(textContainer.getAnnotation(AltTranslationsAnnotation.class));
+		return false;
 	}
 
 	@Override
-	protected long count(Segment segment) {
-		return countInATA(segment.getAnnotation(AltTranslationsAnnotation.class));
+	protected long count(TextContainer textContainer, LocaleId locale) {
+		long count = WordCounter.getCount(getSource());
+		if (count == 0) // No metrics found on the container
+			WordCounter.count(getSource(), locale); // Word Count metrics are based on counting in source
+		return count;
+
 	}
-	
+
+	@Override
+	protected long count(Segment segment, LocaleId locale) {
+		long count = WordCounter.getCount(segment);
+		if (count == 0) // No metrics found on the container
+			WordCounter.count(segment, locale); // Word Count metrics are based on counting in source
+		return count;
+	}
+
 	@Override
 	protected boolean countOnlyTranslatable() {
 		return true;
 	}
 
 	@Override
-	protected CountContext getCountContext() {
-		return CountContext.CC_TARGET;
+	protected long countInTextUnit(TextUnit textUnit) {
+		if (textUnit == null) return 0;
+		
+		LocaleId srcLocale = getSourceLocale();
+		LocaleId trgLocale = getTargetLocale();
+		
+		TextContainer source = textUnit.getSource();
+		TextContainer target = textUnit.getTarget(trgLocale);
+		if (target == null) return 0;
+		
+		// Individual segments metrics
+		long segmentCount = 0;
+		long segmentsCount = 0;
+		long textContainerCount = 0;
+		
+		ISegments segs = target.getSegments();
+		ISegments srcSegments = source.getSegments();
+		if (segs != null) {
+			for (Segment seg : segs) {
+				if (acceptATA(seg.getAnnotation(AltTranslationsAnnotation.class))) {
+					Segment srcSeg = srcSegments.get(seg.getId());
+					segmentCount = count(srcSeg, srcLocale);
+					segmentsCount += segmentCount;
+					saveToMetrics(seg, segmentCount);
+				}
+			}
+		}
+		// TC metrics
+		if (acceptATA(target.getAnnotation(AltTranslationsAnnotation.class))) {
+			textContainerCount = count(source, srcLocale);
+			saveToMetrics(target, textContainerCount);
+		}
+		
+		if (textContainerCount > 0) return textContainerCount;  
+		if (segmentsCount > 0) return segmentsCount;
+		return 0;
 	}
+
+//	@Override
+//	protected CountContext getCountContext() {
+//		return CountContext.CC_TARGET;
+//	}
 }

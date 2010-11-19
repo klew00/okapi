@@ -20,6 +20,7 @@
 
 package net.sf.okapi.steps.wordcount.categorized;
 
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
@@ -53,14 +54,14 @@ public class RepetitionWordCountStep extends AltAnnotationBasedCountStep {
 	}
 
 	@Override
-	protected long count(Segment segment) {
-		return super.count(segment) - (BaseCounter.getCount(segment, GMX.ExactMatchedWordCount) + 
+	protected long count(Segment segment, LocaleId locale) {
+		return super.count(segment, locale) - (BaseCounter.getCount(segment, GMX.ExactMatchedWordCount) + 
 				BaseCounter.getCount(segment, GMX.LeveragedMatchedWordCount));
 	}
 
 	@Override
-	protected long count(TextContainer textContainer) {
-		long res = super.count(textContainer) - (BaseCounter.getCount(textContainer, GMX.ExactMatchedWordCount) + 
+	protected long count(TextContainer textContainer, LocaleId locale) {
+		long res = super.count(textContainer, locale) - (BaseCounter.getCount(textContainer, GMX.ExactMatchedWordCount) + 
 				BaseCounter.getCount(textContainer, GMX.LeveragedMatchedWordCount)); 
 		return res > 0 ? res : 0;
 	}
