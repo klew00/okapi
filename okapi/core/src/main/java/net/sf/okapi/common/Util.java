@@ -200,6 +200,24 @@ public final class Util {
     }
 	
 	/**
+	 * Replaces exceeding path separators with a slash.
+	 * @param path the given path
+	 * @return the fixed given path
+	 */
+	public static String fixPath(String path) {
+		String res = path;
+		String saveRes;
+		do {
+			saveRes = res;
+			res = res.replaceAll("\\\\/", "/");
+			res = res.replaceAll("\\\\\\\\", "/");
+			res = res.replaceAll("//", "/");
+			res = res.replaceAll("/\\\\", "/");
+		} while (saveRes != res);
+		return res;
+	}
+	
+	/**
 	 * Replaces unsupported characters in a given short file name (no directory path) with underscore.
 	 * @param fileName the given short file name
 	 * @return the given file name with fixed unsupported characters
@@ -812,6 +830,27 @@ public final class Util {
 			tmp = Util.getDirectoryName(tmp);
 		}
 		return tmp;
+	}
+	
+	/**
+	 * Gets the longest common path between directories on a given list.
+	 * 
+	 * @param ignoreCase
+	 *            if the method should ignore cases differences.
+	 * @param directories
+	 *            the given list of directories.
+	 * @return the longest sub-directory that is common to all directories.
+	 *         This can be a null or empty string.
+	 */
+	static public String longestCommonDir (boolean ignoreCase, String... directories) {
+		if (directories == null) return "";
+		if (directories.length == 1) return directories[0]; // Can be null
+		
+		String res = directories[0];
+		for (int i = 1; i < directories.length; i++) {
+			res = longestCommonDir(res, directories[i], ignoreCase);
+		}
+		return res;
 	}
 
 	/**

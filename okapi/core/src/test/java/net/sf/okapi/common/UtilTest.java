@@ -313,6 +313,16 @@ public class UtilTest {
 		assertEquals("a_bc_de_fgh_ijk{l};mn_op_qr (s) t_uvw!x_y[z]", Util.fixFilename("a*bc:de<fgh>ijk{l};mn?op\\qr (s) t|uvw!x/y[z]"));
 	}
 	
+	@Test
+	public void testFixPath() {
+		assertEquals("/C:/dir1/dir2/dir3/dir4/filename.ext", Util.fixPath("/C:/dir1////dir2/dir3/dir4/filename.ext"));
+		assertEquals("/C:/dir1/dir2/dir3/dir4/filename.ext", Util.fixPath("/C:/dir1/dir2/////dir3/dir4/filename.ext"));
+		assertEquals("/C:/dir1/dir2/dir3/dir4/filename.ext", Util.fixPath("/C:/dir1/dir2\\/dir3/dir4/filename.ext"));
+		assertEquals("/C:/dir1/dir2/dir3/dir4/filename.ext", Util.fixPath("/C:/dir1/dir2//\\\\\\\\\\dir3/dir4/filename.ext"));
+		assertEquals("/C:/dir1/dir2/dir3/dir4/filename.ext", Util.fixPath("/C:/dir1/dir2/dir3/dir4/\\filename.ext"));
+		assertEquals("/C:/dir1/dir2/dir3/dir4/filename.ext", Util.fixPath("/C:/dir1//dir2/\\//\\\\dir3/dir4/filename.ext"));
+	}
+	
 // Unused
 //	@Test
 //	public void generateRandomId() {
