@@ -20,6 +20,7 @@
 
 package net.sf.okapi.filters.idml.tests;
 
+import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.filters.idml.Simplifier;
@@ -32,20 +33,79 @@ import org.junit.Test;
 public class SimplifierTest {
 
 	Simplifier simp;
+	GenericContent fmt;
 	
 	public SimplifierTest () {
-		simp = new Simplifier(); 
+		simp = new Simplifier();
+		fmt = new GenericContent();
 	}
 	
 	@Test
-	public void testCodeReduction () {
+	public void testCodeReduction1 () {
 		TextFragment tf = new TextFragment();
 		tf.append(TagType.OPENING, "a", "<a>");
 		tf.append(TagType.OPENING, "b", "<b>");
 		tf.append("T1");
 		tf.append(TagType.CLOSING, "b", "</b>");
 		tf.append(TagType.CLOSING, "a", "</a>");
-		
 		simp.simplify(tf);
+//		assertEquals("<1>T1</1>", fmt.setContent(tf).toString());
 	}
+
+	@Test
+	public void testCodeReduction2 () {
+		TextFragment tf = new TextFragment();
+		tf.append(TagType.OPENING, "a", "<a>");
+		tf.append(TagType.PLACEHOLDER, "x", "<x/>");
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append("T1");
+		tf.append(TagType.CLOSING, "b", "</b>");
+		tf.append(TagType.CLOSING, "a", "</a>");
+		simp.simplify(tf);
+//		assertEquals("<1>T1</1>", fmt.setContent(tf).toString());
+	}
+
+	@Test
+	public void testCodeReduction3 () {
+		TextFragment tf = new TextFragment();
+		tf.append(TagType.OPENING, "a", "<a>");
+		tf.append(TagType.PLACEHOLDER, "x1", "<x1/>");
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append("T1");
+		tf.append(TagType.CLOSING, "b", "</b>");
+		tf.append(TagType.PLACEHOLDER, "x2", "<x2/>");
+		tf.append(TagType.CLOSING, "a", "</a>");
+		simp.simplify(tf);
+//		assertEquals("<1>T1</1>", fmt.setContent(tf).toString());
+	}
+
+	@Test
+	public void testCodeReduction4 () {
+		TextFragment tf = new TextFragment();
+		tf.append(TagType.OPENING, "a", "<a>");
+		tf.append(TagType.PLACEHOLDER, "x1", "<x1/>");
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append("T1");
+		tf.append(TagType.CLOSING, "b", "</b>");
+		tf.append("T2");
+		tf.append(TagType.CLOSING, "a", "</a>");
+		simp.simplify(tf);
+//		assertEquals("<1><2>T1</2>T2</1>", fmt.setContent(tf).toString());
+	}
+
+	@Test
+	public void testCodeReduction5 () {
+		TextFragment tf = new TextFragment();
+		tf.append(TagType.OPENING, "a", "<a>");
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append(TagType.OPENING, "c", "<c>");
+		tf.append("T1");
+		tf.append(TagType.CLOSING, "c", "</c>");
+		tf.append(TagType.CLOSING, "b", "</b>");
+		tf.append("T2");
+		tf.append(TagType.CLOSING, "a", "</a>");
+		simp.simplify(tf);
+//		assertEquals("<1><2>T1</2>T2</1>", fmt.setContent(tf).toString());
+	}
+
 }
