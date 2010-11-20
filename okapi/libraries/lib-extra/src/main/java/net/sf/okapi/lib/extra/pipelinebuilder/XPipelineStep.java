@@ -59,8 +59,12 @@ public class XPipelineStep implements IPipelineStep{
 				else if (value instanceof Boolean)
 					parametersString.setParameter(parameter.getName(), Boolean.class.cast(value));
 				
-				else if (value instanceof String)
-					parametersString.setParameter(parameter.getName(), String.class.cast(value));
+				else if (value instanceof String) {
+					if (parameter.isAsGroup())
+						parametersString.setGroup(parameter.getName(), String.class.cast(value));
+					else
+						parametersString.setParameter(parameter.getName(), String.class.cast(value));
+				}					
 			}
 			else
 				switch (parameter.getType()) {

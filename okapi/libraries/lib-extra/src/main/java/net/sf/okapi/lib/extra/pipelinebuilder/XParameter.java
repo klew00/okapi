@@ -26,10 +26,16 @@ public class XParameter {
 	private StepParameterType type = null;
 	private String name;
 	private Object value;
+	private boolean asGroup = false;
 
 	// Type safety constructors
 	public XParameter(String name, String value) {
 		setParameter(name, value);
+	}
+	
+	public XParameter(String name, String value, boolean asGroup) {
+		setParameter(name, value);
+		this.asGroup = asGroup;
 	}
 
 	public XParameter(String name, int value) {
@@ -90,5 +96,9 @@ public class XParameter {
 
 	public StepParameterType getType() {
 		return type;
+	}
+
+	public boolean isAsGroup() {
+		return asGroup;
 	}	
 }
