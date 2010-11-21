@@ -31,6 +31,7 @@ import java.util.SortedMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.okapi.applications.rainbow.lib.CodeFinderEditor;
 import net.sf.okapi.applications.rainbow.lib.EncodingItem;
 import net.sf.okapi.applications.rainbow.lib.EncodingManager;
 import net.sf.okapi.applications.rainbow.lib.FormatManager;
@@ -553,6 +554,13 @@ public class MainForm { //implements IParametersProvider {
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				runQualityChecker();
+			}
+		});
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "tools.codefindereditor"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				showCodeFinderEditor();
 			}
 		});
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
@@ -2354,6 +2362,16 @@ public class MainForm { //implements IParametersProvider {
 		try {
 			CharacterInfoDialog dlg = new CharacterInfoDialog(shell, Res.getString("MainForm.charInfoCaption"), help); //$NON-NLS-1$
 			dlg.showDialog(0x9F99);
+		}
+		catch ( Exception e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+	}
+	
+	private void showCodeFinderEditor () {
+		try {
+			CodeFinderEditor dlg = new CodeFinderEditor(shell, help);
+			dlg.showDialog();
 		}
 		catch ( Exception e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
