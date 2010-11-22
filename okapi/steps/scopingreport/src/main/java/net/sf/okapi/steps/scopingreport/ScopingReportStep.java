@@ -34,6 +34,7 @@ import java.util.LinkedList;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IResource;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiIOException;
@@ -166,7 +167,9 @@ public class ScopingReportStep extends CompoundStep {
 		}		
 		// Generate report
 		String report = gen.generate();
-		File outFile = new File(Util.fillRootDirectoryVariable(params.getOutputPath(), rootDir));
+		String outPath = Util.fillRootDirectoryVariable(params.getOutputPath(), rootDir);
+		outPath = LocaleId.replaceVariables(outPath, getSourceLocale(), getTargetLocale());
+		File outFile = new File(outPath);
 		Util.createDirectories(outFile.getAbsolutePath());
 		
 		BufferedWriter writer;

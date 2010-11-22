@@ -138,7 +138,7 @@ public class BatchTranslator {
 	private void initialize () {
 		if ( params.getMakeTMX() ) {
 			String tmxOutputPath = Util.fillRootDirectoryVariable(params.getTmxPath(), rootDir);
-			tmxOutputPath = LocaleId.replaceVariables(tmxOutputPath, srcLoc.toString(), trgLoc.toString());
+			tmxOutputPath = LocaleId.replaceVariables(tmxOutputPath, srcLoc, trgLoc);
 			tmxWriter = new TMXWriter(tmxOutputPath);
 			tmxWriter.writeStartDocument(srcLoc, trgLoc, getClass().getCanonicalName(), "1", "sentence",
 				(params.getMarkAsMT() ? "MT-based" : null), "unknown");
@@ -161,7 +161,7 @@ public class BatchTranslator {
 		// Initialize existing TM if needed
 		if ( params.getCheckExistingTm() ) {
 			String existingTMPath = Util.fillRootDirectoryVariable(params.getExistingTm(), rootDir);
-			existingTMPath = LocaleId.replaceVariables(existingTMPath, srcLoc.toString(), trgLoc.toString());
+			existingTMPath = LocaleId.replaceVariables(existingTMPath, srcLoc, trgLoc);
 			existingTm = TmSeekerFactory.createFileBasedTmSeeker(existingTMPath);
 		}
 		
@@ -169,7 +169,7 @@ public class BatchTranslator {
 		if ( params.getSegment() ) {
 			SRXDocument srxDoc = new SRXDocument();
 			String srxPath = Util.fillRootDirectoryVariable(params.getSrxPath(), rootDir);
-			srxPath = LocaleId.replaceVariables(srxPath, srcLoc.toString(), trgLoc.toString());
+			srxPath = LocaleId.replaceVariables(srxPath, srcLoc, trgLoc);
 			srxDoc.loadRules(srxPath);
 			//if ( srxDoc.hasWarning() ) logger.warning(srxDoc.getWarning());
 			segmenter = srxDoc.compileLanguageRules(srcLoc, null);
@@ -214,7 +214,7 @@ public class BatchTranslator {
 			}
 			if ( params.getMakeTM() ) {
 				String tmDir = Util.fillRootDirectoryVariable(params.getTmDirectory(), rootDir);
-				tmDir = LocaleId.replaceVariables(tmDir, srcLoc.toString(), trgLoc.toString());
+				tmDir = LocaleId.replaceVariables(tmDir, srcLoc, trgLoc);
 				Util.createDirectories(tmDir+File.separator);
 				//TODO: Move this check at the pensieve package level
 				File file = new File(tmDir+File.separator+"segments.gen");
@@ -416,7 +416,7 @@ public class BatchTranslator {
 			loc = rawDoc.getTargetLocale().toJavaLocale();
 			cmd = cmd.replace("${trgLangName}", loc.getDisplayLanguage(Locale.ENGLISH));
 			
-			cmd = LocaleId.replaceVariables(cmd, srcLoc.toString(), trgLoc.toString());
+			cmd = LocaleId.replaceVariables(cmd, srcLoc, trgLoc);
 			
 			LOGGER.info("Command line: "+cmd);
 			Process p = Runtime.getRuntime().exec(cmd);

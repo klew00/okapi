@@ -520,9 +520,25 @@ public class LocaleIdTest {
 	}		
 
     @Test
-    public void testVariables () {
+    public void testVariablesWithString () {
     	String srcLoc = new LocaleId("de", "CH").toString();
     	String trgLoc = new LocaleId("en", "IE").toString();
+    	assertEquals("", LocaleId.replaceVariables("", srcLoc, trgLoc));
+    	assertEquals("de-ch,en-ie", LocaleId.replaceVariables("${srcLang},${trgLang}", srcLoc, trgLoc));
+    	assertEquals("DE-CH,EN-IE", LocaleId.replaceVariables("${srcLangU},${trgLangU}", srcLoc, trgLoc));
+    	assertEquals("de-ch,en-ie", LocaleId.replaceVariables("${srcLangL},${trgLangL}", srcLoc, trgLoc));
+    	assertEquals("de_CH,en_IE", LocaleId.replaceVariables("${srcLoc},${trgLoc}", srcLoc, trgLoc));
+    	assertEquals("de,en", LocaleId.replaceVariables("${srcLocLang},${trgLocLang}", srcLoc, trgLoc));
+    	assertEquals("CH,IE", LocaleId.replaceVariables("${srcLocReg},${trgLocReg}", srcLoc, trgLoc));
+    	// With null
+    	assertEquals("CH,", LocaleId.replaceVariables("${srcLocReg},${trgLocReg}", srcLoc, null));
+    	assertEquals(",en-ie", LocaleId.replaceVariables("${srcLang},${trgLang}", null, trgLoc));
+	}
+	
+    @Test
+    public void testVariablesWithLocaleId () {
+    	LocaleId srcLoc = new LocaleId("de", "CH");
+    	LocaleId trgLoc = new LocaleId("en", "IE");
     	assertEquals("", LocaleId.replaceVariables("", srcLoc, trgLoc));
     	assertEquals("de-ch,en-ie", LocaleId.replaceVariables("${srcLang},${trgLang}", srcLoc, trgLoc));
     	assertEquals("DE-CH,EN-IE", LocaleId.replaceVariables("${srcLangU},${trgLangU}", srcLoc, trgLoc));

@@ -196,7 +196,7 @@ public class LeveragingStep extends BasePipelineStep {
 		if ( params.getMakeTMX() ) {
 			// Resolve the variables
 			String realPath = Util.fillRootDirectoryVariable(params.getTMXPath(), rootDir);
-			realPath = LocaleId.replaceVariables(realPath, sourceLocale.toString(), targetLocale.toString());
+			realPath = LocaleId.replaceVariables(realPath, sourceLocale, targetLocale);
 			// Create the output
 			tmxWriter = new TMXWriter(realPath);
 			tmxWriter.setUseMTPrefix(params.getUseMTPrefix());

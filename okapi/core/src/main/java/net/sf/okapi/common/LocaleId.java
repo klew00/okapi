@@ -144,6 +144,23 @@ public final class LocaleId implements Comparable<Object> {
 	 * @return the modified string.
 	 */
 	static public String replaceVariables (String input,
+		LocaleId srcLoc,
+		LocaleId trgLoc)
+	{
+		return replaceVariables(input,
+			(srcLoc==null) ? "" : srcLoc.toString(),
+			(trgLoc==null) ? "" : trgLoc.toString());
+	}
+	
+	/**
+	 * Replaces the locale/language variables in a given input string by their runtime values.
+	 * If one of the locale passed is null, its corresponding variables are replaced by an empty string.
+	 * @param input the string with the variables.
+	 * @param srcLoc the source locale code (can be null).
+	 * @param trgLoc the target locale code (can be null).
+	 * @return the modified string.
+	 */
+	static public String replaceVariables (String input,
 		String srcLoc,
 		String trgLoc)
 	{
