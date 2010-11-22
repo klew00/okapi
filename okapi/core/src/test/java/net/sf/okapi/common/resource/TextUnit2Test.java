@@ -95,14 +95,14 @@ public class TextUnit2Test {
 	}
 
     @Test
-    public void removeTarget(){
+    public void removeTarget() {
         tu1.setTarget(locFR, tc1);
         tu1.removeTarget(locFR);
         assertFalse("TextUnit should no longer have a target", tu1.hasTarget(locFR));
     }
 
     @Test
-    public void createTargetCase1 (){
+    public void createTargetCase1 () {
     	tu1 = createSegmentedTU();
         tu1.createTarget(locFR, false, IResource.COPY_ALL);
         assertEquals(tu1.getSource().toString(), tu1.getTarget_DIFF(locFR).toString());
@@ -110,7 +110,7 @@ public class TextUnit2Test {
     }
 
     @Test
-    public void createTargetCase2 (){
+    public void createTargetCase2 () {
     	tu1 = createSegmentedTU();
         tu1.createTarget(locFR, false, IResource.COPY_SEGMENTS);
         assertEquals(tu1.getSource().getSegments().count(), tu1.getTarget_DIFF(locFR).getSegments().count());
@@ -118,11 +118,48 @@ public class TextUnit2Test {
     }
 
     @Test
-    public void createTargetCase3 (){
+    public void createTargetCase3 () {
     	tu1 = createSegmentedTU();
         tu1.createTarget(locFR, false, IResource.COPY_CONTENT);
         assertEquals(1, tu1.getTarget_DIFF(locFR).getSegments().count());
         assertEquals("Part 1. a Part 2.", tu1.getTarget_DIFF(locFR).toString());
+    }
+    
+    @Test
+    public void loopThroughSegments () {
+    	tu1 = createSegmentedTUAndTarget();
+    	Segment trgSeg;
+    	for ( Segment srcSeg : tu1.getSourceSegments() ) {
+    		if ( srcSeg.id.equals("0") ) {
+    			assertEquals("Part 1.", srcSeg.text.toString());
+    			trgSeg = tu1.getTargetSegment(locFR, srcSeg.id, false);
+    			assertEquals("Trg 1.", trgSeg.text.toString());
+    		}
+    		else {
+    			assertEquals("Part 2.", srcSeg.text.toString());
+    			trgSeg = tu1.getTargetSegment(locFR, srcSeg.id, false);
+    			assertEquals("Trg 2.", trgSeg.text.toString());
+    		}
+    	}
+    }
+
+    @Test
+    public void loopThroughSegmentsType2 () {
+    	tu1 = createSegmentedTUAndTarget();
+    	Segment trgSeg;
+    	IAlignedSegments segs = tu1.getSegments();
+    	for ( Segment srcSeg : segs ) {
+    		if ( srcSeg.id.equals("0") ) {
+    			assertEquals("Part 1.", srcSeg.text.toString());
+    			trgSeg = segs.getCorrespondingTarget(srcSeg, locFR);
+    			assertEquals("Trg 1.", trgSeg.text.toString());
+    		}
+    		else {
+    			assertEquals("Part 2.", srcSeg.text.toString());
+    			trgSeg = segs.getCorrespondingTarget(srcSeg, locFR);
+    			assertEquals("Trg 2.", trgSeg.text.toString());
+    		}
+    	}
     }
 
     @Test
@@ -310,6 +347,15 @@ public class TextUnit2Test {
     private ITextUnit createSegmentedTU () {
     	ITextUnit tu = new TextUnit2("id", "Part 1.");
     	tu.getSource().getSegments().append(new Segment("s2", new TextFragment("Part 2.")), " a ");
+    	return tu;
+    }
+    
+    private ITextUnit createSegmentedTUAndTarget () {
+    	ITextUnit tu = createSegmentedTU();
+    	// Add the target segments
+    	ISegments segs = tu.getTarget_DIFF(locFR).getSegments();
+    	segs.get(0).text.append("Trg 1.");
+    	segs.get(1).text.append("Trg 2.");
     	return tu;
     }
 }

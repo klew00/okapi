@@ -154,66 +154,68 @@ public class TextUnit2 implements ITextUnit {
 			return false;
 		}
 		
+//		@Override
+//		public void mergeSource (Segment srcSeg1,
+//			Segment srcSeg2)
+//		{
+//			//TODO
+//			//do we need this? it's complicated and there is no current usage for it(?)
+//		}
+
 		@Override
-		public void mergeSource (Segment srcSeg1, Segment srcSeg2) {
-			// TODO Auto-generated method stub
-			
+		public void joinWithNext (Segment seg) {
+			ISegments srcSegs = source.getSegments();
+			int n = srcSegs.getIndex(seg.id);
+			if ( n == -1 ) return; // Not found
+			srcSegs.joinWithNext(n);
+
+			// Do the same for the target
+			for ( LocaleId loc : getTargetLocales() ) {
+				ISegments trgSegs = targets.get(loc).getSegments();
+				// Get the target index, skip it if not found
+				if ( (n = trgSegs.getIndex(seg.id)) == -1 ) continue;
+				trgSegs.joinWithNext(n);
+			}
 		}
 		
 		@Override
 		public void joinAll () {
-			// TODO Auto-generated method stub
-			
+			source.joinAll();
+			for ( LocaleId loc : getTargetLocales() ) {
+				targets.get(loc).joinAll();
+			}
 		}
 		
 		@Override
-		public void insert (int index, Segment srcSeg, Segment trgSeg,
-			LocaleId trgLoc) {
-			// TODO Auto-generated method stub
-			
-		}
-		
-		@Override
-		public void insert (int index, Segment srcSeg) {
-			// TODO Auto-generated method stub
-			
-		}
-		
-		@Override
-		public ISegments getTargetSegments (LocaleId trgLoc) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-		
-		@Override
-		public Segment getTargetSegment (LocaleId trgLoc,
-			String segId,
-			boolean createIfNeeded)
+		public void insert (int index,
+			Segment srcSeg,
+			Segment trgSeg,
+			LocaleId trgLoc)
 		{
 			// TODO Auto-generated method stub
-			return null;
+			
 		}
 		
 		@Override
-		public ISegments getSourceSegments () {
-			// TODO Auto-generated method stub
-			return null;
-		}
-		
-		@Override
-		public Segment getSourceSegment (String segId,
-			boolean createIfNeeded)
+		public void insert (int index,
+			Segment srcSeg)
 		{
 			// TODO Auto-generated method stub
-			return null;
+			
 		}
 		
 		@Override
 		public Segment getCorrespondingTarget (Segment srcSeg,
 			LocaleId trgLoc)
 		{
-			// TODO Auto-generated method stub
-			return null;
+			// Get the target segments (creates them if needed)
+			ISegments trgSegs = getTarget_DIFF(trgLoc).getSegments();
+			Segment res = trgSegs.get(srcSeg.id);
+			if ( res == null ) { // If no corresponding segment found: create one
+				res = new Segment(srcSeg.id);
+				trgSegs.append(res);
+			}
+			return res;
 		}
 		
 		@Override
@@ -229,6 +231,7 @@ public class TextUnit2 implements ITextUnit {
 		@Override
 		public int getAlignmentStatus () {
 			// TODO Auto-generated method stub
+			// should be an enum
 			return 0;
 		}
 		

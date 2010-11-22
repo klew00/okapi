@@ -1263,6 +1263,13 @@ public class TextContainerTest {
 	}
 	
 	@Test
+	public void testGetSegmentIndex () {
+		TextContainer tc = createMultiSegmentContentWithCodes();
+		ISegments segments = tc.getSegments();
+		assertEquals("1", segments.get(tc.getSegments().getIndex("1")).id);
+	}
+
+	@Test
 	public void getFirstSegment () {
 		Segment seg = new Segment("qwerty", new TextFragment("xyz"));
 		TextContainer tc = new TextContainer(seg);

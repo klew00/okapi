@@ -364,7 +364,20 @@ public class TextContainer implements Iterable<TextPart> {
 			}
 			return -1; // Not found
 		}
-		
+
+		@Override
+		public int getIndex (String segId) {
+			int n = 0;
+			for ( int i=0; i<parts.size(); i++ ) {
+				if ( parts.get(i).isSegment() ) {
+					if ( segId.equals(((Segment)parts.get(i)).id) ) return n;
+					// Else, move to the next
+					n++;
+				}
+			}
+			return -1; // Not found
+		}
+
 	};
 	
 	/**

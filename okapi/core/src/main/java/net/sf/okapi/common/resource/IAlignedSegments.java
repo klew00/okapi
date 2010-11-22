@@ -117,7 +117,8 @@ public interface IAlignedSegments extends Iterable<Segment> {
 	
 	/**
 	 * Gets the target segment corresponding to a given source segment.
-	 * This always returns a segment: If the segment does not exists it is created at the end of the target content.
+	 * This always returns a segment: If the target does not exists one is created.
+	 * If the segment does not exists one is created at the end of the target content.
 	 * @param srcSeg the source segment of the corresponding segment to look up.
 	 * @param trgLoc the target to look up.
 	 * @return the corresponding target segment (may be empty).
@@ -165,16 +166,23 @@ public interface IAlignedSegments extends Iterable<Segment> {
 		Segment trgSeg,
 		int splitPos);
 	
-	/**
-	 * Merges two source segments (and anything in between).
-	 * This also merges all the corresponding targets.
-	 * @param srcSeg1 the first segment to merge. This segment keeps it's ID. 
-	 * @param srcSeg2 the second segment to merge with the first.
-	 */
-	// exception -> if out-of-order in between
-	public void mergeSource (Segment srcSeg1,
-		Segment srcSeg2);
+//	/**
+//	 * Merges two source segments (and anything in between).
+//	 * This also merges all the corresponding targets.
+//	 * @param srcSeg1 the first segment to merge. This segment keeps its id. 
+//	 * @param srcSeg2 the second segment to merge with the first.
+//	 */
+//	// exception -> if out-of-order in between
+//	public void mergeSource (Segment srcSeg1,
+//		Segment srcSeg2);
 
+	/**
+	 * Joins (in source and all targets) the segment for a given segment's id to all the parts between
+	 * that segment and the next, as well as the next segment. 
+	 * @param seg a segment holding the id to use for the join. 
+	 */
+	public void joinWithNext (Segment seg);
+	
 	/**
 	 * Joins all segments for all source and target contents.
 	 */
@@ -207,41 +215,5 @@ public interface IAlignedSegments extends Iterable<Segment> {
 	 */
 	public void segmentTarget (ISegmenter segmenter,
 		LocaleId targetLocale);
-	
-	/**
-	 * Gets the segments for the source. Un-segmented content return a single segment.
-	 * @return an object implementing ISegments for the source content. 
-	 */
-	public ISegments getSourceSegments ();
-
-	/**
-	 * Get the segments for a given target. Un-segmented content return a single segment.
-	 * @param trgLoc the locale of the target to retrieve.
-	 * @return an object implementing ISegments for the given target content.
-	 */
-	public ISegments getTargetSegments (LocaleId trgLoc);
-
-	/**
-	 * Gets the source segment for a given segment id.
-	 * @param segId the id of the segment to retrieve.
-	 * @param createIfNeeded true to append a segment at the end of the content and return it 
-	 * if the segment does not exist yet. False to return null when the segment does not exists.
-	 * @return the found or created segment, or null.
-	 */
-	public Segment getSourceSegment (String segId,
-		boolean createIfNeeded);
-	
-	/**
-	 * Gets the segment for a given segment id in a given target.
-	 * @param trgLoc the target locale to look up.
-	 * @param segId the id of the segment to retrieve.
-	 * @param createIfNeeded true to append a segment at the end of the target content and 
-	 * return it if the segment does not exist yet. False to return null when the segment
-	 * does not exists.
-	 * @return the found or created segment, or null.
-	 */
-	public Segment getTargetSegment (LocaleId trgLoc,
-		String segId,
-		boolean createIfNeeded);
 	
 }

@@ -196,7 +196,7 @@ public interface ISegments extends Iterable<Segment> {
 	public List<Range> getRanges ();
 	
 	/**
-	 * Joins to a given segments all the parts between that segment and the next, as well as
+	 * Joins to a given segment all the parts between that segment and the next, as well as
 	 * the next segment.
 	 * <p>For example for the content: " [seg1] [seg2] ", the call joinWithNext(0)
 	 * will give the result: " [seg1 seg2] ". And the call joinWithNext(1)
@@ -215,5 +215,12 @@ public interface ISegments extends Iterable<Segment> {
 	 * @return the index of the part for the given segment index.
 	 */
 	public int getPartIndex (int segIndex);
+	
+	/**
+	 * Gets the segment index for a given segment id.
+	 * @param segId the id to search for.
+	 * @return the segment index found or -1 if not found.
+	 */
+	public int getIndex (String segId);
 	
 }
