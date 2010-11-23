@@ -3,6 +3,8 @@ package net.sf.okapi.steps.wordcount;
 import static org.junit.Assert.assertEquals;
 
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 
 import org.junit.Test;
 
@@ -24,16 +26,17 @@ public class WordCountTest {
 
 	@Test
 	public void testCountApostrophe () {
-		//TODO: Should be 4 per http://www.lisa.org/fileadmin/standards/GMX-V.html#Words L'objectif is 2 words in FR
+		//TODO: Should be 4 per http://www.lisa.org/fileadmin/standards/GMX-V.html#Words "L'objectif" is 2 words in FR
 		assertEquals(3, WordCounter.count("L'objectif est defini.", locFR));
 		assertEquals(3, WordCounter.count("L\u2019objectif est defini.", locFR));
+
 		assertEquals(5, WordCounter.count("He can't eat that fast.", locFR));
 		assertEquals(5, WordCounter.count("He can\u2019t eat that fast.", locFR));
 	}
 	
 	@Test
 	public void testCountHyphen () {
-		assertEquals(5, WordCounter.count("Al Capone was an Italian-American.", locEN));
+		assertEquals(5, WordCounter.count("  Al Capone was an Italian-American.  ", locEN));
 	}
 	
 	@Test
@@ -47,7 +50,25 @@ public class WordCountTest {
 		//TODO: GMX "words" are really "tokens" this is a problem 
 		assertEquals(3, WordCounter.count("123 123.4 123,5", locEN));
 		//TODO: Not quite "tokens"
-		assertEquals(0, WordCounter.count("/ % $ @ #", locEN));
+		assertEquals(0, WordCounter.count("( ) \" \' { } [ ] / % $ @ # ? ! * _ -", locEN));
+	}
+	
+	@Test
+	public void testCountEmpty () {
+		assertEquals(0, WordCounter.count("", locEN));
+		assertEquals(0, WordCounter.count(" \t\n\f\r ", locEN));
+
+		TextFragment tf = new TextFragment();
+		tf.append(TagType.PLACEHOLDER, "b", "[b]");
+		assertEquals(0, WordCounter.count(tf, locEN));
+	}
+	
+	@Test
+	public void testCountFragments () {
+		TextFragment tf = new TextFragment("abc");
+		tf.append(TagType.PLACEHOLDER, "b", "[b]");
+		tf.append("def");
+		assertEquals(1, WordCounter.count(tf, locEN));
 	}
 	
 }

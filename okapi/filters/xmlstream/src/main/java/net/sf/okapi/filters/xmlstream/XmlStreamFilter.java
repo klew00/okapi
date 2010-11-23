@@ -22,7 +22,6 @@ package net.sf.okapi.filters.xmlstream;
 
 import java.io.File;
 import java.net.URL;
-import java.util.logging.Logger;
 
 import net.htmlparser.jericho.EndTag;
 import net.htmlparser.jericho.StartTag;
@@ -39,7 +38,7 @@ import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
 @UsingParameters(Parameters.class)
 public class XmlStreamFilter extends AbstractMarkupFilter {
 
-	private static final Logger LOGGER = Logger.getLogger(XmlStreamFilter.class.getName());
+	//not used for now: private static final Logger LOGGER = Logger.getLogger(XmlStreamFilter.class.getName());
 
 	private Parameters parameters;
 	

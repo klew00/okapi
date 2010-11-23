@@ -46,6 +46,9 @@ import net.sf.okapi.common.resource.TextUnit;
  * Writer for creating XLIFF document.
  */
 public class XLIFFWriter implements IFilterWriter {
+
+	public static final String NS_XLIFF12 = "urn:oasis:names:tc:xliff:document:1.2";
+	public static final String NS_XLIFFOKAPI = "okapi-framework:xliff-extensions";
 	
 	private static final String RESTYPEVALUES = 
 		";auto3state;autocheckbox;autoradiobutton;bedit;bitmap;button;caption;cell;"
@@ -152,8 +155,8 @@ public class XLIFFWriter implements IFilterWriter {
 		writer.writeStartDocument();
 		writer.writeStartElement("xliff");
 		writer.writeAttributeString("version", "1.2");
-		writer.writeAttributeString("xmlns", "urn:oasis:names:tc:xliff:document:1.2");
-		writer.writeAttributeString("xmlns:okp", "okapi-framework:xliff-extensions"); 
+		writer.writeAttributeString("xmlns", NS_XLIFF12);
+		writer.writeAttributeString("xmlns:okp", NS_XLIFFOKAPI); 
 
 		if ( !Util.isEmpty(message) ) {
 			writer.writeLineBreak();

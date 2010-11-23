@@ -2,7 +2,9 @@ package net.sf.okapi.filters.xmlstream;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
+import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.filters.FilterTestDriver;
+import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.*;
@@ -15,7 +17,6 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.beans.EventSetDescriptor;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -253,6 +254,19 @@ public class XmlSnippetsTest {
 	}
 
 	@Test
+	public void testCdataSectionAsHTML() {
+		parameters = XmlSnippetsTest.class.getResource("/cdataAsHTML.yml");
+		IFilterConfigurationMapper fcMapper = new FilterConfigurationMapper();
+		fcMapper.addConfigurations("net.sf.okapi.filters.html.HtmlFilter");
+		xmlStreamFilter.setFilterConfigurationMapper(fcMapper);
+
+		String snippet = "<doc><p>&amp;xmp;=amp</p><p><![CDATA[&amp;=amp]]></p></doc>";
+		assertEquals("<doc><p>&amp;xmp;=amp</p><p><![CDATA[&amp;=amp]]></p></doc>", XmlStreamTestUtils.generateOutput(
+			XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters), snippet, locEN,
+			xmlStreamFilter));
+	}
+
+	@Test
 	public void testEscapes() {
 		String snippet = "<p><b>Question</b>: When the \"<code>&lt;b></code>\" code was added</p>";
 		assertEquals(
@@ -270,6 +284,16 @@ public class XmlSnippetsTest {
 						XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters),
 						snippet, locEN, xmlStreamFilter));
 	}
+
+//	@Test
+//	public void testEscapes2 () {
+//		String snippet = "<p>&lt;=lt, &amp;=amp, etc. but &amp;amp=escaped amp</p>";
+//		assertEquals(
+//				"<p>&lt;=lt, &amp;=amp, etc. but &amp;amp=escaped amp</p>",
+//				XmlStreamTestUtils.generateOutput(
+//						XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters),
+//						snippet, locEN, xmlStreamFilter));
+//	}
 
 	@Test
 	public void testEscapedEntities() {
