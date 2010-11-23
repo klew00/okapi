@@ -9,10 +9,11 @@ import org.junit.Test;
 public class WordCountTest {
 
 	private LocaleId locEN = LocaleId.ENGLISH;
+	private LocaleId locFR = LocaleId.FRENCH;
 	private LocaleId locES005 = LocaleId.fromString("es-005");
 	
 	@Test
-	public void testStatics() {
+	public void testStatics () {
 		assertEquals(5, WordCounter.count("Test word count is correct.", locEN));
 		assertEquals(9, WordCounter.count("The quick (\"brown\") fox can't jump 32.3 feet, right?", locEN));
 		assertEquals(9, WordCounter.count("The quick (\u201Cbrown\u201D) fox can\u2019t jump 32.3 feet, right?", locEN));
@@ -20,4 +21,33 @@ public class WordCountTest {
 		assertEquals(4, WordCounter.count("Words in a sentence", locEN));
 		assertEquals(4, WordCounter.count("Words in a sentence", locES005));
 	}	
+
+	@Test
+	public void testCountApostrophe () {
+		//TODO: Should be 4 per http://www.lisa.org/fileadmin/standards/GMX-V.html#Words L'objectif is 2 words in FR
+		assertEquals(3, WordCounter.count("L'objectif est defini.", locFR));
+		assertEquals(3, WordCounter.count("L\u2019objectif est defini.", locFR));
+		assertEquals(5, WordCounter.count("He can't eat that fast.", locFR));
+		assertEquals(5, WordCounter.count("He can\u2019t eat that fast.", locFR));
+	}
+	
+	@Test
+	public void testCountHyphen () {
+		assertEquals(5, WordCounter.count("Al Capone was an Italian-American.", locEN));
+	}
+	
+	@Test
+	public void testCountGMXExamples () {
+		assertEquals(9, WordCounter.count("This sentence has a word count of 9 words.", locEN));
+		assertEquals(11, WordCounter.count("This sentence/text unit has a word count of 11 words.", locEN));
+	}
+	
+	@Test
+	public void testCountTokens () {
+		//TODO: GMX "words" are really "tokens" this is a problem 
+		assertEquals(3, WordCounter.count("123 123.4 123,5", locEN));
+		//TODO: Not quite "tokens"
+		assertEquals(0, WordCounter.count("/ % $ @ #", locEN));
+	}
+	
 }
