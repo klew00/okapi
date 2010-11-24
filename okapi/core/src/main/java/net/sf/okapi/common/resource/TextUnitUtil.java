@@ -1069,7 +1069,7 @@ public class TextUnitUtil {
 	}
 	
 	/**
-	 * Adds an {@link #AltTranslation} object to a given {@link #TextContainer}. The {@link #AltTranslationsAnnotation}
+	 * Adds an {@link AltTranslation} object to a given {@link TextContainer}. The {@link AltTranslationsAnnotation}
 	 * annotation is created if it does not exist already.
 	 * @param targetContainer the container where to add the object.
 	 * @param alt alternate translation to add.
@@ -1089,8 +1089,8 @@ public class TextUnitUtil {
 	}
 	
 	/**
-	 * Adds an {@link #AltTranslation} object to a given {@link #Segment}. The {@link #AltTranslationsAnnotation}
-	 * annotation is created if it does not exist already.
+	 * Adds an {@link AltTranslation} object to a given {@link Segment}.
+	 * The {@link AltTranslationsAnnotation} annotation is created if it does not exist already.
 	 * @param seg the segment where to add the object.
 	 * @param alt alternate translation to add.
 	 * @return the annotation where the object was added,

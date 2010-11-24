@@ -436,9 +436,11 @@ public class QueryManager {
 	 * Leverages a text unit (segmented or not) based on the current settings.
 	 * Any options or attributes needed must be set before calling this method.
 	 * @param tu the text unit to leverage.
-	 * @param thresholdToFillTarget if the first match has a score equal or above this value,
+	 * @param thresholdToFill if the first match has a score equal or above this value,
 	 * the target text of the match is placed in the target content. To avoid any filling of
 	 * the target: simply use a high value (e.g. <code>Integer.MAX_VALUE</code>).
+	 * @param downgradeIdenticalBestMatches true to reduce the score of best matches when
+	 * they are identical.
 	 */
 	public void leverage (TextUnit tu,
 		int thresholdToFill,
@@ -630,7 +632,7 @@ public class QueryManager {
 	
 	/**
 	 * Resets the counters used to calculate the number of segments leveraged.
-	 * @see #getLeveragedSegments()
+	 * @see #getExactBestMatches()
 	 * @see #getTotalSegments()
 	 */
 	public void resetCounters () {

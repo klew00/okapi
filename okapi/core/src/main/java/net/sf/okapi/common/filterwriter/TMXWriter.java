@@ -400,9 +400,10 @@ public class TMXWriter {
 //    }
 
     /**
-     * Writes the entries of an {@link #AltTranslationsAnnotation} annotation(s) of
-     * a given text unit to the TMX document.
+     * Writes the entries of an {@link AltTranslationsAnnotation}
+     * annotation(s) of a given text unit to the TMX document.
      * @param tu text unit to use.
+     * @param trgLoc target locale.
      */
     public void writeAlternates (TextUnit tu,
     	LocaleId trgLoc)

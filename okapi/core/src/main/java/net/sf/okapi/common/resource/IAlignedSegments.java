@@ -198,18 +198,12 @@ public interface IAlignedSegments extends Iterable<Segment> {
 	
 	/**
 	 * Segments the source content based on the rules provided by a given ISegmenter.
-	 * <p>This methods also stores the boundaries for the segments so they can be re-applied later.
-	 * for example when calling {@link #synchronizeSourceSegmentation(LocaleId)}.
 	 * @param segmenter the segmenter to use to create the segments.
 	 */
 	public void segmentSource (ISegmenter segmenter);
 	
 	/**
 	 * Segments the specified target content based on the rules provided by a given ISegmenter.
-	 * <p>This method may cause the source and target segments to be desynchronized, that is:
-	 * That each source segment may or may not be aligned with a corresponding target segment.
-	 * You can associate a target-specific segmentation for the source using
-	 * {@link #setSourceSegmentationForTarget(LocaleId, List)}.
 	 * @param segmenter the segmenter to use to create the segments.
 	 * @param targetLocale {@link LocaleId} of the target we want to segment.
 	 */

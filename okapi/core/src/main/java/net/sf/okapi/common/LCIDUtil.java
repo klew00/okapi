@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -30,8 +30,8 @@ import net.sf.okapi.common.Util;
 
 /**
  * Converts Microsoft's LCID to Okapi LocaleId back and forth.
- * @see http://msdn.microsoft.com/en-us/library/cc233968%28PROT.10%29.aspx
- * @see http://msdn.microsoft.com/en-us/library/a9eac961-e77d-41a6-90a5-ce1a8b0cdb9c%28v=PROT.10%29#id8
+ * @see <a href="http://msdn.microsoft.com/en-us/library/cc233968%28PROT.10%29.aspx">Microsoft LCID Structure</a>
+ * @see <a href="http://msdn.microsoft.com/en-us/library/a9eac961-e77d-41a6-90a5-ce1a8b0cdb9c%28v=PROT.10%29#id8">LCID List</a>
  */
 public class LCIDUtil {
 
@@ -58,8 +58,14 @@ public class LCIDUtil {
 	private static HashMap<Integer, LCIDDescr> tagLookup = new HashMap<Integer, LCIDDescr>();  
 	private static HashMap<String, LCIDDescr> lcidLookup = new HashMap<String, LCIDDescr>();
 	private static LCIDUtil inst; 
-	
-	private static void registerLCID(String language, String region, int lcid) {
+
+	/**
+	 * Registers an LCID for a given language and region.
+	 * @param language the language code.
+	 * @param region the region code.
+	 * @param lcid the LCID value.
+	 */
+	private static void registerLCID (String language, String region, int lcid) {
 		LCIDDescr descr0 = tagLookup.get(lcid);
 		if (descr0 != null) {
 			String lang0 = descr0.language;
@@ -83,6 +89,11 @@ public class LCIDUtil {
 		tagLookup.put(lcid, descr);
 	}
 	
+	/**
+	 * Registers an LCID for a language tag.
+	 * @param lcid the LCID value. 
+	 * @param tag the language tag.
+	 */
 	private static void registerTag(int lcid, String tag) {
 		LCIDDescr descr;
 		descr = tagLookup.get(lcid);
@@ -889,39 +900,79 @@ public class LCIDUtil {
 		registerTag(0x0077, "so");		
 	}
 
-	public static List<LCIDDescr> getDescriptors() {
+	/**
+	 * Gets a list of all descriptors for the registered LCID.
+	 * @return a list of all descriptors for the registered LCID.
+	 */
+	public static List<LCIDDescr> getDescriptors () {
 		return descriptors;
 	}
 
-	public static String getTag(int lcid) {
+	/**
+	 * Gets the language tag for a given LCID.
+	 * @param lcid the LCID value.
+	 * @return the language tag found or an empty string
+	 */
+	public static String getTag (int lcid) {
 		LCIDDescr descr = tagLookup.get(lcid); 
 		return descr != null ? descr.tag : "";
 	}
 	
-	public static int getLCID(String tag) {
+	/**
+	 * Gets an LCID for a given language tag.
+	 * @param tag the language tag to lookup.
+	 * @return the LCID value found.
+	 */
+	public static int getLCID (String tag) {
 		return getLCID(new LocaleId(tag));
 	}
 	
-	public static String getTag(LocaleId locId) {
+	/**
+	 * Gets the language tag for a given locale id.
+	 * @param locId the locale id to lookup.
+	 * @return the language tag found, or an empty string.
+	 */
+	public static String getTag (LocaleId locId) {
 		LCIDDescr descr = lcidLookup.get(locId.toString());
-		
 		return descr != null ? descr.tag : "";
 	}
 	
-	public static int getLCID(LocaleId locId) {
+	/**
+	 * Gets the LCID for a given locale id.
+	 * @param locId the locale id to lookup.
+	 * @return the LCID value found, or 0 if nothing is found.
+	 */
+	public static int getLCID (LocaleId locId) {
 		LCIDDescr descr = lcidLookup.get(locId.toString()); 
 		return descr != null ? descr.lcid : 0;
 	}
 	
-	public static String getLCID_asString(LocaleId locId) {
+	/**
+	 * Gets the LCID as a string, for a given locale id.
+	 * @param locId the localie id to lookup.
+	 * @return the LCID found, as a string.
+	 */
+	public static String getLCID_asString (LocaleId locId) {
 		return Util.intToStr(getLCID(locId));
 	}
 	
-	public static LocaleId getLocaleId(String tag) {
+	/**
+	 * Creates a locale id for a given language tag.
+	 * <p>This method is the same as calling <code>new LocaleId(tag)</code>.
+	 * @param tag the language tag.
+	 * @return a new locale id for the given language tag.
+	 */
+	public static LocaleId getLocaleId (String tag) {
 		return new LocaleId(tag);
 	}
 	
-	public static LocaleId getLocaleId(int lcid) {
+	/**
+	 * Creates a locale id for a given LCID value.
+	 * @param lcid the LCID to lookup.
+	 * @return a new locale id for the given LCID value.
+	 */
+	public static LocaleId getLocaleId (int lcid) {
 		return new LocaleId(getTag(lcid));
 	}
+
 }
