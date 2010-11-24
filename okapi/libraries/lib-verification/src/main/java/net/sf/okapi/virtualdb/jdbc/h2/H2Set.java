@@ -27,7 +27,7 @@ import net.sf.okapi.virtualdb.IVTextUnit;
 
 public class H2Set implements IVSet {
 
-	private H2Access db;
+//	private H2Access db;
 	private String id;
 	private String name;
 	private String type;
@@ -37,7 +37,7 @@ public class H2Set implements IVSet {
 		String name,
 		String type)
 	{
-		db = access;
+		//db = access;
 		this.id = id;
 		this.name = name;
 		this.type = type;

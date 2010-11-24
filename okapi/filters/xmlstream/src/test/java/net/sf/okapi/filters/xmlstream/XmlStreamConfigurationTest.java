@@ -16,6 +16,7 @@
 /*                                                                           */
 /* See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html */
 /*===========================================================================*/
+
 package net.sf.okapi.filters.xmlstream;
 
 import java.net.URL;
@@ -77,13 +78,15 @@ public class XmlStreamConfigurationTest {
 	@Test
 	public void genericCodeTypes() {
 		URL url = XmlStreamFilter.class.getResource("/net/sf/okapi/filters/xmlstream/dita.yml");
-		TaggedFilterConfiguration rules = new TaggedFilterConfiguration(url);		
+		TaggedFilterConfiguration rules = new TaggedFilterConfiguration(url);
+		assertNotNull(rules);
 	}
 
 	@Test
 	public void textUnitCodeTypes() {
 		URL url = XmlStreamFilter.class.getResource("/net/sf/okapi/filters/xmlstream/dita.yml");
 		TaggedFilterConfiguration rules = new TaggedFilterConfiguration(url);		
+		assertNotNull(rules);
 	}
 
 	@Test

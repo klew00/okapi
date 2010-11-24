@@ -253,6 +253,15 @@ public class XmlSnippetsTest {
 				xmlStreamFilter));
 	}
 
+//	@Test
+//	public void testCdataSectionExtraction () {
+//		String snippet = "<doc><![CDATA[<b> text]]></doc>";
+//		ArrayList<Event> events = XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters);
+//		TextUnit tu = FilterTestDriver.getTextUnit(events, 1);
+//		assertNotNull(tu);
+//		assertEquals("<b> text", tu.toString());
+//	}
+
 	@Test
 	public void testCdataSectionAsHTML() {
 		parameters = XmlSnippetsTest.class.getResource("/cdataAsHTML.yml");
