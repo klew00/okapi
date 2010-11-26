@@ -323,6 +323,8 @@
 		<copy todir="${dist}/help" overwrite="true">
 			<fileset dir="../../help">
 				<include name="**/tutorials/**"/>
+				<include name="help.css"/>
+				<include name="index.html"/>
 			</fileset>
 		</copy>
 
