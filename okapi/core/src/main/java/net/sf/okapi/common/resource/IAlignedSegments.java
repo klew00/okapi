@@ -27,6 +27,7 @@ import net.sf.okapi.common.ISegmenter;
 import net.sf.okapi.common.LocaleId;
 
 /**
+ * EXPERIMENTAL interface. Do not use yet.
  * Provides the methods to access all the source and target segments of a {@link ITextUnit}.
  * The methods of this interface try to automatically preserve the one-to-one match between
  * source segments and all the target segments.

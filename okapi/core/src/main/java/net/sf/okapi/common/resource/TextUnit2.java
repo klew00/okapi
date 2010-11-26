@@ -36,6 +36,7 @@ import net.sf.okapi.common.annotation.Annotations;
 import net.sf.okapi.common.annotation.IAnnotation;
 
 /**
+ * EXPERIMENTAL class. Do not use yet.
  * Basic unit of extraction from a filter and also the resource associated with the filter event TEXT_UNIT.
  * The TextUnit object holds the extracted source text, all its properties and 
  * annotations, and any target corresponding data.

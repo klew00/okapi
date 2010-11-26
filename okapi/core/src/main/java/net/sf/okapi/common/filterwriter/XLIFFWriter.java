@@ -47,7 +47,13 @@ import net.sf.okapi.common.resource.TextUnit;
  */
 public class XLIFFWriter implements IFilterWriter {
 
+	/**
+	 * URI for the XLIFF 1.2 namespace.
+	 */
 	public static final String NS_XLIFF12 = "urn:oasis:names:tc:xliff:document:1.2";
+	/**
+	 * URI for the Okapi XLIFF extensions namespace.
+	 */
 	public static final String NS_XLIFFOKAPI = "okapi-framework:xliff-extensions";
 	
 	private static final String RESTYPEVALUES = 
@@ -83,14 +89,25 @@ public class XLIFFWriter implements IFilterWriter {
 	private boolean useSourceForTranslated = false;
 	private boolean includeAltTrans = true;
 
+	/**
+	 * Creates an XLIFF writer object.
+	 */
 	public XLIFFWriter () {
 		xliffCont = new XLIFFContent();
 	}
 	
+	/**
+	 * Sets the copySource flag indicating to copy the source at the target spot if there is no target defined.
+	 * @param copySource true to copy the source at the target spot if there is no target defined.
+	 */
 	public void setCopySource (boolean copySource) {
 		this.copySource = copySource;
 	}
 	
+	/**
+	 * Sets the flag indicating if the inline code should use the place-holder notation (g and x elements).
+	 * @param placeholderMode true if the inline code should use the place-holder notation.
+	 */
 	public void setPlaceholderMode (boolean placeholderMode) {
 		this.placeholderMode = placeholderMode;
 	}

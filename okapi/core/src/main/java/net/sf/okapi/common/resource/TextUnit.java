@@ -42,9 +42,21 @@ import net.sf.okapi.common.annotation.IAnnotation;
  */
 public class TextUnit implements INameable, IReferenceable {
 
+	/**
+	 * Resource type value for a paragraph.
+	 */
 	public static final String TYPE_PARA = "paragraph";
+	/**
+	 * Resource type value for a list.
+	 */
 	public static final String TYPE_LIST_ELEMENT = "list_element";
+	/**
+	 * Resource type value for a title.
+	 */
 	public static final String TYPE_TITLE = "title";
+	/**
+	 * Resource type value for a header.
+	 */
 	public static final String TYPE_HEADER = "header";
 	
 	private static final int TARGETS_INITCAP = 2;

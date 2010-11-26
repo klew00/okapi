@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -59,7 +59,7 @@ import java.util.regex.Pattern;
 public final class Util {
 		
 	/**
-	 * Enumeration of supported OS's	 	 
+	 * Enumeration of supported OSes	 	 
 	 */
 	public static enum SUPPORTED_OS {
 		WINDOWS,
@@ -67,17 +67,50 @@ public final class Util {
 		LINUX		
 	}
 
+	/**
+	 * Line-break string for DOS/Windows.
+	 */
 	public static final String LINEBREAK_DOS = "\r\n";
+	/**
+	 * Line-break string for Unix/Linux
+	 */
 	public static final String LINEBREAK_UNIX = "\n";
+	/**
+	 * Line-break string for Macintosh
+	 */
 	public static final String LINEBREAK_MAC = "\r";
 
+	/**
+	 * Default RTF style for starting an external code.
+	 */
 	public static final String RTF_STARTCODE = "{\\cs5\\f1\\cf15\\lang1024 ";
+	/**
+	 * Default RTF style for ending an external code.
+	 */
 	public static final String RTF_ENDCODE = "}";
+	/**
+	 * Default RTF style for starting an internal code.
+	 */
 	public static final String RTF_STARTINLINE = "{\\cs6\\f1\\cf6\\lang1024 ";
+	/**
+	 * Default RTF style for ending an internal code.
+	 */
 	public static final String RTF_ENDINLINE = "}";
+	/**
+	 * Default RTF style for starting an in-between source/target marker.
+	 */
 	public static final String RTF_STARTMARKER = "{\\cs15\\v\\cf12\\sub\\f2 \\{0>}{\\v\\f1 ";
+	/**
+	 * Default RTF style for the first half of a middle part of an in-between source/target marker.
+	 */
 	public static final String RTF_MIDMARKER1 = "}{\\cs15\\v\\cf12\\sub\\f2 <\\}";
+	/**
+	 * Default RTF style for the second half of a middle part of an in-between source/target marker.
+	 */
 	public static final String RTF_MIDMARKER2 = "\\{>}";
+	/**
+	 * Default RTF style for ending an in-between source/target marker.
+	 */
 	public static final String RTF_ENDMARKER = "{\\cs15\\v\\cf12\\sub\\f2 <0\\}}";
 
 	private static final String NEWLINES_REGEX = "\r(\n)?";
@@ -1017,48 +1050,101 @@ public final class Util {
 	static public boolean isEmpty (String string) {
 		return (( string == null ) || ( string.length() == 0 ));
 	}
-	
+
+	/**
+	 * Indicates if a locale id is null or empty.
+	 * @param locale the locale id to examine.
+	 * @return true if the given locale id is null or empty, false otherwise.
+	 */
 	static public boolean isNullOrEmpty (LocaleId locale) {
 		return (( locale == null ) || ( locale.equals(LocaleId.EMPTY) ));
 	}
 	
-	static public boolean isEmpty (String string, boolean ignoreWS) {
+	/**
+	 * Indicates if a string is null or empty, optionally ignoring the white spaces.
+	 * @param string the string to examine.
+	 * @param ignoreWS true to ignore white spaces.
+	 * @return true if the given string is null, or empty. The argument ignoreWS is true a string
+	 * with only white spaces is concidered empty.
+	 */
+	static public boolean isEmpty (String string,
+		boolean ignoreWS)
+	{
         if ( ignoreWS && ( string != null )) {
             string = string.trim();
         }
 		return isEmpty(string);
 	}
 	
-	static public boolean isEmpty(StringBuilder sb) {
-		return (sb == null ||(sb != null && sb.length() == 0));
+	/**
+	 * Indicates if a StringBuilder object is null or empty.
+	 * @param sb the object to examine.
+	 * @return true if the given object is null or empty. 
+	 */
+	static public boolean isEmpty (StringBuilder sb) {
+		return (( sb == null ) || ( sb.length() == 0 ));
 	}
 
-	static public <E> boolean isEmpty(List <E> e) {
-		return (e == null ||(e != null && e.isEmpty()));
+	/**
+	 * Indicates if a given list is null or empty.
+	 * @param e the list to examine.
+	 * @return true if the list is null or empty.
+	 */
+	static public <E> boolean isEmpty (List <E>e) {
+		return (( e == null ) || e.isEmpty() );
 	}
 	
-	public static <K, V> boolean isEmpty(Map<K, V> map) {		
-		return (map == null || (map != null && map.isEmpty()));
+	/**
+	 * Indicates if a given map is null or empty.
+	 * @param map the map to examine.
+	 * @return true if the map is null or empty,
+	 */
+	public static <K, V> boolean isEmpty (Map<K, V>map) {		
+		return (( map == null ) || map.isEmpty() );
 	}
 	
-	static public boolean isEmpty(Object[] e) {
+	/**
+	 * Indicates if an array is null or empty.
+	 * @param e the array to examine.
+	 * @return true if the given array is null or empty.
+	 */
+	static public boolean isEmpty (Object[] e) {
 		return (e == null ||(e != null && e.length == 0));
 	}
 	
-	
-	//=== Safe string functions
-	
-	static public int getLength(String string) {
+	/**
+	 * Gets the length of a string, even a null one.
+	 * @param string the string to examine.
+	 * @return the length of the given string, 0 if the string is null.
+	 */
+	static public int getLength (String string) {
 		return (isEmpty(string)) ? 0 : string.length();
 	}
 
-	static public char getCharAt (String string, int pos) {
+	/**
+	 * Gets a character at a given position in a string.
+	 * The string can be null and the position can be beyond the last character.
+	 * @param string the string to examine.
+	 * @param pos the position of the character to retrieve. 
+	 * @return the character at the given position,
+	 * or '\0' if the string is null or if the position is beyond the length of the string. 
+	 */
+	static public char getCharAt (String string,
+		int pos)
+	{
 		if ( isEmpty(string) ) {
 			return '\0';
 		}
-		return (string.length() > pos) ? string.charAt(pos) : 0;
+		return (string.length() > pos) ? string.charAt(pos) : '\0';
 	}
 
+	/**
+	 * Gets the last character of a given string.
+	 * The string can be null or empty.
+	 * @param string the string to examine.
+	 * @return the last character of the given string,
+	 * or '\0' if the string is null or empty.
+	 */
 	static public char getLastChar (String string) {
 		if ( isEmpty(string) ) {
 			return '\0';
@@ -1066,6 +1152,13 @@ public final class Util {
 		return string.charAt(string.length() - 1);
 	}
 
+	/**
+	 * Deletes the last character of a given string.
+	 * The string can be null or empty.
+	 * @param string the string where to remove the character.
+	 * @return a new string where the last character has been removed,
+	 * or an empty string if the given string was null or empty. 
+	 */
 	static public String deleteLastChar (String string) {
 		if ( isEmpty(string) ) {
 			return "";
@@ -1073,25 +1166,41 @@ public final class Util {
 		return string.substring(0, string.length() - 1);
 	}
 
+	/**
+	 * Gets the last character of a given StringBuilder object.
+	 * The object can be null or empty.
+	 * @param sb the StringBuilder object to examine.
+	 * @return the last character of the given StringBuilder object,
+	 * or '\0' if the object is null or empty. 
+	 */
 	static public char getLastChar (StringBuilder sb) {
-		if ((sb == null) || (sb.length() == 0))
+		if ( isEmpty(sb) ) {
 			return '\0';
+		}
 		return sb.charAt(sb.length() - 1);
 	}
 
+	/**
+	 * Deletes the last character of a given StringBuilder object.
+	 * If the object is null or empty no character are removed.
+	 * @param sb the StringBuilder object where to remove the character.
+	 */
 	static public void deleteLastChar (StringBuilder sb) {
-		if ((sb == null) || (sb.length() == 0))
+		if ( isEmpty(sb) ) {
 			return;
+		}
 		sb.deleteCharAt(sb.length() - 1);
 	}
 
-// List helpers	
 	/**
-	 * Returns true if a given index is within the list bounds.
+	 * Indicates if a given index is within the list bounds.
 	 * @param index the given index.
 	 * @param list the given list.
+	 * @return true if a given index is within the list bounds.
 	 */
-	public static <E> boolean checkIndex(int index, List<E> list) {
+	public static <E> boolean checkIndex (int index,
+		List<E> list)
+	{
 		return (list != null) && (index >= 0) && (index < list.size());
 	}
 
@@ -1113,7 +1222,9 @@ public final class Util {
 	 * @return the integer value of the string, or the provided default
 	 * value if the conversion failed.
 	 */
-	public static int strToInt (String value, int intDefault) {
+	public static int strToInt (String value,
+		int intDefault)
+	{
 		if ( Util.isEmpty(value) ) {
 			return intDefault;
 		}
@@ -1133,7 +1244,9 @@ public final class Util {
 	 * @return the long value of the string, or the provided default
 	 * value if the conversion failed.
 	 */
-	public static long strToLong (String value, long longDefault) {
+	public static long strToLong (String value,
+		long longDefault)
+	{
 		if ( Util.isEmpty(value) ) {
 			return longDefault;
 		}
@@ -1153,11 +1266,15 @@ public final class Util {
 	 * @return the element of the array for the given index, or null if the
 	 * index is out of bounds, or if the element is null.
 	 */
-	public static <T>T get(T[] array, int index) {
-		if (index >= 0 && index < array.length)
+	public static <T>T get(T[] array,
+		int index)
+	{
+		if (( index >= 0 ) && ( index < array.length )) {
 			return array[index];
-		else
+		}
+		else {
 			return null;
+		}
 	}
 
 	/**
@@ -1166,7 +1283,9 @@ public final class Util {
 	 * @param array the given list.
 	 * @return true if a given index is within the array bounds.
 	 */
-	public static <T> boolean checkIndex(int index, T[] array) {
+	public static <T> boolean checkIndex (int index,
+		T[] array)
+	{
 		return (array != null) && (index >= 0) && (index < array.length);
 	}
 	
@@ -1176,7 +1295,9 @@ public final class Util {
 	 * @param flag the flag to look for.
 	 * @return true if the flag is set, false if it is not.
 	 */
-	public static boolean checkFlag (int value, int flag) {
+	public static boolean checkFlag (int value,
+		int flag)
+	{
 		return (value & flag) == flag;
 	}
 	
@@ -1184,7 +1305,7 @@ public final class Util {
 	 * Get the operating system
 	 * @return one of WINDOWS, MAC or LINUX
 	 */
-	public static SUPPORTED_OS getOS() {
+	public static SUPPORTED_OS getOS () {
 		String osName = System.getProperty("os.name");
 		if (osName.startsWith("Windows")) { // Windows case
 			return SUPPORTED_OS.WINDOWS;
@@ -1310,15 +1431,15 @@ public final class Util {
 
 	/**
 	 * Returns the smallest value in a given array of values.
-	 * @param values - the given array
-	 * @return - the smallest value in the array
+	 * @param values the given array
+	 * @return the smallest value in the array
 	 */
-	public static int min(int... values) {
+	public static int min (int... values) {
 		int res = Integer.MAX_VALUE;
-		
 		for (int value : values) {
 			res = Math.min(res, value);
 		}
 		return (values.length > 0) ? res : 0;		
 	}
+
 }

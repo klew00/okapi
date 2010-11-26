@@ -597,31 +597,18 @@ public class PipelineWrapper {
 			}
 			availableSteps.put(step.id, step);
 
-
-// not ready
+// Not ready			
 //			ps = (IPipelineStep)Class.forName(
-//				"net.sf.okapi.steps.xliffkit.writer.XLIFFKitWriterStep").newInstance();
+//				"net.sf.okapi.steps.simplekit.creation.TranslationPackageCreationStep").newInstance();
 //			params = ps.getParameters();
 //			step = new StepInfo(ps.getClass().getSimpleName(),
 //				ps.getName(), ps.getDescription(), ps.getClass().getName(), null,
 //				params.getClass().getName());
 //			if ( params != null ) {
 //				step.paramsData = params.toString();
-//				peMapper.addDescriptionProvider("net.sf.okapi.steps.xliffkit.writer.Parameters", step.paramsClass);
+//				peMapper.addEditor("net.sf.okapi.steps.simplekit.ui.CreationParametersEditor", step.paramsClass);
 //			}
 //			availableSteps.put(step.id, step);
-
-			ps = (IPipelineStep)Class.forName(
-				"net.sf.okapi.steps.simplekit.creation.TranslationPackageCreationStep").newInstance();
-			params = ps.getParameters();
-			step = new StepInfo(ps.getClass().getSimpleName(),
-				ps.getName(), ps.getDescription(), ps.getClass().getName(), null,
-				params.getClass().getName());
-			if ( params != null ) {
-				step.paramsData = params.toString();
-				peMapper.addEditor("net.sf.okapi.steps.simplekit.ui.CreationParametersEditor", step.paramsClass);
-			}
-			availableSteps.put(step.id, step);
 
 		}
 		catch ( InstantiationException e ) {

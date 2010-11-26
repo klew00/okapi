@@ -32,28 +32,36 @@ import java.util.List;
 public final class FileUtil {
 
 	/**
-	 * Search all {@link File}s recursively that pass the {@link FilenameFilter}. Adapted from
-	 * http://snippets.dzone.com/posts/show/1875
+	 * Gets an array of the files in a given directory.
+	 * <p>This method searches all {@link File}s recursively that pass the {@link FilenameFilter}.
+	 * Adapted from http://snippets.dzone.com/posts/show/1875
 	 * @param directory root directory
 	 * @param filter {@link FilenameFilter} used to filter the File candidates
-	 * @param recurse do we recurse or not?
+	 * @param recurse true to recurse in the sub-directories, false to not.
 	 * @return an array of {@link File}s (File[])
 	 */
-	public static File[] getFilteredFilesAsArray(File directory, FilenameFilter filter, boolean recurse) {
+	public static File[] getFilteredFilesAsArray (File directory,
+		FilenameFilter filter,
+		boolean recurse)
+	{
 		Collection<File> files = FileUtil.getFilteredFiles(directory, filter, recurse);
 		File[] arr = new File[files.size()];
 		return files.toArray(arr);
 	}
 
 	/**
-	 * Search all {@link File}s recursively that pass the {@link FilenameFilter}. Adapted from
-	 * http://snippets.dzone.com/posts/show/1875
+	 * Gets a collection of the files in a given directory.
+	 * <p>This method search all {@link File}s recursively that pass the {@link FilenameFilter}.
+	 * Adapted from http://snippets.dzone.com/posts/show/1875
 	 * @param directory root directory
 	 * @param filter {@link FilenameFilter} used to filter the File candidates
-	 * @param recurse do we recurse or not?
+	 * @param recurse true to recurse in the sub-directories, false to not.
 	 * @return {@link Collection} of {@link File}s
 	 */
-	public static Collection<File> getFilteredFiles(File directory, FilenameFilter filter, boolean recurse) {
+	public static Collection<File> getFilteredFiles (File directory,
+		FilenameFilter filter,
+		boolean recurse)
+	{
 		// List of files / directories
 		List<File> files = new LinkedList<File>();
 	

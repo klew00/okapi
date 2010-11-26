@@ -240,9 +240,7 @@
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi/steps/scopingreport/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../okapi/steps/simplekit/target/classes"
-			 excludes="**/META-INF/**"/>
-<!--			<fileset dir="../../okapi/steps/xliffkit/target/classes"
+<!--			<fileset dir="../../okapi/steps/simplekit/target/classes"
 			 excludes="**/META-INF/**"/>-->
 		</copy>
 		

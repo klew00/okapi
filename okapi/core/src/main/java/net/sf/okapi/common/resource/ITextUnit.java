@@ -22,6 +22,9 @@ package net.sf.okapi.common.resource;
 
 import net.sf.okapi.common.LocaleId;
 
+/**
+ * EXPERIMENTAL interface. Do not use yet.
+ */
 public interface ITextUnit extends INameable, IReferenceable {
 
 	/**

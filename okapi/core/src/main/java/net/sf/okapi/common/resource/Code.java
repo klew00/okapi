@@ -32,14 +32,41 @@ import net.sf.okapi.common.resource.TextFragment.TagType;
  */
 public class Code {
 
+	/**
+	 * Code type value for bold.
+	 */
 	public static final String TYPE_BOLD = "bold";
+	/**
+	 * Code type value for italic.
+	 */
 	public static final String TYPE_ITALIC = "italic";
+	/**
+	 * Code type value for underline.
+	 */
 	public static final String TYPE_UNDERLINED = "underlined";
-	public static final String TYPE_LB = "lb"; // Line-break
+	/**
+	 * Code type value for line-break.
+	 */
+	public static final String TYPE_LB = "lb";
+	/**
+	 * Code type value for link.
+	 */
 	public static final String TYPE_LINK = "link";
+	/**
+	 * Code type value for image.
+	 */
 	public static final String TYPE_IMAGE = "image";
+	/**
+	 * Code type value for comment.
+	 */
 	public static final String TYPE_COMMENT = "comment";
+	/**
+	 * Code type value for processing instruction.
+	 */
 	public static final String TYPE_XML_PROCESSING_INSTRUCTION = "processing-instruction";
+	/**
+	 * Code type value for reference.
+	 */
 	public static final String TYPE_REFERENCE = "ref";
 	
 	/**
@@ -68,12 +95,38 @@ public class Code {
 	 */
 	protected static final int DELETEABLE   = 0x04;
 	
+	/**
+	 * Tag type for this code.
+	 */
 	protected TagType tagType;
+	/**
+	 * Id for this code.
+	 */
 	protected int id;
-	protected String type; // Must not be null (so internal compare can be fast), null is mapped to "null"
-	protected StringBuilder data; // Used by toString() except if outerData is not null
-	protected StringBuilder outerData; // Must be null (not just empty) to be unused
+	/**
+	 * Type of the code.
+	 * It MUST NEVER be null (so internal compare can be fast), null is mapped to "null"
+	 */
+	protected String type;
+	/**
+	 * Native data for this code.
+	 * This is used to generate the text output, except if outerData is not null.
+	 */
+	protected StringBuilder data;
+	/**
+	 * Outer data. It must be null (not just empty) for data to be used.
+	 * Outer data is reserved to store inline native codes in formats that are extraction formats
+	 * such as XLIFF, TS, etc.
+	 */
+	protected StringBuilder outerData;
+	/**
+	 * Flag for this code.
+	 * This flag holds various information about the code (is it deletable, does it have a reference, etc.)
+	 */
 	protected int flag;
+	/**
+	 * Annotations for this code.
+	 */
 	protected LinkedHashMap<String, InlineAnnotation> annotations;
 
 	/**
