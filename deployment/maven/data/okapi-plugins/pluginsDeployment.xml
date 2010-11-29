@@ -1,22 +1,11 @@
 <?xml version="1.0"?>
 <pluginsDeployment>
 
- <plugin name="okapi-step-xmlvalidation-@version@"
-  helpURL="http://www.opentag.com/okapi/wiki/index.php?title=XML Validation Step"
+<!-- <plugin name="okapi-step-simplekit-@version@"
+  helpURL="http://www.opentag.com/okapi/wiki/index.php?title=Translation Package Creation Step"
   provider="Okapi Framework">
-  <description>XML validation: checks well-fromness, and optionally validates against DTD or schema.</description>
+  <description>ALPHA - Test only - Creates translation packages.</description>
  </plugin>
-
- <plugin name="okapi-filter-vignette-@version@"
-  helpURL="http://www.opentag.com/okapi/wiki/index.php?title=Vignette_Filter"
-  provider="Okapi Framework">
-  <description>Filter for export/import XML documents used with the Vignette Content Managment System.</description>
- </plugin>
-
- <plugin name="okapi-filter-versifiedtxt-@version@"
-  helpURL="http://www.opentag.com/okapi/wiki/index.php?title=Versified_Text_Filter"
-  provider="Okapi Framework">
-  <description>Filter for versified text files.</description>
- </plugin>
+-->
 
 </pluginsDeployment>

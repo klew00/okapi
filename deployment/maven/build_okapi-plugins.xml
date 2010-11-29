@@ -59,36 +59,49 @@
 	<target name="makeZips"> 
 
 		<!-- ============== okapi-step-xmlvalidation -->
-		<property name="plg001" value="okapi-step-xmlvalidation-${okapilibStamp}"/>
+<!--		<property name="plg001" value="okapi-step-xmlvalidation-${okapilibStamp}"/>
 		<delete includeEmptyDirs="true" failonerror="false">
 			<fileset dir="${tmp}"/>
 		</delete>
 		<mkdir dir="${tmp}"/>
 		<copy todir="${tmp}" file="../../okapi/steps/xmlvalidation/target/${plg001}.jar"/>
 		<mkdir dir="${tmp}/lib"/>
-		<copy todir="${tmp}/lib"> <!-- Add dependencies for tests -->
+		<copy todir="${tmp}/lib">
 		   <fileset dir="${mavenStore}/dtdparser/dtdparser/1.21" includes="**/dtdparser-1.21.jar"/>
 		   <fileset dir="../shared/licenses" includes="**/dtdparser-*"/>
 		</copy>
 		<zip destfile="${dist_plugins}/${plg001}.zip" basedir="${tmp}"/>
+-->
 
 		<!-- ============== okapi-filter-vignette -->
-		<property name="plg002" value="okapi-filter-vignette-${okapilibStamp}"/>
+<!--		<property name="plg002" value="okapi-filter-vignette-${okapilibStamp}"/>
 		<delete includeEmptyDirs="true" failonerror="false">
 			<fileset dir="${tmp}"/>
 		</delete>
 		<mkdir dir="${tmp}"/>
 		<copy todir="${tmp}" file="../../okapi/filters/vignette/target/${plg002}.jar"/>
 		<zip destfile="${dist_plugins}/${plg002}.zip" basedir="${tmp}"/>
+-->
 
 		<!-- ============== okapi-filter-versifiedtxt -->
-		<property name="plg003" value="okapi-filter-versifiedtxt-${okapilibStamp}"/>
+<!--		<property name="plg003" value="okapi-filter-versifiedtxt-${okapilibStamp}"/>
 		<delete includeEmptyDirs="true" failonerror="false">
 			<fileset dir="${tmp}"/>
 		</delete>
 		<mkdir dir="${tmp}"/>
 		<copy todir="${tmp}" file="../../okapi/filters/versifiedtxt/target/${plg003}.jar"/>
 		<zip destfile="${dist_plugins}/${plg003}.zip" basedir="${tmp}"/>
+-->
+
+		<!-- ============== okapi-steps-simplekit -->
+<!--		<property name="plg001" value="okapi-step-simplekit-${okapilibStamp}"/>
+		<delete includeEmptyDirs="true" failonerror="false">
+			<fileset dir="${tmp}"/>
+		</delete>
+		<mkdir dir="${tmp}"/>
+		<copy todir="${tmp}" file="../../okapi/steps/simplekit/target/${plg001}.jar"/>
+		<zip destfile="${dist_plugins}/${plg001}.zip" basedir="${tmp}"/>
+-->
 
 	</target>
 	
