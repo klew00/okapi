@@ -319,6 +319,9 @@ public class XMLFilter implements IFilter {
 		startDoc.setLineBreak(lineBreak);
 		startDoc.setLocale(srcLang);
 
+		// Default quote mode == 3
+		params.quoteModeDefined = true;
+		params.quoteMode = 3; // quote is escaped, apos is not
 		// Change the escapeQuotes option depending on whether translatable attributes rule
 		// was triggered or not
 		if ( !itsEng.getTranslatableAttributeRuleTriggered() ) {
