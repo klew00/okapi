@@ -199,6 +199,27 @@ public class XMLFilterTest {
 			filter.getEncoderManager(), locEN));
 	}
 	
+	@Test
+	public void testOutputAttributesAndQuotes () {
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc><its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "<its:translateRule selector=\"//*/@alt\" translate=\"yes\"/>"
+			+ "</its:rules>"
+			+ "<p alt='It&apos;s done' notrans='&apos;'>It&apos;s done</p>"
+			+ "</doc>";
+		// All empty elements are re-written as <elem/>
+		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			+ "<doc><its:rules version=\"1.0\" xmlns:its=\"http://www.w3.org/2005/11/its\">"
+			+ "<its:translateRule selector=\"//*/@alt\" translate=\"yes\"/>"
+			+ "</its:rules>"
+			+ "<p alt=\"It's done\" notrans=\"'\">It's done</p>"
+			+ "</doc>";
+		ArrayList<Event> list = getEvents(snippet);
+		TextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertEquals("It's done", tu.getSource().toString());
+		assertEquals(expected, FilterTestDriver.generateOutput(list,
+			filter.getEncoderManager(), locEN));
+	}
 // Cannot test with internal rules, works with external only
 //	@Test
 //	public void testLineBreakAsCode () {
