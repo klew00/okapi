@@ -484,7 +484,9 @@ public class TTXFilter implements IFilter {
 								}
 							}
 							if ( value > 0 ) {
-								altTrans = new AltTranslation(srcLoc, trgLoc, null, null, null, MatchType.UKNOWN,
+								MatchType matchType = MatchType.FUZZY;
+								if ( value > 99 ) matchType = MatchType.EXACT;
+								altTrans = new AltTranslation(srcLoc, trgLoc, null, null, null, matchType,
 									value, ((origin==null) ? AltTranslation.ORIGIN_SOURCEDOC : origin));
 							}
 						}

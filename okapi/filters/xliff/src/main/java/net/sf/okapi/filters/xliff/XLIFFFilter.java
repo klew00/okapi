@@ -882,7 +882,7 @@ public class XLIFFFilter implements IFilter {
 		}
 		// Adjust UNKNOWN type if we can
 		if ( altTransMatchType.equals(MatchType.UKNOWN)) {
-			if ( altTransQuality >= 100 ) altTransMatchType = MatchType.EXACT;
+			if ( altTransQuality > 99 ) altTransMatchType = MatchType.EXACT;
 			else if ( altTransQuality > 0 ) altTransMatchType = MatchType.FUZZY;
 		}
 		

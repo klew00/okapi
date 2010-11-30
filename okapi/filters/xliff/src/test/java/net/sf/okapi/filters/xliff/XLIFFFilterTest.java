@@ -430,8 +430,8 @@ public class XLIFFFilterTest {
 				break;
 			case 2:
 				assertEquals("alt-trans target 2", at.getTarget().toString());
-				assertEquals(10, at.getScore());
-				assertEquals(MatchType.FUZZY, at.getType());
+				assertEquals(101, at.getScore());
+				assertEquals(MatchType.EXACT, at.getType());
 				assertEquals("xyz", at.getOrigin());
 				break;
 			case 3:
@@ -924,7 +924,7 @@ public class XLIFFFilterTest {
 			+ "<body>"
 			+ "<trans-unit id=\"1\">"
 			+ "<source>source</source>"
-			+ "<alt-trans match-quality='10' origin='xyz'>"
+			+ "<alt-trans match-quality='101' origin='xyz'>"
 			+ "<source>alt-trans source 2</source>"
 			+ "<target>alt-trans target 2</target></alt-trans>"
 			+ "<alt-trans>"

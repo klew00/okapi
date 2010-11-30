@@ -30,6 +30,7 @@ import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filterwriter.XLIFFContent;
+import net.sf.okapi.common.filterwriter.XLIFFWriter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.*;
@@ -417,7 +418,7 @@ public class Writer extends BaseWriter {
 				writer.writeAttributeString("origin", at.getOrigin());
 			}
 			if ( at.getType() != MatchType.UKNOWN ) {
-				writer.writeAttributeString("okp:matchType", at.getType().toString());
+				writer.writeAttributeString("okp:"+XLIFFWriter.OKP_MATCHTYPE, at.getType().toString());
 			}
 			writer.writeLineBreak();
 			// alt-trans source
