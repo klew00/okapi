@@ -23,7 +23,7 @@ package net.sf.okapi.common.query;
 /**
  * Enumeration of the different match types possible for an alternate translation entry.
  * <p>
- * <h2>Matches are in ranked order from highest to lowest. Please maintain ranked order when adding new entries.</h2>
+ * <b>Matches are in ranked order from highest to lowest. Please maintain ranked order when adding new entries.</b>
  */
 public enum MatchType {
 

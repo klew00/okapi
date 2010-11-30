@@ -27,9 +27,12 @@ import java.util.List;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.TestUtil;
+import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filterwriter.GenericContent;
+import net.sf.okapi.common.filterwriter.XLIFFWriter;
+import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
@@ -408,6 +411,43 @@ public class XLIFFFilterTest {
 		assertEquals("", annot.getFirst().getEntry().getSource().toString()); // No source
 		assertEquals("TRG for t2", annot.getFirst().getEntry().getTarget(locFR).toString());
 		assertNotNull(annot);
+	}
+
+	@Test
+	public void testAlTransData () {
+		TextUnit tu = FilterTestDriver.getTextUnit(createTUWithAltTransData(), 1);
+		assertNotNull(tu);
+		AltTranslationsAnnotation annot = tu.getTarget(locFR).getAnnotation(AltTranslationsAnnotation.class);
+		int n = 0;
+		for ( AltTranslation at : annot ) {
+			n++;
+			switch ( n ) {
+			case 1:
+				assertEquals("alt-trans best target", at.getTarget().toString());
+				assertEquals(100, at.getScore());
+				assertEquals(MatchType.EXACT_UNIQUE_ID, at.getType());
+				assertEquals(AltTranslation.ORIGIN_SOURCEDOC, at.getOrigin());
+				break;
+			case 2:
+				assertEquals("alt-trans target 2", at.getTarget().toString());
+				assertEquals(10, at.getScore());
+				assertEquals(MatchType.FUZZY, at.getType());
+				assertEquals("xyz", at.getOrigin());
+				break;
+			case 3:
+				assertEquals("alt-trans target 3", at.getTarget().toString());
+				assertEquals(0, at.getScore());
+				assertEquals(MatchType.UKNOWN, at.getType());
+				assertEquals(AltTranslation.ORIGIN_SOURCEDOC, at.getOrigin());
+				break;
+			case 4:
+				assertEquals("alt-trans target 4", at.getTarget().toString());
+				assertEquals(0, at.getScore());
+				assertEquals(MatchType.UKNOWN, at.getType());
+				assertEquals(AltTranslation.ORIGIN_SOURCEDOC, at.getOrigin());
+				break;
+			}
+		}
 	}
 
 	@Test
@@ -875,7 +915,29 @@ public class XLIFFFilterTest {
 			+ "</file></xliff>";
 		return getEvents(snippet);
 	}
-	
+
+	private ArrayList<Event> createTUWithAltTransData () {
+		String snippet = "<?xml version=\"1.0\"?>\r"
+			+ "<xliff version=\"1.2\""
+			+ " xmlns='"+XLIFFWriter.NS_XLIFF12+"' xmlns:okp='"+XLIFFWriter.NS_XLIFFOKAPI+"'>\r"
+			+ "<file source-language=\"en\" datatype=\"x-test\" original=\"file.ext\">"
+			+ "<body>"
+			+ "<trans-unit id=\"1\">"
+			+ "<source>source</source>"
+			+ "<alt-trans match-quality='10' origin='xyz'>"
+			+ "<source>alt-trans source 2</source>"
+			+ "<target>alt-trans target 2</target></alt-trans>"
+			+ "<alt-trans>"
+			+ "<target>alt-trans target 3</target></alt-trans>"
+			+ "<alt-trans match-quality='exact'>" // not a commond match-quality -> not supported
+			+ "<target>alt-trans target 4</target></alt-trans>"
+			+ "<alt-trans match-quality='100%' okp:matchType='EXACT_UNIQUE_ID'>"
+			+ "<target>alt-trans best target</target></alt-trans>"
+			+ "</trans-unit>"
+			+ "</body>"
+			+ "</file></xliff>";
+		return getEvents(snippet);
+	}
 	private ArrayList<Event> getEvents(String snippet) {
 		return getEvents(snippet, filter);
 	}

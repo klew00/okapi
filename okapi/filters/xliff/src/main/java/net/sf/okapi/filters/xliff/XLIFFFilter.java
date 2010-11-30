@@ -51,6 +51,7 @@ import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.filterwriter.XLIFFWriter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.Code;
@@ -104,6 +105,8 @@ public class XLIFFFilter implements IFilter {
 	private Stack<String> parentIds;
 	private AltTranslationsAnnotation altTrans;
 	private int altTransQuality;
+	private MatchType altTransMatchType;
+	private String altTransOrigin;
 	private boolean inAltTrans;
 	private boolean processAltTrans;
 	private Stack<Boolean> preserveSpaces;
@@ -647,6 +650,10 @@ public class XLIFFFilter implements IFilter {
 					if ( "trans-unit".equals(name) ) {
 						addTargetIfNeeded();
 						storeEndElement();
+						if ( altTrans != null ) {
+							// make sure the entries are ordered
+							altTrans.sort();
+						}
 						if ( params.getIgnoreInputSegmentation() ) {
 							tu.removeAllSegmentations();
 						}
@@ -723,7 +730,7 @@ public class XLIFFFilter implements IFilter {
 					else {
 						// Add the source, no target yet
 						AltTranslation alt = altTrans.add(lang, null, null, tc.getFirstContent(), null,
-							MatchType.UKNOWN, 0, AltTranslation.ORIGIN_SOURCEDOC);
+							altTransMatchType, 0, altTransOrigin);
 						alt.getEntry().setPreserveWhitespaces(preserveSpaces.peek());
 						if ( altTransQuality > 0 ) {
 							alt.setScore(altTransQuality);
@@ -783,7 +790,12 @@ public class XLIFFFilter implements IFilter {
 						alt = null; // Behave like it's a first entry
 					}
 					if ( alt == null ) {
-						alt = altTrans.add(srcLang, null, null, null, null, MatchType.UKNOWN, 0, AltTranslation.ORIGIN_SOURCEDOC);
+						alt = altTrans.add(srcLang, null, null, null, null,
+							altTransMatchType, 0, altTransOrigin);
+						alt.getEntry().setPreserveWhitespaces(preserveSpaces.peek());
+						if ( altTransQuality > 0 ) {
+							alt.setScore(altTransQuality);
+						}
 					}
 					if ( tc.contentIsOneSegment() ) {
 						alt.setTarget(lang, tc.getFirstContent());
@@ -862,6 +874,25 @@ public class XLIFFFilter implements IFilter {
 			}
 		}
 		
+		// Get the Okapi match-type if one is present
+		altTransMatchType = MatchType.UKNOWN;
+		tmp = reader.getAttributeValue(XLIFFWriter.NS_XLIFFOKAPI, XLIFFWriter.OKP_MATCHTYPE);
+		if ( !Util.isEmpty(tmp) ) {
+			altTransMatchType = MatchType.valueOf(tmp);
+		}
+		// Adjust UNKNOWN type if we can
+		if ( altTransMatchType.equals(MatchType.UKNOWN)) {
+			if ( altTransQuality >= 100 ) altTransMatchType = MatchType.EXACT;
+			else if ( altTransQuality > 0 ) altTransMatchType = MatchType.FUZZY;
+		}
+		
+		// Get the origin if present
+		altTransOrigin = AltTranslation.ORIGIN_SOURCEDOC;
+		tmp = reader.getAttributeValue(null, "origin");
+		if ( !Util.isEmpty(tmp) ) {
+			altTransOrigin = tmp;
+		}
+		
 		// Look where the annotation needs to go: segment or container?
 		// Get the target (and possibly creates it if needed)
 		TextContainer tc = tu.getTarget(trgLang);
@@ -884,7 +915,6 @@ public class XLIFFFilter implements IFilter {
 			}
 		}
 		else { // Annotation should be attached to its corresponding segment 
-			//TODO: No optimal to re-create segments every single time...
 			Segment seg = tc.getSegments().get(mid);
 			if ( seg == null ) {
 				// No corresponding segment found. We drop that entry
@@ -900,7 +930,6 @@ public class XLIFFFilter implements IFilter {
 				seg.setAnnotation(altTrans);
 			}
 		}
-		
 	}
 	
 	private void addSegSourceIfNeeded () {

@@ -55,6 +55,10 @@ public class XLIFFWriter implements IFilterWriter {
 	 * URI for the Okapi XLIFF extensions namespace.
 	 */
 	public static final String NS_XLIFFOKAPI = "okapi-framework:xliff-extensions";
+	/**
+	 * Name of the Okapi XLIFF extension matchType.
+	 */
+	public static final String OKP_MATCHTYPE = "matchType";
 	
 	private static final String RESTYPEVALUES = 
 		";auto3state;autocheckbox;autoradiobutton;bedit;bitmap;button;caption;cell;"
@@ -504,7 +508,7 @@ public class XLIFFWriter implements IFilterWriter {
 				writer.writeAttributeString("origin", alt.getOrigin());
 			}
 			if ( alt.getType() != MatchType.UKNOWN ) {
-				writer.writeAttributeString("okp:matchType", alt.getType().toString());
+				writer.writeAttributeString("okp:"+OKP_MATCHTYPE, alt.getType().toString());
 			}
 			TextContainer cont = alt.getSource();
 			if ( !cont.isEmpty() ) {
