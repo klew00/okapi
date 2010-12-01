@@ -5,120 +5,28 @@
 <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
 <title>Okapi Framework</title>
 <meta name="keywords" content="localization standard SRX ITS TMX GMX XLIFF tools translation CAT filter Okapi cross-platform open-source java xml l10n i18n internationalization">
+<meta http-equiv="Refresh" content="1 ;url=http://www.opentag.com/okapi/wiki/index.php?title=Open_Standards">
 <link rel="stylesheet" type="text/css" href="okapi.css">
 </head>
 
 <body>
 <table border="0" width="100%" cellspacing="0" cellpadding="0">
 	<tr class="head">
-		<td rowspan="2" class="toc" width="160">
-		<p><a href="index.html">Introduction</a></p>
-		<p><a href="downloads.html">Downloads</a></p>
-		<p class="current">Standards</p>
-		<p><a href="components.html">Components</a></p>
-		<p><a href="applications.html">Applications</a></p>
-		<p><a href="help.html">Help and Support</a></p>
-		<p><a href="developers.html">Developers Notes</a></p>
-		<p><a href="screenshots.html">Screen Shots</a></p></td>
 		<td class="head"><h1 class="head">Okapi Framework</h1>
 		<h2 class="head">Standards</h2></td>
 	</tr>
 	<tr>
 		<td align="left" valign="top">
-		<img border="0" src="okapi_large.png" width="209" height="72" align="right"></td>
+		<img vspace="10" border="0" src="okapi_large.png" width="209" height="72" align="right"></td>
 	</tr>
 </table>
-<h2>Overview</h2>
-<p>The localization industry uses several standards to exchange data 
-between tools. It is <b>very important for tools to support such standards</b>. They 
-avoid your data to be locked into proprietary formats. Using standards also 
-allows you to approach the 
-translation process with a broader choice of options and more flexibility. The 
-applications and components of the Okapi Framework support standards when 
-possible. Some of them are:</p>
-<ul>
-	<li><a href="#xliff">XLIFF - XML Localisation Interchange File Format</a></li>
-<li><a href="#tmx">TMX - Translation Memory eXchange</a></li>
-	<li><a href="#its">ITS - Internationalization Tag Set</a></li>
-<li><a href="#srx">SRX - Segmentation Rules eXchange</a></li>
-<li><a href="#gmx">GMX - Global information management Metrics eXchange</a></li>
-</ul>
-<h2><a name="xliff"></a>XLIFF - XML Localisation Interchange File Format</h2>
-<p>Maintained by the XLIFF Technical Committee at OASIS, XLIFF provides a common 
-markup language for extracted localizable text.</p>
-<ul>
-	<li><a href="http://docs.oasis-open.org/xliff/xliff-core/xliff-core.html">
-	XLIFF 1.2 specification</a></li>
-	<li><a href="http://www.oasis-open.org/committees/xliff/">The OASIS XLIFF 
-	Technical Committee home page</a></li>
-	<li><a href="sample12.xlf">Example of XLIFF 1.2 document</a></li>
-</ul>
-<p>Many components of the framework use XLIFF. The framework also includes an
-<a href="help/filters/ui/xliff/index.html">XLIFF filter</a>.</p>
-<h2><a name="tmx"></a>TMX - Translation Memory eXchange</h2>
-<p>Maintained by the OSCAR Committee at LISA, TMX covers the exchange of 
-translation memory data.</p>
-<ul>
-	<li><a href="http://www.lisa.org/fileadmin/standards/tmx1.4/tmx.htm">TMX 
-	1.4b specification</a></li>
-	<li><a href="http://www.lisa.org/Translation-Memory-e.34.0.html">TMX main 
-	page at LISA</a></li>
-	<li><a href="sample14b.tmx">Example of TMX 1.4b document</a></li>
-</ul>
-<p>Many components of the framework use TMX.</p>
-<h2><a name="its"></a>ITS - Internationalization Tag Set</h2>
-<p>ITS is a W3C namespace to provide internationalization information and 
-support in XML documents.</p>
-<ul>
-	<li><a href="http://www.w3.org/TR/its/">ITS 1.0 specification</a></li>
-	<li><a href="http://www.w3.org/International/its/ig/">The W3C ITS Interest 
-	Group home page</a></li>
-	<li><a href="sample10.xml">Example of XML document with ITS markup</a></li>
-</ul>
-<p>The <a href="help/filters/ui/xml/index.html">XML Filter</a> that is part of 
-the framework supports ITS.</p>
-<p>Related to ITS, the <a href="http://www.w3.org/TR/xml-i18n-bp/">Best 
-Practices for XML Internationalization</a> W3C Note can help you designing and 
-authoring XML documents in a way they are easier to localize.</p>
-<h2><a name="srx"></a>SRX - Segmentation Rules eXchange</h2>
-<p>Maintained by the OSCAR Committee at LISA, SRX addresses the exchange of 
-segmentation rules among tools. The version 1.0 of SRX has been implemented 
-different ways by different tools and has limited usage for exchange. The 
-version 2.0 of SRX has been implemented with better consistency.</p>
-<ul>
-	<li><a href="http://www.lisa.org/fileadmin/standards/srx20.html">SRX 2.0 specification</a></li>
-	<li><a href="http://www.lisa.org/Segmentation-Rules-e.40.0.html">SRX main 
-	page at LISA</a></li>
-	<li><a href="sample20.srx">Example of SRX 2.0 document</a></li>
-</ul>
-<p>The segmentation engine provided in the framework implements SRX&nbsp;2.0. See the
-<a href="devguide/segmentation.html">Segmentation page of the Developer's Guide</a> for more details. In addition,
-<a href="help/lib/ui/segmentation/index.html">Ratel is an editor to create and 
-maintain SRX documents</a>.</p>
 
-<h2><a name="gmx"></a>GMX - Global information management Metrics eXchange</h2>
-<p>Maintained by the OSCAR Committee at LISA, GMX is a family of standards of globalization- 
-and localization-related metrics. The three components of GMX are:</p>
-<ul>
-    <li><b>Volume (V)</b> Global Information Management Metrics Volume addresses the issue of quantifying the workload 
-    for a given localization or translation task. GMX-V provides a standard and more precise definition of the 
-    statistics necessary for to assess the quantity of text (and costs) associated with language-related 
-    globalization tasks.</li>
-    <li><b>Complexity (C) (proposed)</b>. GMX-C will provide a standard metric for the assessment of textual complexity 
-    with regard to globalization tasks. This format has not yet been defined.</li>
-    <li><b>Quality (Q) (proposed)</b>. GMX-Q will provide a standard format for the specification of quality requirements 
-    for globalization tasks, thus allowing quality expectations to be specified in contracts and other agreements 
-    and verified. This format has not yet been defined.</li>
-</ul>    
+<p class="notice">The Okapi Framework documentation is now on a wiki at:
+<a href="http://www.opentag.com/okapi/wiki">http://www.opentag.com/okapi/wiki</a><br>
+If you are not automatically redirected on the corresponding 
+wiki page, follow this link:
+<a target="_top" href="http://www.opentag.com/okapi/wiki/index.php?title=Open_Standards">http://www.opentag.com/okapi/wiki/index.php?title=Open_Standards</a></p>
 
-<p>The <a href="help/steps/wordcountstep.html">Word Count step</a> provided in the framework implements GMX-V&nbsp;1.0.</p>
-<ul>
-	<li><a href="http://www.lisa.org/fileadmin/standards/GMX-V.html">GMX-V 1.0 specification</a></li>
-	<li><a href="http://www.lisa.org/Global-information-m.105.0.html">GMX-V main 
-	page at LISA</a></li>
-</ul>
-
-<p>&nbsp;</p>
 </body>
 
 </html>

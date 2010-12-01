@@ -5,127 +5,27 @@
 <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
 <title>Okapi Framework</title>
 <meta name="keywords" content="localization tools translation CAT filter Okapi cross-platform open-source java xml l10n i18n internationalization">
+<meta http-equiv="Refresh" content="1 ;url=http://www.opentag.com/okapi/wiki/index.php?title=Main_Page">
 <link rel="stylesheet" type="text/css" href="okapi.css">
 </head>
 
 <body>
 <table border="0" width="100%" cellspacing="0" cellpadding="0">
 	<tr class="head">
-		<td rowspan="2" class="toc" width="160">
-		<p><a href="index.html">Introduction</a></p>
-		<p><a href="downloads.html">Downloads</a></p>
-		<p><a href="standards.html">Standards</a></p>
-		<p class="current">Components</p>
-		<p><a href="applications.html">Applications</a></p>
-		<p><a href="help.html">Help and Support</a></p>
-		<p><a href="developers.html">Developers Notes</a></p>
-		<p><a href="screenshots.html">Screen Shots</a></p></td>
 		<td class="head"><h1 class="head">Okapi Framework</h1>
 		<h2 class="head">Components</h2></td>
 	</tr>
 	<tr>
 		<td align="left" valign="top">
-		<img border="0" src="okapi_large.png" width="209" height="72" align="right"></td>
+		<img vspace="10" border="0" src="okapi_large.png" width="209" height="72" align="right"></td>
 	</tr>
 </table>
-<p>The Okapi Framework comes with a collection of various components and 
-libraries that are used in the okapi applications, but can also be utilized by 
-any developer as a toolkit to quickly put together powerful and specialized 
-processes related to translation and localization.</p>
-<h2><a name="filters"></a>Filters</h2>
-<p>An important type of component in the framework is the filter. Filters allow you to read a given document and get access to its content 
-using the same API regardless of the file format.</p>
-<p>The following list shows some of the filters available with the framework:</p>
-<ul>
-	<li><b><a href="help/filters/html/ui/index.html">HTML Filter</a></b> - A 
-	filter for HTML and XHTML files.</li>
-	<li><b><a href="help/filters/properties/ui/index.html">Properties Filter</a></b> 
-	- A filter for properties files.</li>
-	<li><b><a href="help/filters/xml/ui/index.html">XML Filter</a></b> - A 
-	filter for XML documents.</li>
-	<li><b><a href="help/filters/xliff/ui/index.html">XLIFF Filter</a></b> - A 
-	filter for XLIFF documents.</li>
-	<li><a href="help/filters/index.html">See all the filters available...</a></li>
-</ul>
-<h2><span style="background-position: 0 0"><a name="steps"></a>Steps</span></h2>
-<p>Another important type of component in the framework is the step. Steps are 
-self-contained parts that takes an input, perform one specific task, and send an 
-output. The steps are chained together into a pipeline.</p>
-<p>The following list shows some of the steps available with the framework:</p>
-<ul>
-	<li><cite><a href="help/steps/rawdocumenttofiltereventsstep.html">Raw 
-	Document to Filter Events</a></cite> - Extracts translatable data from a raw 
-	document and convert it into filter events.</li>
-	<li><cite><a href="help/steps/filtereventstorawdocumentstep.html">Filter 
-	Events to Raw Document</a></cite> - Merges filter events back into the 
-	original file format.</li>
-	<li><cite><a href="help/steps/segmentationstep.html">SRX Segmentation</a></cite> 
-	- Segments extracted text.</li>
-	<li><cite><a href="help/steps/formatconversionstep.html">Format Conversion</a></cite> 
-	- Converts extracted data to a given file format.</li>
-	<li><a href="help/steps/index.html">See all the steps available...</a></li>
-</ul>
-<h2><a name="utilities"></a>Utilities</h2>
-<p>Rainbow has several modules that are not implemented (yet) as steps. The 
-following list shows some of those utilities:</p>
-<ul>
-	<li><cite>
-	<a href="help/applications/rainbow/utilities/extraction/index.html">
-	Translation Package Creation</a></cite> - A utility to create translation 
-	kit from different documents.</li>
-	<li><cite>
-	<a href="help/applications/rainbow/utilities/encodingconversion/index.html">
-	Encoding Conversion</a></cite> - A utility to convert documents from one 
-	encoding to another.</li>
-	<li><a href="help/applications/rainbow/utilities/index.html">See all the 
-	utilities available...</a></li>
-</ul>
-<h2>Example</h2>
-<p>Here is a simple example of how you can use the framework's components in your 
-own code:</p>
-<p>The Java code below opens a properties file or an OpenOffice.org document and 
-display all the translatable text inside.</p>
-<pre>import java.io.File;
-import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.Event;
-import net.sf.okapi.common.EventType;
-import net.sf.okapi.common.filters.IFilter;
-import net.sf.okapi.common.filterwriter.GenericContent;
-import net.sf.okapi.filters.openoffice.OpenOfficeFilter;
-import net.sf.okapi.filters.properties.PropertiesFilter; 
 
-public class Main {
-   public static void main (String[] args) {
-      try {
-         IFilter filter = null;
-         if ( args[0].endsWith(&quot;.properties&quot;) ) {
-            filter = new PropertiesFilter();
-         }
-         else if ( args[0].endsWith(&quot;.odt&quot;) ) {
-            filter = new OpenOfficeFilter();
-         }
-         // Open the document to process
-         filter.open(new RawDocument(new File(args[0]).toURI(),
-            &quot;UTF-8&quot;, LocaleId.fromString(&quot;en&quot;)));
-         // Create a formatter to display text unit more prettily.
-         GenericContent fmt = new GenericContent();
-         // Process the input document
-         while ( filter.hasNext() ) {
-            Event event = filter.next();
-            if ( event.getEventType() == EventType.TEXT_UNIT ) {
-               // Format and print out each text unit
-               fmt.setContent(((TextUnit)event.getResource()
-                  ).getSourceContent());
-               System.out.println(fmt.toString());
-            }
-         }
-      }
-      catch ( Throwable e ) {
-         e.printStackTrace();
-      }
-   }
-}</pre>
-<p>&nbsp;</p>
+<p class="notice">The Okapi Framework documentation is now on a wiki at:
+<a href="http://www.opentag.com/okapi/wiki">http://www.opentag.com/okapi/wiki</a><br>
+If you are not automatically redirected on the corresponding 
+wiki page, follow this link:
+<a target="_top" href="http://www.opentag.com/okapi/wiki/index.php?title=Main_Page">http://www.opentag.com/okapi/wiki/index.php?title=Main_Page</a></p>
 
 </body>
 

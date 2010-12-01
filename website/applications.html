@@ -5,171 +5,27 @@
 <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
 <title>Okapi Framework</title>
 <meta name="keywords" content="localization tools translation CAT filter Okapi cross-platform open-source java xml l10n i18n internationalization">
+<meta http-equiv="Refresh" content="1 ;url=http://www.opentag.com/okapi/wiki/index.php?title=Main_Page">
 <link rel="stylesheet" type="text/css" href="okapi.css">
 </head>
 
 <body>
 <table border="0" width="100%" cellspacing="0" cellpadding="0">
 	<tr class="head">
-		<td rowspan="2" class="toc" width="160">
-		<p><a href="index.html">Introduction</a></p>
-		<p><a href="downloads.html">Downloads</a></p>
-		<p><a href="standards.html">Standards</a></p>
-		<p><a href="components.html">Components</a></p>
-		<p class="current">Applications</p>
-		<p><a href="help.html">Help and Support</a></p>
-		<p><a href="developers.html">Developers Notes</a></p>
-		<p><a href="screenshots.html">Screen Shots</a></p></td>
 		<td class="head"><h1 class="head">Okapi Framework</h1>
 		<h2 class="head">Applications</h2></td>
 	</tr>
 	<tr>
 		<td align="left" valign="top">
-		<img border="0" src="okapi_large.png" width="209" height="72" align="right"></td>
-	</tr>
-</table>
-<p>The Okapi Framework provides a few ready-to-use applications in addition to 
-its set of libraries and components:</p>
-<ul>
-	<li><a href="#rainbow">Rainbow</a> (included in the <b>okapi-apps</b> 
-	distribution)</li>
-	<li><a href="#checkmate">CheckMate</a> (included in the <b>okapi-apps</b> 
-	distribution)</li>
-	<li><a href="#ratel">Ratel</a> (included in the <b>okapi-apps</b> 
-	distribution)</li>
-	<li><a href="#tikal">Tikal</a> (included in both both <b>okapi-lib</b> and <b>okapi-apps</b> 
-	distributions)</li>
-</ul>
-
-<h2><a name="rainbow"></a>Rainbow</h2>
-<table border="0" cellspacing="12" cellpadding="0" >
-	<tr>
-		<td align="left" valign="top"><img border="0" src="images/rainbow3.png" width="682" height="487"><br>
-		<br>
-		<a href="downloads.html#okapiApps">Download Rainbow</a>&nbsp; |&nbsp; <a href="help/applications/rainbow/index.html">See online help</a>&nbsp; 
-		|&nbsp; <a href="screenshots.html#rainbow">See more screenshots</a></td>
-		<td align="left" valign="top">
-Rainbow is a cross-platform application to launch different utilities to help you 
-perform various localization-relate tasks. Its features include for example:<ul>
-	<li>Creation of translation packages (e.g. XLIFF, OmegaT, RTF).</li>
-	<li>Conversion of character encoding or line-breaks.</li>
-	<li>Conversion to various file formats.</li>
-	<li>Terminology extraction.</li>
-	<li>Pseudo-translation and various modification of the source text for 
-	testing.</li>
-	<li>Batch translation using various MT and TM sources.</li>
-	<li>Apply XSLT template in batch mode.</li>
-	<li>Quality check report.</li>
-	<li>Comparison between different translations.</li>
-	<li>Search and replace on filtered text.</li>
-	<li>Source and translation alignment.</li>
-	<li>And more...</li>
-</ul>
-<p>Like other Okapi applications, Rainbow uses the components called &quot;filters&quot; 
-that take input files in a given native format and extract its translatable 
-content into common resources that the Okapi tools can manipulate and modify. 
-There are filters for amny formats, for example: OpenOffice, XML, HTML, 
-Properties, DTD, MS Office, tables, etc. Many translation-related formats are 
-also supported: XLIFF, PO, TS, TMX, TTX, etc.<p>Rainbow also uses the Okpai 
-components called &quot;connectors&quot;: They allow you to access different type of local 
-or remote translation resources. For example: Google-MT, Microsoft-MT, OpenTran, 
-MyMemory, Translate Toolkit TM, Apertium, TDA-Search, and more.<p>Note that, in 
-addition to third-party TM access, Rainbow can also use Okapi's own TM egine: 
-the Pensieve TM.<p>Another feature of Rainbow is to 
-allow the user to build &quot;pipelines&quot; of tasks using simple components called 
-&quot;steps&quot; that perform well-defined limited actions. You can chain those steps to 
-execute many tasks in a single process.</td>
+		<img vspace="10" border="0" src="okapi_large.png" width="209" height="72" align="right"></td>
 	</tr>
 </table>
 
-<h2><a name="checkmate"></a>CheckMate</h2>
-<table border="0" cellspacing="12" cellpadding="0" >
-	<tr>
-		<td align="left" valign="top">
-		<img border="0" src="images/checkmate1.png" width="880" height="620"><br>
-		<br>
-		<a href="downloads.html#okapiApps">Download CheckMate</a>&nbsp; |&nbsp; <a href="help/lib/ui/verification/index.html">See online help</a>&nbsp; 
-		|&nbsp; <a href="screenshots.html#checkmate">See more screenshots</a></td>
-		<td align="left" valign="top">
-CheckMate is a cross-platform application that allows you to perfom various 
-quality checks on bilingual translated documents.<p>Some of the verifications 
-performed are:<ul>
-	<li>Repeated words</li>
-	<li>Corrupted characters</li>
-	<li>Patterns in the source text that should correspond to a given pattern in 
-	the translation.</li>
-	<li>Inline codes differences.</li>
-	<li>Translation suspiciously longer or shorter than the source.</li>
-	<li>Missing translation.</li>
-	<li>Leading and trailing spaces.</li>
-	<li>And more...</li>
-	</ul>
-	<p>You can disabled warnings that happen to be incorrect, so the next time 
-	you re-run the verification those warnings remain disabled. You can also 
-	save your session and come back to it later.<p>In addition to the 
-	interactive list of warnings, the tool can generate complete reports of the 
-	issues found.<p>CheckMate allows you to integrate directly the verifications 
-	done by the open-source LanguageTool checker, which offers a wide range of 
-	simple and complex checks for many languages.<p>You can work with any 
-	bilingual or multilingual file format supported by the Okapi filters, for 
-	example: XLIFF, TMX, PO, TS, TTX, etc.</td>
-	</tr>
-</table>
-
-<h2><a name="ratel"></a>Ratel</h2>
-<table border="0" cellspacing="12" cellpadding="0" >
-	<tr>
-		<td align="left" valign="top"><img border="0" src="images/ratel1.png" width="704" height="601"><br>
-		<br>
-		<a href="downloads.html#okapiApps">Download Ratel</a>&nbsp; |&nbsp; <a href="help/lib/ui/segmentation/index.html">See online help</a>&nbsp; 
-		|&nbsp; <a href="screenshots.html#ratel">See more screenshots</a></td>
-		<td align="left" valign="top">
-Ratel is a cross-platform application to create and maintain segmentation rules. 
-The tool works with the <a href="standards.html#srx">SRX (Segmentation Rules eXchange)</a> format.<p>
-Its features includes for example:</p>
-<ul>
-	<li>Immediate previous of the segmentation as you edit the rules.</li>
-	<li>Can enabled/disable rules for easier debugging.</li>
-	<li>Apply the rules on input files for testing.</li>
-	<li>Copy/Paste the SRX document to Clipboard for easy exchange with other 
-	tools.</li>
-	<li>Can test with different language codes</li>
-	<li>And more...</li>
-</ul>
-<p>Segmentations rules 
-are used in several of Okapi's components to break text units into small parts 
-such as sentences. Using SRX rules allows to be more interoperable with other 
-sets of tools. For example, when sharing a translation memory, SRX allows two 
-different tools to also exchange the rules used to break down the paragraphs 
-into the sentences that are in the TM.</td>
-	</tr>
-</table>
-
-<h2><a name="tikal"></a>Tikal</h2>
-<table border="0" cellspacing="12" cellpadding="0" >
-	<tr>
-		<td align="left" valign="top"><img border="0" src="images/tikal1.png" width="652" height="338"><br>
-		<br>
-		<a href="downloads.html#okapiApps">Download Tikal</a>&nbsp; |&nbsp; <a href="help/applications/tikal/index.html">See online help</a>&nbsp; 
-		|&nbsp; <a href="screenshots.html#tikal">See more screenshots</a></td>
-		<td align="left" valign="top">
-Tikal is a cross-platform command-line tool that performs some simple 
-localization-related tasks. For example:<ul>
-	<li>Extracting and merging XLIFF documents</li>
-	<li>Querying different MT and TM systems</li>
-	<li>Performing format conversions</li>
-	<li>Translate directly files in various formats using TM or MT ssytems.</li>
-	<li>And more...</li>
-</ul>
-<p>Like other Okapi applications, Tikal uses the components provided by the 
-Okapi libraries, for example the connectors to differents translation resource 
-engines such as Apertium, OpenTran, Googl-MT, Microsoft-MT, MyMemory, etc. It 
-also uses the Okapi filters, allowing you to process files in many different 
-formats: HTML, ODT, DOCX, PO, XLIFF, TMX, XML, and many more.</td>
-	</tr>
-</table>
-
-<p>&nbsp;</p>
+<p class="notice">The Okapi Framework documentation is now on a wiki at:
+<a href="http://www.opentag.com/okapi/wiki">http://www.opentag.com/okapi/wiki</a><br>
+If you are not automatically redirected on the corresponding 
+wiki page, follow this link:
+<a target="_top" href="http://www.opentag.com/okapi/wiki/index.php?title=Main_Page">http://www.opentag.com/okapi/wiki/index.php?title=Main_Page</a></p>
 
 </body>
 
