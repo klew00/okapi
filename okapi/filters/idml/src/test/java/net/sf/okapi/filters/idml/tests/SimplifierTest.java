@@ -23,33 +23,35 @@ package net.sf.okapi.filters.idml.tests;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
-import net.sf.okapi.filters.idml.Simplifier;
+import net.sf.okapi.filters.idml.SimplifierV2;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import org.junit.Before;
 import org.junit.Test;
 
 public class SimplifierTest {
 
-	Simplifier simp;
 	GenericContent fmt;
+	SimplifierV2 simplifier;
 	
 	public SimplifierTest () {
-		simp = new Simplifier();
+
+		simplifier = new SimplifierV2();
 		fmt = new GenericContent();
+
 	}
-	
+
 	@Test
 	public void testCodeReduction1 () {
+		
 		TextFragment tf = new TextFragment();
 		tf.append(TagType.OPENING, "a", "<a>");
 		tf.append(TagType.OPENING, "b", "<b>");
 		tf.append("T1");
 		tf.append(TagType.CLOSING, "b", "</b>");
 		tf.append(TagType.CLOSING, "a", "</a>");
-		simp.simplify(tf);
-//		assertEquals("<1>T1</1>", fmt.setContent(tf).toString());
+
+		simplifier.simplifyAll(tf);
+		
+		assertEquals("<1>T1</1>", fmt.setContent(tf).toString());
 	}
 
 	@Test
@@ -61,8 +63,10 @@ public class SimplifierTest {
 		tf.append("T1");
 		tf.append(TagType.CLOSING, "b", "</b>");
 		tf.append(TagType.CLOSING, "a", "</a>");
-		simp.simplify(tf);
-//		assertEquals("<1>T1</1>", fmt.setContent(tf).toString());
+		
+		simplifier.simplifyAll(tf);
+		
+		assertEquals("<1>T1</1>", fmt.setContent(tf).toString());
 	}
 
 	@Test
@@ -75,8 +79,10 @@ public class SimplifierTest {
 		tf.append(TagType.CLOSING, "b", "</b>");
 		tf.append(TagType.PLACEHOLDER, "x2", "<x2/>");
 		tf.append(TagType.CLOSING, "a", "</a>");
-		simp.simplify(tf);
-//		assertEquals("<1>T1</1>", fmt.setContent(tf).toString());
+		
+		simplifier.simplifyAll(tf);
+
+		assertEquals("<1>T1</1>", fmt.setContent(tf).toString());
 	}
 
 	@Test
@@ -89,8 +95,10 @@ public class SimplifierTest {
 		tf.append(TagType.CLOSING, "b", "</b>");
 		tf.append("T2");
 		tf.append(TagType.CLOSING, "a", "</a>");
-		simp.simplify(tf);
-//		assertEquals("<1><2>T1</2>T2</1>", fmt.setContent(tf).toString());
+
+		simplifier.simplifyAll(tf);
+		
+		assertEquals("<1><2>T1</2>T2</1>", fmt.setContent(tf).toString());
 	}
 
 	@Test
@@ -104,8 +112,10 @@ public class SimplifierTest {
 		tf.append(TagType.CLOSING, "b", "</b>");
 		tf.append("T2");
 		tf.append(TagType.CLOSING, "a", "</a>");
-		simp.simplify(tf);
-//		assertEquals("<1><2>T1</2>T2</1>", fmt.setContent(tf).toString());
+
+		simplifier.simplifyAll(tf);
+		
+		assertEquals("<1><2>T1</2>T2</1>", fmt.setContent(tf).toString());
 	}
 
 }
