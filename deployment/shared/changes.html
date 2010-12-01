@@ -10,16 +10,16 @@ the <b>okapi-apps</b> distribution. The information pertaining to
 applications other than Tikal are relevant only for the <b>okapi-apps</b> 
 distribution.</p>
 <ul>
-	<li>Download page for LATEST STABLE RELEASE:
+	<li>Download page for latest STABLE RELEASE:
 	<a href="http://code.google.com/p/okapi/downloads/list">
 	http://code.google.com/p/okapi/downloads/list</a></li>
+	<li>Download page for latest DEVELOPMENT SNAPSHOTS:
+	<a href="http://okapi.opentag.com/snapshots">
+	http://okapi.opentag.com/snapshots</a></li>
 	<li>Main Web site: <a href="http://www.opentag.com/okapi/wiki">
 	http://www.opentag.com/okapi/wiki</a></li>
 	<li>Google Code Project site: <a href="http://code.google.com/p/okapi/">
 	http://code.google.com/p/okapi/</a></li>
-	<li>Download page for latest development SNAPSHOTS:
-	<a href="http://okapi.opentag.com/snapshots">
-	http://okapi.opentag.com/snapshots</a></li>
 </ul>
 <h2>Changes from M9 to M10-SNAPSHOT</h2>
 <ul>
@@ -33,6 +33,9 @@ distribution.</p>
 	<li>Fixed corrupted path when dropping file on output using ${TrgLoc}.</li>
 	<li>Added the Code Finder Editor (in Tools menu) to edit code finder rules 
 	for filters using them but not having any UI to define them.</li>
+	<li>The root of a list is now automatically adjusted to the longest root 
+	possible when a document above the current root is added, the documents 
+	already listed have their relative path adjusted as well.</li>
 	<li>Create Translation package:<ul>
 	<li>Refactored heavily the leveraging mechanism and the output (e.g. added &lt;alt-trans&gt; output in 
 	Generic XLIFF)</li>

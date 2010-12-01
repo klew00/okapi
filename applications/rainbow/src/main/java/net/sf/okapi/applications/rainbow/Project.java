@@ -94,6 +94,34 @@ public class Project {
 	public ArrayList<Input> getList (int index) {
 		return inputLists.get(index);
 	}
+
+	/**
+	 * Tries to adjust the root for a given path.
+	 * <p>This assumes the new path is not on the existing root. If a new root is possible
+	 * all relative paths of the list are updated and the root of the list is also updated. 
+	 * @param listIndex index of the list.
+	 * @param newPath new path to adjust to.
+	 * @return true if the root was adjusted, false if it was not possible.
+	 */
+	private boolean adjustRootAndRelativePaths (int listIndex,
+		String newPath)
+	{
+		String currentRoot = getInputRoot(listIndex);
+		String dir = Util.getDirectoryName(newPath);
+		// Compute the longest root possible
+		String newRoot = Util.longestCommonDir(currentRoot, dir, !Util.isOSCaseSensitive());
+		if ( Util.isEmpty(newRoot) ) return false; // Cannot adjust
+		
+		// Adjust the existing relative paths:
+		for ( Input input : inputLists.get(listIndex) ) {
+			// Re-build the full path
+			String fullPath = currentRoot + File.separator + input.relativePath;
+			// Compute the new relative path
+			input.relativePath = fullPath.substring(newRoot.length()+1);
+		}
+		setInputRoot(listIndex, newRoot, true);
+		return true; // Has adjusted
+	}
 	
 	/**
 	 * Adds a document to the project.
@@ -103,7 +131,7 @@ public class Project {
 	 * @param filterSettings Filter settings string for the document (can be null).
 	 * @param allowDuplicates True to allow adding a path that is already there,
 	 * false to not add the file and return 2 if it is a duplicate. 
-	 * @return 0=Document added, 1=bad root, 2=exists already
+	 * @return 0=Document added, 1=bad root, 2=exists already, 3=root/paths adjusted
 	 */
 	public int addDocument (int listIndex,
 		String newPath,
@@ -112,16 +140,31 @@ public class Project {
 		String filterSettings,
 		boolean allowDuplicates)
 	{
+		int res = 0;
 		// Is the root OK?
 		String inputRoot = getInputRoot(listIndex);
-		if ( newPath.indexOf(inputRoot) == -1 ) return 1;
+		if ( newPath.indexOf(inputRoot) == -1 ) {
+			if ( !adjustRootAndRelativePaths(listIndex, newPath)) {
+				return 1;
+			}
+			// Else: was adjusted
+			res = 3;
+			inputRoot = getInputRoot(listIndex);
+		}
+		
 		int correction = (inputRoot.endsWith(File.separator) ? -1 : 0);
 		newPath = newPath.substring(inputRoot.length()+correction+1); // No leading separator
 		
 		// Does the path exists already?
+		boolean ignoreCase = !Util.isOSCaseSensitive();
 		if ( !allowDuplicates ) {
 			for ( Input tmpInp : inputLists.get(listIndex) ) {
-				if ( tmpInp.relativePath.equalsIgnoreCase(newPath) ) return 2;
+				if ( ignoreCase ) {
+					if ( tmpInp.relativePath.equalsIgnoreCase(newPath) ) return 2;
+				}
+				else {
+					if ( tmpInp.relativePath.equals(newPath) ) return 2;
+				}
 			}
 		}
 		
@@ -133,7 +176,7 @@ public class Project {
 		inp.relativePath = newPath;
 		inputLists.get(listIndex).add(inp);
 		isModified = true;
-		return 0;
+		return res;
 	}
 
 	/**

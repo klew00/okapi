@@ -2123,6 +2123,7 @@ public class MainForm { //implements IParametersProvider {
 		String dir)
 		throws Exception
 	{
+		boolean resetDisp = false;
 		int n = 0;
 		boolean allowDup = config.getBoolean(OPT_ALLOWDUPINPUT);
 		for ( String path : paths ) {
@@ -2162,12 +2163,20 @@ public class MainForm { //implements IParametersProvider {
 					break;
 				case 1: // Bad root
 					// Tell the user
-					Dialogs.showError(shell, Res.getString("MainForm.42")+path+Res.getString("MainForm.43"), null); //$NON-NLS-1$ //$NON-NLS-2$
+					Dialogs.showError(shell, String.format(Res.getString("MainForm.42"), path), null); //$NON-NLS-1$
 					return n;
+				case 3: // Root was adjusted
+					// Reset the root display
+					resetDisp = true;
+					break;
 				default:
 					break;
 				}
 			}
+		}
+		// Update the root display if needed
+		if ( resetDisp ) {
+			resetDisplay(currentInput);
 		}
 		return n;
 	}

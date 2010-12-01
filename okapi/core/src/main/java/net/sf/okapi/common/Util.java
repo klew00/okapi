@@ -821,45 +821,49 @@ public final class Util {
 	 * @param ignoreCase
 	 *            true if the method should ignore cases differences.
 	 * @return the longest sub-directory that is common to both directories.
-	 *         This can be a null or empty string.
+	 *         This can be a null if the current directory is null,
+	 *         or empty if there is no common path.
 	 */
 	static public String longestCommonDir (String currentDir,
 		String newDir,
 		boolean ignoreCase)
 	{
-		if (currentDir == null)
+		if ( currentDir == null ) {
 			return newDir;
-		if (currentDir.length() == 0)
+		}
+		if ( currentDir.length() == 0 ) {
 			return currentDir;
+		}
 
 		// Get temporary copies
 		String currentLow = currentDir;
 		String newLow = newDir;
-		if (ignoreCase) {
+		if ( ignoreCase ) {
 			currentLow = currentDir.toLowerCase();
 			newLow = newDir.toLowerCase();
 		}
 
 		// The new path equals, or include the existing root: no change
-		if (newLow.indexOf(currentLow) == 0)
+		if ( newLow.indexOf(currentLow) == 0 ) {
 			return currentDir;
+		}
 
 		// Search the common path
 		String tmp = currentLow;
 		int i = 0;
-		while (newLow.indexOf(tmp) != 0) {
+		while ( newLow.indexOf(tmp) != 0 ) {
 			tmp = Util.getDirectoryName(tmp);
 			i++;
-			if (tmp.length() == 0)
+			if ( tmp.length() == 0 ) {
 				return ""; // No common path at all
+			}
 		}
 
 		// Do not return currentDir.substring(0, tmp.length());
-		// because the lower-case string maybe of a different length than cased
-		// one
+		// because the lower-case string maybe of a different length than cased one
 		// (e.g. German Sz). Instead re-do the splitting as many time as needed.
 		tmp = currentDir;
-		for (int j = 0; j < i; j++) {
+		for ( int j = 0; j < i; j++ ) {
 			tmp = Util.getDirectoryName(tmp);
 		}
 		return tmp;
