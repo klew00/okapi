@@ -116,4 +116,66 @@ public class SimplifierTest {
 		assertEquals("<1><2>T1</2>T2</1>", fmt.setContent(tf).toString());
 	}
 
+	@Test
+	public void testCodeReduction6 () {
+		TextFragment tf = new TextFragment();
+		tf.append(TagType.OPENING, "a", "<a>");
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append(TagType.OPENING, "c", "<c>");
+		tf.append(TagType.PLACEHOLDER, "x1", "<x1/>");
+		tf.append("T1");
+		tf.append(TagType.CLOSING, "c", "</c>");
+		tf.append(TagType.CLOSING, "b", "</b>");
+		tf.append("T2");
+		tf.append(TagType.CLOSING, "a", "</a>");
+		tf.append(TagType.PLACEHOLDER, "x2", "<x2/>");
+
+		simplifier.simplifyAll(tf);
+		
+		assertEquals("<1><2>T1</2>T2</1>", fmt.setContent(tf).toString());
+	}
+
+	@Test
+	public void testCodeReduction7 () {
+		TextFragment tf = new TextFragment();
+		tf.append(TagType.OPENING, "a", "<a>");
+		tf.append(TagType.PLACEHOLDER, "x1", "<x1/>");
+		tf.append("T1");
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append(TagType.OPENING, "c", "<c>");
+		tf.append(TagType.PLACEHOLDER, "x2", "<x2/>");
+		tf.append(TagType.CLOSING, "c", "</c>");
+		tf.append(TagType.CLOSING, "b", "</b>");
+		tf.append("T2");
+		tf.append(TagType.CLOSING, "a", "</a>");
+		tf.append(TagType.PLACEHOLDER, "x3", "<x3/>");
+
+		simplifier.simplifyAll(tf);
+//TODO: should be:
+//		assertEquals("<1>T1<2/>T2</1>", fmt.setContent(tf).toString());
+		assertEquals("<1>T1<2></2>T2</1>", fmt.setContent(tf).toString());
+	}
+
+	@Test
+	public void testCodeReduction8 () {
+		TextFragment tf = new TextFragment();
+		tf.append(TagType.OPENING, "a", "<a>");
+		tf.append(TagType.PLACEHOLDER, "x1", "<x1/>");
+		tf.append("T1");
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append(TagType.OPENING, "c", "<c>");
+		tf.append(TagType.PLACEHOLDER, "x2", "<x2/>");
+		tf.append(TagType.CLOSING, "c", "</c>");
+		tf.append("T2");
+		tf.append(TagType.CLOSING, "b", "</b>");
+		tf.append("T3");
+		tf.append(TagType.CLOSING, "a", "</a>");
+		tf.append(TagType.PLACEHOLDER, "x3", "<x3/>");
+
+		simplifier.simplifyAll(tf);
+//TODO: should be:
+//		assertEquals("<1>T1<2>T2</2>T3</1>", fmt.setContent(tf).toString());
+		assertEquals("<1>T1<2><3></3>T2</2>T3</1>", fmt.setContent(tf).toString());
+	}
+
 }
