@@ -46,7 +46,7 @@ public class IDMLContext {
 	private boolean isReferent;
 	private IDMLSkeleton skel;
 	private String tuId;
-
+	
 	/**
 	 * Create a new context.
 	 * @param rootNode Node when starting embedded context. Should be null for the top-level context.
@@ -88,9 +88,10 @@ public class IDMLContext {
 	/**
 	 * Adds the text unit to the given queue.
 	 * @param queue the event queue where to add the event.
+	 * @return true if a text unit with possibly inline codes was added, false otherwise.
 	 */
-	public void addToQueue (List<Event> queue) {
-		if ( tf.isEmpty() ) return; // Skip empty entries
+	public boolean addToQueue (List<Event> queue) {
+		if ( tf.isEmpty() ) return false; // Skip empty entries
 		
 		if ( status == 1 ) {
 			// Only one content: no need for inline codes
@@ -110,6 +111,8 @@ public class IDMLContext {
 		// And add the new event to the queue
 		queue.add(new Event(EventType.TEXT_UNIT, tu));
 		// This object should not be called again
+		
+		return (status != 1);
 	}
 	
 	/**

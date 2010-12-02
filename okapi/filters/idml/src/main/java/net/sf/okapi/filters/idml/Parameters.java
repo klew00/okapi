@@ -30,8 +30,10 @@ import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
 	private static final String EXTRACTNOTES = "extractNotes";
+	private static final String SIMPLIFYCODES = "simplifyCodes";
 
 	private boolean extractNotes;
+	private boolean simplifyCodes;
 
 	public Parameters () {
 		reset();
@@ -40,18 +42,21 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	
 	public void reset () {
 		extractNotes = false;
+		simplifyCodes = true;
 	}
 
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
 		extractNotes = buffer.getBoolean(EXTRACTNOTES, extractNotes);
+		simplifyCodes = buffer.getBoolean(SIMPLIFYCODES, simplifyCodes);
 	}
 	
 	@Override
 	public String toString () {
 		buffer.reset();
 		buffer.setBoolean(EXTRACTNOTES, extractNotes);
+		buffer.setBoolean(SIMPLIFYCODES, simplifyCodes);
 		return buffer.toString();
 	}
 
@@ -63,10 +68,19 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.extractNotes = extractNotes;
 	}
 
+	public boolean getSimplifyCodes () {
+		return simplifyCodes;
+	}
+	
+	public void setSimplifyCodes (boolean simplifyCodes) {
+		this.simplifyCodes = simplifyCodes;
+	}
+
 	@Override
 	public ParametersDescription getParametersDescription() {
 		ParametersDescription desc = new ParametersDescription(this);
 		desc.add(EXTRACTNOTES, "Extract notes", null);
+		desc.add(SIMPLIFYCODES, "Simplify inline codes when possible", null);
 		return desc;
 	}
 
@@ -75,6 +89,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		EditorDescription desc = new EditorDescription("IDML Filter", true, false);
 		
 		desc.addCheckboxPart(paramsDesc.get(EXTRACTNOTES));
+		desc.addCheckboxPart(paramsDesc.get(SIMPLIFYCODES));
 		
 		return desc;
 	}

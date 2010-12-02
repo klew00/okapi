@@ -78,6 +78,7 @@ public class IDMLFilter implements IFilter {
 	private final static String ENDID = "end";
 	private final static String SPREADTYPE = "spread";
 	private final static String STORYTYPE = "story";
+	private final static Simplifier SIMPLIFIER = new Simplifier();
 	
 	final private DocumentBuilder docBuilder;
 	private URI docURI;
@@ -490,7 +491,11 @@ public class IDMLFilter implements IFilter {
 			// When coming back from the children
 			if ( name.equals("ParagraphStyleRange") ) {
 				// Trigger the text unit
-				ctx.peek().addToQueue(queue);
+				if ( ctx.peek().addToQueue(queue) && params.getSimplifyCodes() ) {
+					// Try to simplify the inline codes if possible
+					TextFragment tf = queue.getLast().getTextUnit().getSource().getFirstContent();
+					SIMPLIFIER.simplifyAll(tf);
+				}
 				ctx.peek().leaveScope();
 			}
 			else if ( embeddedElements.containsKey(name) ) {
