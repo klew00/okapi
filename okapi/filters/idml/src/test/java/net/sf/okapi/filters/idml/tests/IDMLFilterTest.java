@@ -29,7 +29,6 @@ import net.sf.okapi.common.filters.RoundTripComparison;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.filters.idml.IDMLFilter;
 import static org.junit.Assert.assertEquals;

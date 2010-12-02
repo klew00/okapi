@@ -23,20 +23,18 @@ package net.sf.okapi.filters.idml.tests;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
-import net.sf.okapi.filters.idml.SimplifierV2;
+import net.sf.okapi.filters.idml.Simplifier;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 public class SimplifierTest {
 
 	GenericContent fmt;
-	SimplifierV2 simplifier;
+	Simplifier simplifier;
 	
 	public SimplifierTest () {
-
-		simplifier = new SimplifierV2();
+		simplifier = new Simplifier();
 		fmt = new GenericContent();
-
 	}
 
 	@Test
