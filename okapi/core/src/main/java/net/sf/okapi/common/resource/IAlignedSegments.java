@@ -117,6 +117,14 @@ public interface IAlignedSegments extends Iterable<Segment> {
 	public boolean remove (Segment seg);
 	
 	/**
+	 * Gets the source segment at a given position.
+	 * @param index the segment index of the segment to retrieve.
+	 * @return the segment at the given position.
+	 * @throws IndexOutOfBoundsException if the index is out of bounds.
+	 */
+	public Segment getSource (int index);
+	
+	/**
 	 * Gets the target segment corresponding to a given source segment.
 	 * This always returns a segment: If the target does not exists one is created.
 	 * If the segment does not exists one is created at the end of the target content.

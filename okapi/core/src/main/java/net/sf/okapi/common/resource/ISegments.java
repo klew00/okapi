@@ -86,6 +86,15 @@ public interface ISegments extends Iterable<Segment> {
 	 * @param fragment the fragment to append as a segment.
 	 */
 	public void append (TextFragment fragment);
+
+	/**
+	 * Inserts a given segment at the specified position.
+	 * @param index the segment index position.
+	 * @param seg the segment to insert.
+	 * @throws IndexOutOfBoundsException if the index is out of bounds.
+	 */
+	public void insert (int index,
+		Segment seg);
 	
 	/**
 	 * Creates a set of segments in this container. Use {@link TextContainer#getCodedText()}
@@ -222,5 +231,5 @@ public interface ISegments extends Iterable<Segment> {
 	 * @return the segment index found or -1 if not found.
 	 */
 	public int getIndex (String segId);
-	
+
 }

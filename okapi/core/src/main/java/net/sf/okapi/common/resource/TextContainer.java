@@ -152,6 +152,18 @@ public class TextContainer implements Iterable<TextPart> {
 		}
 		
 		@Override
+		public void insert (int index,
+			Segment seg)
+		{
+			int n = getPartIndex(index);
+			if ( n < -1 ) {
+				throw new IndexOutOfBoundsException("Invalid segment index: "+index);
+			}
+			parts.add(n, seg);
+			validateSegmentId(seg);
+		}
+		
+		@Override
 		public int create (List<Range> ranges) {
 			// Do nothing if null or empty
 			if (( ranges == null ) || ranges.isEmpty() ) return 0;
@@ -1286,7 +1298,7 @@ public class TextContainer implements Iterable<TextPart> {
 	/**
 	 * Checks if the id of a given segment is empty, null or a duplicate. If it is, the id
 	 * is automatically set to a new value auto-generated.
-	 * @param seg the segment to verify.
+	 * @param seg the segment to verify and possibly modify.
 	 */
 	private void validateSegmentId (Segment seg) {
 		if ( !Util.isEmpty(seg.id) ) {

@@ -151,8 +151,27 @@ public class TextUnit2 implements ITextUnit {
 		
 		@Override
 		public boolean remove (Segment seg) {
-			// TODO Auto-generated method stub
-			return false;
+			int count = 0;
+			// Remove the source segment
+			ISegments srcSegs = source.getSegments();
+			int n = srcSegs.getIndex(seg.id);
+			if ( n > -1 ) {
+				n = srcSegs.getPartIndex(n);
+				source.remove(n);
+				count++;
+			}
+			// Remove the same segment in the target
+			for ( LocaleId loc : getTargetLocales() ) {
+				TextContainer tc = targets.get(loc);
+				ISegments trgSegs = tc.getSegments();
+				n = trgSegs.getIndex(seg.id);
+				if ( n > -1 ) {
+					n = trgSegs.getPartIndex(n);
+					tc.remove(n);
+					count++;
+				}
+			}
+			return (count>0);
 		}
 		
 //		@Override
@@ -193,16 +212,40 @@ public class TextUnit2 implements ITextUnit {
 			Segment trgSeg,
 			LocaleId trgLoc)
 		{
-			// TODO Auto-generated method stub
-			
+			//TODO
 		}
 		
 		@Override
 		public void insert (int index,
 			Segment srcSeg)
 		{
-			// TODO Auto-generated method stub
+			// Insert the source segment
+			ISegments segs = source.getSegments();
+			Segment currentSrc = segs.get(index);
+			segs.insert(index, srcSeg);
+			String srcId = srcSeg.id; // Get validated id
 			
+			// Add empty segment in targets
+			for ( LocaleId loc : getTargetLocales() ) {
+				segs = targets.get(loc).getSegments();
+				// Get the corresponding target segment based on the source segment id
+				Segment currentTrg = segs.get(currentSrc.id);
+				if ( currentTrg == null ) {
+					// If it does not exists: add the new target at the end
+					segs.append(new Segment(srcId));
+				}
+				else { // If it exists
+					// Get its index position
+					int n = segs.getIndex(currentTrg.id);
+					// And insert a new segment there
+					segs.insert(n, new Segment(srcId));
+				}
+			}
+		}
+		
+		@Override
+		public Segment getSource (int index) {
+			return source.getSegments().get(index);
 		}
 		
 		@Override
@@ -218,7 +261,7 @@ public class TextUnit2 implements ITextUnit {
 			}
 			return res;
 		}
-		
+
 		@Override
 		public Segment getCorrespondingSource (Segment trgSeg) {
 			Segment res = source.getSegments().get(trgSeg.id);

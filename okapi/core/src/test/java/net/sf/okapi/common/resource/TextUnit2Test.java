@@ -322,7 +322,57 @@ public class TextUnit2Test {
     	assertNotNull(as);
     }
     
-//	@Test
+    @Test
+    public void removeSegmentsTest () {
+    	ITextUnit tu = createSegmentedTU();
+    	IAlignedSegments as = tu.getSegments();
+    	Segment seg = as.getSource(0);
+    	assertEquals("0", seg.id);
+    	as.remove(seg);
+    	seg = as.getSource(0);
+    	assertEquals("s2", seg.id);
+    }
+    
+    @Test
+    public void removeSegmentsWithTargetTest () {
+    	ITextUnit tu = createSegmentedTUAndTarget();
+    	IAlignedSegments as = tu.getSegments();
+    	Segment seg = as.getSource(0);
+    	assertEquals("0", seg.id);
+    	as.remove(seg);
+    	ISegments segs = tu.getTargetSegments(locFR);
+    	seg = segs.get(0);
+    	assertEquals("s2", seg.id);
+    }
+    
+    @Test
+    public void insertSourceSegmentTest () {
+    	ITextUnit tu = createSegmentedTUAndTarget();
+    	IAlignedSegments as = tu.getSegments();
+    	Segment seg1 = new Segment("newId");
+    	as.insert(1, seg1);
+    	Segment seg2 = as.getSource(1);
+    	assertSame(seg1, seg2); // Check insertion
+    	Segment seg3 = as.getSource(2);
+    	assertEquals("s2", seg3.id); // Check old seg(1) was move down
+    	Segment seg4 = as.getCorrespondingTarget(seg2, locFR);
+    	assertEquals(seg1.id, seg4.id); // Check target was added
+    }
+    
+    @Test
+    public void insertSourceSegmentChangeIdTest () {
+    	ITextUnit tu = createSegmentedTUAndTarget();
+    	IAlignedSegments as = tu.getSegments();
+    	Segment seg1 = new Segment("s2"); // "s2" id exists already
+    	as.insert(1, seg1);
+    	Segment seg2 = as.getSource(1);
+    	assertSame(seg1, seg2);
+    	assertEquals("1", seg2.id); // Id was changed to a valid one
+    	Segment seg4 = as.getCorrespondingTarget(seg2, locFR);
+    	assertEquals(seg1.id, seg4.id); // Check target was added with validated id
+    }
+
+    //	@Test
 //	public void testGetSetSourceContent () {
 //		TextFragment tf1 = new TextFragment("source text");
 //		tu1.setSourceContent(tf1);
