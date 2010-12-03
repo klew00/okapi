@@ -429,7 +429,7 @@ public class PensieveSeeker implements ITmSeeker, Iterable<TranslationUnit> {
 				if (score >= 100.0f && tmCodedText.equals(queryFrag.getCodedText())) {
 					matchType = MatchType.EXACT;
 				} else if (score >= 100.0f && sourceTextOnly.equals(queryFrag.getText())) {
-					matchType = MatchType.FUZZY_EXACT_TEXT;
+					matchType = MatchType.EXACT_TEXT_ONLY;
 				} else if (score >= 100.0f) {
 					// must be a whitespace or case difference
 					score -= WHITESPACE_OR_CASE_PENALTY;

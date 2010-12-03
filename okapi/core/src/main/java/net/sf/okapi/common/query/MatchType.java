@@ -58,26 +58,26 @@ public enum MatchType {
 	EXACT,
 
 	/**
+	 * EXACT_TEXT_ONLY and comes from a previous version of the same document
+	 */
+	EXACT_TEXT_ONLY_PREVIOUS_VERSION,
+
+	/**
+	 * EXACT_TEXT_ONLY and matches with a unique id
+	 */
+	EXACT_TEXT_ONLY_UNIQUE_ID,
+	
+	/**
+	 * Matches text exactly, but there is a difference in one or more codes and/or whitespace
+	 */
+	EXACT_TEXT_ONLY,
+	
+	/**
 	 * Matches text and codes exactly, but only after the result 
 	 * of some automated repair (i.e., number replacement, code repair, 
 	 * capitalization, punctuation etc..)
 	 */
 	EXACT_REPAIRED,
-
-	/**
-	 * FUZZY_EXACT_TEXT and comes from a previous version of the same document
-	 */
-	FUZZY_EXACT_TEXT_PREVIOUS_VERSION,
-
-	/**
-	 * FUZZY_EXACT_TEXT and matches with a unique id
-	 */
-	FUZZY_EXACT_TEXT_UNIQUE_ID,
-	
-	/**
-	 * Matches text exactly, but there is a difference in one or more codes and/or whitespace
-	 */
-	FUZZY_EXACT_TEXT,
 
 	/**
 	 * FUZZY and comes from a previous version of the same document

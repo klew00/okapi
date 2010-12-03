@@ -55,7 +55,7 @@ public class AltTranslationTest {
 		at4 = new AltTranslation(LocaleId.ENGLISH, LocaleId.SPANISH, null, source1,
 				target1, MatchType.FUZZY, 60, "");
 		at5 = new AltTranslation(LocaleId.ENGLISH, LocaleId.SPANISH, null, source2,
-				target2, MatchType.FUZZY_EXACT_TEXT, 95, "");
+				target2, MatchType.EXACT_TEXT_ONLY, 95, "");
 		at6 = new AltTranslation(LocaleId.ENGLISH, LocaleId.SPANISH, null, source3,
 				target3, MatchType.FUZZY_UNIQUE_ID, 99, "");
 	}
@@ -79,8 +79,8 @@ public class AltTranslationTest {
 		ats.add(at5);
 		ats.add(at6);
 		Collections.sort(ats);
-		Assert.assertEquals(at6, ats.get(0));
-		Assert.assertEquals(at5, ats.get(1));
+		Assert.assertEquals(at5, ats.get(0));
+		Assert.assertEquals(at6, ats.get(1));
 		Assert.assertEquals(at4, ats.get(2));
 	}
 	@Test

@@ -48,7 +48,7 @@ public class FuzzyMatchWordCountStep extends AltAnnotationBasedCountStep {
 	protected boolean accept(MatchType type) {
 		return (type == MatchType.FUZZY_UNIQUE_ID ||
 				type == MatchType.FUZZY_PREVIOUS_VERSION ||
-				type == MatchType.FUZZY_EXACT_TEXT ||
+				type == MatchType.EXACT_TEXT_ONLY ||
 				type == MatchType.FUZZY ||
 				type == MatchType.FUZZY_REPAIRED);
 	}

@@ -78,7 +78,7 @@ public class QueryResultTest {
 		at4.target = target1;
 		
 		at5 = new QueryResult();
-		at5.matchType = MatchType.FUZZY_EXACT_TEXT;
+		at5.matchType = MatchType.EXACT_TEXT_ONLY;
 		at5.score = 95;
 		at5.source = source2;
 		at5.target = target2;		
