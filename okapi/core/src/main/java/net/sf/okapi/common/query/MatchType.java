@@ -115,9 +115,11 @@ public enum MatchType {
 	 * TM concordance or phrase match (usually a word or term only)
 	 */
 	CONCORDANCE,
-	
+
 	/**
-	 * Unknown match type. A UNKOWN type always sorts below all other matches. Make sure this type is the last in the list.
+	 * Unknown match type. Used as default value only - should always be updated
+	 * to a known match type. A UNKOWN type always sorts below all other
+	 * matches. Make sure this type is the last in the list.
 	 */
 	UKNOWN
 }
