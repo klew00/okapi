@@ -53,28 +53,28 @@ public class LexersTab extends CompoundStepItemsTab {
 	protected void actionAdd(int afterIndex) {
 		// TODO Auto-generated method stub
 		
-		System.out.println("add");
+		//System.out.println("add");
 	}
 
 	@Override
 	protected void actionDown(int itemIndex) {
 		// TODO Auto-generated method stub
 		
-		System.out.println("down");
+		//System.out.println("down");
 	}
 
 	@Override
 	protected void actionModify(int itemIndex) {
 		// TODO Auto-generated method stub
 		
-		System.out.println("modify");
+		//System.out.println("modify");
 	}
 
 	@Override
 	protected void actionUp(int itemIndex) {
 		// TODO Auto-generated method stub
 	
-		System.out.println("up");
+		//System.out.println("up");
 	}
 
 	@Override
