@@ -28,27 +28,27 @@ package net.sf.okapi.common.query;
 public enum MatchType {
 
 	/**
-	 * Matches EXACT and matches a unique id
+	 * EXACT and matches a unique id
 	 */
 	EXACT_UNIQUE_ID,
 
 	/**
-	 * A match that is EXACT and comes from a previous version of the same document
+	 * EXACT and comes from a previous version of the same document
 	 */
 	EXACT_PREVIOUS_VERSION,
 
 	/**
-	 * Matches EXACT and a small number of segments before and/or after.
+	 * EXACT and a small number of segments before and/or after.
 	 */
 	EXACT_LOCAL_CONTEXT,
 
 	/**
-	 * Matches EXACT and comes from a repeated segment in the same document
+	 * EXACT and comes from a repeated segment in the same document
 	 */
 	EXACT_REPEATED_SEGMENT_SAME_DOCUMENT,
 
 	/**
-	 * Matches EXACT and the structural type of the segment (title, paragraph, list element etc..)
+	 * EXACT and the structural type of the segment (title, paragraph, list element etc..)
 	 */
 	EXACT_STRUCTURAL,
 	
@@ -63,22 +63,32 @@ public enum MatchType {
 	 * capitalization, punctuation etc..)
 	 */
 	EXACT_REPAIRED,
+
+	/**
+	 * FUZZY_EXACT_TEXT and comes from a previous version of the same document
+	 */
+	FUZZY_EXACT_TEXT_PREVIOUS_VERSION,
+
+	/**
+	 * FUZZY_EXACT_TEXT and matches with a unique id
+	 */
+	FUZZY_EXACT_TEXT_UNIQUE_ID,
+	
+	/**
+	 * Matches text exactly, but there is a difference in one or more codes and/or whitespace
+	 */
+	FUZZY_EXACT_TEXT,
+
+	/**
+	 * FUZZY and comes from a previous version of the same document
+	 */
+	FUZZY_PREVIOUS_VERSION,
 	
 	/**
 	 * Matches FUZZY with a unique id
 	 */
 	FUZZY_UNIQUE_ID,
-
-	/**
-	 * Matches FUZZY and comes from a previous version of the same document
-	 */
-	FUZZY_PREVIOUS_VERSION,
-
-	/**
-	 * Matches text exactly, but there is a difference in one or more codes
-	 */
-	FUZZY_EXACT_TEXT,
-
+	
 	/**
 	 * Matches both text and/or codes partially.
 	 */
