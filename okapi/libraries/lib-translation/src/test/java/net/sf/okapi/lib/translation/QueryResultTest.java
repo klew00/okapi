@@ -147,8 +147,8 @@ public class QueryResultTest {
 		ats.add(at5);
 		ats.add(at6);
 		Collections.sort(ats);
-		Assert.assertSame(at6, ats.get(0));
-		Assert.assertSame(at5, ats.get(1));
+		Assert.assertSame(at5, ats.get(0));
+		Assert.assertSame(at6, ats.get(1));
 		Assert.assertSame(at4, ats.get(2));
 	}
 	

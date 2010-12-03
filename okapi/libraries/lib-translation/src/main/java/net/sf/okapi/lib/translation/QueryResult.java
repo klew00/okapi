@@ -32,131 +32,132 @@ import net.sf.okapi.common.resource.TextFragment;
  * Stores one result of a query.
  */
 public class QueryResult implements Comparable<QueryResult> {
-	
+
 	/**
 	 * Convert a QueryResult to an {@link AltTranslation}
+	 * 
 	 * @param originalSource
 	 *            the original source content.
-  	 * @param sourceLocId
+	 * @param sourceLocId
 	 *            the {@link LocaleId} of the source.
 	 * @param targetLocId
 	 *            the {@link LocaleId} of the target.
 	 * @return an {@link AltTranslation} corresponding to this QueryResult
 	 */
-	public AltTranslation toAltTranslation(TextFragment originalSource, LocaleId sourceLocId, LocaleId targetLocId) {
-		return new AltTranslation(sourceLocId,
-				targetLocId, 
-				originalSource, 
-				source, 
-				target, 
-				matchType, 
-				score, 
-				origin);		
+	public AltTranslation toAltTranslation(TextFragment originalSource,
+			LocaleId sourceLocId, LocaleId targetLocId) {
+		return new AltTranslation(sourceLocId, targetLocId, originalSource,
+				source, target, matchType, score, origin);
 	}
 
 	/**
 	 * Weight for this result.
 	 */
 	public int weight;
-	
+
 	/**
 	 * Score of this result (a value between 0 and 100).
 	 */
 	public int score;
-	
+
 	/**
 	 * {@link MatchType} of this result.
 	 */
 	public MatchType matchType = MatchType.UKNOWN;
-	
+
 	/**
 	 * Text of the source for this result.
 	 */
 	public TextFragment source;
-	
+
 	/**
 	 * Text of the target for this result.
 	 */
 	public TextFragment target;
-	
+
 	/**
 	 * Creation date of TM entry
 	 */
 	public Date creationDate = new Date(0);
-	
+
 	/**
 	 * Unique id of this TM entry. Can be null.
 	 */
 	public String entryId = null;
-	
+
 	/**
 	 * ID of the connector that generated this result.
 	 */
 	public int connectorId;
 
 	/**
-	 * String indicating the origin of the result (e.g. name of a TM).
-	 * This value can be null and depends on each type of resource.
+	 * String indicating the origin of the result (e.g. name of a TM). This
+	 * value can be null and depends on each type of resource.
 	 */
 	public String origin;
-	
+
 	/**
-	 * Indicator telling if the result is coming from a machine translation engine or not.
-	 * @return true if the result is coming from a machine translation engine, false otherwise.
+	 * Indicator telling if the result is coming from a machine translation
+	 * engine or not.
+	 * 
+	 * @return true if the result is coming from a machine translation engine,
+	 *         false otherwise.
 	 */
 	public boolean fromMT() {
 		return (matchType == MatchType.MT);
 	}
-	
+
 	/**
-	 * This method implements a five way sort on (1) weight (2) {@link MatchType} (3) Score (4)
-	 * source string match and (5) creation date. Weight is the primary key, 
-	 * {@link MatchType} secondary, score tertiary and source string quaternary.
-	 * @param other the QueryResult we are comparing against.
+	 * This method implements a five way sort on (1) weight (2)
+	 * {@link MatchType} (3) Score (4) source string match and (5) creation
+	 * date. Weight is the primary key, {@link MatchType} secondary, score
+	 * tertiary and source string quaternary.
+	 * 
+	 * @param other
+	 *            the QueryResult we are comparing against.
 	 * @return the comparison result (0 if both objects are equal).
 	 */
 	@Override
-	public int compareTo (QueryResult other) {
+	public int compareTo(QueryResult other) {
 		final int EQUAL = 0;
 
-		if ( this == other ) {
+		if (this == other) {
 			return EQUAL;
 		}
 
 		String thisSource = this.source.toText();
 		String otherSource = other.source.toText();
 		int comparison;
-		
+
 		// compare weight
 		comparison = Float.compare(this.weight, other.weight);
-		if ( comparison != EQUAL ) {
+		if (comparison != EQUAL) {
 			return comparison;
 		}
-		
-		// only sort by match type if this or other is some kind of exact match
-		if ( isExact(this.matchType) || isExact(other.matchType) ) {					
-			// compare MatchType
+
+		// compare MatchType only if the two matches are not fuzzy
+		if (!(isTrueFuzzy(this.matchType) && isTrueFuzzy(other.matchType))) {
 			comparison = this.matchType.compareTo(other.matchType);
-			if ( comparison != EQUAL ) {
+			if (comparison != EQUAL) {
 				return comparison;
 			}
 		}
-				
+
 		// compare score
 		comparison = Float.compare(this.score, other.score);
-		if ( comparison != EQUAL ) {
+		if (comparison != EQUAL) {
 			return comparison * -1; // we want to reverse the normal score sort
 		}
 
 		// compare source strings with codes
 		comparison = thisSource.compareTo(otherSource);
-		if ( comparison != EQUAL ) {
+		if (comparison != EQUAL) {
 			return comparison;
 		}
-		
+
 		// compare creation dates
 		comparison = this.creationDate.compareTo(other.creationDate);
-		if ( comparison != EQUAL ) {
+		if (comparison != EQUAL) {
 			return comparison * -1; // we want more recent dates first
 		}
 
@@ -165,22 +166,24 @@ public class QueryResult implements Comparable<QueryResult> {
 	}
 
 	/**
-	 * Define equality of state. 
-	 * <b>Note: this class has a natural ordering that is inconsistent with equals.</b>
-	 * @param other the object to compare with.
+	 * Define equality of state. <b>Note: this class has a natural ordering that
+	 * is inconsistent with equals.</b>
+	 * 
+	 * @param other
+	 *            the object to compare with.
 	 * @return true if the objects are equal, false otherwise.
 	 */
 	@Override
-	public boolean equals (Object other) {
-		if ( this == other ) {
+	public boolean equals(Object other) {
+		if (this == other) {
 			return true;
 		}
-		if ( !(other instanceof QueryResult) ) {
+		if (!(other instanceof QueryResult)) {
 			return false;
 		}
 
 		QueryResult otherHit = (QueryResult) other;
-		return  (this.weight == otherHit.weight)
+		return (this.weight == otherHit.weight)
 				&& (this.matchType == otherHit.matchType)
 				&& (this.source.toText().equals(otherHit.source.toText()))
 				&& (this.target.toText().equals(otherHit.target.toText()));
@@ -188,10 +191,11 @@ public class QueryResult implements Comparable<QueryResult> {
 
 	/**
 	 * A class that overrides equals must also override hashCode.
+	 * 
 	 * @return the hash code for this object.
 	 */
 	@Override
-	public int hashCode () {
+	public int hashCode() {
 		int result = HashCodeUtil.SEED;
 		result = HashCodeUtil.hash(result, this.weight);
 		result = HashCodeUtil.hash(result, this.matchType);
@@ -199,10 +203,10 @@ public class QueryResult implements Comparable<QueryResult> {
 		result = HashCodeUtil.hash(result, this.target.toText());
 		return result;
 	}
-	
-	private boolean isExact (MatchType type) {
-		// EXACT_REPAIRED is considered a fuzzy match type
-		if ( type.ordinal() < MatchType.EXACT_REPAIRED.ordinal() ) {
+
+	private boolean isTrueFuzzy(MatchType type) {
+		if (type == MatchType.FUZZY_PREVIOUS_VERSION
+				|| type == MatchType.FUZZY_UNIQUE_ID || type == MatchType.FUZZY) {
 			return true;
 		}
 		return false;
