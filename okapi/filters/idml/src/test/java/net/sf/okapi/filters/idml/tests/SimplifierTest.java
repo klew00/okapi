@@ -151,9 +151,10 @@ public class SimplifierTest {
 		tf.append(TagType.PLACEHOLDER, "x3", "<x3/>");
 
 		simplifier.simplifyAll(tf);
-//TODO: should be:
-//		assertEquals("<1>T1<2/>T2</1>", fmt.setContent(tf).toString());
-		assertEquals("<1>T1<2></2>T2</1>", fmt.setContent(tf).toString());
+		
+		simplifier.simplifyEmptyOpeningClosing(tf);
+		
+		assertEquals("<1>T1<2/>T2</1>", fmt.setContent(tf).toString());
 	}
 
 	@Test
@@ -173,9 +174,7 @@ public class SimplifierTest {
 		tf.append(TagType.PLACEHOLDER, "x3", "<x3/>");
 
 		simplifier.simplifyAll(tf);
-//TODO: should be:
-//		assertEquals("<1>T1<2>T2</2>T3</1>", fmt.setContent(tf).toString());
-		assertEquals("<1>T1<2><3></3>T2</2>T3</1>", fmt.setContent(tf).toString());
+		assertEquals("<1>T1<2>T2</2>T3</1>", fmt.setContent(tf).toString());
 	}
 
 }

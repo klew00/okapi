@@ -31,6 +31,8 @@ import net.sf.okapi.common.resource.TextFragment.TagType;
 
 public class Simplifier {
 
+	protected static final int MAX = 10;
+	
 	class CodeNode {
 
 		int offset;
@@ -151,15 +153,42 @@ public class Simplifier {
 	/**
 	 * Simplifies all possible tags in a given text fragment.
 	 * @param tf the text fragment to modify.
+	 * @param maxIterations maxIterations.
+	 */
+	public void simplifyAll (TextFragment tf, int maxIterations) {
+		
+		int isolatedMerges=0;
+		int openCloseMerges=0;
+		int emptyOpenCloseMerges=0;
+
+		int iteration = 0;
+		
+		do{
+			iteration++;
+			
+			prepare(tf.getCodedText(), tf.getCodes());
+			isolatedMerges = simplifyIsolated();
+			tf.setCodedText(getCodedText(), getCodes());
+
+			prepare(tf.getCodedText(), tf.getCodes());
+			openCloseMerges = simplifyOpeningClosing();
+			tf.setCodedText(getCodedText(), getCodes());
+
+			prepare(tf.getCodedText(), tf.getCodes());
+			emptyOpenCloseMerges = simplifyEmptyOpeningClosing();
+			tf.setCodedText(getCodedText(), getCodes());
+			
+		}while ((iteration < maxIterations) && (isolatedMerges+openCloseMerges+emptyOpenCloseMerges) > 0);
+	}
+	
+	/**
+	 * Simplifies all possible tags in a given text fragment.
+	 * @param tf the text fragment to modify.
 	 */
 	public void simplifyAll (TextFragment tf) {
-		prepare(tf.getCodedText(), tf.getCodes());
-		simplifyIsolated();
-		tf.setCodedText(getCodedText(), getCodes());
+
+		simplifyAll(tf, Simplifier.MAX);
 		
-		prepare(tf.getCodedText(), tf.getCodes());
-		simplifyOpeningClosing();
-		tf.setCodedText(getCodedText(), getCodes());
 	}
 
 	/**
@@ -172,8 +201,9 @@ public class Simplifier {
 		tf.setCodedText(getCodedText(), getCodes());
 	}
 	
-	private void simplifyIsolated () {
+	private int simplifyIsolated () {
 		
+		int merges = 0;
 		CodeNode peekCn;
 		
 		for(int i=0; i< codeNodesList.size(); i++){
@@ -192,6 +222,7 @@ public class Simplifier {
 						//      Possibly do two runs one forward and one backwards.
 
 						mergeNodes(cn,peekCn);
+						merges++;
 						i--;
 						continue;
 					}
@@ -200,6 +231,8 @@ public class Simplifier {
 		}
 		renumberMarkerIndexes();
 		updateCodeIds();
+		
+		return merges++;
 	}
 		
 	/*
@@ -214,8 +247,9 @@ public class Simplifier {
 	/*
 	 * Merges the Start tags
 	 */
-	private void simplifyOpeningClosing () {
+	private int simplifyOpeningClosing () {
 		
+		int merges = 0;
 		CodeNode peekCn;
 		
 		for(int i=0; i< codeNodesList.size(); i++){
@@ -240,7 +274,8 @@ public class Simplifier {
 
 							mergeEndNodes(ecn2, ecn1);
 							mergeNodes(scn1, scn2);
-
+							
+							merges++;
 							i--;
 							continue;
 						}
@@ -250,12 +285,62 @@ public class Simplifier {
 		}
 		renumberMarkerIndexes();
 		updateCodeIds();
+		
+		return merges;
+	}
+	
+	/*
+	 * Simplify the isolated tags
+	 */
+	public void simplifyEmptyOpeningClosing (TextFragment tf) {
+		prepare(tf.getCodedText(), tf.getCodes());
+		simplifyEmptyOpeningClosing();
+		tf.setCodedText(getCodedText(), getCodes());
+	}
+	
+	/*
+	 * Merges the Start tags
+	 */
+	private int simplifyEmptyOpeningClosing(){
+		
+		int merges = 0;
+		CodeNode peekCn;
+		
+		for(int i=0; i< codeNodesList.size(); i++){
+		
+			CodeNode cn = codeNodesList.get(i);
+			
+			if(i+1 < codeNodesList.size()){
+		
+				peekCn = codeNodesList.get(i+1);
+				
+				if(cn.adjacentNext && peekCn.adjacentPrev){
+					
+					if(cn.code.getTagType() == TagType.OPENING && peekCn.code.getTagType() == TagType.CLOSING && cn.intIndex == (peekCn.intIndex-1)){
+						
+						StartCodeNode scn = (StartCodeNode)cn;
+						EndCodeNode ecn = (EndCodeNode)peekCn;
+
+						mergeEmptyNodes(scn, ecn);
+
+						merges++;
+						i--;
+						continue;
+					}
+				}
+			}
+		}
+		renumberMarkerIndexes();
+		updateCodeIds();
+		
+		return merges++;
 	}
 	
 	/*
 	 * Renumber marker indexes
 	 */
 	private void renumberMarkerIndexes () {
+		
 		for (int i=0; i< codeNodesList.size(); i++) {
 			CodeNode cn = codeNodesList.get(i);
 			char newCharIndex = TextFragment.toChar(i);
@@ -266,7 +351,7 @@ public class Simplifier {
 			cn.marker = newMarker;
 		}
 	}
-	
+		
 	/*
 	 * Generates the list of codes from the code node list
 	 */
@@ -337,6 +422,26 @@ public class Simplifier {
 		codeNodesList.remove(node1);
 	}
 
+	/*
+	 * merges codes for empty start/end tags
+	 */
+	private void mergeEmptyNodes(CodeNode node1, CodeNode node2){
+
+		codedText = codedText.replace(node1.marker+node2.marker, "\ue103"+node1.charIndex);
+
+		node1.code.setData(node1.code.getData()+node2.code.getData());
+		node1.code.setTagType(TagType.PLACEHOLDER);
+
+		PhCodeNode pcn = new PhCodeNode(node1.offset,node1.intIndex, node1.charIndex, node1.code);
+		
+		int i = codeNodesList.indexOf(node2);
+		
+		codeNodesList.add(i, pcn);
+		
+		codeNodesList.remove(node1);
+		codeNodesList.remove(node2);
+		
+	}		
 }
 
 //TextFragment oriFrag;
