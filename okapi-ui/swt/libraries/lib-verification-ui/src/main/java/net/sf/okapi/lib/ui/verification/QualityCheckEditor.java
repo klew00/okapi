@@ -269,7 +269,10 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 			}
 		}
 		else {
-			if ( processOnStart ) checkAll();
+			if ( processOnStart ) {
+				fillDocumentCombo(null);
+				checkAll();
+			}
 		}
 		
 		while ( !shell.isDisposed() ) {
