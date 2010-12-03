@@ -24,6 +24,8 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -54,7 +56,9 @@ public class ScopingReportTest {
 	private static final LocaleId ES = new LocaleId("es");
 	
 	public static void testPath(String path) {
-		System.out.println(new File(path).getAbsolutePath());
+		Logger logger = Logger.getLogger(ScopingReportTest.class.getName()); // loggers are cached
+		logger.setLevel(Level.FINE);
+		logger.fine(new File(path).getAbsolutePath());
 	}
 	
 	@Test

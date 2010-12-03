@@ -21,6 +21,8 @@
 package net.sf.okapi.lib.reporting;
 
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.junit.Test;
 
@@ -34,6 +36,8 @@ public class DateTest {
 //		TimeZone tz;
 		
 		date = new Date();
-		System.out.println(date);
+		Logger logger = Logger.getLogger(getClass().getName());
+		logger.setLevel(Level.FINE);
+		logger.fine(date.toString());
 	}
 }

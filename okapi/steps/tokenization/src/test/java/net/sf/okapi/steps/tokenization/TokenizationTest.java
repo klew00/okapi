@@ -34,6 +34,8 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -161,10 +163,14 @@ public class TokenizationTest {
 	private void listTokens(Tokens tokens) {
 		
 		if (tokens == null) return;
+		StringBuilder sb = new StringBuilder(); 
 		for (Token token : tokens) {	
 			
-			System.out.println(token.toString());
+			sb.append(token.toString() + "\n");
 		}
+		Logger logger = Logger.getLogger(getClass().getName()); // loggers are cached
+		logger.setLevel(Level.FINE);
+		logger.fine(sb.toString());
 	}
 	
 // DEBUG	

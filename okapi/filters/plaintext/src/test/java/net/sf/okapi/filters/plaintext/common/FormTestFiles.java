@@ -4,6 +4,8 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.sf.okapi.common.TestUtil;
 
@@ -78,7 +80,9 @@ public class FormTestFiles {
 		
 		formMixture();
 		
-		System.out.println("Done");
+		Logger logger = Logger.getLogger(FormTestFiles.class.getName());
+		logger.setLevel(Level.FINE);
+		logger.fine("Done");
 	}
 
 }

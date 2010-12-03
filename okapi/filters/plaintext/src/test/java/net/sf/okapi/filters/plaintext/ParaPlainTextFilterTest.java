@@ -578,8 +578,8 @@ public class ParaPlainTextFilterTest {
 		case TEXT_UNIT:
 			IResource res = event.getResource();
 			assertTrue(res instanceof TextUnit);
-			System.out.println(res.toString());
-			System.out.println(expectedText);
+//			System.out.println(res.toString());
+//			System.out.println(expectedText);
 			assertEquals(expectedText, res.toString());
 			break;
 			

@@ -35,7 +35,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.persistence.BeanMapper;
@@ -97,6 +100,20 @@ public class TestReflection {
 		// used to prevent maven failure when no unit tests are found
 	}
 		
+	private void log(String str) {
+		Logger logger = Logger.getLogger(getClass().getName()); // loggers are cached
+		logger.setLevel(Level.FINE);
+		logger.fine(str);
+	}
+	
+	private void log(int value) {
+		log(String.valueOf(value));
+	}
+	
+	private void log(long value) {
+		log(String.valueOf(value));
+	}
+	
 	// DEBUG	@Test
 	public void testMethods() {
 //		TestClass testClass1 = new TestClass();
@@ -113,7 +130,7 @@ public class TestReflection {
 //		System.out.println(methods.length);
 		
 		methods = TextUnitBean.class.getMethods();
-		System.out.println(methods.length);
+		log(methods.length);
 		
 //		for (Method method : methods) {
 //			String name = method.getName();
@@ -150,15 +167,15 @@ public class TestReflection {
 		
 		Field[] fields = null;
 		fields = TestClass2.class.getDeclaredFields();
-		System.out.println(fields.length);
+		log(fields.length);
 		fields = TestClass2.class.getFields();
-		System.out.println(fields.length);
+		log(fields.length);
 		
 //		Field[] fields = TestClass.class.getFields();
 //		System.out.println(fields.length);
 		
 		fields = TestClass.class.getDeclaredFields();
-		System.out.println(fields.length);
+		log(fields.length);
 		
 //		Class<?>[] classes = TestClass.class.getDeclaredClasses();
 //		System.out.println(classes.length);
@@ -167,41 +184,41 @@ public class TestReflection {
 //		System.out.println(classes.length);
 		
 		Field f1 = fields[3];
-		System.out.println(f1.getName());
+		log(f1.getName());
 		
 		PropertyBean b0 = (PropertyBean) f1.get(testClass1);
-		System.out.println(b0);
+		log(b0.toString());
 		testClass1.initBean1();
 		
 		b0 = (PropertyBean) f1.get(testClass1); // needs to be read again
-		System.out.println(b0.getRefId());
+		log(b0.getRefId());
 		
 		PropertyBean bean = new PropertyBean();
 		bean.setRefId(1011103);
 		f1.set(testClass1, bean);
-		System.out.println(testClass1.bean1.getRefId());
+		log(testClass1.bean1.getRefId());
 		
 		Field f2 = fields[5];		
-		System.out.println(f2.getName());
-		System.out.println(f2.getType());
+		log(f2.getName());
+		log(f2.getType().toString());
 		TypeVariable<?>[] params = f2.getType().getTypeParameters();
-		System.out.println("params: " + params.length);
+		log("params: " + params.length);
 		
 		Field f6 = fields[6];		
-		System.out.println(f6.getName());
-		System.out.println(f6.getType());
+		log(f6.getName());
+		log(f6.getType().toString());
 		TypeVariable<?>[] params6 = f6.getType().getTypeParameters();
-		System.out.println("params: " + params6.length);
-		System.out.println(params6[0].getName());
-		System.out.println(params6[0].getClass());
-		System.out.println(params6[1].getName());
+		log("params: " + params6.length);
+		log(params6[0].getName());
+		log(params6[0].getClass().toString());
+		log(params6[1].getName());
 		//sun.reflect.generics.reflectiveObjects.TypeVariableImpl test = null;
 				
 		List<?> bb0 = (List<?>) f2.get(testClass1);
-		System.out.println(bb0);
+		log(bb0.toString());
 		testClass1.initBeans();
 		bb0 = (List<?>) f2.get(testClass1);
-		System.out.println(bb0);
+		log(bb0.toString());
 	}
 
 	// DEBUG	@Test
@@ -222,7 +239,7 @@ public class TestReflection {
 		for(int i = 0; i < loops; i++) {			
 			long refId = b0.getRefId();
 		}
-		System.out.println(loops + " regular: " + (System.currentTimeMillis() - start) + " milliseconds."); 
+		log(loops + " regular: " + (System.currentTimeMillis() - start) + " milliseconds."); 
 		
 		Field f1 = fields[3];
 		
@@ -231,8 +248,7 @@ public class TestReflection {
 		for(int i = 0; i < loops; i++) {			
 			long refId = b0.getRefId();
 		}
-		System.out.println(loops + " reflection: " + (System.currentTimeMillis() - start) + " milliseconds.");
-		System.out.println();
+		log(loops + " reflection: " + (System.currentTimeMillis() - start) + " milliseconds.");
 		
 		//---------------------------
 		loops = 1000000;
@@ -241,7 +257,7 @@ public class TestReflection {
 		for(int i = 0; i < loops; i++) {
 			long refId = testClass1.bean1.getRefId();
 		}
-		System.out.println(loops + " regular: " + (System.currentTimeMillis() - start) + " milliseconds."); 
+		log(loops + " regular: " + (System.currentTimeMillis() - start) + " milliseconds."); 
 		
 		f1 = fields[3];
 				
@@ -250,21 +266,19 @@ public class TestReflection {
 			b0 = (PropertyBean) f1.get(testClass1);
 			long refId = b0.getRefId();
 		}
-		System.out.println(loops + " reflection: " + (System.currentTimeMillis() - start) + " milliseconds.");
-		System.out.println();
+		log(loops + " reflection: " + (System.currentTimeMillis() - start) + " milliseconds.");
 		
 		start = System.currentTimeMillis();
 		for(int i = 0; i < loops; i++) {
 			TextUnit tu = new TextUnit("tu1");
 		}
-		System.out.println("----" + loops + " TextUnit creation: " + (System.currentTimeMillis() - start) + " milliseconds.");
+		log("----" + loops + " TextUnit creation: " + (System.currentTimeMillis() - start) + " milliseconds.");
 		
 		start = System.currentTimeMillis();
 		for(int i = 0; i < loops; i++) {
 			Property tu = new Property("name", "value");
 		}
-		System.out.println(loops + " Property creation: " + (System.currentTimeMillis() - start) + " milliseconds.");
-		System.out.println();
+		log(loops + " Property creation: " + (System.currentTimeMillis() - start) + " milliseconds.");
 		
 		//---------------------------
 		loops = 10000;
@@ -273,7 +287,7 @@ public class TestReflection {
 		for(int i = 0; i < loops; i++) {
 			session.registerBean(TextUnit.class, TextUnitBean.class);
 		}
-		System.out.println(loops + " registerBean(): " + (System.currentTimeMillis() - start) + " milliseconds.");
+		log(loops + " registerBean(): " + (System.currentTimeMillis() - start) + " milliseconds.");
 		
 //		//---------------------------
 //		loops = 1000000;

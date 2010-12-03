@@ -20,7 +20,11 @@
 
 package net.sf.okapi.lib.extra.steps;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartSubDocument;
@@ -30,6 +34,8 @@ public class EventLogger extends BasePipelineStep {
 
 	private int indent = 0;
 	private boolean increasing = true;
+	private final Logger logger = Logger.getLogger(getClass().getName());
+	private StringBuilder sb;
 	
 	@Override
 	public String getDescription() {
@@ -64,21 +70,22 @@ public class EventLogger extends BasePipelineStep {
 		String indentStr = "";
 		for (int i = 0; i < indent; i++) 
 			indentStr += "  ";
-		
-		System.out.print(indentStr);
-		System.out.print(event.getEventType() + getEventDescr(event));
-		System.out.println();
+				
+		sb.append(indentStr);
+		sb.append(event.getEventType() + getEventDescr(event));
+		sb.append("\n");
 	}
 	
 	@Override
 	public Event handleEvent(Event event) {
 		switch ( event.getEventType() ) {
+		case START_BATCH:
+			sb = new StringBuilder("\n\n");
 		case START_DOCUMENT:
 		case START_SUBDOCUMENT:
-		case START_GROUP:
-		case START_BATCH:
+		case START_GROUP:		
 		case START_BATCH_ITEM:
-			if (!increasing) System.out.println();
+			if (!increasing) sb.append("\n");
 			printEvent(event);
 			indent++; 
 			increasing = true;
@@ -92,10 +99,14 @@ public class EventLogger extends BasePipelineStep {
 			if (indent > 0) indent--;
 			increasing = false;
 			printEvent(event);
-			break;
+			if (event.getEventType() == EventType.END_BATCH) {
+				logger.setLevel(Level.FINE);
+				logger.fine(sb.toString());
+			}
+			break;		
 			
 		default:
-			if (!increasing) System.out.println();
+			if (!increasing) sb.append("\n");
 			printEvent(event);
 		}
 		

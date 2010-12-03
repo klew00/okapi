@@ -23,6 +23,8 @@ package net.sf.okapi.steps.xliffkit.writer;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -157,7 +159,13 @@ public class XstreamWriterTest {
 						//new XParameter("outputURI", this.getClass().getResource("draft4.xliff.kit").toURI().toString()))
 						new XParameter("outputURI", new URL("file", null, pathBase + "testPackageFormat4.xstream.kit").toURI().toString()))
 		).execute();
-		System.out.println(" Total: " + (System.currentTimeMillis() - start) + " milliseconds.");
+		log(" Total: " + (System.currentTimeMillis() - start) + " milliseconds.");
+	}
+	
+	private void log(String str) {
+		Logger logger = Logger.getLogger(getClass().getName()); // loggers are cached
+		logger.setLevel(Level.FINE);
+		logger.fine(str);
 	}
 	
 	// DEBUG @Test
@@ -261,7 +269,7 @@ public class XstreamWriterTest {
 						new XParameter("outputURI", new URL("file", null, pathBase + "testPackageFormat5.xstream.kit").toURI().toString()))
 		).execute();
 		}
-		System.out.println(" Total: " + (System.currentTimeMillis() - start) + " milliseconds.");
+		log(" Total: " + (System.currentTimeMillis() - start) + " milliseconds.");
 	}
 
 	

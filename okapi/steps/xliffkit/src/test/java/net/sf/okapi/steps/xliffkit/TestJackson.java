@@ -30,6 +30,8 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import net.sf.okapi.common.Event;
@@ -83,6 +85,12 @@ public class TestJackson {
 		assertEquals("abc", session.getDescription());
 	}
 	
+	private void log(String str) {
+		Logger logger = Logger.getLogger(getClass().getName()); // loggers are cached
+		logger.setLevel(Level.FINE);
+		logger.fine(str);
+	}
+	
 	// DEBUG @Test
 	public void testTextUnit() throws JsonGenerationException, JsonMappingException, IOException, URISyntaxException {
 		Event event = new Event(EventType.TEXT_UNIT);
@@ -113,7 +121,7 @@ public class TestJackson {
 		
 		//String st = mapper.writeValueAsString(tub);
 		String st = mapper.writeValueAsString(evb);
-		System.out.println(st);
+		log(st);
 		
 //		String st2 = mapper.writeValueAsString(evb);
 //		System.out.println(st2);
@@ -122,7 +130,7 @@ public class TestJackson {
 		tub = mapper.readValue(st, TextUnitBean.class);
 		tu = tub.get(TextUnit.class, session);
 //		System.out.println(tu.getSource().getCodedText());
-		System.out.println(((TextContainer)tub.getSource().get(TextContainer.class, session)).getCodedText());
+		log(((TextContainer)tub.getSource().get(TextContainer.class, session)).getCodedText());
 //		ISkeleton skel = tub.getSkeleton().read(ISkeleton.class);
 //		if (skel != null)
 //			System.out.println(skel.getClass());
@@ -147,7 +155,7 @@ public class TestJackson {
 		
 		//String st = mapper.writeValueAsString(tub);
 		String st = mapper.writeValueAsString(evb);
-		System.out.println(st);
+		log(st);
 	}
 	
 	// DEBUG @Test
@@ -209,10 +217,10 @@ public class TestJackson {
 	// DEBUG @Test
 	public void testInputStream() {
 		InputStream is = this.getClass().getResourceAsStream("test3.txt");
-		System.out.println(is.markSupported());
+		log(is.markSupported()? "true" : "false");
 //		is.mark(Integer.MAX_VALUE);
 		
-		System.out.println();
+		//System.out.println();
 		//InputStream is2 = is.clone();
 		
 		String st = "";
@@ -228,7 +236,7 @@ public class TestJackson {
 			// TODO Handle exception
 			e.printStackTrace();
 		}
-		System.out.println(st);
+		log(st);
 	}
 	
 	
@@ -245,7 +253,7 @@ public class TestJackson {
 		ZipSkeletonBean zsb = new ZipSkeletonBean();
 		zsb.set(zs, session);
 		String st = mapper.writeValueAsString(zsb);
-		System.out.println(st);
+		log(st);
 		zf.close();
 	}
 
@@ -255,7 +263,7 @@ public class TestJackson {
 		InputStreamBean isb = new InputStreamBean();
 		isb.set(fis, session);
 		String st = mapper.writeValueAsString(isb);
-		System.out.println(st);
+		log(st);
 	}
 	
 	// DEBUG @Test

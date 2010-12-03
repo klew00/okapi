@@ -23,6 +23,9 @@ package net.sf.okapi.steps.xliffkit;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import java.io.UnsupportedEncodingException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.InlineAnnotation;
 import net.sf.okapi.common.resource.TextContainer;
@@ -47,19 +50,25 @@ public class TestJsonSession {
 //		return new String(baos.toByteArray(), "UTF-8");		
 //	}
 	
+	private void log(String str) {
+		Logger logger = Logger.getLogger(getClass().getName()); // loggers are cached
+		logger.setLevel(Level.FINE);
+		logger.fine(str);
+	}
+	
 	// DEBUG 
 	@Test
 	public void testReadWriteObject() throws UnsupportedEncodingException {
 		OkapiJsonSession session = new OkapiJsonSession();		
 		session.setVersion(OkapiBeans.VERSION);
 		
-		System.out.println("===== Annotation");
+		log("===== Annotation");
 		InlineAnnotation annot1 = new InlineAnnotation();
 		annot1.setData("test inline annotation");
 		String st1 = session.writeObject(annot1);
-		System.out.println(st1 + "\n\n");
+		log(st1 + "\n\n");
 		
-		System.out.println("===== TextUnit");
+		log("===== TextUnit");
 		TextUnit tu1 = TextUnitUtil.buildTU("source-text1" + (char) 2 + '"' + " : " + '"' + 
 				'{' + '"' + "ssssss " + ':' + '"' + "ddddd" + "}:" + '<' + '>' + "sssddd: <>dsdd");
 		//tu1.setSkeleton(new GenericSkeleton());
@@ -69,14 +78,14 @@ public class TestJsonSession {
 		gs.addContentPlaceholder(tu1);
 		gs.append("after");
 		
-		System.out.println(gs);
+		log(gs.toString());
 		
 		tu1.setSkeleton(gs);
 		//------------
 		tu1.setTarget(LocaleId.FRENCH, new TextContainer("french-text1"));
 		tu1.setTarget(LocaleId.TAIWAN_CHINESE, new TextContainer("chinese-text1"));
 		String st2 = session.writeObject(tu1);
-		System.out.println(st2);
+		log(st2);
 		
 		
 		session.setVersion(OkapiBeans.VERSION);
