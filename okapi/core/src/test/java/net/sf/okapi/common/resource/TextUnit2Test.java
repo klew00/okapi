@@ -22,6 +22,7 @@ package net.sf.okapi.common.resource;
 
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.filterwriter.GenericContent;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,8 +32,13 @@ public class TextUnit2Test {
     private static final LocaleId locFR = LocaleId.fromString("fr");
     private static final String TU1 = "tu1";
     private TextContainer tc1;
-    ITextUnit tu1;
+    private ITextUnit tu1;
+    private GenericContent fmt;
 
+    public TextUnit2Test () {
+    	fmt = new GenericContent();
+    }
+    
     @Before
     public void setUp(){
         tu1 = new TextUnit2(TU1);
@@ -387,6 +393,23 @@ public class TextUnit2Test {
     	assertEquals(seg1.id, seg4.id); // Check target was added with validated id
     }
 
+    @Test
+    public void splitSourceSegmentTest () {
+    	ITextUnit tu = createSegmentedTUAndTarget();
+    	IAlignedSegments as = tu.getSegments();
+    	Segment srcSeg = as.getSource(1);
+    	Segment newSrcSeg = as.splitSource(srcSeg, 5); // "Part ][2."
+    	assertNotNull(newSrcSeg);
+    	assertEquals("2.", newSrcSeg.text.toString()); // Check new segment content
+    	assertEquals("Part ", srcSeg.text.toString()); // Check original segment content
+    	// Check the target
+    	Segment newTrgSeg = as.getCorrespondingTarget(newSrcSeg, locFR);
+    	assertNotNull(newTrgSeg);
+    	assertTrue(newTrgSeg.text.isEmpty());
+    	assertEquals("[Part 1.] a [Part ][2.]", fmt.printSegmentedContent(tu.getSource(), true));
+    	assertEquals("[Trg 1.] a [Trg 2.][]", fmt.printSegmentedContent(tu.getTarget_DIFF(locFR), true));
+    }
+    
     //	@Test
 //	public void testGetSetSourceContent () {
 //		TextFragment tf1 = new TextFragment("source text");

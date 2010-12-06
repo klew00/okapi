@@ -91,7 +91,8 @@ public interface ISegments extends Iterable<Segment> {
 	 * Inserts a given segment at the specified position.
 	 * <p>If the segment to insert has no id or an id that is already used in the
 	 * text container, the id is automatically changed to a new valid id.
-	 * @param index the segment index position.
+	 * @param index the segment index position. If the given position is the same
+	 * as the number of segments in the container, the call is the same as {@link #append(Segment)}.
 	 * @param seg the segment to insert.
 	 * @throws IndexOutOfBoundsException if the index is out of bounds.
 	 */
@@ -223,7 +224,7 @@ public interface ISegments extends Iterable<Segment> {
 	 * <p>For example in the container "[segment1] [segment2] [segment3]" the sgment index for "[segment2]" is
 	 * 1 and its part index is 2 because there is one non-segment part before.
 	 * @param segIndex the segment index to convert to part index.
-	 * @return the index of the part for the given segment index.
+	 * @return the index of the part for the given segment index, or -1 if the segment was not found.
 	 */
 	public int getPartIndex (int segIndex);
 	

@@ -118,6 +118,7 @@ public interface IAlignedSegments extends Iterable<Segment> {
 	
 	/**
 	 * Gets the source segment at a given position.
+	 * The first segment has the index 0, the second has the index 1, etc.
 	 * @param index the segment index of the segment to retrieve.
 	 * @return the segment at the given position.
 	 * @throws IndexOutOfBoundsException if the index is out of bounds.
@@ -156,17 +157,19 @@ public interface IAlignedSegments extends Iterable<Segment> {
 	
 	/**
 	 * Splits a given source segment into two.
-	 * All target alignment statuses are updated, and an empty segment is created for each target to match with the new source segment.
+	 * All target alignment statuses are updated, and an empty segment is created for each target
+	 * to match with the new source segment.
 	 * @param srcSeg the source segment to split.
 	 * @param splitPos the position where to split.
+	 * @return the new source segment created, or null if none was created.
 	 */
-	public void splitSource (Segment srcSeg,
+	public Segment splitSource (Segment srcSeg,
 		int splitPos);
 
 	/**
 	 * Splits a given target segment into two.
-	 * All target alignment statuses are updated, and an empty segment is created for each other target as well as for the source
-	 * to match with the new target segment.
+	 * All target alignment statuses are updated, and an empty segment is created for each
+	 * other target as well as for the source to match with the new target segment.
 	 * @param trgLoc the target locale to work on.
 	 * @param trgSeg the targets segment.
 	 * @param splitPos the position where to split.

@@ -74,10 +74,28 @@ public class TextUnit2 implements ITextUnit {
 		}
 		
 		@Override
-		public void splitSource (Segment srcSeg,
+		public Segment splitSource (Segment srcSeg,
 			int splitPos)
 		{
-			// TODO Auto-generated method stub
+			Segment newSrcSeg = null;
+			ISegments srcSegs = source.getSegments();
+			int segIndex = srcSegs.getIndex(srcSeg.id);
+			if ( segIndex == -1 ) return newSrcSeg; // Not a segment in this container.
+			int partIndex = srcSegs.getPartIndex(segIndex);
+			// Split the segment (with no spanned part)
+			source.split(partIndex, splitPos, splitPos, false);
+			// New segment is on the right of original (so: segIndex+1)
+			newSrcSeg = srcSegs.get(segIndex+1);
+			
+			// Create empty new segments for each target
+			for ( LocaleId loc : getTargetLocales() ) {
+				Segment trgSeg = getCorrespondingTarget(srcSeg, loc);
+				TextContainer tc = targets.get(loc);
+				ISegments trgSegs = tc.getSegments();
+				segIndex = trgSegs.getIndex(trgSeg.id);
+				trgSegs.insert(segIndex+1, new Segment(newSrcSeg.id));
+			}
+			return newSrcSeg;
 		}
 		
 		@Override

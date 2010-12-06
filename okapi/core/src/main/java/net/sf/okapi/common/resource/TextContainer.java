@@ -155,6 +155,12 @@ public class TextContainer implements Iterable<TextPart> {
 		public void insert (int index,
 			Segment seg)
 		{
+			// If the index is the one after the last segment: we append
+			if ( index == count() ) {
+				append(seg);
+				return;
+			}
+			// Otherwise it has to exist
 			int n = getPartIndex(index);
 			if ( n < -1 ) {
 				throw new IndexOutOfBoundsException("Invalid segment index: "+index);
@@ -726,7 +732,9 @@ public class TextContainer implements Iterable<TextPart> {
 	 * @param partIndex the position where to insert the new part.
 	 * @param part the part to insert.
 	 */
-	public void insert (int partIndex, TextPart part) {
+	public void insert (int partIndex,
+		TextPart part)
+	{
 		parts.add(partIndex, part);
 		if ( part.isSegment() ) {
 			validateSegmentId((Segment)part);
