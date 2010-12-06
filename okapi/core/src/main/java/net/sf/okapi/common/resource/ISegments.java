@@ -89,6 +89,8 @@ public interface ISegments extends Iterable<Segment> {
 
 	/**
 	 * Inserts a given segment at the specified position.
+	 * <p>If the segment to insert has no id or an id that is already used in the
+	 * text container, the id is automatically changed to a new valid id.
 	 * @param index the segment index position.
 	 * @param seg the segment to insert.
 	 * @throws IndexOutOfBoundsException if the index is out of bounds.

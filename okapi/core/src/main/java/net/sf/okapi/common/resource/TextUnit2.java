@@ -212,35 +212,46 @@ public class TextUnit2 implements ITextUnit {
 			Segment trgSeg,
 			LocaleId trgLoc)
 		{
-			//TODO
-		}
-		
-		@Override
-		public void insert (int index,
-			Segment srcSeg)
-		{
 			// Insert the source segment
 			ISegments segs = source.getSegments();
 			Segment currentSrc = segs.get(index);
 			segs.insert(index, srcSeg);
 			String srcId = srcSeg.id; // Get validated id
 			
-			// Add empty segment in targets
+			// Add empty segments in targets
 			for ( LocaleId loc : getTargetLocales() ) {
 				segs = targets.get(loc).getSegments();
-				// Get the corresponding target segment based on the source segment id
+				// Get the corresponding target segment based on the original source segment id
 				Segment currentTrg = segs.get(currentSrc.id);
+				
+				// Prepare the target segment
+				Segment newSeg = null;
+				if (( trgLoc != null ) && trgLoc.equals(loc) ) {
+					newSeg = trgSeg;
+					newSeg.id = srcId;
+				}
+				if ( newSeg == null ) {
+					newSeg = new Segment(srcId);
+				}
+				
 				if ( currentTrg == null ) {
 					// If it does not exists: add the new target at the end
-					segs.append(new Segment(srcId));
+					segs.append(newSeg);
 				}
 				else { // If it exists
 					// Get its index position
 					int n = segs.getIndex(currentTrg.id);
 					// And insert a new segment there
-					segs.insert(n, new Segment(srcId));
+					segs.insert(n, newSeg);
 				}
 			}
+		}
+		
+		@Override
+		public void insert (int index,
+			Segment srcSeg)
+		{
+			insert(index, srcSeg, null, null);
 		}
 		
 		@Override

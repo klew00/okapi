@@ -68,6 +68,7 @@ import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
@@ -899,6 +900,7 @@ public class TsFilter implements IFilter {
 		if ( params.useCodeFinder ) {
 			params.codeFinder.process(tu.getSource().getFirstContent());
 			params.codeFinder.process(tu.getTarget(trgLang).getFirstContent());
+			//TODO: new codes may need to be escaped!!!
 		}
 		
 		tu.setSkeleton(skel);
@@ -971,33 +973,34 @@ public class TsFilter implements IFilter {
 					tf_target.setSourceContent(source);
 					tf_target.createTarget(trgLang, false, TextUnit.CREATE_EMPTY);
 					
-				}else if( startElemName.equals("lengthvariant") ){
+				}
+				else if ( startElemName.equals("lengthvariant") ){
 					//TODO Handle lengthvariant
-					if(ts.currentMessageLocation == MessageLocation.RESOURCE){
+					if ( ts.currentMessageLocation == MessageLocation.RESOURCE ) {
 						addStartElemToSkel(startElem);
-					}else if (ts.currentMessageLocation == MessageLocation.TARGET){
+					}
+					else if ( ts.currentMessageLocation == MessageLocation.TARGET ){
 						procStartElemAddToTuContent(startElem, tf_target);	
 					}
 					
-				}else if( startElemName.equals("byte") ){
+				}
+				else if ( startElemName.equals("byte") ) {
 					//TODO Handle byte within numberus and lengthvariant
-					
-					if(ts.currentMessageLocation == MessageLocation.RESOURCE){
+					Attribute attr = startElem.getAttributeByName(new QName("value"));
+					if ( ts.currentMessageLocation == MessageLocation.RESOURCE ) {
 						procStartElemByte(startElem);
-					}else if(ts.currentMessageLocation == MessageLocation.SOURCE){
-						
+					}
+					else if ( ts.currentMessageLocation == MessageLocation.SOURCE ) {
 						procStartElemByte(startElem);
-						if(params.decodeByteValues){
-							Attribute attr = startElem.getAttributeByName(new QName("value"));
+						if ( params.decodeByteValues ) {
 							source.append(decodeByteValue(attr.getValue()));
-						}else{
-							source.append("<byte value=\""+startElem.getAttributeByName(new QName("value")).getValue()+"\"/>");
-							//tc.append(TagType.PLACEHOLDER, "byte", "<byte value=\""+startElement.getName().getLocalPart()+ "\"/>");
-							//TODO: should it be text or code?
 						}
-
-					}else if(ts.currentMessageLocation == MessageLocation.TARGET){
-
+						else { // Else: we make the element an inline code
+							// We can use getFirstPartContent() because nothing is segmented
+							source.append(TagType.PLACEHOLDER, "byte", "<byte value=\""+attr.getValue()+ "\"/>");
+						}
+					}
+					else if ( ts.currentMessageLocation == MessageLocation.TARGET ) {
 						procStartElemByte(startElem, tf_target);
 					}
 					
@@ -1025,6 +1028,7 @@ public class TsFilter implements IFilter {
 						// We can use getFirstPartContent() because nothing is segmented
 						params.codeFinder.process(tf_target.getSource().getFirstContent());
 						params.codeFinder.process(tf_target.getTarget(trgLang).getFirstContent());
+						//TODO: new codes may need to be escaped!!!
 					}
 					
 					tf_target.setSkeleton(skel);
@@ -1369,6 +1373,7 @@ public class TsFilter implements IFilter {
 	private void procStartElemByte (StartElement elem,
 		TextUnit tu)
 	{
+		Attribute attr = elem.getAttributeByName(new QName("value"));
 		if ( ts.currentMessageLocation == MessageLocation.RESOURCE ) {
 			procStartElemByte(elem);
 		}
@@ -1380,15 +1385,12 @@ public class TsFilter implements IFilter {
 			}
 			
 			if ( params.decodeByteValues ) {
-				Attribute attr = elem.getAttributeByName(new QName("value"));
 				// We can use getFirstPartContent() because nothing is segmented
 				tc.getFirstContent().append(decodeByteValue(attr.getValue()));
 			}
-			else {
+			else { // Else: we make the element an inline code
 				// We can use getFirstPartContent() because nothing is segmented
-				tc.getFirstContent().append("<byte value=\""+elem.getAttributeByName(new QName("value")).getValue()+"\"/>");
-				//tc.append(TagType.PLACEHOLDER, "byte", "<byte value=\""+startElement.getName().getLocalPart()+ "\"/>");
-				//TODO: should it be text or code?
+				tc.getFirstContent().append(TagType.PLACEHOLDER, "byte", "<byte value=\""+attr.getValue()+ "\"/>");
 			}
 		}
 		else if ( ts.currentMessageLocation == MessageLocation.TARGET ) {
@@ -1398,16 +1400,13 @@ public class TsFilter implements IFilter {
 				skel.addContentPlaceholder(tu,trgLang);	
 			}
 			
-			if (params.decodeByteValues ) {
-				Attribute attr = elem.getAttributeByName(new QName("value"));
+			if ( params.decodeByteValues ) {
 				// We can use getFirstPartContent() because nothing is segmented
 				tc.getFirstContent().append(decodeByteValue(attr.getValue()));
 			}
-			else {
+			else { // Else: we make the element an inline code
 				// We can use getFirstPartContent() because nothing is segmented
-				tc.getFirstContent().append("<byte value=\""+elem.getAttributeByName(new QName("value")).getValue()+"\"/>");
-				//tc.append(TagType.PLACEHOLDER, "byte", "<byte value=\""+startElement.getName().getLocalPart()+ "\"/>");
-				//TODO: should it be text or code?
+				tc.getFirstContent().append(TagType.PLACEHOLDER, "byte", "<byte value=\""+attr.getValue()+ "\"/>");
 			}
 		}
 	}

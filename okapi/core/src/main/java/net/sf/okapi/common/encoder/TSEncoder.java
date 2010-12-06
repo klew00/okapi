@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -20,24 +20,13 @@
 
 package net.sf.okapi.common.encoder;
 
-import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.resource.Property;
 
 /**
  * Implements {@link IEncoder} for TS file format.
  */
-public class TSEncoder implements IEncoder {
+public class TSEncoder extends XMLEncoder {
 	
-	private String lineBreak;
-	
-	@Override
-	public void setOptions (IParameters params,
-		String encoding,
-		String lineBreak)
-	{
-		this.lineBreak = lineBreak;
-	}
-
 	@Override
 	public String encode (String text,
 		int context)
@@ -46,9 +35,10 @@ public class TSEncoder implements IEncoder {
 		char ch;
 		for ( int i=0; i<text.length(); i++ ) {
 			ch = text.charAt(i);
-			if((ch==0x9) || (ch==0xA)|| (ch==0xD) || ((ch >= 0x20) && (ch<=0xD7FF)) || ((ch >= 0xE000) && (ch<=0xFFFD)) || ((ch >= 0x10000) && (ch<=0x10FFFF))){
-				escaped.append(ch);
-			}else{
+			if ((ch==0x9) || (ch==0xA)|| (ch==0xD) || ((ch >= 0x20) && (ch<=0xD7FF)) || ((ch >= 0xE000) && (ch<=0xFFFD)) || ((ch >= 0x10000) && (ch<=0x10FFFF))) {
+				escaped.append(super.encode(ch, context));
+			}
+			else {
 				escaped.append("<byte value=\"x"+Integer.toHexString(ch)+"\">");
 			}
 		}
@@ -56,23 +46,13 @@ public class TSEncoder implements IEncoder {
 	}
 
 	@Override
-	public String encode(int codePoint, int context) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String encode(char value, int context) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String toNative(String propertyName, String value) {
+	public String toNative (String propertyName,
+		String value)
+	{
 		// PROP_LANGUAGE: Not applicable
 		// PROP_ENCODING: No change
 		
-		// No changes for the other values
+		// Approve property is resolved with tyep attribute
 		if ( propertyName.equals(Property.APPROVED) ) {
 			if (( value != null ) && ( value.equals("yes") )) {
 				return "";
@@ -81,11 +61,6 @@ public class TSEncoder implements IEncoder {
 			}
 		}
 		return value;		
-	}
-
-	@Override
-	public String getLineBreak () {
-		return lineBreak;
 	}
 
 }

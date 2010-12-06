@@ -30,6 +30,7 @@
 <!ENTITY findDescription "Enter your search criteria below and select the Find button to begin the search.">
 <!ENTITY findCriteria "Search Criteria">
 <!ENTITY type.name "Name">
+<!ENTITY test.withCodes "This is a text <code>with codes</code> that should work.">
 <!ENTITY type.size "Size">
 <!ENTITY type.date "Date Modified">
 <!ENTITY mode.is "Is">
@@ -43,3 +44,4 @@
 <!ENTITY bytes.after "bytes">
 <!ENTITY button.find "Find">
 <!ENTITY button.cancel "Cancel">
+

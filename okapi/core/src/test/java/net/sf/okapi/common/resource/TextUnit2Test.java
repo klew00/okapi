@@ -372,6 +372,21 @@ public class TextUnit2Test {
     	assertEquals(seg1.id, seg4.id); // Check target was added with validated id
     }
 
+    @Test
+    public void insertSegmentsChangeIdTest () {
+    	ITextUnit tu = createSegmentedTUAndTarget();
+    	IAlignedSegments as = tu.getSegments();
+    	Segment seg1 = new Segment("s2"); // "s2" id exists already
+    	Segment trgSeg = new Segment("zzId", new TextFragment("[text]"));
+    	as.insert(1, seg1, trgSeg, locFR);
+    	Segment seg2 = as.getSource(1);
+    	assertSame(seg1, seg2);
+    	assertEquals("1", seg2.id); // Id was changed to a valid one
+    	Segment seg4 = as.getCorrespondingTarget(seg2, locFR);
+    	assertEquals("[text]", seg4.toString());
+    	assertEquals(seg1.id, seg4.id); // Check target was added with validated id
+    }
+
     //	@Test
 //	public void testGetSetSourceContent () {
 //		TextFragment tf1 = new TextFragment("source text");

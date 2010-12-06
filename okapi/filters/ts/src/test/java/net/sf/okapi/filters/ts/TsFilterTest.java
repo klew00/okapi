@@ -27,11 +27,14 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
+
 import javax.xml.parsers.ParserConfigurationException;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
@@ -266,6 +269,113 @@ public class TsFilterTest {
 		assertEquals("hello 1world", tu.getSource().getFirstContent().toText());
 		assertEquals("hejsan 1varlden", tu.getTarget(locFRFR).getFirstContent().toText());
 	}
+
+	@Test
+	public void testTranslationStatus () {
+		String snippet = "<?xml version='1.0' encoding='UTF-16BE'?>" +
+		"<TS version=\"4.5.1\" sourcelanguage=\"en-us\" language=\"fr-fr\">\r" +
+		"<context>\r" +
+		"<name>contextName</name>\r" +
+		"<message id=\"1\">\r" +
+		"<source>source 1</source>\r" +
+		"<translation >target 1</translation>\r" +
+		"</message>\r" +
+		"<message id=\"2\">\r" +
+		"<source>source 2</source>\r" +
+		"<translation type='unfinished'>target 2</translation>\r" +
+		"</message>\r" +
+		"<message id=\"3\">\r" +
+		"<source>source 3</source>\r" +
+		"<translation type='obsolete'>target 3</translation>\r" +
+		"</message>\r" +
+		"</context>\r" +
+		"</TS>";
+		
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locENUS, locFRFR), 1);
+		assertNotNull(tu);
+		Property prop = tu.getTargetProperty(locFRFR, Property.APPROVED);
+		assertNotNull(prop);
+		assertEquals("yes", prop.getValue());
+		
+		tu = FilterTestDriver.getTextUnit(getEvents(snippet, locENUS, locFRFR), 2);
+		assertNotNull(tu);
+		prop = tu.getTargetProperty(locFRFR, Property.APPROVED);
+		assertNotNull(prop);
+		assertEquals("no", prop.getValue());
+		
+		tu = FilterTestDriver.getTextUnit(getEvents(snippet, locENUS, locFRFR), 3);
+		assertNull(tu); // entries with obsolete translation are not extracted (based on Qt manual)
+	}
+
+	@Test
+	public void testInlineCodes () {
+		String snippet = "<?xml version='1.0' encoding='UTF-16BE'?>" +
+		"<TS version=\"4.5.1\" sourcelanguage=\"en-us\" language=\"fr-fr\">\r" +
+		"<context>\r" +
+		"<name>contextName</name>\r" +
+		"<message id=\"1\">\r" +
+		"<source>%s = %d <byte value=\"79\"/></source>\r" +
+		"<translation>%s = %d <byte value=\"79\"/></translation>\r" +
+		"</message>\r" +
+		"</context>\r" +
+		"</TS>";
+		
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locENUS, locFRFR), 1);
+		assertNotNull(tu);
+		List<Code> list = tu.getSource().getFirstContent().getCodes();
+		assertEquals(3, list.size());
+		assertEquals("%s", list.get(0).getData());
+		assertEquals("<byte value=\"79\"/>", list.get(1).getData());
+		assertEquals("%d", list.get(2).getData());
+	}		
+	
+	@Test
+	public void testInlineCodesOutput () {
+		String snippet = "<?xml version='1.0' encoding='UTF-16BE'?>" +
+		"<TS sourcelanguage=\"en-us\" language=\"fr-fr\" version=\"4.5.1\">\r" +
+		"<context>\r" +
+		"<name>contextName</name>\r" +
+		"<message id=\"1\">\r" +
+		"<source>%s = %d <byte value=\"3\"/></source>\r" +
+		"<translation>%s = %d <byte value=\"3\"/></translation>\r" +
+		"</message>\r" +
+		"</context>\r" +
+		"</TS>";
+		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r" +
+		"<TS sourcelanguage=\"en-us\" language=\"fr-fr\" version=\"4.5.1\">\r" +
+		"<context>\r" +
+		"<name>contextName</name>\r" +
+		"<message id=\"1\">\r" +
+		"<source>%s = %d <byte value=\"3\"/></source>\r" +
+		"<translation>%s = %d <byte value=\"3\"/></translation>\r" +
+		"</message>\r" +
+		"</context>\r" +
+		"</TS>";
+		
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet,locENUS,locFRFR),
+			filter.getEncoderManager(), locFR));
+	}		
+	
+//	@Test
+//	public void testComments () {
+//		String snippet = "<?xml version='1.0' encoding='UTF-16BE'?>" +
+//		"<TS version=\"4.5.1\" sourcelanguage=\"en-us\" language=\"fr-fr\">\r" +
+//		"<context>\r" +
+//		"<name>contextName</name>\r" +
+//		"<message id=\"1\">\r" +
+//		"<source>source 1</source>\r" +
+//		"<comment>comment 1</comment>\r" +
+//		"<translation >target 1</translation>\r" +
+//		"</message>\r" +
+//		"</context>\r" +
+//		"</TS>";
+//		
+//		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locENUS, locFRFR), 1);
+//		assertNotNull(tu);
+//		Property prop = tu.getProperty(Property.NOTE);
+//		assertNotNull(prop);
+//		assertEquals("comment 1", prop.getValue());
+//	}
 	
 	@Test
 	public void TestDecodeByteTrueHex2() {
@@ -425,7 +535,7 @@ public class TsFilterTest {
 		"<location line=\"55\" filename=\"test.ts\"/>\r" +
 		"<source>hello " +
 		"\u0009" + 
-		"\n" +
+		"\r" +
 		"\r" +
 		"\u0020" +
 		"\ud7ff" +
