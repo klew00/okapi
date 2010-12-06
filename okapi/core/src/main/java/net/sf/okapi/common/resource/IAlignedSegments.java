@@ -173,8 +173,9 @@ public interface IAlignedSegments extends Iterable<Segment> {
 	 * @param trgLoc the target locale to work on.
 	 * @param trgSeg the targets segment.
 	 * @param splitPos the position where to split.
+	 * @return the new target segment created, or null if none was created.
 	 */
-	public void splitTarget (LocaleId trgLoc,
+	public Segment splitTarget (LocaleId trgLoc,
 		Segment trgSeg,
 		int splitPos);
 	

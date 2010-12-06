@@ -66,26 +66,49 @@ public class TextUnit2 implements ITextUnit {
 	private final IAlignedSegments segments = new IAlignedSegments () {
 		
 		@Override
-		public void splitTarget (LocaleId trgLoc,
+		public Segment splitTarget (LocaleId trgLoc,
 			Segment trgSeg,
 			int splitPos)
 		{
-			// TODO Auto-generated method stub
+			// TODO
+			ISegments trgSegs = getTarget_DIFF(trgLoc).getSegments();
+			int segIndex = trgSegs.getIndex(trgSeg.id);
+			if ( segIndex == -1 ) return null; // Not a segment in this container.
+			int partIndex = trgSegs.getPartIndex(segIndex);
+			// Split the segment (with no spanned part)
+			getTarget_DIFF(trgLoc).split(partIndex, splitPos, splitPos, false);
+			// New segment is on the right of original (so: segIndex+1)
+			Segment newTrgSeg = trgSegs.get(segIndex+1);
+
+			// Create the corresponding source segment
+			Segment srcSeg = getCorrespondingSource(trgSeg);
+			ISegments srcSegs = source.getSegments();
+			segIndex = srcSegs.getIndex(srcSeg.id);
+			srcSegs.insert(segIndex+1, new Segment(newTrgSeg.id));
+			
+			// Create the corresponding segments in the other targets
+			for ( LocaleId loc : getTargetLocales() ) {
+				if ( loc.equals(trgLoc) ) continue;
+				Segment otherTrgSeg = getCorrespondingTarget(srcSeg, loc);
+				trgSegs = targets.get(loc).getSegments();
+				segIndex = trgSegs.getIndex(trgSeg.id);
+				trgSegs.insert(segIndex+1, new Segment(newTrgSeg.id));
+			}
+			return newTrgSeg;
 		}
 		
 		@Override
 		public Segment splitSource (Segment srcSeg,
 			int splitPos)
 		{
-			Segment newSrcSeg = null;
 			ISegments srcSegs = source.getSegments();
 			int segIndex = srcSegs.getIndex(srcSeg.id);
-			if ( segIndex == -1 ) return newSrcSeg; // Not a segment in this container.
+			if ( segIndex == -1 ) return null; // Not a segment in this container.
 			int partIndex = srcSegs.getPartIndex(segIndex);
 			// Split the segment (with no spanned part)
 			source.split(partIndex, splitPos, splitPos, false);
 			// New segment is on the right of original (so: segIndex+1)
-			newSrcSeg = srcSegs.get(segIndex+1);
+			Segment newSrcSeg = srcSegs.get(segIndex+1);
 			
 			// Create empty new segments for each target
 			for ( LocaleId loc : getTargetLocales() ) {

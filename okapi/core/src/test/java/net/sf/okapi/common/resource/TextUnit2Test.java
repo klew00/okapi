@@ -29,7 +29,8 @@ import org.junit.Test;
 
 public class TextUnit2Test {
 
-    private static final LocaleId locFR = LocaleId.fromString("fr");
+    private static final LocaleId locFR = LocaleId.FRENCH;
+    private static final LocaleId locES = LocaleId.SPANISH;
     private static final String TU1 = "tu1";
     private TextContainer tc1;
     private ITextUnit tu1;
@@ -120,6 +121,7 @@ public class TextUnit2Test {
     	tu1 = createSegmentedTU();
         tu1.createTarget(locFR, false, IResource.COPY_SEGMENTS);
         assertEquals(tu1.getSource().getSegments().count(), tu1.getTarget_DIFF(locFR).getSegments().count());
+        assertEquals("[] a []", fmt.printSegmentedContent(tu1.getTarget_DIFF(locFR), true));
         assertEquals(" a ", tu1.getTarget_DIFF(locFR).toString());
     }
 
@@ -408,6 +410,25 @@ public class TextUnit2Test {
     	assertTrue(newTrgSeg.text.isEmpty());
     	assertEquals("[Part 1.] a [Part ][2.]", fmt.printSegmentedContent(tu.getSource(), true));
     	assertEquals("[Trg 1.] a [Trg 2.][]", fmt.printSegmentedContent(tu.getTarget_DIFF(locFR), true));
+    	assertEquals("[Objetivo 1.] a [Objetivo 2.][]", fmt.printSegmentedContent(tu.getTarget_DIFF(locES), true));
+    }
+    
+    @Test
+    public void splitTargetSegmentTest () {
+    	ITextUnit tu = createSegmentedTUAndTarget();
+    	IAlignedSegments as = tu.getSegments();
+    	Segment trgSeg = tu.getTargetSegments(locFR).get(1);
+    	Segment newTrgSeg = as.splitTarget(locFR, trgSeg, 4); // "Trg ][2."
+    	assertNotNull(newTrgSeg);
+    	assertEquals("2.", newTrgSeg.text.toString()); // Check new segment content
+    	assertEquals("Trg ", trgSeg.text.toString()); // Check original segment content
+    	// Check the source
+    	Segment newSrcSeg = as.getCorrespondingSource(newTrgSeg);
+    	assertNotNull(newSrcSeg);
+    	assertTrue(newSrcSeg.text.isEmpty());
+    	assertEquals("[Part 1.] a [Part 2.][]", fmt.printSegmentedContent(tu.getSource(), true));
+    	assertEquals("[Trg 1.] a [Trg ][2.]", fmt.printSegmentedContent(tu.getTarget_DIFF(locFR), true));
+    	assertEquals("[Objetivo 1.] a [Objetivo 2.][]", fmt.printSegmentedContent(tu.getTarget_DIFF(locES), true));
     }
     
     //	@Test
@@ -444,6 +465,9 @@ public class TextUnit2Test {
     	ISegments segs = tu.getTarget_DIFF(locFR).getSegments();
     	segs.get(0).text.append("Trg 1.");
     	segs.get(1).text.append("Trg 2.");
+    	segs = tu.getTarget_DIFF(locES).getSegments();
+    	segs.get(0).text.append("Objetivo 1.");
+    	segs.get(1).text.append("Objetivo 2.");
     	return tu;
     }
 }
