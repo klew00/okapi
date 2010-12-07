@@ -88,6 +88,15 @@ public interface ISegments extends Iterable<Segment> {
 	public void append (TextFragment fragment);
 
 	/**
+	 * Sets a new segment at a given segment index.
+	 * <p>If the new segment's id exists already in the container, it is replaced by a valid id.
+	 * @param index the segment index position. 
+	 * @param seg the new segment.
+	 */
+	public void set (int index,
+		Segment seg);
+	
+	/**
 	 * Inserts a given segment at the specified position.
 	 * <p>If the segment to insert has no id or an id that is already used in the
 	 * text container, the id is automatically changed to a new valid id.

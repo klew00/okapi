@@ -85,26 +85,25 @@ public interface IAlignedSegments extends Iterable<Segment> {
 	
 	/**
 	 * Replaces a source segment at a given position by a clone of a given segment.
-	 * If the id of the new segment is different from the current one, the id... TODO 
+	 * If the id of the new segment is different from the current one, the target segments corresponding
+	 * to the replaced segment have their id updated to match the one of the new segment.
 	 * @param index the segment index position.
 	 * @param srcSeg the new source segment to place at the position.
 	 * @throws IndexOutOfBoundsException if the index is out of bounds.
 	 */
-//What is the segment ID is different from the ID of the current segment?
-//	-> replace with new one, also in targets
-// if new id exists, then change it so it's unique
 	public void setSource (int index,
 		Segment srcSeg);
 
 	/**
 	 * Replaces a target segment at a given position.
+	 * <p>If the given target does not exists yet, one segment and empty is created automatically.
+	 * <p>If the id of the new target segment is different from the current one, the source and other
+	 * target segments corresponding to the replaced segment have their id updated to match the one of the new segment.
 	 * @param index the index position.
 	 * @param trgSeg the new target segment to place at the position.
 	 * @param trgLoc the locale of the target segment.
+	 * @throws IndexOutOfBoundsException if the index is out of bounds.
 	 */
-//What if the locale does not exists? -> create it
-//What if the position is out-of-bounds?
-//What is the segment ID is different from the ID of the current segment?
 	public void setTarget (int index,
 		Segment trgSeg,
 		LocaleId trgLoc);
@@ -129,19 +128,18 @@ public interface IAlignedSegments extends Iterable<Segment> {
 	 * Gets the target segment corresponding to a given source segment.
 	 * This always returns a segment: If the target does not exists one is created.
 	 * If the segment does not exists one is created at the end of the target content.
-	 * @param srcSeg the source segment of the corresponding segment to look up.
+	 * @param seg the source (or other target) segment for which a corresponding target segment is requested.
 	 * @param trgLoc the target to look up.
 	 * @return the corresponding target segment (may be empty).
 	 */
-//TODO: creating randomly a new segment at the end is not really useable: what about the possible inter-segment space(s)? 	
-	public Segment getCorrespondingTarget (Segment srcSeg,
+	public Segment getCorrespondingTarget (Segment seg,
 		LocaleId trgLoc);
 	
-//TODO: what about the cases where we have s0-t1? -> 0-1 = empty - non-empty
-//Do we create an empty source segment (and corresponding ones in all other targets?	
 	/**
 	 * Gets the source segment corresponding to a given target segment.
-	 * @param trgSeg the target segment of the corresponding source segment to look for. 
+	 * <p>If no corresponding source segment is found an empty one is added at the end of the 
+	 * container and returned as the new corresponding segment.
+	 * @param trgSeg the target segment for which the corresponding source segment is requested. 
 	 * @return the corresponding source segment.
 	 */
 	public Segment getCorrespondingSource (Segment trgSeg);
@@ -179,16 +177,6 @@ public interface IAlignedSegments extends Iterable<Segment> {
 		Segment trgSeg,
 		int splitPos);
 	
-//	/**
-//	 * Merges two source segments (and anything in between).
-//	 * This also merges all the corresponding targets.
-//	 * @param srcSeg1 the first segment to merge. This segment keeps its id. 
-//	 * @param srcSeg2 the second segment to merge with the first.
-//	 */
-//	// exception -> if out-of-order in between
-//	public void mergeSource (Segment srcSeg1,
-//		Segment srcSeg2);
-
 	/**
 	 * Joins (in source and all targets) the segment for a given segment's id to all the parts between
 	 * that segment and the next, as well as the next segment. 
@@ -211,12 +199,14 @@ public interface IAlignedSegments extends Iterable<Segment> {
 	
 	/**
 	 * Segments the source content based on the rules provided by a given ISegmenter.
+	 * <p>The targets are not modified.
 	 * @param segmenter the segmenter to use to create the segments.
 	 */
 	public void segmentSource (ISegmenter segmenter);
 	
 	/**
 	 * Segments the specified target content based on the rules provided by a given ISegmenter.
+	 * <p>If the given target does not exist one is created.
 	 * @param segmenter the segmenter to use to create the segments.
 	 * @param targetLocale {@link LocaleId} of the target we want to segment.
 	 */

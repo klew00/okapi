@@ -1281,6 +1281,17 @@ public class TextContainerTest {
 	}
 
 	@Test
+	public void testSetSegment () {
+		TextContainer tc = createMultiSegmentContent();
+		ISegments segs = tc.getSegments();
+		segs.set(1, new Segment("s1", new TextFragment("[new-seg]"))); // s1 exists already
+		Segment seg = segs.get(1);
+		assertEquals("[new-seg]", seg.toString()); // segment was inserted
+		assertEquals("0", seg.id); // new segment has new id
+		assertEquals("[new-seg]", seg.text.toString());
+	}
+
+	@Test
 	public void getFirstSegment () {
 		Segment seg = new Segment("qwerty", new TextFragment("xyz"));
 		TextContainer tc = new TextContainer(seg);

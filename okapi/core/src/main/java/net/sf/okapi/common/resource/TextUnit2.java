@@ -70,7 +70,6 @@ public class TextUnit2 implements ITextUnit {
 			Segment trgSeg,
 			int splitPos)
 		{
-			// TODO
 			ISegments trgSegs = getTarget_DIFF(trgLoc).getSegments();
 			int segIndex = trgSegs.getIndex(trgSeg.id);
 			if ( segIndex == -1 ) return null; // Not a segment in this container.
@@ -91,7 +90,7 @@ public class TextUnit2 implements ITextUnit {
 				if ( loc.equals(trgLoc) ) continue;
 				Segment otherTrgSeg = getCorrespondingTarget(srcSeg, loc);
 				trgSegs = targets.get(loc).getSegments();
-				segIndex = trgSegs.getIndex(trgSeg.id);
+				segIndex = trgSegs.getIndex(otherTrgSeg.id);
 				trgSegs.insert(segIndex+1, new Segment(newTrgSeg.id));
 			}
 			return newTrgSeg;
@@ -127,14 +126,13 @@ public class TextUnit2 implements ITextUnit {
 			LocaleId trgLoc)
 		{
 			ISegments trgSegs = getTarget_DIFF(trgLoc).getSegments();
-			List<Segment> trgList = trgSegs.asList();
-			// Get the existing segment's ID 
-			String oldId = trgList.get(index).id;
+			// Get the existing segment's ID
+			String oldId = trgSegs.get(index).id;
 			// Set the new segment. its ID is updated internally if needed
-			trgList.set(index, trgSeg);
+			trgSegs.set(index, trgSeg);
 			if ( !oldId.equals(trgSeg.id) ) {
 				// Change the source ID too
-				Segment srcSeg = getCorrespondingSource(trgSeg);
+				Segment srcSeg = source.getSegments().get(oldId);
 				srcSeg.id = trgSeg.id;
 				// If needed update the target IDs for that segment
 				for ( LocaleId loc : getTargetLocales() ) {
@@ -151,11 +149,10 @@ public class TextUnit2 implements ITextUnit {
 			Segment srcSeg)
 		{
 			ISegments srcSegs = source.getSegments();
-			List<Segment> srcList = srcSegs.asList();
 			// Get the existing segment's ID 
-			String oldId = srcList.get(index).id;
+			String oldId = srcSegs.get(index).id;
 			// Set the new segment. its ID is updated internally if needed
-			srcList.set(index, srcSeg);
+			srcSegs.set(index, srcSeg);
 			if ( !oldId.equals(srcSeg.id) ) {
 				// If needed update the target IDs for that segment
 				for ( LocaleId loc : getTargetLocales() ) {
@@ -170,13 +167,6 @@ public class TextUnit2 implements ITextUnit {
 		public void segmentTarget (ISegmenter segmenter,
 			LocaleId targetLocale)
 		{
-	//TODO: what do we do if target doesn't exist?
-	// Exception or just create empty segmented copy from source?
-	//for now: exception
-			if ( !hasTarget(targetLocale) ) {
-				throw new RuntimeException(String.format("There is no target content for '%s'", targetLocale.toString()));
-			}
-			// else: segment
 			TextContainer tc = getTarget_DIFF(targetLocale);
 			segmenter.computeSegments(tc);
 			tc.getSegments().create(segmenter.getRanges());
@@ -215,14 +205,6 @@ public class TextUnit2 implements ITextUnit {
 			return (count>0);
 		}
 		
-//		@Override
-//		public void mergeSource (Segment srcSeg1,
-//			Segment srcSeg2)
-//		{
-//			//TODO
-//			//do we need this? it's complicated and there is no current usage for it(?)
-//		}
-
 		@Override
 		public void joinWithNext (Segment seg) {
 			ISegments srcSegs = source.getSegments();

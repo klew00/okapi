@@ -89,7 +89,7 @@ public class TextContainer implements Iterable<TextPart> {
 		};
 		
 		@Override
-		public List<Segment> asList() {
+		public List<Segment> asList () {
 			ArrayList<Segment> segments = new ArrayList<Segment>();
 			for ( TextPart part : parts ) {
 				if ( part.isSegment() ) {
@@ -100,7 +100,9 @@ public class TextContainer implements Iterable<TextPart> {
 		}
 
 		@Override
-		public void swap (int segIndex1, int segIndex2) {
+		public void swap (int segIndex1,
+			int segIndex2)
+		{
 			int partIndex1 = getPartIndex(segIndex1);
 			int partIndex2 = getPartIndex(segIndex2);
 			if (( partIndex1 == -1 ) || ( partIndex2 == -1 )) {
@@ -149,6 +151,18 @@ public class TextContainer implements Iterable<TextPart> {
 		@Override
 		public void append (TextFragment fragment) {
 			append(new Segment(null, fragment));
+		}
+
+		@Override
+		public void set (int index,
+			Segment seg)
+		{
+			int n = getPartIndex(index);
+			if ( n < -1 ) {
+				throw new IndexOutOfBoundsException("Invalid segment index: "+index);
+			}
+			parts.set(n, seg);
+			validateSegmentId(seg);
 		}
 		
 		@Override
