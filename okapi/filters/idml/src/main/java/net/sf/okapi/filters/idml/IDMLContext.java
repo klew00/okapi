@@ -47,6 +47,8 @@ public class IDMLContext {
 	private IDMLSkeleton skel;
 	private String tuId;
 	
+	private final static boolean phOnly = true;
+	
 	/**
 	 * Create a new context.
 	 * @param rootNode Node when starting embedded context. Should be null for the top-level context.
@@ -120,9 +122,16 @@ public class IDMLContext {
 	 * @param elem the Content element node.
 	 */
 	public void addContent (Element elem) {
-		tf.append(TagType.OPENING, "code", buildStartTag(elem));
-		IDMLFilter.processContent(elem, tf);
-		tf.append(TagType.CLOSING, "code", buildEndTag(elem));
+		if ( phOnly ) {
+			tf.append(TagType.PLACEHOLDER, "code", buildStartTag(elem));
+			IDMLFilter.processContent(elem, tf);
+			tf.append(TagType.PLACEHOLDER, "code", buildEndTag(elem));
+		}
+		else {
+			tf.append(TagType.OPENING, "code", buildStartTag(elem));
+			IDMLFilter.processContent(elem, tf);
+			tf.append(TagType.CLOSING, "code", buildEndTag(elem));
+		}
 		status++;
 		contentNode = elem;
 	}
@@ -154,13 +163,24 @@ public class IDMLContext {
 	}
 	
 	public void addStartTag (Element elem) {
-		tf.append(elem.hasChildNodes() ? TagType.OPENING : TagType.PLACEHOLDER,
-			elem.getNodeName(), buildStartTag(elem));
+		if ( phOnly ) {
+			tf.append(TagType.PLACEHOLDER,
+				elem.getNodeName(), buildStartTag(elem));
+		}
+		else {
+			tf.append(elem.hasChildNodes() ? TagType.OPENING : TagType.PLACEHOLDER,
+				elem.getNodeName(), buildStartTag(elem));
+		}
 	}
 	
 	public void addEndTag (Element elem) {
 		if ( elem.hasChildNodes() ) {
-			tf.append(TagType.CLOSING, elem.getNodeName(), buildEndTag(elem));
+			if ( phOnly ) {
+				tf.append(TagType.PLACEHOLDER, elem.getNodeName(), buildEndTag(elem));
+			}
+			else {
+				tf.append(TagType.CLOSING, elem.getNodeName(), buildEndTag(elem));
+			}
 		}
 	}
 	
