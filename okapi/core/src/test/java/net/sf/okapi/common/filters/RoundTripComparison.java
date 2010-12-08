@@ -103,7 +103,7 @@ public class RoundTripComparison {
 		String defaultEncoding,
 		LocaleId srcLoc,
 		LocaleId trgLoc,
-		String outputDir)
+		String dirSuffix)
 	{
 		this.filter = filter;
 		this.defaultEncoding = defaultEncoding;
@@ -131,7 +131,7 @@ public class RoundTripComparison {
 					params.load(Util.toURI(root + File.separator + doc.paramFile), false);
 			}
 			// Execute the first extraction and the re-writing
-			String outPath = executeFirstExtractionToFile(doc, outputDir, (IPipelineStep[]) null);
+			String outPath = executeFirstExtractionToFile(doc, dirSuffix, (IPipelineStep[]) null);
 			// Execute the second extraction from the output of the first
 			executeSecondExtractionFromFile(outPath);
 			// Compare the events
@@ -143,7 +143,7 @@ public class RoundTripComparison {
 	}
 
 	public boolean executeCompare(IFilter filter, List<InputDocument> inputDocs,
-			String defaultEncoding, LocaleId srcLoc, LocaleId trgLoc, String outputDir, IPipelineStep... steps) {
+			String defaultEncoding, LocaleId srcLoc, LocaleId trgLoc, String dirSuffux, IPipelineStep... steps) {
 		
 		this.filter = filter;
 		this.defaultEncoding = defaultEncoding;
@@ -176,7 +176,7 @@ public class RoundTripComparison {
 					params.load(Util.toURI(root + File.separator + doc.paramFile), false);
 			}
 			// Execute the first extraction and the re-writing
-			String outPath = executeFirstExtractionToFile(doc, outputDir, steps);
+			String outPath = executeFirstExtractionToFile(doc, dirSuffux, steps);
 			// Execute the second extraction from the output of the first
 			executeSecondExtractionFromFile(outPath);
 			// Compare the events
@@ -277,7 +277,7 @@ public class RoundTripComparison {
 			else {
 				outPath += (File.separator + outputDir + File.separator + Util.getFilename(doc.path, true));
 			}
-			writer.setOutput(outPath);
+			writer.setOutput(Util.fixPath(outPath));
 			
 			// Process the document
 			Event event;
