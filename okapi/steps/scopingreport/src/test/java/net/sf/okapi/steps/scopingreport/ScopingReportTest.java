@@ -130,6 +130,9 @@ public class ScopingReportTest {
 	public void testLeveraging() throws MalformedURLException {
 
 		String pathBase = Util.getDirectoryName(this.getClass().getResource("aa324.html").getPath()) + "/";
+		net.sf.okapi.connectors.pensieve.Parameters params = 
+			new net.sf.okapi.connectors.pensieve.Parameters();
+		params.setDbDirectory(pathBase + "testtm");
 		
 		new XPipeline(
 				"HTML report test",
@@ -157,7 +160,8 @@ public class ScopingReportTest {
 				),
 				new XPipelineStep(new LeveragingStep(), 
 						//new XParameter("resourceClassName", net.sf.okapi.connectors.opentran.OpenTranTMConnector.class.getName()),
-						new XParameter("resourceClassName", net.sf.okapi.connectors.google.GoogleMTConnector.class.getName()),
+						new XParameter("resourceClassName", net.sf.okapi.connectors.pensieve.PensieveTMConnector.class.getName()),
+						new XParameter("resourceParameters", params.toString(), true),
 						new XParameter("threshold", 80),
 						new XParameter("fillTarget", true)
 				),
