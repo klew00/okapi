@@ -127,7 +127,7 @@
 		
 		<dependency>
 			<groupId>net.sf.okapi.connectors</groupId>
-			<artifactId>okapi-connector-google</artifactId>
+			<artifactId>okapi-connector-pensieve</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>

@@ -102,6 +102,11 @@ public class XLIFFKitWriterTest {
 		
 //		TextModificationStep step3 = new TextModificationStep();
 //		step3.setTargetLocale(LocaleId.FRENCH);
+		String pathBase = Util.getDirectoryName(this.getClass().getResource("test2.txt").getPath()) + "/";
+		
+		net.sf.okapi.connectors.pensieve.Parameters params = 
+			new net.sf.okapi.connectors.pensieve.Parameters();
+		params.setDbDirectory(pathBase + "testtm");
 		
 		return
 			new XPipeline(
@@ -139,8 +144,9 @@ public class XLIFFKitWriterTest {
 					new RawDocumentToFilterEventsStep(),
 					
 					new XPipelineStep(new LeveragingStep(), 
-							//new Parameter("resourceClassName", net.sf.okapi.connectors.opentran.OpenTranTMConnector.class.getName()),
-							new XParameter("resourceClassName", net.sf.okapi.connectors.google.GoogleMTConnector.class.getName()),
+							//new XParameter("resourceClassName", net.sf.okapi.connectors.opentran.OpenTranTMConnector.class.getName()),
+							new XParameter("resourceClassName", net.sf.okapi.connectors.pensieve.PensieveTMConnector.class.getName()),
+							new XParameter("resourceParameters", params.toString(), true),
 							new XParameter("threshold", 80),
 							new XParameter("fillTarget", true)
 					),
@@ -214,6 +220,9 @@ public class XLIFFKitWriterTest {
 		String src1Path = pathBase + "src1/";
 		String src2Path = pathBase + "src2/";
 		//System.out.println(pathBase);
+		net.sf.okapi.connectors.pensieve.Parameters params = 
+			new net.sf.okapi.connectors.pensieve.Parameters();
+		params.setDbDirectory(pathBase + "testtm");
 		
 		new XPipeline(
 				"Test pipeline for XLIFFKitWriterStep",
@@ -289,7 +298,9 @@ public class XLIFFKitWriterTest {
 				new EventLogger()
 				,
 				new XPipelineStep(new LeveragingStep(), 
-						new XParameter("resourceClassName", net.sf.okapi.connectors.google.GoogleMTConnector.class.getName()),
+						//new XParameter("resourceClassName", net.sf.okapi.connectors.opentran.OpenTranTMConnector.class.getName()),
+						new XParameter("resourceClassName", net.sf.okapi.connectors.pensieve.PensieveTMConnector.class.getName()),
+						new XParameter("resourceParameters", params.toString(), true),
 						new XParameter("threshold", 80),
 						new XParameter("fillTarget", true)
 				),
@@ -312,6 +323,10 @@ public class XLIFFKitWriterTest {
 		String src1Path = pathBase + "src1/";
 		String src2Path = pathBase + "src2/";
 		//System.out.println(pathBase);
+		
+		net.sf.okapi.connectors.pensieve.Parameters params = 
+			new net.sf.okapi.connectors.pensieve.Parameters();
+		params.setDbDirectory(pathBase + "testtm");
 		
 		new XPipeline(
 				"Test pipeline for XLIFFKitWriterStep",
@@ -377,7 +392,9 @@ public class XLIFFKitWriterTest {
 						new RawDocumentToFilterEventsStep()
 				,				
 				new XPipelineStep(new LeveragingStep(), 
-						new XParameter("resourceClassName", net.sf.okapi.connectors.google.GoogleMTConnector.class.getName()),
+						//new XParameter("resourceClassName", net.sf.okapi.connectors.opentran.OpenTranTMConnector.class.getName()),
+						new XParameter("resourceClassName", net.sf.okapi.connectors.pensieve.PensieveTMConnector.class.getName()),
+						new XParameter("resourceParameters", params.toString(), true),
 						new XParameter("threshold", 80),
 						new XParameter("fillTarget", true)
 				),
@@ -400,6 +417,10 @@ public class XLIFFKitWriterTest {
 		String src2Path = pathBase + "src2/";
 		//System.out.println(pathBase);
 		
+		net.sf.okapi.connectors.pensieve.Parameters params = 
+			new net.sf.okapi.connectors.pensieve.Parameters();
+		params.setDbDirectory(pathBase + "testtm");
+		
 		RawDocumentToFilterEventsStep rd2fe = new RawDocumentToFilterEventsStep();
 		IFilter filter = new TableFilter();
 		rd2fe.setFilter(filter);
@@ -418,7 +439,9 @@ public class XLIFFKitWriterTest {
 				rd2fe
 				,				
 				new XPipelineStep(new LeveragingStep(), 
-						new XParameter("resourceClassName", net.sf.okapi.connectors.google.GoogleMTConnector.class.getName()),
+						//new XParameter("resourceClassName", net.sf.okapi.connectors.opentran.OpenTranTMConnector.class.getName()),
+						new XParameter("resourceClassName", net.sf.okapi.connectors.pensieve.PensieveTMConnector.class.getName()),
+						new XParameter("resourceParameters", params.toString(), true),
 						new XParameter("threshold", 80),
 						new XParameter("fillTarget", true)
 				),
@@ -443,6 +466,9 @@ public class XLIFFKitWriterTest {
 		String src1Path = pathBase + "src1/";
 		String src2Path = pathBase + "src2/";
 		//System.out.println(pathBase);
+		net.sf.okapi.connectors.pensieve.Parameters params = 
+			new net.sf.okapi.connectors.pensieve.Parameters();
+		params.setDbDirectory(pathBase + "testtm");
 		
 		new XPipeline(
 				"Test pipeline for XLIFFKitWriterStep",
@@ -516,7 +542,9 @@ public class XLIFFKitWriterTest {
 				new RawDocumentToFilterEventsStep()
 				,				
 				new XPipelineStep(new LeveragingStep(), 
-						new XParameter("resourceClassName", net.sf.okapi.connectors.google.GoogleMTConnector.class.getName()),
+						//new XParameter("resourceClassName", net.sf.okapi.connectors.opentran.OpenTranTMConnector.class.getName()),
+						new XParameter("resourceClassName", net.sf.okapi.connectors.pensieve.PensieveTMConnector.class.getName()),
+						new XParameter("resourceParameters", params.toString(), true),
 						new XParameter("threshold", 80),
 						new XParameter("fillTarget", true)
 				),
@@ -542,6 +570,9 @@ public class XLIFFKitWriterTest {
 		String src1Path = pathBase + "src1/";
 		String src2Path = pathBase + "src2/";
 		//System.out.println(pathBase);
+		net.sf.okapi.connectors.pensieve.Parameters params = 
+			new net.sf.okapi.connectors.pensieve.Parameters();
+		params.setDbDirectory(pathBase + "testtm");
 		
 		for(int i = 0; i < loops; i++) {
 		new XPipeline(
@@ -616,7 +647,9 @@ public class XLIFFKitWriterTest {
 				new RawDocumentToFilterEventsStep()
 				,				
 				new XPipelineStep(new LeveragingStep(), 
-						new XParameter("resourceClassName", net.sf.okapi.connectors.google.GoogleMTConnector.class.getName()),
+						//new XParameter("resourceClassName", net.sf.okapi.connectors.opentran.OpenTranTMConnector.class.getName()),
+						new XParameter("resourceClassName", net.sf.okapi.connectors.pensieve.PensieveTMConnector.class.getName()),
+						new XParameter("resourceParameters", params.toString(), true),
 						new XParameter("threshold", 80),
 						new XParameter("fillTarget", true)
 				),
@@ -647,6 +680,9 @@ public class XLIFFKitWriterTest {
 		String src1Path = pathBase + "src1/";
 		String src2Path = pathBase + "src2/";
 		//System.out.println(pathBase);
+		net.sf.okapi.connectors.pensieve.Parameters params = 
+			new net.sf.okapi.connectors.pensieve.Parameters();
+		params.setDbDirectory(pathBase + "testtm");
 		
 		new XPipeline(
 				"Test pipeline for XLIFFKitWriterStep",
@@ -712,7 +748,9 @@ public class XLIFFKitWriterTest {
 						new RawDocumentToFilterEventsStep()
 				,				
 				new XPipelineStep(new LeveragingStep(), 
-						new XParameter("resourceClassName", net.sf.okapi.connectors.google.GoogleMTConnector.class.getName()),
+						//new XParameter("resourceClassName", net.sf.okapi.connectors.opentran.OpenTranTMConnector.class.getName()),
+						new XParameter("resourceClassName", net.sf.okapi.connectors.pensieve.PensieveTMConnector.class.getName()),
+						new XParameter("resourceParameters", params.toString(), true),
 						new XParameter("threshold", 80),
 						new XParameter("fillTarget", true)
 				),
