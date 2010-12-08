@@ -152,22 +152,53 @@ public class TextUnit2Test {
     }
 
     @Test
-    public void loopThroughSegmentsType2 () {
-    	tu1 = createSegmentedTUAndTarget();
+    public void loopThroughSegmentsWithoutTargets () {
+    	ITextUnit tu = createSegmentedTU();
+    	tu.createTarget(locES, true, IResource.CREATE_EMPTY); // Not a copy of the source
     	Segment trgSeg;
-    	IAlignedSegments segs = tu1.getSegments();
-    	for ( Segment srcSeg : segs ) {
+    	for ( Segment srcSeg : tu.getSourceSegments() ) {
     		if ( srcSeg.id.equals("0") ) {
     			assertEquals("Part 1.", srcSeg.text.toString());
-    			trgSeg = segs.getCorrespondingTarget(srcSeg, locFR);
-    			assertEquals("Trg 1.", trgSeg.text.toString());
+    			trgSeg = tu.getTargetSegment(locFR, srcSeg.id, true); // FR
+    			assertEquals("", trgSeg.text.toString());
     		}
     		else {
     			assertEquals("Part 2.", srcSeg.text.toString());
-    			trgSeg = segs.getCorrespondingTarget(srcSeg, locFR);
-    			assertEquals("Trg 2.", trgSeg.text.toString());
+    			trgSeg = tu.getTargetSegment(locES, srcSeg.id, false); // ES
+    			assertNull(trgSeg);
     		}
     	}
+        assertEquals("[Part 1.] a [Part 2.]", fmt.printSegmentedContent(tu.getSource(), true));
+        assertTrue(tu.hasTarget(locFR));
+        assertEquals("[] a []", fmt.printSegmentedContent(tu.getTarget_DIFF(locFR), true));
+        assertTrue(tu.hasTarget(locES));
+        assertEquals("[]", fmt.printSegmentedContent(tu.getTarget_DIFF(locES), true));
+    }
+
+    @Test
+    public void getSourceSegments () {
+    	ITextUnit tu = createSegmentedTU();
+    	ISegments segs = tu.getSourceSegments();
+    	assertNotNull(segs);
+    	assertEquals(2, segs.count());
+    }
+
+    @Test
+    public void getExistingTargetSegments () {
+    	ITextUnit tu = createSegmentedTUAndTarget();
+    	ISegments segs = tu.getTargetSegments(locFR);
+    	assertNotNull(segs);
+    	assertEquals(2, segs.count());
+    	assertEquals("Trg 1.", segs.get(0).toString());
+    }
+
+    @Test
+    public void getNonExistingTargetSegments () {
+    	ITextUnit tu = createSegmentedTU();
+    	ISegments segs = tu.getTargetSegments(locES);
+    	assertNotNull(segs);
+    	assertEquals(2, segs.count());
+    	assertEquals("", segs.get(0).toString());
     }
 
     @Test

@@ -60,6 +60,7 @@ public interface ITextUnit extends INameable, IReferenceable {
 
     /**
 	 * Sets the target object for this text unit for a given locale.
+	 * <p>If the target does not exists, one is created.
 	 * Any existing content for the given locale is overwritten.
 	 * To set a target object based on the source, use the
 	 * {@link #createTarget(LocaleId, boolean, int)} method.
@@ -110,6 +111,10 @@ public interface ITextUnit extends INameable, IReferenceable {
 
 	/**
 	 * Sets the content of the target for a given locale for this TextUnit.
+	 * <p>If the target does not exists, one is created.
+	 * Any existing content for the given locale is overwritten.
+	 * To set a target object based on the source, use the
+	 * {@link #createTarget(LocaleId, boolean, int)} method.
 	 * @param locId the locale to set.
 	 * @param content the new content to set.
 	 * @return the new content for the given target locale for this text unit. 
@@ -123,9 +128,6 @@ public interface ITextUnit extends INameable, IReferenceable {
 	 */
 	IAlignedSegments getSegments ();
 	
-	
-	//=== Possible additions
-	
 	/**
 	 * Gets the segments for the source. Un-segmented content return a single segment.
 	 * @return an object implementing ISegments for the source content. 
@@ -134,6 +136,7 @@ public interface ITextUnit extends INameable, IReferenceable {
 
 	/**
 	 * Get the segments for a given target. Un-segmented content return a single segment.
+	 * <p>If the target does not exists, one is created.
 	 * @param trgLoc the locale of the target to retrieve.
 	 * @return an object implementing ISegments for the given target content.
 	 */
@@ -141,6 +144,7 @@ public interface ITextUnit extends INameable, IReferenceable {
 
 	/**
 	 * Gets the source segment for a given segment id.
+	 * <p>If the segment does not exists, one is created if <code>createIfNeeded</code> is true.
 	 * @param segId the id of the segment to retrieve.
 	 * @param createIfNeeded true to append a segment at the end of the content and return it 
 	 * if the segment does not exist yet. False to return null when the segment does not exists.
@@ -151,6 +155,8 @@ public interface ITextUnit extends INameable, IReferenceable {
 	
 	/**
 	 * Gets the segment for a given segment id in a given target.
+	 * <p>If the target does not exists, one is created.
+	 * <p>If the segment does not exists, one is created if <code>createIfNeeded</code> is true.
 	 * @param trgLoc the target locale to look up.
 	 * @param segId the id of the segment to retrieve.
 	 * @param createIfNeeded true to append a segment at the end of the target content and 

@@ -23,6 +23,7 @@ package net.sf.okapi.common.resource;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import static org.junit.Assert.*;
+
 import org.junit.Test;
 
 public class AlignedSegmentsTest {
@@ -36,6 +37,25 @@ public class AlignedSegmentsTest {
     	fmt = new GenericContent();
     }
     
+    @Test
+    public void loopThroughSegments () {
+    	ITextUnit tu = createSegmentedTUAndTarget();
+    	Segment trgSeg;
+    	IAlignedSegments as = tu.getSegments();
+    	for ( Segment srcSeg : as ) {
+    		if ( srcSeg.id.equals("0") ) {
+    			assertEquals("Part 1.", srcSeg.text.toString());
+    			trgSeg = as.getCorrespondingTarget(srcSeg, locFR);
+    			assertEquals("Trg 1.", trgSeg.text.toString());
+    		}
+    		else {
+    			assertEquals("Part 2.", srcSeg.text.toString());
+    			trgSeg = as.getCorrespondingTarget(srcSeg, locES);
+    			assertEquals("Objetivo 2.", trgSeg.text.toString());
+    		}
+    	}
+    }
+
     @Test
     public void getSegmentsTest () {
     	ITextUnit tu = new TextUnit2(TU1);

@@ -591,7 +591,7 @@ public class TextContainer implements Iterable<TextPart> {
 	/**
 	 * Gets the string representation of this container.
 	 * If the container is segmented, the representation shows the merged
-	 * segments.
+	 * segments. Inline codes are also included.
 	 * @return the string representation of this container.
 	 */
 	@Override

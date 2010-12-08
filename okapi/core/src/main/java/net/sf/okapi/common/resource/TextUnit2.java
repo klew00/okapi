@@ -417,8 +417,10 @@ public class TextUnit2 implements ITextUnit {
 	}
 
 	/**
-	 * Gets the string representation of the source text of this TextUnit.
-	 * @return the source text of this TextUnit.
+	 * Gets the string representation of the source container.
+	 * If the container is segmented, the representation shows the merged
+	 * segments. Inline codes are also included.
+	 * @return the string representation of the source container.
 	 */
 	@Override
 	public String toString () {
@@ -462,7 +464,7 @@ public class TextUnit2 implements ITextUnit {
 	
 	/**
 	 * Used by TextUnit clone method to copy over all annotations at once. 
-	 * @param annotations
+	 * @param annotations the new annotations to set.
 	 */
 	protected void setAnnotations (Annotations annotations) {
 		this.annotations = annotations;
@@ -692,11 +694,7 @@ public class TextUnit2 implements ITextUnit {
 		return source;
 	}
 
-	/**
-	 * Sets the source object for this TextUnit. Any existing source object is overwritten.
-	 * @param textContainer the source object to set.
-	 * @return the source object that has been set.
-	 */
+	@Override
 	public TextContainer setSource (TextContainer textContainer) {
 		if ( textContainer == null ) {
 			throw new NullPointerException("The source container of a TextUnit cannot be null.");
@@ -718,7 +716,6 @@ public class TextUnit2 implements ITextUnit {
 		TextContainer text)
 	{
 		targets.put(locId, text);
-		//TODO: invalidate the seg status
 		return text;
 	}
 
@@ -755,25 +752,15 @@ public class TextUnit2 implements ITextUnit {
 		return trgCont;
 	}
 
-	/**
-	 * Sets the content of the source for this TextUnit.
-	 * @param content the new content to set.
-	 * @return the new content of the source for this TextUnit. 
-	 */
+	@Override
 	public TextFragment setSourceContent (TextFragment content) {
         source.setContent(content);
         // We can use this because the setContent() removed any segmentation
         TextFragment tf = source.getSegments().getFirstContent();
-        //TODO: Invalidate targets segmentation
         return tf;
 	}
 
-	/**
-	 * Sets the content of the target for a given locale for this TextUnit.
-	 * @param locId the locale to set.
-	 * @param content the new content to set.
-	 * @return the new content for the given target locale for this text unit. 
-	 */
+	@Override
 	public TextFragment setTargetContent (LocaleId locId,
 		TextFragment content)
 	{
@@ -821,9 +808,6 @@ public class TextUnit2 implements ITextUnit {
 		return segments;
 	}
 
-	
-	//=== Possible additions
-	
 	@Override
 	public ISegments getSourceSegments () {
 		return source.getSegments();
