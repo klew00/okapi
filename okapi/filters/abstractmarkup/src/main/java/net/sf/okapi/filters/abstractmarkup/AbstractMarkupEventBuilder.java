@@ -23,7 +23,6 @@ package net.sf.okapi.filters.abstractmarkup;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import net.htmlparser.jericho.CharacterReference;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.EventBuilder;
 import net.sf.okapi.common.filters.InlineCodeFinder;
@@ -69,7 +68,7 @@ public class AbstractMarkupEventBuilder extends EventBuilder {
 		// We can use getFirstPartContent() because nothing is segmented
 		TextFragment text = textUnit.getSource().getFirstContent();
 		// Treat the white spaces
-		text.setCodedText(normalizeHtmlText(text.getCodedText(), false, isPreserveWhitespace()));
+		text.setCodedText(normalizeHtmlText(text.getCodedText(), false, textUnit.preserveWhitespaces()));
 		// Apply the in-line codes rules if needed
 		if ( useCodeFinder ) {
 			codeFinder.process(text);

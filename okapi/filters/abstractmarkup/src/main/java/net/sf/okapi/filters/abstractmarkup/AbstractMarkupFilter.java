@@ -50,6 +50,7 @@ import net.htmlparser.jericho.Tag;
 
 import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.AbstractFilter;
@@ -515,16 +516,17 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 * 
 	 * @param tag
 	 */
-	protected void handleCdataSection(Tag tag) {	
-		if (cdataSubfilter != null) {	
-			// end any skeleton so we can start CDATA section with subfilter
-			if (eventBuilder.hasUnfinishedSkeleton()) {
-				endDocumentPart();
-			}
-			
+	protected void handleCdataSection(Tag tag) {
+		// end any skeleton so we can start CDATA section with subfilter
+		if (eventBuilder.hasUnfinishedSkeleton()) {
+			endDocumentPart();
+		}
+
+		String cdataWithoutMarkers = CDATA_START_PATTERN.matcher(tag.toString()).replaceFirst("");
+		cdataWithoutMarkers = CDATA_END_PATTERN.matcher(cdataWithoutMarkers).replaceFirst("");
+
+		if (cdataSubfilter != null) {				
 			String parentId = eventBuilder.findMostRecentParentId();
-			String cdataWithoutMarkers = CDATA_START_PATTERN.matcher(tag.toString()).replaceFirst("");
-			cdataWithoutMarkers = CDATA_END_PATTERN.matcher(cdataWithoutMarkers).replaceFirst("");
 			cdataSubfilter.close();
 			
 			parentId = (parentId == null ? getDocumentId().getLastId() : parentId); 
@@ -542,7 +544,13 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 			}			
 			cdataSubfilter.close();			
 		} else {
-			addToDocumentPart(tag.toString());
+			// we assume the CDATA is plain text take it as is
+			startTextUnit(new GenericSkeleton("<![CDATA["));
+			addToTextUnit(cdataWithoutMarkers);
+			setTextUnitType(TextUnit.TYPE_CDATA);
+			setTextUnitMimeType(MimeTypeMapper.PLAIN_TEXT_MIME_TYPE);
+			setTextUnitPreserveWhitespace(true);
+			endTextUnit(new GenericSkeleton("]]>"));
 		}
 	}
 
@@ -1102,6 +1110,10 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		eventBuilder.setPreserveWhitespace(preserveWhitespace);
 	}
 
+	protected void setTextUnitPreserveWhitespace(boolean preserveWhitespace) {
+		eventBuilder.setTextUnitPreserveWhitespace(preserveWhitespace);
+	}
+	
 	protected void addToDocumentPart(String part) {
 		eventBuilder.addToDocumentPart(part);
 	}
@@ -1205,6 +1217,10 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 
 	protected void setTextUnitId(long id) {
 		eventBuilder.setTextUnitId(id);
+	}
+	
+	protected void setTextUnitMimeType(String mimeType) {
+		eventBuilder.setTextUnitMimeType(mimeType);
 	}
 
 	protected long getDocumentPartId() {
