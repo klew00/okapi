@@ -19,6 +19,7 @@
         <module>mif</module>
         <module>openoffice</module>
         <module>openxml</module>
+        <module>mosestext</module>
         <module>pensieve</module>
         <module>plaintext</module>
         <module>po</module>
