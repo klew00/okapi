@@ -58,7 +58,11 @@ public class TextUnit implements INameable, IReferenceable {
 	 * Resource type value for a header.
 	 */
 	public static final String TYPE_HEADER = "header";
-	
+	/**
+	 * Resource type value for a cdata section.
+	 */
+	public static final String TYPE_CDATA = "cdata";
+
 	private static final int TARGETS_INITCAP = 2;
 	
 	private String id;

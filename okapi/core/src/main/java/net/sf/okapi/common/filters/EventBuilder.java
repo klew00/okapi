@@ -1250,15 +1250,39 @@ public class EventBuilder {
 	public void setMimeType(String mimeType) {
 		this.mimeType = mimeType;
 	}
+	
+	/**
+	 * Set the mime type on the current {@link TextUnit}
+	 * @param mimeType - mime type
+	 */
+	public void setTextUnitMimeType(String mimeType) {
+		TextUnit tu = peekMostRecentTextUnit();
+		if (tu != null) {
+			tu.setMimeType(mimeType);
+		}
+	}
 
 	/**
 	 * Tell the {@link IFilter} what to do with whitespace.
 	 * 
 	 * @param preserveWhitespace
-	 *            the preserveWhitespace as boolean.
-	 */
+	 *            the preserveWhitespace as boolean.	
+	 */	
 	public void setPreserveWhitespace(boolean preserveWhitespace) {
 		this.preserveWhitespace = preserveWhitespace;
+	}
+	
+	/**
+	 * Set preserve whitespace flag on current {@link TextUnit}
+	 * 
+	 * @param preserveWhitespace
+	 *            the preserveWhitespace as boolean.
+	 */
+	public void setTextUnitPreserveWhitespace(boolean preserveWhitespace) {
+		TextUnit tu = peekMostRecentTextUnit();
+		if (tu != null) {
+			tu.setPreserveWhitespaces(preserveWhitespace);
+		}
 	}
 	
 	/**
