@@ -100,11 +100,11 @@ public class TTXSkeletonWriter extends GenericSkeletonWriter {
 					tmp.append(processSegment(srcSeg.text, trgSeg.text, altTrans));
 				}
 				else {
-					tmp.append(processFragment(part.getContent()));
+					tmp.append(processFragment(part.getContent(), 0)); // Normal text
 				}
 			}
-			else {
-				tmp.append(processFragment(part.getContent()));
+			else { // Inter-segment parts
+				tmp.append(processFragment(part.getContent(), 1));
 			}
 			i++;
 		}
@@ -142,13 +142,34 @@ public class TTXSkeletonWriter extends GenericSkeletonWriter {
 		}
 		
 		tmp.append(String.format("<Tuv Lang=\"%s\">", srcLangCode));
-		tmp.append(processFragment(srcFrag));
+		tmp.append(processFragment(srcFrag, 1));
 		tmp.append("</Tuv>");
 		
 		tmp.append(String.format("<Tuv Lang=\"%s\">", trgLangCode));
-		tmp.append(processFragment(trgFrag));
+		
+		if ( layer != null ) {
+			if ( altTrans != null ) {
+				// This is an entry with source and target
+				tmp.append(layer.endCode());
+				tmp.append(layer.startSegment());
+				tmp.append(processFragment(srcFrag, 1));
+				tmp.append(layer.midSegment(altTrans.getScore()));
+				tmp.append(processFragment(trgFrag, 0));
+				tmp.append(layer.endSegment());
+				tmp.append(layer.startCode());
+			}
+			else {
+				// Write target only
+				tmp.append(layer.endCode()); 
+				tmp.append(processFragment(trgFrag, 0));
+				tmp.append(layer.startCode()); 
+			}
+		}
+		else {
+			tmp.append(processFragment(trgFrag, 0));
+		}
+		
 		tmp.append("</Tuv>");
-
 		tmp.append("</Tu>");
 		return tmp.toString();
 	}
@@ -167,21 +188,28 @@ public class TTXSkeletonWriter extends GenericSkeletonWriter {
 		}
 	}
 	
-	protected String processFragment (TextFragment frag) {
+	/**
+	 * Outputs a fragment.
+	 * @param frag the fragment to output
+	 * @param context output context: 0=text, 1=skeleton
+	 * @return the output string.
+	 */
+	protected String processFragment (TextFragment frag,
+		int context)
+	{
 		StringBuilder tmp = new StringBuilder();
 		String text = frag.getCodedText();
 
-		// No MARKER_SEGMENT at this stage
 		for ( int i=0; i<text.length(); i++ ) {
 			char ch = text.charAt(i);
 			switch ( ch ) {
 			case TextFragment.MARKER_ISOLATED:
 			case TextFragment.MARKER_OPENING:
 			case TextFragment.MARKER_CLOSING:
-				tmp.append(expandCode(frag.getCode(text.charAt(++i))));
+				tmp.append(expandCode(frag.getCode(text.charAt(++i)), context));
 				continue;
 			default:
-				tmp.append(encoderManager.encode(ch, 0));
+				tmp.append(encoderManager.encode(ch, context));
 				continue;
 			}
 		}
@@ -189,12 +217,20 @@ public class TTXSkeletonWriter extends GenericSkeletonWriter {
 		return tmp.toString(); 
 	}
 
-	private String expandCode (Code code) {
+	private String expandCode (Code code,
+		int context)
+	{
 		if ( layer != null ) {
-			return layer.startInline() 
-				+ layer.encode(code.getOuterData(), 2)
-				+ layer.endInline();
+			if ( context == 0 ) { // Parent is text -> codes are inline
+				return layer.startInline() 
+					+ layer.encode(code.getOuterData(), 2)
+					+ layer.endInline();
+			}
+			else {
+				return layer.encode(code.getOuterData(), 1);
+			}
 		}
+		// Else: no layer
 		return code.getOuterData();
 	}
 

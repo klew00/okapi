@@ -44,7 +44,7 @@ public class IdGenerator {
 	/**
 	 * Creates a generator with a given root and no prefix.
 	 * @param root
-	 * 	the root to use (case-sensitive)
+	 * 	the root to use (case-sensitive, can be null)
 	 */
 	public IdGenerator (String root) {
 		create(root, "");
@@ -53,9 +53,9 @@ public class IdGenerator {
 	/**
 	 * Creates a generator with a given root and a given prefix.
 	 * @param root
-	 * 	the root to use (case-sensitive)
+	 * 	the root to use (case-sensitive, can be null)
 	 * @param prefix
-	 * 	the prefix to use (case-sensitive)
+	 * 	the prefix to use (case-sensitive, can be null)
 	 */
 	public IdGenerator (String root,
 		String prefix)

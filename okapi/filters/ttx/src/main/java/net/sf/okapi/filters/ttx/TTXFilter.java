@@ -603,10 +603,10 @@ public class TTXFilter implements IFilter {
 				// Use the skeleton writer processFragment() to get the output
 				// so any outer data is generated.
 				if ( srcCont.contentIsOneSegment() ) {
-					skel.append(skelWriter.processFragment(srcCont.getFirstContent()));
+					skel.append(skelWriter.processFragment(srcCont.getFirstContent(), 1));
 				}
 				else { // Merge all if there is more than one segment
-					skel.append(skelWriter.processFragment(srcCont.getUnSegmentedContentCopy()));
+					skel.append(skelWriter.processFragment(srcCont.getUnSegmentedContentCopy(), 1));
 				}
 				tu = null;
 				return false; // No return from filter

@@ -274,7 +274,6 @@ public class TMXWriter {
     		}
     	}
 
-    	//TODO: Output only the items with real match or translations (not copy of source)		
     	AltTranslationsAnnotation atAnn = null;
 		for ( Segment srcSeg : srcTC.getSegments() ) {
     		TextFragment tf = srcSeg.text;
@@ -283,15 +282,16 @@ public class TMXWriter {
 				trgSeg = trgTC.getSegments().get(srcSeg.id);
 			}
 			if ( trgSeg == null ) {
-	       		writeTU(tf, null, String.format("%s_s%s", tuid, srcSeg.id), attributes);
+	       		// No target segment
 				continue;
 			}
 			// Get annotation
 			AltTranslation at = null;
 			atAnn = trgSeg.getAnnotation(AltTranslationsAnnotation.class);
-			if ( atAnn != null ) {
-				at = atAnn.getFirst();
+			if ( atAnn == null ) {
+				continue;
 			}
+			at = atAnn.getFirst();
     		if ( at != null ) {
 				// Now see if we need to alter the source text
 				if ( at.fromMT() ) {
