@@ -10,6 +10,12 @@
 and line 2
 and line 3.</source>
 </trans-unit>
+<?abc stuff in-between XLIFF elements?>
+<!-- Comment that should be preserved-->
+<trans-unit id="tu3">
+<source xml:lang="en"><g id="1">word1</g>, <bpt id="2">b-codeA</bpt>word2<ept id="2">e-codeA</ept>,
+<ph id="3">codeB</ph>word3, <x id="4"/>word5, <mrk mtype="protected">to protect</mrk>, etc.</source>
+</trans-unit>
 </body>
 </file>
 </xliff>

@@ -323,6 +323,27 @@ public class XLIFFFilterTest {
 	}
 
 	@Test
+	public void testMrk () {
+		TextUnit tu = FilterTestDriver.getTextUnit(createTUWithMrk(), 1);
+		assertNotNull(tu);
+		assertTrue(tu.getSource().getFirstContent().hasCode());
+		assertEquals("t1t2", tu.getSource().toString()); // mrk has empty data (native data is in outerdata)
+	}
+
+	@Test
+	public void testOutputMrk () {
+		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><xliff version=\"1.2\">\r"
+			+ "<file source-language=\"en\" target-language=\"fr\" datatype=\"x-test\" original=\"file.ext\">"
+			+ "<body>"
+			+ "<trans-unit id=\"1\"><source>t1<mrk mtype=\"x-abc\">t2</mrk></source>"
+			+ "<target xml:lang=\"fr\">t1<mrk mtype=\"x-abc\">t2</mrk></target>\r"
+			+ "</trans-unit>"
+			+ "</body>"
+			+ "</file></xliff>";
+		assertEquals(expected, FilterTestDriver.generateOutput(createTUWithMrk(),
+			locFR, filter.createSkeletonWriter(), filter.getEncoderManager()));
+	}
+	@Test
 	public void testAlTrans () {
 		TextUnit tu = FilterTestDriver.getTextUnit(createTUWithAltTrans(), 1);
 		assertNotNull(tu);
@@ -876,6 +897,18 @@ public class XLIFFFilterTest {
 			+ "<x:target>translated t1</x:target></x:trans-unit>"
 			+ "</x:body>"
 			+ "</x:file></x:xliff>";
+		return getEvents(snippet);
+	}
+	
+	private ArrayList<Event> createTUWithMrk () {
+		String snippet = "<?xml version=\"1.0\"?>\r"
+			+ "<xliff version=\"1.2\">\r"
+			+ "<file source-language=\"en\" target-language=\"fr\" datatype=\"x-test\" original=\"file.ext\">"
+			+ "<body>"
+			+ "<trans-unit id=\"1\"><source>t1<mrk mtype=\"x-abc\">t2</mrk></source>"
+			+ "</trans-unit>"
+			+ "</body>"
+			+ "</file></xliff>";
 		return getEvents(snippet);
 	}
 	

@@ -98,11 +98,12 @@ public class MosesTextFilterWriterTest {
 		String res = generateOutput(getEventsFromFile(xlfFilter, root+"Test-XLIFF02.xlf"));
 		
 		// Check the Moses output
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(res), 4);
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(res), 5);
 		assertNotNull(tu);
 		// Here two TUs are 5 entries because of the line breaks
-		assertEquals("4", tu.getId());
-		assertEquals("and line 3.", tu.getSource().toString());
+		assertEquals("5", tu.getId());
+		assertEquals("<g id=\"1\">word1</g>, <g id=\"2\">word2</g>, <x id=\"3\"/>word3, <x id=\"4\"/>word5, <mrk mtype=\"protected\">to protect</mrk>, etc.",
+			tu.getSource().toString());
 	}
 
 	private String generateOutput (List<Event> list) {

@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
@@ -36,11 +37,13 @@ import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiFileNotFoundException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
-import net.sf.okapi.common.filterwriter.XLIFFContent;
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 
 /**
  * Implementation of the {@link IFilterWriter} interface for Moses Text files.
@@ -53,7 +56,6 @@ public class MosesTextFilterWriter implements IFilterWriter {
 	private String outputPath;
 	private OutputStreamWriter writer;
 	private LocaleId trgLoc;
-	private XLIFFContent fmt;
 	private String lineBreak;
 	
 	@Override
@@ -152,7 +154,6 @@ public class MosesTextFilterWriter implements IFilterWriter {
 			throw new OkapiIOException(e);
 		}
 		// Initialize the variables
-		fmt = new XLIFFContent();
 		lineBreak = sd.getLineBreak();
 	}
 	
@@ -168,7 +169,7 @@ public class MosesTextFilterWriter implements IFilterWriter {
 
 			// Process by segments
 			for ( Segment seg : tc.getSegments() ) {
-				String out = fmt.setContent(seg.text).toString(0, false, false, true);
+				String out = toMosesText(seg.text);
 				if ( hasLineBreak(out) ) {
 					//TODO: special mrk to mark the lines for a given segment
 					writer.write(out.replace("\n", lineBreak));
@@ -187,4 +188,132 @@ public class MosesTextFilterWriter implements IFilterWriter {
 	private boolean hasLineBreak (String text) {
 		return false;
 	}
+
+	/**
+	 * Convert a text fragment into a Moses string.
+	 * @param frag the fragment to convert.
+	 * @return the Moses text for the given fragment.
+	 */
+	public String toMosesText (TextFragment frag) {
+		boolean gMode = true;
+		boolean escapeGT = false;
+		int quoteMode = 0;
+		
+		String codedText = frag.getCodedText();
+		List<Code> codes = frag.getCodes();
+		
+		StringBuilder tmp = new StringBuilder();
+		int index;
+		Code code;
+		
+		for ( int i=0; i<codedText.length(); i++ ) {
+			switch ( codedText.codePointAt(i) ) {
+			case TextFragment.MARKER_OPENING:
+				index = TextFragment.toIndex(codedText.charAt(++i));
+				code = codes.get(index);
+				if ( code.hasData() ) {
+					if ( gMode ) {
+						tmp.append(String.format("<g id=\"%d\">", code.getId()));
+					}
+					else {
+						tmp.append(String.format("<bpt id=\"%d\">", code.getId()));
+						tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
+						tmp.append("</bpt>");
+					}
+				}
+				else {
+					// Marker
+					tmp.append(code.getOuterData());
+				}
+				break;
+			case TextFragment.MARKER_CLOSING:
+				index = TextFragment.toIndex(codedText.charAt(++i));
+				code = codes.get(index);
+				if ( code.hasData() ) {
+					if ( gMode ) {
+						tmp.append("</g>");
+					}
+					else {
+						tmp.append(String.format("<ept id=\"%d\">", code.getId()));
+						tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
+						tmp.append("</ept>");
+					}
+				}
+				else {
+					// Marker
+					tmp.append(code.getOuterData());
+				}
+				break;
+			case TextFragment.MARKER_ISOLATED:
+				index = TextFragment.toIndex(codedText.charAt(++i));
+				code = codes.get(index);
+				if ( gMode ) {
+					if ( code.getTagType() == TagType.OPENING ) {
+						tmp.append(String.format("<bx id=\"%d\"/>", code.getId()));
+					}
+					else if ( code.getTagType() == TagType.CLOSING ) {
+						tmp.append(String.format("<ex id=\"%d\"/>", code.getId()));
+					}
+					else {
+						tmp.append(String.format("<x id=\"%d\"/>", code.getId()));
+					}
+				}
+				else {
+					if ( code.getTagType() == TagType.OPENING ) {
+						tmp.append(String.format("<it id=\"%d\" pos=\"open\">", code.getId()));
+						tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
+						tmp.append("</it>");
+					}
+					else if ( code.getTagType() == TagType.CLOSING ) {
+						tmp.append(String.format("<it id=\"%d\" pos=\"close\">", code.getId()));
+						tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
+						tmp.append("</it>");
+					}
+					else {
+						tmp.append(String.format("<ph id=\"%d\">", code.getId()));
+						tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
+						tmp.append("</ph>");
+					}
+				}
+				break;
+			case '>':
+				if ( escapeGT ) tmp.append("&gt;");
+				else {
+					if (( i > 0 ) && ( codedText.charAt(i-1) == ']' )) 
+						tmp.append("&gt;");
+					else
+						tmp.append('>');
+				}
+				break;
+			case '<':
+				tmp.append("&lt;");
+				break;
+			case '&':
+				tmp.append("&amp;");
+				break;
+			case '"':
+				if ( quoteMode > 0 ) tmp.append("&quot;");
+				else tmp.append('"');
+				break;
+			case '\'':
+				switch ( quoteMode ) {
+				case 1:
+					tmp.append("&apos;");
+					break;
+				case 2:
+					tmp.append("&#39;");
+					break;
+				default:
+					tmp.append(codedText.charAt(i));
+					break;
+				}
+				break;
+			default:
+				tmp.append(codedText.charAt(i));
+				break;
+			}
+		}
+		return tmp.toString();
+	}
+
 }
