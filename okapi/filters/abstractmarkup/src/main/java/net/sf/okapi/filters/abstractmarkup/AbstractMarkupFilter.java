@@ -548,8 +548,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 			startTextUnit(new GenericSkeleton("<![CDATA["));
 			addToTextUnit(cdataWithoutMarkers);
 			setTextUnitType(TextUnit.TYPE_CDATA);
-			setTextUnitMimeType(MimeTypeMapper.PLAIN_TEXT_MIME_TYPE);
-			setTextUnitPreserveWhitespace(true);
+			setTextUnitMimeType(MimeTypeMapper.PLAIN_TEXT_MIME_TYPE);			
 			endTextUnit(new GenericSkeleton("]]>"));
 		}
 	}
