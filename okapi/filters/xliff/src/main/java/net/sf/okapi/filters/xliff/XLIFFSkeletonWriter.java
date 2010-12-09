@@ -24,6 +24,12 @@ import java.util.logging.Logger;
 
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.Util;
+import net.sf.okapi.common.annotation.AltTranslation;
+import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
+import net.sf.okapi.common.filterwriter.XLIFFContent;
+import net.sf.okapi.common.filterwriter.XLIFFWriter;
+import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.INameable;
 import net.sf.okapi.common.resource.IReferenceable;
 import net.sf.okapi.common.resource.Property;
@@ -41,18 +47,22 @@ import net.sf.okapi.common.skeleton.StorageList;
 public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 
 	public static final String SEGSOURCEMARKER = "[@#$SEGSRC$#@]";
+	public static final String ALTTRANSMARKER = "[@#$ALTTRANS$#@]";
 	
 	private final Logger logger = Logger.getLogger(getClass().getName());
 	
 	private Parameters params;
+	private XLIFFContent fmt;
 
 	// For serialization
 	public XLIFFSkeletonWriter () {
 		params = new Parameters();
+		fmt = new XLIFFContent();
 	}
 	
 	public XLIFFSkeletonWriter (Parameters params) {
 		this.params = params;
+		fmt = new XLIFFContent();
 	}
 	
 	@Override
@@ -63,6 +73,9 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 		if ( part.toString().startsWith(SEGSOURCEMARKER) ) {
 			// There is normally a text unit associated
 			return getSegSourceOutput((TextUnit)part.getParent());
+		}
+		else if ( part.toString().startsWith(ALTTRANSMARKER) ) {
+			return getNewAltTransOutput((TextUnit)part.getParent());
 		}
 		
 		// If it is not a reference marker, just use the data
@@ -162,7 +175,7 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 			// We fall back to source
 			trgCont = srcCont;
 		}
-		// We if show segments, makw sure both entries are actually segmented
+		// We if show segments, make sure both entries are actually segmented
 //		if ( doSegments ) {
 //			doSegments = trgCont.hasBeenSegmented();
 //			if ( doSegments ) {
@@ -215,6 +228,68 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 		}
 		
 		return tmp.toString();
+	}
+	
+	private String getNewAltTransOutput (TextUnit tu) {
+		if ( !params.getAddAltTrans() ) {
+			return "";
+		}
+		// Empty?
+		if ( tu.getSource().isEmpty() ) {
+			return ""; // Empty
+		}
+		if ( !tu.hasTarget(outputLoc) ) {
+			return ""; // Nothing to output
+		}
+		
+		StringBuilder tmp = new StringBuilder();
+		TextContainer tc = tu.getTarget(outputLoc);
+		// From the target container
+		formatAltTranslations(tc.getAnnotation(AltTranslationsAnnotation.class), null, tmp);
+		// From the segments
+		for ( Segment seg : tc.getSegments() ) {
+			formatAltTranslations(seg.getAnnotation(AltTranslationsAnnotation.class), seg, tmp);
+		}
+		
+		return tmp.toString();
+	}
+
+	private void formatAltTranslations (AltTranslationsAnnotation ann,
+		Segment segment,
+		StringBuilder sb)
+	{
+		if ( ann == null ) {
+			return; // No annotation
+		}
+		for ( AltTranslation alt : ann ) {
+			if ( alt.getScore() <= 0 ) continue;
+			if ( alt.getFromOriginal() ) continue; // New alt-trans only
+			
+			sb.append("<alt-trans");
+			if ( segment != null ) {
+				sb.append(String.format(" mid=\"%s\":", Util.escapeToXML(segment.getId(), 0, false, null)));
+			}
+			sb.append(String.format(" match-quality=\"%d\"", alt.getScore()));
+			if ( !Util.isEmpty(alt.getOrigin()) ) {
+				sb.append(String.format(" origin=\"%s\"", Util.escapeToXML(alt.getOrigin(), 0, false, null)));
+			}
+			if ( alt.getType() != MatchType.UKNOWN ) {
+				sb.append(" xmlns:okp=\""+XLIFFWriter.NS_XLIFFOKAPI+"\"");
+				sb.append(String.format(" okp:"+XLIFFWriter.OKP_MATCHTYPE+"=\"%s\"", alt.getType().toString()));
+			}
+			sb.append(">"+encoderManager.getLineBreak());
+			TextContainer cont = alt.getSource();
+			if ( !cont.isEmpty() ) {
+				sb.append(String.format("<source xml:lang=\"%s\">", alt.getSourceLocale().toString()));
+				// Write full source content (never with segments markers)
+				sb.append(fmt.toSegmentedString(cont, 0, false, false, true));
+				sb.append("</source>"+encoderManager.getLineBreak()); // source
+			}
+			sb.append(String.format("<target xml:lang=\"%s\">", alt.getTargetLocale().toString()));
+			sb.append(fmt.toSegmentedString(alt.getTarget(), 0, false, false, true));
+			sb.append("</target>"+encoderManager.getLineBreak()); // target
+			sb.append("</alt-trans>"+encoderManager.getLineBreak()); // alt-trans
+		}
 	}
 	
 	private String getUnsegmentedOutput (TextContainer cont,

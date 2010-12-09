@@ -40,6 +40,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private static final String OVERRIDETARGETLANGUAGE = "overrideTargetLanguage";
 	private static final String OUTPUTSEGMENTATIONTYPE = "outputSegmentationType";
 	private static final String IGNOREINPUTSEGMENTATION = "ignoreInputSegmentation";
+	private static final String ADDALTTRANS = "addAltTrans";
 	
 	private boolean fallbackToID;
 	private boolean escapeGT;
@@ -47,50 +48,13 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private boolean overrideTargetLanguage;
 	private int outputSegmentationType;
 	private boolean ignoreInputSegmentation;
+	private boolean addAltTrans;
 	
-	// Not used for now
-//	private boolean useStateValues;
-//	private boolean extractOnlyMatchingValues;
-//	private String stateValues;
-//	private boolean extractNoState;
-
 	public Parameters () {
 		reset();
 		toString(); // fill the list
 	}
 	
-//	public boolean getUseStateValues () {
-//		return useStateValues;
-//	}
-//
-//	public void setUseStateValues (boolean useStateValues) {
-//		this.useStateValues = useStateValues;
-//	}
-//
-//	public boolean getExtractOnlyMatchingValues () {
-//		return extractOnlyMatchingValues;
-//	}
-//
-//	public void setExtractOnlyMatchingValues (boolean extractOnlyMatchingValues) {
-//		this.extractOnlyMatchingValues = extractOnlyMatchingValues;
-//	}
-//
-//	public String getStateValues () {
-//		return stateValues;
-//	}
-//
-//	public void setStateValues (String stateValues) {
-//		this.stateValues = stateValues;
-//	}
-//
-//	public boolean getExtractNoState () {
-//		return extractNoState;
-//	}
-//
-//	public void setExtractNoState (boolean extractNoState) {
-//		this.extractNoState = extractNoState;
-//	}
-
 	public boolean getEscapeGT () {
 		return escapeGT;
 	}
@@ -139,47 +103,46 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.ignoreInputSegmentation = ignoreInputSegmentation;
 	}
 
+	public boolean getAddAltTrans () {
+		return this.addAltTrans;
+	}
+	
+	public void setaddAltTrans (boolean addAltTrans) {
+		this.addAltTrans = addAltTrans;
+	}
+
 	public void reset () {
-//		useStateValues = true;
-//		stateValues = "new|needs-translation";
-//		extractOnlyMatchingValues = true;
-//		extractNoState = true;
 		fallbackToID = false;
 		escapeGT = false;
 		addTargetLanguage = true;
 		overrideTargetLanguage = false;
 		outputSegmentationType = SEGMENTATIONTYPE_ORIGINAL;
 		ignoreInputSegmentation = false;
+		addAltTrans = false;
 	}
 
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
-//		useStateValues = buffer.getBoolean("useStateValues", useStateValues);
-//		extractOnlyMatchingValues = buffer.getBoolean("extractOnlyMatchingValues", extractOnlyMatchingValues);
-//		stateValues = buffer.getString("stateValues", stateValues);
-//		extractNoState = buffer.getBoolean("extractNoState", extractNoState);
 		fallbackToID = buffer.getBoolean(FALLBACKTOID, fallbackToID);
 		escapeGT = buffer.getBoolean(XMLEncoder.ESCAPEGT, escapeGT);
 		addTargetLanguage = buffer.getBoolean(ADDTARGETLANGUAGE, addTargetLanguage);
 		overrideTargetLanguage = buffer.getBoolean(OVERRIDETARGETLANGUAGE, overrideTargetLanguage);
 		outputSegmentationType = buffer.getInteger(OUTPUTSEGMENTATIONTYPE, outputSegmentationType);
 		ignoreInputSegmentation = buffer.getBoolean(IGNOREINPUTSEGMENTATION, ignoreInputSegmentation);
+		addAltTrans = buffer.getBoolean(ADDALTTRANS, addAltTrans);
 	}
 
 	@Override
 	public String toString () {
 		buffer.reset();
-//		buffer.setBoolean("useStateValues", useStateValues);
-//		buffer.setBoolean("extractOnlyMatchingValues", extractOnlyMatchingValues);
-//		buffer.setString("stateValues", stateValues);
-//		buffer.setBoolean("extractNoState", extractNoState);
 		buffer.setBoolean(FALLBACKTOID, fallbackToID);
 		buffer.setBoolean(XMLEncoder.ESCAPEGT, escapeGT);
 		buffer.setBoolean(ADDTARGETLANGUAGE, addTargetLanguage);
 		buffer.setBoolean(OVERRIDETARGETLANGUAGE, overrideTargetLanguage);
 		buffer.setInteger(OUTPUTSEGMENTATIONTYPE, outputSegmentationType);
 		buffer.setBoolean(IGNOREINPUTSEGMENTATION, ignoreInputSegmentation);
+		buffer.setBoolean(ADDALTTRANS, addAltTrans);
 		return buffer.toString();
 	}
 	
@@ -192,6 +155,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.add(ADDTARGETLANGUAGE, "Add the target-language attribute if not present", null);
 		desc.add(OVERRIDETARGETLANGUAGE, "Override the target language of the XLIFF document", null);
 		desc.add(OUTPUTSEGMENTATIONTYPE, "Type of output segmentation", "Indicates wether to segment or not the text content in output");
+		desc.add(ADDALTTRANS, "Add new <alt-trans> elements if possible", "Indicates wether or not to add <alt-trans> elements not alreay in the document");
 		return desc;
 	}
 
@@ -218,6 +182,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		ListSelectionPart lsp = desc.addListSelectionPart(paramDesc.get(OUTPUTSEGMENTATIONTYPE), values);
 		lsp.setChoicesLabels(labels);
 		
+		desc.addCheckboxPart(paramDesc.get(ADDALTTRANS));
+
 		return desc;
 	}
 

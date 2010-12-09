@@ -54,6 +54,10 @@ distribution.</p>
 	<li>Added support for term list in CSV format.</li>
 </ul>
 	</li>
+	<li>Tikal:<ul>
+	<li>Added the -xm command to extract files to Moses text format.</li>
+</ul>
+	</li>
 	<li>Steps:<ul>
 	<li><span class="str">Added the RTF Conversion Step, and replaced the &quot;RTF 
 	Conversion&quot; utility by a pre-defined pipeline.</span></li>
@@ -106,10 +110,14 @@ distribution.</p>
 	<li>Fixed issue #145 about PI being moved.</li>
 	<li>Fixed issue #150 about inline codes being incorrectly escaped.</li>
 	<li>Changed default so apostrophes are not escaped in output.</li>
+	<li>Implemented default extraction for CDATA sections when no sub-filter is 
+	defined.</li>
+	<li>Fixed issue </li>
 </ul>
 	</li>
 	<li>HTML Filter:<ul>
 	<li>Fixed escaping of inline codes detected using the codeFinder option.</li>
+	<li>Fixed issue #90 (CDATA section not extracted)</li>
 </ul>
 	</li>
 	<li>IDML Filter:<ul>
@@ -131,6 +139,8 @@ distribution.</p>
 	<li>XLIFF Filter:<ul>
 	<li>Added the option to override the original target language.</li>
 	<li>Improved mapping of alt-trans attributes to Okapi annotations.</li>
+	<li>Implemented option to add possible new &lt;alt-trans&gt; elements in output 
+	files&nbsp; (in addition to the one in the original document).</li>
 </ul>
 	</li>
 </ul>

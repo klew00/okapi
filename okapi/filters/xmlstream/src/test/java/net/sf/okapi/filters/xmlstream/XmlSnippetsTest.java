@@ -253,14 +253,28 @@ public class XmlSnippetsTest {
 				xmlStreamFilter));
 	}
 
-//	@Test
-//	public void testCdataSectionExtraction () {
-//		String snippet = "<doc><![CDATA[<b> text]]></doc>";
-//		ArrayList<Event> events = XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters);
-//		TextUnit tu = FilterTestDriver.getTextUnit(events, 1);
-//		assertNotNull(tu);
-//		assertEquals("<b> text", tu.toString());
-//	}
+	@Test
+	public void testCdataSectionExtraction () {
+		String snippet = "<doc><![CDATA[<b> text]]></doc>";
+		ArrayList<Event> events = XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters);
+		TextUnit tu = FilterTestDriver.getTextUnit(events, 1);
+		assertNotNull(tu);
+		assertEquals("<b> text", tu.toString());
+	}
+
+	@Test
+	public void testCdataSectionExtractionAndWS () {
+		String snippet = "<doc><p>&lt; line1\nline2</p><p><![CDATA[< line1\nline2]]></p></doc>";
+		ArrayList<Event> events = XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters);
+		TextUnit tu1 = FilterTestDriver.getTextUnit(events, 1);
+		assertNotNull(tu1);
+		assertFalse(tu1.preserveWhitespaces());
+		assertEquals("< line1 line2", tu1.toString());
+		TextUnit tu2 = FilterTestDriver.getTextUnit(events, 2);
+		assertNotNull(tu2);
+		assertFalse(tu1.preserveWhitespaces());
+		assertEquals(tu1.toString(), tu2.toString());
+	}
 
 	@Test
 	public void testCdataSectionAsHTML() {

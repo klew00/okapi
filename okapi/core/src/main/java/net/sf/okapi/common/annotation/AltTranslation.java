@@ -48,6 +48,7 @@ public class AltTranslation implements Comparable<AltTranslation> {
 	MatchType type;
 	int score;
 	String origin;
+	boolean fromOriginal;
 
 	/**
 	 * Creates a new AltTranslation object.
@@ -184,18 +185,52 @@ public class AltTranslation implements Comparable<AltTranslation> {
 		return type;
 	}
 
+	/**
+	 * Sets the match type of this alternate translation.
+	 * @param type the new match type.
+	 */
 	public void setType (MatchType type) {
 		this.type = type;
 	}
 
+	/**
+	 * Sets the score of this alternate translation.
+	 * @param score the new score.
+	 */
 	public void setScore (int score) {
 		this.score = score;
 	}
 
+	/**
+	 * Sets the origin of this alternate translation.
+	 * @param origin the new origin.
+	 */
 	public void setOrigin (String origin) {
 		this.origin = origin;
 	}
+
+	/**
+	 * Sets the flag indicating if this alternate translation was provided from the original document
+	 * (e.g. as an alt-trans element in XLIFF).
+	 * @param fromOriginal true if the match was provided by the original document.
+	 */
+	public void setFromOriginal (boolean fromOriginal) {
+		this.fromOriginal = fromOriginal;
+	}
 	
+	/**
+	 * Indicates if this alternate translation was provided from the original document.
+	 * @return true if the match was provided by the original document.
+	 */
+	public boolean getFromOriginal () {
+		return this.fromOriginal;
+	}
+	
+	/**
+	 * Indicates if a given match type is considered as exact or not.
+	 * @param type the match type to evaluate.
+	 * @return true if the given match type is considered exact.
+	 */
 	private boolean isExact (MatchType type) {
 		// EXACT_REPAIRED considered a fuzzy match
 		if ( type.ordinal() < MatchType.EXACT_REPAIRED.ordinal() ) {

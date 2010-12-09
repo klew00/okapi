@@ -99,6 +99,7 @@ public class XLIFFFilter implements IFilter {
 	private Parameters params;
 	private boolean sourceDone;
 	private boolean targetDone;
+	private boolean altTransDone;
 	private boolean segSourceDone;
 	private TextContainer content;
 	private String encoding;
@@ -560,6 +561,7 @@ public class XLIFFFilter implements IFilter {
 			// Process trans-unit
 			sourceDone = false;
 			targetDone = false;
+			altTransDone = false;
 			segSourceDone = false;
 			altTrans = null;
 			processAltTrans = false;
@@ -804,6 +806,7 @@ public class XLIFFFilter implements IFilter {
 						alt.setTarget(lang, tc.getUnSegmentedContentCopy());
 					}
 					alt.getEntry().setPreserveWhitespaces(preserveSpaces.peek());
+					alt.setFromOriginal(true);
 				}
 			}
 		}
@@ -943,11 +946,25 @@ public class XLIFFFilter implements IFilter {
 		}
 	}
 	
+	private void addAltTransMarker () {
+		if ( altTransDone ) return;
+		// Add skeleton part for the alt-trans to be added
+		// This is in addition to the existing ones
+		// Add an empty part of the potential alt-trans to add
+		skel.add(XLIFFSkeletonWriter.ALTTRANSMARKER);
+		skel.attachParent(tu);
+		skel.flushPart(); // Close the part for the seg-source
+		altTransDone = true;
+	}
+
 	private void addTargetIfNeeded () {
 		if ( !sourceDone ) {
 			throw new OkapiIllegalFilterOperationException("Element <source> missing or not placed properly.");
 		}
-		if ( targetDone ) return; // Nothing to add
+		if ( targetDone ) {
+			addAltTransMarker();
+			return; // Nothing to add
+		}
 
 		// Add the seg-source part if needed
 		addSegSourceIfNeeded();
@@ -961,6 +978,7 @@ public class XLIFFFilter implements IFilter {
 		skel.append("</target>");
 		skel.append(lineBreak);
 		targetDone = true;
+		addAltTransMarker();
 	}
 	
 	/**
