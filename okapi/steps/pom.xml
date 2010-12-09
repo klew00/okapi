@@ -25,12 +25,14 @@
 		<module>imagemodification</module>
 		<module>leveraging</module>
 		<module>linebreakconversion</module>
+        <module>moses</module>
         <module>qualitycheck</module>
+        <module>rtfconversion</module>
+		<module>scopingreport</module>
 		<module>searchandreplace</module>
 		<module>segmentation</module>
         <module>sentence-aligner</module>
         <module>simplekit</module>
-        <module>rtfconversion</module>
         <module>termextraction</module>
 		<module>textmodification</module>
         <module>tokenization</module>
@@ -42,6 +44,5 @@
 		<module>xliffsplitter</module>
 		<module>idbasedaligner</module>
 		<module>xmlvalidation</module>
-		<module>scopingreport</module>
     </modules>
 </project>

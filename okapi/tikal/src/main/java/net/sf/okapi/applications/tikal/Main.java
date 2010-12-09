@@ -64,6 +64,7 @@ import net.sf.okapi.steps.formatconversion.FormatConversionStep;
 import net.sf.okapi.steps.formatconversion.Parameters;
 import net.sf.okapi.steps.formatconversion.TableFilterWriterParameters;
 import net.sf.okapi.steps.leveraging.LeveragingStep;
+import net.sf.okapi.steps.moses.ExtractionStep;
 import net.sf.okapi.steps.segmentation.SegmentationStep;
 import net.sf.okapi.connectors.apertium.ApertiumMTConnector;
 import net.sf.okapi.connectors.globalsight.GlobalSightTMConnector;
@@ -72,7 +73,6 @@ import net.sf.okapi.connectors.microsoft.MicrosoftMTConnector;
 import net.sf.okapi.connectors.mymemory.MyMemoryTMConnector;
 import net.sf.okapi.connectors.opentran.OpenTranTMConnector;
 import net.sf.okapi.connectors.pensieve.PensieveTMConnector;
-//import net.sf.okapi.connectors.promt.ProMTConnector;
 import net.sf.okapi.connectors.tda.TDASearchConnector;
 import net.sf.okapi.connectors.translatetoolkit.TranslateToolkitTMConnector;
 
@@ -87,6 +87,7 @@ public class Main {
 	protected final static int CMD_CONV2TABLE = 6;
 	protected final static int CMD_CONV2PEN = 7;
 	protected final static int CMD_TRANSLATE = 8;
+	protected final static int CMD_EXTRACTTOMOSES = 9;
 	
 	private static final String DEFAULT_SEGRULES = "-";
 	private static final String MSG_ONLYWITHUICOMP = "UI-based commands are available only in the distributions with UI components.";
@@ -229,6 +230,9 @@ public class Main {
 				}
 				else if ( arg.equals("-x") ) {
 					prog.command = CMD_EXTRACT;
+				}
+				else if ( arg.equals("-xm") ) {
+					prog.command = CMD_EXTRACTTOMOSES;
 				}
 				else if ( arg.equals("-t") ) {
 					prog.command = CMD_TRANSLATE;
@@ -738,6 +742,16 @@ public class Main {
 			extractFile(rd);
 			break;
 			
+		case CMD_EXTRACTTOMOSES:
+			ps.println("Extraction to Moses Text");
+			guessMissingParameters(input);
+			if ( !prepareFilter(configId) ) return; // Next input
+			file = new File(input);
+			rd = new RawDocument(file.toURI(), inputEncoding, srcLoc, trgLoc);
+			rd.setFilterConfigId(configId);
+			extractFileToMoses(rd);
+			break;
+			
 		case CMD_MERGE:
 			ps.println("Merging");
 			guessMergingArguments(input);
@@ -865,6 +879,9 @@ public class Main {
 		ps.println("      [-sl srcLang] [-tl trgLang] [-seg [srxFile]] [-tt hostname[:port]");
 		ps.println("      |-mm key|-pen tmDirectory|-gs configFile|-google|-apertium [serverURL]");
 		ps.println("      |-ms configFile|-tda configFile] [-maketmx [tmxFile]] [-opt threshold]");
+		ps.println("Extracts a file to Moses text:");
+		ps.println("   -xm inputFile [inputFile2...] [-fc configId] [-ie encoding]");
+		ps.println("      [-sl srcLang] [-tl trgLang]");
 		ps.println("Queries translation resources:");
 		ps.println("   -q \"source text\" [-sl srcLang] [-tl trgLang] [-google] [-opentran]");
 		ps.println("      [-tt hostname[:port]] [-mm key] [-pen tmDirectory] [-gs configFile]");
@@ -1211,6 +1228,38 @@ public class Main {
 
 		ps.println("Source language: "+srcLoc);
 		ps.println("Target language: "+trgLoc);
+		ps.println("Default input encoding: "+inputEncoding);
+		ps.println("Filter configuration: "+configId);
+		ps.println("Output: "+tmp);
+
+		// Process
+		driver.processBatch();
+	}
+
+	private void extractFileToMoses (RawDocument rd) throws URISyntaxException {
+		// Create the driver
+		PipelineDriver driver = new PipelineDriver();
+		driver.setFilterConfigurationMapper(fcMapper);
+		driver.setRootDirectory(System.getProperty("user.dir"));
+
+		// Raw document to filter events step 
+		RawDocumentToFilterEventsStep rd2feStep = new RawDocumentToFilterEventsStep();
+		driver.addStep(rd2feStep);
+		
+		// Filter events to raw document final step (using the XLIFF writer)
+		ExtractionStep extStep = new ExtractionStep();
+		driver.addStep(extStep);
+
+		// Create the raw document and set the output
+		String tmp = rd.getInputURI().getPath();
+		// If the input is a directory, it ends with a separator, then we remove it
+		if ( tmp.endsWith("/") || tmp.endsWith("\\") ) {
+			tmp = tmp.substring(0, tmp.length()-1);
+		}
+		tmp += ".txt";
+		driver.addBatchItem(rd, new File(tmp).toURI(), "UTF-8");
+
+		ps.println("Source language: "+srcLoc);
 		ps.println("Default input encoding: "+inputEncoding);
 		ps.println("Filter configuration: "+configId);
 		ps.println("Output: "+tmp);

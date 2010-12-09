@@ -168,7 +168,14 @@ public class MosesTextFilterWriter implements IFilterWriter {
 
 			// Process by segments
 			for ( Segment seg : tc.getSegments() ) {
-				writer.write(fmt.setContent(seg.text).toString(0, false, false, false));
+				String out = fmt.setContent(seg.text).toString(0, false, false, true);
+				if ( hasLineBreak(out) ) {
+					//TODO: special mrk to mark the lines for a given segment
+					writer.write(out.replace("\n", lineBreak));
+				}
+				else {
+					writer.write(out);
+				}
 				writer.write(lineBreak);
 			}
 		}
@@ -177,4 +184,7 @@ public class MosesTextFilterWriter implements IFilterWriter {
 		}
 	}
 
+	private boolean hasLineBreak (String text) {
+		return false;
+	}
 }

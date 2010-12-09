@@ -3,8 +3,8 @@
 <file original="helpguidelines.html" source-language="en" target-language="fr" datatype="html">
 <body>
 <trans-unit id="tu1" restype="x-title">
-<source xml:lang="en">Okapi Framework Developer's Guide - Help Guidelines</source>
-<target xml:lang="fr">Okapi Framework Developer's Guide - Help Guidelines</target>
+<source xml:lang="en">Okapi Framework <g id='1'>Developer's Guide</g> - Help Guidelines</source>
+<target xml:lang="fr">Okapi Framework <g id='1'>Developer's Guide</g> - Help Guidelines</target>
 </trans-unit>
 <trans-unit id="tu2" restype="x-td">
 <source xml:lang="en"></source>

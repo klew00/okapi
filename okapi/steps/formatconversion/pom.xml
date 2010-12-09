@@ -28,7 +28,7 @@
         <dependency>
             <groupId>net.sf.okapi.tm</groupId>
             <artifactId>okapi-tm-pensieve</artifactId>
-            <version>0.10-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>        
     </dependencies>
 </project>

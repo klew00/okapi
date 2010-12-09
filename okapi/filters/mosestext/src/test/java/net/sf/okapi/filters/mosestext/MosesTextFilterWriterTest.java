@@ -70,9 +70,41 @@ public class MosesTextFilterWriterTest {
 		assertNotNull(tu);
 		assertEquals("3", tu.getId());
 		assertEquals("Help Authoring Guidelines", tu.getSource().toString());
+	}
+
+	@Test
+	public void testFileOutputFromXLIFF01 () {
+		File outFile = new File(root+"Test-XLIFF01.out.txt");
+		outFile.delete();
+		
+		IFilter xlfFilter = new net.sf.okapi.filters.xliff.XLIFFFilter();
+		generateFileOutput(
+			getEventsFromFile(xlfFilter, root+"Test-XLIFF01.xlf"),
+			outFile);
+		
+		// Read the Moses file and compare with the expected result
+		String res = generateOutput(getEventsFromFile(filter, root+"Test-XLIFF01.out.txt"));
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(res), 3);
+		assertNotNull(tu);
+		assertEquals("3", tu.getId());
+		assertEquals("Help Authoring Guidelines", tu.getSource().toString());
 		
 	}
 	
+	@Test
+	public void testOutputFromXLIFF02 () {
+		// Read from XLIFF and generate the Moses file (in a string)
+		IFilter xlfFilter = new net.sf.okapi.filters.xliff.XLIFFFilter();
+		String res = generateOutput(getEventsFromFile(xlfFilter, root+"Test-XLIFF02.xlf"));
+		
+		// Check the Moses output
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(res), 4);
+		assertNotNull(tu);
+		// Here two TUs are 5 entries because of the line breaks
+		assertEquals("4", tu.getId());
+		assertEquals("and line 3.", tu.getSource().toString());
+	}
+
 	private String generateOutput (List<Event> list) {
 		try {
 			IFilterWriter writer = new MosesTextFilterWriter();
@@ -88,6 +120,18 @@ public class MosesTextFilterWriterTest {
 		catch ( UnsupportedEncodingException e ) {
 			throw new RuntimeException("Error when creating the output");
 		}
+	}
+	
+	private void generateFileOutput (List<Event> list,
+		File outFile)
+	{
+		IFilterWriter writer = new MosesTextFilterWriter();
+		writer.setOptions(locEN, "UTF-8");
+		writer.setOutput(outFile.getAbsolutePath());
+		for ( Event event : list ) {
+			writer.handleEvent(event);
+		}
+		writer.close();
 	}
 	
 	private ArrayList<Event> getEventsFromFile (IFilter filter,

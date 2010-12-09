@@ -216,9 +216,9 @@ public class MosesTextFilter implements IFilter {
 	}
 
 	private Event processLine (String line) {
-		// All is text for now
-		//TODO: What about the line-breaks?
-		
+		// Otherwise: we have in-line codes
+
+		// Create the text unit and the skeleton
 		TextUnit tu = new TextUnit(tuIdGen.createId());
 		tu.setSourceContent(new TextFragment(line));
 		tu.setPreserveWhitespaces(true);

@@ -269,8 +269,6 @@ public class FormatConversionStep extends BasePipelineStep {
 
 	private void createCorpusWriter () {
 		writer = new CorpusFilterWriter();
-		//TableFilterWriterParameters options = (TableFilterWriterParameters)writer.getParameters();
-		//options.fromString(params.getFormatOptions());
 	}
 	
 	private void startCorpusOutput () {
