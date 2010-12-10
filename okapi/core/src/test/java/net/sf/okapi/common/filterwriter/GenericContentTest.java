@@ -41,7 +41,12 @@ public class GenericContentTest {
 	public void testSimple_Default () {
 		TextFragment tf = createTextUnit();
 		assertEquals(tf.getCodes().size(), 5);
-		assertEquals("t1<1><2><3/>t2</2></1>t3", fmt.setContent(tf).toString());
+		String gtext = fmt.setContent(tf).toString();
+		assertEquals("t1<1><2><3/>t2</2></1>t3", gtext);
+		// Reconstruct it
+		TextFragment tf2 = tf.clone();
+		fmt.updateFragment(gtext, tf2, false);
+		assertEquals("t1<1><2><3/>t2</2></1>t3", fmt.setContent(tf2).toString());
 	}
 	
 	@Test
@@ -68,9 +73,38 @@ public class GenericContentTest {
 		fmt.setContent(tf);
 		// Not real XML so mis-ordering is OK
 		assertEquals("t1<b1>t2<b2>t3</b1>t4</b2>t5", fmt.toString(true));
-		assertEquals("t1<b1/>t2<b2/>t3<e1/>t4<e2/>t5", fmt.toString(false));
+		String gtext = fmt.toString(false);
+		assertEquals("t1<b1/>t2<b2/>t3<e1/>t4<e2/>t5", gtext);
+		// Reconstruct it
+		TextFragment tf2 = tf.clone();
+		fmt.updateFragment(gtext, tf2, false);
+		assertEquals("t1<b1>t2<b2>t3</b1>t4</b2>t5", fmt.setContent(tf2).toString(true));
+		assertEquals("t1<b1/>t2<b2/>t3<e1/>t4<e2/>t5", fmt.setContent(tf2).toString());
 	}
 	
+	@Test
+	public void testReOrderingCodes () {
+		TextFragment tf = new TextFragment();
+		tf.append("t1");
+		tf.append(TagType.OPENING, "b1", "<b1>");
+		tf.append("t2");
+		tf.append(TagType.OPENING, "b2", "<b2>");
+		tf.append("t3");
+		tf.append(TagType.CLOSING, "b1", "</b1>");
+		tf.append("t4");
+		tf.append(TagType.CLOSING, "b2", "</b2>");
+		tf.append("t5");
+		fmt.setContent(tf);
+		// Not real XML so mis-ordering is OK
+		assertEquals("t1<b1>t2<b2>t3</b1>t4</b2>t5", fmt.toString(true));
+		assertEquals("t1<b1/>t2<b2/>t3<e1/>t4<e2/>t5", fmt.toString(false));
+		// Reconstruct it in a different order
+//TODO
+//		TextFragment tf2 = tf.clone();
+//		fmt.updateFragment("t1<b1/>t2<b2/>t4<e2/>t5 t3<e1/>", tf2, false);
+//		assertEquals("t1<1>t2<2>t4</2>t5 t3</1>", fmt.setContent(tf2).toString());
+	}
+
 	private TextFragment createTextUnit () {
 		TextFragment tf = new TextFragment();
 		tf.append("t1");

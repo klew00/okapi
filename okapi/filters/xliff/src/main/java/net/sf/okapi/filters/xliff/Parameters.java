@@ -155,7 +155,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.add(ADDTARGETLANGUAGE, "Add the target-language attribute if not present", null);
 		desc.add(OVERRIDETARGETLANGUAGE, "Override the target language of the XLIFF document", null);
 		desc.add(OUTPUTSEGMENTATIONTYPE, "Type of output segmentation", "Indicates wether to segment or not the text content in output");
-		desc.add(ADDALTTRANS, "Add new <alt-trans> elements if possible", "Indicates wether or not to add <alt-trans> elements not alreay in the document");
+		desc.add(ADDALTTRANS, "Allow addition of new <alt-trans> elements", "Indicates wether or not to adding new <alt-trans> elements is allowed");
 		return desc;
 	}
 

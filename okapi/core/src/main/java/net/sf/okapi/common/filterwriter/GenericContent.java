@@ -295,11 +295,12 @@ public class GenericContent {
 		m = patternClosing.matcher(tmp.toString());
 		while ( m.find(start) ) {
 			n = m.start();
-			index = fragment.getIndex(Integer.valueOf(m.group(1)));
+			index = fragment.getIndexForClosing(Integer.valueOf(m.group(1)));
+			fragment.getCode(index).setId(-1); // For re-balancing
 			if ( index == -1 )
 				throw new InvalidContentException(String.format("Invalid code: '%s'", m.group()));
 			tmp.replace(n+diff, (n+diff)+m.group().length(), String.format("%c%c",
-				(char)TextFragment.MARKER_ISOLATED, TextFragment.toChar(index)));
+				(char)TextFragment.MARKER_CLOSING, TextFragment.toChar(index)));
 			diff += (2-m.group().length());
 			start = n+m.group().length();
 		}
@@ -331,7 +332,8 @@ public class GenericContent {
 		m = patternIsolatedE.matcher(tmp.toString());
 		while ( m.find(start) ) {
 			n = m.start();
-			index = fragment.getIndex(Integer.valueOf(m.group(1)));
+			index = fragment.getIndexForClosing(Integer.valueOf(m.group(1)));
+			fragment.getCode(index).setId(-1); // For re-balancing
 			if ( index == -1 )
 				throw new InvalidContentException(String.format("Invalid code: '%s'", m.group()));
 			tmp.replace(n+diff, (n+diff)+m.group().length(), String.format("%c%c",
