@@ -24,6 +24,7 @@ import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.ParametersDescription;
 import net.sf.okapi.common.encoder.XMLEncoder;
+import net.sf.okapi.common.uidescription.CheckboxPart;
 import net.sf.okapi.common.uidescription.EditorDescription;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 import net.sf.okapi.common.uidescription.ListSelectionPart;
@@ -41,6 +42,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private static final String OUTPUTSEGMENTATIONTYPE = "outputSegmentationType";
 	private static final String IGNOREINPUTSEGMENTATION = "ignoreInputSegmentation";
 	private static final String ADDALTTRANS = "addAltTrans";
+	private static final String INCLUDEEXTENSIONS = "includeExtensions";
 	
 	private boolean fallbackToID;
 	private boolean escapeGT;
@@ -49,6 +51,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private int outputSegmentationType;
 	private boolean ignoreInputSegmentation;
 	private boolean addAltTrans;
+	private boolean includeExtensions;
 	
 	public Parameters () {
 		reset();
@@ -107,8 +110,16 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		return this.addAltTrans;
 	}
 	
-	public void setaddAltTrans (boolean addAltTrans) {
+	public void setAddAltTrans (boolean addAltTrans) {
 		this.addAltTrans = addAltTrans;
+	}
+
+	public boolean getIncludeExtensions () {
+		return this.includeExtensions;
+	}
+	
+	public void setIncludeExtensions (boolean includeExtensions) {
+		this.includeExtensions = includeExtensions;
 	}
 
 	public void reset () {
@@ -119,6 +130,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		outputSegmentationType = SEGMENTATIONTYPE_ORIGINAL;
 		ignoreInputSegmentation = false;
 		addAltTrans = false;
+		includeExtensions = true;
 	}
 
 	public void fromString (String data) {
@@ -131,6 +143,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		outputSegmentationType = buffer.getInteger(OUTPUTSEGMENTATIONTYPE, outputSegmentationType);
 		ignoreInputSegmentation = buffer.getBoolean(IGNOREINPUTSEGMENTATION, ignoreInputSegmentation);
 		addAltTrans = buffer.getBoolean(ADDALTTRANS, addAltTrans);
+		includeExtensions = buffer.getBoolean(INCLUDEEXTENSIONS, includeExtensions);
 	}
 
 	@Override
@@ -143,6 +156,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.setInteger(OUTPUTSEGMENTATIONTYPE, outputSegmentationType);
 		buffer.setBoolean(IGNOREINPUTSEGMENTATION, ignoreInputSegmentation);
 		buffer.setBoolean(ADDALTTRANS, addAltTrans);
+		buffer.setBoolean(INCLUDEEXTENSIONS, includeExtensions);
 		return buffer.toString();
 	}
 	
@@ -156,6 +170,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.add(OVERRIDETARGETLANGUAGE, "Override the target language of the XLIFF document", null);
 		desc.add(OUTPUTSEGMENTATIONTYPE, "Type of output segmentation", "Indicates wether to segment or not the text content in output");
 		desc.add(ADDALTTRANS, "Allow addition of new <alt-trans> elements", "Indicates wether or not to adding new <alt-trans> elements is allowed");
+		desc.add(INCLUDEEXTENSIONS, "Include extra information", "If set: non-standard information are included in the added <alt-trans>");
 		return desc;
 	}
 
@@ -182,7 +197,9 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		ListSelectionPart lsp = desc.addListSelectionPart(paramDesc.get(OUTPUTSEGMENTATIONTYPE), values);
 		lsp.setChoicesLabels(labels);
 		
-		desc.addCheckboxPart(paramDesc.get(ADDALTTRANS));
+		CheckboxPart cbp1 = desc.addCheckboxPart(paramDesc.get(ADDALTTRANS));
+		CheckboxPart cbp2 = desc.addCheckboxPart(paramDesc.get(INCLUDEEXTENSIONS));
+		cbp2.setMasterPart(cbp1, true);
 
 		return desc;
 	}

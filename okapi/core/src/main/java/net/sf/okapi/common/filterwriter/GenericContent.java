@@ -170,7 +170,6 @@ public class GenericContent {
 				else tmp.append(String.format("</%d>", codes.get(index).getId()));
 				break;
 			case TextFragment.MARKER_ISOLATED:
-//			case TextFragment.MARKER_SEGMENT:
 				index = TextFragment.toIndex(codedText.charAt(++i));
 				if ( normalText ) tmp.append(codes.get(index).toString());
 				else {

@@ -273,10 +273,15 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 			if ( !Util.isEmpty(alt.getOrigin()) ) {
 				sb.append(String.format(" origin=\"%s\"", Util.escapeToXML(alt.getOrigin(), 0, false, null)));
 			}
-			if ( alt.getType() != MatchType.UKNOWN ) {
-				sb.append(" xmlns:okp=\""+XLIFFWriter.NS_XLIFFOKAPI+"\"");
-				sb.append(String.format(" okp:"+XLIFFWriter.OKP_MATCHTYPE+"=\"%s\"", alt.getType().toString()));
+			
+			if ( params.getIncludeExtensions() ) {
+				// Include extensions only if requested
+				if ( alt.getType() != MatchType.UKNOWN ) {
+					sb.append(" xmlns:okp=\""+XLIFFWriter.NS_XLIFFOKAPI+"\"");
+					sb.append(String.format(" okp:"+XLIFFWriter.OKP_MATCHTYPE+"=\"%s\"", alt.getType().toString()));
+				}
 			}
+			
 			sb.append(">"+encoderManager.getLineBreak());
 			TextContainer cont = alt.getSource();
 			if ( !cont.isEmpty() ) {
