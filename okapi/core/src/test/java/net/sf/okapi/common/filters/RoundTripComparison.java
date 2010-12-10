@@ -120,15 +120,12 @@ public class RoundTripComparison {
 			extraction2Events.clear();
 			subDocEvents.clear();
 			// Load parameters if needed
-			if (doc.paramFile == null) {
-				IParameters params = filter.getParameters();
-				if (params != null)
-					params.reset();
-			} else {
+			if (doc.paramFile != null && !doc.paramFile.equals("")) {
 				String root = Util.getDirectoryName(doc.path);
 				IParameters params = filter.getParameters();
-				if (params != null)
+				if (params != null) {
 					params.load(Util.toURI(root + File.separator + doc.paramFile), false);
+				}
 			}
 			// Execute the first extraction and the re-writing
 			String outPath = executeFirstExtractionToFile(doc, dirSuffix, (IPipelineStep[]) null);
