@@ -27,6 +27,7 @@ import java.nio.charset.CharsetEncoder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -176,10 +177,23 @@ class QualityChecker {
 				if ( params.getScope() == Parameters.SCOPE_APPROVEDONLY ) return;
 			}
 		}
-		
+
 		tu.synchronizeSourceSegmentation(trgLoc);
 		ISegments srcSegs = srcCont.getSegments();
 		ISegments trgSegs = trgCont.getSegments();
+		
+		// Check hidden text (e.g. RTF)
+		Property prop = trgCont.getProperty("hashiddentext");
+		if ( prop != null ) {
+			// There is a hidden section
+			Scanner scan = new Scanner(prop.getValue()).useDelimiter(";");
+			TextFragment tf = trgCont.getUnSegmentedContentCopy();
+			int start = fromFragmentToString(tf, scan.nextInt());
+			int end = fromFragmentToString(tf, scan.nextInt());
+			reportIssue(IssueType.SUSPECT_PATTERN, tu, null,
+				"Target content has at least one hidden part.",
+				0, -1, start, end, Issue.SEVERITY_HIGH, srcCont.toString(), trgCont.toString(), null);
+		}
 		
 		for ( Segment srcSeg : srcSegs ) {
 			Segment trgSeg = trgSegs.get(srcSeg.getId());

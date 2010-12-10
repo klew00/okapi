@@ -53,6 +53,7 @@ import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment;
@@ -62,6 +63,8 @@ import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 public class RTFFilter implements IFilter {
+
+	public static final String PROP_HASHIDDENTEXT = "hashiddentext";
 
 	public static final int TOKEN_CHAR           = 0;
 	public static final int TOKEN_STARTGROUP     = 1;
@@ -126,6 +129,8 @@ public class RTFFilter implements IFilter {
 	public static final int CW_AFTNSEP           = 54;
 	public static final int CW_AFTNSEPC          = 55;
 	public static final int CW_RTF               = 56;
+	public static final int CW_FLDINST           = 57;
+	public static final int CW_XMLOPEN           = 58;
 
 	private final Logger logger = Logger.getLogger(getClass().getName());
 	
@@ -291,6 +296,8 @@ public class RTFFilter implements IFilter {
 		controlWords.put("aftnsep", CW_AFTNSEP);
 		controlWords.put("aftnsepc", CW_AFTNSEPC);
 		controlWords.put("rtf", CW_RTF);
+		controlWords.put("fldinst", CW_FLDINST);
+		controlWords.put("xmlopen", CW_XMLOPEN);
 	}
 	
 	public void cancel () {
@@ -478,6 +485,11 @@ public class RTFFilter implements IFilter {
 		int nGrp = 0;
 		int nStyle = 0;
 		int nCode = 0;
+		int startHidden = -1;
+		int endHidden = -1;
+		// groups to skip
+		int fldinst = 0;
+		int xmlopen = 0;
 
 		TextFragment srcFrag = tu.setSourceContent(new TextFragment());
 		TextFragment trgFrag = new TextFragment();
@@ -492,10 +504,19 @@ public class RTFFilter implements IFilter {
 				return false;
 
 			case TOKEN_CHAR:
-				if ( !ctxStack.peek().inText ) {
+				if ( ctxStack.peek().inText ) {
+					if (( startHidden > -1 ) && ( endHidden == -1 )) {
+						endHidden = trgFrag.length();
+					}
+				}
+				else {
 					if ( nStyle > 0 ) {
 						// Get style name
 						sTmp += chCurrent;
+					}
+					// Warn if hidden text is detected in target content
+					if (( nState == 7 ) && ( startHidden < 0 )) {
+						startHidden = trgFrag.length();
 					}
 				}
 				switch ( nState ) {
@@ -518,6 +539,10 @@ public class RTFFilter implements IFilter {
 					break;
 
 				case 3: // After {0>, wait for <}n*{>
+					if (( fldinst > 0 ) || ( xmlopen > 0 )) {
+						// Skip
+						break;
+					}
 					if ( chCurrent == '<' ) {
 						sTmp = "";
 						nState = 4;
@@ -529,9 +554,10 @@ public class RTFFilter implements IFilter {
 					break;
 
 				case 4: // After < in <}n*{>
-					if ( chCurrent == '}' ) nState = 5;
-					else if ( chCurrent == '<' )
-					{
+					if ( chCurrent == '}' ) {
+						nState = 5;
+					}
+					else if ( chCurrent == '<' ) {
 						if ( nGrp > 0 ) sCode += chCurrent;
 						else srcFrag.append(chCurrent);
 					}
@@ -582,7 +608,11 @@ public class RTFFilter implements IFilter {
 					if ( chCurrent == '<' ) nState = 8;
 					else {
 						if ( nGrp > 0 ) sCode += chCurrent;
-						else trgFrag.append(chCurrent);
+						else {
+							if (( fldinst == 0 ) && ( xmlopen == 0 )) { // If not inside spans we skip
+								trgFrag.append(chCurrent);
+							}
+						}
 					}
 					break;
 
@@ -611,6 +641,19 @@ public class RTFFilter implements IFilter {
 						// Segment is done
 						if ( !trgFrag.isEmpty() ) {
 							tu.setTargetContent(trgLang, trgFrag);
+							if ( startHidden > -1 ) {
+								// Adjust the ending if needed
+								if ( endHidden == -1 ) {
+									endHidden = trgFrag.length();
+								}
+								if ( endHidden-startHidden > 0 ) {
+									logger.warning(String.format("Hidden text detected in target content of text unit '%s'\nTarget=\"%s\"",
+										tu.getId(), trgFrag.toText()));
+									tu.setTargetProperty(trgLang, new Property(PROP_HASHIDDENTEXT,
+										String.format("%d;%d", startHidden, endHidden)));
+								}
+							}
+							
 						}
 						return true;
 					}
@@ -663,6 +706,16 @@ public class RTFFilter implements IFilter {
 					}
 					break;
 				}
+				if ( fldinst > 0 ) {
+					if ( fldinst == ctxStack.size()+1 ) {
+						fldinst = 0;
+					}
+				}
+				if ( xmlopen > 0 ) {
+					if ( xmlopen == ctxStack.size()+1 ) {
+						xmlopen = 0;
+					}
+				}
 				break;
 
 			case TOKEN_CTRLWORD:
@@ -685,6 +738,12 @@ public class RTFFilter implements IFilter {
 					break;
 				case CW_STYLESHEET:
 					nStyle = ctxStack.size();
+					break;
+				case CW_FLDINST:
+					fldinst = ctxStack.size();
+					break;
+				case CW_XMLOPEN:
+					xmlopen = ctxStack.size();
 					break;
 				}
 				break; // End of case TOKEN_CTRLWORD:

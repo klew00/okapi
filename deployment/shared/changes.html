@@ -52,6 +52,7 @@ distribution.</p>
 	<li>Implemented tab-delimited format for the report, and added choice 
 	between HTML or tab-delimited in Configuration dialog.</li>
 	<li>Added support for term list in CSV format.</li>
+	<li>Added warning when the target from RTF contains an hidden part.</li>
 </ul>
 	</li>
 	<li>Tikal:<ul>
@@ -133,6 +134,12 @@ distribution.</p>
 	<li>TTX Filter:<ul>
 	<li>Improved mapping of leveraged entries with a score to Okapi annotations.</li>
 	<li>Fixed filter-writer for pre-segmented RTF output.</li>
+</ul>
+	</li>
+	<li>Trados-Tagged RTF Filter:<ul>
+	<li>Improved parsing for fldinst and xmlopen fields: their content is not 
+	included in the extracted text.</li>
+	<li>Added warning when part of the target segment is hidden.</li>
 </ul>
 	</li>
 	<li>XLIFF Filter:<ul>
