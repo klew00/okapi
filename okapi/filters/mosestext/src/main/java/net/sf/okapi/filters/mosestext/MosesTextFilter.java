@@ -26,6 +26,8 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
@@ -56,12 +58,17 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
 public class MosesTextFilter implements IFilter {
 
 	public static final String MOSESTEXT_MIME_TYPE = "text/x-mosestext";
+	
+	private static final String ENDSEGMENT = "</mrk>"; 
+
+	private final Pattern startSegment = Pattern.compile("<mrk\\s+mtype\\s*=\\s*[\"']seg[\"'].*?>");
 
 	private BufferedReader reader;
 	private String lineBreak;
 	private Event event;
 	private IdGenerator tuIdGen;
 	private EncoderManager encoderManager;
+	private GenericSkeleton skel;
 	
 	public MosesTextFilter () {
 	}
@@ -141,18 +148,48 @@ public class MosesTextFilter implements IFilter {
 		
 		// Else: compute the next event
 		try {
+			skel = new GenericSkeleton();
+			StringBuilder sb = new StringBuilder();
+			boolean inSeg = false;
 			while ( true ) {
 				String line = reader.readLine();
 				if ( line == null ) {
+					if ( inSeg ) {
+						throw new OkapiIOException("End of segment expected before the end of the document.");
+					}
+					// Else: normal end of document
 					event = new Event(EventType.END_DOCUMENT, new Ending("ed"));
 				}
 				else {
-					// Skip empty or space-only lines
-					String tmp = line.trim();
-					if ( tmp.isEmpty() ) continue;
-					// Else: process the line
-					event = processLine(line);
+					// Detect start of segment
+					Matcher m = startSegment.matcher(line);
+					if ( m.lookingAt() ) {
+						if ( inSeg ) {
+							throw new OkapiIOException("End of segment expected before a new segment.");
+						}
+						line = line.substring(m.group().length());
+						inSeg = true;
+						skel.append(m.group());
+					}
+					else if ( !inSeg ) {
+						// Not starting with a segment marker: If not in segment already we assume the line is the segment.
+						sb.append(line);
+						event = processBuffer(sb);
+						return eventToSend;
+					}
+					// Look for the ending of the segment
+					if ( line.endsWith(ENDSEGMENT) ) {
+						line = line.substring(0, line.length()-ENDSEGMENT.length());
+						sb.append(line);
+						event = processBuffer(sb);
+					}
+					else { // Not the end of the segment yet
+						sb.append(line+"\n");
+						continue; // Continue onto the next line
+					}
 				}
+				
+				// We are done
 				return eventToSend;
 			}
 		}
@@ -215,17 +252,24 @@ public class MosesTextFilter implements IFilter {
 		// Not used
 	}
 
-	private Event processLine (String line) {
+	private Event processBuffer (StringBuilder sb) {
 		// Otherwise: we have in-line codes
+		
+		// Unescape XML?
+		
 
 		// Create the text unit and the skeleton
 		TextUnit tu = new TextUnit(tuIdGen.createId());
-		tu.setSourceContent(new TextFragment(line));
+		tu.setSourceContent(new TextFragment(sb.toString()));
 		tu.setPreserveWhitespaces(true);
-		GenericSkeleton skel = new GenericSkeleton();
+		
+		boolean add = !skel.isEmpty();
 		skel.addContentPlaceholder(tu);
+		if ( add ) skel.append(ENDSEGMENT);
+		
 		skel.add(lineBreak);
 		tu.setSkeleton(skel);
+		
 		return new Event(EventType.TEXT_UNIT, tu);
 	}
 

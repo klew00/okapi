@@ -31,6 +31,7 @@ import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.filters.FilterTestDriver;
+import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
 import net.sf.okapi.common.LocaleId;
@@ -109,13 +110,34 @@ public class MosesTextFilterTest {
 	}
 	
 	@Test
+	public void testFromFile () {
+		TextUnit tu = FilterTestDriver.getTextUnit(getEventsFromFile(filter, root+"/Test01.txt"), 2);
+		assertNotNull(tu);
+		assertEquals("This is a test on line 1,\nand line two.", tu.getSource().toString());
+	}
+
+	@Test
 	public void testDoubleExtraction () {
 		// Read all files in the data directory
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
 		list.add(new InputDocument(root+"Test01.txt", null));
+		list.add(new InputDocument(root+"Test02.txt", null));
 	
 		RoundTripComparison rtc = new RoundTripComparison();
 		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, locPT));
+	}
+
+	private ArrayList<Event> getEventsFromFile (IFilter filter,
+		String path)
+	{
+		ArrayList<Event> list = new ArrayList<Event>();
+		filter.open(new RawDocument(new File(path).toURI(), "UTF-8", locEN, locPT));
+		while (filter.hasNext()) {
+			Event event = filter.next();
+			list.add(event);
+		}
+		filter.close();
+		return list;
 	}
 
 	private ArrayList<Event> getEvents(String snippet) {

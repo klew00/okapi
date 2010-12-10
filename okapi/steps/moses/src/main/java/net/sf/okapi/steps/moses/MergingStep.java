@@ -20,33 +20,40 @@
 
 package net.sf.okapi.steps.moses;
 
+import java.io.File;
 import java.net.URI;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
-import net.sf.okapi.filters.mosestext.MosesTextFilterWriter;
+import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.filters.mosestext.MosesTextFilter;
 
-public class ExtractionStep extends BasePipelineStep {
+public class MergingStep extends BasePipelineStep {
 
 	private LocaleId sourceLocale;
+	private LocaleId targetLocale;
 	private URI inputURI;
-	private MosesTextFilterWriter writer;
+	private RawDocument mosesDoc;
+	private MosesTextFilter filter;
+	private IFilterWriter writer;
 	
-	public ExtractionStep () {
+	public MergingStep () {
 	}
 	
 	@Override
 	public String getDescription () {
-		return "Creates a Moses text file from the input document."
+		return "Merges an original source document with its Moses text data."
 			+ " Expects: filter events. Sends back: filter events.";
 	}
 
 	@Override
 	public String getName () {
-		return "Extraction to Moses InlineText";
+		return "Merging Moses InlineText";
 	}
 
 	@StepParameterMapping(parameterType = StepParameterType.SOURCE_LOCALE)
@@ -54,34 +61,64 @@ public class ExtractionStep extends BasePipelineStep {
 		this.sourceLocale = sourceLocale;
 	}
 
+	@StepParameterMapping(parameterType = StepParameterType.TARGET_LOCALE)
+	public void setTargetLocale (LocaleId targetLocale) {
+		this.targetLocale = targetLocale;
+	}
+
 	@StepParameterMapping(parameterType = StepParameterType.INPUT_URI)
 	public void setInputURI (URI inputURI) {
 		this.inputURI = inputURI;
+	}
+	
+	@StepParameterMapping(parameterType = StepParameterType.SECOND_INPUT_RAWDOC)
+	public void setSecondInput(final RawDocument secondInput) {
+		mosesDoc = secondInput;
 	}
 
 	@Override
 	public Event handleEvent (Event event) {
 		switch ( event.getEventType() ) {
 		case START_DOCUMENT:
-			writer = new MosesTextFilterWriter();
-			writer.setOptions(sourceLocale, "UTF-8");
-			writer.setOutput(inputURI.getPath() + ".txt");
-			return writer.handleEvent(event);
+			processStartDocument();
+			return event;
 			
 		case END_DOCUMENT:
-			if ( writer != null ) {
-				event = writer.handleEvent(event);
-				writer.close();
-			}
+			processEndDocument();
 			return event;
 			
 		default:
-			// The writer creates and closes the files
-			if ( writer != null ) {
-				return writer.handleEvent(event);
-			}
 			return event;
 		}
 	}
 	
+	private void processStartDocument () {
+		// Open the corresponding Moses file
+		// First try to get it from the secondary input
+		RawDocument rd = mosesDoc;
+		if ( rd == null ) {
+			// If not available: guess the path from the input document
+			// = same path plus a .txt extension
+			String path = inputURI.getPath() + ".txt";
+			rd = new RawDocument(new File(path).toURI(), "UTF-8", sourceLocale);
+		}
+		
+		// Open the Moses file
+		filter = new MosesTextFilter();
+		filter.open(rd);
+		
+		// Prepare the writer
+		writer = filter.createFilterWriter();
+		//writer.setOptions(targetLocale, TODO);
+		//writer.setOutput(path);
+	}
+
+	private void processEndDocument () {
+		// Close the Moses filter
+		if ( filter != null ) {
+			filter.close();
+			filter = null;
+		}
+	}
+
 }

@@ -56,7 +56,8 @@ public class MosesTextFilterWriter implements IFilterWriter {
 	private String outputPath;
 	private OutputStreamWriter writer;
 	private LocaleId trgLoc;
-	private String lineBreak;
+	
+	private final String lineBreak = System.getProperty("line.separator"); 
 	
 	@Override
 	public void cancel () {
@@ -153,8 +154,6 @@ public class MosesTextFilterWriter implements IFilterWriter {
 		catch ( UnsupportedEncodingException e ) {
 			throw new OkapiIOException(e);
 		}
-		// Initialize the variables
-		lineBreak = sd.getLineBreak();
 	}
 	
 	private void processTextUnit (TextUnit tu) {
@@ -169,10 +168,11 @@ public class MosesTextFilterWriter implements IFilterWriter {
 
 			// Process by segments
 			for ( Segment seg : tc.getSegments() ) {
-				String out = toMosesText(seg.text);
+				String out = toMosesText(seg);
 				if ( hasLineBreak(out) ) {
-					//TODO: special mrk to mark the lines for a given segment
+					writer.write("<mrk mtype=\"seg\">");
 					writer.write(out.replace("\n", lineBreak));
+					writer.write("</mrk>");					
 				}
 				else {
 					writer.write(out);
@@ -186,19 +186,20 @@ public class MosesTextFilterWriter implements IFilterWriter {
 	}
 
 	private boolean hasLineBreak (String text) {
-		return false;
+		return (text.indexOf('\n') != -1);
 	}
 
 	/**
-	 * Convert a text fragment into a Moses string.
-	 * @param frag the fragment to convert.
+	 * Convert a segment into a Moses string.
+	 * @param frag the fragment of the segment to convert.
 	 * @return the Moses text for the given fragment.
 	 */
-	public String toMosesText (TextFragment frag) {
+	private String toMosesText (Segment seg) {
 		boolean gMode = true;
 		boolean escapeGT = false;
 		int quoteMode = 0;
 		
+		TextFragment frag = seg.text;
 		String codedText = frag.getCodedText();
 		List<Code> codes = frag.getCodes();
 		
@@ -206,6 +207,7 @@ public class MosesTextFilterWriter implements IFilterWriter {
 		int index;
 		Code code;
 		
+		// Content
 		for ( int i=0; i<codedText.length(); i++ ) {
 			switch ( codedText.codePointAt(i) ) {
 			case TextFragment.MARKER_OPENING:
@@ -313,6 +315,7 @@ public class MosesTextFilterWriter implements IFilterWriter {
 				break;
 			}
 		}
+		
 		return tmp.toString();
 	}
 

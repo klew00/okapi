@@ -45,6 +45,7 @@ public class MosesTextFilterWriterTest {
 	private MosesTextFilter filter;
 	private LocaleId locEN = LocaleId.ENGLISH;
 	private LocaleId locFR = LocaleId.FRENCH;
+	private final String lb = System.getProperty("line.separator");
 
 	public MosesTextFilterWriterTest () {
 		filter = new MosesTextFilter();
@@ -54,21 +55,32 @@ public class MosesTextFilterWriterTest {
 
 	@Test
 	public void testSimpleOutputFromMosesText () {
-		String snippet = "Line 1\rLine 2\r";
-		String res = generateOutput(getEvents(snippet));
-		assertEquals(snippet, res);
+		// Read a Moses text and create Moses output (not a round trip!)
+		String snippet = "<mrk mtype=\"seg\">Line 1</mrk>\rLine 2\r";
+		String expected = "Line 1"+lb+"Line 2"+lb;
+		String res = generateMosesOutput(getEvents(snippet));
+		assertEquals(expected, res);
+	}
+	
+	@Test
+	public void testMultilineOutputFromMosesText () {
+		// Read a Moses text and create Moses output (not a round trip!)
+		String snippet = "Text 1.\r<mrk mtype=\"seg\">Text 2\rText 3.</mrk>\rText 4\r";
+		String expected = "Text 1."+lb+"<mrk mtype=\"seg\">Text 2"+lb+"Text 3.</mrk>"+lb+"Text 4"+lb;
+		String res = generateMosesOutput(getEvents(snippet));
+		assertEquals(expected, res);
 	}
 	
 	@Test
 	public void testOutputFromXLIFF01 () {
 		// Read from XLIFF and generate the Moses file (in a string)
 		IFilter xlfFilter = new net.sf.okapi.filters.xliff.XLIFFFilter();
-		String res = generateOutput(getEventsFromFile(xlfFilter, root+"Test-XLIFF01.xlf"));
+		String res = generateMosesOutput(getEventsFromFile(xlfFilter, root+"Test-XLIFF01.xlf"));
 		
 		// Read the Moses string and compare with the expected result
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(res), 3);
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(res), 4);
 		assertNotNull(tu);
-		assertEquals("3", tu.getId());
+		assertEquals("4", tu.getId());
 		assertEquals("Help Authoring Guidelines", tu.getSource().toString());
 	}
 
@@ -83,30 +95,28 @@ public class MosesTextFilterWriterTest {
 			outFile);
 		
 		// Read the Moses file and compare with the expected result
-		String res = generateOutput(getEventsFromFile(filter, root+"Test-XLIFF01.out.txt"));
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(res), 3);
+		String res = generateMosesOutput(getEventsFromFile(filter, root+"Test-XLIFF01.out.txt"));
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(res), 4);
 		assertNotNull(tu);
-		assertEquals("3", tu.getId());
+		assertEquals("4", tu.getId());
 		assertEquals("Help Authoring Guidelines", tu.getSource().toString());
-		
 	}
 	
 	@Test
 	public void testOutputFromXLIFF02 () {
 		// Read from XLIFF and generate the Moses file (in a string)
 		IFilter xlfFilter = new net.sf.okapi.filters.xliff.XLIFFFilter();
-		String res = generateOutput(getEventsFromFile(xlfFilter, root+"Test-XLIFF02.xlf"));
+		String res = generateMosesOutput(getEventsFromFile(xlfFilter, root+"Test-XLIFF02.xlf"));
 		
 		// Check the Moses output
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(res), 5);
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(res), 3);
 		assertNotNull(tu);
-		// Here two TUs are 5 entries because of the line breaks
-		assertEquals("5", tu.getId());
+		assertEquals("3", tu.getId());
 		assertEquals("<g id=\"1\">word1</g>, <g id=\"2\">word2</g>, <x id=\"3\"/>word3, <x id=\"4\"/>word5, <mrk mtype=\"protected\">to protect</mrk>, etc.",
 			tu.getSource().toString());
 	}
 
-	private String generateOutput (List<Event> list) {
+	private String generateMosesOutput (List<Event> list) {
 		try {
 			IFilterWriter writer = new MosesTextFilterWriter();
 			writer.setOptions(locEN, "UTF-8");
