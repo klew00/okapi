@@ -1,0 +1,87 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>net.sf.okapi.applications.rcp.credenza</groupId>
+	<artifactId>build-credenza</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<name>Credenza Parent POM</name>
+	<description>Root POM for the Credenza RCP application</description>
+
+	<url>http://code.google.com/p/okapi</url>
+	<issueManagement>
+		<system>Google Code</system>
+		<url>http://code.google.com/p/okapi/issues</url>
+	</issueManagement>
+
+	<scm>
+		<connection>scm:svn:http://okapi.googlecode.com/svn/trunk/</connection>
+		<developerConnection>scm:svn:https://okapi.googlecode.com/svn/trunk/</developerConnection>
+		<url>http://code.google.com/p/okapi/source/browse/</url>
+	</scm>
+
+	<repositories>
+		<repository>
+			<id>okapi</id>
+			<name>okapi-repository</name>
+			<url>http://okapi.googlecode.com/svn/maven2</url>
+			<layout>default</layout>
+		</repository>
+	</repositories>
+
+	<properties>
+		<tycho-version>0.10.0</tycho-version>
+		<tycho-groupid>org.sonatype.tycho</tycho-groupid>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+	<modules>
+		<module>rcp-target-defs</module>
+		<module>ui</module>
+	</modules>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>${tycho-groupid}</groupId>
+				<artifactId>target-platform-configuration</artifactId>
+				<version>${tycho-version}</version>
+				<configuration>
+					<resolver>p2</resolver>
+					<target>
+						<artifact>
+							<groupId>net.sf.okapi.applications.rcp.credenza</groupId>
+							<artifactId>eclipse-target-defs</artifactId>
+							<version>${project.version}</version>
+							<classifier>credenza-helios</classifier>
+						</artifact>
+					</target>
+					<ignoreTychoRepositories>true</ignoreTychoRepositories>
+					<environments>
+						<environment>
+							<os>win32</os>
+							<ws>win32</ws>
+							<arch>x86</arch>
+						</environment>
+						<environment>
+							<os>linux</os>
+							<ws>gtk</ws>
+							<arch>x86</arch>
+						</environment>
+						<environment>
+							<os>macosx</os>
+							<ws>cocoa</ws>
+							<arch>x86</arch>
+						</environment>
+					</environments>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>${tycho-groupid}</groupId>
+				<artifactId>tycho-maven-plugin</artifactId>
+				<version>${tycho-version}</version>
+				<extensions>true</extensions>
+			</plugin>
+		</plugins>
+	</build>
+</project>
