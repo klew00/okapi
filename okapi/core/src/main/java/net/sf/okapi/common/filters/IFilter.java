@@ -45,7 +45,8 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
 public interface IFilter {
 	
 	/**
-	 * Prefix marker indicating a sub-filter in the name of a {@link StartDocument} object created
+	 * Prefix marker indicating a sub-filter in the name of a
+	 * {@link net.sf.okapi.common.resource.StartDocument StartDocument} object created
 	 * when processing content with sub-filters. 
 	 */
 	public static String SUB_FILTER = "sub-filter:"; 
