@@ -61,6 +61,28 @@ public class BatchItemContext extends BaseContext implements IBatchItemContext {
 	}
 	
 	/**
+	 * Creates a new BatchItemContext object and initializes it with a given
+	 * {@link RawDocument} and additional arguments.
+	 * @param rawDoc the {@link RawDocument} to use as the main input document.
+	 * @param outputURI the output URI of the input document (can be null if not used).
+	 * @param outputEncoding the output encoding (can be null if not used).
+	 * @param rawDocs one or more RawDocuments to include in this item.
+	 */
+	public BatchItemContext (RawDocument rawDoc,
+		URI outputURI,
+		String outputEncoding,
+		RawDocument... rawDocs)
+	{
+		this();
+		add(rawDoc, outputURI, outputEncoding);
+		for ( RawDocument rd : rawDocs ) {
+			DocumentData ddi = new DocumentData();
+			ddi.rawDocument = rd;
+			list.add(ddi);
+		}
+	}
+	
+	/**
 	 * Creates a new BatchItemContext object and initializes it based on a given
 	 * input URI and additional arguments.
 	 * @param inputURI the URI of the main input document

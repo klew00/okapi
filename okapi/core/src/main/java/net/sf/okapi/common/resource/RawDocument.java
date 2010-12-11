@@ -143,6 +143,32 @@ public class RawDocument implements IResource {
 	}
 
 	/**
+	 * Creates a new RawDocument object with a given URI, a default encoding, a source locale and a target locale,
+	 * and the filter configuration id.
+	 * 
+	 * @param inputURI
+	 *            the URI for this RawDocument.
+	 * @param defaultEncoding
+	 *            the default encoding for this RawDocument.
+	 * @param sourceLocale
+	 *            the source locale for this RawDocument.
+	 * @param targetLocale
+	 *            the target locale for this RawDocument.
+	 * @param filterConfigId
+	 *            the filter configuration id.
+	 */
+	public RawDocument(URI inputURI,
+		String defaultEncoding,
+		LocaleId sourceLocale,
+		LocaleId targetLocale,
+		String filterConfigId)
+	{
+		this.hasReaderBeenCalled = false;
+		create(inputURI, defaultEncoding, sourceLocale, targetLocale);
+		setFilterConfigId(filterConfigId);
+	}
+	
+	/**
 	 * Creates a new RawDocument object with a given InputStream, a default encoding and a source locale.
 	 * 
 	 * @param inputStream

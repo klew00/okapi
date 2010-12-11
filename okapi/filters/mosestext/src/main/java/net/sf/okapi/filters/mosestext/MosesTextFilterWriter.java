@@ -157,6 +157,9 @@ public class MosesTextFilterWriter implements IFilterWriter {
 	}
 	
 	private void processTextUnit (TextUnit tu) {
+		if ( !tu.isTranslatable() ) {
+			return;
+		}
 		try {
 			TextContainer tc;
 			if ( tu.hasTarget(trgLoc) ) {

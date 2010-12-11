@@ -49,6 +49,7 @@ import net.sf.okapi.common.filters.IFilterConfigurationListEditor;
 import net.sf.okapi.common.filterwriter.XLIFFWriter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.IPipelineStep;
+import net.sf.okapi.common.pipelinedriver.BatchItemContext;
 import net.sf.okapi.common.pipelinedriver.PipelineDriver;
 import net.sf.okapi.common.plugins.PluginsManager;
 import net.sf.okapi.common.resource.RawDocument;
@@ -65,6 +66,7 @@ import net.sf.okapi.steps.formatconversion.Parameters;
 import net.sf.okapi.steps.formatconversion.TableFilterWriterParameters;
 import net.sf.okapi.steps.leveraging.LeveragingStep;
 import net.sf.okapi.steps.moses.ExtractionStep;
+import net.sf.okapi.steps.moses.MergingStep;
 import net.sf.okapi.steps.segmentation.SegmentationStep;
 import net.sf.okapi.connectors.apertium.ApertiumMTConnector;
 import net.sf.okapi.connectors.globalsight.GlobalSightTMConnector;
@@ -88,6 +90,7 @@ public class Main {
 	protected final static int CMD_CONV2PEN = 7;
 	protected final static int CMD_TRANSLATE = 8;
 	protected final static int CMD_EXTRACTTOMOSES = 9;
+	protected final static int CMD_LEVERAGEMOSES = 10;
 	
 	private static final String DEFAULT_SEGRULES = "-";
 	private static final String MSG_ONLYWITHUICOMP = "UI-based commands are available only in the distributions with UI components.";
@@ -96,6 +99,7 @@ public class Main {
 	
 	protected ArrayList<String> inputs;
 	protected String skeleton;
+	protected String moses;
 	protected String output;
 	protected String specifiedConfigId;
 	protected String configId;
@@ -239,6 +243,9 @@ public class Main {
 				}
 				else if ( arg.equals("-m") ) {
 					prog.command = CMD_MERGE;
+				}
+				else if ( arg.equals("-lm") ) {
+					prog.command = CMD_LEVERAGEMOSES;
 				}
 				else if ( arg.equals("-2po") ) {
 					prog.command = CMD_CONV2PO;
@@ -716,6 +723,14 @@ public class Main {
 		output = skeleton.substring(0, n) + ".out" + ext;
 	}
 	
+	private void guessMergingMosesArguments (String input) {
+		// Main input is the original file, not the Moses file
+		moses = input + ".txt";
+		String ext = Util.getExtension(input);
+		int n = input.lastIndexOf('.');
+		output = input.substring(0, n) + ".out" + ext;
+	}
+	
 	protected void process (String input) throws URISyntaxException {
 		initialize();
 		RawDocument rd;
@@ -743,7 +758,7 @@ public class Main {
 			break;
 			
 		case CMD_EXTRACTTOMOSES:
-			ps.println("Extraction to Moses Text");
+			ps.println("Extraction to Moses InlineText");
 			guessMissingParameters(input);
 			if ( !prepareFilter(configId) ) return; // Next input
 			file = new File(input);
@@ -773,6 +788,16 @@ public class Main {
 			ps.println("XLIFF: "+input);
 			ps.println(String.format("Output: %s", (output==null) ? "<auto-defined>" : output));
 			stepMrg.handleRawDocument(skelRawDoc);
+			break;
+
+		case CMD_LEVERAGEMOSES:
+			ps.println("Merging Moses InlineText");
+			guessMergingMosesArguments(input);
+			guessMissingParameters(input);
+			if ( !prepareFilter(configId) ) return; // Next input
+			file = new File(input);
+			rd = new RawDocument(file.toURI(), inputEncoding, srcLoc, trgLoc, configId);
+			leverageFileWithMoses(rd);
 			break;
 			
 		case CMD_CONV2PO:
@@ -879,8 +904,11 @@ public class Main {
 		ps.println("      [-sl srcLang] [-tl trgLang] [-seg [srxFile]] [-tt hostname[:port]");
 		ps.println("      |-mm key|-pen tmDirectory|-gs configFile|-google|-apertium [serverURL]");
 		ps.println("      |-ms configFile|-tda configFile] [-maketmx [tmxFile]] [-opt threshold]");
-		ps.println("Extracts a file to Moses text:");
+		ps.println("Extracts a file to Moses InlineText:");
 		ps.println("   -xm inputFile [inputFile2...] [-fc configId] [-ie encoding]");
+		ps.println("      [-sl srcLang] [-tl trgLang]");
+		ps.println("Leverage a file with Moses InlineText:");
+		ps.println("   -lm inputFile [inputFile2...] [-fc configId] [-ie encoding]");
 		ps.println("      [-sl srcLang] [-tl trgLang]");
 		ps.println("Queries translation resources:");
 		ps.println("   -q \"source text\" [-sl srcLang] [-tl trgLang] [-google] [-opentran]");
@@ -1236,6 +1264,22 @@ public class Main {
 		driver.processBatch();
 	}
 
+	private void leverageFileWithMoses (RawDocument rd) {
+		// Create the driver
+		PipelineDriver driver = new PipelineDriver();
+		driver.setFilterConfigurationMapper(fcMapper);
+		driver.setRootDirectory(System.getProperty("user.dir"));
+		driver.addStep(new RawDocumentToFilterEventsStep());
+		driver.addStep(new MergingStep());
+		driver.addStep(new FilterEventsToRawDocumentStep());
+		
+		// Two parallel inputs: 1=the original file, 2=the Moses translated file
+		RawDocument rdMoses = new RawDocument(new File(moses).toURI(), "UTF-8", trgLoc);
+		driver.addBatchItem(new BatchItemContext(rd, new File(output).toURI(), outputEncoding, rdMoses));
+		// Execute
+		driver.processBatch();
+	}
+	
 	private void extractFileToMoses (RawDocument rd) throws URISyntaxException {
 		// Create the driver
 		PipelineDriver driver = new PipelineDriver();

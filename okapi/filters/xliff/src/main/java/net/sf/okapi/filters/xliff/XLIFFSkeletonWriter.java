@@ -267,7 +267,7 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 			
 			sb.append("<alt-trans");
 			if ( segment != null ) {
-				sb.append(String.format(" mid=\"%s\":", Util.escapeToXML(segment.getId(), 0, false, null)));
+				sb.append(String.format(" mid=\"%s\"", Util.escapeToXML(segment.getId(), 0, false, null)));
 			}
 			sb.append(String.format(" match-quality=\"%d\"", alt.getScore()));
 			if ( !Util.isEmpty(alt.getOrigin()) ) {
