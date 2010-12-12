@@ -40,13 +40,13 @@ public class ExtractionStep extends BasePipelineStep {
 	
 	@Override
 	public String getDescription () {
-		return "Creates a Moses text file from the input document."
+		return "Creates a Moses InlineText file from the input document."
 			+ " Expects: filter events. Sends back: filter events.";
 	}
 
 	@Override
 	public String getName () {
-		return "Extraction to Moses InlineText";
+		return "Moses InlineText Extraction";
 	}
 
 	@StepParameterMapping(parameterType = StepParameterType.SOURCE_LOCALE)

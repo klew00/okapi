@@ -54,7 +54,8 @@ public interface ISegments extends Iterable<Segment> {
 	 * @param segIndex1 the segment index of the first segment to swap.
 	 * @param segIndex2 the segment index of the second segment to swap.
 	 */
-	public void swap (int segIndex1, int segIndex2);
+	public void swap (int segIndex1,
+		int segIndex2);
 	
 	/**
 	 * Appends a segment at the end of this container.
@@ -63,30 +64,67 @@ public interface ISegments extends Iterable<Segment> {
 	 * Otherwise the new segment is appended to the content as a new segment part and its
 	 * id is validated.
 	 * @param segment the segment to append.
+	 * @param collapseIfPreviousEmpty true to collapse the new segment if the last part of the container
+	 * is an empty segment.
+	 */
+	public void append (Segment segment,
+		boolean collapseIfPreviousEmpty);
+	
+	/**
+	 * Appends a segment at the end of this container, with an optional non-segment part just before.
+	 * <p>If collapseIfPreviousEmpty is true and collapseIfPreviousEmpty is empty or null,
+	 * and if the last part of the container is an empty segment,
+	 * this new segment replaces the last one (including its id, and the new id is validated).
+	 * Otherwise the new segment is appended to the content as a new segment part and its
+	 * id is validated.
+	 * @param segment the segment to append.
+	 * @param textBefore the text of the non-segment part before the segment (can be null).
+	 * @param collapseIfPreviousEmpty true to collapse the new segment if the last part of the container
+	 * is an empty segment (that is if textBefore is also empty or null).
+	 */
+	public void append (Segment segment,
+		String textBefore,
+		boolean collapseIfPreviousEmpty);
+	
+	/**
+	 * Appends a TextFragment as a segment at the end of this container.
+	 * <p>If collapseIfPreviousEmpty is true and if the last part of the container is an empty segment,
+	 * this new segment replaces the last one.
+	 * Otherwise the new segment is appended to the content as a new segment part.
+	 * In all case the id of the new segment is set automatically.
+	 * @param fragment the fragment to append as a segment.
+	 * @param collapseIfPreviousEmpty true to collapse the new segment if the last part of the container
+	 * is an empty segment. 
+	 */
+	public void append (TextFragment fragment,
+		boolean collapseIfPreviousEmpty);
+
+	/**
+	 * Appends a segment at the end of this container.
+	 * <p>This call is the same as calling {@link #append(Segment, boolean)} with collapseIfPreviousEmpty
+	 * set to true.
+	 * @param segment the segment to append.
 	 */
 	public void append (Segment segment);
 	
 	/**
 	 * Appends a segment at the end of this container, with an optional non-segment part just before.
-	 * If there is no content after the last segment, and the last segment is empty,
-	 * the new segment replaces the last one (including its id, and the new id is validated).
-	 * Otherwise the new segment is appended to the content as a new segment part and its
-	 * id is validated.
+	 * <p>This call is the same as calling {@link #append(Segment, String, boolean)} with
+	 * collapseIfPreviousEmpty set to true.
 	 * @param segment the segment to append.
 	 * @param textBefore the text of the non-segment part before the segment (can be null).
 	 */
-	public void append (Segment segment, String textBefore);
+	public void append (Segment segment,
+		String textBefore);
 	
 	/**
 	 * Appends a TextFragment as a segment at the end of this container.
-	 * If there is content after the last segment, and the last segment is empty,
-	 * the new segment replaces the last one.
-	 * Otherwise the new segment is appended to the content as a new segment part.
-	 * In all case the id of the new segment is set automatically.
+	 * <p>This call is the same as calling {@link #append(TextFragment, boolean)} with
+	 * collapseIfPreviousEmpty set to true.
 	 * @param fragment the fragment to append as a segment.
 	 */
 	public void append (TextFragment fragment);
-
+	
 	/**
 	 * Sets a new segment at a given segment index.
 	 * <p>If the new segment's id exists already in the container, it is replaced by a valid id.
@@ -101,7 +139,8 @@ public interface ISegments extends Iterable<Segment> {
 	 * <p>If the segment to insert has no id or an id that is already used in the
 	 * text container, the id is automatically changed to a new valid id.
 	 * @param index the segment index position. If the given position is the same
-	 * as the number of segments in the container, the call is the same as {@link #append(Segment)}.
+	 * as the number of segments in the container, the call is the same as {@link #append(Segment, boolean)}
+	 * with collapseIfPreviousEmpty set to true.
 	 * @param seg the segment to insert.
 	 * @throws IndexOutOfBoundsException if the index is out of bounds.
 	 */

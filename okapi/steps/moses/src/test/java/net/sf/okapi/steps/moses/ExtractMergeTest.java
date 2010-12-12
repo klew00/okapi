@@ -2,13 +2,22 @@ package net.sf.okapi.steps.moses;
 
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
+import net.sf.okapi.common.Event;
 import net.sf.okapi.common.FileCompare;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
+import net.sf.okapi.common.filters.FilterTestDriver;
+import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.pipelinedriver.BatchItemContext;
 import net.sf.okapi.common.pipelinedriver.PipelineDriver;
+import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.Segment;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.xliff.XLIFFFilter;
 import net.sf.okapi.steps.common.FilterEventsToRawDocumentStep;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
@@ -21,6 +30,7 @@ public class ExtractMergeTest {
 	private String root;
 	private LocaleId locEN = LocaleId.ENGLISH;
 	private LocaleId locJA = LocaleId.JAPANESE;
+	private LocaleId locFR = LocaleId.FRENCH;
 	private FileCompare fc;
 
 	public ExtractMergeTest () {
@@ -30,7 +40,7 @@ public class ExtractMergeTest {
 	}
 
 	@Test
-	public void testExtraction () {
+	public void testExtracThenMerge () {
 		// Make sure output does not exists
 		File inFile = new File(root+"/Test-XLIFF01.xlf");
 		File out1File = new File(root+"/Test-XLIFF01.xlf.txt");
@@ -71,6 +81,74 @@ public class ExtractMergeTest {
 
 		// Check output
 		assertTrue(out2File.exists());
+	}
+
+	@Test
+	public void testExtracThenMergeWithAlt () {
+		// Make sure output does not exists
+		File inFile = new File(root+"/Test-XLIFF02.xlf");
+		File out1File = new File(root+"/Test-XLIFF02.xlf.txt");
+		File transFile = new File(root+"/Test-XLIFF02.xlf.txt_trans");
+		File out2File = new File(root+"/Test-XLIFF02.out.xlf");
+		
+		// Make sure output are deleted
+		out1File.delete();
+		assertFalse(out1File.exists());
+		out2File.delete();
+		assertFalse(out2File.exists());
+		
+		// Set up the extraction pipeline
+		PipelineDriver pd = new PipelineDriver();
+		pd.addStep(new RawDocumentToFilterEventsStep(new XLIFFFilter()));
+		pd.addStep(new ExtractionStep());
+		pd.addBatchItem(inFile.toURI(), "UTF-8", "okf_xliff", locEN, locFR);
+		// Execute it
+		pd.processBatch();
+
+		// Check output
+		assertTrue(out1File.exists());
+
+		// Setup the merging pipeline
+		pd = new PipelineDriver();
+		pd.addStep(new RawDocumentToFilterEventsStep(new XLIFFFilter()));
+		pd.addStep(new MergingStep());
+		pd.addStep(new FilterEventsToRawDocumentStep());
+		// Two parallel inputs: 1=the original file, 2=the Moses translated file
+		RawDocument rd1 = new RawDocument(inFile.toURI(), "UTF-8", locEN, locFR, "okf_xliff");
+		RawDocument rd2 = new RawDocument(transFile.toURI(), "UTF-8", locFR);
+		pd.addBatchItem(new BatchItemContext(rd1, out2File.toURI(), "UTF-8", rd2));
+		// Execute it
+		pd.processBatch();
+
+		// Check output
+		assertTrue(out2File.exists());
+		// Check some translations
+		// Read the Moses string and compare with the expected result
+		List<Event> list = getEventsFromFile(new XLIFFFilter(), out2File.getAbsolutePath(), locFR);
+		TextUnit tu = FilterTestDriver.getTextUnit(list, 2);
+		assertNotNull(tu);
+		assertEquals("2", tu.getId());
+		ISegments segs = tu.getTarget(locFR).getSegments();
+		assertEquals(2, segs.count());
+		for ( Segment seg : segs ) {
+			AltTranslationsAnnotation ann = seg.getAnnotation(AltTranslationsAnnotation.class);
+			assertNotNull(ann);
+			assertTrue(ann.getFirst().getTarget().toString().startsWith("FR "));
+		}
+	}
+
+	private ArrayList<Event> getEventsFromFile (IFilter filter,
+		String path,
+		LocaleId trgLoc)
+	{
+		ArrayList<Event> list = new ArrayList<Event>();
+		filter.open(new RawDocument(new File(path).toURI(), "UTF-8", locEN, trgLoc));
+		while (filter.hasNext()) {
+			Event event = filter.next();
+			list.add(event);
+		}
+		filter.close();
+		return list;
 	}
 
 }

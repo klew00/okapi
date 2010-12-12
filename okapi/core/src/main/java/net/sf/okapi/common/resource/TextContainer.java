@@ -115,13 +115,21 @@ public class TextContainer implements Iterable<TextPart> {
 		
 
 		@Override
+		public void append (Segment segment,
+			boolean collapseIfPreviousEmpty)
+		{
+			append(segment, null, collapseIfPreviousEmpty);
+		}
+		
+		@Override
 		public void append (Segment segment) {
-			append(segment, null);
+			append(segment, true);
 		}
 		
 		@Override
 		public void append (Segment segment,
-			String textBefore)
+			String textBefore,
+			boolean collapseIfPreviousEmpty)
 		{
 			// Add the text before if needed
 			if ( !Util.isEmpty(textBefore) ) {
@@ -136,21 +144,41 @@ public class TextContainer implements Iterable<TextPart> {
 			}
 			
 			// If the last segment is empty and at the end of the content: re-use it
-			if (( parts.get(parts.size()-1).getContent().isEmpty() )
-				&& parts.get(parts.size()-1).isSegment() )
-			{
-				parts.set(parts.size()-1, segment);
+			if ( collapseIfPreviousEmpty ) {
+				if (( parts.get(parts.size()-1).getContent().isEmpty() )
+					&& parts.get(parts.size()-1).isSegment() )
+				{
+					parts.set(parts.size()-1, segment);
+				}
+				else {
+					parts.add(segment);
+				}
 			}
 			else {
 				parts.add(segment);
 			}
+			
 			validateSegmentId(segment);
 			segApplied = true;
+		}
+
+		@Override
+		public void append (Segment segment,
+			String textBefore)
+		{
+			append(segment, textBefore, true);
+		}
+		
+		@Override
+		public void append (TextFragment fragment,
+			boolean collapseIfPreviousEmpty)
+		{
+			append(new Segment(null, fragment), collapseIfPreviousEmpty);
 		}
 		
 		@Override
 		public void append (TextFragment fragment) {
-			append(new Segment(null, fragment));
+			append(fragment, true);
 		}
 
 		@Override
@@ -171,7 +199,7 @@ public class TextContainer implements Iterable<TextPart> {
 		{
 			// If the index is the one after the last segment: we append
 			if ( index == count() ) {
-				append(seg);
+				append(seg, true);
 				return;
 			}
 			// Otherwise it has to exist
@@ -774,58 +802,107 @@ public class TextContainer implements Iterable<TextPart> {
 	
 	/**
 	 * Appends a part at the end of this container.
-	 * If the current last part (segment or non-segment) is empty,
-	 * the TextFragment is appended to that part. Otherwise the
-	 * TextFragment is appended to the content as a new non-segment part.
+	 * <p>If collapseIfPreviousEmpty and if the current last part (segment or non-segment)
+	 * is empty, the text fragment is appended to the last part.
+	 * Otherwise the text fragment is appended to the content as a new non-segment part.
 	 * <p>Important: If the container is empty, the appended part becomes
 	 * a segment, as the container has always at least one segment.
 	 * @param fragment the text fragment to append.
+	 * @param collapseIfPreviousEmpty true to collapse the previous part if it is empty.
+	 */
+	public void append (TextFragment fragment,
+		boolean collapseIfPreviousEmpty)
+	{
+		if ( collapseIfPreviousEmpty ) {
+			// If the last part is empty we append to it
+			if ( parts.get(parts.size()-1).getContent().isEmpty() ) {
+				// Append the fragment to the segment or non-segment part
+				parts.get(parts.size()-1).text.append(fragment);
+			}
+			else { // Else: like appending a TextPart
+				append(new TextPart(fragment), false);
+			}
+		}
+		else {
+			append(new TextPart(fragment), false);
+		}
+	}
+
+	/**
+	 * Appends a part at the end of this container.
+	 * <p>This call is the same as calling {@link #append(TextFragment, boolean)} with collapseIfPreviousEmpty
+	 * set to true.
+	 * @param fragment the text fragment to append.
 	 */
 	public void append (TextFragment fragment) {
-		//If the last part is empty we append to it
-		if ( parts.get(parts.size()-1).getContent().isEmpty() ) {
-			// Append the fragment to the segment or non-segment part
-			parts.get(parts.size()-1).text.append(fragment);
-		}
-		else { // Else: like appending a TextPart
-			append(new TextPart(fragment));
-		} 
+		append(fragment, true);
 	}
 	
 	/**
 	 * Appends a part with a given text at the end of this container.
-	 * If the current last part (segment or non-segment) is empty,
-	 * the text is appended to that part. Otherwise the
-	 * text is appended to the content as a new non-segment part.
+	 * <p>If collapseIfPreviousEmpty is true and if the current last part (segment or non-segment)
+	 * is empty, the new text is appended to the last part part.
+	 * Otherwise the text is appended to the content as a new non-segment part.
+	 * @param text the text to append.
+	 * @param collapseIfPreviousEmpty true to collapse the previous part if it is empty.
+	 */
+	public void append (String text,
+		boolean collapseIfPreviousEmpty)
+	{
+		append(new TextPart(text), collapseIfPreviousEmpty);
+	}
+
+	/**
+	 * Appends a part with a given text at the end of this container.
+	 * <p>This call is the same as calling {@link #append(String, boolean)} with collapseIfPreviousEmpty
+	 * set to true.
 	 * @param text the text to append.
 	 */
 	public void append (String text) {
-		append(new TextPart(text));
+		append(text, true);
 	}
 	
 	/**
 	 * Appends a {@link TextPart} (segment or non-segment) at the end of this container.
-	 * If the current last part (segment or non-segment) is empty,
-	 * the part replaces the last part, otherwise the part is
-	 * appended to the content as it.
+	 * <p>If collapseiIfPreviousEmpty is true and if the current last part (segment or non-segment)
+	 * is empty, the new part replaces the last part.
+	 * Otherwise the part is appended to the container as it.
 	 * If the result of the operation would result in a container without segment, the
 	 * first part is automatically converted to a fragment.
 	 * @param part the TextPart to append.
+	 * @param collapseIfPreviousEmpty true to collapse the previous part if it is empty.
 	 */
-	public void append (TextPart part) {
+	public void append (TextPart part,
+		boolean collapseIfPreviousEmpty)
+	{
 		// If the last part is empty we append to it
-		if ( parts.get(parts.size()-1).getContent().isEmpty() ) {
-			parts.set(parts.size()-1, part);
+		if ( collapseIfPreviousEmpty ) {
+			if ( parts.get(parts.size()-1).getContent().isEmpty() ) {
+				parts.set(parts.size()-1, part);
+			}
+			else {
+				parts.add(part);
+			}
 		}
 		else {
 			parts.add(part);
 		}
+
 		if ( segments.count() == 0 ) {
 			// We need to ensure there is at least one segment
 			changePart(0);
 		}
 	}
-	
+
+	/**
+	 * Appends a {@link TextPart} (segment or non-segment) at the end of this container.
+	 * <p>This call is the same as calling {@link #append(TextPart, boolean)} with collapseIfPreviousEmpty
+	 * set to true.
+	 * @param part the TextPart to append.
+	 */
+	public void append (TextPart part) {
+		append(part, true);
+	}
 	
 	/**
 	 * Gets the coded text of the whole content (segmented or not).
@@ -938,13 +1015,20 @@ public class TextContainer implements Iterable<TextPart> {
 	/**
 	 * Unwraps the content of this container.
 	 * <p>This method replaces any sequences of white-spaces by a single space character.
-	 * If also remove leading and trailing white-spaces if the parameter
+	 * It also removes leading and trailing white-spaces if the parameter
 	 * trimEnds is set to true.
-	 * Empty non-segment parts are removed. Empty segments are left. 
+	 * <p>If the container has more than one segment and if collapseMode mode is set:
+	 * non-segments parts are normalized and removed if they end up empty. If the option
+	 * is not set: the method preserve at least one space between segments, even if the
+	 * segments are empty. 
+	 * <p>Empty segments are always left. 
 	 * @param trimEnds true to remove leading and trailing white-spaces.
 	 */
-	public void unwrap (boolean trimEnds) {
+	public void unwrap (boolean trimEnds,
+		boolean collapseMode)
+	{
 		boolean wasWS = trimEnds; // Removes leading white-spaces
+		
 		for ( int i=0; i<parts.size(); i++ ) {
 			StringBuilder text = parts.get(i).text.text;
 			
@@ -974,6 +1058,15 @@ public class TextContainer implements Iterable<TextPart> {
 				default:
 					wasWS = false;
 					break;
+				}
+			}
+
+			// Adjust WS flag for next part in non-collapse mode:
+			if ( parts.get(i).isSegment() ) {
+				if (( parts.size() > i+1 ) && !parts.get(i+1).isSegment() ) {
+					if ( text.toString().trim().length() == 0 ) {
+						wasWS = collapseMode;
+					}
 				}
 			}
 			

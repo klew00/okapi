@@ -364,6 +364,26 @@ public class PipelineWrapper {
 			availableSteps.put(step.id, step);
 
 			ps = (IPipelineStep)Class.forName(
+				"net.sf.okapi.steps.moses.ExtractionStep").newInstance();
+			params = ps.getParameters();
+			step = new StepInfo(ps.getClass().getSimpleName(),
+				ps.getName(), ps.getDescription(), ps.getClass().getName(), null, null);
+			if ( params != null ) {
+				step.paramsData = params.toString();
+			}
+			availableSteps.put(step.id, step);
+
+			ps = (IPipelineStep)Class.forName(
+				"net.sf.okapi.steps.moses.MergingStep").newInstance();
+			params = ps.getParameters();
+			step = new StepInfo(ps.getClass().getSimpleName(),
+				ps.getName(), ps.getDescription(), ps.getClass().getName(), null, null);
+			if ( params != null ) {
+				step.paramsData = params.toString();
+			}
+			availableSteps.put(step.id, step);
+
+			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.qualitycheck.QualityCheckStep").newInstance();
 			params = ps.getParameters();
 			step = new StepInfo(ps.getClass().getSimpleName(),

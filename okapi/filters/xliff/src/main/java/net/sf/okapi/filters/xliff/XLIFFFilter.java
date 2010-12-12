@@ -719,7 +719,7 @@ public class XLIFFFilter implements IFilter {
 			tc = processContent(isSegSource ? "seg-source" : "source", true);
 			// Put the source in the alt-trans annotation
 			if ( !preserveSpaces.peek() ) {
-				tc.unwrap(true);
+				tc.unwrap(true, false);
 			}
 			// Store in altTrans only when we are within alt-trans
 			if ( inAltTrans ) {
@@ -760,7 +760,7 @@ public class XLIFFFilter implements IFilter {
 			skel.addContentPlaceholder(tu);
 			tc = processContent(isSegSource ? "seg-source" : "source", false);
 			if ( !preserveSpaces.peek() ) {
-				tc.unwrap(true);
+				tc.unwrap(true, false);
 			}
 			tu.setPreserveWhitespaces(preserveSpaces.peek());
 			tu.setSource(tc);
@@ -780,7 +780,7 @@ public class XLIFFFilter implements IFilter {
 			tc = processContent("target", true);
 			// Put the target in the alt-trans annotation
 			if ( !preserveSpaces.peek() ) {
-				tc.unwrap(true);
+				tc.unwrap(true, false);
 			}
 			if ( inAltTrans ) {
 				if ( processAltTrans ) {
@@ -822,7 +822,7 @@ public class XLIFFFilter implements IFilter {
 			tc = processContent("target", false);
 			if ( !tc.isEmpty() ) {
 				if ( !preserveSpaces.peek() ) {
-					tc.unwrap(true);
+					tc.unwrap(true, false);
 				}
 				tu.setPreserveWhitespaces(preserveSpaces.peek());
 				tu.setTarget(trgLang, tc);
@@ -1033,8 +1033,8 @@ public class XLIFFFilter implements IFilter {
 							current = new TextFragment(); // Point back to content
 							idStack.pop(); // Pop only after test is true
 							segIdStack = -1; // Reset to not trigger segment ending again
-							// Add the segment to the content
-							segments.append(segment);
+							// Add the segment to the content (no collapsing, except when no segments exist yet. Keep empty segments)
+							segments.append(segment, !content.hasBeenSegmented());
 							if ( changeFirstPart && ( content.count()==2 )) {
 								// Change the initial part into a non-segment
 								changeFirstPart = false;
@@ -1067,11 +1067,11 @@ public class XLIFFFilter implements IFilter {
 						String type = reader.getAttributeValue(null, "mtype");
 						if (( type != null ) && ( type.equals("seg") )) {
 							if ( !current.isEmpty() ) { // Append non-segment part
-								content.append(current);
+								content.append(current, !content.hasBeenSegmented());
 								// If this is have a first part that was not a segment, appending it
 								// will make it a segment because a container has always one segment.
 								// So we need to fix later when closing this first segment. 
-								changeFirstPart = (content.count() == 1); 
+								changeFirstPart = !content.hasBeenSegmented(); //(content.count() == 1); 
 							}
 							idStack.push(++id);
 							segIdStack = id;

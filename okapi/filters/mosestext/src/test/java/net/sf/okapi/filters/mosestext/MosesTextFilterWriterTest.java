@@ -96,7 +96,13 @@ public class MosesTextFilterWriterTest {
 		
 		// Read the Moses file and compare with the expected result
 		String res = generateMosesOutput(getEventsFromFile(filter, root+"Test-XLIFF01.out.txt"));
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(res), 4);
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(res), 1);
+		assertNotNull(tu);
+		assertEquals("1", tu.getId());
+		assertEquals("Okapi Framework <g id=\"1\">Developer's Guide</g> - Help Guidelines", tu.getSource().toString());
+		assertEquals("<g id=\"1\">", tu.getSource().getFirstContent().getCode(0).getData());
+
+		tu = FilterTestDriver.getTextUnit(getEvents(res), 4);
 		assertNotNull(tu);
 		assertEquals("4", tu.getId());
 		assertEquals("Help Authoring Guidelines", tu.getSource().toString());

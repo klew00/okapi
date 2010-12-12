@@ -776,7 +776,7 @@ public class XMLFilter implements IFilter {
 		}
 		else {
 			tu.setPreserveWhitespaces(false);
-			tu.getSource().unwrap(true);
+			tu.getSource().unwrap(true, true);
 		}
 		
 		skel.addContentPlaceholder(tu);

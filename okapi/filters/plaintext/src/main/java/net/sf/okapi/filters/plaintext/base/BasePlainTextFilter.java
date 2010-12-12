@@ -384,7 +384,7 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 		
 		if (!params.preserveWS ) {
 			// Unwrap the content
-			source.unwrap(true);
+			source.unwrap(true, true);
 			
 //			for (String lng : languages)
 //				TextFragment.unwrap(textUnit.getTargetContent(lng));				

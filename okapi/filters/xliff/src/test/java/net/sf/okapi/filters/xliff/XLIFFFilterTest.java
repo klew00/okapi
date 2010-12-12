@@ -175,6 +175,47 @@ public class XLIFFFilterTest {
 	}
 
 	@Test
+	public void testSegmentedSource1 () {
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+			+ "<xliff version=\"1.2\">"
+			+ "<file source-language=\"en\" target-language=\"fr\" datatype=\"x-test\" original=\"file.ext\">"
+			+ "<body>"
+			+ "<trans-unit id=\"1\">"
+			+ "<source>t1. t2</source>"
+			+ "<seg-source><mrk mid=\"1\" mtype=\"seg\">t1.</mrk> <mrk mid=\"2\" mtype=\"seg\">t2</mrk></seg-source>"
+			+ "</trans-unit>"
+			+ "</body>"
+			+ "</file></xliff>";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		TextContainer cont = tu.getSource();
+		ISegments segments = cont.getSegments();
+		assertNotNull(tu);
+		assertEquals("[t1.] [t2]", fmt.printSegmentedContent(cont, true));
+		assertEquals(2, segments.count());
+		assertEquals("t1.", segments.get(0).text.toText());
+		assertEquals("t2", segments.get(1).text.toText());
+	}
+
+	@Test
+	public void testSegmentedWithEmptyTarget () {
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+			+ "<xliff version=\"1.2\">"
+			+ "<file source-language=\"en\" target-language=\"fr\" datatype=\"x-test\" original=\"file.ext\">"
+			+ "<body>"
+			+ "<trans-unit id=\"1\">"
+			+ "<source>t1. t2</source>"
+			+ "<target><mrk mid=\"1\" mtype=\"seg\"></mrk> <mrk mid=\"2\" mtype=\"seg\"></mrk></target>"
+			+ "<seg-source><mrk mid=\"1\" mtype=\"seg\">t1.</mrk> <mrk mid=\"2\" mtype=\"seg\">t2</mrk></seg-source>"
+			+ "</trans-unit>"
+			+ "</body>"
+			+ "</file></xliff>";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		TextContainer cont = tu.getTarget(locFR);
+		assertEquals("[t1.] [t2]", fmt.printSegmentedContent(tu.getSource(), true));
+		assertEquals("[] []", fmt.printSegmentedContent(cont, true));
+	}
+
+	@Test
 	public void testSegmentedEntryWithDifferences () {
 		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
 			+ "<xliff version=\"1.2\">"

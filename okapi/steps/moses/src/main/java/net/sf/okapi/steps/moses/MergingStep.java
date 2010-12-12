@@ -62,7 +62,7 @@ public class MergingStep extends BasePipelineStep {
 
 	@Override
 	public String getName () {
-		return "Leverage Moses InlineText";
+		return "Moses InlineText Leveraging";
 	}
 
 	@StepParameterMapping(parameterType = StepParameterType.SOURCE_LOCALE)
@@ -162,38 +162,64 @@ public class MergingStep extends BasePipelineStep {
 				seg.text = new TextFragment();
 			}
 		}
-		
-		Segment srcSeg;
-		for ( Segment seg : tc.getSegments() ) {
-			srcSeg = tu.getSource().getSegments().get(seg.id);
-			
-			// For each segment in the original we should have a corresponding text unit in the Moses file
-			if ( !filter.hasNext() ) {
-				throw new OkapiIOException(String.format(
-					"The InlineText file is missing entries for text unit id='%s'", tu.getId()));
-			}
-			Event event = filter.next();
-			if ( event.getEventType() != EventType.TEXT_UNIT ) {
-				throw new OkapiIOException(String.format(
-					"The InlineText file is de-synchronized for text unit id='%s'", tu.getId()));
-			}
-			
-			// Retrieve the translated text
-			TextUnit mtu = event.getTextUnit();
-			AltTranslationsAnnotation ann = new AltTranslationsAnnotation();
-			ann.add(sourceLocale, targetLocale, srcSeg.text,
-				null, mtu.getSource().getFirstContent(),
-				MatchType.MT, 0, "Moses-MT"); //TODO: make info parameters
-			// Attach the annotation
-			seg.setAnnotation(ann);
-			
+
+		// Leverage on the container or on each segment
+		// and make sure to add to any existing annotation rather than obliterate it 
+		AltTranslationsAnnotation ann;
+		if ( tc.contentIsOneSegment() ) {
+			ann = tc.getAnnotation(AltTranslationsAnnotation.class);
+			ann = leverage(ann, tu.getSource().getFirstContent(), tu.getId());
+			tc.setAnnotation(ann); // Attach or re-attach the annotation
 			// If alt-trans not supported: put also the translation in the target
-//TODO: should be optional			
 			if ( !supportAltTrans ) {
-				seg.text = mtu.getSource().getFirstContent();
+				tc.setContent(ann.getLast().getTarget().getFirstContent());
+			}
+		}
+		else { // By segments
+			Segment srcSeg;
+			for ( Segment seg : tc.getSegments() ) {
+				srcSeg = tu.getSource().getSegments().get(seg.id);
+				
+				ann = seg.getAnnotation(AltTranslationsAnnotation.class);
+				ann = leverage(ann, srcSeg.text, tu.getId());
+				seg.setAnnotation(ann); // Attach or re-attach the annotation
+				// If alt-trans not supported: put also the translation in the target
+				if ( !supportAltTrans ) {
+					seg.text = ann.getLast().getTarget().getFirstContent();
+				}
 			}
 		}
 		
 	}
-	
+
+	private AltTranslationsAnnotation leverage (AltTranslationsAnnotation ann,
+		TextFragment srcFrag,
+		String tuId)
+	{
+		// Next text unit in the Moses file should be the corresponding data
+		// to this text fragment
+		if ( !filter.hasNext() ) {
+			throw new OkapiIOException(String.format(
+				"The InlineText file is missing entries for text unit id='%s'", tuId));
+		}
+		Event event = filter.next();
+		if ( event.getEventType() != EventType.TEXT_UNIT ) {
+			throw new OkapiIOException(String.format(
+				"The InlineText file is de-synchronized for text unit id='%s'", tuId));
+		}
+		
+		// Retrieve the translated text
+		TextUnit mtu = event.getTextUnit();
+		// Create a new annotation if one does not exists already
+		if ( ann == null ) {
+			ann = new AltTranslationsAnnotation();
+		}
+		// Add the translation
+		ann.add(sourceLocale, targetLocale, srcFrag,
+			null, mtu.getSource().getFirstContent(),
+			MatchType.MT, 10, "Moses-MT"); //TODO: make info parameters
+		
+		return ann;
+	}
+
 }

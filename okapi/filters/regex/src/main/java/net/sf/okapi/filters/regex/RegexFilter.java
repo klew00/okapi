@@ -508,8 +508,8 @@ public class RegexFilter implements IFilter {
 			tuRes.setPreserveWhitespaces(true);
 		}
 		else { // Unwrap the content
-			tuRes.getSource().unwrap(true);
-			if ( hasTarget ) tuRes.getTarget(trgLang).unwrap(true);
+			tuRes.getSource().unwrap(true, true);
+			if ( hasTarget ) tuRes.getTarget(trgLang).unwrap(true, true);
 		}
 
 		if ( rule.useCodeFinder ) {
@@ -606,7 +606,7 @@ public class RegexFilter implements IFilter {
 					tuRes.setPreserveWhitespaces(true);
 				}
 				else { // Unwrap the string
-					tuRes.getSource().unwrap(true);
+					tuRes.getSource().unwrap(true, true);
 				}
 				
 				if ( rule.useCodeFinder ) {

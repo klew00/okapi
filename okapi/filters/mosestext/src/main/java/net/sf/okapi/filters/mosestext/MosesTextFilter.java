@@ -26,6 +26,7 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,6 +35,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IdGenerator;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
@@ -42,11 +44,13 @@ import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
@@ -61,9 +65,12 @@ public class MosesTextFilter implements IFilter {
 	
 	private static final String ENDSEGMENT = "</mrk>"; 
 
-	private final Pattern startSegment = Pattern.compile("<mrk\\s+mtype\\s*=\\s*[\"']seg[\"'].*?>");
+	private static final Pattern startSegment = Pattern.compile("<mrk\\s+mtype\\s*=\\s*[\"']seg[\"'].*?>");
+	private static final Pattern OPENCLOSE = Pattern.compile("(\\<g(\\s+)id=['\"](.*?)['\"]>)|(\\</g\\>)");
+	private static final Pattern ISOLATED = Pattern.compile("\\<x(\\s+)id=['\"](.*?)['\"](\\s*?)/>");
 
-	private BufferedReader reader;
+
+private BufferedReader reader;
 	private String lineBreak;
 	private Event event;
 	private IdGenerator tuIdGen;
@@ -207,7 +214,7 @@ public class MosesTextFilter implements IFilter {
 	{
 		close(); // Just in case resources need to be freed
 		
-		BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input.getStream(), input.getEncoding());
+		BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input.getStream(), "UTF-8");
 		detector.detectAndRemoveBom();
 		input.setEncoding(detector.getEncoding());
 		String encoding = input.getEncoding();
@@ -253,14 +260,11 @@ public class MosesTextFilter implements IFilter {
 	}
 
 	private Event processBuffer (StringBuilder sb) {
-		// Otherwise: we have in-line codes
-		
-		// Unescape XML?
-		
-
+		// Convert to normal text fragment
+		TextFragment tf = fromPseudoXLIFF(sb.toString());
 		// Create the text unit and the skeleton
 		TextUnit tu = new TextUnit(tuIdGen.createId());
-		tu.setSourceContent(new TextFragment(sb.toString()));
+		tu.setSourceContent(tf);
 		tu.setPreserveWhitespaces(true);
 		
 		boolean add = !skel.isEmpty();
@@ -273,4 +277,66 @@ public class MosesTextFilter implements IFilter {
 		return new Event(EventType.TEXT_UNIT, tu);
 	}
 
+	public TextFragment fromPseudoXLIFF (String text) {
+		TextFragment tf = new TextFragment();
+		// Empty?
+		if ( Util.isEmpty(text) ) {
+			return tf;
+		}
+		// Has code?
+		if ( text.indexOf('<') == -1 ) {
+			// Plain text
+			tf.append(text);
+			return tf;
+		}
+//TODO: MRK, bx, ex, etc.		
+		// Otherwise: process the codes
+		Code code;
+		Matcher m;
+		StringBuilder sb = new StringBuilder(text);
+		ArrayList<Code> codes = new ArrayList<Code>();
+
+		// Opening/closing markers
+		// This assume no-overlapping tags and no empty elements
+		m = OPENCLOSE.matcher(sb.toString());
+		Stack<Integer> stack = new Stack<Integer>();
+		String markers;
+		while ( m.find() ) {
+			if (m.group(1) != null) {
+				// It's an opening tag
+				int id = Util.strToInt(m.group(3), -1);
+				code = new Code(TagType.OPENING, "g", m.group(1));
+				code.setId(id);
+				codes.add(code);
+				markers = String.format("%c%c", TextFragment.MARKER_OPENING,
+					TextFragment.toChar(codes.size()-1));
+				sb.replace(m.start(), m.end(), markers);
+				stack.push(id);
+			}
+			else {
+				// It's a closing tag
+				codes.add(new Code(TagType.CLOSING, "g", m.group(4)));
+				markers = String.format("%c%c", TextFragment.MARKER_CLOSING,
+					TextFragment.toChar(codes.size()-1));
+				sb.replace(m.start(), m.end(), markers);
+			}
+			m = OPENCLOSE.matcher(sb.toString());
+		}
+
+		m = ISOLATED.matcher(sb.toString());
+		while (m.find()) {
+			int id = Util.strToInt(m.group(2), -1);
+			code = new Code(TagType.PLACEHOLDER, "x", m.group());
+			code.setId(id);
+			codes.add(code);
+			markers = String.format("%c%c", TextFragment.MARKER_ISOLATED,
+				TextFragment.toChar(codes.size()-1));
+			sb.replace(m.start(), m.end(), markers);
+			m = ISOLATED.matcher(sb.toString());
+		}
+
+		tf.setCodedText(sb.toString(), codes);
+		return tf;
+	}
+	
 }

@@ -570,10 +570,38 @@ public class TextContainerTest {
 	public void testAppendSimpleSegmentToEmpty () {
 		TextContainer tc = new TextContainer();
 		ISegments segments = tc.getSegments();
+		assertFalse(tc.hasBeenSegmented());
 		assertEquals(1, segments.count());
 		segments.append(new TextFragment("seg"));
+		assertTrue(tc.hasBeenSegmented());
 		assertEquals(1, segments.count());
 		assertEquals("seg", segments.get(0).toString());
+	}
+
+	@Test
+	public void testAppendSimpleSegmentToEmptyWithOption () {
+		TextContainer tc = new TextContainer();
+		ISegments segments = tc.getSegments();
+		assertFalse(tc.hasBeenSegmented());
+		assertEquals(1, segments.count());
+		segments.append(new TextFragment("seg"), false);
+		assertEquals(2, segments.count());
+		assertEquals("", segments.get(0).toString());
+		assertEquals("seg", segments.get(1).toString());
+	}
+
+	@Test
+	public void testAppendSimpleSegmentToInitialEmpty () {
+		TextContainer tc = new TextContainer();
+		ISegments segments = tc.getSegments();
+		assertFalse(tc.hasBeenSegmented());
+		segments.append(new TextFragment(), !tc.hasBeenSegmented());
+		assertTrue(tc.hasBeenSegmented());
+		assertEquals(1, segments.count());
+		assertEquals("", segments.get(0).toString());
+		segments.append(new TextFragment(), !tc.hasBeenSegmented());
+		assertEquals("", segments.get(0).toString());
+		assertEquals("", segments.get(1).toString());
 	}
 
 	@Test
@@ -1048,22 +1076,42 @@ public class TextContainerTest {
 
 	@Test
 	public void testUnwrap_All () {
-		TextContainer tc = new TextContainer(" \t \n");
-		tc.unwrap(true);
-		assertEquals("[]", fmt.printSegmentedContent(tc, true));
-		tc = new TextContainer(" \t \n");
-		tc.unwrap(false);
-		assertEquals("[ ]", fmt.printSegmentedContent(tc, true));
+		TextContainer tc1 = new TextContainer(" \t \n");
+		TextContainer tc2 = tc1.clone();
+		TextContainer tc3 = tc1.clone();
+		TextContainer tc4 = tc1.clone();
+		
+		tc1.unwrap(true, true);
+		assertEquals("[]", fmt.printSegmentedContent(tc1, true));
+		
+		tc2.unwrap(false, true);
+		assertEquals("[ ]", fmt.printSegmentedContent(tc2, true));
+		
+		tc3.unwrap(true, false);
+		assertEquals("[]", fmt.printSegmentedContent(tc3, true));
+		
+		tc4.unwrap(false, false);
+		assertEquals("[ ]", fmt.printSegmentedContent(tc4, true));
 	}
 	
 	@Test
 	public void testUnwrap_Simple () {
-		TextContainer tc = new TextContainer(" a b\tc \n\t");
-		tc.unwrap(true);
-		assertEquals("[a b c]", fmt.printSegmentedContent(tc, true));
-		tc = new TextContainer(" a b\tc \n\t");
-		tc.unwrap(false);
-		assertEquals("[ a b c ]", fmt.printSegmentedContent(tc, true));
+		TextContainer tc1 = new TextContainer(" a b\tc \n\t");
+		TextContainer tc2 = tc1.clone();
+		TextContainer tc3 = tc1.clone();
+		TextContainer tc4 = tc1.clone();
+		
+		tc1.unwrap(true, true);
+		assertEquals("[a b c]", fmt.printSegmentedContent(tc1, true));
+		
+		tc2.unwrap(false, true);
+		assertEquals("[ a b c ]", fmt.printSegmentedContent(tc2, true));
+		
+		tc3.unwrap(true, false);
+		assertEquals("[a b c]", fmt.printSegmentedContent(tc3, true));
+
+		tc4.unwrap(false, false);
+		assertEquals("[ a b c ]", fmt.printSegmentedContent(tc4, true));
 	}
 	
 	@Test
@@ -1074,11 +1122,21 @@ public class TextContainerTest {
 		tc1.append(new TextFragment("  "));
 		tc1.append(new TextFragment(" \n"));
 		TextContainer tc2 = tc1.clone();
+		TextContainer tc3 = tc1.clone();
+		TextContainer tc4 = tc1.clone();
 		assertEquals("[ \t ]    \n", fmt.printSegmentedContent(tc1, true));
-		tc1.unwrap(true);
+		
+		tc1.unwrap(true, true);
 		assertEquals("[]", fmt.printSegmentedContent(tc1, true));
-		tc2.unwrap(false);
+		
+		tc2.unwrap(false, true); // Ending deletion is because of collapse is true
 		assertEquals("[ ]", fmt.printSegmentedContent(tc2, true));
+
+		tc3.unwrap(true, false); // Ends are trimmed
+		assertEquals("[]", fmt.printSegmentedContent(tc3, true));
+		
+		tc4.unwrap(false, false); // End not trimmed, last part is not collapsed
+		assertEquals("[ ] ", fmt.printSegmentedContent(tc4, true));
 	}
 
 	@Test
@@ -1092,11 +1150,21 @@ public class TextContainerTest {
 		segments.append(new TextFragment(" t3\n\n"));
 		tc1.append(new TextFragment("  "));
 		TextContainer tc2 = tc1.clone();
+		TextContainer tc3 = tc1.clone();
+		TextContainer tc4 = tc1.clone();
 		assertEquals("[ \tt1 ]   [t2]  [ t3\n\n]  ", fmt.printSegmentedContent(tc1, true));
-		tc1.unwrap(true);
+	
+		tc1.unwrap(true, true);
 		assertEquals("[t1 ][t2] [t3]", fmt.printSegmentedContent(tc1, true));
-		tc2.unwrap(false);
+		
+		tc2.unwrap(false, true);
 		assertEquals("[ t1 ][t2] [t3 ]", fmt.printSegmentedContent(tc2, true));
+
+		tc3.unwrap(true, false);
+		assertEquals("[t1 ][t2] [t3]", fmt.printSegmentedContent(tc3, true));
+		
+		tc4.unwrap(false, false);
+		assertEquals("[ t1 ][t2] [t3 ]", fmt.printSegmentedContent(tc4, true));
 	}
 	
 	@Test
@@ -1106,14 +1174,55 @@ public class TextContainerTest {
 		segments.append(new TextFragment("t1"));
 		tc1.append(new TextFragment(" "));
 		TextContainer tc2 = tc1.clone();
+		TextContainer tc3 = tc1.clone();
+		TextContainer tc4 = tc1.clone();
 		assertEquals(2, tc1.count());
 		assertEquals("[t1] ", fmt.printSegmentedContent(tc1, true));
-		tc1.unwrap(true);
+		
+		tc1.unwrap(true, true);
 		assertEquals("[t1]", fmt.printSegmentedContent(tc1, true));
-		tc2.unwrap(false);
+		
+		tc2.unwrap(false, true);
 		assertEquals("[t1] ", fmt.printSegmentedContent(tc2, true));
+
+		tc3.unwrap(true, false);
+		assertEquals("[t1]", fmt.printSegmentedContent(tc3, true));
+		
+		tc4.unwrap(false, false);
+		assertEquals("[t1] ", fmt.printSegmentedContent(tc4, true));
 	}
 	
+	@Test
+	public void testUnwrap_MixedPartsEmpties () {
+		TextContainer tc1 = new TextContainer();
+		ISegments segments = tc1.getSegments();
+		tc1.append(" ", false);
+		assertEquals("[] ", fmt.printSegmentedContent(tc1, true));
+		segments.append(new TextFragment(""), false);
+		assertEquals("[] []", fmt.printSegmentedContent(tc1, true));
+		tc1.append("\n", false);
+		assertEquals("[] []\n", fmt.printSegmentedContent(tc1, true));
+		segments.append(new TextFragment(""), false);
+		assertEquals("[] []\n[]", fmt.printSegmentedContent(tc1, true));
+		tc1.append("\n", false);
+		assertEquals("[] []\n[]\n", fmt.printSegmentedContent(tc1, true));
+		TextContainer tc2 = tc1.clone();
+		TextContainer tc3 = tc1.clone();
+		TextContainer tc4 = tc1.clone();
+		
+		tc1.unwrap(true, true);
+		assertEquals("[][][]", fmt.printSegmentedContent(tc1, true));
+		
+		tc2.unwrap(false, true); // Ending is removed by collapsing not by trimming 
+		assertEquals("[][][]", fmt.printSegmentedContent(tc2, true));
+
+		tc3.unwrap(true, false);
+		assertEquals("[] [] []", fmt.printSegmentedContent(tc3, true));
+		
+		tc4.unwrap(false, false);
+		assertEquals("[] [] [] ", fmt.printSegmentedContent(tc4, true));
+	}
+
 	@Test
 	public void testSegments () {
 		String originalText = "[seg1][seg2] [seg3]";
