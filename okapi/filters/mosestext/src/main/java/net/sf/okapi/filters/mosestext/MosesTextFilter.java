@@ -277,6 +277,12 @@ private BufferedReader reader;
 		return new Event(EventType.TEXT_UNIT, tu);
 	}
 
+	/**
+	 * Converts a pseudoXLIFF string into a TextFragment. It assumes there is no
+	 * escaped characters in attribute values.
+	 * @param text the string to convert.
+	 * @return the new text fragment.
+	 */
 	public TextFragment fromPseudoXLIFF (String text) {
 		TextFragment tf = new TextFragment();
 		// Empty?
@@ -284,16 +290,21 @@ private BufferedReader reader;
 			return tf;
 		}
 		// Has code?
-		if ( text.indexOf('<') == -1 ) {
+		if (( text.indexOf('<') == -1 ) && ( text.indexOf('&') == -1 )) {
 			// Plain text
 			tf.append(text);
 			return tf;
 		}
+
+		text = text.toString().replace("&apos;", "'");
+		text = text.replace("&lt;", "<");
+		text = text.replace("&gt;", ">");
+		StringBuilder sb = new StringBuilder(text.replace("&quot;", "\""));
+		
 //TODO: MRK, bx, ex, etc.		
 		// Otherwise: process the codes
 		Code code;
 		Matcher m;
-		StringBuilder sb = new StringBuilder(text);
 		ArrayList<Code> codes = new ArrayList<Code>();
 
 		// Opening/closing markers

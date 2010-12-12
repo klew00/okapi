@@ -133,6 +133,7 @@ public class MosesTextFilterTest {
 	
 	@Test
 	public void testSpecialChars () {
+		// Note '<' should really be escaped, but we support it anyway
 		String snippet = "Line 1\rLine 2 with tab[\t] and more [<{|&/\\}>]";
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 2);
 		assertNotNull(tu);
@@ -140,8 +141,29 @@ public class MosesTextFilterTest {
 	}
 	
 	@Test
+	public void testLiterals () {
+		String snippet = "&lt;=lt, &gt;=gt, &quot;=quot, &apos;=apos";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertNotNull(tu);
+		assertEquals("<=lt, >=gt, \"=quot, '=apos", tu.getSource().toString());
+	}
+	
+	@Test
+	public void testWhiteSpaces () {
+		String snippet = "Text 1   .\r<mrk mtype=\"seg\">Line 1\r\rLine 2</mrk>";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertNotNull(tu);
+		assertEquals("Text 1   .", tu.getSource().toString());
+		assertTrue(tu.preserveWhitespaces());
+		tu = FilterTestDriver.getTextUnit(getEvents(snippet), 2);
+		assertNotNull(tu);
+		assertEquals("Line 1\n\nLine 2", tu.getSource().toString());
+		assertTrue(tu.preserveWhitespaces());
+	}
+	
+	@Test
 	public void testFromFile () {
-		TextUnit tu = FilterTestDriver.getTextUnit(getEventsFromFile(filter, root+"/Test01.txt"), 2);
+		TextUnit tu = FilterTestDriver.getTextUnit(getEventsFromFile(filter, root+"/Test01.txt", locPT), 2);
 		assertNotNull(tu);
 		assertEquals("This is a test on line 1,\nand line two.", tu.getSource().toString());
 	}
@@ -158,10 +180,11 @@ public class MosesTextFilterTest {
 	}
 
 	private ArrayList<Event> getEventsFromFile (IFilter filter,
-		String path)
+		String path,
+		LocaleId trgLoc)
 	{
 		ArrayList<Event> list = new ArrayList<Event>();
-		filter.open(new RawDocument(new File(path).toURI(), "UTF-8", locEN, locPT));
+		filter.open(new RawDocument(new File(path).toURI(), "UTF-8", locEN, trgLoc));
 		while (filter.hasNext()) {
 			Event event = filter.next();
 			list.add(event);

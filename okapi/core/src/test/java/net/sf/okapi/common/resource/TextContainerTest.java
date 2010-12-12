@@ -1224,6 +1224,33 @@ public class TextContainerTest {
 	}
 
 	@Test
+	public void testUnwrap_MixedParts () {
+		TextContainer tc1 = new TextContainer();
+		ISegments segments = tc1.getSegments();
+		tc1.append(" ", false);
+		assertEquals("[] ", fmt.printSegmentedContent(tc1, true));
+		segments.append(new TextFragment("  t1 "), false);
+		assertEquals("[] [  t1 ]", fmt.printSegmentedContent(tc1, true));
+		segments.append(new TextFragment("  t2" ), false);
+		assertEquals("[] [  t1 ][  t2]", fmt.printSegmentedContent(tc1, true));
+		TextContainer tc2 = tc1.clone();
+		TextContainer tc3 = tc1.clone();
+		TextContainer tc4 = tc1.clone();
+		
+		tc1.unwrap(true, true);
+		assertEquals("[][t1 ][t2]", fmt.printSegmentedContent(tc1, true));
+		
+		tc2.unwrap(false, true); // Trimming s done after first segment 
+		assertEquals("[][t1 ][t2]", fmt.printSegmentedContent(tc2, true));
+
+		tc3.unwrap(true, false);
+		assertEquals("[] [t1 ][t2]", fmt.printSegmentedContent(tc3, true));
+		
+		tc4.unwrap(false, false);
+		assertEquals("[] [t1 ][t2]", fmt.printSegmentedContent(tc4, true));
+	}
+
+	@Test
 	public void testSegments () {
 		String originalText = "[seg1][seg2] [seg3]";
 		TextContainer tc = new TextContainer(originalText);

@@ -16,6 +16,12 @@ and line 3.</source>
 <source xml:lang="en"><g id="1">word1</g>, <bpt id="2">b-codeA</bpt>word2<ept id="2">e-codeA</ept>,
 <ph id="3">codeB</ph>word3, <x id="4"/>word5, <mrk mtype="protected">to protect</mrk>, etc.</source>
 </trans-unit>
+<trans-unit id="tu4" xml:space="preserve">
+<source xml:lang="en">&lt;=lt, &gt;=gt, "=quot, '=apos
+Line 2
+Line 3
+<ph id='1'>&lt;=lt, &gt;=gt, "=quot, '=apos</ph> end.</source>
+</trans-unit>
 </body>
 </file>
 </xliff>
