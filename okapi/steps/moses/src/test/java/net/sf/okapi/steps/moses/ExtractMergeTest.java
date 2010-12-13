@@ -111,7 +111,10 @@ public class ExtractMergeTest {
 		// Setup the merging pipeline
 		pd = new PipelineDriver();
 		pd.addStep(new RawDocumentToFilterEventsStep(new XLIFFFilter()));
-		pd.addStep(new MergingStep());
+		MergingStep step = new MergingStep();
+		MergingParameters p = (MergingParameters)step.getParameters();
+		p.setCopyToTarget(true);
+		pd.addStep(step);
 		pd.addStep(new FilterEventsToRawDocumentStep());
 		// Two parallel inputs: 1=the original file, 2=the Moses translated file
 		RawDocument rd1 = new RawDocument(inFile.toURI(), "UTF-8", locEN, locFR, "okf_xliff");
@@ -131,6 +134,9 @@ public class ExtractMergeTest {
 		ISegments segs = tu.getTarget(locFR).getSegments();
 		assertEquals(2, segs.count());
 		for ( Segment seg : segs ) {
+			// Copy to the target was set so the target should be translated
+			assertTrue(seg.text.toText().startsWith("FR "));
+			// Check annotation
 			AltTranslationsAnnotation ann = seg.getAnnotation(AltTranslationsAnnotation.class);
 			assertNotNull(ann);
 			assertTrue(ann.getFirst().getTarget().toString().startsWith("FR "));

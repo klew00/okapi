@@ -286,69 +286,55 @@ public abstract class BaseWriter implements IWriter {
 	}
 
 	public void writeTMXEntries (TextUnit tu) {
-		// Write the items text in the TM if needed
-		// (case of existing translations)
+		// Check if we have a target
 		TextContainer tc = tu.getTarget(trgLoc);
-		if (( tc != null ) && ( !tc.isEmpty() )) {
-			if ( tu.getSource().isEmpty() ||
-				( tu.getSource().hasText(false) && !tc.hasText(false) )) {
-				return; // Target has code and/or spaces only
-			}
-			
-			boolean done = false;
-			if ( tu.hasTargetProperty(trgLoc, Property.APPROVED) ) {
-				if ( tu.getTargetProperty(trgLoc, Property.APPROVED).getValue().equals("yes") ) {
-					// Write existing translation that was approved
-					tmxWriterApproved.writeItem(tu, null);
-					done = true;
-				}
-			}
-			if ( !done ) {
-				// Write leveraged data
-				writeScoredItem(tu);
-				// Write existing translation not yet approved
-				tmxWriterUnApproved.writeItem(tu, null);
-			}
+		if (( tc == null ) || ( tc.isEmpty() )) {
+			return; // No target
+		}
+		if ( tu.getSource().isEmpty() || ( tu.getSource().hasText(false) && !tc.hasText(false) )) {
+			return; // Target has code and/or spaces only
 		}
 
-		// Check for alternates
+		// Process translation(s) in the container itself
+		boolean done = false;
+		if ( tu.hasTargetProperty(trgLoc, Property.APPROVED) ) {
+			if ( tu.getTargetProperty(trgLoc, Property.APPROVED).getValue().equals("yes") ) {
+				// Write existing translation that was approved
+				tmxWriterApproved.writeItem(tu, null);
+				done = true;
+			}
+		}
+		if ( !done ) {
+			// Write existing translation not yet approved
+			tmxWriterUnApproved.writeItem(tu, null);
+		}
+
+		// Process translations in the AltTranslationsAnnotation annotation
+		// alternates from the input file or leveraged entries
 		TextContainer altCont = tu.getTarget(trgLoc);
-		if ( altCont != null ) {
-			// From the segments
-			ISegments srcSegs = tu.getSource().getSegments();
-			for ( Segment seg : altCont.getSegments() ) {
-				Segment srcSeg = srcSegs.get(seg.id);
-				if ( srcSeg == null ) continue;
-				writeAltTranslations(seg.getAnnotation(AltTranslationsAnnotation.class), srcSeg.text);
-			}
-			// From the target container
-			TextFragment srcOriginal;
-			if ( tu.getSource().contentIsOneSegment() ) {
-				srcOriginal = tu.getSource().getFirstContent();
-			}
-			else {
-				srcOriginal = tu.getSource().getUnSegmentedContentCopy();
-			}
-			writeAltTranslations(altCont.getAnnotation(AltTranslationsAnnotation.class), srcOriginal);
+
+		// From the segments
+		ISegments srcSegs = tu.getSource().getSegments();
+		for ( Segment seg : altCont.getSegments() ) {
+			Segment srcSeg = srcSegs.get(seg.id);
+			if ( srcSeg == null ) continue;
+			writeAltTranslations(seg.getAnnotation(AltTranslationsAnnotation.class), srcSeg.text);
 		}
 		
+		// From the target container
+		TextFragment srcOriginal;
+		if ( tu.getSource().contentIsOneSegment() ) {
+			srcOriginal = tu.getSource().getFirstContent();
+		}
+		else {
+			srcOriginal = tu.getSource().getUnSegmentedContentCopy();
+		}
+		writeAltTranslations(altCont.getAnnotation(AltTranslationsAnnotation.class), srcOriginal);
+		
+		// Make sure to call this too (for derived writers)
+		writeScoredItem(tu);
 	}
 
-//	/**
-//	 * Indicates if a text unit has {@link #AltTranslationAnnotation} or not.
-//	 * @param tu the text unit to look at.
-//	 * @return true if the given text unit has one or more annotations.
-//	 */
-//	boolean hasAltTranslations (TextUnit tu) {
-//		TextContainer tc = tu.getTarget(trgLoc);
-//		if ( tc.getAnnotation(AltTranslationsAnnotation.class) != null ) return true;
-//		// Else, check the segments
-//		for ( Segment seg : tc.getSegments() ) {
-//			if ( seg.getAnnotation(AltTranslationsAnnotation.class) != null ) return true;
-//		}
-//		return false;
-//	}
-	
 	private void writeAltTranslations (AltTranslationsAnnotation ann,
 		TextFragment srcOriginal)
 	{
@@ -356,14 +342,21 @@ public abstract class BaseWriter implements IWriter {
 			return;
 		}
 		for ( AltTranslation alt : ann ) {
-			tmxWriterAlternate.writeAlternate(alt, srcOriginal);
+			if ( alt.getFromOriginal() ) {
+				// If it's coming from the original it's a true alternate (e.g. XLIFF one)
+				tmxWriterAlternate.writeAlternate(alt, srcOriginal);
+			}
+			else {
+				// Otherwise the translation is from a leveraging step
+				tmxWriterLeverage.writeAlternate(alt, srcOriginal);
+			}
 		}
 	}
 
 	@Override
 	public void writeScoredItem (TextUnit item) {
-		// By default, matches go in the leverage TM
-		tmxWriterLeverage.writeItem(item, null);
+		// Not used. Alternate writing is done in writeTMXEntries
+		// But some derived writer may use this
 	}
 
 }

@@ -25,8 +25,10 @@ import java.net.URI;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.exceptions.OkapiIOException;
@@ -42,6 +44,7 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.mosestext.MosesTextFilter;
 
+@UsingParameters(MergingParameters.class)
 public class MergingStep extends BasePipelineStep {
 
 	private LocaleId sourceLocale;
@@ -49,9 +52,10 @@ public class MergingStep extends BasePipelineStep {
 	private URI inputURI;
 	private RawDocument mosesDoc;
 	private MosesTextFilter filter;
-	private boolean supportAltTrans;
+	private MergingParameters params;
 	
 	public MergingStep () {
+		params = new MergingParameters();
 	}
 	
 	@Override
@@ -86,6 +90,16 @@ public class MergingStep extends BasePipelineStep {
 	}
 
 	@Override
+	public IParameters getParameters() {
+		return params;
+	}
+
+	@Override
+	public void setParameters(IParameters params) {
+		params = (MergingParameters)params;
+	}
+
+	@Override
 	public Event handleEvent (Event event) {
 		switch ( event.getEventType() ) {
 		case START_DOCUMENT:
@@ -101,16 +115,14 @@ public class MergingStep extends BasePipelineStep {
 	}
 	
 	private void processStartDocument (StartDocument sd) {
-		// Check the type of input document
-		supportAltTrans = false;
-		// If the original document is coming from the XLIFF filter
-		// We force the parameters to accept alt-trans
-//TODO: should be optional
-		if ( sd.getFilterParameters() instanceof net.sf.okapi.filters.xliff.Parameters ) {
-			net.sf.okapi.filters.xliff.Parameters params = (net.sf.okapi.filters.xliff.Parameters)sd.getFilterParameters();
-			if ( params != null ) {
-				params.setAddAltTrans(true);
-				supportAltTrans = true;
+		if ( params.getForceAltTransOutput() ) {
+			// Check the type of input document
+			if ( sd.getFilterParameters() instanceof net.sf.okapi.filters.xliff.Parameters ) {
+				// Force the alt-trans to be output if requested
+				net.sf.okapi.filters.xliff.Parameters params = (net.sf.okapi.filters.xliff.Parameters)sd.getFilterParameters();
+				if ( params != null ) {
+					params.setAddAltTrans(true);
+				}
 			}
 		}
 		
@@ -170,10 +182,8 @@ public class MergingStep extends BasePipelineStep {
 			ann = tc.getAnnotation(AltTranslationsAnnotation.class);
 			ann = leverage(ann, tu.getSource().getFirstContent(), tu.getId());
 			tc.setAnnotation(ann); // Attach or re-attach the annotation
-			// If alt-trans not supported: put also the translation in the target
-			if ( !supportAltTrans ) {
-				tc.setContent(ann.getLast().getTarget().getFirstContent());
-			}
+			// Copy also to target if needed
+			copyToTarget(tc, null, ann);
 		}
 		else { // By segments
 			Segment srcSeg;
@@ -183,13 +193,30 @@ public class MergingStep extends BasePipelineStep {
 				ann = seg.getAnnotation(AltTranslationsAnnotation.class);
 				ann = leverage(ann, srcSeg.text, tu.getId());
 				seg.setAnnotation(ann); // Attach or re-attach the annotation
-				// If alt-trans not supported: put also the translation in the target
-				if ( !supportAltTrans ) {
-					seg.text = ann.getLast().getTarget().getFirstContent();
-				}
+				// Copy also to target if needed
+				copyToTarget(null, seg, ann);
 			}
 		}
 		
+	}
+
+	private void copyToTarget (TextContainer tc,
+		Segment seg,
+		AltTranslationsAnnotation ann)
+	{
+		// Do we copy to the target?
+		if ( !params.getCopyToTarget() ) return;
+		// Get the existing content to check if it's empty
+		if ( tc != null ) {
+			if ( params.getOverwriteExistingTarget() || tc.isEmpty() ) {
+				tc.setContent(ann.getLast().getTarget().getFirstContent());
+			}
+		}
+		else { // Segment
+			if ( params.getOverwriteExistingTarget() || seg.text.isEmpty() ) {
+				seg.text = ann.getLast().getTarget().getFirstContent();
+			}
+		}
 	}
 
 	private AltTranslationsAnnotation leverage (AltTranslationsAnnotation ann,

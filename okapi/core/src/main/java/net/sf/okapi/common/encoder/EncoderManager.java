@@ -20,6 +20,7 @@
 
 package net.sf.okapi.common.encoder;
 
+import java.nio.charset.CharsetEncoder;
 import java.security.InvalidParameterException;
 import java.util.Hashtable;
 import java.util.Map.Entry;
@@ -273,6 +274,14 @@ public class EncoderManager implements IEncoder {
 			return encoder.getLineBreak();
 		}
 		return this.defLineBreak;
+	}
+
+	@Override
+	public CharsetEncoder getCharsetEncoder () {
+		if ( encoder != null ) {
+			return encoder.getCharsetEncoder();
+		}
+		return null;
 	}
 
 }

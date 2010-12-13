@@ -21,7 +21,6 @@ See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 package net.sf.okapi.common.filterwriter;
 
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -31,6 +30,7 @@ import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
@@ -231,92 +231,107 @@ public class TMXWriter {
     }
 
     /**
-     * Writes a given text unit.
-     * @param item The text unit to output.
+     * Writes a given text unit. One TMX TU per segment if the text unit is segment,
+     * or one TU for the full content, if the text unit is not segmented.
+     * @param tu The text unit to output.
      * @param attributes The optional set of attribute to put along with the entry.
      */
-    public void writeItem (TextUnit item,
+    public void writeItem (TextUnit tu,
     	Map<String, String> attributes)
     {
-    	//TODO: re-implement writeItem without alternates option
-    	writeItem(item, attributes, false);
-    }
-
-    /**
-     * Writes a given text unit.
-     * @param item the text unit to output.
-     * @param attributes the optional set of attribute to put along with the entry.
-     * @param alternate indicates if this item is an 'alternate'. If it is an alternate, if the
-     * target locale does not have any entry in this item, the first found entry is used
-     * instead. This is to allow getting for example FR-CA translations for an FR project.
-     * @deprecated This method will be removed soon, to write alternates use
-     * {@link #writeAlternate(AltTranslation, TextFragment)}.
-     */
-    public void writeItem (TextUnit item,
-   		Map<String, String> attributes,
-   		boolean alternate)
-    {
-    	String tuid = item.getName();
-    	if ( Util.isEmpty(tuid) ) {
-    		// itemCount will be incremented in writeTU, so do a +1 here to take that in account
-    		tuid = String.format("autoID%d", itemCount + 1);
+    	if ( !tu.hasTarget(trgLoc) ) {
+    		return; // No target
     	}
+    	ISegments srcSegs = tu.getSource().getSegments();
+    	ISegments trgSegs = tu.getTarget(trgLoc).getSegments();
 
-    	TextContainer srcTC = item.getSource();
-    	TextContainer trgTC = item.getTarget(trgLoc);
-
-    	if (( trgTC == null ) && alternate ) {
-    		// If we don't have a target but are in alternate mode: get the first
-    		// available locale in the list
-    		Iterator<LocaleId> iter = item.getTargetLocales().iterator();
-    		if ( iter.hasNext() ) {
-    			trgTC = item.getTarget(iter.next());
-    		}
-    	}
-
-    	AltTranslationsAnnotation atAnn = null;
-		for ( Segment srcSeg : srcTC.getSegments() ) {
-    		TextFragment tf = srcSeg.text;
-			Segment trgSeg = null;
-			if ( trgTC != null ) {
-				trgSeg = trgTC.getSegments().get(srcSeg.id);
-			}
-			if ( trgSeg == null ) {
-	       		// No target segment
-				continue;
-			}
-			// Get annotation
-			AltTranslation at = null;
-			atAnn = trgSeg.getAnnotation(AltTranslationsAnnotation.class);
-			if ( atAnn == null ) {
-				continue;
-			}
-			at = atAnn.getFirst();
-    		if ( at != null ) {
-				// Now see if we need to alter the source text
-				if ( at.fromMT() ) {
-					// Set the MT flag attribute
-		        	if ( attributes != null ) {
-		        		if ( !attributes.containsKey(CREATIONID) ) {
-		        			attributes.put(CREATIONID, Util.MTFLAG);
-		        		}
-		        	}
-		        	else {
-		        		attributes = MTattribute;
-		        	}
-		        	// Add the flag prefix if requested (that's why we clone)
-		        	if ( useMTPrefix ) {
-		        		tf = srcSeg.text.clone();
-		        		tf.setCodedText(Util.MTFLAG+" "+tf.getCodedText());
-		        	}
-				}
-    		}
-    		if ( trgSeg.text.isEmpty() ) continue; // Skip possible empty entries
-    		// Write out the segment
-       		writeTU(tf, trgSeg.text,
-   				String.format("%s_s%s", tuid, srcSeg.id), attributes);
+    	// Output each segment (handles single-segment entry)
+    	String tuId = tu.getId();
+    	for ( Segment srcSeg : srcSegs ) {
+    		Segment trgSeg = trgSegs.get(srcSeg.id);
+    		if (( trgSeg == null ) || trgSeg.text.isEmpty() ) continue; // No target
+    		// Else: output
+    		writeTU(srcSeg.text, trgSeg.text,
+				String.format("%s_s%s", tuId, srcSeg.id), attributes);
     	}
     }
+
+// Removed deprecated method    
+//    /**
+//     * Writes a given text unit.
+//     * @param item the text unit to output.
+//     * @param attributes the optional set of attribute to put along with the entry.
+//     * @param alternate indicates if this item is an 'alternate'. If it is an alternate, if the
+//     * target locale does not have any entry in this item, the first found entry is used
+//     * instead. This is to allow getting for example FR-CA translations for an FR project.
+//     * @deprecated This method will be removed soon, to write alternates use
+//     * {@link #writeAlternate(AltTranslation, TextFragment)}.
+//     */
+//    public void writeItem (TextUnit item,
+//   		Map<String, String> attributes,
+//   		boolean alternate)
+//    {
+//    	String tuid = item.getName();
+//    	if ( Util.isEmpty(tuid) ) {
+//    		// itemCount will be incremented in writeTU, so do a +1 here to take that in account
+//    		tuid = String.format("autoID%d", itemCount + 1);
+//    	}
+//
+//    	TextContainer srcTC = item.getSource();
+//    	TextContainer trgTC = item.getTarget(trgLoc);
+//
+//    	if (( trgTC == null ) && alternate ) {
+//    		// If we don't have a target but are in alternate mode: get the first
+//    		// available locale in the list
+//    		Iterator<LocaleId> iter = item.getTargetLocales().iterator();
+//    		if ( iter.hasNext() ) {
+//    			trgTC = item.getTarget(iter.next());
+//    		}
+//    	}
+//
+//    	AltTranslationsAnnotation atAnn = null;
+//		for ( Segment srcSeg : srcTC.getSegments() ) {
+//    		TextFragment tf = srcSeg.text;
+//			Segment trgSeg = null;
+//			if ( trgTC != null ) {
+//				trgSeg = trgTC.getSegments().get(srcSeg.id);
+//			}
+//			if ( trgSeg == null ) {
+//	       		// No target segment
+//				continue;
+//			}
+//			// Get annotation
+//			AltTranslation at = null;
+//			atAnn = trgSeg.getAnnotation(AltTranslationsAnnotation.class);
+//			if ( atAnn == null ) {
+//				continue;
+//			}
+//			at = atAnn.getFirst();
+//    		if ( at != null ) {
+//				// Now see if we need to alter the source text
+//				if ( at.fromMT() ) {
+//					// Set the MT flag attribute
+//		        	if ( attributes != null ) {
+//		        		if ( !attributes.containsKey(CREATIONID) ) {
+//		        			attributes.put(CREATIONID, Util.MTFLAG);
+//		        		}
+//		        	}
+//		        	else {
+//		        		attributes = MTattribute;
+//		        	}
+//		        	// Add the flag prefix if requested (that's why we clone)
+//		        	if ( useMTPrefix ) {
+//		        		tf = srcSeg.text.clone();
+//		        		tf.setCodedText(Util.MTFLAG+" "+tf.getCodedText());
+//		        	}
+//				}
+//    		}
+//    		if ( trgSeg.text.isEmpty() ) continue; // Skip possible empty entries
+//    		// Write out the segment
+//       		writeTU(tf, trgSeg.text,
+//   				String.format("%s_s%s", tuid, srcSeg.id), attributes);
+//    	}
+//    }
 
 //    /**
 //     * Writes a given text unit.
@@ -456,6 +471,8 @@ public class TMXWriter {
     
     /**
      * Writes the data of an {@link AltTranslation} to this TMX output.
+     * <p>Which entries will be output also depends on what patterns have been set with
+     * {@link #setAltTranslationOption(String)} and {@link #setExclusionOption(String)}.
      * @param alt the alternate translation.
      * @param srcOriginal the default source (coming from the segment or container where
      * the annotation was attached to).

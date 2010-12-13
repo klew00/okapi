@@ -119,4 +119,9 @@ public class LayerProvider implements ILayerProvider {
 		return lineBreak;
 	}
 
+	@Override
+	public CharsetEncoder getCharsetEncoder () {
+		return outputEncoder;
+	}
+
 }

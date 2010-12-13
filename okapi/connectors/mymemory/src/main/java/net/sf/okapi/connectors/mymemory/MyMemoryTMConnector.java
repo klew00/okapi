@@ -126,8 +126,8 @@ public class MyMemoryTMConnector extends BaseConnector implements ITMQuery {
 					if ( ++i > maxHits ) break; // Maximum reached
 					res = new QueryResult();
 					res.weight = getWeight();
+					res.origin = getName();
 					if ( match.getTranslator().equals("MT!") ) {
-						res.origin = getName();
 						res.matchType = MatchType.MT;
 						res.score = 95; // Standard score for MT
 					}

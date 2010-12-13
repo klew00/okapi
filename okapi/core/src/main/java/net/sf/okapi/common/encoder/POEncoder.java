@@ -20,6 +20,8 @@
 
 package net.sf.okapi.common.encoder;
 
+import java.nio.charset.CharsetEncoder;
+
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.resource.Property;
 
@@ -83,5 +85,9 @@ public class POEncoder implements IEncoder {
 		return "\n";
 	}
 
-	
+	@Override
+	public CharsetEncoder getCharsetEncoder () {
+		return null;
+	}
+
 }

@@ -20,6 +20,7 @@
 
 package net.sf.okapi.common.filterwriter;
 
+import java.nio.charset.CharsetEncoder;
 import java.util.List;
 
 import net.sf.okapi.common.Util;
@@ -38,6 +39,7 @@ public class XLIFFContent {
 	private String codedText;
 	private List<Code> codes;
 	private XLIFFContent innerContent;
+	private CharsetEncoder chsEnc;
 	
 	/**
 	 * Creates a new XLIFFContent object without any content.
@@ -52,6 +54,14 @@ public class XLIFFContent {
 	 */
 	public XLIFFContent (TextFragment content) {
 		setContent(content);
+	}
+
+	/**
+	 * Sets the character set encoder to use. 
+	 * @param chsEnc the character set encoder to use.
+	 */
+	public void setCharsetEncoder (CharsetEncoder chsEnc) {
+		this.chsEnc = chsEnc;
 	}
 
 	/**
@@ -121,7 +131,7 @@ public class XLIFFContent {
 						}
 						else {
 							tmp.append(String.format("<bpt id=\"%d\">", code.getId()));//TODO: escape unsupported chars
-							tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
+							tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, chsEnc));
 							tmp.append("</bpt>");
 						}
 					//}
@@ -139,7 +149,7 @@ public class XLIFFContent {
 					}
 					else {
 						tmp.append(String.format("<ept id=\"%d\">", code.getId())); //TODO: escape unsupported chars
-						tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
+						tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, chsEnc));
 						tmp.append("</ept>");
 					}
 					if ( code.hasAnnotation("protected") ) {
@@ -168,17 +178,17 @@ public class XLIFFContent {
 					else {
 						if ( code.getTagType() == TagType.OPENING ) {
 							tmp.append(String.format("<it id=\"%d\" pos=\"open\">", code.getId())); //TODO: escape unsupported chars
-							tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
+							tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, chsEnc));
 							tmp.append("</it>");
 						}
 						else if ( code.getTagType() == TagType.CLOSING ) {
 							tmp.append(String.format("<it id=\"%d\" pos=\"close\">", code.getId())); //TODO: escape unsupported chars
-							tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
+							tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, chsEnc));
 							tmp.append("</it>");
 						}
 						else {
 							tmp.append(String.format("<ph id=\"%d\">", code.getId())); //TODO: escape unsupported chars
-							tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
+							tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, chsEnc));
 							tmp.append("</ph>");
 						}
 					}
@@ -217,7 +227,28 @@ public class XLIFFContent {
 				}
 				break;
 			default:
-				tmp.append(codedText.charAt(i));
+				if ( codedText.charAt(i) > 127 ) { // Extended chars
+					if ( Character.isHighSurrogate(codedText.charAt(i)) ) {
+						int cp = codedText.codePointAt(i++);
+						String buf = new String(Character.toChars(cp));
+						if (( chsEnc != null ) && !chsEnc.canEncode(buf) ) {
+							tmp.append(String.format("&#x%x;", cp));
+						} else {
+							tmp.append(buf);
+						}
+					}
+					else {
+						if (( chsEnc != null ) && !chsEnc.canEncode(codedText.charAt(i)) ) {
+							tmp.append(String.format("&#x%04x;", codedText.codePointAt(i)));
+						}
+						else { // No encoder or char is supported
+							tmp.append(codedText.charAt(i));
+						}
+					}
+				}
+				else { // ASCII chars
+					tmp.append(codedText.charAt(i));
+				}
 				break;
 			}
 		}
@@ -244,6 +275,7 @@ public class XLIFFContent {
 		StringBuilder tmp = new StringBuilder();
 		if ( innerContent == null ) {
 			innerContent = new XLIFFContent();
+			innerContent.setCharsetEncoder(chsEnc);
 		}
 
 		for ( TextPart part : container ) {

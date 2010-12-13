@@ -20,6 +20,8 @@
 
 package net.sf.okapi.common.encoder;
 
+import java.nio.charset.CharsetEncoder;
+
 import net.sf.okapi.common.IParameters;
 
 /**
@@ -150,6 +152,11 @@ public class OpenXMLEncoder implements IEncoder {
 	@Override
 	public String getLineBreak () {
 		return this.lineBreak;
+	}
+
+	@Override
+	public CharsetEncoder getCharsetEncoder () {
+		return null;
 	}
 
 }

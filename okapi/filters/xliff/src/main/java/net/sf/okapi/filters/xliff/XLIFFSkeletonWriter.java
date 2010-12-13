@@ -20,6 +20,7 @@
 
 package net.sf.okapi.filters.xliff;
 
+import java.nio.charset.CharsetEncoder;
 import java.util.logging.Logger;
 
 import net.sf.okapi.common.IResource;
@@ -27,6 +28,8 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
+import net.sf.okapi.common.encoder.EncoderManager;
+import net.sf.okapi.common.filterwriter.ILayerProvider;
 import net.sf.okapi.common.filterwriter.XLIFFContent;
 import net.sf.okapi.common.filterwriter.XLIFFWriter;
 import net.sf.okapi.common.query.MatchType;
@@ -35,6 +38,7 @@ import net.sf.okapi.common.resource.IReferenceable;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.ISegments;
+import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextPart;
@@ -53,6 +57,7 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 	
 	private Parameters params;
 	private XLIFFContent fmt;
+	private CharsetEncoder chsEnc;
 
 	// For serialization
 	public XLIFFSkeletonWriter () {
@@ -63,6 +68,19 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 	public XLIFFSkeletonWriter (Parameters params) {
 		this.params = params;
 		fmt = new XLIFFContent();
+	}
+	
+	@Override
+	public String processStartDocument (LocaleId outputLocale,
+		String outputEncoding,
+		ILayerProvider layer,
+		EncoderManager encoderManager,
+		StartDocument resource)
+	{
+		String res = super.processStartDocument(outputLocale, outputEncoding, layer, encoderManager, resource);
+		chsEnc = encoderManager.getCharsetEncoder();
+		fmt.setCharsetEncoder(chsEnc);
+		return res;
 	}
 	
 	@Override
@@ -267,11 +285,11 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 			
 			sb.append("<alt-trans");
 			if ( segment != null ) {
-				sb.append(String.format(" mid=\"%s\"", Util.escapeToXML(segment.getId(), 0, false, null)));
+				sb.append(String.format(" mid=\"%s\"", Util.escapeToXML(segment.getId(), 0, false, chsEnc)));
 			}
 			sb.append(String.format(" match-quality=\"%d\"", alt.getScore()));
 			if ( !Util.isEmpty(alt.getOrigin()) ) {
-				sb.append(String.format(" origin=\"%s\"", Util.escapeToXML(alt.getOrigin(), 0, false, null)));
+				sb.append(String.format(" origin=\"%s\"", Util.escapeToXML(alt.getOrigin(), 0, false, chsEnc)));
 			}
 			
 			if ( params.getIncludeExtensions() ) {

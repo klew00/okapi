@@ -179,4 +179,9 @@ public class JSONEncoder implements IEncoder {
 		return "\n";
 	}
 
+	@Override
+	public CharsetEncoder getCharsetEncoder () {
+		return chsEnc;
+	}
+
 }

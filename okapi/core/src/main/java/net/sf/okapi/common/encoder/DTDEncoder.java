@@ -194,4 +194,9 @@ public class DTDEncoder implements IEncoder {
 		return this.lineBreak;
 	}
 
+	@Override
+	public CharsetEncoder getCharsetEncoder () {
+		return chsEnc;
+	}
+
 }

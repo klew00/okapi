@@ -226,4 +226,9 @@ public class HtmlEncoder implements IEncoder {
 		return this.lineBreak;
 	}
 
+	@Override
+	public CharsetEncoder getCharsetEncoder () {
+		return chsEnc;
+	}
+
 }

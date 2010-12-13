@@ -20,6 +20,8 @@
 
 package net.sf.okapi.common.encoder;
 
+import java.nio.charset.CharsetEncoder;
+
 import net.sf.okapi.common.IParameters;
 
 /**
@@ -84,5 +86,11 @@ public interface IEncoder {
 	 * @return the line-break to use for this encoder.
 	 */
 	public String getLineBreak ();
+
+	/**
+	 * Gets the character set encoder used for this encoder.
+	 * @return the the character set encoder used for this encoder. This can be null.
+	 */
+	public CharsetEncoder getCharsetEncoder ();
 	
 }

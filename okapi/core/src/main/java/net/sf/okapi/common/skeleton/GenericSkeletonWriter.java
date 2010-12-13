@@ -63,7 +63,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	private final Logger logger = Logger.getLogger(getClass().getName());
 
 	private LinkedHashMap<String, Referent> referents;
-	private String outputEncoding;
+	protected String outputEncoding;
 	private int referentCopies = 1; // Number of copies to have for the referents (min=1)
 
 //	private boolean segmentReferents = false;

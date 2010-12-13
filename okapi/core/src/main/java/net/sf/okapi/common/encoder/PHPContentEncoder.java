@@ -20,6 +20,8 @@
 
 package net.sf.okapi.common.encoder;
 
+import java.nio.charset.CharsetEncoder;
+
 import net.sf.okapi.common.IParameters;
 
 /**
@@ -135,6 +137,11 @@ public class PHPContentEncoder implements IEncoder {
 	@Override
 	public String getLineBreak () {
 		return "\n";
+	}
+
+	@Override
+	public CharsetEncoder getCharsetEncoder () {
+		return null;
 	}
 
 }

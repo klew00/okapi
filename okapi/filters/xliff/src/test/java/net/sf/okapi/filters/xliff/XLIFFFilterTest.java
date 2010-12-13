@@ -491,18 +491,24 @@ public class XLIFFFilterTest {
 				assertEquals(AltTranslation.ORIGIN_SOURCEDOC, at.getOrigin());
 				break;
 			case 2:
+				assertEquals("alt-trans local context", at.getTarget().toString());
+				assertEquals(100, at.getScore());
+				assertEquals(MatchType.EXACT_LOCAL_CONTEXT, at.getType());
+				assertEquals("qwe", at.getOrigin());
+				break;
+			case 3:
 				assertEquals("alt-trans target 2", at.getTarget().toString());
 				assertEquals(101, at.getScore());
 				assertEquals(MatchType.EXACT, at.getType());
 				assertEquals("xyz", at.getOrigin());
 				break;
-			case 3:
+			case 4:
 				assertEquals("alt-trans target 3", at.getTarget().toString());
 				assertEquals(0, at.getScore());
 				assertEquals(MatchType.UKNOWN, at.getType());
 				assertEquals(AltTranslation.ORIGIN_SOURCEDOC, at.getOrigin());
 				break;
-			case 4:
+			case 5:
 				assertEquals("alt-trans target 4", at.getTarget().toString());
 				assertEquals(0, at.getScore());
 				assertEquals(MatchType.UKNOWN, at.getType());
@@ -1007,6 +1013,8 @@ public class XLIFFFilterTest {
 			+ "<target>alt-trans target 4</target></alt-trans>"
 			+ "<alt-trans match-quality='100%' okp:matchType='EXACT_UNIQUE_ID'>"
 			+ "<target>alt-trans best target</target></alt-trans>"
+			+ "<alt-trans match-quality='100%' okp:matchType='EXACT_LOCAL_CONTEXT' origin='qwe'>"
+			+ "<target>alt-trans local context</target></alt-trans>"
 			+ "</trans-unit>"
 			+ "</body>"
 			+ "</file></xliff>";

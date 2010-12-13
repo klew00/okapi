@@ -66,6 +66,7 @@ import net.sf.okapi.steps.formatconversion.Parameters;
 import net.sf.okapi.steps.formatconversion.TableFilterWriterParameters;
 import net.sf.okapi.steps.leveraging.LeveragingStep;
 import net.sf.okapi.steps.moses.ExtractionStep;
+import net.sf.okapi.steps.moses.MergingParameters;
 import net.sf.okapi.steps.moses.MergingStep;
 import net.sf.okapi.steps.segmentation.SegmentationStep;
 import net.sf.okapi.connectors.apertium.ApertiumMTConnector;
@@ -138,6 +139,8 @@ public class Main {
 	protected boolean levOptFillTarget = true;
 	protected String levOptTMXPath;
 	protected boolean extOptNoCopy = false; // Copy source in empty target by default
+	protected boolean mosesCopyToTarget = false;
+	protected boolean mosesOverwriteTarget = false;
 	
 	private FilterConfigurationMapper fcMapper;
 	private Hashtable<String, String> extensionsMap;
@@ -246,6 +249,14 @@ public class Main {
 				}
 				else if ( arg.equals("-lm") ) {
 					prog.command = CMD_LEVERAGEMOSES;
+				}
+				else if ( arg.equals("-totrg") ) {
+					prog.mosesCopyToTarget = true;
+					prog.mosesOverwriteTarget = false;
+				}
+				else if ( arg.equals("-overtrg") ) {
+					prog.mosesCopyToTarget = true;
+					prog.mosesOverwriteTarget = true;
 				}
 				else if ( arg.equals("-2po") ) {
 					prog.command = CMD_CONV2PO;
@@ -910,7 +921,7 @@ public class Main {
 		ps.println("      [-sl srcLang] [-tl trgLang]");
 		ps.println("Leverage a file with Moses InlineText:");
 		ps.println("   -lm inputFile [inputFile2...] [-fc configId] [-ie encoding]");
-		ps.println("      [-oe encoding] [-sl srcLang] [-tl trgLang]");
+		ps.println("      [-oe encoding] [-sl srcLang] [-tl trgLang] [-totrg|-overtrg]");
 		ps.println("Queries translation resources:");
 		ps.println("   -q \"source text\" [-sl srcLang] [-tl trgLang] [-google] [-opentran]");
 		ps.println("      [-tt hostname[:port]] [-mm key] [-pen tmDirectory] [-gs configFile]");
@@ -1271,7 +1282,14 @@ public class Main {
 		driver.setFilterConfigurationMapper(fcMapper);
 		driver.setRootDirectory(System.getProperty("user.dir"));
 		driver.addStep(new RawDocumentToFilterEventsStep());
-		driver.addStep(new MergingStep());
+
+		MergingStep mrgStep = new MergingStep();
+		MergingParameters params = (MergingParameters)mrgStep.getParameters();
+		params.setCopyToTarget(mosesCopyToTarget);
+		params.setOverwriteExistingTarget(mosesOverwriteTarget);
+		params.setForceAltTransOutput(true);
+		driver.addStep(mrgStep);
+		
 		driver.addStep(new FilterEventsToRawDocumentStep());
 		
 		// Two parallel inputs: 1=the original file, 2=the Moses translated file

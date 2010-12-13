@@ -285,4 +285,9 @@ public class XMLEncoder implements IEncoder {
 		return lineBreak;
 	}
 
+	@Override
+	public CharsetEncoder getCharsetEncoder () {
+		return chsEnc;
+	}
+
 }

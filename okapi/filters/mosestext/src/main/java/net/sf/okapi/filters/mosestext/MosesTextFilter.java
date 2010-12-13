@@ -65,9 +65,10 @@ public class MosesTextFilter implements IFilter {
 	
 	private static final String ENDSEGMENT = "</mrk>"; 
 
-	private static final Pattern startSegment = Pattern.compile("<mrk\\s+mtype\\s*=\\s*[\"']seg[\"'].*?>");
+	private static final Pattern STARTSEGMENT = Pattern.compile("<mrk\\s+mtype\\s*=\\s*[\"']seg[\"'].*?>");
 	private static final Pattern OPENCLOSE = Pattern.compile("(\\<g(\\s+)id=['\"](.*?)['\"]>)|(\\</g\\>)");
 	private static final Pattern ISOLATED = Pattern.compile("\\<x(\\s+)id=['\"](.*?)['\"](\\s*?)/>");
+//	private static final Pattern OPENCLOSESEGMENT = Pattern.compile("(<mrk\\s+mtype\\s*=\\s*[\"']seg[\"'].*?>)|(\\</mrk\\>)");
 
 
 private BufferedReader reader;
@@ -169,7 +170,7 @@ private BufferedReader reader;
 				}
 				else {
 					// Detect start of segment
-					Matcher m = startSegment.matcher(line);
+					Matcher m = STARTSEGMENT.matcher(line);
 					if ( m.lookingAt() ) {
 						if ( inSeg ) {
 							throw new OkapiIOException("End of segment expected before a new segment.");
@@ -340,6 +341,7 @@ private BufferedReader reader;
 			code = new Code(TagType.PLACEHOLDER, "x", m.group());
 			code.setId(id);
 			codes.add(code);
+			//TODO: Do we need to make isolated-open / isolated-close distinction?
 			markers = String.format("%c%c", TextFragment.MARKER_ISOLATED,
 				TextFragment.toChar(codes.size()-1));
 			sb.replace(m.start(), m.end(), markers);
