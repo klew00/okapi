@@ -34,6 +34,7 @@ import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import static org.junit.Assert.*;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -405,6 +406,26 @@ public class XMLFilterTest {
 			+ "<doc><p><![CDATA[&=amp, <=lt, &#xaaa;=not-a-ncr]]></p></doc>";
 		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 			+ "<doc><p>&amp;=amp, &lt;=lt, &amp;#xaaa;=not-a-ncr</p></doc>";
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), locEN));
+	}
+
+	@Test
+	public void testCREntity () {
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc><p>t1\n\n   &#xD;&#13;   t2</p></doc>";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertNotNull(tu);
+		String str = tu.getSource().toString();
+		assertEquals("t1 \r\r t2", str);
+	}
+
+	@Test
+	public void testCREntityOutput () {
+		String snippet = "<?xml version=\"1.0\"?>\n"
+			+ "<doc><p>t1\n\n   &#xD;&#13;   t2</p></doc>";
+		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			+ "<doc><p>t1 &#13;&#13; t2</p></doc>";
 		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
 			filter.getEncoderManager(), locEN));
 	}

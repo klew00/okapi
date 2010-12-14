@@ -297,7 +297,8 @@ private BufferedReader reader;
 			return tf;
 		}
 
-		text = text.toString().replace("&apos;", "'");
+		text = text.replaceAll("(&#13;)|(&#x0*?[dD];)", "\r");
+		text = text.replace("&apos;", "'");
 		text = text.replace("&lt;", "<");
 		text = text.replace("&gt;", ">");
 		StringBuilder sb = new StringBuilder(text.replace("&quot;", "\""));

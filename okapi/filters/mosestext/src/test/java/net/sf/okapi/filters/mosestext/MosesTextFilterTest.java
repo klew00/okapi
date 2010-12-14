@@ -142,10 +142,10 @@ public class MosesTextFilterTest {
 	
 	@Test
 	public void testLiterals () {
-		String snippet = "&lt;=lt, &gt;=gt, &quot;=quot, &apos;=apos";
+		String snippet = "&lt;=lt, &gt;=gt, &quot;=quot, &apos;=apos, &#x00d;&#13;=U+D";
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
-		assertEquals("<=lt, >=gt, \"=quot, '=apos", tu.getSource().toString());
+		assertEquals("<=lt, >=gt, \"=quot, '=apos, \r\r=U+D", tu.getSource().toString());
 	}
 	
 	@Test

@@ -1017,6 +1017,8 @@ public class TextContainer implements Iterable<TextPart> {
 	 * <p>This method replaces any sequences of white-spaces by a single space character.
 	 * It also removes leading and trailing white-spaces if the parameter
 	 * trimEnds is set to true.
+	 * <p>White spaces in this context are #x9, #xA and #x20. #xD is not considered a whitespace as the
+	 * content of a text container must have its line-breaks normalized to #xA.
 	 * <p>If the container has more than one segment and if collapseMode mode is set:
 	 * non-segments parts are normalized and removed if they end up empty. If the option
 	 * is not set: the method preserve at least one space between segments, even if the
@@ -1042,9 +1044,10 @@ public class TextContainer implements Iterable<TextPart> {
 					wasWS = false;
 					//TODO: Do we need to do something for inline between WS?
 					break;
+				//case '\r': We should not have \r in text as line-break in a TextContainer.
+				// If it's there it's a literal e.g. from XML #xD;
 				case ' ':
 				case '\t':
-				case '\r':
 				case '\n':
 					if ( wasWS ) {
 						text.deleteCharAt(j);

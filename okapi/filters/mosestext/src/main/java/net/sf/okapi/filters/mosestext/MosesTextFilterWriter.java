@@ -296,6 +296,9 @@ public class MosesTextFilterWriter implements IFilterWriter {
 			case '&':
 				tmp.append("&amp;");
 				break;
+			case '\r':
+				tmp.append("&#13;");
+				break;
 			case '"':
 				if ( quoteMode > 0 ) tmp.append("&quot;");
 				else tmp.append('"');

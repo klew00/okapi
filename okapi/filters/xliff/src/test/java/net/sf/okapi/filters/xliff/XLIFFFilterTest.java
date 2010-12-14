@@ -216,6 +216,48 @@ public class XLIFFFilterTest {
 	}
 
 	@Test
+	public void testCREntity () {
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+			+ "<xliff version=\"1.2\">"
+			+ "<file source-language=\"en\" target-language=\"fr\" datatype=\"x-test\" original=\"file.ext\">"
+			+ "<body>"
+			+ "<trans-unit id=\"1\">"
+			+ "<source>\r\r&#13; {<ph id='1'>#13;  </ph>}</source>"
+			+ "</trans-unit>"
+			+ "</body>"
+			+ "</file></xliff>";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertNotNull(tu);
+		String str = tu.getSource().toString();
+		assertEquals("\r {#13;  }", str);
+	}
+
+	@Test
+	public void testCREntityOutput () {
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+			+ "<xliff version=\"1.2\">"
+			+ "<file source-language=\"en\" target-language=\"fr\" datatype=\"x-test\" original=\"file.ext\">"
+			+ "<body>"
+			+ "<trans-unit id=\"1\">"
+			+ "<source>\r\r&#13; {<ph id='1'>#13;  </ph>}</source>"
+			+ "</trans-unit>"
+			+ "</body>"
+			+ "</file></xliff>";
+		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+			+ "<xliff version=\"1.2\">"
+			+ "<file source-language=\"en\" target-language=\"fr\" datatype=\"x-test\" original=\"file.ext\">"
+			+ "<body>"
+			+ "<trans-unit id=\"1\">"
+			+ "<source>&#13; {<ph id=\"1\">#13;  </ph>}</source>"
+			+ "<target xml:lang=\"fr\">&#13; {<ph id=\"1\">#13;  </ph>}</target>\r"
+			+ "</trans-unit>"
+			+ "</body>"
+			+ "</file></xliff>";
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
+			locFR, filter.createSkeletonWriter(), filter.getEncoderManager()));
+	}
+
+	@Test
 	public void testSegmentedEntryWithDifferences () {
 		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
 			+ "<xliff version=\"1.2\">"

@@ -338,6 +338,9 @@ public class TMXContent {
 			case '<':
 				tmp.append("&lt;");
 				break;
+			case '\r': // Not a line-break in the XML context, but a literal
+				tmp.append("&#13;");
+				break;
 			case '&':
 				tmp.append("&amp;");
 				break;

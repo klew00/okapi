@@ -504,7 +504,7 @@ public class TsFilterTest {
 		"<source>hello " +
 		"<byte value=\"x9\"/>" +
 		"<byte value=\"xA\"/>" +
-		"<byte value=\"xD\"/>" +
+		//"<byte value=\"xD\"/>" + normal literal
 		"<byte value=\"x20\"/>" +
 		"<byte value=\"xD7FF\"/>" +
 		"<byte value=\"xE000\"/>" +
@@ -536,7 +536,7 @@ public class TsFilterTest {
 		"<source>hello " +
 		"\u0009" + 
 		"\r" +
-		"\r" +
+		//"\r" +
 		"\u0020" +
 		"\ud7ff" +
 		"\ue000" +

@@ -17,10 +17,10 @@ and line 3.</source>
 <ph id="3">codeB</ph>word3, <x id="4"/>word5, <mrk mtype="protected">to protect</mrk>, etc.</source>
 </trans-unit>
 <trans-unit id="tu4" xml:space="preserve">
-<source xml:lang="en">&lt;=lt, &gt;=gt, "=quot, '=apos
+<source xml:lang="en">&lt;=lt, &gt;=gt, "=quot, '=apos, &#13;&#x0D;=0xD
 Line 2
 Line 3
-<ph id='1'>&lt;=lt, &gt;=gt, "=quot, '=apos</ph> end.</source>
+<ph id='1'>&lt;=lt, &gt;=gt, "=quot, '=apos, &#13;&#x0D;=0xD</ph> end.</source>
 </trans-unit>
 </body>
 </file>

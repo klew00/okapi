@@ -142,6 +142,9 @@ public class XMLEncoder implements IEncoder {
 					break;
 				}
 				continue;
+			case '\r': // In XML this is a literal not a line-break
+				sbTmp.append("&#13;");
+				break;
 			case '\n':
 				if ( escapeLineBreak ) {
 					sbTmp.append("&#10;");
@@ -201,6 +204,8 @@ public class XMLEncoder implements IEncoder {
 		case '>':
 			if ( escapeGT ) return "&gt;";
 			else return ">";
+		case '\r': // In XML this is a literal not a line-break
+			return "&#13;";
 		case '\n':
 			if ( escapeLineBreak ) return "&#10;";
 			else return lineBreak;
@@ -240,6 +245,8 @@ public class XMLEncoder implements IEncoder {
 		case '>':
 			if ( escapeGT ) return "&gt;";
 			else return ">";
+		case '\r': // In XML this is a literal not a line-break
+			return "&#13;";
 		case '\n':
 			if ( escapeLineBreak ) return "&#10;";
 			else return lineBreak;

@@ -124,7 +124,7 @@ public class MosesTextFilterWriterTest {
 		tu = FilterTestDriver.getTextUnit(getEvents(res), 4);
 		assertNotNull(tu);
 		assertEquals("4", tu.getId());
-		assertEquals("<=lt, >=gt, \"=quot, '=apos\n"
+		assertEquals("<=lt, >=gt, \"=quot, '=apos, \r\r=0xD\n"
 			+ "Line 2\n"
 			+ "Line 3\n"
 			+ "<x id=\"1\"/> end.",
