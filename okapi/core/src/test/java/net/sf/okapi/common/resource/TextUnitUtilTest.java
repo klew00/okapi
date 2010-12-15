@@ -188,14 +188,17 @@ public class TextUnitUtilTest {
 		// TextContainer tcc = new TextContainer("    123456  ");
 		TextFragment tcc = new TextFragment();
 		Code c2 = new Code(TagType.PLACEHOLDER, "code");
+		tcc.append("   ");
 		tcc.append(c2);
 		tcc.append("    123456  ");
 
 		GenericSkeleton skel = new GenericSkeleton();
 		TextUnitUtil.trimLeading(tcc, skel);
 
-		assertEquals("123456  ", tcc.getCodedText());
-		assertEquals("    ", skel.toString());
+		TextUnit tu1 = new TextUnit("tu1");
+		tu1.setSourceContent(tcc);
+		assertEquals("    123456  ", tu1.toString());
+		assertEquals("   ", skel.toString());
 
 		// --------------------
 		TextFragment tcc2 = new TextFragment("    123456  ");
@@ -205,8 +208,9 @@ public class TextUnitUtilTest {
 		GenericSkeleton skel2 = new GenericSkeleton();
 		TextUnitUtil.trimTrailing(tcc2, skel2);
 
-		assertEquals("    123456", tcc2.getCodedText());
-		assertEquals("  ", skel2.toString());
+		tu1.setSourceContent(tcc2);		
+		assertEquals("    123456  ", tu1.toString());
+		assertEquals("", skel2.toString());
 
 		// --------------------
 		TextFragment tcc4 = new TextFragment("    123456  ");
@@ -295,6 +299,38 @@ public class TextUnitUtilTest {
 		assertEquals(2, (int) positions.get(0));
 		assertEquals(7, (int) positions.get(1));
 		assertEquals(12, (int) positions.get(2));
+		assertEquals(19, (int) positions.get(3));
+
+		st = "abcdefghijklmn";
+		assertEquals(st, TextUnitUtil.getText(new TextFragment(st)));
+		
+		//-------------
+		sb = new StringBuilder();
+
+		sb.append("abcde");
+		sb.append((char) TextFragment.MARKER_ISOLATED);
+		sb.append((char) (TextFragment.CHARBASE + 1));
+		sb.append((char) TextFragment.MARKER_ISOLATED);
+		sb.append((char) (TextFragment.CHARBASE + 2));
+		sb.append("fghijklm");
+		sb.append((char) TextFragment.MARKER_ISOLATED);
+		sb.append((char) (TextFragment.CHARBASE + 3));
+		sb.append((char) TextFragment.MARKER_ISOLATED);
+		sb.append((char) (TextFragment.CHARBASE + 4));
+		sb.append("n");
+
+		st = sb.toString();
+
+		assertEquals("abcdefghijklmn", TextUnitUtil.getText(new TextFragment(st)));
+
+		positions = new ArrayList<Integer>();
+		assertEquals("abcdefghijklmn", TextUnitUtil.getText(new TextFragment(st), positions));
+
+		assertEquals(4, positions.size());
+
+		assertEquals(5, (int) positions.get(0));
+		assertEquals(7, (int) positions.get(1));
+		assertEquals(17, (int) positions.get(2));
 		assertEquals(19, (int) positions.get(3));
 
 		st = "abcdefghijklmn";

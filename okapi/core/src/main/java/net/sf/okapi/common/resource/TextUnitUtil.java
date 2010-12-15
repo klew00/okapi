@@ -213,7 +213,7 @@ public class TextUnitUtil {
 		String st = textFragment.getCodedText();
 		TextFragment skelTF;
 
-		int pos = TextFragment.indexOfFirstNonWhitespace(st, 0, -1, true, true, true, true);
+		int pos = TextFragment.indexOfFirstNonWhitespace(st, 0, -1, false, false, false, true);
 		if (pos == -1) { // Whole string is whitespaces
 			skelTF = new TextFragment(st);
 			textFragment.setCodedText("");
@@ -259,7 +259,7 @@ public class TextUnitUtil {
 		String st = textFragment.getCodedText();
 		TextFragment skelTF;
 
-		int pos = TextFragment.indexOfLastNonWhitespace(st, -1, 0, true, true, true, true);
+		int pos = TextFragment.indexOfLastNonWhitespace(st, -1, 0, false, false, false, true);
 		if (pos == -1) { // Whole string is whitespaces
 			skelTF = new TextFragment(st);
 			textFragment.setCodedText("");
@@ -435,7 +435,7 @@ public class TextUnitUtil {
 		}
 
 		// Collect marker positions & remove markers
-		int startPos = 0;
+		int startPos = -1;
 		for (int i = 0; i < res.length(); i++) {
 			switch (res.charAt(i)) {
 			case TextFragment.MARKER_OPENING:
@@ -444,17 +444,26 @@ public class TextUnitUtil {
 				if (markerPositions != null) {
 					markerPositions.add(i);
 				}
-				if (i > startPos) {
+				if (i > startPos && startPos >= 0) {
 					sb.append(res.substring(startPos, i));
 				}
-				startPos = i + 2;
-				i = startPos;
+				i += 1;
+				startPos = -1;
+//				startPos = i + 2;
+//				i = startPos;
+				break;
+			default:
+				if (startPos < 0)
+					startPos = i;
 			}
 		}
 
-		if (startPos < res.length()) {
-			sb.append(res.substring(startPos));
-		}
+		if (startPos < 0 && sb.length() == 0) // Whole string 
+			startPos = 0; 		
+		else			
+			if (startPos > -1 && startPos < res.length()) {
+				sb.append(res.substring(startPos));
+			}
 
 		return sb.toString();
 	}
