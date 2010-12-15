@@ -78,6 +78,7 @@ import net.sf.okapi.connectors.opentran.OpenTranTMConnector;
 import net.sf.okapi.connectors.pensieve.PensieveTMConnector;
 import net.sf.okapi.connectors.tda.TDASearchConnector;
 import net.sf.okapi.connectors.translatetoolkit.TranslateToolkitTMConnector;
+import net.sf.okapi.filters.mosestext.FilterWriterParameters;
 
 public class Main {
 	
@@ -92,6 +93,7 @@ public class Main {
 	protected final static int CMD_TRANSLATE = 8;
 	protected final static int CMD_EXTRACTTOMOSES = 9;
 	protected final static int CMD_LEVERAGEMOSES = 10;
+	protected final static int CMD_SEGMENTATION = 11;
 	
 	private static final String DEFAULT_SEGRULES = "-";
 	private static final String MSG_ONLYWITHUICOMP = "UI-based commands are available only in the distributions with UI components.";
@@ -141,6 +143,7 @@ public class Main {
 	protected boolean extOptNoCopy = false; // Copy source in empty target by default
 	protected boolean mosesCopyToTarget = false;
 	protected boolean mosesOverwriteTarget = false;
+	protected boolean moses2Outputs = false;
 	
 	private FilterConfigurationMapper fcMapper;
 	private Hashtable<String, String> extensionsMap;
@@ -240,6 +243,9 @@ public class Main {
 				}
 				else if ( arg.equals("-xm") ) {
 					prog.command = CMD_EXTRACTTOMOSES;
+				}
+				else if ( arg.equals("-2") ) {
+					prog.moses2Outputs = true;
 				}
 				else if ( arg.equals("-t") ) {
 					prog.command = CMD_TRANSLATE;
@@ -390,6 +396,10 @@ public class Main {
 				else if ( arg.endsWith("-listconf") || arg.equals("-lfc") ) {
 					prog.showAllConfigurations();
 					return;
+				}
+				else if ( arg.equals("-s") ) {
+					prog.command = CMD_SEGMENTATION;
+					prog.segRules = DEFAULT_SEGRULES;
 				}
 				else if ( arg.equals("-seg") ) {
 					prog.segRules = DEFAULT_SEGRULES; // Default
@@ -759,6 +769,16 @@ public class Main {
 			translateFile(rd);
 			break;
 			
+		case CMD_SEGMENTATION:
+			ps.println("Segmentation");
+			guessMissingParameters(input);
+			if ( !prepareFilter(configId) ) return; // Next input
+			file = new File(input);
+			rd = new RawDocument(file.toURI(), inputEncoding, srcLoc, trgLoc);
+			rd.setFilterConfigId(configId);
+			segmentFile(rd);
+			break;
+			
 		case CMD_EXTRACT:
 			ps.println("Extraction");
 			guessMissingParameters(input);
@@ -918,7 +938,7 @@ public class Main {
 		ps.println("      |-ms configFile|-tda configFile] [-maketmx [tmxFile]] [-opt threshold]");
 		ps.println("Extracts a file to Moses InlineText:");
 		ps.println("   -xm inputFile [inputFile2...] [-fc configId] [-ie encoding]");
-		ps.println("      [-sl srcLang] [-tl trgLang]");
+		ps.println("      [-sl srcLang] [-tl trgLang] [-2]");
 		ps.println("Leverage a file with Moses InlineText:");
 		ps.println("   -lm inputFile [inputFile2...] [-fc configId] [-ie encoding]");
 		ps.println("      [-oe encoding] [-sl srcLang] [-tl trgLang] [-totrg|-overtrg]");
@@ -1276,6 +1296,41 @@ public class Main {
 		driver.processBatch();
 	}
 
+	private void segmentFile (RawDocument rd) throws URISyntaxException {
+		// Create the driver
+		PipelineDriver driver = new PipelineDriver();
+		driver.setFilterConfigurationMapper(fcMapper);
+		driver.setRootDirectory(System.getProperty("user.dir"));
+
+		// Raw document to filter events step 
+		RawDocumentToFilterEventsStep rd2feStep = new RawDocumentToFilterEventsStep();
+		driver.addStep(rd2feStep);
+
+		driver.addStep(addSegmentationStep());
+		
+		// Filter events to raw document final step
+		FilterEventsToRawDocumentStep ferdStep = new FilterEventsToRawDocumentStep();
+		driver.addStep(ferdStep);
+
+		// Create the raw document and set the output
+		String tmp = rd.getInputURI().getPath();
+		String ext = Util.getExtension(tmp);
+		int n = tmp.lastIndexOf('.');
+		output = tmp.substring(0, n) + ".out" + ext;
+
+		ps.println("Source language: "+srcLoc);
+		ps.println("Target language: "+trgLoc);
+		ps.println("Default input encoding: "+inputEncoding);
+		ps.println("Output encoding: "+outputEncoding);
+		ps.println("Filter configuration: "+configId);
+		ps.println("Output: "+output);
+		
+		driver.addBatchItem(rd, new File(output).toURI(), outputEncoding);
+
+		// Process
+		driver.processBatch();
+	}
+
 	private void leverageFileWithMoses (RawDocument rd) {
 		// Create the driver
 		PipelineDriver driver = new PipelineDriver();
@@ -1311,6 +1366,10 @@ public class Main {
 		
 		// Filter events to raw document final step (using the XLIFF writer)
 		ExtractionStep extStep = new ExtractionStep();
+		if ( moses2Outputs ) {
+			FilterWriterParameters p = (FilterWriterParameters)extStep.getParameters();
+			p.setSourceAndTarget(true);
+		}
 		driver.addStep(extStep);
 
 		// Create the raw document and set the output
@@ -1319,10 +1378,13 @@ public class Main {
 		if ( tmp.endsWith("/") || tmp.endsWith("\\") ) {
 			tmp = tmp.substring(0, tmp.length()-1);
 		}
-		tmp += ".txt";
+		tmp += ("."+srcLoc.toString());
 		driver.addBatchItem(rd, new File(tmp).toURI(), "UTF-8");
 
 		ps.println("Source language: "+srcLoc);
+		if ( moses2Outputs ) {
+			ps.println("Target language: "+trgLoc);
+		}
 		ps.println("Default input encoding: "+inputEncoding);
 		ps.println("Filter configuration: "+configId);
 		ps.println("Output: "+tmp);

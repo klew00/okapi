@@ -47,6 +47,8 @@ import net.sf.okapi.filters.mosestext.MosesTextFilter;
 @UsingParameters(MergingParameters.class)
 public class MergingStep extends BasePipelineStep {
 
+	final static String NAME = "Moses InlineText Leveraging";
+	
 	private LocaleId sourceLocale;
 	private LocaleId targetLocale;
 	private URI inputURI;
@@ -66,7 +68,7 @@ public class MergingStep extends BasePipelineStep {
 
 	@Override
 	public String getName () {
-		return "Moses InlineText Leveraging";
+		return NAME;
 	}
 
 	@StepParameterMapping(parameterType = StepParameterType.SOURCE_LOCALE)
@@ -117,12 +119,9 @@ public class MergingStep extends BasePipelineStep {
 	private void processStartDocument (StartDocument sd) {
 		if ( params.getForceAltTransOutput() ) {
 			// Check the type of input document
-			if ( sd.getFilterParameters() instanceof net.sf.okapi.filters.xliff.Parameters ) {
-				// Force the alt-trans to be output if requested
-				net.sf.okapi.filters.xliff.Parameters params = (net.sf.okapi.filters.xliff.Parameters)sd.getFilterParameters();
-				if ( params != null ) {
-					params.setAddAltTrans(true);
-				}
+			IParameters prm = sd.getFilterParameters();
+			if ( prm != null ) {
+				prm.setBoolean("addAltTrans", true);
 			}
 		}
 		

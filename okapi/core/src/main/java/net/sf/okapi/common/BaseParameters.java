@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -54,15 +54,18 @@ public abstract class BaseParameters implements IParameters {
 		path = null;
 		buffer = new ParametersString();
 	}
-	
+
+	@Override
 	public String getPath () {
 		return path;
 	}
 
+	@Override
 	public void setPath (String filePath) {
 		path = filePath;
 	}
 	
+	@Override
 	public void load (URI inputURI,
 		boolean ignoreErrors)
 	{
@@ -99,6 +102,7 @@ public abstract class BaseParameters implements IParameters {
 		}
 	}
 
+	@Override
 	public void save (String newPath) {
 		Writer SW = null;
 		try {
@@ -117,22 +121,53 @@ public abstract class BaseParameters implements IParameters {
 				try { SW.close(); } catch ( IOException e ) {};
 		}
 	}
-	
+
+	@Override
 	public boolean getBoolean (String name) {
 		toString(); // Make sure the buffer is up-to-date
 		return buffer.getBoolean(name);
 	}
 	
+	@Override
+	public void setBoolean (String name,
+		boolean value)
+	{
+		toString(); // Make sure the buffer is up-to-date
+		buffer.setBoolean(name, value);
+		fromString(buffer.toString()); // Update the variables from the buffer
+	}
+	
+	@Override
 	public String getString (String name) {
 		toString(); // Make sure the buffer is up-to-date
 		return buffer.getString(name);
 	}
 	
+	@Override
+	public void setString (String name,
+		String value)
+	{
+		toString(); // Make sure the buffer is up-to-date
+		buffer.setString(name, value);
+		fromString(buffer.toString()); // Update the variables from the buffer
+	}
+
+	@Override
 	public int getInteger (String name) {
 		toString(); // Make sure the buffer is up-to-date
 		return buffer.getInteger(name);
 	}
 
+	@Override
+	public void setInteger (String name,
+		int value)
+	{
+		toString(); // Make sure the buffer is up-to-date
+		buffer.setInteger(name, value);
+		fromString(buffer.toString()); // Update the variables from the buffer
+	}
+
+	@Override
 	public ParametersDescription getParametersDescription () {
 		return null;
 	}

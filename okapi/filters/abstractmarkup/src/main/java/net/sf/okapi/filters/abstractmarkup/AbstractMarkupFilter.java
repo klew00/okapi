@@ -524,32 +524,38 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 
 		String cdataWithoutMarkers = CDATA_START_PATTERN.matcher(tag.toString()).replaceFirst("");
 		cdataWithoutMarkers = CDATA_END_PATTERN.matcher(cdataWithoutMarkers).replaceFirst("");
-
-		if (cdataSubfilter != null) {				
-			String parentId = eventBuilder.findMostRecentParentId();
-			cdataSubfilter.close();
-			
-			parentId = (parentId == null ? getDocumentId().getLastId() : parentId); 
-			SubFilterEventConverter converter = 
-				new SubFilterEventConverter(parentId, 
-						new GenericSkeleton("<![CDATA["), 
-						new GenericSkeleton("]]>"));
 		
-			// TODO: only AbstractFilter subclasses can be used as subflters!!!
-			((AbstractFilter)cdataSubfilter).setParentId(parentId);
-			cdataSubfilter.open(new RawDocument(cdataWithoutMarkers, getSrcLoc()));	
-			while (cdataSubfilter.hasNext()) {
-				Event event = converter.convertEvent(cdataSubfilter.next());
-				eventBuilder.addFilterEvent(event);
-			}			
-			cdataSubfilter.close();			
-		} else {
-			// we assume the CDATA is plain text take it as is
-			startTextUnit(new GenericSkeleton("<![CDATA["));
-			addToTextUnit(cdataWithoutMarkers);
-			setTextUnitType(TextUnit.TYPE_CDATA);
-			setTextUnitMimeType(MimeTypeMapper.PLAIN_TEXT_MIME_TYPE);			
-			endTextUnit(new GenericSkeleton("]]>"));
+		if ( ruleState.isExludedState() ) {
+			// Excluded content
+			addToDocumentPart(tag.toString());
+		}
+		else { // Content to extract
+			if (cdataSubfilter != null) {				
+				String parentId = eventBuilder.findMostRecentParentId();
+				cdataSubfilter.close();
+				
+				parentId = (parentId == null ? getDocumentId().getLastId() : parentId); 
+				SubFilterEventConverter converter = 
+					new SubFilterEventConverter(parentId, 
+							new GenericSkeleton("<![CDATA["), 
+							new GenericSkeleton("]]>"));
+			
+				// TODO: only AbstractFilter subclasses can be used as subflters!!!
+				((AbstractFilter)cdataSubfilter).setParentId(parentId);
+				cdataSubfilter.open(new RawDocument(cdataWithoutMarkers, getSrcLoc()));	
+				while (cdataSubfilter.hasNext()) {
+					Event event = converter.convertEvent(cdataSubfilter.next());
+					eventBuilder.addFilterEvent(event);
+				}			
+				cdataSubfilter.close();			
+			} else {
+				// we assume the CDATA is plain text take it as is
+				startTextUnit(new GenericSkeleton("<![CDATA["));
+				addToTextUnit(cdataWithoutMarkers);
+				setTextUnitType(TextUnit.TYPE_CDATA);
+				setTextUnitMimeType(MimeTypeMapper.PLAIN_TEXT_MIME_TYPE);			
+				endTextUnit(new GenericSkeleton("]]>"));
+			}
 		}
 	}
 

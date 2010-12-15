@@ -1,3 +1,2 @@
 <mrk mtype="seg">This is line 1.</mrk>
-<mrk mtype="seg">This is a test on line 1,
-and line two.</mrk>
+This is a test on line 1,<lb/>and line two.

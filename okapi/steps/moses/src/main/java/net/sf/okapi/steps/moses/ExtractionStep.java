@@ -23,19 +23,25 @@ package net.sf.okapi.steps.moses;
 import java.net.URI;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
+import net.sf.okapi.filters.mosestext.FilterWriterParameters;
 import net.sf.okapi.filters.mosestext.MosesTextFilterWriter;
 
+@UsingParameters(FilterWriterParameters.class)
 public class ExtractionStep extends BasePipelineStep {
 
-	private LocaleId sourceLocale;
+	private LocaleId targetLocale;
 	private URI inputURI;
 	private MosesTextFilterWriter writer;
+	private FilterWriterParameters params;
 	
 	public ExtractionStep () {
+		params = new FilterWriterParameters();
 	}
 	
 	@Override
@@ -46,12 +52,12 @@ public class ExtractionStep extends BasePipelineStep {
 
 	@Override
 	public String getName () {
-		return "Moses InlineText Extraction";
+		return FilterWriterParameters.NAME;
 	}
 
-	@StepParameterMapping(parameterType = StepParameterType.SOURCE_LOCALE)
-	public void setSourceLocale (LocaleId sourceLocale) {
-		this.sourceLocale = sourceLocale;
+	@StepParameterMapping(parameterType = StepParameterType.TARGET_LOCALE)
+	public void setTargetLocale (LocaleId targetLocale) {
+		this.targetLocale = targetLocale;
 	}
 
 	@StepParameterMapping(parameterType = StepParameterType.INPUT_URI)
@@ -60,12 +66,23 @@ public class ExtractionStep extends BasePipelineStep {
 	}
 
 	@Override
+	public IParameters getParameters() {
+		return params;
+	}
+
+	@Override
+	public void setParameters(IParameters params) {
+		params = (FilterWriterParameters)params;
+	}
+
+	@Override
 	public Event handleEvent (Event event) {
 		switch ( event.getEventType() ) {
 		case START_DOCUMENT:
 			writer = new MosesTextFilterWriter();
-			writer.setOptions(sourceLocale, "UTF-8");
-			writer.setOutput(inputURI.getPath() + ".txt");
+			writer.setOptions(targetLocale, "UTF-8");
+			writer.setOutput(inputURI.getPath() + "."+event.getStartDocument().getLocale().toString());
+			writer.setParameters(params);
 			return writer.handleEvent(event);
 			
 		case END_DOCUMENT:

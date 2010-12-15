@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 The Okapi framework contributors                       */
+/* Copyright (C) 2008-2010 The Okapi framework contributors                       */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -88,6 +88,14 @@ public interface IParameters {
 	public boolean getBoolean (String name);
 	
 	/**
+	 * Sets the boolean value for a given parameter name.
+	 * @param name the name of the parameter to set.
+	 * @param value the new value to set.
+	 */
+	public void setBoolean (String name,
+		boolean value);
+	
+	/**
 	 * Gets the string value for a given parameter name.
 	 * @param name the name of the string parameter to retrieve.
 	 * @return the value of the given parameter, or null if it is not defined.
@@ -95,11 +103,27 @@ public interface IParameters {
 	public String getString (String name);
 
 	/**
+	 * Sets the string value for a given parameter name.
+	 * @param name the name of the parameter to set.
+	 * @param value the new value to set.
+	 */
+	public void setString (String name,
+		String value);
+	
+	/**
 	 * Gets the integer value for a given parameter name.
 	 * @param name the name of the integer parameter to retrieve.
 	 * @return the value of the given parameter, or 0 if it is not defined.
 	 */
 	public int getInteger (String name);
+
+	/**
+	 * Sets the integer value for a given parameter name.
+	 * @param name the name of the parameter to set.
+	 * @param value the new value to set.
+	 */
+	public void setInteger (String name,
+		int value);
 
 	/**
 	 * Gets the description of the parameters.

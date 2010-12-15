@@ -302,14 +302,42 @@ public class Parameters implements IParameters {
 	}
 
 	@Override
+	public void setBoolean (String name, 
+		boolean value)
+	{
+		if ( name.equals(XMLEncoder.ESCAPEGT) ) escapeGT = value;
+		else if ( name.equals(XMLEncoder.ESCAPENBSP) ) escapeNbsp = value;
+		else if ( name.equals(PROTECTENTITYREF) ) protectEntityRef = value;
+		else if ( name.equals(XMLEncoder.ESCAPELINEBREAK) ) escapeLineBreak = value;
+		else if ( name.equals(LINEBREAKASCODE) ) lineBreakAsCode = value;
+		else if ( name.equals(OMITXMLDECLARATION) ) omitXMLDeclaration = value;
+		else if ( name.equals(XMLEncoder.QUOTEMODEDEFINED) ) quoteModeDefined = value;
+		else if ( name.equals(ESCAPEQUOTES) ) escapeQuotes = value;
+	}
+
+	@Override
 	public String getString (String name) {
 		return null;
+	}
+
+	@Override
+	public void setString (String name,
+		String value)
+	{
+		// No string options
 	}
 
 	@Override
 	public int getInteger (String name) {
 		if ( name.equals(XMLEncoder.QUOTEMODE) ) return quoteMode;
 		return 0;
+	}
+
+	@Override
+	public void setInteger (String name,
+		int value)
+	{
+		if ( name.equals(XMLEncoder.QUOTEMODE) ) quoteMode = value;
 	}
 
 	@Override

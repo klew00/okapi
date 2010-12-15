@@ -35,6 +35,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public static final int SEGMENTATIONTYPE_ORIGINAL = 0;
 	public static final int SEGMENTATIONTYPE_SEGMENTED = 1;
 	public static final int SEGMENTATIONTYPE_NOTSEGMENTED = 2;
+	public static final int SEGMENTATIONTYPE_ASNEEDED = 3;
 
 	private static final String FALLBACKTOID = "fallbackToID";
 	private static final String ADDTARGETLANGUAGE = "addTargetLanguage";
@@ -188,11 +189,13 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		String[] values = {
 			String.valueOf(SEGMENTATIONTYPE_ORIGINAL),
 			String.valueOf(SEGMENTATIONTYPE_SEGMENTED),
-			String.valueOf(SEGMENTATIONTYPE_NOTSEGMENTED)};
+			String.valueOf(SEGMENTATIONTYPE_NOTSEGMENTED),
+			String.valueOf(SEGMENTATIONTYPE_ASNEEDED)};
 		String[] labels = {
 			"Segment only if the input text unit is segmented",
 			"Always segment (even if the input text unit is not segmented)",
 			"Never segment (even if the input text unit is segmented)",
+			"Segment only if the entry is segmented and regardless how the input was",
 		};
 		ListSelectionPart lsp = desc.addListSelectionPart(paramDesc.get(OUTPUTSEGMENTATIONTYPE), values);
 		lsp.setChoicesLabels(labels);

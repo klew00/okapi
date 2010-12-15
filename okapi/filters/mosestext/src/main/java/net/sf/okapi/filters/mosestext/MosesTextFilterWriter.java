@@ -21,6 +21,7 @@
 package net.sf.okapi.filters.mosestext;
 
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -38,9 +39,9 @@ import net.sf.okapi.common.exceptions.OkapiFileNotFoundException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.StartDocument;
-import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
@@ -53,12 +54,19 @@ import net.sf.okapi.common.resource.TextFragment.TagType;
 public class MosesTextFilterWriter implements IFilterWriter {
 
 	private OutputStream output;
-	private String outputPath;
-	private OutputStreamWriter writer;
+	private String srcOutputPath;
+	private String trgOutputPath;
+	private OutputStreamWriter srcWriter;
+	private OutputStreamWriter trgWriter;
 	private LocaleId trgLoc;
+	private FilterWriterParameters params;
 	
 	private final String lineBreak = System.getProperty("line.separator"); 
 	
+	public MosesTextFilterWriter () {
+		params = new FilterWriterParameters();
+	}
+
 	@Override
 	public void cancel () {
 	}
@@ -66,13 +74,17 @@ public class MosesTextFilterWriter implements IFilterWriter {
 	@Override
 	public void close () {
 		try {
-			if ( writer != null ) {
-				writer.close();
-				writer = null;
+			if ( srcWriter != null ) {
+				srcWriter.close();
+				srcWriter = null;
 			}
 			if ( output != null ) {
 				output.close();
 				output = null;
+			}
+			if ( trgWriter != null ) {
+				trgWriter.close();
+				trgWriter = null;
 			}
 		}
 		catch ( IOException e ) {
@@ -92,7 +104,7 @@ public class MosesTextFilterWriter implements IFilterWriter {
 
 	@Override
 	public IParameters getParameters () {
-		return null; // Not used
+		return params;
 	}
 
 	@Override
@@ -122,31 +134,59 @@ public class MosesTextFilterWriter implements IFilterWriter {
 	@Override
 	public void setOutput (String path) {
 		close(); // Make sure previous is closed
-		this.outputPath = path;
+		this.srcOutputPath = path;
 	}
 
 	@Override
 	public void setOutput (OutputStream output) {
 		close(); // Make sure previous is closed
-		this.outputPath = null; // If we use the stream, we can't use the path
+		this.srcOutputPath = null; // If we use the stream, we can't use the path
 		this.output = output; // then assign the new stream
 	}
 
 	@Override
 	public void setParameters (IParameters params) {
-		// Not used
+		this.params = (FilterWriterParameters)params;
 	}
 
 	private void processStartDocument (StartDocument sd) {
-		// Create the output file
+		// Create the output file(s)
 		// If needed, create the output stream from the path provided
 		try {
+			String srcLCode = sd.getLocale().toString();
+			
 			if ( output == null ) {
-				Util.createDirectories(outputPath);
-				output = new BufferedOutputStream(new FileOutputStream(outputPath));
+				// Path provided is used for the source only
+				Util.createDirectories(srcOutputPath);
+				output = new BufferedOutputStream(new FileOutputStream(srcOutputPath));
 			}
-			// Create the output
-			writer = new OutputStreamWriter(output, "UTF-8");
+			// Create the source output
+			srcWriter = new OutputStreamWriter(output, "UTF-8");
+
+			if ( params.getSourceAndTarget() ) {
+				// Compute the output path from the input path and the target locale
+				String ext = Util.getExtension(srcOutputPath);
+				if ( ext.equals("."+srcLCode) ) {
+					// If the extension of the source is the locale code
+					// We do the same for the target
+					trgOutputPath = Util.getDirectoryName(srcOutputPath)
+						+ File.separator
+						+ Util.getFilename(srcOutputPath, false)
+						+ "."
+						+ trgLoc.toString();
+				}
+				else {
+					// Otherwise we use the same path as the source and add the target extension
+					trgOutputPath = srcOutputPath + "." + trgLoc.toString();
+				}
+				// Create the target path
+				trgWriter = new OutputStreamWriter(
+					new BufferedOutputStream(new FileOutputStream(trgOutputPath)), "UTF-8");
+			}
+			else { // No target output to do
+				trgWriter = null;
+			}
+			
 		}
 		catch ( FileNotFoundException e ) {
 			throw new OkapiFileNotFoundException(e);
@@ -161,26 +201,28 @@ public class MosesTextFilterWriter implements IFilterWriter {
 			return;
 		}
 		try {
-			TextContainer tc;
+			ISegments srcSegs = tu.getSource().getSegments();
+			ISegments trgSegs = null;
 			if ( tu.hasTarget(trgLoc) ) {
-				tc = tu.getTarget(trgLoc);
-			}
-			else { // Use the source
-				tc = tu.getSource();
+				trgSegs = tu.getTarget(trgLoc).getSegments();
 			}
 
 			// Process by segments
-			for ( Segment seg : tc.getSegments() ) {
-				String out = toMosesText(seg);
-				if ( hasLineBreak(out) ) {
-					writer.write("<mrk mtype=\"seg\">");
-					writer.write(out.replace("\n", lineBreak));
-					writer.write("</mrk>");					
+			for ( Segment seg : srcSegs ) {
+				// Write the source
+				srcWriter.write(toMosesText(seg.text));
+				srcWriter.write(lineBreak);
+				
+				// Write the target if needed
+				if ( trgWriter != null ) {
+					if ( trgSegs != null ) {
+						Segment trgSeg = trgSegs.get(seg.id);
+						if ( trgSeg != null ) {
+							trgWriter.write(toMosesText(trgSeg.text));
+						}
+					}
+					trgWriter.write(lineBreak);
 				}
-				else {
-					writer.write(out);
-				}
-				writer.write(lineBreak);
 			}
 		}
 		catch ( IOException e ) {
@@ -188,21 +230,16 @@ public class MosesTextFilterWriter implements IFilterWriter {
 		}
 	}
 
-	private boolean hasLineBreak (String text) {
-		return (text.indexOf('\n') != -1);
-	}
-
 	/**
 	 * Convert a segment into a Moses string.
 	 * @param frag the fragment of the segment to convert.
 	 * @return the Moses text for the given fragment.
 	 */
-	private String toMosesText (Segment seg) {
+	private String toMosesText (TextFragment frag) {
 		boolean gMode = true;
 		boolean escapeGT = false;
 		int quoteMode = 0;
 		
-		TextFragment frag = seg.text;
 		String codedText = frag.getCodedText();
 		List<Code> codes = frag.getCodes();
 		
@@ -315,6 +352,9 @@ public class MosesTextFilterWriter implements IFilterWriter {
 					tmp.append(codedText.charAt(i));
 					break;
 				}
+				break;
+			case '\n':
+				tmp.append("<lb/>");
 				break;
 			default:
 				tmp.append(codedText.charAt(i));

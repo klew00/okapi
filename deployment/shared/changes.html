@@ -120,6 +120,8 @@ distribution.</p>
 	<li>Changed default so apostrophes are not escaped in output.</li>
 	<li>Implemented default extraction for CDATA sections when no sub-filter is 
 	defined.</li>
+	<li>Fixed issue null point with empty CDATA sections.</li>
+	<li>Fixed issue of conditions not being applied on CDATA sections.</li>
 </ul>
 	</li>
 	<li>HTML Filter:<ul>
@@ -155,6 +157,8 @@ distribution.</p>
 	<li>Implemented options to add possible new &lt;alt-trans&gt; elements in output 
 	files&nbsp; (in addition to the one in the original document), and to 
 	include or not extension information in the new &lt;alt-trans&gt;.</li>
+	<li>Added the output option: &quot;Segment only if the entry is segmented and 
+	regardless how the input was&quot;.</li>
 </ul>
 	</li>
 </ul>
@@ -169,6 +173,7 @@ distribution.</p>
 	<li>Upgraded the SWT libraries to 3.6.1.</li>
 	<li>Fixed the handling of literal &amp;#13; and &amp;#xD; in most XML-based filters 
 	and encoders, so \r is not stripped out or converted to \n.</li>
+	<li>Added setBoolean, setString and setInteger by name in IParameters.</li>
 </ul>
 	</li>
 </ul>

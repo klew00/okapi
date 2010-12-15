@@ -142,10 +142,10 @@ public class MosesTextFilterTest {
 	
 	@Test
 	public void testLiterals () {
-		String snippet = "&lt;=lt, &gt;=gt, &quot;=quot, &apos;=apos, &#x00d;&#13;=U+D";
+		String snippet = "&lt;=lt, &gt;=gt, &quot;=quot, &apos;=apos, &amp;=amp, &#x00d;&#13;=U+D";
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
-		assertEquals("<=lt, >=gt, \"=quot, '=apos, \r\r=U+D", tu.getSource().toString());
+		assertEquals("<=lt, >=gt, \"=quot, '=apos, &=amp, \r\r=U+D", tu.getSource().toString());
 	}
 	
 	@Test
@@ -172,6 +172,7 @@ public class MosesTextFilterTest {
 	public void testDoubleExtraction () {
 		// Read all files in the data directory
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
+		assertNotNull(list);
 		list.add(new InputDocument(root+"Test01.txt", null));
 		list.add(new InputDocument(root+"Test02.txt", null));
 	

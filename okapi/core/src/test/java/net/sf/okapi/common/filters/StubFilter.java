@@ -138,6 +138,22 @@ public class StubFilter implements IFilter {
         public ParametersDescription getParametersDescription() {
             return null;  //To change body of implemented methods use File | Settings | File Templates.
         }
+
+		@Override
+		public void setBoolean (String name, boolean value) {
+			// TODO Auto-generated method stub
+		}
+
+		@Override
+		public void setInteger (String name, int value) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void setString (String name, String value) {
+			// TODO Auto-generated method stub
+		}
     }
 
 }

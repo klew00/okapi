@@ -303,6 +303,26 @@ public class XmlSnippetsTest {
 	}
 
 	@Test
+	public void testCdataSectionExtractionWithCondition () {
+		parameters = XmlSnippetsTest.class.getResource("/cdataWithConditions.yml");
+		IFilterConfigurationMapper fcMapper = new FilterConfigurationMapper();
+		fcMapper.addConfigurations("net.sf.okapi.filters.html.HtmlFilter");
+		xmlStreamFilter.setFilterConfigurationMapper(fcMapper);
+
+		String snippet = "<doc><no><![CDATA[code1 &lt;=lt,&amp;=amp]]></no><no>code2</no><yes><![CDATA[text&lt;=lt,&amp;=amp]]></yes></doc>";
+		ArrayList<Event> events = XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters);
+		TextUnit tu = FilterTestDriver.getTextUnit(events, 1);
+		assertNotNull(tu);
+		assertEquals("text<=lt,&=amp", tu.toString());
+		
+		assertEquals(snippet, XmlStreamTestUtils.generateOutput(
+			XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters), snippet, locEN,
+			xmlStreamFilter));
+		
+	}
+
+
+	@Test
 	public void testEscapes() {
 		String snippet = "<p><b>Question</b>: When the \"<code>&lt;b></code>\" code was added</p>";
 		assertEquals(

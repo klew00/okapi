@@ -43,9 +43,9 @@ public class ExtractMergeTest {
 	public void testExtracThenMerge () {
 		// Make sure output does not exists
 		File inFile = new File(root+"/Test-XLIFF01.xlf");
-		File out1File = new File(root+"/Test-XLIFF01.xlf.txt");
-		File gold1File = new File(root+"/Test-XLIFF01.xlf.txt_gold");
-		File transFile = new File(root+"/Test-XLIFF01.xlf.txt_trans");
+		File out1File = new File(root+"/Test-XLIFF01.xlf.en");
+		File gold1File = new File(root+"/Test-XLIFF01.xlf.en_gold");
+		File transFile = new File(root+"/Test-XLIFF01.xlf.en_trans");
 		File out2File = new File(root+"/Test-XLIFF01.out.xlf");
 		
 		// Make sure output are deleted
@@ -87,8 +87,8 @@ public class ExtractMergeTest {
 	public void testExtracThenMergeWithAlt () {
 		// Make sure output does not exists
 		File inFile = new File(root+"/Test-XLIFF02.xlf");
-		File out1File = new File(root+"/Test-XLIFF02.xlf.txt");
-		File transFile = new File(root+"/Test-XLIFF02.xlf.txt_trans");
+		File out1File = new File(root+"/Test-XLIFF02.xlf.en");
+		File transFile = new File(root+"/Test-XLIFF02.xlf.en_trans");
 		File out2File = new File(root+"/Test-XLIFF02.out.xlf");
 		
 		// Make sure output are deleted

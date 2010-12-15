@@ -141,4 +141,26 @@ public class ParametersTest {
 		assertEquals(98765, params.getInteger("paramInt1"));
 	}
 
+	@Test
+	public void testSetFromName () {
+		DummyParameters natParams = new DummyParameters();
+		natParams.paramStr1 = "qwerty";
+		natParams.paramBool1 = false;
+		natParams.paramInt1 = 98765;
+		IParameters params = natParams;
+		
+		assertEquals("qwerty", params.getString("paramStr1"));
+		assertEquals(false, params.getBoolean("paramBool1"));
+
+		params.setString("paramStr1", "newValue");
+		params.setBoolean("paramBool1", true);
+		
+		assertEquals("newValue", params.getString("paramStr1"));
+		assertEquals(true, params.getBoolean("paramBool1"));
+
+		assertEquals(98765, params.getInteger("paramInt1"));
+		params.setInteger("paramInt1", 12345678);
+		assertEquals(12345678, params.getInteger("paramInt1"));
+	}
+
 }

@@ -65,13 +65,12 @@ public class MosesTextFilter implements IFilter {
 	
 	private static final String ENDSEGMENT = "</mrk>"; 
 
-	private static final Pattern STARTSEGMENT = Pattern.compile("<mrk\\s+mtype\\s*=\\s*[\"']seg[\"'].*?>");
+	private static final Pattern STARTSEGMENT = Pattern.compile("<mrk\\s+mtype\\s*=\\s*?[\"']seg[\"'].*?>");
 	private static final Pattern OPENCLOSE = Pattern.compile("(\\<g(\\s+)id=['\"](.*?)['\"]>)|(\\</g\\>)");
 	private static final Pattern ISOLATED = Pattern.compile("\\<x(\\s+)id=['\"](.*?)['\"](\\s*?)/>");
-//	private static final Pattern OPENCLOSESEGMENT = Pattern.compile("(<mrk\\s+mtype\\s*=\\s*[\"']seg[\"'].*?>)|(\\</mrk\\>)");
+	private static final Pattern LINEBREAK = Pattern.compile("(\\<lb\\s*?/>)");
 
-
-private BufferedReader reader;
+	private BufferedReader reader;
 	private String lineBreak;
 	private Event event;
 	private IdGenerator tuIdGen;
@@ -119,7 +118,7 @@ private BufferedReader reader;
 	public EncoderManager getEncoderManager () {
 		if ( encoderManager == null ) {
 			encoderManager = new EncoderManager();
-			encoderManager.setMapping(MOSESTEXT_MIME_TYPE, "net.sf.okapi.common.encoder.DefaultEncoder");
+			encoderManager.setMapping(MOSESTEXT_MIME_TYPE, "net.sf.okapi.filters.mosestext.MosesTextEncoder");
 		}
 		return encoderManager;
 	}
@@ -301,7 +300,8 @@ private BufferedReader reader;
 		text = text.replace("&apos;", "'");
 		text = text.replace("&lt;", "<");
 		text = text.replace("&gt;", ">");
-		StringBuilder sb = new StringBuilder(text.replace("&quot;", "\""));
+		text = text.replace("&quot;", "\"");
+		StringBuilder sb = new StringBuilder(text.replace("&amp;", "&"));
 		
 //TODO: MRK, bx, ex, etc.		
 		// Otherwise: process the codes
@@ -337,7 +337,7 @@ private BufferedReader reader;
 		}
 
 		m = ISOLATED.matcher(sb.toString());
-		while (m.find()) {
+		while ( m.find() ) {
 			int id = Util.strToInt(m.group(2), -1);
 			code = new Code(TagType.PLACEHOLDER, "x", m.group());
 			code.setId(id);
@@ -347,6 +347,12 @@ private BufferedReader reader;
 				TextFragment.toChar(codes.size()-1));
 			sb.replace(m.start(), m.end(), markers);
 			m = ISOLATED.matcher(sb.toString());
+		}
+
+		m = LINEBREAK.matcher(sb.toString());
+		while ( m.find() ) {
+			sb.replace(m.start(), m.end(), "\n");
+			m = LINEBREAK.matcher(sb.toString());
 		}
 
 		tf.setCodedText(sb.toString(), codes);

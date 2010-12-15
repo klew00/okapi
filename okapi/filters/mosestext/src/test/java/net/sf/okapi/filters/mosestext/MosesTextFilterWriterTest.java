@@ -66,7 +66,7 @@ public class MosesTextFilterWriterTest {
 	public void testMultilineOutputFromMosesText () {
 		// Read a Moses text and create Moses output (not a round trip!)
 		String snippet = "Text 1.\r<mrk mtype=\"seg\">Text 2\rText 3.</mrk>\rText 4\r";
-		String expected = "Text 1."+lb+"<mrk mtype=\"seg\">Text 2"+lb+"Text 3.</mrk>"+lb+"Text 4"+lb;
+		String expected = "Text 1."+lb+"Text 2<lb/>Text 3."+lb+"Text 4"+lb;
 		String res = generateMosesOutput(getEvents(snippet));
 		assertEquals(expected, res);
 	}

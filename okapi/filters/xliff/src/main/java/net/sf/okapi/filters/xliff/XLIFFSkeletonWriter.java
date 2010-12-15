@@ -426,8 +426,11 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 			return true;
 		case Parameters.SEGMENTATIONTYPE_NOTSEGMENTED:
 			return false;
+		// As needed: segment only if it's segmented regardless what was there before
+		case Parameters.SEGMENTATIONTYPE_ASNEEDED:
+			return !tu.getSource().contentIsOneSegment();
 		}
-		// Otherwise: do as in the input
+		// Otherwise: SEGMENTATIONTYPE_ORIGINAL (do as in the input)
 		// So check the property with the info on whether it was segmented or not
 		Property prop = tu.getProperty(XLIFFFilter.PROP_WASSEGMENTED);
 		if ( prop != null ) {

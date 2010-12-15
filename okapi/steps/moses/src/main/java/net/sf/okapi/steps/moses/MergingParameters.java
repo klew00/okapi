@@ -99,7 +99,7 @@ public class MergingParameters extends BaseParameters implements IEditorDescript
 	}
 
 	public EditorDescription createEditorDescription (ParametersDescription paramDesc) {
-		EditorDescription desc = new EditorDescription("Moses InlineText Leveraging", true, false);
+		EditorDescription desc = new EditorDescription(MergingStep.NAME, true, false);
 
 		CheckboxPart cbp1 = desc.addCheckboxPart(paramDesc.get(COPYTOTARGET));
 		CheckboxPart cbp2 = desc.addCheckboxPart(paramDesc.get(OVERWRITEEXISINGTARGET));

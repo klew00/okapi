@@ -91,4 +91,14 @@ public class DummyParameters implements IParameters {
 		return null;
 	}
 
+	@Override
+	public void setInteger (String name, int value) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void setString (String name, String value) {
+		// TODO Auto-generated method stub
+	}
+
 }
