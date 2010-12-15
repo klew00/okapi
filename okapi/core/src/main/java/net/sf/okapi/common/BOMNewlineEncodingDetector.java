@@ -385,7 +385,8 @@ public final class BOMNewlineEncodingDetector {
 		try {
 			final int b1 = inputStream.read();
 			if (b1 == -1) {
-				return setEncoding(null, "empty input stream");
+				// Use default encoding for empty stream, or we get null pointer later
+				return setEncoding(defaultEncoding, "empty input stream");
 			}
 			final int b2 = inputStream.read();
 			final int b3 = inputStream.read();

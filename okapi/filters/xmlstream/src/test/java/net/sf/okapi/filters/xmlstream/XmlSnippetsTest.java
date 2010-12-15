@@ -290,6 +290,19 @@ public class XmlSnippetsTest {
 	}
 
 	@Test
+	public void testCdataSectionAsHTMLButEmpty() {
+		parameters = XmlSnippetsTest.class.getResource("/cdataAsHTML.yml");
+		IFilterConfigurationMapper fcMapper = new FilterConfigurationMapper();
+		fcMapper.addConfigurations("net.sf.okapi.filters.html.HtmlFilter");
+		xmlStreamFilter.setFilterConfigurationMapper(fcMapper);
+
+		String snippet = "<doc><p><![CDATA[]]></p></doc>";
+		assertEquals("<doc><p><![CDATA[]]></p></doc>", XmlStreamTestUtils.generateOutput(
+			XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters), snippet, locEN,
+			xmlStreamFilter));
+	}
+
+	@Test
 	public void testEscapes() {
 		String snippet = "<p><b>Question</b>: When the \"<code>&lt;b></code>\" code was added</p>";
 		assertEquals(
