@@ -203,7 +203,7 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 		if (parentSkeleton == null) return TextProcessingResult.REJECTED;
 		
 		//if (!processTU(textUnit)) return TextProcessingResult.REJECTED;
-		processTU(textUnit); // Can have an empty source, no problem
+		//processTU(textUnit); // Can have an empty source, no problem
 		
 		parentSkeleton.add(TextUnitUtil.convertToSkeleton(textUnit));
 		return TextProcessingResult.ACCEPTED;
