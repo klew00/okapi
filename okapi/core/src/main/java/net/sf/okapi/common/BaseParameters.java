@@ -119,18 +119,18 @@ public abstract class BaseParameters implements IParameters {
 	}
 	
 	public boolean getBoolean (String name) {
-		if ( buffer == null ) return false;
-		else return buffer.getBoolean(name);
+		toString(); // Make sure the buffer is up-to-date
+		return buffer.getBoolean(name);
 	}
 	
 	public String getString (String name) {
-		if ( buffer == null ) return null;
-		else return buffer.getString(name);
+		toString(); // Make sure the buffer is up-to-date
+		return buffer.getString(name);
 	}
 	
 	public int getInteger (String name) {
-		if ( buffer == null ) return 0;
-		else return buffer.getInteger(name); //Integer.parseInt(buffer.getString(name));
+		toString(); // Make sure the buffer is up-to-date
+		return buffer.getInteger(name);
 	}
 
 	public ParametersDescription getParametersDescription () {

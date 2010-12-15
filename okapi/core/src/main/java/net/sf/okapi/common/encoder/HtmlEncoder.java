@@ -57,9 +57,6 @@ public class HtmlEncoder implements IEncoder {
 
 		// Get options from the filter's configuration
 		if ( params != null ) {
-			// Force the options to be written out in the internal buffer
-			// So we can use the name-based methods to get the latest info
-			params.toString(); 
 			// Retrieve the options
 			if ( params.getBoolean("quoteModeDefined") ) {
 				quoteMode = params.getInteger("quoteMode");

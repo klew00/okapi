@@ -128,5 +128,17 @@ public class ParametersTest {
 		assertEquals(pd, desc.getDescriptors().get("flag"));
 		assertEquals(boolean.class, pd.getType());
 	}
+	
+	@Test
+	public void testGetFromName () {
+		DummyParameters natParams = new DummyParameters();
+		natParams.paramStr1 = "qwerty";
+		natParams.paramBool1 = false;
+		natParams.paramInt1 = 98765;
+		IParameters params = natParams;
+		assertEquals("qwerty", params.getString("paramStr1"));
+		assertEquals(false, params.getBoolean("paramBool1"));
+		assertEquals(98765, params.getInteger("paramInt1"));
+	}
 
 }
