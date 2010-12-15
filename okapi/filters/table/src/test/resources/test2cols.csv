@@ -22,7 +22,7 @@
 820,"text, text" text, text
 820,"text, text", text, text
 820, text "text, text" text, text
-820, "text"text "text,text",text"text, text
+820, "text "text "text,text", text" text", text
 999,"X <x>xxxxN</x> xxxxN <X>xxxxN</X>, text4."
 999,"A <b>text1</b> text2 <B>text3</B>, text4."
 999,"A <b>text1</b> text2 <B>text3</B>, text4 "
