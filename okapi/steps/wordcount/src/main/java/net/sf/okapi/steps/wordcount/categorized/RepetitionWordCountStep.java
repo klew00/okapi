@@ -50,7 +50,7 @@ public class RepetitionWordCountStep extends AltAnnotationBasedCountStep {
 
 	@Override
 	protected boolean accept(MatchType type) {
-		return type == MatchType.EXACT_REPEATED_SEGMENT_SAME_DOCUMENT;
+		return type == MatchType.EXACT_DOCUMENT_CONTEXT;
 	}
 
 	@Override

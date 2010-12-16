@@ -33,7 +33,8 @@ public enum MatchType {
 	EXACT_UNIQUE_ID,
 
 	/**
-	 * EXACT and comes from a previous version of the same document
+	 * EXACT and comes from the preceding version of the same document 
+	 * (i.e., if v4 is leveraged this match must come from v3, not v2 or v1!!).
 	 */
 	EXACT_PREVIOUS_VERSION,
 
@@ -43,9 +44,10 @@ public enum MatchType {
 	EXACT_LOCAL_CONTEXT,
 
 	/**
-	 * EXACT and comes from a repeated segment in the same document
+	 * EXACT and comes from a repeated segment in the same document or a different version of the same document.
+	 * See also {@link #EXACT_PREVIOUS_VERSION}
 	 */
-	EXACT_REPEATED_SEGMENT_SAME_DOCUMENT,
+	EXACT_DOCUMENT_CONTEXT,
 
 	/**
 	 * EXACT and the structural type of the segment (title, paragraph, list element etc..)
