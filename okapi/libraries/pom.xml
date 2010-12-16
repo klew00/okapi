@@ -21,5 +21,6 @@
         <module>lib-persistence</module>
         <module>lib-beans</module>
         <module>lib-reporting</module>
+        <module>lib-omegat</module>
     </modules>
 </project>

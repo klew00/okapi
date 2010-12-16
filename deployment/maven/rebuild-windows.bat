@@ -14,6 +14,9 @@ if ERRORLEVEL 1 goto end
 call ant -f build_okapi-plugins.xml
 if ERRORLEVEL 1 goto end
 
+call ant -f build_omegat-plugins.xml
+if ERRORLEVEL 1 goto end
+
 cd ../../applications/integration-tests
 call mvn clean integration-test
 

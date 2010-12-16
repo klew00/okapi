@@ -12,6 +12,8 @@ ant -f build_okapi-apps.xml -Dplatform=gtk2-linux-x86
 
 ant -f build_okapi-plugins.xml
 
+ant -f build_omegat-plugins.xml
+
 chmod a+x dist_gtk2-linux-x86/tikal.sh
 chmod a+x dist_gtk2-linux-x86/rainbow.sh
 chmod a+x dist_gtk2-linux-x86/ratel.sh
