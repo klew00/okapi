@@ -523,8 +523,14 @@ public class TTXFilter implements IFilter {
 					tmp = reader.getAttributeValue(null, "Type");
 					if ( tmp != null ) {
 						if ( tmp.equals("start") ) {
-							tagType = TagType.OPENING;
-							type = "Xpt";
+							String leftEdge = reader.getAttributeValue(null, "LeftEdge");
+							if (( leftEdge != null ) && leftEdge.equals("split") ) {
+								// Closing part of a split opening tag: treat it as placeholder
+							}
+							else { // Normal start tag
+								tagType = TagType.OPENING;
+								type = "Xpt";
+							}
 						}
 						else if ( tmp.equals("end") ) {
 							tagType = TagType.CLOSING;

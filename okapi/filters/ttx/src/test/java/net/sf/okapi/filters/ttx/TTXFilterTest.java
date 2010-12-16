@@ -492,6 +492,18 @@ public class TTXFilterTest {
 	}
 
 	@Test
+	public void testNoTUContentWithSplitStart () {
+		String snippet = STARTFILENOLB
+			+ "before <ut Type=\"start\" RightEdge=\"split\">[ulink={</ut>text1<ut Type=\"start\" LeftEdge=\"split\">}]</ut>text2<ut Type=\"end\">[/ulink]</ut> after"
+			+ "</Raw></Body></TRADOStag>";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(filter1, snippet, locESEM), 1);
+		assertNotNull(tu);
+		TextContainer cont = tu.getSource();
+		assertEquals("before [ulink={text1}]text2[/ulink] after", cont.toString());
+		assertEquals("before <1>text1<2/>text2</1> after", fmt.setContent(tu.getSource().getFirstContent()).toString());
+	}
+
+	@Test
 	public void testNoTUContentWithUT () {
 		String snippet = STARTFILENOLB
 			+ "before <ut Type=\"start\">[</ut>in<ut Type=\"end\">]</ut> after"
