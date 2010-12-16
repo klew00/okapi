@@ -747,7 +747,8 @@ public class Main {
 	
 	private void guessMergingMosesArguments (String input) {
 		// Main input is the original file, not the Moses file
-		moses = input + ".txt";
+		// We guess the Moses filename:
+		moses = input + "."+trgLoc.toString();
 		String ext = Util.getExtension(input);
 		int n = input.lastIndexOf('.');
 		output = input.substring(0, n) + ".out" + ext;
@@ -1378,8 +1379,8 @@ public class Main {
 		if ( tmp.endsWith("/") || tmp.endsWith("\\") ) {
 			tmp = tmp.substring(0, tmp.length()-1);
 		}
-		tmp += ("."+srcLoc.toString());
-		driver.addBatchItem(rd, new File(tmp).toURI(), "UTF-8");
+		String srcName = tmp + ("."+srcLoc.toString());
+		driver.addBatchItem(rd, new File(srcName).toURI(), "UTF-8");
 
 		ps.println("Source language: "+srcLoc);
 		if ( moses2Outputs ) {
@@ -1387,7 +1388,10 @@ public class Main {
 		}
 		ps.println("Default input encoding: "+inputEncoding);
 		ps.println("Filter configuration: "+configId);
-		ps.println("Output: "+tmp);
+		ps.println("Source output: "+srcName);
+		if ( moses2Outputs ) {
+			ps.println("Target output: " + tmp + ("."+trgLoc.toString()));
+		}
 
 		// Process
 		driver.processBatch();

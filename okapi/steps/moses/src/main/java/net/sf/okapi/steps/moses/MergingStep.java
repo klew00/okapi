@@ -130,8 +130,8 @@ public class MergingStep extends BasePipelineStep {
 		RawDocument rd = mosesDoc;
 		if ( rd == null ) {
 			// If not available: guess the path from the input document
-			// = same path plus a .txt extension
-			String path = inputURI.getPath() + ".txt";
+			// = same path plus a target extra extension
+			String path = inputURI.getPath() + "." + targetLocale.toString();
 			rd = new RawDocument(new File(path).toURI(), "UTF-8", sourceLocale);
 		}
 		// Make sure the Moses file filter configuration is set
