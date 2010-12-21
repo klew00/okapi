@@ -102,7 +102,6 @@ public class Main {
 	
 	protected ArrayList<String> inputs;
 	protected String skeleton;
-	protected String moses;
 	protected String output;
 	protected String specifiedConfigId;
 	protected String configId;
@@ -144,6 +143,7 @@ public class Main {
 	protected boolean mosesCopyToTarget = false;
 	protected boolean mosesOverwriteTarget = false;
 	protected boolean moses2Outputs = false;
+	protected String moses2ndPath;
 	
 	private FilterConfigurationMapper fcMapper;
 	private Hashtable<String, String> extensionsMap;
@@ -263,6 +263,9 @@ public class Main {
 				else if ( arg.equals("-overtrg") ) {
 					prog.mosesCopyToTarget = true;
 					prog.mosesOverwriteTarget = true;
+				}
+				else if ( arg.equals("-from") || arg.equals("-to") ) {
+					prog.moses2ndPath = prog.getArgument(args, ++i);
 				}
 				else if ( arg.equals("-2po") ) {
 					prog.command = CMD_CONV2PO;
@@ -747,8 +750,11 @@ public class Main {
 	
 	private void guessMergingMosesArguments (String input) {
 		// Main input is the original file, not the Moses file
-		// We guess the Moses filename:
-		moses = input + "."+trgLoc.toString();
+		// The Moses file is specified with -from or null
+		if ( Util.isEmpty(moses2ndPath) ) {
+			// We guess the Moses filename:
+			moses2ndPath = input + "."+trgLoc.toString();
+		}
 		String ext = Util.getExtension(input);
 		int n = input.lastIndexOf('.');
 		output = input.substring(0, n) + ".out" + ext;
@@ -939,10 +945,10 @@ public class Main {
 		ps.println("      |-ms configFile|-tda configFile] [-maketmx [tmxFile]] [-opt threshold]");
 		ps.println("Extracts a file to Moses InlineText:");
 		ps.println("   -xm inputFile [inputFile2...] [-fc configId] [-ie encoding]");
-		ps.println("      [-sl srcLang] [-tl trgLang] [-2]");
+		ps.println("      [-sl srcLang] [-tl trgLang] [-2] [-to srcOutputFile]");
 		ps.println("Leverage a file with Moses InlineText:");
-		ps.println("   -lm inputFile [inputFile2...] [-fc configId] [-ie encoding]");
-		ps.println("      [-oe encoding] [-sl srcLang] [-tl trgLang] [-totrg|-overtrg]");
+		ps.println("   -lm inputFile [inputFile2...] [-fc configId] [-ie encoding] [-oe encoding]");
+		ps.println("      [-sl srcLang] [-tl trgLang] [-totrg|-overtrg] [-from mosesFile]");
 		ps.println("Queries translation resources:");
 		ps.println("   -q \"source text\" [-sl srcLang] [-tl trgLang] [-google] [-opentran]");
 		ps.println("      [-tt hostname[:port]] [-mm key] [-pen tmDirectory] [-gs configFile]");
@@ -1349,7 +1355,7 @@ public class Main {
 		driver.addStep(new FilterEventsToRawDocumentStep());
 		
 		// Two parallel inputs: 1=the original file, 2=the Moses translated file
-		RawDocument rdMoses = new RawDocument(new File(moses).toURI(), "UTF-8", trgLoc);
+		RawDocument rdMoses = new RawDocument(new File(moses2ndPath).toURI(), "UTF-8", trgLoc);
 		driver.addBatchItem(new BatchItemContext(rd, new File(output).toURI(), outputEncoding, rdMoses));
 		// Execute
 		driver.processBatch();
@@ -1374,13 +1380,15 @@ public class Main {
 		driver.addStep(extStep);
 
 		// Create the raw document and set the output
-		String tmp = rd.getInputURI().getPath();
-		// If the input is a directory, it ends with a separator, then we remove it
-		if ( tmp.endsWith("/") || tmp.endsWith("\\") ) {
-			tmp = tmp.substring(0, tmp.length()-1);
+		if ( Util.isEmpty(moses2ndPath) ) {
+			moses2ndPath = rd.getInputURI().getPath();
+			// If the input is a directory, it ends with a separator, then we remove it
+			if ( moses2ndPath.endsWith("/") || moses2ndPath.endsWith("\\") ) {
+				moses2ndPath = moses2ndPath.substring(0, moses2ndPath.length()-1);
+			}
+			moses2ndPath = moses2ndPath + ("."+srcLoc.toString());
 		}
-		String srcName = tmp + ("."+srcLoc.toString());
-		driver.addBatchItem(rd, new File(srcName).toURI(), "UTF-8");
+		driver.addBatchItem(rd, new File(moses2ndPath).toURI(), "UTF-8");
 
 		ps.println("Source language: "+srcLoc);
 		if ( moses2Outputs ) {
@@ -1388,10 +1396,7 @@ public class Main {
 		}
 		ps.println("Default input encoding: "+inputEncoding);
 		ps.println("Filter configuration: "+configId);
-		ps.println("Source output: "+srcName);
-		if ( moses2Outputs ) {
-			ps.println("Target output: " + tmp + ("."+trgLoc.toString()));
-		}
+		ps.println("Source output: "+moses2ndPath);
 
 		// Process
 		driver.processBatch();

@@ -20,6 +20,7 @@
 
 package net.sf.okapi.steps.moses;
 
+import java.io.File;
 import java.net.URI;
 
 import net.sf.okapi.common.Event;
@@ -37,6 +38,7 @@ public class ExtractionStep extends BasePipelineStep {
 
 	private LocaleId targetLocale;
 	private URI inputURI;
+	private URI outputURI;
 	private MosesTextFilterWriter writer;
 	private FilterWriterParameters params;
 	
@@ -65,6 +67,11 @@ public class ExtractionStep extends BasePipelineStep {
 		this.inputURI = inputURI;
 	}
 
+	@StepParameterMapping(parameterType = StepParameterType.OUTPUT_URI)
+	public void setOutputURI (URI outputURI) {
+		this.outputURI = outputURI;
+	}
+
 	@Override
 	public IParameters getParameters() {
 		return params;
@@ -81,7 +88,11 @@ public class ExtractionStep extends BasePipelineStep {
 		case START_DOCUMENT:
 			writer = new MosesTextFilterWriter();
 			writer.setOptions(targetLocale, "UTF-8");
-			writer.setOutput(inputURI.getPath() + "."+event.getStartDocument().getLocale().toString());
+			if ( outputURI == null ) {
+				File f = new File(inputURI.getPath() + "."+event.getStartDocument().getLocale().toString());
+				outputURI = f.toURI();
+			}
+			writer.setOutput(outputURI.getPath());
 			writer.setParameters(params);
 			return writer.handleEvent(event);
 			

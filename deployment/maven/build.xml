@@ -34,6 +34,8 @@
 		<!-- Plugins -->
 		<ant antfile="build_okapi-plugins.xml">
 		</ant>
+		<ant antfile="build_omegat-plugins.xml">
+		</ant>
 
 	</target>
 
