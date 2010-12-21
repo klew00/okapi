@@ -11,7 +11,7 @@ public class Manual {
 	public static void main (String[] args) {
 		
 		IQuery conn = new MicrosoftMTConnector();
-		((Parameters)conn.getParameters()).setAppId("AppID goes here");
+		((Parameters)conn.getParameters()).setAppId("myAppID");
 		conn.open();
 		conn.setLanguages(LocaleId.ENGLISH, LocaleId.FRENCH);
 		
@@ -32,6 +32,18 @@ public class Manual {
 		tf.append("big");
 		tf.append(TagType.CLOSING, "b", "</b>");
 		tf.append(" red car.");
+		
+		conn.query(tf);
+		if ( conn.hasNext() ) {
+			QueryResult qr = conn.next();
+			System.out.println("\n"+qr.source.toText()+"\n"+qr.target.toText());
+		}
+
+		tf = new TextFragment("The ");
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append("big");
+		tf.append(TagType.CLOSING, "b", "</b>");
+		tf.append(" red car has the markers & and < on its roof.");
 		
 		conn.query(tf);
 		if ( conn.hasNext() ) {

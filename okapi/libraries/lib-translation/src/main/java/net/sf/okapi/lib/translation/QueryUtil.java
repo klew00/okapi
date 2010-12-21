@@ -306,6 +306,63 @@ public class QueryUtil {
 	}
 
 	/**
+	 * Converts an HTML plain text into a plain text one.
+	 * <p>This method assumes there is no elements in the text, just escaped characters.
+	 * The methods supported NCRs as well as HTML CERs.
+	 * @param text the HTML string to convert.
+	 * @return the un-escaped text.
+	 */
+	public String fromPlainTextHTML (String text) {
+		if (Util.isEmpty(text))
+			return "";
+		text = text.toString().replace("&apos;", "'");
+		text = text.replace("&lt;", "<");
+		text = text.replace("&gt;", ">");
+		text = text.replace("&quot;", "\"");
+		StringBuilder sb = new StringBuilder();
+		sb.append(text.replace("&amp;", "&"));
+		if (entities == null) {
+			entities = new HTMLCharacterEntities();
+			entities.ensureInitialization(false);
+		}
+
+		// Un-escape character entity references
+		Matcher m;
+		while (true) {
+			m = CER.matcher(sb.toString());
+			if (!m.find())
+				break;
+			int val = entities.lookupReference(m.group(0));
+			if (val != -1) {
+				sb.replace(m.start(0), m.end(0), String.valueOf((char) val));
+			} else { // Unknown entity
+						// TODO: replace by something meaningful to allow continuing the replacements
+				break; // Temporary, to avoid infinite loop
+			}
+		}
+
+		// Un-escape numeric character references
+		m = NCR.matcher(sb.toString());
+		while (m.find()) {
+			String val = m.group(1);
+			int n = (int) '?'; // Default
+			try {
+				if (val.charAt(0) == 'x') { // Hexadecimal
+					n = Integer.valueOf(m.group(1).substring(1), 16);
+				} else { // Decimal
+					n = Integer.valueOf(m.group(1));
+				}
+			} catch (NumberFormatException e) {
+				// Just use default
+			}
+			sb.replace(m.start(0), m.end(0), String.valueOf((char) n));
+			m = NCR.matcher(sb.toString());
+		}
+
+		return sb.toString();
+	}
+
+	/**
 	 * Converts from coded text to XLIFF.
 	 * 
 	 * @param fragment
