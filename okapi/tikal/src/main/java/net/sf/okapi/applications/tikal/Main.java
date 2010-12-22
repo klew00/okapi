@@ -32,6 +32,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -39,6 +40,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.okapi.common.FileUtil;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.DefaultFilters;
@@ -169,13 +171,6 @@ public class Main {
 	public static void main (String[] originalArgs) {
 		Main prog = new Main();
 	
-		// Set the default locales
-		prog.srcLoc = new LocaleId("en", false);
-		prog.trgLoc = new LocaleId(Locale.getDefault());
-		if ( prog.trgLoc.sameLanguageAs(prog.srcLoc) ) {
-			prog.trgLoc = new LocaleId("fr", false);
-		}
-		
 		boolean showTrace = false;
 		try {
 			// Create an encoding-aware output for the console
@@ -587,6 +582,7 @@ public class Main {
 	
 	private void editAllConfigurations () {
 		initialize();
+		guessMissingLocales(null);
 		// Add all the pre-defined configurations
 		DefaultFilters.setMappings(fcMapper, false, true);
 		loadFromPluginsAndUpdate();
@@ -614,6 +610,7 @@ public class Main {
 	
 	private void editConfiguration () {
 		initialize();
+		guessMissingLocales(null);
 		
 		if ( specifiedConfigId == null ) {
 			throw new RuntimeException("You must specified the configuration to edit.");
@@ -711,6 +708,38 @@ public class Main {
 		}
 	}
 	
+	private void guessMissingLocales (String inputPath) {
+		// If both locales are already set: just use those
+		if (( srcLoc != null ) && ( trgLoc != null )) return;
+		
+		// Try to see if we can get one or both from the input file
+		if ( inputPath != null ) {
+			List<String> guessed = FileUtil.guessLanguages(inputPath);
+			if ( guessed.size() > 0 ) {
+				if ( srcLoc == null ) {
+					srcLoc = LocaleId.fromString(guessed.get(0));
+				}
+				if ( guessed.size() > 1 ) {
+					if ( trgLoc == null ) {
+						trgLoc = LocaleId.fromString(guessed.get(1));
+					}
+				}
+			}
+		}
+
+		// Make sure we do have a source
+		if ( srcLoc == null ) {
+			srcLoc = new LocaleId("en", false);
+		}
+		// Make sure we do have a target
+		if ( trgLoc == null ) {
+			trgLoc = new LocaleId(Locale.getDefault());
+			if ( trgLoc.sameLanguageAs(srcLoc) ) {
+				trgLoc = new LocaleId("fr", false);
+			}
+		}
+	}
+	
 	private void guessMissingParameters (String inputOfConfig) {
 		if ( specifiedConfigId == null ) {
 			String ext = Util.getExtension(inputOfConfig);
@@ -770,6 +799,7 @@ public class Main {
 			ps.println("Translation");
 			guessMissingParameters(input);
 			if ( !prepareFilter(configId) ) return; // Next input
+			guessMissingLocales(input);
 			file = new File(input);
 			rd = new RawDocument(file.toURI(), inputEncoding, srcLoc, trgLoc);
 			rd.setFilterConfigId(configId);
@@ -780,6 +810,7 @@ public class Main {
 			ps.println("Segmentation");
 			guessMissingParameters(input);
 			if ( !prepareFilter(configId) ) return; // Next input
+			guessMissingLocales(input);
 			file = new File(input);
 			rd = new RawDocument(file.toURI(), inputEncoding, srcLoc, trgLoc);
 			rd.setFilterConfigId(configId);
@@ -790,6 +821,7 @@ public class Main {
 			ps.println("Extraction");
 			guessMissingParameters(input);
 			if ( !prepareFilter(configId) ) return; // Next input
+			guessMissingLocales(input);
 			file = new File(input);
 			rd = new RawDocument(file.toURI(), inputEncoding, srcLoc, trgLoc);
 			rd.setFilterConfigId(configId);
@@ -800,6 +832,7 @@ public class Main {
 			ps.println("Extraction to Moses InlineText");
 			guessMissingParameters(input);
 			if ( !prepareFilter(configId) ) return; // Next input
+			guessMissingLocales(input);
 			file = new File(input);
 			rd = new RawDocument(file.toURI(), inputEncoding, srcLoc, trgLoc);
 			rd.setFilterConfigId(configId);
@@ -811,6 +844,7 @@ public class Main {
 			guessMergingArguments(input);
 			guessMissingParameters(skeleton);
 			if ( !prepareFilter(configId) ) return; // Next input
+			guessMissingLocales(input);
 			XLIFFMergingStep stepMrg = new XLIFFMergingStep(fcMapper);
 			file = new File(skeleton);
 			RawDocument skelRawDoc = new RawDocument(file.toURI(), inputEncoding,
@@ -834,6 +868,7 @@ public class Main {
 			guessMergingMosesArguments(input);
 			guessMissingParameters(input);
 			if ( !prepareFilter(configId) ) return; // Next input
+			guessMissingLocales(input);
 			file = new File(input);
 			rd = new RawDocument(file.toURI(), inputEncoding, srcLoc, trgLoc, configId);
 			leverageFileWithMoses(rd);
@@ -857,6 +892,7 @@ public class Main {
 			}
 			guessMissingParameters(input);
 			if ( !prepareFilter(configId) ) return; // Next input
+			guessMissingLocales(input);
 			
 			file = new File(input);
 			String output = input;
@@ -944,10 +980,10 @@ public class Main {
 		ps.println("      |-mm key|-pen tmDirectory|-gs configFile|-google|-apertium [serverURL]");
 		ps.println("      |-ms configFile|-tda configFile] [-maketmx [tmxFile]] [-opt threshold]");
 		ps.println("Extracts a file to Moses InlineText:");
-		ps.println("   -xm inputFile [inputFile2...] [-fc configId] [-ie encoding]");
+		ps.println("   -xm inputFile [-fc configId] [-ie encoding]");
 		ps.println("      [-sl srcLang] [-tl trgLang] [-2] [-to srcOutputFile]");
 		ps.println("Leverage a file with Moses InlineText:");
-		ps.println("   -lm inputFile [inputFile2...] [-fc configId] [-ie encoding] [-oe encoding]");
+		ps.println("   -lm inputFile [-fc configId] [-ie encoding] [-oe encoding]");
 		ps.println("      [-sl srcLang] [-tl trgLang] [-totrg|-overtrg] [-from mosesFile]");
 		ps.println("Queries translation resources:");
 		ps.println("   -q \"source text\" [-sl srcLang] [-tl trgLang] [-google] [-opentran]");
@@ -1011,6 +1047,7 @@ public class Main {
 	}
 	
 	private void processQuery () {
+		guessMissingLocales(null);
 		if ( !useGoogle && !useOpenTran && !useTransToolkit && !useMyMemory
 			&& !usePensieve && !useGlobalSight && !useApertium && !useMicrosoft && !useTDA ) {
 			useGoogle = true; // Default if none is specified

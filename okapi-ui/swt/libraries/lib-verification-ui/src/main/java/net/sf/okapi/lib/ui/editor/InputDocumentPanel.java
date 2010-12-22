@@ -23,6 +23,7 @@ package net.sf.okapi.lib.ui.editor;
 import java.nio.charset.Charset;
 import java.util.List;
 
+import net.sf.okapi.common.FileUtil;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterConfiguration;
@@ -59,7 +60,6 @@ public class InputDocumentPanel extends Composite {
 	private String filterNames;
 	private String filterExtensions;
 	private IFilterConfigurationMapper fcMapper;
-	private LanguageCodesDetector langDetector;
 
 	public InputDocumentPanel (Composite parent,
 		int flags,
@@ -69,7 +69,6 @@ public class InputDocumentPanel extends Composite {
 		IFilterConfigurationMapper fcMapper)
 	{
 		super(parent, flags);
-		langDetector = new LanguageCodesDetector();
 		createContent(horizontalSpan, documentLabel, getDocumentLabel, fcMapper);
 	}
 	
@@ -214,7 +213,7 @@ public class InputDocumentPanel extends Composite {
 	public void guessLocales () {
 		// Guess the languages if possible
 		if ( edSourceLocale.getEditable() ) {
-			List<String> list = langDetector.guessLanguages(edDocument.getText());
+			List<String> list = FileUtil.guessLanguages(edDocument.getText());
 			if ( list.size() > 0 ) {
 				edSourceLocale.setText(list.get(0));
 			}
