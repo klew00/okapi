@@ -485,7 +485,13 @@ public class TTXFilter implements IFilter {
 							}
 							if ( value > 0 ) {
 								MatchType matchType = MatchType.FUZZY;
-								if ( value > 99 ) matchType = MatchType.EXACT;
+								if (( value > 100 ) && (( origin != null ) && origin.equalsIgnoreCase("xtranslate") )) {
+									// case of the "XU" tags
+									matchType = MatchType.EXACT_LOCAL_CONTEXT;
+								}
+								else if ( value > 99 ) {
+									matchType = MatchType.EXACT;
+								}
 								altTrans = new AltTranslation(srcLoc, trgLoc, null, null, null, matchType,
 									value, ((origin==null) ? AltTranslation.ORIGIN_SOURCEDOC : origin));
 							}

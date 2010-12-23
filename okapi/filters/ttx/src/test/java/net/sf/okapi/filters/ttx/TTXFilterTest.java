@@ -26,6 +26,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.filterwriter.GenericContent;
+import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.TextContainer;
@@ -453,6 +454,7 @@ public class TTXFilterTest {
 		assertEquals("es", ann.getFirst().getTarget().toString());
 		assertEquals("abc", ann.getFirst().getOrigin());
 		assertEquals(50, ann.getFirst().getScore());
+		assertEquals(MatchType.FUZZY, ann.getFirst().getType());
 	}
 
 	@Test
@@ -465,6 +467,25 @@ public class TTXFilterTest {
 			+ "</Raw></Body></TRADOStag>";
 		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(filter2, snippet, locESEM),
 			locESEM, filter2.createSkeletonWriter(), filter2.getEncoderManager()));
+	}
+
+	@Test
+	public void testTUInfoXU () {
+		String snippet = STARTFILENOLB
+			+ "<Tu Origin=\"xtranslate\" MatchPercent=\"101\"><Tuv Lang=\"EN-US\">en</Tuv><Tuv Lang=\"ES-EM\">es</Tuv></Tu>"
+			+ "</Raw></Body></TRADOStag>";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(filter1, snippet, locESEM), 1);
+		assertNotNull(tu);
+		TextContainer cont = tu.getTarget(locESEM);
+		assertNotNull(cont);
+		ISegments segs = cont.getSegments();
+		AltTranslationsAnnotation ann = segs.get(0).getAnnotation(AltTranslationsAnnotation.class);
+		assertNotNull(ann);
+		assertEquals(1, ann.size());
+		assertEquals("es", ann.getFirst().getTarget().toString());
+		assertEquals("xtranslate", ann.getFirst().getOrigin());
+		assertEquals(101, ann.getFirst().getScore());
+		assertEquals(MatchType.EXACT_LOCAL_CONTEXT, ann.getFirst().getType());
 	}
 
 	@Test
