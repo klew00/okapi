@@ -26,12 +26,12 @@ public class WordCountTest {
 
 	@Test
 	public void testCountApostrophe () {
-		//TODO: Should be 4 per http://www.lisa.org/fileadmin/standards/GMX-V.html#Words "L'objectif" is 2 words in FR
-		assertEquals(3, WordCounter.count("L'objectif est defini.", locFR));
-		assertEquals(3, WordCounter.count("L\u2019objectif est defini.", locFR));
+		//Should be 4 per http://www.lisa.org/fileadmin/standards/GMX-V.html#Words "L'objectif" is 2 words in FR
+		assertEquals(4, WordCounter.count("L'objectif est defini.", locFR));
+		assertEquals(4, WordCounter.count("L\u2019objectif est defini.", locFR));
 
-		assertEquals(5, WordCounter.count("He can't eat that fast.", locFR));
-		assertEquals(5, WordCounter.count("He can\u2019t eat that fast.", locFR));
+		assertEquals(5, WordCounter.count("He can't eat that fast.", locEN));
+		assertEquals(5, WordCounter.count("He can\u2019t eat that fast.", locEN));
 	}
 	
 	@Test
