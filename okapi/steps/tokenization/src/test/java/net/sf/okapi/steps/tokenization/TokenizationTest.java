@@ -63,6 +63,7 @@ import org.junit.Test;
 import com.ibm.icu.text.BreakIterator;
 import com.ibm.icu.text.RuleBasedBreakIterator;
 
+@SuppressWarnings("unused")
 public class TokenizationTest {
 
 	private String text = "Jaguar will sell its new XJ-6 model in the U.S. for " +
@@ -76,7 +77,7 @@ public class TokenizationTest {
 	private LocaleId locENUS = LocaleId.fromString("en-us");
 	private LocaleId locENGB = LocaleId.fromString("en-gb");
 	private LocaleId locDEDE = LocaleId.fromString("de-de");
-	private LocaleId locDECH = LocaleId.fromString("de-ch");
+	private LocaleId locDECH = LocaleId.fromString("de-ch");	
 	private LocaleId locFR = LocaleId.fromString("fr");
 
 	//private String text = "The quick (\"brown\") fox can't jump 32.3 feet, right?";
@@ -135,7 +136,6 @@ public class TokenizationTest {
 	@Test
 	public void testDefRules() {
 		
-		@SuppressWarnings("unused")
 		RuleBasedBreakIterator iterator = (RuleBasedBreakIterator) BreakIterator.getWordInstance();
 		// System.out.println(iterator.toString().replace(";", ";\n"));
 	}
@@ -160,7 +160,6 @@ public class TokenizationTest {
 		ts.handleEvent(new Event(EventType.END_BATCH));
 	}
 	
-	@SuppressWarnings("unused")
 	private void listTokens(Tokens tokens) {
 		
 		if (tokens == null) return;

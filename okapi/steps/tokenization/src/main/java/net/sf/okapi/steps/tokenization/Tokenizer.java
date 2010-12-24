@@ -114,7 +114,6 @@ public class Tokenizer {
 		}
 		else if (text instanceof String) {
 			Tokenizer tokenizer = new Tokenizer();
-			if (tokenizer == null) return null;
 			return tokenizer.tokenizeString((String) text, language, tokenNames);
 		}
 		
