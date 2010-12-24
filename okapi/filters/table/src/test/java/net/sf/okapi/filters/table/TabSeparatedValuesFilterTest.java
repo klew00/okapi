@@ -230,7 +230,7 @@ public class TabSeparatedValuesFilterTest {
 		assertNotNull(tu);
 		assertEquals("Source 2", tu.getSource().toString());
 //TODO: Error when the 3rd column is empty, the target is confused with the comment		
-//		assertEquals("Comment 2", tu.getProperty(Property.NOTE).getValue());
+//		assertTrue(null==tu.getProperty(Property.NOTE));
 //		assertEquals("Target 3", tu.getTarget(locFR).toString());
 	}
 	
