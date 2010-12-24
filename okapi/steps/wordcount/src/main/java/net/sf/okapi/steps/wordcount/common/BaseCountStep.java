@@ -125,8 +125,6 @@ public abstract class BaseCountStep extends AbstractPipelineStep {
 			res.setAnnotation(ma);
 		}
 		
-		if (ma == null) return;
-		
 		Metrics m = ma.getMetrics();		
 		if (m == null) return;
 					
@@ -164,8 +162,6 @@ public abstract class BaseCountStep extends AbstractPipelineStep {
 			textContainer.setAnnotation(ma);
 		}
 		
-		if (ma == null) return;
-		
 		Metrics m = ma.getMetrics();		
 		if (m == null) return;
 					
@@ -182,8 +178,6 @@ public abstract class BaseCountStep extends AbstractPipelineStep {
 			ma = new MetricsAnnotation();
 			seg.setAnnotation(ma);
 		}
-		
-		if (ma == null) return;
 		
 		Metrics m = ma.getMetrics();		
 		if (m == null) return;
