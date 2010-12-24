@@ -77,6 +77,7 @@ public class TokenizationTest {
 	private LocaleId locENGB = LocaleId.fromString("en-gb");
 	private LocaleId locDEDE = LocaleId.fromString("de-de");
 	private LocaleId locDECH = LocaleId.fromString("de-ch");
+	private LocaleId locFR = LocaleId.fromString("fr");
 
 	//private String text = "The quick (\"brown\") fox can't jump 32.3 feet, right?";
 //	private String text = "$120,000.00 on 05/30/2007 at 12.30PM is much better than $10.00 on 05/30/2007 at 22:30:15";
@@ -177,7 +178,9 @@ public class TokenizationTest {
 //	@Test
 //	public void listTokenizerOutput() {
 //		
-//		Tokens tokens = Tokenizer.tokenize(text, locENUS); // All tokens
+//		//Tokens tokens = Tokenizer.tokenize(text, locENUS); // All tokens
+//		Tokens tokens = Tokenizer.tokenize("L'objectif est defini.", locFR); // All tokens
+//		//Tokens tokens = Tokenizer.tokenize(" for info 3.5pct", locENUS); // All tokens
 //						
 //		listTokens(tokens);
 //		System.out.println(tokens.size());
