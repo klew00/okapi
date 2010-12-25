@@ -405,9 +405,9 @@
 		   <fileset dir="../shared/licenses" includes="**/lucene-*"/>
 		</copy>-->
 
-		<property name="dep020" value="${mavenStore}/com/ibm/icu/icu4j/4.0.1"/>
+		<property name="dep020" value="${mavenStore}/com/ibm/icu/icu4j/4.6"/>
 		<fileset id="list.contents" dir="${dep020}"
-		 includes="**/icu4j-4.0.1.jar"/>
+		 includes="**/icu4j-4.6.jar"/>
 		<property name="jar020" refid="list.contents"/>
 		<echo file="tmpJars" append="yes"> ${jar020}</echo>
 		<copy todir="${distLib}" file="${dep020}/${jar020}"/>

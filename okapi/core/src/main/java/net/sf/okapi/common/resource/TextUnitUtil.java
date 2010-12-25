@@ -425,16 +425,22 @@ public class TextUnitUtil {
 	public static String getText (TextFragment textFragment,
 		List<Integer> markerPositions)
 	{
-		if (textFragment == null)
+		if ( textFragment == null ) {
 			return "";
+		}
 
 		String res = textFragment.getCodedText();
-		StringBuilder sb = new StringBuilder();
-		if (markerPositions != null) {
+		if ( markerPositions != null ) {
 			markerPositions.clear();
 		}
 
+		// No need to parse the text if there are no codes
+		if ( !textFragment.hasCode() ) {
+			return res;
+		}
+		
 		// Collect marker positions & remove markers
+		StringBuilder sb = new StringBuilder();
 		int startPos = -1;
 		for (int i = 0; i < res.length(); i++) {
 			switch (res.charAt(i)) {

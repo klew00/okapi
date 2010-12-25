@@ -442,7 +442,7 @@ public class Code {
 	
 	/**
 	 * Gets the abstract type for the code. For example: "bold".
-	 * @return the abstract type of the code.
+	 * @return the abstract type of the code. This value should never be null (it is set to "null" if not otherwise set).
 	 */
 	public String getType () {
 		return type;
