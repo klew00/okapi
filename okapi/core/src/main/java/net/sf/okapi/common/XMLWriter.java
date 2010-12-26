@@ -96,10 +96,25 @@ public class XMLWriter {
     }
 
     /**
-     * Writes the start of the document. This method generate the XML declaration.
+     * Writes the start of the document. This method generates the XML declaration.
      */
     public void writeStartDocument () {
     	writer.print("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+lineBreak);
+    }
+
+    /**
+     * Writes the start of a XHTML document, including the head and start of body element.
+     * @param title the title of the document (can be null).
+     */
+    public void writeStartHTMLDocument (String title) {
+    	writer.print("<html>"+lineBreak);
+    	writer.print("<head>"+lineBreak);
+    	writer.print("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">"+lineBreak);
+    	if ( title != null ) {
+    		writeElementString("title", title);
+    		writeLineBreak();
+    	}
+    	writer.print("</head>"+lineBreak);
     }
 
     /**

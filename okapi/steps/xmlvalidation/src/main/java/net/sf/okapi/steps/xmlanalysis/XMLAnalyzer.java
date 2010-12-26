@@ -197,54 +197,65 @@ public class XMLAnalyzer {
 		XMLWriter xw = null;
 		try {
 			xw = new XMLWriter(params.getOutputPath());
-			xw.writeStartDocument();
-			xw.writeStartElement("html");
-			xw.writeStartElement("body");
+			xw.writeStartHTMLDocument("XML Analyis");
 			xw.writeElementString("h1", "XML Analyis Results");
 			
-			xw.writeStartElement("table");
+			xw.writeRawXML("<table cellspacing=\"0\" cellpadding=\"5\" border=\"1\">");
 
 			xw.writeStartElement("tr");
-			xw.writeElementString("td", "All elements:");
-			xw.writeStartElement("td");
+			xw.writeRawXML(String.format("<td valign=\"top\">%s</td>", "All elements:"));
+			xw.writeRawXML("<td valign=\"top\"><code>");
 			for ( String name : elements.keySet() ) {
 				xw.writeString(name+" ");
 			}
-			xw.writeEndElement(); // td
-			xw.writeEndElement(); // tr
+			xw.writeRawXML("\u00a0</code></td>");
+			xw.writeEndElementLineBreak(); // tr
 
 			xw.writeStartElement("tr");
-			xw.writeElementString("td", "Root elements:");
-			xw.writeStartElement("td");
+			xw.writeRawXML(String.format("<td valign=\"top\">%s</td>", "Root elements:"));
+			xw.writeRawXML("<td valign=\"top\"><code>");
 			for ( String name : elements.keySet() ) {
 				if ( elements.get(name).isRoot ) {
 					xw.writeString(name+" ");
 				}
 			}
-			xw.writeEndElement(); // td
-			xw.writeEndElement(); // tr
+			xw.writeRawXML("\u00a0</code></td>");
+			xw.writeEndElementLineBreak(); // tr
 			
 			xw.writeStartElement("tr");
-			xw.writeElementString("td", "Elements with text content:");
-			xw.writeStartElement("td");
+			xw.writeRawXML(String.format("<td valign=\"top\">%s</td>", "Elements with text content:"));
+			xw.writeRawXML("<td valign=\"top\"><code>");
 			for ( String name : elements.keySet() ) {
 				if ( elements.get(name).hasText ) {
 					xw.writeString(name+" ");
 				}
 			}
-			xw.writeEndElement(); // td
-			xw.writeEndElement(); // tr
+			xw.writeRawXML("\u00a0</code></td>");
+			xw.writeEndElementLineBreak(); // tr
 
 			xw.writeStartElement("tr");
-			xw.writeElementString("td", "Elements within text (inline):");
-			xw.writeStartElement("td");
+			xw.writeRawXML(String.format("<td valign=\"top\">%s</td>", "Elements within text (inline):"));
+			xw.writeRawXML("<td valign=\"top\"><code>");
 			for ( String name : elements.keySet() ) {
 				if ( elements.get(name).withinText ) {
 					xw.writeString(name+" ");
 				}
 			}
-			xw.writeEndElement(); // td
-			xw.writeEndElement(); // tr
+			xw.writeRawXML("\u00a0</code></td>");
+			xw.writeEndElementLineBreak(); // tr
+			
+			xw.writeStartElement("tr");
+			xw.writeRawXML(String.format("<td valign=\"top\">%s</td>", "Elements with CDATA:"));
+			xw.writeRawXML("<td valign=\"top\"><code>");
+			for ( String name : elements.keySet() ) {
+				if ( elements.get(name).hasCDATA ) {
+					xw.writeString(name+" ");
+				}
+			}
+			xw.writeRawXML("\u00a0</code></td>");
+			xw.writeEndElementLineBreak(); // tr
+			
+			xw.writeRawXML("</table>");
 		}
 		finally {
 			if ( xw != null ) {
