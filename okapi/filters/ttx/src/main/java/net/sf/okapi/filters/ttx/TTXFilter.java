@@ -434,6 +434,9 @@ public class TTXFilter implements IFilter {
 			boolean done = false;
 			boolean inTU = false;
 			
+			String lastDFOpen = "";
+			String crumbs = ""; // to keep track of open.close of df elements
+			
 			while ( !done ) {
 				// Move to next event if required 
 				if ( moveToNext ) reader.next();
@@ -518,8 +521,10 @@ public class TTXFilter implements IFilter {
 					else if ( name.equals("df") ) {
 						// We have to use placeholder for df because they don't match ut nesting order
 						dfCount++;
+						crumbs += "o";
 						Code code = current.append(TagType.PLACEHOLDER, "x-df-s", "", -1);
-						code.setOuterData(buildStartElement(false));
+						lastDFOpen = buildStartElement(false);
+						code.setOuterData(lastDFOpen);
 						continue;
 					}
 					// Inline to include in this segment
@@ -555,6 +560,7 @@ public class TTXFilter implements IFilter {
 					else if ( name.equals("df") ) {
 						// We have to use placeholder for df because they don't match ut nesting order
 						dfCount--;
+						crumbs += "c";
 						Code code = current.append(TagType.PLACEHOLDER, "x-df-e", "", -1); //(inTarget ? ++trgId : ++srcId));
 						code.setOuterData(buildEndElement(false));
 						continue;
@@ -625,7 +631,7 @@ public class TTXFilter implements IFilter {
 			}
 			
 			// Else genuine text unit, finalize and send
-			String movedCodes = "";
+			String toMoveAfter = "";
 			if ( srcCont.hasBeenSegmented() ) {
 				TextContainer cont = srcCont.clone();
 				int i = 0;
@@ -643,8 +649,8 @@ public class TTXFilter implements IFilter {
 			}
 			else { // We assume pre-segmented entry don't have the overlapping DF problem.
 				// If they are un-segmented they may, and we try to fix it here:
-				if ( dfCount < 0 ) { // Extra </df> in content
-					movedCodes = moveDFCodesToString(srcCont, dfCount);
+				if (( dfCount < 0 ) || crumbs.startsWith("c") ) { // Extra </df> in content
+					toMoveAfter = moveDFCodesToString(srcCont, dfCount, crumbs);
 				}
 			}
 			
@@ -654,15 +660,14 @@ public class TTXFilter implements IFilter {
 			tu.setPreserveWhitespaces(true);
 			tu.setMimeType(MimeTypeMapper.TTX_MIME_TYPE);
 			queue.add(new Event(EventType.TEXT_UNIT, tu));
+			
+			// For next event (as document part if not empty)
 			skel = new GenericSkeleton();
-			if ( !Util.isEmpty(movedCodes) ) {
-				skel.add(movedCodes);
+			if ( !Util.isEmpty(toMoveAfter) ) {
+				skel.add(toMoveAfter);
 			}
 			return returnValueAfterTextUnitDone;
 		}
-//		catch ( IndexOutOfBoundsException e ) {
-//			throw new OkapiIOException("Out of bounds.", e);
-//		}
 		catch ( XMLStreamException e) {
 			throw new OkapiIOException("Error processing top-level ut element.", e);
 		}
@@ -672,15 +677,48 @@ public class TTXFilter implements IFilter {
 	 * Moves the trailing DF codes to a string until dfCount is 0.
 	 * The container must not be segmented yet.
 	 * @param tc the container to update.
-	 * @param dfCount the df counter.
+	 * @param dfCount the df counter (-N:more closes, +N:more open)
+	 * @param crumbs the track of open and close for df.
 	 * @return the string with removed codes.
 	 */
-	private String moveDFCodesToString (TextContainer tc, int dfCount) {
-		if ( dfCount >= 0 ) return "";
+	private String moveDFCodesToString (TextContainer tc,
+		int dfCount,
+		String crumbs)
+	{
 		String tmp = "";
 		TextFragment tf = tc.get(0).text; 
 		StringBuilder ctext = new StringBuilder(tf.getCodedText());
 		List<Code> codes = tc.getFirstContent().getCodes();
+
+		// If starts with close tags: move them until we reach an open
+		// Calculate the number of close tags at the front to move after the TU.
+		int count = 0;
+		for ( int i=0; i<crumbs.length(); i++ ) {
+			if ( crumbs.charAt(i) == 'c' ) count++;
+			else break;
+		}
+		// Do the moving
+		if ( count > 0 ) {
+			for ( int i=0; i<ctext.length(); i++ ) {
+				if ( TextFragment.isMarker(ctext.charAt(i)) ) {
+					Code code = codes.get(TextFragment.toIndex(ctext.charAt(i+1)));
+					if ( code.getType().equals("x-df-e") ) {
+						// Copy the code data at the front of the skeleton string
+						tmp += code.getOuterData(); // Same order as in TU
+						// Remove the code from the fragment
+						tf.remove(i, i+2);
+						// Get the coded text again 
+						ctext.setLength(0);
+						ctext.append(tf.getCodedText());
+						dfCount++;
+						if ( --count == 0 ) break; // Done
+					}
+				}
+			}
+			tf.renumberCodes();
+		}
+		
+		if ( dfCount >= 0 ) return tmp;
 		
 		for ( int i=ctext.length()-1; i>=0; i-- ) {
 			if ( TextFragment.isMarker(ctext.charAt(i)) ) {
@@ -699,6 +737,34 @@ public class TTXFilter implements IFilter {
 		}
 		return tmp;
 	}
+//Backup code Dec-26-2010 8pm
+//	private String moveDFCodesToString (TextContainer tc,
+//		int dfCount,
+//		String crumbs)
+//	{
+//		if ( dfCount >= 0 ) return "";
+//		String tmp = "";
+//		TextFragment tf = tc.get(0).text; 
+//		StringBuilder ctext = new StringBuilder(tf.getCodedText());
+//		List<Code> codes = tc.getFirstContent().getCodes();
+//		
+//		for ( int i=ctext.length()-1; i>=0; i-- ) {
+//			if ( TextFragment.isMarker(ctext.charAt(i)) ) {
+//				Code code = codes.get(TextFragment.toIndex(ctext.charAt(i+1)));
+//				if (( code.getType() != null ) && code.getType().equals("x-df-e") ) {
+//					// Copy the code data at the front of the skeleton string
+//					tmp = code.getOuterData() + tmp;
+//					// Remove the code from the fragment
+//					tf.remove(i, i+2);
+//					// Get the coded text again 
+//					ctext.setLength(0);
+//					ctext.append(tf.getCodedText());
+//					if ( ++dfCount == 0 ) break;
+//				}
+//			}
+//		}
+//		return tmp;
+//	}
 	
 	private boolean hasText (TextContainer tc) {
 		for ( TextPart part : tc ) {

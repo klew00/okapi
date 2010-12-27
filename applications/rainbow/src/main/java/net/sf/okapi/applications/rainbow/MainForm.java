@@ -59,6 +59,9 @@ import net.sf.okapi.applications.rainbow.pipeline.TermExtractionPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.TextRewritingPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.TranslationComparisonPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.URIConversionPipeline;
+import net.sf.okapi.applications.rainbow.pipeline.XMLAnalysisPipeline;
+import net.sf.okapi.applications.rainbow.pipeline.XMLCharactersFixingPipeline;
+import net.sf.okapi.applications.rainbow.pipeline.XMLValidationPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.XSLTransformPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.SnRWithoutFilterPipeline;
 import net.sf.okapi.common.Util;
@@ -1478,38 +1481,24 @@ public class MainForm { //implements IParametersProvider {
 		});
 		
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(menuItem, "utilities.formatconversion"); //$NON-NLS-1$
+		rm.setCommand(menuItem, "utilities.textrewriting"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				executePipeline(new FormatConversionPipeline());
+				executePipeline(new TextRewritingPipeline());
 			}
 		});
+
+		//--- Sub menus
+		new MenuItem(dropMenu, SWT.SEPARATOR);
 		
-		menuItem = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(menuItem, "utilities.encodingconversion"); //$NON-NLS-1$
-		menuItem.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent event) {
-				executePipeline(new EncodingConversionPipeline());
-			}
-		});
+		//--- Conversion Utilities
 		
-		menuItem = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(menuItem, "utilities.linebreakconversion"); //$NON-NLS-1$
-		menuItem.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent event) {
-				executePipeline(new LineBreakConversionPipeline());
-			}
-		});
+		final MenuItem conversionUtilitiesMenu = new MenuItem(dropMenu, SWT.CASCADE);
+		conversionUtilitiesMenu.setText("Conversion Utilities");
+		Menu subMenu = new Menu(shell, SWT.DROP_DOWN);
+		conversionUtilitiesMenu.setMenu(subMenu);
 		
-		menuItem = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(menuItem, "utilities.bomconversion"); //$NON-NLS-1$
-		menuItem.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent event) {
-				executePipeline(new BOMConversionPipeline());
-			}
-		});
-		
-		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		menuItem = new MenuItem(subMenu, SWT.PUSH);
 		rm.setCommand(menuItem, "utilities.rtfconversion"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
@@ -1517,7 +1506,43 @@ public class MainForm { //implements IParametersProvider {
 			}
 		});
 		
-		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		menuItem = new MenuItem(subMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "utilities.formatconversion"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				executePipeline(new FormatConversionPipeline());
+			}
+		});
+		
+		new MenuItem(subMenu, SWT.SEPARATOR);
+
+		menuItem = new MenuItem(subMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "utilities.encodingconversion"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				executePipeline(new EncodingConversionPipeline());
+			}
+		});
+		
+		menuItem = new MenuItem(subMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "utilities.linebreakconversion"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				executePipeline(new LineBreakConversionPipeline());
+			}
+		});
+		
+		menuItem = new MenuItem(subMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "utilities.bomconversion"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				executePipeline(new BOMConversionPipeline());
+			}
+		});
+
+		new MenuItem(subMenu, SWT.SEPARATOR);
+
+		menuItem = new MenuItem(subMenu, SWT.PUSH);
 		rm.setCommand(menuItem, "utilities.uriconversion"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
@@ -1525,21 +1550,50 @@ public class MainForm { //implements IParametersProvider {
 			}
 		});
 		
-		menuItem = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(menuItem, "utilities.textrewriting"); //$NON-NLS-1$
+		
+		//--- XML / XLIFF Utilities
+		
+		final MenuItem xmlUtilitiesMenu = new MenuItem(dropMenu, SWT.CASCADE);
+		xmlUtilitiesMenu.setText("XML Utilities");
+		subMenu = new Menu(shell, SWT.DROP_DOWN);
+		xmlUtilitiesMenu.setMenu(subMenu);
+		
+		menuItem = new MenuItem(subMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "utilities.xmlanalysis"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				executePipeline(new TextRewritingPipeline());
+				executePipeline(new XMLAnalysisPipeline());
 			}
 		});
 		
-		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		menuItem = new MenuItem(subMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "utilities.xmlvalidation"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				executePipeline(new XMLValidationPipeline());
+			}
+		});
+		
+		new MenuItem(subMenu, SWT.SEPARATOR);
+		
+		menuItem = new MenuItem(subMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "utilities.xmlcharsfixing"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				executePipeline(new XMLCharactersFixingPipeline());
+			}
+		});
+		
+		menuItem = new MenuItem(subMenu, SWT.PUSH);
 		rm.setCommand(menuItem, "utilities.xsltransform"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				executePipeline(new XSLTransformPipeline());
 			}
 		});
+		
+		//--- Other
+		new MenuItem(dropMenu, SWT.SEPARATOR);
 		
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
 		rm.setCommand(menuItem, "utilities.imagemodification"); //$NON-NLS-1$
@@ -1572,7 +1626,6 @@ public class MainForm { //implements IParametersProvider {
 				executePipeline(new BatchTranslationPipeline());
 			}
 		});
-		
 		
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
 		rm.setCommand(menuItem, "utilities.qualitycheck"); //$NON-NLS-1$

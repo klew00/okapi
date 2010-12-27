@@ -60,7 +60,7 @@ public class TTXSkeletonWriter extends GenericSkeletonWriter {
 		}
 
 		StringBuilder tmp = new StringBuilder();
-
+		
 		TextContainer srcCont = tu.getSource();
 		if ( forceSegmentedOutput && !srcCont.hasBeenSegmented() ) {
 			// Work from a clone if we need to change the segmentation

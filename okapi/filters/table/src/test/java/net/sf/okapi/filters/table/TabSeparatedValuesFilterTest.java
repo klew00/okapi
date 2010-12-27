@@ -222,16 +222,16 @@ public class TabSeparatedValuesFilterTest {
 		List<Event> events = getEvents(snippet, locEN, locFR);
 		TextUnit tu = FilterTestDriver.getTextUnit(events, 1);
 		assertNotNull(tu);
-		assertEquals("Source 1", tu.getSource().toString());
+		assertEquals("Source 1\t", tu.getSource().toString());
 		assertEquals("Target 1", tu.getTarget(locFR).toString());
 		assertEquals("Comment 1", tu.getProperty(Property.NOTE).getValue());
 
 		tu = FilterTestDriver.getTextUnit(events, 2);
 		assertNotNull(tu);
-		assertEquals("Source 2", tu.getSource().toString());
+		assertEquals("Source 2\t", tu.getSource().toString());
 //TODO: Error when the 3rd column is empty, the target is confused with the comment		
 //		assertTrue(null==tu.getProperty(Property.NOTE));
-//		assertEquals("Target 3", tu.getTarget(locFR).toString());
+//		assertEquals("Target 2", tu.getTarget(locFR).toString());
 	}
 	
 	@Test
