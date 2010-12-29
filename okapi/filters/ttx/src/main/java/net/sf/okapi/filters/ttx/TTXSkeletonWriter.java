@@ -37,11 +37,6 @@ public class TTXSkeletonWriter extends GenericSkeletonWriter {
 
 	private String srcLangCode;
 	private String trgLangCode;
-	private boolean forceSegmentedOutput;
-	
-	public TTXSkeletonWriter (boolean forceSegments) {
-		forceSegmentedOutput = forceSegments;
-	}
 	
 	public void setSourceLanguageCode (String langCode) {
 		srcLangCode = langCode;
@@ -62,7 +57,7 @@ public class TTXSkeletonWriter extends GenericSkeletonWriter {
 		StringBuilder tmp = new StringBuilder();
 		
 		TextContainer srcCont = tu.getSource();
-		if ( forceSegmentedOutput && !srcCont.hasBeenSegmented() ) {
+		if ( !srcCont.hasBeenSegmented() ) {
 			// Work from a clone if we need to change the segmentation
 			srcCont = srcCont.clone();
 			srcCont.setHasBeenSegmentedFlag(true);
@@ -71,7 +66,7 @@ public class TTXSkeletonWriter extends GenericSkeletonWriter {
 		TextContainer trgCont;
 		if ( tu.hasTarget(outputLoc) ) {
 			trgCont = tu.getTarget(outputLoc);
-			if ( forceSegmentedOutput && !trgCont.hasBeenSegmented() ) {
+			if ( !trgCont.hasBeenSegmented() ) {
 				trgCont = trgCont.clone();
 				trgCont.setHasBeenSegmentedFlag(true);
 			}
@@ -91,6 +86,10 @@ public class TTXSkeletonWriter extends GenericSkeletonWriter {
 					// Fall back to the target
 					srcSeg = trgSeg;
 				}
+				if ( trgSeg.text.isEmpty() && !srcSeg.text.isEmpty() ) {
+					// Target has no content while source does: fall back to the source
+					trgSeg.text = srcSeg.text.clone();
+				}
 				if ( trgCont.hasBeenSegmented() ) {
 					AltTranslation altTrans = null;
 					AltTranslationsAnnotation ann = trgSeg.getAnnotation(AltTranslationsAnnotation.class);
@@ -100,6 +99,7 @@ public class TTXSkeletonWriter extends GenericSkeletonWriter {
 					tmp.append(processSegment(srcSeg.text, trgSeg.text, altTrans));
 				}
 				else {
+// This should never be called now					
 					tmp.append(processFragment(part.getContent(), 0)); // Normal text
 				}
 			}

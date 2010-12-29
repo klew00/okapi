@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -30,9 +30,6 @@ import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 @EditorFor(Parameters.class)
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
-	protected static final String FORCESEGMENTS = "forceSegments";
-	
-	private boolean forceSegments;
 	private boolean escapeGT;
 	
 
@@ -41,14 +38,6 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		toString(); // fill the list
 	}
 	
-	public boolean getForceSegments () {
-		return forceSegments;
-	}
-
-	public void setForceSegments (boolean forceSegments) {
-		this.forceSegments = forceSegments;
-	}
-
 	public boolean getEscapeGT () {
 		return escapeGT;
 	}
@@ -58,21 +47,18 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	}
 
 	public void reset () {
-		forceSegments = true;
 		escapeGT = false;
 	}
 
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
-		forceSegments = buffer.getBoolean(FORCESEGMENTS, forceSegments);
 		escapeGT = buffer.getBoolean(XMLEncoder.ESCAPEGT, escapeGT);
 	}
 
 	@Override
 	public String toString () {
 		buffer.reset();
-		buffer.setBoolean(FORCESEGMENTS, forceSegments);
 		buffer.setBoolean(XMLEncoder.ESCAPEGT, escapeGT);
 		return buffer.toString();
 	}
@@ -80,14 +66,12 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	@Override
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
-		desc.add(FORCESEGMENTS, "Force un-segmented entries to be output as a segment", null);
 		desc.add(XMLEncoder.ESCAPEGT, "Escape the greater-than characters", null);
 		return desc;
 	}
 
 	public EditorDescription createEditorDescription (ParametersDescription paramDesc) {
 		EditorDescription desc = new EditorDescription("TTX Filter Parameters", true, false);
-		desc.addCheckboxPart(paramDesc.get(FORCESEGMENTS));
 		desc.addCheckboxPart(paramDesc.get(XMLEncoder.ESCAPEGT));
 		return desc;
 	}

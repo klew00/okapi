@@ -318,7 +318,7 @@ public class TextContainer implements Iterable<TextPart> {
 		}
 
 		@Override
-		public Segment getLast() {
+		public Segment getLast () {
 			for ( int i=parts.size()-1; i>=0; i-- ) {
 				if ( parts.get(i).isSegment() ) {
 					return (Segment)parts.get(i);
@@ -875,6 +875,13 @@ public class TextContainer implements Iterable<TextPart> {
 	public void append (TextPart part,
 		boolean collapseIfPreviousEmpty)
 	{
+		// Use the segment method if it is a segemnt
+		if ( part.isSegment() ) {
+			getSegments().append((Segment)part, collapseIfPreviousEmpty);
+			return;
+		}
+		
+		// Else: do the normal append
 		// If the last part is empty we append to it
 		if ( collapseIfPreviousEmpty ) {
 			if ( parts.get(parts.size()-1).getContent().isEmpty() ) {

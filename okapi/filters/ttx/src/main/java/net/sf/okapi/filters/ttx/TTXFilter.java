@@ -144,13 +144,13 @@ public class TTXFilter implements IFilter {
 			"Configuration for Trados TTX documents.",
 			null,
 			".ttx;"));
-		list.add(new FilterConfiguration(getName()+"-noForcedTuv",
-			MimeTypeMapper.TTX_MIME_TYPE,
-			getClass().getName(),
-			"TTX (without forced Tuv in output)",
-			"Configuration for Trados TTX documents without forcing Tuv in output.",
-			"noForcedTuv.fprm",
-			".ttx;"));
+//		list.add(new FilterConfiguration(getName()+"-noForcedTuv",
+//			MimeTypeMapper.TTX_MIME_TYPE,
+//			getClass().getName(),
+//			"TTX (without forced Tuv in output)",
+//			"Configuration for Trados TTX documents without forcing Tuv in output.",
+//			"noForcedTuv.fprm",
+//			".ttx;"));
 		return list;
 	}
 	
@@ -234,7 +234,7 @@ public class TTXFilter implements IFilter {
 
 			// Set the language codes for the skeleton writer
 			if ( skelWriter == null ) {
-				skelWriter = new TTXSkeletonWriter(params.getForceSegments());
+				skelWriter = new TTXSkeletonWriter();
 			}
 
 			srcLoc = input.getSourceLocale();
@@ -306,7 +306,7 @@ public class TTXFilter implements IFilter {
 
 	public ISkeletonWriter createSkeletonWriter() {
 		if ( skelWriter == null ) {
-			skelWriter = new TTXSkeletonWriter(params.getForceSegments());
+			skelWriter = new TTXSkeletonWriter();
 		}
 		return skelWriter;
 	}
@@ -425,6 +425,7 @@ public class TTXFilter implements IFilter {
 			TextFragment inter = new TextFragment();
 			TextFragment current = inter;
 			boolean returnValueAfterTextUnitDone = true;
+			StringBuilder movedCodes = new StringBuilder();
 
 			String tmp;
 			String name;
@@ -436,6 +437,7 @@ public class TTXFilter implements IFilter {
 			
 			String lastDFOpen = "";
 			String crumbs = ""; // to keep track of open.close of df elements
+			
 			
 			while ( !done ) {
 				// Move to next event if required 
@@ -468,8 +470,14 @@ public class TTXFilter implements IFilter {
 						trgSegFrag = null;
 						altTrans = null;
 						if ( !inter.isEmpty() ) {
-							changeFirst = srcCont.isEmpty();
-							srcCont.append(inter);
+							if ( hasText(inter.getCodedText()) ) {
+								// Unsegmented section contain text: make it a text unit
+								addSegment(inter, srcCont, trgFragments, altTranslations, dfCount, crumbs, movedCodes);
+							}
+							else {
+								changeFirst = srcCont.isEmpty();
+								srcCont.append(inter);
+							}
 							inter = null;
 						}
 						current = srcSegFrag;
@@ -574,9 +582,12 @@ public class TTXFilter implements IFilter {
 								srcCont.changePart(0);
 								changeFirst = false;
 							}
+
 							// If the target is not there, we copy the source instead
 							// TTX should not have source-only TU
-							trgFragments.add((trgSegFrag==null) ? srcSegFrag.clone() : trgSegFrag);
+							// why??? trgFragments.add((trgSegFrag==null) ? srcSegFrag.clone() : trgSegFrag);
+							
+							trgFragments.add((trgSegFrag==null) ? new TextFragment() : trgSegFrag);
 							// Set the alt-trans target if we had an alt-trans
 							if ( altTrans != null ) {
 								// Use target or source if target is not available (rare case)
@@ -592,9 +603,15 @@ public class TTXFilter implements IFilter {
 							// A Tu stops the current segment, but not the text unit
 						}
 						else if (( inter != null ) && !inter.isEmpty() ) { // If no source segment: only content
-							srcCont.append(current);
-							srcSegFrag = null;
-							trgSegFrag = null;
+							if ( hasText(inter.getCodedText()) ) {
+								// Unsegmented section contain text: make it a text unit
+								addSegment(inter, srcCont, trgFragments, altTranslations, dfCount, crumbs, movedCodes);
+							}
+							else {
+								srcCont.append(current);
+								srcSegFrag = null;
+								trgSegFrag = null;
+							}
 							inter = new TextFragment();
 							current = inter; // Start storing inter-segment part
 						}
@@ -607,14 +624,21 @@ public class TTXFilter implements IFilter {
 
 			// Check if we had only non-segmented text
 			if (( inter != null) && !inter.isEmpty() ) {
-				srcCont.append(inter);
+				if ( hasText(inter.getCodedText()) ) {
+					// Unsegmented section contain text: make it a text unit
+					addSegment(inter, srcCont, trgFragments, altTranslations, dfCount, crumbs, movedCodes);
+					inter = null;
+				}
+				else {
+					srcCont.append(inter);
+				}
 			}
 			
 			// Check if this it is worth sending as text unit
 			if ( !hasText(srcCont) ) { // Use special hasText()
 				// No text-type characters
 				if ( skelWriter == null ) {
-					skelWriter = new TTXSkeletonWriter(params.getForceSegments());
+					skelWriter = new TTXSkeletonWriter();
 				}
 				skelWriter.checkForFilterInternalUse(lineBreak);
 				// Not really a text unit: convert to skeleton
@@ -650,7 +674,8 @@ public class TTXFilter implements IFilter {
 			else { // We assume pre-segmented entry don't have the overlapping DF problem.
 				// If they are un-segmented they may, and we try to fix it here:
 				if (( dfCount < 0 ) || crumbs.startsWith("c") ) { // Extra </df> in content
-					toMoveAfter = moveDFCodesToString(srcCont, dfCount, crumbs);
+					// Process the last segment
+					toMoveAfter = moveDFCodesToString(srcCont.getSegments().getLastContent(), dfCount, crumbs);
 				}
 			}
 			
@@ -663,14 +688,36 @@ public class TTXFilter implements IFilter {
 			
 			// For next event (as document part if not empty)
 			skel = new GenericSkeleton();
+			if ( movedCodes.length() > 0 ) {
+				skel.add(movedCodes.toString());
+			}
 			if ( !Util.isEmpty(toMoveAfter) ) {
 				skel.add(toMoveAfter);
 			}
+			
 			return returnValueAfterTextUnitDone;
 		}
 		catch ( XMLStreamException e) {
 			throw new OkapiIOException("Error processing top-level ut element.", e);
 		}
+	}
+	
+	private void addSegment (TextFragment frag,
+		TextContainer srcCont,
+		ArrayList<TextFragment> trgSegments,
+		ArrayList<AltTranslation> altTranslations,
+		int dfCount,
+		String crumbs,
+		StringBuilder movedCodes)
+	{
+		// For next event (as document part if not empty)
+		if (( dfCount < 0 ) || crumbs.startsWith("c") ) { // Extra </df> in content
+			movedCodes.append(moveDFCodesToString(frag, dfCount, crumbs));
+		}
+		
+		srcCont.append(new Segment(null, frag));
+		trgSegments.add(new TextFragment());
+		altTranslations.add(null);
 	}
 	
 	/**
@@ -681,14 +728,13 @@ public class TTXFilter implements IFilter {
 	 * @param crumbs the track of open and close for df.
 	 * @return the string with removed codes.
 	 */
-	private String moveDFCodesToString (TextContainer tc,
+	private String moveDFCodesToString (TextFragment tf,
 		int dfCount,
 		String crumbs)
 	{
 		String tmp = "";
-		TextFragment tf = tc.get(0).text; 
 		StringBuilder ctext = new StringBuilder(tf.getCodedText());
-		List<Code> codes = tc.getFirstContent().getCodes();
+		List<Code> codes = tf.getCodes();
 
 		// If starts with close tags: move them until we reach an open
 		// Calculate the number of close tags at the front to move after the TU.
@@ -768,19 +814,25 @@ public class TTXFilter implements IFilter {
 	
 	private boolean hasText (TextContainer tc) {
 		for ( TextPart part : tc ) {
-			String text = part.getContent().getCodedText();
-			for ( int i=0; i<text.length(); i++ ) {
-				if ( TextFragment.isMarker(text.charAt(i)) ) {
-					i++; // Skip index
-					continue;
-				}
-				// Not a marker: test the type of character
-				if ( !Character.isWhitespace(text.charAt(i)) ) {
-					// Extra TTX-no-text specific checks
-					if ( TTXNOTEXTCHARS.indexOf(text.charAt(i)) == -1 ) {
-						// Not a non-white-space that is not a TTX-no-text: that's text
-						return true;
-					}
+			if ( hasText(part.getContent().getCodedText()) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean hasText (String codedText) {
+		for ( int i=0; i<codedText.length(); i++ ) {
+			if ( TextFragment.isMarker(codedText.charAt(i)) ) {
+				i++; // Skip index
+				continue;
+			}
+			// Not a marker: test the type of character
+			if ( !Character.isWhitespace(codedText.charAt(i)) ) {
+				// Extra TTX-no-text specific checks
+				if ( TTXNOTEXTCHARS.indexOf(codedText.charAt(i)) == -1 ) {
+					// Not a non-white-space that is not a TTX-no-text: that's text
+					return true;
 				}
 			}
 		}
@@ -847,7 +899,7 @@ public class TTXFilter implements IFilter {
 
 	private void processUserSettings () {
 		 if ( skelWriter == null ) {
-			 skelWriter = new TTXSkeletonWriter(params.getForceSegments());
+			 skelWriter = new TTXSkeletonWriter();
 		 }
 		// Check source language
 		String tmp = reader.getAttributeValue(null, "SourceLanguage");
