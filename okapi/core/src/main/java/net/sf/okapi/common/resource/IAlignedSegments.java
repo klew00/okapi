@@ -145,12 +145,26 @@ public interface IAlignedSegments extends Iterable<Segment> {
 	public Segment getCorrespondingSource (Segment trgSeg);
 	
 	/**
-	 * Collapses all the segments listed in the aligned pairs for given locale.
+	 * Aligns all the segments listed in the aligned pairs for given locale.
 	 * @param alignedSegmentPairs the list of pairs to align
 	 * @param trgLoc the locale of the target to work with.
 	 */
 	public void align (List<AlignedPair> alignedSegmentPairs,
 		LocaleId trgLoc);
+
+	/**
+	 * Aligns all the segments for the given locale. Assumes the same number of 
+	 * source and target segments otherwise an exception is thrown.
+	 * @param trgLoc the locale of the target to work with.
+	 */
+	public void align (LocaleId trgLoc);
+
+	/**
+	 * Aligns all the segments for given locale by collapsing all 
+	 * segments into one. 
+	 * @param trgLoc the locale of the target to work with.
+	 */
+	public void alignCollapseAll (LocaleId trgLoc);
 
 	
 	/**
@@ -193,8 +207,7 @@ public interface IAlignedSegments extends Iterable<Segment> {
 	 * Gets the status of the alignment for this text unit.
 	 * @return the status of the alignment for this text unit.
 	 */
-	//TODO: should be an enum return
-	public int getAlignmentStatus ();
+	public AlignmentStatus getAlignmentStatus ();
 	
 	
 	/**

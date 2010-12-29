@@ -282,5 +282,16 @@ public interface ISegments extends Iterable<Segment> {
 	 * @return the segment index found or -1 if not found.
 	 */
 	public int getIndex (String segId);
-
+	
+	/**
+	 * Returns the {@link AlignmentStatus} for these segments.
+	 * @return the {@link AlignmentStatus}
+	 */
+	public AlignmentStatus getAlignmentStatus();
+	
+	/**
+	 * Sets the {@link AlignmentStatus} for these segments.
+	 * @param alignmentStatus
+	 */
+	public void setAlignmentStatus(AlignmentStatus alignmentStatus);
 }

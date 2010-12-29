@@ -51,6 +51,7 @@ public class TextContainer implements Iterable<TextPart> {
 	private boolean segApplied;
 
 	private final ISegments segments = new ISegments() {
+		private AlignmentStatus alignmentStatus = AlignmentStatus.NOT_ALIGNED;
 		
 		public Iterator<Segment> iterator() {
 			return new Iterator<Segment>() {
@@ -438,6 +439,15 @@ public class TextContainer implements Iterable<TextPart> {
 			return -1; // Not found
 		}
 
+		@Override
+		public AlignmentStatus getAlignmentStatus() {			
+			return alignmentStatus;
+		}
+
+		@Override
+		public void setAlignmentStatus(AlignmentStatus alignmentStatus) {
+			this.alignmentStatus = alignmentStatus;			
+		}
 	};
 	
 	/**

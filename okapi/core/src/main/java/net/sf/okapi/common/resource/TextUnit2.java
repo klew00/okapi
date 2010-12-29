@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,6 +35,7 @@ import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.annotation.Annotations;
 import net.sf.okapi.common.annotation.IAnnotation;
+import net.sf.okapi.common.exceptions.OkapiMisAlignmentException;
 
 /**
  * EXPERIMENTAL class. Do not use yet.
@@ -63,8 +65,9 @@ public class TextUnit2 implements ITextUnit {
 	private String mimeType;
 	private ConcurrentHashMap<LocaleId, TextContainer> targets;
 	
+	// TODO: this is too big to be an inner/anonymous class - can we make it a
+	// protected class in the same package?
 	private final IAlignedSegments segments = new IAlignedSegments () {
-		
 		@Override
 		public Segment splitTarget (LocaleId trgLoc,
 			Segment trgSeg,
@@ -307,10 +310,14 @@ public class TextUnit2 implements ITextUnit {
 		}
 		
 		@Override
-		public int getAlignmentStatus () {
-			// TODO Auto-generated method stub
-			// should be an enum
-			return 0;
+		public AlignmentStatus getAlignmentStatus () {
+			for ( LocaleId loc : getTargetLocales() ) {
+				ISegments trgSegs = targets.get(loc).getSegments();
+				if (trgSegs.getAlignmentStatus() == AlignmentStatus.NOT_ALIGNED) {
+					return AlignmentStatus.NOT_ALIGNED;
+				}
+			}			
+			return AlignmentStatus.ALIGNED;
 		}
 		
 		@Override
@@ -342,15 +349,50 @@ public class TextUnit2 implements ITextUnit {
 		}
 		
 		@Override
+		public Iterator<Segment> iterator () {
+			return source.getSegments().iterator();
+		}
+		
+		@Override
 		public void align (List<AlignedPair> alignedSegmentPairs,
 			LocaleId trgLoc)
 		{
-			//TODO: for Jim :-)
+						
+			// these target segments are now aligned with their source counterparts
+			targets.get(trgLoc).getSegments().setAlignmentStatus(AlignmentStatus.ALIGNED);			
 		}
 
+		/**
+		 * Force one to one alignment. Assume that both source and target 
+		 * have the same number of segments.
+		 * 
+		 * @param trgLoc target locale used to align with the source
+		 */
 		@Override
-		public Iterator<Segment> iterator () {
-			return source.getSegments().iterator();
+		public void align(LocaleId trgLoc) {
+			Iterator<Segment> srcSegsIt = source.getSegments().iterator();
+			Iterator<Segment> trgSegsIt = targets.get(trgLoc).getSegments().iterator();			
+			while (srcSegsIt.hasNext()) {
+				try {
+					Segment srcSeg = srcSegsIt.next();
+					Segment trgSeg = trgSegsIt.next();
+					trgSeg.id = srcSeg.id; 
+				} catch (NoSuchElementException e) {
+					throw new OkapiMisAlignmentException("Different number of source and target segments", e);
+				}
+			}		
+			
+			// these target segments are now aligned with their source counterparts
+			targets.get(trgLoc).getSegments().setAlignmentStatus(AlignmentStatus.ALIGNED);
+		}
+
+		/**
+		 * Collapse all segments for the source and target
+		 */
+		@Override
+		public void alignCollapseAll(LocaleId trgLoc) {
+			// these target segments are now aligned with their source counterparts
+			targets.get(trgLoc).getSegments().setAlignmentStatus(AlignmentStatus.ALIGNED);
 		}
 	};
 

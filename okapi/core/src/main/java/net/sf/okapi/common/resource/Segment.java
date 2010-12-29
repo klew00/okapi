@@ -31,11 +31,13 @@ import net.sf.okapi.common.annotation.IAnnotation;
  */
 public class Segment extends TextPart {
 	
-	protected Annotations annotations;
+	// FIXME - why is this protected?
+	protected Annotations annotations;	
 
 	/**
 	 * Identifier of this segment.
 	 */
+	// FIXME - why is this public?
 	public String id;
 	
 	/**
