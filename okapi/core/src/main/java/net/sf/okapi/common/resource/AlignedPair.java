@@ -1,3 +1,23 @@
+/*===========================================================================
+  Copyright (C) 2010 by the Okapi Framework contributors
+-----------------------------------------------------------------------------
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
+
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+===========================================================================*/
+
 package net.sf.okapi.common.resource;
 
 import java.util.LinkedList;
@@ -21,7 +41,7 @@ public final class AlignedPair {
 	private final LocaleId localeId;
 
 	/**
-	 * Create an AlignedPair from source and target {@link TextPart}s
+	 * Creates an AlignedPair from source and target {@link TextPart}s
 	 * 
 	 * @param sourceParts
 	 *            List source inter-segment and segment parts
@@ -38,7 +58,7 @@ public final class AlignedPair {
 	}
 
 	/**
-	 * Create an AlignedPair from source and target {@link Segment}s
+	 * Creates an AlignedPair from source and target {@link Segment}s
 	 * 
 	 * @param sourceSegment
 	 *            - the source {@link Segment}
@@ -65,7 +85,7 @@ public final class AlignedPair {
 	}
 
 	/**
-	 * Get the source {@link TextPart}s
+	 * Gets the source {@link TextPart}s
 	 * 
 	 * @return list of {@link TextPart}s
 	 */
@@ -74,7 +94,7 @@ public final class AlignedPair {
 	}
 
 	/**
-	 * Get the target {@link TextPart}s
+	 * Gets the target {@link TextPart}s
 	 * 
 	 * @return list of {@link TextPart}s
 	 */
@@ -83,7 +103,7 @@ public final class AlignedPair {
 	}
 
 	/**
-	 * Get the {@link LocaleId} of the target parts
+	 * Gets the {@link LocaleId} of the target parts
 	 * 
 	 * @return a {@link LocaleId}
 	 */
