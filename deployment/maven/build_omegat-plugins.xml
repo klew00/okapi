@@ -70,6 +70,8 @@
 		<fileset dir="../../okapi/filters/ttx/target/classes" includes="net/**"/>
 		<!-- JSON filter -->
 		<fileset dir="../../okapi/filters/json/target/classes" includes="net/**"/>
+		<!-- IDML filter -->
+		<fileset dir="../../okapi/filters/idml/target/classes" includes="net/**"/>
 	</jar>
 	
 	<copy tofile="${dist_omtplugins}/${base_name}-readme.html" file="data/omegat-plugins/readme.html"/>

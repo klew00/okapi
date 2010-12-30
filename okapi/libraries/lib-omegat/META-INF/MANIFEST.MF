@@ -17,3 +17,6 @@ OmegaT-Plugin: filter
 Name: net.sf.okapi.lib.omegat.JSONFilter
 OmegaT-Plugin: filter
 
+Name: net.sf.okapi.lib.omegat.IDMLFilter
+OmegaT-Plugin: filter
+
