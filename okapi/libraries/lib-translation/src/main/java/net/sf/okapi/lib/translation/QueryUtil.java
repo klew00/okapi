@@ -59,7 +59,7 @@ public class QueryUtil {
 	private XLIFFContent fmt;
 	private HTMLCharacterEntities entities;
 
-	public QueryUtil() {
+	public QueryUtil () {
 		codesMarkers = new StringBuilder();
 		fmt = new XLIFFContent();
 	}
@@ -69,9 +69,8 @@ public class QueryUtil {
 	 * 
 	 * @return true if the fragment has one or more code, false if it does not.
 	 */
-	public boolean hasCode() {
-		if (codes == null)
-			return false;
+	public boolean hasCode () {
+		if ( codes == null ) return false;
 		return (codes.size() > 0);
 	}
 
@@ -79,11 +78,11 @@ public class QueryUtil {
 	 * Separate and store codes of a given text fragment.
 	 * 
 	 * @param frag
-	 *            the fragment to process. Use {@link #createNewFragmentWithCodes(String)} to reconstruct the text back
-	 *            with its codes at the end.
+	 *            the fragment to process. Use {@link #createNewFragmentWithCodes(String)} to 
+	 *            reconstruct the text back with its codes at the end.
 	 * @return the fragment content stripped of its codes.
 	 */
-	public String separateCodesFromText(TextFragment frag) {
+	public String separateCodesFromText (TextFragment frag) {
 		// Reset
 		codesMarkers.setLength(0);
 		codes = frag.getCodes();
@@ -119,7 +118,7 @@ public class QueryUtil {
 	 *            new text to use (must be plain)
 	 * @return the provided fragment, but with the new text and the original codes appended at the end.
 	 */
-	public TextFragment createNewFragmentWithCodes(String plainText) {
+	public TextFragment createNewFragmentWithCodes (String plainText) {
 		return new TextFragment(plainText + codesMarkers, codes);
 	}
 
@@ -130,13 +129,14 @@ public class QueryUtil {
 	 *            the fragment to convert.
 	 * @return The resulting HTML string.
 	 */
-	public String toCodedHTML(TextFragment fragment) {
-		if (fragment == null)
+	public String toCodedHTML (TextFragment fragment) {
+		if ( fragment == null ) {
 			return "";
+		}
 		Code code;
 		StringBuilder sb = new StringBuilder();
 		String text = fragment.getCodedText();
-		for (int i = 0; i < text.length(); i++) {
+		for ( int i = 0; i < text.length(); i++ ) {
 			switch (text.charAt(i)) {
 			case TextFragment.MARKER_OPENING:
 				code = fragment.getCode(text.charAt(++i));
@@ -172,16 +172,19 @@ public class QueryUtil {
 	 *            the original text fragment.
 	 * @return the coded text with its code markers.
 	 */
-	public String fromCodedHTML(String text, TextFragment fragment) {
-		if (Util.isEmpty(text))
+	public String fromCodedHTML (String text,
+		TextFragment fragment)
+	{
+		if ( Util.isEmpty(text) ) {
 			return "";
+		}
 		text = text.toString().replace("&apos;", "'");
 		text = text.replace("&lt;", "<");
 		text = text.replace("&gt;", ">");
 		text = text.replace("&quot;", "\"");
 		StringBuilder sb = new StringBuilder();
 		sb.append(text.replace("&amp;", "&"));
-		if (entities == null) {
+		if ( entities == null ) {
 			entities = new HTMLCharacterEntities();
 			entities.ensureInitialization(false);
 		}
@@ -189,8 +192,8 @@ public class QueryUtil {
 		// Create a lists to verify the codes
 		ArrayList<String> newCodes = new ArrayList<String>();
 		ArrayList<String> oriCodes = new ArrayList<String>();
-		for (Code code : fragment.getCodes()) {
-			switch (code.getTagType()) {
+		for ( Code code : fragment.getCodes() ) {
+			switch ( code.getTagType() ) {
 			case OPENING:
 				oriCodes.add(String.format("o%d", code.getId()));
 				break;
@@ -205,31 +208,33 @@ public class QueryUtil {
 
 		// Un-escape character entity references
 		Matcher m;
-		while (true) {
+		while ( true ) {
 			m = CER.matcher(sb.toString());
-			if (!m.find())
-				break;
+			if ( !m.find() ) break;
 			int val = entities.lookupReference(m.group(0));
-			if (val != -1) {
+			if ( val != -1 ) {
 				sb.replace(m.start(0), m.end(0), String.valueOf((char) val));
-			} else { // Unknown entity
-						// TODO: replace by something meaningful to allow continuing the replacements
+			}
+			else { // Unknown entity
+				// TODO: replace by something meaningful to allow continuing the replacements
 				break; // Temporary, to avoid infinite loop
 			}
 		}
 
 		// Un-escape numeric character references
 		m = NCR.matcher(sb.toString());
-		while (m.find()) {
+		while ( m.find() ) {
 			String val = m.group(1);
 			int n = (int) '?'; // Default
 			try {
 				if (val.charAt(0) == 'x') { // Hexadecimal
 					n = Integer.valueOf(m.group(1).substring(1), 16);
-				} else { // Decimal
+				}
+				else { // Decimal
 					n = Integer.valueOf(m.group(1));
 				}
-			} catch (NumberFormatException e) {
+			}
+			catch ( NumberFormatException e ) {
 				// Just use default
 			}
 			sb.replace(m.start(0), m.end(0), String.valueOf((char) n));
@@ -241,31 +246,39 @@ public class QueryUtil {
 		m = HTML_OPENCLOSE.matcher(sb.toString());
 		Stack<Integer> stack = new Stack<Integer>();
 		String markers;
-		while (m.find()) {
-			if (m.group(1) != null) {
+		while ( m.find() ) {
+			if ( m.group(1) != null ) {
 				// It's an opening tag
 				int id = Util.strToInt(m.group(3), -1);
 				markers = String.format("%c%c", TextFragment.MARKER_OPENING,
-						TextFragment.toChar(fragment.getIndex(id)));
+					TextFragment.toChar(fragment.getIndex(id)));
 				sb.replace(m.start(), m.end(), markers);
 				stack.push(id);
 				newCodes.add(String.format("o%d", id));
-			} else {
+			}
+			else {
 				// It's a closing tag
-				newCodes.add(String.format("c%d", stack.peek()));
-				markers = String.format("%c%c", TextFragment.MARKER_CLOSING,
+				if ( stack.isEmpty() ) {
+					// If the stack is empty it means the string is not well-formed, or a start tag is missing.
+					// The two codes will be added automatically at the end of the entry
+					markers = "";
+				}
+				else {
+					newCodes.add(String.format("c%d", stack.peek()));
+					markers = String.format("%c%c", TextFragment.MARKER_CLOSING,
 						TextFragment.toChar(fragment.getIndexForClosing(stack.pop())));
+				}
 				sb.replace(m.start(), m.end(), markers);
 			}
 			m = HTML_OPENCLOSE.matcher(sb.toString());
 		}
 
 		m = HTML_ISOLATED.matcher(sb.toString());
-		while (m.find()) {
+		while ( m.find() ) {
 			// Replace the HTML fake code by the coded text markers
 			int id = Util.strToInt(m.group(2), -1);
 			markers = String.format("%c%c", TextFragment.MARKER_ISOLATED,
-					TextFragment.toChar(fragment.getIndex(id)));
+				TextFragment.toChar(fragment.getIndex(id)));
 			sb.replace(m.start(), m.end(), markers);
 			m = HTML_ISOLATED.matcher(sb.toString());
 			newCodes.add(String.format("i%d", id));
@@ -274,28 +287,27 @@ public class QueryUtil {
 		// Remove any span elements that may have been added
 		// (some MT engines mark up their output with extra info)
 		m = HTML_SPAN.matcher(sb.toString());
-		while (m.find()) {
+		while ( m.find() ) {
 			sb.replace(m.start(), m.end(), "");
 			m = HTML_SPAN.matcher(sb.toString());
 		}
 
 		// Try to correct missing codes
-		if (newCodes.size() < oriCodes.size()) {
-			for (String tmp : oriCodes) {
-				if (!newCodes.contains(tmp)) {
-					switch (tmp.charAt(0)) {
+		if ( newCodes.size() < oriCodes.size() ) {
+			for ( String tmp : oriCodes ) {
+				if ( !newCodes.contains(tmp) ) {
+					switch ( tmp.charAt(0) ) {
 					case 'o':
-						sb.append(String.format("%c%c", TextFragment.MARKER_OPENING, TextFragment
-								.toChar(fragment.getIndex(Integer.parseInt(tmp.substring(1))))));
+						sb.append(String.format("%c%c", TextFragment.MARKER_OPENING,
+							TextFragment.toChar(fragment.getIndex(Integer.parseInt(tmp.substring(1))))));
 						break;
 					case 'c':
-						sb.append(String.format("%c%c", TextFragment.MARKER_CLOSING, TextFragment
-								.toChar(fragment.getIndexForClosing(Integer.parseInt(tmp
-										.substring(1))))));
+						sb.append(String.format("%c%c", TextFragment.MARKER_CLOSING,
+							TextFragment.toChar(fragment.getIndexForClosing(Integer.parseInt(tmp.substring(1))))));
 						break;
 					case 'i':
-						sb.append(String.format("%c%c", TextFragment.MARKER_ISOLATED, TextFragment
-								.toChar(fragment.getIndex(Integer.parseInt(tmp.substring(1))))));
+						sb.append(String.format("%c%c", TextFragment.MARKER_ISOLATED,
+							TextFragment.toChar(fragment.getIndex(Integer.parseInt(tmp.substring(1))))));
 						break;
 					}
 				}
@@ -313,46 +325,49 @@ public class QueryUtil {
 	 * @return the un-escaped text.
 	 */
 	public String fromPlainTextHTML (String text) {
-		if (Util.isEmpty(text))
+		if ( Util.isEmpty(text) ) {
 			return "";
+		}
 		text = text.toString().replace("&apos;", "'");
 		text = text.replace("&lt;", "<");
 		text = text.replace("&gt;", ">");
 		text = text.replace("&quot;", "\"");
 		StringBuilder sb = new StringBuilder();
 		sb.append(text.replace("&amp;", "&"));
-		if (entities == null) {
+		if ( entities == null ) {
 			entities = new HTMLCharacterEntities();
 			entities.ensureInitialization(false);
 		}
 
 		// Un-escape character entity references
 		Matcher m;
-		while (true) {
+		while ( true ) {
 			m = CER.matcher(sb.toString());
-			if (!m.find())
-				break;
+			if ( !m.find() ) break;
 			int val = entities.lookupReference(m.group(0));
-			if (val != -1) {
+			if ( val != -1 ) {
 				sb.replace(m.start(0), m.end(0), String.valueOf((char) val));
-			} else { // Unknown entity
-						// TODO: replace by something meaningful to allow continuing the replacements
+			}
+			else { // Unknown entity
+				// TODO: replace by something meaningful to allow continuing the replacements
 				break; // Temporary, to avoid infinite loop
 			}
 		}
 
 		// Un-escape numeric character references
 		m = NCR.matcher(sb.toString());
-		while (m.find()) {
+		while ( m.find() ) {
 			String val = m.group(1);
 			int n = (int) '?'; // Default
 			try {
-				if (val.charAt(0) == 'x') { // Hexadecimal
+				if ( val.charAt(0) == 'x' ) { // Hexadecimal
 					n = Integer.valueOf(m.group(1).substring(1), 16);
-				} else { // Decimal
+				}
+				else { // Decimal
 					n = Integer.valueOf(m.group(1));
 				}
-			} catch (NumberFormatException e) {
+			}
+			catch (NumberFormatException e) {
 				// Just use default
 			}
 			sb.replace(m.start(0), m.end(0), String.valueOf((char) n));
@@ -370,9 +385,10 @@ public class QueryUtil {
 	 * @return The resulting XLIFF string.
 	 * @see #fromXLIFF(Element, TextFragment)
 	 */
-	public String toXLIFF(TextFragment fragment) {
-		if (fragment == null)
+	public String toXLIFF (TextFragment fragment) {
+		if ( fragment == null ) {
 			return "";
+		}
 		fmt.setContent(fragment);
 		return fmt.toString();
 	}
@@ -411,7 +427,9 @@ public class QueryUtil {
 	 *            the original TextFragment (cannot be null).
 	 * @see #toXLIFF(TextFragment)
 	 */
-	public TextFragment fromXLIFF(Element elem, TextFragment original) {
+	public TextFragment fromXLIFF (Element elem,
+		TextFragment original)
+	{
 		NodeList list = elem.getChildNodes();
 		int lastId = -1;
 		int id = -1;
@@ -420,40 +438,45 @@ public class QueryUtil {
 		StringBuilder buffer = new StringBuilder();
 
 		// Note that this parsing assumes non-overlapping codes.
-		for (int i = 0; i < list.getLength(); i++) {
+		for ( int i = 0; i < list.getLength(); i++ ) {
 			node = list.item(i);
-			switch (node.getNodeType()) {
+			switch ( node.getNodeType() ) {
 			case Node.TEXT_NODE:
 				buffer.append(node.getNodeValue());
 				break;
 			case Node.ELEMENT_NODE:
 				NamedNodeMap map = node.getAttributes();
-				if (node.getNodeName().equals("bpt")) {
+				if ( node.getNodeName().equals("bpt") ) {
 					id = getRawIndex(lastId, map.getNamedItem("id"));
 					stack.push(id);
 					buffer.append(String.format("%c%c", TextFragment.MARKER_OPENING,
-							TextFragment.toChar(original.getIndex(id))));
-				} else if (node.getNodeName().equals("ept")) {
+						TextFragment.toChar(original.getIndex(id))));
+				}
+				else if ( node.getNodeName().equals("ept") ) {
 					buffer.append(String.format("%c%c", TextFragment.MARKER_CLOSING,
-							TextFragment.toChar(original.getIndexForClosing(stack.pop()))));
-				} else if (node.getNodeName().equals("ph")) {
+						TextFragment.toChar(original.getIndexForClosing(stack.pop()))));
+				}
+				else if ( node.getNodeName().equals("ph") ) {
 					id = getRawIndex(lastId, map.getNamedItem("id"));
 					buffer.append(String.format("%c%c", TextFragment.MARKER_ISOLATED,
-							TextFragment.toChar(original.getIndex(id))));
-				} else if (node.getNodeName().equals("it")) {
+						TextFragment.toChar(original.getIndex(id))));
+				}
+				else if ( node.getNodeName().equals("it") ) {
 					Node pos = map.getNamedItem("pos");
-					if (pos == null) { // Error, but just treat it as a placeholder
+					if ( pos == null ) { // Error, but just treat it as a placeholder
 						id = getRawIndex(lastId, map.getNamedItem("id"));
 						buffer.append(String.format("%c%c", TextFragment.MARKER_ISOLATED,
-								TextFragment.toChar(original.getIndex(id))));
-					} else if (pos.getNodeValue().equals("begin")) {
+							TextFragment.toChar(original.getIndex(id))));
+					}
+					else if ( pos.getNodeValue().equals("begin") ) {
 						id = getRawIndex(lastId, map.getNamedItem("id"));
 						buffer.append(String.format("%c%c", TextFragment.MARKER_OPENING,
-								TextFragment.toChar(original.getIndex(id))));
-					} else { // Assumes 'end'
+							TextFragment.toChar(original.getIndex(id))));
+					}
+					else { // Assumes 'end'
 						id = getRawIndex(lastId, map.getNamedItem("id"));
 						buffer.append(String.format("%c%c", TextFragment.MARKER_CLOSING,
-								TextFragment.toChar(original.getIndexForClosing(id))));
+							TextFragment.toChar(original.getIndexForClosing(id))));
 					}
 				}
 				break;
@@ -484,9 +507,12 @@ public class QueryUtil {
 		return new ArrayList<QueryResult>(dupRemove);
 	}
 
-	private int getRawIndex(int lastIndex, Node attr) {
-		if (attr == null)
+	private int getRawIndex (int lastIndex,
+		Node attr)
+	{
+		if ( attr == null ) {
 			return ++lastIndex;
+		}
 		return Integer.valueOf(attr.getNodeValue());
 	}
 
