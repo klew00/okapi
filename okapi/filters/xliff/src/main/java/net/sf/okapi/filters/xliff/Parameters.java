@@ -192,10 +192,10 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 			String.valueOf(SEGMENTATIONTYPE_NOTSEGMENTED),
 			String.valueOf(SEGMENTATIONTYPE_ASNEEDED)};
 		String[] labels = {
-			"Segment only if the input text unit is segmented",
-			"Always segment (even if the input text unit is not segmented)",
-			"Never segment (even if the input text unit is segmented)",
-			"Segment only if the entry is segmented and regardless how the input was",
+			"Show segments only if the input text unit is segmented",
+			"Always show segments (even if the input text unit is not segmented)",
+			"Never show segments (even if the input text unit is segmented)",
+			"Show segments only if the entry is segmented and regardless how the input was",
 		};
 		ListSelectionPart lsp = desc.addListSelectionPart(paramDesc.get(OUTPUTSEGMENTATIONTYPE), values);
 		lsp.setChoicesLabels(labels);

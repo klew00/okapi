@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2010 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -28,6 +28,8 @@ public class Parameters extends BaseParameters {
 	public static int TRIM_NO = 0;
 	public static int TRIM_YES = 1;
 	
+	private static final String FORCESEGMENTEDOUTPUT = "forceSegmentedOutput";
+	
 	public boolean segmentSource;
 	public boolean segmentTarget;
 	public String sourceSrxPath;
@@ -38,6 +40,8 @@ public class Parameters extends BaseParameters {
 	public int trimSrcTrailingWS;
 	public int trimTrgLeadingWS;
 	public int trimTrgTrailingWS;
+	private boolean forceSegmentedOutput;
+
 	
 	public Parameters () {
 		reset();
@@ -54,6 +58,15 @@ public class Parameters extends BaseParameters {
 		trimSrcTrailingWS = TRIM_DEFAULT;
 		trimTrgLeadingWS = TRIM_DEFAULT;
 		trimTrgTrailingWS = TRIM_DEFAULT;
+		forceSegmentedOutput = true;
+	}
+	
+	public boolean getForcesegmentedOutput () {
+		return forceSegmentedOutput;
+	}
+
+	public void setForcesegmentedOutput (boolean forceSegmentedOutput) {
+		this.forceSegmentedOutput = forceSegmentedOutput;
 	}
 
 	public void fromString (String data) {
@@ -69,6 +82,7 @@ public class Parameters extends BaseParameters {
 		trimSrcTrailingWS = buffer.getInteger("trimSrcTrailingWS", trimSrcTrailingWS);
 		trimTrgLeadingWS = buffer.getInteger("trimTrgLeadingWS", trimTrgLeadingWS);
 		trimTrgTrailingWS = buffer.getInteger("trimTrgTrailingWS", trimTrgTrailingWS);
+		forceSegmentedOutput = buffer.getBoolean(FORCESEGMENTEDOUTPUT, forceSegmentedOutput);
 	}
 
 	@Override
@@ -84,6 +98,7 @@ public class Parameters extends BaseParameters {
 		buffer.setInteger("trimSrcTrailingWS", trimSrcTrailingWS);
 		buffer.setInteger("trimTrgLeadingWS", trimTrgLeadingWS);
 		buffer.setInteger("trimTrgTrailingWS", trimTrgTrailingWS);
+		buffer.setBoolean(FORCESEGMENTEDOUTPUT, forceSegmentedOutput);
 		return buffer.toString();
 	}	
 }

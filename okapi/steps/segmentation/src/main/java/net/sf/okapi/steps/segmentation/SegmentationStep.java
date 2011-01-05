@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -138,6 +138,18 @@ public class SegmentationStep extends BasePipelineStep {
 			trgSeg = srxDoc.compileLanguageRules(targetLocale, null);
 		}		
 		
+		return event;
+	}
+	
+	@Override
+	protected Event handleStartDocument (Event event) {
+		if ( params.getForcesegmentedOutput() ) {
+			// Force to show the segments when possible
+			IParameters prm = event.getStartDocument().getFilterParameters();
+			if ( prm != null ) {
+				prm.setInteger("outputSegmentationType", 3);
+			}
+		}
 		return event;
 	}
 	

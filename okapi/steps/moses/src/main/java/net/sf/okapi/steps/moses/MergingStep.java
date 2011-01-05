@@ -118,7 +118,7 @@ public class MergingStep extends BasePipelineStep {
 	
 	private void processStartDocument (StartDocument sd) {
 		if ( params.getForceAltTransOutput() ) {
-			// Check the type of input document
+			// Overwrite the option for the filters where it's possible.
 			IParameters prm = sd.getFilterParameters();
 			if ( prm != null ) {
 				prm.setBoolean("addAltTrans", true);

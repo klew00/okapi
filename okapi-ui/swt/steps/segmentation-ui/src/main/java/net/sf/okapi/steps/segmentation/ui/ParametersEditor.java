@@ -59,6 +59,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Button btEditTargetSRX;
 	private Button chkCopySource;
 	private Button chkCheckSegments;
+	private Button chkForceSegmentedOutput;
 	private Text edSourceSRX;
 	private Text edTargetSRX;
 	private IHelp help;
@@ -233,6 +234,9 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 
 		chkCheckSegments = new Button(grpOptions, SWT.CHECK);
 		chkCheckSegments.setText("Verify that a target segment matches each source segment when a target content exists");
+		
+		chkForceSegmentedOutput = new Button(grpOptions, SWT.CHECK);
+		chkForceSegmentedOutput.setText("When possible force the output to show the segmentation");
 	}
 		
 	private boolean showDialog () {
@@ -291,6 +295,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		edTargetSRX.setText(params.targetSrxPath);
 		chkCopySource.setSelection(params.copySource);
 		chkCheckSegments.setSelection(params.checkSegments);
+		chkForceSegmentedOutput.setSelection(params.getForcesegmentedOutput());
 		updateSourceDisplay();
 		updateTargetDisplay();
 	}
@@ -306,6 +311,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		}
 		params.copySource = chkCopySource.getSelection();
 		params.checkSegments = chkCheckSegments.getSelection();
+		params.setForcesegmentedOutput(chkForceSegmentedOutput.getSelection());
 		result = true;
 		return true;
 	}

@@ -988,6 +988,9 @@ public class Main {
 		ps.println("Leverage a file with Moses InlineText:");
 		ps.println("   -lm inputFile [-fc configId] [-ie encoding] [-oe encoding]");
 		ps.println("      [-sl srcLang] [-tl trgLang] [-totrg|-overtrg] [-from mosesFile]");
+		ps.println("Segment a file:");
+		ps.println("   -s inputFile [-fc configId] [-ie encoding] [-oe encoding]");
+		ps.println("      [-sl srcLang] [-tl trgLang] [-seg [srxFile]]");
 		ps.println("Queries translation resources:");
 		ps.println("   -q \"source text\" [-sl srcLang] [-tl trgLang] [-google] [-opentran]");
 		ps.println("      [-tt hostname[:port]] [-mm key] [-pen tmDirectory] [-gs configFile]");
