@@ -211,30 +211,6 @@ public class TabSeparatedValuesFilterTest {
 	}
 	
 	@Test
-	public void testCatkeys () {
-		Parameters params = (Parameters) filter.getParameters();
-		// col1=source, col3=comment, col4=target
-		params.load(new File(root+"/okf_table@catkeys.fprm").toURI(), false);
-		String snippet = "1\tfrench\tinfo\t1234\n"
-			+ "Source 1\tContext 1\tComment 1\tTarget 1\n"
-			+ "Source 2\tContext 2\t\tTarget 2\n";
-		
-		List<Event> events = getEvents(snippet, locEN, locFR);
-		TextUnit tu = FilterTestDriver.getTextUnit(events, 1);
-		assertNotNull(tu);
-		assertEquals("Source 1\t", tu.getSource().toString());
-		assertEquals("Target 1", tu.getTarget(locFR).toString());
-		assertEquals("Comment 1", tu.getProperty(Property.NOTE).getValue());
-
-		tu = FilterTestDriver.getTextUnit(events, 2);
-		assertNotNull(tu);
-		assertEquals("Source 2\t", tu.getSource().toString());
-//TODO: Error when the 3rd column is empty, the target is confused with the comment		
-//		assertTrue(null==tu.getProperty(Property.NOTE));
-//		assertEquals("Target 2", tu.getTarget(locFR).toString());
-	}
-	
-	@Test
 	public void testSkeleton () {
 		String st = null;
 		String expected = null;

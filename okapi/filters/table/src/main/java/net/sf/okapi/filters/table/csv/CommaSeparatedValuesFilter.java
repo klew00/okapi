@@ -76,10 +76,15 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 		setName(FILTER_NAME);
 
 		addConfiguration(true, // Do not inherit configurations from Base Table Filter
-				FILTER_CONFIG,
-				"Table (Comma-Separated Values)",
-				"Comma-separated values, optional header with field names.", 
-				"okf_table_csv.fprm");
+			FILTER_CONFIG,
+			"Table (Comma-Separated Values)",
+			"Comma-separated values, optional header with field names.", 
+			"okf_table_csv.fprm");
+		addConfiguration(true,
+			"okf_table_catkeys",
+			"Haiku CatKeys",
+			"Haiku CatKeys resource files", 
+			"okf_table_catkeys.fprm");
 		
 		setParameters(new Parameters());	// CSV Filter's parameters
 	}
