@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -31,7 +31,6 @@ public class FormatManager {
 	
 	public void load (String p_sPath) {
 		//TODO: Load format manager data from external file
-		
 		pairs = new Hashtable<String, String>();
 		pairs.put(".xlf", "okf_xliff");
 		pairs.put(".xml", "okf_xml");
@@ -75,7 +74,7 @@ public class FormatManager {
 		pairs.put(".ttx", "okf_ttx");
 		pairs.put(".pentm", "okf_pensieve");
 		pairs.put(".yml", "okf_railsyaml");
-    pairs.put(".vrsz", "okf_versifiedtxt");
+		pairs.put(".vrsz", "okf_versifiedtxt");
 	}
 	
 	/**

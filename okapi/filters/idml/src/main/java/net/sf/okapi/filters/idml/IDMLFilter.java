@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2010 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -493,8 +493,15 @@ public class IDMLFilter implements IFilter {
 				// Trigger the text unit
 				if ( ctx.peek().addToQueue(queue) && params.getSimplifyCodes() ) {
 					// Try to simplify the inline codes if possible
-					TextFragment tf = queue.getLast().getTextUnit().getSource().getFirstContent();
-					SIMPLIFIER.simplifyAll(tf);
+					// We can access the text this way because it's not segmented yet
+					TextUnit tu = queue.getLast().getTextUnit();
+					TextFragment tf = tu.getSource().getFirstContent();
+					String[] res = SIMPLIFIER.simplifyAll(tf, true);
+					// Move the native data into the skeleton if needed
+					if ( res != null ) {
+						IDMLSkeleton skel = (IDMLSkeleton)tu.getSkeleton();
+						skel.addMovedParts(res);
+					}
 				}
 				ctx.peek().leaveScope();
 			}

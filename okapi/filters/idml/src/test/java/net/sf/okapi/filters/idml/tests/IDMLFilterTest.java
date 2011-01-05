@@ -71,6 +71,14 @@ public class IDMLFilterTest {
 	}
 
 	@Test
+	public void testSimpleEntry2 () {
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(root+"Test00.idml"), 1);
+		assertNotNull(tu);
+		String text = TextFragment.getText(tu.getSource().getFirstContent().getCodedText());
+		assertEquals("Hello World!", text);
+	}
+
+	@Test
 	public void testStartDocument () {
 		assertTrue("Problem in StartDocument", FilterTestDriver.testStartDocument(filter,
 			new InputDocument(root+"Test01.idml", null),

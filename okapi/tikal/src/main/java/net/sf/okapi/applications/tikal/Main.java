@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2010 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -564,6 +564,9 @@ public class Main {
 
 		extensionsMap.put(".yml", "okf_railsyaml");
 		filtersMap.put("okf_railsyaml", "net.sf.okapi.filters.railsyaml.RailsYamlFilter");
+
+		extensionsMap.put(".idml", "okf_idml");
+		filtersMap.put("okf_idml", "net.sf.okapi.filters.idml.IDMLFilter");
 
 		filtersMap.put("okf_versifiedtxt", "net.sf.okapi.filters.versifiedtxt.VersifiedTextFilter");
 		filtersMap.put("okf_xmlstream", "net.sf.okapi.filters.xmlstream.XmlStreamFilter");

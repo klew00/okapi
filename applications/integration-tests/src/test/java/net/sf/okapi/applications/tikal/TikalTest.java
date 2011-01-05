@@ -211,6 +211,19 @@ public class TikalTest {
     }
 
     @Test
+    public void testExtractMergeIDML () throws IOException, InterruptedException {
+    	// Delete previous output
+    	assertTrue(deleteOutputFile("idmltest.idml.xlf"));
+    	assertTrue(deleteOutputFile("idmltest.out.idml"));
+    	// Extract
+    	assertEquals(0, runTikal("-x -sl en -tl fr idmltest.idml -ie UTF-8"));
+    	assertTrue("File different from gold", compareWithGoldFile("idmltest.idml.xlf", "UTF-8"));
+    	// Merge
+    	assertEquals(0, runTikal("-m -sl en -tl fr idmltest.idml.xlf"));
+    	assertTrue("File different from gold", compareZipWithGoldFile("idmltest.out.idml"));
+    }
+
+    @Test
     public void testExtractMergeTS () throws IOException, InterruptedException {
     
     	// Delete previous output

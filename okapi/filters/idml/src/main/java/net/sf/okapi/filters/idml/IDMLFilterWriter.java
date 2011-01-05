@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -284,9 +284,20 @@ public class IDMLFilterWriter implements IFilterWriter {
 		tf.setCodedText(ctext);
 		
 		// Now the whole content is true XML, it can be parsed as a fragment
-		String xml = "<r>"+tf.toText()+"</r>";
+		StringBuilder xml = new StringBuilder("<r>");
+		// If there were moved inline codes: we put them back, so we have valid XML
+		String[] res = skel.getMovedParts();
+		if (( res != null ) && ( res[0] != null )) {
+			xml.append(res[0]);
+		}
+		xml.append(tf.toText());
+		if (( res != null ) && ( res[1] != null )) {
+			xml.append(res[1]);
+		}
+		xml.append("</r>");
+		
 		try {
-			Document tmpDoc =  docBuilder.parse(new InputSource(new StringReader(xml)));
+			Document tmpDoc =  docBuilder.parse(new InputSource(new StringReader(xml.toString())));
 			DocumentFragment docFrag = doc.createDocumentFragment();
 			Node imp = doc.importNode(tmpDoc.getDocumentElement(), true);
 			while ( imp.hasChildNodes() ) {

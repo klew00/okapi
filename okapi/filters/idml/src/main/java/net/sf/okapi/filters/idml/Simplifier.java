@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -154,18 +154,26 @@ public class Simplifier {
 	 * Simplifies all possible tags in a given text fragment.
 	 * @param tf the text fragment to modify.
 	 * @param maxIterations maxIterations.
+	 * @param removeLeadingTrailingCodes true to remove the leading and/or the trailing code
+	 * of the fragment and place their text in the result.
+	 * This works for isolated codes only for now.
+	 * <b>It is the responsibility of the caller to put the leading/trailing data into the skeleton.</b>
+	 * @return Null (no leading or trailing code removal was) or a string array with the
+	 * original data of the codes removed. The first string if there was a leading code, the second string
+	 * if there was a trailing code. Both or either can be null.
 	 */
-	public void simplifyAll (TextFragment tf, int maxIterations) {
-		
+	public String[] simplifyAll (TextFragment tf,
+		int maxIterations,
+		boolean removeLeadingTrailingCodes)
+	{
 		int isolatedMerges=0;
 		int openCloseMerges=0;
 		int emptyOpenCloseMerges=0;
-
 		int iteration = 0;
 		
-		do{
+		do {
 			iteration++;
-			
+
 			prepare(tf.getCodedText(), tf.getCodes());
 			isolatedMerges = simplifyIsolated();
 			tf.setCodedText(getCodedText(), getCodes());
@@ -177,18 +185,68 @@ public class Simplifier {
 			prepare(tf.getCodedText(), tf.getCodes());
 			emptyOpenCloseMerges = simplifyEmptyOpeningClosing();
 			tf.setCodedText(getCodedText(), getCodes());
-			
-		}while ((iteration < maxIterations) && (isolatedMerges+openCloseMerges+emptyOpenCloseMerges) > 0);
+		}
+		while ((iteration < maxIterations) && (isolatedMerges + openCloseMerges + emptyOpenCloseMerges) > 0);
+		
+		// Check leading and trailing codes if requested
+		if ( removeLeadingTrailingCodes ) {
+			return removeLeadingTrailingCodes(tf);
+		}
+		else {
+			return null;
+		}
 	}
+	
+	private String[] removeLeadingTrailingCodes (TextFragment tf) {
+		if ( tf.isEmpty() ) return null; // Nothing to do
+		String ctext = tf.getCodedText();
+		Code code;
+		String[] res = new String[2];
+		
+		// Check for leading location
+		switch ( ctext.charAt(0) ) {
+		case TextFragment.MARKER_ISOLATED:
+			// We can move it
+			code = tf.getCode(TextFragment.toIndex(ctext.charAt(1)));
+			// Store the data in the return value
+			res[0] = code.getOuterData();
+			// Remove the code from the fragment
+			tf.remove(0, 2);
+			break;
+		}
+
+		// Checks for trailing code
+		ctext = tf.getCodedText(); // Reset the coded text because the indices may have changed
+		int last = ctext.length()-2;
+		switch ( ctext.charAt(last) ) {
+		case TextFragment.MARKER_ISOLATED:
+			// We can move it
+			code = tf.getCode(TextFragment.toIndex(ctext.charAt(last+1)));
+			// Store the data in the return value
+			res[1] = code.getOuterData();
+			// Remove the code from the fragment
+			tf.remove(last, last+2);
+			break;
+		}
+		return res;
+	}
+	
 	
 	/**
 	 * Simplifies all possible tags in a given text fragment.
 	 * @param tf the text fragment to modify.
+	 * @param removeLeadingTrailingCodes true to remove the leading and/or the trailing code
+	 * of the fragment and place their text in the result.
+	 * This works for isolated codes only for now.
+	 * <b>It is the responsibility of the caller to put the leading/trailing data into the skeleton.</b>
+	 * @return Null (no leading or trailing code removal was) or a string array with the
+	 * original data of the codes removed. The first string if there was a leading code, the second string
+	 * if there was a trailing code. Both or either can be null.
 	 */
-	public void simplifyAll (TextFragment tf) {
-
-		simplifyAll(tf, Simplifier.MAX);
-		
+	public String[] simplifyAll (TextFragment tf,
+		boolean removeLeadingTrailingCodes)
+	{
+		return simplifyAll(tf, Simplifier.MAX, removeLeadingTrailingCodes);
 	}
 
 	/**
@@ -202,7 +260,6 @@ public class Simplifier {
 	}
 	
 	private int simplifyIsolated () {
-		
 		int merges = 0;
 		CodeNode peekCn;
 		
@@ -236,7 +293,7 @@ public class Simplifier {
 	}
 		
 	/*
-	 * Simplify the isolated tags
+	 * Simplifies the isolated tags
 	 */
 	public void simplifyOpeningClosing (TextFragment tf) {
 		prepare(tf.getCodedText(), tf.getCodes());

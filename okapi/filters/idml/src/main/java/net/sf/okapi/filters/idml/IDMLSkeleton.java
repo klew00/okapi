@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -39,6 +39,7 @@ public class IDMLSkeleton implements ISkeleton {
 	private Node topNode; // Used for TextUnit
 	private Node scopeNode; // Used for TextUnit
 	private HashMap<String, NodeReference> refs; // Used for TextUnit
+	private String[] movedParts; // Temporary moved outside the content
 	
 	public IDMLSkeleton (ZipFile original) {
 		this.original = original;
@@ -65,6 +66,14 @@ public class IDMLSkeleton implements ISkeleton {
 			refs = new HashMap<String, NodeReference>();
 		}
 		refs.put(id, ref);
+	}
+	
+	public void addMovedParts (String[] movedParts) {
+		this.movedParts = movedParts;
+	}
+	
+	public String[] getMovedParts () {
+		return movedParts;
 	}
 	
 	public boolean hasReferences () {
