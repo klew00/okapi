@@ -124,7 +124,9 @@ public abstract class BaseParameters implements IParameters {
 
 	@Override
 	public boolean getBoolean (String name) {
-		toString(); // Make sure the buffer is up-to-date
+		// Make sure the buffer is up-to-date and check the type of storage
+		// We do this to avoid setting YAML-based parameters
+		if ( !toString().startsWith("#v") ) return false; 
 		return buffer.getBoolean(name);
 	}
 	
@@ -132,14 +134,18 @@ public abstract class BaseParameters implements IParameters {
 	public void setBoolean (String name,
 		boolean value)
 	{
-		toString(); // Make sure the buffer is up-to-date
+		// Make sure the buffer is up-to-date and check the type of storage
+		// We do this to avoid setting YAML-based parameters
+		if ( !toString().startsWith("#v") ) return; 
 		buffer.setBoolean(name, value);
 		fromString(buffer.toString()); // Update the variables from the buffer
 	}
 	
 	@Override
 	public String getString (String name) {
-		toString(); // Make sure the buffer is up-to-date
+		// Make sure the buffer is up-to-date and check the type of storage
+		// We do this to avoid setting YAML-based parameters
+		if ( !toString().startsWith("#v") ) return null; 
 		return buffer.getString(name);
 	}
 	
@@ -147,14 +153,18 @@ public abstract class BaseParameters implements IParameters {
 	public void setString (String name,
 		String value)
 	{
-		toString(); // Make sure the buffer is up-to-date
+		// Make sure the buffer is up-to-date and check the type of storage
+		// We do this to avoid setting YAML-based parameters
+		if ( !toString().startsWith("#v") ) return; 
 		buffer.setString(name, value);
 		fromString(buffer.toString()); // Update the variables from the buffer
 	}
 
 	@Override
 	public int getInteger (String name) {
-		toString(); // Make sure the buffer is up-to-date
+		// Make sure the buffer is up-to-date and check the type of storage
+		// We do this to avoid setting YAML-based parameters
+		if ( !toString().startsWith("#v") ) return 0; 
 		return buffer.getInteger(name);
 	}
 
@@ -162,7 +172,9 @@ public abstract class BaseParameters implements IParameters {
 	public void setInteger (String name,
 		int value)
 	{
-		toString(); // Make sure the buffer is up-to-date
+		// Make sure the buffer is up-to-date and check the type of storage
+		// We do this to avoid setting YAML-based parameters
+		if ( !toString().startsWith("#v") ) return; 
 		buffer.setInteger(name, value);
 		fromString(buffer.toString()); // Update the variables from the buffer
 	}
