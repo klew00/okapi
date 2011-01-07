@@ -236,7 +236,6 @@ public class MosesTextFilterWriter implements IFilterWriter {
 	 * @return the Moses text for the given fragment.
 	 */
 	private String toMosesText (TextFragment frag) {
-		boolean gMode = true;
 		boolean escapeGT = false;
 		int quoteMode = 0;
 		
@@ -253,69 +252,34 @@ public class MosesTextFilterWriter implements IFilterWriter {
 			case TextFragment.MARKER_OPENING:
 				index = TextFragment.toIndex(codedText.charAt(++i));
 				code = codes.get(index);
-				if ( code.hasData() ) {
-					if ( gMode ) {
-						tmp.append(String.format("<g id=\"%d\">", code.getId()));
-					}
-					else {
-						tmp.append(String.format("<bpt id=\"%d\">", code.getId()));
-						tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
-						tmp.append("</bpt>");
-					}
-				}
-				else {
-					// Marker
+				if ( code.getType().equals("mrk") ) {
 					tmp.append(code.getOuterData());
+				}
+				else { 
+					tmp.append(String.format("<g id=\"%d\">", code.getId()));
 				}
 				break;
 			case TextFragment.MARKER_CLOSING:
 				index = TextFragment.toIndex(codedText.charAt(++i));
 				code = codes.get(index);
-				if ( code.hasData() ) {
-					if ( gMode ) {
-						tmp.append("</g>");
-					}
-					else {
-						tmp.append(String.format("<ept id=\"%d\">", code.getId()));
-						tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
-						tmp.append("</ept>");
-					}
+				if ( code.getType().equals("mrk") ) {
+					tmp.append(code.getOuterData());
 				}
 				else {
-					// Marker
-					tmp.append(code.getOuterData());
+					tmp.append("</g>");
 				}
 				break;
 			case TextFragment.MARKER_ISOLATED:
 				index = TextFragment.toIndex(codedText.charAt(++i));
 				code = codes.get(index);
-				if ( gMode ) {
-					if ( code.getTagType() == TagType.OPENING ) {
-						tmp.append(String.format("<bx id=\"%d\"/>", code.getId()));
-					}
-					else if ( code.getTagType() == TagType.CLOSING ) {
-						tmp.append(String.format("<ex id=\"%d\"/>", code.getId()));
-					}
-					else {
-						tmp.append(String.format("<x id=\"%d\"/>", code.getId()));
-					}
+				if ( code.getTagType() == TagType.OPENING ) {
+					tmp.append(String.format("<bx id=\"%d\"/>", code.getId()));
+				}
+				else if ( code.getTagType() == TagType.CLOSING ) {
+					tmp.append(String.format("<ex id=\"%d\"/>", code.getId()));
 				}
 				else {
-					if ( code.getTagType() == TagType.OPENING ) {
-						tmp.append(String.format("<it id=\"%d\" pos=\"open\">", code.getId()));
-						tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
-						tmp.append("</it>");
-					}
-					else if ( code.getTagType() == TagType.CLOSING ) {
-						tmp.append(String.format("<it id=\"%d\" pos=\"close\">", code.getId()));
-						tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
-						tmp.append("</it>");
-					}
-					else {
-						tmp.append(String.format("<ph id=\"%d\">", code.getId()));
-						tmp.append(Util.escapeToXML(code.toString(), quoteMode, escapeGT, null));
-						tmp.append("</ph>");
-					}
+					tmp.append(String.format("<x id=\"%d\"/>", code.getId()));
 				}
 				break;
 			case '>':
