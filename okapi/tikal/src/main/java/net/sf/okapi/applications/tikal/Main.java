@@ -868,10 +868,10 @@ public class Main {
 
 		case CMD_LEVERAGEMOSES:
 			ps.println("Merging Moses InlineText");
+			guessMissingLocales(input);
 			guessMergingMosesArguments(input);
 			guessMissingParameters(input);
 			if ( !prepareFilter(configId) ) return; // Next input
-			guessMissingLocales(input);
 			file = new File(input);
 			rd = new RawDocument(file.toURI(), inputEncoding, srcLoc, trgLoc, configId);
 			leverageFileWithMoses(rd);
@@ -1425,10 +1425,8 @@ public class Main {
 		// Create the raw document and set the output
 		if ( Util.isEmpty(moses2ndPath) ) {
 			moses2ndPath = rd.getInputURI().getPath();
-			// If the input is a directory, it ends with a separator, then we remove it
-			if ( moses2ndPath.endsWith("/") || moses2ndPath.endsWith("\\") ) {
-				moses2ndPath = moses2ndPath.substring(0, moses2ndPath.length()-1);
-			}
+		}
+		if ( !moses2ndPath.endsWith("."+srcLoc.toString()) ) {
 			moses2ndPath = moses2ndPath + ("."+srcLoc.toString());
 		}
 		driver.addBatchItem(rd, new File(moses2ndPath).toURI(), "UTF-8");
@@ -1439,7 +1437,6 @@ public class Main {
 		}
 		ps.println("Default input encoding: "+inputEncoding);
 		ps.println("Filter configuration: "+configId);
-		ps.println("Source output: "+moses2ndPath);
 
 		// Process
 		driver.processBatch();
