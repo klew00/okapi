@@ -161,7 +161,7 @@ public class SegmentationStep extends BasePipelineStep {
 
 		// Segment source if requested
 		if ( params.segmentSource ) {
-			if ( !tu.getSource().hasBeenSegmented() ) {
+			if ( params.getOverwriteSegmentation() || !tu.getSource().hasBeenSegmented() ) {
 				tu.createSourceSegmentation(srcSeg);
 			}
 		}
@@ -170,7 +170,7 @@ public class SegmentationStep extends BasePipelineStep {
 
 		// Segment target if requested
 		if ( params.segmentTarget && ( trgCont != null )) {
-			if ( !trgCont.hasBeenSegmented() ) {
+			if ( params.getOverwriteSegmentation() || !trgCont.hasBeenSegmented() ) {
 				trgSeg.computeSegments(trgCont);
 				trgCont.getSegments().create(trgSeg.getRanges());
 			}

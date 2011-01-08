@@ -29,6 +29,7 @@ public class Parameters extends BaseParameters {
 	public static int TRIM_YES = 1;
 	
 	private static final String FORCESEGMENTEDOUTPUT = "forceSegmentedOutput";
+	private static final String OVERWRITESEGMENTATION = "overwriteSegmentation";
 	
 	public boolean segmentSource;
 	public boolean segmentTarget;
@@ -41,6 +42,7 @@ public class Parameters extends BaseParameters {
 	public int trimTrgLeadingWS;
 	public int trimTrgTrailingWS;
 	private boolean forceSegmentedOutput;
+	private boolean overwriteSegmentation;
 
 	
 	public Parameters () {
@@ -59,6 +61,7 @@ public class Parameters extends BaseParameters {
 		trimTrgLeadingWS = TRIM_DEFAULT;
 		trimTrgTrailingWS = TRIM_DEFAULT;
 		forceSegmentedOutput = true;
+		overwriteSegmentation = false;
 	}
 	
 	public boolean getForcesegmentedOutput () {
@@ -67,6 +70,14 @@ public class Parameters extends BaseParameters {
 
 	public void setForcesegmentedOutput (boolean forceSegmentedOutput) {
 		this.forceSegmentedOutput = forceSegmentedOutput;
+	}
+	
+	public boolean getOverwriteSegmentation () {
+		return this.overwriteSegmentation;
+	}
+	
+	public void setOverwriteSegmentation (boolean overwriteSegmentation) {
+		this.overwriteSegmentation = overwriteSegmentation;
 	}
 
 	public void fromString (String data) {
@@ -83,6 +94,7 @@ public class Parameters extends BaseParameters {
 		trimTrgLeadingWS = buffer.getInteger("trimTrgLeadingWS", trimTrgLeadingWS);
 		trimTrgTrailingWS = buffer.getInteger("trimTrgTrailingWS", trimTrgTrailingWS);
 		forceSegmentedOutput = buffer.getBoolean(FORCESEGMENTEDOUTPUT, forceSegmentedOutput);
+		overwriteSegmentation = buffer.getBoolean(OVERWRITESEGMENTATION, overwriteSegmentation);
 	}
 
 	@Override
@@ -99,6 +111,8 @@ public class Parameters extends BaseParameters {
 		buffer.setInteger("trimTrgLeadingWS", trimTrgLeadingWS);
 		buffer.setInteger("trimTrgTrailingWS", trimTrgTrailingWS);
 		buffer.setBoolean(FORCESEGMENTEDOUTPUT, forceSegmentedOutput);
+		buffer.setBoolean(OVERWRITESEGMENTATION, overwriteSegmentation);
 		return buffer.toString();
 	}	
+
 }
