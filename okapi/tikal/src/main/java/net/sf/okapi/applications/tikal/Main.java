@@ -983,11 +983,11 @@ public class Main {
 		ps.println("      |-mm key|-pen tmDirectory|-gs configFile|-google|-apertium [serverURL]");
 		ps.println("      |-ms configFile|-tda configFile] [-maketmx [tmxFile]] [-opt threshold]");
 		ps.println("Extracts a file to Moses InlineText:");
-		ps.println("   -xm inputFile [-fc configId] [-ie encoding]");
+		ps.println("   -xm inputFile [-fc configId] [-ie encoding] [-seg [srxFile]]");
 		ps.println("      [-sl srcLang] [-tl trgLang] [-2] [-to srcOutputFile]");
 		ps.println("Leverage a file with Moses InlineText:");
-		ps.println("   -lm inputFile [-fc configId] [-ie encoding] [-oe encoding]");
-		ps.println("      [-sl srcLang] [-tl trgLang] [-totrg|-overtrg] [-from mosesFile]");
+		ps.println("   -lm inputFile [-fc configId] [-ie encoding] [-oe encoding] [-sl srcLang]");
+		ps.println("      [-tl trgLang] [-seg [srxFile]] [-totrg|-overtrg] [-from mosesFile]");
 		ps.println("Segment a file:");
 		ps.println("   -s inputFile [-fc configId] [-ie encoding]");
 		ps.println("      [-sl srcLang] [-tl trgLang] [-seg [srxFile]]");
@@ -1388,6 +1388,11 @@ public class Main {
 		driver.setRootDirectory(System.getProperty("user.dir"));
 		driver.addStep(new RawDocumentToFilterEventsStep());
 
+		// Add segmentation step if requested
+		if ( segRules != null ) {
+			driver.addStep(addSegmentationStep());
+		}
+
 		MergingStep mrgStep = new MergingStep();
 		MergingParameters params = (MergingParameters)mrgStep.getParameters();
 		params.setCopyToTarget(mosesCopyToTarget);
@@ -1413,6 +1418,11 @@ public class Main {
 		// Raw document to filter events step 
 		RawDocumentToFilterEventsStep rd2feStep = new RawDocumentToFilterEventsStep();
 		driver.addStep(rd2feStep);
+		
+		// Add segmentation step if requested
+		if ( segRules != null ) {
+			driver.addStep(addSegmentationStep());
+		}
 		
 		// Filter events to raw document final step (using the XLIFF writer)
 		ExtractionStep extStep = new ExtractionStep();
