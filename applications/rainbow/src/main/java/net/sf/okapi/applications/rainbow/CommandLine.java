@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -33,6 +33,7 @@ import net.sf.okapi.applications.rainbow.lib.Utils;
 import net.sf.okapi.applications.rainbow.pipeline.IPredefinedPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.PipelineEditor;
 import net.sf.okapi.applications.rainbow.pipeline.PipelineWrapper;
+import net.sf.okapi.applications.rainbow.pipeline.PreDefinedPipelines;
 import net.sf.okapi.applications.rainbow.utilities.IUtility;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.DefaultFilters;
@@ -71,13 +72,28 @@ public class CommandLine {
 				return;
 			}
 			
+			IPredefinedPipeline predefinedPipeline = null;
+			// Detect if the argument for -x is a true utility or a predefined pipeline
+			if ( utilityId != null ) {
+				PreDefinedPipelines ppMapper = new PreDefinedPipelines();
+				predefinedPipeline = ppMapper.create(utilityId);
+				if ( predefinedPipeline != null ) {
+					utilityId = null;
+				}
+			}
+			
 			// Launch either a utility
 			if ( utilityId != null ) {
 				launchUtility();
 			}
 			// Or a pipeline
-			else if ( pipelineFile != null ) {
-				launchPipeline();
+			else {
+				if ( pipelineFile != null ) {
+					launchPipeline(null);
+				}
+				else if ( predefinedPipeline != null ) {
+					launchPipeline(predefinedPipeline);
+				}
 			}
 		}
 		catch ( Throwable e ) {
@@ -276,22 +292,23 @@ public class CommandLine {
 		ud.execute(shell);
 	}
 
-	private void launchPipeline () {
+	private void launchPipeline (IPredefinedPipeline predefinedPipeline) {
 		// Save any pending data
 		fcMapper.setCustomConfigurationsDirectory(prj.getParametersFolder());
 		fcMapper.updateCustomConfigurations();
 		PipelineWrapper wrapper = new PipelineWrapper(fcMapper, appRootFolder, pm, prj.getParametersFolder(), null);
 
-		IPredefinedPipeline predefinedPipeline = null;
-		
-//		// If we have a predefined pipeline: set it
-//		if ( predefinedPipeline != null ) {
-//			// Get the parameters data from the project
-//			predefinedPipeline.setParameters(prj.getUtilityParameters(predefinedPipeline.getId()));
-//			// Load the pipeline
-//			wrapper.loadPipeline(predefinedPipeline, null);
-//		}
-		wrapper.load(pipelineFile);
+		// If we have a predefined pipeline: set it
+		if ( predefinedPipeline != null ) {
+			// Get the parameters data from the project
+			predefinedPipeline.setParameters(wrapper.getAvailableSteps(),
+				prj.getUtilityParameters(predefinedPipeline.getId()));
+			// Load the pipeline
+			wrapper.loadPipeline(predefinedPipeline, null);
+		}
+		else { // It's a pipeline file
+			wrapper.load(pipelineFile);
+		}
 
 		if ( promptForOptions ) {
 			PipelineEditor dlg = new PipelineEditor();
