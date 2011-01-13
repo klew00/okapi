@@ -42,6 +42,7 @@ import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.filters.mosestext.MosesTextFilter;
 
 @UsingParameters(MergingParameters.class)
@@ -236,13 +237,17 @@ public class MergingStep extends BasePipelineStep {
 		
 		// Retrieve the translated text
 		TextUnit mtu = event.getTextUnit();
+		TextFragment trgFrag = mtu.getSource().getFirstContent();
+		// Substitute the codes (and complete them if needed)
+		TextUnitUtil.adjustTargetCodes(srcFrag, trgFrag, true, true, null, null);
+		
 		// Create a new annotation if one does not exists already
 		if ( ann == null ) {
 			ann = new AltTranslationsAnnotation();
 		}
 		// Add the translation
 		ann.add(sourceLocale, targetLocale, srcFrag,
-			null, mtu.getSource().getFirstContent(),
+			null, trgFrag,
 			MatchType.MT, 10, "Moses-MT"); //TODO: make info parameters
 		
 		return ann;
