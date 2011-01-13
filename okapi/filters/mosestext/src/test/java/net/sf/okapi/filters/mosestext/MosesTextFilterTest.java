@@ -132,6 +132,15 @@ public class MosesTextFilterTest {
 	}
 	
 	@Test
+	public void testCode4 () {
+		String snippet = "<bx id='1'/>T1<x id='2'/>T2<ex id='3'/>";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertNotNull(tu);
+		assertEquals(snippet, tu.getSource().toString());
+		assertEquals("<b1/>T1<2/>T2<e3/>", fmt.setContent(tu.getSource().getFirstContent()).toString());
+	}
+	
+	@Test
 	public void testSpecialChars () {
 		// Note '<' should really be escaped, but we support it anyway
 		String snippet = "Line 1\rLine 2 with tab[\t] and more [<{|&/\\}>]";

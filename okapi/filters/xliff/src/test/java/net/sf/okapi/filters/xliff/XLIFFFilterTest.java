@@ -43,6 +43,7 @@ import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
@@ -230,6 +231,49 @@ public class XLIFFFilterTest {
 		assertNotNull(tu);
 		String str = tu.getSource().toString();
 		assertEquals("\r {#13;  }", str);
+	}
+
+	@Test
+	public void testUnbalancedIT () {
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+			+ "<xliff version=\"1.2\">"
+			+ "<file source-language=\"en\" target-language=\"fr\" datatype=\"x-test\" original=\"file.ext\">"
+			+ "<body>"
+			+ "<trans-unit id=\"1\">"
+			+ "<source>t1<it id='1' pos='open'>[b]</it>t2</source>"
+			+ "</trans-unit>"
+			+ "</body>"
+			+ "</file></xliff>";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertNotNull(tu);
+		List<Code> codes = tu.getSource().getFirstContent().getCodes();
+		assertEquals("[b]", codes.get(0).toString());
+		String str = tu.getSource().getCodedText();
+		assertEquals(TextFragment.MARKER_ISOLATED, str.charAt(2));
+		assertEquals(TagType.OPENING, codes.get(0).getTagType());
+	}
+
+	@Test
+	public void testBalancedIT () {
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+			+ "<xliff version=\"1.2\">"
+			+ "<file source-language=\"en\" target-language=\"fr\" datatype=\"x-test\" original=\"file.ext\">"
+			+ "<body>"
+			+ "<trans-unit id=\"1\">"
+			+ "<source><it id='1' pos='open'>[b]</it>T<it id='2' pos='close'>[/b]</it></source>"
+			+ "</trans-unit>"
+			+ "</body>"
+			+ "</file></xliff>";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertNotNull(tu);
+		List<Code> codes = tu.getSource().getFirstContent().getCodes();
+		assertEquals("[b]", codes.get(0).toString());
+		assertEquals("[/b]", codes.get(1).toString());
+		String str = tu.getSource().getCodedText();
+		assertEquals(TextFragment.MARKER_OPENING, str.charAt(0));
+		assertEquals(TextFragment.MARKER_CLOSING, str.charAt(3));
+		assertEquals(TagType.OPENING, codes.get(0).getTagType());
+		assertEquals(TagType.CLOSING, codes.get(1).getTagType());
 	}
 
 	@Test

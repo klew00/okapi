@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -36,6 +36,10 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public static final int SEGMENTATIONTYPE_SEGMENTED = 1;
 	public static final int SEGMENTATIONTYPE_NOTSEGMENTED = 2;
 	public static final int SEGMENTATIONTYPE_ASNEEDED = 3;
+	
+	public static final int TARGETSTATEMODE_IGNORE = 0;
+	public static final int TARGETSTATEMODE_EXTRACT = 1;
+	public static final int TARGETSTATEMODE_DONOTEXTRACT = 2;
 
 	private static final String FALLBACKTOID = "fallbackToID";
 	private static final String ADDTARGETLANGUAGE = "addTargetLanguage";
@@ -44,6 +48,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private static final String IGNOREINPUTSEGMENTATION = "ignoreInputSegmentation";
 	private static final String ADDALTTRANS = "addAltTrans";
 	private static final String INCLUDEEXTENSIONS = "includeExtensions";
+	private static final String TARGETSTATEMODE = "targetStateMode";
+	private static final String TARGETSTATEVALUE = "targetStateValue";
 	
 	private boolean fallbackToID;
 	private boolean escapeGT;
@@ -53,6 +59,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private boolean ignoreInputSegmentation;
 	private boolean addAltTrans;
 	private boolean includeExtensions;
+	private int targetStateMode;
+	private String targetStateValue;
 	
 	public Parameters () {
 		reset();
@@ -122,6 +130,22 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public void setIncludeExtensions (boolean includeExtensions) {
 		this.includeExtensions = includeExtensions;
 	}
+	
+	public int getTargetStateMode () {
+		return this.targetStateMode;
+	}
+	
+	public void setTargetStateMode (int targetStateMode) {
+		this.targetStateMode = targetStateMode;
+	}
+
+	public String getTargetStateValue () {
+		return this.targetStateValue;
+	}
+	
+	public void setTargetStateValue (String targetStateValue) {
+		this.targetStateValue = targetStateValue;
+	}
 
 	public void reset () {
 		fallbackToID = false;
@@ -132,6 +156,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		ignoreInputSegmentation = false;
 		addAltTrans = false;
 		includeExtensions = true;
+		targetStateMode = TARGETSTATEMODE_IGNORE;
+		targetStateValue = "needs-translation";
 	}
 
 	public void fromString (String data) {
@@ -145,6 +171,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		ignoreInputSegmentation = buffer.getBoolean(IGNOREINPUTSEGMENTATION, ignoreInputSegmentation);
 		addAltTrans = buffer.getBoolean(ADDALTTRANS, addAltTrans);
 		includeExtensions = buffer.getBoolean(INCLUDEEXTENSIONS, includeExtensions);
+		targetStateMode = buffer.getInteger(TARGETSTATEMODE, targetStateMode);
+		targetStateValue = buffer.getString(TARGETSTATEVALUE, targetStateValue);
 	}
 
 	@Override
@@ -158,6 +186,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.setBoolean(IGNOREINPUTSEGMENTATION, ignoreInputSegmentation);
 		buffer.setBoolean(ADDALTTRANS, addAltTrans);
 		buffer.setBoolean(INCLUDEEXTENSIONS, includeExtensions);
+		buffer.setInteger(TARGETSTATEMODE, targetStateMode);
+		buffer.setString(TARGETSTATEVALUE, targetStateValue);
 		return buffer.toString();
 	}
 	
@@ -172,6 +202,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.add(OUTPUTSEGMENTATIONTYPE, "Type of output segmentation", "Indicates wether to segment or not the text content in output");
 		desc.add(ADDALTTRANS, "Allow addition of new <alt-trans> elements", "Indicates wether or not to adding new <alt-trans> elements is allowed");
 		desc.add(INCLUDEEXTENSIONS, "Include extra information", "If set: non-standard information are included in the added <alt-trans>");
+		desc.add(TARGETSTATEMODE, "Action to do when the value of the state attribute matches the specified pattern", null);
+		desc.add(TARGETSTATEVALUE, "Pattern for the state attribute value", null);
 		return desc;
 	}
 
@@ -180,25 +212,40 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.addCheckboxPart(paramDesc.get(FALLBACKTOID));
 		desc.addCheckboxPart(paramDesc.get(IGNOREINPUTSEGMENTATION));
 
+//Not implemented yet		
+//		desc.addTextInputPart(paramDesc.get(TARGETSTATEVALUE));
+//		
+//		String[] values = {
+//			String.valueOf(TARGETSTATEMODE_IGNORE),
+//			String.valueOf(TARGETSTATEMODE_EXTRACT),
+//			String.valueOf(TARGETSTATEMODE_DONOTEXTRACT)};
+//		String[] labels = {
+//			"Ignore the state attribute",
+//			"Extract the matching entries (and only those entries)",
+//			"Do not extract the matching entries",
+//		};
+//		ListSelectionPart lsp = desc.addListSelectionPart(paramDesc.get(TARGETSTATEMODE), values);
+//		lsp.setChoicesLabels(labels);
+		
 		desc.addSeparatorPart();
 		
 		desc.addCheckboxPart(paramDesc.get(XMLEncoder.ESCAPEGT));
 		desc.addCheckboxPart(paramDesc.get(ADDTARGETLANGUAGE));
 		desc.addCheckboxPart(paramDesc.get(OVERRIDETARGETLANGUAGE));
 
-		String[] values = {
+		String[] values2 = {
 			String.valueOf(SEGMENTATIONTYPE_ORIGINAL),
 			String.valueOf(SEGMENTATIONTYPE_SEGMENTED),
 			String.valueOf(SEGMENTATIONTYPE_NOTSEGMENTED),
 			String.valueOf(SEGMENTATIONTYPE_ASNEEDED)};
-		String[] labels = {
+		String[] labels2 = {
 			"Show segments only if the input text unit is segmented",
 			"Always show segments (even if the input text unit is not segmented)",
 			"Never show segments (even if the input text unit is segmented)",
 			"Show segments only if the entry is segmented and regardless how the input was",
 		};
-		ListSelectionPart lsp = desc.addListSelectionPart(paramDesc.get(OUTPUTSEGMENTATIONTYPE), values);
-		lsp.setChoicesLabels(labels);
+		ListSelectionPart lsp = desc.addListSelectionPart(paramDesc.get(OUTPUTSEGMENTATIONTYPE), values2);
+		lsp.setChoicesLabels(labels2);
 		
 		CheckboxPart cbp1 = desc.addCheckboxPart(paramDesc.get(ADDALTTRANS));
 		CheckboxPart cbp2 = desc.addCheckboxPart(paramDesc.get(INCLUDEEXTENSIONS));

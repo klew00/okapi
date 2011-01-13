@@ -127,6 +127,30 @@ public class TextFragmentTest {
 	}
 
 	@Test
+	public void testAppendWithSameID () {
+		// Two separate fragments with one code of same id
+		TextFragment tf1 = new TextFragment();
+		tf1.append(TagType.OPENING, "b", "[b]");
+		tf1.append("T1.");
+		TextFragment tf2 = new TextFragment(" T2");
+		tf2.append(TagType.PLACEHOLDER, "br", "[br/]");
+		tf2.append(TagType.CLOSING, "b", "[/b]");
+
+		// First codes of each have same id
+		assertEquals(tf1.getCodes().get(0).id, tf2.getCodes().get(0).id);
+		// Second code is 2
+		assertEquals(2, tf2.getCodes().get(1).id);
+		
+		// Now group into a single fragment
+		tf1.append(tf2); // Effectively calling insert()
+		
+		List<Code> codes = tf1.getCodes();
+		assertEquals(1, codes.get(0).id); // opening
+//TOFIX		assertEquals(2, codes.get(1).id); // placeholder
+		assertEquals(1, codes.get(2).id); // closing (balanced)
+	}
+
+	@Test
 	public void testRemove () {
 		TextFragment tf1 = makeFragment1();
 		assertEquals(fmt.setContent(tf1).toString(true), "[b]A[br/]B[/b]C");

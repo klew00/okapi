@@ -67,7 +67,7 @@ public class MosesTextFilter implements IFilter {
 
 	private static final Pattern STARTSEGMENT = Pattern.compile("<mrk\\s+mtype\\s*=\\s*?[\"']seg[\"'].*?>");
 	private static final Pattern OPENCLOSE = Pattern.compile("(\\<g(\\s+)id=['\"](.*?)['\"]>)|(\\</g\\>)");
-	private static final Pattern ISOLATED = Pattern.compile("\\<x(\\s+)id=['\"](.*?)['\"](\\s*?)/>");
+	private static final Pattern ISOLATED = Pattern.compile("\\<(bx|ex|x)(\\s+)id=['\"](.*?)['\"](\\s*?)/>");
 	private static final Pattern LINEBREAK = Pattern.compile("(\\<lb\\s*?/>)");
 
 	private BufferedReader reader;
@@ -338,11 +338,21 @@ public class MosesTextFilter implements IFilter {
 
 		m = ISOLATED.matcher(sb.toString());
 		while ( m.find() ) {
-			int id = Util.strToInt(m.group(2), -1);
-			code = new Code(TagType.PLACEHOLDER, "x", m.group());
+			int id = Util.strToInt(m.group(3), -1);
+			String name = m.group(1);
+			if ( name.equals("bx") ) {
+				// Match on IDs
+				code = new Code(TagType.OPENING, "Xpt"+id, m.group());;
+			}
+			else if ( name.equals("ex") ) {
+				// Match on IDs
+				code = new Code(TagType.CLOSING, "Xpt"+id, m.group());;
+			}
+			else {
+				code = new Code(TagType.PLACEHOLDER, "x", m.group());;
+			}
 			code.setId(id);
 			codes.add(code);
-			//TODO: Do we need to make isolated-open / isolated-close distinction?
 			markers = String.format("%c%c", TextFragment.MARKER_ISOLATED,
 				TextFragment.toChar(codes.size()-1));
 			sb.replace(m.start(), m.end(), markers);

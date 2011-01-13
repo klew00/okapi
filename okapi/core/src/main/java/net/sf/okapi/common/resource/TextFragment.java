@@ -660,8 +660,11 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 		// Insert the new text in one chunk
 		if ( offset < 0 ) text.append(tmp);
 		else text.insert(offset, tmp);
-		// If there was new codes we will need to re-number and re-balance
-		//if ( newCodes.size() > 0 ) renumberCodes(); // renumberCodes() set isBalanced to false
+		// If there was new codes we will need to re-balance
+		//TODO: do we need to renumber all? bad because we loose existing number, but need for new
+		if ( newCodes.size() > 0 ) {
+			this.isBalanced = false;
+		}
 	}
 
 	/**
