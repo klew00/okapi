@@ -141,15 +141,19 @@ public class IDMLContext {
 	}
 
 	public void addCode (Node node) {
-		// Assume text node
-		String text = node.getNodeValue();
-		for ( int i=0; i<text.length(); i++ ) {
-			if ( !Character.isWhitespace(text.charAt(i)) ) {
-				tf.append(TagType.PLACEHOLDER, "text", text);
-				return;
+		if ( node.getNodeType() == Node.TEXT_NODE ) {
+			String text = node.getNodeValue();
+			for ( int i=0; i<text.length(); i++ ) {
+				if ( !Character.isWhitespace(text.charAt(i)) ) {
+					tf.append(TagType.PLACEHOLDER, "text", text);
+					return;
+				}
 			}
+			// Otherwise: just white spaces: no output
 		}
-		// Otherwise: just white spaces: no output
+		else if ( node.getNodeType() == Node.CDATA_SECTION_NODE ) {
+			tf.append(TagType.PLACEHOLDER, "cdata", "<![CDATA["+node.getNodeValue()+"]]>");
+		}
 	}
 	
 	public void addReference (String key,

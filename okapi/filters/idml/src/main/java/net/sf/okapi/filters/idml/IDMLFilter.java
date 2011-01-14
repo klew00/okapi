@@ -88,6 +88,7 @@ public class IDMLFilter implements IFilter {
 	private EncoderManager encoderManager;
 	private HashMap<String, ZipEntry> stories;
 	private LinkedHashMap<String, ArrayList<String>> spreads;
+	private ArrayList<String> storiesDone;
 	private Iterator<String> storyIter;
 	private Iterator<String> spreadIter;
 	private ZipFile zipFile;
@@ -316,6 +317,7 @@ public class IDMLFilter implements IFilter {
 		spreadIter = null;
 		storyIter = null;
 		spreads = new LinkedHashMap<String, ArrayList<String>>();
+		storiesDone = new ArrayList<String>();
 		stories = new HashMap<String, ZipEntry>();
 		try {
 			zipFile = new ZipFile(new File(docURI));
@@ -363,7 +365,10 @@ public class IDMLFilter implements IFilter {
 				throw new IOException("Missing value for parentStory.");
 			}
 			// Add the the story to the lookup list
-			storyList.add(tmp);
+			if ( !storiesDone.contains(tmp) ) {
+				storyList.add(tmp);
+				storiesDone.add(tmp);
+			}
 		}
 		
 		// Add the stories for this spread to the overall list of stories to process
@@ -418,6 +423,7 @@ public class IDMLFilter implements IFilter {
 					// Add to current entry if needed
 					switch ( node.getNodeType() ) {
 					case Node.TEXT_NODE:
+					case Node.CDATA_SECTION_NODE:
 						ctx.peek().addCode(node);
 						break;
 					default:

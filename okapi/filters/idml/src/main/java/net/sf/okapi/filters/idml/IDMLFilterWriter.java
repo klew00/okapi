@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Stack;
@@ -85,6 +86,7 @@ public class IDMLFilterWriter implements IFilterWriter {
 	private Document doc;
 	private int group;
 	private Stack<IReferenceable> referents;
+	private ArrayList<String> storiesLeft;
 	
 	public IDMLFilterWriter () {
         try {
@@ -196,6 +198,7 @@ public class IDMLFilterWriter implements IFilterWriter {
 			zipOriginal = skel.getOriginal();
 			group = 0;
 			referents = new Stack<IReferenceable>();
+			storiesLeft = new ArrayList<String>();
 		
 			// Create the output stream from the path provided
 			tempFile = null;			
@@ -227,6 +230,7 @@ public class IDMLFilterWriter implements IFilterWriter {
 				ZipEntry entry = entries.nextElement();
 				if ( entry.getName().endsWith(".xml") ) {
 					if ( entry.getName().startsWith("Stories/") ) {
+						storiesLeft.add(entry.getName());
 						continue; // Not yet
 					}
 				}
@@ -247,6 +251,29 @@ public class IDMLFilterWriter implements IFilterWriter {
 	}
 
 	private void processEndDocument () {
+		try {
+			if ( storiesLeft != null ) {
+				Enumeration<? extends ZipEntry> entries = zipOriginal.entries();
+				while( entries.hasMoreElements() ) {
+					ZipEntry entry = entries.nextElement();
+					if ( storiesLeft.contains(entry.getName()) ) {
+						// Copy the entry into the output ZIP file
+						zipOutStream.putNextEntry(new ZipEntry(entry.getName()));
+						InputStream input = zipOriginal.getInputStream(entry); 
+						int len;
+						while ( (len = input.read(buffer)) > 0 ) {
+							zipOutStream.write(buffer, 0, len);
+						}
+						input.close();
+						zipOutStream.closeEntry();
+						storiesLeft.remove(entry.getName());
+					}
+				}
+			}
+		}
+		catch ( IOException e ) {
+			throw new OkapiIOException("Error writting out non-extracted stories.", e);
+		}
 		close();
 	}
 
@@ -399,6 +426,8 @@ public class IDMLFilterWriter implements IFilterWriter {
 	        // Write the DOM document to the file
 	        xformer.transform(source, result);
 			zipOutStream.closeEntry();
+			// This story is done
+			storiesLeft.remove(entry.getName());
 		}
 		catch ( IOException e ) {
 			throw new OkapiIOException("Error writing out the story.\n"+e.getMessage(), e);
