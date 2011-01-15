@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2011 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -95,10 +95,10 @@ public class IDMLFilter implements IFilter {
 	private IdGenerator spreadIdGen;
 	private IdGenerator storyIdGen;
 	private int spreadStack;
-	private int nodeCount;
 	private String tuIdPrefix;
 	private Stack<IDMLContext> ctx;
 	private HashMap<String, Boolean> embeddedElements;
+	private HashMap<String, Integer> embeddedElementsPos;
 	private IdGenerator refGen;
 	private IdGenerator tuIdGen;
 	
@@ -113,6 +113,11 @@ public class IDMLFilter implements IFilter {
 			embeddedElements.put("Table", true);
 			embeddedElements.put("Footnote", true);
 			embeddedElements.put("Note", true);
+			// Create position holder for each
+			embeddedElementsPos = new HashMap<String, Integer>();
+			for ( String name : embeddedElements.keySet() ) {
+				embeddedElementsPos.put(name, -1);
+			}
 		}
 		catch ( Throwable e ) {
 			throw new OkapiIOException("Error initializing.\n"+e.getMessage(), e);
@@ -232,6 +237,7 @@ public class IDMLFilter implements IFilter {
 
 		// Adjust options
 		embeddedElements.put("Note", this.params.getExtractNotes());
+		embeddedElementsPos.put("Note", -1);
 		
 		// Gather the spreads
 		gatherStories();
@@ -386,8 +392,6 @@ public class IDMLFilter implements IFilter {
 			// Read the document in memory
 			Document doc = docBuilder.parse(zipFile.getInputStream(entry));
 			
-			// Real story id
-			
 			// Start the story group
 			StartGroup sg = new StartGroup(spreadIdGen.getLastId(), storyIdGen.createId());
 			sg.setName(storyId);
@@ -396,13 +400,18 @@ public class IDMLFilter implements IFilter {
 			queue.add(new Event(EventType.START_GROUP, sg));
 			
 			// Prepare for traversal
-			nodeCount = 0;
 			tuIdPrefix = storyId+"-";
 			ctx = new Stack<IDMLContext>();
 			refGen = new IdGenerator(null);
 			tuIdGen = new IdGenerator(null);
 			Node topNode = doc.getDocumentElement();
 			ctx.push(new IDMLContext(false, topNode));
+
+			// Reset the embedded elements position
+			for ( String name : embeddedElementsPos.keySet() ) {
+				embeddedElementsPos.put(name, -1);
+			}
+			
 			// Traverse the story
 			processNodes(topNode);
 			
@@ -437,7 +446,6 @@ public class IDMLFilter implements IFilter {
 			// Else: it's an element
 			Element elem = (Element)node;
 			String name = elem.getNodeName();
-			nodeCount++;
 			
 			// Process before the children
 			if ( name.equals("Content") ) {
@@ -453,17 +461,16 @@ public class IDMLFilter implements IFilter {
 				}
 			}
 			else if ( embeddedElements.containsKey(name) ) {
+				// Update the count for that element
+				embeddedElementsPos.put(name, embeddedElementsPos.get(name) + 1);
+				// Process the element
 				if ( ctx.peek().inScope() ) {
 					if ( embeddedElements.get(name) ) {
-						//TODO: extract
 						// Create the inline code that holds the reference
-//						String tuId = makeTuId();
-//						ctx.peek().addCode(new Code(TagType.PLACEHOLDER, name,
-//							TextFragment.makeRefMarker(tuId)));
 						String key = refGen.createId();
 						ctx.peek().addCode(new Code(TagType.PLACEHOLDER, name,
 							String.format("<%s id=\"%s\"/>", IDMLSkeleton.NODEREMARKER, key)));
-						ctx.peek().addReference(key, makeNodeReference(ctx.peek().getScopeNode(), node));
+						ctx.peek().addReference(key, makeNodeReference(node));
 						// Create the new context
 						ctx.push(new IDMLContext(true, node));
 					}
@@ -471,7 +478,7 @@ public class IDMLFilter implements IFilter {
 						String key = refGen.createId();
 						ctx.peek().addCode(new Code(TagType.PLACEHOLDER, name,
 							String.format("<%s id=\"%s\"/>", IDMLSkeleton.NODEREMARKER, key)));
-						ctx.peek().addReference(key, makeNodeReference(ctx.peek().getScopeNode(), node));
+						ctx.peek().addReference(key, makeNodeReference(node));
 						// Moves to the next sibling
 						node = elem.getNextSibling();
 						continue;
@@ -528,26 +535,9 @@ public class IDMLFilter implements IFilter {
 		}
 	}
 	
-	private NodeReference makeNodeReference (Node scopeNode,
-		Node targetNode)
-	{
-		Node node = targetNode;
+	private NodeReference makeNodeReference (Node targetNode) {
 		String name = targetNode.getNodeName();
-		int pos = 0;
-
-		while ( true ) {
-			Node tmp = node.getPreviousSibling();
-			if ( tmp == null ) node = node.getParentNode();
-			else node = tmp;
-			if ( node == scopeNode ) {
-				return new NodeReference(name, pos); // Done
-			}
-			if ( node.getNodeType() == Node.ELEMENT_NODE ) {
-				if ( node.getNodeName().equals(name) ) {
-					pos++;
-				}
-			}
-		}
+		return new NodeReference(name, embeddedElementsPos.get(name));
 	}
 	
 	private String makeTuId () {

@@ -40,7 +40,7 @@ public class IDMLContext {
 	private boolean inScope;
 	private Node topNode;
 	private Node scopeNode;
-	private Node contentNode;
+//	private Node contentNode;
 	private TextFragment tf;
 	private int status;
 	private boolean isReferent;
@@ -95,13 +95,13 @@ public class IDMLContext {
 	public boolean addToQueue (List<Event> queue) {
 		if ( tf.isEmpty() ) return false; // Skip empty entries
 		
-		if ( status == 1 ) {
-			// Only one content: no need for inline codes
-			// Reset the fragment to just the text
-			tf = new TextFragment(TextFragment.getText(tf.getCodedText()));
-			// Make the Content the top node
-			scopeNode = contentNode;
-		}
+//		if ( status == 1 ) {
+//			// Only one content: no need for inline codes
+//			// Reset the fragment to just the text
+//			tf = new TextFragment(TextFragment.getText(tf.getCodedText()));
+//			// Make the Content the top node
+//			scopeNode = contentNode;
+//		}
 		
 		// Create the text unit
 		TextUnit tu = new TextUnit(tuId, null, isReferent);
@@ -114,7 +114,8 @@ public class IDMLContext {
 		queue.add(new Event(EventType.TEXT_UNIT, tu));
 		// This object should not be called again
 		
-		return (status != 1);
+//		return (status != 1);
+		return true;
 	}
 	
 	/**
@@ -133,7 +134,7 @@ public class IDMLContext {
 			tf.append(TagType.CLOSING, "code", buildEndTag(elem));
 		}
 		status++;
-		contentNode = elem;
+//		contentNode = elem;
 	}
 	
 	public void addCode (Code code) {
