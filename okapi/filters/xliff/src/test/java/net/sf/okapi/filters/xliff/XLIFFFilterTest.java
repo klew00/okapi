@@ -878,6 +878,14 @@ public class XLIFFFilterTest {
 	}
 
 	@Test
+	public void testDoubelextractionFromDEDEtoENUS () {
+		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
+		list.add(new InputDocument(root+"OnTramTest01.xlf", null));
+		RoundTripComparison rtc = new RoundTripComparison();
+		assertTrue(rtc.executeCompare(filter, list, "UTF-8", LocaleId.fromString("de-de"), LocaleId.fromString("en-us")));
+	}
+
+	@Test
 	public void testDoubelextractionES () {
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
 		list.add(new InputDocument(root+"SF-12-Test01.xlf", null));
