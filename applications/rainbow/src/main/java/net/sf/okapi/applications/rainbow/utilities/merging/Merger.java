@@ -507,19 +507,17 @@ public class Merger {
 				}
 			}
 			if ( oriCode == null ) { // Not found in original (extra in target)
-				if (( transCode.getData() == null )
-					|| ( transCode.getData().length() == 0 )) {
+				if ( !transCode.hasData() ) {
 					// Leave it like that
 					logger.warning(String.format("The extra target code id='%d' does not have corresponding data (item id='%s', name='%s')",
 						transCode.getId(), tu.getId(), (tu.getName()==null ? "" : tu.getName())));
 				}
 			}
 			else { // Get the data from the original
-				if ( transCode.getOuterData() != null ) {
+				if ( oriCode.hasOuterData() ) {
 					transCode.setOuterData(oriCode.getOuterData());
 				}
-				else if (( transCode.getData() == null )
-					|| ( transCode.getData().length() == 0 )) {
+				else if ( !transCode.hasData() ) {
 					transCode.setData(oriCode.getData());
 				}
 				transCode.setReferenceFlag(oriCode.hasReference());

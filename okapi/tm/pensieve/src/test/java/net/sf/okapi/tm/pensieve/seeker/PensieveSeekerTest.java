@@ -217,6 +217,17 @@ public class PensieveSeekerTest {
     }
 
     @Test
+    public void searchOnInlineCodes () throws Exception {
+        PensieveWriter writer = getWriter();
+        TextFragment tf = new TextFragment("ABC");
+        tf.append(TagType.PLACEHOLDER, "br", "[br/]");
+        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(LocaleId.fromString("EN"), tf), TARGET));
+        writer.close();
+        tmhits = seeker.searchFuzzy(tf, 99, 10, null);
+//TOFIX        assertEquals(1, tmhits.size());
+    }
+
+    @Test
     public void searchOnNoiseAndShortWords () throws Exception {
         PensieveWriter writer = getWriter();
         String WORD = "from";

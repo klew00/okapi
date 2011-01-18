@@ -392,11 +392,20 @@ public class Code {
 	}
 	
 	/**
-	 * Indicates if this code has data.
-	 * @return true if this code has data. 
+	 * Indicates if this code has data (i.e. data is empty, as data is never null)
+	 * @return true if this code has data.
 	 */
 	public boolean hasData () {
-		return (data.length()>0);
+		// Data is never null
+		return ( data.length() > 0 );
+	}
+	
+	/**
+	 * Indicates if this code has outer data (i.e. outerData is not null and not empty)
+	 * @return true if this code has outer data.
+	 */
+	public boolean hasOuterData () {
+		return ( outerData!=null );
 	}
 	
 	/**
@@ -539,6 +548,7 @@ public class Code {
 	/**
 	 * Gets the outer data for this in-line code. If there is no outer data,
 	 * the inner data is returned (same as {@link #getData()}).
+	 * <p>Use {@link #hasOuterData()} to know if there is true outer data.
 	 * @return the outer data or, if there is none, the inner data.
 	 */
 	public String getOuterData () {
