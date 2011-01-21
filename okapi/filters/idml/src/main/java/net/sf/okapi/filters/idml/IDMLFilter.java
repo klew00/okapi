@@ -512,8 +512,15 @@ public class IDMLFilter implements IFilter {
 					String[] res = SIMPLIFIER.simplifyAll(tf, true);
 					// Move the native data into the skeleton if needed
 					if ( res != null ) {
-						IDMLSkeleton skel = (IDMLSkeleton)tu.getSkeleton();
-						skel.addMovedParts(res);
+						// Check if the new fragment is empty
+						if ( tu.getSource().isEmpty() ) {
+							// Remove from queue
+							queue.removeLast();
+						}
+						else {
+							IDMLSkeleton skel = (IDMLSkeleton)tu.getSkeleton();
+							skel.addMovedParts(res);
+						}
 					}
 				}
 				ctx.peek().leaveScope();

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -49,9 +49,6 @@ import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
-import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
@@ -59,18 +56,23 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
 @UsingParameters() // No parameters used
 public class MIFFilter implements IFilter {
 	
+	// Must be windows-1252 to allow proper auto-detection
+	private static final String DEFENCODING = "windows-1252";
 	private static final Hashtable<String, Character> charTable = initCharTable();
+	
+	private static final String TOPSTATEMENTSTOSKIP = "ColorCatalog;ConditionCatalog;BoolCondCatalog;"
+		+ "CombinedFontCatalog;PgfCatalog;ElementDefCatalog;FmtChangeListCatalog;DefAttrValuesCatalog;"
+		+ "AttrCondExprCatalog;FontCatalog;RulingCatalog;TblCatalog;KumihanCatalog;Views;VariableFormats;"
+		+ "MarkerTypeCatalog;XRefFormats;Document;BookComponent;InitialAutoNums;Dictionary;AFrames;Tbls;"
+		+ "Page";
 
 	private String docName;
 	private BufferedReader reader;
 	private StringBuilder tagBuffer;
 	private StringBuilder strBuffer;
-	private int inPara;
-	private int inString;
 	private int tuId;
 	private int otherId;
 	private int level;
-	private TextFragment cont;
 	private boolean canceled;
 	private LinkedList<Event> queue;
 	private LocaleId srcLang;
@@ -80,23 +82,25 @@ public class MIFFilter implements IFilter {
 	
 	private static Hashtable<String, Character> initCharTable () {
 		Hashtable<String, Character> table = new Hashtable<String, Character>();
-		table.put("HardSpace", '\u00a0');
-		table.put("DiscHyphen", '\u00ad');
-		table.put("NoHyphen", '\u200d');
 		table.put("Tab", '\t');
+		table.put("HardSpace", '\u00a0');
+		table.put("SoftHyphen", '\u2010'); // = Unicode Hyphen (not Soft-Hyphen)
+		table.put("HardHyphen", '\u2011'); // = Unicode Non-Breaking Hyphen
+		table.put("DiscHyphen", '\u00ad'); // = Unicode Soft-Hyphen
+		table.put("NoHyphen", '\u200d'); // = Unicode Zero-Width Joiner
 		table.put("Cent", '\u00a2');
 		table.put("Pound", '\u00a3');
 		table.put("Yen", '\u00a5');
 		table.put("EnDash", '\u2013');
-		table.put("Dagger", '\u2020');
 		table.put("EmDash", '\u2014');
+		table.put("Dagger", '\u2020');
 		table.put("DoubleDagger", '\u2021');
 		table.put("Bullet", '\u2022');
+		table.put("HardReturn", '\r');
 		table.put("NumberSpace", '\u2007');
 		table.put("ThinSpace", '\u2009');
 		table.put("EnSpace", '\u2002');
 		table.put("EmSpace", '\u2003');
-		table.put("HardReturn", '\r');
 		return table;
 	}
 
@@ -163,14 +167,14 @@ public class MIFFilter implements IFilter {
 		boolean generateSkeleton)
 	{
 		close();
-		
 		setOptions(input.getSourceLocale(), input.getTargetLocale(),
-			input.getEncoding(), generateSkeleton);
+			DEFENCODING, generateSkeleton);
 		
-		if (input.getInputURI() != null) {
+		if ( input.getInputURI() != null ) {
 			docName = input.getInputURI().getPath();
 		}
 		
+		input.setEncoding(DEFENCODING);
 		open(input.getStream());
 	}
 	
@@ -186,13 +190,10 @@ public class MIFFilter implements IFilter {
 		try {
 			// Detect encoding
 			String encoding = guessEncoding(input);
-			reader = new BufferedReader(
-				new InputStreamReader(input, encoding));
+			reader = new BufferedReader(new InputStreamReader(input, encoding));
 			tagBuffer = new StringBuilder();
 			strBuffer = new StringBuilder();
 			level = 0;
-			inPara = -1;
-			inString = -1;
 			tuId = 0;
 			otherId = 0;
 			canceled = false;
@@ -202,7 +203,8 @@ public class MIFFilter implements IFilter {
 			StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
 			startDoc.setName(docName);
 			startDoc.setLineBreak("\n");
-			startDoc.setEncoding(encoding, false); //TODO: UTF8 BOM detection
+			startDoc.setEncoding(encoding, false);
+			// We assume no BOM in all case for MIF
 			startDoc.setLocale(srcLang);
 			startDoc.setFilterParameters(getParameters());
 			startDoc.setFilterWriter(createFilterWriter());
@@ -216,9 +218,11 @@ public class MIFFilter implements IFilter {
 	}
 	
 	public void setFilterConfigurationMapper (IFilterConfigurationMapper fcMapper) {
+		// Not used
 	}
 
 	public void setParameters (IParameters params) {
+		// No parameters for now
 	}
 
 	public Event next () {
@@ -248,9 +252,11 @@ public class MIFFilter implements IFilter {
 		return new GenericFilterWriter(createSkeletonWriter(), getEncoderManager());
 	}
 
+	/**
+	 * Top-level read
+	 */
 	private void read () {
 		try {
-			// Process other calls
 			skel = new GenericSkeleton();
 			int c;
 			while ( (c = reader.read()) != -1 ) {
@@ -259,50 +265,60 @@ public class MIFFilter implements IFilter {
 					skel.append((char)c);
 					readComment();
 					break;
+					
 				case '<': // Start of statement
 					level++;
-					//skel.append((char)c);
-					String tag = readTag();
-					if ( "Para".equals(tag) ) {
-						inPara = level;
-						cont = new TextFragment();
-					}
-					else if ( "String".equals(tag) ) {
-						inString = level;
-					}
-					//TODO: inline
-					break;
-				case '>': // End of statement
-					if ( inString == level ) {
-						inString = -1;
-					}
-					else if ( inPara == level ) {
-						inPara = -1;
-						if ( !cont.isEmpty() ) {
-							TextUnit tu = new TextUnit(String.valueOf(++tuId));
-							tu.setSource(new TextContainer(cont));
-							tu.setMimeType("text/x-mif");
-							skel.addContentPlaceholder(tu);
-							tu.setSkeleton(skel);
-							queue.add(new Event(EventType.TEXT_UNIT, tu));
-							return;
-						}
-					}
 					skel.append((char)c);
+					String tag = readTag();
+					//TODO: dispatch according tags
+					if ( TOPSTATEMENTSTOSKIP.indexOf(tag) > -1 ) {
+						skipOverContent();
+					}
+					else if ( "TextFlow".equals(tag) ) {
+						processTextFlow();
+						return;
+					}
+					else {
+						// Default: skip over
+						skipOverContent();
+					}
+					// Flush the skeleton from time to time to allow very large files
+					queue.add(new Event(EventType.DOCUMENT_PART,
+						new DocumentPart(String.valueOf(++otherId), false),
+						skel));
+					return;
+					
+				case '>': // End of statement
+					skel.append((char)c);
+//					if ( inString == level ) {
+//						inString = -1;
+//					}
+//					else if ( inPara == level ) {
+//						inPara = -1;
+//						if ( !cont.isEmpty() ) {
+//							TextUnit tu = new TextUnit(String.valueOf(++tuId));
+//							tu.setSource(new TextContainer(cont));
+//							tu.setMimeType("text/x-mif");
+//							skel.addContentPlaceholder(tu);
+//							tu.setSkeleton(skel);
+//							queue.add(new Event(EventType.TEXT_UNIT, tu));
+//							return;
+//						}
+//					}
 					level--;
 					// Return skeleton
 					DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false, skel); 
 					queue.add(new Event(EventType.DOCUMENT_PART, dp));
 					return;
-				case '`':
-					if (( inPara > -1 ) && ( level == inString )) {
-						cont.append(processString());
-					}
-					else {
-						skel.append((char)c); // Store '`'
-						copyStringToStorage();
-					}
-					break;
+//				case '`':
+//					if (( inPara > -1 ) && ( level == inString )) {
+//						cont.append(processString());
+//					}
+//					else {
+//						skel.append((char)c); // Store '`'
+//						copyStringToStorage();
+//					}
+//					break;
 				default:
 					skel.append((char)c);
 					break;
@@ -321,6 +337,54 @@ public class MIFFilter implements IFilter {
 			new Ending(String.valueOf(++otherId))));
 	}
 
+	/**
+	 * Skips over the content of the current statement.
+	 * Normally "<token" has been processed and level for after '<'
+	 * @throws IOException if an error occurs.
+	 */
+	private void skipOverContent ()
+		throws IOException
+	{
+		int baseLevel = 1;
+		int c;
+		boolean inEscape = false;
+		boolean inString = false;
+		while ( (c = reader.read()) != -1 ) {
+			skel.append((char)c);
+			// Parse a string content
+			if ( inString ) {
+				if ( c == '\'' ) inString = false;
+				continue;
+			}
+			// Else: we are outside a string
+			if ( inEscape ) {
+				inEscape = false;
+			}
+			else {
+				switch ( c ) {
+				case '`':
+					inString = true;
+					break;
+				case '\\':
+					inEscape = true;
+					break;
+				case '<':
+					baseLevel++;
+					break;
+				case '>':
+					baseLevel--;
+					if ( baseLevel == 0 ) {
+						level--; 
+						return;
+					}
+					break;
+				}
+			}
+		}
+		// Unexpected end
+		throw new OkapiIllegalFilterOperationException("Unexpected end of input.");
+	}
+	
 	private void readComment () throws IOException {
 		int c;
 		while ( (c = reader.read()) != -1 ) {
@@ -331,6 +395,32 @@ public class MIFFilter implements IFilter {
 				return;
 			}
 		}
+		// A comment can end the file
+	}
+
+	private void processTextFlow ()
+		throws IOException
+	{
+		if ( readUntil("Para") ) {
+			
+		}
+		// else create a document part and return
+		queue.add(new Event(EventType.DOCUMENT_PART,
+			new DocumentPart(String.valueOf(++otherId), false),
+			skel));
+	}
+	
+	/**
+	 * Reads until the end of the current statement or the first occurrence of the given statement.
+	 * @param tagName the tag name of the statement.
+	 * @return true if the given tag was found, false otherwise.
+	 * @throws IOException 
+	 */
+	private boolean readUntil (String tagName)
+		throws IOException
+	{
+		skipOverContent();
+		return false;
 	}
 	
 	/**
@@ -350,7 +440,7 @@ public class MIFFilter implements IFilter {
 			case '\r':
 			case '\n':
 				// Let go for now
-				//buffer.append((char)c);
+				skel.add((char)c);
 				break;
 			case -1:
 			default:
@@ -447,11 +537,23 @@ public class MIFFilter implements IFilter {
 			// Read the start of the file to an array of bytes
 		
 			// Try to match the file signature with the pre-defined signatures
+			String signature = "";
+			
+			
+			if ( signature.equals("\u201C\u00FA\u2013\u007B\u0152\u00EA") ) {
+				// "Japanese" in Shift-JIS seen in Windows-1252 (coded in Unicode)
+				return "Shift_JIS";
+			}
+			else if ( signature.equals("\u00C6\u00FC\u00CB\u00DC\u00B8\u00EC") ) {
+				// "Japanse" in EUC seen in Windows-1252 (coded in Unicode)
+				return "EUC-JP";
+			}
+			
 		}
 		finally {
 			
 		}
-		return "UTF-8"; // No encoding detected: use UTF-8
+		return DEFENCODING;
 	}
 
 }

@@ -218,19 +218,20 @@ public class Simplifier {
 		// Checks for trailing code
 		ctext = tf.getCodedText(); // Reset the coded text because the indices may have changed
 		int last = ctext.length()-2;
-		switch ( ctext.charAt(last) ) {
-		case TextFragment.MARKER_ISOLATED:
-			// We can move it
-			code = tf.getCode(TextFragment.toIndex(ctext.charAt(last+1)));
-			// Store the data in the return value
-			res[1] = code.getOuterData();
-			// Remove the code from the fragment
-			tf.remove(last, last+2);
-			break;
+		if ( last > 0 ) {
+			switch ( ctext.charAt(last) ) {
+			case TextFragment.MARKER_ISOLATED:
+				// We can move it
+				code = tf.getCode(TextFragment.toIndex(ctext.charAt(last+1)));
+				// Store the data in the return value
+				res[1] = code.getOuterData();
+				// Remove the code from the fragment
+				tf.remove(last, last+2);
+				break;
+			}
 		}
 		return res;
 	}
-	
 	
 	/**
 	 * Simplifies all possible tags in a given text fragment.

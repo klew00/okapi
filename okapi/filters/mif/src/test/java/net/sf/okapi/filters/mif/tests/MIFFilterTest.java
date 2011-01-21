@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -22,26 +22,43 @@ package net.sf.okapi.filters.mif.tests;
 
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.FilterTestDriver;
+import net.sf.okapi.common.filters.InputDocument;
+import net.sf.okapi.common.filters.RoundTripComparison;
+import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.Event;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.mif.MIFFilter;
+
 import org.junit.Assert;
+
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MIFFilterTest {
 	
+	private LocaleId locEN = LocaleId.fromString("en");
+
+	private String root;
 	private MIFFilter filter;
 	
 	@Before
 	public void setUp() {
 		filter = new MIFFilter();
+		URL url = MIFFilterTest.class.getResource("/Test01.mif");
+		root = Util.getDirectoryName(url.getPath()) + File.separator;
 	}
 
 	@Test
@@ -54,25 +71,56 @@ public class MIFFilterTest {
 	}
 
 	@Test
-	public void runTest () {
-		FilterTestDriver testDriver;
-				
-		try {
-			testDriver = new FilterTestDriver();
-			testDriver.setShowSkeleton(false);
-			testDriver.setDisplayLevel(0);
-			URL url = MIFFilterTest.class.getResource("/Test01.mif");
-			filter.open(new RawDocument(new URI(url.toString()), "UTF-8",
-				LocaleId.fromString("en")));
-			if ( !testDriver.process(filter) ) Assert.fail();
-		}
-		catch ( Throwable e ) {
-			e.printStackTrace();
-			Assert.fail();
-		}
-		finally {
-			if ( filter != null ) filter.close();
-		}
+	public void testStartDocument () {
+		assertTrue("Problem in StartDocument", FilterTestDriver.testStartDocument(filter,
+			new InputDocument(root+"Test01.mif", null),
+			"UTF-8", locEN, locEN));
+	}
+
+	@Test
+	public void testSimpleText () {
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents("Test01.mif"), 1);
+//		assertNotNull(tu);
+//		assertEquals("Text1", tu.getSource().toString());
 	}
 	
+	@Test
+	public void testOutput () {
+		rewriteFile("Test01.mif");
+		rewriteFile("Test02-v9.mif");
+		rewriteFile("Test01-v7.mif");
+	}
+	
+	private void rewriteFile (String fileName) {
+		filter.open(new RawDocument(Util.toURI(root+fileName), "Window-1252", locEN));
+		IFilterWriter writer = filter.createFilterWriter();
+		writer.setOptions(locEN, "Windows-1252");
+		writer.setOutput(root+fileName+".out.mif");
+		while ( filter.hasNext() ) {
+			writer.handleEvent(filter.next());
+		}
+		writer.close();
+		filter.close();
+	}
+	
+	@Test
+	public void testDoubleExtraction () throws MalformedURLException {
+		// Read all files in the data directory
+		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
+		list.add(new InputDocument(root+"Test01.mif", null));
+		
+		RoundTripComparison rtc = new RoundTripComparison();
+		assertTrue(rtc.executeCompare(filter, list, "Windows-1252", locEN, locEN));
+	}
+
+	private ArrayList<Event> getEvents(String filename) {
+		ArrayList<Event> list = new ArrayList<Event>();
+		filter.open(new RawDocument(Util.toURI(root+filename), "UTF-8", locEN));
+		while (filter.hasNext()) {
+			Event event = filter.next();
+			list.add(event);
+		}
+		filter.close();
+		return list;
+	}
 }
