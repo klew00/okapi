@@ -38,6 +38,7 @@
 	<property name="dist_omtplugins" value="dist_omtplugins"/>
 	<property name="base_name" value="okapiFiltersForOmegaT"/>
 	<property name="distName" value="${base_name}-${okapilibStamp}"/>
+	<property name="zipName" value="okapi-pluginForOmegaT_all-platforms_${okapilibStamp}"/>
 
 	<tstamp>
 	 <format property="TODAY" pattern="MMM-dd-yyyy"/>
@@ -78,7 +79,7 @@
 	<replace file="${dist_omtplugins}/${base_name}-readme.html" token="@version@" value="${okapilibStamp}"/>
 	<replace file="${dist_omtplugins}/${base_name}-readme.html" token="@date@" value="${TODAY}"/>
 
-	<zip destfile="${done}/${distName}.zip" basedir="${dist_omtplugins}"/>
+	<zip destfile="${done}/${zipName}.zip" basedir="${dist_omtplugins}"/>
 
 	</target>
 	

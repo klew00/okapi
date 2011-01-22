@@ -3,7 +3,7 @@
 	<parent>
 		<artifactId>build-steps</artifactId>
 		<groupId>net.sf.okapi.steps</groupId>
-		<version>0.10-SNAPSHOT</version>
+		<version>0.10</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>okapi-step-xliffkit</artifactId>
@@ -188,74 +188,74 @@
 		<dependency>
 			<groupId>net.sf.okapi.filters</groupId>
 			<artifactId>okapi-filter-rtf</artifactId>
-			<version>0.10-SNAPSHOT</version>
+			<version>0.10</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.okapi.filters</groupId>
 			<artifactId>okapi-filter-dtd</artifactId>
-			<version>0.10-SNAPSHOT</version>
+			<version>0.10</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.okapi.filters</groupId>
 			<artifactId>okapi-filter-ts</artifactId>
-			<version>0.10-SNAPSHOT</version>
+			<version>0.10</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.okapi.filters</groupId>
 			<artifactId>okapi-filter-idml</artifactId>
-			<version>0.10-SNAPSHOT</version>
+			<version>0.10</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.okapi.filters</groupId>
 			<artifactId>okapi-filter-json</artifactId>
-			<version>0.10-SNAPSHOT</version>
+			<version>0.10</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.okapi.filters</groupId>
 			<artifactId>okapi-filter-php</artifactId>
-			<version>0.10-SNAPSHOT</version>
+			<version>0.10</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.okapi.filters</groupId>
 			<artifactId>okapi-filter-ttx</artifactId>
-			<version>0.10-SNAPSHOT</version>
+			<version>0.10</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.okapi.filters</groupId>
 			<artifactId>okapi-filter-railsyaml</artifactId>
-			<version>0.10-SNAPSHOT</version>
+			<version>0.10</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.okapi.filters</groupId>
 			<artifactId>okapi-filter-xmlstream</artifactId>
-			<version>0.10-SNAPSHOT</version>
+			<version>0.10</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.okapi.filters</groupId>
 			<artifactId>okapi-filter-versifiedtxt</artifactId>
-			<version>0.10-SNAPSHOT</version>
+			<version>0.10</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.okapi.lib</groupId>
 			<artifactId>okapi-lib-persistence</artifactId>
-			<version>0.10-SNAPSHOT</version>
+			<version>0.10</version>
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.okapi.lib</groupId>
 			<artifactId>okapi-lib-beans</artifactId>
-			<version>0.10-SNAPSHOT</version>
+			<version>0.10</version>
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>

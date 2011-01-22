@@ -18,8 +18,14 @@ mvn -PWIN_SWT -PWIN_64_SWT -PCOCOA_SWT -PCOCOA_64_SWT -PLinux_x86_swt -PLinux_x8
 
 --- 3) Make sure the following files have the proper version and release numbers for this release:
 
-- All the POM.XML files
+-- All the POM.XML files
+For example from M10-SNAPSHOT to M10:
+- go to /trunk
+- search is the are any existing <version>0.10</version>. If there are you'll need to remmember them and change them back manually when moving to M11-SNAPSHOT.
+- search all pom for <version>0.10-SNAPSHOT</version> and replace by <version>0.10</version>
+
 - trunk/deployment/shared/release.properties
+
 - The Change Log has its titles set with the proper versions
 
 --- 4) Make also sure the readme files are up-to-date:
@@ -54,6 +60,7 @@ Use the following summary, in this order (one by one to ensure the order!):
 
 Okapi Libraries for all platforms (GZIP)
 Okapi Libraries for all platforms (ZIP)
+Okapi Plugin for OmegaT for all platforms (ZIP)
 Okapi Applications for Macintosh Cocoa 64-bit (Includes Libraries)
 Okapi Applications for Macintosh Cocoa (Includes Libraries)
 Okapi Applications for Linux 64-bit (Includes Libraries)
