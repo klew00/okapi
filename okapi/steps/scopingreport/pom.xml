@@ -3,7 +3,7 @@
   <parent>
     <artifactId>build-steps</artifactId>
     <groupId>net.sf.okapi.steps</groupId>
-    <version>0.10</version>
+    <version>0.11-SNAPSHOT</version>
   </parent>
   <artifactId>okapi-step-scopingreport</artifactId>
   <name>Okapi Step for Scoping Report</name>
@@ -47,19 +47,19 @@
   	<dependency>
   		<groupId>net.sf.okapi.steps</groupId>
   		<artifactId>okapi-step-leveraging</artifactId>
-  		<version>0.10</version>
+  		<version>0.11-SNAPSHOT</version>
   		<scope>test</scope>
   	</dependency>
   	<dependency>
   		<groupId>net.sf.okapi.connectors</groupId>
   		<artifactId>okapi-connector-pensieve</artifactId>
-  		<version>0.10</version>
+  		<version>0.11-SNAPSHOT</version>
   		<scope>test</scope>
   	</dependency>
   	<dependency>
   		<groupId>net.sf.okapi.steps</groupId>
   		<artifactId>okapi-step-segmentation</artifactId>
-  		<version>0.10</version>
+  		<version>0.11-SNAPSHOT</version>
   		<scope>test</scope>
   	</dependency>
   </dependencies>
