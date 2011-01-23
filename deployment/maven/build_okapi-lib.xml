@@ -90,8 +90,8 @@
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi/filters/json/target/classes"
 			 excludes="**/META-INF/**"/>
-<!--			<fileset dir="../../okapi/filters/mif/target/classes"
-			 excludes="**/META-INF/**"/>-->
+			<fileset dir="../../okapi/filters/mif/target/classes"
+			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi/filters/mosestext/target/classes"
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi/filters/openoffice/target/classes"

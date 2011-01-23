@@ -32,8 +32,6 @@ import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.mif.MIFFilter;
 
-import org.junit.Assert;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -42,7 +40,6 @@ import org.junit.Test;
 
 import java.io.File;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -74,14 +71,19 @@ public class MIFFilterTest {
 	public void testStartDocument () {
 		assertTrue("Problem in StartDocument", FilterTestDriver.testStartDocument(filter,
 			new InputDocument(root+"Test01.mif", null),
-			"UTF-8", locEN, locEN));
+			null, locEN, locEN));
 	}
 
 	@Test
 	public void testSimpleText () {
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents("Test01.mif"), 1);
-//		assertNotNull(tu);
-//		assertEquals("Text1", tu.getSource().toString());
+		List<Event> list = getEvents("Test01.mif");
+		TextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertNotNull(tu);
+		assertEquals("Line 1\nLine 2", tu.getSource().toString());
+		
+		tu = FilterTestDriver.getTextUnit(list, 2);
+		assertNotNull(tu);
+		assertEquals("\u00e0=agrave", tu.getSource().toString());
 	}
 	
 	@Test
@@ -92,9 +94,9 @@ public class MIFFilterTest {
 	}
 	
 	private void rewriteFile (String fileName) {
-		filter.open(new RawDocument(Util.toURI(root+fileName), "Window-1252", locEN));
+		filter.open(new RawDocument(Util.toURI(root+fileName), null, locEN));
 		IFilterWriter writer = filter.createFilterWriter();
-		writer.setOptions(locEN, "Windows-1252");
+		writer.setOptions(locEN, null);
 		writer.setOutput(root+fileName+".out.mif");
 		while ( filter.hasNext() ) {
 			writer.handleEvent(filter.next());
@@ -110,12 +112,12 @@ public class MIFFilterTest {
 		list.add(new InputDocument(root+"Test01.mif", null));
 		
 		RoundTripComparison rtc = new RoundTripComparison();
-		assertTrue(rtc.executeCompare(filter, list, "Windows-1252", locEN, locEN));
+		assertTrue(rtc.executeCompare(filter, list, null, locEN, locEN));
 	}
 
-	private ArrayList<Event> getEvents(String filename) {
+	private ArrayList<Event> getEvents (String filename) {
 		ArrayList<Event> list = new ArrayList<Event>();
-		filter.open(new RawDocument(Util.toURI(root+filename), "UTF-8", locEN));
+		filter.open(new RawDocument(Util.toURI(root+filename), null, locEN));
 		while (filter.hasNext()) {
 			Event event = filter.next();
 			list.add(event);

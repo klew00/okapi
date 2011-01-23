@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -42,13 +43,14 @@ import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
-import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
@@ -56,9 +58,12 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
 @UsingParameters() // No parameters used
 public class MIFFilter implements IFilter {
 	
+	private final Logger logger = Logger.getLogger(getClass().getName());
+
 	// Must be windows-1252 to allow proper auto-detection
-	private static final String DEFENCODING = "windows-1252";
-	private static final Hashtable<String, Character> charTable = initCharTable();
+	public static final String DEFENCODING = "UTF-8"; // String in MIF 9 are UTF-8 according documentation
+	
+	private static final Hashtable<String, String> charTable = initCharTable();
 	
 	private static final String TOPSTATEMENTSTOSKIP = "ColorCatalog;ConditionCatalog;BoolCondCatalog;"
 		+ "CombinedFontCatalog;PgfCatalog;ElementDefCatalog;FmtChangeListCatalog;DefAttrValuesCatalog;"
@@ -72,42 +77,44 @@ public class MIFFilter implements IFilter {
 	private StringBuilder strBuffer;
 	private int tuId;
 	private int otherId;
-	private int level;
 	private boolean canceled;
 	private LinkedList<Event> queue;
 	private LocaleId srcLang;
 	private GenericSkeleton skel;
 	private boolean hasNext;
 	private EncoderManager encoderManager;
+	private boolean inTextFlow;
 	
-	private static Hashtable<String, Character> initCharTable () {
-		Hashtable<String, Character> table = new Hashtable<String, Character>();
-		table.put("Tab", '\t');
-		table.put("HardSpace", '\u00a0');
-		table.put("SoftHyphen", '\u2010'); // = Unicode Hyphen (not Soft-Hyphen)
-		table.put("HardHyphen", '\u2011'); // = Unicode Non-Breaking Hyphen
-		table.put("DiscHyphen", '\u00ad'); // = Unicode Soft-Hyphen
-		table.put("NoHyphen", '\u200d'); // = Unicode Zero-Width Joiner
-		table.put("Cent", '\u00a2');
-		table.put("Pound", '\u00a3');
-		table.put("Yen", '\u00a5');
-		table.put("EnDash", '\u2013');
-		table.put("EmDash", '\u2014');
-		table.put("Dagger", '\u2020');
-		table.put("DoubleDagger", '\u2021');
-		table.put("Bullet", '\u2022');
-		table.put("HardReturn", '\r');
-		table.put("NumberSpace", '\u2007');
-		table.put("ThinSpace", '\u2009');
-		table.put("EnSpace", '\u2002');
-		table.put("EmSpace", '\u2003');
+	private static Hashtable<String, String> initCharTable () {
+		Hashtable<String, String> table = new Hashtable<String, String>();
+		table.put("Tab", "\t");
+		table.put("HardSpace", "\u00a0"); // = Unicode non-breaking space
+		table.put("SoftHyphen", ""); // "\u2010" = Unicode Hyphen (not Soft-Hyphen), but we remove those
+		table.put("HardHyphen", "\u2011"); // = Unicode Non-Breaking Hyphen
+		table.put("DiscHyphen", "\u00ad"); // = Unicode Soft-Hyphen
+		table.put("NoHyphen", "\u200d"); // = Unicode Zero-Width Joiner
+		table.put("Cent", "\u00a2");
+		table.put("Pound", "\u00a3");
+		table.put("Yen", "\u00a5");
+		table.put("EnDash", "\u2013");
+		table.put("EmDash", "\u2014");
+		table.put("Dagger", "\u2020");
+		table.put("DoubleDagger", "\u2021");
+		table.put("Bullet", "\u2022");
+		table.put("HardReturn", "\n");
+		table.put("NumberSpace", "\u2007");
+		table.put("ThinSpace", "\u2009");
+		table.put("EnSpace", "\u2002");
+		table.put("EmSpace", "\u2003");
 		return table;
 	}
 
+	@Override
 	public void cancel () {
 		canceled = true;
 	}
 
+	@Override
 	public void close () {
 		try {
 			if ( reader != null ) {
@@ -121,18 +128,22 @@ public class MIFFilter implements IFilter {
 		}
 	}
 
+	@Override
 	public String getName () {
 		return "okf_mif";
 	}
 	
+	@Override
 	public String getDisplayName () {
 		return "MIF Filter (Pre-ALPHA don't even try)";
 	}
 
+	@Override
 	public String getMimeType () {
 		return MimeTypeMapper.MIF_MIME_TYPE;
 	}
 
+	@Override
 	public List<FilterConfiguration> getConfigurations () {
 		List<FilterConfiguration> list = new ArrayList<FilterConfiguration>();
 		list.add(new FilterConfiguration(getName(),
@@ -143,6 +154,7 @@ public class MIFFilter implements IFilter {
 		return list;
 	}
 	
+	@Override
 	public EncoderManager getEncoderManager () {
 		if ( encoderManager == null ) {
 			encoderManager = new EncoderManager();
@@ -151,18 +163,22 @@ public class MIFFilter implements IFilter {
 		return encoderManager;
 	}
 
+	@Override
 	public IParameters getParameters () {
 		return null;
 	}
 
+	@Override
 	public boolean hasNext () {
 		return hasNext;
 	}
 
+	@Override
 	public void open (RawDocument input) {
 		open(input, true);
 	}
 	
+	@Override
 	public void open (RawDocument input,
 		boolean generateSkeleton)
 	{
@@ -193,11 +209,11 @@ public class MIFFilter implements IFilter {
 			reader = new BufferedReader(new InputStreamReader(input, encoding));
 			tagBuffer = new StringBuilder();
 			strBuffer = new StringBuilder();
-			level = 0;
 			tuId = 0;
 			otherId = 0;
 			canceled = false;
 			hasNext = true;
+			inTextFlow = false;
 			
 			queue = new LinkedList<Event>();
 			StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
@@ -217,14 +233,17 @@ public class MIFFilter implements IFilter {
 		}
 	}
 	
+	@Override
 	public void setFilterConfigurationMapper (IFilterConfigurationMapper fcMapper) {
 		// Not used
 	}
 
+	@Override
 	public void setParameters (IParameters params) {
 		// No parameters for now
 	}
 
+	@Override
 	public Event next () {
 		// Treat cancel
 		if ( canceled ) {
@@ -244,12 +263,14 @@ public class MIFFilter implements IFilter {
 		return queue.poll();
 	}
 
+	@Override
 	public ISkeletonWriter createSkeletonWriter () {
 		return new GenericSkeletonWriter();
 	}
-	
+
+	@Override
 	public IFilterWriter createFilterWriter () {
-		return new GenericFilterWriter(createSkeletonWriter(), getEncoderManager());
+		return new MIFFilterWriter(createSkeletonWriter(), getEncoderManager());
 	}
 
 	/**
@@ -259,20 +280,26 @@ public class MIFFilter implements IFilter {
 		try {
 			skel = new GenericSkeleton();
 			int c;
+			
+			// Check if we are still processing a TextFlow 
+			if ( inTextFlow ) {
+				processTextFlow();
+				return;
+			}
+			
 			while ( (c = reader.read()) != -1 ) {
 				switch ( c ) {
 				case '#':
 					skel.append((char)c);
-					readComment();
+					readComment(true);
 					break;
 					
 				case '<': // Start of statement
-					level++;
 					skel.append((char)c);
-					String tag = readTag();
+					String tag = readTag(true);
 					//TODO: dispatch according tags
 					if ( TOPSTATEMENTSTOSKIP.indexOf(tag) > -1 ) {
-						skipOverContent();
+						skipOverContent(true);
 					}
 					else if ( "TextFlow".equals(tag) ) {
 						processTextFlow();
@@ -280,7 +307,7 @@ public class MIFFilter implements IFilter {
 					}
 					else {
 						// Default: skip over
-						skipOverContent();
+						skipOverContent(true);
 					}
 					// Flush the skeleton from time to time to allow very large files
 					queue.add(new Event(EventType.DOCUMENT_PART,
@@ -290,35 +317,10 @@ public class MIFFilter implements IFilter {
 					
 				case '>': // End of statement
 					skel.append((char)c);
-//					if ( inString == level ) {
-//						inString = -1;
-//					}
-//					else if ( inPara == level ) {
-//						inPara = -1;
-//						if ( !cont.isEmpty() ) {
-//							TextUnit tu = new TextUnit(String.valueOf(++tuId));
-//							tu.setSource(new TextContainer(cont));
-//							tu.setMimeType("text/x-mif");
-//							skel.addContentPlaceholder(tu);
-//							tu.setSkeleton(skel);
-//							queue.add(new Event(EventType.TEXT_UNIT, tu));
-//							return;
-//						}
-//					}
-					level--;
 					// Return skeleton
 					DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false, skel); 
 					queue.add(new Event(EventType.DOCUMENT_PART, dp));
 					return;
-//				case '`':
-//					if (( inPara > -1 ) && ( level == inString )) {
-//						cont.append(processString());
-//					}
-//					else {
-//						skel.append((char)c); // Store '`'
-//						copyStringToStorage();
-//					}
-//					break;
 				default:
 					skel.append((char)c);
 					break;
@@ -326,7 +328,7 @@ public class MIFFilter implements IFilter {
 			}
 			
 			Ending ending = new Ending(String.valueOf(++otherId)); 
-			queue.add(new Event(EventType.END_DOCUMENT, ending));
+			queue.add(new Event(EventType.END_DOCUMENT, ending, skel));
 		}
 		catch ( IOException e ) {
 			throw new OkapiIOException(e);
@@ -340,9 +342,10 @@ public class MIFFilter implements IFilter {
 	/**
 	 * Skips over the content of the current statement.
 	 * Normally "<token" has been processed and level for after '<'
+	 * @param store true to store in the skeleton
 	 * @throws IOException if an error occurs.
 	 */
-	private void skipOverContent ()
+	private void skipOverContent (boolean store)
 		throws IOException
 	{
 		int baseLevel = 1;
@@ -350,7 +353,7 @@ public class MIFFilter implements IFilter {
 		boolean inEscape = false;
 		boolean inString = false;
 		while ( (c = reader.read()) != -1 ) {
-			skel.append((char)c);
+			if ( store ) skel.append((char)c);
 			// Parse a string content
 			if ( inString ) {
 				if ( c == '\'' ) inString = false;
@@ -374,7 +377,6 @@ public class MIFFilter implements IFilter {
 				case '>':
 					baseLevel--;
 					if ( baseLevel == 0 ) {
-						level--; 
 						return;
 					}
 					break;
@@ -385,10 +387,12 @@ public class MIFFilter implements IFilter {
 		throw new OkapiIllegalFilterOperationException("Unexpected end of input.");
 	}
 	
-	private void readComment () throws IOException {
+	private void readComment (boolean store)
+		throws IOException
+	{
 		int c;
 		while ( (c = reader.read()) != -1 ) {
-			skel.append((char)c);
+			if ( store ) skel.append((char)c);
 			switch ( c ) {
 			case '\r':
 			case '\n':
@@ -398,29 +402,188 @@ public class MIFFilter implements IFilter {
 		// A comment can end the file
 	}
 
+	/**
+	 * Process the first or next entry of a TextFlow statement.
+	 * @throws IOException if a low-level error occurs.
+	 */
 	private void processTextFlow ()
 		throws IOException
 	{
-		if ( readUntil("Para") ) {
-			
+		// Process one Para statement at a time
+		if ( readUntil("Para", true) != null ) {
+			processPara();
+			inTextFlow = true; // We are not done yet with this TextFlow statement
 		}
-		// else create a document part and return
-		queue.add(new Event(EventType.DOCUMENT_PART,
-			new DocumentPart(String.valueOf(++otherId), false),
-			skel));
+		else { // Done
+			inTextFlow = false; // We are done
+		}
+		
+		// If needed, create a document part and return
+		if ( !skel.isEmpty() ) {
+			queue.add(new Event(EventType.DOCUMENT_PART,
+				new DocumentPart(String.valueOf(++otherId), false),
+				skel));
+		}
+	}
+
+	private void processPara ()
+		throws IOException
+	{
+		TextFragment tf = new TextFragment();
+		
+		// Process all ParaLine statements
+		while ( true ) {
+			if ( readUntil("ParaLine", true) == null ) break;
+			// Else: process the ParaLine statement
+			processParaLine(tf);
+		}
+
+		if ( !tf.isEmpty() ) {
+			// Add the text unit to the queue
+			TextUnit tu = new TextUnit(String.valueOf(++tuId));
+			tu.setPreserveWhitespaces(true);
+			tu.setSourceContent(tf);
+			queue.add(new Event(EventType.TEXT_UNIT, tu, skel));
+			// New skeleton object for the next parts of the parent statement
+			skel = new GenericSkeleton();
+		}
+	}
+	
+	private void processParaLine (TextFragment tf)
+		throws IOException
+	{
+		String tag;
+		while ( true ) {
+			if ( (tag = readUntil("String;Char", true)) == null ) break;
+			if ( "String".equals(tag) ) {
+				String text = processString(true);
+				tf.append(text);
+			}
+			else if ( "Char".equals(tag) ) {
+				MIFToken token = processChar(true);
+				tf.append(token.toString());
+			}
+		}
+	}
+
+	private MIFToken getNextTokenInStatement (boolean store)
+		throws IOException
+	{
+		int n;
+		boolean leadingWSDone = false;
+		do {
+			switch ( n = reader.read() ) {
+			case ' ':
+			case '\t':
+			case '\r':
+			case '\n':
+				if ( store ) skel.add((char)n);
+				break;
+			case -1:
+				throw new OkapiIllegalFilterOperationException("Unexpected end of input.");
+			default:
+				if ( store ) skel.add((char)n);
+				leadingWSDone = true;
+				break;
+			}
+		}
+		while ( !leadingWSDone );
+		
+		StringBuilder tmp = new StringBuilder();
+		tmp.append((char)n);
+		do {
+			n = reader.read();
+			if ( store ) skel.add((char)n);
+			switch ( n ) {
+			case ' ':
+			case '\t':
+			case '\r':
+			case '\n':
+			case '>': // End of statement
+				MIFToken token = new MIFToken(tmp.toString());
+				token.setLast(n == '>');
+				return token;
+			case -1:
+				throw new OkapiIllegalFilterOperationException("Unexpected end of input.");
+			default:
+				tmp.append((char)n);
+				break;
+			}
+		}
+		while ( true );
+	}
+	
+	private MIFToken processChar (boolean store)
+		throws IOException
+	{
+		//skipOverContent(store);
+		
+		// Get the next token: the name of the character
+		MIFToken token = getNextTokenInStatement(store);
+		if ( !token.isLast() ) {
+			skipOverContent(store);
+		}
+		
+		// Default return is also a token
+		MIFToken chToken = new MIFToken();
+		// Map the character to its string, if possible
+		if ( token.getType() == MIFToken.MIFTOKEN_STRING ) {
+			String str = charTable.get(token.getString());
+			if ( str == null ) {
+				logger.warning(String.format("Unknow character name '%s'. This character will be ignored.", token));
+			}
+			else {
+				chToken.setString(str); 
+			}
+		}
+		else {
+			// Invalid statement
+			logger.warning("Unexpected token is Char statement. This character will be ignored.");
+		}
+		return chToken;
 	}
 	
 	/**
 	 * Reads until the end of the current statement or the first occurrence of the given statement.
-	 * @param tagName the tag name of the statement.
-	 * @return true if the given tag was found, false otherwise.
-	 * @throws IOException 
+	 * @param tagNames the list of tag names to stop at.
+	 * @param store true if we store the parsed characters into the skeleton.
+	 * @return the name of the tag found, or null if none was found.
+	 * @throws IOException if a low-level error occurs.
 	 */
-	private boolean readUntil (String tagName)
+	private String readUntil (String tagNames,
+		boolean store)
 		throws IOException
 	{
-		skipOverContent();
-		return false;
+		int c;
+		int baseLevel = 1;
+		while ( (c = reader.read()) != -1 ) {
+			if ( store ) skel.append((char)c);
+			switch ( c ) {
+			case '#':
+				readComment(true);
+				break;
+				
+			case '<': // Start of statement
+				baseLevel++;
+				String tag = readTag(store);
+				if ( tagNames.indexOf(tag) > -1 ) {
+					return tag;
+				}
+				else { // Default: skip over
+					skipOverContent(store);
+					baseLevel--;
+				}
+				break;
+				
+			case '>': // End of statement
+				baseLevel--;
+				if ( baseLevel == 0 ) {
+					return null;
+				}
+				break;
+			}
+		}
+		return null;
 	}
 	
 	/**
@@ -428,7 +591,9 @@ public class MIFFilter implements IFilter {
 	 * @return The name of the tag.
 	 * @throws IOException
 	 */
-	private String readTag () throws IOException {
+	private String readTag (boolean store)
+		throws IOException
+	{
 		tagBuffer.setLength(0);
 		int c;
 		boolean leadingWSDone = false;
@@ -457,8 +622,10 @@ public class MIFFilter implements IFilter {
 			case '\t':
 			case '\r':
 			case '\n':
-				skel.append(tagBuffer.toString());
-				skel.append((char)c);
+				if ( store ) {
+					skel.append(tagBuffer.toString());
+					skel.append((char)c);
+				}
 				return tagBuffer.toString();
 			case -1:
 				throw new OkapiIllegalFilterOperationException("Unexpected end of input.");
@@ -470,59 +637,58 @@ public class MIFFilter implements IFilter {
 		}
 	}
 	
-	void copyStringToStorage () throws IOException {
-		int c;
-		boolean inEscape = false;
-		while ( (c = reader.read()) != -1 ) {
-			skel.append((char)c);
-			if ( inEscape ) {
-				inEscape = false;
-			}
-			else {
-				if ( c == '\'' ) return;
-			}
-		}
-		// Else: Missing end of string error
-		throw new OkapiIllegalFilterOperationException("End of string is missing.");
-	}
-	
-	String processString () throws IOException {
+	private String processString (boolean store)
+		throws IOException
+	{
 		strBuffer.setLength(0);
 		int c;
+		boolean inString = false;
 		boolean inEscape = false;
 		while ( (c = reader.read()) != -1 ) {
-			if ( inEscape ) {
-				switch ( c ) {
-				case '\\':
-				case '>':
-					strBuffer.append((char)c);
-					break;
-				case 't':
-					strBuffer.append('\t');
-					break;
-				case 'Q':
-					strBuffer.append('`');
-					break;
-				case 'q':
-					strBuffer.append('\'');
-					break;
-				case 'u':
-				case 'x':
-					//TODO: parse escaped U and X styled chars
-					break;
+			if ( store ) skel.append((char)c);
+			if ( inString ) {
+				if ( inEscape ) {
+					switch ( c ) {
+					case '\\':
+					case '>':
+						strBuffer.append((char)c);
+						break;
+					case 't':
+						strBuffer.append('\t');
+						break;
+					case 'Q':
+						strBuffer.append('`');
+						break;
+					case 'q':
+						strBuffer.append('\'');
+						break;
+					case 'u':
+					case 'x':
+						//TODO: parse escaped U and X styled chars
+						break;
+					}
+					inEscape = false;
 				}
-				inEscape = false;
+				else {
+					switch ( c ) {
+					case '\'': // End of string
+						inString = false;
+					case '\\':
+						inEscape = true;
+						break;
+					default:
+						strBuffer.append((char)c);
+						break;
+					}
+				}
 			}
-			else {
+			else { // Not yet in string
 				switch ( c ) {
-				case '\'': // End of string
+				case '`':
+					inString = true;
+					break;
+				case '>':
 					return strBuffer.toString();
-				case '\\':
-					inEscape = true;
-					break;
-				default:
-					strBuffer.append((char)c);
-					break;
 				}
 			}
 		}
