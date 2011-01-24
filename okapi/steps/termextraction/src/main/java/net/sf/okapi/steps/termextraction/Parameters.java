@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -23,6 +23,7 @@ package net.sf.okapi.steps.termextraction;
 import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.ParametersDescription;
+import net.sf.okapi.common.ReferenceParameter;
 import net.sf.okapi.common.uidescription.EditorDescription;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 import net.sf.okapi.common.uidescription.PathInputPart;
@@ -91,6 +92,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.minOccurrences = minOccurrences;
 	}
 
+	@ReferenceParameter
 	public String getStopWordsPath () {
 		return stopWordsPath;
 	}
@@ -99,6 +101,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.stopWordsPath = stopWordsPath;
 	}
 
+	@ReferenceParameter
 	public String getNotStartWordsPath () {
 		return notStartWordsPath;
 	}
@@ -107,6 +110,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.notStartWordsPath = notStartWordsPath;
 	}
 
+	@ReferenceParameter
 	public String getNotEndWordsPath () {
 		return notEndWordsPath;
 	}
