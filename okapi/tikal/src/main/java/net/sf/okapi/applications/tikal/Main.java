@@ -96,6 +96,7 @@ public class Main {
 	protected final static int CMD_EXTRACTTOMOSES = 9;
 	protected final static int CMD_LEVERAGEMOSES = 10;
 	protected final static int CMD_SEGMENTATION = 11;
+	protected final static int CMD_SHOWCONFIGS = 12;
 	
 	private static final String DEFAULT_SEGRULES = "-";
 	private static final String MSG_ONLYWITHUICOMP = "UI-based commands are available only in the distributions with UI components.";
@@ -392,8 +393,7 @@ public class Main {
 					}
 				}
 				else if ( arg.endsWith("-listconf") || arg.equals("-lfc") ) {
-					prog.showAllConfigurations();
-					return;
+					prog.command = CMD_SHOWCONFIGS;
 				}
 				else if ( arg.equals("-s") ) {
 					prog.command = CMD_SEGMENTATION;
@@ -442,6 +442,10 @@ public class Main {
 				else {
 					prog.editConfiguration();
 				}
+				return;
+			}
+			if ( prog.command == CMD_SHOWCONFIGS ) {
+				prog.showAllConfigurations();
 				return;
 			}
 			if ( prog.command == CMD_QUERYTRANS ) {
@@ -642,9 +646,9 @@ public class Main {
 	private void showAllConfigurations () {
 		initialize();
 		DefaultFilters.setMappings(fcMapper, true, true);
-		// Add the Pensieve filter to the list (for now)
-		// The filter may be added in the default list at some point, but is not yet.
-		fcMapper.addConfigurations(filtersMap.get("okf_pensieve"));
+		loadFromPluginsAndUpdate();
+		// Add the custom configurations
+		fcMapper.updateCustomConfigurations();
 
 		ps.println("List of all filter configurations available:");
 		Iterator<FilterConfiguration> iter = fcMapper.getAllConfigurations();

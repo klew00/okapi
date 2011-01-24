@@ -468,7 +468,7 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 		fc.parametersLocation = fc.configId + CONFIGFILE_EXT;
 		fc.filterClass = tmpFilter.getClass().getName();
 		fc.mimeType = tmpFilter.getMimeType();
-		fc.description = "Configuration for "+fc.configId; // Temporary
+		fc.description = "Configuration "+fc.configId; // Temporary
 		fc.name = fc.configId; // Temporary
 		addConfiguration(fc);
 	}
