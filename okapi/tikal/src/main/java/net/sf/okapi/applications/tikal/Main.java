@@ -142,7 +142,8 @@ public class Main {
 	protected String tmOptions;
 	protected boolean levOptFillTarget = true;
 	protected String levOptTMXPath;
-	protected boolean extOptNoCopy = false; // Copy source in empty target by default
+	protected boolean extOptCopy = true; // Copy source in empty target by default
+	protected boolean extOptAltTrans = true; // Output alt-trans by default
 	protected boolean mosesCopyToTarget = false;
 	protected boolean mosesOverwriteTarget = false;
 	protected boolean moses2Outputs = false;
@@ -294,7 +295,10 @@ public class Main {
 					prog.levOptFillTarget = false;
 				}
 				else if ( arg.equals("-nocopy") ) {
-					prog.extOptNoCopy = true;
+					prog.extOptCopy = false;
+				}
+				else if ( arg.equals("-noalttrans") ) {
+					prog.extOptAltTrans = false;
 				}
 				else if ( arg.equals("-maketmx") ) {
 					prog.levOptTMXPath = "pretrans.tmx";
@@ -977,7 +981,7 @@ public class Main {
 		ps.println("      [-tl trgLang] [-seg [srxFile]] [-tt hostname[:port]-mm key");
 		ps.println("      |-pen tmDirectory|-gs configFile|-google|-apertium [serverURL]");
 		ps.println("      |-ms configFile|-tda configFile] [-maketmx [tmxFile]] [-opt threshold]");
-		ps.println("      [-nocopy]");
+		ps.println("      [-nocopy] [-noalttrans]");
 		ps.println("Merges an XLIFF document back to its original format:");
 		ps.println("   -m xliffFile [xliffFile2...] [-fc configId] [-ie encoding]");
 		ps.println("      [-oe encoding] [-sl srcLang] [-tl trgLang]");
@@ -1326,7 +1330,8 @@ public class Main {
 		// Filter events to raw document final step (using the XLIFF writer)
 		FilterEventsWriterStep fewStep = new FilterEventsWriterStep();
 		XLIFFWriter writer = new XLIFFWriter();
-		writer.setCopySource(!extOptNoCopy);
+		writer.setCopySource(extOptCopy);
+		writer.setIncludeAltTrans(extOptAltTrans);
 		fewStep.setFilterWriter(writer);
 		fewStep.setDocumentRoots(System.getProperty("user.dir"));
 		driver.addStep(fewStep);
