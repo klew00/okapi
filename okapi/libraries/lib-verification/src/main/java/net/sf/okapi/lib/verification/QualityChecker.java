@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -270,7 +270,7 @@ class QualityChecker {
 			}
 			
 			// Check length
-			if ( params.getCheckMaxCharLength() || params.getCheckMinCharLength() ) {
+			if ( params.getCheckMaxCharLength() || params.getCheckMinCharLength() || params.getCheckAbsoluteMaxCharLength() ) {
 				checkLengths(srcSeg, trgSeg, tu);
 			}
 			
@@ -615,6 +615,16 @@ class QualityChecker {
 		int srcLen = TextUnitUtil.getText(srcSeg.text, null).length();
 		int trgLen = TextUnitUtil.getText(trgSeg.text, null).length();
 		int n;
+		
+		if ( params.getCheckAbsoluteMaxCharLength() ) {
+			if ( trgLen > params.getAbsoluteMaxCharLength() ) {
+				n = trgLen-params.getAbsoluteMaxCharLength();
+				reportIssue(IssueType.TARGET_LENGTH, tu, srcSeg.getId(),
+					String.format("The target is longer than %d (by %d).", params.getAbsoluteMaxCharLength(), n),
+					0, -1, params.getAbsoluteMaxCharLength(), trgLen, Issue.SEVERITY_HIGH, 
+					srcSeg.toString(), trgSeg.toString(), null);
+			}
+		}
 		
 		if ( params.getCheckMaxCharLength() ) {
 			if ( srcLen <= params.getMaxCharLengthBreak() ) {

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -123,6 +123,8 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Button chkTranslateLTMsg;
 	private Text edLTTranslationSource;
 	private Text edLTTranslationTarget;
+	private Button chkAbsoluteMaxCharLength;
+	private Spinner spAbsoluteMaxCharLength;
 	private Button chkMaxCharLength;
 	private Composite cmpMaxCharLength;
 	private Spinner spMaxCharLengthBreak;
@@ -363,7 +365,24 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		cmpTmp.setLayout(new GridLayout());
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		cmpTmp.setLayoutData(gdTmp);
+		
+		chkAbsoluteMaxCharLength = new Button(cmpTmp, SWT.CHECK);
+		chkAbsoluteMaxCharLength.setText("Warn if a target is longer than:");
+		chkAbsoluteMaxCharLength.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				updateAbsoluteMaxCharLength();
+			};
+		});
+		
+		spAbsoluteMaxCharLength = new Spinner(cmpTmp, SWT.BORDER);
+		gdTmp = new GridData();
+		gdTmp.widthHint = 70;
+		gdTmp.horizontalIndent = horizIndent;
+		spAbsoluteMaxCharLength.setLayoutData(gdTmp);
+		spAbsoluteMaxCharLength.setMaximum(99999);
+		spAbsoluteMaxCharLength.setMinimum(0);
 
+		
 		chkMaxCharLength = new Button(cmpTmp, SWT.CHECK);
 		chkMaxCharLength.setText("Warn if a target is longer than the given percentage of the character length of its source:");
 		chkMaxCharLength.addSelectionListener(new SelectionAdapter() {
@@ -1190,6 +1209,11 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		chkTargetSameAsSourceWithCodes.setEnabled(chkTargetSameAsSource.getSelection());
 	}
 
+	private void updateAbsoluteMaxCharLength () {
+		boolean enabled = chkAbsoluteMaxCharLength.getSelection();
+		spAbsoluteMaxCharLength.setEnabled(enabled);
+	}
+
 	private void updateMaxCharLength () {
 		boolean enabled = chkMaxCharLength.getSelection();
 		for ( Control ctrl : cmpMaxCharLength.getChildren() ) {
@@ -1259,6 +1283,9 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		edDoubledWordExceptions.setText(params.getDoubledWordExceptions());
 		chkCorruptedChars.setSelection(params.getCorruptedCharacters());
 
+		chkAbsoluteMaxCharLength.setSelection(params.getCheckAbsoluteMaxCharLength());
+		spAbsoluteMaxCharLength.setSelection(params.getAbsoluteMaxCharLength());
+		
 		chkMaxCharLength.setSelection(params.getCheckMaxCharLength());
 		spMaxCharLengthBreak.setSelection(params.getMaxCharLengthBreak());
 		spMaxCharLengthAbove.setSelection(params.getMaxCharLengthAbove());
@@ -1289,6 +1316,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		updatePatterns();
 		updateDoubledWord();
 		updateLTOptions();
+		updateAbsoluteMaxCharLength();
 		updateMaxCharLength();
 		updateMinCharLength();
 		updateCharacters();
@@ -1389,12 +1417,18 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			}
 		}
 
+		params.setCheckAbsoluteMaxCharLength(chkAbsoluteMaxCharLength.getSelection());
+		if ( chkAbsoluteMaxCharLength.getSelection() ) {
+			params.setAbsoluteMaxCharLength(spAbsoluteMaxCharLength.getSelection());
+		}
+		
 		params.setCheckMaxCharLength(chkMaxCharLength.getSelection());
 		if ( chkMaxCharLength.getSelection() ) {
 			params.setMaxCharLengthBreak(spMaxCharLengthBreak.getSelection());
 			params.setMaxCharLengthAbove(spMaxCharLengthAbove.getSelection());
 			params.setMaxCharLengthBelow(spMaxCharLengthBelow.getSelection());
 		}
+		
 		params.setCheckMinCharLength(chkMinCharLength.getSelection());
 		if ( chkMinCharLength.getSelection() ) {
 			params.setMinCharLengthBreak(spMinCharLengthBreak.getSelection());

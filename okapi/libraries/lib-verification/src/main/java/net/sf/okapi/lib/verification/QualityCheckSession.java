@@ -63,6 +63,7 @@ public class QualityCheckSession {
 	private LocaleId targetLocale = LocaleId.FRENCH;
 	private IFilter filter;
 	private boolean modified;
+	private boolean autoRefresh;
 
 	public QualityCheckSession () {
 		reset();
@@ -84,9 +85,16 @@ public class QualityCheckSession {
 		return params;
 	}
 
-	
 	public void setParameters (Parameters params) {
 		this.params = params;
+	}
+	
+	public boolean getAutoRefresh () {
+		return autoRefresh;
+	}
+	
+	public void setAutoRefresh (boolean autoRefresh) {
+		this.autoRefresh = autoRefresh;
 	}
 
 	/**

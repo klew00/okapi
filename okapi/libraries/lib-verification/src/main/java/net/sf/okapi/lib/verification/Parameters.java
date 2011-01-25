@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -68,6 +68,8 @@ public class Parameters extends BaseParameters {
 	private static final String MINCHARLENGTHBREAK = "minCharLengthBreak";
 	private static final String MINCHARLENGTHABOVE = "minCharLengthAbove";
 	private static final String MINCHARLENGTHBELOW = "minCharLengthBelow";
+	private static final String CHECKABSOLUTEMAXCHARLENGTH = "checkAbsoluteMaxCharLength";
+	private static final String ABSOLUTEMAXCHARLENGTH = "absoluteMaxCharLength";
 	private static final String CHECKCHARACTERS = "checkCharacters";
 	private static final String CHARSET = "charset";
 	private static final String EXTRACHARSALLOWED = "extraCharsAllowed";
@@ -109,6 +111,8 @@ public class Parameters extends BaseParameters {
 	int minCharLengthBreak;
 	int minCharLengthAbove;
 	int minCharLengthBelow;
+	boolean checkAbsoluteMaxCharLength;
+	int absoluteMaxCharLength;
 	boolean checkCharacters;
 	String charset;
 	String extraCharsAllowed;
@@ -235,6 +239,22 @@ public class Parameters extends BaseParameters {
 
 	public void setMinCharLengthBelow (int minCharLengthBelow) {
 		this.minCharLengthBelow = minCharLengthBelow;
+	}
+
+	public boolean getCheckAbsoluteMaxCharLength () {
+		return checkAbsoluteMaxCharLength;
+	}
+
+	public void setCheckAbsoluteMaxCharLength (boolean checkAbsoluteMaxCharLength) {
+		this.checkAbsoluteMaxCharLength = checkAbsoluteMaxCharLength;
+	}
+
+	public int getAbsoluteMaxCharLength () {
+		return absoluteMaxCharLength;
+	}
+
+	public void setAbsoluteMaxCharLength (int absoluteMaxCharLength) {
+		this.absoluteMaxCharLength = absoluteMaxCharLength;
 	}
 
 	public boolean getDoubledWord () {
@@ -471,6 +491,9 @@ public class Parameters extends BaseParameters {
 		minCharLengthAbove = 45;
 		minCharLengthBelow = 30;
 		
+		checkAbsoluteMaxCharLength = false;
+		absoluteMaxCharLength = 255;
+		
 		checkCharacters = false;
 		charset = "ISO-8859-1";
 		extraCharsAllowed = "";
@@ -558,6 +581,8 @@ public class Parameters extends BaseParameters {
 		minCharLengthBreak = buffer.getInteger(MINCHARLENGTHBREAK, minCharLengthBreak);
 		minCharLengthAbove = buffer.getInteger(MINCHARLENGTHABOVE, minCharLengthAbove);
 		minCharLengthBelow = buffer.getInteger(MINCHARLENGTHBELOW, minCharLengthBelow);
+		checkAbsoluteMaxCharLength = buffer.getBoolean(CHECKABSOLUTEMAXCHARLENGTH, checkAbsoluteMaxCharLength);
+		absoluteMaxCharLength = buffer.getInteger(ABSOLUTEMAXCHARLENGTH, absoluteMaxCharLength);
 		// Characters
 		checkCharacters = buffer.getBoolean(CHECKCHARACTERS, checkCharacters);
 		charset = buffer.getString(CHARSET, charset);
@@ -629,6 +654,8 @@ public class Parameters extends BaseParameters {
 		buffer.setInteger(MINCHARLENGTHBREAK, minCharLengthBreak);
 		buffer.setInteger(MINCHARLENGTHABOVE, minCharLengthAbove);
 		buffer.setInteger(MINCHARLENGTHBELOW, minCharLengthBelow);
+		buffer.setBoolean(CHECKABSOLUTEMAXCHARLENGTH, checkAbsoluteMaxCharLength);
+		buffer.setInteger(ABSOLUTEMAXCHARLENGTH, absoluteMaxCharLength);
 		// Characters
 		buffer.setBoolean(CHECKCHARACTERS, checkCharacters);
 		buffer.setString(CHARSET, charset);

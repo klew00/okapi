@@ -83,7 +83,6 @@ public class IdGenerator {
 		else {
 			return rootId + "-" + prefix + Long.toString(++seq);
 		}
-		
 	}
 	
 	/**

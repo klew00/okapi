@@ -58,6 +58,7 @@ class SessionSettingsDialog {
 	private List lbDocs;
 	private Button btRemove;
 	private Button btRemoveAll;
+	private Button chkAutoRefresh;
 	
 	public SessionSettingsDialog (Shell parent, IHelp paramHelp) {
 
@@ -72,12 +73,12 @@ class SessionSettingsDialog {
 		
 		Group grpDocs = new Group(dialog, SWT.NONE);
 		grpDocs.setText("Documents");
-		grpDocs.setLayout(new GridLayout(3, false));
+		grpDocs.setLayout(new GridLayout(4, false));
 		grpDocs.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
 		lbDocs = new List(grpDocs, SWT.BORDER | SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 		GridData gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.horizontalSpan = 3;
+		gdTmp.horizontalSpan = 4;
 		lbDocs.setLayoutData(gdTmp);
 		
 		Button btAdd = UIUtil.createGridButton(grpDocs, SWT.PUSH, "Add...", UIUtil.BUTTON_DEFAULT_WIDTH, 1);
@@ -100,6 +101,10 @@ class SessionSettingsDialog {
 				removeAll();
 			}
 		});
+		
+		chkAutoRefresh = new Button(grpDocs, SWT.CHECK);
+		chkAutoRefresh.setText("Re-check documents automatically when they change");
+		chkAutoRefresh.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END));
 		
 		// Locales
 		
@@ -231,6 +236,7 @@ class SessionSettingsDialog {
 		if ( lbDocs.getItemCount() > 0 ) {
 			lbDocs.setSelection(0);
 		}
+		chkAutoRefresh.setSelection(session.getAutoRefresh());
 		edSourceLocale.setText(session.getSourceLocale().toString());
 		edTargetLocale.setText(session.getTargetLocale().toString());
 		updateFileButtons();
@@ -264,6 +270,8 @@ class SessionSettingsDialog {
 			edTargetLocale.setFocus();
 			return false;
 		}
+		
+		session.setAutoRefresh(chkAutoRefresh.getSelection());
 		
 		// Save locales
 		session.setSourceLocale(srcLoc);

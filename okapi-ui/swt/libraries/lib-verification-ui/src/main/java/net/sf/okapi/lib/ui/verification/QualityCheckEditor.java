@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -24,8 +24,10 @@ import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Timer;
 
 import net.sf.okapi.common.BaseContext;
 import net.sf.okapi.common.IHelp;
@@ -133,6 +135,8 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 	private SelectionAdapter allowExtraCodesAdapter;
 	private SelectionAdapter allowMissingCodesAdapter;
 	private SelectionAdapter copyItemDataAdapter;
+	private Timer watcherTimer;
+	private Watcher watcher;
 	
 	private int displayType = 1;
 	private int issueType = 0;
@@ -232,7 +236,15 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		dispose();
 	}
 
+	private void deleteWatcher () {
+		if ( watcherTimer != null ) {
+			watcherTimer.cancel();
+			watcherTimer.purge();
+			watcherTimer = null;
+		}
+	}
 	private void dispose () {
+		deleteWatcher();
 		if ( srcTextOpt != null ) {
 			srcTextOpt.dispose();
 			srcTextOpt = null;
@@ -279,6 +291,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 			if ( !shell.getDisplay().readAndDispatch() )
 				shell.getDisplay().sleep();
 		}
+		dispose();
 	}
 	
 	private void createMenus () {
@@ -1161,9 +1174,23 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 			
 			// Update the table of issues
 			refreshTableDisplay();
+			// And the file watcher
+			resetWatcher();
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, "Error editing session settings.\n"+e.getMessage(), null);
+		}
+	}
+	
+	private void resetWatcher () {
+		// Cancel the current watcher
+		deleteWatcher();
+		if ( session.getAutoRefresh() ) {
+			watcher = new Watcher(this, shell.getDisplay());
+			if ( watcherTimer == null ) {
+				watcherTimer = new Timer();
+			}
+			watcherTimer.schedule(watcher, new Date(), 2000);
 		}
 	}
 	
@@ -1367,10 +1394,10 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		}
 	}
 	
-	private void checkAll () {
+	void checkAll () {
 		try {
 			startWaiting("Checking all documents...");
-			// Recheck all using the signatures of the current issue lists
+			// Re-check all using the signatures of the current issue lists
 			session.recheckAll(null);
 		}
 		catch ( Throwable e ) {
