@@ -70,22 +70,21 @@ public class PensieveSeekerTest {
         seeker.close();
     }
 
-    //TODO: This test does not pass (even before TextContainer refectoring)
-//    @Test
-//    public void shortEntries () throws Exception {
-//        PensieveWriter writer = getWriter();
-//        writer.indexTranslationUnit(new TranslationUnit(
-//           	new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment("abcd")), TARGET));
-//        writer.indexTranslationUnit(new TranslationUnit(
-//           	new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment("abc")), TARGET));
-//        writer.close();
-//
-//        List<TmHit> list = seeker.searchFuzzy(new TextFragment("abcd"), 100, 1, null);
-//        assertEquals("number of docs found", 1, list.size());
-//        
-//        list = seeker.searchFuzzy(new TextFragment("abc"), 100, 1, null);
-//        assertEquals("number of docs found", 1, list.size());
-//    }
+    @Test
+    public void shortEntries () throws Exception {
+        PensieveWriter writer = getWriter();
+        writer.indexTranslationUnit(new TranslationUnit(
+           	new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment("abcd")), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(
+           	new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment("abc")), TARGET));
+        writer.close();
+
+        List<TmHit> list = seeker.searchFuzzy(new TextFragment("abcd"), 100, 1, null);
+        assertEquals("number of docs found", 1, list.size());
+        
+        list = seeker.searchFuzzy(new TextFragment("abc"), 100, 1, null);
+        assertEquals("number of docs found", 1, list.size());
+    }
 
     @Test
     public void penaltyDifferentSpaces () throws Exception {
@@ -224,7 +223,7 @@ public class PensieveSeekerTest {
         writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(LocaleId.fromString("EN"), tf), TARGET));
         writer.close();
         tmhits = seeker.searchFuzzy(tf, 99, 10, null);
-//TOFIX        assertEquals(1, tmhits.size());
+        assertEquals(1, tmhits.size());
     }
 
     @Test
@@ -241,8 +240,8 @@ public class PensieveSeekerTest {
         assertEquals(1, tmhits.size());
         assertEquals("help", tmhits.get(0).getTu().getSource().getContent().toText());
         tmhits = seeker.searchFuzzy(new TextFragment(WORD), 80, 10, null);
-//TOFIX        assertEquals(1, tmhits.size());
-//TOFIX        assertEquals("From", tmhits.get(0).getTu().getSource().getContent().toText());
+        assertEquals(1, tmhits.size());
+        assertEquals("from", tmhits.get(0).getTu().getSource().getContent().toText());
     }
 
     @Test
