@@ -107,7 +107,6 @@ public class AlphabeticNgramTokenizer extends Tokenizer {
 			}
 			ngramCache.add((char) c);
 		}
-
 	}
 
 	@Override
@@ -115,12 +114,14 @@ public class AlphabeticNgramTokenizer extends Tokenizer {
 		clearAttributes();
 		int c;
 		c = getReader().read();
-		if (c == NO_CHAR) {
+		if (c == NO_CHAR && ngramCache.get(0) != Character.MIN_VALUE) {
 			offset = 0;
 			return false;
 		}
 		ngramCache.remove(0);
-		ngramCache.add((char) c);
+		if (c != NO_CHAR) {
+			ngramCache.add((char) c);
+		}
 
 		// Populate Attributes
 		termAttribute.setTermBuffer(toLowerCase(ngramCache));
