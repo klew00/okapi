@@ -20,39 +20,41 @@
 
 package net.sf.okapi.filters.mif;
 
+import net.sf.okapi.common.resource.Code;
+
 class MIFToken {
 
-	public static final int MIFTOKEN_NULL = 0;
-	public static final int MIFTOKEN_STRING = 1;
-	public static final int MIFTOKEN_BOOLEAN = 2;
+	public static final int TYPE_NULL = 0;
+	public static final int TYPE_STRING = 1;
+	public static final int TYPE_CODE = 2;
 	
 	private int type;
 	private String stringValue;
-	private boolean booleanValue;
+	private Code codeValue;
 	private boolean isLast;
 
 	public MIFToken () {
-		type = MIFTOKEN_NULL;
+		type = TYPE_NULL;
 	}
 	
 	public MIFToken (String value) {
-		type = MIFTOKEN_STRING;
+		type = TYPE_STRING;
 		stringValue = value;
 	}
 	
-	public MIFToken (boolean value) {
-		type = MIFTOKEN_BOOLEAN;
-		booleanValue = value;
+	public MIFToken (Code value) {
+		type = TYPE_CODE;
+		codeValue = value;
 	}
 	
 	@Override
 	public String toString () {
-		if ( type == MIFTOKEN_STRING ) return stringValue;
+		if ( type == TYPE_STRING ) return stringValue;
 		else return "";
 	}
 	
 	public void setString (String value) {
-		type = MIFTOKEN_STRING;
+		type = TYPE_STRING;
 		stringValue = value;
 	}
 	
@@ -60,8 +62,8 @@ class MIFToken {
 		return stringValue;
 	}
 	
-	public boolean getBoolean () {
-		return booleanValue;
+	public Code getCode () {
+		return codeValue;
 	}
 	
 	public void setLast (boolean value) {

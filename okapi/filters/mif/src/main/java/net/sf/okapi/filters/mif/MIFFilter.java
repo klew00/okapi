@@ -51,6 +51,7 @@ import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
@@ -83,7 +84,9 @@ public class MIFFilter implements IFilter {
 	private GenericSkeleton skel;
 	private boolean hasNext;
 	private EncoderManager encoderManager;
-	private boolean inTextFlow;
+	private int inTextFlow;
+	private String version;
+	private String sdId;
 	
 	private static Hashtable<String, String> initCharTable () {
 		Hashtable<String, String> table = new Hashtable<String, String>();
@@ -213,10 +216,12 @@ public class MIFFilter implements IFilter {
 			otherId = 0;
 			canceled = false;
 			hasNext = true;
-			inTextFlow = false;
+			inTextFlow = 0;
+			version = "";
 			
 			queue = new LinkedList<Event>();
-			StartDocument startDoc = new StartDocument(String.valueOf(++otherId));
+			sdId = "sd1";
+			StartDocument startDoc = new StartDocument(sdId);
 			startDoc.setName(docName);
 			startDoc.setLineBreak("\n");
 			startDoc.setEncoding(encoding, false);
@@ -282,7 +287,7 @@ public class MIFFilter implements IFilter {
 			int c;
 			
 			// Check if we are still processing a TextFlow 
-			if ( inTextFlow ) {
+			if ( inTextFlow > 0 ) {
 				processTextFlow();
 				return;
 			}
@@ -299,15 +304,24 @@ public class MIFFilter implements IFilter {
 					String tag = readTag(true);
 					//TODO: dispatch according tags
 					if ( TOPSTATEMENTSTOSKIP.indexOf(tag) > -1 ) {
-						skipOverContent(true);
+						skipOverContent(true, null);
 					}
 					else if ( "TextFlow".equals(tag) ) {
 						processTextFlow();
 						return;
 					}
+					else if ( "MIFFile".equals(tag) ) {
+						MIFToken token = getNextTokenInStatement(true);
+						if ( token.getType() == MIFToken.TYPE_STRING ) {
+							version = token.getString();
+						}
+						else {
+							throw new OkapiIOException("MIF version not found.");
+						}
+					}
 					else {
 						// Default: skip over
-						skipOverContent(true);
+						skipOverContent(true, null);
 					}
 					// Flush the skeleton from time to time to allow very large files
 					queue.add(new Event(EventType.DOCUMENT_PART,
@@ -343,9 +357,11 @@ public class MIFFilter implements IFilter {
 	 * Skips over the content of the current statement.
 	 * Normally "<token" has been processed and level for after '<'
 	 * @param store true to store in the skeleton
+	 * @param buffer the StringBuilder object where to copy the content, or null to not copy.
 	 * @throws IOException if an error occurs.
 	 */
-	private void skipOverContent (boolean store)
+	private void skipOverContent (boolean store,
+		StringBuilder buffer)
 		throws IOException
 	{
 		int baseLevel = 1;
@@ -354,6 +370,7 @@ public class MIFFilter implements IFilter {
 		boolean inString = false;
 		while ( (c = reader.read()) != -1 ) {
 			if ( store ) skel.append((char)c);
+			if ( buffer != null ) buffer.append((char)c);
 			// Parse a string content
 			if ( inString ) {
 				if ( c == '\'' ) inString = false;
@@ -411,11 +428,12 @@ public class MIFFilter implements IFilter {
 	{
 		// Process one Para statement at a time
 		if ( readUntil("Para", true) != null ) {
+			inTextFlow++; // We are not done yet with this TextFlow statement
 			processPara();
-			inTextFlow = true; // We are not done yet with this TextFlow statement
 		}
 		else { // Done
-			inTextFlow = false; // We are done
+			inTextFlow = 0; // We are done
+			// Close 
 		}
 		
 		// If needed, create a document part and return
@@ -454,7 +472,7 @@ public class MIFFilter implements IFilter {
 	{
 		String tag;
 		while ( true ) {
-			if ( (tag = readUntil("String;Char", true)) == null ) break;
+			if ( (tag = readUntil("String;Char;Variable;Font;Marker;XRef", true)) == null ) break;
 			if ( "String".equals(tag) ) {
 				String text = processString(true);
 				tf.append(text);
@@ -462,6 +480,26 @@ public class MIFFilter implements IFilter {
 			else if ( "Char".equals(tag) ) {
 				MIFToken token = processChar(true);
 				tf.append(token.toString());
+			}
+			else if ( "Variable".equals(tag) ) {
+				StringBuilder sb = new StringBuilder("<Variable ");
+				skipOverContent(true, sb);
+				tf.append(TagType.PLACEHOLDER, "var", sb.toString());
+			}
+			else if ( "Font".equals(tag) ) {
+				StringBuilder sb = new StringBuilder("<Font ");
+				skipOverContent(true, sb);
+				tf.append(TagType.PLACEHOLDER, "font", sb.toString());
+			}
+			else if ( "Marker".equals(tag) ) {
+				StringBuilder sb = new StringBuilder("<Marker ");
+				skipOverContent(true, sb);
+				tf.append(TagType.PLACEHOLDER, "marker", sb.toString());
+			}
+			else if ( "XRef".equals(tag) ) {
+				StringBuilder sb = new StringBuilder("<XRef ");
+				skipOverContent(true, sb);
+				tf.append(TagType.PLACEHOLDER, "xref", sb.toString());
 			}
 		}
 	}
@@ -516,18 +554,16 @@ public class MIFFilter implements IFilter {
 	private MIFToken processChar (boolean store)
 		throws IOException
 	{
-		//skipOverContent(store);
-		
 		// Get the next token: the name of the character
 		MIFToken token = getNextTokenInStatement(store);
 		if ( !token.isLast() ) {
-			skipOverContent(store);
+			skipOverContent(store, null);
 		}
 		
 		// Default return is also a token
 		MIFToken chToken = new MIFToken();
 		// Map the character to its string, if possible
-		if ( token.getType() == MIFToken.MIFTOKEN_STRING ) {
+		if ( token.getType() == MIFToken.TYPE_STRING ) {
 			String str = charTable.get(token.getString());
 			if ( str == null ) {
 				logger.warning(String.format("Unknow character name '%s'. This character will be ignored.", token));
@@ -570,7 +606,7 @@ public class MIFFilter implements IFilter {
 					return tag;
 				}
 				else { // Default: skip over
-					skipOverContent(store);
+					skipOverContent(store, null);
 					baseLevel--;
 				}
 				break;
