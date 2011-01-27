@@ -27,6 +27,7 @@ public class DummyParameters extends BaseParameters {
 	public boolean paramBool1;
 	public int paramInt1;
 	public String paramStr1;
+	public String reference1;
 
 	public DummyParameters () {
 		reset();
@@ -37,6 +38,7 @@ public class DummyParameters extends BaseParameters {
 		paramBool1 = true;
 		paramInt1 = 123;
 		paramStr1 = "test";
+		reference1 = "reference1";
 	}
 
 	public void fromString (String data) {
@@ -56,4 +58,12 @@ public class DummyParameters extends BaseParameters {
 		return buffer.toString();
 	}
 
+	@ReferenceParameter
+	public String getReference1 () {
+		return reference1;
+	}
+	
+	public void setReference1 (String reference1) {
+		this.reference1 = reference1;
+	}
 }
