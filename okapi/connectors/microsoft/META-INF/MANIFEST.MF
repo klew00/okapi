@@ -1,9 +1,15 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.connectors.microsoft;uses:="net.sf.okapi.
+ common,net.sf.okapi.lib.translation,net.sf.okapi.common.resource,net.
+ sf.okapi.common.query,net.sf.okapi.common.uidescription"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi MT Connector for Microsoft
+Bnd-LastModified: 1296170363952
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: Microsoft Machine Translation Connector
-Bundle-SymbolicName: net.sf.okapi.connectors.microsoft
-Bundle-Version: 1.0.0
-Export-Package: net.sf.okapi.connectors.microsoft
-Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0",
- net.sf.okapi.lib.translation;bundle-version="1.0.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-SymbolicName: net.sf.okapi.connectors.okapi-connector-microsoft
+Import-Package: net.sf.okapi.common,net.sf.okapi.common.query,net.sf.o
+ kapi.common.resource,net.sf.okapi.common.uidescription,net.sf.okapi.l
+ ib.translation
+

@@ -1,7 +1,33 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.applications.serval;uses:="org.eclipse.sw
+ t.events,org.eclipse.swt.widgets,net.sf.okapi.common,net.sf.okapi.lib
+ .translation,org.eclipse.swt.graphics,net.sf.okapi.common.ui,org.ecli
+ pse.swt.layout,net.sf.okapi.connectors.crosslanguage,net.sf.okapi.con
+ nectors.simpletm,net.sf.okapi.connectors.pensieve,net.sf.okapi.connec
+ tors.globalsight,net.sf.okapi.connectors.tda,net.sf.okapi.connectors.
+ google,net.sf.okapi.connectors.promt,net.sf.okapi.connectors.opentran
+ ,net.sf.okapi.connectors.translatetoolkit,net.sf.okapi.connectors.mym
+ emory,net.sf.okapi.connectors.apertium,net.sf.okapi.tm.pensieve.write
+ r,net.sf.okapi.tm.pensieve.tmx,net.sf.okapi.common.filters,net.sf.oka
+ pi.filters.tmx,net.sf.okapi.common.resource,net.sf.okapi.common.filte
+ rwriter"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi Serval
+Bnd-LastModified: 1296168867535
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: Dummy Manifest File For Maven
-Bundle-SymbolicName: net.sf.okapi
-Bundle-Version: 0.0.1
-Export-Package: net.sf.okapi 
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-SymbolicName: net.sf.okapi.applications.okapi-application-serva
+ l
+Import-Package: net.sf.okapi.common,net.sf.okapi.common.filters,net.sf
+ .okapi.common.filterwriter,net.sf.okapi.common.resource,net.sf.okapi.
+ common.ui,net.sf.okapi.connectors.apertium,net.sf.okapi.connectors.cr
+ osslanguage,net.sf.okapi.connectors.globalsight,net.sf.okapi.connecto
+ rs.google,net.sf.okapi.connectors.mymemory,net.sf.okapi.connectors.op
+ entran,net.sf.okapi.connectors.pensieve,net.sf.okapi.connectors.promt
+ ,net.sf.okapi.connectors.simpletm,net.sf.okapi.connectors.tda,net.sf.
+ okapi.connectors.translatetoolkit,net.sf.okapi.filters.tmx,net.sf.oka
+ pi.lib.translation,net.sf.okapi.tm.pensieve.tmx,net.sf.okapi.tm.pensi
+ eve.writer,org.eclipse.swt.events,org.eclipse.swt.graphics,org.eclips
+ e.swt.layout,org.eclipse.swt.widgets
+

@@ -1,7 +1,17 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.applications.checkmate;uses:="net.sf.okap
+ i.common.filters,net.sf.okapi.common,net.sf.okapi.lib.verification,ne
+ t.sf.okapi.lib.ui.verification,org.eclipse.swt.widgets,net.sf.okapi.c
+ ommon.ui"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi CheckMate
+Bnd-LastModified: 1296168864469
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: Dummy Manifest File For Maven
-Bundle-SymbolicName: net.sf.okapi
-Bundle-Version: 0.0.1
-Export-Package: net.sf.okapi 
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-SymbolicName: net.sf.okapi.applications.okapi-application-check
+ mate
+Import-Package: net.sf.okapi.common,net.sf.okapi.common.filters,net.sf
+ .okapi.common.ui,net.sf.okapi.lib.ui.verification,net.sf.okapi.lib.ve
+ rification,org.eclipse.swt.widgets
+

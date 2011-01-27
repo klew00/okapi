@@ -1,12 +1,20 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.lib.ui.segmentation;uses:="net.sf.okapi.c
+ ommon,org.eclipse.swt.events,org.eclipse.swt.widgets,net.sf.okapi.com
+ mon.ui,org.eclipse.swt.graphics,org.eclipse.swt.layout,net.sf.okapi.c
+ ommon.resource,net.sf.okapi.common.filterwriter,net.sf.okapi.lib.segm
+ entation,org.eclipse.swt.dnd,org.eclipse.swt.custom",net.sf.okapi.lib
+ .ui.segmentation.images
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi Library for segmentation - UI
+Bnd-LastModified: 1296168797846
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: Segmentation UI Library
-Bundle-SymbolicName: net.sf.okapi.ui.lib.segmentation
-Bundle-Version: 1.0.0
-Export-Package: net.sf.okapi.lib.ui.segmentation,
- net.sf.okapi.lib.ui.segmentation.images
-Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0",
- net.sf.okapi.lib.segmentation;bundle-version="1.0.0",
- net.sf.okapi.ui.common;bundle-version="1.0.0",
- org.eclipse.swt;bundle-version="3.4.2"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-SymbolicName: net.sf.okapi.lib.okapi-lib-segmentation-ui
+Import-Package: net.sf.okapi.common,net.sf.okapi.common.filterwriter,n
+ et.sf.okapi.common.resource,net.sf.okapi.common.ui,net.sf.okapi.lib.s
+ egmentation,org.eclipse.swt.custom,org.eclipse.swt.dnd,org.eclipse.sw
+ t.events,org.eclipse.swt.graphics,org.eclipse.swt.layout,org.eclipse.
+ swt.widgets
+

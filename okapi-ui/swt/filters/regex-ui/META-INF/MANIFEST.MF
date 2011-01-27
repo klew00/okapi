@@ -1,12 +1,17 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.filters.regex.ui;uses:="org.eclipse.swt.e
+ vents,org.eclipse.swt.widgets,net.sf.okapi.common,net.sf.okapi.common
+ .filters,net.sf.okapi.common.ui.filters,net.sf.okapi.filters.regex,or
+ g.eclipse.swt.graphics,net.sf.okapi.common.ui,org.eclipse.swt.layout"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi Filter for Regex - UI
+Bnd-LastModified: 1296168785588
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: Regex Filter UI
-Bundle-SymbolicName: net.sf.okapi.ui.filters.regex
-Bundle-Version: 1.0.0
-Export-Package: net.sf.okapi.filters.ui.regex
-Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0",
- net.sf.okapi.filters.regex;bundle-version="1.0.0",
- net.sf.okapi.ui.common;bundle-version="1.0.0",
- org.eclipse.swt;bundle-version="3.4.2"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-SymbolicName: net.sf.okapi.filters.okapi-filter-regex-ui
+Import-Package: net.sf.okapi.common,net.sf.okapi.common.filters,net.sf
+ .okapi.common.ui,net.sf.okapi.common.ui.filters,net.sf.okapi.filters.
+ regex,org.eclipse.swt.events,org.eclipse.swt.graphics,org.eclipse.swt
+ .layout,org.eclipse.swt.widgets
 

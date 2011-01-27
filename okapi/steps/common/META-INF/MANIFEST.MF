@@ -1,9 +1,22 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.steps.common;uses:="net.sf.okapi.common.p
+ ipeline.annotations,net.sf.okapi.common,net.sf.okapi.common.exception
+ s,net.sf.okapi.common.resource,net.sf.okapi.common.filterwriter,net.s
+ f.okapi.common.pipeline,net.sf.okapi.common.filters,net.sf.okapi.comm
+ on.skeleton",net.sf.okapi.steps.common.createtarget;uses:="net.sf.oka
+ pi.common.pipeline.annotations,net.sf.okapi.common,net.sf.okapi.commo
+ n.resource,net.sf.okapi.common.pipeline,net.sf.okapi.common.uidescrip
+ tion"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi Common Steps
+Bnd-LastModified: 1296170377771
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: Common Steps
-Bundle-SymbolicName: net.sf.okapi.steps.common
-Bundle-Version: 1.0.0
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0"
-Export-Package: net.sf.okapi.steps.common,
- net.sf.okapi.steps.common.stepintrospector
+Bundle-SymbolicName: net.sf.okapi.steps.okapi-step-common
+Import-Package: net.sf.okapi.common,net.sf.okapi.common.exceptions,net
+ .sf.okapi.common.filters,net.sf.okapi.common.filterwriter,net.sf.okap
+ i.common.pipeline,net.sf.okapi.common.pipeline.annotations,net.sf.oka
+ pi.common.resource,net.sf.okapi.common.skeleton,net.sf.okapi.common.u
+ idescription
+

@@ -1,15 +1,33 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.tm.pensieve.common;uses:="org.apache.luce
+ ne.document,net.sf.okapi.common,net.sf.okapi.common.resource,net.sf.o
+ kapi.common.query",net.sf.okapi.tm.pensieve.seeker;uses:="net.sf.okap
+ i.tm.pensieve.common,net.sf.okapi.common.resource,net.sf.okapi.common
+ .exceptions,org.apache.lucene.document,org.apache.lucene.index,org.ap
+ ache.lucene.analysis.tokenattributes,org.apache.lucene.util,net.sf.ok
+ api.lib.search.lucene.query,net.sf.okapi.common.query,net.sf.okapi.co
+ mmon,org.apache.lucene.store,net.sf.okapi.lib.search.lucene.analysis,
+ org.apache.lucene.search,org.apache.lucene.analysis",net.sf.okapi.tm.
+ pensieve.tmx;uses:="net.sf.okapi.common,net.sf.okapi.common.filterwri
+ ter,net.sf.okapi.tm.pensieve.seeker,net.sf.okapi.tm.pensieve.writer,n
+ et.sf.okapi.tm.pensieve.common,net.sf.okapi.common.resource,net.sf.ok
+ api.common.filters",net.sf.okapi.tm.pensieve.writer;uses:="net.sf.oka
+ pi.tm.pensieve.common,net.sf.okapi.common.exceptions,org.apache.lucen
+ e.index,net.sf.okapi.common,org.apache.lucene.store,net.sf.okapi.lib.
+ search.lucene.analysis,org.apache.lucene.document,net.sf.okapi.common
+ .resource,org.apache.lucene.analysis"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi TM Pensieve
+Bnd-LastModified: 1296170413948
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: Pensieve TM
-Bundle-SymbolicName: net.sf.okapi.tm.pensieve
-Bundle-Version: 0.0.1
-Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0",
- net.sf.okapi.filters.tmx;bundle-version="1.0.0",
- net.sf.okapi.lib.search;bundle-version="1.0.0",
- org.apache.lucene-core;bundle-version="3.0.0"
-Export-Package: net.sf.okapi.tm.pensieve.common,
- net.sf.okapi.tm.pensieve.seeker,
- net.sf.okapi.tm.pensieve.writer,
- net.sf.okapi.tm.pensieve.tmx
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-SymbolicName: net.sf.okapi.tm.okapi-tm-pensieve
+Import-Package: net.sf.okapi.common,net.sf.okapi.common.exceptions,net
+ .sf.okapi.common.filters,net.sf.okapi.common.filterwriter,net.sf.okap
+ i.common.query,net.sf.okapi.common.resource,net.sf.okapi.lib.search.l
+ ucene.analysis,net.sf.okapi.lib.search.lucene.query,org.apache.lucene
+ .analysis,org.apache.lucene.analysis.tokenattributes,org.apache.lucen
+ e.document,org.apache.lucene.index,org.apache.lucene.search,org.apach
+ e.lucene.store,org.apache.lucene.util
 

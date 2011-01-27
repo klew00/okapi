@@ -1,9 +1,15 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.connectors.google;uses:="net.sf.okapi.com
+ mon,net.sf.okapi.lib.translation,org.json.simple.parser,net.sf.okapi.
+ common.resource,org.json.simple,net.sf.okapi.common.query"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi MT Connector for Google
+Bnd-LastModified: 1296170364920
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: Google Machine Translation Connector
-Bundle-SymbolicName: net.sf.okapi.connectors.google
-Bundle-Version: 1.0.0
-Export-Package: net.sf.okapi.connectors.google
-Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0",
- net.sf.okapi.lib.translation;bundle-version="1.0.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-SymbolicName: net.sf.okapi.connectors.okapi-connector-google
+Import-Package: net.sf.okapi.common,net.sf.okapi.common.query,net.sf.o
+ kapi.common.resource,net.sf.okapi.lib.translation,org.json.simple,org
+ .json.simple.parser
+

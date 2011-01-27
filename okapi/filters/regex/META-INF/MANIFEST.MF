@@ -1,8 +1,17 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.filters.regex;uses:="net.sf.okapi.common.
+ filters,net.sf.okapi.common,net.sf.okapi.common.encoder,net.sf.okapi.
+ common.skeleton,net.sf.okapi.common.exceptions,net.sf.okapi.common.fi
+ lterwriter,net.sf.okapi.common.resource"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi Filter for Regex
+Bnd-LastModified: 1296170276234
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: Regex Filter
-Bundle-SymbolicName: net.sf.okapi.filters.regex
-Bundle-Version: 1.0.0
-Export-Package: net.sf.okapi.filters.regex
-Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-SymbolicName: net.sf.okapi.filters.okapi-filter-regex
+Import-Package: net.sf.okapi.common,net.sf.okapi.common.encoder,net.sf
+ .okapi.common.exceptions,net.sf.okapi.common.filters,net.sf.okapi.com
+ mon.filterwriter,net.sf.okapi.common.resource,net.sf.okapi.common.ske
+ leton
+

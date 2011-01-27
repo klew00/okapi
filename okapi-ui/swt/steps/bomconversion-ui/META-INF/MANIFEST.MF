@@ -1,11 +1,16 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.steps.bomconversion.ui;uses:="net.sf.okap
+ i.common,org.eclipse.swt.events,org.eclipse.swt.widgets,org.eclipse.s
+ wt.graphics,net.sf.okapi.steps.bomconversion,net.sf.okapi.common.ui,o
+ rg.eclipse.swt.layout"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi Step for BOM Conversion - UI
+Bnd-LastModified: 1296168808922
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: BOM Conversion Parameters Editor
-Bundle-SymbolicName: net.sf.okapi.ui.steps.bomconversion
-Bundle-Version: 1.0.0
-Export-Package: net.sf.okapi.steps.ui.bomconversion
-Require-Bundle: net.sf.okapi.steps.bomconversion;bundle-version="1.0.0",
- net.sf.okapi.common;bundle-version="1.0.0",
- net.sf.okapi.ui.common;bundle-version="1.0.0",
- org.eclipse.swt;bundle-version="3.4.2"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-SymbolicName: net.sf.okapi.steps.okapi-step-bomconversion-ui
+Import-Package: net.sf.okapi.common,net.sf.okapi.common.ui,net.sf.okap
+ i.steps.bomconversion,org.eclipse.swt.events,org.eclipse.swt.graphics
+ ,org.eclipse.swt.layout,org.eclipse.swt.widgets
+

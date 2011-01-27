@@ -1,11 +1,15 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.filters.openxml.ui;uses:="net.sf.okapi.co
+ mmon,org.eclipse.swt.events,org.eclipse.swt.widgets,net.sf.okapi.comm
+ on.ui,net.sf.okapi.filters.openxml,org.eclipse.swt.layout"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi Filter for OpenXML - UI
+Bnd-LastModified: 1296168775513
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: Openxml Filter UI
-Bundle-SymbolicName: net.sf.okapi.ui.filters.openxml; singleton:=true
-Bundle-Version: 1.0.0
-Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0",
- net.sf.okapi.ui.common;bundle-version="1.0.0",
- net.sf.okapi.filters.openxml;bundle-version="1.0.0",
- org.eclipse.swt;bundle-version="3.4.2"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Export-Package: net.sf.okapi.ui.filters.openxml
+Bundle-SymbolicName: net.sf.okapi.filters.okapi-filter-openxml-ui
+Import-Package: net.sf.okapi.common,net.sf.okapi.common.ui,net.sf.okap
+ i.filters.openxml,org.eclipse.swt.events,org.eclipse.swt.layout,org.e
+ clipse.swt.widgets
+

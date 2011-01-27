@@ -1,9 +1,30 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.steps.xliffkit.opc;uses:="net.sf.okapi.li
+ b.beans.sessions,net.sf.okapi.common.exceptions,net.sf.okapi.filters.
+ xliff,net.sf.okapi.common.filterwriter,net.sf.okapi.common.filters,ne
+ t.sf.okapi.common,net.sf.okapi.common.resource,org.apache.poi.openxml
+ 4j.opc,net.sf.okapi.steps.xliffkit.reader,org.apache.poi.openxml4j.ex
+ ceptions",net.sf.okapi.steps.xliffkit.reader;uses:="net.sf.okapi.comm
+ on.uidescription,net.sf.okapi.common,net.sf.okapi.common.resource,net
+ .sf.okapi.common.pipeline.annotations,net.sf.okapi.steps.xliffkit.opc
+ ,net.sf.okapi.common.pipeline",net.sf.okapi.steps.xliffkit.writer;use
+ s:="net.sf.okapi.common.uidescription,net.sf.okapi.common,net.sf.okap
+ i.lib.beans.sessions,net.sf.okapi.common.encoder,net.sf.okapi.common.
+ pipeline.annotations,net.sf.okapi.lib.persistence,net.sf.okapi.common
+ .filterwriter,org.apache.poi.openxml4j.exceptions,net.sf.okapi.common
+ .resource,net.sf.okapi.common.pipeline,org.apache.poi.openxml4j.opc"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi Steps for Creating and Reading XLIFF Kits
+Bnd-LastModified: 1296170426482
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: Segmentation
-Bundle-SymbolicName: net.sf.okapi.steps.xliffkit
-Bundle-Version: 1.0.0
-Export-Package: net.sf.okapi.steps.xliffkit.xliffwriter
-Require-Bundle: net.sf.okapi.pipeline;bundle-version="1.0.0",
- net.sf.okapi.common;bundle-version="1.0.0",
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-SymbolicName: net.sf.okapi.steps.okapi-step-xliffkit
+Import-Package: net.sf.okapi.common,net.sf.okapi.common.encoder,net.sf
+ .okapi.common.exceptions,net.sf.okapi.common.filters,net.sf.okapi.com
+ mon.filterwriter,net.sf.okapi.common.pipeline,net.sf.okapi.common.pip
+ eline.annotations,net.sf.okapi.common.resource,net.sf.okapi.common.ui
+ description,net.sf.okapi.filters.xliff,net.sf.okapi.lib.beans.session
+ s,net.sf.okapi.lib.persistence,org.apache.poi.openxml4j.exceptions,or
+ g.apache.poi.openxml4j.opc
+

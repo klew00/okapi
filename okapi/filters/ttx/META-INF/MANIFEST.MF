@@ -1,8 +1,20 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.filters.ttx;uses:="net.sf.okapi.common.ui
+ description,net.sf.okapi.common,net.sf.okapi.common.encoder,net.sf.ok
+ api.common.skeleton,net.sf.okapi.common.exceptions,net.sf.okapi.commo
+ n.annotation,net.sf.okapi.common.filterwriter,net.sf.okapi.common.que
+ ry,javax.xml.stream,net.sf.okapi.common.filters,net.sf.okapi.common.r
+ esource"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi Filter for TTX
+Bnd-LastModified: 1296170284514
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: TTX Filter
-Bundle-SymbolicName: net.sf.okapi.filters.ttx
-Bundle-Version: 1.0.0
-Export-Package: net.sf.okapi.filters.ttx
-Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-SymbolicName: net.sf.okapi.filters.okapi-filter-ttx
+Import-Package: javax.xml.stream,net.sf.okapi.common,net.sf.okapi.comm
+ on.annotation,net.sf.okapi.common.encoder,net.sf.okapi.common.excepti
+ ons,net.sf.okapi.common.filters,net.sf.okapi.common.filterwriter,net.
+ sf.okapi.common.query,net.sf.okapi.common.resource,net.sf.okapi.commo
+ n.skeleton,net.sf.okapi.common.uidescription
+

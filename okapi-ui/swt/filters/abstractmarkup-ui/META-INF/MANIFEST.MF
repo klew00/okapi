@@ -1,12 +1,19 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.filters.abstractmarkup.ui;uses:="net.sf.o
+ kapi.filters.yaml,net.sf.okapi.common,org.eclipse.swt.events,org.ecli
+ pse.swt.widgets,net.sf.okapi.common.ui,org.eclipse.swt.graphics,org.e
+ clipse.swt.layout,net.sf.okapi.filters.abstractmarkup,net.sf.okapi.co
+ mmon.filters,net.sf.okapi.common.ui.filters"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi Filter for Abstract Markup - UI
+Bnd-LastModified: 1296168769563
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: Abstract Markup Filter UI
-Bundle-SymbolicName: net.sf.okapi.filters.abstractmarkup.ui
-Bundle-Version: 1.0.0.qualifier
-Require-Bundle: org.eclipse.swt;bundle-version="3.5.0",
- net.sf.okapi.ui.common;bundle-version="1.0.0",
- net.sf.okapi.common;bundle-version="1.0.0",
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Export-Package: net.sf.okapi.filters.abstractmarkup.ui
-Bundle-ClassPath: lib/swing2swt.jar,
- .
+Bundle-SymbolicName: net.sf.okapi.filters.okapi-filter-abstractmarkup-
+ ui
+Import-Package: net.sf.okapi.common,net.sf.okapi.common.filters,net.sf
+ .okapi.common.ui,net.sf.okapi.common.ui.filters,net.sf.okapi.filters.
+ abstractmarkup,net.sf.okapi.filters.yaml,org.eclipse.swt.events,org.e
+ clipse.swt.graphics,org.eclipse.swt.layout,org.eclipse.swt.widgets
+

@@ -1,12 +1,14 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.steps.textmodification;uses:="net.sf.okap
+ i.common,net.sf.okapi.common.pipeline.annotations,net.sf.okapi.common
+ .resource,net.sf.okapi.common.pipeline"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi Step for Text Modification
+Bnd-LastModified: 1296170397589
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: Text Modification
-Bundle-SymbolicName: net.sf.okapi.steps.textmodification
-Bundle-Version: 1.0.0
-Export-Package: net.sf.okapi.steps.textmodification
-Require-Bundle: net.sf.okapi.pipeline;bundle-version="1.0.0",
- net.sf.okapi.common;bundle-version="1.0.0",
- net.sf.okapi.filters.common;bundle-version="1.0.0",
- net.sf.okapi.lib.segmentation;bundle-version="1.0.0",
- net.sf.okapi.pipelinedriver;bundle-version="1.0.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-SymbolicName: net.sf.okapi.steps.okapi-step-textmodification
+Import-Package: net.sf.okapi.common,net.sf.okapi.common.pipeline,net.s
+ f.okapi.common.pipeline.annotations,net.sf.okapi.common.resource
+

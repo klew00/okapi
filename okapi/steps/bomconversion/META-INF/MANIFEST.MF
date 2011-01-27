@@ -1,8 +1,15 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.steps.bomconversion;uses:="net.sf.okapi.c
+ ommon.pipeline.annotations,net.sf.okapi.common,net.sf.okapi.common.ex
+ ceptions,net.sf.okapi.common.resource,net.sf.okapi.common.pipeline"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi Step for BOM Conversion
+Bnd-LastModified: 1296170374734
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: BOM Conversion
-Bundle-SymbolicName: net.sf.okapi.steps.bomconversion
-Bundle-Version: 1.0.0
-Export-Package: net.sf.okapi.steps.bomconversion
-Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-SymbolicName: net.sf.okapi.steps.okapi-step-bomconversion
+Import-Package: net.sf.okapi.common,net.sf.okapi.common.exceptions,net
+ .sf.okapi.common.pipeline,net.sf.okapi.common.pipeline.annotations,ne
+ t.sf.okapi.common.resource
+

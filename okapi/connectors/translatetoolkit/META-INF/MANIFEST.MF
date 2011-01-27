@@ -1,11 +1,18 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.connectors.translatetoolkit;uses:="net.sf
+ .okapi.common.uidescription,net.sf.okapi.common,net.sf.okapi.lib.tran
+ slation,net.sf.okapi.common.exceptions,org.json.simple.parser,org.jso
+ n.simple,net.sf.okapi.common.resource,net.sf.okapi.common.query"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi TM Connector for Translate Toolkit
+Bnd-LastModified: 1296170357783
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: Translate Toolkit TM Connector
-Bundle-SymbolicName: net.sf.okapi.connectors.translatetoolkit
-Bundle-Version: 1.0.0
-Bundle-ClassPath: lib/json-simple-1.1.jar
-Export-Package: net.sf.okapi.connectors.translatetoolkit
-Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0",
- net.sf.okapi.lib.translation;bundle-version="1.0.0",
- net.sf.okapi.filters.common;bundle-version="1.0.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-SymbolicName: net.sf.okapi.connectors.okapi-connector-translate
+ toolkit
+Import-Package: net.sf.okapi.common,net.sf.okapi.common.exceptions,net
+ .sf.okapi.common.query,net.sf.okapi.common.resource,net.sf.okapi.comm
+ on.uidescription,net.sf.okapi.lib.translation,org.json.simple,org.jso
+ n.simple.parser
+

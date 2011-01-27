@@ -1,13 +1,19 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.steps.generatesimpletm;uses:="net.sf.okap
+ i.common.pipeline.annotations,net.sf.okapi.common,net.sf.okapi.common
+ .exceptions,net.sf.okapi.common.resource,net.sf.okapi.common.pipeline
+ ,net.sf.okapi.tm.simpletm,net.sf.okapi.common.uidescription",net.sf.o
+ kapi.steps.simpletm2tmx;uses:="net.sf.okapi.common,net.sf.okapi.commo
+ n.resource,net.sf.okapi.common.pipeline,net.sf.okapi.tm.simpletm"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi Step for Generating a Simple TM
+Bnd-LastModified: 1296170470098
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: Full Width Conversion
-Bundle-SymbolicName: net.sf.okapi.steps.generatesimpletm
-Bundle-Version: 1.0.0
-Export-Package: net.sf.okapi.steps.generatesimpletm
-Require-Bundle: net.sf.okapi.pipeline;bundle-version="1.0.0",
- net.sf.okapi.common;bundle-version="1.0.0",
- net.sf.okapi.filters.common;bundle-version="1.0.0",
- net.sf.okapi.lib.segmentation;bundle-version="1.0.0",
- net.sf.okapi.tm.simpletm;bundle-version="1.0.0",
- net.sf.okapi.pipelinedriver;bundle-version="1.0.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-SymbolicName: net.sf.okapi.steps.okapi-step-generatesimpletm
+Import-Package: net.sf.okapi.common,net.sf.okapi.common.exceptions,net
+ .sf.okapi.common.pipeline,net.sf.okapi.common.pipeline.annotations,ne
+ t.sf.okapi.common.resource,net.sf.okapi.common.uidescription,net.sf.o
+ kapi.tm.simpletm
+

@@ -1,9 +1,16 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.connectors.apertium;uses:="net.sf.okapi.c
+ ommon,net.sf.okapi.lib.translation,org.json.simple.parser,org.json.si
+ mple,net.sf.okapi.common.resource,net.sf.okapi.common.query,net.sf.ok
+ api.common.uidescription"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi MT Connector for Apertium
+Bnd-LastModified: 1296170369213
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: Apertium Connector
-Bundle-SymbolicName: net.sf.okapi.connectors.apertium
-Bundle-Version: 1.0.0
-Export-Package: net.sf.okapi.connectors.apertium
-Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0",
- net.sf.okapi.lib.translation;bundle-version="1.0.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-SymbolicName: net.sf.okapi.connectors.okapi-connector-apertium
+Import-Package: net.sf.okapi.common,net.sf.okapi.common.query,net.sf.o
+ kapi.common.resource,net.sf.okapi.common.uidescription,net.sf.okapi.l
+ ib.translation,org.json.simple,org.json.simple.parser
+

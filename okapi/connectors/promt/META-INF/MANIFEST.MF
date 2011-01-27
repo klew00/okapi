@@ -1,9 +1,17 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.connectors.promt;uses:="net.sf.okapi.comm
+ on.uidescription,net.sf.okapi.common,net.sf.okapi.common.exceptions,j
+ avax.xml.parsers,org.w3c.dom,net.sf.okapi.common.query,org.xml.sax,ne
+ t.sf.okapi.lib.translation,net.sf.okapi.common.resource"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi TM Connector for ProMT
+Bnd-LastModified: 1296170359863
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: ProMT Connector
-Bundle-SymbolicName: net.sf.okapi.connectors.promt
-Bundle-Version: 1.0.0
-Export-Package: net.sf.okapi.connectors.promt
-Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0",
- net.sf.okapi.lib.translation;bundle-version="1.0.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-SymbolicName: net.sf.okapi.connectors.okapi-connector-promt
+Import-Package: javax.xml.parsers,net.sf.okapi.common,net.sf.okapi.com
+ mon.exceptions,net.sf.okapi.common.query,net.sf.okapi.common.resource
+ ,net.sf.okapi.common.uidescription,net.sf.okapi.lib.translation,org.w
+ 3c.dom,org.xml.sax
+

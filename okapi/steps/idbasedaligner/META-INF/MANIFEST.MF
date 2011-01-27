@@ -1,8 +1,17 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.steps.idaligner;uses:="net.sf.okapi.commo
+ n.pipeline.annotations,net.sf.okapi.common,net.sf.okapi.common.filter
+ s,net.sf.okapi.common.resource,net.sf.okapi.common.filterwriter,net.s
+ f.okapi.common.pipeline,net.sf.okapi.common.uidescription"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi Step for aligning text units based on ID.
+Bnd-LastModified: 1296170386784
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: ID-based Aligner
-Bundle-SymbolicName: net.sf.okapi.steps.idaligner
-Bundle-Version: 1.0.0
-Export-Package: net.sf.okapi.steps.idaligner
-Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-SymbolicName: net.sf.okapi.steps.okapi-step-idbasedaligner
+Import-Package: net.sf.okapi.common,net.sf.okapi.common.filters,net.sf
+ .okapi.common.filterwriter,net.sf.okapi.common.pipeline,net.sf.okapi.
+ common.pipeline.annotations,net.sf.okapi.common.resource,net.sf.okapi
+ .common.uidescription
+

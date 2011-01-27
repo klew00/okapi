@@ -1,11 +1,17 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.filters.json.ui;uses:="org.eclipse.swt.ev
+ ents,org.eclipse.swt.widgets,net.sf.okapi.common,net.sf.okapi.filters
+ .json,net.sf.okapi.common.ui.filters,org.eclipse.swt.graphics,net.sf.
+ okapi.common.ui,org.eclipse.swt.layout"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi Filter for JSON - UI
+Bnd-LastModified: 1296168792676
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: JSON Filter UI
-Bundle-SymbolicName: net.sf.okapi.filters.ui.json
-Bundle-Version: 1.0.0
-Export-Package: net.sf.okapi.filters.ui.json
-Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0",
- net.sf.okapi.filters.ts;bundle-version="1.0.0",
- net.sf.okapi.ui.common;bundle-version="1.0.0",
- org.eclipse.swt;bundle-version="3.4.2"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-SymbolicName: net.sf.okapi.filters.okapi-filter-json-ui
+Import-Package: net.sf.okapi.common,net.sf.okapi.common.ui,net.sf.okap
+ i.common.ui.filters,net.sf.okapi.filters.json,org.eclipse.swt.events,
+ org.eclipse.swt.graphics,org.eclipse.swt.layout,org.eclipse.swt.widge
+ ts
+

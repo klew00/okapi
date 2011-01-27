@@ -1,13 +1,24 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.filters.table.ui;uses:="org.eclipse.swt.e
+ vents,org.eclipse.swt.widgets,net.sf.okapi.common,net.sf.okapi.common
+ .ui.abstracteditor,org.eclipse.swt.layout,org.eclipse.swt.graphics,ne
+ t.sf.okapi.filters.table.fwc,net.sf.okapi.filters.table.base,net.sf.o
+ kapi.filters.plaintext.ui.common,net.sf.okapi.filters.table,net.sf.ok
+ api.filters.plaintext.ui,net.sf.okapi.common.ui,net.sf.okapi.filters.
+ table.tsv,net.sf.okapi.lib.extra.filters,net.sf.okapi.filters.table.c
+ sv"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi Filter for Table - UI
+Bnd-LastModified: 1296168787634
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: Table Filter Parameters Editor
-Bundle-SymbolicName: net.sf.okapi.ui.filters.table
-Bundle-Version: 1.0.0
-Require-Bundle: org.eclipse.swt;bundle-version="3.4.2",
- net.sf.okapi.common;bundle-version="1.0.0",
- net.sf.okapi.filters.table;bundle-version="1.0.0",
- net.sf.okapi.ui.common;bundle-version="1.0.0",
- net.sf.okapi.ui.filters.plaintext;bundle-version="1.0.0",
- net.sf.okapi.filters.plaintext
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Export-Package: net.sf.okapi.filters.table.ui
+Bundle-SymbolicName: net.sf.okapi.filters.okapi-filter-table-ui
+Import-Package: net.sf.okapi.common,net.sf.okapi.common.ui,net.sf.okap
+ i.common.ui.abstracteditor,net.sf.okapi.filters.plaintext.ui,net.sf.o
+ kapi.filters.plaintext.ui.common,net.sf.okapi.filters.table,net.sf.ok
+ api.filters.table.base,net.sf.okapi.filters.table.csv,net.sf.okapi.fi
+ lters.table.fwc,net.sf.okapi.filters.table.tsv,net.sf.okapi.lib.extra
+ .filters,org.eclipse.swt.events,org.eclipse.swt.graphics,org.eclipse.
+ swt.layout,org.eclipse.swt.widgets
+

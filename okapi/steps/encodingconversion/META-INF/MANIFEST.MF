@@ -1,8 +1,16 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.steps.encodingconversion;uses:="net.sf.ok
+ api.common.pipeline.annotations,net.sf.okapi.common.exceptions,net.sf
+ .okapi.common,net.sf.okapi.common.resource,net.sf.okapi.common.pipeli
+ ne"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi Step for Encoding Conversion
+Bnd-LastModified: 1296170382930
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: Encoding Conversion
-Bundle-SymbolicName: net.sf.okapi.steps.encodingconversion
-Bundle-Version: 1.0.0
-Export-Package: net.sf.okapi.steps.encodingconversion
-Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-SymbolicName: net.sf.okapi.steps.okapi-step-encodingconversion
+Import-Package: net.sf.okapi.common,net.sf.okapi.common.exceptions,net
+ .sf.okapi.common.pipeline,net.sf.okapi.common.pipeline.annotations,ne
+ t.sf.okapi.common.resource
+

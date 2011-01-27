@@ -1,8 +1,23 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.steps.formatconversion;uses:="net.sf.okap
+ i.common.encoder,net.sf.okapi.common,net.sf.okapi.common.exceptions,n
+ et.sf.okapi.common.resource,net.sf.okapi.common.filterwriter,net.sf.o
+ kapi.common.pipeline.annotations,net.sf.okapi.filters.po,net.sf.okapi
+ .common.pipeline,net.sf.okapi.filters.pensieve,net.sf.okapi.common.ui
+ description",net.sf.okapi.steps.tmimport;uses:="net.sf.okapi.common.u
+ idescription,net.sf.okapi.common,net.sf.okapi.common.pipeline.annotat
+ ions,net.sf.okapi.common.filterwriter,net.sf.okapi.common.pipeline,ne
+ t.sf.okapi.filters.pensieve"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi Step for Format Conversion
+Bnd-LastModified: 1296170418388
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: Copy Source To Target Plug-in
-Bundle-SymbolicName: net.sf.okapi.steps.formatconversion
-Bundle-Version: 1.0.0
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0"
-Export-Package: net.sf.okapi.steps.formatconversion
+Bundle-SymbolicName: net.sf.okapi.steps.okapi-step-formatconversion
+Import-Package: net.sf.okapi.common,net.sf.okapi.common.encoder,net.sf
+ .okapi.common.exceptions,net.sf.okapi.common.filterwriter,net.sf.okap
+ i.common.pipeline,net.sf.okapi.common.pipeline.annotations,net.sf.oka
+ pi.common.resource,net.sf.okapi.common.uidescription,net.sf.okapi.fil
+ ters.pensieve,net.sf.okapi.filters.po
+

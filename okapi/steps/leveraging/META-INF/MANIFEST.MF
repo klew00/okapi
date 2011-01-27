@@ -1,11 +1,25 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.steps.batchtranslation;uses:="net.sf.okap
+ i.common.filters,net.sf.okapi.common.pipeline.annotations,net.sf.okap
+ i.common,net.sf.okapi.common.resource,net.sf.okapi.common.pipeline,ne
+ t.sf.okapi.tm.pensieve.writer,net.htmlparser.jericho,net.sf.okapi.com
+ mon.filterwriter,net.sf.okapi.tm.pensieve.seeker,net.sf.okapi.lib.seg
+ mentation,net.sf.okapi.lib.translation,net.sf.okapi.tm.pensieve.commo
+ n,net.sf.okapi.common.uidescription",net.sf.okapi.steps.leveraging;us
+ es:="net.sf.okapi.common.pipeline.annotations,net.sf.okapi.common,net
+ .sf.okapi.lib.translation,net.sf.okapi.common.resource,net.sf.okapi.c
+ ommon.filterwriter,net.sf.okapi.common.pipeline"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi Step for Leveraging
+Bnd-LastModified: 1296170416178
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: Segmentation
-Bundle-SymbolicName: net.sf.okapi.steps.leveraging
-Bundle-Version: 1.0.0
-Export-Package: net.sf.okapi.steps.leveraging
-Require-Bundle: net.sf.okapi.pipeline;bundle-version="1.0.0",
- net.sf.okapi.common;bundle-version="1.0.0",
- net.sf.okapi.filters.common;bundle-version="1.0.0",
- net.sf.okapi.lib.translation;bundle-version="1.0.0",
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-SymbolicName: net.sf.okapi.steps.okapi-step-leveraging
+Import-Package: net.htmlparser.jericho,net.sf.okapi.common,net.sf.okap
+ i.common.filters,net.sf.okapi.common.filterwriter,net.sf.okapi.common
+ .pipeline,net.sf.okapi.common.pipeline.annotations,net.sf.okapi.commo
+ n.resource,net.sf.okapi.common.uidescription,net.sf.okapi.lib.segment
+ ation,net.sf.okapi.lib.translation,net.sf.okapi.tm.pensieve.common,ne
+ t.sf.okapi.tm.pensieve.seeker,net.sf.okapi.tm.pensieve.writer
+

@@ -1,17 +1,16 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.filters.html.ui;uses:="org.eclipse.swt.wi
+ dgets,net.sf.okapi.common.ui,org.eclipse.swt.layout,net.sf.okapi.comm
+ on.ui.abstracteditor,org.eclipse.swt.events,net.sf.okapi.common,net.s
+ f.okapi.filters.html",net.sf.okapi.filters.html.ui.model
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi Filter for HTML - UI
+Bnd-LastModified: 1296168766479
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: Abstract Markup Filter UI
-Bundle-SymbolicName: net.sf.okapi.ui.filters.html
-Bundle-Version: 1.0.0.qualifier
-Require-Bundle: org.eclipse.swt;bundle-version="3.5.0",
- net.sf.okapi.ui.common;bundle-version="1.0.0",
- net.sf.okapi.common;bundle-version="1.0.0",
- net.sf.okapi.filters.html;bundle-version="1.0.0",
- org.eclipse.core.databinding;bundle-version="1.2.0",
- org.eclipse.core.databinding.beans;bundle-version="1.2.0",
- org.eclipse.jface.databinding;bundle-version="1.3.1",
- org.eclipse.core.databinding.property;bundle-version="1.2.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Export-Package: net.sf.okapi.ui.filters.html
-Bundle-ClassPath: lib/swing2swt.jar,
- .
+Bundle-SymbolicName: net.sf.okapi.filters.okapi-filter-html-ui
+Import-Package: net.sf.okapi.common,net.sf.okapi.common.ui,net.sf.okap
+ i.common.ui.abstracteditor,net.sf.okapi.filters.html,org.eclipse.swt.
+ events,org.eclipse.swt.layout,org.eclipse.swt.widgets
+

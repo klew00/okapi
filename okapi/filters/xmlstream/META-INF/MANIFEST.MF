@@ -1,8 +1,16 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.filters.xmlstream;uses:="net.sf.okapi.com
+ mon,net.sf.okapi.filters.yaml,net.sf.okapi.filters.abstractmarkup,net
+ .sf.okapi.common.filters,net.htmlparser.jericho,net.sf.okapi.common.f
+ ilterwriter"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi Filter for Streamed XML
+Bnd-LastModified: 1296170299591
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: XML Stream Filter
-Bundle-SymbolicName: net.sf.okapi.filters.xmlstream
-Bundle-Version: 1.0.0
-Export-Package: net.sf.okapi.filters.xmlstream
-Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-SymbolicName: net.sf.okapi.filters.okapi-filter-xmlstream
+Import-Package: net.htmlparser.jericho,net.sf.okapi.common,net.sf.okap
+ i.common.filters,net.sf.okapi.common.filterwriter,net.sf.okapi.filter
+ s.abstractmarkup,net.sf.okapi.filters.yaml
+

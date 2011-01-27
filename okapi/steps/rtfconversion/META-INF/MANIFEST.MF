@@ -1,8 +1,17 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.steps.rtfconversion;uses:="net.sf.okapi.c
+ ommon.uidescription,net.sf.okapi.common,net.sf.okapi.common.pipeline.
+ annotations,net.sf.okapi.common.exceptions,net.sf.okapi.common.resour
+ ce,net.sf.okapi.common.pipeline,net.sf.okapi.filters.rtf"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi Step for RTF Conversion
+Bnd-LastModified: 1296170392584
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: RTF Conversion
-Bundle-SymbolicName: net.sf.okapi.steps.rtfconversion
-Bundle-Version: 1.0.0
-Export-Package: net.sf.okapi.steps.rtfconversion
-Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-SymbolicName: net.sf.okapi.steps.okapi-step-rtfconversion
+Import-Package: net.sf.okapi.common,net.sf.okapi.common.exceptions,net
+ .sf.okapi.common.pipeline,net.sf.okapi.common.pipeline.annotations,ne
+ t.sf.okapi.common.resource,net.sf.okapi.common.uidescription,net.sf.o
+ kapi.filters.rtf
+

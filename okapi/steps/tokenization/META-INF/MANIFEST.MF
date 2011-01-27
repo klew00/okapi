@@ -1,20 +1,26 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.steps.tokenization;uses:="net.sf.okapi.co
+ mmon,net.sf.okapi.steps.tokenization.common,net.sf.okapi.steps.tokeni
+ zation.tokens,net.sf.okapi.common.annotation,net.sf.okapi.common.reso
+ urce,net.sf.okapi.lib.extra.steps",net.sf.okapi.steps.tokenization.co
+ mmon;uses:="net.sf.okapi.steps.tokenization.tokens,net.sf.okapi.commo
+ n,net.sf.okapi.lib.extra,net.sf.okapi.common.annotation",net.sf.okapi
+ .steps.tokenization.engine;uses:="net.sf.okapi.steps.tokenization.tok
+ ens,net.sf.okapi.common,net.sf.okapi.steps.tokenization.common,net.sf
+ .okapi.steps.tokenization.engine.javacc,net.sf.okapi.common.annotatio
+ n,com.ibm.icu.util,com.ibm.icu.text",net.sf.okapi.steps.tokenization.
+ engine.javacc,net.sf.okapi.steps.tokenization.locale;uses:="net.sf.ok
+ api.common,com.ibm.icu.util",net.sf.okapi.steps.tokenization.tokens;u
+ ses:="net.sf.okapi.common,net.sf.okapi.lib.extra,net.sf.okapi.steps.t
+ okenization.common"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi Step for Tokenization
+Bnd-LastModified: 1296170399822
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: Tokenization Plug-in
-Bundle-SymbolicName: net.sf.okapi.steps.tokenization
-Bundle-Version: 1.0.0
-Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0",
- net.sf.okapi.steps.common;bundle-version="1.0.0",
- com.ibm.icu;bundle-version="3.8.1",
- net.sf.okapi.filters.plaintext;bundle-version="1.0.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Export-Package: net.sf.okapi.steps.tokenization,
- net.sf.okapi.steps.tokenization.common,
- net.sf.okapi.steps.tokenization.engine,
- net.sf.okapi.steps.tokenization.engine.dictionary,
- net.sf.okapi.steps.tokenization.engine.javacc,
- net.sf.okapi.steps.tokenization.engine.rbbi,
- net.sf.okapi.steps.tokenization.engine.recognizer,
- net.sf.okapi.steps.tokenization.engine.regex,
- net.sf.okapi.steps.tokenization.locale,
- net.sf.okapi.steps.tokenization.tokens
+Bundle-SymbolicName: net.sf.okapi.steps.okapi-step-tokenization
+Import-Package: com.ibm.icu.text,com.ibm.icu.util,net.sf.okapi.common,
+ net.sf.okapi.common.annotation,net.sf.okapi.common.resource,net.sf.ok
+ api.lib.extra,net.sf.okapi.lib.extra.steps
+

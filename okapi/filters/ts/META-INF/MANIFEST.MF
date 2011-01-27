@@ -1,8 +1,18 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.filters.ts;uses:="net.sf.okapi.common.fil
+ ters,net.sf.okapi.common,javax.xml.stream.events,javax.xml.namespace,
+ net.sf.okapi.common.skeleton,net.sf.okapi.common.encoder,net.sf.okapi
+ .common.exceptions,net.sf.okapi.common.filterwriter,javax.xml.stream,
+ net.sf.okapi.common.resource"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi Filter for TS
+Bnd-LastModified: 1296170283119
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: ts Filter
-Bundle-SymbolicName: net.sf.okapi.filters.ts
-Bundle-Version: 1.0.0
-Export-Package: net.sf.okapi.filters.ts
-Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-SymbolicName: net.sf.okapi.filters.okapi-filter-ts
+Import-Package: javax.xml.namespace,javax.xml.stream,javax.xml.stream.
+ events,net.sf.okapi.common,net.sf.okapi.common.encoder,net.sf.okapi.c
+ ommon.exceptions,net.sf.okapi.common.filters,net.sf.okapi.common.filt
+ erwriter,net.sf.okapi.common.resource,net.sf.okapi.common.skeleton
+

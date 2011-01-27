@@ -1,9 +1,19 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.filters.tmx;uses:="net.sf.okapi.common,ne
+ t.sf.okapi.common.uidescription,net.sf.okapi.common.skeleton,net.sf.o
+ kapi.common.encoder,net.sf.okapi.common.exceptions,net.sf.okapi.commo
+ n.filterwriter,javax.xml.stream,net.sf.okapi.common.filters,net.sf.ok
+ api.common.resource"
+Class-Path: 
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi Filter for TMX
+Bnd-LastModified: 1296170280442
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: TMX Filter
-Bundle-SymbolicName: net.sf.okapi.filters.tmx
-Bundle-Version: 1.0.0
-Export-Package: net.sf.okapi.filters.tmx
-Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-SymbolicName: net.sf.okapi.filters.okapi-filter-tmx
+Import-Package: javax.xml.stream,net.sf.okapi.common,net.sf.okapi.comm
+ on.encoder,net.sf.okapi.common.exceptions,net.sf.okapi.common.filters
+ ,net.sf.okapi.common.filterwriter,net.sf.okapi.common.resource,net.sf
+ .okapi.common.skeleton,net.sf.okapi.common.uidescription
 

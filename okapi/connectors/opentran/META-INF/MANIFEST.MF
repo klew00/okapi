@@ -1,12 +1,16 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.connectors.opentran;uses:="net.sf.okapi.l
+ ib.translation,net.sf.okapi.common,net.sf.okapi.common.exceptions,org
+ .json.simple.parser,org.json.simple,net.sf.okapi.common.resource,net.
+ sf.okapi.common.query"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi TM Connector for OpenTran
+Bnd-LastModified: 1296170360789
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: Opentran  TM Connector
-Bundle-SymbolicName: net.sf.okapi.connectors.opentran
-Bundle-Version: 1.0.0
-Bundle-ClassPath: lib/xmlrpc-client-3.1.jar,
- lib/xmlrpc-common-3.1.jar,
- lib/ws-commons-util-1.0.2.jar
-Export-Package: net.sf.okapi.connectors.opentran
-Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0",
- net.sf.okapi.lib.translation;bundle-version="1.0.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-SymbolicName: net.sf.okapi.connectors.okapi-connector-opentran
+Import-Package: net.sf.okapi.common,net.sf.okapi.common.exceptions,net
+ .sf.okapi.common.query,net.sf.okapi.common.resource,net.sf.okapi.lib.
+ translation,org.json.simple,org.json.simple.parser
+

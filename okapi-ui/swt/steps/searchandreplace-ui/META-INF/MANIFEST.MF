@@ -1,11 +1,16 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.steps.searchandreplace.ui;uses:="org.ecli
+ pse.swt.widgets,org.eclipse.swt.events,net.sf.okapi.steps.searchandre
+ place,net.sf.okapi.common,net.sf.okapi.common.ui,org.eclipse.swt.grap
+ hics,org.eclipse.swt.layout"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi Step for Search and Replace - UI
+Bnd-LastModified: 1296168819259
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: SearchAndReplace Parameters Editor
-Bundle-SymbolicName: net.sf.okapi.ui.steps.searchandreplace
-Bundle-Version: 1.0.0
-Export-Package: net.sf.okapi.steps.ui.searchandreplace
-Require-Bundle: net.sf.okapi.steps.searchandreplace;bundle-version="1.0.0",
- net.sf.okapi.common;bundle-version="1.0.0",
- net.sf.okapi.ui.common;bundle-version="1.0.0",
- org.eclipse.swt;bundle-version="3.4.2"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-SymbolicName: net.sf.okapi.steps.okapi-step-searchandreplace-ui
+Import-Package: net.sf.okapi.common,net.sf.okapi.common.ui,net.sf.okap
+ i.steps.searchandreplace,org.eclipse.swt.events,org.eclipse.swt.graph
+ ics,org.eclipse.swt.layout,org.eclipse.swt.widgets
+

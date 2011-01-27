@@ -1,9 +1,22 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.steps.diffleverage;uses:="net.sf.okapi.li
+ b.search.lucene.scorer,net.sf.okapi.common.pipeline.annotations,net.s
+ f.okapi.common.exceptions,net.sf.okapi.common.annotation,net.sf.okapi
+ .common.query,net.sf.okapi.common,net.sf.okapi.common.filters,net.sf.
+ okapi.lib.search.lucene.analysis,net.sf.okapi.lib.extra.diff.incava,n
+ et.sf.okapi.common.resource,net.sf.okapi.common.pipeline,net.sf.okapi
+ .common.uidescription"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi Step for Diff Leveraging
+Bnd-LastModified: 1296170382022
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: Diff Leverage Step
-Bundle-SymbolicName: net.sf.okapi.steps.diffleverage
-Bundle-Version: 1.0.0
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0",
- net.sf.okapi.lib.extra;bundle-version="1.0.0"
-Export-Package: net.sf.okapi.steps.diffleverage
+Bundle-SymbolicName: net.sf.okapi.steps.okapi-step-diffleverage
+Import-Package: net.sf.okapi.common,net.sf.okapi.common.annotation,net
+ .sf.okapi.common.exceptions,net.sf.okapi.common.filters,net.sf.okapi.
+ common.pipeline,net.sf.okapi.common.pipeline.annotations,net.sf.okapi
+ .common.query,net.sf.okapi.common.resource,net.sf.okapi.common.uidesc
+ ription,net.sf.okapi.lib.extra.diff.incava,net.sf.okapi.lib.search.lu
+ cene.analysis,net.sf.okapi.lib.search.lucene.scorer
+

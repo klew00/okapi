@@ -1,12 +1,17 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.steps.segmentation.ui;uses:="net.sf.okapi
+ .common,org.eclipse.swt.events,org.eclipse.swt.widgets,org.eclipse.sw
+ t.graphics,net.sf.okapi.steps.segmentation,net.sf.okapi.common.ui,net
+ .sf.okapi.lib.ui.segmentation,org.eclipse.swt.layout"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi Step for SRX Segmentation - UI
+Bnd-LastModified: 1296168822290
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: SegmentationStep Parameters Editor
-Bundle-SymbolicName: net.sf.okapi.ui.steps.segmentation
-Bundle-Version: 1.0.0
-Export-Package: net.sf.okapi.steps.ui.segmentation
-Require-Bundle: net.sf.okapi.steps.segmentation;bundle-version="1.0.0",
- net.sf.okapi.common;bundle-version="1.0.0",
- net.sf.okapi.ui.common;bundle-version="1.0.0",
- net.sf.okapi.ui.lib.segmentation;bundle-version="1.0.0",
- org.eclipse.swt;bundle-version="3.4.2"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-SymbolicName: net.sf.okapi.steps.okapi-step-segmentation-ui
+Import-Package: net.sf.okapi.common,net.sf.okapi.common.ui,net.sf.okap
+ i.lib.ui.segmentation,net.sf.okapi.steps.segmentation,org.eclipse.swt
+ .events,org.eclipse.swt.graphics,org.eclipse.swt.layout,org.eclipse.s
+ wt.widgets
+

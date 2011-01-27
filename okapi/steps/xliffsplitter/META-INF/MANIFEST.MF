@@ -1,8 +1,19 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.steps.xliffsplitter;uses:="net.sf.okapi.c
+ ommon.uidescription,net.sf.okapi.common,javax.xml.stream,net.sf.okapi
+ .common.exceptions,javax.xml.stream.events,net.sf.okapi.common.pipeli
+ ne.annotations,javax.xml.namespace,net.sf.okapi.common.resource,net.s
+ f.okapi.common.pipeline,net.htmlparser.jericho"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi Step for Splitting an XLIFF File
+Bnd-LastModified: 1296170409145
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: XLIFF Splitter
-Bundle-SymbolicName: net.sf.okapi.steps.xliffsplitter
-Bundle-Version: 1.0.0
-Export-Package: net.sf.okapi.steps.xliffsplitter
-Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-SymbolicName: net.sf.okapi.steps.okapi-step-xliffsplitter
+Import-Package: javax.xml.namespace,javax.xml.stream,javax.xml.stream.
+ events,net.htmlparser.jericho,net.sf.okapi.common,net.sf.okapi.common
+ .exceptions,net.sf.okapi.common.pipeline,net.sf.okapi.common.pipeline
+ .annotations,net.sf.okapi.common.resource,net.sf.okapi.common.uidescr
+ iption
+

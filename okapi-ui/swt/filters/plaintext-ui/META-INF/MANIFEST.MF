@@ -1,13 +1,25 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.filters.plaintext.ui;uses:="net.sf.okapi.
+ filters.plaintext,net.sf.okapi.common,net.sf.okapi.filters.plaintext.
+ ui.common,org.eclipse.swt.widgets,org.eclipse.swt.events,net.sf.okapi
+ .filters.plaintext.base,net.sf.okapi.filters.plaintext.spliced,net.sf
+ .okapi.filters.plaintext.paragraphs,net.sf.okapi.common.ui.abstracted
+ itor,net.sf.okapi.lib.extra.filters,net.sf.okapi.filters.plaintext.re
+ gex,org.eclipse.swt.layout,net.sf.okapi.common.ui.filters,net.sf.okap
+ i.common.ui",net.sf.okapi.filters.plaintext.ui.common;uses:="net.sf.o
+ kapi.common,net.sf.okapi.common.ui.abstracteditor,net.sf.okapi.lib.ex
+ tra.filters,org.eclipse.swt.widgets,net.sf.okapi.common.ui"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi Filter for Plaintext - UI
+Bnd-LastModified: 1296168779975
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: Plain Text Filter Parameters Editor
-Bundle-SymbolicName: net.sf.okapi.ui.filters.plaintext
-Bundle-Version: 1.0.0
-Require-Bundle: org.eclipse.swt;bundle-version="3.4.2",
- net.sf.okapi.common;bundle-version="1.0.0",
- net.sf.okapi.filters.plaintext;bundle-version="1.0.0",
- net.sf.okapi.ui.common;bundle-version="1.0.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Export-Package: net.sf.okapi.filters.plaintext.ui,
- net.sf.okapi.filters.plaintext.ui.common
+Bundle-SymbolicName: net.sf.okapi.filters.okapi-filter-plaintext-ui
+Import-Package: net.sf.okapi.common,net.sf.okapi.common.ui,net.sf.okap
+ i.common.ui.abstracteditor,net.sf.okapi.common.ui.filters,net.sf.okap
+ i.filters.plaintext,net.sf.okapi.filters.plaintext.base,net.sf.okapi.
+ filters.plaintext.paragraphs,net.sf.okapi.filters.plaintext.regex,net
+ .sf.okapi.filters.plaintext.spliced,net.sf.okapi.lib.extra.filters,or
+ g.eclipse.swt.events,org.eclipse.swt.layout,org.eclipse.swt.widgets
 

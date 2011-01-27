@@ -1,12 +1,35 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.common.ui;uses:="org.eclipse.swt.events,o
+ rg.eclipse.swt.widgets,org.eclipse.swt.graphics,org.eclipse.swt.layou
+ t,net.sf.okapi.common,org.eclipse.swt.custom,net.sf.okapi.common.exce
+ ptions,org.eclipse.swt.program,org.eclipse.swt",net.sf.okapi.common.u
+ i.abstracteditor;uses:="org.eclipse.swt.events,net.sf.okapi.lib.extra
+ ,org.eclipse.swt.widgets,net.sf.okapi.common,org.eclipse.swt.graphics
+ ,net.sf.okapi.common.ui,org.eclipse.swt.layout",net.sf.okapi.common.u
+ i.filters;uses:="net.sf.okapi.common.uidescription,net.sf.okapi.commo
+ n.filters,net.sf.okapi.common,net.sf.okapi.common.ui.genericeditor,or
+ g.eclipse.swt.widgets,net.sf.okapi.common.ui,org.eclipse.swt.events,o
+ rg.eclipse.swt.graphics,org.eclipse.swt.layout,net.sf.okapi.common.ex
+ ceptions,net.sf.okapi.common.resource,net.sf.okapi.common.filterwrite
+ r",net.sf.okapi.common.ui.genericeditor;uses:="net.sf.okapi.common.ui
+ description,org.eclipse.swt.events,org.eclipse.swt.widgets,net.sf.oka
+ pi.common.exceptions,net.sf.okapi.common.ui,org.eclipse.swt.layout,ne
+ t.sf.okapi.common,net.sf.okapi.common.ui.filters,org.eclipse.swt.grap
+ hics",net.sf.okapi.common.ui.plugins;uses:="net.sf.okapi.common,org.e
+ clipse.swt.events,org.eclipse.swt.widgets,org.eclipse.swt.graphics,ja
+ vax.xml.parsers,net.sf.okapi.common.ui,org.eclipse.swt.layout,org.w3c
+ .dom"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi Core UI
+Bnd-LastModified: 1296168763538
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: Common UI Library
-Bundle-SymbolicName: net.sf.okapi.ui.common
-Bundle-Version: 1.0.0
-Export-Package: net.sf.okapi.common.ui,
- net.sf.okapi.common.ui.abstracteditor,
- net.sf.okapi.common.ui.filters
- net.sf.okapi.common.ui.genericeditor
-Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0",
- org.eclipse.swt;bundle-version="3.4.2"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-SymbolicName: net.sf.okapi.core-ui
+Import-Package: javax.xml.parsers,net.sf.okapi.common,net.sf.okapi.com
+ mon.exceptions,net.sf.okapi.common.filters,net.sf.okapi.common.filter
+ writer,net.sf.okapi.common.resource,net.sf.okapi.common.uidescription
+ ,net.sf.okapi.lib.extra,org.eclipse.swt,org.eclipse.swt.custom,org.ec
+ lipse.swt.events,org.eclipse.swt.graphics,org.eclipse.swt.layout,org.
+ eclipse.swt.program,org.eclipse.swt.widgets,org.w3c.dom
+

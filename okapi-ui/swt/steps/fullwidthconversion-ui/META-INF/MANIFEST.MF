@@ -1,11 +1,17 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.steps.fullwidthconversion.ui;uses:="net.s
+ f.okapi.common,org.eclipse.swt.events,org.eclipse.swt.widgets,org.ecl
+ ipse.swt.graphics,net.sf.okapi.common.ui,org.eclipse.swt.layout,net.s
+ f.okapi.steps.fullwidthconversion"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi Step for Full Width Conversion UI
+Bnd-LastModified: 1296168813586
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: Fullwidth Conversion Parameters Editor
-Bundle-SymbolicName: net.sf.okapi.ui.steps.fullwidthconversion
-Bundle-Version: 1.0.0
-Export-Package: net.sf.okapi.steps.ui.fullwidthconversion
-Require-Bundle: net.sf.okapi.steps.fullwidthconversion;bundle-version="1.0.0",
- net.sf.okapi.common;bundle-version="1.0.0",
- net.sf.okapi.ui.common;bundle-version="1.0.0",
- org.eclipse.swt;bundle-version="3.4.2"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-SymbolicName: net.sf.okapi.steps.okapi-step-fullwidthconversion
+ -ui
+Import-Package: net.sf.okapi.common,net.sf.okapi.common.ui,net.sf.okap
+ i.steps.fullwidthconversion,org.eclipse.swt.events,org.eclipse.swt.gr
+ aphics,org.eclipse.swt.layout,org.eclipse.swt.widgets
+

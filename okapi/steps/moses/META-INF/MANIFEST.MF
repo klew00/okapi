@@ -1,9 +1,19 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.steps.moses;uses:="net.sf.okapi.common.pi
+ peline.annotations,net.sf.okapi.common,net.sf.okapi.common.resource,n
+ et.sf.okapi.common.pipeline,net.sf.okapi.filters.mosestext,net.sf.oka
+ pi.common.uidescription,net.sf.okapi.common.exceptions,net.sf.okapi.c
+ ommon.annotation,net.sf.okapi.common.query"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi Steps for Moses Utilities
+Bnd-LastModified: 1296170390486
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: Moses Utilities
-Bundle-SymbolicName: net.sf.okapi.steps.moses
-Bundle-Version: 1.0.0
-Export-Package: net.sf.okapi.steps.moses
-Require-Bundle: net.sf.okapi.pipeline;bundle-version="1.0.0",
- net.sf.okapi.common;bundle-version="1.0.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-SymbolicName: net.sf.okapi.steps.okapi-step-moses
+Import-Package: net.sf.okapi.common,net.sf.okapi.common.annotation,net
+ .sf.okapi.common.exceptions,net.sf.okapi.common.pipeline,net.sf.okapi
+ .common.pipeline.annotations,net.sf.okapi.common.query,net.sf.okapi.c
+ ommon.resource,net.sf.okapi.common.uidescription,net.sf.okapi.filters
+ .mosestext
+

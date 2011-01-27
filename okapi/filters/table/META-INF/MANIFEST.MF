@@ -1,13 +1,25 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.filters.table;uses:="net.sf.okapi.filters
+ .table.fwc,net.sf.okapi.filters.table.tsv,net.sf.okapi.lib.extra.filt
+ ers,net.sf.okapi.filters.table.csv,net.sf.okapi.common",net.sf.okapi.
+ filters.table.base;uses:="net.sf.okapi.filters.plaintext.base,net.sf.
+ okapi.common.skeleton,net.sf.okapi.common,net.sf.okapi.lib.extra.filt
+ ers,net.sf.okapi.common.resource",net.sf.okapi.filters.table.csv;uses
+ :="net.sf.okapi.common.skeleton,net.sf.okapi.common,net.sf.okapi.filt
+ ers.table.base,net.sf.okapi.lib.extra.filters,net.sf.okapi.common.res
+ ource",net.sf.okapi.filters.table.fwc;uses:="net.sf.okapi.common,net.
+ sf.okapi.filters.table.base,net.sf.okapi.lib.extra.filters,net.sf.oka
+ pi.common.resource",net.sf.okapi.filters.table.tsv;uses:="net.sf.okap
+ i.filters.table.base,net.sf.okapi.common,net.sf.okapi.lib.extra.filte
+ rs,net.sf.okapi.common.resource"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi Filter for Table
+Bnd-LastModified: 1296170345652
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: Table Filter
-Bundle-SymbolicName: net.sf.okapi.filters.table
-Bundle-Version: 1.0.0
-Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0",
- net.sf.okapi.filters.plaintext;bundle-version="1.0.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Export-Package: net.sf.okapi.filters.table,
- net.sf.okapi.filters.table.base,
- net.sf.okapi.filters.table.csv,
- net.sf.okapi.filters.table.fwc,
- net.sf.okapi.filters.table.tsv
+Bundle-SymbolicName: net.sf.okapi.filters.okapi-filter-table
+Import-Package: net.sf.okapi.common,net.sf.okapi.common.resource,net.s
+ f.okapi.common.skeleton,net.sf.okapi.filters.plaintext.base,net.sf.ok
+ api.lib.extra.filters
+

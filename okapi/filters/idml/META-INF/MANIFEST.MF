@@ -1,8 +1,21 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.filters.idml;uses:="net.sf.okapi.common,n
+ et.sf.okapi.common.resource,org.w3c.dom,net.sf.okapi.common.skeleton,
+ net.sf.okapi.common.encoder,net.sf.okapi.common.exceptions,javax.xml.
+ parsers,net.sf.okapi.common.filterwriter,org.xml.sax,net.sf.okapi.com
+ mon.filters,javax.xml.transform.dom,javax.xml.transform,javax.xml.tra
+ nsform.stream,net.sf.okapi.common.uidescription"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi Filter for IDML
+Bnd-LastModified: 1296170257165
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: Idml Filter
-Bundle-SymbolicName: net.sf.okapi.filters.idml
-Bundle-Version: 1.0.0
-Export-Package: net.sf.okapi.filters.idml
-Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-SymbolicName: net.sf.okapi.filters.okapi-filter-idml
+Import-Package: javax.xml.parsers,javax.xml.transform,javax.xml.transf
+ orm.dom,javax.xml.transform.stream,net.sf.okapi.common,net.sf.okapi.c
+ ommon.encoder,net.sf.okapi.common.exceptions,net.sf.okapi.common.filt
+ ers,net.sf.okapi.common.filterwriter,net.sf.okapi.common.resource,net
+ .sf.okapi.common.skeleton,net.sf.okapi.common.uidescription,org.w3c.d
+ om,org.xml.sax
+

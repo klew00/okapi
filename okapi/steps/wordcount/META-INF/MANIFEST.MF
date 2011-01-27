@@ -1,12 +1,25 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.steps.wordcount;uses:="net.sf.okapi.steps
+ .wordcount.common,net.sf.okapi.common,net.sf.okapi.steps.tokenization
+ .tokens,net.sf.okapi.steps.tokenization,net.sf.okapi.common.annotatio
+ n,net.sf.okapi.common.resource",net.sf.okapi.steps.wordcount.categori
+ zed;uses:="net.sf.okapi.steps.wordcount.common,net.sf.okapi.common.qu
+ ery,net.sf.okapi.common,net.sf.okapi.common.resource",net.sf.okapi.st
+ eps.wordcount.common;uses:="net.sf.okapi.common,net.sf.okapi.steps.wo
+ rdcount,net.sf.okapi.common.annotation,net.sf.okapi.common.resource,n
+ et.sf.okapi.common.query,net.sf.okapi.lib.extra.steps,net.sf.okapi.li
+ b.extra,net.sf.okapi.steps.tokenization.tokens,net.sf.okapi.steps.tok
+ enization,net.sf.okapi.steps.tokenization.common"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi Step for Word Count
+Bnd-LastModified: 1296170406855
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: WordCount Plug-in
-Bundle-SymbolicName: net.sf.okapi.steps.wordcount
-Bundle-Version: 1.0.0
-Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0",
- net.sf.okapi.steps.common;bundle-version="1.0.0",
- net.sf.okapi.steps.tokenization;bundle-version="1.0.0",
- net.sf.okapi.filters.plaintext;bundle-version="1.0.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Export-Package: net.sf.okapi.steps.wordcount,
- net.sf.okapi.steps.wordcount.common
+Bundle-SymbolicName: net.sf.okapi.steps.okapi-step-wordcount
+Import-Package: net.sf.okapi.common,net.sf.okapi.common.annotation,net
+ .sf.okapi.common.query,net.sf.okapi.common.resource,net.sf.okapi.lib.
+ extra,net.sf.okapi.lib.extra.steps,net.sf.okapi.steps.tokenization,ne
+ t.sf.okapi.steps.tokenization.common,net.sf.okapi.steps.tokenization.
+ tokens
+

@@ -1,8 +1,14 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.steps.charlisting;uses:="net.sf.okapi.com
+ mon,net.sf.okapi.common.resource,net.sf.okapi.common.pipeline,net.sf.
+ okapi.common.uidescription"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi Step for Char Listing
+Bnd-LastModified: 1296170375603
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: Characters Listing
-Bundle-SymbolicName: net.sf.okapi.steps.charlisting
-Bundle-Version: 1.0.0
-Export-Package: net.sf.okapi.steps.charlisting
-Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-SymbolicName: net.sf.okapi.steps.okapi-step-charlisting
+Import-Package: net.sf.okapi.common,net.sf.okapi.common.pipeline,net.s
+ f.okapi.common.resource,net.sf.okapi.common.uidescription
+

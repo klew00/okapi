@@ -1,11 +1,18 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.steps.xsltransform.ui;uses:="net.sf.okapi
+ .common,org.eclipse.swt.events,org.eclipse.swt.widgets,net.sf.okapi.c
+ ommon.ui,org.eclipse.swt.program,net.sf.okapi.steps.xsltransform,java
+ x.xml.parsers,org.w3c.dom,org.eclipse.swt.layout,javax.xml.namespace,
+ javax.xml.xpath,org.eclipse.swt.graphics"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi Step for XSL Transform - UI
+Bnd-LastModified: 1296168843654
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: Xsltransform Parameters Editor
-Bundle-SymbolicName: net.sf.okapi.ui.steps.xsltransform
-Bundle-Version: 1.0.0
-Export-Package: net.sf.okapi.steps.xsltransform.ui
-Require-Bundle: net.sf.okapi.steps.xsltransform;bundle-version="1.0.0",
- net.sf.okapi.common;bundle-version="1.0.0",
- net.sf.okapi.ui.common;bundle-version="1.0.0",
- org.eclipse.swt;bundle-version="3.4.2"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-SymbolicName: net.sf.okapi.steps.okapi-step-xsltransform-ui
+Import-Package: javax.xml.namespace,javax.xml.parsers,javax.xml.xpath,
+ net.sf.okapi.common,net.sf.okapi.common.ui,net.sf.okapi.steps.xsltran
+ sform,org.eclipse.swt.events,org.eclipse.swt.graphics,org.eclipse.swt
+ .layout,org.eclipse.swt.program,org.eclipse.swt.widgets,org.w3c.dom
+

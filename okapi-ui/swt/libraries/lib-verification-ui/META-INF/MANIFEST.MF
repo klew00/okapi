@@ -1,11 +1,29 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.lib.ui.editor;uses:="net.sf.okapi.common.
+ resource,org.eclipse.swt.dnd,net.sf.okapi.common.filters,net.sf.okapi
+ .common,org.eclipse.swt.events,org.eclipse.swt.widgets,org.eclipse.sw
+ t.graphics,net.sf.okapi.common.ui,org.eclipse.swt.layout,net.sf.okapi
+ .common.ui.filters,org.eclipse.swt.custom,net.sf.okapi.virtualdb,net.
+ sf.okapi.common.filterwriter,net.sf.okapi.virtualdb.jdbc.h2,net.sf.ok
+ api.virtualdb.jdbc",net.sf.okapi.lib.ui.verification;uses:="net.sf.ok
+ api.lib.verification,org.eclipse.swt.graphics,org.eclipse.swt.widgets
+ ,net.sf.okapi.common,org.eclipse.swt.events,net.sf.okapi.common.ui,or
+ g.eclipse.swt.layout,net.sf.okapi.lib.ui.editor,org.eclipse.swt.dnd,n
+ et.sf.okapi.common.resource,org.eclipse.swt.program,org.eclipse.swt.c
+ ustom,net.sf.okapi.common.filters",net.sf.okapi.lib.ui.verification.i
+ mages
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi Library for Verification Utilities - UI
+Bnd-LastModified: 1296168804841
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: Segmentation UI Library
-Bundle-SymbolicName: net.sf.okapi.lib.ui.verification
-Bundle-Version: 1.0.0
-Export-Package: net.sf.okapi.lib.ui.verification
-Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0",
- net.sf.okapi.lib.verification;bundle-version="1.0.0",
- net.sf.okapi.ui.common;bundle-version="1.0.0",
- org.eclipse.swt;bundle-version="3.4.2"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-SymbolicName: net.sf.okapi.lib.okapi-lib-verification-ui
+Import-Package: net.sf.okapi.common,net.sf.okapi.common.filters,net.sf
+ .okapi.common.filterwriter,net.sf.okapi.common.resource,net.sf.okapi.
+ common.ui,net.sf.okapi.common.ui.filters,net.sf.okapi.lib.verificatio
+ n,net.sf.okapi.virtualdb,net.sf.okapi.virtualdb.jdbc,net.sf.okapi.vir
+ tualdb.jdbc.h2,org.eclipse.swt.custom,org.eclipse.swt.dnd,org.eclipse
+ .swt.events,org.eclipse.swt.graphics,org.eclipse.swt.layout,org.eclip
+ se.swt.program,org.eclipse.swt.widgets
+

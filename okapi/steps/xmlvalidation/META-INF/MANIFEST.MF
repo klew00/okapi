@@ -1,8 +1,25 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.steps.xmlanalysis;uses:="net.sf.okapi.com
+ mon.uidescription,net.sf.okapi.common,net.sf.okapi.common.resource,ne
+ t.sf.okapi.common.pipeline,net.sf.okapi.common.exceptions,javax.xml.p
+ arsers,org.w3c.dom.traversal,org.w3c.dom,org.xml.sax",net.sf.okapi.st
+ eps.xmlcharfixing;uses:="net.sf.okapi.common.uidescription,net.sf.oka
+ pi.common,net.sf.okapi.common.pipeline.annotations,net.sf.okapi.commo
+ n.exceptions,net.sf.okapi.common.resource,net.sf.okapi.common.pipelin
+ e",net.sf.okapi.steps.xmlvalidation;uses:="org.xml.sax,net.sf.okapi.c
+ ommon.uidescription,net.sf.okapi.common,javax.xml.parsers,javax.xml.s
+ tream,javax.xml.transform,javax.xml.transform.stream,net.sf.okapi.com
+ mon.resource,net.sf.okapi.common.pipeline"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi Step for XML Validation
+Bnd-LastModified: 1296170410954
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: XML Validation
-Bundle-SymbolicName: net.sf.okapi.steps.xmlvalidation
-Bundle-Version: 1.0.0
-Export-Package: net.sf.okapi.steps.xmlvalidation
-Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-SymbolicName: net.sf.okapi.steps.okapi-step-xmlvalidation
+Import-Package: javax.xml.parsers,javax.xml.stream,javax.xml.transform
+ ,javax.xml.transform.stream,net.sf.okapi.common,net.sf.okapi.common.e
+ xceptions,net.sf.okapi.common.pipeline,net.sf.okapi.common.pipeline.a
+ nnotations,net.sf.okapi.common.resource,net.sf.okapi.common.uidescrip
+ tion,org.w3c.dom,org.w3c.dom.traversal,org.xml.sax
+

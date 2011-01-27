@@ -1,14 +1,19 @@
 Manifest-Version: 1.0
-Archiver-Version: Plexus Archiver
-Created-By: Apache Maven
-Built-By: HiginbothamDW
-Build-Jdk: 1.5.0_16
+Export-Package: net.sf.okapi.filters.openxml;uses:="net.sf.okapi.commo
+ n.skeleton,net.sf.okapi.common.resource,net.sf.okapi.common,net.sf.ok
+ api.filters.abstractmarkup,net.sf.okapi.filters.yaml,net.sf.okapi.com
+ mon.exceptions,net.htmlparser.jericho,net.sf.okapi.common.encoder,net
+ .sf.okapi.common.filterwriter,net.sf.okapi.common.filters"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi Filter for OpenXML
+Bnd-LastModified: 1296170265735
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: OpenXml Filter
-Bundle-SymbolicName: net.sf.okapi.filters.openxml
-Bundle-Version: 1.0.0
-Export-Package: net.sf.okapi.filters.openxml
-Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0",
- net.sf.okapi.filters.abstractmarkup;bundle-version="1.0.0",
- net.htmlparser.jericho;bundle-version="3.1.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-SymbolicName: net.sf.okapi.filters.okapi-filter-openxml
+Import-Package: net.htmlparser.jericho,net.sf.okapi.common,net.sf.okap
+ i.common.encoder,net.sf.okapi.common.exceptions,net.sf.okapi.common.f
+ ilters,net.sf.okapi.common.filterwriter,net.sf.okapi.common.resource,
+ net.sf.okapi.common.skeleton,net.sf.okapi.filters.abstractmarkup,net.
+ sf.okapi.filters.yaml
+

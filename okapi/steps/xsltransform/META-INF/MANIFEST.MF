@@ -1,8 +1,17 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.steps.xsltransform;uses:="net.sf.okapi.co
+ mmon,net.sf.okapi.common.pipeline.annotations,net.sf.okapi.common.exc
+ eptions,javax.xml.transform,javax.xml.transform.stream,net.sf.okapi.c
+ ommon.resource,net.sf.okapi.common.pipeline"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi Step for XSLT Transform
+Bnd-LastModified: 1296170412302
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: XSL Transformation
-Bundle-SymbolicName: net.sf.okapi.steps.xsltransform
-Bundle-Version: 1.0.0
-Export-Package: net.sf.okapi.steps.xsltransform
-Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-SymbolicName: net.sf.okapi.steps.okapi-step-xsltransform
+Import-Package: javax.xml.transform,javax.xml.transform.stream,net.sf.
+ okapi.common,net.sf.okapi.common.exceptions,net.sf.okapi.common.pipel
+ ine,net.sf.okapi.common.pipeline.annotations,net.sf.okapi.common.reso
+ urce
+

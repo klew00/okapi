@@ -1,8 +1,16 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.filters.versifiedtxt;uses:="net.sf.okapi.
+ common.encoder,net.sf.okapi.common,net.sf.okapi.common.filters,net.sf
+ .okapi.common.exceptions,net.sf.okapi.common.resource,net.sf.okapi.co
+ mmon.filterwriter"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi Filter for Versified Text Files
+Bnd-LastModified: 1296170286525
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: Versified Text Filter
-Bundle-SymbolicName: net.sf.okapi.filters.versifiedtxt
-Bundle-Version: 1.0.0
-Export-Package: net.sf.okapi.filters.versifiedtxt
-Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-SymbolicName: net.sf.okapi.filters.okapi-filter-versifiedtxt
+Import-Package: net.sf.okapi.common,net.sf.okapi.common.encoder,net.sf
+ .okapi.common.exceptions,net.sf.okapi.common.filters,net.sf.okapi.com
+ mon.filterwriter,net.sf.okapi.common.resource
+

@@ -1,9 +1,19 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.steps.termextraction;uses:="net.sf.okapi.
+ common.uidescription,net.sf.okapi.common,net.sf.okapi.steps.tokenizat
+ ion.tokens,net.sf.okapi.steps.tokenization.common,com.ibm.icu.text,ne
+ t.sf.okapi.common.annotation,net.sf.okapi.common.resource,net.sf.okap
+ i.common.pipeline.annotations,net.sf.okapi.common.pipeline"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi Step for Term Extraction
+Bnd-LastModified: 1296170401993
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: Term Extraction
-Bundle-SymbolicName: net.sf.okapi.steps.termextraction
-Bundle-Version: 1.0.0
-Export-Package: net.sf.okapi.steps.termextraction
-Require-Bundle: net.sf.okapi.pipeline;bundle-version="1.0.0",
- net.sf.okapi.common;bundle-version="1.0.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-SymbolicName: net.sf.okapi.steps.okapi-step-termextraction
+Import-Package: com.ibm.icu.text,net.sf.okapi.common,net.sf.okapi.comm
+ on.annotation,net.sf.okapi.common.pipeline,net.sf.okapi.common.pipeli
+ ne.annotations,net.sf.okapi.common.resource,net.sf.okapi.common.uides
+ cription,net.sf.okapi.steps.tokenization.common,net.sf.okapi.steps.to
+ kenization.tokens
+

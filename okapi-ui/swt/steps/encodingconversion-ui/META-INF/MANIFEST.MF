@@ -1,11 +1,17 @@
 Manifest-Version: 1.0
+Export-Package: net.sf.okapi.steps.encodingconversion.ui;uses:="net.sf
+ .okapi.common,org.eclipse.swt.events,org.eclipse.swt.widgets,net.sf.o
+ kapi.steps.encodingconversion,org.eclipse.swt.graphics,net.sf.okapi.c
+ ommon.ui,org.eclipse.swt.layout"
+Bundle-Version: 0.11.0.SNAPSHOT
+Tool: Bnd-1.15.0
+Bundle-Name: Okapi Step for Encoding Conversion - UI
+Bnd-LastModified: 1296168812207
+Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-Name: EncodingConversionStep Parameters Editor
-Bundle-SymbolicName: net.sf.okapi.ui.steps.encodingconversion
-Bundle-Version: 1.0.0
-Export-Package: net.sf.okapi.steps.encodingconversion.ui
-Require-Bundle: net.sf.okapi.steps.encodingconversion;bundle-version="1.0.0",
- net.sf.okapi.common;bundle-version="1.0.0",
- net.sf.okapi.ui.common;bundle-version="1.0.0",
- org.eclipse.swt;bundle-version="3.5.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-SymbolicName: net.sf.okapi.steps.okapi-step-encodingconversion-
+ ui
+Import-Package: net.sf.okapi.common,net.sf.okapi.common.ui,net.sf.okap
+ i.steps.encodingconversion,org.eclipse.swt.events,org.eclipse.swt.gra
+ phics,org.eclipse.swt.layout,org.eclipse.swt.widgets
+
