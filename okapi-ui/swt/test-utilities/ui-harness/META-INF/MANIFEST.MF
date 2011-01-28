@@ -18,7 +18,7 @@ Export-Package: net.sf.okapi.testutilities.uiharness;uses:="net.sf.oka
 Bundle-Version: 0.11.0.SNAPSHOT
 Tool: Bnd-1.15.0
 Bundle-Name: Okapi UI Test Harness
-Bnd-LastModified: 1296168847519
+Bnd-LastModified: 1296238005259
 Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: net.sf.okapi.testutilities.okapi-ui-harness

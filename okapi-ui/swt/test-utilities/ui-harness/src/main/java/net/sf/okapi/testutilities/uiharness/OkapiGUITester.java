@@ -66,7 +66,6 @@ public class OkapiGUITester {
 
 	String[] GUI_CLASSES = new String[] {
 			// filters
-			net.sf.okapi.filters.html.ui.Editor.class.getName(),
 			net.sf.okapi.filters.openoffice.ui.Editor.class.getName(),
 			net.sf.okapi.filters.openxml.ui.Editor.class.getName(),
 			net.sf.okapi.filters.plaintext.ui.Editor.class.getName(),
