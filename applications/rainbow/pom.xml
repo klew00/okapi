@@ -135,11 +135,6 @@
 		</dependency>
 		<dependency>
 			<groupId>net.sf.okapi.filters</groupId>
-			<artifactId>okapi-filter-html-ui</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sf.okapi.filters</groupId>
 			<artifactId>okapi-filter-openoffice-ui</artifactId>
 			<version>${project.version}</version>
 		</dependency>
