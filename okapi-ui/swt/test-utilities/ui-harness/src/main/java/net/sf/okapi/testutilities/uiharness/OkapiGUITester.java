@@ -78,21 +78,26 @@ public class OkapiGUITester {
 
 			// steps
 			net.sf.okapi.steps.tokenization.ui.ParametersEditor.class.getName(),
-			net.sf.okapi.steps.bomconversion.ui.ParametersEditor.class.getName(),
-			net.sf.okapi.steps.encodingconversion.ui.ParametersEditor.class.getName(),
-			net.sf.okapi.steps.fullwidthconversion.ui.ParametersEditor.class.getName(),
-			net.sf.okapi.steps.searchandreplace.ui.ParametersEditor.class.getName(),
+			net.sf.okapi.steps.bomconversion.ui.ParametersEditor.class
+					.getName(),
+			net.sf.okapi.steps.encodingconversion.ui.ParametersEditor.class
+					.getName(),
+			net.sf.okapi.steps.fullwidthconversion.ui.ParametersEditor.class
+					.getName(),
+			net.sf.okapi.steps.searchandreplace.ui.ParametersEditor.class
+					.getName(),
 			net.sf.okapi.steps.segmentation.ui.ParametersEditor.class.getName(),
-			net.sf.okapi.steps.textmodification.ui.ParametersEditor.class.getName(),
+			net.sf.okapi.steps.textmodification.ui.ParametersEditor.class
+					.getName(),
 			net.sf.okapi.steps.tokenization.ui.ParametersEditor.class.getName(),
-			net.sf.okapi.steps.uriconversion.ui.ParametersEditor.class.getName(),
+			net.sf.okapi.steps.uriconversion.ui.ParametersEditor.class
+					.getName(),
 			net.sf.okapi.steps.wordcount.ui.ParametersEditor.class.getName(),
 			net.sf.okapi.steps.xsltransform.ui.ParametersEditor.class.getName(),
 
 			// Descriptors
 			net.sf.okapi.steps.batchtranslation.Parameters.class.getName(),
-			net.sf.okapi.steps.gcaligner.Parameters.class.getName()
-	};
+			net.sf.okapi.steps.gcaligner.Parameters.class.getName() };
 
 	private Group grpParameters;
 	private FormData formData_1;
@@ -185,10 +190,13 @@ public class OkapiGUITester {
 				button_1.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent e) {
 
-						String[] selected = Dialogs.browseFilenames(shell, "Open", false, null,
-								"Filter Parameters (*.fprm)\tAll Files (*.*)", "*.fprm\t*.*");
+						String[] selected = Dialogs.browseFilenames(shell,
+								"Open", false, null,
+								"Filter Parameters (*.fprm)\tAll Files (*.*)",
+								"*.fprm\t*.*");
 
-						if (selected != null && selected.length > 0 && !Util.isEmpty(selected[0])) {
+						if (selected != null && selected.length > 0
+								&& !Util.isEmpty(selected[0])) {
 							text.setText(selected[0]);
 							text_1.setText(fileAsString(selected[0]));
 							text_1.setFocus();
@@ -208,8 +216,9 @@ public class OkapiGUITester {
 				button.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent e) {
 
-						String selected = Dialogs.browseFilenamesForSave(shell, "Save As", text
-								.getText(), "Filter Parameters (*.fprm)\tAll Files (*.*)",
+						String selected = Dialogs.browseFilenamesForSave(shell,
+								"Save As", text.getText(),
+								"Filter Parameters (*.fprm)\tAll Files (*.*)",
 								"*.fprm\t*.*");
 
 						if (!Util.isEmpty(selected)) {
@@ -239,7 +248,8 @@ public class OkapiGUITester {
 		grpParameterEditors = new Group(shell, SWT.NONE);
 		formData_1.top = new FormAttachment(grpParameterEditors, 4);
 
-		text_1 = new Text(grpParameters, SWT.BORDER | SWT.WRAP | SWT.V_SCROLL | SWT.MULTI);
+		text_1 = new Text(grpParameters, SWT.BORDER | SWT.WRAP | SWT.V_SCROLL
+				| SWT.MULTI);
 		FormData formData_7 = new FormData();
 		formData_7.left = new FormAttachment(0, 10);
 		formData_7.right = new FormAttachment(button_1, -4);
@@ -256,7 +266,8 @@ public class OkapiGUITester {
 		formData_5.top = new FormAttachment(btnClear, 4);
 		btnClear.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				// SWTUtil.inputQuery(shell, "caption", "Input a value prompt:", 1, null);
+				// SWTUtil.inputQuery(shell, "caption", "Input a value prompt:",
+				// 1, null);
 				text.setText("");
 				text_1.setText("");
 			}
@@ -327,11 +338,10 @@ public class OkapiGUITester {
 		// Check if it's an IEditorDescriptionProvider class
 		if (IEditorDescriptionProvider.class.isAssignableFrom(c)) {
 			if (!IParameters.class.isAssignableFrom(c)) {
-				Dialogs
-						.showWarning(
-								shell,
-								"The class must implements both IParameters and IEditorDescriptionProvider to be displayed.",
-								null);
+				Dialogs.showWarning(
+						shell,
+						"The class must implements both IParameters and IEditorDescriptionProvider to be displayed.",
+						null);
 				return;
 			}
 			// If it is: create a GenericEditor from it
@@ -348,9 +358,11 @@ public class OkapiGUITester {
 				} else if (!Util.isEmpty(text.getText())) {
 					params.load(Util.toURI(text.getText()), true);
 				} else {
-					Dialogs.showWarning(shell, "No parameters loaded, defaults used.", null);
+					Dialogs.showWarning(shell,
+							"No parameters loaded, defaults used.", null);
 				}
-				if (ged.edit(params, (IEditorDescriptionProvider) obj, false, context)) {
+				if (ged.edit(params, (IEditorDescriptionProvider) obj, false,
+						context)) {
 					if (params != null) {
 						text_1.setText(params.toString());
 					}
@@ -392,7 +404,8 @@ public class OkapiGUITester {
 					params.load(Util.toURI(text.getText()), true);
 
 				else
-					Dialogs.showWarning(shell, "No parameters loaded, defaults used.", null);
+					Dialogs.showWarning(shell,
+							"No parameters loaded, defaults used.", null);
 			}
 
 			if (editor.edit(params, false, context)) {
