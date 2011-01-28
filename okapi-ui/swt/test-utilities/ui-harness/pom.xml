@@ -18,12 +18,7 @@
 			<groupId>net.sf.okapi</groupId>
 			<artifactId>okapi-core-ui</artifactId>
 			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sf.okapi.filters</groupId>
-			<artifactId>okapi-filter-html-ui</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+		</dependency>		
 		<dependency>
 			<groupId>net.sf.okapi.steps</groupId>
 			<artifactId>okapi-step-xsltransform-ui</artifactId>
