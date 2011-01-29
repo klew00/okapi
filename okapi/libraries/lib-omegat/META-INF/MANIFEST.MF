@@ -1,15 +1,22 @@
 Manifest-Version: 1.0
-Export-Package: net.sf.okapi.lib.omegat;uses:="org.omegat.filters2,net
- .sf.okapi.common.filterwriter,net.sf.okapi.common,net.sf.okapi.common
- .filters,org.omegat.util,net.sf.okapi.common.resource",org.omegat.fil
- ters2;uses:="org.omegat.util",org.omegat.util
-Bundle-Version: 0.11.0.SNAPSHOT
-Tool: Bnd-1.15.0
-Bundle-Name: Okapi Library for OmegaT
-Bnd-LastModified: 1296170346852
-Created-By: 1.6.0_22 (Sun Microsystems Inc.)
 Bundle-ManifestVersion: 2
-Bundle-SymbolicName: net.sf.okapi.lib.okapi-lib-omegat
-Import-Package: net.sf.okapi.common,net.sf.okapi.common.filters,net.sf
- .okapi.common.filterwriter,net.sf.okapi.common.resource
+Bundle-Name: Okapi Filters for OmegT
+Bundle-SymbolicName: net.sf.okapi.lib.omegat
+Bundle-Version: 1.0.0
+Export-Package: net.sf.okapi.lib.omegat
+Require-Bundle: net.sf.okapi.common;bundle-version="1.0.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+OmegaT-Plugin: true
+
+Name: net.sf.okapi.lib.omegat.TSFilter
+OmegaT-Plugin: filter
+
+Name: net.sf.okapi.lib.omegat.TTXFilter
+OmegaT-Plugin: filter
+
+Name: net.sf.okapi.lib.omegat.JSONFilter
+OmegaT-Plugin: filter
+
+Name: net.sf.okapi.lib.omegat.IDMLFilter
+OmegaT-Plugin: filter
 
