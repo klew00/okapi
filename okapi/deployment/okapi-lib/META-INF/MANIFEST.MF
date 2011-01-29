@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Okapi Common Lib
+Bundle-SymbolicName: net.sf.okapi
+Bundle-Version: 1.0.0
+Export-Package: net.sf.okapi
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
