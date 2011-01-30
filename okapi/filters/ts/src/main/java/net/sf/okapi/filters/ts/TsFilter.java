@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2010 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -304,6 +304,7 @@ public class TsFilter implements IFilter {
 	private boolean hasUTF8BOM;
 	private Parameters params;
 	private EncoderManager encoderManager;
+	private String contextName;
 	
 	private final Logger logger = Logger.getLogger(getClass().getName());
 	
@@ -452,8 +453,7 @@ public class TsFilter implements IFilter {
 			
 			
 			ts.resetAll();
-			
-			
+			contextName = null;
 
 			// Set the start event
 			hasNext = true;
@@ -536,6 +536,10 @@ public class TsFilter implements IFilter {
 					eventList.add(event);
 					queue.add(new Event(EventType.START_GROUP, resource));
 				}
+				
+				if ( startElemName.equals("name") ) {
+					readContextName();
+				}
  
 				if(startElemName.equals("context")){
 					ts.currentDocumentLocation = DocumentLocation.CONTEXT;
@@ -604,7 +608,7 @@ public class TsFilter implements IFilter {
 			case XMLStreamConstants.DTD:
 				break;
 			case XMLStreamConstants.SPACE:
-				System.out.println("space: ");
+//				System.out.println("space: ");
 				break;
 			case XMLStreamConstants.ENTITY_REFERENCE:
 			case XMLStreamConstants.CDATA:
@@ -626,6 +630,24 @@ public class TsFilter implements IFilter {
 		return false;
 	}	
 
+	private void readContextName ()
+		throws XMLStreamException
+	{
+		while ( true ) {
+			XMLEvent event = eventReader.nextEvent();
+			eventList.add(event);
+			// Should be the content
+			switch ( event.getEventType() ) {
+			case XMLStreamConstants.CHARACTERS:
+				contextName = event.toString();
+				break;
+			case XMLStreamConstants.SPACE:
+				break;
+			default:
+				return;
+			}
+		}
+	}
 	
 	/**
 	 * 
@@ -752,6 +774,10 @@ public class TsFilter implements IFilter {
 			
 			ts.contextStack.push(otherId);
 			resource = new StartGroup(null,String.valueOf(otherId));
+			if ( contextName != null ) {
+				((StartGroup)resource).setName(contextName);
+				contextName = null;
+			}
 		}else{
 			
 			ts.contextStack.pop();

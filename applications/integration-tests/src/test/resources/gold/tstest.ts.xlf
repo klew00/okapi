@@ -2,8 +2,8 @@
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:okp="okapi-framework:xliff-extensions">
 <file original="tstest.ts" source-language="en-us" target-language="fr-fr" datatype="x-application/x-ts" okp:inputEncoding="UTF-8">
 <body>
-<group id="o3">
-<group id="o4">
+<group id="o3" resname="context name 1">
+<group id="o4" resname="context name 2">
 <trans-unit id="1" resname="1">
 <source xml:lang="en-us">hello <x id="1"/>world</source>
 <target xml:lang="fr-fr">hejsan <x id="1"/>varlden</target>
