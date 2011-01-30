@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -207,15 +207,29 @@ public final class Util {
 	/**
 	 * Determines if a given path ends with a file name separator for the current platform.
 	 * If not, the file separator is appended to the path.
-	 * @param path the given path
-	 * @return the given path ending with the file name separator
+	 * @param path the given path.
+	 * @param true if the ending separator must be a forward slash.
+	 * @return the given path ending with the file name separator.
 	 */
-	static public String ensureSeparator (String path) {
-		if (isEmpty(path)) return path;
-		if (path.endsWith(File.separator)) return path;
-		if (path.endsWith("/")) return path;
-		
-		return path + File.separator; 
+	static public String ensureSeparator (String path,
+		boolean forceForwardSlash)
+	{
+		if ( isEmpty(path) ) return path;
+		if ( path.endsWith("/") ) return path;
+		if ( path.endsWith(File.separator) ) {
+			if ( forceForwardSlash ) {
+				path = path.substring(0, path.length()-1);
+			}
+			else {
+				return path;
+			}
+		}
+		if ( forceForwardSlash ) {
+			return path + "/";
+		}
+		else {
+			return path + File.separator;
+		}
 	}
 	
 	/**

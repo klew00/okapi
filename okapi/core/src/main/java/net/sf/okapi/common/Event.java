@@ -229,6 +229,14 @@ public class Event {
 	}
 	
 	/**
+	 * Convenience method returns the Ending resource.
+	 * @return the Ending resource.
+	 */
+	public Ending getEnding () {
+		return (Ending)resource;
+	}
+	
+	/**
 	 * Convenience method returns the {@link IResource} as a {@link RawDocument}. The
 	 * caller should confirm the {@link Event} type using isRawDocument before calling
 	 * this method.

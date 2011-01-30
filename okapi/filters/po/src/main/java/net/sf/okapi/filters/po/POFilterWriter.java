@@ -44,6 +44,7 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
+import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 
@@ -53,6 +54,10 @@ import net.sf.okapi.common.resource.TextUnit;
  * can be driven by filter events.
  */
 public class POFilterWriter implements IFilterWriter {
+
+	private static final String ESCAPEABLE = "\\\"abfnrtv";
+	private static final String SSDMARKER = "_okpSSD_:";
+	private static final String TUMARKER = "_okpTU_:";
 
 	private Parameters params;
 	private OutputStream output;
@@ -66,18 +71,24 @@ public class POFilterWriter implements IFilterWriter {
 	private String linebreak;
 	private GenericContent fmt;
 	private ArrayList<TextUnit> plurals;
-	private static final String ESCAPEABLE = "\\\"abfnrtv"; 
+	private boolean forExtractMerge;
+	private String subDocMarker;
 	
 	public POFilterWriter () {
 		params = new Parameters();
 		fmt = new GenericContent();
 		plurals = new ArrayList<TextUnit>();
+		forExtractMerge = false;
 	}
 	
 	public void cancel () {
 		//TODO
 	}
 
+	public void setForExtractMerge (boolean value) {
+		forExtractMerge = value;
+	}
+	
 	public void close() {
 		if ( writer == null ) return;
 		IOException err = null;
@@ -157,6 +168,12 @@ public class POFilterWriter implements IFilterWriter {
 		case END_DOCUMENT:
 			processEndDocument();
 			break;
+		case START_SUBDOCUMENT:
+			processStartSubDocument(event);
+			break;
+		case END_SUBDOCUMENT:
+			processEndSubDocument();
+			break;
 		case START_GROUP:
 			processStartGroup(event);
 			break;
@@ -210,6 +227,7 @@ public class POFilterWriter implements IFilterWriter {
 			writer.write("\"Content-Transfer-Encoding: 8bit\\n\""+linebreak);
 			writer.write("\"Plural-Forms: "+PluralForms.getExpression(language));
 			writer.write("\\n\""+linebreak+linebreak);
+			subDocMarker = null;
 		}
 		catch ( IOException e ) {
 			throw new OkapiIOException("Error writing the header.", e);
@@ -218,6 +236,17 @@ public class POFilterWriter implements IFilterWriter {
 
 	private void processEndDocument () {
 		close();
+	}
+
+	private void processStartSubDocument (Event event) {
+		if ( forExtractMerge ) {
+			StartSubDocument ssd = (StartSubDocument)event.getResource();
+			subDocMarker = SSDMARKER+ssd.getId();
+		}
+	}
+	
+	private void processEndSubDocument () {
+		// Do nothing, as a domain is never 'closed'
 	}
 
 	private void processStartGroup (Event event) {
@@ -284,7 +313,7 @@ public class POFilterWriter implements IFilterWriter {
 	
 	private void processTextUnit (Event event) {
 		try {
-			TextUnit tu = (TextUnit)event.getResource();
+			TextUnit tu = event.getTextUnit();
 			if ( tu.isEmpty() ) return; // Do not write out entries with empty source
 			
 			TextContainer tc = tu.getTarget(language);
@@ -297,6 +326,16 @@ public class POFilterWriter implements IFilterWriter {
 			if ( prop != null ) {
 				if ( !prop.getValue().equals("yes") ) {
 					writer.write("#, fuzzy"+linebreak);
+				}
+			}
+			// ID reference
+			if ( forExtractMerge ) {
+				if ( subDocMarker == null ) { // Normal entry
+					writer.write("#: " + TUMARKER+tu.getId() + linebreak);
+				}
+				else { // First entry of a sub-document
+					writer.write("#: " + subDocMarker+" " + TUMARKER+tu.getId() + linebreak);
+					subDocMarker = null;
 				}
 			}
 			// msgid
@@ -380,7 +419,11 @@ public class POFilterWriter implements IFilterWriter {
 				if ( prev != '\\' ) {
 					tmp.append('\\');
 				}
-				// Fall thru
+				tmp.append(in.charAt(i));
+				break;
+			case '\n':
+				tmp.append("\\n");
+				break;
 			default:
 				tmp.append(in.charAt(i));
 				break;

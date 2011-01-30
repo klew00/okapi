@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -298,11 +298,13 @@ public class UtilTest {
 
 	@Test
 	public void testEnsureSeparator() {
-		assertEquals(null, Util.ensureSeparator(null));
-		assertEquals("", Util.ensureSeparator(""));
-		assertEquals("/C:/test/", Util.ensureSeparator("/C:/test/"));
-		assertEquals("/C:/test" + File.separator, Util.ensureSeparator("/C:/test" + File.separator));
-		assertEquals("/C:/test" + File.separator, Util.ensureSeparator("/C:/test"));
+		assertEquals(null, Util.ensureSeparator(null, false));
+		assertEquals("", Util.ensureSeparator("", false));
+		assertEquals("/C:/test/", Util.ensureSeparator("/C:/test/", false));
+		assertEquals("/C:/test" + File.separator, Util.ensureSeparator("/C:/test" + File.separator, false));
+		assertEquals("/C:/test/", Util.ensureSeparator("/C:/test" + File.separator, true));
+		assertEquals("/C:/test" + File.separator, Util.ensureSeparator("/C:/test", false));
+		assertEquals("/C:/test/", Util.ensureSeparator("/C:/test", true));
 	}
 	
 	@Test
