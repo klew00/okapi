@@ -201,12 +201,16 @@ public class XMLWriter {
     /**
      * Writes a comment.
      * @param text the text of the comment.
+     * @param withLineBreak add a line break at the end of the comment.
      */
-    public void writeComment (String text) {
+    public void writeComment (String text,
+    	boolean withLineBreak)
+    {
     	closeStartTag();
     	writer.write("<!--");
     	writer.write(text.replace("\n", lineBreak));
     	writer.write("-->");
+    	if ( withLineBreak ) writer.write(lineBreak);
     }
 
     /**

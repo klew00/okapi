@@ -38,8 +38,11 @@ public interface IPackageWriter extends IFilterWriter {
 		LocaleId trgLoc,
 		String inputRoot);
 	
-	public void setDocumentInformation (String inputPath,
+	public void setDocumentInformation (String relativeInputPath,
 		String filterConfigId,
-		String outputPath);
+		String filterParameters,
+		String inputEncoding,
+		String relativeTargetPath,
+		String outputEncoding);
 
 }

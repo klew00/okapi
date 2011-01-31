@@ -112,8 +112,7 @@ public class ExtractionStep extends BasePipelineStep {
 		case END_BATCH:
 			return doEndBatch(event);
 		case START_DOCUMENT:
-			writer.setDocumentInformation(inputURI.getPath(), filterConfigId, outputURI.getPath());
-			return writer.handleEvent(event);
+			return doStartDocument(event);
 		default:
 			return writer.handleEvent(event);
 		}
@@ -157,21 +156,22 @@ outputRoot = rootDir;
 		return event;
 	}
 	
-//	@Override
-//	protected Event handleStartDocument (Event event) {
-//		StartDocument sd = (StartDocument)event.getResource();
-//		String tmpIn = inputURI.getPath();
-//		String relativeInput = tmpIn.substring(inputRoot.length()+1);
-//		String tmpOut = outputURI.getPath();
-//		String relativeOutput = tmpOut.substring(outputRoot.length()+1);
-//		String res[] = FilterConfigurationMapper.splitFilterFromConfiguration(filterConfigId);
-//		
-////		writer.createOutput(++docId, relativeInput, relativeOutput,
-////			sd.getEncoding(), outputEncoding, res[0], sd.getFilterParameters(),
-////			sd.getFilterWriter().getEncoderManager());
-//		
-//		return event;
-//	}
+	private Event doStartDocument (Event event) {
+		StartDocument sd = event.getStartDocument();
+		String tmpIn = inputURI.getPath();
+		String relativeInput = tmpIn.substring(inputRoot.length()+1);
+		String tmpOut = outputURI.getPath();
+		String relativeOutput = tmpOut.substring(outputRoot.length()+1);
+		
+		IParameters prm = sd.getFilterParameters();
+		String paramsData = null;
+		if ( prm != null ) {
+			paramsData = prm.toString();
+		}
+		
+		writer.setDocumentInformation(relativeInput, filterConfigId, paramsData, sd.getEncoding(), relativeOutput, outputEncoding);
+		return writer.handleEvent(event);
+	}
 
 	@Override
 	public void setParameters (IParameters params) {

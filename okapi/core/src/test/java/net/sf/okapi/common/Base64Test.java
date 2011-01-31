@@ -68,6 +68,15 @@ public class Base64Test {
 		}
 	}
 
+	@Test
+	public void testLongBlock () {
+		String text = "[This is a long text that may need to be wrapped onto several lines.]";
+		//String res = Base64.encodeString(text);
+		String wrapped = "W1RoaXMgaXMg\r\nYSBsb25nIHRleHQgdGhhdC\rBtYXkgb\n\n\nmVlZCB0byBiZSB3cmFwcGVkIG9udG8gc2V\n"
+			+ "2ZXJhbCBsaW5lcy5d";
+		assertEquals(text, Base64.decodeString(wrapped));
+	}
+
     @Test(expected = RuntimeException.class)
 	public void testBadInput () {
     	// Input not in a length multiple of 4

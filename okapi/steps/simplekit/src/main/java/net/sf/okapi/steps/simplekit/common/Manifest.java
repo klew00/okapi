@@ -48,7 +48,7 @@ public class Manifest {
 	public static final String VERSION = "2";
 	public static final String MANIFEST_FILENAME = "manifest.xml";
 	
-	private LinkedHashMap<Integer, ManifestItem> docs;
+	private LinkedHashMap<Integer, MergingInfo> docs;
 	private String inputRoot;
 	private String packageRoot;
 	private String packageId;
@@ -61,17 +61,17 @@ public class Manifest {
 	private String date;
 
 	public Manifest () {
-		docs = new LinkedHashMap<Integer, ManifestItem>();
+		docs = new LinkedHashMap<Integer, MergingInfo>();
 		originalDir = "";
 		sourceDir = "";
 		targetDir = "";
 	}
 
-	public Map<Integer, ManifestItem> getItems () {
+	public Map<Integer, MergingInfo> getItems () {
 		return docs;
 	}
 
-	public ManifestItem getItem (int docID) {
+	public MergingInfo getItem (int docID) {
 		return docs.get(docID);
 	}
 	
@@ -161,15 +161,16 @@ public class Manifest {
 	 * @param relativeOutputPath Relative path of the output document.
 	 */
 	public void addDocument (int docId,
-		String originalRelativePath,
-		String sourceRelativePath,
-		String encoding,
-		String filterID,
-		String formatType)
+		String extractionType,
+		String relativeInputPath,
+		String filterId,
+		String filterParameters,
+		String inputEncoding,
+		String relativeTargetPath,
+		String targetEncoding)
 	{
-		docs.put(docId, new ManifestItem(docId,
-			originalRelativePath, sourceRelativePath,
-			encoding, filterID, formatType));
+		docs.put(docId, new MergingInfo(docId, extractionType, relativeInputPath, filterId,
+			filterParameters, inputEncoding, relativeTargetPath, targetEncoding));
 	}
 
 	/**
@@ -181,9 +182,9 @@ public class Manifest {
 			writer = new XMLWriter(packageRoot + MANIFEST_FILENAME);
 
 			writer.writeStartDocument();
-			writer.writeComment("=================================================================");
-			writer.writeComment("PLEASE, DO NOT RENAME, MOVE, MODIFY OR ALTER IN ANY WAY THIS FILE");
-			writer.writeComment("=================================================================");
+			writer.writeComment("=================================================================", true);
+			writer.writeComment("PLEASE, DO NOT RENAME, MOVE, MODIFY OR ALTER IN ANY WAY THIS FILE", true);
+			writer.writeComment("=================================================================", true);
 			writer.writeStartElement("manifest");
 			writer.writeAttributeString("version", VERSION);
 			writer.writeAttributeString("projectId", projectId);
@@ -195,16 +196,11 @@ public class Manifest {
 			writer.writeAttributeString("targetDir", targetDir.replace('\\', '/'));
 			SimpleDateFormat DF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ");
 			writer.writeAttributeString("date", DF.format(new java.util.Date()));
+			writer.writeLineBreak();
 
-			for ( ManifestItem item : docs.values() ) {
-				writer.writeStartElement("doc");
-				writer.writeAttributeString("id", String.valueOf(item.getId()));
-				writer.writeAttributeString("original", item.getOriginalRelativePath().replace('\\', '/'));
-				writer.writeAttributeString("source", item.getSourceRelativePath().replace('\\', '/'));
-				writer.writeAttributeString("filter", item.getFilterId());
-				writer.writeAttributeString("encoding", item.getEncoding());
-				writer.writeAttributeString("formatType", item.getFormatType());
-				writer.writeEndElementLineBreak();
+			for ( MergingInfo item : docs.values() ) {
+				writer.writeRawXML(item.writeToXML("doc", true));
+				writer.writeLineBreak();
 			}
 
 			writer.writeEndElement(); // manifest
@@ -262,41 +258,9 @@ public class Manifest {
 		    NL = elem.getElementsByTagName("doc");
 		    for ( int i=0; i<NL.getLength(); i++ ) {
 		    	elem = (Element)NL.item(i);
-		    	tmp = elem.getAttribute("id");
-			    if ( Util.isEmpty(tmp) ) throw new RuntimeException("Missing id attribute.");
-			    int id = Integer.valueOf(tmp);
-			    
-//		    	tmp = elem.getAttribute("sourcePath");
-//		    	if ( Util.isEmpty(tmp) ) throw new RuntimeException("Missing work attribute.");
-//		    	sourceDir
-//			    
-//		    	oriPath = elem.getAttribute("original");
-//			    if (( oriPathinPath == null ) || ( inPath.length() == 0 ))
-//			    	throw new RuntimeException("Missing input attribute.");
-//			    
-//		    	inEnc = elem.getAttribute("inputEncoding");
-//			    if (( inEnc == null ) || ( inEnc.length() == 0 ))
-//			    	throw new RuntimeException("Missing inputEncoding attribute.");
-//			    
-//		    	outEnc = elem.getAttribute("outputEncoding");
-//			    if (( outEnc == null ) || ( outEnc.length() == 0 ))
-//			    	throw new RuntimeException("Missing outputEncoding attribute.");
-//			    
-//			    filterID = elem.getAttribute("filter");
-//			    if (( filterID == null ) || ( filterID.length() == 0 ))
-//			    	throw new RuntimeException("Missing filter attribute.");
-//			    
-//			    postProcessingType = elem.getAttribute("postProcessing");
-//			    if (( filterID == null ) || ( filterID.length() == 0 )) {
-//			    	postProcessingType = "default";	
-//			    }
-			    
-//		    	docs.put(id, new ManifestItem(id, tmp.replace('/', File.separatorChar),
-//		    		inPath.replace('/', File.separatorChar),
-//		    		outPath.replace('/', File.separatorChar),
-//		    		inEnc, outEnc, filterID, postProcessingType, true));
+		    	MergingInfo item = MergingInfo.readFromXML(elem);
+		    	docs.put(item.getDocId(), item);
 		    }
-
 		    packageRoot = Util.getDirectoryName(inputFile.getAbsolutePath());
 		}
 		catch ( SAXException e ) {

@@ -99,21 +99,25 @@ public class Base64 {
 
 	/**
 	* Decodes a string from a UTF-8 Base64 string.
+	* The coded string may have line breaks.
 	* @param str the Base64 String to be decoded.
 	* @return the String containing the decoded data.
 	* @throws IllegalArgumentException if the input is not valid Base64 encoded data.
 	*/
 	public static String decodeString (String str) {
+		str = str.replaceAll("[\r\n]", "");
 		return new String(decode(str), CSUTF8);
 	}
 	
 	/**
 	* Decodes a byte array from Base64 format.
+	* The coded string may have line breaks.
 	* @param str the Base64 String to be decoded.
 	* @return the array containing the decoded data bytes.
 	* @throws IllegalArgumentException if the input is not valid Base64 encoded data.
 	*/
 	public static byte[] decode (String str) {
+		str = str.replaceAll("[\r\n]", "");
 		return decode(str.toCharArray());
 	}
 

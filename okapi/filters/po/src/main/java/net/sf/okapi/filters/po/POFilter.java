@@ -72,6 +72,7 @@ public class POFilter implements IFilter {
 	public static final String PROPERTY_PLURALFORMS = "pluralforms";
 	public static final String PROPERTY_TRANSNOTE = "transnote";
 	public static final String PROPERTY_REFERENCES = "references";
+	public static final String PROPERTY_CONTEXT = "context";
 	
 	private static final String DOMAIN_SEP = "::";
 	private static final String DOMAIN_NONE = "messages";
@@ -124,6 +125,7 @@ public class POFilter implements IFilter {
 	private String domain;
 	private boolean hasFuzzyFlag;
 	private EncoderManager encoderManager;
+	private String msgContext;
 	
 	public POFilter () {
 		params = new Parameters();
@@ -309,6 +311,7 @@ public class POFilter implements IFilter {
 			transNote = "";
 			references = "";
 			hasFuzzyFlag = false;
+			msgContext = "";
 		}
 		else if ( pluralMode == 2 ) { // Closing plural group?
 			// Reset the plural variables
@@ -394,6 +397,11 @@ public class POFilter implements IFilter {
 				// Store as a localization note
 				if ( transNote.length() > 0 ) transNote += lineBreak;
 				transNote += textLine.substring(2).trim();
+				continue;
+			}
+			
+			if ( textLine.startsWith("msgctxt") ) {
+				msgContext = getQuotedString(true);
 				continue;
 			}
 			
@@ -589,6 +597,9 @@ public class POFilter implements IFilter {
 		}
 		if ( references.length() > 0 ) {
 			tu.setProperty(new Property(PROPERTY_REFERENCES, references));
+		}
+		if ( !Util.isEmpty(msgContext) ) {
+			tu.setProperty(new Property(PROPERTY_CONTEXT, msgContext));
 		}
 
 		// Set the text and possibly its translation
@@ -801,7 +812,7 @@ public class POFilter implements IFilter {
 	}
 */		
 	
-	private String getQuotedString (boolean forMsgID) {
+	private String getQuotedString (boolean addLinebreak) {
 		StringBuilder  sbTmp = new StringBuilder();
 		try {
 			// Get opening quote
@@ -814,7 +825,7 @@ public class POFilter implements IFilter {
 			if (( nPos2 == -1 ) || ( nPos2 == nPos1 )) {
 				throw new OkapiIllegalFilterOperationException(Res.getString("missingEndQuote"));
 			}
-			if ( forMsgID ) {
+			if ( addLinebreak ) {
 				skel.append(textLine+lineBreak);
 			}
 			else {
@@ -846,7 +857,7 @@ public class POFilter implements IFilter {
 						if (( nPos2 == -1 ) || ( nPos2 == nPos1 )) {
 							throw new Exception(Res.getString("missingEndQuote"));
 						}
-						if ( forMsgID ) {
+						if ( addLinebreak ) {
 							skel.append(textLine+lineBreak);
 						}
 						// Else: No need to put white spaces in codes buffer

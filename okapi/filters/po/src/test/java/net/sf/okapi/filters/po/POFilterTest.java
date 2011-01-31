@@ -237,6 +237,18 @@ public class POFilterTest {
 	}
 	
 	@Test
+	public void testOuputEntryWithCTXT () {
+		String snippet = "msgctxt \"Context\"\n"
+			+ "msgid \"Text 1\"\n"
+			+ "msgstr \"\"\n";
+		String expect = "msgctxt \"Context\"\n"
+			+ "msgid \"Text 1\"\n"
+			+ "msgstr \"Text 1\"\n";
+		assertEquals(expect, FilterTestDriver.generateOutput(getEvents(snippet, locEN, locFR),
+			filter.getEncoderManager(), locFR));
+	}
+	
+	@Test
 	public void testOuputAddTranslation () {
 		String snippet = "msgid \"Text 1\"\n"
 			+ "msgstr \"\"\n";
@@ -259,7 +271,8 @@ public class POFilterTest {
 			+ "#. Comment\n"
 			+ "#: Reference\n"
 			+ "# Translator note\n"
-			+ "#| Context\n"
+			+ "#| Context1\n"
+			+ "msgctxt \"Context2\"\n"
 			+ "msgid \"Source\"\n"
 			+ "msgstr \"Target\"\n";
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
@@ -286,6 +299,11 @@ public class POFilterTest {
 		assertTrue(tu.hasProperty(POFilter.PROPERTY_TRANSNOTE));
 		prop = tu.getProperty(POFilter.PROPERTY_TRANSNOTE);
 		assertEquals("Translator note", prop.getValue());
+		assertTrue(prop.isReadOnly());
+
+		assertTrue(tu.hasProperty(POFilter.PROPERTY_CONTEXT));
+		prop = tu.getProperty(POFilter.PROPERTY_CONTEXT);
+		assertEquals("Context2", prop.getValue());
 		assertTrue(prop.isReadOnly());
 	}
 	

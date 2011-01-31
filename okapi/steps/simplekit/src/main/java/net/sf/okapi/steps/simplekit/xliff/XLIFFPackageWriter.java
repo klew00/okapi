@@ -22,8 +22,9 @@ package net.sf.okapi.steps.simplekit.xliff;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.filterwriter.XLIFFWriter;
+import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.steps.simplekit.common.BasePackageWriter;
-import net.sf.okapi.steps.simplekit.common.ManifestItem;
+import net.sf.okapi.steps.simplekit.common.MergingInfo;
 
 public class XLIFFPackageWriter extends BasePackageWriter {
 
@@ -36,6 +37,7 @@ public class XLIFFPackageWriter extends BasePackageWriter {
 	@Override
 	protected void processStartBatch () {
 		manifest.setSourceSubDirectory("work");
+		manifest.setOriginalSurDirectory("original");
 		super.processStartBatch();
 	}
 	
@@ -45,11 +47,18 @@ public class XLIFFPackageWriter extends BasePackageWriter {
 		
 		writer = new XLIFFWriter();
 		writer.setOptions(manifest.getTargetLocale(), "UTF-8");
-		ManifestItem item = manifest.getItem(docId);
-		String path = manifest.getSourceDirectory() + item.getSourceRelativePath() + ".xlf";
-		writer.setOutput(path);
+		MergingInfo item = manifest.getItem(docId);
+		String path = manifest.getSourceDirectory() + item.getRelativeInputPath() + ".xlf";
+		writer.setOutput(path); // Not really used, but doesn't hurt just in case
 
-		writer.handleEvent(event);
+		//TODO: get it from params
+		writer.setPlaceholderMode(true);
+		
+		String skelPath = manifest.getOriginalDirectory() + item.getRelativeInputPath(); 
+		StartDocument sd = event.getStartDocument();
+		writer.create(path, skelPath, manifest.getSourceLocale(), manifest.getTargetLocale(),
+			sd.getMimeType(), sd.getName(), null);
+
 	}
 	
 	@Override

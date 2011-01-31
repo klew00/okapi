@@ -244,9 +244,9 @@ public class Manifest {
 			writer = new XMLWriter(rootFolder + File.separator + "manifest.xml");
 
 			writer.writeStartDocument();
-			writer.writeComment("=================================================================");
-			writer.writeComment("PLEASE, DO NOT RENAME, MOVE, MODIFY OR ALTER IN ANY WAY THIS FILE");
-			writer.writeComment("=================================================================");
+			writer.writeComment("=================================================================", true);
+			writer.writeComment("PLEASE, DO NOT RENAME, MOVE, MODIFY OR ALTER IN ANY WAY THIS FILE", true);
+			writer.writeComment("=================================================================", true);
 			writer.writeStartElement("rainbowManifest");
 			writer.writeAttributeString("xmlns:its", "http://www.w3.org/2005/11/its");
 			writer.writeAttributeString("its:version", "1.0");

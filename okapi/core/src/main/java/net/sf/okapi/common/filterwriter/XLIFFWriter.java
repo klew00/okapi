@@ -181,7 +181,7 @@ public class XLIFFWriter implements IFilterWriter {
 
 		if ( !Util.isEmpty(message) ) {
 			writer.writeLineBreak();
-			writer.writeComment(message);
+			writer.writeComment(message, false);
 		}
 		writer.writeLineBreak();
 	}

@@ -27,7 +27,6 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
-import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.steps.simplekit.creation.Parameters;
 
 public abstract class BasePackageWriter implements IPackageWriter {
@@ -35,13 +34,11 @@ public abstract class BasePackageWriter implements IPackageWriter {
 	protected Parameters params;
 	protected Manifest manifest;
 	protected int docId;
-	protected String inputPath;
-	protected String filterConfigId;
-	protected String outputPath;
-	protected String formatType;
+	protected String extractionType;
+	protected MergingInfo mergingInfo;
 	
-	public BasePackageWriter (String formatType) {
-		this.formatType = formatType;
+	public BasePackageWriter (String extractionType) {
+		this.extractionType = extractionType;
 		manifest = new Manifest();
 	}
 	
@@ -64,15 +61,6 @@ public abstract class BasePackageWriter implements IPackageWriter {
 		manifest.setInformation(packageRoot, srcLoc, trgLoc, inputRoot);
 	}
 
-	public void setDocumentInformation (String inputPath,
-		String filterConfigId,
-		String outputPath)
-	{
-		this.inputPath = inputPath;
-		this.filterConfigId = filterConfigId;
-		this.outputPath = outputPath;
-	}
-	
 	@Override
 	public void cancel () {
 		// TODO
@@ -165,16 +153,20 @@ public abstract class BasePackageWriter implements IPackageWriter {
 		}
 	}
 
-	protected void processStartDocument (Event event) {
-		StartDocument sd = event.getStartDocument();
-		String relativeInput = inputPath.substring(manifest.getInputRoot().length());
-//TODO: Make the relative output based on an output root, not input 
-//		String relativeOutput = outputPath.substring(manifest.getInputRoot().length());
-		
+	@Override
+	public void setDocumentInformation (String relativeInputPath,
+		String filterConfigId,
+		String filterParameters,
+		String inputEncoding,
+		String relativeTargetPath,
+		String targetEncoding)
+	{
 		String res[] = FilterConfigurationMapper.splitFilterFromConfiguration(filterConfigId);
-		
-		manifest.addDocument(++docId, relativeInput, relativeInput,
-			sd.getEncoding(), res[0], formatType);
+		manifest.addDocument(++docId, extractionType, relativeInputPath, res[0], filterParameters, inputEncoding, relativeTargetPath, targetEncoding);
+	}
+	
+	protected void processStartDocument (Event event) {
+		// All is done is setDocumentInformation
 	}
 
 	protected void processEndDocument (Event event) {

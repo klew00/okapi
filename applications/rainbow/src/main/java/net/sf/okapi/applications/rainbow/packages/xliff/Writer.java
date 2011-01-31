@@ -207,7 +207,7 @@ public class Writer extends BaseWriter {
 		writer.writeAttributeString("xmlns:okp", "okapi-framework:xliff-extensions"); 
 		docMimeType = resource.getMimeType();
 		if (( options.message != null ) && ( options.message.length() > 0 )) {
-			writer.writeComment(options.message);
+			writer.writeComment(options.message, true);
 		}
 	}
 

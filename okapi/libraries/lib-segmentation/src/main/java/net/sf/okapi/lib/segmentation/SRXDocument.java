@@ -958,8 +958,7 @@ public class SRXDocument {
 		try {
 			writer.writeStartDocument();
 			if ( docComment != null ) {
-				writer.writeComment(docComment);
-				writer.writeLineBreak();
+				writer.writeComment(docComment, true);
 			}
 			writer.writeStartElement("srx");
 			writer.writeAttributeString("xmlns", NSURI_SRX20);
@@ -971,8 +970,7 @@ public class SRXDocument {
 			writer.writeLineBreak();
 			
 			if ( headerComment != null ) {
-				writer.writeComment(headerComment);
-				writer.writeLineBreak();
+				writer.writeComment(headerComment, true);
 			}
 			writer.writeStartElement("header");
 			writer.writeAttributeString("segmentsubflows", (segmentSubFlows ? "yes" : "no"));
@@ -1029,8 +1027,7 @@ public class SRXDocument {
 				ArrayList<Rule> langRule = langRules.get(ruleName);
 				for ( Rule rule : langRule ) {
 					if ( rule.comment != null ) {
-						writer.writeComment(rule.comment);
-						writer.writeLineBreak();
+						writer.writeComment(rule.comment, true);
 					}
 					writer.writeStartElement("rule");
 					writer.writeAttributeString("break", (rule.isBreak ? "yes" : "no"));

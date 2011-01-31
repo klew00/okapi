@@ -23,7 +23,7 @@ package net.sf.okapi.steps.simplekit.po;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.filters.po.POFilterWriter;
 import net.sf.okapi.steps.simplekit.common.BasePackageWriter;
-import net.sf.okapi.steps.simplekit.common.ManifestItem;
+import net.sf.okapi.steps.simplekit.common.MergingInfo;
 
 public class POPackageWriter extends BasePackageWriter {
 
@@ -36,6 +36,7 @@ public class POPackageWriter extends BasePackageWriter {
 	@Override
 	protected void processStartBatch () {
 		manifest.setSourceSubDirectory("work");
+		manifest.setOriginalSurDirectory("original");
 		super.processStartBatch();
 	}
 	
@@ -47,8 +48,8 @@ public class POPackageWriter extends BasePackageWriter {
 		writer.setForExtractMerge(true);
 		writer.setOptions(manifest.getTargetLocale(), "UTF-8");
 		
-		ManifestItem item = manifest.getItem(docId);
-		String path = manifest.getSourceDirectory() + item.getSourceRelativePath() + ".po";
+		MergingInfo item = manifest.getItem(docId);
+		String path = manifest.getSourceDirectory() + item.getRelativeInputPath() + ".po";
 		writer.setOutput(path);
 		
 		writer.handleEvent(event);

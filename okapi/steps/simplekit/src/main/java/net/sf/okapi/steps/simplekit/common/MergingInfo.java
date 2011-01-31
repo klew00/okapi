@@ -29,12 +29,15 @@ import net.sf.okapi.common.exceptions.OkapiIOException;
 public class MergingInfo {
 
 	private static final String INVALIDVALUE = "Invalid value for attribute '%s'.";
-	
+
+	private int docId;
+	private String extractionType;
+	private String relativeInputPath;
 	private String filterId;
 	private String filterParameters;
 	private String inputEncoding;
-	private String relativeOutputPath;
-	private String outputEncoding;
+	private String relativeTargetPath;
+	private String targetEncoding;
 
 	/**
 	 * Creates a new merging information file object with no settings.
@@ -44,23 +47,43 @@ public class MergingInfo {
 	
 	/**
 	 * Creates a new merging information file object.
+	 * @param docId the document id in the manifest/batch.
+	 * @param relativeInputPath the relative input path of the extracted document
 	 * @param filterId the id of the filter used to extract.
 	 * @param filterParameters the parameters used to extract (can be null).
 	 * @param inputEncoding the encoding used to extract.
-	 * @param relativeTargetPath the output path for the merged file relative to the root.
-	 * @param outputEncoding the default output encoding for the merged file.
+	 * @param relativeTargetPath the relative output path for the merged file relative to the root.
+	 * @param targetEncoding the default encoding for the merged file.
 	 */
-	public MergingInfo (String filterId,
+	public MergingInfo (int docId,
+		String extractionType,
+		String relativeInputPath,
+		String filterId,
 		String filterParameters,
 		String inputEncoding,
 		String relativeTargetPath,
-		String outputEncoding)
+		String targetEncoding)
 	{
+		this.docId = docId;
+		this.extractionType = extractionType;
+		this.relativeInputPath = relativeInputPath;
 		this.filterId = filterId;
 		this.filterParameters = filterParameters;
 		this.inputEncoding = inputEncoding;
-		this.relativeOutputPath = relativeTargetPath;
-		this.outputEncoding = outputEncoding;
+		this.relativeTargetPath = relativeTargetPath;
+		this.targetEncoding = targetEncoding;
+	}
+	
+	public int getDocId () {
+		return docId;
+	}
+	
+	public String getExtractionType () {
+		return extractionType;
+	}
+	
+	public String getRelativeInputPath () {
+		return relativeInputPath;
 	}
 	
 	public String getFilterId () {
@@ -75,12 +98,12 @@ public class MergingInfo {
 		return inputEncoding;
 	}
 
-	public String getRelativeOutputPath () {
-		return relativeOutputPath;
+	public String getRelativeTargetPath () {
+		return relativeTargetPath;
 	}
 
-	public String getOutputEncoding () {
-		return outputEncoding;
+	public String getTargetEncoding () {
+		return targetEncoding;
 	}
 	
 	/**
@@ -94,8 +117,10 @@ public class MergingInfo {
 		boolean base64)
 	{
 		StringBuilder sb = new StringBuilder();
-		sb.append(String.format("<%s xml:space=\"preserve\" filterId=\"%s\" inputEncoding=\"%s\" relativeOutputPath=\"%s\" outputEncoding=\"%s\"",
-			elementQName, filterId, inputEncoding, Util.escapeToXML(relativeOutputPath, 3, false, null), outputEncoding
+		sb.append(String.format("<%s xml:space=\"preserve\" docId=\"%d\" extractionType=\"%s\" relativeInputPath=\"%s\" "
+			+ "filterId=\"%s\" inputEncoding=\"%s\" relativeTargetPath=\"%s\" targetEncoding=\"%s\"",
+			elementQName, docId, extractionType, Util.escapeToXML(relativeInputPath, 3, false, null),
+			filterId, inputEncoding, Util.escapeToXML(relativeTargetPath, 3, false, null), targetEncoding
 		));
 		if ( filterParameters == null ) {
 			// Empty element
@@ -119,7 +144,24 @@ public class MergingInfo {
 	static public MergingInfo readFromXML (Element element) {
 		MergingInfo info = new MergingInfo();
 		
-		String tmp = element.getAttribute("filterId");
+		String tmp = element.getAttribute("docId");
+		if ( tmp.isEmpty() ) throw new OkapiIOException(String.format(INVALIDVALUE, "docId"));
+		try {
+			info.docId = Integer.parseInt(tmp);
+		}
+		catch ( NumberFormatException e ) {
+			throw new OkapiIOException(String.format(INVALIDVALUE, "docId"));
+		}
+		
+		tmp = element.getAttribute("extractionType");
+		if ( tmp.isEmpty() ) throw new OkapiIOException(String.format(INVALIDVALUE, "extractionType"));
+		info.extractionType = tmp;
+		
+		tmp = element.getAttribute("relativeInputPath");
+		if ( tmp.isEmpty() ) throw new OkapiIOException(String.format(INVALIDVALUE, "relativeInputPath"));
+		info.relativeInputPath = tmp;
+		
+		tmp = element.getAttribute("filterId");
 		if ( tmp.isEmpty() ) throw new OkapiIOException(String.format(INVALIDVALUE, "filterId"));
 		info.filterId = tmp;
 		
@@ -127,13 +169,13 @@ public class MergingInfo {
 		if ( tmp.isEmpty() ) throw new OkapiIOException(String.format(INVALIDVALUE, "inputEncoding"));
 		info.inputEncoding = tmp;
 		
-		tmp = element.getAttribute("relativeOutputPath");
-		if ( tmp.isEmpty() ) throw new OkapiIOException(String.format(INVALIDVALUE, "relativeOutputPath"));
-		info.relativeOutputPath = tmp;
+		tmp = element.getAttribute("relativeTargetPath");
+		if ( tmp.isEmpty() ) throw new OkapiIOException(String.format(INVALIDVALUE, "relativeTargetPath"));
+		info.relativeTargetPath = tmp;
 		
-		tmp = element.getAttribute("outputEncoding");
-		if ( tmp.isEmpty() ) info.outputEncoding = info.inputEncoding;
-		else info.outputEncoding = tmp;
+		tmp = element.getAttribute("targetEncoding");
+		if ( tmp.isEmpty() ) info.targetEncoding = info.inputEncoding;
+		else info.targetEncoding = tmp;
 		
 		// Read the content (filter parameters data)
 		tmp = Util.getTextContent(element);
