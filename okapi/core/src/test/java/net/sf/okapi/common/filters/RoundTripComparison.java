@@ -105,6 +105,7 @@ public class RoundTripComparison {
 		LocaleId trgLoc,
 		String dirSuffix)
 	{
+		//return executeCompare(filter, inputDocs, defaultEncoding, srcLoc, trgLoc, dirSuffix, (IPipelineStep[]) null);
 		this.filter = filter;
 		this.defaultEncoding = defaultEncoding;
 		this.srcLoc = srcLoc;
@@ -119,7 +120,7 @@ public class RoundTripComparison {
 			extraction1Events.clear();
 			extraction2Events.clear();
 			subDocEvents.clear();
-			// Load parameters if needed
+			// Load parameters if needed, !!! no reset is called for parameters
 			if (doc.paramFile != null && !doc.paramFile.equals("")) {
 				String root = Util.getDirectoryName(doc.path);
 				IParameters params = filter.getParameters();
