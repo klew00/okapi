@@ -45,42 +45,28 @@ import org.xml.sax.SAXException;
  */
 public class Manifest {
 
+	public static final String VERSION = "2";
 	public static final String MANIFEST_FILENAME = "manifest.xml";
 	
 	private LinkedHashMap<Integer, ManifestItem> docs;
-	private String rootFolder;
-	private String packageID;
-	private String packageType;
-	private String projectID;
+	private String inputRoot;
+	private String packageRoot;
+	private String packageId;
+	private String projectId;
 	private LocaleId sourceLoc;
 	private LocaleId targetLoc;
-	private String skeletonDir;
+	private String originalDir;
 	private String sourceDir;
 	private String targetDir;
-	private String doneDir;
-	private String readerClass;
 	private String date;
-	private boolean useApprovedOnly;
-	private boolean updateApprovedFlag;
 
 	public Manifest () {
 		docs = new LinkedHashMap<Integer, ManifestItem>();
+		originalDir = "";
 		sourceDir = "";
 		targetDir = "";
-		skeletonDir = "";
-		doneDir = "";
-		useApprovedOnly = false;
-		updateApprovedFlag = true;
 	}
 
-	public void setReaderClass (String readerClass) {
-		this.readerClass = readerClass;
-	}
-	
-	public String getReaderClass () {
-		return readerClass;
-	}
-	
 	public Map<Integer, ManifestItem> getItems () {
 		return docs;
 	}
@@ -89,115 +75,83 @@ public class Manifest {
 		return docs.get(docID);
 	}
 	
-	public String getPackageID () {
-		return packageID;
+	public String getPackageId () {
+		return packageId;
 	}
 	
-	public void setPackageID (String value) {
-		packageID = value;
-	}
-
-	public String getPackageType () {
-		return packageType;
+	public String getProjectId () {
+		return projectId;
 	}
 	
-	public void setPackageType (String value) {
-		packageType = value;
-	}
-
-	public String getProjectID () {
-		return projectID;
-	}
-	
-	public void setProjectID (String value) {
-		projectID = value;
-	}
-
-	public LocaleId getSourceLanguage () {
+	public LocaleId getSourceLocale () {
 		return sourceLoc;
 	}
 	
-	public void setSourceLanguage (LocaleId value) {
-		if ( value == null ) throw new NullPointerException();
-		sourceLoc = value;
-	}
-
-	public LocaleId getTargetLanguage () {
+	public LocaleId getTargetLocale () {
 		return targetLoc;
 	}
 	
-	public void setTargetLanguage (LocaleId value) {
-		if ( value == null ) throw new NullPointerException();
-		targetLoc = value;
-	}
-
-	public String getRoot () {
-		return rootFolder;
+	/**
+	 * Gets the input root (always with the terminal separator).
+	 * @return the input root.
+	 */
+	public String getInputRoot () {
+		return inputRoot;
 	}
 	
-	public void setRoot (String value) {
-		if ( value == null ) throw new NullPointerException();
-		rootFolder = value;
+	/**
+	 * Gets the package root (always with the terminal separator).
+	 * @return the package root.
+	 */
+	public String getPackageRoot () {
+		return packageRoot;
 	}
-
-	public String getSourceLocation () {
+	
+	/**
+	 * Gets the directory where to store the original files (always with a terminal separator).
+	 * @return the directory where to store the original files.
+	 */
+	public String getOriginalDirectory () {
+		return originalDir;
+	}
+	
+	public void setOriginalSurDirectory (String subDir) {
+		this.originalDir = Util.ensureSeparator(packageRoot + subDir, false);
+	}
+	
+	/**
+	 * Gets the full directory where to store the prepared source files (always with a terminal separator). 
+	 * @return the directory where to store the prepared source files.
+	 */
+	public String getSourceDirectory () {
 		return sourceDir;
 	}
 	
-	public void setSourceLocation (String value) {
-		if ( value == null ) sourceDir = "";
-		else sourceDir = value;
+	public void setSourceSubDirectory (String subDir) {
+		sourceDir = Util.ensureSeparator(packageRoot + subDir, false);
 	}
-
-	public String getTargetLocation () {
+	
+	/**
+	 * Get the directory where to store the prepared target files (always with a terminal separator).
+	 * @return the directory where to store the prepared target files.
+	 */
+	public String getTargetDirectory () {
 		return targetDir;
 	}
 	
-	public void setTargetLocation (String value) {
-		if ( value == null ) targetDir = "";
-		else targetDir = value;
-	}
-
-	public String getSkeletonLocation () {
-		return skeletonDir;
+	public void setTargetSubDirectory (String subDir) {
+		targetDir = Util.ensureSeparator(packageRoot + subDir, false);
 	}
 	
-	public void setSkeletonLocation (String value) {
-		if ( value == null ) skeletonDir = "";
-		else skeletonDir = value;
-	}
-
-	public String getDoneLocation () {
-		return doneDir;
-	}
-	
-	public void setDoneLocation (String value) {
-		if ( value == null ) doneDir = "";
-		else doneDir = value;
-	}
-
-	public void setDate (String value) {
-		date = value;
-	}
-	
-	public String getDate () {
-		return date;
-	}
-	
-	public boolean useApprovedOnly () {
-		return useApprovedOnly;
-	}
-	
-	public void setUseApprovedOnly (boolean value) {
-		useApprovedOnly = value;
-	}
-	
-	public boolean updateApprovedFlag () {
-		return updateApprovedFlag;
-	}
-	
-	public void setUpdateApprovedFlag (boolean value) {
-		updateApprovedFlag = value;
+	public void setInformation (String packageRoot,
+		LocaleId srcLoc,
+		LocaleId trgLoc,
+		String inputRoot)
+	{
+		this.sourceLoc = srcLoc;
+		this.targetLoc = trgLoc;
+		this.inputRoot = Util.ensureSeparator(inputRoot, false);
+		this.packageRoot = Util.ensureSeparator(packageRoot, false);
 	}
 	
 	/**
@@ -207,34 +161,15 @@ public class Manifest {
 	 * @param relativeOutputPath Relative path of the output document.
 	 */
 	public void addDocument (int docId,
-		String relativeWorkPath,
-		String relativeInputPath,
-		String relativeOutputPath,
-		String inputEncoding,
-		String outputEncoding,
+		String originalRelativePath,
+		String sourceRelativePath,
+		String encoding,
 		String filterID,
-		String postProcessingType)
+		String formatType)
 	{
-		docs.put(docId, new ManifestItem(docId, relativeWorkPath,
-			relativeInputPath, relativeOutputPath, inputEncoding,
-			outputEncoding, filterID, postProcessingType, true));
-	}
-
-	public String getFileToMergePath (int docID) {
-		return rootFolder + File.separator
-			+ (( targetDir.length() == 0 ) ? "" : (targetDir + File.separator))
-			+ docs.get(docID).getRelativeWorkPath();
-	}
-	
-	public String getMergeInputRoot () {
-		return rootFolder + File.separator
-			+ (( targetDir.length() == 0 ) ? "" : (targetDir + File.separator));
-	}
-
-	public String getFileToGeneratePath (int docID) {
-		return rootFolder + File.separator
-			+ (( doneDir.length() == 0 ) ? "" : (doneDir + File.separator))
-			+ docs.get(docID).getRelativeOutputPath();
+		docs.put(docId, new ManifestItem(docId,
+			originalRelativePath, sourceRelativePath,
+			encoding, filterID, formatType));
 	}
 
 	/**
@@ -243,49 +178,36 @@ public class Manifest {
 	public void Save () {
 		XMLWriter writer = null;
 		try {
-			writer = new XMLWriter(rootFolder + File.separator + MANIFEST_FILENAME);
+			writer = new XMLWriter(packageRoot + MANIFEST_FILENAME);
 
 			writer.writeStartDocument();
 			writer.writeComment("=================================================================");
 			writer.writeComment("PLEASE, DO NOT RENAME, MOVE, MODIFY OR ALTER IN ANY WAY THIS FILE");
 			writer.writeComment("=================================================================");
-			writer.writeStartElement("rainbowManifest");
-			writer.writeAttributeString("xmlns:its", "http://www.w3.org/2005/11/its");
-			writer.writeAttributeString("its:version", "1.0");
-			writer.writeAttributeString("its:translate", "no");
-			writer.writeAttributeString("projectID", projectID);
-			writer.writeAttributeString("packageID", packageID);
-			writer.writeAttributeString("sourceLang", sourceLoc.toBCP47());
-			writer.writeAttributeString("targetLang", targetLoc.toBCP47());
-			writer.writeAttributeString("packageType", packageType);
-			writer.writeAttributeString("readerClass", readerClass);
-			writer.writeAttributeString("originalDir", skeletonDir.replace('\\', '/'));
+			writer.writeStartElement("manifest");
+			writer.writeAttributeString("version", VERSION);
+			writer.writeAttributeString("projectId", projectId);
+			writer.writeAttributeString("packageId", packageId);
+			writer.writeAttributeString("source", sourceLoc.toString());
+			writer.writeAttributeString("target", targetLoc.toString());
+			writer.writeAttributeString("originalDir", originalDir.replace('\\', '/'));
 			writer.writeAttributeString("sourceDir", sourceDir.replace('\\', '/'));
 			writer.writeAttributeString("targetDir", targetDir.replace('\\', '/'));
-			writer.writeAttributeString("doneDir", doneDir.replace('\\', '/'));
 			SimpleDateFormat DF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ");
 			writer.writeAttributeString("date", DF.format(new java.util.Date()));
-			writer.writeAttributeString("useApprovedOnly", (useApprovedOnly ? "yes" : "no"));
-			writer.writeAttributeString("updateApprovedFlag", (updateApprovedFlag ? "yes" : "no"));
 
-			Iterator<Integer> iter = docs.keySet().iterator();
-			ManifestItem item;
-			while ( iter.hasNext() ) {
-				int id = iter.next();
-				item = docs.get(id);
+			for ( ManifestItem item : docs.values() ) {
 				writer.writeStartElement("doc");
-				writer.writeAttributeString("id", String.valueOf(id));
-				writer.writeAttributeString("filter", item.getFilterID());
-				writer.writeAttributeString("work", item.getRelativeWorkPath().replace('\\', '/'));
-				writer.writeAttributeString("input", item.getRelativeInputPath().replace('\\', '/'));
-				writer.writeAttributeString("output", item.getRelativeOutputPath().replace('\\', '/'));
-				writer.writeAttributeString("inputEncoding", item.getInputEncoding());
-				writer.writeAttributeString("outputEncoding", item.getOutputEncoding());
-				writer.writeAttributeString("postProcessing", item.getPostProcessingType());
+				writer.writeAttributeString("id", String.valueOf(item.getId()));
+				writer.writeAttributeString("original", item.getOriginalRelativePath().replace('\\', '/'));
+				writer.writeAttributeString("source", item.getSourceRelativePath().replace('\\', '/'));
+				writer.writeAttributeString("filter", item.getFilterId());
+				writer.writeAttributeString("encoding", item.getEncoding());
+				writer.writeAttributeString("formatType", item.getFormatType());
 				writer.writeEndElementLineBreak();
 			}
 
-			writer.writeEndElement(); // rainbowManifest
+			writer.writeEndElement(); // manifest
 			writer.writeEndDocument();
 		}
 		finally {
@@ -296,110 +218,86 @@ public class Manifest {
 	public void load (File inputFile) {
 		try {
 			DocumentBuilderFactory docFac = DocumentBuilderFactory.newInstance();
-		    // Not needed in this case: DFac.setNamespaceAware(true);
-		    Document doc = docFac.newDocumentBuilder().parse(inputFile);
+		    // Not needed in this case: docFac.setNamespaceAware(true);
+			Document doc = docFac.newDocumentBuilder().parse(inputFile);
 		    
-		    NodeList NL = doc.getElementsByTagName("rainbowManifest");
+		    NodeList NL = doc.getElementsByTagName("manifest");
 		    if ( NL == null ) throw new RuntimeException("Invalid manifest file.");
 		    Element elem = (Element)NL.item(0);
 		    if ( elem == null ) throw new RuntimeException("Invalid manifest file.");
 		    
-		    String tmp = elem.getAttribute("projectID");
-		    if (( tmp == null ) || ( tmp.length() == 0 ))
-		    	throw new RuntimeException("Missing projectID attribute.");
-		    else setProjectID(tmp);
+		    String tmp = elem.getAttribute("version");
+		    if ( Util.isEmpty(tmp) ) throw new RuntimeException("Missing vaersion attribute.");
+
+		    tmp = elem.getAttribute("projectId");
+		    if ( Util.isEmpty(tmp) ) throw new RuntimeException("Missing projectId attribute.");
+		    projectId = tmp;
 		    
-		    tmp = elem.getAttribute("packageID");
-		    if (( tmp == null ) || ( tmp.length() == 0 ))
-		    	throw new RuntimeException("Missing packageID attribute.");
-		    else setPackageID(tmp);
+		    tmp = elem.getAttribute("packageId");
+		    if ( Util.isEmpty(tmp) ) throw new RuntimeException("Missing packageId attribute.");
+		    packageId = tmp;
 		    
-		    tmp = elem.getAttribute("packageType");
-		    if (( tmp == null ) || ( tmp.length() == 0 ))
-		    	throw new RuntimeException("Missing packageType attribute.");
-		    else setPackageType(tmp);
+		    tmp = elem.getAttribute("source");
+		    if ( Util.isEmpty(tmp) ) throw new RuntimeException("Missing source attribute.");
+		    sourceLoc = LocaleId.fromString(tmp);
 		    
-		    tmp = elem.getAttribute("readerClass");
-		    if (( tmp == null ) || ( tmp.length() == 0 ))
-		    	throw new RuntimeException("Missing readerClass attribute.");
-		    else setReaderClass(tmp);
-		    
-		    tmp = elem.getAttribute("sourceLang");
-		    if (( tmp == null ) || ( tmp.length() == 0 ))
-		    	throw new RuntimeException("Missing sourceLang attribute.");
-		    else setSourceLanguage(LocaleId.fromString(tmp));
-		    
-		    tmp = elem.getAttribute("targetLang");
-		    if (( tmp == null ) || ( tmp.length() == 0 ))
-		    	throw new RuntimeException("Missing targetLang attribute.");
-		    else setTargetLanguage(LocaleId.fromString(tmp));
+		    tmp = elem.getAttribute("target");
+		    if ( Util.isEmpty(tmp) ) throw new RuntimeException("Missing target attribute.");
+		    targetLoc = LocaleId.fromString(tmp);
 
 		    tmp = elem.getAttribute("originalDir");
-		    setSkeletonLocation(tmp.replace('/', File.separatorChar));
+		    if ( Util.isEmpty(tmp) ) throw new RuntimeException("Missing originalDir attribute.");
+		    originalDir = tmp.replace('/', File.separatorChar);
 
 		    tmp = elem.getAttribute("sourceDir");
-		    setSourceLocation(tmp.replace('/', File.separatorChar));
+		    if ( Util.isEmpty(tmp) ) throw new RuntimeException("Missing sourceDir attribute.");
+		    sourceDir = tmp.replace('/', File.separatorChar);
 
-		    tmp = elem.getAttribute("targetDir");
-		    setTargetLocation(tmp.replace('/', File.separatorChar));
-
-		    tmp = elem.getAttribute("doneDir");
-		    setDoneLocation(tmp.replace('/', File.separatorChar));
-		    
 		    tmp = elem.getAttribute("date");
-		    setDate(tmp);
+		    if ( Util.isEmpty(tmp) ) throw new RuntimeException("Missing date attribute.");
+		    date = tmp;
 		    
-		    tmp = elem.getAttribute("useApprovedOnly");
-		    if ( tmp != null ) {
-		    	setUseApprovedOnly(tmp.equals("yes"));
-		    }
-
-		    String inPath, outPath, inEnc, outEnc, filterID, postProcessingType;
+		    String oriPath, srcPath, enc, filterID, formatType;
 		    docs.clear();
 		    NL = elem.getElementsByTagName("doc");
 		    for ( int i=0; i<NL.getLength(); i++ ) {
 		    	elem = (Element)NL.item(i);
 		    	tmp = elem.getAttribute("id");
-			    if (( tmp == null ) || ( tmp.length() == 0 ))
-			    	throw new RuntimeException("Missing id attribute.");
+			    if ( Util.isEmpty(tmp) ) throw new RuntimeException("Missing id attribute.");
 			    int id = Integer.valueOf(tmp);
 			    
-		    	tmp = elem.getAttribute("work");
-			    if (( tmp == null ) || ( tmp.length() == 0 ))
-			    	throw new RuntimeException("Missing work attribute.");
+//		    	tmp = elem.getAttribute("sourcePath");
+//		    	if ( Util.isEmpty(tmp) ) throw new RuntimeException("Missing work attribute.");
+//		    	sourceDir
+//			    
+//		    	oriPath = elem.getAttribute("original");
+//			    if (( oriPathinPath == null ) || ( inPath.length() == 0 ))
+//			    	throw new RuntimeException("Missing input attribute.");
+//			    
+//		    	inEnc = elem.getAttribute("inputEncoding");
+//			    if (( inEnc == null ) || ( inEnc.length() == 0 ))
+//			    	throw new RuntimeException("Missing inputEncoding attribute.");
+//			    
+//		    	outEnc = elem.getAttribute("outputEncoding");
+//			    if (( outEnc == null ) || ( outEnc.length() == 0 ))
+//			    	throw new RuntimeException("Missing outputEncoding attribute.");
+//			    
+//			    filterID = elem.getAttribute("filter");
+//			    if (( filterID == null ) || ( filterID.length() == 0 ))
+//			    	throw new RuntimeException("Missing filter attribute.");
+//			    
+//			    postProcessingType = elem.getAttribute("postProcessing");
+//			    if (( filterID == null ) || ( filterID.length() == 0 )) {
+//			    	postProcessingType = "default";	
+//			    }
 			    
-		    	inPath = elem.getAttribute("input");
-			    if (( inPath == null ) || ( inPath.length() == 0 ))
-			    	throw new RuntimeException("Missing input attribute.");
-			    
-		    	outPath = elem.getAttribute("output");
-			    if (( outPath == null ) || ( outPath.length() == 0 ))
-			    	throw new RuntimeException("Missing output attribute.");
-			    
-		    	inEnc = elem.getAttribute("inputEncoding");
-			    if (( inEnc == null ) || ( inEnc.length() == 0 ))
-			    	throw new RuntimeException("Missing inputEncoding attribute.");
-			    
-		    	outEnc = elem.getAttribute("outputEncoding");
-			    if (( outEnc == null ) || ( outEnc.length() == 0 ))
-			    	throw new RuntimeException("Missing outputEncoding attribute.");
-			    
-			    filterID = elem.getAttribute("filter");
-			    if (( filterID == null ) || ( filterID.length() == 0 ))
-			    	throw new RuntimeException("Missing filter attribute.");
-			    
-			    postProcessingType = elem.getAttribute("postProcessing");
-			    if (( filterID == null ) || ( filterID.length() == 0 )) {
-			    	postProcessingType = "default";	
-			    }
-			    
-		    	docs.put(id, new ManifestItem(id, tmp.replace('/', File.separatorChar),
-		    		inPath.replace('/', File.separatorChar),
-		    		outPath.replace('/', File.separatorChar),
-		    		inEnc, outEnc, filterID, postProcessingType, true));
+//		    	docs.put(id, new ManifestItem(id, tmp.replace('/', File.separatorChar),
+//		    		inPath.replace('/', File.separatorChar),
+//		    		outPath.replace('/', File.separatorChar),
+//		    		inEnc, outEnc, filterID, postProcessingType, true));
 		    }
 
-		    rootFolder = Util.getDirectoryName(inputFile.getAbsolutePath());
+		    packageRoot = Util.getDirectoryName(inputFile.getAbsolutePath());
 		}
 		catch ( SAXException e ) {
 			throw new RuntimeException(e);
@@ -424,12 +322,12 @@ public class Manifest {
 		ManifestItem mi;
 		while ( iter.hasNext() ) {
 			docId = iter.next();
-			mi = docs.get(docId);
-			File F = new File(getFileToMergePath(docId));
-			if ( !F.exists() ) {
-				nErrors++;
-				mi.setExists(false);
-			}
+////			mi = docs.get(docId);
+////			File F = new File(getFileToMergePath(docId));
+//			if ( !F.exists() ) {
+//				nErrors++;
+//				mi.setExists(false);
+//			}
 		}
 		return nErrors;
 	}

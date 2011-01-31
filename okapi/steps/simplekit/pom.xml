@@ -20,20 +20,26 @@
       <artifactId>okapi-step-common</artifactId>
       <version>${project.version}</version>
      </dependency>
-		<dependency>
-			<groupId>net.sf.okapi.filters</groupId>
-			<artifactId>okapi-filter-xliff</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
-     <!-- For test -->
-		<dependency>
-			<groupId>net.sf.okapi</groupId>
-			<artifactId>okapi-core</artifactId>
-			<scope>test</scope>
-			<classifier>tests</classifier>
+	<dependency>
+		<groupId>net.sf.okapi.filters</groupId>
+		<artifactId>okapi-filter-po</artifactId>
 		<version>${project.version}</version>
-     	</dependency>
+	</dependency>
+		
+     <!-- For test -->
+	<dependency>
+		<groupId>net.sf.okapi.filters</groupId>
+		<artifactId>okapi-filter-xliff</artifactId>
+		<version>${project.version}</version>
+		<scope>test</scope>
+	</dependency>
+	<dependency>
+		<groupId>net.sf.okapi</groupId>
+		<artifactId>okapi-core</artifactId>
+		<scope>test</scope>
+		<classifier>tests</classifier>
+		<version>${project.version}</version>
+   	</dependency>
 		<dependency>
 			<groupId>net.sf.okapi.filters</groupId>
 			<artifactId>okapi-filter-properties</artifactId>
@@ -46,5 +52,6 @@
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
+		
     </dependencies>
 </project>

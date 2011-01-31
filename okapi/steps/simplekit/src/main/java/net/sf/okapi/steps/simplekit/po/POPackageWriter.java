@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010-2011 by the Okapi Framework contributors
+  Copyright (C) 2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -18,19 +18,19 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.simplekit.xliff;
+package net.sf.okapi.steps.simplekit.po;
 
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.filterwriter.XLIFFWriter;
+import net.sf.okapi.filters.po.POFilterWriter;
 import net.sf.okapi.steps.simplekit.common.BasePackageWriter;
 import net.sf.okapi.steps.simplekit.common.ManifestItem;
 
-public class XLIFFPackageWriter extends BasePackageWriter {
+public class POPackageWriter extends BasePackageWriter {
 
-	private XLIFFWriter writer;
+	private POFilterWriter writer;
 
-	public XLIFFPackageWriter () {
-		super("generic-xliff");
+	public POPackageWriter () {
+		super("po-package");
 	}
 	
 	@Override
@@ -43,12 +43,14 @@ public class XLIFFPackageWriter extends BasePackageWriter {
 	protected void processStartDocument (Event event) {
 		super.processStartDocument(event);
 		
-		writer = new XLIFFWriter();
+		writer = new POFilterWriter();
+		writer.setForExtractMerge(true);
 		writer.setOptions(manifest.getTargetLocale(), "UTF-8");
+		
 		ManifestItem item = manifest.getItem(docId);
-		String path = manifest.getSourceDirectory() + item.getSourceRelativePath() + ".xlf";
+		String path = manifest.getSourceDirectory() + item.getSourceRelativePath() + ".po";
 		writer.setOutput(path);
-
+		
 		writer.handleEvent(event);
 	}
 	
@@ -59,7 +61,8 @@ public class XLIFFPackageWriter extends BasePackageWriter {
 			writer.close();
 			writer = null;
 		}
-
+		
+		// Call the base method, in case there is something common to do
 		super.processEndDocument(event);
 	}
 
@@ -90,4 +93,5 @@ public class XLIFFPackageWriter extends BasePackageWriter {
 	public String getName () {
 		return getClass().getName();
 	}
+
 }

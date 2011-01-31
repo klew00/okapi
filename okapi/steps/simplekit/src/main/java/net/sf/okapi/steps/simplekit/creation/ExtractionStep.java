@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -25,6 +25,7 @@ import java.net.URI;
 import java.util.UUID;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.UsingParameters;
@@ -35,9 +36,10 @@ import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.steps.simplekit.common.IPackageWriter;
+import net.sf.okapi.steps.simplekit.common.IPackageWriter;
 
 @UsingParameters(Parameters.class)
-public class TranslationPackageCreationStep extends BasePipelineStep {
+public class ExtractionStep extends BasePipelineStep {
 
 	private IPackageWriter writer;
 	private Parameters params;
@@ -50,9 +52,8 @@ public class TranslationPackageCreationStep extends BasePipelineStep {
 	private String rootDir;
 	private String inputRoot;
 	private String outputRoot;
-	private int docId;
 
-	public TranslationPackageCreationStep () {
+	public ExtractionStep () {
 		super();
 		params = new Parameters();
 	}
@@ -107,28 +108,23 @@ public class TranslationPackageCreationStep extends BasePipelineStep {
 	public Event handleEvent (Event event) {
 		switch ( event.getEventType() ) {
 		case START_BATCH:
-			handleStartBatch(event);
-			break;
+			return doStartBatch(event);
 		case END_BATCH:
-			writer.writeEndPackage(false);
-			break;
+			return doEndBatch(event);
 		case START_DOCUMENT:
-			handleStartDocument(event);
-			break;
+			writer.setDocumentInformation(inputURI.getPath(), filterConfigId, outputURI.getPath());
+			return writer.handleEvent(event);
+		default:
+			return writer.handleEvent(event);
 		}
-		// All events then go to the actual writer
-		return writer.handleEvent(event);
 	}
 
-	
-	@Override
-	protected Event handleStartBatch (Event event) {
+	private Event doStartBatch (Event event) {
 		try {
 			// Get the format (class name)
 			String writerClass = params.getWriterClass();
 			writer = (IPackageWriter)Class.forName(writerClass).newInstance();
 			writer.setParameters(params);
-			docId = 0;
 
 //TODO: input/output roots
 inputRoot = rootDir;
@@ -139,11 +135,7 @@ outputRoot = rootDir;
 			resolvedOutputDir = LocaleId.replaceVariables(resolvedOutputDir, srcLoc, trgLoc);
 			Util.deleteDirectory(resolvedOutputDir, false);
 			
-			String pkgId = UUID.randomUUID().toString();
-			// Use the hash code of the input root for project ID, just to have one
-			writer.setInformation(srcLoc, trgLoc, Util.makeId(inputRoot),
-				resolvedOutputDir, pkgId, inputRoot, getClass().getName());
-			writer.writeStartPackage();
+			writer.setBatchInformation(resolvedOutputDir, srcLoc, trgLoc, inputRoot);
 		}
 		catch ( InstantiationException e ) {
 			throw new RuntimeException("Error creating writer class.", e);
@@ -154,24 +146,32 @@ outputRoot = rootDir;
 		catch ( ClassNotFoundException e ) {
 			throw new RuntimeException("Error creating writer class.", e);
 		}
+		
+		return writer.handleEvent(event);
+	}
+
+	private Event doEndBatch (Event event) {
+		event = writer.handleEvent(event);
+		writer.close();
+		writer = null;
 		return event;
 	}
 	
-	@Override
-	protected Event handleStartDocument (Event event) {
-		StartDocument sd = (StartDocument)event.getResource();
-		String tmpIn = inputURI.getPath();
-		String relativeInput = tmpIn.substring(inputRoot.length()+1);
-		String tmpOut = outputURI.getPath();
-		String relativeOutput = tmpOut.substring(outputRoot.length()+1);
-		String res[] = FilterConfigurationMapper.splitFilterFromConfiguration(filterConfigId);
-		
-		writer.createOutput(++docId, relativeInput, relativeOutput,
-			sd.getEncoding(), outputEncoding, res[0], sd.getFilterParameters(),
-			sd.getFilterWriter().getEncoderManager());
-		
-		return event;
-	}
+//	@Override
+//	protected Event handleStartDocument (Event event) {
+//		StartDocument sd = (StartDocument)event.getResource();
+//		String tmpIn = inputURI.getPath();
+//		String relativeInput = tmpIn.substring(inputRoot.length()+1);
+//		String tmpOut = outputURI.getPath();
+//		String relativeOutput = tmpOut.substring(outputRoot.length()+1);
+//		String res[] = FilterConfigurationMapper.splitFilterFromConfiguration(filterConfigId);
+//		
+////		writer.createOutput(++docId, relativeInput, relativeOutput,
+////			sd.getEncoding(), outputEncoding, res[0], sd.getFilterParameters(),
+////			sd.getFilterWriter().getEncoderManager());
+//		
+//		return event;
+//	}
 
 	@Override
 	public void setParameters (IParameters params) {
@@ -179,7 +179,7 @@ outputRoot = rootDir;
 	}
 	
 	@Override
-	public IParameters getParameters() {
+	public IParameters getParameters () {
 		return params;
 	}
 

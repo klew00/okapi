@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -29,14 +29,14 @@ public class Parameters extends BaseParameters {
 	static final String PACKAGENAME = "packageName"; //$NON-NLS-1$
 	static final String PACKAGEDIRECTORY = "packageDirectory"; //$NON-NLS-1$ 
 	static final String MESSAGE = "message"; //$NON-NLS-1$
-	static final String USEMANIFEST = "useManifest"; //$NON-NLS-1$
+	static final String OUTPUTMANIFEST = "outputManifest"; //$NON-NLS-1$
 	
 	private String writerClass;
 	private String writerOptions;
 	private String packageName;
 	private String packageDirectory;
 	private String message;
-	private boolean useManifest;
+	private boolean outputManifest;
 
 	public Parameters () {
 		reset();
@@ -50,7 +50,7 @@ public class Parameters extends BaseParameters {
 		packageDirectory = "${rootDir}";
 		// Internal
 		message = "";
-		useManifest = true;
+		outputManifest = true;
 	}
 
 	@Override
@@ -63,7 +63,7 @@ public class Parameters extends BaseParameters {
 		packageDirectory = buffer.getString(PACKAGEDIRECTORY, packageDirectory);
 		// Internal
 		message = buffer.getString(MESSAGE, message);
-		useManifest = buffer.getBoolean(USEMANIFEST, useManifest);
+		outputManifest = buffer.getBoolean(OUTPUTMANIFEST, outputManifest);
 	}
 
 	@Override
@@ -75,7 +75,7 @@ public class Parameters extends BaseParameters {
 		buffer.setParameter(PACKAGEDIRECTORY, packageDirectory);
 		// Internal
 		buffer.setParameter(MESSAGE, message);
-		buffer.setParameter(USEMANIFEST, useManifest);
+		buffer.setParameter(OUTPUTMANIFEST, outputManifest);
 		return buffer.toString();
 	}
 
@@ -119,12 +119,12 @@ public class Parameters extends BaseParameters {
 		this.packageDirectory = packageDirectory;
 	}
 	
-	public boolean getUseManifest () {
-		return useManifest;
+	public boolean getOutputManifest () {
+		return outputManifest;
 	}
 
-	public void setUseManifest (boolean useManifest) {
-		this.useManifest = useManifest;
+	public void setOuputManifest (boolean outputManifest) {
+		this.outputManifest = outputManifest;
 	}
 
 }

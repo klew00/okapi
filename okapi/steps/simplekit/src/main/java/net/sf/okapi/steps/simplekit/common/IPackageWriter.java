@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -21,68 +21,25 @@
 package net.sf.okapi.steps.simplekit.common;
 
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.encoder.EncoderManager;
-import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.filterwriter.IFilterWriter;
 
 /**
- * Provides a common way create a translation package. 
+ * Provides a common writer to create a translation package. 
  */
 public interface IPackageWriter extends IFilterWriter {
 
-	public String getPackageType ();
-
-	/**
-	 * Gets the name of the class to use to read this type of package. 
-	 * @return the name of the class to use to read this type of package.
-	 */
-	public String getReaderClass ();
+	public void setParameters (IParameters params);
 	
-	/**
-	 * Sets the global parameters of the package.
-	 * @param sourceLocale the source language.
-	 * @param targetLocale the target language.
-	 * @param projectID the project identifier.
-	 * @param outputDir the root folder for the output.
-	 * @param packageID the package identifier.
-	 * @param sourceRoot the root folder of the original inputs.
-	 * @param creationTool the tool that creates the package.
-	 */
-	public void setInformation (LocaleId sourceLocale,
-		LocaleId targetLocale,
-		String projectID,
-		String outputDir,
-		String packageID,
-		String sourceRoot,
-		String creationTool);
+	public IParameters getParameters ();
 	
-	public void writeStartPackage ();
+	public void setBatchInformation (String packageRoot,
+		LocaleId srcLoc,
+		LocaleId trgLoc,
+		String inputRoot);
 	
-	public void writeEndPackage (boolean createZip);
-	
-	public void createOutput (int docID,
-		String relativeSourcePath,
-		String relativeTargetPath,
-		String sourceEncoding,
-		String targetEncoding,
-		String filterId,
-		IParameters filterParams,
-		EncoderManager encoderManager);
-
-	public void createCopies (int docID,
-		String relativeSourcePath);
-
-	/**
-	 * Helper method to output the TMX entries.
-	 * @param tu the text unit to look at for possible output.
-	 */
-	public void writeTMXEntries (TextUnit tu);
-
-	/**
-	 * Helper method to output scored entries. This method is called by {@link #writeTMXEntries(TextUnit)}.
-	 * @param item the text unit to process.
-	 */
-	public void writeScoredItem (TextUnit item);
+	public void setDocumentInformation (String inputPath,
+		String filterConfigId,
+		String outputPath);
 
 }

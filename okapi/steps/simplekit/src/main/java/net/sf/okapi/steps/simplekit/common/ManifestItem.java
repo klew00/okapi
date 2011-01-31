@@ -22,96 +22,57 @@ package net.sf.okapi.steps.simplekit.common;
 
 public class ManifestItem {
 
-	public static final String POSPROCESSING_TYPE_DEFAULT = "default";
-	public static final String POSPROCESSING_TYPE_RTF = "rtf";
-	
-	private String relativeWorkPath;
-	private String relativeInputPath;
-	private String relativeOutputPath;
-	private String inputEncoding;
-	private String outputEncoding;
-	private String filterID;
-	private boolean selected;
-	private String postProcessingType;
-	private boolean exists;
-	private int docId;
+	private int id;
+	private String originalRelativePath;
+	private String sourceRelativePath;
+	private String encoding;
+	private String filterId;
+	private String formatType;
 
-	public ManifestItem (int docId,
-		String relativeWorkPath,
-		String relativeInputPath,
-		String relativeOutputPath,
-		String inputEncoding,
-		String outputEncoding,
-		String filterID,
-		String postProcessingType,
-		boolean selected)
+	public ManifestItem (int id,
+		String originalRelativePath,
+		String sourceRelativePath,
+		String encoding,
+		String filterId,
+		String formatType)
 	{
-		if ( relativeWorkPath == null ) throw new NullPointerException();
-		if ( relativeInputPath == null ) throw new NullPointerException();
-		if ( relativeOutputPath == null ) throw new NullPointerException();
-		if ( inputEncoding == null ) throw new NullPointerException();
-		if ( outputEncoding == null ) throw new NullPointerException();
-		if ( filterID == null ) throw new NullPointerException();
-		if ( postProcessingType == null ) throw new NullPointerException();
+		if ( originalRelativePath == null ) throw new NullPointerException();
+		if ( sourceRelativePath == null ) throw new NullPointerException();
+		if ( encoding == null ) throw new NullPointerException();
+		if ( encoding == null ) throw new NullPointerException();
+		if ( filterId == null ) throw new NullPointerException();
+		if ( formatType == null ) throw new NullPointerException();
 		
-		this.docId = docId;
-		this.relativeWorkPath = relativeWorkPath;
-		this.relativeInputPath = relativeInputPath;
-		this.relativeOutputPath = relativeOutputPath;
-		this.inputEncoding = inputEncoding;
-		this.outputEncoding = outputEncoding;
-		this.filterID = filterID;
-		this.selected = selected;
-		this.postProcessingType = postProcessingType;
-		exists = true;
+		this.id = id;
+		this.originalRelativePath = originalRelativePath;
+		this.sourceRelativePath = sourceRelativePath;
+		this.encoding = encoding;
+		this.filterId = filterId;
+		this.formatType = formatType;
 	}
 
-	public String getRelativeWorkPath () {
-		return relativeWorkPath;
+	public String getSourceRelativePath () {
+		return sourceRelativePath;
 	}
 	
-	public String getRelativeInputPath () {
-		return relativeInputPath;
+	public String getOriginalRelativePath () {
+		return originalRelativePath;
 	}
 	
-	public String getRelativeOutputPath () {
-		return relativeOutputPath;
-	}
-	
-	public String getInputEncoding () {
-		return inputEncoding;
+	public String getEncoding () {
+		return encoding;
 	}
 
-	public String getOutputEncoding () {
-		return outputEncoding;
+	public String getFilterId () {
+		return filterId;
 	}
 
-	public String getFilterID () {
-		return filterID;
-	}
-
-	public boolean selected () {
-		return selected;
+	public String getFormatType () {
+		return formatType;
 	}
 	
-	public void setSelected (boolean value) {
-		selected = value;
-	}
-	
-	public boolean exists () {
-		return exists;
-	}
-	
-	public void setExists (boolean value) {
-		exists = value;
-	}
-	
-	public String getPostProcessingType () {
-		return postProcessingType;
-	}
-	
-	public int getDocId () {
-		return docId;
+	public int getId () {
+		return id;
 	}
 
 }
