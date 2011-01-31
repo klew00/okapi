@@ -56,8 +56,8 @@ import net.sf.okapi.common.resource.TextUnit;
 public class POFilterWriter implements IFilterWriter {
 
 	private static final String ESCAPEABLE = "\\\"abfnrtv";
-	private static final String SSDMARKER = "_okpSSD_:";
-	private static final String TUMARKER = "_okpTU_:";
+	private static final String SSDMARKER = "okpSD:";
+	private static final String TUMARKER = "okpTU:";
 
 	private Parameters params;
 	private OutputStream output;
@@ -328,14 +328,13 @@ public class POFilterWriter implements IFilterWriter {
 					writer.write("#, fuzzy"+linebreak);
 				}
 			}
-			// ID reference
+			// ID reference to allow merging back and duplication of msgid text
 			if ( forExtractMerge ) {
 				if ( subDocMarker == null ) { // Normal entry
-					writer.write("#: " + TUMARKER+tu.getId() + linebreak);
+					writer.write("msgctxt \"" + TUMARKER+tu.getId() + "\"" + linebreak);
 				}
-				else { // First entry of a sub-document
-					writer.write("#: " + subDocMarker+" " + TUMARKER+tu.getId() + linebreak);
-					subDocMarker = null;
+				else { // With sub-document
+					writer.write("msgctxt \"" + subDocMarker+" " + TUMARKER+tu.getId() + "\""+ linebreak);
 				}
 			}
 			// msgid
