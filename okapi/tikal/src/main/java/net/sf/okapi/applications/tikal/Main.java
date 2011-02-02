@@ -21,6 +21,7 @@
 package net.sf.okapi.applications.tikal;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -43,6 +44,7 @@ import java.util.regex.Pattern;
 import net.sf.okapi.common.FileUtil;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.DefaultFilters;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
@@ -961,8 +963,17 @@ public class Main {
 	}
 	
 	private String getAppRootDirectory () {
-		URL url = getClass().getProtectionDomain().getCodeSource().getLocation();
-		return Util.getDirectoryName(Util.getDirectoryName(url.getPath()));
+		try {
+			URL url = getClass().getProtectionDomain().getCodeSource().getLocation();
+			String path = new File(url.toURI()).getCanonicalPath();
+			return Util.getDirectoryName(Util.getDirectoryName(path));
+		}
+		catch ( IOException e ) {
+			throw new OkapiIOException(e);
+		}
+		catch ( URISyntaxException e ) {
+			throw new OkapiIOException("Bad URI syntax.", e);
+		}
 	}
 	
 	private void showHelp () throws MalformedURLException {
