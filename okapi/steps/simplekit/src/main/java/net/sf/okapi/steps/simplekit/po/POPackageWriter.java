@@ -22,6 +22,7 @@ package net.sf.okapi.steps.simplekit.po;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.filters.po.POFilterWriter;
+import net.sf.okapi.filters.po.Parameters;
 import net.sf.okapi.steps.simplekit.common.BasePackageWriter;
 import net.sf.okapi.steps.simplekit.common.MergingInfo;
 
@@ -45,6 +46,9 @@ public class POPackageWriter extends BasePackageWriter {
 		super.processStartDocument(event);
 		
 		writer = new POFilterWriter();
+		Parameters params = (Parameters)writer.getParameters();
+		params.outputGeneric = true;
+		
 		writer.setForExtractMerge(true);
 		writer.setOptions(manifest.getTargetLocale(), "UTF-8");
 		

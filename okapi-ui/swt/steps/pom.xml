@@ -23,7 +23,7 @@
 		<module>uriconversion-ui</module>
         <module>wordcount-ui</module>
         <module>xsltransform-ui</module>
-        <!--Off for now <module>simplekit-ui</module>-->
+        <module>simplekit-ui</module>
     </modules>
 
 	<dependencies>

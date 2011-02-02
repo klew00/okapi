@@ -32,7 +32,7 @@
 		<module>searchandreplace</module>
 		<module>segmentation</module>
         <module>sentence-aligner</module>
-        <!-- off for now <module>simplekit</module>-->
+		<module>simplekit</module>
         <module>termextraction</module>
 		<module>textmodification</module>
         <module>tokenization</module>

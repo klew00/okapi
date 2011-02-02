@@ -295,11 +295,11 @@
 			<artifactId>okapi-step-uriconversion-ui</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-<!-- off for now		<dependency>
+		<dependency>
 			<groupId>net.sf.okapi.steps</groupId>
 			<artifactId>okapi-step-simplekit-ui</artifactId>
 			<version>${project.version}</version>
-		</dependency>-->
+		</dependency>
 
 		<dependency>
 			<groupId>net.sf.okapi.steps</groupId>
@@ -391,11 +391,11 @@
 			<artifactId>okapi-step-external-command</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-<!--off for now		<dependency>
+		<dependency>
 			<groupId>net.sf.okapi.steps</groupId>
 			<artifactId>okapi-step-simplekit</artifactId>
 			<version>${project.version}</version>
-		</dependency>-->
+		</dependency>
         <dependency>
 			<groupId>net.sf.okapi.steps</groupId>
 			<artifactId>okapi-step-wordcount</artifactId>

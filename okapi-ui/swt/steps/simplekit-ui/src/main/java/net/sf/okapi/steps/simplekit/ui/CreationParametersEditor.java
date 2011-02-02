@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -172,6 +172,10 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		optEditors.add("net.sf.okapi.steps.simplekit.xliff.Options");
 		optStrings.add(createParameters(optEditors.get(0)));
 		writers.add("net.sf.okapi.steps.simplekit.xliff.XLIFFPackageWriter");
+		// PO options
+		optEditors.add(null);
+		optStrings.add(null);
+		writers.add("net.sf.okapi.steps.simplekit.po.POPackageWriter");
 
 		mainComposite = new Composite(parent, SWT.BORDER);
 		mainComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -203,10 +207,11 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		
 		lbTypes = new List(cmpTmp, SWT.BORDER);
 		lbTypes.add("Generic XLIFF");
-		//lbTypes.add("OmegaT");
-		//lbTypes.add("Original + RTF layer");
-		// Data of the list matches the writer's name.
-		lbTypes.setData("net.sf.okapi.steps.simplekit.xliff.XLIFFPackageWriter"); //\tomegat\trtf");
+		lbTypes.setData("0", "net.sf.okapi.steps.simplekit.xliff.XLIFFPackageWriter");
+		
+		lbTypes.add("PO Package");
+		lbTypes.setData("1", "net.sf.okapi.steps.simplekit.po.POPackageWriter");
+
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.heightHint = 70;
 		gdTmp.horizontalSpan = 2;
@@ -265,6 +270,10 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		case 0: // XLIFF
 			btOptions.setEnabled(optEditors.get(n)!=null);
 			edDescription.setText("Simple package where all files to translate are extracted to XLIFF. You can translate this package with any XLIFF editor.");
+			break;
+		case 1: // PO
+			btOptions.setEnabled(false);
+			edDescription.setText("Set of PO files. You can translate this package with anu PO editor.");
 			break;
 //		case 1: // OmegaT
 //			btOptions.setEnabled(false);
@@ -345,7 +354,12 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 			//TODO: error box
 			return result;
 		}
+		params.setPackageDirectory(pnlPackageDir.getText().trim());
 		params.setPackageName(edPackageName.getText().trim());
+		
+		int n = lbTypes.getSelectionIndex();
+		params.setWriterClass((String)lbTypes.getData(String.valueOf(n)));
+		
 		result = true;
 		return result;
 	}

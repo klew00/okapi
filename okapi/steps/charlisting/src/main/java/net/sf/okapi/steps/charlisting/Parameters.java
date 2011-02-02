@@ -28,7 +28,7 @@ import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 import net.sf.okapi.common.uidescription.PathInputPart;
 
 @EditorFor(Parameters.class)
-public class Parameters extends BaseParameters implements IEditorDescriptionProvider{
+public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
 	private static String OUTPUTPATH = "outputPath";
 	private static String AUTOOPEN = "autoOpen";

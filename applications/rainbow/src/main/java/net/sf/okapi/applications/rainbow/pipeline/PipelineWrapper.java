@@ -631,18 +631,18 @@ public class PipelineWrapper {
 			}
 			availableSteps.put(step.id, step);
 
-// Not ready			
-//			ps = (IPipelineStep)Class.forName(
-//				"net.sf.okapi.steps.simplekit.creation.TranslationPackageCreationStep").newInstance();
-//			params = ps.getParameters();
-//			step = new StepInfo(ps.getClass().getSimpleName(),
-//				ps.getName(), ps.getDescription(), ps.getClass().getName(), null,
-//				params.getClass().getName());
-//			if ( params != null ) {
-//				step.paramsData = params.toString();
-//				peMapper.addEditor("net.sf.okapi.steps.simplekit.ui.CreationParametersEditor", step.paramsClass);
-//			}
-//			availableSteps.put(step.id, step);
+// BETA, for test only 			
+			ps = (IPipelineStep)Class.forName(
+				"net.sf.okapi.steps.simplekit.creation.ExtractionStep").newInstance();
+			params = ps.getParameters();
+			step = new StepInfo(ps.getClass().getSimpleName(),
+				ps.getName(), ps.getDescription(), ps.getClass().getName(), null,
+				params.getClass().getName());
+			if ( params != null ) {
+				step.paramsData = params.toString();
+				peMapper.addEditor("net.sf.okapi.steps.simplekit.ui.CreationParametersEditor", step.paramsClass);
+			}
+			availableSteps.put(step.id, step);
 
 		}
 		catch ( InstantiationException e ) {
