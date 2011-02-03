@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2010 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -294,9 +294,9 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	
 	private void setData () {
 		chkSegmentSource.setSelection(params.segmentSource);
-		edSourceSRX.setText(params.sourceSrxPath);
+		edSourceSRX.setText(params.getSourceSrxPath());
 		chkSegmentTarget.setSelection(params.segmentTarget);
-		edTargetSRX.setText(params.targetSrxPath);
+		edTargetSRX.setText(params.getTargetSrxPath());
 		chkCopySource.setSelection(params.copySource);
 		chkCheckSegments.setSelection(params.checkSegments);
 		chkForceSegmentedOutput.setSelection(params.getForcesegmentedOutput());
@@ -308,11 +308,11 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private boolean saveData () {
 		params.segmentSource = chkSegmentSource.getSelection();
 		if ( params.segmentSource ) {
-			params.sourceSrxPath = edSourceSRX.getText();
+			params.setSourceSrxPath(edSourceSRX.getText());
 		}
 		params.segmentTarget = chkSegmentTarget.getSelection();
 		if ( params.segmentTarget ) {
-			params.targetSrxPath = edTargetSRX.getText();
+			params.setTargetSrxPath(edTargetSRX.getText());
 		}
 		params.copySource = chkCopySource.getSelection();
 		params.checkSegments = chkCheckSegments.getSelection();

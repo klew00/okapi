@@ -60,13 +60,13 @@ public class MultistepPipelineTest {
 	public void xsltPipeline() throws URISyntaxException {
 		String xsltPath = MultistepPipelineTest.class.getResource("identity.xsl").getPath();
 		IPipelineStep step1 = new XSLTransformStep();
-		((net.sf.okapi.steps.xsltransform.Parameters) step1.getParameters()).xsltPath = xsltPath;
+		((net.sf.okapi.steps.xsltransform.Parameters) step1.getParameters()).setXsltPath(xsltPath);
 
 		IPipelineStep step2 = new XSLTransformStep();
-		((net.sf.okapi.steps.xsltransform.Parameters) step2.getParameters()).xsltPath = xsltPath;
+		((net.sf.okapi.steps.xsltransform.Parameters) step2.getParameters()).setXsltPath(xsltPath);
 
 		IPipelineStep step3 = new XSLTransformStep();
-		((net.sf.okapi.steps.xsltransform.Parameters) step3.getParameters()).xsltPath = xsltPath;
+		((net.sf.okapi.steps.xsltransform.Parameters) step3.getParameters()).setXsltPath(xsltPath);
 
 		IPipelineStep step4 = new RawDocumentWriterStep();
 
@@ -195,7 +195,7 @@ public class MultistepPipelineTest {
 		driver.addStep(new RawDocumentToFilterEventsStep());
 		SegmentationStep ss = new SegmentationStep();
 		Parameters sp = (Parameters)ss.getParameters();
-		sp.sourceSrxPath = new File(getUri("test.srx")).getAbsolutePath();
+		sp.setSourceSrxPath(new File(getUri("test.srx")).getAbsolutePath());
 		sp.segmentSource = true;
 		driver.addStep(ss);
 		driver.addStep(new FilterEventsWriterStep());

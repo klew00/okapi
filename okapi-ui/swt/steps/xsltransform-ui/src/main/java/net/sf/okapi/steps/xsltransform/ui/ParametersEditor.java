@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -255,7 +255,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private void setData () {
 		chkUseCustomTransformer.setSelection(params.useCustomTransformer);
 		edFactoryClass.setText(params.factoryClass);
-		edXsltPath.setText(params.xsltPath);
+		edXsltPath.setText(params.getXsltPath());
 		ConfigurationString tmp = new ConfigurationString(params.paramList);
 		edParameters.setText(tmp.toString());
 		edFactoryClass.setEnabled(chkUseCustomTransformer.getSelection());
@@ -280,7 +280,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			params.factoryClass = edFactoryClass.getText();
 		}
 
-		params.xsltPath = edXsltPath.getText();
+		params.setXsltPath(edXsltPath.getText());
 		ConfigurationString tmp = new ConfigurationString(edParameters.getText());
 		params.paramList = tmp.toString();
 		result = true;

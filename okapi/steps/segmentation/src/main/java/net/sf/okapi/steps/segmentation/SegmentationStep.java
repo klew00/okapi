@@ -102,7 +102,7 @@ public class SegmentationStep extends BasePipelineStep {
 		SRXDocument srxDoc = new SRXDocument();
 		String src = null;
 		if ( params.segmentSource ) {
-			src = Util.fillRootDirectoryVariable(params.sourceSrxPath, rootDir);
+			src = Util.fillRootDirectoryVariable(params.getSourceSrxPath(), rootDir);
 			srxDoc.loadRules(src);
 			if ( srxDoc.hasWarning() ) {
 				logger.warning(srxDoc.getWarning());
@@ -118,7 +118,7 @@ public class SegmentationStep extends BasePipelineStep {
 			srcSeg = srxDoc.compileLanguageRules(sourceLocale, null);
 		}
 		if ( params.segmentTarget ) {
-			String trg = Util.fillRootDirectoryVariable(params.targetSrxPath, rootDir);
+			String trg = Util.fillRootDirectoryVariable(params.getTargetSrxPath(), rootDir);
 			// Load target SRX only if different from sources
 			if ( Util.isEmpty(src) || !src.equals(trg) ) {
 				srxDoc.loadRules(trg);

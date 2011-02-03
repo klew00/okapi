@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -23,6 +23,7 @@ package net.sf.okapi.steps.xmlvalidation;
 import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.ParametersDescription;
+import net.sf.okapi.common.ReferenceParameter;
 import net.sf.okapi.common.uidescription.CheckboxPart;
 import net.sf.okapi.common.uidescription.EditorDescription;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
@@ -56,6 +57,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.validate = validate;
 	}
 	
+	@ReferenceParameter
 	public String getSchemaPath () {
 		return schemaPath;
 	}

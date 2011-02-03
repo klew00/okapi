@@ -31,6 +31,7 @@ import java.util.SortedMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.sf.okapi.applications.rainbow.batchconfig.BatchConfiguration;
 import net.sf.okapi.applications.rainbow.lib.CodeFinderEditor;
 import net.sf.okapi.applications.rainbow.lib.EncodingItem;
 import net.sf.okapi.applications.rainbow.lib.EncodingManager;
@@ -596,6 +597,14 @@ public class MainForm { //implements IParametersProvider {
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				pluginsManager();
+			}
+		});
+
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "tools.exportbatchconfig"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				exportBatchConfiguration();
 			}
 		});
 
@@ -1265,16 +1274,7 @@ public class MainForm { //implements IParametersProvider {
 	 */
 	private void executePipeline (IPredefinedPipeline predefinedPipeline) {
 		try {
-			// Save any pending data
-			saveSurfaceData();
-			updateCustomConfigurations();
-			if ( wrapper == null ) {
-				wrapper = new PipelineWrapper(fcMapper, appRootFolder, pm, prj.getProjectFolder(), shell);
-			}
-			else { // Make sure to reset the root dir each time
-				wrapper.setRootDirectory(prj.getProjectFolder());
-			}
-
+			setupPipelineWrapper();
 			if ( predefinedPipeline == null ) {
 				wrapper.loadFromStringStorageOrReset(prj.getUtilityParameters(PRJPIPELINEID));
 			}
@@ -2401,6 +2401,33 @@ public class MainForm { //implements IParametersProvider {
 			FilterConfigurationsDialog dlg = new FilterConfigurationsDialog(shell, false, fcMapper, help); 
 			updateCustomConfigurations();
 			dlg.showDialog(null);
+		}
+		catch ( Exception e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+	}
+
+	private void setupPipelineWrapper () {
+		saveSurfaceData();
+		updateCustomConfigurations();
+		if ( wrapper == null ) {
+			wrapper = new PipelineWrapper(fcMapper, appRootFolder, pm, prj.getProjectFolder(), shell);
+		}
+		else { // Make sure to reset the root dir each time
+			wrapper.setRootDirectory(prj.getProjectFolder());
+		}
+	}
+	
+	private void exportBatchConfiguration () {
+		try {
+			setupPipelineWrapper();
+			String path = Dialogs.browseFilenamesForSave(shell, "Save Batch Configuration", null, null, null);
+			if ( Util.isEmpty(path) ) return;
+			// Else: export
+			// Get the current pipeline of the project
+			BatchConfiguration bc = new BatchConfiguration();
+			wrapper.loadFromStringStorageOrReset(prj.getUtilityParameters(PRJPIPELINEID));
+			bc.exportConfiguration(path, wrapper.getPipeline(), fcMapper);
 		}
 		catch ( Exception e ) {
 			Dialogs.showError(shell, e.getMessage(), null);

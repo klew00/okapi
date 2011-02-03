@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.okapi.common.BaseParameters;
+import net.sf.okapi.common.ReferenceParameter;
 
 public class Parameters extends BaseParameters {
 	
@@ -449,6 +450,7 @@ public class Parameters extends BaseParameters {
 		this.betweenCodes = betweenCodes;
 	}
 	
+	@ReferenceParameter
 	public String getTermsPath () {
 		return termsPath;
 	}

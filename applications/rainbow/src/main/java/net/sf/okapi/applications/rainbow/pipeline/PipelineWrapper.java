@@ -736,6 +736,11 @@ public class PipelineWrapper {
 		this.path = path;
 	}
 	
+	public IPipeline getPipeline () {
+		copyInfoStepsToPipeline();
+		return driver.getPipeline();
+	}
+	
 	private void copyInfoStepsToPipeline () {
 		try {
 			// Build the pipeline

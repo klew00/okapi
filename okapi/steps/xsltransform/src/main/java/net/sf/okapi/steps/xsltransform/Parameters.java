@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -21,18 +21,14 @@
 package net.sf.okapi.steps.xsltransform;
 
 import net.sf.okapi.common.BaseParameters;
+import net.sf.okapi.common.ReferenceParameter;
 
 public class Parameters extends BaseParameters {
 
-	/**
-	 * Path of the XSLT template to apply.
-	 */
-	public String xsltPath;
-	/**
-	 * List of parameters to pass to the template.
-	 */
+	private static final String XSLTPATH = "xsltPath";
+	
+	private String xsltPath;
 	public String paramList;
-
 	public boolean useCustomTransformer;
 	public String factoryClass;
 
@@ -47,11 +43,20 @@ public class Parameters extends BaseParameters {
 		// Example: net.sf.saxon.TransformerFactoryImpl
 		factoryClass = ""; //$NON-NLS-1$
 	}
+	
+	public void setXsltPath (String xsltPath) {
+		this.xsltPath = xsltPath;
+	}
+	
+	@ReferenceParameter
+	public String getXsltPath () {
+		return xsltPath;
+	}
 
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
-		xsltPath = buffer.getString("xsltPath", xsltPath); //$NON-NLS-1$
+		xsltPath = buffer.getString(XSLTPATH, xsltPath); //$NON-NLS-1$
 		paramList = buffer.getString("paramList", paramList); //$NON-NLS-1$
 		useCustomTransformer = buffer.getBoolean("useCustomTransformer", useCustomTransformer); //$NON-NLS-1$
 		factoryClass = buffer.getString("transformerClass", factoryClass); //$NON-NLS-1$
@@ -60,7 +65,7 @@ public class Parameters extends BaseParameters {
 	@Override
 	public String toString () {
 		buffer.reset();
-		buffer.setString("xsltPath", xsltPath); //$NON-NLS-1$
+		buffer.setString(XSLTPATH, xsltPath); //$NON-NLS-1$
 		buffer.setString("paramList", paramList); //$NON-NLS-1$
 		buffer.setBoolean("useCustomTransformer", useCustomTransformer); //$NON-NLS-1$
 		buffer.setString("transformerClass", factoryClass); //$NON-NLS-1$

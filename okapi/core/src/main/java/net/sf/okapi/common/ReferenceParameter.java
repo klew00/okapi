@@ -27,6 +27,10 @@ import java.lang.annotation.Target;
 
 /**
  * Java annotation for indicating a parameter that is a reference to an external resource.
+ * <p>This annotation should be placed on the getter method of any parameter that is a reference to
+ * an external file (e.g. the path to a SRX file in a segmentation step).
+ * <p>The getter method must be in the form a getAbc(), and must have a corresponding
+ * setter method (e.g. setAbc(String)).
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

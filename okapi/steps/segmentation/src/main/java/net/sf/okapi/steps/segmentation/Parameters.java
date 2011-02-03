@@ -21,6 +21,7 @@
 package net.sf.okapi.steps.segmentation;
 
 import net.sf.okapi.common.BaseParameters;
+import net.sf.okapi.common.ReferenceParameter;
 
 public class Parameters extends BaseParameters {
 	
@@ -30,17 +31,19 @@ public class Parameters extends BaseParameters {
 	
 	private static final String FORCESEGMENTEDOUTPUT = "forceSegmentedOutput";
 	private static final String OVERWRITESEGMENTATION = "overwriteSegmentation";
+	private static final String SOURCESRXPATH = "sourceSrxPath";
+	private static final String TARGETSRXPATH = "targetSrxPath";
 	
 	public boolean segmentSource;
 	public boolean segmentTarget;
-	public String sourceSrxPath;
-	public String targetSrxPath;
 	public boolean copySource;
 	public boolean checkSegments;
 	public int trimSrcLeadingWS;
 	public int trimSrcTrailingWS;
 	public int trimTrgLeadingWS;
 	public int trimTrgTrailingWS;
+	private String sourceSrxPath;
+	private String targetSrxPath;
 	private boolean forceSegmentedOutput;
 	private boolean overwriteSegmentation;
 
@@ -79,14 +82,32 @@ public class Parameters extends BaseParameters {
 	public void setOverwriteSegmentation (boolean overwriteSegmentation) {
 		this.overwriteSegmentation = overwriteSegmentation;
 	}
+	
+	public void setSourceSrxPath (String sourceSrxPath) {
+		this.sourceSrxPath = sourceSrxPath.trim();
+	}
+	
+	@ReferenceParameter
+	public String getSourceSrxPath () {
+		return sourceSrxPath;
+	}
+	
+	public void setTargetSrxPath (String targetSrxPath) {
+		this.targetSrxPath = targetSrxPath.trim();
+	}
+	
+	@ReferenceParameter
+	public String getTargetSrxPath () {
+		return targetSrxPath;
+	}
 
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
 		segmentSource = buffer.getBoolean("segmentSource", segmentSource);
 		segmentTarget = buffer.getBoolean("segmentTarget", segmentTarget);
-		sourceSrxPath = buffer.getString("sourceSrxPath", sourceSrxPath);
-		targetSrxPath = buffer.getString("targetSrxPath", targetSrxPath);
+		sourceSrxPath = buffer.getString(SOURCESRXPATH, sourceSrxPath);
+		targetSrxPath = buffer.getString(TARGETSRXPATH, targetSrxPath);
 		copySource = buffer.getBoolean("copySource", copySource);
 		checkSegments = buffer.getBoolean("checkSegments", checkSegments);
 		trimSrcLeadingWS = buffer.getInteger("trimSrcLeadingWS", trimSrcLeadingWS);
@@ -102,8 +123,8 @@ public class Parameters extends BaseParameters {
 		buffer.reset();
 		buffer.setBoolean("segmentSource", segmentSource);
 		buffer.setBoolean("segmentTarget", segmentTarget);
-		buffer.setString("sourceSrxPath", sourceSrxPath);
-		buffer.setString("targetSrxPath", targetSrxPath);
+		buffer.setString(SOURCESRXPATH, sourceSrxPath);
+		buffer.setString(TARGETSRXPATH, targetSrxPath);
 		buffer.setBoolean("copySource", copySource);
 		buffer.setBoolean("checkSegments", checkSegments);
 		buffer.setInteger("trimSrcLeadingWS", trimSrcLeadingWS);

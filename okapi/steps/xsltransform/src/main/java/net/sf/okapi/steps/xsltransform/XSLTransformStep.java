@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -139,7 +139,7 @@ public class XSLTransformStep extends BasePipelineStep {
 			
 			// Create the source for the XSLT
 			xsltInput = new javax.xml.transform.stream.StreamSource(
-				new File(params.xsltPath)); //TODO: .replace(VAR_PROJDIR, projectDir)));
+				new File(params.getXsltPath()));
 			
 			// Create an instance of TransformerFactory
 			if ( params.useCustomTransformer ) {

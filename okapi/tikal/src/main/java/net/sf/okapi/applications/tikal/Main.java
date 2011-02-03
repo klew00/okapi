@@ -1267,8 +1267,8 @@ public class Main {
 		segParams.segmentSource = true;
 		segParams.segmentTarget = true;
 		File f = new File(segRules);
-		segParams.sourceSrxPath = f.getAbsolutePath();
-		segParams.targetSrxPath = f.getAbsolutePath();
+		segParams.setSourceSrxPath(f.getAbsolutePath());
+		segParams.setTargetSrxPath(f.getAbsolutePath());
 		ps.println("Segmentation: " + f.getAbsolutePath());
 		return segStep;
 	}
