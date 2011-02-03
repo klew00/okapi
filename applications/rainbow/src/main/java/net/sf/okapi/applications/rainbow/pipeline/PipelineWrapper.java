@@ -122,6 +122,10 @@ public class PipelineWrapper {
 		}
 	}
 
+	public void setRootDirectory (String rootDir) {
+		driver.setRootDirectory(rootDir);
+	}
+	
 	/**
 	 * Populate the hard-wired steps.
 	 */

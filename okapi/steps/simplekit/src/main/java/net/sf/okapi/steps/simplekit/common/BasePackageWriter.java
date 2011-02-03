@@ -25,6 +25,7 @@ import java.io.OutputStream;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.steps.simplekit.creation.Parameters;
@@ -166,7 +167,16 @@ public abstract class BasePackageWriter implements IPackageWriter {
 	}
 	
 	protected void processStartDocument (Event event) {
-		// All is done is setDocumentInformation
+		// Call setDocumentInformation first
+		
+		String ori = manifest.getOriginalDirectory();
+		if ( Util.isEmpty(ori) ) return; // No copy to be done
+		
+		// Else: copy the original
+		MergingInfo info = manifest.getItem(docId);
+		String inputPath = manifest.getInputRoot() + info.getRelativeInputPath();
+		String outputPath = ori + info.getRelativeInputPath();
+		Util.copyFile(inputPath, outputPath, false);
 	}
 
 	protected void processEndDocument (Event event) {

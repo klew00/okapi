@@ -1271,6 +1271,9 @@ public class MainForm { //implements IParametersProvider {
 			if ( wrapper == null ) {
 				wrapper = new PipelineWrapper(fcMapper, appRootFolder, pm, prj.getProjectFolder(), shell);
 			}
+			else { // Make sure to reset the root dir each time
+				wrapper.setRootDirectory(prj.getProjectFolder());
+			}
 
 			if ( predefinedPipeline == null ) {
 				wrapper.loadFromStringStorageOrReset(prj.getUtilityParameters(PRJPIPELINEID));
