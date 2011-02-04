@@ -118,8 +118,8 @@
 			 excludes="**/META-INF/**"/>
 			 
 			<!-- filters -->
-			<fileset dir="../../okapi-ui/swt/filters/html-ui/target/classes"
-			 excludes="**/META-INF/**"/>
+<!--No longer available			<fileset dir="../../okapi-ui/swt/filters/html-ui/target/classes"
+			 excludes="**/META-INF/**"/> -->
 			<fileset dir="../../okapi-ui/swt/filters/openoffice-ui/target/classes"
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi-ui/swt/filters/openxml-ui/target/classes"
