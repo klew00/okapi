@@ -23,15 +23,16 @@ package net.sf.okapi.steps.simplekit.xliff;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.filterwriter.XLIFFWriter;
 import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.filters.simplekit.Manifest;
+import net.sf.okapi.filters.simplekit.MergingInfo;
 import net.sf.okapi.steps.simplekit.common.BasePackageWriter;
-import net.sf.okapi.steps.simplekit.common.MergingInfo;
 
 public class XLIFFPackageWriter extends BasePackageWriter {
 
 	private XLIFFWriter writer;
 
 	public XLIFFPackageWriter () {
-		super("generic-xliff");
+		super(Manifest.EXTRACTIONTYPE_XLIFF);
 	}
 	
 	@Override

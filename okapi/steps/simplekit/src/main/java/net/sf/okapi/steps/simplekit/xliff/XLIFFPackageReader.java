@@ -20,33 +20,20 @@
 
 package net.sf.okapi.steps.simplekit.xliff;
 
-import java.io.File;
-
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.Util;
-import net.sf.okapi.common.encoder.EncoderManager;
-import net.sf.okapi.common.filterwriter.XLIFFWriter;
-import net.sf.okapi.common.resource.StartDocument;
-import net.sf.okapi.common.resource.StartGroup;
-import net.sf.okapi.common.resource.StartSubDocument;
-import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.steps.simplekit.common.BasePackageReader;
-import net.sf.okapi.steps.simplekit.common.BasePackageWriter;
-import net.sf.okapi.steps.simplekit.common.ManifestItem;
-import net.sf.okapi.steps.simplekit.creation.Parameters;
+import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.steps.simplekit.common.IPackageReader;
 
 /**
  * Implements {@link IPackageReader} for generic XLIFF translation packages.
  */
-public class XLIFFPackageReader extends BasePackageReader {
+public class XLIFFPackageReader implements IPackageReader  {
 
 	@Override
-	protected void postProcessPackageItem (String path, LocaleId sourceLocale,
-		LocaleId targetLocale) {
+	public Event initiateReading (RawDocument rawDoc) {
 		// TODO Auto-generated method stub
-		
+		return null;
 	}
+
 
 }

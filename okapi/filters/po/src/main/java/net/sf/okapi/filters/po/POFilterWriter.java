@@ -72,6 +72,7 @@ public class POFilterWriter implements IFilterWriter {
 	private GenericContent fmt;
 	private ArrayList<TextUnit> plurals;
 	private boolean forExtractMerge;
+	private boolean makePOT;
 	private String subDocMarker;
 	
 	public POFilterWriter () {
@@ -85,8 +86,16 @@ public class POFilterWriter implements IFilterWriter {
 		//TODO
 	}
 
-	public void setForExtractMerge (boolean value) {
-		forExtractMerge = value;
+	/**
+	 * Sets the creation mode for this writer.
+	 * @param forExtractMerge true to create a file that can be merged back into its original format.
+	 * @param makePOT true to create a PO template file.
+	 */
+	public void setMode (boolean forExtractMerge,
+		boolean makePOT)
+	{
+		this.forExtractMerge = forExtractMerge;
+		this.makePOT = makePOT;
 	}
 	
 	public void close() {
@@ -295,7 +304,7 @@ public class POFilterWriter implements IFilterWriter {
 			int count = 0;
 			for ( TextUnit tu : plurals ) {
 				writer.write(String.format("msgstr[%d] ", count));
-				if ( tu.hasTarget(language) ) {
+				if ( tu.hasTarget(language) && !makePOT ) {
 					writeQuotedContent(tu.getTarget(language));
 				}
 				else {
@@ -343,7 +352,7 @@ public class POFilterWriter implements IFilterWriter {
 			writer.write(linebreak);
 			// msgstr
 			writer.write("msgstr ");
-			if ( tc != null ) {
+			if (( tc != null ) && !makePOT ) {
 				writeQuotedContent(tc);
 			}
 			else {

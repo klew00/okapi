@@ -18,15 +18,16 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ============================================================================*/
 
-package net.sf.okapi.steps.simplekit.common;
+package net.sf.okapi.filters.simplekit;
 
 import org.w3c.dom.Element;
 
 import net.sf.okapi.common.Base64;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 
-public class MergingInfo {
+public class MergingInfo implements IAnnotation {
 
 	private static final String INVALIDVALUE = "Invalid value for attribute '%s'.";
 

@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.simplekit.common;
+package net.sf.okapi.filters.simplekit;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,6 +44,9 @@ import org.xml.sax.SAXException;
  * in different types of translation packages.
  */
 public class Manifest {
+
+	public static final String EXTRACTIONTYPE_XLIFF = "xliff";
+	public static final String EXTRACTIONTYPE_PO = "po";
 
 	public static final String VERSION = "2";
 	public static final String MANIFEST_FILENAME = "manifest.xml";
@@ -283,7 +286,6 @@ public class Manifest {
 		int nErrors = 0;
 		Iterator<Integer> iter = docs.keySet().iterator();
 		int docId;
-		ManifestItem mi;
 		while ( iter.hasNext() ) {
 			docId = iter.next();
 ////			mi = docs.get(docId);

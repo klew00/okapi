@@ -23,15 +23,16 @@ package net.sf.okapi.steps.simplekit.po;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.filters.po.POFilterWriter;
 import net.sf.okapi.filters.po.Parameters;
+import net.sf.okapi.filters.simplekit.Manifest;
+import net.sf.okapi.filters.simplekit.MergingInfo;
 import net.sf.okapi.steps.simplekit.common.BasePackageWriter;
-import net.sf.okapi.steps.simplekit.common.MergingInfo;
 
 public class POPackageWriter extends BasePackageWriter {
 
 	private POFilterWriter writer;
 
 	public POPackageWriter () {
-		super("po-package");
+		super(Manifest.EXTRACTIONTYPE_PO);
 	}
 	
 	@Override
@@ -49,7 +50,7 @@ public class POPackageWriter extends BasePackageWriter {
 		Parameters params = (Parameters)writer.getParameters();
 		params.outputGeneric = true;
 		
-		writer.setForExtractMerge(true);
+		writer.setMode(true, false);
 		writer.setOptions(manifest.getTargetLocale(), "UTF-8");
 		
 		MergingInfo item = manifest.getItem(docId);

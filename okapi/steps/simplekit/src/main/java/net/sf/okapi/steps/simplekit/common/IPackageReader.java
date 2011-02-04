@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -20,7 +20,8 @@
 
 package net.sf.okapi.steps.simplekit.common;
 
-import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.resource.RawDocument;
 
 /**
  * Provides a common way to read a translation package generated with an 
@@ -29,13 +30,10 @@ import net.sf.okapi.common.LocaleId;
 public interface IPackageReader {
 
 	/**
-	 * Post-process a package.
-	 * @param path The full path of the document to post-process.
-	 * @param sourceLocale The code of the source locale.
-	 * @param targetLocale The code of the target locale.
+	 * Starts the post-processing of a package.
+	 * @param rawDoc the raw document to post-process.
+	 * @return the first event to pass down the pipeline.
 	 */
-	public void postProcessPackage (String path,
-		LocaleId sourceLocale,
-		LocaleId targetLocale);
+	public Event initiateReading (RawDocument rawDoc);
 
 }

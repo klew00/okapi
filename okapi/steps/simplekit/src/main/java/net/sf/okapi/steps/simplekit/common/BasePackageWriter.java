@@ -28,6 +28,8 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
+import net.sf.okapi.filters.simplekit.Manifest;
+import net.sf.okapi.filters.simplekit.MergingInfo;
 import net.sf.okapi.steps.simplekit.creation.Parameters;
 
 public abstract class BasePackageWriter implements IPackageWriter {

@@ -208,7 +208,7 @@ public final class Util {
 	 * Determines if a given path ends with a file name separator for the current platform.
 	 * If not, the file separator is appended to the path.
 	 * @param path the given path.
-	 * @param true if the ending separator must be a forward slash.
+	 * @param forceForwardSlash true if the ending separator must be a forward slash.
 	 * @return the given path ending with the file name separator.
 	 */
 	static public String ensureSeparator (String path,

@@ -22,20 +22,16 @@ package net.sf.okapi.steps.simplekit.creation;
 
 import java.io.File;
 import java.net.URI;
-import java.util.UUID;
 
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.StartDocument;
-import net.sf.okapi.steps.simplekit.common.IPackageWriter;
 import net.sf.okapi.steps.simplekit.common.IPackageWriter;
 
 @UsingParameters(Parameters.class)
@@ -108,17 +104,18 @@ public class ExtractionStep extends BasePipelineStep {
 	public Event handleEvent (Event event) {
 		switch ( event.getEventType() ) {
 		case START_BATCH:
-			return doStartBatch(event);
+			return handleStartBatch(event);
 		case END_BATCH:
-			return doEndBatch(event);
+			return handleEndBatch(event);
 		case START_DOCUMENT:
-			return doStartDocument(event);
+			return handleStartDocument(event);
 		default:
 			return writer.handleEvent(event);
 		}
 	}
 
-	private Event doStartBatch (Event event) {
+	@Override
+	protected Event handleStartBatch (Event event) {
 		try {
 			// Get the format (class name)
 			String writerClass = params.getWriterClass();
@@ -149,14 +146,16 @@ outputRoot = rootDir;
 		return writer.handleEvent(event);
 	}
 
-	private Event doEndBatch (Event event) {
+	@Override
+	protected Event handleEndBatch (Event event) {
 		event = writer.handleEvent(event);
 		writer.close();
 		writer = null;
 		return event;
 	}
 	
-	private Event doStartDocument (Event event) {
+	@Override
+	protected Event handleStartDocument (Event event) {
 		StartDocument sd = event.getStartDocument();
 		String tmpIn = inputURI.getPath();
 		String relativeInput = tmpIn.substring(inputRoot.length()+1);
