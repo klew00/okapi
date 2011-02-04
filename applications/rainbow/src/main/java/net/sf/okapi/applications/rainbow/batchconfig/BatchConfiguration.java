@@ -25,7 +25,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.RandomAccessFile;
@@ -34,14 +33,16 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import net.sf.okapi.applications.rainbow.pipeline.PipelineStorage;
+import net.sf.okapi.applications.rainbow.pipeline.StepInfo;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.ReferenceParameter;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.exceptions.OkapiFileNotFoundException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.FilterConfiguration;
-import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.pipeline.IPipeline;
 import net.sf.okapi.common.pipeline.IPipelineStep;
@@ -98,8 +99,7 @@ public class BatchConfiguration {
 			store.write(pipeline);
 			writeLongString(dos, store.getStringOutput());
 			
-			
-			
+
 			//=== Section 3: The filter configurations
 
 			// Get the number of custom configurations
@@ -123,24 +123,19 @@ public class BatchConfiguration {
 			
 		}
 		catch ( IllegalArgumentException e ) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new OkapiIOException("Error when calling getter method.", e); 
 		}
 		catch ( IllegalAccessException e ) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new OkapiIOException("Error when calling getter method.", e); 
 		}
 		catch ( InvocationTargetException e ) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new OkapiIOException("Error when calling getter method.", e); 
 		}
 		catch ( FileNotFoundException e ) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new OkapiFileNotFoundException(e);
 		}
 		catch ( IOException e ) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new OkapiIOException(e);
 		}
 		finally {
 			// Close the output file
@@ -149,17 +144,18 @@ public class BatchConfiguration {
 					dos.close();
 				}
 				catch ( IOException e ) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					throw new OkapiIOException(e);
 				}
 			}
 		}
 	}
 	
 	public void installConfiguration (String configPath,
-		String outputDir)
+		String outputDir,
+		Map<String, StepInfo> availableSteps)
 	{
 		RandomAccessFile raf = null;
+		PrintWriter pw = null;
 		try {
 			raf = new RandomAccessFile(configPath, "r");
 			String tmp = raf.readUTF(); // signature
@@ -171,14 +167,15 @@ public class BatchConfiguration {
 				throw new OkapiIOException("Invalid version.");
 			}
 			
-			Util.createDirectories(outputDir);
+			Util.createDirectories(outputDir+File.separator);
 			
 			//=== Section 1: references data
 
 			// Build a lookup table to the references
 			HashMap<Integer, Long> refMap = new HashMap<Integer, Long>();
-			long pos = raf.getFilePointer();
 			int id = raf.readInt(); // First ID or end of section marker
+			long pos = raf.getFilePointer();
+			raf.readUTF(); // Skip filename
 			while ( id != -1 ) {
 				// Add the entry in the lookup table
 				refMap.put(id, pos);
@@ -188,22 +185,73 @@ public class BatchConfiguration {
 					raf.seek(raf.getFilePointer()+size);
 				}
 				// Then get the information for next entry
-				pos = raf.getFilePointer(); // Position
 				id = raf.readInt(); // ID
+				pos = raf.getFilePointer(); // Position
+				if ( id > 0 ) raf.readUTF(); // Skip filename
 			}
 		
 			//=== Section 2 : the pipeline itself
 			
 			tmp = readLongString(raf);
+			long startFilterConfigs = raf.getFilePointer();
 			
-//			PipelineStorage store = new PipelineStorage(null, tmp);
-//			store.read();
-//			
-//			store.write(pipeline);
-//			writeLongString(dos, store.getStringOutput());
+			// Read the pipeline and instantiate the steps
+			PipelineStorage store = new PipelineStorage(availableSteps, (CharSequence)tmp);
+			IPipeline pipeline = store.read(); 
+			
+			byte[] buffer = new byte[MAXBUFFERSIZE];
+
+			// Go through each step of the pipeline
+			for ( IPipelineStep step : pipeline.getSteps() ) {
+				// Get the parameters for that step
+				IParameters params = step.getParameters();
+				if ( params == null ) continue;
+				// Get all methods for the parameters object
+				Method[] methods = params.getClass().getMethods();
+				// Look for references
+				id = 0;
+				for ( Method m : methods ) {
+					if ( Modifier.isPublic(m.getModifiers() ) && m.isAnnotationPresent(ReferenceParameter.class)) {
+						// Update the references to point to the new location
+						// Read the reference content
+						pos = refMap.get(++id);
+						raf.seek(pos);
+						String filename = raf.readUTF();
+						long size = raf.readLong(); // Read the size
+						// Save the data to a file
+						if ( !Util.isEmpty(filename) ) {
+							String path = outputDir + File.separator + filename; 
+							FileOutputStream fos = new FileOutputStream(path);
+							int toRead = (int)Math.min(size, MAXBUFFERSIZE);
+							int bytesRead = raf.read(buffer, 0, toRead);
+							while ( bytesRead > 0 ) {
+								fos.write(buffer, 0, bytesRead);
+								size -= bytesRead;
+								if ( size <= 0 ) break;
+								toRead = (int)Math.min(size, MAXBUFFERSIZE);
+								bytesRead = raf.read(buffer, 0, toRead);
+							}
+							fos.close();
+							// Update the reference in the parameters to point to the saved file
+							// Test changing the value
+							String setMethodName = "set"+m.getName().substring(3);
+							Method setMethod = params.getClass().getMethod(setMethodName, String.class);
+							setMethod.invoke(params, path);
+						}
+					}
+				}
+			}
+			
+			// Write out the pipeline file
+			String path = outputDir + File.separator + "pipeline.pln";
+			pw = new PrintWriter(path, "UTF-8");
+			store.write(pipeline);
+			pw.write(store.getStringOutput());
+			pw.close();
 			
 			//=== Section 3 : the filter configurations
 			
+			raf.seek(startFilterConfigs);
 			// Get the number of filter configurations
 			int count = raf.readInt();
 			
@@ -212,29 +260,26 @@ public class BatchConfiguration {
 				String configId = raf.readUTF();
 				String data = raf.readUTF();
 				// And create the parameters file
-				String path = outputDir + File.separator + configId + ".fprm";
-				PrintWriter pw = new PrintWriter(path, "UTF-8"); 
+				path = outputDir + File.separator + configId + ".fprm";
+				pw = new PrintWriter(path, "UTF-8"); 
 				pw.write(data);
 				pw.close();
 			}
 			
 		}
-		catch ( FileNotFoundException e ) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		catch ( IOException e ) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		catch ( Throwable e ) {
+			throw new OkapiIOException("Error when installing the batch configuration.\n"+e.getMessage(), e);
 		}
 		finally {
+			if ( pw != null ) {
+				pw.close();
+			}
 			if ( raf != null ) {
 				try {
 					raf.close();
 				}
 				catch ( IOException e ) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					throw new OkapiIOException(e);
 				}
 			}
 		}
@@ -248,8 +293,8 @@ public class BatchConfiguration {
 		FileInputStream fis = null;
 		try {
 			dos.writeInt(id);
-			String ext = Util.getExtension(refPath);
-			dos.writeUTF(ext);
+			String filename = Util.getFilename(refPath, true);
+			dos.writeUTF(filename);
 
 			// Deal with empty references
 			if ( Util.isEmpty(refPath) ) {

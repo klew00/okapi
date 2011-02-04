@@ -600,11 +600,21 @@ public class MainForm { //implements IParametersProvider {
 			}
 		});
 
+		new MenuItem(dropMenu, SWT.SEPARATOR);
+
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
 		rm.setCommand(menuItem, "tools.exportbatchconfig"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				exportBatchConfiguration();
+			}
+		});
+
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "tools.installbatchconfig"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				installBatchConfiguration();
 			}
 		});
 
@@ -2428,6 +2438,27 @@ public class MainForm { //implements IParametersProvider {
 			BatchConfiguration bc = new BatchConfiguration();
 			wrapper.loadFromStringStorageOrReset(prj.getUtilityParameters(PRJPIPELINEID));
 			bc.exportConfiguration(path, wrapper.getPipeline(), fcMapper);
+		}
+		catch ( Exception e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+	}
+	
+	private void installBatchConfiguration () {
+		try {
+			setupPipelineWrapper();
+			// Get the batch configuration file
+			String[] paths = Dialogs.browseFilenames(shell, "Install Batch Configuration", false, null, null, null);
+			if ( paths == null ) return;
+			// Select the output directory
+			InputDialog dlg = new InputDialog(shell, "Batch Configuration Installation",
+				"Directory where the batch configuration should be installed", 
+				prj.getInputRoot(currentInput), null, 1, -1, -1);
+			String outputDir = dlg.showDialog();
+			if ( outputDir == null ) return; // Canceled
+			// Else: install
+			BatchConfiguration bc = new BatchConfiguration();
+			bc.installConfiguration(paths[0], outputDir, wrapper.getAvailableSteps());
 		}
 		catch ( Exception e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
