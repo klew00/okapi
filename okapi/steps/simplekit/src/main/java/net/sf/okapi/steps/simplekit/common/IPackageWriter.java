@@ -36,7 +36,9 @@ public interface IPackageWriter extends IFilterWriter {
 	public void setBatchInformation (String packageRoot,
 		LocaleId srcLoc,
 		LocaleId trgLoc,
-		String inputRoot);
+		String inputRoot,
+		String packageId,
+		String projectId);
 	
 	public void setDocumentInformation (String relativeInputPath,
 		String filterConfigId,

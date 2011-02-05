@@ -21,16 +21,15 @@
 package net.sf.okapi.filters.simplekit;
 
 import java.io.File;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.FilterConfiguration;
@@ -38,17 +37,19 @@ import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 import net.sf.okapi.filters.po.POFilter;
 import net.sf.okapi.filters.xliff.XLIFFFilter;
 
+@UsingParameters() // No parameters
 public class SimpleKitFilter implements IFilter {
 
 	public static final String SIMPLEKIT_MIME_TYPE = "application/x-simplekit";
 	
 	private boolean canceled;
 	private boolean hasNext;
-	private Queue<Event> queue;
+	private LinkedList<Event> queue;
 	private Manifest manifest;
 	private MergingInfo info;
 	private Iterator<Integer> iter;
@@ -96,7 +97,7 @@ public class SimpleKitFilter implements IFilter {
 			"Simple Translation Kit",
 			"Configuration for simple translation kit.",
 			null,
-			".xml;"));
+			Manifest.MANIFEST_EXTENSION+";"));
 		return list;
 	}
 	
@@ -132,15 +133,13 @@ public class SimpleKitFilter implements IFilter {
 			
 			// Parse next if nothing in the queue
 			if ( queue.isEmpty() ) {
+				nextEventInDocument(false);
 				if ( !hasMoreDoc ) {
 					// All documents in the manifest have been processed
 					// No need to send an END_BATCH_ITEM, as the one for the initial raw document will be sent
 					// Use an no-operation event to flush the queue
-					queue.add(Event.NOOP_EVENT);
 					hasNext = false;
-				}
-				else {
-					nextEventInDocument();
+					queue.add(Event.NOOP_EVENT);
 				}
 			}
 			
@@ -164,6 +163,8 @@ public class SimpleKitFilter implements IFilter {
 		close();
 		canceled = false;
 		hasMoreDoc = true;
+		queue = new LinkedList<Event>();
+		hasNext = true;
 		
 		manifest = new Manifest();
 		if ( input.getInputURI() == null ) {
@@ -214,15 +215,16 @@ public class SimpleKitFilter implements IFilter {
 			info = manifest.getItem(id);
 			startDocument();
 		}
-		// Else: No more document
-		// Empty queue will trigger the end
-		hasMoreDoc = false;
+		else {
+			// Else: No more document
+			// Empty queue will trigger the end
+			hasMoreDoc = false;
+		}
 	}
 
 	private void startDocument () {
-		try {
-			URI uri = new URI(info.getRelativeInputPath());
-			RawDocument rd = new RawDocument(uri, info.getInputEncoding(),
+			File file = new File(manifest.getTargetDirectory()+info.getRelativeInputPath()+".xlf");
+			RawDocument rd = new RawDocument(file.toURI(), info.getInputEncoding(),
 				manifest.getSourceLocale(), manifest.getTargetLocale());
 
 			// Pick the filter to use
@@ -239,18 +241,29 @@ public class SimpleKitFilter implements IFilter {
 			
 			// Open the document, and start sending its events
 			filter.open(rd);
-			nextEventInDocument();
-		}
-		catch ( URISyntaxException e ) {
-			throw new OkapiIOException("Bad URI in manifest.", e);
-		}
+			nextEventInDocument(true);
 	}
 
-	private void nextEventInDocument () {
+	/**
+	 * Get the next event in the current document.
+	 * @param attach true to attach the merging information and the manifest.
+	 */
+	private void nextEventInDocument (boolean attach) {
 		if ( filter.hasNext() ) {
-			queue.add(filter.next());
+			if ( attach ) {
+				// Attach the manifest and the current merging info to the start document
+				Event event = filter.next();
+				StartDocument sd = event.getStartDocument();
+				sd.setAnnotation(info);
+				sd.setAnnotation(manifest);
+				queue.add(event);
+			}
+			else {
+				Event e = filter.next();
+				queue.add(e);
+			}
 		}
-		else {
+		else { // No more event: close the filter and move to the next document
 			filter.close();
 			nextDocument();
 		}

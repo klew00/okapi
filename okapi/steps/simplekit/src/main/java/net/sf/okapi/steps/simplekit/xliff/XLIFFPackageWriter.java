@@ -37,8 +37,7 @@ public class XLIFFPackageWriter extends BasePackageWriter {
 	
 	@Override
 	protected void processStartBatch () {
-		manifest.setSourceSubDirectory("work");
-		manifest.setOriginalSurDirectory("original");
+		manifest.setSubDirectories("original", "work", "work", "done");
 		super.processStartBatch();
 	}
 	

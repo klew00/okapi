@@ -27,7 +27,7 @@ import net.sf.okapi.filters.simplekit.Manifest;
 import net.sf.okapi.filters.simplekit.MergingInfo;
 import net.sf.okapi.steps.simplekit.common.BasePackageWriter;
 
-public class POPackageWriter extends BasePackageWriter {
+class POPackageWriter extends BasePackageWriter {
 
 	private POFilterWriter writer;
 
@@ -37,8 +37,7 @@ public class POPackageWriter extends BasePackageWriter {
 	
 	@Override
 	protected void processStartBatch () {
-		manifest.setSourceSubDirectory("work");
-		manifest.setOriginalSurDirectory("original");
+		manifest.setSubDirectories("original", "work", "work", "done");
 		super.processStartBatch();
 	}
 	

@@ -23,7 +23,6 @@ package net.sf.okapi.filters.simplekit;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -33,6 +32,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.annotation.IAnnotation;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -43,31 +43,39 @@ import org.xml.sax.SAXException;
  * Implements the writing and reading of a manifest document, commonly used
  * in different types of translation packages.
  */
-public class Manifest {
+public class Manifest implements IAnnotation {
 
 	public static final String EXTRACTIONTYPE_XLIFF = "xliff";
 	public static final String EXTRACTIONTYPE_PO = "po";
 
 	public static final String VERSION = "2";
-	public static final String MANIFEST_FILENAME = "manifest.xml";
+	public static final String MANIFEST_FILENAME = "manifest";
+	public static final String MANIFEST_EXTENSION = ".skm";
 	
 	private LinkedHashMap<Integer, MergingInfo> docs;
-	private String inputRoot;
 	private String packageRoot;
 	private String packageId;
 	private String projectId;
 	private LocaleId sourceLoc;
 	private LocaleId targetLoc;
+	private String inputRoot;
+	private String originalSubDir;
+	private String sourceSubDir;
+	private String targetSubDir;
+	private String mergeSubDir;
 	private String originalDir;
 	private String sourceDir;
 	private String targetDir;
-	private String date;
+	private String mergeDir;
 
 	public Manifest () {
 		docs = new LinkedHashMap<Integer, MergingInfo>();
-		originalDir = "";
-		sourceDir = "";
-		targetDir = "";
+		packageRoot = "";
+		originalSubDir = "";
+		sourceSubDir = "";
+		targetSubDir = "";
+		mergeSubDir = "";
+		updateFullDirectories();
 	}
 
 	public Map<Integer, MergingInfo> getItems () {
@@ -110,16 +118,24 @@ public class Manifest {
 		return packageRoot;
 	}
 	
+	public void setSubDirectories (String originalSubDir,
+		String sourceSubDir,
+		String targetSubDir,
+		String mergeSubDir)
+	{
+		this.originalSubDir = originalSubDir;
+		this.sourceSubDir = sourceSubDir;
+		this.targetSubDir = targetSubDir;
+		this.mergeSubDir = mergeSubDir;
+		updateFullDirectories();
+	}
+	
 	/**
 	 * Gets the directory where to store the original files (always with a terminal separator).
 	 * @return the directory where to store the original files.
 	 */
 	public String getOriginalDirectory () {
 		return originalDir;
-	}
-	
-	public void setOriginalSurDirectory (String subDir) {
-		this.originalDir = Util.ensureSeparator(packageRoot + subDir, false);
 	}
 	
 	/**
@@ -130,10 +146,6 @@ public class Manifest {
 		return sourceDir;
 	}
 	
-	public void setSourceSubDirectory (String subDir) {
-		sourceDir = Util.ensureSeparator(packageRoot + subDir, false);
-	}
-	
 	/**
 	 * Get the directory where to store the prepared target files (always with a terminal separator).
 	 * @return the directory where to store the prepared target files.
@@ -142,19 +154,28 @@ public class Manifest {
 		return targetDir;
 	}
 	
-	public void setTargetSubDirectory (String subDir) {
-		targetDir = Util.ensureSeparator(packageRoot + subDir, false);
+	/**
+	 * Get the directory where to output the result of the merging process (always with a terminal separator).
+	 * @return the directory where to store the prepared target files.
+	 */
+	public String getMergeDirectory () {
+		return mergeDir;
 	}
 	
 	public void setInformation (String packageRoot,
 		LocaleId srcLoc,
 		LocaleId trgLoc,
-		String inputRoot)
+		String inputRoot,
+		String packageId,
+		String projectId)
 	{
 		this.sourceLoc = srcLoc;
 		this.targetLoc = trgLoc;
 		this.inputRoot = Util.ensureSeparator(inputRoot, false);
 		this.packageRoot = Util.ensureSeparator(packageRoot, false);
+		this.packageId = packageId;
+		this.projectId = projectId;
+		updateFullDirectories();
 	}
 	
 	/**
@@ -182,7 +203,7 @@ public class Manifest {
 	public void Save () {
 		XMLWriter writer = null;
 		try {
-			writer = new XMLWriter(packageRoot + MANIFEST_FILENAME);
+			writer = new XMLWriter(packageRoot+MANIFEST_FILENAME+MANIFEST_EXTENSION);
 
 			writer.writeStartDocument();
 			writer.writeComment("=================================================================", true);
@@ -194,9 +215,10 @@ public class Manifest {
 			writer.writeAttributeString("packageId", packageId);
 			writer.writeAttributeString("source", sourceLoc.toString());
 			writer.writeAttributeString("target", targetLoc.toString());
-			writer.writeAttributeString("originalDir", originalDir.replace('\\', '/'));
-			writer.writeAttributeString("sourceDir", sourceDir.replace('\\', '/'));
-			writer.writeAttributeString("targetDir", targetDir.replace('\\', '/'));
+			writer.writeAttributeString("originalSubDir", originalSubDir.replace('\\', '/'));
+			writer.writeAttributeString("sourceSubDir", sourceSubDir.replace('\\', '/'));
+			writer.writeAttributeString("targetSubDir", targetSubDir.replace('\\', '/'));
+			writer.writeAttributeString("mergeSubDir", mergeSubDir.replace('\\', '/'));
 			SimpleDateFormat DF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ");
 			writer.writeAttributeString("date", DF.format(new java.util.Date()));
 			writer.writeLineBreak();
@@ -244,19 +266,22 @@ public class Manifest {
 		    if ( Util.isEmpty(tmp) ) throw new RuntimeException("Missing target attribute.");
 		    targetLoc = LocaleId.fromString(tmp);
 
-		    tmp = elem.getAttribute("originalDir");
-		    if ( Util.isEmpty(tmp) ) throw new RuntimeException("Missing originalDir attribute.");
-		    originalDir = tmp.replace('/', File.separatorChar);
+		    tmp = elem.getAttribute("originalSubDir");
+		    if ( Util.isEmpty(tmp) ) throw new RuntimeException("Missing originalSubDir attribute.");
+		    originalSubDir = tmp.replace('/', File.separatorChar);
 
-		    tmp = elem.getAttribute("sourceDir");
-		    if ( Util.isEmpty(tmp) ) throw new RuntimeException("Missing sourceDir attribute.");
-		    sourceDir = tmp.replace('/', File.separatorChar);
+		    tmp = elem.getAttribute("sourceSubDir");
+		    if ( Util.isEmpty(tmp) ) throw new RuntimeException("Missing sourceSubDir attribute.");
+		    sourceSubDir = tmp.replace('/', File.separatorChar);
 
-		    tmp = elem.getAttribute("date");
-		    if ( Util.isEmpty(tmp) ) throw new RuntimeException("Missing date attribute.");
-		    date = tmp;
-		    
-		    String oriPath, srcPath, enc, filterID, formatType;
+		    tmp = elem.getAttribute("targetSubDir");
+		    if ( Util.isEmpty(tmp) ) throw new RuntimeException("Missing targetSubDir attribute.");
+		    targetSubDir = tmp.replace('/', File.separatorChar);
+
+		    tmp = elem.getAttribute("mergeSubDir");
+		    if ( Util.isEmpty(tmp) ) throw new RuntimeException("Missing mergeSubDir attribute.");
+		    mergeSubDir = tmp.replace('/', File.separatorChar);
+
 		    docs.clear();
 		    NL = elem.getElementsByTagName("doc");
 		    for ( int i=0; i<NL.getLength(); i++ ) {
@@ -264,7 +289,8 @@ public class Manifest {
 		    	MergingInfo item = MergingInfo.readFromXML(elem);
 		    	docs.put(item.getDocId(), item);
 		    }
-		    packageRoot = Util.getDirectoryName(inputFile.getAbsolutePath());
+		    packageRoot = Util.ensureSeparator(Util.getDirectoryName(inputFile.getAbsolutePath()), false);
+			updateFullDirectories();
 		}
 		catch ( SAXException e ) {
 			throw new RuntimeException(e);
@@ -277,25 +303,31 @@ public class Manifest {
 		}
 	}
 
-	/**
-	 * Checks the content of the manifest against the package where
-	 * it has been found.
-	 * @return The number of error found.
-	 */
-	public int checkPackageContent () {
-		int nErrors = 0;
-		Iterator<Integer> iter = docs.keySet().iterator();
-		int docId;
-		while ( iter.hasNext() ) {
-			docId = iter.next();
-////			mi = docs.get(docId);
-////			File F = new File(getFileToMergePath(docId));
-//			if ( !F.exists() ) {
-//				nErrors++;
-//				mi.setExists(false);
-//			}
-		}
-		return nErrors;
-	}
+//	/**
+//	 * Checks the content of the manifest against the package where
+//	 * it has been found.
+//	 * @return The number of error found.
+//	 */
+//	public int checkPackageContent () {
+//		int nErrors = 0;
+//		Iterator<Integer> iter = docs.keySet().iterator();
+//		int docId;
+//		while ( iter.hasNext() ) {
+//			docId = iter.next();
+//////			mi = docs.get(docId);
+//////			File F = new File(getFileToMergePath(docId));
+////			if ( !F.exists() ) {
+////				nErrors++;
+////				mi.setExists(false);
+////			}
+//		}
+//		return nErrors;
+//	}
 
+	private void updateFullDirectories () {
+		originalDir = Util.ensureSeparator(packageRoot + originalSubDir, false);
+		sourceDir = Util.ensureSeparator(packageRoot + sourceSubDir, false);
+		targetDir = Util.ensureSeparator(packageRoot + targetSubDir, false);
+		mergeDir = Util.ensureSeparator(packageRoot + mergeSubDir, false);
+	}
 }

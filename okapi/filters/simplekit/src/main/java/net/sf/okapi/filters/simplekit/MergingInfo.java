@@ -120,8 +120,11 @@ public class MergingInfo implements IAnnotation {
 		StringBuilder sb = new StringBuilder();
 		sb.append(String.format("<%s xml:space=\"preserve\" docId=\"%d\" extractionType=\"%s\" relativeInputPath=\"%s\" "
 			+ "filterId=\"%s\" inputEncoding=\"%s\" relativeTargetPath=\"%s\" targetEncoding=\"%s\"",
-			elementQName, docId, extractionType, Util.escapeToXML(relativeInputPath, 3, false, null),
-			filterId, inputEncoding, Util.escapeToXML(relativeTargetPath, 3, false, null), targetEncoding
+			elementQName, docId, extractionType,
+			Util.escapeToXML(relativeInputPath, 3, false, null).replace('\\', '/'),
+			filterId, inputEncoding,
+			Util.escapeToXML(relativeTargetPath, 3, false, null).replace('\\', '/'),
+			targetEncoding
 		));
 		if ( filterParameters == null ) {
 			// Empty element

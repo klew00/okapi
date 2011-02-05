@@ -59,9 +59,11 @@ public abstract class BasePackageWriter implements IPackageWriter {
 	public void setBatchInformation (String packageRoot,
 		LocaleId srcLoc,
 		LocaleId trgLoc,
-		String inputRoot)
+		String inputRoot,
+		String packageId,
+		String projectId)
 	{
-		manifest.setInformation(packageRoot, srcLoc, trgLoc, inputRoot);
+		manifest.setInformation(packageRoot, srcLoc, trgLoc, inputRoot, packageId, projectId);
 	}
 
 	@Override
@@ -165,7 +167,8 @@ public abstract class BasePackageWriter implements IPackageWriter {
 		String targetEncoding)
 	{
 		String res[] = FilterConfigurationMapper.splitFilterFromConfiguration(filterConfigId);
-		manifest.addDocument(++docId, extractionType, relativeInputPath, res[0], filterParameters, inputEncoding, relativeTargetPath, targetEncoding);
+		manifest.addDocument(++docId, extractionType, relativeInputPath, res[0], filterParameters,
+			inputEncoding, relativeTargetPath, targetEncoding);
 	}
 	
 	protected void processStartDocument (Event event) {
