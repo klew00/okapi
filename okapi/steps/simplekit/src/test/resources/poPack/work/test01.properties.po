@@ -7,10 +7,10 @@ msgstr ""
 
 msgctxt "okpCtx:tu=1"
 msgid ""
-"Text for ID100 with <1/> and \n"
+"Text for ID100 with <x1/> and \n"
 ", and Æ=AE."
 msgstr ""
-"FR Text for ID100 with <1/> and \n"
+"FR Text for ID100 with <x1/> and \n"
 ", and Æ=AE."
 
 msgctxt "okpCtx:tu=2"

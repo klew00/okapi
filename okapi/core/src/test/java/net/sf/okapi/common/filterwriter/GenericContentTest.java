@@ -39,7 +39,7 @@ public class GenericContentTest {
 	
 	@Test
 	public void testSimple_Default () {
-		TextFragment tf = createTextUnit();
+		TextFragment tf = createTextFragment();
 		assertEquals(tf.getCodes().size(), 5);
 		String gtext = fmt.setContent(tf).toString();
 		assertEquals("t1<1><2><3/>t2</2></1>t3", gtext);
@@ -51,7 +51,7 @@ public class GenericContentTest {
 	
 	@Test
 	public void testSimple_WithOption () {
-		TextFragment tf = createTextUnit();
+		TextFragment tf = createTextFragment();
 		assertEquals(tf.getCodes().size(), 5);
 		fmt.setContent(tf);
 		assertEquals("t1<b1><b2><x1/>t2</b2></b1>t3", fmt.toString(true));
@@ -105,7 +105,31 @@ public class GenericContentTest {
 //		assertEquals("t1<1>t2<2>t4</2>t5 t3</1>", fmt.setContent(tf2).toString());
 	}
 
-	private TextFragment createTextUnit () {
+	@Test
+	public void testLetterCodedToFragment () {
+		String ori = "t1<g1>t2</g1><g2><x3/>t3<g4>t4</g4>t5</g2>t6";
+		TextFragment tf1 = fmt.fromLetterCodedToFragment(ori, null);
+		assertNotNull(tf1);
+		assertEquals(7, tf1.getCodes().size());
+		assertEquals("t1<1>t2</1><2><3/>t3<4>t4</4>t5</2>t6", fmt.setContent(tf1).toString());
+		
+		TextFragment tf = createTextFragment();
+		tf1 = fmt.fromLetterCodedToFragment(ori, tf);
+		assertEquals(tf, tf1);
+		assertEquals("t1<1>t2</1><2><3/>t3<4>t4</4>t5</2>t6", fmt.setContent(tf1).toString());
+	}
+	
+	@Test
+	public void testFragmentToLetterCoded () {
+		TextFragment tf1 = createTextFragment();
+		String res = fmt.fromFragmentToLetterCoded(tf1);
+		assertEquals("t1<g1><g2><x3/>t2</g2></g1>t3", res);
+		// Try round trip
+		TextFragment tf2 = fmt.fromLetterCodedToFragment(res, null);
+		assertEquals(fmt.setContent(tf1).toString(), fmt.setContent(tf2).toString());
+	}
+	
+	private TextFragment createTextFragment () {
 		TextFragment tf = new TextFragment();
 		tf.append("t1");
 		tf.append(TagType.OPENING, "b1", "<b1>");

@@ -20,6 +20,7 @@
 
 package net.sf.okapi.common.filterwriter;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -39,13 +40,20 @@ import net.sf.okapi.common.resource.TextFragment.TagType;
  */
 public class GenericContent {
 
-	private String codedText;
-	private List<Code> codes;
 	private final Pattern patternOpening = Pattern.compile("\\<(\\d*?)\\>");
 	private final Pattern patternClosing = Pattern.compile("\\</(\\d*?)\\>");
 	private final Pattern patternIsolated = Pattern.compile("\\<(\\d*?)/\\>");
 	private final Pattern patternIsolatedB = Pattern.compile("\\<b(\\d*?)/\\>");
 	private final Pattern patternIsolatedE = Pattern.compile("\\<e(\\d*?)/\\>");
+
+	private final Pattern patternLCOpening = Pattern.compile("\\<g(\\d*?)\\>");
+	private final Pattern patternLCClosing = Pattern.compile("\\</g(\\d*?)\\>");
+	private final Pattern patternLCIsolated = Pattern.compile("\\<x(\\d*?)/\\>");
+	private final Pattern patternLCIsolatedB = Pattern.compile("\\<b(\\d*?)/\\>");
+	private final Pattern patternLCIsolatedE = Pattern.compile("\\<e(\\d*?)/\\>");
+
+	private String codedText;
+	private List<Code> codes;
 
 	public GenericContent () {
 		codedText = "";
@@ -97,46 +105,6 @@ public class GenericContent {
 				tmp.append(setContent(part.text).toString(normalText));
 			}
 		}
-/*		
-		for ( int i=0; i<text.length(); i++ ) {
-			switch ( text.charAt(i) ) {
-			case TextFragment.MARKER_OPENING:
-				code = tf.getCode(text.charAt(++i));
-				if ( normalText ) tmp.append(code.toString());
-				else tmp.append(String.format("<%d>", code.getId()));
-				break;
-			case TextFragment.MARKER_CLOSING:
-				code = tf.getCode(text.charAt(++i));
-				if ( normalText ) tmp.append(code.toString());
-				else tmp.append(String.format("</%d>", code.getId()));
-				break;
-			case TextFragment.MARKER_ISOLATED:
-				code = tf.getCode(text.charAt(++i));
-				if ( normalText ) tmp.append(code.toString());
-				else {
-					if ( code.getTagType() == TagType.OPENING ) {
-						tmp.append(String.format("<b%d/>", code.getId()));
-					}
-					else if ( code.getTagType() == TagType.CLOSING ) {
-						tmp.append(String.format("<e%d/>", code.getId()));
-					}
-					else {
-						tmp.append(String.format("<%d/>", code.getId()));
-					}
-				}
-				break;
-			case TextFragment.MARKER_SEGMENT:
-				int index = TextFragment.toIndex(text.charAt(++i));
-				if ( showSegments ) tmp.append("[");
-				tmp.append(setContent(container.getSegment(index).text).toString(normalText));
-				if ( showSegments ) tmp.append("]");
-				break;
-			default:
-				tmp.append(text.charAt(i));
-				break;
-			}
-		}
-*/		
 		return tmp.toString();
 	}
 	
@@ -344,4 +312,148 @@ public class GenericContent {
 		// Allow deletion of codes
 		fragment.setCodedText(tmp.toString(), allowCodeDeletion);
 	}
+
+	/**
+	 * Converts a letter-coded text to a fragment.
+	 * <p>A letter-coded text is like "&lt;g1>text&lt;x2/>&lt;/g1>&lt;b3/>".
+	 * @param text the text to convert.
+	 * @param fragment optional existing fragment where to set the converted data, or null to create a new fragment.
+	 * If an existing fragment is provided, no existing code is preserved: all codes are coming from the parsing
+	 * of the input text.
+	 * @return the new fragment created from the text.
+	 */
+	public TextFragment fromLetterCodedToFragment (String text,
+		TextFragment fragment)
+	{
+		// Case with no in-line codes
+		if ( text.indexOf('<') == -1 ) {
+			if ( fragment != null ) {
+				fragment.setCodedText(text, true);
+				return fragment;
+			}
+			else {
+				return new TextFragment(text);
+			}
+		}
+		
+		// Otherwise: we have in-line codes
+		ArrayList<Code> codes = new ArrayList<Code>();
+		StringBuilder tmp = new StringBuilder(text);
+		
+		int n;
+		int start = 0;
+		int diff = 0;
+		Code code;
+		
+		Matcher m = patternLCOpening.matcher(text);
+		while ( m.find(start) ) {
+			n = m.start();
+			code = new Code(TagType.OPENING, "Xpt", tmp.substring(n+diff, (n+diff)+m.group().length()));
+			code.setId(Integer.valueOf(m.group(1)));
+			codes.add(code);
+			tmp.replace(n+diff, (n+diff)+m.group().length(), String.format("%c%c",
+				(char)TextFragment.MARKER_OPENING, TextFragment.toChar(codes.size()-1)));
+			diff += (2-m.group().length());
+			start = n+m.group().length();
+		}
+		start = diff = 0;
+		m = patternLCClosing.matcher(tmp.toString());
+		while ( m.find(start) ) {
+			n = m.start();
+			code = new Code(TagType.CLOSING, "Xpt", tmp.substring(n+diff, (n+diff)+m.group().length()));
+			code.setId(Integer.valueOf(m.group(1)));
+			codes.add(code);
+			tmp.replace(n+diff, (n+diff)+m.group().length(), String.format("%c%c",
+				(char)TextFragment.MARKER_CLOSING, TextFragment.toChar(codes.size()-1)));
+			diff += (2-m.group().length());
+			start = n+m.group().length();
+		}
+		start = diff = 0;
+		m = patternLCIsolated.matcher(tmp.toString());
+		while ( m.find(start) ) {
+			n = m.start();
+			code = new Code(TagType.PLACEHOLDER, "Xph", tmp.substring(n+diff, (n+diff)+m.group().length()));
+			code.setId(Integer.valueOf(m.group(1)));
+			codes.add(code);
+			tmp.replace(n+diff, (n+diff)+m.group().length(), String.format("%c%c",
+				(char)TextFragment.MARKER_ISOLATED, TextFragment.toChar(codes.size()-1)));
+			diff += (2-m.group().length());
+			start = n+m.group().length();
+		}
+		start = diff = 0;
+		m = patternLCIsolatedB.matcher(tmp.toString());
+		while ( m.find(start) ) {
+			n = m.start();
+			code = new Code(TagType.OPENING, "Xpt", tmp.substring(n+diff, (n+diff)+m.group().length()));
+			code.setId(Integer.valueOf(m.group(1)));
+			codes.add(code);
+			tmp.replace(n+diff, (n+diff)+m.group().length(), String.format("%c%c",
+				(char)TextFragment.MARKER_ISOLATED, TextFragment.toChar(codes.size()-1)));
+			diff += (2-m.group().length());
+			start = n+m.group().length();
+		}
+		start = diff = 0;
+		m = patternLCIsolatedE.matcher(tmp.toString());
+		while ( m.find(start) ) {
+			n = m.start();
+			code = new Code(TagType.CLOSING, "Xpt", tmp.substring(n+diff, (n+diff)+m.group().length()));
+			code.setId(Integer.valueOf(m.group(1)));
+			codes.add(code);
+			tmp.replace(n+diff, (n+diff)+m.group().length(), String.format("%c%c",
+				(char)TextFragment.MARKER_ISOLATED, TextFragment.toChar(codes.size()-1)));
+			diff += (2-m.group().length());
+			start = n+m.group().length();
+		}
+		
+		// Create the fragment or update the existing one
+		if ( fragment != null ) {
+			fragment.setCodedText(tmp.toString(), codes, true);
+			return fragment;
+		}
+		else {
+			return new TextFragment(tmp.toString(), codes);
+		}
+	}
+
+	/**
+	 * Converts a text fragment into a letter-coded text.
+	 * Use {@link #fromLetterCodedToFragment(String, TextFragment)} to convert back to a fragment.
+	 * @param fragment the fragment to convert.
+	 * @return the resulting letter-coded text. 
+	 */
+	public String fromFragmentToLetterCoded (TextFragment fragment) {
+		String codedText = fragment.getCodedText();
+		List<Code> codes = fragment.getCodes();
+		StringBuilder tmp = new StringBuilder();
+		int index;
+		for ( int i=0; i<codedText.length(); i++ ) {
+			switch ( codedText.codePointAt(i) ) {
+			case TextFragment.MARKER_OPENING:
+				index = TextFragment.toIndex(codedText.charAt(++i));
+				tmp.append(String.format("<g%d>", codes.get(index).getId()));
+				break;
+			case TextFragment.MARKER_CLOSING:
+				index = TextFragment.toIndex(codedText.charAt(++i));
+				tmp.append(String.format("</g%d>", codes.get(index).getId()));
+				break;
+			case TextFragment.MARKER_ISOLATED:
+				index = TextFragment.toIndex(codedText.charAt(++i));
+				if ( codes.get(index).getTagType() == TagType.OPENING ) {
+					tmp.append(String.format("<b%d/>", codes.get(index).getId()));
+				}
+				else if ( codes.get(index).getTagType() == TagType.CLOSING ) {
+					tmp.append(String.format("<e%d/>", codes.get(index).getId()));
+				}
+				else {
+					tmp.append(String.format("<x%d/>", codes.get(index).getId()));
+				}
+				break;
+			default:
+				tmp.append(codedText.charAt(i));
+				break;
+			}
+		}
+		return tmp.toString();
+	}
+
 }

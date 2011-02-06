@@ -46,6 +46,7 @@ import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
+import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.LocaleId;
@@ -127,6 +128,7 @@ public class POFilter implements IFilter {
 	private EncoderManager encoderManager;
 	private String msgContext;
 	private String originalTuId;
+	private GenericContent fmt;
 	
 	public POFilter () {
 		params = new Parameters();
@@ -651,9 +653,6 @@ public class POFilter implements IFilter {
 				TextFragment tf = tc.getFirstContent();
 				tf.synchronizeCodes(tu.getSource().getFirstContent());
 			}
-			//else { // Correct the approved property
-			//	tu.getTargetProperty(trgLang, Property.APPROVED).setValue("no");
-			//}
 		}
 		else { // Parameters.MODE_MONOLINGUAL
 			if ( pluralMode == 0 ) {
@@ -673,7 +672,7 @@ public class POFilter implements IFilter {
 			tu.setIsTranslatable(false);
 		}
 		// Else: it is TextUnit is translatable by default
-
+		
 		skel.addContentPlaceholder(tu, trgLang);
 		skel.append("\""+lineBreak);
 		
@@ -895,9 +894,17 @@ public class POFilter implements IFilter {
 	}
 
 	private TextFragment toAbstract (TextFragment frag) {
-		// Sets the inline codes
-		if ( params.useCodeFinder ) {
-			params.codeFinder.process(frag);
+		// If the entry is from extraction/merge mode try to convert the inline codes
+		if ( originalTuId != null ) {
+			if ( fmt == null ) fmt = new GenericContent();
+			// At this point the fragment should not be segmented nor have any inline codes
+			fmt.fromLetterCodedToFragment(frag.getCodedText(), frag);
+		}
+		else { // Else: Normal PO entry
+			// Sets the inline codes
+			if ( params.useCodeFinder ) {
+				params.codeFinder.process(frag);
+			}
 		}
 		return frag;
 	}

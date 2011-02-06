@@ -390,7 +390,19 @@ public class POFilterWriter implements IFilterWriter {
 				return;
 			}
 
-			String tmp = escapeIfNeeded(fmt.printSegmentedContent(tc, false, !params.outputGeneric));
+			String tmp;
+			if ( forExtractMerge ) {
+				if ( tc.contentIsOneSegment() ) {
+					tmp = fmt.fromFragmentToLetterCoded(tc.getFirstContent());
+				}
+				else {
+					tmp = fmt.fromFragmentToLetterCoded(tc.getUnSegmentedContentCopy());
+				}
+			}
+			else {
+				tmp = fmt.printSegmentedContent(tc, false, !params.outputGeneric);
+			}
+			tmp = escapeIfNeeded(tmp);
 			
 			if ( !params.wrapContent || ( tmp.indexOf("\\n") == -1 )) {
 				writer.write("\"");
