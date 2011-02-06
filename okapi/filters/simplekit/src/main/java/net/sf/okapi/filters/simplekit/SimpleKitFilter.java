@@ -54,6 +54,7 @@ public class SimpleKitFilter implements IFilter {
 	private MergingInfo info;
 	private Iterator<Integer> iter;
 	private IFilter filter;
+	private String extension;
 	private boolean hasMoreDoc;
 	
 	public SimpleKitFilter () {
@@ -223,21 +224,23 @@ public class SimpleKitFilter implements IFilter {
 	}
 
 	private void startDocument () {
-			File file = new File(manifest.getTargetDirectory()+info.getRelativeInputPath()+".xlf");
-			RawDocument rd = new RawDocument(file.toURI(), info.getInputEncoding(),
-				manifest.getSourceLocale(), manifest.getTargetLocale());
-
 			// Pick the filter to use
 			if ( info.getExtractionType().equals(Manifest.EXTRACTIONTYPE_XLIFF) ) {
 				filter = new XLIFFFilter();
+				extension = ".xlf";
 			}
 			else if ( info.getExtractionType().equals(Manifest.EXTRACTIONTYPE_PO) ) {
 				filter = new POFilter();
+				extension = ".po";
 			}
 			//TODO all others types
 			else {
 				throw new OkapiIOException("Unsupported extraction type: "+info.getExtractionType());
 			}
+			
+			File file = new File(manifest.getTargetDirectory()+info.getRelativeInputPath()+extension);
+			RawDocument rd = new RawDocument(file.toURI(), info.getInputEncoding(),
+				manifest.getSourceLocale(), manifest.getTargetLocale());
 			
 			// Open the document, and start sending its events
 			filter.open(rd);

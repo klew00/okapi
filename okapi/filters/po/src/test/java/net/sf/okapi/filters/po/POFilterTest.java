@@ -264,6 +264,17 @@ public class POFilterTest {
 			+ "msgstr \"Some stuff\"\n";
 		assertEquals(null, FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1));
 	}
+
+	@Test
+	public void testTUContextParsing () {
+		String snippet = "msgctxt \""+POFilterWriter.CRUMBS_PREFIX+":tu=123\"\n"
+			+ "msgid \"Source\"\n"
+			+ "msgstr \"Target\"\n";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		assertNotNull(tu);
+		assertEquals("Source", tu.getSource().toString());
+		assertEquals("123", tu.getId());
+	}
 	
 	@Test
 	public void testTUCompleteEntry () {

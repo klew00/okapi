@@ -27,7 +27,7 @@ import net.sf.okapi.filters.simplekit.Manifest;
 import net.sf.okapi.filters.simplekit.MergingInfo;
 import net.sf.okapi.steps.simplekit.common.BasePackageWriter;
 
-class POPackageWriter extends BasePackageWriter {
+public class POPackageWriter extends BasePackageWriter {
 
 	private POFilterWriter writer;
 

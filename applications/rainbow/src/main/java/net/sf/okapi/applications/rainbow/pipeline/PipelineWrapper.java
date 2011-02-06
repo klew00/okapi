@@ -635,7 +635,6 @@ public class PipelineWrapper {
 			}
 			availableSteps.put(step.id, step);
 
-// BETA, for test only 			
 			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.simplekit.creation.ExtractionStep").newInstance();
 			params = ps.getParameters();
@@ -645,6 +644,26 @@ public class PipelineWrapper {
 			if ( params != null ) {
 				step.paramsData = params.toString();
 				peMapper.addEditor("net.sf.okapi.steps.simplekit.ui.CreationParametersEditor", step.paramsClass);
+			}
+			availableSteps.put(step.id, step);
+
+			ps = (IPipelineStep)Class.forName(
+				"net.sf.okapi.steps.simplekit.postprocess.SimpleKitReaderStep").newInstance();
+			params = ps.getParameters();
+			step = new StepInfo(ps.getClass().getSimpleName(),
+				ps.getName(), ps.getDescription(), ps.getClass().getName(), null, null);
+			if ( params != null ) {
+				step.paramsData = params.toString();
+			}
+			availableSteps.put(step.id, step);
+
+			ps = (IPipelineStep)Class.forName(
+				"net.sf.okapi.steps.simplekit.postprocess.MergingStep").newInstance();
+			params = ps.getParameters();
+			step = new StepInfo(ps.getClass().getSimpleName(),
+				ps.getName(), ps.getDescription(), ps.getClass().getName(), null, null);
+			if ( params != null ) {
+				step.paramsData = params.toString();
 			}
 			availableSteps.put(step.id, step);
 

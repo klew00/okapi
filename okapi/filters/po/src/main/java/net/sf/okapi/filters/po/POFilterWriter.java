@@ -52,12 +52,18 @@ import net.sf.okapi.common.resource.TextUnit;
  * Implementation of {@link IFilterWriter} for PO. This class is not
  * designed to be used with the PO Filter, but as a standalone writer that
  * can be driven by filter events.
+ * <p>In extraction/merging mode the context line holds a trace of the current sub-document,
+ * group and text unit.
+ * okpctx: sd=ID:gp=ID:gp=ID...:tuID
  */
 public class POFilterWriter implements IFilterWriter {
 
+	public static final String CRUMBS_PREFIX = "okpCtx";
+	public static final String SUBDOCUMENT_CRUMB = "sd=";
+	public static final String GROUP_CRUMB = "gp=";
+	public static final String TEXTUNIT_CRUMB = "tu=";
+
 	private static final String ESCAPEABLE = "\\\"abfnrtv";
-	private static final String SSDMARKER = "okpSD:";
-	private static final String TUMARKER = "okpTU:";
 
 	private Parameters params;
 	private OutputStream output;
@@ -73,7 +79,7 @@ public class POFilterWriter implements IFilterWriter {
 	private ArrayList<TextUnit> plurals;
 	private boolean forExtractMerge;
 	private boolean makePOT;
-	private String subDocMarker;
+	private String crumbs;
 	
 	public POFilterWriter () {
 		params = new Parameters();
@@ -236,7 +242,7 @@ public class POFilterWriter implements IFilterWriter {
 			writer.write("\"Content-Transfer-Encoding: 8bit\\n\""+linebreak);
 			writer.write("\"Plural-Forms: "+PluralForms.getExpression(language));
 			writer.write("\\n\""+linebreak+linebreak);
-			subDocMarker = null;
+			crumbs = CRUMBS_PREFIX;
 		}
 		catch ( IOException e ) {
 			throw new OkapiIOException("Error writing the header.", e);
@@ -250,12 +256,14 @@ public class POFilterWriter implements IFilterWriter {
 	private void processStartSubDocument (Event event) {
 		if ( forExtractMerge ) {
 			StartSubDocument ssd = (StartSubDocument)event.getResource();
-			subDocMarker = SSDMARKER+ssd.getId();
+			pushCrumb(SUBDOCUMENT_CRUMB+ssd.getId());
 		}
 	}
 	
 	private void processEndSubDocument () {
-		// Do nothing, as a domain is never 'closed'
+		if ( forExtractMerge ) {
+			popCrumb();
+		}
 	}
 
 	private void processStartGroup (Event event) {
@@ -265,6 +273,9 @@ public class POFilterWriter implements IFilterWriter {
 			pluralGroup = group;
 			plurals.clear();
 		}
+		if ( forExtractMerge ) {
+			pushCrumb(GROUP_CRUMB+sg.getId());
+		}
 	}
 
 	private void processEndGroup (Event event) {
@@ -273,6 +284,18 @@ public class POFilterWriter implements IFilterWriter {
 			pluralGroup = -1;
 		}
 		group--;
+		if ( forExtractMerge ) {
+			popCrumb();
+		}
+	}
+
+	private void popCrumb () {
+		int n = crumbs.lastIndexOf(':');
+		crumbs = crumbs.substring(0, n);
+	}
+	
+	private void pushCrumb (String crumb) {
+		crumbs += (":"+crumb);
 	}
 	
 	private void writePluralForms () {
@@ -339,12 +362,7 @@ public class POFilterWriter implements IFilterWriter {
 			}
 			// ID reference to allow merging back and duplication of msgid text
 			if ( forExtractMerge ) {
-				if ( subDocMarker == null ) { // Normal entry
-					writer.write("msgctxt \"" + TUMARKER+tu.getId() + "\"" + linebreak);
-				}
-				else { // With sub-document
-					writer.write("msgctxt \"" + subDocMarker+" " + TUMARKER+tu.getId() + "\""+ linebreak);
-				}
+				writer.write("msgctxt \"" + crumbs + ":" + TEXTUNIT_CRUMB+tu.getId() + "\"" + linebreak);
 			}
 			// msgid
 			writer.write("msgid ");

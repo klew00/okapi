@@ -126,6 +126,7 @@ public class POFilter implements IFilter {
 	private boolean hasFuzzyFlag;
 	private EncoderManager encoderManager;
 	private String msgContext;
+	private String originalTuId;
 	
 	public POFilter () {
 		params = new Parameters();
@@ -304,6 +305,7 @@ public class POFilter implements IFilter {
 		//boolean skip = false;
 		skel = new GenericSkeleton();
 		tu = null;
+		originalTuId = null;
 
 		if ( pluralMode == 0 ) {
 			msgID = "";
@@ -402,6 +404,8 @@ public class POFilter implements IFilter {
 			
 			if ( textLine.startsWith("msgctxt") ) {
 				msgContext = getQuotedString(true);
+				// Check for Okapi extraction info
+				parseCrumbs(msgContext);
 				continue;
 			}
 			
@@ -501,6 +505,20 @@ public class POFilter implements IFilter {
 		} // End of while
 	}
 
+	private void parseCrumbs (String text) {
+		// Check if it is a crumbs-string or not
+		if ( !text.startsWith(POFilterWriter.CRUMBS_PREFIX) ) return;
+
+		// Get the text unit id
+		int n = text.indexOf(POFilterWriter.TEXTUNIT_CRUMB);
+		if ( n == -1 ) return; // No text unit id available
+		originalTuId = text.substring(n+POFilterWriter.TEXTUNIT_CRUMB.length()).trim();
+		if ( originalTuId.isEmpty() ) {
+			// Something is not right
+			originalTuId = null;
+		}
+	}
+	
 	private Event processMsgStr () {
 		// Check for plural form
 		if ( textLine.indexOf("msgstr[") == 0 ) {
@@ -583,7 +601,7 @@ public class POFilter implements IFilter {
 		// Create it if it was not done yet
 		if ( tu == null ) tu = new TextUnit(null);
 		// Set the ID and other info
-		tu.setId(String.valueOf(++tuId));
+		tu.setId((originalTuId != null) ? originalTuId : String.valueOf(++tuId));
 		tu.setPreserveWhitespaces(true);
 		tu.setSkeleton(skel);
 		//TODO: Need to adjust for each format

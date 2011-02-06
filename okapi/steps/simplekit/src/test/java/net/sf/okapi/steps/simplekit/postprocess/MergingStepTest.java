@@ -33,11 +33,9 @@ import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.pipelinedriver.BatchItemContext;
 import net.sf.okapi.common.pipelinedriver.IPipelineDriver;
 import net.sf.okapi.common.pipelinedriver.PipelineDriver;
-import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.filters.openoffice.OpenOfficeFilter;
 import net.sf.okapi.filters.properties.PropertiesFilter;
 import net.sf.okapi.filters.simplekit.SimpleKitFilter;
-import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -59,7 +57,7 @@ public class MergingStepTest {
 	}
 	
 	@Test
-	public void testSimpleStep ()
+	public void testXLIFFMerging ()
 		throws URISyntaxException
 	{
 		deleteOutputDir("xliffPack/done", true);
@@ -74,7 +72,7 @@ public class MergingStepTest {
 		pdriver.addStep(new SimpleKitReaderStep());
 		pdriver.addStep(new MergingStep());
 		
-		URI inputURI = new File(root+"xliffPack/manifest.xml").toURI();
+		URI inputURI = new File(root+"xliffPack/manifest.skm").toURI();
 		pdriver.addBatchItem(new BatchItemContext(inputURI, "UTF-8", "okf_simplekit", null, "UTF-8", locEN, locFR));
 		
 		pdriver.processBatch();
@@ -82,6 +80,34 @@ public class MergingStepTest {
 		File file = new File(root+"xliffPack/done/test01.out.properties");
 		assertTrue(file.exists());
 		file = new File(root+"xliffPack/done/sub Dir/test01.out.odt");
+		assertTrue(file.exists());
+		
+	}
+	
+	@Test
+	public void testPOMerging ()
+		throws URISyntaxException
+	{
+		deleteOutputDir("poPack/done", true);
+		
+		IPipelineDriver pdriver = new PipelineDriver();
+		FilterConfigurationMapper fcMapper = new FilterConfigurationMapper();
+		fcMapper.addConfigurations(PropertiesFilter.class.getName());
+		fcMapper.addConfigurations(OpenOfficeFilter.class.getName());
+		fcMapper.addConfigurations(SimpleKitFilter.class.getName());
+		pdriver.setFilterConfigurationMapper(fcMapper);
+		pdriver.setRootDirectory(Util.deleteLastChar(root)); // Don't include final separator
+		pdriver.addStep(new SimpleKitReaderStep());
+		pdriver.addStep(new MergingStep());
+		
+		URI inputURI = new File(root+"poPack/manifest.skm").toURI();
+		pdriver.addBatchItem(new BatchItemContext(inputURI, "UTF-8", "okf_simplekit", null, "UTF-8", locEN, locFR));
+		
+		pdriver.processBatch();
+
+		File file = new File(root+"poPack/done/test01.out.properties");
+		assertTrue(file.exists());
+		file = new File(root+"poPack/done/sub Dir/test01.out.odt");
 		assertTrue(file.exists());
 		
 	}
