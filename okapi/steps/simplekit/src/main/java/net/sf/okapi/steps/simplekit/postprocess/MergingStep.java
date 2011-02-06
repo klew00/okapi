@@ -29,7 +29,6 @@ import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.filters.simplekit.Manifest;
 import net.sf.okapi.filters.simplekit.MergingInfo;
-import net.sf.okapi.steps.simplekit.common.Merger;
 
 public class MergingStep extends BasePipelineStep {
 
