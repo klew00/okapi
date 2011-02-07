@@ -47,6 +47,7 @@ import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 /**
  * Implementation of {@link IFilterWriter} for PO. This class is not
@@ -104,7 +105,7 @@ public class POFilterWriter implements IFilterWriter {
 		this.makePOT = makePOT;
 	}
 	
-	public void close() {
+	public void close () {
 		if ( writer == null ) return;
 		IOException err = null;
 		InputStream orig = null;
@@ -171,6 +172,11 @@ public class POFilterWriter implements IFilterWriter {
 		return null;
 	}
 	
+	@Override
+	public ISkeletonWriter getSkeletonWriter () {
+		return null;
+	}
+
 	public IParameters getParameters () {
 		return params;
 	}

@@ -45,6 +45,7 @@ import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
+import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 /**
  * Implementation of the {@link IFilterWriter} interface for Moses Text files.
@@ -95,6 +96,11 @@ public class MosesTextFilterWriter implements IFilterWriter {
 	@Override
 	public EncoderManager getEncoderManager () {
 		return null; // Not used
+	}
+
+	@Override
+	public ISkeletonWriter getSkeletonWriter () {
+		return null;
 	}
 
 	@Override

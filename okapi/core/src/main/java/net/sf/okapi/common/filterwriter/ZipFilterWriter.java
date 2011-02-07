@@ -136,6 +136,11 @@ public class ZipFilterWriter implements IFilterWriter {
 		return encoderManager;
 	}
 	
+	@Override
+	public ISkeletonWriter getSkeletonWriter () {
+		return null;
+	}
+
 	public IParameters getParameters () {
 		return null; // Not used
 	}

@@ -34,6 +34,7 @@ import net.sf.okapi.common.filterwriter.XLIFFWriter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.*;
+import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 import java.io.File;
 
@@ -439,6 +440,11 @@ public class Writer extends BaseWriter {
 			writer.writeEndElementLineBreak();
 		}
 		
+	}
+
+	@Override
+	public ISkeletonWriter getSkeletonWriter () {
+		return null;
 	}
 
 }

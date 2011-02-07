@@ -171,8 +171,9 @@ outputRoot = rootDir;
 		if ( prm != null ) {
 			paramsData = prm.toString();
 		}
-		
-		writer.setDocumentInformation(relativeInput, filterConfigId, paramsData, sd.getEncoding(), relativeOutput, outputEncoding);
+
+		writer.setDocumentInformation(relativeInput, filterConfigId, paramsData, sd.getEncoding(),
+			relativeOutput, outputEncoding, sd.getFilterWriter().getSkeletonWriter());
 		return writer.handleEvent(event);
 	}
 

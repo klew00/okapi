@@ -41,6 +41,7 @@ import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 /**
  * Writer for creating XLIFF document.
@@ -534,6 +535,11 @@ public class XLIFFWriter implements IFilterWriter {
 	@Override
 	public EncoderManager getEncoderManager () {
 		// None
+		return null;
+	}
+
+	@Override
+	public ISkeletonWriter getSkeletonWriter () {
 		return null;
 	}
 

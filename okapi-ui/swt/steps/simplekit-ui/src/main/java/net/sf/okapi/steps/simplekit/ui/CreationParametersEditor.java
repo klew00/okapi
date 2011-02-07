@@ -176,6 +176,10 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		optEditors.add(null);
 		optStrings.add(null);
 		writers.add("net.sf.okapi.steps.simplekit.po.POPackageWriter");
+		// RTF options
+		optEditors.add(null);
+		optStrings.add(null);
+		writers.add("net.sf.okapi.steps.simplekit.rtf.RTFPackageWriter");
 
 		mainComposite = new Composite(parent, SWT.BORDER);
 		mainComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -211,6 +215,9 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		
 		lbTypes.add("PO Package");
 		lbTypes.setData("1", "net.sf.okapi.steps.simplekit.po.POPackageWriter");
+
+		lbTypes.add("Original + RTF");
+		lbTypes.setData("2", "net.sf.okapi.steps.simplekit.rtf.RTFPackageWriter");
 
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.heightHint = 70;
@@ -269,7 +276,7 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		switch ( n ) {
 		case 0: // XLIFF
 			btOptions.setEnabled(optEditors.get(n)!=null);
-			edDescription.setText("Simple package where all files to translate are extracted to XLIFF. You can translate this package with any XLIFF editor.");
+			edDescription.setText("Simple package where all files to translate are extracted to XLIFF.\nYou can translate this package with any XLIFF editor.");
 			break;
 		case 1: // PO
 			btOptions.setEnabled(false);
@@ -279,10 +286,10 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 //			btOptions.setEnabled(false);
 //			edDescription.setText("OmegaT project with all its files and directory structure in place. You can translate this package with OmegaT.");
 //			break;
-//		case 2: // Original + RTF
-//			btOptions.setEnabled(false);
-//			edDescription.setText("Package where all the files to translate are converted into an RTF file with Trados-compatible styles. You can translate this package with Trados Translator's Workbench or any compatible tool.");
-//			break;
+		case 2: // Original + RTF
+			btOptions.setEnabled(false);
+			edDescription.setText("Package where all the files to translate are converted into an RTF file with Trados-compatible styles.\nYou can translate this package with Trados Translator's Workbench or any compatible tool.");
+			break;
 		}
 	}
 

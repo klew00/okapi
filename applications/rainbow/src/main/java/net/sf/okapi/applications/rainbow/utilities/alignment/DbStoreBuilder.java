@@ -34,6 +34,7 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 class DbStoreBuilder implements IFilterWriter {
 	
@@ -149,6 +150,11 @@ class DbStoreBuilder implements IFilterWriter {
 		//TODO: Better temp filename (rely on createTmpFile() or something like this)
 		String path = Util.getTempDirectory() + File.separatorChar + "tmpDB";
 		dbs.create(path, "tmpDB", true);
+	}
+
+	@Override
+	public ISkeletonWriter getSkeletonWriter () {
+		return null;
 	}
 
 }

@@ -33,6 +33,7 @@ import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 /**
  * Implementation of {@link IFilterWriter} for TMX. This class is not
@@ -72,6 +73,11 @@ public class TMXFilterWriter implements IFilterWriter {
 		return null;
 	}
 	
+	@Override
+	public ISkeletonWriter getSkeletonWriter () {
+		return null;
+	}
+
 	public IParameters getParameters () {
 		return null;
 	}

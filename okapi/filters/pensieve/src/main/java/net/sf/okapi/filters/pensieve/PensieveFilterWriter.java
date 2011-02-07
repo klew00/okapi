@@ -35,6 +35,7 @@ import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.skeleton.ISkeletonWriter;
 import net.sf.okapi.tm.pensieve.common.PensieveUtil;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
 import net.sf.okapi.tm.pensieve.common.TranslationUnitVariant;
@@ -71,6 +72,11 @@ public class PensieveFilterWriter implements IFilterWriter {
 
 	@Override
 	public EncoderManager getEncoderManager () {
+		return null;
+	}
+
+	@Override
+	public ISkeletonWriter getSkeletonWriter () {
 		return null;
 	}
 

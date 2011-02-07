@@ -48,6 +48,7 @@ import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.skeleton.ISkeletonWriter;
 import net.sf.okapi.common.skeleton.ZipSkeleton;
 //import net.sf.okapi.filters.abstractmarkup.Parameters;
 
@@ -166,6 +167,11 @@ public class OpenXMLZipFilterWriter implements IFilterWriter {
 		return encoderManager;
 	}
 	
+	@Override
+	public ISkeletonWriter getSkeletonWriter () {
+		return subSkelWriter;
+	}
+
 	/**
 	 * Handles an event.  Passes all but START_DOCUMENT, END_DOCUMENT,
                * and DOCUMENT_PART to subdocument processing.

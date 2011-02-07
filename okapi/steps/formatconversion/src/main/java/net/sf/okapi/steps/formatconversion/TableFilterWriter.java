@@ -47,6 +47,7 @@ import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 /**
  * Implementation of the {@link IFilterWriter} interface for table-type output.
@@ -149,6 +150,11 @@ public class TableFilterWriter implements IFilterWriter {
 		return null;
 	}
 	
+	@Override
+	public ISkeletonWriter getSkeletonWriter () {
+		return null;
+	}
+
 	public IParameters getParameters () {
 		return params;
 	}

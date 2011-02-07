@@ -44,6 +44,7 @@ import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
+import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 /**
  * Implementation of the {@link IFilterWriter} interface for corpus-type output.
@@ -112,6 +113,11 @@ public class CorpusFilterWriter implements IFilterWriter {
 		return null;
 	}
 	
+	@Override
+	public ISkeletonWriter getSkeletonWriter () {
+		return null;
+	}
+
 	public IParameters getParameters () {
 		return null;
 	}

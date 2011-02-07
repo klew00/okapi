@@ -47,6 +47,7 @@ public class Manifest implements IAnnotation {
 
 	public static final String EXTRACTIONTYPE_XLIFF = "xliff";
 	public static final String EXTRACTIONTYPE_PO = "po";
+	public static final String EXTRACTIONTYPE_RTF = "rtf";
 
 	public static final String VERSION = "2";
 	public static final String MANIFEST_FILENAME = "manifest";

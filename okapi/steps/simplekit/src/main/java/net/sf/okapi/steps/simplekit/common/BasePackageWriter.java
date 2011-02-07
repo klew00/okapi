@@ -28,6 +28,7 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
+import net.sf.okapi.common.skeleton.ISkeletonWriter;
 import net.sf.okapi.filters.simplekit.Manifest;
 import net.sf.okapi.filters.simplekit.MergingInfo;
 import net.sf.okapi.steps.simplekit.creation.Parameters;
@@ -39,6 +40,7 @@ public abstract class BasePackageWriter implements IPackageWriter {
 	protected int docId;
 	protected String extractionType;
 	protected MergingInfo mergingInfo;
+	protected ISkeletonWriter skelWriter;
 	
 	public BasePackageWriter (String extractionType) {
 		this.extractionType = extractionType;
@@ -79,6 +81,11 @@ public abstract class BasePackageWriter implements IPackageWriter {
 	@Override
 	public EncoderManager getEncoderManager () {
 		// Not used
+		return null;
+	}
+
+	@Override
+	public ISkeletonWriter getSkeletonWriter () {
 		return null;
 	}
 
@@ -164,8 +171,10 @@ public abstract class BasePackageWriter implements IPackageWriter {
 		String filterParameters,
 		String inputEncoding,
 		String relativeTargetPath,
-		String targetEncoding)
+		String targetEncoding,
+		ISkeletonWriter skelWriter)
 	{
+		this.skelWriter = skelWriter;
 		String res[] = FilterConfigurationMapper.splitFilterFromConfiguration(filterConfigId);
 		manifest.addDocument(++docId, extractionType, relativeInputPath, res[0], filterParameters,
 			inputEncoding, relativeTargetPath, targetEncoding);

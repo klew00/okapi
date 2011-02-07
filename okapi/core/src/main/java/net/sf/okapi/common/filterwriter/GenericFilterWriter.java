@@ -145,6 +145,11 @@ public class GenericFilterWriter implements IFilterWriter {
 	}
 	
 	@Override
+	public ISkeletonWriter getSkeletonWriter () {
+		return skelWriter;
+	}
+
+	@Override
 	public IParameters getParameters () {
 		return null;
 	}

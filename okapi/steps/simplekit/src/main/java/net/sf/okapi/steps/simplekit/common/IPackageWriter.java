@@ -23,6 +23,7 @@ package net.sf.okapi.steps.simplekit.common;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 /**
  * Provides a common writer to create a translation package. 
@@ -45,6 +46,7 @@ public interface IPackageWriter extends IFilterWriter {
 		String filterParameters,
 		String inputEncoding,
 		String relativeTargetPath,
-		String outputEncoding);
+		String outputEncoding,
+		ISkeletonWriter skelWriter);
 
 }

@@ -69,6 +69,7 @@ import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 public class IDMLFilterWriter implements IFilterWriter {
 
@@ -131,6 +132,11 @@ public class IDMLFilterWriter implements IFilterWriter {
 	@Override
 	public EncoderManager getEncoderManager () {
 		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ISkeletonWriter getSkeletonWriter () {
 		return null;
 	}
 

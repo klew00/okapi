@@ -281,4 +281,9 @@ public class Writer extends BaseWriter {
 		writer.write(skelWriter.processDocumentPart(resource));
 	}
 
+	@Override
+	public ISkeletonWriter getSkeletonWriter () {
+		return skelWriter;
+	}
+
 }
