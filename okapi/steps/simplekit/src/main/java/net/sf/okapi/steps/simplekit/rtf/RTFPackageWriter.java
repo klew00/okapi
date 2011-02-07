@@ -27,7 +27,7 @@ import java.security.InvalidParameterException;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filterwriter.ILayerProvider;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartSubDocument;
@@ -73,23 +73,32 @@ public class RTFPackageWriter extends BasePackageWriter {
 	protected void processStartDocument (Event event) {
 		super.processStartDocument(event);
 		
+		if ( skelWriter == null ) {
+			throw new InvalidParameterException("You cannot use the RTF writer with no skeleton writer.\n"
+				+ "The filter you are trying to use may be incompatible with an RTF output.");
+		}
+		// Keep 2 copies of the referents for RTF: source and target
+		if ( skelWriter instanceof GenericSkeletonWriter ) {
+			((GenericSkeletonWriter)this.skelWriter).setReferentCopies(2);
+		}
+		
 		MergingInfo item = manifest.getItem(docId);
 		String path = manifest.getSourceDirectory() + item.getRelativeInputPath() + ".rtf";
 
 		StartDocument sd = event.getStartDocument();
-		
 		try {
 			Util.createDirectories(path);
 			writer = new PrintWriter(path, item.getTargetEncoding());
 		}
 		catch ( FileNotFoundException e ) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException("Error creating RTF writer.", e);
 		}
 		catch ( UnsupportedEncodingException e ) {
-			throw new RuntimeException(e);
+			throw new OkapiIOException("Error creating RTF writer.", e);
 		}
 
 		//TODO: change codepage
+		// Write RTF header and stylesheet
 		writer.write("{\\rtf1\\ansi\\ansicpg" + "1252" + "\\uc1\\deff1 \n"+
 			"{\\fonttbl \n"+
 			"{\\f1 \\fmodern\\fcharset0\\fprq1 Courier New;}\n"+
@@ -117,15 +126,6 @@ public class RTFPackageWriter extends BasePackageWriter {
 			"\\paperw11907\\paperh16840\\viewkind4\\viewscale100\\pard\\plain\\s0\\sb80\\slmult1\\widctlpar\\fs20\\f1 \n"+
 			Util.RTF_STARTCODE);
 
-		if ( skelWriter == null ) {
-			throw new InvalidParameterException("You cannot use the RTF writer with no skeleton writer.\n"
-				+ "The filter you are trying to use may be incompatible with an RTF output.");
-		}
-		// Keep 2 copies of the referents for RTF: source and target
-		if ( skelWriter instanceof GenericSkeletonWriter ) {
-			((GenericSkeletonWriter)this.skelWriter).setReferentCopies(2);
-		}
-		
 		// Write the skeleton
 		writer.write(skelWriter.processStartDocument(manifest.getTargetLocale(), item.getTargetEncoding(),
 			layer, sd.getFilterWriter().getEncoderManager(), sd));
@@ -165,6 +165,10 @@ public class RTFPackageWriter extends BasePackageWriter {
 	@Override
 	protected void processEndGroup (Event event) {
 		writer.write(skelWriter.processEndGroup(event.getEnding()));
+	}
+
+	protected void processDocumentPart (Event event) {
+		writer.write(skelWriter.processDocumentPart(event.getDocumentPart()));
 	}
 
 	@Override

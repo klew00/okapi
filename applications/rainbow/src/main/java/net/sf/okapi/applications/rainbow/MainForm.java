@@ -2431,7 +2431,8 @@ public class MainForm { //implements IParametersProvider {
 	private void exportBatchConfiguration () {
 		try {
 			setupPipelineWrapper();
-			String path = Dialogs.browseFilenamesForSave(shell, "Save Batch Configuration", null, null, null);
+			String path = Dialogs.browseFilenamesForSave(shell, "Save Batch Configuration", null,
+				"Batch Configuration Files (*.bconf)", "*.bconf");
 			if ( Util.isEmpty(path) ) return;
 			// Else: export
 			// Get the current pipeline of the project
@@ -2448,7 +2449,8 @@ public class MainForm { //implements IParametersProvider {
 		try {
 			setupPipelineWrapper();
 			// Get the batch configuration file
-			String[] paths = Dialogs.browseFilenames(shell, "Install Batch Configuration", false, null, null, null);
+			String[] paths = Dialogs.browseFilenames(shell, "Install Batch Configuration", false, null,
+				"Batch Configuration Files (*.bconf)", "*.bconf");
 			if ( paths == null ) return;
 			// Select the output directory
 			InputDialog dlg = new InputDialog(shell, "Batch Configuration Installation",

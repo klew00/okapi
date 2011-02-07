@@ -74,11 +74,6 @@ public abstract class BasePackageWriter implements IPackageWriter {
 	}
 
 	@Override
-	public void close () {
-		// Do nothing by default
-	}
-
-	@Override
 	public EncoderManager getEncoderManager () {
 		// Not used
 		return null;
@@ -124,6 +119,9 @@ public abstract class BasePackageWriter implements IPackageWriter {
 			break;
 		case TEXT_UNIT:
 			processTextUnit(event);
+			break;
+		case DOCUMENT_PART:
+			processDocumentPart(event);
 			break;
 		}
 		// This writer is not supposed to change the event, so we return the same
@@ -210,6 +208,10 @@ public abstract class BasePackageWriter implements IPackageWriter {
 	}
 
 	protected void processEndGroup (Event event) {
+		// Do nothing by default
+	}
+
+	protected void processDocumentPart (Event event) {
 		// Do nothing by default
 	}
 

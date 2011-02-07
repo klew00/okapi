@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -20,16 +20,22 @@
 
 package net.sf.okapi.filters.simplekit;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.UsingParameters;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.FilterConfiguration;
@@ -40,6 +46,7 @@ import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 import net.sf.okapi.filters.po.POFilter;
+import net.sf.okapi.filters.rtf.RTFFilter;
 import net.sf.okapi.filters.xliff.XLIFFFilter;
 
 @UsingParameters() // No parameters
@@ -47,6 +54,8 @@ public class SimpleKitFilter implements IFilter {
 
 	public static final String SIMPLEKIT_MIME_TYPE = "application/x-simplekit";
 	
+	private static final Logger LOGGER = Logger.getLogger(SimpleKitFilter.class.getName());
+
 	private boolean canceled;
 	private boolean hasNext;
 	private LinkedList<Event> queue;
@@ -54,6 +63,7 @@ public class SimpleKitFilter implements IFilter {
 	private MergingInfo info;
 	private Iterator<Integer> iter;
 	private IFilter filter;
+	private RTFFilter rtfFilter;
 	private String extension;
 	private boolean hasMoreDoc;
 	
@@ -71,6 +81,10 @@ public class SimpleKitFilter implements IFilter {
 		if ( filter != null ) {
 			filter.close();
 			filter = null;
+		}
+		if ( rtfFilter != null ) {
+			rtfFilter.close();
+			rtfFilter = null;
 		}
 	}
 
@@ -224,27 +238,33 @@ public class SimpleKitFilter implements IFilter {
 	}
 
 	private void startDocument () {
-			// Pick the filter to use
-			if ( info.getExtractionType().equals(Manifest.EXTRACTIONTYPE_XLIFF) ) {
-				filter = new XLIFFFilter();
-				extension = ".xlf";
-			}
-			else if ( info.getExtractionType().equals(Manifest.EXTRACTIONTYPE_PO) ) {
-				filter = new POFilter();
-				extension = ".po";
-			}
-			//TODO all others types
-			else {
-				throw new OkapiIOException("Unsupported extraction type: "+info.getExtractionType());
-			}
+		// Pick the filter to use (if any)
+		if ( info.getExtractionType().equals(Manifest.EXTRACTIONTYPE_XLIFF) ) {
+			filter = new XLIFFFilter();
+			extension = ".xlf";
+		}
+		else if ( info.getExtractionType().equals(Manifest.EXTRACTIONTYPE_PO) ) {
+			filter = new POFilter();
+			extension = ".po";
+		}
+		else if ( info.getExtractionType().equals(Manifest.EXTRACTIONTYPE_RTF) ) {
+			postprocessRTF();
+			// We send a no-operation event rather than call nextDocument() to avoid
+			// having nested calls that would keep going deeper 
+			queue.add(Event.NOOP_EVENT);
+			return;
+		}
+		else {
+			throw new OkapiIOException("Unsupported extraction type: "+info.getExtractionType());
+		}
+		
+		File file = new File(manifest.getTargetDirectory()+info.getRelativeInputPath()+extension);
+		RawDocument rd = new RawDocument(file.toURI(), info.getInputEncoding(),
+			manifest.getSourceLocale(), manifest.getTargetLocale());
 			
-			File file = new File(manifest.getTargetDirectory()+info.getRelativeInputPath()+extension);
-			RawDocument rd = new RawDocument(file.toURI(), info.getInputEncoding(),
-				manifest.getSourceLocale(), manifest.getTargetLocale());
-			
-			// Open the document, and start sending its events
-			filter.open(rd);
-			nextEventInDocument(true);
+		// Open the document, and start sending its events
+		filter.open(rd);
+		nextEventInDocument(true);
 	}
 
 	/**
@@ -252,6 +272,13 @@ public class SimpleKitFilter implements IFilter {
 	 * @param attach true to attach the merging information and the manifest.
 	 */
 	private void nextEventInDocument (boolean attach) {
+		// No filter cases
+		if ( filter == null ) {
+			nextDocument();
+			return;
+		}
+		
+		// Filter-based case
 		if ( filter.hasNext() ) {
 			if ( attach ) {
 				// Attach the manifest and the current merging info to the start document
@@ -269,6 +296,58 @@ public class SimpleKitFilter implements IFilter {
 		else { // No more event: close the filter and move to the next document
 			filter.close();
 			nextDocument();
+		}
+	}
+
+	private void postprocessRTF () {
+		OutputStreamWriter writer = null;
+		try {
+			// Instantiate the reader if needed
+			if ( rtfFilter == null ) {
+				rtfFilter = new RTFFilter();
+			}
+
+			//TODO: get LB info from original
+			String lineBreak = Util.LINEBREAK_DOS;
+			
+			// Open the RTF input
+			//TODO: guess encoding based on language
+			File file = new File(manifest.getTargetDirectory()+info.getRelativeInputPath()+".rtf");
+			rtfFilter.open(new RawDocument(file.toURI(), "windows-1252", manifest.getTargetLocale()));
+				
+			// Open the output document
+			// Initializes the output
+			String outputFile = manifest.getMergeDirectory()+info.getRelativeTargetPath();
+			Util.createDirectories(outputFile);
+			writer = new OutputStreamWriter(new BufferedOutputStream(
+				new FileOutputStream(outputFile)), info.getTargetEncoding());
+			//TODO: check BOM option from original
+			Util.writeBOMIfNeeded(writer, false, info.getTargetEncoding());
+				
+			// Process
+			StringBuilder buf = new StringBuilder();
+			while ( rtfFilter.getTextUntil(buf, -1, 0) == 0 ) {
+				writer.write(buf.toString());
+				writer.write(lineBreak);
+			}
+		}		
+		catch ( Exception e ) {
+			// Log and move on to the next file
+			Throwable e2 = e.getCause();
+			LOGGER.severe("RTF Conversion error. " + ((e2!=null) ? e2.getMessage() : e.getMessage()));
+		}
+		finally {
+			if ( rtfFilter != null ) {
+				rtfFilter.close();
+			}
+			if ( writer != null ) {
+				try {
+					writer.close();
+				}
+				catch ( IOException e ) {
+					LOGGER.severe("RTF Conversion error when closing file. " + e.getMessage());
+				}
+			}
 		}
 	}
 }
