@@ -112,7 +112,7 @@
 		</dependency>
 		<dependency>
 			<groupId>net.sf.okapi.filters</groupId>
-			<artifactId>okapi-filter-simplekit</artifactId>
+			<artifactId>okapi-filter-rainbowkit</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
@@ -302,7 +302,7 @@
 		</dependency>
 		<dependency>
 			<groupId>net.sf.okapi.steps</groupId>
-			<artifactId>okapi-step-simplekit-ui</artifactId>
+			<artifactId>okapi-step-rainbowkit-ui</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
@@ -398,7 +398,7 @@
 		</dependency>
 		<dependency>
 			<groupId>net.sf.okapi.steps</groupId>
-			<artifactId>okapi-step-simplekit</artifactId>
+			<artifactId>okapi-step-rainbowkit</artifactId>
 			<version>${project.version}</version>
 		</dependency>
         <dependency>

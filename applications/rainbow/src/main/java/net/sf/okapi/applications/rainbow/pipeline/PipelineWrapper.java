@@ -636,19 +636,19 @@ public class PipelineWrapper {
 			availableSteps.put(step.id, step);
 
 			ps = (IPipelineStep)Class.forName(
-				"net.sf.okapi.steps.simplekit.creation.ExtractionStep").newInstance();
+				"net.sf.okapi.steps.rainbowkit.creation.ExtractionStep").newInstance();
 			params = ps.getParameters();
 			step = new StepInfo(ps.getClass().getSimpleName(),
 				ps.getName(), ps.getDescription(), ps.getClass().getName(), null,
 				params.getClass().getName());
 			if ( params != null ) {
 				step.paramsData = params.toString();
-				peMapper.addEditor("net.sf.okapi.steps.simplekit.ui.CreationParametersEditor", step.paramsClass);
+				peMapper.addEditor("net.sf.okapi.steps.rainbowkit.ui.CreationParametersEditor", step.paramsClass);
 			}
 			availableSteps.put(step.id, step);
 
 			ps = (IPipelineStep)Class.forName(
-				"net.sf.okapi.steps.simplekit.postprocess.SimpleKitReaderStep").newInstance();
+				"net.sf.okapi.steps.rainbowkit.postprocess.RainbowKitReaderStep").newInstance();
 			params = ps.getParameters();
 			step = new StepInfo(ps.getClass().getSimpleName(),
 				ps.getName(), ps.getDescription(), ps.getClass().getName(), null, null);
@@ -658,7 +658,7 @@ public class PipelineWrapper {
 			availableSteps.put(step.id, step);
 
 			ps = (IPipelineStep)Class.forName(
-				"net.sf.okapi.steps.simplekit.postprocess.MergingStep").newInstance();
+				"net.sf.okapi.steps.rainbowkit.postprocess.MergingStep").newInstance();
 			params = ps.getParameters();
 			step = new StepInfo(ps.getClass().getSimpleName(),
 				ps.getName(), ps.getDescription(), ps.getClass().getName(), null, null);

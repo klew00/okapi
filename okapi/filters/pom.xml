@@ -38,6 +38,6 @@
 		<module>railsyaml</module>
 		<module>versifiedtxt</module>
 		<module>xmlstream</module>
-		<module>simplekit</module>
+		<module>rainbowkit</module>
     </modules>
 </project>

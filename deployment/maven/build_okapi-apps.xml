@@ -172,7 +172,7 @@
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi-ui/swt/steps/xsltransform-ui/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../okapi-ui/swt/steps/simplekit-ui/target/classes"
+			<fileset dir="../../okapi-ui/swt/steps/rainbowkit-ui/target/classes"
 			 excludes="**/META-INF/**"/>
 			 
 		</copy>

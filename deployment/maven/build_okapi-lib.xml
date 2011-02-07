@@ -132,7 +132,7 @@
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi/filters/xmlstream/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../okapi/filters/simplekit/target/classes"
+			<fileset dir="../../okapi/filters/rainbowkit/target/classes"
 			 excludes="**/META-INF/**"/>
 			 
 			<!-- lib -->
@@ -246,7 +246,7 @@
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi/steps/scopingreport/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../okapi/steps/simplekit/target/classes"
+			<fileset dir="../../okapi/steps/rainbowkit/target/classes"
 			 excludes="**/META-INF/**"/>
 		</copy>
 		
