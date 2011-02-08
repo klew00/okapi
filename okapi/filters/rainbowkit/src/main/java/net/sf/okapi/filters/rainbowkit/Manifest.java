@@ -197,6 +197,14 @@ public class Manifest implements IAnnotation {
 		docs.put(docId, new MergingInfo(docId, extractionType, relativeInputPath, filterId,
 			filterParameters, inputEncoding, relativeTargetPath, targetEncoding));
 	}
+	
+	/**
+	 * Gets the full path of the manifest file.
+	 * @return the full path of the manifest file.
+	 */
+	public String getPath () {
+		return packageRoot+MANIFEST_FILENAME+MANIFEST_EXTENSION;
+	}
 
 	/**
 	 * Saves the manifest file. This method assumes the root is set.
@@ -204,7 +212,7 @@ public class Manifest implements IAnnotation {
 	public void Save () {
 		XMLWriter writer = null;
 		try {
-			writer = new XMLWriter(packageRoot+MANIFEST_FILENAME+MANIFEST_EXTENSION);
+			writer = new XMLWriter(getPath());
 
 			writer.writeStartDocument();
 			writer.writeComment("=================================================================", true);

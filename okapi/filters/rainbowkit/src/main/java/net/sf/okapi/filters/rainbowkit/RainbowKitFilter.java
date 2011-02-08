@@ -95,7 +95,7 @@ public class RainbowKitFilter implements IFilter {
 
 	@Override
 	public String getDisplayName () {
-		return "Rainbow Kit Filter (EXPERIMENTAL)";
+		return "Rainbow Translation Kit Filter";
 	}
 
 	@Override

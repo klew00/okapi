@@ -63,7 +63,7 @@ public class ExtractionStep extends BasePipelineStep {
 
 	@Override
 	public String getName () {
-		return "Translation Kit Creation (EXPERIMENTAL)";
+		return "Rainbow Translation Kit Creation";
 	}
 
 	@StepParameterMapping(parameterType = StepParameterType.SOURCE_LOCALE)
@@ -165,7 +165,7 @@ outputRoot = rootDir;
 		String relativeInput = tmpIn.substring(inputRoot.length()+1);
 		String tmpOut = outputURI.getPath();
 		String relativeOutput = tmpOut.substring(outputRoot.length()+1);
-		
+
 		IParameters prm = sd.getFilterParameters();
 		String paramsData = null;
 		if ( prm != null ) {

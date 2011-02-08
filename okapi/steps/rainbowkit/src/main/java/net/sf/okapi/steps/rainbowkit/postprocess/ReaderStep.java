@@ -27,13 +27,13 @@ import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.filters.rainbowkit.RainbowKitFilter;
 
 @UsingParameters() // No parameters
-public class RainbowKitReaderStep extends BasePipelineStep {
+public class ReaderStep extends BasePipelineStep {
 
 	private IFilter filter;
 	private boolean isDone;
 //	private IFilterConfigurationMapper fcMapper;
 
-	public RainbowKitReaderStep () {
+	public ReaderStep () {
 	}
 	
 //	@StepParameterMapping (parameterType = StepParameterType.FILTER_CONFIGURATION_MAPPER)
@@ -43,12 +43,12 @@ public class RainbowKitReaderStep extends BasePipelineStep {
 
 	@Override
 	public String getName () {
-		return "Simple Kit Reader";
+		return "Rainbow Translation Kit Reader";
 	}
 
 	@Override
 	public String getDescription () {
-		return "Convert a simple kit into filter events."
+		return "Convert a Rainbow translation kit into filter events."
 			+ " Expects: raw document. Sends back: filter events.";
 	}
 

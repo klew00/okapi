@@ -69,7 +69,7 @@ public class MergingStepTest {
 		fcMapper.addConfigurations(RainbowKitFilter.class.getName());
 		pdriver.setFilterConfigurationMapper(fcMapper);
 		pdriver.setRootDirectory(Util.deleteLastChar(root)); // Don't include final separator
-		pdriver.addStep(new RainbowKitReaderStep());
+		pdriver.addStep(new ReaderStep());
 		pdriver.addStep(new MergingStep());
 		
 		URI inputURI = new File(root+"xliffPack/manifest.rkm").toURI();
@@ -97,7 +97,7 @@ public class MergingStepTest {
 		fcMapper.addConfigurations(RainbowKitFilter.class.getName());
 		pdriver.setFilterConfigurationMapper(fcMapper);
 		pdriver.setRootDirectory(Util.deleteLastChar(root)); // Don't include final separator
-		pdriver.addStep(new RainbowKitReaderStep());
+		pdriver.addStep(new ReaderStep());
 		pdriver.addStep(new MergingStep());
 		
 		URI inputURI = new File(root+"poPack/manifest.rkm").toURI();

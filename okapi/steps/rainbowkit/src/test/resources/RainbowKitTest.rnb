@@ -24,7 +24,7 @@ transResClass2=net.sf.okapi.connectors.apertium.ApertiumMTConnector</params><par
 &lt;rainbowPipeline version="1">&lt;step class="net.sf.okapi.steps.common.RawDocumentToFilterEventsStep">&lt;/step>
 &lt;step class="net.sf.okapi.steps.rainbowkit.creation.ExtractionStep">#v1
 writerClass=net.sf.okapi.steps.rainbowkit.po.POPackageWriter
-packageName=poPack
+packageName=testPack
 packageDirectory=C:\OkapiJava\trunk\okapi\steps\rainbowkit\src\test\resources
 message=
 outputManifest.b=true&lt;/step>

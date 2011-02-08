@@ -48,7 +48,7 @@ public class MergingStep extends BasePipelineStep {
 
 	@Override
 	public String getName () {
-		return "Translation Kit Merging (EXPERIMENTAL)";
+		return "Rainbow Translation Kit Merging";
 	}
 
 	@StepParameterMapping(parameterType = StepParameterType.FILTER_CONFIGURATION_MAPPER)

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010-2011 by the Okapi Framework contributors
+  Copyright (C) 2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -18,37 +18,18 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.rainbowkit.common;
+package net.sf.okapi.applications.rainbow.pipeline;
 
-import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.filterwriter.IFilterWriter;
-import net.sf.okapi.common.skeleton.ISkeletonWriter;
+import net.sf.okapi.steps.rainbowkit.postprocess.MergingStep;
+import net.sf.okapi.steps.rainbowkit.postprocess.ReaderStep;
 
-/**
- * Provides a common writer to create a translation package. 
- */
-public interface IPackageWriter extends IFilterWriter {
+public class TranslationKitPostProcessingPipeline extends PredefinedPipeline {
 
-	public void setParameters (IParameters params);
+	public TranslationKitPostProcessingPipeline () {
+		super("TranslationKitPostProcessingPipeline",
+			"Translation Kit Post-Processing");
+		addStep(new ReaderStep());
+		addStep(new MergingStep());
+	}
 	
-	public IParameters getParameters ();
-	
-	public void setBatchInformation (String packageRoot,
-		LocaleId srcLoc,
-		LocaleId trgLoc,
-		String inputRoot,
-		String packageId,
-		String projectId);
-	
-	public void setDocumentInformation (String relativeInputPath,
-		String filterConfigId,
-		String filterParameters,
-		String inputEncoding,
-		String relativeTargetPath,
-		String outputEncoding,
-		ISkeletonWriter skelWriter);
-
-	public String getMainOutputPath ();
-
 }

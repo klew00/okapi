@@ -68,6 +68,10 @@ public abstract class BasePackageWriter implements IPackageWriter {
 		manifest.setInformation(packageRoot, srcLoc, trgLoc, inputRoot, packageId, projectId);
 	}
 
+	public String getMainOutputPath () {
+		return manifest.getPath();
+	}
+	
 	@Override
 	public void cancel () {
 		// TODO

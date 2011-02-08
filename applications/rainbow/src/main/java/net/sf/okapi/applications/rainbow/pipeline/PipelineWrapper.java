@@ -648,7 +648,7 @@ public class PipelineWrapper {
 			availableSteps.put(step.id, step);
 
 			ps = (IPipelineStep)Class.forName(
-				"net.sf.okapi.steps.rainbowkit.postprocess.RainbowKitReaderStep").newInstance();
+				"net.sf.okapi.steps.rainbowkit.postprocess.ReaderStep").newInstance();
 			params = ps.getParameters();
 			step = new StepInfo(ps.getClass().getSimpleName(),
 				ps.getName(), ps.getDescription(), ps.getClass().getName(), null, null);

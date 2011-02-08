@@ -59,6 +59,8 @@ import net.sf.okapi.applications.rainbow.pipeline.SnRWithFilterPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.TermExtractionPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.TextRewritingPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.TranslationComparisonPipeline;
+import net.sf.okapi.applications.rainbow.pipeline.TranslationKitCreationPipeline;
+import net.sf.okapi.applications.rainbow.pipeline.TranslationKitPostProcessingPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.URIConversionPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.XMLAnalysisPipeline;
 import net.sf.okapi.applications.rainbow.pipeline.XMLCharactersFixingPipeline;
@@ -1473,9 +1475,27 @@ public class MainForm { //implements IParametersProvider {
 			}
 		}
 		
+		// Add pre-defined pipelines
+
 		new MenuItem(dropMenu, SWT.SEPARATOR);
 		
-		// Add pre-defined pipelines
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "utilities.translationkitcreation"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				executePipeline(new TranslationKitCreationPipeline());
+			}
+		});
+		
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "utilities.translationkitpostprocessing"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				executePipeline(new TranslationKitPostProcessingPipeline());
+			}
+		});
+		
+		new MenuItem(dropMenu, SWT.SEPARATOR);
 		
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
 		rm.setCommand(menuItem, "utilities.snrwithfilter"); //$NON-NLS-1$
