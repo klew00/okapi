@@ -33,8 +33,10 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
+import net.sf.okapi.applications.rainbow.Input;
 import net.sf.okapi.applications.rainbow.pipeline.PipelineStorage;
 import net.sf.okapi.applications.rainbow.pipeline.StepInfo;
 import net.sf.okapi.common.IParameters;
@@ -56,7 +58,8 @@ public class BatchConfiguration {
 
 	public void exportConfiguration (String configPath,
 		IPipeline pipeline,
-		IFilterConfigurationMapper fcMapper)
+		IFilterConfigurationMapper fcMapper,
+		List<Input> inputFiles)
 	{
 		DataOutputStream dos = null;
 		
@@ -121,6 +124,40 @@ public class BatchConfiguration {
 				}
 			}
 			
+			//=== Section 4: Mapping extensions -> filter configuration id
+			
+			if ( inputFiles != null ) {
+				// Gather the extensions (if duplicate: first one is used)
+				HashMap<String, String> extMap = new HashMap<String, String>();
+				// From the input files first
+				for ( Input input : inputFiles ) {
+					String ext = Util.getExtension(input.relativePath);
+					if ( !Util.isEmpty(ext) && !extMap.containsKey(ext) && !Util.isEmpty(input.filterConfigId)) {
+						extMap.put(ext, input.filterConfigId);
+					}
+				}
+				// Then complement with the default
+				iter = fcMapper.getAllConfigurations();
+				while ( iter.hasNext() ) {
+					FilterConfiguration fc = iter.next();
+					String ext = fc.extensions;
+					if ( Util.isEmpty(ext) ) continue;
+					int n = ext.indexOf(';');
+					if ( n > 0 ) ext = ext.substring(0, n);
+					if ( !extMap.containsKey(ext) ) {
+						extMap.put(ext, fc.configId);
+					}
+				}
+				// Write out the mapping
+				dos.writeInt(extMap.size());
+				for ( String ext : extMap.keySet() ) {
+					dos.writeUTF(ext);
+					dos.writeUTF(extMap.get(ext));
+				}
+			}
+			else {
+				dos.writeInt(0); // None
+			}
 		}
 		catch ( IllegalArgumentException e ) {
 			throw new OkapiIOException("Error when calling getter method.", e); 
@@ -175,8 +212,8 @@ public class BatchConfiguration {
 			HashMap<Integer, Long> refMap = new HashMap<Integer, Long>();
 			int id = raf.readInt(); // First ID or end of section marker
 			long pos = raf.getFilePointer();
-			raf.readUTF(); // Skip filename
 			while ( id != -1 ) {
+				raf.readUTF(); // Skip filename
 				// Add the entry in the lookup table
 				refMap.put(id, pos);
 				// Skip over the data to move to the next reference
@@ -265,6 +302,20 @@ public class BatchConfiguration {
 				pw.write(data);
 				pw.close();
 			}
+		
+			//=== Section 4: the extensions -> filter configuration id mapping
+			
+			// Get the number of mappings
+			path = outputDir + File.separator + "extensions-mapping.txt";
+			pw = new PrintWriter(path, "UTF-8");
+			String lb = System.getProperty("line.separator");
+			count = raf.readInt();
+			for ( int i=0; i<count; i++ ) {
+				String ext  = raf.readUTF();
+				String configId = raf.readUTF();
+				pw.write(ext + "\t" + configId + lb);
+			}
+			pw.close();
 			
 		}
 		catch ( Throwable e ) {

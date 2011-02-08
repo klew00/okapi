@@ -2458,7 +2458,7 @@ public class MainForm { //implements IParametersProvider {
 			// Get the current pipeline of the project
 			BatchConfiguration bc = new BatchConfiguration();
 			wrapper.loadFromStringStorageOrReset(prj.getUtilityParameters(PRJPIPELINEID));
-			bc.exportConfiguration(path, wrapper.getPipeline(), fcMapper);
+			bc.exportConfiguration(path, wrapper.getPipeline(), fcMapper, prj.inputLists.get(0));
 		}
 		catch ( Exception e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
