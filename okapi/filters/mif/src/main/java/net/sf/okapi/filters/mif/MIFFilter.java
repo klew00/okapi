@@ -31,11 +31,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import net.sf.okapi.common.BOMAwareInputStream;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.UsingParameters;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
@@ -72,6 +74,7 @@ public class MIFFilter implements IFilter {
 		+ "MarkerTypeCatalog;XRefFormats;Document;BookComponent;InitialAutoNums;Dictionary;AFrames;Tbls;"
 		+ "Page";
 
+	private String lineBreak;
 	private String docName;
 	private BufferedReader reader;
 	private StringBuilder tagBuffer;
@@ -85,8 +88,11 @@ public class MIFFilter implements IFilter {
 	private boolean hasNext;
 	private EncoderManager encoderManager;
 	private int inTextFlow;
-	private String version;
+//	private String version;
 	private String sdId;
+	private int paraLevel;
+	private StringBuilder paraBuf;
+	private boolean paraBufNeeded;
 	
 	private static Hashtable<String, String> initCharTable () {
 		Hashtable<String, String> table = new Hashtable<String, String>();
@@ -138,7 +144,7 @@ public class MIFFilter implements IFilter {
 	
 	@Override
 	public String getDisplayName () {
-		return "MIF Filter (Pre-ALPHA don't even try)";
+		return "MIF Filter (ALPHA don't even try)";
 	}
 
 	@Override
@@ -152,7 +158,7 @@ public class MIFFilter implements IFilter {
 		list.add(new FilterConfiguration(getName(),
 			MimeTypeMapper.MIF_MIME_TYPE,
 			getClass().getName(),
-			"MIF",
+			"MIF (ALPHA don't even try)",
 			"Adobe FrameMaker MIF documents"));
 		return list;
 	}
@@ -161,7 +167,7 @@ public class MIFFilter implements IFilter {
 	public EncoderManager getEncoderManager () {
 		if ( encoderManager == null ) {
 			encoderManager = new EncoderManager();
-			encoderManager.setMapping(MimeTypeMapper.MIF_MIME_TYPE, "net.sf.okapi.common.encoder.MIFEncoder");
+			encoderManager.setMapping(MimeTypeMapper.MIF_MIME_TYPE, "net.sf.okapi.filters.mif.MIFEncoder");
 		}
 		return encoderManager;
 	}
@@ -208,23 +214,26 @@ public class MIFFilter implements IFilter {
 	private void open (InputStream input) {
 		try {
 			// Detect encoding
-			String encoding = guessEncoding(input);
-			reader = new BufferedReader(new InputStreamReader(input, encoding));
+			Object[] res = guessEncoding(input);
+			reader = new BufferedReader(new InputStreamReader((InputStream)res[0], (String)res[1]));
+			
 			tagBuffer = new StringBuilder();
 			strBuffer = new StringBuilder();
+			paraBuf = new StringBuilder();
 			tuId = 0;
 			otherId = 0;
 			canceled = false;
 			hasNext = true;
 			inTextFlow = 0;
-			version = "";
+//			version = "";
+			lineBreak = "\n"; //TODO: Get from input file
 			
 			queue = new LinkedList<Event>();
 			sdId = "sd1";
 			StartDocument startDoc = new StartDocument(sdId);
 			startDoc.setName(docName);
-			startDoc.setLineBreak("\n");
-			startDoc.setEncoding(encoding, false);
+			startDoc.setLineBreak(lineBreak);
+			startDoc.setEncoding((String)res[1], false);
 			// We assume no BOM in all case for MIF
 			startDoc.setLocale(srcLang);
 			startDoc.setFilterParameters(getParameters());
@@ -234,7 +243,10 @@ public class MIFFilter implements IFilter {
 			queue.add(new Event(EventType.START_DOCUMENT, startDoc));
 		}
 		catch ( UnsupportedEncodingException e ) {
-			throw new OkapiUnsupportedEncodingException(e);
+			throw new OkapiUnsupportedEncodingException("Error reading MIF input.", e);
+		}
+		catch ( IOException e ) {
+			throw new OkapiIOException("Error reading MIF input.", e);
 		}
 	}
 	
@@ -296,12 +308,12 @@ public class MIFFilter implements IFilter {
 				switch ( c ) {
 				case '#':
 					skel.append((char)c);
-					readComment(true);
+					readComment(true, null);
 					break;
 					
 				case '<': // Start of statement
 					skel.append((char)c);
-					String tag = readTag(true);
+					String tag = readTag(true, true, null);
 					//TODO: dispatch according tags
 					if ( TOPSTATEMENTSTOSKIP.indexOf(tag) > -1 ) {
 						skipOverContent(true, null);
@@ -313,7 +325,7 @@ public class MIFFilter implements IFilter {
 					else if ( "MIFFile".equals(tag) ) {
 						MIFToken token = getNextTokenInStatement(true);
 						if ( token.getType() == MIFToken.TYPE_STRING ) {
-							version = token.getString();
+							//version = token.getString();
 						}
 						else {
 							throw new OkapiIOException("MIF version not found.");
@@ -369,8 +381,10 @@ public class MIFFilter implements IFilter {
 		boolean inEscape = false;
 		boolean inString = false;
 		while ( (c = reader.read()) != -1 ) {
-			if ( store ) skel.append((char)c);
-			if ( buffer != null ) buffer.append((char)c);
+			if ( store ) {
+				if ( buffer != null ) buffer.append((char)c);
+				else skel.append((char)c);
+			}
 			// Parse a string content
 			if ( inString ) {
 				if ( c == '\'' ) inString = false;
@@ -404,12 +418,16 @@ public class MIFFilter implements IFilter {
 		throw new OkapiIllegalFilterOperationException("Unexpected end of input.");
 	}
 	
-	private void readComment (boolean store)
+	private void readComment (boolean store,
+		StringBuilder sb)
 		throws IOException
 	{
 		int c;
 		while ( (c = reader.read()) != -1 ) {
-			if ( store ) skel.append((char)c);
+			if ( store ) {
+				if ( sb != null ) sb.append((char)c);
+				else skel.append((char)c);
+			}
 			switch ( c ) {
 			case '\r':
 			case '\n':
@@ -448,61 +466,127 @@ public class MIFFilter implements IFilter {
 		throws IOException
 	{
 		TextFragment tf = new TextFragment();
-		
-		// Process all ParaLine statements
-		while ( true ) {
-			if ( readUntil("ParaLine", true) == null ) break;
-			// Else: process the ParaLine statement
-			processParaLine(tf);
+		boolean first = true;
+		paraLevel = 1;
+		paraBuf.setLength(0);
+		paraBufNeeded = false;
+
+		// Go to the first ParaLine
+		int res = readUntilText(paraBuf, false);
+		while ( res > 0 ) {
+			
+			// Get the text to append
+			paraLevel--; // We close String or Char outside of readUntilText() 
+			String text = null;
+			switch ( res ) {
+			case 1: // String
+				text = processString(false);
+				paraBuf.append("`");
+				break;
+			case 2: // Char
+				//TODO: we may have to remove the Char tag from the sb
+				text = processChar(false).toString();
+				break;
+			}
+			
+			if ( Util.isEmpty(text) ) {
+				// Nothing to do, keep on reading
+			}
+			else { // We have text
+				if ( first ) { // First text in the fragment: put the codes in the skeleton
+					first = false;
+					skel.append(paraBuf.toString());
+				}
+				else { // Put the codes in an inline code 
+					if ( paraBufNeeded && ( paraBuf.length() > 0 )) {
+						tf.append(TagType.PLACEHOLDER, "x", paraBuf.toString());
+					}
+				}
+				// Reset the codes buffer for next sequence
+				paraBuf.setLength(0);
+				paraBufNeeded = false;
+				// Set the text
+				tf.append(text);
+			}
+			
+			// Place the closing of the String
+			if ( res == 1 ) {
+				paraBuf.append("'>");
+			}
+
+			// Move to the next text
+			res = readUntilText(paraBuf, true);
 		}
 
-		if ( !tf.isEmpty() ) {
+		TextUnit tu = null;
+		if ( tf.hasText() ) {
 			// Add the text unit to the queue
-			TextUnit tu = new TextUnit(String.valueOf(++tuId));
+			tu = new TextUnit(String.valueOf(++tuId));
 			tu.setPreserveWhitespaces(true);
 			tu.setSourceContent(tf);
 			queue.add(new Event(EventType.TEXT_UNIT, tu, skel));
+			skel.addContentPlaceholder(tu);
+		}
+		else { // Put back the content/codes in skeleton
+			skel.append(tf.toText());
+		}
+
+		if ( paraBuf.length() > 0 ) {
+			skel.append(paraBuf.toString());
+		}
+		if ( tu != null ) {
 			// New skeleton object for the next parts of the parent statement
 			skel = new GenericSkeleton();
 		}
 	}
 	
-	private void processParaLine (TextFragment tf)
-		throws IOException
-	{
-		String tag;
-		while ( true ) {
-			if ( (tag = readUntil("String;Char;Variable;Font;Marker;XRef", true)) == null ) break;
-			if ( "String".equals(tag) ) {
-				String text = processString(true);
-				tf.append(text);
-			}
-			else if ( "Char".equals(tag) ) {
-				MIFToken token = processChar(true);
-				tf.append(token.toString());
-			}
-			else if ( "Variable".equals(tag) ) {
-				StringBuilder sb = new StringBuilder("<Variable ");
-				skipOverContent(true, sb);
-				tf.append(TagType.PLACEHOLDER, "var", sb.toString());
-			}
-			else if ( "Font".equals(tag) ) {
-				StringBuilder sb = new StringBuilder("<Font ");
-				skipOverContent(true, sb);
-				tf.append(TagType.PLACEHOLDER, "font", sb.toString());
-			}
-			else if ( "Marker".equals(tag) ) {
-				StringBuilder sb = new StringBuilder("<Marker ");
-				skipOverContent(true, sb);
-				tf.append(TagType.PLACEHOLDER, "marker", sb.toString());
-			}
-			else if ( "XRef".equals(tag) ) {
-				StringBuilder sb = new StringBuilder("<XRef ");
-				skipOverContent(true, sb);
-				tf.append(TagType.PLACEHOLDER, "xref", sb.toString());
-			}
-		}
-	}
+//	private void processParaLine (TextFragment tf,
+//		StringBuilder sb)
+//		throws IOException
+//	{
+//		String tag;
+//		while ( true ) {
+//			tag = readInlineUntil("String;Char;Variable;Font;Marker;XRef", true, sb);
+//			if ( tag == null ) break; // Done
+//			
+//			if ( "String".equals(tag) ) {
+//				sb.append("<String `");
+//				tf.append(TagType.PLACEHOLDER, "x", sb.toString());
+//				sb.setLength(0);
+//				String text = processString(false);
+//				tf.append(text);
+//				sb.append("'>");
+//				continue; // Skip common sb.SetLength(0);
+//			}
+//			else if ( "Char".equals(tag) ) {
+//				//TODO: deal with parts strtaing with <Char
+//				MIFToken token = processChar(false);
+//				tf.append(token.toString());
+//			}
+//			else if ( "Variable".equals(tag) ) {
+//				sb.append("<Variable ");
+//				skipOverContent(true, sb);
+//				tf.append(TagType.PLACEHOLDER, "var", sb.toString());
+//			}
+//			else if ( "Font".equals(tag) ) {
+//				sb.append("<Font ");
+//				skipOverContent(true, sb);
+//				tf.append(TagType.PLACEHOLDER, "font", sb.toString());
+//			}
+//			else if ( "Marker".equals(tag) ) {
+//				sb.append("<Marker ");
+//				skipOverContent(true, sb);
+//				tf.append(TagType.PLACEHOLDER, "marker", sb.toString());
+//			}
+//			else if ( "XRef".equals(tag) ) {
+//				sb.append("<XRef ");
+//				skipOverContent(true, sb);
+//				tf.append(TagType.PLACEHOLDER, "xref", sb.toString());
+//			}
+//			
+//			sb.setLength(0);
+//		}
+//	}
 
 	private MIFToken getNextTokenInStatement (boolean store)
 		throws IOException
@@ -579,6 +663,110 @@ public class MIFFilter implements IFilter {
 		return chToken;
 	}
 	
+//	/**
+//	 * Reads until the end of the current statement or the first occurrence of the given statement.
+//	 * @param tagNames the list of tag names to stop at.
+//	 * @param store true if we store the parsed characters into the skeleton.
+//	 * @param tf the text fragment where to store the inline codes
+//	 * @return the name of the tag found, or null if none was found.
+//	 * @throws IOException if a low-level error occurs.
+//	 */
+//	private String readInlineUntil (String tagNames,
+//		boolean store,
+//		StringBuilder sb)
+//		throws IOException
+//	{
+//		int c;
+//		int baseLevel = 1;
+//		while ( (c = reader.read()) != -1 ) {
+//			switch ( c ) {
+//			case '#':
+//				//sb.append((char)c);
+//				readComment(false, null);
+//				break;
+//				
+//			case '<': // Start of statement
+//				baseLevel++;
+//				StringBuilder sbTag = new StringBuilder();
+//				String tag = readTag(store, true, sbTag);
+//				if ( tagNames.indexOf(tag) > -1 ) {
+//					return tag;
+//				}
+//				else { // Default: skip over
+//					sb.append((char)c);
+//					sb.append(sbTag);
+//					skipOverContent(store, sb);
+//					baseLevel--;
+//				}
+//				break;
+//				
+//			case '>': // End of statement
+//				baseLevel--;
+//				sb.append((char)c);
+//				if ( baseLevel == 0 ) {
+//					return null;
+//				}
+//				break;
+//
+//			default:
+//				sb.append((char)c);
+//				break;
+//			}
+//		}
+//		return null;
+//	}
+
+	
+	private int readUntilText (StringBuilder sb,
+		boolean checkIfParaBufNeeded)
+		throws IOException
+	{
+		int c;
+		while ( (c = reader.read()) != -1 ) {
+			switch ( c ) {
+			case '#':
+				sb.append((char)c);
+				readComment(true, sb);
+				break;
+				
+			case '<': // Start of statement
+				paraLevel++;
+				sb.append((char)c);
+				String tag = readTag(true, false, sb);
+				if ( "ParaLine".equals(tag) ) {
+					return readUntilText(sb, checkIfParaBufNeeded);
+				}
+				// Cases for inside ParaLine
+				else if ( "String".equals(tag) ) {
+					return 1;
+				}
+				else if ( "Char".equals(tag) ) {
+					return 2;
+				}
+				// Default: skip over
+				else {
+					if ( checkIfParaBufNeeded ) paraBufNeeded = true;
+					skipOverContent(true, sb);
+					paraLevel--;
+				}
+				break;
+				
+			case '>': // End of statement
+				paraLevel--;
+				sb.append((char)c);
+				if ( paraLevel == 0 ) {
+					return 0;
+				}
+				break;
+
+			default:
+				sb.append((char)c);
+				break;
+			}
+		}
+		return 0;
+	}
+
 	/**
 	 * Reads until the end of the current statement or the first occurrence of the given statement.
 	 * @param tagNames the list of tag names to stop at.
@@ -596,12 +784,12 @@ public class MIFFilter implements IFilter {
 			if ( store ) skel.append((char)c);
 			switch ( c ) {
 			case '#':
-				readComment(true);
+				readComment(true, null);
 				break;
 				
 			case '<': // Start of statement
 				baseLevel++;
-				String tag = readTag(store);
+				String tag = readTag(store, true, null);
 				if ( tagNames.indexOf(tag) > -1 ) {
 					return tag;
 				}
@@ -624,14 +812,19 @@ public class MIFFilter implements IFilter {
 	
 	/**
 	 * Reads a tag name.
+	 * @param store true to store the tag codes
+	 * @param sb Not null to store the codes there, null to store in skeleton
 	 * @return The name of the tag.
 	 * @throws IOException
 	 */
-	private String readTag (boolean store)
+	private String readTag (boolean store,
+		boolean storeCharStatement,
+		StringBuilder sb)
 		throws IOException
 	{
 		tagBuffer.setLength(0);
 		int c;
+		int wsStart = ((sb != null ) ? sb.length()-1 : -1);
 		boolean leadingWSDone = false;
 		// Skip and whitespace between '<' and the name
 		do {
@@ -640,8 +833,10 @@ public class MIFFilter implements IFilter {
 			case '\t':
 			case '\r':
 			case '\n':
-				// Let go for now
-				skel.add((char)c);
+				if ( store ) {
+					if ( sb != null ) sb.append((char)c);
+					else skel.add((char)c);
+				}
 				break;
 			case -1:
 			default:
@@ -659,12 +854,28 @@ public class MIFFilter implements IFilter {
 			case '\r':
 			case '\n':
 				if ( store ) {
-					skel.append(tagBuffer.toString());
-					skel.append((char)c);
+					if ( !storeCharStatement && tagBuffer.toString().equals("Char") ) {
+						// Special case for <Char...>: we don't store it
+						if ( wsStart > 0 ) {
+							sb.delete(wsStart, sb.length());
+						}
+					}
+					else {
+						if ( sb != null ) {
+							sb.append(tagBuffer.toString());
+							sb.append((char)c);
+						}
+						else {
+							skel.append(tagBuffer.toString());
+							skel.append((char)c);
+						}
+					}
 				}
 				return tagBuffer.toString();
+				
 			case -1:
 				throw new OkapiIllegalFilterOperationException("Unexpected end of input.");
+				
 			default:
 				tagBuffer.append((char)c);
 				break;
@@ -732,30 +943,38 @@ public class MIFFilter implements IFilter {
 		throw new OkapiIllegalFilterOperationException("End of string is missing.");
 	}
 
-	private String guessEncoding (InputStream input) {
-		try {
-			// Open the file for byte reading
-		
-			// Read the start of the file to an array of bytes
-		
-			// Try to match the file signature with the pre-defined signatures
-			String signature = "";
-			
-			
-			if ( signature.equals("\u201C\u00FA\u2013\u007B\u0152\u00EA") ) {
-				// "Japanese" in Shift-JIS seen in Windows-1252 (coded in Unicode)
-				return "Shift_JIS";
-			}
-			else if ( signature.equals("\u00C6\u00FC\u00CB\u00DC\u00B8\u00EC") ) {
-				// "Japanse" in EUC seen in Windows-1252 (coded in Unicode)
-				return "EUC-JP";
-			}
-			
+	private Object[] guessEncoding (InputStream input)
+		throws IOException
+	{
+		Object[] res = new Object[2];
+		// Detect any BOM-type encoded (and set the stream to skip over it)
+		BOMAwareInputStream bais = new BOMAwareInputStream(input, DEFENCODING);
+		res[0] = bais;
+		res[1] = bais.detectEncoding();
+		if ( bais.autoDtected() ) {
+			return res;
 		}
-		finally {
 			
+		// Else: try detect based on MIF weird mechanism
+		//TODO
+
+		// Try to match the file signature with the pre-defined signatures
+		String signature = "";
+			
+		if ( signature.equals("\u201C\u00FA\u2013\u007B\u0152\u00EA") ) {
+			// "Japanese" in Shift-JIS seen in Windows-1252 (coded in Unicode)
+			res[1] = "Shift_JIS";
+			return res;
 		}
-		return DEFENCODING;
+		else if ( signature.equals("\u00C6\u00FC\u00CB\u00DC\u00B8\u00EC") ) {
+			res[1] = "EUC-JP";
+			// "Japanese" in EUC seen in Windows-1252 (coded in Unicode)
+			return res;
+		}
+
+		// Default
+		res[1] = DEFENCODING;
+		return res;
 	}
 
 }

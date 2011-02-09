@@ -23,7 +23,7 @@ package net.sf.okapi.filters.mif.tests;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
-import net.sf.okapi.common.filters.RoundTripComparison;
+import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.LocaleId;
@@ -39,17 +39,20 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MIFFilterTest {
+
+	private final static String STARTMIF = "<MIFFile 9.00 <TextFlow <Para ";
+	private final static String ENDMIF = ">>>";
 	
 	private LocaleId locEN = LocaleId.fromString("en");
 
 	private String root;
 	private MIFFilter filter;
+	private GenericContent fmt = new GenericContent();
 	
 	@Before
 	public void setUp() {
@@ -76,14 +79,54 @@ public class MIFFilterTest {
 
 	@Test
 	public void testSimpleText () {
-		List<Event> list = getEvents("Test01.mif");
+		List<Event> list = getEventsFromFile("Test01.mif");
 		TextUnit tu = FilterTestDriver.getTextUnit(list, 1);
 		assertNotNull(tu);
-		assertEquals("Line 1\nLine 2", tu.getSource().toString());
+		assertEquals("Line 1\nLine 2", fmt.setContent(tu.getSource().getFirstContent()).toString());
 		
 		tu = FilterTestDriver.getTextUnit(list, 2);
 		assertNotNull(tu);
-		assertEquals("\u00e0=agrave", tu.getSource().toString());
+		assertEquals("\u00e0=agrave", fmt.setContent(tu.getSource().getFirstContent()).toString());
+	}
+
+	@Test
+	public void testSimpleEntry () {
+		String snippet = STARTMIF
+			+ "<Unique 12345><ParaLine <String `text'>>"
+			+ ENDMIF;
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertNotNull(tu);
+		assertEquals("text", fmt.setContent(tu.getSource().getFirstContent()).toString());
+	}
+	
+	@Test
+	public void testNoTextEntry () {
+		String snippet = STARTMIF
+			+ "<Unique 12345><ParaLine <TextRectID 9> >"
+			+ ENDMIF;
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertTrue(tu==null);
+	}
+	
+	@Test
+	public void testTwoPartsEntry () {
+		String snippet = STARTMIF
+			+ "<Unique 12345><ParaLine <String `Part 1'><ParaLine <String ` and part 2'>>"
+			+ ENDMIF;
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertNotNull(tu);
+		assertEquals("Part 1 and part 2", fmt.setContent(tu.getSource().getFirstContent()).toString());
+	}
+	
+	@Test
+	public void testSoftHyphen () {
+		String snippet = STARTMIF
+			+ "<ParaLine <TextRectID 20><String `How'><Char SoftHyphen>>"
+			+ "<ParaLine <String `ever.'>>"
+			+ ENDMIF;
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertNotNull(tu);
+		assertEquals("However.", fmt.setContent(tu.getSource().getFirstContent()).toString());
 	}
 	
 	@Test
@@ -105,19 +148,30 @@ public class MIFFilterTest {
 		filter.close();
 	}
 	
-	@Test
-	public void testDoubleExtraction () throws MalformedURLException {
-		// Read all files in the data directory
-		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
-		list.add(new InputDocument(root+"Test01.mif", null));
-		
-		RoundTripComparison rtc = new RoundTripComparison();
-		assertTrue(rtc.executeCompare(filter, list, null, locEN, locEN));
-	}
+//	@Test
+//	public void testDoubleExtraction () throws IOException, URISyntaxException {
+//		// Read all files in the data directory
+//		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
+//		list.add(new InputDocument(root+"Test01.mif", null));
+//
+//		RoundTripComparison rtc = new RoundTripComparison();
+//		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, locEN));
+//	}
 
-	private ArrayList<Event> getEvents (String filename) {
+	private ArrayList<Event> getEventsFromFile (String filename) {
 		ArrayList<Event> list = new ArrayList<Event>();
 		filter.open(new RawDocument(Util.toURI(root+filename), null, locEN));
+		while (filter.hasNext()) {
+			Event event = filter.next();
+			list.add(event);
+		}
+		filter.close();
+		return list;
+	}
+
+	private ArrayList<Event> getEvents(String snippet) {
+		ArrayList<Event> list = new ArrayList<Event>();
+		filter.open(new RawDocument(snippet, locEN));
 		while (filter.hasNext()) {
 			Event event = filter.next();
 			list.add(event);

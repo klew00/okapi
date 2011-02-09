@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -18,11 +18,12 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.common.encoder;
+package net.sf.okapi.filters.mif;
 
 import java.nio.charset.CharsetEncoder;
 
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.encoder.IEncoder;
 import net.sf.okapi.common.resource.Property;
 
 /**
@@ -37,8 +38,10 @@ public class MIFEncoder implements IEncoder {
 		StringBuilder escaped = new StringBuilder();
 		for ( int i=0; i<text.length(); i++ ) {
 			if ( text.codePointAt(i) > 127 ) {
-				escaped.append(String.format("\\u%04X", text.codePointAt(i))); 
-				//TODO: Do we need legacy \xHH using MIF encoding?
+				int value = text.codePointAt(i);
+				String res = tryCharStatment(value);
+				if ( res == null ) escaped.append(String.format("\\u%04X", value)); //escaped.append(String.format("\\u%04X", value));
+				else escaped.append(res);
 			}
 			else {
 				switch ( text.charAt(i) ) {
@@ -83,8 +86,9 @@ public class MIFEncoder implements IEncoder {
 			return "\\\\";
 		default:
 			if ( value > 127 ) {
-				return String.format("\\u%04X", value);
-				//TODO: Do we need legacy \xHH using MIF encoding?
+				String res = tryCharStatment(value);
+				if ( res == null ) return String.valueOf(value); //return String.format("\\u%04X", (int)value);
+				else return res;
 			}
 			else {
 				return String.valueOf(value);
@@ -110,8 +114,9 @@ public class MIFEncoder implements IEncoder {
 		default:
 			//TODO: supplemental chars
 			if ( value > 127 ) {
-				return String.format("\\u%04X", value);
-				//TODO: Do we need legacy \xHH using MIF encoding?
+				String res = tryCharStatment(value);
+				if ( res == null ) return String.valueOf((char)value); //return String.format("\\u%04X", value);
+				else return res;
 			}
 			else {
 				return String.valueOf((char)value);
@@ -152,4 +157,31 @@ public class MIFEncoder implements IEncoder {
 		return null;
 	}
 
+	private String tryCharStatment (int value) {
+		String token = "";
+		switch ( value ) {
+		case '\t': token = "Tab"; break;
+		case '\u00a0': token = "HardSpace"; break;
+		case '\u2010': token = "SoftHypen"; break;
+		case '\u2011': token = "HardHypen"; break;
+		case '\u00ad': token = "DiscHypen"; break;
+		case '\u200d': token = "NoHypen"; break;
+		case '\u00a2': token = "Cent"; break;
+		case '\u00a3': token = "Pound"; break;
+		case '\u00a5': token = "Yen"; break;
+		case '\u2013': token = "EnDash"; break;
+		case '\u2014': token = "EmDash"; break;
+		case '\u2020': token = "Dagger"; break;
+		case '\u2021': token = "DoubleDagger"; break;
+		case '\u2022': token = "Bullet"; break;
+		case '\n': token = "HardReturn"; break;
+		case '\u2007': token = "NumberSpace"; break;
+		case '\u2009': token = "ThinSpace"; break;
+		case '\u2002': token = "EnSpace"; break;
+		case '\u2003': token = "EmSpace"; break;
+		default:
+			return null;
+		}
+		return "'><Char " + token + "><String `";
+	}
 }

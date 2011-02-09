@@ -867,8 +867,8 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 	
 	/**
 	 * Indicates if this fragment contains at least one character other than a whitespace.
-	 * (inline codes, segment markers, and annotation markers do not count as characters).
-	 * @return true if this fragment contains at least one character, excluding whitespaces.
+	 * (inline codes and other markers do not count as characters).
+	 * @return true if this fragment contains at least one character, excluding whitespace.
 	 */
 	public boolean hasText () {
 		return hasText(false);
