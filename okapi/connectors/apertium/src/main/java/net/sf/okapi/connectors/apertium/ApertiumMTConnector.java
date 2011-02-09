@@ -102,6 +102,7 @@ public class ApertiumMTConnector extends BaseConnector {
 					URLEncoder.encode(params.getApiKey(), "UTF-8"), URLEncoder.encode(qtext, "UTF-8"), srcCode, trgCode));
 			}
 			URLConnection conn = url.openConnection();
+			conn.setConnectTimeout(params.getTimeout()*1000);
 
 			// Get the response
 			JSONObject object = (JSONObject)parser.parse(new InputStreamReader(conn.getInputStream(), "UTF-8"));

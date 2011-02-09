@@ -24,15 +24,18 @@ import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.ParametersDescription;
 import net.sf.okapi.common.uidescription.EditorDescription;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
+import net.sf.okapi.common.uidescription.SpinInputPart;
 import net.sf.okapi.common.uidescription.TextInputPart;
 
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
 	private static final String SERVER = "server";
 	private static final String APIKEY = "apiKey";
+	private static final String TIMEOUT = "timeout";
 	
 	private String server;
 	private String apiKey;
+	private int timeout;
 	
 	public Parameters () {
 		reset();
@@ -49,6 +52,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.fromString(data);
 		server = buffer.getString(SERVER, server);
 		apiKey = buffer.getString(APIKEY, apiKey);
+		timeout = buffer.getInteger(TIMEOUT, timeout);
 	}
 
 	@Override
@@ -56,6 +60,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		// Default
 		server = "http://api.apertium.org/json/translate";
 		apiKey = "";
+		timeout = 0;
 	}
 
 	@Override
@@ -63,6 +68,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.reset();
 		buffer.setString(SERVER, server);
 		buffer.setString(APIKEY, apiKey);
+		buffer.setInteger(TIMEOUT, timeout);
 		return buffer.toString();
 	}
 
@@ -81,22 +87,36 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public void setApiKey (String apiKey) {
 		this.apiKey = apiKey;
 	}
+	
+	public int getTimeout () {
+		return timeout;
+	}
+	
+	public void setTimeout (int timeout) {
+		this.timeout = timeout;
+	}
 
 	@Override
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
 		desc.add(SERVER, "Server URL:", "Full URL of the server");
 		desc.add(APIKEY, "API Key:", "Recommended key (See http://api.apertium.org/register.jsp)");
+		desc.add(TIMEOUT, "Timeout", "Timeout in second after which to give up (use 0 for system timeout)");
 		return desc;
 	}
 
 	@Override
 	public EditorDescription createEditorDescription(ParametersDescription paramsDesc) {
 		EditorDescription desc = new EditorDescription("Apertium MT Connector Settings");
+		
 		desc.addTextInputPart(paramsDesc.get(SERVER));
+		
 		TextInputPart tip = desc.addTextInputPart(paramsDesc.get(APIKEY));
 		tip.setPassword(true);
 		tip.setAllowEmpty(true); // API key is optional
+		
+		SpinInputPart sip = desc.addSpinInputPart(paramsDesc.get(TIMEOUT));
+		sip.setRange(0, 60);
 		return desc;
 	}
 
