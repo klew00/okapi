@@ -224,7 +224,6 @@ public class BatchConfiguration {
 				// Then get the information for next entry
 				id = raf.readInt(); // ID
 				pos = raf.getFilePointer(); // Position
-				if ( id > 0 ) raf.readUTF(); // Skip filename
 			}
 		
 			//=== Section 2 : the pipeline itself
