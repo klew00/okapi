@@ -449,7 +449,7 @@ public class XLIFFFilter implements IFilter {
 		for ( int i=0; i<count; i++ ) {
 			prefix = reader.getNamespacePrefix(i);
 			skel.append(String.format(" xmlns%s=\"%s\"",
-				((prefix!=null) ? ":"+prefix : ""),
+				(!Util.isEmpty(prefix) ? ":"+prefix : ""),
 				reader.getNamespaceURI(i)));
 		}
 		String attrName;
@@ -492,7 +492,7 @@ public class XLIFFFilter implements IFilter {
 		for ( int i=0; i<count; i++ ) {
 			prefix = reader.getNamespacePrefix(i);
 			skel.append(String.format(" xmlns%s=\"%s\"",
-				((prefix!=null) ? ":"+prefix : ""),
+				(!Util.isEmpty(prefix) ? ":"+prefix : ""),
 				reader.getNamespaceURI(i)));
 		}
 		String attrName;
@@ -1099,7 +1099,7 @@ public class XLIFFFilter implements IFilter {
 						for ( int i=0; i<count; i++ ) {
 							prefix = reader.getNamespacePrefix(i);
 							tmpg.append(String.format(" xmlns%s=\"%s\"",
-								((prefix!=null) ? ":"+prefix : ""),
+								(!Util.isEmpty(prefix) ? ":"+prefix : ""),
 								reader.getNamespaceURI(i)));
 						}
 						count = reader.getAttributeCount();
@@ -1245,7 +1245,7 @@ public class XLIFFFilter implements IFilter {
 					for ( int i=0; i<count; i++ ) {
 						prefix = reader.getNamespacePrefix(i);
 						tmpg.append(String.format(" xmlns%s=\"%s\"",
-							((prefix!=null) ? ":"+prefix : ""),
+							(!Util.isEmpty(prefix) ? ":"+prefix : ""),
 							reader.getNamespaceURI(i)));
 					}
 					count = reader.getAttributeCount();
