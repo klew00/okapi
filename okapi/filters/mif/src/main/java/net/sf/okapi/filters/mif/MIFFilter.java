@@ -51,6 +51,7 @@ import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
@@ -71,7 +72,7 @@ public class MIFFilter implements IFilter {
 	private static final String TOPSTATEMENTSTOSKIP = "ColorCatalog;ConditionCatalog;BoolCondCatalog;"
 		+ "CombinedFontCatalog;PgfCatalog;ElementDefCatalog;FmtChangeListCatalog;DefAttrValuesCatalog;"
 		+ "AttrCondExprCatalog;FontCatalog;RulingCatalog;TblCatalog;KumihanCatalog;Views;VariableFormats;"
-		+ "MarkerTypeCatalog;XRefFormats;Document;BookComponent;InitialAutoNums;Dictionary;AFrames;Tbls;"
+		+ "MarkerTypeCatalog;XRefFormats;Document;BookComponent;InitialAutoNums;Dictionary;AFrames;" //Tbls;"
 		+ "Page";
 
 	private String lineBreak;
@@ -87,12 +88,16 @@ public class MIFFilter implements IFilter {
 	private GenericSkeleton skel;
 	private boolean hasNext;
 	private EncoderManager encoderManager;
-	private int inTextFlow;
+	private int inBlock;
+	private int blockLevel;
 //	private String version;
 	private String sdId;
 	private int paraLevel;
 	private StringBuilder paraBuf;
 	private boolean paraBufNeeded;
+	private int tableGroupLevel;
+	private int rowGroupLevel;
+	private int cellGroupLevel;
 	
 	private static Hashtable<String, String> initCharTable () {
 		Hashtable<String, String> table = new Hashtable<String, String>();
@@ -224,9 +229,13 @@ public class MIFFilter implements IFilter {
 			otherId = 0;
 			canceled = false;
 			hasNext = true;
-			inTextFlow = 0;
+			inBlock = 0;
+			blockLevel = 1;
 //			version = "";
 			lineBreak = "\n"; //TODO: Get from input file
+			tableGroupLevel = -1;
+			rowGroupLevel = -1;
+			cellGroupLevel = -1;
 			
 			queue = new LinkedList<Event>();
 			sdId = "sd1";
@@ -299,9 +308,15 @@ public class MIFFilter implements IFilter {
 			int c;
 			
 			// Check if we are still processing a TextFlow 
-			if ( inTextFlow > 0 ) {
-				processTextFlow();
+			if ( inBlock > 0 ) {
+				processBlock();
 				return;
+			}
+			else { //TODO: remove this test when done
+				if ( blockLevel != 1 ) {
+					//throw new OkapiIOException("inBlock at 0 should have blockLevel at 1.");
+					blockLevel = 1;
+				}
 			}
 			
 			while ( (c = reader.read()) != -1 ) {
@@ -319,7 +334,11 @@ public class MIFFilter implements IFilter {
 						skipOverContent(true, null);
 					}
 					else if ( "TextFlow".equals(tag) ) {
-						processTextFlow();
+						processBlock();
+						return;
+					}
+					else if ( "Tbls".equals(tag) ) {
+						processBlock();
 						return;
 					}
 					else if ( "MIFFile".equals(tag) ) {
@@ -441,16 +460,17 @@ public class MIFFilter implements IFilter {
 	 * Process the first or next entry of a TextFlow statement.
 	 * @throws IOException if a low-level error occurs.
 	 */
-	private void processTextFlow ()
+	private void processBlock ()
 		throws IOException
 	{
 		// Process one Para statement at a time
 		if ( readUntil("Para", true) != null ) {
-			inTextFlow++; // We are not done yet with this TextFlow statement
+			inBlock++; // We are not done yet with this TextFlow statement
 			processPara();
+			blockLevel--; // Closing the Para statement here
 		}
 		else { // Done
-			inTextFlow = 0; // We are done
+			inBlock = 0; // We are done
 			// Close 
 		}
 		
@@ -540,54 +560,6 @@ public class MIFFilter implements IFilter {
 		}
 	}
 	
-//	private void processParaLine (TextFragment tf,
-//		StringBuilder sb)
-//		throws IOException
-//	{
-//		String tag;
-//		while ( true ) {
-//			tag = readInlineUntil("String;Char;Variable;Font;Marker;XRef", true, sb);
-//			if ( tag == null ) break; // Done
-//			
-//			if ( "String".equals(tag) ) {
-//				sb.append("<String `");
-//				tf.append(TagType.PLACEHOLDER, "x", sb.toString());
-//				sb.setLength(0);
-//				String text = processString(false);
-//				tf.append(text);
-//				sb.append("'>");
-//				continue; // Skip common sb.SetLength(0);
-//			}
-//			else if ( "Char".equals(tag) ) {
-//				//TODO: deal with parts strtaing with <Char
-//				MIFToken token = processChar(false);
-//				tf.append(token.toString());
-//			}
-//			else if ( "Variable".equals(tag) ) {
-//				sb.append("<Variable ");
-//				skipOverContent(true, sb);
-//				tf.append(TagType.PLACEHOLDER, "var", sb.toString());
-//			}
-//			else if ( "Font".equals(tag) ) {
-//				sb.append("<Font ");
-//				skipOverContent(true, sb);
-//				tf.append(TagType.PLACEHOLDER, "font", sb.toString());
-//			}
-//			else if ( "Marker".equals(tag) ) {
-//				sb.append("<Marker ");
-//				skipOverContent(true, sb);
-//				tf.append(TagType.PLACEHOLDER, "marker", sb.toString());
-//			}
-//			else if ( "XRef".equals(tag) ) {
-//				sb.append("<XRef ");
-//				skipOverContent(true, sb);
-//				tf.append(TagType.PLACEHOLDER, "xref", sb.toString());
-//			}
-//			
-//			sb.setLength(0);
-//		}
-//	}
-
 	private MIFToken getNextTokenInStatement (boolean store)
 		throws IOException
 	{
@@ -663,60 +635,6 @@ public class MIFFilter implements IFilter {
 		return chToken;
 	}
 	
-//	/**
-//	 * Reads until the end of the current statement or the first occurrence of the given statement.
-//	 * @param tagNames the list of tag names to stop at.
-//	 * @param store true if we store the parsed characters into the skeleton.
-//	 * @param tf the text fragment where to store the inline codes
-//	 * @return the name of the tag found, or null if none was found.
-//	 * @throws IOException if a low-level error occurs.
-//	 */
-//	private String readInlineUntil (String tagNames,
-//		boolean store,
-//		StringBuilder sb)
-//		throws IOException
-//	{
-//		int c;
-//		int baseLevel = 1;
-//		while ( (c = reader.read()) != -1 ) {
-//			switch ( c ) {
-//			case '#':
-//				//sb.append((char)c);
-//				readComment(false, null);
-//				break;
-//				
-//			case '<': // Start of statement
-//				baseLevel++;
-//				StringBuilder sbTag = new StringBuilder();
-//				String tag = readTag(store, true, sbTag);
-//				if ( tagNames.indexOf(tag) > -1 ) {
-//					return tag;
-//				}
-//				else { // Default: skip over
-//					sb.append((char)c);
-//					sb.append(sbTag);
-//					skipOverContent(store, sb);
-//					baseLevel--;
-//				}
-//				break;
-//				
-//			case '>': // End of statement
-//				baseLevel--;
-//				sb.append((char)c);
-//				if ( baseLevel == 0 ) {
-//					return null;
-//				}
-//				break;
-//
-//			default:
-//				sb.append((char)c);
-//				break;
-//			}
-//		}
-//		return null;
-//	}
-
-	
 	private int readUntilText (StringBuilder sb,
 		boolean checkIfParaBufNeeded)
 		throws IOException
@@ -768,7 +686,8 @@ public class MIFFilter implements IFilter {
 	}
 
 	/**
-	 * Reads until the end of the current statement or the first occurrence of the given statement.
+	 * Reads until the end of the current statement or the first occurrence of one 
+	 * of the given statements.
 	 * @param tagNames the list of tag names to stop at.
 	 * @param store true if we store the parsed characters into the skeleton.
 	 * @return the name of the tag found, or null if none was found.
@@ -779,35 +698,106 @@ public class MIFFilter implements IFilter {
 		throws IOException
 	{
 		int c;
-		int baseLevel = 1;
 		while ( (c = reader.read()) != -1 ) {
-			if ( store ) skel.append((char)c);
+			if ( store ) {
+				skel.append((char)c);
+			}
 			switch ( c ) {
 			case '#':
 				readComment(true, null);
 				break;
-				
+
 			case '<': // Start of statement
-				baseLevel++;
-				String tag = readTag(store, true, null);
-				if ( tagNames.indexOf(tag) > -1 ) {
-					return tag;
-				}
-				else { // Default: skip over
-					skipOverContent(store, null);
-					baseLevel--;
+				while ( true ) {
+					blockLevel++;
+					String tag = readTag(store, true, null);
+					if ( tagNames.indexOf(tag) > -1 ) {
+						return tag;
+					}
+					else if ( "Tbl".equals(tag) ) {
+						tableGroupLevel = blockLevel;
+						StartGroup sg = new StartGroup(sdId, String.valueOf(++otherId));
+						sg.setType("table");
+						queue.add(new Event(EventType.START_GROUP, sg));
+					}
+					else if ( "Row".equals(tag) ) {
+						rowGroupLevel = blockLevel;
+						StartGroup sg = new StartGroup(sdId, String.valueOf(++otherId));
+						sg.setType("row");
+						queue.add(new Event(EventType.START_GROUP, sg));
+					}
+					else { // Default: skip over
+						if ( !readUntilOpenOrClose(store) ) {
+							blockLevel--;
+							break;
+						}
+						// Else: re-process the next tag
+					}
 				}
 				break;
 				
 			case '>': // End of statement
-				baseLevel--;
-				if ( baseLevel == 0 ) {
+				if ( blockLevel == 1 ) {
 					return null;
 				}
+				else if ( tableGroupLevel == blockLevel ) {
+					tableGroupLevel = -1;
+					queue.add(new Event(EventType.END_GROUP, new Ending(String.valueOf(++otherId))));
+				}
+				else if ( rowGroupLevel == blockLevel ) {
+					rowGroupLevel = -1;
+					queue.add(new Event(EventType.END_GROUP, new Ending(String.valueOf(++otherId))));
+				}
+				blockLevel--;
 				break;
 			}
 		}
+		//TODO: we shouldn't exit this way
 		return null;
+	}
+	
+	/**
+	 * Reads until the next opening or closing statement. 
+	 * @param store
+	 * @return true if stops on opening, false if stops on closing.
+	 * @throws IOException if the end of file occurs.
+	 */
+	private boolean readUntilOpenOrClose (boolean store)
+		throws IOException
+	{
+		int c;
+		boolean inEscape = false;
+		boolean inString = false;
+		while ( (c = reader.read()) != -1 ) {
+			if ( store ) {
+				skel.append((char)c);
+			}
+			// Parse a string content
+			if ( inString ) {
+				if ( c == '\'' ) inString = false;
+				continue;
+			}
+			// Else: we are outside a string
+			if ( inEscape ) {
+				inEscape = false;
+			}
+			else {
+				switch ( c ) {
+				case '`':
+					inString = true;
+					break;
+				case '\\':
+					inEscape = true;
+					break;
+				case '<':
+					return true;
+				case '>':
+					return false;
+				}
+			}
+		}
+		// Unexpected end
+		throw new OkapiIllegalFilterOperationException("Unexpected end of input.");
 	}
 	
 	/**

@@ -36,34 +36,35 @@ public class MIFEncoder implements IEncoder {
 		int context)
 	{
 		StringBuilder escaped = new StringBuilder();
+		char ch;
 		for ( int i=0; i<text.length(); i++ ) {
-			if ( text.codePointAt(i) > 127 ) {
-				int value = text.codePointAt(i);
-				String res = tryCharStatment(value);
-				if ( res == null ) escaped.append(String.format("\\u%04X", value)); //escaped.append(String.format("\\u%04X", value));
-				else escaped.append(res);
-			}
-			else {
-				switch ( text.charAt(i) ) {
-				case '\t':
-					escaped.append("\\t");
-					break;
-				case '>':
-					escaped.append("\\>");
-					break;
-				case '\'':
-					escaped.append("\\q");
-					break;
-				case '`':
-					escaped.append("\\Q");
-					break;
-				case '\\':
-					escaped.append("\\\\");
-					break;
-				default:
-					escaped.append(text.charAt(i));
-					break;
+			ch = text.charAt(i);
+			switch ( text.charAt(i) ) {
+			case '\t':
+				escaped.append("\\t");
+				break;
+			case '>':
+				escaped.append("\\>");
+				break;
+			case '\'':
+				escaped.append("\\q");
+				break;
+			case '`':
+				escaped.append("\\Q");
+				break;
+			case '\\':
+				escaped.append("\\\\");
+				break;
+			default:
+				if ( ch > 127 ) {
+					String res = tryCharStatment(ch);
+					if ( res == null ) escaped.append(ch);
+					else escaped.append(res);
 				}
+				else {
+					escaped.append(ch);
+				}
+				break;
 			}
 		}
 		return escaped.toString();

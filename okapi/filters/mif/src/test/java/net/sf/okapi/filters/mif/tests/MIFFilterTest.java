@@ -80,11 +80,11 @@ public class MIFFilterTest {
 	@Test
 	public void testSimpleText () {
 		List<Event> list = getEventsFromFile("Test01.mif");
-		TextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		TextUnit tu = FilterTestDriver.getTextUnit(list, 186);
 		assertNotNull(tu);
 		assertEquals("Line 1\nLine 2", fmt.setContent(tu.getSource().getFirstContent()).toString());
 		
-		tu = FilterTestDriver.getTextUnit(list, 2);
+		tu = FilterTestDriver.getTextUnit(list, 187);
 		assertNotNull(tu);
 		assertEquals("\u00e0=agrave", fmt.setContent(tu.getSource().getFirstContent()).toString());
 	}

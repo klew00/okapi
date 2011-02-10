@@ -54,10 +54,9 @@ public class XLIFFPackageWriter extends BasePackageWriter {
 		//TODO: get it from params
 		writer.setPlaceholderMode(true);
 		
-//		String skelPath = manifest.getOriginalDirectory() + item.getRelativeInputPath(); 
 		StartDocument sd = event.getStartDocument();
 		writer.create(path, null, manifest.getSourceLocale(), manifest.getTargetLocale(),
-			sd.getMimeType(), sd.getName(), null);
+			sd.getMimeType(), item.getRelativeInputPath(), null);
 
 	}
 	
