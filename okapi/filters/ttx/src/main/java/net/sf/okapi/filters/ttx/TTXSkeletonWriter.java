@@ -31,6 +31,8 @@ import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.skeleton.GenericSkeleton;
+import net.sf.okapi.common.skeleton.GenericSkeletonPart;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 
 public class TTXSkeletonWriter extends GenericSkeletonWriter {
@@ -55,6 +57,13 @@ public class TTXSkeletonWriter extends GenericSkeletonWriter {
 		}
 
 		StringBuilder tmp = new StringBuilder();
+		// Write the possible part before the text-unit
+		GenericSkeleton skel = (GenericSkeleton)tu.getSkeleton();
+		if ( skel != null ) {
+			if ( skel.getParts().size() > 1 ) {
+				tmp.append(getString(skel.getParts().get(0), 1));
+			}
+		}
 		
 		TextContainer srcCont = tu.getSource();
 		if ( !srcCont.hasBeenSegmented() ) {

@@ -23,6 +23,7 @@ package net.sf.okapi.filters.ttx;
 import java.util.ArrayList;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.filterwriter.GenericContent;
@@ -154,6 +155,43 @@ public class TTXFilterTest {
 			+ "</Tu>"
 			+ "</df>"
 			+ "<ut Type=\"end\" Style=\"external\">{/P}</ut>"
+			+ "</Raw></Body></TRADOStag>";
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(filter, snippet, locESEM),
+			locESEM, filter.createSkeletonWriter(), filter.getEncoderManager()));
+	}
+
+	@Test
+	public void testNotSegmentedWithLeadingWS () {
+		String snippet = STARTFILENOLB
+			+ "<ut Type=\"start\" Style=\"external\">bc</ut>"
+			+ "\n   text" 
+			+ "<ut Type=\"end\" Style=\"external\">ec</ut>"
+			+ "</Raw></Body></TRADOStag>";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(filter, snippet, locESEM), 1);
+		assertNotNull(tu);
+		TextContainer cont = tu.getSource();
+		ISegments segments = cont.getSegments();
+		assertEquals(1, segments.count());
+		assertEquals("[text]", fmt.printSegmentedContent(cont, true));
+		ISkeleton skl = tu.getSkeleton();
+		assertNotNull(skl);
+	}
+
+	@Test
+	public void testOutputNotSegmentedWithLeadingWS () {
+		String snippet = STARTFILENOLB
+			+ "<ut Type=\"start\" Style=\"external\">bc</ut>"
+			+ "\n   text" 
+			+ "<ut Type=\"end\" Style=\"external\">ec</ut>"
+			+ "</Raw></Body></TRADOStag>";
+		String expected = STARTFILENOLB
+			+ "<ut Type=\"start\" Style=\"external\">bc</ut>"
+			+ "\n   "
+			+ "<Tu MatchPercent=\"0\">"
+			+ "<Tuv Lang=\"EN-US\">text</Tuv>"
+			+ "<Tuv Lang=\"ES-EM\">text</Tuv>"
+			+ "</Tu>"
+			+ "<ut Type=\"end\" Style=\"external\">ec</ut>"
 			+ "</Raw></Body></TRADOStag>";
 		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(filter, snippet, locESEM),
 			locESEM, filter.createSkeletonWriter(), filter.getEncoderManager()));
@@ -575,7 +613,7 @@ public class TTXFilterTest {
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(filter, snippet, locESEM), 1);
 		assertNotNull(tu);
 		TextContainer cont = tu.getSource();
-		assertEquals("\ntext", cont.toString());
+		assertEquals("text", cont.toString());
 		assertTrue(tu.hasTarget(locESEM));
 		assertEquals("", tu.getTarget(locESEM).toString());
 	}
@@ -659,8 +697,8 @@ public class TTXFilterTest {
 			+ "</Raw></Body></TRADOStag>";
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(filter, snippet, locESEM), 1);
 		assertNotNull(tu);
-		assertEquals("[Src1][ Src2]", fmt.printSegmentedContent(tu.getSource(), true));
-		assertEquals("[Trg1][]", fmt.printSegmentedContent(tu.getTarget(locESEM), true));
+		assertEquals("[Src1] [Src2]", fmt.printSegmentedContent(tu.getSource(), true));
+		assertEquals("[Trg1] []", fmt.printSegmentedContent(tu.getTarget(locESEM), true));
 	}
 
 	@Test
@@ -673,8 +711,8 @@ public class TTXFilterTest {
 		String expected = STARTFILENOLB
 			+ "<df Font=\"z\"><ut Type=\"start\" Style=\"external\">[z]</ut>"
 			+ "<Tu MatchPercent=\"0\"><Tuv Lang=\"EN-US\">Src1</Tuv><Tuv Lang=\"ES-EM\">Trg1</Tuv></Tu>"
-			+ "<Tu MatchPercent=\"0\"><Tuv Lang=\"EN-US\"> Src2</Tuv>"
-			+ "<Tuv Lang=\"ES-EM\"> Src2</Tuv></Tu>"
+			+ " <Tu MatchPercent=\"0\"><Tuv Lang=\"EN-US\">Src2</Tuv>"
+			+ "<Tuv Lang=\"ES-EM\">Src2</Tuv></Tu>"
 			+ "</df><ut Type=\"end\" Style=\"external\">[/z]</ut>"
 			+ "</Raw></Body></TRADOStag>";
 		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(filter, snippet, locESEM),

@@ -104,7 +104,7 @@ public enum MatchType {
 	FUZZY_REPAIRED,
 
 	/**
-	 * Matches assembled from phrases in the TM.
+	 * Matches assembled from phrases in the TM or other resource.
 	 */
 	PHRASE_ASSEMBLED,
 

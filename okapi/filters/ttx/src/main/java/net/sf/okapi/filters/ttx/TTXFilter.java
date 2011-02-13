@@ -624,8 +624,25 @@ public class TTXFilter implements IFilter {
 
 			// Check if we had only non-segmented text
 			if (( inter != null) && !inter.isEmpty() ) {
-				if ( hasText(inter.getCodedText()) ) {
+				String ctext = inter.getCodedText();
+				if ( hasText(ctext) ) {
 					// Unsegmented section contain text: make it a text unit
+
+					// Move leading whitespace characters to outside
+					int n = TextFragment.indexOfFirstNonWhitespace(ctext, 0, -1, false, false, false, true);
+					if ( n > 0 ) {
+						if ( srcCont.isEmpty() ) {
+							// Move to the skeleton if we are at the first segment
+							skel.add(ctext.substring(0, n));
+						}
+						else { // Move to a part before the segment
+							srcCont.append(new TextPart(ctext.substring(0, n)));
+						}
+						ctext = ctext.substring(n);
+						inter.setCodedText(ctext);
+					}
+
+					// Put the text after in a segment
 					addSegment(inter, srcCont, trgFragments, altTranslations, dfCount, crumbs, movedCodes);
 					inter = null;
 				}
