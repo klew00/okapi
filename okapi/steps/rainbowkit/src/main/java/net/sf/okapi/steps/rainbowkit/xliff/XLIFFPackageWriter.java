@@ -29,7 +29,7 @@ import net.sf.okapi.steps.rainbowkit.common.BasePackageWriter;
 
 public class XLIFFPackageWriter extends BasePackageWriter {
 
-	private XLIFFWriter writer;
+	protected XLIFFWriter writer;
 
 	public XLIFFPackageWriter () {
 		super(Manifest.EXTRACTIONTYPE_XLIFF);
@@ -37,7 +37,7 @@ public class XLIFFPackageWriter extends BasePackageWriter {
 	
 	@Override
 	protected void processStartBatch () {
-		manifest.setSubDirectories("original", "work", "work", "done");
+		manifest.setSubDirectories("original", "work", "work", "done", null, false);
 		super.processStartBatch();
 	}
 	

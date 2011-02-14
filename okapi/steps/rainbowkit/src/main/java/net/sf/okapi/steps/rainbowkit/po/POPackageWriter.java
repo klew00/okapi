@@ -37,7 +37,7 @@ public class POPackageWriter extends BasePackageWriter {
 	
 	@Override
 	protected void processStartBatch () {
-		manifest.setSubDirectories("original", "work", "work", "done");
+		manifest.setSubDirectories("original", "work", "work", "done", null, true);
 		super.processStartBatch();
 	}
 	

@@ -180,6 +180,10 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		optEditors.add(null);
 		optStrings.add(null);
 		writers.add("net.sf.okapi.steps.rainbowkit.rtf.RTFPackageWriter");
+		// OmegaT options
+		optEditors.add(null);
+		optStrings.add(null);
+		writers.add("net.sf.okapi.steps.rainbowkit.omegat.OmegaTPackageWriter");
 
 		mainComposite = new Composite(parent, SWT.BORDER);
 		mainComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -218,6 +222,9 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 
 		lbTypes.add("Original + RTF");
 		lbTypes.setData("2", "net.sf.okapi.steps.rainbowkit.rtf.RTFPackageWriter");
+
+		lbTypes.add("OmegaT Project");
+		lbTypes.setData("3", "net.sf.okapi.steps.rainbowkit.omegat.OmegaTPackageWriter");
 
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.heightHint = 70;
@@ -282,13 +289,13 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 			btOptions.setEnabled(false);
 			edDescription.setText("Set of PO files. You can translate this package with anu PO editor.");
 			break;
-//		case 1: // OmegaT
-//			btOptions.setEnabled(false);
-//			edDescription.setText("OmegaT project with all its files and directory structure in place. You can translate this package with OmegaT.");
-//			break;
 		case 2: // Original + RTF
 			btOptions.setEnabled(false);
 			edDescription.setText("Package where all the files to translate are converted into an RTF file with Trados-compatible styles.\nYou can translate this package with Trados Translator's Workbench or any compatible tool.");
+			break;
+		case 3: // OmegaT
+			btOptions.setEnabled(false);
+			edDescription.setText("OmegaT project with all its files and directory structure in place.\nYou can translate this package with OmegaT.");
 			break;
 		}
 	}

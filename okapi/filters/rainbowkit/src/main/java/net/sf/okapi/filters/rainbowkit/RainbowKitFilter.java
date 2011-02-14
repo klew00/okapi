@@ -243,6 +243,10 @@ public class RainbowKitFilter implements IFilter {
 			filter = new XLIFFFilter();
 			extension = ".xlf";
 		}
+		else if ( info.getExtractionType().equals(Manifest.EXTRACTIONTYPE_OMEGAT) ) {
+			filter = new XLIFFFilter();
+			extension = ".xlf";
+		}
 		else if ( info.getExtractionType().equals(Manifest.EXTRACTIONTYPE_PO) ) {
 			filter = new POFilter();
 			extension = ".po";

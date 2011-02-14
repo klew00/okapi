@@ -112,6 +112,34 @@ public class MergingStepTest {
 		
 	}
 	
+	@Test
+	public void testOmegaTFMerging ()
+		throws URISyntaxException
+	{
+		deleteOutputDir("omegatPack/done", true);
+		
+		IPipelineDriver pdriver = new PipelineDriver();
+		FilterConfigurationMapper fcMapper = new FilterConfigurationMapper();
+		fcMapper.addConfigurations(PropertiesFilter.class.getName());
+		fcMapper.addConfigurations(OpenOfficeFilter.class.getName());
+		fcMapper.addConfigurations(RainbowKitFilter.class.getName());
+		pdriver.setFilterConfigurationMapper(fcMapper);
+		pdriver.setRootDirectory(Util.deleteLastChar(root)); // Don't include final separator
+		pdriver.addStep(new ReaderStep());
+		pdriver.addStep(new MergingStep());
+		
+		URI inputURI = new File(root+"omegatPack/manifest.rkm").toURI();
+		pdriver.addBatchItem(new BatchItemContext(inputURI, "UTF-8", "okf_rainbowkit", null, "UTF-8", locEN, locFR));
+		
+		pdriver.processBatch();
+
+		File file = new File(root+"omegatPack/done/test01.out.properties");
+		assertTrue(file.exists());
+		file = new File(root+"omegatPack/done/sub Dir/test01.out.odt");
+		assertTrue(file.exists());
+		
+	}
+	
     public boolean deleteOutputDir (String dirname, boolean relative) {
     	File d;
     	if ( relative ) d = new File(root + File.separator + dirname);

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -48,6 +48,7 @@ public class Manifest implements IAnnotation {
 	public static final String EXTRACTIONTYPE_XLIFF = "xliff";
 	public static final String EXTRACTIONTYPE_PO = "po";
 	public static final String EXTRACTIONTYPE_RTF = "rtf";
+	public static final String EXTRACTIONTYPE_OMEGAT = "omegat";
 
 	public static final String VERSION = "2";
 	public static final String MANIFEST_FILENAME = "manifest";
@@ -63,11 +64,13 @@ public class Manifest implements IAnnotation {
 	private String originalSubDir;
 	private String sourceSubDir;
 	private String targetSubDir;
+	private String tmSubDir;
 	private String mergeSubDir;
 	private String originalDir;
 	private String sourceDir;
 	private String targetDir;
 	private String mergeDir;
+	private String tmDir;
 
 	public Manifest () {
 		docs = new LinkedHashMap<Integer, MergingInfo>();
@@ -76,6 +79,7 @@ public class Manifest implements IAnnotation {
 		sourceSubDir = "";
 		targetSubDir = "";
 		mergeSubDir = "";
+		tmSubDir = "";
 		updateFullDirectories();
 	}
 
@@ -119,15 +123,39 @@ public class Manifest implements IAnnotation {
 		return packageRoot;
 	}
 	
+	/**
+	 * Sets the sub-directories used by the given package.
+	 * All defaults to "" (same directory as the directory of the package itself.
+	 * @param originalSubDir the sub-directory for the original document.
+	 * @param sourceSubDir the sub-directory for the source documents.
+	 * @param targetSubDir the sub-directory for the target documents.
+	 * @param mergeSubDir the sub-directory for the merged documents.
+	 * @param tmSubDir the sub-directory for TM-related data.
+	 * @param overwrite true to overwrite existing settings (use null to not overwrite a given sub-directory).
+	 * false to use the specified value (if the current is empty).
+	 */
 	public void setSubDirectories (String originalSubDir,
 		String sourceSubDir,
 		String targetSubDir,
-		String mergeSubDir)
+		String mergeSubDir,
+		String tmSubDir,
+		boolean overwrite)
 	{
-		this.originalSubDir = originalSubDir;
-		this.sourceSubDir = sourceSubDir;
-		this.targetSubDir = targetSubDir;
-		this.mergeSubDir = mergeSubDir;
+		if (( originalSubDir != null ) && ( overwrite || Util.isEmpty(this.originalSubDir) )) {
+			this.originalSubDir = originalSubDir;
+		}
+		if (( sourceSubDir != null ) && ( overwrite || Util.isEmpty(this.sourceSubDir) )) {
+			this.sourceSubDir = sourceSubDir;
+		}
+		if (( targetSubDir != null ) && ( overwrite || Util.isEmpty(this.targetSubDir) )) {
+			this.targetSubDir = targetSubDir;
+		}
+		if (( mergeSubDir != null ) && ( overwrite || Util.isEmpty(this.mergeSubDir) )) {
+			this.mergeSubDir = mergeSubDir;
+		}
+		if (( tmSubDir != null ) && ( overwrite || Util.isEmpty(this.tmSubDir) )) {
+			this.tmSubDir = tmSubDir;
+		}
 		updateFullDirectories();
 	}
 	
@@ -161,6 +189,14 @@ public class Manifest implements IAnnotation {
 	 */
 	public String getMergeDirectory () {
 		return mergeDir;
+	}
+	
+	/**
+	 * Get the directory where to output TM-related information (always with a terminal separator).
+	 * @return the directory where to store TM-related information.
+	 */
+	public String getTmDirectory () {
+		return tmDir;
 	}
 	
 	public void setInformation (String packageRoot,
@@ -228,6 +264,7 @@ public class Manifest implements IAnnotation {
 			writer.writeAttributeString("sourceSubDir", sourceSubDir.replace('\\', '/'));
 			writer.writeAttributeString("targetSubDir", targetSubDir.replace('\\', '/'));
 			writer.writeAttributeString("mergeSubDir", mergeSubDir.replace('\\', '/'));
+			writer.writeAttributeString("tmSubDir", tmSubDir.replace('\\', '/'));
 			SimpleDateFormat DF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ");
 			writer.writeAttributeString("date", DF.format(new java.util.Date()));
 			writer.writeLineBreak();
@@ -291,6 +328,10 @@ public class Manifest implements IAnnotation {
 		    if ( Util.isEmpty(tmp) ) throw new RuntimeException("Missing mergeSubDir attribute.");
 		    mergeSubDir = tmp.replace('/', File.separatorChar);
 
+		    tmp = elem.getAttribute("tmSubDir");
+		    if ( Util.isEmpty(tmp) ) tmSubDir = "";
+		    else tmSubDir = tmp.replace('/', File.separatorChar);
+
 		    docs.clear();
 		    NL = elem.getElementsByTagName("doc");
 		    for ( int i=0; i<NL.getLength(); i++ ) {
@@ -338,5 +379,7 @@ public class Manifest implements IAnnotation {
 		sourceDir = Util.ensureSeparator(packageRoot + sourceSubDir, false);
 		targetDir = Util.ensureSeparator(packageRoot + targetSubDir, false);
 		mergeDir = Util.ensureSeparator(packageRoot + mergeSubDir, false);
+		tmDir = Util.ensureSeparator(packageRoot + tmSubDir, false);
 	}
+
 }
