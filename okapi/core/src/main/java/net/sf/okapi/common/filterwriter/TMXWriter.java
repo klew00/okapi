@@ -111,11 +111,11 @@ public class TMXWriter {
 
     /**
      * Sets the flag indicating whether the writer should output
-     * workaround codes specific for OmegaT.
-     * @param value true to output OmegaT-specific workarounds. False otherwise.
+     * letter-coded content (e.g. to work for OmegaT).
+     * @param value true to output letter-coded content. False otherwise.
      */
-    public void setOmegaTWorkarounds (boolean value) {
-    	tmxCont.setOmegaTWorkarounds(value);
+    public void setLetterCodedMode (boolean value) {
+    	tmxCont.setLetterCodedMode(value);
     }
     
     /**
@@ -193,8 +193,8 @@ public class TMXWriter {
     	this.srcLoc = sourceLocale;
     	this.trgLoc = targetLocale;
 
-    	if ( tmxCont.getOmegaTWorkarounds() ) {
-    		// If OmegaT mode is set, we need to overwrite the creationtool attribute
+    	if ( tmxCont.getLetterCodedMode() ) {
+    		// If letter-coded mode is set, we need to overwrite the creationtool attribute
     		creationTool = "OmegaT";
     	}
 

@@ -39,9 +39,10 @@ public class POFilterWriterTest {
 	private LocaleId locEN = LocaleId.fromString("en");
 	private LocaleId locFR = LocaleId.fromString("fr");
 	private POFilter filter;
-	private String header = "#, fuzzy\nmsgid \"\"\nmsgstr \"\"\n"
+	private String header = "# \nmsgid \"\"\nmsgstr \"\"\n"
 		+ "\"Content-Type: text/plain; charset=UTF-8\\n\"\n"
 		+ "\"Content-Transfer-Encoding: 8bit\\n\"\n"
+		+ "\"Language: fr\\n\"\n"
 		+ "\"Plural-Forms: nplurals=2; plural=(n>1);\\n\"\n\n";
 	
 	@Before

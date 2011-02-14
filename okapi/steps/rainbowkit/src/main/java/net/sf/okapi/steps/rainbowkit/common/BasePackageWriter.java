@@ -20,6 +20,7 @@
 
 package net.sf.okapi.steps.rainbowkit.common;
 
+import java.io.File;
 import java.io.OutputStream;
 
 import net.sf.okapi.common.Event;
@@ -28,6 +29,10 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
+import net.sf.okapi.common.filterwriter.TMXWriter;
+import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 import net.sf.okapi.filters.rainbowkit.Manifest;
 import net.sf.okapi.filters.rainbowkit.MergingInfo;
@@ -41,6 +46,10 @@ public abstract class BasePackageWriter implements IPackageWriter {
 	protected String extractionType;
 	protected MergingInfo mergingInfo;
 	protected ISkeletonWriter skelWriter;
+	protected TMXWriter tmxWriterApproved;
+	protected String tmxPathApproved;
+	protected TMXWriter tmxWriterUnApproved;
+	protected String tmxPathUnApproved;
 	
 	public BasePackageWriter (String extractionType) {
 		this.extractionType = extractionType;
@@ -151,10 +160,36 @@ public abstract class BasePackageWriter implements IPackageWriter {
 
 	protected void processStartBatch () {
 		docId = 0;
+		initializeTMXWriters();
+	}
+	
+	protected void initializeTMXWriters () {
+		tmxPathApproved = manifest.getTmDirectory()+"approved.tmx";
+		tmxWriterApproved = new TMXWriter(tmxPathApproved);
+		tmxWriterApproved.writeStartDocument(manifest.getSourceLocale(),
+			manifest.getTargetLocale(), getClass().getName(), null, null, null, null);
+
+		tmxPathUnApproved = manifest.getTmDirectory()+"unapproved.tmx";
+		tmxWriterUnApproved = new TMXWriter(tmxPathUnApproved);
+		tmxWriterUnApproved.writeStartDocument(manifest.getSourceLocale(),
+			manifest.getTargetLocale(), getClass().getName(), null, null, null, null);
+
 	}
 
 	protected void processEndBatch () {
-		// Do nothing by default
+		tmxWriterApproved.writeEndDocument();
+		tmxWriterApproved.close();
+		if ( tmxWriterApproved.getItemCount() == 0 ) {
+			File file = new File(tmxPathApproved);
+			file.delete();
+		}
+		
+		tmxWriterUnApproved.writeEndDocument();
+		tmxWriterUnApproved.close();
+		if ( tmxWriterApproved.getItemCount() == 0 ) {
+			File file = new File(tmxPathUnApproved);
+			file.delete();
+		}
 	}
 
 	protected void processStartBatchItem () {
@@ -220,5 +255,34 @@ public abstract class BasePackageWriter implements IPackageWriter {
 	}
 
 	protected abstract void processTextUnit (Event event);
+
+	protected void writeTMXEntries (TextUnit tu) {
+		// Check if we have a target
+		LocaleId trgLoc = manifest.getTargetLocale();
+		TextContainer tc = tu.getTarget(trgLoc);
+		if (( tc == null ) || ( tc.isEmpty() )) {
+			return; // No target
+		}
+		if ( tu.getSource().isEmpty() || ( tu.getSource().hasText(false) && !tc.hasText(false) )) {
+			return; // Target has code and/or spaces only
+		}
+		
+		// Process translation(s) in the container itself
+		boolean done = false;
+		if ( tu.hasTargetProperty(trgLoc, Property.APPROVED) ) {
+			if ( tu.getTargetProperty(trgLoc, Property.APPROVED).getValue().equals("yes") ) {
+				// Write existing translation that was approved
+				tmxWriterApproved.writeItem(tu, null);
+				done = true;
+			}
+		}
+		if ( !done ) {
+			// Write existing translation not yet approved
+			tmxWriterUnApproved.writeItem(tu, null);
+		}
+
+		
+		
+	}
 
 }

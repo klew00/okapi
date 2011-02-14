@@ -241,11 +241,17 @@ public class POFilterWriter implements IFilterWriter {
 			// Create the output
 			createWriter(sd);
 			// Writer header
-			writer.write("#, fuzzy"+linebreak);
+			writer.write("# "+linebreak);
+			if ( forExtractMerge ) {
+				writer.write("# This file is intended to be merged back. "+linebreak);
+				writer.write("# Please preserve the msgctxt lines and the order of the entries."+linebreak);
+				writer.write("# "+linebreak);
+			}
 			writer.write("msgid \"\""+linebreak);
 			writer.write("msgstr \"\""+linebreak);
 			writer.write("\"Content-Type: text/plain; charset="+encoding+"\\n\""+linebreak);
 			writer.write("\"Content-Transfer-Encoding: 8bit\\n\""+linebreak);
+			writer.write("\"Language: "+language.toPOSIXLocaleId()+"\\n\""+linebreak);
 			writer.write("\"Plural-Forms: "+PluralForms.getExpression(language));
 			writer.write("\\n\""+linebreak+linebreak);
 			crumbs = CRUMBS_PREFIX;

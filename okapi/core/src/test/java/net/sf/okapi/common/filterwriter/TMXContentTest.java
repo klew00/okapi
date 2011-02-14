@@ -48,7 +48,7 @@ public class TMXContentTest {
 	public void testSimple_OmegaT () {
 		TextFragment tf = createTextUnit();
 		assertEquals(tf.getCodes().size(), 5);
-		fmt.setOmegaTWorkarounds(true);
+		fmt.setLetterCodedMode(true);
 		fmt.setContent(tf);
 		assertEquals("t1<bpt i=\"1\">&lt;g0&gt;</bpt><bpt i=\"2\">&lt;g1&gt;</bpt><ph x=\"3\">&lt;x2/&gt;</ph>t2<ept i=\"2\">&lt;/g1&gt;</ept><ept i=\"1\">&lt;/g0&gt;</ept>t3",
 			fmt.toString());

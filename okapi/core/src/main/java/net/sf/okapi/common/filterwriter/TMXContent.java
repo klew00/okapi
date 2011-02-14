@@ -89,15 +89,15 @@ public class TMXContent {
 	 * into account, the attribute <code>creationtool</code> must be set to "OmegaT".
 	 * @param value true to use workarounds, false to not use workarounds.
 	 */
-	public void setOmegaTWorkarounds (boolean value) {
+	public void setLetterCodedMode (boolean value) {
 		codeMode = CODEMODE_LETTERCODED;
 	}
 	
 	/**
-	 * Indicates if this formatter is set to output work-arounds specific to OmegaT.
+	 * Indicates if this formatter is set to output letter-coded content.
 	 * @return true if the formatter is set for OmegaT.
 	 */
-    public boolean getOmegaTWorkarounds () {
+    public boolean getLetterCodedMode () {
     	return (codeMode == CODEMODE_LETTERCODED);
     }
 	
