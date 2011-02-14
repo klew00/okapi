@@ -153,6 +153,23 @@ public class XLIFFFilterTest {
 	}
 
 	@Test
+	public void testCDATAEntry () {
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+			+ "<xliff version=\"1.2\">"
+			+ "<file source-language=\"en\" target-language=\"fr\" datatype=\"x-test\" original=\"file.ext\">"
+			+ "<body>"
+			+ "<trans-unit id=\"1\">"
+			+ "<source>t1.<![CDATA[ t2 & ]]>.t3</source>"
+			+ "</trans-unit>"
+			+ "</body>"
+			+ "</file></xliff>";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		TextContainer cont = tu.getSource();
+		assertNotNull(tu);
+		assertEquals("[t1. t2 & .t3]", fmt.printSegmentedContent(cont, true));
+	}
+
+	@Test
 	public void testSegmentedEntry () {
 		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
 			+ "<xliff version=\"1.2\">"

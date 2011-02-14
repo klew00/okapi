@@ -82,6 +82,16 @@ public class XLIFFPackageWriter extends BasePackageWriter {
 	}
 	
 	@Override
+	protected void processStartGroup (Event event) {
+		writer.handleEvent(event);
+	}
+	
+	@Override
+	protected void processEndGroup (Event event) {
+		writer.handleEvent(event);
+	}
+	
+	@Override
 	protected void processTextUnit (Event event) {
 		writer.handleEvent(event);
 	}
