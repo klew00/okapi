@@ -21,8 +21,10 @@
 package net.sf.okapi.steps.rainbowkit.xliff;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filterwriter.XLIFFWriter;
 import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.rainbowkit.Manifest;
 import net.sf.okapi.filters.rainbowkit.MergingInfo;
 import net.sf.okapi.steps.rainbowkit.common.BasePackageWriter;
@@ -30,15 +32,23 @@ import net.sf.okapi.steps.rainbowkit.common.BasePackageWriter;
 public class XLIFFPackageWriter extends BasePackageWriter {
 
 	protected XLIFFWriter writer;
+	protected Options options;
 
 	public XLIFFPackageWriter () {
 		super(Manifest.EXTRACTIONTYPE_XLIFF);
+		options = new Options();
 	}
 	
 	@Override
 	protected void processStartBatch () {
 		manifest.setSubDirectories("original", "work", "work", "done", null, false);
+		setTMXPaths(null, null, null, null);
 		super.processStartBatch();
+
+		// Get the options from the parameters
+		if ( !Util.isEmpty(params.getWriterOptions()) ) {
+			options.fromString(params.getWriterOptions());
+		}
 	}
 	
 	@Override
@@ -46,18 +56,22 @@ public class XLIFFPackageWriter extends BasePackageWriter {
 		super.processStartDocument(event);
 		
 		writer = new XLIFFWriter();
+
 		writer.setOptions(manifest.getTargetLocale(), "UTF-8");
 		MergingInfo item = manifest.getItem(docId);
 		String path = manifest.getSourceDirectory() + item.getRelativeInputPath() + ".xlf";
 		writer.setOutput(path); // Not really used, but doesn't hurt just in case
 
-		//TODO: get it from params
-		writer.setPlaceholderMode(true);
+		// Set the writer's options
+		//TODO: Would be easier to use IParameters in XLIFFWriter.
+		writer.setPlaceholderMode(options.getPlaceholderMode());
+		writer.setCopySource(options.getCopySource());
+		writer.setIncludeAltTrans(options.getIncludeAltTrans());
+		writer.setSetApprovedasNoTranslate(options.getSetApprovedAsNoTranslate());
 		
 		StartDocument sd = event.getStartDocument();
 		writer.create(path, null, manifest.getSourceLocale(), manifest.getTargetLocale(),
 			sd.getMimeType(), item.getRelativeInputPath(), null);
-
 	}
 	
 	@Override
@@ -93,7 +107,11 @@ public class XLIFFPackageWriter extends BasePackageWriter {
 	
 	@Override
 	protected void processTextUnit (Event event) {
+		// Skip non-translatable
+		TextUnit tu = event.getTextUnit();
+		
 		writer.handleEvent(event);
+		writeTMXEntries(tu);
 	}
 
 	@Override

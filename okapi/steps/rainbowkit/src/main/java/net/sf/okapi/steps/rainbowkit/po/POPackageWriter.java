@@ -21,6 +21,7 @@
 package net.sf.okapi.steps.rainbowkit.po;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.po.POFilterWriter;
 import net.sf.okapi.filters.po.Parameters;
 import net.sf.okapi.filters.rainbowkit.Manifest;
@@ -38,6 +39,7 @@ public class POPackageWriter extends BasePackageWriter {
 	@Override
 	protected void processStartBatch () {
 		manifest.setSubDirectories("original", "work", "work", "done", null, true);
+		setTMXPaths(null, null, null, null);
 		super.processStartBatch();
 	}
 	
@@ -83,7 +85,12 @@ public class POPackageWriter extends BasePackageWriter {
 	
 	@Override
 	protected void processTextUnit (Event event) {
+		// Skip non-translatable
+		TextUnit tu = event.getTextUnit();
+		if ( !tu.isTranslatable() ) return;
+		
 		writer.handleEvent(event);
+		writeTMXEntries(event.getTextUnit());
 	}
 
 	@Override

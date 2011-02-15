@@ -20,6 +20,8 @@
 
 package net.sf.okapi.steps.rainbowkit.omegat;
 
+import java.io.File;
+
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
@@ -36,6 +38,7 @@ public class OmegaTPackageWriter extends XLIFFPackageWriter {
 	@Override
 	protected void processStartBatch () {
 		manifest.setSubDirectories("original", "source", "target", "done", "tm", true);
+		setTMXPaths(manifest.getPackageRoot()+"omegat"+File.separator+"project_save.tmx", null, null, null);
 		super.processStartBatch();
 	}
 	

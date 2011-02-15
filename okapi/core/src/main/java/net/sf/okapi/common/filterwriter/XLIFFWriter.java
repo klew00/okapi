@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2010 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -87,13 +87,14 @@ public class XLIFFWriter implements IFilterWriter {
 	private String fwInputEncoding; // Used in IFilterWriter mode
 
 	private boolean inFile;
-	private boolean copySource = true;
-	private boolean placeholderMode = false;
-	private boolean setApprovedAsNoTranslate = false;
-	private boolean includeNoTranslate = true;
 	private boolean useSourceForTranslated = false;
-	private boolean includeAltTrans = true;
 
+	private boolean placeholderMode = false;
+	private boolean includeNoTranslate = true;
+	private boolean setApprovedAsNoTranslate = false;
+	private boolean copySource = true;
+	private boolean includeAltTrans = true;
+	
 	/**
 	 * Creates an XLIFF writer object.
 	 */
@@ -144,6 +145,14 @@ public class XLIFFWriter implements IFilterWriter {
 	 */
 	public void setIncludeAltTrans (boolean includeAltTrans) {
 		this.includeAltTrans = includeAltTrans;
+	}
+	
+	/**
+	 * Sets the flag indicating to mark as not translatable all entries that are approved.
+	 * @param setApprovedasNoTranslate true to mark approved entries as not translatable.
+	 */
+	public void setSetApprovedasNoTranslate (boolean setApprovedasNoTranslate) {
+		this.setApprovedAsNoTranslate = setApprovedasNoTranslate;
 	}
 
 	/**

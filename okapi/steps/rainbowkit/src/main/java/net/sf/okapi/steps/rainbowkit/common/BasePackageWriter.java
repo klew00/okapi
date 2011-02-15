@@ -27,11 +27,16 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.annotation.AltTranslation;
+import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.filterwriter.TMXWriter;
+import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 import net.sf.okapi.filters.rainbowkit.Manifest;
@@ -50,6 +55,10 @@ public abstract class BasePackageWriter implements IPackageWriter {
 	protected String tmxPathApproved;
 	protected TMXWriter tmxWriterUnApproved;
 	protected String tmxPathUnApproved;
+	protected TMXWriter tmxWriterAlternates;
+	protected String tmxPathAlternates;
+	protected TMXWriter tmxWriterLeverage;
+	protected String tmxPathLeverage;
 	
 	public BasePackageWriter (String extractionType) {
 		this.extractionType = extractionType;
@@ -163,17 +172,65 @@ public abstract class BasePackageWriter implements IPackageWriter {
 		initializeTMXWriters();
 	}
 	
+	protected void setTMXPaths (String pathApproved,
+		String pathUnApproved,
+		String pathAlternates,
+		String pathLeverage)
+	{
+		if ( pathApproved == null ) {
+			if ( tmxPathApproved == null ) {
+				tmxPathApproved = manifest.getTmDirectory() + "approved.tmx";
+			}
+		}
+		else {
+			tmxPathApproved = pathApproved;
+		}
+		
+		if ( pathUnApproved == null ) {
+			if ( tmxPathUnApproved == null ) {
+				tmxPathUnApproved = manifest.getTmDirectory() + "unapproved.tmx";
+			}
+		}
+		else {
+			tmxPathUnApproved = pathUnApproved;
+		}
+		
+		if ( pathAlternates == null ) {
+			if ( tmxPathAlternates == null ) {
+				tmxPathAlternates = manifest.getTmDirectory() + "alternates.tmx";
+			}
+		}
+		else {
+			tmxPathAlternates = pathAlternates;
+		}
+		
+		if ( pathLeverage == null ) {
+			if ( tmxPathLeverage == null ) {
+				tmxPathLeverage = manifest.getTmDirectory() + "leverage.tmx";
+			}
+		}
+		else {
+			tmxPathLeverage = pathLeverage;
+		}
+		
+	}
+	
 	protected void initializeTMXWriters () {
-		tmxPathApproved = manifest.getTmDirectory()+"approved.tmx";
 		tmxWriterApproved = new TMXWriter(tmxPathApproved);
 		tmxWriterApproved.writeStartDocument(manifest.getSourceLocale(),
 			manifest.getTargetLocale(), getClass().getName(), null, null, null, null);
 
-		tmxPathUnApproved = manifest.getTmDirectory()+"unapproved.tmx";
 		tmxWriterUnApproved = new TMXWriter(tmxPathUnApproved);
 		tmxWriterUnApproved.writeStartDocument(manifest.getSourceLocale(),
 			manifest.getTargetLocale(), getClass().getName(), null, null, null, null);
 
+		tmxWriterAlternates = new TMXWriter(tmxPathAlternates);
+		tmxWriterAlternates.writeStartDocument(manifest.getSourceLocale(),
+			manifest.getTargetLocale(), getClass().getName(), null, null, null, null);
+
+		tmxWriterLeverage = new TMXWriter(tmxPathLeverage);
+		tmxWriterLeverage.writeStartDocument(manifest.getSourceLocale(),
+			manifest.getTargetLocale(), getClass().getName(), null, null, null, null);
 	}
 
 	protected void processEndBatch () {
@@ -186,8 +243,22 @@ public abstract class BasePackageWriter implements IPackageWriter {
 		
 		tmxWriterUnApproved.writeEndDocument();
 		tmxWriterUnApproved.close();
-		if ( tmxWriterApproved.getItemCount() == 0 ) {
+		if ( tmxWriterUnApproved.getItemCount() == 0 ) {
 			File file = new File(tmxPathUnApproved);
+			file.delete();
+		}
+
+		tmxWriterAlternates.writeEndDocument();
+		tmxWriterAlternates.close();
+		if ( tmxWriterAlternates.getItemCount() == 0 ) {
+			File file = new File(tmxPathAlternates);
+			file.delete();
+		}
+		
+		tmxWriterLeverage.writeEndDocument();
+		tmxWriterLeverage.close();
+		if ( tmxWriterLeverage.getItemCount() == 0 ) {
+			File file = new File(tmxPathLeverage);
 			file.delete();
 		}
 	}
@@ -260,11 +331,33 @@ public abstract class BasePackageWriter implements IPackageWriter {
 		// Check if we have a target
 		LocaleId trgLoc = manifest.getTargetLocale();
 		TextContainer tc = tu.getTarget(trgLoc);
-		if (( tc == null ) || ( tc.isEmpty() )) {
+		if ( tc == null ) {
 			return; // No target
 		}
-		if ( tu.getSource().isEmpty() || ( tu.getSource().hasText(false) && !tc.hasText(false) )) {
-			return; // Target has code and/or spaces only
+		if ( !tu.getSource().hasText(false) ) {
+			return; // Empty or no-text source
+		}
+		
+		// Look for annotations
+		// In each segment
+		ISegments srcSegs = tu.getSource().getSegments();
+		for ( Segment seg : tc.getSegments() ) {
+			Segment srcSeg = srcSegs.get(seg.id);
+			if ( srcSeg == null ) continue;
+			writeAltTranslations(seg.getAnnotation(AltTranslationsAnnotation.class), srcSeg.text);
+		}
+		// In the target container
+		TextFragment srcOriginal;
+		if ( tu.getSource().contentIsOneSegment() ) {
+			srcOriginal = tu.getSource().getFirstContent();
+		}
+		else {
+			srcOriginal = tu.getSource().getUnSegmentedContentCopy();
+		}
+		writeAltTranslations(tc.getAnnotation(AltTranslationsAnnotation.class), srcOriginal);
+
+		if ( tc.isEmpty() ) {
+			return; // No target text
 		}
 		
 		// Process translation(s) in the container itself
@@ -277,12 +370,30 @@ public abstract class BasePackageWriter implements IPackageWriter {
 			}
 		}
 		if ( !done ) {
-			// Write existing translation not yet approved
-			tmxWriterUnApproved.writeItem(tu, null);
+			// If un-approved and source == target: don't count it as a translation
+			if ( tu.getSource().compareTo(tc, true) != 0 ) {
+				// Write existing translation not yet approved
+				tmxWriterUnApproved.writeItem(tu, null);
+			}
 		}
-
-		
-		
 	}
 
+	private void writeAltTranslations (AltTranslationsAnnotation ann,
+		TextFragment srcOriginal)
+	{
+		if ( ann == null ) {
+			return;
+		}
+		for ( AltTranslation alt : ann ) {
+			if ( alt.getFromOriginal() ) {
+				// If it's coming from the original it's a true alternate (e.g. XLIFF one)
+				tmxWriterAlternates.writeAlternate(alt, srcOriginal);
+			}
+			else {
+				// Otherwise the translation is from a leveraging step
+				tmxWriterLeverage.writeAlternate(alt, srcOriginal);
+			}
+		}
+	}
+	
 }

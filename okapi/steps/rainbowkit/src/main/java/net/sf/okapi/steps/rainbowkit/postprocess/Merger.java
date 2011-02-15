@@ -171,6 +171,12 @@ public class Merger {
 		while ( filter.hasNext() ) {
 			Event event = filter.next();
 			if ( event.getEventType() == EventType.TEXT_UNIT ) {
+				TextUnit tu = event.getTextUnit();
+				if ( !tu.isTranslatable() ) {
+					// Do not merge the translation for non-translatable
+					writer.handleEvent(event);
+					continue;
+				}
 				return event;
 			}
 			// Else: write out the event

@@ -355,6 +355,11 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 			else n++;
 		}
 		lbTypes.setSelection(n);
+		IParameters p = optStrings.get(n);
+		if ( p != null ) {
+			p.fromString(params.getWriterOptions());
+		}
+		
 		updatePackageType();
 	}
 
@@ -372,8 +377,16 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		params.setPackageName(edPackageName.getText().trim());
 		
 		int n = lbTypes.getSelectionIndex();
+		// Writer type/class
 		params.setWriterClass((String)lbTypes.getData(String.valueOf(n)));
-		
+		// Writer options
+		IParameters p = optStrings.get(n);
+		if ( p != null ) {
+			params.setWriterOptions(p.toString());
+		}
+		else {
+			params.setWriterOptions(null);
+		}
 		result = true;
 		return result;
 	}

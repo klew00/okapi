@@ -66,6 +66,7 @@ public class RTFPackageWriter extends BasePackageWriter {
 	@Override
 	protected void processStartBatch () {
 		manifest.setSubDirectories("original", "work", "work", "done", null, true);
+		setTMXPaths(null, null, null, null);
 		super.processStartBatch();
 	}
 	
@@ -155,6 +156,7 @@ public class RTFPackageWriter extends BasePackageWriter {
 	protected void processTextUnit (Event event) {
 		// Write skeleton and its content
 		writer.write(skelWriter.processTextUnit(event.getTextUnit()));
+		writeTMXEntries(event.getTextUnit());
 	}
 
 	@Override
