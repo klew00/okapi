@@ -516,15 +516,15 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 			}
 			catch ( InstantiationException e ) {
 				throw new OkapiFilterCreationException(
-					String.format("Cannot instantiate afilter from the configuration '%s'", config.configId), e);
+					String.format("Cannot instantiate a filter from the configuration '%s'", config.configId), e);
 			}
 			catch ( IllegalAccessException e ) {
 				throw new OkapiFilterCreationException(
-					String.format("Cannot instantiate afilter from the configuration '%s'", config.configId), e);
+					String.format("Cannot instantiate a filter from the configuration '%s'", config.configId), e);
 			}
 			catch ( ClassNotFoundException e ) {
 				throw new OkapiFilterCreationException(
-					String.format("Cannot instantiate afilter from the configuration '%s'", config.configId), e);
+					String.format("Cannot instantiate a filter from the configuration '%s'", config.configId), e);
 			}
 		}
 		return filter;
