@@ -930,6 +930,58 @@ public class CommaSeparatedValuesFilterTest {
 	}
 	
 	@Test
+	public void testFileEvents4() {		
+		Parameters params = (Parameters) filter.getParameters();
+		
+		InputStream input = TableFilterTest.class.getResourceAsStream("/csv_testh.txt");
+		assertNotNull(input);
+		
+		params.detectColumnsMode = Parameters.DETECT_COLUMNS_NONE;
+		params.removeQualifiers = false;
+		params.trimMode = Parameters.TRIM_NONQUALIFIED_ONLY;
+		//params.trimMode = Parameters.TRIM_NONE;
+		params.wrapMode = WrapMode.NONE;
+		
+		filter.open(new RawDocument(input, "UTF-8", locEN));
+		
+		testEvent(EventType.START_DOCUMENT, null);
+		// Line 1, 2				
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "1");
+		testEvent(EventType.TEXT_UNIT, "\"\"\"eins\"\"\nzwei\"");
+		testEvent(EventType.END_GROUP, null);
+				
+		testEvent(EventType.END_DOCUMENT, null);
+		
+		filter.close();
+	}
+	
+	@Test
+	public void testFileEvents5() {		
+		Parameters params = (Parameters) filter.getParameters();
+		
+		InputStream input = TableFilterTest.class.getResourceAsStream("/csv_testh.txt");
+		assertNotNull(input);
+		
+		params.detectColumnsMode = Parameters.DETECT_COLUMNS_NONE;
+		params.removeQualifiers = false;
+		params.trimMode = Parameters.TRIM_NONE;
+		
+		filter.open(new RawDocument(input, "UTF-8", locEN));
+		
+		testEvent(EventType.START_DOCUMENT, null);
+		// Line 1, 2				
+		testEvent(EventType.START_GROUP, null);
+		testEvent(EventType.TEXT_UNIT, "1");
+		testEvent(EventType.TEXT_UNIT, "\"\"\"eins\"\"\nzwei\"");
+		testEvent(EventType.END_GROUP, null);
+				
+		testEvent(EventType.END_DOCUMENT, null);
+		
+		filter.close();
+	}
+	
+	@Test
 	public void testFileEvents106_3() {
 		
 		Parameters params = (Parameters) filter.getParameters();
