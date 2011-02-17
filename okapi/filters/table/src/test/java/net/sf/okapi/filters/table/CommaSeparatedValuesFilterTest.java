@@ -939,7 +939,6 @@ public class CommaSeparatedValuesFilterTest {
 		params.detectColumnsMode = Parameters.DETECT_COLUMNS_NONE;
 		params.removeQualifiers = false;
 		params.trimMode = Parameters.TRIM_NONQUALIFIED_ONLY;
-		//params.trimMode = Parameters.TRIM_NONE;
 		params.wrapMode = WrapMode.NONE;
 		
 		filter.open(new RawDocument(input, "UTF-8", locEN));
