@@ -33,41 +33,42 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import net.sf.okapi.common.BOMNewlineEncodingDetector;
+import net.sf.okapi.common.ClassUtil;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.IdGenerator;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.encoder.EncoderManager;
-import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
+import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.filterwriter.XLIFFWriter;
-import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
-import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.resource.Property;
-import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.ISegments;
+import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
@@ -216,7 +217,14 @@ public class XLIFFFilter implements IFilter {
 			close();
 			canceled = false;
 
-			XMLInputFactory fact = XMLInputFactory.newInstance();
+			XMLInputFactory fact = null;
+			if (params.getUseCustomParser()) {
+				Class<?> factClass = ClassUtil.getClass(params.getFactoryClass());
+				fact = (XMLInputFactory) factClass.newInstance();
+			}
+			else
+				fact = XMLInputFactory.newInstance();
+			
 			fact.setProperty(XMLInputFactory.IS_COALESCING, true);
 			//Removed for Java 1.6: fact.setProperty(XMLInputFactory2.P_REPORT_PROLOG_WHITESPACE, true);
 			
@@ -281,8 +289,13 @@ public class XLIFFFilter implements IFilter {
 			skel.addValuePlaceholder(startDoc, Property.ENCODING, LocaleId.EMPTY);
 			skel.append("\"?>");
 			startDoc.setSkeleton(skel);
-		}
-		catch ( XMLStreamException e) {
+		}catch ( XMLStreamException e) {
+			throw new OkapiIOException(e);
+			
+		} catch (InstantiationException e) {
+			throw new OkapiIOException(e);
+			
+		} catch (IllegalAccessException e) {
 			throw new OkapiIOException(e);
 		}
 	}

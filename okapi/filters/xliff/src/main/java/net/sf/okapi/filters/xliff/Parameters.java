@@ -41,6 +41,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public static final int TARGETSTATEMODE_EXTRACT = 1;
 	public static final int TARGETSTATEMODE_DONOTEXTRACT = 2;
 
+	private static final String USECUSTOMPARSER = "useCustomParser";
+	private static final String FACTORYCLASS = "factoryClass";
 	private static final String FALLBACKTOID = "fallbackToID";
 	private static final String ADDTARGETLANGUAGE = "addTargetLanguage";
 	private static final String OVERRIDETARGETLANGUAGE = "overrideTargetLanguage";
@@ -51,6 +53,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private static final String TARGETSTATEMODE = "targetStateMode";
 	private static final String TARGETSTATEVALUE = "targetStateValue";
 	
+	private boolean useCustomParser;
+	private String factoryClass;
 	private boolean fallbackToID;
 	private boolean escapeGT;
 	private boolean addTargetLanguage;
@@ -65,6 +69,22 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public Parameters () {
 		reset();
 		toString(); // fill the list
+	}
+
+	public boolean getUseCustomParser() {
+		return useCustomParser;
+	}
+
+	public void setUseCustomParser(boolean useCustomParser) {
+		this.useCustomParser = useCustomParser;
+	}
+
+	public String getFactoryClass() {
+		return factoryClass;
+	}
+
+	public void setFactoryClass(String factoryClass) {
+		this.factoryClass = factoryClass;
 	}
 	
 	public boolean getEscapeGT () {
@@ -148,6 +168,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	}
 
 	public void reset () {
+		useCustomParser = true;
+		factoryClass = "com.ctc.wstx.stax.WstxInputFactory"; // Woodstox XML parser
 		fallbackToID = false;
 		escapeGT = false;
 		addTargetLanguage = true;
@@ -161,8 +183,10 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	}
 
 	public void fromString (String data) {
-		reset();
+		reset();		
 		buffer.fromString(data);
+		useCustomParser = buffer.getBoolean(USECUSTOMPARSER, useCustomParser);
+		factoryClass = buffer.getString(FACTORYCLASS, factoryClass);
 		fallbackToID = buffer.getBoolean(FALLBACKTOID, fallbackToID);
 		escapeGT = buffer.getBoolean(XMLEncoder.ESCAPEGT, escapeGT);
 		addTargetLanguage = buffer.getBoolean(ADDTARGETLANGUAGE, addTargetLanguage);
@@ -178,6 +202,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	@Override
 	public String toString () {
 		buffer.reset();
+		buffer.setBoolean(USECUSTOMPARSER, useCustomParser);
+		buffer.setString(FACTORYCLASS, factoryClass);
 		buffer.setBoolean(FALLBACKTOID, fallbackToID);
 		buffer.setBoolean(XMLEncoder.ESCAPEGT, escapeGT);
 		buffer.setBoolean(ADDTARGETLANGUAGE, addTargetLanguage);
@@ -194,6 +220,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	@Override
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
+		desc.add(USECUSTOMPARSER, "Use a custom XML stream parser", null);
+		desc.add(FACTORYCLASS, "Factory class for the custom XML stream parser", null);
 		desc.add(FALLBACKTOID, "Use the trans-unit id attribute for the text unit name if there is no resname", null);
 		desc.add(IGNOREINPUTSEGMENTATION, "Ignore the segmentation information in the input", null);
 		desc.add(XMLEncoder.ESCAPEGT, "Escape the greater-than characters", null);
@@ -209,6 +237,12 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 
 	public EditorDescription createEditorDescription (ParametersDescription paramDesc) {
 		EditorDescription desc = new EditorDescription("XLIFF Filter Parameters", true, false);
+		
+		CheckboxPart cbp = desc.addCheckboxPart(paramDesc.get(USECUSTOMPARSER));
+		desc.addTextInputPart(paramDesc.get(FACTORYCLASS)).setMasterPart(cbp, true);
+		
+		desc.addSeparatorPart();
+		
 		desc.addCheckboxPart(paramDesc.get(FALLBACKTOID));
 		desc.addCheckboxPart(paramDesc.get(IGNOREINPUTSEGMENTATION));
 
