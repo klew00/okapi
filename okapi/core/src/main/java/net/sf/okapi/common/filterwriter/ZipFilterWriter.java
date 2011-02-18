@@ -62,6 +62,7 @@ public class ZipFilterWriter implements IFilterWriter {
 	private File tempFile;
 	private File tempZip;
 	private EncoderManager encoderManager;
+	private int subDocLevel;
 
 	public ZipFilterWriter (EncoderManager encoderManager) {
 		this.encoderManager = encoderManager;
@@ -148,19 +149,29 @@ public class ZipFilterWriter implements IFilterWriter {
 	public Event handleEvent (Event event) {
 		switch ( event.getEventType() ) {
 		case START_DOCUMENT:
-			processStartDocument((StartDocument)event.getResource());
+			subDocLevel = 0;
+			processStartDocument((StartDocument)event.getResource());			
 			break;
 		case DOCUMENT_PART:
 			processDocumentPart(event);
 			break;
 		case END_DOCUMENT:
 			processEndDocument();
+			subDocLevel = 0;
 			break;
 		case START_SUBDOCUMENT:
-			processStartSubDocument((StartSubDocument)event.getResource());
+			if (subDocLevel == 0)
+				processStartSubDocument((StartSubDocument)event.getResource());
+			else
+				subDocWriter.handleEvent(event);
+			subDocLevel++;
 			break;
 		case END_SUBDOCUMENT:
-			processEndSubDocument((Ending)event.getResource());
+			subDocLevel--;
+			if (subDocLevel == 0)
+				processEndSubDocument((Ending)event.getResource());
+			else
+				subDocWriter.handleEvent(event);
 			break;
 		case TEXT_UNIT:
 		case START_GROUP:
