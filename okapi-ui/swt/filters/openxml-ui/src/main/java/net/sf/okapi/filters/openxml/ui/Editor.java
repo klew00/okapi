@@ -334,8 +334,8 @@ public class Editor implements IParametersEditor, SelectionListener {
 					sRGB = "FF00B050";
 				else if (sColor.equals("purple"))
 					sRGB = "FF7030A0";
-				else if (sColor.equals("FFFF0000"))
-					sRGB = "red";
+				else if (sColor.equals("red"))
+					sRGB = "FFFF0000";
 				else if (sColor.equals("yellow"))
 					sRGB = "FFFFFF00";
 				else if (sColor.equals("dark red"))
