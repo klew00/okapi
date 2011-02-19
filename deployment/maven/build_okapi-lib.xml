@@ -283,16 +283,6 @@
 		   <fileset dir="../shared/licenses" includes="**/snakeyaml-*"/>
 		</copy>
 
-<!--		<property name="dep005" value="${mavenStore}/com/h2database/h2/1.1.103"/>
-		<fileset id="list.contents" dir="${dep005}"
-		 includes="**/h2-1.1.103.jar"/>
-		<property name="jar005" refid="list.contents"/>
-		<echo file="tmpJars" append="yes"> ${jar005}</echo>
-		<copy todir="${distLib}" file="${dep005}/${jar005}"/>
-		<copy todir="${distLicenses}">
-		   <fileset dir="../shared/licenses" includes="**/h2-*"/>
-		</copy>
--->
 		<property name="dep005bis" value="${mavenStore}/com/h2database/h2/1.2.135"/>
 		<fileset id="list.contents" dir="${dep005bis}"
 		 includes="**/h2-1.2.135.jar"/>
@@ -302,35 +292,6 @@
 		<copy todir="${distLicenses}">
 		   <fileset dir="../shared/licenses" includes="**/h2-*"/>
 		</copy>
-
-<!-- Not needed anymore (opentra using rest api)
-		<property name="dep006" value="${mavenStore}/org/apache/ws/commons/util/ws-commons-util/1.0.2"/>
-		<fileset id="list.contents" dir="${dep006}"
-		 includes="**/ws-commons-util-1.0.2.jar"/>
-		<property name="jar006" refid="list.contents"/>
-		<echo file="tmpJars" append="yes"> ${jar006}</echo>
-		<copy todir="${distLib}" file="${dep006}/${jar006}"/>
-		<copy todir="${distLicenses}">
-		   <fileset dir="../shared/licenses" includes="**/ws-common-*"/>
-		</copy>
-
-		<property name="dep007" value="${mavenStore}/org/apache/xmlrpc/xmlrpc-client/3.1"/>
-		<fileset id="list.contents" dir="${dep007}"
-		 includes="**/xmlrpc-client-3.1.jar"/>
-		<property name="jar007" refid="list.contents"/>
-		<echo file="tmpJars" append="yes"> ${jar007}</echo>
-		<copy todir="${distLib}" file="${dep007}/${jar007}"/>
-		+
-		<property name="dep008" value="${mavenStore}/org/apache/xmlrpc/xmlrpc-common/3.1"/>
-		<fileset id="list.contents" dir="${dep008}"
-		 includes="**/xmlrpc-common-3.1.jar"/>
-		<property name="jar008" refid="list.contents"/>
-		<echo file="tmpJars" append="yes"> ${jar008}</echo>
-		<copy todir="${distLib}" file="${dep008}/${jar008}"/>
-		<copy todir="${distLicenses}">
-		   <fileset dir="../shared/licenses" includes="**/xmlrpc-*"/>
-		</copy>
--->
 
 		<property name="dep009" value="${mavenStore}/com/googlecode/json-simple/json-simple/1.1"/>
 		<fileset id="list.contents" dir="${dep009}"
@@ -396,16 +357,6 @@
 		<property name="jar018" refid="list.contents"/>
 		<echo file="tmpJars" append="yes"> ${jar018}</echo>
 		<copy todir="${distLib}" file="${dep018}/${jar018}"/>
-		<!-- + -->
-<!--		<property name="dep019" value="${mavenStore}/org/apache/lucene/lucene-spellchecker/3.0.0"/>
-		<fileset id="list.contents" dir="${dep019}"
-		 includes="**/lucene-spellchecker-3.0.0.jar"/>
-		<property name="jar019" refid="list.contents"/>
-		<echo file="tmpJars" append="yes"> ${jar019}</echo>
-		<copy todir="${distLib}" file="${dep019}/${jar019}"/>
-		<copy todir="${distLicenses}">
-		   <fileset dir="../shared/licenses" includes="**/lucene-*"/>
-		</copy>-->
 
 		<property name="dep020" value="${mavenStore}/com/ibm/icu/icu4j/4.6"/>
 		<fileset id="list.contents" dir="${dep020}"
@@ -437,37 +388,22 @@
 		   <fileset dir="../shared/licenses" includes="**/commons-*"/>
 		</copy>
 
-<!--For xliff-tkit later
-		<property name="dep022" value="${mavenStore}/org/apache/poi/poi-ooxml/3.6"/>
-		<fileset id="list.contents" dir="${dep022}"
-		 includes="**/poi-ooxml-3.6.jar"/>
-		<property name="jar022" refid="list.contents"/>
-		<echo file="tmpJars" append="yes"> ${jar022}</echo>
-		<copy todir="${distLib}" file="${dep022}/${jar022}"/>
-		<copy todir="${distLicenses}">
-		   <fileset dir="../shared/licenses" includes="**/poi-ooxml-*"/>
-		</copy>
-
-		<property name="dep023" value="${mavenStore}/org/apache/poi/poi/3.6"/>
+		<property name="dep023" value="${mavenStore}/org/codehaus/woodstox/woodstox-core-lgpl/4.1.0"/>
 		<fileset id="list.contents" dir="${dep023}"
-		 includes="**/poi-3.6.jar"/>
+		 includes="**/woodstox-core-lgpl-4.1.0.jar"/>
 		<property name="jar023" refid="list.contents"/>
 		<echo file="tmpJars" append="yes"> ${jar023}</echo>
 		<copy todir="${distLib}" file="${dep023}/${jar023}"/>
 		<copy todir="${distLicenses}">
-		   <fileset dir="../shared/licenses" includes="**/poi-*"/>
+		   <fileset dir="../shared/licenses" includes="**/woodstox-*"/>
 		</copy>
-
-		<property name="dep024" value="${mavenStore}/dom4j/dom4j/1.6.1"/>
+		<!-- + -->
+		<property name="dep024" value="${mavenStore}/org/codehaus/woodstox/stax2-api/3.1.0"/>
 		<fileset id="list.contents" dir="${dep024}"
-		 includes="**/dom4j-1.6.1.jar"/>
+		 includes="**/stax2-api-3.1.0.jar"/>
 		<property name="jar024" refid="list.contents"/>
 		<echo file="tmpJars" append="yes"> ${jar024}</echo>
 		<copy todir="${distLib}" file="${dep024}/${jar024}"/>
-		<copy todir="${distLicenses}">
-		   <fileset dir="../shared/licenses" includes="**/dom4j-*"/>
-		</copy>
--->
 
 		<!-- Create the manifest file -->
 		<property file="tmpJars"/>

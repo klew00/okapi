@@ -367,8 +367,13 @@ public class POFilterWriter implements IFilterWriter {
 			}
 			
 			// Fuzzy
-			if ( prop != null ) {
-				if ( !prop.getValue().equals("yes") ) {
+			if ( !makePOT ) {
+				if ( prop != null ) {
+					if ( !prop.getValue().equals("yes") ) {
+						writer.write("#, fuzzy"+linebreak);
+					}
+				}
+				else if ( forExtractMerge && (( tc != null ) && !tc.isEmpty() )) {
 					writer.write("#, fuzzy"+linebreak);
 				}
 			}

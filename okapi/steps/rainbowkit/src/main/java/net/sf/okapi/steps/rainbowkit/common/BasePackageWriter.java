@@ -22,6 +22,7 @@ package net.sf.okapi.steps.rainbowkit.common;
 
 import java.io.File;
 import java.io.OutputStream;
+import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
@@ -44,6 +45,8 @@ import net.sf.okapi.filters.rainbowkit.MergingInfo;
 import net.sf.okapi.steps.rainbowkit.creation.Parameters;
 
 public abstract class BasePackageWriter implements IPackageWriter {
+
+	protected final Logger logger = Logger.getLogger(getClass().getName());
 
 	protected Parameters params;
 	protected Manifest manifest;
@@ -81,9 +84,10 @@ public abstract class BasePackageWriter implements IPackageWriter {
 		LocaleId trgLoc,
 		String inputRoot,
 		String packageId,
-		String projectId)
+		String projectId,
+		String creatorParams)
 	{
-		manifest.setInformation(packageRoot, srcLoc, trgLoc, inputRoot, packageId, projectId);
+		manifest.setInformation(packageRoot, srcLoc, trgLoc, inputRoot, packageId, projectId, creatorParams);
 	}
 
 	public String getMainOutputPath () {
@@ -234,6 +238,10 @@ public abstract class BasePackageWriter implements IPackageWriter {
 	}
 
 	protected void processEndBatch () {
+		if ( params.getOutputManifest() ) {
+			manifest.Save();
+		}
+
 		tmxWriterApproved.writeEndDocument();
 		tmxWriterApproved.close();
 		if ( tmxWriterApproved.getItemCount() == 0 ) {
@@ -268,9 +276,7 @@ public abstract class BasePackageWriter implements IPackageWriter {
 	}
 
 	protected void processEndBatchItem () {
-		if ( params.getOutputManifest() ) {
-			manifest.Save();
-		}
+		// Do nothing by default
 	}
 
 	@Override

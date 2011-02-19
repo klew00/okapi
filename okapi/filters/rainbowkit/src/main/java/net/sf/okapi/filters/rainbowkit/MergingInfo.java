@@ -39,6 +39,7 @@ public class MergingInfo implements IAnnotation {
 	private String inputEncoding;
 	private String relativeTargetPath;
 	private String targetEncoding;
+	private String resourceId; // Use in some packages
 
 	/**
 	 * Creates a new merging information file object with no settings.
@@ -107,6 +108,14 @@ public class MergingInfo implements IAnnotation {
 		return targetEncoding;
 	}
 	
+	public String getResourceId () {
+		return resourceId;
+	}
+	
+	public void setResourceId (String resourceId) {
+		this.resourceId = resourceId;
+	}
+	
 	/**
 	 * Creates a string output of the XML representation of the information.
 	 * The output file must be UTF-8.
@@ -126,6 +135,10 @@ public class MergingInfo implements IAnnotation {
 			Util.escapeToXML(relativeTargetPath, 3, false, null).replace('\\', '/'),
 			targetEncoding
 		));
+		if ( !Util.isEmpty(resourceId) ) {
+			sb.append(String.format(" resourceId=\"%s\"", resourceId));
+		}
+
 		if ( filterParameters == null ) {
 			// Empty element
 			sb.append(" />");
@@ -181,6 +194,10 @@ public class MergingInfo implements IAnnotation {
 		if ( tmp.isEmpty() ) info.targetEncoding = info.inputEncoding;
 		else info.targetEncoding = tmp;
 		
+		tmp = element.getAttribute("resourceId");
+		if ( !tmp.isEmpty() ) info.resourceId = tmp;
+		// Else: null
+
 		// Read the content (filter parameters data)
 		tmp = Util.getTextContent(element);
 		if ( !tmp.isEmpty() ) {

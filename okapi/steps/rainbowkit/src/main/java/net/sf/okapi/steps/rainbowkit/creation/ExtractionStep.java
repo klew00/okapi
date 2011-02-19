@@ -135,7 +135,8 @@ outputRoot = rootDir;
 			String packageId = UUID.randomUUID().toString();
 			String projectId = Util.makeId(params.getPackageName()+srcLoc.toString()+trgLoc.toString());
 
-			writer.setBatchInformation(resolvedOutputDir, srcLoc, trgLoc, inputRoot, packageId, projectId);
+			writer.setBatchInformation(resolvedOutputDir, srcLoc, trgLoc, inputRoot,
+				packageId, projectId, params.getWriterOptions());
 		}
 		catch ( InstantiationException e ) {
 			throw new RuntimeException("Error creating writer class.", e);

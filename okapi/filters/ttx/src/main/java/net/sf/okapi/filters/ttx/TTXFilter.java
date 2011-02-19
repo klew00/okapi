@@ -71,7 +71,7 @@ public class TTXFilter implements IFilter {
 	private final static String ORIGIN = "Origin";
 	
 	// Characters no considered as 'text' in TTX (for un-segmented entries)
-	private final static String TTXNOTEXTCHARS = "\u00a0~`!@#$%^&*()_+=-{[}]|\\:;\"'<,>.?/";
+	private final static String TTXNOTEXTCHARS = "\u00a0~`!@#$%^&*()_+=-{[}]|\\:;\"'<,>.?/\u2022\u2013";
 	
 	private final static String TARGETLANGUAGE_ATTR = "TargetLanguage";
 	private final Logger logger = Logger.getLogger(getClass().getName());

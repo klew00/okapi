@@ -29,6 +29,7 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import net.sf.okapi.common.Base64;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.LocaleId;
@@ -49,6 +50,7 @@ public class Manifest implements IAnnotation {
 	public static final String EXTRACTIONTYPE_PO = "po";
 	public static final String EXTRACTIONTYPE_RTF = "rtf";
 	public static final String EXTRACTIONTYPE_OMEGAT = "omegat";
+	public static final String EXTRACTIONTYPE_TRANSIFEX = "transifex";
 
 	public static final String VERSION = "2";
 	public static final String MANIFEST_FILENAME = "manifest";
@@ -71,6 +73,7 @@ public class Manifest implements IAnnotation {
 	private String targetDir;
 	private String mergeDir;
 	private String tmDir;
+	private String creatorParams;
 
 	public Manifest () {
 		docs = new LinkedHashMap<Integer, MergingInfo>();
@@ -105,6 +108,10 @@ public class Manifest implements IAnnotation {
 	
 	public LocaleId getTargetLocale () {
 		return targetLoc;
+	}
+	
+	public String getCreatorParameters () {
+		return creatorParams;
 	}
 	
 	/**
@@ -204,7 +211,8 @@ public class Manifest implements IAnnotation {
 		LocaleId trgLoc,
 		String inputRoot,
 		String packageId,
-		String projectId)
+		String projectId,
+		String creatorParams)
 	{
 		this.sourceLoc = srcLoc;
 		this.targetLoc = trgLoc;
@@ -213,6 +221,7 @@ public class Manifest implements IAnnotation {
 		this.packageId = packageId;
 		this.projectId = projectId;
 		updateFullDirectories();
+		this.creatorParams = creatorParams;
 	}
 	
 	/**
@@ -269,6 +278,12 @@ public class Manifest implements IAnnotation {
 			writer.writeAttributeString("date", DF.format(new java.util.Date()));
 			writer.writeLineBreak();
 
+			// creatorParams
+			writer.writeStartElement("creatorParameters");
+			writer.writeString(Base64.encodeString(creatorParams.toString()));
+			writer.writeEndElementLineBreak();
+			
+			// Infor for the documents
 			for ( MergingInfo item : docs.values() ) {
 				writer.writeRawXML(item.writeToXML("doc", true));
 				writer.writeLineBreak();
@@ -331,6 +346,18 @@ public class Manifest implements IAnnotation {
 		    tmp = elem.getAttribute("tmSubDir");
 		    if ( Util.isEmpty(tmp) ) tmSubDir = "";
 		    else tmSubDir = tmp.replace('/', File.separatorChar);
+		    
+		    // creatorParameters
+		    
+		    NL = elem.getElementsByTagName("creatorParameters");
+		    if ( NL.getLength() > 0 ) {
+		    	creatorParams = Base64.decodeString(Util.getTextContent(NL.item(0)));
+		    }
+		    else {
+		    	creatorParams = "";
+		    }
+		    
+		    // Documents
 
 		    docs.clear();
 		    NL = elem.getElementsByTagName("doc");

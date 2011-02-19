@@ -22,5 +22,6 @@
         <module>lib-beans</module>
         <module>lib-reporting</module>
         <module>lib-omegat</module>
+        <module>lib-transifex</module>
     </modules>
 </project>

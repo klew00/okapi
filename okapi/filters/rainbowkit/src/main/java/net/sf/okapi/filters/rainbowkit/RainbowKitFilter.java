@@ -48,6 +48,7 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
 import net.sf.okapi.filters.po.POFilter;
 import net.sf.okapi.filters.rtf.RTFFilter;
 import net.sf.okapi.filters.xliff.XLIFFFilter;
+import net.sf.okapi.lib.transifex.TransifexClient;
 
 @UsingParameters() // No parameters
 public class RainbowKitFilter implements IFilter {
@@ -64,8 +65,8 @@ public class RainbowKitFilter implements IFilter {
 	private Iterator<Integer> iter;
 	private IFilter filter;
 	private RTFFilter rtfFilter;
-	private String extension;
 	private boolean hasMoreDoc;
+	private TransifexClient cli;
 	
 	public RainbowKitFilter () {
 	}
@@ -238,6 +239,8 @@ public class RainbowKitFilter implements IFilter {
 	}
 
 	private void startDocument () {
+		File file = null;
+		String extension = null;
 		// Pick the filter to use (if any)
 		if ( info.getExtractionType().equals(Manifest.EXTRACTIONTYPE_XLIFF) ) {
 			filter = new XLIFFFilter();
@@ -258,11 +261,17 @@ public class RainbowKitFilter implements IFilter {
 			queue.add(Event.NOOP_EVENT);
 			return;
 		}
+		else if ( info.getExtractionType().equals(Manifest.EXTRACTIONTYPE_TRANSIFEX) ) {
+			file = downloadFromTransifex(info);
+			filter = new POFilter();
+		}
 		else {
 			throw new OkapiIOException("Unsupported extraction type: "+info.getExtractionType());
 		}
 		
-		File file = new File(manifest.getTargetDirectory()+info.getRelativeInputPath()+extension);
+		if ( file == null ) {
+			file = new File(manifest.getTargetDirectory()+info.getRelativeInputPath()+extension);
+		}
 		RawDocument rd = new RawDocument(file.toURI(), info.getInputEncoding(),
 			manifest.getSourceLocale(), manifest.getTargetLocale());
 			
@@ -354,4 +363,39 @@ public class RainbowKitFilter implements IFilter {
 			}
 		}
 	}
+	
+	private File downloadFromTransifex (MergingInfo info) {
+		// Check if we have a resource id
+		if ( Util.isEmpty(info.getResourceId()) ) {
+			// No resource id in the info: cannot post-process
+			LOGGER.severe(String.format("The file '%s' does not have an associated Transifex resource id.",
+				info.getRelativeInputPath()));
+			return null;
+		}
+		
+		// Initialize the Transifex client if it's not done yet
+		if ( cli == null ) {
+			// Get the Transifex setting from the manifest
+			net.sf.okapi.lib.transifex.Parameters prm = new net.sf.okapi.lib.transifex.Parameters();
+			prm.fromString(manifest.getCreatorParameters());
+			// Create the client with those settings
+			cli = new TransifexClient(prm.getServer());
+			cli.setProject(prm.getProjectId());
+			cli.setCredentials(prm.getUser(), prm.getPassword(), "TODO");
+		}
+		
+		// Set the path of the output
+		// This file will be the one merged after it's downloaded
+		String outputPath = manifest.getTargetDirectory()+info.getRelativeInputPath()+".po";
+		// Retrieve the file
+		String[] res = cli.pullResource(info.getResourceId(), manifest.getTargetLocale(), outputPath);
+		if ( res[0] == null ) {
+			// Could not download the file
+			LOGGER.severe("Cannot pull the resource from Transifex.\n"+res[1]);
+			return null;
+		}
+		File file = new File(outputPath);
+		return file;
+	}
+	
 }

@@ -27,6 +27,7 @@ import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.ISWTEmbeddableParametersEditor;
 import net.sf.okapi.common.ui.OKCancelPanel;
@@ -64,11 +65,13 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 	private Composite mainComposite;
 	private List lbTypes;
 	private Button btOptions;
+	private Button btHelp;
 	private Text edDescription;
 	private GenericEditor gedit;
 	private ArrayList<String> optEditors;
 	private ArrayList<String> writers;
 	private ArrayList<IParameters> optStrings;
+	private ArrayList<String> optMoreInfo;
 	private IContext context;
 	
 	public boolean edit (IParameters params,
@@ -167,23 +170,33 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 	private void createComposite (Composite parent) {
 		optEditors = new ArrayList<String>();
 		optStrings = new ArrayList<IParameters>();
+		optMoreInfo = new ArrayList<String>();
 		writers = new ArrayList<String>();
 		// XLIFF options
 		optEditors.add("net.sf.okapi.steps.rainbowkit.xliff.Options");
-		optStrings.add(createParameters(optEditors.get(0)));
+		optStrings.add(createParameters(optEditors.get(optEditors.size()-1)));
+		optMoreInfo.add("Rainbow TKit - Generic XLIFF"); // wiki page
 		writers.add("net.sf.okapi.steps.rainbowkit.xliff.XLIFFPackageWriter");
 		// PO options
 		optEditors.add(null);
 		optStrings.add(null);
+		optMoreInfo.add("Rainbow TKit - PO Package"); // wiki page
 		writers.add("net.sf.okapi.steps.rainbowkit.po.POPackageWriter");
 		// RTF options
 		optEditors.add(null);
 		optStrings.add(null);
+		optMoreInfo.add("Rainbow TKit - Original with RTF"); // wiki page
 		writers.add("net.sf.okapi.steps.rainbowkit.rtf.RTFPackageWriter");
 		// OmegaT options
 		optEditors.add(null);
 		optStrings.add(null);
+		optMoreInfo.add("Rainbow TKit - OmegaT Project"); // wiki page
 		writers.add("net.sf.okapi.steps.rainbowkit.omegat.OmegaTPackageWriter");
+		// Transifex options
+		optEditors.add("net.sf.okapi.lib.transifex.Parameters");
+		optStrings.add(createParameters(optEditors.get(optEditors.size()-1)));
+		optMoreInfo.add("Rainbow TKit - Transifex Project"); // wiki page
+		writers.add("net.sf.okapi.steps.rainbowkit.transifex.TransifexPackageWriter");
 
 		mainComposite = new Composite(parent, SWT.BORDER);
 		mainComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -220,11 +233,14 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		lbTypes.add("PO Package");
 		lbTypes.setData("1", "net.sf.okapi.steps.rainbowkit.po.POPackageWriter");
 
-		lbTypes.add("Original + RTF");
+		lbTypes.add("Original with RTF");
 		lbTypes.setData("2", "net.sf.okapi.steps.rainbowkit.rtf.RTFPackageWriter");
 
 		lbTypes.add("OmegaT Project");
 		lbTypes.setData("3", "net.sf.okapi.steps.rainbowkit.omegat.OmegaTPackageWriter");
+
+		lbTypes.add("Transifex Project");
+		lbTypes.setData("4", "net.sf.okapi.steps.rainbowkit.transifex.TransifexPackageWriter");
 
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.heightHint = 70;
@@ -251,8 +267,20 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		edDescription.setEditable(false);
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.heightHint = 60;
+		gdTmp.verticalSpan = 2;
 		edDescription.setLayoutData(gdTmp);
 
+		btHelp = new Button(cmpTmp, SWT.PUSH);
+		btHelp.setText("&More Info");
+		gdTmp = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
+		btHelp.setLayoutData(gdTmp);
+		UIUtil.ensureWidth(btHelp, 80);
+		btHelp.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				callMoreInfo();
+			}
+		});
+		
 		//--- Location tab
 		
 		cmpTmp = new Composite(tabs, SWT.NONE);
@@ -289,13 +317,17 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 			btOptions.setEnabled(false);
 			edDescription.setText("Set of PO files. You can translate this package with anu PO editor.");
 			break;
-		case 2: // Original + RTF
+		case 2: // Original with RTF
 			btOptions.setEnabled(false);
 			edDescription.setText("Package where all the files to translate are converted into an RTF file with Trados-compatible styles.\nYou can translate this package with Trados Translator's Workbench or any compatible tool.");
 			break;
 		case 3: // OmegaT
 			btOptions.setEnabled(false);
 			edDescription.setText("OmegaT project with all its files and directory structure in place.\nYou can translate this package with OmegaT.");
+			break;
+		case 4: // Transifex
+			btOptions.setEnabled(optEditors.get(n)!=null);
+			edDescription.setText("Populate an on-line Transifex project.");
 			break;
 		}
 	}
@@ -329,6 +361,17 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 			}
 			// Else: Save the data
 			optStrings.set(n, p);
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+	}
+	
+	private void callMoreInfo () {
+		try {
+			int n = lbTypes.getSelectionIndex();
+			if ( n == -1 ) return;
+			Util.openWikiTopic(optMoreInfo.get(n));
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getMessage(), null);

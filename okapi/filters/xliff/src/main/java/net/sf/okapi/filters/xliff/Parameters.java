@@ -238,11 +238,6 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public EditorDescription createEditorDescription (ParametersDescription paramDesc) {
 		EditorDescription desc = new EditorDescription("XLIFF Filter Parameters", true, false);
 		
-		CheckboxPart cbp = desc.addCheckboxPart(paramDesc.get(USECUSTOMPARSER));
-		desc.addTextInputPart(paramDesc.get(FACTORYCLASS)).setMasterPart(cbp, true);
-		
-		desc.addSeparatorPart();
-		
 		desc.addCheckboxPart(paramDesc.get(FALLBACKTOID));
 		desc.addCheckboxPart(paramDesc.get(IGNOREINPUTSEGMENTATION));
 
@@ -282,9 +277,13 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		lsp.setChoicesLabels(labels2);
 		
 		CheckboxPart cbp1 = desc.addCheckboxPart(paramDesc.get(ADDALTTRANS));
-		CheckboxPart cbp2 = desc.addCheckboxPart(paramDesc.get(INCLUDEEXTENSIONS));
-		cbp2.setMasterPart(cbp1, true);
+		desc.addCheckboxPart(paramDesc.get(INCLUDEEXTENSIONS)).setMasterPart(cbp1, true);
 
+		desc.addSeparatorPart();
+		
+		CheckboxPart cbp = desc.addCheckboxPart(paramDesc.get(USECUSTOMPARSER));
+		desc.addTextInputPart(paramDesc.get(FACTORYCLASS)).setMasterPart(cbp, true);
+		
 		return desc;
 	}
 

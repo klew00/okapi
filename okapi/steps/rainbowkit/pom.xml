@@ -30,6 +30,11 @@
 		<artifactId>okapi-filter-po</artifactId>
 		<version>${project.version}</version>
 	</dependency>
+	<dependency>
+		<groupId>net.sf.okapi.lib</groupId>
+		<artifactId>okapi-lib-transifex</artifactId>
+		<version>${project.version}</version>
+	</dependency>        
 		
      <!-- For test -->
 	<dependency>

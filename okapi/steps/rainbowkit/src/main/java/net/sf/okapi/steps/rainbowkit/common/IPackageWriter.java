@@ -39,7 +39,8 @@ public interface IPackageWriter extends IFilterWriter {
 		LocaleId trgLoc,
 		String inputRoot,
 		String packageId,
-		String projectId);
+		String projectId,
+		String creatorParams);
 	
 	public void setDocumentInformation (String relativeInputPath,
 		String filterConfigId,

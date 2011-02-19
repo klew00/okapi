@@ -291,8 +291,8 @@ public class RawDocument implements IResource {
 						+ ((url == null) ? "URL is null" : url.toString()), e);
 			} catch (IOException e) {
 				throw new OkapiIOException(
-						"Could not open the URL. The URL is OK but the input stream could not be opened. "
-								+ "Possible problem closing the previous stream.", e);
+						"Could not open the URL. The URL is OK but the input stream could not be opened.\n"
+						+ e.getMessage(), e);
 			}
 		} else {
 			if (createdStream == null) {
@@ -301,7 +301,7 @@ public class RawDocument implements IResource {
 			} else {
 				// createStream.reset() didn't work above so we throw an exception. No way to safely reset this stream
 				throw new OkapiIOException(
-						"Second call to getStream() with InputStream. Cannot reset stream");
+					"Second call to getStream() with InputStream. Cannot reset stream.");
 			}
 		}
 
