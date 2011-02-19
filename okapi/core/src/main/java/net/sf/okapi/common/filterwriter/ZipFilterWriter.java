@@ -305,8 +305,10 @@ public class ZipFilterWriter implements IFilterWriter {
 			throw new RuntimeException(e);
 		}
 		
-		// Instantiate the filter writer for that entry
-		subDocWriter = createSubDocumentFilterWriter(res);
+		// Instantiate the filter writer for that entry if not set from outside with setSubDocWriter()
+		if (subDocWriter == null) {
+			subDocWriter = createSubDocumentFilterWriter(res);
+		}			
 		subDocWriter.setOutput(tempFile.getAbsolutePath());
 				
 		StartDocument sd = convertToStartDocument(res);
@@ -318,6 +320,10 @@ public class ZipFilterWriter implements IFilterWriter {
 			// Finish writing the sub-document
 			subDocWriter.handleEvent(new Event(EventType.END_DOCUMENT, res));
 			subDocWriter.close();
+			
+			// Reset subDocWriter, next sub-document might require a different writer
+			// (a default writer will be created if not set from outside)
+			subDocWriter = null;
 
 			// Create the new entry from the temporary output file
 			zipOut.putNextEntry(new ZipEntry(entryName));
@@ -335,5 +341,13 @@ public class ZipFilterWriter implements IFilterWriter {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
+	public IFilterWriter getSubDocWriter() {
+		return subDocWriter;
+	}
+
+	public void setSubDocWriter(IFilterWriter subDocWriter) {
+		this.subDocWriter = subDocWriter;
+		subDocWriter.setOptions(outLoc, "UTF-8");
+	}
 }
