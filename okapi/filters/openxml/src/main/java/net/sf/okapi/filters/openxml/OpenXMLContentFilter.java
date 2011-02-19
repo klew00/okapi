@@ -760,7 +760,10 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 		}
 		if (bInTextBox)
 		{
-			sInsideTextBox += txt;
+			if (txt.equals("<") ) // DWH 2-19-11 for < inside text box
+				sInsideTextBox += "&lt;";
+			else
+				sInsideTextBox += txt;
 			return;
 		}
 		// check for need to modify index in Excel cell pointing to a shared string
