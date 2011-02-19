@@ -908,7 +908,6 @@ public class XLIFFFilterTest {
 		list.add(new InputDocument(root+"SF-12-Test01.xlf", null));
 		list.add(new InputDocument(root+"SF-12-Test02.xlf", null));
 		list.add(new InputDocument(root+"test1_es.xlf", null));
-		list.add(new InputDocument(root+"TS09-12-Test01.xlf", null));		
 		RoundTripComparison rtc = new RoundTripComparison();
 		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, locES));
 	}

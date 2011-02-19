@@ -1037,7 +1037,7 @@ public class XLIFFFilter implements IFilter {
 					name = reader.getLocalName();
 					if ( name.equals(tagName) ) {
 						if ( !current.isEmpty() ) {
-							content.append(current);
+							content.append(current, !content.hasBeenSegmented());
 						}
 						return content;
 					}
