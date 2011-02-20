@@ -24,7 +24,6 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.po.POFilterWriter;
-import net.sf.okapi.filters.po.Parameters;
 import net.sf.okapi.filters.rainbowkit.Manifest;
 import net.sf.okapi.filters.rainbowkit.MergingInfo;
 import net.sf.okapi.lib.transifex.TransifexClient;
@@ -51,31 +50,40 @@ public class TransifexPackageWriter extends BasePackageWriter {
 		super.processEndBatch();
 		
 		// Get the parameters/options for the Transifex project
-		net.sf.okapi.lib.transifex.Parameters options = new net.sf.okapi.lib.transifex.Parameters();
+		Parameters options = new Parameters();
 		// Get the options from the parameters
 		if ( !Util.isEmpty(params.getWriterOptions()) ) {
 			options.fromString(params.getWriterOptions());
 		}
 
 		TransifexClient cli = new TransifexClient(options.getServer());
-		cli.setCredentials(options.getUser(), options.getPassword(), "okapi@opentag.com");
+		cli.setCredentials(options.getUser(), options.getPassword());
 		
-		String[] res = cli.createProject(options.getProjectId(), options.getProjectName(), "TODO short desc", "TODO Long desc");
-		if ( res[0] == null ) {
+		String[] res1 = cli.createProject(options.getProjectId(), options.getProjectName(), "TODO short desc", "TODO Long desc");
+		if ( res1[0] == null ) {
 			// Could not create the project
-			logger.severe(res[1]);
+			logger.severe(res1[1]);
 			return;
 		}
 		for ( int id : manifest.getItems().keySet() ) {
 			MergingInfo info = manifest.getItem(id);
 			String poPath = manifest.getSourceDirectory() + info.getRelativeInputPath() + ".po";
-			res = cli.putResource(poPath, manifest.getSourceLocale());
-			if ( res[0] != null ) {
-				info.setResourceId(res[1]);
+			String resourceFile = Util.getFilename(poPath, true);
+			res1 = cli.putSourceResource(poPath, manifest.getSourceLocale(), resourceFile);
+			if ( res1[0] == null ) {
+				logger.severe(res1[1]);
+				return;
 			}
-			else {
-				logger.severe(res[1]);
+			// Else: set the resource id
+			info.setResourceId(res1[1]);
+			
+			// Try to put the translated resource
+			poPath = makeTargetPath(info);
+			String[] res2 = cli.putTargetResource(poPath, manifest.getTargetLocale(), res1[1], resourceFile);
+			if ( res2[0] == null ) {
+				logger.severe(res2[1]);
 			}
+			
 		}
 		
 		// Save the manifest again (for the esourceId)
@@ -90,7 +98,7 @@ public class TransifexPackageWriter extends BasePackageWriter {
 
 		// Set the source POT file
 		potWriter = new POFilterWriter();
-		Parameters params = (Parameters)potWriter.getParameters();
+		net.sf.okapi.filters.po.Parameters params = (net.sf.okapi.filters.po.Parameters)potWriter.getParameters();
 		params.outputGeneric = true;
 		potWriter.setMode(true, true);
 		potWriter.setOptions(manifest.getSourceLocale(), "UTF-8");
@@ -101,19 +109,12 @@ public class TransifexPackageWriter extends BasePackageWriter {
 
 		// Set the target PO file
 		trgWriter = new POFilterWriter();
-		params = (Parameters)trgWriter.getParameters();
+		params = (net.sf.okapi.filters.po.Parameters)trgWriter.getParameters();
 		params.outputGeneric = true;
 		trgWriter.setMode(true, false);
 		trgWriter.setOptions(manifest.getTargetLocale(), "UTF-8");
 		
-		String ex = Util.getExtension(item.getRelativeInputPath());
-		String sd = Util.getDirectoryName(item.getRelativeInputPath());
-		String fn = Util.getFilename(item.getRelativeInputPath(), false);
-		path = manifest.getSourceDirectory()
-			+ ( sd.isEmpty() ? "" : sd + "/" )
-			+ fn + "_" + manifest.getTargetLocale().toPOSIXLocaleId()
-			+ ex + ".po";
-		
+		path = makeTargetPath(item);
 		trgWriter.setOutput(path);
 		
 		potWriter.handleEvent(event);
@@ -177,4 +178,14 @@ public class TransifexPackageWriter extends BasePackageWriter {
 		return getClass().getName();
 	}
 
+	private String makeTargetPath (MergingInfo item) {
+		String ex = Util.getExtension(item.getRelativeInputPath());
+		String sd = Util.getDirectoryName(item.getRelativeInputPath());
+		String fn = Util.getFilename(item.getRelativeInputPath(), false);
+		
+		return manifest.getSourceDirectory()
+			+ ( sd.isEmpty() ? "" : sd + "/" )
+			+ fn + "_" + manifest.getTargetLocale().toPOSIXLocaleId()
+			+ ex + ".po";
+	}
 }

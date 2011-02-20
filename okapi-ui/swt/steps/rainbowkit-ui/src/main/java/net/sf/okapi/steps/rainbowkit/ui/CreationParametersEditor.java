@@ -193,7 +193,7 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		optMoreInfo.add("Rainbow TKit - OmegaT Project"); // wiki page
 		writers.add("net.sf.okapi.steps.rainbowkit.omegat.OmegaTPackageWriter");
 		// Transifex options
-		optEditors.add("net.sf.okapi.lib.transifex.Parameters");
+		optEditors.add("net.sf.okapi.steps.rainbowkit.transifex.Parameters");
 		optStrings.add(createParameters(optEditors.get(optEditors.size()-1)));
 		optMoreInfo.add("Rainbow TKit - Transifex Project"); // wiki page
 		writers.add("net.sf.okapi.steps.rainbowkit.transifex.TransifexPackageWriter");

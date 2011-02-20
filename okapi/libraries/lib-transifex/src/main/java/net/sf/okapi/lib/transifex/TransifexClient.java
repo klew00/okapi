@@ -24,7 +24,6 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -59,7 +58,6 @@ public class TransifexClient {
 	private String project;
 	private String credentials;
 	private String username;
-	private String email;
 	private JSONParser parser;
 
 	public TransifexClient (String host) {
@@ -84,16 +82,15 @@ public class TransifexClient {
 	}
 	
 	public void setCredentials (String username,
-		String password,
-		String email)
+		String password)
 	{
 		this.username = username;
-		this.email = email;
 		credentials = "Basic " + Base64.encodeString(username+":"+password);
 	}
 
 	/**
 	 * Creates a new project if one does not exists already.
+	 * If the project exists already it is updated.
 	 * @param projectId the project Id.
 	 * @param name the name of the project.
 	 * @param shortDescription a short description.
@@ -151,30 +148,47 @@ public class TransifexClient {
 	
 	/**
 	 * Add a resource to the current project.
+	 * If the resource exists already it is updated.
 	 * @param poPath the full path of the PO file to add.
 	 * @param srcLoc the locale of the source text.
+	 * @param resourceFile filename of the resource (must be the same for all languages)
+	 * or null to use the filename of the path.
 	 * @return An array of strings: On success 0=redirect path, 1=resource Id.
 	 * On error: 0=null, 1=Error code and message.
 	 */
-	public String[] putResource (String poPath,
-		LocaleId srcLoc)
+	public String[] putSourceResource (String poPath,
+		LocaleId srcLoc,
+		String resourceFile)
 	{
-		String[] res = uploadFile(poPath, srcLoc.toPOSIXLocaleId());
+		String[] res = uploadFile(poPath, srcLoc.toPOSIXLocaleId(), resourceFile);
 		if ( res[0] == null ) {
 			return res; // Could not upload the file
 		}
-		return extractStoredFile(res[0], srcLoc.toPOSIXLocaleId());
+		return extractSourceFromStoredFile(res[0], srcLoc.toPOSIXLocaleId());
 	}
 	
+	public String[] putTargetResource (String poPath,
+		LocaleId srcLoc,
+		String resourceId,
+		String resourceFile)
+	{
+		String[] res = uploadFile(poPath, srcLoc.toPOSIXLocaleId(), resourceFile);
+		if ( res[0] == null ) {
+			return res; // Could not upload the file
+		}
+		return extractTargetFromStoredFile(res[0], srcLoc.toPOSIXLocaleId(), resourceId);
+	}
+	
+	
 	/**
-	 * Pull a resource from the current project.
+	 * Pulls a resource from the current project.
 	 * @param resourceId the id of the resource to pull.
 	 * @param trgLoc the target locale of the resource to pull.
 	 * @param outputPath the output path of the resulting PO file.
 	 * @return an array of strings: On success 0=the output path, 1=the resource id.
 	 * On error 0=null, 1=the code and error message.
 	 */
-	public String[] pullResource (String resourceId,
+	public String[] getResource (String resourceId,
 		LocaleId trgLoc,
 		String outputPath)
 	{
@@ -258,13 +272,13 @@ public class TransifexClient {
 	}
 
 	/**
-	 * Extracts to the repository a file in the storage.
+	 * Extracts a source file from the the storage into the repository.
 	 * <p>The file in storage is removed from storage by Transifex.
 	 * @param uuid the UUID of the file to extract.
 	 * @return String array: On success 0=redirect path to the extracted file, 1=id.
 	 * On error: 0=null, 1=Error code and message.
 	 */
-	public String[] extractStoredFile (String uuid,
+	public String[] extractSourceFromStoredFile (String uuid,
 		String language)
 	{
 		String[] res = new String[2];
@@ -275,6 +289,43 @@ public class TransifexClient {
 			writeData(conn, data);
 
 			// {"strings_added": 0, "strings_updated": 0, "redirect": "/projects/p/Icaria/resource/test03pot/"}
+			int code = conn.getResponseCode();
+			if ( code == RESCODE_OK ) {
+			    JSONObject object = (JSONObject)parser.parse(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+			    res[0] = res[1] = (String)object.get("redirect");
+			    if ( res[1].endsWith("/") ) res[1] = res[1].substring(0, res[1].length()-1);
+			    res[1] = Util.getFilename(res[1], false);
+			}
+			else {
+				res[1] = String.format("Error %d ", code) + conn.getResponseMessage();
+			}
+		}
+		catch ( MalformedURLException e ) {
+			res[1] = e.getMessage();
+		}
+		catch ( IOException e ) {
+			res[1] = e.getMessage();
+		}
+		catch ( ParseException e ) {
+			res[1] = e.getMessage();
+		}
+		
+		return res;
+	}
+
+	public String[] extractTargetFromStoredFile (String uuid,
+		String language,
+		String resourceId)
+	{
+		String[] res = new String[2];
+		try {
+			// %(hostname)s/api/project/%(project)s/resource/%(resource)s/%(language)s/
+			URL url = new URL(host + "api/project/" + project + "/resource/" + resourceId + "/" + language);
+			HttpURLConnection conn = createConnection(url, "PUT");
+			
+			String data = String.format("{\"uuid\": \"%s\"}", uuid);
+			writeData(conn, data);
+
 			int code = conn.getResponseCode();
 			if ( code == RESCODE_OK ) {
 			    JSONObject object = (JSONObject)parser.parse(new InputStreamReader(conn.getInputStream(), "UTF-8"));
@@ -320,16 +371,24 @@ public class TransifexClient {
 	 * Upload a file to the storage.
 	 * <p>The file must be a POT file, in UTF-8 without BOM.
 	 * @param path the path of the POT file to upload. 
-	 * @return an array of strings: On success 0=UUID, 1=name, 2=Resource ID.
+	 * @param resourceFile filename of the resource (must be the same for all languages)
+	 * or null to use the filename of the path.
+	 * @return an array of strings: On success 0=UUID, 1=name, 2=Resource id.
 	 * On error 0=null, 1=error code and message, 2=null.
 	 */
 	public String[] uploadFile (String path,
-		String language)
+		String language,
+		String resourceFile)
 	{
 		FileInputStream fis = null;
 		DataOutputStream dos = null;
 		String[] res = new String[3];
 		try {
+			// Set the default value for the resource file if needed
+			if ( resourceFile == null ) {
+				resourceFile = Util.getFilename(path, true);
+			}
+			
 			// Start by opening the input, making sure it exists
 			fis = new FileInputStream(path);
 			
@@ -344,12 +403,12 @@ public class TransifexClient {
 
 			dos = new DataOutputStream(conn.getOutputStream());
 
-			addFormDataPart("resource", Util.getFilename(path, true), dos);
+			addFormDataPart("resource", resourceFile, dos);
 			addFormDataPart("language", language, dos);
 			
 			dos.writeBytes(HYPHENS + BOUNDARY + LINEBREAK);
 			dos.writeBytes("Content-Disposition: form-data; name=\"uploaded_file\";"
-				+ " filename=\"" + Util.getFilename(path, true) + "\"" + LINEBREAK);
+				+ " filename=\"" + resourceFile + "\"" + LINEBREAK);
 			dos.writeBytes("Content-Type: application/octet-stream"
 				+ LINEBREAK + LINEBREAK);
 			

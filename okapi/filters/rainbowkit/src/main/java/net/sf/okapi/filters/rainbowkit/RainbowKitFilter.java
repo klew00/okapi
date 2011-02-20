@@ -381,14 +381,14 @@ public class RainbowKitFilter implements IFilter {
 			// Create the client with those settings
 			cli = new TransifexClient(prm.getServer());
 			cli.setProject(prm.getProjectId());
-			cli.setCredentials(prm.getUser(), prm.getPassword(), "TODO");
+			cli.setCredentials(prm.getUser(), prm.getPassword());
 		}
 		
 		// Set the path of the output
 		// This file will be the one merged after it's downloaded
 		String outputPath = manifest.getTargetDirectory()+info.getRelativeInputPath()+".po";
 		// Retrieve the file
-		String[] res = cli.pullResource(info.getResourceId(), manifest.getTargetLocale(), outputPath);
+		String[] res = cli.getResource(info.getResourceId(), manifest.getTargetLocale(), outputPath);
 		if ( res[0] == null ) {
 			// Could not download the file
 			LOGGER.severe("Cannot pull the resource from Transifex.\n"+res[1]);

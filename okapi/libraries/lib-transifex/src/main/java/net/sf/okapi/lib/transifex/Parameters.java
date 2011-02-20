@@ -30,13 +30,11 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 
 	private static final String SERVER = "server";
 	private static final String PROJECTID = "projectId";
-	private static final String PROJECTNAME = "projectName";
 	private static final String USER = "user";
 	private static final String PASSWORD = "password";
 	
 	private String server;
 	private String projectId;
-	private String projectName;
 	private String user;
 	private String password;
 	
@@ -55,7 +53,6 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.fromString(data);
 		server = buffer.getString(SERVER, server);
 		projectId = buffer.getString(PROJECTID, projectId);
-		projectName = buffer.getString(PROJECTNAME, projectName);
 		user = buffer.getString(USER, user);
 		password = buffer.getString(PASSWORD, password);
 	}
@@ -65,7 +62,6 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		// Default
 		server = "http://www.transifex.net/";
 		projectId = "";
-		projectName = "";
 		user = "";
 		password = "";
 	}
@@ -75,7 +71,6 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.reset();
 		buffer.setString(SERVER, server);
 		buffer.setString(PROJECTID, projectId);
-		buffer.setString(PROJECTNAME, projectName);
 		buffer.setString(USER, user);
 		buffer.setString(PASSWORD, password);
 		return buffer.toString();
@@ -103,14 +98,6 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.projectId = projectId;
 	}
 
-	public String getProjectName () {
-		return projectName;
-	}
-
-	public void setProjectName (String projectName) {
-		this.projectName = projectName;
-	}
-
 	public String getUser () {
 		return user;
 	}
@@ -134,7 +121,6 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.add(USER, "User name", "User name to login");
 		desc.add(PASSWORD, "Password", "Password to login");
 		desc.add(PROJECTID, "ProjectId", "Identifier of the project (case sensitive)");
-		desc.add(PROJECTNAME, "ProjectName", "Name of the project");
 		return desc;
 	}
 
@@ -146,7 +132,6 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		TextInputPart tip = desc.addTextInputPart(paramsDesc.get(PASSWORD));
 		tip.setPassword(true);
 		desc.addTextInputPart(paramsDesc.get(PROJECTID));
-		desc.addTextInputPart(paramsDesc.get(PROJECTNAME));
 		return desc;
 	}
 
