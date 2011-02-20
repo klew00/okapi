@@ -120,7 +120,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.add(SERVER, "Server URL", "Full URL of the server (e.g. http://www.transifex.net/)");
 		desc.add(USER, "User name", "User name to login");
 		desc.add(PASSWORD, "Password", "Password to login");
-		desc.add(PROJECTID, "ProjectId", "Identifier of the project (case sensitive)");
+		desc.add(PROJECTID, "Project ID", "Identifier of the project (case sensitive)");
 		return desc;
 	}
 

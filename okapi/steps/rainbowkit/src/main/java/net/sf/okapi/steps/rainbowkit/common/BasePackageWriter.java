@@ -176,11 +176,20 @@ public abstract class BasePackageWriter implements IPackageWriter {
 		initializeTMXWriters();
 	}
 	
-	protected void setTMXPaths (String pathApproved,
+	protected void setTMXInfo (boolean generate,
+		String pathApproved,
 		String pathUnApproved,
 		String pathAlternates,
 		String pathLeverage)
 	{
+		if ( !generate ) {
+			tmxPathApproved = null;
+			tmxPathUnApproved = null;
+			tmxPathAlternates = null;
+			tmxPathLeverage = null;
+			return;
+		}
+		
 		if ( pathApproved == null ) {
 			if ( tmxPathApproved == null ) {
 				tmxPathApproved = manifest.getTmDirectory() + "approved.tmx";
@@ -220,21 +229,29 @@ public abstract class BasePackageWriter implements IPackageWriter {
 	}
 	
 	protected void initializeTMXWriters () {
-		tmxWriterApproved = new TMXWriter(tmxPathApproved);
-		tmxWriterApproved.writeStartDocument(manifest.getSourceLocale(),
-			manifest.getTargetLocale(), getClass().getName(), null, null, null, null);
+		if ( tmxPathApproved != null ) {
+			tmxWriterApproved = new TMXWriter(tmxPathApproved);
+			tmxWriterApproved.writeStartDocument(manifest.getSourceLocale(),
+				manifest.getTargetLocale(), getClass().getName(), null, null, null, null);
+		}
 
-		tmxWriterUnApproved = new TMXWriter(tmxPathUnApproved);
-		tmxWriterUnApproved.writeStartDocument(manifest.getSourceLocale(),
-			manifest.getTargetLocale(), getClass().getName(), null, null, null, null);
+		if ( tmxPathUnApproved != null ) {
+			tmxWriterUnApproved = new TMXWriter(tmxPathUnApproved);
+			tmxWriterUnApproved.writeStartDocument(manifest.getSourceLocale(),
+				manifest.getTargetLocale(), getClass().getName(), null, null, null, null);
+		}
 
-		tmxWriterAlternates = new TMXWriter(tmxPathAlternates);
-		tmxWriterAlternates.writeStartDocument(manifest.getSourceLocale(),
-			manifest.getTargetLocale(), getClass().getName(), null, null, null, null);
+		if ( tmxPathAlternates != null ) {
+			tmxWriterAlternates = new TMXWriter(tmxPathAlternates);
+			tmxWriterAlternates.writeStartDocument(manifest.getSourceLocale(),
+				manifest.getTargetLocale(), getClass().getName(), null, null, null, null);
+		}
 
-		tmxWriterLeverage = new TMXWriter(tmxPathLeverage);
-		tmxWriterLeverage.writeStartDocument(manifest.getSourceLocale(),
-			manifest.getTargetLocale(), getClass().getName(), null, null, null, null);
+		if ( tmxPathLeverage != null ) {
+			tmxWriterLeverage = new TMXWriter(tmxPathLeverage);
+			tmxWriterLeverage.writeStartDocument(manifest.getSourceLocale(),
+				manifest.getTargetLocale(), getClass().getName(), null, null, null, null);
+		}
 	}
 
 	protected void processEndBatch () {
@@ -242,32 +259,40 @@ public abstract class BasePackageWriter implements IPackageWriter {
 			manifest.Save();
 		}
 
-		tmxWriterApproved.writeEndDocument();
-		tmxWriterApproved.close();
-		if ( tmxWriterApproved.getItemCount() == 0 ) {
-			File file = new File(tmxPathApproved);
-			file.delete();
+		if ( tmxWriterApproved != null ) {
+			tmxWriterApproved.writeEndDocument();
+			tmxWriterApproved.close();
+			if ( tmxWriterApproved.getItemCount() == 0 ) {
+				File file = new File(tmxPathApproved);
+				file.delete();
+			}
 		}
 		
-		tmxWriterUnApproved.writeEndDocument();
-		tmxWriterUnApproved.close();
-		if ( tmxWriterUnApproved.getItemCount() == 0 ) {
-			File file = new File(tmxPathUnApproved);
-			file.delete();
+		if ( tmxWriterUnApproved != null ) {
+			tmxWriterUnApproved.writeEndDocument();
+			tmxWriterUnApproved.close();
+			if ( tmxWriterUnApproved.getItemCount() == 0 ) {
+				File file = new File(tmxPathUnApproved);
+				file.delete();
+			}
 		}
 
-		tmxWriterAlternates.writeEndDocument();
-		tmxWriterAlternates.close();
-		if ( tmxWriterAlternates.getItemCount() == 0 ) {
-			File file = new File(tmxPathAlternates);
-			file.delete();
+		if ( tmxWriterAlternates != null ) {
+			tmxWriterAlternates.writeEndDocument();
+			tmxWriterAlternates.close();
+			if ( tmxWriterAlternates.getItemCount() == 0 ) {
+				File file = new File(tmxPathAlternates);
+				file.delete();
+			}
 		}
 		
-		tmxWriterLeverage.writeEndDocument();
-		tmxWriterLeverage.close();
-		if ( tmxWriterLeverage.getItemCount() == 0 ) {
-			File file = new File(tmxPathLeverage);
-			file.delete();
+		if ( tmxWriterLeverage != null ) {
+			tmxWriterLeverage.writeEndDocument();
+			tmxWriterLeverage.close();
+			if ( tmxWriterLeverage.getItemCount() == 0 ) {
+				File file = new File(tmxPathLeverage);
+				file.delete();
+			}
 		}
 	}
 
@@ -371,7 +396,9 @@ public abstract class BasePackageWriter implements IPackageWriter {
 		if ( tu.hasTargetProperty(trgLoc, Property.APPROVED) ) {
 			if ( tu.getTargetProperty(trgLoc, Property.APPROVED).getValue().equals("yes") ) {
 				// Write existing translation that was approved
-				tmxWriterApproved.writeItem(tu, null);
+				if ( tmxWriterApproved != null ) {
+					tmxWriterApproved.writeItem(tu, null);
+				}
 				done = true;
 			}
 		}
@@ -379,7 +406,9 @@ public abstract class BasePackageWriter implements IPackageWriter {
 			// If un-approved and source == target: don't count it as a translation
 			if ( tu.getSource().compareTo(tc, true) != 0 ) {
 				// Write existing translation not yet approved
-				tmxWriterUnApproved.writeItem(tu, null);
+				if ( tmxWriterUnApproved != null ) {
+					tmxWriterUnApproved.writeItem(tu, null);
+				}
 			}
 		}
 	}
@@ -393,11 +422,15 @@ public abstract class BasePackageWriter implements IPackageWriter {
 		for ( AltTranslation alt : ann ) {
 			if ( alt.getFromOriginal() ) {
 				// If it's coming from the original it's a true alternate (e.g. XLIFF one)
-				tmxWriterAlternates.writeAlternate(alt, srcOriginal);
+				if ( tmxWriterAlternates != null ) {
+					tmxWriterAlternates.writeAlternate(alt, srcOriginal);
+				}
 			}
 			else {
 				// Otherwise the translation is from a leveraging step
-				tmxWriterLeverage.writeAlternate(alt, srcOriginal);
+				if ( tmxWriterLeverage != null ) {
+					tmxWriterLeverage.writeAlternate(alt, srcOriginal);
+				}
 			}
 		}
 	}

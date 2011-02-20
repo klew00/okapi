@@ -103,6 +103,7 @@ public class LeveragingStep extends BasePipelineStep {
 	
 	@Override
 	protected Event handleEndBatch (Event event) {
+		if ( !params.getLeverage() ) return event;
 		logger.info(String.format("\nTotals:\nProcesseed segments = %d", totalCount));
 		logger.info(String.format("Best matches that are exact = %d", exactCount));
 		logger.info(String.format("Best matches that are fuzzy = %d", fuzzyCount));

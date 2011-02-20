@@ -22,6 +22,7 @@ package net.sf.okapi.steps.rainbowkit.transifex;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.po.POFilterWriter;
 import net.sf.okapi.filters.rainbowkit.Manifest;
@@ -41,14 +42,15 @@ public class TransifexPackageWriter extends BasePackageWriter {
 	@Override
 	protected void processStartBatch () {
 		manifest.setSubDirectories("original", "uploads", "downloads", "done", null, true);
-		setTMXPaths(null, null, null, null);
+		setTMXInfo(false, null, null, null, null);
 		super.processStartBatch();
 	}
 
 	@Override
 	protected void processEndBatch () {
 		super.processEndBatch();
-		
+		XMLWriter report = null;
+
 		// Get the parameters/options for the Transifex project
 		Parameters options = new Parameters();
 		// Get the options from the parameters
@@ -56,9 +58,27 @@ public class TransifexPackageWriter extends BasePackageWriter {
 			options.fromString(params.getWriterOptions());
 		}
 
+		// Start HTML page with links
+		String reportPath = manifest.getPackageRoot()+"linksToTransifex.html";
+		report = new XMLWriter(reportPath);
+		report.writeStartDocument();
+		report.writeRawXML("<h1>Transifex Package Summary</h1>");
+		report.writeLineBreak();
+		report.writeRawXML(String.format("<p>Resources uploaded to Transifex in the project "
+			+ "<b><a target='_blank' href='%s'>%s</a></b></p>",
+			options.getServer() + "projects/p/" + options.getProjectId() + "/",
+			options.getProjectName()));
+		report.writeLineBreak();
+		report.writeRawXML("<table border='1' cellspacing='0' cellpadding='5'>");
+		report.writeRawXML("<tr><th>Transifex Resource</th><th>Original Source File</th></tr>");
+		report.writeLineBreak();
+
+		// Create the Transifex client and initialize it
 		TransifexClient cli = new TransifexClient(options.getServer());
+		cli.setProject(options.getProjectId());
 		cli.setCredentials(options.getUser(), options.getPassword());
 		
+		// Create the project
 		String[] res1 = cli.createProject(options.getProjectId(), options.getProjectName(), "TODO short desc", "TODO Long desc");
 		if ( res1[0] == null ) {
 			// Could not create the project
@@ -68,7 +88,14 @@ public class TransifexPackageWriter extends BasePackageWriter {
 		for ( int id : manifest.getItems().keySet() ) {
 			MergingInfo info = manifest.getItem(id);
 			String poPath = manifest.getSourceDirectory() + info.getRelativeInputPath() + ".po";
+			
+			// Compute the resource filename to use in Transifex
 			String resourceFile = Util.getFilename(poPath, true);
+			String subdir = Util.getDirectoryName(info.getRelativeInputPath());
+			if ( !subdir.isEmpty() ) {
+				resourceFile = Util.makeId(subdir) + "_" + resourceFile;
+			}
+			
 			res1 = cli.putSourceResource(poPath, manifest.getSourceLocale(), resourceFile);
 			if ( res1[0] == null ) {
 				logger.severe(res1[1]);
@@ -77,19 +104,36 @@ public class TransifexPackageWriter extends BasePackageWriter {
 			// Else: set the resource id
 			info.setResourceId(res1[1]);
 			
+			// Write the link to the resource in the HTML file
+			report.writeRawXML(String.format("<tr><td><a target='_blank' href=\"%s\">%s</a></td>",
+				options.getServer()+res1[0].substring(1), resourceFile));
+			report.writeRawXML(String.format("<td>%s</td></tr>", info.getRelativeInputPath()));
+			report.writeLineBreak();
+			
 			// Try to put the translated resource
 			poPath = makeTargetPath(info);
 			String[] res2 = cli.putTargetResource(poPath, manifest.getTargetLocale(), res1[1], resourceFile);
 			if ( res2[0] == null ) {
 				logger.severe(res2[1]);
 			}
-			
+		
 		}
+		
+		report.writeRawXML("</table>");
+		report.writeRawXML("<p>For more information about this package, see: "
+			+ "<a target='_blank' href='http://www.opentag.com/okapi/wiki/index.php?title=Rainbow_TKit_-_Transifex_Project'>"
+			+ "Rainbow TKit - Transifex Project</a>.");
+		report.writeRawXML("<p><font size='2'>Note: This report was generated when creating the translation package, "
+			+ "the Transifex project may have been updated with other files since.</font></p>");
+		report.close();
 		
 		// Save the manifest again (for the esourceId)
 		if ( params.getOutputManifest() ) {
 			manifest.Save();
 		}
+
+		Util.openURL("file:///"+reportPath);
+		
 	}
 	
 	@Override

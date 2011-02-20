@@ -69,7 +69,7 @@ public class Parameters extends net.sf.okapi.lib.transifex.Parameters {
 	@Override
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = super.getParametersDescription();
-		desc.add(PROJECTNAME, "ProjectName", "Name of the project");
+		desc.add(PROJECTNAME, "Project name", "Name of the project");
 		return desc;
 	}
 
