@@ -94,14 +94,8 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 		super.component_init();
 		
 		// Initialization
-		if (params.useCodeFinder && codeFinder != null) {
-			
-			codeFinder.reset();
-			List<String> rules = ListUtil.stringAsList(params.codeFinderRules, "\n");
-			
-			for (String rule : rules)
-				codeFinder.addRule(rule);
-			
+		if ( params.useCodeFinder && ( codeFinder != null )) {
+			codeFinder.fromString(params.codeFinderRules);
 			codeFinder.compile();
 		}
 	}
