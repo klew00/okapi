@@ -96,7 +96,7 @@ public class OpenXMLRoundTripTest {
 		themfiles.add("EndGroup.docx");
 		themfiles.add("Practice2.docx");
 		themfiles.add("Hangs.docx");
-//Missing file in SVN		themfiles.add("TestLTinsideBoxFails.docx");
+		themfiles.add("TestLTinsideBoxFails.docx");
 
 //		themfiles.add("2008FinancialsDecember.xlsx");
 //		themfiles.add("welfarelesson_new_skin_Mar3.pptx");	
