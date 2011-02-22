@@ -163,9 +163,9 @@ public class MIFEncoder implements IEncoder {
 		switch ( value ) {
 		case '\t': token = "Tab"; break;
 		case '\u00a0': token = "HardSpace"; break;
-		case '\u2010': token = "SoftHypen"; break;
-		case '\u2011': token = "HardHypen"; break;
-		case '\u00ad': token = "DiscHypen"; break;
+		case '\u2010': token = "SoftHyphen"; break;
+		case '\u2011': token = "HardHyphen"; break;
+		case '\u00ad': token = "DiscHyphen"; break;
 		case '\u200d': token = "NoHypen"; break;
 		case '\u00a2': token = "Cent"; break;
 		case '\u00a3': token = "Pound"; break;
