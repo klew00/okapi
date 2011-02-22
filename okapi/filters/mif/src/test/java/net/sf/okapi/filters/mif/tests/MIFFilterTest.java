@@ -80,11 +80,11 @@ public class MIFFilterTest {
 	@Test
 	public void testSimpleText () {
 		List<Event> list = getEventsFromFile("Test01.mif");
-		TextUnit tu = FilterTestDriver.getTextUnit(list, 186);
+		TextUnit tu = FilterTestDriver.getTextUnit(list, 185);
 		assertNotNull(tu);
 		assertEquals("Line 1\nLine 2", fmt.setContent(tu.getSource().getFirstContent()).toString());
 		
-		tu = FilterTestDriver.getTextUnit(list, 187);
+		tu = FilterTestDriver.getTextUnit(list, 186);
 		assertNotNull(tu);
 		assertEquals("\u00e0=agrave", fmt.setContent(tu.getSource().getFirstContent()).toString());
 	}
@@ -121,7 +121,7 @@ public class MIFFilterTest {
 	@Test
 	public void testSoftHyphen () {
 		String snippet = STARTMIF
-			+ "<ParaLine <TextRectID 20><String `How'><Char SoftHyphen>>"
+			+ "<Unique 123><ParaLine <TextRectID 20><String `How'><Char SoftHyphen>>"
 			+ "<ParaLine <String `ever.'>>"
 			+ ENDMIF;
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
@@ -136,6 +136,16 @@ public class MIFFilterTest {
 		rewriteFile("Test01-v7.mif");
 	}
 	
+//	@Test
+//	public void testDoubleExtraction () throws IOException, URISyntaxException {
+//		// Read all files in the data directory
+//		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
+//		list.add(new InputDocument(root+"Test01.mif", null));
+//
+//		RoundTripComparison rtc = new RoundTripComparison();
+//		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, locEN));
+//	}
+
 	private void rewriteFile (String fileName) {
 		filter.open(new RawDocument(Util.toURI(root+fileName), null, locEN));
 		IFilterWriter writer = filter.createFilterWriter();
@@ -148,16 +158,6 @@ public class MIFFilterTest {
 		filter.close();
 	}
 	
-//	@Test
-//	public void testDoubleExtraction () throws IOException, URISyntaxException {
-//		// Read all files in the data directory
-//		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
-//		list.add(new InputDocument(root+"Test01.mif", null));
-//
-//		RoundTripComparison rtc = new RoundTripComparison();
-//		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, locEN));
-//	}
-
 	private ArrayList<Event> getEventsFromFile (String filename) {
 		ArrayList<Event> list = new ArrayList<Event>();
 		filter.open(new RawDocument(Util.toURI(root+filename), null, locEN));

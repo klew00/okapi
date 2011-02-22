@@ -25,10 +25,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Stack;
 import java.util.logging.Logger;
 
 import net.sf.okapi.common.BOMAwareInputStream;
@@ -39,12 +45,14 @@ import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.encoder.EncoderManager;
+import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
+import net.sf.okapi.common.filters.InlineCodeFinder;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.DocumentPart;
@@ -72,8 +80,7 @@ public class MIFFilter implements IFilter {
 	private static final String TOPSTATEMENTSTOSKIP = "ColorCatalog;ConditionCatalog;BoolCondCatalog;"
 		+ "CombinedFontCatalog;PgfCatalog;ElementDefCatalog;FmtChangeListCatalog;DefAttrValuesCatalog;"
 		+ "AttrCondExprCatalog;FontCatalog;RulingCatalog;TblCatalog;KumihanCatalog;Views;VariableFormats;"
-		+ "MarkerTypeCatalog;XRefFormats;Document;BookComponent;InitialAutoNums;Dictionary;AFrames;" //Tbls;"
-		+ "Page";
+		+ "MarkerTypeCatalog;XRefFormats;Document;BookComponent;InitialAutoNums;Dictionary;AFrames;Page";
 
 	private String lineBreak;
 	private String docName;
@@ -82,6 +89,7 @@ public class MIFFilter implements IFilter {
 	private StringBuilder strBuffer;
 	private int tuId;
 	private int otherId;
+	private int grpId;
 	private boolean canceled;
 	private LinkedList<Event> queue;
 	private LocaleId srcLang;
@@ -98,6 +106,14 @@ public class MIFFilter implements IFilter {
 	private int tableGroupLevel;
 	private int rowGroupLevel;
 	private int cellGroupLevel;
+	private int fnoteGroupLevel;
+	private Stack<String> parentIds;
+	private InlineCodeFinder codeFinder;
+	private ByteBuffer byteBuffer;
+	private CharsetDecoder chsDecoder;
+	private ArrayList<String> textFlows; 
+	private ArrayList<String> tables;
+	private boolean secondPass;
 	
 	private static Hashtable<String, String> initCharTable () {
 		Hashtable<String, String> table = new Hashtable<String, String>();
@@ -123,6 +139,12 @@ public class MIFFilter implements IFilter {
 		return table;
 	}
 
+	public MIFFilter () {
+		codeFinder = new InlineCodeFinder();
+		codeFinder.addRule("<\\$.*?>");
+		codeFinder.compile();
+	}
+
 	@Override
 	public void cancel () {
 		canceled = true;
@@ -136,6 +158,7 @@ public class MIFFilter implements IFilter {
 				reader = null;
 			}
 			hasNext = false;
+			docName = null;
 		}
 		catch ( IOException e ) {
 			throw new OkapiIOException(e);
@@ -197,48 +220,72 @@ public class MIFFilter implements IFilter {
 		boolean generateSkeleton)
 	{
 		close();
-		setOptions(input.getSourceLocale(), input.getTargetLocale(),
-			DEFENCODING, generateSkeleton);
+		if (( input.getInputURI() == null ) && ( input.getInputCharSequence() == null )) {
+			// Can do this currently because of the double pass
+			throw new OkapiBadFilterInputException("Direct stream input not supported for MIF.");
+		}
 		
+		srcLang = input.getSourceLocale();
 		if ( input.getInputURI() != null ) {
 			docName = input.getInputURI().getPath();
 		}
 		
 		input.setEncoding(DEFENCODING);
-		open(input.getStream());
+		chsDecoder = Charset.forName(DEFENCODING).newDecoder();
+		byteBuffer = ByteBuffer.allocate(4);
+		
+		open(input.getStream(), input);
 	}
 	
-	private void setOptions (LocaleId sourceLocale,
-		LocaleId targetLocale,
-		String defaultEncoding,
-		boolean generateSkeleton)
-	{
-		srcLang = sourceLocale;
+	
+	private void initialize () {
+		tagBuffer = new StringBuilder();
+		strBuffer = new StringBuilder();
+		paraBuf = new StringBuilder();
+		tuId = 0;
+		otherId = 0;
+		grpId = 0;
+		canceled = false;
+		hasNext = true;
+		inBlock = 0;
+		blockLevel = 0;
+//		version = "";
+		lineBreak = "\n"; //TODO: Get from input file
+		tableGroupLevel = -1;
+		rowGroupLevel = -1;
+		cellGroupLevel = -1;
+		fnoteGroupLevel = -1;
+		sdId = "sd1";
+		parentIds = new Stack<String>();
+		parentIds.push(sdId);
 	}
-
-	private void open (InputStream input) {
+	
+	private void open (InputStream input,
+		RawDocument rd)
+	{
 		try {
+			//--- First pass: gather information
+			
 			// Detect encoding
 			Object[] res = guessEncoding(input);
 			reader = new BufferedReader(new InputStreamReader((InputStream)res[0], (String)res[1]));
+			initialize();
+			secondPass = false;
+			textFlows = new ArrayList<String>();
+			tables = new ArrayList<String>();
+			gatherExtractionInformation();
+			reader.close();
+			input.close();
+
+			//--- Second pass: extract
 			
-			tagBuffer = new StringBuilder();
-			strBuffer = new StringBuilder();
-			paraBuf = new StringBuilder();
-			tuId = 0;
-			otherId = 0;
-			canceled = false;
-			hasNext = true;
-			inBlock = 0;
-			blockLevel = 1;
-//			version = "";
-			lineBreak = "\n"; //TODO: Get from input file
-			tableGroupLevel = -1;
-			rowGroupLevel = -1;
-			cellGroupLevel = -1;
+			secondPass = true;
+			input = rd.getStream();
+			res = guessEncoding(input);
+			reader = new BufferedReader(new InputStreamReader((InputStream)res[0], (String)res[1]));
+			initialize();
 			
 			queue = new LinkedList<Event>();
-			sdId = "sd1";
 			StartDocument startDoc = new StartDocument(sdId);
 			startDoc.setName(docName);
 			startDoc.setLineBreak(lineBreak);
@@ -249,6 +296,7 @@ public class MIFFilter implements IFilter {
 			startDoc.setFilterWriter(createFilterWriter());
 			startDoc.setType(getMimeType());
 			startDoc.setMimeType(getMimeType());
+
 			queue.add(new Event(EventType.START_DOCUMENT, startDoc));
 		}
 		catch ( UnsupportedEncodingException e ) {
@@ -309,13 +357,13 @@ public class MIFFilter implements IFilter {
 			
 			// Check if we are still processing a TextFlow 
 			if ( inBlock > 0 ) {
-				processBlock();
+				processBlock(inBlock);
 				return;
 			}
 			else { //TODO: remove this test when done
 				if ( blockLevel != 1 ) {
 					//throw new OkapiIOException("inBlock at 0 should have blockLevel at 1.");
-					blockLevel = 1;
+//					blockLevel = 0;
 				}
 			}
 			
@@ -328,21 +376,24 @@ public class MIFFilter implements IFilter {
 					
 				case '<': // Start of statement
 					skel.append((char)c);
+					blockLevel++;
 					String tag = readTag(true, true, null);
 					//TODO: dispatch according tags
 					if ( TOPSTATEMENTSTOSKIP.indexOf(tag) > -1 ) {
 						skipOverContent(true, null);
+						blockLevel--;
 					}
 					else if ( "TextFlow".equals(tag) ) {
-						processBlock();
+						processBlock(blockLevel);
 						return;
 					}
 					else if ( "Tbls".equals(tag) ) {
-						processBlock();
+						processBlock(blockLevel);
 						return;
 					}
 					else if ( "MIFFile".equals(tag) ) {
 						MIFToken token = getNextTokenInStatement(true);
+						if ( token.isLast() ) blockLevel--;
 						if ( token.getType() == MIFToken.TYPE_STRING ) {
 							//version = token.getString();
 						}
@@ -353,6 +404,7 @@ public class MIFFilter implements IFilter {
 					else {
 						// Default: skip over
 						skipOverContent(true, null);
+						blockLevel--;
 					}
 					// Flush the skeleton from time to time to allow very large files
 					queue.add(new Event(EventType.DOCUMENT_PART,
@@ -362,6 +414,7 @@ public class MIFFilter implements IFilter {
 					
 				case '>': // End of statement
 					skel.append((char)c);
+					blockLevel--;
 					// Return skeleton
 					DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false, skel); 
 					queue.add(new Event(EventType.DOCUMENT_PART, dp));
@@ -379,11 +432,211 @@ public class MIFFilter implements IFilter {
 			throw new OkapiIOException(e);
 		}
 
-		// Else: we are done
-		queue.add(new Event(EventType.END_DOCUMENT,
-			new Ending(String.valueOf(++otherId))));
+//		// Else: we are done
+//		queue.add(new Event(EventType.END_DOCUMENT,
+//			new Ending(String.valueOf(++otherId))));
 	}
 
+	/*
+	 * LeftMasterPage
+	 * RightMasterPage
+	 * OtherMasterPage
+	 * ReferencePage
+	 * BodyPage
+	 * HiddenPage
+	 */
+	private void gatherExtractionInformation () {
+		try {
+			int c;
+			MIFToken token;
+			boolean inEscape = false;
+			boolean inString = false;
+			ArrayList<String> toTRExtract = new ArrayList<String>();
+			ArrayList<String> tblIds = new ArrayList<String>();
+
+			while ( true ) {
+				
+				int res = -1;
+				while ( res == -1 ) {
+					c = reader.read();
+					// Parse a string content
+					if ( inString ) {
+						if ( c == '\'' ) inString = false;
+						continue;
+					}
+					// Else: we are outside a string
+					if ( inEscape ) {
+						inEscape = false;
+					}
+					else {
+						switch ( c ) {
+						case -1:
+							return; // No more data
+						case '`':
+							inString = true;
+							break;
+						case '\\':
+							inEscape = true;
+							break;
+						case '<':
+							blockLevel++;
+							res = 1;
+							break;
+						case '>':
+							blockLevel--;
+							res = 0;
+							break;
+						}
+					}
+				}
+				// Res can be 0 or 1 here
+				
+				if ( res == 1 ) {
+					// We reached an opening <
+					// Get the tag name
+					String tag = readTag(false, false, null);
+					if ( tag.equals("Page") ) {
+						// If it's a Page: get the first TextRect id and the type
+						String pageType = null;
+						String textRectId = null;
+						
+						while ( true ) {
+							tag = readUntil("PageType;TextRect;", false, blockLevel);
+							if ( tag == null ) {
+								// One of PageType or TextRect was not in the page
+								break;
+							}
+							// Else it's a PageType or a TextRect
+							if ( tag.equals("PageType") ) {
+								token = getNextTokenInStatement(false);
+								if ( token.isLast() ) blockLevel--;
+								if ( token.getType() == MIFToken.TYPE_STRING ) {
+									pageType = token.getString();
+								}
+								else {
+									// Error: Missing page type value.
+									throw new OkapiIOException("Missing PageType value.");
+								}
+								if ( textRectId != null ) break;
+							}
+							else if ( tag.equals("TextRect") ) {
+								while ( true ) {
+									tag = readUntil("ID", false, blockLevel);
+									if ( tag != null ) {
+										// Found
+										token = getNextTokenInStatement(false);
+										if ( token.isLast() ) blockLevel--;
+										if ( token.getType() == MIFToken.TYPE_STRING ) {
+											textRectId = token.getString();
+										}
+										else {
+											// Error: Missing ID value
+											throw new OkapiIOException("Missing ID value.");
+										}
+									}
+									else {
+										// Error ID not found
+										throw new OkapiIOException("ID statement not found.");
+									}
+									break;
+								}
+								if ( pageType != null ) break;
+							}
+						
+						} // End of while
+						
+						// We have looked at the page data
+						if ( !Util.isEmpty(pageType) && !Util.isEmpty(textRectId) ) {
+							if ( pageType.equals("BodyPage") ) {
+								toTRExtract.add(textRectId);
+							}
+						}
+					}
+					else if ( tag.equals("TextFlow") ) {
+						// Check which text flows have table reference,
+						// So we know which one to extract during the second pass
+						String textRectId = null;
+						String unique = null;
+						boolean textRectDone = false;
+						
+						// Next harvest the Para groups
+						// to get the first TextRectID and all ATbl in the ParaLine entries
+						int tfLevel = blockLevel;
+						while ( true ) {
+							
+							if ( readUntil("Para", false, tfLevel) == null ) {
+								break; // Done
+							}
+							tblIds.clear(); // Hold all table references for this paragraph
+
+							// Get the unique id for the text flow: the unique id of the first Para
+							tag = readUntil("Unique", false, blockLevel);
+							if ( tag == null ) {
+								// Error: Unique ID missing
+								throw new OkapiIOException("Missing unique id for the text flow.");
+							}
+							token = getNextTokenInStatement(false);
+							if ( token.isLast() ) blockLevel--;
+							if ( token.getType() != MIFToken.TYPE_STRING ) {
+								throw new OkapiIOException("Missing unique id value for the text flow.");
+							}
+							unique = token.getString();
+
+							// Inside a Para:
+							while ( true ) {
+								if ( readUntil("ParaLine", false, blockLevel) == null ) {
+									break; // Done for this Para
+								}
+								// Else: inside a ParaLine
+								while ( true ) {
+									tag = readUntil("TextRectID;ATbl", false, blockLevel);
+									if ( tag == null ) {
+										break; // Done
+									}
+									if ( !textRectDone && tag.equals("TextRectID") ) {
+										token = getNextTokenInStatement(false);
+										if ( token.isLast() ) blockLevel--;
+										if ( token.getType() == MIFToken.TYPE_STRING ) {
+											textRectId = token.getString();
+											// A FNote may occur before the Para that holds the key TextRect id
+											// so we don't count them if we are inside a FNote group
+											if ( fnoteGroupLevel == -1 ) {
+												textRectDone = true;
+											}
+										}
+									}
+									else if ( tag.equals("ATbl") ) {
+										token = getNextTokenInStatement(false);
+										if ( token.isLast() ) blockLevel--;
+										if ( token.getType() == MIFToken.TYPE_STRING ) {
+											tblIds.add(token.getString());
+										}
+									}
+								}
+							}
+							
+							// Check the TextRect id against the ones found for the pages
+							if ( toTRExtract.contains(textRectId) ) {
+								// This text flow is to be extracted
+								// and so are any table referenced in it
+								textFlows.add(unique);
+								tables.addAll(tblIds);
+							}
+						}
+						
+					}
+				}
+				// Else: Ending of statement. Nothing to do
+			}
+		}
+		catch ( IOException e ) {
+			throw new OkapiIOException("Error while gathering extraction information.", e);
+		}
+		finally {
+			
+		}
+	}
+	
 	/**
 	 * Skips over the content of the current statement.
 	 * Normally "<token" has been processed and level for after '<'
@@ -460,18 +713,17 @@ public class MIFFilter implements IFilter {
 	 * Process the first or next entry of a TextFlow statement.
 	 * @throws IOException if a low-level error occurs.
 	 */
-	private void processBlock ()
+	private void processBlock (int stopLevel)
 		throws IOException
 	{
 		// Process one Para statement at a time
-		if ( readUntil("Para", true) != null ) {
-			inBlock++; // We are not done yet with this TextFlow statement
+		if ( readUntil("Para", true, stopLevel) != null ) {
+			inBlock = stopLevel; // We are not done yet with this TextFlow statement
 			processPara();
 			blockLevel--; // Closing the Para statement here
 		}
 		else { // Done
 			inBlock = 0; // We are done
-			// Close 
 		}
 		
 		// If needed, create a document part and return
@@ -537,6 +789,9 @@ public class MIFFilter implements IFilter {
 			// Move to the next text
 			res = readUntilText(paraBuf, true);
 		}
+
+		// Check for inline codes
+		codeFinder.process(tf);
 
 		TextUnit tu = null;
 		if ( tf.hasText() ) {
@@ -686,17 +941,26 @@ public class MIFFilter implements IFilter {
 	}
 
 	/**
-	 * Reads until the end of the current statement or the first occurrence of one 
-	 * of the given statements.
+	 * Reads until the first occurrence of one of the given statements, or (if stopLevel
+	 * is -1) at the end of the current level, or at the end of the given level.
 	 * @param tagNames the list of tag names to stop at.
 	 * @param store true if we store the parsed characters into the skeleton.
+	 * @param stopLevel -1=return if the end of the current blockLevel is reached.
+	 * other values=return if the blockLevel get lower than that value
+	 * False to stop when it reaches 0.
 	 * @return the name of the tag found, or null if none was found.
 	 * @throws IOException if a low-level error occurs.
 	 */
 	private String readUntil (String tagNames,
-		boolean store)
+		boolean store,
+		int stopLevel)
 		throws IOException
 	{
+		int endNow = stopLevel;
+		if ( stopLevel == -1 ) {
+			endNow = blockLevel;
+		}
+		
 		int c;
 		while ( (c = reader.read()) != -1 ) {
 			if ( store ) {
@@ -704,7 +968,7 @@ public class MIFFilter implements IFilter {
 			}
 			switch ( c ) {
 			case '#':
-				readComment(true, null);
+				readComment(store, null);
 				break;
 
 			case '<': // Start of statement
@@ -716,15 +980,37 @@ public class MIFFilter implements IFilter {
 					}
 					else if ( "Tbl".equals(tag) ) {
 						tableGroupLevel = blockLevel;
-						StartGroup sg = new StartGroup(sdId, String.valueOf(++otherId));
-						sg.setType("table");
-						queue.add(new Event(EventType.START_GROUP, sg));
+						if ( secondPass ) {
+							StartGroup sg = new StartGroup(parentIds.peek());
+							sg.setId(parentIds.push(String.valueOf(++grpId)));
+							sg.setType("table");
+							queue.add(new Event(EventType.START_GROUP, sg));
+						}
 					}
 					else if ( "Row".equals(tag) ) {
 						rowGroupLevel = blockLevel;
-						StartGroup sg = new StartGroup(sdId, String.valueOf(++otherId));
-						sg.setType("row");
-						queue.add(new Event(EventType.START_GROUP, sg));
+						if ( secondPass ) {
+							StartGroup sg = new StartGroup(parentIds.peek());
+							sg.setId(parentIds.push(String.valueOf(++grpId)));
+							sg.setType("row");
+							queue.add(new Event(EventType.START_GROUP, sg));
+						}
+					}
+					else if ( "Cell".equals(tag) ) {
+						cellGroupLevel = blockLevel;
+						if ( secondPass ) {
+							StartGroup sg = new StartGroup(parentIds.peek(), String.valueOf(++grpId));
+							sg.setType("cell");
+							queue.add(new Event(EventType.START_GROUP, sg));
+						}
+					}
+					else if ( "FNote".equals(tag) ) {
+						fnoteGroupLevel = blockLevel;
+						if ( secondPass ) {
+							StartGroup sg = new StartGroup(parentIds.peek(), String.valueOf(++grpId));
+							sg.setType("fn");
+							queue.add(new Event(EventType.START_GROUP, sg));
+						}
 					}
 					else { // Default: skip over
 						if ( !readUntilOpenOrClose(store) ) {
@@ -737,22 +1023,40 @@ public class MIFFilter implements IFilter {
 				break;
 				
 			case '>': // End of statement
-				if ( blockLevel == 1 ) {
-					return null;
-				}
-				else if ( tableGroupLevel == blockLevel ) {
+				if ( tableGroupLevel == blockLevel ) {
 					tableGroupLevel = -1;
-					queue.add(new Event(EventType.END_GROUP, new Ending(String.valueOf(++otherId))));
+					if ( secondPass ) {
+						queue.add(new Event(EventType.END_GROUP, new Ending(String.valueOf(++grpId))));
+						parentIds.pop();
+					}
 				}
 				else if ( rowGroupLevel == blockLevel ) {
 					rowGroupLevel = -1;
-					queue.add(new Event(EventType.END_GROUP, new Ending(String.valueOf(++otherId))));
+					if ( secondPass ) {
+						queue.add(new Event(EventType.END_GROUP, new Ending(String.valueOf(++grpId))));
+						parentIds.pop();
+					}
+				}
+				else if ( cellGroupLevel == blockLevel ) {
+					cellGroupLevel = -1;
+					if ( secondPass ) {
+						queue.add(new Event(EventType.END_GROUP, new Ending(String.valueOf(++grpId))));
+					}
+				}
+				else if ( fnoteGroupLevel == blockLevel ) {
+					fnoteGroupLevel = -1;
+					if ( secondPass ) {
+						queue.add(new Event(EventType.END_GROUP, new Ending(String.valueOf(++grpId))));
+					}
 				}
 				blockLevel--;
+				if ( blockLevel < endNow ) {
+					return null;
+				}
 				break;
 			}
 		}
-		//TODO: we shouldn't exit this way
+		//TODO: we shouldn't exit this way, except when starting at 0
 		return null;
 	}
 	
@@ -803,7 +1107,8 @@ public class MIFFilter implements IFilter {
 	/**
 	 * Reads a tag name.
 	 * @param store true to store the tag codes
-	 * @param sb Not null to store the codes there, null to store in skeleton
+	 * @param storeCharStatement true to store if it's a Char statement.
+	 * @param sb Not null to store there, null to store in the skeleton.
 	 * @return The name of the tag.
 	 * @throws IOException
 	 */
@@ -900,8 +1205,27 @@ public class MIFFilter implements IFilter {
 						strBuffer.append('\'');
 						break;
 					case 'u':
+						// Format: like Java properties
+						c = readHexa(4, false);
+						if ( c != Integer.MAX_VALUE ) {
+							strBuffer.append((char)c);
+						}
+						break;
 					case 'x':
-						//TODO: parse escaped U and X styled chars
+						// Format: \xHH<space>
+						c = readHexa(2, true);
+						if ( c != Integer.MAX_VALUE ) {
+							// The value c is a byte value in the current encoding
+							try {
+								byteBuffer.clear();
+								byteBuffer.put(0, (byte)c);
+								CharBuffer buf = chsDecoder.decode(byteBuffer);
+								strBuffer.append(buf.get(0));
+							}
+							catch ( CharacterCodingException e ) {
+								// Warning
+							}
+						}
 						break;
 					}
 					inEscape = false;
@@ -933,6 +1257,37 @@ public class MIFFilter implements IFilter {
 		throw new OkapiIllegalFilterOperationException("End of string is missing.");
 	}
 
+	private int readHexa (int length,
+		boolean readExtraSpace)
+		throws IOException
+	{
+		tagBuffer.setLength(0);
+
+		// Fill the buffer
+		for ( int i=0; i<length; i++ ) {
+			int c = reader.read();
+			if ( c == -1 ) {
+				throw new OkapiIllegalFilterOperationException("Unexpected end of file.");
+			}
+			tagBuffer.append((char)c);
+		}
+		if ( readExtraSpace ) {
+			reader.read();
+		}
+		
+		// Try to convert
+		try {
+			int n = Integer.valueOf(tagBuffer.toString(), 16);
+			return n;
+		}
+		catch ( NumberFormatException e ) {
+			// Log warning
+		}
+		
+		// Error
+		return Integer.MAX_VALUE;
+	}
+	
 	private Object[] guessEncoding (InputStream input)
 		throws IOException
 	{
