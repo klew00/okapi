@@ -49,7 +49,8 @@ import net.sf.okapi.common.resource.TextFragment.TagType;
  */
 public class VersifiedTextFilter extends AbstractFilter {
 	private static final Logger LOGGER = Logger.getLogger(VersifiedTextFilter.class.getName());
-
+	private static final int BUFFER_SIZE = 128000;
+	
 	public static final String VERSIFIED_TXT_MIME_TYPE = "text/x-versified-txt";
 
 	private static final String VERSE = "^\\|v.+$";
@@ -241,9 +242,9 @@ public class VersifiedTextFilter extends AbstractFilter {
 	private void handleVerse(BufferedReader verse, String currentVerse, String verseNumber)
 			throws IOException {
 		String line = null;
-		StringBuilder source = new StringBuilder(3200);
+		StringBuilder source = new StringBuilder(BUFFER_SIZE);
 		
-		verse.mark(3200);
+		verse.mark(BUFFER_SIZE);
 		while ((line = verse.readLine()) != null) {
 			if (line.matches(VERSE) || line.matches(BOOK) || line.matches(CHAPTER)) {
 				verse.reset();
@@ -251,7 +252,7 @@ public class VersifiedTextFilter extends AbstractFilter {
 			}
 			// Need to capture all line-breaks between lines, even empty (they can be between lines)
 			source.append(line + "\n"); // But use standard line-break in content			
-			verse.mark(3200);
+			verse.mark(BUFFER_SIZE);
 		}
 
 		// take care of worldserver placeholders
