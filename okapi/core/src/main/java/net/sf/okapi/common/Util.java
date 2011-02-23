@@ -709,7 +709,7 @@ public final class Util {
 	 *            the path of the directory to delete
 	 * @param contentOnly
 	 *            indicates if the directory itself should be removed. If this
-	 *            flag is false, only the content is deleted.
+	 *            flag is true, only the content is deleted.
 	 */
 	public static void deleteDirectory (String directory,
 		boolean contentOnly)
