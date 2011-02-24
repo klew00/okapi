@@ -1183,7 +1183,7 @@ public class FilterTestDriver {
 					return false;
 				}
 				if (!tmp1.equals(tmp2)) {
-					System.err.println("Data difference: '" + tmp1 + "' and '" + tmp2 + "'");					
+					System.err.println("Data difference: 1=[" + tmp1 + "] and 2=[" + tmp2 + "]");					
 					return false;
 				}
 			}

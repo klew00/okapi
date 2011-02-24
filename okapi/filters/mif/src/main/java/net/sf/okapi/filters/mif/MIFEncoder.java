@@ -41,7 +41,7 @@ public class MIFEncoder implements IEncoder {
 			ch = text.charAt(i);
 			switch ( text.charAt(i) ) {
 			case '\t':
-				escaped.append("\\t");
+				escaped.append(tryCharStatment(ch)); //"\\t");
 				break;
 			case '>':
 				escaped.append("\\>");
@@ -76,7 +76,7 @@ public class MIFEncoder implements IEncoder {
 	{
 		switch ( value ) {
 		case '\t':
-			return "\\t";
+			return tryCharStatment(value); //"\\t";
 		case '>':
 			return "\\>";
 		case '\'':
@@ -103,7 +103,7 @@ public class MIFEncoder implements IEncoder {
 	{
 		switch ( value ) {
 		case '\t':
-			return "\\t";
+			return tryCharStatment(value); //"\\t";
 		case '>':
 			return "\\>";
 		case '\'':

@@ -38,7 +38,7 @@ public class MIFFilterWriter extends GenericFilterWriter {
 		String defaultEncoding)
 	{
 		// Force the encoding
-		super.setOptions(locale, MIFFilter.DEFENCODING);
+		super.setOptions(locale, defaultEncoding); //MIFFilter.DEFENCODING);
 	}
 
 }

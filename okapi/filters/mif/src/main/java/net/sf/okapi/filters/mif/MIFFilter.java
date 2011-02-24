@@ -55,6 +55,7 @@ import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filters.InlineCodeFinder;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
@@ -742,6 +743,8 @@ public class MIFFilter implements IFilter {
 		paraLevel = 1;
 		paraBuf.setLength(0);
 		paraBufNeeded = false;
+		String endString = null;
+		boolean startString = false;
 
 		// Go to the first ParaLine
 		int res = readUntilText(paraBuf, false);
@@ -763,6 +766,13 @@ public class MIFFilter implements IFilter {
 			
 			if ( Util.isEmpty(text) ) {
 				// Nothing to do, keep on reading
+				if ( paraBuf.length() > 0 ) {
+					if ( res == 1 ) {
+						// We have inline plus an empty string ("<Dummy 1><String`'>")
+						// We remove the empty string "<String `"
+						paraBuf.delete(paraBuf.length()-9, paraBuf.length());
+					}
+				}
 			}
 			else { // We have text
 				if ( first ) { // First text in the fragment: put the codes in the skeleton
@@ -771,19 +781,35 @@ public class MIFFilter implements IFilter {
 				}
 				else { // Put the codes in an inline code 
 					if ( paraBufNeeded && ( paraBuf.length() > 0 )) {
-						tf.append(TagType.PLACEHOLDER, "x", paraBuf.toString());
+						if ( endString == null ) {
+							tf.append(TagType.PLACEHOLDER, "x", paraBuf.toString());
+						}
+						else {
+							tf.append(TagType.PLACEHOLDER, "x", endString + paraBuf.toString());
+							endString = null;
+						}
+						startString = true;
 					}
 				}
 				// Reset the codes buffer for next sequence
 				paraBuf.setLength(0);
 				paraBufNeeded = false;
+				
 				// Set the text
+				if ( startString ) {
+					startString = false;
+					if ( res != 1 ) {
+						List<Code> codes = tf.getCodes();
+						codes.get(codes.size()-1).append("<String `");
+					}
+				}
 				tf.append(text);
 			}
 			
 			// Place the closing of the String
 			if ( res == 1 ) {
-				paraBuf.append("'>");
+				endString = "'>";
+				//paraBuf.append("'>");
 			}
 
 			// Move to the next text
@@ -803,11 +829,17 @@ public class MIFFilter implements IFilter {
 			skel.addContentPlaceholder(tu);
 		}
 		else { // Put back the content/codes in skeleton
+			
 			skel.append(tf.toText());
 		}
 
 		if ( paraBuf.length() > 0 ) {
-			skel.append(paraBuf.toString());
+			if ( endString == null ) {
+				skel.append(paraBuf.toString());
+			}
+			else {
+				skel.append(endString + paraBuf.toString());
+			}
 		}
 		if ( tu != null ) {
 			// New skeleton object for the next parts of the parent statement

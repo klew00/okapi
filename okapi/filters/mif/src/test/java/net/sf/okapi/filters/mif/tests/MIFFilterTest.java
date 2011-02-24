@@ -23,11 +23,13 @@ package net.sf.okapi.filters.mif.tests;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
+import net.sf.okapi.common.filters.RoundTripComparison;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.mif.MIFFilter;
@@ -119,6 +121,56 @@ public class MIFFilterTest {
 	}
 	
 	@Test
+	public void testEmptyString () {
+		String snippet = STARTMIF
+			+ "<Unique 12345><ParaLine <String `Text 1'><Dummy 1><Char ThinSpace><String `'><Dummy 2><String ` end'>>"
+			+ ENDMIF;
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertNotNull(tu);
+		assertEquals("Text 1<1/>\u2009<2/> end", fmt.setContent(tu.getSource().getFirstContent()).toString());
+		Code code = tu.getSource().getFirstContent().getCode(0);
+		assertEquals("'><Dummy 1><String `", code.getData());
+		code = tu.getSource().getFirstContent().getCode(1);
+		assertEquals("'><Dummy 2><String `", code.getData());
+	}
+	
+//	@Test
+//	public void testTabs () {
+//		String snippet = STARTMIF
+//			+ "<Unique 12345><ParaLine <String ` '><Var 1><Char Tab><char Tab>>"
+//			+ ENDMIF;
+//		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+//		assertNotNull(tu);
+//		assertEquals(" <1/>\t\t", fmt.setContent(tu.getSource().getFirstContent()).toString());
+//		Code code = tu.getSource().getFirstContent().getCode(0);
+//		assertEquals("'><Var 1><String `", code.getData());
+//	}
+
+	@Test
+	public void testDummyBeforeChar () {
+		String snippet = STARTMIF
+			+ "<Unique 12345><ParaLine <String `Text 1'><Dummy <InDummy 2>><Char ThinSpace><String `Text 2'>>"
+			+ ENDMIF;
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertNotNull(tu);
+		assertEquals("Text 1<1/>\u2009Text 2", fmt.setContent(tu.getSource().getFirstContent()).toString());
+		Code code = tu.getSource().getFirstContent().getCode(0);
+		assertEquals("'><Dummy <InDummy 2>><String `", code.getData());
+	}
+
+	@Test
+	public void testEmptyFTag () {
+		String snippet = STARTMIF
+			+ "<Unique 12345><ParaLine <Dummy 1><String `Text 1'><Char ThinSpace><Dummy 2><String `5'><Dummy 3>>"
+			+ ENDMIF;
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertNotNull(tu);
+		assertEquals("Text 1\u2009<1/>5", fmt.setContent(tu.getSource().getFirstContent()).toString());
+		Code code = tu.getSource().getFirstContent().getCode(0);
+		assertEquals("'><Dummy 2><String `", code.getData());
+	}
+	
+	@Test
 	public void testSoftHyphen () {
 		String snippet = STARTMIF
 			+ "<Unique 123><ParaLine <TextRectID 20><String `How'><Char SoftHyphen>>"
@@ -137,13 +189,18 @@ public class MIFFilterTest {
 	}
 	
 //	@Test
-//	public void testDoubleExtraction () throws IOException, URISyntaxException {
+//	public void testDoubleExtraction () {
 //		// Read all files in the data directory
 //		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
-//		list.add(new InputDocument(root+"Test01.mif", null));
+////		list.add(new InputDocument(root+"Test01.mif", null));
+//		
+//		list.add(new InputDocument(root+"private/OT/Set 02/05_Segmentation.mif", null));
+//		//list.add(new InputDocument(root+"private/OT/Set 02/06_Export.mif", null));
+//		//list.add(new InputDocument(root+"private/OT/Set 02/08_Addendum.mif", null));
+//		//list.add(new InputDocument(root+"private/OT/Set 04/0701.mif", null));
 //
 //		RoundTripComparison rtc = new RoundTripComparison();
-//		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, locEN));
+//		assertTrue(rtc.executeCompare(filter, list, "UTF-16", locEN, locEN));
 //	}
 
 	private void rewriteFile (String fileName) {
