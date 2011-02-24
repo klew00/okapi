@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2010 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -676,7 +676,10 @@ public class PipelineWrapper {
 		}
 		catch ( ClassNotFoundException e ) {
 			LOGGER.warning("Step class not found.\n" + e.getMessage());
-		}		
+		}
+		catch ( Throwable e ) {
+			LOGGER.warning("Error creating one of the step.\n" + e.getMessage());
+		}
 	}
 	
 	public void clear () {

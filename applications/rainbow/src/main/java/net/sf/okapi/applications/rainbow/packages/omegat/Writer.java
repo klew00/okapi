@@ -75,6 +75,7 @@ public class Writer extends net.sf.okapi.applications.rainbow.packages.xliff.Wri
 		options.message = "This file is intended to be used with OmegaT. "
 			+ "In order to provide better matching for exact matches, "
 			+ "it may use specific XLIFF constructs in ways that may not work with other XLIFF tools.";
+		options.includeNoTranslate = false;
 		
 		// Create the OmegaT-specific directories
 		Util.createDirectories(manifest.getRoot() + File.separator + "glossary" + File.separator);

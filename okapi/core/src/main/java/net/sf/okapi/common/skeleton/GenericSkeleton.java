@@ -303,5 +303,14 @@ public class GenericSkeleton implements ISkeleton {
 		}
 		return b.toString();
 	}
+	
+	/**
+	 * Gets the last part of this skeleton, or null if there are none.
+	 * @return the last part of this skeleton, or null if there are none.
+	 */
+	public GenericSkeletonPart getLastPart () {
+		if  ( list.size() == 0 ) return null;
+		else return list.get(list.size()-1);
+	}
 
 }

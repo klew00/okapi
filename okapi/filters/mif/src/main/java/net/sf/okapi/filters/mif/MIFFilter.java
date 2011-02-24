@@ -65,6 +65,7 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
+import net.sf.okapi.common.skeleton.GenericSkeletonPart;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
@@ -115,6 +116,7 @@ public class MIFFilter implements IFilter {
 	private ArrayList<String> textFlows; 
 	private ArrayList<String> tables;
 	private boolean secondPass;
+	private MIFEncoder encoder;
 	
 	private static Hashtable<String, String> initCharTable () {
 		Hashtable<String, String> table = new Hashtable<String, String>();
@@ -259,6 +261,7 @@ public class MIFFilter implements IFilter {
 		sdId = "sd1";
 		parentIds = new Stack<String>();
 		parentIds.push(sdId);
+		encoder = new MIFEncoder();
 	}
 	
 	private void open (InputStream input,
@@ -744,7 +747,6 @@ public class MIFFilter implements IFilter {
 		paraBuf.setLength(0);
 		paraBufNeeded = false;
 		String endString = null;
-		boolean startString = false;
 
 		// Go to the first ParaLine
 		int res = readUntilText(paraBuf, false);
@@ -759,7 +761,6 @@ public class MIFFilter implements IFilter {
 				paraBuf.append("`");
 				break;
 			case 2: // Char
-				//TODO: we may have to remove the Char tag from the sb
 				text = processChar(false).toString();
 				break;
 			}
@@ -775,43 +776,28 @@ public class MIFFilter implements IFilter {
 				}
 			}
 			else { // We have text
+				boolean restartString = false;
 				if ( first ) { // First text in the fragment: put the codes in the skeleton
 					first = false;
 					skel.append(paraBuf.toString());
+					if ( res == 2 ) skel.append("<String `");
+					endString = "'>";
 				}
 				else { // Put the codes in an inline code 
 					if ( paraBufNeeded && ( paraBuf.length() > 0 )) {
-						if ( endString == null ) {
-							tf.append(TagType.PLACEHOLDER, "x", paraBuf.toString());
+						if ( res != 1 ) {
+							paraBuf.append("<String `");
 						}
-						else {
-							tf.append(TagType.PLACEHOLDER, "x", endString + paraBuf.toString());
-							endString = null;
-						}
-						startString = true;
+						tf.append(TagType.PLACEHOLDER, "x", endString + paraBuf.toString());
 					}
 				}
 				// Reset the codes buffer for next sequence
 				paraBuf.setLength(0);
 				paraBufNeeded = false;
 				
-				// Set the text
-				if ( startString ) {
-					startString = false;
-					if ( res != 1 ) {
-						List<Code> codes = tf.getCodes();
-						codes.get(codes.size()-1).append("<String `");
-					}
-				}
 				tf.append(text);
 			}
 			
-			// Place the closing of the String
-			if ( res == 1 ) {
-				endString = "'>";
-				//paraBuf.append("'>");
-			}
-
 			// Move to the next text
 			res = readUntilText(paraBuf, true);
 		}
@@ -820,27 +806,44 @@ public class MIFFilter implements IFilter {
 		codeFinder.process(tf);
 
 		TextUnit tu = null;
-		if ( tf.hasText() ) {
-			// Add the text unit to the queue
-			tu = new TextUnit(String.valueOf(++tuId));
-			tu.setPreserveWhitespaces(true);
-			tu.setSourceContent(tf);
-			queue.add(new Event(EventType.TEXT_UNIT, tu, skel));
-			skel.addContentPlaceholder(tu);
+		if ( !tf.isEmpty() ) {
+			if ( tf.hasText() ) {
+				// Add the text unit to the queue
+				tu = new TextUnit(String.valueOf(++tuId));
+				tu.setPreserveWhitespaces(true);
+				tu.setSourceContent(tf);
+				queue.add(new Event(EventType.TEXT_UNIT, tu, skel));
+				skel.addContentPlaceholder(tu);
+			}
+			else { // No text (only codes and/or white spaces) Put back the content/codes in skeleton
+				// We need to escape the text parts (white spaces like tabs)
+				String ctext = tf.getCodedText();
+				StringBuilder tmp = new StringBuilder();
+				for ( int i=0; i<ctext.length(); i++ ) {
+					char ch = ctext.charAt(i);
+					if ( TextFragment.isMarker(ch) ) {
+						tmp.append(tf.getCode(ctext.charAt(++i)));
+					}
+					else {
+						tmp.append(encoder.encode(ch, 1));
+					}
+				}
+				GenericSkeletonPart part = skel.getLastPart();
+				if (( part == null ) || !part.getData().toString().endsWith("<String `") ) {
+					skel.append("<String `");
+					endString = "'>";
+				}
+				skel.append(tmp.toString());
+			}
 		}
-		else { // Put back the content/codes in skeleton
-			
-			skel.append(tf.toText());
+		
+		if ( endString == null ) {
+			skel.append(paraBuf.toString());
+		}
+		else {
+			skel.append(endString + paraBuf.toString());
 		}
 
-		if ( paraBuf.length() > 0 ) {
-			if ( endString == null ) {
-				skel.append(paraBuf.toString());
-			}
-			else {
-				skel.append(endString + paraBuf.toString());
-			}
-		}
 		if ( tu != null ) {
 			// New skeleton object for the next parts of the parent statement
 			skel = new GenericSkeleton();

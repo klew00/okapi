@@ -30,6 +30,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.mif.MIFFilter;
@@ -134,17 +135,25 @@ public class MIFFilterTest {
 		assertEquals("'><Dummy 2><String `", code.getData());
 	}
 	
-//	@Test
-//	public void testTabs () {
-//		String snippet = STARTMIF
-//			+ "<Unique 12345><ParaLine <String ` '><Var 1><Char Tab><char Tab>>"
-//			+ ENDMIF;
-//		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
-//		assertNotNull(tu);
-//		assertEquals(" <1/>\t\t", fmt.setContent(tu.getSource().getFirstContent()).toString());
-//		Code code = tu.getSource().getFirstContent().getCode(0);
-//		assertEquals("'><Var 1><String `", code.getData());
-//	}
+	@Test
+	public void testTabs () {
+		String snippet = STARTMIF
+			+ "<Unique 12345><ParaLine <String ` '><Var 1><Char Tab><Char Tab>>"
+			+ ENDMIF;
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertTrue(tu==null);
+	}
+
+	@Test
+	public void testTabsAndCodes () {
+		String snippet = STARTMIF
+			+ "<Unique 12345><ParaLine <Char Tab><Font 1><Var 1><Font 2><Char Tab><ParaLine <Font 3>>"
+			+ ENDMIF;
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertTrue(tu==null);
+		DocumentPart dp = FilterTestDriver.getDocumentPart(getEvents(snippet), 2);
+		assertEquals("<TextFlow <Para <Unique 12345><ParaLine <String `'><Char Tab><String `'><Font 1><Var 1><Font 2><String `'><Char Tab><String `'><ParaLine <Font 3>>>>", dp.getSkeleton().toString());
+	}
 
 	@Test
 	public void testDummyBeforeChar () {
@@ -156,6 +165,36 @@ public class MIFFilterTest {
 		assertEquals("Text 1<1/>\u2009Text 2", fmt.setContent(tu.getSource().getFirstContent()).toString());
 		Code code = tu.getSource().getFirstContent().getCode(0);
 		assertEquals("'><Dummy <InDummy 2>><String `", code.getData());
+	}
+
+	@Test
+	public void testCharOnly () {
+		String snippet = STARTMIF
+			+ "<Unique 12345><ParaLine <Dummy 1><Char Tab><Dummy 2>>"
+			+ ENDMIF;
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertTrue(tu==null);
+	}
+
+	@Test
+	public void testEndsInCharAndCode () {
+		String snippet = STARTMIF
+			+ "<Unique 12345><ParaLine <String `aaa'><Dummy 1><Char Tab><Dummy 2>>"
+			+ ENDMIF;
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertNotNull(tu);
+		assertEquals("aaa<1/>\t", fmt.setContent(tu.getSource().getFirstContent()).toString());
+	}
+
+	@Test
+	public void testDummyCharString () {
+		String snippet = STARTMIF
+			+ "<Unique 12345><ParaLine <Var 1><Char Tab><String `aaa'>>"
+			+ ENDMIF;
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertNotNull(tu);
+		assertEquals("\taaa", fmt.setContent(tu.getSource().getFirstContent()).toString());
+		assertEquals("<TextFlow <Para <Unique 12345><ParaLine <Var 1><String `[#$$self$]'>>>", tu.getSkeleton().toString());
 	}
 
 	@Test
@@ -188,20 +227,25 @@ public class MIFFilterTest {
 		rewriteFile("Test01-v7.mif");
 	}
 	
-//	@Test
-//	public void testDoubleExtraction () {
-//		// Read all files in the data directory
-//		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
-////		list.add(new InputDocument(root+"Test01.mif", null));
-//		
+	@Test
+	public void testDoubleExtraction () {
+		// Read all files in the data directory
+		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
+		list.add(new InputDocument(root+"Test01.mif", null));
+		list.add(new InputDocument(root+"Test01-v7.mif", null));
+		list.add(new InputDocument(root+"Test02-v9.mif", null));
+		list.add(new InputDocument(root+"Test03.mif", null));
+		
 //		list.add(new InputDocument(root+"private/OT/Set 02/05_Segmentation.mif", null));
-//		//list.add(new InputDocument(root+"private/OT/Set 02/06_Export.mif", null));
-//		//list.add(new InputDocument(root+"private/OT/Set 02/08_Addendum.mif", null));
-//		//list.add(new InputDocument(root+"private/OT/Set 04/0701.mif", null));
-//
-//		RoundTripComparison rtc = new RoundTripComparison();
-//		assertTrue(rtc.executeCompare(filter, list, "UTF-16", locEN, locEN));
-//	}
+//		list.add(new InputDocument(root+"private/OT/Set 02/06_Export.mif", null));
+//		list.add(new InputDocument(root+"private/OT/Set 02/08_Addendum.mif", null));
+//		list.add(new InputDocument(root+"private/OT/Set 02/01_introduction.mif", null));
+//		list.add(new InputDocument(root+"private/OT/Set 02/0$_symbols.mif", null));
+//		list.add(new InputDocument(root+"private/OT/Set 02/03_View.mif", null));
+
+		RoundTripComparison rtc = new RoundTripComparison();
+		assertTrue(rtc.executeCompare(filter, list, "UTF-16", locEN, locEN));
+	}
 
 	private void rewriteFile (String fileName) {
 		filter.open(new RawDocument(Util.toURI(root+fileName), null, locEN));
