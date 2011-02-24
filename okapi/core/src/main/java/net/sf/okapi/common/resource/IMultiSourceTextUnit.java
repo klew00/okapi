@@ -40,6 +40,16 @@ import net.sf.okapi.common.annotation.IAnnotation;
 public interface IMultiSourceTextUnit extends ITextUnit {
 
     /**
+     * Sets all this text unit's fields to values from the given text unit,
+     * effectively making this text unit a clone of the original but with the
+     * capacity to deal with multiple sources.
+     *
+     * @param original an ITextUnit object to copy
+     * @throws NullPointerException if original is null
+     */
+    public void copyFromSingleSource(ITextUnit original) throws NullPointerException;
+
+    /**
      * Sets the target locale for the source that will be accessed in the standard
      * ITextUnit methods. Default source will be used if no custom source is
      * associated with the given locale, or if the given locale is null.
@@ -54,7 +64,7 @@ public interface IMultiSourceTextUnit extends ITextUnit {
      *         locale is empty, false otherwise
      */
     public boolean isSourceEmpty(LocaleId targetLocale);
-
+    
     /**
      * Creates a custom source for a given target locale, using the content of the
      * default source.
@@ -62,7 +72,8 @@ public interface IMultiSourceTextUnit extends ITextUnit {
      * @param targetLocale the target locale that uses the new source
      * @param overwriteExisting overwrites any existing source associated with
      *                          the locale if true
-     * @return the newly created source, or the existing source if it was not overwritten
+     * @return the newly created source, or the existing source if it was not
+     *         overwritten, or null if the
      */
     public TextContainer createCustomSource(LocaleId targetLocale, boolean overwriteExisting);
     //TODO add creation options
@@ -77,8 +88,8 @@ public interface IMultiSourceTextUnit extends ITextUnit {
      * @return the newly created source
      */
     public TextContainer createCustomSource(String sourceText,
-                                      LocaleId targetLocale,
-                                      boolean overwriteExisting);
+                                            LocaleId targetLocale,
+                                            boolean overwriteExisting);
     //TODO add creation options
 
 
@@ -122,9 +133,10 @@ public interface IMultiSourceTextUnit extends ITextUnit {
      *
      * @param targetLocale the locale to check for custom sources
      * @return true if there is a custom source object for the given locale,
-     *         false otherwise
+     *         false otherwise. Returns false if null target locale is given.
+     * @throws NullPointerException if targetLocale is null
      */
-    public boolean hasCustomSource(LocaleId targetLocale);
+    public boolean hasCustomSource(LocaleId targetLocale) throws NullPointerException;
 
     /**
      * Sets the content of the custom source for the given target locale. Creates
@@ -137,8 +149,9 @@ public interface IMultiSourceTextUnit extends ITextUnit {
      *                     null to set for default source
      * @param content the content to use for the source of the given locale
      * @return the source content that was set.
+     * @throws NullPointerException if targetLocale is null
      */
-    public TextFragment setCustomSourceContent(LocaleId targetLocale, TextFragment content);
+    public TextFragment setCustomSourceContent(LocaleId targetLocale, TextFragment content) throws NullPointerException;
 
     /**
      * Creates a new {@link IAlignedSegments} object to access and manipulate the
