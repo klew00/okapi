@@ -22,7 +22,7 @@ public class MergingInfoTest {
 	public void testSimpleWrite () {
 		MergingInfo info = new MergingInfo(1, "et", "inpPath", "fi", "#v1\nfp", "inEnc", "outPath", "outEnc");
 		String res = info.writeToXML("test", false);
-		String expected1 = "<test xml:space=\"preserve\" docId=\"1\" extractionType=\"et\" relativeInputPath=\"inpPath\" filterId=\"fi\" inputEncoding=\"inEnc\" relativeTargetPath=\"outPath\" targetEncoding=\"outEnc\">"
+		String expected1 = "<test xml:space=\"preserve\" docId=\"1\" extractionType=\"et\" relativeInputPath=\"inpPath\" filterId=\"fi\" inputEncoding=\"inEnc\" relativeTargetPath=\"outPath\" targetEncoding=\"outEnc\" selected=\"1\">"
 			+ "#v1\nfp</test>";
 		assertEquals(expected1, res);
 	}
@@ -31,7 +31,7 @@ public class MergingInfoTest {
 	public void testSimpleWriteBase64 () {
 		MergingInfo info = new MergingInfo(1, "et", "inpPath", "fi", "#v1\nfp", "inEnc", "outPath", "outEnc");
 		String res = info.writeToXML("test", true);
-		String expected1 = "<test xml:space=\"preserve\" docId=\"1\" extractionType=\"et\" relativeInputPath=\"inpPath\" filterId=\"fi\" inputEncoding=\"inEnc\" relativeTargetPath=\"outPath\" targetEncoding=\"outEnc\">"
+		String expected1 = "<test xml:space=\"preserve\" docId=\"1\" extractionType=\"et\" relativeInputPath=\"inpPath\" filterId=\"fi\" inputEncoding=\"inEnc\" relativeTargetPath=\"outPath\" targetEncoding=\"outEnc\" selected=\"1\">"
 			+ "I3YxCmZw</test>";
 		assertEquals(expected1, res);
 	}

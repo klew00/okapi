@@ -20,15 +20,15 @@
 
 package net.sf.okapi.applications.rainbow.pipeline;
 
+import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 import net.sf.okapi.steps.rainbowkit.postprocess.MergingStep;
-import net.sf.okapi.steps.rainbowkit.postprocess.ReaderStep;
 
 public class TranslationKitPostProcessingPipeline extends PredefinedPipeline {
 
 	public TranslationKitPostProcessingPipeline () {
 		super("TranslationKitPostProcessingPipeline",
 			"Translation Kit Post-Processing");
-		addStep(new ReaderStep());
+		addStep(new RawDocumentToFilterEventsStep());
 		addStep(new MergingStep());
 	}
 	

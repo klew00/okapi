@@ -22,6 +22,7 @@
         <module>table-ui</module>
         <module>ts-ui</module>
         <module>json-ui</module>
+        <module>rainbowkit-ui</module>
     </modules>
 
    <dependencies>

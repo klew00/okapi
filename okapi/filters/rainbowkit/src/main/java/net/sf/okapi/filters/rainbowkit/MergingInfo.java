@@ -40,6 +40,7 @@ public class MergingInfo implements IAnnotation {
 	private String relativeTargetPath;
 	private String targetEncoding;
 	private String resourceId; // Use in some packages
+	private boolean selected;
 
 	/**
 	 * Creates a new merging information file object with no settings.
@@ -74,6 +75,7 @@ public class MergingInfo implements IAnnotation {
 		this.inputEncoding = inputEncoding;
 		this.relativeTargetPath = relativeTargetPath;
 		this.targetEncoding = targetEncoding;
+		this.selected = true;
 	}
 	
 	public int getDocId () {
@@ -115,6 +117,14 @@ public class MergingInfo implements IAnnotation {
 	public void setResourceId (String resourceId) {
 		this.resourceId = resourceId;
 	}
+
+	public boolean getSelected () {
+		return selected;
+	}
+	
+	public void setSelected (boolean selected) {
+		this.selected = selected;
+	}
 	
 	/**
 	 * Creates a string output of the XML representation of the information.
@@ -128,12 +138,13 @@ public class MergingInfo implements IAnnotation {
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append(String.format("<%s xml:space=\"preserve\" docId=\"%d\" extractionType=\"%s\" relativeInputPath=\"%s\" "
-			+ "filterId=\"%s\" inputEncoding=\"%s\" relativeTargetPath=\"%s\" targetEncoding=\"%s\"",
+			+ "filterId=\"%s\" inputEncoding=\"%s\" relativeTargetPath=\"%s\" targetEncoding=\"%s\" selected=\"%s\"",
 			elementQName, docId, extractionType,
 			Util.escapeToXML(relativeInputPath, 3, false, null).replace('\\', '/'),
 			filterId, inputEncoding,
 			Util.escapeToXML(relativeTargetPath, 3, false, null).replace('\\', '/'),
-			targetEncoding
+			targetEncoding,
+			(selected ? "1" : "0")
 		));
 		if ( !Util.isEmpty(resourceId) ) {
 			sb.append(String.format(" resourceId=\"%s\"", resourceId));
@@ -194,6 +205,10 @@ public class MergingInfo implements IAnnotation {
 		if ( tmp.isEmpty() ) info.targetEncoding = info.inputEncoding;
 		else info.targetEncoding = tmp;
 		
+		tmp = element.getAttribute("selected");
+		if ( tmp.isEmpty() ) info.selected = true;
+		else info.selected = (!tmp.equals("0"));
+
 		tmp = element.getAttribute("resourceId");
 		if ( !tmp.isEmpty() ) info.resourceId = tmp;
 		// Else: null

@@ -50,13 +50,14 @@ import net.sf.okapi.filters.rtf.RTFFilter;
 import net.sf.okapi.filters.xliff.XLIFFFilter;
 import net.sf.okapi.lib.transifex.TransifexClient;
 
-@UsingParameters() // No parameters
+@UsingParameters(Parameters.class)
 public class RainbowKitFilter implements IFilter {
 
 	public static final String RAINBOWKIT_MIME_TYPE = "application/x-rainbowkit";
 	
 	private static final Logger LOGGER = Logger.getLogger(RainbowKitFilter.class.getName());
 
+	private Parameters params;
 	private boolean canceled;
 	private boolean hasNext;
 	private LinkedList<Event> queue;
@@ -69,6 +70,7 @@ public class RainbowKitFilter implements IFilter {
 	private TransifexClient cli;
 	
 	public RainbowKitFilter () {
+		params = new Parameters();
 	}
 	
 	@Override
@@ -129,7 +131,7 @@ public class RainbowKitFilter implements IFilter {
 	
 	@Override
 	public IParameters getParameters () {
-		return null;
+		return params;
 	}
 
 	@Override
@@ -178,9 +180,6 @@ public class RainbowKitFilter implements IFilter {
 	{
 		close();
 		canceled = false;
-		hasMoreDoc = true;
-		queue = new LinkedList<Event>();
-		hasNext = true;
 		
 		manifest = new Manifest();
 		if ( input.getInputURI() == null ) {
@@ -188,6 +187,25 @@ public class RainbowKitFilter implements IFilter {
 		}
 		manifest.load(new File(input.getInputURI()));
 		
+		// Prompt the user?
+		if ( params.getOpenManifest() ) {
+			String className = "net.sf.okapi.filters.rainbowkit.ui.ManifestDialog";
+			try {
+				IManifestEditor dlg = (IManifestEditor)Class.forName(className).newInstance();
+				if ( !dlg.edit(null, null, manifest) ) {
+					canceled = true;
+					return; // Canceled
+				}
+			}
+			catch ( Throwable e ) {
+				LOGGER.severe(String.format("Cannot create the editor (%s)\n"+e.getMessage(), className));
+			}
+		}
+		
+		hasMoreDoc = true;
+		queue = new LinkedList<Event>();
+		hasNext = true;
+
 		// Create the iterator
 		iter = manifest.getItems().keySet().iterator();
 		// Start passing the documents
@@ -201,7 +219,7 @@ public class RainbowKitFilter implements IFilter {
 
 	@Override
 	public void setParameters (IParameters params) {
-		// Not used
+		this.params = (Parameters)params;
 	}
 
 	@Override
@@ -225,17 +243,19 @@ public class RainbowKitFilter implements IFilter {
 	}
 
 	private void nextDocument () {
-		if ( iter.hasNext() ) { // New document
+		while ( iter.hasNext() ) { // New document
 			// Get the current item
 			int id = iter.next();
 			info = manifest.getItem(id);
-			startDocument();
+			if ( info.getSelected() ) {
+				startDocument();
+				return;
+			}
+			// Not selected? get the next one
 		}
-		else {
-			// Else: No more document
-			// Empty queue will trigger the end
-			hasMoreDoc = false;
-		}
+		// Else: No more document
+		// Empty queue will trigger the end
+		hasMoreDoc = false;
 	}
 
 	private void startDocument () {

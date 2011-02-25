@@ -74,6 +74,9 @@ public class Manifest implements IAnnotation {
 	private String mergeDir;
 	private String tmDir;
 	private String creatorParams;
+	private boolean useApprovedOnly;
+	private boolean updateApprovedFlag;
+	
 
 	public Manifest () {
 		docs = new LinkedHashMap<Integer, MergingInfo>();
@@ -84,6 +87,8 @@ public class Manifest implements IAnnotation {
 		mergeSubDir = "";
 		tmSubDir = "";
 		updateFullDirectories();
+		useApprovedOnly = false;
+		updateApprovedFlag = true;
 	}
 
 	public Map<Integer, MergingInfo> getItems () {
@@ -112,6 +117,22 @@ public class Manifest implements IAnnotation {
 	
 	public String getCreatorParameters () {
 		return creatorParams;
+	}
+	
+	public boolean getUseApprovedOnly () {
+		return useApprovedOnly;
+	}
+	
+	public void setUseApprovedOnly (boolean value) {
+		useApprovedOnly = value;
+	}
+	
+	public boolean getUpdateApprovedFlag () {
+		return updateApprovedFlag;
+	}
+	
+	public void setUpdateApprovedFlag (boolean value) {
+		updateApprovedFlag = value;
 	}
 	
 	/**
@@ -276,6 +297,8 @@ public class Manifest implements IAnnotation {
 			writer.writeAttributeString("tmSubDir", tmSubDir.replace('\\', '/'));
 			SimpleDateFormat DF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ");
 			writer.writeAttributeString("date", DF.format(new java.util.Date()));
+			writer.writeAttributeString("useApprovedOnly", (useApprovedOnly ? "1" : "0"));
+			writer.writeAttributeString("updateApprovedFlag", (updateApprovedFlag ? "1" : "0"));
 			writer.writeLineBreak();
 
 			// creatorParams
@@ -348,7 +371,6 @@ public class Manifest implements IAnnotation {
 		    else tmSubDir = tmp.replace('/', File.separatorChar);
 		    
 		    // creatorParameters
-		    
 		    NL = elem.getElementsByTagName("creatorParameters");
 		    if ( NL.getLength() > 0 ) {
 		    	creatorParams = Base64.decodeString(Util.getTextContent(NL.item(0)));
@@ -357,8 +379,15 @@ public class Manifest implements IAnnotation {
 		    	creatorParams = "";
 		    }
 		    
+		    tmp = elem.getAttribute("useApprovedOnly");
+		    if ( Util.isEmpty(tmp) ) useApprovedOnly = false;
+		    else useApprovedOnly = !tmp.equals("0");
+		    
+		    tmp = elem.getAttribute("updateApprovedFlag");
+		    if ( Util.isEmpty(tmp) ) this.updateApprovedFlag = true;
+		    else updateApprovedFlag = !tmp.equals("0");
+		    
 		    // Documents
-
 		    docs.clear();
 		    NL = elem.getElementsByTagName("doc");
 		    for ( int i=0; i<NL.getLength(); i++ ) {

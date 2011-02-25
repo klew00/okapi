@@ -100,7 +100,7 @@ public class Pipeline implements IPipeline, IObservable, IObserver {
 
 	@Override
 	public List<IPipelineStep> getSteps() {
-		return new ArrayList<IPipelineStep>(steps);
+		return new LinkedList<IPipelineStep>(steps);
 	}
 
 	@Override

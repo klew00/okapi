@@ -648,16 +648,6 @@ public class PipelineWrapper {
 			availableSteps.put(step.id, step);
 
 			ps = (IPipelineStep)Class.forName(
-				"net.sf.okapi.steps.rainbowkit.postprocess.ReaderStep").newInstance();
-			params = ps.getParameters();
-			step = new StepInfo(ps.getClass().getSimpleName(),
-				ps.getName(), ps.getDescription(), ps.getClass().getName(), null, null);
-			if ( params != null ) {
-				step.paramsData = params.toString();
-			}
-			availableSteps.put(step.id, step);
-
-			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.rainbowkit.postprocess.MergingStep").newInstance();
 			params = ps.getParameters();
 			step = new StepInfo(ps.getClass().getSimpleName(),
@@ -863,12 +853,6 @@ public class PipelineWrapper {
 
 		// Execute
 		driver.processBatch();
-		
-		// Look if there 
-//TODO: Replace this		String path = driver.getPipeline().getContext().getString("outputFile");
-//		if ( path != null ) {
-//			UIUtil.start(path);
-//		}
 	}
 
 	public void addStep (StepInfo step) {
