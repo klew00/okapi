@@ -92,6 +92,7 @@ public abstract class PredefinedPipeline extends Pipeline implements IPredefined
 			for ( int j=0; j<tmpSteps.size(); j++ ) {
 				if ( steps.get(i).getName().equals(tmpSteps.get(j).getName()) ) {
 					found = j;
+					break;
 				}
 			}
 			// If found: Use the data, then remove it
