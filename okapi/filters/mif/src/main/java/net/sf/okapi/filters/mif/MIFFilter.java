@@ -55,7 +55,6 @@ import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filters.InlineCodeFinder;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
@@ -428,17 +427,14 @@ public class MIFFilter implements IFilter {
 					break;
 				}
 			}
-			
+
+			// We are done
 			Ending ending = new Ending(String.valueOf(++otherId)); 
 			queue.add(new Event(EventType.END_DOCUMENT, ending, skel));
 		}
 		catch ( IOException e ) {
 			throw new OkapiIOException(e);
 		}
-
-//		// Else: we are done
-//		queue.add(new Event(EventType.END_DOCUMENT,
-//			new Ending(String.valueOf(++otherId))));
 	}
 
 	/*
@@ -711,6 +707,7 @@ public class MIFFilter implements IFilter {
 			}
 		}
 		// A comment can end the file
+		// Actually that's the case most of the time
 	}
 
 	/**
@@ -776,7 +773,6 @@ public class MIFFilter implements IFilter {
 				}
 			}
 			else { // We have text
-				boolean restartString = false;
 				if ( first ) { // First text in the fragment: put the codes in the skeleton
 					first = false;
 					skel.append(paraBuf.toString());
@@ -791,11 +787,11 @@ public class MIFFilter implements IFilter {
 						tf.append(TagType.PLACEHOLDER, "x", endString + paraBuf.toString());
 					}
 				}
+				// Add the text
+				tf.append(text);
 				// Reset the codes buffer for next sequence
 				paraBuf.setLength(0);
 				paraBufNeeded = false;
-				
-				tf.append(text);
 			}
 			
 			// Move to the next text

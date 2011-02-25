@@ -236,13 +236,6 @@ public class MIFFilterTest {
 		list.add(new InputDocument(root+"Test02-v9.mif", null));
 		list.add(new InputDocument(root+"Test03.mif", null));
 		
-//		list.add(new InputDocument(root+"private/OT/Set 02/05_Segmentation.mif", null));
-//		list.add(new InputDocument(root+"private/OT/Set 02/06_Export.mif", null));
-//		list.add(new InputDocument(root+"private/OT/Set 02/08_Addendum.mif", null));
-//		list.add(new InputDocument(root+"private/OT/Set 02/01_introduction.mif", null));
-//		list.add(new InputDocument(root+"private/OT/Set 02/0$_symbols.mif", null));
-//		list.add(new InputDocument(root+"private/OT/Set 02/03_View.mif", null));
-
 		RoundTripComparison rtc = new RoundTripComparison();
 		assertTrue(rtc.executeCompare(filter, list, "UTF-16", locEN, locEN));
 	}
