@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <!-- comment -->
-<TS sourcelanguage="en-us" language="fr-fr" version="4.5.1">
+<TS version="4.5.1" sourcelanguage="en-us" language="fr-fr">
 <defaultcodec>hello defaultcodec</defaultcodec>
 <extra-loc-blank>hello extra-loc-blank</extra-loc-blank>
 <context encoding="utf-8">

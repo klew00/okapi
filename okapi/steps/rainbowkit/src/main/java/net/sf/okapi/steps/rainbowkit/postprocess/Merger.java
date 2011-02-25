@@ -21,6 +21,7 @@
 package net.sf.okapi.steps.rainbowkit.postprocess;
 
 import java.io.File;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
@@ -31,6 +32,7 @@ import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
@@ -139,7 +141,20 @@ public class Merger {
 		// Check if we have a translation
 		TextContainer tc = traTu.getTarget(trgLoc);
 		if ( tc == null ) {
-			LOGGER.warning(String.format("No translation found for TU id='%s'.", traTu.getId()));
+			LOGGER.warning(String.format("No translation found for TU id='%s'. Using source.", traTu.getId()));
+			writer.handleEvent(oriEvent); // Use the source
+			return;
+		}
+		
+		// Process the "approved" property
+		boolean isTransApproved = false;
+		Property prop = traTu.getTargetProperty(trgLoc, Property.APPROVED);
+		if ( prop != null ) {
+			isTransApproved = prop.getValue().equals("yes");
+		}
+		if ( !isTransApproved && manifest.getUseApprovedOnly() ) {
+			// Not approved: use the source
+			LOGGER.warning(String.format("Item id='%s': Target is not approved; Using source.", traTu.getId()));
 			writer.handleEvent(oriEvent); // Use the source
 			return;
 		}
@@ -158,6 +173,15 @@ public class Merger {
 		
 		TextUnitUtil.adjustTargetCodes(oriSrcTf, traTrgTf, true, true, null, oriTu);
 		oriTu.setTargetContent(trgLoc, traTrgTf);
+		
+		// Update the 'approved' flag of the entry to merge if available
+		// (for example to remove the fuzzy flag in POs or set the approved attribute in XLIFF)
+		if ( manifest.getUpdateApprovedFlag() ) {
+			prop = oriTu.getTargetProperty(trgLoc, Property.APPROVED);
+			if ( prop != null ) {
+				prop.setValue("yes");
+			}			
+		}
 		
 		writer.handleEvent(oriEvent);
 	}

@@ -111,7 +111,7 @@ public class ManifestDialog implements IManifestEditor {
 		chkUseApprovedOnly.setText("Merge the translation only if it is approved");
 		
 		chkUpdateApprovedFlag = new Button(cmpTmp, SWT.CHECK);
-		chkUpdateApprovedFlag.setText("Set the 'approved' flag on the merged translations");
+		chkUpdateApprovedFlag.setText("Set the 'approved' flag on the merged translations (for supported formats)");
 
 		//--- Information tab
 		

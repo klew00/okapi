@@ -639,7 +639,7 @@ public class TsFilter implements IFilter {
 			// Should be the content
 			switch ( event.getEventType() ) {
 			case XMLStreamConstants.CHARACTERS:
-				contextName = event.toString();
+				contextName = event.asCharacters().getData();
 				break;
 			case XMLStreamConstants.SPACE:
 				break;
