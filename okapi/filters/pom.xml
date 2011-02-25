@@ -39,5 +39,6 @@
 		<module>versifiedtxt</module>
 		<module>xmlstream</module>
 		<module>rainbowkit</module>
+		<module>archive</module>		
     </modules>
 </project>
