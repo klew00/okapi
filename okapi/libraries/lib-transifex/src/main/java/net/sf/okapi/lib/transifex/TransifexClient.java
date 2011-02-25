@@ -434,13 +434,17 @@ public class TransifexClient {
 
 			int code =  conn.getResponseCode();
 			if ( code == RESCODE_OK ) {
-			    JSONObject object = (JSONObject)parser.parse(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+				String str = readResponse(conn);
+			    JSONObject object = (JSONObject)parser.parse(str);
 			    JSONArray files = (JSONArray)object.get("files");
 			    if ( files.size() == 1 ) {
 			    	JSONObject file = (JSONObject)files.get(0);
 			    	res[0] = (String)file.get("uuid");
 			    	res[1] = (String)file.get("name");
 			    	res[2] = (String)file.get("id");
+			    }
+			    else {
+			    	res[1] = String.format("Success returned, but no file description returned. Response='%s'", str);
 			    }
 			}
 			else {
