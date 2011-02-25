@@ -7,7 +7,6 @@
   </parent>
   <groupId>net.sf.okapi.filters</groupId>
   <artifactId>okapi-filter-archive</artifactId>
-  <version>0.11-SNAPSHOT</version>
   <dependencies>
   	<dependency>
   		<groupId>net.sf.okapi</groupId>
@@ -18,12 +17,6 @@
   	<dependency>
   		<groupId>net.sf.okapi.filters</groupId>
   		<artifactId>okapi-filter-xliff</artifactId>
-  		<version>${project.version}</version>
-  		<scope>compile</scope>
-  	</dependency>
-  	<dependency>
-  		<groupId>net.sf.okapi</groupId>
-  		<artifactId>lds-okapi-core</artifactId>
   		<version>${project.version}</version>
   		<scope>compile</scope>
   	</dependency>
