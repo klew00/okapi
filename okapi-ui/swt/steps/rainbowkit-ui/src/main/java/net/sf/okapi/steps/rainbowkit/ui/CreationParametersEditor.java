@@ -312,7 +312,7 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		case 0: // XLIFF
 			btOptions.setEnabled(optEditors.get(n)!=null);
 			edDescription.setText("Simple package where all files to translate are extracted into XLIFF documents.\n"
-				+ "You can translate this package with any XLIFF editor and many XML-enabled tools (e.g. TagEditor).");
+				+ "You can translate this package with any XLIFF editor and many XML-enabled tools.");
 			break;
 		case 1: // PO
 			btOptions.setEnabled(false);

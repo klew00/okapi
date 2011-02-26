@@ -49,7 +49,7 @@ public class TransifexClient {
 
 	private static final String HYPHENS = "--";
 	private static final String BOUNDARY = "oIkPaApKiO";
-	private static final String LINEBREAK = System.getProperty("line.separator");
+	private static final String LINEBREAK = "\r\n"; // HTTP uses CR+LF
 	private static final int RESCODE_OK = 200; 
 	private static final int RESCODE_CREATED = 201; 
 	private static final int MAXBUFFERSIZE = 1024*8; 

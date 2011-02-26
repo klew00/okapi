@@ -133,7 +133,6 @@ public class TransifexPackageWriter extends BasePackageWriter {
 		}
 
 		Util.openURL("file:///"+reportPath);
-		
 	}
 	
 	@Override
@@ -232,4 +231,5 @@ public class TransifexPackageWriter extends BasePackageWriter {
 			+ fn + "_" + manifest.getTargetLocale().toPOSIXLocaleId()
 			+ ex + ".po";
 	}
+
 }
