@@ -21,6 +21,7 @@
 package net.sf.okapi.filters.rainbowkit.ui;
 
 import net.sf.okapi.common.IHelp;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
@@ -46,17 +47,16 @@ import org.eclipse.swt.widgets.Text;
 public class ManifestDialog implements IManifestEditor {
 	
 	private Shell shell;
-	private IHelp help;
 	private Manifest manifest;
 	private ManifestTableModel tableMod;
 	private SelectionAdapter CloseActions;
 	private boolean result;
-	private Text edPkgType;
+	private Text edProjectId;
 	private Text edPkgID;
 	private Text edSource;
 	private Text edTarget;
 	private Text edDate;
-	private Text edMergeInputRoot;
+	private Text edTargetDirectory;
 	private Button chkUseApprovedOnly;
 	private Button chkUpdateApprovedFlag;
 
@@ -64,13 +64,10 @@ public class ManifestDialog implements IManifestEditor {
 		// Needed to be able to instantiate this class with Class.forName().
 	}
 	
-	private void create (Shell parent,
-		IHelp helpParam)
-	{
+	private void create (Shell parent) {
 		result = false;
-		help = helpParam;
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
-		shell.setText("Translation Package Manifest");
+		shell.setText("Translation Kit Manifest");
 		UIUtil.inheritIcon(shell, parent);
 		shell.setLayout(new GridLayout());
 		
@@ -95,9 +92,9 @@ public class ManifestDialog implements IManifestEditor {
 		tableMod = new ManifestTableModel();
 		tableMod.linkTable(tableDocs);
 
-		edMergeInputRoot = new Text(cmpTmp, SWT.BORDER);
-		edMergeInputRoot.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		edMergeInputRoot.setEditable(false);
+		edTargetDirectory = new Text(cmpTmp, SWT.BORDER);
+		edTargetDirectory.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		edTargetDirectory.setEditable(false);
 		
 		//--- Options tab
 		
@@ -111,7 +108,7 @@ public class ManifestDialog implements IManifestEditor {
 		chkUseApprovedOnly.setText("Merge the translation only if it is approved");
 		
 		chkUpdateApprovedFlag = new Button(cmpTmp, SWT.CHECK);
-		chkUpdateApprovedFlag.setText("Set the 'approved' flag on the merged translations (for supported formats)");
+		chkUpdateApprovedFlag.setText("Update the 'approved' flag on the merged translations (for applicable formats)");
 
 		//--- Information tab
 		
@@ -122,11 +119,11 @@ public class ManifestDialog implements IManifestEditor {
 		tiTmp.setControl(cmpTmp);
 
 		Label stTmp = new Label(cmpTmp, SWT.NONE);
-		stTmp.setText("Package type:");
+		stTmp.setText("Project ID:");
 		stTmp.setLayoutData(new GridData());
-		edPkgType = new Text(cmpTmp, SWT.BORDER);
-		edPkgType.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		edPkgType.setEditable(false);
+		edProjectId = new Text(cmpTmp, SWT.BORDER);
+		edProjectId.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		edProjectId.setEditable(false);
 		
 		stTmp = new Label(cmpTmp, SWT.NONE);
 		stTmp.setText("Package ID:");
@@ -136,14 +133,14 @@ public class ManifestDialog implements IManifestEditor {
 		edPkgID.setEditable(false);
 		
 		stTmp = new Label(cmpTmp, SWT.NONE);
-		stTmp.setText("Source language:");
+		stTmp.setText("Source locale:");
 		stTmp.setLayoutData(new GridData());
 		edSource = new Text(cmpTmp, SWT.BORDER);
 		edSource.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		edSource.setEditable(false);
 		
 		stTmp = new Label(cmpTmp, SWT.NONE);
-		stTmp.setText("Target language:");
+		stTmp.setText("Target locale:");
 		stTmp.setLayoutData(new GridData());
 		edTarget = new Text(cmpTmp, SWT.BORDER);
 		edTarget.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -161,10 +158,11 @@ public class ManifestDialog implements IManifestEditor {
 		CloseActions = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
-					if ( help != null ) help.showWiki("Rainbow Translation Kit Manifest");
+					// Don't use context because this dialog box may be used from anywhere
+					Util.openWikiTopic("Rainbow Translation Kit Manifest");
 					return;
 				}
-				if ( e.widget.getData().equals("o") ) {
+				if ( e.widget.getData().equals("o") ) { //$NON-NLS-1$
 					tableMod.saveData();
 					manifest.setUseApprovedOnly(chkUseApprovedOnly.getSelection());
 					manifest.setUpdateApprovedFlag(chkUpdateApprovedFlag.getSelection());
@@ -174,8 +172,7 @@ public class ManifestDialog implements IManifestEditor {
 				shell.close();
 			};
 		};
-		OKCancelPanel pnlActions = new OKCancelPanel(shell, SWT.NONE, CloseActions,
-			(help!=null), "OK");
+		OKCancelPanel pnlActions = new OKCancelPanel(shell, SWT.NONE, CloseActions, true, "OK");
 		pnlActions.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		shell.setDefaultButton(pnlActions.btOK);
 
@@ -196,12 +193,12 @@ public class ManifestDialog implements IManifestEditor {
 	
 	private void setData (Manifest manifest) {
 		this.manifest = manifest;
-//		edMergeInputRoot.setText(manifest.getMergeInputRoot());
-//		edPkgType.setText(manifest.getPackageType());
+		edTargetDirectory.setText(manifest.getTargetDirectory());
+		edProjectId.setText(manifest.getProjectId());
 		edPkgID.setText(manifest.getPackageId());
 		edSource.setText(manifest.getSourceLocale().toString());
 		edTarget.setText(manifest.getTargetLocale().toString());
-//		edDate.setText(manifest.getDate());
+		edDate.setText(manifest.getDate());
 		chkUseApprovedOnly.setSelection(manifest.getUseApprovedOnly());
 		chkUpdateApprovedFlag.setSelection(manifest.getUpdateApprovedFlag());
 	}
@@ -219,14 +216,13 @@ public class ManifestDialog implements IManifestEditor {
 
 	@Override
 	public boolean edit (Object parent,
-		IHelp helpParam,
 		Manifest manifest)
 	{
 		Shell shell = null;
 		if (( parent != null ) && ( parent instanceof Shell )) {
 			shell = (Shell)parent;
 		}
-		create(shell, helpParam);
+		create(shell);
 		boolean res = showDialog(manifest);
 		
 		return res;

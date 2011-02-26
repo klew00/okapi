@@ -21,7 +21,6 @@
 package net.sf.okapi.steps.rainbowkit.postprocess;
 
 import java.io.File;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
@@ -122,13 +121,20 @@ public class Merger {
 	}
 	
 	private void processTextUnit (Event event) {
+		// Get the unit from the translation file
 		TextUnit traTu = event.getTextUnit();
+		// If it's not translatable:
+		if ( !traTu.isTranslatable() ) {
+			return; // Do nothing: the original will be handled by processUntilTextUnit()
+		}
+		// search for the corresponding event in the original
 		Event oriEvent = processUntilTextUnit();
 		if ( oriEvent == null ) {
 			LOGGER.severe(String.format("No corresponding text unit for id='%s' in the original file.",
 				traTu.getId()));
 			return;
 		}
+		// Get the actual trans-unit object of the original
 		TextUnit oriTu = oriEvent.getTextUnit();
 
 		// Check the IDs
@@ -148,13 +154,13 @@ public class Merger {
 		
 		// Process the "approved" property
 		boolean isTransApproved = false;
-		Property prop = traTu.getTargetProperty(trgLoc, Property.APPROVED);
-		if ( prop != null ) {
-			isTransApproved = prop.getValue().equals("yes");
+		Property traProp = traTu.getTargetProperty(trgLoc, Property.APPROVED);
+		if ( traProp != null ) {
+			isTransApproved = traProp.getValue().equals("yes");
 		}
 		if ( !isTransApproved && manifest.getUseApprovedOnly() ) {
 			// Not approved: use the source
-			LOGGER.warning(String.format("Item id='%s': Target is not approved; Using source.", traTu.getId()));
+			LOGGER.info(String.format("Item id='%s': Target is not approved. Using source.", traTu.getId()));
 			writer.handleEvent(oriEvent); // Use the source
 			return;
 		}
@@ -177,9 +183,14 @@ public class Merger {
 		// Update the 'approved' flag of the entry to merge if available
 		// (for example to remove the fuzzy flag in POs or set the approved attribute in XLIFF)
 		if ( manifest.getUpdateApprovedFlag() ) {
-			prop = oriTu.getTargetProperty(trgLoc, Property.APPROVED);
-			if ( prop != null ) {
-				prop.setValue("yes");
+			Property oriProp = oriTu.getTargetProperty(trgLoc, Property.APPROVED);
+			if ( oriProp != null ) {
+				if ( traProp != null ) {
+					oriProp.setValue(traProp.getValue());
+				}
+				else {
+					oriProp.setValue("yes");
+				}
 			}			
 		}
 		

@@ -311,23 +311,28 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		switch ( n ) {
 		case 0: // XLIFF
 			btOptions.setEnabled(optEditors.get(n)!=null);
-			edDescription.setText("Simple package where all files to translate are extracted to XLIFF.\nYou can translate this package with any XLIFF editor.");
+			edDescription.setText("Simple package where all files to translate are extracted into XLIFF documents.\n"
+				+ "You can translate this package with any XLIFF editor and many XML-enabled tools (e.g. TagEditor).");
 			break;
 		case 1: // PO
 			btOptions.setEnabled(false);
-			edDescription.setText("Set of PO files. You can translate this package with anu PO editor.");
+			edDescription.setText("Simple package where all files to translate are extracted into PO files.\n"
+				+ "You can translate this package with any PO editor.");
 			break;
 		case 2: // Original with RTF
 			btOptions.setEnabled(false);
-			edDescription.setText("Package where all the files to translate are converted into an RTF file with Trados-compatible styles.\nYou can translate this package with Trados Translator's Workbench or any compatible tool.");
+			edDescription.setText("Package where all the files to translate are converted into an RTF file with Trados-compatible styles.\n"
+				+ "You can translate this package with Trados Translator's Workbench or any compatible tool.");
 			break;
 		case 3: // OmegaT
 			btOptions.setEnabled(false);
-			edDescription.setText("OmegaT project with all its files and directory structure in place.\nYou can translate this package with OmegaT.");
+			edDescription.setText("OmegaT project with all its files and directory structure in place.\n"
+				+ "You can translate this package with OmegaT.");
 			break;
 		case 4: // Transifex
 			btOptions.setEnabled(optEditors.get(n)!=null);
-			edDescription.setText("Populate an on-line Transifex project.");
+			edDescription.setText("Package where translatable files are uploaded to an online Transifex project.\n"
+				+ "You can translate this package with the online Transifex editor or locally with PO editors.");
 			break;
 		}
 	}

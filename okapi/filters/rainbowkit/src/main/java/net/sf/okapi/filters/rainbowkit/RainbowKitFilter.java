@@ -192,13 +192,14 @@ public class RainbowKitFilter implements IFilter {
 			String className = "net.sf.okapi.filters.rainbowkit.ui.ManifestDialog";
 			try {
 				IManifestEditor dlg = (IManifestEditor)Class.forName(className).newInstance();
-				if ( !dlg.edit(null, null, manifest) ) {
+				if ( !dlg.edit(null, manifest) ) {
 					canceled = true;
 					return; // Canceled
 				}
 			}
 			catch ( Throwable e ) {
 				LOGGER.severe(String.format("Cannot create the editor (%s)\n"+e.getMessage(), className));
+				// And move on to the merge
 			}
 		}
 		

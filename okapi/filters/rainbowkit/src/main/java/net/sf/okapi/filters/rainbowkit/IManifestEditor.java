@@ -25,7 +25,6 @@ import net.sf.okapi.common.IHelp;
 public interface IManifestEditor {
 
 	public boolean edit (Object parent,
-		IHelp helpParam,
 		Manifest manifest);	
 
 }

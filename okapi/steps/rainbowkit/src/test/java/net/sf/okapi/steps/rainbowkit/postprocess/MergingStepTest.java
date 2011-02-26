@@ -36,6 +36,7 @@ import net.sf.okapi.common.pipelinedriver.PipelineDriver;
 import net.sf.okapi.filters.openoffice.OpenOfficeFilter;
 import net.sf.okapi.filters.properties.PropertiesFilter;
 import net.sf.okapi.filters.rainbowkit.RainbowKitFilter;
+import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -43,12 +44,19 @@ import org.junit.Test;
 public class MergingStepTest {
 	
 	private String root;
+	private FilterConfigurationMapper fcMapper;
 	private LocaleId locEN = LocaleId.fromString("en");
 	private LocaleId locFR = LocaleId.fromString("fr");
 	
 	@Before
 	public void setUp() {
 		root = TestUtil.getParentDir(this.getClass(), "/test01.properties");
+		fcMapper = new FilterConfigurationMapper();
+		fcMapper.addConfigurations(PropertiesFilter.class.getName());
+		fcMapper.addConfigurations(OpenOfficeFilter.class.getName());
+		fcMapper.addConfigurations(RainbowKitFilter.class.getName());
+		fcMapper.setCustomConfigurationsDirectory(root);
+		fcMapper.updateCustomConfigurations();
 	}
 
 	@Test
@@ -63,17 +71,13 @@ public class MergingStepTest {
 		deleteOutputDir("xliffPack/done", true);
 		
 		IPipelineDriver pdriver = new PipelineDriver();
-		FilterConfigurationMapper fcMapper = new FilterConfigurationMapper();
-		fcMapper.addConfigurations(PropertiesFilter.class.getName());
-		fcMapper.addConfigurations(OpenOfficeFilter.class.getName());
-		fcMapper.addConfigurations(RainbowKitFilter.class.getName());
 		pdriver.setFilterConfigurationMapper(fcMapper);
 		pdriver.setRootDirectory(Util.deleteLastChar(root)); // Don't include final separator
-		pdriver.addStep(new ReaderStep());
+		pdriver.addStep(new RawDocumentToFilterEventsStep());
 		pdriver.addStep(new MergingStep());
 		
 		URI inputURI = new File(root+"xliffPack/manifest.rkm").toURI();
-		pdriver.addBatchItem(new BatchItemContext(inputURI, "UTF-8", "okf_rainbowkit", null, "UTF-8", locEN, locFR));
+		pdriver.addBatchItem(new BatchItemContext(inputURI, "UTF-8", "okf_rainbowkit@noPrompt", null, "UTF-8", locEN, locFR));
 		
 		pdriver.processBatch();
 
@@ -91,17 +95,13 @@ public class MergingStepTest {
 		deleteOutputDir("poPack/done", true);
 		
 		IPipelineDriver pdriver = new PipelineDriver();
-		FilterConfigurationMapper fcMapper = new FilterConfigurationMapper();
-		fcMapper.addConfigurations(PropertiesFilter.class.getName());
-		fcMapper.addConfigurations(OpenOfficeFilter.class.getName());
-		fcMapper.addConfigurations(RainbowKitFilter.class.getName());
 		pdriver.setFilterConfigurationMapper(fcMapper);
 		pdriver.setRootDirectory(Util.deleteLastChar(root)); // Don't include final separator
-		pdriver.addStep(new ReaderStep());
+		pdriver.addStep(new RawDocumentToFilterEventsStep());
 		pdriver.addStep(new MergingStep());
 		
 		URI inputURI = new File(root+"poPack/manifest.rkm").toURI();
-		pdriver.addBatchItem(new BatchItemContext(inputURI, "UTF-8", "okf_rainbowkit", null, "UTF-8", locEN, locFR));
+		pdriver.addBatchItem(new BatchItemContext(inputURI, "UTF-8", "okf_rainbowkit@noPrompt", null, "UTF-8", locEN, locFR));
 		
 		pdriver.processBatch();
 
@@ -119,17 +119,13 @@ public class MergingStepTest {
 		deleteOutputDir("omegatPack/done", true);
 		
 		IPipelineDriver pdriver = new PipelineDriver();
-		FilterConfigurationMapper fcMapper = new FilterConfigurationMapper();
-		fcMapper.addConfigurations(PropertiesFilter.class.getName());
-		fcMapper.addConfigurations(OpenOfficeFilter.class.getName());
-		fcMapper.addConfigurations(RainbowKitFilter.class.getName());
 		pdriver.setFilterConfigurationMapper(fcMapper);
 		pdriver.setRootDirectory(Util.deleteLastChar(root)); // Don't include final separator
-		pdriver.addStep(new ReaderStep());
+		pdriver.addStep(new RawDocumentToFilterEventsStep());
 		pdriver.addStep(new MergingStep());
 		
 		URI inputURI = new File(root+"omegatPack/manifest.rkm").toURI();
-		pdriver.addBatchItem(new BatchItemContext(inputURI, "UTF-8", "okf_rainbowkit", null, "UTF-8", locEN, locFR));
+		pdriver.addBatchItem(new BatchItemContext(inputURI, "UTF-8", "okf_rainbowkit@noPrompt", null, "UTF-8", locEN, locFR));
 		
 		pdriver.processBatch();
 
@@ -139,7 +135,7 @@ public class MergingStepTest {
 		assertTrue(file.exists());
 		
 	}
-	
+
     public boolean deleteOutputDir (String dirname, boolean relative) {
     	File d;
     	if ( relative ) d = new File(root + File.separator + dirname);

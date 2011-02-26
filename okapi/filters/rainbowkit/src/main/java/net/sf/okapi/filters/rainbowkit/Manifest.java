@@ -76,7 +76,7 @@ public class Manifest implements IAnnotation {
 	private String creatorParams;
 	private boolean useApprovedOnly;
 	private boolean updateApprovedFlag;
-	
+	private String date;
 
 	public Manifest () {
 		docs = new LinkedHashMap<Integer, MergingInfo>();
@@ -220,11 +220,20 @@ public class Manifest implements IAnnotation {
 	}
 	
 	/**
-	 * Get the directory where to output TM-related information (always with a terminal separator).
+	 * Gets the directory where to output TM-related information (always with a terminal separator).
 	 * @return the directory where to store TM-related information.
 	 */
 	public String getTmDirectory () {
 		return tmDir;
+	}
+	
+	/**
+	 * Gets the date when the manifest was created (saved the first time).
+	 * @return A string representation of the creation date,
+	 * or null if the manifest file has not been saved yet.
+	 */
+	public String getDate () {
+		return date;
 	}
 	
 	public void setInformation (String packageRoot,
@@ -296,7 +305,8 @@ public class Manifest implements IAnnotation {
 			writer.writeAttributeString("mergeSubDir", mergeSubDir.replace('\\', '/'));
 			writer.writeAttributeString("tmSubDir", tmSubDir.replace('\\', '/'));
 			SimpleDateFormat DF = new SimpleDateFormat("yyyy-MM-dd HH:mm:ssZ");
-			writer.writeAttributeString("date", DF.format(new java.util.Date()));
+			date = DF.format(new java.util.Date());
+			writer.writeAttributeString("date", date);
 			writer.writeAttributeString("useApprovedOnly", (useApprovedOnly ? "1" : "0"));
 			writer.writeAttributeString("updateApprovedFlag", (updateApprovedFlag ? "1" : "0"));
 			writer.writeLineBreak();
@@ -349,6 +359,9 @@ public class Manifest implements IAnnotation {
 		    tmp = elem.getAttribute("target");
 		    if ( Util.isEmpty(tmp) ) throw new RuntimeException("Missing target attribute.");
 		    targetLoc = LocaleId.fromString(tmp);
+
+		    date = elem.getAttribute("date");
+		    if ( Util.isEmpty(tmp) ) date = "Unknown";
 
 		    tmp = elem.getAttribute("originalSubDir");
 		    if ( Util.isEmpty(tmp) ) throw new RuntimeException("Missing originalSubDir attribute.");
