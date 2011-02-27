@@ -26,13 +26,17 @@ import java.util.logging.Logger;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
@@ -145,8 +149,8 @@ public class Merger {
 		}
 		
 		// Check if we have a translation
-		TextContainer tc = traTu.getTarget(trgLoc);
-		if ( tc == null ) {
+		TextContainer trgTraCont = traTu.getTarget(trgLoc);
+		if ( trgTraCont == null ) {
 			LOGGER.warning(String.format("No translation found for TU id='%s'. Using source.", traTu.getId()));
 			writer.handleEvent(oriEvent); // Use the source
 			return;
@@ -160,38 +164,53 @@ public class Merger {
 		}
 		if ( !isTransApproved && manifest.getUseApprovedOnly() ) {
 			// Not approved: use the source
-			LOGGER.info(String.format("Item id='%s': Target is not approved. Using source.", traTu.getId()));
+			LOGGER.warning(String.format("Item id='%s': Target is not approved. Using source.", traTu.getId()));
 			writer.handleEvent(oriEvent); // Use the source
 			return;
 		}
 		
 		// Do we need to preserve the segmentation for merging (e.g. TTX case)
-//TODO		boolean mergeAsSegments = false;
+//		boolean mergeAsSegments = false;
 //		if ( oriTu.getMimeType() != null ) { 
 //			if ( oriTu.getMimeType().equals(MimeTypeMapper.TTX_MIME_TYPE)
 //				|| oriTu.getMimeType().equals(MimeTypeMapper.XLIFF_MIME_TYPE) ) {
 //				mergeAsSegments = true;
 //			}
 //		}
+
+		TextContainer srcOriCont = oriTu.getSource();
+		ISegments trgTraSegs = trgTraCont.getSegments();
 		
-		TextFragment traTrgTf = tc.getUnSegmentedContentCopy();
-		TextFragment oriSrcTf = oriTu.getSource().getUnSegmentedContentCopy();
+		for ( Segment srcOriSeg : srcOriCont.getSegments() ) {
+			Segment trgTraSeg = trgTraSegs.get(srcOriSeg.id);
+			if ( trgTraSeg == null ) {
+				LOGGER.warning(String.format("Item id='%s': No translation segment found for the source segment '%s'. Using source.",
+					traTu.getId(), srcOriSeg.id));
+				// Use the source instead
+				trgTraSeg.text = srcOriSeg.text.clone();
+			}
+			else {
+				TextUnitUtil.adjustTargetCodes(srcOriSeg.text, trgTraSeg.text, true, true, null, oriTu);
+			}
+		}
+		// 
+		oriTu.setTarget(trgLoc, trgTraCont);
 		
-		TextUnitUtil.adjustTargetCodes(oriSrcTf, traTrgTf, true, true, null, oriTu);
-		oriTu.setTargetContent(trgLoc, traTrgTf);
+//		TextFragment traTrgTf = tc.getUnSegmentedContentCopy();
+//		TextFragment oriSrcTf = oriTu.getSource().getUnSegmentedContentCopy();
+//		TextUnitUtil.adjustTargetCodes(oriSrcTf, traTrgTf, true, true, null, oriTu);
+//		oriTu.setTargetContent(trgLoc, traTrgTf);
 		
-		// Update the 'approved' flag of the entry to merge if available
+		// Update/add the 'approved' flag of the entry to merge if available
 		// (for example to remove the fuzzy flag in POs or set the approved attribute in XLIFF)
 		if ( manifest.getUpdateApprovedFlag() ) {
-			Property oriProp = oriTu.getTargetProperty(trgLoc, Property.APPROVED);
-			if ( oriProp != null ) {
-				if ( traProp != null ) {
-					oriProp.setValue(traProp.getValue());
-				}
-				else {
-					oriProp.setValue("yes");
-				}
-			}			
+			Property oriProp = oriTu.createTargetProperty(trgLoc, Property.APPROVED, false, IResource.CREATE_EMPTY);
+			if ( traProp != null ) {
+				oriProp.setValue(traProp.getValue());
+			}
+			else {
+				oriProp.setValue("yes");
+			}
 		}
 		
 		writer.handleEvent(oriEvent);

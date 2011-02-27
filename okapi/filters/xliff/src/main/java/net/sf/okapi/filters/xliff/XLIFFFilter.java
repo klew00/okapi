@@ -96,7 +96,7 @@ public class XLIFFFilter implements IFilter {
 	private boolean canceled;
 	private GenericSkeleton skel;
 	private TextUnit tu;
-	private boolean approved;
+	private int approved; // -1=no property, 0=no, 1=yes
 	private Parameters params;
 	private boolean sourceDone;
 	private boolean targetDone;
@@ -338,7 +338,7 @@ public class XLIFFFilter implements IFilter {
 				else if ( "bin-unit".equals(name) ) {
 					if ( processStartBinUnit() ) return true;
 				}
-				else storeStartElement(false);
+				else storeStartElement(false, false);
 				break;
 				
 			case XMLStreamConstants.END_ELEMENT:
@@ -449,7 +449,9 @@ public class XLIFFFilter implements IFilter {
 		return true;
 	}
 	
-	private void storeStartElement (boolean updateLangWithTarget) {
+	private void storeStartElement (boolean updateLangWithTarget,
+		boolean addApprovedIfNeeded)
+	{
 		String prefix = reader.getPrefix();
 		if (( prefix == null ) || ( prefix.length()==0 )) {
 			skel.append("<"+reader.getLocalName());
@@ -481,13 +483,26 @@ public class XLIFFFilter implements IFilter {
 			if ( updateLangWithTarget && attrName.equals("xml:lang") ) {
 				attrValue = trgLang.toBCP47(); 
 			}
+
+			if ( reader.getAttributeLocalName(i).equals(Property.APPROVED) ) {
+				skel.addValuePlaceholder(tu, Property.APPROVED, trgLang);
+				addApprovedIfNeeded = false;
+			}
+			else {
+				skel.append(String.format(" %s=\"%s\"", attrName,
+					Util.escapeToXML(attrValue.replace("\n", lineBreak), 3, params.getEscapeGT(), null)));
+			}
 			
-			skel.append(String.format(" %s=\"%s\"", attrName,
-				Util.escapeToXML(attrValue.replace("\n", lineBreak), 3, params.getEscapeGT(), null)));
 			if ( attrName.equals("xml:space") ) {
 				ps = reader.getAttributeValue(i).equals("preserve");
 			}
 		}
+		
+		// Add properties not set but that are writeable
+		if ( addApprovedIfNeeded ) {
+			skel.addValuePlaceholder(tu, Property.APPROVED, trgLang);
+		}
+		
 		skel.append(">");
 		preserveSpaces.push(ps);
 	}
@@ -581,7 +596,7 @@ public class XLIFFFilter implements IFilter {
 			inAltTrans = false;
 			segSourceDone = false;
 			tu = new TextUnit(String.valueOf(++tuId));
-			storeStartElement(false);
+			storeStartElement(false, true);
 
 			String tmp = reader.getAttributeValue(null, "translate");
 			if ( tmp != null ) tu.setIsTranslatable(tmp.equals("yes"));
@@ -601,10 +616,14 @@ public class XLIFFFilter implements IFilter {
 				tu.setProperty(new Property(PROP_EXTRADATA, tmp, true));
 			}
 
-			approved = false;
+			approved = -1;
 			tmp = reader.getAttributeValue(null, Property.APPROVED);
-			if (( tmp != null ) && tmp.equals("yes") ) {
-				approved = true;
+			if ( tmp != null ) {
+				approved = 0;
+				if ( tmp.equals("yes") ) {
+					approved = 1;
+				}
+				
 			}
 
 			// Set restype (can be null)
@@ -619,13 +638,13 @@ public class XLIFFFilter implements IFilter {
 				case XMLStreamConstants.START_ELEMENT:
 					name = reader.getLocalName();
 					if ( "source".equals(name) ) {
-						storeStartElement(false);
+						storeStartElement(false, false);
 						processSource(false);
 						storeEndElement();
 					}
 					else if ( "target".equals(name) ) {
 						addSegSourceIfNeeded();
-						storeStartElement(params.getOverrideTargetLanguage());
+						storeStartElement(params.getOverrideTargetLanguage(), false);
 						processTarget();
 						storeEndElement();
 					}
@@ -633,7 +652,7 @@ public class XLIFFFilter implements IFilter {
 						// Store the seg-source skeleton in a isolated part
 						skel.add(XLIFFSkeletonWriter.SEGSOURCEMARKER);
 						skel.attachParent(tu);
-						storeStartElement(false);
+						storeStartElement(false, false);
 						processSource(true);
 						storeEndElement();
 						skel.flushPart(); // Close the part for the seg-source
@@ -644,18 +663,18 @@ public class XLIFFFilter implements IFilter {
 					}
 					else if ( "note".equals(name) ) {
 						addTargetIfNeeded();
-						storeStartElement(false);
+						storeStartElement(false, false);
 						processNote();
 						storeEndElement();
 					}
 					else if ( "alt-trans".equals(name) ) {
 						addTargetIfNeeded();
-						storeStartElement(false);
+						storeStartElement(false, false);
 						processStartAltTrans();
 					}
 					else {
 						addTargetIfNeeded();
-						storeStartElement(false);
+						storeStartElement(false, false);
 					}
 					break;
 				
@@ -850,9 +869,9 @@ public class XLIFFFilter implements IFilter {
 				tu.setTargetProperty(trgLang, new Property(Property.COORDINATES, coordValue, false));
 			}
 
-			if ( approved ) {
+			if ( approved > -1 ) {
 				// Note that this property is set to the target at the resource-level
-				tu.setTargetProperty(trgLang, new Property(Property.APPROVED, "yes", false));
+				tu.setTargetProperty(trgLang, new Property(Property.APPROVED, (approved==1 ? "yes" : "no"), false));
 			}
 			
 			targetDone = true;
@@ -1074,7 +1093,7 @@ public class XLIFFFilter implements IFilter {
 					break;
 					
 				case XMLStreamConstants.START_ELEMENT:
-					if ( store ) storeStartElement(false);
+					if ( store ) storeStartElement(false, false);
 					name = reader.getLocalName();
 					if ( name.equals("mrk") ) { // Check for start of segment
 						String type = reader.getAttributeValue(null, "mtype");
@@ -1239,7 +1258,7 @@ public class XLIFFFilter implements IFilter {
 				eventType = reader.next();
 				switch ( eventType ) {
 				case XMLStreamConstants.START_ELEMENT:
-					if ( store ) storeStartElement(false);
+					if ( store ) storeStartElement(false, false);
 					StringBuilder tmpg = new StringBuilder();
 					if ( reader.getLocalName().equals("sub") ) {
 						logger.warning("A <sub> element was detected. It will be included in its parent code as <sub> is currently not supported.");
@@ -1376,7 +1395,7 @@ public class XLIFFFilter implements IFilter {
 	}
 
 	private boolean processStartGroup () {
-		storeStartElement(false);
+		storeStartElement(false, false);
 		// Check if it's a 'merge-trans' group (v1.2)
 		String tmp = reader.getAttributeValue(null, "merge-trans");
 		if ( tmp != null ) {
@@ -1422,7 +1441,7 @@ public class XLIFFFilter implements IFilter {
 	}
 
 	private boolean processStartBinUnit () {
-		storeStartElement(false);
+		storeStartElement(false, false);
 
 		String tmp = reader.getAttributeValue(null, "id");
 		if ( tmp == null ) {

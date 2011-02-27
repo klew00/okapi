@@ -650,6 +650,85 @@ public class XLIFFFilterTest {
 		assertNotNull(prop);
 		assertEquals("yes", prop.getValue());
 	}
+	
+	@Test
+	public void testApprovedOutput () {
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+			+ "<xliff version=\"1.2\">"
+			+ "<file source-language=\"en\" target-language=\"fr\" datatype=\"x-test\" original=\"file.ext\">"
+			+ "<body>"
+			+ "<trans-unit id=\"1\">"
+			+ "<source>en</source><target>fr</target>"
+			+ "</trans-unit>"
+			+ "<trans-unit id=\"2\" approved=\"no\">"
+			+ "<source>en</source><target>fr</target>"
+			+ "</trans-unit>"
+			+ "<trans-unit id=\"3\" approved=\"yes\">"
+			+ "<source>en</source><target>fr</target>"
+			+ "</trans-unit>"
+			+ "</body>"
+			+ "</file></xliff>";
+		List<Event> list = getEvents(snippet);
+
+		String expectedNoChange = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+			+ "<xliff version=\"1.2\">"
+			+ "<file source-language=\"en\" target-language=\"fr\" datatype=\"x-test\" original=\"file.ext\">"
+			+ "<body>"
+			+ "<trans-unit id=\"1\">"
+			+ "<source>en</source><target>fr</target>"
+			+ "</trans-unit>"
+			+ "<trans-unit id=\"2\" approved=\"no\">"
+			+ "<source>en</source><target>fr</target>"
+			+ "</trans-unit>"
+			+ "<trans-unit id=\"3\" approved=\"yes\">"
+			+ "<source>en</source><target>fr</target>"
+			+ "</trans-unit>"
+			+ "</body>"
+			+ "</file></xliff>";
+		assertEquals(expectedNoChange, FilterTestDriver.generateOutput(list,
+			locFR, filter.createSkeletonWriter(), filter.getEncoderManager()));
+
+		// Add a property
+		TextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		Property prop = tu.getTargetProperty(locFR, Property.APPROVED);
+		assertTrue(prop==null);
+		prop = tu.createTargetProperty(locFR, Property.APPROVED, false, IResource.CREATE_EMPTY);
+		prop.setValue("no");
+		
+		// Change value
+		tu = FilterTestDriver.getTextUnit(list, 2);
+		prop = tu.getTargetProperty(locFR, Property.APPROVED);
+		assertNotNull(prop);
+		assertEquals("no", prop.getValue());
+		prop.setValue("yes");
+		
+		// Remove
+		tu = FilterTestDriver.getTextUnit(list, 3);
+		prop = tu.getTargetProperty(locFR, Property.APPROVED);
+		assertNotNull(prop);
+		assertEquals("yes", prop.getValue());
+		tu.removeTargetProperty(locFR, Property.APPROVED);
+
+		String expectedChanges = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+			+ "<xliff version=\"1.2\">"
+			+ "<file source-language=\"en\" target-language=\"fr\" datatype=\"x-test\" original=\"file.ext\">"
+			+ "<body>"
+			+ "<trans-unit id=\"1\" approved=\"no\">" // add
+			+ "<source>en</source><target>fr</target>"
+			+ "</trans-unit>"
+			+ "<trans-unit id=\"2\" approved=\"yes\">" // change value
+			+ "<source>en</source><target>fr</target>"
+			+ "</trans-unit>"
+			+ "<trans-unit id=\"3\">" // remove
+			+ "<source>en</source><target>fr</target>"
+			+ "</trans-unit>"
+			+ "</body>"
+			+ "</file></xliff>";
+		assertEquals(expectedChanges, FilterTestDriver.generateOutput(list,
+			locFR, filter.createSkeletonWriter(), filter.getEncoderManager()));
+	}
+
+	
 
 	@Test
 	public void testDefaultInfo () {

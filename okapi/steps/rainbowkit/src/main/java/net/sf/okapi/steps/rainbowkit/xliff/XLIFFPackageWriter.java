@@ -68,6 +68,7 @@ public class XLIFFPackageWriter extends BasePackageWriter {
 		writer.setCopySource(options.getCopySource());
 		writer.setIncludeAltTrans(options.getIncludeAltTrans());
 		writer.setSetApprovedasNoTranslate(options.getSetApprovedAsNoTranslate());
+		writer.setIncludeNoTranslate(options.getIncludeNoTranslate());
 		
 		StartDocument sd = event.getStartDocument();
 		writer.create(path, null, manifest.getSourceLocale(), manifest.getTargetLocale(),
@@ -107,11 +108,8 @@ public class XLIFFPackageWriter extends BasePackageWriter {
 	
 	@Override
 	protected void processTextUnit (Event event) {
-		// Skip non-translatable
-		TextUnit tu = event.getTextUnit();
-		
-		writer.handleEvent(event);
-		writeTMXEntries(tu);
+		event = writer.handleEvent(event);
+		writeTMXEntries(event.getTextUnit());
 	}
 
 	@Override

@@ -439,4 +439,84 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 		return false;
 	}
 
+	@Override
+	protected String getPropertyValue (INameable resource,
+		String name,
+		LocaleId locToUse,
+		int context)
+	{
+		// Update the encoder from the TU's MIME type
+		if ( encoderManager != null ) {
+			encoderManager.updateEncoder(resource.getMimeType());
+		}
+
+		// Get the value based on the output locale
+		Property prop = null;
+		String value = null;
+		if ( locToUse == null ) { // Use the source
+			prop = resource.getSourceProperty(name);
+		}
+		else if ( locToUse.equals(LocaleId.EMPTY) ) { // Use the resource-level properties
+			prop = resource.getProperty(name);
+		}
+		else { // Use the given target locale if possible
+			if ( resource.hasTargetProperty(locToUse, name) ) {
+				prop = resource.getTargetProperty(locToUse, name);
+			}
+			else {
+				if ( name.equals(Property.APPROVED) ) {
+					// Default for approved is 'no' that is no value
+					value = "";
+				}
+				else {
+					// Fall back to source if there is no target
+					prop = resource.getSourceProperty(name);
+				}
+			}
+		}
+		// Check the property we got
+		if ( value == null ) {
+			if ( prop == null ) {
+				logger.warning(String.format("Property '%s' not found.", name));
+				return "-ERR:PROP-NOT-FOUND-";
+			}
+			// Else process the value
+			value = prop.getValue();
+		}
+		
+		// Now look at the value
+		if ( value == null ) {
+			logger.warning(String.format("Property value for '%s' is null.", name));
+			return "-ERR:PROP-VALUE-NULL-";
+		}
+		// Else: We got the property value
+		// Check if it needs to be auto-modified
+		if ( Property.LANGUAGE.equals(name) ) {
+			// If it is the input locale, we change it with the output locale
+			//TODO: Do we need an option to be region-insensitive? (en==en-gb)
+			LocaleId locId = LocaleId.fromString(value);
+			if ( locId.equals(inputLoc) ) {
+				value = outputLoc.toString();
+			}
+		}
+		else if ( Property.ENCODING.equals(name) ) {
+			value = outputEncoding;
+		}
+		else if ( Property.APPROVED.equals(name) ) {
+			if ( !value.isEmpty() ) {
+				value = String.format(" approved=\"%s\"", value);
+			}
+		}
+		
+		// Return the native value if possible
+		if ( encoderManager == null ) {
+			if ( layer == null ) return value;
+			else return layer.encode(value, context); //TODO: context correct??
+		}
+		else {
+			if ( layer == null ) return encoderManager.toNative(name, value);
+			else return layer.encode(encoderManager.toNative(name, value), context);
+		}
+	}
+
 }

@@ -944,7 +944,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		return tmp.toString();
 	}
 	
-	private String getPropertyValue (INameable resource,
+	protected String getPropertyValue (INameable resource,
 		String name,
 		LocaleId locToUse,
 		int context)

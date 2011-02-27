@@ -384,7 +384,7 @@ public class XLIFFWriter implements IFilterWriter {
 				}
 			}
 			// Check if we need to skip non-translatable entries
-			if ( !includeNoTranslate && !tu.isTranslatable() ) {
+			if ( !tu.isTranslatable() && !includeNoTranslate ) {
 				return;
 			}
 		}
@@ -662,6 +662,6 @@ public class XLIFFWriter implements IFilterWriter {
 
 	// Use for IFilterWriter mode
 	private void processTextUnit (TextUnit tu) {
-		writeTextUnit(tu);
+		writeTextUnit(tu, null);
 	}
 }
