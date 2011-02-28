@@ -95,12 +95,13 @@ public class ArchiveFilterTest {
 	}
 	
 	@Test
-	public void testEvents() throws MalformedURLException {		
+	public void testEvents() throws MalformedURLException {
+		// Only document parts are extracted
 		RawDocumentToFilterEventsStep rd2fe = new RawDocumentToFilterEventsStep();
 		rd2fe.setFilter(filter);
 		
 		new XPipeline(
-				"Test pipeline for ArchiveFilterContentTest",
+				"Test pipeline for ArchiveFilterTest",
 				new XBatch(
 						new XBatchItem(
 								new URL("file", null, pathBase + "test2_es.archive"),
@@ -117,10 +118,11 @@ public class ArchiveFilterTest {
 	}
 	
 	@Test
-	public void testMimeType() throws MalformedURLException {		
+	public void testMimeType() throws MalformedURLException {
+		// Only tmx is extracted, no xliff2 in the sample
 		Parameters params = new Parameters();
-		params.setFileExtensions("xliff2,tmx");
-		params.setConfigIds("okf_xliff,okf_tmx");
+		params.setFileNames("*.xliff2, *.tmx");
+		params.setConfigIds("okf_xliff, okf_tmx");
 		
 		filter = new ArchiveFilter();
 		assertEquals(ArchiveFilter.MIME_TYPE, filter.getMimeType());
@@ -132,7 +134,7 @@ public class ArchiveFilterTest {
 		assertEquals("okf_test", filter.getMimeType());
 		
 		new XPipeline(
-				"Test pipeline for ArchiveFilterContentTest",
+				"Test pipeline for ArchiveFilterTest",
 				new XBatch(
 						new XBatchItem(
 								new URL("file", null, pathBase + "test2_es.archive"),
@@ -141,14 +143,15 @@ public class ArchiveFilterTest {
 								ESES)
 						),
 						
-				new RawDocumentToFilterEventsStep(filter)
-				
+				new RawDocumentToFilterEventsStep(filter),				
+				new EventLogger()				
 		).execute();
 		assertEquals("okf_test", filter.getMimeType());
 	}
 	
 	@Test
-	public void testEvents2() throws MalformedURLException {		
+	public void testEvents2() throws MalformedURLException {
+		// only tmx is extracted, no config for xliff is registered (fcm has no default filter configs set)
 		RawDocumentToFilterEventsStep rd2fe = new RawDocumentToFilterEventsStep();
 		
 		FilterConfigurationMapper fcm = new FilterConfigurationMapper();
@@ -174,11 +177,18 @@ public class ArchiveFilterTest {
 						".tmx;"));
 		
 		
-		filter = new ArchiveFilter(fcm);
+		filter = new ArchiveFilter();
+		filter.setFilterConfigurationMapper(fcm);
+		
+		Parameters params = new Parameters();
+		params.setFileNames("*.xliff2, *.tmx, *02.xlf");
+		params.setConfigIds("okf_xliff, okf_tmx, okf_xliff");
+		filter.setParameters(params);
+		
 		rd2fe.setFilter(filter);
 		
 		new XPipeline(
-				"Test pipeline for ArchiveFilterContentTest",
+				"Test pipeline for ArchiveFilterTest",
 				new XBatch(
 						new XBatchItem(
 								new URL("file", null, pathBase + "test4_es.archive"),
@@ -195,13 +205,14 @@ public class ArchiveFilterTest {
 	}
 	
 	@Test
-	public void testEvents3() throws MalformedURLException {		
-		RawDocumentToFilterEventsStep rd2fe = new RawDocumentToFilterEventsStep();
-		
-		rd2fe.setFilter(new ArchiveFilter());
+	public void testEvents3() throws MalformedURLException {	
+		// extracts xlf as it's specified in parameters and xliff config is available from default configs
+		Parameters params = (Parameters) filter.getParameters();
+		params.setFileNames("*.xlf");
+		params.setConfigIds("okf_xliff");
 		
 		new XPipeline(
-				"Test pipeline for ArchiveFilterContentTest",
+				"Test pipeline for ArchiveFilterTest",
 				new XBatch(
 						new XBatchItem(
 								new URL("file", null, pathBase + "test4_es.archive"),
@@ -210,27 +221,27 @@ public class ArchiveFilterTest {
 								ESES)
 						),
 						
-				rd2fe,
-				
+				new RawDocumentToFilterEventsStep(filter),				
 				new EventLogger()
 				
 		).execute();
 	}
 	
 	@Test
-	public void testEvents4() throws MalformedURLException {		
+	public void testEvents4() throws MalformedURLException {
+		// both tmx and xlf are extracted
 		RawDocumentToFilterEventsStep rd2fe = new RawDocumentToFilterEventsStep();
 		
 		filter = new ArchiveFilter();
 		rd2fe.setFilter(filter);
 		
 		Parameters params = new Parameters();
-		params.setFileExtensions("xliff2,tmx");
-		params.setConfigIds("okf_xliff,okf_tmx");
+		params.setFileNames("*.xlf, *.xliff2, *.tmx");
+		params.setConfigIds("okf_xliff, okf_xliff, okf_tmx");
 		filter.setParameters(params);
 		
 		new XPipeline(
-				"Test pipeline for ArchiveFilterContentTest",
+				"Test pipeline for ArchiveFilterTest",
 				new XBatch(
 						new XBatchItem(
 								new URL("file", null, pathBase + "test4_es.archive"),
@@ -247,19 +258,20 @@ public class ArchiveFilterTest {
 	}
 	
 	@Test
-	public void testEvents5() throws MalformedURLException {		
+	public void testEvents5() throws MalformedURLException {
+		// only xlf is extracted
 		RawDocumentToFilterEventsStep rd2fe = new RawDocumentToFilterEventsStep();
 		
 		filter = new ArchiveFilter();
 		rd2fe.setFilter(filter);
 		
 		Parameters params = new Parameters();
-		params.setFileExtensions("xliff2,xliff,xlf");
-		params.setConfigIds("okf_xliff,okf_xliff,okf_xliff");
+		params.setFileNames("*.xliff2, *.xliff, *.xlf");
+		params.setConfigIds("okf_xliff, okf_xliff, okf_xliff");
 		filter.setParameters(params);
 		
 		new XPipeline(
-				"Test pipeline for ArchiveFilterContentTest",
+				"Test pipeline for ArchiveFilterTest",
 				new XBatch(
 						new XBatchItem(
 								new URL("file", null, pathBase + "test4_es.archive"),
@@ -276,19 +288,20 @@ public class ArchiveFilterTest {
 	}
 	
 	@Test
-	public void testEvents6() throws MalformedURLException {		
+	public void testEvents6() throws MalformedURLException {	
+		// tmx and xlf are extracted
 		RawDocumentToFilterEventsStep rd2fe = new RawDocumentToFilterEventsStep();
 		
 		filter = new ArchiveFilter();
 		rd2fe.setFilter(filter);
 		
 		Parameters params = new Parameters();
-		params.setFileExtensions("xlf,tmx");
-		params.setConfigIds("okf_xliff,okf_tmx");
+		params.setFileNames("*.xlf, *.tmx");
+		params.setConfigIds("okf_xliff, okf_tmx");
 		filter.setParameters(params);
 		
 		new XPipeline(
-				"Test pipeline for ArchiveFilterContentTest",
+				"Test pipeline for ArchiveFilterTest",
 				new XBatch(
 						new XBatchItem(
 								new URL("file", null, pathBase + "test5_es.archive"),
@@ -305,13 +318,14 @@ public class ArchiveFilterTest {
 	}
 	
 	@Test
-	public void testEvents7() throws MalformedURLException {		
+	public void testEvents7() throws MalformedURLException {
+		// nothing is extracted as no parameters are specified
 		RawDocumentToFilterEventsStep rd2fe = new RawDocumentToFilterEventsStep();
 		
 		rd2fe.setFilter(new ArchiveFilter());
 		
 		new XPipeline(
-				"Test pipeline for ArchiveFilterContentTest",
+				"Test pipeline for ArchiveFilterTest",
 				new XBatch(
 						new XBatchItem(
 								new URL("file", null, pathBase + "test5_es.archive"),
@@ -328,19 +342,20 @@ public class ArchiveFilterTest {
 	}
 	
 	@Test
-	public void testEvents8() throws MalformedURLException {		
+	public void testEvents8() throws MalformedURLException {
+		// tmx and xlf are extracted
 		RawDocumentToFilterEventsStep rd2fe = new RawDocumentToFilterEventsStep();
 		
 		filter = new ArchiveFilter();
 		rd2fe.setFilter(filter);
 		
 		Parameters params = new Parameters();
-		params.setFileExtensions("xlf,tmx");
+		params.setFileNames("*.xlf, *.tmx");
 		params.setConfigIds("okf_xliff,okf_tmx");
 		filter.setParameters(params);
 		
 		new XPipeline(
-				"Test pipeline for ArchiveFilterContentTest",
+				"Test pipeline for ArchiveFilterTest",
 				new XBatch(
 						new XBatchItem(
 								new URL("file", null, pathBase + "test5_es.archive"),

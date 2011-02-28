@@ -35,11 +35,16 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private String mimeType;
 	
 	/**
-	 * Comma-delimited list of extensions in the same order as configIds. If the container contains a file with 
-	 * one of the extensions, the corresponding config Id is looked up in the fileExtensions string,
-	 * and the container's filter instantiates a sub-filter to process that internal file.  
+	 * Comma-delimited list of file names (masks with ? and * wildcards are allowed). Elements of the list correspond to elements in configIds. 
+	 * If the container includes a file which name fits one of the masks or a filename, the corresponding config Id is looked up in 
+	 * the fileExtensions string, and the container's filter instantiates a sub-filter to process that internal file.
+	 * <p> If the container includes several files with the same name located in different internal ZIP folders, all those files will be processed;
+	 * if you want to process only some of them, prefix those file names with path info.
+	 * <p> If fileNames is empty, then no contained files are processed, and all content is sent as document part events.  
+	 * <p> Examples of fileNames:
+	 * <p> document.xml, styles.xml, *notes.xml, word/fontTable.xml, word/theme/theme?.xml  
 	 */
-	private String fileExtensions;
+	private String fileNames;
 
 	/**
 	 * Comma-delimited list of configuration Ids corresponding to the extension
@@ -54,7 +59,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	@Override
 	public void reset() {
 		mimeType = ArchiveFilter.MIME_TYPE;
-		fileExtensions = "";
+		fileNames = "";
 		configIds = "";
 	}
 
@@ -63,7 +68,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		reset();
 		buffer.fromString(data);
 		mimeType = buffer.getString("mimeType", mimeType);
-		fileExtensions = buffer.getString("fileExtensions", fileExtensions);
+		fileNames = buffer.getString("fileNames", fileNames);
 		configIds = buffer.getString("configIds", configIds);
 	}
 
@@ -71,17 +76,17 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public String toString() {
 		buffer.reset();
 		buffer.setString("mimeType", mimeType);
-		buffer.setString("fileExtensions", fileExtensions);
+		buffer.setString("fileNames", fileNames);
 		buffer.setString("configIds", configIds);
 		return buffer.toString();
 	}
 		
-	public void setFileExtensions(String fileExtensions) {
-		this.fileExtensions = fileExtensions;
+	public void setFileNames(String fileNames) {
+		this.fileNames = fileNames;
 	}
 
-	public String getFileExtensions() {
-		return fileExtensions;
+	public String getFileNames() {
+		return fileNames;
 	}
 
 	public void setConfigIds(String configIds) {
@@ -104,7 +109,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public ParametersDescription getParametersDescription() {
 		ParametersDescription desc = new ParametersDescription(this);
 		desc.add("mimeType", "MIME type of the filter's container format", null);
-		desc.add("fileExtensions", "Extensions:", "Comma-delimited list of extensions in the same order as configIds");
+		desc.add("fileNames", "File names:", "Comma-delimited list of file names to be processed (masks are allowed) in the same order as configIds");
 		desc.add("configIds", "Config Ids:", "Comma-delimited list of configuration Ids corresponding to the extension");
 		return desc;
 	}
@@ -115,7 +120,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		EditorDescription desc = new EditorDescription("Archive Filter Parameters", true, false);
 		
 		desc.addTextInputPart(parametersDescription.get("mimeType"));
-		desc.addTextInputPart(parametersDescription.get("fileExtensions"));
+		desc.addTextInputPart(parametersDescription.get("fileNames"));
 		desc.addTextInputPart(parametersDescription.get("configIds"));
 		
 		return desc;

@@ -36,7 +36,8 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.ListUtil;
 import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.Util;
+import net.sf.okapi.common.ResourceUtil;
+import net.sf.okapi.common.StringUtil;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
@@ -48,7 +49,6 @@ import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.filterwriter.ZipFilterWriter;
-import net.sf.okapi.common.ResourceUtil;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
@@ -61,9 +61,9 @@ import net.sf.okapi.common.skeleton.ZipSkeleton;
 /**
  * Implements the IFilter interface for archive-based (ZIP) content. This filter generates events for
  * certain files in the archive. Those files are processed with sub-filters that are instantiated automatically
- * based on the files' extensions. Mapping between the extensions and filter configurations to be used is
- * defined either in the filter parameters, or with the FilterConfigurationMapper object passed to the constructor.
- * The files, for which extensions no sub-filter configId is provided, will be sent as document parts with ZipSkeleton.
+ * based on the file names. Mapping between the file names and filter configurations to be used is
+ * defined in the filter parameters. File names in filter parameters may contain wildcards (* and ?).
+ * The files, for which file names no sub-filter configId is provided, will be sent as document parts with ZipSkeleton.
  * <p>
  * MIME type of the format supported by the filter is not defined by the filter, but is specified via filter parameters. 
  * It allows to use the same filter for different container formats, e.g. DOCX, ODT, etc. by only changing a set of 
@@ -73,15 +73,13 @@ import net.sf.okapi.common.skeleton.ZipSkeleton;
  * you are responsible to provide visibility of class loaders of those sub-filter classes you specify, otherwise the ArchiveFilter
  * won't be able to instantiate the sub-filters, and an exception will be thrown.
  * <p>
- * There are two ways to configure this filter:
- * <li> pass to the constructor a configured FilterConfigurationMapper object, which will include sub-filter configurations for the
- * internal files to be processed. Files are detected by their extensions, and FilterConfigurationMapper creates sub-filters for 
- * those extensions. Extensions and corresponding filter configurations in filter parameters are ignored.  
- * <li> specify in Parameters the comma-separated lists of file extensions and their corresponding config Ids. In this case the filter
- * should be instantiated with its empty constructor, and then it will create a FilterConfigurationMapper object and load it with default 
- * configurations specified by the DefaultFilters class. Make sure you use one of those default configurations, provided by the 
- * DefaultFilters class. You can use this approach to map one of default configurations to a *non-standard* file extension (i.e. one 
- * not listed among the configuration's file extensions). In case you need to use a custom configuration, consider the first way.
+ * To configure the filter, specify in Parameters the comma-separated lists of file names (may contain wildcards) and their corresponding 
+ * config Ids.
+ * <p>
+ * When specifying congigId for a file, you can choose one of the configurations provided by DefaultFilters class. If the desired
+ * configuration is not provided there, you can use setFilterConfigurationMapper() to set your own FilterConfiguationMapper,
+ * or alternatively you can get a reference to the default implementation of IFilterConfigurationMapper provided by this class, and
+ * use addConfiguration() and other methods to configure it to your desire.
  */
 
 public class ArchiveFilter implements IFilter {
@@ -111,21 +109,18 @@ public class ArchiveFilter implements IFilter {
 	//private String internalMimeType;
 	private EncoderManager encoderManager;
 	private String mimeType = MIME_TYPE;
+	private String[] fileNames;
+	private String[] configIds;
+	//private boolean setMapping;
 	private IFilterConfigurationMapper fcMapper;
-	private boolean setMapping;
 
 	public ArchiveFilter() {
 		super();
 		params = new Parameters();
 		params.setMimeType(MIME_TYPE);
 		subFilters = new ArrayList<IFilter> ();		
-		setMapping = true;	
+		//setMapping = true;	
 		filterWriter = new ZipFilterWriter(null);
-	}
-	
-	public ArchiveFilter(IFilterConfigurationMapper fcMapper) {
-		this();
-		setFilterConfigurationMapper(fcMapper);
 	}
 	
 	@Override
@@ -227,6 +222,8 @@ public class ArchiveFilter implements IFilter {
 		open(input, true);
 	}
 
+	
+	
 	@Override
 	public void open(RawDocument input, boolean generateSkeleton) {
 		close();
@@ -242,49 +239,57 @@ public class ArchiveFilter implements IFilter {
 		if (params != null) {
 			mimeType = params.getMimeType();
 		}
-		// Configure fcMapper for given parameters
-		if (setMapping) {
-			this.fcMapper = new FilterConfigurationMapper();
-			DefaultFilters.setMappings(fcMapper, true, true);
-			
-			List<FilterConfiguration> usedConfigs = new ArrayList<FilterConfiguration> ();
-			String[] extensions = ListUtil.stringAsArray(params.getFileExtensions());
-			String[] configIds = ListUtil.stringAsArray(params.getConfigIds());
-			if ((configIds.length > 0) && (extensions.length != configIds.length)) {
+//		// Configure fcMapper for given parameters
+//		if (setMapping) {
+			updateFilterConfigurationMapper();			
+						
+			//List<FilterConfiguration> usedConfigs = new ArrayList<FilterConfiguration> ();
+			fileNames = ListUtil.stringAsArray(params.getFileNames());
+			configIds = ListUtil.stringAsArray(params.getConfigIds());
+			if ((configIds.length > 0) && (fileNames.length != configIds.length)) {
 				throw new RuntimeException("Different number of configIds and extensions in parameters");
 			}
-			for (int i = 0; i < configIds.length; i++) {
-				String configId = configIds[i];
-				
-				FilterConfiguration fc = fcMapper.getConfiguration(configId);
-				if (fc == null) 
-					fc = new FilterConfiguration();
-				else
-					usedConfigs.add(fc);
-				
-				String ext = extensions[i];
-				if (!ext.startsWith(".")) ext = "." + ext;
-					
-				fc.configId = configId;
-				if (fc.extensions == null)
-					fc.extensions = "";
-				if (fc.extensions.indexOf(ext + ";") < 0) {
-					fc.extensions += ext + ";";
-				}
-				
-			}
+//			for (int i = 0; i < configIds.length; i++) {
+//				String configId = configIds[i];
+//				
+//				FilterConfiguration fc = fcMapper.getConfiguration(configId);
+//				if (fc == null) 
+//					fc = new FilterConfiguration();
+//				else
+//					usedConfigs.add(fc);
+//				
+//				String fname = fileNames[i];
+//				if (!ext.startsWith(".")) ext = "." + ext;
+//					
+//				fc.configId = configId;
+//				if (fc.extensions == null)
+//					fc.extensions = "";
+//				if (fc.extensions.indexOf(ext + ";") < 0) {
+//					fc.extensions += ext + ";";
+//				}
+//				
+//			}
 			
-			fcMapper.clearConfigurations(false);
-			for (FilterConfiguration config : usedConfigs) {
-				fcMapper.addConfiguration(config);
-			}
+//			fcMapper.clearConfigurations(false);
+//			for (FilterConfiguration config : usedConfigs) {
+//				fcMapper.addConfiguration(config);
+//			}
+		}		
+	private void updateFilterConfigurationMapper() {
+		if (fcMapper == null) {
+			fcMapper = new FilterConfigurationMapper();
+			DefaultFilters.setMappings(fcMapper, true, true);
 		}		
 	}
 
 	@Override
 	public void setFilterConfigurationMapper(IFilterConfigurationMapper fcMapper) {
 		this.fcMapper = fcMapper;
-		setMapping = fcMapper == null;
+	}
+	
+	public IFilterConfigurationMapper getFilterConfigurationMapper() {
+		updateFilterConfigurationMapper();
+		return fcMapper;
 	}
 
 	@Override
@@ -345,17 +350,19 @@ public class ArchiveFilter implements IFilter {
 	}
 	
 	private IFilter getSubFilter(String name) {
-		// Get extension (with no dot)
-		String ext = Util.getExtension(name);
-		if (Util.isEmpty(ext)) return null;
-		//if (ext.startsWith(".")) ext = ext.substring(1); // remove the leading dot
+		String configId = "";
 		
-		// Lookup config for this extension
-		FilterConfiguration config = fcMapper.getDefaultConfigurationFromExtension(ext);
-		if (config == null) return null;
+		for (int i = 0; i < fileNames.length; i++) {
+			String fname = fileNames[i];
+			
+			if (StringUtil.matchesWildcard(name, fname, true)) {
+				configId = configIds[i];
+				break;
+			}
+		}
 		
 		// Create sub-filter		
-		return fcMapper.createFilter(config.configId);
+		return fcMapper.createFilter(configId);
 	}
 
 	private Event openSubDocument () {
@@ -408,4 +415,5 @@ public class ArchiveFilter implements IFilter {
 		}
 		return null; // Should not get here
 	}
+
 }
