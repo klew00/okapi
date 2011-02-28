@@ -88,6 +88,26 @@ import org.junit.Test;
 	}
 	
 	@Test
+	public void testMatchesWildcard() {
+		assertTrue(StringUtil.matchesWildcard("filename1.xml", "*.xml"));
+		assertTrue(StringUtil.matchesWildcard("filename2.xml", "*.xml"));
+		assertTrue(StringUtil.matchesWildcard(".xml", "*.xml"));
+		assertFalse(StringUtil.matchesWildcard("filename1.dita", "*.xml")); // false
+		assertTrue(StringUtil.matchesWildcard("filename1.dita", "*.*"));
+		assertTrue(StringUtil.matchesWildcard("filename.*", "filename.*"));
+		assertTrue(StringUtil.matchesWildcard("filename1.dita", "filename?.d?ta"));
+		assertTrue(StringUtil.matchesWildcard("filename5.data", "filename?.d?ta"));
+		assertFalse(StringUtil.matchesWildcard("filenames5.data", "filename?.d?ta")); // false		
+		assertFalse(StringUtil.matchesWildcard("word/settings/filenames5.data", "filename?.d?ta")); // false		
+		assertFalse(StringUtil.matchesWildcard("word/settings/filename5.data", "filename?.d?ta")); // false, !!! non-filename mode
+		assertTrue(StringUtil.matchesWildcard("word/settings/filename5.data", "filename?.d?ta", true)); // filename mode
+		assertTrue(StringUtil.matchesWildcard("word/settings/filename5.data", "word/settings/*.*"));
+		assertTrue(StringUtil.matchesWildcard("word/settings/filename5.data", "word/*.*"));
+		assertFalse(StringUtil.matchesWildcard("word/settings/filename5.data", "word/*.*", true)); // false
+		assertTrue(StringUtil.matchesWildcard("word/settings/filename5.data", "word/settings/*.*", true));
+	}
+	
+	@Test
 	public void testSplit() {
 		
 		String[] chunks = StringUtil.split("item1,   item2,item3,\t\nitem4", ",\\p{Space}*");

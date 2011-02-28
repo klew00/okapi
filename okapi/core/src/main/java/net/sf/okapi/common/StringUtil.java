@@ -253,6 +253,44 @@ public final class StringUtil {
 	
 		return string.indexOf('*') != -1 || string.indexOf('?') != -1;
 	}
+		
+	/**
+	 * Detects if a given string matches a given pattern (not necessarily a regex), possibly containing wildcards
+	 * @param string the given string (no-wildcards)
+	 * @param pattern the pattern containing wildcards to match against
+	 * @param filenameMode indicates if the given string should be considered a file name
+	 * @return true if the given string matches the given pattern
+	 */
+	public static boolean matchesWildcard(String string, String pattern, boolean filenameMode) {
+		if (filenameMode) {
+			String filename = Util.getFilename(string, true);
+			String patternFilename = Util.getFilename(pattern, true);
+			
+			String filePath = Util.getDirectoryName(string);
+			String patternFilePath = Util.getDirectoryName(pattern);
+			
+			boolean pathMatches;
+			if (Util.isEmpty(patternFilePath)) 
+				pathMatches = true; // word/settings/filename.ext matches *.ext
+			else
+				pathMatches = Pattern.matches(normalizeWildcards(patternFilePath), filePath); // word/settings/filename.ext matches word/*/*.ext
+			
+			boolean filenameMatches = Pattern.matches(normalizeWildcards(patternFilename), filename);			
+			
+			return pathMatches && filenameMatches;				
+		}
+		return Pattern.matches(normalizeWildcards(pattern), string);
+	}
+	
+	/**
+	 * Detects if a given string matches a given pattern (not necessarily a regex), possibly containing wildcards
+	 * @param string the given string (no-wildcards)
+	 * @param pattern the pattern containing wildcards to match against
+	 * @return true if the given string matches the given pattern
+	 */
+	public static boolean matchesWildcard(String string, String pattern) {
+		return matchesWildcard(string, pattern, false);
+	}
 
 	public static String[] split(String string, String delimRegex, int group) {
 		
