@@ -49,6 +49,7 @@ public class Manifest implements IAnnotation {
 	public static final String EXTRACTIONTYPE_XLIFF = "xliff";
 	public static final String EXTRACTIONTYPE_PO = "po";
 	public static final String EXTRACTIONTYPE_RTF = "rtf";
+	public static final String EXTRACTIONTYPE_XLIFFRTF = "xliff+rtf";
 	public static final String EXTRACTIONTYPE_OMEGAT = "omegat";
 	public static final String EXTRACTIONTYPE_TRANSIFEX = "transifex";
 
@@ -88,7 +89,7 @@ public class Manifest implements IAnnotation {
 		tmSubDir = "";
 		updateFullDirectories();
 		useApprovedOnly = false;
-		updateApprovedFlag = true;
+		updateApprovedFlag = false;
 	}
 
 	public Map<Integer, MergingInfo> getItems () {

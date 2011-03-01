@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -46,8 +46,8 @@ public class Property {
 	 * Creates a new property object with a name, a vale and its read-only flag.
 	 * @param name the name of the property (case-sensitive).
 	 * @param value the value of the property.
-	 * @param isReadOnly true if the property is protected, false if it is not protected
-	 * and can be modified.
+	 * @param isReadOnly true if the property cannot be modified using the filter, false if you
+	 * can modify the value in the output document.
 	 */
 	public Property (String name, String value, boolean isReadOnly) {
 		this.name = name;
@@ -120,7 +120,9 @@ public class Property {
 	
 	/**
 	 * Indicates if this property is read-only.
-	 * @return true if the property is not modifiable, false if it can be modified.
+	 * <p>All property can be changed, but the ones flagged as read-only
+	 * cannot be modified when re-writing the document from where they have been extracted.
+	 * @return true if the property cannot be modified in the filter output, false if it can be modified.
 	 */
 	public boolean isReadOnly () {
 		return isReadOnly;

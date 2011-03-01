@@ -52,7 +52,6 @@ public abstract class BasePackageWriter implements IPackageWriter {
 	protected Manifest manifest;
 	protected int docId;
 	protected String extractionType;
-	protected MergingInfo mergingInfo;
 	protected ISkeletonWriter skelWriter;
 	protected TMXWriter tmxWriterApproved;
 	protected String tmxPathApproved;

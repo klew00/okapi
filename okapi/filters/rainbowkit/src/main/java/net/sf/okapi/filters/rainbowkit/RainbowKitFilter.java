@@ -276,11 +276,18 @@ public class RainbowKitFilter implements IFilter {
 			extension = ".po";
 		}
 		else if ( info.getExtractionType().equals(Manifest.EXTRACTIONTYPE_RTF) ) {
-			postprocessRTF();
+			postprocessRTF(false);
 			// We send a no-operation event rather than call nextDocument() to avoid
 			// having nested calls that would keep going deeper 
 			queue.add(Event.NOOP_EVENT);
 			return;
+		}
+		else if ( info.getExtractionType().equals(Manifest.EXTRACTIONTYPE_XLIFFRTF) ) {
+			// Remove the RTF layer and get the resulting XLIFF file
+			file = postprocessRTF(true);
+			// Now we have an XLIFF document ready for parsing
+			filter = new XLIFFFilter();
+			extension = ""; // Extension is already on the filename
 		}
 		else if ( info.getExtractionType().equals(Manifest.EXTRACTIONTYPE_TRANSIFEX) ) {
 			file = downloadFromTransifex(info);
@@ -333,7 +340,8 @@ public class RainbowKitFilter implements IFilter {
 		}
 	}
 
-	private void postprocessRTF () {
+	private File postprocessRTF (boolean forXLIFFRTF) {
+		File outputFile = null;
 		OutputStreamWriter writer = null;
 		try {
 			// Instantiate the reader if needed
@@ -346,15 +354,22 @@ public class RainbowKitFilter implements IFilter {
 			
 			// Open the RTF input
 			//TODO: guess encoding based on language
-			File file = new File(manifest.getTargetDirectory()+info.getRelativeInputPath()+".rtf");
+			File file = new File(manifest.getTargetDirectory()+info.getRelativeInputPath() + (forXLIFFRTF ? ".xlf" : "") + ".rtf");
 			rtfFilter.open(new RawDocument(file.toURI(), "windows-1252", manifest.getTargetLocale()));
 				
 			// Open the output document
 			// Initializes the output
-			String outputFile = manifest.getMergeDirectory()+info.getRelativeTargetPath();
-			Util.createDirectories(outputFile);
+			String outputPath;
+			if ( forXLIFFRTF ) { // Output in the XLIFF file in the target directory
+				outputPath = manifest.getTargetDirectory()+info.getRelativeInputPath() + ".xlf";
+			}
+			else {
+				outputPath = manifest.getMergeDirectory()+info.getRelativeTargetPath();
+			}
+			outputFile = new File(outputPath);
+			Util.createDirectories(outputPath);
 			writer = new OutputStreamWriter(new BufferedOutputStream(
-				new FileOutputStream(outputFile)), info.getTargetEncoding());
+				new FileOutputStream(outputPath)), info.getTargetEncoding());
 			//TODO: check BOM option from original
 			Util.writeBOMIfNeeded(writer, false, info.getTargetEncoding());
 				
@@ -383,6 +398,7 @@ public class RainbowKitFilter implements IFilter {
 				}
 			}
 		}
+		return outputFile;
 	}
 	
 	private File downloadFromTransifex (MergingInfo info) {

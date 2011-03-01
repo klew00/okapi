@@ -28,7 +28,6 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
@@ -38,7 +37,6 @@ import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.filters.rainbowkit.Manifest;
@@ -184,16 +182,21 @@ public class Merger {
 		for ( Segment srcOriSeg : srcOriCont.getSegments() ) {
 			Segment trgTraSeg = trgTraSegs.get(srcOriSeg.id);
 			if ( trgTraSeg == null ) {
-				LOGGER.warning(String.format("Item id='%s': No translation segment found for the source segment '%s'. Using source.",
+				LOGGER.warning(String.format("Item id='%s': No translation found for the segment '%s'. Using source.",
 					traTu.getId(), srcOriSeg.id));
 				// Use the source instead
-				trgTraSeg.text = srcOriSeg.text.clone();
 			}
 			else {
 				TextUnitUtil.adjustTargetCodes(srcOriSeg.text, trgTraSeg.text, true, true, null, oriTu);
 			}
 		}
-		// 
+		// Check if the target has more segments
+		if ( srcOriCont.getSegments().count() < trgTraCont.getSegments().count() ) {
+			LOGGER.warning(String.format("Item id='%s': There is at least one extra segment in the translation file.\n"
+				+ "Extra segments are not merged into the translated output.",
+				traTu.getId()));
+		}
+		
 		oriTu.setTarget(trgLoc, trgTraCont);
 		
 //		TextFragment traTrgTf = tc.getUnSegmentedContentCopy();

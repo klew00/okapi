@@ -24,7 +24,6 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filterwriter.XLIFFWriter;
 import net.sf.okapi.common.resource.StartDocument;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.rainbowkit.Manifest;
 import net.sf.okapi.filters.rainbowkit.MergingInfo;
 import net.sf.okapi.steps.rainbowkit.common.BasePackageWriter;
@@ -32,11 +31,9 @@ import net.sf.okapi.steps.rainbowkit.common.BasePackageWriter;
 public class XLIFFPackageWriter extends BasePackageWriter {
 
 	protected XLIFFWriter writer;
-	protected Options options;
 
 	public XLIFFPackageWriter () {
 		super(Manifest.EXTRACTIONTYPE_XLIFF);
-		options = new Options();
 	}
 	
 	@Override
@@ -44,11 +41,6 @@ public class XLIFFPackageWriter extends BasePackageWriter {
 		manifest.setSubDirectories("original", "work", "work", "done", null, false);
 		setTMXInfo(true, null, null, null, null);
 		super.processStartBatch();
-
-		// Get the options from the parameters
-		if ( !Util.isEmpty(params.getWriterOptions()) ) {
-			options.fromString(params.getWriterOptions());
-		}
 	}
 	
 	@Override
@@ -63,6 +55,11 @@ public class XLIFFPackageWriter extends BasePackageWriter {
 		writer.setOutput(path); // Not really used, but doesn't hurt just in case
 
 		// Set the writer's options
+		// Get the options from the parameters
+		Options options = new Options();
+		if ( !Util.isEmpty(params.getWriterOptions()) ) {
+			options.fromString(params.getWriterOptions());
+		}
 		//TODO: Would be easier to use IParameters in XLIFFWriter.
 		writer.setPlaceholderMode(options.getPlaceholderMode());
 		writer.setCopySource(options.getCopySource());

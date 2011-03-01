@@ -71,7 +71,6 @@ public class ExtractionStepTest {
 		pdriver.setRootDirectory(Util.deleteLastChar(root)); // Don't include final separator
 		pdriver.addStep(new RawDocumentToFilterEventsStep());
 		pdriver.addStep(new ExtractionStep());
-	
 		
 		String inputPath = root+"/test01.properties";
 		String outputPath = inputPath.replace("test01.", "test01.out.");

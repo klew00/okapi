@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -787,7 +787,7 @@ public class XLIFFFilter implements IFilter {
 			// Get the coord attribute if available
 			String tmp = reader.getAttributeValue(null, "coord");
 			if ( tmp != null ) {
-				tu.setSourceProperty(new Property(Property.COORDINATES, tmp, false));
+				tu.setSourceProperty(new Property(Property.COORDINATES, tmp, true));
 			}
 			skel.addContentPlaceholder(tu);
 			tc = processContent(isSegSource ? "seg-source" : "source", false);
@@ -862,7 +862,7 @@ public class XLIFFFilter implements IFilter {
 			
 			// Set the target properties (after the target container has been set
 			if ( stateValue != null ) {
-				tu.setTargetProperty(trgLang, new Property("state", stateValue, false));
+				tu.setTargetProperty(trgLang, new Property("state", stateValue, true));
 			}
 		
 			if ( coordValue != null ) {
@@ -1334,7 +1334,6 @@ public class XLIFFFilter implements IFilter {
 	}
 	
 	private void processNote () {
-		//TODO: Handle 'annotates', etc.
 		try {
 			// Check the destination of the property
 			String dest = reader.getAttributeValue(null, "annotates");

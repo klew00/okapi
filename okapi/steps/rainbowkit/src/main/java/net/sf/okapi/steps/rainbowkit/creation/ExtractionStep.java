@@ -118,7 +118,7 @@ public class ExtractionStep extends BasePipelineStep {
 	@Override
 	protected Event handleStartBatch (Event event) {
 		try {
-			// Get the format (class name)
+			// Get the package format (class name)
 			String writerClass = params.getWriterClass();
 			writer = (IPackageWriter)Class.forName(writerClass).newInstance();
 			writer.setParameters(params);
