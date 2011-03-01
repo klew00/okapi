@@ -22,8 +22,10 @@ package net.sf.okapi.steps.common;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IFilter;
@@ -33,7 +35,6 @@ import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.resource.TextUnit;
 
 /**
  * Verifies if a {@link RawDocument} is extracted and merged back properly.
@@ -43,19 +44,33 @@ import net.sf.okapi.common.resource.TextUnit;
  * <p>This verification does not verify that the merge file is valid, but it
  * should catch most of the problems caused by invalid merges.
  */
-@UsingParameters() // No parameters
+@UsingParameters(ExtractionVerificationStepParameters.class) // No parameters
 public class ExtractionVerificationStep extends BasePipelineStep {
 
+	private static final Logger LOGGER = Logger.getLogger(ExtractionVerificationStep.class.getName());
+	
 	private IFilter filter;
 	private IFilterWriter writer;
 	private IFilterConfigurationMapper fcMapper;
 	private String filterConfigId;
-
+	private ExtractionVerificationStepParameters params;
+	
 	/**
 	 * Creates a new ExtractionVerificationStep object. This constructor is
 	 * needed to be able to instantiate an object from newInstance()
 	 */
 	public ExtractionVerificationStep() {
+		params = new ExtractionVerificationStepParameters();
+	}
+	
+	@Override
+	public void setParameters(IParameters params) {
+		this.params = (ExtractionVerificationStepParameters) params;
+	}
+	
+	@Override
+	public ExtractionVerificationStepParameters getParameters() {
+		return params;
 	}
 	
 	@StepParameterMapping(parameterType = StepParameterType.FILTER_CONFIGURATION_MAPPER)
@@ -79,6 +94,7 @@ public class ExtractionVerificationStep extends BasePipelineStep {
 
 	@Override
 	protected Event handleRawDocument (Event event) {
+		
 		try {
 			if ( Util.isEmpty(filterConfigId) ) {
 				return event;
@@ -121,16 +137,27 @@ public class ExtractionVerificationStep extends BasePipelineStep {
 			int i = 0;
 			while ( filter.hasNext() ) {
 				event2 = filter.next();
+			
 				if ( i >= firstEvents.size() ) {
-					//TODO: log error
+					i++;
 					break;
 				}
 				event1 = firstEvents.get(i++);
 				// Compare events
 				if ( !identicalEvent(event1, event2) ) {
 					// TODO log error
+					LOGGER.info("different events");
 					break;
+				}else{
+					//LOGGER.info("identical events");
 				}
+			}
+			
+			// Compare total number of events
+			if(firstEvents.size() > i){
+				LOGGER.warning("Additional events found in the first run");
+			}else if(i > firstEvents.size()){
+				LOGGER.warning("Additional events found in the second run");
 			}
 			
 		}
@@ -167,11 +194,11 @@ public class ExtractionVerificationStep extends BasePipelineStep {
 		Event event2)
 	{
 		if (( event1 == null ) && ( event2 != null )) {
-			//TODO:  Error message
+			LOGGER.warning("Event from first run is null");
 			return false;
 		}
 		if (( event1 != null ) && ( event2 == null )) {
-			//TODO:  Error message
+			LOGGER.warning("Event from second run is null");
 			return false;
 		}
 		if (( event1 == null ) && ( event2 == null )) {
@@ -179,7 +206,7 @@ public class ExtractionVerificationStep extends BasePipelineStep {
 		}
 
 		if ( event1.getEventType() != event2.getEventType() ) {
-			//TODO:  Error message
+			LOGGER.warning("Event Types are different");
 			return false;
 		}
 		
@@ -199,19 +226,20 @@ public class ExtractionVerificationStep extends BasePipelineStep {
 		case DOCUMENT_PART:
 			break;
 		case TEXT_UNIT:
-			return identicalTextUnit(event1.getTextUnit(), event2.getTextUnit());
+			//return identicalTextUnit(event1.getTextUnit(), event2.getTextUnit());
+			return ExtractionVerificationUtil.compareTextUnit(event1.getTextUnit(), event2.getTextUnit(), params.isCompareSkeleton());
 		}
 		
 		return true;
 	}
 	
-	private boolean identicalTextUnit (TextUnit tu1,
+	/*private boolean identicalTextUnit (TextUnit tu1,
 		TextUnit tu2)
 	{
 		if ( !tu1.getId().equals(tu2.getId()) ) {
-			//TODO:  Error message
+			LOGGER.warning("TextUnit ids do not match.\tFirst Run: "+tu1.getId()+ "\tSecond Run: "+tu2.getId());
 			return false;
 		}
 		return true;
-	}
+	}*/
 }
