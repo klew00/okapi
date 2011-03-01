@@ -98,7 +98,7 @@ public class SimpleTB {
 	}
 	
 	public void importCSV (File file) {
-		importGlossary(new CSVReader(srcLoc, srcLoc), file);
+		importGlossary(new CSVReader(srcLoc, trgLoc), file);
 	}
 	
 	public void importTSV (File file) {
