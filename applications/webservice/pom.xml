@@ -8,7 +8,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>okapi-application-webservice</artifactId>
 	<packaging>war</packaging>
-	<name>Okapi Web Service</name>
+	<name>Okapi Web-Service</name>
 
     <repositories>
         <!-- For resteasy -->
@@ -47,7 +47,7 @@
     </dependencies>
 
     <build>
-        <finalName>webservice</finalName>
+        <finalName>okapi-webservice</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -63,7 +63,7 @@
                 <artifactId>maven-jetty-plugin</artifactId>
                 <version>6.1.16</version>
                 <configuration>
-                    <contextPath>/</contextPath>
+                    <contextPath>/okapi-webservice</contextPath>
                     <scanIntervalSeconds>2</scanIntervalSeconds>
                     <stopKey>foo</stopKey>
                     <stopPort>9999</stopPort>

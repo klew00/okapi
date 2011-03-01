@@ -22,14 +22,17 @@ package net.sf.okapi.applications.webservice;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 
 import net.sf.okapi.applications.webservice.transport.XMLStringList;
+import net.sf.okapi.common.Util;
 
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
@@ -45,12 +48,12 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class ServiceTest {
-	private static final String SERVICE_BASE_URL = "http://localhost:9095/okapi";
+	private static final String SERVICE_BASE_URL = "http://localhost:9095/okapi-webservice";
 	private HttpClient client;
 	private File batchConfig;
 	private ArrayList<File> inputFiles;
 	
-	//@Before
+	@Before
 	public void init() throws Exception {
 		client = new HttpClient();
 
@@ -109,7 +112,7 @@ public class ServiceTest {
 			put(uri, inputParts);
 		}
 
-		// Test if
+		// Test if upload worked
 		inputFileNames = getList(projectUri + "/inputFiles");
 		assertNotNull(inputFileNames);
 		assertEquals(inputFiles.size(), inputFileNames.size());
@@ -121,6 +124,15 @@ public class ServiceTest {
 		outputFileNames = getList(projectUri + "/outputFiles");
 		assertNotNull(outputFileNames);
 		assertEquals(inputFiles.size(), outputFileNames.size());
+		
+		// Does the fetching of files work?
+		for (String filename : outputFileNames) {
+			File outputFile = downloadFileToTemp(projectUri + "/outputFiles/" + filename);
+			assertNotNull(outputFile);
+			assertTrue(outputFile.exists());
+			assertTrue(outputFile.length() > 0);
+			outputFile.delete();
+		}
 
 		// Delete project
 		delete(projectUri);
@@ -128,8 +140,15 @@ public class ServiceTest {
 		projects = getList(SERVICE_BASE_URL + "/projects");
 		assertNotNull(projects);
 		assertEquals(projCountBefore, projects.size());
+	}
+
+	private File downloadFileToTemp(String uri) throws IOException {
 		
-		//TODO does the fetching of files work?
+		InputStream remoteFile = new URL(uri).openStream();
+		File tempFile = File.createTempFile("webservice", "file");
+		Util.copy(remoteFile, tempFile);
+		remoteFile.close();
+		return tempFile;
 	}
 
 	private void put(String uri, Part[] params) throws IOException {

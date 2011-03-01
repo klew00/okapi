@@ -21,11 +21,15 @@
 package net.sf.okapi.applications.webservice;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.sf.okapi.common.DefaultFilenameFilter;
 
@@ -33,19 +37,14 @@ import net.sf.okapi.common.DefaultFilenameFilter;
  * Utilities for the web-service's project and file handling.
  */
 public final class WorkspaceUtils {
-	//TODO Move this to some configuration file
-	private static final String LOCAL_WORKING_DIR = "E:\\Okapi-Webservice";
-	
+	private static final Logger LOGGER = Logger.getLogger(WorkspaceUtils.class.getName());
 	private static final String PLUGINS = "plugins";
 	private static final String BATCH_CONF = "settings.bconf";
 	private static final String EXTENSIONS_MAPPING = "extensions-mapping.txt";
 	private static final String INPUT = "input";
 	private static final String CONFIG = "config";
 	private static final String OUTPUT = "output";
-
-	public static final String BATCH_CONF_PARAM = "batchConfiguration";
-	public static final String INPUT_FILE_PARAM = "inputFile";
-	public static final FilenameFilter DIRECTORY_FILTER = new FilenameFilter() {
+	private static final FilenameFilter DIRECTORY_FILTER = new FilenameFilter() {
 		@Override
 		public boolean accept(File dir, String name) {
 			File file = new File(dir.getAbsolutePath() + File.separator + name);
@@ -53,20 +52,42 @@ public final class WorkspaceUtils {
 		}
 	};
 
+	public static final String BATCH_CONF_PARAM = "batchConfiguration";
+	public static final String INPUT_FILE_PARAM = "inputFile";
+
 	/**
 	 * @return The directory where the local projects will be created and saved temporarily
 	 */
 	public static String getWorkingDirectory() {
-		
-		return LOCAL_WORKING_DIR;
+		//TODO Don't re-load that every time!
+		Configuration conf = loadConfig();
+		return conf.getWorkingDirectory();
 	}
-
+	
 	/**
-	 * @return The path to the local repository for rainbow plug-ins
+	 * @return The user's configuration (if <code>System.getProperty("user.home") + "/okapi-webservice-configuration.xml"</code>
+	 * 		was found) or the default configuration
 	 */
-	public static String getPluginsDirectory() {
+	private static Configuration loadConfig() {
+		File userConfig = new File( System.getProperty("user.home") + "/okapi-webservice-configuration.xml");
 		
-		return getWorkingDirectory() + File.separator + PLUGINS;
+		try {
+			if(userConfig.exists())
+				return new Configuration(new FileInputStream(userConfig));
+			else
+				LOGGER.log(Level.INFO, "No system specific configuration was found at " + userConfig.getAbsolutePath() + ". " +
+						"The default configuration will be loaded instead.");
+		}
+		catch (FileNotFoundException e) {
+			// This should be impossible, because we checked for the existence of the file
+			throw new RuntimeException(e);
+		}
+		catch (IllegalArgumentException e) {
+			LOGGER.log(Level.WARNING, "An error occurred while loading the system specific configuration. " +
+					"The default configuration will be loaded instead.", e);
+		}
+		
+		return new Configuration();
 	}
 
 	/**
@@ -209,9 +230,15 @@ public final class WorkspaceUtils {
 	 * @return A list of all project ids that are currently in use (in numerical order)
 	 */
 	public static ArrayList<Integer> getProjectIds() {
-		
-		Collection<File> directories = Arrays.asList(getSubdirectories(getWorkingDirectory()));
+
 		ArrayList<Integer> projectIds = new ArrayList<Integer>();
+		File[] subDirs = getSubdirectories(getWorkingDirectory());
+		
+		if(subDirs == null)
+			// The Directory has not yet been created
+			return projectIds;
+		
+		Collection<File> directories = Arrays.asList(subDirs);
 		
 		for (File dir : directories) {
 			if (PLUGINS.equals(dir.getName()))
@@ -256,7 +283,7 @@ public final class WorkspaceUtils {
 	
 	/**
 	 * @param directory - directory where sub-directories are located
-	 * @return - list of the directory's sub-directories
+	 * @return - list of the directory's sub-directories or null if the directory does not exist
 	 */
 	private static File[] getSubdirectories(String directory) {
 		File dir = new File(directory);

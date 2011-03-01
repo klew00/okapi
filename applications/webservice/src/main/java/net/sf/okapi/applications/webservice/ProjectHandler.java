@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -41,11 +43,11 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import net.sf.okapi.applications.webservice.transport.XMLStringList;
 import net.sf.okapi.applications.rainbow.Project;
 import net.sf.okapi.applications.rainbow.batchconfig.BatchConfiguration;
 import net.sf.okapi.applications.rainbow.lib.LanguageManager;
 import net.sf.okapi.applications.rainbow.pipeline.PipelineWrapper;
-import net.sf.okapi.applications.webservice.transport.XMLStringList;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.DefaultFilters;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
@@ -53,7 +55,6 @@ import net.sf.okapi.common.plugins.PluginsManager;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
-import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
 
 /**
  * Handles WebService requests and delegates them to Rainbow/Okapi.
@@ -62,20 +63,23 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataOutput;
  *
  * Basic workflow for processing files with the web-service:
  * 
- * POST	/projects/new
- * POST	/projects/1/batchConfiguration
- * PUT	/projects/1/inputFiles/a.html
- * PUT	/projects/1/inputFiles/b.html
- * PUT	/projects/1/inputFiles/c.html
- * POST	/projects/1/tasks/execute
- * GET	/projects/1/outputFiles
- * GET	/projects/1/outputFiles/a.out.html
- * GET	/projects/1/outputFiles/b.out.html
- * GET	/projects/1/outputFiles/c.out.html
- * DEL	/projects/1
+ * <ol>
+ *	<li> POST	/projects/new
+ *	<li> POST	/projects/1/batchConfiguration
+ *	<li> PUT	/projects/1/inputFiles/a.html
+ *	<li> PUT	/projects/1/inputFiles/b.html
+ *	<li> PUT	/projects/1/inputFiles/c.html
+ *	<li> POST	/projects/1/tasks/execute
+ *	<li> GET	/projects/1/outputFiles
+ *	<li> GET	/projects/1/outputFiles/a.out.html
+ *	<li> GET	/projects/1/outputFiles/b.out.html
+ *	<li> GET	/projects/1/outputFiles/c.out.html
+ *	<li> DEL	/projects/1
+ * </ol>
  */
-@Path("/okapi/projects")
+@Path("/projects")
 public class ProjectHandler {
+	private static final Logger LOGGER = Logger.getLogger(ProjectHandler.class.getName());
 	private static final String CURRENT_PROJECT_PIPELINE = "currentProjectPipeline";
 
 	/**
@@ -89,11 +93,14 @@ public class ProjectHandler {
 		
 		int projId = WorkspaceUtils.determineNewProjectId();
 		
+		File workingDir = new File(WorkspaceUtils.getWorkingDirectory());
+		if (!workingDir.exists())
+			LOGGER.log(Level.INFO, "The working directory " + workingDir.getAbsolutePath() + " doesn't exist. " +
+					"It will be created.");
+		
 		Util.createDirectories(WorkspaceUtils.getInputDirPath(projId) + File.separator);
 		Util.createDirectories(WorkspaceUtils.getConfigDirPath(projId) + File.separator);
 		Util.createDirectories(WorkspaceUtils.getOutputDirPath(projId) + File.separator);
-		// Make sure the plug-in directory exists
-		Util.createDirectories(WorkspaceUtils.getPluginsDirectory() + File.separator);
 		
 		URI projectUri = uriInfo.getAbsolutePath().resolve(projId + "");
 		return Response.created(projectUri).build();
@@ -104,7 +111,7 @@ public class ProjectHandler {
 	 */
 	@GET
 	@Path("/")
-	@Produces(MediaType.APPLICATION_XML)
+	@Produces(MediaType.TEXT_XML)
 	public XMLStringList getProjects() {
 		
 		ArrayList<Integer> projIds = WorkspaceUtils.getProjectIds();
@@ -121,7 +128,8 @@ public class ProjectHandler {
 	@Path("/{projId}")
 	public Response deleteProject(@PathParam("projId") int projId) {
 		
-		//TODO Check why the batch configuration cannot be deleted
+		//TODO Check why some files remain on the FS
+		//TODO The last input file processed in the pipeline seems to remain opened
 		Util.deleteDirectory(WorkspaceUtils.getProjectPath(projId), false);
 
 		int status = HttpStatus.SC_OK;
@@ -198,7 +206,7 @@ public class ProjectHandler {
 	 */
 	@GET
 	@Path("/{projId}/inputFiles")
-	@Produces(MediaType.APPLICATION_XML)
+	@Produces(MediaType.TEXT_XML)
 	public XMLStringList getProjectInputFiles(@PathParam("projId") int projId) {
 		
 		// TODO How to handle sub-directories?
@@ -216,13 +224,11 @@ public class ProjectHandler {
 	 */
 	@GET
 	@Path("/{projId}/inputFiles/{filename}")
-	@Produces(MediaType.MULTIPART_FORM_DATA)
-	public MultipartFormDataOutput getProjectInputFile(
+	@Produces(MediaType.WILDCARD)
+	public File getProjectInputFile(
 			@PathParam("projId") int projId, @PathParam("filename") String filename) {
 		
-		MultipartFormDataOutput formOut = new MultipartFormDataOutput();
-		formOut.addPart(WorkspaceUtils.getInputFile(projId, filename),MediaType.APPLICATION_OCTET_STREAM_TYPE);
-		return formOut;
+		return WorkspaceUtils.getInputFile(projId, filename);
 	}
 
 	/**
@@ -327,9 +333,9 @@ public class ProjectHandler {
 	}
 
 	/**
-	 * Loads locally installed plug-ins (from the plug-ins folder within the workspace directory),
-	 * the default filter configurations and the custom ones from the project's configuration
-	 * directory (where the batch configuration should have been installed to).
+	 * Loads the default filter configurations from Okapi and also the custom filter
+	 * configurations and plug-ins from the project's configuration directory
+	 * (where the batch configuration should have been installed to).
 	 * 
 	 * @param projId The id of a local project
 	 * @return A PipelineWrapper using all available filter configurations and plug-ins
@@ -339,7 +345,7 @@ public class ProjectHandler {
 		// Load local plug-ins
 		// TODO Check if this works
 		PluginsManager plManager = new PluginsManager();
-		plManager.discover(new File(WorkspaceUtils.getPluginsDirectory()), true);
+		plManager.discover(new File(WorkspaceUtils.getConfigDirPath(projId)), true);
 
 		// Initialize filter configurations
 		FilterConfigurationMapper fcMapper = new FilterConfigurationMapper();
@@ -348,8 +354,8 @@ public class ProjectHandler {
 		fcMapper.updateCustomConfigurations();
 
 		// Load pipeline
-		PipelineWrapper pipelineWrapper = new PipelineWrapper(fcMapper, null,
-				plManager, WorkspaceUtils.getConfigDirPath(projId), null);
+		PipelineWrapper pipelineWrapper = new PipelineWrapper(fcMapper, WorkspaceUtils.getConfigDirPath(projId),
+				plManager, WorkspaceUtils.getInputDirPath(projId), null);
 		pipelineWrapper.addFromPlugins(plManager);
 		return pipelineWrapper;
 	}
@@ -360,7 +366,7 @@ public class ProjectHandler {
 	 */
 	@GET
 	@Path("/{projId}/outputFiles")
-	@Produces(MediaType.APPLICATION_XML)
+	@Produces(MediaType.TEXT_XML)
 	public XMLStringList getProjectOutputFiles(@PathParam("projId") int projId) {
 		
 		ArrayList<String> outputFiles = WorkspaceUtils.getOutputFileNames(projId);
@@ -376,12 +382,10 @@ public class ProjectHandler {
 	 */
 	@GET
 	@Path("/{projId}/outputFiles/{filename}")
-	@Produces(MediaType.MULTIPART_FORM_DATA)
-	public MultipartFormDataOutput getProjectOutputFile(
+	@Produces(MediaType.WILDCARD)
+	public File getProjectOutputFile(
 			@PathParam("projId") int projId, @PathParam("filename") String filename) {
 		
-		MultipartFormDataOutput formOut = new MultipartFormDataOutput();
-		formOut.addPart(WorkspaceUtils.getOutputFile(projId, filename),MediaType.APPLICATION_OCTET_STREAM_TYPE);
-		return formOut;
+		return WorkspaceUtils.getOutputFile(projId, filename);
 	}
 }
