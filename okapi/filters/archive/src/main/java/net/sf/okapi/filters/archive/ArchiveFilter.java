@@ -105,21 +105,19 @@ public class ArchiveFilter implements IFilter {
 	private LocaleId trgLoc;
 	private List<IFilter> subFilters;
 	private IFilter subFilter;
+	private IFilterWriter subDocWriter;
 	private Parameters params;
-	//private String internalMimeType;
-	private EncoderManager encoderManager;
 	private String mimeType = MIME_TYPE;
 	private String[] fileNames;
 	private String[] configIds;
-	//private boolean setMapping;
 	private IFilterConfigurationMapper fcMapper;
+	private StartDocument saveStartDoc;
 
 	public ArchiveFilter() {
 		super();
 		params = new Parameters();
 		params.setMimeType(MIME_TYPE);
 		subFilters = new ArrayList<IFilter> ();		
-		//setMapping = true;	
 		filterWriter = new ZipFilterWriter(null);
 	}
 	
@@ -173,7 +171,8 @@ public class ArchiveFilter implements IFilter {
 
 	@Override
 	public EncoderManager getEncoderManager() {
-		return encoderManager; // There is no corresponding encoder manager, encoding is handled by sub-filters
+		// There is no corresponding encoder manager, encoding is handled by sub-filters
+		return null;
 	}
 
 	@Override
@@ -239,41 +238,14 @@ public class ArchiveFilter implements IFilter {
 		if (params != null) {
 			mimeType = params.getMimeType();
 		}
-//		// Configure fcMapper for given parameters
-//		if (setMapping) {
-			updateFilterConfigurationMapper();			
-						
-			//List<FilterConfiguration> usedConfigs = new ArrayList<FilterConfiguration> ();
-			fileNames = ListUtil.stringAsArray(params.getFileNames());
-			configIds = ListUtil.stringAsArray(params.getConfigIds());
-			if ((configIds.length > 0) && (fileNames.length != configIds.length)) {
-				throw new RuntimeException("Different number of configIds and extensions in parameters");
-			}
-//			for (int i = 0; i < configIds.length; i++) {
-//				String configId = configIds[i];
-//				
-//				FilterConfiguration fc = fcMapper.getConfiguration(configId);
-//				if (fc == null) 
-//					fc = new FilterConfiguration();
-//				else
-//					usedConfigs.add(fc);
-//				
-//				String fname = fileNames[i];
-//				if (!ext.startsWith(".")) ext = "." + ext;
-//					
-//				fc.configId = configId;
-//				if (fc.extensions == null)
-//					fc.extensions = "";
-//				if (fc.extensions.indexOf(ext + ";") < 0) {
-//					fc.extensions += ext + ";";
-//				}
-//				
-//			}
-			
-//			fcMapper.clearConfigurations(false);
-//			for (FilterConfiguration config : usedConfigs) {
-//				fcMapper.addConfiguration(config);
-//			}
+		
+		updateFilterConfigurationMapper();			
+					
+		fileNames = ListUtil.stringAsArray(params.getFileNames());
+		configIds = ListUtil.stringAsArray(params.getConfigIds());
+		if ((configIds.length > 0) && (fileNames.length != configIds.length)) {
+			throw new RuntimeException("Different number of configIds and extensions in parameters");
+		}
 		}		
 	private void updateFilterConfigurationMapper() {
 		if (fcMapper == null) {
@@ -295,7 +267,7 @@ public class ArchiveFilter implements IFilter {
 	@Override
 	public void setParameters(IParameters params) {
 		this.params = (Parameters)params;
-		//if ( subFilter != null ) subFilter.setParameters(params);
+
 		for (IFilter subFilter : subFilters) {
 			subFilter.setParameters(params);
 		}
@@ -307,8 +279,6 @@ public class ArchiveFilter implements IFilter {
 			entries = zipFile.entries();
 			subDocId = 0;
 			nextAction = NextAction.NEXTINZIP;
-//			// Initialize the internalMime type
-//			getInternalMimeType();
 			
 			StartDocument startDoc = new StartDocument(SID);
 			startDoc.setName(docURI.getPath());
@@ -333,7 +303,8 @@ public class ArchiveFilter implements IFilter {
 			entry = entries.nextElement();
 			subFilter = getSubFilter(entry.getName());
 			if (subFilter != null) {	
-				filterWriter.setSubDocWriter(subFilter.createFilterWriter());
+				subDocWriter = subFilter.createFilterWriter();
+				filterWriter.setSubDocWriter(subDocWriter);
 				return openSubDocument();
 			}
 			else {
@@ -371,7 +342,6 @@ public class ArchiveFilter implements IFilter {
 		try {
 			subFilter.open(new RawDocument(zipFile.getInputStream(entry), "UTF-8", srcLoc, trgLoc));
 			event = subFilter.next(); // START_DOCUMENT
-			//filter.setContainerMimeType(internalMimeType);
 		}
 		catch (IOException e) {
 			throw new OkapiIOException("Error opening internal file.", e);
@@ -382,7 +352,8 @@ public class ArchiveFilter implements IFilter {
 		StartSubDocument ssd = null;
 		if (event.getEventType() == EventType.START_DOCUMENT) {
 			sd = (StartDocument) event.getResource();
-			ssd = new StartSubDocument(SID, sd.getId());
+			ssd = new StartSubDocument(SID, sd.getId());			
+			saveStartDoc = sd; // Remember the SD transformed to SSD not to loose isMultilingual
 		}
 		else
 			ssd = new StartSubDocument(SID, String.valueOf(++subDocId));
@@ -396,13 +367,19 @@ public class ArchiveFilter implements IFilter {
 	}
 	
 	private Event nextInSubDocument () {
+		if (saveStartDoc != null && subDocWriter != null) {
+			// To set the lost StartDocument's isMultilingual in sub-filter's skeleton writer
+			subDocWriter.getSkeletonWriter().processStartDocument(trgLoc, "UTF-8", null, 
+					subDocWriter.getEncoderManager(), saveStartDoc);
+			saveStartDoc = null;
+		}
+		
 		Event event;
 		while ( subFilter.hasNext() ) {
 			event = subFilter.next();
 			switch ( event.getEventType() ) {
 			case END_DOCUMENT:
 				// Change the END_DOCUMENT to END_SUBDOCUMENT
-				//Ending ending = new Ending(String.valueOf(++subDocId));
 				Ending ending = (Ending) event.getResource();
 				nextAction = NextAction.NEXTINZIP;
 				ZipSkeleton skel = new ZipSkeleton(
