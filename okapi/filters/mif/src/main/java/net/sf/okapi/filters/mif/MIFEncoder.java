@@ -166,7 +166,7 @@ public class MIFEncoder implements IEncoder {
 		case '\u2010': token = "SoftHyphen"; break;
 		case '\u2011': token = "HardHyphen"; break;
 		case '\u00ad': token = "DiscHyphen"; break;
-		case '\u200d': token = "NoHypen"; break;
+		case '\u200d': token = "NoHyphen"; break;
 		case '\u00a2': token = "Cent"; break;
 		case '\u00a3': token = "Pound"; break;
 		case '\u00a5': token = "Yen"; break;

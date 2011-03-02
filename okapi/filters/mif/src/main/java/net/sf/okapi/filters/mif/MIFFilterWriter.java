@@ -43,7 +43,8 @@ public class MIFFilterWriter extends GenericFilterWriter {
 			super.setOptions(locale, defaultEncoding);
 		}
 		else {
-			super.setOptions(locale, MIFFilter.DEFENCODING);
+			// Null encoding should make the writer get it from the start-document info
+			super.setOptions(locale, null);
 		}
 	}
 

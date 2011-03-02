@@ -73,9 +73,6 @@ public class MIFFilter implements IFilter {
 	
 	private final Logger logger = Logger.getLogger(getClass().getName());
 
-	// Must be windows-1252 to allow proper auto-detection
-	public static final String DEFENCODING = "UTF-8"; // String in MIF 9 are UTF-8 according documentation
-	
 	private static final Hashtable<String, String> charTable = initCharTable();
 	
 	private static final String TOPSTATEMENTSTOSKIP = "ColorCatalog;ConditionCatalog;BoolCondCatalog;"
@@ -84,7 +81,6 @@ public class MIFFilter implements IFilter {
 		+ "MarkerTypeCatalog;XRefFormats;Document;BookComponent;InitialAutoNums;Dictionary;AFrames;Page";
 	
 	private static final String IMPORTOBJECT = "ImportObject";
-	private static final String ENDINSET = "EndInset";
 
 	private String lineBreak;
 	private String docName;
@@ -102,7 +98,7 @@ public class MIFFilter implements IFilter {
 	private EncoderManager encoderManager;
 	private int inBlock;
 	private int blockLevel;
-//	private String version;
+	private String version;
 	private String sdId;
 	private int paraLevel;
 	private StringBuilder paraBuf;
@@ -119,6 +115,7 @@ public class MIFFilter implements IFilter {
 	private ArrayList<String> tables;
 	private boolean secondPass;
 	private MIFEncoder encoder;
+	private int decodingErrors;
 	
 	private static Hashtable<String, String> initCharTable () {
 		Hashtable<String, String> table = new Hashtable<String, String>();
@@ -235,10 +232,7 @@ public class MIFFilter implements IFilter {
 			docName = input.getInputURI().getPath();
 		}
 		
-		input.setEncoding(DEFENCODING);
-		chsDecoder = Charset.forName(DEFENCODING).newDecoder();
-		byteBuffer = ByteBuffer.allocate(4);
-		
+		input.setEncoding("UTF-8");
 		open(input.getStream(), input);
 	}
 	
@@ -254,7 +248,6 @@ public class MIFFilter implements IFilter {
 		hasNext = true;
 		inBlock = 0;
 		blockLevel = 0;
-//		version = "";
 		lineBreak = "\n"; //TODO: Get from input file
 		tableGroupLevel = -1;
 		rowGroupLevel = -1;
@@ -264,6 +257,7 @@ public class MIFFilter implements IFilter {
 		parentIds = new Stack<String>();
 		parentIds.push(sdId);
 		encoder = new MIFEncoder();
+		decodingErrors = 0;
 	}
 	
 	private void open (InputStream input,
@@ -273,6 +267,7 @@ public class MIFFilter implements IFilter {
 			//--- First pass: gather information
 			
 			// Detect encoding
+			version = "";
 			Object[] res = guessEncoding(input);
 			reader = new BufferedReader(new InputStreamReader((InputStream)res[0], (String)res[1]));
 			initialize();
@@ -290,6 +285,9 @@ public class MIFFilter implements IFilter {
 			res = guessEncoding(input);
 			reader = new BufferedReader(new InputStreamReader((InputStream)res[0], (String)res[1]));
 			initialize();
+			
+			chsDecoder = Charset.forName((String)res[1]).newDecoder();
+			byteBuffer = ByteBuffer.allocate(4);
 			
 			queue = new LinkedList<Event>();
 			StartDocument startDoc = new StartDocument(sdId);
@@ -366,12 +364,6 @@ public class MIFFilter implements IFilter {
 				processBlock(inBlock);
 				return;
 			}
-			else { //TODO: remove this test when done
-				if ( blockLevel != 1 ) {
-					//throw new OkapiIOException("inBlock at 0 should have blockLevel at 1.");
-//					blockLevel = 0;
-				}
-			}
 			
 			while ( (c = reader.read()) != -1 ) {
 				switch ( c ) {
@@ -384,7 +376,6 @@ public class MIFFilter implements IFilter {
 					skel.append((char)c);
 					blockLevel++;
 					String tag = readTag(true, true, null);
-					//TODO: dispatch according tags
 					if ( TOPSTATEMENTSTOSKIP.indexOf(tag) > -1 ) {
 						skipOverContent(true, null);
 						blockLevel--;
@@ -441,7 +432,7 @@ public class MIFFilter implements IFilter {
 		}
 	}
 
-	/*
+	/* PageType=
 	 * LeftMasterPage
 	 * RightMasterPage
 	 * OtherMasterPage
@@ -633,6 +624,17 @@ public class MIFFilter implements IFilter {
 						skipOverImportObject(false, null);
 						blockLevel--;
 					}
+					else if ( "MIFFile".equals(tag) ) {
+						token = getNextTokenInStatement(false);
+						if ( token.isLast() ) blockLevel--;
+						if ( token.getType() == MIFToken.TYPE_STRING ) {
+							version = token.getString();
+						}
+						else {
+							throw new OkapiIOException("MIF version not found.");
+						}
+					}
+
 				}
 				// Else: Ending of statement. Nothing to do
 			}
@@ -720,50 +722,6 @@ public class MIFFilter implements IFilter {
 					tagBuffer.append((char)c);
 					continue;
 				}
-				
-//			case 4: // In facet mode wait for line-break
-//				if (( c == '\r' ) || ( c == '\n' )) {
-//					state = 5;
-//				}
-//				// Else: stay in this current state
-//				continue;
-//				
-//			case 5: // After \r or \r: wait for & or =
-//				if ( c == '&' ) {
-//					state = 6; // In facet line
-//				}
-//				else if ( c == '=' ) {
-//					tagBuffer.setLength(0);
-//					state = 7; // After Line-break followed by '='
-//				}
-//				else if (( c == '\n' ) || ( c == '\r' )) {
-//					// Stay in this current state
-//				}
-//				else { // Back to within an ImportObject (after a line-break)
-//					state = 4;
-//				}
-//				continue;
-//			
-//			case 6: // Inside a facet line, waiting for end-of-line
-//				if (( c == '\r' ) || ( c == '\n' )) {
-//					state = 5; // Back to after a line-break state
-//				}
-//				continue;
-//			
-//			case 7: // After line-break followed by '='
-//				if (( c == '\r' ) || ( c == '\n' ) || ( c == ' ' ) || ( c == '\t' )) {
-//					if ( tagBuffer.toString().equals(ENDINSET)) {
-//						// We have reached the end of the inset, back to normal mode
-//						state = 0;
-//					}
-//					else {
-//						state = 4; // back to facet mode
-//					}
-//				}
-//				else {
-//					tagBuffer.append((char)c);
-//				}
-//				continue;
 			}
 		}
 		// Unexpected end
@@ -1431,7 +1389,11 @@ public class MIFFilter implements IFilter {
 								strBuffer.append(buf.get(0));
 							}
 							catch ( CharacterCodingException e ) {
-								// Warning
+								if ( ++decodingErrors < 25 ) {
+									// Warning message, but only up to a point
+									logger.warning(String.format("Error with decoding character \\x%2x (%d) with encoding '%s'.",
+										c, c, chsDecoder.charset().name()));
+								}
 							}
 						}
 						break;
@@ -1500,33 +1462,42 @@ public class MIFFilter implements IFilter {
 		throws IOException
 	{
 		Object[] res = new Object[2];
+		String defEncoding = "UTF-8"; // Use v8/v9 default by default
+		if ( !Util.isEmpty(version) ) {
+			// If we have a version, it means we are in the second pass and need to get the correct encoding
+			if ( version.compareTo("8.00") < 0 ) {
+				// Before 8.00 the default was not UTF-8
+				defEncoding = "MacRoman"; //TODO: Use MacRoman for now, but we will need a real Java Charset for FrameRoman
+			}
+		}
+		
 		// Detect any BOM-type encoded (and set the stream to skip over it)
-		BOMAwareInputStream bais = new BOMAwareInputStream(input, DEFENCODING);
+		BOMAwareInputStream bais = new BOMAwareInputStream(input, defEncoding);
 		res[0] = bais;
 		res[1] = bais.detectEncoding();
 		if ( bais.autoDtected() ) {
 			return res;
 		}
 			
-		// Else: try detect based on MIF weird mechanism
-		//TODO
-
-		// Try to match the file signature with the pre-defined signatures
-		String signature = "";
-			
-		if ( signature.equals("\u201C\u00FA\u2013\u007B\u0152\u00EA") ) {
-			// "Japanese" in Shift-JIS seen in Windows-1252 (coded in Unicode)
-			res[1] = "Shift_JIS";
-			return res;
-		}
-		else if ( signature.equals("\u00C6\u00FC\u00CB\u00DC\u00B8\u00EC") ) {
-			res[1] = "EUC-JP";
-			// "Japanese" in EUC seen in Windows-1252 (coded in Unicode)
-			return res;
-		}
-
-		// Default
-		res[1] = DEFENCODING;
+//		// Else: try detect based on MIF weird mechanism
+//		//TODO
+//
+//		// Try to match the file signature with the pre-defined signatures
+//		String signature = "";
+//			
+//		if ( signature.equals("\u201C\u00FA\u2013\u007B\u0152\u00EA") ) {
+//			// "Japanese" in Shift-JIS seen in Windows-1252 (coded in Unicode)
+//			res[1] = "Shift_JIS";
+//			return res;
+//		}
+//		else if ( signature.equals("\u00C6\u00FC\u00CB\u00DC\u00B8\u00EC") ) {
+//			res[1] = "EUC-JP";
+//			// "Japanese" in EUC seen in Windows-1252 (coded in Unicode)
+//			return res;
+//		}
+//
+//		// Default
+//		res[1] = DEFENCODING;
 		return res;
 	}
 
