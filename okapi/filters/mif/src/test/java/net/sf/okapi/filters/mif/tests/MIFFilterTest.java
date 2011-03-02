@@ -222,6 +222,7 @@ public class MIFFilterTest {
 	
 	@Test
 	public void testOutput () {
+		rewriteFile("Test03.mif");
 		rewriteFile("Test01.mif");
 		rewriteFile("Test02-v9.mif");
 		rewriteFile("Test01-v7.mif");
@@ -244,7 +245,7 @@ public class MIFFilterTest {
 		filter.open(new RawDocument(Util.toURI(root+fileName), null, locEN));
 		IFilterWriter writer = filter.createFilterWriter();
 		writer.setOptions(locEN, null);
-		writer.setOutput(root+fileName+".out.mif");
+		writer.setOutput(root+fileName+".rewrite.mif");
 		while ( filter.hasNext() ) {
 			writer.handleEvent(filter.next());
 		}

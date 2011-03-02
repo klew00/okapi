@@ -21,6 +21,7 @@
 package net.sf.okapi.filters.mif;
 
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
@@ -38,7 +39,12 @@ public class MIFFilterWriter extends GenericFilterWriter {
 		String defaultEncoding)
 	{
 		// Force the encoding
-		super.setOptions(locale, defaultEncoding); //MIFFilter.DEFENCODING);
+		if ( !Util.isEmpty(defaultEncoding) && defaultEncoding.startsWith("UTF-16") ) {
+			super.setOptions(locale, defaultEncoding);
+		}
+		else {
+			super.setOptions(locale, MIFFilter.DEFENCODING);
+		}
 	}
 
 }

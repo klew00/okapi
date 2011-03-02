@@ -82,6 +82,9 @@ public class MIFFilter implements IFilter {
 		+ "CombinedFontCatalog;PgfCatalog;ElementDefCatalog;FmtChangeListCatalog;DefAttrValuesCatalog;"
 		+ "AttrCondExprCatalog;FontCatalog;RulingCatalog;TblCatalog;KumihanCatalog;Views;VariableFormats;"
 		+ "MarkerTypeCatalog;XRefFormats;Document;BookComponent;InitialAutoNums;Dictionary;AFrames;Page";
+	
+	private static final String IMPORTOBJECT = "ImportObject";
+	private static final String ENDINSET = "EndInset";
 
 	private String lineBreak;
 	private String docName;
@@ -422,6 +425,7 @@ public class MIFFilter implements IFilter {
 					DocumentPart dp = new DocumentPart(String.valueOf(++otherId), false, skel); 
 					queue.add(new Event(EventType.DOCUMENT_PART, dp));
 					return;
+					
 				default:
 					skel.append((char)c);
 					break;
@@ -625,6 +629,10 @@ public class MIFFilter implements IFilter {
 						}
 						
 					}
+					else if ( tag.equals(IMPORTOBJECT) ) {
+						skipOverImportObject(false, null);
+						blockLevel--;
+					}
 				}
 				// Else: Ending of statement. Nothing to do
 			}
@@ -649,45 +657,118 @@ public class MIFFilter implements IFilter {
 		throws IOException
 	{
 		int baseLevel = 1;
+		int state = 0;
 		int c;
-		boolean inEscape = false;
-		boolean inString = false;
+		
 		while ( (c = reader.read()) != -1 ) {
+			// Store if needed
 			if ( store ) {
 				if ( buffer != null ) buffer.append((char)c);
 				else skel.append((char)c);
 			}
-			// Parse a string content
-			if ( inString ) {
-				if ( c == '\'' ) inString = false;
-				continue;
-			}
-			// Else: we are outside a string
-			if ( inEscape ) {
-				inEscape = false;
-			}
-			else {
+			
+			// Parse according current state
+			switch ( state ) {
+			case 0:
 				switch ( c ) {
 				case '`':
-					inString = true;
-					break;
+					state = 1; // In string
+					continue;
 				case '\\':
-					inEscape = true;
-					break;
+					state = 2; // In escape
+					continue;
 				case '<':
 					baseLevel++;
-					break;
+					tagBuffer.setLength(0);
+					state = 3; // In tag buffer mode
+					continue;
 				case '>':
 					baseLevel--;
 					if ( baseLevel == 0 ) {
 						return;
 					}
-					break;
+					continue;
 				}
+				// Else do nothing
+				continue;
+				
+			case 1: // In string
+				if ( c == '\'' ) state = 0;
+				continue;
+				
+			case 2: // In escape
+				state = 0; // Go back to normal 
+				continue;
+				
+			case 3: // In tag buffer mode
+				switch ( c ) {
+				case '>':
+					baseLevel--;
+					if ( baseLevel == 0 ) {
+						return;
+					}
+					// Fall thru
+				case ' ':
+				case '\t':
+					if ( tagBuffer.toString().equals(IMPORTOBJECT) ) {
+						skipOverImportObject(store, buffer);
+						baseLevel--;
+					}
+					state = 0;
+					continue;
+				default:
+					tagBuffer.append((char)c);
+					continue;
+				}
+				
+//			case 4: // In facet mode wait for line-break
+//				if (( c == '\r' ) || ( c == '\n' )) {
+//					state = 5;
+//				}
+//				// Else: stay in this current state
+//				continue;
+//				
+//			case 5: // After \r or \r: wait for & or =
+//				if ( c == '&' ) {
+//					state = 6; // In facet line
+//				}
+//				else if ( c == '=' ) {
+//					tagBuffer.setLength(0);
+//					state = 7; // After Line-break followed by '='
+//				}
+//				else if (( c == '\n' ) || ( c == '\r' )) {
+//					// Stay in this current state
+//				}
+//				else { // Back to within an ImportObject (after a line-break)
+//					state = 4;
+//				}
+//				continue;
+//			
+//			case 6: // Inside a facet line, waiting for end-of-line
+//				if (( c == '\r' ) || ( c == '\n' )) {
+//					state = 5; // Back to after a line-break state
+//				}
+//				continue;
+//			
+//			case 7: // After line-break followed by '='
+//				if (( c == '\r' ) || ( c == '\n' ) || ( c == ' ' ) || ( c == '\t' )) {
+//					if ( tagBuffer.toString().equals(ENDINSET)) {
+//						// We have reached the end of the inset, back to normal mode
+//						state = 0;
+//					}
+//					else {
+//						state = 4; // back to facet mode
+//					}
+//				}
+//				else {
+//					tagBuffer.append((char)c);
+//				}
+//				continue;
 			}
 		}
 		// Unexpected end
-		throw new OkapiIllegalFilterOperationException("Unexpected end of input.");
+		throw new OkapiIllegalFilterOperationException(
+			String.format("Unexpected end of input at state = %d", state));
 	}
 	
 	private void readComment (boolean store,
@@ -1043,6 +1124,10 @@ public class MIFFilter implements IFilter {
 							queue.add(new Event(EventType.START_GROUP, sg));
 						}
 					}
+					else if ( IMPORTOBJECT.equals(tag) ) {
+						skipOverImportObject(store, null);
+						blockLevel--;
+					}
 					else { // Default: skip over
 						if ( !readUntilOpenOrClose(store) ) {
 							blockLevel--;
@@ -1089,6 +1174,98 @@ public class MIFFilter implements IFilter {
 		}
 		//TODO: we shouldn't exit this way, except when starting at 0
 		return null;
+	}
+	
+	private void skipOverImportObject (boolean store,
+		StringBuilder buffer)
+		throws IOException
+	{
+		// At the point only the tag has been read
+		// We should leave after the corresponding '>' is found
+		// The content may have one or more inset data (start with line-break and '&' per line)
+		int state = 0;
+		int c;
+		int baseLevel = 1;
+		
+		while ( (c = reader.read()) != -1 ) {
+			// Store if needed
+			if ( store ) {
+				if ( buffer != null ) buffer.append((char)c);
+				else skel.append((char)c);
+			}
+			
+			// Parse according current state
+			switch ( state ) {
+			case 0: // In facet mode wait for line-break
+				switch ( c ) {
+				case '`':
+					state = 1; // In string
+					continue;
+				case '<':
+					baseLevel++;
+					continue;
+				case '>':
+					baseLevel--;
+					if ( baseLevel == 0 ) {
+						// We are done
+						return;
+					}
+				case '\r':
+				case '\n':
+					state = 3;
+					continue;
+				}
+				// Else: stay in this current state
+				continue;
+				
+			case 1: // In string
+				if ( c == '\'' ) {
+					state = 0; // Back to normal
+				}
+				continue;
+				
+			case 2: // In escape
+				state = 0; // Back to normal
+				continue;
+				
+			case 3: // After \r or \r: wait for & or =
+				switch ( c ) {
+				case '&':
+					state = 4; // In facet line
+					continue;
+				case '<':
+					state = 0;
+					baseLevel++;
+					continue;
+				case '>':
+					state = 0;
+					baseLevel--;
+					if ( baseLevel == 0 ) {
+						return; // Done
+					}
+					continue;
+					
+				case '\n':
+				case '\r':
+					// Stay in this current state
+					continue;
+				default:
+					// Back to within an ImportObject (after a line-break)
+					state = 0;
+					continue;
+				}
+			
+			case 4: // Inside a facet line, waiting for end-of-line
+				if (( c == '\r' ) || ( c == '\n' )) {
+					state = 3; // Back to after a line-break state
+				}
+				continue;
+			
+			}
+		}
+		// Unexpected end
+		throw new OkapiIllegalFilterOperationException(
+			String.format("Unexpected end of input at state = %d", state));
 	}
 	
 	/**
