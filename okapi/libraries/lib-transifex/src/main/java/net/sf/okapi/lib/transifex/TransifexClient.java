@@ -31,6 +31,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -54,15 +56,18 @@ public class TransifexClient {
 	private static final int RESCODE_CREATED = 201; 
 	private static final int MAXBUFFERSIZE = 1024*8; 
 
+	private final SimpleDateFormat dateFormat; 
+	private final JSONParser parser;
+
 	private String host;
 	private String project;
 	private String credentials;
 	private String username;
-	private JSONParser parser;
 
 	public TransifexClient (String host) {
 		setHost(host);
 		parser = new JSONParser();
+		dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");		
 	}
 	
 	public void setHost (String host) {
@@ -179,7 +184,6 @@ public class TransifexClient {
 		return extractTargetFromStoredFile(res[0], srcLoc.toPOSIXLocaleId(), resourceId);
 	}
 	
-	
 	/**
 	 * Pulls a resource from the current project.
 	 * @param resourceId the id of the resource to pull.
@@ -218,22 +222,22 @@ public class TransifexClient {
 	 * @param uuid the UUID of the file to delete.
 	 * @return response code.
 	 */
-	public int deleteStoredFile (String uuid) {
-		try {
-			URL url = new URL(host + "api/storage/"+uuid);
-			HttpURLConnection conn = (HttpURLConnection)url.openConnection();
-			conn.setRequestMethod("DELETE");
-			conn.setRequestProperty("Authorization", credentials);
-			// Execute
-			return conn.getResponseCode();
-		}
-		catch ( MalformedURLException e ) {
-			throw new OkapiIOException("Error deleting file.", e);
-		}
-		catch ( IOException e ) {
-			throw new OkapiIOException("Error deleting file.", e);
-		}
-	}
+//	private int deleteStoredFile (String uuid) {
+//		try {
+//			URL url = new URL(host + "api/storage/"+uuid);
+//			HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+//			conn.setRequestMethod("DELETE");
+//			conn.setRequestProperty("Authorization", credentials);
+//			// Execute
+//			return conn.getResponseCode();
+//		}
+//		catch ( MalformedURLException e ) {
+//			throw new OkapiIOException("Error deleting file.", e);
+//		}
+//		catch ( IOException e ) {
+//			throw new OkapiIOException("Error deleting file.", e);
+//		}
+//	}
 	
 	/**
 	 * Retrieves a file.
@@ -242,7 +246,7 @@ public class TransifexClient {
 	 * @return an array of strings: On success 0=the content of the file, 1=the resource id.
 	 * On error 0=null, 1=the code and error messge.
 	 */
-	public String[] retrieveFile (String resId,
+	private String[] retrieveFile (String resId,
 		String lang)
 	{
 		String[] res = new String[2];
@@ -278,7 +282,7 @@ public class TransifexClient {
 	 * @return String array: On success 0=redirect path to the extracted file, 1=id.
 	 * On error: 0=null, 1=Error code and message.
 	 */
-	public String[] extractSourceFromStoredFile (String uuid,
+	private String[] extractSourceFromStoredFile (String uuid,
 		String language)
 	{
 		String[] res = new String[2];
@@ -313,7 +317,7 @@ public class TransifexClient {
 		return res;
 	}
 
-	public String[] extractTargetFromStoredFile (String uuid,
+	private String[] extractTargetFromStoredFile (String uuid,
 		String language,
 		String resourceId)
 	{
@@ -350,23 +354,63 @@ public class TransifexClient {
 		return res;
 	}
 
-	private HttpURLConnection createConnection (URL url,
-		String requestType)
-		throws IOException
+	/**
+	 * Gets information about a given resource for a given locale.
+	 * @param resId the identifier of the resource.
+	 * @param locId the locale identifier
+	 * @return an array of two objects: On success 0=date 1=completion,
+	 * On error: 0=null, 1=null.
+	 */
+	public Object[] getInformation (String resId,
+		LocaleId locId)
 	{
-		HttpURLConnection conn = null;
+		Object res[] = new Object[2];
+		try {
+			URL url = new URL(host + String.format("api/project/%s/resource/%s/stats/%s/",
+				project, resId, locId.toPOSIXLocaleId()));
+			HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+			conn.setRequestProperty("Authorization", credentials);
 
-		conn = (HttpURLConnection)url.openConnection();
-		conn.setRequestMethod(requestType);
-		conn.setDoOutput(true);
-	    conn.setDoInput(true);
-	    conn.setAllowUserInteraction(false);
-		conn.setRequestProperty("Authorization", credentials);
-		conn.setRequestProperty("Content-Type", "application/json");
-
-		return conn;
+			int code = conn.getResponseCode();
+			if ( code == RESCODE_OK ) {
+				//{ "en": {
+				//        "completed": "100%", 
+				//        "translated_entities": 10, 
+				//        "last_update": "2011-03-03 11:59:09"
+				// } }
+				JSONObject object = (JSONObject)parser.parse(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+			    object = (JSONObject)object.get(locId.toPOSIXLocaleId());
+			    if ( object == null ) {
+			    	res[0] = new Date(0);
+			    	res[1] = "0%";
+			    }
+			    else {
+			    	// Get the last update date/time
+			    	// (string is in UTC, but not marked as such so we add the time-zone
+			    	res[0] = dateFormat.parse((String)object.get("last_update") + " -0000");
+			    	// Get the percentage completed
+			    	res[1] = (String)object.get("completed");
+			    }
+			}
+			else {
+				res[1] = String.format("Error %d ", code) + conn.getResponseMessage(); 
+			}
+		}
+		catch ( MalformedURLException e ) {
+			throw new OkapiIOException("Error retrieving info.", e);
+		}
+		catch ( IOException e ) {
+			throw new OkapiIOException("Error retrieving info.", e);
+		}
+		catch ( ParseException e ) {
+			throw new OkapiIOException("Error parsing results.", e);
+		}
+		catch ( java.text.ParseException e ) {
+			throw new OkapiIOException("Error parsing last update date/time.", e);
+		}
+		return res;
 	}
-	
+		
 	/**
 	 * Upload a file to the storage.
 	 * <p>The file must be a POT file, in UTF-8 without BOM.
@@ -376,7 +420,7 @@ public class TransifexClient {
 	 * @return an array of strings: On success 0=UUID, 1=name, 2=Resource id.
 	 * On error 0=null, 1=error code and message, 2=null.
 	 */
-	public String[] uploadFile (String path,
+	private String[] uploadFile (String path,
 		String language,
 		String resourceFile)
 	{
@@ -463,6 +507,21 @@ public class TransifexClient {
 		return res;
 	}
 
+	private HttpURLConnection createConnection (URL url,
+		String requestType)
+		throws IOException
+	{
+		HttpURLConnection conn = null;
+		conn = (HttpURLConnection)url.openConnection();
+		conn.setRequestMethod(requestType);
+		conn.setDoOutput(true);
+	    conn.setDoInput(true);
+	    conn.setAllowUserInteraction(false);
+		conn.setRequestProperty("Authorization", credentials);
+		conn.setRequestProperty("Content-Type", "application/json");
+		return conn;
+	}
+	
 	private void addFormDataPart (String name,
 		String value,
 		DataOutputStream dos)
@@ -511,12 +570,3 @@ public class TransifexClient {
 	}
 	
 }
-
-//StringBuilder tmp = new StringBuilder();
-//String line;
-//BufferedReader reader = new BufferedReader(
-//	new InputStreamReader(conn.getInputStream(), "UTF-8"));
-//while ( (line = reader.readLine()) != null ) {
-//	tmp.append(line);
-//}
-//reader.close();
