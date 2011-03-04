@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.applications.webservice;
+package net.sf.okapi.applications.longhorn;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -31,7 +31,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import net.sf.okapi.applications.webservice.transport.XMLStringList;
+import net.sf.okapi.applications.longhorn.transport.XMLStringList;
 import net.sf.okapi.common.Util;
 
 import org.apache.commons.httpclient.Header;
@@ -48,7 +48,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class ServiceTest {
-	private static final String SERVICE_BASE_URL = "http://localhost:9095/okapi-webservice";
+	private static final String SERVICE_BASE_URL = "http://localhost:9095/okapi-longhorn";
 	private HttpClient client;
 	private File batchConfig;
 	private ArrayList<File> inputFiles;
@@ -72,7 +72,6 @@ public class ServiceTest {
 		
 	}
 
-	// As long the path to the workspace is still hard-coded, this might be dangerous to run
 	//@Test
 	public void runRainbowProject() throws Exception {
 
@@ -145,7 +144,7 @@ public class ServiceTest {
 	private File downloadFileToTemp(String uri) throws IOException {
 		
 		InputStream remoteFile = new URL(uri).openStream();
-		File tempFile = File.createTempFile("webservice", "file");
+		File tempFile = File.createTempFile("okapi-longhorn", "outfile");
 		Util.copy(remoteFile, tempFile);
 		remoteFile.close();
 		return tempFile;

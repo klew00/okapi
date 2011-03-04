@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.applications.webservice;
+package net.sf.okapi.applications.longhorn;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -65,11 +65,11 @@ public final class WorkspaceUtils {
 	}
 	
 	/**
-	 * @return The user's configuration (if <code>System.getProperty("user.home") + "/okapi-webservice-configuration.xml"</code>
+	 * @return The user's configuration (if <code>System.getProperty("user.home") + "/okapi-longhorn-configuration.xml"</code>
 	 * 		was found) or the default configuration
 	 */
 	private static Configuration loadConfig() {
-		File userConfig = new File( System.getProperty("user.home") + "/okapi-webservice-configuration.xml");
+		File userConfig = new File( System.getProperty("user.home") + "/okapi-longhorn-configuration.xml");
 		
 		try {
 			if(userConfig.exists())

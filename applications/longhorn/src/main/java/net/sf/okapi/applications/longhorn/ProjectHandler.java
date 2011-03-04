@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.applications.webservice;
+package net.sf.okapi.applications.longhorn;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -43,7 +43,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import net.sf.okapi.applications.webservice.transport.XMLStringList;
+import net.sf.okapi.applications.longhorn.transport.XMLStringList;
 import net.sf.okapi.applications.rainbow.Project;
 import net.sf.okapi.applications.rainbow.batchconfig.BatchConfiguration;
 import net.sf.okapi.applications.rainbow.lib.LanguageManager;
@@ -57,7 +57,7 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 
 /**
- * Handles WebService requests and delegates them to Rainbow/Okapi.
+ * Handles Web-Service requests and delegates them to Rainbow/Okapi.
  * Also does the handling of the input and output files.
  * 
  *

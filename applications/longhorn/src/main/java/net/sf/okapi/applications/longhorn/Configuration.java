@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.applications.webservice;
+package net.sf.okapi.applications.longhorn;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,7 +33,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class Configuration {
-	private static final String DEF_WORKING_DIR = System.getProperty("user.home") + File.separator + "Okapi-Web-Service-Files";
+	private static final String DEF_WORKING_DIR = System.getProperty("user.home") + File.separator + "Okapi-Longhorn-Files";
 	
 	private String workingDirectory;
 	

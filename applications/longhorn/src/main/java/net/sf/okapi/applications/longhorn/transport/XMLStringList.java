@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.applications.webservice.transport;
+package net.sf.okapi.applications.longhorn.transport;
 
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
