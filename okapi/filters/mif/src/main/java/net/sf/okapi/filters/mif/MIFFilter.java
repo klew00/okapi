@@ -21,6 +21,7 @@
 package net.sf.okapi.filters.mif;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -74,6 +75,7 @@ public class MIFFilter implements IFilter {
 	private final Logger logger = Logger.getLogger(getClass().getName());
 
 	private static final Hashtable<String, String> charTable = initCharTable();
+	private static final Hashtable<String, String> encodingTable = initEncodingTable();
 	
 	private static final String TOPSTATEMENTSTOSKIP = "ColorCatalog;ConditionCatalog;BoolCondCatalog;"
 		+ "CombinedFontCatalog;PgfCatalog;ElementDefCatalog;FmtChangeListCatalog;DefAttrValuesCatalog;"
@@ -81,6 +83,7 @@ public class MIFFilter implements IFilter {
 		+ "MarkerTypeCatalog;XRefFormats;Document;BookComponent;InitialAutoNums;Dictionary;AFrames;Page";
 	
 	private static final String IMPORTOBJECT = "ImportObject";
+	private static final String FRAMEROMAN = "x-MacRoman"; //TODO: Set to x-FrameRoman when ready
 
 	private String lineBreak;
 	private String docName;
@@ -109,13 +112,18 @@ public class MIFFilter implements IFilter {
 	private int fnoteGroupLevel;
 	private Stack<String> parentIds;
 	private InlineCodeFinder codeFinder;
-	private ByteBuffer byteBuffer;
-	private CharsetDecoder chsDecoder;
 	private ArrayList<String> textFlows; 
 	private ArrayList<String> tables;
 	private boolean secondPass;
+	private ByteBuffer byteBuffer;
+	private ByteArrayOutputStream byteStream;
+	private CharsetDecoder[] decoders;
+	private CharsetDecoder currentDecoder;
+	private int currentDecoderIndex;
 	private MIFEncoder encoder;
 	private int decodingErrors;
+	private String baseEncoding;
+	private boolean useUTF8;
 	
 	private static Hashtable<String, String> initCharTable () {
 		Hashtable<String, String> table = new Hashtable<String, String>();
@@ -138,6 +146,16 @@ public class MIFFilter implements IFilter {
 		table.put("ThinSpace", "\u2009");
 		table.put("EnSpace", "\u2002");
 		table.put("EmSpace", "\u2003");
+		return table;
+	}
+	
+	private static Hashtable<String, String> initEncodingTable () {
+		Hashtable<String, String> table = new Hashtable<String, String>();
+		table.put("FrameRoman", FRAMEROMAN);
+		table.put("JISX0208.ShiftJIS", "Shift-JIS");
+		table.put("BIG5", "Big5");
+		table.put("GB2312-80.EUC", "GB2312");
+		table.put("KSC5601-1992", "EUC-KR");
 		return table;
 	}
 
@@ -283,17 +301,24 @@ public class MIFFilter implements IFilter {
 			secondPass = true;
 			input = rd.getStream();
 			res = guessEncoding(input);
-			reader = new BufferedReader(new InputStreamReader((InputStream)res[0], (String)res[1]));
+			baseEncoding = (String)res[1];
+			reader = new BufferedReader(new InputStreamReader((InputStream)res[0], baseEncoding));
 			initialize();
 			
-			chsDecoder = Charset.forName((String)res[1]).newDecoder();
+			// Initialize the decoders
+			decoders = new CharsetDecoder[2];
+			decoders[0] = Charset.forName(baseEncoding).newDecoder();
+			decoders[1] = decoders[0]; // Use the same to start
+			currentDecoderIndex = 0;
+			currentDecoder = decoders[currentDecoderIndex];
 			byteBuffer = ByteBuffer.allocate(4);
+			byteStream = new ByteArrayOutputStream(20);
 			
 			queue = new LinkedList<Event>();
 			StartDocument startDoc = new StartDocument(sdId);
 			startDoc.setName(docName);
 			startDoc.setLineBreak(lineBreak);
-			startDoc.setEncoding((String)res[1], false);
+			startDoc.setEncoding(baseEncoding, false);
 			// We assume no BOM in all case for MIF
 			startDoc.setLocale(srcLang);
 			startDoc.setFilterParameters(getParameters());
@@ -389,7 +414,7 @@ public class MIFFilter implements IFilter {
 						return;
 					}
 					else if ( "MIFFile".equals(tag) ) {
-						MIFToken token = getNextTokenInStatement(true);
+						MIFToken token = getNextTokenInStatement(true, null);
 						if ( token.isLast() ) blockLevel--;
 						if ( token.getType() == MIFToken.TYPE_STRING ) {
 							//version = token.getString();
@@ -503,7 +528,7 @@ public class MIFFilter implements IFilter {
 							}
 							// Else it's a PageType or a TextRect
 							if ( tag.equals("PageType") ) {
-								token = getNextTokenInStatement(false);
+								token = getNextTokenInStatement(false, null);
 								if ( token.isLast() ) blockLevel--;
 								if ( token.getType() == MIFToken.TYPE_STRING ) {
 									pageType = token.getString();
@@ -519,7 +544,7 @@ public class MIFFilter implements IFilter {
 									tag = readUntil("ID", false, blockLevel);
 									if ( tag != null ) {
 										// Found
-										token = getNextTokenInStatement(false);
+										token = getNextTokenInStatement(false, null);
 										if ( token.isLast() ) blockLevel--;
 										if ( token.getType() == MIFToken.TYPE_STRING ) {
 											textRectId = token.getString();
@@ -570,7 +595,7 @@ public class MIFFilter implements IFilter {
 								// Error: Unique ID missing
 								throw new OkapiIOException("Missing unique id for the text flow.");
 							}
-							token = getNextTokenInStatement(false);
+							token = getNextTokenInStatement(false, null);
 							if ( token.isLast() ) blockLevel--;
 							if ( token.getType() != MIFToken.TYPE_STRING ) {
 								throw new OkapiIOException("Missing unique id value for the text flow.");
@@ -589,7 +614,7 @@ public class MIFFilter implements IFilter {
 										break; // Done
 									}
 									if ( !textRectDone && tag.equals("TextRectID") ) {
-										token = getNextTokenInStatement(false);
+										token = getNextTokenInStatement(false, null);
 										if ( token.isLast() ) blockLevel--;
 										if ( token.getType() == MIFToken.TYPE_STRING ) {
 											textRectId = token.getString();
@@ -601,7 +626,7 @@ public class MIFFilter implements IFilter {
 										}
 									}
 									else if ( tag.equals("ATbl") ) {
-										token = getNextTokenInStatement(false);
+										token = getNextTokenInStatement(false, null);
 										if ( token.isLast() ) blockLevel--;
 										if ( token.getType() == MIFToken.TYPE_STRING ) {
 											tblIds.add(token.getString());
@@ -625,7 +650,7 @@ public class MIFFilter implements IFilter {
 						blockLevel--;
 					}
 					else if ( "MIFFile".equals(tag) ) {
-						token = getNextTokenInStatement(false);
+						token = getNextTokenInStatement(false, null);
 						if ( token.isLast() ) blockLevel--;
 						if ( token.getType() == MIFToken.TYPE_STRING ) {
 							version = token.getString();
@@ -783,6 +808,7 @@ public class MIFFilter implements IFilter {
 		paraBuf.setLength(0);
 		paraBufNeeded = false;
 		String endString = null;
+		resetToDefaultDecoder();
 
 		// Go to the first ParaLine
 		int res = readUntilText(paraBuf, false);
@@ -885,23 +911,27 @@ public class MIFFilter implements IFilter {
 		}
 	}
 	
-	private MIFToken getNextTokenInStatement (boolean store)
+	private MIFToken getNextTokenInStatement (boolean store,
+		StringBuilder sb)
 		throws IOException
 	{
 		int n;
 		boolean leadingWSDone = false;
 		do {
-			switch ( n = reader.read() ) {
+			n = reader.read();
+			if ( store ) {
+				if ( sb != null ) sb.append((char)n);
+				else skel.add((char)n);
+			}
+			switch ( n ) {
 			case ' ':
 			case '\t':
 			case '\r':
 			case '\n':
-				if ( store ) skel.add((char)n);
 				break;
 			case -1:
 				throw new OkapiIllegalFilterOperationException("Unexpected end of input.");
 			default:
-				if ( store ) skel.add((char)n);
 				leadingWSDone = true;
 				break;
 			}
@@ -912,8 +942,12 @@ public class MIFFilter implements IFilter {
 		tmp.append((char)n);
 		do {
 			n = reader.read();
-			if ( store ) skel.add((char)n);
+			if ( store ) {
+				if ( sb != null ) sb.append((char)n);
+				else skel.add((char)n);
+			}
 			switch ( n ) {
+//TODO: what if the token is a string? 			
 			case ' ':
 			case '\t':
 			case '\r':
@@ -936,7 +970,7 @@ public class MIFFilter implements IFilter {
 		throws IOException
 	{
 		// Get the next token: the name of the character
-		MIFToken token = getNextTokenInStatement(store);
+		MIFToken token = getNextTokenInStatement(store, null);
 		if ( !token.isLast() ) {
 			skipOverContent(store, null);
 		}
@@ -986,6 +1020,13 @@ public class MIFFilter implements IFilter {
 				else if ( "Char".equals(tag) ) {
 					return 2;
 				}
+				else if ( !useUTF8 && "Font".equals(tag) ) {
+					// Do the font-driven encoding resolving only for non-UTF-8 files
+					//TODO: Is it safe? need to be verified
+					if ( checkIfParaBufNeeded ) paraBufNeeded = true;
+					readFont(sb); //skipOverContent(true, sb);
+					paraLevel--;
+				}
 				// Default: skip over
 				else {
 					if ( checkIfParaBufNeeded ) paraBufNeeded = true;
@@ -1010,6 +1051,117 @@ public class MIFFilter implements IFilter {
 		return 0;
 	}
 
+	private void readFont (StringBuilder sb)
+		throws IOException
+	{
+		int c;
+		int baseLevel = 1;
+		
+		String encoding = null;
+		String fontHint = null;
+		String ftag = null;
+		boolean inString = false;
+		MIFToken token;
+		
+		while ( (c = reader.read()) != -1 ) {
+			sb.append((char)c);
+			// Handle string content
+			if ( inString ) {
+				if ( c == '\'' ) inString = false;
+				continue;
+			}
+			// Otherwise:
+			switch ( c ) {
+			case '#':
+				readComment(true, sb);
+				break;
+				
+			case '`':
+				inString = true;
+				break;
+				
+			case '<':
+				baseLevel++;
+				String tag = readTag(true, true, sb);
+				if ( "FTag".equals(tag) ) {
+					token = getNextTokenInStatement(true, sb);
+					if ( token.isLast() ) baseLevel--;
+					ftag = token.toString().substring(1, token.toString().length()-1);
+				}
+				if ( "FEncoding".equals(tag) ) {
+					token = getNextTokenInStatement(true, sb);
+					if ( token.isLast() ) baseLevel--;
+					encoding = token.toString().substring(1, token.toString().length()-1);
+				}
+				else if ( "FPlatformName".equals(tag) ) {
+					token = getNextTokenInStatement(true, sb);
+					if ( token.isLast() ) baseLevel--;
+					fontHint = token.toString().substring(1, token.toString().length()-1);
+				}
+				// TODO: use Flanguage as well?
+				// FLanguage
+				break;
+				
+			case '>':
+				baseLevel--;
+				if ( baseLevel == 0 ) {
+					updateCurrentDecoder(ftag, encoding, fontHint);
+					return;
+				}
+				break;
+			}
+		}
+		// Unexpected end
+		throw new OkapiIllegalFilterOperationException(
+			"Unexpected end of input when reading a font");
+	}
+	
+	private void resetToDefaultDecoder () {
+		currentDecoderIndex = 0;
+		currentDecoder = decoders[0];
+	}
+	
+	private void updateCurrentDecoder (String ftag,
+		String newEncoding,
+		String newHint)
+	{
+		if ( newEncoding == null ) {
+			// No encoding definition
+			if ( Util.isEmpty(ftag) ) {
+				// No FTag and no encoding: likely a default for the encoding
+				resetToDefaultDecoder();
+			}
+			else {
+				//TODO: get the encoding info from the font of this paragraph style
+			}
+		}
+		else {
+			// Map the MIF encoding name to a standard name
+			String mappedEncoding = encodingTable.get(newEncoding);
+			if ( mappedEncoding == null ) {
+				// Warn if the name is not found (and just move on)
+				logger.warning(String.format("Unknown encoding name: '%s'.", mappedEncoding));
+				return;
+			}
+			// Check if the new encoding is the same as the current one
+			if ( !mappedEncoding.equalsIgnoreCase(currentDecoder.charset().name()) ) {
+				// Test the other one
+				int n = ((currentDecoderIndex == 0) ? 1 : 0);
+				if ( mappedEncoding.equalsIgnoreCase(decoders[n].charset().name()) ) {
+					// Use this one
+					currentDecoderIndex = n;
+				}
+				else { // Create a new one (keep the number 0 always the same)
+					decoders[1] = Charset.forName(mappedEncoding).newDecoder();
+					currentDecoderIndex = 1;
+				}
+				// Set the current one
+				currentDecoder = decoders[currentDecoderIndex];
+			}
+			// Else: current decoder in fine
+		}
+	}
+	
 	/**
 	 * Reads until the first occurrence of one of the given statements, or (if stopLevel
 	 * is -1) at the end of the current level, or at the end of the given level.
@@ -1350,78 +1502,106 @@ public class MIFFilter implements IFilter {
 	{
 		strBuffer.setLength(0);
 		int c;
-		boolean inString = false;
-		boolean inEscape = false;
+		int state = 0;
+		boolean byteMode = false;
+		
 		while ( (c = reader.read()) != -1 ) {
+			
 			if ( store ) skel.append((char)c);
-			if ( inString ) {
-				if ( inEscape ) {
-					switch ( c ) {
-					case '\\':
-					case '>':
-						strBuffer.append((char)c);
-						break;
-					case 't':
-						strBuffer.append('\t');
-						break;
-					case 'Q':
-						strBuffer.append('`');
-						break;
-					case 'q':
-						strBuffer.append('\'');
-						break;
-					case 'u':
-						// Format: like Java properties
-						c = readHexa(4, false);
-						if ( c != Integer.MAX_VALUE ) {
-							strBuffer.append((char)c);
-						}
-						break;
-					case 'x':
-						// Format: \xHH<space>
-						c = readHexa(2, true);
-						if ( c != Integer.MAX_VALUE ) {
-							// The value c is a byte value in the current encoding
-							try {
-								byteBuffer.clear();
-								byteBuffer.put(0, (byte)c);
-								CharBuffer buf = chsDecoder.decode(byteBuffer);
-								strBuffer.append(buf.get(0));
-							}
-							catch ( CharacterCodingException e ) {
-								if ( ++decodingErrors < 25 ) {
-									// Warning message, but only up to a point
-									logger.warning(String.format("Error with decoding character \\x%2x (%d) with encoding '%s'.",
-										c, c, chsDecoder.charset().name()));
-								}
-							}
-						}
-						break;
-					}
-					inEscape = false;
-				}
-				else {
-					switch ( c ) {
-					case '\'': // End of string
-						inString = false;
-					case '\\':
-						inEscape = true;
-						break;
-					default:
-						strBuffer.append((char)c);
-						break;
-					}
-				}
-			}
-			else { // Not yet in string
+			
+			switch ( state ) {
+			case 0: // Outside the string
 				switch ( c ) {
 				case '`':
-					inString = true;
-					break;
+					state = 1; // In string
+					continue;
 				case '>':
+					if ( byteMode ) {
+						try {
+							CharBuffer buf = currentDecoder.decode(ByteBuffer.wrap(byteStream.toByteArray()));
+							strBuffer.append(buf.toString());
+						}
+						catch ( CharacterCodingException e ) {
+							if ( ++decodingErrors < 25 ) {
+								// Warning message, but only up to a point
+								logger.warning(String.format("Error with decoding character \\x%2x (%d) with encoding '%s'.",
+									c, c, currentDecoder.charset().name()));
+							}
+						}
+					}
 					return strBuffer.toString();
 				}
+				continue;
+			
+			case 1: // In string
+				switch ( c ) {
+				case '\'': // End of string
+					state = 0;
+					continue;
+				case '\\':
+					state = 2; // In escape mode
+					continue;
+				default:
+					if ( byteMode ) {
+						if ( c > 127 ) {
+							// Extended characters are normally all escaped in a byte string
+							logger.warning(String.format("A raw extended character (0x%04X) was found in a byte string.\n"
+								+ "This may be a problem.", c));
+						}
+						byteStream.write(c);
+					}
+					else strBuffer.append((char)c);
+					continue;
+				}
+				
+			case 2: // In escape mode (after a backslash)
+				state = 1; // Reset to in-string state
+				switch ( c ) {
+				case '\\':
+				case '>':
+					if ( byteMode ) byteStream.write(c);
+					else strBuffer.append((char)c);
+					continue;
+				case 't':
+					if ( byteMode ) byteStream.write(c);
+					else strBuffer.append('\t');
+					continue;
+				case 'Q':
+					if ( byteMode ) byteStream.write(c);
+					else strBuffer.append('`');
+					continue;
+				case 'q':
+					if ( byteMode ) byteStream.write(c);
+					else strBuffer.append('\'');
+					continue;
+				case 'u':
+					c = readHexa(4, false);
+					if ( c == Integer.MAX_VALUE ) {
+						continue; // warning already logged
+					}
+					if ( byteMode ) {
+						// We should not see this in byte mode
+						logger.warning("A Uniocde escape sequence was found in a byte string.\n"
+							+ "Mixed notations are not supported, this character will be skipped.");
+					}
+					else {
+						strBuffer.append((char)c);
+					}
+					continue;
+				case 'x':
+					c = readHexa(2, true);
+					if ( c == Integer.MAX_VALUE ) {
+						continue; // warning already logged
+					}
+					if ( !byteMode ) {
+						byteStream.reset();
+						byteMode = true;
+					}
+					byteStream.write(c);
+					continue;
+				}				
 			}
+			
 		}
 		// Else: Missing end of string error
 		throw new OkapiIllegalFilterOperationException("End of string is missing.");
@@ -1452,6 +1632,7 @@ public class MIFFilter implements IFilter {
 		}
 		catch ( NumberFormatException e ) {
 			// Log warning
+			logger.warning(String.format("Invalid escape sequence found: '%s'", tagBuffer.toString()));
 		}
 		
 		// Error
@@ -1467,7 +1648,7 @@ public class MIFFilter implements IFilter {
 			// If we have a version, it means we are in the second pass and need to get the correct encoding
 			if ( version.compareTo("8.00") < 0 ) {
 				// Before 8.00 the default was not UTF-8
-				defEncoding = "MacRoman"; //TODO: Use MacRoman for now, but we will need a real Java Charset for FrameRoman
+				defEncoding = FRAMEROMAN;
 			}
 		}
 		
@@ -1475,6 +1656,7 @@ public class MIFFilter implements IFilter {
 		BOMAwareInputStream bais = new BOMAwareInputStream(input, defEncoding);
 		res[0] = bais;
 		res[1] = bais.detectEncoding();
+		useUTF8 = (((String)res[1]).equals("UTF-8"));
 		if ( bais.autoDtected() ) {
 			return res;
 		}

@@ -223,6 +223,7 @@ public class MIFFilterTest {
 	@Test
 	public void testOutput () {
 		rewriteFile("Test03.mif");
+		rewriteFile("Test03_mif7.mif");
 		rewriteFile("Test01.mif");
 		rewriteFile("Test02-v9.mif");
 		rewriteFile("Test01-v7.mif");
