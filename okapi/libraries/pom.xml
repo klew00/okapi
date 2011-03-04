@@ -23,5 +23,6 @@
         <module>lib-reporting</module>
         <module>lib-omegat</module>
         <module>lib-transifex</module>
+        <module>lib-longhorn-api</module>
     </modules>
 </project>
