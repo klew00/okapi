@@ -33,6 +33,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -410,7 +412,62 @@ public class TransifexClient {
 		}
 		return res;
 	}
+
+	/**
+	 * Retrieves the list of the resources for the current project, for a given source locale.
+	 * @param srcLoc the source locale.
+	 * @return an array of object. On success: 0=project id, 1=project short description,
+	 * 2=a map of the resource (id and name). On error: 0=null, 1=Error message. 
+	 */
+	public Object[] getResourceList (LocaleId srcLoc) {
+		Object[] res = new Object[3];
+		res[0] = null;
+		try {
+			URL url = new URL(host + String.format("api/project/%s/", project));
+			HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+			conn.setRequestProperty("Authorization", credentials);
+
+			int code = conn.getResponseCode();
+			String srcLang = srcLoc.toPOSIXLocaleId();
+			if ( code == RESCODE_OK ) {
+				Map<String, String> resources = new HashMap<String, String>();
+				res[2] = resources;
+				// See http://help.transifex.net/technical/api/api.html
+				JSONObject object = (JSONObject)parser.parse(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+				res[0] = (String)object.get("slug");
+				res[1] = (String)object.get("description");
+				JSONArray array = (JSONArray)object.get("resources");
+				for ( int i=0; i<array.size(); i++ ) {
+					object = (JSONObject)array.get(i);
+					JSONObject object2 = (JSONObject)object.get("source_language");
+					String lang = (String)object2.get("code");
+					if ( !srcLang.equals(lang) ) continue;
+					// Else: This is a resource for the given source locale
+					String resId = (String)object.get("slug");
+					String name = (String)object.get("name");
+					resources.put(resId, name);
+				}
+			}
+			else {
+				res[1] = String.format("Error %d ", code) + conn.getResponseMessage(); 
+			}
+		}
+		catch ( MalformedURLException e ) {
+			throw new OkapiIOException("Error retrieving info.", e);
+		}
+		catch ( UnsupportedEncodingException e ) {
+			throw new OkapiIOException("Error retrieving info.", e);
+		}
+		catch ( IOException e ) {
+			throw new OkapiIOException("Error retrieving info.", e);
+		}
+		catch ( ParseException e ) {
+			throw new OkapiIOException("Error retrieving info.", e);
+		}
 		
+		return res;
+	}
+	
 	/**
 	 * Upload a file to the storage.
 	 * <p>The file must be a POT file, in UTF-8 without BOM.

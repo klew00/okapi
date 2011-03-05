@@ -55,13 +55,11 @@ public class RTFConversionStep extends BasePipelineStep {
 
 	public RTFConversionStep () {
 		params = new Parameters();
-
 		reXML = Pattern.compile("<\\?xml(.*?)encoding(\\s*?)=(\\s*?)(\"|')(.*?)(\"|')(.*?)\\?>");
 		strXMLReplace = "<?xml$1encoding$2=$3$4ZZZ$6$7?>";
 		reXMLVersion = Pattern.compile("<\\?xml(.*?)version(\\s*?)=(\\s*?)(\"|')(.*?)(\"|')");
 		reHTML = Pattern.compile("(content)(\\s*?)=(.*?)(charset)(\\s*?)=(.*?)(\\s|\"|')", Pattern.CASE_INSENSITIVE);
 		strHTMLReplace = "$1$2=$3$4$5=ZZZ$7";
-		
 	}
 
 	@StepParameterMapping(parameterType = StepParameterType.OUTPUT_URI)
