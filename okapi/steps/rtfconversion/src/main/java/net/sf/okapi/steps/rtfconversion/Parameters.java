@@ -38,9 +38,11 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	
 	private static final String LINEBREAK = "lineBreak";
 	private static final String BOMONUTF8 = "bomOnUTF8";
+	private static final String UPDATEENCODING = "updateEncoding";
 	
 	private String lineBreak;
 	private boolean bomOnUTF8;
+	private boolean updateEncoding;
 
 	public Parameters () {
 		reset();
@@ -51,6 +53,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		if ( (lineBreak = System.getProperty("line.separator") ) == null ) {
 			lineBreak = Util.LINEBREAK_DOS;
 		}
+		updateEncoding = true;
 	}
 
 	public void fromString (String data) {
@@ -58,12 +61,14 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.fromString(data);
 		lineBreak = buffer.getString(LINEBREAK, lineBreak);
 		bomOnUTF8 = buffer.getBoolean(BOMONUTF8, bomOnUTF8);
+		updateEncoding = buffer.getBoolean(UPDATEENCODING, updateEncoding);
 	}
 
 	public String toString() {
 		buffer.reset();
 		buffer.setString(LINEBREAK, lineBreak);
 		buffer.setBoolean(BOMONUTF8, bomOnUTF8);
+		buffer.setBoolean(UPDATEENCODING, updateEncoding);
 		return buffer.toString();
 	}
 	
@@ -79,6 +84,14 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		return bomOnUTF8;
 	}
 	
+	public void setUpdateEncoding (boolean updateEncoding) {
+		this.updateEncoding = updateEncoding;
+	}
+
+	public boolean getUpdateEncoding () {
+		return updateEncoding;
+	}
+	
 	public void setBomOnUTF8 (boolean bomOnUTF8) {
 		this.bomOnUTF8 = bomOnUTF8;
 	}
@@ -88,6 +101,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		ParametersDescription desc = new ParametersDescription(this);
 		desc.add(LINEBREAK, "Type of line-break to use", "Select the type of line-break to use in the output.");		
 		desc.add(BOMONUTF8, "Use Byte-Order-Mark for UTF-8 output", null);
+		desc.add(UPDATEENCODING, "Try to update the encoding declarations (when detected)", null);
 		return desc;
 	}
 	
@@ -96,6 +110,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		EditorDescription desc = new EditorDescription("RTF Conversion", true, false);	
 
 		desc.addCheckboxPart(paramsDesc.get(BOMONUTF8));
+		desc.addCheckboxPart(paramsDesc.get(UPDATEENCODING));
 
 		String[] values = {
 			Util.LINEBREAK_DOS,

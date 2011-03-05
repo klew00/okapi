@@ -26,6 +26,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.URI;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
@@ -45,9 +47,21 @@ public class RTFConversionStep extends BasePipelineStep {
 	private URI outputURI;
 	private String outputEncoding;
 	private RTFFilter filter;
+	private final Pattern reXML;
+	private final String strXMLReplace;
+	private final Pattern reXMLVersion;
+	private final Pattern reHTML;
+	private final String strHTMLReplace;
 
 	public RTFConversionStep () {
 		params = new Parameters();
+
+		reXML = Pattern.compile("<\\?xml(.*?)encoding(\\s*?)=(\\s*?)(\"|')(.*?)(\"|')(.*?)\\?>");
+		strXMLReplace = "<?xml$1encoding$2=$3$4ZZZ$6$7?>";
+		reXMLVersion = Pattern.compile("<\\?xml(.*?)version(\\s*?)=(\\s*?)(\"|')(.*?)(\"|')");
+		reHTML = Pattern.compile("(content)(\\s*?)=(.*?)(charset)(\\s*?)=(.*?)(\\s|\"|')", Pattern.CASE_INSENSITIVE);
+		strHTMLReplace = "$1$2=$3$4$5=ZZZ$7";
+		
 	}
 
 	@StepParameterMapping(parameterType = StepParameterType.OUTPUT_URI)
@@ -84,7 +98,6 @@ public class RTFConversionStep extends BasePipelineStep {
 		// Create the RTF reader
 		if ( filter != null ) filter.close();
 		filter = new RTFFilter();
-
 		return event;
 	}
 	
@@ -114,9 +127,60 @@ public class RTFConversionStep extends BasePipelineStep {
 			writer = new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(outFile)), outputEncoding);
 			Util.writeBOMIfNeeded(writer, params.getBomOnUTF8(), outputEncoding);
 			
+			String xmlReplace = strXMLReplace.replace("ZZZ", outputEncoding);
+			String htmlReplace = strHTMLReplace.replace("ZZZ", outputEncoding);
+			boolean declDone = !params.getUpdateEncoding(); // Set to done if we don't have do it
+			int lines = 0;
+			int declState = 0;
+			Matcher m;
+			
 			// Process
 			StringBuilder buf = new StringBuilder();
 			while ( filter.getTextUntil(buf, -1, 0) == 0 ) {
+				
+				if ( !declDone  ) {
+					String sTmp = buf.toString();
+					switch ( declState ) {
+					case 0:
+						if ( sTmp.indexOf("<?xml ") != -1 ) { // XML is case-sensitive
+							declState = 1;
+							m = reXML.matcher(sTmp);
+							if ( m.find() ) {
+								buf.setLength(0);
+								buf.append(m.replaceFirst(xmlReplace));
+							}
+							else { // Check for cases when there is no encoding declaration
+								m = reXMLVersion.matcher(sTmp);
+								if ( m.find()) {
+									buf.insert(m.end(), " encoding=\"" + outputEncoding + "\"");
+								}
+							}
+						}
+						if ( sTmp.toLowerCase().indexOf("<html") != -1 ) {
+							declState = 2;
+						}
+						break;
+
+					case 1:
+						// No support for XML declaration on several lines
+						// Look for HTML (XHTML cases)
+						if ( sTmp.toLowerCase().indexOf("<html") != -1 ) {
+							declState = 2;
+						}
+						break;
+
+					case 2:
+						m = reHTML.matcher(sTmp);
+						if ( m.find() ) {
+							buf.setLength(0);
+							buf.append(m.replaceFirst(htmlReplace));
+							if ( !sTmp.equals(buf.toString()) ) declDone = true;
+						}
+						break;
+					}
+					if ( ++lines > 20 ) declDone = true;
+				}
+				
 				writer.write(buf.toString());
 				writer.write(params.getLineBreak());
 			}
@@ -124,6 +188,7 @@ public class RTFConversionStep extends BasePipelineStep {
 			// Done: close the output
 			writer.close();
 			writer = null;
+			
 			// Set the new raw-document URI and the encoding, other info stays the same
 			RawDocument newDoc = new RawDocument(outFile.toURI(), outputEncoding,
 				rawDoc.getSourceLocale(), rawDoc.getTargetLocale());
