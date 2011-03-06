@@ -417,11 +417,11 @@ public class POFilterWriter implements IFilterWriter {
 				}
 			}
 			else {
-				tmp = fmt.printSegmentedContent(tc, false, !params.outputGeneric);
+				tmp = fmt.printSegmentedContent(tc, false, !params.getOutputGeneric());
 			}
 			tmp = escapeIfNeeded(tmp);
 			
-			if ( !params.wrapContent || ( tmp.indexOf("\\n") == -1 )) {
+			if ( !params.getWrapContent() || ( tmp.indexOf("\\n") == -1 )) {
 				writer.write("\"");
 				writer.write(tmp); // No wrapping needed
 				writer.write("\"");

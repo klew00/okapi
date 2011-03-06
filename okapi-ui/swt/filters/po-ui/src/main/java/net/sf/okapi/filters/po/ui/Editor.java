@@ -249,14 +249,14 @@ public class Editor implements IParametersEditor {
 	}
 
 	private void setData () {
-		rdBilingualMode.setSelection(params.bilingualMode);
-		rdMonolingualMode.setSelection(!params.bilingualMode);
-		chkMakeID.setSelection(params.makeID);
+		rdBilingualMode.setSelection(params.getBilingualMode());
+		rdMonolingualMode.setSelection(!params.getBilingualMode());
+		chkMakeID.setSelection(params.getMakeID());
 		updateOptions();
 		
 		//For later: pnlLD.setOptions(params.locDir.useLD(), params.locDir.localizeOutside());
-		chkUseCodeFinder.setSelection(params.useCodeFinder);
-		pnlCodeFinder.setRules(params.codeFinder.toString());
+		chkUseCodeFinder.setSelection(params.getUseCodeFinder());
+		pnlCodeFinder.setRules(params.getCodeFinder().toString());
 		
 		updateInlineCodes();
 		pnlCodeFinder.updateDisplay();
@@ -269,14 +269,14 @@ public class Editor implements IParametersEditor {
 			return false;
 		}
 		else {
-			params.codeFinder.fromString(tmp);
+			params.getCodeFinder().fromString(tmp);
 		}
 		
-		params.makeID = chkMakeID.getSelection();
-		params.bilingualMode = rdBilingualMode.getSelection();
+		params.setMakeID(chkMakeID.getSelection());
+		params.setBilingualMode(rdBilingualMode.getSelection());
 		
 		//For later: params.locDir.setOptions(pnlLD.getUseLD(), pnlLD.getLocalizeOutside());
-		params.useCodeFinder = chkUseCodeFinder.getSelection();
+		params.setUseCodeFinder(chkUseCodeFinder.getSelection());
 		return true;
 	}
 	

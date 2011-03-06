@@ -22,29 +22,77 @@ package net.sf.okapi.filters.po;
 
 import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.filters.InlineCodeFinder;
-import net.sf.okapi.common.filters.LocalizationDirectives;
 
 public class Parameters extends BaseParameters {
 
-	public boolean bilingualMode;
-	public boolean useCodeFinder;
-	public InlineCodeFinder codeFinder;
-	public LocalizationDirectives locDir;
-	public boolean makeID;
+	private static final String BILINGUALMODE = "bilingualMode";
+	private static final String MAKEID = "makeID";
+	private static final String USECODEFINDER = "useCodeFinder";
+	private static final String CODEFINDERRULES = "codeFinderRules";
 	
+	private boolean bilingualMode;
+	private boolean useCodeFinder;
+	private InlineCodeFinder codeFinder;
+	private boolean makeID;
 	// POFilterWriter option
-	public boolean wrapContent = true;
-	public boolean outputGeneric = false;
+	private boolean wrapContent = true;
+	private boolean outputGeneric = false;
 
 	public Parameters () {
-		locDir = new LocalizationDirectives();
 		codeFinder = new InlineCodeFinder();
 		reset();
 		toString(); // Fill the list
 	}
 	
+	public boolean getBilingualMode () {
+		return bilingualMode;
+	}
+
+	public void setBilingualMode (boolean bilingualMode) {
+		this.bilingualMode = bilingualMode;
+	}
+
+	public boolean getUseCodeFinder () {
+		return useCodeFinder;
+	}
+	
+	public void setUseCodeFinder (boolean useCodeFinder) {
+		this.useCodeFinder = useCodeFinder;
+	}
+	
+	public InlineCodeFinder getCodeFinder () {
+		return codeFinder;
+	}
+
+	public void setCodeFinder (InlineCodeFinder codeFinder) {
+		this.codeFinder = codeFinder;
+	}
+
+	public boolean getMakeID () {
+		return makeID;
+	}
+	
+	public void setMakeID (boolean makeID) {
+		this.makeID = makeID;
+	}
+
+	public boolean getWrapContent () {
+		return wrapContent;
+	}
+	
+	public void setWrapContent (boolean wrapContent) {
+		this.wrapContent = wrapContent;
+	}
+
+	public boolean getOutputGeneric () {
+		return outputGeneric;
+	}
+	
+	public void setOutputGeneric (boolean outputGeneric) {
+		this.outputGeneric = outputGeneric;
+	}
+
 	public void reset () {
-		locDir.reset();
 		bilingualMode = true;
 		makeID = true;
 		useCodeFinder = true;
@@ -61,25 +109,20 @@ public class Parameters extends BaseParameters {
 	@Override
 	public String toString () {
 		buffer.reset();
-		buffer.setBoolean("bilingualMode", bilingualMode);
-		buffer.setBoolean("makeID", makeID);
-		buffer.setBoolean("useLD", locDir.useLD());
-		buffer.setBoolean("localizeOutside", locDir.localizeOutside());
-		buffer.setBoolean("useCodeFinder", useCodeFinder);
-		buffer.setGroup("codeFinderRules", codeFinder.toString());
+		buffer.setBoolean(BILINGUALMODE, bilingualMode);
+		buffer.setBoolean(MAKEID, makeID);
+		buffer.setBoolean(USECODEFINDER, useCodeFinder);
+		buffer.setGroup(CODEFINDERRULES, codeFinder.toString());
 		return buffer.toString();
 	}
 	
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
-		bilingualMode = buffer.getBoolean("bilingualMode", bilingualMode);
-		makeID = buffer.getBoolean("makeID", makeID);
-		boolean tmpBool1 = buffer.getBoolean("useLD", locDir.useLD());
-		boolean tmpBool2 = buffer.getBoolean("localizeOutside", locDir.localizeOutside());
-		locDir.setOptions(tmpBool1, tmpBool2);
-		useCodeFinder = buffer.getBoolean("useCodeFinder", useCodeFinder);
-		codeFinder.fromString(buffer.getGroup("codeFinderRules", ""));
+		bilingualMode = buffer.getBoolean(BILINGUALMODE, bilingualMode);
+		makeID = buffer.getBoolean(MAKEID, makeID);
+		useCodeFinder = buffer.getBoolean(USECODEFINDER, useCodeFinder);
+		codeFinder.fromString(buffer.getGroup(CODEFINDERRULES, ""));
 	}
 
 }

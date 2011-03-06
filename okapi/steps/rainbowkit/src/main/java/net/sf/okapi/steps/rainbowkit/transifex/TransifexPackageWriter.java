@@ -142,7 +142,7 @@ public class TransifexPackageWriter extends BasePackageWriter {
 		// Set the source POT file
 		potWriter = new POFilterWriter();
 		net.sf.okapi.filters.po.Parameters params = (net.sf.okapi.filters.po.Parameters)potWriter.getParameters();
-		params.outputGeneric = true;
+		params.setOutputGeneric(true);
 		potWriter.setMode(true, true);
 		potWriter.setOptions(manifest.getSourceLocale(), "UTF-8");
 
@@ -153,7 +153,7 @@ public class TransifexPackageWriter extends BasePackageWriter {
 		// Set the target PO file
 		trgWriter = new POFilterWriter();
 		params = (net.sf.okapi.filters.po.Parameters)trgWriter.getParameters();
-		params.outputGeneric = true;
+		params.setOutputGeneric(true);
 		trgWriter.setMode(true, false);
 		trgWriter.setOptions(manifest.getTargetLocale(), "UTF-8");
 		

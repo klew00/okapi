@@ -247,8 +247,8 @@ public class POFilter implements IFilter {
 		level = 0;
 		domain = DOMAIN_NONE; // Default domain prefix
 		// Compile code finder rules
-		if ( params.useCodeFinder ) {
-			params.codeFinder.compile();
+		if ( params.getUseCodeFinder() ) {
+			params.getCodeFinder().compile();
 		}
 
 		// Detect and remove BOM
@@ -299,7 +299,7 @@ public class POFilter implements IFilter {
 		startDoc.setLineBreak(lineBreak);
 		startDoc.setType(MimeTypeMapper.PO_MIME_TYPE);
 		startDoc.setMimeType(getMimeType());
-		startDoc.setMultilingual(params.bilingualMode);
+		startDoc.setMultilingual(params.getBilingualMode());
 		return new Event(EventType.START_DOCUMENT, startDoc);
 	}
 	
@@ -417,7 +417,7 @@ public class POFilter implements IFilter {
 					tu = new TextUnit(null); // No id yet, it will be set later
 				}
 				int pos = textLine.indexOf("fuzzy");
-				if ( params.bilingualMode && ( pos > -1 )) { // No fuzzy flag or monolingual mode
+				if ( params.getBilingualMode() && ( pos > -1 )) { // No fuzzy flag or monolingual mode
 					skel.append(textLine.substring(0, pos));
 					skel.addValuePlaceholder(tu, Property.APPROVED, trgLang);
 					tu.setTargetProperty(trgLang, new Property(Property.APPROVED, "no", false));
@@ -624,7 +624,7 @@ public class POFilter implements IFilter {
 
 		// Set the text and possibly its translation
 		// depending on the processing mode
-		if ( params.bilingualMode ) {
+		if ( params.getBilingualMode() ) {
 			String sID = msgID;
 			if (( pluralMode != 0 ) && ( pluralCount-1 > 0 )) {
 				sID = msgIDPlural;
@@ -632,7 +632,7 @@ public class POFilter implements IFilter {
 			// Add the source text and parse it
 			toAbstract(tu.setSourceContent(new TextFragment(sID)));
 			// Create an ID if requested
-			if ( params.makeID ) {
+			if ( params.getMakeID() ) {
 				// Note we always use msgID for resname, not msgIDPlural
 				if ( pluralMode == 0 ) {
 					tu.setName(Util.makeId(domain+DOMAIN_SEP+msgID));
@@ -902,8 +902,8 @@ public class POFilter implements IFilter {
 		}
 		else { // Else: Normal PO entry
 			// Sets the inline codes
-			if ( params.useCodeFinder ) {
-				params.codeFinder.process(frag);
+			if ( params.getUseCodeFinder() ) {
+				params.getCodeFinder().process(frag);
 			}
 		}
 		return frag;

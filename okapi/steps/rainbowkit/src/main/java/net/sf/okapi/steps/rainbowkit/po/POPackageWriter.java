@@ -49,7 +49,7 @@ public class POPackageWriter extends BasePackageWriter {
 		
 		writer = new POFilterWriter();
 		Parameters params = (Parameters)writer.getParameters();
-		params.outputGeneric = true;
+		params.setOutputGeneric(true);
 		
 		writer.setMode(true, false);
 		writer.setOptions(manifest.getTargetLocale(), "UTF-8");
