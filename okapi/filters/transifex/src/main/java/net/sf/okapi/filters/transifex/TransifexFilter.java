@@ -300,8 +300,20 @@ public class TransifexFilter implements IFilter {
 		Map<String, ResourceInfo> map = (Map<String, ResourceInfo>)res[2];
 		List<ResourceInfo> list = proj.getResources();
 		list.clear();
+		if ( map.isEmpty() ) {
+			logger.warning(String.format("The project '%s' has no resources for '%s'.",
+				proj.getProjectId(), srcLoc));
+		}
+		
 		for ( String resId : map.keySet() ) {
-			list.add(map.get(resId));
+			ResourceInfo info = map.get(resId);
+			if ( "PO".equals(info.getI18nType()) ) {
+				list.add(info);
+			}
+		}
+		if ( list.isEmpty() ) {
+			logger.warning(String.format("The project '%s' has no PO-based resources for '%s'.",
+				proj.getProjectId(), srcLoc));
 		}
 	}
 

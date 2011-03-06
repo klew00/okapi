@@ -24,12 +24,15 @@ public class ResourceInfo {
 
 	private String id;
 	private String name;
+	private String i18nType;
 	
 	public ResourceInfo (String id,
-		String name)
+		String name,
+		String i18nType)
 	{
 		this.id = id;
 		this.name = name;
+		this.i18nType = i18nType;
 	}
 	
 	public String getId () {
@@ -38,6 +41,10 @@ public class ResourceInfo {
 	
 	public String getName () {
 		return name;
+	}
+
+	public String getI18nType () {
+		return i18nType;
 	}
 
 }

@@ -153,7 +153,7 @@ public class POFilterTest {
 
 	@Test
 	public void testPluralFormAccess () {
-		assertEquals("nplurals=2; plural= n==1 or n%10==1 ? 0 : 1;",
+		assertEquals("nplurals=2; plural= n==1 || n%10==1 ? 0 : 1;",
 			PluralForms.getExpression(LocaleId.fromString("mk")));
 		assertEquals(4, PluralForms.getNumber("cy"));
 	}

@@ -443,9 +443,10 @@ public class TransifexClient {
 					String lang = (String)object2.get("code");
 					if ( !srcLang.equals(lang) ) continue;
 					// Else: This is a resource for the given source locale
+					String i18nType = (String)object.get("i18n_type");
 					String resId = (String)object.get("slug");
 					String name = (String)object.get("name");
-					resources.put(resId, new ResourceInfo(resId, name));
+					resources.put(resId, new ResourceInfo(resId, name, i18nType));
 				}
 			}
 			else {
