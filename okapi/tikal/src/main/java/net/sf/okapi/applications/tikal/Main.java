@@ -578,6 +578,12 @@ public class Main {
 		extensionsMap.put(".idml", "okf_idml");
 		filtersMap.put("okf_idml", "net.sf.okapi.filters.idml.IDMLFilter");
 
+		extensionsMap.put(".mif", "okf_mif");
+		filtersMap.put("okf_mif", "net.sf.okapi.filters.mif.MIFFilter");
+
+		extensionsMap.put(".txp", "okf_transifex");
+		filtersMap.put("okf_transifex", "net.sf.okapi.filters.transifex.TransifexFilter");
+
 		filtersMap.put("okf_versifiedtxt", "net.sf.okapi.filters.versifiedtxt.VersifiedTextFilter");
 		filtersMap.put("okf_xmlstream", "net.sf.okapi.filters.xmlstream.XmlStreamFilter");
 		filtersMap.put("okf_mosestext", "net.sf.okapi.filters.mosestext.MosesTextFilter");

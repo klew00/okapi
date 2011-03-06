@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.okapi.lib.transifex.ResourceInfo;
+
 public class Project {
 
 	private static final String HOST = "host";
@@ -36,14 +38,14 @@ public class Project {
 	private String user;
 	private String password;
 	private String projectId;
-	private List<String> resourceIds;
+	private List<ResourceInfo> resourceIds;
 	
 	public Project () {
 		reset();
 	}
 	
 	private void reset () {
-		resourceIds = new ArrayList<String>();
+		resourceIds = new ArrayList<ResourceInfo>();
 		setHost("http://www.transifex.net");
 		setUser("");
 		setPassword("");
@@ -88,7 +90,7 @@ public class Project {
 		this.password = password;
 	}
 	
-	public List<String> getResourceIds () {
+	public List<ResourceInfo> getResources () {
 		return resourceIds;
 	}
 	
@@ -99,27 +101,26 @@ public class Project {
 		String line = br.readLine();
 		while ( line != null ) {
 			line = line.trim();
-			if ( line.isEmpty() ) continue; // Skip empty lines
-			if ( line.startsWith("#") ) continue; // Skip comments
-			
-			int n = line.indexOf('=');
-			if ( n > 0 ) {
-				if ( line.startsWith(HOST) ) {
-					setHost(line.substring(n+1).trim());
+			if ( !line.isEmpty() && !line.startsWith("#") ) {
+				int n = line.indexOf('=');
+				if ( n > 0 ) {
+					if ( line.startsWith(HOST) ) {
+						setHost(line.substring(n+1).trim());
+					}
+					else if ( line.startsWith(USER) ) {
+						setUser(line.substring(n+1).trim());
+					}
+					else if ( line.startsWith(PASSWORD) ) {
+						setPassword(line.substring(n+1).trim());
+					}
+					else if ( line.startsWith(PROJECTID) ) {
+						setProjectId(line.substring(n+1).trim());
+					}
 				}
-				else if ( line.startsWith(USER) ) {
-					setUser(line.substring(n+1).trim());
+				else {
+					// Else: add the resource to the list
+					//resourceIds.add(line);
 				}
-				else if ( line.startsWith(PASSWORD) ) {
-					setPassword(line.substring(n+1).trim());
-				}
-				else if ( line.startsWith(PROJECTID) ) {
-					setProjectId(line.substring(n+1).trim());
-				}
-			}
-			else {
-				// Else: add the resource to the list
-				resourceIds.add(line);
 			}
 			// Next line
 			line = br.readLine();

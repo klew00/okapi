@@ -175,15 +175,15 @@ public class TransifexClient {
 	}
 	
 	public String[] putTargetResource (String poPath,
-		LocaleId srcLoc,
+		LocaleId trgLoc,
 		String resourceId,
 		String resourceFile)
 	{
-		String[] res = uploadFile(poPath, srcLoc.toPOSIXLocaleId(), resourceFile);
+		String[] res = uploadFile(poPath, trgLoc.toPOSIXLocaleId(), resourceFile);
 		if ( res[0] == null ) {
 			return res; // Could not upload the file
 		}
-		return extractTargetFromStoredFile(res[0], srcLoc.toPOSIXLocaleId(), resourceId);
+		return extractTargetFromStoredFile(res[0], trgLoc.toPOSIXLocaleId(), resourceId);
 	}
 	
 	/**
@@ -430,7 +430,7 @@ public class TransifexClient {
 			int code = conn.getResponseCode();
 			String srcLang = srcLoc.toPOSIXLocaleId();
 			if ( code == RESCODE_OK ) {
-				Map<String, String> resources = new HashMap<String, String>();
+				Map<String, ResourceInfo> resources = new HashMap<String, ResourceInfo>();
 				res[2] = resources;
 				// See http://help.transifex.net/technical/api/api.html
 				JSONObject object = (JSONObject)parser.parse(new InputStreamReader(conn.getInputStream(), "UTF-8"));
@@ -445,7 +445,7 @@ public class TransifexClient {
 					// Else: This is a resource for the given source locale
 					String resId = (String)object.get("slug");
 					String name = (String)object.get("name");
-					resources.put(resId, name);
+					resources.put(resId, new ResourceInfo(resId, name));
 				}
 			}
 			else {
@@ -474,7 +474,7 @@ public class TransifexClient {
 	 * @param path the path of the POT file to upload. 
 	 * @param resourceFile filename of the resource (must be the same for all languages)
 	 * or null to use the filename of the path.
-	 * @return an array of strings: On success 0=UUID, 1=name, 2=Resource id.
+	 * @return an array of strings: On success 0=UUID, 1=Resource filename, 2=Resource id.
 	 * On error 0=null, 1=error code and message, 2=null.
 	 */
 	private String[] uploadFile (String path,

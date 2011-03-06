@@ -97,7 +97,7 @@ public class TransifexPackageWriter extends BasePackageWriter {
 			}
 			
 			res1 = cli.putSourceResource(poPath, manifest.getSourceLocale(), resourceFile);
-			if ( res1[0] == null ) {
+ 			if ( res1[0] == null ) {
 				logger.severe(res1[1]);
 				return;
 			}

@@ -126,10 +126,10 @@ public class RawDocumentToFilterEventsStep extends BasePipelineStep {
 				if ( filter == null ) {
 					throw new RuntimeException(String.format("Unsupported filter type '%s'.", filterConfigId));
 				}
-				// Is it a filter that creates events for multiple documents or just one
-				// Note: we could also add a method in IFilter for that information
-				multiDocuments = "okf_rainbowkit;okf_transifex;".contains(filter.getName());
 			}
+			// Is it a filter that creates events for multiple documents or just one
+			// Note: we could also add a method in IFilter for that information
+			multiDocuments = "okf_rainbowkit;okf_transifex;".contains(filter.getName());
 			isDone = false;
 			// Open the document
 			filter.open(event.getRawDocument());

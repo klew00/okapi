@@ -34,6 +34,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.encoder.EncoderManager;
+import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
@@ -41,8 +42,10 @@ import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 import net.sf.okapi.filters.po.POFilter;
+import net.sf.okapi.lib.transifex.ResourceInfo;
 import net.sf.okapi.lib.transifex.TransifexClient;
 
 /**
@@ -56,7 +59,7 @@ public class TransifexFilter implements IFilter {
 
 	private Project proj;
 	private POFilter pof;
-	private Iterator<String> iter;
+	private Iterator<ResourceInfo> iter;
 	private TransifexClient cli;
 	private boolean canceled;
 	private LinkedList<Event> queue;
@@ -65,6 +68,7 @@ public class TransifexFilter implements IFilter {
 	private LocaleId srcLoc;
 	private LocaleId trgLoc;
 	private String tempDir;
+	private IFilterWriter writer;
 	
 	public TransifexFilter () {
 		proj = new Project();
@@ -80,11 +84,15 @@ public class TransifexFilter implements IFilter {
 	}
 
 	public ISkeletonWriter createSkeletonWriter () {
-		return pof.createSkeletonWriter();
+		return createFilterWriter().getSkeletonWriter();
 	}
 
 	public IFilterWriter createFilterWriter () {
-		return pof.createFilterWriter();
+		if ( writer == null ) {
+			writer = new TransifexFilterWriter();
+			writer.setOptions(trgLoc, null);
+		}
+		return writer;
 	}
 
 	public List<FilterConfiguration> getConfigurations () {
@@ -183,7 +191,7 @@ public class TransifexFilter implements IFilter {
 			refreshResourceList();
 
 			// Initialize the iteration
-			iter = proj.getResourceIds().iterator();
+			iter = proj.getResources().iterator();
 			hasMoreDoc = true;
 			queue = new LinkedList<Event>();
 			hasNext = true;
@@ -233,7 +241,7 @@ public class TransifexFilter implements IFilter {
 		}
 	}
 
-	private boolean prepareDocument (String resId) {
+	private boolean prepareDocument (ResourceInfo info) {
 //		// Check the information on this file
 //		Object[] res = cli.getInformation(resId, trgLoc);
 //		if ( res[0] == null ) {
@@ -243,16 +251,40 @@ public class TransifexFilter implements IFilter {
 //		//TODO: avoid re-downloading if we re-write here and the existing file is newer
 
 		// Download the PO for this resource and the given target language
-		String outputPath = tempDir + File.separator + resId;
-		String[] res = cli.getResource(resId, trgLoc, outputPath);
+		String outputPath = tempDir + File.separator + info.getName();
+		String[] res = cli.getResource(info.getId(), trgLoc, outputPath);
 		if ( res[0] == null ) {
-			logger.severe(String.format("Could not download the resource '%s'.", resId));
+			logger.severe(String.format("Could not download the resource '%s'.", info.getId()));
 			return false;
 		}
 
-		// Opeen the local copy for processing
+		// Open the local copy for processing
 		RawDocument rd = new RawDocument(new File(outputPath).toURI(), "UTF-8", srcLoc, trgLoc);
 		pof.open(rd);
+		
+		// Send a start batch item if this is not the first document
+		// If it is the first: one was already sent
+		//todo
+		
+		// Get the original start-document of the input file
+		if ( !pof.hasNext() ) {
+			// Problem with the PO file
+			throw new OkapiBadFilterInputException("Input did not generate an event.");
+		}
+		Event event = pof.next();
+		if ( event.getEventType() != EventType.START_DOCUMENT ) {
+			// Problem with the PO file
+			throw new OkapiBadFilterInputException("First event of the input is not a start document event.");
+		}
+		// Modify the start document resource so it triggers the use of TransifexFilterWriter:
+		StartDocument sd = event.getStartDocument();
+		// Save the original one in an annotation
+		FilterWriterAnnotation ann = new FilterWriterAnnotation();
+		ann.setData(proj, info, sd.getFilterWriter());
+		sd.setAnnotation(ann);
+		// Set the one to expose
+		sd.setFilterWriter(createFilterWriter());
+		queue.add(event);
 		
 		return true;
 	}
@@ -265,11 +297,11 @@ public class TransifexFilter implements IFilter {
 			logger.severe((String)res[1]);
 			return;
 		}
-		Map<String, String> map = (Map<String, String>)res[2];
-		List<String> list = proj.getResourceIds();
+		Map<String, ResourceInfo> map = (Map<String, ResourceInfo>)res[2];
+		List<ResourceInfo> list = proj.getResources();
 		list.clear();
 		for ( String resId : map.keySet() ) {
-			list.add(resId);
+			list.add(map.get(resId));
 		}
 	}
 

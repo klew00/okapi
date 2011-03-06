@@ -208,6 +208,11 @@ public class GenericFilterWriter implements IFilterWriter {
 	{
 		// Create the output
 		createWriter(resource);
+		// Try to set the outputEncoding if it's null
+		// (may have been set to the input in createWriter()) 
+		if ( outputEncoding == null ) {
+			outputEncoding = encoding;
+		}
 		writer.write(skelWriter.processStartDocument(outputLocale,
 			outputEncoding, null, encoderManager, resource));
 	}
