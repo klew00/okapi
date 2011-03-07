@@ -206,6 +206,36 @@ public class ProjectHandler {
 	}
 
 	/**
+	 * Stores the posted file in the input file's directory of the project with the given id.
+	 * 
+	 * @param projId The id of the project the file shall be added to
+	 * @param filename The file's original filename
+	 * @param input The input file as part of a multi-part form. The parameter must have the name from
+	 *            <code>WorkspaceUtils.BATCH_CONF_PARAM</code>
+	 * @return
+	 */
+	@POST
+	@Path("/{projId}/inputFiles/{filename}")
+	public Response addProjectInputFilePost(@PathParam("projId") int projId, @PathParam("filename") String filename,
+			MultipartFormDataInput input) {
+		
+		// TODO How to handle sub-directories?
+		
+		try {
+			File tmpFile = input.getFormDataPart(WorkspaceUtils.INPUT_FILE_PARAM, File.class, null);
+			File targetFile = WorkspaceUtils.getInputFile(projId, filename);
+			Util.copyFile(tmpFile, targetFile);
+		}
+		catch (IOException e) {
+			int status = HttpStatus.SC_INTERNAL_SERVER_ERROR;
+			return Response.status(status).build();
+		}
+
+		int status = HttpStatus.SC_OK;
+		return Response.status(status).build();
+	}
+	
+	/**
 	 * @param projId The id of a project
 	 * @return A list of the names of all input files uploaded yet
 	 */
