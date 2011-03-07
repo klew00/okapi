@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -26,7 +26,6 @@ import net.sf.okapi.applications.rainbow.lib.Utils;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.ui.UIUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -86,8 +85,8 @@ public class Project {
 		pathBuilder.setExtension(".out"); //$NON-NLS-1$
 		sourceLanguage = Utils.getDefaultSourceLanguage();
 		targetLanguage = Utils.getDefaultTargetLanguage();
-		sourceEncoding = lm.getDefaultEncodingFromCode(sourceLanguage, UIUtil.getPlatformType());
-		targetEncoding = lm.getDefaultEncodingFromCode(targetLanguage, UIUtil.getPlatformType());
+		sourceEncoding = lm.getDefaultEncodingFromCode(sourceLanguage, Util.getOS());
+		targetEncoding = lm.getDefaultEncodingFromCode(targetLanguage, Util.getOS());
 		isModified = false;
 	}
 	

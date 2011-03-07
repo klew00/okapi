@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -29,7 +29,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.ui.UIUtil;
+import net.sf.okapi.common.Util.SUPPORTED_OS;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -63,12 +63,12 @@ public class LanguageManager {
 				if ( N == null ) LI.lcid = -1;
 				else LI.lcid = Integer.valueOf(Util.getTextContent(N));
 				N = NL.item(i).getAttributes().getNamedItem("encoding");
-				if ( N == null ) LI.setEncoding("UTF-8", UIUtil.PFTYPE_WIN);
-				else LI.setEncoding(Util.getTextContent(N), UIUtil.PFTYPE_WIN);
+				if ( N == null ) LI.setEncoding("UTF-8", SUPPORTED_OS.WINDOWS);
+				else LI.setEncoding(Util.getTextContent(N), SUPPORTED_OS.WINDOWS);
 				N = NL.item(i).getAttributes().getNamedItem("macEncoding");
-				if ( N != null ) LI.setEncoding(Util.getTextContent(N), UIUtil.PFTYPE_MAC);
+				if ( N != null ) LI.setEncoding(Util.getTextContent(N), SUPPORTED_OS.MAC);
 				N = NL.item(i).getAttributes().getNamedItem("unixEncoding");
-				if ( N != null ) LI.setEncoding(Util.getTextContent(N), UIUtil.PFTYPE_UNIX);
+				if ( N != null ) LI.setEncoding(Util.getTextContent(N), SUPPORTED_OS.LINUX);
 				
 				N = NL.item(i).getFirstChild();
 				while ( N != null ) {
@@ -132,10 +132,10 @@ public class LanguageManager {
 	}
 	
 	public String getDefaultEncodingFromCode (LocaleId language,
-		int p_nPFType)
+		SUPPORTED_OS osType)
 	{
 		LanguageItem LI = GetItem(language.toString());
 		if ( LI == null ) return "UTF-8";
-		return LI.getEncoding(p_nPFType);
+		return LI.getEncoding(osType);
 	}
 }

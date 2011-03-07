@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -20,7 +20,7 @@
 
 package net.sf.okapi.applications.rainbow.lib;
 
-import net.sf.okapi.common.ui.UIUtil;
+import net.sf.okapi.common.Util.SUPPORTED_OS;
 
 public class LanguageItem {
 
@@ -35,13 +35,13 @@ public class LanguageItem {
 		return name;
 	}
 	
-	public String getEncoding (int platformType) {
+	public String getEncoding (SUPPORTED_OS osType) {
 		String sTmp;
-		switch ( platformType ) {
-		case UIUtil.PFTYPE_MAC:
+		switch ( osType ) {
+		case MAC:
 			sTmp = encodingM;
 			break;
-		case UIUtil.PFTYPE_UNIX:
+		case LINUX:
 			sTmp = encodingU;
 			break;
 		default:
@@ -53,13 +53,13 @@ public class LanguageItem {
 	}
 	
 	public void setEncoding (String value,
-		int platformType)
+		SUPPORTED_OS osType)
 	{
-		switch ( platformType ) {
-		case UIUtil.PFTYPE_MAC:
+		switch ( osType ) {
+		case MAC:
 			encodingM = value;
 			break;
-		case UIUtil.PFTYPE_UNIX:
+		case LINUX:
 			encodingU = value;
 			break;
 		default:

@@ -25,6 +25,8 @@ import java.net.URLDecoder;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.eclipse.swt.widgets.Shell;
+
 import net.sf.okapi.applications.rainbow.lib.FormatManager;
 import net.sf.okapi.applications.rainbow.lib.LanguageManager;
 import net.sf.okapi.applications.rainbow.lib.Utils;
@@ -38,6 +40,7 @@ import net.sf.okapi.common.filters.DefaultFilters;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.plugins.PluginsManager;
+import net.sf.okapi.common.ui.BaseHelp;
 
 public class CommandLine {
 
@@ -45,6 +48,7 @@ public class CommandLine {
 	private String sharedFolder;
 	private LanguageManager lm;
 	private Project prj;
+	private Shell shell;
 	private UtilityDriver ud;
 	private FilterConfigurationMapper fcMapper;
 	private UtilitiesAccess utilitiesAccess;
@@ -54,10 +58,14 @@ public class CommandLine {
 	private String pipelineFile;
 	private String optionsFile;
 	private boolean promptForOptions = true;
+	private BaseHelp help;
 	private PluginsManager pm;
 	
-	public void execute (String[] args) {
+	public void execute (Shell shell,
+		String[] args)
+	{
 		try {
+			this.shell = shell;
 			printBanner();
 			initialize();
 			if ( !parseArguments(args) ) {
@@ -127,7 +135,7 @@ public class CommandLine {
 				promptForOptions = false;
 			}
 			else if (( "-h".equals(arg) ) || ( "-?".equals(arg) )) { // Help //$NON-NLS-1$ //$NON-NLS-2$
-				Util.openWikiTopic("Rainbow - Command Line"); //$NON-NLS-1$
+				help.showWiki("Rainbow Help#Rainbow - Command Line"); //$NON-NLS-1$
 			}
 			else if ( "-se".equals(arg) ) { // Source encoding //$NON-NLS-1$
 				prj.setSourceEncoding(nextArg(args, ++i));
@@ -227,7 +235,7 @@ public class CommandLine {
     	// Remove the application folder in all cases
     	appRootFolder = Util.getDirectoryName(appRootFolder);
 		sharedFolder = Utils.getOkapiSharedFolder(appRootFolder, fromJar);
-		//help = new BaseHelp(appRootFolder+File.separator+"help"); //$NON-NLS-1$
+		help = new BaseHelp(appRootFolder+File.separator+"help"); //$NON-NLS-1$
 
 		log = new BatchLog();
 		logHandler = new LogHandler(log);
@@ -255,7 +263,7 @@ public class CommandLine {
 		if ( ud == null ) {
 			fcMapper.setCustomConfigurationsDirectory(prj.getParametersFolder());
 			fcMapper.updateCustomConfigurations();
-			ud = new UtilityDriver(log, fcMapper, utilitiesAccess, null, false);
+			ud = new UtilityDriver(log, fcMapper, utilitiesAccess, help, false);
 		}
 		
 		// Get default/project data for the utility and instantiate the utility object
@@ -273,7 +281,7 @@ public class CommandLine {
 		
 		// Prompt to edit the parameters if requested 
 		if ( promptForOptions ) {
-			if ( !ud.checkParameters(null) ) return;
+			if ( !ud.checkParameters(shell) ) return;
 			// Save the file if needed
 			if (( optionsFile != null ) && ( util.hasParameters() )) {
 				util.getParameters().save(optionsFile);
@@ -281,7 +289,7 @@ public class CommandLine {
 		}
 		
 		// Run the utility
-		ud.execute(null);
+		ud.execute(shell);
 	}
 
 	private void launchPipeline (IPredefinedPipeline predefinedPipeline) {
@@ -304,9 +312,9 @@ public class CommandLine {
 
 		if ( promptForOptions ) {
 			PipelineEditor dlg = new PipelineEditor();
-			int res = dlg.edit(null, wrapper.getAvailableSteps(), wrapper,
+			int res = dlg.edit(shell, wrapper.getAvailableSteps(), wrapper,
 				(predefinedPipeline==null) ? null : predefinedPipeline.getTitle(),
-				null, null,
+				help, null,
 				(predefinedPipeline==null) ? -1 : predefinedPipeline.getInitialStepIndex());
 		
 			if ( res == PipelineEditor.RESULT_CANCEL ) {

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -143,9 +143,9 @@ public class MainForm { //implements IParametersProvider {
 	
 	protected static final String PRJPIPELINEID = "currentProjectPipeline"; //$NON-NLS-1$
 	protected static final String NOEXPAND_EXTENSIONS = ";.pentm;"; //$NON-NLS-1$
-	
-	private static final String HELP_USAGE = "Rainbow - Usage"; //$NON-NLS-1$
 
+	private static final String HELP_USAGE = "Rainbow - Usage"; //$NON-NLS-1$
+	
 	private int currentInput;
 	private ArrayList<Table> inputTables;
 	private ArrayList<InputTableModel> inputTableMods;
@@ -222,23 +222,6 @@ public class MainForm { //implements IParametersProvider {
 	private ToolItem tbiOpenFolder;
 	private ToolItem tbiEditDocProp;
 
-	public static void runUI (String projectFile) {
-		Display dispMain = null;
-		try {
-			dispMain = new Display();
-			Shell shlMain = new Shell(dispMain);
-			MainForm mf = new MainForm(shlMain, projectFile);
-			shlMain.open();
-			mf.run();
-		}
-		catch ( Throwable e ) {
-			e.printStackTrace();
-		}
-		finally {
-			if ( dispMain != null ) dispMain.dispose();
-		}
-	}
-	
 	public MainForm (Shell shell,
 		String projectFile)
 	{
@@ -256,7 +239,7 @@ public class MainForm { //implements IParametersProvider {
 			
 			createContent();
 			createProject(false);
-
+			
 			// Check for -? and -h parameters first
 			if (( projectFile != null ) && ( "-?".equals(projectFile) || "-h".equals(projectFile) )) {
 				projectFile = null;
@@ -267,8 +250,7 @@ public class MainForm { //implements IParametersProvider {
 				// Load project if passed as parameter
 				openProject(projectFile);
 			}
-			else {
-				// Load MRU project if requested
+			else { // Load MRU project if requested
 				int n = config.getInteger(OPT_LOADMRU); //$NON-NLS-1$
 				if ( n > 0 ) { // 1=ask, 2=load without asking
 					String path = mruList.getfirst();
