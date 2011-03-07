@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -20,38 +20,20 @@
 
 package net.sf.okapi.applications.rainbow;
 
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
-
 public class Main {
 
 	public static void main (String args[]) {
-		
-		Display dispMain = null;
-		try {
-			dispMain = new Display();
-			Shell shlMain = new Shell(dispMain);
-
-			if ( args.length < 2 ) {
-				// Normal mode
-				String projectFile = null;
-				if ( args.length == 1 ) {
-					projectFile = args[0];
-				}
-				MainForm mf = new MainForm(shlMain, projectFile);
-				shlMain.open();
-				mf.run();
+		if ( args.length < 2 ) {
+			// Normal mode
+			String projectFile = null;
+			if ( args.length == 1 ) {
+				projectFile = args[0];
 			}
-			else { // Command line mode
-				CommandLine cmd = new CommandLine();
-				cmd.execute(shlMain, args);
-			}
+			MainForm.runUI(projectFile);
 		}
-		catch ( Throwable e ) {
-			e.printStackTrace();
-		}
-		finally {
-			if ( dispMain != null ) dispMain.dispose();
+		else { // Command line mode
+			CommandLine cmd = new CommandLine();
+			cmd.execute(args);
 		}
     }
 

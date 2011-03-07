@@ -143,6 +143,8 @@ public class MainForm { //implements IParametersProvider {
 	
 	protected static final String PRJPIPELINEID = "currentProjectPipeline"; //$NON-NLS-1$
 	protected static final String NOEXPAND_EXTENSIONS = ";.pentm;"; //$NON-NLS-1$
+	
+	private static final String HELP_USAGE = "Rainbow - Usage"; //$NON-NLS-1$
 
 	private int currentInput;
 	private ArrayList<Table> inputTables;
@@ -220,6 +222,23 @@ public class MainForm { //implements IParametersProvider {
 	private ToolItem tbiOpenFolder;
 	private ToolItem tbiEditDocProp;
 
+	public static void runUI (String projectFile) {
+		Display dispMain = null;
+		try {
+			dispMain = new Display();
+			Shell shlMain = new Shell(dispMain);
+			MainForm mf = new MainForm(shlMain, projectFile);
+			shlMain.open();
+			mf.run();
+		}
+		catch ( Throwable e ) {
+			e.printStackTrace();
+		}
+		finally {
+			if ( dispMain != null ) dispMain.dispose();
+		}
+	}
+	
 	public MainForm (Shell shell,
 		String projectFile)
 	{
@@ -238,11 +257,18 @@ public class MainForm { //implements IParametersProvider {
 			createContent();
 			createProject(false);
 
+			// Check for -? and -h parameters first
+			if (( projectFile != null ) && ( "-?".equals(projectFile) || "-h".equals(projectFile) )) {
+				projectFile = null;
+				Util.openWikiTopic(HELP_USAGE);
+			}
+
 			if ( projectFile != null ) {
 				// Load project if passed as parameter
 				openProject(projectFile);
 			}
-			else { // Load MRU project if requested
+			else {
+				// Load MRU project if requested
 				int n = config.getInteger(OPT_LOADMRU); //$NON-NLS-1$
 				if ( n > 0 ) { // 1=ask, 2=load without asking
 					String path = mruList.getfirst();
@@ -650,7 +676,7 @@ public class MainForm { //implements IParametersProvider {
 		rm.setCommand(menuItem, "help.howtouse"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				if ( help != null ) help.showWiki("Rainbow - Usage"); //$NON-NLS-1$
+				if ( help != null ) help.showWiki(HELP_USAGE); //$NON-NLS-1$
 			}
 		});
 		
