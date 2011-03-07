@@ -20,16 +20,24 @@
 
 package net.sf.okapi.filters.mif;
 
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.encoder.IEncoder;
-import net.sf.okapi.common.resource.Property;
 
 /**
  * Implements {@link IEncoder} for Adobe FrameMaker MIF format.
  */
 public class MIFEncoder implements IEncoder {
+
+	private CharsetEncoder chsEnc;
+	private CharBuffer tmpBuf = CharBuffer.allocate(1);
+	private StringBuilder outBuf = new StringBuilder();
+	private ByteBuffer encBuf;
 
 	@Override
 	public String encode (String text,
@@ -41,7 +49,7 @@ public class MIFEncoder implements IEncoder {
 			ch = text.charAt(i);
 			switch ( text.charAt(i) ) {
 			case '\t':
-				escaped.append(tryCharStatment(ch)); //"\\t");
+				escaped.append(tryCharStatment(ch));
 				break;
 			case '>':
 				escaped.append("\\>");
@@ -58,8 +66,33 @@ public class MIFEncoder implements IEncoder {
 			default:
 				if ( ch > 127 ) {
 					String res = tryCharStatment(ch);
-					if ( res == null ) escaped.append(ch);
-					else escaped.append(res);
+					if ( res != null ) {
+						escaped.append(res);
+						continue;
+					}
+					// Normal extended characters
+					if ( chsEnc == null ) {
+						// UTF-8/16, nothing special
+						escaped.append(String.valueOf(ch));
+						continue;
+					}
+					// Else: we should escape
+					tmpBuf.put(0, ch);
+					tmpBuf.position(0);
+					try {
+						encBuf = chsEnc.encode(tmpBuf);
+					}
+					catch ( CharacterCodingException e ) {
+						return "?"; // Unknown
+					}
+					if ( encBuf.limit() > 1 ) {
+						for (int j=0; j<encBuf.limit(); j++) {
+							escaped.append(String.format("\\x%x ", encBuf.get(j)));
+						}
+					}
+					else {
+						escaped.append(String.format("\\x%x ", encBuf.get(0)));
+					}
 				}
 				else {
 					escaped.append(ch);
@@ -76,7 +109,7 @@ public class MIFEncoder implements IEncoder {
 	{
 		switch ( value ) {
 		case '\t':
-			return tryCharStatment(value); //"\\t";
+			return tryCharStatment(value);
 		case '>':
 			return "\\>";
 		case '\'':
@@ -88,8 +121,31 @@ public class MIFEncoder implements IEncoder {
 		default:
 			if ( value > 127 ) {
 				String res = tryCharStatment(value);
-				if ( res == null ) return String.valueOf(value); //return String.format("\\u%04X", (int)value);
-				else return res;
+				if ( res != null ) return res;
+				// Normal extended characters
+				if ( chsEnc == null ) {
+					// UTF-8/16, nothing special
+					return String.valueOf(value);
+				}
+				// Else: we should escape
+				tmpBuf.put(0, value);
+				tmpBuf.position(0);
+				try {
+					encBuf = chsEnc.encode(tmpBuf);
+				}
+				catch ( CharacterCodingException e ) {
+					return "?"; // Unknown
+				}
+				if ( encBuf.limit() > 1 ) {
+					outBuf.setLength(0);
+					for (int j=0; j<encBuf.limit(); j++) {
+						outBuf.append(String.format("\\x%x ", encBuf.get(j)));
+					}
+					return outBuf.toString();
+				}
+				else {
+					return String.format("\\x%x ", encBuf.get(0));
+				}
 			}
 			else {
 				return String.valueOf(value);
@@ -103,7 +159,7 @@ public class MIFEncoder implements IEncoder {
 	{
 		switch ( value ) {
 		case '\t':
-			return tryCharStatment(value); //"\\t";
+			return tryCharStatment(value);
 		case '>':
 			return "\\>";
 		case '\'':
@@ -113,13 +169,35 @@ public class MIFEncoder implements IEncoder {
 		case '\\':
 			return "\\\\";
 		default:
-			//TODO: supplemental chars
 			if ( value > 127 ) {
 				String res = tryCharStatment(value);
-				if ( res == null ) return String.valueOf((char)value); //return String.format("\\u%04X", value);
-				else return res;
+				if ( res != null ) return res;
+				// Normal extended characters
+				if ( chsEnc == null ) {
+					// UTF-8/16, nothing special
+					return String.valueOf((char)value);
+				}
+				// Else: we should escape
+				tmpBuf.put(0, (char)value);
+				tmpBuf.position(0);
+				try {
+					encBuf = chsEnc.encode(tmpBuf);
+				}
+				catch ( CharacterCodingException e ) {
+					return "?"; // Unknown
+				}
+				if ( encBuf.limit() > 1 ) {
+					outBuf.setLength(0);
+					for (int j=0; j<encBuf.limit(); j++) {
+						outBuf.append(String.format("\\x%x ", encBuf.get(j)));
+					}
+					return outBuf.toString();
+				}
+				else {
+					return String.format("\\x%x ", encBuf.get(0));
+				}
 			}
-			else {
+			else { // ASCII
 				return String.valueOf((char)value);
 			}
 		}
@@ -130,17 +208,23 @@ public class MIFEncoder implements IEncoder {
 		String encoding,
 		String lineBreak)
 	{
-		// Nothing to do
+		if ( encoding == null ) return;
+		if ( "utf-8".equalsIgnoreCase(encoding) || "utf-16".equalsIgnoreCase(encoding) ) {
+			chsEnc = null;
+		}
+		else {
+			chsEnc = Charset.forName(encoding).newEncoder();
+		}
 	}
 
 	@Override
 	public String toNative (String propertyName,
 		String value)
 	{
-		if ( Property.ENCODING.equals(propertyName) ) {
-			if ( "shift-jis".equals(value) ) return "\u65E5\u672C\u8A9E";
-			//TODO: CJK etc...
-		}
+//		if ( Property.ENCODING.equals(propertyName) ) {
+//			if ( "shift-jis".equals(value) ) return "\u65E5\u672C\u8A9E";
+//			//TODO: CJK etc...
+//		}
 
 		// PROP_LANGUGE: Not applicable
 
@@ -155,7 +239,7 @@ public class MIFEncoder implements IEncoder {
 
 	@Override
 	public CharsetEncoder getCharsetEncoder () {
-		return null;
+		return chsEnc;
 	}
 
 	private String tryCharStatment (int value) {
@@ -185,4 +269,5 @@ public class MIFEncoder implements IEncoder {
 		}
 		return "'><Char " + token + "><String `";
 	}
+
 }

@@ -43,6 +43,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -239,7 +240,7 @@ public class MIFFilterTest {
 		list.add(new InputDocument(root+"Test03.mif", null));
 		
 		RoundTripComparison rtc = new RoundTripComparison();
-		assertTrue(rtc.executeCompare(filter, list, "UTF-16", locEN, locEN));
+		assertTrue(rtc.executeCompare(filter, list, null, /*UTF-8*/locEN, locEN));
 	}
 
 	private void rewriteFile (String fileName) {

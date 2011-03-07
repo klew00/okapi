@@ -31,6 +31,7 @@ import java.nio.CharBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CharsetEncoder;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.LinkedList;
@@ -115,15 +116,15 @@ public class MIFFilter implements IFilter {
 	private ArrayList<String> textFlows; 
 	private ArrayList<String> tables;
 	private boolean secondPass;
-	private ByteBuffer byteBuffer;
 	private ByteArrayOutputStream byteStream;
 	private CharsetDecoder[] decoders;
+	private CharsetEncoder[] encoders;
 	private CharsetDecoder currentDecoder;
-	private int currentDecoderIndex;
+	private int currentCharsetIndex;
 	private MIFEncoder encoder;
 	private int decodingErrors;
 	private String baseEncoding;
-	private boolean useUTF8;
+	private boolean useUTF;
 	
 	private static Hashtable<String, String> initCharTable () {
 		Hashtable<String, String> table = new Hashtable<String, String>();
@@ -151,8 +152,9 @@ public class MIFFilter implements IFilter {
 	
 	private static Hashtable<String, String> initEncodingTable () {
 		Hashtable<String, String> table = new Hashtable<String, String>();
+		// Map the Java canonical charset names
 		table.put("FrameRoman", FRAMEROMAN);
-		table.put("JISX0208.ShiftJIS", "Shift-JIS");
+		table.put("JISX0208.ShiftJIS", "Shift_JIS");
 		table.put("BIG5", "Big5");
 		table.put("GB2312-80.EUC", "GB2312");
 		table.put("KSC5601-1992", "EUC-KR");
@@ -309,9 +311,11 @@ public class MIFFilter implements IFilter {
 			decoders = new CharsetDecoder[2];
 			decoders[0] = Charset.forName(baseEncoding).newDecoder();
 			decoders[1] = decoders[0]; // Use the same to start
-			currentDecoderIndex = 0;
-			currentDecoder = decoders[currentDecoderIndex];
-			byteBuffer = ByteBuffer.allocate(4);
+			currentCharsetIndex = 0;
+			currentDecoder = decoders[currentCharsetIndex];
+			encoders = new CharsetEncoder[2];
+			encoders[0] = Charset.forName(baseEncoding).newEncoder();
+			encoders[1] = encoders[0];
 			byteStream = new ByteArrayOutputStream(20);
 			
 			queue = new LinkedList<Event>();
@@ -1020,7 +1024,7 @@ public class MIFFilter implements IFilter {
 				else if ( "Char".equals(tag) ) {
 					return 2;
 				}
-				else if ( !useUTF8 && "Font".equals(tag) ) {
+				else if ( !useUTF && "Font".equals(tag) ) {
 					// Do the font-driven encoding resolving only for non-UTF-8 files
 					//TODO: Is it safe? need to be verified
 					if ( checkIfParaBufNeeded ) paraBufNeeded = true;
@@ -1117,7 +1121,7 @@ public class MIFFilter implements IFilter {
 	}
 	
 	private void resetToDefaultDecoder () {
-		currentDecoderIndex = 0;
+		currentCharsetIndex = 0;
 		currentDecoder = decoders[0];
 	}
 	
@@ -1136,27 +1140,45 @@ public class MIFFilter implements IFilter {
 			}
 		}
 		else {
-			// Map the MIF encoding name to a standard name
+			// Map the MIF encoding name to Java canonical charset name
 			String mappedEncoding = encodingTable.get(newEncoding);
 			if ( mappedEncoding == null ) {
 				// Warn if the name is not found (and just move on)
 				logger.warning(String.format("Unknown encoding name: '%s'.", mappedEncoding));
 				return;
 			}
+			
+			// Special case for FrameRoman: it may be anything depending on the font
+			if ( mappedEncoding.equals(FRAMEROMAN) && !Util.isEmpty(newHint) ) {
+				// Try to guess the real encoding from the platform font name
+//TODO: the strings should be in parameters so they can be adapted
+				newHint = newHint.toLowerCase();
+				if ( newHint.contains("greek") ) {
+					newEncoding = "x-MacGreek";
+				}
+				else if ( newHint.contains("cyrillic") ) {
+					newEncoding = "x-MacCyrillic";
+				}
+				else if ( newHint.contains(" ce ") ) {
+					newEncoding = "x-MacCentralEurope";
+				}
+			}
+			
 			// Check if the new encoding is the same as the current one
-			if ( !mappedEncoding.equalsIgnoreCase(currentDecoder.charset().name()) ) {
+			if ( !mappedEncoding.equals(currentDecoder.charset().name()) ) {
 				// Test the other one
-				int n = ((currentDecoderIndex == 0) ? 1 : 0);
-				if ( mappedEncoding.equalsIgnoreCase(decoders[n].charset().name()) ) {
+				int n = ((currentCharsetIndex == 0) ? 1 : 0);
+				if ( mappedEncoding.equals(decoders[n].charset().name()) ) {
 					// Use this one
-					currentDecoderIndex = n;
+					currentCharsetIndex = n;
 				}
 				else { // Create a new one (keep the number 0 always the same)
 					decoders[1] = Charset.forName(mappedEncoding).newDecoder();
-					currentDecoderIndex = 1;
+					encoders[1] = Charset.forName(mappedEncoding).newEncoder();
+					currentCharsetIndex = 1;
 				}
 				// Set the current one
-				currentDecoder = decoders[currentDecoderIndex];
+				currentDecoder = decoders[currentCharsetIndex];
 			}
 			// Else: current decoder in fine
 		}
@@ -1656,7 +1678,7 @@ public class MIFFilter implements IFilter {
 		BOMAwareInputStream bais = new BOMAwareInputStream(input, defEncoding);
 		res[0] = bais;
 		res[1] = bais.detectEncoding();
-		useUTF8 = (((String)res[1]).equals("UTF-8"));
+		useUTF = (((String)res[1]).startsWith("UTF-"));
 		if ( bais.autoDtected() ) {
 			return res;
 		}
