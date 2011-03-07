@@ -23,7 +23,7 @@
 
     <servlet-mapping>
         <servlet-name>Resteasy</servlet-name>
-        <url-pattern>/*</url-pattern>
+        <url-pattern>/projects/*</url-pattern>
     </servlet-mapping>
 
 </web-app>

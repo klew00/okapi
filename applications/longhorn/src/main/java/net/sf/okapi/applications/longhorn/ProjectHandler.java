@@ -81,6 +81,13 @@ import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 public class ProjectHandler {
 	private static final Logger LOGGER = Logger.getLogger(ProjectHandler.class.getName());
 	private static final String CURRENT_PROJECT_PIPELINE = "currentProjectPipeline";
+	
+	//TODO DEL for input file
+	//TODO DEL for output file
+	//TODO DEL /projects/outputFiles to clear output directory
+	//TODO GET for batch conf
+	//TODO POST to add input files as archive
+	//TODO POST to get output files as archive
 
 	/**
 	 * Create a new project to work with.
@@ -184,8 +191,6 @@ public class ProjectHandler {
 	public Response addProjectInputFile(@PathParam("projId") int projId, @PathParam("filename") String filename,
 			MultipartFormDataInput input) {
 		
-		// TODO How to handle sub-directories?
-		
 		try {
 			File tmpFile = input.getFormDataPart(WorkspaceUtils.INPUT_FILE_PARAM, File.class, null);
 			File targetFile = WorkspaceUtils.getInputFile(projId, filename);
@@ -208,8 +213,6 @@ public class ProjectHandler {
 	@Path("/{projId}/inputFiles")
 	@Produces(MediaType.TEXT_XML)
 	public XMLStringList getProjectInputFiles(@PathParam("projId") int projId) {
-		
-		// TODO How to handle sub-directories?
 		
 		ArrayList<String> inputFiles = WorkspaceUtils.getInputFileNames(projId);
 		return new XMLStringList(inputFiles);
