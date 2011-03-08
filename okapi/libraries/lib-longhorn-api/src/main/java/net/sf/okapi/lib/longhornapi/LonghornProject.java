@@ -1,6 +1,27 @@
+/*===========================================================================
+  Copyright (C) 2011 by the Okapi Framework contributors
+-----------------------------------------------------------------------------
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
+
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+===========================================================================*/
+
 package net.sf.okapi.lib.longhornapi;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 /**
@@ -14,16 +35,18 @@ public interface LonghornProject {
 	 * It will be used to process the input files when {@link #executePipeline()} is called.
 	 * 
 	 * @param bconf A batch configuration file that was exported from Rainbow
+	 * @throws FileNotFoundException If the file does not exist
 	 */
-	void addBatchConfiguration(File bconf);
+	void addBatchConfiguration(File bconf) throws FileNotFoundException;
 	
 	/**
 	 * Adds an input file to the project. It will be processed when {@link #executePipeline()} is called.
 	 * 
 	 * @param inputFile The file to be pushed to the service
 	 * @param relativePath The relative path of the file that shall be used to store it in the project
+	 * @throws FileNotFoundException  If the file does not exist
 	 */
-	void addInputFile(File inputFile, String relativePath);
+	void addInputFile(File inputFile, String relativePath) throws FileNotFoundException;
 	
 	/**
 	 * Returns all input files that have been added to this project so far.
