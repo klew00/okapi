@@ -43,7 +43,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import net.sf.okapi.applications.longhorn.transport.XMLStringList;
 import net.sf.okapi.applications.rainbow.Project;
 import net.sf.okapi.applications.rainbow.batchconfig.BatchConfiguration;
 import net.sf.okapi.applications.rainbow.lib.LanguageManager;
@@ -52,6 +51,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.DefaultFilters;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.plugins.PluginsManager;
+import net.sf.okapi.lib.longhornapi.impl.rest.transport.XMLStringList;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
@@ -218,8 +218,6 @@ public class ProjectHandler {
 	@Path("/{projId}/inputFiles/{filename}")
 	public Response addProjectInputFilePost(@PathParam("projId") int projId, @PathParam("filename") String filename,
 			MultipartFormDataInput input) {
-		
-		// TODO How to handle sub-directories?
 		
 		try {
 			File tmpFile = input.getFormDataPart(WorkspaceUtils.INPUT_FILE_PARAM, File.class, null);

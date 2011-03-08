@@ -27,35 +27,26 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
 
-import net.sf.okapi.applications.longhorn.transport.XMLStringList;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.lib.longhornapi.LonghornFile;
+import net.sf.okapi.lib.longhornapi.LonghornProject;
+import net.sf.okapi.lib.longhornapi.LonghornService;
+import net.sf.okapi.lib.longhornapi.impl.rest.RESTService;
 
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.DeleteMethod;
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.PutMethod;
-import org.apache.commons.httpclient.methods.multipart.FilePart;
-import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
-import org.apache.commons.httpclient.methods.multipart.Part;
 import org.junit.Before;
 import org.junit.Test;
 
 public class ServiceTest {
 	private static final String SERVICE_BASE_URL = "http://localhost:9095/okapi-longhorn";
-	private HttpClient client;
 	private File batchConfig;
 	private ArrayList<File> inputFiles;
 	
 	@Before
 	public void init() throws Exception {
-		client = new HttpClient();
 
 		batchConfig = new File(this.getClass().getResource("/html_segment_and_text_mod.bconf").toURI());
 		URL input1 = this.getClass().getResource("/rawdocumenttofiltereventsstep.html");
@@ -74,59 +65,44 @@ public class ServiceTest {
 
 	//@Test
 	public void runRainbowProject() throws Exception {
-
-		// Get list of all projects
-		Collection<String> projects = getList(SERVICE_BASE_URL + "/projects");
-		assertNotNull(projects);
-		int projCountBefore = projects.size();
+		
+		LonghornService ws = new RESTService(new URI(SERVICE_BASE_URL));
+		
+		int projCountBefore = ws.getProjects().size();
 
 		// Create project
-		String projectUri = createProject();
-		assertNotNull(projectUri);
-
+		LonghornProject proj = ws.createProject();
+		
 		// Now there should be one project more than before...
-		projects = getList(SERVICE_BASE_URL + "/projects");
-		assertNotNull(projects);
-		assertEquals(projCountBefore + 1, projects.size());
+		assertEquals(projCountBefore + 1, ws.getProjects().size());
 		
 		// ... that has still 0 input and output files
-		Collection<String> inputFileNames = getList(projectUri + "/inputFiles");
-		Collection<String> outputFileNames = getList(projectUri + "/outputFiles");
-		assertNotNull(inputFileNames);
-		assertNotNull(outputFileNames);
-		assertEquals(0, inputFileNames.size());
-		assertEquals(0, outputFileNames.size());
+		assertEquals(0, proj.getInputFiles().size());
+		assertEquals(0, proj.getOutputFiles().size());
 
 		// Post batch configuration
-		Part[] parts = {
-				new FilePart(WorkspaceUtils.BATCH_CONF_PARAM, batchConfig.getName(), batchConfig)};
-		post(projectUri + "/batchConfiguration", parts);
+		proj.addBatchConfiguration(batchConfig);
 
 		// Send input files
-		for (File inputFile : inputFiles) {
-
-			String uri = projectUri + "/inputFiles/" + inputFile.getName();
-			Part[] inputParts = {
-					new FilePart(WorkspaceUtils.INPUT_FILE_PARAM, inputFile.getName(), inputFile)};
-			put(uri, inputParts);
+		for (File inFile : inputFiles) {
+			proj.addInputFile(inFile, inFile.getName());
 		}
 
 		// Test if upload worked
-		inputFileNames = getList(projectUri + "/inputFiles");
-		assertNotNull(inputFileNames);
-		assertEquals(inputFiles.size(), inputFileNames.size());
+		assertEquals(inputFiles.size(), proj.getInputFiles().size());
 
 		// Execute pipeline
-		post(projectUri + "/tasks/execute", null);
+		proj.executePipeline();
 
 		// Get list of all output files
-		outputFileNames = getList(projectUri + "/outputFiles");
-		assertNotNull(outputFileNames);
-		assertEquals(inputFiles.size(), outputFileNames.size());
-		
+		ArrayList<LonghornFile> outputFiles = proj.getOutputFiles();
+		// Should be the same number of files with this config
+		assertEquals(inputFiles.size(), outputFiles.size());
+
 		// Does the fetching of files work?
-		for (String filename : outputFileNames) {
-			File outputFile = downloadFileToTemp(projectUri + "/outputFiles/" + filename);
+		for (LonghornFile of : outputFiles) {
+			File outputFile = downloadFileToTemp(of.openStream());
+			
 			assertNotNull(outputFile);
 			assertTrue(outputFile.exists());
 			assertTrue(outputFile.length() > 0);
@@ -134,74 +110,17 @@ public class ServiceTest {
 		}
 
 		// Delete project
-		delete(projectUri);
+		proj.delete();
 		
-		projects = getList(SERVICE_BASE_URL + "/projects");
-		assertNotNull(projects);
-		assertEquals(projCountBefore, projects.size());
+		// Has the project been deleted?
+		assertEquals(projCountBefore, ws.getProjects().size());
 	}
 
-	private File downloadFileToTemp(String uri) throws IOException {
+	private File downloadFileToTemp(InputStream remoteFile) throws IOException {
 		
-		InputStream remoteFile = new URL(uri).openStream();
 		File tempFile = File.createTempFile("okapi-longhorn", "outfile");
 		Util.copy(remoteFile, tempFile);
 		remoteFile.close();
 		return tempFile;
-	}
-
-	private void put(String uri, Part[] params) throws IOException {
-		
-		PutMethod putMethod = new PutMethod(uri);
-		putMethod.setRequestEntity(new MultipartRequestEntity(params, putMethod.getParams()));
-		int status = client.executeMethod(putMethod);
-		assertEquals(HttpStatus.SC_OK, status);
-		putMethod.releaseConnection();
-	}
-
-	private void delete(String uri) throws IOException {
-		
-		DeleteMethod delMethod = new DeleteMethod(uri);
-		int status = client.executeMethod(delMethod);
-		assertEquals(HttpStatus.SC_OK, status);
-		delMethod.releaseConnection();
-	}
-
-	private void post(String uri, Part[] parts) throws IOException {
-		
-		PostMethod postMethod = new PostMethod(uri);
-		if (parts != null)
-			postMethod.setRequestEntity(new MultipartRequestEntity(parts, postMethod.getParams()));
-		
-		int status = client.executeMethod(postMethod);
-		
-		if (status == HttpStatus.SC_INTERNAL_SERVER_ERROR)
-			System.err.println("Error: " + postMethod.getResponseBodyAsString());
-		
-		assertEquals(HttpStatus.SC_OK, status);
-		postMethod.releaseConnection();
-	}
-
-	private String createProject() throws IOException {
-		
-		PostMethod postMethod = new PostMethod(SERVICE_BASE_URL + "/projects/new");
-		int status = client.executeMethod(postMethod);
-		assertEquals(HttpStatus.SC_CREATED, status);
-		Header projectUri = postMethod.getResponseHeader("Location");
-		assertNotNull(projectUri);
-		
-		postMethod.releaseConnection();
-		return projectUri.getValue();
-	}
-
-	private Collection<String> getList(String uri) throws IOException {
-		
-		GetMethod getMethod = new GetMethod(uri);
-		int status = client.executeMethod(getMethod);
-		String xmlList = getMethod.getResponseBodyAsString();
-		assertEquals(HttpStatus.SC_OK, status);
-		getMethod.releaseConnection();
-		
-		return XMLStringList.unmarshal(xmlList);
 	}
 }
