@@ -34,7 +34,7 @@
 			<groupId>net.sf.okapi.lib</groupId>
 			<artifactId>okapi-lib-transifex</artifactId>
 			<version>${project.version}</version>
-		</dependency>        
+		</dependency>
         
         <!-- For test -->
         <dependency>

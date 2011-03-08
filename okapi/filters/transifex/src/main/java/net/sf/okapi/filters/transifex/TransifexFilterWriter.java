@@ -24,7 +24,6 @@ import java.io.OutputStream;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
-import net.sf.okapi.common.Util;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;

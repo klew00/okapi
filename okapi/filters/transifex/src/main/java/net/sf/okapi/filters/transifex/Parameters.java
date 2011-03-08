@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.filters.rainbowkit;
+package net.sf.okapi.filters.transifex;
 
 import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.EditorFor;
@@ -29,9 +29,9 @@ import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 @EditorFor(Parameters.class)
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
-	private static final String OPENMANIFEST = "openManifest";
+	private static final String OPENPROJECT = "openProject";
 	
-	private boolean openManifest;
+	private boolean openProject;
 
 	public Parameters () {
 		reset();
@@ -40,21 +40,21 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	
 	@Override
 	public void reset () {
-		openManifest = true;
+		openProject = true;
 	}
 	
-	public void setOpenManifest (boolean openManifest) {
-		this.openManifest = openManifest;
+	public void setOpenProject (boolean openManifest) {
+		this.openProject = openManifest;
 	}
 	
-	public boolean getOpenManifest () {
-		return openManifest;
+	public boolean getOpenProject () {
+		return openProject;
 	}
 
 	@Override
 	public String toString () {
 		buffer.reset();
-		buffer.setBoolean(OPENMANIFEST, openManifest);
+		buffer.setBoolean(OPENPROJECT, openProject);
 		return buffer.toString();
 	}
 	
@@ -62,20 +62,20 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
-		openManifest = buffer.getBoolean(OPENMANIFEST, openManifest);
+		openProject = buffer.getBoolean(OPENPROJECT, openProject);
 	}
 
 	@Override
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
-		desc.add(OPENMANIFEST, "Open the manifest file before processing", null);
+		desc.add(OPENPROJECT, "Open the project file before processing", null);
 		return desc;
 	}
 
 	@Override
 	public EditorDescription createEditorDescription (ParametersDescription paramDesc) {
-		EditorDescription desc = new EditorDescription("Rainbow Translation Kit Parameters", true, false);
-		desc.addCheckboxPart(paramDesc.get(OPENMANIFEST));
+		EditorDescription desc = new EditorDescription("Transifex Filter Parameters", true, false);
+		desc.addCheckboxPart(paramDesc.get(OPENPROJECT));
 		return desc;
 	}
 }

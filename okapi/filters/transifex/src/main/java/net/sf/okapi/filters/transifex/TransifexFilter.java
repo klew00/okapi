@@ -33,6 +33,7 @@ import java.util.logging.Logger;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
@@ -40,7 +41,6 @@ import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
-import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
@@ -51,12 +51,14 @@ import net.sf.okapi.lib.transifex.TransifexClient;
 /**
  * Implements the IFilter interface for Transifex-based files.
  */
+@UsingParameters(Parameters.class)
 public class TransifexFilter implements IFilter {
 
 	private static final String MIMETYPE = "application/x-transifex";
 	
 	private final Logger logger = Logger.getLogger(getClass().getName());
 
+	private Parameters params;
 	private Project proj;
 	private POFilter pof;
 	private Iterator<ResourceInfo> iter;
@@ -65,12 +67,11 @@ public class TransifexFilter implements IFilter {
 	private LinkedList<Event> queue;
 	private boolean hasNext;
 	private boolean hasMoreDoc;
-	private LocaleId srcLoc;
-	private LocaleId trgLoc;
 	private String tempDir;
 	private IFilterWriter writer;
 	
 	public TransifexFilter () {
+		params = new Parameters();
 		proj = new Project();
 		pof = new POFilter();
 	}
@@ -90,7 +91,7 @@ public class TransifexFilter implements IFilter {
 	public IFilterWriter createFilterWriter () {
 		if ( writer == null ) {
 			writer = new TransifexFilterWriter();
-			writer.setOptions(trgLoc, null);
+			writer.setOptions(proj.getTargetLocale(), null);
 		}
 		return writer;
 	}
@@ -124,7 +125,7 @@ public class TransifexFilter implements IFilter {
 	}
 
 	public IParameters getParameters () {
-		return null; // No parameters
+		return params;
 	}
 
 	public boolean hasNext () {
@@ -171,16 +172,14 @@ public class TransifexFilter implements IFilter {
 			close();
 			canceled = false;
 
-			File temp = File.createTempFile("transifex-", null);
+			File temp = File.createTempFile("tx-", null);
 			temp.delete();
 			temp.mkdirs();
 			tempDir = temp.getAbsolutePath();
-			
-			srcLoc = input.getSourceLocale();
-			trgLoc = input.getTargetLocale();
-			
+
 			// read the project file
 			proj.read(new BufferedReader(input.getReader()));
+			proj.setPath(input.getInputURI().getPath());
 			
 			// Initialize the client
 			cli = new TransifexClient(proj.getHost());
@@ -188,7 +187,13 @@ public class TransifexFilter implements IFilter {
 			cli.setProject(proj.getProjectId());
 			
 			// Refresh the list of resources
-			refreshResourceList();
+			proj.refreshResources();
+			// Prompt the user if requested
+			if ( params.getOpenProject() ) {
+				if ( !editProjectFile() ) {
+					return;
+				}
+			}
 
 			// Initialize the iteration
 			iter = proj.getResources().iterator();
@@ -201,27 +206,46 @@ public class TransifexFilter implements IFilter {
 			throw new OkapiIOException("Error processing input.\n"+e.getMessage(), e);
 		}
 	}
+	
+	public boolean editProjectFile () {
+		String className = "net.sf.okapi.filters.transifex.ui.ProjectDialog";
+		try {
+			IProjectEditor dlg = (IProjectEditor)Class.forName(className).newInstance();
+			if ( !dlg.edit(null, proj) ) {
+				canceled = true;
+				return false; // Canceled
+			}
+		}
+		catch ( Throwable e ) {
+			logger.severe(String.format("Cannot create the editor (%s)\n"+e.getMessage(), className));
+			// And move on
+			return false;
+		}
+		return true;
+	}
 
 	public void setFilterConfigurationMapper (IFilterConfigurationMapper fcMapper) {
 		// Not used
 	}
 
 	public void setParameters (IParameters params) {
-		// Not used
+		this.params = (Parameters)params;
 	}
 
 	private void nextDocument () {
-		if ( iter.hasNext() ) {
-			if ( prepareDocument(iter.next()) ) {
-				nextEventInDocument();
-				return;
+		while ( iter.hasNext() ) {
+			ResourceInfo info = iter.next();
+			// Work only with selected resources
+			if ( info.getSelected() ) {
+				if ( prepareDocument(info) ) {
+					nextEventInDocument();
+					return;
+				}
 			}
-			// Else: error with that file, move to the next one
+			// Else: error with that file, or un-selected one: move to the next one
 		}
-		else {
-			// No more document
-			hasMoreDoc = false;
-		}
+		// No more document
+		hasMoreDoc = false;
 	}
 	
 	private void nextEventInDocument () {
@@ -252,14 +276,15 @@ public class TransifexFilter implements IFilter {
 
 		// Download the PO for this resource and the given target language
 		String outputPath = tempDir + File.separator + info.getName();
-		String[] res = cli.getResource(info.getId(), trgLoc, outputPath);
+		String[] res = cli.getResource(info.getId(), proj.getTargetLocale(), outputPath);
 		if ( res[0] == null ) {
 			logger.severe(String.format("Could not download the resource '%s'.", info.getId()));
 			return false;
 		}
 
 		// Open the local copy for processing
-		RawDocument rd = new RawDocument(new File(outputPath).toURI(), "UTF-8", srcLoc, trgLoc);
+		RawDocument rd = new RawDocument(new File(outputPath).toURI(), "UTF-8",
+			proj.getSourceLocale(), proj.getTargetLocale());
 		pof.open(rd);
 		
 		// Send a start batch item if this is not the first document
@@ -289,32 +314,45 @@ public class TransifexFilter implements IFilter {
 		return true;
 	}
 
-	@SuppressWarnings("unchecked")
-	private void refreshResourceList () {
-		// Get the list of resources in the given project
-		Object[] res = cli.getResourceList(srcLoc);
-		if ( res[0] == null ) {
-			logger.severe((String)res[1]);
-			return;
-		}
-		Map<String, ResourceInfo> map = (Map<String, ResourceInfo>)res[2];
-		List<ResourceInfo> list = proj.getResources();
-		list.clear();
-		if ( map.isEmpty() ) {
-			logger.warning(String.format("The project '%s' has no resources for '%s'.",
-				proj.getProjectId(), srcLoc));
-		}
-		
-		for ( String resId : map.keySet() ) {
-			ResourceInfo info = map.get(resId);
-			if ( "PO".equals(info.getI18nType()) ) {
-				list.add(info);
-			}
-		}
-		if ( list.isEmpty() ) {
-			logger.warning(String.format("The project '%s' has no PO-based resources for '%s'.",
-				proj.getProjectId(), srcLoc));
-		}
-	}
+//	@SuppressWarnings("unchecked")
+//	private void refreshResourceList () {
+//		// Get the list of resources in the given project
+//		Object[] res = cli.getResourceList(proj.getSourceLocale());
+//		if ( res[0] == null ) {
+//			logger.severe((String)res[1]);
+//			return;
+//		}
+//		Map<String, ResourceInfo> map = (Map<String, ResourceInfo>)res[2];
+//		List<ResourceInfo> list = proj.getResources();
+//		if ( map.isEmpty() ) {
+//			list.clear();
+//			logger.warning(String.format("The project '%s' has no resources for '%s'.",
+//				proj.getProjectId(), proj.getSourceLocale()));
+//		}
+//
+//		// Make a temporary copy of the existing list
+//		List<ResourceInfo> oldList = new ArrayList<ResourceInfo>();
+//		oldList.addAll(list);
+//		list.clear();
+//		
+//		// Fill the new list
+//		for ( String resId : map.keySet() ) {
+//			ResourceInfo info = map.get(resId);
+//			if ( "PO".equals(info.getI18nType()) ) {
+//				list.add(info);
+//				// Try to preserve the existing selection
+//				for ( int i=0; i<oldList.size(); i++ ) {
+//					if ( oldList.get(i).getId().equals(resId) ) {
+//						info.setSelected(oldList.get(i).getSelected());
+//						break;
+//					}
+//				}
+//			}
+//		}
+//		if ( list.isEmpty() ) {
+//			logger.warning(String.format("The project '%s' has no PO-based resources for '%s'.",
+//				proj.getProjectId(), proj.getSourceLocale()));
+//		}
+//	}
 
 }

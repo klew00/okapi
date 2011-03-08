@@ -18,44 +18,11 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.lib.transifex;
+package net.sf.okapi.filters.transifex;
 
-public class ResourceInfo {
+public interface IProjectEditor {
 
-	private String id;
-	private String name;
-	private String i18nType;
-	private boolean selected;
-	
-	public ResourceInfo (String id,
-		String name,
-		String i18nType,
-		boolean selected)
-	{
-		this.id = id;
-		this.name = name;
-		this.i18nType = i18nType;
-		this.selected = selected;
-	}
-	
-	public String getId () {
-		return id;
-	}
-	
-	public String getName () {
-		return name;
-	}
-
-	public String getI18nType () {
-		return i18nType;
-	}
-
-	public boolean getSelected () {
-		return selected;
-	}
-	
-	public void setSelected (boolean selected) {
-		this.selected = selected;
-	}
+	public boolean edit (Object parent,
+		Project manifest);	
 
 }

@@ -446,7 +446,7 @@ public class TransifexClient {
 					String i18nType = (String)object.get("i18n_type");
 					String resId = (String)object.get("slug");
 					String name = (String)object.get("name");
-					resources.put(resId, new ResourceInfo(resId, name, i18nType));
+					resources.put(resId, new ResourceInfo(resId, name, i18nType, true));
 				}
 			}
 			else {
