@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
@@ -178,7 +177,7 @@ public class TransifexFilter implements IFilter {
 			tempDir = temp.getAbsolutePath();
 
 			// read the project file
-			proj.read(new BufferedReader(input.getReader()));
+			proj.read(new BufferedReader(input.getReader()), input.getSourceLocale(), input.getTargetLocale());
 			proj.setPath(input.getInputURI().getPath());
 			
 			// Initialize the client

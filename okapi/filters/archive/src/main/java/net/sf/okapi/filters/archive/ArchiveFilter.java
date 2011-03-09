@@ -38,6 +38,7 @@ import net.sf.okapi.common.ListUtil;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.ResourceUtil;
 import net.sf.okapi.common.StringUtil;
+import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
@@ -82,6 +83,7 @@ import net.sf.okapi.common.skeleton.ZipSkeleton;
  * use addConfiguration() and other methods to configure it to your desire.
  */
 
+@UsingParameters(Parameters.class)
 public class ArchiveFilter implements IFilter {
 
 	private enum NextAction {
@@ -155,8 +157,8 @@ public class ArchiveFilter implements IFilter {
 		list.add(new FilterConfiguration(getName(),
 			MIME_TYPE,
 			getClass().getName(),
-			"Archive files",
-			"Archive files",
+			"Archive Files",
+			"Configuration for archive files",
 			null,
 			".archive;")); 
 		// TODO Add mapping for these extensions to FormatManager in

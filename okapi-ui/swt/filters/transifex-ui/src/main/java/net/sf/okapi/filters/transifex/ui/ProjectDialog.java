@@ -88,6 +88,7 @@ public class ProjectDialog implements IProjectEditor {
 		label.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END));
 		edSource = new Text(cmpTmp, SWT.BORDER);
 		edSource.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+		edSource.setEditable(false);
 		
 		label = new Label(cmpTmp, SWT.NONE);
 		label.setText("Username:");
@@ -100,6 +101,7 @@ public class ProjectDialog implements IProjectEditor {
 		label.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END));
 		edTarget = new Text(cmpTmp, SWT.BORDER);
 		edTarget.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+		edTarget.setEditable(false);
 		
 		label = new Label(cmpTmp, SWT.NONE);
 		label.setText("Password:");

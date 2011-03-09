@@ -161,7 +161,9 @@ public class Project {
 		}
 	}
 	
-	public void read (BufferedReader br)
+	public void read (BufferedReader br,
+		LocaleId srcLoc,
+		LocaleId trgLoc)
 		throws IOException
 	{
 		reset();
@@ -184,10 +186,20 @@ public class Project {
 						setProjectId(line.substring(n+1).trim());
 					}
 					else if ( line.startsWith(SOURCELOCALE) ) {
-						setSourceLocale(LocaleId.fromString(line.substring(n+1).trim()));
+						if ( srcLoc == null ) {
+							setSourceLocale(LocaleId.fromString(line.substring(n+1).trim()));
+						}
+						else {
+							setSourceLocale(srcLoc);
+						}
 					}
 					else if ( line.startsWith(TARGETLOCALE) ) {
-						setTargetLocale(LocaleId.fromString(line.substring(n+1).trim()));
+						if ( trgLoc == null ) {
+							setTargetLocale(LocaleId.fromString(line.substring(n+1).trim()));
+						}
+						else {
+							setTargetLocale(trgLoc);
+						}
 					}
 				}
 				else {
