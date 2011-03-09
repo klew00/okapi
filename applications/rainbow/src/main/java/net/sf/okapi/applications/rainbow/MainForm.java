@@ -2336,7 +2336,8 @@ public class MainForm { //implements IParametersProvider {
 			}
 			Input inp = prj.getItemFromRelativePath(currentInput,
 				inputTables.get(currentInput).getItem(index).getText(0));
-			Program.launch(prj.getInputRoot(currentInput) + File.separator + inp.relativePath); 
+			File file = new File(prj.getInputRoot(currentInput) + File.separator + inp.relativePath);
+			Program.launch(file.getCanonicalPath()); 
 		}
 		catch ( Exception e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
@@ -2351,8 +2352,8 @@ public class MainForm { //implements IParametersProvider {
 			}
 			Input inp = prj.getItemFromRelativePath(currentInput,
 				inputTables.get(currentInput).getItem(index).getText(0));
-			Program.launch(Util.getDirectoryName(
-				prj.getInputRoot(currentInput) + File.separator + inp.relativePath)); 
+			File file = new File(prj.getInputRoot(currentInput) + File.separator + inp.relativePath);
+			Program.launch(Util.getDirectoryName(file.getCanonicalPath()));
 		}
 		catch ( Exception e ) {
 			Dialogs.showError(shell, e.getMessage(), null);

@@ -101,9 +101,15 @@ public class TransifexFilter implements IFilter {
 			MIMETYPE,
 			getClass().getName(),
 			"Transifex Project",
-			"Configuration for Transifex project",
+			"Transifex project with prompt when starting",
 			null,
 			".txp;"));
+		list.add(new FilterConfiguration(getName()+"-noPrompt",
+			MIMETYPE,
+			getClass().getName(),
+			"Transifex Project (without prompt)",
+			"Transifex project without prompt when starting",
+			"noPrompt.fprm"));
 		return list;
 	}
 

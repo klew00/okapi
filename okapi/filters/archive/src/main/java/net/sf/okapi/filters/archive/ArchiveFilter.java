@@ -246,9 +246,10 @@ public class ArchiveFilter implements IFilter {
 		fileNames = ListUtil.stringAsArray(params.getFileNames());
 		configIds = ListUtil.stringAsArray(params.getConfigIds());
 		if ((configIds.length > 0) && (fileNames.length != configIds.length)) {
-			throw new RuntimeException("Different number of configIds and extensions in parameters");
+			throw new RuntimeException("Different number of filter configuration ids and filenames in parameters");
 		}
-		}		
+	}
+	
 	private void updateFilterConfigurationMapper() {
 		if (fcMapper == null) {
 			fcMapper = new FilterConfigurationMapper();

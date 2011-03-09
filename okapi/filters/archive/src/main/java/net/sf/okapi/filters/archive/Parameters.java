@@ -109,8 +109,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public ParametersDescription getParametersDescription() {
 		ParametersDescription desc = new ParametersDescription(this);
 		desc.add("mimeType", "MIME type of the filter's container format", null);
-		desc.add("fileNames", "File names:", "Comma-delimited list of file names to be processed (wildcards are allowed) in the same order as configIds");
-		desc.add("configIds", "Config Ids:", "Comma-delimited list of configuration Ids corresponding to the extension");
+		desc.add("fileNames", "File names", "Comma-delimited list of file names to be processed (wildcards are allowed) in the same order as configuration ids");
+		desc.add("configIds", "Filter configuration ids", "Comma-delimited list of configuration ids corresponding to the file names");
 		return desc;
 	}
 	
