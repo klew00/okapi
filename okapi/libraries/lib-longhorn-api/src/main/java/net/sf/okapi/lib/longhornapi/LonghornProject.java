@@ -22,6 +22,7 @@ package net.sf.okapi.lib.longhornapi;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 /**
@@ -49,6 +50,16 @@ public interface LonghornProject {
 	void addInputFile(File inputFile, String relativePath) throws FileNotFoundException;
 	
 	/**
+	 * Allows to add any number of input files to the project with one call.
+	 * The specified file is expected to be a zip archive.
+	 * The archive will be extracted into the project (with the relative file paths).
+	 * 
+	 * @param zipFile The zip archive with the files to be pushed to the service
+	 * @throws FileNotFoundException  If the file does not exist
+	 */
+	void addInputFilesFromZip(File zipFile) throws FileNotFoundException;
+	
+	/**
 	 * Returns all input files that have been added to this project so far.
 	 * 
 	 * @return A list of all input files in this project
@@ -67,6 +78,15 @@ public interface LonghornProject {
 	 * @return A list of all output files in this project
 	 */
 	ArrayList<LonghornFile> getOutputFiles();
+	
+	/**
+	 * Returns all output files that were generated when the project's pipeline was executed.
+	 * All files are stored in a single zip archive. The entries in the zip archive have
+	 * the same relative file paths as the output files in the project.
+	 * 
+	 * @return The content of the zip file
+	 */
+	InputStream getOutputFilesAsZip();
 	
 	/**
 	 * Deletes this project from the web-service.

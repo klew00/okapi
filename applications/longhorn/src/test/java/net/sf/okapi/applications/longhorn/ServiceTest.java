@@ -37,26 +37,10 @@ import net.sf.okapi.lib.longhornapi.LonghornProject;
 import net.sf.okapi.lib.longhornapi.LonghornService;
 import net.sf.okapi.lib.longhornapi.impl.rest.RESTService;
 
-import org.junit.Before;
 import org.junit.Test;
 
 public class ServiceTest {
 	private static final String SERVICE_BASE_URL = "http://localhost:9095/okapi-longhorn";
-	private File batchConfig;
-	private ArrayList<File> inputFiles;
-	
-	@Before
-	public void init() throws Exception {
-
-		batchConfig = new File(this.getClass().getResource("/html_segment_and_text_mod.bconf").toURI());
-		URL input1 = this.getClass().getResource("/rawdocumenttofiltereventsstep.html");
-		URL input2 = this.getClass().getResource("/searchandreplacestep.html");
-		URL input3 = this.getClass().getResource("/segmentationstep.html");
-		inputFiles = new ArrayList<File>();
-		inputFiles.add(new File(input1.toURI()));
-		inputFiles.add(new File(input2.toURI()));
-		inputFiles.add(new File(input3.toURI()));
-	}
 	
 	@Test
 	public void dummy() {
@@ -70,7 +54,9 @@ public class ServiceTest {
 		
 		int projCountBefore = ws.getProjects().size();
 
+		//
 		// Create project
+		//
 		LonghornProject proj = ws.createProject();
 		
 		// Now there should be one project more than before...
@@ -80,24 +66,76 @@ public class ServiceTest {
 		assertEquals(0, proj.getInputFiles().size());
 		assertEquals(0, proj.getOutputFiles().size());
 
+		//
 		// Post batch configuration
-		proj.addBatchConfiguration(batchConfig);
+		//
+		URL bconf = this.getClass().getResource("/html_segment_and_text_mod.bconf");
+		File bconfFile = new File(bconf.toURI());
+		proj.addBatchConfiguration(bconfFile);
 
+		//
 		// Send input files
-		for (File inFile : inputFiles) {
-			proj.addInputFile(inFile, inFile.getName());
+		//
+		
+		// First by single upload
+		URL input1 = this.getClass().getResource("/rawdocumenttofiltereventsstep.html");
+		File file1 = new File(input1.toURI());
+		// in the root directory
+		proj.addInputFile(file1, file1.getName());
+		// and in a sub-directory
+		proj.addInputFile(file1, "samefile/" + file1.getName());
+		
+		ArrayList<LonghornFile> inputFiles = proj.getInputFiles();
+		assertEquals(2, inputFiles.size());
+		assertEquals(0, proj.getOutputFiles().size());
+		ArrayList<String> relFilePaths = new ArrayList<String>();
+		for (LonghornFile f : inputFiles) {
+			relFilePaths.add(f.getRelativePath());
 		}
+		assertTrue(relFilePaths.contains("rawdocumenttofiltereventsstep.html"));
+		assertTrue(relFilePaths.contains("samefile/rawdocumenttofiltereventsstep.html"));
+		
+		// Then by package upload
+		URL input2 = this.getClass().getResource("/more_files.zip");
+		File file2 = new File(input2.toURI());
+		proj.addInputFilesFromZip(file2);
+		
+		inputFiles = proj.getInputFiles();
+		assertEquals(4, inputFiles.size());
+		assertEquals(0, proj.getOutputFiles().size());
 
-		// Test if upload worked
-		assertEquals(inputFiles.size(), proj.getInputFiles().size());
+		// Are the input file names as expected (with 1 file in a sub-directory)?
+		relFilePaths = new ArrayList<String>();
+		for (LonghornFile f : inputFiles) {
+			relFilePaths.add(f.getRelativePath());
+		}
+		assertTrue(relFilePaths.contains("rawdocumenttofiltereventsstep.html"));
+		assertTrue(relFilePaths.contains("samefile/rawdocumenttofiltereventsstep.html"));
+		assertTrue(relFilePaths.contains("searchandreplacestep.html"));
+		assertTrue(relFilePaths.contains("subdir1/segmentationstep.html"));
 
+		//
 		// Execute pipeline
+		//
 		proj.executePipeline();
 
-		// Get list of all output files
+		//
+		// Get output files
+		//
 		ArrayList<LonghornFile> outputFiles = proj.getOutputFiles();
+		
 		// Should be the same number of files with this config
 		assertEquals(inputFiles.size(), outputFiles.size());
+
+		// Are the names as expected?
+		relFilePaths = new ArrayList<String>();
+		for (LonghornFile f : outputFiles) {
+			relFilePaths.add(f.getRelativePath());
+		}
+		assertTrue(relFilePaths.contains("rawdocumenttofiltereventsstep.out.html"));
+		assertTrue(relFilePaths.contains("samefile/rawdocumenttofiltereventsstep.out.html"));
+		assertTrue(relFilePaths.contains("searchandreplacestep.out.html"));
+		assertTrue(relFilePaths.contains("subdir1/segmentationstep.out.html"));
 
 		// Does the fetching of files work?
 		for (LonghornFile of : outputFiles) {
@@ -109,7 +147,9 @@ public class ServiceTest {
 			outputFile.delete();
 		}
 
+		//
 		// Delete project
+		//
 		proj.delete();
 		
 		// Has the project been deleted?

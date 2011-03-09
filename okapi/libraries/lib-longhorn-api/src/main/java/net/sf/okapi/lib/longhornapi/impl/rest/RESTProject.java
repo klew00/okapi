@@ -23,6 +23,7 @@ package net.sf.okapi.lib.longhornapi.impl.rest;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -79,7 +80,7 @@ public class RESTProject implements LonghornProject {
 
 	@Override
 	public void addInputFile(File inputFile, String relativePath) throws FileNotFoundException {
-		String uri = projUri + "/inputFiles/" + inputFile.getName();
+		String uri = projUri + "/inputFiles/" + relativePath;
 		Part[] inputParts = {
 				new FilePart("inputFile", inputFile.getName(), inputFile)};
 		try {
@@ -139,6 +140,29 @@ public class RESTProject implements LonghornProject {
 			}
 			
 			return files;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Override
+	public void addInputFilesFromZip(File zipFile) throws FileNotFoundException {
+		Part[] parts = {
+				new FilePart("inputFile", zipFile.getName(), zipFile)};
+		try {
+			Util.post(projUri + "/inputFiles.zip", parts);
+		}
+		catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Override
+	public InputStream getOutputFilesAsZip() {
+		try {
+			URI remoteFile = new URI(projUri + "/outputFiles.zip");
+			return remoteFile.toURL().openStream();
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);

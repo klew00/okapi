@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.applications.longhorn;
+package net.sf.okapi.applications.longhorn.lib;
 
 import java.io.File;
 import java.io.IOException;

@@ -18,20 +18,29 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.applications.longhorn;
+package net.sf.okapi.applications.longhorn.lib;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 import net.sf.okapi.common.DefaultFilenameFilter;
+import net.sf.okapi.common.Util;
 
 /**
  * Utilities for the web-service's project and file handling.
@@ -51,6 +60,14 @@ public final class WorkspaceUtils {
 			return file.isDirectory();
 		}
 	};
+	private static final FilenameFilter ANY_FILE_FILTER = new FilenameFilter() {
+		@Override
+		public boolean accept(File dir, String name) {
+			File file = new File(dir.getAbsolutePath() + File.separator + name);
+			return file.isFile();
+		}
+	};
+	private static final int BUFFER = 102400;
 
 	public static final String BATCH_CONF_PARAM = "batchConfiguration";
 	public static final String INPUT_FILE_PARAM = "inputFile";
@@ -93,6 +110,7 @@ public final class WorkspaceUtils {
 	/**
 	 * @param projId The id of a local project
 	 * @return The project's absolute path on the file system
+	 * 		(without a trailing path separator)
 	 */
 	public static String getProjectPath(int projId) {
 		
@@ -111,6 +129,7 @@ public final class WorkspaceUtils {
 	/**
 	 * @param projId The id of a local project
 	 * @return The absolute path of the project's input files directory on the file system
+	 * 		(without a trailing path separator)
 	 */
 	public static String getInputDirPath(int projId) {
 		
@@ -131,9 +150,9 @@ public final class WorkspaceUtils {
 	 * @param projId The id of a local project
 	 * @return All input files belonging to the project
 	 */
-	public static Collection<File> getInputFiles(int projId) {
+	public static List<File> getInputFiles(int projId) {
 		
-		return Arrays.asList(getFilteredFiles(getInputDirPath(projId), null));
+		return getFilesRecursivly(new File(getInputDirPath(projId)));
 	}
 	
 	/**
@@ -143,12 +162,13 @@ public final class WorkspaceUtils {
 	public static ArrayList<String> getInputFileNames(int projId) {
 		
 		Collection<File> files = getInputFiles(projId);
-		return getFileNames(files);
+		return getFileNames(files, getInputDirPath(projId) + File.separator);
 	}
 	
 	/**
 	 * @param projId The id of a local project
 	 * @return The absolute path of the project's output files directory on the file system
+	 * 		(without a trailing path separator)
 	 */
 	public static String getOutputDirPath(int projId) {
 		
@@ -158,6 +178,7 @@ public final class WorkspaceUtils {
 	/**
 	 * @param projId The id of a local project
 	 * @return The absolute path of the project's configuration files directory on the file system
+	 * 		(without a trailing path separator)
 	 */
 	public static String getConfigDirPath(int projId) {
 		
@@ -198,9 +219,9 @@ public final class WorkspaceUtils {
 	 * @param projId The id of a local project
 	 * @return All output files belonging to the project
 	 */
-	public static Collection<File> getOutputFiles(int projId) {
+	public static List<File> getOutputFiles(int projId) {
 		
-		return Arrays.asList(getFilteredFiles(getOutputDirPath(projId), null));
+		return getFilesRecursivly(new File(getOutputDirPath(projId)));
 	}
 	
 	/**
@@ -210,20 +231,23 @@ public final class WorkspaceUtils {
 	public static ArrayList<String> getOutputFileNames(int projId) {
 		
 		Collection<File> files = getOutputFiles(projId);
-		return getFileNames(files);
+		return getFileNames(files, getOutputDirPath(projId) + File.separator);
 	}
 	
 	/**
 	 * @param files Any collection of files
-	 * @return The names of the given files (including their extension)
+	 * @param rootDir The path that is the starting point for the returned relative file paths (WITH trailing path separator)
+	 * @return The names of the given files (including their extension and their relative path from the root directory with '/' as path separator)
 	 */
-	public static ArrayList<String> getFileNames(Collection<File> files) {
+	public static ArrayList<String> getFileNames(Collection<File> files, String rootDir) {
 		
-		ArrayList<String> fileNames = new ArrayList<String>();
+		ArrayList<String> relFilePaths = new ArrayList<String>();
 		for (File file : files) {
-			fileNames.add(file.getName());
+			String relativePath = file.getAbsolutePath().substring(rootDir.length());
+			relativePath = relativePath.replace("\\", "/");
+			relFilePaths.add(relativePath);
 		}
-		return fileNames;
+		return relFilePaths;
 	}
 
 	/**
@@ -281,6 +305,26 @@ public final class WorkspaceUtils {
 		return dir.listFiles(new DefaultFilenameFilter(extension));
 	}
 	
+	
+	/**
+	 * Get all files in a directory (and it's sub-directories).
+	 * 
+	 * @param directory - root directory
+	 * @return - list all files in that directory and it's sub-directories
+	 */
+	private static ArrayList<File> getFilesRecursivly(File dir) {
+		
+		ArrayList<File> allFiles = new ArrayList<File>();
+		
+		for (File subDir : dir.listFiles(DIRECTORY_FILTER)) {
+			allFiles.addAll(getFilesRecursivly(subDir));
+		}
+		
+		File[] files = dir.listFiles(ANY_FILE_FILTER);
+		allFiles.addAll(Arrays.asList(files));
+		return allFiles;
+	}
+	
 	/**
 	 * @param directory - directory where sub-directories are located
 	 * @return - list of the directory's sub-directories or null if the directory does not exist
@@ -289,5 +333,82 @@ public final class WorkspaceUtils {
 		File dir = new File(directory);
 		File[] directories = dir.listFiles(DIRECTORY_FILTER);
 		return directories;
+	}
+
+	public static File getOutputFilesAsArchive(int projId) throws IOException {
+		
+		File tempZip = File.createTempFile("Okapi-Longhorn-Files", ".zip");
+		if (0 == zip(getOutputFiles(projId), getOutputDirPath(projId) + File.separator, tempZip))
+			throw new RuntimeException("Error while addind the output files to an archive.");
+		
+		return tempZip;
+	}
+	
+	public static void unzip(File zipFile, String targetDirectory) throws IOException {
+
+		ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile));
+		
+		ZipEntry entry;
+		while ((entry = zis.getNextEntry()) != null) {
+			
+			// Skip directories here. They will be created anyway.
+			if (entry.isDirectory())
+				continue;
+			
+			int count;
+			byte data[] = new byte[BUFFER];
+			String targetFilePath = targetDirectory + File.separator + entry.getName();
+			
+			// Normalize separators
+			targetFilePath = targetFilePath.replace("\\", File.separator);
+			targetFilePath = targetFilePath.replace("/", File.separator);
+			System.err.println("F-Sep: '" + File.separator + "'");
+			Util.createDirectories(targetFilePath);
+			
+			FileOutputStream fos = new FileOutputStream(targetFilePath);
+			while ((count = zis.read(data, 0, BUFFER)) != -1) {
+				fos.write(data, 0, count);
+			}
+			fos.flush();
+			fos.close();
+		}
+		zis.close();
+	}
+	
+	/**
+	 * @param files Files to be added to the new zip archive
+	 * @param rootDirectory Root directory of the files WITH trailing path separator (directories below will be in the archive)
+	 * @param destZip The zip archive to be created
+	 * @return 1 if the zip archive was created, 0 if some of the files were outside of the specified root directory
+	 * @throws IOException
+	 */
+	public static int zip(Collection<File> files, String rootDirectory, File destZip) throws IOException {
+		
+		for (File file : files) {
+			if (!file.getAbsolutePath().startsWith(rootDirectory))
+				return 0;
+		}
+		
+		FileOutputStream dest = new FileOutputStream(destZip);
+		BufferedInputStream origin = null;
+		ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(dest));
+		
+		byte data[] = new byte[BUFFER];
+
+		for (File file : files) {
+			FileInputStream fi = new FileInputStream(file);
+			origin = new BufferedInputStream(fi, BUFFER);
+			String entryName = file.getAbsolutePath().substring(rootDirectory.length());
+			ZipEntry entry = new ZipEntry(entryName);
+			out.putNextEntry(entry);
+			int count;
+			while ((count = origin.read(data, 0, BUFFER)) != -1) {
+				out.write(data, 0, count);
+			}
+			origin.close();
+		}
+		out.close();
+		
+		return 1;
 	}
 }
