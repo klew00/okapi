@@ -21,6 +21,7 @@
 package net.sf.okapi.filters.html;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.EmptyStackException;
 import java.util.logging.Level;
@@ -32,14 +33,18 @@ import net.htmlparser.jericho.Segment;
 import net.htmlparser.jericho.StartTag;
 import net.htmlparser.jericho.StartTagType;
 import net.htmlparser.jericho.Tag;
+import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.encoder.HtmlEncoder;
+import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder;
 import net.sf.okapi.common.filters.PropertyTextUnitPlaceholder.PlaceholderAccessType;
+import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.filters.abstractmarkup.AbstractMarkupEventBuilder;
 import net.sf.okapi.filters.abstractmarkup.AbstractMarkupFilter;
 import net.sf.okapi.filters.abstractmarkup.ExtractionRuleState.RuleType;
@@ -49,9 +54,11 @@ import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
 @UsingParameters(Parameters.class)
 public class HtmlFilter extends AbstractMarkupFilter {
 
-	private static final Logger LOGGER = Logger.getLogger(HtmlFilter.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(HtmlFilter.class
+			.getName());
 
 	private Parameters parameters;
+	private RawDocument tempSourceInput;
 
 	public HtmlFilter() {
 		super();
@@ -60,14 +67,31 @@ public class HtmlFilter extends AbstractMarkupFilter {
 		setParameters(new Parameters());
 		setName("okf_html"); //$NON-NLS-1$
 		setDisplayName("HTML/XHTML Filter"); //$NON-NLS-1$
-		addConfiguration(new FilterConfiguration(getName(), MimeTypeMapper.HTML_MIME_TYPE,
-			getClass().getName(), "HTML", "HTML or XHTML documents", //$NON-NLS-1$
-			Parameters.NONWELLFORMED_PARAMETERS,
-			".html;.htm;")); //$NON-NLS-1$
+		addConfiguration(new FilterConfiguration(getName(),
+				MimeTypeMapper.HTML_MIME_TYPE, getClass().getName(),
+				"HTML", "HTML or XHTML documents", //$NON-NLS-1$
+				Parameters.NONWELLFORMED_PARAMETERS, ".html;.htm;")); //$NON-NLS-1$
 		addConfiguration(new FilterConfiguration(getName() + "-wellFormed",
-			MimeTypeMapper.XHTML_MIME_TYPE, getClass().getName(),
-			"HTML (Well-Formed)", "XHTML and well-formed HTML documents", //$NON-NLS-1$
-			Parameters.WELLFORMED_PARAMETERS));
+				MimeTypeMapper.XHTML_MIME_TYPE, getClass().getName(),
+				"HTML (Well-Formed)", "XHTML and well-formed HTML documents", //$NON-NLS-1$
+				Parameters.WELLFORMED_PARAMETERS));
+	}
+
+	@Override
+	public void open(RawDocument input, boolean generateSkeleton) {
+		// try to detect a document encoding
+		String encoding = detectEncoding(input);
+		
+		setCurrentDocName(input.getInputURI() == null ? "" : input.getInputURI().getPath());
+		
+		// rewrite tidied file (make sure all attribute values have quotes)
+		try {
+			tempSourceInput = StreamedSourceCopy.htmlTidiedRewrite(input, isDocumentEncoding(), encoding, isBOM());
+		} catch (IOException e) {
+			throw new OkapiIOException("Error generating tidied source temp file", e);
+		}
+				
+		super.open(tempSourceInput, generateSkeleton);
 	}
 
 	/**
@@ -77,11 +101,29 @@ public class HtmlFilter extends AbstractMarkupFilter {
 	protected void startFilter() {
 		super.startFilter();
 		if (!getConfig().isGlobalPreserveWhitespace()) {
-			LOGGER.log(Level.FINE,
+			LOGGER.log(
+					Level.FINE,
 					"By default the HTML filter will collapse whitespace unless overridden in the configuration"); //$NON-NLS-1$
 		}
 		getEventBuilder().initializeCodeFinder(getConfig().isUseCodeFinder(),
 				getConfig().getCodeFinderRules());
+	}
+	
+	/**
+	 * End the current filter processing and send the {@link Ending} {@link Event}
+	 */
+	@Override
+	protected void endFilter() {
+		super.endFilter();
+		
+		// delete temp source file
+		if (tempSourceInput != null) {
+			tempSourceInput.close();
+			boolean success = (new File(tempSourceInput.getInputURI())).delete();
+			if (!success) {
+				(new File(tempSourceInput.getInputURI())).deleteOnExit();
+			}
+		}
 	}
 
 	@Override
@@ -93,13 +135,15 @@ public class HtmlFilter extends AbstractMarkupFilter {
 			return;
 		}
 
-		// otherwise we can't assume a valid end tag and we must close any TextUnits when we see a non inline tag
+		// otherwise we can't assume a valid end tag and we must close any
+		// TextUnits when we see a non inline tag
 		if (segment instanceof Tag) {
 			// We just hit a tag that could close the current TextUnit
 			final Tag tag = (Tag) segment;
 			boolean inlineTag = false;
 			if (getConfig().getElementRuleType(tag.getName()) == RULE_TYPE.INLINE_ELEMENT
-					|| (getEventBuilder().isInsideTextRun() && (tag.getTagType() == StartTagType.COMMENT || tag
+					|| (getEventBuilder().isInsideTextRun() && (tag
+							.getTagType() == StartTagType.COMMENT || tag
 							.getTagType() == StartTagType.XML_PROCESSING_INSTRUCTION)))
 				inlineTag = true;
 
@@ -115,19 +159,19 @@ public class HtmlFilter extends AbstractMarkupFilter {
 	 * Overridden to support non-wellformed (unbalanced tag exceptions in HTML)
 	 */
 	protected RULE_TYPE updateEndTagRuleState(EndTag endTag) {
-		RULE_TYPE ruleType = getConfig().getElementRuleType(endTag.getName()); 
+		RULE_TYPE ruleType = getConfig().getElementRuleType(endTag.getName());
 		RuleType currentState = null;
-		
-		switch(ruleType) {
+
+		switch (ruleType) {
 		case INLINE_ELEMENT:
 			try {
 				currentState = getRuleState().popInlineRule();
 				ruleType = currentState.ruleType;
 			} catch (EmptyStackException e) {
-				// empty stack means the inline tags are not wellformed. 
+				// empty stack means the inline tags are not wellformed.
 				// assume the tag is a valid inline tag - even if
 				// it doesn't have a mate
-			}			
+			}
 			break;
 		case ATTRIBUTES_ONLY:
 			// TODO: add a rule state for ATTRIBUTE_ONLY rules
@@ -151,71 +195,84 @@ public class HtmlFilter extends AbstractMarkupFilter {
 			try {
 				currentState = getRuleState().popTextUnitRule();
 				ruleType = currentState.ruleType;
-			} catch (EmptyStackException e) {	
-				// empty stack means the text unit tags are not wellformed. 
-				// we try our best to recover by ending the current TextUnit	
-				// The EventBuilder should handle this case where there is an 
-				// TextUnit end tag without a TextUnit. It will simply be turned 
+			} catch (EmptyStackException e) {
+				// empty stack means the text unit tags are not wellformed.
+				// we try our best to recover by ending the current TextUnit
+				// The EventBuilder should handle this case where there is an
+				// TextUnit end tag without a TextUnit. It will simply be turned
 				// into a DocumentPart
 			}
 			break;
-		default:				
+		default:
 			break;
-		}	
-		
+		}
+
 		if (currentState != null) {
-			// if the end tag doesn't match with what is on the stack then assume the default (non-conditional) rule
+			// if the end tag doesn't match with what is on the stack then
+			// assume the default (non-conditional) rule
 			if (!currentState.ruleName.equalsIgnoreCase(endTag.getName())) {
 				ruleType = getConfig().getElementRuleType(endTag.getName());
-				
-				String character = Integer.toString(endTag.getBegin());			
-				LOGGER.log(Level.FINE,
-						"End tag " + endTag.getName() + " and start tag " + currentState.ruleName 
+
+				String character = Integer.toString(endTag.getBegin());
+				LOGGER.log(Level.FINE, "End tag " + endTag.getName()
+						+ " and start tag " + currentState.ruleName
 						+ " do not match at character number " + character);
 			}
 		}
-		
+
 		return ruleType;
 	}
-	
+
 	@Override
 	protected PropertyTextUnitPlaceholder createPropertyTextUnitPlaceholder(
-			PlaceholderAccessType type, String name, String value, Tag tag, Attribute attribute) {
+			PlaceholderAccessType type, String name, String value, Tag tag,
+			Attribute attribute) {
 
 		String normalizeAttributeName = normalizeAttributeName(name, value, tag);
 
 		// Test for charset in meta tag - we need to isolate the position of
 		// charset within the attribute value
 		// i.e., content="text/html; charset=ISO-2022-JP"
-		if (isMetaCharset(name, value, tag) && value.toLowerCase().indexOf("charset=") != -1) { //$NON-NLS-1$
+		if (isMetaCharset(name, value, tag)
+				&& value.toLowerCase().indexOf("charset=") != -1) { //$NON-NLS-1$
 			// offset of attribute
 			int mainStartPos = attribute.getBegin() - tag.getBegin();
 			int mainEndPos = attribute.getEnd() - tag.getBegin();
 
 			// adjust offset of value of the attribute
-			int charsetValueOffset = value.toLowerCase().lastIndexOf("charset=") + "charset=".length(); //$NON-NLS-1$
+			int charsetValueOffset = value.toLowerCase()
+					.lastIndexOf("charset=") + "charset=".length(); //$NON-NLS-1$
 
 			int valueStartPos = (attribute.getValueSegment().getBegin() + charsetValueOffset)
 					- tag.getBegin();
-			int valueEndPos = attribute.getValueSegment().getEnd() - tag.getBegin();
+			int valueEndPos = attribute.getValueSegment().getEnd()
+					- tag.getBegin();
 
 			// get the charset value (encoding)
 			String v = tag.toString().substring(valueStartPos, valueEndPos);
-			return new PropertyTextUnitPlaceholder(type, normalizeAttributeName, v, mainStartPos,
-					mainEndPos, valueStartPos, valueEndPos);
+			return new PropertyTextUnitPlaceholder(type,
+					normalizeAttributeName, v, mainStartPos, mainEndPos,
+					valueStartPos, valueEndPos);
 		}
 
 		// name is normalized in super-class
-		return super.createPropertyTextUnitPlaceholder(type, name, getEventBuilder()
-				.normalizeHtmlText(value, true, isPreserveWhitespace()), tag, attribute);
+		return super.createPropertyTextUnitPlaceholder(
+				type,
+				name,
+				getEventBuilder().normalizeHtmlText(value, true,
+						isPreserveWhitespace()), tag, attribute);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see net.sf.okapi.common.markupfilter.BaseMarkupFilter#normalizeName(java. lang.String)
+	 * 
+	 * @see
+	 * net.sf.okapi.common.markupfilter.BaseMarkupFilter#normalizeName(java.
+	 * lang.String)
 	 */
 	@Override
-	protected String normalizeAttributeName(String attrName, String attrValue, Tag tag) {
+	protected String normalizeAttributeName(String attrName, String attrValue,
+			Tag tag) {
 		// normalize values for HTML
 		String normalizedName = attrName;
 
@@ -231,7 +288,8 @@ public class HtmlFilter extends AbstractMarkupFilter {
 				&& attrName.equalsIgnoreCase(HtmlEncoder.CONTENT)) {
 			StartTag st = (StartTag) tag;
 			if (st.getAttributeValue("http-equiv") != null) {
-				if (st.getAttributeValue("http-equiv").equalsIgnoreCase("Content-Language")) {
+				if (st.getAttributeValue("http-equiv").equalsIgnoreCase(
+						"Content-Language")) {
 					normalizedName = Property.LANGUAGE;
 					return normalizedName;
 				}
@@ -239,7 +297,8 @@ public class HtmlFilter extends AbstractMarkupFilter {
 		}
 
 		// <x lang="en"> or <x xml:lang="en">
-		if (attrName.equalsIgnoreCase("lang") || attrName.equalsIgnoreCase("xml:lang")) {
+		if (attrName.equalsIgnoreCase("lang")
+				|| attrName.equalsIgnoreCase("xml:lang")) {
 			normalizedName = Property.LANGUAGE;
 		}
 
@@ -252,8 +311,10 @@ public class HtmlFilter extends AbstractMarkupFilter {
 			StartTag st = (StartTag) tag;
 			if (st.getAttributeValue("http-equiv") != null
 					&& st.getAttributeValue("content") != null) {
-				if (st.getAttributeValue("http-equiv").equalsIgnoreCase("Content-Type")
-						&& st.getAttributeValue("content").toLowerCase().contains("charset=")) {
+				if (st.getAttributeValue("http-equiv").equalsIgnoreCase(
+						"Content-Type")
+						&& st.getAttributeValue("content").toLowerCase()
+								.contains("charset=")) {
 					return true;
 				}
 			}
@@ -268,7 +329,10 @@ public class HtmlFilter extends AbstractMarkupFilter {
 
 	/*
 	 * (non-Javadoc)
-	 * @see net.sf.okapi.common.filters.IFilter#setParameters(net.sf.okapi.common .IParameters)
+	 * 
+	 * @see
+	 * net.sf.okapi.common.filters.IFilter#setParameters(net.sf.okapi.common
+	 * .IParameters)
 	 */
 	public void setParameters(IParameters params) {
 		this.parameters = (Parameters) params;
@@ -276,6 +340,7 @@ public class HtmlFilter extends AbstractMarkupFilter {
 
 	/*
 	 * (non-Javadoc)
+	 * 
 	 * @see net.sf.okapi.common.filters.IFilter#getParameters()
 	 */
 	public IParameters getParameters() {

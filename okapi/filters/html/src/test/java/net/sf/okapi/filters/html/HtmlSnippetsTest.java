@@ -155,32 +155,32 @@ public class HtmlSnippetsTest {
 
 	@Test
 	public void testPWithAttributes() {
-		String snippet = "<p title='my title' dir='rtl'>Text of p</p>";
+		String snippet = "<p title=\"my title\" dir=\"rtl\">Text of p</p>";
 		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, locEN));
 	}
 
 	@Test
 	public void testLang() {
-		String snippet = "<p lang='en'>Text of p</p>";
+		String snippet = "<p lang=\"en\">Text of p</p>";
 		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, locEN));
 	}
 
 	@Test
 	public void testLangUpdate() {
-		String snippet = "<p lang='en'>Text <span lang='en'>text</span> text</p>";
-		assertEquals("<p lang='fr'>Text <span lang='fr'>text</span> text</p>", generateOutput(getEvents(snippet),
+		String snippet = "<p lang=\"en\">Text <span lang=\"en\">text</span> text</p>";
+		assertEquals("<p lang=\"fr\">Text <span lang=\"fr\">text</span> text</p>", generateOutput(getEvents(snippet),
 				snippet, locFR));
 	}
 
 	@Test
 	public void testMultilangUpdate() {
-		String snippet = "<p lang='en'>Text</p><p lang='ja'>JA text</p>";
-		assertEquals("<p lang='fr'>Text</p><p lang='ja'>JA text</p>", generateOutput(getEvents(snippet), snippet, locFR));
+		String snippet = "<p lang=\"en\">Text</p><p lang=\"ja\">JA text</p>";
+		assertEquals("<p lang=\"fr\">Text</p><p lang=\"ja\">JA text</p>", generateOutput(getEvents(snippet), snippet, locFR));
 	}
 
 	@Test
 	public void testComplexEmptyElement() {
-		String snippet = "<dummy write=\"w\" readonly=\"ro\" trans=\"tu1\" />";
+		String snippet = "<dummy write=\"w\" readonly=\"ro\" trans=\"tu1\"/>";
 		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, locEN));
 	}
 
@@ -356,15 +356,11 @@ public class HtmlSnippetsTest {
 		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, locEN));
 	}
 	
-	/*
-	 * Issue 126: Problem with un-quoted translatable attributes
-	 * This will fail until fixed!!!
 	@Test
 	public void textWithUnquotedAttribtes() {
 		String snippet = "<img alt=R&amp;D src=image.png>";
 		assertEquals("<img alt=\"R&amp;D\" src=\"image.png\">", generateOutput(getEvents(snippet), snippet, locEN));
 	}
-	*/
 	
 	@Test
 	public void table() {

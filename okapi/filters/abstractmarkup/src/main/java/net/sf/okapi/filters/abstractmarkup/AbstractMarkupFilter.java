@@ -95,12 +95,15 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	private Iterator<Segment> nodeIterator;
 	private boolean hasUtf8Bom;
 	private boolean hasUtf8Encoding;
+	private boolean hasBOM;
 	private EventBuilder eventBuilder;
 	private RawDocument currentRawDocument;
 	private ExtractionRuleState ruleState;
 	@SubFilter() // make this IFilter a subfilter 
 	private IFilter cdataSubfilter;
 	private String currentId;
+	private boolean documentEncoding;
+	private String currentDocName;
 	
 	static {
 		Config.ConvertNonBreakingSpaces = false;
@@ -115,7 +118,9 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		this.bufferedWhitespace = new StringBuilder();
 		this.hasUtf8Bom = false;
 		this.hasUtf8Encoding = false;
+		this.hasBOM = false;
 		this.currentId = null;
+		this.documentEncoding = false;
 	}
 
 	/**
@@ -126,7 +131,9 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		this.bufferedWhitespace = new StringBuilder();
 		this.hasUtf8Bom = false;
 		this.hasUtf8Encoding = false;
+		this.hasBOM = false;
 		this.currentId = null;
+		this.documentEncoding = false;
 	}
 
 	/**
@@ -167,7 +174,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	/*
 	 * Get PREVIEW_BYTE_COUNT bytes so we can sniff out any encoding information in XML or HTML files
 	 */
-	private Source getParsedHeader(final InputStream inputStream) {
+	protected Source getParsedHeader(final InputStream inputStream) {
 		try {
 			final byte[] bytes = new byte[PREVIEW_BYTE_COUNT];
 			int i;
@@ -188,6 +195,37 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 
 			}
 		}
+	}
+	
+	protected String detectEncoding(RawDocument input) {
+		BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input.getStream(),
+				input.getEncoding());
+		detector.detectAndRemoveBom();
+
+		setEncoding(detector.getEncoding());
+		hasUtf8Bom = detector.hasUtf8Bom();
+		hasUtf8Encoding = detector.hasUtf8Encoding();
+		hasBOM = detector.hasBom();
+		setNewlineType(detector.getNewlineType().toString());
+
+		Source parsedHeader = getParsedHeader(input.getStream());
+		String detectedEncoding = parsedHeader.getDocumentSpecifiedEncoding();
+		documentEncoding = detectedEncoding == null ? false : true; 
+
+		if (detectedEncoding == null && getEncoding() != null) {
+			detectedEncoding = getEncoding();
+			LOGGER.log(Level.FINE, String.format(
+					"Cannot auto-detect encoding. Using the default encoding (%s)", getEncoding()));
+		} else if (getEncoding() == null) {
+			detectedEncoding = parsedHeader.getEncoding(); // get best guess
+			LOGGER.log(
+					Level.FINE,
+					String.format(
+							"Default encoding and detected encoding not found. Using best guess encoding (%s)",
+							detectedEncoding));
+		}
+
+		return detectedEncoding;
 	}
 
 	/**
@@ -218,36 +256,15 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 
 		currentRawDocument = input;
 
-		if (input.getInputURI() != null) {
+		// doc name may be set by sub-classes
+		if (getCurrentDocName() != null) {
+			setDocumentName(getCurrentDocName());
+		} else if (input.getInputURI() != null) {
 			setDocumentName(input.getInputURI().getPath());
 		}
 
-		BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input.getStream(),
-				input.getEncoding());
-		detector.detectAndRemoveBom();
-
-		setEncoding(detector.getEncoding());
-		hasUtf8Bom = detector.hasUtf8Bom();
-		hasUtf8Encoding = detector.hasUtf8Encoding();
-		setNewlineType(detector.getNewlineType().toString());
-
-		Source parsedHeader = getParsedHeader(input.getStream());
-		String detectedEncoding = parsedHeader.getDocumentSpecifiedEncoding();
-
-		if (detectedEncoding == null && getEncoding() != null) {
-			detectedEncoding = getEncoding();
-			LOGGER.log(Level.FINE, String.format(
-					"Cannot auto-detect encoding. Using the default encoding (%s)", getEncoding()));
-		} else if (getEncoding() == null) {
-			detectedEncoding = parsedHeader.getEncoding(); // get best guess
-			LOGGER.log(
-					Level.FINE,
-					String.format(
-							"Default encoding and detected encoding not found. Using best guess encoding (%s)",
-							detectedEncoding));
-		}
-
 		try {
+			String detectedEncoding = detectEncoding(input);
 			input.setEncoding(detectedEncoding);
 			setOptions(input.getSourceLocale(), input.getTargetLocale(), detectedEncoding,
 					generateSkeleton);
@@ -255,6 +272,8 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		} catch (IOException e) {
 			throw new OkapiIOException("Filter could not open input stream", e);
 		}
+		
+		currentDocName = null;
 
 		startFilter();
 	}
@@ -1102,6 +1121,23 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	protected boolean isUtf8Bom() {
 		return hasUtf8Bom;
 	}
+	
+	/**
+	 * Does the input have a BOM?
+	 * 
+	 * @return true if the document has a BOM.
+	 */
+	protected boolean isBOM() {
+		return hasBOM;
+	}
+	
+	/**
+	 * Does this document have a document encoding specified? 
+	 * @return true if has meta tag with encoding, false otherwise
+	 */
+	protected boolean isDocumentEncoding() {
+		return documentEncoding;
+	}
 
 	/**
 	 * 
@@ -1143,6 +1179,14 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	
 	protected void setTextUnitTranslatable(boolean translatable) {
 		eventBuilder.setTextUnitTranslatable(translatable);
+	}
+
+	protected void setCurrentDocName(String currentDocName) {
+		this.currentDocName = currentDocName;
+	}
+
+	protected String getCurrentDocName() {
+		return currentDocName;
 	}
 
 	protected boolean canStartNewTextUnit() {
