@@ -56,10 +56,12 @@ public class Project {
 	private TransifexClient cli;
 	
 	public Project () {
-		reset();
+		reset(LocaleId.ENGLISH, LocaleId.FRENCH);
 	}
 	
-	private void reset () {
+	private void reset (LocaleId srcLoc,
+		LocaleId trgLoc)
+	{
 		path = null;
 		resourceIds = new ArrayList<ResourceInfo>();
 		setHost("http://www.transifex.net");
@@ -67,8 +69,8 @@ public class Project {
 		setPassword("");
 		setPassword("");
 		cli = null;
-		sourceLocale = LocaleId.ENGLISH;
-		targetLocale = LocaleId.FRENCH;
+		sourceLocale = srcLoc;
+		targetLocale = trgLoc;
 	}
 	
 	public String getHost () {
@@ -166,7 +168,7 @@ public class Project {
 		LocaleId trgLoc)
 		throws IOException
 	{
-		reset();
+		reset(srcLoc, trgLoc);
 		String line = br.readLine();
 		while ( line != null ) {
 			line = line.trim();
@@ -185,20 +187,15 @@ public class Project {
 					else if ( line.startsWith(PROJECTID) ) {
 						setProjectId(line.substring(n+1).trim());
 					}
+					// Source and target from the file are used only as fall-back
 					else if ( line.startsWith(SOURCELOCALE) ) {
-						if ( srcLoc == null ) {
+						if ( sourceLocale == null ) {
 							setSourceLocale(LocaleId.fromString(line.substring(n+1).trim()));
-						}
-						else {
-							setSourceLocale(srcLoc);
 						}
 					}
 					else if ( line.startsWith(TARGETLOCALE) ) {
-						if ( trgLoc == null ) {
+						if ( targetLocale == null ) {
 							setTargetLocale(LocaleId.fromString(line.substring(n+1).trim()));
-						}
-						else {
-							setTargetLocale(trgLoc);
 						}
 					}
 				}
