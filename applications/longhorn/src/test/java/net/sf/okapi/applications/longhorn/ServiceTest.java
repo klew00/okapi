@@ -43,11 +43,6 @@ public class ServiceTest {
 	private static final String SERVICE_BASE_URL = "http://localhost:9095/okapi-longhorn";
 	
 	@Test
-	public void dummy() {
-		
-	}
-
-	//@Test
 	public void runRainbowProject() throws Exception {
 		
 		LonghornService ws = new RESTService(new URI(SERVICE_BASE_URL));

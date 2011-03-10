@@ -135,6 +135,10 @@ public class RawDocumentToFilterEventsStep extends BasePipelineStep {
 			filter.open(event.getRawDocument());
 			// Return the first event from the filter
 			return filter.next();
+			
+		case END_DOCUMENT:
+			filter.close();
+			return event;
 		}
 
 		if ( isDone ) {
