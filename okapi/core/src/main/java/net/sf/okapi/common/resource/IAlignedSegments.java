@@ -35,6 +35,14 @@ import net.sf.okapi.common.LocaleId;
  */
 public interface IAlignedSegments extends Iterable<Segment> {
 
+    //TODO consider whether it would be more appropriate to retrieve an
+    // aligned segment object for a specific target locale, as this would
+    // allow easy selection of the appropriate source.
+    // An alternative would be to have an AlignedSegments object aware of the
+    // difference between default and variant source, and perform operations
+    // as appropriate, or just to always request the source from the parent
+    // ITextUnit
+
 	/**
 	 * Gets an iterator for the source segments of this text unit.
 	 * This iterator does not iterate through non-segment parts of the content.

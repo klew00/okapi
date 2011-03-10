@@ -26,71 +26,60 @@ import net.sf.okapi.common.annotation.IAnnotation;
 
 /**
  * EXPERIMENTAL interface. Do not use yet.
- * 
- * Extends ITextUnit to allow the creation and manipulation of different source
- * versions for different locales.
  *
- * Custom sources are created using createCustomSource and removed using
- * removeCustomSource. Custom sources can be manipulated with methods from
- * ITextUnit after setting the target locale with setActiveTargetLocale. Methods
- * in this interface do not require the active target locale to be set.
+ * Provides methods to allow the creation and manipulation of different source
+ * versions for different locales of an {@link ITextUnit} object.
+ *
+ * To create an instance of this interface, use the method {@link ITextUnit#getCustomSources()}.
  *
  * @author David Mason, dr.d.mason@gmail.com
  */
-public interface IMultiSourceTextUnit extends ITextUnit {
+public interface IVariantSources extends Iterable<TextContainer> {
 
     /**
-     * Sets all this text unit's fields to values from the given text unit,
-     * effectively making this text unit a clone of the original but with the
-     * capacity to deal with multiple sources.
+     * Indicates if the source text for the given target locale is empty. Result
+     * will be for the default source if there is no custom source for the given
+     * locale, or the given locale is null.
      *
-     * @param original an ITextUnit object to copy
-     * @throws NullPointerException if original is null
-     */
-    public void copyFromSingleSource(ITextUnit original) throws NullPointerException;
-
-    /**
-     * Sets the target locale for the source that will be accessed in the standard
-     * ITextUnit methods. Default source will be used if no custom source is
-     * associated with the given locale, or if the given locale is null.
-     * @param targetLocale the locale for the source to be accessed
-     */
-    public void setActiveTargetLocale(LocaleId targetLocale);
-
-    /**
-     * Indicates if the source text for the given target locale is empty.
      * @param targetLocale the target locale for the source to check
      * @return true if the source text (may be the default source) for the given
      *         locale is empty, false otherwise
      */
     public boolean isSourceEmpty(LocaleId targetLocale);
-    
+
     /**
      * Creates a custom source for a given target locale, using the content of the
-     * default source.
+     * default source according to the specified options.
      *
      * @param targetLocale the target locale that uses the new source
      * @param overwriteExisting overwrites any existing source associated with
      *                          the locale if true
-     * @return the newly created source, or the existing source if it was not
-     *         overwritten, or null if the
+     * @param creationOptions creation options:
+     * <ul><li>CREATE_EMPTY: Create an empty source object.</li>
+     * <li>COPY_CONTENT: Copy the text of the default source (and any associated in-line code).</li>
+     * <li>COPY_PROPERTIES: Copy the default source properties.</li>
+     * <li>COPY_SEGMENTS: Copy the default source segmentation.</li>
+     * <li>COPY_ALL: Same as (COPY_CONTENT|COPY_PROPERTIES|COPY_SEGMENTS).</li></ul>
+     * @return the source object that was created or retrieved, or null if the
      */
-    public TextContainer createCustomSource(LocaleId targetLocale, boolean overwriteExisting);
-    //TODO add creation options
+    public TextContainer createSource(LocaleId targetLocale,
+                                      boolean overwriteExisting,
+                                      int creationOptions);
 
 
     /**
-     * Creates a custom source for a given locale, using the provided text.
+     * Creates a custom source for a given locale, using the provided text container.
      * @param sourceText the text to include in this source
      * @param targetLocale the target locale that uses the new source
      * @param overwriteExisting overwrites any existing source associated with
      *                          the locale if true
-     * @return the newly created source
+     * @return the source object that was created or retrieved
      */
-    public TextContainer createCustomSource(String sourceText,
-                                            LocaleId targetLocale,
-                                            boolean overwriteExisting);
-    //TODO add creation options
+    public TextContainer createSource(TextContainer sourceText,
+                                      LocaleId targetLocale,
+                                      boolean overwriteExisting);
+    //TODO think about whether to keep this method at all - custom sources
+    //     should be based on default source after all
 
 
     /**
@@ -106,12 +95,13 @@ public interface IMultiSourceTextUnit extends ITextUnit {
     /**
      * Sets the source object to use for the given target locale. Any existing
      * custom source object for the target locale will be overwritten.
-     * 
+     *
      * @param targetLocale the target locale that will use the given source object
      * @param textContainer the source object to use for the given target locale
      * @return the source object that has been set
+     * @throws IllegalArgumentException if the target locale is null
      */
-    public TextContainer setCustomSource(LocaleId targetLocale, TextContainer textContainer);
+    public TextContainer setSource(LocaleId targetLocale, TextContainer textContainer) throws IllegalArgumentException;
 
     /**
      * Removes any custom source used for the given target locale. Any associated
@@ -119,14 +109,21 @@ public interface IMultiSourceTextUnit extends ITextUnit {
      * misalignment of segments between the target and default source.
      *
      * @param targetLocale the locale for which to remove custom source
+     * @throws IllegalArgumentException if the target locale is null
      */
-    public void removeCustomSource(LocaleId targetLocale);
+    public void removeSource(LocaleId targetLocale) throws IllegalArgumentException;
 
     /**
-     * Indicates whether there are any custom sources used in this text unit
-     * @return true if there are one or more custom sources, false if there are none
+     * Indicates the number of custom sources stored in this custom source object
+     * @return the number of custom sources stored in this CustomSources object
      */
-    public boolean hasCustomSource();
+    public int count();
+
+    /**
+     * Indicates whether this custom source object contains any custom sources
+     * @return true if there are no custom sources in this custom sources object
+     */
+    public boolean empty();
 
     /**
      * Indicates whether there is a custom source for the given locale
@@ -134,24 +131,30 @@ public interface IMultiSourceTextUnit extends ITextUnit {
      * @param targetLocale the locale to check for custom sources
      * @return true if there is a custom source object for the given locale,
      *         false otherwise. Returns false if null target locale is given.
-     * @throws NullPointerException if targetLocale is null
+     * @throws IllegalArgumentException if targetLocale is null
      */
-    public boolean hasCustomSource(LocaleId targetLocale) throws NullPointerException;
+    public boolean hasCustomSource(LocaleId targetLocale) throws IllegalArgumentException;
 
     /**
      * Sets the content of the custom source for the given target locale. Creates
      * a custom source if one does not exist for the given locale. Replaces any
      * existing content for the source of the given locale.
      *
-     * TODO discuss adding an overwriteExisting flag
+     * TODO consider adding an overwriteExisting flag
      *
      * @param targetLocale the locale for which to set the source content
      *                     null to set for default source
      * @param content the content to use for the source of the given locale
      * @return the source content that was set.
-     * @throws NullPointerException if targetLocale is null
+     * @throws IllegalArgumentException if targetLocale is null
      */
-    public TextFragment setCustomSourceContent(LocaleId targetLocale, TextFragment content) throws NullPointerException;
+    public TextFragment setSourceContent(LocaleId targetLocale, TextFragment content) throws IllegalArgumentException;
+
+
+
+    //TODO consider the implications of using a locale with no custom source
+    //     as having multiple targets using default source could cause alignment
+    //     problems.
 
     /**
      * Creates a new {@link IAlignedSegments} object to access and manipulate the
@@ -161,9 +164,7 @@ public interface IMultiSourceTextUnit extends ITextUnit {
      * @return a new {@link IAlignedSegments} object
      */
     public IAlignedSegments getSegments(LocaleId targetLocale);
-    //TODO consider the implications of using a locale with no custom source
-    //     as having multiple targets using default source could cause alignment
-    //     problems.
+
 
     /**
      * Gets the segments for the source used for the given target locale.
@@ -198,7 +199,7 @@ public interface IMultiSourceTextUnit extends ITextUnit {
     public Set<LocaleId> getTargetLocalesWithCustomSource();
 
 
-    
+
     //TODO consider adding COPY_OPTIONS to the following methods if there is any call for it
 
     /**
@@ -212,7 +213,7 @@ public interface IMultiSourceTextUnit extends ITextUnit {
      * @param overwriteExisting true to overwrite an existing property if present
      */
     public void propagateSourceProperty(LocaleId from, LocaleId to, String propertyName, boolean overwriteExisting);
-    
+
     /**
      * Copies a single property from one source version to all other source versions.
      *
@@ -244,7 +245,7 @@ public interface IMultiSourceTextUnit extends ITextUnit {
      */
     public void propagateAllSourceProperties(LocaleId from, boolean overwriteExisting);
 
-    
+
     /**
      * Copies a single annotation from one source version to another source version.
      *
@@ -296,7 +297,7 @@ public interface IMultiSourceTextUnit extends ITextUnit {
      * @param name The name of the source property to retrieve.
      * @return The property or null if it does not exist.
      */
-    public Property getSourceProperty (LocaleId targetLocale, String name);
+    public Property getSourceProperty(LocaleId targetLocale, String name);
 
     /**
      * Sets a source property. If a property already exists it is overwritten.
@@ -304,7 +305,7 @@ public interface IMultiSourceTextUnit extends ITextUnit {
      * @param property The new property to set.
      * @return The property that has been set.
      */
-    public Property setSourceProperty (LocaleId targetLocale, Property property);
+    public Property setSourceProperty(LocaleId targetLocale, Property property);
 
     /**
      * Removes a source property of a given name. If the property does not exists
@@ -312,14 +313,14 @@ public interface IMultiSourceTextUnit extends ITextUnit {
      * @param targetLocale the target locale of the source
      * @param name The name of the property to remove.
      */
-    public void removeSourceProperty (LocaleId targetLocale, String name);
+    public void removeSourceProperty(LocaleId targetLocale, String name);
 
     /**
      * Gets the names of all the source properties for this resource.
      * @param targetLocale the target locale of the source
      * @return All the names of the source properties for this resource.
      */
-    public Set<String> getSourcePropertyNames (LocaleId targetLocale);
+    public Set<String> getSourcePropertyNames(LocaleId targetLocale);
 
     /**
      * Indicates if a source property exists for a given name.
@@ -327,15 +328,6 @@ public interface IMultiSourceTextUnit extends ITextUnit {
      * @param name The name of the source property to query.
      * @return True if a source property exists, false otherwise.
      */
-    public boolean hasSourceProperty (LocaleId targetLocale, String name);
-
-
-
-
-    //TODO consider methods such as:
-    //     - appending text to all sources at once
-    //     - comparing sources to determine which are identical
-    //           to count unique sources
-    //           to modify all identical sources at once
+    public boolean hasSourceProperty(LocaleId targetLocale, String name);
 
 }

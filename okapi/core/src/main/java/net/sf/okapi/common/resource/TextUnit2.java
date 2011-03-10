@@ -886,5 +886,15 @@ public class TextUnit2 implements ITextUnit {
 		}
 		return seg;
 	}
+
+    @Override
+    public boolean hasVariantSource() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public IVariantSources getVariantSources() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 	
 }
