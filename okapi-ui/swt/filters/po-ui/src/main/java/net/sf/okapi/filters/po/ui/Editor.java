@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -50,6 +50,7 @@ public class Editor implements IParametersEditor {
 	private Shell shell;
 	private boolean result = false;
 	//private LDPanel pnlLD;
+	private Button chkProtectApproved;
 	private Button rdBilingualMode;
 	private Text edBModeNote;
 	private Button rdMonolingualMode;
@@ -109,6 +110,9 @@ public class Editor implements IParametersEditor {
 		layTmp = new GridLayout();
 		cmpTmp.setLayout(layTmp);
 		
+		chkProtectApproved = new Button(cmpTmp, SWT.CHECK);
+		chkProtectApproved.setText("Protect approved entries (entries not empty and not fuzzy)");
+
 		Group grpTmp = new Group(cmpTmp, SWT.NONE);
 		layTmp = new GridLayout();
 		grpTmp.setLayout(layTmp);
@@ -249,6 +253,8 @@ public class Editor implements IParametersEditor {
 	}
 
 	private void setData () {
+		chkProtectApproved.setSelection(params.getProtectApproved());
+		
 		rdBilingualMode.setSelection(params.getBilingualMode());
 		rdMonolingualMode.setSelection(!params.getBilingualMode());
 		chkMakeID.setSelection(params.getMakeID());
@@ -272,6 +278,7 @@ public class Editor implements IParametersEditor {
 			params.getCodeFinder().fromString(tmp);
 		}
 		
+		params.setProtectApproved(chkProtectApproved.getSelection());
 		params.setMakeID(chkMakeID.getSelection());
 		params.setBilingualMode(rdBilingualMode.getSelection());
 		

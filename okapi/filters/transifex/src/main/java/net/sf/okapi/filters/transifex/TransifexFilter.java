@@ -199,7 +199,7 @@ public class TransifexFilter implements IFilter {
 					return;
 				}
 			}
-
+			
 			// Initialize the iteration
 			iter = proj.getResources().iterator();
 			hasMoreDoc = true;
@@ -287,6 +287,10 @@ public class TransifexFilter implements IFilter {
 			return false;
 		}
 
+		// Set the options for the PO filter
+		pof.getParameters().setBoolean(net.sf.okapi.filters.po.Parameters.PROTECTAPPROVED,
+			proj.getProtectApproved());
+		
 		// Open the local copy for processing
 		RawDocument rd = new RawDocument(new File(outputPath).toURI(), "UTF-8",
 			proj.getSourceLocale(), proj.getTargetLocale());
@@ -318,46 +322,5 @@ public class TransifexFilter implements IFilter {
 		
 		return true;
 	}
-
-//	@SuppressWarnings("unchecked")
-//	private void refreshResourceList () {
-//		// Get the list of resources in the given project
-//		Object[] res = cli.getResourceList(proj.getSourceLocale());
-//		if ( res[0] == null ) {
-//			logger.severe((String)res[1]);
-//			return;
-//		}
-//		Map<String, ResourceInfo> map = (Map<String, ResourceInfo>)res[2];
-//		List<ResourceInfo> list = proj.getResources();
-//		if ( map.isEmpty() ) {
-//			list.clear();
-//			logger.warning(String.format("The project '%s' has no resources for '%s'.",
-//				proj.getProjectId(), proj.getSourceLocale()));
-//		}
-//
-//		// Make a temporary copy of the existing list
-//		List<ResourceInfo> oldList = new ArrayList<ResourceInfo>();
-//		oldList.addAll(list);
-//		list.clear();
-//		
-//		// Fill the new list
-//		for ( String resId : map.keySet() ) {
-//			ResourceInfo info = map.get(resId);
-//			if ( "PO".equals(info.getI18nType()) ) {
-//				list.add(info);
-//				// Try to preserve the existing selection
-//				for ( int i=0; i<oldList.size(); i++ ) {
-//					if ( oldList.get(i).getId().equals(resId) ) {
-//						info.setSelected(oldList.get(i).getSelected());
-//						break;
-//					}
-//				}
-//			}
-//		}
-//		if ( list.isEmpty() ) {
-//			logger.warning(String.format("The project '%s' has no PO-based resources for '%s'.",
-//				proj.getProjectId(), proj.getSourceLocale()));
-//		}
-//	}
 
 }

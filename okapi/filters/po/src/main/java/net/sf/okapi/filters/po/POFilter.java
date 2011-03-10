@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2010 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -78,7 +78,8 @@ public class POFilter implements IFilter {
 	private static final String DOMAIN_SEP = "::";
 	private static final String DOMAIN_NONE = "messages";
 	private static final String DOMAIN_DEFAULT = "default";
-	private static final int DEFAULT_NPLURALS = 2;  // Default = "Germanic langauges" (per Gettext doc)
+	private static final String TMPMARKER = "\u001E";
+	private static final int DEFAULT_NPLURALS = 2;  // Default = "Germanic languages" (per Gettext doc)
 
 	private static final int PLURALFORMS_VALUEGROUP = 3;
 	private static final Pattern pluralformsPattern = Pattern.compile(
@@ -548,6 +549,7 @@ public class POFilter implements IFilter {
 
 		// Get the message string
 		StringBuilder tmp = new StringBuilder(getQuotedString(false));
+		boolean trgIsEmpty = (tmp.length()==0);
 		
 		// Check for header entry, and update it if required
 		if ( msgID.length() == 0 ) {
@@ -557,7 +559,6 @@ public class POFilter implements IFilter {
 			dp.setMimeType(getMimeType());
 			tmp.insert(0, "\""+lineBreak+"\"");
 			tmp.append("\""+lineBreak);
-			String TMPMARKER = "\u001E";
 
 			// Look for encoding field
 			Matcher m = charsetPattern.matcher(tmp.toString());
@@ -671,163 +672,20 @@ public class POFilter implements IFilter {
 		if (( pluralMode != 0 ) && ( nPlurals == 1 ) && ( pluralCount-1 > 0 )) {
 			tu.setIsTranslatable(false);
 		}
-		// Else: it is TextUnit is translatable by default
+		else {
+			// Else: it is TextUnit is translatable by default
+			// Protect approved entries if needed
+			// (only if not empty)
+			if ( !hasFuzzyFlag && params.getProtectApproved() ) {
+				tu.setIsTranslatable(trgIsEmpty);
+			}
+		}
 		
 		skel.addContentPlaceholder(tu, trgLang);
 		skel.append("\""+lineBreak);
 		
 		return new Event(EventType.TEXT_UNIT, tu);
 	}
-
-/* Copy before Aug-22-09 changes
-	private Event processMsgStr () {
-		// Check for plural form
-		if ( textLine.indexOf("msgstr[") == 0 ) {
-			// Check if we are indeed in plural mode
-			if ( pluralMode == 0 ) {
-				throw new OkapiIllegalFilterOperationException(Res.getString("extraPluralMsgStr"));
-			}
-			// Check if we reached the last plural form
-			// Note that PO files have at least 2 plural entries even if nplural=1
-			pluralCount++;
-			switch ( nbPlurals ) {
-			case 1:
-			case 2:
-				if ( pluralCount == 2 ) pluralMode = 2;
-				break;
-			default: // Above 2
-				if ( pluralCount == nbPlurals ) pluralMode = 2;
-				break;
-			}
-			// Then proceed as a normal entry
-		}
-		else if ( pluralMode != 0 ) {
-			throw new OkapiIllegalFilterOperationException(Res.getString("missingPluralMsgStr"));
-		}
-
-		// Get the message string
-		String tmp = getQuotedString(false);
-		
-		// Check for header entry, and update it if required
-		if ( msgID.length() == 0 ) {
-			String id = otherId.createId();
-			DocumentPart dp = new DocumentPart(id, false, skel);
-			String part1 = "\""+lineBreak+"\""+tmp;
-			String part2 = "\""+lineBreak;
-			boolean hasProp = false;
-			
-			// Create the modifiable property for the encoding in the header
-			Matcher m = charsetPattern.matcher(tmp);
-			if ( m.find() ) { // Replace the encoding by the reference marker
-				dp.setProperty(new Property(Property.ENCODING, encoding, false));
-				part1 = "\""+lineBreak+"\""+tmp.substring(0, m.start(6));
-				hasProp = true;
-				part2 = tmp.substring(m.end(6))+"\""+lineBreak;
-			}
-			
-			//TODO: plural forms
-			
-			// Always reformat the lines for this entry
-			part1 = part1.replace("\\n", "\\n\""+lineBreak+"\"");
-			part2 = part2.replace("\\n", "\\n\""+lineBreak+"\"");
-			if ( part2.endsWith("\"\""+lineBreak) ) {
-				// Remove last empty string if needed
-				part2 = part2.substring(0, part2.length()-(2+lineBreak.length()));
-			}
-			
-			// Add the parts to the skeleton
-			skel.append(part1);
-			if ( hasProp ) {
-				skel.addValuePlaceholder(dp, Property.ENCODING, "");
-			}
-			if ( part2 != null ) {
-				skel.append(part2);
-			}
-			else skel.add(lineBreak);
-
-			// Send this entry as a document part
-			return new Event(EventType.DOCUMENT_PART, dp);
-		}
-
-		// Else: We have a text unit to send
-		// Create it if it was not done yet
-		if ( tu == null ) tu = new TextUnit(null);
-		// Set the ID and other info
-		tu.setId(String.valueOf(++tuId));
-		tu.setPreserveWhitespaces(true);
-		tu.setSkeleton(skel);
-		//TODO: Need to adjust for each format
-		tu.setMimeType(getMimeType());
-		
-		if ( locNote.length() > 0 ) {
-			tu.setProperty(new Property(Property.NOTE, locNote));
-		}
-		if ( transNote.length() > 0 ) {
-			tu.setProperty(new Property("transnote", transNote));
-		}
-		if ( references.length() > 0 ) {
-			tu.setProperty(new Property("references", references));
-		}
-
-		// Set the text and possibly its translation
-		// depending on the processing mode
-		if ( params.bilingualMode ) {
-			String sID = msgID;
-			if (( pluralMode != 0 ) && ( pluralCount-1 > 0 )) {
-				sID = msgIDPlural;
-			}
-			// Add the source text and parse it
-			toAbstract(tu.setSourceContent(new TextFragment(sID)));
-			// Create an ID if requested
-			if ( params.makeID ) {
-				// Note we always use msgID for resname, not msgIDPlural
-				if ( pluralMode == 0 ) {
-					tu.setName(Util.makeID(domain+DOMAIN_SEP+msgID));
-				}
-				else {
-					tu.setName(Util.makeID(domain+DOMAIN_SEP+msgID)
-						+ String.format("-%d", pluralCount-1));
-				}
-			}
-			// Set the translation if one exists
-			if ( tmp.length() > 0 ) {
-				TextContainer tc = tu.createTarget(trgLang, false, IResource.CREATE_EMPTY);
-				tc.setContent(toAbstract(new TextFragment(tmp)));
-				if ( !hasFuzzyFlag ) {
-					tu.setTargetProperty(trgLang, new Property(Property.APPROVED, "yes", true));
-				}
-				// Synchronizes source and target codes as much as possible
-				tc.synchronizeCodes(tu.getSourceContent());
-			}
-			//else { // Correct the approved property
-			//	tu.getTargetProperty(trgLang, Property.APPROVED).setValue("no");
-			//}
-		}
-		else { // Parameters.MODE_MONOLINGUAL
-			if ( pluralMode == 0 ) {
-				tu.setName(domain+DOMAIN_SEP+msgID);
-			}
-			else {
-				tu.setName(domain+DOMAIN_SEP+msgID
-					+ String.format("-%d", pluralCount-1));
-			}
-			// Add the source and parse it 
-			toAbstract(tu.setSourceContent(new TextFragment(tmp)));
-		}
-
-		// Translate flag should be set to no for no-0 case of 1-plural-type forms
-		// Should be true otherwise
-		if (( pluralMode != 0 ) && ( nbPlurals == 1 ) && ( pluralCount-1 > 0 )) {
-			tu.setIsTranslatable(false);
-		}
-		// Else: it is TextUnit is translatable by default
-
-		skel.addContentPlaceholder(tu, trgLang);
-		skel.append("\""+lineBreak);
-		
-		return new Event(EventType.TEXT_UNIT, tu);
-	}
-*/		
 	
 	private String getQuotedString (boolean addLinebreak) {
 		StringBuilder  sbTmp = new StringBuilder();

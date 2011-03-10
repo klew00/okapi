@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2010 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -206,6 +206,44 @@ public class POFilterTest {
 		FilterTestDriver.checkCodeData(src, trg);
 	}
 		
+	@Test
+	public void testProtectApproved () {
+		String snippet = "#, c-format\n"
+			+ "msgid \"Text 1\"\n"
+			+ "msgstr \"Texte 1\"\n\n"
+			+ "msgid \"Text 2\"\n"
+			+ "msgstr \"\"\n";
+		// When approved entries are protected
+		filter.getParameters().setBoolean("protectApproved", true);
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		assertTrue(tu!=null);
+		assertFalse(tu.isTranslatable());
+		tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 2);
+		assertTrue(tu!=null);
+		assertTrue(tu.isTranslatable());
+		// When approved entries are not protected
+		filter.getParameters().setBoolean("protectApproved", false);
+		tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		assertTrue(tu!=null);
+		assertTrue(tu.isTranslatable());
+		tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 2);
+		assertTrue(tu!=null);
+		assertTrue(tu.isTranslatable());
+	}
+
+	@Test
+	public void testOutputProtectApproved () {
+		String snippet = "#, c-format\n"
+			+ "msgid \"Text 1\"\n"
+			+ "msgstr \"Texte 1\"\n\n";
+		// When approved entries are protected
+		filter.getParameters().setBoolean("protectApproved", true);
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, locEN, locFR),
+			filter.getEncoderManager(), locFR);
+		filter.getParameters().setBoolean("protectApproved", false); // Set back to original value
+		assertEquals(result, snippet);
+	}
+
 	@Test
 	public void testOuputOptionLine_FuzyFormat () {
 		String snippet = "#, fuzzy, c-format\n"

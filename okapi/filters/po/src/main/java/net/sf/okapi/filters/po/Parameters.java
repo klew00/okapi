@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -25,6 +25,8 @@ import net.sf.okapi.common.filters.InlineCodeFinder;
 
 public class Parameters extends BaseParameters {
 
+	public static final String PROTECTAPPROVED = "protectApproved";
+
 	private static final String BILINGUALMODE = "bilingualMode";
 	private static final String MAKEID = "makeID";
 	private static final String USECODEFINDER = "useCodeFinder";
@@ -34,6 +36,7 @@ public class Parameters extends BaseParameters {
 	private boolean useCodeFinder;
 	private InlineCodeFinder codeFinder;
 	private boolean makeID;
+	private boolean protectApproved;
 	// POFilterWriter option
 	private boolean wrapContent = true;
 	private boolean outputGeneric = false;
@@ -50,6 +53,14 @@ public class Parameters extends BaseParameters {
 
 	public void setBilingualMode (boolean bilingualMode) {
 		this.bilingualMode = bilingualMode;
+	}
+
+	public boolean getProtectApproved () {
+		return protectApproved;
+	}
+
+	public void setProtectApproved (boolean protectApproved) {
+		this.protectApproved = protectApproved;
 	}
 
 	public boolean getUseCodeFinder () {
@@ -95,6 +106,7 @@ public class Parameters extends BaseParameters {
 	public void reset () {
 		bilingualMode = true;
 		makeID = true;
+		protectApproved = false;
 		useCodeFinder = true;
 		codeFinder.reset();
 		codeFinder.setSample("%s, %d, {1}, \\n, \\r, \\t, etc.");
@@ -111,6 +123,7 @@ public class Parameters extends BaseParameters {
 		buffer.reset();
 		buffer.setBoolean(BILINGUALMODE, bilingualMode);
 		buffer.setBoolean(MAKEID, makeID);
+		buffer.setBoolean(PROTECTAPPROVED, protectApproved);
 		buffer.setBoolean(USECODEFINDER, useCodeFinder);
 		buffer.setGroup(CODEFINDERRULES, codeFinder.toString());
 		return buffer.toString();
@@ -121,6 +134,7 @@ public class Parameters extends BaseParameters {
 		buffer.fromString(data);
 		bilingualMode = buffer.getBoolean(BILINGUALMODE, bilingualMode);
 		makeID = buffer.getBoolean(MAKEID, makeID);
+		protectApproved = buffer.getBoolean(PROTECTAPPROVED, protectApproved);
 		useCodeFinder = buffer.getBoolean(USECODEFINDER, useCodeFinder);
 		codeFinder.fromString(buffer.getGroup(CODEFINDERRULES, ""));
 	}

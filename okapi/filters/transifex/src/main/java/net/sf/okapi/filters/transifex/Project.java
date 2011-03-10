@@ -44,6 +44,7 @@ public class Project {
 	private static final String PROJECTID = "projectId";
 	private static final String SOURCELOCALE = "sourceLocale";
 	private static final String TARGETLOCALE = "targetLocale";
+	private static final String PROTECTAPPROVED = "protectApproved";
 
 	private String path;
 	private String host;
@@ -54,6 +55,7 @@ public class Project {
 	private LocaleId targetLocale;
 	private List<ResourceInfo> resourceIds;
 	private TransifexClient cli;
+	private boolean protectApproved;
 	
 	public Project () {
 		reset(LocaleId.ENGLISH, LocaleId.FRENCH);
@@ -71,6 +73,7 @@ public class Project {
 		cli = null;
 		sourceLocale = srcLoc;
 		targetLocale = trgLoc;
+		protectApproved = false;
 	}
 	
 	public String getHost () {
@@ -130,6 +133,14 @@ public class Project {
 		cli = null;
 	}
 	
+	public boolean getProtectApproved () {
+		return protectApproved;
+	}
+
+	public void setProtectApproved (boolean protectApproved) {
+		this.protectApproved = protectApproved;
+	}
+
 	public List<ResourceInfo> getResources () {
 		return resourceIds;
 	}
@@ -148,6 +159,7 @@ public class Project {
 			pw.println(PROJECTID + "=" + projectId);
 			pw.println(SOURCELOCALE + "=" + sourceLocale.toString());
 			pw.println(TARGETLOCALE + "=" + targetLocale.toString());
+			pw.println(PROTECTAPPROVED+ "=" + (protectApproved ? "yes" : "no"));
 			//TODO: resource etc.
 		}
 		catch ( FileNotFoundException e ) {
@@ -197,6 +209,9 @@ public class Project {
 						if ( targetLocale == null ) {
 							setTargetLocale(LocaleId.fromString(line.substring(n+1).trim()));
 						}
+					}
+					else if ( line.startsWith(PROTECTAPPROVED) ) {
+						setProtectApproved(line.substring(n+1).trim().equals("yes"));
 					}
 				}
 				else {
