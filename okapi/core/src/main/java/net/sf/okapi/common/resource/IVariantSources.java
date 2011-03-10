@@ -30,7 +30,7 @@ import net.sf.okapi.common.annotation.IAnnotation;
  * Provides methods to allow the creation and manipulation of different source
  * versions for different locales of an {@link ITextUnit} object.
  *
- * To create an instance of this interface, use the method {@link ITextUnit#getCustomSources()}.
+ * To create an instance of this interface, use the method {@link ITextUnit#getVariantSources()}.
  *
  * @author David Mason, dr.d.mason@gmail.com
  */
@@ -38,7 +38,7 @@ public interface IVariantSources extends Iterable<TextContainer> {
 
     /**
      * Indicates if the source text for the given target locale is empty. Result
-     * will be for the default source if there is no custom source for the given
+     * will be for the default source if there is no variant source for the given
      * locale, or the given locale is null.
      *
      * @param targetLocale the target locale for the source to check
@@ -48,7 +48,7 @@ public interface IVariantSources extends Iterable<TextContainer> {
     public boolean isSourceEmpty(LocaleId targetLocale);
 
     /**
-     * Creates a custom source for a given target locale, using the content of the
+     * Creates a variant source for a given target locale, using the content of the
      * default source according to the specified options.
      *
      * @param targetLocale the target locale that uses the new source
@@ -68,7 +68,7 @@ public interface IVariantSources extends Iterable<TextContainer> {
 
 
     /**
-     * Creates a custom source for a given locale, using the provided text container.
+     * Creates a variant source for a given locale, using the provided text container.
      * @param sourceText the text to include in this source
      * @param targetLocale the target locale that uses the new source
      * @param overwriteExisting overwrites any existing source associated with
@@ -78,14 +78,14 @@ public interface IVariantSources extends Iterable<TextContainer> {
     public TextContainer createSource(TextContainer sourceText,
                                       LocaleId targetLocale,
                                       boolean overwriteExisting);
-    //TODO think about whether to keep this method at all - custom sources
+    //TODO think about whether to keep this method at all - variant sources
     //     should be based on default source after all
 
 
     /**
      * Gets the source object (a {@link TextContainer} object) used for the
      * given target locale. Returns the default source object if the target
-     * locale has no custom source.
+     * locale has no variant source.
      *
      * @param targetLocale the target locale used by the source.
      * @return the source used by the given locale. May be the default source.
@@ -94,7 +94,7 @@ public interface IVariantSources extends Iterable<TextContainer> {
 
     /**
      * Sets the source object to use for the given target locale. Any existing
-     * custom source object for the target locale will be overwritten.
+     * variant source object for the target locale will be overwritten.
      *
      * @param targetLocale the target locale that will use the given source object
      * @param textContainer the source object to use for the given target locale
@@ -104,40 +104,40 @@ public interface IVariantSources extends Iterable<TextContainer> {
     public TextContainer setSource(LocaleId targetLocale, TextContainer textContainer) throws IllegalArgumentException;
 
     /**
-     * Removes any custom source used for the given target locale. Any associated
+     * Removes any variant source used for the given target locale. Any associated
      * targets will be associated with the default locale, which may lead to
      * misalignment of segments between the target and default source.
      *
-     * @param targetLocale the locale for which to remove custom source
+     * @param targetLocale the locale for which to remove variant source
      * @throws IllegalArgumentException if the target locale is null
      */
     public void removeSource(LocaleId targetLocale) throws IllegalArgumentException;
 
     /**
-     * Indicates the number of custom sources stored in this custom source object
-     * @return the number of custom sources stored in this CustomSources object
+     * Indicates the number of variant sources stored in this variant source object
+     * @return the number of variant sources stored in this VariantSources object
      */
     public int count();
 
     /**
-     * Indicates whether this custom source object contains any custom sources
-     * @return true if there are no custom sources in this custom sources object
+     * Indicates whether this variant source object contains any variant sources
+     * @return true if there are no variant sources in this variant sources object
      */
     public boolean empty();
 
     /**
-     * Indicates whether there is a custom source for the given locale
+     * Indicates whether there is a variant source for the given locale
      *
-     * @param targetLocale the locale to check for custom sources
-     * @return true if there is a custom source object for the given locale,
+     * @param targetLocale the locale to check for variant sources
+     * @return true if there is a variant source object for the given locale,
      *         false otherwise. Returns false if null target locale is given.
      * @throws IllegalArgumentException if targetLocale is null
      */
-    public boolean hasCustomSource(LocaleId targetLocale) throws IllegalArgumentException;
+    public boolean hasVariantSource(LocaleId targetLocale) throws IllegalArgumentException;
 
     /**
-     * Sets the content of the custom source for the given target locale. Creates
-     * a custom source if one does not exist for the given locale. Replaces any
+     * Sets the content of the variant source for the given target locale. Creates
+     * a variant source if one does not exist for the given locale. Replaces any
      * existing content for the source of the given locale.
      *
      * TODO consider adding an overwriteExisting flag
@@ -152,7 +152,7 @@ public interface IVariantSources extends Iterable<TextContainer> {
 
 
 
-    //TODO consider the implications of using a locale with no custom source
+    //TODO consider the implications of using a locale with no variant source
     //     as having multiple targets using default source could cause alignment
     //     problems.
 
@@ -192,11 +192,11 @@ public interface IVariantSources extends Iterable<TextContainer> {
 
 
     /**
-     * Lists all target locales for which there is a custom source
+     * Lists all target locales for which there is a variant source
      * Does not include a locale for the default source.
-     * @return a set of all target locales that use a custom source.
+     * @return a set of all target locales that use a variant source.
      */
-    public Set<LocaleId> getTargetLocalesWithCustomSource();
+    public Set<LocaleId> getTargetLocalesWithVariantSource();
 
 
 

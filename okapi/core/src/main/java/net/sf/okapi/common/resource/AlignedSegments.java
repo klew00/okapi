@@ -73,7 +73,7 @@ public class AlignedSegments implements IAlignedSegments {
 
             //only want to return targets associated with the default source
             //so remove any with custom source
-            allTargs.removeAll(myParent.getVariantSources().getTargetLocalesWithCustomSource());
+            allTargs.removeAll(myParent.getVariantSources().getTargetLocalesWithVariantSource());
             return allTargs;
         } else {
             //must be a custom source, so only return the associated target

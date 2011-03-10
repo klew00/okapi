@@ -147,7 +147,7 @@ public class VariantSources implements IVariantSources {
     }
 
     @Override
-    public boolean hasCustomSource(LocaleId targetLocale) throws IllegalArgumentException {
+    public boolean hasVariantSource(LocaleId targetLocale) throws IllegalArgumentException {
         if (targetLocale == null) throw new IllegalArgumentException("The target locale must not be null");
         return (sources == null) ? false : sources.containsKey(targetLocale);
     }
@@ -201,7 +201,7 @@ public class VariantSources implements IVariantSources {
     }
 
     @Override
-    public Set<LocaleId> getTargetLocalesWithCustomSource() {
+    public Set<LocaleId> getTargetLocalesWithVariantSource() {
         return (sources == null) ? new HashSet<LocaleId>() : sources.keySet();
     }
 
@@ -245,7 +245,7 @@ public class VariantSources implements IVariantSources {
         propagateSourceProperty(from, null, propertyName, overwriteExisting);
 
         //propagate to all custom sources
-        for (LocaleId loc : getTargetLocalesWithCustomSource()) {
+        for (LocaleId loc : getTargetLocalesWithVariantSource()) {
             propagateSourceProperty(from, loc, propertyName, overwriteExisting);
         }
     }
@@ -272,7 +272,7 @@ public class VariantSources implements IVariantSources {
         propagateAllSourceProperties(from, null, overwriteExisting);
 
         //propagate to all custom sources
-        for (LocaleId loc : getTargetLocalesWithCustomSource()) {
+        for (LocaleId loc : getTargetLocalesWithVariantSource()) {
             propagateAllSourceProperties(from, loc, overwriteExisting);
         }
     }
@@ -297,7 +297,7 @@ public class VariantSources implements IVariantSources {
         propagateSourceAnnotation(from, null, type, overwriteExisting);
 
         //propagate to all custom sources
-        for (LocaleId loc : getTargetLocalesWithCustomSource()) {
+        for (LocaleId loc : getTargetLocalesWithVariantSource()) {
             propagateSourceAnnotation(from, loc, type, overwriteExisting);
         }
     }
@@ -324,7 +324,7 @@ public class VariantSources implements IVariantSources {
         propagateAllSourceAnnotations(from, null, overwriteExisting);
 
         //propagate to all custom sources
-        for (LocaleId loc : getTargetLocalesWithCustomSource()) {
+        for (LocaleId loc : getTargetLocalesWithVariantSource()) {
             propagateAllSourceAnnotations(from, loc, overwriteExisting);
         }
     }
