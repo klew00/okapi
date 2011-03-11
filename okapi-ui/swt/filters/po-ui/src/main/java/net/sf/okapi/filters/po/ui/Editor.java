@@ -111,7 +111,7 @@ public class Editor implements IParametersEditor {
 		cmpTmp.setLayout(layTmp);
 		
 		chkProtectApproved = new Button(cmpTmp, SWT.CHECK);
-		chkProtectApproved.setText("Protect approved entries (entries not empty and not fuzzy)");
+		chkProtectApproved.setText(Res.getString("protectApproved"));
 
 		Group grpTmp = new Group(cmpTmp, SWT.NONE);
 		layTmp = new GridLayout();

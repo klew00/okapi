@@ -37,6 +37,10 @@
 		<ant antfile="build_omegat-plugins.xml">
 		</ant>
 
+		<!-- Longhorn -->
+		<ant antfile="build_longhorn.xml">
+		</ant>
+
 	</target>
 
 </project>

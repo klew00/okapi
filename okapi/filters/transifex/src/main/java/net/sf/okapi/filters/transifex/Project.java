@@ -46,6 +46,8 @@ public class Project {
 	private static final String TARGETLOCALE = "targetLocale";
 	private static final String PROTECTAPPROVED = "protectApproved";
 
+	private static final String PO_TYPE = "PO";
+
 	private String path;
 	private String host;
 	private String user;
@@ -53,7 +55,7 @@ public class Project {
 	private String projectId;
 	private LocaleId sourceLocale;
 	private LocaleId targetLocale;
-	private List<ResourceInfo> resourceIds;
+	private List<ResourceInfo> resources;
 	private TransifexClient cli;
 	private boolean protectApproved;
 	
@@ -65,7 +67,7 @@ public class Project {
 		LocaleId trgLoc)
 	{
 		path = null;
-		resourceIds = new ArrayList<ResourceInfo>();
+		resources = new ArrayList<ResourceInfo>();
 		setHost("http://www.transifex.net");
 		setUser("");
 		setPassword("");
@@ -142,7 +144,7 @@ public class Project {
 	}
 
 	public List<ResourceInfo> getResources () {
-		return resourceIds;
+		return resources;
 	}
 	
 	public void setPath (String path) {
@@ -160,7 +162,10 @@ public class Project {
 			pw.println(SOURCELOCALE + "=" + sourceLocale.toString());
 			pw.println(TARGETLOCALE + "=" + targetLocale.toString());
 			pw.println(PROTECTAPPROVED+ "=" + (protectApproved ? "yes" : "no"));
-			//TODO: resource etc.
+			// Resources
+			for ( ResourceInfo info : resources ) {
+				pw.println(info.getId() + "\t" + (info.getSelected() ? "yes" : "no" ));
+			}
 		}
 		catch ( FileNotFoundException e ) {
 			throw new OkapiIOException("Error saving project file.\n"+e.getMessage(), e);
@@ -187,36 +192,45 @@ public class Project {
 			if ( !line.isEmpty() && !line.startsWith("#") ) {
 				int n = line.indexOf('=');
 				if ( n > 0 ) {
+					String value = line.substring(n+1).trim();
 					if ( line.startsWith(HOST) ) {
-						setHost(line.substring(n+1).trim());
+						setHost(value);
 					}
 					else if ( line.startsWith(USER) ) {
-						setUser(line.substring(n+1).trim());
+						setUser(value);
 					}
 					else if ( line.startsWith(PASSWORD) ) {
-						setPassword(line.substring(n+1).trim());
+						setPassword(value);
 					}
 					else if ( line.startsWith(PROJECTID) ) {
-						setProjectId(line.substring(n+1).trim());
+						setProjectId(value);
 					}
 					// Source and target from the file are used only as fall-back
 					else if ( line.startsWith(SOURCELOCALE) ) {
 						if ( sourceLocale == null ) {
-							setSourceLocale(LocaleId.fromString(line.substring(n+1).trim()));
+							setSourceLocale(LocaleId.fromString(value));
 						}
 					}
 					else if ( line.startsWith(TARGETLOCALE) ) {
 						if ( targetLocale == null ) {
-							setTargetLocale(LocaleId.fromString(line.substring(n+1).trim()));
+							setTargetLocale(LocaleId.fromString(value));
 						}
 					}
 					else if ( line.startsWith(PROTECTAPPROVED) ) {
-						setProtectApproved(line.substring(n+1).trim().equals("yes"));
+						setProtectApproved(value.equals("yes"));
 					}
 				}
 				else {
 					// Else: add the resource to the list
-					//resourceIds.add(line);
+					n = line.indexOf('\t');
+					boolean selected = true;
+					if ( n > 0 ) { // The selected flag is present
+						String tmp = line.substring(n+1).trim();
+						selected = tmp.equals("yes");
+						line = line.substring(0, n);
+					}
+					ResourceInfo info = new ResourceInfo(line, "", PO_TYPE, selected);
+					resources.add(info);
 				}
 			}
 			// Next line
@@ -240,7 +254,7 @@ public class Project {
 		}
 		Map<String, ResourceInfo> map = (Map<String, ResourceInfo>)res[2];
 		if ( map.isEmpty() ) {
-			resourceIds.clear();
+			resources.clear();
 //			lastMessage = String.format("The project '%s' has no resources for '%s'.",
 //				projectId, sourceLocale.toString());
 			return;
@@ -248,14 +262,14 @@ public class Project {
 
 		// Make a temporary copy of the existing list
 		List<ResourceInfo> oldList = new ArrayList<ResourceInfo>();
-		oldList.addAll(resourceIds);
-		resourceIds.clear();
+		oldList.addAll(resources);
+		resources.clear();
 		
 		// Fill the new list
 		for ( String resId : map.keySet() ) {
 			ResourceInfo info = map.get(resId);
-			if ( "PO".equals(info.getI18nType()) ) {
-				resourceIds.add(info);
+			if ( PO_TYPE.equals(info.getI18nType()) ) {
+				resources.add(info);
 				// Try to preserve the existing selection
 				for ( int i=0; i<oldList.size(); i++ ) {
 					if ( oldList.get(i).getId().equals(resId) ) {
@@ -264,10 +278,6 @@ public class Project {
 					}
 				}
 			}
-		}
-		if ( resourceIds.isEmpty() ) {
-//			lastMessage = String.format("The project '%s' has no PO-based resources for '%s'.",
-//				projectId, sourceLocale.toString());
 		}
 	}
 
