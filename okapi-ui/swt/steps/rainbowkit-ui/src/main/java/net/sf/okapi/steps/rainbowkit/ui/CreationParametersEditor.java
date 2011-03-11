@@ -202,6 +202,11 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		optStrings.add(createParameters(optEditors.get(optEditors.size()-1)));
 		optMoreInfo.add("Rainbow TKit - Transifex Project"); // wiki page
 		writers.add("net.sf.okapi.steps.rainbowkit.transifex.TransifexPackageWriter");
+		// ONTRAM options
+		optEditors.add(null);
+		optStrings.add(null);
+		optMoreInfo.add("Rainbow TKit - ONTRAM XINI"); // wiki page
+		writers.add("net.sf.okapi.steps.rainbowkit.ontram.OntramPackageWriter");
 
 		mainComposite = new Composite(parent, SWT.BORDER);
 		mainComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -249,6 +254,9 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 
 		lbTypes.add("Transifex Project");
 		lbTypes.setData("5", "net.sf.okapi.steps.rainbowkit.transifex.TransifexPackageWriter");
+
+		lbTypes.add("ONTRAM XINI (Alpha)");
+		lbTypes.setData("6", "net.sf.okapi.steps.rainbowkit.ontram.OntramPackageWriter");
 
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.heightHint = 70;
@@ -347,6 +355,11 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 			btOptions.setEnabled(optEditors.get(n)!=null);
 			edDescription.setText("Package where translatable files are uploaded to an online Transifex project.\n"
 				+ "You can translate this package with the online Transifex editor or locally with PO editors.");
+			break;
+		case 6: // ONTRAM
+			btOptions.setEnabled(false);
+			edDescription.setText("Simple package where translatable files are extracted into a XINI document.\n"
+				+ "You can translate this package with ONTRAM.");
 			break;
 		}
 	}
