@@ -125,7 +125,7 @@ public class FilterEventToXiniTransformer {
 		
 		for (Segment okapiSegment : textContainer.getSegments()) {
 			
-			phCounter = 0;
+			phCounter = 1;
 			
 			// Skip empty segments
 			if(okapiSegment.getContent().getText().isEmpty()) {
@@ -141,13 +141,10 @@ public class FilterEventToXiniTransformer {
 			List<Code> codes = textFragment.getCodes();
 			
 			if (codes.size() > 0) {
-				LOGGER.info("Seg mit inline code: " + textFragment.getCodedText());
-				LOGGER.info("------ " + transformInlineTags(textFragment.getCodedText(), codes));
 				xiniSegment.getContent().addAll(
 						transformInlineTags(textFragment.getCodedText(), codes));
 			}
 			else {
-				LOGGER.info("Seg ohne inline code: " + textFragment.getText());
 				xiniSegment.getContent().add(textFragment.getText());
 			}
 			
