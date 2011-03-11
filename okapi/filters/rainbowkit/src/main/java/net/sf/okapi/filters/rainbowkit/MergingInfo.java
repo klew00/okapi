@@ -155,9 +155,13 @@ public class MergingInfo implements IAnnotation {
 			sb.append(" />");
 		}
 		else { // Write the content
-			String tmp = Util.escapeToXML(filterParameters, 0, false, null);
+			String tmp;
 			if ( base64 ) {
-				tmp = Base64.encodeString(tmp);
+				// Don't escape to XML in base64 notation: the parser will not un-escape it back
+				tmp = Base64.encodeString(filterParameters);
+			}
+			else {
+				tmp = Util.escapeToXML(filterParameters, 0, false, null);
 			}
 			sb.append(">" + tmp + String.format("</%s>", elementQName));
 		}

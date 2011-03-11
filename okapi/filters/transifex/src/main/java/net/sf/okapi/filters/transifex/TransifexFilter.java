@@ -186,19 +186,23 @@ public class TransifexFilter implements IFilter {
 			proj.read(new BufferedReader(input.getReader()), input.getSourceLocale(), input.getTargetLocale());
 			proj.setPath(input.getInputURI().getPath());
 			
-			// Initialize the client
-			cli = new TransifexClient(proj.getHost());
-			cli.setCredentials(proj.getUser(), proj.getPassword());
-			cli.setProject(proj.getProjectId());
-			
 			// Refresh the list of resources
-			proj.refreshResources();
 			// Prompt the user if requested
 			if ( params.getOpenProject() ) {
 				if ( !editProjectFile() ) {
 					return;
 				}
 			}
+			else { // Refresh the resource only if we have none
+				if ( proj.getResources().size() == 0 ) {
+					proj.refreshResources();
+				}
+			}
+			
+			// Initialize the client
+			cli = new TransifexClient(proj.getHost());
+			cli.setCredentials(proj.getUser(), proj.getPassword());
+			cli.setProject(proj.getProjectId());
 			
 			// Initialize the iteration
 			iter = proj.getResources().iterator();

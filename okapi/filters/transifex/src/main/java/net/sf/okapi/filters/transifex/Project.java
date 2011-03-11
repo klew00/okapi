@@ -38,13 +38,13 @@ import net.sf.okapi.lib.transifex.TransifexClient;
 
 public class Project {
 
-	private static final String HOST = "host";
-	private static final String USER = "user";
-	private static final String PASSWORD = "password";
-	private static final String PROJECTID = "projectId";
-	private static final String SOURCELOCALE = "sourceLocale";
-	private static final String TARGETLOCALE = "targetLocale";
-	private static final String PROTECTAPPROVED = "protectApproved";
+	public static final String HOST = "host";
+	public static final String USER = "user";
+	public static final String PASSWORD = "password";
+	public static final String PROJECTID = "projectId";
+	public static final String SOURCELOCALE = "sourceLocale";
+	public static final String TARGETLOCALE = "targetLocale";
+	public static final String PROTECTAPPROVED = "protectApproved";
 
 	private static final String PO_TYPE = "PO";
 
@@ -71,7 +71,7 @@ public class Project {
 		setHost("http://www.transifex.net");
 		setUser("");
 		setPassword("");
-		setPassword("");
+		setProjectId("");
 		cli = null;
 		sourceLocale = srcLoc;
 		targetLocale = trgLoc;
