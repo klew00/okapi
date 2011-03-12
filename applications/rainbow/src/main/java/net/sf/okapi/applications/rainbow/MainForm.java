@@ -20,7 +20,10 @@
 
 package net.sf.okapi.applications.rainbow;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
@@ -84,6 +87,9 @@ import net.sf.okapi.common.ui.filters.FilterConfigurationsDialog;
 import net.sf.okapi.common.ui.plugins.PluginsManagerDialog;
 import net.sf.okapi.common.plugins.PluginsManager;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.filters.rainbowkit.Manifest;
+import net.sf.okapi.filters.rainbowkit.ui.ManifestDialog;
+import net.sf.okapi.filters.transifex.ui.ProjectDialog;
 import net.sf.okapi.lib.ui.editor.PairEditorUserTest;
 import net.sf.okapi.lib.ui.segmentation.SRXEditor;
 import net.sf.okapi.lib.ui.verification.QualityCheckEditor;
@@ -2337,7 +2343,27 @@ public class MainForm { //implements IParametersProvider {
 			Input inp = prj.getItemFromRelativePath(currentInput,
 				inputTables.get(currentInput).getItem(index).getText(0));
 			File file = new File(prj.getInputRoot(currentInput) + File.separator + inp.relativePath);
-			Program.launch(file.getCanonicalPath()); 
+
+			String ext = Util.getExtension(inp.relativePath);
+			if ( ext.equalsIgnoreCase(Manifest.MANIFEST_EXTENSION) ) {
+				// Use the manifest editor if it's a manifest file
+				Manifest mnf = new Manifest();
+				mnf.load(file);
+				ManifestDialog dlg = new ManifestDialog();
+				dlg.edit(shell, mnf, false);
+			}
+			else if ( ext.equalsIgnoreCase(net.sf.okapi.filters.transifex.Project.PROJECT_EXTENSION) ) {
+				// Use the Transifex project editor if it's a Transifex project file
+				saveSurfaceData(); // Make sure we have the correct source/target locales
+				net.sf.okapi.filters.transifex.Project txprj = new net.sf.okapi.filters.transifex.Project();
+				BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
+				txprj.read(br, prj.getSourceLanguage(), prj.getTargetLanguage());
+				ProjectDialog dlg = new ProjectDialog();
+				dlg.edit(shell, txprj, false);
+			}
+			else { // Other types of file
+				Program.launch(file.getCanonicalPath());
+			}
 		}
 		catch ( Exception e ) {
 			Dialogs.showError(shell, e.getMessage(), null);

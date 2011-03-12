@@ -192,7 +192,7 @@ public class RainbowKitFilter implements IFilter {
 			String className = "net.sf.okapi.filters.rainbowkit.ui.ManifestDialog";
 			try {
 				IManifestEditor dlg = (IManifestEditor)Class.forName(className).newInstance();
-				if ( !dlg.edit(null, manifest) ) {
+				if ( !dlg.edit(null, manifest, true) ) {
 					canceled = true;
 					return; // Canceled
 				}

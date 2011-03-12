@@ -64,7 +64,9 @@ public class ManifestDialog implements IManifestEditor {
 		// Needed to be able to instantiate this class with Class.forName().
 	}
 	
-	private void create (Shell parent) {
+	private void create (Shell parent,
+		boolean inProcess)
+	{
 		result = false;
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		shell.setText("Translation Kit Manifest");
@@ -172,7 +174,8 @@ public class ManifestDialog implements IManifestEditor {
 				shell.close();
 			};
 		};
-		OKCancelPanel pnlActions = new OKCancelPanel(shell, SWT.NONE, CloseActions, true, "OK");
+		OKCancelPanel pnlActions = new OKCancelPanel(shell, SWT.NONE, CloseActions, true,
+			(inProcess ? "Continue" : "OK"));
 		pnlActions.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		shell.setDefaultButton(pnlActions.btOK);
 
@@ -216,13 +219,14 @@ public class ManifestDialog implements IManifestEditor {
 
 	@Override
 	public boolean edit (Object parent,
-		Manifest manifest)
+		Manifest manifest,
+		boolean inProcess)
 	{
 		Shell shell = null;
 		if (( parent != null ) && ( parent instanceof Shell )) {
 			shell = (Shell)parent;
 		}
-		create(shell);
+		create(shell, inProcess);
 		boolean res = showDialog(manifest);
 		
 		return res;

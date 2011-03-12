@@ -23,6 +23,7 @@ package net.sf.okapi.filters.transifex;
 public interface IProjectEditor {
 
 	public boolean edit (Object parent,
-		Project manifest);	
+		Project manifest,
+		boolean inProcess);	
 
 }

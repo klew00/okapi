@@ -45,6 +45,8 @@ public class Project {
 	public static final String SOURCELOCALE = "sourceLocale";
 	public static final String TARGETLOCALE = "targetLocale";
 	public static final String PROTECTAPPROVED = "protectApproved";
+	
+	public static final String PROJECT_EXTENSION = ".txp";
 
 	private static final String PO_TYPE = "PO";
 

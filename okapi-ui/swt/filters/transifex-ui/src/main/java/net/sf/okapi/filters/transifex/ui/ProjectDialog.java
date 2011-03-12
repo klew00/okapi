@@ -61,7 +61,9 @@ public class ProjectDialog implements IProjectEditor {
 		// Needed to be able to instantiate this class with Class.forName().
 	}
 	
-	private void create (Shell parent) {
+	private void create (Shell parent,
+		boolean inProcess)
+	{
 		result = false;
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		shell.setText("Transifex Project");
@@ -157,7 +159,8 @@ public class ProjectDialog implements IProjectEditor {
 				shell.close();
 			};
 		};
-		OKCancelPanel pnlActions = new OKCancelPanel(shell, SWT.NONE, CloseActions, true, "OK");
+		OKCancelPanel pnlActions = new OKCancelPanel(shell, SWT.NONE, CloseActions, true,
+			(inProcess ? "Continue" : "OK"));
 		pnlActions.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		shell.setDefaultButton(btRefresh);
 
@@ -241,13 +244,14 @@ public class ProjectDialog implements IProjectEditor {
 
 	@Override
 	public boolean edit (Object parent,
-		Project project)
+		Project project,
+		boolean inProcess)
 	{
 		Shell shell = null;
 		if (( parent != null ) && ( parent instanceof Shell )) {
 			shell = (Shell)parent;
 		}
-		create(shell);
+		create(shell, inProcess);
 		boolean res = showDialog(project);
 		
 		return res;

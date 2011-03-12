@@ -103,7 +103,7 @@ public class TransifexFilter implements IFilter {
 			"Transifex Project",
 			"Transifex project with prompt when starting",
 			null,
-			".txp;"));
+			Project.PROJECT_EXTENSION+";"));
 		list.add(new FilterConfiguration(getName()+"-noPrompt",
 			MIMETYPE,
 			getClass().getName(),
@@ -220,7 +220,7 @@ public class TransifexFilter implements IFilter {
 		String className = "net.sf.okapi.filters.transifex.ui.ProjectDialog";
 		try {
 			IProjectEditor dlg = (IProjectEditor)Class.forName(className).newInstance();
-			if ( !dlg.edit(null, proj) ) {
+			if ( !dlg.edit(null, proj, true) ) {
 				canceled = true;
 				return false; // Canceled
 			}

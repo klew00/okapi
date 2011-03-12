@@ -22,7 +22,15 @@ package net.sf.okapi.filters.rainbowkit;
 
 public interface IManifestEditor {
 
+	/**
+	 * Opens the editor for the manifest files.
+	 * @param parent UI parent object (can be null)
+	 * @param manifest manifest object to edit
+	 * @param inProcess true if a process is continued when the editor is closed.
+	 * @return false on error or if the user cancels.
+	 */
 	public boolean edit (Object parent,
-		Manifest manifest);	
+		Manifest manifest,
+		boolean inProcess);	
 
 }
