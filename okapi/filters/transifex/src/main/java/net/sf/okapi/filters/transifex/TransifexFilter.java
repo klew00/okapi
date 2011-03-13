@@ -193,11 +193,9 @@ public class TransifexFilter implements IFilter {
 					return;
 				}
 			}
-			else { // Refresh the resource only if we have none
-				if ( proj.getResources().size() == 0 ) {
-					proj.refreshResources();
-				}
-			}
+			// Refresh the resource (and their names)
+			// All if there are none listed, otherwise, just the existing entries
+			proj.refreshResources(!(proj.getResources().size()==0));
 			
 			// Initialize the client
 			cli = new TransifexClient(proj.getHost());
@@ -283,6 +281,7 @@ public class TransifexFilter implements IFilter {
 //		}
 //		//TODO: avoid re-downloading if we re-write here and the existing file is newer
 
+		logger.info("Resource: " + info.getId());
 		// Download the PO for this resource and the given target language
 		String outputPath = tempDir + File.separator + info.getName();
 		String[] res = cli.getResource(info.getId(), proj.getTargetLocale(), outputPath);

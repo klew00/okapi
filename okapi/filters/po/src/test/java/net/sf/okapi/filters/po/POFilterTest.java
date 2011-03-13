@@ -245,6 +245,26 @@ public class POFilterTest {
 	}
 
 	@Test
+	public void testWithNoCodesLookingLikeCodes () {
+		String snippet = "msgctxt \"okpCtx:tu=1\"\n"
+			+ "msgid \"EN<x>...</x><x/>\"\n"
+			+ "msgstr \"FR<x>...</x><x/>\"\n";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		assertNotNull(tu);
+		assertEquals("EN<x>...</x><x/>", tu.getSource().toString());
+	}
+
+	@Test
+	public void testWithLetterCodes () {
+		String snippet = "msgctxt \"okpCtx:tu=1\"\n"
+			+ "msgid \"EN<g1>...</g1><x2/>\"\n"
+			+ "msgstr \"FR<g1>...</g1><x2/>\"\n";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		assertNotNull(tu);
+		assertEquals(3, tu.getSource().getFirstContent().getCodes().size());
+	}
+
+	@Test
 	public void testOuputOptionLine_FuzyFormat () {
 		String snippet = "#, fuzzy, c-format\n"
 			+ "msgid \"Text 1\"\n"

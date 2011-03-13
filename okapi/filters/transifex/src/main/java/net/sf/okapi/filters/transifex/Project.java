@@ -241,7 +241,7 @@ public class Project {
 	}
 
 	@SuppressWarnings("unchecked")
-	public void refreshResources () {
+	public void refreshResources (boolean onlyExistingResources) {
 		// Reset the connection info if needed
 		if ( cli == null ) {
 			cli = new TransifexClient(getHost());
@@ -271,13 +271,18 @@ public class Project {
 		for ( String resId : map.keySet() ) {
 			ResourceInfo info = map.get(resId);
 			if ( PO_TYPE.equals(info.getI18nType()) ) {
-				resources.add(info);
 				// Try to preserve the existing selection
+				boolean found = false;
 				for ( int i=0; i<oldList.size(); i++ ) {
 					if ( oldList.get(i).getId().equals(resId) ) {
 						info.setSelected(oldList.get(i).getSelected());
+						found = true;
 						break;
 					}
+				}
+				// Update the list as needed
+				if ( found || !onlyExistingResources ) {
+					resources.add(info);
 				}
 			}
 		}

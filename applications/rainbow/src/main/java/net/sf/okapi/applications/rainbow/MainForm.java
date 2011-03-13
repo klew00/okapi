@@ -2358,6 +2358,7 @@ public class MainForm { //implements IParametersProvider {
 				net.sf.okapi.filters.transifex.Project txprj = new net.sf.okapi.filters.transifex.Project();
 				BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
 				txprj.read(br, prj.getSourceLanguage(), prj.getTargetLanguage());
+				txprj.setPath(file.getCanonicalPath());
 				ProjectDialog dlg = new ProjectDialog();
 				dlg.edit(shell, txprj, false);
 			}

@@ -260,7 +260,7 @@ public class ProjectDialog implements IProjectEditor {
 	private void refresh () {
 		try {
 			if ( !saveData() ) return;
-			project.refreshResources();
+			project.refreshResources(false);
 			tableMod.setProject(project);
 		}
 		catch ( Throwable e ) {

@@ -40,17 +40,17 @@ import net.sf.okapi.common.resource.TextFragment.TagType;
  */
 public class GenericContent {
 
-	private final Pattern patternOpening = Pattern.compile("\\<(\\d*?)\\>");
-	private final Pattern patternClosing = Pattern.compile("\\</(\\d*?)\\>");
-	private final Pattern patternIsolated = Pattern.compile("\\<(\\d*?)/\\>");
-	private final Pattern patternIsolatedB = Pattern.compile("\\<b(\\d*?)/\\>");
-	private final Pattern patternIsolatedE = Pattern.compile("\\<e(\\d*?)/\\>");
+	private final Pattern patternOpening = Pattern.compile("\\<(\\d+?)\\>");
+	private final Pattern patternClosing = Pattern.compile("\\</(\\d+?)\\>");
+	private final Pattern patternIsolated = Pattern.compile("\\<(\\d+?)/\\>");
+	private final Pattern patternIsolatedB = Pattern.compile("\\<b(\\d+?)/\\>");
+	private final Pattern patternIsolatedE = Pattern.compile("\\<e(\\d+?)/\\>");
 
-	private final Pattern patternLCOpening = Pattern.compile("\\<g(\\d*?)\\>");
-	private final Pattern patternLCClosing = Pattern.compile("\\</g(\\d*?)\\>");
-	private final Pattern patternLCIsolated = Pattern.compile("\\<x(\\d*?)/\\>");
-	private final Pattern patternLCIsolatedB = Pattern.compile("\\<b(\\d*?)/\\>");
-	private final Pattern patternLCIsolatedE = Pattern.compile("\\<e(\\d*?)/\\>");
+	private final Pattern patternLCOpening = Pattern.compile("\\<g(\\d+?)\\>");
+	private final Pattern patternLCClosing = Pattern.compile("\\</g(\\d+?)\\>");
+	private final Pattern patternLCIsolated = Pattern.compile("\\<x(\\d+?)/\\>");
+	private final Pattern patternLCIsolatedB = Pattern.compile("\\<b(\\d+?)/\\>");
+	private final Pattern patternLCIsolatedE = Pattern.compile("\\<e(\\d+?)/\\>");
 
 	private String codedText;
 	private List<Code> codes;
