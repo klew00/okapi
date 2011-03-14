@@ -39,6 +39,7 @@ import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
@@ -275,10 +276,21 @@ public class POFilterTest {
 	}
 
 	@Test
+	public void testOuputWithAllowedEmpty () {
+		String snippet = "msgid \"Text 1\"\n"
+			+ "msgstr \"\"\n";
+		filter.getParameters().setBoolean(GenericSkeletonWriter.ALLOWEMPTYOUTPUTTARGET, true);
+		String result = FilterTestDriver.generateOutput(getEvents(snippet, locEN, locFR),
+			filter.getEncoderManager(), locFR);
+		filter.getParameters().setBoolean(GenericSkeletonWriter.ALLOWEMPTYOUTPUTTARGET, false); // Reset to default
+		assertEquals(result, snippet);
+	}
+
+	@Test
 	public void testOuputOptionLine_StuffFuzyFormat () {
 		String snippet = "#, x-stuff, fuzzy, c-format\n"
 			+ "msgid \"Text 1\"\n"
-			+ "msgstr \"Texte 1\"\n";
+			+ "msgstr \"Text 1\"\n";
 		String result = FilterTestDriver.generateOutput(getEvents(snippet, locEN, locFR),
 			filter.getEncoderManager(), locFR);
 		assertEquals(result, snippet);

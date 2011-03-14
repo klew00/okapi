@@ -22,6 +22,7 @@ package net.sf.okapi.filters.po;
 
 import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.filters.InlineCodeFinder;
+import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 
 public class Parameters extends BaseParameters {
 
@@ -31,15 +32,16 @@ public class Parameters extends BaseParameters {
 	private static final String MAKEID = "makeID";
 	private static final String USECODEFINDER = "useCodeFinder";
 	private static final String CODEFINDERRULES = "codeFinderRules";
-	
+
 	private boolean bilingualMode;
 	private boolean useCodeFinder;
 	private InlineCodeFinder codeFinder;
 	private boolean makeID;
 	private boolean protectApproved;
-	// POFilterWriter option
+	// POFilterWriter or filter-driven options 
 	private boolean wrapContent = true;
 	private boolean outputGeneric = false;
+	private boolean allowEmptyOutputTarget;
 
 	public Parameters () {
 		codeFinder = new InlineCodeFinder();
@@ -103,6 +105,14 @@ public class Parameters extends BaseParameters {
 		this.outputGeneric = outputGeneric;
 	}
 
+	public boolean getAllowEmptyOutputTarget () {
+		return allowEmptyOutputTarget;
+	}
+	
+	public void setAllowEmptyOutputTarget (boolean allowEmptyOutputTarget) {
+		this.allowEmptyOutputTarget = allowEmptyOutputTarget;
+	}
+
 	public void reset () {
 		bilingualMode = true;
 		makeID = true;
@@ -116,6 +126,7 @@ public class Parameters extends BaseParameters {
 		codeFinder.addRule("(\\\\r\\\\n)|\\\\a|\\\\b|\\\\f|\\\\n|\\\\r|\\\\t|\\\\v");
 		//TODO: Add Java-style variables. this is too basic
 		codeFinder.addRule("\\{\\d.*?\\}");
+		allowEmptyOutputTarget = false;
 	}
 
 	@Override
@@ -124,6 +135,7 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean(BILINGUALMODE, bilingualMode);
 		buffer.setBoolean(MAKEID, makeID);
 		buffer.setBoolean(PROTECTAPPROVED, protectApproved);
+		buffer.setBoolean(GenericSkeletonWriter.ALLOWEMPTYOUTPUTTARGET, allowEmptyOutputTarget);
 		buffer.setBoolean(USECODEFINDER, useCodeFinder);
 		buffer.setGroup(CODEFINDERRULES, codeFinder.toString());
 		return buffer.toString();
@@ -135,6 +147,7 @@ public class Parameters extends BaseParameters {
 		bilingualMode = buffer.getBoolean(BILINGUALMODE, bilingualMode);
 		makeID = buffer.getBoolean(MAKEID, makeID);
 		protectApproved = buffer.getBoolean(PROTECTAPPROVED, protectApproved);
+		allowEmptyOutputTarget = buffer.getBoolean(GenericSkeletonWriter.ALLOWEMPTYOUTPUTTARGET, allowEmptyOutputTarget);
 		useCodeFinder = buffer.getBoolean(USECODEFINDER, useCodeFinder);
 		codeFinder.fromString(buffer.getGroup(CODEFINDERRULES, ""));
 	}

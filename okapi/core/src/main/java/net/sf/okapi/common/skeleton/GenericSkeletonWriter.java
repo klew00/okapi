@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -26,6 +26,7 @@ import java.util.Stack;
 import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.annotation.AltTranslation;
@@ -53,12 +54,17 @@ import net.sf.okapi.common.resource.TextUnit;
  */
 public class GenericSkeletonWriter implements ISkeletonWriter {
 
+	public static final String ALLOWEMPTYOUTPUTTARGET = "allowEmptyOutputTarget";
+	
 	protected LocaleId inputLoc;
 	protected LocaleId outputLoc;
 	protected ILayerProvider layer;
 	protected EncoderManager encoderManager;
 	protected Stack<StorageList> storageStack;
 	protected boolean isMultilingual;
+	// A few formats may require to allow empty target in output.
+	// They must be multilingual and not used with layer with this option
+	protected boolean allowEmptyOutputTarget = false;
 	
 	private final Logger logger = Logger.getLogger(getClass().getName());
 
@@ -118,10 +124,16 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		this.outputEncoding = outputEncoding;
 		this.layer = layer;
 		isMultilingual = resource.isMultilingual();
+		IParameters prm = resource.getFilterParameters();
 		if ( this.encoderManager != null ) {
-			this.encoderManager.setDefaultOptions(resource.getFilterParameters(), outputEncoding,
+			this.encoderManager.setDefaultOptions(prm, outputEncoding,
 				resource.getLineBreak());
 			this.encoderManager.updateEncoder(resource.getMimeType());
+		}
+		// By default do not allow empty target in output
+		allowEmptyOutputTarget = false;
+		if ( prm != null ) {
+			allowEmptyOutputTarget = prm.getBoolean(ALLOWEMPTYOUTPUTTARGET);
 		}
 		
 		return getString((GenericSkeleton)resource.getSkeleton(), 1);
@@ -356,8 +368,15 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			// or if the target is empty (regardless the source)
 			if (( trgCont == null ) || trgCont.isEmpty() ) {
 				// If there is no target available
-				// We fall back to source
-				trgCont = srcCont;
+				if ( allowEmptyOutputTarget ) {
+					// If empty targets are allowed and we don't have one: create a temporary one
+					if ( trgCont == null ) {
+						trgCont = tu.createTarget(locToUse, false, IResource.CREATE_EMPTY);
+					}
+				}
+				else { // Fall back to the source
+					trgCont = srcCont;
+				}
 			}
 		}
 		else { // Use the source

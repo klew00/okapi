@@ -42,6 +42,7 @@ import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 import net.sf.okapi.filters.po.POFilter;
 import net.sf.okapi.lib.transifex.ResourceInfo;
@@ -293,6 +294,7 @@ public class TransifexFilter implements IFilter {
 		// Set the options for the PO filter
 		pof.getParameters().setBoolean(net.sf.okapi.filters.po.Parameters.PROTECTAPPROVED,
 			proj.getProtectApproved());
+		pof.getParameters().setBoolean(GenericSkeletonWriter.ALLOWEMPTYOUTPUTTARGET, true);
 		
 		// Open the local copy for processing
 		RawDocument rd = new RawDocument(new File(outputPath).toURI(), "UTF-8",

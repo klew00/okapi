@@ -61,11 +61,11 @@ abstract class AbstractOkapiFilter implements org.omegat.filters2.IFilter {
     protected String defaultOutEncoding = "UTF-8";
     protected String supportedExtensions;
 
-	private final Pattern patternOpening = Pattern.compile("\\<g(\\d*?)\\>");
-	private final Pattern patternClosing = Pattern.compile("\\</g(\\d*?)\\>");
-	private final Pattern patternIsolated = Pattern.compile("\\<x(\\d*?)/\\>");
-	private final Pattern patternIsolatedB = Pattern.compile("\\<b(\\d*?)/\\>");
-	private final Pattern patternIsolatedE = Pattern.compile("\\<e(\\d*?)/\\>");
+	private final Pattern patternOpening = Pattern.compile("\\<g(\\d+?)\\>");
+	private final Pattern patternClosing = Pattern.compile("\\</g(\\d+?)\\>");
+	private final Pattern patternIsolated = Pattern.compile("\\<x(\\d+?)/\\>");
+	private final Pattern patternIsolatedB = Pattern.compile("\\<b(\\d+?)/\\>");
+	private final Pattern patternIsolatedE = Pattern.compile("\\<e(\\d+?)/\\>");
 
 	private String filterConfigId;
 	private FilterConfigurationMapper fcMapper;
@@ -295,6 +295,9 @@ abstract class AbstractOkapiFilter implements org.omegat.filters2.IFilter {
 									// And create the new target content
 									fromOmegat(trans, trgSeg.text);
 								}
+							}
+							else { // Empty translation from OmegaT
+								trgSeg.text = new TextFragment(); 
 							}
 						}
 					}
