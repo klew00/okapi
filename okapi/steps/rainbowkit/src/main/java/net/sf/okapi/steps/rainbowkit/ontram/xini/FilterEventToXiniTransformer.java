@@ -54,12 +54,13 @@ public class FilterEventToXiniTransformer {
 
 			jc = JAXBContext.newInstance(ObjectFactory.class);
 			m = jc.createMarshaller();
+			m.setProperty("jaxb.noNamespaceSchemaLocation", "http://www.ontram.com/xsd/xini.xsd");
 
 		} catch (JAXBException e) {
 			e.printStackTrace();
 		}
 		
-		currentPageId = 1;
+		currentPageId = 0;
 		currentElementId = 10;
 		currentFieldId = 0;
 		
@@ -77,6 +78,7 @@ public class FilterEventToXiniTransformer {
 		LocaleId srcLoc = startDocument.getLocale();
 		xini.setSourceLanguage(srcLoc.getLanguage());
 		
+		//TODO don't use full path here
 		startPage(startDocument.getName());
 	}
 
@@ -119,7 +121,7 @@ public class FilterEventToXiniTransformer {
 		// Set IDs and add meta-data
 		element.setElementID(currentElementId);
 		field.setFieldID(currentFieldId);
-		field.setLabel(unit.getId());
+//		field.setLabel(unit.getId());
 		
 		int currentSegmentId = 0;
 		
@@ -237,8 +239,8 @@ public class FilterEventToXiniTransformer {
 
 		if (code.getType().equals("br")) {
 
-			Empty empty = null;
-			return objectFactory.createTextContentBr(empty);
+			Empty emptyContent = new Empty();
+			return objectFactory.createTextContentBr(emptyContent);
 		}
 
 		return null;

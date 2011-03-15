@@ -362,7 +362,6 @@ public final class WorkspaceUtils {
 			// Normalize separators
 			targetFilePath = targetFilePath.replace("\\", File.separator);
 			targetFilePath = targetFilePath.replace("/", File.separator);
-			System.err.println("F-Sep: '" + File.separator + "'");
 			Util.createDirectories(targetFilePath);
 			
 			FileOutputStream fos = new FileOutputStream(targetFilePath);

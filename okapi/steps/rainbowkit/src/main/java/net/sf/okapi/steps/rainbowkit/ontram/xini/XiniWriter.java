@@ -93,7 +93,7 @@ public class XiniWriter implements IFilterWriter {
 			transformer.marshall(new FileOutputStream(outPutPath));
 		}
 		catch (FileNotFoundException e) {
-			// We created the file
+			// Should be impossible. We created the file.
 			throw new RuntimeException(e);
 		}
 		catch (IOException e) {

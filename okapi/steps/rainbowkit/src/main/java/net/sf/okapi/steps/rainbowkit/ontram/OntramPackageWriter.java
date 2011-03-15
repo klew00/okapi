@@ -17,9 +17,9 @@ public class OntramPackageWriter extends BasePackageWriter {
 
 	@Override
 	protected void processStartBatch() {
+		super.processStartBatch();
 		manifest.setSubDirectories("original", "work", "work", "done", null, true);
 		setTMXInfo(false, null, null, null, null);
-		super.processStartBatch();
 
 		writer = new XiniWriter();
 		String xiniPath = manifest.getSourceDirectory() + "contents.xini";
@@ -35,11 +35,13 @@ public class OntramPackageWriter extends BasePackageWriter {
 
 	@Override
 	protected void processStartDocument(Event event) {
+		super.processStartDocument(event);
 		writer.handleEvent(event);
 	}
 
 	@Override
 	protected void processEndDocument(Event event) {
+		super.processEndDocument(event);
 		writer.handleEvent(event);
 	}
 

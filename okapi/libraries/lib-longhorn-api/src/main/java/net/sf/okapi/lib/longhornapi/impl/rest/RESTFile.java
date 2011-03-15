@@ -55,8 +55,10 @@ public class RESTFile implements LonghornFile {
 			switch (type) {
 				case input:
 					remoteFile = new URI(project.getProjectURI() + "/inputFiles/" + relativePath);
+					break;
 				case output:
 					remoteFile = new URI(project.getProjectURI() + "/outputFiles/" + relativePath);
+					break;
 			}
 			return remoteFile.toURL().openStream();
 		}

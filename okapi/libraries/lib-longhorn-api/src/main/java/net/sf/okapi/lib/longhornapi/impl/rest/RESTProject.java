@@ -84,7 +84,6 @@ public class RESTProject implements LonghornProject {
 		Part[] inputParts = {
 				new FilePart("inputFile", inputFile.getName(), inputFile)};
 		try {
-			//TODO implement sub-directories
 			Util.put(uri, inputParts);
 		}
 		catch (IOException e) {
