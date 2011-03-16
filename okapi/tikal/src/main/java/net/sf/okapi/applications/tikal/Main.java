@@ -584,6 +584,9 @@ public class Main {
 		extensionsMap.put(".txp", "okf_transifex");
 		filtersMap.put("okf_transifex", "net.sf.okapi.filters.transifex.TransifexFilter");
 
+		extensionsMap.put(".zip", "okf_archive");
+		filtersMap.put("okf_archive", "net.sf.okapi.filters.archive.ArchiveFilter");
+
 		filtersMap.put("okf_versifiedtxt", "net.sf.okapi.filters.versifiedtxt.VersifiedTextFilter");
 		filtersMap.put("okf_xmlstream", "net.sf.okapi.filters.xmlstream.XmlStreamFilter");
 		filtersMap.put("okf_mosestext", "net.sf.okapi.filters.mosestext.MosesTextFilter");

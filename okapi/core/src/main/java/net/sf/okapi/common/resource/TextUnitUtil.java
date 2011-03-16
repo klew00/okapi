@@ -127,30 +127,58 @@ public class TextUnitUtil {
 		
 		int done = 0;
 		Code newCode, oriCode;
-//		int oriIndex = -1;
 
 		for ( int i=0; i<newCodes.size(); i++ ) {
 			newCode = newCodes.get(i);
 			newCode.setOuterData(null); // Remove XLIFF outer codes if needed
 
 			// Get the data from the original code (match on id)
+//ori
+//			oriCode = null;
+//			for ( int j=0; j<oriIndices.length; j++ ) {
+//				if ( oriIndices[j] == -1) continue; // Used already
+//				if ( oriCodes.get(oriIndices[j]).getTagType() == newCode.getTagType() ) {
+//					oriCode = oriCodes.get(oriIndices[j]);
+//					oriIndices[j] = -1;
+//					done++;
+//					break;
+//				}
+//			}
+//end-ori
 			oriCode = null;
 			for ( int j=0; j<oriIndices.length; j++ ) {
-				if ( oriIndices[j] == -1) continue; // Used already
-				//if (( oriCodes.get(oriIndices[j]).getId() == newCode.getId() ))
-					//TOFIX && ( oriCodes.get(oriIndices[j]).getTagType() == newCode.getTagType() ))
-				if ( oriCodes.get(oriIndices[j]).getTagType() == newCode.getTagType() ) {
-					//oriIndex = oriIndices[j];
-					oriCode = oriCodes.get(oriIndices[j]);
-					oriIndices[j] = -1;
+				// Do we have the same id?
+				if ( oriCodes.get(j).getId() == newCode.getId() ) {
+					// Do we have the same tag type?
+					if ( oriCodes.get(j).getTagType() == newCode.getTagType() ) {
+						if ( oriIndices[j] == -1 ) {
+							// Was used already: this is a clone
+							if ( !oriCodes.get(j).isCloneable() ) {
+								String place = null;
+								if ( parent != null ) {
+									place = String.format(" (item id='%s', name='%s')",
+										parent.getId(), (parent.getName()==null ? "" : parent.getName()));
+								}
+								LOGGER.warning(String.format("The extra code id='%d' cannot be cloned.",
+									newCode.getId()) + ((place == null) ? "" : place));
+							}
+						}
+					}
+					else {
+						// Same id but not the same tag-type
+						// probably a ending matching on its starting
+						continue; // Keep on searching
+					}
+					// Original code found, use it
+					oriCode = oriCodes.get(j);
+					oriIndices[j] = -1; // Mark it has used
 					done++;
 					break;
 				}
 			}
 			
 			if ( oriCode == null ) { // Not found in original (extra in target)
-				if (( newCode.getData() == null )
-					|| ( newCode.getData().length() == 0 )) {
+				if (( newCode.getData() == null ) || ( newCode.getData().length() == 0 )) {
 					// Leave it like that
 					String place = null;
 					if ( parent != null ) {

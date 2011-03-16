@@ -641,6 +641,21 @@ public class XLIFFFilterTest {
 	}
 
 	@Test
+	public void testAddedCloneCode () {
+		String snippet = "<?xml version=\"1.0\"?>\r"
+			+ "<xliff version=\"1.2\">\r"
+			+ "<file source-language=\"en\" datatype=\"x-abc\" original=\"file.ext\">"
+			+ "<body><trans-unit id=\"1\">"
+			+ "<source>s1 <g id='1'>s2 s3</g> s4.</source>"
+			+ "<target>t1 <g id='1'>t2</g> t3 <g id='1'>t4</g>.</target>" // Clone of id='1'
+			+ "</trans-unit></body>"
+			+ "</file></xliff>";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertNotNull(tu);
+		assertEquals("t1 <1>t2</1> t3 <1>t4</1>.", fmt.printSegmentedContent(tu.getTarget(locFR), false, false));
+	}
+	
+	@Test
 	public void testApprovedTU () {
 		TextUnit tu = FilterTestDriver.getTextUnit(createApprovedTU(), 1);
 		assertNotNull(tu);

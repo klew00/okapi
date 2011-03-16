@@ -144,6 +144,19 @@ public class TextUnitUtilTest {
 		assertEquals("U <b>BOLD</b> U <br/>", tf.toText());
 		assertEquals("U <1>BOLD</1> U <2/>", fmt.setContent(tf).toString());
 	}
+
+	@Test
+	public void testMovedCodes () {
+		TextFragment oriFrag = new TextFragment("s1 ");
+		oriFrag.append(TagType.PLACEHOLDER, "c1", "[c1]");
+		oriFrag.append(" s2 ");
+		oriFrag.append(TagType.OPENING, "c2", "[c2>]");
+		oriFrag.append(" s3 ");
+		oriFrag.append(TagType.CLOSING, "c2", "[<c2]");
+		TextFragment trgFrag = fmt.fromLetterCodedToFragment("<g2>t3</g2> t1 <x1/> t2", null);
+		TextUnitUtil.adjustTargetCodes(oriFrag, trgFrag, true, false, null, null);
+		assertEquals("[c2>]t3[<c2] t1 [c1] t2", fmt.setContent(trgFrag).toString(true));
+	}
 	
 	@Test
 	public void testUtils() {
