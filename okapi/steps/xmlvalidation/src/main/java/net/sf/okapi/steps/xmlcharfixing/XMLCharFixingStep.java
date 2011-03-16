@@ -30,6 +30,8 @@ import java.io.OutputStreamWriter;
 import java.net.URI;
 import java.util.IllegalFormatException;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
@@ -46,6 +48,7 @@ import net.sf.okapi.common.resource.RawDocument;
 public class XMLCharFixingStep extends BasePipelineStep {
 
 	private final Logger LOGGER = Logger.getLogger(getClass().getName());
+	private final Pattern pattern = Pattern.compile("&#(x?)([0-9a-fA-F]+);");
 	
 	private Parameters params;
 	private URI outputURI;
@@ -133,6 +136,8 @@ public class XMLCharFixingStep extends BasePipelineStep {
 			// Process
 			StringBuilder tmp = new StringBuilder();
 			String line;
+			Matcher m = null;
+			
 			while ( (line = reader.readLine()) != null ) {;
 				// Process that line
 				tmp.setLength(0);
@@ -163,6 +168,29 @@ public class XMLCharFixingStep extends BasePipelineStep {
 						continue;
 					}
 				}
+				
+				// Check for decimal NCRs
+				int start = 0;
+				do {
+					m = pattern.matcher(tmp.toString());
+					if ( !m.find(start) ) break; // Done
+					try {
+						int n = Integer.parseInt(m.group(2), m.group(1).isEmpty() ? 10 : 16);
+						start = m.start();
+						if ( !isValid(n) ) {
+							String repl = String.format(params.getReplacement(), n);
+							tmp.replace(start, m.end(), repl);
+							start += (repl.length()-m.group().length()); // Move cursor on next
+							count++;
+						}
+						else start = m.end();
+					}
+					catch ( NumberFormatException e ) {
+						LOGGER.severe(String.format("Invalid NCR: '%s'", m.group()));
+					}
+					
+				}
+				while ( true );
 				
 				// Line has been processed, write it back
 				writer.write(tmp.toString()+lineBreak);
@@ -195,6 +223,28 @@ public class XMLCharFixingStep extends BasePipelineStep {
 		}
 
 		return event;
+	}
+	
+	private boolean isValid (int value ) {
+		switch ( value ) {
+		case 0x0009: // Tab is allowed
+		case 0x000A: // Line-feed is allowed
+		case 0x000D: // Carriage-return is allowed
+			return true;
+		default:
+			if (( value >= 0x0020 ) && ( value <= 0xD7FF )) {
+				return true; // Valid
+			}
+			if (( value >= 0xE000 ) && ( value <= 0xFFFF )) {
+				return true; // Valid
+			}
+			if (( value >= 0x10000 ) && ( value <= 0x10FFFF )) {
+				return true; // Valid
+			}
+			// Else: it's an invalid character
+			return false;
+		}
+
 	}
 
 }
