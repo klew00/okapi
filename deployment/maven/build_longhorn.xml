@@ -1,5 +1,5 @@
 <?xml version="1.0"?> 
-<project name="okapi-filters-for-omegat" default="all" basedir="."> 
+<project name="okapi-longhorn" default="all" basedir="."> 
 
 	<!-- Get the version information to use from file -->
 	<property file="../shared/release.properties" />
@@ -28,7 +28,7 @@
 	<!-- Make the zip file -->
 	<target name="makeZip"> 
 		<copy tofile="${dist_longhorn}/okapi-longhorn.war" file="../../applications/longhorn/target/okapi-longhorn.war"/>
-		<copy tofile="${dist_longhorn}/readme.html" file="data/longhorn/readme.html"/>
+		<copy tofile="${dist_longhorn}/okapi-longhorn-api.jar" file="../../okapi/libraries/lib-longhorn-api/target/okapi-lib-longhorn-api-${okapilibStamp}.jar"/>
 		<copy tofile="${dist_longhorn}/readme.html" file="data/longhorn/readme.html"/>
 		<replace file="${dist_longhorn}/readme.html" token="@version@" value="${okapilibStamp}"/>
 		<replace file="${dist_longhorn}/readme.html" token="@date@" value="${TODAY}"/>
