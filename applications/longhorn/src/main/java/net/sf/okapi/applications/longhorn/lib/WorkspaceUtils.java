@@ -33,8 +33,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -46,7 +44,6 @@ import net.sf.okapi.common.Util;
  * Utilities for the web-service's project and file handling.
  */
 public final class WorkspaceUtils {
-	private static final Logger LOGGER = Logger.getLogger(WorkspaceUtils.class.getName());
 	private static final String PLUGINS = "plugins";
 	private static final String BATCH_CONF = "settings.bconf";
 	private static final String EXTENSIONS_MAPPING = "extensions-mapping.txt";
@@ -82,29 +79,36 @@ public final class WorkspaceUtils {
 	}
 	
 	/**
+	 * TODO update JavaDoc!
+	 * 
 	 * @return The user's configuration (if <code>System.getProperty("user.home") + "/okapi-longhorn-configuration.xml"</code>
 	 * 		was found) or the default configuration
 	 */
 	private static Configuration loadConfig() {
-		File userConfig = new File( System.getProperty("user.home") + "/okapi-longhorn-configuration.xml");
 		
-		try {
-			if(userConfig.exists())
-				return new Configuration(new FileInputStream(userConfig));
-			else
-				LOGGER.log(Level.INFO, "No system specific configuration was found at " + userConfig.getAbsolutePath() + ". " +
-						"The default configuration will be loaded instead.");
+		Configuration config = null;
+
+		String workdirEnvVar = System.getProperty("LONGHORN_WORKDIR");
+		String userHome = System.getProperty("user.home");
+		File userConfig = new File(userHome + "/okapi-longhorn-configuration.xml");
+		
+		if (workdirEnvVar != null) {
+			config = new Configuration(workdirEnvVar);
 		}
-		catch (FileNotFoundException e) {
-			// This should be impossible, because we checked for the existence of the file
-			throw new RuntimeException(e);
+		else if (userConfig.exists()) {
+			try {
+				config = new Configuration(new FileInputStream(userConfig));
+			}
+			catch (FileNotFoundException e) {
+				// This should be impossible, because we checked for the existence of the file
+				throw new RuntimeException(e);
+			}
 		}
-		catch (IllegalArgumentException e) {
-			LOGGER.log(Level.WARNING, "An error occurred while loading the system specific configuration. " +
-					"The default configuration will be loaded instead.", e);
+		else {
+			config = new Configuration();
 		}
 		
-		return new Configuration();
+		return config;
 	}
 
 	/**

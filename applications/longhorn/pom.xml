@@ -106,6 +106,12 @@
                             <maxIdleTime>60000</maxIdleTime>
                         </connector>
                     </connectors>
+					<systemProperties>
+						<systemProperty>
+							<name>LONGHORN_WORKDIR</name>
+							<value>${project.build.directory}/longhorn-workdir</value>
+						</systemProperty>
+					</systemProperties> 
                 </configuration>
                 <executions>
                     <execution>
