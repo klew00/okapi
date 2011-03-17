@@ -54,7 +54,6 @@ import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
-import net.sf.okapi.common.filters.InlineCodeFinder;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.DocumentPart;
@@ -70,7 +69,7 @@ import net.sf.okapi.common.skeleton.GenericSkeletonPart;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
-@UsingParameters() // No parameters used
+@UsingParameters(Parameters.class)
 public class MIFFilter implements IFilter {
 	
 	private final Logger logger = Logger.getLogger(getClass().getName());
@@ -86,6 +85,7 @@ public class MIFFilter implements IFilter {
 	private static final String IMPORTOBJECT = "ImportObject";
 	private static final String FRAMEROMAN = "x-MacRoman"; //TODO: Set to x-FrameRoman when ready
 
+	private Parameters params;
 	private String lineBreak;
 	private String docName;
 	private BufferedReader reader;
@@ -112,7 +112,6 @@ public class MIFFilter implements IFilter {
 	private int cellGroupLevel;
 	private int fnoteGroupLevel;
 	private Stack<String> parentIds;
-	private InlineCodeFinder codeFinder;
 	private ArrayList<String> textFlows; 
 	private ArrayList<String> tables;
 	private boolean secondPass;
@@ -162,9 +161,7 @@ public class MIFFilter implements IFilter {
 	}
 
 	public MIFFilter () {
-		codeFinder = new InlineCodeFinder();
-		codeFinder.addRule("<\\$.*?>");
-		codeFinder.compile();
+		params = new Parameters();
 	}
 
 	@Override
@@ -224,7 +221,7 @@ public class MIFFilter implements IFilter {
 
 	@Override
 	public IParameters getParameters () {
-		return null;
+		return params;
 	}
 
 	@Override
@@ -307,6 +304,11 @@ public class MIFFilter implements IFilter {
 			reader = new BufferedReader(new InputStreamReader((InputStream)res[0], baseEncoding));
 			initialize();
 			
+			// Compile code finder rules
+			if ( params.getUseCodeFinder() ) {
+				params.getCodeFinder().compile();
+			}
+			
 			// Initialize the decoders
 			decoders = new CharsetDecoder[2];
 			decoders[0] = Charset.forName(baseEncoding).newDecoder();
@@ -347,7 +349,7 @@ public class MIFFilter implements IFilter {
 
 	@Override
 	public void setParameters (IParameters params) {
-		// No parameters for now
+		this.params = (Parameters)params;
 	}
 
 	@Override
@@ -868,7 +870,9 @@ public class MIFFilter implements IFilter {
 		}
 
 		// Check for inline codes
-		codeFinder.process(tf);
+		if ( params.getUseCodeFinder() ) {
+			params.getCodeFinder().process(tf);
+		}
 
 		TextUnit tu = null;
 		if ( !tf.isEmpty() ) {

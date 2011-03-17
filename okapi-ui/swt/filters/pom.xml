@@ -24,6 +24,7 @@
         <module>json-ui</module>
         <module>rainbowkit-ui</module>
         <module>transifex-ui</module>
+        <module>mif-ui</module>
     </modules>
 
    <dependencies>
