@@ -110,7 +110,7 @@ public class MIFFilterTest {
 		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu==null);
 	}
-	
+
 	@Test
 	public void testTwoPartsEntry () {
 		String snippet = STARTMIF

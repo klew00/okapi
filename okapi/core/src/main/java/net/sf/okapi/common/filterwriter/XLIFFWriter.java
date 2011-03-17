@@ -87,6 +87,7 @@ public class XLIFFWriter implements IFilterWriter {
 	private String fwInputEncoding; // Used in IFilterWriter mode
 
 	private boolean inFile;
+	private boolean hasFile;
 	private boolean useSourceForTranslated = false;
 
 	private boolean placeholderMode = false;
@@ -202,6 +203,9 @@ public class XLIFFWriter implements IFilterWriter {
 	 */
 	public void close () {
 		if ( writer != null ) {
+			if ( !hasFile ) {
+				writeStartFile(original, dataType, skeletonPath, fwConfigId, fwInputEncoding, null);
+			}
 			if ( inFile ) {
 				writeEndFile();
 			}
@@ -304,7 +308,7 @@ public class XLIFFWriter implements IFilterWriter {
 			writer.writeEndElementLineBreak(); // header
 		}
 
-		inFile = true;
+		inFile = hasFile = true;
 		writer.writeStartElement("body");
 		writer.writeLineBreak();
 	}

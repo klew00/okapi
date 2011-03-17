@@ -74,17 +74,21 @@ public class MIFFilter implements IFilter {
 	
 	private final Logger logger = Logger.getLogger(getClass().getName());
 
+	private static final int BLOCKTYPE_TEXTFLOW = 1;
+	private static final int BLOCKTYPE_TABLE = 2;
+	
 	private static final Hashtable<String, String> charTable = initCharTable();
 	private static final Hashtable<String, String> encodingTable = initEncodingTable();
 	
 	private static final String TOPSTATEMENTSTOSKIP = "ColorCatalog;ConditionCatalog;BoolCondCatalog;"
 		+ "CombinedFontCatalog;PgfCatalog;ElementDefCatalog;FmtChangeListCatalog;DefAttrValuesCatalog;"
 		+ "AttrCondExprCatalog;FontCatalog;RulingCatalog;TblCatalog;KumihanCatalog;Views;VariableFormats;"
-		+ "MarkerTypeCatalog;XRefFormats;Document;BookComponent;InitialAutoNums;Dictionary;AFrames;Page";
+		+ "MarkerTypeCatalog;XRefFormats;Document;BookComponent;InitialAutoNums;Dictionary;AFrames;Page;";
+	// Must end with ';'
 	
 	private static final String IMPORTOBJECT = "ImportObject";
 	private static final String FRAMEROMAN = "x-MacRoman"; //TODO: Set to x-FrameRoman when ready
-
+	
 	private Parameters params;
 	private String lineBreak;
 	private String docName;
@@ -294,6 +298,11 @@ public class MIFFilter implements IFilter {
 			gatherExtractionInformation();
 			reader.close();
 			input.close();
+			
+//System.out.println("Text flow to extract:");			
+//for ( String s : textFlows ) {
+//	System.out.println(s);
+//}
 
 			//--- Second pass: extract
 			
@@ -392,7 +401,7 @@ public class MIFFilter implements IFilter {
 			
 			// Check if we are still processing a TextFlow 
 			if ( inBlock > 0 ) {
-				processBlock(inBlock);
+				processBlock(inBlock, false);
 				return;
 			}
 			
@@ -407,17 +416,21 @@ public class MIFFilter implements IFilter {
 					skel.append((char)c);
 					blockLevel++;
 					String tag = readTag(true, true, null);
-					if ( TOPSTATEMENTSTOSKIP.indexOf(tag) > -1 ) {
+					if ( TOPSTATEMENTSTOSKIP.indexOf(tag+";") > -1 ) {
 						skipOverContent(true, null);
 						blockLevel--;
 					}
 					else if ( "TextFlow".equals(tag) ) {
-						processBlock(blockLevel);
-						return;
+						if ( startBlock(blockLevel, BLOCKTYPE_TEXTFLOW) ) return;
 					}
 					else if ( "Tbls".equals(tag) ) {
-						processBlock(blockLevel);
-						return;
+						// Do nothing, but do not skip.
+						// The tables will be read in Tbl tags
+						tag = tag.toString();
+						continue;
+					}
+					else if ( "Tbl".equals(tag) ) {
+						if ( startBlock(blockLevel, BLOCKTYPE_TABLE) ) return;
 					}
 					else if ( "MIFFile".equals(tag) ) {
 						MIFToken token = getNextTokenInStatement(true, null);
@@ -463,13 +476,10 @@ public class MIFFilter implements IFilter {
 		}
 	}
 
-	/* PageType=
-	 * LeftMasterPage
-	 * RightMasterPage
-	 * OtherMasterPage
-	 * ReferencePage
-	 * BodyPage
-	 * HiddenPage
+	/**
+	 * Gather the information about what to extract.
+	 * This method create a list of all text flow and table to extract, based
+	 * on the filter's options.
 	 */
 	private void gatherExtractionInformation () {
 		try {
@@ -477,8 +487,9 @@ public class MIFFilter implements IFilter {
 			MIFToken token;
 			boolean inEscape = false;
 			boolean inString = false;
-			ArrayList<String> toTRExtract = new ArrayList<String>();
+			ArrayList<String> trToExtract = new ArrayList<String>();
 			ArrayList<String> tblIds = new ArrayList<String>();
+			boolean hasPages = false; // Simple MIF may not have any page
 
 			while ( true ) {
 				
@@ -497,6 +508,10 @@ public class MIFFilter implements IFilter {
 					else {
 						switch ( c ) {
 						case -1:
+							if ( !hasPages ) {
+								textFlows = null;
+								tables = null;
+							}
 							return; // No more data
 						case '`':
 							inString = true;
@@ -525,6 +540,7 @@ public class MIFFilter implements IFilter {
 						// If it's a Page: get the first TextRect id and the type
 						String pageType = null;
 						String textRectId = null;
+						hasPages = true;
 						
 						while ( true ) {
 							tag = readUntil("PageType;TextRect;", false, blockLevel);
@@ -574,9 +590,32 @@ public class MIFFilter implements IFilter {
 						// We have looked at the page data
 						if ( !Util.isEmpty(pageType) && !Util.isEmpty(textRectId) ) {
 							if ( pageType.equals("BodyPage") ) {
-								toTRExtract.add(textRectId);
+								if ( params.getExtractBodyPages() ) {
+									trToExtract.add(textRectId);
+								}
+							}
+							else if ( pageType.equals("ReferencePage") ) {
+								if ( params.getExtractReferencePages() ) {
+									trToExtract.add(textRectId);
+								}
+							}
+							else if ( pageType.equals("HiddenPage") ) {
+								if ( params.getExtractHiddenPages() ) {
+									trToExtract.add(textRectId);
+								}
+							}
+							else if ( pageType.endsWith("MasterPage") ) {
+								if ( params.getExtractMasterPages() ) {
+									trToExtract.add(textRectId);
+								}
+							}
+							else {
+								// Else: unexpected type of page: extract it just in case
+								trToExtract.add(textRectId);
+								logger.warning(String.format("Unknown page type '%s' (It will be extracted)", pageType));
 							}
 						}
+
 					}
 					else if ( tag.equals("TextFlow") ) {
 						// Check which text flows have table reference,
@@ -642,7 +681,7 @@ public class MIFFilter implements IFilter {
 							}
 							
 							// Check the TextRect id against the ones found for the pages
-							if ( toTRExtract.contains(textRectId) ) {
+							if ( trToExtract.contains(textRectId) ) {
 								// This text flow is to be extracted
 								// and so are any table referenced in it
 								textFlows.add(unique);
@@ -669,6 +708,7 @@ public class MIFFilter implements IFilter {
 				}
 				// Else: Ending of statement. Nothing to do
 			}
+			
 		}
 		catch ( IOException e ) {
 			throw new OkapiIOException("Error while gathering extraction information.", e);
@@ -780,21 +820,79 @@ public class MIFFilter implements IFilter {
 		// Actually that's the case most of the time
 	}
 
+	private boolean startBlock (int stopLevel,
+		int type)
+		throws IOException
+	{
+		if ( type == BLOCKTYPE_TABLE ) {
+			// Get the table id
+			String tag = readUntil("TblID", true, stopLevel);
+			if ( tag == null ) {
+				// Error: Unique ID missing
+				throw new OkapiIOException("Missing id for the table.");
+			}
+			MIFToken token = getNextTokenInStatement(true, null);
+			if ( token.getType() != MIFToken.TYPE_STRING ) {
+				throw new OkapiIOException("Missing id value for the table.");
+			}
+			// If the table is not listed as to be extracted: we skip it
+			if (( tables != null ) && !tables.contains(token.getString()) ) {
+				skipOverContent(true, null);
+				blockLevel--;
+				return false;
+			}
+			// If tables==null it's because we didn't have any page, so we extract by default
+			// Else: extract: use fall thru code
+		}
+		else if ( type == BLOCKTYPE_TEXTFLOW ) {
+			// Get the unique id
+			String tag = readUntil("Unique", true, stopLevel);
+			if ( tag == null ) {
+				// Error: Unique ID missing
+				throw new OkapiIOException("Missing unique id for the table.");
+			}
+			MIFToken token = getNextTokenInStatement(true, null);
+			if ( token.getType() != MIFToken.TYPE_STRING ) {
+				throw new OkapiIOException("Missing unique id value for the text flow.");
+			}
+			// If the table is not listed as to be extracted: we skip it
+			if (( textFlows != null ) && !textFlows.contains(token.getString()) ) {
+				skipOverContent(true, null);
+				blockLevel--;
+				return false;
+			}
+			// If textFlows==null it's because we didn't have any page, so we extract by default
+			// Else: extract: use fall thru code
+		}
+		
+		// Extract
+		processBlock(stopLevel, (type==BLOCKTYPE_TEXTFLOW));
+		return true;
+	}
+	
 	/**
 	 * Process the first or next entry of a TextFlow statement.
 	 * @throws IOException if a low-level error occurs.
 	 */
-	private void processBlock (int stopLevel)
+	private void processBlock (int stopLevel,
+		boolean inPara)
 		throws IOException
 	{
 		// Process one Para statement at a time
-		if ( readUntil("Para", true, stopLevel) != null ) {
+		if ( inPara ) {
 			inBlock = stopLevel; // We are not done yet with this TextFlow statement
 			processPara();
 			blockLevel--; // Closing the Para statement here
 		}
-		else { // Done
-			inBlock = 0; // We are done
+		else {
+			if ( readUntil("Para", true, stopLevel) != null ) {
+				inBlock = stopLevel; // We are not done yet with this TextFlow statement
+				processPara();
+				blockLevel--; // Closing the Para statement here
+			}
+			else { // Done
+				inBlock = 0; // We are done
+			}
 		}
 		
 		// If needed, create a document part and return

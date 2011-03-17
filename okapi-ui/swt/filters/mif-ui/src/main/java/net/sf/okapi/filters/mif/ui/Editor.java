@@ -52,6 +52,10 @@ public class Editor implements IParametersEditor {
 	private Button chkUseCodeFinder;
 	private InlineCodeFinderPanel pnlCodeFinder;
 	private IHelp help;
+	private Button chkExtractBodyPages;
+	private Button chkExtractHiddenPages;
+	private Button chkExtractMasterPages;
+	private Button chkExtractReferencePages;
 
 	public boolean edit (IParameters params,
 		boolean readOnly,
@@ -100,6 +104,18 @@ public class Editor implements IParametersEditor {
 		Composite cmpTmp = new Composite(tfTmp, SWT.NONE);
 		layTmp = new GridLayout();
 		cmpTmp.setLayout(layTmp);
+		
+		chkExtractBodyPages = new Button(cmpTmp, SWT.CHECK);
+		chkExtractBodyPages.setText(Res.getString("extractBodyPages"));
+
+		chkExtractHiddenPages = new Button(cmpTmp, SWT.CHECK);
+		chkExtractHiddenPages.setText(Res.getString("extractHiddenPages"));
+
+		chkExtractMasterPages = new Button(cmpTmp, SWT.CHECK);
+		chkExtractMasterPages.setText(Res.getString("extractMasterPages"));
+
+		chkExtractReferencePages = new Button(cmpTmp, SWT.CHECK);
+		chkExtractReferencePages.setText(Res.getString("extractReferencePages"));
 
 		//options controls: todo
 		
@@ -170,9 +186,12 @@ public class Editor implements IParametersEditor {
 	}
 	
 	private void setData () {
+		chkExtractBodyPages.setSelection(params.getExtractBodyPages());
+		chkExtractHiddenPages.setSelection(params.getExtractHiddenPages());
+		chkExtractMasterPages.setSelection(params.getExtractMasterPages());
+		chkExtractReferencePages.setSelection(params.getExtractReferencePages());
 		chkUseCodeFinder.setSelection(params.getUseCodeFinder());
 		pnlCodeFinder.setRules(params.getCodeFinderData());
-		
 		updateInlineCodes();
 		pnlCodeFinder.updateDisplay();
 	}
@@ -187,6 +206,10 @@ public class Editor implements IParametersEditor {
 			}
 		}
 
+		params.setExtractBodyPages(chkExtractBodyPages.getSelection());
+		params.setExtractHiddenPages(chkExtractHiddenPages.getSelection());
+		params.setExtractMasterPages(chkExtractMasterPages.getSelection());
+		params.setExtractReferencePages(chkExtractReferencePages.getSelection());
 		params.setUseCodeFinder(chkUseCodeFinder.getSelection());
 		return true;
 	}

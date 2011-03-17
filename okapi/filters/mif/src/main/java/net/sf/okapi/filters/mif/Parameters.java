@@ -25,6 +25,17 @@ import net.sf.okapi.common.filters.InlineCodeFinder;
 
 public class Parameters extends BaseParameters {
 
+	private static final String EXTRACTBODYPAGES = "extractBodyPages";
+	private static final String EXTRACTREFERENCEPAGES = "extractReferencePages";
+	private static final String EXTRACTMASTERPAGES = "extractMasterPages";
+	private static final String EXTRACTHIDDENPAGES = "extractHiddenPages";
+	private static final String USECODEFINDER = "useCodeFinder";
+	private static final String CODEFINDERRULES = "codeFinderRules";
+	
+	private boolean extractBodyPages;
+	private boolean extractReferencePages;
+	private boolean extractMasterPages;
+	private boolean extractHiddenPages;
 	private boolean useCodeFinder;
 	private InlineCodeFinder codeFinder;
 
@@ -54,7 +65,43 @@ public class Parameters extends BaseParameters {
 		codeFinder.fromString(data);
 	}
 
+	public boolean getExtractReferencePages () {
+		return extractReferencePages;
+	}
+	
+	public void setExtractReferencePages (boolean extractReferencePages) {
+		this.extractReferencePages = extractReferencePages;
+	}
+
+	public boolean getExtractMasterPages () {
+		return extractMasterPages;
+	}
+	
+	public void setExtractMasterPages (boolean extractMasterPages) {
+		this.extractMasterPages = extractMasterPages;
+	}
+	
+	public boolean getExtractHiddenPages () {
+		return extractHiddenPages;
+	}
+
+	public void setExtractHiddenPages (boolean extractHiddenPages) {
+		this.extractHiddenPages = extractHiddenPages;
+	}
+
+	public boolean getExtractBodyPages () {
+		return extractBodyPages;
+	}
+
+	public void setExtractBodyPages (boolean extractBodyPages) {
+		this.extractBodyPages = extractBodyPages;
+	}
+
 	public void reset () {
+		extractBodyPages = true;
+		extractMasterPages = true;
+		extractReferencePages = true;
+		extractHiddenPages = true;
 		useCodeFinder = true;
 		codeFinder.reset();
 		codeFinder.setSample("text <$varName> text");
@@ -65,15 +112,23 @@ public class Parameters extends BaseParameters {
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
-		useCodeFinder = buffer.getBoolean("useCodeFinder", useCodeFinder);
-		codeFinder.fromString(buffer.getGroup("codeFinderRules", ""));
+		extractBodyPages = buffer.getBoolean(EXTRACTBODYPAGES, extractBodyPages);
+		extractHiddenPages = buffer.getBoolean(EXTRACTHIDDENPAGES, extractHiddenPages);
+		extractMasterPages = buffer.getBoolean(EXTRACTMASTERPAGES, extractMasterPages);
+		extractReferencePages = buffer.getBoolean(EXTRACTREFERENCEPAGES, extractReferencePages);
+		useCodeFinder = buffer.getBoolean(USECODEFINDER, useCodeFinder);
+		codeFinder.fromString(buffer.getGroup(CODEFINDERRULES, ""));
 	}
 	
 	@Override
 	public String toString () {
 		buffer.reset();
-		buffer.setBoolean("useCodeFinder", useCodeFinder);
-		buffer.setGroup("codeFinderRules", codeFinder.toString());
+		buffer.setBoolean(EXTRACTBODYPAGES, extractBodyPages);
+		buffer.setBoolean(EXTRACTHIDDENPAGES, extractHiddenPages);
+		buffer.setBoolean(EXTRACTMASTERPAGES, extractMasterPages);
+		buffer.setBoolean(EXTRACTREFERENCEPAGES, extractReferencePages);
+		buffer.setBoolean(USECODEFINDER, useCodeFinder);
+		buffer.setGroup(CODEFINDERRULES, codeFinder.toString());
 		return buffer.toString();
 	}
 
