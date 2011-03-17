@@ -28,13 +28,12 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 
@@ -295,6 +294,43 @@ public class UtilTest {
 		assertEquals("/C:/test", Util.toURI("/C:/test").getPath());
 		assertEquals("/C:/test", Util.toURI("file:/C:/test").getPath()); 
 	}
+	
+	@Test
+	public void testEmptyURI() throws URISyntaxException {
+		// IllegalArgumentException expected
+		try{
+			assertEquals("", Util.toURI(null).toString());
+		}
+		catch (IllegalArgumentException e) {
+		}
+		try{
+			assertEquals("", Util.toURI(null).getPath());
+		}
+		catch (IllegalArgumentException e) {
+		}
+		try{
+			assertEquals("", Util.makeURIFromPath(null));
+		}
+		catch (IllegalArgumentException e) {
+		}
+		try{
+			assertEquals("", Util.toURI("").toString());
+		}
+		catch (IllegalArgumentException e) {
+		}
+		try{
+			assertEquals("", Util.toURI("").getPath());
+		}
+		catch (IllegalArgumentException e) {
+		}
+		try{
+			assertEquals("", Util.makeURIFromPath(""));
+		}
+		catch (IllegalArgumentException e) {
+			return;
+		}
+		fail();		
+	}	
 
 	@Test
 	public void testEnsureSeparator() {

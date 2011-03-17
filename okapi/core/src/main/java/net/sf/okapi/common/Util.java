@@ -787,6 +787,9 @@ public final class Util {
 	 * @throws OkapiUnsupportedEncodingException
 	 */
 	static public String makeURIFromPath (String pathOrUri) {
+		if (isEmpty(pathOrUri)) {
+			throw new IllegalArgumentException();
+		}
 		// This should catch most of the URI forms
 		pathOrUri = pathOrUri.replace('\\', '/');
 		if (pathOrUri.indexOf("://") != -1)
