@@ -43,7 +43,7 @@ import net.sf.okapi.lib.extra.steps.EventLogger;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 import net.sf.okapi.steps.leveraging.LeveragingStep;
 import net.sf.okapi.steps.segmentation.SegmentationStep;
-import net.sf.okapi.steps.wordcount.categorized.LocalContextExactMatchWordCountStep;
+import net.sf.okapi.steps.wordcount.categorized.okapi.ExactLocalContextMatchWordCountStep;
 import net.sf.okapi.steps.wordcount.common.GMX;
 import net.sf.okapi.steps.wordcount.common.Metrics;
 import net.sf.okapi.steps.wordcount.common.MetricsAnnotation;
@@ -61,6 +61,16 @@ public class ScopingReportTest {
 		logger.fine(new File(path).getAbsolutePath());
 	}
 	
+	@Test
+	public void testDefaultTemplate() {
+		// TODO
+	}
+	
+	@Test
+	public void testCustomTemplate() {
+		// TODO
+	}
+		
 	@Test
 	public void htmlReportTest() throws MalformedURLException {
 		String pathBase = Util.getDirectoryName(this.getClass().getResource("aa324.html").getPath()) + "/";
@@ -106,6 +116,9 @@ public class ScopingReportTest {
 		params.setProjectName("Test scoping report");
 		params.setOutputPath(pathBase + "out/test_scoping_report2.html");
 		
+		srs.setSourceLocale(EN);
+		srs.setTargetLocale(ES);
+		
 		srs.handleEvent(new Event(EventType.START_BATCH));
 		srs.handleEvent(new Event(EventType.START_DOCUMENT, sd1));
 		srs.handleEvent(new Event(EventType.START_DOCUMENT, sd2));
@@ -116,7 +129,7 @@ public class ScopingReportTest {
 		Metrics m = ma.getMetrics();		
 		
 		m.setMetric(GMX.TotalWordCount, 1273);
-		m.setMetric(LocalContextExactMatchWordCountStep.METRIC, 72);
+		m.setMetric(ExactLocalContextMatchWordCountStep.METRIC, 72);
 		m.setMetric(GMX.ExactMatchedWordCount, 120);
 		m.setMetric(GMX.LeveragedMatchedWordCount, 132);
 		m.setMetric(GMX.FuzzyMatchedWordCount, 781);
@@ -175,6 +188,7 @@ public class ScopingReportTest {
 		
 		testPath(pathBase + "out");
 	}
+
 	
 }
 
