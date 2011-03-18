@@ -200,6 +200,11 @@ abstract public class AbstractPipelineStep extends OkapiComponent implements IPi
 		return event;
 	}
 	
+	@StepParameterMapping(parameterType = StepParameterType.SOURCE_LOCALE)
+	public void setSourceLocale (LocaleId sourceLocale) {
+		this.srcLoc = sourceLocale;
+	}
+	
 	@StepParameterMapping(parameterType = StepParameterType.TARGET_LOCALE)
 	public void setTargetLocale (LocaleId targetLocale) {
 		this.trgLoc = targetLocale;

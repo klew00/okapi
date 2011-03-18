@@ -52,7 +52,10 @@ public class EventLogger extends BasePipelineStep {
 		if (event.getResource() != null)
 			res = String.format("  [%s]", event.getResource().getId());
 		
-		switch ( event.getEventType() ) {
+		switch ( event.getEventType() ) {	
+			case TEXT_UNIT:
+				res = "";
+				break;
 			case START_DOCUMENT:
 				res +=  "  " + ((StartDocument) event.getResource()).getName();
 				break;
