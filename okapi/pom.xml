@@ -76,14 +76,12 @@
 					</execution>
 				</executions>
 				<configuration>
-					<manifestLocation>META-INF</manifestLocation>
+					<manifestLocation>${basedir}/META-INF</manifestLocation>
 					<supportedProjectTypes>
 						<supportedProjectType>jar</supportedProjectType>
 						<supportedProjectType>bundle</supportedProjectType>
 						<supportedProjectType>war</supportedProjectType>
-					</supportedProjectTypes>
-					<instructions>
-					</instructions>
+					</supportedProjectTypes>					
 				</configuration>
 
 			</plugin>
