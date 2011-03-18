@@ -114,10 +114,7 @@ public class ScopingReportTest {
 		ScopingReportStep srs = new ScopingReportStep();
 		Parameters params = (Parameters) srs.getParameters();
 		params.setProjectName("Test scoping report");
-		params.setOutputPath(pathBase + "out/test_scoping_report2.html");
-			
-		srs.setSourceLocale(EN);
-		srs.setTargetLocale(ES);
+		params.setOutputPath(pathBase + "out/test_scoping_report2.html"); srs.setSourceLocale(EN); srs.setTargetLocale(ES);
 		
 		srs.handleEvent(new Event(EventType.START_BATCH));
 		srs.handleEvent(new Event(EventType.START_DOCUMENT, sd1));
