@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -18,50 +18,42 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.wordcount;
+package net.sf.okapi.steps.wordcount.categorized.gmx;
 
-import net.sf.okapi.common.UsingParameters;
+import net.sf.okapi.common.query.MatchType;
+import net.sf.okapi.steps.wordcount.common.AltAnnotationBasedCountStep;
 import net.sf.okapi.steps.wordcount.common.GMX;
-import net.sf.okapi.steps.wordcount.common.Parameters;
-import net.sf.okapi.steps.wordcount.common.TokenCountStep;
 
-/**
- * Word Counter pipeline step. The counter counts a number of words in translatable text units. 
- * The count results are placed in a MetricsAnnotation structure (with the GMX TotalWordCount 
- * metric set), attached to the respective event's resource (TEXT_UNIT, END_DOCUMENT, END_BATCH, 
- * END_BATCH_ITEM, END_SUBDOCUMENT, END_GROUP).  
- * 
- * @version 0.1 06.07.2009
- */
-@UsingParameters(Parameters.class)
-public class WordCountStep extends TokenCountStep {
-	
-	public static final String METRIC = GMX.TotalWordCount; 
-	
+public class GMXFuzzyMatchWordCountStep extends AltAnnotationBasedCountStep {
+
+	public static final String METRIC = GMX.FuzzyMatchedWordCount; 
+		
 	@Override
 	protected String getMetric() {
 		return METRIC;
 	}
 
 	@Override
-	protected String[] getTokenNames() {
-		return new String[] {WordCounter.getTokenName()};
-	}
-
-	@Override
-	protected boolean countOnlyTranslatable() {
-		return false;
-	}
-
-	@Override
 	public String getDescription() {
-		return "Count the number of words in the text units of a set of documents or/and in its parts."
+		return "An accumulation of the word count for text units that have been fuzzy matched against " +
+				"a leveraged translation memory database."
 		+ " Expects: filter events. Sends back: filter events.";
 	}
 
 	@Override
 	public String getName() {
-		return "Word Count";
+		return "Fuzzy Match Word Count";
 	}
 
+	@Override
+	protected boolean accept(MatchType type) {
+		return (type == MatchType.EXACT_TEXT_ONLY_UNIQUE_ID ||
+				type == MatchType.EXACT_TEXT_ONLY_PREVIOUS_VERSION ||
+				type == MatchType.EXACT_TEXT_ONLY ||
+				type == MatchType.EXACT_REPAIRED ||
+				type == MatchType.FUZZY_UNIQUE_ID ||
+				type == MatchType.FUZZY_PREVIOUS_VERSION ||				
+				type == MatchType.FUZZY ||
+				type == MatchType.FUZZY_REPAIRED);
+	}
 }

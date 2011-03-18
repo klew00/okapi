@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2010 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -18,50 +18,33 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.wordcount;
+package net.sf.okapi.steps.wordcount.categorized.okapi;
 
-import net.sf.okapi.common.UsingParameters;
-import net.sf.okapi.steps.wordcount.common.GMX;
-import net.sf.okapi.steps.wordcount.common.Parameters;
-import net.sf.okapi.steps.wordcount.common.TokenCountStep;
+import net.sf.okapi.common.query.MatchType;
+import net.sf.okapi.steps.wordcount.common.AltAnnotationBasedCountStep;
 
-/**
- * Word Counter pipeline step. The counter counts a number of words in translatable text units. 
- * The count results are placed in a MetricsAnnotation structure (with the GMX TotalWordCount 
- * metric set), attached to the respective event's resource (TEXT_UNIT, END_DOCUMENT, END_BATCH, 
- * END_BATCH_ITEM, END_SUBDOCUMENT, END_GROUP).  
- * 
- * @version 0.1 06.07.2009
- */
-@UsingParameters(Parameters.class)
-public class WordCountStep extends TokenCountStep {
+public class ExactLocalContextMatchWordCountStep extends AltAnnotationBasedCountStep {
 	
-	public static final String METRIC = GMX.TotalWordCount; 
-	
+	public static final String METRIC = MatchType.EXACT_LOCAL_CONTEXT.name(); 
+
 	@Override
 	protected String getMetric() {
 		return METRIC;
 	}
 
 	@Override
-	protected String[] getTokenNames() {
-		return new String[] {WordCounter.getTokenName()};
-	}
-
-	@Override
-	protected boolean countOnlyTranslatable() {
-		return false;
-	}
-
-	@Override
 	public String getDescription() {
-		return "Count the number of words in the text units of a set of documents or/and in its parts."
+		return "Matches EXACT and a small number of segments before and/or after."
 		+ " Expects: filter events. Sends back: filter events.";
 	}
 
 	@Override
 	public String getName() {
-		return "Word Count";
+		return "Exact Local Context Match Word Count";
 	}
 
+	@Override
+	protected boolean accept(MatchType type) {
+		return type == MatchType.EXACT_LOCAL_CONTEXT;
+	}
 }

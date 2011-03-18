@@ -52,8 +52,8 @@ public class Parameters extends AbstractParameters {
 
 	@Override
 	protected void parameters_reset() {
-		countInBatch = false;
-		countInBatchItems = false;
+		countInBatch = true; // Defaults for the scoping report step
+		countInBatchItems = true; // Defaults for the scoping report step
 		countInDocuments = false;
 		countInSubDocuments = false;
 		countInGroups = false;

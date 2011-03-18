@@ -31,7 +31,7 @@ import net.sf.okapi.steps.tokenization.tokens.Tokens;
 
 public abstract class TokenCountStep extends BaseCountStep {
 
-	protected abstract String getTokenName();
+	protected abstract String[] getTokenNames();
 	
 	@Override
 	protected long count(TextContainer textContainer, LocaleId locale) {		
@@ -39,9 +39,9 @@ public abstract class TokenCountStep extends BaseCountStep {
 		Tokens tokens = null;
 		
 		if (ta != null)			
-			tokens = ta.getFilteredList(getTokenName());			
+			tokens = ta.getFilteredList(getTokenNames());			
 		else
-			tokens = Tokenizer.tokenize(textContainer, locale, getTokenName());
+			tokens = Tokenizer.tokenize(textContainer, locale, getTokenNames());
 		
 		if (tokens == null) return 0;
 		
@@ -54,9 +54,9 @@ public abstract class TokenCountStep extends BaseCountStep {
 		Tokens tokens = null;
 		
 		if (ta != null)			
-			tokens = ta.getFilteredList(getTokenName());			
+			tokens = ta.getFilteredList(getTokenNames());			
 		else
-			tokens = Tokenizer.tokenize(segment.getContent(), locale, getTokenName());
+			tokens = Tokenizer.tokenize(segment.getContent(), locale, getTokenNames());
 		
 		if (tokens == null) return 0;
 		

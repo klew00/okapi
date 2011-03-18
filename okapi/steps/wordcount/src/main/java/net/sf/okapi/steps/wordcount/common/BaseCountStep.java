@@ -38,10 +38,10 @@ import net.sf.okapi.lib.extra.steps.AbstractPipelineStep;
 
 public abstract class BaseCountStep extends AbstractPipelineStep {
 
-	protected enum CountContext {
-		CC_SOURCE,
-		CC_TARGET
-	}
+//	protected enum CountContext {
+//		CC_SOURCE,
+//		CC_TARGET
+//	}
 	private Parameters params;
 	private IdGenerator gen = new IdGenerator("ending");
 	private TextContainer source;
