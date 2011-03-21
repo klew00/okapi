@@ -43,7 +43,7 @@ public class MergingStep extends BasePipelineStep {
 	@Override
 	public String getDescription () {
 		return "Post-process a Rainbow translation kit."
-			+" Expects: raw document. Sends back: filter events.";
+			+" Expects: filter events. Sends back: filter events.";
 	}
 
 	@Override
