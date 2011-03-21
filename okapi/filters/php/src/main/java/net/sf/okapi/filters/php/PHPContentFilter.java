@@ -133,7 +133,7 @@ public class PHPContentFilter implements IFilter {
 	}
 	
 	public String getDisplayName () {
-		return "PHP Content Filter (BETA)";
+		return "PHP Content Filter";
 	}
 
 	public String getMimeType () {

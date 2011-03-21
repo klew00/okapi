@@ -128,7 +128,7 @@ public class TTXFilter implements IFilter {
 	}
 
 	public String getDisplayName () {
-		return "TTX Filter (BETA)";
+		return "TTX Filter";
 	}
 
 	public String getMimeType () {

@@ -367,7 +367,7 @@ public class TsFilter implements IFilter {
 	}
 
 	public String getDisplayName () {
-		return "TS Filter (BETA)";
+		return "TS Filter";
 	}
 
 	public IParameters getParameters() {

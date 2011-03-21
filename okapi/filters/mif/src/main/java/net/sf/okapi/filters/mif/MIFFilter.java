@@ -200,7 +200,7 @@ public class MIFFilter implements IFilter {
 	
 	@Override
 	public String getDisplayName () {
-		return "MIF Filter (ALPHA don't even try)";
+		return "MIF Filter (early BETA)";
 	}
 
 	@Override

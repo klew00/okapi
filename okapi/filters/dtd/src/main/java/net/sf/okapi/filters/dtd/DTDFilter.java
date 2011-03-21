@@ -120,7 +120,7 @@ public class DTDFilter implements IFilter {
 	}
 	
 	public String getDisplayName () {
-		return "DTD Filter (BETA)";
+		return "DTD Filter";
 	}
 
 	public String getMimeType () {

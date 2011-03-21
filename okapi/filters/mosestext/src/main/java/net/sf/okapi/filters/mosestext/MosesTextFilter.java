@@ -124,7 +124,7 @@ public class MosesTextFilter implements IFilter {
 	}
 	
 	public String getDisplayName () {
-		return "Moses Text Filter (BETA)";
+		return "Moses Text Filter";
 	}
 
 	public String getMimeType () {

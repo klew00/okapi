@@ -115,7 +115,7 @@ public class XMLFilter implements IFilter {
 	}
 	
 	public String getDisplayName () {
-		return "XML Filter (BETA)";
+		return "XML Filter";
 	}
 
 	public String getMimeType () {

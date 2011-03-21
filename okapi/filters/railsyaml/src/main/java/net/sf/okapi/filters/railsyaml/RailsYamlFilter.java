@@ -98,7 +98,7 @@ public class RailsYamlFilter extends AbstractFilter {
 		setFilterWriter(createFilterWriter());
 		
 		setName("okf_railsyaml");
-		setDisplayName("Ruby on Rails YAML Filter (BETA)");
+		setDisplayName("Ruby on Rails YAML Filter");
 		addConfiguration(new FilterConfiguration(getName(), 
 			YAML_MIME_TYPE, 
 			getClass().getName(),

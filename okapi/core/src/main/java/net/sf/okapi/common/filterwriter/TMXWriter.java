@@ -46,6 +46,7 @@ public class TMXWriter {
     	+ "changedate;segtype;changeid;o-tmf;srclang;";
 
     private static final String CREATIONID = "creationid";
+    private static final String FROMALTERNATE = "FromAlternate!";
     
     private XMLWriter writer;
     private TMXContent tmxCont = new TMXContent();
@@ -54,7 +55,8 @@ public class TMXWriter {
     private int itemCount;
     private Pattern exclusionPattern = null;
     private Pattern altTransInclusionPattern = null;
-    private Hashtable<String, String> MTattribute;
+    private Hashtable<String, String> mtAttribute;
+    private Hashtable<String, String> altAttribute;
     private boolean useMTPrefix = true;
 
     /**
@@ -68,8 +70,10 @@ public class TMXWriter {
     		throw new IllegalArgumentException("path must be set");
     	}
     	writer = new XMLWriter(path);
-    	MTattribute = new Hashtable<String, String>();
-    	MTattribute.put(CREATIONID, Util.MTFLAG);
+    	mtAttribute = new Hashtable<String, String>();
+    	mtAttribute.put(CREATIONID, Util.MTFLAG);
+    	altAttribute = new Hashtable<String, String>();
+    	altAttribute.put(CREATIONID, FROMALTERNATE);
     }
 
     /**
@@ -495,9 +499,18 @@ public class TMXWriter {
     	if ( srcFrag.isEmpty() ) {
    			srcFrag = srcOriginal;
     	}
+
+    	// Add an MT prefix if requested, use a clone for this
+    	if ( useMTPrefix && alt.fromMT() ) {
+   			if ( !srcFrag.getCodedText().startsWith(Util.MTFLAG) ) {
+   				srcFrag = srcFrag.clone();
+   				srcFrag.setCodedText(Util.MTFLAG+" "+srcFrag.getCodedText());
+    		}
+    	}
+    	
     	TextFragment trgFrag = alt.getTarget().getFirstContent();
 		// Write out the segment
-   		writeTU(srcFrag, trgFrag, null, null, alt.getTargetLocale());
+   		writeTU(srcFrag, trgFrag, null, (alt.fromMT() ? mtAttribute : altAttribute), alt.getTargetLocale());
     }
     
     /**
