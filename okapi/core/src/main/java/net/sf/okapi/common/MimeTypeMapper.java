@@ -62,6 +62,7 @@ public final class MimeTypeMapper {
 	public static final String TTX_MIME_TYPE = "application/x-ttx+xml";
 	public static final String TMX_MIME_TYPE = "application/x-tmx+xml";
 	public static final String VERSIFIED_TXT_MIME_TYPE = "text/x-versified-txt";
+	public static final String XINI_MIME_TYPE = "text/x-xini";
 
 	static {
 		extensionToMimeMap.put("xml", XML_MIME_TYPE);
@@ -95,7 +96,8 @@ public final class MimeTypeMapper {
 		extensionToMimeMap.put("ods", OPENOFFICE_MIME_TYPE);		
 		extensionToMimeMap.put("odp", OPENOFFICE_MIME_TYPE);		
 		extensionToMimeMap.put("odg", OPENOFFICE_MIME_TYPE);		
-		extensionToMimeMap.put("vrsz", VERSIFIED_TXT_MIME_TYPE);		
+		extensionToMimeMap.put("vrsz", VERSIFIED_TXT_MIME_TYPE);	
+		extensionToMimeMap.put("xini", XINI_MIME_TYPE);		
 	}
 
 	/**

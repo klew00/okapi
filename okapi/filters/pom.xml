@@ -41,5 +41,6 @@
 		<module>rainbowkit</module>
 		<module>archive</module>
 		<module>transifex</module>
+		<module>xini</module>
     </modules>
 </project>

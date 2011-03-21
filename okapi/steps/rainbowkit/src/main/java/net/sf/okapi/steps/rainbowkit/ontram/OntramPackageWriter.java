@@ -3,46 +3,50 @@ package net.sf.okapi.steps.rainbowkit.ontram;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.rainbowkit.Manifest;
+import net.sf.okapi.filters.rainbowkit.MergingInfo;
+import net.sf.okapi.filters.xini.XINIWriter;
 import net.sf.okapi.steps.rainbowkit.common.BasePackageWriter;
-import net.sf.okapi.steps.rainbowkit.ontram.xini.XiniWriter;
 
 public class OntramPackageWriter extends BasePackageWriter {
 
-	private XiniWriter writer;
+	private XINIWriter writer;
 
 	public OntramPackageWriter() {
-		super(Manifest.EXTRACTIONTYPE_ONRTAM);
-		writer = new XiniWriter();
+		super(Manifest.EXTRACTIONTYPE_ONTRAM);
+		writer = new XINIWriter();
 	}
 
 	@Override
 	protected void processStartBatch() {
-		super.processStartBatch();
-		manifest.setSubDirectories("original", "work", "work", "done", null, true);
+		manifest.setSubDirectories("original", "xini", "xini", "translated", null, false);
 		setTMXInfo(false, null, null, null, null);
+		String path = manifest.getSourceDirectory() + "contents.xini";
 
-		writer = new XiniWriter();
-		String xiniPath = manifest.getSourceDirectory() + "contents.xini";
-		writer.setXiniPath(xiniPath);
-	}
-
-	@Override
-	protected void processEndBatch() {
-		super.processEndBatch();
-		writer.writeXINI();
-		close();
+		writer = new XINIWriter();
+		writer.setOutputPath(path);
+		
+		writer.init();
+		
+		super.processStartBatch();
 	}
 
 	@Override
 	protected void processStartDocument(Event event) {
 		super.processStartDocument(event);
+		
+		MergingInfo info = manifest.getItem(docId);
+		String inputPath = info.getRelativeInputPath();
+		writer.setNextPageName(inputPath);
+		
 		writer.handleEvent(event);
 	}
 
 	@Override
 	protected void processEndDocument(Event event) {
+		writer.writeXINI();
+		close();
+
 		super.processEndDocument(event);
-		writer.handleEvent(event);
 	}
 
 	@Override

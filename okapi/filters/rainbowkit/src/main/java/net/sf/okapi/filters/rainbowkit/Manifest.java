@@ -52,7 +52,7 @@ public class Manifest implements IAnnotation {
 	public static final String EXTRACTIONTYPE_XLIFFRTF = "xliff+rtf";
 	public static final String EXTRACTIONTYPE_OMEGAT = "omegat";
 	public static final String EXTRACTIONTYPE_TRANSIFEX = "transifex";
-	public static final String EXTRACTIONTYPE_ONRTAM = "ontram";
+	public static final String EXTRACTIONTYPE_ONTRAM = "ontram";
 
 	public static final String VERSION = "2";
 	public static final String MANIFEST_FILENAME = "manifest";

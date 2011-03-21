@@ -47,6 +47,7 @@ import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 import net.sf.okapi.filters.po.POFilter;
 import net.sf.okapi.filters.rtf.RTFFilter;
+import net.sf.okapi.filters.xini.XINIFilter;
 import net.sf.okapi.filters.xliff.XLIFFFilter;
 import net.sf.okapi.lib.transifex.TransifexClient;
 
@@ -292,6 +293,10 @@ public class RainbowKitFilter implements IFilter {
 		else if ( info.getExtractionType().equals(Manifest.EXTRACTIONTYPE_TRANSIFEX) ) {
 			file = downloadFromTransifex(info);
 			filter = new POFilter();
+		}
+		else if ( info.getExtractionType().equals(Manifest.EXTRACTIONTYPE_ONTRAM) ) {
+			file = new File(manifest.getTargetDirectory()+"contents.xini");
+			filter =  new  XINIFilter(info.getRelativeInputPath());
 		}
 		else {
 			throw new OkapiIOException("Unsupported extraction type: "+info.getExtractionType());
