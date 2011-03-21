@@ -17,6 +17,8 @@ public class RESTService implements LonghornService {
 	
 	public RESTService(URI baseUri) {
 		this.baseUri = baseUri;
+		// Check if service is reachable
+		getProjects();
 	}
 	
 	public URI getBaseUri() {
