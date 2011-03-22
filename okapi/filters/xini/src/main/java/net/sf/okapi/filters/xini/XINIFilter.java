@@ -62,7 +62,10 @@ public class XINIFilter implements IFilter {
 
 	@Override
 	public void close () {
-		reader.close();
+		if ( reader != null ) {
+			reader.close();
+			reader = null;
+		}
 	}
 
 	@Override

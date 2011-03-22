@@ -37,6 +37,7 @@ import javax.xml.bind.Unmarshaller;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.MimeTypeMapper;
+import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
@@ -90,9 +91,13 @@ public class XINIReader {
 	
 	public void close() {
 		try {
-			xiniStream.close();
+			if ( xiniStream != null ) {
+				xiniStream.close();
+				xiniStream = null;
+			}
 		}
 		catch (IOException e) {
+			throw new OkapiIOException(e);
 		}
 	}
 	
