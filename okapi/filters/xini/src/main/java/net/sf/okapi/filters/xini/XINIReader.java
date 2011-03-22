@@ -20,6 +20,7 @@
 
 package net.sf.okapi.filters.xini;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.Collections;
@@ -65,6 +66,7 @@ public class XINIReader {
         tagType = Collections.unmodifiableMap(tagTypes);
     }
 	private Xini xini;
+	private InputStream xiniStream;
 	
 	public XINIReader() {
 	}
@@ -72,7 +74,7 @@ public class XINIReader {
 	@SuppressWarnings("unchecked")
 	public void open(RawDocument input) {
 		
-		InputStream xiniStream = input.getStream();
+		xiniStream = input.getStream();
 		
 		// unmarshalling
 		try {
@@ -83,6 +85,14 @@ public class XINIReader {
 		}
 		catch (JAXBException e) {
 			throw new RuntimeException(e);
+		}
+	}
+	
+	public void close() {
+		try {
+			xiniStream.close();
+		}
+		catch (IOException e) {
 		}
 	}
 	

@@ -95,7 +95,9 @@ public class XINIWriter extends FilterEventToXiniTransformer implements IFilterW
 			if ( !outputPath.exists() )
 				outputPath.createNewFile();
 			
-			marshall(new FileOutputStream(outputPath));
+			FileOutputStream fos = new FileOutputStream(outputPath);
+			marshall(fos);
+			fos.close();
 		}
 		catch (FileNotFoundException e) {
 			// Should be impossible. We created the file.
