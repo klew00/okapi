@@ -126,6 +126,8 @@ public class ProjectUtils {
 
 		// Add files to project input list
 		addDocumentsToProject(projId, rainbowProject, filterConfigByExtension);
+		
+		rainbowProject.getPathBuilder().setUseExtension(false);
 
 		// Execute pipeline
 		pipelineWrapper.execute(rainbowProject);

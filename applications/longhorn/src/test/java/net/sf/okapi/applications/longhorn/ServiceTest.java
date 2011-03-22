@@ -127,10 +127,10 @@ public class ServiceTest {
 		for (LonghornFile f : outputFiles) {
 			relFilePaths.add(f.getRelativePath());
 		}
-		assertTrue(relFilePaths.contains("rawdocumenttofiltereventsstep.out.html"));
-		assertTrue(relFilePaths.contains("samefile/rawdocumenttofiltereventsstep.out.html"));
-		assertTrue(relFilePaths.contains("searchandreplacestep.out.html"));
-		assertTrue(relFilePaths.contains("subdir1/segmentationstep.out.html"));
+		assertTrue(relFilePaths.contains("rawdocumenttofiltereventsstep.html"));
+		assertTrue(relFilePaths.contains("samefile/rawdocumenttofiltereventsstep.html"));
+		assertTrue(relFilePaths.contains("searchandreplacestep.html"));
+		assertTrue(relFilePaths.contains("subdir1/segmentationstep.html"));
 
 		// Does the fetching of files work?
 		for (LonghornFile of : outputFiles) {

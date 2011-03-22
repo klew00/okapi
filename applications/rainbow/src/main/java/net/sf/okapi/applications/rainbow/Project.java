@@ -695,5 +695,9 @@ public class Project {
 		if ( path == null ) return System.getProperty("user.home");  //$NON-NLS-1$
 		else return Util.getDirectoryName(path);
 	}
+	
+	public PathBuilder getPathBuilder() {
+		return pathBuilder;
+	}
 
 }
