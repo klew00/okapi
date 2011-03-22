@@ -24,6 +24,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
@@ -134,7 +135,11 @@ public class RawDocumentToFilterEventsStep extends BasePipelineStep {
 			// Open the document
 			filter.open(event.getRawDocument());
 			// Return the first event from the filter
-			return filter.next();
+			if ( filter.hasNext() ) {
+				return filter.next();
+			}
+			// Else: no events
+			throw new OkapiIOException(String.format("No events available from '%s'.", filter.getDisplayName()));
 			
 		case END_BATCH_ITEM:
 			filter.close();
