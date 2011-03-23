@@ -296,7 +296,7 @@ public class RainbowKitFilter implements IFilter {
 		}
 		else if ( info.getExtractionType().equals(Manifest.EXTRACTIONTYPE_ONTRAM) ) {
 			file = new File(manifest.getTargetDirectory()+"contents.xini");
-			filter =  new  XINIFilter(info.getRelativeInputPath());
+			filter =  new XINIFilter(info.getRelativeInputPath());
 		}
 		else {
 			throw new OkapiIOException("Unsupported extraction type: "+info.getExtractionType());

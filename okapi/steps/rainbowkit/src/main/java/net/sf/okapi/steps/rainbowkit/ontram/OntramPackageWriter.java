@@ -60,13 +60,13 @@ public class OntramPackageWriter extends BasePackageWriter {
 		
 		writer.handleEvent(event);
 	}
-
+	
 	@Override
-	protected void processEndDocument(Event event) {
+	protected void processEndBatch() {
+		super.processEndBatch();
+
 		writer.writeXINI();
 		close();
-
-		super.processEndDocument(event);
 	}
 
 	@Override

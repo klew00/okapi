@@ -61,8 +61,6 @@ public class MergingStep extends BasePipelineStep {
 		switch ( event.getEventType() ) {
 		case START_DOCUMENT:
 			return handleStartDocument(event);
-		case END_BATCH:
-			return handleEndBatch(event);
 		default:
 			if ( merger != null ) {
 				merger.handleEvent(event);
@@ -78,7 +76,6 @@ public class MergingStep extends BasePipelineStep {
 
 	@Override
 	protected Event handleEndBatch (Event event) {
-		merger.close();
 		return event;
 	}
 	

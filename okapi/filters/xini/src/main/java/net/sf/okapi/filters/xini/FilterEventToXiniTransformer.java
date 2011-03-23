@@ -24,12 +24,10 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import javax.xml.bind.PropertyException;
 
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Segment;
@@ -50,8 +48,6 @@ import net.sf.okapi.filters.xini.jaxb.Xini;
 import net.sf.okapi.filters.xini.jaxb.Page.Elements;
 
 public class FilterEventToXiniTransformer {
-	private static final Logger LOGGER = Logger
-			.getLogger(FilterEventToXiniTransformer.class.getName());
 
 	private ObjectFactory objectFactory = new ObjectFactory();
 	private Marshaller m;
@@ -105,9 +101,8 @@ public class FilterEventToXiniTransformer {
 		// Get the source container
 		TextContainer textContainer = tu.getSource();
 
-		// Skip empty TextUnits
-		boolean srcHasText = textContainer.hasText(false);
-		if (!srcHasText) {
+		// Skip non-translatable TextUnits
+		if ( !tu.isTranslatable() ) {
 			return;
 		}
 
@@ -126,38 +121,41 @@ public class FilterEventToXiniTransformer {
 		// Set IDs and add meta-data
 		element.setElementID(currentElementId);
 		field.setFieldID(currentFieldId);
-		//TODO That's not the right attribute! Add specific one in the schema
-		field.setCustomerTextID(tu.getId());
+		field.setExternalID(tu.getId());
 		
 		int currentSegmentId = 0;
+		StringBuilder emptySegsFlags = new StringBuilder();
 		
 		for (Segment okapiSegment : textContainer.getSegments()) {
 			
 			phCounter = 1;
 			
-			// Skip empty segments
-			if(okapiSegment.getContent().getText().isEmpty()) {
-				continue;
-			}
-
-			Seg xiniSegment = objectFactory.createSeg();
-			xiniSegment.setSegID(currentSegmentId);
-			field.getSegAndTrans().add(xiniSegment);
-			
 			TextFragment textFragment = okapiSegment.getContent();
-
-			List<Code> codes = textFragment.getCodes();
 			
-			if (codes.size() > 0) {
-				xiniSegment.getContent().addAll(
-						transformInlineTags(textFragment.getCodedText(), codes));
+			if (!textFragment.isEmpty()) {
+
+				Seg xiniSegment = objectFactory.createSeg();
+				xiniSegment.setSegID(currentSegmentId);
+				field.getSegAndTrans().add(xiniSegment);
+				
+				List<Code> codes = textFragment.getCodes();
+				
+				if (codes.size() > 0)
+					xiniSegment.getContent().addAll(
+							transformInlineTags(textFragment.getCodedText(), codes));
+				else
+					xiniSegment.getContent().add(textFragment.getText());
+				
+				emptySegsFlags.append("0");
 			}
 			else {
-				xiniSegment.getContent().add(textFragment.getText());
+				emptySegsFlags.append("1");
 			}
 			
 			currentSegmentId++;
 		}
+		
+		field.setEmptySegmentsFlags(emptySegsFlags.toString());
 	}
 
 	private ArrayList<Serializable> transformInlineTags(String codedText, List<Code> codes) {
@@ -266,13 +264,6 @@ public class FilterEventToXiniTransformer {
 	}
 
 	public void marshall(OutputStream os) {
-
-		try {
-			//TODO revert after testing!
-			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-		} catch (PropertyException e) {
-			LOGGER.warning("JAXB PropertyException: " + e.getLocalizedMessage());
-		}
 		try {
 			m.marshal(xini, os);
 		} catch (JAXBException e) {

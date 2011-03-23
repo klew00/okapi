@@ -30,6 +30,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.encoder.EncoderManager;
+import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
@@ -104,8 +105,7 @@ public class XINIWriter extends FilterEventToXiniTransformer implements IFilterW
 			throw new RuntimeException(e);
 		}
 		catch (IOException e) {
-			// TODO add Logging
-			throw new RuntimeException(e);
+			throw new OkapiIOException(e);
 		}
 	}
 

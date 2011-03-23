@@ -39,10 +39,12 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.filters.xini.jaxb.Element;
@@ -154,6 +156,9 @@ public class XINIReader {
 			events.addAll(processElement(element));
 		}
 		
+		Ending ending = new Ending(page.getPageID()+"end");
+		events.add(new Event(EventType.END_DOCUMENT, ending));
+		
 		return events;
 	}
 
@@ -184,13 +189,33 @@ public class XINIReader {
 	private LinkedList<Event> processField(Field field) {
 		LinkedList<Event> events = new LinkedList<Event>();
 
-		TextUnit tu = new TextUnit(field.getCustomerTextID());
+		TextUnit tu = new TextUnit(field.getExternalID());
 		TextContainer tc = new TextContainer();
 		
-		
-		//TODO preserve segmentation
-		for (Seg xiniSeg : field.getSeg()) {
-			tc.append(processSegment(xiniSeg));
+		String emptySegsFlags = field.getEmptySegmentsFlags();
+		int segIndex;
+		int nonEmptySegIndex = 0;
+		for (segIndex = 0; segIndex < emptySegsFlags.length(); segIndex++) {
+			
+			//TODO does this preserve the segmentation?
+			
+			char empty = emptySegsFlags.charAt(segIndex);
+			if (empty == '0') {
+
+				Seg xiniSeg = field.getSeg().get(nonEmptySegIndex);
+				nonEmptySegIndex++;
+				
+				System.out.println("Nicht-leeres Segment");
+				TextPart tp = new TextPart(processSegment(xiniSeg));
+				System.out.println("Segment? " + tp.isSegment());
+				tc.append(tp, false);
+			}
+			else {
+				
+				System.out.println("Leeres Segment");
+				tc.append("", false);
+				tc.getSegments();
+			}
 		}
 
 		tu.setSource(tc);

@@ -15,7 +15,6 @@ import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
-
 /**
  * <p>Java class for Field complex type.
  * 
@@ -37,6 +36,8 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *       &lt;attribute name="RawSourceBeforeField" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="RawSourceAfterField" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="Label" type="{}TokenMaxLen255" />
+ *       &lt;attribute name="ExternalID" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="EmptySegmentsFlags" type="{}TokenMaxLen255" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -51,8 +52,8 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 public class Field {
 
     @XmlElements({
-        @XmlElement(name = "Trans", type = Trans.class),
-        @XmlElement(name = "Seg", type = Seg.class)
+			@XmlElement(name = "Trans", type = Trans.class),
+			@XmlElement(name = "Seg", type = Seg.class)
     })
     protected List<TextContent> segAndTrans;
     @XmlAttribute(name = "FieldID", required = true)
@@ -70,30 +71,33 @@ public class Field {
     @XmlAttribute(name = "Label")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     protected String label;
+    @XmlAttribute(name = "ExternalID")
+    protected String externalID;
+    @XmlAttribute(name = "EmptySegmentsFlags")
+    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
+    protected String emptySegmentsFlags;
 
-    /**
-     * Gets the value of the segAndTrans property.
-     * 
-     * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the segAndTrans property.
-     * 
-     * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getSegAndTrans().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link Trans }
-     * {@link Seg }
-     * 
-     * 
-     */
+	/**
+	 * Gets the value of the segAndTrans property.
+	 * 
+	 * <p>
+	 * This accessor method returns a reference to the live list, not a snapshot. Therefore any modification you make to
+	 * the returned list will be present inside the JAXB object. This is why there is not a <CODE>set</CODE> method for
+	 * the segAndTrans property.
+	 * 
+	 * <p>
+	 * For example, to add a new item, do as follows:
+	 * 
+	 * <pre>
+	 * getSegAndTrans().add(newItem);
+	 * </pre>
+	 * 
+	 * 
+	 * <p>
+	 * Objects of the following type(s) are allowed in the list {@link Trans } {@link Seg }
+	 * 
+	 * 
+	 */
     public List<TextContent> getSegAndTrans() {
         if (segAndTrans == null) {
             segAndTrans = new ArrayList<TextContent>();
@@ -245,6 +249,54 @@ public class Field {
      */
     public void setLabel(String value) {
         this.label = value;
+    }
+
+    /**
+     * Gets the value of the externalID property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getExternalID() {
+        return externalID;
+    }
+
+    /**
+     * Sets the value of the externalID property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setExternalID(String value) {
+        this.externalID = value;
+    }
+
+    /**
+     * Gets the value of the emptySegmentsFlags property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getEmptySegmentsFlags() {
+        return emptySegmentsFlags;
+    }
+
+    /**
+     * Sets the value of the emptySegmentsFlags property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setEmptySegmentsFlags(String value) {
+        this.emptySegmentsFlags = value;
     }
 
 }

@@ -32,6 +32,8 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *       &lt;attribute name="NoContent" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="CustomerTextID" type="{}TokenMaxLen255" />
  *       &lt;attribute name="Label" type="{}TokenMaxLen255" />
+ *       &lt;attribute name="ExternalID" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="EmptySegmentsFlags" type="{}TokenMaxLen255" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -58,6 +60,11 @@ public class TD {
     @XmlAttribute(name = "Label")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     protected String label;
+    @XmlAttribute(name = "ExternalID")
+    protected String externalID;
+    @XmlAttribute(name = "EmptySegmentsFlags")
+    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
+    protected String emptySegmentsFlags;
 
     /**
      * Gets the value of the segAndTrans property.
@@ -169,6 +176,54 @@ public class TD {
      */
     public void setLabel(String value) {
         this.label = value;
+    }
+
+    /**
+     * Gets the value of the externalID property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getExternalID() {
+        return externalID;
+    }
+
+    /**
+     * Sets the value of the externalID property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setExternalID(String value) {
+        this.externalID = value;
+    }
+
+    /**
+     * Gets the value of the emptySegmentsFlags property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getEmptySegmentsFlags() {
+        return emptySegmentsFlags;
+    }
+
+    /**
+     * Sets the value of the emptySegmentsFlags property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setEmptySegmentsFlags(String value) {
+        this.emptySegmentsFlags = value;
     }
 
 }
