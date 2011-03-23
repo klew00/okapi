@@ -197,28 +197,24 @@ public class XINIReader {
 		int nonEmptySegIndex = 0;
 		for (segIndex = 0; segIndex < emptySegsFlags.length(); segIndex++) {
 			
-			//TODO does this preserve the segmentation?
-			
 			char empty = emptySegsFlags.charAt(segIndex);
 			if (empty == '0') {
 
 				Seg xiniSeg = field.getSeg().get(nonEmptySegIndex);
 				nonEmptySegIndex++;
 				
-				System.out.println("Nicht-leeres Segment");
 				TextPart tp = new TextPart(processSegment(xiniSeg));
-				System.out.println("Segment? " + tp.isSegment());
 				tc.append(tp, false);
 			}
 			else {
 				
-				System.out.println("Leeres Segment");
 				tc.append("", false);
 				tc.getSegments();
 			}
 		}
 
 		tu.setSource(tc);
+		tu.setName(field.getLabel());
 		events.add(new Event(EventType.TEXT_UNIT, tu));
 		
 		return events;
@@ -257,7 +253,7 @@ public class XINIReader {
 		}
 		else {
 			code.setType(tagType.get(localname));
-			//TODO
+			//TODO What should we set here?
 			code.setId(0);
 		}
 		code.append(serializeTextParts(((TextContent) part).getContent()).getCodedText());

@@ -122,6 +122,7 @@ public class FilterEventToXiniTransformer {
 		element.setElementID(currentElementId);
 		field.setFieldID(currentFieldId);
 		field.setExternalID(tu.getId());
+		field.setLabel(tu.getName());
 		
 		int currentSegmentId = 0;
 		StringBuilder emptySegsFlags = new StringBuilder();
@@ -164,54 +165,56 @@ public class FilterEventToXiniTransformer {
 
 		for (int charIndex = 0; charIndex < codedText.length(); charIndex++) {
 			
-			int codePoint = codedText.codePointAt(charIndex);
+			char chr = codedText.charAt(charIndex);
+			
+			if (!TextFragment.isMarker(chr)) {
 
-			switch (codePoint) {
+				// This is a regular character
+				tempString.append(chr);
+			}
+			
+			else {
+				
+				// This is a code
+				int codePoint = codedText.codePointAt(charIndex);
+				Integer codeIndex = TextFragment.toIndex(codedText.charAt(++charIndex));
+				Code code = codes.get(codeIndex);
+				boolean codeIsIsolated = false;
 
+				// Save last part of the text that had no codes
+				if (tempString.length() > 0)
+					parts.add(tempString.toString());
+				tempString = new StringBuilder();
+
+				switch(codePoint) {
 				case TextFragment.MARKER_OPENING:
+
+					Integer endMarkerIndex = findEndMark(codes, code, codedText, charIndex);
+					String innerCodedText = null;
 					
-					int codeOpCharIndex = TextFragment.toIndex(codedText.charAt(++charIndex));
-					Code code = codes.get(codeOpCharIndex);
-	
-					// Save last part of the text that had no codes
-					if (tempString.length() > 0)
-						parts.add(tempString.toString());
-					tempString = new StringBuilder();
-	
-					int endMarkerIndex = findEndMark(codes, code, codedText, charIndex);
-					String innerCodedText="";
-					
-					if(endMarkerIndex < codedText.length() && endMarkerIndex > 0) {
+					if(endMarkerIndex != null) {
 						
 						innerCodedText = codedText.substring(charIndex + 1, endMarkerIndex - 1);
 						charIndex = endMarkerIndex;
 					}
-					
-					if(!innerCodedText.equals(""))
-						parts.add(getRepresentingObject(code, codes, innerCodedText));
-					
-					endMarkerIndex = 0;
-					break;
-					
-				case TextFragment.MARKER_ISOLATED:
-	
-					if (codedText.length() > charIndex + 1) {
-						int codeIsoCharIndex = TextFragment.toIndex(codedText.charAt(++charIndex));
-						code = codes.get(codeIsoCharIndex);
-						
-						if (tempString.length() > 0)
-							parts.add(tempString.toString());
-						tempString = new StringBuilder();
-						
-						parts.add(getRepresentingObject(code, codes, null));
+					else {
+						codeIsIsolated = true;
 					}
-					break;
 					
-				default:
-					
-					if (codedText.length() > charIndex)
-						tempString.append(codedText.charAt(charIndex));
+					parts.add(codeToXMLObject(code, codes, innerCodedText, codeIsIsolated));
 					break;
+				
+				case TextFragment.MARKER_CLOSING:
+					
+					// This closing code does not have it's corresponding opening code in the same segment
+					parts.add(codeToXMLObject(code, codes, null, true));
+					break;
+				
+				case TextFragment.MARKER_ISOLATED:
+					
+					parts.add(codeToXMLObject(code, codes, null, true));
+					break;
+				}
 			}
 		}
 
@@ -220,7 +223,7 @@ public class FilterEventToXiniTransformer {
 		return parts;
 	}
 
-	private int findEndMark(List<Code> codes, Code code, String codedText, int startCharIndex) {
+	private Integer findEndMark(List<Code> codes, Code code, String codedText, int startCharIndex) {
 
 		for (int charIndex = startCharIndex; charIndex < codedText.length(); charIndex++) {
 			
@@ -236,10 +239,11 @@ public class FilterEventToXiniTransformer {
 			}
 		}
 
-		return 0;
+		// No closing marker found
+		return null;
 	}
 
-	private Serializable getRepresentingObject(Code code, List<Code> codes, String innerCodedText) {
+	private Serializable codeToXMLObject(Code code, List<Code> codes, String innerCodedText, boolean codeIsIsolated) {
 
 		if (code.getType().equals("br")) {
 
@@ -247,8 +251,11 @@ public class FilterEventToXiniTransformer {
 			return objectFactory.createTextContentBr(emptyContent);
 		}
 
+		//TODO opening or closing codes with matching other code in another segment --> use sph/eph
+
 		PlaceHolder ph = new PlaceHolder();
 		ph.setID(phCounter);
+		phCounter++;
 		ph.setType(PlaceHolderType.PH);
 		
 		if (innerCodedText != null && !innerCodedText.isEmpty()) {
@@ -256,20 +263,17 @@ public class FilterEventToXiniTransformer {
 		}
 		
 		Serializable phelement = objectFactory.createTextContentPh(ph);
-		
-		phCounter++;
 
 		return phelement;
-
 	}
 
 	public void marshall(OutputStream os) {
 		try {
 			m.marshal(xini, os);
-		} catch (JAXBException e) {
+		}
+		catch (JAXBException e) {
 			throw new RuntimeException(e);
 		}
-
 	}
 
 }
