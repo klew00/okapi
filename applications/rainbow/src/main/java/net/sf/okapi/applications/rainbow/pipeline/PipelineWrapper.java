@@ -332,6 +332,12 @@ public class PipelineWrapper {
 			availableSteps.put(step.id, step);
 			
 			ps = (IPipelineStep)Class.forName(
+				"net.sf.okapi.steps.idbasedcopy.IdBasedCopyStep").newInstance();
+			step = new StepInfo(ps.getClass().getSimpleName(),
+				ps.getName(), ps.getDescription(), ps.getClass().getName(), null, null);
+			availableSteps.put(step.id, step);
+			
+			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.imagemodification.ImageModificationStep").newInstance();
 			params = ps.getParameters();
 			step = new StepInfo(ps.getClass().getSimpleName(),
