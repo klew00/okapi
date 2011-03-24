@@ -39,13 +39,9 @@ import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 
 /**
- * Step that takes two input files: the first one is the one to update, where
- * the step copies the text. The second is a file with entries that have unique ids
- * and translated text. The step loads the second file and create a table indexed
- * on the id of the entries. Then it goes through the first file and for
- * each text unit, tries to find the corresponding text unit in the table.
- * If it does, it copies the source of that text unit into the target of the 
- * first file. If no match is found, the text unit of the first file is left alone.
+ * This step copies into a destination file (first input file) the text of a
+ * reference file (second input file) for text units that have the same id. 
+ * The ids are taken from the name (TextUnit.getName()) of each text unit.
  */
 public class IdBasedCopyStep extends BasePipelineStep {
 
@@ -56,6 +52,7 @@ public class IdBasedCopyStep extends BasePipelineStep {
 	private LocaleId targetLocale;
 	private RawDocument toCopyInput = null;
 	private Map<String, TextUnit> toCopy;
+	private boolean useTargetText;
 
 	public IdBasedCopyStep() {
 	}
@@ -98,6 +95,9 @@ public class IdBasedCopyStep extends BasePipelineStep {
 
 	@Override
 	protected Event handleStartDocument (Event event) {
+		// Use target text if reference file is bilingual, otherwise use the source
+		useTargetText = event.getStartDocument().isMultilingual();
+		// Create the table if possible
 		if ( toCopyInput == null ) {
 			logger.warning("Second input file is not specified.");
 			toCopy = null;
@@ -137,8 +137,10 @@ public class IdBasedCopyStep extends BasePipelineStep {
 
 		// Find the matching id in the entries to copy
 		TextUnit toCopyTu = toCopy.get(tu.getName());
+		TextContainer tc;
 		if ( toCopyTu != null ) {
-			TextContainer tc = toCopyTu.getSource();
+			if ( useTargetText ) tc = toCopyTu.getTarget(targetLocale);
+			else tc = toCopyTu.getSource();
 			if ( tc != null ) {
 				tu.setTarget(targetLocale, tc);
 				toCopy.remove(tu.getName());
