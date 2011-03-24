@@ -31,6 +31,8 @@ import net.sf.okapi.common.annotation.IAnnotation;
  */
 public class Segment extends TextPart {
 	
+	public static final String REF_MARKER = "$segment$";
+	
 	// FIXME - why is this protected?
 	protected Annotations annotations;	
 
@@ -120,4 +122,7 @@ public class Segment extends TextPart {
 		return annotations;
 	}
 	
+	public static String makeRefMarker(String segId) {
+		return TextFragment.makeRefMarker(segId, REF_MARKER);
+	}
 }

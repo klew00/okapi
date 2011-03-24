@@ -249,7 +249,28 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		// If we have a property name: It's a reference to a property of 
 		// the resource holding this skeleton
 		if ( propName != null ) { // Reference to the content of the referent
-			return getString((INameable)part.parent, propName, part.locId, context);
+			if (Segment.REF_MARKER.equals(propName)) {
+				String segId = (String) marker[0];
+				TextUnit tu = (TextUnit) part.getParent();
+				LocaleId locId = part.getLocale();
+				TextContainer tc = null;
+				
+				if (locId == null) { // source
+					tc = tu.getSource();
+				}
+				else {
+					tc = tu.getTarget(locId);
+				}
+				Segment seg = tc.getSegments().get(segId);
+				if (seg == null) {
+					logger.warning(String.format("Segment reference '%s' not found.", (String)marker[0]));
+					return "-ERR:INVALID-SEGMENT-REF-";
+				}
+				
+				return getContent(seg.getContent(), locId, context);
+			}
+			else
+				return getString((INameable)part.parent, propName, part.locId, context);
 		}
 
 		// Set the locToUse and the contextToUse parameters
