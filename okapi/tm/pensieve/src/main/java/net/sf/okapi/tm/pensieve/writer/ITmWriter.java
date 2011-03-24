@@ -41,6 +41,14 @@ public interface ITmWriter {
      * @throws OkapiIOException if the indexing cannot happen.
      */
     void indexTranslationUnit(TranslationUnit tu);
+
+    /**
+     * Indexes a given translation unit, possibly overwriting an existing one with the same source.
+     * @param tu the translation unit to index.
+     * @param overwrite true to overwrite any existing unit that has the same source content (codes excluded)
+     */
+    public void indexTranslationUnit (TranslationUnit tu,
+    	boolean overwrite);
     
     /**
      * Deletes a TranslationUnit based on the id.

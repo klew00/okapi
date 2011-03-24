@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it
   under the terms of the GNU Lesser General Public License as published by
@@ -141,6 +141,63 @@ public class PensieveWriterTest {
         assertEquals("target text", tu2.getTarget().getContent().toText(), doc2.getField(TranslationUnitField.TARGET.name()).stringValue());
     }
 
+    @Test
+    public void indexTranslationUnitWithOverwriteOption () throws IOException, ParseException {
+    	// Start TM
+    	TranslationUnit tu1 = Helper.createTU(locEN, locKR, "Joe", "Jo", "1");
+        TranslationUnit tu2 = Helper.createTU(locEN, locKR, "Jane", "Jaen", "2");
+        tmWriter.indexTranslationUnit(tu1);
+        tmWriter.indexTranslationUnit(tu2);
+        writer.commit();
+
+        // Overwrite the first document
+        TranslationUnit tu1new = Helper.createTU(locEN, locKR, "Joe", "NewJo", "3");
+        tmWriter.indexTranslationUnit(tu1new, true);
+        writer.commit();
+        // New document should be in
+        Document doc = findDocument(MetadataType.ID.fieldName(), "3");
+        assertEquals("source text", "Joe", doc.getField(TranslationUnitField.SOURCE_EXACT.name()).stringValue());
+        assertEquals("target text", "NewJo", doc.getField(TranslationUnitField.TARGET.name()).stringValue());
+        // Old document should not be in
+        doc = findDocument(MetadataType.ID.fieldName(), "1");
+        assertNull(doc);
+        
+        // Add without overwriting
+        tu1new = Helper.createTU(locEN, locKR, "Joe", "NewJo2", "4");
+        tmWriter.indexTranslationUnit(tu1new, false);
+        writer.commit();
+        // New document should be in
+        doc = findDocument(MetadataType.ID.fieldName(), "4");
+        assertEquals("source text", "Joe", doc.getField(TranslationUnitField.SOURCE_EXACT.name()).stringValue());
+        assertEquals("target text", "NewJo2", doc.getField(TranslationUnitField.TARGET.name()).stringValue());
+        // Previous document should be in
+        doc = findDocument(MetadataType.ID.fieldName(), "3");
+        assertEquals("source text", "Joe", doc.getField(TranslationUnitField.SOURCE_EXACT.name()).stringValue());
+        assertEquals("target text", "NewJo", doc.getField(TranslationUnitField.TARGET.name()).stringValue());
+    }
+
+    @Test
+    public void indexTranslationUnitWithOverwriteOptionAndCodes () throws IOException, ParseException {
+    	// Start TM
+    	TranslationUnit tu1 = Helper.createTU(locEN, locKR, "Joe", "Jo", "1");
+    	tu1.getSource().getContent().append(TagType.PLACEHOLDER, "code", "data1");
+        tmWriter.indexTranslationUnit(tu1);
+        writer.commit();
+
+        // Overwrite the first document
+        TranslationUnit tu1new = Helper.createTU(locEN, locKR, "Joe", "NewJo", "2");
+    	tu1new.getSource().getContent().append(TagType.PLACEHOLDER, "code", "data2");
+        tmWriter.indexTranslationUnit(tu1new, true);
+        writer.commit();
+        
+        // New document should be in
+        Document doc = findDocument(MetadataType.ID.fieldName(), "2");
+        assertEquals("target text", "NewJo", doc.getField(TranslationUnitField.TARGET.name()).stringValue());
+        // Old document should also be in (not overwritten because the code data are not the same)
+        doc = findDocument(MetadataType.ID.fieldName(), "1");
+        assertEquals("target text", "Jo", doc.getField(TranslationUnitField.TARGET.name()).stringValue());
+    }
+    
     @Test(expected = IllegalArgumentException.class)
     public void deleteNullId() throws IOException, ParseException {
         tmWriter.delete(null);
@@ -335,6 +392,7 @@ public class PensieveWriterTest {
         PhraseQuery q = new PhraseQuery();
         q.add(new Term(fieldName, fieldValue));
         TopDocs hits = is.search(q, 1);
+        if ( hits.totalHits == 0 ) return null;
         ScoreDoc scoreDoc = hits.scoreDocs[0];
         return is.doc(scoreDoc.doc);
     }

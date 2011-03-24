@@ -30,8 +30,10 @@ import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
 	private static final String TMDIRECTORY = "tmDirectory";
+	private static final String OVERWRITESAMESOURCE = "overwriteSameSource";
 	
 	private String tmDirectory;
+	private boolean overwriteSameSource;
 	
 	public Parameters () {
 		reset();
@@ -45,9 +47,18 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.tmDirectory = tmDirectory;
 	}
 
+	public boolean getOverwriteSameSource () {
+		return overwriteSameSource;
+	}
+	
+	public void setOverwriteSameSource (boolean overwriteSameSource) {
+		this.overwriteSameSource = overwriteSameSource;
+	}
+	
 	@Override
 	public void reset () {
 		tmDirectory = "";
+		overwriteSameSource = false;
 	}
 
 	@Override
@@ -55,12 +66,14 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		reset();
 		buffer.fromString(data);
 		tmDirectory = buffer.getString(TMDIRECTORY, tmDirectory);
+		overwriteSameSource = buffer.getBoolean(OVERWRITESAMESOURCE, overwriteSameSource);
 	}
 
 	@Override
 	public String toString() {
 		buffer.reset();
 		buffer.setString(TMDIRECTORY, tmDirectory);
+		buffer.setBoolean(OVERWRITESAMESOURCE, overwriteSameSource);
 		return buffer.toString();
 	}
 
@@ -69,12 +82,14 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		ParametersDescription desc = new ParametersDescription(this);
 		desc.add(TMDIRECTORY, "Directory of the TM where to import",
 			"Full path of directory of the TM where to import");
+		desc.add(OVERWRITESAMESOURCE, "Overwrite if source is the same", null);
 		return desc;
 	}
 
 	public EditorDescription createEditorDescription(ParametersDescription paramDesc) {
 		EditorDescription desc = new EditorDescription("TM Import", true, false);
 		desc.addFolderInputPart(paramDesc.get(TMDIRECTORY), "TM Directory");
+		desc.addCheckboxPart(paramDesc.get(OVERWRITESAMESOURCE));
 		return desc;
 	}
 

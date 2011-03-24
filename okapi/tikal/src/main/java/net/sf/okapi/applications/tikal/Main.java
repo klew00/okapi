@@ -139,6 +139,7 @@ public class Main {
 	protected String tableConvCodes;
 	protected int convTargetStyle = net.sf.okapi.steps.formatconversion.Parameters.TRG_TARGETOREMPTY;
 	protected boolean convSkipEntriesWithoutText = true;
+	protected boolean convOverwrite = false;
 	protected String segRules;
 	protected boolean showTraceHint = true;
 	protected String tmOptions;
@@ -262,6 +263,9 @@ public class Main {
 				else if ( arg.equals("-overtrg") ) {
 					prog.mosesCopyToTarget = true;
 					prog.mosesOverwriteTarget = true;
+				}
+				else if ( arg.equals("-over") ) {
+					prog.convOverwrite = true;
 				}
 				else if ( arg.equals("-from") || arg.equals("-to") ) {
 					prog.moses2ndPath = prog.getArgument(args, ++i);
@@ -1036,7 +1040,7 @@ public class Main {
 		ps.println("      [-csv|-tab] [-xliff|-xliffgx|-tmx|-generic] [-all]");
 		ps.println("Imports to Pensieve TM:");
 		ps.println("   -imp tmDirectory inputFile [inputFile2...] [-fc configId] [-ie encoding]");
-		ps.println("      [-sl srcLang] [-tl trgLang] [-trgsource|-trgempty] [-all]");
+		ps.println("      [-sl srcLang] [-tl trgLang] [-trgsource|-trgempty] [-all] [-over]");
 		ps.println("Export Pensieve TM as TMX:");
 		ps.println("   -exp tmDirectory1 [tmDirectory2...] [-sl srcLang] [-tl trgLang]");
 		ps.println("      [-trgsource|-trgempty] [-all]");
@@ -1254,6 +1258,7 @@ public class Main {
 		params.setUseGenericCodes(genericOutput);
 		params.setTargetStyle(convTargetStyle);
 		params.setSkipEntriesWithoutText(convSkipEntriesWithoutText);
+		params.setOverwriteSameSource(convOverwrite);
 		
 		driver.addStep(fcStep);
 		driver.addBatchItem(rd, outputURI, outputEncoding);

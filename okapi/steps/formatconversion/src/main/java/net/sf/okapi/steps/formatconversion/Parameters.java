@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2010 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -51,6 +51,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private static final String USEGENERICCODES = "useGenericCodes";
 	private static final String SKIPENTRIESWITHOUTTEXT = "skipEntriesWithoutText";
 	private static final String APPROVEDENTRIESONLY = "approvedEntriesOnly";
+	private static final String OVERWRITESAMESOURCE = "overwriteSameSource";
 	
 	private boolean singleOutput;
 	private boolean autoExtensions;
@@ -61,6 +62,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private String formatOptions;
 	private boolean skipEntriesWithoutText;
 	private boolean approvedEntriesOnly;
+	private boolean overwriteSameSource;
 	
 	public Parameters () {
 		reset();
@@ -138,6 +140,14 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.approvedEntriesOnly = approvedEntriesOnly;
 	}
 
+	public boolean getOverwriteSameSource () {
+		return overwriteSameSource;
+	}
+	
+	public void setOverwriteSameSource (boolean overwriteSameSource) {
+		this.overwriteSameSource = overwriteSameSource;
+	}
+	
 	public void reset () {
 		singleOutput = true;
 		autoExtensions = false;
@@ -148,6 +158,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		useGenericCodes = false;
 		skipEntriesWithoutText = true;
 		approvedEntriesOnly = false;
+		overwriteSameSource = false;
 	}
 
 	public void fromString (String data) {
@@ -162,6 +173,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		useGenericCodes = buffer.getBoolean(USEGENERICCODES, useGenericCodes);
 		skipEntriesWithoutText = buffer.getBoolean(SKIPENTRIESWITHOUTTEXT, skipEntriesWithoutText);
 		approvedEntriesOnly = buffer.getBoolean(APPROVEDENTRIESONLY, approvedEntriesOnly);
+		overwriteSameSource = buffer.getBoolean(OVERWRITESAMESOURCE, overwriteSameSource);
 	}
 
 	public String toString() {
@@ -175,6 +187,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.setBoolean(USEGENERICCODES, useGenericCodes);
 		buffer.setBoolean(SKIPENTRIESWITHOUTTEXT, skipEntriesWithoutText);
 		buffer.setBoolean(APPROVEDENTRIESONLY, approvedEntriesOnly);
+		buffer.setBoolean(OVERWRITESAMESOURCE, overwriteSameSource);
 		return buffer.toString();
 	}
 
@@ -189,6 +202,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.add(TARGETSTYLE, "Target content", "Type of content to put in the target");
 		desc.add(SKIPENTRIESWITHOUTTEXT, "Do not output entries without text", null);
 		desc.add(APPROVEDENTRIESONLY, "Output only approved entries", null);
+		desc.add(OVERWRITESAMESOURCE, "Overwrite if source is the same (for Pensieve TM)", null);
 		desc.add(FORMATOPTIONS, "Format options", null); // Not used for display 
 		return desc;
 	}
@@ -205,6 +219,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		
 		desc.addCheckboxPart(paramDesc.get(APPROVEDENTRIESONLY));
 		desc.addCheckboxPart(paramDesc.get(USEGENERICCODES));
+		desc.addCheckboxPart(paramDesc.get(OVERWRITESAMESOURCE));
 
 		CheckboxPart cbp1 = desc.addCheckboxPart(paramDesc.get(SINGLEOUTPUT));
 		PathInputPart pip = desc.addPathInputPart(paramDesc.get(OUTPUTPATH), "Output File", true);

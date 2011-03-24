@@ -316,6 +316,7 @@ public class FormatConversionStep extends BasePipelineStep {
 
 	private void createPensieveWriter () {
 		writer = new PensieveFilterWriter();
+		((PensieveFilterWriter)writer).setOverwriteSameSource(params.getOverwriteSameSource());
 	}
 
 	private void startPensieveOutput () {

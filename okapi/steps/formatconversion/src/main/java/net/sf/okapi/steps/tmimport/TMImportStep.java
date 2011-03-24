@@ -94,6 +94,7 @@ public class TMImportStep extends BasePipelineStep {
 				writer = new PensieveFilterWriter();
 				writer.setOutput(Util.fillRootDirectoryVariable(params.getTmDirectory(), rootDir));
 				writer.setOptions(targetLocale, "UTF-8");
+				((PensieveFilterWriter)writer).setOverwriteSameSource(params.getOverwriteSameSource());
 				writer.handleEvent(event);
 			}
 			break;

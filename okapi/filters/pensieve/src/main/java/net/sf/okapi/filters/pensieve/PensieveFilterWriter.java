@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2010 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -52,6 +52,7 @@ public class PensieveFilterWriter implements IFilterWriter {
 	private String directory;
 	private LocaleId srcLoc;
 	private LocaleId trgLoc;
+	private boolean overwriteSameSource = false;
 
 	@Override
 	public void cancel () {
@@ -115,6 +116,10 @@ public class PensieveFilterWriter implements IFilterWriter {
 		// We need to make sure this is absolute
 		directory = f.getAbsolutePath(); // We assume it is a directory
 	}
+	
+	public void setOverwriteSameSource (boolean overwriteSameSource) {
+		this.overwriteSameSource = overwriteSameSource;
+	}
 
 	@Override
 	public void setOutput (OutputStream output) {
@@ -123,7 +128,7 @@ public class PensieveFilterWriter implements IFilterWriter {
 
 	@Override
 	public void setParameters (IParameters params) {
-		// No parameters for now.
+		// Not used for now
 	}
 
 	private void handleStartDocument (Event event) {
@@ -146,7 +151,7 @@ public class PensieveFilterWriter implements IFilterWriter {
 		
 		// Un-segmented entry get their metadata
 		if ( srcCont.contentIsOneSegment() && trgCont.contentIsOneSegment() ) {
-			writer.indexTranslationUnit(PensieveUtil.convertToTranslationUnit(srcLoc, trgLoc, tu));
+			writer.indexTranslationUnit(PensieveUtil.convertToTranslationUnit(srcLoc, trgLoc, tu), overwriteSameSource);
 			return;
 		}
 		
@@ -158,7 +163,7 @@ public class PensieveFilterWriter implements IFilterWriter {
 			TranslationUnit trUnit = new TranslationUnit(source, target);
 			// TODO: what do we do with properties? e.g. tuid should not be used as it
 			// PensieveUtil.populateMetaDataFromProperties(tu, trUnit);
-			writer.indexTranslationUnit(trUnit);
+			writer.indexTranslationUnit(trUnit, overwriteSameSource);
 			// TODO: Log a warning
 			return;
 		}
@@ -174,7 +179,7 @@ public class PensieveFilterWriter implements IFilterWriter {
 				TranslationUnit trUnit = new TranslationUnit(source, target);
 				// TODO: what do we do with properties? e.g. tuid should not be used as it
 				// PensieveUtil.populateMetaDataFromProperties(tu, trUnit);
-				writer.indexTranslationUnit(trUnit);
+				writer.indexTranslationUnit(trUnit, overwriteSameSource);
 			}
 		}
 	}

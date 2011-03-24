@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it
   under the terms of the GNU Lesser General Public License as published by
@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.search.lucene.analysis.NgramAnalyzer;
 import net.sf.okapi.tm.pensieve.common.Metadata;
@@ -42,6 +43,10 @@ import org.apache.lucene.document.Field.TermVector;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.AlreadyClosedException;
 import org.apache.lucene.store.Directory;
 
@@ -49,6 +54,7 @@ import org.apache.lucene.store.Directory;
  * Used to write, delete and update the index.
  */
 public class PensieveWriter implements ITmWriter {
+	
 	private static final Logger LOGGER = Logger.getLogger(PensieveWriter.class.getName());
 
 	private IndexWriter indexWriter;
@@ -74,7 +80,8 @@ public class PensieveWriter implements ITmWriter {
 	 * @throws OkapiIOException
 	 *             if the commit cannot happen.
 	 */
-	public void close() {
+	@Override
+	public void close () {
 		try {
 			indexWriter.commit();
 			indexWriter.optimize();
@@ -104,12 +111,12 @@ public class PensieveWriter implements ITmWriter {
 	
 
 	/**
-	 * Gets a handle on the IndexWriter so that commits and rollbacks can happen outside. For now, this is a convience
+	 * Gets a handle on the IndexWriter so that commits and rollbacks can happen outside. For now, this is a convenience
 	 * method. In other words, don't depend on it working for you.
 	 * 
 	 * @return a handle on the IndexWriter used to Create, Update or Delete the index.
 	 */
-	public IndexWriter getIndexWriter() {
+	public IndexWriter getIndexWriter () {
 		return indexWriter;
 	}
 
@@ -123,7 +130,8 @@ public class PensieveWriter implements ITmWriter {
 	 * @throws IllegalArgumentException
 	 *             if tu is null
 	 */
-	public void indexTranslationUnit(TranslationUnit tu) {
+	@Override
+	public void indexTranslationUnit (TranslationUnit tu) {
 		if (tu == null) {
 			throw new NullPointerException("TextUnit can not be null");
 		}
@@ -140,6 +148,47 @@ public class PensieveWriter implements ITmWriter {
 		}
 	}
 
+	@Override
+	public void indexTranslationUnit (TranslationUnit tu,
+		boolean overwrite)
+	{
+		if ( tu == null ) {
+			throw new NullPointerException("TextUnit can not be null.");
+		}
+		try {
+			if ( overwrite ) {
+				TextFragment srcFrag = tu.getSource().getContent();
+				if ( srcFrag.hasCode() ) {
+					BooleanQuery bq = new BooleanQuery();
+					bq.add(
+						new TermQuery(
+							new Term(TranslationUnitField.SOURCE_EXACT.name(),
+								srcFrag.getCodedText())
+						),
+						BooleanClause.Occur.MUST);
+					bq.add(
+						new TermQuery(
+							new Term(TranslationUnitField.SOURCE_CODES.name(),
+								Code.codesToString(srcFrag.getCodes(), true))
+						), BooleanClause.Occur.MUST);			
+					indexWriter.deleteDocuments(bq);
+				}
+				else {
+					indexWriter.deleteDocuments(new Term(TranslationUnitField.SOURCE_EXACT.name(),
+						srcFrag.getCodedText()));
+				}
+			}
+		}
+		catch (CorruptIndexException e) {
+			throw new OkapiIOException("Error deleting a translationUnit from the TM. Corrupted index.", e);
+		}
+		catch (IOException e) {
+			throw new OkapiIOException("Error deleting a translationUnit from the TM.", e);
+		}
+		
+		indexTranslationUnit(tu);
+	}
+
 	/**
 	 * Deletes a TranslationUnit based on the id.
 	 * 
@@ -150,7 +199,8 @@ public class PensieveWriter implements ITmWriter {
 	 * @throws IllegalArgumentException
 	 *             if the id is invalid
 	 */
-	public void delete(String id) {
+	@Override
+	public void delete (String id) {
 		if (Util.isEmpty(id)) {
 			throw new IllegalArgumentException("id is a required field for delete to happen");
 		}
@@ -172,7 +222,8 @@ public class PensieveWriter implements ITmWriter {
 	 *             if the update can not happen
 	 * @throws IllegalArgumentException if the tu or MetadataType.ID is null
 	 */
-	public void update(TranslationUnit tu) {
+	@Override
+	public void update (TranslationUnit tu) {
 		if (tu == null || tu.getMetadata().get(MetadataType.ID) == null) {
 			throw new IllegalArgumentException("tu must be set and at least have its ID set");
 		}
