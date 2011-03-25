@@ -50,13 +50,13 @@ import net.sf.okapi.steps.wordcount.common.MetricsAnnotation;
 
 import org.junit.Test;
 
-public class ScopingReportTest {
+public class TestScopingReport {
 
 	private static final LocaleId EN = new LocaleId("en");
 	private static final LocaleId ES = new LocaleId("es");
 	
 	public static void testPath(String path) {
-		Logger logger = Logger.getLogger(ScopingReportTest.class.getName()); // loggers are cached
+		Logger logger = Logger.getLogger(TestScopingReport.class.getName()); // loggers are cached
 		logger.setLevel(Level.FINE);
 		logger.fine(new File(path).getAbsolutePath());
 	}
