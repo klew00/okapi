@@ -24,6 +24,10 @@ import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.steps.wordcount.common.AltAnnotationBasedCountStep;
 import net.sf.okapi.steps.wordcount.common.GMX;
 
+/**
+ * M11: No step provides the metrics yet. 
+ *
+ */
 public class GMXRepetitionMatchedWordCountStep extends AltAnnotationBasedCountStep {
 
 	public static final String METRIC = GMX.RepetitionMatchedWordCount; 

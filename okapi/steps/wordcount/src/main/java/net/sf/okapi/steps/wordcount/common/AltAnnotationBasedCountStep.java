@@ -86,7 +86,6 @@ public abstract class AltAnnotationBasedCountStep extends BaseCountStep {
 		if (target == null) return 0;
 		
 		// Individual segments metrics
-		long segmentCount = 0;
 		long segmentsCount = 0;
 		long textContainerCount = 0;
 		
@@ -96,9 +95,9 @@ public abstract class AltAnnotationBasedCountStep extends BaseCountStep {
 			for (Segment seg : segs) {
 				if (acceptATA(seg.getAnnotation(AltTranslationsAnnotation.class))) {
 					Segment srcSeg = srcSegments.get(seg.getId());
-					segmentCount = count(srcSeg, srcLocale);
-					segmentsCount += segmentCount;
-					saveToMetrics(seg, segmentCount);
+					long segCount = count(srcSeg, srcLocale);
+					segmentsCount += segCount;
+					saveToMetrics(seg, segCount);
 				}
 			}
 		}

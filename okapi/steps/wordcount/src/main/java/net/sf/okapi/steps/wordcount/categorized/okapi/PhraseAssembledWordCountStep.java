@@ -23,6 +23,10 @@ package net.sf.okapi.steps.wordcount.categorized.okapi;
 import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.steps.wordcount.common.AltAnnotationBasedCountStep;
 
+/**
+ * M11: No step provides the metrics yet. 
+ *
+ */
 public class PhraseAssembledWordCountStep extends AltAnnotationBasedCountStep {
 	
 	public static final String METRIC = MatchType.PHRASE_ASSEMBLED.name(); 

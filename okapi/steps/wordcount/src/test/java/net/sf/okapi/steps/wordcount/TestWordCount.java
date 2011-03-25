@@ -8,7 +8,7 @@ import net.sf.okapi.common.resource.TextFragment.TagType;
 
 import org.junit.Test;
 
-public class WordCountTest {
+public class TestWordCount {
 
 	private LocaleId locEN = LocaleId.ENGLISH;
 	private LocaleId locFR = LocaleId.FRENCH;

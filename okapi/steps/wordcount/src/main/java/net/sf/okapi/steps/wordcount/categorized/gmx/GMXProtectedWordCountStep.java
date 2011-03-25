@@ -1,18 +1,18 @@
 package net.sf.okapi.steps.wordcount.categorized.gmx;
 
-import net.sf.okapi.common.query.MatchType;
-import net.sf.okapi.steps.wordcount.common.AltAnnotationBasedCountStep;
+import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.resource.ISegments;
+import net.sf.okapi.common.resource.Segment;
+import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.steps.wordcount.WordCounter;
+import net.sf.okapi.steps.wordcount.common.BaseCountStep;
 import net.sf.okapi.steps.wordcount.common.GMX;
 
-public class GMXProtectedWordCountStep extends AltAnnotationBasedCountStep {
+public class GMXProtectedWordCountStep extends BaseCountStep {
 	
 	public static final String METRIC = GMX.ProtectedWordCount;
 	
-	@Override
-	protected boolean accept(MatchType type) {
-		return false; // TODO Implement accept(), probably change the superclass
-	}
-
 	@Override
 	public String getName() {
 		return "GMX Protected Word Count";
@@ -28,6 +28,57 @@ public class GMXProtectedWordCountStep extends AltAnnotationBasedCountStep {
 	@Override
 	protected String getMetric() {
 		return METRIC;
+	}
+
+	@Override
+	protected long count(TextContainer textContainer, LocaleId locale) {
+		long count = WordCounter.getCount(getSource());
+		if (count == 0) // No metrics found on the container
+			WordCounter.count(getSource(), locale); // Word Count metrics are based on counting in source
+		return count;
+	}
+
+	@Override
+	protected long count(Segment segment, LocaleId locale) {
+		long count = WordCounter.getCount(segment);
+		if (count == 0) // No metrics found on the container
+			WordCounter.count(segment, locale); // Word Count metrics are based on counting in source
+		return count;
+	}
+
+	@Override
+	protected long countInTextUnit(TextUnit textUnit) {
+		if (textUnit == null) return 0;		
+		if (textUnit.isTranslatable()) return 0; // Count only in non-translatable TUs
+		
+		LocaleId srcLocale = getSourceLocale();
+		TextContainer source = textUnit.getSource();
+		
+		// Individual segments metrics
+		long segCount = 0;
+		long segmentsCount = 0;
+		long textContainerCount = 0;
+		
+		ISegments segs = source.getSegments();
+		if (segs != null) {
+			for (Segment seg : segs) {
+				segCount = count(seg, srcLocale);
+				segmentsCount += segCount;
+				saveToMetrics(seg, segCount);
+			}
+		}
+		// TC metrics
+		textContainerCount = count(source, srcLocale);
+		saveToMetrics(source, textContainerCount);
+		
+		if (textContainerCount > 0) return textContainerCount;  
+		if (segmentsCount > 0) return segmentsCount;
+		return 0;
+	}
+
+	@Override
+	protected boolean countOnlyTranslatable() {
+		return false;
 	}
 
 }

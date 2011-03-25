@@ -32,7 +32,7 @@ import net.sf.okapi.common.resource.TextUnit;
 
 import org.junit.Test;
 
-public class WordCountStepTest {
+public class TestWordCountStep {
 
 	@Test
 	public void testTextUnitCounts() {
