@@ -244,6 +244,23 @@ public class PensieveSeekerTest {
         assertEquals("from", tmhits.get(0).getTu().getSource().getContent().toText());
     }
 
+//    @Test
+//    public void searchOnNoiseAndVeryShortWords () throws Exception {
+//        PensieveWriter writer = getWriter();
+//        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(LocaleId.fromString("EN"),
+//        	new TextFragment("of")), TARGET));
+//        writer.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(LocaleId.fromString("EN"),
+//        	new TextFragment("a")), TARGET));
+//        writer.close();
+//
+//        tmhits = seeker.searchFuzzy(new TextFragment("a"), 80, 10, null);
+//        assertEquals(1, tmhits.size());
+//        assertEquals("a", tmhits.get(0).getTu().getSource().getContent().toText());
+//        tmhits = seeker.searchFuzzy(new TextFragment("of"), 80, 10, null);
+//        assertEquals(1, tmhits.size());
+//        assertEquals("of", tmhits.get(0).getTu().getSource().getContent().toText());
+//    }
+
     @Test
     public void searchFuzzyWordOrder80Percent() throws Exception {
         PensieveWriter writer = getWriter();
