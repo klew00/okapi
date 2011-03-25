@@ -39,27 +39,23 @@ public class VariantSources implements IVariantSources {
 
     private static final int SOURCES_INITCAP = 2;
     private ConcurrentHashMap<LocaleId, TextContainer> sources;
-    TextContainer parentSource; //points to source in parent ITextUnit
+    TextContainer defaultSource; //points to source in parent ITextUnit
     private int sourceCount;
-    private ITextUnit myParent;
 
-
-
-    public VariantSources(ITextUnit parent) {
-        create(parent, null);
+    public VariantSources(TextContainer sourceContainer) {
+        createVariantSources(sourceContainer, null);
     }
 
-    public VariantSources(ITextUnit parent, VariantSources original) {
-        create(parent, original);
+    public VariantSources(TextContainer sourceContainer, VariantSources original) {
+        createVariantSources(sourceContainer, original);
     }
 
     public void setDefaultSource(TextContainer sourceContainer) {
-        this.parentSource = sourceContainer;
+        this.defaultSource = sourceContainer;
     }
 
-    private void create(ITextUnit parent, VariantSources original) {
-        myParent = parent;
-        this.parentSource = parent.getSource();
+    private void createVariantSources(TextContainer sourceContainer, VariantSources original) {
+        this.defaultSource = sourceContainer;
         sourceCount = 0;
         sources = new ConcurrentHashMap<LocaleId, TextContainer>();
         if (original != null) {
@@ -72,7 +68,7 @@ public class VariantSources implements IVariantSources {
     public VariantSources clone() {
         //this links to the parent, which may not be appropriate where clone() is to be used
         //TODO consider whether this is appropriate
-        VariantSources cs = new VariantSources(myParent);
+        VariantSources cs = new VariantSources(defaultSource);
         cs.sources = new ConcurrentHashMap<LocaleId, TextContainer>();
         cs.sources.putAll(this.sources);
 
@@ -80,23 +76,23 @@ public class VariantSources implements IVariantSources {
     }
 
     @Override
-    public boolean isSourceEmpty(LocaleId targetLocale) {
-        return getSource(targetLocale).isEmpty();
+    public boolean isEmpty(LocaleId targetLocale) {
+        return get(targetLocale).isEmpty();
     }
 
     @Override
-    public TextContainer createSource(LocaleId targetLocale, boolean overwriteExisting, int creationOptions) {
-        TextContainer newSource = parentSource.clone((creationOptions & COPY_PROPERTIES) == COPY_PROPERTIES);
+    public TextContainer create(LocaleId targetLocale, boolean overwriteExisting, int creationOptions) {
+        TextContainer newSource = defaultSource.clone((creationOptions & COPY_PROPERTIES) == COPY_PROPERTIES);
         if ( (creationOptions & COPY_SEGMENTS) != COPY_SEGMENTS )
             newSource.joinAll();
         if ( (creationOptions & COPY_CONTENT) != COPY_CONTENT )
             for (Segment seg : newSource.getSegments())
                 seg.text.clear();
-        return createSource(parentSource.clone(), targetLocale, overwriteExisting);
+        return create(defaultSource.clone(), targetLocale, overwriteExisting);
     }
 
     @Override
-    public TextContainer createSource(TextContainer sourceText, LocaleId targetLocale, boolean overwriteExisting) {
+    public TextContainer create(TextContainer sourceText, LocaleId targetLocale, boolean overwriteExisting) {
         if (targetLocale == null) {
             return null;
         } else {
@@ -110,18 +106,18 @@ public class VariantSources implements IVariantSources {
     }
 
     @Override
-    public TextContainer getSource(LocaleId targetLocale) {
+    public TextContainer get(LocaleId targetLocale) {
         TextContainer theSource = null;
         if (sourceCount > 0 && targetLocale != null)
             if (sources.containsKey(targetLocale))
                 theSource = sources.get(targetLocale);
-        return ((theSource != null) ? theSource : parentSource);
+        return ((theSource != null) ? theSource : defaultSource);
     }
 
     @Override
-    public TextContainer setSource(LocaleId targetLocale, TextContainer textContainer) throws IllegalArgumentException {
+    public TextContainer set(LocaleId targetLocale, TextContainer textContainer) throws IllegalArgumentException {
         if (targetLocale == null) throw new IllegalArgumentException("The target locale must not be null");
-        return putSource(targetLocale, textContainer);
+        return put(targetLocale, textContainer);
     }
 
     /* Adds or replaces a custom source for the given locale, creating a hash of
@@ -131,7 +127,7 @@ public class VariantSources implements IVariantSources {
      * @param theSource the source to be put in the hash
      * @return the source that was put in the list
      */
-    private TextContainer putSource(LocaleId targetLocale, TextContainer theSource) {
+    private TextContainer put(LocaleId targetLocale, TextContainer theSource) {
         if (sources == null) sources = new ConcurrentHashMap<LocaleId, TextContainer>(SOURCES_INITCAP);
         //can rely on a null meaning that there was no custom source because
         // ConcurrentHashMap cannot contain null values
@@ -140,14 +136,14 @@ public class VariantSources implements IVariantSources {
     }
 
     @Override
-    public void removeSource(LocaleId targetLocale) throws IllegalArgumentException {
+    public void remove(LocaleId targetLocale) throws IllegalArgumentException {
         if (targetLocale == null) throw new IllegalArgumentException("The target locale must not be null");
         if (sources == null) return;
         if (sources.remove(targetLocale) != null) sourceCount--;
     }
 
     @Override
-    public boolean hasVariantSource(LocaleId targetLocale) throws IllegalArgumentException {
+    public boolean hasVariant(LocaleId targetLocale) throws IllegalArgumentException {
         if (targetLocale == null) throw new IllegalArgumentException("The target locale must not be null");
         return (sources == null) ? false : sources.containsKey(targetLocale);
     }
@@ -158,157 +154,150 @@ public class VariantSources implements IVariantSources {
     }
 
     @Override
-    public boolean empty() {
+    public boolean isEmpty() {
         return (sourceCount == 0);
     }
 
     @Override
-    public TextFragment setSourceContent(LocaleId targetLocale, TextFragment content) throws IllegalArgumentException {
+    public TextFragment setContent(LocaleId targetLocale, TextFragment content) throws IllegalArgumentException {
         if (targetLocale == null) throw new IllegalArgumentException("targetLocale should not be null");
 
         TextContainer theSource;
         if (sources == null) sources = new ConcurrentHashMap<LocaleId, TextContainer>(SOURCES_INITCAP);
         if (sources.containsKey(targetLocale)) {
-            theSource = getSource(targetLocale);
+            theSource = get(targetLocale);
             theSource.setContent(content);
         } else {
-            theSource = putSource(targetLocale, new TextContainer(content));
+            theSource = put(targetLocale, new TextContainer(content));
         }
         // We can use this because the setContent() removed any segmentation
         return theSource.getSegments().getFirstContent();
     }
 
-    //TODO look at making IAlignedSegments use an action listener model so that
-    // if associated source/target are removed it can respond appropriately
     @Override
-    public IAlignedSegments getSegments(LocaleId loc) {
-        return new AlignedSegments(myParent, loc);
+    public ISegments getSegments(LocaleId targetLocale) {
+        return get(targetLocale).getSegments();
     }
 
     @Override
-    public ISegments getSourceSegments(LocaleId targetLocale) {
-        return getSource(targetLocale).getSegments();
-    }
-
-    @Override
-    public Segment getSourceSegment(LocaleId targetLocale, String segId, boolean createIfNeeded) {
-        Segment seg = getSourceSegments(targetLocale).get(segId);
+    public Segment getSegment(LocaleId targetLocale, String segId, boolean createIfNeeded) {
+        Segment seg = getSegments(targetLocale).get(segId);
         if (( seg == null ) && createIfNeeded ) {
             seg = new Segment(segId);
-            getSource(targetLocale).getSegments().append(seg);
+            get(targetLocale).getSegments().append(seg);
         }
         return seg;
     }
 
     @Override
-    public Set<LocaleId> getTargetLocalesWithVariantSource() {
+    public Set<LocaleId> getLocales() {
         return (sources == null) ? new HashSet<LocaleId>() : sources.keySet();
     }
 
     @Override
-    public Property getSourceProperty(LocaleId targetLocale, String name) {
-        return getSource(targetLocale).getProperty(name);
+    public Property getProperty(LocaleId targetLocale, String name) {
+        return get(targetLocale).getProperty(name);
     }
 
     @Override
-    public Property setSourceProperty(LocaleId targetLocale, Property property) {
-        return getSource(targetLocale).setProperty(property);
+    public Property setProperty(LocaleId targetLocale, Property property) {
+        return get(targetLocale).setProperty(property);
     }
 
     @Override
-    public void removeSourceProperty(LocaleId targetLocale, String name) {
-        getSource(targetLocale).removeProperty(name);
+    public void removeProperty(LocaleId targetLocale, String name) {
+        get(targetLocale).removeProperty(name);
     }
 
     @Override
-    public Set<String> getSourcePropertyNames(LocaleId targetLocale) {
-        return getSource(targetLocale).getPropertyNames();
+    public Set<String> getPropertyNames(LocaleId targetLocale) {
+        return get(targetLocale).getPropertyNames();
     }
 
     @Override
-    public boolean hasSourceProperty(LocaleId targetLocale, String name) {
-        return getSource(targetLocale).hasProperty(name);
+    public boolean hasProperty(LocaleId targetLocale, String name) {
+        return get(targetLocale).hasProperty(name);
     }
 
 
     @Override
-    public void propagateSourceProperty(LocaleId from, String propertyName, boolean overwriteExisting) {
+    public void propagateProperty(LocaleId from, String propertyName, boolean overwriteExisting) {
         if (sources == null) return;
 
         //Could be made more efficient by first checking that the property to copy exists
         //Not doing that for now in order to keep code less complicated
 
         //the following will try to copy the property to the origin source, but
-        // this is ok as it is prevented in the other propagateSourceProperty method
+        // this is ok as it is prevented in the other propagateProperty method
 
         //propagate to default source
-        propagateSourceProperty(from, null, propertyName, overwriteExisting);
+        propagateProperty(from, null, propertyName, overwriteExisting);
 
         //propagate to all custom sources
-        for (LocaleId loc : getTargetLocalesWithVariantSource()) {
-            propagateSourceProperty(from, loc, propertyName, overwriteExisting);
+        for (LocaleId loc : getLocales()) {
+            propagateProperty(from, loc, propertyName, overwriteExisting);
         }
     }
 
     @Override
-    public void propagateSourceProperty(LocaleId from, LocaleId to, String propertyName, boolean overwriteExisting) {
+    public void propagateProperty(LocaleId from, LocaleId to, String propertyName, boolean overwriteExisting) {
         if (sources == null) return;
         if (from == null ? from == to : from.equals(to)) return; //compare from & to without NullPointerException
-        Property p = getSourceProperty(from, propertyName);
+        Property p = getProperty(from, propertyName);
         if (p != null)
-            if ( overwriteExisting || !hasSourceProperty(to, propertyName) )
-                setSourceProperty(to, p);
+            if ( overwriteExisting || !hasProperty(to, propertyName) )
+                setProperty(to, p);
     }
 
     @Override
-    public void propagateAllSourceProperties(LocaleId from, boolean overwriteExisting) {
+    public void propagateAllProperties(LocaleId from, boolean overwriteExisting) {
         if (sources == null) return;
 
         //Could be made more efficient as property names for the 'from' locale
-        // are retrieved on each call of the overloaded propagateAllSourceProperties()
+        // are retrieved on each call of the overloaded propagateAllProperties()
         // function, but leaving it for the moment to keep code simple
 
         //propagate to default source
-        propagateAllSourceProperties(from, null, overwriteExisting);
+        propagateAllProperties(from, null, overwriteExisting);
 
         //propagate to all custom sources
-        for (LocaleId loc : getTargetLocalesWithVariantSource()) {
-            propagateAllSourceProperties(from, loc, overwriteExisting);
+        for (LocaleId loc : getLocales()) {
+            propagateAllProperties(from, loc, overwriteExisting);
         }
     }
 
     @Override
-    public void propagateAllSourceProperties(LocaleId from, LocaleId to, boolean overwriteExisting) {
+    public void propagateAllProperties(LocaleId from, LocaleId to, boolean overwriteExisting) {
         if (sources == null) return;
         if (from == null ? from == to : from.equals(to)) return;
         //get a list of all properties from from
-        for (String propName : getSourcePropertyNames(from)) {
+        for (String propName : getPropertyNames(from)) {
             //for each, propagate it to to
-            propagateSourceProperty(from, to, propName, overwriteExisting);
+            propagateProperty(from, to, propName, overwriteExisting);
         }
     }
 
 
     @Override
-    public <A extends IAnnotation> void propagateSourceAnnotation(LocaleId from, Class<A> type, boolean overwriteExisting) {
+    public <A extends IAnnotation> void propagateAnnotation(LocaleId from, Class<A> type, boolean overwriteExisting) {
         if (sources == null) return;
 
         //propagate to default source
-        propagateSourceAnnotation(from, null, type, overwriteExisting);
+        propagateAnnotation(from, null, type, overwriteExisting);
 
         //propagate to all custom sources
-        for (LocaleId loc : getTargetLocalesWithVariantSource()) {
-            propagateSourceAnnotation(from, loc, type, overwriteExisting);
+        for (LocaleId loc : getLocales()) {
+            propagateAnnotation(from, loc, type, overwriteExisting);
         }
     }
 
     @Override
-    public <A extends IAnnotation> void propagateSourceAnnotation(LocaleId from, LocaleId to, Class<A> type, boolean overwriteExisting) {
+    public <A extends IAnnotation> void propagateAnnotation(LocaleId from, LocaleId to, Class<A> type, boolean overwriteExisting) {
         if (sources == null) return;
         if (from == null ? from == to : from.equals(to)) return;
 
-        IAnnotation fromA = getSource(from).getAnnotation(type);
-        TextContainer toSource = getSource(to);
+        IAnnotation fromA = get(from).getAnnotation(type);
+        TextContainer toSource = get(to);
         if (fromA != null) {
             if (overwriteExisting || ( toSource.getAnnotation(type) == null ) ) {
                 toSource.setAnnotation(fromA);
@@ -317,26 +306,26 @@ public class VariantSources implements IVariantSources {
     }
 
     @Override
-    public void propagateAllSourceAnnotations(LocaleId from, boolean overwriteExisting) {
+    public void propagateAllAnnotations(LocaleId from, boolean overwriteExisting) {
         if (sources == null) return;
 
         //propagate to default source
-        propagateAllSourceAnnotations(from, null, overwriteExisting);
+        propagateAllAnnotations(from, null, overwriteExisting);
 
         //propagate to all custom sources
-        for (LocaleId loc : getTargetLocalesWithVariantSource()) {
-            propagateAllSourceAnnotations(from, loc, overwriteExisting);
+        for (LocaleId loc : getLocales()) {
+            propagateAllAnnotations(from, loc, overwriteExisting);
         }
     }
 
     @Override
-    public void propagateAllSourceAnnotations(LocaleId from, LocaleId to, boolean overwriteExisting) {
+    public void propagateAllAnnotations(LocaleId from, LocaleId to, boolean overwriteExisting) {
         if (sources == null) return;
         if (from == null ? from == to : from.equals(to)) return;
 
-        for (IAnnotation annot : getSource(from).getAnnotations()) {
+        for (IAnnotation annot : get(from).getAnnotations()) {
             //TODO check that getClass() will always return the correct class for looking up the annotation
-            propagateSourceAnnotation(from, to, annot.getClass(), overwriteExisting);
+            propagateAnnotation(from, to, annot.getClass(), overwriteExisting);
         }
     }
 
@@ -354,7 +343,7 @@ public class VariantSources implements IVariantSources {
 
             @Override
             public TextContainer next() {
-                return (removedParentContainer) ? iter.next() : parentSource;
+                return (removedParentContainer) ? iter.next() : defaultSource;
             }
 
             @Override

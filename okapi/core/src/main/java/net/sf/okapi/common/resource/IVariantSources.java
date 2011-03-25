@@ -25,27 +25,28 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.annotation.IAnnotation;
 
 /**
- * EXPERIMENTAL interface. Do not use yet.
+ * EXPERIMENTAL interface, do not use yet.
  *
  * Provides methods to allow the creation and manipulation of different source
  * versions for different locales of an {@link ITextUnit} object.
- *
- * To create an instance of this interface, use the method {@link ITextUnit#getVariantSources()}.
+ * <p>
+ * To create an instance of this interface, use the method
+ * {@link ITextUnit#getVariantSources()}.
  *
  * @author David Mason, dr.d.mason@gmail.com
  */
 public interface IVariantSources extends Iterable<TextContainer> {
 
     /**
-     * Indicates if the source text for the given target locale is empty. Result
+     * Indicates if the source text for the given target locale is isEmpty. Result
      * will be for the default source if there is no variant source for the given
      * locale, or the given locale is null.
      *
      * @param targetLocale the target locale for the source to check
      * @return true if the source text (may be the default source) for the given
-     *         locale is empty, false otherwise
+     *         locale is isEmpty, false otherwise
      */
-    public boolean isSourceEmpty(LocaleId targetLocale);
+    public boolean isEmpty(LocaleId targetLocale);
 
     /**
      * Creates a variant source for a given target locale, using the content of the
@@ -55,29 +56,30 @@ public interface IVariantSources extends Iterable<TextContainer> {
      * @param overwriteExisting overwrites any existing source associated with
      *                          the locale if true
      * @param creationOptions creation options:
-     * <ul><li>CREATE_EMPTY: Create an empty source object.</li>
+     * <ul><li>CREATE_EMPTY: Create an isEmpty source object.</li>
      * <li>COPY_CONTENT: Copy the text of the default source (and any associated in-line code).</li>
      * <li>COPY_PROPERTIES: Copy the default source properties.</li>
      * <li>COPY_SEGMENTS: Copy the default source segmentation.</li>
      * <li>COPY_ALL: Same as (COPY_CONTENT|COPY_PROPERTIES|COPY_SEGMENTS).</li></ul>
      * @return the source object that was created or retrieved, or null if the
      */
-    public TextContainer createSource(LocaleId targetLocale,
-                                      boolean overwriteExisting,
-                                      int creationOptions);
+    public TextContainer create(LocaleId targetLocale,
+                                boolean overwriteExisting,
+                                int creationOptions);
 
 
     /**
      * Creates a variant source for a given locale, using the provided text container.
+     *
      * @param sourceText the text to include in this source
      * @param targetLocale the target locale that uses the new source
      * @param overwriteExisting overwrites any existing source associated with
      *                          the locale if true
      * @return the source object that was created or retrieved
      */
-    public TextContainer createSource(TextContainer sourceText,
-                                      LocaleId targetLocale,
-                                      boolean overwriteExisting);
+    public TextContainer create(TextContainer sourceText,
+                                LocaleId targetLocale,
+                                boolean overwriteExisting);
     //TODO think about whether to keep this method at all - variant sources
     //     should be based on default source after all
 
@@ -90,7 +92,7 @@ public interface IVariantSources extends Iterable<TextContainer> {
      * @param targetLocale the target locale used by the source.
      * @return the source used by the given locale. May be the default source.
      */
-    public TextContainer getSource(LocaleId targetLocale);
+    public TextContainer get(LocaleId targetLocale);
 
     /**
      * Sets the source object to use for the given target locale. Any existing
@@ -101,7 +103,8 @@ public interface IVariantSources extends Iterable<TextContainer> {
      * @return the source object that has been set
      * @throws IllegalArgumentException if the target locale is null
      */
-    public TextContainer setSource(LocaleId targetLocale, TextContainer textContainer) throws IllegalArgumentException;
+    public TextContainer set(LocaleId targetLocale, TextContainer textContainer)
+            throws IllegalArgumentException;
 
     /**
      * Removes any variant source used for the given target locale. Any associated
@@ -111,19 +114,21 @@ public interface IVariantSources extends Iterable<TextContainer> {
      * @param targetLocale the locale for which to remove variant source
      * @throws IllegalArgumentException if the target locale is null
      */
-    public void removeSource(LocaleId targetLocale) throws IllegalArgumentException;
+    public void remove(LocaleId targetLocale) throws IllegalArgumentException;
 
     /**
      * Indicates the number of variant sources stored in this variant source object
+     *
      * @return the number of variant sources stored in this VariantSources object
      */
     public int count();
 
     /**
      * Indicates whether this variant source object contains any variant sources
+     *
      * @return true if there are no variant sources in this variant sources object
      */
-    public boolean empty();
+    public boolean isEmpty();
 
     /**
      * Indicates whether there is a variant source for the given locale
@@ -133,13 +138,13 @@ public interface IVariantSources extends Iterable<TextContainer> {
      *         false otherwise. Returns false if null target locale is given.
      * @throws IllegalArgumentException if targetLocale is null
      */
-    public boolean hasVariantSource(LocaleId targetLocale) throws IllegalArgumentException;
+    public boolean hasVariant(LocaleId targetLocale) throws IllegalArgumentException;
 
     /**
      * Sets the content of the variant source for the given target locale. Creates
      * a variant source if one does not exist for the given locale. Replaces any
      * existing content for the source of the given locale.
-     *
+     * <p>
      * TODO consider adding an overwriteExisting flag
      *
      * @param targetLocale the locale for which to set the source content
@@ -148,22 +153,8 @@ public interface IVariantSources extends Iterable<TextContainer> {
      * @return the source content that was set.
      * @throws IllegalArgumentException if targetLocale is null
      */
-    public TextFragment setSourceContent(LocaleId targetLocale, TextFragment content) throws IllegalArgumentException;
-
-
-
-    //TODO consider the implications of using a locale with no variant source
-    //     as having multiple targets using default source could cause alignment
-    //     problems.
-
-    /**
-     * Creates a new {@link IAlignedSegments} object to access and manipulate the
-     * segments of this text unit for a given target locale.
-     *
-     * @param targetLocale the target locale for the segments
-     * @return a new {@link IAlignedSegments} object
-     */
-    public IAlignedSegments getSegments(LocaleId targetLocale);
+    public TextFragment setContent(LocaleId targetLocale, TextFragment content)
+            throws IllegalArgumentException;
 
 
     /**
@@ -173,11 +164,12 @@ public interface IVariantSources extends Iterable<TextContainer> {
      * @param targetLocale the target locale for which to return source segments
      * @return an object implementing ISegments for the source content.
      */
-    public ISegments getSourceSegments(LocaleId targetLocale);
+    public ISegments getSegments(LocaleId targetLocale);
 
     /**
      * Gets the source segment for a given target locale and segment id.
-     * <p>If the segment does not exists, one is created if <code>createIfNeeded</code> is true.
+     * <p>
+     * If the segment does not exists, one is created if <code>createIfNeeded</code> is true.
      * TODO discuss how to handle target locales that use the default source
      *
      * @param targetLocale the target locale for which to return a source segment
@@ -187,16 +179,17 @@ public interface IVariantSources extends Iterable<TextContainer> {
      *                       False to return null when the segment does not exists.
      * @return the retrieved or created segment, or null if none was found or created.
      */
-    public Segment getSourceSegment(LocaleId targetLocale, String segId,
+    public Segment getSegment(LocaleId targetLocale, String segId,
                                     boolean createIfNeeded);
 
 
     /**
      * Lists all target locales for which there is a variant source
      * Does not include a locale for the default source.
+     *
      * @return a set of all target locales that use a variant source.
      */
-    public Set<LocaleId> getTargetLocalesWithVariantSource();
+    public Set<LocaleId> getLocales();
 
 
 
@@ -212,7 +205,9 @@ public interface IVariantSources extends Iterable<TextContainer> {
      * @param propertyName the name of the property to copy
      * @param overwriteExisting true to overwrite an existing property if present
      */
-    public void propagateSourceProperty(LocaleId from, LocaleId to, String propertyName, boolean overwriteExisting);
+    public void propagateProperty(LocaleId from, LocaleId to,
+                                  String propertyName,
+                                  boolean overwriteExisting);
 
     /**
      * Copies a single property from one source version to all other source versions.
@@ -222,7 +217,9 @@ public interface IVariantSources extends Iterable<TextContainer> {
      * @param propertyName the name of the property to copy
      * @param overwriteExisting true to overwrite an existing property if present
      */
-    public void propagateSourceProperty(LocaleId from, String propertyName, boolean overwriteExisting);
+    public void propagateProperty(LocaleId from,
+                                  String propertyName,
+                                  boolean overwriteExisting);
 
     /**
      * Copies all properties from one source version to another source version.
@@ -233,7 +230,9 @@ public interface IVariantSources extends Iterable<TextContainer> {
      *           null to use the default source
      * @param overwriteExisting true to overwrite any existing properties if present
      */
-    public void propagateAllSourceProperties(LocaleId from, LocaleId to, boolean overwriteExisting);
+    public void propagateAllProperties(LocaleId from,
+                                       LocaleId to,
+                                       boolean overwriteExisting);
 
 
     /**
@@ -243,7 +242,7 @@ public interface IVariantSources extends Iterable<TextContainer> {
      *             null to use the default source
      * @param overwriteExisting true to overwrite any existing properties if present
      */
-    public void propagateAllSourceProperties(LocaleId from, boolean overwriteExisting);
+    public void propagateAllProperties(LocaleId from, boolean overwriteExisting);
 
 
     /**
@@ -256,7 +255,10 @@ public interface IVariantSources extends Iterable<TextContainer> {
      * @param type the type of the annotation to copy
      * @param overwriteExisting true to overwrite an existing annotation if present
      */
-    public <A extends IAnnotation> void propagateSourceAnnotation(LocaleId from, LocaleId to, Class<A> type, boolean overwriteExisting);
+    public <A extends IAnnotation> void propagateAnnotation(LocaleId from,
+                                                            LocaleId to,
+                                                            Class<A> type,
+                                                            boolean overwriteExisting);
 
     /**
      * Copies a single annotation from one source version to all other source versions.
@@ -266,7 +268,9 @@ public interface IVariantSources extends Iterable<TextContainer> {
      * @param type the type of the annotation to copy
      * @param overwriteExisting true to overwrite an existing annotation if present
      */
-    public <A extends IAnnotation> void propagateSourceAnnotation(LocaleId from, Class<A> type, boolean overwriteExisting);
+    public <A extends IAnnotation> void propagateAnnotation(LocaleId from,
+                                                            Class<A> type,
+                                                            boolean overwriteExisting);
 
     /**
      * Copies all annotations from one source version to another source version.
@@ -277,7 +281,9 @@ public interface IVariantSources extends Iterable<TextContainer> {
      *           null to use the default source
      * @param overwriteExisting true to overwrite any existing annotation if present
      */
-    public void propagateAllSourceAnnotations(LocaleId from, LocaleId to, boolean overwriteExisting);
+    public void propagateAllAnnotations(LocaleId from,
+                                        LocaleId to,
+                                        boolean overwriteExisting);
 
     /**
      * Copies all annotations from one source version to all other source versions.
@@ -286,48 +292,53 @@ public interface IVariantSources extends Iterable<TextContainer> {
      *             null to use the default source
      * @param overwriteExisting true to overwrite any existing annotation if present
      */
-    public void propagateAllSourceAnnotations(LocaleId from, boolean overwriteExisting);
+    public void propagateAllAnnotations(LocaleId from, boolean overwriteExisting);
 
 
     //TODO decide whether to keep these 5 methods, or perhaps move them to INameable if appropriate
 
     /**
      * Gets the source property for a given name and target locale.
+     *
      * @param targetLocale the target locale of the source
      * @param name The name of the source property to retrieve.
      * @return The property or null if it does not exist.
      */
-    public Property getSourceProperty(LocaleId targetLocale, String name);
+    public Property getProperty(LocaleId targetLocale, String name);
 
     /**
      * Sets a source property. If a property already exists it is overwritten.
+     *
      * @param targetLocale the target locale of the source
      * @param property The new property to set.
      * @return The property that has been set.
      */
-    public Property setSourceProperty(LocaleId targetLocale, Property property);
+    public Property setProperty(LocaleId targetLocale, Property property);
 
     /**
      * Removes a source property of a given name. If the property does not exists
      * nothing happens.
+     *
      * @param targetLocale the target locale of the source
      * @param name The name of the property to remove.
      */
-    public void removeSourceProperty(LocaleId targetLocale, String name);
+    public void removeProperty(LocaleId targetLocale, String name);
 
     /**
      * Gets the names of all the source properties for this resource.
+     *
      * @param targetLocale the target locale of the source
      * @return All the names of the source properties for this resource.
      */
-    public Set<String> getSourcePropertyNames(LocaleId targetLocale);
+    public Set<String> getPropertyNames(LocaleId targetLocale);
 
     /**
      * Indicates if a source property exists for a given name.
+     * 
      * @param targetLocale the target locale of the source
      * @param name The name of the source property to query.
      * @return True if a source property exists, false otherwise.
      */
-    public boolean hasSourceProperty(LocaleId targetLocale, String name);
+    public boolean hasProperty(LocaleId targetLocale, String name);
 
 }

@@ -30,22 +30,37 @@ import net.sf.okapi.common.Util;
 
 public class Segments implements ISegments {
     private AlignmentStatus alignmentStatus = AlignmentStatus.NOT_ALIGNED;
-
-    //TODO currently this relies on a few protected methods and fields in the
-    // parent text container. Consider whether the implementation can be improved
-    // by providing more encapsulated access to these
     private TextContainer parent;
+    private List<TextPart> parts;
 
+    /**
+     * Creates an uninitialised Segments object.
+     * <p>
+     * <b>IMPORTANT:</b> setParts() must be called with
+     * a non-null argument before calling any other methods.
+     */
     public Segments(TextContainer parent) {
         this.parent = parent;
+
+    }
+
+    /**
+     * Sets the list of TextPart objects in which the segments for this Segments
+     * object are located. Parts must be set after construction before any other
+     * methods are invoked.
+     *
+     * @param parts the list of {@link TextPart}s where the segments are stored.
+     */
+    public void setParts(List<TextPart> parts) {
+        this.parts = parts;
     }
 
     public Iterator<Segment> iterator() {
             return new Iterator<Segment>() {
                     int current = foundNext(-1);
                     private int foundNext (int start) {
-                            for ( int i=start+1; i<parent.parts.size(); i++ ) {
-                                    if ( parent.parts.get(i).isSegment() ) {
+                            for ( int i=start+1; i<parts.size(); i++ ) {
+                                    if ( parts.get(i).isSegment() ) {
                                             return i;
                                     }
                             }
@@ -66,7 +81,7 @@ public class Segments implements ISegments {
                             // Get next here because hasNext() could be called several times
                             current = foundNext(current);
                             // Return 'previous' current
-                            return (Segment)parent.parts.get(n);
+                            return (Segment)parts.get(n);
                     }
 
                     @Override
@@ -77,9 +92,9 @@ public class Segments implements ISegments {
     };
 
     @Override
-    public List<Segment> asList () {
+    public List<Segment> asList() {
             ArrayList<Segment> segments = new ArrayList<Segment>();
-            for ( TextPart part : parent.parts ) {
+            for ( TextPart part : parts ) {
                     if ( part.isSegment() ) {
                             segments.add((Segment)part);
                     }
@@ -88,103 +103,90 @@ public class Segments implements ISegments {
     }
 
     @Override
-    public void swap (int segIndex1,
-            int segIndex2)
-    {
+    public void swap(int segIndex1, int segIndex2) {
             int partIndex1 = getPartIndex(segIndex1);
             int partIndex2 = getPartIndex(segIndex2);
             if (( partIndex1 == -1 ) || ( partIndex2 == -1 )) {
                     return; // At least one index is wrong: do nothing
             }
-            TextPart tmp = parent.parts.get(partIndex1);
-            parent.parts.set(partIndex1, parent.parts.get(partIndex2));
-            parent.parts.set(partIndex2, tmp);
+            TextPart tmp = parts.get(partIndex1);
+            parts.set(partIndex1, parts.get(partIndex2));
+            parts.set(partIndex2, tmp);
     }
 
 
     @Override
-    public void append (Segment segment,
-            boolean collapseIfPreviousEmpty)
-    {
+    public void append(Segment segment, boolean collapseIfPreviousEmpty) {
             append(segment, null, collapseIfPreviousEmpty);
     }
 
     @Override
-    public void append (Segment segment) {
+    public void append(Segment segment) {
             append(segment, true);
     }
 
     @Override
-    public void append (Segment segment,
-            String textBefore,
-            boolean collapseIfPreviousEmpty)
-    {
+    public void append(Segment segment,
+                       String textBefore,
+                       boolean collapseIfPreviousEmpty) {
             // Add the text before if needed
             if ( !Util.isEmpty(textBefore) ) {
-                    if (( parent.parts.get(parent.parts.size()-1).getContent().isEmpty() )
-                            && !parent.parts.get(parent.parts.size()-1).isSegment() )
+                    if (( parts.get(parts.size()-1).getContent().isEmpty() )
+                            && !parts.get(parts.size()-1).isSegment() )
                     {
-                            parent.parts.set(parent.parts.size()-1, new TextPart(textBefore));
+                            parts.set(parts.size()-1, new TextPart(textBefore));
                     }
                     else {
-                            parent.parts.add(new TextPart(textBefore));
+                            parts.add(new TextPart(textBefore));
                     }
             }
 
             // If the last segment is empty and at the end of the content: re-use it
             if ( collapseIfPreviousEmpty ) {
-                    if (( parent.parts.get(parent.parts.size()-1).getContent().isEmpty() )
-                            && parent.parts.get(parent.parts.size()-1).isSegment() )
+                    if (( parts.get(parts.size()-1).getContent().isEmpty() )
+                            && parts.get(parts.size()-1).isSegment() )
                     {
-                            parent.parts.set(parent.parts.size()-1, segment);
+                            parts.set(parts.size()-1, segment);
                     }
                     else {
-                            parent.parts.add(segment);
+                            parts.add(segment);
                     }
             }
             else {
-                    parent.parts.add(segment);
+                    parts.add(segment);
             }
 
-            parent.validateSegmentId(segment);
-            parent.segApplied = true;
+            validateSegmentId(segment);
+            parent.setHasBeenSegmentedFlag(true);
     }
 
     @Override
-    public void append (Segment segment,
-            String textBefore)
-    {
+    public void append(Segment segment, String textBefore) {
             append(segment, textBefore, true);
     }
 
     @Override
-    public void append (TextFragment fragment,
-            boolean collapseIfPreviousEmpty)
-    {
+    public void append(TextFragment fragment, boolean collapseIfPreviousEmpty) {
             append(new Segment(null, fragment), collapseIfPreviousEmpty);
     }
 
     @Override
-    public void append (TextFragment fragment) {
+    public void append(TextFragment fragment) {
             append(fragment, true);
     }
 
     @Override
-    public void set (int index,
-            Segment seg)
-    {
+    public void set(int index, Segment seg) {
             int n = getPartIndex(index);
             if ( n < -1 ) {
                     throw new IndexOutOfBoundsException("Invalid segment index: "+index);
             }
-            parent.parts.set(n, seg);
-            parent.validateSegmentId(seg);
+            parts.set(n, seg);
+            validateSegmentId(seg);
     }
 
     @Override
-    public void insert (int index,
-            Segment seg)
-    {
+    public void insert(int index, Segment seg) {
             // If the index is the one after the last segment: we append
             if ( index == count() ) {
                     append(seg, true);
@@ -195,26 +197,26 @@ public class Segments implements ISegments {
             if ( n < -1 ) {
                     throw new IndexOutOfBoundsException("Invalid segment index: "+index);
             }
-            parent.parts.add(n, seg);
-            parent.validateSegmentId(seg);
+            parts.add(n, seg);
+            validateSegmentId(seg);
     }
 
     @Override
-    public int create (List<Range> ranges) {
+    public int create(List<Range> ranges) {
             // Do nothing if null or empty
             if (( ranges == null ) || ranges.isEmpty() ) return 0;
 
             // If the current content is a single segment we start from it
             TextFragment holder;
-            if ( parent.parts.size() == 1  ) {
-                    holder = parent.parts.get(0).getContent();
+            if ( parts.size() == 1  ) {
+                    holder = parts.get(0).getContent();
             }
             else {
-                    holder = parent.createJoinedContent(null);
+                    holder = createJoinedContent(null);
             }
 
             // Reset the segments
-            parent.parts = new ArrayList<TextPart>();
+            parts.clear();
 
             // Extract the segments using the ranges
             int start = 0;
@@ -237,45 +239,43 @@ public class Segments implements ISegments {
                     }
                     // If there is an interstice: creates the corresponding part
                     if ( start < range.start ) {
-                            parent.parts.add(new TextPart(holder.subSequence(start, range.start)));
+                            parts.add(new TextPart(holder.subSequence(start, range.start)));
                     }
                     // Create the part for the segment
                     // Use existing id if possible, otherwise use local counter
                     Segment seg = new Segment(((range.id == null) ? String.valueOf(id++) : range.id),
                             holder.subSequence(range.start, range.end));
-                    parent.parts.add(seg);
-                    parent.validateSegmentId(seg);
+                    parts.add(seg);
+                    validateSegmentId(seg);
                     start = range.end;
-                    parent.segApplied = true;
+                    parent.setHasBeenSegmentedFlag(true);
             }
 
             // Check if we have remaining text after the last segment
             if ( start < holder.text.length() ) {
                     if ( start == 0 ) { // If the remain is the whole content: make it a segment
-                            parent.parts.add(new Segment(String.valueOf(id), holder));
+                            parts.add(new Segment(String.valueOf(id), holder));
                             // That is the only segment: no need to validate the id
                     }
                     else { // Otherwise: make it an interstice
-                            parent.parts.add(new TextPart(holder.subSequence(start, -1)));
+                            parts.add(new TextPart(holder.subSequence(start, -1)));
                     }
             }
 
-            return parent.parts.size();
+            return parts.size();
     }
 
     @Override
-    public int create (int start,
-            int end)
-    {
+    public int create(int start, int end) {
             ArrayList<Range> range = new ArrayList<Range>();
             range.add(new Range(start, end));
             return create(range);
     }
 
     @Override
-    public int count () {
+    public int count() {
             int count = 0;
-            for ( TextPart part : parent.parts ) {
+            for ( TextPart part : parts ) {
                     if ( part.isSegment() ) {
                             count++;
                     }
@@ -284,8 +284,8 @@ public class Segments implements ISegments {
     }
 
     @Override
-    public TextFragment getFirstContent () {
-            for ( TextPart part : parent.parts ) {
+    public TextFragment getFirstContent() {
+            for ( TextPart part : parts ) {
                     if ( part.isSegment() ) {
                             return part.getContent();
                     }
@@ -295,10 +295,10 @@ public class Segments implements ISegments {
     }
 
     @Override
-    public TextFragment getLastContent () {
-            for ( int i=parent.parts.size()-1; i>=0; i-- ) {
-                    if ( parent.parts.get(i).isSegment() ) {
-                            return parent.parts.get(i).getContent();
+    public TextFragment getLastContent() {
+            for ( int i=parts.size()-1; i>=0; i-- ) {
+                    if ( parts.get(i).isSegment() ) {
+                            return parts.get(i).getContent();
                     }
             }
             // Should never occur
@@ -306,10 +306,10 @@ public class Segments implements ISegments {
     }
 
     @Override
-    public Segment getLast () {
-            for ( int i=parent.parts.size()-1; i>=0; i-- ) {
-                    if ( parent.parts.get(i).isSegment() ) {
-                            return (Segment)parent.parts.get(i);
+    public Segment getLast() {
+            for ( int i=parts.size()-1; i>=0; i-- ) {
+                    if ( parts.get(i).isSegment() ) {
+                            return (Segment)parts.get(i);
                     }
             }
             // Should never occur
@@ -317,8 +317,8 @@ public class Segments implements ISegments {
     }
 
     @Override
-    public Segment get (String id) {
-            for ( TextPart part : parent.parts ) {
+    public Segment get(String id) {
+            for ( TextPart part : parts ) {
                     if ( part.isSegment() ) {
                             if ( ((Segment)part).id.equals(id) ) return (Segment)part;
                     }
@@ -328,41 +328,41 @@ public class Segments implements ISegments {
     }
 
     @Override
-    public Segment get (int index) {
-            int tmp = -1;
-            for ( TextPart part : parent.parts ) {
-                    if ( part.isSegment() ) {
-                            if ( ++tmp == index ) {
-                                    return (Segment)part;
-                            }
-                    }
+    public Segment get(int index) {
+        int tmp = -1;
+        for ( TextPart part : parts ) {
+            if ( part.isSegment() ) {
+                if ( ++tmp == index ) {
+                    return (Segment)part;
+                }
             }
-            // Should never occur
-            return null;
+        }
+        throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + ++tmp);
     }
 
     @Override
-    public void joinAll () {
+    public void joinAll() {
             // Merge but don't remember the ranges
-            parent.setContent(parent.createJoinedContent(null));
+            //parent.setContent(createJoinedContent(null));
+            joinAll(null);
     }
 
     @Override
-    public void joinAll (List<Range> ranges) {
-            parent.setContent(parent.createJoinedContent(ranges));
+    public void joinAll(List<Range> ranges) {
+            parent.setContent(createJoinedContent(ranges));
     }
 
     @Override
-    public List<Range> getRanges () {
+    public List<Range> getRanges() {
             List<Range> ranges = new ArrayList<Range>();
-            parent.createJoinedContent(ranges);
+            createJoinedContent(ranges);
             return ranges;
     }
 
     @Override
-    public int joinWithNext (int segmentIndex) {
+    public int joinWithNext(int segmentIndex) {
             // Check if we have something to join to
-            if ( parent.parts.size() == 1 ) {
+            if ( parts.size() == 1 ) {
                     return 0; // Nothing to do
             }
 
@@ -375,8 +375,8 @@ public class Segments implements ISegments {
 
             // Find the next segment
             int end = -1;
-            for ( int i=start+1; i<parent.parts.size(); i++ ) {
-                    if ( parent.parts.get(i).isSegment() ) {
+            for ( int i=start+1; i<parts.size(); i++ ) {
+                    if ( parts.get(i).isSegment() ) {
                             end = i;
                             break;
                     }
@@ -388,12 +388,12 @@ public class Segments implements ISegments {
                     return 0;
             }
 
-            TextFragment tf = parent.parts.get(start).getContent();
+            TextFragment tf = parts.get(start).getContent();
             int count = (end-start);
             int i = 0;
             while ( i < count ) {
-                    tf.append(parent.parts.get(start+1).getContent());
-                    parent.parts.remove(start+1);
+                    tf.append(parts.get(start+1).getContent());
+                    parts.remove(start+1);
                     i++;
             }
 
@@ -402,10 +402,10 @@ public class Segments implements ISegments {
     }
 
     @Override
-    public int getPartIndex (int segIndex) {
+    public int getPartIndex(int segIndex) {
             int n = -1;
-            for ( int i=0; i<parent.parts.size(); i++ ) {
-                    if ( parent.parts.get(i).isSegment() ) {
+            for ( int i=0; i<parts.size(); i++ ) {
+                    if ( parts.get(i).isSegment() ) {
                             n++;
                             if ( n == segIndex ) return i;
                     }
@@ -414,11 +414,11 @@ public class Segments implements ISegments {
     }
 
     @Override
-    public int getIndex (String segId) {
+    public int getIndex(String segId) {
             int n = 0;
-            for ( int i=0; i<parent.parts.size(); i++ ) {
-                    if ( parent.parts.get(i).isSegment() ) {
-                            if ( segId.equals(((Segment)parent.parts.get(i)).id) ) return n;
+            for ( int i=0; i<parts.size(); i++ ) {
+                    if ( parts.get(i).isSegment() ) {
+                            if ( segId.equals(((Segment)parts.get(i)).id) ) return n;
                             // Else, move to the next
                             n++;
                     }
@@ -435,4 +435,66 @@ public class Segments implements ISegments {
     public void setAlignmentStatus(AlignmentStatus alignmentStatus) {
             this.alignmentStatus = alignmentStatus;
     }
+
+    /**
+     * Checks if the id of a given segment is empty, null or a duplicate. If it is, the id
+     * is automatically set to a new value auto-generated.
+     * @param seg the segment to verify and possibly modify.
+     */
+    public void validateSegmentId(Segment seg) {
+            if ( !Util.isEmpty(seg.id) ) {
+                    // If not null or empty: check if it is a duplicate
+                    boolean duplicate = false;
+                    for ( TextPart tmp : parts ) {
+                            if ( !tmp.isSegment() ) continue;
+                            if ( seg == tmp ) continue;
+                            if ( seg.id.equals(((Segment)tmp).id) ) {
+                                    duplicate = true;
+                                    break;
+                            }
+                    }
+                    if ( !duplicate ) return; // Not a duplicate, nothing to do
+            }
+
+            // If duplicate or empty or null: assign a default id
+            int value = 0;
+            for ( TextPart tmp : parts ) {
+                    if ( tmp == seg ) continue; // Skip over the actual segment
+                    if ( !tmp.isSegment() ) continue; // Skip over non-segment
+                    // If it starts with a digit, it's probably a number
+                    if ( Character.isDigit(((Segment)tmp).id.charAt(0)) ) {
+                            // try to convert the id to a integer
+                            try {
+                                    int val = Integer.parseInt(((Segment)tmp).id);
+                                    // Make the new id the same +1
+                                    if ( value <= val ) value = val+1;
+                            }
+                            catch ( NumberFormatException ignore ) {
+                                    // Not really an error, just a non-numeric id
+                            }
+                    }
+            }
+            // Set the auto-value
+            seg.id = String.valueOf(value);
+    }
+
+    private TextFragment createJoinedContent(List<Range> ranges) {
+        // Clear the ranges if needed
+        if ( ranges != null ) {
+            ranges.clear();
+        }
+        // Join all segment into a new TextFragment
+        int start = 0;
+        TextFragment tf = new TextFragment();
+        for ( TextPart part : parts ) {
+            if (( ranges != null ) && part.isSegment() ) {
+                ranges.add(new Range(start, start+part.text.text.length(), ((Segment)part).id));
+            }
+            start += part.text.text.length();
+            tf.append(part.getContent());
+        }
+        return tf;
+    }
+
+
 }

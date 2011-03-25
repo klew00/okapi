@@ -48,7 +48,7 @@ public class TextUnit4Test {
 
 
 
-    ////TODO check that these tests adequately cover the ITextUnit interface
+    ////TODO verify that these tests adequately cover the ITextUnit interface
 
 
     @Test
@@ -75,25 +75,25 @@ public class TextUnit4Test {
         //before adding
         assertFalse("hasVariantSource() should return false before any variant "
                   + "sources have been added",
-                    tu1.hasVariantSource());
+                    tu1.hasVariantSources());
     }
 
     @Test
     public void hasVariantSourceFalseAfterRemoving() {
         //add then remove variant source
-        tu1.getVariantSources().createSource(locFR, true, IResource.CREATE_EMPTY);
-        tu1.getVariantSources().removeSource(locFR);
+        tu1.getVariantSources().create(locFR, true, IResource.CREATE_EMPTY);
+        tu1.getVariantSources().remove(locFR);
         assertFalse("hasVariantSource() should return false after the last "
                   + "variant source has been removed",
-                    tu1.hasVariantSource());
+                    tu1.hasVariantSources());
     }
 
     @Test
     public void hasVaraintSourceTrue() {
-        tu1.getVariantSources().createSource(locFR, true, IResource.CREATE_EMPTY);
+        tu1.getVariantSources().create(locFR, true, IResource.CREATE_EMPTY);
         assertTrue("hasVariantSource() should return true if this text unit has "
                  + "one or more varaint sources",
-                   tu1.hasVariantSource());
+                   tu1.hasVariantSources());
     }
 
 
@@ -248,14 +248,14 @@ public class TextUnit4Test {
         assertTrue(tu1.getTarget_DIFF(locFR).getProperty("test") == null);
     }
 
-    //TODO test setSourceContent(TextFragment)
+    //TODO test setContent(TextFragment)
     //TODO test setTargetContent(LocaleId, TextFragment)
-    //TODO test getSegments()
+    //TODO test getAlignedSegments()
 
     @Test
     public void getSegments() {
         ITextUnit tu = createSegmentedTUAndTarget();
-        IAlignedSegments as = tu.getSegments();
+        IAlignedSegments as = tu.getAlignedSegments();
         assertNotNull("getSegments() should return a non-null IAlignedSegments instance",
                       as);
 
@@ -332,7 +332,7 @@ public class TextUnit4Test {
     }
 
 
-    //TODO test getSourceSegment(String, boolean)
+    //TODO test getSegment(String, boolean)
 
 
 

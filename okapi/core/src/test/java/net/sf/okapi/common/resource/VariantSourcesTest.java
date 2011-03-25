@@ -34,7 +34,6 @@ public class VariantSourcesTest {
     private static final LocaleId locDE = LocaleId.GERMAN;
     private static final String TU1 = "tu1";
     private TextContainer defaultSource;
-//    private ITextUnit tu1;
 
 
 
@@ -78,7 +77,8 @@ public class VariantSourcesTest {
     @Before
     public void setUp(){
         defaultSource = new TextContainer(DEFAULT_SOURCE);
-        cs = new VariantSources(new TextUnit4(TU1, DEFAULT_SOURCE));
+        //cs = new VariantSources(new TextUnit4(TU1, DEFAULT_SOURCE));
+        cs = new VariantSources(new TextContainer(DEFAULT_SOURCE));
 
         DEFAULT_SOURCE_CONT = new TextContainer(DEFAULT_SOURCE);
         FR_SOURCE_CONT = new TextContainer(FR_SOURCE);
@@ -111,17 +111,17 @@ public class VariantSourcesTest {
 
         assertFalse("isSourceEmpty(LocaleId) should return the empty status for the "
                   + "default source when passed a null locale id",
-                    cs.isSourceEmpty(null));
+                    cs.isEmpty(null));
 
         assertTrue("isSourceEmpty(LocaleId) should return the empty status for "
                  + "the variant source of the given target locale if a variant "
                  + "source exists",
-                   cs.isSourceEmpty(locFR));
+                   cs.isEmpty(locFR));
 
         assertFalse("isSourceEmpty(LocaleId) should return the empty status for "
                   + "the default source if there is no variant source for the given"
                   + " target locale",
-                    cs.isSourceEmpty(locES));
+                    cs.isEmpty(locES));
     }
 
     @Test
@@ -130,17 +130,17 @@ public class VariantSourcesTest {
 
         assertTrue("isSourceEmpty(LocaleId) should return the empty status for the "
                  + "default source when passed a null locale id",
-                   cs.isSourceEmpty(null));
+                   cs.isEmpty(null));
 
         assertFalse("isSourceEmpty(LocaleId) should return the empty status for "
                   + "the variant source of the given target locale if a variant "
                   + "source exists",
-                    cs.isSourceEmpty(locFR));
+                    cs.isEmpty(locFR));
 
         assertTrue("isSourceEmpty(LocaleId) should return the empty status for "
                  + "the default source if there is no variant source for the given"
                  + " target locale",
-                   cs.isSourceEmpty(locES));
+                   cs.isEmpty(locES));
     }
 
 
@@ -152,39 +152,39 @@ public class VariantSourcesTest {
         cs = createVariantSources(DEFAULT_SOURCE, null, null, null);
 
         //null locale should not create any variant sources
-        cs.createSource(null, true, CREATE_EMPTY);
+        cs.create(null, true, CREATE_EMPTY);
 
         assertEquals("no variant source should be created when a null locale is "
                    + "passed to createVariantSource",
-                     0, cs.getTargetLocalesWithVariantSource().size() );
+                     0, cs.getLocales().size() );
     }
 
     @Test
     public void createVariantSourceUsesDefault() {
         cs = createVariantSources(DEFAULT_SOURCE, null, null, null);
-        cs.createSource(locFR, true, COPY_ALL);
+        cs.create(locFR, true, COPY_ALL);
         assertEquals("createVariantSource() should use the content of the default "
                    + "source if no source content is given",
-                     DEFAULT_SOURCE, cs.getSource(locFR).toString());
+                     DEFAULT_SOURCE, cs.get(locFR).toString());
     }
 
     @Test
     public void createVariantSourceAlreadyExistsOverwriteExisting() {
         cs = createVariantSources(DEFAULT_SOURCE, FR_SOURCE, null, null);
-        cs.createSource(locFR, true, COPY_CONTENT);
+        cs.create(locFR, true, COPY_CONTENT);
         assertEquals("createVariantSource() should use the content of the default "
                    + "source when overwriting a variant source if no source "
                    + "content is given",
-                     DEFAULT_SOURCE, cs.getSource(locFR).toString());
+                     DEFAULT_SOURCE, cs.get(locFR).toString());
     }
     @Test
     public void createVariantSourceAlreadyExistsDontOverwriteExisting() {
         cs = createVariantSources(DEFAULT_SOURCE, FR_SOURCE, null, null);
-        cs.createSource(locFR, false, COPY_CONTENT);
+        cs.create(locFR, false, COPY_CONTENT);
         assertEquals("createVariantSource() should use the content of the default "
                    + "source when overwriting a variant source if no source "
                    + "content is given",
-                     FR_SOURCE, cs.getSource(locFR).toString());
+                     FR_SOURCE, cs.get(locFR).toString());
     }
 
     //TODO test each of the copy options for this method
@@ -194,31 +194,31 @@ public class VariantSourcesTest {
         cs = createVariantSources(DEFAULT_SOURCE, null, null, null);
 
         //null locale should not create any variant sources
-        cs.createSource(FR_SOURCE_CONT, null, true);
+        cs.create(FR_SOURCE_CONT, null, true);
 
         assertEquals("no variant source should be created when a null locale is "
                    + "passed to createVariantSource",
-                     0, cs.getTargetLocalesWithVariantSource().size() );
+                     0, cs.getLocales().size() );
 
         assertEquals("the default source should not be changed by createVariantSource()",
-                     DEFAULT_SOURCE, cs.getSource(null).toString());
+                     DEFAULT_SOURCE, cs.get(null).toString());
     }
 
     @Test
     public void createVariantSourceWithContentAlreadyExistsOverwriteExisting() {
         cs = createVariantSources(DEFAULT_SOURCE, FR_SOURCE, null, null);
-        cs.createSource(ES_SOURCE_CONT, locFR, true);
+        cs.create(ES_SOURCE_CONT, locFR, true);
         assertEquals("createVariantSource() should overwrite variant source content "
                    + "when the overwriteExisting flag is true",
-                     ES_SOURCE, cs.getSource(locFR).toString());
+                     ES_SOURCE, cs.get(locFR).toString());
     }
     @Test
     public void createVariantSourceWithContentAlreadyExistsDontOverwriteExisting() {
         cs = createVariantSources(DEFAULT_SOURCE, FR_SOURCE, null, null);
-        cs.createSource(ES_SOURCE_CONT, locFR, false);
+        cs.create(ES_SOURCE_CONT, locFR, false);
         assertEquals("createVariantSource() should not overwrite variant source content "
                    + "when the overwriteExisting flag is false",
-                     FR_SOURCE, cs.getSource(locFR).toString());
+                     FR_SOURCE, cs.get(locFR).toString());
     }
 
     @Test
@@ -226,55 +226,55 @@ public class VariantSourcesTest {
         cs = createVariantSources(DEFAULT_SOURCE, FR_SOURCE, null, null);
         assertEquals("getSource(LocaleId) should return the default source when "
                    + "given a null target locale",
-                     DEFAULT_SOURCE, cs.getSource(null).toString());
+                     DEFAULT_SOURCE, cs.get(null).toString());
         assertEquals("getSource(LocaleId) should return a variant source if one "
                    + "exists for the given target locale",
-                     FR_SOURCE, cs.getSource(locFR).toString());
+                     FR_SOURCE, cs.get(locFR).toString());
         assertEquals("getSource(LocaleId) should return the default source when "
                    + "there is no variant source for the given target locale",
-                     DEFAULT_SOURCE, cs.getSource(locES).toString());
+                     DEFAULT_SOURCE, cs.get(locES).toString());
     }
 
     @Test(expected= IllegalArgumentException.class)
     public void setSourceNullLocaleThrowsException() {
         cs = createVariantSources(DEFAULT_SOURCE, FR_SOURCE, null, null);
-        cs.setSource(null, newDefaultContainer);
+        cs.set(null, newDefaultContainer);
     }
 
     @Test
     public void setSourceReplacesExisting() {
         cs = createVariantSources(DEFAULT_SOURCE, FR_SOURCE, null, null);
 
-        cs.setSource(locFR, newFRContainer);
+        cs.set(locFR, newFRContainer);
         assertEquals("setSource() should replace any existing variant "
                    + "source for the given target locale",
-                     NEW_FR_SOURCE, cs.getSource(locFR).toString());
+                     NEW_FR_SOURCE, cs.get(locFR).toString());
     }
 
     @Test
     public void setSourceCreatesNew() {
         cs = createVariantSources(DEFAULT_SOURCE, FR_SOURCE, null, null);
 
-        cs.setSource(locES, newESContainer);
+        cs.set(locES, newESContainer);
         assertEquals("setSource() should create a new variant source if "
                    + "none exists for the given target locale",
-                     NEW_ES_SOURCE, cs.getSource(locES).toString());
+                     NEW_ES_SOURCE, cs.get(locES).toString());
     }
 
     @Test(expected= IllegalArgumentException.class)
     public void removeSourceNullLocaleThrowsException() {
         cs = createVariantSources(DEFAULT_SOURCE, FR_SOURCE, null, null);
-        cs.removeSource(null);
+        cs.remove(null);
     }
 
     @Test
     public void removeSource() {
         cs = createVariantSources(DEFAULT_SOURCE, FR_SOURCE, null, null);
 
-        cs.removeSource(locFR);
+        cs.remove(locFR);
         assertEquals("removeSource(LocaleId) should remove any variant source "
                    + "for the given target locale",
-                     DEFAULT_SOURCE, cs.getSource(locFR).toString());
+                     DEFAULT_SOURCE, cs.get(locFR).toString());
     }
 
 
@@ -282,7 +282,7 @@ public class VariantSourcesTest {
     @Test(expected= IllegalArgumentException.class)
     public void localeHasVariantSourceNullLocaleThrowsException() {
         cs = createVariantSources(DEFAULT_SOURCE, FR_SOURCE, null, null);
-        cs.hasVariantSource(null);
+        cs.hasVariant(null);
     }
 
     @Test
@@ -290,7 +290,7 @@ public class VariantSourcesTest {
         cs = createVariantSources(DEFAULT_SOURCE, FR_SOURCE, null, null);
         assertTrue("hasVariantSource(LocaleId) should return true if there is a "
                  + "variant source for the given target locale",
-                   cs.hasVariantSource(locFR));
+                   cs.hasVariant(locFR));
     }
 
     @Test
@@ -298,33 +298,33 @@ public class VariantSourcesTest {
         cs = createVariantSources(DEFAULT_SOURCE, FR_SOURCE, null, null);
         assertFalse("hasVariantSource(LocaleId) should return false if there is no "
                   + "variant source for the given target locale",
-                    cs.hasVariantSource(locES));
+                    cs.hasVariant(locES));
     }
 
 
     @Test(expected= IllegalArgumentException.class)
     public void setVariantSourceContentWithNullLocale() {
         cs = createVariantSources(DEFAULT_SOURCE, FR_SOURCE, null, null);
-        cs.setSourceContent(null, newDefaultFragment);
+        cs.setContent(null, newDefaultFragment);
     }
 
     @Test
     public void setVariantSourceContentNewSource() {
         cs = createVariantSources(DEFAULT_SOURCE, FR_SOURCE, null, null);
-        cs.setSourceContent(locES, newESFragment);
+        cs.setContent(locES, newESFragment);
         assertEquals("setVariantSourceContent() should create a new variant source "
                    + "with the given content if none exists for the given target "
                    + "locale",
-                     NEW_ES_SOURCE, cs.getSource(locES).toString());
+                     NEW_ES_SOURCE, cs.get(locES).toString());
     }
 
     @Test
     public void setVariantSourceContentExistingSource() {
         cs = createVariantSources(DEFAULT_SOURCE, FR_SOURCE, null, null);
-        cs.setSourceContent(locFR, newFRFragment);
+        cs.setContent(locFR, newFRFragment);
         assertEquals("setSourceContent() should replace the content for "
                    + "the variant source of the given target locale",
-                     NEW_FR_SOURCE, cs.getSource(locFR).toString());
+                     NEW_FR_SOURCE, cs.get(locFR).toString());
     }
 
 
@@ -352,7 +352,7 @@ public class VariantSourcesTest {
         ISegments segs;
         cs = createVariantSegmentedSources();
 
-        segs = cs.getSourceSegments(null);
+        segs = cs.getSegments(null);
 
         //check that default source segments match
         assertEquals("getSourceSegments() should return the segments for the default "
@@ -368,7 +368,7 @@ public class VariantSourcesTest {
         ISegments segs;
         cs = createVariantSegmentedSources();
 
-        segs = cs.getSourceSegments(locFR);
+        segs = cs.getSegments(locFR);
 
         //check that french source segments match
         assertEquals("getSourceSegments() should return the segments for a variant "
@@ -384,7 +384,7 @@ public class VariantSourcesTest {
         ISegments segs;
         cs = createVariantSegmentedSources();
 
-        segs = cs.getSourceSegments(locES);
+        segs = cs.getSegments(locES);
 
         //check that default segments are returned when no variant locale is present
         assertEquals("getSourceSegments() should return the segments for the default "
@@ -401,7 +401,7 @@ public class VariantSourcesTest {
 
 
 //TODO tests for createIfNeeded?
-// public Segment getSourceSegment(LocaleId targetLocale, String segId,
+// public Segment getSegment(LocaleId targetLocale, String segId,
 //                                    boolean createIfNeeded);
 
     @Test
@@ -410,7 +410,7 @@ public class VariantSourcesTest {
 
         assertEquals("getSourceSegment() should return the given segment for the"
                      + " default soure if a null target locale is given",
-                     DEFAULT_SEG_2, cs.getSourceSegment(null, SEGMENT_2_ID, true).toString());
+                     DEFAULT_SEG_2, cs.getSegment(null, SEGMENT_2_ID, true).toString());
     }
 
     @Test
@@ -419,7 +419,7 @@ public class VariantSourcesTest {
 
         assertEquals("getSourceSegment() should return the given segment for a "
                      + " variant soure if one exists for the given target locale",
-                     FR_SEG_2, cs.getSourceSegment(locFR, SEGMENT_2_ID, true).toString());
+                     FR_SEG_2, cs.getSegment(locFR, SEGMENT_2_ID, true).toString());
     }
 
     @Test
@@ -428,7 +428,7 @@ public class VariantSourcesTest {
 
         assertEquals("getSourceSegment() should return the given segment for the"
                      + "default soure if there is no variant source for the given target locale",
-                     DEFAULT_SEG_2, cs.getSourceSegment(locES, SEGMENT_2_ID, true).toString());
+                     DEFAULT_SEG_2, cs.getSegment(locES, SEGMENT_2_ID, true).toString());
     }
 
     @Test
@@ -438,7 +438,7 @@ public class VariantSourcesTest {
         assertEquals("getTargetLocalesWithVariantSource() should return an empty "
                    + "set if there are no locales with variant source",
                      0,
-                     cs.getTargetLocalesWithVariantSource().size());
+                     cs.getLocales().size());
     }
 
     @Test
@@ -447,13 +447,13 @@ public class VariantSourcesTest {
         assertEquals("getTargetLocalesWithVariantSource() should return a set "
                    + "of each locale id that has an associated variant source",
                      1,
-                     cs.getTargetLocalesWithVariantSource().size());
+                     cs.getLocales().size());
         assertTrue("getTargetLocalesWithVariantSource() should return the "
                  + "target locales that have an associated variant source",
-                   cs.getTargetLocalesWithVariantSource().contains(locFR));
+                   cs.getLocales().contains(locFR));
         assertFalse("getTargetLocalesWithVariantSource() should return only the "
                   + "target locales that have an associated variant source",
-                    cs.getTargetLocalesWithVariantSource().contains(locES));
+                    cs.getLocales().contains(locES));
     }
 
     @Test
@@ -462,16 +462,16 @@ public class VariantSourcesTest {
         assertEquals("getTargetLocalesWithVariantSource() should return a set "
                    + "of each locale id that has an associated variant source",
                      2,
-                     cs.getTargetLocalesWithVariantSource().size());
+                     cs.getLocales().size());
         assertTrue("getTargetLocalesWithVariantSource() should return all the "
                  + "target locales that have an associated variant source",
-                   cs.getTargetLocalesWithVariantSource().contains(locFR));
+                   cs.getLocales().contains(locFR));
         assertTrue("getTargetLocalesWithVariantSource() should return all the "
                  + "target locales that have an associated variant source",
-                   cs.getTargetLocalesWithVariantSource().contains(locFR));
+                   cs.getLocales().contains(locFR));
         assertFalse("getTargetLocalesWithVariantSource() should return only the "
                   + "target locales that have an associated variant source",
-                    cs.getTargetLocalesWithVariantSource().contains(locDE));
+                    cs.getLocales().contains(locDE));
     }
 
     @Test
@@ -479,15 +479,15 @@ public class VariantSourcesTest {
         cs = createVariantSources(DEFAULT_SOURCE, FR_SOURCE, null, null);
 
         //add property to default
-        cs.setSourceProperty(null, dp1);
+        cs.setProperty(null, dp1);
         assertSame("setSourceProperty() should apply a property to the default"
                  + " source when given a null target locale",
-                     dp1, cs.getSourceProperty(null, "property1"));
+                     dp1, cs.getProperty(null, "property1"));
 
         //check property not on french
         assertNull("setSourceProperty() should not change properties for variant "
                  + "locales when a null target locale is given",
-                   cs.getSourceProperty(locFR, "property1"));
+                   cs.getProperty(locFR, "property1"));
     }
 
     @Test
@@ -495,15 +495,15 @@ public class VariantSourcesTest {
         cs = createVariantSources(DEFAULT_SOURCE, FR_SOURCE, null, null);
 
         //add property to french
-        cs.setSourceProperty(locFR, fp1);
+        cs.setProperty(locFR, fp1);
 
         assertSame("setSourceProperty() should set a property for the variant "
                  + "source if one exists for the given target locale",
-                   fp1, cs.getSourceProperty(locFR, "property1"));
+                   fp1, cs.getProperty(locFR, "property1"));
         assertNull("setSourceProperty() should not change properties for the "
                  + "default source when there is a variant source for the given "
                  + "target locale",
-                   cs.getSourceProperty(null, "property1"));
+                   cs.getProperty(null, "property1"));
     }
 
     @Test
@@ -511,18 +511,18 @@ public class VariantSourcesTest {
         cs = createVariantSources(DEFAULT_SOURCE, FR_SOURCE, null, null);
 
         //add property to spanish
-        cs.setSourceProperty(locES, dp1);
+        cs.setProperty(locES, dp1);
 
         assertFalse("setSourceProperty() should not cause a new variant source "
                   + "to be created",
-                    cs.hasVariantSource(locES));
+                    cs.hasVariant(locES));
         assertSame("properties of the default source should be set by "
                  + "setSourceProperty() when there is no variant source for the "
                  + "given target locale",
-                   dp1, cs.getSourceProperty(null, "property1"));
+                   dp1, cs.getProperty(null, "property1"));
         assertSame("properties of the default source should be returned when there "
                  + "is no variant source for the given target locale",
-                   dp1, cs.getSourceProperty(locES, "property1"));
+                   dp1, cs.getProperty(locES, "property1"));
     }
 
 
@@ -530,17 +530,17 @@ public class VariantSourcesTest {
     public void removeSourcePropertyByLocaleNull() {
         cs = createVariantSources(DEFAULT_SOURCE, FR_SOURCE, null, null);
 
-        cs.setSourceProperty(null, dp1);
-        cs.setSourceProperty(locFR, fp1);
+        cs.setProperty(null, dp1);
+        cs.setProperty(locFR, fp1);
 
-        cs.removeSourceProperty(null, "property1");
+        cs.removeProperty(null, "property1");
         assertNull("removeSourceProperty() should remove properties from the "
                  + "default source when a null target locale is given",
-                   cs.getSourceProperty(null, "property1"));
+                   cs.getProperty(null, "property1"));
 
         assertNotNull("removeSourceProperty() should not remove properties "
                     + "from variant sources when a null target locale is given",
-                      cs.getSourceProperty(locFR, "property1"));
+                      cs.getProperty(locFR, "property1"));
     }
 
 
@@ -548,18 +548,18 @@ public class VariantSourcesTest {
     public void removeSourcePropertyByLocaleVariantSource() {
         cs = createVariantSources(DEFAULT_SOURCE, FR_SOURCE, null, null);
 
-        cs.setSourceProperty(null, dp1);
-        cs.setSourceProperty(locFR, fp1);
+        cs.setProperty(null, dp1);
+        cs.setProperty(locFR, fp1);
 
-        cs.removeSourceProperty(locFR, "property1");
+        cs.removeProperty(locFR, "property1");
         assertNull("removeSourceProperty() should remove properties from a "
                  + "variant source when one exists for the given target locale",
-                   cs.getSourceProperty(locFR, "property1"));
+                   cs.getProperty(locFR, "property1"));
 
         assertNotNull("removeSourceProperty() should not remove properties "
                     + "from the default source when a variant source exists for "
                     + "the given target locale",
-                      cs.getSourceProperty(null, "property1"));
+                      cs.getProperty(null, "property1"));
     }
 
 
@@ -567,36 +567,36 @@ public class VariantSourcesTest {
     public void removeSourcePropertyByLocaleNoVariantSource() {
         cs = createVariantSources(DEFAULT_SOURCE, FR_SOURCE, null, null);
 
-        cs.setSourceProperty(null, dp1);
-        cs.setSourceProperty(locFR, fp1);
+        cs.setProperty(null, dp1);
+        cs.setProperty(locFR, fp1);
 
-        cs.removeSourceProperty(locES, "property1");
+        cs.removeProperty(locES, "property1");
         assertNull("removeSourceProperty() should remove properties from the "
                  + "default source when no variant source exists for the given "
                  + "target locale",
-                   cs.getSourceProperty(null, "property1"));
+                   cs.getProperty(null, "property1"));
     }
 
     @Test
     public void getSourcePropertyNamesByLocale() {
         cs = createVariantSources(DEFAULT_SOURCE, FR_SOURCE, null, null);
 
-        cs.setSourceProperty(null, dp1);
-        cs.setSourceProperty(locFR, fp1);
-        cs.setSourceProperty(locFR, fp2);
+        cs.setProperty(null, dp1);
+        cs.setProperty(locFR, fp1);
+        cs.setProperty(locFR, fp2);
 
         assertEquals("getSourcePropertyNames() should return property names "
                    + "for the default source when a null locale is given",
-                     1, cs.getSourcePropertyNames(null).size());
+                     1, cs.getPropertyNames(null).size());
 
         assertEquals("getSourcePropertyNames() should return property names "
                    + "for a variant source when one exists for the given locale",
-                     2, cs.getSourcePropertyNames(locFR).size());
+                     2, cs.getPropertyNames(locFR).size());
 
         assertEquals("getSourcePropertyNames() should return property names "
                    + "for the default source when there is no variant source for "
                    + "the given locale",
-                     1, cs.getSourcePropertyNames(locES).size());
+                     1, cs.getPropertyNames(locES).size());
     }
 
     @Test
@@ -606,176 +606,176 @@ public class VariantSourcesTest {
         assertEquals("getSourcePropertyNames() should return an empty set if "
                    + "there are no properties for the source of the given "
                    + "target locale",
-                     0, cs.getSourcePropertyNames(locFR).size());
+                     0, cs.getPropertyNames(locFR).size());
     }
 
     @Test
     public void hasSourcePropertyByLocale() {
         cs = createVariantSources(DEFAULT_SOURCE, FR_SOURCE, null, null);
 
-        cs.setSourceProperty(null, dp1);
-        cs.setSourceProperty(locFR, fp2);
+        cs.setProperty(null, dp1);
+        cs.setProperty(locFR, fp2);
 
         assertTrue("hasSourceProperty() should check for properties of the "
                  + "default source when a null target locale is given",
-                   cs.hasSourceProperty(null, "property1"));
+                   cs.hasProperty(null, "property1"));
         assertFalse("hasSourceProperty() should check for properties of the "
                  + "default source when a null target locale is given",
-                    cs.hasSourceProperty(null, "property2"));
+                    cs.hasProperty(null, "property2"));
 
         assertFalse("hasSourceProperty() should check for properties of the "
                   + "variant source if one exists for the given target locale",
-                    cs.hasSourceProperty(locFR, "property1"));
+                    cs.hasProperty(locFR, "property1"));
         assertTrue("hasSourceProperty() should check for properties of the "
                   + "variant source if one exists for the given target locale",
-                   cs.hasSourceProperty(locFR, "property2"));
+                   cs.hasProperty(locFR, "property2"));
 
         assertTrue("hasSourceProperty() should check for properties of the "
                  + "default source if there is no variant source for the given "
                  + "target locale",
-                   cs.hasSourceProperty(locES, "property1"));
+                   cs.hasProperty(locES, "property1"));
         assertFalse("hasSourceProperty() should check for properties of the "
                   + "default source if there is no variant source for the given "
                   + "target locale",
-                    cs.hasSourceProperty(locES, "property2"));
+                    cs.hasProperty(locES, "property2"));
     }
 
     @Test
     public void propagateSourcePropertyFromDefaultToOne() {
         cs = createVariantSources(DEFAULT_SOURCE, FR_SOURCE, ES_SOURCE, null);
-        cs.setSourceProperty(null, dp1);
-        cs.propagateSourceProperty(null, locFR, "property1", true);
+        cs.setProperty(null, dp1);
+        cs.propagateProperty(null, locFR, "property1", true);
         assertTrue("property should be copied from default source to the variant"
                  + " source of the given locale if present",
-                   cs.hasSourceProperty(locFR, "property1"));
+                   cs.hasProperty(locFR, "property1"));
         assertFalse("the property should only be copied to the source for the "
                   + "specified target locale",
-                    cs.hasSourceProperty(locES, "property1"));
+                    cs.hasProperty(locES, "property1"));
     }
 
     @Test
     public void propagateSourcePropertyFromVariantToOne() {
         cs = createVariantSources(DEFAULT_SOURCE, FR_SOURCE, ES_SOURCE, null);
-        cs.setSourceProperty(locFR, dp1);
-        cs.propagateSourceProperty(locFR, null, "property1", true);
+        cs.setProperty(locFR, dp1);
+        cs.propagateProperty(locFR, null, "property1", true);
         assertTrue("property should be copied from variant source to the default source",
-                   cs.hasSourceProperty(null, "property1"));
+                   cs.hasProperty(null, "property1"));
         assertFalse("the property should only be copied to the source for the "
                   + "specified target locale",
-                    cs.hasSourceProperty(locES, "property1"));
+                    cs.hasProperty(locES, "property1"));
     }
 
     @Test
     public void propagateSourcePropertyFromDefaultToAll() {
         cs = createVariantSources(DEFAULT_SOURCE, FR_SOURCE, ES_SOURCE, null);
-        cs.setSourceProperty(null, dp1);
-        cs.propagateSourceProperty(null, "property1", true);
+        cs.setProperty(null, dp1);
+        cs.propagateProperty(null, "property1", true);
         assertTrue("property should be copied from default source to all other"
                  + " sources",
-                   cs.hasSourceProperty(locFR, "property1"));
+                   cs.hasProperty(locFR, "property1"));
         assertTrue("property should be copied from default source to all other"
                  + " sources",
-                   cs.hasSourceProperty(locES, "property1"));
+                   cs.hasProperty(locES, "property1"));
     }
 
     @Test
     public void propagateSourcePropertyFromVariantToAll() {
         cs = createVariantSources(DEFAULT_SOURCE, FR_SOURCE, ES_SOURCE, null);
-        cs.setSourceProperty(locFR, fp1);
-        cs.propagateSourceProperty(locFR, "property1", true);
+        cs.setProperty(locFR, fp1);
+        cs.propagateProperty(locFR, "property1", true);
         assertTrue("property should be copied from french source to all other"
                  + " sources",
-                   cs.hasSourceProperty(null, "property1"));
+                   cs.hasProperty(null, "property1"));
         assertTrue("property should be copied from french source to all other"
                  + " sources",
-                   cs.hasSourceProperty(locES, "property1"));
+                   cs.hasProperty(locES, "property1"));
     }
 
     @Test
     public void propagateAllSourcePropertiesFromDefaultToOne() {
         cs = createVariantSources(DEFAULT_SOURCE, FR_SOURCE, ES_SOURCE, null);
-        cs.setSourceProperty(null, dp1);
-        cs.setSourceProperty(null, dp2);
-        cs.propagateAllSourceProperties(null, locFR, true);
+        cs.setProperty(null, dp1);
+        cs.setProperty(null, dp2);
+        cs.propagateAllProperties(null, locFR, true);
         assertTrue("all properties should be copied from default source to the variant"
                  + " source of the given locale if present",
-                   cs.hasSourceProperty(locFR, "property1"));
+                   cs.hasProperty(locFR, "property1"));
         assertTrue("all properties should be copied from default source to the variant"
                  + " source of the given locale if present",
-                   cs.hasSourceProperty(locFR, "property2"));
+                   cs.hasProperty(locFR, "property2"));
         assertFalse("properties should only be copied to the source for the "
                   + "specified target locale",
-                    cs.hasSourceProperty(locES, "property1"));
+                    cs.hasProperty(locES, "property1"));
         assertFalse("properties should only be copied to the source for the "
                   + "specified target locale",
-                    cs.hasSourceProperty(locES, "property2"));
+                    cs.hasProperty(locES, "property2"));
     }
 
     @Test
     public void propagateAllSourcePropertiesFromVariantToOne() {
         cs = createVariantSources(DEFAULT_SOURCE, FR_SOURCE, ES_SOURCE, null);
-        cs.setSourceProperty(locFR, dp1);
-        cs.setSourceProperty(locFR, dp2);
-        cs.propagateAllSourceProperties(locFR, null, true);
+        cs.setProperty(locFR, dp1);
+        cs.setProperty(locFR, dp2);
+        cs.propagateAllProperties(locFR, null, true);
         assertTrue("all properties should be copied from french source to the "
                  + "default source",
-                   cs.hasSourceProperty(locFR, "property1"));
+                   cs.hasProperty(locFR, "property1"));
         assertTrue("all properties should be copied from french source to the "
                  + "default source",
-                   cs.hasSourceProperty(locFR, "property2"));
+                   cs.hasProperty(locFR, "property2"));
         assertFalse("properties should only be copied to the source for the "
                   + "specified target locale",
-                    cs.hasSourceProperty(locES, "property1"));
+                    cs.hasProperty(locES, "property1"));
         assertFalse("properties should only be copied to the source for the "
                   + "specified target locale",
-                    cs.hasSourceProperty(locES, "property2"));
+                    cs.hasProperty(locES, "property2"));
     }
 
-//TODO    public void propagateAllSourceProperties(LocaleId from, boolean overwriteExisting);
+//TODO    public void propagateAllProperties(LocaleId from, boolean overwriteExisting);
     @Test
     public void propagateAllSourcePropertiesFromDefaultToAll() {
         cs = createVariantSources(DEFAULT_SOURCE, FR_SOURCE, ES_SOURCE, null);
-        cs.setSourceProperty(null, dp1);
-        cs.setSourceProperty(null, dp2);
-        cs.propagateAllSourceProperties(null, true);
+        cs.setProperty(null, dp1);
+        cs.setProperty(null, dp2);
+        cs.propagateAllProperties(null, true);
         assertTrue("all properties should be copied from default source to "
                  + "all other sources",
-                   cs.hasSourceProperty(locFR, "property1"));
+                   cs.hasProperty(locFR, "property1"));
         assertTrue("all properties should be copied from default source to "
                  + "all other sources",
-                   cs.hasSourceProperty(locFR, "property2"));
+                   cs.hasProperty(locFR, "property2"));
         assertTrue("all properties should be copied from default source to "
                  + "all other sources",
-                   cs.hasSourceProperty(locES, "property1"));
+                   cs.hasProperty(locES, "property1"));
         assertTrue("all properties should be copied from default source to "
                  + "all other sources",
-                   cs.hasSourceProperty(locES, "property2"));
+                   cs.hasProperty(locES, "property2"));
     }
 
     @Test
     public void propagateAllSourcePropertiesFromVariantToAll() {
         cs = createVariantSources(DEFAULT_SOURCE, FR_SOURCE, ES_SOURCE, null);
-        cs.setSourceProperty(locFR, dp1);
-        cs.setSourceProperty(locFR, dp2);
-        cs.propagateAllSourceProperties(locFR, true);
+        cs.setProperty(locFR, dp1);
+        cs.setProperty(locFR, dp2);
+        cs.propagateAllProperties(locFR, true);
         assertTrue("all properties should be copied from default source to "
                  + "all other sources",
-                   cs.hasSourceProperty(null, "property1"));
+                   cs.hasProperty(null, "property1"));
         assertTrue("all properties should be copied from default source to "
                  + "all other sources",
-                   cs.hasSourceProperty(null, "property2"));
+                   cs.hasProperty(null, "property2"));
         assertTrue("all properties should be copied from default source to "
                  + "all other sources",
-                   cs.hasSourceProperty(locES, "property1"));
+                   cs.hasProperty(locES, "property1"));
         assertTrue("all properties should be copied from default source to "
                  + "all other sources",
-                   cs.hasSourceProperty(locES, "property2"));
+                   cs.hasProperty(locES, "property2"));
     }
 
-//TODO    public <A extends IAnnotation> void propagateSourceAnnotation(LocaleId from, LocaleId to, Class<A> type, boolean overwriteExisting);
-//TODO    public <A extends IAnnotation> void propagateSourceAnnotation(LocaleId from, Class<A> type, boolean overwriteExisting);
-//TODO    public void propagateAllSourceAnnotations(LocaleId from, LocaleId to, boolean overwriteExisting);
-//TODO    public void propagateAllSourceAnnotations(LocaleId from, boolean overwriteExisting);
+//TODO    public <A extends IAnnotation> void propagateAnnotation(LocaleId from, LocaleId to, Class<A> type, boolean overwriteExisting);
+//TODO    public <A extends IAnnotation> void propagateAnnotation(LocaleId from, Class<A> type, boolean overwriteExisting);
+//TODO    public void propagateAllAnnotations(LocaleId from, LocaleId to, boolean overwriteExisting);
+//TODO    public void propagateAllAnnotations(LocaleId from, boolean overwriteExisting);
 
 
 //TODO think about null pointer exceptions for each of the classes that take a LocaleId
@@ -784,10 +784,10 @@ public class VariantSourcesTest {
 
     private VariantSources createVariantSegmentedSources() {
 
-        VariantSources cSources = new VariantSources(new TextUnit4(TU1, DEFAULT_SEG_1));
-        cSources.getSource(null).getSegments().append(new Segment(SEGMENT_2_ID, new TextFragment(DEFAULT_SEG_2)), " a ");
-        cSources.createSource(new TextContainer(FR_SEG_1), locFR, true);
-        cSources.getSource(locFR).getSegments().append(new Segment(SEGMENT_2_ID, new TextFragment(FR_SEG_2)), " b ");
+        VariantSources cSources = new VariantSources(new TextContainer(DEFAULT_SEG_1));
+        cSources.get(null).getSegments().append(new Segment(SEGMENT_2_ID, new TextFragment(DEFAULT_SEG_2)), " a ");
+        cSources.create(new TextContainer(FR_SEG_1), locFR, true);
+        cSources.get(locFR).getSegments().append(new Segment(SEGMENT_2_ID, new TextFragment(FR_SEG_2)), " b ");
 
         return cSources;
     }
@@ -798,10 +798,10 @@ public class VariantSourcesTest {
                                               String spanishSource,
                                               String germanSource) {
 
-        VariantSources cSources = new VariantSources(new TextUnit4(TU1, defaultSourceString) );
-        if (frenchSource != null) cSources.createSource(new TextContainer(frenchSource), locFR, true);
-        if (spanishSource != null) cSources.createSource(new TextContainer(spanishSource), locES, true);
-        if (germanSource != null) cSources.createSource(new TextContainer(germanSource), locDE, true);
+        VariantSources cSources = new VariantSources(new TextContainer(defaultSourceString) );
+        if (frenchSource != null) cSources.create(new TextContainer(frenchSource), locFR, true);
+        if (spanishSource != null) cSources.create(new TextContainer(spanishSource), locES, true);
+        if (germanSource != null) cSources.create(new TextContainer(germanSource), locDE, true);
 
         return cSources;
     }

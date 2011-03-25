@@ -32,9 +32,9 @@ import net.sf.okapi.common.annotation.Annotations;
 import net.sf.okapi.common.annotation.IAnnotation;
 
 /**
- * EXPERIMENTAL class. Do not use yet.
+ * EXPERIMENTAL class, do not use yet.
  *
- * Basic unit of extraction from a filter and also the resource associated with\
+ * Basic unit of extraction from a filter and also the resource associated with
  * the filter event TEXT_UNIT.
  * The TextUnit object holds the extracted source text in one or more versions,
  * all its properties and annotations, and any target corresponding data.
@@ -64,10 +64,11 @@ public class TextUnit4 implements ITextUnit {
     private VariantSources variantSources;
     private ConcurrentHashMap<LocaleId, TextContainer> targets;
 
-    //TODO make a single method for instantiating variantSources when necessary
+    private AlignedSegments myAlignedSegments; //so that a new one doesn't have to be created every time it is requested
 
     /**
      * Creates a new TextUnit object with its identifier.
+     *
      * @param id the identifier of this resource.
      */
     public TextUnit4 (String id) {
@@ -76,6 +77,7 @@ public class TextUnit4 implements ITextUnit {
 
     /**
      * Creates a new TextUnit object with its identifier and a text.
+     *
      * @param id the identifier of this resource.
      * @param sourceText the initial text of the source.
      */
@@ -86,7 +88,9 @@ public class TextUnit4 implements ITextUnit {
     }
 
     /**
-     * Creates a new TextUnit object with its ID, a text, and a flag indicating if it is a referent or not.
+     * Creates a new TextUnit object with its ID, a text, and a flag indicating
+     * if it is a referent or not.
+     *
      * @param id the identifier of this resource.
      * @param sourceText the initial text of the source (can be null).
      * @param isReferent indicates if this resource is a referent (i.e. is referred to
@@ -102,6 +106,7 @@ public class TextUnit4 implements ITextUnit {
     /**
      * Creates a new TextUnit object with its identifier, a text, a flag indicating
      * if it is a referent or not, and a given MIME type.
+     *
      * @param id the identifier of this resource.
      * @param sourceText the initial text of the source (can be null).
      * @param isReferent indicates if this resource is a referent (i.e. is referred to
@@ -126,8 +131,7 @@ public class TextUnit4 implements ITextUnit {
         refCount = (isReferent ? 1 : 0);
         this.mimeType = mimeType;
 
-        defaultSource = new TextContainer(sourceText);
-//        source = defaultSource;
+        setDefaultSource(new TextContainer(sourceText));
     }
 
 
@@ -144,25 +148,25 @@ public class TextUnit4 implements ITextUnit {
     //convenience method to return the source (default or variant) associated with a target locale
     private TextContainer getSource(LocaleId targetLocale) {
         if (variantSources == null || targetLocale == null) return defaultSource;
-        return variantSources.getSource(targetLocale);
+        return variantSources.get(targetLocale);
     }
 
     @Override
     public TextContainer setSource(TextContainer textContainer) {
-        defaultSource = textContainer;
+        setDefaultSource(textContainer);
         return defaultSource;
     }
 
 
     @Override
-    public boolean hasVariantSource() {
-        return (variantSources == null) ? false : (!variantSources.empty());
+    public boolean hasVariantSources() {
+        return (variantSources == null) ? false : (!variantSources.isEmpty());
     }
 
     @Override
     public IVariantSources getVariantSources() {
         if (variantSources == null) {
-            variantSources = new VariantSources(this);
+            variantSources = new VariantSources(defaultSource);
         }
         return variantSources;
     }
@@ -226,12 +230,15 @@ public class TextUnit4 implements ITextUnit {
 
 
 
-    //TODO ensure that the segments returned will work consistently on a pair of
-    //source/target without breaking when the locale is changed
     @Override
-    public IAlignedSegments getSegments() {
-        //TODO ensure that predictable behaviour can be ensured with variant sources
-        return new AlignedSegments(this, null);
+    public IAlignedSegments getAlignedSegments() {
+        return getMyAlignedSegments();
+    }
+    
+    private AlignedSegments getMyAlignedSegments() {
+        if (myAlignedSegments == null)
+            myAlignedSegments = new AlignedSegments(this);
+        return myAlignedSegments;
     }
 
     @Override
@@ -440,7 +447,7 @@ public class TextUnit4 implements ITextUnit {
                                           String name,
                                           boolean overwriteExisting,
                                           int creationOptions) {
-        // Get the target or create an empty one
+        // Get the target or create an isEmpty one
         TextContainer tc = createTarget(locId, false, CREATE_EMPTY);
         // Get the property if it exists
         Property prop = tc.getProperty(name);
@@ -449,11 +456,11 @@ public class TextUnit4 implements ITextUnit {
             // Get the source property
             prop = getSource(locId).getProperty(name);
             if ( prop == null ) {
-                // If there is no source, create an empty property
+                // If there is no source, create an isEmpty property
                 return tc.setProperty(new Property(name, "", false));
             }
             else { // If there is a source property
-                // Create a copy, empty or not depending on the options
+                // Create a copy, isEmpty or not depending on the options
                 if ( creationOptions == CREATE_EMPTY ) {
                     return tc.setProperty(new Property(name, "", prop.isReadOnly()));
                 }
@@ -469,6 +476,7 @@ public class TextUnit4 implements ITextUnit {
      * Gets the string representation of the default source container.
      * If the container is segmented, the representation shows the merged segments.
      * Inline codes are also included.
+     *
      * @return the string representation of the source container.
      */
     @Override
@@ -478,6 +486,7 @@ public class TextUnit4 implements ITextUnit {
 
     /**
      * Clones this TextUnit.
+     *
      * @return A new TextUnit object that is a copy of this one.
      */
     @Override
@@ -497,7 +506,7 @@ public class TextUnit4 implements ITextUnit {
         tu.setType(getType());
 
         // Set all variant sources
-        if (hasVariantSource()) {
+        if (hasVariantSources()) {
             tu.variantSources = this.variantSources.clone();
             tu.variantSources.setDefaultSource(tu.getSource());
         }
@@ -519,12 +528,25 @@ public class TextUnit4 implements ITextUnit {
 
     /**
      * Used by TextUnit clone method to copy over all annotations at once.
+     *
      * @param annotations the new annotations to set.
      */
     protected void setAnnotations (Annotations annotations) {
         this.annotations = annotations;
     }
 
+
+    /**
+     * Safe method to reassign defaultSource that ensures variantSources is updated
+     * 
+     * @param newDefaultSource the new source to assign to defaultSource
+     */
+    private void setDefaultSource(TextContainer newDefaultSource) {
+        defaultSource = newDefaultSource;
+        if (variantSources != null) {
+            variantSources.setDefaultSource(defaultSource);
+        }
+    }
 
 
 }
