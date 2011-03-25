@@ -369,214 +369,214 @@ public class Parameters extends AbstractParameters implements IEditorDescription
 		return EMPTY_URI.equalsIgnoreCase(customTemplateURI.toString()); 
 	}
 	
-	public boolean istranslateGMXExactMatched() {
+	public boolean isTranslateGMXExactMatched() {
 		return translateGMXExactMatched;
 	}
 
-	public void settranslateGMXExactMatched(boolean translateGMXExactMatched) {
+	public void setTranslateGMXExactMatched(boolean translateGMXExactMatched) {
 		this.translateGMXExactMatched = translateGMXExactMatched;
 	}
 
-	public boolean istranslateGMXLeveragedMatched() {
+	public boolean isTranslateGMXLeveragedMatched() {
 		return translateGMXLeveragedMatched;
 	}
 
-	public void settranslateGMXLeveragedMatched(boolean translateGMXLeveragedMatched) {
+	public void setTranslateGMXLeveragedMatched(boolean translateGMXLeveragedMatched) {
 		this.translateGMXLeveragedMatched = translateGMXLeveragedMatched;
 	}
 
-	public boolean istranslateGMXRepetitionMatched() {
+	public boolean isTranslateGMXRepetitionMatched() {
 		return translateGMXRepetitionMatched;
 	}
 
-	public void settranslateGMXRepetitionMatched(
+	public void setTranslateGMXRepetitionMatched(
 			boolean translateGMXRepetitionMatched) {
 		this.translateGMXRepetitionMatched = translateGMXRepetitionMatched;
 	}
 
-	public boolean istranslateGMXFuzzyMatch() {
+	public boolean isTranslateGMXFuzzyMatch() {
 		return translateGMXFuzzyMatch;
 	}
 
-	public void settranslateGMXFuzzyMatch(boolean translateGMXFuzzyMatch) {
+	public void setTranslateGMXFuzzyMatch(boolean translateGMXFuzzyMatch) {
 		this.translateGMXFuzzyMatch = translateGMXFuzzyMatch;
 	}
 
-	public boolean istranslateGMXAlphanumericOnlyTextUnit() {
+	public boolean isTranslateGMXAlphanumericOnlyTextUnit() {
 		return translateGMXAlphanumericOnlyTextUnit;
 	}
 
-	public void settranslateGMXAlphanumericOnlyTextUnit(
+	public void setTranslateGMXAlphanumericOnlyTextUnit(
 			boolean translateGMXAlphanumericOnlyTextUnit) {
 		this.translateGMXAlphanumericOnlyTextUnit = translateGMXAlphanumericOnlyTextUnit;
 	}
 
-	public boolean istranslateGMXNumericOnlyTextUnit() {
+	public boolean isTranslateGMXNumericOnlyTextUnit() {
 		return translateGMXNumericOnlyTextUnit;
 	}
 
-	public void settranslateGMXNumericOnlyTextUnit(
+	public void setTranslateGMXNumericOnlyTextUnit(
 			boolean translateGMXNumericOnlyTextUnit) {
 		this.translateGMXNumericOnlyTextUnit = translateGMXNumericOnlyTextUnit;
 	}
 
-	public boolean istranslateGMXMeasurementOnlyTextUnit() {
+	public boolean isTranslateGMXMeasurementOnlyTextUnit() {
 		return translateGMXMeasurementOnlyTextUnit;
 	}
 
-	public void settranslateGMXMeasurementOnlyTextUnit(
+	public void setTranslateGMXMeasurementOnlyTextUnit(
 			boolean translateGMXMeasurementOnlyTextUnit) {
 		this.translateGMXMeasurementOnlyTextUnit = translateGMXMeasurementOnlyTextUnit;
 	}
 
-	public boolean istranslateExactUniqueIdMatch() {
+	public boolean isTranslateExactUniqueIdMatch() {
 		return translateExactUniqueIdMatch;
 	}
 
-	public void settranslateExactUniqueIdMatch(boolean translateExactUniqueIdMatch) {
+	public void setTranslateExactUniqueIdMatch(boolean translateExactUniqueIdMatch) {
 		this.translateExactUniqueIdMatch = translateExactUniqueIdMatch;
 	}
 
-	public boolean istranslateExactPreviousVersionMatch() {
+	public boolean isTranslateExactPreviousVersionMatch() {
 		return translateExactPreviousVersionMatch;
 	}
 
-	public void settranslateExactPreviousVersionMatch(
+	public void setTranslateExactPreviousVersionMatch(
 			boolean translateExactPreviousVersionMatch) {
 		this.translateExactPreviousVersionMatch = translateExactPreviousVersionMatch;
 	}
 
-	public boolean istranslateExactLocalContextMatch() {
+	public boolean isTranslateExactLocalContextMatch() {
 		return translateExactLocalContextMatch;
 	}
 
-	public void settranslateExactLocalContextMatch(
+	public void setTranslateExactLocalContextMatch(
 			boolean translateExactLocalContextMatch) {
 		this.translateExactLocalContextMatch = translateExactLocalContextMatch;
 	}
 
-	public boolean istranslateExactDocumentContextMatch() {
+	public boolean isTranslateExactDocumentContextMatch() {
 		return translateExactDocumentContextMatch;
 	}
 
-	public void settranslateExactDocumentContextMatch(
+	public void setTranslateExactDocumentContextMatch(
 			boolean translateExactDocumentContextMatch) {
 		this.translateExactDocumentContextMatch = translateExactDocumentContextMatch;
 	}
 
-	public boolean istranslateExactStructuralMatch() {
+	public boolean isTranslateExactStructuralMatch() {
 		return translateExactStructuralMatch;
 	}
 
-	public void settranslateExactStructuralMatch(
+	public void setTranslateExactStructuralMatch(
 			boolean translateExactStructuralMatch) {
 		this.translateExactStructuralMatch = translateExactStructuralMatch;
 	}
 
-	public boolean istranslateExactMatch() {
+	public boolean isTranslateExactMatch() {
 		return translateExactMatch;
 	}
 
-	public void settranslateExactMatch(boolean translateExactMatch) {
+	public void setTranslateExactMatch(boolean translateExactMatch) {
 		this.translateExactMatch = translateExactMatch;
 	}
 
-	public boolean istranslateExactTextOnlyPreviousVersionMatch() {
+	public boolean isTranslateExactTextOnlyPreviousVersionMatch() {
 		return translateExactTextOnlyPreviousVersionMatch;
 	}
 
-	public void settranslateExactTextOnlyPreviousVersionMatch(
+	public void setTranslateExactTextOnlyPreviousVersionMatch(
 			boolean translateExactTextOnlyPreviousVersionMatch) {
 		this.translateExactTextOnlyPreviousVersionMatch = translateExactTextOnlyPreviousVersionMatch;
 	}
 
-	public boolean istranslateExactTextOnlyUniqueIdMatch() {
+	public boolean isTranslateExactTextOnlyUniqueIdMatch() {
 		return translateExactTextOnlyUniqueIdMatch;
 	}
 
-	public void settranslateExactTextOnlyUniqueIdMatch(
+	public void setTranslateExactTextOnlyUniqueIdMatch(
 			boolean translateExactTextOnlyUniqueIdMatch) {
 		this.translateExactTextOnlyUniqueIdMatch = translateExactTextOnlyUniqueIdMatch;
 	}
 
-	public boolean istranslateExactTextOnly() {
+	public boolean isTranslateExactTextOnly() {
 		return translateExactTextOnly;
 	}
 
-	public void settranslateExactTextOnly(boolean translateExactTextOnly) {
+	public void setTranslateExactTextOnly(boolean translateExactTextOnly) {
 		this.translateExactTextOnly = translateExactTextOnly;
 	}
 
-	public boolean istranslateExactRepaired() {
+	public boolean isTranslateExactRepaired() {
 		return translateExactRepaired;
 	}
 
-	public void settranslateExactRepaired(boolean translateExactRepaired) {
+	public void setTranslateExactRepaired(boolean translateExactRepaired) {
 		this.translateExactRepaired = translateExactRepaired;
 	}
 
-	public boolean istranslateFuzzyPreviousVersionMatch() {
+	public boolean isTranslateFuzzyPreviousVersionMatch() {
 		return translateFuzzyPreviousVersionMatch;
 	}
 
-	public void settranslateFuzzyPreviousVersionMatch(
+	public void setTranslateFuzzyPreviousVersionMatch(
 			boolean translateFuzzyPreviousVersionMatch) {
 		this.translateFuzzyPreviousVersionMatch = translateFuzzyPreviousVersionMatch;
 	}
 
-	public boolean istranslateFuzzyUniqueIdMatch() {
+	public boolean isTranslateFuzzyUniqueIdMatch() {
 		return translateFuzzyUniqueIdMatch;
 	}
 
-	public void settranslateFuzzyUniqueIdMatch(boolean translateFuzzyUniqueIdMatch) {
+	public void setTranslateFuzzyUniqueIdMatch(boolean translateFuzzyUniqueIdMatch) {
 		this.translateFuzzyUniqueIdMatch = translateFuzzyUniqueIdMatch;
 	}
 
-	public boolean istranslateFuzzyMatch() {
+	public boolean isTranslateFuzzyMatch() {
 		return translateFuzzyMatch;
 	}
 
-	public void settranslateFuzzyMatch(boolean translateFuzzyMatch) {
+	public void setTranslateFuzzyMatch(boolean translateFuzzyMatch) {
 		this.translateFuzzyMatch = translateFuzzyMatch;
 	}
 
-	public boolean istranslateFuzzyRepaired() {
+	public boolean isTranslateFuzzyRepaired() {
 		return translateFuzzyRepaired;
 	}
 
-	public void settranslateFuzzyRepaired(boolean translateFuzzyRepaired) {
+	public void setTranslateFuzzyRepaired(boolean translateFuzzyRepaired) {
 		this.translateFuzzyRepaired = translateFuzzyRepaired;
 	}
 
-	public boolean istranslatePhraseAssembled() {
+	public boolean isTranslatePhraseAssembled() {
 		return translatePhraseAssembled;
 	}
 
-	public void settranslatePhraseAssembled(boolean translatePhraseAssembled) {
+	public void setTranslatePhraseAssembled(boolean translatePhraseAssembled) {
 		this.translatePhraseAssembled = translatePhraseAssembled;
 	}
 
-	public boolean istranslateMT() {
+	public boolean isTranslateMT() {
 		return translateMT;
 	}
 
-	public void settranslateMT(boolean translateMT) {
+	public void setTranslateMT(boolean translateMT) {
 		this.translateMT = translateMT;
 	}
 
-	public boolean istranslateConcordance() {
+	public boolean isTranslateConcordance() {
 		return translateConcordance;
 	}
 
-	public void settranslateConcordance(boolean translateConcordance) {
+	public void setTranslateConcordance(boolean translateConcordance) {
 		this.translateConcordance = translateConcordance;
 	}
 
-	public boolean istranslateGMXProtected() {
+	public boolean isTranslateGMXProtected() {
 		return translateGMXProtected;
 	}
 
-	public void settranslateGMXProtected(boolean translateGMXProtected) {
+	public void setTranslateGMXProtected(boolean translateGMXProtected) {
 		this.translateGMXProtected = translateGMXProtected;
 	}
 }

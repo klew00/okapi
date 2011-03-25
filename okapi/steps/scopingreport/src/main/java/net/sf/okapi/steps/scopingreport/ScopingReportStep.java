@@ -266,9 +266,10 @@ public class ScopingReportStep extends CompoundStep {
 	protected Event handleEndBatch(Event event) {
 		IResource res = event.getResource();
 		if (res != null) {
-			gen.setField(PROJECT_TOTAL_WORD_COUNT, BaseCounter.getCount(res, GMX.TotalWordCount));
-			// gen.setField(PROJECT_NONTRANSLATABLE_WORD_COUNT, 0); // TODO Calculate
-			// gen.setField(PROJECT_TRANSLATABLE_WORD_COUNT, 0); // TODO Calculate
+			gen.setField(PROJECT_TOTAL_WORD_COUNT, BaseCounter.getCount(res, GMX.TotalWordCount));			
+			long trCount = countTranslatable(res);
+			gen.setField(PROJECT_NONTRANSLATABLE_WORD_COUNT, BaseCounter.getCount(res, GMX.TotalWordCount) - trCount);
+			gen.setField(PROJECT_TRANSLATABLE_WORD_COUNT, trCount);
 			
 			gen.setField(PROJECT_GMX_PROTECTED_WORD_COUNT, BaseCounter.getCount(res, GMX.ProtectedWordCount));
 			gen.setField(PROJECT_GMX_EXACT_MATCHED_WORD_COUNT, BaseCounter.getCount(res, GMX.ExactMatchedWordCount));
@@ -278,7 +279,7 @@ public class ScopingReportStep extends CompoundStep {
 			gen.setField(PROJECT_GMX_ALPHANUMERIC_ONLY_TEXT_UNIT_WORD_COUNT, BaseCounter.getCount(res, GMX.AlphanumericOnlyTextUnitWordCount));
 			gen.setField(PROJECT_GMX_NUMERIC_ONLY_TEXT_UNIT_WORD_COUNT, BaseCounter.getCount(res, GMX.NumericOnlyTextUnitWordCount));
 			gen.setField(PROJECT_GMX_MEASUREMENT_ONLY_TEXT_UNIT_WORD_COUNT, BaseCounter.getCount(res, GMX.MeasurementOnlyTextUnitWordCount));
-			//gen.setField(PROJECT_GMX_NOMATCH, BaseCounter.getCount(res, 0)); // TODO Calculate
+			gen.setField(PROJECT_GMX_NOMATCH, countCategories(res, false, true));
 			
 			gen.setField(PROJECT_EXACT_UNIQUE_ID, BaseCounter.getCount(res, MatchType.EXACT_UNIQUE_ID.name()));
 			gen.setField(PROJECT_EXACT_PREVIOUS_VERSION, BaseCounter.getCount(res, MatchType.EXACT_PREVIOUS_VERSION.name()));
@@ -297,7 +298,7 @@ public class ScopingReportStep extends CompoundStep {
 			gen.setField(PROJECT_PHRASE_ASSEMBLED, BaseCounter.getCount(res, MatchType.PHRASE_ASSEMBLED.name()));
 			gen.setField(PROJECT_MT, BaseCounter.getCount(res, MatchType.MT.name()));
 			gen.setField(PROJECT_CONCORDANCE, BaseCounter.getCount(res, MatchType.CONCORDANCE.name()));
-			// gen.setField(PROJECT_NOMATCH, BaseCounter.getCount(res, 0); // TODO Calculate
+			gen.setField(PROJECT_NOMATCH, countCategories(res, true, false));
 			
 			setEndBatchFields(gen, res);
 		}		
@@ -324,6 +325,76 @@ public class ScopingReportStep extends CompoundStep {
 		return super.handleEndBatch(event);
 	}
 
+	private long countTranslatable(IResource res) {		
+		long count = 0;
+		
+		if (params.isTranslateGMXProtected()) count += BaseCounter.getCount(res, GMX.ProtectedWordCount);
+		if (params.isTranslateGMXExactMatched()) count += BaseCounter.getCount(res, GMX.ExactMatchedWordCount);
+		if (params.isTranslateGMXLeveragedMatched()) count += BaseCounter.getCount(res, GMX.LeveragedMatchedWordCount);
+		if (params.isTranslateGMXRepetitionMatched()) count += BaseCounter.getCount(res, GMX.RepetitionMatchedWordCount);
+		if (params.isTranslateGMXFuzzyMatch()) count += BaseCounter.getCount(res, GMX.FuzzyMatchedWordCount);
+		if (params.isTranslateGMXAlphanumericOnlyTextUnit()) count += BaseCounter.getCount(res, GMX.AlphanumericOnlyTextUnitWordCount);
+		if (params.isTranslateGMXNumericOnlyTextUnit()) count += BaseCounter.getCount(res, GMX.NumericOnlyTextUnitWordCount);
+		if (params.isTranslateGMXMeasurementOnlyTextUnit()) count += BaseCounter.getCount(res, GMX.MeasurementOnlyTextUnitWordCount);
+		
+		if (params.isTranslateExactUniqueIdMatch()) count += BaseCounter.getCount(res, MatchType.EXACT_UNIQUE_ID.name());
+		if (params.isTranslateExactPreviousVersionMatch()) count += BaseCounter.getCount(res, MatchType.EXACT_PREVIOUS_VERSION.name());
+		if (params.isTranslateExactLocalContextMatch()) count += BaseCounter.getCount(res, MatchType.EXACT_LOCAL_CONTEXT.name());
+		if (params.isTranslateExactDocumentContextMatch()) count += BaseCounter.getCount(res, MatchType.EXACT_DOCUMENT_CONTEXT.name());
+		if (params.isTranslateExactStructuralMatch()) count += BaseCounter.getCount(res, MatchType.EXACT_STRUCTURAL.name());
+		if (params.isTranslateExactMatch()) count += BaseCounter.getCount(res, MatchType.EXACT.name());
+		if (params.isTranslateExactTextOnlyPreviousVersionMatch()) count += BaseCounter.getCount(res, MatchType.EXACT_TEXT_ONLY_PREVIOUS_VERSION.name());
+		if (params.isTranslateExactTextOnlyUniqueIdMatch()) count += BaseCounter.getCount(res, MatchType.EXACT_TEXT_ONLY_UNIQUE_ID.name());
+		if (params.isTranslateExactTextOnly()) count += BaseCounter.getCount(res, MatchType.EXACT_TEXT_ONLY.name());
+		if (params.isTranslateExactRepaired()) count += BaseCounter.getCount(res, MatchType.EXACT_REPAIRED.name());
+		if (params.isTranslateFuzzyPreviousVersionMatch()) count += BaseCounter.getCount(res, MatchType.FUZZY_PREVIOUS_VERSION.name());
+		if (params.isTranslateFuzzyUniqueIdMatch()) count += BaseCounter.getCount(res, MatchType.FUZZY_UNIQUE_ID.name());
+		if (params.isTranslateFuzzyMatch()) count += BaseCounter.getCount(res, MatchType.FUZZY.name());
+		if (params.isTranslateFuzzyRepaired()) count += BaseCounter.getCount(res, MatchType.FUZZY_REPAIRED.name());
+		if (params.isTranslatePhraseAssembled()) count += BaseCounter.getCount(res, MatchType.PHRASE_ASSEMBLED.name());
+		if (params.isTranslateMT()) count += BaseCounter.getCount(res, MatchType.MT.name());
+		if (params.isTranslateConcordance()) count += BaseCounter.getCount(res, MatchType.CONCORDANCE.name());
+		
+		return count;
+	}
+
+	private long countCategories(IResource res, boolean countOkapiCategories, boolean countGMXCategories) {
+		long count = 0;
+		
+		if (countGMXCategories) {
+			count += BaseCounter.getCount(res, GMX.ProtectedWordCount);
+			count += BaseCounter.getCount(res, GMX.ExactMatchedWordCount);
+			count += BaseCounter.getCount(res, GMX.LeveragedMatchedWordCount);
+			count += BaseCounter.getCount(res, GMX.RepetitionMatchedWordCount);
+			count += BaseCounter.getCount(res, GMX.FuzzyMatchedWordCount);
+			count += BaseCounter.getCount(res, GMX.AlphanumericOnlyTextUnitWordCount);
+			count += BaseCounter.getCount(res, GMX.NumericOnlyTextUnitWordCount);
+			count += BaseCounter.getCount(res, GMX.MeasurementOnlyTextUnitWordCount);
+		}		
+		
+		if (countOkapiCategories) {
+			count += BaseCounter.getCount(res, MatchType.EXACT_UNIQUE_ID.name());
+			count += BaseCounter.getCount(res, MatchType.EXACT_PREVIOUS_VERSION.name());
+			count += BaseCounter.getCount(res, MatchType.EXACT_LOCAL_CONTEXT.name());
+			count += BaseCounter.getCount(res, MatchType.EXACT_DOCUMENT_CONTEXT.name());
+			count += BaseCounter.getCount(res, MatchType.EXACT_STRUCTURAL.name());
+			count += BaseCounter.getCount(res, MatchType.EXACT.name());
+			count += BaseCounter.getCount(res, MatchType.EXACT_TEXT_ONLY_PREVIOUS_VERSION.name());
+			count += BaseCounter.getCount(res, MatchType.EXACT_TEXT_ONLY_UNIQUE_ID.name());
+			count += BaseCounter.getCount(res, MatchType.EXACT_TEXT_ONLY.name());
+			count += BaseCounter.getCount(res, MatchType.EXACT_REPAIRED.name());
+			count += BaseCounter.getCount(res, MatchType.FUZZY_PREVIOUS_VERSION.name());
+			count += BaseCounter.getCount(res, MatchType.FUZZY_UNIQUE_ID.name());
+			count += BaseCounter.getCount(res, MatchType.FUZZY.name());
+			count += BaseCounter.getCount(res, MatchType.FUZZY_REPAIRED.name());
+			count += BaseCounter.getCount(res, MatchType.PHRASE_ASSEMBLED.name());
+			count += BaseCounter.getCount(res, MatchType.MT.name());
+			count += BaseCounter.getCount(res, MatchType.CONCORDANCE.name());
+		}
+				
+		return count;
+	}
+	
 	// To be overridden in subclasses
 	protected void setEndBatchFields(ReportGenerator gen, IResource res) {
 	}
@@ -345,8 +416,9 @@ public class ScopingReportStep extends CompoundStep {
 		IResource res = event.getResource();
 		if (res != null) {
 			gen.setField(ITEM_TOTAL_WORD_COUNT, BaseCounter.getCount(res, GMX.TotalWordCount));
-			// gen.setField(ITEM_NONTRANSLATABLE_WORD_COUNT, 0); // TODO Calculate
-			// gen.setField(ITEM_TRANSLATABLE_WORD_COUNT, 0); // TODO Calculate
+			long trCount = countTranslatable(res);
+			gen.setField(ITEM_NONTRANSLATABLE_WORD_COUNT, BaseCounter.getCount(res, GMX.TotalWordCount) - trCount);
+			gen.setField(ITEM_TRANSLATABLE_WORD_COUNT, trCount);
 			
 			gen.setField(ITEM_GMX_PROTECTED_WORD_COUNT, BaseCounter.getCount(res, GMX.ProtectedWordCount));
 			gen.setField(ITEM_GMX_EXACT_MATCHED_WORD_COUNT, BaseCounter.getCount(res, GMX.ExactMatchedWordCount));
@@ -356,7 +428,7 @@ public class ScopingReportStep extends CompoundStep {
 			gen.setField(ITEM_GMX_ALPHANUMERIC_ONLY_TEXT_UNIT_WORD_COUNT, BaseCounter.getCount(res, GMX.AlphanumericOnlyTextUnitWordCount));
 			gen.setField(ITEM_GMX_NUMERIC_ONLY_TEXT_UNIT_WORD_COUNT, BaseCounter.getCount(res, GMX.NumericOnlyTextUnitWordCount));
 			gen.setField(ITEM_GMX_MEASUREMENT_ONLY_TEXT_UNIT_WORD_COUNT, BaseCounter.getCount(res, GMX.MeasurementOnlyTextUnitWordCount));
-			//gen.setField(ITEM_GMX_NOMATCH, BaseCounter.getCount(res, 0)); // TODO Calculate
+			gen.setField(ITEM_GMX_NOMATCH, countCategories(res, false, true));
 			
 			gen.setField(ITEM_EXACT_UNIQUE_ID, BaseCounter.getCount(res, MatchType.EXACT_UNIQUE_ID.name()));
 			gen.setField(ITEM_EXACT_PREVIOUS_VERSION, BaseCounter.getCount(res, MatchType.EXACT_PREVIOUS_VERSION.name()));
@@ -375,7 +447,7 @@ public class ScopingReportStep extends CompoundStep {
 			gen.setField(ITEM_PHRASE_ASSEMBLED, BaseCounter.getCount(res, MatchType.PHRASE_ASSEMBLED.name()));
 			gen.setField(ITEM_MT, BaseCounter.getCount(res, MatchType.MT.name()));
 			gen.setField(ITEM_CONCORDANCE, BaseCounter.getCount(res, MatchType.CONCORDANCE.name()));
-			// gen.setField(ITEM_NOMATCH, BaseCounter.getCount(res, 0); // TODO Calculate
+			gen.setField(ITEM_NOMATCH, countCategories(res, true, false));
 			
 			setEndBatchItemFields(gen, res);
 		}			
