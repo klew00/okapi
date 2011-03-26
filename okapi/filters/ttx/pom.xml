@@ -10,17 +10,24 @@
    <artifactId>okapi-filter-ttx</artifactId>
    <name>Okapi Filter for TTX</name>
 	<dependencies>
-      <dependency>
-      	<groupId>net.sf.okapi</groupId>
-        <artifactId>okapi-core</artifactId>
-        <scope>test</scope>
-		<classifier>tests</classifier>
-		<version>${project.version}</version>
-      </dependency>
-	<dependency>
-		<groupId>net.sf.okapi</groupId>
-		<artifactId>okapi-core</artifactId>
-		<version>${project.version}</version>
-	</dependency>
+		<dependency>
+			<groupId>net.sf.okapi</groupId>
+			<artifactId>okapi-core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.woodstox</groupId>
+			<artifactId>woodstox-core-lgpl</artifactId>
+			<version>4.1.0</version>
+		</dependency>
+		
+		<!-- Test -->
+    	<dependency>
+      		<groupId>net.sf.okapi</groupId>
+        	<artifactId>okapi-core</artifactId>
+        	<scope>test</scope>
+			<classifier>tests</classifier>
+			<version>${project.version}</version>
+      	</dependency>
 	</dependencies>
 </project>
