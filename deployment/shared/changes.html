@@ -61,8 +61,6 @@ distribution.</p>
 	<li>Steps:<ul>
 	<li>Added the &quot;Rainbow Translation Kit Creation&quot; step, to create translation 
 	package in various format from a pipeline.</li>
-	<li>Added the &quot;Rainbow Translation Kit Reader&quot; step, to read a translation 
-	package from a pipeline.</li>
 	<li>Added the &quot;Rainbow Translation Kit Merging&quot; step, to merge back 
 	extracted files.</li>
 	<li>XML Characters Fixing Step:<ul>
@@ -72,6 +70,11 @@ distribution.</p>
 	</li>
 	<li>Added the &quot;Id-Based Copy&quot; step, to copy the source text from one file 
 	into the target of another for the entries with the same id.</li>
+	<li>Scoping Report Step:<ul>
+	<li>Many changes have been implemented: better support for GMX and Okapi 
+	categories, etc.</li>
+</ul>
+	</li>
 </ul>
 	</li>
 	<li>Filters:<ul>
@@ -87,12 +90,14 @@ distribution.</p>
 	</li>
 	<li>TS Filter:<ul>
 	<li>Added resname for group (&lt;context&gt; elements)</li>
+	<li>Changed to use Woodsox Stax parser instead of the defautl VM parser.</li>
 </ul>
 	</li>
 	<li>TTX Filter:<ul>
 	<li>Improved handling of unsegmented content to mimick TagEditor&#39;s behavior 
 	closer: Leading whitespace characters are now excluded from the entries. 
 	This addresses issue #164.</li>
+	<li>Changed to use Woodsox Stax parser instead of the defautl VM parser.</li>
 </ul>
 	</li>
 	<li>PO Filter:<ul>
@@ -101,11 +106,16 @@ distribution.</p>
 	fuzzy).</li>
 </ul>
 	</li>
+	<li>TMX Filter:<ul>
+	<li>Changed to use Woodsox Stax parser instead of the defautl VM parser.</li>
+</ul>
+	</li>
 	<li>XLIFF Filter:<ul>
 	<li>Fixed issue with out-of-segment inline codes collapsing in previous 
 	empty segmented target entry.</li>
 	<li>Fixed the bug were the approved property was not writeable. Now you can 
 	add, delete or modify it.</li>
+	<li>Changed to use Woodsox Stax parser instead of the defautl VM parser.</li>
 </ul>
 	</li>
 	<li>OpenXML Filter<ul>
