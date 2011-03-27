@@ -30,7 +30,7 @@ import net.sf.okapi.common.ParameterDescriptor;
 public class SeparatorPart extends AbstractPart {
 
 	/**
-	 * Creates a new SeparatorPart object with a given parameter descriptor.
+	 * Creates a new SeparatorPart object.
 	 */
 	public SeparatorPart () {
 		// Create descriptor with unique name to allow several in the same dialog

@@ -565,7 +565,7 @@ public class PipelineWrapper {
 				params.getClass().getName());
 			if ( params != null ) {
 				step.paramsData = params.toString();
-				peMapper.addEditor("net.sf.okapi.steps.wordcount.ui.ParametersEditor", step.paramsClass);
+				peMapper.addDescriptionProvider("net.sf.okapi.steps.wordcount.common.Parameters", step.paramsClass);
 			}
 			availableSteps.put(step.id, step);
 

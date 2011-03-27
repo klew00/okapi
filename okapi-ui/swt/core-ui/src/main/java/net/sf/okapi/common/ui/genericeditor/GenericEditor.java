@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2010 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -24,6 +24,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Map;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -41,13 +42,17 @@ import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
 import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.ParameterDescriptor;
 import net.sf.okapi.common.ParametersDescription;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.uidescription.AbstractPart;
+import net.sf.okapi.common.uidescription.CheckListPart;
 import net.sf.okapi.common.uidescription.CheckboxPart;
 import net.sf.okapi.common.uidescription.CodeFinderPart;
 import net.sf.okapi.common.uidescription.EditorDescription;
@@ -59,6 +64,7 @@ import net.sf.okapi.common.uidescription.PathInputPart;
 import net.sf.okapi.common.uidescription.SeparatorPart;
 import net.sf.okapi.common.uidescription.SpinInputPart;
 import net.sf.okapi.common.uidescription.TextInputPart;
+import net.sf.okapi.common.uidescription.TextLabelPart;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.TextAndBrowsePanel;
@@ -284,6 +290,17 @@ public class GenericEditor {
 					list.setEnabled(d.getWriteMethod()!=null);
 				}
 			}
+			else if ( part instanceof CheckListPart ) {
+				CheckListPart d = (CheckListPart)part;
+				cmp = lookupParent(d.getContainer());
+				if ( d.isWithLabel() ) setLabel(cmp, d, GridData.VERTICAL_ALIGN_BEGINNING);
+				Table table = new Table (cmp, SWT.CHECK | SWT.FULL_SELECTION | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
+				controls.put(d.getName(), table);
+				gdTmp = new GridData(GridData.FILL, GridData.FILL, true, true);
+				gdTmp.heightHint = d.getHeightHint();
+				if ( part.isVertical() || !part.isWithLabel() ) gdTmp.horizontalSpan = 2;
+				table.setLayoutData(gdTmp);
+			}
 			else if ( part instanceof CodeFinderPart ) {
 				CodeFinderPart d = (CodeFinderPart)part;
 				cmp = lookupParent(d.getContainer());
@@ -325,6 +342,21 @@ public class GenericEditor {
 					gdTmp.horizontalSpan = 2;
 				}
 				separator.setLayoutData(gdTmp);
+			}
+			else if ( part instanceof TextLabelPart ) {
+				TextLabelPart d = (TextLabelPart)part;
+				cmp = lookupParent(d.getContainer());
+				Label label = new Label(cmp, SWT.NONE);
+				label.setText(d.getDisplayName());
+				if ( !Util.isEmpty(d.getShortDescription()) ) {
+					label.setToolTipText(d.getShortDescription());
+				}
+				controls.put(d.getName(), label);
+				gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+				if ( part.isVertical() || !part.isWithLabel() ) {
+					gdTmp.horizontalSpan = 2;
+				}
+				label.setLayoutData(gdTmp);
 			}
 
 			// Update the list of observers if needed
@@ -457,6 +489,10 @@ public class GenericEditor {
 					setListControl((List)controls.get(d.getName()), d);
 				}
 			}
+			else if ( part instanceof CheckListPart ) {
+				CheckListPart d = (CheckListPart)part;
+				setCheckListControl((Table)controls.get(d.getName()), d);
+			}
 			else if ( part instanceof CodeFinderPart ) {
 				CodeFinderPart d = (CodeFinderPart)part;
 				setCodeFinderControl((InlineCodeFinderPanel)controls.get(d.getName()), d);
@@ -517,6 +553,13 @@ public class GenericEditor {
 			else if ( ctrl instanceof List ) {
 				if ( description.getDescriptor(name) instanceof ListSelectionPart ) {
 					if ( !saveListControl((List)ctrl, (ListSelectionPart)description.getDescriptor(name)) ) {
+						return false;
+					}
+				}
+			}
+			else if ( ctrl instanceof Table ) {
+				if ( description.getDescriptor(name) instanceof CheckListPart ) {
+					if ( !saveCheckListControl((Table)ctrl, (CheckListPart)description.getDescriptor(name)) ) {
 						return false;
 					}
 				}
@@ -753,6 +796,27 @@ public class GenericEditor {
 		return true;
 	}
 	
+	private boolean saveCheckListControl (Table table,
+		CheckListPart part)
+	{
+		try {
+			if ( !table.isEnabled() ) return true; // Don't save disabled input
+			Map<String, ParameterDescriptor> map = part.getEntries();
+			int i = 0;
+			for ( String name : map.keySet() ) {
+				ParameterDescriptor desc = map.get(name);
+				TableItem ti = table.getItem(i);
+				desc.getWriteMethod().invoke(desc.getParent(), ti.getChecked());
+				i++;
+			}
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+			return false;
+		}
+		return true;
+	}
+	
 	private boolean saveListControl (List list,
 		ListSelectionPart desc)
 	{
@@ -906,6 +970,29 @@ public class GenericEditor {
 		return true;
 	}
 
+	private void setCheckListControl (Table table,
+		CheckListPart part)
+	{
+		try {
+			Map<String, ParameterDescriptor> map = part.getEntries();
+			for ( String name : map.keySet() ) {
+				ParameterDescriptor desc = map.get(name);
+				TableItem ti = new TableItem (table, SWT.NONE);
+				ti.setText(desc.getDisplayName());
+				ti.setChecked((Boolean)desc.getReadMethod().invoke(desc.getParent()));
+			}
+		}
+		catch ( IllegalArgumentException e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+		catch ( IllegalAccessException e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+		catch ( InvocationTargetException e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+	}
+	
 	private void setListControl (List list,
 		ListSelectionPart desc)
 	{

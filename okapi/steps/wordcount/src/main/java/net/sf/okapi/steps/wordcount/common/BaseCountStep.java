@@ -194,7 +194,7 @@ public abstract class BaseCountStep extends AbstractPipelineStep {
 	
 	@Override
 	protected Event handleEndBatch(Event event) {
-		if (!params.countInBatch) return event;
+		if (!params.getCountInBatch()) return event;
 		if (batchCount == 0) return event;
 		
 		saveToMetrics(event, batchCount);
@@ -210,7 +210,7 @@ public abstract class BaseCountStep extends AbstractPipelineStep {
 	
 	@Override
 	protected Event handleEndBatchItem(Event event) {
-		if (!params.countInBatchItems) return event;
+		if (!params.getCountInBatchItems()) return event;
 		if (batchItemCount == 0) return event;
 		
 		saveToMetrics(event, batchItemCount);
@@ -226,7 +226,7 @@ public abstract class BaseCountStep extends AbstractPipelineStep {
 	
 	@Override
 	protected Event handleEndDocument(Event event) {
-		if (!params.countInDocuments) return event;
+		if (!params.getCountInDocuments()) return event;
 		if (documentCount == 0) return event;
 		
 		saveToMetrics(event, documentCount);
@@ -242,7 +242,7 @@ public abstract class BaseCountStep extends AbstractPipelineStep {
 	
 	@Override
 	protected Event handleEndSubDocument(Event event) {
-		if (!params.countInSubDocuments) return event;
+		if (!params.getCountInSubDocuments()) return event;
 		if (subDocumentCount == 0) return event;
 		
 		saveToMetrics(event, subDocumentCount);
@@ -258,7 +258,7 @@ public abstract class BaseCountStep extends AbstractPipelineStep {
 	
 	@Override
 	protected Event handleEndGroup(Event event) {		
-		if (!params.countInGroups) return event;
+		if (!params.getCountInGroups()) return event;
 		if (groupCount == 0) return event;
 		
 		saveToMetrics(event, groupCount);
@@ -366,11 +366,11 @@ public abstract class BaseCountStep extends AbstractPipelineStep {
 				
 		saveToMetrics(event, textUnitCount); // Saves in annotations of the whole TU
 				
-		if (params.countInBatch) batchCount += textUnitCount;
-		if (params.countInBatchItems) batchItemCount += textUnitCount;
-		if (params.countInDocuments) documentCount += textUnitCount;
-		if (params.countInSubDocuments) subDocumentCount += textUnitCount;
-		if (params.countInGroups) groupCount += textUnitCount;
+		if (params.getCountInBatch()) batchCount += textUnitCount;
+		if (params.getCountInBatchItems()) batchItemCount += textUnitCount;
+		if (params.getCountInDocuments()) documentCount += textUnitCount;
+		if (params.getCountInSubDocuments()) subDocumentCount += textUnitCount;
+		if (params.getCountInGroups()) groupCount += textUnitCount;
 		return event;
 	}		
 }

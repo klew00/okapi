@@ -21,7 +21,6 @@
 		<module>textmodification-ui</module>
         <module>tokenization-ui</module>
 		<module>uriconversion-ui</module>
-        <module>wordcount-ui</module>
         <module>xsltransform-ui</module>
         <module>rainbowkit-ui</module>
     </modules>

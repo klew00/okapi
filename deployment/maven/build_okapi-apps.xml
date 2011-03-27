@@ -172,8 +172,6 @@
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi-ui/swt/steps/uriconversion-ui/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../okapi-ui/swt/steps/wordcount-ui/target/classes"
-			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi-ui/swt/steps/uriconversion-ui/target/classes"
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi-ui/swt/steps/xsltransform-ui/target/classes"

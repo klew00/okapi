@@ -126,6 +126,22 @@ public class EditorDescription {
 		descriptors.put(desc.getName(), desc);
 		return desc;
 	}
+	
+	/**
+	 * Adds a check list UI part to this editor description.
+	 * @param label the text of the label above the list
+	 * @param heightHint the suggested height of the list.
+	 * @return the UI part created by this call.
+	 */
+	public CheckListPart addCheckListPart (String label,
+		int heightHint)
+	{
+		CheckListPart clp = new CheckListPart(label, heightHint);
+		clp.setVertical(defaultVertical);
+		clp.setLabelFlushed(defaultLabelFlushed);
+		descriptors.put(clp.getName(), clp);
+		return clp;
+	}
 
 	/**
 	 * Adds a selection list UI part to this editor description.
@@ -209,6 +225,14 @@ public class EditorDescription {
 	 */
 	public SeparatorPart addSeparatorPart () {
 		SeparatorPart desc = new SeparatorPart();
+		desc.setVertical(defaultVertical);
+		desc.setLabelFlushed(defaultLabelFlushed);
+		descriptors.put(desc.getName(), desc);
+		return desc;
+	}
+	
+	public TextLabelPart addTextLabelPart (String text) {
+		TextLabelPart desc = new TextLabelPart(text);
 		desc.setVertical(defaultVertical);
 		desc.setLabelFlushed(defaultLabelFlushed);
 		descriptors.put(desc.getName(), desc);

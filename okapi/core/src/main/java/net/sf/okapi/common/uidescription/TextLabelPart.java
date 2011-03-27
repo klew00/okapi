@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -18,41 +18,28 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.wordcount.ui;
+package net.sf.okapi.common.uidescription;
 
-import org.eclipse.swt.widgets.TabFolder;
-import org.eclipse.swt.widgets.Widget;
+import java.util.UUID;
 
-import net.sf.okapi.common.EditorFor;
-import net.sf.okapi.common.IParameters;
-import net.sf.okapi.steps.wordcount.common.Parameters;
-import net.sf.okapi.common.ui.abstracteditor.AbstractParametersEditor;
+import net.sf.okapi.common.ParameterDescriptor;
 
-@EditorFor(Parameters.class)
-public class ParametersEditor extends AbstractParametersEditor {
+/**
+ * UI part descriptor for a text item. This UI part supports no type.
+ */
+public class TextLabelPart extends AbstractPart {
 
-	@Override
-	protected void createPages(TabFolder pageContainer) {
-		
-		addPage("Options", OptionsTab.class);
+	/**
+	 * Creates a new TextPart object.
+	 */
+	public TextLabelPart (String text) {
+		// Create descriptor with unique name to allow several in the same dialog
+		super(new ParameterDescriptor(UUID.randomUUID().toString(), null, text, null));
 	}
 
 	@Override
-	public IParameters createParameters() {
-		
-		return new Parameters();
-	}
-
-	@Override
-	protected String getCaption() {
-		
-		return "Counting";
-	}
-
-	@Override
-	protected void interop(Widget speaker) {
-		
-
+	protected void checkType () {
+		// Nothing to check
 	}
 
 }

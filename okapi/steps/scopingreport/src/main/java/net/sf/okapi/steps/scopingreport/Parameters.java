@@ -23,6 +23,7 @@ package net.sf.okapi.steps.scopingreport;
 import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.ParametersDescription;
 import net.sf.okapi.common.ParametersString;
+import net.sf.okapi.common.uidescription.CheckListPart;
 import net.sf.okapi.common.uidescription.EditorDescription;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 import net.sf.okapi.common.uidescription.PathInputPart;
@@ -35,7 +36,7 @@ public class Parameters extends AbstractParameters implements IEditorDescription
 	private static final String CUSTOM_TEMPLATE_URI = "customTemplateURI";
 	private static final String OUTPUT_PATH = "outputPath";
 	private static final String EMPTY_URI = "";
-	
+
 	private static final String TRANSLATE_GMX_PROTECTED = "translateGMXProtected";
 	private static final String TRANSLATE_GMX_EXACT_MATCHED = "translateGMXExactMatched";
 	private static final String TRANSLATE_GMX_LEVERAGED_MATCHED = "translateGMXLeveragedMatched";
@@ -229,7 +230,7 @@ public class Parameters extends AbstractParameters implements IEditorDescription
 	}
 
 	@Override
-	public ParametersDescription getParametersDescription() {
+	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
 		desc.add(PROJECT_NAME,
 			"Name of the project", "Name of the project to be displayed in the report");
@@ -319,7 +320,7 @@ public class Parameters extends AbstractParameters implements IEditorDescription
 	}
 
 	@Override
-	public EditorDescription createEditorDescription(ParametersDescription paramsDesc) {
+	public EditorDescription createEditorDescription (ParametersDescription paramsDesc) {
 		EditorDescription desc = new EditorDescription("Scope Reporting", true, false);
 		
 		desc.addTextInputPart(paramsDesc.get(PROJECT_NAME));
@@ -332,36 +333,65 @@ public class Parameters extends AbstractParameters implements IEditorDescription
 		PathInputPart pip = desc.addPathInputPart(paramsDesc.get(OUTPUT_PATH),
 			"Report to Generate", true);
 		pip.setBrowseFilters("HTML Files (*.htm;*.html)\tAll Files (*.*)", "*.htm;*.html\t*.*");
+
+//		desc.addSeparatorPart();
+		CheckListPart clp = desc.addCheckListPart("GMX categories to count as translatable", 90);
+		clp.addEntry(paramsDesc.get(TRANSLATE_GMX_PROTECTED));
+		clp.addEntry(paramsDesc.get(TRANSLATE_GMX_EXACT_MATCHED));
+		clp.addEntry(paramsDesc.get(TRANSLATE_GMX_LEVERAGED_MATCHED));
+		clp.addEntry(paramsDesc.get(TRANSLATE_GMX_REPETITION_MATCHED));
+		clp.addEntry(paramsDesc.get(TRANSLATE_GMX_FUZZY_MATCHED));
+		clp.addEntry(paramsDesc.get(TRANSLATE_GMX_ALPHANUMERIC_ONLY_TEXT_UNIT));
+		clp.addEntry(paramsDesc.get(TRANSLATE_GMX_NUMERIC_ONLY_TEXT_UNIT));
+		clp.addEntry(paramsDesc.get(TRANSLATE_GMX_MEASUREMENT_ONLY_TEXT_UNIT));
 		
-		desc.addSeparatorPart();
-		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_GMX_PROTECTED));
-		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_GMX_EXACT_MATCHED));
-		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_GMX_LEVERAGED_MATCHED));
-		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_GMX_REPETITION_MATCHED));
-		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_GMX_FUZZY_MATCHED));
-		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_GMX_ALPHANUMERIC_ONLY_TEXT_UNIT));
-		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_GMX_NUMERIC_ONLY_TEXT_UNIT));
-		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_GMX_MEASUREMENT_ONLY_TEXT_UNIT));
+//		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_GMX_PROTECTED));
+//		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_GMX_EXACT_MATCHED));
+//		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_GMX_LEVERAGED_MATCHED));
+//		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_GMX_REPETITION_MATCHED));
+//		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_GMX_FUZZY_MATCHED));
+//		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_GMX_ALPHANUMERIC_ONLY_TEXT_UNIT));
+//		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_GMX_NUMERIC_ONLY_TEXT_UNIT));
+//		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_GMX_MEASUREMENT_ONLY_TEXT_UNIT));
 		
-		desc.addSeparatorPart();
-		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_EXACT_UNIQUE_ID));
-		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_EXACT_PREVIOUS_VERSION));
-		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_EXACT_LOCAL_CONTEXT));
-		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_EXACT_DOCUMENT_CONTEXT));
-		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_EXACT_STRUCTURAL));
-		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_EXACT));
-		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_EXACT_TEXT_ONLY_PREVIOUS_VERSION));
-		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_EXACT_TEXT_ONLY_UNIQUE_ID));
-		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_EXACT_TEXT_ONLY));
-		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_EXACT_REPAIRED));
-		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_FUZZY_PREVIOUS_VERSION));
-		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_FUZZY_UNIQUE_ID));
-		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_FUZZY));
-		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_FUZZY_REPAIRED));
-		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_PHRASE_ASSEMBLED));
-		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_MT));
-		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_CONCORDANCE));
+//		desc.addSeparatorPart();
+		clp = desc.addCheckListPart("Okapi categories to count as translatable", 120);
+		clp.addEntry(paramsDesc.get(TRANSLATE_EXACT_UNIQUE_ID));
+		clp.addEntry(paramsDesc.get(TRANSLATE_EXACT_PREVIOUS_VERSION));
+		clp.addEntry(paramsDesc.get(TRANSLATE_EXACT_LOCAL_CONTEXT));
+		clp.addEntry(paramsDesc.get(TRANSLATE_EXACT_DOCUMENT_CONTEXT));
+		clp.addEntry(paramsDesc.get(TRANSLATE_EXACT_STRUCTURAL));
+		clp.addEntry(paramsDesc.get(TRANSLATE_EXACT));
+		clp.addEntry(paramsDesc.get(TRANSLATE_EXACT_TEXT_ONLY_PREVIOUS_VERSION));
+		clp.addEntry(paramsDesc.get(TRANSLATE_EXACT_TEXT_ONLY_UNIQUE_ID));
+		clp.addEntry(paramsDesc.get(TRANSLATE_EXACT_TEXT_ONLY));
+		clp.addEntry(paramsDesc.get(TRANSLATE_EXACT_REPAIRED));
+		clp.addEntry(paramsDesc.get(TRANSLATE_FUZZY_PREVIOUS_VERSION));
+		clp.addEntry(paramsDesc.get(TRANSLATE_FUZZY_UNIQUE_ID));
+		clp.addEntry(paramsDesc.get(TRANSLATE_FUZZY));
+		clp.addEntry(paramsDesc.get(TRANSLATE_FUZZY_REPAIRED));
+		clp.addEntry(paramsDesc.get(TRANSLATE_PHRASE_ASSEMBLED));
+		clp.addEntry(paramsDesc.get(TRANSLATE_MT));
+		clp.addEntry(paramsDesc.get(TRANSLATE_CONCORDANCE));
 		
+//		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_EXACT_UNIQUE_ID));
+//		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_EXACT_PREVIOUS_VERSION));
+//		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_EXACT_LOCAL_CONTEXT));
+//		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_EXACT_DOCUMENT_CONTEXT));
+//		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_EXACT_STRUCTURAL));
+//		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_EXACT));
+//		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_EXACT_TEXT_ONLY_PREVIOUS_VERSION));
+//		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_EXACT_TEXT_ONLY_UNIQUE_ID));
+//		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_EXACT_TEXT_ONLY));
+//		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_EXACT_REPAIRED));
+//		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_FUZZY_PREVIOUS_VERSION));
+//		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_FUZZY_UNIQUE_ID));
+//		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_FUZZY));
+//		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_FUZZY_REPAIRED));
+//		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_PHRASE_ASSEMBLED));
+//		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_MT));
+//		desc.addCheckboxPart(paramsDesc.get(TRANSLATE_CONCORDANCE));
+
 		return desc;
 	}
 	
