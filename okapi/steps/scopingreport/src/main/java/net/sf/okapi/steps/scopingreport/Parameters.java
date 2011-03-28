@@ -240,81 +240,81 @@ public class Parameters extends AbstractParameters implements IEditorDescription
 			"Output path:", "Full path of the report to generate");
 		
 		desc.add(TRANSLATE_GMX_PROTECTED,
-				"Translate GMX Protected",
-				"Translate the words in PROJECT_GMX_PROTECTED_WORD_COUNT and ITEM_GMX_PROTECTED_WORD_COUNT categories");
+				"GMX Protected Word Count",
+				"Count as translatable the words in PROJECT_GMX_PROTECTED_WORD_COUNT and ITEM_GMX_PROTECTED_WORD_COUNT categories");
 		desc.add(TRANSLATE_GMX_EXACT_MATCHED,
-				"Translate GMX Exact Matched",
-				"Translate the words in PROJECT_GMX_EXACT_MATCHED_WORD_COUNT and ITEM_GMX_EXACT_MATCHED_WORD_COUNT categories");
+				"GMX Exact Matched Word Count",
+				"Count as translatable the words in PROJECT_GMX_EXACT_MATCHED_WORD_COUNT and ITEM_GMX_EXACT_MATCHED_WORD_COUNT categories");
 		desc.add(TRANSLATE_GMX_LEVERAGED_MATCHED,
-				"Translate GMX Leveraged Matched",
-				"Translate the words in PROJECT_GMX_LEVERAGED_MATCHED_WORD_COUNT and ITEM_GMX_LEVERAGED_MATCHED_WORD_COUNT categories");
+				"GMX Leveraged Matched Word Count",
+				"Count as translatable the words in PROJECT_GMX_LEVERAGED_MATCHED_WORD_COUNT and ITEM_GMX_LEVERAGED_MATCHED_WORD_COUNT categories");
 		desc.add(TRANSLATE_GMX_REPETITION_MATCHED,
-				"Translate GMX Repetition Matched",
-				"Translate the words in PROJECT_GMX_REPETITION_MATCHED_WORD_COUNT and ITEM_GMX_REPETITION_MATCHED_WORD_COUNT categories");
+				"GMX Repetition Matched Word Count",
+				"Count as translatable the words in PROJECT_GMX_REPETITION_MATCHED_WORD_COUNT and ITEM_GMX_REPETITION_MATCHED_WORD_COUNT categories");
 		desc.add(TRANSLATE_GMX_FUZZY_MATCHED,
-				"Translate GMX Fuzzy Match",
-				"Translate the words in PROJECT_GMX_FUZZY_MATCHED_WORD_COUNT and ITEM_GMX_FUZZY_MATCHED_WORD_COUNT categories");
+				"GMX Fuzzy Matched Word Count",
+				"Count as translatable the words in PROJECT_GMX_FUZZY_MATCHED_WORD_COUNT and ITEM_GMX_FUZZY_MATCHED_WORD_COUNT categories");
 		desc.add(TRANSLATE_GMX_ALPHANUMERIC_ONLY_TEXT_UNIT,
-				"Translate GMX Alphanumeric Only Text Units",
-				"Translate the words in PROJECT_GMX_ALPHANUMERIC_ONLY_TEXT_UNIT_WORD_COUNT and ITEM_GMX_ALPHANUMERIC_ONLY_TEXT_UNIT_WORD_COUNT categories");
+				"GMX Alphanumeric Only Text Unit Word Count",
+				"Count as translatable the words in PROJECT_GMX_ALPHANUMERIC_ONLY_TEXT_UNIT_WORD_COUNT and ITEM_GMX_ALPHANUMERIC_ONLY_TEXT_UNIT_WORD_COUNT categories");
 		desc.add(TRANSLATE_GMX_NUMERIC_ONLY_TEXT_UNIT,
-				"Translate GMX Numeric Only Text Units",
-				"Translate the words in PROJECT_GMX_NUMERIC_ONLY_TEXT_UNIT_WORD_COUNT and ITEM_GMX_NUMERIC_ONLY_TEXT_UNIT_WORD_COUNT categories");
+				"GMX Numeric Only Text Unit Word Count",
+				"Count as translatable the words in PROJECT_GMX_NUMERIC_ONLY_TEXT_UNIT_WORD_COUNT and ITEM_GMX_NUMERIC_ONLY_TEXT_UNIT_WORD_COUNT categories");
 		desc.add(TRANSLATE_GMX_MEASUREMENT_ONLY_TEXT_UNIT,
-				"Translate GMX Measurement Only Text Units",
-				"Translate the words in PROJECT_GMX_MEASUREMENT_ONLY_TEXT_UNIT_WORD_COUNT and ITEM_GMX_MEASUREMENT_ONLY_TEXT_UNIT_WORD_COUNT categories");
+				"GMX Measurement Only Text Unit Word Count",
+				"Count as translatable the words in PROJECT_GMX_MEASUREMENT_ONLY_TEXT_UNIT_WORD_COUNT and ITEM_GMX_MEASUREMENT_ONLY_TEXT_UNIT_WORD_COUNT categories");
 		
 		desc.add(TRANSLATE_EXACT_UNIQUE_ID,
-				"Translate Exact Unique Id Match",
-				"Translate the words in PROJECT_EXACT_UNIQUE_ID and ITEM_EXACT_UNIQUE_ID categories");
+				"Exact Unique Id Match",
+				"Count as translatable the words in PROJECT_EXACT_UNIQUE_ID and ITEM_EXACT_UNIQUE_ID categories");
 		desc.add(TRANSLATE_EXACT_PREVIOUS_VERSION,
-				"Translate Exact Previous Version Match",
-				"Translate the words in PROJECT_EXACT_PREVIOUS_VERSION and ITEM_EXACT_PREVIOUS_VERSION categories");
+				"Exact Previous Version Match",
+				"Count as translatable the words in PROJECT_EXACT_PREVIOUS_VERSION and ITEM_EXACT_PREVIOUS_VERSION categories");
 		desc.add(TRANSLATE_EXACT_LOCAL_CONTEXT,
-				"Translate Exact Local Context Match",
-				"Translate the words in PROJECT_EXACT_LOCAL_CONTEXT and ITEM_EXACT_LOCAL_CONTEXT categories");
+				"Exact Local Context Match",
+				"Count as translatable the words in PROJECT_EXACT_LOCAL_CONTEXT and ITEM_EXACT_LOCAL_CONTEXT categories");
 		desc.add(TRANSLATE_EXACT_DOCUMENT_CONTEXT,
-				"Translate Exact Document Context Match",
-				"Translate the words in PROJECT_EXACT_DOCUMENT_CONTEXT and ITEM_EXACT_DOCUMENT_CONTEXT categories");
+				"Exact Document Context Match",
+				"Count as translatable the words in PROJECT_EXACT_DOCUMENT_CONTEXT and ITEM_EXACT_DOCUMENT_CONTEXT categories");
 		desc.add(TRANSLATE_EXACT_STRUCTURAL,
-				"Translate Exact Structural Match",
-				"Translate the words in PROJECT_EXACT_STRUCTURAL and ITEM_EXACT_STRUCTURAL categories");
+				"Exact Structural Match",
+				"Count as translatable the words in PROJECT_EXACT_STRUCTURAL and ITEM_EXACT_STRUCTURAL categories");
 		desc.add(TRANSLATE_EXACT,
-				"Translate Exact Match",
-				"Translate the words in PROJECT_EXACT and ITEM_EXACT categories");
+				"Exact Match",
+				"Count as translatable the words in PROJECT_EXACT and ITEM_EXACT categories");
 		desc.add(TRANSLATE_EXACT_TEXT_ONLY_PREVIOUS_VERSION,
-				"Translate Exact Text Only Previous Version Match",
-				"Translate the words in PROJECT_EXACT_TEXT_ONLY_PREVIOUS_VERSION and ITEM_EXACT_TEXT_ONLY_PREVIOUS_VERSION categories");
+				"Exact Text Only Previous Version Match",
+				"Count as translatable the words in PROJECT_EXACT_TEXT_ONLY_PREVIOUS_VERSION and ITEM_EXACT_TEXT_ONLY_PREVIOUS_VERSION categories");
 		desc.add(TRANSLATE_EXACT_TEXT_ONLY_UNIQUE_ID,
-				"Translate Exact Text Only Unique Id Match",
-				"Translate the words in PROJECT_EXACT_TEXT_ONLY_UNIQUE_ID and ITEM_EXACT_TEXT_ONLY_UNIQUE_ID categories");
+				"Exact Text Only Unique Id Match",
+				"Count as translatable the words in PROJECT_EXACT_TEXT_ONLY_UNIQUE_ID and ITEM_EXACT_TEXT_ONLY_UNIQUE_ID categories");
 		desc.add(TRANSLATE_EXACT_TEXT_ONLY,
-				"Translate Exact Text Only",
-				"Translate the words in PROJECT_EXACT_TEXT_ONLY and ITEM_EXACT_TEXT_ONLY categories");
+				"Exact Text Only",
+				"Count as translatable the words in PROJECT_EXACT_TEXT_ONLY and ITEM_EXACT_TEXT_ONLY categories");
 		desc.add(TRANSLATE_EXACT_REPAIRED,
-				"Translate Exact Repaired",
-				"Translate the words in PROJECT_EXACT_REPAIRED and ITEM_EXACT_REPAIRED categories");
+				"Exact Repaired",
+				"Count as translatable the words in PROJECT_EXACT_REPAIRED and ITEM_EXACT_REPAIRED categories");
 		desc.add(TRANSLATE_FUZZY_PREVIOUS_VERSION,
-				"Translate Fuzzy Previous Version Match",
-				"Translate the words in PROJECT_FUZZY_PREVIOUS_VERSION and ITEM_FUZZY_PREVIOUS_VERSION categories");
+				"Fuzzy Previous Version Match",
+				"Count as translatable the words in PROJECT_FUZZY_PREVIOUS_VERSION and ITEM_FUZZY_PREVIOUS_VERSION categories");
 		desc.add(TRANSLATE_FUZZY_UNIQUE_ID,
-				"Translate Fuzzy Unique Id Match",
-				"Translate the words in PROJECT_FUZZY_UNIQUE_ID and ITEM_FUZZY_UNIQUE_ID categories");
+				"Fuzzy Unique Id Match",
+				"Count as translatable the words in PROJECT_FUZZY_UNIQUE_ID and ITEM_FUZZY_UNIQUE_ID categories");
 		desc.add(TRANSLATE_FUZZY,
-				"Translate Fuzzy Match",
-				"Translate the words in PROJECT_FUZZY and ITEM_FUZZY categories");
+				"Fuzzy Match",
+				"Count as translatable the words in PROJECT_FUZZY and ITEM_FUZZY categories");
 		desc.add(TRANSLATE_FUZZY_REPAIRED,
-				"Translate Fuzzy Repaired",
-				"Translate the words in PROJECT_FUZZY_REPAIRED and ITEM_FUZZY_REPAIRED categories");
+				"Fuzzy Repaired",
+				"Count as translatable the words in PROJECT_FUZZY_REPAIRED and ITEM_FUZZY_REPAIRED categories");
 		desc.add(TRANSLATE_PHRASE_ASSEMBLED,
-				"Translate Phrase Assembled",
-				"Translate the words in PROJECT_PHRASE_ASSEMBLED and ITEM_PHRASE_ASSEMBLED categories");
+				"Phrase Assembled",
+				"Count as translatable the words in PROJECT_PHRASE_ASSEMBLED and ITEM_PHRASE_ASSEMBLED categories");
 		desc.add(TRANSLATE_MT,
-				"Translate after MT",
-				"Translate the words in PROJECT_MT and ITEM_MT categories");
+				"MT",
+				"Count as translatable the words in PROJECT_MT and ITEM_MT categories");
 		desc.add(TRANSLATE_CONCORDANCE,
-				"Translate Concordance",
-				"Translate the words in PROJECT_CONCORDANCE and ITEM_CONCORDANCE categories");
+				"Concordance",
+				"Count as translatable the words in PROJECT_CONCORDANCE and ITEM_CONCORDANCE categories");
 		
 		return desc;
 	}
