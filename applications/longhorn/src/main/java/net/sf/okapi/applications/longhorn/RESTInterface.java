@@ -219,6 +219,7 @@ public class RESTInterface {
 			ProjectUtils.executeProject(projId);
 		}
 		catch (Exception e) {
+			e.printStackTrace();
 			int status = HttpStatus.SC_INTERNAL_SERVER_ERROR;
 			String type = MediaType.TEXT_PLAIN;
 			String body = e.toString();

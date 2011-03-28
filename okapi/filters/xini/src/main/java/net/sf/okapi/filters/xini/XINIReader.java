@@ -48,10 +48,12 @@ import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.filters.xini.jaxb.Element;
+import net.sf.okapi.filters.xini.jaxb.EndPlaceHolder;
 import net.sf.okapi.filters.xini.jaxb.Field;
 import net.sf.okapi.filters.xini.jaxb.Page;
 import net.sf.okapi.filters.xini.jaxb.PlaceHolder;
 import net.sf.okapi.filters.xini.jaxb.Seg;
+import net.sf.okapi.filters.xini.jaxb.StartPlaceHolder;
 import net.sf.okapi.filters.xini.jaxb.TextContent;
 import net.sf.okapi.filters.xini.jaxb.Xini;
 import net.sf.okapi.filters.xini.jaxb.Element.ElementContent;
@@ -215,6 +217,7 @@ public class XINIReader {
 
 		tu.setSource(tc);
 		tu.setName(field.getLabel());
+		
 		events.add(new Event(EventType.TEXT_UNIT, tu));
 		
 		return events;
@@ -232,7 +235,7 @@ public class XINIReader {
 			if (part instanceof String) {
 				fragment.append((String) part);
 			}
-			else if (part instanceof TextContent) {
+			else if (part instanceof JAXBElement<?>) {
 				fragment.append(processInlineTag(part));
 			}
 
@@ -244,19 +247,31 @@ public class XINIReader {
 	private TextFragment processInlineTag(Serializable part) {
 		TextFragment fragment = new TextFragment();
 		
-		JAXBElement<TextContent> jaxbEl = (JAXBElement<TextContent>) part;
-		String localname = jaxbEl.getName().getLocalPart();
+		JAXBElement<?> jaxbEl = (JAXBElement<?>) part;
 		
-		Code code = new Code(TagType.PLACEHOLDER, null);
-		if (part instanceof PlaceHolder) {
-			code.setId(((PlaceHolder) part).getID());
+		Code code;
+		List<Serializable> content = null;
+		if (jaxbEl.getValue() instanceof PlaceHolder) {
+			JAXBElement<PlaceHolder> ph = (JAXBElement<PlaceHolder>) part;
+			code = new Code(TagType.PLACEHOLDER, null);
+			code.setId(ph.getValue().getID());
+			content = ph.getValue().getContent();
+		}
+		else if (jaxbEl.getValue() instanceof StartPlaceHolder) {
+			JAXBElement<StartPlaceHolder> sph = (JAXBElement<StartPlaceHolder>) part;
+			code = new Code(TagType.OPENING, null);
+			code.setId(sph.getValue().getID());
+		}
+		else if (jaxbEl.getValue() instanceof EndPlaceHolder) {
+			JAXBElement<EndPlaceHolder> eph = (JAXBElement<EndPlaceHolder>) part;
+			code = new Code(TagType.CLOSING, null);
+			code.setId(eph.getValue().getID());
 		}
 		else {
-			code.setType(tagType.get(localname));
-			//TODO What should we set here?
-			code.setId(0);
+			throw new RuntimeException();
 		}
-		code.append(serializeTextParts(((TextContent) part).getContent()).getCodedText());
+		if (content != null)
+			code.append(serializeTextParts(content).getCodedText());
 		fragment.append(code);
 		
 		return fragment;

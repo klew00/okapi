@@ -34,8 +34,10 @@ import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.filters.xini.jaxb.Element;
 import net.sf.okapi.filters.xini.jaxb.Empty;
+import net.sf.okapi.filters.xini.jaxb.EndPlaceHolder;
 import net.sf.okapi.filters.xini.jaxb.Field;
 import net.sf.okapi.filters.xini.jaxb.Fields;
 import net.sf.okapi.filters.xini.jaxb.Main;
@@ -44,6 +46,7 @@ import net.sf.okapi.filters.xini.jaxb.Page;
 import net.sf.okapi.filters.xini.jaxb.PlaceHolder;
 import net.sf.okapi.filters.xini.jaxb.PlaceHolderType;
 import net.sf.okapi.filters.xini.jaxb.Seg;
+import net.sf.okapi.filters.xini.jaxb.StartPlaceHolder;
 import net.sf.okapi.filters.xini.jaxb.Xini;
 import net.sf.okapi.filters.xini.jaxb.Page.Elements;
 
@@ -60,7 +63,6 @@ public class FilterEventToXiniTransformer {
 	private int currentPageId;
 	private int currentElementId;
 	private int currentFieldId;
-	private int phCounter;
 
 	public void init() {
 		try {
@@ -128,8 +130,6 @@ public class FilterEventToXiniTransformer {
 		StringBuilder emptySegsFlags = new StringBuilder();
 		
 		for (Segment okapiSegment : textContainer.getSegments()) {
-			
-			phCounter = 1;
 			
 			TextFragment textFragment = okapiSegment.getContent();
 			
@@ -250,19 +250,35 @@ public class FilterEventToXiniTransformer {
 			Empty emptyContent = new Empty();
 			return objectFactory.createTextContentBr(emptyContent);
 		}
-
-		//TODO opening or closing codes with matching other code in another segment --> use sph/eph
-
-		PlaceHolder ph = new PlaceHolder();
-		ph.setID(phCounter);
-		phCounter++;
-		ph.setType(PlaceHolderType.PH);
 		
-		if (innerCodedText != null && !innerCodedText.isEmpty()) {
-			ph.getContent().addAll(transformInlineTags(innerCodedText, codes));
+		Serializable phelement;
+
+		if (!codeIsIsolated) {
+			// use g/x-style placeholder
+			PlaceHolder ph = new PlaceHolder();
+			ph.setID(code.getId());
+			ph.setType(PlaceHolderType.PH);
+			
+			if (innerCodedText != null && !innerCodedText.isEmpty()) {
+				ph.getContent().addAll(transformInlineTags(innerCodedText, codes));
+			}
+			
+			phelement = objectFactory.createTextContentPh(ph);
 		}
-		
-		Serializable phelement = objectFactory.createTextContentPh(ph);
+		else if (code.getTagType() == TagType.OPENING) {
+			// use bpt style placeholder
+			StartPlaceHolder sph = new StartPlaceHolder();
+			sph.setID(code.getId());
+			sph.setType(PlaceHolderType.PH);
+			phelement = objectFactory.createTextContentSph(sph);
+		}
+		else {
+			// use ept-style placeholder
+			EndPlaceHolder eph = new EndPlaceHolder();
+			eph.setID(code.getId());
+			eph.setType(PlaceHolderType.PH);
+			phelement = objectFactory.createTextContentEph(eph);
+		}
 
 		return phelement;
 	}

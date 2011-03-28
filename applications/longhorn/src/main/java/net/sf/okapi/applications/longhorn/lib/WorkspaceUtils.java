@@ -358,6 +358,10 @@ public final class WorkspaceUtils {
 			// Skip directories here. They will be created anyway.
 			if (entry.isDirectory())
 				continue;
+
+			// Skip Mac specific files
+			if (entry.getName().endsWith("__MACOSX"))
+				continue;
 			
 			int count;
 			byte data[] = new byte[BUFFER];

@@ -32,10 +32,13 @@ import net.sf.okapi.applications.rainbow.Project;
 import net.sf.okapi.applications.rainbow.batchconfig.BatchConfiguration;
 import net.sf.okapi.applications.rainbow.lib.LanguageManager;
 import net.sf.okapi.applications.rainbow.pipeline.PipelineWrapper;
+import net.sf.okapi.applications.rainbow.pipeline.StepInfo;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.DefaultFilters;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.plugins.PluginsManager;
+import net.sf.okapi.filters.rainbowkit.Manifest;
+import net.sf.okapi.steps.rainbowkit.postprocess.MergingStep;
 
 public class ProjectUtils {
 	private static final Logger LOGGER = Logger.getLogger(ProjectUtils.class.getName());
@@ -125,12 +128,30 @@ public class ProjectUtils {
 		HashMap<String, String> filterConfigByExtension = loadFilterConfigurationMapping(projId);
 
 		// Add files to project input list
-		addDocumentsToProject(projId, rainbowProject, filterConfigByExtension);
+		if (!isTKitMergePipeline(pipelineWrapper)) {
+			addDocumentsToProject(projId, rainbowProject, filterConfigByExtension);
+		}
+		else {
+			addManifestToProject(projId, rainbowProject, filterConfigByExtension);
+		}
 		
 		rainbowProject.getPathBuilder().setUseExtension(false);
 
 		// Execute pipeline
 		pipelineWrapper.execute(rainbowProject);
+	}
+
+	/**
+	 * @param pipelineWrapper The pipeline wrapper with the pipeline to execute
+	 * @return true if one of the step is the Rainbow TKit Merging Step, false otherwise
+	 */
+	private static boolean isTKitMergePipeline(PipelineWrapper pipelineWrapper) {
+		for (StepInfo step : pipelineWrapper.getSteps()) {
+			if (step.stepClass.equals(MergingStep.class.getName()))
+				return true;
+			
+		}
+		return false;
 	}
 
 	/**
@@ -155,6 +176,36 @@ public class ProjectUtils {
 			
 			if (status == 1)
 				throw new RuntimeException("Adding document " + inputFile.getName() + " to list of input files failed");
+		}
+	}
+
+	/**
+	 * Adds all Rainbow TKit manifest files from the local project directory with the specified projId to the Rainbow project.
+	 * The HashMap will be used to assign the correct filter configuration.
+	 * 
+	 * @param projId The id of the local project in which the input files are located
+	 * @param rainbowProject The Rainbow project to which the input files shall be added
+	 * @param filterConfigByExtension The mapping from file extensions (including dot, ".html" for example)
+	 * 			to filter configurations (e.g. "okf_html@Customized")
+	 */
+	private static void addManifestToProject(int projId, Project rainbowProject,
+			HashMap<String, String> filterConfigByExtension) {
+		
+		for (File inputFile : WorkspaceUtils.getInputFiles(projId)) {
+			
+			String extension = Util.getExtension(inputFile.getName());
+			String filterConfigurationId = filterConfigByExtension.get(extension);
+			
+			if (inputFile.getName().equals(Manifest.MANIFEST_FILENAME + Manifest.MANIFEST_EXTENSION)) {
+
+				int status = rainbowProject.addDocument(
+						0, inputFile.getAbsolutePath(), null, null, filterConfigurationId, false);
+				
+				if (status == 1)
+					throw new RuntimeException("Adding document " + inputFile.getName() + " to list of input files failed");
+				
+				break;
+			}
 		}
 	}
 
