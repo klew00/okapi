@@ -236,7 +236,7 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		gdTmp.horizontalSpan = 2;
 		label.setLayoutData(gdTmp);
 		
-		lbTypes = new List(cmpTmp, SWT.BORDER);
+		lbTypes = new List(cmpTmp, SWT.BORDER | SWT.V_SCROLL);
 		lbTypes.add("Generic XLIFF");
 		lbTypes.setData("0", "net.sf.okapi.steps.rainbowkit.xliff.XLIFFPackageWriter");
 		
