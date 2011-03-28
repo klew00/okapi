@@ -328,32 +328,32 @@ public class ScopingReportStep extends CompoundStep {
 	private long countTranslatable(IResource res) {		
 		long count = 0;
 		
-		if (params.isTranslateGMXProtected()) count += BaseCounter.getCount(res, GMX.ProtectedWordCount);
-		if (params.isTranslateGMXExactMatched()) count += BaseCounter.getCount(res, GMX.ExactMatchedWordCount);
-		if (params.isTranslateGMXLeveragedMatched()) count += BaseCounter.getCount(res, GMX.LeveragedMatchedWordCount);
-		if (params.isTranslateGMXRepetitionMatched()) count += BaseCounter.getCount(res, GMX.RepetitionMatchedWordCount);
-		if (params.isTranslateGMXFuzzyMatch()) count += BaseCounter.getCount(res, GMX.FuzzyMatchedWordCount);
-		if (params.isTranslateGMXAlphanumericOnlyTextUnit()) count += BaseCounter.getCount(res, GMX.AlphanumericOnlyTextUnitWordCount);
-		if (params.isTranslateGMXNumericOnlyTextUnit()) count += BaseCounter.getCount(res, GMX.NumericOnlyTextUnitWordCount);
-		if (params.isTranslateGMXMeasurementOnlyTextUnit()) count += BaseCounter.getCount(res, GMX.MeasurementOnlyTextUnitWordCount);
+		if (params.isCountAsTranslatable_GMXProtected()) count += BaseCounter.getCount(res, GMX.ProtectedWordCount);
+		if (params.isCountAsTranslatable_GMXExactMatched()) count += BaseCounter.getCount(res, GMX.ExactMatchedWordCount);
+		if (params.isCountAsTranslatable_GMXLeveragedMatched()) count += BaseCounter.getCount(res, GMX.LeveragedMatchedWordCount);
+		if (params.isCountAsTranslatable_GMXRepetitionMatched()) count += BaseCounter.getCount(res, GMX.RepetitionMatchedWordCount);
+		if (params.isCountAsTranslatable_GMXFuzzyMatch()) count += BaseCounter.getCount(res, GMX.FuzzyMatchedWordCount);
+		if (params.isCountAsTranslatable_GMXAlphanumericOnlyTextUnit()) count += BaseCounter.getCount(res, GMX.AlphanumericOnlyTextUnitWordCount);
+		if (params.isCountAsTranslatable_GMXNumericOnlyTextUnit()) count += BaseCounter.getCount(res, GMX.NumericOnlyTextUnitWordCount);
+		if (params.isCountAsTranslatable_GMXMeasurementOnlyTextUnit()) count += BaseCounter.getCount(res, GMX.MeasurementOnlyTextUnitWordCount);
 		
-		if (params.isTranslateExactUniqueIdMatch()) count += BaseCounter.getCount(res, MatchType.EXACT_UNIQUE_ID.name());
-		if (params.isTranslateExactPreviousVersionMatch()) count += BaseCounter.getCount(res, MatchType.EXACT_PREVIOUS_VERSION.name());
-		if (params.isTranslateExactLocalContextMatch()) count += BaseCounter.getCount(res, MatchType.EXACT_LOCAL_CONTEXT.name());
-		if (params.isTranslateExactDocumentContextMatch()) count += BaseCounter.getCount(res, MatchType.EXACT_DOCUMENT_CONTEXT.name());
-		if (params.isTranslateExactStructuralMatch()) count += BaseCounter.getCount(res, MatchType.EXACT_STRUCTURAL.name());
-		if (params.isTranslateExactMatch()) count += BaseCounter.getCount(res, MatchType.EXACT.name());
-		if (params.isTranslateExactTextOnlyPreviousVersionMatch()) count += BaseCounter.getCount(res, MatchType.EXACT_TEXT_ONLY_PREVIOUS_VERSION.name());
-		if (params.isTranslateExactTextOnlyUniqueIdMatch()) count += BaseCounter.getCount(res, MatchType.EXACT_TEXT_ONLY_UNIQUE_ID.name());
-		if (params.isTranslateExactTextOnly()) count += BaseCounter.getCount(res, MatchType.EXACT_TEXT_ONLY.name());
-		if (params.isTranslateExactRepaired()) count += BaseCounter.getCount(res, MatchType.EXACT_REPAIRED.name());
-		if (params.isTranslateFuzzyPreviousVersionMatch()) count += BaseCounter.getCount(res, MatchType.FUZZY_PREVIOUS_VERSION.name());
-		if (params.isTranslateFuzzyUniqueIdMatch()) count += BaseCounter.getCount(res, MatchType.FUZZY_UNIQUE_ID.name());
-		if (params.isTranslateFuzzyMatch()) count += BaseCounter.getCount(res, MatchType.FUZZY.name());
-		if (params.isTranslateFuzzyRepaired()) count += BaseCounter.getCount(res, MatchType.FUZZY_REPAIRED.name());
-		if (params.isTranslatePhraseAssembled()) count += BaseCounter.getCount(res, MatchType.PHRASE_ASSEMBLED.name());
-		if (params.isTranslateMT()) count += BaseCounter.getCount(res, MatchType.MT.name());
-		if (params.isTranslateConcordance()) count += BaseCounter.getCount(res, MatchType.CONCORDANCE.name());
+		if (params.isCountAsTranslatable_ExactUniqueIdMatch()) count += BaseCounter.getCount(res, MatchType.EXACT_UNIQUE_ID.name());
+		if (params.isCountAsTranslatable_ExactPreviousVersionMatch()) count += BaseCounter.getCount(res, MatchType.EXACT_PREVIOUS_VERSION.name());
+		if (params.isCountAsTranslatable_ExactLocalContextMatch()) count += BaseCounter.getCount(res, MatchType.EXACT_LOCAL_CONTEXT.name());
+		if (params.isCountAsTranslatable_ExactDocumentContextMatch()) count += BaseCounter.getCount(res, MatchType.EXACT_DOCUMENT_CONTEXT.name());
+		if (params.isCountAsTranslatable_ExactStructuralMatch()) count += BaseCounter.getCount(res, MatchType.EXACT_STRUCTURAL.name());
+		if (params.isCountAsTranslatable_ExactMatch()) count += BaseCounter.getCount(res, MatchType.EXACT.name());
+		if (params.isCountAsTranslatable_ExactTextOnlyPreviousVersionMatch()) count += BaseCounter.getCount(res, MatchType.EXACT_TEXT_ONLY_PREVIOUS_VERSION.name());
+		if (params.isCountAsTranslatable_ExactTextOnlyUniqueIdMatch()) count += BaseCounter.getCount(res, MatchType.EXACT_TEXT_ONLY_UNIQUE_ID.name());
+		if (params.isCountAsTranslatable_ExactTextOnly()) count += BaseCounter.getCount(res, MatchType.EXACT_TEXT_ONLY.name());
+		if (params.isCountAsTranslatable_ExactRepaired()) count += BaseCounter.getCount(res, MatchType.EXACT_REPAIRED.name());
+		if (params.isCountAsTranslatable_FuzzyPreviousVersionMatch()) count += BaseCounter.getCount(res, MatchType.FUZZY_PREVIOUS_VERSION.name());
+		if (params.isCountAsTranslatable_FuzzyUniqueIdMatch()) count += BaseCounter.getCount(res, MatchType.FUZZY_UNIQUE_ID.name());
+		if (params.isCountAsTranslatable_FuzzyMatch()) count += BaseCounter.getCount(res, MatchType.FUZZY.name());
+		if (params.isCountAsTranslatable_FuzzyRepaired()) count += BaseCounter.getCount(res, MatchType.FUZZY_REPAIRED.name());
+		if (params.isCountAsTranslatable_PhraseAssembled()) count += BaseCounter.getCount(res, MatchType.PHRASE_ASSEMBLED.name());
+		if (params.isCountAsTranslatable_MT()) count += BaseCounter.getCount(res, MatchType.MT.name());
+		if (params.isCountAsTranslatable_Concordance()) count += BaseCounter.getCount(res, MatchType.CONCORDANCE.name());
 		
 		return count;
 	}
