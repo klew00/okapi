@@ -77,7 +77,7 @@ public class CheckListPart extends AbstractPart {
 	
 	/**
 	 * Adds one entry in the map.
-	 * @param paramDescriptor the description of the parameter.
+	 * @param desc the description of the parameter.
 	 */
 	public void addEntry (ParameterDescriptor desc) {
 		entries.put(desc.getName(), desc);

@@ -49,7 +49,6 @@ public class ParameterDescriptor implements IParameterDescriptor {
 	 * @param parent the object where this parameter is instantiated (or null for container-only).
 	 * @param displayName the localizable name of this parameter.
 	 * @param shortDescription a short localizable description of this parameter.
-	 * @return the ParameterDescriptor object created.
 	 */
 	public ParameterDescriptor (String name,
 		Object parent,
