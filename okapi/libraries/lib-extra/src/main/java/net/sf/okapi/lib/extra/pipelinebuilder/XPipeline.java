@@ -60,8 +60,12 @@ public class XPipeline extends net.sf.okapi.common.pipeline.Pipeline implements 
 		stepImpl.setDescription(description);
 		this.type = type;
 		
-		for (IPipelineStep step : steps)
+		for (IPipelineStep step : steps) {
+			if (step instanceof XPipelineStep) {
+				if (((XPipelineStep) step).getStep() == null) continue; // Do not insert
+			}
 			this.addStep(step);
+		}
 		
 		if (buildPipeline)
 			recreatePipeline();

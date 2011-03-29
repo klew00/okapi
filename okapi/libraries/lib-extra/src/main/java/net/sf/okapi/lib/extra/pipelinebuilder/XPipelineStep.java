@@ -48,7 +48,10 @@ public class XPipelineStep implements IPipelineStep{
 	public XPipelineStep(IPipelineStep step, XParameter... parameters) {	
 		this(step);
 		
-		parametersString.reset();
+		if (step == null) return;
+		IParameters params = step.getParameters();
+		if (params != null)
+			parametersString.fromString(params.toString());
 		for (XParameter parameter : parameters) {
 			if (parameter.getType() == null) {
 				Object value = parameter.getValue();
@@ -73,7 +76,7 @@ public class XPipelineStep implements IPipelineStep{
 				}
 			
 		}
-		IParameters params = step.getParameters();
+		
 		if (params != null)
 			params.fromString(parametersString.toString());
 	}

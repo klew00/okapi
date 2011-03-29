@@ -28,6 +28,7 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartSubDocument;
+import net.sf.okapi.common.resource.TextUnit;
 //import net.sf.okapi.steps.xliffkit.common.persistence.sessions.OkapiJsonSession;
 
 public class EventLogger extends BasePipelineStep {
@@ -54,7 +55,7 @@ public class EventLogger extends BasePipelineStep {
 		
 		switch ( event.getEventType() ) {	
 			case TEXT_UNIT:
-				res = "";
+				res = "  " + event.getResource().getId();
 				break;
 			case START_DOCUMENT:
 				res +=  "  " + ((StartDocument) event.getResource()).getName();
