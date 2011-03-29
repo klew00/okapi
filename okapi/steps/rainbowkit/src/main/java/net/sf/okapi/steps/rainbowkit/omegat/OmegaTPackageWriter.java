@@ -94,10 +94,11 @@ public class OmegaTPackageWriter extends XLIFFPackageWriter {
 			XR.writeStartElement("target_lang");
 			XR.writeRawXML(manifest.getTargetLocale().toString());
 			XR.writeEndElementLineBreak(); // target_lang
-//TODO: detect or set in process
-boolean preSegmented = false;
+
 			XR.writeStartElement("sentence_seg");
-			XR.writeRawXML(preSegmented ? "false" : "true");
+			// If the data are pre-segmented set the project with no segmentation
+			// Otherwise: TODO set it as defined by the user
+			XR.writeRawXML(getPreSegmented() ? "false" : "true");
 			XR.writeEndElementLineBreak(); // sentence_seg
 
 			XR.writeEndElementLineBreak(); // project

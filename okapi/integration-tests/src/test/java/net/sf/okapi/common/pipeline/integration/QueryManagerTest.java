@@ -50,7 +50,7 @@ public class QueryManagerTest {
 		
 		PensieveTMConnector pensieveConnector = new PensieveTMConnector();
 		net.sf.okapi.connectors.pensieve.Parameters p = new net.sf.okapi.connectors.pensieve.Parameters();
-		p.setDbDirectory("${rootDir}");		
+		p.setDbDirectory(Util.ROOT_DIRECTORY_VAR);		
 		qm.addAndInitializeResource(
 			pensieveConnector, 
 			"Pensieve",

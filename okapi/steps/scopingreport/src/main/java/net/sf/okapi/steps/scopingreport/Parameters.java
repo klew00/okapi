@@ -23,6 +23,7 @@ package net.sf.okapi.steps.scopingreport;
 import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.ParametersDescription;
 import net.sf.okapi.common.ParametersString;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.uidescription.CheckListPart;
 import net.sf.okapi.common.uidescription.EditorDescription;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
@@ -149,7 +150,7 @@ public class Parameters extends AbstractParameters implements IEditorDescription
 //			new RuntimeException(e);
 //		}
 		customTemplateURI = EMPTY_URI;
-		outputPath = "${rootDir}/scoping_report.html";
+		outputPath = Util.ROOT_DIRECTORY_VAR+"/scoping_report.html";
 		
 		countAsTranslatable_GMXProtected = false;
 		countAsTranslatable_GMXExactMatched = false;

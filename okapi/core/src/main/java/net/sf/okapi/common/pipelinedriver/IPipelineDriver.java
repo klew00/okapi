@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -48,12 +48,13 @@ public interface IPipelineDriver {
 	public void setFilterConfigurationMapper (IFilterConfigurationMapper fcMapper);
 	
 	/**
-	 * Sets the root directory corresponding to the ${rootDir} variable for steps.
-	 * @param rootDir the root directory. If it is null, the fall-back is expected to be the
-	 * user home directory.
+	 * Sets the root directories corresponding to the ${rootDir} and ${inputRootDir} variables for steps.
+	 * @param rootDir the root directory of the project. If it is null, the fall-back is expected to be the user home directory.
+	 * @param inputRootDir the root directory of the first set of input files. If it is null, the fall-back is expected to be an empty string.
 	 */
-	public void setRootDirectory (String rootDir);
-	
+	public void setRootDirectories (String rootDir,
+		String inputRootDir);
+
 	/**
 	 * Sets the UI parent object for this driver.
 	 * @param uiParent the UI parent object (window/shell/etc.). Its type depend

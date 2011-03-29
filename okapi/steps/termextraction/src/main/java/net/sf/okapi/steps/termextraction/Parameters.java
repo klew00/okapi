@@ -24,6 +24,7 @@ import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.ParametersDescription;
 import net.sf.okapi.common.ReferenceParameter;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.uidescription.EditorDescription;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 import net.sf.okapi.common.uidescription.PathInputPart;
@@ -153,7 +154,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 
 	@Override
 	public void reset () {
-		outputPath = "${rootDir}/terms.txt";
+		outputPath = Util.ROOT_DIRECTORY_VAR+"/terms.txt";
 		autoOpen = false;
 		minWordsPerTerm = 1;
 		maxWordsPerTerm = 3;

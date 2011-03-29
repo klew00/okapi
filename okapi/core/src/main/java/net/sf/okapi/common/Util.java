@@ -57,7 +57,17 @@ import java.util.regex.Pattern;
  * Collection of various all-purpose helper functions.
  */
 public final class Util {
-		
+
+	/**
+	 * Name of the root directory variable. 
+	 */
+	public static final String ROOT_DIRECTORY_VAR = "${rootDir}";
+	
+	/**
+	 * Name of the input root directory variable.
+	 */
+	public static final String INPUT_ROOT_DIRECTORY_VAR = "${inputRootDir}";
+
 	/**
 	 * Enumeration of supported OSes	 	 
 	 */
@@ -1435,11 +1445,11 @@ public final class Util {
 //	}
 
 	/**
-	 * Replaces in a given original string, a potential variable ${rootDir} by a given root directory.
+	 * Replaces in a given original string, a potential variable ROOT_DIRECTORY_VAR by a given root directory.
 	 * @param original the original string where to perform the replacement.
 	 * @param rootDir the root directory. If null it will be automatically set to the
 	 * user home directory.
-	 * @return the original string with ${rootDir} replaced if it was there.
+	 * @return the original string with ROOT_DIRECTORY_VAR replaced if it was there.
 	 */
 	public static String fillRootDirectoryVariable (String original,
 		String rootDir)
@@ -1447,7 +1457,23 @@ public final class Util {
 		if ( rootDir == null ) {
 			rootDir = System.getProperty("user.dir");
 		}
-		return original.replace("${rootDir}", rootDir);
+		return original.replace(ROOT_DIRECTORY_VAR, rootDir);
+	}
+
+	/**
+	 * Replaces in a given original string, a potential variable INPUT_ROOT_DIRECTORY_VAR by a given root directory.
+	 * @param original the original string where to perform the replacement.
+	 * @param inputRootDir the input root directory. If null it will be automatically set to
+	 * an empty string.
+	 * @return the original string with INPUT_ROOT_DIRECTORY_VAR replaced if it was there.
+	 */
+	public static String fillInputRootDirectoryVariable (String original,
+		String inputRootDir)
+	{
+		if ( inputRootDir == null ) {
+			inputRootDir = "";
+		}
+		return original.replace(INPUT_ROOT_DIRECTORY_VAR, inputRootDir);
 	}
 
 	/**

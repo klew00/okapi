@@ -168,7 +168,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	}
 
 	public void reset () {
-		useCustomParser = true;
+		useCustomParser = false;
 		factoryClass = "com.ctc.wstx.stax.WstxInputFactory"; // Woodstox XML parser
 		fallbackToID = false;
 		escapeGT = false;

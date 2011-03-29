@@ -94,7 +94,7 @@ public class ProjectUtils {
 
 		// Load pipeline
 		PipelineWrapper pipelineWrapper = new PipelineWrapper(fcMapper, WorkspaceUtils.getConfigDirPath(projId),
-				plManager, WorkspaceUtils.getInputDirPath(projId), null);
+				plManager, WorkspaceUtils.getInputDirPath(projId), WorkspaceUtils.getInputDirPath(projId), null);
 		pipelineWrapper.addFromPlugins(plManager);
 		return pipelineWrapper;
 	}

@@ -25,6 +25,7 @@ import java.util.List;
 
 import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.ReferenceParameter;
+import net.sf.okapi.common.Util;
 
 public class Parameters extends BaseParameters {
 	
@@ -461,7 +462,7 @@ public class Parameters extends BaseParameters {
 	
 	@Override
 	public void reset () {
-		outputPath = "${rootDir}/qa-report.html";
+		outputPath = Util.ROOT_DIRECTORY_VAR+"/qa-report.html";
 		outputType = 0;
 		autoOpen = true;
 		leadingWS = true;
@@ -478,7 +479,7 @@ public class Parameters extends BaseParameters {
 		ltTranslationSource = "";
 		ltTranslationTarget = "en";
 		saveSession = true;
-		sessionPath = "${rootDir}/qa-session"+QualityCheckSession.FILE_EXTENSION;
+		sessionPath = Util.ROOT_DIRECTORY_VAR+"/qa-session"+QualityCheckSession.FILE_EXTENSION;
 		doubledWord = true;
 		doubledWordExceptions = "sie;vous";
 		corruptedCharacters = true;

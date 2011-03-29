@@ -21,6 +21,7 @@
 package net.sf.okapi.steps.rainbowkit.creation;
 
 import net.sf.okapi.common.BaseParameters;
+import net.sf.okapi.common.Util;
 
 public class Parameters extends BaseParameters {
 
@@ -47,7 +48,7 @@ public class Parameters extends BaseParameters {
 		writerClass = "net.sf.okapi.steps.rainbowkit.xliff.XLIFFPackageWriter";
 		writerOptions = "";
 		packageName = "pack1";
-		packageDirectory = "${rootDir}";
+		packageDirectory = Util.ROOT_DIRECTORY_VAR;
 		// Internal
 		message = "";
 		outputManifest = true;

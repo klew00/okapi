@@ -510,7 +510,13 @@ public class TMXWriter {
     	
     	TextFragment trgFrag = alt.getTarget().getFirstContent();
 		// Write out the segment
-   		writeTU(srcFrag, trgFrag, null, (alt.fromMT() ? mtAttribute : altAttribute), alt.getTargetLocale());
+   		writeTU(srcFrag, trgFrag, null,
+   			(alt.fromMT()
+   				? mtAttribute
+   				: (alt.getFromOriginal()
+   					? altAttribute
+   					: null)),
+   			alt.getTargetLocale());
     }
     
     /**

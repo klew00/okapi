@@ -72,7 +72,7 @@ public class MergingStepTest {
 		
 		IPipelineDriver pdriver = new PipelineDriver();
 		pdriver.setFilterConfigurationMapper(fcMapper);
-		pdriver.setRootDirectory(Util.deleteLastChar(root)); // Don't include final separator
+		pdriver.setRootDirectories(Util.deleteLastChar(root), Util.deleteLastChar(root)); // Don't include final separator
 		pdriver.addStep(new RawDocumentToFilterEventsStep());
 		pdriver.addStep(new MergingStep());
 		
@@ -96,7 +96,7 @@ public class MergingStepTest {
 		
 		IPipelineDriver pdriver = new PipelineDriver();
 		pdriver.setFilterConfigurationMapper(fcMapper);
-		pdriver.setRootDirectory(Util.deleteLastChar(root)); // Don't include final separator
+		pdriver.setRootDirectories(Util.deleteLastChar(root),Util.deleteLastChar(root)); // Don't include final separator
 		pdriver.addStep(new RawDocumentToFilterEventsStep());
 		pdriver.addStep(new MergingStep());
 		
@@ -120,7 +120,7 @@ public class MergingStepTest {
 		
 		IPipelineDriver pdriver = new PipelineDriver();
 		pdriver.setFilterConfigurationMapper(fcMapper);
-		pdriver.setRootDirectory(Util.deleteLastChar(root)); // Don't include final separator
+		pdriver.setRootDirectories(Util.deleteLastChar(root), Util.deleteLastChar(root)); // Don't include final separator
 		pdriver.addStep(new RawDocumentToFilterEventsStep());
 		pdriver.addStep(new MergingStep());
 		

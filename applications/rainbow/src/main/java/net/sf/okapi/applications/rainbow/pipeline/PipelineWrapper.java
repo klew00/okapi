@@ -62,6 +62,7 @@ public class PipelineWrapper {
 		String appFolder,
 		PluginsManager pm,
 		String rootDir,
+		String inputRootDir,
 		Object uiParent)
 	{
 		this.fcMapper = fcMapper;
@@ -69,7 +70,7 @@ public class PipelineWrapper {
 		steps = new ArrayList<StepInfo>();
 		driver = new PipelineDriver();
 		driver.setFilterConfigurationMapper(this.fcMapper);
-		driver.setRootDirectory(rootDir);
+		driver.setRootDirectories(rootDir, inputRootDir);
 		driver.setUIParent(uiParent);
 		
 		refreshAvailableStepsList();
@@ -122,8 +123,10 @@ public class PipelineWrapper {
 		}
 	}
 
-	public void setRootDirectory (String rootDir) {
-		driver.setRootDirectory(rootDir);
+	public void setRootDirectories (String rootDir,
+		String inputRootDir)
+	{
+		driver.setRootDirectories(rootDir, inputRootDir);
 	}
 	
 	/**

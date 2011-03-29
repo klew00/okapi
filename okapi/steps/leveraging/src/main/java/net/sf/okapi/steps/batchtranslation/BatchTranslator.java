@@ -409,7 +409,7 @@ public class BatchTranslator {
 			cmd = cmd.replace("${inputURI}", htmlSourceFile.toString());
 			cmd = cmd.replace("${inputPath}", htmlSourceFile.getPath());
 			cmd = cmd.replace("${outputPath}", htmlTargetFile.getPath());
-			cmd = cmd.replace("${rootDir}", rootDir);
+			cmd = cmd.replace(Util.ROOT_DIRECTORY_VAR, rootDir);
 			
 			Locale loc = rawDoc.getSourceLocale().toJavaLocale();
 			cmd = cmd.replace("${srcLangName}", loc.getDisplayLanguage(Locale.ENGLISH));

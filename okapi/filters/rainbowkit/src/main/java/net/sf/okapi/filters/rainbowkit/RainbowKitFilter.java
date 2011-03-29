@@ -353,7 +353,8 @@ public class RainbowKitFilter implements IFilter {
 			if ( rtfFilter == null ) {
 				rtfFilter = new RTFFilter();
 			}
-
+//TODO: encoding output warnings
+			
 			//TODO: get LB info from original
 			String lineBreak = Util.LINEBREAK_DOS;
 			

@@ -2477,10 +2477,10 @@ public class MainForm { //implements IParametersProvider {
 		saveSurfaceData();
 		updateCustomConfigurations();
 		if ( wrapper == null ) {
-			wrapper = new PipelineWrapper(fcMapper, appRootFolder, pm, prj.getInputRoot(0), shell);
+			wrapper = new PipelineWrapper(fcMapper, appRootFolder, pm, prj.getProjectFolder(), prj.getInputRoot(0), shell);
 		}
 		else { // Make sure to reset the root dir each time
-			wrapper.setRootDirectory(prj.getInputRoot(0));
+			wrapper.setRootDirectories(prj.getProjectFolder(), prj.getInputRoot(0));
 		}
 	}
 	

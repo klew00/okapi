@@ -32,8 +32,18 @@ public class XLIFFPackageWriter extends BasePackageWriter {
 
 	protected XLIFFWriter writer;
 
+	private boolean preSegmented = false;
+
 	public XLIFFPackageWriter () {
 		super(Manifest.EXTRACTIONTYPE_XLIFF);
+	}
+
+	/**
+	 * Indicates if at least one text unit so far has been segmented.
+	 * @return true if at least one text unit so far has been segmented
+	 */
+	public boolean getPreSegmented () {
+		return preSegmented;
 	}
 	
 	@Override
@@ -107,6 +117,11 @@ public class XLIFFPackageWriter extends BasePackageWriter {
 	protected void processTextUnit (Event event) {
 		event = writer.handleEvent(event);
 		writeTMXEntries(event.getTextUnit());
+		
+		// Check if it has been segmented (if not set already)
+		if ( !preSegmented ) {
+			preSegmented = event.getTextUnit().getSource().hasBeenSegmented();
+		}
 	}
 
 	@Override

@@ -61,6 +61,7 @@ public abstract class BasePackageWriter implements IPackageWriter {
 	protected String tmxPathAlternates;
 	protected TMXWriter tmxWriterLeverage;
 	protected String tmxPathLeverage;
+	protected boolean copiedTargetsLikeApproved = false;
 	
 	public BasePackageWriter (String extractionType) {
 		this.extractionType = extractionType;
@@ -368,6 +369,30 @@ public abstract class BasePackageWriter implements IPackageWriter {
 			return; // Empty or no-text source
 		}
 		
+		// Process translation(s) in the container itself (if there is one)
+		boolean done = false;
+		if ( !tc.isEmpty() ) {
+			if ( tu.hasTargetProperty(trgLoc, Property.APPROVED) ) {
+				if ( tu.getTargetProperty(trgLoc, Property.APPROVED).getValue().equals("yes") ) {
+					// Write existing translation that was approved
+					if ( tmxWriterApproved != null ) {
+						tmxWriterApproved.writeItem(tu, null);
+						done = true;
+					}
+				}
+			}
+			if ( !done ) {
+				// If un-approved and source == target: don't count it as a translation
+				if ( tu.getSource().compareTo(tc, true) != 0 ) {
+					// Write existing translation not yet approved
+					if ( tmxWriterUnApproved != null ) {
+						tmxWriterUnApproved.writeItem(tu, null);
+						done = true;
+					}
+				}
+			}
+		}
+		
 		// Look for annotations
 		// In each segment
 		ISegments srcSegs = tu.getSource().getSegments();
@@ -386,30 +411,6 @@ public abstract class BasePackageWriter implements IPackageWriter {
 		}
 		writeAltTranslations(tc.getAnnotation(AltTranslationsAnnotation.class), srcOriginal);
 
-		if ( tc.isEmpty() ) {
-			return; // No target text
-		}
-		
-		// Process translation(s) in the container itself
-		boolean done = false;
-		if ( tu.hasTargetProperty(trgLoc, Property.APPROVED) ) {
-			if ( tu.getTargetProperty(trgLoc, Property.APPROVED).getValue().equals("yes") ) {
-				// Write existing translation that was approved
-				if ( tmxWriterApproved != null ) {
-					tmxWriterApproved.writeItem(tu, null);
-				}
-				done = true;
-			}
-		}
-		if ( !done ) {
-			// If un-approved and source == target: don't count it as a translation
-			if ( tu.getSource().compareTo(tc, true) != 0 ) {
-				// Write existing translation not yet approved
-				if ( tmxWriterUnApproved != null ) {
-					tmxWriterUnApproved.writeItem(tu, null);
-				}
-			}
-		}
 	}
 
 	private void writeAltTranslations (AltTranslationsAnnotation ann,

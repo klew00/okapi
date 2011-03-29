@@ -47,8 +47,8 @@ public class ExtractionStep extends BasePipelineStep {
 	private String outputEncoding;
 	private String filterConfigId;
 	private String rootDir;
-	private String inputRoot;
-	private String outputRoot;
+	private String inputRootDir;
+	private String outputRootDir;
 
 	public ExtractionStep () {
 		super();
@@ -101,6 +101,13 @@ public class ExtractionStep extends BasePipelineStep {
 		this.rootDir = rootDir;
 	}
 
+	@StepParameterMapping(parameterType = StepParameterType.INPUT_ROOT_DIRECTORY)
+	public void setInputRootDirectory (String inputRootDir) {
+		this.inputRootDir = inputRootDir;
+		// For now treat both roots as the same
+		this.outputRootDir = inputRootDir;
+	}
+
 	@Override
 	public Event handleEvent (Event event) {
 		switch ( event.getEventType() ) {
@@ -123,19 +130,16 @@ public class ExtractionStep extends BasePipelineStep {
 			writer = (IPackageWriter)Class.forName(writerClass).newInstance();
 			writer.setParameters(params);
 
-//TODO: input/output roots
-inputRoot = rootDir;
-outputRoot = rootDir;
-
 			String resolvedOutputDir = params.getPackageDirectory() + File.separator + params.getPackageName();
 			resolvedOutputDir = Util.fillRootDirectoryVariable(resolvedOutputDir, rootDir);
+			resolvedOutputDir = Util.fillInputRootDirectoryVariable(resolvedOutputDir, inputRootDir);
 			resolvedOutputDir = LocaleId.replaceVariables(resolvedOutputDir, srcLoc, trgLoc);
 			Util.deleteDirectory(resolvedOutputDir, false);
 			
 			String packageId = UUID.randomUUID().toString();
 			String projectId = Util.makeId(params.getPackageName()+srcLoc.toString()+trgLoc.toString());
 
-			writer.setBatchInformation(resolvedOutputDir, srcLoc, trgLoc, inputRoot,
+			writer.setBatchInformation(resolvedOutputDir, srcLoc, trgLoc, inputRootDir,
 				packageId, projectId, params.getWriterOptions());
 		}
 		catch ( InstantiationException e ) {
@@ -163,9 +167,9 @@ outputRoot = rootDir;
 	protected Event handleStartDocument (Event event) {
 		StartDocument sd = event.getStartDocument();
 		String tmpIn = inputURI.getPath();
-		String relativeInput = tmpIn.substring(inputRoot.length()+1);
+		String relativeInput = tmpIn.substring(inputRootDir.length()+1);
 		String tmpOut = outputURI.getPath();
-		String relativeOutput = tmpOut.substring(outputRoot.length()+1);
+		String relativeOutput = tmpOut.substring(outputRootDir.length()+1);
 
 		IParameters prm = sd.getFilterParameters();
 		String paramsData = null;

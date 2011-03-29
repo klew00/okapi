@@ -1225,7 +1225,8 @@ public class Main {
 		// Create the driver
 		PipelineDriver driver = new PipelineDriver();
 		driver.setFilterConfigurationMapper(fcMapper);
-		driver.setRootDirectory(System.getProperty("user.dir"));
+		driver.setRootDirectories(System.getProperty("user.dir"),
+			Util.getDirectoryName(rd.getInputURI().getPath()));
 
 		RawDocumentToFilterEventsStep rd2feStep = new RawDocumentToFilterEventsStep();
 		driver.addStep(rd2feStep);
@@ -1335,7 +1336,8 @@ public class Main {
 		// Create the driver
 		PipelineDriver driver = new PipelineDriver();
 		driver.setFilterConfigurationMapper(fcMapper);
-		driver.setRootDirectory(System.getProperty("user.dir"));
+		driver.setRootDirectories(System.getProperty("user.dir"),
+			Util.getDirectoryName(rd.getInputURI().getPath()));
 
 		// Raw document to filter events step 
 		RawDocumentToFilterEventsStep rd2feStep = new RawDocumentToFilterEventsStep();
@@ -1384,7 +1386,8 @@ public class Main {
 		// Create the driver
 		PipelineDriver driver = new PipelineDriver();
 		driver.setFilterConfigurationMapper(fcMapper);
-		driver.setRootDirectory(System.getProperty("user.dir"));
+		driver.setRootDirectories(System.getProperty("user.dir"),
+			Util.getDirectoryName(rd.getInputURI().getPath()));
 
 		// Raw document to filter events step 
 		RawDocumentToFilterEventsStep rd2feStep = new RawDocumentToFilterEventsStep();
@@ -1419,7 +1422,8 @@ public class Main {
 		// Create the driver
 		PipelineDriver driver = new PipelineDriver();
 		driver.setFilterConfigurationMapper(fcMapper);
-		driver.setRootDirectory(System.getProperty("user.dir"));
+		driver.setRootDirectories(System.getProperty("user.dir"),
+			Util.getDirectoryName(rd.getInputURI().getPath()));
 		driver.addStep(new RawDocumentToFilterEventsStep());
 
 		// Add segmentation step if requested
@@ -1447,7 +1451,8 @@ public class Main {
 		// Create the driver
 		PipelineDriver driver = new PipelineDriver();
 		driver.setFilterConfigurationMapper(fcMapper);
-		driver.setRootDirectory(System.getProperty("user.dir"));
+		driver.setRootDirectories(System.getProperty("user.dir"),
+			Util.getDirectoryName(rd.getInputURI().getPath()));
 
 		// Raw document to filter events step 
 		RawDocumentToFilterEventsStep rd2feStep = new RawDocumentToFilterEventsStep();
@@ -1490,7 +1495,8 @@ public class Main {
 		// Create the driver
 		PipelineDriver driver = new PipelineDriver();
 		driver.setFilterConfigurationMapper(fcMapper);
-		driver.setRootDirectory(System.getProperty("user.dir"));
+		driver.setRootDirectories(System.getProperty("user.dir"),
+			Util.getDirectoryName(rd.getInputURI().getPath()));
 
 		// Raw document to filter events step 
 		RawDocumentToFilterEventsStep rd2feStep = new RawDocumentToFilterEventsStep();

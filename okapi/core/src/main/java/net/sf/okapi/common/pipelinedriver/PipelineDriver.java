@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2010 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -56,6 +56,7 @@ public class PipelineDriver implements IPipelineDriver {
 	private int maxInputCount;
 	private IFilterConfigurationMapper fcMapper;
 	private String rootDir;
+	private String inputRootDir;
 	private Object uiParent;
 	
 	/**
@@ -74,8 +75,11 @@ public class PipelineDriver implements IPipelineDriver {
 	}
 	
 	@Override
-	public void setRootDirectory (String rootDir) {
+	public void setRootDirectories (String rootDir,
+		String inputRootDir)
+	{
 		this.rootDir = rootDir;
+		this.inputRootDir = inputRootDir;
 	}
 	
 	@Override
@@ -281,6 +285,9 @@ public class PipelineDriver implements IPipelineDriver {
 						break;
 					case ROOT_DIRECTORY:
 						method.invoke(p.getStep(), (rootDir==null) ? "" : rootDir);
+						break;
+					case INPUT_ROOT_DIRECTORY:
+						method.invoke(p.getStep(), (inputRootDir==null) ? "" : inputRootDir);
 						break;
 					case UI_PARENT:
 						method.invoke(p.getStep(), uiParent);
