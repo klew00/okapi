@@ -2,7 +2,7 @@ package net.sf.okapi.steps.scopingreport;
 
 import org.junit.Test;
 
-public class TestCategories {
+public class TestFields {
 
 	@Test
 	public void total_word_count_should_be_less_than_the_sum_of_categories() {

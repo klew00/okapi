@@ -20,6 +20,9 @@
 
 package net.sf.okapi.steps.scopingreport;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -62,13 +65,78 @@ public class TestScopingReport {
 	}
 	
 	@Test
-	public void testDefaultTemplate() {
-		// TODO
+	public void testDefaultTemplate() throws MalformedURLException {
+		ScopingReportStep srs = new ScopingReportStep();
+		Parameters params = (Parameters) srs.getParameters();
+		assertEquals("My Project", params.getProjectName());
+		assertEquals("", params.getCustomTemplateURI());
+		
+		String pathBase = Util.getDirectoryName(this.getClass().getResource("aa324.html").getPath()) + "/";
+		new XPipeline(
+				"HTML report test",
+				new XBatch(
+						new XBatchItem(
+								new URL("file", null, pathBase + "aa324.html"),
+								"UTF-8",
+								EN,
+								ES),								
+						new XBatchItem(
+								new URL("file", null, pathBase + "form.html"),
+								"UTF-8",
+								EN,
+								ES)
+						),
+				new RawDocumentToFilterEventsStep(new HtmlFilter()),
+				new EventLogger(),
+				new XPipelineStep(
+						srs,
+						new XParameter("outputPath", pathBase + "out/test_custom_template_report.html")
+						)
+		).execute();
+		testPath(pathBase + "out");
+		assertEquals("My Project", params.getProjectName());
+		assertEquals("", params.getCustomTemplateURI());
 	}
 	
 	@Test
-	public void testCustomTemplate() {
-		// TODO
+	public void testCustomTemplate() throws MalformedURLException {
+		ScopingReportStep srs = new ScopingReportStep();
+		Parameters params = (Parameters) srs.getParameters();
+		assertEquals("", params.getCustomTemplateURI());
+		params.setProjectName("Test scoping report");
+		String path = this.getClass().getResource("test_scoping_report.html").getPath();
+		assertNotNull(path);
+		params.setCustomTemplateURI(path);
+		assertEquals("test_scoping_report.html", Util.getFilename(path, true));
+		
+		String pathBase = Util.getDirectoryName(this.getClass().getResource("aa324.html").getPath()) + "/";
+		XPipeline pipeline = new XPipeline(
+				"HTML report test",
+				new XBatch(
+						new XBatchItem(
+								new URL("file", null, pathBase + "aa324.html"),
+								"UTF-8",
+								EN,
+								ES),								
+						new XBatchItem(
+								new URL("file", null, pathBase + "form.html"),
+								"UTF-8",
+								EN,
+								ES)
+						),
+				new RawDocumentToFilterEventsStep(new HtmlFilter()),
+				new EventLogger(),
+				new XPipelineStep(
+						srs,
+						new XParameter("outputPath", pathBase + "out/test_custom_template_report.html")
+						)
+		);
+		assertEquals("Test scoping report", params.getProjectName());
+		assertEquals("test_scoping_report.html", Util.getFilename(params.getCustomTemplateURI(), true));
+		pipeline.execute();
+		testPath(pathBase + "out");
+		assertEquals("Test scoping report", params.getProjectName());
+		assertEquals("test_scoping_report.html", Util.getFilename(params.getCustomTemplateURI(), true));
 	}
 		
 	@Test
@@ -93,7 +161,7 @@ public class TestScopingReport {
 				new EventLogger(),
 				new XPipelineStep(
 						new ScopingReportStep(),
-						new XParameter("projectName", "Test Scoping Report"),
+						//new XParameter("projectName", "Test Scoping Report"),
 						//new XParameter("outputURI", this.getClass().getResource("").toString() + "out/test_scoping_report.html")
 						new XParameter("outputPath", pathBase + "out/test_scoping_report.html")
 						)
