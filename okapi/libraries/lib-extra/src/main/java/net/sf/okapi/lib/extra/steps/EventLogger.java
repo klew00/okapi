@@ -40,7 +40,7 @@ public class EventLogger extends BasePipelineStep {
 	
 	@Override
 	public String getDescription() {
-		return "Logs events going through a pipeline.";
+		return "Logs events going through the pipeline.";
 	}
 
 	@Override
