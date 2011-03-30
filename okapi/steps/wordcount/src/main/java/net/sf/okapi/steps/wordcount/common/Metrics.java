@@ -94,4 +94,13 @@ public class Metrics implements Iterable<String> {
 	public Iterator<String> iterator() {
 		return metrics.keySet().iterator();
 	}	
+	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		for (String name : metrics.keySet()) {
+			sb.append(String.format("%s=%d ", name, metrics.get(name)));
+		}
+		return sb.toString();
+	}
 }

@@ -35,5 +35,10 @@ public class MetricsAnnotation implements IAnnotation {
 	public Metrics getMetrics() {
 		
 		return metrics;
-	}	
+	}
+	
+	@Override
+	public String toString() {
+		return String.format("Metrics: %s", metrics.toString());
+	}
 }

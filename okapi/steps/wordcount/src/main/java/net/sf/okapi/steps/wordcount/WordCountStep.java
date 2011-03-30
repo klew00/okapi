@@ -63,5 +63,5 @@ public class WordCountStep extends TokenCountStep {
 	public String getName() {
 		return "Word Count";
 	}
-
+	
 }
