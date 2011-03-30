@@ -181,8 +181,7 @@ public class ScopingReportStep extends CompoundStep {
 		setParameters(params);
 		setName("Scoping Report");
 		setDescription("Create a template-based scoping report based on word count and leverage annotations."
-			+" Expects: filter events. Sends back: filter events.");
-		gen = new ReportGenerator(getTemplateStream());
+			+" Expects: filter events. Sends back: filter events.");		
 	}
 	
 	@StepParameterMapping(parameterType = StepParameterType.ROOT_DIRECTORY)
@@ -248,7 +247,7 @@ public class ScopingReportStep extends CompoundStep {
 	@Override
 	protected Event handleStartBatch(Event event) {
 		params = getParameters(Parameters.class);
-		gen.reset();
+		gen = new ReportGenerator(getTemplateStream());
 		DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
 		gen.setField(PROJECT_NAME, params.getProjectName());
 		gen.setField(PROJECT_DATE, df.format(new Date()));
