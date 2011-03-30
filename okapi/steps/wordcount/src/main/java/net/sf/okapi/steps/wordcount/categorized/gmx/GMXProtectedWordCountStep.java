@@ -34,7 +34,7 @@ public class GMXProtectedWordCountStep extends BaseCountStep {
 	protected long count(TextContainer textContainer, LocaleId locale) {
 		long count = WordCounter.getCount(getSource());
 		if (count == 0) // No metrics found on the container
-			WordCounter.count(getSource(), locale); // Word Count metrics are based on counting in source
+			count = WordCounter.count(getSource(), locale); // Word Count metrics are based on counting in source
 		return count;
 	}
 
@@ -42,14 +42,17 @@ public class GMXProtectedWordCountStep extends BaseCountStep {
 	protected long count(Segment segment, LocaleId locale) {
 		long count = WordCounter.getCount(segment);
 		if (count == 0) // No metrics found on the container
-			WordCounter.count(segment, locale); // Word Count metrics are based on counting in source
+			count = WordCounter.count(segment, locale); // Word Count metrics are based on counting in source
 		return count;
 	}
 
 	@Override
 	protected long countInTextUnit(TextUnit textUnit) {
-		if (textUnit == null) return 0;		
-		if (textUnit.isTranslatable()) return 0; // Count only in non-translatable TUs
+		if (textUnit == null) return 0;
+		if (textUnit.isTranslatable()) { // Count only in non-translatable TUs
+			removeMetric(textUnit);
+			return 0; 
+		}
 		
 		LocaleId srcLocale = getSourceLocale();
 		TextContainer source = textUnit.getSource();
@@ -74,6 +77,19 @@ public class GMXProtectedWordCountStep extends BaseCountStep {
 		if (textContainerCount > 0) return textContainerCount;  
 		if (segmentsCount > 0) return segmentsCount;
 		return 0;
+	}
+
+	private void removeMetric(TextUnit textUnit) {
+		TextContainer source = textUnit.getSource();
+		
+		ISegments segs = source.getSegments();
+		if (segs != null) {
+			for (Segment seg : segs) {
+				removeFromMetrics(seg, getMetric());
+			}
+		}
+		removeFromMetrics(source, getMetric());
+		removeFromMetrics(textUnit, getMetric());
 	}
 
 	@Override

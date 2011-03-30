@@ -131,6 +131,51 @@ public abstract class BaseCountStep extends AbstractPipelineStep {
 		saveCount(m, count);
 	}
 	
+	protected void removeFromMetrics(IResource res, String metricName) {
+		MetricsAnnotation ma = res.getAnnotation(MetricsAnnotation.class);
+		
+		if (ma == null) {			
+			ma = new MetricsAnnotation();
+			res.setAnnotation(ma);
+		}
+		
+		Metrics m = ma.getMetrics();		
+		if (m == null) return;
+		m.unregisterMetric(metricName);
+	}
+	
+	protected void removeFromMetrics(TextContainer textContainer, String metricName) {
+		if (textContainer == null) return;
+		
+		MetricsAnnotation ma = textContainer.getAnnotation(MetricsAnnotation.class);
+		
+		if (ma == null) {			
+			ma = new MetricsAnnotation();
+			textContainer.setAnnotation(ma);
+		}
+		
+		Metrics m = ma.getMetrics();		
+		if (m == null) return;
+					
+		m.unregisterMetric(metricName);
+	}
+	
+	protected void removeFromMetrics(Segment seg, String metricName) {		
+		if (seg == null) return;
+		
+		MetricsAnnotation ma = seg.getAnnotation(MetricsAnnotation.class);
+		
+		if (ma == null) {			
+			ma = new MetricsAnnotation();
+			seg.setAnnotation(ma);
+		}
+		
+		Metrics m = ma.getMetrics();		
+		if (m == null) return;
+					
+		m.unregisterMetric(metricName);
+	}
+	
 	private IResource createResource(Event event) {
 		if (event == null) return null;
 		
@@ -153,7 +198,7 @@ public abstract class BaseCountStep extends AbstractPipelineStep {
 
 	protected void saveToMetrics(TextContainer textContainer, long count) {
 		if (textContainer == null) return;
-		if (count == 0) return;
+		//if (count == 0) return;
 				
 		MetricsAnnotation ma = textContainer.getAnnotation(MetricsAnnotation.class);
 		
