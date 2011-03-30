@@ -56,7 +56,7 @@ public abstract class AltAnnotationBasedCountStep extends BaseCountStep {
 	protected long count(TextContainer textContainer, LocaleId locale) {
 		long count = WordCounter.getCount(getSource());
 		if (count == 0) // No metrics found on the container
-			WordCounter.count(getSource(), locale); // Word Count metrics are based on counting in source
+			count = WordCounter.count(getSource(), locale); // Word Count metrics are based on counting in source
 		return count;
 
 	}
@@ -65,7 +65,7 @@ public abstract class AltAnnotationBasedCountStep extends BaseCountStep {
 	protected long count(Segment segment, LocaleId locale) {
 		long count = WordCounter.getCount(segment);
 		if (count == 0) // No metrics found on the container
-			WordCounter.count(segment, locale); // Word Count metrics are based on counting in source
+			count = WordCounter.count(segment, locale); // Word Count metrics are based on counting in source
 		return count;
 	}
 

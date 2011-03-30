@@ -80,7 +80,9 @@ public class TestGMXCounts {
 		bcs.setTargetLocale(LocaleId.FRENCH);
 		bcs.handleEvent(sdEvent);
 		bcs.handleEvent(tuEvent);
-//		assertEquals(3, BaseCounter.getCount(tu, GMX.LeveragedMatchedWordCount)); // 
+		System.out.println(TextUnitLogger.getTuInfo(tu, LocaleId.ENGLISH));
+		
+		assertEquals(3, BaseCounter.getCount(tu, GMX.LeveragedMatchedWordCount)); // 
 	}
 	
 	@Test
