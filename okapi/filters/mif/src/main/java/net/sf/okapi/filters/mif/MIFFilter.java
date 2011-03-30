@@ -442,7 +442,13 @@ public class MIFFilter implements IFilter {
 						if ( startBlock(blockLevel, BLOCKTYPE_TABLE) ) return;
 					}
 					else if ( "VariableFormats".equals(tag) ) {
-						processVariables();
+						if ( params.getExtractVariables() ) {
+							processVariables();
+						}
+						else {
+							skipOverContent(true, null);
+							blockLevel--;
+						}
 					}
 					else if ( "MIFFile".equals(tag) ) {
 						// Version was read already

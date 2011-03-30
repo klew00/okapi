@@ -34,6 +34,7 @@ import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.mif.MIFFilter;
+import net.sf.okapi.filters.mif.Parameters;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -82,12 +83,30 @@ public class MIFFilterTest {
 
 	@Test
 	public void testSimpleText () {
-		List<Event> list = getEventsFromFile("Test01.mif");
+		List<Event> list = getEventsFromFile("Test01.mif", null);
 		TextUnit tu = FilterTestDriver.getTextUnit(list, 194);
 		assertNotNull(tu);
 		assertEquals("Line 1\nLine 2", fmt.setContent(tu.getSource().getFirstContent()).toString());
 		
 		tu = FilterTestDriver.getTextUnit(list, 195);
+		assertNotNull(tu);
+		assertEquals("\u00e0=agrave", fmt.setContent(tu.getSource().getFirstContent()).toString());
+	}
+
+	@Test
+	public void testBodyOnlyNoVariables () {
+		Parameters params = new Parameters();
+		params.setExtractHiddenPages(false);
+		params.setExtractMasterPages(false);
+		params.setExtractReferencePages(false);
+		params.setExtractVariables(false);
+
+		List<Event> list = getEventsFromFile("Test01.mif", params);
+		TextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertNotNull(tu);
+		assertEquals("Line 1\nLine 2", fmt.setContent(tu.getSource().getFirstContent()).toString());
+		
+		tu = FilterTestDriver.getTextUnit(list, 2);
 		assertNotNull(tu);
 		assertEquals("\u00e0=agrave", fmt.setContent(tu.getSource().getFirstContent()).toString());
 	}
@@ -254,14 +273,23 @@ public class MIFFilterTest {
 		filter.close();
 	}
 
-	private ArrayList<Event> getEventsFromFile (String filename) {
+	private ArrayList<Event> getEventsFromFile (String filename,
+		Parameters params)
+	{
 		ArrayList<Event> list = new ArrayList<Event>();
+		
+		// Swithc parameters if needed
+		Parameters oldParams = (Parameters)filter.getParameters();
+		if ( params != null ) {
+			filter.setParameters(params);
+		}
 		filter.open(new RawDocument(Util.toURI(root+filename), null, locEN));
 		while (filter.hasNext()) {
 			Event event = filter.next();
 			list.add(event);
 		}
 		filter.close();
+		filter.setParameters(oldParams);
 		return list;
 	}
 

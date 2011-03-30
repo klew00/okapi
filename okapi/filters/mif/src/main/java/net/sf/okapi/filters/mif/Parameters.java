@@ -31,6 +31,7 @@ public class Parameters extends BaseParameters {
 	private static final String EXTRACTHIDDENPAGES = "extractHiddenPages";
 	private static final String USECODEFINDER = "useCodeFinder";
 	private static final String CODEFINDERRULES = "codeFinderRules";
+	private static final String EXTRACTVARIABLES = "extractVariables";
 	
 	private boolean extractBodyPages;
 	private boolean extractReferencePages;
@@ -38,6 +39,7 @@ public class Parameters extends BaseParameters {
 	private boolean extractHiddenPages;
 	private boolean useCodeFinder;
 	private InlineCodeFinder codeFinder;
+	private boolean extractVariables;
 
 	public Parameters () {
 		codeFinder = new InlineCodeFinder();
@@ -97,11 +99,20 @@ public class Parameters extends BaseParameters {
 		this.extractBodyPages = extractBodyPages;
 	}
 
+	public boolean getExtractVariables () {
+		return extractVariables;
+	}
+	
+	public void setExtractVariables (boolean extractVariables) {
+		this.extractVariables = extractVariables;
+	}
+	
 	public void reset () {
 		extractBodyPages = true;
 		extractMasterPages = true;
 		extractReferencePages = true;
 		extractHiddenPages = true;
+		extractVariables = true;
 		useCodeFinder = true;
 		codeFinder.reset();
 		codeFinder.setSample("text <$varName> text");
@@ -116,6 +127,7 @@ public class Parameters extends BaseParameters {
 		extractHiddenPages = buffer.getBoolean(EXTRACTHIDDENPAGES, extractHiddenPages);
 		extractMasterPages = buffer.getBoolean(EXTRACTMASTERPAGES, extractMasterPages);
 		extractReferencePages = buffer.getBoolean(EXTRACTREFERENCEPAGES, extractReferencePages);
+		extractVariables = buffer.getBoolean(EXTRACTVARIABLES, extractVariables);
 		useCodeFinder = buffer.getBoolean(USECODEFINDER, useCodeFinder);
 		codeFinder.fromString(buffer.getGroup(CODEFINDERRULES, ""));
 	}
@@ -127,6 +139,7 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean(EXTRACTHIDDENPAGES, extractHiddenPages);
 		buffer.setBoolean(EXTRACTMASTERPAGES, extractMasterPages);
 		buffer.setBoolean(EXTRACTREFERENCEPAGES, extractReferencePages);
+		buffer.setBoolean(EXTRACTVARIABLES, extractVariables);
 		buffer.setBoolean(USECODEFINDER, useCodeFinder);
 		buffer.setGroup(CODEFINDERRULES, codeFinder.toString());
 		return buffer.toString();

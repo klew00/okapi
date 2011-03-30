@@ -38,6 +38,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
@@ -56,6 +57,7 @@ public class Editor implements IParametersEditor {
 	private Button chkExtractHiddenPages;
 	private Button chkExtractMasterPages;
 	private Button chkExtractReferencePages;
+	private Button chkExtractVariables;
 
 	public boolean edit (IParameters params,
 		boolean readOnly,
@@ -105,20 +107,27 @@ public class Editor implements IParametersEditor {
 		layTmp = new GridLayout();
 		cmpTmp.setLayout(layTmp);
 		
-		chkExtractBodyPages = new Button(cmpTmp, SWT.CHECK);
+		chkExtractVariables = new Button(cmpTmp, SWT.CHECK);
+		chkExtractVariables.setText(Res.getString("extractVariables"));
+		
+		Group grpTmp = new Group(cmpTmp, SWT.NONE);
+		grpTmp.setText(Res.getString("pageTypesExtraction"));
+		grpTmp.setLayout(new GridLayout());
+		gdTmp = new GridData(); gdTmp.verticalIndent = 8;
+		grpTmp.setLayoutData(gdTmp);
+		
+		chkExtractBodyPages = new Button(grpTmp, SWT.CHECK);
 		chkExtractBodyPages.setText(Res.getString("extractBodyPages"));
 
-		chkExtractHiddenPages = new Button(cmpTmp, SWT.CHECK);
+		chkExtractHiddenPages = new Button(grpTmp, SWT.CHECK);
 		chkExtractHiddenPages.setText(Res.getString("extractHiddenPages"));
 
-		chkExtractMasterPages = new Button(cmpTmp, SWT.CHECK);
+		chkExtractMasterPages = new Button(grpTmp, SWT.CHECK);
 		chkExtractMasterPages.setText(Res.getString("extractMasterPages"));
 
-		chkExtractReferencePages = new Button(cmpTmp, SWT.CHECK);
+		chkExtractReferencePages = new Button(grpTmp, SWT.CHECK);
 		chkExtractReferencePages.setText(Res.getString("extractReferencePages"));
 
-		//options controls: todo
-		
 		TabItem tiTmp = new TabItem(tfTmp, SWT.NONE);
 		tiTmp.setText(Res.getString("tabOptions"));
 		tiTmp.setControl(cmpTmp);
@@ -190,6 +199,7 @@ public class Editor implements IParametersEditor {
 		chkExtractHiddenPages.setSelection(params.getExtractHiddenPages());
 		chkExtractMasterPages.setSelection(params.getExtractMasterPages());
 		chkExtractReferencePages.setSelection(params.getExtractReferencePages());
+		chkExtractVariables.setSelection(params.getExtractVariables());
 		chkUseCodeFinder.setSelection(params.getUseCodeFinder());
 		pnlCodeFinder.setRules(params.getCodeFinderData());
 		updateInlineCodes();
@@ -210,6 +220,7 @@ public class Editor implements IParametersEditor {
 		params.setExtractHiddenPages(chkExtractHiddenPages.getSelection());
 		params.setExtractMasterPages(chkExtractMasterPages.getSelection());
 		params.setExtractReferencePages(chkExtractReferencePages.getSelection());
+		params.setExtractVariables(chkExtractVariables.getSelection());
 		params.setUseCodeFinder(chkUseCodeFinder.getSelection());
 		return true;
 	}
