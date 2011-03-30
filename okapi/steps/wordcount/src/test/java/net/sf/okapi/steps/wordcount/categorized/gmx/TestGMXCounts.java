@@ -1,9 +1,7 @@
 package net.sf.okapi.steps.wordcount.categorized.gmx;
 
 import static org.junit.Assert.assertEquals;
-
 import java.util.logging.Logger;
-
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.LocaleId;

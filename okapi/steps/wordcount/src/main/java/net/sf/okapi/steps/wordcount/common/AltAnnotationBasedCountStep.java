@@ -41,12 +41,6 @@ public abstract class AltAnnotationBasedCountStep extends BaseCountStep {
 			if (at == null) continue;
 			
 			MatchType type = at.getType();
-			if (type == MatchType.MT) { // TODO Remove when MatchType to GMX mapping is done
-				if (at.getScore() < 100)
-					type = MatchType.FUZZY;
-				else
-					type = MatchType.EXACT;
-			}
 			if (accept(type)) return true;
 		}
 		return false;
