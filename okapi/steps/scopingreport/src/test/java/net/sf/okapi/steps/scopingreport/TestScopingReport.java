@@ -37,15 +37,18 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.filters.html.HtmlFilter;
+import net.sf.okapi.filters.plaintext.PlainTextFilter;
 import net.sf.okapi.lib.extra.pipelinebuilder.XBatch;
 import net.sf.okapi.lib.extra.pipelinebuilder.XBatchItem;
 import net.sf.okapi.lib.extra.pipelinebuilder.XParameter;
 import net.sf.okapi.lib.extra.pipelinebuilder.XPipeline;
 import net.sf.okapi.lib.extra.pipelinebuilder.XPipelineStep;
 import net.sf.okapi.lib.extra.steps.EventLogger;
+import net.sf.okapi.lib.extra.steps.TextUnitLogger;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 import net.sf.okapi.steps.leveraging.LeveragingStep;
 import net.sf.okapi.steps.segmentation.SegmentationStep;
+import net.sf.okapi.steps.wordcount.WordCountStep;
 import net.sf.okapi.steps.wordcount.categorized.okapi.ExactLocalContextMatchWordCountStep;
 import net.sf.okapi.steps.wordcount.common.GMX;
 import net.sf.okapi.steps.wordcount.common.Metrics;
@@ -224,12 +227,14 @@ public class TestScopingReport {
 //								EN,
 //								ES),								
 						new XBatchItem(
-								new URL("file", null, pathBase + "form.html"),
+								//new URL("file", null, pathBase + "form.html"),
+								new URL("file", null, pathBase + "test.txt"),
 								"UTF-8",
 								EN,
 								ES)
 						),
-				new RawDocumentToFilterEventsStep(new HtmlFilter()),
+				//new RawDocumentToFilterEventsStep(new HtmlFilter()),
+				new RawDocumentToFilterEventsStep(new PlainTextFilter()),
 				new EventLogger(),
 				new XPipelineStep(
 						new SegmentationStep(),
@@ -243,9 +248,11 @@ public class TestScopingReport {
 						//new XParameter("resourceClassName", net.sf.okapi.connectors.opentran.OpenTranTMConnector.class.getName()),
 						new XParameter("resourceClassName", net.sf.okapi.connectors.pensieve.PensieveTMConnector.class.getName()),
 						new XParameter("resourceParameters", params.toString(), true),
-						new XParameter("threshold", 80),
+						new XParameter("threshold", 60),
 						new XParameter("fillTarget", true)
 				),
+				new WordCountStep(),
+				new TextUnitLogger(),
 				new XPipelineStep(
 						new ScopingReportStep(),
 						new XParameter("projectName", "Test Scoping Report"),
