@@ -1,14 +1,19 @@
 package net.sf.okapi.steps.wordcount.categorized.gmx;
 
 import static org.junit.Assert.assertEquals;
+
+import java.util.logging.Logger;
+
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.annotation.AltTranslation;
+import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
+import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.lib.extra.pipelinebuilder.XParameter;
 import net.sf.okapi.lib.extra.steps.TextUnitLogger;
 import net.sf.okapi.steps.leveraging.LeveragingStep;
 import net.sf.okapi.steps.wordcount.common.BaseCountStep;
@@ -25,6 +30,7 @@ public class TestGMXCounts {
 	private Event sdEvent;
 	private TextUnit tu;
 	private Event tuEvent;
+	private final Logger logger = Logger.getLogger(getClass().getName());
 	
 	@Before
 	public void startup() {
@@ -47,14 +53,37 @@ public class TestGMXCounts {
 	
 	@Test
 	public void testGMXExactMatchedWordCountStep () {
+		String pathBase = Util.getDirectoryName(this.getClass().getResource("").getPath()) + "/";
+		net.sf.okapi.connectors.pensieve.Parameters rparams = 
+			new net.sf.okapi.connectors.pensieve.Parameters();
+		rparams.setDbDirectory(pathBase + "testtm");
+		tu.setSource(new TextContainer("Elephants cannot fly."));
 		
-	}
-	
-	@Test
-	public void testGMXFuzzyMatchWordCountStep () {
+		LeveragingStep ls = new LeveragingStep();
+		ls.setSourceLocale(LocaleId.ENGLISH);
+		ls.setTargetLocale(LocaleId.FRENCH);
+		net.sf.okapi.steps.leveraging.Parameters params = (net.sf.okapi.steps.leveraging.Parameters) ls.getParameters();
+		params.setResourceParameters(rparams.toString());
+		params.setResourceClassName(net.sf.okapi.connectors.pensieve.PensieveTMConnector.class.getName());
+		params.setThreshold(99);
+		params.setFillTarget(true);
+		ls.handleEvent(sdEvent);
+		ls.handleEvent(tuEvent);
+		logger.fine(TextUnitLogger.getTuInfo(tu, LocaleId.ENGLISH));
+		AltTranslationsAnnotation ata = tu.getTarget(LocaleId.FRENCH).getAnnotation(AltTranslationsAnnotation.class);
+		ata.add(new AltTranslation(LocaleId.ENGLISH, LocaleId.FRENCH, tu.getSource().getFirstContent(), null, null, MatchType.EXACT_UNIQUE_ID, 100, null));
+		logger.fine(TextUnitLogger.getTuInfo(tu, LocaleId.ENGLISH));
 		
+		bcs = new GMXExactMatchedWordCountStep();
+		bcs.setSourceLocale(LocaleId.ENGLISH);
+		bcs.setTargetLocale(LocaleId.FRENCH);
+		bcs.handleEvent(sdEvent);
+		bcs.handleEvent(tuEvent);
+		logger.fine(TextUnitLogger.getTuInfo(tu, LocaleId.ENGLISH));
+		
+		assertEquals(3, BaseCounter.getCount(tu, GMX.ExactMatchedWordCount)); //
 	}
-	
+
 	@Test
 	public void testGMXLeveragedMatchedWordCountStep () {
 		String pathBase = Util.getDirectoryName(this.getClass().getResource("").getPath()) + "/";
@@ -69,20 +98,52 @@ public class TestGMXCounts {
 		net.sf.okapi.steps.leveraging.Parameters params = (net.sf.okapi.steps.leveraging.Parameters) ls.getParameters();
 		params.setResourceParameters(rparams.toString());
 		params.setResourceClassName(net.sf.okapi.connectors.pensieve.PensieveTMConnector.class.getName());
-		params.setThreshold(60);
+		params.setThreshold(99);
 		params.setFillTarget(true);
 		ls.handleEvent(sdEvent);
 		ls.handleEvent(tuEvent);
-		System.out.println(TextUnitLogger.getTuInfo(tu, LocaleId.ENGLISH));
+		logger.fine(TextUnitLogger.getTuInfo(tu, LocaleId.ENGLISH));
 		
 		bcs = new GMXLeveragedMatchedWordCountStep();
 		bcs.setSourceLocale(LocaleId.ENGLISH);
 		bcs.setTargetLocale(LocaleId.FRENCH);
 		bcs.handleEvent(sdEvent);
 		bcs.handleEvent(tuEvent);
-		System.out.println(TextUnitLogger.getTuInfo(tu, LocaleId.ENGLISH));
+		logger.fine(TextUnitLogger.getTuInfo(tu, LocaleId.ENGLISH));
 		
-		assertEquals(3, BaseCounter.getCount(tu, GMX.LeveragedMatchedWordCount)); // 
+		assertEquals(3, BaseCounter.getCount(tu, GMX.LeveragedMatchedWordCount)); 
+		assertEquals(0, BaseCounter.getCount(tu, GMX.FuzzyMatchedWordCount));
+	}
+	
+	@Test
+	public void testGMXFuzzyMatchWordCountStep () {
+		String pathBase = Util.getDirectoryName(this.getClass().getResource("").getPath()) + "/";
+		net.sf.okapi.connectors.pensieve.Parameters rparams = 
+			new net.sf.okapi.connectors.pensieve.Parameters();
+		rparams.setDbDirectory(pathBase + "testtm");
+		tu.setSource(new TextContainer("Elephants cannot fly here."));
+		
+		LeveragingStep ls = new LeveragingStep();
+		ls.setSourceLocale(LocaleId.ENGLISH);
+		ls.setTargetLocale(LocaleId.FRENCH);
+		net.sf.okapi.steps.leveraging.Parameters params = (net.sf.okapi.steps.leveraging.Parameters) ls.getParameters();
+		params.setResourceParameters(rparams.toString());
+		params.setResourceClassName(net.sf.okapi.connectors.pensieve.PensieveTMConnector.class.getName());
+		params.setThreshold(80);
+		params.setFillTarget(true);
+		ls.handleEvent(sdEvent);
+		ls.handleEvent(tuEvent);
+		logger.fine(TextUnitLogger.getTuInfo(tu, LocaleId.ENGLISH));
+		
+		bcs = new GMXFuzzyMatchWordCountStep();
+		bcs.setSourceLocale(LocaleId.ENGLISH);
+		bcs.setTargetLocale(LocaleId.FRENCH);
+		bcs.handleEvent(sdEvent);
+		bcs.handleEvent(tuEvent);
+		logger.fine(TextUnitLogger.getTuInfo(tu, LocaleId.ENGLISH));
+		
+		assertEquals(4, BaseCounter.getCount(tu, GMX.FuzzyMatchedWordCount));
+		assertEquals(0, BaseCounter.getCount(tu, GMX.LeveragedMatchedWordCount));
 	}
 	
 	@Test
