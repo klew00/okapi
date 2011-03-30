@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
@@ -49,7 +50,10 @@ public class TestGMXCounts {
 	
 	@Test
 	public void testGMXLeveragedMatchedWordCountStep () {
-		
+		String pathBase = Util.getDirectoryName(this.getClass().getResource("").getPath()) + "/";
+		net.sf.okapi.connectors.pensieve.Parameters params = 
+			new net.sf.okapi.connectors.pensieve.Parameters();
+		params.setDbDirectory(pathBase + "testtm");
 	}
 	
 	@Test
