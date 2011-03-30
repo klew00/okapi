@@ -359,8 +359,8 @@ public final class WorkspaceUtils {
 			if (entry.isDirectory())
 				continue;
 
-			// Skip Mac specific files
-			if (entry.getName().endsWith("__MACOSX"))
+			// Skip Mac specific directories
+			if (entry.getName().contains("__MACOSX"))
 				continue;
 			
 			int count;
