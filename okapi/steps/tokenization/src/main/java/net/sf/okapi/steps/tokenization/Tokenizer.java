@@ -20,6 +20,8 @@
 
 package net.sf.okapi.steps.tokenization;
 
+import java.util.logging.Logger;
+
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.LocaleFilter;
@@ -42,6 +44,7 @@ import net.sf.okapi.steps.tokenization.tokens.Tokens;
 public class Tokenizer {
 
 	protected static TokenizationStep ts = new TokenizationStep();
+	private static final Logger logger = Logger.getLogger(Tokenizer.class.getName());
 	
 	/**
 	 * Extracts tokens from the given text.
@@ -87,10 +90,13 @@ public class Tokenizer {
 		return res;
 	}
 	
-	static private Tokens doTokenize(Object text, LocaleId language, String... tokenNames) {
+	private static Tokens doTokenize(Object text, LocaleId language, String... tokenNames) {
 		
 		if ( text == null ) return null;
-		if ( Util.isNullOrEmpty(language) ) return null;
+		if ( Util.isNullOrEmpty(language) ) {
+			logger.warning("Language is not set, cannot tokenize.");
+			return null;
+		}
 		
 		if (text instanceof TextUnit) {
 			TextUnit tu = (TextUnit) text;
@@ -120,19 +126,19 @@ public class Tokenizer {
 		return null;		
 	}
 	
-	static public Tokens tokenize(TextUnit textUnit, LocaleId language, String... tokenNames) {
+	public static Tokens tokenize(TextUnit textUnit, LocaleId language, String... tokenNames) {
 		return doTokenize(textUnit, language, tokenNames);		
 	}
 	
-	static public Tokens tokenize(TextContainer textContainer, LocaleId language, String... tokenNames) {
+	public static Tokens tokenize(TextContainer textContainer, LocaleId language, String... tokenNames) {
 		return doTokenize(textContainer, language, tokenNames);		
 	}
 	
-	static public Tokens tokenize(TextFragment textFragment, LocaleId language, String... tokenNames) {
+	public static Tokens tokenize(TextFragment textFragment, LocaleId language, String... tokenNames) {
 		return doTokenize(textFragment, language, tokenNames);		
 	}
 	
-	static public Tokens tokenize(String string, LocaleId language, String... tokenNames) {
+	public static Tokens tokenize(String string, LocaleId language, String... tokenNames) {
 		return doTokenize(string, language, tokenNames);		
 	}
 
