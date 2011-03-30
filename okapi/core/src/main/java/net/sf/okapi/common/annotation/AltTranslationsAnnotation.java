@@ -242,4 +242,12 @@ public class AltTranslationsAnnotation implements IAnnotation, Iterable<AltTrans
 		}
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		for (AltTranslation at : list) {
+			sb.append(String.format("{%s} ", at.toString()));
+		}
+		return sb.toString();
+	}
 }

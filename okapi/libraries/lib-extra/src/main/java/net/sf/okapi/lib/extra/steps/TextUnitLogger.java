@@ -43,7 +43,18 @@ public class TextUnitLogger extends BasePipelineStep {
 	@Override
 	protected Event handleTextUnit(Event event) {
 		TextUnit tu = (TextUnit) event.getResource();
+		fillSB(sb, tu, srcLoc);
 		
+		return super.handleTextUnit(event);
+	}
+	
+	@Override
+	protected Event handleEndBatch(Event event) {
+		logger.fine(sb.toString());
+		return super.handleEndBatch(event);
+	}
+	
+	private static void fillSB(StringBuilder sb, TextUnit tu, LocaleId srcLoc) {
 		sb.append(tu.getId());
 		sb.append(":");
 		sb.append("\n");
@@ -116,13 +127,11 @@ public class TextUnitLogger extends BasePipelineStep {
 				}
 			}
 		}
-		
-		return super.handleTextUnit(event);
 	}
 	
-	@Override
-	protected Event handleEndBatch(Event event) {
-		logger.fine(sb.toString());
-		return super.handleEndBatch(event);
+	public static String getTuInfo(TextUnit tu, LocaleId srcLoc) {
+		StringBuilder sb = new StringBuilder();
+		fillSB(sb, tu, srcLoc);
+		return sb.toString();
 	}
 }

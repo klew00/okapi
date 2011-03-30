@@ -323,5 +323,10 @@ public class AltTranslation implements Comparable<AltTranslation> {
 		result = HashCodeUtil.hash(result, getTarget().toString());
 		return result;
 	}
+	
+	@Override
+	public String toString() {		
+		return String.format("%s %d%% %s", type.name(), score, tu.getSource());
+	}
 
 }
