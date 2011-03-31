@@ -41,10 +41,10 @@ import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.filters.xini.jaxb.Element;
@@ -54,7 +54,6 @@ import net.sf.okapi.filters.xini.jaxb.Page;
 import net.sf.okapi.filters.xini.jaxb.PlaceHolder;
 import net.sf.okapi.filters.xini.jaxb.Seg;
 import net.sf.okapi.filters.xini.jaxb.StartPlaceHolder;
-import net.sf.okapi.filters.xini.jaxb.TextContent;
 import net.sf.okapi.filters.xini.jaxb.Xini;
 import net.sf.okapi.filters.xini.jaxb.Element.ElementContent;
 
@@ -205,13 +204,13 @@ public class XINIReader {
 				Seg xiniSeg = field.getSeg().get(nonEmptySegIndex);
 				nonEmptySegIndex++;
 				
-				TextPart tp = new TextPart(processSegment(xiniSeg));
-				tc.append(tp, false);
+				TextFragment tf = new TextFragment(processSegment(xiniSeg));
+				// To merge first XINI Segment into previously created Segment in TC
+				boolean collapseIfPreviousEmpty = segIndex == 0;
+				tc.getSegments().append(tf, collapseIfPreviousEmpty);
 			}
 			else {
-				
-				tc.append("", false);
-				tc.getSegments();
+				tc.getSegments().append(new Segment(""));
 			}
 		}
 
@@ -253,26 +252,41 @@ public class XINIReader {
 		List<Serializable> content = null;
 		if (jaxbEl.getValue() instanceof PlaceHolder) {
 			JAXBElement<PlaceHolder> ph = (JAXBElement<PlaceHolder>) part;
-			code = new Code(TagType.PLACEHOLDER, null);
-			code.setId(ph.getValue().getID());
 			content = ph.getValue().getContent();
+			
+			if (content == null || content.isEmpty()) {
+				code = new Code(TagType.PLACEHOLDER, null);
+				code.setId(ph.getValue().getID());
+				fragment.append(code);
+			}
+			else {
+				code = new Code(TagType.OPENING, null);
+				code.setId(ph.getValue().getID());
+				fragment.append(code);
+				
+				String innerText = serializeTextParts(content).getCodedText();
+				fragment.append(innerText);
+				
+				code = new Code(TagType.CLOSING, null);
+				code.setId(ph.getValue().getID());
+				fragment.append(code);
+			}
 		}
 		else if (jaxbEl.getValue() instanceof StartPlaceHolder) {
 			JAXBElement<StartPlaceHolder> sph = (JAXBElement<StartPlaceHolder>) part;
 			code = new Code(TagType.OPENING, null);
 			code.setId(sph.getValue().getID());
+			fragment.append(code);
 		}
 		else if (jaxbEl.getValue() instanceof EndPlaceHolder) {
 			JAXBElement<EndPlaceHolder> eph = (JAXBElement<EndPlaceHolder>) part;
 			code = new Code(TagType.CLOSING, null);
 			code.setId(eph.getValue().getID());
+			fragment.append(code);
 		}
 		else {
-			throw new RuntimeException();
+			throw new RuntimeException("Unknown placeholder: " + part);
 		}
-		if (content != null)
-			code.append(serializeTextParts(content).getCodedText());
-		fragment.append(code);
 		
 		return fragment;
 	}

@@ -253,7 +253,7 @@ public class FilterEventToXiniTransformer {
 		
 		Serializable phelement;
 
-		if (!codeIsIsolated) {
+		if (!codeIsIsolated || codeIsIsolated && code.getTagType() == TagType.PLACEHOLDER) {
 			// use g/x-style placeholder
 			PlaceHolder ph = new PlaceHolder();
 			ph.setID(code.getId());
