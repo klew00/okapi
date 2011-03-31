@@ -46,8 +46,10 @@ import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.extra.steps.CompoundStep;
 import net.sf.okapi.lib.reporting.ReportGenerator;
+import net.sf.okapi.steps.wordcount.categorized.CategoryResolver;
 import net.sf.okapi.steps.wordcount.categorized.gmx.GMXAlphanumericOnlyTextUnitWordCountStep;
 import net.sf.okapi.steps.wordcount.categorized.gmx.GMXExactMatchedWordCountStep;
 import net.sf.okapi.steps.wordcount.categorized.gmx.GMXFuzzyMatchWordCountStep;
@@ -173,11 +175,12 @@ public class ScopingReportStep extends CompoundStep {
 	private Parameters params;
 	private ReportGenerator gen;
 	private String rootDir;
+	private CategoryResolver resolver;
 	
 	public ScopingReportStep() {
 		super();
 		params = new Parameters();
-		setParameters(params);
+		setParameters(params);		
 		setName("Scoping Report");
 		setDescription("Create a template-based scoping report based on word count and leverage annotations."
 			+" Expects: filter events. Sends back: filter events.");		
@@ -241,6 +244,8 @@ public class ScopingReportStep extends CompoundStep {
 		list.add(new PhraseAssembledWordCountStep());
 		list.add(new MTWordCountStep());
 		list.add(new ConcordanceWordCountStep());
+		
+		resolver = new CategoryResolver(list); // List should be filled up at this point
 	}
 
 	@Override
@@ -470,4 +475,11 @@ public class ScopingReportStep extends CompoundStep {
 		return super.handleEndDocument(event);
 	}
 	
+	@Override
+	protected Event handleTextUnit(Event event) {
+		TextUnit tu = (TextUnit) event.getResource();
+		resolver.resolve(tu);
+		
+		return super.handleTextUnit(event);
+	}
 }
