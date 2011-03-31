@@ -37,7 +37,7 @@ public class TikalTest {
 			distDir = "dist_win32-x86";
 		}
 		else { // Assumes Unix or Linux
-			if ( System.getProperty("os.arch").equals("x86_64") ) {
+			if ( System.getProperty("os.arch").equals("x86_64") || System.getProperty("os.arch").equals("amd64") ) {
 				distDir = "dist_gtk2-linux-x86_64";
 			}
 			else {
