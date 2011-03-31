@@ -92,7 +92,6 @@ public class OkapiGUITester {
 			net.sf.okapi.steps.tokenization.ui.ParametersEditor.class.getName(),
 			net.sf.okapi.steps.uriconversion.ui.ParametersEditor.class
 					.getName(),
-			net.sf.okapi.steps.wordcount.ui.ParametersEditor.class.getName(),
 			net.sf.okapi.steps.xsltransform.ui.ParametersEditor.class.getName(),
 
 			// Descriptors
