@@ -58,6 +58,20 @@ public class TextUnitLogger extends BasePipelineStep {
 		sb.append(tu.getId());
 		sb.append(":");
 		sb.append("\n");
+		
+		if (tu.getAnnotations() != null) {
+//			sb.append("             ");
+//			sb.append("Source annotations:");
+//			sb.append("\n");
+			for (IAnnotation annot : tu.getAnnotations()) {
+				sb.append("                    ");
+				sb.append(annot.getClass().getName());
+				sb.append(" ");
+				sb.append(annot.toString());
+				sb.append("\n");
+			}		
+		}
+		
 		sb.append(String.format("      Source (%s): %s", srcLoc, tu.getSource()));
 		sb.append("\n");
 		
