@@ -278,6 +278,7 @@ public class TestScopingReport {
 	@Test
 	public void test_a_word_is_counted_only_once() throws MalformedURLException {
 		ScopingReportStep srs;
+		WordCountStep wcs;
 		StartDocument sd;
 		Ending ed;
 		Event sdEvent, edEvent;
@@ -336,6 +337,7 @@ public class TestScopingReport {
 //		ata.add(new AltTranslation(LocaleId.ENGLISH, LocaleId.FRENCH, tu.getSource().getFirstContent(), null, null, MatchType.EXACT_UNIQUE_ID, 100, null));
 //		logger.fine(TextUnitLogger.getTuInfo(tu, LocaleId.ENGLISH));
 		
+		wcs = new WordCountStep();				
 		srs = new ScopingReportStep();
 		srs.setSourceLocale(LocaleId.ENGLISH);
 		srs.setTargetLocale(LocaleId.FRENCH);
@@ -344,6 +346,17 @@ public class TestScopingReport {
 		params2.setCustomTemplateURI(this.getClass().getResource("golden_file_template.txt").getPath());
 		sd.setName(params2.getCustomTemplateURI());
 				
+		wcs.handleEvent(sbEvent);
+		wcs.handleEvent(siEvent);
+		wcs.handleEvent(sdEvent);
+		wcs.handleEvent(tuEvent1);
+		wcs.handleEvent(tuEvent2);
+		wcs.handleEvent(tuEvent3);
+		wcs.handleEvent(tuEvent4);
+		wcs.handleEvent(edEvent);
+		wcs.handleEvent(eiEvent);
+		wcs.handleEvent(ebEvent);
+		
 		ls.handleEvent(sbEvent);
 		ls.handleEvent(siEvent);
 		ls.handleEvent(sdEvent);

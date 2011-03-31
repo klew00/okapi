@@ -166,8 +166,7 @@ public class ScopingReportStep extends CompoundStep {
 	public static final String ITEM_MT = "ITEM_MT";
 	public static final String ITEM_CONCORDANCE = "ITEM_CONCORDANCE";
 	public static final String ITEM_NOMATCH = "ITEM_NOMATCH";
-	
-	
+		
 	private static final String DEFAULT_TEMPLATE = "scoping_report.html";
 	private final Logger logger = Logger.getLogger(getClass().getName());
 	
