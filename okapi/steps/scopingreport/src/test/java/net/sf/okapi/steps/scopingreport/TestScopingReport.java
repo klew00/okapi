@@ -378,7 +378,7 @@ public class TestScopingReport {
 		srs.handleEvent(edEvent);
 		srs.handleEvent(eiEvent);
 		srs.handleEvent(ebEvent);
-		
+				
 		logger.fine(TextUnitLogger.getTuInfo(tu1, LocaleId.ENGLISH));
 		logger.fine(TextUnitLogger.getTuInfo(tu2, LocaleId.ENGLISH));
 		logger.fine(TextUnitLogger.getTuInfo(tu3, LocaleId.ENGLISH));
