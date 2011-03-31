@@ -370,12 +370,9 @@ public class TestScopingReport {
 		logger.fine(TextUnitLogger.getTuInfo(tu2, LocaleId.ENGLISH));
 		logger.fine(TextUnitLogger.getTuInfo(tu3, LocaleId.ENGLISH));
 		logger.fine(TextUnitLogger.getTuInfo(tu4, LocaleId.ENGLISH));
-//		
-//		assertEquals(3, BaseCounter.getCount(tu, GMX.ExactMatchedWordCount));
 		
-//		FileCompare fc = new FileCompare();		
-//		assertTrue(fc.filesExactlyTheSame(outputFilePath, goldFilePath));
-
+		FileCompare fc = new FileCompare();		
+		assertTrue(fc.filesExactlyTheSame(outputFilePath, goldFilePath));
 	}	
 }
 

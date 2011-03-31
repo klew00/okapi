@@ -267,7 +267,7 @@ public class ScopingReportStep extends CompoundStep {
 		if (res != null) {
 			gen.setField(PROJECT_TOTAL_WORD_COUNT, BaseCounter.getCount(res, GMX.TotalWordCount));			
 			long trCount = countTranslatable(res);
-			gen.setField(PROJECT_NONTRANSLATABLE_WORD_COUNT, BaseCounter.getCount(res, GMX.TotalWordCount) - trCount);
+			gen.setField(PROJECT_NONTRANSLATABLE_WORD_COUNT, Math.max(0, BaseCounter.getCount(res, GMX.TotalWordCount) - trCount));
 			gen.setField(PROJECT_TRANSLATABLE_WORD_COUNT, trCount);
 			
 			gen.setField(PROJECT_GMX_PROTECTED_WORD_COUNT, BaseCounter.getCount(res, GMX.ProtectedWordCount));
@@ -354,7 +354,7 @@ public class ScopingReportStep extends CompoundStep {
 		if (params.isCountAsTranslatable_MT()) count += BaseCounter.getCount(res, MatchType.MT.name());
 		if (params.isCountAsTranslatable_Concordance()) count += BaseCounter.getCount(res, MatchType.CONCORDANCE.name());
 		
-		return count;
+		return count > 0 ? count : 0; // Negative values are not allowed
 	}
 
 	protected long countCategories(IResource res, boolean countOkapiCategories, boolean countGMXCategories) {
@@ -391,7 +391,7 @@ public class ScopingReportStep extends CompoundStep {
 			count += BaseCounter.getCount(res, MatchType.CONCORDANCE.name());
 		}
 				
-		return count;
+		return count > 0 ? count : 0; // Negative values are not allowed
 	}
 	
 	// To be overridden in subclasses
@@ -408,7 +408,7 @@ public class ScopingReportStep extends CompoundStep {
 		if (res != null) {
 			gen.setField(ITEM_TOTAL_WORD_COUNT, BaseCounter.getCount(res, GMX.TotalWordCount));
 			long trCount = countTranslatable(res);
-			gen.setField(ITEM_NONTRANSLATABLE_WORD_COUNT, BaseCounter.getCount(res, GMX.TotalWordCount) - trCount);
+			gen.setField(ITEM_NONTRANSLATABLE_WORD_COUNT, Math.max(0, BaseCounter.getCount(res, GMX.TotalWordCount) - trCount));
 			gen.setField(ITEM_TRANSLATABLE_WORD_COUNT, trCount);
 			
 			gen.setField(ITEM_GMX_PROTECTED_WORD_COUNT, BaseCounter.getCount(res, GMX.ProtectedWordCount));
