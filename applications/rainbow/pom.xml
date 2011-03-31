@@ -318,11 +318,6 @@
 		</dependency>
 		<dependency>
 			<groupId>net.sf.okapi.steps</groupId>
-			<artifactId>okapi-step-wordcount-ui</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sf.okapi.steps</groupId>
 			<artifactId>okapi-step-uriconversion-ui</artifactId>
 			<version>${project.version}</version>
 		</dependency>
