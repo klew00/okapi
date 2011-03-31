@@ -299,7 +299,7 @@ public class ScopingReportStep extends CompoundStep {
 			gen.setField(PROJECT_CONCORDANCE, BaseCounter.getCount(res, MatchType.CONCORDANCE.name()));
 			gen.setField(PROJECT_NOMATCH, countCategories(res, true, false));
 			
-			setEndBatchFields(gen, res);
+			setProjectFields(gen, res);
 		}		
 		// Generate report
 		String report = gen.generate();
@@ -395,21 +395,13 @@ public class ScopingReportStep extends CompoundStep {
 	}
 	
 	// To be overridden in subclasses
-	protected void setEndBatchFields(ReportGenerator gen, IResource res) {
+	protected void setProjectFields(ReportGenerator gen, IResource res) {
 	}
 	
 	// To be overridden in subclasses
-	protected void setEndBatchItemFields(ReportGenerator gen, IResource res) {
+	protected void setItemFields(ReportGenerator gen, IResource res) {
 	}
 	
-	// To be overridden in subclasses
-	protected void setStartDocumentFields(ReportGenerator gen, IResource res) {
-	}
-	
-	// To be overridden in subclasses
-	protected void setEndDocumentFields(ReportGenerator gen, IResource res) {
-	}
-
 	@Override
 	protected Event handleEndBatchItem(Event event) {
 		IResource res = event.getResource();
@@ -448,7 +440,7 @@ public class ScopingReportStep extends CompoundStep {
 			gen.setField(ITEM_CONCORDANCE, BaseCounter.getCount(res, MatchType.CONCORDANCE.name()));
 			gen.setField(ITEM_NOMATCH, countCategories(res, true, false));
 			
-			setEndBatchItemFields(gen, res);
+			setItemFields(gen, res);
 		}			
 		
 		return super.handleEndBatchItem(event);
@@ -463,7 +455,7 @@ public class ScopingReportStep extends CompoundStep {
 			String fname = sd.getName();
 			gen.setField(ITEM_NAME, new File(fname).getAbsolutePath());
 			
-			setStartDocumentFields(gen, sd);
+			setItemFields(gen, sd);
 		}		
 		return ev;
 	}
@@ -474,7 +466,7 @@ public class ScopingReportStep extends CompoundStep {
 		gen.setField(ITEM_SOURCE_LOCALE, getSourceLocale().toString());
 		gen.setField(ITEM_TARGET_LOCALE, getTargetLocale().toString());
 		
-		setEndDocumentFields(gen, event.getResource());		
+		setItemFields(gen, event.getResource());		
 		
 		return super.handleEndDocument(event);
 	}
