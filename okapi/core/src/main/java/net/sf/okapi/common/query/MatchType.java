@@ -60,14 +60,14 @@ public enum MatchType {
 	EXACT,
 
 	/**
-	 * EXACT_TEXT_ONLY and comes from a previous version of the same document
-	 */
-	EXACT_TEXT_ONLY_PREVIOUS_VERSION,
-
-	/**
 	 * EXACT_TEXT_ONLY and matches with a unique id
 	 */
 	EXACT_TEXT_ONLY_UNIQUE_ID,
+	
+	/**
+	 * EXACT_TEXT_ONLY and comes from a previous version of the same document
+	 */
+	EXACT_TEXT_ONLY_PREVIOUS_VERSION,
 	
 	/**
 	 * Matches text exactly, but there is a difference in one or more codes and/or whitespace
@@ -82,14 +82,14 @@ public enum MatchType {
 	EXACT_REPAIRED,
 
 	/**
-	 * FUZZY and comes from a previous version of the same document
-	 */
-	FUZZY_PREVIOUS_VERSION,
-	
-	/**
 	 * Matches FUZZY with a unique id
 	 */
 	FUZZY_UNIQUE_ID,
+	
+	/**
+	 * FUZZY and comes from a previous version of the same document
+	 */
+	FUZZY_PREVIOUS_VERSION,
 	
 	/**
 	 * Matches both text and/or codes partially.
