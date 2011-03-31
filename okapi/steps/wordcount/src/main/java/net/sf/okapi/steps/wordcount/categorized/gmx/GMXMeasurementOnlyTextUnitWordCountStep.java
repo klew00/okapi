@@ -1,9 +1,11 @@
 package net.sf.okapi.steps.wordcount.categorized.gmx;
 
+import net.sf.okapi.steps.wordcount.categorized.CategoryGroup;
+import net.sf.okapi.steps.wordcount.categorized.CategoryHandler;
 import net.sf.okapi.steps.wordcount.common.GMX;
 import net.sf.okapi.steps.wordcount.common.TokenCountStep;
 
-public class GMXMeasurementOnlyTextUnitWordCountStep extends TokenCountStep {
+public class GMXMeasurementOnlyTextUnitWordCountStep extends TokenCountStep implements CategoryHandler {
 
 	public static final String METRIC = GMX.MeasurementOnlyTextUnitWordCount;
 	
@@ -24,7 +26,7 @@ public class GMXMeasurementOnlyTextUnitWordCountStep extends TokenCountStep {
 	}
 
 	@Override
-	protected String getMetric() {
+	public String getMetric() {
 		return METRIC;
 	}
 
@@ -33,4 +35,8 @@ public class GMXMeasurementOnlyTextUnitWordCountStep extends TokenCountStep {
 		return true;
 	}
 
+	@Override
+	public CategoryGroup getCategoryGroup() {
+		return CategoryGroup.GMX_WORD_COUNTS;
+	}
 }

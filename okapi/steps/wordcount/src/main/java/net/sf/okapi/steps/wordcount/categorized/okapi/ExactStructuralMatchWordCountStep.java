@@ -21,14 +21,16 @@
 package net.sf.okapi.steps.wordcount.categorized.okapi;
 
 import net.sf.okapi.common.query.MatchType;
+import net.sf.okapi.steps.wordcount.categorized.CategoryGroup;
+import net.sf.okapi.steps.wordcount.categorized.CategoryHandler;
 import net.sf.okapi.steps.wordcount.common.AltAnnotationBasedCountStep;
 
-public class ExactStructuralMatchWordCountStep extends AltAnnotationBasedCountStep {
+public class ExactStructuralMatchWordCountStep extends AltAnnotationBasedCountStep implements CategoryHandler {
 	
 	public static final String METRIC = MatchType.EXACT_STRUCTURAL.name(); 
 
 	@Override
-	protected String getMetric() {
+	public String getMetric() {
 		return METRIC;
 	}
 
@@ -46,5 +48,10 @@ public class ExactStructuralMatchWordCountStep extends AltAnnotationBasedCountSt
 	@Override
 	protected boolean accept(MatchType type) {
 		return type == MatchType.EXACT_STRUCTURAL;
+	}
+
+	@Override
+	public CategoryGroup getCategoryGroup() {
+		return CategoryGroup.OKAPI_WORD_COUNTS;
 	}
 }

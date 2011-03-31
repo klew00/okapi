@@ -21,15 +21,17 @@
 package net.sf.okapi.steps.wordcount.categorized.gmx;
 
 import net.sf.okapi.common.query.MatchType;
+import net.sf.okapi.steps.wordcount.categorized.CategoryGroup;
+import net.sf.okapi.steps.wordcount.categorized.CategoryHandler;
 import net.sf.okapi.steps.wordcount.common.AltAnnotationBasedCountStep;
 import net.sf.okapi.steps.wordcount.common.GMX;
 
-public class GMXLeveragedMatchedWordCountStep extends AltAnnotationBasedCountStep {
+public class GMXLeveragedMatchedWordCountStep extends AltAnnotationBasedCountStep implements CategoryHandler {
 
 	public static final String METRIC = GMX.LeveragedMatchedWordCount; 
 		
 	@Override
-	protected String getMetric() {
+	public String getMetric() {
 		return METRIC;
 	}
 
@@ -50,5 +52,10 @@ public class GMXLeveragedMatchedWordCountStep extends AltAnnotationBasedCountSte
 				type == MatchType.EXACT_DOCUMENT_CONTEXT ||
 				type == MatchType.EXACT_STRUCTURAL ||
 				type == MatchType.EXACT);
+	}
+
+	@Override
+	public CategoryGroup getCategoryGroup() {
+		return CategoryGroup.GMX_WORD_COUNTS;
 	}
 }

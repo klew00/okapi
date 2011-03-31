@@ -21,6 +21,8 @@
 package net.sf.okapi.steps.wordcount.categorized.gmx;
 
 import net.sf.okapi.common.query.MatchType;
+import net.sf.okapi.steps.wordcount.categorized.CategoryGroup;
+import net.sf.okapi.steps.wordcount.categorized.CategoryHandler;
 import net.sf.okapi.steps.wordcount.common.AltAnnotationBasedCountStep;
 import net.sf.okapi.steps.wordcount.common.GMX;
 
@@ -28,12 +30,12 @@ import net.sf.okapi.steps.wordcount.common.GMX;
  * M11: No step provides the metrics yet. 
  *
  */
-public class GMXRepetitionMatchedWordCountStep extends AltAnnotationBasedCountStep {
+public class GMXRepetitionMatchedWordCountStep extends AltAnnotationBasedCountStep implements CategoryHandler {
 
 	public static final String METRIC = GMX.RepetitionMatchedWordCount; 
 		
 	@Override
-	protected String getMetric() {
+	public String getMetric() {
 		return METRIC;
 	}
 
@@ -66,4 +68,9 @@ public class GMXRepetitionMatchedWordCountStep extends AltAnnotationBasedCountSt
 //				BaseCounter.getCount(textContainer, GMX.LeveragedMatchedWordCount)); 
 //		return res > 0 ? res : 0;
 //	}
+
+	@Override
+	public CategoryGroup getCategoryGroup() {
+		return CategoryGroup.GMX_WORD_COUNTS;
+	}
 }

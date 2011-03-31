@@ -6,10 +6,12 @@ import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.steps.wordcount.WordCounter;
+import net.sf.okapi.steps.wordcount.categorized.CategoryGroup;
+import net.sf.okapi.steps.wordcount.categorized.CategoryHandler;
 import net.sf.okapi.steps.wordcount.common.BaseCountStep;
 import net.sf.okapi.steps.wordcount.common.GMX;
 
-public class GMXProtectedWordCountStep extends BaseCountStep {
+public class GMXProtectedWordCountStep extends BaseCountStep implements CategoryHandler {
 	
 	public static final String METRIC = GMX.ProtectedWordCount;
 	
@@ -26,7 +28,7 @@ public class GMXProtectedWordCountStep extends BaseCountStep {
 	}
 
 	@Override
-	protected String getMetric() {
+	public String getMetric() {
 		return METRIC;
 	}
 
@@ -97,4 +99,8 @@ public class GMXProtectedWordCountStep extends BaseCountStep {
 		return false;
 	}
 
+	@Override
+	public CategoryGroup getCategoryGroup() {
+		return CategoryGroup.GMX_WORD_COUNTS;
+	}
 }

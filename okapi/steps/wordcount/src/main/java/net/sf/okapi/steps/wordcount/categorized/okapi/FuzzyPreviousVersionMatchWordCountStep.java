@@ -21,14 +21,16 @@
 package net.sf.okapi.steps.wordcount.categorized.okapi;
 
 import net.sf.okapi.common.query.MatchType;
+import net.sf.okapi.steps.wordcount.categorized.CategoryGroup;
+import net.sf.okapi.steps.wordcount.categorized.CategoryHandler;
 import net.sf.okapi.steps.wordcount.common.AltAnnotationBasedCountStep;
 
-public class FuzzyPreviousVersionMatchWordCountStep extends AltAnnotationBasedCountStep {
+public class FuzzyPreviousVersionMatchWordCountStep extends AltAnnotationBasedCountStep implements CategoryHandler {
 
 	public static final String METRIC = MatchType.FUZZY_PREVIOUS_VERSION.name(); 
 		
 	@Override
-	protected String getMetric() {
+	public String getMetric() {
 		return METRIC;
 	}
 
@@ -46,5 +48,10 @@ public class FuzzyPreviousVersionMatchWordCountStep extends AltAnnotationBasedCo
 	@Override
 	protected boolean accept(MatchType type) {
 		return type == MatchType.FUZZY_PREVIOUS_VERSION;
+	}
+
+	@Override
+	public CategoryGroup getCategoryGroup() {
+		return CategoryGroup.OKAPI_WORD_COUNTS;
 	}
 }

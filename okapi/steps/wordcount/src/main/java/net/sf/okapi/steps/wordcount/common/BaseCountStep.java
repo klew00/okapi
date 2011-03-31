@@ -75,7 +75,7 @@ public abstract class BaseCountStep extends AbstractPipelineStep {
 	//-------------------------
 	abstract public String getName();
 	abstract public String getDescription();
-	abstract protected String getMetric();
+	abstract public String getMetric();
 	abstract protected long count(TextContainer textContainer, LocaleId locale);
 	abstract protected long count(Segment segment, LocaleId locale);
 	abstract protected long countInTextUnit(TextUnit textUnit);

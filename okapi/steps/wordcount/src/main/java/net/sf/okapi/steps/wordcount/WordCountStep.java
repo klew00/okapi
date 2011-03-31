@@ -39,7 +39,7 @@ public class WordCountStep extends TokenCountStep {
 	public static final String METRIC = GMX.TotalWordCount; 
 	
 	@Override
-	protected String getMetric() {
+	public String getMetric() {
 		return METRIC;
 	}
 

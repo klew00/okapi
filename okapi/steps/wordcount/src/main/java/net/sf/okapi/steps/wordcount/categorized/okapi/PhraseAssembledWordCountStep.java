@@ -21,18 +21,20 @@
 package net.sf.okapi.steps.wordcount.categorized.okapi;
 
 import net.sf.okapi.common.query.MatchType;
+import net.sf.okapi.steps.wordcount.categorized.CategoryGroup;
+import net.sf.okapi.steps.wordcount.categorized.CategoryHandler;
 import net.sf.okapi.steps.wordcount.common.AltAnnotationBasedCountStep;
 
 /**
  * M11: No step provides the metrics yet. 
  *
  */
-public class PhraseAssembledWordCountStep extends AltAnnotationBasedCountStep {
+public class PhraseAssembledWordCountStep extends AltAnnotationBasedCountStep implements CategoryHandler {
 	
 	public static final String METRIC = MatchType.PHRASE_ASSEMBLED.name(); 
 
 	@Override
-	protected String getMetric() {
+	public String getMetric() {
 		return METRIC;
 	}
 
@@ -50,5 +52,10 @@ public class PhraseAssembledWordCountStep extends AltAnnotationBasedCountStep {
 	@Override
 	protected boolean accept(MatchType type) {
 		return type == MatchType.PHRASE_ASSEMBLED;
+	}
+
+	@Override
+	public CategoryGroup getCategoryGroup() {
+		return CategoryGroup.OKAPI_WORD_COUNTS;
 	}
 }
