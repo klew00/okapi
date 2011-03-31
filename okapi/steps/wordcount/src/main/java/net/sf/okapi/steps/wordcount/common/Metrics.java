@@ -20,6 +20,7 @@
 
 package net.sf.okapi.steps.wordcount.common;
 
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 
@@ -31,8 +32,10 @@ import net.sf.okapi.common.Util;
  * @version 0.1 07.07.2009
  */
 
-public class Metrics implements Iterable<String> {
-
+public class Metrics extends HashSet<String> {
+	
+	private static final long serialVersionUID = 4568824618144120407L;
+	
 	private Hashtable <String, Long> metrics;
 	
 	public Metrics() {		

@@ -1,7 +1,7 @@
 package net.sf.okapi.steps.wordcount.categorized;
 
 import java.util.LinkedList;
-
+import java.util.List;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.resource.Segment;
@@ -12,8 +12,8 @@ import net.sf.okapi.steps.wordcount.common.MetricsAnnotation;
 
 public class CategoryResolver {
 
-	private LinkedList<String> gmxCategories = new LinkedList<String>();
-	private LinkedList<String> okapiCategories = new LinkedList<String>();
+	private List<String> gmxCategories = new LinkedList<String>(); // Original sequence is preserved by LinkedList
+	private List<String> okapiCategories = new LinkedList<String>();
 		
 	public CategoryResolver(LinkedList<IPipelineStep> steps) {
 		super();
@@ -35,14 +35,21 @@ public class CategoryResolver {
 	}
 
 	public void resolve(Metrics metrics) {
-		for (String metric : metrics) {
+		// Can't do it on metrics directly for concurrency reasons
+		List<String> m = new LinkedList<String>(metrics);
+		
+		
+		// Reread metrics as new translated metrics might've been added
+		m = new LinkedList<String>(metrics);
+		
+		for (String metric : m) {
 			// Remove all metrics lower ranked
 			int index = gmxCategories.indexOf(metric);			
 			if (index > -1) {
 				for (int i = index + 1; i < gmxCategories.size(); i++) {
 					metrics.unregisterMetric(gmxCategories.get(i));
 				}
-				return;
+				continue;
 			}
 			
 			// Remove all metrics lower ranked
@@ -51,7 +58,7 @@ public class CategoryResolver {
 				for (int i = index + 1; i < okapiCategories.size(); i++) {
 					metrics.unregisterMetric(okapiCategories.get(i));
 				}
-			}
+			}			
 		}
 	}
 	
