@@ -51,72 +51,17 @@ public class AlignedSegments implements IAlignedSegments {
     }
 
     @Override
-    public void append (Segment srcSeg,
-                        Segment trgSeg,
-                        LocaleId trgLoc,
-                        EnumSet<VariantOptions> variantOptions,
-                        EnumSet<CopyOptions> copyOptions) {
+    public void append(Segment srcSeg,
+                       Segment trgSeg,
+                       LocaleId trgLoc,
+                       EnumSet<VariantOptions> variantOptions,
+                       EnumSet<CopyOptions> copyOptions) {
 
         if (srcSeg == null && trgSeg == null)
             throw new IllegalArgumentException("srcSeg and trgSeg cannot both be null");
 
-        Segment sourceSeg = (srcSeg != null ? srcSeg : trgSeg.clone());
-        Segment targetSeg = (trgSeg != null ? trgSeg : srcSeg.clone());
-
-        Segment copySeg = sourceSeg.clone();
-        Segment tempSeg;
-        
-        //make sure ids match
-        targetSeg.id = sourceSeg.id;
-
-        if (hasMultipleTargets(trgLoc)) {
-            if (variantOptions.contains(CANCEL_IF_MULTIPLE_TARGETS))
-                return;
-            if (variantOptions.contains(CREATE_VARIANT_IF_MULTIPLE_TARGETS))
-                myParent.getVariantSources().create(trgLoc, false, COPY_ALL);
-        }
-
-        if (variantOptions.contains(MODIFY_SOURCE)) {
-            if ( !copyOptions.contains(COPY_TO_SOURCE) )
-                sourceSeg.getContent().clear();
-            getSource(trgLoc).getSegments().append(sourceSeg); //using actual source segment (not a copy)
-        }
-
-        if (variantOptions.contains(MODIFY_TARGET)) {
-            if ( !copyOptions.contains(COPY_TO_TARGET))
-                targetSeg.getContent().clear();
-            myParent.getTarget_DIFF(trgLoc).getSegments().append(targetSeg); //using actual target segment
-        }
-
-        tempSeg = copySeg.clone();
-        if ( variantOptions.contains(MODIFY_TARGETS_WITH_SAME_SOURCE) ) {
-            if ( !copyOptions.contains(COPY_TO_TARGETS_WITH_SAME_SOURCE))
-                tempSeg.getContent().clear();
-            for ( TextContainer targ : getSameSourceTargets(trgLoc) )
-                targ.getSegments().append(tempSeg.clone());
-        }
-
-        tempSeg = copySeg.clone();
-        if ( variantOptions.contains(MODIFY_VARIANT_SOURCES)) {
-            if ( !copyOptions.contains(COPY_TO_VARIANT_SOURCES))
-                tempSeg.getContent().clear();
-            for (TextContainer variant : getOtherSources(trgLoc)) {
-                variant.getSegments().append(tempSeg.clone());
-            }
-        }
-
-        tempSeg = copySeg.clone();
-        if ( variantOptions.contains(MODIFY_TARGETS_OF_VARIANT_SOURCES)) {
-            if ( !copyOptions.contains(COPY_TO_TARGETS_OF_VARIANT_SOURCES))
-                tempSeg.getContent().clear();
-            for (TextContainer variantTarg : getTargetsOfOtherSources(trgLoc)) {
-                variantTarg.getSegments().append(tempSeg.clone());
-            }
-        }
-
+        insertOrAppend(true, -1, srcSeg, trgSeg, trgLoc, variantOptions, copyOptions);
     }
-
-
 
     @Override
     public void insert (int index,
@@ -129,115 +74,127 @@ public class AlignedSegments implements IAlignedSegments {
         if (srcSeg == null)
             throw new IllegalArgumentException("srcSeg cannot be null");
 
+        insertOrAppend(false, index, srcSeg, trgSeg, trgLoc, variantOptions, copyOptions);
+    }
+
+    private void insertOrAppend(boolean append,
+                                int index,
+                                Segment srcSeg,
+                                Segment trgSeg,
+                                LocaleId trgLoc,
+                                EnumSet<VariantOptions> variantOptions,
+                                EnumSet<CopyOptions> copyOptions) {
+        
+        //calling methods handle exceptions
+
         Segment sourceSeg = (srcSeg != null ? srcSeg : trgSeg.clone());
         Segment targetSeg = (trgSeg != null ? trgSeg : srcSeg.clone());
 
         Segment copySeg = sourceSeg.clone(); //copy of original source seg that will not be changed
         Segment tempSeg;
-        Segment currentSeg;
-        Segment newSeg;
-        
-        ISegments segs;
-        
-        String originalId;
-        String insertedId = "";
-        boolean inserted = false; //used to decide whether to set or get insertedId
 
-        if (hasMultipleTargets(trgLoc)) {
-            if (variantOptions.contains(CANCEL_IF_MULTIPLE_TARGETS))
-                return;
-            if (variantOptions.contains(CREATE_VARIANT_IF_MULTIPLE_TARGETS))
-                myParent.getVariantSources().create(trgLoc, false, COPY_ALL);
-        }
+        String originalId = null;
+        String insertedId = null;
 
-        segs = getSource(trgLoc).getSegments();
-        originalId = segs.get(index).id; //used to locate equivalent location in other sources/targets
+        if (append)
+            targetSeg.id = sourceSeg.id; //make sure ids match
+        else
+            originalId = getSource(trgLoc).getSegments().get(index).id; //get id at insertion location
+
+        if (!continueWithOperation(trgLoc, variantOptions)) return;
 
         if (variantOptions.contains(MODIFY_SOURCE)) {
             if ( !copyOptions.contains(COPY_TO_SOURCE) )
                 sourceSeg.getContent().clear();
-
-            segs.insert(index, sourceSeg);
-            insertedId = sourceSeg.id; // Get validated id
-            inserted = true;
+            if (append)
+                getSource(trgLoc).append(sourceSeg);
+            else
+                insertedId = doInsert(getSource(trgLoc), index, null, null, sourceSeg);
         }
 
         if (variantOptions.contains(MODIFY_TARGET)) {
             if ( !copyOptions.contains(COPY_TO_TARGET))
                 targetSeg.getContent().clear();
-
-            segs = myParent.getTarget_DIFF(trgLoc).getSegments();
-            currentSeg = segs.get(originalId);
-            if (currentSeg != null) {
-                segs.insert(segs.getIndex(originalId), targetSeg);
-                if (inserted)
-                    targetSeg.id = insertedId;
-                else
-                    insertedId = targetSeg.id;
-                inserted = true;
-            } else
-                segs.append(targetSeg);
+            if (append)
+                myParent.getTarget_DIFF(trgLoc).getSegments().append(targetSeg); //using actual target segment
+            else
+                insertedId = doInsert(myParent.getTarget_DIFF(trgLoc), index, originalId, insertedId, targetSeg);
         }
 
         tempSeg = copySeg.clone();
         if ( variantOptions.contains(MODIFY_TARGETS_WITH_SAME_SOURCE) ) {
             if ( !copyOptions.contains(COPY_TO_TARGETS_WITH_SAME_SOURCE))
                 tempSeg.getContent().clear();
-            for ( TextContainer targ : getSameSourceTargets(trgLoc) ) {
-                segs = targ.getSegments();
-                currentSeg = segs.get(originalId);
-                newSeg = tempSeg.clone();
-                if (currentSeg != null) {
-                    segs.insert(segs.getIndex(originalId), newSeg);
-                    if (inserted)
-                        newSeg.id = insertedId;
-                    else
-                        insertedId = newSeg.id;
-                    inserted = true;
-                } else
-                    segs.append(newSeg);
-            }
+            for ( TextContainer container : getSameSourceTargets(trgLoc) )
+                if (append)
+                    container.getSegments().append(tempSeg.clone());
+                else
+                    insertedId = doInsert(container, index, originalId, insertedId, tempSeg.clone());
         }
 
         tempSeg = copySeg.clone();
         if ( variantOptions.contains(MODIFY_VARIANT_SOURCES)) {
             if ( !copyOptions.contains(COPY_TO_VARIANT_SOURCES))
                 tempSeg.getContent().clear();
-            for (TextContainer variant : getOtherSources(trgLoc)) {
-                segs = variant.getSegments();
-                currentSeg = segs.get(originalId);
-                newSeg = tempSeg.clone();
-                if (currentSeg != null) {
-                    segs.insert(segs.getIndex(originalId), newSeg);
-                    if (inserted)
-                        newSeg.id = insertedId;
-                    else
-                        insertedId = newSeg.id;
-                    inserted = true;
-                } else
-                    segs.append(newSeg);
-            }
+            for (TextContainer container : getOtherSources(trgLoc))
+                if (append)
+                    container.getSegments().append(tempSeg.clone());
+                else
+                    insertedId = doInsert(container, index, originalId, insertedId, tempSeg.clone());
         }
 
         tempSeg = copySeg.clone();
         if ( variantOptions.contains(MODIFY_TARGETS_OF_VARIANT_SOURCES)) {
             if ( !copyOptions.contains(COPY_TO_TARGETS_OF_VARIANT_SOURCES))
                 tempSeg.getContent().clear();
-            for (TextContainer variantTarg : getTargetsOfOtherSources(trgLoc)) {
-                segs = variantTarg.getSegments();
-                currentSeg = segs.get(originalId);
-                newSeg = tempSeg.clone();
-                if (currentSeg != null) {
-                    segs.insert(segs.getIndex(originalId), newSeg);
-                    if (inserted)
-                        newSeg.id = insertedId;
-                    else
-                        insertedId = newSeg.id;
-                    inserted = true;
-                } else
-                    segs.append(newSeg);
-            }
+            for (TextContainer container : getTargetsOfOtherSources(trgLoc))
+                if (append)
+                    container.getSegments().append(tempSeg.clone());
+                else
+                    insertedId = doInsert(container, index, originalId, insertedId, tempSeg.clone());
         }
+    }
+
+    /* indicates whether to continue based on variant options and source structure
+     * also creates a variant source if required
+     */
+    private boolean continueWithOperation(LocaleId trgLoc,
+                                          EnumSet<VariantOptions> variantOptions) {
+        if (hasMultipleTargets(trgLoc)) {
+            if (variantOptions.contains(CANCEL_IF_MULTIPLE_TARGETS))
+                return false;
+            if (variantOptions.contains(CREATE_VARIANT_IF_MULTIPLE_TARGETS))
+                myParent.getVariantSources().create(trgLoc, false, COPY_ALL);
+        }
+        return true;
+    }
+
+    /*
+     * @param originalId use null for source of target locale
+     * @param insertedId use null if a new inserted id is needed
+     * @returns null id or inserted id
+     */
+    private String doInsert(TextContainer container, int index, String originalId, String insertedId, Segment seg) {
+        ISegments segs = container.getSegments();
+        Segment currentSeg;
+
+        //handle source for target locale
+        if (originalId == null) {
+            //must be the first source
+            segs.insert(index, seg);
+            return seg.id; //return validated Id
+        }
+        //handle insertion for any other container
+        currentSeg = segs.get(originalId);
+        if (currentSeg != null) {
+            segs.insert(segs.getIndex(originalId), seg);
+            if (insertedId != null)
+                seg.id = insertedId;
+            return seg.id;
+        }
+        //append if unable to insert
+        segs.append(seg);
+        return insertedId; //return the most up-to-date insertedId
     }
 
     @Override
@@ -247,12 +204,7 @@ public class AlignedSegments implements IAlignedSegments {
                            EnumSet<VariantOptions> variantOptions,
                            EnumSet<VariantOptions> idUpdateOptions) {
         
-        if (hasMultipleTargets(trgLoc)) {
-            if (variantOptions.contains(CANCEL_IF_MULTIPLE_TARGETS))
-                return;
-            if (variantOptions.contains(CREATE_VARIANT_IF_MULTIPLE_TARGETS))
-                myParent.getVariantSources().create(trgLoc, false, COPY_ALL);
-        }
+        if (!continueWithOperation(trgLoc, variantOptions)) return;
         
         ISegments segs = getSource(trgLoc).getSegments();
         String oldId = segs.get(index).id;
@@ -262,9 +214,8 @@ public class AlignedSegments implements IAlignedSegments {
 
         Segment tempSeg;
 
-        if (variantOptions.contains(MODIFY_SOURCE)) {
+        if (variantOptions.contains(MODIFY_SOURCE))
             segs.set(theIndex, seg.clone());
-        }
         
         if (variantOptions.contains(MODIFY_TARGET)) {
             segs = myParent.getTarget_DIFF(trgLoc).getSegments();
@@ -272,29 +223,26 @@ public class AlignedSegments implements IAlignedSegments {
             segs.set(segs.getIndex(oldId), tempSeg);
         }
         
-        if ( variantOptions.contains(MODIFY_TARGETS_WITH_SAME_SOURCE) ) {
+        if ( variantOptions.contains(MODIFY_TARGETS_WITH_SAME_SOURCE) )
             for ( TextContainer targ : getSameSourceTargets(trgLoc) ) {
                 segs = targ.getSegments();
                 tempSeg = seg.clone();
                 segs.set(segs.getIndex(oldId), tempSeg);
             }
-        }
 
-        if ( variantOptions.contains(MODIFY_VARIANT_SOURCES)) {
+        if ( variantOptions.contains(MODIFY_VARIANT_SOURCES))
             for ( TextContainer targ : getOtherSources(trgLoc) ) {
                 segs = targ.getSegments();
                 tempSeg = seg.clone();
                 segs.set(segs.getIndex(oldId), tempSeg);
             }
-        }
 
-        if ( variantOptions.contains(MODIFY_TARGETS_OF_VARIANT_SOURCES)) {
+        if ( variantOptions.contains(MODIFY_TARGETS_OF_VARIANT_SOURCES))
             for ( TextContainer targ : getTargetsOfOtherSources(trgLoc) ) {
                 segs = targ.getSegments();
                 tempSeg = seg.clone();
                 segs.set(segs.getIndex(oldId), tempSeg);
             }
-        }
 
         //update the ids
         if (idChanged) {
@@ -302,30 +250,25 @@ public class AlignedSegments implements IAlignedSegments {
                 tempSeg = getSource(trgLoc).getSegments().get(oldId);
                 if (tempSeg != null) tempSeg.id = newId;
             }
-
             if (idUpdateOptions.contains(MODIFY_TARGET)) {
                 tempSeg = myParent.getTarget_DIFF(trgLoc).getSegments().get(oldId);
                 if (tempSeg != null) tempSeg.id = newId;
             }
-
-            if (idUpdateOptions.contains(MODIFY_TARGETS_WITH_SAME_SOURCE)) {
+            if (idUpdateOptions.contains(MODIFY_TARGETS_WITH_SAME_SOURCE))
                 for ( TextContainer targ : getSameSourceTargets(trgLoc) ) {
                     tempSeg = targ.getSegments().get(oldId);
                     if (tempSeg != null) tempSeg.id = newId;
                 }
-            }
-            if (idUpdateOptions.contains(MODIFY_VARIANT_SOURCES)) {
+            if (idUpdateOptions.contains(MODIFY_VARIANT_SOURCES))
                 for ( TextContainer targ : getOtherSources(trgLoc) ) {
                     tempSeg = targ.getSegments().get(oldId);
                     if (tempSeg != null) tempSeg.id = newId;
                 }
-            }
-            if (idUpdateOptions.contains(MODIFY_TARGETS_OF_VARIANT_SOURCES)) {
+            if (idUpdateOptions.contains(MODIFY_TARGETS_OF_VARIANT_SOURCES))
                 for ( TextContainer targ : getTargetsOfOtherSources(trgLoc) ) {
                     tempSeg = targ.getSegments().get(oldId);
                     if (tempSeg != null) tempSeg.id = newId;
                 }
-            }
         }
     }
 
@@ -334,65 +277,34 @@ public class AlignedSegments implements IAlignedSegments {
                           LocaleId trgLoc,
                           EnumSet<VariantOptions> variantOptions) {
         int count = 0;
-        String segId = seg.id;
-        TextContainer container;
-        ISegments segs;
-        int segIndex;
 
-        if (variantOptions.contains(MODIFY_SOURCE)) {
-            container = getSource(trgLoc);
-            segs = container.getSegments();
-            segIndex = segs.getIndex(segId);
-            if (segIndex > -1) {
-                container.remove(segs.getPartIndex(segIndex));
-                count++;
-            }
-        }
-
-        if (variantOptions.contains(MODIFY_TARGET)) {
-            container = myParent.getTarget_DIFF(trgLoc);
-            segs = container.getSegments();
-            segIndex = segs.getIndex(segId);
-            if (segIndex > -1) {
-                container.remove(segs.getPartIndex(segIndex));
-                count++;
-            }
-        }
-
-        if ( variantOptions.contains(MODIFY_TARGETS_WITH_SAME_SOURCE) ) {
-            for ( TextContainer targ : getSameSourceTargets(trgLoc) ) {
-                segs = targ.getSegments();
-                segIndex = segs.getIndex(segId);
-                if (segIndex > -1) {
-                    targ.remove(segs.getPartIndex(segIndex));
-                    count++;
-                }
-            }
-        }
-
-        if ( variantOptions.contains(MODIFY_VARIANT_SOURCES)) {
-            for ( TextContainer targ : getOtherSources(trgLoc) ) {
-                segs = targ.getSegments();
-                segIndex = segs.getIndex(segId);
-                if (segIndex > -1) {
-                    targ.remove(segs.getPartIndex(segIndex));
-                    count++;
-                }
-            }
-        }
-
-        if ( variantOptions.contains(MODIFY_TARGETS_OF_VARIANT_SOURCES)) {
-            for ( TextContainer targ : getTargetsOfOtherSources(trgLoc) ) {
-                segs = targ.getSegments();
-                segIndex = segs.getIndex(segId);
-                if (segIndex > -1) {
-                    targ.remove(segs.getPartIndex(segIndex));
-                    count++;
-                }
-            }
-        }
-
+        if (variantOptions.contains(MODIFY_SOURCE))
+            count += removeSegment(getSource(trgLoc), seg.id);
+        if (variantOptions.contains(MODIFY_TARGET))
+            count += removeSegment(myParent.getTarget_DIFF(trgLoc), seg.id);
+        if ( variantOptions.contains(MODIFY_TARGETS_WITH_SAME_SOURCE) )
+            for ( TextContainer targ : getSameSourceTargets(trgLoc) )
+                count += removeSegment(targ, seg.id);
+        if ( variantOptions.contains(MODIFY_VARIANT_SOURCES))
+            for ( TextContainer targ : getOtherSources(trgLoc) )
+                count += removeSegment(targ, seg.id);
+        if ( variantOptions.contains(MODIFY_TARGETS_OF_VARIANT_SOURCES))
+            for ( TextContainer targ : getTargetsOfOtherSources(trgLoc) )
+                count += removeSegment(targ, seg.id);
         return (count > 0);
+    }
+
+    /* Removes a segment witht he given id from the given container. Returns
+     * 1 if a segment was removed, 0 otherwise.
+     */
+    private int removeSegment(TextContainer container, String segId) {
+        ISegments segs = container.getSegments();
+        int segIndex = segs.getIndex(segId);
+        if (segIndex > -1) {
+            container.remove(segs.getPartIndex(segIndex));
+            return 1;
+        }
+        return 0;
     }
 
     @Override
@@ -485,7 +397,6 @@ public class AlignedSegments implements IAlignedSegments {
                                  EnumSet<VariantOptions> variantOptions) {
         //TODO actually collapse first
 
-
         // these target segments are now aligned with their source counterparts
         myParent.getTarget_DIFF(trgLoc).getSegments().setAlignmentStatus(AlignmentStatus.ALIGNED);
     }
@@ -499,12 +410,7 @@ public class AlignedSegments implements IAlignedSegments {
                                EnumSet<VariantOptions> variantOptions,
                                EnumSet<CopyOptions> copyOptions) {
 
-        if (hasMultipleTargets(trgLoc)) {
-            if (variantOptions.contains(CANCEL_IF_MULTIPLE_TARGETS))
-                return null;
-            if (variantOptions.contains(CREATE_VARIANT_IF_MULTIPLE_TARGETS))
-                myParent.getVariantSources().create(trgLoc, false, COPY_ALL);
-        }
+        if (!continueWithOperation(trgLoc, variantOptions)) return null;
 
         TextContainer theSource = getSource(trgLoc);
         ISegments srcSegs = theSource.getSegments();
@@ -522,7 +428,6 @@ public class AlignedSegments implements IAlignedSegments {
         Segment currentSeg;
 
         //inserting new segments in all the places they go
-
         if (variantOptions.contains(MODIFY_TARGET)) {
             tempSeg = newSeg.clone();
             if ( !copyOptions.contains(COPY_TO_TARGET))
@@ -534,7 +439,6 @@ public class AlignedSegments implements IAlignedSegments {
                 currentSegs.insert(currentSegs.getIndex(srcSeg.id)+1, tempSeg);
             }
         }
-
         propagateChangesForSplit(newSeg, srcSeg.id, trgLoc, variantOptions, copyOptions);
 
         return newSeg;
@@ -557,9 +461,8 @@ public class AlignedSegments implements IAlignedSegments {
             for ( TextContainer targ : getSameSourceTargets(trgLoc) ) {
                 currentSegs = targ.getSegments();
                 currentSeg = currentSegs.get(segId);
-                if (currentSeg != null) {
+                if (currentSeg != null)
                     currentSegs.insert(currentSegs.getIndex(segId)+1, tempSeg.clone());
-                }
             }
         }
 
@@ -570,9 +473,8 @@ public class AlignedSegments implements IAlignedSegments {
             for (TextContainer variant : getOtherSources(trgLoc)) {
                 currentSegs = variant.getSegments();
                 currentSeg = currentSegs.get(segId);
-                if (currentSeg != null) {
+                if (currentSeg != null)
                     currentSegs.insert(currentSegs.getIndex(segId)+1, tempSeg.clone());
-                }
             }
         }
 
@@ -583,9 +485,8 @@ public class AlignedSegments implements IAlignedSegments {
             for (TextContainer variantTarg : getTargetsOfOtherSources(trgLoc)) {
                 currentSegs = variantTarg.getSegments();
                 currentSeg = currentSegs.get(segId);
-                if (currentSeg != null) {
+                if (currentSeg != null)
                     currentSegs.insert(currentSegs.getIndex(segId)+1, tempSeg.clone());
-                }
             }
         }
     }
@@ -599,12 +500,7 @@ public class AlignedSegments implements IAlignedSegments {
                                 EnumSet<VariantOptions> variantOptions,
                                 EnumSet<CopyOptions> copyOptions) {
 
-        if (hasMultipleTargets(trgLoc)) {
-            if (variantOptions.contains(CANCEL_IF_MULTIPLE_TARGETS))
-                return null;
-            if (variantOptions.contains(CREATE_VARIANT_IF_MULTIPLE_TARGETS))
-                myParent.getVariantSources().create(trgLoc, false, COPY_ALL);
-        }
+        if (!continueWithOperation(trgLoc, variantOptions)) return null;
 
         TextContainer theTarget = myParent.getTarget_DIFF(trgLoc);
         ISegments trgSegs = theTarget.getSegments();
@@ -622,7 +518,6 @@ public class AlignedSegments implements IAlignedSegments {
         Segment currentSeg;
 
         //inserting new segments in all the places they go
-
         if (variantOptions.contains(MODIFY_TARGET)) {
             tempSeg = newSeg.clone();
             if ( !copyOptions.contains(COPY_TO_TARGET))
@@ -634,26 +529,17 @@ public class AlignedSegments implements IAlignedSegments {
                 currentSegs.insert(currentSegs.getIndex(trgSeg.id)+1, tempSeg);
             }
         }
-
         propagateChangesForSplit(newSeg, trgSeg.id, trgLoc, variantOptions, copyOptions);
 
         return newSeg;
     }
-
-
 
     @Override
     public void joinWithNext (Segment seg,
                               LocaleId trgLoc,
                               EnumSet<VariantOptions> variantOptions) {
 
-        if (hasMultipleTargets(trgLoc)) {
-            if (variantOptions.contains(CANCEL_IF_MULTIPLE_TARGETS))
-                return;
-            if (variantOptions.contains(CREATE_VARIANT_IF_MULTIPLE_TARGETS))
-                myParent.getVariantSources().create(trgLoc, false, COPY_ALL);
-        }
-
+        if (!continueWithOperation(trgLoc, variantOptions)) return;
 
         if (variantOptions.contains(MODIFY_SOURCE))
             doJoinWithNext(getSource(trgLoc), seg.id);
@@ -689,12 +575,7 @@ public class AlignedSegments implements IAlignedSegments {
     public void joinAll(LocaleId trgLoc,
                         EnumSet<VariantOptions> variantOptions) {
 
-        if (hasMultipleTargets(trgLoc)) {
-            if (variantOptions.contains(CANCEL_IF_MULTIPLE_TARGETS))
-                return;
-            if (variantOptions.contains(CREATE_VARIANT_IF_MULTIPLE_TARGETS))
-                myParent.getVariantSources().create(trgLoc, false, COPY_ALL);
-        }
+        if (!continueWithOperation(trgLoc, variantOptions)) return;
 
         if (variantOptions.contains(MODIFY_SOURCE))
             getSource(trgLoc).joinAll();
@@ -716,7 +597,6 @@ public class AlignedSegments implements IAlignedSegments {
                 variantTarg.joinAll();
 
     }
-
 
     @Override
     public AlignmentStatus getAlignmentStatus () {
@@ -770,13 +650,11 @@ public class AlignedSegments implements IAlignedSegments {
         if (hasVariant(targetLocale)) { return false; } //variants have only one target
         
         //else locale must use default source
-
         //check if more than one target uses default source
         int targetsOfDefault = 0;
         for (LocaleId loc : myParent.getTargetLocales()) {
-            if (!myParent.getVariantSources().getLocales().contains(loc)) {
+            if (!myParent.getVariantSources().getLocales().contains(loc))
                 targetsOfDefault++;
-            }
             if (targetsOfDefault > 1) return true;
         }
         return false;
@@ -791,20 +669,17 @@ public class AlignedSegments implements IAlignedSegments {
                 locales.removeAll(myParent.getVariantSources().getLocales());
         }
         Set<TextContainer> targets = new HashSet<TextContainer>();
-        for (LocaleId loc : locales) {
+        for (LocaleId loc : locales)
             targets.add(myParent.getTarget_DIFF(loc));
-        }
         return targets;
     }
 
     private Set<TextContainer> getOtherSources(LocaleId loc) {
         Set<TextContainer> sources = new HashSet<TextContainer>();
-        if ( !myParent.hasVariantSources()) {
+        if ( !myParent.hasVariantSources())
             return sources;
-        }
-        for (LocaleId varLoc : myParent.getVariantSources().getLocales() ) {
+        for (LocaleId varLoc : myParent.getVariantSources().getLocales() )
             sources.add(myParent.getVariantSources().get(varLoc));
-        }
         sources.add(myParent.getSource());
         sources.remove(getSource(loc));
         return sources;
@@ -825,16 +700,14 @@ public class AlignedSegments implements IAlignedSegments {
     }
     
     private boolean hasVariant(LocaleId loc) {
-        if (myParent.hasVariantSources()) {
+        if (myParent.hasVariantSources())
             return myParent.getVariantSources().hasVariant(loc);
-        }
         return false;
     }
 
     private TextContainer getSource(LocaleId loc) {
-        if (hasVariant(loc)) {
+        if (hasVariant(loc))
             return myParent.getVariantSources().get(loc);
-        }
         return myParent.getSource();
     }
 };
