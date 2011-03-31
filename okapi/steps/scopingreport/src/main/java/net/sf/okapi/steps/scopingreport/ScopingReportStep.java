@@ -230,12 +230,12 @@ public class ScopingReportStep extends CompoundStep {
 		list.add(new ExactDocumentContextMatchWordCountStep());
 		list.add(new ExactStructuralMatchWordCountStep());
 		list.add(new ExactMatchWordCountStep());
-		list.add(new ExactTextOnlyPreviousVersionMatchWordCountStep());
 		list.add(new ExactTextOnlyUniqueIdMatchWordCountStep());
+		list.add(new ExactTextOnlyPreviousVersionMatchWordCountStep());		
 		list.add(new ExactTextOnlyWordCountStep());
 		list.add(new ExactRepairedWordCountStep());
-		list.add(new FuzzyPreviousVersionMatchWordCountStep());
 		list.add(new FuzzyUniqueIdMatchWordCountStep());
+		list.add(new FuzzyPreviousVersionMatchWordCountStep());		
 		list.add(new FuzzyMatchWordCountStep());
 		list.add(new FuzzyRepairedWordCountStep());
 		list.add(new PhraseAssembledWordCountStep());
