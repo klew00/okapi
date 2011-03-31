@@ -67,6 +67,7 @@ public class Metrics implements Iterable<String> {
 	public boolean setMetric(String name, long value) {		
 		if (Util.isEmpty(name)) return false;
 		if (metrics == null) return false;
+		if (value == 0) return false;
 		
 		metrics.put(name, value);		
 		return true;

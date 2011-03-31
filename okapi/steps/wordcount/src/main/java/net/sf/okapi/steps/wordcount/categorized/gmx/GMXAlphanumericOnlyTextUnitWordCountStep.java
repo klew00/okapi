@@ -1,9 +1,12 @@
 package net.sf.okapi.steps.wordcount.categorized.gmx;
 
+import net.sf.okapi.common.Event;
 import net.sf.okapi.steps.wordcount.common.GMX;
 import net.sf.okapi.steps.wordcount.common.TokenCountStep;
 
 public class GMXAlphanumericOnlyTextUnitWordCountStep extends TokenCountStep {
+
+	public static final String METRIC = GMX.AlphanumericOnlyTextUnitWordCount;
 
 	@Override
 	protected String[] getTokenNames() {
@@ -23,12 +26,18 @@ public class GMXAlphanumericOnlyTextUnitWordCountStep extends TokenCountStep {
 
 	@Override
 	protected String getMetric() {
-		return GMX.AlphanumericOnlyTextUnitWordCount;
+		return METRIC;
 	}
 
 	@Override
 	protected boolean countOnlyTranslatable() {
 		return true;
+	}
+	
+	@Override
+	protected Event handleTextUnit(Event event) {
+		// TODO Auto-generated method stub
+		return super.handleTextUnit(event);
 	}
 
 }

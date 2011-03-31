@@ -5,6 +5,8 @@ import net.sf.okapi.steps.wordcount.common.TokenCountStep;
 
 public class GMXMeasurementOnlyTextUnitWordCountStep extends TokenCountStep {
 
+	public static final String METRIC = GMX.MeasurementOnlyTextUnitWordCount;
+	
 	@Override
 	protected String[] getTokenNames() {
 		return new String[] {"DATE", "TIME", "CURRENCY"};
@@ -23,7 +25,7 @@ public class GMXMeasurementOnlyTextUnitWordCountStep extends TokenCountStep {
 
 	@Override
 	protected String getMetric() {
-		return GMX.MeasurementOnlyTextUnitWordCount;
+		return METRIC;
 	}
 
 	@Override
