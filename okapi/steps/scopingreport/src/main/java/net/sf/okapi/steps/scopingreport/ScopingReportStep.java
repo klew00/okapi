@@ -324,7 +324,7 @@ public class ScopingReportStep extends CompoundStep {
 		return super.handleEndBatch(event);
 	}
 
-	private long countTranslatable(IResource res) {		
+	protected long countTranslatable(IResource res) {		
 		long count = 0;
 		
 		if (params.isCountAsTranslatable_GMXProtected()) count += BaseCounter.getCount(res, GMX.ProtectedWordCount);
@@ -357,7 +357,7 @@ public class ScopingReportStep extends CompoundStep {
 		return count;
 	}
 
-	private long countCategories(IResource res, boolean countOkapiCategories, boolean countGMXCategories) {
+	protected long countCategories(IResource res, boolean countOkapiCategories, boolean countGMXCategories) {
 		long count = 0;
 		
 		if (countGMXCategories) {
