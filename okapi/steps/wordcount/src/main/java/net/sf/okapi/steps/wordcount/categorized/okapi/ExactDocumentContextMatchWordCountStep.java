@@ -36,7 +36,7 @@ public class ExactDocumentContextMatchWordCountStep extends AltAnnotationBasedCo
 
 	@Override
 	public String getDescription() {
-		return "Matches EXACT and comes from the same document either existing or different version. " +
+		return "Matches EXACT and comes from a repeated segment in the same document or a different version of the same document. " +
 				"See also EXACT_PREVIOUS_VERSION"
 		+ " Expects: filter events. Sends back: filter events.";
 	}

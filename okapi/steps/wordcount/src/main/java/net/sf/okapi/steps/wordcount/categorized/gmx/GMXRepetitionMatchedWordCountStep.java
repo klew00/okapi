@@ -53,21 +53,8 @@ public class GMXRepetitionMatchedWordCountStep extends AltAnnotationBasedCountSt
 
 	@Override
 	protected boolean accept(MatchType type) {
-		return false; // TODO Implement accept(), probably change the superclass
+		return (type == MatchType.EXACT_DOCUMENT_CONTEXT);
 	}
-
-//	@Override
-//	protected long count(Segment segment, LocaleId locale) {
-//		return super.count(segment, locale) - (BaseCounter.getCount(segment, GMX.ExactMatchedWordCount) + 
-//				BaseCounter.getCount(segment, GMX.LeveragedMatchedWordCount));
-//	}
-//
-//	@Override
-//	protected long count(TextContainer textContainer, LocaleId locale) {
-//		long res = super.count(textContainer, locale) - (BaseCounter.getCount(textContainer, GMX.ExactMatchedWordCount) + 
-//				BaseCounter.getCount(textContainer, GMX.LeveragedMatchedWordCount)); 
-//		return res > 0 ? res : 0;
-//	}
 
 	@Override
 	public CategoryGroup getCategoryGroup() {
