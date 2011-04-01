@@ -77,13 +77,29 @@ public class PensieveSeekerTest {
            	new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment("abcd")), TARGET));
         writer.indexTranslationUnit(new TranslationUnit(
            	new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment("abc")), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(
+            new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment("am")), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(
+                new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment("zq")), TARGET));
+        writer.indexTranslationUnit(new TranslationUnit(
+                new TranslationUnitVariant(LocaleId.fromString("EN"), new TextFragment("zqq")), TARGET));
         writer.close();
 
-        List<TmHit> list = seeker.searchFuzzy(new TextFragment("abcd"), 100, 1, null);
+        List<TmHit> list;
+        list = seeker.searchFuzzy(new TextFragment("abcd"), 100, 1, null);
         assertEquals("number of docs found", 1, list.size());
         
         list = seeker.searchFuzzy(new TextFragment("abc"), 100, 1, null);
         assertEquals("number of docs found", 1, list.size());
+        
+        list = seeker.searchFuzzy(new TextFragment("zqq"), 100, 1, null);
+        assertEquals("number of docs found", 1, list.size());
+
+        list = seeker.searchFuzzy(new TextFragment("am"), 100, 1, null);
+        assertEquals("number of docs found", 1, list.size());
+        
+        list = seeker.searchFuzzy(new TextFragment("zq"), 100, 1, null);
+        assertEquals("number of docs found", 1, list.size());        
     }
 
     @Test

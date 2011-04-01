@@ -94,10 +94,11 @@ public class AlphabeticNgramTokenizer extends Tokenizer {
 	private void initializeCache() {
 		// Clearing for when it's called by reset
 		ngramCache.clear();
-
-		// Place dummy character at beginning for first call to increment to
-		// remove
+		
+		// add a dummy character as we remove the first character of the cache on each iteration
 		ngramCache.add(Character.MIN_VALUE);
+		
+		// create initial ngram
 		int c;
 		for (int i = 1; i < ngramLength; i++) {
 			try {
@@ -105,29 +106,48 @@ public class AlphabeticNgramTokenizer extends Tokenizer {
 			} catch (IOException ioe) {
 				throw new OkapiIOException(ioe.getMessage(), ioe);
 			}
-			ngramCache.add((char) c);
+			
+			if (c == NO_CHAR) {
+				break;
+			}
+		
+			offset = 0;
+			ngramCache.add((char)c);
 		}
+	}
+	
+	private void createToken() {
+		// Populate Attributes
+		termAttribute.setTermBuffer(toLowerCase(ngramCache));
+		offsetAttribute.setOffset(offset, offset + ngramCache.size());
+		typeAttribute.setType(ngramType);
 	}
 
 	@Override
 	public boolean incrementToken() throws IOException {
 		clearAttributes();
-		int c;
-		c = getReader().read();
-		if (c == NO_CHAR && ngramCache.get(0) != Character.MIN_VALUE) {
-			offset = 0;
-			return false;
+		int c = getReader().read();
+		
+		// remove the old intial character
+		if (ngramCache.size() > 0) {
+			ngramCache.remove(0);
 		}
-		ngramCache.remove(0);
-		if (c != NO_CHAR) {
-			ngramCache.add((char) c);
+		
+		if (c == NO_CHAR) {
+			// remaining ngram (could be smaller than ngram size) 
+			if (ngramCache.size() > 0)
+			{
+				createToken();			
+				ngramCache.clear();
+				return true;
+			} else {
+				offset = 0;
+				return false;
+			}
 		}
-
-		// Populate Attributes
-		termAttribute.setTermBuffer(toLowerCase(ngramCache));
-		offsetAttribute.setOffset(offset, offset + ngramLength);
-		typeAttribute.setType(ngramType);
-
+		
+		ngramCache.add((char)c);
+		createToken();
 		offset++;
 		return true;
 	}

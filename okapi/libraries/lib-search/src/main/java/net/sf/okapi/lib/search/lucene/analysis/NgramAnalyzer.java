@@ -73,7 +73,7 @@ public class NgramAnalyzer extends Analyzer {
 	public NgramAnalyzer(Locale locale, int ngramLength) {
 		if (ngramLength <= 0) {
 			throw new IllegalArgumentException(
-					"'ngramLength' cannot be less than 1");
+					"'ngramLength' cannot be less than 0");
 		}
 		this.stopNgrams = StopFilter.makeStopSet(ENGLISH_STOP_NGRAMS);
 		this.locale = locale;

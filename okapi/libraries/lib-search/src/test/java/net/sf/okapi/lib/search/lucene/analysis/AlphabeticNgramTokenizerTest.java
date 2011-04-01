@@ -76,7 +76,8 @@ public class AlphabeticNgramTokenizerTest {
     public void IncrementToken() throws Exception {
         assertTrue("should have first token", ngramTk.incrementToken());
         assertTrue("should have second token", ngramTk.incrementToken());
-        assertFalse("should not have third token", ngramTk.incrementToken());
+        assertTrue("should have third token", ngramTk.incrementToken());
+        assertFalse("should not have fourth token", ngramTk.incrementToken());
     }
 
     @Test
@@ -86,6 +87,8 @@ public class AlphabeticNgramTokenizerTest {
         ngramTk.incrementToken();
         assertEquals("Second Token Value", "23456", getTermString());
         ngramTk.incrementToken();
+        assertEquals("ThirdToken Value", "3456", getTermString());
+        ngramTk.incrementToken();
         assertEquals("non-existent Token Value", "", getTermString());
     }
 
@@ -93,20 +96,27 @@ public class AlphabeticNgramTokenizerTest {
     public void IncrementTokenTypeValue() throws Exception {
         ngramTk.incrementToken();
         assertEquals("First Token Type", "ngram(5)", getTypeString());
+        
         ngramTk.incrementToken();
         assertEquals("Second Token Type", "ngram(5)", getTypeString());
+        
+        ngramTk.incrementToken();
+        assertEquals("Third Token Type", "ngram(5)", getTypeString());
+        
         ngramTk.incrementToken();
         assertEquals("non-existent Token Type (default)", "word", getTypeString());
     }
 
     @Test
     public void IncrementTokenOffsetValue() throws Exception {
-
         ngramTk.incrementToken();
         assertEquals("First Token Offset Start", 0, getOffsetStart());
         assertEquals("First Token Offset End", 5, getOffsetEnd());
         ngramTk.incrementToken();
         assertEquals("First Token Offset Start", 1, getOffsetStart());
+        assertEquals("First Token Offset End", 6, getOffsetEnd());
+        ngramTk.incrementToken();       
+        assertEquals("First Token Offset Start", 2, getOffsetStart());
         assertEquals("First Token Offset End", 6, getOffsetEnd());
         ngramTk.incrementToken();
         assertEquals("non-existent Token Offset Start", 0, getOffsetStart());
