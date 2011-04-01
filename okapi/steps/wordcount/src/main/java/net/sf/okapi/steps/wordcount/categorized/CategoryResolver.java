@@ -17,8 +17,15 @@ import net.sf.okapi.steps.wordcount.common.Metrics;
 import net.sf.okapi.steps.wordcount.common.MetricsAnnotation;
 
 /**
- * 
- *
+ * Helper class for removal of categories that are superseded by other higher-ranked categories from the same category group.
+ * <p>If a text fragment has been matched against more than one category, and the matching categories belong to the same group,
+ * e.g. all are GMX-categories, then only one category is left, namely the one ranked the highest. Ranking of categories is
+ * defined by the sequence of category handler steps in a list passed to the constructor.
+ * <p>The class modifies count-related metrics in a MetricsAnnotation attached to a given resource.  
+ * The superseded metrics are removed, but if they contained non-zero values, those values are remembered in the
+ * removedCategories hash map to later be subtracted from accumulated counts in resources of END_BATCH_ITEM and END_BATCH
+ * events.  
+ * @see ScopingReportStep.
  */
 public class CategoryResolver {
 
