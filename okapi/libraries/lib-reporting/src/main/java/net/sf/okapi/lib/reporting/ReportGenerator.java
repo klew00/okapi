@@ -26,6 +26,7 @@ import java.text.DecimalFormatSymbols;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.sf.okapi.common.ListUtil;
@@ -45,11 +46,15 @@ public class ReportGenerator {
 	
 	private Hashtable<String, String> simpleFields = new Hashtable<String, String>();
 	private Hashtable<String, LinkedList<String>> multiFields = new Hashtable<String, LinkedList<String>>();
+	private StringBuilder sb;
+	
+	private final Logger logger = Logger.getLogger(this.getClass().getName());
 	
 	public ReportGenerator(String template) {
 		super();
 		setTemplate(template);		
 		registerFields();
+		sb = new StringBuilder(); 
 	}
 	
 	public ReportGenerator(InputStream templateStream) {
@@ -69,8 +74,17 @@ public class ReportGenerator {
 	}
 	
 	public void setField(String fieldName, String value) {
-		if (isSimpleField(fieldName))
+		// Logging
+		if (!"0".equals(value)) {
+			sb.append(fieldName);
+			sb.append(" = ");
+			sb.append(value);
+			sb.append("\n");
+		}		
+		
+		if (isSimpleField(fieldName)) {
 			simpleFields.put(fieldName, value);
+		}			
 		
 		else if (isMultiField(fieldName)) {
 			LinkedList<String> list = multiFields.get(fieldName);
@@ -208,11 +222,13 @@ public class ReportGenerator {
 		    }
 		    else 
 		    	break;
-	    }		
+	    }
+		logger.fine(sb.toString());
 		return st;
 	}
 	
 	public void reset() {
+		sb = new StringBuilder(); 
 		for (String fieldName : simpleFields.keySet()) {
 			simpleFields.put(fieldName, "");
 		}
@@ -233,7 +249,11 @@ public class ReportGenerator {
 		else if (simpleFields.containsKey(fieldName))
 			st = simpleFields.get(fieldName);
 				
-		return (st);
+		return st;
+	}
+	
+	public String getField(String fieldName) {
+		return simpleFields.get(fieldName);
 	}
 
 //	private String generateRow(String rowTemplate) {
