@@ -49,6 +49,7 @@ import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.extra.steps.CompoundStep;
 import net.sf.okapi.lib.reporting.ReportGenerator;
+import net.sf.okapi.steps.wordcount.categorized.CategoryGroup;
 import net.sf.okapi.steps.wordcount.categorized.CategoryResolver;
 import net.sf.okapi.steps.wordcount.categorized.gmx.GMXAlphanumericOnlyTextUnitWordCountStep;
 import net.sf.okapi.steps.wordcount.categorized.gmx.GMXExactMatchedWordCountStep;
@@ -89,15 +90,11 @@ public class ScopingReportStep extends CompoundStep {
 	public static final String PROJECT_SOURCE_LOCALE = "PROJECT_SOURCE_LOCALE";
 	public static final String PROJECT_TARGET_LOCALE = "PROJECT_TARGET_LOCALE";	
 	public static final String PROJECT_TOTAL_WORD_COUNT = "PROJECT_TOTAL_WORD_COUNT";
-	public static final String PROJECT_NONTRANSLATABLE_WORD_COUNT = "PROJECT_NONTRANSLATABLE_WORD_COUNT"; 
-	public static final String PROJECT_TRANSLATABLE_WORD_COUNT = "PROJECT_TRANSLATABLE_WORD_COUNT";
 	
 	public static final String ITEM_NAME = "ITEM_NAME";
 	public static final String ITEM_SOURCE_LOCALE = "ITEM_SOURCE_LOCALE";
 	public static final String ITEM_TARGET_LOCALE = "ITEM_TARGET_LOCALE";
-	public static final String ITEM_TOTAL_WORD_COUNT = "ITEM_TOTAL_WORD_COUNT";
-	public static final String ITEM_NONTRANSLATABLE_WORD_COUNT = "ITEM_NONTRANSLATABLE_WORD_COUNT"; 
-	public static final String ITEM_TRANSLATABLE_WORD_COUNT = "ITEM_TRANSLATABLE_WORD_COUNT";
+	public static final String ITEM_TOTAL_WORD_COUNT = "ITEM_TOTAL_WORD_COUNT";	
 	
 	/**
 	 * Report fields for word counts of the entire project (GMX categories)
@@ -110,7 +107,9 @@ public class ScopingReportStep extends CompoundStep {
 	public static final String PROJECT_GMX_ALPHANUMERIC_ONLY_TEXT_UNIT_WORD_COUNT = "PROJECT_GMX_ALPHANUMERIC_ONLY_TEXT_UNIT_WORD_COUNT";
 	public static final String PROJECT_GMX_NUMERIC_ONLY_TEXT_UNIT_WORD_COUNT = "PROJECT_GMX_NUMERIC_ONLY_TEXT_UNIT_WORD_COUNT";
 	public static final String PROJECT_GMX_MEASUREMENT_ONLY_TEXT_UNIT_WORD_COUNT = "PROJECT_GMX_MEASUREMENT_ONLY_TEXT_UNIT_WORD_COUNT";
-	public static final String PROJECT_GMX_NOMATCH = "PROJECT_GMX_NOMATCH";
+	public static final String PROJECT_GMX_NONTRANSLATABLE_WORD_COUNT = "PROJECT_GMX_NONTRANSLATABLE_WORD_COUNT"; 
+	public static final String PROJECT_GMX_TRANSLATABLE_WORD_COUNT = "PROJECT_GMX_TRANSLATABLE_WORD_COUNT";
+	public static final String PROJECT_GMX_NOCATEGORY = "PROJECT_GMX_NOCATEGORY";
 	
 	/**
 	 * Report fields for word counts of individual items (GMX categories)
@@ -123,7 +122,9 @@ public class ScopingReportStep extends CompoundStep {
 	public static final String ITEM_GMX_ALPHANUMERIC_ONLY_TEXT_UNIT_WORD_COUNT = "ITEM_GMX_ALPHANUMERIC_ONLY_TEXT_UNIT_WORD_COUNT";
 	public static final String ITEM_GMX_NUMERIC_ONLY_TEXT_UNIT_WORD_COUNT = "ITEM_GMX_NUMERIC_ONLY_TEXT_UNIT_WORD_COUNT";
 	public static final String ITEM_GMX_MEASUREMENT_ONLY_TEXT_UNIT_WORD_COUNT = "ITEM_GMX_MEASUREMENT_ONLY_TEXT_UNIT_WORD_COUNT";
-	public static final String ITEM_GMX_NOMATCH = "ITEM_GMX_NOMATCH";
+	public static final String ITEM_GMX_NONTRANSLATABLE_WORD_COUNT = "ITEM_GMX_NONTRANSLATABLE_WORD_COUNT"; 
+	public static final String ITEM_GMX_TRANSLATABLE_WORD_COUNT = "ITEM_GMX_TRANSLATABLE_WORD_COUNT";
+	public static final String ITEM_GMX_NOCATEGORY = "ITEM_GMX_NOCATEGORY";
 	
 	/**
 	 * Report fields for word counts of the entire project (Okapi categories)
@@ -145,7 +146,9 @@ public class ScopingReportStep extends CompoundStep {
 	public static final String PROJECT_PHRASE_ASSEMBLED = "PROJECT_PHRASE_ASSEMBLED";
 	public static final String PROJECT_MT = "PROJECT_MT";
 	public static final String PROJECT_CONCORDANCE = "PROJECT_CONCORDANCE";
-	public static final String PROJECT_NOMATCH = "PROJECT_NOMATCH";
+	public static final String PROJECT_NONTRANSLATABLE_WORD_COUNT = "PROJECT_NONTRANSLATABLE_WORD_COUNT"; 
+	public static final String PROJECT_TRANSLATABLE_WORD_COUNT = "PROJECT_TRANSLATABLE_WORD_COUNT";
+	public static final String PROJECT_NOCATEGORY = "PROJECT_NOCATEGORY";
 	
 	/**
 	 * Report fields for word counts of individual items (Okapi categories)
@@ -167,7 +170,9 @@ public class ScopingReportStep extends CompoundStep {
 	public static final String ITEM_PHRASE_ASSEMBLED = "ITEM_PHRASE_ASSEMBLED";
 	public static final String ITEM_MT = "ITEM_MT";
 	public static final String ITEM_CONCORDANCE = "ITEM_CONCORDANCE";
-	public static final String ITEM_NOMATCH = "ITEM_NOMATCH";
+	public static final String ITEM_NONTRANSLATABLE_WORD_COUNT = "ITEM_NONTRANSLATABLE_WORD_COUNT"; 
+	public static final String ITEM_TRANSLATABLE_WORD_COUNT = "ITEM_TRANSLATABLE_WORD_COUNT";
+	public static final String ITEM_NOCATEGORY = "ITEM_NOCATEGORY";
 		
 	private static final String DEFAULT_TEMPLATE = "scoping_report.html";
 	private final Logger logger = Logger.getLogger(getClass().getName());
@@ -269,10 +274,15 @@ public class ScopingReportStep extends CompoundStep {
 		if (res != null) {
 			resolver.resolve(res);
 			
-			gen.setField(PROJECT_TOTAL_WORD_COUNT, BaseCounter.getCount(res, GMX.TotalWordCount));			
-			long ntrCount = countNonTranslatable(res, true, false);
+			gen.setField(PROJECT_TOTAL_WORD_COUNT, BaseCounter.getCount(res, GMX.TotalWordCount));
+			
+			long ntrCount = countNonTranslatable(res, CategoryGroup.OKAPI_WORD_COUNTS);
 			gen.setField(PROJECT_TRANSLATABLE_WORD_COUNT, Math.max(0, BaseCounter.getCount(res, GMX.TotalWordCount) - ntrCount));
 			gen.setField(PROJECT_NONTRANSLATABLE_WORD_COUNT, ntrCount);
+			
+			ntrCount = countNonTranslatable(res, CategoryGroup.GMX_WORD_COUNTS);
+			gen.setField(PROJECT_GMX_TRANSLATABLE_WORD_COUNT, Math.max(0, BaseCounter.getCount(res, GMX.TotalWordCount) - ntrCount));
+			gen.setField(PROJECT_GMX_NONTRANSLATABLE_WORD_COUNT, ntrCount);
 			
 			gen.setField(PROJECT_GMX_PROTECTED_WORD_COUNT, BaseCounter.getCount(res, GMX.ProtectedWordCount));
 			gen.setField(PROJECT_GMX_EXACT_MATCHED_WORD_COUNT, BaseCounter.getCount(res, GMX.ExactMatchedWordCount));
@@ -282,7 +292,7 @@ public class ScopingReportStep extends CompoundStep {
 			gen.setField(PROJECT_GMX_ALPHANUMERIC_ONLY_TEXT_UNIT_WORD_COUNT, BaseCounter.getCount(res, GMX.AlphanumericOnlyTextUnitWordCount));
 			gen.setField(PROJECT_GMX_NUMERIC_ONLY_TEXT_UNIT_WORD_COUNT, BaseCounter.getCount(res, GMX.NumericOnlyTextUnitWordCount));
 			gen.setField(PROJECT_GMX_MEASUREMENT_ONLY_TEXT_UNIT_WORD_COUNT, BaseCounter.getCount(res, GMX.MeasurementOnlyTextUnitWordCount));
-			gen.setField(PROJECT_GMX_NOMATCH, BaseCounter.getCount(res, GMX.TotalWordCount) - countCategories(res, false, true));
+			gen.setField(PROJECT_GMX_NOCATEGORY, BaseCounter.getCount(res, GMX.TotalWordCount) - countCategories(res, CategoryGroup.GMX_WORD_COUNTS));
 			
 			gen.setField(PROJECT_EXACT_UNIQUE_ID, BaseCounter.getCount(res, MatchType.EXACT_UNIQUE_ID.name()));
 			gen.setField(PROJECT_EXACT_PREVIOUS_VERSION, BaseCounter.getCount(res, MatchType.EXACT_PREVIOUS_VERSION.name()));
@@ -301,7 +311,7 @@ public class ScopingReportStep extends CompoundStep {
 			gen.setField(PROJECT_PHRASE_ASSEMBLED, BaseCounter.getCount(res, MatchType.PHRASE_ASSEMBLED.name()));
 			gen.setField(PROJECT_MT, BaseCounter.getCount(res, MatchType.MT.name()));
 			gen.setField(PROJECT_CONCORDANCE, BaseCounter.getCount(res, MatchType.CONCORDANCE.name()));
-			gen.setField(PROJECT_NOMATCH, BaseCounter.getCount(res, GMX.TotalWordCount) - countCategories(res, true, false));
+			gen.setField(PROJECT_NOCATEGORY, BaseCounter.getCount(res, GMX.TotalWordCount) - countCategories(res, CategoryGroup.OKAPI_WORD_COUNTS));
 			
 			setProjectFields(gen, res);
 		}		
@@ -328,10 +338,11 @@ public class ScopingReportStep extends CompoundStep {
 		return super.handleEndBatch(event);
 	}
 
-	protected long countNonTranslatable(IResource res, boolean countOkapiCategories, boolean countGMXCategories) {		
+	protected long countNonTranslatable(IResource res, CategoryGroup group) {		
 		long count = 0;
 		
-		if (countGMXCategories) {
+		switch (group) {
+		case GMX_WORD_COUNTS:
 			if (params.isCountAsNonTranslatable_GMXProtected()) 
 				count += BaseCounter.getCount(res, GMX.ProtectedWordCount);
 			
@@ -355,9 +366,9 @@ public class ScopingReportStep extends CompoundStep {
 			
 			if (params.isCountAsNonTranslatable_GMXMeasurementOnlyTextUnit()) 
 				count += BaseCounter.getCount(res, GMX.MeasurementOnlyTextUnitWordCount);
-		}
-				
-		if (countOkapiCategories) {
+			break;
+
+		case OKAPI_WORD_COUNTS:
 			if (params.isCountAsNonTranslatable_ExactUniqueIdMatch()) 
 				count += BaseCounter.getCount(res, MatchType.EXACT_UNIQUE_ID.name());
 			
@@ -408,15 +419,17 @@ public class ScopingReportStep extends CompoundStep {
 			
 			if (params.isCountAsNonTranslatable_Concordance()) 
 				count += BaseCounter.getCount(res, MatchType.CONCORDANCE.name());
-		}		
+			break;
+		}
 		
 		return count > 0 ? count : 0; // Negative values are not allowed
 	}
 
-	protected long countCategories(IResource res, boolean countOkapiCategories, boolean countGMXCategories) {
+	protected long countCategories(IResource res, CategoryGroup group) {
 		long count = 0;
 		
-		if (countGMXCategories) {
+		switch (group) {
+		case GMX_WORD_COUNTS:
 			count += BaseCounter.getCount(res, GMX.ProtectedWordCount);
 			count += BaseCounter.getCount(res, GMX.ExactMatchedWordCount);
 			count += BaseCounter.getCount(res, GMX.LeveragedMatchedWordCount);
@@ -425,9 +438,9 @@ public class ScopingReportStep extends CompoundStep {
 			count += BaseCounter.getCount(res, GMX.AlphanumericOnlyTextUnitWordCount);
 			count += BaseCounter.getCount(res, GMX.NumericOnlyTextUnitWordCount);
 			count += BaseCounter.getCount(res, GMX.MeasurementOnlyTextUnitWordCount);
-		}		
-		
-		if (countOkapiCategories) {
+			break;
+
+		case OKAPI_WORD_COUNTS:
 			count += BaseCounter.getCount(res, MatchType.EXACT_UNIQUE_ID.name());
 			count += BaseCounter.getCount(res, MatchType.EXACT_PREVIOUS_VERSION.name());
 			count += BaseCounter.getCount(res, MatchType.EXACT_LOCAL_CONTEXT.name());
@@ -445,8 +458,9 @@ public class ScopingReportStep extends CompoundStep {
 			count += BaseCounter.getCount(res, MatchType.PHRASE_ASSEMBLED.name());
 			count += BaseCounter.getCount(res, MatchType.MT.name());
 			count += BaseCounter.getCount(res, MatchType.CONCORDANCE.name());
+			break;
 		}
-				
+		
 		return count > 0 ? count : 0; // Negative values are not allowed
 	}
 	
@@ -465,9 +479,14 @@ public class ScopingReportStep extends CompoundStep {
 			resolver.resolve(res);
 			
 			gen.setField(ITEM_TOTAL_WORD_COUNT, BaseCounter.getCount(res, GMX.TotalWordCount));
-			long ntrCount = countNonTranslatable(res, true, false);
+			
+			long ntrCount = countNonTranslatable(res, CategoryGroup.OKAPI_WORD_COUNTS);
 			gen.setField(ITEM_TRANSLATABLE_WORD_COUNT, Math.max(0, BaseCounter.getCount(res, GMX.TotalWordCount) - ntrCount));
 			gen.setField(ITEM_NONTRANSLATABLE_WORD_COUNT, ntrCount);
+			
+			ntrCount = countNonTranslatable(res, CategoryGroup.GMX_WORD_COUNTS);
+			gen.setField(ITEM_GMX_TRANSLATABLE_WORD_COUNT, Math.max(0, BaseCounter.getCount(res, GMX.TotalWordCount) - ntrCount));
+			gen.setField(ITEM_GMX_NONTRANSLATABLE_WORD_COUNT, ntrCount);
 			
 			gen.setField(ITEM_GMX_PROTECTED_WORD_COUNT, BaseCounter.getCount(res, GMX.ProtectedWordCount));
 			gen.setField(ITEM_GMX_EXACT_MATCHED_WORD_COUNT, BaseCounter.getCount(res, GMX.ExactMatchedWordCount));
@@ -477,7 +496,7 @@ public class ScopingReportStep extends CompoundStep {
 			gen.setField(ITEM_GMX_ALPHANUMERIC_ONLY_TEXT_UNIT_WORD_COUNT, BaseCounter.getCount(res, GMX.AlphanumericOnlyTextUnitWordCount));
 			gen.setField(ITEM_GMX_NUMERIC_ONLY_TEXT_UNIT_WORD_COUNT, BaseCounter.getCount(res, GMX.NumericOnlyTextUnitWordCount));
 			gen.setField(ITEM_GMX_MEASUREMENT_ONLY_TEXT_UNIT_WORD_COUNT, BaseCounter.getCount(res, GMX.MeasurementOnlyTextUnitWordCount));
-			gen.setField(ITEM_GMX_NOMATCH, BaseCounter.getCount(res, GMX.TotalWordCount) - countCategories(res, false, true));
+			gen.setField(ITEM_GMX_NOCATEGORY, BaseCounter.getCount(res, GMX.TotalWordCount) - countCategories(res, CategoryGroup.GMX_WORD_COUNTS));
 			
 			gen.setField(ITEM_EXACT_UNIQUE_ID, BaseCounter.getCount(res, MatchType.EXACT_UNIQUE_ID.name()));
 			gen.setField(ITEM_EXACT_PREVIOUS_VERSION, BaseCounter.getCount(res, MatchType.EXACT_PREVIOUS_VERSION.name()));
@@ -496,7 +515,7 @@ public class ScopingReportStep extends CompoundStep {
 			gen.setField(ITEM_PHRASE_ASSEMBLED, BaseCounter.getCount(res, MatchType.PHRASE_ASSEMBLED.name()));
 			gen.setField(ITEM_MT, BaseCounter.getCount(res, MatchType.MT.name()));
 			gen.setField(ITEM_CONCORDANCE, BaseCounter.getCount(res, MatchType.CONCORDANCE.name()));
-			gen.setField(ITEM_NOMATCH, BaseCounter.getCount(res, GMX.TotalWordCount) - countCategories(res, true, false));
+			gen.setField(ITEM_NOCATEGORY, BaseCounter.getCount(res, GMX.TotalWordCount) - countCategories(res, CategoryGroup.OKAPI_WORD_COUNTS));
 			
 			setItemFields(gen, res);
 		}			
@@ -535,5 +554,9 @@ public class ScopingReportStep extends CompoundStep {
 		resolver.resolve(tu);
 		
 		return super.handleTextUnit(event);
+	}
+	
+	public ReportGenerator getReportGenerator() {
+		return gen;
 	}
 }
