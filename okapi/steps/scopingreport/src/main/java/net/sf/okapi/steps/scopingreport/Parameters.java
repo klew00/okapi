@@ -38,63 +38,63 @@ public class Parameters extends AbstractParameters implements IEditorDescription
 	private static final String OUTPUT_PATH = "outputPath";
 	private static final String EMPTY_URI = "";
 
-	private static final String COUNT_AS_TRANSLATABLE_GMX_PROTECTED = "countAsTranslatable_GMXProtected";
-	private static final String COUNT_AS_TRANSLATABLE_GMX_EXACT_MATCHED = "countAsTranslatable_GMXExactMatched";
-	private static final String COUNT_AS_TRANSLATABLE_GMX_LEVERAGED_MATCHED = "countAsTranslatable_GMXLeveragedMatched";
-	private static final String COUNT_AS_TRANSLATABLE_GMX_REPETITION_MATCHED = "countAsTranslatable_GMXRepetitionMatched";
-	private static final String COUNT_AS_TRANSLATABLE_GMX_FUZZY_MATCHED = "countAsTranslatable_GMXFuzzyMatch";
-	private static final String COUNT_AS_TRANSLATABLE_GMX_ALPHANUMERIC_ONLY_TEXT_UNIT = "countAsTranslatable_GMXAlphanumericOnlyTextUnit";
-	private static final String COUNT_AS_TRANSLATABLE_GMX_NUMERIC_ONLY_TEXT_UNIT = "countAsTranslatable_GMXNumericOnlyTextUnit";
-	private static final String COUNT_AS_TRANSLATABLE_GMX_MEASUREMENT_ONLY_TEXT_UNIT = "countAsTranslatable_GMXMeasurementOnlyTextUnit";
+	private static final String COUNT_AS_NONTRANSLATABLE_GMX_PROTECTED = "countAsNonTranslatable_GMXProtected";
+	private static final String COUNT_AS_NONTRANSLATABLE_GMX_EXACT_MATCHED = "countAsNonTranslatable_GMXExactMatched";
+	private static final String COUNT_AS_NONTRANSLATABLE_GMX_LEVERAGED_MATCHED = "countAsNonTranslatable_GMXLeveragedMatched";
+	private static final String COUNT_AS_NONTRANSLATABLE_GMX_REPETITION_MATCHED = "countAsNonTranslatable_GMXRepetitionMatched";
+	private static final String COUNT_AS_NONTRANSLATABLE_GMX_FUZZY_MATCHED = "countAsNonTranslatable_GMXFuzzyMatch";
+	private static final String COUNT_AS_NONTRANSLATABLE_GMX_ALPHANUMERIC_ONLY_TEXT_UNIT = "countAsNonTranslatable_GMXAlphanumericOnlyTextUnit";
+	private static final String COUNT_AS_NONTRANSLATABLE_GMX_NUMERIC_ONLY_TEXT_UNIT = "countAsNonTranslatable_GMXNumericOnlyTextUnit";
+	private static final String COUNT_AS_NONTRANSLATABLE_GMX_MEASUREMENT_ONLY_TEXT_UNIT = "countAsNonTranslatable_GMXMeasurementOnlyTextUnit";
 	
-	private static final String COUNT_AS_TRANSLATABLE_EXACT_UNIQUE_ID = "countAsTranslatable_ExactUniqueIdMatch";
-	private static final String COUNT_AS_TRANSLATABLE_EXACT_PREVIOUS_VERSION = "countAsTranslatable_ExactPreviousVersionMatch";
-	private static final String COUNT_AS_TRANSLATABLE_EXACT_LOCAL_CONTEXT = "countAsTranslatable_ExactLocalContextMatch";
-	private static final String COUNT_AS_TRANSLATABLE_EXACT_DOCUMENT_CONTEXT = "countAsTranslatable_ExactDocumentContextMatch";
-	private static final String COUNT_AS_TRANSLATABLE_EXACT_STRUCTURAL = "countAsTranslatable_ExactStructuralMatch";
-	private static final String COUNT_AS_TRANSLATABLE_EXACT = "countAsTranslatable_ExactMatch";
-	private static final String COUNT_AS_TRANSLATABLE_EXACT_TEXT_ONLY_PREVIOUS_VERSION = "countAsTranslatable_ExactTextOnlyPreviousVersionMatch";
-	private static final String COUNT_AS_TRANSLATABLE_EXACT_TEXT_ONLY_UNIQUE_ID = "countAsTranslatable_ExactTextOnlyUniqueIdMatch";
-	private static final String COUNT_AS_TRANSLATABLE_EXACT_TEXT_ONLY = "countAsTranslatable_ExactTextOnly";
-	private static final String COUNT_AS_TRANSLATABLE_EXACT_REPAIRED = "countAsTranslatable_ExactRepaired";
-	private static final String COUNT_AS_TRANSLATABLE_FUZZY_PREVIOUS_VERSION = "countAsTranslatable_FuzzyPreviousVersionMatch";
-	private static final String COUNT_AS_TRANSLATABLE_FUZZY_UNIQUE_ID = "countAsTranslatable_FuzzyUniqueIdMatch";
-	private static final String COUNT_AS_TRANSLATABLE_FUZZY = "countAsTranslatable_FuzzyMatch";
-	private static final String COUNT_AS_TRANSLATABLE_FUZZY_REPAIRED = "countAsTranslatable_FuzzyRepaired";
-	private static final String COUNT_AS_TRANSLATABLE_PHRASE_ASSEMBLED = "countAsTranslatable_PhraseAssembled";
-	private static final String COUNT_AS_TRANSLATABLE_MT = "countAsTranslatable_MT";
-	private static final String COUNT_AS_TRANSLATABLE_CONCORDANCE = "countAsTranslatable_Concordance";
+	private static final String COUNT_AS_NONTRANSLATABLE_EXACT_UNIQUE_ID = "countAsNonTranslatable_ExactUniqueIdMatch";
+	private static final String COUNT_AS_NONTRANSLATABLE_EXACT_PREVIOUS_VERSION = "countAsNonTranslatable_ExactPreviousVersionMatch";
+	private static final String COUNT_AS_NONTRANSLATABLE_EXACT_LOCAL_CONTEXT = "countAsNonTranslatable_ExactLocalContextMatch";
+	private static final String COUNT_AS_NONTRANSLATABLE_EXACT_DOCUMENT_CONTEXT = "countAsNonTranslatable_ExactDocumentContextMatch";
+	private static final String COUNT_AS_NONTRANSLATABLE_EXACT_STRUCTURAL = "countAsNonTranslatable_ExactStructuralMatch";
+	private static final String COUNT_AS_NONTRANSLATABLE_EXACT = "countAsNonTranslatable_ExactMatch";
+	private static final String COUNT_AS_NONTRANSLATABLE_EXACT_TEXT_ONLY_PREVIOUS_VERSION = "countAsNonTranslatable_ExactTextOnlyPreviousVersionMatch";
+	private static final String COUNT_AS_NONTRANSLATABLE_EXACT_TEXT_ONLY_UNIQUE_ID = "countAsNonTranslatable_ExactTextOnlyUniqueIdMatch";
+	private static final String COUNT_AS_NONTRANSLATABLE_EXACT_TEXT_ONLY = "countAsNonTranslatable_ExactTextOnly";
+	private static final String COUNT_AS_NONTRANSLATABLE_EXACT_REPAIRED = "countAsNonTranslatable_ExactRepaired";
+	private static final String COUNT_AS_NONTRANSLATABLE_FUZZY_PREVIOUS_VERSION = "countAsNonTranslatable_FuzzyPreviousVersionMatch";
+	private static final String COUNT_AS_NONTRANSLATABLE_FUZZY_UNIQUE_ID = "countAsNonTranslatable_FuzzyUniqueIdMatch";
+	private static final String COUNT_AS_NONTRANSLATABLE_FUZZY = "countAsNonTranslatable_FuzzyMatch";
+	private static final String COUNT_AS_NONTRANSLATABLE_FUZZY_REPAIRED = "countAsNonTranslatable_FuzzyRepaired";
+	private static final String COUNT_AS_NONTRANSLATABLE_PHRASE_ASSEMBLED = "countAsNonTranslatable_PhraseAssembled";
+	private static final String COUNT_AS_NONTRANSLATABLE_MT = "countAsNonTranslatable_MT";
+	private static final String COUNT_AS_NONTRANSLATABLE_CONCORDANCE = "countAsNonTranslatable_Concordance";
 
 	private String projectName;
 	private String outputPath;
 	private String customTemplateURI;
 	
-	private boolean countAsTranslatable_GMXProtected;
-	private boolean countAsTranslatable_GMXExactMatched;
-	private boolean countAsTranslatable_GMXLeveragedMatched;
-	private boolean countAsTranslatable_GMXRepetitionMatched;
-	private boolean countAsTranslatable_GMXFuzzyMatch;
-	private boolean countAsTranslatable_GMXAlphanumericOnlyTextUnit;
-	private boolean countAsTranslatable_GMXNumericOnlyTextUnit;
-	private boolean countAsTranslatable_GMXMeasurementOnlyTextUnit;
+	private boolean countAsNonTranslatable_GMXProtected;
+	private boolean countAsNonTranslatable_GMXExactMatched;
+	private boolean countAsNonTranslatable_GMXLeveragedMatched;
+	private boolean countAsNonTranslatable_GMXRepetitionMatched;
+	private boolean countAsNonTranslatable_GMXFuzzyMatch;
+	private boolean countAsNonTranslatable_GMXAlphanumericOnlyTextUnit;
+	private boolean countAsNonTranslatable_GMXNumericOnlyTextUnit;
+	private boolean countAsNonTranslatable_GMXMeasurementOnlyTextUnit;
 	
-	private boolean countAsTranslatable_ExactUniqueIdMatch;
-	private boolean countAsTranslatable_ExactPreviousVersionMatch;
-	private boolean countAsTranslatable_ExactLocalContextMatch;
-	private boolean countAsTranslatable_ExactDocumentContextMatch;
-	private boolean countAsTranslatable_ExactStructuralMatch;
-	private boolean countAsTranslatable_ExactMatch;
-	private boolean countAsTranslatable_ExactTextOnlyPreviousVersionMatch;
-	private boolean countAsTranslatable_ExactTextOnlyUniqueIdMatch;
-	private boolean countAsTranslatable_ExactTextOnly;
-	private boolean countAsTranslatable_ExactRepaired;
-	private boolean countAsTranslatable_FuzzyPreviousVersionMatch;
-	private boolean countAsTranslatable_FuzzyUniqueIdMatch;
-	private boolean countAsTranslatable_FuzzyMatch;
-	private boolean countAsTranslatable_FuzzyRepaired;
-	private boolean countAsTranslatable_PhraseAssembled;
-	private boolean countAsTranslatable_MT;
-	private boolean countAsTranslatable_Concordance;
+	private boolean countAsNonTranslatable_ExactUniqueIdMatch;
+	private boolean countAsNonTranslatable_ExactPreviousVersionMatch;
+	private boolean countAsNonTranslatable_ExactLocalContextMatch;
+	private boolean countAsNonTranslatable_ExactDocumentContextMatch;
+	private boolean countAsNonTranslatable_ExactStructuralMatch;
+	private boolean countAsNonTranslatable_ExactMatch;
+	private boolean countAsNonTranslatable_ExactTextOnlyPreviousVersionMatch;
+	private boolean countAsNonTranslatable_ExactTextOnlyUniqueIdMatch;
+	private boolean countAsNonTranslatable_ExactTextOnly;
+	private boolean countAsNonTranslatable_ExactRepaired;
+	private boolean countAsNonTranslatable_FuzzyPreviousVersionMatch;
+	private boolean countAsNonTranslatable_FuzzyUniqueIdMatch;
+	private boolean countAsNonTranslatable_FuzzyMatch;
+	private boolean countAsNonTranslatable_FuzzyRepaired;
+	private boolean countAsNonTranslatable_PhraseAssembled;
+	private boolean countAsNonTranslatable_MT;
+	private boolean countAsNonTranslatable_Concordance;
 	
 	public String getCustomTemplateURI() {
 		return customTemplateURI;
@@ -112,32 +112,32 @@ public class Parameters extends AbstractParameters implements IEditorDescription
 		customTemplateURI = buffer.getString(CUSTOM_TEMPLATE_URI, customTemplateURI);
 		outputPath = buffer.getString(OUTPUT_PATH, outputPath);
 		
-		countAsTranslatable_GMXProtected = buffer.getBoolean(COUNT_AS_TRANSLATABLE_GMX_PROTECTED, countAsTranslatable_GMXProtected);
-		countAsTranslatable_GMXExactMatched = buffer.getBoolean(COUNT_AS_TRANSLATABLE_GMX_EXACT_MATCHED, countAsTranslatable_GMXExactMatched);
-		countAsTranslatable_GMXLeveragedMatched = buffer.getBoolean(COUNT_AS_TRANSLATABLE_GMX_LEVERAGED_MATCHED, countAsTranslatable_GMXLeveragedMatched);
-		countAsTranslatable_GMXRepetitionMatched = buffer.getBoolean(COUNT_AS_TRANSLATABLE_GMX_REPETITION_MATCHED, countAsTranslatable_GMXRepetitionMatched);
-		countAsTranslatable_GMXFuzzyMatch = buffer.getBoolean(COUNT_AS_TRANSLATABLE_GMX_FUZZY_MATCHED, countAsTranslatable_GMXFuzzyMatch);
-		countAsTranslatable_GMXAlphanumericOnlyTextUnit = buffer.getBoolean(COUNT_AS_TRANSLATABLE_GMX_ALPHANUMERIC_ONLY_TEXT_UNIT, countAsTranslatable_GMXAlphanumericOnlyTextUnit);
-		countAsTranslatable_GMXNumericOnlyTextUnit = buffer.getBoolean(COUNT_AS_TRANSLATABLE_GMX_NUMERIC_ONLY_TEXT_UNIT, countAsTranslatable_GMXNumericOnlyTextUnit);
-		countAsTranslatable_GMXMeasurementOnlyTextUnit = buffer.getBoolean(COUNT_AS_TRANSLATABLE_GMX_MEASUREMENT_ONLY_TEXT_UNIT, countAsTranslatable_GMXMeasurementOnlyTextUnit);
+		countAsNonTranslatable_GMXProtected = buffer.getBoolean(COUNT_AS_NONTRANSLATABLE_GMX_PROTECTED, countAsNonTranslatable_GMXProtected);
+		countAsNonTranslatable_GMXExactMatched = buffer.getBoolean(COUNT_AS_NONTRANSLATABLE_GMX_EXACT_MATCHED, countAsNonTranslatable_GMXExactMatched);
+		countAsNonTranslatable_GMXLeveragedMatched = buffer.getBoolean(COUNT_AS_NONTRANSLATABLE_GMX_LEVERAGED_MATCHED, countAsNonTranslatable_GMXLeveragedMatched);
+		countAsNonTranslatable_GMXRepetitionMatched = buffer.getBoolean(COUNT_AS_NONTRANSLATABLE_GMX_REPETITION_MATCHED, countAsNonTranslatable_GMXRepetitionMatched);
+		countAsNonTranslatable_GMXFuzzyMatch = buffer.getBoolean(COUNT_AS_NONTRANSLATABLE_GMX_FUZZY_MATCHED, countAsNonTranslatable_GMXFuzzyMatch);
+		countAsNonTranslatable_GMXAlphanumericOnlyTextUnit = buffer.getBoolean(COUNT_AS_NONTRANSLATABLE_GMX_ALPHANUMERIC_ONLY_TEXT_UNIT, countAsNonTranslatable_GMXAlphanumericOnlyTextUnit);
+		countAsNonTranslatable_GMXNumericOnlyTextUnit = buffer.getBoolean(COUNT_AS_NONTRANSLATABLE_GMX_NUMERIC_ONLY_TEXT_UNIT, countAsNonTranslatable_GMXNumericOnlyTextUnit);
+		countAsNonTranslatable_GMXMeasurementOnlyTextUnit = buffer.getBoolean(COUNT_AS_NONTRANSLATABLE_GMX_MEASUREMENT_ONLY_TEXT_UNIT, countAsNonTranslatable_GMXMeasurementOnlyTextUnit);
 		
-		countAsTranslatable_ExactUniqueIdMatch = buffer.getBoolean(COUNT_AS_TRANSLATABLE_EXACT_UNIQUE_ID, countAsTranslatable_ExactUniqueIdMatch);
-		countAsTranslatable_ExactPreviousVersionMatch = buffer.getBoolean(COUNT_AS_TRANSLATABLE_EXACT_PREVIOUS_VERSION, countAsTranslatable_ExactPreviousVersionMatch);
-		countAsTranslatable_ExactLocalContextMatch = buffer.getBoolean(COUNT_AS_TRANSLATABLE_EXACT_LOCAL_CONTEXT, countAsTranslatable_ExactLocalContextMatch);
-		countAsTranslatable_ExactDocumentContextMatch = buffer.getBoolean(COUNT_AS_TRANSLATABLE_EXACT_DOCUMENT_CONTEXT, countAsTranslatable_ExactDocumentContextMatch);
-		countAsTranslatable_ExactStructuralMatch = buffer.getBoolean(COUNT_AS_TRANSLATABLE_EXACT_STRUCTURAL, countAsTranslatable_ExactStructuralMatch);
-		countAsTranslatable_ExactMatch = buffer.getBoolean(COUNT_AS_TRANSLATABLE_EXACT, countAsTranslatable_ExactMatch);
-		countAsTranslatable_ExactTextOnlyPreviousVersionMatch = buffer.getBoolean(COUNT_AS_TRANSLATABLE_EXACT_TEXT_ONLY_PREVIOUS_VERSION, countAsTranslatable_ExactTextOnlyPreviousVersionMatch);
-		countAsTranslatable_ExactTextOnlyUniqueIdMatch = buffer.getBoolean(COUNT_AS_TRANSLATABLE_EXACT_TEXT_ONLY_UNIQUE_ID, countAsTranslatable_ExactTextOnlyUniqueIdMatch);
-		countAsTranslatable_ExactTextOnly = buffer.getBoolean(COUNT_AS_TRANSLATABLE_EXACT_TEXT_ONLY, countAsTranslatable_ExactTextOnly);
-		countAsTranslatable_ExactRepaired = buffer.getBoolean(COUNT_AS_TRANSLATABLE_EXACT_REPAIRED, countAsTranslatable_ExactRepaired);
-		countAsTranslatable_FuzzyPreviousVersionMatch = buffer.getBoolean(COUNT_AS_TRANSLATABLE_FUZZY_PREVIOUS_VERSION, countAsTranslatable_FuzzyPreviousVersionMatch);
-		countAsTranslatable_FuzzyUniqueIdMatch = buffer.getBoolean(COUNT_AS_TRANSLATABLE_FUZZY_UNIQUE_ID, countAsTranslatable_FuzzyUniqueIdMatch);
-		countAsTranslatable_FuzzyMatch = buffer.getBoolean(COUNT_AS_TRANSLATABLE_FUZZY, countAsTranslatable_FuzzyMatch);
-		countAsTranslatable_FuzzyRepaired = buffer.getBoolean(COUNT_AS_TRANSLATABLE_FUZZY_REPAIRED, countAsTranslatable_FuzzyRepaired);
-		countAsTranslatable_PhraseAssembled = buffer.getBoolean(COUNT_AS_TRANSLATABLE_PHRASE_ASSEMBLED, countAsTranslatable_PhraseAssembled);
-		countAsTranslatable_MT = buffer.getBoolean(COUNT_AS_TRANSLATABLE_MT, countAsTranslatable_MT);
-		countAsTranslatable_Concordance = buffer.getBoolean(COUNT_AS_TRANSLATABLE_CONCORDANCE, countAsTranslatable_Concordance);
+		countAsNonTranslatable_ExactUniqueIdMatch = buffer.getBoolean(COUNT_AS_NONTRANSLATABLE_EXACT_UNIQUE_ID, countAsNonTranslatable_ExactUniqueIdMatch);
+		countAsNonTranslatable_ExactPreviousVersionMatch = buffer.getBoolean(COUNT_AS_NONTRANSLATABLE_EXACT_PREVIOUS_VERSION, countAsNonTranslatable_ExactPreviousVersionMatch);
+		countAsNonTranslatable_ExactLocalContextMatch = buffer.getBoolean(COUNT_AS_NONTRANSLATABLE_EXACT_LOCAL_CONTEXT, countAsNonTranslatable_ExactLocalContextMatch);
+		countAsNonTranslatable_ExactDocumentContextMatch = buffer.getBoolean(COUNT_AS_NONTRANSLATABLE_EXACT_DOCUMENT_CONTEXT, countAsNonTranslatable_ExactDocumentContextMatch);
+		countAsNonTranslatable_ExactStructuralMatch = buffer.getBoolean(COUNT_AS_NONTRANSLATABLE_EXACT_STRUCTURAL, countAsNonTranslatable_ExactStructuralMatch);
+		countAsNonTranslatable_ExactMatch = buffer.getBoolean(COUNT_AS_NONTRANSLATABLE_EXACT, countAsNonTranslatable_ExactMatch);
+		countAsNonTranslatable_ExactTextOnlyPreviousVersionMatch = buffer.getBoolean(COUNT_AS_NONTRANSLATABLE_EXACT_TEXT_ONLY_PREVIOUS_VERSION, countAsNonTranslatable_ExactTextOnlyPreviousVersionMatch);
+		countAsNonTranslatable_ExactTextOnlyUniqueIdMatch = buffer.getBoolean(COUNT_AS_NONTRANSLATABLE_EXACT_TEXT_ONLY_UNIQUE_ID, countAsNonTranslatable_ExactTextOnlyUniqueIdMatch);
+		countAsNonTranslatable_ExactTextOnly = buffer.getBoolean(COUNT_AS_NONTRANSLATABLE_EXACT_TEXT_ONLY, countAsNonTranslatable_ExactTextOnly);
+		countAsNonTranslatable_ExactRepaired = buffer.getBoolean(COUNT_AS_NONTRANSLATABLE_EXACT_REPAIRED, countAsNonTranslatable_ExactRepaired);
+		countAsNonTranslatable_FuzzyPreviousVersionMatch = buffer.getBoolean(COUNT_AS_NONTRANSLATABLE_FUZZY_PREVIOUS_VERSION, countAsNonTranslatable_FuzzyPreviousVersionMatch);
+		countAsNonTranslatable_FuzzyUniqueIdMatch = buffer.getBoolean(COUNT_AS_NONTRANSLATABLE_FUZZY_UNIQUE_ID, countAsNonTranslatable_FuzzyUniqueIdMatch);
+		countAsNonTranslatable_FuzzyMatch = buffer.getBoolean(COUNT_AS_NONTRANSLATABLE_FUZZY, countAsNonTranslatable_FuzzyMatch);
+		countAsNonTranslatable_FuzzyRepaired = buffer.getBoolean(COUNT_AS_NONTRANSLATABLE_FUZZY_REPAIRED, countAsNonTranslatable_FuzzyRepaired);
+		countAsNonTranslatable_PhraseAssembled = buffer.getBoolean(COUNT_AS_NONTRANSLATABLE_PHRASE_ASSEMBLED, countAsNonTranslatable_PhraseAssembled);
+		countAsNonTranslatable_MT = buffer.getBoolean(COUNT_AS_NONTRANSLATABLE_MT, countAsNonTranslatable_MT);
+		countAsNonTranslatable_Concordance = buffer.getBoolean(COUNT_AS_NONTRANSLATABLE_CONCORDANCE, countAsNonTranslatable_Concordance);
 	}
 
 	@Override
@@ -152,32 +152,32 @@ public class Parameters extends AbstractParameters implements IEditorDescription
 		customTemplateURI = EMPTY_URI;
 		outputPath = Util.ROOT_DIRECTORY_VAR+"/scoping_report.html";
 		
-		countAsTranslatable_GMXProtected = false;
-		countAsTranslatable_GMXExactMatched = false;
-		countAsTranslatable_GMXLeveragedMatched = true;
-		countAsTranslatable_GMXRepetitionMatched = true;
-		countAsTranslatable_GMXFuzzyMatch = true;
-		countAsTranslatable_GMXAlphanumericOnlyTextUnit = false;
-		countAsTranslatable_GMXNumericOnlyTextUnit = false;
-		countAsTranslatable_GMXMeasurementOnlyTextUnit = false;
+		countAsNonTranslatable_GMXProtected = true;
+		countAsNonTranslatable_GMXExactMatched = true;
+		countAsNonTranslatable_GMXLeveragedMatched = false;
+		countAsNonTranslatable_GMXRepetitionMatched = false;
+		countAsNonTranslatable_GMXFuzzyMatch = false;
+		countAsNonTranslatable_GMXAlphanumericOnlyTextUnit = true;
+		countAsNonTranslatable_GMXNumericOnlyTextUnit = true;
+		countAsNonTranslatable_GMXMeasurementOnlyTextUnit = true;
 		
-		countAsTranslatable_ExactUniqueIdMatch = false;
-		countAsTranslatable_ExactPreviousVersionMatch = false;
-		countAsTranslatable_ExactLocalContextMatch = true;
-		countAsTranslatable_ExactDocumentContextMatch = true;
-		countAsTranslatable_ExactStructuralMatch = true;
-		countAsTranslatable_ExactMatch = true;
-		countAsTranslatable_ExactTextOnlyPreviousVersionMatch = true;
-		countAsTranslatable_ExactTextOnlyUniqueIdMatch = true;
-		countAsTranslatable_ExactTextOnly = true;
-		countAsTranslatable_ExactRepaired = true;
-		countAsTranslatable_FuzzyPreviousVersionMatch = true;
-		countAsTranslatable_FuzzyUniqueIdMatch = true;
-		countAsTranslatable_FuzzyMatch = true;
-		countAsTranslatable_FuzzyRepaired = true;
-		countAsTranslatable_PhraseAssembled = true;
-		countAsTranslatable_MT = true;
-		countAsTranslatable_Concordance = true;
+		countAsNonTranslatable_ExactUniqueIdMatch = true;
+		countAsNonTranslatable_ExactPreviousVersionMatch = true;
+		countAsNonTranslatable_ExactLocalContextMatch = false;
+		countAsNonTranslatable_ExactDocumentContextMatch = false;
+		countAsNonTranslatable_ExactStructuralMatch = false;
+		countAsNonTranslatable_ExactMatch = false;
+		countAsNonTranslatable_ExactTextOnlyPreviousVersionMatch = false;
+		countAsNonTranslatable_ExactTextOnlyUniqueIdMatch = false;
+		countAsNonTranslatable_ExactTextOnly = false;
+		countAsNonTranslatable_ExactRepaired = false;
+		countAsNonTranslatable_FuzzyPreviousVersionMatch = false;
+		countAsNonTranslatable_FuzzyUniqueIdMatch = false;
+		countAsNonTranslatable_FuzzyMatch = false;
+		countAsNonTranslatable_FuzzyRepaired = false;
+		countAsNonTranslatable_PhraseAssembled = false;
+		countAsNonTranslatable_MT = false;
+		countAsNonTranslatable_Concordance = false;
 	}
 
 	@Override
@@ -186,32 +186,32 @@ public class Parameters extends AbstractParameters implements IEditorDescription
 		buffer.setString(CUSTOM_TEMPLATE_URI, customTemplateURI == null ? EMPTY_URI : customTemplateURI.toString());
 		buffer.setString(OUTPUT_PATH, outputPath);
 		
-		buffer.setBoolean(COUNT_AS_TRANSLATABLE_GMX_PROTECTED, countAsTranslatable_GMXProtected);
-		buffer.setBoolean(COUNT_AS_TRANSLATABLE_GMX_EXACT_MATCHED, countAsTranslatable_GMXExactMatched);
-		buffer.setBoolean(COUNT_AS_TRANSLATABLE_GMX_LEVERAGED_MATCHED, countAsTranslatable_GMXLeveragedMatched);
-		buffer.setBoolean(COUNT_AS_TRANSLATABLE_GMX_REPETITION_MATCHED, countAsTranslatable_GMXRepetitionMatched);
-		buffer.setBoolean(COUNT_AS_TRANSLATABLE_GMX_FUZZY_MATCHED, countAsTranslatable_GMXFuzzyMatch);
-		buffer.setBoolean(COUNT_AS_TRANSLATABLE_GMX_ALPHANUMERIC_ONLY_TEXT_UNIT, countAsTranslatable_GMXAlphanumericOnlyTextUnit);
-		buffer.setBoolean(COUNT_AS_TRANSLATABLE_GMX_NUMERIC_ONLY_TEXT_UNIT, countAsTranslatable_GMXNumericOnlyTextUnit);
-		buffer.setBoolean(COUNT_AS_TRANSLATABLE_GMX_MEASUREMENT_ONLY_TEXT_UNIT, countAsTranslatable_GMXMeasurementOnlyTextUnit);
+		buffer.setBoolean(COUNT_AS_NONTRANSLATABLE_GMX_PROTECTED, countAsNonTranslatable_GMXProtected);
+		buffer.setBoolean(COUNT_AS_NONTRANSLATABLE_GMX_EXACT_MATCHED, countAsNonTranslatable_GMXExactMatched);
+		buffer.setBoolean(COUNT_AS_NONTRANSLATABLE_GMX_LEVERAGED_MATCHED, countAsNonTranslatable_GMXLeveragedMatched);
+		buffer.setBoolean(COUNT_AS_NONTRANSLATABLE_GMX_REPETITION_MATCHED, countAsNonTranslatable_GMXRepetitionMatched);
+		buffer.setBoolean(COUNT_AS_NONTRANSLATABLE_GMX_FUZZY_MATCHED, countAsNonTranslatable_GMXFuzzyMatch);
+		buffer.setBoolean(COUNT_AS_NONTRANSLATABLE_GMX_ALPHANUMERIC_ONLY_TEXT_UNIT, countAsNonTranslatable_GMXAlphanumericOnlyTextUnit);
+		buffer.setBoolean(COUNT_AS_NONTRANSLATABLE_GMX_NUMERIC_ONLY_TEXT_UNIT, countAsNonTranslatable_GMXNumericOnlyTextUnit);
+		buffer.setBoolean(COUNT_AS_NONTRANSLATABLE_GMX_MEASUREMENT_ONLY_TEXT_UNIT, countAsNonTranslatable_GMXMeasurementOnlyTextUnit);
 		
-		buffer.setBoolean(COUNT_AS_TRANSLATABLE_EXACT_UNIQUE_ID, countAsTranslatable_ExactUniqueIdMatch);
-		buffer.setBoolean(COUNT_AS_TRANSLATABLE_EXACT_PREVIOUS_VERSION, countAsTranslatable_ExactPreviousVersionMatch);
-		buffer.setBoolean(COUNT_AS_TRANSLATABLE_EXACT_LOCAL_CONTEXT, countAsTranslatable_ExactLocalContextMatch);
-		buffer.setBoolean(COUNT_AS_TRANSLATABLE_EXACT_DOCUMENT_CONTEXT, countAsTranslatable_ExactDocumentContextMatch);
-		buffer.setBoolean(COUNT_AS_TRANSLATABLE_EXACT_STRUCTURAL, countAsTranslatable_ExactStructuralMatch);
-		buffer.setBoolean(COUNT_AS_TRANSLATABLE_EXACT, countAsTranslatable_ExactMatch);
-		buffer.setBoolean(COUNT_AS_TRANSLATABLE_EXACT_TEXT_ONLY_PREVIOUS_VERSION, countAsTranslatable_ExactTextOnlyPreviousVersionMatch);
-		buffer.setBoolean(COUNT_AS_TRANSLATABLE_EXACT_TEXT_ONLY_UNIQUE_ID, countAsTranslatable_ExactTextOnlyUniqueIdMatch);
-		buffer.setBoolean(COUNT_AS_TRANSLATABLE_EXACT_TEXT_ONLY, countAsTranslatable_ExactTextOnly);
-		buffer.setBoolean(COUNT_AS_TRANSLATABLE_EXACT_REPAIRED, countAsTranslatable_ExactRepaired);
-		buffer.setBoolean(COUNT_AS_TRANSLATABLE_FUZZY_PREVIOUS_VERSION, countAsTranslatable_FuzzyPreviousVersionMatch);
-		buffer.setBoolean(COUNT_AS_TRANSLATABLE_FUZZY_UNIQUE_ID, countAsTranslatable_FuzzyUniqueIdMatch);
-		buffer.setBoolean(COUNT_AS_TRANSLATABLE_FUZZY, countAsTranslatable_FuzzyMatch);
-		buffer.setBoolean(COUNT_AS_TRANSLATABLE_FUZZY_REPAIRED, countAsTranslatable_FuzzyRepaired);
-		buffer.setBoolean(COUNT_AS_TRANSLATABLE_PHRASE_ASSEMBLED, countAsTranslatable_PhraseAssembled);
-		buffer.setBoolean(COUNT_AS_TRANSLATABLE_MT, countAsTranslatable_MT);
-		buffer.setBoolean(COUNT_AS_TRANSLATABLE_CONCORDANCE, countAsTranslatable_Concordance);
+		buffer.setBoolean(COUNT_AS_NONTRANSLATABLE_EXACT_UNIQUE_ID, countAsNonTranslatable_ExactUniqueIdMatch);
+		buffer.setBoolean(COUNT_AS_NONTRANSLATABLE_EXACT_PREVIOUS_VERSION, countAsNonTranslatable_ExactPreviousVersionMatch);
+		buffer.setBoolean(COUNT_AS_NONTRANSLATABLE_EXACT_LOCAL_CONTEXT, countAsNonTranslatable_ExactLocalContextMatch);
+		buffer.setBoolean(COUNT_AS_NONTRANSLATABLE_EXACT_DOCUMENT_CONTEXT, countAsNonTranslatable_ExactDocumentContextMatch);
+		buffer.setBoolean(COUNT_AS_NONTRANSLATABLE_EXACT_STRUCTURAL, countAsNonTranslatable_ExactStructuralMatch);
+		buffer.setBoolean(COUNT_AS_NONTRANSLATABLE_EXACT, countAsNonTranslatable_ExactMatch);
+		buffer.setBoolean(COUNT_AS_NONTRANSLATABLE_EXACT_TEXT_ONLY_PREVIOUS_VERSION, countAsNonTranslatable_ExactTextOnlyPreviousVersionMatch);
+		buffer.setBoolean(COUNT_AS_NONTRANSLATABLE_EXACT_TEXT_ONLY_UNIQUE_ID, countAsNonTranslatable_ExactTextOnlyUniqueIdMatch);
+		buffer.setBoolean(COUNT_AS_NONTRANSLATABLE_EXACT_TEXT_ONLY, countAsNonTranslatable_ExactTextOnly);
+		buffer.setBoolean(COUNT_AS_NONTRANSLATABLE_EXACT_REPAIRED, countAsNonTranslatable_ExactRepaired);
+		buffer.setBoolean(COUNT_AS_NONTRANSLATABLE_FUZZY_PREVIOUS_VERSION, countAsNonTranslatable_FuzzyPreviousVersionMatch);
+		buffer.setBoolean(COUNT_AS_NONTRANSLATABLE_FUZZY_UNIQUE_ID, countAsNonTranslatable_FuzzyUniqueIdMatch);
+		buffer.setBoolean(COUNT_AS_NONTRANSLATABLE_FUZZY, countAsNonTranslatable_FuzzyMatch);
+		buffer.setBoolean(COUNT_AS_NONTRANSLATABLE_FUZZY_REPAIRED, countAsNonTranslatable_FuzzyRepaired);
+		buffer.setBoolean(COUNT_AS_NONTRANSLATABLE_PHRASE_ASSEMBLED, countAsNonTranslatable_PhraseAssembled);
+		buffer.setBoolean(COUNT_AS_NONTRANSLATABLE_MT, countAsNonTranslatable_MT);
+		buffer.setBoolean(COUNT_AS_NONTRANSLATABLE_CONCORDANCE, countAsNonTranslatable_Concordance);
 	}
 
 	public String getProjectName() {
@@ -240,82 +240,82 @@ public class Parameters extends AbstractParameters implements IEditorDescription
 		desc.add(OUTPUT_PATH,
 			"Output path:", "Full path of the report to generate");
 		
-		desc.add(COUNT_AS_TRANSLATABLE_GMX_PROTECTED,
+		desc.add(COUNT_AS_NONTRANSLATABLE_GMX_PROTECTED,
 				"GMX Protected Word Count",
-				"Count as translatable the words in PROJECT_GMX_PROTECTED_WORD_COUNT and ITEM_GMX_PROTECTED_WORD_COUNT categories");
-		desc.add(COUNT_AS_TRANSLATABLE_GMX_EXACT_MATCHED,
+				"Count as non-translatable the words in PROJECT_GMX_PROTECTED_WORD_COUNT and ITEM_GMX_PROTECTED_WORD_COUNT categories");
+		desc.add(COUNT_AS_NONTRANSLATABLE_GMX_EXACT_MATCHED,
 				"GMX Exact Matched Word Count",
-				"Count as translatable the words in PROJECT_GMX_EXACT_MATCHED_WORD_COUNT and ITEM_GMX_EXACT_MATCHED_WORD_COUNT categories");
-		desc.add(COUNT_AS_TRANSLATABLE_GMX_LEVERAGED_MATCHED,
+				"Count as non-translatable the words in PROJECT_GMX_EXACT_MATCHED_WORD_COUNT and ITEM_GMX_EXACT_MATCHED_WORD_COUNT categories");
+		desc.add(COUNT_AS_NONTRANSLATABLE_GMX_LEVERAGED_MATCHED,
 				"GMX Leveraged Matched Word Count",
-				"Count as translatable the words in PROJECT_GMX_LEVERAGED_MATCHED_WORD_COUNT and ITEM_GMX_LEVERAGED_MATCHED_WORD_COUNT categories");
-		desc.add(COUNT_AS_TRANSLATABLE_GMX_REPETITION_MATCHED,
+				"Count as non-translatable the words in PROJECT_GMX_LEVERAGED_MATCHED_WORD_COUNT and ITEM_GMX_LEVERAGED_MATCHED_WORD_COUNT categories");
+		desc.add(COUNT_AS_NONTRANSLATABLE_GMX_REPETITION_MATCHED,
 				"GMX Repetition Matched Word Count",
-				"Count as translatable the words in PROJECT_GMX_REPETITION_MATCHED_WORD_COUNT and ITEM_GMX_REPETITION_MATCHED_WORD_COUNT categories");
-		desc.add(COUNT_AS_TRANSLATABLE_GMX_FUZZY_MATCHED,
+				"Count as non-translatable the words in PROJECT_GMX_REPETITION_MATCHED_WORD_COUNT and ITEM_GMX_REPETITION_MATCHED_WORD_COUNT categories");
+		desc.add(COUNT_AS_NONTRANSLATABLE_GMX_FUZZY_MATCHED,
 				"GMX Fuzzy Matched Word Count",
-				"Count as translatable the words in PROJECT_GMX_FUZZY_MATCHED_WORD_COUNT and ITEM_GMX_FUZZY_MATCHED_WORD_COUNT categories");
-		desc.add(COUNT_AS_TRANSLATABLE_GMX_ALPHANUMERIC_ONLY_TEXT_UNIT,
+				"Count as non-translatable the words in PROJECT_GMX_FUZZY_MATCHED_WORD_COUNT and ITEM_GMX_FUZZY_MATCHED_WORD_COUNT categories");
+		desc.add(COUNT_AS_NONTRANSLATABLE_GMX_ALPHANUMERIC_ONLY_TEXT_UNIT,
 				"GMX Alphanumeric Only Text Unit Word Count",
-				"Count as translatable the words in PROJECT_GMX_ALPHANUMERIC_ONLY_TEXT_UNIT_WORD_COUNT and ITEM_GMX_ALPHANUMERIC_ONLY_TEXT_UNIT_WORD_COUNT categories");
-		desc.add(COUNT_AS_TRANSLATABLE_GMX_NUMERIC_ONLY_TEXT_UNIT,
+				"Count as non-translatable the words in PROJECT_GMX_ALPHANUMERIC_ONLY_TEXT_UNIT_WORD_COUNT and ITEM_GMX_ALPHANUMERIC_ONLY_TEXT_UNIT_WORD_COUNT categories");
+		desc.add(COUNT_AS_NONTRANSLATABLE_GMX_NUMERIC_ONLY_TEXT_UNIT,
 				"GMX Numeric Only Text Unit Word Count",
-				"Count as translatable the words in PROJECT_GMX_NUMERIC_ONLY_TEXT_UNIT_WORD_COUNT and ITEM_GMX_NUMERIC_ONLY_TEXT_UNIT_WORD_COUNT categories");
-		desc.add(COUNT_AS_TRANSLATABLE_GMX_MEASUREMENT_ONLY_TEXT_UNIT,
+				"Count as non-translatable the words in PROJECT_GMX_NUMERIC_ONLY_TEXT_UNIT_WORD_COUNT and ITEM_GMX_NUMERIC_ONLY_TEXT_UNIT_WORD_COUNT categories");
+		desc.add(COUNT_AS_NONTRANSLATABLE_GMX_MEASUREMENT_ONLY_TEXT_UNIT,
 				"GMX Measurement Only Text Unit Word Count",
-				"Count as translatable the words in PROJECT_GMX_MEASUREMENT_ONLY_TEXT_UNIT_WORD_COUNT and ITEM_GMX_MEASUREMENT_ONLY_TEXT_UNIT_WORD_COUNT categories");
+				"Count as non-translatable the words in PROJECT_GMX_MEASUREMENT_ONLY_TEXT_UNIT_WORD_COUNT and ITEM_GMX_MEASUREMENT_ONLY_TEXT_UNIT_WORD_COUNT categories");
 		
-		desc.add(COUNT_AS_TRANSLATABLE_EXACT_UNIQUE_ID,
+		desc.add(COUNT_AS_NONTRANSLATABLE_EXACT_UNIQUE_ID,
 				"Exact Unique Id Match",
-				"Count as translatable the words in PROJECT_EXACT_UNIQUE_ID and ITEM_EXACT_UNIQUE_ID categories");
-		desc.add(COUNT_AS_TRANSLATABLE_EXACT_PREVIOUS_VERSION,
+				"Count as non-translatable the words in PROJECT_EXACT_UNIQUE_ID and ITEM_EXACT_UNIQUE_ID categories");
+		desc.add(COUNT_AS_NONTRANSLATABLE_EXACT_PREVIOUS_VERSION,
 				"Exact Previous Version Match",
-				"Count as translatable the words in PROJECT_EXACT_PREVIOUS_VERSION and ITEM_EXACT_PREVIOUS_VERSION categories");
-		desc.add(COUNT_AS_TRANSLATABLE_EXACT_LOCAL_CONTEXT,
+				"Count as non-translatable the words in PROJECT_EXACT_PREVIOUS_VERSION and ITEM_EXACT_PREVIOUS_VERSION categories");
+		desc.add(COUNT_AS_NONTRANSLATABLE_EXACT_LOCAL_CONTEXT,
 				"Exact Local Context Match",
-				"Count as translatable the words in PROJECT_EXACT_LOCAL_CONTEXT and ITEM_EXACT_LOCAL_CONTEXT categories");
-		desc.add(COUNT_AS_TRANSLATABLE_EXACT_DOCUMENT_CONTEXT,
+				"Count as non-translatable the words in PROJECT_EXACT_LOCAL_CONTEXT and ITEM_EXACT_LOCAL_CONTEXT categories");
+		desc.add(COUNT_AS_NONTRANSLATABLE_EXACT_DOCUMENT_CONTEXT,
 				"Exact Document Context Match",
-				"Count as translatable the words in PROJECT_EXACT_DOCUMENT_CONTEXT and ITEM_EXACT_DOCUMENT_CONTEXT categories");
-		desc.add(COUNT_AS_TRANSLATABLE_EXACT_STRUCTURAL,
+				"Count as non-translatable the words in PROJECT_EXACT_DOCUMENT_CONTEXT and ITEM_EXACT_DOCUMENT_CONTEXT categories");
+		desc.add(COUNT_AS_NONTRANSLATABLE_EXACT_STRUCTURAL,
 				"Exact Structural Match",
-				"Count as translatable the words in PROJECT_EXACT_STRUCTURAL and ITEM_EXACT_STRUCTURAL categories");
-		desc.add(COUNT_AS_TRANSLATABLE_EXACT,
+				"Count as non-translatable the words in PROJECT_EXACT_STRUCTURAL and ITEM_EXACT_STRUCTURAL categories");
+		desc.add(COUNT_AS_NONTRANSLATABLE_EXACT,
 				"Exact Match",
-				"Count as translatable the words in PROJECT_EXACT and ITEM_EXACT categories");
-		desc.add(COUNT_AS_TRANSLATABLE_EXACT_TEXT_ONLY_PREVIOUS_VERSION,
+				"Count as non-translatable the words in PROJECT_EXACT and ITEM_EXACT categories");
+		desc.add(COUNT_AS_NONTRANSLATABLE_EXACT_TEXT_ONLY_PREVIOUS_VERSION,
 				"Exact Text Only Previous Version Match",
-				"Count as translatable the words in PROJECT_EXACT_TEXT_ONLY_PREVIOUS_VERSION and ITEM_EXACT_TEXT_ONLY_PREVIOUS_VERSION categories");
-		desc.add(COUNT_AS_TRANSLATABLE_EXACT_TEXT_ONLY_UNIQUE_ID,
+				"Count as non-translatable the words in PROJECT_EXACT_TEXT_ONLY_PREVIOUS_VERSION and ITEM_EXACT_TEXT_ONLY_PREVIOUS_VERSION categories");
+		desc.add(COUNT_AS_NONTRANSLATABLE_EXACT_TEXT_ONLY_UNIQUE_ID,
 				"Exact Text Only Unique Id Match",
-				"Count as translatable the words in PROJECT_EXACT_TEXT_ONLY_UNIQUE_ID and ITEM_EXACT_TEXT_ONLY_UNIQUE_ID categories");
-		desc.add(COUNT_AS_TRANSLATABLE_EXACT_TEXT_ONLY,
+				"Count as non-translatable the words in PROJECT_EXACT_TEXT_ONLY_UNIQUE_ID and ITEM_EXACT_TEXT_ONLY_UNIQUE_ID categories");
+		desc.add(COUNT_AS_NONTRANSLATABLE_EXACT_TEXT_ONLY,
 				"Exact Text Only",
-				"Count as translatable the words in PROJECT_EXACT_TEXT_ONLY and ITEM_EXACT_TEXT_ONLY categories");
-		desc.add(COUNT_AS_TRANSLATABLE_EXACT_REPAIRED,
+				"Count as non-translatable the words in PROJECT_EXACT_TEXT_ONLY and ITEM_EXACT_TEXT_ONLY categories");
+		desc.add(COUNT_AS_NONTRANSLATABLE_EXACT_REPAIRED,
 				"Exact Repaired",
-				"Count as translatable the words in PROJECT_EXACT_REPAIRED and ITEM_EXACT_REPAIRED categories");
-		desc.add(COUNT_AS_TRANSLATABLE_FUZZY_PREVIOUS_VERSION,
+				"Count as non-translatable the words in PROJECT_EXACT_REPAIRED and ITEM_EXACT_REPAIRED categories");
+		desc.add(COUNT_AS_NONTRANSLATABLE_FUZZY_PREVIOUS_VERSION,
 				"Fuzzy Previous Version Match",
-				"Count as translatable the words in PROJECT_FUZZY_PREVIOUS_VERSION and ITEM_FUZZY_PREVIOUS_VERSION categories");
-		desc.add(COUNT_AS_TRANSLATABLE_FUZZY_UNIQUE_ID,
+				"Count as non-translatable the words in PROJECT_FUZZY_PREVIOUS_VERSION and ITEM_FUZZY_PREVIOUS_VERSION categories");
+		desc.add(COUNT_AS_NONTRANSLATABLE_FUZZY_UNIQUE_ID,
 				"Fuzzy Unique Id Match",
-				"Count as translatable the words in PROJECT_FUZZY_UNIQUE_ID and ITEM_FUZZY_UNIQUE_ID categories");
-		desc.add(COUNT_AS_TRANSLATABLE_FUZZY,
+				"Count as non-translatable the words in PROJECT_FUZZY_UNIQUE_ID and ITEM_FUZZY_UNIQUE_ID categories");
+		desc.add(COUNT_AS_NONTRANSLATABLE_FUZZY,
 				"Fuzzy Match",
-				"Count as translatable the words in PROJECT_FUZZY and ITEM_FUZZY categories");
-		desc.add(COUNT_AS_TRANSLATABLE_FUZZY_REPAIRED,
+				"Count as non-translatable the words in PROJECT_FUZZY and ITEM_FUZZY categories");
+		desc.add(COUNT_AS_NONTRANSLATABLE_FUZZY_REPAIRED,
 				"Fuzzy Repaired",
-				"Count as translatable the words in PROJECT_FUZZY_REPAIRED and ITEM_FUZZY_REPAIRED categories");
-		desc.add(COUNT_AS_TRANSLATABLE_PHRASE_ASSEMBLED,
+				"Count as non-translatable the words in PROJECT_FUZZY_REPAIRED and ITEM_FUZZY_REPAIRED categories");
+		desc.add(COUNT_AS_NONTRANSLATABLE_PHRASE_ASSEMBLED,
 				"Phrase Assembled",
-				"Count as translatable the words in PROJECT_PHRASE_ASSEMBLED and ITEM_PHRASE_ASSEMBLED categories");
-		desc.add(COUNT_AS_TRANSLATABLE_MT,
+				"Count as non-translatable the words in PROJECT_PHRASE_ASSEMBLED and ITEM_PHRASE_ASSEMBLED categories");
+		desc.add(COUNT_AS_NONTRANSLATABLE_MT,
 				"MT",
-				"Count as translatable the words in PROJECT_MT and ITEM_MT categories");
-		desc.add(COUNT_AS_TRANSLATABLE_CONCORDANCE,
+				"Count as non-translatable the words in PROJECT_MT and ITEM_MT categories");
+		desc.add(COUNT_AS_NONTRANSLATABLE_CONCORDANCE,
 				"Concordance",
-				"Count as translatable the words in PROJECT_CONCORDANCE and ITEM_CONCORDANCE categories");
+				"Count as non-translatable the words in PROJECT_CONCORDANCE and ITEM_CONCORDANCE categories");
 		
 		return desc;
 	}
@@ -336,62 +336,62 @@ public class Parameters extends AbstractParameters implements IEditorDescription
 		pip.setBrowseFilters("HTML Files (*.htm;*.html)\tAll Files (*.*)", "*.htm;*.html\t*.*");
 
 //		desc.addSeparatorPart();
-		CheckListPart clp = desc.addCheckListPart("GMX categories to count as translatable", 90);
-		clp.addEntry(paramsDesc.get(COUNT_AS_TRANSLATABLE_GMX_PROTECTED));
-		clp.addEntry(paramsDesc.get(COUNT_AS_TRANSLATABLE_GMX_EXACT_MATCHED));
-		clp.addEntry(paramsDesc.get(COUNT_AS_TRANSLATABLE_GMX_LEVERAGED_MATCHED));
-		clp.addEntry(paramsDesc.get(COUNT_AS_TRANSLATABLE_GMX_REPETITION_MATCHED));
-		clp.addEntry(paramsDesc.get(COUNT_AS_TRANSLATABLE_GMX_FUZZY_MATCHED));
-		clp.addEntry(paramsDesc.get(COUNT_AS_TRANSLATABLE_GMX_ALPHANUMERIC_ONLY_TEXT_UNIT));
-		clp.addEntry(paramsDesc.get(COUNT_AS_TRANSLATABLE_GMX_NUMERIC_ONLY_TEXT_UNIT));
-		clp.addEntry(paramsDesc.get(COUNT_AS_TRANSLATABLE_GMX_MEASUREMENT_ONLY_TEXT_UNIT));
+		CheckListPart clp = desc.addCheckListPart("GMX categories to count as non-translatable", 90);
+		clp.addEntry(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_GMX_PROTECTED));
+		clp.addEntry(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_GMX_EXACT_MATCHED));
+		clp.addEntry(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_GMX_LEVERAGED_MATCHED));
+		clp.addEntry(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_GMX_REPETITION_MATCHED));
+		clp.addEntry(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_GMX_FUZZY_MATCHED));
+		clp.addEntry(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_GMX_ALPHANUMERIC_ONLY_TEXT_UNIT));
+		clp.addEntry(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_GMX_NUMERIC_ONLY_TEXT_UNIT));
+		clp.addEntry(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_GMX_MEASUREMENT_ONLY_TEXT_UNIT));
 		
-//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_TRANSLATABLE_GMX_PROTECTED));
-//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_TRANSLATABLE_GMX_EXACT_MATCHED));
-//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_TRANSLATABLE_GMX_LEVERAGED_MATCHED));
-//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_TRANSLATABLE_GMX_REPETITION_MATCHED));
-//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_TRANSLATABLE_GMX_FUZZY_MATCHED));
-//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_TRANSLATABLE_GMX_ALPHANUMERIC_ONLY_TEXT_UNIT));
-//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_TRANSLATABLE_GMX_NUMERIC_ONLY_TEXT_UNIT));
-//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_TRANSLATABLE_GMX_MEASUREMENT_ONLY_TEXT_UNIT));
+//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_GMX_PROTECTED));
+//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_GMX_EXACT_MATCHED));
+//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_GMX_LEVERAGED_MATCHED));
+//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_GMX_REPETITION_MATCHED));
+//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_GMX_FUZZY_MATCHED));
+//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_GMX_ALPHANUMERIC_ONLY_TEXT_UNIT));
+//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_GMX_NUMERIC_ONLY_TEXT_UNIT));
+//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_GMX_MEASUREMENT_ONLY_TEXT_UNIT));
 		
 //		desc.addSeparatorPart();
-		clp = desc.addCheckListPart("Okapi categories to count as translatable", 120);
-		clp.addEntry(paramsDesc.get(COUNT_AS_TRANSLATABLE_EXACT_UNIQUE_ID));
-		clp.addEntry(paramsDesc.get(COUNT_AS_TRANSLATABLE_EXACT_PREVIOUS_VERSION));
-		clp.addEntry(paramsDesc.get(COUNT_AS_TRANSLATABLE_EXACT_LOCAL_CONTEXT));
-		clp.addEntry(paramsDesc.get(COUNT_AS_TRANSLATABLE_EXACT_DOCUMENT_CONTEXT));
-		clp.addEntry(paramsDesc.get(COUNT_AS_TRANSLATABLE_EXACT_STRUCTURAL));
-		clp.addEntry(paramsDesc.get(COUNT_AS_TRANSLATABLE_EXACT));
-		clp.addEntry(paramsDesc.get(COUNT_AS_TRANSLATABLE_EXACT_TEXT_ONLY_PREVIOUS_VERSION));
-		clp.addEntry(paramsDesc.get(COUNT_AS_TRANSLATABLE_EXACT_TEXT_ONLY_UNIQUE_ID));
-		clp.addEntry(paramsDesc.get(COUNT_AS_TRANSLATABLE_EXACT_TEXT_ONLY));
-		clp.addEntry(paramsDesc.get(COUNT_AS_TRANSLATABLE_EXACT_REPAIRED));
-		clp.addEntry(paramsDesc.get(COUNT_AS_TRANSLATABLE_FUZZY_PREVIOUS_VERSION));
-		clp.addEntry(paramsDesc.get(COUNT_AS_TRANSLATABLE_FUZZY_UNIQUE_ID));
-		clp.addEntry(paramsDesc.get(COUNT_AS_TRANSLATABLE_FUZZY));
-		clp.addEntry(paramsDesc.get(COUNT_AS_TRANSLATABLE_FUZZY_REPAIRED));
-		clp.addEntry(paramsDesc.get(COUNT_AS_TRANSLATABLE_PHRASE_ASSEMBLED));
-		clp.addEntry(paramsDesc.get(COUNT_AS_TRANSLATABLE_MT));
-		clp.addEntry(paramsDesc.get(COUNT_AS_TRANSLATABLE_CONCORDANCE));
+		clp = desc.addCheckListPart("Okapi categories to count as non-translatable", 120);
+		clp.addEntry(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_EXACT_UNIQUE_ID));
+		clp.addEntry(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_EXACT_PREVIOUS_VERSION));
+		clp.addEntry(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_EXACT_LOCAL_CONTEXT));
+		clp.addEntry(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_EXACT_DOCUMENT_CONTEXT));
+		clp.addEntry(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_EXACT_STRUCTURAL));
+		clp.addEntry(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_EXACT));
+		clp.addEntry(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_EXACT_TEXT_ONLY_PREVIOUS_VERSION));
+		clp.addEntry(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_EXACT_TEXT_ONLY_UNIQUE_ID));
+		clp.addEntry(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_EXACT_TEXT_ONLY));
+		clp.addEntry(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_EXACT_REPAIRED));
+		clp.addEntry(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_FUZZY_PREVIOUS_VERSION));
+		clp.addEntry(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_FUZZY_UNIQUE_ID));
+		clp.addEntry(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_FUZZY));
+		clp.addEntry(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_FUZZY_REPAIRED));
+		clp.addEntry(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_PHRASE_ASSEMBLED));
+		clp.addEntry(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_MT));
+		clp.addEntry(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_CONCORDANCE));
 		
-//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_TRANSLATABLE_EXACT_UNIQUE_ID));
-//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_TRANSLATABLE_EXACT_PREVIOUS_VERSION));
-//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_TRANSLATABLE_EXACT_LOCAL_CONTEXT));
-//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_TRANSLATABLE_EXACT_DOCUMENT_CONTEXT));
-//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_TRANSLATABLE_EXACT_STRUCTURAL));
-//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_TRANSLATABLE_EXACT));
-//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_TRANSLATABLE_EXACT_TEXT_ONLY_PREVIOUS_VERSION));
-//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_TRANSLATABLE_EXACT_TEXT_ONLY_UNIQUE_ID));
-//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_TRANSLATABLE_EXACT_TEXT_ONLY));
-//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_TRANSLATABLE_EXACT_REPAIRED));
-//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_TRANSLATABLE_FUZZY_PREVIOUS_VERSION));
-//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_TRANSLATABLE_FUZZY_UNIQUE_ID));
-//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_TRANSLATABLE_FUZZY));
-//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_TRANSLATABLE_FUZZY_REPAIRED));
-//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_TRANSLATABLE_PHRASE_ASSEMBLED));
-//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_TRANSLATABLE_MT));
-//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_TRANSLATABLE_CONCORDANCE));
+//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_EXACT_UNIQUE_ID));
+//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_EXACT_PREVIOUS_VERSION));
+//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_EXACT_LOCAL_CONTEXT));
+//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_EXACT_DOCUMENT_CONTEXT));
+//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_EXACT_STRUCTURAL));
+//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_EXACT));
+//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_EXACT_TEXT_ONLY_PREVIOUS_VERSION));
+//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_EXACT_TEXT_ONLY_UNIQUE_ID));
+//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_EXACT_TEXT_ONLY));
+//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_EXACT_REPAIRED));
+//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_FUZZY_PREVIOUS_VERSION));
+//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_FUZZY_UNIQUE_ID));
+//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_FUZZY));
+//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_FUZZY_REPAIRED));
+//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_PHRASE_ASSEMBLED));
+//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_MT));
+//		desc.addCheckboxPart(paramsDesc.get(COUNT_AS_NONTRANSLATABLE_CONCORDANCE));
 
 		return desc;
 	}
@@ -400,215 +400,215 @@ public class Parameters extends AbstractParameters implements IEditorDescription
 		return EMPTY_URI.equalsIgnoreCase(customTemplateURI.toString()); 
 	}
 	
-	public boolean isCountAsTranslatable_GMXExactMatched() {
-		return countAsTranslatable_GMXExactMatched;
+	public boolean isCountAsNonTranslatable_GMXExactMatched() {
+		return countAsNonTranslatable_GMXExactMatched;
 	}
 
-	public void setCountAsTranslatable_GMXExactMatched(boolean countAsTranslatable_GMXExactMatched) {
-		this.countAsTranslatable_GMXExactMatched = countAsTranslatable_GMXExactMatched;
+	public void setCountAsNonTranslatable_GMXExactMatched(boolean countAsNonTranslatable_GMXExactMatched) {
+		this.countAsNonTranslatable_GMXExactMatched = countAsNonTranslatable_GMXExactMatched;
 	}
 
-	public boolean isCountAsTranslatable_GMXLeveragedMatched() {
-		return countAsTranslatable_GMXLeveragedMatched;
+	public boolean isCountAsNonTranslatable_GMXLeveragedMatched() {
+		return countAsNonTranslatable_GMXLeveragedMatched;
 	}
 
-	public void setCountAsTranslatable_GMXLeveragedMatched(boolean countAsTranslatable_GMXLeveragedMatched) {
-		this.countAsTranslatable_GMXLeveragedMatched = countAsTranslatable_GMXLeveragedMatched;
+	public void setCountAsNonTranslatable_GMXLeveragedMatched(boolean countAsNonTranslatable_GMXLeveragedMatched) {
+		this.countAsNonTranslatable_GMXLeveragedMatched = countAsNonTranslatable_GMXLeveragedMatched;
 	}
 
-	public boolean isCountAsTranslatable_GMXRepetitionMatched() {
-		return countAsTranslatable_GMXRepetitionMatched;
+	public boolean isCountAsNonTranslatable_GMXRepetitionMatched() {
+		return countAsNonTranslatable_GMXRepetitionMatched;
 	}
 
-	public void setCountAsTranslatable_GMXRepetitionMatched(
-			boolean countAsTranslatable_GMXRepetitionMatched) {
-		this.countAsTranslatable_GMXRepetitionMatched = countAsTranslatable_GMXRepetitionMatched;
+	public void setCountAsNonTranslatable_GMXRepetitionMatched(
+			boolean countAsNonTranslatable_GMXRepetitionMatched) {
+		this.countAsNonTranslatable_GMXRepetitionMatched = countAsNonTranslatable_GMXRepetitionMatched;
 	}
 
-	public boolean isCountAsTranslatable_GMXFuzzyMatch() {
-		return countAsTranslatable_GMXFuzzyMatch;
+	public boolean isCountAsNonTranslatable_GMXFuzzyMatch() {
+		return countAsNonTranslatable_GMXFuzzyMatch;
 	}
 
-	public void setCountAsTranslatable_GMXFuzzyMatch(boolean countAsTranslatable_GMXFuzzyMatch) {
-		this.countAsTranslatable_GMXFuzzyMatch = countAsTranslatable_GMXFuzzyMatch;
+	public void setCountAsNonTranslatable_GMXFuzzyMatch(boolean countAsNonTranslatable_GMXFuzzyMatch) {
+		this.countAsNonTranslatable_GMXFuzzyMatch = countAsNonTranslatable_GMXFuzzyMatch;
 	}
 
-	public boolean isCountAsTranslatable_GMXAlphanumericOnlyTextUnit() {
-		return countAsTranslatable_GMXAlphanumericOnlyTextUnit;
+	public boolean isCountAsNonTranslatable_GMXAlphanumericOnlyTextUnit() {
+		return countAsNonTranslatable_GMXAlphanumericOnlyTextUnit;
 	}
 
-	public void setCountAsTranslatable_GMXAlphanumericOnlyTextUnit(
-			boolean countAsTranslatable_GMXAlphanumericOnlyTextUnit) {
-		this.countAsTranslatable_GMXAlphanumericOnlyTextUnit = countAsTranslatable_GMXAlphanumericOnlyTextUnit;
+	public void setCountAsNonTranslatable_GMXAlphanumericOnlyTextUnit(
+			boolean countAsNonTranslatable_GMXAlphanumericOnlyTextUnit) {
+		this.countAsNonTranslatable_GMXAlphanumericOnlyTextUnit = countAsNonTranslatable_GMXAlphanumericOnlyTextUnit;
 	}
 
-	public boolean isCountAsTranslatable_GMXNumericOnlyTextUnit() {
-		return countAsTranslatable_GMXNumericOnlyTextUnit;
+	public boolean isCountAsNonTranslatable_GMXNumericOnlyTextUnit() {
+		return countAsNonTranslatable_GMXNumericOnlyTextUnit;
 	}
 
-	public void setCountAsTranslatable_GMXNumericOnlyTextUnit(
-			boolean countAsTranslatable_GMXNumericOnlyTextUnit) {
-		this.countAsTranslatable_GMXNumericOnlyTextUnit = countAsTranslatable_GMXNumericOnlyTextUnit;
+	public void setCountAsNonTranslatable_GMXNumericOnlyTextUnit(
+			boolean countAsNonTranslatable_GMXNumericOnlyTextUnit) {
+		this.countAsNonTranslatable_GMXNumericOnlyTextUnit = countAsNonTranslatable_GMXNumericOnlyTextUnit;
 	}
 
-	public boolean isCountAsTranslatable_GMXMeasurementOnlyTextUnit() {
-		return countAsTranslatable_GMXMeasurementOnlyTextUnit;
+	public boolean isCountAsNonTranslatable_GMXMeasurementOnlyTextUnit() {
+		return countAsNonTranslatable_GMXMeasurementOnlyTextUnit;
 	}
 
-	public void setCountAsTranslatable_GMXMeasurementOnlyTextUnit(
-			boolean countAsTranslatable_GMXMeasurementOnlyTextUnit) {
-		this.countAsTranslatable_GMXMeasurementOnlyTextUnit = countAsTranslatable_GMXMeasurementOnlyTextUnit;
+	public void setCountAsNonTranslatable_GMXMeasurementOnlyTextUnit(
+			boolean countAsNonTranslatable_GMXMeasurementOnlyTextUnit) {
+		this.countAsNonTranslatable_GMXMeasurementOnlyTextUnit = countAsNonTranslatable_GMXMeasurementOnlyTextUnit;
 	}
 
-	public boolean isCountAsTranslatable_ExactUniqueIdMatch() {
-		return countAsTranslatable_ExactUniqueIdMatch;
+	public boolean isCountAsNonTranslatable_ExactUniqueIdMatch() {
+		return countAsNonTranslatable_ExactUniqueIdMatch;
 	}
 
-	public void setCountAsTranslatable_ExactUniqueIdMatch(boolean countAsTranslatable_ExactUniqueIdMatch) {
-		this.countAsTranslatable_ExactUniqueIdMatch = countAsTranslatable_ExactUniqueIdMatch;
+	public void setCountAsNonTranslatable_ExactUniqueIdMatch(boolean countAsNonTranslatable_ExactUniqueIdMatch) {
+		this.countAsNonTranslatable_ExactUniqueIdMatch = countAsNonTranslatable_ExactUniqueIdMatch;
 	}
 
-	public boolean isCountAsTranslatable_ExactPreviousVersionMatch() {
-		return countAsTranslatable_ExactPreviousVersionMatch;
+	public boolean isCountAsNonTranslatable_ExactPreviousVersionMatch() {
+		return countAsNonTranslatable_ExactPreviousVersionMatch;
 	}
 
-	public void setCountAsTranslatable_ExactPreviousVersionMatch(
-			boolean countAsTranslatable_ExactPreviousVersionMatch) {
-		this.countAsTranslatable_ExactPreviousVersionMatch = countAsTranslatable_ExactPreviousVersionMatch;
+	public void setCountAsNonTranslatable_ExactPreviousVersionMatch(
+			boolean countAsNonTranslatable_ExactPreviousVersionMatch) {
+		this.countAsNonTranslatable_ExactPreviousVersionMatch = countAsNonTranslatable_ExactPreviousVersionMatch;
 	}
 
-	public boolean isCountAsTranslatable_ExactLocalContextMatch() {
-		return countAsTranslatable_ExactLocalContextMatch;
+	public boolean isCountAsNonTranslatable_ExactLocalContextMatch() {
+		return countAsNonTranslatable_ExactLocalContextMatch;
 	}
 
-	public void setCountAsTranslatable_ExactLocalContextMatch(
-			boolean countAsTranslatable_ExactLocalContextMatch) {
-		this.countAsTranslatable_ExactLocalContextMatch = countAsTranslatable_ExactLocalContextMatch;
+	public void setCountAsNonTranslatable_ExactLocalContextMatch(
+			boolean countAsNonTranslatable_ExactLocalContextMatch) {
+		this.countAsNonTranslatable_ExactLocalContextMatch = countAsNonTranslatable_ExactLocalContextMatch;
 	}
 
-	public boolean isCountAsTranslatable_ExactDocumentContextMatch() {
-		return countAsTranslatable_ExactDocumentContextMatch;
+	public boolean isCountAsNonTranslatable_ExactDocumentContextMatch() {
+		return countAsNonTranslatable_ExactDocumentContextMatch;
 	}
 
-	public void setCountAsTranslatable_ExactDocumentContextMatch(
-			boolean countAsTranslatable_ExactDocumentContextMatch) {
-		this.countAsTranslatable_ExactDocumentContextMatch = countAsTranslatable_ExactDocumentContextMatch;
+	public void setCountAsNonTranslatable_ExactDocumentContextMatch(
+			boolean countAsNonTranslatable_ExactDocumentContextMatch) {
+		this.countAsNonTranslatable_ExactDocumentContextMatch = countAsNonTranslatable_ExactDocumentContextMatch;
 	}
 
-	public boolean isCountAsTranslatable_ExactStructuralMatch() {
-		return countAsTranslatable_ExactStructuralMatch;
+	public boolean isCountAsNonTranslatable_ExactStructuralMatch() {
+		return countAsNonTranslatable_ExactStructuralMatch;
 	}
 
-	public void setCountAsTranslatable_ExactStructuralMatch(
-			boolean countAsTranslatable_ExactStructuralMatch) {
-		this.countAsTranslatable_ExactStructuralMatch = countAsTranslatable_ExactStructuralMatch;
+	public void setCountAsNonTranslatable_ExactStructuralMatch(
+			boolean countAsNonTranslatable_ExactStructuralMatch) {
+		this.countAsNonTranslatable_ExactStructuralMatch = countAsNonTranslatable_ExactStructuralMatch;
 	}
 
-	public boolean isCountAsTranslatable_ExactMatch() {
-		return countAsTranslatable_ExactMatch;
+	public boolean isCountAsNonTranslatable_ExactMatch() {
+		return countAsNonTranslatable_ExactMatch;
 	}
 
-	public void setCountAsTranslatable_ExactMatch(boolean countAsTranslatable_ExactMatch) {
-		this.countAsTranslatable_ExactMatch = countAsTranslatable_ExactMatch;
+	public void setCountAsNonTranslatable_ExactMatch(boolean countAsNonTranslatable_ExactMatch) {
+		this.countAsNonTranslatable_ExactMatch = countAsNonTranslatable_ExactMatch;
 	}
 
-	public boolean isCountAsTranslatable_ExactTextOnlyPreviousVersionMatch() {
-		return countAsTranslatable_ExactTextOnlyPreviousVersionMatch;
+	public boolean isCountAsNonTranslatable_ExactTextOnlyPreviousVersionMatch() {
+		return countAsNonTranslatable_ExactTextOnlyPreviousVersionMatch;
 	}
 
-	public void setCountAsTranslatable_ExactTextOnlyPreviousVersionMatch(
-			boolean countAsTranslatable_ExactTextOnlyPreviousVersionMatch) {
-		this.countAsTranslatable_ExactTextOnlyPreviousVersionMatch = countAsTranslatable_ExactTextOnlyPreviousVersionMatch;
+	public void setCountAsNonTranslatable_ExactTextOnlyPreviousVersionMatch(
+			boolean countAsNonTranslatable_ExactTextOnlyPreviousVersionMatch) {
+		this.countAsNonTranslatable_ExactTextOnlyPreviousVersionMatch = countAsNonTranslatable_ExactTextOnlyPreviousVersionMatch;
 	}
 
-	public boolean isCountAsTranslatable_ExactTextOnlyUniqueIdMatch() {
-		return countAsTranslatable_ExactTextOnlyUniqueIdMatch;
+	public boolean isCountAsNonTranslatable_ExactTextOnlyUniqueIdMatch() {
+		return countAsNonTranslatable_ExactTextOnlyUniqueIdMatch;
 	}
 
-	public void setCountAsTranslatable_ExactTextOnlyUniqueIdMatch(
-			boolean countAsTranslatable_ExactTextOnlyUniqueIdMatch) {
-		this.countAsTranslatable_ExactTextOnlyUniqueIdMatch = countAsTranslatable_ExactTextOnlyUniqueIdMatch;
+	public void setCountAsNonTranslatable_ExactTextOnlyUniqueIdMatch(
+			boolean countAsNonTranslatable_ExactTextOnlyUniqueIdMatch) {
+		this.countAsNonTranslatable_ExactTextOnlyUniqueIdMatch = countAsNonTranslatable_ExactTextOnlyUniqueIdMatch;
 	}
 
-	public boolean isCountAsTranslatable_ExactTextOnly() {
-		return countAsTranslatable_ExactTextOnly;
+	public boolean isCountAsNonTranslatable_ExactTextOnly() {
+		return countAsNonTranslatable_ExactTextOnly;
 	}
 
-	public void setCountAsTranslatable_ExactTextOnly(boolean countAsTranslatable_ExactTextOnly) {
-		this.countAsTranslatable_ExactTextOnly = countAsTranslatable_ExactTextOnly;
+	public void setCountAsNonTranslatable_ExactTextOnly(boolean countAsNonTranslatable_ExactTextOnly) {
+		this.countAsNonTranslatable_ExactTextOnly = countAsNonTranslatable_ExactTextOnly;
 	}
 
-	public boolean isCountAsTranslatable_ExactRepaired() {
-		return countAsTranslatable_ExactRepaired;
+	public boolean isCountAsNonTranslatable_ExactRepaired() {
+		return countAsNonTranslatable_ExactRepaired;
 	}
 
-	public void setCountAsTranslatable_ExactRepaired(boolean countAsTranslatable_ExactRepaired) {
-		this.countAsTranslatable_ExactRepaired = countAsTranslatable_ExactRepaired;
+	public void setCountAsNonTranslatable_ExactRepaired(boolean countAsNonTranslatable_ExactRepaired) {
+		this.countAsNonTranslatable_ExactRepaired = countAsNonTranslatable_ExactRepaired;
 	}
 
-	public boolean isCountAsTranslatable_FuzzyPreviousVersionMatch() {
-		return countAsTranslatable_FuzzyPreviousVersionMatch;
+	public boolean isCountAsNonTranslatable_FuzzyPreviousVersionMatch() {
+		return countAsNonTranslatable_FuzzyPreviousVersionMatch;
 	}
 
-	public void setCountAsTranslatable_FuzzyPreviousVersionMatch(
-			boolean countAsTranslatable_FuzzyPreviousVersionMatch) {
-		this.countAsTranslatable_FuzzyPreviousVersionMatch = countAsTranslatable_FuzzyPreviousVersionMatch;
+	public void setCountAsNonTranslatable_FuzzyPreviousVersionMatch(
+			boolean countAsNonTranslatable_FuzzyPreviousVersionMatch) {
+		this.countAsNonTranslatable_FuzzyPreviousVersionMatch = countAsNonTranslatable_FuzzyPreviousVersionMatch;
 	}
 
-	public boolean isCountAsTranslatable_FuzzyUniqueIdMatch() {
-		return countAsTranslatable_FuzzyUniqueIdMatch;
+	public boolean isCountAsNonTranslatable_FuzzyUniqueIdMatch() {
+		return countAsNonTranslatable_FuzzyUniqueIdMatch;
 	}
 
-	public void setCountAsTranslatable_FuzzyUniqueIdMatch(boolean countAsTranslatable_FuzzyUniqueIdMatch) {
-		this.countAsTranslatable_FuzzyUniqueIdMatch = countAsTranslatable_FuzzyUniqueIdMatch;
+	public void setCountAsNonTranslatable_FuzzyUniqueIdMatch(boolean countAsNonTranslatable_FuzzyUniqueIdMatch) {
+		this.countAsNonTranslatable_FuzzyUniqueIdMatch = countAsNonTranslatable_FuzzyUniqueIdMatch;
 	}
 
-	public boolean isCountAsTranslatable_FuzzyMatch() {
-		return countAsTranslatable_FuzzyMatch;
+	public boolean isCountAsNonTranslatable_FuzzyMatch() {
+		return countAsNonTranslatable_FuzzyMatch;
 	}
 
-	public void setCountAsTranslatable_FuzzyMatch(boolean countAsTranslatable_FuzzyMatch) {
-		this.countAsTranslatable_FuzzyMatch = countAsTranslatable_FuzzyMatch;
+	public void setCountAsNonTranslatable_FuzzyMatch(boolean countAsNonTranslatable_FuzzyMatch) {
+		this.countAsNonTranslatable_FuzzyMatch = countAsNonTranslatable_FuzzyMatch;
 	}
 
-	public boolean isCountAsTranslatable_FuzzyRepaired() {
-		return countAsTranslatable_FuzzyRepaired;
+	public boolean isCountAsNonTranslatable_FuzzyRepaired() {
+		return countAsNonTranslatable_FuzzyRepaired;
 	}
 
-	public void setCountAsTranslatable_FuzzyRepaired(boolean countAsTranslatable_FuzzyRepaired) {
-		this.countAsTranslatable_FuzzyRepaired = countAsTranslatable_FuzzyRepaired;
+	public void setCountAsNonTranslatable_FuzzyRepaired(boolean countAsNonTranslatable_FuzzyRepaired) {
+		this.countAsNonTranslatable_FuzzyRepaired = countAsNonTranslatable_FuzzyRepaired;
 	}
 
-	public boolean isCountAsTranslatable_PhraseAssembled() {
-		return countAsTranslatable_PhraseAssembled;
+	public boolean isCountAsNonTranslatable_PhraseAssembled() {
+		return countAsNonTranslatable_PhraseAssembled;
 	}
 
-	public void setCountAsTranslatable_PhraseAssembled(boolean countAsTranslatable_PhraseAssembled) {
-		this.countAsTranslatable_PhraseAssembled = countAsTranslatable_PhraseAssembled;
+	public void setCountAsNonTranslatable_PhraseAssembled(boolean countAsNonTranslatable_PhraseAssembled) {
+		this.countAsNonTranslatable_PhraseAssembled = countAsNonTranslatable_PhraseAssembled;
 	}
 
-	public boolean isCountAsTranslatable_MT() {
-		return countAsTranslatable_MT;
+	public boolean isCountAsNonTranslatable_MT() {
+		return countAsNonTranslatable_MT;
 	}
 
-	public void setCountAsTranslatable_MT(boolean countAsTranslatable_MT) {
-		this.countAsTranslatable_MT = countAsTranslatable_MT;
+	public void setCountAsNonTranslatable_MT(boolean countAsNonTranslatable_MT) {
+		this.countAsNonTranslatable_MT = countAsNonTranslatable_MT;
 	}
 
-	public boolean isCountAsTranslatable_Concordance() {
-		return countAsTranslatable_Concordance;
+	public boolean isCountAsNonTranslatable_Concordance() {
+		return countAsNonTranslatable_Concordance;
 	}
 
-	public void setCountAsTranslatable_Concordance(boolean countAsTranslatable_Concordance) {
-		this.countAsTranslatable_Concordance = countAsTranslatable_Concordance;
+	public void setCountAsNonTranslatable_Concordance(boolean countAsNonTranslatable_Concordance) {
+		this.countAsNonTranslatable_Concordance = countAsNonTranslatable_Concordance;
 	}
 
-	public boolean isCountAsTranslatable_GMXProtected() {
-		return countAsTranslatable_GMXProtected;
+	public boolean isCountAsNonTranslatable_GMXProtected() {
+		return countAsNonTranslatable_GMXProtected;
 	}
 
-	public void setCountAsTranslatable_GMXProtected(boolean countAsTranslatable_GMXProtected) {
-		this.countAsTranslatable_GMXProtected = countAsTranslatable_GMXProtected;
+	public void setCountAsNonTranslatable_GMXProtected(boolean countAsNonTranslatable_GMXProtected) {
+		this.countAsNonTranslatable_GMXProtected = countAsNonTranslatable_GMXProtected;
 	}
 }
 
