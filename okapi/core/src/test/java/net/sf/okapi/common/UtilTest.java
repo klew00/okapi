@@ -20,8 +20,12 @@
 
 package net.sf.okapi.common;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 import org.junit.After;
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Document;
@@ -36,6 +40,8 @@ import java.io.StringReader;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
+import java.util.HashMap;
+import java.util.Map;
 
 public class UtilTest {
 	
@@ -373,6 +379,17 @@ public class UtilTest {
 //		two = Util.generateRandomId(5);
 //		assertFalse(one.equals(two));
 //	}
+	
+	@Test
+	public void testMapGetValue() {
+		Map<String, Long> map = new HashMap<String, Long>();
+		map.put("one", 1L);
+		map.put("two", 2L);
+		assertEquals((Long) 1L, Util.getValue(map, "one", 0L));
+		assertEquals((Long) 2L, Util.getValue(map, "two", 0L));
+		assertEquals((Long) 0L, Util.getValue(map, "three", 0L));
+		assertEquals((Long) 5L, Util.getValue(map, "three", 5L));
+	}
 	
 	private Document createXMLdocument (String data) {
 		InputSource input = new InputSource(new StringReader(data));

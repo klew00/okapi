@@ -1121,7 +1121,7 @@ public final class Util {
 	 * @param e the list to examine.
 	 * @return true if the list is null or empty.
 	 */
-	static public <E> boolean isEmpty (List <E>e) {
+	static public <E> boolean isEmpty (List <E> e) {
 		return (( e == null ) || e.isEmpty() );
 	}
 	
@@ -1130,7 +1130,7 @@ public final class Util {
 	 * @param map the map to examine.
 	 * @return true if the map is null or empty,
 	 */
-	public static <K, V> boolean isEmpty (Map<K, V>map) {		
+	public static <K, V> boolean isEmpty (Map<K, V> map) {		
 		return (( map == null ) || map.isEmpty() );
 	}
 	
@@ -1489,4 +1489,20 @@ public final class Util {
 		return (values.length > 0) ? res : 0;		
 	}
 
+	/**
+	 * Safely returns a value for a given key in a given map. 
+	 * @param <V> the type of keys maintained by the given map
+	 * @param <K> the type of mapped values of the given map
+	 * @param map the given map
+	 * @param key the key whose associated value is to be returned 
+	 * @param defaultValue the default value to be returned if the key is not found
+	 * @return the value to which the specified key is mapped, or
+     *         defaultValue if the given map contains no mapping for the given key
+	 */
+	public static <K, V> V getValue(Map<K, V> map, K key, V defaultValue) {
+		if (map == null) return defaultValue;
+		if (!map.containsKey(key)) return defaultValue;
+		
+		return map.get(key);		
+	}
 }
