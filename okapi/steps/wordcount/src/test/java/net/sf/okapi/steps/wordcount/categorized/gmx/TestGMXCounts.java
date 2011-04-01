@@ -127,7 +127,7 @@ public class TestGMXCounts {
 		net.sf.okapi.steps.leveraging.Parameters params = (net.sf.okapi.steps.leveraging.Parameters) ls.getParameters();
 		params.setResourceParameters(rparams.toString());
 		params.setResourceClassName(net.sf.okapi.connectors.pensieve.PensieveTMConnector.class.getName());
-		params.setThreshold(80);
+		params.setThreshold(50);
 		params.setFillTarget(true);
 		ls.handleEvent(sdEvent);
 		ls.handleEvent(tuEvent);
