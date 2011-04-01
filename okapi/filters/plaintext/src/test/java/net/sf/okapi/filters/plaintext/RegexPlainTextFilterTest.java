@@ -161,8 +161,8 @@ public class RegexPlainTextFilterTest {
 		assertTrue(rp instanceof net.sf.okapi.filters.regex.Parameters);
 		
 		net.sf.okapi.filters.regex.Parameters rpp = (net.sf.okapi.filters.regex.Parameters) rp;
-		assertNotNull(rpp.rules);
-		assertFalse(rpp.rules.isEmpty());
+		assertNotNull(rpp.getRules());
+		assertFalse(rpp.getRules().isEmpty());
 				
 		// Check if defaults are set
 		Parameters params = new Parameters(); 

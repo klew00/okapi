@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -173,7 +173,7 @@ public class RegexFilter implements IFilter {
 		
 		while ( true ) {
 			bestRule = null;
-			for ( Rule rule : params.rules ) {
+			for ( Rule rule : params.getRules() ) {
 				Matcher m = rule.pattern.matcher(inputText);
 				if ( m.find(startSearch) ) {
 					if ( m.start() < bestPosition ) {
@@ -326,8 +326,8 @@ public class RegexFilter implements IFilter {
 		startDoc.setLineBreak(lineBreak);
 		startDoc.setFilterParameters(getParameters());
 		startDoc.setFilterWriter(createFilterWriter());
-		startDoc.setType(params.mimeType);
-		startDoc.setMimeType(params.mimeType);
+		startDoc.setType(params.getMimeType());
+		startDoc.setMimeType(params.getMimeType());
 		startDoc.setMultilingual(hasRulesWithTarget());
 		queue.add(new Event(EventType.START_DOCUMENT, startDoc));
 	}
@@ -348,7 +348,7 @@ public class RegexFilter implements IFilter {
 			startSkl = result.end();
 			// If comment: process the source content for directives
 			if ( rule.ruleType == Rule.RULETYPE_COMMENT ) {
-				params.locDir.process(result.group(rule.sourceGroup));
+				params.getLocalizationDirectives().process(result.group(rule.sourceGroup));
 			}
 			// Then just return one skeleton event
 			return new Event(EventType.DOCUMENT_PART,
@@ -364,7 +364,7 @@ public class RegexFilter implements IFilter {
 			startSkl = result.end();
 			if ( rule.ruleType == Rule.RULETYPE_OPENGROUP ) {
 				// See if we need to auto-close the groups
-				if ( params.oneLevelGroups && (groupStack.size() > 0 )) {
+				if ( params.getOneLevelGroups() && (groupStack.size() > 0 )) {
 					closeGroups();
 				}
 				// Start the new one
@@ -404,7 +404,7 @@ public class RegexFilter implements IFilter {
 		startSearch = result.end(); // For the next read
 		
 		// Check localization directives
-		if ( !params.locDir.isLocalizable(true) ) {
+		if ( !params.getLocalizationDirectives().isLocalizable(true) ) {
 			// If not to be localized: make it a skeleton unit
 			addSkeletonToQueue(inputText.substring(startSkl, result.end()), false);
 			startSkl = result.end(); // For the next read
@@ -556,7 +556,7 @@ public class RegexFilter implements IFilter {
 				
 				// Deal with \\, \" and \' escapes
 				if ( state > 0 ) {
-					if ( params.useBSlashEscape ) {
+					if ( params.getUseBSlashEscape() ) {
 						while ( data.codePointAt(i) == '\\' ) {
 							if ( i+2 < data.length() ) i += 2; // Now point to next
 							else throw new OkapiIllegalFilterOperationException("Escape syntax error in ["+data+"]");
@@ -567,12 +567,12 @@ public class RegexFilter implements IFilter {
 				// Check characters
 				switch ( state ) {
 				case 0:
-					n = params.startString.indexOf(data.codePointAt(i));
+					n = params.getStartString().indexOf(data.codePointAt(i));
 					if ( n > -1 ) {
 						// Start of string match found, set search info for end
 						start = i+1; // Start of the string content
 						state = 1;
-						endChar = params.endString.charAt(n);
+						endChar = params.getEndString().charAt(n);
 					}
 					break;
 				case 1: // Look for the end mark
@@ -677,7 +677,7 @@ public class RegexFilter implements IFilter {
 
 	// Tells if at least one rule has a target
 	private boolean hasRulesWithTarget () {
-		for ( Rule rule : params.rules ) {
+		for ( Rule rule : params.getRules() ) {
 			if ( rule.targetGroup != -1 ) return true;
 		}
 		return false;

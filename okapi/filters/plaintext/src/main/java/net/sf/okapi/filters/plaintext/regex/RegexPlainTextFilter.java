@@ -125,7 +125,7 @@ public class RegexPlainTextFilter extends AbstractBaseFilter {
 		net.sf.okapi.filters.regex.Parameters rp = (net.sf.okapi.filters.regex.Parameters) _getRegexParams();
 		if (rp == null) return;
 		
-		rp.regexOptions = regexOptions;
+		rp.setRegexOptions(regexOptions);
 		rp.compileRules();
 		
 		if (this.params == null) return;
@@ -266,10 +266,10 @@ public class RegexPlainTextFilter extends AbstractBaseFilter {
 		net.sf.okapi.filters.regex.Parameters regexParams = _getRegexParams();
 		
 		if (regexParams == null) return null;
-		if (regexParams.rules == null) return null;
-		if (regexParams.rules.isEmpty()) return null;
+		if (regexParams.getRules() == null) return null;
+		if (regexParams.getRules().isEmpty()) return null;
 		
-		return regexParams.rules.get(0);
+		return regexParams.getRules().get(0);
 	}
 
 }	

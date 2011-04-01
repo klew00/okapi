@@ -176,6 +176,7 @@ public abstract class BaseParameters implements IParameters {
 		// We do this to avoid setting YAML-based parameters
 		if ( !toString().startsWith("#v") ) return; 
 		buffer.setInteger(name, value);
+//TOFIX: this fromString() calls reset()!!! and can cause incorrect values for things like compiled rules		
 		fromString(buffer.toString()); // Update the variables from the buffer
 	}
 

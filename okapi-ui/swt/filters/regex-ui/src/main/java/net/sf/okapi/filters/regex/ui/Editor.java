@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -599,18 +599,19 @@ chkExtractOuterStrings.setEnabled(false); // NOT WORKING YET
 	}
 	
 	private void setData () {
-		pnlLD.setOptions(params.locDir.useLD(), params.locDir.localizeOutside());
-		chkExtractOuterStrings.setSelection(params.extractOuterStrings);
-		edStartString.setText(params.startString);
-		edEndString.setText(params.endString);
-		edMimeType.setText(params.mimeType);
+		pnlLD.setOptions(params.getLocalizationDirectives().useLD(),
+			params.getLocalizationDirectives().localizeOutside());
+		chkExtractOuterStrings.setSelection(params.getExtractOuterStrings());
+		edStartString.setText(params.getStartString());
+		edEndString.setText(params.getEndString());
+		edMimeType.setText(params.getMimeType());
 		
 		for ( Rule rule : rules ) {
 			lbRules.add(rule.getRuleName());
 		}
-		chkOneLevelGroups.setSelection(params.oneLevelGroups);
+		chkOneLevelGroups.setSelection(params.getOneLevelGroups());
 
-		int tmp = params.regexOptions;
+		int tmp = params.getRegexOptions();
 		chkDotAll.setSelection((tmp & Pattern.DOTALL)==Pattern.DOTALL);
 		chkIgnoreCase.setSelection((tmp & Pattern.CASE_INSENSITIVE)==Pattern.CASE_INSENSITIVE);
 		chkMultiline.setSelection((tmp & Pattern.MULTILINE)==Pattern.MULTILINE);
@@ -623,19 +624,19 @@ chkExtractOuterStrings.setEnabled(false); // NOT WORKING YET
 	private void saveData () {
 		saveRuleData(ruleIndex);
 		//TODO: validation
-		params.locDir.setOptions(pnlLD.getUseLD(), pnlLD.getLocalizeOutside());
-		params.extractOuterStrings = chkExtractOuterStrings.getSelection();
-		params.startString = edStartString.getText();
-		params.endString = edEndString.getText();
-		params.mimeType = edMimeType.getText();
+		params.getLocalizationDirectives().setOptions(pnlLD.getUseLD(), pnlLD.getLocalizeOutside());
+		params.setExtractOuterStrings(chkExtractOuterStrings.getSelection());
+		params.setStartString(edStartString.getText());
+		params.setEndString(edEndString.getText());
+		params.setMimeType(edMimeType.getText());
 		
 		ArrayList<Rule> paramRules = params.getRules();
 		paramRules.clear();
 		for ( Rule rule : rules ) {
 			paramRules.add(rule);
 		}
-		params.oneLevelGroups = chkOneLevelGroups.getSelection();
-		params.regexOptions = getRegexOptions();
+		params.setOneLevelGroups(chkOneLevelGroups.getSelection());
+		params.setRegexOptions(getRegexOptions());
 		result = true;
 	}
 

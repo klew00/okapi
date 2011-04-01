@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -28,19 +28,28 @@ import net.sf.okapi.common.filters.LocalizationDirectives;
 
 public class Parameters extends BaseParameters {
 
-	public boolean extractOuterStrings;
-	public String startString;
-	public String endString;
-	public boolean useBSlashEscape;
-	public ArrayList<Rule> rules;
-	public int regexOptions;
-	public String expression;
-	public LocalizationDirectives locDir;
-	public String mimeType;
-	public boolean oneLevelGroups;
+	private static final String EXTRACTOUTERSTRINGS = "extractOuterStrings";
+	private static final String STARTSTRING = "startString";
+	private static final String ENDSTRING = "endString";
+	private static final String USEBSLASHESCAPE = "useBSlashEscape";
+	private static final String ONELEVELGROUP = "oneLevelGroups";
+	private static final String USELD = "useLd";
+	private static final String LOCALIZEOUTSIDE = "localizeOutside";
+	private static final String REGEXOPTIONS = "regexOptions";
+	private static final String MIMETYPE = "mimeType";
+	
+	private boolean extractOuterStrings;
+	private String startString;
+	private String endString;
+	private boolean useBSlashEscape;
+	private int regexOptions;
+	private LocalizationDirectives localizationDirectives;
+	private String mimeType;
+	private boolean oneLevelGroups;
+	private ArrayList<Rule> rules;
 
 	public Parameters () {
-		locDir = new LocalizationDirectives();
+		localizationDirectives = new LocalizationDirectives();
 		reset();
 		toString(); // fill the list
 	}
@@ -52,24 +61,90 @@ public class Parameters extends BaseParameters {
 		endString = "\"";
 		extractOuterStrings = false;
 		useBSlashEscape = true;
-		locDir.reset();
+		localizationDirectives.reset();
 		mimeType = "text/plain";
 		oneLevelGroups = false;
+	}
+
+	public boolean getExtractOuterStrings () {
+		return extractOuterStrings;
+	}
+
+	public void setExtractOuterStrings (boolean extractOuterStrings) {
+		this.extractOuterStrings = extractOuterStrings;
+	}
+
+	public String getStartString () {
+		return startString;
+	}
+
+	public void setStartString (String startString) {
+		this.startString = startString;
+	}
+
+	public String getEndString () {
+		return endString;
+	}
+
+	public void setEndString (String endString) {
+		this.endString = endString;
+	}
+
+	public boolean getUseBSlashEscape () {
+		return useBSlashEscape;
+	}
+
+	public void setUseBSlashEscape (boolean useBSlashEscape) {
+		this.useBSlashEscape = useBSlashEscape;
+	}
+	
+	public int getRegexOptions () {
+		return regexOptions;
+	}
+
+	public void setRegexOptions (int regexOptions) {
+		this.regexOptions = regexOptions;
+	}
+
+	
+	public LocalizationDirectives getLocalizationDirectives () {
+		return localizationDirectives;
+	}
+	
+	public void setLocalizationDirectives (
+		LocalizationDirectives localizationDirectives) {
+		this.localizationDirectives = localizationDirectives;
+	}
+	
+	public String getMimeType () {
+		return mimeType;
+	}
+	
+	public void setMimeType (String mimeType) {
+		this.mimeType = mimeType;
+	}
+	
+	public boolean getOneLevelGroups () {
+		return oneLevelGroups;
+	}
+	
+	public void setOneLevelGroups (boolean oneLevelGroups) {
+		this.oneLevelGroups = oneLevelGroups;
 	}
 
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
-		boolean tmpBool1 = buffer.getBoolean("useLD", locDir.useLD());
-		boolean tmpBool2 = buffer.getBoolean("localizeOutside", locDir.localizeOutside());
-		locDir.setOptions(tmpBool1, tmpBool2);
-		startString = buffer.getString("startString", startString);
-		endString = buffer.getString("endString", endString);
-		extractOuterStrings = buffer.getBoolean("extractOuterStrings", extractOuterStrings);
-		useBSlashEscape = buffer.getBoolean("useBSlashEscape", useBSlashEscape);
-		oneLevelGroups = buffer.getBoolean("oneLevelGroups", oneLevelGroups);
-		regexOptions = buffer.getInteger("regexOptions", regexOptions);
-		mimeType = buffer.getString("mimeType", mimeType);
+		boolean tmpBool1 = buffer.getBoolean(USELD, localizationDirectives.useLD());
+		boolean tmpBool2 = buffer.getBoolean(LOCALIZEOUTSIDE, localizationDirectives.localizeOutside());
+		localizationDirectives.setOptions(tmpBool1, tmpBool2);
+		startString = buffer.getString(STARTSTRING, startString);
+		endString = buffer.getString(ENDSTRING, endString);
+		extractOuterStrings = buffer.getBoolean(EXTRACTOUTERSTRINGS, extractOuterStrings);
+		useBSlashEscape = buffer.getBoolean(USEBSLASHESCAPE, useBSlashEscape);
+		oneLevelGroups = buffer.getBoolean(ONELEVELGROUP, oneLevelGroups);
+		regexOptions = buffer.getInteger(REGEXOPTIONS, regexOptions);
+		mimeType = buffer.getString(MIMETYPE, mimeType);
 		Rule rule;
 		int count = buffer.getInteger("ruleCount", 0);
 		for ( int i=0; i<count; i++ ) {
@@ -82,15 +157,15 @@ public class Parameters extends BaseParameters {
 	@Override
 	public String toString () {
 		buffer.reset();
-		buffer.setBoolean("useLD", locDir.useLD());
-		buffer.setBoolean("localizeOutside", locDir.localizeOutside());
-		buffer.setString("startString", startString);
-		buffer.setString("endString", endString);
-		buffer.setBoolean("extractOuterStrings", extractOuterStrings);
-		buffer.setBoolean("useBSlashEscape", useBSlashEscape);
-		buffer.setBoolean("oneLevelGroups", oneLevelGroups);
-		buffer.setInteger("regexOptions", regexOptions);
-		buffer.setString("mimeType", mimeType);
+		buffer.setBoolean(USELD, localizationDirectives.useLD());
+		buffer.setBoolean(LOCALIZEOUTSIDE, localizationDirectives.localizeOutside());
+		buffer.setString(STARTSTRING, startString);
+		buffer.setString(ENDSTRING, endString);
+		buffer.setBoolean(EXTRACTOUTERSTRINGS, extractOuterStrings);
+		buffer.setBoolean(USEBSLASHESCAPE, useBSlashEscape);
+		buffer.setBoolean(ONELEVELGROUP, oneLevelGroups);
+		buffer.setInteger(REGEXOPTIONS, regexOptions);
+		buffer.setString(MIMETYPE, mimeType);
 		buffer.setInteger("ruleCount", rules.size());
 		for ( int i=0; i<rules.size(); i++ ) {
 			buffer.setGroup(String.format("rule%d", i), rules.get(i).toString());
@@ -112,4 +187,5 @@ public class Parameters extends BaseParameters {
 	public ArrayList<Rule> getRules () {
 		return rules;
 	}
+	
 }

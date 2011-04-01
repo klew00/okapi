@@ -113,7 +113,7 @@ public class RegexFilterTest {
 		rule.setRuleType(Rule.RULETYPE_STRING);
 		rule.setExpression("=(.+)$");
 		rule.setSourceGroup(1);
-		params.rules.add(rule);
+		params.getRules().add(rule);
 		filter.setParameters(params);
 		// Process
 		ArrayList<Event> list = getEvents(snippet);
@@ -135,7 +135,7 @@ public class RegexFilterTest {
 		rule.setSourceGroup(2);
 		rule.setNameGroup(1);
 		rule.setPreserveWS(true);
-		params.rules.add(rule);
+		params.getRules().add(rule);
 		filter.setParameters(params);
 		// Process
 		ArrayList<Event> list = getEvents(snippet);
@@ -165,7 +165,7 @@ public class RegexFilterTest {
 		Parameters params = new Parameters();
 		Rule rule = new Rule();
 		rule.setRuleType(Rule.RULETYPE_CONTENT);
-		params.regexOptions = Pattern.MULTILINE;
+		params.setRegexOptions(Pattern.MULTILINE);
 		
 		rule.setExpression("^(.*?)$");
 		rule.setSourceGroup(1);
@@ -173,7 +173,7 @@ public class RegexFilterTest {
 		//rule.setExpression("(^(?=.+))(.*?)$");
 		//rule.setSourceGroup(2);
 		
-		params.rules.add(rule);
+		params.getRules().add(rule);
 		filter.setParameters(params);
 						
 		String inputText = "Line 1\n\nLine 2\n\n\n\n\nLine 3\n\n\nLine 4";
