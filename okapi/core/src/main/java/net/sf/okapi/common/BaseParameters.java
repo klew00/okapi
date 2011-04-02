@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -20,6 +20,9 @@
 
 package net.sf.okapi.common;
 
+import java.beans.BeanInfo;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
@@ -28,6 +31,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URL;
 
@@ -46,7 +50,7 @@ public abstract class BaseParameters implements IParameters {
 	 * Buffer where the parameters are stored during conversion.
 	 */
 	protected ParametersString buffer;
-
+	
 	/**
 	 * Creates a new BaseParameters object with a null path and an empty buffer.
 	 */
@@ -137,8 +141,32 @@ public abstract class BaseParameters implements IParameters {
 		// Make sure the buffer is up-to-date and check the type of storage
 		// We do this to avoid setting YAML-based parameters
 		if ( !toString().startsWith("#v") ) return; 
-		buffer.setBoolean(name, value);
-		fromString(buffer.toString()); // Update the variables from the buffer
+
+		// Previous we were doing:
+		// buffer.setBoolean(name, value);
+		// fromString(buffer.toString()); // Update the variables from the buffer
+		// But this calls fromString() which resets all variables, including the runtime ones
+		// like regex compiled rules, etc.
+
+		// Instead, now we try to use the bean method
+		try {
+			// Get the bean method for updating the parameter
+			BeanInfo info;
+			info = Introspector.getBeanInfo(getClass());
+			for ( PropertyDescriptor pd : info.getPropertyDescriptors() ) {
+				if ( pd.getName().equals(name) ) {
+					Method writeMethod = pd.getWriteMethod();
+					// Update the object directly
+					writeMethod.invoke(this, value);
+					// Update the buffer list too (just in case)
+					buffer.setBoolean(name, value);
+					return; // Done
+				}
+			}
+		}
+		catch ( Throwable e ) {
+			throw new RuntimeException(String.format("Error with setInteger() on '%s':\n" + e.getMessage(), name));
+		}
 	}
 	
 	@Override
@@ -156,8 +184,32 @@ public abstract class BaseParameters implements IParameters {
 		// Make sure the buffer is up-to-date and check the type of storage
 		// We do this to avoid setting YAML-based parameters
 		if ( !toString().startsWith("#v") ) return; 
-		buffer.setString(name, value);
-		fromString(buffer.toString()); // Update the variables from the buffer
+
+		// Previous we were doing:
+		// buffer.setInteger(name, value);
+		// buffer.setString(name, value);
+		// fromString(buffer.toString()); // Update the variables from the buffer
+		// like regex compiled rules, etc.
+
+		// Instead, now we try to use the bean method
+		try {
+			// Get the bean method for updating the parameter
+			BeanInfo info;
+			info = Introspector.getBeanInfo(getClass());
+			for ( PropertyDescriptor pd : info.getPropertyDescriptors() ) {
+				if ( pd.getName().equals(name) ) {
+					Method writeMethod = pd.getWriteMethod();
+					// Update the object directly
+					writeMethod.invoke(this, value);
+					// Update the buffer list too (just in case)
+					buffer.setString(name, value);
+					return; // Done
+				}
+			}
+		}
+		catch ( Throwable e ) {
+			throw new RuntimeException(String.format("Error with setInteger() on '%s':\n" + e.getMessage(), name));
+		}
 	}
 
 	@Override
@@ -175,9 +227,32 @@ public abstract class BaseParameters implements IParameters {
 		// Make sure the buffer is up-to-date and check the type of storage
 		// We do this to avoid setting YAML-based parameters
 		if ( !toString().startsWith("#v") ) return; 
-		buffer.setInteger(name, value);
-//TOFIX: this fromString() calls reset()!!! and can cause incorrect values for things like compiled rules		
-		fromString(buffer.toString()); // Update the variables from the buffer
+
+		// Previous we were doing:
+		// buffer.setInteger(name, value);
+		// fromString(buffer.toString()); // Update the variables from the buffer
+		// But this calls fromString() which resets all variables, including the runtime ones
+		// like regex compiled rules, etc.
+
+		// Instead, now we try to use the bean method
+		try {
+			// Get the bean method for updating the parameter
+			BeanInfo info;
+			info = Introspector.getBeanInfo(getClass());
+			for ( PropertyDescriptor pd : info.getPropertyDescriptors() ) {
+				if ( pd.getName().equals(name) ) {
+					Method writeMethod = pd.getWriteMethod();
+					// Update the object directly
+					writeMethod.invoke(this, value);
+					// Update the buffer list too (just in case)
+					buffer.setInteger(name, value);
+					return; // Done
+				}
+			}
+		}
+		catch ( Throwable e ) {
+			throw new RuntimeException(String.format("Error with setInteger() on '%s':\n" + e.getMessage(), name));
+		}
 	}
 
 	@Override

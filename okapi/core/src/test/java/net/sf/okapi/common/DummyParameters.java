@@ -66,4 +66,16 @@ public class DummyParameters extends BaseParameters {
 	public void setReference1 (String reference1) {
 		this.reference1 = reference1;
 	}
+	
+	public void setParamStr1 (String value) {
+		paramStr1 = value;
+	}
+	
+	public void setParamBool1 (boolean value) {
+		paramBool1 = value;
+	}
+	
+	public void setParamInt1 (int value) {
+		paramInt1 = value;
+	}
 }
