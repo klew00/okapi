@@ -33,7 +33,7 @@ public class CategoryResolver {
 	private List<String> okapiCategories = new LinkedList<String>();
 	private Map<String, Long> removedCategories = new HashMap<String, Long>();
 		
-	public CategoryResolver(LinkedList<IPipelineStep> steps) {
+	public CategoryResolver(List<IPipelineStep> steps) {
 		super();
 		for (IPipelineStep step : steps) {
 			if (step instanceof CategoryHandler) {
