@@ -31,7 +31,7 @@
 		<!-- Update and copy change log and readme -->
 		<copy todir="${dist}" file="../shared/changes.html"/>
 		<replace file="${dist}/changes.html" token="@date@" value="${TODAY}"/>
-		<copy todir="${dist}" file="../maven/data/okapi-lib/readme.html"/>
+		<copy todir="${dist}" file="../maven/data/okapi-apps/readme.html"/>
 		<replace file="${dist}/readme.html" token="@version@" value="${okapilibStamp}"/>
 		<replace file="${dist}/readme.html" token="@date@" value="${TODAY}"/>
 		

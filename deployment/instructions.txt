@@ -54,13 +54,12 @@ The file _tests_results.txt shows any differences between the expected results a
 //TODO: Port those tests to applications integration tests
 
 
---- 7) Post each package (.zip or .gz) of the distributions to the GoogleCode download area.
+--- 7) Post each package of the distributions (stored in maven/done) to the GoogleCode download area.
 Use the labels: OpSys-... and Featured
 Use the following summary, in this order (one by one to ensure the order!):
 
-Okapi Libraries for all platforms (GZIP)
-Okapi Libraries for all platforms (ZIP)
-Okapi Plugin for OmegaT for all platforms (ZIP)
+Okapi Libraries for all platforms
+Okapi Plugin for OmegaT for all platforms
 Okapi Applications for Macintosh Cocoa 64-bit (Includes Libraries)
 Okapi Applications for Macintosh Cocoa (Includes Libraries)
 Okapi Applications for Linux 64-bit (Includes Libraries)
