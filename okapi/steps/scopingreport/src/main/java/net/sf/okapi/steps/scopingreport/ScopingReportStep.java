@@ -32,7 +32,7 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 import java.util.Date;
-import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
@@ -216,7 +216,7 @@ public class ScopingReportStep extends CompoundStep {
 	 * A category group is assigned to a step by having it *implement* the category group's marker interface.
 	 */
 	@Override
-	protected void addSteps(LinkedList<IPipelineStep> list) {
+	protected void addSteps(List<IPipelineStep> list) {
 		
 		// GMX word count categories
 		list.add(new GMXProtectedWordCountStep());
