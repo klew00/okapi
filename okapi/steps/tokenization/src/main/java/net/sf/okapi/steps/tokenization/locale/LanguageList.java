@@ -40,11 +40,10 @@ public class LanguageList {
 				map.put(locale.getName(), locale);
 	}
 	
-	protected static String formatLanguageInfo(ULocale locale) {
-		
+	protected static String formatLanguageInfo(ULocale locale) {		
 		if (locale == null) return "";
-		//return StringUtil.titleCase(locale.getDisplayName());
-		return StringUtil.titleCase(locale.getDisplayLanguage(EN));
+		
+		return locale.getDisplayName(EN);
 	}
 	
 	public static String[] getLanguages() {
