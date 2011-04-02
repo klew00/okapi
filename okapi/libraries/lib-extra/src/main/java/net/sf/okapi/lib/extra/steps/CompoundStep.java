@@ -41,7 +41,7 @@ public abstract class CompoundStep extends AbstractPipelineStep {
 	protected LinkedList<IPipelineStep> steps = new LinkedList<IPipelineStep>();
 	private LinkedList<List<ConfigurationParameter>> paramList;
 
-	protected abstract void addSteps(LinkedList<IPipelineStep> list);
+	protected abstract void addSteps(List<IPipelineStep> list);
 	
 	public CompoundStep() {
 		super();
