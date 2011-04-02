@@ -537,8 +537,14 @@
 	</target>
 		
 	<target name="zip">
-		<zip destfile="${done}/${distName}.zip" basedir="${dist}"/>
-		<tar destfile="${done}/${distName}.tar.gz" basedir="${dist}" compression="gzip"/>
+		<zip destfile="${done}/${distName}.zip">
+			<zipfileset filemode="755" dir="${dist}">
+				<include name="**/*.sh"/>
+			</zipfileset>
+			<zipfileset dir="${dist}">
+				<exclude name="**/*.sh"/>
+			</zipfileset>
+		</zip>
 	</target>
 
 	<target name="all" depends="init, okapiLib, tikal, zip"/>

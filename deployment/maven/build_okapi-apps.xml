@@ -353,29 +353,21 @@
 		<delete file="${dist}/tikal.sh"/>
 	</target>
 
-	<target name="zipAll" unless="building-linuxmac">
+	<target name="zipWin" unless="building-linuxmac">
 		<zip destfile="${done}/${distName}.zip" basedir="${dist}"/>
 	</target>
 
-	<target name="gzipAll" if="building-linuxmac">
-		<mkdir dir="${dist}/${distName}"/>
-		<copy todir="${dist}/${distName}">
-			<fileset dir="${dist}" excludes="${distName}"/>
-		</copy>
-		<!-- tar the files and set the executable flag on the shell scripts -->
-		<tar destfile="${done}/${distName}.tar.gz" compression="gzip">
-			<tarfileset filemode="755" dir="${dist}">
-				<include name="${distName}/**/*.sh"/>
-			</tarfileset>
-			<tarfileset dir="${dist}">
-				<include name="${distName}/**/*"/>
-				<exclude name="${distName}/**/*.sh"/>
-			</tarfileset>
-		</tar>
-		
-		<delete dir="${dist}/${distName}"/>
+	<target name="zipLinuxMac" if="building-linuxmac">
+		<zip destfile="${done}/${distName}.zip">
+			<zipfileset filemode="755" dir="${dist}">
+				<include name="**/*.sh"/>
+			</zipfileset>
+			<zipfileset dir="${dist}">
+				<exclude name="**/*.sh"/>
+			</zipfileset>
+		</zip>
 	</target>
 
-	<target name="all" depends="init, okapiLibUI, checkmate, ratel, rainbow, noWinStuff, winStuff, zipAll, gzipAll"/>
+	<target name="all" depends="init, okapiLibUI, checkmate, ratel, rainbow, noWinStuff, winStuff, zipWin, zipLinuxMac"/>
 
 </project>
