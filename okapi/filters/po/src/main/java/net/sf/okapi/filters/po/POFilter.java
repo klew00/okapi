@@ -119,6 +119,7 @@ public class POFilter implements IFilter {
 	private int pluralMode; // 0=not in a plural, 1=inside a plural, 2=closing a plural 
 	private int pluralCount;
 	private boolean readLine;
+	private int lineNumber;
 	private String msgID;
 	private String locNote;
 	private String transNote;
@@ -246,6 +247,7 @@ public class POFilter implements IFilter {
 		readLine = true;
 		msgIDPlural = "";
 		level = 0;
+		lineNumber = 0;
 		domain = DOMAIN_NONE; // Default domain prefix
 		// Compile code finder rules
 		if ( params.getUseCodeFinder() ) {
@@ -264,7 +266,7 @@ public class POFilter implements IFilter {
 		}
 		catch ( UnsupportedEncodingException e ) {
 			throw new OkapiUnsupportedEncodingException(
-				String.format("The encoding '%s' is not supported.", encoding), e);
+				msg(String.format("The encoding '%s' is not supported.", encoding)), e);
 		}
 	
 		srcLang = input.getSourceLocale();
@@ -341,6 +343,7 @@ public class POFilter implements IFilter {
 			if ( readLine ) {
 				try {
 					textLine = reader.readLine();
+					lineNumber++;
 				} catch ( IOException e ) {
 					throw new OkapiIOException(e);
 				}
@@ -527,7 +530,7 @@ public class POFilter implements IFilter {
 		if ( textLine.indexOf("msgstr[") == 0 ) {
 			// Check if we are indeed in plural mode
 			if ( pluralMode == 0 ) {
-				throw new OkapiIllegalFilterOperationException(Res.getString("extraPluralMsgStr"));
+				throw new OkapiIllegalFilterOperationException(msg(Res.getString("extraPluralMsgStr")));
 			}
 			// Check if we reached the last plural form
 			// Note that PO files have at least 2 plural entries even if nplural=1
@@ -544,7 +547,7 @@ public class POFilter implements IFilter {
 			// Then proceed as a normal entry
 		}
 		else if ( pluralMode != 0 ) {
-			throw new OkapiIllegalFilterOperationException(Res.getString("missingPluralMsgStr"));
+			throw new OkapiIllegalFilterOperationException(msg(Res.getString("missingPluralMsgStr")));
 		}
 
 		// Get the message string
@@ -634,12 +637,13 @@ public class POFilter implements IFilter {
 			toAbstract(tu.setSourceContent(new TextFragment(sID)));
 			// Create an ID if requested
 			if ( params.getMakeID() ) {
+				String base = domain + DOMAIN_SEP + msgContext + msgID;
 				// Note we always use msgID for resname, not msgIDPlural
 				if ( pluralMode == 0 ) {
-					tu.setName(Util.makeId(domain+DOMAIN_SEP+msgID));
+					tu.setName(Util.makeId(base));
 				}
 				else {
-					tu.setName(Util.makeId(domain+DOMAIN_SEP+msgID)
+					tu.setName(Util.makeId(base)
 						+ String.format("-%d", pluralCount-1));
 				}
 			}
@@ -689,32 +693,49 @@ public class POFilter implements IFilter {
 	
 	private String getQuotedString (boolean addLinebreak) {
 		StringBuilder  sbTmp = new StringBuilder();
+		boolean quotedTextStarted = false;
 		try {
 			// Get opening quote
+			int nPos2;
 			int nPos1 = textLine.indexOf('"');
-			if ( nPos1 == -1 ) {
-				throw new OkapiIllegalFilterOperationException(Res.getString("missingStartQuote"));
-			}
-			// Get closing quote
-			int nPos2 = textLine.lastIndexOf('"');
-			if (( nPos2 == -1 ) || ( nPos2 == nPos1 )) {
-				throw new OkapiIllegalFilterOperationException(Res.getString("missingEndQuote"));
-			}
-			if ( addLinebreak ) {
-				skel.append(textLine+lineBreak);
+			if ( nPos1 > -1 ) {
+				quotedTextStarted = true;
+				// Get closing quote
+				nPos2 = textLine.lastIndexOf('"');
+				if (( nPos2 == -1 ) || ( nPos2 == nPos1 )) {
+					throw new Exception(msg(Res.getString("missingEndQuote")));
+				}
+				if ( addLinebreak ) {
+					skel.append(textLine+lineBreak);
+				}
+				else {
+					// Copy codes before text in code buffer
+					skel.append(textLine.substring(0, nPos1+1));
+				}
+				// Copy text in text buffer
+				sbTmp.append(textLine.substring(nPos1+1, nPos2));
 			}
 			else {
-				// Copy codes before text in code buffer
-				skel.append(textLine.substring(0, nPos1+1));
+				// If no quote: it's a case like
+				// msgid
+				// "some text"
+				// Which is allowed with some implementations of gettext
+				// In that case: make the output compatible
+				skel.append(textLine.trim()+" \"\""+lineBreak);
+				if ( !addLinebreak ) { // For msgstr we add a quote
+					skel.append("\"");
+				}
 			}
-			// Copy text in text buffer
-			sbTmp.append(textLine.substring(nPos1+1, nPos2));
 
 			// Check for spliced strings
 			String sTmp;
 			while ( true ) {
 				textLine = reader.readLine();
+				lineNumber++;
 				if ( textLine == null ) {
+					if ( !quotedTextStarted ) {
+						throw new Exception(msg(Res.getString("missingStartQuote")));
+					}
 					// No more lines
 					return sbTmp.toString();
 				}
@@ -722,15 +743,16 @@ public class POFilter implements IFilter {
 					sTmp = textLine.trim();
 					// Check if it's a quoted line detected
 					if ( sTmp.startsWith("\"") ) {
+						quotedTextStarted = true;
 						// Get opening quote
 						nPos1 = textLine.indexOf('"');
 						if ( nPos1 == -1 ) {
-							throw new Exception(Res.getString("missingStartQuote"));
+							throw new Exception(msg(Res.getString("missingStartQuote")));
 						}
 						// Get closing quote
 						nPos2 = textLine.lastIndexOf('"');
 						if (( nPos2 == -1 ) || ( nPos2 == nPos1 )) {
-							throw new Exception(Res.getString("missingEndQuote"));
+							throw new Exception(msg(Res.getString("missingEndQuote")));
 						}
 						if ( addLinebreak ) {
 							skel.append(textLine+lineBreak);
@@ -740,6 +762,9 @@ public class POFilter implements IFilter {
 						sbTmp.append(textLine.substring(nPos1+1, nPos2));
 					}
 					else { // No more following quoted lines: end of text
+						if ( !quotedTextStarted ) {
+							throw new Exception(msg(Res.getString("missingStartQuote")));
+						}
 						readLine = false;
 						return sbTmp.toString();
 					}
@@ -747,7 +772,7 @@ public class POFilter implements IFilter {
 			}
 		}
 		catch ( Throwable e ) {
-			throw new OkapiIllegalFilterOperationException(Res.getString("problemWithQuotes"));
+			throw new OkapiIllegalFilterOperationException(Res.getString("problemWithQuotes") + "\n" + e.getMessage());
 		}
 	}
 
@@ -861,6 +886,10 @@ public class POFilter implements IFilter {
  		finally {
  			buffer = null;
  		}
+ 	}
+
+ 	private String msg (String text) {
+ 		return String.format(Res.getString("lineNumber"), lineNumber) + text;
  	}
 
 }

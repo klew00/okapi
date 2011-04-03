@@ -208,6 +208,22 @@ public class POFilterTest {
 	}
 		
 	@Test
+	public void testIDWithContext () {
+		String snippet =
+			  "msgid \"Text1\"\n"
+			+ "msgstr \"Texte1\"\n\n"
+			+ "msgctxt \"abc\"\n"
+			+ "msgid \"Text1\"\n"
+			+ "msgstr \"Texte1\"\n";
+		TextUnit tu1 = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		assertNotNull(tu1);
+		assertEquals("P39E32278", tu1.getName());
+		TextUnit tu2 = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 2);
+		assertNotNull(tu2);
+		assertEquals("NE9257EEE", tu2.getName());
+	}
+
+	@Test
 	public void testProtectApproved () {
 		String snippet = "#, c-format\n"
 			+ "msgid \"Text 1\"\n"
@@ -344,6 +360,30 @@ public class POFilterTest {
 		assertNotNull(tu);
 		assertEquals("Source", tu.getSource().toString());
 		assertEquals("123", tu.getId());
+	}
+
+	@Test
+	public void testNoQuoteOnSameLinee () {
+		String snippet = "msgctxt \n\""+POFilterWriter.CRUMBS_PREFIX+":tu=123\"\n"
+			+ "msgid \n\"Source\"\n"
+			+ "msgstr \n\"Target\"\n";
+		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		assertNotNull(tu);
+		assertEquals("Source", tu.getSource().toString());
+		assertEquals("Target", tu.getTarget(locFR).toString());
+		assertEquals("123", tu.getId());
+	}
+	
+	@Test
+	public void testOuputNoQuoteOnSameLinee () {
+		String snippet = "msgctxt \n\""+POFilterWriter.CRUMBS_PREFIX+":tu=123\"\n"
+			+ "msgid \n\"Source\"\n"
+			+ "msgstr \n\"Target\"\n";
+		String expect = "msgctxt \"\"\n\""+POFilterWriter.CRUMBS_PREFIX+":tu=123\"\n"
+			+ "msgid \"\"\n\"Source\"\n"
+			+ "msgstr \"\"\n\"Target\"\n";
+		assertEquals(expect, FilterTestDriver.generateOutput(getEvents(snippet, locEN, locFR),
+			filter.getEncoderManager(), locFR));
 	}
 	
 	@Test

@@ -37,8 +37,10 @@ msgstr "Characters spéciaux : \"=quot, &=amp, <=lt, >=gt, '=apos, Ą=U+0104"
 
 msgid "%d file"
 msgid_plural "%d files"
-msgstr[0] "%d fichier"
-msgstr[1] "%d fichiers"
+msgstr[0]
+"%d fichier"
+msgstr[1]
+"%d fichiers"
 
 #, fuzzy, c-format
 msgid "%d file left to trash"
