@@ -354,7 +354,11 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 				String s[] = params.rules.get(i);
 				if ( s[0].equals("true") ) {
 					matcher = patterns[i].matcher(result);
-					result = matcher.replaceAll(replace[i]);
+					if (params.replaceALL) {
+						result = matcher.replaceAll(replace[i]);
+					} else {
+						result = matcher.replaceFirst(replace[i]);
+					}
 				}
 			}
 		}

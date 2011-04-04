@@ -32,6 +32,7 @@ public class Parameters extends BaseParameters {
 	public  boolean multiLine;
 	public boolean target;
 	public boolean source;
+	public boolean replaceALL;
 	public ArrayList<String[]> rules;
 	
 	public Parameters () {
@@ -45,6 +46,7 @@ public class Parameters extends BaseParameters {
 		multiLine = false;
 		target = true;
 		source = false;
+		replaceALL = true;
 		rules = new ArrayList<String[]>();
 	}
 
@@ -67,6 +69,7 @@ public class Parameters extends BaseParameters {
 		multiLine = buffer.getBoolean("multiLine", multiLine);
 		target = buffer.getBoolean("target", target);
 		source = buffer.getBoolean("source", source);
+		replaceALL = buffer.getBoolean("replaceALL", replaceALL);
 		
 		int count = buffer.getInteger("count", 0);
 		for ( int i=0; i<count; i++ ) {
@@ -88,6 +91,7 @@ public class Parameters extends BaseParameters {
 		buffer.setInteger("count", rules.size());
 		buffer.setBoolean("target", target);
 		buffer.setBoolean("source", source);
+		buffer.setBoolean("replaceALL", replaceALL);
 		
 		int i = 0;
 

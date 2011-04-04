@@ -78,6 +78,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Button chkRegEx;
 	private Button chkDotAll;
 	private Button chkIgnoreCase;
+	private Button chkReplaceAll;
 	private Button chkMultiLine;
 	private int updateType;
 	private IHelp help;
@@ -374,6 +375,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 				chkDotAll.setEnabled(chkRegEx.getSelection());
 				chkMultiLine.setEnabled(chkRegEx.getSelection());
 				chkIgnoreCase.setEnabled(chkRegEx.getSelection());
+				chkReplaceAll.setEnabled(chkRegEx.getSelection());
 			}
 		});
 		
@@ -394,6 +396,10 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		chkIgnoreCase = new Button(group, SWT.CHECK);
 		chkIgnoreCase.setText("Ignore case differences");
 
+		chkReplaceAll = new Button(group, SWT.CHECK);
+		chkReplaceAll.setText("Replace all instances of the pattern");
+		chkReplaceAll.setToolTipText("If true replace all instances, otherwise replace only the first");
+		
 		//--- Filter event options group
 		group = new Group(mainComposite, SWT.NONE);
 		group.setLayout(new GridLayout());
@@ -551,13 +557,15 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		chkRegEx.setSelection(fromParams.regEx);
 		chkDotAll.setSelection(fromParams.dotAll);
 		chkIgnoreCase.setSelection(fromParams.ignoreCase);
+		chkReplaceAll.setSelection(fromParams.replaceALL);
 		chkMultiLine.setSelection(fromParams.multiLine);
 		chkTarget.setSelection(fromParams.target);
 		chkSource.setSelection(fromParams.source);
 
 		chkDotAll.setEnabled(chkRegEx.getSelection());
 		chkMultiLine.setEnabled(chkRegEx.getSelection());
-		chkIgnoreCase.setEnabled(chkRegEx.getSelection());		
+		chkIgnoreCase.setEnabled(chkRegEx.getSelection());
+		chkReplaceAll.setEnabled(chkRegEx.getSelection());	
 		
 		table.removeAll();
         for ( String[] s : fromParams.rules ) {
@@ -596,6 +604,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		destParams.regEx = chkRegEx.getSelection();
 		destParams.dotAll = chkDotAll.getSelection();		
 		destParams.ignoreCase = chkIgnoreCase.getSelection();
+		destParams.replaceALL = chkReplaceAll.getSelection();
 		destParams.multiLine = chkMultiLine.getSelection();
 		destParams.target = chkTarget.getSelection();
 		destParams.source = chkSource.getSelection();
