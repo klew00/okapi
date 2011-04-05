@@ -102,7 +102,7 @@ public class XPipeline extends net.sf.okapi.common.pipeline.Pipeline implements 
 		if (pd == null) return getState();
 		
 		pd.processBatch();
-		return getState();		
+		return pd.getPipeline().getState();		
 	}
 	
 	public String getHelpLocation() {
