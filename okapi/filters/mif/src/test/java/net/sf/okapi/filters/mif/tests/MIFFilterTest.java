@@ -94,6 +94,52 @@ public class MIFFilterTest {
 	}
 
 	@Test
+	public void testExtractIndexMarkers () {
+		Parameters params = new Parameters();
+		params.setExtractHiddenPages(false);
+		params.setExtractMasterPages(false);
+		params.setExtractReferencePages(false);
+		params.setExtractVariables(false);
+		
+		// Extract index markers
+		List<Event> list = getEventsFromFile("TestMarkers.mif", params);
+		TextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertNotNull(tu);
+		assertEquals("Text of marker", fmt.setContent(tu.getSource().getFirstContent()).toString());
+		assertEquals("x-index", tu.getType());
+		
+		// Do not extract index markers
+		params.setExtractIndexMarkers(false);
+		list = getEventsFromFile("TestMarkers.mif", params);
+		tu = FilterTestDriver.getTextUnit(list, 1);
+		assertNotNull(tu);
+		assertEquals("Text with index about some subject.", fmt.setContent(tu.getSource().getFirstContent()).toString());
+	}
+
+	@Test
+	public void testExtractLinks () {
+		Parameters params = new Parameters();
+		params.setExtractHiddenPages(false);
+		params.setExtractMasterPages(false);
+		params.setExtractReferencePages(false);
+		params.setExtractVariables(false);
+		
+		// Do not extract links
+		List<Event> list = getEventsFromFile("TestMarkers.mif", params);
+		TextUnit tu = FilterTestDriver.getTextUnit(list, 5);
+		assertNotNull(tu);
+		assertEquals("text with a link to <1/>http://okapi.opentag.org/", fmt.setContent(tu.getSource().getFirstContent()).toString());
+		
+		// Do extract links
+		params.setExtractLinks(true);
+		list = getEventsFromFile("TestMarkers.mif", params);
+		tu = FilterTestDriver.getTextUnit(list, 5);
+		assertNotNull(tu);
+		assertEquals("http://okapi.opentag.com/", fmt.setContent(tu.getSource().getFirstContent()).toString());
+		assertEquals("link", tu.getType());
+	}
+
+	@Test
 	public void testBodyOnlyNoVariables () {
 		Parameters params = new Parameters();
 		params.setExtractHiddenPages(false);
@@ -241,6 +287,7 @@ public class MIFFilterTest {
 	
 	@Test
 	public void testOutput () {
+		rewriteFile("TestMarkers.mif");
 		rewriteFile("Test03.mif");
 		rewriteFile("Test03_mif7.mif");
 		rewriteFile("Test01.mif");
@@ -256,6 +303,7 @@ public class MIFFilterTest {
 		list.add(new InputDocument(root+"Test01-v7.mif", null));
 		list.add(new InputDocument(root+"Test02-v9.mif", null));
 		list.add(new InputDocument(root+"Test03.mif", null));
+		list.add(new InputDocument(root+"TestMarkers.mif", null));
 		
 		RoundTripComparison rtc = new RoundTripComparison();
 		assertTrue(rtc.executeCompare(filter, list, null, /*UTF-8*/locEN, locEN));

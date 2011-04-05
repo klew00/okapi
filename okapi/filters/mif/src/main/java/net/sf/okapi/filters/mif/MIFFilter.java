@@ -85,8 +85,7 @@ public class MIFFilter implements IFilter {
 	private static final String TOPSTATEMENTSTOSKIP = "ColorCatalog;ConditionCatalog;BoolCondCatalog;"
 		+ "CombinedFontCatalog;PgfCatalog;ElementDefCatalog;FmtChangeListCatalog;DefAttrValuesCatalog;"
 		+ "AttrCondExprCatalog;FontCatalog;RulingCatalog;TblCatalog;KumihanCatalog;Views;"
-		+ "MarkerTypeCatalog;XRefFormats;Document;BookComponent;InitialAutoNums;Dictionary;AFrames;Page;";
-	// Must end with ';'
+		+ "MarkerTypeCatalog;XRefFormats;Document;BookComponent;InitialAutoNums;Dictionary;AFrames;Page;"; // Must end with ';'
 	
 	private static final String IMPORTOBJECT = "ImportObject";
 	private static final String FRAMEROMAN = "x-MacRoman"; //TODO: Set to x-FrameRoman when ready
@@ -133,6 +132,7 @@ public class MIFFilter implements IFilter {
 	private String resname;
 	private int footnotesLevel;
 	private int textFlowNumber;
+	private TextUnit refTU;
 	
 	private static Hashtable<String, String> initCharTable () {
 		Hashtable<String, String> table = new Hashtable<String, String>();
@@ -556,7 +556,7 @@ public class MIFFilter implements IFilter {
 						hasPages = true;
 						
 						while ( true ) {
-							tag = readUntil("PageType;TextRect;", false, blockLevel, true);
+							tag = readUntil("PageType;TextRect;", false, null, blockLevel, true);
 							if ( tag == null ) {
 								// One of PageType or TextRect was not in the page
 								break;
@@ -575,7 +575,7 @@ public class MIFFilter implements IFilter {
 							}
 							else if ( tag.equals("TextRect") ) {
 								while ( true ) {
-									tag = readUntil("ID", false, blockLevel, true);
+									tag = readUntil("ID;", false, null, blockLevel, true);
 									if ( tag != null ) {
 										// Found
 										token = getNextTokenInStatement(false, null, true);
@@ -640,19 +640,19 @@ public class MIFFilter implements IFilter {
 						int tfLevel = blockLevel;
 						while ( true ) {
 							
-							if ( readUntil("Para", false, tfLevel, true) == null ) {
+							if ( readUntil("Para;", false, null, tfLevel, true) == null ) {
 								break; // Done
 							}
 							tblIds.clear(); // Hold all table references for this paragraph
 
 							// Inside a Para:
 							while ( true ) {
-								if ( readUntil("ParaLine", false, blockLevel, true) == null ) {
+								if ( readUntil("ParaLine;", false, null, blockLevel, true) == null ) {
 									break; // Done for this Para
 								}
 								// Else: inside a ParaLine
 								while ( true ) {
-									tag = readUntil("TextRectID;ATbl", false, blockLevel, true);
+									tag = readUntil("TextRectID;ATbl;", false, null, blockLevel, true);
 									if ( tag == null ) {
 										break; // Done
 									}
@@ -821,7 +821,7 @@ public class MIFFilter implements IFilter {
 	{
 		if ( type == BLOCKTYPE_TABLE ) {
 			// Get the table id
-			String tag = readUntil("TblID", true, stopLevel, true);
+			String tag = readUntil("TblID;", true, null, stopLevel, true);
 			if ( tag == null ) {
 				// Error: ID missing
 				throw new OkapiIOException("Missing id for the table.");
@@ -877,7 +877,7 @@ public class MIFFilter implements IFilter {
 			blockLevel--; // Closing the Para statement here
 		}
 		else {
-			if ( readUntil("Para", true, stopLevel, false) != null ) {
+			if ( readUntil("Para;", true, null, stopLevel, false) != null ) {
 				inBlock = stopLevel; // We are not done yet with this TextFlow statement
 				processPara();
 				blockLevel--; // Closing the Para statement here
@@ -906,6 +906,8 @@ public class MIFFilter implements IFilter {
 		paraBufNeeded = false;
 		String endString = null;
 		resetToDefaultDecoder();
+		Code code = null;
+		boolean extractedMarker = false;
 
 		// Go to the first ParaLine
 		int res = readUntilText(paraBuf, false);
@@ -916,15 +918,20 @@ public class MIFFilter implements IFilter {
 			String text = null;
 			switch ( res ) {
 			case 1: // String
-				text = processString(false);
+				text = processString(false, null);
 				paraBuf.append("`");
 				break;
 			case 2: // Char
 				text = processChar(false).toString();
 				break;
+			case 3: // Extracted marker
+				code = new Code(TagType.PLACEHOLDER, "index", "'>"+TextFragment.makeRefMarker(refTU.getId())+"<String `");
+				code.setReferenceFlag(true);
+				extractedMarker = true;
+				break;
 			}
 			
-			if ( Util.isEmpty(text) ) {
+			if ( Util.isEmpty(text) && !extractedMarker ) {
 				// Nothing to do, keep on reading
 				if ( paraBuf.length() > 0 ) {
 					if ( res == 1 ) {
@@ -934,11 +941,11 @@ public class MIFFilter implements IFilter {
 					}
 				}
 			}
-			else { // We have text
+			else { // We have text or code with reference
 				if ( first ) { // First text in the fragment: put the codes in the skeleton
 					first = false;
 					skel.append(paraBuf.toString());
-					if ( res == 2 ) skel.append("<String `");
+					if ( res != 1 ) skel.append("<String `");
 					endString = "'>";
 				}
 				else { // Put the codes in an inline code 
@@ -949,8 +956,15 @@ public class MIFFilter implements IFilter {
 						tf.append(TagType.PLACEHOLDER, "x", endString + paraBuf.toString());
 					}
 				}
-				// Add the text
-				tf.append(text);
+				
+				if ( code != null ) {
+					tf.append(code);
+					code = null;
+				}
+				else {
+					// Add the text
+					tf.append(text);
+				}
 				// Reset the codes buffer for next sequence
 				paraBuf.setLength(0);
 				paraBufNeeded = false;
@@ -965,7 +979,7 @@ public class MIFFilter implements IFilter {
 
 		TextUnit tu = null;
 		if ( !tf.isEmpty() ) {
-			if ( tf.hasText() ) {
+			if ( tf.hasText() || extractedMarker ) {
 				// Add the text unit to the queue
 				tu = new TextUnit(String.valueOf(++tuId));
 				tu.setPreserveWhitespaces(true);
@@ -1095,6 +1109,86 @@ public class MIFFilter implements IFilter {
 		}
 		return chToken;
 	}
+
+	/**
+	 * Processes a <Marker entry.
+	 * @return An array of objects: 0=StringBuilder of the skeleton or null,
+	 * 1=Text unit if this is extractable or null.
+	 */
+	private Object[] processMarker ()
+		throws IOException
+	{
+		refTU = null;
+		int level = blockLevel;
+		StringBuilder sb = new StringBuilder("<Marker ");
+		Object[] res = new Object[2];
+		res[0] = sb;
+		res[1] = null;
+		
+		String tag = readUntil("MTypeName;", true, sb, -1, true);
+		if ( tag == null ) {
+			logger.warning("Marker without type or text found. It will be skipped.");
+			skipOverContent(true, sb);
+			return res;
+		}
+
+		// Is it a marker we need to extract?
+		String type = processString(true, sb);
+		String resType = null;
+		if ( "Index".equals(type) ) {
+			if ( params.getExtractIndexMarkers() ) resType = "x-index";
+		}
+		else if ( "Hypertext".equals(type) ) {
+			if ( params.getExtractLinks() ) resType = "link";
+		}
+		
+		if ( resType == null ) {
+			// Not to extract
+			skipOverContent(true, sb);
+			blockLevel = level;
+			return res;
+		}
+		
+		// Else: it is to extract: get the string
+		tag = readUntil("MText;", true, sb, -1, true);
+		if ( tag == null ) {
+			skipOverContent(true, sb);
+			blockLevel = level;
+			return res; // Nothing to extract
+		}
+		
+		TextFragment tf = new TextFragment(processString(true, sb));
+		checkInlineCodes(tf);
+		
+		if ( tf.hasText() ) {
+			// If there is translatable parts: create a new text unit
+			refTU = new TextUnit(String.valueOf(++tuId));
+			refTU.setPreserveWhitespaces(true);
+			refTU.setSourceContent(tf);
+			refTU.setType(resType);
+			refTU.setIsReferent(true);
+
+			// Remove string
+			int n = sb.lastIndexOf("`");
+			sb.delete(n+1, sb.length());
+			GenericSkeleton refSkel = new GenericSkeleton(sb.toString());
+			refSkel.addContentPlaceholder(refTU);
+			sb.setLength(0);
+			sb.append("'>");
+			skipOverContent(true, sb);
+			refSkel.add(sb.toString());
+			queue.add(new Event(EventType.TEXT_UNIT, refTU, refSkel));
+			sb = null; // Now it is in the text unit skeleton
+			res[1] = refTU;
+		}
+		else {
+			// Store the remaining part of the marker
+			skipOverContent(true, sb);
+		}
+		
+		blockLevel = level;
+		return res;
+	}
 	
 	private int readUntilText (StringBuilder sb,
 		boolean checkIfParaBufNeeded)
@@ -1121,6 +1215,18 @@ public class MIFFilter implements IFilter {
 				}
 				else if ( "Char".equals(tag) ) {
 					return 2;
+				}
+				else if ( "Marker".equals(tag) ) {
+					int n = sb.lastIndexOf("<Marker");
+					sb.delete(n, sb.length());
+					Object[] res = processMarker();
+					if ( checkIfParaBufNeeded ) paraBufNeeded = true;
+					if ( res[1] != null ) { // We have a text unit
+						return 3;
+					}
+					// No text unit: nothing to extract
+					sb.append(res[0]);
+					paraLevel--;
 				}
 				else if ( !useUTF && "Font".equals(tag) ) {
 					// Do the font-driven encoding resolving only for non-UTF-8 files
@@ -1284,9 +1390,10 @@ public class MIFFilter implements IFilter {
 	/**
 	 * Reads until the first occurrence of one of the given statements, or (if stopLevel
 	 * is -1) at the end of the current level, or at the end of the given level.
-	 * @param tagNames the list of tag names to stop at.
+	 * @param tagNames the list of tag names to stop at (separated and ending with ';')
 	 * @param store true if we store the parsed characters into the skeleton.
 	 * @param stopLevel -1=return if the end of the current blockLevel is reached.
+	 * @param skipNotesBlock
 	 * other values=return if the blockLevel get lower than that value
 	 * False to stop when it reaches 0.
 	 * @return the name of the tag found, or null if none was found.
@@ -1294,6 +1401,7 @@ public class MIFFilter implements IFilter {
 	 */
 	private String readUntil (String tagNames,
 		boolean store,
+		StringBuilder sb,
 		int stopLevel,
 		boolean skipNotesBlock)
 		throws IOException
@@ -1306,18 +1414,19 @@ public class MIFFilter implements IFilter {
 		int c;
 		while ( (c = reader.read()) != -1 ) {
 			if ( store ) {
-				skel.append((char)c);
+				if ( sb == null ) skel.append((char)c);
+				else sb.append((char)c);
 			}
 			switch ( c ) {
 			case '#':
-				readComment(store, null);
+				readComment(store, sb);
 				break;
 
 			case '<': // Start of statement
 				while ( true ) {
 					blockLevel++;
-					String tag = readTag(store, true, null);
-					if ( tagNames.indexOf(tag) > -1 ) {
+					String tag = readTag(store, true, sb);
+					if ( tagNames.indexOf(tag+";") > -1 ) {
 						if ( !skipNotesBlock || ( footnotesLevel == -1) ) {
 							return tag;
 						}
@@ -1364,12 +1473,12 @@ public class MIFFilter implements IFilter {
 						break;
 					}
 					else if ( IMPORTOBJECT.equals(tag) ) {
-						skipOverImportObject(store, null);
+						skipOverImportObject(store, sb);
 						blockLevel--;
 						break;
 					}
 					else { // Default: skip over
-						if ( !readUntilOpenOrClose(store) ) {
+						if ( !readUntilOpenOrClose(store, sb) ) {
 							blockLevel--;
 							break;
 						}
@@ -1520,7 +1629,8 @@ public class MIFFilter implements IFilter {
 	 * @return true if stops on opening, false if stops on closing.
 	 * @throws IOException if the end of file occurs.
 	 */
-	private boolean readUntilOpenOrClose (boolean store)
+	private boolean readUntilOpenOrClose (boolean store,
+		StringBuilder sb)
 		throws IOException
 	{
 		int c;
@@ -1528,7 +1638,8 @@ public class MIFFilter implements IFilter {
 		boolean inString = false;
 		while ( (c = reader.read()) != -1 ) {
 			if ( store ) {
-				skel.append((char)c);
+				if ( sb == null ) skel.append((char)c);
+				else sb.append((char)c);
 			}
 			// Parse a string content
 			if ( inString ) {
@@ -1643,11 +1754,11 @@ public class MIFFilter implements IFilter {
 		TextUnit tu = null;
 		
 		do {
-			tag = readUntil("VariableFormat", true, blockLevel-1, true);
+			tag = readUntil("VariableFormat;", true, null, blockLevel-1, true);
 			if ( tag != null ) {
-				tag = readUntil("VariableDef", true, blockLevel-1, true);
+				tag = readUntil("VariableDef;", true, null, blockLevel-1, true);
 				if ( tag != null ) {
-					String text = processString(false);
+					String text = processString(false, null);
 					TextFragment tf = new TextFragment(text);
 					checkInlineCodes(tf);
 					skel.append("`");
@@ -1719,7 +1830,8 @@ public class MIFFilter implements IFilter {
 		}
 	}
 	
-	private String processString (boolean store)
+	private String processString (boolean store,
+		StringBuilder sb)
 		throws IOException
 	{
 		strBuffer.setLength(0);
@@ -1729,7 +1841,10 @@ public class MIFFilter implements IFilter {
 		
 		while ( (c = reader.read()) != -1 ) {
 			
-			if ( store ) skel.append((char)c);
+			if ( store ) {
+				if ( sb == null ) skel.append((char)c);
+				else sb.append((char)c);
+			}
 			
 			switch ( state ) {
 			case 0: // Outside the string

@@ -32,6 +32,8 @@ public class Parameters extends BaseParameters {
 	private static final String USECODEFINDER = "useCodeFinder";
 	private static final String CODEFINDERRULES = "codeFinderRules";
 	private static final String EXTRACTVARIABLES = "extractVariables";
+	private static final String EXTRACTINDEXMARKERS = "extractIndexMarkers";
+	private static final String EXTRACTLINKS = "extractLinks";
 	
 	private boolean extractBodyPages;
 	private boolean extractReferencePages;
@@ -40,6 +42,8 @@ public class Parameters extends BaseParameters {
 	private boolean useCodeFinder;
 	private InlineCodeFinder codeFinder;
 	private boolean extractVariables;
+	private boolean extractIndexMarkers;
+	private boolean extractLinks;
 
 	public Parameters () {
 		codeFinder = new InlineCodeFinder();
@@ -107,12 +111,30 @@ public class Parameters extends BaseParameters {
 		this.extractVariables = extractVariables;
 	}
 	
+	public boolean getExtractIndexMarkers () {
+		return extractIndexMarkers;
+	}
+	
+	public void setExtractIndexMarkers (boolean extractIndexMarkers) {
+		this.extractIndexMarkers = extractIndexMarkers;
+	}
+	
+	public boolean getExtractLinks () {
+		return extractLinks;
+	}
+	
+	public void setExtractLinks (boolean extractLinks) {
+		this.extractLinks = extractLinks;
+	}
+	
 	public void reset () {
 		extractBodyPages = true;
 		extractMasterPages = true;
 		extractReferencePages = true;
 		extractHiddenPages = true;
 		extractVariables = true;
+		extractIndexMarkers = true;
+		extractLinks = false;
 		useCodeFinder = true;
 		codeFinder.reset();
 		codeFinder.setSample("text <$varName> text");
@@ -128,6 +150,8 @@ public class Parameters extends BaseParameters {
 		extractMasterPages = buffer.getBoolean(EXTRACTMASTERPAGES, extractMasterPages);
 		extractReferencePages = buffer.getBoolean(EXTRACTREFERENCEPAGES, extractReferencePages);
 		extractVariables = buffer.getBoolean(EXTRACTVARIABLES, extractVariables);
+		extractIndexMarkers = buffer.getBoolean(EXTRACTINDEXMARKERS, extractIndexMarkers);
+		extractLinks = buffer.getBoolean(EXTRACTLINKS, extractLinks);
 		useCodeFinder = buffer.getBoolean(USECODEFINDER, useCodeFinder);
 		codeFinder.fromString(buffer.getGroup(CODEFINDERRULES, ""));
 	}
@@ -140,6 +164,8 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean(EXTRACTMASTERPAGES, extractMasterPages);
 		buffer.setBoolean(EXTRACTREFERENCEPAGES, extractReferencePages);
 		buffer.setBoolean(EXTRACTVARIABLES, extractVariables);
+		buffer.setBoolean(EXTRACTINDEXMARKERS, extractIndexMarkers);
+		buffer.setBoolean(EXTRACTLINKS, extractLinks);
 		buffer.setBoolean(USECODEFINDER, useCodeFinder);
 		buffer.setGroup(CODEFINDERRULES, codeFinder.toString());
 		return buffer.toString();

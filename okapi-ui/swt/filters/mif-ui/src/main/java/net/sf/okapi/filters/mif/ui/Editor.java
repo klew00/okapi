@@ -58,6 +58,8 @@ public class Editor implements IParametersEditor {
 	private Button chkExtractMasterPages;
 	private Button chkExtractReferencePages;
 	private Button chkExtractVariables;
+	private Button chkExtractIndexMarkers;
+	private Button chkExtractLinks;
 
 	public boolean edit (IParameters params,
 		boolean readOnly,
@@ -109,6 +111,12 @@ public class Editor implements IParametersEditor {
 		
 		chkExtractVariables = new Button(cmpTmp, SWT.CHECK);
 		chkExtractVariables.setText(Res.getString("extractVariables"));
+		
+		chkExtractIndexMarkers = new Button(cmpTmp, SWT.CHECK);
+		chkExtractIndexMarkers.setText(Res.getString("extractIndexMarkers"));
+		
+		chkExtractLinks = new Button(cmpTmp, SWT.CHECK);
+		chkExtractLinks.setText(Res.getString("extractLinks"));
 		
 		Group grpTmp = new Group(cmpTmp, SWT.NONE);
 		grpTmp.setText(Res.getString("pageTypesExtraction"));
@@ -200,6 +208,8 @@ public class Editor implements IParametersEditor {
 		chkExtractMasterPages.setSelection(params.getExtractMasterPages());
 		chkExtractReferencePages.setSelection(params.getExtractReferencePages());
 		chkExtractVariables.setSelection(params.getExtractVariables());
+		chkExtractIndexMarkers.setSelection(params.getExtractIndexMarkers());
+		chkExtractLinks.setSelection(params.getExtractLinks());
 		chkUseCodeFinder.setSelection(params.getUseCodeFinder());
 		pnlCodeFinder.setRules(params.getCodeFinderData());
 		updateInlineCodes();
@@ -221,6 +231,8 @@ public class Editor implements IParametersEditor {
 		params.setExtractMasterPages(chkExtractMasterPages.getSelection());
 		params.setExtractReferencePages(chkExtractReferencePages.getSelection());
 		params.setExtractVariables(chkExtractVariables.getSelection());
+		params.setExtractIndexMarkers(chkExtractIndexMarkers.getSelection());
+		params.setExtractLinks(chkExtractLinks.getSelection());
 		params.setUseCodeFinder(chkUseCodeFinder.getSelection());
 		return true;
 	}
