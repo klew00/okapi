@@ -223,22 +223,20 @@ public class TikalTest {
     	assertTrue("File different from gold", compareZipWithGoldFile("idmltest.out.idml"));
     }
 
-//TODO: Fix this    
-//    @Test
-//    public void testExtractMergeTS () throws IOException, InterruptedException {
-//    
-//    	// Delete previous output
-//    	assertTrue(deleteOutputFile("tstest.ts.xlf"));
-//    	assertTrue(deleteOutputFile("tstest.out.ts"));
-//
-//    	// Extract
-//    	assertEquals(0, runTikal("-x -sl en -tl fr tstest.ts -sl EN-US -tl FR-FR -ie UTF-8"));
-//    	assertTrue("File different from gold", compareWithGoldFile("tstest.ts.xlf", "UTF-8"));
-//  	
-//    	// Merge
-//    	assertEquals(0, runTikal("-m -sl en -tl fr tstest.ts.xlf -sl EN-US -tl FR-FR -oe UTF-8"));
-//    	assertTrue("File different from gold", compareWithGoldFile("tstest.out.ts", "windows-1252"));
-//    }
+    @Test
+    public void testExtractMergeTS () throws IOException, InterruptedException {
+    	// Delete previous output
+    	assertTrue(deleteOutputFile("tstest.ts.xlf"));
+    	assertTrue(deleteOutputFile("tstest.out.ts"));
+
+    	// Extract
+    	assertEquals(0, runTikal("-x -sl en -tl fr tstest.ts -sl EN-US -tl FR-FR -ie UTF-8"));
+    	assertTrue("File different from gold", compareWithGoldFile("tstest.ts.xlf", "UTF-8"));
+  	
+    	// Merge
+    	assertEquals(0, runTikal("-m -sl en -tl fr tstest.ts.xlf -sl EN-US -tl FR-FR -oe UTF-8"));
+    	assertTrue("File different from gold", compareWithGoldFile("tstest.out.ts", "windows-1252"));
+    }
     
     @Test
     public void testExtractMergeXLIFF () throws IOException, InterruptedException {

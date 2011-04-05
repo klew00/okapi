@@ -43,6 +43,7 @@ import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
+import net.sf.okapi.common.filters.RoundTripComparison;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import org.junit.Assert;
 import org.junit.Before;
@@ -61,7 +62,7 @@ public class TsFilterTest {
 	private FilterTestDriver testDriver;
 	
 	String completeTs = "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\r" +
-	//"<!DOCTYPE TS>\r" +
+	"<!DOCTYPE TS>\r" +
 	"<!-- comment -->\r" +
 	"<TS version=\"4.5.1\" sourcelanguage=\"en-us\" language=\"fr-fr\">\r" +
 	"<defaultcodec>hello defaultcodec</defaultcodec>\r" +
@@ -128,7 +129,7 @@ public class TsFilterTest {
 		assertTrue(sd.getFilterWriter() instanceof GenericFilterWriter);
 		assertEquals("utf-8", sd.getProperty("encoding").getValue());
 		assertEquals(
-				"<?xml version=\"1.0\" encoding=\"[#$$self$@%encoding]\"?>\r", 
+				"<?xml version=\"1.0\" encoding=\"[#$$self$@%encoding]\"?>", 
 				sd.getSkeleton().toString());
 	}
 	
@@ -140,8 +141,9 @@ public class TsFilterTest {
 		assertEquals("4.5.1", dp.getProperty("version").getValue());
 		assertEquals(locENUS, dp.getProperty("sourcelanguage").getValue());
 		assertEquals(locFRFR, dp.getProperty("language").getValue());
+		
 		assertEquals( 
-				//"\r<!DOCTYPE TS []>\r" +
+				"\r<!DOCTYPE TS []>\r" +
 				"<!-- comment -->\r" +
 				"<TS version=\"4.5.1\" sourcelanguage=\"en-us\" language=\"fr-fr\">\r" +
 				"<defaultcodec>hello defaultcodec</defaultcodec>\r" +
@@ -161,9 +163,9 @@ public class TsFilterTest {
 		//assertEquals("context comment 1", sg.getProperty("comment").getValue());
 		
 		assertEquals( 
-				"\r<name>context name 1</name>\r" +
-				"<comment>context comment 1</comment>\r" + 
-				"<context encoding=\"utf-8\">",
+				"<context encoding=\"utf-8\">\r" +
+				"<name>context name 1</name>\r" +
+				"<comment>context comment 1</comment>\r",
 				sg.getSkeleton().toString());
 		
 		sg = FilterTestDriver.getGroup(getEvents(completeTs, locENUS, locFRFR), 2);
@@ -331,7 +333,7 @@ public class TsFilterTest {
 	
 	@Test
 	public void testInlineCodesOutput () {
-		String snippet = "<?xml version='1.0' encoding='UTF-16BE'?>" +
+		String snippet = "<?xml version='1.0' encoding='UTF-16BE'?>\r" +
 		"<TS sourcelanguage=\"en-us\" language=\"fr-fr\" version=\"4.5.1\">\r" +
 		"<context>\r" +
 		"<name>contextName</name>\r" +
@@ -553,6 +555,7 @@ public class TsFilterTest {
 		"</context>\r" +
 		"</TS>";
 
+
 		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet,locENUS,locFRFR),
 			filter.getEncoderManager(), locFR));
 	}
@@ -624,31 +627,14 @@ public class TsFilterTest {
 		assertEquals("utf-8", sd.getProperty("encoding").getValue());
 	
 		assertEquals(
-			"<?xml version=\"1.0\" encoding=\"[#$$self$@%encoding]\"?>\r\n", 
+			"<?xml version=\"1.0\" encoding=\"[#$$self$@%encoding]\"?>", 
 			sd.getSkeleton().toString());
 		
 	}	
-	@Test
-	public void DocumentPartTsPart_FromFile() {
-		DocumentPart dp = FilterTestDriver.getDocumentPart(getEventsFromFile("Complete_valid_utf8_bom_crlf.ts"), 1);
-		
-		assertEquals("o2", dp.getId());
-		assertEquals("4.5.1", dp.getProperty("version").getValue());
-		assertEquals(locENUS, dp.getProperty("sourcelanguage").getValue());
-		assertEquals(locFRFR, dp.getProperty("language").getValue());
-		assertEquals( 
-				//"\r\n<!DOCTYPE TS []>\r\n" +
-				"<!-- comment -->\r\n" +
-				"<TS version=\"4.5.1\" sourcelanguage=\"en-us\" language=\"fr-fr\">\r\n" +
-				"<defaultcodec>hello defaultcodec</defaultcodec>\r\n" +
-				"<extra-loc-blank>hello extra-loc-blank</extra-loc-blank>\r\n",
-				dp.getSkeleton().toString());
-
-		//q. should all iresources have mimetype set, or only the ones with text?		
-	}
 
 	@Test
 	public void StartGroupContextPart_FromFile() {
+		
 		StartGroup sg = FilterTestDriver.getGroup(getEventsFromFile("Complete_valid_utf8_bom_crlf.ts"), 1);
 
 		assertEquals("o3", sg.getId());
@@ -657,9 +643,9 @@ public class TsFilterTest {
 		//assertEquals("context comment 1", sg.getProperty("comment").getValue());
 		
 		assertEquals( 
-				"\r\n<name>context name 1</name>\r\n" +
-				"<comment>context comment 1</comment>\r\n" + 
-				"<context encoding=\"utf-8\">",
+				"<context encoding=\"utf-8\">\r\n" +
+				"<name>context name 1</name>\r\n" +
+				"<comment>context comment 1</comment>\r\n",
 				sg.getSkeleton().toString());
 
 		
@@ -939,13 +925,13 @@ public class TsFilterTest {
 				tu.getSkeleton().toString());
 	}	
 	
-/*	@Test
+	@Test
 	public void testDoubleExtraction () {
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
 		list.add(new InputDocument(root+"Complete_valid_utf8_bom_crlf.ts", null));
 		RoundTripComparison rtc = new RoundTripComparison();
 		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locENUS, locFRFR));
-	}*/
+	}
 	
 	//--methods--
 	@Test
@@ -974,15 +960,15 @@ public class TsFilterTest {
 		FilterTestDriver.getStartDocument(getEvents(simpleSnippet, locENUS, null));
 	}
 	
-/*	@Test (expected=NullPointerException.class)
+	@Test (expected=NullPointerException.class)
 	public void testSourceLangEmpty() {
-		FilterTestDriver.getStartDocument(getEvents(simpleSnippet, "",locFRFR));
-	}*/	
+		FilterTestDriver.getStartDocument(getEvents(simpleSnippet, null, locFRFR));
+	}	
 	
-/*	@Test (expected=NullPointerException.class)
+	@Test (expected=NullPointerException.class)
 	public void testTargetLangEmpty() {
-		FilterTestDriver.getStartDocument(getEvents(simpleSnippet, locENUS,""));
-	}*/	
+		FilterTestDriver.getStartDocument(getEvents(simpleSnippet, locENUS, null));
+	}	
 	
 	@Test
 	public void testInputStream() {
@@ -997,7 +983,6 @@ public class TsFilterTest {
 		filter.open(new RawDocument(simpleSnippet, locENUS,locFRFR));
 		if ( !testDriver.process(filter) ) Assert.fail();
 		filter.close();
-		//System.out.println(FilterTestDriver.generateOutput(getEvents(simpleSnippet, locENUS,locFRFR), simpleSnippet, locFRFR));
 	}	
 
 	@Test

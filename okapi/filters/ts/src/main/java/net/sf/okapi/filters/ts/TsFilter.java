@@ -40,6 +40,9 @@ import javax.xml.stream.events.DTD;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+
+import org.codehaus.stax2.XMLInputFactory2;
+
 import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -221,7 +224,7 @@ public class TsFilter implements IFilter {
 				if(event.getEventType() == XMLEvent.START_ELEMENT){
 					
 					StartElement startElem = event.asStartElement();
-					String startElemName = startElem.getName().getLocalPart();
+					String startElemName = event.asStartElement().getName().getLocalPart();
 					
 					if( startElemName.equals("source") ){
 						sourceExists = true;
@@ -412,12 +415,19 @@ public class TsFilter implements IFilter {
 
 	public void open(RawDocument input, boolean generateSkeleton) {
 		try {
+			
 			close();
 			canceled = false;
-
+			
+			//XMLInputFactory2 fact = (XMLInputFactory2) XMLInputFactory2.newInstance();
 			XMLInputFactory fact = XMLInputFactory.newInstance();
-			fact.setProperty(XMLInputFactory.IS_COALESCING, false);
+			//fact.setProperty(XMLInputFactory.IS_COALESCING, false);
 			fact.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+			
+			//fact.setProperty(XMLInputFactory.IS_COALESCING, true);	
+			fact.setProperty(XMLInputFactory.IS_COALESCING, false);
+			fact.setProperty(XMLInputFactory2.P_REPORT_PROLOG_WHITESPACE, true);
+			
 					
 			// Determine encoding based on BOM, if any
 			input.setEncoding("UTF-8"); // Default for XML, other should be auto-detected
@@ -483,7 +493,8 @@ public class TsFilter implements IFilter {
 			startDoc.setProperty(new Property(Property.ENCODING, encoding, false));
 			skel.append("<?xml version=\"1.0\" encoding=\"");
 			skel.addValuePlaceholder(startDoc, Property.ENCODING, LocaleId.EMPTY);
-			skel.append("\"?>"+lineBreak);
+			//skel.append("\"?>"+lineBreak);
+			skel.append("\"?>");
 			startDoc.setSkeleton(skel);
 		}
 		catch ( XMLStreamException e) {
@@ -500,89 +511,84 @@ public class TsFilter implements IFilter {
 		this.params = (Parameters)params;
 	}
 	
-	//--custom methods--
 	private boolean read () throws XMLStreamException {
-		
-		while ( eventReader.hasNext() ) {
-			
-			XMLEvent event = eventReader.nextEvent();
-			
-			//TODO: Validate before adding
-			eventList.add(event);
-			
-			switch ( event.getEventType() ) {
-					
-			case XMLStreamConstants.START_ELEMENT:
 
+		while ( eventReader.hasNext() ) {
+
+			XMLEvent event = eventReader.nextEvent();
+			eventList.add(event);
+
+			if(event.getEventType() == XMLEvent.START_ELEMENT){
 				StartElement startElem = event.asStartElement();
 				String startElemName = startElem.getName().getLocalPart();
-				if( !startElemName.equals("byte") )
-					elementStack.push(startElemName);	
-				
+
+				//--thinking the element stack could be used for custom validation at some point
+				if( !startElemName.equals("byte")){
+					elementStack.push(startElemName);
+					//TODO various validation
+				}
+
 				if(tsPartReady(startElemName)){
-					//TODO validateTs();
-					eventList.remove(event);
+					eventList.remove(eventList.size()-1);			//remove the <context> or <message> element and generate TS "part"
 					IResource resource = generateTsPart(true);
 					eventList.clear();
-					eventList.add(event);
+					eventList.add(event);							//remove the <context> or <message> element
 					queue.add(new Event(EventType.DOCUMENT_PART, resource));
-					
+
 				}else if(contextPartReady(startElemName)){
-					//TODO validateContext();
-					eventList.remove(event);
+					eventList.remove(eventList.size()-1);			//remove the <context> or <message> element and generate Context "part"
 					IResource resource = generateContextPart(true);
-					//printGroup(resource);
 					eventList.clear();
-					eventList.add(event);
+					eventList.add(event); 							//remove the <context> or <message> element and generate Context "part"
 					queue.add(new Event(EventType.START_GROUP, resource));
 				}
-				
+
 				if ( startElemName.equals("name") ) {
 					readContextName();
 				}
- 
+
+				//--are we processing context or message--
 				if(startElemName.equals("context")){
 					ts.currentDocumentLocation = DocumentLocation.CONTEXT;
 				}else if(startElemName.equals("message")){
 					ts.currentDocumentLocation = DocumentLocation.MESSAGE;
 				}
 
-				break;
-				
-			case XMLStreamConstants.END_ELEMENT:
-
+			}else if(event.getEventType() == XMLEvent.END_ELEMENT){
 				EndElement endElem = event.asEndElement();
 				String endElemName = endElem.getName().getLocalPart();
 
-				if( !endElemName.equals("byte") )
-					elementStack.pop();	
-
+				//--thinking the element stack could be used for custom validation at some point
+				if( !endElemName.equals("byte")){
+					elementStack.pop();
+					//TODO various validation
+				}
+				
 				if(endElemName.equals("message")){
-					//TODO validateMessage();
+
 					ts.analyzeMessage();
-					
+
 					if( ts.msgIsObsolete() || ts.noSource() ){
 
 						StartElement se = getStartElement("message");
 						if( ts.noSource() ){
 							logger.warning("Message (Line "+se.getLocation().getLineNumber()+" contains no <source>. Message will be ignored.");
 						}
-						
+
 						DocumentPart dp = generateObsoleteTu();
-						//printDp(dp);
 						queue.add(new Event(EventType.DOCUMENT_PART, dp));
 						eventList.clear();
 						ts.reset();
-						
+
 					}else if (ts.numerusFormCount > 0) {
 
 						generateNumerusFormTu();
 						eventList.clear();
 						ts.reset();
 						skel = new GenericSkeleton();
-						
+
 						return true;
-						
+
 					}else{
 						TextUnit tu = generateTu();
 						queue.add(new Event(EventType.TEXT_UNIT, tu));
@@ -592,34 +598,15 @@ public class TsFilter implements IFilter {
 
 						return true;
 					}
-					
 
 				}else if (endElemName.equals("context")){
-					//TODO validateEndContext();
+
+					//--Generate Context EndGroup--
 					IResource resource = generateContextPart(false);
 					eventList.clear();
 					queue.add(new Event(EventType.END_GROUP, resource));
-				}
 
-				break;
-			
-			case XMLStreamConstants.START_DOCUMENT:
-			case XMLStreamConstants.CHARACTERS:
-			case XMLStreamConstants.DTD:
-				break;
-			case XMLStreamConstants.SPACE:
-//				System.out.println("space: ");
-				break;
-			case XMLStreamConstants.ENTITY_REFERENCE:
-			case XMLStreamConstants.CDATA:
-			case XMLStreamConstants.COMMENT:
-			case XMLStreamConstants.PROCESSING_INSTRUCTION:
-			case XMLStreamConstants.ENTITY_DECLARATION:
-			case XMLStreamConstants.NAMESPACE:
-			case XMLStreamConstants.NOTATION_DECLARATION:
-			case XMLStreamConstants.ATTRIBUTE:
-			case XMLStreamConstants.END_DOCUMENT:
-				
+				}
 			}
 		}
 
@@ -628,7 +615,7 @@ public class TsFilter implements IFilter {
 		eventList.clear();
 		skel = new GenericSkeleton("");
 		return false;
-	}	
+	}
 
 	private void readContextName ()
 		throws XMLStreamException
@@ -684,6 +671,11 @@ public class TsFilter implements IFilter {
 	}
 
 	
+	/**
+	 * Determines if the TsPart is ready to be written. TsPart is everything up to the first context or the first message.
+	 * @param elemName Current element returned by the Stax parser
+	 * @return
+	 */
 	private boolean tsPartReady(String elemName) {
 		if(ts.currentDocumentLocation == DocumentLocation.TS){
 			if( elemName.equals("context") || elemName.equals("message") ){
@@ -694,6 +686,11 @@ public class TsFilter implements IFilter {
 	}
 
 	
+	/**
+	 * Determines if a ContextPart is ready to be written. ContextPart is everything up to the next context or the next message.
+	 * @param elemName Current element returned by the Stax parser
+	 * @return
+	 */
 	private boolean contextPartReady(String elemName) {
 		if(ts.currentDocumentLocation == DocumentLocation.CONTEXT){
 			if( elemName.equals("context") || elemName.equals("message") ){
@@ -724,7 +721,9 @@ public class TsFilter implements IFilter {
 			}else if(event.getEventType() == XMLEvent.END_DOCUMENT){
 				
 			}else if(event.getEventType() == XMLEvent.DTD){
-				//procDTD(event);
+				procDTD(event);
+			}else if(event.getEventType() == XMLEvent.CDATA){
+				procCDATA(event);
 			}else if(event.getEventType() == XMLEvent.COMMENT){
 				procComment(event);
 
@@ -752,8 +751,6 @@ public class TsFilter implements IFilter {
 				Characters chars = event.asCharacters();
 				procCharacters(chars);
 
-			}else{
-				System.out.println("Leftover");
 			}
 		}
 		resource.setSkeleton(skel);
@@ -819,6 +816,8 @@ public class TsFilter implements IFilter {
 				Characters chars = event.asCharacters();
 				procCharacters(chars);
 
+			}else if(event.getEventType() == XMLEvent.CDATA){
+				procCDATA(event);
 			}
 		}
 		resource.setSkeleton(skel);
@@ -1200,17 +1199,20 @@ public class TsFilter implements IFilter {
 		skel.append(escaped);	
 	}
 
-
 	private void procDTD(XMLEvent event) {
 		DTD dtd =(DTD)event;
 		skel.append(dtd.getDocumentTypeDeclaration().replace("\n", lineBreak));
+	}
+	
+	private void procCDATA(XMLEvent event) {
+		Characters chars = event.asCharacters();
+		skel.append(chars.getData().replace("\n", lineBreak));
 	}
 
 
 	private void procComment(XMLEvent event) {
 		Comment comment = (Comment)event;
-		skel.append("<!--"+comment.getText().replace("\n", lineBreak)+"-->"+lineBreak);
-		
+		skel.append("<!--"+comment.getText().replace("\n", lineBreak)+"-->");
 	}
 	
 	
