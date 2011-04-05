@@ -384,7 +384,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		
 		//--- Regular expression options group
 		Group group = new Group(mainComposite, SWT.NONE);
-		group.setLayout(new GridLayout(2, false));
+		group.setLayout(new GridLayout(1, false));
 		group.setText("Regular expression options");
 
 		chkDotAll = new Button(group, SWT.CHECK);
