@@ -25,6 +25,7 @@ import java.util.List;
 
 import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.lib.persistence.IPersistenceSession;
@@ -35,7 +36,8 @@ public class TextContainerBean extends PersistenceBean<TextContainer> {
 	
 	private List<PropertyBean> properties = new ArrayList<PropertyBean>();
 	private AnnotationsBean annotations = new AnnotationsBean();
-	private List<TextPartBean> parts = new ArrayList<TextPartBean>();
+	//private List<TextPartBean> parts = new ArrayList<TextPartBean>();
+	private List<FactoryBean> parts = new ArrayList<FactoryBean>();
 	private boolean segApplied;
 
 	@Override
@@ -54,9 +56,13 @@ public class TextContainerBean extends PersistenceBean<TextContainer> {
 		annotations.set(obj.getAnnotations(), session);
 		
 		for (int i = 0; i < obj.count(); i++) {
-			TextPartBean partBean = (TextPartBean) session.createBean(obj.get(i).getClass());
+			TextPart part = obj.get(i);
+//			TextPartBean partBean = part.isSegment() ? 
+//					(SegmentBean) session.createBean(part.getClass()) : 
+//						(TextPartBean) session.createBean(part.getClass());
+			FactoryBean partBean = new FactoryBean();
 			parts.add(partBean);
-			partBean.set(obj.get(i), session);
+			partBean.set(part, session);
 		}
 		
 		segApplied = obj.hasBeenSegmented();
@@ -70,8 +76,11 @@ public class TextContainerBean extends PersistenceBean<TextContainer> {
 		for (FactoryBean annotationBean : annotations.getItems())
 			obj.setAnnotation(annotationBean.get(IAnnotation.class, session));
 		
-		for (TextPartBean partBean : parts)
-			obj.insert(obj.count(), partBean.get(TextPart.class, session));
+		for (FactoryBean partBean : parts) {
+			TextPart part = partBean.get(TextPart.class, session);
+			if (part != null)
+				obj.append(part, true);
+		}			
 		
 		obj.setHasBeenSegmentedFlag(segApplied);
 	}
@@ -92,11 +101,19 @@ public class TextContainerBean extends PersistenceBean<TextContainer> {
 		this.properties = properties;
 	}
 
-	public List<TextPartBean> getParts() {
+//	public List<TextPartBean> getParts() {
+//		return parts;
+//	}
+//
+//	public void setParts(List<TextPartBean> parts) {
+//		this.parts = parts;
+//	}
+
+	public List<FactoryBean> getParts() {
 		return parts;
 	}
 
-	public void setParts(List<TextPartBean> parts) {
+	public void setParts(List<FactoryBean> parts) {
 		this.parts = parts;
 	}
 
