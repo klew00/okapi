@@ -34,6 +34,11 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
+import net.sf.okapi.common.ClassUtil;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.LocaleId;
@@ -1231,5 +1236,47 @@ public class XLIFFKitWriterTest {
 		assertEquals(parent.getClassName(), TestEvent.class.getName());
 		assertEquals(rid6, parent.getReference());
 		assertNull(parent.getContent());
+	}
+	
+	@Test
+	public void testStaxParser () throws XMLStreamException {		
+		Logger logger = Logger.getLogger(getClass().getName());
+		XMLInputFactory fact = null;
+		XMLStreamReader reader = null;
+		 
+		logger.info("Factory class: " + System.getProperty("javax.xml.stream.XMLInputFactory"));
+		
+		fact = XMLInputFactory.newInstance();
+		reader = fact.createXMLStreamReader(this.getClass().getResourceAsStream("."));
+		logger.info("Factory class: " + ClassUtil.getQualifiedClassName(fact));
+		logger.info("Reader class: " + ClassUtil.getQualifiedClassName(reader));
+	}
+	
+	@Test
+	public void testStaxParser2 () throws XMLStreamException {		
+		Logger logger = Logger.getLogger(getClass().getName());
+		XMLInputFactory fact = null;
+		XMLStreamReader reader = null;
+		 
+		logger.info("Factory class: " + System.getProperty("javax.xml.stream.XMLInputFactory"));
+		
+		fact = XMLInputFactory.newInstance();
+		reader = fact.createXMLStreamReader(this.getClass().getResourceAsStream("."));
+		logger.info("Factory class: " + ClassUtil.getQualifiedClassName(fact));
+		logger.info("Reader class: " + ClassUtil.getQualifiedClassName(reader));
+		
+//		System.setProperty("javax.xml.stream.XMLInputFactory","com.sun.xml.internal.stream.XMLInputFactoryImpl");
+//		fact = XMLInputFactory.newInstance();
+//		reader = fact.createXMLStreamReader(this.getClass().getResourceAsStream("/BinUnitTest01.xlf"));
+//		logger.info("Factory class: " + ClassUtil.getQualifiedClassName(fact));
+//		logger.info("Reader class: " + ClassUtil.getQualifiedClassName(reader));
+//		
+//		System.getProperties().remove("javax.xml.stream.XMLInputFactory");
+//		//testSystemProperties();
+//		
+//		fact = XMLInputFactory.newInstance();
+//		reader = fact.createXMLStreamReader(this.getClass().getResourceAsStream("/BinUnitTest01.xlf"));
+//		logger.info("Factory class: " + ClassUtil.getQualifiedClassName(fact));
+//		logger.info("Reader class: " + ClassUtil.getQualifiedClassName(reader));
 	}
 }
