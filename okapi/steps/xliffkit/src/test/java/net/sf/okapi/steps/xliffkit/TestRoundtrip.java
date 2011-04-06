@@ -1,19 +1,14 @@
 package net.sf.okapi.steps.xliffkit;
 
-import static org.junit.Assert.assertTrue;
-
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterTestDriver;
-import net.sf.okapi.common.filters.InputDocument;
-import net.sf.okapi.common.filters.RoundTripComparison;
 import net.sf.okapi.filters.html.HtmlFilter;
 import net.sf.okapi.filters.openxml.OpenXMLFilter;
 import net.sf.okapi.lib.extra.pipelinebuilder.XBatch;
@@ -55,6 +50,7 @@ public class TestRoundtrip {
 						),
 				new RawDocumentToFilterEventsStep(new OpenXMLFilter()),
 				elb,
+				//new TextUnitLogger(),
 				new XPipelineStep(
 						new XLIFFKitWriterStep(),								
 						new XParameter("gMode", true),
@@ -79,6 +75,7 @@ public class TestRoundtrip {
 						),
 				new XLIFFKitReaderStep(),
 				elb,
+				new TextUnitLogger(),
 				new EventLogger()
 		).execute();
 		
