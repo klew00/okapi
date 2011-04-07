@@ -47,6 +47,7 @@ import org.xml.sax.SAXException;
 public class Manifest implements IAnnotation {
 
 	public static final String EXTRACTIONTYPE_XLIFF = "xliff";
+	public static final String EXTRACTIONTYPE_XLIFF2 = "xliff2";
 	public static final String EXTRACTIONTYPE_PO = "po";
 	public static final String EXTRACTIONTYPE_RTF = "rtf";
 	public static final String EXTRACTIONTYPE_XLIFFRTF = "xliff+rtf";

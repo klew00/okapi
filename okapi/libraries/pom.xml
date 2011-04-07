@@ -24,5 +24,6 @@
         <module>lib-omegat</module>
         <module>lib-transifex</module>
         <module>lib-longhorn-api</module>
+        <module>lib-xliff</module>
     </modules>
 </project>

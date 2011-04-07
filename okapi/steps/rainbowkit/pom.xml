@@ -45,6 +45,11 @@
 		<artifactId>okapi-filter-transifex</artifactId>
 		<version>${project.version}</version>
 	</dependency>        
+	<dependency>
+		<groupId>net.sf.okapi.lib</groupId>
+		<artifactId>okapi-lib-xliff</artifactId>
+		<version>${project.version}</version>
+	</dependency>
 		
      <!-- For test -->
 	<dependency>

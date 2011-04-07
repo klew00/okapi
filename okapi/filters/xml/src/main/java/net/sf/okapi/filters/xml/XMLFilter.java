@@ -268,10 +268,10 @@ public class XMLFilter implements IFilter {
 			doc = docBuilder.parse(is);
 		}
 		catch ( SAXException e ) {
-			throw new OkapiIOException("Error when parsing the document.", e);
+			throw new OkapiIOException("Error when parsing the document.\n"+e.getMessage(), e);
 		}
 		catch ( IOException e ) {
-			throw new OkapiIOException("Error when reading the document.", e);
+			throw new OkapiIOException("Error when reading the document.\n"+e.getMessage(), e);
 		}
 
 		encoding = doc.getXmlEncoding();

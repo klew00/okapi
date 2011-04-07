@@ -207,6 +207,11 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		optStrings.add(null);
 		optMoreInfo.add("Rainbow TKit - ONTRAM XINI"); // wiki page
 		writers.add("net.sf.okapi.steps.rainbowkit.ontram.OntramPackageWriter");
+		// XLIFF 2
+		optEditors.add(null);
+		optStrings.add(null);
+		optMoreInfo.add("Rainbow TKit - XLIFF 2.0"); // wiki page
+		writers.add("net.sf.okapi.steps.rainbowkit.xliff.XLIFF2PackageWriter");
 
 		mainComposite = new Composite(parent, SWT.BORDER);
 		mainComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -257,6 +262,9 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 
 		lbTypes.add("ONTRAM XINI (Alpha)");
 		lbTypes.setData("6", "net.sf.okapi.steps.rainbowkit.ontram.OntramPackageWriter");
+
+		lbTypes.add("XLIFF 2.0 (Experimental - output only)");
+		lbTypes.setData("7", "net.sf.okapi.steps.rainbowkit.xliff.XLIFF2PackageWriter");
 
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.heightHint = 70;
@@ -360,6 +368,11 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 			btOptions.setEnabled(false);
 			edDescription.setText("Simple package where translatable files are extracted into a XINI document.\n"
 				+ "You can translate this package with ONTRAM.");
+			break;
+		case 7: // XLIFF 2
+			btOptions.setEnabled(false);
+			edDescription.setText("Simple package with XLIFF 2.0 experimental files.\n"
+				+ "Not for real projects. The XLIFF 2.0 format is defined yet. See XLIFF TC for more info and feedback.");
 			break;
 		}
 	}
