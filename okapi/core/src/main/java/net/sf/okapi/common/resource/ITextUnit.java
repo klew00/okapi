@@ -26,19 +26,19 @@ import net.sf.okapi.common.LocaleId;
  * EXPERIMENTAL interface, do not use yet.
  * <p>
  * Interface for the basic unit of extraction from a filter and also the resource
- * associated with the filter event TEXT_UNIT.
+ * associated with the filter event TEXT_UNIT.</p>
  * <p>
  * The TextUnit object holds the extracted source text, all its properties and
- * annotations, and any target corresponding data.
+ * annotations, and any target corresponding data.</p>
  * <p>
  * If adjustments to the source are required for different target locales, these
  * can be made using the {@link IVariantSources} interface, accessible through
- * {@link ITextUnit#getVariantSources()}
+ * {@link ITextUnit#getVariantSources()}</p>
  * <p>
  * Where adjusted sources exist, methods in this interface should have
  * their effects on the default source, however a specific implementation may
  * provide a method to select one of the variant sources that methods would then
- * use. The main source should always be used before such a method is called.
+ * use. The main source should always be used before such a method is called.</p>
  *
  */
 public interface ITextUnit extends INameable, IReferenceable {
@@ -84,7 +84,7 @@ public interface ITextUnit extends INameable, IReferenceable {
      * If the target does not exists one is created automatically, and contains a copy
      * of the source with all segments empty.
      * <p>
-     * Calling this method is the same as calling <code>createTarget(locId, false, IResource.COPY_SEGMENTS)</code>
+     * Calling this method is the same as calling <code>createTarget(locId, false, IResource.COPY_SEGMENTS)</code></p>
      *
      * @param locId the locale to query.
      * @return the target object for this text unit for the given locale. Never returns null.
@@ -99,7 +99,7 @@ public interface ITextUnit extends INameable, IReferenceable {
      * If the target does not exists, one is created.
      * Any existing content for the given locale is overwritten.
      * To set a target object based on the source, use the
-     * {@link #createTarget(LocaleId, boolean, int)} method.
+     * {@link #createTarget(LocaleId, boolean, int)} method.</p>
      *
      * @param locId the target locale.
      * @param text the target content to set.
@@ -129,7 +129,7 @@ public interface ITextUnit extends INameable, IReferenceable {
      * Creates or get the target for this TextUnit.
      * <p>
      * If a variant source exists for the target locale, creationOptions apply
-     * to the variant source.
+     * to the variant source.</p>
      *
      * @param locId the target locale.
      * @param overwriteExisting true to overwrite any existing target for the given locale.
@@ -159,7 +159,7 @@ public interface ITextUnit extends INameable, IReferenceable {
      * <p>If the target does not exists, one is created.
      * Any existing content for the given locale is overwritten.
      * To set a target object based on the source, use the
-     * {@link #createTarget(LocaleId, boolean, int)} method.
+     * {@link #createTarget(LocaleId, boolean, int)} method.</p>
      *
      * @param locId the locale to set.
      * @param content the new content to set.
@@ -185,7 +185,7 @@ public interface ITextUnit extends INameable, IReferenceable {
     /**
      * Get the segments for a given target. Un-segmented content return a single segment.
      * <p>
-     * If the target does not exists, one is created.
+     * If the target does not exists, one is created.</p>
      *
      * @param trgLoc the locale of the target to retrieve.
      * @return an object implementing ISegments for the given target content.
@@ -195,7 +195,7 @@ public interface ITextUnit extends INameable, IReferenceable {
     /**
      * Gets the source segment for a given segment id.
      * <p>
-     * If the segment does not exists, one is created if <code>createIfNeeded</code> is true.
+     * If the segment does not exists, one is created if <code>createIfNeeded</code> is true.</p>
      *
      * @param segId the id of the segment to retrieve.
      * @param createIfNeeded true to append a segment at the end of the content
@@ -208,9 +208,9 @@ public interface ITextUnit extends INameable, IReferenceable {
     /**
      * Gets the segment for a given segment id in a given target.
      * <p>
-     * If the target does not exists, one is created.
+     * If the target does not exists, one is created.</p>
      * <p>
-     * If the segment does not exists, one is created if <code>createIfNeeded</code> is true.
+     * If the segment does not exists, one is created if <code>createIfNeeded</code> is true.</p>
      *
      * @param trgLoc the target locale to look up.
      * @param segId the id of the segment to retrieve.

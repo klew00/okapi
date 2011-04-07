@@ -23,6 +23,7 @@ package net.sf.okapi.common.resource;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -32,9 +33,8 @@ import static net.sf.okapi.common.resource.IAlignedSegments.VariantOptions.*;
 import static net.sf.okapi.common.resource.IAlignedSegments.CopyOptions.*;
 import net.sf.okapi.common.ISegmenter;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.ReversedIterator;
 import net.sf.okapi.common.exceptions.OkapiMisAlignmentException;
-
-//TODO code will be more readable and maintainable after significant refactoring.
 
 /**
  * EXPERIMENTAL implementation, Do not use yet.
@@ -293,19 +293,94 @@ public class AlignedSegments implements IAlignedSegments {
     @Override
     public void align(List<AlignedPair> alignedSegmentPairs,
                       LocaleId trgLoc) {
-        //Note: implementation in TextUnitUtils - something like makeMultilingual()
-        // possibly createMultiLingualTextUnit()
+        //Based on TextUnitUtil.createMultilingualTextUnit(...)
 
-        //See: TextUnitUtil.createMultilingualTextUnit(...)
+        //Note: this implementation will wipe out any content that exists for this locale
+        //TODO check that this is the desired behaviour for this method.
 
-        //TODO implement. Approach: set target seg ids to match source id in aligned pair
-        //TODO check that alignedpair doesn't already do this
-        //iterate over the list
-            //get target seg by id
-            //set target seg id to id in alignedpair source
+        TextContainer src;
+        TextContainer trg;
+        String srcSegId;
 
-        // these target segments are now aligned with their source counterparts
-        myParent.getTarget_DIFF(trgLoc).getSegments().setAlignmentStatus(AlignmentStatus.ALIGNED);
+        //add source and target if required
+        if (!hasVariant(trgLoc)) {
+            myParent.getVariantSources().create(trgLoc, true, COPY_ALL);
+        }
+        myParent.createTarget(trgLoc, false, COPY_ALL); //no check required, see method description
+
+        src = getSource(trgLoc);
+        trg = myParent.getTarget_DIFF(trgLoc);
+
+        //clear content ready for new segments
+        src.clear();
+        trg.clear();
+        
+        //iterate through the aligned pairs, adding content to both containers
+        for (AlignedPair alignedPair : alignedSegmentPairs) {
+            //use the id from the source as the id for the target
+            srcSegId = appendPartsToContainer(alignedPair.getSourceParts(), src, null);
+            appendPartsToContainer(alignedPair.getTargetParts(), trg, srcSegId);
+        }
+        
+        // We now consider the source and target content to be segmented
+        // if nothing else we need to prevent re-segmentation as that
+        // will break the alignments
+        src.setHasBeenSegmentedFlag(true);
+        trg.setHasBeenSegmentedFlag(true);
+
+        //the target and source should now be aligned since their content is all
+        //from aligned pairs.
+        trg.getSegments().setAlignmentStatus(AlignmentStatus.ALIGNED);
+    }
+
+    /**
+     * Appends the given {@link TextPart}s to the given {@link TextContainer}.
+     *
+     * @param parts
+     * @param container
+     * @param segId the id to use for the segment component of parts
+     * @return the identifier for the segment in parts
+     */
+    private String appendPartsToContainer(List<TextPart> parts, TextContainer container, String segId) {
+        // make a shallow copy because we may modify the list elements
+        List<TextPart> partsCopy = new LinkedList<TextPart>(parts);
+
+        // calculate indexes of the source before and after inter-segment TextParts
+        int beforeIndex = 0;
+        int afterIndex = partsCopy.size();
+        for (TextPart part : partsCopy) {
+            if (part.isSegment()) {
+                break;
+            }
+            beforeIndex++;
+        }
+        ReversedIterator<TextPart> ri = new ReversedIterator<TextPart>(partsCopy);
+        for (TextPart part : ri) {
+            if (part.isSegment()) {
+                break;
+            }
+            afterIndex--;
+        }
+
+        // append the before inter-segment TextParts
+        for (TextPart part : partsCopy.subList(0, beforeIndex)) {
+            container.append(part);
+        }
+
+        // append segment parts
+        TextFragment frag = new TextFragment();
+        for (TextPart part : partsCopy.subList(beforeIndex, afterIndex)) {
+            frag.append(part.getContent());
+        }
+        Segment seg = new Segment(segId, frag);
+        container.getSegments().append(seg);
+
+        // append the after inter-segment TextParts
+        for (TextPart part : partsCopy.subList(afterIndex, partsCopy.size())) {
+            container.append(part);
+        }
+
+        return seg.getId();
     }
 
     
@@ -333,17 +408,51 @@ public class AlignedSegments implements IAlignedSegments {
         myParent.getTarget_DIFF(trgLoc).getSegments().setAlignmentStatus(AlignmentStatus.ALIGNED);
     }
 
-    
-    /**
-     * Collapse all segments for the source and target
-     */
+
     @Override
     public void alignCollapseAll(LocaleId trgLoc,
                                  EnumSet<VariantOptions> variantOptions) {
-        //TODO actually collapse first
 
-        // these target segments are now aligned with their source counterparts
-        myParent.getTarget_DIFF(trgLoc).getSegments().setAlignmentStatus(AlignmentStatus.ALIGNED);
+        ContainerIterator ci = new ContainerIterator(trgLoc, variantOptions, COPY_TO_NONE);
+
+        //keeping track of collapsed containers to check which to set to ALIGNED
+        LinkedList<TextContainer> collapsed = new LinkedList<TextContainer>();
+
+
+        //TODO decide if source/target should always collapse regardless of variantOptions
+        // (currently they depend on variantOptions)
+        if (ci.hasSource()) {
+            ci.getSource().joinAll();
+            ci.getSource().setHasBeenSegmentedFlag(false);
+            collapsed.add(ci.getSource());
+        }
+        if (ci.hasTarget()) {
+            ci.getTarget().joinAll();
+            ci.getTarget().setHasBeenSegmentedFlag(false);
+            collapsed.add(ci.getTarget());
+        }
+
+        TextContainer container;
+        while (ci.hasNextOtherLocale()) {
+            container = ci.getNextOtherLocale();
+            container.joinAll();
+            container.setHasBeenSegmentedFlag(false);
+            collapsed.add(container);
+        }
+        
+        //mark target/source pairs aligned if both have been collapsed
+        TextContainer src, trg;
+        for (LocaleId loc : myParent.getTargetLocales()) {
+            src = getSource(loc);
+            if (collapsed.contains(src)) {
+                trg = myParent.getTarget_DIFF(loc);
+                if (collapsed.contains(trg)) {
+                    trg.getSegments().setAlignmentStatus(AlignmentStatus.ALIGNED);
+                    trg.getFirstSegment().id = src.getFirstSegment().getId(); //TODO check that this is the desired behaviour
+                }
+            }
+        }
+        
     }
 
     @Override
@@ -516,6 +625,12 @@ public class AlignedSegments implements IAlignedSegments {
         return getSource(trgLoc).getSegments().iterator();
     }
 
+    /**
+     * Indicates whether the source for the given locale is used by multiple targets.
+     *
+     * @param targetLocale the locale to check
+     * @return true if the source for the given locale is used by multiple targets
+     */
     private boolean hasMultipleTargets(LocaleId targetLocale) {
         //check if default source
         if (hasVariant(targetLocale)) { return false; } //variants have only one target
@@ -531,12 +646,25 @@ public class AlignedSegments implements IAlignedSegments {
         return false;
     }
 
+    /**
+     * Indicates whether the parent has a variant source for the given locale
+     *
+     * @param loc locale to check for variant source
+     * @return true if the parent has a variant source for the locale, otherwise false
+     */
     private boolean hasVariant(LocaleId loc) {
         if (myParent.hasVariantSources())
             return myParent.getVariantSources().hasVariant(loc);
         return false;
     }
-
+    
+    /**
+     * Returns the source {@link TextContainer} for the given locale (may be the
+     * default source).
+     * 
+     * @param loc
+     * @return
+     */
     private TextContainer getSource(LocaleId loc) {
         if (hasVariant(loc))
             return myParent.getVariantSources().get(loc);

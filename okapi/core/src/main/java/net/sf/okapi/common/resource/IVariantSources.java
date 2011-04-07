@@ -145,7 +145,7 @@ public interface IVariantSources extends Iterable<TextContainer> {
      * a variant source if one does not exist for the given locale. Replaces any
      * existing content for the source of the given locale.
      * <p>
-     * TODO consider adding an overwriteExisting flag
+     * TODO consider adding an overwriteExisting flag</p>
      *
      * @param targetLocale the locale for which to set the source content
      *                     null to set for default source
@@ -170,7 +170,7 @@ public interface IVariantSources extends Iterable<TextContainer> {
      * Gets the source segment for a given target locale and segment id.
      * <p>
      * If the segment does not exists, one is created if <code>createIfNeeded</code> is true.
-     * TODO discuss how to handle target locales that use the default source
+     * TODO discuss how to handle target locales that use the default source.</p>
      *
      * @param targetLocale the target locale for which to return a source segment
      * @param segId the id of the segment to retrieve
