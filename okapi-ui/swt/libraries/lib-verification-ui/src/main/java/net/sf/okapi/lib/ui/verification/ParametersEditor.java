@@ -29,6 +29,7 @@ import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.ISWTEmbeddableParametersEditor;
 import net.sf.okapi.common.ui.OKCancelPanel;
@@ -101,6 +102,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Button chkDoubledWord;
 	private Label stDoubledWordExceptions;
 	private Text edDoubledWordExceptions;
+	private Text edTypesToIgnore;
 	private Button chkCorruptedChars;
 	private Table table;
 	private Button btAdd;
@@ -496,6 +498,17 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		gdTmp.horizontalSpan = 2;
 		chkCodeDifference.setLayoutData(gdTmp);
 		
+		Label label = new Label(cmpTmp, SWT.NONE);
+		label.setText("List of the inline code types to ignore:");
+		gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		label.setLayoutData(gdTmp);
+		
+		edTypesToIgnore = new Text(cmpTmp, SWT.BORDER);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalSpan = 2;
+		edTypesToIgnore.setLayoutData(gdTmp);
+		
 		pnlMissingCodesAllowed = new StringListPanel(cmpTmp, SWT.NONE, "Codes allowed to be missing from the target:");
 		pnlMissingCodesAllowed.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
@@ -674,7 +687,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			};
 		});
 		
-		Label label = new Label(cmpTmp, SWT.NONE);
+		label = new Label(cmpTmp, SWT.NONE);
 		label.setText("Server URL (e.g. http://localhost:8081/):");
 		edServerURL = new Text(cmpTmp, SWT.BORDER);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
@@ -1305,6 +1318,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 
 		pnlMissingCodesAllowed.fillList(params.getMissingCodesAllowed());
 		pnlExtraCodesAllowed.fillList(params.getExtraCodesAllowed());
+		edTypesToIgnore.setText(params.getTypesToIgnore());
 		
 		chkCheckTerms.setSelection(params.getCheckTerms());
 		pnlTermsPath.setText(params.getTermsPath());
@@ -1443,6 +1457,13 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		list = params.getExtraCodesAllowed();
 		list.clear();
 		list.addAll(pnlExtraCodesAllowed.getList());
+		
+		String tmp = edTypesToIgnore.getText().trim();
+		if ( !tmp.isEmpty() && ( Util.getLastChar(tmp) != ';' )) {
+			tmp = tmp.replace(" ", "");
+			tmp += ";";
+		}
+		params.setTypesToIgnore(tmp);
 
 		if ( rdScopeApprovedOnly.getSelection() ) {
 			params.setScope(Parameters.SCOPE_APPROVEDONLY);

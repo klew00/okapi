@@ -83,6 +83,7 @@ public class Parameters extends BaseParameters {
 	private static final String TERMSPATH = "termsPath";
 	private static final String STRINGMODE = "stringMode";
 	private static final String BETWEENCODES = "betweenCodes";
+	private static final String TYPESTOIGNORE = "typesToIgnore";
 
 	String outputPath;
 	int outputType;
@@ -122,6 +123,7 @@ public class Parameters extends BaseParameters {
 	int scope;
 	List<String> extraCodesAllowed;
 	List<String> missingCodesAllowed;
+	String typesToIgnore;
 	boolean checkTerms;
 	String termsPath;
 	boolean stringMode;
@@ -137,6 +139,14 @@ public class Parameters extends BaseParameters {
 
 	public List<String> getMissingCodesAllowed () {
 		return missingCodesAllowed;
+	}
+	
+	public String getTypesToIgnore () {
+		return typesToIgnore;
+	}
+	
+	public void setTypesToIgnore (String typesToIgnore) {
+		this.typesToIgnore = typesToIgnore;
 	}
 
 	public int getScope () {
@@ -548,6 +558,7 @@ public class Parameters extends BaseParameters {
 		
 		extraCodesAllowed = new ArrayList<String>();
 		missingCodesAllowed = new ArrayList<String>();
+		typesToIgnore = "mrk;x-df-s;";
 	}
 
 	@Override
@@ -622,6 +633,8 @@ public class Parameters extends BaseParameters {
 		for ( int i=0; i<count; i++ ) {
 			missingCodesAllowed.add(buffer.getString(String.format("%s%d", MISSINGCODESALLOWED, i), ""));
 		}
+		
+		typesToIgnore = buffer.getString(TYPESTOIGNORE, typesToIgnore);
 	}
 
 	@Override
@@ -688,7 +701,7 @@ public class Parameters extends BaseParameters {
 		for ( int i=0; i<missingCodesAllowed.size(); i++ ) {
 			buffer.setString(String.format("%s%d", MISSINGCODESALLOWED, i), missingCodesAllowed.get(i));
 		}		
-		
+		buffer.setString(TYPESTOIGNORE, typesToIgnore);
 		return buffer.toString();
 	}
 	

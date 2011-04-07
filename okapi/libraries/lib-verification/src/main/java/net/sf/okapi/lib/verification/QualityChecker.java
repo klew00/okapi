@@ -407,7 +407,7 @@ class QualityChecker {
 		Iterator<Code> iter = list.iterator();
 		while ( iter.hasNext() ) {
 			Code code = iter.next();
-			if ( Util.isEmpty(code.getData()) ) {
+			if ( params.getTypesToIgnore().indexOf(code.getType()+";") != -1 ) {
 				iter.remove();
 			}
 		}
@@ -418,7 +418,12 @@ class QualityChecker {
 		StringBuilder tmp = new StringBuilder();
 		for ( Code code : list ) {
 			if ( tmp.length() > 0 ) tmp.append(", ");
-			tmp.append("\""+code.getData()+"\"");
+			if ( code.getData().isEmpty() ) {
+				tmp.append(code.getOuterData());
+			}
+			else { // Show the content
+				tmp.append("\""+code.getData()+"\"");
+			}
 		}
 		return tmp.toString();
 	}
@@ -443,7 +448,15 @@ class QualityChecker {
 			Iterator<Code> trgIter = trgList.iterator();
 			while ( trgIter.hasNext() ) {
 				Code trgCode = trgIter.next();
-				if ( trgCode.getData().equals(srcCode.getData()) ) {
+				if ( trgCode.getData().isEmpty() && srcCode.getData().isEmpty() ) {
+					if (( trgCode.getId() == srcCode.getId() ) && trgCode.getType().equals(srcCode.getType()) ) {
+						// Found: remove them from lists
+						trgIter.remove();
+						srcIter.remove();
+						break;
+					}
+				}
+				else if ( trgCode.getData().equals(srcCode.getData()) ) {
 					// Found: remove them from lists
 					trgIter.remove();
 					srcIter.remove();
