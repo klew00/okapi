@@ -25,13 +25,13 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.annotation.IAnnotation;
 
 /**
- * EXPERIMENTAL interface, do not use yet.
+ * EXPERIMENTAL interface, do not use yet,
  *
  * Provides methods to allow the creation and manipulation of different source
  * versions for different locales of an {@link ITextUnit} object.
  * <p>
  * To create an instance of this interface, use the method
- * {@link ITextUnit#getVariantSources()}.
+ * {@link ITextUnit#getVariantSources()}.</p>
  *
  * @author David Mason, dr.d.mason@gmail.com
  */
@@ -40,7 +40,7 @@ public interface IVariantSources extends Iterable<TextContainer> {
     /**
      * Indicates if the source text for the given target locale is isEmpty. Result
      * will be for the default source if there is no variant source for the given
-     * locale, or the given locale is null.
+     * locale, or if the given locale is null.
      *
      * @param targetLocale the target locale for the source to check
      * @return true if the source text (may be the default source) for the given
@@ -69,7 +69,7 @@ public interface IVariantSources extends Iterable<TextContainer> {
 
 
     /**
-     * Creates a variant source for a given locale, using the provided text container.
+     * Creates a variant source for a given locale, using the provided {@link TextContainer}.
      *
      * @param sourceText the text to include in this source
      * @param targetLocale the target locale that uses the new source
@@ -108,8 +108,8 @@ public interface IVariantSources extends Iterable<TextContainer> {
 
     /**
      * Removes any variant source used for the given target locale. Any associated
-     * targets will be associated with the default locale, which may lead to
-     * misalignment of segments between the target and default source.
+     * targets will be associated with the default source, which may lead to
+     * misalignment of segments between some targets and the default source.
      *
      * @param targetLocale the locale for which to remove variant source
      * @throws IllegalArgumentException if the target locale is null
@@ -124,7 +124,7 @@ public interface IVariantSources extends Iterable<TextContainer> {
     public int count();
 
     /**
-     * Indicates whether this variant source object contains any variant sources
+     * Indicates whether this variant source object contains any variant sources.
      *
      * @return true if there are no variant sources in this variant sources object
      */

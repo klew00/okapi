@@ -67,7 +67,7 @@ public class VariantSources implements IVariantSources {
     @Override
     public VariantSources clone() {
         //this links to the parent, which may not be appropriate where clone() is to be used
-        //TODO consider whether this is appropriate
+        //TODO consider whether linking a clone to the same parent is appropriate
         VariantSources cs = new VariantSources(defaultSource);
         cs.sources = new ConcurrentHashMap<LocaleId, TextContainer>();
         cs.sources.putAll(this.sources);

@@ -28,18 +28,19 @@ import net.sf.okapi.common.ISegmenter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.exceptions.OkapiMisAlignmentException;
 
-//TODO add recommendations for keeping segments in alignment (either here or in
-//     each method doc, or both).
-//TODO link to VariantOptions and CopyOptions enums here.
-//TODO add information or links about VariantOptions and CopyOptions in the methods that use them.
 /**
  * EXPERIMENTAL interface, Do not use yet.
  * <p>
- * Provides the methods to access all the source and target segments of a
+ * Provides the methods to access all the source and target {@link Segment}s of a
  * {@link ITextUnit}.</p>
  * <p>
- * The methods of this interface use flags to determine which sources and targets
- * to modify during segment operations.</p>
+ * Several methods of this interface use flags to determine which sources and
+ * targets to modify during segment operations. {@link VariantOptions} (in conjunction
+ * with a {@link LocaleId}) and {@link CopyOptions} will determine which sources
+ * and targets are modified and whether new Segments will contain content. These
+ * flags are passed in an {@link EnumSet}. IAlignedSegments.MODIFY_AS_VARIANT
+ * is recommended in order to maintain alignment between each target and its
+ * associated source.</p>
  * <p>
  * To create an instance of this interface, use the method {@link ITextUnit#getAlignedSegments()}.</p>
  */
@@ -49,15 +50,34 @@ public interface IAlignedSegments extends Iterable<Segment> {
      * Flag used to determine the containers that will have segments modified
      * by an operation.
      * <p>
-     * Containers are divided into 5 categories based on the target locale:
-     * <ul>
-     * <li>SOURCE is the source used for the target locale,
-     * <li>TARGET is the target for the target locale,
-     * <li>TARGETS_WITH_SAME_SOURCE are any targets that use SOURCE (but not including TARGET),
-     * <li>VARIANT_SOURCES refers to all sources except SOURCE (may include the default source),
-     * <li>TARGETS_OF_VARIANT_SOURCES refers to all targets except TARGET and TARGETS_WITH_SAME_SOURCE.
-     * </ul>
+     * VariantOptions in conjunction with a {@link LocaleId}, represents directions
+     * to a method on which of 5 different categories of {@link TextContainer}s
+     * in the parent {@link ITextUnit} should be modified:
+     * <dl>
+     *   <dt>MODIFY_SOURCE</dt>
+     *   <dd>modify the source used by the specified target locale</dd>
+     *   <dt>MODIFY_TARGET</dt>
+     *   <dd>modify the target for the specified locale</dd>
+     *   <dt>MODIFY_TARGETS_WITH_SAME_SOURCE</dt>
+     *   <dd>modify other targets that also use the source of the target locale</dd>
+     *   <dt>MODIFY_VARIANT_SOURCES</dt>
+     *   <dd>modify sources other than the one for the target locale</dd>
+     *   <dt>MODIFY_TARGETS_OF_VARIANT_SOURCES</dt>
+     *   <dd>modify targets that do not use the source for the target locale</dd>
+     * </dl>
+     * VariantOptions also defines 2 flags:
+     * <dl>
+     *   <dt>CANCEL_IF_MULTIPLE_TARGETS</dt>
+     *   <dd>indicates that the method should not proceed if there are any targets
+     *       in the TARGETS_WITH_SAME_SOURCE category</dd>
+     *   <dt>CREATE_VARIANT_IF_MULTIPLE_TARGETS</dt>
+     *   <dd>indicates that if there are any targets in the TARGETS_WITH_SAME_SOURCE
+     *       category, a new variant source should be used rather than apply changes
+     *       to the shared source</dd>
+     * </dl>
      * </p>
+     *
+     * @see CopyOptions
      */
     public enum VariantOptions {
         CREATE_VARIANT_IF_MULTIPLE_TARGETS,
@@ -73,21 +93,44 @@ public interface IAlignedSegments extends Iterable<Segment> {
     // them does not seem a good solution.
     //Ideally these would be presented as immutable EnumSets, with a method to
     //return a mutable clone.
+
+    /**
+     * MODIFY_SOURCE + MODIFY_TARGET + CANCEL_IF_MULTIPLE_TARGETS
+     *
+     * @see VariantOptions
+     */
     public final EnumSet<VariantOptions> MODIFY_ONLY_IF_ALONE = EnumSet.of(
             VariantOptions.MODIFY_SOURCE,
             VariantOptions.MODIFY_TARGET,
             VariantOptions.CANCEL_IF_MULTIPLE_TARGETS);
-    
+
+    /**
+     * MODIFY_SOURCE + MODIFY_TARGET + CREATE_VARIANT_IF_MULTIPLE_TARGETS
+     *
+     * @see VariantOptions
+     */
     public final EnumSet<VariantOptions> MODIFY_AS_VARIANT = EnumSet.of(
             VariantOptions.MODIFY_SOURCE,
             VariantOptions.MODIFY_TARGET,
             VariantOptions.CREATE_VARIANT_IF_MULTIPLE_TARGETS);
-
+    
+    /**
+     * MODIFY_SOURCE + MODIFY_TARGET + MODIFY_TARGETS_WITH_SAME_SOURCE
+     *
+     * @see VariantOptions
+     */
     public final EnumSet<VariantOptions> MODIFY_SOURCE_AND_ASSOCIATED_TARGETS = EnumSet.of(
             VariantOptions.MODIFY_SOURCE,
             VariantOptions.MODIFY_TARGET,
             VariantOptions.MODIFY_TARGETS_WITH_SAME_SOURCE);
 
+    /**
+     * Modify all {@link TextContainer}s in the parent {@link ITextUnit}.
+     * MODIFY_SOURCE + MODIFY_TARGET + MODIFY_TARGETS_WITH_SAME_SOURCE +
+     * MODIFY_VARIANT_SOURCES + MODIFY_TARGETS_OF_VARIANT_SOURCES
+     *
+     * @see VariantOptions
+     */
     public final EnumSet<VariantOptions> MODIFY_ALL = EnumSet.of(
             VariantOptions.MODIFY_SOURCE,
             VariantOptions.MODIFY_TARGET,
@@ -97,10 +140,27 @@ public interface IAlignedSegments extends Iterable<Segment> {
 
 
     /**
-     * Flag to indicate which new segments should contain content. Empty segments
-     * are created if a segment is flagged to be modified (added) but is not
-     * flagged for copying. If no segment is created or modified, this flag does
-     * nothing.
+     * Flag to indicate which segments should contain content when new or copied
+     * segments are created. Empty segments are created if a segment is flagged
+     * to be modified in {@link VariantOptions} but is not flagged in CopyOptions.
+     * If no segment is created or modified, this flag does nothing.
+     * <dl>
+     *   <dt>COPY_TO_SOURCE</dt>
+     *   <dd>the source for the given target locale should contain content</dd>
+     *   <dt>COPY_TO_TARGET</dt>
+     *   <dd>the target for the given target locale should contain content</dd>
+     *   <dt>COPY_TO_TARGETS_WITH_SAME_SOURCE</dt>
+     *   <dd>other targets that also use the source of the target locale should
+     *       contain content</dd>
+     *   <dt>COPY_TO_VARIANT_SOURCES</dt>
+     *   <dd>sources other than the one for the target locale should contain
+     *       content</dd>
+     *   <dt>COPY_TO_TARGETS_OF_VARIANT_SOURCES</dt>
+     *   <dd>targets that do not use the source of the target locale should
+     *       contain content</dd>
+     * </dl>
+     *
+     * @see VariantOptions
      */
     public enum CopyOptions {
         COPY_TO_SOURCE,
@@ -110,10 +170,29 @@ public interface IAlignedSegments extends Iterable<Segment> {
         COPY_TO_TARGETS_OF_VARIANT_SOURCES
     }
 
+    /**
+     * No new segments should contain any content
+     *
+     * @see CopyOptions
+     */
     public final EnumSet<CopyOptions> COPY_TO_NONE = EnumSet.noneOf(CopyOptions.class);
+
+    /**
+     * Source and target for the given locale should contain content.
+     * <p>
+     * COPY_TO_SOURCE + COPY_TO_TARGET</p>
+     *
+     * @see CopyOptions
+     */
     public final EnumSet<CopyOptions> COPY_TO_SOURCE_AND_TARGET = EnumSet.of(
             CopyOptions.COPY_TO_SOURCE,
             CopyOptions.COPY_TO_TARGET);
+
+    /**
+     * Copy to all {@link TextContainer}s in this {@link ITextUnit}.
+     *
+     * @see CopyOptions
+     */
     public final EnumSet<CopyOptions> COPY_TO_ALL = EnumSet.allOf(CopyOptions.class);
 
 
@@ -122,6 +201,7 @@ public interface IAlignedSegments extends Iterable<Segment> {
     /**
      * Gets an iterator for the default source segments of this text unit.
      * This iterator does not iterate through non-segment parts of the content.
+     *
      * @return an iterator for the source segments of this text unit.
      */
     @Override
@@ -130,6 +210,7 @@ public interface IAlignedSegments extends Iterable<Segment> {
     /**
      * Gets an iterator for the source of the specified target locale.
      * This iterator does not iterate through non-segment parts of the content.
+     *
      * @param trgLoc the target locale for the source to iterate over.
      * @return an iterator for the source segments used for trgLoc.
      */
@@ -146,11 +227,9 @@ public interface IAlignedSegments extends Iterable<Segment> {
      * @param trgSeg the target segment to add. Null to use a clone of srcSeg instead.
      * @param trgLoc the target locale for which to append segments
      * @param variantOptions determines which sources and targets will have
-     *        segments added.
-     *        TODO add details
+     *        segments added. See {@link VariantOptions}.
      * @param copyOptions determines whether to use the content of srcSeg or
-     *        an empty segment for any segments that are added.
-     *        TODO add details
+     *        an empty segment for any segments that are added. See {@link CopyOptions}.
      *
      * @throws IllegalArgumentException if srcSeg and trgSeg are both null
      */
@@ -175,9 +254,9 @@ public interface IAlignedSegments extends Iterable<Segment> {
      * @param trgSeg the target segment to insert. Null to use srcSeg instead.
      * @param trgLoc the target locale for which to insert the segment
      * @param variantOptions determines which sources and targets will have
-     *        a segment inserted.
+     *        a segment inserted. See {@link VariantOptions}.
      * @param copyOptions determines whether to use the content of srcSeg or
-     *        an empty segment for any segments that are inserted.
+     *        an empty segment for any segments that are inserted. See {@link CopyOptions}.
      *
      * @throws IllegalArgumentException if srcSeg is null
      */
@@ -206,9 +285,9 @@ public interface IAlignedSegments extends Iterable<Segment> {
      * @param seg the new segment to place at the position
      * @param trgLoc the locale used to specify the target and source to use
      * @param variantOptions determines which targets and sources will have
-     *                       a segment replaced
+     *                       a segment replaced. See {@link VariantOptions}.
      * @param idUpdateOptions determines which targets and sources will have
-     *                        their id updated
+     *                        their id updated. See {@link VariantOptions}.
      *
      * @throws IndexOutOfBoundsException if the index is out of bounds.
      * @throws IllegalArgumentException if seg is null
@@ -221,14 +300,14 @@ public interface IAlignedSegments extends Iterable<Segment> {
 
 
     /**
-     * Removes the given segment and any corresponding segment from the
+     * Removes the given segment and any segments with the same id from the
      * specified sources and targets.
      *
      * @param seg the segment to remove.
      * @param trgLoc the locale used in specifying which sources and targets
      *               to use.
      * @param variantOptions determines which sources and targets will have
-     *                       a segment removed
+     *                       a segment removed. See {@link VariantOptions}.
      * @return true if remove success
      */
     public boolean remove(Segment seg,
@@ -259,11 +338,12 @@ public interface IAlignedSegments extends Iterable<Segment> {
      * @param trgLoc the target to look up.
      * @param variantOptions determines which sources and targets will have
      *                       a segment added if the segment does not exist.
-     *                       The options for the target of trgLoc are ignored
-     *                       so that a segment can always be returned.
+     *                       The option for the target of trgLoc (i.e. MODIFY_TARGET)
+     *                       is ignored so that a segment can always be returned.
+     *                       See {@link VariantOptions}.
      * @param copyOptions determines whether newly created segments will
-     *                    contain the content of seg.
-     * @return the corresponding target segment (may be empty).
+     *                    contain the content of seg. See {@link CopyOptions}.
+     * @return the corresponding target {@link Segment} (may be empty).
      */
     public Segment getCorrespondingTarget(Segment seg,
                                           LocaleId trgLoc,
@@ -282,9 +362,10 @@ public interface IAlignedSegments extends Iterable<Segment> {
      * @param variantOptions determines which sources and targets will have
      *                       a segment added if the segment does not exist.
      *                       The options for the source of trgLoc are ignored
-     *                       so that a segment can always be returned.
+     *                       so that a segment can always be returned. See
+     *                       {@link VariantOptions}.
      * @param copyOptions determines whether newly created segments will
-     *                    contain the content of trgSeg.
+     *                    contain the content of trgSeg. See {@link CopyOptions}.
      * @return the corresponding source segment.
      */
     public Segment getCorrespondingSource(Segment trgSeg,
@@ -321,17 +402,17 @@ public interface IAlignedSegments extends Iterable<Segment> {
 
 
     /**
-     * Aligns all the segments for the given locale by collapsing all
+     * Aligns all the segments for the specified sources and targets by collapsing all
      * segments into one.
      * <p>
-     * If variantOptions causes other targets and segments to be collapsed,
-     * the other locales will be considered aligned only if both the source
-     * and target for that locale are collapsed.</p>
+     * variantOptions determines which targets and sources will be collapsed,
+     * and targets will be considered aligned with their sources only if both
+     * the source and target for that locale are collapsed.</p>
      *
      * @param trgLoc the target locale of the target (and its corresponding
      *               source) to collapse.
      * @param variantOptions determines which targets and sources will be
-     *                       collapsed to a single segment.
+     *                       collapsed to a single segment. See {@link VariantOptions}.
      */
     public void alignCollapseAll(LocaleId trgLoc,
                                      EnumSet<VariantOptions> variantOptions);
@@ -350,9 +431,10 @@ public interface IAlignedSegments extends Iterable<Segment> {
      * @param srcSeg the source segment to split.
      * @param splitPos the position where to split.
      * @param variantOptions determines which sources and targets will have
-     *                       new segments added.
+     *                       new segments added. See {@link VariantOptions}
      * @param copyOptions determines whether the content of new segments
      *                    will be empty or the same as the new segment.
+     *                    See {@link CopyOptions}.
      * @return the new source segment created, or null if none was created.
      */
     public Segment splitSource(LocaleId trgLoc,
@@ -374,9 +456,10 @@ public interface IAlignedSegments extends Iterable<Segment> {
      * @param trgSeg the targets segment.
      * @param splitPos the position where to split.
      * @param variantOptions determines which sources and targets will have
-     *                       new segments added.
+     *                       new segments added. See {@link VariantOptions}.
      * @param copyOptions determines whether the content of new segments
-     *                    will be empty or the same as the new segment.
+     *                    will be empty or the same as the new segment. See
+     *                    {@link CopyOptions}.
      * @return the new target segment created, or null if none was created.
      */
     public Segment splitTarget(LocaleId trgLoc,
@@ -393,19 +476,20 @@ public interface IAlignedSegments extends Iterable<Segment> {
      * @param trgLoc the target locale used with variantOptions to determine
      *               which sources and targets will have segments joined.
      * @param variantOptions determines which sources and targets will have
-     *                       segments joined.
+     *                       segments joined. See {@link VariantOptions}.
      */
     public void joinWithNext(Segment seg,
                              LocaleId trgLoc,
                              EnumSet<VariantOptions> variantOptions);
 
     /**
-     * Joins all segments for the specified sources and targets.
+     * Joins all segments for the specified sources and targets. The content
+     * becomes a single segment.
      *
      * @param trgLoc the target locale used with variantOptions to determine
      *               which sources and targets will have all segments joined.
      * @param variantOptions determines which sources and targets will have
-     *                       all segments joined.
+     *                       all segments joined. See {@link VariantOptions}.
      */
     public void joinAll(LocaleId trgLoc,
                         EnumSet<VariantOptions> variantOptions);
@@ -430,7 +514,7 @@ public interface IAlignedSegments extends Iterable<Segment> {
 
     /**
      * Segments the source content used for the given target locale based on
-     * the rules provided by a given ISegmenter.
+     * the rules provided by a given {@link ISegmenter}.
      * <p>No associated targets are modified.</p>
      *
      * @param segmenter the segmenter to use to create the segments.
@@ -440,7 +524,7 @@ public interface IAlignedSegments extends Iterable<Segment> {
 	
     /**
      * Segments the specified target content based on the rules provided by
-     * a given ISegmenter.
+     * a given {@link ISegmenter}.
      * <p>If the given target does not exist one is created.</p>
      *
      * @param segmenter the segmenter to use to create the segments.
