@@ -21,6 +21,9 @@
 package net.sf.okapi.common.resource;
 
 import java.util.EnumSet;
+import java.util.LinkedList;
+import java.util.List;
+import static net.sf.okapi.common.IResource.*;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import static net.sf.okapi.common.resource.IAlignedSegments.*;
@@ -39,6 +42,7 @@ public class AlignedSegmentsTest {
 
     private static final LocaleId locFR = LocaleId.FRENCH;
     private static final LocaleId locES = LocaleId.SPANISH;
+    private static final LocaleId locEL = LocaleId.fromString("el-GR");
     private static final String TU1 = "tu1";
     private GenericContent fmt;
 
@@ -48,7 +52,6 @@ public class AlignedSegmentsTest {
     
     @Test
     public void loopThroughSegments () {
-        VariantOptions v = MODIFY_SOURCE;
 
     	ITextUnit tu = createSegmentedTUAndTarget();
     	Segment trgSeg;
@@ -301,7 +304,137 @@ public class AlignedSegmentsTest {
     	assertEquals("[Trg 1.] a [Trg 2.][newTrgText]", fmt.printSegmentedContent(tu.getTarget_DIFF(locFR), true));
     	assertEquals("[Objetivo 1.] a [Objetivo 2.][]", fmt.printSegmentedContent(tu.getTarget_DIFF(locES), true));
     }
-    
+
+    @Test
+    public void alignWithAlignedPairs() {
+        //create aligned pairs
+        Segment srcSeg, trgSeg;
+        List<AlignedPair> alignedPairs = new LinkedList<AlignedPair>();
+
+        String[] source = {"apSource 1.", "apSource 2.", "apSource 3."};
+        String[] target = {"apTarg 1.", "apTarg 2.", "apTarg 3."};
+
+        srcSeg = new Segment("sA", new TextFragment(source[0]));
+        trgSeg = new Segment("sAlpha", new TextFragment(target[0]));
+        alignedPairs.add(new AlignedPair(srcSeg, trgSeg, locEL));
+
+        srcSeg = new Segment("sB", new TextFragment(source[1]));
+        trgSeg = new Segment("sBeta", new TextFragment(target[1]));
+        alignedPairs.add(new AlignedPair(srcSeg, trgSeg, locEL));
+
+        srcSeg = new Segment("sC", new TextFragment(source[2]));
+        trgSeg = new Segment("sChuppa?", new TextFragment(target[2]));
+        alignedPairs.add(new AlignedPair(srcSeg, trgSeg, locEL));
+        
+        //create tu
+        ITextUnit tu = createSegmentedTUAndTarget();
+
+        //call method
+        tu.getAlignedSegments().align(alignedPairs, locEL);
+        
+        //creates if not present
+        assertTrue("a new variant source should be created if none is present "
+                 + "for the given locale",
+                   tu.getVariantSources().hasVariant(locEL));
+
+        assertTrue("a new target should be created if nont is present for the given "
+                 + "locale",
+                   tu.hasTarget(locEL));
+
+        //replaces content
+
+        String[] actualSources = {
+            tu.getVariantSources().get(locEL).getSegments().get(0).toString(),
+            tu.getVariantSources().get(locEL).getSegments().get(1).toString(),
+            tu.getVariantSources().get(locEL).getSegments().get(2).toString()};
+
+        assertArrayEquals("the source segments of the aligned pairs should be "
+                        + "used in the source content",
+                        source,
+                        actualSources);
+
+        String[] actualTargets = {
+            tu.getTarget_DIFF(locEL).getSegments().get(0).toString(),
+            tu.getTarget_DIFF(locEL).getSegments().get(1).toString(),
+            tu.getTarget_DIFF(locEL).getSegments().get(2).toString()};
+
+        assertArrayEquals("the target segments of the aligned pairs should be "
+                        + "used in the target content",
+                          target,
+                          actualTargets);
+
+        //target is aligned after
+        assertEquals("the target should have a status of ALIGNED after the "
+                   + "align() method is called",
+                     AlignmentStatus.ALIGNED,
+                     tu.getTarget_DIFF(locEL).getSegments().getAlignmentStatus());
+
+        //default source left alone
+        assertEquals("the default source should not be changed by this method",
+                     "Part 1.",
+                     tu.getSource().getFirstSegment().toString());
+
+        //other locales left alone
+        assertEquals("the default source should not be changed by this method",
+                     "Trg 1.",
+                     tu.getTarget_DIFF(locFR).getFirstSegment().toString());
+
+        assertEquals("the default source should not be changed by this method",
+                     "Objetivo 1.",
+                     tu.getTarget_DIFF(locES).getFirstSegment().toString());
+
+    }
+
+    @Test
+    public void alignCollapseAll() {
+        ITextUnit tu = createSegmentedTUAndTarget();
+        tu.getAlignedSegments().alignCollapseAll(locFR, MODIFY_AS_VARIANT);
+
+        //locFR should be aligned, with source and target collapsed
+        assertTrue("a variant source should exist after calling a method with "
+                 + "MODIFY_AS_VARIANT",
+                   tu.hasVariantSources());
+
+        assertTrue("the source content should be one segment after alignCollapseAll()",
+                   tu.getVariantSources().get(locFR).contentIsOneSegment());
+
+        assertFalse("the target should not be flagged as segmented after it "
+                  + "has been collapsed",
+                    tu.getVariantSources().get(locFR).hasBeenSegmented());
+        
+        
+        assertTrue("the target content should be one segment after alignCollapseAll()",
+                   tu.getTarget_DIFF(locFR).contentIsOneSegment());
+
+        assertFalse("the target should not be flagged as segmented after it "
+                  + "has been collapsed",
+                    tu.getTarget_DIFF(locFR).hasBeenSegmented());
+
+        assertEquals("the target should be marked as ALIGNED after alignCollapseAll()",
+                     AlignmentStatus.ALIGNED,
+                     tu.getTarget_DIFF(locFR).getSegments().getAlignmentStatus());
+
+        //default source should not be collapsed
+        assertFalse("the default source should not be changed when the method "
+                  + "is called with MODIFY_AS_VARIANT",
+                    tu.getSource().contentIsOneSegment());
+        
+        //locES should not be collapsed or aligned
+        assertFalse("targets of other locales should not be changed when the "
+                  + "method is called with MODIFY_AS_VARIANT",
+                    tu.getTarget_DIFF(locES).contentIsOneSegment());
+
+        assertEquals("other targets should not be marked as ALIGNED when the "
+                   + "method is called with MODIFY_AS_VARIANT",
+                     AlignmentStatus.NOT_ALIGNED,
+                     tu.getTarget_DIFF(locES).getSegments().getAlignmentStatus());
+        
+    }
+
+
+
+
+
     private ITextUnit createSegmentedTU () {
     	ITextUnit tu = new TextUnit4("id", "Part 1.");
     	tu.getSource().getSegments().append(new Segment("s2", new TextFragment("Part 2.")), " a ");

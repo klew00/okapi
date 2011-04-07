@@ -413,6 +413,8 @@ public class AlignedSegments implements IAlignedSegments {
     public void alignCollapseAll(LocaleId trgLoc,
                                  EnumSet<VariantOptions> variantOptions) {
 
+        if (continueWithOperation(trgLoc, variantOptions));
+
         ContainerIterator ci = new ContainerIterator(trgLoc, variantOptions, COPY_TO_NONE);
 
         //keeping track of collapsed containers to check which to set to ALIGNED
