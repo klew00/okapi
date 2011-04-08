@@ -99,14 +99,14 @@ public class TextUnit4Test {
 
     @Test
     public void getTargetReturnsNewEmptyOnNoMatch(){
-        assertNotNull("When there is no match a empty should be returned", tu1.getTarget_DIFF(locFR));
-        assertEquals("", tu1.getTarget_DIFF(locFR).toString());
+        assertNotNull("When there is no match a empty should be returned", tu1.getTarget(locFR));
+        assertEquals("", tu1.getTarget(locFR).toString());
     }
 
     @Test
     public void getSetTarget () {
         tu1.setTarget(locFR, tc1);
-        assertSame("The target should be TextContainer we just set", tc1, tu1.getTarget_DIFF(locFR));
+        assertSame("The target should be TextContainer we just set", tc1, tu1.getTarget(locFR));
     }
 
 
@@ -141,40 +141,40 @@ public class TextUnit4Test {
     public void createTargetCase1 () {
     	tu1 = createSegmentedTU();
         tu1.createTarget(locFR, false, IResource.COPY_ALL);
-        assertEquals(tu1.getSource().toString(), tu1.getTarget_DIFF(locFR).toString());
-        assertEquals(tu1.getSource().getSegments().count(), tu1.getTarget_DIFF(locFR).getSegments().count());
+        assertEquals(tu1.getSource().toString(), tu1.getTarget(locFR).toString());
+        assertEquals(tu1.getSource().getSegments().count(), tu1.getTarget(locFR).getSegments().count());
     }
 
     @Test
     public void createTargetCase2 () {
     	tu1 = createSegmentedTU();
         tu1.createTarget(locFR, false, IResource.COPY_SEGMENTS);
-        assertEquals(tu1.getSource().getSegments().count(), tu1.getTarget_DIFF(locFR).getSegments().count());
-        assertEquals("[] a []", fmt.printSegmentedContent(tu1.getTarget_DIFF(locFR), true));
-        assertEquals(" a ", tu1.getTarget_DIFF(locFR).toString());
+        assertEquals(tu1.getSource().getSegments().count(), tu1.getTarget(locFR).getSegments().count());
+        assertEquals("[] a []", fmt.printSegmentedContent(tu1.getTarget(locFR), true));
+        assertEquals(" a ", tu1.getTarget(locFR).toString());
     }
 
     @Test
     public void createTargetCase3 () {
     	tu1 = createSegmentedTU();
         tu1.createTarget(locFR, false, IResource.COPY_CONTENT);
-        assertEquals(1, tu1.getTarget_DIFF(locFR).getSegments().count());
-        assertEquals("Part 1. a Part 2.", tu1.getTarget_DIFF(locFR).toString());
+        assertEquals(1, tu1.getTarget(locFR).getSegments().count());
+        assertEquals("Part 1. a Part 2.", tu1.getTarget(locFR).toString());
     }
 
     @Test
     public void createTargetSourceContentAndTargetContentSame(){
         tu1.setSource(tc1);
         tu1.createTarget(locFR, false, IResource.COPY_ALL);
-        assertEquals("Target text vs Source Text", tu1.getSource().toString(), tu1.getTarget_DIFF(locFR).toString());
+        assertEquals("Target text vs Source Text", tu1.getSource().toString(), tu1.getTarget(locFR).toString());
     }
 
     @Test
     public void createTargetDoesntAlreadyExist () {
         tu1.setSource(tc1);
         TextContainer tc2 = tu1.createTarget(locFR, false, IResource.COPY_ALL);
-        assertSame("Target should be the same as returned from createTarget", tc2, tu1.getTarget_DIFF(locFR));
-        assertNotSame("Target should have been cloned", tu1.getTarget_DIFF(locFR), tu1.getSource());
+        assertSame("Target should be the same as returned from createTarget", tc2, tu1.getTarget(locFR));
+        assertNotSame("Target should have been cloned", tu1.getTarget(locFR), tu1.getSource());
     }
 
     @Test
@@ -184,7 +184,7 @@ public class TextUnit4Test {
         TextContainer tc2 = new TextContainer("unique fr text");
         tu1.setTarget(locFR, tc2);
         tu1.createTarget(locFR, false, IResource.COPY_ALL);
-        assertSame("Target should not have been modified", tc2, tu1.getTarget_DIFF(locFR));
+        assertSame("Target should not have been modified", tc2, tu1.getTarget(locFR));
     }
 
     @Test
@@ -193,7 +193,7 @@ public class TextUnit4Test {
         TextContainer tc2 = new TextContainer("unique fr text");
         tu1.setTarget(locFR, tc2);
         tu1.createTarget(locFR, true, IResource.COPY_ALL);
-        assertNotSame("Target should not have been modified", tc2, tu1.getTarget_DIFF(locFR));
+        assertNotSame("Target should not have been modified", tc2, tu1.getTarget(locFR));
     }
 
     @Test
@@ -201,7 +201,7 @@ public class TextUnit4Test {
         tu1.setSource(tc1);
         tu1.createTarget(locFR, false, IResource.CREATE_EMPTY);
         assertTrue(tu1.hasTarget(locFR));
-        assertEquals("Empty target created", "", tu1.getTarget_DIFF(locFR).toString());
+        assertEquals("Empty target created", "", tu1.getTarget(locFR).toString());
     }
 
     @Test
@@ -211,7 +211,7 @@ public class TextUnit4Test {
         tu1.setTarget(locFR, tc2);
         tu1.createTarget(locFR, true, IResource.CREATE_EMPTY);
         assertTrue(tu1.hasTarget(locFR));
-        assertEquals("Empty target created", "", tu1.getTarget_DIFF(locFR).toString());
+        assertEquals("Empty target created", "", tu1.getTarget(locFR).toString());
     }
 
     @Test
@@ -220,8 +220,8 @@ public class TextUnit4Test {
         tu1.getSource().setProperty(new Property("test", "value"));
         tu1.createTarget(locFR, false, IResource.COPY_PROPERTIES);
         assertTrue(tu1.hasTarget(locFR));
-        assertEquals("Empty target created", "", tu1.getTarget_DIFF(locFR).toString());
-        assertTrue(tu1.getTarget_DIFF(locFR).getProperty("test") != null);
+        assertEquals("Empty target created", "", tu1.getTarget(locFR).toString());
+        assertTrue(tu1.getTarget(locFR).getProperty("test") != null);
     }
 
     @Test
@@ -232,8 +232,8 @@ public class TextUnit4Test {
         tu1.setTarget(locFR, tc2);
         tu1.createTarget(locFR, true, IResource.COPY_PROPERTIES);
         assertTrue(tu1.hasTarget(locFR));
-        assertEquals("Empty target created", "", tu1.getTarget_DIFF(locFR).toString());
-        assertTrue(tu1.getTarget_DIFF(locFR).getProperty("test") != null);
+        assertEquals("Empty target created", "", tu1.getTarget(locFR).toString());
+        assertTrue(tu1.getTarget(locFR).getProperty("test") != null);
     }
 
     @Test
@@ -244,8 +244,8 @@ public class TextUnit4Test {
         tu1.setTarget(locFR, tc2);
         tu1.createTarget(locFR, false, IResource.COPY_PROPERTIES);
         assertTrue(tu1.hasTarget(locFR));
-        assertEquals("unique fr text", tu1.getTarget_DIFF(locFR).toString());
-        assertTrue(tu1.getTarget_DIFF(locFR).getProperty("test") == null);
+        assertEquals("unique fr text", tu1.getTarget(locFR).toString());
+        assertTrue(tu1.getTarget(locFR).getProperty("test") == null);
     }
 
     //TODO test setContent(TextFragment)
@@ -299,9 +299,9 @@ public class TextUnit4Test {
     	}
         assertEquals("[Part 1.] a [Part 2.]", fmt.printSegmentedContent(tu.getSource(), true));
         assertTrue(tu.hasTarget(locFR));
-        assertEquals("[] a []", fmt.printSegmentedContent(tu.getTarget_DIFF(locFR), true));
+        assertEquals("[] a []", fmt.printSegmentedContent(tu.getTarget(locFR), true));
         assertTrue(tu.hasTarget(locES));
-        assertEquals("[]", fmt.printSegmentedContent(tu.getTarget_DIFF(locES), true));
+        assertEquals("[]", fmt.printSegmentedContent(tu.getTarget(locES), true));
     }
 
     @Test
@@ -430,10 +430,10 @@ public class TextUnit4Test {
     private ITextUnit createSegmentedTUAndTarget () {
     	ITextUnit tu = createSegmentedTU();
     	// Add the target segments
-    	ISegments segs = tu.getTarget_DIFF(locFR).getSegments();
+    	ISegments segs = tu.getTarget(locFR).getSegments();
     	segs.get(0).text.append("Trg 1.");
     	segs.get(1).text.append("Trg 2.");
-    	segs = tu.getTarget_DIFF(locES).getSegments();
+    	segs = tu.getTarget(locES).getSegments();
     	segs.get(0).text.append("Objetivo 1.");
     	segs.get(1).text.append("Objetivo 2.");
     	return tu;

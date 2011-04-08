@@ -161,8 +161,8 @@ public class AlignedSegmentsTest {
     	assertNotNull(newTrgSeg);
     	assertTrue(newTrgSeg.text.isEmpty());
     	assertEquals("[Part 1.] a [Part ][2.]", fmt.printSegmentedContent(tu.getSource(), true));
-    	assertEquals("[Trg 1.] a [Trg 2.][]", fmt.printSegmentedContent(tu.getTarget_DIFF(locFR), true));
-    	assertEquals("[Objetivo 1.] a [Objetivo 2.][]", fmt.printSegmentedContent(tu.getTarget_DIFF(locES), true));
+    	assertEquals("[Trg 1.] a [Trg 2.][]", fmt.printSegmentedContent(tu.getTarget(locFR), true));
+    	assertEquals("[Objetivo 1.] a [Objetivo 2.][]", fmt.printSegmentedContent(tu.getTarget(locES), true));
     }
 
     @Test
@@ -179,8 +179,8 @@ public class AlignedSegmentsTest {
     	assertNotNull(newSrcSeg);
     	assertTrue(newSrcSeg.text.isEmpty());
     	assertEquals("[Part 1.] a [Part 2.][]", fmt.printSegmentedContent(tu.getSource(), true));
-    	assertEquals("[Trg 1.] a [Trg ][2.]", fmt.printSegmentedContent(tu.getTarget_DIFF(locFR), true));
-    	assertEquals("[Objetivo 1.] a [Objetivo 2.][]", fmt.printSegmentedContent(tu.getTarget_DIFF(locES), true));
+    	assertEquals("[Trg 1.] a [Trg ][2.]", fmt.printSegmentedContent(tu.getTarget(locFR), true));
+    	assertEquals("[Objetivo 1.] a [Objetivo 2.][]", fmt.printSegmentedContent(tu.getTarget(locES), true));
     }
 
     @Test
@@ -250,20 +250,20 @@ public class AlignedSegmentsTest {
     		new Segment("nId", new TextFragment("newTrgText")), locFR,
                 MODIFY_ALL, COPY_TO_SOURCE_AND_TARGET);
     	assertEquals("[Part 1.] a [Part 2.][newSrcText]", fmt.printSegmentedContent(tu.getSource(), true));
-    	assertEquals("[Trg 1.] a [Trg 2.][newTrgText]", fmt.printSegmentedContent(tu.getTarget_DIFF(locFR), true));
-    	assertEquals("[Objetivo 1.] a [Objetivo 2.][]", fmt.printSegmentedContent(tu.getTarget_DIFF(locES), true));
+    	assertEquals("[Trg 1.] a [Trg 2.][newTrgText]", fmt.printSegmentedContent(tu.getTarget(locFR), true));
+    	assertEquals("[Objetivo 1.] a [Objetivo 2.][]", fmt.printSegmentedContent(tu.getTarget(locES), true));
     	// First join
     	Segment srcSeg = as.getSource(1, locFR);
     	as.joinWithNext(srcSeg, locFR, MODIFY_ALL);
     	assertEquals("[Part 1.] a [Part 2.newSrcText]", fmt.printSegmentedContent(tu.getSource(), true));
-    	assertEquals("[Trg 1.] a [Trg 2.newTrgText]", fmt.printSegmentedContent(tu.getTarget_DIFF(locFR), true));
-    	assertEquals("[Objetivo 1.] a [Objetivo 2.]", fmt.printSegmentedContent(tu.getTarget_DIFF(locES), true));
+    	assertEquals("[Trg 1.] a [Trg 2.newTrgText]", fmt.printSegmentedContent(tu.getTarget(locFR), true));
+    	assertEquals("[Objetivo 1.] a [Objetivo 2.]", fmt.printSegmentedContent(tu.getTarget(locES), true));
     	// Second join
     	srcSeg = as.getSource(0, locFR);
     	as.joinWithNext(srcSeg, locFR, MODIFY_ALL);
     	assertEquals("[Part 1. a Part 2.newSrcText]", fmt.printSegmentedContent(tu.getSource(), true));
-    	assertEquals("[Trg 1. a Trg 2.newTrgText]", fmt.printSegmentedContent(tu.getTarget_DIFF(locFR), true));
-    	assertEquals("[Objetivo 1. a Objetivo 2.]", fmt.printSegmentedContent(tu.getTarget_DIFF(locES), true));
+    	assertEquals("[Trg 1. a Trg 2.newTrgText]", fmt.printSegmentedContent(tu.getTarget(locFR), true));
+    	assertEquals("[Objetivo 1. a Objetivo 2.]", fmt.printSegmentedContent(tu.getTarget(locES), true));
     }
 
     @Test
@@ -272,8 +272,8 @@ public class AlignedSegmentsTest {
     	IAlignedSegments as = tu.getAlignedSegments();
     	as.joinAll(locFR, MODIFY_ALL);
     	assertEquals("[Part 1. a Part 2.]", fmt.printSegmentedContent(tu.getSource(), true));
-    	assertEquals("[Trg 1. a Trg 2.]", fmt.printSegmentedContent(tu.getTarget_DIFF(locFR), true));
-    	assertEquals("[Objetivo 1. a Objetivo 2.]", fmt.printSegmentedContent(tu.getTarget_DIFF(locES), true));
+    	assertEquals("[Trg 1. a Trg 2.]", fmt.printSegmentedContent(tu.getTarget(locFR), true));
+    	assertEquals("[Objetivo 1. a Objetivo 2.]", fmt.printSegmentedContent(tu.getTarget(locES), true));
 
     }
 
@@ -287,8 +287,8 @@ public class AlignedSegmentsTest {
     	assertEquals("newSrcText", as.getSource(2, locFR).toString());
     	assertEquals("nId", as.getCorrespondingTarget(seg, locFR, MODIFY_ALL, COPY_TO_NONE).id);
     	assertEquals("[Part 1.] a [Part 2.][newSrcText]", fmt.printSegmentedContent(tu.getSource(), true));
-    	assertEquals("[Trg 1.] a [Trg 2.][]", fmt.printSegmentedContent(tu.getTarget_DIFF(locFR), true));
-    	assertEquals("[Objetivo 1.] a [Objetivo 2.][]", fmt.printSegmentedContent(tu.getTarget_DIFF(locES), true));
+    	assertEquals("[Trg 1.] a [Trg 2.][]", fmt.printSegmentedContent(tu.getTarget(locFR), true));
+    	assertEquals("[Objetivo 1.] a [Objetivo 2.][]", fmt.printSegmentedContent(tu.getTarget(locES), true));
     }
 
     @Test
@@ -301,8 +301,8 @@ public class AlignedSegmentsTest {
     	assertEquals("nId", as.getCorrespondingTarget(seg, locFR, MODIFY_ALL, COPY_TO_NONE).id);
     	assertEquals("newTrgText", as.getCorrespondingTarget(seg, locFR, MODIFY_ALL, COPY_TO_NONE).toString());
     	assertEquals("[Part 1.] a [Part 2.][newSrcText]", fmt.printSegmentedContent(tu.getSource(), true));
-    	assertEquals("[Trg 1.] a [Trg 2.][newTrgText]", fmt.printSegmentedContent(tu.getTarget_DIFF(locFR), true));
-    	assertEquals("[Objetivo 1.] a [Objetivo 2.][]", fmt.printSegmentedContent(tu.getTarget_DIFF(locES), true));
+    	assertEquals("[Trg 1.] a [Trg 2.][newTrgText]", fmt.printSegmentedContent(tu.getTarget(locFR), true));
+    	assertEquals("[Objetivo 1.] a [Objetivo 2.][]", fmt.printSegmentedContent(tu.getTarget(locES), true));
     }
 
     @Test
@@ -354,9 +354,9 @@ public class AlignedSegmentsTest {
                         actualSources);
 
         String[] actualTargets = {
-            tu.getTarget_DIFF(locEL).getSegments().get(0).toString(),
-            tu.getTarget_DIFF(locEL).getSegments().get(1).toString(),
-            tu.getTarget_DIFF(locEL).getSegments().get(2).toString()};
+            tu.getTarget(locEL).getSegments().get(0).toString(),
+            tu.getTarget(locEL).getSegments().get(1).toString(),
+            tu.getTarget(locEL).getSegments().get(2).toString()};
 
         assertArrayEquals("the target segments of the aligned pairs should be "
                         + "used in the target content",
@@ -367,7 +367,7 @@ public class AlignedSegmentsTest {
         assertEquals("the target should have a status of ALIGNED after the "
                    + "align() method is called",
                      AlignmentStatus.ALIGNED,
-                     tu.getTarget_DIFF(locEL).getSegments().getAlignmentStatus());
+                     tu.getTarget(locEL).getSegments().getAlignmentStatus());
 
         //default source left alone
         assertEquals("the default source should not be changed by this method",
@@ -377,11 +377,11 @@ public class AlignedSegmentsTest {
         //other locales left alone
         assertEquals("the default source should not be changed by this method",
                      "Trg 1.",
-                     tu.getTarget_DIFF(locFR).getFirstSegment().toString());
+                     tu.getTarget(locFR).getFirstSegment().toString());
 
         assertEquals("the default source should not be changed by this method",
                      "Objetivo 1.",
-                     tu.getTarget_DIFF(locES).getFirstSegment().toString());
+                     tu.getTarget(locES).getFirstSegment().toString());
 
     }
 
@@ -404,15 +404,15 @@ public class AlignedSegmentsTest {
         
         
         assertTrue("the target content should be one segment after alignCollapseAll()",
-                   tu.getTarget_DIFF(locFR).contentIsOneSegment());
+                   tu.getTarget(locFR).contentIsOneSegment());
 
         assertFalse("the target should not be flagged as segmented after it "
                   + "has been collapsed",
-                    tu.getTarget_DIFF(locFR).hasBeenSegmented());
+                    tu.getTarget(locFR).hasBeenSegmented());
 
         assertEquals("the target should be marked as ALIGNED after alignCollapseAll()",
                      AlignmentStatus.ALIGNED,
-                     tu.getTarget_DIFF(locFR).getSegments().getAlignmentStatus());
+                     tu.getTarget(locFR).getSegments().getAlignmentStatus());
 
         //default source should not be collapsed
         assertFalse("the default source should not be changed when the method "
@@ -422,12 +422,12 @@ public class AlignedSegmentsTest {
         //locES should not be collapsed or aligned
         assertFalse("targets of other locales should not be changed when the "
                   + "method is called with MODIFY_AS_VARIANT",
-                    tu.getTarget_DIFF(locES).contentIsOneSegment());
+                    tu.getTarget(locES).contentIsOneSegment());
 
         assertEquals("other targets should not be marked as ALIGNED when the "
                    + "method is called with MODIFY_AS_VARIANT",
                      AlignmentStatus.NOT_ALIGNED,
-                     tu.getTarget_DIFF(locES).getSegments().getAlignmentStatus());
+                     tu.getTarget(locES).getSegments().getAlignmentStatus());
         
     }
 
@@ -444,10 +444,10 @@ public class AlignedSegmentsTest {
     private ITextUnit createSegmentedTUAndTarget () {
     	ITextUnit tu = createSegmentedTU();
     	// Add the target segments
-    	ISegments segs = tu.getTarget_DIFF(locFR).getSegments();
+    	ISegments segs = tu.getTarget(locFR).getSegments();
     	segs.get(0).text.append("Trg 1.");
     	segs.get(1).text.append("Trg 2.");
-    	segs = tu.getTarget_DIFF(locES).getSegments();
+    	segs = tu.getTarget(locES).getSegments();
     	segs.get(0).text.append("Objetivo 1.");
     	segs.get(1).text.append("Objetivo 2.");
     	return tu;

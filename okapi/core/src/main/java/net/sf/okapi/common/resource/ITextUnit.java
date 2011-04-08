@@ -91,7 +91,7 @@ public interface ITextUnit extends INameable, IReferenceable {
      * (Before M10 if the target did not exist none was created and the return was null).
      * @see #createTarget(LocaleId, boolean, int)
      */
-    public TextContainer getTarget_DIFF (LocaleId locId);
+    public TextContainer getTarget (LocaleId locId);
 
     /**
      * Sets the target object for this text unit for a given locale.

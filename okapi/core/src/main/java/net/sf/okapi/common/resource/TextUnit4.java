@@ -197,7 +197,7 @@ public class TextUnit4 implements ITextUnit {
     }
 
     @Override
-    public TextContainer getTarget_DIFF(LocaleId locId) {
+    public TextContainer getTarget(LocaleId locId) {
         return createTarget(locId, false, IResource.COPY_SEGMENTS);
     }
 
@@ -258,16 +258,16 @@ public class TextUnit4 implements ITextUnit {
 
     @Override
     public ISegments getTargetSegments(LocaleId trgLoc) {
-        return getTarget_DIFF(trgLoc).getSegments();
+        return getTarget(trgLoc).getSegments();
     }
 
     @Override
     public Segment getTargetSegment(LocaleId trgLoc, String segId, boolean createIfNeeded) {
-        Segment seg = getTarget_DIFF(trgLoc).getSegments().get(segId);
+        Segment seg = getTarget(trgLoc).getSegments().get(segId);
         if (( seg == null ) && createIfNeeded ) {
             // If the segment does not exists: create a new one if requested
             seg = new Segment(segId);
-            getTarget_DIFF(trgLoc).getSegments().append(seg);
+            getTarget(trgLoc).getSegments().append(seg);
             //TODO consider appending a segment to variant source if present
         }
         return seg;
@@ -414,7 +414,7 @@ public class TextUnit4 implements ITextUnit {
     @Override
     public Property getTargetProperty (LocaleId locId, String name) {
         if ( !hasTarget(locId) ) return null;
-        return getTarget_DIFF(locId).getProperty(name);
+        return getTarget(locId).getProperty(name);
     }
 
     @Override
@@ -424,20 +424,20 @@ public class TextUnit4 implements ITextUnit {
 
     @Override
     public void removeTargetProperty (LocaleId locId, String name) {
-        if ( hasTarget(locId) )  getTarget_DIFF(locId).removeProperty(name);
+        if ( hasTarget(locId) )  getTarget(locId).removeProperty(name);
     }
 
     @Override
     public Set<String> getTargetPropertyNames (LocaleId locId) {
         if ( hasTarget(locId) ) {
-            return getTarget_DIFF(locId).getPropertyNames();
+            return getTarget(locId).getPropertyNames();
         }
         return Collections.emptySet();
     }
 
     @Override
     public boolean hasTargetProperty (LocaleId locId, String name) {
-        TextContainer tc = getTarget_DIFF(locId);
+        TextContainer tc = getTarget(locId);
         if ( tc == null ) return false;
         return (tc.getProperty(name) != null);
     }

@@ -261,7 +261,7 @@ public class AlignedSegments implements IAlignedSegments {
         variantOptions = variantOptions.clone();
 
         // Get the target segments (creates them if needed)
-        ISegments trgSegs = myParent.getTarget_DIFF(trgLoc).getSegments();
+        ISegments trgSegs = myParent.getTarget(trgLoc).getSegments();
         Segment trgSeg = trgSegs.get(srcSeg.id);
         if (trgSeg == null) { // If no corresponding segment found: create one
             variantOptions.remove(MODIFY_SOURCE); //prevent source being overwritten
@@ -309,7 +309,7 @@ public class AlignedSegments implements IAlignedSegments {
         myParent.createTarget(trgLoc, false, COPY_ALL); //no check required, see method description
 
         src = getSource(trgLoc);
-        trg = myParent.getTarget_DIFF(trgLoc);
+        trg = myParent.getTarget(trgLoc);
 
         //clear content ready for new segments
         src.clear();
@@ -393,7 +393,7 @@ public class AlignedSegments implements IAlignedSegments {
     @Override
     public void align(LocaleId trgLoc) {
         Iterator<Segment> srcSegsIt = getSource(trgLoc).getSegments().iterator();
-        Iterator<Segment> trgSegsIt = myParent.getTarget_DIFF(trgLoc).getSegments().iterator();
+        Iterator<Segment> trgSegsIt = myParent.getTarget(trgLoc).getSegments().iterator();
         while (srcSegsIt.hasNext()) {
             try {
                 Segment srcSeg = srcSegsIt.next();
@@ -405,7 +405,7 @@ public class AlignedSegments implements IAlignedSegments {
         }
 
         // these target segments are now aligned with their source counterparts
-        myParent.getTarget_DIFF(trgLoc).getSegments().setAlignmentStatus(AlignmentStatus.ALIGNED);
+        myParent.getTarget(trgLoc).getSegments().setAlignmentStatus(AlignmentStatus.ALIGNED);
     }
 
 
@@ -447,7 +447,7 @@ public class AlignedSegments implements IAlignedSegments {
         for (LocaleId loc : myParent.getTargetLocales()) {
             src = getSource(loc);
             if (collapsed.contains(src)) {
-                trg = myParent.getTarget_DIFF(loc);
+                trg = myParent.getTarget(loc);
                 if (collapsed.contains(trg)) {
                     trg.getSegments().setAlignmentStatus(AlignmentStatus.ALIGNED);
                     trg.getFirstSegment().id = src.getFirstSegment().getId(); //TODO check that this is the desired behaviour
@@ -502,7 +502,7 @@ public class AlignedSegments implements IAlignedSegments {
 
         if (!continueWithOperation(trgLoc, variantOptions)) return null;
 
-        TextContainer theTarget = myParent.getTarget_DIFF(trgLoc);
+        TextContainer theTarget = myParent.getTarget(trgLoc);
         ISegments trgSegs = theTarget.getSegments();
         int segIndex = trgSegs.getIndex(trgSeg.id);
         if (segIndex == -1) return null; //segment id not found in the container
@@ -588,7 +588,7 @@ public class AlignedSegments implements IAlignedSegments {
     @Override
     public AlignmentStatus getAlignmentStatus () {
         for ( LocaleId loc : myParent.getTargetLocales() ) {
-            ISegments trgSegs = myParent.getTarget_DIFF(loc).getSegments();
+            ISegments trgSegs = myParent.getTarget(loc).getSegments();
             if (trgSegs.getAlignmentStatus() == AlignmentStatus.NOT_ALIGNED) {
                 return AlignmentStatus.NOT_ALIGNED;
             }
@@ -598,7 +598,7 @@ public class AlignedSegments implements IAlignedSegments {
 
     @Override
     public AlignmentStatus getAlignmentStatus(LocaleId trgLoc) {
-        return myParent.getTarget_DIFF(trgLoc).getSegments().getAlignmentStatus();
+        return myParent.getTarget(trgLoc).getSegments().getAlignmentStatus();
     }
 
     @Override
@@ -610,7 +610,7 @@ public class AlignedSegments implements IAlignedSegments {
 
     @Override
     public void segmentTarget(ISegmenter segmenter, LocaleId targetLocale) {
-        TextContainer theTarget = myParent.getTarget_DIFF(targetLocale);
+        TextContainer theTarget = myParent.getTarget(targetLocale);
         segmenter.computeSegments(theTarget);
         theTarget.getSegments().create(segmenter.getRanges());
 //TODO: invalidate source and other targets? or this one.
@@ -715,7 +715,7 @@ public class AlignedSegments implements IAlignedSegments {
                 theSource = AlignedSegments.this.getSource(trgLoc);
             }
             if (variantOptions.contains(MODIFY_TARGET)) {
-                theTarget = myParent.getTarget_DIFF(trgLoc);
+                theTarget = myParent.getTarget(trgLoc);
             }
             if ( variantOptions.contains(MODIFY_TARGETS_WITH_SAME_SOURCE) ) {
                 sameSourceTargets = getSameSourceTargets(trgLoc);
@@ -800,7 +800,7 @@ public class AlignedSegments implements IAlignedSegments {
             locales.remove(loc);
             Stack<TextContainer> targets = new Stack<TextContainer>();
             for (LocaleId targLoc : locales)
-                targets.push(myParent.getTarget_DIFF(targLoc));
+                targets.push(myParent.getTarget(targLoc));
             return targets;
         }
 
@@ -814,7 +814,7 @@ public class AlignedSegments implements IAlignedSegments {
             }
             Stack<TextContainer> targets = new Stack<TextContainer>();
             for (LocaleId loc : locales)
-                targets.push(myParent.getTarget_DIFF(loc));
+                targets.push(myParent.getTarget(loc));
             return targets;
         }
 
