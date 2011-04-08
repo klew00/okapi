@@ -36,7 +36,10 @@ import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextUnitUtil;
 
 /**
  * Align two {@link TextUnit}s based on matching ids. The ids are taken from the name (TextUnit.getName()) of each
@@ -159,11 +162,20 @@ public class IdBasedAlignerStep extends BasePipelineStep {
 
 		// Populate the target TU
 		TextUnit alignedTextUnit = sourceTu.clone();
+		TextContainer targetTC = sourceTu.getSource();
+				
 		if (targetInput != null) {
+			// adjust codes to match new source
+			TextFragment atf = TextUnitUtil.adjustTargetCodes(
+					sourceTu.getSource().getUnSegmentedContentCopy(),
+					targetTC.getUnSegmentedContentCopy(), 
+					true, false, null, sourceTu);
+			targetTC.setContent(atf);
+
 			// Use the target text, if it exists
 			if (targetTextUnitMap.containsKey(sourceTu.getName())) {
 				targetTu = targetTextUnitMap.get(sourceTu.getName());
-				alignedTextUnit.setTarget(targetLocale, targetTu.getSource());
+				alignedTextUnit.setTarget(targetLocale, targetTC);
 			}
 			else {
 				logger.warning("String is missing from the target: " + sourceTu.getName());
