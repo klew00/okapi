@@ -320,7 +320,10 @@ public class Simplifier {
 				
 				if(cn.adjacentNext && peekCn.adjacentPrev){
 					
-					if(cn.code.getTagType() == TagType.OPENING && peekCn.code.getTagType() == TagType.OPENING){
+					if(cn.code.getTagType() == TagType.OPENING && 
+							peekCn.code.getTagType() == TagType.OPENING &&
+							cn instanceof StartCodeNode &&
+							peekCn instanceof StartCodeNode){
 						
 						StartCodeNode scn1 = (StartCodeNode)cn;
 						StartCodeNode scn2 = (StartCodeNode)peekCn;
@@ -374,7 +377,11 @@ public class Simplifier {
 				
 				if(cn.adjacentNext && peekCn.adjacentPrev){
 					
-					if(cn.code.getTagType() == TagType.OPENING && peekCn.code.getTagType() == TagType.CLOSING && cn.intIndex == (peekCn.intIndex-1)){
+					if(cn.code.getTagType() == TagType.OPENING && 
+							peekCn.code.getTagType() == TagType.CLOSING && 
+							cn.intIndex == (peekCn.intIndex-1) &&
+							cn instanceof StartCodeNode &&
+							peekCn instanceof EndCodeNode){
 						
 						StartCodeNode scn = (StartCodeNode)cn;
 						EndCodeNode ecn = (EndCodeNode)peekCn;
@@ -439,9 +446,14 @@ public class Simplifier {
 
 			if(cn.code.getTagType() == TagType.OPENING){
 				
-				StartCodeNode scn = (StartCodeNode)cn;
-				scn.code.setId(i+1);
-				scn.endNode.code.setId(i+1);
+				if (cn instanceof StartCodeNode) {
+					StartCodeNode scn = (StartCodeNode)cn;
+					scn.code.setId(i+1);
+					scn.endNode.code.setId(i+1);
+				}
+				else {
+					cn.code.setId(i+1);
+				}
 				
 			}else if(cn.code.getTagType() == TagType.PLACEHOLDER){
 
