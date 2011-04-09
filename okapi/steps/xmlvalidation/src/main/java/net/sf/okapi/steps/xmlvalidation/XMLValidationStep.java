@@ -32,6 +32,12 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Source;
 
+/*import org.iso_relax.verifier.VerifierConfigurationException;
+import org.iso_relax.verifier.VerifierFactory;
+import org.iso_relax.verifier.VerifierFilter;*/
+/*import com.sun.msv.verifier.ValidityViolation;
+import com.sun.msv.verifier.Verifier;*/
+
 import org.xml.sax.EntityResolver;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
@@ -52,9 +58,6 @@ public class XMLValidationStep extends BasePipelineStep {
 	private final Logger logger = Logger.getLogger(getClass().getName());
 
 	private XMLInputFactory xmlInputFact;
-//	private Schema schema;
-//	private Validator validator;
-//	private InputSource source;
 	private String currentFileDir;
 	private Parameters params;
 	
@@ -128,6 +131,62 @@ public class XMLValidationStep extends BasePipelineStep {
 					"\n"+ e.getMessage().substring(e.getMessage().indexOf("Message:")));
 			return event;
 		}
+		
+		/*if(params.isValidate() && params.getValidationType() == Parameters.VALIDATIONTYPE_RELAXNG){
+
+			try {
+			
+				SAXParserFactory factory = SAXParserFactory.newInstance();
+
+				// create a VerifierFactory with the default SAX parser
+				VerifierFactory vFact = new com.sun.msv.verifier.jarv.TheFactoryImpl();
+
+				// compile a RELAX schema (or whatever schema you like)
+				org.iso_relax.verifier.Schema relaxSchema = null;
+
+				try {
+					 
+					if(params.getSchemaPath().length() > 0){
+						//relaxSchema = vFact.compileSchema(new File("C:\\Documents and Settings\\fliden\\Desktop\\xslt_test\\relaxng.rng"));
+						relaxSchema = vFact.compileSchema(new File(params.getSchemaPath()));
+					}
+
+					// obtain a verifier
+					org.iso_relax.verifier.Verifier verifier = relaxSchema.newVerifier();
+
+					// set an error handler
+					// this error handler will throw an exception if there is an error
+					verifier.setErrorHandler( com.sun.msv.verifier.util.ErrorHandlerImpl.theInstance );
+
+					// get a XMLFilter
+					VerifierFilter filter = verifier.getVerifierFilter();
+
+					// set up the pipe-line
+					XMLReader reader = factory.newSAXParser().getXMLReader();
+					filter.setParent( reader );
+					//filter.setContentHandler( new ContentHandler() );
+
+					//filter.parse(new File("C:\\Documents and Settings\\fliden\\Desktop\\xslt_test\\relaxng.xml").toURI().toString());
+					filter.parse(rawDoc.getInputURI().toString());
+
+				} catch (VerifierConfigurationException e) {
+					logger.severe(e.getMessage());
+
+				} catch( SAXException e ) {
+					//com.sun.msv.verifier.ValidityViolation violation = (ValidityViolation) e;
+					logger.severe(e.getMessage());
+				}
+
+			} catch ( ParserConfigurationException e) {
+				logger.severe(e.getMessage());
+				return event;
+			} catch ( IOException e) {
+				logger.severe(e.getMessage());
+				return event;
+			}
+			
+			return event;
+		}*/
 		
 
 		if(params.isValidate()){

@@ -36,6 +36,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 
 	public static final int VALIDATIONTYPE_DTD = 0;
 	public static final int VALIDATIONTYPE_SCHEMA = 1;
+	//public static final int VALIDATIONTYPE_RELAXNG = 2;
 	
 	private static String VALIDATE = "validate";
 	private static String SCHEMAPATH = "schemaPath";
@@ -121,6 +122,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		String[] values = {
 				"DTD",
 				"XML Schema",
+//				"RelaxNG"
 			};
 		ListSelectionPart lsp = desc.addListSelectionPart(paramDesc.get(VALIDATIONTYPE), values);
 		lsp.setMasterPart(cbp, true);

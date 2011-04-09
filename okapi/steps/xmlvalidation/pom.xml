@@ -18,6 +18,13 @@
 			<artifactId>okapi-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>        
+		<!--<dependency>
+			<groupId>net.java.dev.msv</groupId>
+			<artifactId>msv-core</artifactId>
+			<version>2009.1</version>
+			<type>jar</type>
+			<scope>compile</scope>
+		</dependency>-->
 	</dependencies>
 </project>		
 		
