@@ -195,8 +195,10 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 		
 	private void processStartBatch() {		
 		try {
-			if (outputURI == null && params != null)
+			// If outputURI is defined explicitly in parameters, get it from there, otherwise use the one from the batch item
+			if (params != null && !Util.isEmpty(params.getOutputURI())) {
 				outputURI = new URI(params.getOutputURI());
+			}
 		} catch (URISyntaxException e) {
 			// TODO Handle exception
 			e.printStackTrace();
