@@ -34,6 +34,7 @@ public class XLIFFWriter {
 
     private PrintWriter writer = null;
     private String lb = System.getProperty("line.separator");
+    private boolean isIndented = false;
     private String indent;
 
     public void create (File file ) {
@@ -69,6 +70,18 @@ public class XLIFFWriter {
     public void setLineBreak (String lineBreak) {
     	lb = lineBreak;
     }
+    
+    public String getLineBreak () {
+    	return lb;
+    }
+    
+    public void setIsIndented (boolean isIndented) {
+    	this.isIndented = isIndented;
+    }
+    
+    public boolean getIsIndented () {
+    	return isIndented;
+    }
 	
 	public void close () {
 		if ( writer != null ) {
@@ -80,9 +93,11 @@ public class XLIFFWriter {
 	public void writeUnit (Unit unit) {
 		writer.print(indent+String.format("<unit id=\"%s\"", toXML(unit.getId(), true)));
 		writer.print(">"+lb);
+		if ( isIndented ) indent += " ";
 		
 		for ( Segment seg : unit ) {
 			writer.print(indent+"<segment>"+lb);
+			if ( isIndented ) indent += " ";
 			// Leading parts to ignore
 			for ( Fragment frag : seg.getLeadingParts() ) {
 				writeFragment("ignorable", frag);
@@ -97,9 +112,11 @@ public class XLIFFWriter {
 			for ( Fragment frag : seg.getTrailingParts() ) {
 				writeFragment("ignorable", frag);
 			}
+			if ( isIndented ) indent = indent.substring(1);
 			writer.print(indent+"</segment>"+lb);
 		}
 
+		if ( isIndented ) indent = indent.substring(1);
 		writer.print(indent+"</unit>"+lb);
 	}
 
@@ -110,9 +127,11 @@ public class XLIFFWriter {
 		writer.print("<!-- This output is EXPERIMENTAL only. -->"+lb);
 		writer.print("<!-- XLIFF 2.0 is not defined yet. -->"+lb);
 		writer.print("<!-- For feedback or more info, please see the XLIFF TC (http://www.oasis-open.org/committees/xliff) -->"+lb);
+		if ( isIndented ) indent += " ";
 	}
 	
 	public void writeEndDocument () {
+		if ( isIndented ) indent = indent.substring(1);
 		writer.print("</xliff>"+lb);
 	}
 	
@@ -120,7 +139,7 @@ public class XLIFFWriter {
 		Fragment fragment)
 	{
 		writer.print(indent+"<"+name+">");
-		writer.print(toXML(fragment.toString(), false));
+		writer.print(fragment.toString());
 		writer.print("</"+name+">"+lb);
 	}
 

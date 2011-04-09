@@ -22,16 +22,14 @@ package net.sf.okapi.lib.xliff;
 
 public class Code {
 
-	private String id;
-	private String resType;
 	private String nativeData;
-	
+
+	public Code (String nativeData) {
+		this.nativeData = nativeData;
+	}
+
 	public String getNativeData () {
 		return nativeData;
 	}
 	
-	public String getId () {
-		return id;
-	}
-
 }

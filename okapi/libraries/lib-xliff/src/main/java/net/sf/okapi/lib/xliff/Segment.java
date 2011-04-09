@@ -32,6 +32,14 @@ public class Segment {
 	private Fragment target;
 	private ArrayList<Fragment> after;
 	
+	public Segment () {
+		source = new Fragment();
+	}
+	
+	public Segment (Fragment source) {
+		this.source = source;
+	}
+	
 	public Segment (String sourceContent) {
 		source = new Fragment(sourceContent);
 	}
@@ -66,7 +74,15 @@ public class Segment {
 		return target;
 	}
 	
-	public Fragment append (Fragment fragment) {
+	public Fragment addBefore (Fragment fragment) {
+		if ( before == null ) {
+			before = new ArrayList<Fragment>();
+		}
+		before.add(fragment);
+		return fragment;
+	}
+	
+	public Fragment addAfter (Fragment fragment) {
 		if ( after == null ) {
 			after = new ArrayList<Fragment>();
 		}

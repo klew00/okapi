@@ -21,15 +21,16 @@
 package net.sf.okapi.steps.rainbowkit.xliff;
 
 import java.io.File;
+import java.util.List;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.filterwriter.GenericContent;
-import net.sf.okapi.common.filterwriter.XLIFFContent;
-import net.sf.okapi.common.resource.ISegments;
+import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Segment;
-import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.filters.rainbowkit.Manifest;
 import net.sf.okapi.filters.rainbowkit.MergingInfo;
 import net.sf.okapi.lib.xliff.Fragment;
@@ -40,11 +41,9 @@ import net.sf.okapi.steps.rainbowkit.common.BasePackageWriter;
 public class XLIFF2PackageWriter extends BasePackageWriter {
 
 	private XLIFFWriter writer;
-	private XLIFFContent fmt;
 
 	public XLIFF2PackageWriter () {
 		super(Manifest.EXTRACTIONTYPE_XLIFF2);
-		fmt = new XLIFFContent();
 	}
 
 	@Override
@@ -64,8 +63,6 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 		MergingInfo item = manifest.getItem(docId);
 		String path = manifest.getSourceDirectory() + item.getRelativeInputPath() + ".xlf";
 		
-		writer.create(new File(path));
-
 		// Set the writer's options
 		// Get the options from the parameters
 		Options options = new Options();
@@ -79,9 +76,11 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 //		writer.setSetApprovedasNoTranslate(options.getSetApprovedAsNoTranslate());
 //		writer.setIncludeNoTranslate(options.getIncludeNoTranslate());
 		
-		StartDocument sd = event.getStartDocument();
+//		StartDocument sd = event.getStartDocument();
 //		writer.create(path, null, manifest.getSourceLocale(), manifest.getTargetLocale(),
 //			sd.getMimeType(), item.getRelativeInputPath(), null);
+		writer.create(new File(path));
+		writer.setIsIndented(true);
 		writer.writeStartDocument();
 	}
 	
@@ -139,26 +138,96 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 	private Unit toXLIFF2Unit (TextUnit tu) {
 		Unit unit = new Unit(tu.getId());
 
-		ISegments srcSegs = tu.getSource().getSegments();
-		ISegments trgSegs = null;
+		TextContainer srcTc = tu.getSource();
+		TextContainer trgTc = null;
 		if ( tu.hasTarget(manifest.getTargetLocale()) ) {
-			trgSegs = tu.getTarget(manifest.getTargetLocale()).getSegments();
+			trgTc = tu.getTarget(manifest.getTargetLocale());
 		}
 		
-		for ( Segment srcSeg : srcSegs ) {
-			Segment trgSeg = null;
-			if ( trgSegs != null ) {
-				trgSeg = trgSegs.get(srcSeg.getId());
+		boolean afterFirst = false;
+		boolean afterSeg = false;
+		net.sf.okapi.lib.xliff.Segment xSeg = null;
+
+		for ( TextPart part : srcTc ) {
+			if ( part.isSegment() ) {
+				if ( afterFirst ) {
+					// New segment: push the current one and create a new one
+					unit.add(xSeg);
+				}
+				else { // First segment
+					afterFirst = true;
+				}
+				xSeg = new net.sf.okapi.lib.xliff.Segment();
+				xSeg.setSource(toXLIFF2Fragment(part.text));
+				afterSeg = true;
+				xSeg.setId(((Segment)part).getId());
+				// Target
+				if ( trgTc != null ) {
+					Segment trgSeg = trgTc.getSegments().get(xSeg.getId());
+					if ( trgSeg != null ) {
+						xSeg.setTarget(toXLIFF2Fragment(trgSeg.text));
+					}
+				}
 			}
-			net.sf.okapi.lib.xliff.Segment xSeg = new net.sf.okapi.lib.xliff.Segment(
-				fmt.setContent(srcSeg.text).toString(true));
-			if ( trgSeg != null ) {
-				xSeg.setTarget(new Fragment(
-					fmt.setContent(trgSeg.text).toString(true)));
+			else { // Non-segment part
+				if ( xSeg == null ) {
+					// First part
+					afterFirst = true;
+					xSeg = new net.sf.okapi.lib.xliff.Segment();
+				}
+				if ( afterSeg ) {
+					xSeg.addAfter(toXLIFF2Fragment(part.text));
+				}
+				else {
+					xSeg.addBefore(toXLIFF2Fragment(part.text));
+				}
 			}
+		}
+		
+		if ( xSeg != null ) {
 			unit.add(xSeg);
 		}
 		
 		return unit;
 	}
+	
+	private Fragment toXLIFF2Fragment (TextFragment tf) {
+		// fast track for content without codes
+		if ( !tf.hasCode() ) {
+			return new Fragment(tf.getCodedText());
+		}
+		
+		// Otherwise: we map the codes
+		Fragment frag = new Fragment();
+		String ctext = tf.getCodedText();
+		List<Code> codes = tf.getCodes();
+
+		int index;
+		Code code;
+		for ( int i=0; i<ctext.length(); i++ ) {
+			switch ( ctext.codePointAt(i) ) {
+			case TextFragment.MARKER_OPENING:
+				index = TextFragment.toIndex(ctext.charAt(++i));
+				code = codes.get(index);
+				frag.append(0, code.getData());
+				break;
+			case TextFragment.MARKER_CLOSING:
+				index = TextFragment.toIndex(ctext.charAt(++i));
+				code = codes.get(index);
+				frag.append(1, code.getData());
+				break;
+			case TextFragment.MARKER_ISOLATED:
+				index = TextFragment.toIndex(ctext.charAt(++i));
+				code = codes.get(index);
+				frag.append(2, code.getData());
+				break;
+			default:
+				frag.append(ctext.charAt(i));
+				break;
+			}
+		}
+
+		return frag;
+	}
+
 }
