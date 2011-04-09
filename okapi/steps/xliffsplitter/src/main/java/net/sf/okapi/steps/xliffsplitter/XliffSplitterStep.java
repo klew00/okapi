@@ -126,6 +126,13 @@ public class XliffSplitterStep extends BasePipelineStep {
 		return event;
 	}
 
+	/* TODO: Send the splitted files down the pipeline once the context functionality is added	
+	@Override
+	protected Event handleEndBatchItem(final Event event) {
+		//done = false;
+		return event;
+	}*/
+
 	@Override
 	public boolean isDone() {
 		return done;
@@ -134,6 +141,9 @@ public class XliffSplitterStep extends BasePipelineStep {
 	@Override
 	protected Event handleRawDocument(final Event event) {
 		final RawDocument rawDoc = event.getRawDocument();
+		
+		/* TODO: Send the splitted files down the pipeline once the context functionality is added
+		List<Event> tempEvents = new ArrayList<Event>();*/
 		
 		if(!params.isBigFile()){
 		
@@ -273,6 +283,18 @@ public class XliffSplitterStep extends BasePipelineStep {
 					collectBeforeFirstFileElem = false;
 
 					writeFilePart(xmlEvent, eventReader, fileCount, outputFileUri, elemsBeforeFirstFileElem,outputFactory, eventFactory, lineBreak, encoding, hasUTF8BOM);
+
+					/* TODO: Send the splitted files down the pipeline once the context functionality is added
+					if(fileCount > 1){
+						Event e = new Event(EventType.START_BATCH_ITEM);
+						tempEvents.add(e);
+					}
+					
+					Event e = new Event(EventType.RAW_DOCUMENT, new RawDocument(new File(outputFileUri).toURI(), encoding, LocaleId.ENGLISH));
+					tempEvents.add(e);
+					
+					e = new Event(EventType.END_BATCH_ITEM);
+					tempEvents.add(e);*/
 				}
 
 				//--collects any content before the first <file> elem but nothing in between or after following ones--
@@ -285,6 +307,18 @@ public class XliffSplitterStep extends BasePipelineStep {
 			
 			return event;
 			
+			/* TODO: Send the splitted files down the pipeline once the context functionality is added
+			  tempEvents.remove(tempEvents.size()-1);
+			
+			//Event e = new Event(EventType.NO_OP);
+			//me.addEvent(e);
+
+			//Event e = new Event(EventType.END_DOCUMENT);
+			//me.addEvent(e);
+
+			MultiEvent me = new MultiEvent(tempEvents);
+
+			return new Event(EventType.MULTI_EVENT, me);*/
 		}
 	}
 
