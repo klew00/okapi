@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2010 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -36,11 +36,11 @@ import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
@@ -183,7 +183,7 @@ public class TsFilterTest {
 	
 	@Test
 	public void TextUnitMessageUnfinished() {
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(completeTs, locENUS, locFRFR), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(completeTs, locENUS, locFRFR), 1);
 
 		assertEquals("1", tu.getId());
 		assertEquals(MimeTypeMapper.TS_MIME_TYPE, tu.getMimeType());
@@ -218,10 +218,10 @@ public class TsFilterTest {
 		Parameters params = (Parameters) filter.getParameters();
 		params.decodeByteValues = false;
 		
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(completeTs, locENUS, locFRFR), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(completeTs, locENUS, locFRFR), 1);
 
 		assertEquals("hello <byte value=\"79\"/>world", tu.getSource().getFirstContent().toText());
-		assertEquals("hejsan <byte value=\"79\"/>varlden", tu.getTarget(locFRFR).getFirstContent().toText());
+		assertEquals("hejsan <byte value=\"79\"/>varlden", tu.getTarget(locFRFR, false).getFirstContent().toText());
 	}
 	
 	@Test
@@ -242,10 +242,10 @@ public class TsFilterTest {
 		Parameters params = (Parameters) filter.getParameters();
 		params.decodeByteValues = true;
 		
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locENUS, locFRFR), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locENUS, locFRFR), 1);
 
 		assertEquals("hello 0world", tu.getSource().getFirstContent().toText());
-		assertEquals("hejsan 0varlden", tu.getTarget(locFRFR).getFirstContent().toText());
+		assertEquals("hejsan 0varlden", tu.getTarget(locFRFR, false).getFirstContent().toText());
 	}
 	
 	@Test
@@ -266,10 +266,10 @@ public class TsFilterTest {
 		Parameters params = (Parameters) filter.getParameters();
 		params.decodeByteValues = true;
 		
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locENUS, locFRFR), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locENUS, locFRFR), 1);
 
 		assertEquals("hello 1world", tu.getSource().getFirstContent().toText());
-		assertEquals("hejsan 1varlden", tu.getTarget(locFRFR).getFirstContent().toText());
+		assertEquals("hejsan 1varlden", tu.getTarget(locFRFR, false).getFirstContent().toText());
 	}
 
 	@Test
@@ -293,7 +293,7 @@ public class TsFilterTest {
 		"</context>\r" +
 		"</TS>";
 		
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locENUS, locFRFR), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locENUS, locFRFR), 1);
 		assertNotNull(tu);
 		Property prop = tu.getTargetProperty(locFRFR, Property.APPROVED);
 		assertNotNull(prop);
@@ -322,7 +322,7 @@ public class TsFilterTest {
 		"</context>\r" +
 		"</TS>";
 		
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locENUS, locFRFR), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locENUS, locFRFR), 1);
 		assertNotNull(tu);
 		List<Code> list = tu.getSource().getFirstContent().getCodes();
 		assertEquals(3, list.size());
@@ -407,7 +407,7 @@ public class TsFilterTest {
 		Parameters params = (Parameters) filter.getParameters();
 		params.decodeByteValues = true;
 		
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locENUS, locFRFR), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locENUS, locFRFR), 1);
 		
 		String srcCheck = "hello " + 
 		"\u0009" + 
@@ -664,7 +664,7 @@ public class TsFilterTest {
 
 	@Test
 	public void TextUnitMessageUnfinished_FromFile() {
-		TextUnit tu = FilterTestDriver.getTextUnit(getEventsFromFile("Complete_valid_utf8_bom_crlf.ts"), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEventsFromFile("Complete_valid_utf8_bom_crlf.ts"), 1);
 
 		assertEquals("1", tu.getId());
 		assertEquals(MimeTypeMapper.TS_MIME_TYPE, tu.getMimeType());
@@ -694,7 +694,7 @@ public class TsFilterTest {
 	}
 	@Test
 	public void TextUnitMessageApproved_FromFile() {
-		TextUnit tu = FilterTestDriver.getTextUnit(getEventsFromFile("Complete_valid_utf8_bom_crlf.ts"), 2);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEventsFromFile("Complete_valid_utf8_bom_crlf.ts"), 2);
 
 		assertEquals("2", tu.getId());
 		assertEquals(MimeTypeMapper.TS_MIME_TYPE, tu.getMimeType());
@@ -749,7 +749,7 @@ public class TsFilterTest {
 	}	
 	@Test
 	public void TextUnitMessageMissingTranslation_FromFile() {
-		TextUnit tu = FilterTestDriver.getTextUnit(getEventsFromFile("Complete_valid_utf8_bom_crlf.ts"), 3);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEventsFromFile("Complete_valid_utf8_bom_crlf.ts"), 3);
 
 		assertEquals("3", tu.getId());
 		assertEquals(MimeTypeMapper.TS_MIME_TYPE, tu.getMimeType());
@@ -849,7 +849,7 @@ public class TsFilterTest {
 	}		
 	@Test
 	public void TextUnitMessageEmptyTranslation_FromFile() {
-		TextUnit tu = FilterTestDriver.getTextUnit(getEventsFromFile("Complete_valid_utf8_bom_crlf.ts"), 4);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEventsFromFile("Complete_valid_utf8_bom_crlf.ts"), 4);
 	
 		assertEquals("4", tu.getId());
 		assertEquals(MimeTypeMapper.TS_MIME_TYPE, tu.getMimeType());
@@ -902,13 +902,13 @@ public class TsFilterTest {
 
 	@Test
 	public void TextUnitNumerus_FromFile() {
-		TextUnit tu = FilterTestDriver.getTextUnit(getEventsFromFile("Complete_valid_utf8_bom_crlf.ts"), 5);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEventsFromFile("Complete_valid_utf8_bom_crlf.ts"), 5);
 		
 		assertEquals("5", tu.getId());
 		assertEquals(MimeTypeMapper.TS_MIME_TYPE, tu.getMimeType());
 		assertFalse(tu.isEmpty());
 		assertEquals("hello <byte value=\"79\"/>world", tu.getSource().getFirstContent().toText());
-		assertEquals("Numerus<byte value=\"79\"/> 1", tu.getTarget(locFRFR).getFirstContent().toText());
+		assertEquals("Numerus<byte value=\"79\"/> 1", tu.getTarget(locFRFR, false).getFirstContent().toText());
 		assertEquals( 
 				"<numerusform variants=\"no\">[#$$self$]</numerusform>", 
 				tu.getSkeleton().toString());
@@ -919,7 +919,7 @@ public class TsFilterTest {
 		assertEquals(MimeTypeMapper.TS_MIME_TYPE, tu.getMimeType());
 		assertFalse(tu.isEmpty());
 		assertEquals("hello <byte value=\"79\"/>world", tu.getSource().getFirstContent().toText());
-		assertEquals("Numerus<byte value=\"79\"/> 2", tu.getTarget(locFRFR).getFirstContent().toText());
+		assertEquals("Numerus<byte value=\"79\"/> 2", tu.getTarget(locFRFR, false).getFirstContent().toText());
 		assertEquals( 
 				"\r\n<numerusform variants=\"no\">[#$$self$]</numerusform>", 
 				tu.getSkeleton().toString());
@@ -987,10 +987,10 @@ public class TsFilterTest {
 
 	@Test
 	public void testTu() {
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(simpleSnippet, locENUS, locFRFR), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(simpleSnippet, locENUS, locFRFR), 1);
 		assertNotNull(tu);
 		assertEquals("Add Entry To System Log", tu.getSource().getFirstContent().getCodedText());
-		assertEquals("Lagg till i system Loggen", tu.getTarget(locFRFR).getFirstContent().getCodedText());
+		assertEquals("Lagg till i system Loggen", tu.getTarget(locFRFR, false).getFirstContent().getCodedText());
 		
 		/*System.out.println(tu.getId());
 		System.out.println(tu.getMimeType());

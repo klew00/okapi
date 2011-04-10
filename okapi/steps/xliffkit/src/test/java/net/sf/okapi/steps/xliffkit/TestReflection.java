@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -39,6 +39,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.persistence.BeanMapper;
@@ -270,7 +271,7 @@ public class TestReflection {
 		
 		start = System.currentTimeMillis();
 		for(int i = 0; i < loops; i++) {
-			TextUnit tu = new TextUnit("tu1");
+			ITextUnit tu = new TextUnit("tu1");
 		}
 		log("----" + loops + " TextUnit creation: " + (System.currentTimeMillis() - start) + " milliseconds.");
 		
@@ -285,7 +286,7 @@ public class TestReflection {
 		
 		start = System.currentTimeMillis();
 		for(int i = 0; i < loops; i++) {
-			session.registerBean(TextUnit.class, TextUnitBean.class);
+			session.registerBean(ITextUnit.class, TextUnitBean.class);
 		}
 		log(loops + " registerBean(): " + (System.currentTimeMillis() - start) + " milliseconds.");
 		

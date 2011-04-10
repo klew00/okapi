@@ -27,7 +27,7 @@ class FindStringStep extends BasePipelineStep implements IPipelineStep {
 	
 	@Override
 	protected Event handleTextUnit(Event event) {
-		String text = event.getTextUnit().getTarget(locFR).toString();		
+		String text = event.getTextUnit().getTarget(locFR, false).toString();		
 		if (text.contains(lookupString)) {			
 			found = true;
 		}		

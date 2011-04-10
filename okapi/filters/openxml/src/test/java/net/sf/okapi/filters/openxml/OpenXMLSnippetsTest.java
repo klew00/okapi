@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -17,6 +17,7 @@
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
+
 package net.sf.okapi.filters.openxml;
 
 import static org.junit.Assert.assertEquals;
@@ -29,10 +30,10 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
-import net.sf.okapi.common.resource.TextUnit;
 //import net.sf.okapi.common.skeleton.GenericSkeleton;
 //import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.filters.openxml.OpenXMLContentFilter;
@@ -211,7 +212,7 @@ public class OpenXMLSnippetsTest {
 					(StartDocument)event.getResource());
 				break;
 			case TEXT_UNIT:
-				TextUnit tu = (TextUnit) event.getResource();
+				ITextUnit tu = event.getTextUnit();
 				tmp.append(writer.processTextUnit(tu));
 				break;
 			case DOCUMENT_PART:

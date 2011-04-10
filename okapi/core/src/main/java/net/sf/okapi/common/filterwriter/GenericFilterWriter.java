@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -44,7 +44,7 @@ import net.sf.okapi.common.resource.MultiEvent;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubDocument;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 /**
@@ -178,7 +178,7 @@ public class GenericFilterWriter implements IFilterWriter {
 				processEndGroup((Ending)event.getResource());
 				break;
 			case TEXT_UNIT:
-				processTextUnit((TextUnit)event.getResource());
+				processTextUnit(event.getTextUnit());
 				break;
 			case DOCUMENT_PART:
 				processDocumentPart((DocumentPart)event.getResource());
@@ -237,7 +237,7 @@ public class GenericFilterWriter implements IFilterWriter {
 		writer.write(skelWriter.processEndGroup(resource));
 	}
 
-	private void processTextUnit (TextUnit resource) throws IOException {
+	private void processTextUnit (ITextUnit resource) throws IOException {
 		writer.write(skelWriter.processTextUnit(resource));
 	}
 

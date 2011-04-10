@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -27,12 +27,12 @@ import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filterwriter.TMXWriter;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
 
 import java.io.File;
 import java.io.IOException;
@@ -285,9 +285,9 @@ public abstract class BaseWriter implements IWriter {
 		throw new UnsupportedOperationException();
 	}
 
-	public void writeTMXEntries (TextUnit tu) {
+	public void writeTMXEntries (ITextUnit tu) {
 		// Check if we have a target
-		TextContainer tc = tu.getTarget(trgLoc);
+		TextContainer tc = tu.getTarget(trgLoc, false);
 		if (( tc == null ) || ( tc.isEmpty() )) {
 			return; // No target
 		}
@@ -311,7 +311,7 @@ public abstract class BaseWriter implements IWriter {
 
 		// Process translations in the AltTranslationsAnnotation annotation
 		// alternates from the input file or leveraged entries
-		TextContainer altCont = tu.getTarget(trgLoc);
+		TextContainer altCont = tu.getTarget(trgLoc, false);
 
 		// From the segments
 		ISegments srcSegs = tu.getSource().getSegments();
@@ -354,7 +354,7 @@ public abstract class BaseWriter implements IWriter {
 	}
 
 	@Override
-	public void writeScoredItem (TextUnit item) {
+	public void writeScoredItem (ITextUnit item) {
 		// Not used. Alternate writing is done in writeTMXEntries
 		// But some derived writer may use this
 	}

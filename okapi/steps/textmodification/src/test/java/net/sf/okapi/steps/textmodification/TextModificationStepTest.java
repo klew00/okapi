@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2010 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -21,7 +21,7 @@
 package net.sf.okapi.steps.textmodification;
 
 import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.steps.tests.StepTestDriver;
 
 import org.junit.Before;
@@ -49,10 +49,10 @@ public class TextModificationStepTest {
 		Parameters params = (Parameters)step.getParameters();
 		params.type = Parameters.TYPE_XNREPLACE;
 		driver.testFilterEventsStep(step);
-		TextUnit res = driver.getResult();
+		ITextUnit res = driver.getResult();
 		assertNotNull(res);
 		assertTrue(res.hasTarget(locFR));
-		assertEquals(original, res.getTarget(locFR).toString());
+		assertEquals(original, res.getTarget(locFR, false).toString());
 	}
 
 	@Test
@@ -61,10 +61,10 @@ public class TextModificationStepTest {
 		driver.prepareFilterEventsStep(original, null, locEN, locFR);
 		TextModificationStep step = new TextModificationStep(); // Defaults
 		driver.testFilterEventsStep(step);
-		TextUnit res = driver.getResult();
+		ITextUnit res = driver.getResult();
 		assertNotNull(res);
 		assertTrue(res.hasTarget(locFR));
-		assertEquals(original, res.getTarget(locFR).toString());
+		assertEquals(original, res.getTarget(locFR, false).toString());
 	}
 
 	@Test
@@ -81,10 +81,10 @@ public class TextModificationStepTest {
 		params.markSegments = true;
 		params.addID = true;
 		driver.testFilterEventsStep(step);
-		TextUnit res = driver.getResult();
+		ITextUnit res = driver.getResult();
 		assertNotNull(res);
 		assertTrue(res.hasTarget(locFR));
-		assertEquals(expected, res.getTarget(locFR).toString());
+		assertEquals(expected, res.getTarget(locFR, false).toString());
 	}
 
 	@Test
@@ -96,10 +96,10 @@ public class TextModificationStepTest {
 		Parameters params = (Parameters)step.getParameters();
 		params.type = Parameters.TYPE_XNREPLACE;
 		driver.testFilterEventsStep(step);
-		TextUnit res = driver.getResult();
+		ITextUnit res = driver.getResult();
 		assertNotNull(res);
 		assertTrue(res.hasTarget(locFR));
-		assertEquals(expected, res.getTarget(locFR).toString());
+		assertEquals(expected, res.getTarget(locFR, false).toString());
 	}
 
 	@Test
@@ -113,10 +113,10 @@ public class TextModificationStepTest {
 		Parameters params = (Parameters)step.getParameters();
 		params.type = Parameters.TYPE_EXTREPLACE;
 		driver.testFilterEventsStep(step);
-		TextUnit res = driver.getResult();
+		ITextUnit res = driver.getResult();
 		assertNotNull(res);
 		assertTrue(res.hasTarget(locFR));
-		assertEquals(expected, res.getTarget(locFR).toString());
+		assertEquals(expected, res.getTarget(locFR, false).toString());
 	}
 
 	@Test
@@ -128,10 +128,10 @@ public class TextModificationStepTest {
 		Parameters params = (Parameters)step.getParameters();
 		params.type = Parameters.TYPE_KEEPINLINE;
 		driver.testFilterEventsStep(step);
-		TextUnit res = driver.getResult();
+		ITextUnit res = driver.getResult();
 		assertNotNull(res);
 		assertTrue(res.hasTarget(locFR));
-		assertEquals(expected, res.getTarget(locFR).toString());
+		assertEquals(expected, res.getTarget(locFR, false).toString());
 	}
 
 	@Test
@@ -144,10 +144,10 @@ public class TextModificationStepTest {
 		params.type = Parameters.TYPE_XNREPLACE;
 		params.applyToExistingTarget = true; // Overwrite existing target
 		driver.testFilterEventsStep(step);
-		TextUnit res = driver.getResult();
+		ITextUnit res = driver.getResult();
 		assertNotNull(res);
 		assertTrue(res.hasTarget(locFR));
-		assertEquals(expected, res.getTarget(locFR).toString());
+		assertEquals(expected, res.getTarget(locFR, false).toString());
 	}
 
 }

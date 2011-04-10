@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -32,7 +32,7 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 
 /**
  * Provides a wrapper to manage and query several translation resources at the 
@@ -442,7 +442,7 @@ public class QueryManager {
 	 * @param downgradeIdenticalBestMatches true to reduce the score of best matches when
 	 * they are identical.
 	 */
-	public void leverage (TextUnit tu,
+	public void leverage (ITextUnit tu,
 		int thresholdToFill,
 		boolean downgradeIdenticalBestMatches)
 	{
@@ -465,7 +465,7 @@ public class QueryManager {
 		AltTranslation bestMatch = null;
 		for ( LocaleId loc : tu.getTargetLocales() ) {
 			
-			TextContainer tc = tu.getTarget(loc);
+			TextContainer tc = tu.getTarget(loc, false);
 			if ( tc == null ) continue;
 			
 			// Check target container first

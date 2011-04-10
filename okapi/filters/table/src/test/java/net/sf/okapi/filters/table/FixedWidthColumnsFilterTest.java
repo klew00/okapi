@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -49,10 +49,10 @@ import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiBadFilterParametersException;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.DocumentPart;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.filters.table.base.BaseTableFilter;
 import net.sf.okapi.filters.table.fwc.FixedWidthColumnsFilter;
@@ -190,8 +190,8 @@ public class FixedWidthColumnsFilterTest {
 			
 			switch (event.getEventType()) {
 				case TEXT_UNIT:
-					assertTrue(res instanceof TextUnit);
-					assertEquals(((TextUnit) res).getMimeType(), filter.getMimeType());
+					assertTrue(res instanceof ITextUnit);
+					assertEquals(((ITextUnit)res).getMimeType(), filter.getMimeType());
 					break;
 					
 				case DOCUMENT_PART:
@@ -1097,9 +1097,9 @@ public class FixedWidthColumnsFilterTest {
 		switch (event.getEventType()) {
 		case TEXT_UNIT:
 			IResource res = event.getResource();
-			assertTrue(res instanceof TextUnit);
+			assertTrue(res instanceof ITextUnit);
 			
-			assertEquals(expectedText, ((TextUnit) res).toString());
+			assertEquals(expectedText, ((ITextUnit)res).toString());
 			break;
 			
 		case DOCUMENT_PART:
@@ -1126,23 +1126,23 @@ public class FixedWidthColumnsFilterTest {
 		switch (event.getEventType()) {
 		case TEXT_UNIT:
 			IResource res = event.getResource();
-			assertTrue(res instanceof TextUnit);
+			assertTrue(res instanceof ITextUnit);
 			
-			assertEquals(expectedText, ((TextUnit) res).toString());
+			assertEquals(expectedText, ((ITextUnit)res).toString());
 			
-			Property prop = ((TextUnit) res).getSourceProperty(AbstractLineFilter.LINE_NUMBER);
+			Property prop = ((ITextUnit)res).getSourceProperty(AbstractLineFilter.LINE_NUMBER);
 			assertNotNull(prop);
 			
 			String st = prop.getValue();
 			assertEquals(expectedLineNum, new Integer(st).intValue());
 						
-			prop = ((TextUnit) res).getSourceProperty(BaseTableFilter.ROW_NUMBER);
+			prop = ((ITextUnit)res).getSourceProperty(BaseTableFilter.ROW_NUMBER);
 			assertNotNull(prop);
 			
 			st = prop.getValue();
 			assertEquals(expRow, new Integer(st).intValue());
 			
-			prop = ((TextUnit) res).getSourceProperty(BaseTableFilter.COLUMN_NUMBER);
+			prop = ((ITextUnit)res).getSourceProperty(BaseTableFilter.COLUMN_NUMBER);
 			assertNotNull(prop);
 			
 			st = prop.getValue();
@@ -1178,29 +1178,29 @@ public class FixedWidthColumnsFilterTest {
 		
 		case TEXT_UNIT:
 			IResource res = event.getResource();
-			assertTrue(res instanceof TextUnit);
+			assertTrue(res instanceof ITextUnit);
 			
-			assertEquals(expectedText, ((TextUnit) res).toString());
+			assertEquals(expectedText, ((ITextUnit)res).toString());
 			
-			Property prop = ((TextUnit) res).getSourceProperty(AbstractLineFilter.LINE_NUMBER);
+			Property prop = ((ITextUnit)res).getSourceProperty(AbstractLineFilter.LINE_NUMBER);
 			assertNotNull(prop);
 			
 			String st = prop.getValue();
 			assertEquals(expectedLineNum, new Integer(st).intValue());
 						
-			prop = ((TextUnit) res).getSourceProperty(BaseTableFilter.ROW_NUMBER);
+			prop = ((ITextUnit)res).getSourceProperty(BaseTableFilter.ROW_NUMBER);
 			assertNotNull(prop);
 			
 			st = prop.getValue();
 			assertEquals(expRow, new Integer(st).intValue());
 			
-			prop = ((TextUnit) res).getSourceProperty(BaseTableFilter.COLUMN_NUMBER);
+			prop = ((ITextUnit)res).getSourceProperty(BaseTableFilter.COLUMN_NUMBER);
 			assertNotNull(prop);
 			
 			st = prop.getValue();
 			assertEquals(expCol, new Integer(st).intValue());
 						
-			prop = ((TextUnit) res).getSourceProperty(FixedWidthColumnsFilter.COLUMN_WIDTH);
+			prop = ((ITextUnit)res).getSourceProperty(FixedWidthColumnsFilter.COLUMN_WIDTH);
 			assertNotNull(prop);
 			
 			st = prop.getValue();
@@ -1235,17 +1235,17 @@ public class FixedWidthColumnsFilterTest {
 		
 		case TEXT_UNIT:
 			IResource res = event.getResource();
-			assertTrue(res instanceof TextUnit);
+			assertTrue(res instanceof ITextUnit);
 			
-			assertEquals(expectedText, ((TextUnit) res).toString());
+			assertEquals(expectedText, ((ITextUnit)res).toString());
 			
-			Property prop = ((TextUnit) res).getSourceProperty(AbstractLineFilter.LINE_NUMBER);
+			Property prop = ((ITextUnit)res).getSourceProperty(AbstractLineFilter.LINE_NUMBER);
 			assertNotNull(prop);
 			
 			String st = prop.getValue();
 			assertEquals(expectedLineNum, new Integer(st).intValue());
 						
-			prop = ((TextUnit) res).getSourceProperty(BaseTableFilter.ROW_NUMBER);
+			prop = ((ITextUnit)res).getSourceProperty(BaseTableFilter.ROW_NUMBER);
 			assertNotNull(prop);
 			
 			st = prop.getValue();
@@ -1281,8 +1281,8 @@ public class FixedWidthColumnsFilterTest {
 		switch (event.getEventType()) {
 		case TEXT_UNIT:
 			IResource res = event.getResource();
-			assertTrue(res instanceof TextUnit);
-			TextUnit tu = (TextUnit) res;
+			assertTrue(res instanceof ITextUnit);
+			ITextUnit tu = (ITextUnit)res;
 			assertEquals(source, tu.toString());
 			Property prop = tu.getSourceProperty(AbstractLineFilter.LINE_NUMBER);
 			assertNotNull(prop);
@@ -1290,7 +1290,7 @@ public class FixedWidthColumnsFilterTest {
 				assertEquals(expName, tu.getName());
 			}
 			if ( !Util.isEmpty(target) && !Util.isNullOrEmpty(language) ) {
-				TextContainer trg = tu.getTarget(language);
+				TextContainer trg = tu.getTarget(language, false);
 				assertNotNull(trg);
 				assertEquals(target, trg.toString());
 			}
@@ -1318,23 +1318,23 @@ public class FixedWidthColumnsFilterTest {
 		
 		case TEXT_UNIT:
 			IResource res = event.getResource();
-			assertTrue(res instanceof TextUnit);
+			assertTrue(res instanceof ITextUnit);
 			
-			assertEquals(expectedText, ((TextUnit) res).toString());
+			assertEquals(expectedText, ((ITextUnit)res).toString());
 			
-			Property prop = ((TextUnit) res).getSourceProperty(AbstractLineFilter.LINE_NUMBER);
+			Property prop = ((ITextUnit)res).getSourceProperty(AbstractLineFilter.LINE_NUMBER);
 			assertNotNull(prop);
 			
 			String st = prop.getValue();
 			assertEquals(expectedLineNum, new Integer(st).intValue());
 						
-			prop = ((TextUnit) res).getSourceProperty(BaseTableFilter.ROW_NUMBER);
+			prop = ((ITextUnit)res).getSourceProperty(BaseTableFilter.ROW_NUMBER);
 			assertNotNull(prop);
 			
 			st = prop.getValue();
 			assertEquals(expRow, new Integer(st).intValue());
 			
-			prop = ((TextUnit) res).getSourceProperty(BaseTableFilter.COLUMN_NUMBER);
+			prop = ((ITextUnit)res).getSourceProperty(BaseTableFilter.COLUMN_NUMBER);
 			assertNotNull(prop);
 			
 			st = prop.getValue();

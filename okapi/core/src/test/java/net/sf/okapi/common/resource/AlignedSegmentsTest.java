@@ -23,7 +23,6 @@ package net.sf.okapi.common.resource;
 import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
-import static net.sf.okapi.common.IResource.*;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import static net.sf.okapi.common.resource.IAlignedSegments.*;
@@ -76,7 +75,7 @@ public class AlignedSegmentsTest {
 
     @Test
     public void getSegmentsTest () {
-    	ITextUnit tu = new TextUnit4(TU1);
+    	ITextUnit tu = new TextUnit(TU1);
     	tu.setSourceContent(new TextFragment("text"));
     	IAlignedSegments as = tu.getAlignedSegments();
     	assertNotNull(as);
@@ -436,7 +435,7 @@ public class AlignedSegmentsTest {
 
 
     private ITextUnit createSegmentedTU () {
-    	ITextUnit tu = new TextUnit4("id", "Part 1.");
+    	ITextUnit tu = new TextUnit("id", "Part 1.");
     	tu.getSource().getSegments().append(new Segment("s2", new TextFragment("Part 2.")), " a ");
     	return tu;
     }

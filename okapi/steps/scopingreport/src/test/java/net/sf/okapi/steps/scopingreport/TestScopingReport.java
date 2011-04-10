@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -37,6 +37,7 @@ import net.sf.okapi.common.FileCompare;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
@@ -283,7 +284,7 @@ public class TestScopingReport {
 		Ending ed;
 		Event sdEvent, edEvent;
 		Event sbEvent, ebEvent;
-		TextUnit tu1, tu2, tu3, tu4;
+		ITextUnit tu1, tu2, tu3, tu4;
 		Event tuEvent1, tuEvent2, tuEvent3, tuEvent4;
 		Logger logger = Logger.getLogger(getClass().getName());
 		
@@ -394,7 +395,7 @@ public class TestScopingReport {
 		Ending ed;
 		Event sdEvent, edEvent;
 		Event sbEvent, ebEvent;
-		TextUnit tu1, tu2, tu3, tu4;
+		ITextUnit tu1, tu2, tu3, tu4;
 		Event tuEvent1, tuEvent2, tuEvent3, tuEvent4;
 		Logger logger = Logger.getLogger(getClass().getName());
 		

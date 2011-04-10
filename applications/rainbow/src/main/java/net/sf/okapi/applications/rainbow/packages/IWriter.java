@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -23,8 +23,8 @@ package net.sf.okapi.applications.rainbow.packages;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.resource.TextUnit;
 
 /**
  * Provides a common way create a translation package. 
@@ -75,12 +75,12 @@ public interface IWriter extends IFilterWriter {
 	 * Helper method to output the TMX entries.
 	 * @param tu the text unit to look at for possible output.
 	 */
-	public void writeTMXEntries (TextUnit tu);
+	public void writeTMXEntries (ITextUnit tu);
 
 	/**
 	 * Helper method to output scored entries. This method is called by {@link #writeTMXEntries(TextUnit)}.
 	 * @param item the text unit to process.
 	 */
-	public void writeScoredItem (TextUnit item);
+	public void writeScoredItem (ITextUnit item);
 
 }

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -31,12 +31,12 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.segmentation.SRXDocument;
 import net.sf.okapi.lib.translation.QueryManager;
 
@@ -180,7 +180,7 @@ public class Utility extends BaseFilterDrivenUtility {
 			htmlRpt.endDocument();
 			break;
 		case TEXT_UNIT:
-			processTextUnit((TextUnit)event.getResource());
+			processTextUnit(event.getTextUnit());
 			break;
 		case RAW_DOCUMENT:
 			processFileResource((RawDocument)event.getResource());
@@ -218,7 +218,7 @@ public class Utility extends BaseFilterDrivenUtility {
 			res[0], resource.getFilterParameters(), resource.getFilterWriter().getEncoderManager());
     }
 	
-    private void processTextUnit (TextUnit tu) {
+    private void processTextUnit (ITextUnit tu) {
     	// Do not process non-translatable text units
     	if ( !tu.isTranslatable() ) return;
     	
@@ -238,7 +238,7 @@ public class Utility extends BaseFilterDrivenUtility {
 					cont.getSegments().create(sourceSeg.getRanges());
 				}
 				if ( tu.hasTarget(trgLang) ) {
-					cont = tu.getTarget(trgLang);
+					cont = tu.getTarget(trgLang, false);
 					if ( !cont.hasBeenSegmented() ) {
 						targetSeg.computeSegments(cont);
 						cont.getSegments().create(targetSeg.getRanges());
@@ -263,7 +263,7 @@ public class Utility extends BaseFilterDrivenUtility {
 			qm.leverage(tu, params.threshold, downgradeIdenticalBestMatches);
 			
 			// Compute statistics
-			cont = tu.getTarget(trgLang);
+			cont = tu.getTarget(trgLang, false);
 			if ( cont != null ) {
 				tallyResults(cont.getAnnotation(AltTranslationsAnnotation.class));
 				for ( Segment seg : cont.getSegments() ) {

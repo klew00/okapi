@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -28,7 +28,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Property;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.filters.properties.PropertiesFilter;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
@@ -111,7 +111,7 @@ public class PropertiesFilterTest {
 	@Test
 	public void testEntry () {
 		String snippet = "Key1=Text1\n# Comment\nKey2=Text2\n";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 2);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 2);
 		assertNotNull(tu);
 		assertEquals("Text2", tu.getSource().toString());
 		assertEquals("Key2", tu.getName());
@@ -124,7 +124,7 @@ public class PropertiesFilterTest {
 	@Test
 	public void testSplicedEntry () {
 		String snippet = "Key1=Text1\nKey2=Text2 \\\nSecond line";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 2);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 2);
 		assertNotNull(tu);
 		assertEquals("Text2 Second line", tu.getSource().toString());
 	}
@@ -132,7 +132,7 @@ public class PropertiesFilterTest {
 	@Test
 	public void testEscapes () {
 		String snippet = "Key1=Text with \\u00E3";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
 		assertEquals("Text with \u00E3", tu.getSource().toString());
 	}
@@ -140,7 +140,7 @@ public class PropertiesFilterTest {
 	@Test
 	public void testKeySpecial () {
 		String snippet = "\\:\\= : Text1";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
 		assertEquals("Text1", tu.getSource().toString());
 		assertEquals("\\:\\=", tu.getName());
@@ -149,7 +149,7 @@ public class PropertiesFilterTest {
 	@Test
 	public void testLocDirectives_Skip () {
 		String snippet = "#_skip\nKey1:Text1\nKey2:Text2";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
 		// Text1 not extracted because of the directive
 		assertEquals("Text2", tu.getSource().toString());
@@ -158,7 +158,7 @@ public class PropertiesFilterTest {
 	@Test
 	public void testLocDirectives_Group () {
 		String snippet = "#_bskip\nKey1:Text1\n#_text\nKey2:Text2\nKey2:Text3";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
 		// Text1 not extracted because of the directive
 		assertEquals("Text2", tu.getSource().toString());
@@ -170,7 +170,7 @@ public class PropertiesFilterTest {
 	@Test
 	public void testSpecialChars () {
 		String snippet = "Key1:Text1\\n=lf, \\t=tab, \\w=w, \\r=cr, \\\\=bs\n";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu); // Convert the \n
 		assertEquals("Text1\n=lf, \t=tab, \\w=w, \\r=cr, \\\\=bs", tu.getSource().toString());
 	}
@@ -178,7 +178,7 @@ public class PropertiesFilterTest {
 	@Test
 	public void testSpecialCharsInKey () {
 		String snippet = "Key\\ \\:\\\\:Text1\n";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
 		assertEquals("Key\\ \\:\\\\", tu.getName());
 		assertEquals("Text1", tu.getSource().toString());

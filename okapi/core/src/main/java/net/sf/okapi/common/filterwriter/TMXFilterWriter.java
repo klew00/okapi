@@ -1,5 +1,5 @@
 /*===========================================================================
-Copyright (C) 2009 by the Okapi Framework contributors
+//Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
 This library is free software; you can redistribute it and/or modify it 
 under the terms of the GNU Lesser General Public License as published by 
@@ -32,7 +32,6 @@ import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.StartDocument;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 /**
@@ -148,7 +147,7 @@ public class TMXFilterWriter implements IFilterWriter {
 	}
 
 	private void processTextUnit (Event event) {
-		writer.writeTUFull((TextUnit)event.getResource());
+		writer.writeTUFull(event.getTextUnit());
 	}
 
 }

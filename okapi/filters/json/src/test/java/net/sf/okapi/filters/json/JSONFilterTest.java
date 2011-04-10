@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -36,7 +36,7 @@ import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.LocaleId;
 
@@ -58,7 +58,7 @@ public class JSONFilterTest {
 	@Test
 	public void testAllWithKeyNoException () {
 		String snippet = "{ \"key1\" : \"Text1\" }";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, null), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, null), 1);
 		assertNotNull(tu);
 		assertEquals("Text1", tu.getSource().toString());
 		assertEquals("key1", tu.getName());
@@ -69,7 +69,7 @@ public class JSONFilterTest {
 		String snippet = "{ \"key1\" : \"Text1\" }";
 		Parameters params = new Parameters(); // Default: all with keys
 		params.setExceptions("key?"); // Except those
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, params), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, params), 1);
 		assertTrue(tu==null);
 	}
 	
@@ -79,7 +79,7 @@ public class JSONFilterTest {
 		Parameters params = new Parameters();
 		params.setExtractAllPairs(false); // None with key
 		params.setExceptions("key?"); // Except those
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, params), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, params), 1);
 		assertNotNull(tu);
 		assertEquals("Text1", tu.getSource().toString());
 		assertEquals("key1", tu.getName());
@@ -90,7 +90,7 @@ public class JSONFilterTest {
 		String snippet = "{ \"key\" : [ \"Text1\", \"Text2\" ] }";
 		Parameters params = new Parameters();
 		params.setExtractStandalone(true);
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, params), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, params), 1);
 		assertNotNull(tu);
 		assertEquals("Text1", tu.getSource().toString());
 		assertTrue(tu.getName()==null);
@@ -102,14 +102,14 @@ public class JSONFilterTest {
 	@Test
 	public void testStandaloneDefaultWhichIsNo () {
 		String snippet = "{ \"key\" : [ \"Text1\" ] }";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, null), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, null), 1);
 		assertTrue(tu==null);
 	}
 	
 	@Test
 	public void testEscape () {
 		String snippet = "{ \"key1\" : \"agrave=\\u00E0\" }";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, null), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, null), 1);
 		assertNotNull(tu);
 		assertEquals("agrave=\u00e0", tu.getSource().toString());
 		assertEquals("key1", tu.getName());

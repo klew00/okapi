@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2010 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -28,7 +28,7 @@ import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextPart;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 
 public class CodesRemover {
 
@@ -42,7 +42,7 @@ public class CodesRemover {
 		this.targetLocale = targetLocale;
 	}
 
-	public void processTextUnit (TextUnit tu) {
+	public void processTextUnit (ITextUnit tu) {
 		// Skip non-translatable if requested
 		if ( !tu.isTranslatable() ) {
 			if ( !params.getIncludeNonTranslatable() ) return;

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -23,6 +23,7 @@ package net.sf.okapi.steps.termextraction;
 import java.util.Map;
 
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 
@@ -59,8 +60,8 @@ public class SimpleTermExtractorTest {
 		assertEquals("{complex=4, complex expression=3, expression=3}", res.toString());
 	}
 
-	private TextUnit createLongTU () {
-		TextUnit tu = new TextUnit("id");
+	private ITextUnit createLongTU () {
+		ITextUnit tu = new TextUnit("id");
 		tu.setSourceContent(new TextFragment("This is a test with a complex expression. A complex expression that "
 			+ "occurs often. This is important for this test. A complex term like [complex expression] is also "
 			+ "a term with several words. Things like $#@ or & should not be seen as words."

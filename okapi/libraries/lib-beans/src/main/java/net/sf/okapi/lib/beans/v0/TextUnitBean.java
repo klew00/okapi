@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -28,9 +28,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.annotation.IAnnotation;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.lib.beans.v0.FactoryBean;
 import net.sf.okapi.lib.beans.v0.IPersistenceBean;
@@ -50,7 +50,7 @@ public class TextUnitBean implements IPersistenceBean {
 	private List<FactoryBean> annotations = new ArrayList<FactoryBean>();
 	
 	public <T> T get(Class<T> classRef) {
-		TextUnit tu = TextUnitUtil.buildTU(source.get(TextContainer.class));
+		ITextUnit tu = TextUnitUtil.buildTU(source.get(TextContainer.class));
 		
 		tu.setId(id);
 		tu.setName(name);
@@ -75,8 +75,8 @@ public class TextUnitBean implements IPersistenceBean {
 	}
 	
 	public IPersistenceBean set(Object obj) {
-		if (obj instanceof TextUnit) {
-			TextUnit tu = (TextUnit) obj;
+		if (obj instanceof ITextUnit) {
+			ITextUnit tu = (ITextUnit)obj;
 			
 			id = tu.getId();
 			name = tu.getName();
@@ -89,7 +89,7 @@ public class TextUnitBean implements IPersistenceBean {
 			for (LocaleId locId : tu.getTargetLocales()) {
 				TextContainerBean targetBean = new TextContainerBean();
 				targets.put(locId.toString(), targetBean);
-				targetBean.set(tu.getTarget(locId));
+				targetBean.set(tu.getTarget(locId, false));
 			}
 			
 			skeleton.set(tu.getSkeleton());

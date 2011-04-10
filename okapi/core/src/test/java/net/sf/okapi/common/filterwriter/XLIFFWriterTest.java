@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -29,6 +29,7 @@ import java.io.IOException;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextUnit;
 
 import org.junit.Before;
@@ -99,7 +100,7 @@ public class XLIFFWriterTest {
 		throws IOException
 	{
 		writer.create(root+"out.xlf", null, locEN, null, null, "original.ext", null);
-		TextUnit tu = new TextUnit("tu1", "src1");
+		ITextUnit tu = new TextUnit("tu1", "src1");
 		writer.writeTextUnit(tu);
 		writer.close();
 
@@ -119,7 +120,7 @@ public class XLIFFWriterTest {
 		throws IOException
 	{
 		writer.create(root+"out.xlf", null, locEN, locFR, null, "original.ext", null);
-		TextUnit tu = new TextUnit("tu1", "src1<&\"\'>");
+		ITextUnit tu = new TextUnit("tu1", "src1<&\"\'>");
 		tu.setTarget(locFR, new TextContainer("trg1"));
 		writer.writeTextUnit(tu);
 		writer.close();
@@ -141,7 +142,7 @@ public class XLIFFWriterTest {
 		throws IOException
 	{
 		writer.create(root+"out.xlf", "skel.skl", locEN, locFR, "dtValue", "original.ext", "messageValue");
-		TextUnit tu = new TextUnit("tu1", "src1<&\"\'>");
+		ITextUnit tu = new TextUnit("tu1", "src1<&\"\'>");
 		tu.setTarget(locFR, new TextContainer("trg1"));
 		writer.writeTextUnit(tu);
 		writer.close();

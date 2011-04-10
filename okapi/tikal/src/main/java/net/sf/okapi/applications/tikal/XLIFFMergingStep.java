@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2010 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -37,9 +37,9 @@ import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.xliff.XLIFFFilter;
 
 // Temporary merging step. This should eventually be a normal step
@@ -112,7 +112,7 @@ public class XLIFFMergingStep {
 				event = filter.next();
 				switch ( event.getEventType() ) {
 				case TEXT_UNIT:
-					processTextUnit((TextUnit)event.getResource());
+					processTextUnit(event.getTextUnit());
 				}
 				writer.handleEvent(event);
 			}
@@ -128,18 +128,18 @@ public class XLIFFMergingStep {
 	 * Gets the next text unit in the XLIFF document.
 	 * @return the next text unit or null.
 	 */
-	private TextUnit getTextUnitFromXLIFF () {
+	private ITextUnit getTextUnitFromXLIFF () {
 		Event event;
 		while ( xlfReader.hasNext() ) {
 			event = xlfReader.next();
 			if ( event.getEventType() == EventType.TEXT_UNIT ) {
-				return (TextUnit)event.getResource();
+				return event.getTextUnit();
 			}
 		}
 		return null;
 	}
 	
-	private void processTextUnit (TextUnit tu) {
+	private void processTextUnit (ITextUnit tu) {
 		// Skip the non-translatable
 		// This means the translate attributes must be the same
 		// in the original and the merging files
@@ -147,7 +147,7 @@ public class XLIFFMergingStep {
 
 		// Try to get the corresponding translated item
 		// They are expected to be in the same order with the same id
-		TextUnit tuFromTrans;
+		ITextUnit tuFromTrans;
 		while ( true ) {
 			tuFromTrans = getTextUnitFromXLIFF();
 			if ( tuFromTrans == null ) {
@@ -213,7 +213,7 @@ public class XLIFFMergingStep {
 //		}
 
 		// Get the translated target
-		TextContainer fromTrans = tuFromTrans.getTarget(trgLoc);
+		TextContainer fromTrans = tuFromTrans.getTarget(trgLoc, false);
 		if ( fromTrans == null ) {
 			if ( tuFromTrans.getSource().isEmpty() ) return;
 			// Else: Missing target in the XLIFF
@@ -237,7 +237,7 @@ public class XLIFFMergingStep {
 		List<Range> srcRanges = null;
 		if ( mergeAsSegments ) {
 			trgRanges = new ArrayList<Range>();
-			srcRanges = tuFromTrans.saveCurrentSourceSegmentation();
+			srcRanges = tuFromTrans.getSourceSegments().getRanges();//.saveCurrentSourceSegmentation();
 		}
 		if ( !fromTrans.contentIsOneSegment() ) {
 			fromTrans.getSegments().joinAll(trgRanges);
@@ -279,8 +279,9 @@ public class XLIFFMergingStep {
 			// Re-set the ranges on the translated entry
 			if ( mergeAsSegments ) {
 				trgCont.getSegments().create(trgRanges);
-				tu.setSourceSegmentationForTarget(trgLoc, srcRanges);
-				tu.synchronizeSourceSegmentation(trgLoc);
+				tu.getSource().getSegments().create(srcRanges);
+				//tu.setSourceSegmentationForTarget(trgLoc, srcRanges);
+				//tu.synchronizeSourceSegmentation(trgLoc);
 			}
 		}
 		catch ( RuntimeException e ) {
@@ -299,7 +300,7 @@ public class XLIFFMergingStep {
 	 */
 	private List<Code> transferCodes (TextContainer fromTrans,
 		TextContainer srcCont, // Can be a clone of the original content
-		TextUnit tu)
+		ITextUnit tu)
 	{
 		// We assume the container are NOT segmented
 		List<Code> transCodes = fromTrans.getFirstContent().getCodes();

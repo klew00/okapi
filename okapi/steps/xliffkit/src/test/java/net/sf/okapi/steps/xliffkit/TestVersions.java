@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -36,8 +36,8 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.filters.FilterTestDriver;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.common.skeleton.ZipSkeleton;
 
@@ -53,7 +53,7 @@ public class TestVersions {
 	// DEBUG @Test
 	public void testOldPersistenceRoundtrip() throws IOException{
 		Event event1 = new Event(EventType.TEXT_UNIT);
-		TextUnit tu1 = TextUnitUtil.buildTU("source-text1" + (char) 2 + '"' + " : " + '"' + 
+		ITextUnit tu1 = TextUnitUtil.buildTU("source-text1" + (char) 2 + '"' + " : " + '"' + 
 				'{' + '"' + "ssssss " + ':' + '"' + "ddddd" + "}:" + '<' + '>' + "sssddd: <>dsdd");
 		String zipName = this.getClass().getResource("sample1.en.fr.zip").getFile();
 		tu1.setSkeleton(new ZipSkeleton(new ZipFile(new File(zipName)), null));
@@ -62,7 +62,7 @@ public class TestVersions {
 		tu1.setTarget(LocaleId.TAIWAN_CHINESE, new TextContainer("chinese-text1"));
 				
 		Event event2 = new Event(EventType.TEXT_UNIT);
-		TextUnit tu2 = TextUnitUtil.buildTU("source-text2" + (char) 2 + '"' + " : " + '"' + 
+		ITextUnit tu2 = TextUnitUtil.buildTU("source-text2" + (char) 2 + '"' + " : " + '"' + 
 				'{' + '"' + "ssssss " + ':' + '"' + "ddddd" + "}:" + '<' + '>' + "sssddd: <>dsdd");
 		tu2.setSkeleton(new ZipSkeleton(null, new ZipEntry("aa1/content/content.gmx")));
 		event2.setResource(tu2);

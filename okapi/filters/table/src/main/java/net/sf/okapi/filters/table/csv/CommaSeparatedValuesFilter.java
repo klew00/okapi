@@ -31,7 +31,7 @@ import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
@@ -312,7 +312,7 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 //	}
 
 	@Override
-	protected TextProcessingResult extractCells(List<TextUnit> cells, TextContainer lineContainer, long lineNum) {		
+	protected TextProcessingResult extractCells(List<ITextUnit> cells, TextContainer lineContainer, long lineNum) {		
 		// Extract cells from the line, if no multi-line chunks, fill up the cells list, if there are, fill the chunk buffer.
 		// The cells is always an empty non-null list ready for addition
 		
@@ -409,7 +409,7 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 	}
 	
 	@Override
-	protected boolean processTU(TextUnit textUnit) {
+	protected boolean processTU(ITextUnit textUnit) {
 	
 		if (textUnit == null) return false;
 		
@@ -612,7 +612,7 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 		
 //		addLineBreak(); // Insert a line break after the previous line
 		
-		List<TextUnit> buf = new ArrayList<TextUnit>();
+		List<ITextUnit> buf = new ArrayList<ITextUnit>();
 		
 		for (int i = 0; i < index; i++)			
 			buf.add(TextUnitUtil.buildTU(buffer.get(i)));
@@ -641,7 +641,7 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 				skel = (GenericSkeleton) dp.getSkeleton();
 			}
 			else {
-				TextUnit tu = getFirstTextUnit();
+				ITextUnit tu = getFirstTextUnit();
 				if (tu == null) return;
 				
 				skel = (GenericSkeleton) tu.getSkeleton();

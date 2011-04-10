@@ -40,7 +40,7 @@ import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 /**
@@ -367,7 +367,7 @@ public class XLIFFWriter implements IFilterWriter {
 	 * Writes a text unit as a &lt;trans-unit> element.
 	 * @param tu the text unit to output.
 	 */
-	public void writeTextUnit (TextUnit tu) {
+	public void writeTextUnit (ITextUnit tu) {
 		writeTextUnit(tu, null);
 	}
 	
@@ -375,7 +375,7 @@ public class XLIFFWriter implements IFilterWriter {
 	 * Writes a text unit as a &lt;trans-unit> element.
 	 * @param tu the text unit to output.
 	 */
-	public void writeTextUnit (TextUnit tu,
+	public void writeTextUnit (ITextUnit tu,
 		String phaseName)
 	{
 		// Avoid writing out some entries in non-IFilterWriter mode
@@ -456,7 +456,7 @@ public class XLIFFWriter implements IFilterWriter {
 		if ( trgLoc != null ) {
 			// At this point tc contains the source
 			// Do we have an available target to use instead?
-			tc = tu.getTarget(trgLoc);
+			tc = tu.getTarget(trgLoc, false);
 			boolean outputTarget = true;
 			if ( useSourceForTranslated || ( tc == null ) || ( tc.isEmpty() )
 				|| ( srcHasText && !tc.hasText(false) )) {
@@ -476,7 +476,7 @@ public class XLIFFWriter implements IFilterWriter {
 			// Possible alternate translations
 			if ( includeAltTrans ) {
 				// We re-get the target because tc could be coming from the source
-				TextContainer altCont = tu.getTarget(trgLoc);
+				TextContainer altCont = tu.getTarget(trgLoc, false);
 				if ( altCont != null ) {
 					// From the target container
 					writeAltTranslations(altCont.getAnnotation(AltTranslationsAnnotation.class), null);
@@ -589,7 +589,7 @@ public class XLIFFWriter implements IFilterWriter {
 			processEndGroup((Ending)event.getResource());
 			break;
 		case TEXT_UNIT:
-			processTextUnit((TextUnit)event.getResource());
+			processTextUnit(event.getTextUnit());
 			break;
 		}
 		return event;
@@ -665,7 +665,7 @@ public class XLIFFWriter implements IFilterWriter {
 	}
 
 	// Use for IFilterWriter mode
-	private void processTextUnit (TextUnit tu) {
+	private void processTextUnit (ITextUnit tu) {
 		writeTextUnit(tu, null);
 	}
 }

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2010 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -33,7 +33,7 @@ import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.tm.simpletm.Database;
 
 @UsingParameters(Parameters.class)
@@ -145,7 +145,7 @@ public class GenerateSimpleTmStep extends BasePipelineStep {
 			return event;
 		} 
 		
-		TextUnit tu = (TextUnit)event.getResource();
+		ITextUnit tu = event.getTextUnit();
 		// Skip non-translatable
 		if ( !tu.isTranslatable() ){
 			countIsNotTranslatable++;
@@ -158,7 +158,7 @@ public class GenerateSimpleTmStep extends BasePipelineStep {
 			return event;
 		}
 		
-		if( !tu.hasTarget(targetLocale) || ( tu.getTarget(targetLocale)==null )){
+		if( !tu.hasTarget(targetLocale) || ( tu.getTarget(targetLocale, false)==null )){
 			logger.warning(String.format("TextUnit is missing '%s' target.", targetLocale));
 			countTuNotAdded++;
 			return event;

@@ -55,7 +55,7 @@ public class XmlStreamEventTest {
 
 		// Build the input
 		GenericSkeleton skel = new GenericSkeleton();
-		TextUnit tu = new TextUnit("tu1", "one,two,three");
+		ITextUnit tu = new TextUnit("tu1", "one,two,three");
 		skel.add("content=\"");
 		skel.addContentPlaceholder(tu);
 		skel.add("\"");
@@ -86,7 +86,7 @@ public class XmlStreamEventTest {
 
 		// Build the input
 		GenericSkeleton skel = new GenericSkeleton();
-		TextUnit tu2 = new TextUnit("tu2", "my title");
+		ITextUnit tu2 = new TextUnit("tu2", "my title");
 		skel.add("title='");
 		skel.addContentPlaceholder(tu2);
 		skel.add("'");
@@ -96,7 +96,7 @@ public class XmlStreamEventTest {
 		events.add(new Event(EventType.TEXT_UNIT, tu2));
 
 		skel = new GenericSkeleton();
-		TextUnit tu1 = new TextUnit("tu1", "Text of p");
+		ITextUnit tu1 = new TextUnit("tu1", "Text of p");
 		tu1.setType("paragraph");
 		skel.add("<p ");
 		skel.addReference(tu2);
@@ -143,7 +143,7 @@ public class XmlStreamEventTest {
 		addStartEvents(events);
 
 		// Build the input
-		TextUnit tu1 = new TextUnit("tu1", "");		
+		ITextUnit tu1 = new TextUnit("tu1", "");		
 		tu1.setName("foo-id");
 		tu1.setType("paragraph");
 		tu1.setMimeType(MimeTypeMapper.XML_MIME_TYPE);
@@ -219,7 +219,7 @@ public class XmlStreamEventTest {
 		events.add(new Event(EventType.DOCUMENT_PART, dp1));
 
 		skel = new GenericSkeleton();
-		TextUnit tu1 = new TextUnit("tu1", "Before ");
+		ITextUnit tu1 = new TextUnit("tu1", "Before ");
 		tu1.setType("paragraph");
 		TextFragment tf = tu1.getSource().getFirstContent();
 		Code code = new Code(TagType.OPENING, "b", "<b>");
@@ -255,7 +255,7 @@ public class XmlStreamEventTest {
 
 		GenericSkeleton skel = new GenericSkeleton();
 		
-		TextUnit tu1 = new TextUnit("tu1", "Before ");
+		ITextUnit tu1 = new TextUnit("tu1", "Before ");
 		tu1.setType("paragraph");
 		TextFragment tf = tu1.getSource().getFirstContent();
 		Code code = new Code(TagType.PLACEHOLDER, Code.TYPE_COMMENT, "<!--comment-->");
@@ -284,7 +284,7 @@ public class XmlStreamEventTest {
 
 		GenericSkeleton skel = new GenericSkeleton();
 		
-		TextUnit tu1 = new TextUnit("tu1", "Before ");
+		ITextUnit tu1 = new TextUnit("tu1", "Before ");
 		tu1.setType("paragraph");
 		TextFragment tf = tu1.getSource().getFirstContent();
 		Code code = new Code(TagType.PLACEHOLDER, Code.TYPE_XML_PROCESSING_INSTRUCTION, "<?PI?>");		
@@ -309,7 +309,7 @@ public class XmlStreamEventTest {
 		addStartEvents(events);
 
 		GenericSkeleton skel = new GenericSkeleton();
-		TextUnit tu2 = new TextUnit("tu2", "text");
+		ITextUnit tu2 = new TextUnit("tu2", "text");
 		skel.add("alt=\"");
 		skel.addContentPlaceholder(tu2);
 		skel.add("\"");
@@ -332,7 +332,7 @@ public class XmlStreamEventTest {
 		events.add(new Event(EventType.DOCUMENT_PART, dp1));
 
 		skel = new GenericSkeleton();
-		TextUnit tu1 = new TextUnit("tu1", "Before ");
+		ITextUnit tu1 = new TextUnit("tu1", "Before ");
 		tu1.setType("paragraph");
 		TextFragment tf = tu1.getSource().getFirstContent();
 		Code code = new Code(TagType.OPENING, "b", "<b>");
@@ -375,7 +375,7 @@ public class XmlStreamEventTest {
 		events.add(new Event(EventType.START_GROUP, g2));		
 
 		GenericSkeleton skel = new GenericSkeleton();
-		TextUnit tu = new TextUnit("tu1", "text");
+		ITextUnit tu = new TextUnit("tu1", "text");
 		tu.setType("td");
 		
 		skel.append("<td>");
@@ -410,7 +410,7 @@ public class XmlStreamEventTest {
 		addStartEvents(events);
 
 		GenericSkeleton tu3skel = new GenericSkeleton("<p>");
-		TextUnit tu3 = new TextUnit("tu3", "Text before list:");
+		ITextUnit tu3 = new TextUnit("tu3", "Text before list:");
 		tu3.setSkeleton(tu3skel);
 		tu3skel.addContentPlaceholder(tu3);
 		tu3.setType("paragraph");
@@ -427,7 +427,7 @@ public class XmlStreamEventTest {
 		events.add(new Event(EventType.START_GROUP, g1));
 
 		GenericSkeleton tu1skel = new GenericSkeleton();
-		TextUnit tu1 = new TextUnit("tu1", "Text of item 1");		
+		ITextUnit tu1 = new TextUnit("tu1", "Text of item 1");		
 		tu1.setType("li");		
 		tu1skel.append("<li>");
 		tu1skel.addContentPlaceholder(tu1);
@@ -436,7 +436,7 @@ public class XmlStreamEventTest {
 		events.add(new Event(EventType.TEXT_UNIT, tu1));
 				
 		GenericSkeleton tu2skel = new GenericSkeleton();
-		TextUnit tu2 = new TextUnit("tu2", "Text of item 2");		
+		ITextUnit tu2 = new TextUnit("tu2", "Text of item 2");		
 		tu2.setType("li");
 		tu2skel.append("<li>");
 		tu2skel.addContentPlaceholder(tu2);
@@ -466,7 +466,7 @@ public class XmlStreamEventTest {
 		
 		GenericSkeleton skel = new GenericSkeleton();		
 		
-		TextUnit tu = new TextUnit("tu1", "\twhitespace is preserved");
+		ITextUnit tu = new TextUnit("tu1", "\twhitespace is preserved");
 		tu.setType("pre");
 		tu.setPreserveWhitespaces(true);
 		skel.append("<pre>");

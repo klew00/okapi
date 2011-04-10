@@ -66,6 +66,7 @@ import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
@@ -507,7 +508,7 @@ public class IDMLFilter implements IFilter {
 				if ( ctx.peek().addToQueue(queue) && params.getSimplifyCodes() ) {
 					// Try to simplify the inline codes if possible
 					// We can access the text this way because it's not segmented yet
-					TextUnit tu = queue.getLast().getTextUnit();
+					ITextUnit tu = queue.getLast().getTextUnit();
 					TextFragment tf = tu.getSource().getFirstContent();
 					String[] res = SIMPLIFIER.simplifyAll(tf, true);
 					// Move the native data into the skeleton if needed
@@ -568,7 +569,7 @@ public class IDMLFilter implements IFilter {
 			// We have a single Content element
 			Element cnt = (Element)list.item(0);
 			// Create the text unit
-			TextUnit tu = new TextUnit(makeTuId());
+			ITextUnit tu = new TextUnit(makeTuId());
 			tu.setSourceContent(processContent(cnt, null));
 			tu.setSkeleton(new IDMLSkeleton(ctx.peek().getTopNode(), cnt)); // Merge directly on Content
 			// And add the new event to the queue

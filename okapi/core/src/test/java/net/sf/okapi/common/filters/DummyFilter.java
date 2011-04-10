@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -40,6 +40,7 @@ import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
@@ -174,7 +175,7 @@ public class DummyFilter implements IFilter {
 		sd.setMimeType("text");
 		queue.add(new Event(EventType.START_DOCUMENT, sd));
 		
-		TextUnit tu = new TextUnit("id1", parts[0]);
+		ITextUnit tu = new TextUnit("id1", parts[0]);
 		// Use getFirstContent fine because there is nothing segmented
 		String text = tu.getSource().getSegments().getFirstContent().getCodedText();
 		int n = text.indexOf("@#$");
@@ -215,7 +216,7 @@ public class DummyFilter implements IFilter {
 		sd.setSkeleton(skel);
 		queue.add(new Event(EventType.START_DOCUMENT, sd));
 		
-		TextUnit tu = new TextUnit("tu1", "First segment for SRC. Second segment for SRC");
+		ITextUnit tu = new TextUnit("tu1", "First segment for SRC. Second segment for SRC");
 		TextContainer tc = tu.getSource();
 		List<Range> ranges = new ArrayList<Range>();
 		ranges.add(new Range(0, 22));
@@ -249,7 +250,7 @@ public class DummyFilter implements IFilter {
 		sd.setSkeleton(skel);
 		queue.add(new Event(EventType.START_DOCUMENT, sd));
 		
-		TextUnit tu = new TextUnit("tu1", "Source text");
+		ITextUnit tu = new TextUnit("tu1", "Source text");
 		tu.setTarget(trgLang, new TextContainer("Target text"));
 		skel = new GenericSkeleton("<text>\n<s>Source text</s>\n<t>");
 		skel.addContentPlaceholder(tu, trgLang);

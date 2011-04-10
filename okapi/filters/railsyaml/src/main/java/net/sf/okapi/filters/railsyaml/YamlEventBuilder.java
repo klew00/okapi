@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -21,8 +21,8 @@
 package net.sf.okapi.filters.railsyaml;
 
 import net.sf.okapi.common.filters.EventBuilder;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
 
 /**
  * @author PerkinsGW
@@ -40,7 +40,7 @@ public class YamlEventBuilder extends EventBuilder {
 	 * Normalize text after TextUnit is complete. Called after endTextUnit
 	 */
 	@Override
-	protected TextUnit postProcessTextUnit(TextUnit textUnit) {
+	protected ITextUnit postProcessTextUnit (ITextUnit textUnit) {
 		TextFragment text = textUnit.getSource().getFirstContent();
 		text.setCodedText(normalize(text.getCodedText()));
 		return textUnit;

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -28,11 +28,11 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubDocument;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.virtualdb.IVDocument;
 import net.sf.okapi.virtualdb.IVItem.ItemType;
 
@@ -149,7 +149,7 @@ public class H2Importer {
 			key = db.writeResourceData((StartGroup)res, type, docItemKey);
 			break;
 		case TEXT_UNIT:
-			key = db.writeTextUnitData((TextUnit)res, docItemKey);
+			key = db.writeTextUnitData((ITextUnit)res, docItemKey);
 			break;
 		}
 		level++;
@@ -174,7 +174,7 @@ public class H2Importer {
 			key = db.writeResourceData((StartGroup)res, type, docItemKey);
 			break;
 		case TEXT_UNIT:
-			key = db.writeTextUnitData((TextUnit)res, docItemKey);
+			key = db.writeTextUnitData((ITextUnit)res, docItemKey);
 			break;
 		}
 		H2Navigator item = new H2Navigator(type, key, docItemKey, level);

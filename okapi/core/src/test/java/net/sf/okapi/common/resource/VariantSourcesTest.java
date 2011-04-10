@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it
   under the terms of the GNU Lesser General Public License as published by
@@ -32,15 +32,15 @@ public class VariantSourcesTest {
     private static final LocaleId locFR = LocaleId.FRENCH;
     private static final LocaleId locES = LocaleId.SPANISH;
     private static final LocaleId locDE = LocaleId.GERMAN;
-    private static final String TU1 = "tu1";
-    private TextContainer defaultSource;
+//    private static final String TU1 = "tu1";
+//    private TextContainer defaultSource;
 
 
 
     private static final String DEFAULT_SOURCE = "Default source text";
     private static final String FR_SOURCE = "Variant source text for French target";
     private static final String ES_SOURCE = "Variant source text for Spanish target";
-    private static final String DE_SOURCE = "Variant source text for German target";
+//    private static final String DE_SOURCE = "Variant source text for German target";
     private static final String EMPTY_SOURCE = "";
 
     private static final String DEFAULT_SEG_1 = "first default segment.";
@@ -54,7 +54,7 @@ public class VariantSourcesTest {
     private TextFragment newFRFragment;
     private TextFragment newESFragment;
 
-    private TextContainer DEFAULT_SOURCE_CONT;
+//    private TextContainer DEFAULT_SOURCE_CONT;
     private TextContainer FR_SOURCE_CONT;
     private TextContainer ES_SOURCE_CONT;
 
@@ -76,11 +76,11 @@ public class VariantSourcesTest {
 
     @Before
     public void setUp(){
-        defaultSource = new TextContainer(DEFAULT_SOURCE);
+//        defaultSource = new TextContainer(DEFAULT_SOURCE);
         //cs = new VariantSources(new TextUnit4(TU1, DEFAULT_SOURCE));
         cs = new VariantSources(new TextContainer(DEFAULT_SOURCE));
 
-        DEFAULT_SOURCE_CONT = new TextContainer(DEFAULT_SOURCE);
+//        DEFAULT_SOURCE_CONT = new TextContainer(DEFAULT_SOURCE);
         FR_SOURCE_CONT = new TextContainer(FR_SOURCE);
         ES_SOURCE_CONT = new TextContainer(ES_SOURCE);
 

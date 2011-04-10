@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2010 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -36,6 +36,7 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
@@ -222,7 +223,7 @@ public class TranslationComparisonStep extends BasePipelineStep {
 	
 	@Override
 	protected Event handleTextUnit (Event event1) {
-		TextUnit tu1 = event1.getTextUnit();
+		ITextUnit tu1 = event1.getTextUnit();
 		// Move to the next TU
 		Event event2 = synchronize(filter2, EventType.TEXT_UNIT);
 		Event event3 = null;
@@ -232,10 +233,10 @@ public class TranslationComparisonStep extends BasePipelineStep {
 		// Skip non-translatable
 		if ( !tu1.isTranslatable() ) return event1;
 		
-		TextUnit tu2 = (TextUnit)event2.getResource();
-		TextUnit tu3 = null;
+		ITextUnit tu2 = event2.getTextUnit();
+		ITextUnit tu3 = null;
 		if ( event3 != null ) {
-			tu3 = (TextUnit)event3.getResource();
+			tu3 = event3.getTextUnit();
 		}
 
 		TextFragment srcFrag = null;
@@ -269,11 +270,11 @@ public class TranslationComparisonStep extends BasePipelineStep {
 		// Get the text for the base translation
 		TextFragment trgFrag1;
 		if ( isBaseMultilingual ) {
-			if ( tu1.getTarget(targetLocale).contentIsOneSegment() ) {
-				trgFrag1 = tu1.getTarget(targetLocale).getFirstContent();
+			if ( tu1.getTarget(targetLocale, false).contentIsOneSegment() ) {
+				trgFrag1 = tu1.getTarget(targetLocale, false).getFirstContent();
 			}
 			else {
-				trgFrag1 = tu1.getTarget(targetLocale).getUnSegmentedContentCopy();
+				trgFrag1 = tu1.getTarget(targetLocale, false).getUnSegmentedContentCopy();
 			}
 		}
 		else {
@@ -288,11 +289,11 @@ public class TranslationComparisonStep extends BasePipelineStep {
 		// Get the text for the to-compare translation 1
 		TextFragment trgFrag2;
 		if ( isInput2Multilingual ) {
-			if ( tu2.getTarget(targetLocale).contentIsOneSegment() ) {
-				trgFrag2 = tu2.getTarget(targetLocale).getFirstContent();
+			if ( tu2.getTarget(targetLocale, false).contentIsOneSegment() ) {
+				trgFrag2 = tu2.getTarget(targetLocale, false).getFirstContent();
 			}
 			else {
-				trgFrag2 = tu2.getTarget(targetLocale).getUnSegmentedContentCopy();
+				trgFrag2 = tu2.getTarget(targetLocale, false).getUnSegmentedContentCopy();
 			}
 		}
 		else {
@@ -308,11 +309,11 @@ public class TranslationComparisonStep extends BasePipelineStep {
 		TextFragment trgFrag3 = null;
 		if ( tu3 != null ) {
 			if ( isInput3Multilingual ) {
-				if ( tu3.getTarget(targetLocale).contentIsOneSegment() ) {
-					trgFrag3 = tu3.getTarget(targetLocale).getFirstContent();
+				if ( tu3.getTarget(targetLocale, false).contentIsOneSegment() ) {
+					trgFrag3 = tu3.getTarget(targetLocale, false).getFirstContent();
 				}
 				else {
-					trgFrag3 = tu3.getTarget(targetLocale).getUnSegmentedContentCopy();
+					trgFrag3 = tu3.getTarget(targetLocale, false).getUnSegmentedContentCopy();
 				}
 			}
 			else {
@@ -402,7 +403,7 @@ public class TranslationComparisonStep extends BasePipelineStep {
 		}
 
 		if ( params.isGenerateTMX() ) {
-			TextUnit tmxTu = new TextUnit(tu1.getId());
+			ITextUnit tmxTu = new TextUnit(tu1.getId());
 			// Set the source: Use the tu1 if possible
 			if ( isBaseMultilingual ) tmxTu.setSource(tu1.getSource());
 			else if ( srcFrag != null ) {

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -37,10 +37,10 @@ import net.sf.okapi.common.filterwriter.ILayerProvider;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubDocument;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
@@ -172,7 +172,7 @@ public class Writer extends BaseWriter {
 				processEndGroup((Ending)event.getResource());
 				break;
 			case TEXT_UNIT:
-				processTextUnit((TextUnit)event.getResource());
+				processTextUnit(event.getTextUnit());
 				break;
 			case DOCUMENT_PART:
 				processDocumentPart((DocumentPart)event.getResource());
@@ -270,7 +270,7 @@ public class Writer extends BaseWriter {
 		writer.write(skelWriter.processEndGroup(resource));
 	}
 
-	private void processTextUnit (TextUnit tu) {
+	private void processTextUnit (ITextUnit tu) {
 		// Write out TMX entries
 		super.writeTMXEntries(tu);
 		// Write skeleton and its content

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -45,6 +45,7 @@ import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 
@@ -60,7 +61,7 @@ public class ResourceSimplifierTest {
 	public void testMonolingual() {
 		ResourceSimplifier conv = new ResourceSimplifier(ESES);
 		
-		TextUnit tu1 = new TextUnit("tu1");
+		ITextUnit tu1 = new TextUnit("tu1");
 		tu1.setSource(new TextContainer("text1"));
 		GenericSkeleton skel1 = new GenericSkeleton();
 		tu1.setSkeleton(skel1);
@@ -68,7 +69,7 @@ public class ResourceSimplifierTest {
 		skel1.addContentPlaceholder(tu1);
 		skel1.add("'");
 		
-		TextUnit tu2 = new TextUnit("tu2");
+		ITextUnit tu2 = new TextUnit("tu2");
 		tu2.setSource(new TextContainer("text2"));
 		GenericSkeleton skel2 = new GenericSkeleton();
 		tu2.setSkeleton(skel2);
@@ -153,7 +154,7 @@ public class ResourceSimplifierTest {
 		
 		me.addEvent(new Event(EventType.DOCUMENT_PART, new DocumentPart("dp1", false, skel1)));
 		me.addEvent(new Event(EventType.DOCUMENT_PART, new DocumentPart("dp2", false, skel2)));
-		TextUnit tu1 = new TextUnit("tu1");
+		ITextUnit tu1 = new TextUnit("tu1");
 		tu1.setSkeleton(skel4);
 		me.addEvent(new Event(EventType.TEXT_UNIT, tu1));
 		me.addEvent(new Event(EventType.DOCUMENT_PART, new DocumentPart("dp3", false, skel3)));
@@ -255,12 +256,12 @@ public class ResourceSimplifierTest {
 	@Test
 	public void testConversion() {
 		GenericSkeleton skel = new GenericSkeleton();
-		TextUnit tu1 = new TextUnit("tu1");
+		ITextUnit tu1 = new TextUnit("tu1");
 		tu1.setSource(new TextContainer("English text"));
 		tu1.setTarget(FRFR, new TextContainer("Texte en langue Francaise"));
 		tu1.setSkeleton(skel);
 		
-		TextUnit tu2 = new TextUnit("tu2");
+		ITextUnit tu2 = new TextUnit("tu2");
 		tu2.setSource(new TextContainer("English text"));
 		tu2.setTarget(ESES, new TextContainer("Texto en Espanol"));
 		tu2.setIsReferent(true);
@@ -291,7 +292,7 @@ public class ResourceSimplifierTest {
 		event = itr.next();
 		res = event.getResource();
 		assertEquals("tu1", res.getId());
-		assertTrue(res instanceof TextUnit);
+		assertTrue(res instanceof ITextUnit);
 		assertNull(res.getSkeleton());
 		
 		assertTrue(itr.hasNext());
@@ -307,12 +308,12 @@ public class ResourceSimplifierTest {
 	@Test
 	public void testConversion2() {
 		GenericSkeleton skel = new GenericSkeleton();
-		TextUnit tu1 = new TextUnit("tu1");
+		ITextUnit tu1 = new TextUnit("tu1");
 		tu1.setSource(new TextContainer("English text"));
 		tu1.setTarget(FRFR, new TextContainer("Texte en langue Francaise"));
 		tu1.setSkeleton(skel);
 		
-		TextUnit tu2 = new TextUnit("tu2");
+		ITextUnit tu2 = new TextUnit("tu2");
 		tu2.setSource(new TextContainer("English text"));
 		tu2.setTarget(ESES, new TextContainer("Texto en Espanol"));
 		tu2.setIsReferent(true);
@@ -345,7 +346,7 @@ public class ResourceSimplifierTest {
 		event = itr.next();
 		res = event.getResource();
 		assertEquals("tu1", res.getId());
-		assertTrue(res instanceof TextUnit);
+		assertTrue(res instanceof ITextUnit);
 		assertNull(res.getSkeleton());
 		
 		assertTrue(itr.hasNext());
@@ -364,7 +365,7 @@ public class ResourceSimplifierTest {
 		checkTUConversion(tu1, simpleEvent, gsw);
 	}
 	
-	private void checkTUConversion(TextUnit tu, Event simpleEvent, GenericSkeletonWriter gsw) {
+	private void checkTUConversion(ITextUnit tu, Event simpleEvent, GenericSkeletonWriter gsw) {
 		assertNotNull(simpleEvent);
 		assertTrue(simpleEvent.getResource() instanceof MultiEvent);
 		MultiEvent me = (MultiEvent) simpleEvent.getResource();
@@ -377,7 +378,7 @@ public class ResourceSimplifierTest {
 				sb.append(gsw.processDocumentPart((DocumentPart) event.getResource()));
 				break;
 			case TEXT_UNIT:
-				sb.append(gsw.processTextUnit((TextUnit) event.getResource()));
+				sb.append(gsw.processTextUnit(event.getTextUnit()));
 				break;
 			}			
 		}		
@@ -420,18 +421,18 @@ public class ResourceSimplifierTest {
 	
 	@Test // No refs, the original TU is returned
 	public void testTu_NoSkeleton() {
-		TextUnit tu1 = new TextUnit("P1C1D3-tu1");
+		ITextUnit tu1 = new TextUnit("P1C1D3-tu1");
 		tu1.setSource(new TextContainer("Source"));
 		
 		ResourceSimplifier rs = new ResourceSimplifier(ENUS);
 		Event event = rs.convert(new Event(EventType.TEXT_UNIT, tu1));
 		assertNotNull(event);
-		assertTrue(event.getResource() instanceof TextUnit);
+		assertTrue(event.getResource() instanceof ITextUnit);
 	}
 	
 	@Test // No refs, the original TU is returned
 	public void testTu_GenericSkeleton() {
-		TextUnit tu1 = new TextUnit("P1C1D3-tu1");
+		ITextUnit tu1 = new TextUnit("P1C1D3-tu1");
 		tu1.setSource(new TextContainer("Source"));
 		
 		GenericSkeleton skel2 = new GenericSkeleton();
@@ -454,7 +455,7 @@ public class ResourceSimplifierTest {
 		assertEquals("Prefix", ev.getResource().toString());
 		
 		ev = itr.next();
-		assertTrue(ev.getResource() instanceof TextUnit);
+		assertTrue(ev.getResource() instanceof ITextUnit);
 		assertEquals("Source", ev.getResource().toString());
 		
 		ev = itr.next();
@@ -464,14 +465,14 @@ public class ResourceSimplifierTest {
 	
 	@Test // No refs, the original TU is returned
 	public void testTu_NonGenericSkeleton() throws IOException {
-		TextUnit tu1 = new TextUnit("P1C1D3-tu1");
+		ITextUnit tu1 = new TextUnit("P1C1D3-tu1");
 		tu1.setSource(new TextContainer("Source"));		
 		tu1.setSkeleton(createZipSkeleton());
 		
 		ResourceSimplifier rs = new ResourceSimplifier(ENUS);
 		Event event = rs.convert(new Event(EventType.TEXT_UNIT, tu1));
 		assertNotNull(event);
-		assertTrue(event.getResource() instanceof TextUnit);
+		assertTrue(event.getResource() instanceof ITextUnit);
 	}
 	
 	@Test
@@ -486,7 +487,7 @@ public class ResourceSimplifierTest {
 		skel.add(">");
 		dp1.setSourceProperty(new Property("href", "{0}"));
 		
-		TextUnit tu1 = new TextUnit("P1C1D3-tu1");
+		ITextUnit tu1 = new TextUnit("P1C1D3-tu1");
 		TextContainer tc = new TextContainer();
 		tu1.setSource(tc);
 		TextFragment tf = new TextFragment();
@@ -506,8 +507,8 @@ public class ResourceSimplifierTest {
 		rs.convert(new Event(EventType.DOCUMENT_PART, dp1)); // To register the referent
 		Event event = rs.convert(new Event(EventType.TEXT_UNIT, tu1));
 		assertNotNull(event);
-		assertTrue(event.getResource() instanceof TextUnit);
-		TextUnit tu = (TextUnit) event.getResource();
+		assertTrue(event.getResource() instanceof ITextUnit);
+		ITextUnit tu = event.getTextUnit();
 		assertEquals("<b>Javascript is not enabled on your internet browser.</b>" +
 				"<br/><br/>FamilySearch Indexing requires Javascript to operate properly.  Please click" +
 				"<a id=\"jsHelplink\" href=\"{0}\">here </a> for instructions on enabling this browser feature.", 
@@ -529,7 +530,7 @@ public class ResourceSimplifierTest {
 		skel1.add(">");
 		dp1.setSourceProperty(new Property("href", "{0}"));
 		
-		TextUnit tu1 = new TextUnit("P1C1D3-tu1");
+		ITextUnit tu1 = new TextUnit("P1C1D3-tu1");
 		GenericSkeleton skel2 = new GenericSkeleton();
 		tu1.setSkeleton(skel2);
 		skel2.add("Prefix");
@@ -566,7 +567,7 @@ public class ResourceSimplifierTest {
 		assertEquals("Prefix", ev.getResource().toString());
 		
 		ev = itr.next();
-		assertTrue(ev.getResource() instanceof TextUnit);
+		assertTrue(ev.getResource() instanceof ITextUnit);
 		assertEquals("<b>Javascript is not enabled on your internet browser.</b>" +
 				"<br/><br/>FamilySearch Indexing requires Javascript to operate properly.  Please click" +
 				"<a id=\"jsHelplink\" href=\"{0}\">here </a> for instructions on enabling this browser feature.", 

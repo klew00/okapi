@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -193,7 +193,7 @@ public class Writer extends BaseWriter {
 			processEndGroup((Ending)event.getResource());
 			break;
 		case TEXT_UNIT:
-			processTextUnit((TextUnit)event.getResource());
+			processTextUnit(event.getTextUnit());
 			break;
 		}
 		return event;
@@ -288,7 +288,7 @@ public class Writer extends BaseWriter {
 		writer.writeEndElementLineBreak(); // group
 	}
 	
-	private void processTextUnit (TextUnit tu) {
+	private void processTextUnit (ITextUnit tu) {
 		// Check if we need to set the entry as non-translatable
 		if ( options.setApprovedAsNoTranslate ) {
 			Property prop = tu.getTargetProperty(trgLoc, Property.APPROVED);
@@ -359,7 +359,7 @@ public class Writer extends BaseWriter {
 		
 		// At this point tc contains the source
 		// Do we have an available target to use instead?
-		tc = tu.getTarget(trgLoc);
+		tc = tu.getTarget(trgLoc, false);
 		if ( useSourceForTranslated || ( tc == null ) || ( tc.isEmpty() )
 			|| ( srcHasText && !tc.hasText(false) )) {
 			tc = tu.getSource(); // Fall back to source
@@ -383,7 +383,7 @@ public class Writer extends BaseWriter {
 		
 		// Alt-trans
 		if ( options.includeAltTrans ) {
-			tc = tu.getTarget(trgLoc);
+			tc = tu.getTarget(trgLoc, false);
 			if ( tc != null ) {
 				writeAlternates(tc.getAnnotation(AltTranslationsAnnotation.class), null);
 				for ( Segment seg : tc.getSegments() ) {

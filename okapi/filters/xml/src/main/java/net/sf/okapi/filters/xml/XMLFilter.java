@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -50,6 +50,7 @@ import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
@@ -603,7 +604,7 @@ public class XMLFilter implements IFilter {
 		boolean addToSkeleton)
 	{
 		String id = String.valueOf(++tuId);
-		TextUnit tu = new TextUnit(id, attr.getValue(), true, MimeTypeMapper.XML_MIME_TYPE);
+		ITextUnit tu = new TextUnit(id, attr.getValue(), true, MimeTypeMapper.XML_MIME_TYPE);
 
 		// Deal with inline codes if needed
 		if ( params.useCodeFinder ) {
@@ -742,7 +743,7 @@ public class XMLFilter implements IFilter {
 			return false;
 		}
 		// Create the unit
-		TextUnit tu = new TextUnit(String.valueOf(++tuId));
+		ITextUnit tu = new TextUnit(String.valueOf(++tuId));
 		tu.setMimeType(MimeTypeMapper.XML_MIME_TYPE);
 		
 		// Deal with inline codes if needed

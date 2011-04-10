@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -51,7 +51,7 @@ import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
@@ -119,8 +119,8 @@ public class FilterTestDriver {
 			break;
 
 		case TEXT_UNIT:
-			TextUnit mtu = (TextUnit) mr;
-			TextUnit gtu = (TextUnit) gr;
+			ITextUnit mtu = (ITextUnit)mr;
+			ITextUnit gtu = (ITextUnit)gr;
 
 			// Resource-level properties
 			if (!(mtu.getPropertyNames().equals(gtu.getPropertyNames()))) {
@@ -300,8 +300,8 @@ public class FilterTestDriver {
 			break;
 
 		case TEXT_UNIT:
-			TextUnit tu = (TextUnit) manual.getResource();
-			if (!compareTextUnit(tu, (TextUnit) generated.getResource())) {
+			ITextUnit tu = manual.getTextUnit();
+			if (!compareTextUnit(tu, generated.getTextUnit())) {
 				System.err.println("Text unit difference, tu id=" + tu.getId());
 				return false;
 			}
@@ -482,7 +482,7 @@ public class FilterTestDriver {
 				printSkeleton(event.getResource());
 				break;
 			case TEXT_UNIT:
-				TextUnit tu = (TextUnit) event.getResource();
+				ITextUnit tu = event.getTextUnit();
 				if (displayLevel < 1)
 					break;
 				printTU(tu);
@@ -522,11 +522,11 @@ public class FilterTestDriver {
 		return ok;
 	}
 
-	private void printTU(TextUnit tu) {
+	private void printTU (ITextUnit tu) {
 		System.out.println("---Text Unit");
 		System.out.println("S=[" + tu.toString() + "]");
 		for (LocaleId lang : tu.getTargetLocales()) {
-			System.out.println("T(" + lang + ")=[" + tu.getTarget(lang).toString() + "]");
+			System.out.println("T(" + lang + ")=[" + tu.getTarget(lang, false).toString() + "]");
 		}
 	}
 
@@ -669,7 +669,7 @@ public class FilterTestDriver {
 				tmp.append(skelWriter.processEndSubDocument((Ending) event.getResource()));
 				break;
 			case TEXT_UNIT:
-				TextUnit tu = (TextUnit) event.getResource();
+				ITextUnit tu = event.getTextUnit();
 				if (changeTarget) {
 					TextContainer tc = tu.createTarget(trgLang, false, IResource.COPY_ALL);
 					TextFragment tf = tc.getFirstContent();
@@ -694,7 +694,7 @@ public class FilterTestDriver {
 		return tmp.toString();
 	}
 
-	public static TextUnit getTextUnit(IFilter filter, InputDocument doc, String defaultEncoding,
+	public static ITextUnit getTextUnit(IFilter filter, InputDocument doc, String defaultEncoding,
 			LocaleId srcLang, LocaleId trgLang, int tuNumber) {
 		try {
 			// Load parameters if needed
@@ -720,7 +720,7 @@ public class FilterTestDriver {
 				switch (event.getEventType()) {
 				case TEXT_UNIT:
 					if (++num == tuNumber) {
-						return (TextUnit) event.getResource();
+						return event.getTextUnit();
 					}
 					break;
 				}
@@ -783,12 +783,12 @@ public class FilterTestDriver {
 	 *            The number of the unit to return: 1 for the first one, 2 for the second, etc.
 	 * @return The text unit found, or null.
 	 */
-	public static TextUnit getTextUnit(List<Event> list, int tuNumber) {
+	public static ITextUnit getTextUnit (List<Event> list, int tuNumber) {
 		int n = 0;
 		for (Event event : list) {
 			if (event.getEventType() == EventType.TEXT_UNIT) {
 				if (++n == tuNumber) {
-					return (TextUnit) event.getResource();
+					return event.getTextUnit();
 				}
 			}
 		}
@@ -874,7 +874,7 @@ public class FilterTestDriver {
 		return null;
 	}
 
-	public static boolean compareTextUnit(TextUnit tu1, TextUnit tu2) {
+	public static boolean compareTextUnit(ITextUnit tu1, ITextUnit tu2) {
 		if (!compareINameable(tu1, tu2)) {
 			System.err.println("Difference in INameable");
 			return false;

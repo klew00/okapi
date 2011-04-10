@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -29,7 +29,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.InputDocument;
@@ -99,7 +99,7 @@ public class MosesTextFilterTest {
 	@Test
 	public void testEntry () {
 		String snippet = "Line 1\rLine 2";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 2);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 2);
 		assertNotNull(tu);
 		assertEquals("Line 2", tu.getSource().toString());
 	}
@@ -107,7 +107,7 @@ public class MosesTextFilterTest {
 	@Test
 	public void testCode1 () {
 		String snippet = "Text <x id='1'/>";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
 		assertEquals(snippet, tu.getSource().toString());
 		assertEquals("Text <1/>", fmt.setContent(tu.getSource().getFirstContent()).toString());
@@ -116,7 +116,7 @@ public class MosesTextFilterTest {
 	@Test
 	public void testCode2 () {
 		String snippet = "<g id='2'>Text</g> <x id='1'/>";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
 		assertEquals(snippet, tu.getSource().toString());
 		assertEquals("<2>Text</2> <1/>", fmt.setContent(tu.getSource().getFirstContent()).toString());
@@ -125,7 +125,7 @@ public class MosesTextFilterTest {
 	@Test
 	public void testCode3 () {
 		String snippet = "<g id='1'>Text</g><x id='2'/><g id='3'>t2<x id='4'/><g id='5'>t3</g></g>";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
 		assertEquals(snippet, tu.getSource().toString());
 		assertEquals("<1>Text</1><2/><3>t2<4/><5>t3</5></3>", fmt.setContent(tu.getSource().getFirstContent()).toString());
@@ -134,7 +134,7 @@ public class MosesTextFilterTest {
 	@Test
 	public void testCode4 () {
 		String snippet = "<bx id='1'/>T1<x id='2'/>T2<ex id='3'/>";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
 		assertEquals(snippet, tu.getSource().toString());
 		assertEquals("<b1/>T1<2/>T2<e3/>", fmt.setContent(tu.getSource().getFirstContent()).toString());
@@ -144,7 +144,7 @@ public class MosesTextFilterTest {
 	public void testSpecialChars () {
 		// Note '<' should really be escaped, but we support it anyway
 		String snippet = "Line 1\rLine 2 with tab[\t] and more [<{|&/\\}>]";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 2);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 2);
 		assertNotNull(tu);
 		assertEquals("Line 2 with tab[\t] and more [<{|&/\\}>]", tu.getSource().toString());
 	}
@@ -152,7 +152,7 @@ public class MosesTextFilterTest {
 	@Test
 	public void testLiterals () {
 		String snippet = "&lt;=lt, &gt;=gt, &quot;=quot, &apos;=apos, &amp;=amp, &#x00d;&#13;=U+D";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
 		assertEquals("<=lt, >=gt, \"=quot, '=apos, &=amp, \r\r=U+D", tu.getSource().toString());
 	}
@@ -160,7 +160,7 @@ public class MosesTextFilterTest {
 	@Test
 	public void testWhiteSpaces () {
 		String snippet = "Text 1   .\r<mrk mtype=\"seg\">Line 1\r\rLine 2</mrk>";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
 		assertEquals("Text 1   .", tu.getSource().toString());
 		assertTrue(tu.preserveWhitespaces());
@@ -172,7 +172,7 @@ public class MosesTextFilterTest {
 	
 	@Test
 	public void testFromFile () {
-		TextUnit tu = FilterTestDriver.getTextUnit(getEventsFromFile(filter, root+"/Test01.txt", locPT), 2);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEventsFromFile(filter, root+"/Test01.txt", locPT), 2);
 		assertNotNull(tu);
 		assertEquals("This is a test on line 1,\nand line two.", tu.getSource().toString());
 	}

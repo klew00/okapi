@@ -25,10 +25,10 @@ import net.sf.okapi.common.filterwriter.ILayerProvider;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubDocument;
-import net.sf.okapi.common.resource.TextUnit;
 
 /**
  * Provides the methods common to all skeleton writers.
@@ -95,7 +95,7 @@ public interface ISkeletonWriter {
 	 * @param resource the TextUnit resource associated with the event.
 	 * @return the string output corresponding to this event.
 	 */
-	public String processTextUnit (TextUnit resource);
+	public String processTextUnit (ITextUnit resource);
 	
 	/**
 	 * Processes the DOCUMENT_PART event.

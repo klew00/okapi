@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -52,6 +52,7 @@ import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.Segment;
@@ -89,7 +90,7 @@ public class TTXFilter implements IFilter {
 	private LinkedList<Event> queue;
 	private boolean canceled;
 	private GenericSkeleton skel;
-	private TextUnit tu;
+	private ITextUnit tu;
 	private Parameters params;
 	//private boolean sourceDone;
 	//private boolean targetDone;

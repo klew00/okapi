@@ -32,10 +32,10 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.segmentation.SRXDocument;
 
 @UsingParameters(Parameters.class)
@@ -155,7 +155,7 @@ public class SegmentationStep extends BasePipelineStep {
 	
 	@Override
 	protected Event handleTextUnit (Event event) {
-		TextUnit tu = (TextUnit)event.getResource();
+		ITextUnit tu = event.getTextUnit();
 		// Skip non-translatable
 		if ( !tu.isTranslatable() ) return event;
 
@@ -166,7 +166,7 @@ public class SegmentationStep extends BasePipelineStep {
 			}
 		}
 		
-		TextContainer trgCont = tu.getTarget(targetLocale);
+		TextContainer trgCont = tu.getTarget(targetLocale, false);
 
 		// Segment target if requested
 		if ( params.segmentTarget && ( trgCont != null )) {

@@ -8,6 +8,7 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.resource.ISegments;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
@@ -76,33 +77,33 @@ public class QueryManagerTest {
 	
 	@Test
 	public void leverageNoFill() {
-		TextUnit tu = new TextUnit("1");
+		ITextUnit tu = new TextUnit("1");
 		tu.setSourceContent(new TextFragment("Elephants cannot fly."));
 		qm.leverage(tu, 999, false);
 		
-		Assert.assertEquals("", tu.getTarget(locFRFR).toString());
+		Assert.assertEquals("", tu.getTarget(locFRFR, false).toString());
 		
-		AltTranslationsAnnotation a = tu.getTarget(locFRFR).getAnnotation(AltTranslationsAnnotation.class);
+		AltTranslationsAnnotation a = tu.getTarget(locFRFR, false).getAnnotation(AltTranslationsAnnotation.class);
 		Assert.assertNotNull(a);		
 		Assert.assertEquals("Les \u00e9l\u00e9phants ne peuvent pas voler.", a.getFirst().getTarget().toString());
 	}
 	
 	@Test
 	public void leverageFill() {
-		TextUnit tu = new TextUnit("1");
+		ITextUnit tu = new TextUnit("1");
 		tu.setSourceContent(new TextFragment("Elephants cannot fly."));
 		qm.leverage(tu, 1, false);
 		
-		Assert.assertEquals("Les \u00e9l\u00e9phants ne peuvent pas voler.", tu.getTarget(locFRFR).toString());
+		Assert.assertEquals("Les \u00e9l\u00e9phants ne peuvent pas voler.", tu.getTarget(locFRFR, false).toString());
 		
-		AltTranslationsAnnotation a = tu.getTarget(locFRFR).getAnnotation(AltTranslationsAnnotation.class);
+		AltTranslationsAnnotation a = tu.getTarget(locFRFR, false).getAnnotation(AltTranslationsAnnotation.class);
 		Assert.assertNotNull(a);		
 		Assert.assertEquals("Les \u00e9l\u00e9phants ne peuvent pas voler.", a.getFirst().getTarget().toString());
 	}
 
 	@Test
 	public void leverageFillSeveralSegments () {
-		TextUnit tu = new TextUnit("1");
+		ITextUnit tu = new TextUnit("1");
 		TextContainer tc = new TextContainer("Elephants cannot fly.");
 		tc.getSegments().append(new Segment("s2", new TextFragment("Except Dumbo!")), " ");
 		tu.setSource(tc);
@@ -111,7 +112,7 @@ public class QueryManagerTest {
 		
 		qm.leverage(tu, 1, false);
 		
-		segs = tu.getTarget(locFRFR).getSegments();
+		segs = tu.getTarget(locFRFR, false).getSegments();
 		assertEquals(2, segs.count());
 		assertEquals("Les \u00e9l\u00e9phants ne peuvent pas voler.", segs.get(0).text.toText());
 		assertEquals("", segs.get(1).text.toText());

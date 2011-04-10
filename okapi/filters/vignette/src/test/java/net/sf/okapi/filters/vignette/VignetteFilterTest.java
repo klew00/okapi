@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -34,8 +34,8 @@ import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.resource.TextUnit;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -76,7 +76,7 @@ public class VignetteFilterTest {
 	@Test
 	public void testSimpleEntry () {
 		String snippet = createSimpleDoc();
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locENUS, locESES), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locENUS, locESES), 1);
 		assertNotNull(tu);
 		assertEquals("ENtext", tu.getSource().toString());
 	}
@@ -107,7 +107,7 @@ public class VignetteFilterTest {
 	public void testComplexEntry () {
 		String snippet = createComplexDoc();
 		// Order is driven by the targets
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locENUS, locESES), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locENUS, locESES), 1);
 		assertNotNull(tu);
 		assertEquals("EN-id1", tu.getSource().toString());
 		tu = FilterTestDriver.getTextUnit(getEvents(snippet, locENUS, locESES), 2);

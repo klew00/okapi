@@ -8,6 +8,7 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
@@ -30,7 +31,7 @@ public class TestFields {
 		Ending ed;
 		Event sdEvent, edEvent;
 		Event sbEvent, ebEvent;
-		TextUnit tu1, tu2, tu3, tu4;
+		ITextUnit tu1, tu2, tu3, tu4;
 		Event tuEvent1, tuEvent2, tuEvent3, tuEvent4;
 		Logger logger = Logger.getLogger(getClass().getName());
 		

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -27,6 +27,7 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextUnit;
 
 /**
@@ -44,7 +45,7 @@ public class AltTranslation implements Comparable<AltTranslation> {
 
 	LocaleId srcLocId;
 	LocaleId trgLocId;
-	TextUnit tu;
+	ITextUnit tu;
 	MatchType type;
 	int score;
 	String origin;
@@ -103,7 +104,7 @@ public class AltTranslation implements Comparable<AltTranslation> {
 	 * @return the target content of this entry.
 	 */
 	public TextContainer getTarget () {
-		return tu.getTarget(trgLocId);
+		return tu.getTarget(trgLocId, false);
 	}
 
 	/**
@@ -172,7 +173,7 @@ public class AltTranslation implements Comparable<AltTranslation> {
 	 * 
 	 * @return the text unit for this entry.
 	 */
-	public TextUnit getEntry () {
+	public ITextUnit getEntry () {
 		return tu;
 	}
 

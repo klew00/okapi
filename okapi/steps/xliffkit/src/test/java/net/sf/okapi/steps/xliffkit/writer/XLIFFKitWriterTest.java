@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -47,10 +47,10 @@ import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.observer.IObservable;
 import net.sf.okapi.common.observer.IObserver;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.filters.table.TableFilter;
@@ -199,7 +199,7 @@ public class XLIFFKitWriterTest {
 		filter.open(new RawDocument(input, "UTF-8", LocaleId.ENGLISH, LocaleId.FRENCH));
 		
 		Event event = null;
-		TextUnit tu = null;
+		ITextUnit tu = null;
 
 		while (filter.hasNext()) {
 			event = filter.next();
@@ -799,25 +799,25 @@ public class XLIFFKitWriterTest {
 //------------------------
 	
 		
-		TextUnit tu1 = TextUnitUtil.buildTU("source-text1" + (char) 2 + '"' + " : " + '"' + 
+		ITextUnit tu1 = TextUnitUtil.buildTU("source-text1" + (char) 2 + '"' + " : " + '"' + 
 			'{' + '"' + "ssssss " + ':' + '"' + "ddddd" + "}:" + '<' + '>' + "sssddd: <>dsdd");
 		
-		TextUnit tu2 = TextUnitUtil.buildTU("source-text2" + (char) 2 + '"' + " : " + '"' + 
+		ITextUnit tu2 = TextUnitUtil.buildTU("source-text2" + (char) 2 + '"' + " : " + '"' + 
 				'{' + '"' + "ssssss " + ':' + '"' + "ddddd" + "}:" + '<' + '>' + "sssddd: <>dsdd");
 		
-		TextUnit tu3 = TextUnitUtil.buildTU("source-text3" + (char) 2 + '"' + " : " + '"' + 
+		ITextUnit tu3 = TextUnitUtil.buildTU("source-text3" + (char) 2 + '"' + " : " + '"' + 
 				'{' + '"' + "ssssss " + ':' + '"' + "ddddd" + "}:" + '<' + '>' + "sssddd: <>dsdd");
 		
-		TextUnit tu4 = TextUnitUtil.buildTU("source-text4" + (char) 2 + '"' + " : " + '"' + 
+		ITextUnit tu4 = TextUnitUtil.buildTU("source-text4" + (char) 2 + '"' + " : " + '"' + 
 				'{' + '"' + "ssssss " + ':' + '"' + "ddddd" + "}:" + '<' + '>' + "sssddd: <>dsdd");
 		
-		TextUnit tu5 = TextUnitUtil.buildTU("source-text5" + (char) 2 + '"' + " : " + '"' + 
+		ITextUnit tu5 = TextUnitUtil.buildTU("source-text5" + (char) 2 + '"' + " : " + '"' + 
 				'{' + '"' + "ssssss " + ':' + '"' + "ddddd" + "}:" + '<' + '>' + "sssddd: <>dsdd");
 		
-		TextUnit tu6 = TextUnitUtil.buildTU("source-text6" + (char) 2 + '"' + " : " + '"' + 
+		ITextUnit tu6 = TextUnitUtil.buildTU("source-text6" + (char) 2 + '"' + " : " + '"' + 
 				'{' + '"' + "ssssss " + ':' + '"' + "ddddd" + "}:" + '<' + '>' + "sssddd: <>dsdd");
 		
-		TextUnit tu7 = TextUnitUtil.buildTU("source-text7" + (char) 2 + '"' + " : " + '"' + 
+		ITextUnit tu7 = TextUnitUtil.buildTU("source-text7" + (char) 2 + '"' + " : " + '"' + 
 				'{' + '"' + "ssssss " + ':' + '"' + "ddddd" + "}:" + '<' + '>' + "sssddd: <>dsdd");
 
 		tu1.setTarget(FRFR, new TextContainer("french-text1"));
@@ -927,10 +927,10 @@ public class XLIFFKitWriterTest {
 //------------------------
 	
 		
-		TextUnit tu1 = TextUnitUtil.buildTU("source-text1" + (char) 2 + '"' + " : " + '"' + 
+		ITextUnit tu1 = TextUnitUtil.buildTU("source-text1" + (char) 2 + '"' + " : " + '"' + 
 			'{' + '"' + "ssssss " + ':' + '"' + "ddddd" + "}:" + '<' + '>' + "sssddd: <>dsdd");
 		
-		TextUnit tu2 = TextUnitUtil.buildTU("source-text2" + (char) 2 + '"' + " : " + '"' + 
+		ITextUnit tu2 = TextUnitUtil.buildTU("source-text2" + (char) 2 + '"' + " : " + '"' + 
 				'{' + '"' + "ssssss " + ':' + '"' + "ddddd" + "}:" + '<' + '>' + "sssddd: <>dsdd");
 		
 		GenericSkeleton skel1 = new GenericSkeleton();

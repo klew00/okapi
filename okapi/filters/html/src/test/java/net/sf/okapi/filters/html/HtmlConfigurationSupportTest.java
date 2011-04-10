@@ -7,7 +7,7 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.filters.html.HtmlFilter;
 
 import org.junit.Test;
@@ -25,7 +25,7 @@ public class HtmlConfigurationSupportTest {
 		String config = "preserve_whitespace: false";
 		filter.setParameters(new Parameters(config));
 		String snippet = "<p> t1  \nt2  </p>";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
 		assertEquals("t1 t2", tu.getSource().toString());
 
 		config = "preserve_whitespace: true";
@@ -43,7 +43,7 @@ public class HtmlConfigurationSupportTest {
 			    "    ruleTypes: [PRESERVE_WHITESPACE]";
 		filter.setParameters(new Parameters(config));
 		String snippet = "<p> t1  \nt2  </p><pre> t3  \nt4  </pre>";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
 		assertEquals("t1 t2", tu.getSource().toString());
 		tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 2);
 		assertEquals(" t3  \nt4  ", tu.getSource().toString());
@@ -57,7 +57,7 @@ public class HtmlConfigurationSupportTest {
 			    "    ruleTypes: [EXCLUDE]";
 		filter.setParameters(new Parameters(config));
 		String snippet = "<pre>t1</pre><p>t2</p>";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
 		assertEquals("t2", tu.getSource().toString());
 	}
 
@@ -71,7 +71,7 @@ public class HtmlConfigurationSupportTest {
 			"    ruleTypes: [INCLUDE]";
 		filter.setParameters(new Parameters(config));
 		String snippet = "<pre>t1<b>t2</b>t3</pre><p>t4</p>";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
 		assertEquals("t2", tu.getSource().toString());
 		tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 2);
 		assertEquals("t4", tu.getSource().toString());
@@ -86,7 +86,7 @@ public class HtmlConfigurationSupportTest {
 			    "    conditions: [x, EQUALS, 'true']";
 		filter.setParameters(new Parameters(config));
 		String snippet = "<pre x = \"true\">t1</pre><p>t2</p>";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
 		assertEquals("t2", tu.getSource().toString());
 	}
 
@@ -99,7 +99,7 @@ public class HtmlConfigurationSupportTest {
 			    "    conditions: [x, EQUALS, 'true']";
 		filter.setParameters(new Parameters(config));
 		String snippet = "<p><b x=\"true\">t2</b></p>";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
 		assertEquals("<b x=\"true\">t2</b>", tu.getSource().toString());
 	}
 	
@@ -112,7 +112,7 @@ public class HtmlConfigurationSupportTest {
 			    "    conditions: [x, EQUALS, 'true']";
 		filter.setParameters(new Parameters(config));
 		String snippet = "<p>t2<b>test</b></p>";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
 		assertEquals("t2", tu.getSource().toString());
 		tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 2);
 		assertEquals("test", tu.getSource().toString());
@@ -127,7 +127,7 @@ public class HtmlConfigurationSupportTest {
 			    "    conditions: [x, EQUALS, 'true']";
 		filter.setParameters(new Parameters(config));
 		String snippet = "<p><b x=\"false\">t2</b></p>";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
 		assertEquals("t2", tu.getSource().toString());
 	}
 	
@@ -140,7 +140,7 @@ public class HtmlConfigurationSupportTest {
 			    "    conditions: [x, EQUALS, 'false']";
 		filter.setParameters(new Parameters(config));
 		String snippet = "<pre x =\"true\">t1</pre><p>t2</p>";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
 		assertEquals("t1", tu.getSource().toString());
 	}
 	
@@ -157,7 +157,7 @@ public class HtmlConfigurationSupportTest {
 			"    ruleTypes: [TEXTUNIT]\n";
 		filter.setParameters(new Parameters(config));
 		String snippet = "<p id='id1'>t1</p><pre id='id2'>t2</pre>";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
 		assertEquals("t1", tu.getSource().toString());
 		assertEquals("id1-id", tu.getName());
 		tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 2);
@@ -174,7 +174,7 @@ public class HtmlConfigurationSupportTest {
 			"    idAttributes: [id, 'xml:id']";
 		filter.setParameters(new Parameters(config));
 		String snippet = "<p id='id1'>t1</p><p xml:id='id2'>t2</p>";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
 		assertEquals("t1", tu.getSource().toString());
 		assertEquals("id1-id", tu.getName());
 		tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 2);
@@ -191,7 +191,7 @@ public class HtmlConfigurationSupportTest {
 			"    conditions: [x, MATCHES, 'ABZ']";
 		filter.setParameters(new Parameters(config));
 		String snippet = "<p x='ABZ'>t1</p><p x='ZBA'>t2</p>";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
 		assertEquals("t2", tu.toString());		
 	}
 	
@@ -204,7 +204,7 @@ public class HtmlConfigurationSupportTest {
 			"    allElementsExcept: [elem2, elem3]";
 		filter.setParameters(new Parameters(config));
 		String snippet = "<elem1 alt='t1'>t2</elem1><elem2 alt='t3'>t4</elem2><elem3 alt='t5'>t6</elem3>";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
 		assertEquals("t1", tu.getSource().toString()); // alt
 		tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 2);
 		assertEquals("t2", tu.getSource().toString());
@@ -223,7 +223,7 @@ public class HtmlConfigurationSupportTest {
 			"    onlyTheseElements: [elem1, elem3]"; // only in elem1 and elem3, not elem2
 		filter.setParameters(new Parameters(config));
 		String snippet = "<elem1 alt='t1'>t2</elem1><elem2 alt='t3'>t4</elem2><elem3 alt='t5'>t6</elem3>";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
 		assertEquals("t1", tu.getSource().toString()); // alt of elem1
 		tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 2);
 		assertEquals("t2", tu.getSource().toString()); // elem1
@@ -244,7 +244,7 @@ public class HtmlConfigurationSupportTest {
 			"    translatableAttributes: {alt: [attr1, EQUALS, trans]}";
 		filter.setParameters(new Parameters(config));
 		String snippet = "<p alt='t1' attr1='NOTRANS'>t2</p><p alt='t-alt' attr1='trans'>t4</p>";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 2);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 2);
 		assertEquals("t-alt", tu.getSource().toString());
 	}
 	
@@ -257,7 +257,7 @@ public class HtmlConfigurationSupportTest {
 			"    translatableAttributes: {alt: [[attr1, EQUALS, trans], [attr2, EQUALS, 'yes']]}";
 		filter.setParameters(new Parameters(config));
 		String snippet = "<p alt='t-alt1' attr2='yes'>t2</p><p alt='t-alt2' attr1='trans'>t4</p>";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
 		assertEquals("t-alt1", tu.getSource().toString());
 		tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 3);
 		assertEquals("t-alt2", tu.getSource().toString());
@@ -275,7 +275,7 @@ public class HtmlConfigurationSupportTest {
 		filter.setParameters(new Parameters(config));
 		String snippet = "<p dir='rtl'>t1</p><pre dir='ltr'>t2</pre>";
 		// p is defined as TEXTUNIT so the property is with the TU
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
 		assertEquals("t1", tu.getSource().toString());
 		assertNotNull(tu.getSource().getProperty("dir"));
 		assertEquals("rtl", tu.getSource().getProperty("dir").getValue());
@@ -297,12 +297,12 @@ public class HtmlConfigurationSupportTest {
 		filter.setParameters(new Parameters(config));
 		String snippet = "<p dir='rtl'>t1</p><pre dir='ltr'>t2</pre>";
 		// p is defined as TEXTUNIT so the property is with the TU
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
 		assertEquals("t1", tu.getSource().toString());
 		assertNotNull(tu.getSource().getProperty("dir"));
 		assertEquals("rtl", tu.getSource().getProperty("dir").getValue());
 		// pre is also defined as TEXTUNIT 
-		TextUnit tu2 = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 2);
+		ITextUnit tu2 = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 2);
 		assertEquals("t2", tu2.getSource().toString());
 		assertNotNull(tu2.getSource().getProperty("dir"));
 		assertEquals("ltr", tu2.getSource().getProperty("dir").getValue());

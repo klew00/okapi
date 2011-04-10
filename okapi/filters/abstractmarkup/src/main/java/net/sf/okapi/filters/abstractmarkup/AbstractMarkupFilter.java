@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -66,7 +66,7 @@ import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.filters.abstractmarkup.ExtractionRuleState.RuleType;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
@@ -435,7 +435,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 * implementation leaves Event unchanged. Override this method if you need to do format specific handing such as
 	 * collapsing whitespace.
 	 */
-	protected void postProcessTextUnit(TextUnit textUnit) {
+	protected void postProcessTextUnit (ITextUnit textUnit) {
 	}
 
 	/**
@@ -571,7 +571,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 				// we assume the CDATA is plain text take it as is
 				startTextUnit(new GenericSkeleton("<![CDATA["));
 				addToTextUnit(cdataWithoutMarkers);
-				setTextUnitType(TextUnit.TYPE_CDATA);
+				setTextUnitType(ITextUnit.TYPE_CDATA);
 				setTextUnitMimeType(MimeTypeMapper.PLAIN_TEXT_MIME_TYPE);			
 				endTextUnit(new GenericSkeleton("]]>"));
 			}
@@ -725,7 +725,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		} finally {
 			// A TextUnit may have already been created. Update its preserveWS field
 			if (eventBuilder.isCurrentTextUnit()) {
-				TextUnit tu = eventBuilder.peekMostRecentTextUnit();
+				ITextUnit tu = eventBuilder.peekMostRecentTextUnit();
 				tu.setPreserveWhitespaces(ruleState.isPreserveWhitespaceState());
 			}
 		}

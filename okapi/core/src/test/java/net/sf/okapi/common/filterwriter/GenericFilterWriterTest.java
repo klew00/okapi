@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -35,6 +35,7 @@ import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
@@ -70,7 +71,7 @@ public class GenericFilterWriterTest {
 		events.add(new Event(EventType.START_DOCUMENT, sd));
 		
 		GenericSkeleton skel_tu3 = new GenericSkeleton("<p>");
-		TextUnit tu3 = new TextUnit("tu3", "Text before list:");
+		ITextUnit tu3 = new TextUnit("tu3", "Text before list:");
 		tu3.setSkeleton(skel_tu3);
 		skel_tu3.addContentPlaceholder(tu3);
 	
@@ -86,7 +87,7 @@ public class GenericFilterWriterTest {
 		events.add(new Event(EventType.START_GROUP, sg1));
 
 		GenericSkeleton skel_tu1 = new GenericSkeleton("<li>");
-		TextUnit tu1 = new TextUnit("tu1", "Text of item 1");		
+		ITextUnit tu1 = new TextUnit("tu1", "Text of item 1");		
 		tu1.setSkeleton(skel_tu1);
 		skel_tu1.addContentPlaceholder(tu1);
 		skel_tu1.append("</li>");
@@ -95,7 +96,7 @@ public class GenericFilterWriterTest {
 		events.add(new Event(EventType.TEXT_UNIT, tu1));
 				
 		GenericSkeleton skel_tu2 = new GenericSkeleton("<li>");
-		TextUnit tu2 = new TextUnit("tu2", "Text of item 2");		
+		ITextUnit tu2 = new TextUnit("tu2", "Text of item 2");		
 		tu2.setSkeleton(skel_tu2);
 		skel_tu2.addContentPlaceholder(tu2);
 		skel_tu2.append("</li>");
@@ -125,7 +126,7 @@ public class GenericFilterWriterTest {
 	
 	@Test
 	public void testSourceTargetSkeleton () {
-		TextUnit tu = new TextUnit("tu1");
+		ITextUnit tu = new TextUnit("tu1");
 		tu.setSourceContent(new TextFragment("src"));
 		tu.setTargetContent(locFR, new TextFragment("trg"));
 		Event textUnitEvent = new Event(EventType.TEXT_UNIT, tu);
@@ -154,7 +155,7 @@ public class GenericFilterWriterTest {
 
 	@Test
 	public void testTextUnitReferenceInDocumentPart () {
-		TextUnit tu = new TextUnit("tu1");
+		ITextUnit tu = new TextUnit("tu1");
 		tu.setSourceContent(new TextFragment("text"));
 		tu.setIsReferent(true);
 		Event textUnitEvent = new Event(EventType.TEXT_UNIT, tu);

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2010 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -34,8 +34,8 @@ import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.LocaleId;
 
 import org.junit.Before;
@@ -70,7 +70,7 @@ public class VersifiedTxtFilterTest {
 	@Test
 	public void testSimpleVerse() {
 		String snippet = "|v1\nThis is a test.";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
 		assertEquals("This is a test.\n", tu.getSource().toString());
 		assertEquals("::1", tu.getName());
@@ -79,7 +79,7 @@ public class VersifiedTxtFilterTest {
 	@Test
 	public void testSimpleBookChapterVerse() {
 		String snippet = "|bbook\n|cchapter\n|v1\nThis is a test.";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
 		assertEquals("This is a test.\n", tu.getSource().toString());
 		assertEquals("book:chapter:1", tu.getName());
@@ -106,7 +106,7 @@ public class VersifiedTxtFilterTest {
 	@Test
 	public void testSimplePlaceholders() {
 		String snippet = "|bbook\n|cchapter\n|v1\n{1}This is {2}a test{3}";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
 		assertEquals("{1}This is {2}a test{3}\n", tu.getSource().toString());
 		assertEquals("book:chapter:1", tu.getName());
@@ -115,7 +115,7 @@ public class VersifiedTxtFilterTest {
 	@Test
 	public void testEmptyVerses() {
 		String snippet = "|bbook\n|cchapter\n|v1\n|v2\n";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
 		assertEquals("", tu.getSource().toString());
 		

@@ -26,11 +26,11 @@ import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextPart;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 
@@ -48,7 +48,7 @@ public class TTXSkeletonWriter extends GenericSkeletonWriter {
 	}
 	
 	@Override
-	public String processTextUnit (TextUnit tu) {
+	public String processTextUnit (ITextUnit tu) {
 		if ( tu == null ) return "";
 		// Update the encoder from the TU's MIME type
 		if ( encoderManager != null ) {
@@ -73,7 +73,7 @@ public class TTXSkeletonWriter extends GenericSkeletonWriter {
 		
 		TextContainer trgCont;
 		if ( tu.hasTarget(outputLoc) ) {
-			trgCont = tu.getTarget(outputLoc);
+			trgCont = tu.getTarget(outputLoc, false);
 			if ( !trgCont.hasBeenSegmented() ) {
 				trgCont = trgCont.clone();
 				trgCont.setHasBeenSegmentedFlag(true);

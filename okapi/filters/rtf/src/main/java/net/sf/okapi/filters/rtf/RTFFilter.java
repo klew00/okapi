@@ -57,6 +57,7 @@ import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
@@ -378,7 +379,7 @@ public class RTFFilter implements IFilter {
 	}
 
 	public void parseNext () {
-		TextUnit textUnit = new TextUnit(String.valueOf(++tuId));
+		ITextUnit textUnit = new TextUnit(String.valueOf(++tuId));
 		if ( !getSegment(textUnit) ) {
 			// Send the end-document event
 			queue.add(new Event(EventType.END_DOCUMENT,
@@ -478,7 +479,7 @@ public class RTFFilter implements IFilter {
 		queue = new LinkedList<Event>();
 	}
 
-	public boolean getSegment (TextUnit tu) {
+	public boolean getSegment (ITextUnit tu) {
 		int nState = 0;
 		String sTmp = "";
 		String sCode = "";

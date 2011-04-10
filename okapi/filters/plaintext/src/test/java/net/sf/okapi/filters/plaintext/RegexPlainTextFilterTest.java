@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -44,7 +44,7 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.filters.plaintext.regex.Parameters;
 import net.sf.okapi.filters.plaintext.regex.RegexPlainTextFilter;
 import net.sf.okapi.lib.extra.filters.AbstractLineFilter;
@@ -241,8 +241,8 @@ public class RegexPlainTextFilterTest {
 			
 			switch (event.getEventType()) {
 				case TEXT_UNIT:
-					assertTrue(res instanceof TextUnit);
-					assertEquals(((TextUnit) res).getMimeType(), filter.getMimeType());
+					assertTrue(res instanceof ITextUnit);
+					assertEquals(((ITextUnit)res).getMimeType(), filter.getMimeType());
 					break;
 					
 				case DOCUMENT_PART:
@@ -339,9 +339,9 @@ public class RegexPlainTextFilterTest {
 		switch (event.getEventType()) {
 		case TEXT_UNIT:
 			IResource res = event.getResource();
-			assertTrue(res instanceof TextUnit);
+			assertTrue(res instanceof ITextUnit);
 			
-			assertEquals(((TextUnit) res).toString(), expectedText);
+			assertEquals(((ITextUnit)res).toString(), expectedText);
 			break;
 			
 		case DOCUMENT_PART:
@@ -368,11 +368,11 @@ public class RegexPlainTextFilterTest {
 		switch (event.getEventType()) {
 		case TEXT_UNIT:
 			IResource res = event.getResource();
-			assertTrue(res instanceof TextUnit);
+			assertTrue(res instanceof ITextUnit);
 			
-			assertEquals(expectedText, ((TextUnit) res).toString());
+			assertEquals(expectedText, ((ITextUnit)res).toString());
 			
-			Property prop = ((TextUnit) res).getSourceProperty(AbstractLineFilter.LINE_NUMBER);
+			Property prop = ((ITextUnit)res).getSourceProperty(AbstractLineFilter.LINE_NUMBER);
 			assertNotNull(prop);
 			
 			String st = prop.getValue();

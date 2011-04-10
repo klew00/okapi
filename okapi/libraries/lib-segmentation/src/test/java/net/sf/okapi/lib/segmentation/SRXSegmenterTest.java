@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -24,11 +24,13 @@ import java.util.ArrayList;
 
 import org.junit.Before;
 
+import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.ISegmenter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Range;
 import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.segmentation.LanguageMap;
 import net.sf.okapi.lib.segmentation.Rule;
@@ -87,44 +89,53 @@ public class SRXSegmenterTest {
 	
 	@Test
 	public void testTUSegmentation () {
-		TextUnit tu = createMultiTargetSegmentedTextUnit();
+		ITextUnit tu = createMultiTargetSegmentedTextUnit();
 		// Check default source segmentation
 		ISegments segs = tu.getSource().getSegments();
 		assertEquals(3, segs.count());
 		assertEquals("Part 1.", segs.get(0).toString());
 		assertEquals(" Part 2.", segs.get(1).toString());
 		assertEquals(" Part 3.", segs.get(2).toString());
+		assertTrue(tu.hasVariantSources());
 		// Switch to French
-		tu.synchronizeSourceSegmentation(LocaleId.FRENCH);
+		segs = tu.getVariantSources().get(LocaleId.FRENCH).getSegments();
 		assertEquals(2, segs.count());
 		assertEquals("Part 1. Part 2.", segs.get(0).toString());
 		assertEquals("Part 3.", segs.get(1).toString());
 		// back to German
-		tu.synchronizeSourceSegmentation(LocaleId.GERMAN);
+		segs = tu.getVariantSources().get(LocaleId.GERMAN).getSegments();
+		assertEquals(" Part 2.", segs.get(1).toString());
+		// Default should be like for German
+		segs = tu.getSourceSegments();
 		assertEquals(" Part 2.", segs.get(1).toString());
 	}
 
 	@Test
 	public void testTUSegmentationRemoval () {
-		TextUnit tu = createMultiTargetSegmentedTextUnit();
+		ITextUnit tu = createMultiTargetSegmentedTextUnit();
+		// Removing the target does not change the source associated with it
 		tu.removeTarget(LocaleId.FRENCH);
-		tu.synchronizeSourceSegmentation(LocaleId.FRENCH);
-		// Stays with default segmentation
-		ISegments segs = tu.getSource().getSegments();
+		ISegments segs = tu.getVariantSources().get(LocaleId.FRENCH).getSegments();
+		assertEquals(2, segs.count());
+		assertEquals("Part 3.", segs.get(1).toString());
+		// You have to explicitly remove the source variant
+		tu.getVariantSources().remove(LocaleId.FRENCH);
+		segs = tu.getVariantSources().get(LocaleId.FRENCH).getSegments();
 		assertEquals(3, segs.count());
 		assertEquals(" Part 2.", segs.get(1).toString());
 	}
 	
 	@Test
 	public void testTUSegmentationRemovalAll () {
-		TextUnit tu = createMultiTargetSegmentedTextUnit();
+		ITextUnit tu = createMultiTargetSegmentedTextUnit();
+		assertTrue(tu.hasVariantSources());
 		tu.removeAllSegmentations();
+		assertFalse(tu.hasVariantSources());
 		// Nothing is segmented now
 		ISegments segs = tu.getSource().getSegments();
 		assertEquals(1, segs.count());
-		assertEquals("Part 1. Part 2. Part 3.", tu.getSource().getLastContent().toText());
-		tu.synchronizeSourceSegmentation(LocaleId.FRENCH);
-		assertEquals("Part 1. Part 2. Part 3.", tu.getSource().getLastContent().toText());
+		assertEquals("Part 1. Part 2. Part 3.", tu.getVariantSources().get(LocaleId.GERMAN).getLastContent().toText());
+		assertEquals("Part 1. Part 2. Part 3.", tu.getVariantSources().get(LocaleId.FRENCH).getLastContent().toText());
 	}
 	
 	private ISegmenter createSegmenterWithRules (LocaleId locId) {
@@ -140,10 +151,10 @@ public class SRXSegmenterTest {
 		return doc.compileLanguageRules(locId, null);
 	}
 
-	private TextUnit createMultiTargetSegmentedTextUnit () {
+	private ITextUnit createMultiTargetSegmentedTextUnit () {
 		ISegmenter segmenter = createSegmenterWithRules(LocaleId.fromString("en"));
 		// Create the source and segment it
-		TextUnit tu = new TextUnit("id1", "Part 1. Part 2. Part 3.");
+		ITextUnit tu = new TextUnit("id1", "Part 1. Part 2. Part 3.");
 		tu.createSourceSegmentation(segmenter);
 		// Create the German target
 		TextContainer tc1 = tu.setTarget(LocaleId.GERMAN, new TextContainer("DE_Part 1. DE_Part 2. DE_Part 3."));
@@ -159,7 +170,8 @@ public class SRXSegmenterTest {
 		ArrayList<Range> ranges = new ArrayList<Range>();
 		ranges.add(new Range(0, 15, "0"));
 		ranges.add(new Range(16, 23, "1"));
-		tu.setSourceSegmentationForTarget(LocaleId.FRENCH, ranges);
+		tu.getVariantSources().create(LocaleId.FRENCH, true, IResource.COPY_ALL);
+		tu.getVariantSources().get(LocaleId.FRENCH).getSegments().create(ranges);
 		return tu;
 	}
 

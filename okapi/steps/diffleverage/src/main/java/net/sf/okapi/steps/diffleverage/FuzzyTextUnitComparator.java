@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it
   under the terms of the GNU Lesser General Public License as published by
@@ -23,7 +23,7 @@ package net.sf.okapi.steps.diffleverage;
 import java.util.Comparator;
 
 import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.lib.search.lucene.analysis.AlphabeticNgramTokenizer;
 import net.sf.okapi.lib.search.lucene.scorer.Util;
 
@@ -35,7 +35,7 @@ import net.sf.okapi.lib.search.lucene.scorer.Util;
  * @author HARGRAVEJE
  * 
  */
-public class FuzzyTextUnitComparator implements Comparator<TextUnit> {
+public class FuzzyTextUnitComparator implements Comparator<ITextUnit> {
 	private static final int NGRAM_SIZE = 3;
 
 	private boolean codeSensitive;
@@ -66,7 +66,7 @@ public class FuzzyTextUnitComparator implements Comparator<TextUnit> {
 	}
 
 	@Override
-	public int compare(final TextUnit oldTextUnit, final TextUnit newTextUnit) {
+	public int compare(final ITextUnit oldTextUnit, final ITextUnit newTextUnit) {
 		if (oldTextUnit.isReferent() && !newTextUnit.isReferent()) {
 			return -1; // old is greater than new
 			// (not sure what greater means in this case but we have to return something)
@@ -86,7 +86,7 @@ public class FuzzyTextUnitComparator implements Comparator<TextUnit> {
 		}
 	}
 
-	private int fuzzyCompare(final TextUnit oldSource, final TextUnit newSource,
+	private int fuzzyCompare(final ITextUnit oldSource, final ITextUnit newSource,
 			int exactCompareResult) {
 		float score = Util.calculateNgramDiceCoefficient(
 				oldSource.getSource().getUnSegmentedContentCopy().getText(), 

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -25,7 +25,7 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipelinedriver.PipelineDriver;
 import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 
 /**
@@ -74,7 +74,7 @@ public class StepTestDriver {
 	 * Gets the last text unit after the process is done.
 	 * @return the last text unit processed.
 	 */
-	public TextUnit getResult () {
+	public ITextUnit getResult () {
 		return captureStep.getLastTextUnit();
 	}
 

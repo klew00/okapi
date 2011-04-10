@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it
   under the terms of the GNU Lesser General Public License as published by
@@ -22,7 +22,7 @@ package net.sf.okapi.steps.diffleverage;
 
 import java.util.Comparator;
 
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 
 /**
  * Compare two source {@link TextUnit}s. Text, isReferent() and (optionally) codes must all be same in order to be a
@@ -31,7 +31,7 @@ import net.sf.okapi.common.resource.TextUnit;
  * @author HARGRAVEJE
  * 
  */
-public class TextUnitComparator implements Comparator<TextUnit> {
+public class TextUnitComparator implements Comparator<ITextUnit> {
 	private boolean codeSensitive;
 
 	public TextUnitComparator(final boolean codeSensitive) {
@@ -47,7 +47,7 @@ public class TextUnitComparator implements Comparator<TextUnit> {
 	}
 
 	@Override
-	public int compare(final TextUnit oldTextUnit, final TextUnit newTextUnit) {
+	public int compare(final ITextUnit oldTextUnit, final ITextUnit newTextUnit) {
 		if (oldTextUnit.isReferent() && !newTextUnit.isReferent()) {
 			return -1; // old is greater than new
 			// (not sure what greater means in this case but we have to return something)

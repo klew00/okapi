@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -43,10 +43,10 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.resource.INameable;
 import net.sf.okapi.common.resource.ISegments;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.virtualdb.IVDocument;
 import net.sf.okapi.virtualdb.IVItem;
 import net.sf.okapi.virtualdb.KeyAndSegId;
@@ -683,7 +683,7 @@ public class H2Access implements IDBAccess {
 				H2TextUnit htu = new H2TextUnit(rs.getLong(TUNS_IKEY), doc, rs.getString(ITMS_XID),
 					rs.getString(ITMS_NAME), rs.getString(ITMS_TYPE));
 				htu.fillPointers(rs.getLong(ITMS_PARENT), rs.getLong(ITMS_PREV), rs.getLong(ITMS_NEXT));
-				TextUnit tu = htu.getTextUnit();
+				ITextUnit tu = htu.getTextUnit();
 				tu.setSource(TextContainer.splitStorageToContent(rs.getString(TUNS_CTEXT), rs.getString(TUNS_CODES)));
 				storageToTargets(tu, rs.getString(TUNS_TRGCTEXT), rs.getString(TUNS_TRGCODES));
 				item = htu;
@@ -917,7 +917,7 @@ public class H2Access implements IDBAccess {
 //		return itemKey;
 //	}
 
-	long writeTextUnitData (TextUnit tu,
+	long writeTextUnitData (ITextUnit tu,
 		long docKey)
 	{
 		long itemKey = -1;
@@ -968,14 +968,14 @@ public class H2Access implements IDBAccess {
 		return itemKey;
 	}
 
-	private String[] targetsToStorage (TextUnit tu) {
+	private String[] targetsToStorage (ITextUnit tu) {
 		String res[] = new String[2];
 		StringBuilder tmp0 = new StringBuilder();
 		StringBuilder tmp1 = new StringBuilder();
 		Iterator<LocaleId> iter = tu.getTargetLocales().iterator();
 		while ( iter.hasNext() ) {
 			LocaleId loc = iter.next();
-			TextContainer tc = tu.getTarget(loc);
+			TextContainer tc = tu.getTarget(loc, false);
 			tmp0.append(loc.toString()+"|");
 			String[] data = TextContainer.contentToSplitStorage(tc);
 			tmp0.append(data[0]);  // Target coded text
@@ -988,7 +988,7 @@ public class H2Access implements IDBAccess {
 		return res;
 	}
 
-	private void storageToTargets (TextUnit tu,
+	private void storageToTargets (ITextUnit tu,
 		String ctext,
 		String codes)
 	{
@@ -1094,7 +1094,7 @@ public class H2Access implements IDBAccess {
 				SEGS_TBLNAME, SEGS_IKEY, SEGS_SID, SEGS_CTEXT, SEGS_TRGCTEXT));
 			
 			while ( rs.next() ) {
-				TextUnit tu = ((H2TextUnit)getItemFromItemKey(null, rs.getLong(1))).getTextUnit();
+				ITextUnit tu = ((H2TextUnit)getItemFromItemKey(null, rs.getLong(1))).getTextUnit();
 				ISegments srcSegs = tu.getSource().getSegments();
 				// Get the target or create an empty one, then get the segments
 				ISegments trgSegs = tu.createTarget(trgLoc, false, IResource.CREATE_EMPTY).getSegments();

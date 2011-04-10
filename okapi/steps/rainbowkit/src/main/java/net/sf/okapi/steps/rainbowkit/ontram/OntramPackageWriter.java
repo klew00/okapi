@@ -21,7 +21,7 @@
 package net.sf.okapi.steps.rainbowkit.ontram;
 
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.filters.rainbowkit.Manifest;
 import net.sf.okapi.filters.rainbowkit.MergingInfo;
 import net.sf.okapi.filters.xini.XINIWriter;
@@ -71,7 +71,7 @@ public class OntramPackageWriter extends BasePackageWriter {
 	@Override
 	protected void processTextUnit (Event event) {
 		// Skip non-translatable
-		TextUnit tu = event.getTextUnit();
+		ITextUnit tu = event.getTextUnit();
 		if ( !tu.isTranslatable() ) return;
 		
 		writer.handleEvent(event);

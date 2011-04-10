@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -27,9 +27,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.InlineAnnotation;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.lib.beans.v1.OkapiBeans;
@@ -69,7 +69,7 @@ public class TestJsonSession {
 		log(st1 + "\n\n");
 		
 		log("===== TextUnit");
-		TextUnit tu1 = TextUnitUtil.buildTU("source-text1" + (char) 2 + '"' + " : " + '"' + 
+		ITextUnit tu1 = TextUnitUtil.buildTU("source-text1" + (char) 2 + '"' + " : " + '"' + 
 				'{' + '"' + "ssssss " + ':' + '"' + "ddddd" + "}:" + '<' + '>' + "sssddd: <>dsdd");
 		//tu1.setSkeleton(new GenericSkeleton());
 		//------------
@@ -92,7 +92,7 @@ public class TestJsonSession {
 		InlineAnnotation annot2 = session.readObject(st1, InlineAnnotation.class);
 		assertEquals(annot1.getData(), annot2.getData());
 		
-		TextUnit tu2 = session.readObject(st2, TextUnit.class);
+		ITextUnit tu2 = session.readObject(st2, ITextUnit.class);
 		assertEquals(tu1.getSource().toString(), tu2.getSource().toString());
 		
 		// Wrong version
@@ -101,7 +101,7 @@ public class TestJsonSession {
 			annot2 = session.readObject(st1, InlineAnnotation.class);
 			assertEquals(annot1.getData(), annot2.getData());
 			
-			tu2 = session.readObject(st2, TextUnit.class);
+			tu2 = session.readObject(st2, ITextUnit.class);
 			assertEquals(tu1.getSource().toString(), tu2.getSource().toString());
 		} catch (RuntimeException e) {
 			return;

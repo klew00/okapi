@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2010 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -59,6 +59,7 @@ import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
@@ -267,7 +268,7 @@ public class DTDFilter implements IFilter {
 					continue;
 				}
 				// Otherwise we have value
-				TextUnit tu = new TextUnit(String.valueOf(++tuId));
+				ITextUnit tu = new TextUnit(String.valueOf(++tuId));
 				tu.setMimeType(MimeTypeMapper.DTD_MIME_TYPE);
 				tu.setName(tmp.name);
 
@@ -314,7 +315,7 @@ public class DTDFilter implements IFilter {
 	}
 
 	private void addToSkeleton (DTDEntity entity,
-		TextUnit tu)
+		ITextUnit tu)
 	{
 		skel.append("<!ENTITY ");
         if ( entity.isParsed ) {

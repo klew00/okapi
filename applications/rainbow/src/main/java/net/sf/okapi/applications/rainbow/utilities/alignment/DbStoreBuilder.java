@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -31,9 +31,9 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 class DbStoreBuilder implements IFilterWriter {
@@ -89,7 +89,7 @@ class DbStoreBuilder implements IFilterWriter {
 			processEndGroup();
 			break;
 		case TEXT_UNIT:
-			processTextUnit((TextUnit)event.getResource());
+			processTextUnit(event.getTextUnit());
 			break;
 		}
 		return event;
@@ -117,11 +117,11 @@ class DbStoreBuilder implements IFilterWriter {
 		groupStack.pop();
 	}
 
-	private void processTextUnit (TextUnit tu) {
+	private void processTextUnit (ITextUnit tu) {
 		TextContainer tc;
 		if ( useSource ) tc = tu.getSource();
 		else { // Use the target
-			tc = tu.getTarget(language);
+			tc = tu.getTarget(language, false);
 			if ( tc == null ) return; // No target to set
 		}
 		// Segment if requested

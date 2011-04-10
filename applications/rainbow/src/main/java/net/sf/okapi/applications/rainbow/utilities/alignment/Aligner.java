@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -29,13 +29,13 @@ import net.sf.okapi.common.Range;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.InvalidContentException;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.ui.ClosePanel;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.UIUtil;
@@ -723,7 +723,7 @@ public class Aligner {
 	 * @return 1=the segments are deemed aligned, 2=skip this entry,
 	 * 0=stop the process.
 	 */
-	private int showDialog (TextUnit tu) {
+	private int showDialog (ITextUnit tu) {
 		edName.setText("");
 		if ( tu != null ) {
 			if ( tu.getName().length() > 0 ) {
@@ -753,7 +753,7 @@ public class Aligner {
 	 * @return 1=the segments are deemed aligned, 2=skip this entry,
 	 * 0=stop the process.
 	 */
-	public int align (TextUnit tu,
+	public int align (ITextUnit tu,
 		int currentSource,
 		int totalTarget)
 	{
@@ -762,7 +762,7 @@ public class Aligner {
 		if ( !tu.hasTarget(trgLang) ) return 2;
 		// Set the new values
 		source = tu.getSource();
-		target = tu.getTarget(trgLang);
+		target = tu.getTarget(trgLang, false);
 		btToReview.setSelection(false);
 		// If none is segmented, no need to check
 		if ( source.contentIsOneSegment() && target.contentIsOneSegment() ) return 1;

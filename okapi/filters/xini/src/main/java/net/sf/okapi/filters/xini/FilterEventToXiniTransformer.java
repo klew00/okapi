@@ -33,7 +33,7 @@ import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.filters.xini.jaxb.Element;
 import net.sf.okapi.filters.xini.jaxb.Empty;
@@ -98,7 +98,7 @@ public class FilterEventToXiniTransformer {
 		xini.getMain().getPage().add(currentPage);
 	}
 	
-	public void transformTextUnit(TextUnit tu) {
+	public void transformTextUnit(ITextUnit tu) {
 
 		// Get the source container
 		TextContainer textContainer = tu.getSource();

@@ -36,7 +36,7 @@ import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 
 /**
  * This step copies into a destination file (first input file) the text of a
@@ -51,7 +51,7 @@ public class IdBasedCopyStep extends BasePipelineStep {
 	private IFilterConfigurationMapper fcMapper;
 	private LocaleId targetLocale;
 	private RawDocument toCopyInput = null;
-	private Map<String, TextUnit> toCopy;
+	private Map<String, ITextUnit> toCopy;
 	private boolean useTargetText;
 
 	public IdBasedCopyStep() {
@@ -129,17 +129,17 @@ public class IdBasedCopyStep extends BasePipelineStep {
 			return event;
 		}
 		
-		TextUnit tu = event.getTextUnit();
+		ITextUnit tu = event.getTextUnit();
 		// Skip non-translatable and empty
 		if ( !tu.isTranslatable() ) {
 			return event; // No change
 		}
 
 		// Find the matching id in the entries to copy
-		TextUnit toCopyTu = toCopy.get(tu.getName());
+		ITextUnit toCopyTu = toCopy.get(tu.getName());
 		TextContainer tc;
 		if ( toCopyTu != null ) {
-			if ( useTargetText ) tc = toCopyTu.getTarget(targetLocale);
+			if ( useTargetText ) tc = toCopyTu.getTarget(targetLocale, false);
 			else tc = toCopyTu.getSource();
 			if ( tc != null ) {
 				tu.setTarget(targetLocale, tc);
@@ -151,7 +151,7 @@ public class IdBasedCopyStep extends BasePipelineStep {
 	}
 
 	private void readEntriesToCopy () {
-		toCopy = new HashMap<String, TextUnit>();
+		toCopy = new HashMap<String, ITextUnit>();
 		try {
 			// Initialize the filter to read the translation to compare
 			filter = fcMapper.createFilter(toCopyInput.getFilterConfigId(), null);
@@ -161,7 +161,7 @@ public class IdBasedCopyStep extends BasePipelineStep {
 			while ( filter.hasNext() ) {
 				final Event event = filter.next();
 				if ( event.getEventType() == EventType.TEXT_UNIT ) {
-					TextUnit tu = event.getTextUnit();
+					ITextUnit tu = event.getTextUnit();
 					String id = tu.getName();
 					if ( Util.isEmpty(id) ) {
 						logger.warning("Entry without id detected in second file.");

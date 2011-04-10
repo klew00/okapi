@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -39,6 +39,7 @@ import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Document;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.InlineAnnotation;
 import net.sf.okapi.common.resource.MultiEvent;
 import net.sf.okapi.common.resource.Property;
@@ -51,7 +52,6 @@ import net.sf.okapi.common.resource.TargetPropertiesAnnotation;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextPart;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonPart;
 import net.sf.okapi.common.skeleton.ZipSkeleton;
@@ -84,7 +84,7 @@ public class OkapiBeans implements IVersionDriver {
 		
 		// Specific class beans				
 		beanMapper.registerBean(Event.class, EventBean.class);		
-		beanMapper.registerBean(TextUnit.class, TextUnitBean.class);
+		beanMapper.registerBean(ITextUnit.class, TextUnitBean.class);
 		beanMapper.registerBean(RawDocument.class, RawDocumentBean.class);
 		beanMapper.registerBean(Property.class, PropertyBean.class);		
 		beanMapper.registerBean(ConditionalParameters.class, ConditionalParametersBean.class);

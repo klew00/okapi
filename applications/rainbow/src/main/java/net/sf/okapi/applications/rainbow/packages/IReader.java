@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -21,7 +21,7 @@
 package net.sf.okapi.applications.rainbow.packages;
 
 import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 
 /**
  * Provides a common way to read a translation package generated with an 
@@ -54,6 +54,6 @@ public interface IReader {
 	 * Gets the last TextUnit object read.
 	 * @return The last TextUnit object read.
 	 */
-	public TextUnit getItem ();
+	public ITextUnit getItem ();
 	
 }

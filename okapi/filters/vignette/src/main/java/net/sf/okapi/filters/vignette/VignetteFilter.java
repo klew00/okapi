@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -66,6 +66,7 @@ import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
@@ -808,7 +809,7 @@ public class VignetteFilter implements IFilter {
 		String partConfiguration)
 	{
 		if ( partConfiguration.equals("default") ) {
-			TextUnit tu = new TextUnit(String.valueOf(++tuId));
+			ITextUnit tu = new TextUnit(String.valueOf(++tuId));
 			tu.setSourceContent(new TextFragment(data));
 			tu.setMimeType(MimeTypeMapper.XML_MIME_TYPE);
 			tu.setType("x-"+partName);

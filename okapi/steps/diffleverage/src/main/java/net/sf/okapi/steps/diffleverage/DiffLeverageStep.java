@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it
   under the terms of the GNU Lesser General Public License as published by
@@ -46,7 +46,7 @@ import net.sf.okapi.common.resource.MultiEvent;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.lib.extra.diff.incava.DiffLists;
 import net.sf.okapi.lib.search.lucene.analysis.AlphabeticNgramTokenizer;
@@ -73,13 +73,13 @@ public class DiffLeverageStep extends BasePipelineStep {
 	private IFilterConfigurationMapper fcMapper;
 	private RawDocument oldSource;
 	private RawDocument oldTarget;
-	private List<TextUnit> newTextUnits;
-	private List<TextUnit> oldTextUnits;
+	private List<ITextUnit> newTextUnits;
+	private List<ITextUnit> oldTextUnits;
 	private List<Event> newDocumentEvents;
 	private LocaleId sourceLocale;
 	private LocaleId targetLocale;
 	private boolean done = true;
-	private Comparator<TextUnit> sourceComparator;
+	private Comparator<ITextUnit> sourceComparator;
 	private AlphabeticNgramTokenizer tokenizer;
 
 	public DiffLeverageStep() {
@@ -187,8 +187,8 @@ public class DiffLeverageStep extends BasePipelineStep {
 		if (oldSource != null) {
 			done = false;
 			// intialize buffers for a new document
-			newTextUnits = new ArrayList<TextUnit>();
-			oldTextUnits = new ArrayList<TextUnit>();
+			newTextUnits = new ArrayList<ITextUnit>();
+			oldTextUnits = new ArrayList<ITextUnit>();
 			newDocumentEvents = new LinkedList<Event>();
 
 			// open of the secondary input file (this is our old document)
@@ -307,7 +307,7 @@ public class DiffLeverageStep extends BasePipelineStep {
 			while (srcFilter.hasNext()) {
 				final Event event = srcFilter.next();
 				if (event.getEventType() == EventType.TEXT_UNIT) {
-					TextUnit tu = event.getTextUnit();
+					ITextUnit tu = event.getTextUnit();
 					if (oldTarget != null) {
 						Event e = synchronize(trgFilter, EventType.TEXT_UNIT);							
 						tu.setTarget(targetLocale, e.getTextUnit().getSource());
@@ -341,22 +341,22 @@ public class DiffLeverageStep extends BasePipelineStep {
 	}
 
 	private void diffLeverage() {
-		DiffLists<TextUnit> diffTextUnits;
+		DiffLists<ITextUnit> diffTextUnits;
 
-		diffTextUnits = new DiffLists<TextUnit>(oldTextUnits, newTextUnits, sourceComparator);
+		diffTextUnits = new DiffLists<ITextUnit>(oldTextUnits, newTextUnits, sourceComparator);
 
 		// diff the two TextUnit lists based on the provided Comparator
 		diffTextUnits.diff();
 
 		// loop through the matches and copy over the old target to the new TextUnit
 		for (Map.Entry<Integer, Integer> m : diffTextUnits.getMatches().entrySet()) {
-			TextUnit oldTu = oldTextUnits.get(m.getKey());
-			TextUnit newTu = newTextUnits.get(m.getValue());
+			ITextUnit oldTu = oldTextUnits.get(m.getKey());
+			ITextUnit newTu = newTextUnits.get(m.getValue());
 			int score = 100;
 
 			// copy the old translation to the new TextUnit
 			TextContainer otc = null;
-			if ((otc = oldTu.getTarget(targetLocale)) != null) {
+			if ((otc = oldTu.getTarget(targetLocale, false)) != null) {
 				// only copy the old target if diffOnly is false
 				if (!params.isDiffOnly()) {
 					if (params.getFuzzyThreshold() < 100) {

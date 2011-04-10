@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -24,6 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.ReversedIterator;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.AltTranslation;
@@ -79,7 +80,7 @@ public class TextUnitUtil {
 		boolean alwaysCopyCodes,
 		boolean addMissingCodes,
 		TextFragment newSrc,
-		TextUnit parent)
+		ITextUnit parent)
 	{
 		List<Code> newCodes = newTrg.getCodes();
 		List<Code> oriCodes = oriSrc.getCodes();
@@ -339,7 +340,7 @@ public class TextUnitUtil {
 	 *            the text unit to check.
 	 * @return true if the given text unit resource is null, or its source part is null or empty.
 	 */
-	public static boolean isEmpty (TextUnit textUnit) {
+	public static boolean isEmpty (ITextUnit textUnit) {
 		return ((textUnit == null) || textUnit.getSource().isEmpty());
 	}
 
@@ -351,7 +352,7 @@ public class TextUnitUtil {
 	 *            the text unit to check.
 	 * @return true if the given text unit resource is null, or its source part is null or empty.
 	 */
-	public static boolean hasSource (TextUnit textUnit) {
+	public static boolean hasSource (ITextUnit textUnit) {
 		return !isEmpty(textUnit, true);
 	}
 
@@ -365,7 +366,7 @@ public class TextUnitUtil {
 	 *            if true and the text unit contains only whitespaces, then the text unit is considered empty.
 	 * @return true if the given text unit resource is null, or its source part is null or empty.
 	 */
-	public static boolean isEmpty (TextUnit textUnit,
+	public static boolean isEmpty (ITextUnit textUnit,
 		boolean ignoreWS)
 	{
 		return ((textUnit == null) || Util.isEmpty(getSourceText(textUnit), ignoreWS));
@@ -378,7 +379,7 @@ public class TextUnitUtil {
 	 *            the text unit resource which source text should be returned.
 	 * @return the source part of the given text unit resource.
 	 */
-	public static String getSourceText (TextUnit textUnit) {
+	public static String getSourceText (ITextUnit textUnit) {
 		// if ( textUnit == null ) return "";
 		// return getCodedText(textUnit.getSourceContent());
 		return textUnit.getSource().getFirstContent().getCodedText();
@@ -394,7 +395,7 @@ public class TextUnitUtil {
 	 *            true if possible inline codes should be removed.
 	 * @return the source part of the given text unit resource.
 	 */
-	public static String getSourceText (TextUnit textUnit,
+	public static String getSourceText (ITextUnit textUnit,
 		boolean removeCodes)
 	{
 		if (textUnit == null)
@@ -416,7 +417,7 @@ public class TextUnitUtil {
 	 * @return the target part of the given text unit resource in the given loacle, or an empty string if the text unit
 	 *         doesn't contain one.
 	 */
-	public static String getTargetText (TextUnit textUnit,
+	public static String getTargetText (ITextUnit textUnit,
 		LocaleId locId)
 	{
 		if (textUnit == null)
@@ -424,7 +425,7 @@ public class TextUnitUtil {
 		if (Util.isNullOrEmpty(locId))
 			return "";
 
-		return getCodedText(textUnit.getTarget(locId).getFirstContent());
+		return getCodedText(textUnit.getTarget(locId, false).getFirstContent());
 	}
 
 	/**
@@ -595,7 +596,7 @@ public class TextUnitUtil {
 	 *            the given text container becoming the source part of the text unit.
 	 * @return a new text unit resource with the given text container object being its source part.
 	 */
-	public static TextUnit buildTU (TextContainer source) {
+	public static ITextUnit buildTU (TextContainer source) {
 		return buildTU(null, "", source, null, LocaleId.EMPTY, "");
 	}
 
@@ -606,7 +607,7 @@ public class TextUnitUtil {
 	 *            the given string becoming the source text of the text unit.
 	 * @return a new text unit resource with the given string being its source text.
 	 */
-	public static TextUnit buildTU (String source) {
+	public static ITextUnit buildTU (String source) {
 		return buildTU(new TextContainer(source));
 	}
 
@@ -621,10 +622,10 @@ public class TextUnitUtil {
 	 * @return a new text unit resource with the given string being its source text, and the skeleton string in the
 	 *         skeleton.
 	 */
-	public static TextUnit buildTU (String srcPart,
+	public static ITextUnit buildTU (String srcPart,
 		String skelPart)
 	{
-		TextUnit res = buildTU(srcPart);
+		ITextUnit res = buildTU(srcPart);
 		if (res == null)
 			return null;
 
@@ -656,7 +657,7 @@ public class TextUnitUtil {
 	 *            the optional comment becoming a NOTE property of the text unit.
 	 * @return a reference to the original or newly created text unit.
 	 */
-	public static TextUnit buildTU (TextUnit textUnit,
+	public static ITextUnit buildTU (ITextUnit textUnit,
 		String name,
 		TextContainer source,
 		TextContainer target,
@@ -695,7 +696,7 @@ public class TextUnitUtil {
 	 *            the given text unit to have a skeleton.
 	 * @return the skeleton of the text unit.
 	 */
-	public static GenericSkeleton forceSkeleton (TextUnit tu) {
+	public static GenericSkeleton forceSkeleton (ITextUnit tu) {
 		if (tu == null)
 			return null;
 
@@ -720,7 +721,7 @@ public class TextUnitUtil {
 	 *            the text unit to be copied into a skeleton.
 	 * @return the newly created skeleton, which contents reflect the given text unit.
 	 */
-	public static GenericSkeleton convertToSkeleton (TextUnit textUnit) {
+	public static GenericSkeleton convertToSkeleton (ITextUnit textUnit) {
 		if (textUnit == null)
 			return null;
 
@@ -772,7 +773,7 @@ public class TextUnitUtil {
 	 *            reference to the requested annotation type.
 	 * @return the annotation or null if not found.
 	 */
-	public static <A extends IAnnotation> A getSourceAnnotation (TextUnit textUnit,
+	public static <A extends IAnnotation> A getSourceAnnotation (ITextUnit textUnit,
 		Class<A> type)
 	{
 		if (textUnit == null)
@@ -791,7 +792,7 @@ public class TextUnitUtil {
 	 * @param annotation
 	 *            the annotation to be attached to the source part of the text unit.
 	 */
-	public static void setSourceAnnotation (TextUnit textUnit,
+	public static void setSourceAnnotation (ITextUnit textUnit,
 		IAnnotation annotation)
 	{
 		if (textUnit == null)
@@ -813,18 +814,14 @@ public class TextUnitUtil {
 	 *            reference to the requested annotation type.
 	 * @return the annotation or null if not found.
 	 */
-	public static <A extends IAnnotation> A getTargetAnnotation (TextUnit textUnit,
+	public static <A extends IAnnotation> A getTargetAnnotation (ITextUnit textUnit,
 		LocaleId locId,
 		Class<A> type)
 	{
-		if (textUnit == null)
-			return null;
-		if (Util.isNullOrEmpty(locId))
-			return null;
-		if (textUnit.getTarget(locId) == null)
-			return null;
-
-		return textUnit.getTarget(locId).getAnnotation(type);
+		if ( textUnit == null ) return null;
+		if ( Util.isNullOrEmpty(locId) ) return null;
+		if ( textUnit.getTarget(locId, false) == null ) return null;
+		return textUnit.getTarget(locId, false).getAnnotation(type);
 	}
 
 	/**
@@ -837,18 +834,14 @@ public class TextUnitUtil {
 	 * @param annotation
 	 *            the annotation to be attached to the target part of the text unit.
 	 */
-	public static void setTargetAnnotation (TextUnit textUnit,
+	public static void setTargetAnnotation (ITextUnit textUnit,
 		LocaleId locId,
 		IAnnotation annotation)
 	{
-		if (textUnit == null)
-			return;
-		if (Util.isNullOrEmpty(locId))
-			return;
-		if (textUnit.getTarget(locId) == null)
-			return;
-
-		textUnit.getTarget(locId).setAnnotation(annotation);
+		if ( textUnit == null ) return;
+		if ( Util.isNullOrEmpty(locId) ) return;
+		if ( textUnit.getTarget(locId, false) == null ) return;
+		textUnit.getTarget(locId, false).setAnnotation(annotation);
 	}
 
 	/**
@@ -859,7 +852,7 @@ public class TextUnitUtil {
 	 * @param text
 	 *            the text to be set.
 	 */
-	public static void setSourceText (TextUnit textUnit,
+	public static void setSourceText (ITextUnit textUnit,
 		String text)
 	{
 		// fail fast if ( textUnit == null ) return;
@@ -878,13 +871,13 @@ public class TextUnitUtil {
 	 * @param text
 	 *            the text to be set.
 	 */
-	public static void setTargetText (TextUnit textUnit,
+	public static void setTargetText (ITextUnit textUnit,
 		LocaleId locId,
 		String text)
 	{
 		// fail fast if ( textUnit == null ) return;
 		// fail fast if ( Util.isNullOrEmpty(locId) ) return;
-		TextFragment target = textUnit.getTarget(locId).getFirstContent();
+		TextFragment target = textUnit.getTarget(locId, false).getFirstContent();
 		// fail fast if ( target == null ) return;
 		target.setCodedText(text);
 	}
@@ -899,7 +892,7 @@ public class TextUnitUtil {
 	 * @param trimTrailing
 	 *            true to remove trailing whitespaces if there are any.
 	 */
-	public static void trimTU (TextUnit textUnit,
+	public static void trimTU (ITextUnit textUnit,
 		boolean trimLeading,
 		boolean trimTrailing)
 	{
@@ -940,7 +933,7 @@ public class TextUnitUtil {
 	 * @param endQualifier
 	 *            the qualifier to be removed after source text.
 	 */
-	public static void removeQualifiers (TextUnit textUnit,
+	public static void removeQualifiers (ITextUnit textUnit,
 		String startQualifier,
 		String endQualifier)
 	{
@@ -986,7 +979,7 @@ public class TextUnitUtil {
 	 * @param qualifier
 	 *            the qualifier to be removed before and after source text.
 	 */
-	public static void removeQualifiers (TextUnit textUnit,
+	public static void removeQualifiers (ITextUnit textUnit,
 		String qualifier)
 	{
 		removeQualifiers(textUnit, qualifier, qualifier);
@@ -1006,12 +999,12 @@ public class TextUnitUtil {
 	 *            - {@link LocaleId} of the target {@link Segment}s
 	 * @return the new text unit that has been created.
 	 */
-	public static TextUnit createMultilingualTextUnit (final TextUnit textUnit,
+	public static ITextUnit createMultilingualTextUnit (final ITextUnit textUnit,
 		final List<AlignedPair> alignedSegmentPairs,
 		final LocaleId trgLocaleId)
 	{
 		// Clone the original
-		TextUnit tu = textUnit.clone();
+		ITextUnit tu = textUnit.clone();
 		// Empty the source content
 		tu.getSource().clear();
 
@@ -1021,9 +1014,9 @@ public class TextUnitUtil {
 		}
 
 		// Create a new target with all the source data
-		tu.createTarget(trgLocaleId, true, TextUnit.COPY_ALL);
+		tu.createTarget(trgLocaleId, true, IResource.COPY_ALL);
 
-		for (AlignedPair alignedPair : alignedSegmentPairs) {
+		for ( AlignedPair alignedPair : alignedSegmentPairs ) {
 			// make a shallow copy because we may modify the list elements
 			List<TextPart> sourceParts = new LinkedList<TextPart>(alignedPair.getSourceParts());
 			List<TextPart> targetParts = new LinkedList<TextPart>(alignedPair.getTargetParts());
@@ -1085,7 +1078,7 @@ public class TextUnitUtil {
 
 			// append the before inter-segment TextParts
 			for (TextPart part : targetParts.subList(0, beforeIndex)) {
-				tu.getTarget(trgLocaleId).append(part);
+				tu.getTarget(trgLocaleId, false).append(part);
 			}
 
 			// append segment parts
@@ -1093,12 +1086,12 @@ public class TextUnitUtil {
 			for (TextPart part : targetParts.subList(beforeIndex, afterIndex)) {
 				trg.append(part.getContent());
 			}
-			tu.getTarget(trgLocaleId).getSegments().append(
+			tu.getTarget(trgLocaleId, false).getSegments().append(
 					new Segment(tu.getSource().getSegments().getLast().getId(), trg));
 
 			// append the after inter-segment TextParts
 			for (TextPart part : targetParts.subList(afterIndex, targetParts.size())) {
-				tu.getTarget(trgLocaleId).append(part);
+				tu.getTarget(trgLocaleId, false).append(part);
 			}
 		}
 
@@ -1106,7 +1099,7 @@ public class TextUnitUtil {
 		// if nothing else we need to prevent re-segmentation as that
 		// will break the alignments
 		tu.getSource().setHasBeenSegmentedFlag(true);
-		tu.getTarget(trgLocaleId).setHasBeenSegmentedFlag(true);
+		tu.getTarget(trgLocaleId, false).setHasBeenSegmentedFlag(true);
 
 		return tu;
 	}

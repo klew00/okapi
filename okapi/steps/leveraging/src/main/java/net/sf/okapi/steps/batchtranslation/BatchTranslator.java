@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2010 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -43,7 +43,7 @@ import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.lib.segmentation.SRXDocument;
 import net.sf.okapi.lib.translation.QueryUtil;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
@@ -253,7 +253,7 @@ public class BatchTranslator {
 					break;
 					
 				case TEXT_UNIT:
-					TextUnit tu = (TextUnit)event.getResource();
+					ITextUnit tu = event.getTextUnit();
 					if ( !tu.isTranslatable() ) continue;
 
 					TextContainer tc = tu.getSource();

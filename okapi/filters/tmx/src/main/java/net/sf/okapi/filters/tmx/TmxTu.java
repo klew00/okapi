@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -31,6 +31,7 @@ import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.filters.tmx.TmxFilter.TuvXmlLang;
@@ -309,7 +310,7 @@ class TmxTu {
 	 */	
 	int addPrimaryTextUnitEvent(int tuId, boolean processAllTargets, LinkedList<Event> queue){
 		
-		TextUnit tu;
+		ITextUnit tu;
 		GenericSkeleton tuSkel;
 
 		enforceTuRules();
@@ -388,7 +389,7 @@ class TmxTu {
 	int addDuplicateTextUnitEvents(int tuId, boolean processAllTargets, LinkedList<Event> queue){
 		
 		TmxTuv srcTuv = getSourceTuv();
-		TextUnit dupTu;
+		ITextUnit dupTu;
 		GenericSkeleton dupTuSkel;
 
 		if(srcTuv==null){

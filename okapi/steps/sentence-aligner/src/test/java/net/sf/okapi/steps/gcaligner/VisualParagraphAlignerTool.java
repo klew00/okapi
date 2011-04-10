@@ -8,8 +8,8 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.resource.TextUnit;
 
 public class VisualParagraphAlignerTool {
 	private static IFilter srcFilter;
@@ -50,15 +50,15 @@ public class VisualParagraphAlignerTool {
 				String s = "";
 				String t = "";
 
-				if (srcEvent.getEventType() == EventType.TEXT_UNIT) {
+				if ( srcEvent.getEventType() == EventType.TEXT_UNIT ) {
 					srcTuCount++;
-					s = ((TextUnit) srcEvent.getResource()).toString().trim();
-					System.out.println(((TextUnit) srcEvent.getResource()).getName());
+					s = ((ITextUnit)srcEvent.getResource()).toString().trim();
+					System.out.println(((ITextUnit)srcEvent.getResource()).getName());
 					ps.print(s);
 				}
-				if (trgEvent.getEventType() == EventType.TEXT_UNIT) {
+				if ( trgEvent.getEventType() == EventType.TEXT_UNIT ) {
 					trgTuCount++;
-					t = ((TextUnit) trgEvent.getResource()).toString().trim();
+					t = ((ITextUnit)trgEvent.getResource()).toString().trim();
 					ps.println("\n" + t);
 				}
 				System.out.println();

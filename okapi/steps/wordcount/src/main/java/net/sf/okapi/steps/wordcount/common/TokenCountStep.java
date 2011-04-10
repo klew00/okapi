@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -24,9 +24,9 @@ import java.util.logging.Level;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.ISegments;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.steps.tokenization.Tokenizer;
 import net.sf.okapi.steps.tokenization.common.TokensAnnotation;
 import net.sf.okapi.steps.tokenization.tokens.Tokens;
@@ -66,7 +66,7 @@ public abstract class TokenCountStep extends BaseCountStep {
 	}
 	
 	@Override
-	protected long countInTextUnit(TextUnit textUnit) {
+	protected long countInTextUnit(ITextUnit textUnit) {
 		if (textUnit == null) return 0;
 		
 		LocaleId srcLocale = getSourceLocale();		

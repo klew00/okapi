@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -32,7 +32,7 @@ import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
 
 /**
@@ -135,7 +135,7 @@ public abstract class BaseConnector implements IQuery {
 	}
 
 	@Override
-	public void leverage (TextUnit tu) {
+	public void leverage (ITextUnit tu) {
 		if (( tu == null ) || !tu.isTranslatable() ) {
 			return; // No need to query
 		}
@@ -144,16 +144,16 @@ public abstract class BaseConnector implements IQuery {
 
 		// We assume here that if there is a target content it match the segmentation of the source
 		// Create an empty target (or return existing target)
-		boolean hadTarget = tu.hasTarget(getTargetLanguage());
-		TextContainer trgCont = tu.createTarget(getTargetLanguage(), false, IResource.COPY_CONTENT);
+//		boolean hadTarget = tu.hasTarget(getTargetLanguage());
+		TextContainer trgCont = tu.createTarget(getTargetLanguage(), false, IResource.COPY_SEGMENTATION);
 		ISegments trgSegs = trgCont.getSegments();
-		if ( !hadTarget ) {
-			// If we did not have an existing target, we use the copy from the source
-			// but make sure the segments are empty. We just need the segment to attach the annotations
-			for ( Segment seg : trgSegs ) {
-				seg.text.clear();
-			}
-		}
+//		if ( !hadTarget ) {
+//			// If we did not have an existing target, we use the copy from the source
+//			// but make sure the segments are empty. We just need the segment to attach the annotations
+//			for ( Segment seg : trgSegs ) {
+//				seg.text.clear();
+//			}
+//		}
 		
 		// For each segment
 		for ( Segment srcSeg : tu.getSource().getSegments() ) {

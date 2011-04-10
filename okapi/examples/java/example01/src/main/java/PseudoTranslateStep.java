@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -27,7 +27,7 @@ import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 
 public class PseudoTranslateStep extends BasePipelineStep {
 
@@ -51,10 +51,10 @@ public class PseudoTranslateStep extends BasePipelineStep {
 	
 	@Override
 	protected Event handleTextUnit (Event event) {
-		TextUnit tu = (TextUnit)event.getResource();
+		ITextUnit tu = event.getTextUnit();
 		if ( !tu.isTranslatable() ) return event;
 
-		TextContainer tc = tu.createTarget(trgLoc, false, IResource.COPY_CONTENT);
+		TextContainer tc = tu.createTarget(trgLoc, false, IResource.COPY_SEGMENTED_CONTENT);
 		// Process each segment content
 		for ( Segment seg : tc.getSegments() ) {
 			TextFragment tf = seg.getContent();

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -25,7 +25,7 @@ import java.util.List;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 
 /**
  * Provides the methods common to all query engines of translation resources 
@@ -128,7 +128,7 @@ public interface IQuery {
 	 * Any options or attributes needed must be set before calling this method.
 	 * @param tu the text unit to leverage.
 	 */
-	public void leverage(TextUnit tu);
+	public void leverage(ITextUnit tu);
 	
 	/**
 	 * Starts a batch query for a given list of {@link TextFragment}s.

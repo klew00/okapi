@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -43,7 +43,7 @@ import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 
 import org.omegat.filters2.FilterContext;
@@ -225,7 +225,7 @@ abstract class AbstractOkapiFilter implements org.omegat.filters2.IFilter {
 			while ( filter.hasNext() ) {
 				Event event = filter.next();
 				if ( event.isTextUnit() ) {
-					TextUnit tu = event.getTextUnit();
+					ITextUnit tu = event.getTextUnit();
 					// Skip non-translatable entries
 					if ( !tu.isTranslatable() ) continue;
 					

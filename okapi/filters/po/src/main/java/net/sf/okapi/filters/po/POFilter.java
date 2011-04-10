@@ -59,6 +59,7 @@ import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
@@ -109,7 +110,7 @@ public class POFilter implements IFilter {
 	private String lineBreak;
 	private int parseState = 0;
 	private GenericSkeleton skel;
-	private TextUnit tu;
+	private ITextUnit tu;
 	private String docName;
 	private LocaleId srcLang;
 	private LocaleId trgLang;

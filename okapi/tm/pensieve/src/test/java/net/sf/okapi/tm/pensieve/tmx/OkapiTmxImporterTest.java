@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -17,12 +17,14 @@
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
+
 package net.sf.okapi.tm.pensieve.tmx;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
@@ -212,7 +214,7 @@ public class OkapiTmxImporterTest {
     }
 
     private Event createEvent(String id, String source, String target, LocaleId targetLang, String[][] properties) {
-        TextUnit tu = new TextUnit(id, source);
+        ITextUnit tu = new TextUnit(id, source);
         tu.setTargetContent(targetLang, new TextFragment(target));
         //populate properties
         if (properties != null) {

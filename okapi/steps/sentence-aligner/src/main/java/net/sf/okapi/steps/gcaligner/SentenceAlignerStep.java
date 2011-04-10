@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2010 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -39,9 +39,9 @@ import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextPart;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.segmentation.SRXDocument;
 
 /**
@@ -201,8 +201,8 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 
 	@Override
 	protected Event handleTextUnit(Event sourceEvent) {
-		TextUnit sourceTu = sourceEvent.getTextUnit();
-		TextUnit targetTu = null;
+		ITextUnit sourceTu = sourceEvent.getTextUnit();
+		ITextUnit targetTu = null;
 
 		// Skip non-translatable and empty
 		if ( !sourceTu.isTranslatable() || sourceTu.isEmpty() ) {
@@ -222,7 +222,7 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 				p.text.collapseWhitespace();
 			}
 			if (targetInput == null) {
-				for (TextPart p : sourceTu.getTarget(targetLocale).getSegments()) {
+				for (TextPart p : sourceTu.getTarget(targetLocale, false).getSegments()) {
 					p.text.collapseWhitespace();
 				}
 			} else {
@@ -233,26 +233,28 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 		}
 
 		// Segment the source if requested
-		if (params.isSegmentSource()) {
+		if ( params.isSegmentSource() ) {
 			sourceTu.createSourceSegmentation(sourceSegmenter);
 		}
 
 		// Segment the target if requested
-		if (params.isSegmentTarget()) {
-			if (targetTu == null) {
+		if ( params.isSegmentTarget() ) {
+			if ( targetTu == null ) {
 				// TextUnit is bilingual
 				sourceTu.createTargetSegmentation(targetSegmenter, targetLocale);
-			} else {
-				// separate target TextUnit
+			}
+			else {
+				// Separate target TextUnit
 				targetTu.createSourceSegmentation(targetSegmenter);
 			}			
 		}
 		
-		TextUnit alignedTextUnit;
-		if (targetInput == null) {
+		ITextUnit alignedTextUnit;
+		if ( targetInput == null ) {
 			// case where the TextUnit is already bilingual
 			alignedTextUnit = sentenceAligner.align(sourceTu, sourceLocale, targetLocale);
-		} else {
+		}
+		else {
 			// case where we have separate source and target TextUnits
 			alignedTextUnit = sentenceAligner.align(sourceTu, targetTu, sourceLocale, targetLocale);
 		}
@@ -263,7 +265,7 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 			p.text.ltrim();
 			p.text.rtrim();
 		}
-		for (TextPart p : alignedTextUnit.getTarget(targetLocale).getSegments()) {
+		for (TextPart p : alignedTextUnit.getTarget(targetLocale, false).getSegments()) {
 			p.text.ltrim();
 			p.text.rtrim();
 		}
@@ -290,7 +292,7 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 		}
 	}
 
-	private Event synchronize(EventType untilType, TextUnit sourceTu) {
+	private Event synchronize(EventType untilType, ITextUnit sourceTu) {
 		boolean found = false;
 		Event event = null;
 		while (!found && filter.hasNext()) {

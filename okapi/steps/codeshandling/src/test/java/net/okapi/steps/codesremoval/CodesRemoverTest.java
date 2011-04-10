@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2010 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -25,6 +25,7 @@ import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.steps.codesremoval.CodesRemover;
@@ -43,20 +44,20 @@ public class CodesRemoverTest {
 	public void testSimple () {
 		params = new Parameters();
 		remover = new CodesRemover(params, LocaleId.SPANISH);
-		TextUnit tu = new TextUnit("id");
+		ITextUnit tu = new TextUnit("id");
 		tu.setSourceContent(createSimpleFragment());
 		tu.setTargetContent(LocaleId.SPANISH, createSimpleFragment());
 		
 		remover.processTextUnit(tu);
 		assertEquals("t1t2t3", tu.toString());
-		assertEquals("t1t2t3", tu.getTarget(LocaleId.SPANISH).toString());
+		assertEquals("t1t2t3", tu.getTarget(LocaleId.SPANISH, false).toString());
 	}
 	
 	@Test
 	public void testSkipNonTranslatable () {
 		params = new Parameters();
 		remover = new CodesRemover(params, LocaleId.SPANISH);
-		TextUnit tu = new TextUnit("id");
+		ITextUnit tu = new TextUnit("id");
 		tu.setSourceContent(createSimpleFragment());
 		tu.setTargetContent(LocaleId.SPANISH, createSimpleFragment());
 		params.setIncludeNonTranslatable(false);
@@ -65,8 +66,8 @@ public class CodesRemoverTest {
 		remover.processTextUnit(tu);
 		assertEquals("t1<br/>t2<b>t3</b>", tu.toString());
 		assertEquals(3, tu.getSource().getFirstContent().getCodes().size());
-		assertEquals("t1<br/>t2<b>t3</b>", tu.getTarget(LocaleId.SPANISH).toString());
-		assertEquals(3, tu.getTarget(LocaleId.SPANISH).getFirstContent().getCodes().size());
+		assertEquals("t1<br/>t2<b>t3</b>", tu.getTarget(LocaleId.SPANISH, false).toString());
+		assertEquals(3, tu.getTarget(LocaleId.SPANISH, false).getFirstContent().getCodes().size());
 	}
 	
 	@Test
@@ -74,14 +75,14 @@ public class CodesRemoverTest {
 		params = new Parameters();
 		params.setStripSource(false);
 		remover = new CodesRemover(params, LocaleId.SPANISH);
-		TextUnit tu = new TextUnit("id");
+		ITextUnit tu = new TextUnit("id");
 		tu.setSourceContent(createSimpleFragment());
 		tu.setTargetContent(LocaleId.SPANISH, createSimpleFragment());
 		
 		remover.processTextUnit(tu);
 		assertEquals("t1<br/>t2<b>t3</b>", tu.toString());
 		assertEquals(3, tu.getSource().getFirstContent().getCodes().size());
-		assertEquals("t1t2t3", tu.getTarget(LocaleId.SPANISH).toString());
+		assertEquals("t1t2t3", tu.getTarget(LocaleId.SPANISH, false).toString());
 	}
 	
 	@Test
@@ -89,14 +90,14 @@ public class CodesRemoverTest {
 		params = new Parameters();
 		params.setStripTarget(false);
 		remover = new CodesRemover(params, LocaleId.SPANISH);
-		TextUnit tu = new TextUnit("id");
+		ITextUnit tu = new TextUnit("id");
 		tu.setSourceContent(createSimpleFragment());
 		tu.setTargetContent(LocaleId.SPANISH, createSimpleFragment());
 		
 		remover.processTextUnit(tu);
 		assertEquals("t1t2t3", tu.toString());
-		assertEquals("t1<br/>t2<b>t3</b>", tu.getTarget(LocaleId.SPANISH).toString());
-		assertEquals(3, tu.getTarget(LocaleId.SPANISH).getFirstContent().getCodes().size());
+		assertEquals("t1<br/>t2<b>t3</b>", tu.getTarget(LocaleId.SPANISH, false).toString());
+		assertEquals(3, tu.getTarget(LocaleId.SPANISH, false).getFirstContent().getCodes().size());
 	}
 
 	@Test

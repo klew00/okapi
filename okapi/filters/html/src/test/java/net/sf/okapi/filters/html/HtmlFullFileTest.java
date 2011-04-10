@@ -9,7 +9,7 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.filters.html.HtmlFilter;
 
 import org.junit.After;
@@ -83,7 +83,7 @@ public class HtmlFullFileTest {
 		while (htmlFilter.hasNext()) {
 			Event event = htmlFilter.next();
 			if (event.getEventType() == EventType.TEXT_UNIT) {
-				TextUnit tu = (TextUnit) event.getResource();
+				ITextUnit tu = event.getTextUnit();
 				if (first) {
 					first = false;
 					firstText = tu.getSource().toString();
@@ -107,7 +107,7 @@ public class HtmlFullFileTest {
 		while (htmlFilter.hasNext()) {
 			Event event = htmlFilter.next();
 			if (event.getEventType() == EventType.TEXT_UNIT) {
-				TextUnit tu = (TextUnit) event.getResource();
+				ITextUnit tu = event.getTextUnit();
 				if (first) {
 					first = false;
 					firstText = tu.getSource().toString();

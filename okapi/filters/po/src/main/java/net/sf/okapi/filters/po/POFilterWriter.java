@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2010 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -46,7 +46,7 @@ import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 /**
@@ -77,7 +77,7 @@ public class POFilterWriter implements IFilterWriter {
 	private int pluralGroup;
 	private String linebreak;
 	private GenericContent fmt;
-	private ArrayList<TextUnit> plurals;
+	private ArrayList<ITextUnit> plurals;
 	private boolean forExtractMerge;
 	private boolean makePOT;
 	private String crumbs;
@@ -85,7 +85,7 @@ public class POFilterWriter implements IFilterWriter {
 	public POFilterWriter () {
 		params = new Parameters();
 		fmt = new GenericContent();
-		plurals = new ArrayList<TextUnit>();
+		plurals = new ArrayList<ITextUnit>();
 		forExtractMerge = false;
 	}
 	
@@ -203,7 +203,7 @@ public class POFilterWriter implements IFilterWriter {
 			break;
 		case TEXT_UNIT:
 			if ( pluralGroup > -1 ) { // Store until we reach the end of the group
-				plurals.add((TextUnit)event.getResource());
+				plurals.add(event.getTextUnit());
 			}
 			else {
 				processTextUnit(event);
@@ -317,7 +317,7 @@ public class POFilterWriter implements IFilterWriter {
 			}
 
 			// Fuzzy
-			TextContainer tc = plurals.get(0).getTarget(language);
+			TextContainer tc = plurals.get(0).getTarget(language, false);
 			if ( tc != null ) {
 				Property prop = tc.getProperty(Property.APPROVED);
 				if ( prop != null ) {
@@ -337,10 +337,10 @@ public class POFilterWriter implements IFilterWriter {
 			writer.write(linebreak);
 	
 			int count = 0;
-			for ( TextUnit tu : plurals ) {
+			for ( ITextUnit tu : plurals ) {
 				writer.write(String.format("msgstr[%d] ", count));
 				if ( tu.hasTarget(language) && !makePOT ) {
-					writeQuotedContent(tu.getTarget(language));
+					writeQuotedContent(tu.getTarget(language, false));
 				}
 				else {
 					writer.write("\"\"");
@@ -357,10 +357,10 @@ public class POFilterWriter implements IFilterWriter {
 	
 	private void processTextUnit (Event event) {
 		try {
-			TextUnit tu = event.getTextUnit();
+			ITextUnit tu = event.getTextUnit();
 			if ( tu.isEmpty() ) return; // Do not write out entries with empty source
 			
-			TextContainer tc = tu.getTarget(language);
+			TextContainer tc = tu.getTarget(language, false);
 			Property prop = null;
 			if ( tc != null ) {
 				prop = tc.getProperty(Property.APPROVED);

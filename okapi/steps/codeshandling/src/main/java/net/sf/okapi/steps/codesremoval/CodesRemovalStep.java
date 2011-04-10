@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -27,7 +27,6 @@ import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
-import net.sf.okapi.common.resource.TextUnit;
 
 @UsingParameters(Parameters.class)
 public class CodesRemovalStep extends BasePipelineStep {
@@ -76,7 +75,7 @@ public class CodesRemovalStep extends BasePipelineStep {
 	
 	@Override
 	protected Event handleTextUnit (Event event) {
-		remover.processTextUnit((TextUnit)event.getResource());
+		remover.processTextUnit(event.getTextUnit());
 		return event;
 	}
 

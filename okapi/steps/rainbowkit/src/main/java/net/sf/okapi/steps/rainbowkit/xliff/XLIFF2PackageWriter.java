@@ -29,7 +29,7 @@ import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextPart;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.filters.rainbowkit.Manifest;
 import net.sf.okapi.filters.rainbowkit.MergingInfo;
@@ -135,13 +135,13 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 		return getClass().getName();
 	}
 
-	private Unit toXLIFF2Unit (TextUnit tu) {
+	private Unit toXLIFF2Unit (ITextUnit tu) {
 		Unit unit = new Unit(tu.getId());
 
 		TextContainer srcTc = tu.getSource();
 		TextContainer trgTc = null;
 		if ( tu.hasTarget(manifest.getTargetLocale()) ) {
-			trgTc = tu.getTarget(manifest.getTargetLocale());
+			trgTc = tu.getTarget(manifest.getTargetLocale(), false);
 		}
 		
 		boolean afterFirst = false;

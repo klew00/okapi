@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -30,8 +30,8 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Range;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.lib.extra.Notification;
 import net.sf.okapi.lib.extra.steps.AbstractPipelineStep;
@@ -227,7 +227,7 @@ public class TokenizationStep extends AbstractPipelineStep {
 		event = super.handleTextUnit(event);
 		if (event == null) return event;
 		
-		TextUnit tu = (TextUnit) event.getResource();
+		ITextUnit tu = event.getTextUnit();
 		if (tu == null) return event;
 		
 		if (tu.isEmpty()) return event;
@@ -368,7 +368,7 @@ public class TokenizationStep extends AbstractPipelineStep {
 		return tokens;
 	}
 	
-	private void tokenizeSource(TextUnit tu) {
+	private void tokenizeSource(ITextUnit tu) {
 		if (tu == null) return;
 		
 		Tokens tokens = tokenize(tu.getSource(), getSourceLocale());		
@@ -383,12 +383,12 @@ public class TokenizationStep extends AbstractPipelineStep {
 			ta.addTokens(tokens);
 	}	
 	
-	private void tokenizeTargets(TextUnit tu) {
+	private void tokenizeTargets (ITextUnit tu) {
 		if (tu == null) return;
 		
 		for (LocaleId language : tu.getTargetLocales()) {
 		
-			Tokens tokens = tokenize(tu.getTarget(language), language);
+			Tokens tokens = tokenize(tu.getTarget(language, false), language);
 			if (tokens == null) continue;
 			
 			// Attach to TU		

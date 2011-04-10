@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -34,7 +34,7 @@ import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.filters.dtd.DTDFilter;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
@@ -74,7 +74,7 @@ public class DTDFilterTest {
 	@Test
 	public void testSimpleEntry () {
 		String snippet = "<!--Comment-->\n<!ENTITY entry1 \"Text1\"><!ENTITY test2 \"text2\">";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
 		assertEquals("Text1", tu.getSource().toString());
 		assertEquals("entry1", tu.getName());
@@ -94,7 +94,7 @@ public class DTDFilterTest {
 	@Test
 	public void testEntryWithEnitties () {
 		String snippet = "<!ENTITY entry1 \"&ent1;=ent1, %pent1;=pent1\">";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
 		List<Code> codes = tu.getSource().getFirstContent().getCodes();
 		assertEquals(2, codes.size());
@@ -105,7 +105,7 @@ public class DTDFilterTest {
 	@Test
 	public void testEntryWithNCRs () {
 		String snippet = "<!ENTITY entry1 \"&#xe3;, &#xE3;, &#227;\">";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
 		assertEquals("\u00e3, \u00e3, \u00e3", tu.getSource().toString());
 	}

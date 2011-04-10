@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -30,7 +30,7 @@ import java.util.List;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -78,7 +78,7 @@ public class MosesTextFilterWriterTest {
 		String res = generateMosesOutput(getEventsFromFile(xlfFilter, root+"Test-XLIFF01.xlf"));
 		
 		// Read the Moses string and compare with the expected result
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(res), 4);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(res), 4);
 		assertNotNull(tu);
 		assertEquals("4", tu.getId());
 		assertEquals("Help Authoring Guidelines", tu.getSource().toString());
@@ -96,7 +96,7 @@ public class MosesTextFilterWriterTest {
 		
 		// Read the Moses file and compare with the expected result
 		String res = generateMosesOutput(getEventsFromFile(filter, root+"Test-XLIFF01.out.txt"));
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(res), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(res), 1);
 		assertNotNull(tu);
 		assertEquals("1", tu.getId());
 		assertEquals("Okapi Framework <g id=\"1\">Developer's Guide</g> - Help Guidelines", tu.getSource().toString());
@@ -115,7 +115,7 @@ public class MosesTextFilterWriterTest {
 		String res = generateMosesOutput(getEventsFromFile(xlfFilter, root+"Test-XLIFF02.xlf"));
 		
 		// Check the Moses output
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(res), 3);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(res), 3);
 		assertNotNull(tu);
 		assertEquals("3", tu.getId());
 		assertEquals("<g id=\"1\">word1</g>, <g id=\"2\">word2</g>, <x id=\"3\"/>word3, <x id=\"4\"/>word5, <mrk mtype=\"protected\">to protect</mrk>, etc.",

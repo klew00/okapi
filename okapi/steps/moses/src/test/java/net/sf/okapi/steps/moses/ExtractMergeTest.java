@@ -17,7 +17,7 @@ import net.sf.okapi.common.pipelinedriver.PipelineDriver;
 import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Segment;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.filters.xliff.XLIFFFilter;
 import net.sf.okapi.steps.common.FilterEventsToRawDocumentStep;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
@@ -128,10 +128,10 @@ public class ExtractMergeTest {
 		// Check some translations
 		// Read the Moses string and compare with the expected result
 		List<Event> list = getEventsFromFile(new XLIFFFilter(), out2File.getAbsolutePath(), locFR);
-		TextUnit tu = FilterTestDriver.getTextUnit(list, 2);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 2);
 		assertNotNull(tu);
 		assertEquals("2", tu.getId());
-		ISegments segs = tu.getTarget(locFR).getSegments();
+		ISegments segs = tu.getTarget(locFR, false).getSegments();
 		assertEquals(2, segs.count());
 		for ( Segment seg : segs ) {
 			// Copy to the target was set so the target should be translated

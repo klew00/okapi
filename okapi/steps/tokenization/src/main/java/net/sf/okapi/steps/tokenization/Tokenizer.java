@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -27,10 +27,10 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.LocaleFilter;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.steps.tokenization.common.TokensAnnotation;
 import net.sf.okapi.steps.tokenization.tokens.Tokens;
@@ -76,7 +76,7 @@ public class Tokenizer {
 		Event event = new Event(EventType.START_DOCUMENT, startDoc);		
 		ts.handleEvent(event);
 				
-		TextUnit tu = TextUnitUtil.buildTU(text);
+		ITextUnit tu = TextUnitUtil.buildTU(text);
 		event = new Event(EventType.TEXT_UNIT, tu);		
 		ts.handleEvent(event);
 		
@@ -98,15 +98,15 @@ public class Tokenizer {
 			return null;
 		}
 		
-		if (text instanceof TextUnit) {
-			TextUnit tu = (TextUnit) text;
+		if (text instanceof ITextUnit) {
+			ITextUnit tu = (ITextUnit)text;
 			if ( tu.hasTarget(language) )
-				return doTokenize(tu.getTarget(language), language, tokenNames);
+				return doTokenize(tu.getTarget(language, false), language, tokenNames);
 			else
 				return doTokenize(tu.getSource(), language, tokenNames);
 		}
 		else if (text instanceof TextContainer) {
-			TextContainer tc = (TextContainer) text;
+			TextContainer tc = (TextContainer)text;
 			if ( tc.contentIsOneSegment() ) {
 				return doTokenize(tc.getFirstContent(), language, tokenNames);
 			}
@@ -115,7 +115,7 @@ public class Tokenizer {
 			}
 		}
 		else if (text instanceof TextFragment) {
-			TextFragment tf = (TextFragment) text;
+			TextFragment tf = (TextFragment)text;
 			return doTokenize(TextUnitUtil.getText(tf), language, tokenNames);
 		}
 		else if (text instanceof String) {
@@ -126,7 +126,7 @@ public class Tokenizer {
 		return null;		
 	}
 	
-	public static Tokens tokenize(TextUnit textUnit, LocaleId language, String... tokenNames) {
+	public static Tokens tokenize(ITextUnit textUnit, LocaleId language, String... tokenNames) {
 		return doTokenize(textUnit, language, tokenNames);		
 	}
 	

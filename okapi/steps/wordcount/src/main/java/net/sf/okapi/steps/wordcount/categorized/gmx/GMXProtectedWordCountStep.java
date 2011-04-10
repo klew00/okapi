@@ -1,10 +1,30 @@
+/*===========================================================================
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
+-----------------------------------------------------------------------------
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
+
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+===========================================================================*/
+
 package net.sf.okapi.steps.wordcount.categorized.gmx;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.ISegments;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.steps.wordcount.WordCounter;
 import net.sf.okapi.steps.wordcount.categorized.CategoryGroup;
 import net.sf.okapi.steps.wordcount.categorized.CategoryHandler;
@@ -49,7 +69,7 @@ public class GMXProtectedWordCountStep extends BaseCountStep implements Category
 	}
 
 	@Override
-	protected long countInTextUnit(TextUnit textUnit) {
+	protected long countInTextUnit(ITextUnit textUnit) {
 		if (textUnit == null) return 0;
 		if (textUnit.isTranslatable()) { // Count only in non-translatable TUs
 			removeMetric(textUnit);
@@ -81,7 +101,7 @@ public class GMXProtectedWordCountStep extends BaseCountStep implements Category
 		return 0;
 	}
 
-	private void removeMetric(TextUnit textUnit) {
+	private void removeMetric (ITextUnit textUnit) {
 		TextContainer source = textUnit.getSource();
 		
 		ISegments segs = source.getSegments();

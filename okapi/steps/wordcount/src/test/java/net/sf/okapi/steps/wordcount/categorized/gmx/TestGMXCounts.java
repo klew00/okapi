@@ -9,6 +9,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.query.MatchType;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
@@ -26,7 +27,7 @@ public class TestGMXCounts {
 	private BaseCountStep bcs;
 	private StartDocument sd;
 	private Event sdEvent;
-	private TextUnit tu;
+	private ITextUnit tu;
 	private Event tuEvent;
 	private final Logger logger = Logger.getLogger(getClass().getName());
 	
@@ -68,7 +69,7 @@ public class TestGMXCounts {
 		ls.handleEvent(sdEvent);
 		ls.handleEvent(tuEvent);
 		logger.fine(TextUnitLogger.getTuInfo(tu, LocaleId.ENGLISH));
-		AltTranslationsAnnotation ata = tu.getTarget(LocaleId.FRENCH).getAnnotation(AltTranslationsAnnotation.class);
+		AltTranslationsAnnotation ata = tu.getTarget(LocaleId.FRENCH, false).getAnnotation(AltTranslationsAnnotation.class);
 		ata.add(new AltTranslation(LocaleId.ENGLISH, LocaleId.FRENCH, tu.getSource().getFirstContent(), null, null, MatchType.EXACT_UNIQUE_ID, 100, null));
 		logger.fine(TextUnitLogger.getTuInfo(tu, LocaleId.ENGLISH));
 		

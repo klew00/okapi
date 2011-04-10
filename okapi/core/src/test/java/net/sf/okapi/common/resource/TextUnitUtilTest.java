@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2010 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -77,7 +77,7 @@ public class TextUnitUtilTest {
 	
 	@Test
 	public void testAdjustNoCodes () {
-		TextUnit tu = new TextUnit("1", "src");
+		ITextUnit tu = new TextUnit("1", "src");
 		TextFragment newSrc = new TextFragment("src");
 		TextFragment newTrg = new TextFragment("trg");
 		TextUnitUtil.adjustTargetCodes(tu.getSource().getSegments().getFirstContent(), newTrg, true, false, newSrc, tu);
@@ -86,7 +86,7 @@ public class TextUnitUtilTest {
 	
 	@Test
 	public void testAdjustSameMarkers () {
-		TextUnit tu = createTextUnit1();
+		ITextUnit tu = createTextUnit1();
 		TextFragment tf = new TextFragment("T ");
 		tf.append(TagType.OPENING, "b", "<T>");
 		tf.append("BOLD");
@@ -101,7 +101,7 @@ public class TextUnitUtilTest {
 
 	@Test
 	public void testAdjustExtraMarkers () {
-		TextUnit tu = createTextUnit1();
+		ITextUnit tu = createTextUnit1();
 		TextFragment tf = new TextFragment("T ");
 		tf.append(TagType.OPENING, "b", "<T>");
 		tf.append("BOLD");
@@ -117,7 +117,7 @@ public class TextUnitUtilTest {
 	
 	@Test
 	public void testAdjustMissingMarker () {
-		TextUnit tu = createTextUnit1();
+		ITextUnit tu = createTextUnit1();
 		TextFragment tf = new TextFragment("T ");
 		tf.append(TagType.OPENING, "b", "<T>");
 		tf.append("BOLD");
@@ -132,7 +132,7 @@ public class TextUnitUtilTest {
 	
 	@Test
 	public void testAdjustDifferentTextSameMarkers () {
-		TextUnit tu = createTextUnit1();
+		ITextUnit tu = createTextUnit1();
 		TextFragment tf = new TextFragment("U ");
 		tf.append(TagType.OPENING, "b", "<b>");
 		tf.append("BOLD");
@@ -208,7 +208,7 @@ public class TextUnitUtilTest {
 		GenericSkeleton skel = new GenericSkeleton();
 		TextUnitUtil.trimLeading(tcc, skel);
 
-		TextUnit tu1 = new TextUnit("tu1");
+		ITextUnit tu1 = new TextUnit("tu1");
 		tu1.setSourceContent(tcc);
 		assertEquals("    123456  ", tu1.toString());
 		assertEquals("   ", skel.toString());
@@ -330,7 +330,7 @@ public class TextUnitUtilTest {
 	@Test
 	public void testRemoveQualifiers() {
 
-		TextUnit tu = TextUnitUtil.buildTU("\"qualified text\"");
+		ITextUnit tu = TextUnitUtil.buildTU("\"qualified text\"");
 		TextUnitUtil.removeQualifiers(tu, "\"");
 		assertEquals("qualified text", tu.getSource().toString());
 
@@ -354,8 +354,8 @@ public class TextUnitUtilTest {
 	}
 
 //	@Test
-//	public void testCreateBilingualTextUnit() {
-//		TextUnit ori = new TextUnit("id", "Seg1. Seg2");
+//	public void testCreateBilingualTextUnit4() {
+//		TextUnit ori = new TextUnit4("id", "Seg1. Seg2");
 //		ori.createTarget(LocaleId.ITALIAN, true, IResource.COPY_ALL);
 //		TextContainer tc = ori.getSource();
 //		tc.createSegment(6, 10);
@@ -364,7 +364,7 @@ public class TextUnitUtilTest {
 //		tc.createSegment(6, 10);
 //		tc.createSegment(0, 5);
 //
-//		TextUnit res = TextUnitUtil.createBilingualTextUnit(ori, ori.getSource().getSegment(0), ori
+//		TextUnit res = TextUnitUtil.createBilingualTextUnit4(ori, ori.getSource().getSegment(0), ori
 //				.getTarget(LocaleId.ITALIAN).getSegment(0), LocaleId.ITALIAN);
 //		assertEquals(ori.getId(), res.getId());
 //		assertEquals("Seg1.", res.getSource().toString());
@@ -380,10 +380,10 @@ public class TextUnitUtilTest {
 //		trgSegs.add(new Segment("2", new TextFragment("tSeg2.")));
 //		trgSegs.add(new Segment("1", new TextFragment("tSeg1.")));
 //		trgSegs.add(new Segment("3", new TextFragment("tSeg3.")));
-//		TextUnit ori = new TextUnit("id", "text");
+//		TextUnit ori = new TextUnit4("id", "text");
 //		ori.createTarget(LocaleId.ARABIC, true, IResource.COPY_ALL);
 //
-//		TextUnit res = TextUnitUtil.createBilingualTextUnit(ori, srcSegs, trgSegs,
+//		TextUnit res = TextUnitUtil.createBilingualTextUnit4(ori, srcSegs, trgSegs,
 //				LocaleId.ITALIAN, "__");
 //
 //		assertEquals(ori.getId(), res.getId());
@@ -401,8 +401,8 @@ public class TextUnitUtilTest {
 //	}
 
 	@Test
-	public void createMultilingualTextUnit() {
-		TextUnit otu = new TextUnit("id1");
+	public void createMultilingualTextUnit4() {
+		ITextUnit otu = new TextUnit("id1");
 		List<TextPart> sourceParts = new LinkedList<TextPart>();
 		List<TextPart> targetParts = new LinkedList<TextPart>();
 
@@ -419,20 +419,20 @@ public class TextUnitUtilTest {
 		List<AlignedPair> alignedPairs = new LinkedList<AlignedPair>();
 		alignedPairs.add(new AlignedPair(sourceParts, targetParts, LocaleId.SPANISH));
 		
-		TextUnit mtu = TextUnitUtil.createMultilingualTextUnit(otu, alignedPairs, LocaleId.SPANISH);
+		ITextUnit mtu = TextUnitUtil.createMultilingualTextUnit(otu, alignedPairs, LocaleId.SPANISH);
 		
 		assertEquals(otu.getId(), mtu.getId());
 		assertEquals("[sSentence one. sSentence two.] ", fmt.printSegmentedContent(mtu.getSource(), true));
-		assertEquals("[tSentence one. tSentence two.] ", fmt.printSegmentedContent(mtu.getTarget(LocaleId.SPANISH), true));
+		assertEquals("[tSentence one. tSentence two.] ", fmt.printSegmentedContent(mtu.getTarget(LocaleId.SPANISH, false), true));
 
 		assertEquals(1, mtu.getSource().getSegments().count());
 		assertEquals("sSentence one. sSentence two.", mtu.getSource().getSegments().get(0).toString());
 
-		assertEquals(1, mtu.getTarget(LocaleId.SPANISH).getSegments().count());
-		Segment tseg = mtu.getTarget(LocaleId.SPANISH).getSegments().get(0);
+		assertEquals(1, mtu.getTarget(LocaleId.SPANISH, false).getSegments().count());
+		Segment tseg = mtu.getTarget(LocaleId.SPANISH, false).getSegments().get(0);
 		Segment sseg = mtu.getSource().getSegments().get(0);
 		assertEquals("tSentence one. tSentence two.", tseg.toString());
-				
+
 		assertEquals(sseg.id, tseg.id);
 	}
 
@@ -466,8 +466,8 @@ public class TextUnitUtilTest {
 		return tf;
 	}
 
-	private TextUnit createTextUnit1 () {
-		TextUnit tu = new TextUnit("1", "t ");
+	private ITextUnit createTextUnit1 () {
+		ITextUnit tu = new TextUnit("1", "t ");
 		TextFragment tf = tu.getSource().getSegments().getFirstContent();
 		tf.append(TagType.OPENING, "b", "<b>");
 		tf.append("bold");

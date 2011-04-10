@@ -2,6 +2,7 @@ package net.sf.okapi.applications.serval;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
@@ -271,7 +272,7 @@ public class ServalForm {
 			long start = System.nanoTime();
 			
 			if ( chkLeverage.getSelection() ) {
-				TextUnit tu = new TextUnit("id");
+				ITextUnit tu = new TextUnit("id");
 				if ( chkRawText.getSelection() ) {
 					tu.setSource(new TextContainer(edQuery.getText()));
 				}

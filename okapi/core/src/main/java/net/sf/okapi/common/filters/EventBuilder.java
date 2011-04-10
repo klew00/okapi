@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2010 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -43,6 +43,7 @@ import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
@@ -348,7 +349,7 @@ public class EventBuilder {
 	 * 
 	 * @return the filter event
 	 */
-	public TextUnit peekMostRecentTextUnit() {
+	public ITextUnit peekMostRecentTextUnit() {
 		if (tempFilterEventStack.isEmpty()) {
 			return null;
 		}
@@ -357,7 +358,7 @@ public class EventBuilder {
 		for (int i = lastIndex; i >= 0; i--) {
 			Event fe = tempFilterEventStack.get(i);
 			if (fe.getEventType() == EventType.TEXT_UNIT) {
-				TextUnit tu = (TextUnit) fe.getResource();
+				ITextUnit tu = (ITextUnit)fe.getResource();
 				return tu;
 			}
 		}
@@ -476,8 +477,8 @@ public class EventBuilder {
 	// tags
 	// ////////////////////////////////////////////////////////////////////////
 
-	private TextUnit embeddedTextUnit(PropertyTextUnitPlaceholder propOrText, String tag) {
-		TextUnit tu = new TextUnit(textUnitId.createId(), propOrText.getValue());
+	private ITextUnit embeddedTextUnit(PropertyTextUnitPlaceholder propOrText, String tag) {
+		ITextUnit tu = new TextUnit(textUnitId.createId(), propOrText.getValue());
 		tu.setPreserveWhitespaces(this.preserveWhitespace);
 
 		tu.setMimeType(propOrText.getMimeType());
@@ -542,7 +543,7 @@ public class EventBuilder {
 	}
 
 	private boolean processAllEmbedded(String tag, LocaleId locale,
-			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders, boolean inlineCode, TextUnit parentTu) {
+			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders, boolean inlineCode, ITextUnit parentTu) {
 		int propOrTextId = -1;
 		boolean textPlaceholdersOnly = isTextPlaceHoldersOnly(propertyTextUnitPlaceholders);
 		INameable resource = null;
@@ -587,7 +588,7 @@ public class EventBuilder {
 			}
 
 			if (propOrText.getAccessType() == PlaceholderAccessType.TRANSLATABLE) {
-				TextUnit tu = embeddedTextUnit(propOrText, tag);
+				ITextUnit tu = embeddedTextUnit(propOrText, tag);
 				currentSkeleton.addReference(tu);
 				referencableFilterEvents.add(new Event(EventType.TEXT_UNIT, tu));
 			} else if (propOrText.getAccessType() == PlaceholderAccessType.WRITABLE_PROPERTY) {
@@ -715,7 +716,7 @@ public class EventBuilder {
 			endDocumentPart();
 		}
 
-		TextUnit tu;
+		ITextUnit tu;
 		tu = new TextUnit(textUnitId.createId(), text);
 		tu.setMimeType(this.mimeType);
 		tu.setPreserveWhitespaces(this.preserveWhitespace);
@@ -723,7 +724,7 @@ public class EventBuilder {
 		// test for pre-existing parent TextUnit and set the current TextUnit as a child
 		Event e = peekTempEvent();
 		if (e != null && e.getEventType() == EventType.TEXT_UNIT) {
-			TextUnit parentTu = (TextUnit) e.getResource();
+			ITextUnit parentTu = e.getTextUnit();
 			tu.setIsReferent(true);
 			GenericSkeleton skel = (GenericSkeleton) parentTu.getSkeleton();
 			if (skel == null) {
@@ -756,7 +757,7 @@ public class EventBuilder {
 	 * 
 	 * @return the ended {@link TextUnit}
 	 */
-	public TextUnit endTextUnit() {
+	public ITextUnit endTextUnit() {
 		return endTextUnit(null, null, null);
 	}
 
@@ -767,7 +768,7 @@ public class EventBuilder {
 	 *            the tag that ends the complex {@link TextUnit}
 	 * @return the ended {@link TextUnit}
 	 */
-	public TextUnit endTextUnit(GenericSkeleton endMarker) {
+	public ITextUnit endTextUnit(GenericSkeleton endMarker) {
 		return endTextUnit(endMarker, null, null);
 	}
 
@@ -784,7 +785,7 @@ public class EventBuilder {
 	 * 
 	 * @throws OkapiIllegalFilterOperationException
 	 */
-	public TextUnit endTextUnit(GenericSkeleton endMarker, LocaleId locale,
+	public ITextUnit endTextUnit(GenericSkeleton endMarker, LocaleId locale,
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
 		Event tempTextUnit;
 
@@ -808,9 +809,9 @@ public class EventBuilder {
 			skel.add((GenericSkeleton) endMarker);
 		}
 
-		tempTextUnit.setResource(postProcessTextUnit((TextUnit) tempTextUnit.getResource()));
+		tempTextUnit.setResource(postProcessTextUnit((ITextUnit) tempTextUnit.getResource()));
 		filterEvents.add(tempTextUnit);
-		return (TextUnit) tempTextUnit.getResource();
+		return (ITextUnit)tempTextUnit.getResource();
 	}
 
 	/**
@@ -826,7 +827,7 @@ public class EventBuilder {
 			throw new OkapiIllegalFilterOperationException("Trying to add text to a TextUnit that does not exist.");
 		}
 
-		TextUnit tu = peekMostRecentTextUnit();
+		ITextUnit tu = peekMostRecentTextUnit();
 		// We can use the first part as nothing is segment at this point
 		tu.getSource().getFirstContent().append(text);
 	}
@@ -838,18 +839,18 @@ public class EventBuilder {
 	 * 
 	 * @throws OkapiIllegalFilterOperationException
 	 */
-	public void addToTextUnit(TextUnit textUnit) {
+	public void addToTextUnit (ITextUnit textUnit) {
 		if (!isCurrentTextUnit()) {
 			throw new OkapiIllegalFilterOperationException(
 					"Trying to add a TextUnit to a TextUnit that does not exist.");
 		}
 
-		TextUnit tu = new TextUnit(textUnitId.createId());
+		ITextUnit tu = new TextUnit(textUnitId.createId());
 		tu.setPreserveWhitespaces(this.preserveWhitespace);
 		tu.setMimeType(this.mimeType);
 		tu.setIsReferent(true);
 
-		TextUnit parentTU = peekMostRecentTextUnit();
+		ITextUnit parentTU = peekMostRecentTextUnit();
 
 		GenericSkeleton skel = (GenericSkeleton) parentTU.getSkeleton();
 		if (skel == null) {
@@ -930,7 +931,7 @@ public class EventBuilder {
 		}
 
 		currentSkeleton = new GenericSkeleton();
-		TextUnit tu = peekMostRecentTextUnit();
+		ITextUnit tu = peekMostRecentTextUnit();
 		startCode(code);
 		processAllEmbedded(code.toString(), locale, propertyTextUnitPlaceholders, true, tu);
 		if (endCodeNow) {
@@ -1085,7 +1086,7 @@ public class EventBuilder {
 			"Trying to end a Code that does not exist. Did you call startCode?", e);
 		}
 
-		TextUnit tu = peekMostRecentTextUnit();
+		ITextUnit tu = peekMostRecentTextUnit();
 		// We can use the first part as nothing is segment at this point
 		tu.getSource().getFirstContent().append(c);		
 	}
@@ -1105,7 +1106,7 @@ public class EventBuilder {
 		}
 
 		c.appendOuterData(tag);
-		TextUnit tu = peekMostRecentTextUnit();
+		ITextUnit tu = peekMostRecentTextUnit();
 		// We can use the first part as nothing is segment at this point
 		tu.getSource().getFirstContent().append(c);	}
 	
@@ -1256,7 +1257,7 @@ public class EventBuilder {
 	 * @param mimeType - mime type
 	 */
 	public void setTextUnitMimeType(String mimeType) {
-		TextUnit tu = peekMostRecentTextUnit();
+		ITextUnit tu = peekMostRecentTextUnit();
 		if (tu != null) {
 			tu.setMimeType(mimeType);
 		}
@@ -1279,7 +1280,7 @@ public class EventBuilder {
 	 *            the preserveWhitespace as boolean.
 	 */
 	public void setTextUnitPreserveWhitespace(boolean preserveWhitespace) {
-		TextUnit tu = peekMostRecentTextUnit();
+		ITextUnit tu = peekMostRecentTextUnit();
 		if (tu != null) {
 			tu.setPreserveWhitespaces(preserveWhitespace);
 		}
@@ -1330,7 +1331,7 @@ public class EventBuilder {
 	 *             if there is no current {@link TextUnit}
 	 */
 	public void setTextUnitName(String name) {
-		TextUnit tu = peekMostRecentTextUnit();
+		ITextUnit tu = peekMostRecentTextUnit();
 		if (tu != null) {
 			tu.setName(name);
 		}
@@ -1343,7 +1344,7 @@ public class EventBuilder {
 	 *            - the TextUnit type.
 	 */
 	public void setTextUnitType(String type) {
-		TextUnit tu = peekMostRecentTextUnit();
+		ITextUnit tu = peekMostRecentTextUnit();
 		if (tu != null) {
 			tu.setType(type);
 		}
@@ -1356,7 +1357,7 @@ public class EventBuilder {
 	 *            - the TextUnit translatable flag.
 	 */
 	public void setTextUnitTranslatable(boolean translatable) {
-		TextUnit tu = peekMostRecentTextUnit();
+		ITextUnit tu = peekMostRecentTextUnit();
 		if (tu != null) {
 			tu.setIsTranslatable(translatable);
 		}
@@ -1394,7 +1395,7 @@ public class EventBuilder {
 	 * Do any required post-processing on the TextUnit after endTextUnit is called. Default implementation leaves
 	 * TextUnit unchanged. Override this method if you need to do format specific handing such as collapsing whitespace.
 	 */
-	protected TextUnit postProcessTextUnit(TextUnit textUnit) {
+	protected ITextUnit postProcessTextUnit(ITextUnit textUnit) {
 		return textUnit;
 	}
 
@@ -1408,7 +1409,7 @@ public class EventBuilder {
 	public boolean isTextUnitWithSameType(String type) {
 		Event e = peekTempEvent();
 		if (e != null && e.getEventType() == EventType.TEXT_UNIT) {
-			TextUnit tu = (TextUnit) e.getResource();
+			ITextUnit tu = e.getTextUnit();
 			if (tu != null && tu.getType() != null && tu.getType().equals(type)) {
 				return true;
 			}

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -17,6 +17,7 @@
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
+
 package net.sf.okapi.tm.pensieve.tmx;
 
 import net.sf.okapi.common.filters.IFilter;
@@ -25,7 +26,6 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.tm.pensieve.writer.ITmWriter;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
 import net.sf.okapi.tm.pensieve.common.PensieveUtil;
@@ -92,7 +92,7 @@ public class OkapiTmxImporter implements ITmxImporter {
     private void indexEvent(LocaleId targetLang, ITmWriter tmWriter, Event event) throws IOException {
         TranslationUnit tu;
         if (event.getEventType() == EventType.TEXT_UNIT) {
-            tu = PensieveUtil.convertToTranslationUnit(sourceLang, targetLang, (TextUnit) event.getResource());
+            tu = PensieveUtil.convertToTranslationUnit(sourceLang, targetLang, event.getTextUnit());
             tmWriter.indexTranslationUnit(tu);
         }
     }

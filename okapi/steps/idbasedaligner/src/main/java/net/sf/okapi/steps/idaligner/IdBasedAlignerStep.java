@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -38,7 +38,7 @@ import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
 
 /**
@@ -62,7 +62,7 @@ public class IdBasedAlignerStep extends BasePipelineStep {
 	private LocaleId targetLocale;
 	private RawDocument targetInput = null;
 	private TMXWriter tmx;
-	private Map<String, TextUnit> targetTextUnitMap;
+	private Map<String, ITextUnit> targetTextUnitMap;
 
 	public IdBasedAlignerStep() {
 		params = new Parameters();
@@ -134,7 +134,7 @@ public class IdBasedAlignerStep extends BasePipelineStep {
 	@Override
 	protected Event handleStartDocument(Event event) {
 		if (targetInput != null) {
-			targetTextUnitMap = new HashMap<String, TextUnit>();
+			targetTextUnitMap = new HashMap<String, ITextUnit>();
 			getTargetTextUnits();
 		}
 
@@ -152,8 +152,8 @@ public class IdBasedAlignerStep extends BasePipelineStep {
 
 	@Override
 	protected Event handleTextUnit(Event sourceEvent) {
-		TextUnit sourceTu = sourceEvent.getTextUnit();
-		TextUnit targetTu = null;
+		ITextUnit sourceTu = sourceEvent.getTextUnit();
+//		ITextUnit targetTu = null;
 
 		// Skip non-translatable and empty
 		if (!sourceTu.isTranslatable() || sourceTu.isEmpty()) {
@@ -161,7 +161,7 @@ public class IdBasedAlignerStep extends BasePipelineStep {
 		}
 
 		// Populate the target TU
-		TextUnit alignedTextUnit = sourceTu.clone();
+		ITextUnit alignedTextUnit = sourceTu.clone();
 		TextContainer targetTC = sourceTu.getSource();
 				
 		if (targetInput != null) {
@@ -174,7 +174,7 @@ public class IdBasedAlignerStep extends BasePipelineStep {
 
 			// Use the target text, if it exists
 			if (targetTextUnitMap.containsKey(sourceTu.getName())) {
-				targetTu = targetTextUnitMap.get(sourceTu.getName());
+//				targetTu = targetTextUnitMap.get(sourceTu.getName());
 				alignedTextUnit.setTarget(targetLocale, targetTC);
 			}
 			else {

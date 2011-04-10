@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -28,6 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.annotation.IAnnotation;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
@@ -35,7 +36,7 @@ import net.sf.okapi.lib.persistence.IPersistenceSession;
 import net.sf.okapi.lib.persistence.PersistenceBean;
 import net.sf.okapi.lib.persistence.beans.FactoryBean;
 
-public class TextUnitBean extends PersistenceBean<TextUnit> {
+public class TextUnitBean extends PersistenceBean<ITextUnit> {
 	private String id;
 	private int refCount;
 	private String name;
@@ -53,12 +54,12 @@ public class TextUnitBean extends PersistenceBean<TextUnit> {
 //	private ConcurrentHashMap<String, List<RangeBean>> trgSegRanges = new ConcurrentHashMap<String, List<RangeBean>>();
 
 	@Override
-	protected TextUnit createObject(IPersistenceSession session) {
+	protected ITextUnit createObject(IPersistenceSession session) {
 		return new TextUnit(getId());
 	}
 
 	@Override
-	protected void fromObject(TextUnit obj, IPersistenceSession session) {
+	protected void fromObject(ITextUnit obj, IPersistenceSession session) {
 		id = obj.getId();
 		refCount = obj.getReferenceCount();
 		name = obj.getName();
@@ -81,7 +82,7 @@ public class TextUnitBean extends PersistenceBean<TextUnit> {
 		for (LocaleId locId : obj.getTargetLocales()) {
 			TextContainerBean targetBean = new TextContainerBean();
 			targets.put(locId.toString(), targetBean);
-			targetBean.set(obj.getTarget(locId), session);
+			targetBean.set(obj.getTarget(locId, false), session);
 		}
 		
 //			// srcSegRanges
@@ -96,7 +97,7 @@ public class TextUnitBean extends PersistenceBean<TextUnit> {
 	}
 
 	@Override
-	protected void setObject(TextUnit obj, IPersistenceSession session) {
+	protected void setObject(ITextUnit obj, IPersistenceSession session) {
 		obj.setId(id);
 		obj.setReferenceCount(refCount);
 		obj.setName(name);

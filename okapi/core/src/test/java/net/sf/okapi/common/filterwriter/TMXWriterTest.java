@@ -1,5 +1,5 @@
 /*===========================================================================
-Copyright (C) 2009 by the Okapi Framework contributors
+Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
 This library is free software; you can redistribute it and/or modify it
 under the terms of the GNU Lesser General Public License as published by
@@ -34,6 +34,7 @@ import java.io.StringWriter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextUnit;
 
 /**
@@ -89,28 +90,28 @@ public class TMXWriterTest {
 
     @Test
     public void testTmxTuNoAttributes() {
-    	TextUnit tu = createTextUnit("id", "SourceContent", "TargetContent", null);
+    	ITextUnit tu = createTextUnit("id", "SourceContent", "TargetContent", null);
     	tmxWriter.writeTUFull(tu);
     	testTu(tu, strWriter.toString());
     }
 
     @Test
     public void testTmxTuSingleProp() {
-    	TextUnit tu = createTextUnit("id", "SourceContent", "TargetContent", new String[][]{{"prop1", "value1"}});
+    	ITextUnit tu = createTextUnit("id", "SourceContent", "TargetContent", new String[][]{{"prop1", "value1"}});
     	tmxWriter.writeTUFull(tu);
     	testTu(tu, strWriter.toString());
     }
 
     @Test
     public void testTmxTuMultiProp() {
-    	TextUnit tu = createTextUnit("id", "SourceContent", "TargetContent", new String[][]{{"prop1", "value1"}, {"prop2", "value2"}});
+    	ITextUnit tu = createTextUnit("id", "SourceContent", "TargetContent", new String[][]{{"prop1", "value1"}, {"prop2", "value2"}});
     	tmxWriter.writeTUFull(tu);
     	testTu(tu, strWriter.toString());
     }
 
     @Test
     public void testTmxTuMultiLang() {
-    	TextUnit tu = createTextUnit("id", "SourceContent", "TargetContent", new String[][]{{"prop1", "value1"}, {"prop2", "value2"}});
+    	ITextUnit tu = createTextUnit("id", "SourceContent", "TargetContent", new String[][]{{"prop1", "value1"}, {"prop2", "value2"}});
     	tu.setTargetContent(locKR, new TextFragment("KoreanTarget"));
     	tmxWriter.writeTUFull(tu);
     	testTu(tu, strWriter.toString());
@@ -124,7 +125,7 @@ public class TMXWriterTest {
     private final static String expectedHeaderTmx = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><tmx version=\"1.4\"><header creationtool=\"pensieve\" creationtoolversion=\"0.0.1\" segtype=\"sentence\" o-tmf=\"pensieve_format\" adminlang=\"en\" srclang=\"en\" datatype=\"unknown\"></header><body>";
     private final static String expectedFooterTmx = "</body></tmx>";
 
-    private void testTu(TextUnit tu, String tmx) {
+    private void testTu(ITextUnit tu, String tmx) {
     	tmx = stripNewLinesAndReturns(tmx);
     	String properties = getProps(tu);
     	String targetTuvs = getTargetTuvs(tu);
@@ -140,7 +141,7 @@ public class TMXWriterTest {
     	assertEquals("TU Element", expectedHeaderTmx + expectedTMX, tmx);
     }
 
-    private String getProps(TextUnit tu) {
+    private String getProps(ITextUnit tu) {
     	String properties = "";
     	for (String propName : tu.getPropertyNames()) {
     		properties += "<prop type=\"" + propName + "\">" + tu.getProperty(propName) + "</prop>";
@@ -148,7 +149,7 @@ public class TMXWriterTest {
     	return properties;
     }
 
-    private String getTargetTuvs(TextUnit tu) {
+    private String getTargetTuvs(ITextUnit tu) {
     	String targetTuvs = "";
     	for (LocaleId langName : tu.getTargetLocales()) {
     		targetTuvs += "<tuv xml:lang=\"" + langName + "\">" + "<seg>" + 
@@ -157,8 +158,8 @@ public class TMXWriterTest {
     	return targetTuvs;
     }
 
-    private TextUnit createTextUnit(String id, String sourceContent, String targetContent, String[][] attributes) {
-    	TextUnit tu = new TextUnit(id);
+    private ITextUnit createTextUnit(String id, String sourceContent, String targetContent, String[][] attributes) {
+    	ITextUnit tu = new TextUnit(id);
     	tu.setName(id);
     	tu.setSourceContent(new TextFragment(sourceContent));
     	tu.setTargetContent(locFR, new TextFragment(targetContent));

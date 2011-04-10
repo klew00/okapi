@@ -38,7 +38,7 @@ import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
@@ -197,11 +197,11 @@ public class POFilterTest {
 	public void testInlines () {
 		String snippet = "msgid \"Text %s and %d and %f\"\n"
 			+ "msgstr \"Texte %f et %d et %s\"\n";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
 		assertNotNull(tu);
 		assertTrue(tu.hasTarget(locFR));
 		TextFragment src = tu.getSource().getFirstContent();
-		TextFragment trg = tu.getTarget(locFR).getFirstContent();
+		TextFragment trg = tu.getTarget(locFR, false).getFirstContent();
 		assertEquals(3, src.getCodes().size());
 		assertEquals(src.getCodes().size(), trg.getCodes().size());
 		FilterTestDriver.checkCodeData(src, trg);
@@ -215,10 +215,10 @@ public class POFilterTest {
 			+ "msgctxt \"abc\"\n"
 			+ "msgid \"Text1\"\n"
 			+ "msgstr \"Texte1\"\n";
-		TextUnit tu1 = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		ITextUnit tu1 = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
 		assertNotNull(tu1);
 		assertEquals("P39E32278", tu1.getName());
-		TextUnit tu2 = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 2);
+		ITextUnit tu2 = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 2);
 		assertNotNull(tu2);
 		assertEquals("NE9257EEE", tu2.getName());
 	}
@@ -232,7 +232,7 @@ public class POFilterTest {
 			+ "msgstr \"\"\n";
 		// When approved entries are protected
 		filter.getParameters().setBoolean("protectApproved", true);
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
 		assertTrue(tu!=null);
 		assertFalse(tu.isTranslatable());
 		tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 2);
@@ -266,7 +266,7 @@ public class POFilterTest {
 		String snippet = "msgctxt \"okpCtx:tu=1\"\n"
 			+ "msgid \"EN<x>...</x><x/>\"\n"
 			+ "msgstr \"FR<x>...</x><x/>\"\n";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
 		assertNotNull(tu);
 		assertEquals("EN<x>...</x><x/>", tu.getSource().toString());
 	}
@@ -276,7 +276,7 @@ public class POFilterTest {
 		String snippet = "msgctxt \"okpCtx:tu=1\"\n"
 			+ "msgid \"EN<g1>...</g1><x2/>\"\n"
 			+ "msgstr \"FR<g1>...</g1><x2/>\"\n";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
 		assertNotNull(tu);
 		assertEquals(3, tu.getSource().getFirstContent().getCodes().size());
 	}
@@ -356,7 +356,7 @@ public class POFilterTest {
 		String snippet = "msgctxt \""+POFilterWriter.CRUMBS_PREFIX+":tu=123\"\n"
 			+ "msgid \"Source\"\n"
 			+ "msgstr \"Target\"\n";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
 		assertNotNull(tu);
 		assertEquals("Source", tu.getSource().toString());
 		assertEquals("123", tu.getId());
@@ -367,10 +367,10 @@ public class POFilterTest {
 		String snippet = "msgctxt \n\""+POFilterWriter.CRUMBS_PREFIX+":tu=123\"\n"
 			+ "msgid \n\"Source\"\n"
 			+ "msgstr \n\"Target\"\n";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
 		assertNotNull(tu);
 		assertEquals("Source", tu.getSource().toString());
-		assertEquals("Target", tu.getTarget(locFR).toString());
+		assertEquals("Target", tu.getTarget(locFR, false).toString());
 		assertEquals("123", tu.getId());
 	}
 	
@@ -396,11 +396,11 @@ public class POFilterTest {
 			+ "msgctxt \"Context2\"\n"
 			+ "msgid \"Source\"\n"
 			+ "msgstr \"Target\"\n";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
 
 		assertNotNull(tu);
 		assertEquals("Source", tu.getSource().toString());
-		assertEquals("Target", tu.getTarget(locFR).toString());
+		assertEquals("Target", tu.getTarget(locFR, false).toString());
 
 		assertTrue(tu.hasTargetProperty(locFR, Property.APPROVED));
 		Property prop = tu.getTargetProperty(locFR, Property.APPROVED);
@@ -437,7 +437,7 @@ public class POFilterTest {
 
 	@Test
 	public void testTUPluralEntry_DefaultSingular () {
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(makePluralEntry(), locEN, locFR), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(makePluralEntry(), locEN, locFR), 1);
 		assertNotNull(tu);
 		assertEquals("untranslated-singular", tu.getSource().toString());
 		assertFalse(tu.hasTarget(locFR));
@@ -445,7 +445,7 @@ public class POFilterTest {
 
 	@Test
 	public void testTUPluralEntry_DefaultPlural () {
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(makePluralEntry(), locEN, locFR), 2);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(makePluralEntry(), locEN, locFR), 2);
 		assertNotNull(tu);
 		assertEquals("untranslated-plural", tu.getSource().toString());
 		assertFalse(tu.hasTarget(locFR));
@@ -467,9 +467,9 @@ public class POFilterTest {
 	public void testPluralEntryFuzzy () {
 		String snippet = makePluralEntryFuzzy();
 		// First TU
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
 		assertNotNull(tu);
-		assertEquals("translation-singular", tu.getTarget(locFR).toString());
+		assertEquals("translation-singular", tu.getTarget(locFR, false).toString());
 		Property prop = tu.getTargetProperty(locFR, Property.APPROVED);
 		assertNotNull(prop);
 		assertEquals("no", prop.getValue());
@@ -477,7 +477,7 @@ public class POFilterTest {
 		// Second TU
 		tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 2);
 		assertNotNull(tu);
-		assertEquals("translation-plural", tu.getTarget(locFR).toString());
+		assertEquals("translation-plural", tu.getTarget(locFR, false).toString());
 		prop = tu.getTargetProperty(locFR, Property.APPROVED);
 		assertNotNull(prop);
 		assertEquals("no", prop.getValue());

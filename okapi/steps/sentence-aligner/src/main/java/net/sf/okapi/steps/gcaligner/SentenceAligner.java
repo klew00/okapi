@@ -1,5 +1,7 @@
-/**
- *  Copyright 2009 Welocalize, Inc. 
+/**===========================================================================
+ Additional changes Copyright (C) 2009-2011 by the Okapi Framework contributors
+ ===========================================================================*/
+/*  Copyright 2009 Welocalize, Inc. 
  *  
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -14,9 +16,6 @@
  *  limitations under the License.
  *  
  */
-/*===========================================================================
- Additional changes Copyright (C) 2009-2010 by the Okapi Framework contributors
- ===========================================================================*/
 
 package net.sf.okapi.steps.gcaligner;
 
@@ -27,9 +26,9 @@ import java.util.logging.Logger;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.AlignedPair;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextPart;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
 
 /**
@@ -45,33 +44,33 @@ public class SentenceAligner {
 	/*
 	 * TODO: set value for what we consider low scoring matches 
 	 */
-	private static final int LOW_SCORE_THRESHOLD = 0;
+	//private static final int LOW_SCORE_THRESHOLD = 0;
 
-	public TextUnit align(TextUnit sourceParagraph, TextUnit targetParagraph, LocaleId srcLocale,
+	public ITextUnit align(ITextUnit sourceParagraph, ITextUnit targetParagraph, LocaleId srcLocale,
 			LocaleId trgLocale) {
 		return alignWithoutSkeletonAlignment(sourceParagraph, targetParagraph, srcLocale, trgLocale);
 	}
 
-	public TextUnit align(TextUnit bilingualParagraph, LocaleId srcLocale, LocaleId trgLocale) {
+	public ITextUnit align(ITextUnit bilingualParagraph, LocaleId srcLocale, LocaleId trgLocale) {
 		return alignWithoutSkeletonAlignment(bilingualParagraph, srcLocale, trgLocale);
 	}
 
-	private TextUnit alignWithoutSkeletonAlignment(TextUnit sourceParagraph,
-			TextUnit targetParagraph, LocaleId srcLocale, LocaleId trgLocale) {
+	private ITextUnit alignWithoutSkeletonAlignment(ITextUnit sourceParagraph,
+			ITextUnit targetParagraph, LocaleId srcLocale, LocaleId trgLocale) {
 		SegmentAlignmentFunction alignmentFunction = new SegmentAlignmentFunction(srcLocale,
 				trgLocale);
 		return alignSegments(sourceParagraph, targetParagraph, srcLocale, trgLocale,
 				alignmentFunction);
 	}
 
-	private TextUnit alignWithoutSkeletonAlignment(TextUnit bilingualParagraph, LocaleId srcLocale,
+	private ITextUnit alignWithoutSkeletonAlignment(ITextUnit bilingualParagraph, LocaleId srcLocale,
 			LocaleId trgLocale) {
 		SegmentAlignmentFunction alignmentFunction = new SegmentAlignmentFunction(srcLocale,
 				trgLocale);
 		return alignSegments(bilingualParagraph, srcLocale, trgLocale, alignmentFunction);
 	}
 
-	private TextUnit alignSegments(TextUnit sourceParagraph, TextUnit targetParagraph,
+	private ITextUnit alignSegments(ITextUnit sourceParagraph, ITextUnit targetParagraph,
 			LocaleId srcLocale, LocaleId trgLocale, SegmentAlignmentFunction alignmentFunction) {
 
 		// To prevent OutOfMemory exception, simply don't perform the
@@ -130,20 +129,20 @@ public class SentenceAligner {
 		return TextUnitUtil.createMultilingualTextUnit(sourceParagraph, alignedPairs, trgLocale);
 	}
 
-	private TextUnit alignSegments(TextUnit bilingualParagraph, LocaleId srcLocale,
+	private ITextUnit alignSegments(ITextUnit bilingualParagraph, LocaleId srcLocale,
 			LocaleId trgLocale, SegmentAlignmentFunction alignmentFunction) {
 
 		// To prevent OutOfMemory exception, simply don't perform the
 		// alignment for a block with a lot of segments. TEMPORARY FIX
 		if (bilingualParagraph.getSource().getSegments().count()
-				* bilingualParagraph.getTarget(trgLocale).getSegments().count() > MAX_CELL_SIZE) {
+				* bilingualParagraph.getTarget(trgLocale, false).getSegments().count() > MAX_CELL_SIZE) {
 			throw new IllegalArgumentException("Too many segments. Can only align "
 					+ Long.toString(MAX_CELL_SIZE)
 					+ ". Where the number equals the source segments times the target segments.");
 		}
 
 		DpMatrix matrix = new DpMatrix(bilingualParagraph.getSource().getSegments().asList(),
-				bilingualParagraph.getTarget(trgLocale).getSegments().asList(), alignmentFunction);
+				bilingualParagraph.getTarget(trgLocale, false).getSegments().asList(), alignmentFunction);
 
 		List<DpMatrixCell> result = matrix.align();
 

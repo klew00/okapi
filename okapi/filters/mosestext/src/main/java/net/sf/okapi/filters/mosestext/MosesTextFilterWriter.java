@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -43,7 +43,7 @@ import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
@@ -202,7 +202,7 @@ public class MosesTextFilterWriter implements IFilterWriter {
 		}
 	}
 	
-	private void processTextUnit (TextUnit tu) {
+	private void processTextUnit (ITextUnit tu) {
 		if ( !tu.isTranslatable() ) {
 			return;
 		}
@@ -210,7 +210,7 @@ public class MosesTextFilterWriter implements IFilterWriter {
 			ISegments srcSegs = tu.getSource().getSegments();
 			ISegments trgSegs = null;
 			if ( tu.hasTarget(trgLoc) ) {
-				trgSegs = tu.getTarget(trgLoc).getSegments();
+				trgSegs = tu.getTarget(trgLoc, false).getSegments();
 			}
 
 			// Process by segments

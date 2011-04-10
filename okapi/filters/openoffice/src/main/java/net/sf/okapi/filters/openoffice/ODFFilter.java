@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -47,6 +47,7 @@ import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment;
@@ -83,7 +84,7 @@ public class ODFFilter implements IFilter {
 	private Parameters params;
 	private GenericSkeleton skel;
 	private TextFragment tf;
-	private TextUnit tu;
+	private ITextUnit tu;
 	private boolean canceled;
 	private boolean hasNext;
 	private Stack<Context> context;
@@ -408,7 +409,7 @@ public class ODFFilter implements IFilter {
 					String text = reader.getAttributeValue(i);
 					if ( hasTrueText(text) ) {
 						// Create a text unit
-						TextUnit tu = new TextUnit(String.valueOf(++tuId));
+						ITextUnit tu = new TextUnit(String.valueOf(++tuId));
 						tu.setSourceContent(new TextFragment(text));
 						tu.setIsReferent(true);
 						tu.setMimeType(MimeTypeMapper.ODF_MIME_TYPE);

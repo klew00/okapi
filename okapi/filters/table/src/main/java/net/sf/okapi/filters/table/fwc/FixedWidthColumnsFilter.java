@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -23,9 +23,9 @@ package net.sf.okapi.filters.table.fwc;
 import java.util.List;
 
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.common.ListUtil;
 import net.sf.okapi.filters.table.base.BaseTableFilter;
@@ -79,7 +79,7 @@ public class FixedWidthColumnsFilter extends BaseTableFilter {
 	}
 
 	@Override
-	protected TextProcessingResult extractCells(List<TextUnit> cells, TextContainer lineContainer, long lineNum) {
+	protected TextProcessingResult extractCells(List<ITextUnit> cells, TextContainer lineContainer, long lineNum) {
 		
 		if (cells == null) return TextProcessingResult.REJECTED;
 		if (lineContainer == null) return TextProcessingResult.REJECTED;
@@ -133,7 +133,7 @@ public class FixedWidthColumnsFilter extends BaseTableFilter {
 			String srcPart = line.substring(start, end); // end is excluded
 			String skelPart = line.substring(end, skelEnd);
 			
-			TextUnit cell = TextUnitUtil.buildTU(srcPart, skelPart);
+			ITextUnit cell = TextUnitUtil.buildTU(srcPart, skelPart);
 			// TODO check (end - start)
 			cell.setSourceProperty(new Property(COLUMN_WIDTH, String.valueOf(end - start), true));
 			cells.add(cell);

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -20,7 +20,7 @@
 
 package net.sf.okapi.virtualdb;
 
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 
 public interface IVTextUnit extends IVItem {
 
@@ -28,6 +28,6 @@ public interface IVTextUnit extends IVItem {
 	 * Gets the TextUnit resource
 	 * @return the TextUnit resource 
 	 */
-	public TextUnit getTextUnit ();
+	public ITextUnit getTextUnit ();
 	
 }

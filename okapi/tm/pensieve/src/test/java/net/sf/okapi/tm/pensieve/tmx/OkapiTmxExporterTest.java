@@ -1,5 +1,5 @@
 /*===========================================================================
-Copyright (C) 2008-2010 by the Okapi Framework contributors
+Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
 This library is free software; you can redistribute it and/or modify it
 under the terms of the GNU Lesser General Public License as published by
@@ -21,8 +21,8 @@ See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 package net.sf.okapi.tm.pensieve.tmx;
 
 import net.sf.okapi.common.filterwriter.TMXWriter;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.tm.pensieve.Helper;
 import net.sf.okapi.tm.pensieve.common.MetadataType;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
@@ -53,13 +53,13 @@ public class OkapiTmxExporterTest {
     LocaleId locKR = LocaleId.fromString("kr");
     LocaleId locProps = LocaleId.fromString("Props"); // Not sure what is this locale?
     
-    ArgumentCaptor<TextUnit> tuCapture;
+    ArgumentCaptor<ITextUnit> tuCapture;
 
     
     @SuppressWarnings("unchecked")
 	@Before
     public void setUp() throws URISyntaxException, IOException {
-        tuCapture = ArgumentCaptor.forClass(TextUnit.class);
+        tuCapture = ArgumentCaptor.forClass(ITextUnit.class);
         
         mockIterator = mock(Iterator.class);
         mockTmxWriter = mock(TMXWriter.class);
@@ -94,7 +94,7 @@ public class OkapiTmxExporterTest {
         handler.exportTmx(locEN, locFR, mockSeeker, mockTmxWriter);
 
         verify(mockTmxWriter).writeStartDocument(locEN, locFR, "pensieve", "0.0.1", "sentence", "pensieve", "unknown");
-        verify(mockTmxWriter, times(2)).writeTUFull((TextUnit) anyObject());
+        verify(mockTmxWriter, times(2)).writeTUFull((ITextUnit) anyObject());
         verify(mockTmxWriter).writeEndDocument();
         verify(mockTmxWriter).close();
     }
@@ -105,10 +105,10 @@ public class OkapiTmxExporterTest {
 
         verify(mockTmxWriter, times(2)).writeTUFull(tuCapture.capture());
         assertEquals("source of first tu written", "source", tuCapture.getAllValues().get(0).getSource().getFirstContent().toText());
-        assertEquals("target of first tu written", "target", tuCapture.getAllValues().get(0).getTarget(locFR).getFirstContent().toText());
+        assertEquals("target of first tu written", "target", tuCapture.getAllValues().get(0).getTarget(locFR, false).getFirstContent().toText());
         assertEquals("target of first tu written", "sourceid", tuCapture.getAllValues().get(0).getName());
         assertEquals("source of second tu written", "source2", tuCapture.getAllValues().get(1).getSource().getFirstContent().toText());
-        assertEquals("target of second tu written", "target2", tuCapture.getAllValues().get(1).getTarget(locFR).getFirstContent().toText());
+        assertEquals("target of second tu written", "target2", tuCapture.getAllValues().get(1).getTarget(locFR, false).getFirstContent().toText());
         assertEquals("target of second tu written", "sourceid2", tuCapture.getAllValues().get(1).getName());
     }
 
@@ -117,9 +117,9 @@ public class OkapiTmxExporterTest {
         handler.exportTmx(locEN, locProps, mockSeeker, mockTmxWriter);
 
         verify(mockTmxWriter, times(1)).writeTUFull(tuCapture.capture());
-        TextUnit capturedTU = tuCapture.getValue();
+        ITextUnit capturedTU = tuCapture.getValue();
         assertEquals("source of first tu written", "props_source", capturedTU.getSource().getFirstContent().toText());
-        assertEquals("target of first tu written", "props_target", capturedTU.getTarget(locProps).getFirstContent().toText());
+        assertEquals("target of first tu written", "props_target", capturedTU.getTarget(locProps, false).getFirstContent().toText());
         assertEquals("target of first tu written", "props_sourceid", capturedTU.getName());
         assertEquals("groupname metadata", "PropsGroupName", capturedTU.getProperty("Txt::GroupName").getValue());
         assertEquals("filename metadata", "PropsFileName", capturedTU.getProperty("Txt::FileName").getValue());
@@ -129,13 +129,13 @@ public class OkapiTmxExporterTest {
     @Test
     public void exportTmxAllTargetLang() throws IOException {
         handler.exportTmx(locEN, mockSeeker, mockTmxWriter);
-        verify(mockTmxWriter, times(4)).writeTUFull((TextUnit) anyObject());
+        verify(mockTmxWriter, times(4)).writeTUFull((ITextUnit)anyObject());
     }
 
     @Test
     public void exportTmxNoMatchingSourceLang() throws IOException {
         handler.exportTmx(locKR, locFR, mockSeeker, mockTmxWriter);
-        verify(mockTmxWriter, never()).writeTUFull((TextUnit) anyObject());
+        verify(mockTmxWriter, never()).writeTUFull((ITextUnit)anyObject());
     }
 
     @Test

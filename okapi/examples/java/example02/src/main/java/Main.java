@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -25,7 +25,6 @@ import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.openoffice.OpenOfficeFilter;
 import net.sf.okapi.filters.properties.PropertiesFilter;
 
@@ -53,7 +52,7 @@ public class Main {
 				if ( event.getEventType() == EventType.TEXT_UNIT ) {
 					// Format and print out each text unit
 					// We can use getFirstPartContent() because nothing is segmented
-					fmt.setContent(((TextUnit)event.getResource()).getSource().getFirstContent());
+					fmt.setContent((event.getTextUnit()).getSource().getFirstContent());
 					System.out.println(fmt.toString());
 				}
 			}

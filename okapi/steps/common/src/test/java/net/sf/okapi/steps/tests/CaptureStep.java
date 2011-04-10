@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -22,14 +22,14 @@ package net.sf.okapi.steps.tests;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 
 /**
  * Generic step to capture the last text unit for a set of filter events.
  */
 public class CaptureStep extends BasePipelineStep {
 
-	private TextUnit tu;
+	private ITextUnit tu;
 	
 	public String getDescription() {
 		return "Capturing step for testing.";
@@ -41,11 +41,11 @@ public class CaptureStep extends BasePipelineStep {
 
 	@Override
 	protected Event handleTextUnit (Event event) {
-		tu = (TextUnit)event.getResource();
+		tu = event.getTextUnit();
 		return event;
 	}
 	
-	public TextUnit getLastTextUnit () {
+	public ITextUnit getLastTextUnit () {
 		return tu;
 	}
 

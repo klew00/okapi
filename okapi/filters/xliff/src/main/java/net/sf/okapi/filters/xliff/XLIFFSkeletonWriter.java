@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -42,7 +42,7 @@ import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextPart;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonPart;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
@@ -90,10 +90,10 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 		// Check for the seg-source special case
 		if ( part.toString().startsWith(SEGSOURCEMARKER) ) {
 			// There is normally a text unit associated
-			return getSegSourceOutput((TextUnit)part.getParent());
+			return getSegSourceOutput((ITextUnit)part.getParent());
 		}
 		else if ( part.toString().startsWith(ALTTRANSMARKER) ) {
-			return getNewAltTransOutput((TextUnit)part.getParent());
+			return getNewAltTransOutput((ITextUnit)part.getParent());
 		}
 		
 		// If it is not a reference marker, just use the data
@@ -133,8 +133,8 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 		// If a parent if set, it's a reference to the content of the resource
 		// holding this skeleton. And it's always a TextUnit
 		if ( part.getParent() != null ) {
-			if ( part.getParent() instanceof TextUnit ) {
-				return getContent((TextUnit)part.getParent(), locToUse, contextToUse);
+			if ( part.getParent() instanceof ITextUnit ) {
+				return getContent((ITextUnit)part.getParent(), locToUse, contextToUse);
 			}
 			else {
 				throw new RuntimeException("The self-reference to this skeleton part must be a text-unit.");
@@ -147,8 +147,8 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 			logger.warning(String.format("Reference '%s' not found.", (String)marker[0]));
 			return "-ERR:REF-NOT-FOUND-";
 		}
-		if ( ref instanceof TextUnit ) {
-			return getString((TextUnit)ref, locToUse, contextToUse);
+		if ( ref instanceof ITextUnit ) {
+			return getString((ITextUnit)ref, locToUse, contextToUse);
 		}
 		if ( ref instanceof GenericSkeletonPart ) {
 			return getString((GenericSkeletonPart)ref, contextToUse);
@@ -161,7 +161,7 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 	}
 	
 	@Override
-	protected String getContent (TextUnit tu,
+	protected String getContent (ITextUnit tu,
 		LocaleId locToUse,
 		int context)
 	{
@@ -187,7 +187,7 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 		// Determine whether we output segmentation or not
 		boolean doSegments = doSegments(tu);
 		
-		TextContainer trgCont = tu.getTarget(locToUse);
+		TextContainer trgCont = tu.getTarget(locToUse, false);
 		if ( trgCont == null ) {
 			// If there is no target available
 			// We fall back to source
@@ -210,7 +210,7 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 		}
 	}
 
-	private String getSegSourceOutput (TextUnit tu) {
+	private String getSegSourceOutput (ITextUnit tu) {
 		if ( !doSegments(tu) ) {
 			return ""; // No segmentation: no seg-source element
 		}
@@ -248,7 +248,7 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 		return tmp.toString();
 	}
 	
-	private String getNewAltTransOutput (TextUnit tu) {
+	private String getNewAltTransOutput (ITextUnit tu) {
 		if ( !params.getAddAltTrans() ) {
 			return "";
 		}
@@ -261,7 +261,7 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 		}
 		
 		StringBuilder tmp = new StringBuilder();
-		TextContainer tc = tu.getTarget(outputLoc);
+		TextContainer tc = tu.getTarget(outputLoc, false);
 		// From the target container
 		formatAltTranslations(tc.getAnnotation(AltTranslationsAnnotation.class), null, tmp);
 		// From the segments
@@ -419,7 +419,7 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 		return tmp.toString();
 	}
 	
-	private boolean doSegments (TextUnit tu) {
+	private boolean doSegments (ITextUnit tu) {
 		// Do we always segment?
 		switch ( params.getOutputSegmentationType() ) {
 		case Parameters.SEGMENTATIONTYPE_SEGMENTED:

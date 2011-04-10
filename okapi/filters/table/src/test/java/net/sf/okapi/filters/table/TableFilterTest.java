@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -48,9 +48,9 @@ import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiBadFilterParametersException;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.DocumentPart;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.table.TableFilter;
 import net.sf.okapi.filters.table.base.BaseTableFilter;
 import net.sf.okapi.filters.table.base.Parameters;
@@ -185,8 +185,8 @@ public class TableFilterTest {
 			
 			switch (event.getEventType()) {
 				case TEXT_UNIT:
-					assertTrue(res instanceof TextUnit);
-					assertEquals(((TextUnit) res).getMimeType(), filter.getMimeType());
+					assertTrue(res instanceof ITextUnit);
+					assertEquals(((ITextUnit)res).getMimeType(), filter.getMimeType());
 					break;
 					
 				case DOCUMENT_PART:
@@ -460,9 +460,8 @@ public class TableFilterTest {
 		switch (event.getEventType()) {
 		case TEXT_UNIT:
 			IResource res = event.getResource();
-			assertTrue(res instanceof TextUnit);
-			
-			assertEquals(expectedText, ((TextUnit) res).toString());
+			assertTrue(res instanceof ITextUnit);
+			assertEquals(expectedText, ((ITextUnit)res).toString());
 			break;
 			
 		case DOCUMENT_PART:

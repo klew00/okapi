@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -36,6 +36,7 @@ import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
 import net.sf.okapi.common.filters.AbstractFilter;
 import net.sf.okapi.common.filters.FilterConfiguration;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextUnit;
@@ -75,7 +76,7 @@ public class RailsYamlFilter extends AbstractFilter {
 	private int parseState;
 	private BufferedReader reader;
 	private int tuid;
-	private TextUnit tuEntry;
+	private ITextUnit tuEntry;
 	private GenericSkeleton skel;
 	private String key = "";
 	private int indentation;

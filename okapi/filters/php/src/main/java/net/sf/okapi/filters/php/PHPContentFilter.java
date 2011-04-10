@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2010 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -47,6 +47,7 @@ import net.sf.okapi.common.filters.LocalizationDirectives;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
@@ -82,7 +83,7 @@ public class PHPContentFilter implements IFilter {
 	private int stringStart;
 	private int stringEnd;
 	private TextFragment srcFrag;
-	private TextUnit textUnit;
+	private ITextUnit textUnit;
 	private GenericSkeleton srcSkel;
 	private int resType;
 	private HTMLCharacterEntities cerList;

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -23,10 +23,10 @@ package net.sf.okapi.steps.wordcount;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.ISegments;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.steps.tokenization.Tokenizer;
 import net.sf.okapi.steps.tokenization.tokens.Tokens;
 import net.sf.okapi.steps.wordcount.common.BaseCounter;
@@ -76,7 +76,7 @@ public class WordCounter extends BaseCounter {
 	 * @param language the language of the source
 	 * @return number of words
 	 */	
-	public static long count(TextUnit textUnit, LocaleId language) {
+	public static long count(ITextUnit textUnit, LocaleId language) {
 		return count(WordCounter.class, textUnit, language);		
 	}
 	
@@ -134,7 +134,7 @@ public class WordCounter extends BaseCounter {
 	 * @param tu the given text unit
 	 * @return number of words (0 if no word count information found)
 	 */
-	public static long getCount(TextUnit tu) {
+	public static long getCount(ITextUnit tu) {
 		return BaseCounter.getCount(tu, GMX.TotalWordCount);
 	}
 	
@@ -153,7 +153,7 @@ public class WordCounter extends BaseCounter {
 	 * @param segIndex index of the segment in the source
 	 * @return number of words (0 if no word count information found)
 	 */
-	public static long getCount(TextUnit tu, int segIndex) {
+	public static long getCount(ITextUnit tu, int segIndex) {
 		ISegments segments = tu.getSource().getSegments();
 		return getCount(segments.get(segIndex));		
 	}

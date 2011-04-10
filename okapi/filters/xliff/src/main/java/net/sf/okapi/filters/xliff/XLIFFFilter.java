@@ -67,8 +67,9 @@ import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextFragment.TagType;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
@@ -95,7 +96,7 @@ public class XLIFFFilter implements IFilter {
 	private LinkedList<Event> queue;
 	private boolean canceled;
 	private GenericSkeleton skel;
-	private TextUnit tu;
+	private ITextUnit tu;
 	private int approved; // -1=no property, 0=no, 1=yes
 	private Parameters params;
 	private boolean sourceDone;
@@ -930,14 +931,14 @@ public class XLIFFFilter implements IFilter {
 		
 		// Look where the annotation needs to go: segment or container?
 		// Get the target (and possibly creates it if needed)
-		TextContainer tc = tu.getTarget(trgLang);
+		TextContainer tc = tu.getTarget(trgLang, false);
 		if ( tc == null ) {
 			// Create a target from the source if needed
-			tc = tu.createTarget(trgLang, false, IResource.COPY_CONTENT);
-			// Make sure it's empty, but that segments are preserved
-			for ( Segment seg : tc.getSegments() ) {
-				seg.text.clear();
-			}
+			tc = tu.createTarget(trgLang, false, IResource.COPY_SEGMENTATION); // was COPY_CONTENT before ITextUnit
+//			// Make sure it's empty, but that segments are preserved
+//			for ( Segment seg : tc.getSegments() ) {
+//				seg.text.clear();
+//			}
 		}
 		
 		// Decide where to attach the annotation: the segment or the container

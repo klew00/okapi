@@ -64,6 +64,7 @@ import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
@@ -132,7 +133,7 @@ public class MIFFilter implements IFilter {
 	private String resname;
 	private int footnotesLevel;
 	private int textFlowNumber;
-	private TextUnit refTU;
+	private ITextUnit refTU;
 	
 	private static Hashtable<String, String> initCharTable () {
 		Hashtable<String, String> table = new Hashtable<String, String>();
@@ -977,7 +978,7 @@ public class MIFFilter implements IFilter {
 		// Check for inline codes
 		checkInlineCodes(tf);
 
-		TextUnit tu = null;
+		ITextUnit tu = null;
 		if ( !tf.isEmpty() ) {
 			if ( tf.hasText() || extractedMarker ) {
 				// Add the text unit to the queue
@@ -1751,7 +1752,7 @@ public class MIFFilter implements IFilter {
 		// blockLevel should be 1
 		boolean startGroupDone = false;
 		String tag = null;
-		TextUnit tu = null;
+		ITextUnit tu = null;
 		
 		do {
 			tag = readUntil("VariableFormat;", true, null, blockLevel-1, true);

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -46,7 +46,6 @@ import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.StartDocument;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.extra.steps.CompoundStep;
 import net.sf.okapi.lib.reporting.ReportGenerator;
 import net.sf.okapi.steps.wordcount.categorized.CategoryGroup;
@@ -538,25 +537,22 @@ public class ScopingReportStep extends CompoundStep {
 	}
 	
 	@Override
-	protected Event handleEndDocument(Event event) {
+	protected Event handleEndDocument (Event event) {
 		// src/target might have changed during processing of the document, so let's set them here and not in handleStartDocument()
 		gen.setField(ITEM_SOURCE_LOCALE, getSourceLocale().toString());
 		gen.setField(ITEM_TARGET_LOCALE, getTargetLocale().toString());
-		
 		setItemFields(gen, event.getResource());		
-		
 		return super.handleEndDocument(event);
 	}
 	
 	@Override
-	protected Event handleTextUnit(Event event) {
-		TextUnit tu = (TextUnit) event.getResource();
-		resolver.resolve(tu);
-		
+	protected Event handleTextUnit (Event event) {
+		resolver.resolve(event.getTextUnit());
 		return super.handleTextUnit(event);
 	}
 	
-	public ReportGenerator getReportGenerator() {
+	public ReportGenerator getReportGenerator () {
 		return gen;
 	}
+
 }

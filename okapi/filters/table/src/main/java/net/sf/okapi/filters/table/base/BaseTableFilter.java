@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -33,6 +33,7 @@ import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
@@ -175,7 +176,7 @@ public class BaseTableFilter extends BasePlainTextFilter {
 			return super.sendAsSource(lineContainer);
 		}
 		
-		List<TextUnit> cells = new ArrayList<TextUnit>(); 
+		List<ITextUnit> cells = new ArrayList<ITextUnit>(); 
 		TextProcessingResult res = extractCells(cells, lineContainer, lineNum);
 		
 		switch (res) {
@@ -194,7 +195,7 @@ public class BaseTableFilter extends BasePlainTextFilter {
 
 		// Assign missing id's
 		for (int i = 0; i < cells.size(); i++)	{
-			TextUnit cell = cells.get(i);
+			ITextUnit cell = cells.get(i);
 			if (Util.isEmpty(cell.getId()))
 				cell.setId(String.format("%d_%d", lineNum, i + 1));
 		}
@@ -210,7 +211,7 @@ public class BaseTableFilter extends BasePlainTextFilter {
 	 * @param line string containing separated cells
 	 * @return string array of cells
 	 */
-	protected TextProcessingResult extractCells(List<TextUnit> cells, TextContainer lineContainer, long lineNum) {		
+	protected TextProcessingResult extractCells(List<ITextUnit> cells, TextContainer lineContainer, long lineNum) {		
 		// To be overridden in descendant classes
 		
 		if (cells != null) cells.add(TextUnitUtil.buildTU(lineContainer));
@@ -228,7 +229,7 @@ public class BaseTableFilter extends BasePlainTextFilter {
 		return null;
 	}
 	
-	protected boolean processCells(List<TextUnit> cells, long lineNum) {
+	protected boolean processCells(List<ITextUnit> cells, long lineNum) {
 		// Processes cells of one line
 		// To be called from descendants, least likely overridden
 
@@ -252,7 +253,7 @@ public class BaseTableFilter extends BasePlainTextFilter {
 			
 			columnNames.clear();
 			
-			for (TextUnit tu : cells) {
+			for (ITextUnit tu : cells) {
 				
 				String st = TextUnitUtil.getSourceText(tu).trim();
 				columnNames.add(st);
@@ -272,7 +273,7 @@ public class BaseTableFilter extends BasePlainTextFilter {
 				
 				if (i > 0) sendAsSkeleton(getFieldDelimiter());
 				
-				TextUnit cell = cells.get(i);
+				ITextUnit cell = cells.get(i);
 				int colNumber = i + 1;
 				
 				if (TextUnitUtil.isEmpty(cell, true)) {  // only spaces, no translatable text
@@ -299,10 +300,10 @@ public class BaseTableFilter extends BasePlainTextFilter {
 			// Add content of other columns to the created sources
 			for (int i = 0; i < cells.size(); i++)	{
 				
-				TextUnit cell = cells.get(i); // Can be empty				
+				ITextUnit cell = cells.get(i); // Can be empty				
 				//String trimmedCell = preProcessCell(Util.trim(TextUnitUtil.getSourceText(cell)));
 				
-				TextUnit temp = new TextUnit("temp", TextUnitUtil.getSourceText(cell)); 
+				ITextUnit temp = new TextUnit("temp", TextUnitUtil.getSourceText(cell)); 
 				TextUnitUtil.trimTU(temp, true, true);
 				String trimmedCell = TextUnitUtil.getSourceText(temp);
 				
@@ -313,7 +314,7 @@ public class BaseTableFilter extends BasePlainTextFilter {
 				
 				if (isSourceId(colNumber)) {
 					
-					TextUnit tu = getSourceFromIdRef(cells, colNumber);
+					ITextUnit tu = getSourceFromIdRef(cells, colNumber);
 					if (tu == null) continue;										
 					
 					if (TextUnitUtil.isEmpty(cell, true)) {
@@ -339,7 +340,7 @@ public class BaseTableFilter extends BasePlainTextFilter {
 				
 				if (isComment(colNumber)) {
 					
-					TextUnit tu = getSourceFromCommentRef(cells, colNumber);
+					ITextUnit tu = getSourceFromCommentRef(cells, colNumber);
 					if (tu == null) continue;
 					if (Util.isEmpty(trimmedCell)) continue;
 					
@@ -491,7 +492,7 @@ public class BaseTableFilter extends BasePlainTextFilter {
 			// 1. Send all TUs with their skeletons 
 			//GenericSkeleton skel = getActiveSkeleton(); 
 			for (int i = 0; i < cells.size(); i++)	{				
-				TextUnit cell = cells.get(i); // Can be empty				
+				ITextUnit cell = cells.get(i); // Can be empty				
 				int colNumber = i + 1;
 				
 				if (isSource(colNumber)) {
@@ -520,7 +521,7 @@ public class BaseTableFilter extends BasePlainTextFilter {
 			// 3. Loop through the cells, set references to tu's, and hook up the tu skeletons
 			for (int i = 0; i < cells.size(); i++)	{
 				if (i > 0) sendAsSkeleton(getFieldDelimiter());
-				TextUnit cell = cells.get(i); // Can be empty
+				ITextUnit cell = cells.get(i); // Can be empty
 				
 				int colNumber = i + 1;
 				
@@ -552,7 +553,7 @@ public class BaseTableFilter extends BasePlainTextFilter {
 				}
 				
 				if (isTarget(colNumber)) {
-					TextUnit tu = getSourceFromTargetRef(cells, colNumber);
+					ITextUnit tu = getSourceFromTargetRef(cells, colNumber);
 					if ( tu == null ) {
 						sendAsSkeleton(cell);
 						continue;
@@ -602,7 +603,7 @@ public class BaseTableFilter extends BasePlainTextFilter {
 	private boolean isComment(int colNumber) {return (commentColumns == null) ? null : commentColumns.contains(colNumber);}	
 	private boolean isRecordId(int colNumber) {return params.recordIdColumn > 0 && colNumber == params.recordIdColumn;}
 
-	private TextUnit getSource(List<TextUnit> cells, int colNum, List<Integer> columnsList, List<Integer> refList) {
+	private ITextUnit getSource(List<ITextUnit> cells, int colNum, List<Integer> columnsList, List<Integer> refList) {
 		
 		if (columnsList == null) return null;		
 		int index = columnsList.indexOf(colNum); 
@@ -615,17 +616,17 @@ public class BaseTableFilter extends BasePlainTextFilter {
 		return cells.get(ref);
 	}
 	
-	private TextUnit getSourceFromTargetRef(List<TextUnit> cells, int colNum) {
+	private ITextUnit getSourceFromTargetRef(List<ITextUnit> cells, int colNum) {
 
 		return getSource(cells, colNum, targetColumns, targetSourceRefs);
 	}
 			
-	private TextUnit getSourceFromIdRef(List<TextUnit> cells, int colNum) {
+	private ITextUnit getSourceFromIdRef(List<ITextUnit> cells, int colNum) {
 		
 		return getSource(cells, colNum, sourceIdColumns, sourceIdSourceRefs);
 	}
 	
-	private TextUnit getSourceFromCommentRef(List<TextUnit> cells, int colNum) {
+	private ITextUnit getSourceFromCommentRef(List<ITextUnit> cells, int colNum) {
 		
 		return getSource(cells, colNum, commentColumns, commentSourceRefs);
 	}

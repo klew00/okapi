@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -30,7 +30,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.INameable;
 import net.sf.okapi.common.resource.IReferenceable;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 
 /**
  * Simple generic implementation of the ISkeleton interface.
@@ -195,7 +195,7 @@ public class GenericSkeleton implements ISkeleton {
 	 * to which this skeleton is attached.
 	 * @param textUnit the resource object.
 	 */
-	public void addContentPlaceholder (TextUnit textUnit)
+	public void addContentPlaceholder (ITextUnit textUnit)
 	{
 		GenericSkeletonPart part = new GenericSkeletonPart(TextFragment.makeRefMarker("$self$"));
 		part.parent = textUnit;
@@ -211,7 +211,7 @@ public class GenericSkeleton implements ISkeleton {
 	 * @param textUnit the resource object.
 	 * @param locId the locale; use null if the reference is the source.
 	 */
-	public void addContentPlaceholder (TextUnit textUnit,
+	public void addContentPlaceholder (ITextUnit textUnit,
 		LocaleId locId)
 	{
 		GenericSkeletonPart part = new GenericSkeletonPart(TextFragment.makeRefMarker("$self$"));

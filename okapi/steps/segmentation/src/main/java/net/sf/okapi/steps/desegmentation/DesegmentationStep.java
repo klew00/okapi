@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -27,8 +27,8 @@ import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextUnit;
 
 @UsingParameters(Parameters.class)
 public class DesegmentationStep extends BasePipelineStep {
@@ -68,8 +68,8 @@ public class DesegmentationStep extends BasePipelineStep {
 
 	@Override
 	protected Event handleTextUnit (Event event) {
-		TextUnit tu = (TextUnit)event.getResource();
-		
+		ITextUnit tu = event.getTextUnit();
+
 		// Skip non-translatable
 		if ( !tu.isTranslatable() ) return event;
 		
@@ -80,7 +80,7 @@ public class DesegmentationStep extends BasePipelineStep {
 		
 		// Desegment target if needed
 		if ( params.getDesegmentTarget() ) {
-			TextContainer cont = tu.getTarget(targetLocale);
+			TextContainer cont = tu.getTarget(targetLocale, false);
 			if ( cont != null ) {
 				if ( cont.hasBeenSegmented() ) {
 					cont.getSegments().joinAll();

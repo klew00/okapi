@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -25,9 +25,9 @@ import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.ISegments;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.steps.wordcount.WordCounter;
 
 public abstract class AltAnnotationBasedCountStep extends BaseCountStep {
@@ -69,14 +69,14 @@ public abstract class AltAnnotationBasedCountStep extends BaseCountStep {
 	}
 
 	@Override
-	protected long countInTextUnit(TextUnit textUnit) {
+	protected long countInTextUnit (ITextUnit textUnit) {
 		if (textUnit == null) return 0;
 		
 		LocaleId srcLocale = getSourceLocale();
 		LocaleId trgLocale = getTargetLocale();
 		
 		TextContainer source = textUnit.getSource();
-		TextContainer target = textUnit.getTarget(trgLocale);
+		TextContainer target = textUnit.getTarget(trgLocale, false);
 		if (target == null) return 0;
 		
 		// Individual segments metrics

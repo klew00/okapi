@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -20,12 +20,10 @@
 
 package net.sf.okapi.common.resource;
 
+import net.sf.okapi.common.ISegmenter;
 import net.sf.okapi.common.LocaleId;
 
-/**
- * EXPERIMENTAL interface, do not use yet.
- * <p>
- * Interface for the basic unit of extraction from a filter and also the resource
+/** Interface for the basic unit of extraction from a filter and also the resource
  * associated with the filter event TEXT_UNIT.</p>
  * <p>
  * The TextUnit object holds the extracted source text, all its properties and
@@ -39,10 +37,36 @@ import net.sf.okapi.common.LocaleId;
  * their effects on the default source, however a specific implementation may
  * provide a method to select one of the variant sources that methods would then
  * use. The main source should always be used before such a method is called.</p>
- *
  */
 public interface ITextUnit extends INameable, IReferenceable {
 
+	/**
+	 * Resource type value for a paragraph.
+	 */
+	public static final String TYPE_PARA = "paragraph";
+	/**
+	 * Resource type value for a list.
+	 */
+	public static final String TYPE_LIST_ELEMENT = "list_element";
+	/**
+	 * Resource type value for a title.
+	 */
+	public static final String TYPE_TITLE = "title";
+	/**
+	 * Resource type value for a header.
+	 */
+	public static final String TYPE_HEADER = "header";
+	/**
+	 * Resource type value for a cdata section.
+	 */
+	public static final String TYPE_CDATA = "cdata";
+    
+	/**
+	 * Clones this TextUnit.
+	 * @return A new TextUnit object that is a copy of this one. 
+	 */
+	public ITextUnit clone ();
+	
     /**
      * Indicates if the source text of this TextUnit is empty.
      *
@@ -84,7 +108,7 @@ public interface ITextUnit extends INameable, IReferenceable {
      * If the target does not exists one is created automatically, and contains a copy
      * of the source with all segments empty.
      * <p>
-     * Calling this method is the same as calling <code>createTarget(locId, false, IResource.COPY_SEGMENTS)</code></p>
+     * Calling this method is the same as calling <code>createTarget(locId, false, IResource.COPY_SEGMENTATION)</code></p>
      *
      * @param locId the locale to query.
      * @return the target object for this text unit for the given locale. Never returns null.
@@ -92,6 +116,20 @@ public interface ITextUnit extends INameable, IReferenceable {
      * @see #createTarget(LocaleId, boolean, int)
      */
     public TextContainer getTarget (LocaleId locId);
+    
+    /**
+     * Gets the target object for this text unit for a given locale.
+     * If the target does not exists one is created if the parameter createIfNeeded is true.
+     * <p>
+     *
+     * @param locId the locale to query.
+     * @param createIfNeeded true to create the target if it does not exists yet.
+     * @return the target object for this text unit for the given locale, or returns null if the
+     * target does not exits and no new target was created.
+     * @see #createTarget(LocaleId, boolean, int)
+     */
+    public TextContainer getTarget (LocaleId locId,
+    	boolean createIfNeeded);
 
     /**
      * Sets the target object for this text unit for a given locale.
@@ -136,15 +174,16 @@ public interface ITextUnit extends INameable, IReferenceable {
      * False to not create a new target object if one already exists for the given locale.
      * @param creationOptions creation options:
      * <ul><li>CREATE_EMPTY: Create an empty target object.</li>
-     * <li>COPY_CONTENT: Copy the text of the source (and any associated in-line code).</li>
      * <li>COPY_PROPERTIES: Copy the source properties.</li>
-     * <li>COPY_SEGMENTS: Copy the source segmentation.</li>
-     * <li>COPY_ALL: Same as (COPY_CONTENT|COPY_PROPERTIES|COPY_SEGMENTS).</li></ul>
+     * <li>COPY_CONTENT: Copy the text of the source (and any associated in-line code), but not the segmenation.</li>
+     * <li>COPY_SEGMENTATION: Copy the source segmentation.</li>
+     * <li>COPY_SEGMENTED_CONTENT: Same as (COPY_CONTENT|COPY_SEGMENTATION).</li>
+     * <li>COPY_ALL: Same as (COPY_SEGMENTED_CONTENT|COPY_PROPERTIES).</li></ul>
      * @return the target object that was created, or retrieved.
      */
     public TextContainer createTarget (LocaleId locId,
-                                       boolean overwriteExisting,
-                                       int creationOptions);
+    	boolean overwriteExisting,
+    	int creationOptions);
 
     /**
      * Sets the content of the source for this TextUnit.
@@ -165,7 +204,8 @@ public interface ITextUnit extends INameable, IReferenceable {
      * @param content the new content to set.
      * @return the new content for the given target locale for this text unit.
      */
-    public TextFragment setTargetContent (LocaleId locId, TextFragment content);
+    public TextFragment setTargetContent (LocaleId locId,
+    	TextFragment content);
 
     /**
      * Creates a new {@link IAlignedSegments} object to access and
@@ -192,7 +232,27 @@ public interface ITextUnit extends INameable, IReferenceable {
      */
     public ISegments getTargetSegments (LocaleId trgLoc);
 
-    /**
+	/**
+	 * Removes all segmentations (source and targets) in this text unit.
+	 * All entries are converted to non-segmented entries.
+	 */
+	public void removeAllSegmentations ();
+
+	/**
+	 * Segments the default source content based on the rules provided by a given ISegmenter.
+	 * @param segmenter the segmenter to use to create the segments.
+	 */
+	public void createSourceSegmentation (ISegmenter segmenter);
+	
+	/**
+	 * Segments the specified target content based on the rules provided by a given ISegmenter.
+	 * @param segmenter the segmenter to use to create the segments.
+	 * @param targetLocale {@link LocaleId} of the target we want to segment.
+	 */
+	public void createTargetSegmentation (ISegmenter segmenter,
+		LocaleId targetLocale);
+	
+	/**
      * Gets the source segment for a given segment id.
      * <p>
      * If the segment does not exists, one is created if <code>createIfNeeded</code> is true.</p>
@@ -203,7 +263,8 @@ public interface ITextUnit extends INameable, IReferenceable {
      *                       False to return null when the segment does not exists.
      * @return the found or created segment, or null.
      */
-    public Segment getSourceSegment (String segId, boolean createIfNeeded);
+    public Segment getSourceSegment (String segId,
+    	boolean createIfNeeded);
 	
     /**
      * Gets the segment for a given segment id in a given target.
@@ -220,7 +281,7 @@ public interface ITextUnit extends INameable, IReferenceable {
      * @return the found or created segment, or null.
      */
     public Segment getTargetSegment (LocaleId trgLoc,
-                                     String segId,
-                                     boolean createIfNeeded);
-	
+    	String segId,
+    	boolean createIfNeeded);
+
 }

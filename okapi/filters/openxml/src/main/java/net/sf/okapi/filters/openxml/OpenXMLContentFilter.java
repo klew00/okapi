@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -17,6 +17,7 @@
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
+
 package net.sf.okapi.filters.openxml;
 
 import java.io.*;
@@ -51,10 +52,10 @@ import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 
@@ -1199,7 +1200,7 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 		String s; // temporary string
 		DocumentPart dippy; // DWH 7-28-09 textbox
 		GenericSkeleton skel; // DWH 7-28-09 textbox
-		TextUnit tu; // DWH 7-28-09 textbox
+		ITextUnit tu; // DWH 7-28-09 textbox
 		int dpid; // DWH 7-28-09 textbox
 		WordTextBox wtb = null; // DWH 7-23-09 textbox
 		ArrayList<Event> textBoxEventList=null; // DWH 7-23-09 textbox
@@ -1318,7 +1319,7 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 						event = it.next();
 						if (event.getEventType()==EventType.TEXT_UNIT) // DWH 10-27-09 property for being in text box
 						{
-							TextUnit txu = (TextUnit) event.getResource();
+							ITextUnit txu = event.getTextUnit();
 							Property prop = txu.getProperty("TextBoxLevel");
 							if (prop==null)
 								txu.setProperty(new Property("TextBoxLevel","1",false));
@@ -1569,10 +1570,12 @@ public class OpenXMLContentFilter extends AbstractMarkupFilter {
 		}
 		return normalizedName;
 	}
+	
 	protected void initFileTypes() // DWH $$$ needed?
 	{
 		htXMLFileType = new Hashtable();
 	}
+	
 	protected String getContentType(String sPartName) // DWH $$$ needed?
 	{
 		String rslt="",tmp;

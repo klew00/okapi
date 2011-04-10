@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2010 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -33,8 +33,8 @@ import net.sf.okapi.common.filters.RoundTripComparison;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.resource.TextUnit;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -130,7 +130,7 @@ public class PHPContentFilterTest {
 	@Test
 	public void testEntityReferences () {
 		String snippet = "$a='&aacute;&#xC1;&#225;&#x00c1;';";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("\u00e1\u00c1\u00e1\u00c1", tu.getSource().toString());
 	}
@@ -138,7 +138,7 @@ public class PHPContentFilterTest {
 	@Test
 	public void testReferencesLooklike () {
 		String snippet = "$a='& &; &#; &aacute';";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("& &; &#; &aacute", tu.getSource().toString());
 	}
@@ -146,7 +146,7 @@ public class PHPContentFilterTest {
 	@Test
 	public void testConcatSQStrings () {
 		String snippet = "$a='t1' \r. 't2';";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("t1' \r. 't2", tu.getSource().toString());
 		List<Code> codes = tu.getSource().getFirstContent().getCodes();
@@ -158,7 +158,7 @@ public class PHPContentFilterTest {
 	@Test
 	public void testCommaCaseWithConcat () {
 		String snippet = "$a=test('t1', 't2 '.\"and t3\");";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("t1", tu.getSource().toString());
 		tu = FilterTestDriver.getTextUnit(getEvents(snippet), 2);
@@ -171,7 +171,7 @@ public class PHPContentFilterTest {
 	@Test
 	public void testConcatWithVariable () {
 		String snippet = "$a='t1' \r.$b.' t2';";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("t1' \r.$b.' t2", tu.getSource().toString());
 		List<Code> codes = tu.getSource().getFirstContent().getCodes();
@@ -182,7 +182,7 @@ public class PHPContentFilterTest {
 	@Test
 	public void testConcatMultipleStrings () {
 		String snippet = "$a='t1' \r.$b.' t2' . $c.\" t3 \"";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("t1' \r.$b.' t2' . $c.\" t3 ", tu.getSource().toString());
 		assertEquals("t1<1/> t2<2/> t3 ", fmt.setContent(tu.getSource().getFirstContent()).toString());
@@ -192,7 +192,7 @@ public class PHPContentFilterTest {
 	@Test
 	public void testConcatWithEndings () {
 		String snippet = "$a= $z.'t1' \r.$b.' t2' . $c.\" t3 \".$d;";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("t1' \r.$b.' t2' . $c.\" t3 ", tu.getSource().toString());
 		assertEquals("t1<1/> t2<2/> t3 ", fmt.setContent(tu.getSource().getFirstContent()).toString());
@@ -201,7 +201,7 @@ public class PHPContentFilterTest {
 	@Test
 	public void testConcatSGAndDQStrings () {
 		String snippet = "$a='t1' . \"t2\";";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("t1' . \"t2", tu.getSource().toString());
 		assertEquals("x-mixed", tu.getType());
@@ -210,7 +210,7 @@ public class PHPContentFilterTest {
 	@Test
 	public void testEntryWithCodes () {
 		String snippet = "$a='{$abc}=text';";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("{$abc}=text", tu.getSource().toString());
 		List<Code> codes = tu.getSource().getFirstContent().getCodes();
@@ -222,7 +222,7 @@ public class PHPContentFilterTest {
 	@Test
 	public void testSimpleHTMLCodes () {
 		String snippet = "$a='t<a>t</a>t<a attr=\"val\"/>t';";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("t<a>t</a>t<a attr=\"val\"/>t", tu.getSource().toString());
 		assertEquals("t<1/>t<2/>t<3/>t", fmt.setContent(tu.getSource().getFirstContent()).toString());
@@ -231,7 +231,7 @@ public class PHPContentFilterTest {
 	@Test
 	public void testParitalStartingHTMLCodes () {
 		String snippet = "$a='c attr=\"val\"> text <br/>';";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("c attr=\"val\"> text <br/>", tu.getSource().toString());
 		assertEquals("<1/> text <2/>", fmt.setContent(tu.getSource().getFirstContent()).toString());
@@ -240,7 +240,7 @@ public class PHPContentFilterTest {
 	@Test
 	public void testParitalClosingHTMLCodes () {
 		String snippet = "$a='<br/> text <a href=\"...';";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("<br/> text <a href=\"...", tu.getSource().toString());
 		assertEquals("<1/> text <2/>", fmt.setContent(tu.getSource().getFirstContent()).toString());
@@ -249,7 +249,7 @@ public class PHPContentFilterTest {
 	@Test
 	public void testSpecialHTMLCodes () {
 		String snippet = "$a='<!DOCTYPE...> t <?pi attr=\"val\"?> t';";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("<!DOCTYPE...> t <?pi attr=\"val\"?> t", tu.getSource().toString());
 		assertEquals("<1/> t <2/> t", fmt.setContent(tu.getSource().getFirstContent()).toString());
@@ -258,7 +258,7 @@ public class PHPContentFilterTest {
 	@Test
 	public void testEscapeCodes () {
 		String snippet = "$a='\\n t \\r t \\n\\r t \\v t \\a';";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("\\n t \\r t \\n\\r t \\v t \\a", tu.getSource().toString());
 		assertEquals("<1/> t <2/> t <3/><4/> t <5/> t <6/>", fmt.setContent(tu.getSource().getFirstContent()).toString());
@@ -267,7 +267,7 @@ public class PHPContentFilterTest {
 	@Test
 	public void testLinefeedCodes () {
 		String snippet = "$a='\\n\\n';";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		// No extraction because no text
 		assertTrue(tu==null);
 	}
@@ -282,7 +282,7 @@ public class PHPContentFilterTest {
 	@Test
 	public void testVariableCodes () {
 		String snippet = "$a=\"t [var1] t {var2} t {$var3} t\";";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("t [var1] t {var2} t {$var3} t", tu.getSource().toString());
 		assertEquals("t <1/> t <2/> t <3/> t", fmt.setContent(tu.getSource().getFirstContent()).toString());
@@ -291,7 +291,7 @@ public class PHPContentFilterTest {
 	@Test
 	public void testCommentsSingleLine () {
 		String snippet = "// $a='abc';\n$b=\"def\";";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("def", tu.getSource().toString());
 	}
@@ -299,7 +299,7 @@ public class PHPContentFilterTest {
 	@Test
 	public void testCommentsMultiline () {
 		String snippet = "/* $a='abc';\nstuff // etc. * / \n */$b=\"def\";";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("def", tu.getSource().toString());
 	}
@@ -307,7 +307,7 @@ public class PHPContentFilterTest {
 	@Test
 	public void testEmptyComment () {
 		String snippet = "/**/$a='abc';";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("abc", tu.getSource().toString());
 	}
@@ -315,7 +315,7 @@ public class PHPContentFilterTest {
 	@Test
 	public void testCommentsWithApos () {
 		String snippet = "/** Felix's Favorites */\n$cnt['glob']['type'] = 'Felix\\'s Favorites';";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("Felix\\'s Favorites", tu.getSource().toString());
 	}
@@ -323,7 +323,7 @@ public class PHPContentFilterTest {
 	@Test
 	public void testSkipDirective () {
 		String snippet = "//_skip\n $a='skip';\n$b='text';";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("text", tu.getSource().toString());
 	}
@@ -331,7 +331,7 @@ public class PHPContentFilterTest {
 	@Test
 	public void testSkipDirectiveOnConcat () {
 		String snippet = "//_skip\n $a='skip' . $x . 'skip';\n$b='text';";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("text", tu.getSource().toString());
 	}
@@ -339,7 +339,7 @@ public class PHPContentFilterTest {
 	@Test
 	public void testTextInBSkipDirective () {
 		String snippet = "//_bskip\n $a='skip';\n//_text\n$b='text';";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("text", tu.getSource().toString());
 	}
@@ -347,7 +347,7 @@ public class PHPContentFilterTest {
 	@Test
 	public void testESkipDirective () {
 		String snippet = "//_bskip\n $a='skip';\n//_eskip\n$b='text';";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("text", tu.getSource().toString());
 	}
@@ -355,7 +355,7 @@ public class PHPContentFilterTest {
 	@Test
 	public void testDirectiveInMultilineComment () {
 		String snippet = "/*_skip*/ $a='skip'; $b='text';";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("text", tu.getSource().toString());
 	}
@@ -363,7 +363,7 @@ public class PHPContentFilterTest {
 	@Test
 	public void testBTextDirective () {
 		String snippet = "/*_bskip*/ $a='skip'; /*_btext*/ $b='text';";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("text", tu.getSource().toString());
 	}
@@ -372,7 +372,7 @@ public class PHPContentFilterTest {
 	public void testETextDirective () {
 		String snippet = "/*_bskip*/ $a='skip'; /*_btext*/ $b='textB'; /*_etext*/\n"
 			+"$c='skip'; /*_eskip*/ $d='textD'";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("textB", tu.getSource().toString());
 		tu = FilterTestDriver.getTextUnit(getEvents(snippet), 2);
@@ -386,7 +386,7 @@ public class PHPContentFilterTest {
 		Parameters params = (Parameters)filter.getParameters();
 		params.setUseDirectives(true);
 		params.setExtractOutsideDirectives(false);
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, params), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, params), 1);
 		assertTrue(tu!=null);
 		assertEquals("textB", tu.getSource().toString());
 	}
@@ -397,7 +397,7 @@ public class PHPContentFilterTest {
 		Parameters params = (Parameters)filter.getParameters();
 		params.setUseDirectives(false);
 		params.setExtractOutsideDirectives(false);
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, params), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, params), 1);
 		assertTrue(tu!=null);
 		assertEquals("textA", tu.getSource().toString());
 		tu = FilterTestDriver.getTextUnit(getEvents(snippet, params), 2);
@@ -408,7 +408,7 @@ public class PHPContentFilterTest {
 	@Test
 	public void testDirectiveScope () {
 		String snippet = "/*_skip*/ $a['key1']='skip'; $a['key2']='text';";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("text", tu.getSource().toString());
 	}
@@ -417,7 +417,7 @@ public class PHPContentFilterTest {
 	public void testSingleQuotedString () {
 		String snippet = "$a='\\\\text\\'';\n$b='\\'\"text\"';";
 		// Check first TU
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("\\\\text\\'", tu.getSource().toString());
 	}
@@ -426,7 +426,7 @@ public class PHPContentFilterTest {
 	public void testDoubleQuotedString () {
 		String snippet = "$a=\"text\\\"\";\n$b=\"'text\\\"\";";
 		// Check second TU
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 2);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 2);
 		assertTrue(tu!=null);
 		assertEquals("'text\\\"", tu.getSource().toString());
 	}
@@ -434,7 +434,7 @@ public class PHPContentFilterTest {
 	@Test
 	public void testHeredocString () {
 		String snippet = "$a=<<<EOT\ntext\nEOT \n\nEOT;";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("text\nEOT \n", tu.getSource().toString());
 		assertEquals("x-heredoc", tu.getType());
@@ -443,7 +443,7 @@ public class PHPContentFilterTest {
 	@Test
 	public void testQuotedHeredocString () {
 		String snippet = "$a=<<<\"EOT\"\ntext\nEOT \n\nEOT;";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("text\nEOT \n", tu.getSource().toString());
 		assertEquals("x-heredoc", tu.getType());
@@ -452,7 +452,7 @@ public class PHPContentFilterTest {
 	@Test
 	public void testQuotedNowdocString () {
 		String snippet = "$a=<<<'EOT'\ntext\nEOT \n\nEOT;";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("text\nEOT \n", tu.getSource().toString());
 		assertEquals("x-nowdoc", tu.getType());
@@ -461,7 +461,7 @@ public class PHPContentFilterTest {
 	@Test
 	public void testSemiColumnHeredocString () {
 		String snippet = "$a=<<<EOT\ntext\nEOT \n;\nEOT;";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("text\nEOT \n;", tu.getSource().toString());
 	}
@@ -469,7 +469,7 @@ public class PHPContentFilterTest {
 	@Test
 	public void testMultipleLinesHeredocString () {
 		String snippet = "$a=<<<EOT\ntext\nEOT \n EOT \n\nEOT;\n";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("text\nEOT \n EOT \n", tu.getSource().toString());
 	}
@@ -478,7 +478,7 @@ public class PHPContentFilterTest {
 	public void testEmptyHeredocStringAndOutput () {
 		String snippet = "$a=<<<EOT\n\nEOT;";
 		// Should be empty so no TU
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu==null);
 		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet),
 			filter.getEncoderManager(), locEN));
@@ -488,7 +488,7 @@ public class PHPContentFilterTest {
 	public void testWhiteHeredocStringAndOutput () {
 		String snippet = "$a=<<<EOT\n  \t  \nEOT;";
 		// No text so no TU
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu==null);
 		assertEquals(snippet, FilterTestDriver.generateOutput(getEvents(snippet),
 			filter.getEncoderManager(), locEN));
@@ -534,7 +534,7 @@ public class PHPContentFilterTest {
 	@Test
 	public void testSQIndex () {
 		String snippet = "$a['skip']; $arr2[  'skip' ] = 'text';";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("text", tu.getSource().toString());
 	}
@@ -542,7 +542,7 @@ public class PHPContentFilterTest {
 	@Test
 	public void testnoStringIndex () {
 		String snippet = "$a[2] = 'text';";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("text", tu.getSource().toString());
 	}
@@ -550,7 +550,7 @@ public class PHPContentFilterTest {
 	@Test
 	public void testDQIndex () {
 		String snippet = "$a[\"skip\"]; $arr2[  \"skip\" ] = 'text';";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("text", tu.getSource().toString());
 	}
@@ -558,7 +558,7 @@ public class PHPContentFilterTest {
 	@Test
 	public void testHeredocIndex () {
 		String snippet = "$a[ <<<key\nskip\nkey\n] = 'text';";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("text", tu.getSource().toString());
 	}
@@ -566,7 +566,7 @@ public class PHPContentFilterTest {
 	@Test
 	public void testQuotedHeredocIndex () {
 		String snippet = "$a[ <<<\"key\"\nskip\nkey\n] = 'text';";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("text", tu.getSource().toString());
 	}
@@ -574,7 +574,7 @@ public class PHPContentFilterTest {
 	@Test
 	public void testNowdocIndex () {
 		String snippet = "$a[ <<<'key'\nskip\nkey\n] = 'text';";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu!=null);
 		assertEquals("text", tu.getSource().toString());
 	}

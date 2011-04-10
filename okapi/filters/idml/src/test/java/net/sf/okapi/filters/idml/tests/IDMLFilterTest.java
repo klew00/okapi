@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -28,7 +28,7 @@ import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.filters.idml.IDMLFilter;
 import static org.junit.Assert.assertEquals;
@@ -64,7 +64,7 @@ public class IDMLFilterTest {
 	
 	@Test
 	public void testSimpleEntry () {
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(root+"helloworld-1.idml"), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(root+"helloworld-1.idml"), 1);
 		assertNotNull(tu);
 		String text = TextFragment.getText(tu.getSource().getFirstContent().getCodedText());
 		assertEquals("Hello World!", text);
@@ -72,7 +72,7 @@ public class IDMLFilterTest {
 
 	@Test
 	public void testSimpleEntry2 () {
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(root+"Test00.idml"), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(root+"Test00.idml"), 1);
 		assertNotNull(tu);
 		String text = TextFragment.getText(tu.getSource().getFirstContent().getCodedText());
 		assertEquals("Hello World!", text);

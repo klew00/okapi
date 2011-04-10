@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -27,6 +27,7 @@ import java.util.List;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
@@ -59,7 +60,7 @@ public class QualityCheckerTest {
 	public void testMISSING_TARGETTU () {
 		// Create source with non-empty content
 		// but no target
-		TextUnit tu = new TextUnit("id", "source");
+		ITextUnit tu = new TextUnit("id", "source");
 
 		session.processTextUnit(tu);
 		List<Issue> issues = session.getIssues();
@@ -71,7 +72,7 @@ public class QualityCheckerTest {
 	public void testEMPTY_TARGETSEG () {
 		// Create TU with source of non-empty segment
 		// and target of empty segment
-		TextUnit tu = new TextUnit("id", "source");
+		ITextUnit tu = new TextUnit("id", "source");
 		tu.setTarget(locFR, new TextContainer());
 		
 		session.processTextUnit(tu);
@@ -84,7 +85,7 @@ public class QualityCheckerTest {
 	public void testEMPTY_SOURCESEG () {
 		// Create TU with source of non-empty segment
 		// and target of empty segment
-		TextUnit tu = new TextUnit("id", "");
+		ITextUnit tu = new TextUnit("id", "");
 		tu.setTarget(locFR, new TextContainer("target"));
 		
 		session.processTextUnit(tu);
@@ -99,7 +100,7 @@ public class QualityCheckerTest {
 		// and target of one segment
 		TextContainer tc = new TextContainer("srctext1");
 		tc.getSegments().append(new Segment("s2", new TextFragment("srctext2")));
-		TextUnit tu = new TextUnit("id");
+		ITextUnit tu = new TextUnit("id");
 		tu.setSource(tc);
 		tu.setTarget(locFR, new TextContainer("trgext1"));
 		
@@ -115,7 +116,7 @@ public class QualityCheckerTest {
 		// and target of two segments but one empty
 		TextContainer tc = new TextContainer("srctext1");
 		tc.getSegments().append(new Segment("s2", new TextFragment("srctext2")));
-		TextUnit tu = new TextUnit("id");
+		ITextUnit tu = new TextUnit("id");
 		tu.setSource(tc);
 		tc = new TextContainer("trgtext1");
 		tc.getSegments().append(new Segment("s2", new TextFragment()));
@@ -129,7 +130,7 @@ public class QualityCheckerTest {
 
 	@Test
 	public void testMISSINGORDIFF_LEADINGWS () {
-		TextUnit tu = new TextUnit("id", "  srctext");
+		ITextUnit tu = new TextUnit("id", "  srctext");
 		tu.setTarget(locFR, new TextContainer("trgext"));
 		
 		session.processTextUnit(tu);
@@ -140,7 +141,7 @@ public class QualityCheckerTest {
 
 	@Test
 	public void testMISSINGORDIFF_TRAILINGWS () {
-		TextUnit tu = new TextUnit("id", " srctext ");
+		ITextUnit tu = new TextUnit("id", " srctext ");
 		tu.setTarget(locFR, new TextContainer(" trgext"));
 		
 		session.processTextUnit(tu);
@@ -151,7 +152,7 @@ public class QualityCheckerTest {
 
 	@Test
 	public void testEXTRAORDIFF_LEADINGWS () {
-		TextUnit tu = new TextUnit("id", "  srctext");
+		ITextUnit tu = new TextUnit("id", "  srctext");
 		tu.setTarget(locFR, new TextContainer("   trgext"));
 		
 		session.processTextUnit(tu);
@@ -162,7 +163,7 @@ public class QualityCheckerTest {
 
 	@Test
 	public void testEXTRAORDIFF_TRAILINGWS () {
-		TextUnit tu = new TextUnit("id", "srctext  ");
+		ITextUnit tu = new TextUnit("id", "srctext  ");
 		tu.setTarget(locFR, new TextContainer("trgtext   "));
 		
 		session.processTextUnit(tu);
@@ -173,7 +174,7 @@ public class QualityCheckerTest {
 
 	@Test
 	public void testTARGET_SAME_AS_SOURCE () {
-		TextUnit tu = new TextUnit("id", "src text");
+		ITextUnit tu = new TextUnit("id", "src text");
 		tu.setTarget(locFR, new TextContainer("src text"));
 		
 		session.processTextUnit(tu);
@@ -184,7 +185,7 @@ public class QualityCheckerTest {
 	
 	@Test
 	public void testTARGET_SAME_AS_SOURCE_withoutWords () {
-		TextUnit tu = new TextUnit("id", ":?%$#@#_~`()[]{}=+-");
+		ITextUnit tu = new TextUnit("id", ":?%$#@#_~`()[]{}=+-");
 		tu.setTarget(locFR, new TextContainer(":?%$#@#_~`()[]{}=+-"));
 
 		session.processTextUnit(tu);
@@ -194,10 +195,10 @@ public class QualityCheckerTest {
 	
 	@Test
 	public void testTARGET_SAME_AS_SOURCE_WithSameCodes () {
-		TextUnit tu = new TextUnit("id", "src text");
+		ITextUnit tu = new TextUnit("id", "src text");
 		tu.getSource().getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<code/>");
 		tu.setTarget(locFR, new TextContainer("src text"));
-		tu.getTarget(locFR).getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<code/>");
+		tu.getTarget(locFR, false).getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<code/>");
 		
 		session.processTextUnit(tu);
 		List<Issue> issues = session.getIssues();
@@ -207,10 +208,10 @@ public class QualityCheckerTest {
 	
 	@Test
 	public void testTARGET_SAME_AS_SOURCE_WithDiffCodes () {
-		TextUnit tu = new TextUnit("id", "src text");
+		ITextUnit tu = new TextUnit("id", "src text");
 		tu.getSource().getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<code/>");
 		tu.setTarget(locFR, new TextContainer("src text"));
-		tu.getTarget(locFR).getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<etc/>");
+		tu.getTarget(locFR, false).getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<etc/>");
 		
 		session.processTextUnit(tu);
 		List<Issue> issues = session.getIssues();
@@ -222,10 +223,10 @@ public class QualityCheckerTest {
 	
 	@Test
 	public void testTARGET_SAME_AS_SOURCE_WithDiffCodesTurnedOff () {
-		TextUnit tu = new TextUnit("id", "src text");
+		ITextUnit tu = new TextUnit("id", "src text");
 		tu.getSource().getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<code/>");
 		tu.setTarget(locFR, new TextContainer("src text"));
-		tu.getTarget(locFR).getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<etc/>");
+		tu.getTarget(locFR, false).getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<etc/>");
 		
 		session.getParameters().setTargetSameAsSourceWithCodes(false);
 		session.processTextUnit(tu);
@@ -239,10 +240,10 @@ public class QualityCheckerTest {
 	
 	@Test
 	public void testCODE_DIFFERENCE () {
-		TextUnit tu = new TextUnit("id", "src ");
+		ITextUnit tu = new TextUnit("id", "src ");
 		tu.getSource().getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<code/>");
 		tu.setTarget(locFR, new TextContainer("trg "));
-		tu.getTarget(locFR).getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<CODE />");
+		tu.getTarget(locFR, false).getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<CODE />");
 		
 		session.processTextUnit(tu);
 		List<Issue> issues = session.getIssues();
@@ -253,14 +254,14 @@ public class QualityCheckerTest {
 
 	@Test
 	public void testCODE_DIFFERENCE_OrderDiffIsOK () {
-		TextUnit tu = new TextUnit("id", "src ");
+		ITextUnit tu = new TextUnit("id", "src ");
 		tu.getSource().getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<code1/>");
 		tu.getSource().getSegments().get(0).text.append(" and ");
 		tu.getSource().getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<code2/>");
 		tu.setTarget(locFR, new TextContainer("trg "));
-		tu.getTarget(locFR).getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<code2/>");
-		tu.getTarget(locFR).getSegments().get(0).text.append(" et ");
-		tu.getTarget(locFR).getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<code1/>");
+		tu.getTarget(locFR, false).getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<code2/>");
+		tu.getTarget(locFR, false).getSegments().get(0).text.append(" et ");
+		tu.getTarget(locFR, false).getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<code1/>");
 		
 		session.processTextUnit(tu);
 		List<Issue> issues = session.getIssues();
@@ -269,10 +270,10 @@ public class QualityCheckerTest {
 
 	@Test
 	public void testTARGET_SAME_AS_SOURCE_WithDifferentCodes () {
-		TextUnit tu = new TextUnit("id", "src text");
+		ITextUnit tu = new TextUnit("id", "src text");
 		tu.getSource().getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<code/>");
 		tu.setTarget(locFR, new TextContainer("src text"));
-		tu.getTarget(locFR).getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<CODE/>");
+		tu.getTarget(locFR, false).getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<CODE/>");
 		
 		session.getParameters().setCodeDifference(false);
 		session.startProcess(locEN, locFR);
@@ -285,10 +286,10 @@ public class QualityCheckerTest {
 
 	@Test
 	public void testTARGET_SAME_AS_SOURCE_WithDifferentCodes_CodeInsensitive () {
-		TextUnit tu = new TextUnit("id", "src text");
+		ITextUnit tu = new TextUnit("id", "src text");
 		tu.getSource().getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<code/>");
 		tu.setTarget(locFR, new TextContainer("src text"));
-		tu.getTarget(locFR).getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<CODE/>");
+		tu.getTarget(locFR, false).getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<CODE/>");
 		
 		session.getParameters().setCodeDifference(false);
 		session.getParameters().setTargetSameAsSourceWithCodes(false);
@@ -303,7 +304,7 @@ public class QualityCheckerTest {
 	
 	@Test
 	public void testTARGET_SAME_AS_SOURCE_NoIssue () {
-		TextUnit tu = new TextUnit("id", "  \t\n ");
+		ITextUnit tu = new TextUnit("id", "  \t\n ");
 		tu.setTarget(locFR, new TextContainer("  \t\n "));
 		
 		session.processTextUnit(tu);
@@ -313,7 +314,7 @@ public class QualityCheckerTest {
 
 	@Test
 	public void testMISSING_PATTERN () {
-		TextUnit tu = new TextUnit("id", "src text !? %s");
+		ITextUnit tu = new TextUnit("id", "src text !? %s");
 		tu.setTarget(locFR, new TextContainer("trg text"));
 		ArrayList<PatternItem> list = new ArrayList<PatternItem>();
 		list.add(new PatternItem("[!\\?]", PatternItem.SAME, true, Issue.SEVERITY_LOW));
@@ -335,7 +336,7 @@ public class QualityCheckerTest {
 
 	@Test
 	public void testMISSING_PATTERN_ForURL () {
-		TextUnit tu = new TextUnit("id", "test: http://thisisatest.com.");
+		ITextUnit tu = new TextUnit("id", "test: http://thisisatest.com.");
 		tu.setTarget(locFR, new TextContainer("test: http://thisBADtest.com"));
 		session.startProcess(locEN, locFR); // Make sure we re-initialize
 		session.processTextUnit(tu);
@@ -348,7 +349,7 @@ public class QualityCheckerTest {
 
 	@Test
 	public void testNoIssues () {
-		TextUnit tu = new TextUnit("id", "  Text {with} (123). ");
+		ITextUnit tu = new TextUnit("id", "  Text {with} (123). ");
 		tu.setTarget(locFR, new TextContainer("  Texte {avec} (123). "));
 		
 		session.processTextUnit(tu);
@@ -362,7 +363,7 @@ public class QualityCheckerTest {
 		session.getParameters().setMaxCharLengthAbove(149);
 		session.getParameters().setMaxCharLengthBelow(200);
 
-		TextUnit tu = new TextUnit("id", "abcdefghij"); // 10 chars -> use above
+		ITextUnit tu = new TextUnit("id", "abcdefghij"); // 10 chars -> use above
 		tu.setTarget(locFR, new TextContainer("123456789012345")); // 15 chars
 		session.startProcess(locEN, locFR);
 		session.processTextUnit(tu);
@@ -391,7 +392,7 @@ public class QualityCheckerTest {
 		session.getParameters().setMinCharLengthAbove(100);
 		session.getParameters().setMinCharLengthBelow(50);
 
-		TextUnit tu = new TextUnit("id", "abcdefghij"); // 10 chars -> use above
+		ITextUnit tu = new TextUnit("id", "abcdefghij"); // 10 chars -> use above
 		tu.setTarget(locFR, new TextContainer("123456789")); // 10 chars (<100% of src)
 		session.startProcess(locEN, locFR);
 		session.processTextUnit(tu);
@@ -416,7 +417,7 @@ public class QualityCheckerTest {
 
 	@Test
 	public void testTERMINOLOGY () {
-		TextUnit tu = new TextUnit("id", "summer and WINTER");
+		ITextUnit tu = new TextUnit("id", "summer and WINTER");
 		tu.setTarget(locFR, new TextContainer("\u00e9T\u00e9 et printemps"));
 		
 		session.getParameters().setCheckTerms(true);

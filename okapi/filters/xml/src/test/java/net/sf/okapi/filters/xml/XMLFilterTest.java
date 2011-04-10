@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -29,9 +29,9 @@ import net.sf.okapi.common.filters.RoundTripComparison;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import static org.junit.Assert.*;
 
@@ -105,7 +105,7 @@ public class XMLFilterTest {
 			+ "<grp><name id=\"id1\" /><u><src xml:id=\"xid2\">text 2</src></u></grp>"
 			+ "</doc>";
 		ArrayList<Event> list = getEvents(snippet);
-		TextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
 		assertNotNull(tu);
 		assertEquals("id1", tu.getName());
 		tu = FilterTestDriver.getTextUnit(list, 2);
@@ -124,7 +124,7 @@ public class XMLFilterTest {
 			+ "<p xml:id=\"xid2\">text 2</p>"
 			+ "<p xml:id=\"xid3\" name=\"id3\">text 3</p></doc>";
 		ArrayList<Event> list = getEvents(snippet);
-		TextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
 		assertNotNull(tu);
 		assertEquals("id1", tu.getName());
 		tu = FilterTestDriver.getTextUnit(list, 2);
@@ -148,7 +148,7 @@ public class XMLFilterTest {
 			+ "<desc>Value of desc</desc>"
 			+ "</msg></doc>";
 		ArrayList<Event> list = getEvents(snippet);
-		TextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
 		assertNotNull(tu);
 		assertEquals("id1_t", tu.getName());
 		tu = FilterTestDriver.getTextUnit(list, 2);
@@ -167,7 +167,7 @@ public class XMLFilterTest {
 			+ "<p>t1<c></c>t2</p>"
 			+ "</doc>";
 		ArrayList<Event> list = getEvents(snippet);
-		TextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
 		Code code = tu.getSource().getFirstContent().getCodes().get(0);
 		assertEquals(TagType.PLACEHOLDER, code.getTagType());
 		assertEquals("t1<1/>t2", fmt.setContent(tu.getSource().getFirstContent()).toString());
@@ -216,7 +216,7 @@ public class XMLFilterTest {
 			+ "<p alt=\"It's done\" notrans=\"'\">It's done</p>"
 			+ "</doc>";
 		ArrayList<Event> list = getEvents(snippet);
-		TextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
 		assertEquals("It's done", tu.getSource().toString());
 		assertEquals(expected, FilterTestDriver.generateOutput(list,
 			filter.getEncoderManager(), locEN));
@@ -232,7 +232,7 @@ public class XMLFilterTest {
 //			+ "<p>line 1&#10;line 2.</p>"
 //			+ "</doc>";
 //		ArrayList<Event> list = getEvents(snippet);
-//		TextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+//		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
 //		assertNotNull(tu);
 //		assertEquals("line 1.&#10;line 2.", tu.toString());
 //	}
@@ -258,7 +258,7 @@ public class XMLFilterTest {
 //			+ "<p>&aWithRingAndAcute;=e1</p>"
 //			+ "<p>&text;=e2</p>"
 //			+ "</doc>";
-//		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+//		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 //		assertNotNull(tu);
 //		assertEquals("<1/>=e1", fmt.setContent(tu.getSourceContent()).toString());
 //		
@@ -395,7 +395,7 @@ public class XMLFilterTest {
 	public void testCDATAParsing () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc><p><![CDATA[&=amp, <=lt, &#xaaa;=not-a-ncr]]></p></doc>";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
 		assertEquals(tu.getSource().getFirstContent().toText(), "&=amp, <=lt, &#xaaa;=not-a-ncr");
 	}
@@ -414,7 +414,7 @@ public class XMLFilterTest {
 	public void testCREntity () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc><p>t1\n\n   &#xD;&#13;   t2</p></doc>";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
 		String str = tu.getSource().toString();
 		assertEquals("t1 \r\r t2", str);
@@ -434,7 +434,7 @@ public class XMLFilterTest {
 	public void testCommentParsing () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc><p>t1 <!--comment--> t2</p></doc>";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
 		assertEquals(fmt.setContent(tu.getSource().getFirstContent()).toString(), "t1 <1/> t2");
 	}
@@ -453,7 +453,7 @@ public class XMLFilterTest {
 	public void testPIParsing () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc><p>t1 <?abc attr=\"value\"?> t2</p></doc>";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
 		assertEquals(fmt.setContent(tu.getSource().getFirstContent()).toString(), "t1 <1/> t2");
 	}
@@ -509,7 +509,7 @@ public class XMLFilterTest {
 		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc><p>text 1</p><p>text 2</p><p>text 3</p></doc>";
 		ArrayList<Event> list = getEvents(snippet);
-		TextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
 		assertNotNull(tu);
 		assertEquals("text 1", tu.getSource().toString());
 		tu = FilterTestDriver.getTextUnit(list, 2);
@@ -527,7 +527,7 @@ public class XMLFilterTest {
 			+ "<its:translateRule selector=\"//*/@text\" translate=\"yes\"/></its:rules>"
 			+ "<p text=\"value 1\">text 1</p><p>text 2</p><p>text 3</p></doc>";
 		ArrayList<Event> list = getEvents(snippet);
-		TextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
 		assertNotNull(tu);
 		assertEquals("value 1", tu.getSource().toString());
 	}
@@ -539,7 +539,7 @@ public class XMLFilterTest {
 			+ "<its:translateRule selector=\"//*/@text\" translate=\"yes\"/></its:rules>"
 			+ "<p text=\"value 1 &quot;=quot\">text 1</p><p>text 2 &quot;=quot</p><p>text 3</p></doc>";
 		ArrayList<Event> list = getEvents(snippet);
-		TextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
 		assertNotNull(tu);
 		assertEquals("value 1 \"=quot", tu.getSource().toString());
 	}

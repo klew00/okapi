@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -45,7 +45,7 @@ import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 
 public class QualityCheckSession {
 
@@ -402,7 +402,7 @@ public class QualityCheckSession {
 		checker.processStartDocument(startDoc, sigList);
 	}
 
-	public void processTextUnit (TextUnit textUnit) {
+	public void processTextUnit (ITextUnit textUnit) {
 		checker.processTextUnit(textUnit);
 	}
 

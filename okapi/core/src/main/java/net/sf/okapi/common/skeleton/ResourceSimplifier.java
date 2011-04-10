@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -37,7 +37,7 @@ import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextPart;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 
 /**
  * Simplifies events, i.e. splits the generic skeleton of a given event resource into parts to contain no references.
@@ -248,8 +248,8 @@ public class ResourceSimplifier {
 		if (res == null)
 			return false;
 		
-		if (res instanceof TextUnit) {
-			TextUnit tu = (TextUnit) res;
+		if (res instanceof ITextUnit) {
+			ITextUnit tu = (ITextUnit)res;
 			TextFragment tf = tu.getSource().getUnSegmentedContentCopy();
 			for (Code code : tf.getCodes()) {
 				if (code.hasReference()) return true;
@@ -323,7 +323,7 @@ public class ResourceSimplifier {
 		newSkel = new GenericSkeleton(); // newSkel.clear() would damage an already sent skeleton
 	}
 	
-	private void addTU(MultiEvent me, String resId, int tuIndex, TextUnit tu) {
+	private void addTU(MultiEvent me, String resId, int tuIndex, ITextUnit tu) {
 		String id = null;		
 		if (tuIndex == 1)
 			id = resId;
@@ -332,7 +332,7 @@ public class ResourceSimplifier {
 			id = String.format("%s_%d", resId, tuIndex);
 		}
 		
-		TextUnit newTU = tu.clone();
+		ITextUnit newTU = tu.clone();
 		newTU.setId(id);
 		newTU.setSkeleton(null);
 		newTU.setIsReferent(false); //!!! to have GSW write it out
@@ -355,8 +355,8 @@ public class ResourceSimplifier {
 		ISkeleton skel = resource.getSkeleton();		
 		boolean hasGenericSkeleton = skel instanceof GenericSkeleton; 
 		
-		if (resource instanceof TextUnit) {
-			TextUnit tu = (TextUnit) resource;
+		if (resource instanceof ITextUnit) {
+			ITextUnit tu = (ITextUnit)resource;
 			if (tu.isReferent()) {
 				// Referenced TU, we got here from recursion (see *** below)
 				if (!hasGenericSkeleton) {
@@ -433,8 +433,8 @@ public class ResourceSimplifier {
 	private void processSourcePlaceholder(GenericSkeletonPart part, IResource resource, 
 			MultiEvent me, String resId, int tuCounter, int dpCounter) {
 		if (isMultilingual) {
-			if (part.parent instanceof TextUnit)
-				newSkel.add(writer.getContent((TextUnit) part.parent, null, 0)); // Source goes to skeleton
+			if (part.parent instanceof ITextUnit)
+				newSkel.add(writer.getContent((ITextUnit)part.parent, null, 0)); // Source goes to skeleton
 			else {
 				logger.warning("The self-reference must be a text-unit: " + resId);
 				newSkel.add(part.parent.toString());
@@ -442,7 +442,7 @@ public class ResourceSimplifier {
 		}
 		else {
 			flushSkeleton(resId, ++dpCounter, me);
-			addTU(me, resId, ++tuCounter, (TextUnit) resource);
+			addTU(me, resId, ++tuCounter, (ITextUnit)resource);
 		}
 	}	
 	
@@ -451,11 +451,11 @@ public class ResourceSimplifier {
 		// For both isMultilingual true/false
 		if (part.getLocale() == trgLoc) {
 			flushSkeleton(resId, ++dpCounter, me);
-			addTU(me, resId, ++tuCounter, (TextUnit) resource);
+			addTU(me, resId, ++tuCounter, (ITextUnit)resource);
 		}
 		else {
 			//newSkel.add(writer.getContent((TextUnit) resource, trgLoc, 1));
-			newSkel.add(writer.getContent((TextUnit) resource, part.getLocale(), 1));			
+			newSkel.add(writer.getContent((ITextUnit)resource, part.getLocale(), 1));			
 		}
 	}
 	

@@ -23,8 +23,8 @@ package net.sf.okapi.filters.table.tsv;
 import java.util.List;
 
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.filters.table.base.BaseTableFilter;
 import net.sf.okapi.lib.extra.filters.TextProcessingResult;
@@ -56,7 +56,7 @@ public class TabSeparatedValuesFilter  extends BaseTableFilter {
 	}
 
 	@Override
-	protected TextProcessingResult extractCells(List<TextUnit> cells, TextContainer lineContainer, long lineNum) {
+	protected TextProcessingResult extractCells(List<ITextUnit> cells, TextContainer lineContainer, long lineNum) {
 		
 		if (cells == null) return TextProcessingResult.REJECTED;
 		if (lineContainer == null) return TextProcessingResult.REJECTED;

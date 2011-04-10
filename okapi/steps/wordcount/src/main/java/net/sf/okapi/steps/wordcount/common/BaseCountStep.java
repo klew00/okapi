@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -25,9 +25,9 @@ import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.IdGenerator;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.extra.steps.AbstractPipelineStep;
 
 /**
@@ -78,7 +78,7 @@ public abstract class BaseCountStep extends AbstractPipelineStep {
 	abstract public String getMetric();
 	abstract protected long count(TextContainer textContainer, LocaleId locale);
 	abstract protected long count(Segment segment, LocaleId locale);
-	abstract protected long countInTextUnit(TextUnit textUnit);
+	abstract protected long countInTextUnit(ITextUnit textUnit);
 	abstract protected boolean countOnlyTranslatable();
 //	abstract protected CountContext getCountContext();
 
@@ -386,7 +386,7 @@ public abstract class BaseCountStep extends AbstractPipelineStep {
 	
 	@Override
 	protected Event handleTextUnit(Event event) {		
-		TextUnit tu = (TextUnit) event.getResource();
+		ITextUnit tu = event.getTextUnit();
 		
 		if (tu.isEmpty()) return event;
 		if (!tu.isTranslatable() && countOnlyTranslatable()) return event;

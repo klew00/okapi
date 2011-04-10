@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -28,6 +28,7 @@ import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextUnit;
 
 import org.junit.Test;
@@ -40,8 +41,8 @@ public class SkeletonUtilTest {
 	
 	@Test
 	public void testParts() {
-		TextUnit tu1 = new TextUnit("tu1");
-		TextUnit tu2 = new TextUnit("tu2");
+		ITextUnit tu1 = new TextUnit("tu1");
+		ITextUnit tu2 = new TextUnit("tu2");
 		
 		GenericSkeleton skel1 = new GenericSkeleton();
 		tu1.setSkeleton(skel1);
@@ -95,8 +96,8 @@ public class SkeletonUtilTest {
 	
 	@Test
 	public void testTypes() {
-		TextUnit tu1 = new TextUnit("tu1");
-		TextUnit tu2 = new TextUnit("tu2");
+		ITextUnit tu1 = new TextUnit("tu1");
+		ITextUnit tu2 = new TextUnit("tu2");
 		GenericSkeleton skel1 = new GenericSkeleton();
 		GenericSkeleton skel2 = new GenericSkeleton();
 		tu1.setSkeleton(skel1);
@@ -289,8 +290,8 @@ public class SkeletonUtilTest {
 	public void testGenericSkeletonWriter() {
 		GenericSkeletonWriter writer = new GenericSkeletonWriter();
 		
-		TextUnit tu1 = new TextUnit("tu1");
-		TextUnit tu2 = new TextUnit("tu2");
+		ITextUnit tu1 = new TextUnit("tu1");
+		ITextUnit tu2 = new TextUnit("tu2");
 		
 		GenericSkeleton skel1;
 		GenericSkeleton skel2;
@@ -746,8 +747,8 @@ public class SkeletonUtilTest {
 	public void testGenericSkeletonWriter_Multilingual() {
 		GenericSkeletonWriter writer = new GenericSkeletonWriter();
 		
-		TextUnit tu1 = new TextUnit("tu1");
-		TextUnit tu2 = new TextUnit("tu2");
+		ITextUnit tu1 = new TextUnit("tu1");
+		ITextUnit tu2 = new TextUnit("tu2");
 		
 		GenericSkeleton skel1;
 		GenericSkeleton skel2;

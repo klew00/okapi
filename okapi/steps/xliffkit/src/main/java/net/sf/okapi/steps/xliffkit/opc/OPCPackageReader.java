@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -32,11 +32,11 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.AbstractFilter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartSubDocument;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.xliff.XLIFFFilter;
 import net.sf.okapi.lib.beans.sessions.OkapiJsonSession;
 import net.sf.okapi.steps.xliffkit.reader.TextUnitMerger;
@@ -214,7 +214,7 @@ public class OPCPackageReader extends AbstractFilter {
 	public void setParameters(IParameters params) {
 	}
 
-	private TextUnit getNextXliffTu() {
+	private ITextUnit getNextXliffTu() {
 		if (xliffReader == null)
 			throw new RuntimeException("OPCPackageReader: xliffReader is not initialized");
 		
@@ -233,7 +233,7 @@ public class OPCPackageReader extends AbstractFilter {
 				}
 			}
 			if (ev.getEventType() == EventType.TEXT_UNIT) {
-				return (TextUnit) ev.getResource();
+				return ev.getTextUnit();
 			}
 		}
 		return null;
@@ -267,8 +267,8 @@ public class OPCPackageReader extends AbstractFilter {
 	private void processTextUnit(Event event) {
 		if (merger == null) return;
 		
-		TextUnit tu = (TextUnit) event.getResource(); 
-		TextUnit xtu = getNextXliffTu();
+		ITextUnit tu = event.getTextUnit(); 
+		ITextUnit xtu = getNextXliffTu();
 		if (xtu == null) return;
 		
 //		// Set tu source from xtu source

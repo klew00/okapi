@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -52,12 +52,12 @@ import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 import net.sf.okapi.common.skeleton.ZipSkeleton;
@@ -833,7 +833,7 @@ public class OpenXMLFilter implements IFilter {
 					if (translator!=null)
 					{
 						translator.addToReferents(event);
-						TextUnit tu = (TextUnit)event.getResource();
+						ITextUnit tu = event.getTextUnit();
 						// We can use getFirstPartContent() because nothing is segmented yet
 						TextFragment tfSource = tu.getSource().getFirstContent();
 						String torg = translator.translate(tfSource,LOGGER,nFileType); // DWH 5-7-09 nFileType

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -29,7 +29,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.filters.rtf.RTFFilter;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.IFilter;
@@ -72,17 +72,17 @@ public class RTFFilterTest {
 	
 	@Test
 	public void testSimpleTU () {
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents("Test01.rtf", locEN, locFR), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents("Test01.rtf", locEN, locFR), 1);
 		assertNotNull(tu);
 		assertEquals("Text (to) translate.", tu.getSource().toString());
-		TextContainer tc = tu.getTarget(locFR);
+		TextContainer tc = tu.getTarget(locFR, false);
 		assertNotNull(tc);
 		assertEquals("Texte \u00e0 traduire.", tc.toString());
 
 		tu = FilterTestDriver.getTextUnit(getEvents("Test01.rtf", locEN, locFR), 2);
 		assertNotNull(tu);
 		assertEquals("[Text with <1>bold</1>.]", fmt.printSegmentedContent(tu.getSource(), true));
-		tc = tu.getTarget(locFR);
+		tc = tu.getTarget(locFR, false);
 		assertNotNull(tc);
 		assertEquals("[Texte avec du <1>gras</1>.]", fmt.printSegmentedContent(tc, true));
 	}

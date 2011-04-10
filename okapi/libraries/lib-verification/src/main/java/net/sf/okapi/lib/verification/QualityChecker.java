@@ -40,7 +40,7 @@ import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.lib.terminology.simpletb.SimpleTB;
 
@@ -150,13 +150,13 @@ class QualityChecker {
 		return WORDCHARS.matcher(frag.getCodedText()).find();
 	}
 	
-	void processTextUnit (TextUnit tu) {
+	void processTextUnit (ITextUnit tu) {
 		// Skip non-translatable entries
 		if ( !tu.isTranslatable() ) return;
 		
 		// Get the containers
 		TextContainer srcCont = tu.getSource();
-		TextContainer trgCont = tu.getTarget(trgLoc);
+		TextContainer trgCont = tu.getTarget(trgLoc, false);
 		
 		// Check if we have a target (even if option disabled)
 		if ( trgCont == null ) {
@@ -178,7 +178,6 @@ class QualityChecker {
 			}
 		}
 
-		tu.synchronizeSourceSegmentation(trgLoc);
 		ISegments srcSegs = srcCont.getSegments();
 		ISegments trgSegs = trgCont.getSegments();
 		
@@ -333,7 +332,7 @@ class QualityChecker {
 	
 	private void checkCharacters (String srcOri,
 		String trgOri,
-		TextUnit tu)
+		ITextUnit tu)
 	{
 		StringBuilder badChars = new StringBuilder();
 		int pos = -1;
@@ -430,7 +429,7 @@ class QualityChecker {
 	
 	private void checkInlineCodes (Segment srcSeg,
 		Segment trgSeg,
-		TextUnit tu)
+		ITextUnit tu)
 	{
 		ArrayList<Code> srcList = stripNoiseCodes(srcSeg);
 		ArrayList<Code> trgList = stripNoiseCodes(trgSeg);
@@ -512,7 +511,7 @@ class QualityChecker {
 	
 	private void checkCorruptedCharacters (String srcOri,
 		String trgOri,
-		TextUnit tu)
+		ITextUnit tu)
 	{
 		Matcher m = corruption.matcher(trgOri);
 		if ( m.find() ) { // Getting one match is enough
@@ -524,7 +523,7 @@ class QualityChecker {
 	
 	private void checkWhiteSpaces (String srcOri,
 		String trgOri,
-		TextUnit tu)
+		ITextUnit tu)
 	{
 		// Check for leading whitespaces
 		if ( params.getLeadingWS() ) {
@@ -622,7 +621,7 @@ class QualityChecker {
 
 	private void checkLengths (Segment srcSeg,
 		Segment trgSeg,
-		TextUnit tu)
+		ITextUnit tu)
 	{
 		// Strip inline code markers to look at text only
 		int srcLen = TextUnitUtil.getText(srcSeg.text, null).length();
@@ -674,7 +673,7 @@ class QualityChecker {
 	
 	private void checkSuspectPatterns (Segment srcSeg,
 		Segment trgSeg,
-		TextUnit tu)
+		ITextUnit tu)
 	{
 		String trgCText = trgSeg.text.getCodedText();
 		
@@ -699,7 +698,7 @@ class QualityChecker {
 
 	private void checkPatterns (Segment srcSeg,
 		Segment trgSeg,
-		TextUnit tu)
+		ITextUnit tu)
 	{
 		//--- Source-based search
 		// Get the source text
@@ -816,7 +815,7 @@ class QualityChecker {
 	}
 	
 	private void reportIssue (IssueType issueType,
-		TextUnit tu,
+		ITextUnit tu,
 		String segId,
 		String message,
 		int srcStart,

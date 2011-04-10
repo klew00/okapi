@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -27,17 +27,11 @@ import net.sf.okapi.common.ClassUtil;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
-
-/**
- * 
- * 
- * @version 0.1 07.07.2009
- */
 
 abstract public class BaseCounter {
 	
@@ -51,8 +45,8 @@ abstract public class BaseCounter {
 		if (text == null) return 0L;
 		if (Util.isNullOrEmpty(language)) return 0L;
 		
-		if (text instanceof TextUnit) {		
-			TextUnit tu = (TextUnit) text;
+		if (text instanceof ITextUnit) {		
+			ITextUnit tu = (ITextUnit)text;
 			
 //			if (tu.hasTarget(language))
 //				return count(classRef, tu.getTarget(language), language);

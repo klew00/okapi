@@ -1,3 +1,23 @@
+/*===========================================================================
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
+-----------------------------------------------------------------------------
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
+
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+===========================================================================*/
+
 package net.sf.okapi.lib.extra.steps;
 
 import java.util.logging.Logger;
@@ -6,10 +26,10 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.resource.ISegments;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextUnit;
 
 public class TextUnitLogger extends BasePipelineStep {
 
@@ -42,9 +62,8 @@ public class TextUnitLogger extends BasePipelineStep {
 	
 	@Override
 	protected Event handleTextUnit(Event event) {
-		TextUnit tu = (TextUnit) event.getResource();
+		ITextUnit tu = event.getTextUnit();
 		fillSB(sb, tu, srcLoc);
-		
 		return super.handleTextUnit(event);
 	}
 	
@@ -54,7 +73,7 @@ public class TextUnitLogger extends BasePipelineStep {
 		return super.handleEndBatch(event);
 	}
 	
-	private static void fillSB(StringBuilder sb, TextUnit tu, LocaleId srcLoc) {
+	private static void fillSB(StringBuilder sb, ITextUnit tu, LocaleId srcLoc) {
 		sb.append(tu.getId());
 		sb.append(":");
 		sb.append("\n");
@@ -107,10 +126,10 @@ public class TextUnitLogger extends BasePipelineStep {
 		}
 		
 		for (LocaleId locId : tu.getTargetLocales()) {
-			sb.append(String.format("      Target (%s): %s", locId.toString(), tu.getTarget(locId)));
+			sb.append(String.format("      Target (%s): %s", locId.toString(), tu.getTarget(locId, false)));
 			sb.append("\n");
 			
-			TextContainer target = tu.getTarget(locId);
+			TextContainer target = tu.getTarget(locId, false);
 			if (source.getAnnotations() != null) {
 //				sb.append("             ");
 //				sb.append("Target annotations:");
@@ -143,7 +162,7 @@ public class TextUnitLogger extends BasePipelineStep {
 		}
 	}
 	
-	public static String getTuInfo(TextUnit tu, LocaleId srcLoc) {
+	public static String getTuInfo(ITextUnit tu, LocaleId srcLoc) {
 		StringBuilder sb = new StringBuilder();
 		fillSB(sb, tu, srcLoc);
 		return sb.toString();

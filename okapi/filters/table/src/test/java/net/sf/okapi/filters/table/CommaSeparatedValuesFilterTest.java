@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -48,10 +48,10 @@ import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiBadFilterParametersException;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.DocumentPart;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.filters.table.csv.CommaSeparatedValuesFilter;
 import net.sf.okapi.filters.table.csv.Parameters;
@@ -104,17 +104,17 @@ public class CommaSeparatedValuesFilterTest {
 			+ "Source 2\tContext 2\t\tTarget 2\n";
 		
 		List<Event> events = getEvents(snippet, locEN, locFR);
-		TextUnit tu = FilterTestDriver.getTextUnit(events, 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(events, 1);
 		assertNotNull(tu);
 		assertEquals("Source 1", tu.getSource().toString());
-		assertEquals("Target 1", tu.getTarget(locFR).toString());
+		assertEquals("Target 1", tu.getTarget(locFR, false).toString());
 		assertEquals("Comment 1", tu.getProperty(Property.NOTE).getValue());
 
 		tu = FilterTestDriver.getTextUnit(events, 2);
 		assertNotNull(tu);
 		assertEquals("Source 2", tu.getSource().toString());
 		assertTrue(null==tu.getProperty(Property.NOTE));
-		assertEquals("Target 2", tu.getTarget(locFR).toString());
+		assertEquals("Target 2", tu.getTarget(locFR, false).toString());
 	}
 	
 	@Test
@@ -403,8 +403,8 @@ public class CommaSeparatedValuesFilterTest {
 			
 			switch (event.getEventType()) {
 				case TEXT_UNIT:
-					assertTrue(res instanceof TextUnit);
-					assertEquals(((TextUnit) res).getMimeType(), filter.getMimeType());
+					assertTrue(res instanceof ITextUnit);
+					assertEquals(((ITextUnit)res).getMimeType(), filter.getMimeType());
 					break;
 					
 				case DOCUMENT_PART:
@@ -1934,10 +1934,9 @@ public class CommaSeparatedValuesFilterTest {
 		switch (event.getEventType()) {
 		case TEXT_UNIT:
 			IResource res = event.getResource();
-			assertTrue(res instanceof TextUnit);
-			
+			assertTrue(res instanceof ITextUnit);
 			// assertEquals(expectedText, ((TextUnit) res).toString());
-			assertEquals(expectedText, TextUnitUtil.getSourceText((TextUnit) res, true));
+			assertEquals(expectedText, TextUnitUtil.getSourceText((ITextUnit)res, true));
 			break;
 			
 		case DOCUMENT_PART:
@@ -1971,11 +1970,9 @@ public class CommaSeparatedValuesFilterTest {
 		
 		case TEXT_UNIT:
 			IResource res = event.getResource();
-			assertTrue(res instanceof TextUnit);
-			TextUnit tu = (TextUnit) res;
-			
+			assertTrue(res instanceof ITextUnit);
+			ITextUnit tu = (ITextUnit)res;
 			assertEquals(source, tu.toString());
-			
 			Property prop = tu.getSourceProperty(AbstractLineFilter.LINE_NUMBER);
 			assertNotNull(prop);
 			
@@ -1984,7 +1981,7 @@ public class CommaSeparatedValuesFilterTest {
 			}
 			
 			if ( !Util.isEmpty(target) && !Util.isNullOrEmpty(language) ) {
-				TextContainer trg = tu.getTarget(language);
+				TextContainer trg = tu.getTarget(language, false);
 				assertNotNull(trg);
 				assertEquals(target, trg.toString());
 			}

@@ -54,6 +54,7 @@ import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
@@ -72,7 +73,7 @@ public class RegexFilter implements IFilter {
 	private int tuId;
 	private IdGenerator otherId;
 	private String docName;
-	private TextUnit tuRes;
+	private ITextUnit tuRes;
 	private LinkedList<Event> queue;
 	private int startSearch;
 	private int startSkl;
@@ -509,13 +510,13 @@ public class RegexFilter implements IFilter {
 		}
 		else { // Unwrap the content
 			tuRes.getSource().unwrap(true, true);
-			if ( hasTarget ) tuRes.getTarget(trgLang).unwrap(true, true);
+			if ( hasTarget ) tuRes.getTarget(trgLang, false).unwrap(true, true);
 		}
 
 		if ( rule.useCodeFinder ) {
 			// We can use getFirstPartContent() because nothing is segmented yet
 			rule.codeFinder.process(tuRes.getSource().getFirstContent());
-			if ( hasTarget ) rule.codeFinder.process(tuRes.getTarget(trgLang).getFirstContent());
+			if ( hasTarget ) rule.codeFinder.process(tuRes.getTarget(trgLang, false).getFirstContent());
 		}
 
 		if ( rule.nameGroup != -1 ) {

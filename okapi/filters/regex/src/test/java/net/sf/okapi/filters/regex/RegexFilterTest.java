@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -33,7 +33,7 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import org.junit.Assert;
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -117,7 +117,7 @@ public class RegexFilterTest {
 		filter.setParameters(params);
 		// Process
 		ArrayList<Event> list = getEvents(snippet);
-		TextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
 		assertNotNull(tu);
 		assertEquals("text1", tu.getSource().toString());
 		tu = FilterTestDriver.getTextUnit(list, 2);
@@ -139,7 +139,7 @@ public class RegexFilterTest {
 		filter.setParameters(params);
 		// Process
 		ArrayList<Event> list = getEvents(snippet);
-		TextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
 		assertNotNull(tu);
 		assertEquals("Text1", tu.getSource().toString());
 		assertEquals("Id1", tu.getName());
@@ -223,15 +223,13 @@ public class RegexFilterTest {
         switch (event.getEventType()) {
             case TEXT_UNIT:
                 IResource res = event.getResource();
-                assertTrue(res instanceof TextUnit);
-
+                assertTrue(res instanceof ITextUnit);
                 assertEquals(res.toString(), expectedText);
                 break;
 
             case DOCUMENT_PART:
                 res = event.getResource();
                 assertTrue(res instanceof DocumentPart);
-
                 ISkeleton skel = res.getSkeleton();
                 if (skel != null) {
                     assertEquals(skel.toString(), expectedText);

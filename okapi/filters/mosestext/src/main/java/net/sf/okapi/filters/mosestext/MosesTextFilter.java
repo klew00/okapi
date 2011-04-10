@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -49,6 +49,7 @@ import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
@@ -263,7 +264,7 @@ public class MosesTextFilter implements IFilter {
 		// Convert to normal text fragment
 		TextFragment tf = fromPseudoXLIFF(sb.toString());
 		// Create the text unit and the skeleton
-		TextUnit tu = new TextUnit(tuIdGen.createId());
+		ITextUnit tu = new TextUnit(tuIdGen.createId());
 		tu.setSourceContent(tf);
 		tu.setPreserveWhitespaces(true);
 		

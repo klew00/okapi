@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -33,7 +33,7 @@ import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 
 /**
  *	Copied from the test scoped FilterTestDriver. Should be moved to the resources themselves or into a helper class.   
@@ -41,7 +41,7 @@ import net.sf.okapi.common.resource.TextUnit;
  */
 public class ExtractionVerificationUtil {
 
-	public static boolean compareTextUnit(TextUnit tu1, TextUnit tu2, boolean includeSkeleton) {
+	public static boolean compareTextUnit(ITextUnit tu1, ITextUnit tu2, boolean includeSkeleton) {
 
 		if (!compareINameable(tu1, tu2, includeSkeleton)) {
 			System.err.println("Difference in INameable");

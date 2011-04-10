@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -25,7 +25,6 @@ import java.util.List;
 
 import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.resource.Property;
-import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.lib.persistence.IPersistenceSession;

@@ -1,5 +1,5 @@
 /*===========================================================================*/
-/* Copyright (C) 2008 Jim Hargrave                                           */
+/* Copyright (C) 2008-2011 Jim Hargrave                                      */
 /*---------------------------------------------------------------------------*/
 /* This library is free software; you can redistribute it and/or modify it   */
 /* under the terms of the GNU Lesser General Public License as published by  */
@@ -33,8 +33,8 @@ import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipelinedriver.IPipelineDriver;
 import net.sf.okapi.common.pipelinedriver.PipelineDriver;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.html.HtmlFilter;
 import net.sf.okapi.steps.common.FilterEventsWriterStep;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
@@ -118,7 +118,7 @@ public class FilterRoundtripTest {
 			while ( filter.hasNext() ) {
 				event = filter.next();
 				if ( event.getEventType() == EventType.TEXT_UNIT ) {
-					TextUnit tu = (TextUnit)event.getResource();
+					ITextUnit tu = event.getTextUnit();
 					return tu.getSource().toString();
 				}
 			}

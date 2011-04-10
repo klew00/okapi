@@ -83,7 +83,7 @@ public class VariantSources implements IVariantSources {
     @Override
     public TextContainer create(LocaleId targetLocale, boolean overwriteExisting, int creationOptions) {
         TextContainer newSource = defaultSource.clone((creationOptions & COPY_PROPERTIES) == COPY_PROPERTIES);
-        if ( (creationOptions & COPY_SEGMENTS) != COPY_SEGMENTS )
+        if ( (creationOptions & COPY_SEGMENTATION) != COPY_SEGMENTATION )
             newSource.joinAll();
         if ( (creationOptions & COPY_CONTENT) != COPY_CONTENT )
             for (Segment seg : newSource.getSegments())

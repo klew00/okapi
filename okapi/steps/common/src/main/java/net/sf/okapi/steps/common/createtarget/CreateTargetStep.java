@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2010 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -28,7 +28,7 @@ import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.steps.common.createtarget.Parameters;;
 
 @UsingParameters(Parameters.class)
@@ -67,13 +67,13 @@ public class CreateTargetStep extends BasePipelineStep {
 
 	@Override
 	public Event handleTextUnit(Event event) {
-		TextUnit tu = event.getTextUnit();
+		ITextUnit tu = event.getTextUnit();
 		if (tu.isTranslatable() || params.isCreateOnNonTranslatable()) {
 			// Initialize the copy options
 			int copyOptions = IResource.CREATE_EMPTY;
 	
 			if (params.isCopyContent()) {
-				copyOptions |= IResource.COPY_CONTENT;
+				copyOptions |= IResource.COPY_SEGMENTED_CONTENT;
 			}
 			if (params.isCopyProperties()) {
 				copyOptions |= IResource.COPY_PROPERTIES;

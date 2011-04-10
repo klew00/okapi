@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -46,10 +46,10 @@ import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.rtf.RTFFilter;
 
 public class Merger {
@@ -201,7 +201,7 @@ public class Merger {
 			while ( inpFilter.hasNext() ) {
 				event = inpFilter.next();
 				if ( event.getEventType() == EventType.TEXT_UNIT ) {
-					processTextUnit((TextUnit)event.getResource());
+					processTextUnit(event.getTextUnit());
 				}
 				outFilter.handleEvent(event);
 			}
@@ -227,7 +227,7 @@ public class Merger {
 		}
 	}
 
-	private void processTextUnit (TextUnit tu) {
+	private void processTextUnit (ITextUnit tu) {
 		// Skip the non-translatable
 		// This means the translate attributes must be the same
 		// in the original and the merging files
@@ -235,7 +235,7 @@ public class Merger {
 
 		// Try to get the corresponding translated item
 		// They are expected to be in the same order with the same id
-		TextUnit tuFromTrans;
+		ITextUnit tuFromTrans;
 		while ( true ) {
 			if ( !reader.readItem() ) {
 				// Problem: 
@@ -302,7 +302,7 @@ public class Merger {
 		}
 
 		// Get the translated target
-		TextContainer fromTrans = tuFromTrans.getTarget(trgLoc);
+		TextContainer fromTrans = tuFromTrans.getTarget(trgLoc, false);
 		if ( fromTrans == null ) {
 			if ( tuFromTrans.getSource().isEmpty() ) return;
 			// Else: Missing target in the XLIFF
@@ -326,7 +326,7 @@ public class Merger {
 		List<Range> srcRanges = null;
 		if ( mergeAsSegments ) {
 			ranges = new ArrayList<Range>();
-			srcRanges = tuFromTrans.saveCurrentSourceSegmentation();
+			srcRanges = tuFromTrans.getSourceSegments().getRanges();//.saveCurrentSourceSegmentation();
 		}
 		if ( !fromTrans.contentIsOneSegment() ) {
 			fromTrans.getSegments().joinAll(ranges);
@@ -363,8 +363,9 @@ public class Merger {
 			// Re-set the ranges on the translated entry
 			if ( mergeAsSegments ) {
 				trgCont.getSegments().create(ranges);
-				tu.setSourceSegmentationForTarget(trgLoc, srcRanges);
-				tu.synchronizeSourceSegmentation(trgLoc);
+				tu.getSource().getSegments().create(srcRanges);
+				//tu.setSourceSegmentationForTarget(trgLoc, srcRanges);
+				//tu.synchronizeSourceSegmentation(trgLoc);
 			}
 		}
 		catch ( RuntimeException e ) {
@@ -475,7 +476,7 @@ public class Merger {
 	 */
 	private List<Code> transferCodes (TextContainer fromTrans,
 		TextContainer srcCont, // Can be a clone of the original content
-		TextUnit tu)
+		ITextUnit tu)
 	{
 		List<Code> transCodes = fromTrans.getFirstContent().getCodes();
 		List<Code> oriCodes = srcCont.getFirstContent().getCodes();

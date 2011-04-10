@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -32,7 +32,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.List;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -41,9 +40,9 @@ import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.DocumentPart;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.table.base.BaseTableFilter;
 import net.sf.okapi.filters.table.base.Parameters;
 import net.sf.okapi.filters.table.tsv.TabSeparatedValuesFilter;
@@ -288,9 +287,9 @@ public class TabSeparatedValuesFilterTest {
 		switch (event.getEventType()) {
 		case TEXT_UNIT:
 			IResource res = event.getResource();
-			assertTrue(res instanceof TextUnit);
+			assertTrue(res instanceof ITextUnit);
 			
-			assertEquals(expectedText, ((TextUnit) res).toString());
+			assertEquals(expectedText, ((ITextUnit)res).toString());
 			break;
 			
 		case DOCUMENT_PART:
@@ -317,23 +316,23 @@ public class TabSeparatedValuesFilterTest {
 		switch (event.getEventType()) {
 		case TEXT_UNIT:
 			IResource res = event.getResource();
-			assertTrue(res instanceof TextUnit);
+			assertTrue(res instanceof ITextUnit);
 			
-			assertEquals(expectedText, ((TextUnit) res).toString());
+			assertEquals(expectedText, ((ITextUnit)res).toString());
 			
-			Property prop = ((TextUnit) res).getSourceProperty(AbstractLineFilter.LINE_NUMBER);
+			Property prop = ((ITextUnit)res).getSourceProperty(AbstractLineFilter.LINE_NUMBER);
 			assertNotNull(prop);
 			
 			String st = prop.getValue();
 			assertEquals(expectedLineNum, new Integer(st).intValue());
 						
-			prop = ((TextUnit) res).getSourceProperty(BaseTableFilter.ROW_NUMBER);
+			prop = ((ITextUnit)res).getSourceProperty(BaseTableFilter.ROW_NUMBER);
 			assertNotNull(prop);
 			
 			st = prop.getValue();
 			assertEquals(expRow, new Integer(st).intValue());
 			
-			prop = ((TextUnit) res).getSourceProperty(BaseTableFilter.COLUMN_NUMBER);
+			prop = ((ITextUnit)res).getSourceProperty(BaseTableFilter.COLUMN_NUMBER);
 			assertNotNull(prop);
 			
 			st = prop.getValue();

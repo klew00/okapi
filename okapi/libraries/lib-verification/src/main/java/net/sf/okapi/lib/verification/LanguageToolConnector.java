@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -37,7 +37,7 @@ import org.w3c.dom.NodeList;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Segment;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.connectors.google.GoogleMTConnector;
 import net.sf.okapi.lib.translation.IQuery;
 
@@ -94,7 +94,7 @@ public class LanguageToolConnector {
 
 	public int checkSegment (URI docId,
 		Segment seg,
-		TextUnit tu)
+		ITextUnit tu)
 	{
 		issues.clear();
 		if ( !seg.text.hasText() ) return 0;

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2010 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -44,10 +44,10 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextUnit;
 
 /**
  * This step performs search and replace actions on either the text units or the full content of input documents. Source
@@ -313,7 +313,7 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 			firstEventDone = true;
 		}
 
-		TextUnit tu = (TextUnit) event.getResource();
+		ITextUnit tu = event.getTextUnit();
 		// Skip non-translatable
 		if (!tu.isTranslatable())
 			return event;
@@ -332,7 +332,7 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 			
 			// search and replace on target
 			if ( params.target ) {							
-				TextContainer tc = tu.getTarget(targetLocale);
+				TextContainer tc = tu.getTarget(targetLocale, false);
 				if (tc != null) {
 					for (Segment seg : tc.getSegments()) {
 						tmp = searchAndReplace(seg.text.toString());

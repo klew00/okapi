@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -42,8 +42,8 @@ import com.ibm.icu.text.BreakIterator;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.steps.tokenization.common.Token;
 import net.sf.okapi.steps.tokenization.common.TokensAnnotation;
@@ -85,7 +85,7 @@ public class SimpleTermExtractor {
 	 * Processes a text unit for term extraction.
 	 * @param tu the text unit to process.
 	 */
-	public void processTextUnit (TextUnit tu) {
+	public void processTextUnit (ITextUnit tu) {
 		// Skip non-translatable
 		if ( !tu.isTranslatable() ) return;
 		

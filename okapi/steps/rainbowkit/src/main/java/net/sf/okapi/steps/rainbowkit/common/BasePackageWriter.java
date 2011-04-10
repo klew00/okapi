@@ -38,7 +38,7 @@ import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 import net.sf.okapi.filters.rainbowkit.Manifest;
 import net.sf.okapi.filters.rainbowkit.MergingInfo;
@@ -358,10 +358,10 @@ public abstract class BasePackageWriter implements IPackageWriter {
 
 	protected abstract void processTextUnit (Event event);
 
-	protected void writeTMXEntries (TextUnit tu) {
+	protected void writeTMXEntries (ITextUnit tu) {
 		// Check if we have a target
 		LocaleId trgLoc = manifest.getTargetLocale();
-		TextContainer tc = tu.getTarget(trgLoc);
+		TextContainer tc = tu.getTarget(trgLoc, false);
 		if ( tc == null ) {
 			return; // No target
 		}

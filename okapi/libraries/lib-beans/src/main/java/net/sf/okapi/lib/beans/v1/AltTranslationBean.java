@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -24,8 +24,8 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.query.MatchType;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.persistence.IPersistenceSession;
 import net.sf.okapi.lib.persistence.PersistenceBean;
 
@@ -40,7 +40,7 @@ public class AltTranslationBean extends PersistenceBean<AltTranslation> {
 	
 	@Override
 	protected AltTranslation createObject(IPersistenceSession session) {
-		TextUnit tunit = tu.get(TextUnit.class, session);
+		ITextUnit tunit = tu.get(ITextUnit.class, session);
 		LocaleId srcLoc = null;
 		LocaleId trgLoc = null;
 		
@@ -55,7 +55,7 @@ public class AltTranslationBean extends PersistenceBean<AltTranslation> {
 		
 		if (tunit != null) {
 			src = tunit.getSource().getSegments().getFirstContent(); 
-			trg = tunit.getTarget(trgLoc).getSegments().getFirstContent();
+			trg = tunit.getTarget(trgLoc, false).getSegments().getFirstContent();
 		}		
 		return new AltTranslation(srcLoc, trgLoc, null, src, trg, type, score, origin);
 	}

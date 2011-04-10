@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -28,10 +28,10 @@ import net.sf.okapi.common.ISegmenter;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filterwriter.TMXWriter;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.segmentation.SRXDocument;
 import net.sf.okapi.tm.simpletm.Database;
 
@@ -238,7 +238,7 @@ public class Utility extends BaseFilterDrivenUtility {
 			processStartDocument((StartDocument)event.getResource());
 			break;
 		case TEXT_UNIT:
-			processTextUnit((TextUnit)event.getResource());
+			processTextUnit(event.getTextUnit());
 			break;
 		case END_DOCUMENT:
 			processEndDocument();
@@ -296,7 +296,7 @@ public class Utility extends BaseFilterDrivenUtility {
     		aligned, manual));
     }
 
-	private void processTextUnit (TextUnit tu) {
+	private void processTextUnit (ITextUnit tu) {
 		//TODO: Find a way to stop the filter
 		if ( stopProcess ) return;
 		

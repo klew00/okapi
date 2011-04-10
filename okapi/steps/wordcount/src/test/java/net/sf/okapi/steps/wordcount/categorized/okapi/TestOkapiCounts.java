@@ -10,6 +10,7 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.query.MatchType;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnit;
@@ -24,7 +25,7 @@ public class TestOkapiCounts {
 	private BaseCountStep bcs;
 	private StartDocument sd;
 	private Event sdEvent;
-	private TextUnit tu;
+	private ITextUnit tu;
 	private Event tuEvent;
 	private final Logger logger = Logger.getLogger(getClass().getName());
 
@@ -39,7 +40,7 @@ public class TestOkapiCounts {
 		tuEvent = new Event(EventType.TEXT_UNIT, tu);
 		tu.setTarget(LocaleId.FRENCH, new TextContainer(
 				"Les éléphants ne peuvent pas voler."));
-		TextContainer target = tu.getTarget(LocaleId.FRENCH);
+		TextContainer target = tu.getTarget(LocaleId.FRENCH, false);
 		target.setAnnotation(new AltTranslationsAnnotation());
 	}
 
@@ -56,7 +57,7 @@ public class TestOkapiCounts {
 
 	private void testCount(Class<? extends BaseCountStep> cls,
 			MatchType matchType) {
-		AltTranslationsAnnotation ata = tu.getTarget(LocaleId.FRENCH)
+		AltTranslationsAnnotation ata = tu.getTarget(LocaleId.FRENCH, false)
 				.getAnnotation(AltTranslationsAnnotation.class);
 		ata.add(new AltTranslation(LocaleId.ENGLISH, LocaleId.FRENCH, tu
 				.getSource().getFirstContent(), null, null, matchType, 100,

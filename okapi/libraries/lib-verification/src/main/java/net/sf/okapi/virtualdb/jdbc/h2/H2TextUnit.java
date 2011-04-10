@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -20,6 +20,7 @@
 
 package net.sf.okapi.virtualdb.jdbc.h2;
 
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.virtualdb.IVDocument;
 import net.sf.okapi.virtualdb.IVItem;
@@ -32,7 +33,7 @@ public class H2TextUnit implements IVTextUnit {
 	private long parent;
 	private long previous;
 	private long next;
-	private TextUnit tu;
+	private ITextUnit tu;
 	
 	public H2TextUnit (long itemKey,
 		H2Document doc,
@@ -67,12 +68,12 @@ public class H2TextUnit implements IVTextUnit {
 	 * Sets the text unit for this virtual text unit.
 	 * @param tu the text unit to attach to this object.
 	 */
-	void setTextUnit (TextUnit tu) {
+	void setTextUnit (ITextUnit tu) {
 		this.tu = tu;
 	}
 
 	@Override
-	public TextUnit getTextUnit () {
+	public ITextUnit getTextUnit () {
 		return tu;
 	}
 	

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -21,9 +21,9 @@
 package net.sf.okapi.lib.beans.wiki;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.beans.v1.EventBean;
 import net.sf.okapi.lib.beans.v1.PropertyBean;
 import net.sf.okapi.lib.beans.v1.RawDocumentBean;
@@ -44,7 +44,7 @@ public class OkapiBeansVersion1 implements IVersionDriver {
 	@Override
 	public void registerBeans(BeanMapper beanMapper) {
 		beanMapper.registerBean(Event.class, EventBean.class);		
-		beanMapper.registerBean(TextUnit.class, TextUnitBean.class);
+		beanMapper.registerBean(ITextUnit.class, TextUnitBean.class);
 		beanMapper.registerBean(RawDocument.class, RawDocumentBean.class);
 		beanMapper.registerBean(Property.class, PropertyBean.class);
 	}

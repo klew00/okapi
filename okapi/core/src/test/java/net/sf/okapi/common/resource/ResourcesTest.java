@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -31,7 +31,7 @@ import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
@@ -63,7 +63,7 @@ public class ResourcesTest {
 
 		// Build the input
 		GenericSkeleton skel = new GenericSkeleton();
-		TextUnit tu = new TextUnit("t1", "one,two,three");
+		ITextUnit tu = new TextUnit("t1", "one,two,three");
 		skel.add("content=\"");
 		skel.addContentPlaceholder(tu);
 		skel.add("\"");		
@@ -98,7 +98,7 @@ public class ResourcesTest {
 
 		// Build the input
 		GenericSkeleton skel = new GenericSkeleton();
-		TextUnit tu1 = new TextUnit("t1", "my title");
+		ITextUnit tu1 = new TextUnit("t1", "my title");
 		skel.add("title='");
 		skel.addContentPlaceholder(tu1);
 		skel.add("'");		
@@ -108,7 +108,7 @@ public class ResourcesTest {
 		list.add(new Event(EventType.TEXT_UNIT, tu1));
 		
 		skel = new GenericSkeleton();
-		TextUnit tu2 = new TextUnit("tu2", "Text of p");		
+		ITextUnit tu2 = new TextUnit("tu2", "Text of p");		
 		skel.add("<p ");
 		skel.addReference(tu1);
 		skel.add(">");
@@ -135,7 +135,7 @@ public class ResourcesTest {
 
 		// Build the input
 		GenericSkeleton skel = new GenericSkeleton();
-		TextUnit tu = new TextUnit("t1", "text");
+		ITextUnit tu = new TextUnit("t1", "text");
 		skel.add("text='");
 		skel.addContentPlaceholder(tu);
 		skel.add("'");		
@@ -196,7 +196,7 @@ public class ResourcesTest {
 		code.appendReference("dp1");
 		tf.append(code);
 		tf.append(" after.");
-		TextUnit tu1 = new TextUnit("tu1");
+		ITextUnit tu1 = new TextUnit("tu1");
 		tu1.setSourceContent(tf);
 		skel.add("<p>");
 		skel.addContentPlaceholder(tu1);
@@ -247,7 +247,7 @@ public class ResourcesTest {
 		list.add(new Event(EventType.START_DOCUMENT, sd));
 
 		// Create the main tu and its skeleton
-		TextUnit tu = new TextUnit("tu");
+		ITextUnit tu = new TextUnit("tu");
 		GenericSkeleton skel = new GenericSkeleton();
 		skel.add("<tu><tuv xml:lang='EN'><seg>");
 		
@@ -258,7 +258,7 @@ public class ResourcesTest {
 		// Add the <sub> element of the source
 		Code code = src.append(TagType.PLACEHOLDER, null, "<sub>");
 		// Create the tu for sub as a reference
-		TextUnit tuSub = new TextUnit("tuSub", "Sub-en", true);
+		ITextUnit tuSub = new TextUnit("tuSub", "Sub-en", true);
 		// Create the skeleton for the tu of sub, just to hold the content
 		GenericSkeleton skelSub = new GenericSkeleton();
 		skelSub.addContentPlaceholder(tuSub);
@@ -323,7 +323,7 @@ public class ResourcesTest {
 					(StartDocument)event.getResource());
 				break;
 			case TEXT_UNIT:
-				TextUnit tu = (TextUnit)event.getResource();
+				ITextUnit tu = event.getTextUnit();
 				GenericSkeleton skl = (GenericSkeleton)tu.getSkeleton();
 				if ( skl != null ) {
 					//System.out.println("TU:skl="+skl.toString());

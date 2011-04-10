@@ -45,7 +45,7 @@ public class XmlSnippetsTest {
 				+ "<meta name=\"DESCRIPTION\" content=\"Text2\"/>" + "<p>Text3</p>" + "</html>";
 		ArrayList<Event> events = XmlStreamTestUtils
 				.getEvents(snippet, xmlStreamFilter, parameters);
-		TextUnit tu = FilterTestDriver.getTextUnit(events, 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(events, 1);
 		assertNotNull(tu);
 		assertEquals("Text1", tu.toString());
 		tu = FilterTestDriver.getTextUnit(events, 2);
@@ -61,7 +61,7 @@ public class XmlSnippetsTest {
 		String snippet = "<p title=\"Text1\">Text2</p>";
 		ArrayList<Event> events = XmlStreamTestUtils
 				.getEvents(snippet, xmlStreamFilter, parameters);
-		TextUnit tu = FilterTestDriver.getTextUnit(events, 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(events, 1);
 		assertNotNull(tu);
 		assertEquals("Text1", tu.toString());
 		tu = FilterTestDriver.getTextUnit(events, 2);
@@ -74,7 +74,7 @@ public class XmlSnippetsTest {
 		String snippet = "Text1<img alt=\"Text2\"/>.";
 		ArrayList<Event> events = XmlStreamTestUtils
 				.getEvents(snippet, xmlStreamFilter, parameters);
-		TextUnit tu = FilterTestDriver.getTextUnit(events, 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(events, 1);
 		assertNotNull(tu); // Attributes go first
 		assertEquals("Text2", tu.toString());
 		tu = FilterTestDriver.getTextUnit(events, 2);
@@ -87,7 +87,7 @@ public class XmlSnippetsTest {
 		String snippet = "<input type=\"file\" value=\"NotText\"/>.";
 		ArrayList<Event> events = XmlStreamTestUtils
 				.getEvents(snippet, xmlStreamFilter, parameters);
-		TextUnit tu = FilterTestDriver.getTextUnit(events, 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(events, 1);
 		assertNotNull(tu);
 		assertEquals("<1/>.", fmt.setContent(tu.getSource().getFirstContent()).toString());
 	}
@@ -96,7 +96,7 @@ public class XmlSnippetsTest {
 	public void testExtractValueInInput() {
 		String snippet = "<input type=\"other\" value=\"Text\"/>.";
 		List<Event> events = XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters);
-		TextUnit tu = FilterTestDriver.getTextUnit(events, 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(events, 1);
 		assertNotNull(tu);
 		assertEquals("Text", tu.toString());
 		tu = FilterTestDriver.getTextUnit(events, 2);
@@ -109,7 +109,7 @@ public class XmlSnippetsTest {
 		String snippet = "Text1<option label=\"Text2\"/>.";
 		ArrayList<Event> events = XmlStreamTestUtils
 				.getEvents(snippet, xmlStreamFilter, parameters);
-		TextUnit tu = FilterTestDriver.getTextUnit(events, 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(events, 1);
 		assertNotNull(tu); // Attributes go first
 		assertEquals("Text2", tu.toString());
 		tu = FilterTestDriver.getTextUnit(events, 2);
@@ -125,7 +125,7 @@ public class XmlSnippetsTest {
 		String snippet = "<br>text<br/>";
 		ArrayList<Event> events = XmlStreamTestUtils
 				.getEvents(snippet, xmlStreamFilter, parameters);
-		TextUnit tu = (TextUnit) events.get(1).getResource();
+		ITextUnit tu = events.get(1).getTextUnit();
 		List<Code> codes = tu.getSource().getFirstContent().getCodes();
 		for (Code code : codes) {
 			assertEquals(TagType.PLACEHOLDER, code.getTagType());
@@ -257,7 +257,7 @@ public class XmlSnippetsTest {
 	public void testCdataSectionExtraction () {
 		String snippet = "<doc><![CDATA[<b> text]]></doc>";
 		ArrayList<Event> events = XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters);
-		TextUnit tu = FilterTestDriver.getTextUnit(events, 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(events, 1);
 		assertNotNull(tu);
 		assertEquals("<b> text", tu.toString());
 	}
@@ -266,11 +266,11 @@ public class XmlSnippetsTest {
 	public void testCdataSectionExtractionAndWS () {
 		String snippet = "<doc><p>&lt; line1\nline2</p><p><![CDATA[< line1\nline2]]></p></doc>";
 		ArrayList<Event> events = XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters);
-		TextUnit tu1 = FilterTestDriver.getTextUnit(events, 1);
+		ITextUnit tu1 = FilterTestDriver.getTextUnit(events, 1);
 		assertNotNull(tu1);
 		assertFalse(tu1.preserveWhitespaces());
 		assertEquals("< line1 line2", tu1.toString());
-		TextUnit tu2 = FilterTestDriver.getTextUnit(events, 2);
+		ITextUnit tu2 = FilterTestDriver.getTextUnit(events, 2);
 		assertNotNull(tu2);
 		assertFalse(tu1.preserveWhitespaces());
 		assertEquals(tu1.toString(), tu2.toString());
@@ -311,7 +311,7 @@ public class XmlSnippetsTest {
 
 		String snippet = "<doc><no><![CDATA[code1 &lt;=lt,&amp;=amp]]></no><no>code2</no><yes><![CDATA[text&lt;=lt,&amp;=amp]]></yes></doc>";
 		ArrayList<Event> events = XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters);
-		TextUnit tu = FilterTestDriver.getTextUnit(events, 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(events, 1);
 		assertNotNull(tu);
 		assertEquals("text<=lt,&=amp", tu.toString());
 		
@@ -375,7 +375,7 @@ public class XmlSnippetsTest {
 		String snippet = "<p>text notVAR1 VAR2<p>";
 		URL originalParameters = parameters;
 		parameters = XmlSnippetsTest.class.getResource("/withCodeFinderRules.yml");
-		TextUnit tu = FilterTestDriver.getTextUnit(
+		ITextUnit tu = FilterTestDriver.getTextUnit(
 				XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters), 1);
 		assertNotNull(tu);
 		List<Code> list = tu.getSource().getFirstContent().getCodes();
@@ -463,7 +463,7 @@ public class XmlSnippetsTest {
 		URL originalParameters = parameters;
 		parameters = XmlSnippetsTest.class.getResource("dita.yml");
 		String snippet = "this is text with <ph translate=\"no\"><b>inline</b></ph> exclusions";
-		TextUnit tu = FilterTestDriver.getTextUnit(
+		ITextUnit tu = FilterTestDriver.getTextUnit(
 				XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters), 1);
 		assertEquals("<ph translate=\"no\"><b>inline</b></ph>", tu.getSource().getFirstContent()
 				.getCode(0).getOuterData());
@@ -479,7 +479,7 @@ public class XmlSnippetsTest {
 		URL originalParameters = parameters;
 		parameters = XmlSnippetsTest.class.getResource("dita.yml");
 		String snippet = "this is text with <ph translate=\"no\">inline</ph> exclusions <ph translate=\"no\">inline2</ph>";
-		TextUnit tu = FilterTestDriver.getTextUnit(
+		ITextUnit tu = FilterTestDriver.getTextUnit(
 				XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters), 1);
 		assertEquals("<ph translate=\"no\">inline</ph>", tu.getSource().getFirstContent()
 				.getCode(0).getOuterData());
@@ -498,7 +498,7 @@ public class XmlSnippetsTest {
 		URL originalParameters = parameters;
 		parameters = XmlSnippetsTest.class.getResource("dita.yml");
 		String snippet = "this is text with <ph translate=\"yes\">inline</ph> exclusions";
-		TextUnit tu = FilterTestDriver.getTextUnit(
+		ITextUnit tu = FilterTestDriver.getTextUnit(
 				XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters), 1);
 		assertEquals("<ph translate=\"yes\">", tu.getSource().getFirstContent().getCode(0)
 				.toString());
@@ -514,7 +514,7 @@ public class XmlSnippetsTest {
 		URL originalParameters = parameters;
 		parameters = XmlSnippetsTest.class.getResource("dita.yml");
 		String snippet = "<ph translate=\"yes\">this is text with <ph translate=\"no\">inline</ph> exclusions</ph>";
-		TextUnit tu = FilterTestDriver.getTextUnit(
+		ITextUnit tu = FilterTestDriver.getTextUnit(
 				XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters), 1);
 		assertEquals("<ph translate=\"yes\">", tu.getSource().getFirstContent().getCode(0)
 				.toString());
@@ -533,7 +533,7 @@ public class XmlSnippetsTest {
 		URL originalParameters = parameters;
 		parameters = XmlSnippetsTest.class.getResource("dita.yml");
 		String snippet = "<ph translate=\"no\">this is text with <ph translate=\"yes\">inline</ph> exclusions</ph>";
-		TextUnit tu = FilterTestDriver.getTextUnit(
+		ITextUnit tu = FilterTestDriver.getTextUnit(
 				XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters), 1);
 		assertEquals("<ph translate=\"no\">this is text with ", tu.getSource().getFirstContent()
 				.getCode(0).getOuterData());
@@ -552,7 +552,7 @@ public class XmlSnippetsTest {
 		URL originalParameters = parameters;
 		parameters = XmlSnippetsTest.class.getResource("dita.yml");
 		String snippet = "<note id=\"v512165_fr-fr\" type=\"other\" othertype=\"WARNING\">Some text here... </note>";
-		TextUnit tu = FilterTestDriver.getTextUnit(
+		ITextUnit tu = FilterTestDriver.getTextUnit(
 				XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters), 1);
 		assertNull(tu.getName());
 
@@ -569,8 +569,8 @@ public class XmlSnippetsTest {
 		parameters = XmlSnippetsTest.class.getResource("dita.yml");
 		String snippet = "<p>TEST: <image href=\"bike.gif\" alt=\"text in alt\"/> more text</p>";
 		List<Event> events = XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters);
-		TextUnit tu1 = FilterTestDriver.getTextUnit(events, 1);
-		TextUnit tu2 = FilterTestDriver.getTextUnit(events, 2);
+		ITextUnit tu1 = FilterTestDriver.getTextUnit(events, 1);
+		ITextUnit tu2 = FilterTestDriver.getTextUnit(events, 2);
 		assertEquals("text in alt", tu1.toString());
 		assertEquals("TEST: <image href=\"bike.gif\" [#$tu2]/> more text", tu2.toString());
 
@@ -578,7 +578,7 @@ public class XmlSnippetsTest {
 		events = XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters);
 		tu1 = FilterTestDriver.getTextUnit(events, 1);
 		tu2 = FilterTestDriver.getTextUnit(events, 2);
-		TextUnit tu3 = FilterTestDriver.getTextUnit(events, 3);
+		ITextUnit tu3 = FilterTestDriver.getTextUnit(events, 3);
 		assertEquals("text in alt", tu1.toString());
 		assertEquals("TEST:", tu2.toString());
 		assertEquals("more text", tu3.toString());

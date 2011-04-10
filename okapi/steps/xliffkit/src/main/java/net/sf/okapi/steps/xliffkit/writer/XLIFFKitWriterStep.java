@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -48,13 +48,13 @@ import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.persistence.IPersistenceSession;
 import net.sf.okapi.lib.persistence.PersistenceSession;
 import net.sf.okapi.lib.beans.v1.OkapiBeans;
@@ -174,7 +174,7 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 			processEndGroup((Ending)event.getResource());
 			break;
 		case TEXT_UNIT:
-			TextUnit tu = (TextUnit)event.getResource();
+			ITextUnit tu = event.getTextUnit();
 			processTextUnit(tu); // XLIFF
 			Event ev = new Event(EventType.TEXT_UNIT, tu.clone());
 			
@@ -358,7 +358,7 @@ public class XLIFFKitWriterStep extends BasePipelineStep {
 		writer.writeEndGroup();
 	}
 	
-	private void processTextUnit (TextUnit tu) {
+	private void processTextUnit (ITextUnit tu) {
 		writer.writeTextUnit(tu);
 	}
 	

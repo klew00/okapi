@@ -20,8 +20,9 @@ import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextFragment.TagType;
+import net.sf.okapi.common.resource.ITextUnit;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -48,7 +49,7 @@ public class GenericSkeletonWriterTest {
 		// TU
 		GenericSkeleton gs = new GenericSkeleton();
 		gs.add("before [");
-		TextUnit tu = createSimpleTU();
+		ITextUnit tu = createSimpleTU();
 		gs.addContentPlaceholder(tu);
 		gs.add("] after");
 		tu.setSkeleton(gs);
@@ -68,7 +69,7 @@ public class GenericSkeletonWriterTest {
 		// TU
 		GenericSkeleton gs = new GenericSkeleton();
 		gs.add("before [");
-		TextUnit tu = createTranslatedTU();
+		ITextUnit tu = createTranslatedTU();
 		gs.addContentPlaceholder(tu);
 		gs.add("] after");
 		tu.setSkeleton(gs);
@@ -88,7 +89,7 @@ public class GenericSkeletonWriterTest {
 		// TU
 		GenericSkeleton gs = new GenericSkeleton();
 		gs.add("lang1=[");
-		TextUnit tu = createTranslatedTU();
+		ITextUnit tu = createTranslatedTU();
 		gs.addContentPlaceholder(tu);
 		gs.add("] lang2=[");
 		gs.addContentPlaceholder(tu, locFR);
@@ -114,7 +115,7 @@ public class GenericSkeletonWriterTest {
 		// TU
 		GenericSkeleton gs = new GenericSkeleton();
 		gs.add("lang1=[");
-		TextUnit tu = createTranslatedTU();
+		ITextUnit tu = createTranslatedTU();
 		tu.setTarget(locDE, new TextContainer("target2"));
 		gs.addContentPlaceholder(tu);
 		gs.add("] lang2=[");
@@ -148,7 +149,7 @@ public class GenericSkeletonWriterTest {
 		// TU
 		GenericSkeleton gs = new GenericSkeleton();
 		gs.add("[");
-		TextUnit tu = createTranslatedTU();
+		ITextUnit tu = createTranslatedTU();
 		tu.setSourceProperty(new Property("srcProp", "val1", false));
 		tu.setProperty(new Property("tuProp", "val2", false));
 		tu.setTargetProperty(locFR, new Property("trgProp", "val3", false));
@@ -177,7 +178,7 @@ public class GenericSkeletonWriterTest {
 		// TU
 		GenericSkeleton gs1 = new GenericSkeleton();
 		gs1.add("{sub-block [");
-		TextUnit tu = createSimpleTU();
+		ITextUnit tu = createSimpleTU();
 		tu.setIsReferent(true);
 		gs1.addContentPlaceholder(tu);
 		gs1.add("]}");
@@ -205,7 +206,7 @@ public class GenericSkeletonWriterTest {
 	
 	@Test
 	public void testSegmentRef() {
-		TextUnit tu1 = new TextUnit("tu1");
+		ITextUnit tu1 = new TextUnit("tu1");
 		
 		TextFragment tf = new TextFragment();
 		tf.append(new Code(TagType.OPENING, Code.TYPE_BOLD, "<b>"));
@@ -216,8 +217,8 @@ public class GenericSkeletonWriterTest {
 		tu1.getSource().getSegments().append(new Segment("sseg12", new TextFragment("Source segment 12")));
 		
 		tu1.setTarget(locDE, new TextContainer());
-		tu1.getTarget(locDE).getSegments().append(new Segment("tseg11", new TextFragment("Target segment 11")));
-		tu1.getTarget(locDE).getSegments().append(new Segment("tseg12", new TextFragment("Target segment 12")));
+		tu1.getTarget(locDE, false).getSegments().append(new Segment("tseg11", new TextFragment("Target segment 11")));
+		tu1.getTarget(locDE, false).getSegments().append(new Segment("tseg12", new TextFragment("Target segment 12")));
 		
 		GenericSkeleton skel = new GenericSkeleton();
 		tu1.setSkeleton(skel);
@@ -256,14 +257,14 @@ public class GenericSkeletonWriterTest {
 		assertEquals(tu1, part.getParent());
 		assertEquals(locDE, part.getLocale());
 		
-		TextUnit tu2 = new TextUnit("tu2");
+		ITextUnit tu2 = new TextUnit("tu2");
 		
 		tu2.getSource().getSegments().append(new Segment("sseg21", new TextFragment("Source segment 21")));
 		tu2.getSource().getSegments().append(new Segment("sseg22", new TextFragment("Source segment 22")));
 		
 		tu2.setTarget(locDE, new TextContainer());
-		tu2.getTarget(locDE).getSegments().append(new Segment("tseg21", new TextFragment("Target segment 21")));
-		tu2.getTarget(locDE).getSegments().append(new Segment("tseg22", new TextFragment("Target segment 22")));
+		tu2.getTarget(locDE, false).getSegments().append(new Segment("tseg21", new TextFragment("Target segment 21")));
+		tu2.getTarget(locDE, false).getSegments().append(new Segment("tseg22", new TextFragment("Target segment 22")));
 		
 		skel = new GenericSkeleton();
 		tu2.setSkeleton(skel);
@@ -315,7 +316,7 @@ public class GenericSkeletonWriterTest {
 	
 	@Test
 	public void testSegmentRef2() {
-		TextUnit tu1 = new TextUnit("tu1");
+		ITextUnit tu1 = new TextUnit("tu1");
 		
 		TextFragment tf = new TextFragment();
 		tf.append(new Code(TagType.OPENING, Code.TYPE_BOLD, "<b>"));
@@ -326,8 +327,8 @@ public class GenericSkeletonWriterTest {
 		tu1.getSource().getSegments().append(new Segment("sseg2", new TextFragment("Source segment 2")));
 		
 		tu1.setTarget(locDE, new TextContainer());
-		tu1.getTarget(locDE).getSegments().append(new Segment("tseg1", new TextFragment("Target segment 1")));
-		tu1.getTarget(locDE).getSegments().append(new Segment("tseg2", new TextFragment("Target segment 2")));
+		tu1.getTarget(locDE, false).getSegments().append(new Segment("tseg1", new TextFragment("Target segment 1")));
+		tu1.getTarget(locDE, false).getSegments().append(new Segment("tseg2", new TextFragment("Target segment 2")));
 		
 		GenericSkeleton skel = new GenericSkeleton();
 		tu1.setSkeleton(skel);
@@ -366,13 +367,13 @@ public class GenericSkeletonWriterTest {
 		assertEquals(tu1, part.getParent());
 		assertEquals(locDE, part.getLocale());
 		
-		TextUnit tu2 = new TextUnit("tu2");
+		ITextUnit tu2 = new TextUnit("tu2");
 		
 		tu2.getSource().getSegments().append(new Segment("sseg21", new TextFragment("Source segment 21")));
 		tu2.getSource().getSegments().append(new Segment("sseg22", new TextFragment("Source segment 22")));
 		
 		tu2.setTarget(locDE, new TextContainer());
-		tu2.getTarget(locDE).getSegments().append(new Segment("tseg21", new TextFragment("Target segment 21")));
+		tu2.getTarget(locDE, false).getSegments().append(new Segment("tseg21", new TextFragment("Target segment 21")));
 		
 		TextFragment tf2 = new TextFragment();
 		tf2.append("Target segment 22.1");
@@ -382,7 +383,7 @@ public class GenericSkeletonWriterTest {
 		tu1.setIsReferent(true);
 		
 		tf2.append("Target segment 22.2");
-		tu2.getTarget(locDE).getSegments().append(new Segment("tseg22", tf2));
+		tu2.getTarget(locDE, false).getSegments().append(new Segment("tseg22", tf2));
 		
 		skel = new GenericSkeleton();
 		tu2.setSkeleton(skel);
@@ -434,15 +435,15 @@ public class GenericSkeletonWriterTest {
 		assertEquals(expected, result);
 	}
 	
-	private void createSrcSegRefPart(ISkeleton skel, TextUnit tu, String segId) {
+	private void createSrcSegRefPart(ISkeleton skel, ITextUnit tu, String segId) {
 		createSegmentRefPart(skel, tu, segId, null);
 	}
 	
-	private void createTrgSegRefPart(ISkeleton skel, TextUnit tu, String segId, LocaleId locId) {
+	private void createTrgSegRefPart(ISkeleton skel, ITextUnit tu, String segId, LocaleId locId) {
 		createSegmentRefPart(skel, tu, segId, locId);
 	}
 	
-	private void createSegmentRefPart(ISkeleton skel, TextUnit parent, String segId, LocaleId locId) {
+	private void createSegmentRefPart(ISkeleton skel, ITextUnit parent, String segId, LocaleId locId) {
 		if (skel instanceof GenericSkeleton) {
 			GenericSkeletonPart part = new GenericSkeletonPart(TextFragment.makeRefMarker(segId, Segment.REF_MARKER), 
 					parent, locId);
@@ -450,14 +451,14 @@ public class GenericSkeletonWriterTest {
 		}
 	}
 	
-	private TextUnit createSimpleTU () {
-		TextUnit tu = new TextUnit("id1");
+	private ITextUnit createSimpleTU () {
+		ITextUnit tu = new TextUnit("id1");
 		tu.setSourceContent(new TextFragment("text1"));
 		return tu;
 	}
 
-	private TextUnit createTranslatedTU () {
-		TextUnit tu = new TextUnit("id1");
+	private ITextUnit createTranslatedTU () {
+		ITextUnit tu = new TextUnit("id1");
 		tu.setSourceContent(new TextFragment("text1"));
 		tu.setTarget(locFR, new TextContainer("target1"));
 		return tu;

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -27,10 +27,10 @@ import net.sf.okapi.common.XMLWriter;
 //import net.sf.okapi.common.annotation.ScoresAnnotation;
 import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextUnit;
 
 public class Writer extends net.sf.okapi.applications.rainbow.packages.xliff.Writer {
 
@@ -92,11 +92,11 @@ public class Writer extends net.sf.okapi.applications.rainbow.packages.xliff.Wri
 	}
 
 	@Override
-	public void writeScoredItem (TextUnit item) {
+	public void writeScoredItem (ITextUnit item) {
 		// In OmegaT we put both the approved and exact match of the project_save.tmx (the 'approved' one). 
 		String tuid = item.getName();
 		TextContainer srcTC = item.getSource();
-		TextContainer trgTC = item.getTarget(trgLoc);
+		TextContainer trgTC = item.getTarget(trgLoc, false);
 
 		ISegments trgSegs = trgTC.getSegments();
 		for ( Segment srcSeg : srcTC.getSegments() ) {

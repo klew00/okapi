@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -29,9 +29,9 @@ import java.util.List;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Segment;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.virtualdb.IVDocument;
 import net.sf.okapi.virtualdb.IVItem;
 import net.sf.okapi.virtualdb.IVRepository;
@@ -226,7 +226,7 @@ public class H2ImplementationTest {
 
 		// "source text"
 		long key = list.get(0).get(0).key;
-		TextUnit tu = ((IVTextUnit)vdoc.getItem(key)).getTextUnit();
+		ITextUnit tu = ((IVTextUnit)vdoc.getItem(key)).getTextUnit();
 		assertEquals("source text", tu.toString());
 		assertEquals(3, list.get(0).size());
 		
@@ -271,7 +271,7 @@ public class H2ImplementationTest {
 		// "sourceA"
 		int index = 0;
 		KeyAndSegId ksid = list.get(index).get(0);
-		TextUnit tu = ((IVTextUnit)vdoc.getItem(ksid.key)).getTextUnit();
+		ITextUnit tu = ((IVTextUnit)vdoc.getItem(ksid.key)).getTextUnit();
 		Segment seg = tu.getSource().getSegments().get(ksid.segId);
 		assertEquals("sourceA", seg.toString());
 		assertEquals(2, list.get(index).size());

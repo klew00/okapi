@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -31,8 +31,8 @@ import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.openoffice.ODFFilter;
 
 import org.junit.Before;
@@ -52,7 +52,7 @@ public class ODFFilterTest {
 	
 	@Test
 	public void testFirstTextUnit () {
-		TextUnit tu = FilterTestDriver.getTextUnit(filter,
+		ITextUnit tu = FilterTestDriver.getTextUnit(filter,
 			new InputDocument(root+"TestDocument01.odt_content.xml", null),
 			"UTF-8", locEN, locEN, 1);
 		assertNotNull(tu);

@@ -21,7 +21,7 @@ import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.RoundTripComparison;
 import net.sf.okapi.common.filters.InputDocument;
@@ -106,7 +106,7 @@ public class TmxFilterTest {
 			+ "<body><tu tuid=\"tuid_1\">"
 			+ "<prop type=\"p1\">val1</prop>"
 			+ "<tuv xml:lang=\"en\"><seg>Hello World!</seg></tuv></tu></body></tmx>\r";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
 		assertNotNull(tu);
 		Property prop = tu.getProperty("p1");
 		assertNotNull(prop);
@@ -137,7 +137,7 @@ public class TmxFilterTest {
 		String snippet = "<?xml version=\"1.0\"?>\r"
 			+ "<tmx version=\"1.1\"><header creationtool=\"undefined_creationtool\" creationtoolversion=\"undefined_creationversion\" segtype=\"undefined_segtype\" o-tmf=\"undefined_unknown\" adminlang=\"undefined_adminlang\" srclang=\"en-us\" datatype=\"unknown\"></header><body>"
 			+ "<tu tuid=\"tuid_1\"><tuv lang=\"en-us\"><seg>Hello World!</seg></tuv><tuv lang=\"fr-fr\"><seg>Bonjour le monde!</seg></tuv></tu></body></tmx>\r";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locENUS, locFRFR), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locENUS, locFRFR), 1);
 		assertNotNull(tu);
 		assertTrue(tu.hasTarget(locFRFR));
 	}
@@ -191,7 +191,7 @@ public class TmxFilterTest {
 		String snippet = "<?xml version=\"1.0\"?>\r"
 			+ "<tmx version=\"1.1\"><header creationtool=\"undefined_creationtool\" creationtoolversion=\"undefined_creationversion\" segtype=\"undefined_segtype\" o-tmf=\"undefined_unknown\" adminlang=\"undefined_adminlang\" srclang=\"en-us\" datatype=\"unknown\"></header><body>"
 			+ "<tu tuid=\"tuid_1\"><tuv xml:lang=\"en-us\" lang=\"de-de\"><seg>Hello World!</seg></tuv><tuv lang=\"it-it\" xml:lang=\"fr-fr\"><seg>Bonjour le monde!</seg></tuv></tu></body></tmx>\r";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locENUS, locFRFR), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locENUS, locFRFR), 1);
 		assertNotNull(tu);
 		assertTrue(tu.hasTarget(locFRFR));
 	}
@@ -219,7 +219,7 @@ public class TmxFilterTest {
 			} else if (event.getEventType() == EventType.TEXT_UNIT) {
 				//--cancel after first text unit--
 				filter.cancel();
-				assertTrue(event.getResource() instanceof TextUnit);
+				assertTrue(event.getResource() instanceof ITextUnit);
 			} else if (event.getEventType() == EventType.DOCUMENT_PART) {
 				assertTrue(event.getResource() instanceof DocumentPart);
 			} 
@@ -360,7 +360,7 @@ public class TmxFilterTest {
 	
 	@Test
 	public void testDTDHandling () {
-		TextUnit tu = FilterTestDriver.getTextUnit(
+		ITextUnit tu = FilterTestDriver.getTextUnit(
 			getEvents(simpleSnippetWithDTD, locENUS, locFRFR), 2);
 		assertNotNull(tu);
 		assertEquals("Hello Universe!", tu.getSource().getFirstContent().toText());
@@ -368,7 +368,7 @@ public class TmxFilterTest {
 	
 	@Test
 	public void testSimpleTransUnit () {
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(simpleSnippet, locENUS,locFRFR), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(simpleSnippet, locENUS,locFRFR), 1);
 		assertNotNull(tu);
 		assertEquals("Hello World!", tu.getSource().toString());
 		assertEquals("tuid_1", tu.getName());
@@ -378,23 +378,23 @@ public class TmxFilterTest {
 	public void testMulipleTargets () {
 		ArrayList<Event> events = getEvents(multiTransSnippet, locENUS, locFR);
 
-		TextUnit tu = FilterTestDriver.getTextUnit(events, 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(events, 1);
 		assertNotNull(tu);
 		assertEquals("Hello", tu.getSource().toString());
 		assertEquals(3, tu.getTargetLocales().size());
 		assertTrue(tu.hasTarget(locFR));
-		assertEquals("Bonjour", tu.getTarget(locFR).toString());
+		assertEquals("Bonjour", tu.getTarget(locFR, false).toString());
 		assertTrue(tu.hasTarget(locDE));
-		assertEquals("Hallo", tu.getTarget(locDE).toString());
+		assertEquals("Hallo", tu.getTarget(locDE, false).toString());
 		assertTrue(tu.hasTarget(locIT));
-		assertEquals("Buongiorno", tu.getTarget(locIT).toString());
+		assertEquals("Buongiorno", tu.getTarget(locIT, false).toString());
 
 		tu = FilterTestDriver.getTextUnit(events, 2);
 		assertNotNull(tu);
 		assertEquals("Hello", tu.getSource().toString());
 		assertEquals(1, tu.getTargetLocales().size());
 		assertTrue(tu.hasTarget(locFR));
-		assertEquals("Salut", tu.getTarget(locFR).toString());
+		assertEquals("Salut", tu.getTarget(locFR, false).toString());
 	}
 	
 	@Test

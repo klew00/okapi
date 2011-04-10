@@ -1,21 +1,21 @@
 /*===========================================================================
-Copyright (C) 2008-2010 by the Okapi Framework contributors
+ Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
-This library is free software; you can redistribute it and/or modify it 
-under the terms of the GNU Lesser General Public License as published by 
-the Free Software Foundation; either version 2.1 of the License, or (at 
-your option) any later version.
+ This library is free software; you can redistribute it and/or modify it 
+ under the terms of the GNU Lesser General Public License as published by 
+ the Free Software Foundation; either version 2.1 of the License, or (at 
+ your option) any later version.
 
-This library is distributed in the hope that it will be useful, but 
-WITHOUT ANY WARRANTY; without even the implied warranty of 
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
-General Public License for more details.
+ This library is distributed in the hope that it will be useful, but 
+ WITHOUT ANY WARRANTY; without even the implied warranty of 
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+ General Public License for more details.
 
-You should have received a copy of the GNU Lesser General Public License 
-along with this library; if not, write to the Free Software Foundation, 
-Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ You should have received a copy of the GNU Lesser General Public License 
+ along with this library; if not, write to the Free Software Foundation, 
+ Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+ See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
 package net.sf.okapi.common.filterwriter;
@@ -34,7 +34,7 @@ import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 
 /**
  * Writer for TMX documents.
@@ -240,7 +240,7 @@ public class TMXWriter {
      * @param tu The text unit to output.
      * @param attributes The optional set of attribute to put along with the entry.
      */
-    public void writeItem (TextUnit tu,
+    public void writeItem (ITextUnit tu,
     	Map<String, String> attributes)
     {
     	if ( !tu.hasTarget(trgLoc) ) {
@@ -424,10 +424,10 @@ public class TMXWriter {
      * @param tu text unit to use.
      * @param trgLoc target locale.
      */
-    public void writeAlternates (TextUnit tu,
+    public void writeAlternates (ITextUnit tu,
     	LocaleId trgLoc)
     {
-    	TextContainer tc = tu.getTarget(trgLoc);
+    	TextContainer tc = tu.getTarget(trgLoc, false);
     	if ( tc == null ) return; // No target
     	AltTranslationsAnnotation atAnn;
     	
@@ -609,7 +609,7 @@ public class TMXWriter {
      * Writes a TextUnit (all targets) with all the properties associated to it.
      * @param item The text unit to write.
      */
-    public void writeTUFull (TextUnit item) {
+    public void writeTUFull (ITextUnit item) {
     	if ( item == null ) {
     		throw new NullPointerException();
     	}
@@ -656,8 +656,11 @@ public class TMXWriter {
 		
     		// Write each target TUV
     		for ( LocaleId loc : locales ) {
-        		TextContainer trgCont = item.getTarget(loc);
-        		Segment trgSeg = trgCont.getSegments().get(srcSeg.id);
+    			Segment trgSeg = null;
+        		TextContainer trgCont = item.getTarget(loc, false);
+        		if ( trgCont != null ) {
+        			trgSeg = trgCont.getSegments().get(srcSeg.id);
+        		}
         		// Write target only if we have one corresponding to the source segment
         		if ( trgSeg != null ) {
         			writeTUV(trgSeg.text, loc, trgCont);

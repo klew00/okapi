@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2010 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -28,11 +28,11 @@ import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextPart;
-import net.sf.okapi.common.resource.TextUnit;
 
 @UsingParameters(Parameters.class)
 public class TextModificationStep extends BasePipelineStep {
@@ -78,14 +78,14 @@ public class TextModificationStep extends BasePipelineStep {
  
 	@Override
 	protected Event handleTextUnit (Event event) {
-		TextUnit tu = (TextUnit)event.getResource();
+		ITextUnit tu = event.getTextUnit();
 		// Skip non-translatable
 		if ( !tu.isTranslatable() ) return event;
 		// Skip if already translate (only if required)
 		if ( !params.applyToExistingTarget && tu.hasTarget(targetLocale) ) return event;
 		// Check if we need to apply to blank entries
 		if ( !params.applyToBlankEntries ) {
-			TextContainer tc = tu.getTarget(targetLocale);
+			TextContainer tc = tu.getTarget(targetLocale, false);
 			if ( tc == null ) tc = tu.getSource();
 			if ( !tc.hasText() ) return event;
 		}
@@ -93,7 +93,7 @@ public class TextModificationStep extends BasePipelineStep {
 		// Create the target if needed
 		tu.createTarget(targetLocale, false, IResource.COPY_ALL);
 		// If the target is empty we use the source
-		if ( tu.getTarget(targetLocale).isEmpty() ) {
+		if ( tu.getTarget(targetLocale, false).isEmpty() ) {
 			tu.createTarget(targetLocale, true, IResource.COPY_ALL);
 		}
 
@@ -127,8 +127,8 @@ public class TextModificationStep extends BasePipelineStep {
 	 * Removes the text but leaves the inline code.
 	 * @param tu the text unit to process.
 	 */
-	private void removeText (TextUnit tu) {
-		for ( TextPart part : tu.getTarget(targetLocale) ) {
+	private void removeText (ITextUnit tu) {
+		for ( TextPart part : tu.getTarget(targetLocale, false) ) {
 			StringBuilder sb = new StringBuilder();
 			// Remove the text inside the part
 			String text = part.text.getCodedText();
@@ -148,9 +148,9 @@ public class TextModificationStep extends BasePipelineStep {
 	 * Replaces letters with Xs and digits with Ns.
 	 * @param tu the text unit to process.
 	 */
-	private void replaceWithXN (TextUnit tu) {
+	private void replaceWithXN (ITextUnit tu) {
 		String tmp = null;
-		for ( TextPart part : tu.getTarget(targetLocale) ) {
+		for ( TextPart part : tu.getTarget(targetLocale, false) ) {
 			tmp = part.text.getCodedText().replaceAll("\\p{Lu}|\\p{Lo}", "X");
 			tmp = tmp.replaceAll("\\p{Ll}", "x");
 			tmp = tmp.replaceAll("\\d", "N");
@@ -158,9 +158,9 @@ public class TextModificationStep extends BasePipelineStep {
 		}
 	}
 	
-	private void replaceWithExtendedChars (TextUnit tu) {
+	private void replaceWithExtendedChars (ITextUnit tu) {
 		int n;
-		for ( TextPart part : tu.getTarget(targetLocale) ) {
+		for ( TextPart part : tu.getTarget(targetLocale, false) ) {
 			StringBuilder sb = new StringBuilder(part.text.getCodedText());
 			for ( int i=0; i<sb.length(); i++ ) {
 				if ( TextFragment.isMarker(sb.charAt(i)) ) {
@@ -176,8 +176,8 @@ public class TextModificationStep extends BasePipelineStep {
 		}
 	}
 
-	private void addSegmentMarks (TextUnit tu) {
-		for ( Segment seg : tu.getTarget(targetLocale).getSegments() ) {
+	private void addSegmentMarks (ITextUnit tu) {
+		for ( Segment seg : tu.getTarget(targetLocale, false).getSegments() ) {
 			seg.text.setCodedText(STARTSEG+seg.text.getCodedText()+ENDSEG);
 		}
 	}
@@ -187,9 +187,9 @@ public class TextModificationStep extends BasePipelineStep {
 	 * the item has gone through the first transformation already.
 	 * @param tu The text unit to process.
 	 */
-	private void addText (TextUnit tu) {
-		TextFragment firstFrag = tu.getTarget(targetLocale).getFirstContent();
-		TextFragment lastFrag = tu.getTarget(targetLocale).getLastContent();
+	private void addText (ITextUnit tu) {
+		TextFragment firstFrag = tu.getTarget(targetLocale, false).getFirstContent();
+		TextFragment lastFrag = tu.getTarget(targetLocale, false).getLastContent();
 		if ( params.addPrefix ) {
 			firstFrag.setCodedText(params.prefix + firstFrag.getCodedText());
 		}

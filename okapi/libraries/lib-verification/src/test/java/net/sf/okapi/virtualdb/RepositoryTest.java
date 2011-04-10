@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -27,9 +27,9 @@ import java.util.ArrayList;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.virtualdb.IVDocument;
 import net.sf.okapi.virtualdb.IVRepository;
 import net.sf.okapi.virtualdb.IVTextUnit;
@@ -76,13 +76,13 @@ public class RepositoryTest {
 		// Check first document
 		IVDocument vdoc1 = repo.getFirstDocument();
 		IVTextUnit vtu = vdoc1.getTextUnit("1");
-		assertEquals("Texte de l'attribute", vtu.getTextUnit().getTarget(locFR).toString());
+		assertEquals("Texte de l'attribute", vtu.getTextUnit().getTarget(locFR, false).toString());
 		
 		// Check next document
 		IVDocument vdoc2 = (IVDocument)vdoc1.getNextSibling();
 		vtu = vdoc2.getTextUnit("1");
 		assertNotNull(vtu);
-		assertEquals("test02 - Texte de l'attribute", vtu.getTextUnit().getTarget(locFR).toString());
+		assertEquals("test02 - Texte de l'attribute", vtu.getTextUnit().getTarget(locFR, false).toString());
 		// Test previous doc
 //		assertEquals(vdoc1, vdoc2.getPreviousSibling());
 		
@@ -90,7 +90,7 @@ public class RepositoryTest {
 		IVDocument vdoc3 = (IVDocument)vdoc2.getNextSibling();
 		vtu = vdoc3.getTextUnit("1");
 		assertNotNull(vtu);
-		assertEquals("test03 - Texte de l'attribute", vtu.getTextUnit().getTarget(locFR).toString());
+		assertEquals("test03 - Texte de l'attribute", vtu.getTextUnit().getTarget(locFR, false).toString());
 		// Test previous doc
 //		assertEquals(vdoc2, vdoc3.getPreviousSibling());
 		
@@ -101,12 +101,12 @@ public class RepositoryTest {
 		IVDocument nvdoc1 = repo.getFirstDocument();
 		vtu = nvdoc1.getTextUnit("1");
 		assertNotNull(vtu);
-		assertEquals("Texte de l'attribute", vtu.getTextUnit().getTarget(locFR).toString());
+		assertEquals("Texte de l'attribute", vtu.getTextUnit().getTarget(locFR, false).toString());
 		// Next document should be the test03 one
 		IVDocument nvdoc2 = (IVDocument)nvdoc1.getNextSibling();
 		vtu = nvdoc2.getTextUnit("1");
 		assertNotNull(vtu);
-		assertEquals("test03 - Texte de l'attribute", vtu.getTextUnit().getTarget(locFR).toString());
+		assertEquals("test03 - Texte de l'attribute", vtu.getTextUnit().getTarget(locFR, false).toString());
 		// Test previous doc
 //		assertEquals(nvdoc1, nvdoc2.getPreviousSibling());
 
@@ -142,9 +142,9 @@ public class RepositoryTest {
 		}
 		assertEquals(8, vtus.size());
 		
-		TextUnit tu = vtus.get(0).getTextUnit();
+		ITextUnit tu = vtus.get(0).getTextUnit();
 		assertEquals("1", tu.getId());
-		assertEquals("Texte de l'attribute", tu.getTarget(locFR).toString());
+		assertEquals("Texte de l'attribute", tu.getTarget(locFR, false).toString());
 		
 		repo.close();
 	}
@@ -176,9 +176,9 @@ public class RepositoryTest {
 		}
 		assertEquals(8, vtus.size());
 		
-		TextUnit tu = vtus.get(0).getTextUnit();
+		ITextUnit tu = vtus.get(0).getTextUnit();
 		assertEquals("1", tu.getId());
-		assertEquals("Texte de l'attribute", tu.getTarget(locFR).toString());
+		assertEquals("Texte de l'attribute", tu.getTarget(locFR, false).toString());
 
 		repo.close();
 	}
@@ -199,15 +199,15 @@ public class RepositoryTest {
 		IVDocument doc = repo.getFirstDocument();
 
 		IVTextUnit vtu = (IVTextUnit)doc.getItem("1");
-		TextUnit tu = vtu.getTextUnit();
-		assertEquals("Texte de l'attribute", tu.getTarget(locFR).toString());
+		ITextUnit tu = vtu.getTextUnit();
+		assertEquals("Texte de l'attribute", tu.getTarget(locFR, false).toString());
 		
 		tu.setTarget(locFR, new TextContainer("new target text"));
 		vtu.save();
 
 		vtu = (IVTextUnit)doc.getItem("1");
 		tu = vtu.getTextUnit();
-		assertEquals("new target text", tu.getTarget(locFR).toString());
+		assertEquals("new target text", tu.getTarget(locFR, false).toString());
 
 		repo.close();
 	}

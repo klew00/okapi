@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -35,8 +35,8 @@ import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.LocaleId;
 
 import org.junit.Before;
@@ -73,7 +73,7 @@ public class RailsYmlFilterTest {
 	@Test
 	public void testSimpleYaml() {
 		String snippet = "config:\n  title: \"My Rails Website\"";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, null), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, null), 1);
 		assertNotNull(tu);
 		assertEquals("My Rails Website", tu.getSource().toString());
 		assertEquals("config.title", tu.getName());
@@ -82,7 +82,7 @@ public class RailsYmlFilterTest {
 	@Test
 	public void testSimplePlaceholders() {
 		String snippet = "config:\n  title: \"My {{count}} Rails Website\"";
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, null), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, null), 1);
 		assertNotNull(tu);
 		assertEquals("{{count}}", tu.getSource().getFirstContent().getCode(0).toString());
 		assertEquals("My {{count}} Rails Website", tu.getSource().toString());

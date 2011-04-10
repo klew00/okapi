@@ -38,6 +38,7 @@ import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.ui.Dialogs;
@@ -85,14 +86,14 @@ public class PairEditorUserTest {
 	private int curSeg = -1;
 	private ISegments srcSegs;
 	private ISegments trgSegs;
-	private TextUnit tu;
+	private ITextUnit tu;
 	private TextContainer srcCont;
 	private TextContainer trgCont;
 	private boolean segmentMode = true;
 	private String outEncoding;
 	private String outPath;
 	private int TUCount;
-	private ArrayList<TextUnit> textUnits = new ArrayList<TextUnit>();
+	private ArrayList<ITextUnit> textUnits = new ArrayList<ITextUnit>();
 	private ArrayList<Long> keys = new ArrayList<Long>();
 	private IVRepository repo;
 	private IVDocument vdoc;
@@ -301,7 +302,7 @@ public class PairEditorUserTest {
 				TUCount = keys.size();
 			}
 			else {
-				textUnits = new ArrayList<TextUnit>();
+				textUnits = new ArrayList<ITextUnit>();
 				filter.open(rawDoc);
 				while ( filter.hasNext() ) {
 					Event event = filter.next();
@@ -363,7 +364,7 @@ public class PairEditorUserTest {
 			}
 			
 			// Get the existing target, or create an empty one, segmented if needed
-			trgCont = tu.getTarget(trgLoc);
+			trgCont = tu.getTarget(trgLoc, false);
 			if ( trgCont == null ) {
 				// Create a copy
 				trgCont = tu.createTarget(trgLoc, false, IResource.COPY_ALL);
@@ -540,8 +541,8 @@ System.out.println(String.format("displayNext = %d", System.currentTimeMillis()-
 					writer.setOutput(outPath);
 					break;
 				case TEXT_UNIT:
-					TextUnit oriTU = event.getTextUnit();
-					TextUnit updTU;
+					ITextUnit oriTU = event.getTextUnit();
+					ITextUnit updTU;
 					if ( useRepository ) {
 						IVTextUnit updVTU = (IVTextUnit)vdoc.getItem(keys.get(tuIndex));
 						updTU = updVTU.getTextUnit();
@@ -553,7 +554,7 @@ System.out.println(String.format("displayNext = %d", System.currentTimeMillis()-
 					if ( !oriTU.getId().equals(updTU.getId()) ) {
 						throw new RuntimeException("Text units de-synchronized: the underlying file has changed.");
 					}
-					TextContainer tc = updTU.getTarget(trgLoc);
+					TextContainer tc = updTU.getTarget(trgLoc, false);
 					if ( tc != null ) oriTU.setTarget(trgLoc, tc);
 					tuIndex++;
 					break;
@@ -568,7 +569,7 @@ System.out.println(String.format("displayNext = %d", System.currentTimeMillis()-
 	
 	private void createInitialExtractedText () {
 		rawDoc = null;
-		textUnits = new ArrayList<TextUnit>();
+		textUnits = new ArrayList<ITextUnit>();
 		
 		TextFragment srcFrag = new TextFragment("This is a dummy entry of ");
 		srcFrag.append(TagType.OPENING, "emph", "<em>");
@@ -581,7 +582,7 @@ System.out.println(String.format("displayNext = %d", System.currentTimeMillis()-
 		srcFrag.append("Next");
 		srcFrag.append(TagType.CLOSING, "emph", "</b>");
 		srcFrag.append(" to learn how.");
-		TextUnit tu = new TextUnit("id1");
+		ITextUnit tu = new TextUnit("id1");
 		tu.setSource(new TextContainer(srcFrag));
 		textUnits.add(tu);
 		

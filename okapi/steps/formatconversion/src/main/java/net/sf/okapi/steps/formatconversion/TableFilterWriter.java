@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2010 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -46,7 +46,7 @@ import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 /**
@@ -280,10 +280,10 @@ public class TableFilterWriter implements IFilterWriter {
 	}
 	
 	private void handleTextUnit (Event event) {
-		TextUnit tu = (TextUnit)event.getResource();
+		ITextUnit tu = event.getTextUnit();
 
 		TextContainer srcCont = tu.getSource();
-		TextContainer trgCont = tu.getTarget(trgLoc);
+		TextContainer trgCont = tu.getTarget(trgLoc, false);
 		if ( trgCont == null ) {
 			trgCont = new TextContainer(); // Empty
 		}

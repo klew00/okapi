@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2010 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -37,7 +37,7 @@ import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.Property;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.filters.pensieve.PensieveFilterWriter;
 import net.sf.okapi.filters.po.POFilterWriter;
 
@@ -192,7 +192,7 @@ public class FormatConversionStep extends BasePipelineStep {
 	}
 
 	protected void processTextUnit (Event event) {
-		TextUnit tu = (TextUnit)event.getResource();
+		ITextUnit tu = event.getTextUnit();
 		
 		// Skip empty or code-only entries
 		if ( params.getSkipEntriesWithoutText() ) {

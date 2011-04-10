@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -20,18 +20,18 @@
 
 package net.sf.okapi.filters.plaintext.base;
 
-import java.util.List;
+//import java.util.List;
 import java.util.logging.Level;
 
 import net.sf.okapi.common.EventType;
-import net.sf.okapi.common.ListUtil;
+//import net.sf.okapi.common.ListUtil;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.InlineCodeFinder;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.SkeletonUtil;
@@ -122,11 +122,11 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 //			TextUnitUtil.trimTrailing(source, skel);
 //	}
 	
-	protected final TextProcessingResult sendAsSource(TextUnit textUnit) {
+	protected final TextProcessingResult sendAsSource(ITextUnit textUnit) {
 		return sendAsSource(textUnit, true);
 	}
 	
-	protected final TextProcessingResult sendAsSource(TextUnit textUnit, boolean rejectEmpty) {
+	protected final TextProcessingResult sendAsSource(ITextUnit textUnit, boolean rejectEmpty) {
 		
 		if (textUnit == null) return TextProcessingResult.REJECTED;
 		TextUnitUtil.forceSkeleton(textUnit);
@@ -145,8 +145,8 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 		return sendAsSource(TextUnitUtil.buildTU(null, "", textContainer, null, LocaleId.EMPTY, ""));
 	}
 	
-	protected final TextProcessingResult sendAsTarget(TextUnit target,
-		TextUnit source,
+	protected final TextProcessingResult sendAsTarget(ITextUnit target,
+		ITextUnit source,
 		LocaleId language)
 	{
 		if ( target == null ) return TextProcessingResult.REJECTED;
@@ -187,7 +187,7 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 		return TextProcessingResult.ACCEPTED;
 	}
 	
-	protected final TextProcessingResult sendAsSkeleton(TextUnit textUnit) {
+	protected final TextProcessingResult sendAsSkeleton(ITextUnit textUnit) {
 //		if (!processTextUnit(textUnit)) return TextProcessingResult.REJECTED;
 		
 //		if (parentSkeleton == null)
@@ -320,7 +320,7 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 //		return true;
 //	}
 
-	protected boolean processTU(TextUnit textUnit) {
+	protected boolean processTU(ITextUnit textUnit) {
 		
 		if (textUnit == null) return false;
 		TextContainer source = textUnit.getSource();

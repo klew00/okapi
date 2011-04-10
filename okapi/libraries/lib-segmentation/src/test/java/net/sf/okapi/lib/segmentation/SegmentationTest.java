@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2010 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -37,6 +37,7 @@ import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.lib.segmentation.LanguageMap;
@@ -252,7 +253,7 @@ public class SegmentationTest {
 	
 	@Test
 	public void testTUCreateSourceSegmentation () {
-		TextUnit tu = new TextUnit("tuid");
+		ITextUnit tu = new TextUnit("tuid");
 		tu.setSource(createSimpleContent());
 		tu.createSourceSegmentation(segmenter);
 		assertEquals("[<1>Part 1.</1>][ Part 2.]", fmt.printSegmentedContent(tu.getSource(), true));
@@ -260,7 +261,7 @@ public class SegmentationTest {
 	
 	@Test
 	public void testTUCreateSourceSegmentationOverwrite () {
-		TextUnit tu = new TextUnit("tuid");
+		ITextUnit tu = new TextUnit("tuid");
 		tu.setSource(createSegmentedContainer()); // hard-coded
 		assertEquals("[<1>Part 1.</1>] Outside[ Part 2.]", fmt.printSegmentedContent(tu.getSource(), true));
 		tu.createSourceSegmentation(segmenter); // From the segmenter
@@ -269,7 +270,7 @@ public class SegmentationTest {
 	
 	@Test
 	public void testTUSourceSegmentationInTarget () {
-		TextUnit tu = new TextUnit("tuid");
+		ITextUnit tu = new TextUnit("tuid");
 		tu.setSource(createSimpleContent());
 		tu.createSourceSegmentation(segmenter);
 		assertEquals("[<1>Part 1.</1>][ Part 2.]", fmt.printSegmentedContent(tu.getSource(), true));
@@ -283,7 +284,7 @@ public class SegmentationTest {
 	
 	@Test
 	public void testTUSynchronizeSourceSegmentationForTarget () {
-		TextUnit tu = new TextUnit("tuid");
+		ITextUnit tu = new TextUnit("tuid");
 		tu.setSource(createSimpleContent());
 		tu.createSourceSegmentation(segmenter);
 		assertEquals("[<1>Part 1.</1>][ Part 2.]", fmt.printSegmentedContent(tu.getSource(), true));
@@ -296,19 +297,18 @@ public class SegmentationTest {
 		// "**Part 1.** Part 2."
 		//  0123456789012345678
 		ranges.add(new Range(0, 19));
-		tu.setSourceSegmentationForTarget(locAR, ranges);
+		tu.getVariantSources().create(locAR, true, IResource.COPY_ALL);
+		tu.getVariantSources().get(locAR).getSegments().create(ranges);
 		// Check the FR against the source
 		Segment srcSeg;
-		tu.synchronizeSourceSegmentation(locFR);
-		ISegments segs = tu.getSource().getSegments();
+		ISegments segs = tu.getVariantSources().getSegments(locFR);
 		for ( Segment seg : tc1.getSegments() ) {
 			srcSeg = segs.get(seg.id);
 			assertNotNull(srcSeg);
 			assertEquals(seg.text, srcSeg.text);
 		}
 		// Test AR against the source
-		tu.synchronizeSourceSegmentation(locAR);
-		segs = tu.getSource().getSegments();
+		segs = tu.getVariantSources().getSegments(locAR);
 		for ( Segment seg : tc2.getSegments() ) {
 			srcSeg = segs.get(seg.id);
 			assertNotNull(srcSeg);
@@ -318,7 +318,7 @@ public class SegmentationTest {
 	
 	@Test
 	public void testCreateTargetSegmentation () {
-		TextUnit tu = new TextUnit("tuid");
+		ITextUnit tu = new TextUnit("tuid");
 		tu.setSource(createSimpleContent());
 		tu.createTarget(locFR, true, IResource.COPY_ALL);
 		// Segment both with the same segmenter
@@ -326,7 +326,7 @@ public class SegmentationTest {
 		tu.createTargetSegmentation(segmenter, locFR);
 		// We should get the same result
 		assertEquals("[<1>Part 1.</1>][ Part 2.]", fmt.printSegmentedContent(tu.getSource(), true));
-		assertEquals("[<1>Part 1.</1>][ Part 2.]", fmt.printSegmentedContent(tu.getTarget(locFR), true));
+		assertEquals("[<1>Part 1.</1>][ Part 2.]", fmt.printSegmentedContent(tu.getTarget(locFR, false), true));
 	}
 	
 	private TextContainer createSimpleContent () {

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -30,7 +30,7 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Range;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.lib.terminology.TermHit;
 import net.sf.okapi.lib.terminology.simpletb.SimpleTB;
 
@@ -59,7 +59,7 @@ public class TermChecker {
 	}
 	
 	public int verify (URI docId,
-		TextUnit tu,
+		ITextUnit tu,
 		Segment srcSeg,
 		Segment trgSeg)
 	{
@@ -72,7 +72,7 @@ public class TermChecker {
 	}
 	
 	private int verifyTerms (URI docId,
-		TextUnit tu,
+		ITextUnit tu,
 		Segment srcSeg,
 		Segment trgSeg)
 	{
@@ -97,7 +97,7 @@ public class TermChecker {
 	}
 
 	private int verifyStrings (URI docId,
-		TextUnit tu,
+		ITextUnit tu,
 		Segment srcSeg,
 		Segment trgSeg)
 	{

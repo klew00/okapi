@@ -43,7 +43,7 @@ public class HtmlSnippetsTest {
 			+ "<meta NAME=\"DESCRIPTION\" CONTENT=\"Text2\"/>"
 			+ "<p>Text3</p>";
 		ArrayList<Event> events = getEventsDefault(snippet);
-		TextUnit tu = FilterTestDriver.getTextUnit(events, 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(events, 1);
 		assertNotNull(tu);
 		assertEquals("Text1", tu.toString());
 		tu = FilterTestDriver.getTextUnit(events, 2);
@@ -58,7 +58,7 @@ public class HtmlSnippetsTest {
 	public void testInlineCodesStorage () {
 		String snippet = "<p>Before <b>bold</b> <a href=\"there\"/> after.</p>";
 		ArrayList<Event> events = getEventsDefault(snippet);
-		TextUnit tu = FilterTestDriver.getTextUnit(events, 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(events, 1);
 		List<Code> codes1 = tu.getSource().getFirstContent().getCodes();
 		String tmp = Code.codesToString(codes1);
 		List<Code> codes2 = Code.stringToCodes(tmp);
@@ -80,7 +80,7 @@ public class HtmlSnippetsTest {
 	public void testTitleInP () {
 		String snippet = "<p title=\"Text1\">Text2</p>";
 		ArrayList<Event> events = getEventsDefault(snippet);
-		TextUnit tu = FilterTestDriver.getTextUnit(events, 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(events, 1);
 		assertNotNull(tu);
 		assertEquals("Text1", tu.toString());
 		tu = FilterTestDriver.getTextUnit(events, 2);
@@ -92,7 +92,7 @@ public class HtmlSnippetsTest {
 	public void testAltInImg () {
 		String snippet = "Text1<img alt=\"Text2\"/>.";
 		ArrayList<Event> events = getEventsDefault(snippet);
-		TextUnit tu = FilterTestDriver.getTextUnit(events, 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(events, 1);
 		assertNotNull(tu); // Attributes go first
 		assertEquals("Text2", tu.toString());
 		tu = FilterTestDriver.getTextUnit(events, 2);
@@ -104,7 +104,7 @@ public class HtmlSnippetsTest {
 	public void testNoExtractValueInInput () {
 		String snippet = "<input type=\"file\" value=\"NotText\"/>.";
 		ArrayList<Event> events = getEventsDefault(snippet);
-		TextUnit tu = FilterTestDriver.getTextUnit(events, 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(events, 1);
 		assertNotNull(tu);
 		assertEquals("<1/>.", fmt.setContent(tu.getSource().getFirstContent()).toString());
 	}
@@ -113,7 +113,7 @@ public class HtmlSnippetsTest {
 	public void testExtractValueInInput () {
 		String snippet = "<input type=\"other\" value=\"Text\"/>.";
 		ArrayList<Event> events = getEventsDefault(snippet);
-		TextUnit tu = FilterTestDriver.getTextUnit(events, 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(events, 1);
 		assertNotNull(tu);
 		assertEquals("Text", tu.toString());
 		tu = FilterTestDriver.getTextUnit(events, 2);
@@ -125,7 +125,7 @@ public class HtmlSnippetsTest {
 	public void testLabelInOption () {
 		String snippet = "Text1<option label=\"Text2\"/>.";
 		ArrayList<Event> events = getEventsDefault(snippet);
-		TextUnit tu = FilterTestDriver.getTextUnit(events, 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(events, 1);
 		assertNotNull(tu); // Attributes go first
 		assertEquals("Text2", tu.toString());
 		tu = FilterTestDriver.getTextUnit(events, 2);
@@ -140,7 +140,7 @@ public class HtmlSnippetsTest {
 	public void testHtmlNonWellFormedEmptyTag() {
 		String snippet = "<br>text<br/>";
 		ArrayList<Event> events = getEvents(snippet);
-		TextUnit tu = (TextUnit)events.get(1).getResource();
+		ITextUnit tu = (ITextUnit)events.get(1).getResource();
 		List<Code> codes = tu.getSource().getFirstContent().getCodes();
 		for (Code code : codes) {			
 			assertEquals(TagType.PLACEHOLDER, code.getTagType());
@@ -278,7 +278,7 @@ public class HtmlSnippetsTest {
 		String snippet = "<p>text notVAR1 VAR2<p>";
 		URL originalParameters = parameters;
 		parameters = HtmlSnippetsTest.class.getResource("/withCodeFinderRules.yml");
-		TextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
 		List<Code> list = tu.getSource().getFirstContent().getCodes();
 		assertEquals(2, list.size());
@@ -306,25 +306,25 @@ public class HtmlSnippetsTest {
 	}
 
 	@Test
-	public void textUnitsInARow() {
+	public void ITextUnitsInARow() {
 		String snippet = "<td><p><h1>para text in a table element</h1></p></td>";
 		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, locEN));
 	}
 
 	@Test
-	public void textUnitsInARowWithTwoHeaders() {
+	public void ITextUnitsInARowWithTwoHeaders() {
 		String snippet = "<td><p><h1>header one</h1><h2>header two</h2></p></td>";
 		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, locEN));
 	}
 	
 	@Test
-	public void twoTextUnitsInARowNonWellformed() {
+	public void twoITextUnitsInARowNonWellformed() {
 		String snippet = "<td><p><h1>para text in a table element</td>";
 		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, locEN));
 	}
 	
 	@Test
-	public void twoTextUnitsInARowNonWellformedWithNonWellFromedConfig() {
+	public void twoITextUnitsInARowNonWellformedWithNonWellFromedConfig() {
 		URL originalParameters = parameters;
 		parameters = HtmlSnippetsTest.class.getResource("nonwellformedConfiguration.yml");
 		String snippet = "<td><p><h1>para text in a table element</td>";
@@ -333,13 +333,13 @@ public class HtmlSnippetsTest {
 	}
 	
 	@Test
-	public void textUnitName() {
+	public void ITextUnitName() {
 		String snippet = "<p id=\"logo\">para text in a table element</p>";
 		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, locEN));
 	}
 
 	@Test
-	public void textUnitStartedWithText() {
+	public void ITextUnitStartedWithText() {
 		String snippet = "this is some text<x/>";
 		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, locEN));
 	}
@@ -410,7 +410,7 @@ public class HtmlSnippetsTest {
 						.getResource());
 				break;
 			case TEXT_UNIT:
-				TextUnit tu = (TextUnit) event.getResource();
+				ITextUnit tu = (ITextUnit) event.getResource();
 				tmp.append(writer.processTextUnit(tu));
 				break;
 			case DOCUMENT_PART:

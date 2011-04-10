@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -26,8 +26,8 @@ import net.sf.okapi.applications.rainbow.packages.IReader;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.xliff.XLIFFFilter;
 
 /**
@@ -45,8 +45,8 @@ public class Reader implements IReader {
 		}
 	}
 
-	public TextUnit getItem () {
-		return (TextUnit)event.getResource();
+	public ITextUnit getItem () {
+		return event.getTextUnit();
 	}
 
 	public void openDocument (String path,

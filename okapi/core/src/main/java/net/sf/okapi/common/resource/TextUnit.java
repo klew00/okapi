@@ -1,18 +1,18 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
-  This library is free software; you can redistribute it and/or modify it 
-  under the terms of the GNU Lesser General Public License as published by 
-  the Free Software Foundation; either version 2.1 of the License, or (at 
+  This library is free software; you can redistribute it and/or modify it
+  under the terms of the GNU Lesser General Public License as published by
+  the Free Software Foundation; either version 2.1 of the License, or (at
   your option) any later version.
 
-  This library is distributed in the hope that it will be useful, but 
-  WITHOUT ANY WARRANTY; without even the implied warranty of 
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  This library is distributed in the hope that it will be useful, but
+  WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser
   General Public License for more details.
 
-  You should have received a copy of the GNU Lesser General Public License 
-  along with this library; if not, write to the Free Software Foundation, 
+  You should have received a copy of the GNU Lesser General Public License
+  along with this library; if not, write to the Free Software Foundation,
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
@@ -22,620 +22,535 @@ package net.sf.okapi.common.resource;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.ISegmenter;
 import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.Range;
 import net.sf.okapi.common.annotation.Annotations;
 import net.sf.okapi.common.annotation.IAnnotation;
 
 /**
- * Basic unit of extraction from a filter and also the resource associated with the filter event TEXT_UNIT.
- * The TextUnit object holds the extracted source text, all its properties and 
- * annotations, and any target corresponding data.
+ * Basic unit of extraction from a filter and also the resource associated with
+ * the filter event TEXT_UNIT.
+ * The TextUnit object holds the extracted source text in one or more versions,
+ * all its properties and annotations, and any target corresponding data.
  */
-public class TextUnit implements INameable, IReferenceable {
-
-	/**
-	 * Resource type value for a paragraph.
-	 */
-	public static final String TYPE_PARA = "paragraph";
-	/**
-	 * Resource type value for a list.
-	 */
-	public static final String TYPE_LIST_ELEMENT = "list_element";
-	/**
-	 * Resource type value for a title.
-	 */
-	public static final String TYPE_TITLE = "title";
-	/**
-	 * Resource type value for a header.
-	 */
-	public static final String TYPE_HEADER = "header";
-	/**
-	 * Resource type value for a cdata section.
-	 */
-	public static final String TYPE_CDATA = "cdata";
-
-	private static final int TARGETS_INITCAP = 2;
+public class TextUnit implements ITextUnit {
 	
-	private String id;
-	private int refCount;
-	private String name;
-	private String type;
-	private boolean isTranslatable = true;
-	private boolean preserveWS;
-	private ISkeleton skeleton;
-	private LinkedHashMap<String, Property> properties;
-	private Annotations annotations;
-	private TextContainer source;
-	private String mimeType;
-	private ConcurrentHashMap<LocaleId, TextContainer> targets;
-	
-	private List<Range> srcSegRanges;
-	private ConcurrentHashMap<LocaleId, List<Range>> trgSegRanges;
-	// Do not serialize. This variable is used internally for efficiency
-	private transient LocaleId syncLoc;
+    private static final int TARGETS_INITCAP = 2;
 
-	/**
-	 * Creates a new TextUnit object with its identifier.
-	 * @param id the identifier of this resource.
-	 */
-	public TextUnit (String id) {
-		create(id, null, false, null);
-	}
+    private String id;
+    private int refCount;
+    private String name;
+    private String type;
+    private boolean isTranslatable = true;
+    private boolean preserveWS;
+    private ISkeleton skeleton;
+    private LinkedHashMap<String, Property> properties;
+    private Annotations annotations;
+    private String mimeType;
 
-	/**
-	 * Creates a new TextUnit object with its identifier and a text.
-	 * @param id the identifier of this resource.
-	 * @param sourceText the initial text of the source.
-	 */
-	public TextUnit (String id,
-		String sourceText)
-	{
-		create(id, sourceText, false, null);
-	}
+    private TextContainer defaultSource;
+    private VariantSources variantSources;
+    private ConcurrentHashMap<LocaleId, TextContainer> targets;
 
-	/**
-	 * Creates a new TextUnit object with its ID, a text, and a flag indicating if it is a referent or not.
-	 * @param id the identifier of this resource.
-	 * @param sourceText the initial text of the source (can be null).
-	 * @param isReferent indicates if this resource is a referent (i.e. is referred to
-	 * by another resource) or not.
-	 */
-	public TextUnit (String id,
-		String sourceText,
-		boolean isReferent)
-	{
-		create(id, sourceText, isReferent, null);
-	}
+    private AlignedSegments myAlignedSegments; //so that a new one doesn't have to be created every time it is requested
 
-	/**
-	 * Creates a new TextUnit object with its identifier, a text, a flag indicating 
-	 * if it is a referent or not, and a given MIME type.
-	 * @param id the identifier of this resource.
-	 * @param sourceText the initial text of the source (can be null).
-	 * @param isReferent indicates if this resource is a referent (i.e. is referred to
-	 * by another resource) or not.
-	 * @param mimeType the MIME type identifier for the content of this TextUnit.
-	 */
-	public TextUnit (String id,
-		String sourceText,
-		boolean isReferent,
-		String mimeType)
-	{
-		create(id, sourceText, isReferent, mimeType);
-	}
+    /**
+     * Creates a new TextUnit object with its identifier.
+     *
+     * @param id the identifier of this resource.
+     */
+    public TextUnit (String id) {
+            create(id, null, false, null);
+    }
 
-	private void create (String id,
-		String sourceText,
-		boolean isReferent,
-		String mimeType)
-	{
-		targets = new ConcurrentHashMap<LocaleId, TextContainer>(TARGETS_INITCAP);
-		this.id = id;
-		refCount = (isReferent ? 1 : 0); 
-		this.mimeType = mimeType;
-		source = new TextContainer(sourceText);
-	}
+    /**
+     * Creates a new TextUnit object with its identifier and a text.
+     *
+     * @param id the identifier of this resource.
+     * @param sourceText the initial text of the source.
+     */
+    public TextUnit (String id,
+            String sourceText)
+    {
+            create(id, sourceText, false, null);
+    }
 
-	/**
-	 * Gets the string representation of the source text of this TextUnit.
-	 * @return the source text of this TextUnit.
-	 */
+    /**
+     * Creates a new TextUnit object with its ID, a text, and a flag indicating
+     * if it is a referent or not.
+     *
+     * @param id the identifier of this resource.
+     * @param sourceText the initial text of the source (can be null).
+     * @param isReferent indicates if this resource is a referent (i.e. is referred to
+     * by another resource) or not.
+     */
+    public TextUnit (String id,
+            String sourceText,
+            boolean isReferent)
+    {
+            create(id, sourceText, isReferent, null);
+    }
+
+    /**
+     * Creates a new TextUnit object with its identifier, a text, a flag indicating
+     * if it is a referent or not, and a given MIME type.
+     *
+     * @param id the identifier of this resource.
+     * @param sourceText the initial text of the source (can be null).
+     * @param isReferent indicates if this resource is a referent (i.e. is referred to
+     * by another resource) or not.
+     * @param mimeType the MIME type identifier for the content of this TextUnit.
+     */
+    public TextUnit (String id,
+            String sourceText,
+            boolean isReferent,
+            String mimeType)
+    {
+            create(id, sourceText, isReferent, mimeType);
+    }
+
+    private void create (String id,
+                         String sourceText,
+                         boolean isReferent,
+                         String mimeType)
+    {
+        targets = new ConcurrentHashMap<LocaleId, TextContainer>(TARGETS_INITCAP);
+        this.id = id;
+        refCount = (isReferent ? 1 : 0);
+        this.mimeType = mimeType;
+
+        setDefaultSource(new TextContainer(sourceText));
+    }
+
 	@Override
-	public String toString () {
-		return source.toString();
-	}
-	
-	/**
-	 * Clones this TextUnit.
-	 * @return A new TextUnit object that is a copy of this one. 
-	 */
-	@Override
-	public TextUnit clone () {
-		TextUnit tu = new TextUnit(getId());
-		if ( annotations != null ) {
-			tu.setAnnotations(annotations.clone());
-		}
-		tu.setIsReferent(isReferent());
-		tu.setIsTranslatable(isTranslatable);
-		tu.setMimeType(getMimeType());
-		tu.setName(getName());
-		tu.setPreserveWhitespaces(preserveWS);
-		tu.setReferenceCount(getReferenceCount());
-		tu.setSkeleton(getSkeleton());
-		tu.setSource(getSource().clone());
-		tu.setType(getType());
-		
-		// Set all the main level properties
-		if ( properties != null ) {
-			for (Property prop : properties.values()) {
-				tu.setProperty(prop.clone());
-			}
-		}
-		
-		// Set all the targets
-		for (Entry<LocaleId, TextContainer> entry : targets.entrySet()) {
-			tu.setTarget(entry.getKey(), entry.getValue().clone());
-		}
-		
-		return tu;
-	}
-	
-	/**
-	 * Used by TextUnit clone method to copy over all annotations at once. 
-	 * @param annotations
-	 */
-	protected void setAnnotations(Annotations annotations) {
-		this.annotations = annotations;
-	}
-	
-	public String getId () {
-		return id;
-	}
+    public boolean isEmpty () {
+        return getSource().isEmpty();
+    }
 
-	public void setId (String id) {
-		this.id = id;
-	}
+    @Override
+    public TextContainer getSource () {
+        return defaultSource;
+    }
 
-	public ISkeleton getSkeleton () {
-		return skeleton;
-	}
+    //convenience method to return the source (default or variant) associated with a target locale
+    private TextContainer getSource (LocaleId targetLocale) {
+        if (variantSources == null || targetLocale == null) return defaultSource;
+        return variantSources.get(targetLocale);
+    }
 
-	public void setSkeleton (ISkeleton skeleton) {
-		this.skeleton = skeleton;
-	}
+    @Override
+    public TextContainer setSource (TextContainer textContainer) {
+        setDefaultSource(textContainer);
+        return defaultSource;
+    }
 
-	public String getName () {
-		return name;
-	}
 
-	public void setName (String name) {
-		this.name = name;
-	}
+    @Override
+    public boolean hasVariantSources () {
+        return (variantSources == null) ? false : (!variantSources.isEmpty());
+    }
 
-	public String getType () {
-		return type;
-	}
-	
-	public void setType (String value) {
-		type = value;
-	}
-	
-	public <A extends IAnnotation> A getAnnotation (Class<A> annotationType) {
-		if ( annotations == null ) return null;
-		return annotationType.cast(annotations.get(annotationType) );
-	}
+    @Override
+    public IVariantSources getVariantSources () {
+//TODO: is this ok?
+// it seems we are changing the value of hasVariantSources
+// by just getting a list. maybe it should return an empty list?
+        if (variantSources == null) {
+            variantSources = new VariantSources(defaultSource);
+        }
+        return variantSources;
+    }
 
-	public void setAnnotation (IAnnotation annotation) {
-		if ( annotations == null ) {
-			annotations = new Annotations();
-		}
-		annotations.set(annotation);
-	}
+    @Override
+    public TextFragment setSourceContent (TextFragment content) {
+        getSource().setContent(content);
+        return getSource().getFirstContent();
 
-	public Property getProperty (String name) {
-		if ( properties == null ) return null;
-		return properties.get(name);
-	}
+    }
 
-	public Property setProperty (Property property) {
-		if ( properties == null ) properties = new LinkedHashMap<String, Property>();
-		properties.put(property.getName(), property);
-		return property;
-	}
-	
-	public void removeProperty (String name) {
-		if ( properties != null ) {
-			properties.remove(name);
-		}
-	}
-	
-	public Set<String> getPropertyNames () {
-		if ( properties == null ) properties = new LinkedHashMap<String, Property>();
-		return properties.keySet();
-	}
+    @Override
+    public TextContainer createTarget (LocaleId targetLocale,
+    	boolean overwriteExisting,
+    	int creationOptions)
+    {
+        TextContainer trgCont = targets.get(targetLocale);
+        if (( trgCont == null ) || overwriteExisting ) {
+            trgCont = getSource(targetLocale).clone((creationOptions & COPY_PROPERTIES) == COPY_PROPERTIES);
+            if ( (creationOptions & COPY_SEGMENTATION) != COPY_SEGMENTATION ) {
+                trgCont.joinAll();
+            }
+            if ( (creationOptions & COPY_CONTENT) != COPY_CONTENT ) {
+                for ( Segment seg : trgCont.getSegments() ) {
+                    seg.text.clear();
+                }
+            }
+            targets.put(targetLocale, trgCont);
+        }
+        return trgCont;
+    }
 
-	public boolean hasProperty (String name) {
-		if ( properties == null ) return false;
-		return properties.containsKey(name);
-	}
+    @Override
+    public TextContainer getTarget (LocaleId locId) {
+        return createTarget(locId, false, IResource.COPY_SEGMENTATION);
+    }
 
-	public Property getSourceProperty (String name) {
-		return source.getProperty(name);
-	}
+    @Override
+    public TextContainer getTarget (LocaleId locId,
+    	boolean createIfNeeded)
+    {
+        TextContainer trgCont = targets.get(locId);
+        if ( trgCont == null ) {
+        	if ( createIfNeeded ) {
+        		return createTarget(locId, false, IResource.COPY_SEGMENTATION);
+        	}
+        	else {
+        		return null;
+        	}
+        }
+        return trgCont;
+    }
 
-	public Property setSourceProperty (Property property) {
-		return source.setProperty(property);
-	}
-	
-	public Set<String> getSourcePropertyNames () {
-		return source.getPropertyNames();
-	}
-	
-	public void removeSourceProperty (String name) {
-		source.removeProperty(name);
-	}
-	
-	public boolean hasSourceProperty (String name) {
-		return source.hasProperty(name);
-	}
+    @Override
+    public TextContainer setTarget (LocaleId locId,
+    	TextContainer text)
+    {
+        targets.put(locId, text);
+        return text;
+    }
 
-	public Property getTargetProperty (LocaleId locId,
-		String name)
-	{
-		TextContainer tc = getTarget(locId);
-		if ( tc == null ) return null;
-		return tc.getProperty(name);
-	}
+    @Override
+    public void removeTarget (LocaleId locId) {
+        if ( hasTarget(locId) ) {
+        	targets.remove(locId);
+        }
+    }
 
-	public Property setTargetProperty (LocaleId locId,
-		Property property)
-	{
-		return createTarget(locId, false, IResource.CREATE_EMPTY).setProperty(property);
-	}
+    @Override
+    public boolean hasTarget(LocaleId locId) {
+        //ConcurrentHashMap doesn't allow nulls so no need to check for null
+        return targets.containsKey(locId);
+    }
 
-	public void removeTargetProperty (LocaleId locId,
-		String name)
-	{
-		TextContainer tc = getTarget(locId);
-		if ( tc != null ) {
-			tc.removeProperty(name);
-		}
-	}
-	
-	public Set<String> getTargetPropertyNames (LocaleId locId) {
-		TextContainer tc = createTarget(locId, false, IResource.CREATE_EMPTY);
-		return tc.getPropertyNames();
-	}
-
-	public boolean hasTargetProperty (LocaleId locId,
-		String name)
-	{
-		TextContainer tc = getTarget(locId);
-		if ( tc == null ) return false;
-		return (tc.getProperty(name) != null);
-	}
-
-	public Set<LocaleId> getTargetLocales () {
-		return targets.keySet();
-	}
-
-	public Property createTargetProperty (LocaleId locId,
-		String name,
-		boolean overwriteExisting,
-		int creationOptions)
-	{
-		// Get the target or create an empty one
-		TextContainer tc = createTarget(locId, false, CREATE_EMPTY);
-		// Get the property if it exists
-		Property prop = tc.getProperty(name);
-		// If it does not exists or if we overwrite: create a new one
-		if (( prop == null ) || overwriteExisting ) {
-			// Get the source property
-			prop = source.getProperty(name);
-			if ( prop == null ) {
-				// If there is no source, create an empty property
-				return tc.setProperty(new Property(name, "", false));
-			}
-			else { // If there is a source property
-				// Create a copy, empty or not depending on the options
-				if ( creationOptions == CREATE_EMPTY ) {
-					return tc.setProperty(new Property(name, "", prop.isReadOnly()));
-				}
-				else {
-					return tc.setProperty(prop.clone());
-				}
-			}
-		}
-		return prop;
-	}
-
-	public boolean isTranslatable () {
-		return isTranslatable;
-	}
-	
-	public void setIsTranslatable (boolean value) {
-		isTranslatable = value;
-	}
-
-	public boolean isReferent () {
-		return (refCount > 0);
-	}
-
-	public void setIsReferent (boolean value) {
-		refCount = (value ? 1 : 0 );
-	}
-	
-	public int getReferenceCount () {
-		return refCount;
-	}
-	
-	public void setReferenceCount (int value) {
-		refCount = value;
-	}
-
-	/**
-	 * Gets the source object for this TextUnit (a {@link TextContainer} object).
-	 * @return the source object for this TextUnit.
-	 */
-	public TextContainer getSource () {
-		return source;
-	}
-
-	/**
-	 * Sets the source object for this TextUnit. Any existing source object is overwritten.
-	 * @param textContainer the source object to set.
-	 * @return the source object that has been set.
-	 */
-	public TextContainer setSource (TextContainer textContainer) {
-		if ( textContainer == null ) {
-			throw new NullPointerException("The source container of a TextUnit cannot be null.");
-		}
-		source = textContainer;
-		return source;
-	}
-
-    /**
-	 * Gets the target object for this TextUnit for a given locale.
-	 * @param locId the locale to query.
-	 * @return the target object for this text unit for the given locale,
-	 * or null if it does not exist.
-	 */
-	public TextContainer getTarget (LocaleId locId) {
-		return targets.get(locId);
-	}
-
-    /**
-	 * Sets the target object for this TextUnit for a given locale.
-	 * Any existing target object for the given locale is overwritten.
-	 * To set a target object based on the source, use the
-	 * {@link #createTarget(LocaleId, boolean, int)} method.
-	 * @param locId the target locale.
-	 * @param text the target object to set.
-	 * @return the target object that has been set.
-	 */
-	public TextContainer setTarget (LocaleId locId,
-		TextContainer text)
-	{
-		targets.put(locId, text);
-		return text;
-	}
-
-    /**
-	 * Removes a given target object from this TextUnit.
-	 * @param locId the target locale to remove.
-	 */
-	public void removeTarget (LocaleId locId) {
-		if ( hasTarget(locId) ) {
-			targets.remove(locId);
-		}
-		// Remove associated segmentation info if needed
-		if ( trgSegRanges != null ) {
-			trgSegRanges.remove(locId);
-		}
-		if ( syncLoc != null ) {
-			if ( syncLoc.equals(locId) ) syncLoc = null;
-		}
-	}
-
-    /**
-	 * Indicates if there is a target object for a given locale for this TextUnit.
-	 * @param locId the locale to query.
-	 * @return true if a target object exists for the given locale, false otherwise.
-	 */
-	public boolean hasTarget (LocaleId locId) {
-		return (targets.get(locId) != null);
-	}
-
-    /**
-	 * Creates or get the target for this TextUnit.
-	 * @param locId the target locale.
-	 * @param overwriteExisting true to overwrite any existing target for the given locale.
-	 * False to not create a new target object if one already exists for the given locale.
-	 * @param creationOptions creation options:
-	 * <ul><li>CREATE_EMPTY: Create an empty target object.</li>
-	 * <li>COPY_CONTENT: Copy the text of the source (and any associated in-line code).</li>
-	 * <li>COPY_PROPERTIES: Copy the source properties.</li>
-	 * <li>COPY_ALL: Same as (COPY_CONTENT|COPY_PROPERTIES).</li></ul>
-	 * @return the target object that was created, or retrieved.
-	 */
-	public TextContainer createTarget (LocaleId locId,
-		boolean overwriteExisting,
-		int creationOptions)
-	{
-		TextContainer trgCont = targets.get(locId);
-		if (( trgCont == null ) || overwriteExisting ) {
-			trgCont = getSource().clone((creationOptions & COPY_PROPERTIES) == COPY_PROPERTIES);
-			if (( creationOptions == CREATE_EMPTY ) || ( creationOptions == COPY_PROPERTIES )) {
-				trgCont.clear();
-			}
-			targets.put(locId, trgCont);
-		}
-		return trgCont;
-	}
-
-	/**
-	 * Sets the content of the source for this TextUnit.
-	 * @param content the new content to set.
-	 * @return the new content of the source for this TextUnit. 
-	 */
-	public TextFragment setSourceContent (TextFragment content) {
-        source.setContent(content);
+    @Override
+    public TextFragment setTargetContent (LocaleId locId,
+    	TextFragment content)
+    {
+        TextContainer tc = createTarget(locId, false, CREATE_EMPTY);
+        tc.setContent(content);
         // We can use this because the setContent() removed any segmentation
-		return source.getSegments().getFirstContent();
-	}
+        return tc.getSegments().getFirstContent();
+    }
 
-	/**
-	 * Sets the content of the target for a given locale for this TextUnit.
-	 * @param locId the locale to set.
-	 * @param content the new content to set.
-	 * @return the new content for the given target locale for this text unit. 
-	 */
-	public TextFragment setTargetContent (LocaleId locId,
-		TextFragment content)
-	{
-		TextContainer tc = createTarget(locId, false, CREATE_EMPTY);
-		tc.setContent(content);
-        // We can use this because the setContent() removed any segmentation
-		return tc.getSegments().getFirstContent();
-	}
+    @Override
+    public IAlignedSegments getAlignedSegments () {
+        return getMyAlignedSegments();
+    }
+    
+    private AlignedSegments getMyAlignedSegments() {
+        if (myAlignedSegments == null)
+            myAlignedSegments = new AlignedSegments(this);
+        return myAlignedSegments;
+    }
 
-	public String getMimeType () {
-		return mimeType;
-	}
-	
-	public void setMimeType (String mimeType) {
-		this.mimeType = mimeType;
-	}	
+    @Override
+    public ISegments getSourceSegments() {
+        return getSource().getSegments();
+    }
 
-	/**
-	 * Indicates if the source text of this TextUnit is empty.
-	 * @return true if the source text of this TextUnit is empty, false otherwise.
-	 */
-	public boolean isEmpty () {
-		return source.isEmpty();
-	}
+    @Override
+    public Segment getSourceSegment(String segId, boolean createIfNeeded) {
+        Segment seg = getSource().getSegments().get(segId);
+        if ((seg == null) && createIfNeeded) {
+            seg = new Segment(segId);
+            getSource().getSegments().append(seg);
+        }
+        return seg;
+    }
 
-	public boolean preserveWhitespaces () {
-		return preserveWS;
-	}
-	
-	public void setPreserveWhitespaces (boolean value) {
-		preserveWS = value;
-	}
+    @Override
+    public ISegments getTargetSegments(LocaleId trgLoc) {
+        return getTarget(trgLoc).getSegments();
+    }
 
-	/**
-	 * Segments the source content based on the rules provided by a given ISegmenter.
-	 * <p>This methods also stores the boundaries for the segments so they can be re-applied later.
-	 * for example when calling {@link #synchronizeSourceSegmentation(LocaleId)}.
-	 * @param segmenter the segmenter to use to create the segments.
-	 */
-	public void createSourceSegmentation (ISegmenter segmenter) {
-		segmenter.computeSegments(source);
-		srcSegRanges = segmenter.getRanges();
-		source.getSegments().create(srcSegRanges);
-		syncLoc = null;
-	}
-	
-	/**
-	 * Segments the specified target content based on the rules provided by a given ISegmenter.
-	 * <p>This method may cause the source and target segments to be desynchronized, that is:
-	 * That each source segment may or may not be aligned with a corresponding target segment.
-	 * You can associate a target-specific segmentation for the source using
-	 * {@link #setSourceSegmentationForTarget(LocaleId, List)}.
-	 * @param segmenter the segmenter to use to create the segments.
-	 * @param targetLocale {@link LocaleId} of the target we want to segment.
-	 */
-	public void createTargetSegmentation (ISegmenter segmenter,
-		LocaleId targetLocale)
-	{
-		TextContainer tc = getTarget(targetLocale);
-		if ( tc == null ) {
-			throw new RuntimeException(String.format("There is no target content for '%s'", targetLocale.toString()));
-		}
-		segmenter.computeSegments(tc);
-		tc.getSegments().create(segmenter.getRanges());
-	}
-	
-	/**
-	 * Saves the current segment boundaries for the source.
-	 * <p>This methods stores the boundaries for the segments so they can be re-applied later,
-	 * for example when calling {@link #synchronizeSourceSegmentation(LocaleId)}.
-	 * @return the boundaries that have been saved.
-	 * @see #createSourceSegmentation(ISegmenter)
-	 * @see #synchronizeSourceSegmentation(LocaleId)
-	 */
-	public List<Range> saveCurrentSourceSegmentation () {
-		srcSegRanges = source.getSegments().getRanges();
-		return srcSegRanges;
-	}
+    @Override
+    public Segment getTargetSegment(LocaleId trgLoc, String segId, boolean createIfNeeded) {
+        Segment seg = getTarget(trgLoc).getSegments().get(segId);
+        if (( seg == null ) && createIfNeeded ) {
+            // If the segment does not exists: create a new one if requested
+            seg = new Segment(segId);
+            getTarget(trgLoc).getSegments().append(seg);
+            //TODO consider appending a segment to variant source if present
+        }
+        return seg;
+    }
 
-	/**
-	 * Sets the segments ranges for the source container so it matches the segmentation of a given target content.
-	 * <p>This method does not synchronize the current segmentation of the source with that target.
-	 * Use {@link #synchronizeSourceSegmentation(LocaleId)} for that.
-	 * @param locId the locale to match.
-	 * @param ranges the source segment ranges for matching the segments of that locale. 
-	 */
-	public void setSourceSegmentationForTarget (LocaleId locId,
-		List<Range> ranges)
-	{
-		if ( trgSegRanges == null ) {
-			trgSegRanges = new ConcurrentHashMap<LocaleId, List<Range>>();
-		}
-		trgSegRanges.put(locId, ranges);
-		if ( syncLoc != null ) {
-			if ( syncLoc.equals(locId) ) syncLoc = null;
-		}
-	}
-	
-	/**
-	 * Sets the segmentation in the source content, in a way it matches the segmentation for a given locale.
-	 * You must have called {@link #setSourceSegmentationForTarget(LocaleId, List)} or
-	 * {@link #saveCurrentSourceSegmentation()} before.
-	 * If the given locale has no corresponding segment ranges, the default source segmentation (defined
-	 * when calling {@link #createSourceSegmentation(ISegmenter)}) is used.
-	 * @param locId the locale to synchronize with.
-	 * @see #createSourceSegmentation(ISegmenter)
-	 * @see #setSourceSegmentationForTarget(LocaleId, List)
-	 */
-	public void synchronizeSourceSegmentation (LocaleId locId) {
-		if ( syncLoc != null ) {
-			// Avoid re-segmentation if possible
-			if ( syncLoc.equals(locId) ) return;
-		}
-		List<Range> ranges = null;
-		if ( trgSegRanges != null ) {
-			// Try to get target-corresponding segmentation
-			ranges = trgSegRanges.get(locId);
-		}
-		if ( ranges == null ) {
-			// No target-specific ranges available: use the source
-			ranges = srcSegRanges;
-		}
-		source.getSegments().create(ranges); // Ranges can be null: no segmentation occurs then
-		syncLoc = locId;
-	}
-	
-	/**
-	 * Removes all segmentations (source and targets) in this text unit.
-	 * All entries are converted to non-segmented entries.
-	 */
+    @Override
+    public Set<LocaleId> getTargetLocales () {
+        return targets.keySet();
+    }
+
+
+
+    @Override
+    public String getName () {return name;}
+    @Override
+    public void setName (String name) {this.name = name;}
+
+    @Override
+    public String getType () {return type;}
+    @Override
+    public void setType (String value) {type = value;}
+
+    @Override
+    public String getMimeType () {return mimeType;}
+    @Override
+    public void setMimeType (String mimeType) {this.mimeType = mimeType;}
+
+    @Override
+    public boolean isTranslatable () {return isTranslatable;}
+    @Override
+    public void setIsTranslatable (boolean value) {isTranslatable = value;}
+
+    @Override
+    public boolean preserveWhitespaces () {return preserveWS;}
+    @Override
+    public void setPreserveWhitespaces (boolean value) {preserveWS = value;}
+
+    @Override
+    public String getId () {return id;}
+    @Override
+    public void setId (String id) {this.id = id;}
+
+    @Override
+    public ISkeleton getSkeleton () {return skeleton;}
+    @Override
+    public void setSkeleton (ISkeleton skeleton) {this.skeleton = skeleton;}
+
+    @Override
+    public boolean isReferent () {return (refCount > 0);}
+    @Override
+    public void setIsReferent (boolean value) {refCount = (value ? 1 : 0 );}
+
+    @Override
+    public int getReferenceCount () {return refCount;}
+    @Override
+    public void setReferenceCount (int value) {refCount = value;}
+
+
+
+    @Override
+    public Set<String> getPropertyNames () {
+        if ( properties == null ) properties = new LinkedHashMap<String, Property>();
+        return properties.keySet();
+    }
+
+    @Override
+    public Property getProperty (String name) {
+        if ( properties == null ) return null;
+        return properties.get(name);
+    }
+
+    @Override
+    public Property setProperty (Property property) {
+        if ( properties == null ) properties = new LinkedHashMap<String, Property>();
+        properties.put(property.getName(), property);
+        return property;
+    }
+
+    @Override
+    public void removeProperty (String name) {
+        if ( properties != null ) {
+            properties.remove(name);
+        }
+    }
+
+    @Override
+    public boolean hasProperty (String name) {
+        if ( properties == null ) return false;
+        return properties.containsKey(name);
+    }
+
+
+    @Override
+    public <A extends IAnnotation> A getAnnotation (Class<A> annotationType) {
+        if ( annotations == null ) return null;
+        return annotationType.cast(annotations.get(annotationType) );
+    }
+
+    @Override
+    public void setAnnotation (IAnnotation annotation) {
+        if ( annotations == null ) {
+            annotations = new Annotations();
+        }
+        annotations.set(annotation);
+    }
+
+    @Override
+    public Iterable<IAnnotation> getAnnotations () {
+        if ( annotations == null ) {
+            return Collections.emptyList();
+        }
+        return annotations;
+    }
+
+    @Override
+    public Property getSourceProperty(String name) {
+        return getSource().getProperty(name);
+    }
+
+    //for source of active locale
+    @Override
+    public Property setSourceProperty (Property property) {
+        return getSource().setProperty(property);
+    }
+
+    //for source of active locale
+    @Override
+    public void removeSourceProperty (String name) {
+        getSource().removeProperty(name);
+    }
+
+    //for source of active locale
+    @Override
+    public Set<String> getSourcePropertyNames () {
+        return getSource().getPropertyNames();
+    }
+
+    //for source of active locale
+    @Override
+    public boolean hasSourceProperty (String name) {
+        return getSource().hasProperty(name);
+    }
+
+    @Override
+    public Property getTargetProperty (LocaleId locId, String name) {
+        if ( !hasTarget(locId) ) return null;
+        return getTarget(locId).getProperty(name);
+    }
+
+    @Override
+    public Property setTargetProperty (LocaleId locId, Property property) {
+        return createTarget(locId, false, IResource.COPY_SEGMENTATION).setProperty(property);
+    }
+
+    @Override
+    public void removeTargetProperty (LocaleId locId, String name) {
+        if ( hasTarget(locId) ) {
+        	getTarget(locId).removeProperty(name);
+        }
+    }
+
+    @Override
+    public Set<String> getTargetPropertyNames (LocaleId locId) {
+        if ( hasTarget(locId) ) {
+            return getTarget(locId).getPropertyNames();
+        }
+        return Collections.emptySet();
+    }
+
+    @Override
+    public boolean hasTargetProperty (LocaleId locId, String name) {
+        TextContainer tc = getTarget(locId, false);
+        if ( tc == null ) return false;
+        return (tc.getProperty(name) != null);
+    }
+
+    @Override
+    public Property createTargetProperty (LocaleId locId,
+    	String name,
+        boolean overwriteExisting,
+        int creationOptions)
+    {
+        // Get the target or create an isEmpty one
+        TextContainer tc = createTarget(locId, false, CREATE_EMPTY);
+        // Get the property if it exists
+        Property prop = tc.getProperty(name);
+        // If it does not exists or if we overwrite: create a new one
+        if (( prop == null ) || overwriteExisting ) {
+            // Get the source property
+            prop = getSource(locId).getProperty(name);
+            if ( prop == null ) {
+                // If there is no source, create an isEmpty property
+                return tc.setProperty(new Property(name, "", false));
+            }
+            else { // If there is a source property
+                // Create a copy, isEmpty or not depending on the options
+                if ( creationOptions == CREATE_EMPTY ) {
+                    return tc.setProperty(new Property(name, "", prop.isReadOnly()));
+                }
+                else {
+                    return tc.setProperty(prop.clone());
+                }
+            }
+        }
+        return prop;
+    }
+
+    /**
+     * Gets the string representation of the default source container.
+     * If the container is segmented, the representation shows the merged segments.
+     * Inline codes are also included.
+     *
+     * @return the string representation of the source container.
+     */
+    @Override
+    public String toString () {
+        return getSource().toString();
+    }
+
+    /**
+     * Clones this TextUnit.
+     *
+     * @return A new TextUnit object that is a copy of this one.
+     */
+    @Override
+    public TextUnit clone () {
+        TextUnit tu = new TextUnit(getId());
+        if ( annotations != null ) {
+            tu.setAnnotations(annotations.clone());
+        }
+        tu.setIsReferent(isReferent());
+        tu.setIsTranslatable(isTranslatable);
+        tu.setMimeType(getMimeType());
+        tu.setName(getName());
+        tu.setPreserveWhitespaces(preserveWS);
+        tu.setReferenceCount(getReferenceCount());
+        tu.setSkeleton(getSkeleton());
+        tu.setSource(getSource().clone());
+        tu.setType(getType());
+
+        // Set all variant sources
+        if (hasVariantSources()) {
+            tu.variantSources = this.variantSources.clone();
+            tu.variantSources.setDefaultSource(tu.getSource());
+        }
+
+        // Set all the main level properties
+        if ( properties != null ) {
+            for (Property prop : properties.values()) {
+                tu.setProperty(prop.clone());
+            }
+        }
+
+        // Set all the targets
+        for (Entry<LocaleId, TextContainer> entry : targets.entrySet()) {
+            tu.setTarget(entry.getKey(), entry.getValue().clone());
+        }
+
+        return tu;
+    }
+
+    @Override
 	public void removeAllSegmentations () {
 		// Desegment the source if needed
 		if ( getSource().hasBeenSegmented() ) {
 			getSource().joinAll();
 		}
-		// Remove default source segmentation ranges
-		srcSegRanges = null;
 		
 		// Desegment all targets as needed
 		for ( Entry<LocaleId, TextContainer> entry : targets.entrySet() ) {
@@ -643,20 +558,53 @@ public class TextUnit implements INameable, IReferenceable {
 				entry.getValue().joinAll();
 			}
 		}
-		// Removes all target-specific source segmentations 
-		if ( trgSegRanges != null ) {
-			trgSegRanges.clear();
+		
+		// Remove any source variants
+		if ( hasVariantSources() ) {
+			Set<LocaleId> set = getVariantSources().getLocales();
+			for ( LocaleId loc : set ) {
+				getVariantSources().remove(loc);
+			}
 		}
-		// Re-synch to nothing
-		syncLoc = null;
 	}
 
-	@Override
-	public Iterable<IAnnotation> getAnnotations () {
-		if ( annotations == null ) {
-			return Collections.emptyList();
-		}
-		return annotations;
+    @Override
+	public void createSourceSegmentation (ISegmenter segmenter) {
+		segmenter.computeSegments(getSource());
+		getSource().getSegments().create(segmenter.getRanges());
 	}
+
+    @Override
+	public void createTargetSegmentation (ISegmenter segmenter,
+		LocaleId targetLocale)
+	{
+		TextContainer tc = getTarget(targetLocale, false);
+		if ( tc == null ) {
+			throw new RuntimeException(String.format("There is no target content for '%s'", targetLocale.toString()));
+		}
+		segmenter.computeSegments(tc);
+		tc.getSegments().create(segmenter.getRanges());
+	}
+
+	/**
+     * Used by TextUnit clone method to copy over all annotations at once.
+     *
+     * @param annotations the new annotations to set.
+     */
+    protected void setAnnotations (Annotations annotations) {
+        this.annotations = annotations;
+    }
+
+    /**
+     * Safe method to reassign defaultSource that ensures variantSources is updated
+     * 
+     * @param newDefaultSource the new source to assign to defaultSource
+     */
+    private void setDefaultSource (TextContainer newDefaultSource) {
+        defaultSource = newDefaultSource;
+        if ( variantSources != null ) {
+            variantSources.setDefaultSource(defaultSource);
+        }
+    }
 
 }

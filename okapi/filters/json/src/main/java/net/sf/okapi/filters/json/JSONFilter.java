@@ -49,6 +49,7 @@ import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
@@ -466,7 +467,7 @@ public class JSONFilter implements IFilter {
 		// if was to be extracted.
 		
 		// Create the new text unit
-		TextUnit tu = new TextUnit(String.valueOf(++tuId));
+		ITextUnit tu = new TextUnit(String.valueOf(++tuId));
 		
 		// Create the text and process its inline codes if requested
 		TextFragment tf = new TextFragment(buffer.toString());

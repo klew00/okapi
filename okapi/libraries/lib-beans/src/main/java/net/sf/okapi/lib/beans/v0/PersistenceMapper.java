@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -32,6 +32,7 @@ import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Document;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.InlineAnnotation;
 import net.sf.okapi.common.resource.MultiEvent;
 import net.sf.okapi.common.resource.Property;
@@ -43,7 +44,6 @@ import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TargetPropertiesAnnotation;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonPart;
 import net.sf.okapi.common.skeleton.ZipSkeleton;
@@ -165,7 +165,7 @@ public class PersistenceMapper implements IVersionDriver {
 		
 		// Specific class beans
 		registerBean(Event.class, EventBean.class);
-		registerBean(TextUnit.class, TextUnitBean.class);
+		registerBean(ITextUnit.class, TextUnitBean.class);
 		registerBean(RawDocument.class, RawDocumentBean.class);
 		registerBean(Property.class, PropertyBean.class);
 		registerBean(TextFragment.class, TextFragmentBean.class);

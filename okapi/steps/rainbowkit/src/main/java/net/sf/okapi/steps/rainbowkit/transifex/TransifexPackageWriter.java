@@ -29,7 +29,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.exceptions.OkapiIOException;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.filters.po.POFilterWriter;
 import net.sf.okapi.filters.rainbowkit.Manifest;
 import net.sf.okapi.filters.rainbowkit.MergingInfo;
@@ -227,7 +227,7 @@ public class TransifexPackageWriter extends BasePackageWriter {
 	@Override
 	protected void processTextUnit (Event event) {
 		// Skip non-translatable
-		TextUnit tu = event.getTextUnit();
+		ITextUnit tu = event.getTextUnit();
 		if ( !tu.isTranslatable() ) return;
 		
 		potWriter.handleEvent(event);

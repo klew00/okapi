@@ -1,29 +1,30 @@
 /*===========================================================================
-Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
-This library is free software; you can redistribute it and/or modify it
-under the terms of the GNU Lesser General Public License as published by
-the Free Software Foundation; either version 2.1 of the License, or (at
-your option) any later version.
+  This library is free software; you can redistribute it and/or modify it 
+  under the terms of the GNU Lesser General Public License as published by 
+  the Free Software Foundation; either version 2.1 of the License, or (at 
+  your option) any later version.
 
-This library is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser
-General Public License for more details.
+  This library is distributed in the hope that it will be useful, but 
+  WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  General Public License for more details.
 
-You should have received a copy of the GNU Lesser General Public License
-along with this library; if not, write to the Free Software Foundation,
-Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+  You should have received a copy of the GNU Lesser General Public License 
+  along with this library; if not, write to the Free Software Foundation, 
+  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
-See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
+  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
 package net.sf.okapi.tm.pensieve.common;
 
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.resource.TextUnit;
 
 /**
  * A helper class
@@ -42,10 +43,10 @@ public final class PensieveUtil {
      */
     public static TranslationUnit convertToTranslationUnit (LocaleId sourceLoc,
     	LocaleId targetLoc,
-    	TextUnit textUnit)
+    	ITextUnit textUnit)
     {
         TranslationUnitVariant source = new TranslationUnitVariant(sourceLoc, textUnit.getSource().getFirstContent());
-        TextContainer tc = textUnit.getTarget(targetLoc); // Allow null target content
+        TextContainer tc = textUnit.getTarget(targetLoc, false); // Allow null target content
         TranslationUnitVariant target = new TranslationUnitVariant(targetLoc, (( tc==null ) ? null : tc.getFirstContent()));
         TranslationUnit tu = new TranslationUnit(source, target);
         populateMetaDataFromProperties(textUnit, tu);
@@ -57,8 +58,8 @@ public final class PensieveUtil {
      * @param tu The TranslationUnit to convert.
      * @return The converted TextUnit
      */
-    public static TextUnit convertToTextUnit (TranslationUnit tu) {
-        TextUnit textUnit;
+    public static ITextUnit convertToTextUnit (TranslationUnit tu) {
+        ITextUnit textUnit;
         String tuid = tu.getMetadata().get(MetadataType.ID);
 
         textUnit = new TextUnit(tuid);
@@ -75,9 +76,7 @@ public final class PensieveUtil {
         return textUnit;
     }
 
-
-
-    private static void populateMetaDataFromProperties (TextUnit textUnit,
+    private static void populateMetaDataFromProperties (ITextUnit textUnit,
     	TranslationUnit tu)
     {
         MetadataType mdt;

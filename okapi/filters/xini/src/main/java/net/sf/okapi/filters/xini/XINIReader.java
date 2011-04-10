@@ -45,6 +45,7 @@ import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.filters.xini.jaxb.Element;
@@ -190,7 +191,7 @@ public class XINIReader {
 	private LinkedList<Event> processField(Field field) {
 		LinkedList<Event> events = new LinkedList<Event>();
 
-		TextUnit tu = new TextUnit(field.getExternalID());
+		ITextUnit tu = new TextUnit(field.getExternalID());
 		TextContainer tc = new TextContainer();
 		
 		String emptySegsFlags = field.getEmptySegmentsFlags();

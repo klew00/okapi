@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -25,8 +25,8 @@ import java.util.List;
 
 import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.persistence.IPersistenceSession;
 import net.sf.okapi.lib.persistence.PersistenceBean;
 
@@ -55,13 +55,13 @@ public class AltTranslationsAnnotationBean extends PersistenceBean<AltTranslatio
 		for (AltTranslationBean bean : list) {
 			AltTranslation annot = bean.get(AltTranslation.class, session);
 			
-			TextUnit tunit = annot.getEntry();
+			ITextUnit tunit = annot.getEntry();
 			TextFragment src = null; 
 			TextFragment trg = null;
 			
 			if (tunit != null) {
 				src = tunit.getSource().getSegments().getFirstContent(); 
-				trg = tunit.getTarget(annot.getTargetLocale()).getSegments().getFirstContent();
+				trg = tunit.getTarget(annot.getTargetLocale(), false).getSegments().getFirstContent();
 			}			
 			obj.add(annot.getSourceLocale(), annot.getTargetLocale(), null,	src, trg, 
 					annot.getType(), annot.getScore(), annot.getOrigin());

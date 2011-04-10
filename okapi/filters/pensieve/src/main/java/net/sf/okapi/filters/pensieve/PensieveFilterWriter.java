@@ -30,11 +30,11 @@ import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 import net.sf.okapi.tm.pensieve.common.PensieveUtil;
 import net.sf.okapi.tm.pensieve.common.TranslationUnit;
@@ -143,11 +143,11 @@ public class PensieveFilterWriter implements IFilterWriter {
 	}
 
 	private void handleTextUnit (Event event) {
-		TextUnit tu = (TextUnit) event.getResource();
+		ITextUnit tu = event.getTextUnit();
 		if ( !tu.hasTarget(trgLoc) ) return;
 
 		TextContainer srcCont = tu.getSource();
-		TextContainer trgCont = tu.getTarget(trgLoc);
+		TextContainer trgCont = tu.getTarget(trgLoc, false);
 		
 		// Un-segmented entry get their metadata
 		if ( srcCont.contentIsOneSegment() && trgCont.contentIsOneSegment() ) {

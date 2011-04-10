@@ -68,7 +68,7 @@ import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 public class IDMLFilterWriter implements IFilterWriter {
@@ -283,7 +283,7 @@ public class IDMLFilterWriter implements IFilterWriter {
 		close();
 	}
 
-	private void processTextUnit (TextUnit tu) {
+	private void processTextUnit (ITextUnit tu) {
 		// If it's a referent, just store it for now.
 		// It'll be merged when the inline code with the reference to it is merged
 		if ( tu.isReferent() ) {
@@ -291,18 +291,18 @@ public class IDMLFilterWriter implements IFilterWriter {
 		}
 		else { // Otherwise: merge the text unit now
 			while ( !referents.isEmpty() ) {
-				mergeTextUnit((TextUnit)referents.pop());
+				mergeTextUnit((ITextUnit)referents.pop());
 			}
 			mergeTextUnit(tu);
 		}
 	}
 	
-	private void mergeTextUnit (TextUnit tu) {
+	private void mergeTextUnit (ITextUnit tu) {
 		IDMLSkeleton skel = (IDMLSkeleton)tu.getSkeleton();
 		
 		// Get the target content, or fall back to the source
 		// Make a copy to not change the original in the resource
-		TextContainer tc = tu.getTarget(trgLoc);
+		TextContainer tc = tu.getTarget(trgLoc, false);
 		if ( tc == null ) tc = tu.getSource();
 		TextFragment tf = tc.getUnSegmentedContentCopy();
 		if ( tf.isEmpty() && !tu.getSource().isEmpty() ) {

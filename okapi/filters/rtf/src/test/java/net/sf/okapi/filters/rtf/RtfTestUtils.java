@@ -16,7 +16,7 @@ import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartGroup;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.filters.rtf.RTFFilter;
 
 public class RtfTestUtils {
@@ -37,7 +37,7 @@ public class RtfTestUtils {
 	public static void printEvents(ArrayList<Event> events) {
 		for (Event event : events) {
 			if (event.getEventType() == EventType.TEXT_UNIT) {
-				assertTrue(event.getResource() instanceof TextUnit);
+				assertTrue(event.getResource() instanceof ITextUnit);
 			} else if (event.getEventType() == EventType.DOCUMENT_PART) {
 				assertTrue(event.getResource() instanceof DocumentPart);
 			} else if (event.getEventType() == EventType.START_GROUP || event.getEventType() == EventType.END_GROUP) {
@@ -65,7 +65,7 @@ public class RtfTestUtils {
 			while (filter.hasNext()) {
 				Event event = filter.next();
 				if (event.getEventType() == EventType.TEXT_UNIT) {
-					assertTrue(event.getResource() instanceof TextUnit);
+					assertTrue(event.getResource() instanceof ITextUnit);
 				} else if (event.getEventType() == EventType.DOCUMENT_PART) {
 					assertTrue(event.getResource() instanceof DocumentPart);
 				} else if (event.getEventType() == EventType.START_GROUP || event.getEventType() == EventType.END_GROUP) {

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -41,7 +41,7 @@ import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.filters.mosestext.MosesTextFilter;
 
@@ -156,7 +156,7 @@ public class MergingStep extends BasePipelineStep {
 		}
 	}
 
-	private void processTextUnit (TextUnit tu) {
+	private void processTextUnit (ITextUnit tu) {
 		// Skip same text unit as for extraction
 		if ( !tu.isTranslatable() ) return;
 		
@@ -166,13 +166,13 @@ public class MergingStep extends BasePipelineStep {
 		// Create a target entry with empty segments
 		TextContainer tc;
 		if ( tu.hasTarget(targetLocale) ) {
-			tc = tu.getTarget(targetLocale);
+			tc = tu.getTarget(targetLocale, false);
 		}
 		else { // Create a copy with empty segments
-			tc = tu.createTarget(targetLocale, true, IResource.COPY_CONTENT);
-			for ( Segment seg : tc.getSegments() ) {
-				seg.text = new TextFragment();
-			}
+			tc = tu.createTarget(targetLocale, true, IResource.COPY_SEGMENTATION);
+//			for ( Segment seg : tc.getSegments() ) {
+//				seg.text = new TextFragment();
+//			}
 		}
 
 		// Leverage on the container or on each segment
@@ -236,7 +236,7 @@ public class MergingStep extends BasePipelineStep {
 		}
 		
 		// Retrieve the translated text
-		TextUnit mtu = event.getTextUnit();
+		ITextUnit mtu = event.getTextUnit();
 		TextFragment trgFrag = mtu.getSource().getFirstContent();
 		// Substitute the codes (and complete them if needed)
 		TextUnitUtil.adjustTargetCodes(srcFrag, trgFrag, true, true, null, null);

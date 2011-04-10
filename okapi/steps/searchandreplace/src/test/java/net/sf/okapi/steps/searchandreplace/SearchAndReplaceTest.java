@@ -9,6 +9,7 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.Pipeline;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextUnit;
 
 import org.junit.After;
@@ -64,7 +65,7 @@ public class SearchAndReplaceTest {
 		p.source = true;
 		
 		pipeline.startBatch();
-		TextUnit tu = new TextUnit("1", "{nb}{tab}{em}{en}{emsp}{ensp}");
+		ITextUnit tu = new TextUnit("1", "{nb}{tab}{em}{en}{emsp}{ensp}");
 		tu.createTarget(LocaleId.SPANISH, true, IResource.COPY_ALL);
 		Event e = new Event(EventType.TEXT_UNIT, tu);
 		pipeline.process(e);
@@ -76,7 +77,7 @@ public class SearchAndReplaceTest {
 		assertEquals(EventType.START_BATCH_ITEM, el.remove(0).getEventType());
 		tu = el.get(0).getTextUnit();
 		assertTrue(tu.getSource().getFirstContent().isEmpty());
-		assertEquals("{nb}{tab}{em}{en}{emsp}{ensp}", tu.getTarget(LocaleId.SPANISH).getFirstContent().toString());
+		assertEquals("{nb}{tab}{em}{en}{emsp}{ensp}", tu.getTarget(LocaleId.SPANISH, false).getFirstContent().toString());
 		assertEquals(EventType.TEXT_UNIT, el.remove(0).getEventType());
 		assertEquals(EventType.END_BATCH_ITEM, el.remove(0).getEventType());
 		assertEquals(EventType.END_BATCH, el.remove(0).getEventType());
@@ -104,7 +105,7 @@ public class SearchAndReplaceTest {
 		p.source = true;
 		
 		pipeline.startBatch();
-		TextUnit tu = new TextUnit("1", "{nb}{tab}{em}{en}{emsp}{ensp}");
+		ITextUnit tu = new TextUnit("1", "{nb}{tab}{em}{en}{emsp}{ensp}");
 		tu.createTarget(LocaleId.SPANISH, true, IResource.COPY_ALL);
 		Event e = new Event(EventType.TEXT_UNIT, tu);
 		pipeline.process(e);
@@ -116,7 +117,7 @@ public class SearchAndReplaceTest {
 		assertEquals(EventType.START_BATCH_ITEM, el.remove(0).getEventType());
 		tu = el.get(0).getTextUnit();
 		assertTrue(tu.getSource().getFirstContent().isEmpty());
-		assertEquals("{nb}{tab}{em}{en}{emsp}{ensp}", tu.getTarget(LocaleId.SPANISH).getFirstContent().toString());
+		assertEquals("{nb}{tab}{em}{en}{emsp}{ensp}", tu.getTarget(LocaleId.SPANISH, false).getFirstContent().toString());
 		assertEquals(EventType.TEXT_UNIT, el.remove(0).getEventType());
 		assertEquals(EventType.END_BATCH_ITEM, el.remove(0).getEventType());
 		assertEquals(EventType.END_BATCH, el.remove(0).getEventType());
@@ -138,7 +139,7 @@ public class SearchAndReplaceTest {
 		p.source = true;
 		
 		pipeline.startBatch();
-		TextUnit tu = new TextUnit("1", "{nb}{tab}{em}{en}{emsp}{ensp}");		
+		ITextUnit tu = new TextUnit("1", "{nb}{tab}{em}{en}{emsp}{ensp}");		
 		Event e = new Event(EventType.TEXT_UNIT, tu);
 		pipeline.process(e);
 		pipeline.endBatch();
@@ -168,7 +169,7 @@ public class SearchAndReplaceTest {
 		p.addRule(pattern);
 				
 		pipeline.startBatch();
-		TextUnit tu = new TextUnit("1", "{nb}{tab}{em}{en}{emsp}{ensp}");
+		ITextUnit tu = new TextUnit("1", "{nb}{tab}{em}{en}{emsp}{ensp}");
 		tu.createTarget(LocaleId.SPANISH, true, IResource.COPY_ALL);
 		Event e = new Event(EventType.TEXT_UNIT, tu);
 		pipeline.process(e);
@@ -180,7 +181,7 @@ public class SearchAndReplaceTest {
 		assertEquals(EventType.START_BATCH_ITEM, el.remove(0).getEventType());
 		tu = el.get(0).getTextUnit();
 		assertEquals("{nb}{tab}{em}{en}{emsp}{ensp}", tu.getSource().getFirstContent().toString());
-		assertTrue(tu.getTarget(LocaleId.SPANISH).getFirstContent().isEmpty());
+		assertTrue(tu.getTarget(LocaleId.SPANISH, false).getFirstContent().isEmpty());
 		assertEquals(EventType.TEXT_UNIT, el.remove(0).getEventType());
 		assertEquals(EventType.END_BATCH_ITEM, el.remove(0).getEventType());
 		assertEquals(EventType.END_BATCH, el.remove(0).getEventType());

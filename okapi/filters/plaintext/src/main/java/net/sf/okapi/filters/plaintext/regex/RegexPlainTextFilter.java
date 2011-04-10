@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -33,7 +33,7 @@ import net.sf.okapi.common.exceptions.OkapiIllegalFilterOperationException;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 import net.sf.okapi.filters.regex.RegexFilter;
 import net.sf.okapi.filters.regex.Rule;
@@ -197,10 +197,10 @@ public class RegexPlainTextFilter extends AbstractBaseFilter {
 		
 		if (event.getEventType() == EventType.TEXT_UNIT) {		
 			// Change mime type
-			if (res instanceof TextUnit) ((TextUnit) res).setMimeType(this.getMimeType());
+			if (res instanceof ITextUnit) ((ITextUnit)res).setMimeType(this.getMimeType());
 			
 			// Lines are what the regex considers the lines, so line numbering is actually TU numbering 
-			((TextUnit) res).setSourceProperty(new Property(AbstractLineFilter.LINE_NUMBER, String.valueOf(++lineNumber), true));
+			((ITextUnit)res).setSourceProperty(new Property(AbstractLineFilter.LINE_NUMBER, String.valueOf(++lineNumber), true));
 		}
 				
 		return event;

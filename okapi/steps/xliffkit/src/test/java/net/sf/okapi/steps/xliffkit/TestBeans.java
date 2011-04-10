@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -32,8 +32,8 @@ import java.io.OutputStream;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.BaseNameable;
 import net.sf.okapi.common.resource.BaseReferenceable;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.lib.persistence.IPersistenceBean;
@@ -85,14 +85,14 @@ public class TestBeans {
 		outF.deleteOnExit();
 		OutputStream outStream = new FileOutputStream(outF);
 				
-		TextUnit tu1 = TextUnitUtil.buildTU("source-text1" + (char) 2 + '"' + " : " + '"' + 
+		ITextUnit tu1 = TextUnitUtil.buildTU("source-text1" + (char) 2 + '"' + " : " + '"' + 
 				'{' + '"' + "ssssss " + ':' + '"' + "ddddd" + "}:" + '<' + '>' + "sssddd: <>dsdd");
 		tu1.setSkeleton(new GenericSkeleton());
 		tu1.setTarget(LocaleId.FRENCH, new TextContainer("french-text1"));
 		tu1.setTarget(LocaleId.TAIWAN_CHINESE, new TextContainer("chinese-text1"));
 		
 		OkapiJsonSession session = new OkapiJsonSession();		
-		IPersistenceBean<TextUnit> tuBean = session.createBean(TextUnit.class);
+		IPersistenceBean<ITextUnit> tuBean = session.createBean(ITextUnit.class);
 		
 		os.writeObject(tuBean);
 		

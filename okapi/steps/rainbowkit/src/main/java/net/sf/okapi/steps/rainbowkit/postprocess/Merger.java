@@ -37,7 +37,7 @@ import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.filters.rainbowkit.Manifest;
 import net.sf.okapi.filters.rainbowkit.MergingInfo;
@@ -124,7 +124,7 @@ public class Merger {
 	
 	private void processTextUnit (Event event) {
 		// Get the unit from the translation file
-		TextUnit traTu = event.getTextUnit();
+		ITextUnit traTu = event.getTextUnit();
 		// If it's not translatable:
 		if ( !traTu.isTranslatable() ) {
 			return; // Do nothing: the original will be handled by processUntilTextUnit()
@@ -137,7 +137,7 @@ public class Merger {
 			return;
 		}
 		// Get the actual trans-unit object of the original
-		TextUnit oriTu = oriEvent.getTextUnit();
+		ITextUnit oriTu = oriEvent.getTextUnit();
 
 		// Check the IDs
 		if ( !traTu.getId().equals(oriTu.getId()) ) {
@@ -147,7 +147,7 @@ public class Merger {
 		}
 		
 		// Check if we have a translation
-		TextContainer trgTraCont = traTu.getTarget(trgLoc);
+		TextContainer trgTraCont = traTu.getTarget(trgLoc, false);
 		if ( trgTraCont == null ) {
 			LOGGER.warning(String.format("No translation found for TU id='%s'. Using source.", traTu.getId()));
 			writer.handleEvent(oriEvent); // Use the source
@@ -228,7 +228,7 @@ public class Merger {
 		while ( filter.hasNext() ) {
 			Event event = filter.next();
 			if ( event.getEventType() == EventType.TEXT_UNIT ) {
-				TextUnit tu = event.getTextUnit();
+				ITextUnit tu = event.getTextUnit();
 				if ( !tu.isTranslatable() ) {
 					// Do not merge the translation for non-translatable
 					writer.handleEvent(event);

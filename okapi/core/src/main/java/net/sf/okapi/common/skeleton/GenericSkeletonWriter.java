@@ -47,7 +47,7 @@ import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextPart;
-import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.ITextUnit;
 
 /**
  * Implements ISkeletonWriter for the GenericSkeleton skeleton. 
@@ -190,7 +190,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	}
 	
 	@Override
-	public String processTextUnit (TextUnit resource) {
+	public String processTextUnit (ITextUnit resource) {
 		if ( resource.isReferent() ) {
 			referents.put(resource.getId(), new Referent(resource, referentCopies));
 			return "";
@@ -251,17 +251,20 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		if ( propName != null ) { // Reference to the content of the referent
 			if (Segment.REF_MARKER.equals(propName)) {
 				String segId = (String) marker[0];
-				TextUnit tu = (TextUnit) part.getParent();
+				ITextUnit tu = (ITextUnit)part.getParent();
 				LocaleId locId = part.getLocale();
 				TextContainer tc = null;
 				
-				if (locId == null) { // source
+				if ( locId == null ) { // Source
 					tc = tu.getSource();
 				}
-				else {
-					tc = tu.getTarget(locId);
+				else { // Target
+					tc = tu.getTarget(locId, false);
 				}
-				Segment seg = tc.getSegments().get(segId);
+				Segment seg = null;
+				if ( tc != null ) {
+					seg = tc.getSegments().get(segId);
+				}
 				if (seg == null) {
 					logger.warning(String.format("Segment reference '%s' not found.", (String)marker[0]));
 					return "-ERR:INVALID-SEGMENT-REF-";
@@ -286,8 +289,8 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		// If a parent if set, it's a reference to the content of the resource
 		// holding this skeleton. And it's always a TextUnit
 		if ( part.parent != null ) {
-			if ( part.parent instanceof TextUnit ) {
-				return getContent((TextUnit)part.parent, locToUse, contextToUse);
+			if ( part.parent instanceof ITextUnit ) {
+				return getContent((ITextUnit)part.parent, locToUse, contextToUse);
 			}
 			else {
 				throw new RuntimeException("The self-reference to this skeleton part must be a text-unit.");
@@ -300,8 +303,8 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			logger.warning(String.format("Reference '%s' not found.", (String)marker[0]));
 			return "-ERR:REF-NOT-FOUND-";
 		}
-		if ( ref instanceof TextUnit ) {
-			return getString((TextUnit)ref, locToUse, contextToUse); //TODO: Test locToUse
+		if ( ref instanceof ITextUnit ) {
+			return getString((ITextUnit)ref, locToUse, contextToUse); //TODO: Test locToUse
 		}
 		if ( ref instanceof GenericSkeletonPart ) {
 			return getString((GenericSkeletonPart)ref, contextToUse);
@@ -325,8 +328,8 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		if ( propName != null ) {
 			return getPropertyValue((INameable)ref, propName, locToUse, context);
 		}
-		if ( ref instanceof TextUnit ) {
-			return getString((TextUnit)ref, locToUse, context);
+		if ( ref instanceof ITextUnit ) {
+			return getString((ITextUnit)ref, locToUse, context);
 		}
 		if ( ref instanceof DocumentPart ) {
 			return getString((GenericSkeleton)((IResource)ref).getSkeleton(), context);
@@ -346,7 +349,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	 * @param context Context flag: 0=text, 1=skeleton, 2=in-line.
 	 * @return The string representation of the text unit. 
 	 */
-	protected String getString (TextUnit tu,
+	protected String getString (ITextUnit tu,
 		LocaleId locToUse,
 		int context)
 	{
@@ -371,7 +374,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	 * @param context Context flag: 0=text, 1=skeleton, 2=inline.
 	 * @return The string representation of the text unit content.
 	 */
-	protected String getContent (TextUnit tu,
+	protected String getContent (ITextUnit tu,
 		LocaleId locToUse,
 		int context)
 	{
@@ -384,7 +387,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		TextContainer srcCont = tu.getSource();
 		TextContainer trgCont = null;
 		if ( locToUse != null ) { // Expects a target output
-			trgCont = tu.getTarget(locToUse);
+			trgCont = tu.getTarget(locToUse, false);
 			// If we do not have target
 			// or if the target is empty (regardless the source)
 			if (( trgCont == null ) || trgCont.isEmpty() ) {
@@ -943,8 +946,8 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 				tmp.replace(start, end,
 					getPropertyValue((INameable)ref, propName, locToUse, 2));
 			}
-			else if ( ref instanceof TextUnit ) {
-				tmp.replace(start, end, getString((TextUnit)ref, locToUse, 2));
+			else if ( ref instanceof ITextUnit ) {
+				tmp.replace(start, end, getString((ITextUnit)ref, locToUse, 2));
 			}
 			else if ( ref instanceof GenericSkeletonPart ) {
 				tmp.replace(start, end, getString((GenericSkeletonPart)ref, 2));
@@ -968,8 +971,8 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		tmp.append(getString((GenericSkeleton)list.getSkeleton(), context));		
 		// Then treat the list itself
 		for ( IResource res : list ) {
-			if ( res instanceof TextUnit ) {
-				tmp.append(getString((TextUnit)res, locToUse, context));
+			if ( res instanceof ITextUnit ) {
+				tmp.append(getString((ITextUnit)res, locToUse, context));
 			}
 			else if ( res instanceof StorageList ) {
 				tmp.append(getString((StorageList)res, locToUse, context));
@@ -1057,8 +1060,8 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			if ( resource != null ) {
 				switch( event.getEventType() ) {
 				case TEXT_UNIT:
-					if ( ((TextUnit)resource).isReferent() ) {
-						referents.put(resource.getId(), new Referent((TextUnit)resource, referentCopies));
+					if ( ((ITextUnit)resource).isReferent() ) {
+						referents.put(resource.getId(), new Referent((ITextUnit)resource, referentCopies));
 					}
 					break;
 				case DOCUMENT_PART:

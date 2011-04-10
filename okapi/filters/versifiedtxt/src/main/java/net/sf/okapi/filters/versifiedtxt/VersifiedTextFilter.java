@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -37,8 +37,8 @@ import net.sf.okapi.common.filters.EventBuilder;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 
 /**
@@ -275,7 +275,7 @@ public class VersifiedTextFilter extends AbstractFilter {
 			eventBuilder.addToTextUnit(v);
 		}
 
-		TextUnit tu = eventBuilder.peekMostRecentTextUnit();
+		ITextUnit tu = eventBuilder.peekMostRecentTextUnit();
 		tu.setName(currentBook + ":" + currentChapter + ":" + verseNumber);
 		eventBuilder.endTextUnit();
 	}

@@ -20,10 +20,10 @@ import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.LocaleId;
 
@@ -128,7 +128,7 @@ public class PropertyXmlExtractionComparisionTest {
 						xmlStreamFilter.getEncoderManager(), (StartDocument) event.getResource());
 				break;
 			case TEXT_UNIT:
-				TextUnit tu = (TextUnit) event.getResource();
+				ITextUnit tu = event.getTextUnit();
 				tmp.append(writer.processTextUnit(tu));
 				break;
 			case DOCUMENT_PART:

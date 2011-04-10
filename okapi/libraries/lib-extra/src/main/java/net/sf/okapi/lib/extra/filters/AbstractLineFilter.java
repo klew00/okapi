@@ -40,11 +40,11 @@ import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
@@ -276,12 +276,12 @@ public abstract class AbstractLineFilter extends AbstractBaseFilter {
 //		return event;
 //	}
 	
-	protected TextUnit getFirstTextUnit() {
+	protected ITextUnit getFirstTextUnit() {
 		
 		for (Event event : queue) {
 			
 			if (event.getEventType() == EventType.TEXT_UNIT)
-				return (TextUnit) event.getResource();
+				return event.getTextUnit();
 		}
 		
 		return null;

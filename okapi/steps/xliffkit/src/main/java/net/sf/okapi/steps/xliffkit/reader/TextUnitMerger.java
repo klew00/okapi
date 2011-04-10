@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -30,9 +30,9 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.Range;
 import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextUnit;
 
 public class TextUnitMerger {
 	
@@ -42,7 +42,7 @@ public class TextUnitMerger {
 	private boolean updateApprovedFlag;
 	private LocaleId trgLoc;
 
-	public void mergeTargets(TextUnit tu, TextUnit tuFromTrans) {		
+	public void mergeTargets(ITextUnit tu, ITextUnit tuFromTrans) {		
 		// Skip the non-translatable
 		// This means the translate attributes must be the same
 		// in the original and the merging files
@@ -78,7 +78,7 @@ public class TextUnitMerger {
 		}
 
 		// Get the translated target
-		TextContainer fromTrans = tuFromTrans.getTarget(trgLoc);
+		TextContainer fromTrans = tuFromTrans.getTarget(trgLoc, false);
 		if ( fromTrans == null ) {
 			if ( tuFromTrans.getSource().isEmpty() ) return;
 			// Else: Missing target in the XLIFF
@@ -102,7 +102,7 @@ public class TextUnitMerger {
 		List<Range> srcRanges = null;
 		if ( mergeAsSegments ) {
 			ranges = new ArrayList<Range>();
-			srcRanges = tuFromTrans.saveCurrentSourceSegmentation();
+			srcRanges = tuFromTrans.getSourceSegments().getRanges(); //.saveCurrentSourceSegmentation();
 		}
 		if ( !fromTrans.contentIsOneSegment() ) {
 			fromTrans.getSegments().joinAll(ranges);
@@ -144,8 +144,9 @@ public class TextUnitMerger {
 			// Re-set the ranges on the translated entry
 			if ( mergeAsSegments ) {
 				trgCont.getSegments().create(ranges);
-				tu.setSourceSegmentationForTarget(trgLoc, srcRanges);
-				tu.synchronizeSourceSegmentation(trgLoc);
+				tu.getSource().getSegments().create(srcRanges);
+				//tu.setSourceSegmentationForTarget(trgLoc, srcRanges);
+				//tu.synchronizeSourceSegmentation(trgLoc);
 			}
 		}
 		catch ( RuntimeException e ) {
@@ -163,7 +164,7 @@ public class TextUnitMerger {
 	 */
 	private List<Code> transferCodes (TextContainer fromTrans,
 		TextContainer srcCont, // Can be a clone of the original content
-		TextUnit tu)
+		ITextUnit tu)
 	{
 		List<Code> transCodes = fromTrans.getFirstContent().getCodes();
 		List<Code> oriCodes = srcCont.getFirstContent().getCodes();

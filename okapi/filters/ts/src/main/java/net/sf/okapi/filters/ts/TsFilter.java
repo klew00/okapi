@@ -64,6 +64,7 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.INameable;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
@@ -589,8 +590,9 @@ public class TsFilter implements IFilter {
 
 						return true;
 
-					}else{
-						TextUnit tu = generateTu();
+					}
+					else{
+						ITextUnit tu = generateTu();
 						queue.add(new Event(EventType.TEXT_UNIT, tu));
 						eventList.clear();
 						ts.reset();
@@ -825,12 +827,12 @@ public class TsFilter implements IFilter {
 	}
 	
 			
-	TextUnit generateTu(){
+	ITextUnit generateTu(){
 		
 		boolean nextIsSkippableEmpty = false;
 		
 		skel = new GenericSkeleton();
-		TextUnit tu = new TextUnit(String.valueOf(++ts.tuId));
+		ITextUnit tu = new TextUnit(String.valueOf(++ts.tuId));
 		
 		for(XMLEvent event: eventList){
 			
@@ -914,17 +916,16 @@ public class TsFilter implements IFilter {
 					}
 				}
 				
-			}else if(event.getEventType() == XMLEvent.CHARACTERS){
-				
+			}
+			else if(event.getEventType() == XMLEvent.CHARACTERS){
 				Characters chars = event.asCharacters();
 				procCharacters(chars, tu);
-
 			}
 		}
 
 		if ( params.useCodeFinder ) {
 			params.codeFinder.process(tu.getSource().getFirstContent());
-			params.codeFinder.process(tu.getTarget(trgLang).getFirstContent());
+			params.codeFinder.process(tu.getTarget(trgLang, false).getFirstContent());
 			//TODO: new codes may need to be escaped!!!
 		}
 		
@@ -946,7 +947,7 @@ public class TsFilter implements IFilter {
 		TextFragment source = new TextFragment();
 		StartGroup sg = new StartGroup(null,ts.otherId.createId());
 		Ending end = new Ending(ts.otherId.createId());
-		TextUnit tf_target = null; 
+		ITextUnit tf_target = null; 
 		
 		int numerus_counter = 0;
 		
@@ -996,7 +997,7 @@ public class TsFilter implements IFilter {
 					addStartElemToSkel(startElem);
 					tf_target = new TextUnit(String.valueOf(++ts.tuId));
 					tf_target.setSourceContent(source);
-					tf_target.createTarget(trgLang, false, TextUnit.CREATE_EMPTY);
+					tf_target.createTarget(trgLang, false, IResource.CREATE_EMPTY);
 					
 				}
 				else if ( startElemName.equals("lengthvariant") ){
@@ -1052,7 +1053,7 @@ public class TsFilter implements IFilter {
 					if ( params.useCodeFinder ) {
 						// We can use getFirstPartContent() because nothing is segmented
 						params.codeFinder.process(tf_target.getSource().getFirstContent());
-						params.codeFinder.process(tf_target.getTarget(trgLang).getFirstContent());
+						params.codeFinder.process(tf_target.getTarget(trgLang, false).getFirstContent());
 						//TODO: new codes may need to be escaped!!!
 					}
 					
@@ -1085,7 +1086,7 @@ public class TsFilter implements IFilter {
 					procCharacters(chars);
 				}
 				else if ( ts.currentMessageLocation == MessageLocation.TARGET ) {
-					TextContainer tc = tf_target.getTarget(trgLang);
+					TextContainer tc = tf_target.getTarget(trgLang, false);
 					if ( !tc.hasText() ) {
 						skel.addContentPlaceholder(tf_target, trgLang);	
 					}
@@ -1100,7 +1101,7 @@ public class TsFilter implements IFilter {
 		skel = new GenericSkeleton();
 	}
 	
-	private void addTargetSection(TextUnit tu) {
+	private void addTargetSection(ITextUnit tu) {
 		skel.append(lineBreak);
 		skel.append("<translation");
 		skel.addValuePlaceholder(tu, Property.APPROVED, trgLang);
@@ -1170,7 +1171,7 @@ public class TsFilter implements IFilter {
 	}
 
 	private void procCharacters (Characters chars,
-		TextUnit tu)
+		ITextUnit tu)
 	{
 		if ( ts.currentMessageLocation == MessageLocation.RESOURCE ) {
 			procCharacters(chars);
@@ -1184,7 +1185,7 @@ public class TsFilter implements IFilter {
 			tc.getFirstContent().append(chars.getData());
 		}
 		else if ( ts.currentMessageLocation == MessageLocation.TARGET ) {
-			TextContainer tc = tu.getTarget(trgLang);
+			TextContainer tc = tu.getTarget(trgLang, false);
 			if ( !tc.hasText() ) {
 				skel.addContentPlaceholder(tu, trgLang);	
 			}
@@ -1236,15 +1237,19 @@ public class TsFilter implements IFilter {
 	private void procStartElemTS(StartElement startElement, IResource resource) {
 		addStartElemToSkelAddProps(startElement, resource);
 	}
+	
 	private void procStartElemContext(StartElement startElement, IResource resource) {
 		addStartElemToSkelAddProps(startElement, resource);
 	}
+	
 	private void procStartElemMessage(StartElement startElement, IResource resource) {
 		addStartElemToSkelAddProps(startElement, resource);
 	}
-	private void procStartElemSource(StartElement startElement, TextUnit tu) {
+	
+	private void procStartElemSource(StartElement startElement, ITextUnit tu) {
 		addStartElemToSkel(startElement);
 	}
+	
 	@SuppressWarnings("unchecked")
 	private void procStartElemTarget(StartElement startElement, IResource resource) {
 
@@ -1296,8 +1301,8 @@ public class TsFilter implements IFilter {
 				((DocumentPart) resource).setProperty(prop);
 			}else if (resource instanceof StartGroup) {
 				((StartGroup) resource).setProperty(prop);
-			}else if (resource instanceof TextUnit) {
-				((TextUnit) resource).setProperty(prop);
+			}else if (resource instanceof ITextUnit) {
+				((ITextUnit)resource).setProperty(prop);
 			}
 		}
 		skel.append(">");
@@ -1317,7 +1322,7 @@ public class TsFilter implements IFilter {
 	
 	@SuppressWarnings("unchecked")
 	private void procStartElemAddToTuContent (StartElement startElement,
-		TextUnit tu)
+		ITextUnit tu)
 	{
 		StringBuilder sb = new StringBuilder();
 		
@@ -1338,7 +1343,7 @@ public class TsFilter implements IFilter {
 			tc.getFirstContent().append(sb.toString());
 		}
 		else if ( ts.currentMessageLocation == MessageLocation.TARGET ) {
-			TextContainer tc = tu.getTarget(trgLang);
+			TextContainer tc = tu.getTarget(trgLang, false);
 			if ( !tc.hasText() ) {
 				skel.addContentPlaceholder(tu, trgLang);	
 			}
@@ -1348,7 +1353,7 @@ public class TsFilter implements IFilter {
 	}
 	
 	private void procEndElemAddToTuContent(EndElement endElement,
-		TextUnit tu)
+		ITextUnit tu)
 	{
 		StringBuilder sb = new StringBuilder();
 		sb.append("</"+endElement.getName().getLocalPart()+">");
@@ -1361,7 +1366,7 @@ public class TsFilter implements IFilter {
 			tc.getFirstContent().append(sb.toString());
 		}
 		else if ( ts.currentMessageLocation == MessageLocation.TARGET ) {
-			TextContainer tc = tu.getTarget(trgLang);
+			TextContainer tc = tu.getTarget(trgLang, false);
 			if ( !tc.hasText() ) {
 				skel.addContentPlaceholder(tu, trgLang);	
 			}
@@ -1399,7 +1404,7 @@ public class TsFilter implements IFilter {
 	 * @param tu The tu whose TextContainer to populate if needed.
 	 */
 	private void procStartElemByte (StartElement elem,
-		TextUnit tu)
+		ITextUnit tu)
 	{
 		Attribute attr = elem.getAttributeByName(new QName("value"));
 		if ( ts.currentMessageLocation == MessageLocation.RESOURCE ) {
@@ -1422,7 +1427,7 @@ public class TsFilter implements IFilter {
 			}
 		}
 		else if ( ts.currentMessageLocation == MessageLocation.TARGET ) {
-			TextContainer tc = tu.getTarget(trgLang);
+			TextContainer tc = tu.getTarget(trgLang, false);
 			//--This segment adds a tu placeholder assuming this is the first content that is added to the container
 			if ( !tc.hasText() ) {
 				skel.addContentPlaceholder(tu,trgLang);	
