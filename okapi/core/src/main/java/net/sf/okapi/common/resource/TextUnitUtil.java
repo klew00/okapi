@@ -972,7 +972,7 @@ public class TextUnitUtil {
 	}
 	
 	/**
-	 * Simplifies all possible tags in the source part of a given text unit resource.
+	 * Simplifies all possible tags in the source part of a given un-segmented text unit resource.
 	 * @param textUnit the given text unit
 	 * @param removeLeadingTrailingCodes true to remove leading and/or trailing codes
 	 * of the source part and place their text in the skeleton.
