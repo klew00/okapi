@@ -40,7 +40,7 @@
 		<module>uriconversion</module>
 		<module>wordcount</module>
         <module>xsltransform</module>
-<!-- tmporary, to pass other tests		<module>xliffkit</module> -->
+		<module>xliffkit</module>
 		<module>xliffsplitter</module>
 		<module>idbasedaligner</module>
 		<module>xmlvalidation</module>
