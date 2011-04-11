@@ -994,13 +994,13 @@ public class TextUnitUtil {
 		String[] res = simplifier.simplifyAll(tf, removeLeadingTrailingCodes);
 		textUnit.setSourceContent(tf);
 		
-		if (removeLeadingTrailingCodes) {
+		if (removeLeadingTrailingCodes && res != null) {
 			GenericSkeleton tuSkel = TextUnitUtil.forceSkeleton(textUnit);
 			GenericSkeleton skel = new GenericSkeleton();
 			
-			if (res != null) skel.add(res[0]);
+			skel.add(res[0]);
 			skel.addContentPlaceholder(textUnit);
-			if (res != null) skel.add(res[1]);
+			skel.add(res[1]);
 		
 			int index = SkeletonUtil.findTuRefInSkeleton(tuSkel);
 			if (index != -1)
