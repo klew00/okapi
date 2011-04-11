@@ -970,6 +970,45 @@ public class TextUnitUtil {
 				tuSkel.add(skel);
 		}
 	}
+	
+	/**
+	 * Simplifies all possible tags in the source part of a given text unit resource.
+	 * @param textUnit the given text unit
+	 * @param removeLeadingTrailingCodes true to remove leading and/or trailing codes
+	 * of the source part and place their text in the skeleton.
+	 */
+	public static void simplifyCodes (ITextUnit textUnit, boolean removeLeadingTrailingCodes) {
+		if (textUnit == null) {
+			LOGGER.warning("Text unit is null.");
+			return;
+		}
+		
+		// Only un-segmented text units are allowed
+		if (textUnit.getSource().hasBeenSegmented()) {
+			LOGGER.warning(String.format("Text unit %s is segmented, cannot process.", textUnit.getId()));
+			return;
+		}
+		
+		TextFragment tf = textUnit.getSource().getUnSegmentedContentCopy();  
+		CodeSimplifier simplifier = new CodeSimplifier();
+		String[] res = simplifier.simplifyAll(tf, removeLeadingTrailingCodes);
+		textUnit.setSourceContent(tf);
+		
+		if (removeLeadingTrailingCodes) {
+			GenericSkeleton tuSkel = TextUnitUtil.forceSkeleton(textUnit);
+			GenericSkeleton skel = new GenericSkeleton();
+			
+			skel.add(res[0]);
+			skel.addContentPlaceholder(textUnit);
+			skel.add(res[1]);
+		
+			int index = SkeletonUtil.findTuRefInSkeleton(tuSkel);
+			if (index != -1)
+				SkeletonUtil.replaceSkeletonPart(tuSkel, index, skel);
+			else
+				tuSkel.add(skel);
+		}		
+	}
 
 	/**
 	 * Removes from the source part of a given text unit resource qualifiers (quotation marks etc.) around text.

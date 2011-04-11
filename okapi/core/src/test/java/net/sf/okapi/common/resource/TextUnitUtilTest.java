@@ -352,6 +352,31 @@ public class TextUnitUtilTest {
 		assertEquals("})))", parts.get(3).toString());
 		assertEquals("\"", parts.get(4).toString());
 	}
+	
+	@Test
+	public void testSimplifyCodes() {
+		TextFragment tf = new TextFragment();
+		tf.append(TagType.PLACEHOLDER, "x1", "<x1/>");
+		tf.append("T1");
+		tf.append(TagType.PLACEHOLDER, "x2", "<x2/>");
+		
+		TextUnit tu = new TextUnit("tu1");
+		tu.setSourceContent(tf);
+		
+		assertEquals("<x1/>T1<x2/>", tu.getSource().toString());		
+		TextUnitUtil.simplifyCodes(tu, true);		
+		assertEquals("T1", tu.getSource().toString());
+		
+		GenericSkeleton tuSkel = (GenericSkeleton) tu.getSkeleton();
+		assertNotNull(tuSkel);
+		List<GenericSkeletonPart> parts = tuSkel.getParts();
+		assertEquals(3, parts.size());
+		
+		assertEquals("<x1/>", parts.get(0).toString());		
+		String tuRef = TextFragment.makeRefMarker("$self$");
+		assertEquals(tuRef, parts.get(1).toString());
+		assertEquals("<x2/>", parts.get(2).toString());
+	}
 
 //	@Test
 //	public void testCreateBilingualTextUnit4() {
