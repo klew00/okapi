@@ -998,9 +998,9 @@ public class TextUnitUtil {
 			GenericSkeleton tuSkel = TextUnitUtil.forceSkeleton(textUnit);
 			GenericSkeleton skel = new GenericSkeleton();
 			
-			skel.add(res[0]);
+			if (res != null) skel.add(res[0]);
 			skel.addContentPlaceholder(textUnit);
-			skel.add(res[1]);
+			if (res != null) skel.add(res[1]);
 		
 			int index = SkeletonUtil.findTuRefInSkeleton(tuSkel);
 			if (index != -1)
