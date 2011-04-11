@@ -40,7 +40,7 @@ public class CodeSimplifierTest {
 	}
 
 	@Test
-	public void testCodeReduction1 () {		
+	public void testCodeReduction01 () {		
 		TextFragment tf = new TextFragment();
 		tf.append(TagType.OPENING, "a", "<a>");
 		tf.append(TagType.OPENING, "b", "<b>");
@@ -48,7 +48,7 @@ public class CodeSimplifierTest {
 		tf.append(TagType.CLOSING, "b", "</b>");
 		tf.append(TagType.CLOSING, "a", "</a>");
 
-		assertEquals("<1><2>T1</2></1>", fmt.setContent(tf).toString());
+			assertEquals("<1><2>T1</2></1>", fmt.setContent(tf).toString());
 		// 1 + 2 -> 1
 		// /2 + /1 -> /1
 		simplifier.simplifyAll(tf, false);		
@@ -56,7 +56,7 @@ public class CodeSimplifierTest {
 	}
 
 	@Test
-	public void testCodeReduction2 () {
+	public void testCodeReduction02 () {
 		TextFragment tf = new TextFragment();
 		tf.append(TagType.OPENING, "a", "<a>");
 		tf.append(TagType.PLACEHOLDER, "x", "<x/>");
@@ -65,7 +65,7 @@ public class CodeSimplifierTest {
 		tf.append(TagType.CLOSING, "b", "</b>");
 		tf.append(TagType.CLOSING, "a", "</a>");
 		
-		assertEquals("<1><2/><3>T1</3></1>", fmt.setContent(tf).toString());
+			assertEquals("<1><2/><3>T1</3></1>", fmt.setContent(tf).toString());
 		// 1 + 2/ + 3 -> 1
 		// /3 + /1 -> /1
 		simplifier.simplifyAll(tf, false);		
@@ -73,7 +73,7 @@ public class CodeSimplifierTest {
 	}
 
 	@Test
-	public void testCodeReduction3 () {
+	public void testCodeReduction03 () {
 		TextFragment tf = new TextFragment();
 		tf.append(TagType.OPENING, "a", "<a>");
 		tf.append(TagType.PLACEHOLDER, "x1", "<x1/>");
@@ -83,7 +83,7 @@ public class CodeSimplifierTest {
 		tf.append(TagType.PLACEHOLDER, "x2", "<x2/>");
 		tf.append(TagType.CLOSING, "a", "</a>");
 		
-		assertEquals("<1><2/><3>T1</3><4/></1>", fmt.setContent(tf).toString());
+			assertEquals("<1><2/><3>T1</3><4/></1>", fmt.setContent(tf).toString());
 		// 1 + 2/ + 3 -> 1
 		// /3 + 4/ + /1 -> /1 
 		simplifier.simplifyAll(tf, false);
@@ -91,7 +91,7 @@ public class CodeSimplifierTest {
 	}
 
 	@Test
-	public void testCodeReduction4 () {
+	public void testCodeReduction04 () {
 		TextFragment tf = new TextFragment();
 		tf.append(TagType.OPENING, "a", "<a>");
 		tf.append(TagType.PLACEHOLDER, "x1", "<x1/>");
@@ -101,7 +101,7 @@ public class CodeSimplifierTest {
 		tf.append("T2");
 		tf.append(TagType.CLOSING, "a", "</a>");
 
-		assertEquals("<1><2/><3>T1</3>T2</1>", fmt.setContent(tf).toString());
+			assertEquals("<1><2/><3>T1</3>T2</1>", fmt.setContent(tf).toString());
 		// 1 + 2/ -> 1
 		// 3 -> 2
 		// /3 -> /2
@@ -111,7 +111,7 @@ public class CodeSimplifierTest {
 	}
 
 	@Test
-	public void testCodeReduction5 () {
+	public void testCodeReduction05 () {
 		TextFragment tf = new TextFragment();
 		tf.append(TagType.OPENING, "a", "<a>");
 		tf.append(TagType.OPENING, "b", "<b>");
@@ -122,7 +122,7 @@ public class CodeSimplifierTest {
 		tf.append("T2");
 		tf.append(TagType.CLOSING, "a", "</a>");
 
-		assertEquals("<1><2><3>T1</3></2>T2</1>", fmt.setContent(tf).toString());
+			assertEquals("<1><2><3>T1</3></2>T2</1>", fmt.setContent(tf).toString());
 		// 1 -> 1
 		// 2 + 3 -> 2
 		// /3 + /2 -> /2
@@ -132,7 +132,7 @@ public class CodeSimplifierTest {
 	}
 
 	@Test
-	public void testCodeReduction6 () {
+	public void testCodeReduction06 () {
 		TextFragment tf = new TextFragment();
 		tf.append(TagType.OPENING, "a", "<a>");
 		tf.append(TagType.OPENING, "b", "<b>");
@@ -145,7 +145,7 @@ public class CodeSimplifierTest {
 		tf.append(TagType.CLOSING, "a", "</a>");
 		tf.append(TagType.PLACEHOLDER, "x2", "<x2/>");
 
-		assertEquals("<1><2><3><4/>T1</3></2>T2</1><5/>", fmt.setContent(tf).toString());
+			assertEquals("<1><2><3><4/>T1</3></2>T2</1><5/>", fmt.setContent(tf).toString());
 		// 1 -> 1
 		// 2 + 3 + 4/ -> 2
 		// /3 + /2 -> /2
@@ -155,7 +155,7 @@ public class CodeSimplifierTest {
 	}
 
 	@Test
-	public void testCodeReduction7 () {
+	public void testCodeReduction07 () {
 		TextFragment tf = new TextFragment();
 		tf.append(TagType.OPENING, "a", "<a>");
 		tf.append(TagType.PLACEHOLDER, "x1", "<x1/>");
@@ -169,7 +169,7 @@ public class CodeSimplifierTest {
 		tf.append(TagType.CLOSING, "a", "</a>");
 		tf.append(TagType.PLACEHOLDER, "x3", "<x3/>");
 
-		assertEquals("<1><2/>T1<3><4><5/></4></3>T2</1><6/>", fmt.setContent(tf).toString());
+			assertEquals("<1><2/>T1<3><4><5/></4></3>T2</1><6/>", fmt.setContent(tf).toString());
 		// 1 + 2/ -> 1
 		// 3 + 4 + 5/ + /4 + /3 -> 2/
 		// /1 + 6/ -> /1
@@ -179,7 +179,7 @@ public class CodeSimplifierTest {
 	}
 
 	@Test
-	public void testCodeReduction8 () {
+	public void testCodeReduction08 () {
 		TextFragment tf = new TextFragment();
 		tf.append(TagType.OPENING, "a", "<a>");
 		tf.append(TagType.PLACEHOLDER, "x1", "<x1/>");
@@ -194,7 +194,7 @@ public class CodeSimplifierTest {
 		tf.append(TagType.CLOSING, "a", "</a>");
 		tf.append(TagType.PLACEHOLDER, "x3", "<x3/>");
 
-		assertEquals("<1><2/>T1<3><4><5/></4>T2</3>T3</1><6/>", fmt.setContent(tf).toString());
+			assertEquals("<1><2/>T1<3><4><5/></4>T2</3>T3</1><6/>", fmt.setContent(tf).toString());
 		// 1 + 2/ -> 1
 		// 3 + 4 + 5/ + /4 -> 2
 		// /3 -> /2
@@ -204,7 +204,7 @@ public class CodeSimplifierTest {
 	}
 			
 	@Test
-	public void testCodeReduction8_2 () {
+	public void testCodeReduction09 () {
 		TextFragment tf = new TextFragment();
 		tf.append(TagType.OPENING, "a", "<a>");
 		tf.append(TagType.PLACEHOLDER, "x1", "<x1/>");
@@ -219,14 +219,14 @@ public class CodeSimplifierTest {
 		tf.append(TagType.CLOSING, "c", "</c>");			
 		tf.append(TagType.PLACEHOLDER, "x3", "<x3/>");
 
-		assertEquals("<1><2/>T1</1><3><4/>T2</3><5>T3</5><6/>", fmt.setContent(tf).toString());
+			assertEquals("<1><2/>T1</1><3><4/>T2</3><5>T3</5><6/>", fmt.setContent(tf).toString());
 		
 		simplifier.simplifyAll(tf, false);
 		assertEquals("<1>T1</1><3>T2</3><5>T3</5>", fmt.setContent(tf).toString());
 	}
 	
 	@Test
-	public void testCodeReduction8_3 () {
+	public void testCodeReduction10 () {
 		TextFragment tf = new TextFragment();
 		tf.append(TagType.OPENING, "a", "<a>");
 		tf.append(TagType.PLACEHOLDER, "x1", "<x1/>");
@@ -241,14 +241,14 @@ public class CodeSimplifierTest {
 		tf.append(TagType.CLOSING, "b", "</b>");		
 		tf.append(TagType.PLACEHOLDER, "x3", "<x3/>");
 
-		assertEquals("<1><2/>T1</1><3><4><5/>T2</4>T3</3><6/>", fmt.setContent(tf).toString());
+			assertEquals("<1><2/>T1</1><3><4><5/>T2</4>T3</3><6/>", fmt.setContent(tf).toString());
 		
 		simplifier.simplifyAll(tf, false);
 		assertEquals("<1>T1</1><3><4>T2</4>T3</3>", fmt.setContent(tf).toString());
 	}
 
 	@Test
-	public void testCodeReduction8_4 () {
+	public void testCodeReduction11 () {
 		TextFragment tf = new TextFragment();
 		tf.append(TagType.OPENING, "a", "<a>");
 		tf.append(TagType.OPENING, "d", "<d>");
@@ -265,14 +265,14 @@ public class CodeSimplifierTest {
 		tf.append(TagType.CLOSING, "a", "</a>");
 		tf.append(TagType.PLACEHOLDER, "x3", "<x3/>");
 
-		assertEquals("<1><2><3/>T1</2><4><5><6/></5>T2</4>T3</1><7/>", fmt.setContent(tf).toString());
+			assertEquals("<1><2><3/>T1</2><4><5><6/></5>T2</4>T3</1><7/>", fmt.setContent(tf).toString());
 		
 		simplifier.simplifyAll(tf, false);
 		assertEquals("<1><2>T1</2><4>T2</4>T3</1>", fmt.setContent(tf).toString());
 	}
 	
 	@Test
-	public void testCodeReduction8_5 () {
+	public void testCodeReduction12 () {
 		TextFragment tf = new TextFragment();
 		tf.append(TagType.OPENING, "a", "<a>");
 
@@ -280,7 +280,7 @@ public class CodeSimplifierTest {
 	}
 	
 	@Test
-	public void testCodeReduction8_6 () {
+	public void testCodeReduction13 () {
 		// Hanging opening code d
 		TextFragment tf = new TextFragment();
 		tf.append(TagType.OPENING, "a", "<a>");
@@ -297,14 +297,14 @@ public class CodeSimplifierTest {
 		tf.append(TagType.CLOSING, "a", "</a>");
 		tf.append(TagType.PLACEHOLDER, "x3", "<x3/>");
 
-		assertEquals("<b1/><b2/><3/>T1<4><5><6/></5>T2</4>T3<e1/><7/>", fmt.setContent(tf).toString());
+			assertEquals("<b1/><b2/><3/>T1<4><5><6/></5>T2</4>T3<e1/><7/>", fmt.setContent(tf).toString());
 		
 		simplifier.simplifyAll(tf, false);
 		assertEquals("<1><b2/>T1<3>T2</3>T3</1>", fmt.setContent(tf).toString());
 	}
 	
 	@Test
-	public void testCodeReduction8_7 () {
+	public void testCodeReduction14 () {
 		// Hanging closing code d
 		TextFragment tf = new TextFragment();
 		tf.append(TagType.OPENING, "a", "<a>");		
@@ -321,14 +321,14 @@ public class CodeSimplifierTest {
 		tf.append(TagType.CLOSING, "d", "<d>"); // no corresp. opening marker
 		tf.append(TagType.PLACEHOLDER, "x3", "<x3/>");
 
-		assertEquals("<1><2/>T1<3><4><5/></4>T2</3>T3</1><e7/><6/>", fmt.setContent(tf).toString());
+			assertEquals("<1><2/>T1<3><4><5/></4>T2</3>T3</1><e7/><6/>", fmt.setContent(tf).toString());
 		
 		simplifier.simplifyAll(tf, false);
 		assertEquals("<1>T1<2>T2</2>T3</1><e7/>", fmt.setContent(tf).toString());
 	}
 	
 	@Test
-	public void testCodeReduction8_8 () {
+	public void testCodeReduction15 () {
 		// Hanging closing code d
 		TextFragment tf = new TextFragment();
 		tf.append(TagType.OPENING, "a", "<a>");		
@@ -345,14 +345,14 @@ public class CodeSimplifierTest {
 		tf.append(TagType.CLOSING, "a", "</a>");		
 		tf.append(TagType.PLACEHOLDER, "x3", "<x3/>");
 
-		assertEquals("<b1/><2/>T1<3><4><5/></4>T2</3>T3<e7/><e1/><6/>", fmt.setContent(tf).toString());
+			assertEquals("<b1/><2/>T1<3><4><5/></4>T2</3>T3<e7/><e1/><6/>", fmt.setContent(tf).toString());
 		
 		simplifier.simplifyAll(tf, false);
 		assertEquals("<1>T1<2>T2</2>T3<e7/></1>", fmt.setContent(tf).toString());
 	}
 	
 	@Test
-	public void testCodeReduction8_9 () {
+	public void testCodeReduction16 () {
 		// Hanging closing code d
 		TextFragment tf = new TextFragment();
 		tf.append(TagType.OPENING, "a", "<a>");		
@@ -369,18 +369,21 @@ public class CodeSimplifierTest {
 		tf.append(TagType.CLOSING, "a", "</a>");
 		tf.append(TagType.PLACEHOLDER, "x3", "<x3/>");
 
-		assertEquals("<b1/><2/>T1<b3/><b4/><e7/><5/><e4/>T2<e3/>T3<e1/><6/>", fmt.setContent(tf).toString());
+			assertEquals("<b1/><2/>T1<b3/><b4/><e7/><5/><e4/>T2<e3/>T3<e1/><6/>", fmt.setContent(tf).toString());
 		
 		simplifier.simplifyAll(tf, false);
 		assertEquals("<1>T1<2><3><e7/></3>T2</2>T3</1>", fmt.setContent(tf).toString());
 	}
 	
 	@Test
-	public void testCodeReduction9 () {
+	public void testCodeReduction17 () {
 		TextFragment tf = new TextFragment();
 		tf.append(TagType.PLACEHOLDER, "x1", "<x1/>");
 		tf.append("T1");
 		tf.append(TagType.PLACEHOLDER, "x2", "<x2/>");
+		
+			assertEquals("<1/>T1<2/>", fmt.setContent(tf).toString());
+			
 		String[] res = simplifier.simplifyAll(tf, true);
 		assertEquals("T1", fmt.setContent(tf).toString());
 		assertEquals("<x1/>", res[0]);
@@ -388,11 +391,14 @@ public class CodeSimplifierTest {
 	}
 
 	@Test
-	public void testCodeReduction10 () {
+	public void testCodeReduction18 () {
 		TextFragment tf = new TextFragment("T1");
 		tf.append(TagType.PLACEHOLDER, "x1", "<x1/>");
 		tf.append("T2");
 		tf.append(TagType.PLACEHOLDER, "x2", "<x2/>");
+		
+			assertEquals("T1<1/>T2<2/>", fmt.setContent(tf).toString());
+			
 		String[] res = simplifier.simplifyAll(tf, true);
 		assertEquals("T1<1/>T2", fmt.setContent(tf).toString());
 		assertTrue(res[0] == null);
@@ -400,7 +406,7 @@ public class CodeSimplifierTest {
 	}
 
 	@Test
-	public void testCodeReduction11 () {
+	public void testCodeReduction19 () {
 		TextFragment tf = new TextFragment();
 		tf.append(TagType.PLACEHOLDER, "x1", "<x1/>");
 		tf.append("T1");
@@ -413,9 +419,420 @@ public class CodeSimplifierTest {
 		tf.append("T3");
 		tf.append(TagType.PLACEHOLDER, "x3", "<x3/>");
 
+			assertEquals("<1/>T1<2><3><4/></3>T2</2>T3<5/>", fmt.setContent(tf).toString());
+		
 		String[] res = simplifier.simplifyAll(tf, true);
 		assertEquals("T1<2>T2</2>T3", fmt.setContent(tf).toString());
 		assertEquals("<x1/>", res[0]);
 		assertEquals("<x3/>", res[1]);
+	}
+	
+	@Test
+	public void testCodeReduction20 () {
+		TextFragment tf = new TextFragment();
+		tf.append(TagType.PLACEHOLDER, "x1", "<x1/>");
+		tf.append(TagType.PLACEHOLDER, "x2", "<x2/>");
+		tf.append("T1");
+		
+			assertEquals("<1/><2/>T1", fmt.setContent(tf).toString());
+		
+		String[] res = simplifier.simplifyAll(tf, true);
+		assertEquals("T1", fmt.setContent(tf).toString());
+		assertEquals("<x1/><x2/>", res[0]);
+		assertEquals(null, res[1]);
+	}
+	
+	@Test
+	public void testCodeReduction21 () {
+		TextFragment tf = new TextFragment();
+		tf.append(TagType.OPENING, "a", "<a>");
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append("T1");
+		
+			assertEquals("<b1/><b2/>T1", fmt.setContent(tf).toString());
+		
+		String[] res = simplifier.simplifyAll(tf, true);
+		assertEquals("T1", fmt.setContent(tf).toString());
+		assertEquals("<a><b>", res[0]);
+		assertEquals(null, res[1]);
+	}
+	
+	@Test
+	public void testCodeReduction22 () {
+		// Spaces in-between codes
+		TextFragment tf = new TextFragment();
+		tf.append(TagType.PLACEHOLDER, "x1", "<x1/>");
+		tf.append(" ");
+		tf.append(TagType.PLACEHOLDER, "x2", "<x2/>");
+		tf.append(" ");
+		tf.append("T1");
+		
+			assertEquals("<1/> <2/> T1", fmt.setContent(tf).toString());
+		
+		String[] res = simplifier.simplifyAll(tf, true);
+		assertEquals("T1", fmt.setContent(tf).toString());
+		assertEquals("<x1/> <x2/> ", res[0]);
+		assertEquals(null, res[1]);
+	}
+	
+	@Test
+	public void testCodeReduction23 () {
+		TextFragment tf = new TextFragment();
+		tf.append(TagType.OPENING, "a", "<a>");
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append("T1");
+		tf.append(TagType.CLOSING, "b", "</b>");
+		tf.append(TagType.CLOSING, "a", "</a>");
+		
+			assertEquals("<1><2>T1</2></1>", fmt.setContent(tf).toString());
+		
+		String[] res = simplifier.simplifyAll(tf, true);
+		assertEquals("T1", fmt.setContent(tf).toString());
+		assertEquals("<a><b>", res[0]);
+		assertEquals("</b></a>", res[1]);
+	}
+	
+	@Test
+	public void testCodeReduction24 () {
+		// Wrong sequence of closing tags (malformed tags)
+		TextFragment tf = new TextFragment();
+		tf.append(TagType.OPENING, "a", "<a>");
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append("T1");
+		tf.append(TagType.CLOSING, "a", "</a>");
+		tf.append(TagType.CLOSING, "b", "</b>");
+				
+			assertEquals("<b1/><b2/>T1<e1/><e2/>", fmt.setContent(tf).toString());
+		
+		String[] res = simplifier.simplifyAll(tf, true);
+		assertEquals("T1", fmt.setContent(tf).toString());
+		assertEquals("<a><b>", res[0]);
+		assertEquals("</a></b>", res[1]);
+	}
+	
+	@Test
+	public void testCodeReduction25 () {
+		TextFragment tf = new TextFragment();
+		tf.append(TagType.OPENING, "a", "<a>");
+		tf.append(" ");
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append("T1");		
+		tf.append(TagType.CLOSING, "b", "</b>");
+		tf.append(" ");
+		tf.append(TagType.CLOSING, "a", "</a>");
+				
+			assertEquals("<1> <2>T1</2> </1>", fmt.setContent(tf).toString());
+		
+		String[] res = simplifier.simplifyAll(tf, true);
+		assertEquals("T1", fmt.setContent(tf).toString());
+		assertEquals("<a> <b>", res[0]);
+		assertEquals("</b> </a>", res[1]);
+	}
+	
+	@Test
+	public void testCodeReduction26 () {
+		// Wrong sequence of closing tags (malformed tags), nothing is removed
+		TextFragment tf = new TextFragment();
+		tf.append(TagType.OPENING, "a", "<a>");
+		tf.append(" ");
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append(" ");
+		tf.append("T1");
+		tf.append(" ");
+		tf.append(TagType.CLOSING, "a", "</a>");
+		tf.append(" ");
+		tf.append(TagType.CLOSING, "b", "</b>");
+				
+			assertEquals("<b1/> <b2/> T1 <e1/> <e2/>", fmt.setContent(tf).toString());
+		
+		String[] res = simplifier.simplifyAll(tf, true);
+		assertEquals("<1> <2> T1 </1> </2>", fmt.setContent(tf).toString());
+		assertEquals(null, res[0]);
+		assertEquals(null, res[1]);
+	}
+	
+	@Test
+	public void testCodeReduction27 () {
+		// Spaces in-between codes
+		TextFragment tf = new TextFragment();
+		tf.append(TagType.PLACEHOLDER, "x1", "<x1/>");
+		tf.append(" ");
+		tf.append(TagType.PLACEHOLDER, "x2", "<x2/>");
+		tf.append(" ");
+		tf.append("T1");
+		
+			assertEquals("<1/> <2/> T1", fmt.setContent(tf).toString());
+		
+		String[] res = simplifier.simplifyAll(tf, true);
+		assertEquals("T1", fmt.setContent(tf).toString());
+		assertEquals("<x1/> <x2/> ", res[0]);
+	}
+
+	@Test
+	public void testCodeReduction28 () {
+		TextFragment tf = new TextFragment();
+		tf.append(TagType.OPENING, "a", "<a>");
+		tf.append(" ");
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append("T1");		
+		tf.append(TagType.CLOSING, "b", "</b>");
+				
+			assertEquals("<b1/> <2>T1</2>", fmt.setContent(tf).toString());
+		
+		String[] res = simplifier.simplifyAll(tf, true);
+		assertEquals("T1", fmt.setContent(tf).toString());
+		assertEquals("<a> <b>", res[0]);
+		assertEquals("</b>", res[1]);
+	}
+	
+	@Test
+	public void testCodeReduction29 () {
+		TextFragment tf = new TextFragment();
+		tf.append(TagType.OPENING, "a", "<a>");
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append("T1");		
+		tf.append(TagType.CLOSING, "b", "</b>");
+				
+			assertEquals("<b1/><2>T1</2>", fmt.setContent(tf).toString());
+		
+		String[] res = simplifier.simplifyAll(tf, true);
+		assertEquals("T1", fmt.setContent(tf).toString());
+		assertEquals("<a><b>", res[0]);
+		assertEquals("</b>", res[1]);
+	}
+	
+	@Test
+	public void testCodeReduction30 () {
+		TextFragment tf = new TextFragment();
+		tf.append(TagType.OPENING, "a", "<a>");
+		tf.append("T1");
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append("T2");		
+		tf.append(TagType.CLOSING, "b", "</b>");
+				
+			assertEquals("<b1/>T1<2>T2</2>", fmt.setContent(tf).toString());
+		
+		String[] res = simplifier.simplifyAll(tf, true);
+		assertEquals("T1<2>T2</2>", fmt.setContent(tf).toString());
+		assertEquals("<a>", res[0]);
+		assertEquals(null, res[1]);
+	}
+	
+	@Test
+	public void testCodeReduction31 () {
+		TextFragment tf = new TextFragment();		
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append("T1");		
+		tf.append(TagType.CLOSING, "b", "</b>");
+		tf.append("T2");
+		tf.append(TagType.CLOSING, "a", "</a>");
+				
+			assertEquals("<1>T1</1>T2<e2/>", fmt.setContent(tf).toString());
+		
+		String[] res = simplifier.simplifyAll(tf, true);
+		assertEquals("<1>T1</1>T2", fmt.setContent(tf).toString());
+		assertEquals(null, res[0]);
+		assertEquals("</a>", res[1]);
+	}
+	
+	@Test
+	public void testCodeReduction32 () {
+		TextFragment tf = new TextFragment();
+		tf.append(TagType.OPENING, "a", "<a>");
+		tf.append(" ");
+		tf.append("T1");
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append("T2");		
+		tf.append(TagType.CLOSING, "b", "</b>");
+				
+			assertEquals("<b1/> T1<2>T2</2>", fmt.setContent(tf).toString());
+		
+		String[] res = simplifier.simplifyAll(tf, true);
+		assertEquals("T1<2>T2</2>", fmt.setContent(tf).toString());
+		assertEquals("<a> ", res[0]);
+		assertEquals(null, res[1]);
+	}
+	
+	@Test
+	public void testCodeReduction33 () {
+		TextFragment tf = new TextFragment();		
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append("T1");		
+		tf.append(TagType.CLOSING, "b", "</b>");
+		tf.append("T2");
+		tf.append(" ");
+		tf.append(TagType.CLOSING, "a", "</a>");
+				
+			assertEquals("<1>T1</1>T2 <e2/>", fmt.setContent(tf).toString());
+		
+		String[] res = simplifier.simplifyAll(tf, true);
+		assertEquals("<1>T1</1>T2", fmt.setContent(tf).toString());
+		assertEquals(null, res[0]);
+		assertEquals(" </a>", res[1]);
+	}
+	
+	@Test
+	public void testCodeReduction34 () {
+		TextFragment tf = new TextFragment();
+		tf.append("T1");
+		tf.append(TagType.OPENING, "a", "<a>");
+		tf.append("T2");
+		tf.append(TagType.CLOSING, "a", "</a>");
+		tf.append("T3");		
+						
+			assertEquals("T1<1>T2</1>T3", fmt.setContent(tf).toString());
+		
+		String[] res = simplifier.simplifyAll(tf, true);
+		assertEquals("T1<1>T2</1>T3", fmt.setContent(tf).toString());
+		assertEquals(null, res[0]);
+		assertEquals(null, res[1]);
+	}
+	
+	@Test
+	public void testCodeReduction35 () {
+		TextFragment tf = new TextFragment();		
+		tf.append(TagType.OPENING, "a", "<a>");
+		tf.append("T1");		
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append(TagType.CLOSING, "b", "</b>");
+				
+			assertEquals("<b1/>T1<2></2>", fmt.setContent(tf).toString());
+		
+		String[] res = simplifier.simplifyAll(tf, true);
+		assertEquals("T1", fmt.setContent(tf).toString());
+		assertEquals("<a>", res[0]);
+		assertEquals("<b></b>", res[1]);
+	}
+	
+	@Test
+	public void testCodeReduction36 () {
+		// Adjacent codes are not removed, because there's a space in-between
+		TextFragment tf = new TextFragment();		
+		tf.append(TagType.OPENING, "a", "<a>");
+		tf.append("T1");		
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append(" ");
+		tf.append(TagType.CLOSING, "b", "</b>");
+				
+			assertEquals("<b1/>T1<2> </2>", fmt.setContent(tf).toString());
+		
+		String[] res = simplifier.simplifyAll(tf, true);
+		assertEquals("T1<2> </2>", fmt.setContent(tf).toString());
+		assertEquals("<a>", res[0]);
+		assertEquals(null, res[1]);
+	}
+	
+	@Test
+	public void testCodeReduction37 () {
+		// String is not trimmed by simplification
+		TextFragment tf = new TextFragment();
+		tf.append("   ");
+		tf.append("T1");		
+		tf.append("   ");
+				
+			assertEquals("   T1   ", fmt.setContent(tf).toString());
+		
+		String[] res = simplifier.simplifyAll(tf, true);
+		assertEquals("   T1   ", fmt.setContent(tf).toString());
+		assertEquals(null, res[0]);
+		assertEquals(null, res[1]);
+	}
+	
+	@Test
+	public void testCodeReduction38 () {
+		// !!!
+		TextFragment tf = new TextFragment();		
+		tf.append(TagType.PLACEHOLDER, "x1", "<x1/>");
+		tf.append(TagType.PLACEHOLDER, "x2", "<x2/>");
+		tf.append("T1");		
+		tf.append(TagType.PLACEHOLDER, "x3", "<x3/>");
+		tf.append(TagType.PLACEHOLDER, "x4", "<x4/>");
+		tf.append(TagType.OPENING, "x5", "<x5>");
+		tf.append("T2");
+		tf.append(TagType.CLOSING, "x5", "</x5>");
+				
+			assertEquals("<1/><2/>T1<3/><4/><5>T2</5>", fmt.setContent(tf).toString());
+		
+		String[] res = simplifier.simplifyAll(tf, true);
+		assertEquals("T1<2/>T2", fmt.setContent(tf).toString());
+		assertEquals("<x1/><x2/>", res[0]);
+		assertEquals("</x5>", res[1]);
+	}
+	
+	@Test
+	public void testCodeReduction39 () {
+		// !!!
+		TextFragment tf = new TextFragment();		
+		tf.append("T1");		
+		tf.append(TagType.PLACEHOLDER, "x1", "<x1/>");
+		tf.append(TagType.PLACEHOLDER, "x2", "<x2/>");
+		tf.append(TagType.OPENING, "c", "<c>");
+		tf.append("T2");
+		tf.append(TagType.CLOSING, "c", "</c>");
+				
+			assertEquals("T1<1/><2/><3>T2</3>", fmt.setContent(tf).toString());
+		
+		String[] res = simplifier.simplifyAll(tf, true);
+		//assertEquals("T1<1/><3>T2</3>", fmt.setContent(tf).toString());
+		assertEquals("T1<1/>T2", fmt.setContent(tf).toString());
+		assertEquals(null, res[0]);
+		assertEquals("</c>", res[1]);
+	}
+	
+	@Test
+	public void testCodeReduction40 () {
+		TextFragment tf = new TextFragment();		
+		tf.append("T1");		
+		tf.append(TagType.OPENING, "c", "<c>");
+		tf.append("T2");
+		tf.append(TagType.CLOSING, "c", "</c>");
+				
+			assertEquals("T1<1>T2</1>", fmt.setContent(tf).toString());
+		
+		String[] res = simplifier.simplifyAll(tf, true);
+		assertEquals("T1<1>T2</1>", fmt.setContent(tf).toString());
+		assertEquals(null, res[0]);
+		assertEquals(null, res[1]);
+	}
+	
+	@Test
+	public void testCodeReduction41 () {
+		// !!!
+		TextFragment tf = new TextFragment();		
+		tf.append("T1");		
+		tf.append(TagType.PLACEHOLDER, "x1", "<x1/>");
+		tf.append(TagType.OPENING, "c", "<c>");
+		tf.append("T2");
+		tf.append(TagType.CLOSING, "c", "</c>");
+				
+			assertEquals("T1<1/><2>T2</2>", fmt.setContent(tf).toString());
+		
+		String[] res = simplifier.simplifyAll(tf, true);
+		//assertEquals("T1<1/><2>T2</2>", fmt.setContent(tf).toString());
+		assertEquals("T1<1/>T2", fmt.setContent(tf).toString());
+		assertEquals(null, res[0]);
+		assertEquals("</c>", res[1]);
+	}
+	
+	@Test
+	public void testCodeReduction42 () {
+		TextFragment tf = new TextFragment();		
+		tf.append(TagType.OPENING, "a", "<a>");
+		tf.append("T1");
+		tf.append(TagType.CLOSING, "a", "</a>");
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append("T2");
+		tf.append(TagType.CLOSING, "b", "</b>");
+		tf.append(TagType.OPENING, "c", "<c>");
+		tf.append("T3");
+		tf.append(TagType.CLOSING, "c", "</c>");
+		
+				
+			assertEquals("<1>T1</1><2>T2</2><3>T3</3>", fmt.setContent(tf).toString());
+		
+		String[] res = simplifier.simplifyAll(tf, true);
+		assertEquals("<1>T1</1><3>T2</3><5>T3</5>", fmt.setContent(tf).toString());
+		assertEquals(null, res[0]);
+		assertEquals(null, res[1]);
 	}
 }

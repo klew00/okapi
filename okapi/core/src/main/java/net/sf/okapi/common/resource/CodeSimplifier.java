@@ -25,8 +25,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 
-import net.sf.okapi.common.resource.Code;
-import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 
 public class CodeSimplifier {
@@ -190,46 +189,289 @@ public class CodeSimplifier {
 		
 		// Check leading and trailing codes if requested
 		if ( removeLeadingTrailingCodes ) {
-			return removeLeadingTrailingCodes(tf);
+			return removeLeadingTrailingCodes(tf, maxIterations);
 		}
 		else {
 			return null;
 		}
 	}
 	
-	private String[] removeLeadingTrailingCodes (TextFragment tf) {
-		if ( tf.isEmpty() ) return null; // Nothing to do
-		String ctext = tf.getCodedText();
-		Code code;
-		String[] res = new String[2];
+	private String[] removeLeadingTrailingCodes (TextFragment tf, int maxIterations) {
+		String ctext;
+		List<Code> codes;
+		Code code = null;		
+		int startPos;
+		int endPos;
+		StringBuilder leadingSb = new StringBuilder();
+		StringBuilder trailingSb = new StringBuilder();
+		StringBuilder sb;		
+		int iteration = 0;
+		boolean removed;
 		
-		// Check for leading location
-		switch ( ctext.charAt(0) ) {
-		case TextFragment.MARKER_ISOLATED:
-			// We can move it
-			code = tf.getCode(TextFragment.toIndex(ctext.charAt(1)));
-			// Store the data in the return value
-			res[0] = code.getOuterData();
-			// Remove the code from the fragment
-			tf.remove(0, 2);
-			break;
+		do {
+			// Iterations are needed to catch pairs of opening/closing tags at the edges, only if both are there, then remove the pair
+			iteration++;
+			removed = false;
+			
+			// Remove leading isolated codes and spaces
+			ctext = tf.getCodedText();
+			codes = tf.getCodes();
+			startPos = 0;
+			endPos = 0;
+			sb = new StringBuilder();
+					
+			for (int i = 0; i < ctext.length(); i++){
+				if ( TextFragment.isMarker(ctext.charAt(i)) ) {				
+					int codeIndex = TextFragment.toIndex(ctext.charAt(i + 1));
+					code = codes.get(codeIndex);
+					//if (code.getTagType() != TagType.PLACEHOLDER) break;
+					if (ctext.codePointAt(i) != TextFragment.MARKER_ISOLATED) break;
+					
+					sb.append(code.getOuterData());					
+					endPos = i + 2;					
+					i++; // Skip the pair
+				}
+				// For the 1-st iteration mind spaces only after a code not to trim-head the string
+				else if (Character.isWhitespace(ctext.charAt(i)) && (endPos > 0 || iteration > 1)) {
+						sb.append(ctext.charAt(i));
+						endPos = i + 1;
+				}
+				else {
+					break; // If came across a non-space and non-code, fall off
+				}			
+			}
+			
+			if (startPos < endPos) {
+				tf.remove(startPos, endPos);
+				leadingSb.append(sb);
+				removed = true;
+			}		
+			
+			// Remove trailing isolated codes and spaces
+			ctext = tf.getCodedText();
+			codes = tf.getCodes();
+			startPos = ctext.length();
+			endPos = startPos;
+			sb = new StringBuilder();
+			
+			for (int i = ctext.length() - 1; i > 0; i--){
+				if ( TextFragment.isMarker(ctext.charAt(i - 1)) ) {				
+					int codeIndex = TextFragment.toIndex(ctext.charAt(i));
+					code = codes.get(codeIndex);
+					//if (code.getTagType() != TagType.PLACEHOLDER) break;
+					if (ctext.codePointAt(i - 1) != TextFragment.MARKER_ISOLATED) break;
+					
+					sb.insert(0, code.getOuterData());
+									
+					i--; // Skip the pair
+					startPos = i;
+				}
+				// For the 1-st iteration mind spaces only before a code not to trim-tail the string
+				else if (Character.isWhitespace(ctext.charAt(i)) && (startPos < ctext.length() - 1 || iteration > 1)) {
+						sb.insert(0, ctext.charAt(i));
+						startPos = i;
+				}
+				else {
+					break; // If came across a non-space and non-code, and the previous char is not a code marker, fall off
+				}
+			}
+			
+			if (startPos < endPos) {
+				tf.remove(startPos, endPos);
+				trailingSb.insert(0, sb);
+				removed = true;
+			}
+			
+			Code leadingCode = null;
+			Code trailingCode = null;
+			
+			ctext = tf.getCodedText();
+			codes = tf.getCodes();
+			
+			if (ctext.length() > 0 && codes != null) {
+				// Check leading code
+				ctext = tf.getCodedText();
+				codes = tf.getCodes();
+				if ( TextFragment.isMarker(ctext.charAt(0)) ) {				
+					int codeIndex = TextFragment.toIndex(ctext.charAt(1));
+					code = codes.get(codeIndex);
+					if (ctext.codePointAt(0) == TextFragment.MARKER_OPENING) {
+						leadingCode = code;
+					}
+				}
+				
+				// Check trailing code
+				ctext = tf.getCodedText();
+				codes = tf.getCodes();
+				if ( TextFragment.isMarker(ctext.charAt(ctext.length() - 2)) ) {				
+					int codeIndex = TextFragment.toIndex(ctext.charAt(ctext.length() - 1));
+					code = codes.get(codeIndex);
+					if (ctext.codePointAt(ctext.length() - 2) == TextFragment.MARKER_CLOSING) {
+						trailingCode = code;
+					}
+				}
+				
+				if (leadingCode != null && trailingCode != null && leadingCode.getId() == trailingCode.getId()) {
+					tf.remove(0, 2);
+					leadingSb.append(leadingCode.getOuterData());
+				
+					ctext = tf.getCodedText();
+					codes = tf.getCodes();
+					
+					tf.remove(ctext.length() - 2, ctext.length());
+					trailingSb.insert(0, trailingCode.getOuterData());
+					
+					removed = true;
+				}
+			}			
+			
+			if (!removed) break; // 1 exceeding iteration at maximum
+		} while (iteration < maxIterations);
+						
+		String res0 = leadingSb.toString();
+		String res1 = trailingSb.toString();
+		
+		return new String[] {
+				Util.isEmpty(res0)? null : res0, 
+				Util.isEmpty(res1)? null : res1};
+	}
+	
+	private String[] removeLeadingTrailingCodes_Old (TextFragment tf) {
+		if ( tf.isEmpty() ) return null; // Nothing to do
+		
+		String ctext;
+		List<Code> codes;
+		Code code = null;
+		String[] res = new String[2];
+		int startPos;
+		int endPos;
+		StringBuilder sb;
+		List<Integer> leadingCodes = new ArrayList<Integer>();
+		List<Integer> trailingCodes = new ArrayList<Integer>();
+		
+		// Collecting leading codes
+		ctext = tf.getCodedText();
+		codes = tf.getCodes();
+		startPos = 0;
+		endPos = 0;
+				
+		for (int i = 0; i < ctext.length(); i++){
+			if ( TextFragment.isMarker(ctext.charAt(i)) ) {				
+				int codeIndex = TextFragment.toIndex(ctext.charAt(i + 1));
+				code = codes.get(codeIndex);
+				leadingCodes.add(code.getId());
+				
+				endPos = i + 2;					
+				i++; // Skip the pair
+			}
+			else if (Character.isWhitespace(ctext.charAt(i)) && endPos > 0) { // Mind spaces only after a code not to trim-head the string					
+					endPos = i + 1;
+			}
+			else {
+				break; // If came across a non-space and non-code, fall off
+			}			
 		}
-
-		// Checks for trailing code
-		ctext = tf.getCodedText(); // Reset the coded text because the indices may have changed
-		int last = ctext.length()-2;
-		if ( last > 0 ) {
-			switch ( ctext.charAt(last) ) {
-			case TextFragment.MARKER_ISOLATED:
-				// We can move it
-				code = tf.getCode(TextFragment.toIndex(ctext.charAt(last+1)));
-				// Store the data in the return value
-				res[1] = code.getOuterData();
-				// Remove the code from the fragment
-				tf.remove(last, last+2);
-				break;
+		
+		// Collecting trailing codes
+		ctext = tf.getCodedText();
+		codes = tf.getCodes();
+		startPos = ctext.length();
+		endPos = startPos;
+		
+		for (int i = ctext.length() - 1; i > 0; i--){
+			if ( TextFragment.isMarker(ctext.charAt(i - 1)) ) {				
+				int codeIndex = TextFragment.toIndex(ctext.charAt(i));
+				code = codes.get(codeIndex);
+				trailingCodes.add(code.getId());
+								
+				i--; // Skip the pair
+				startPos = i;
+			}
+			else if (Character.isWhitespace(ctext.charAt(i)) && startPos < ctext.length() - 1) { // Mind spaces only before a code not to trim-tail the string
+				trailingCodes.add(code.getId());
+					startPos = i;
+			}
+			else {
+				break; // If came across a non-space and non-code, and the previous char is not a code marker, fall off
 			}
 		}
+				
+		// Removing leading codes and spaces
+		startPos = 0;
+		endPos = 0;
+		sb = new StringBuilder();
+				
+		for (int i = 0; i < ctext.length(); i++){
+			if ( TextFragment.isMarker(ctext.charAt(i)) ) {				
+				int codeIndex = TextFragment.toIndex(ctext.charAt(i + 1));
+				code = codes.get(codeIndex);
+				boolean breakLoop = false;
+				
+				switch (code.getTagType()) {
+				case PLACEHOLDER:
+					sb.append(code.getOuterData());
+					break;
+
+				case OPENING:
+					if (trailingCodes.contains(code.getId())) {
+						
+					}
+					sb.append(code.getOuterData());
+					break;
+					
+				case CLOSING:
+					sb.append(code.getOuterData());
+					break;
+				}
+				if (breakLoop) break;
+				
+				endPos = i + 2;					
+				i++; // Skip the pair
+			}
+			else if (Character.isWhitespace(ctext.charAt(i)) && endPos > 0) { // Mind spaces only after a code not to trim-head the string
+					sb.append(ctext.charAt(i));
+					endPos = i + 1;
+			}
+			else {
+				break; // If came across a non-space and non-code, fall off
+			}			
+		}
+		
+		if (startPos < endPos) {
+			tf.remove(startPos, endPos);
+			res[0] = sb.toString();
+		}		
+		
+		// Removing trailing codes and spaces
+		ctext = tf.getCodedText();
+		codes = tf.getCodes();
+		startPos = ctext.length();
+		endPos = startPos;
+		sb = new StringBuilder();
+		
+		for (int i = ctext.length() - 1; i > 0; i--){
+			if ( TextFragment.isMarker(ctext.charAt(i - 1)) ) {				
+				int codeIndex = TextFragment.toIndex(ctext.charAt(i));
+				code = codes.get(codeIndex);
+				sb.insert(0, code.getOuterData());
+								
+				i--; // Skip the pair
+				startPos = i;
+			}
+			else if (Character.isWhitespace(ctext.charAt(i)) && startPos < ctext.length() - 1) { // Mind spaces only before a code not to trim-tail the string
+					sb.insert(0, ctext.charAt(i));
+					startPos = i;
+			}
+			else {
+				break; // If came across a non-space and non-code, and the previous char is not a code marker, fall off
+			}
+		}
+		
+		if (startPos < endPos) {
+			tf.remove(startPos, endPos);
+			res[1] = sb.toString();
+		}
+				
 		return res;
 	}
 	
