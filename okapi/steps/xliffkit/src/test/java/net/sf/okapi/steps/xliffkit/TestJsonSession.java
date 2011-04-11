@@ -30,6 +30,7 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.InlineAnnotation;
 import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.lib.beans.v1.OkapiBeans;
@@ -92,7 +93,7 @@ public class TestJsonSession {
 		InlineAnnotation annot2 = session.readObject(st1, InlineAnnotation.class);
 		assertEquals(annot1.getData(), annot2.getData());
 		
-		ITextUnit tu2 = session.readObject(st2, ITextUnit.class);
+		ITextUnit tu2 = session.readObject(st2, TextUnit.class);
 		assertEquals(tu1.getSource().toString(), tu2.getSource().toString());
 		
 		// Wrong version
@@ -101,7 +102,7 @@ public class TestJsonSession {
 			annot2 = session.readObject(st1, InlineAnnotation.class);
 			assertEquals(annot1.getData(), annot2.getData());
 			
-			tu2 = session.readObject(st2, ITextUnit.class);
+			tu2 = session.readObject(st2, TextUnit.class);
 			assertEquals(tu1.getSource().toString(), tu2.getSource().toString());
 		} catch (RuntimeException e) {
 			return;
