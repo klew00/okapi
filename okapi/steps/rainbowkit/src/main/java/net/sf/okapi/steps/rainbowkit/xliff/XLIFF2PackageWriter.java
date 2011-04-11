@@ -25,6 +25,8 @@ import java.util.List;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.annotation.AltTranslation;
+import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
@@ -33,6 +35,7 @@ import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.filters.rainbowkit.Manifest;
 import net.sf.okapi.filters.rainbowkit.MergingInfo;
+import net.sf.okapi.lib.xliff.Alternate;
 import net.sf.okapi.lib.xliff.Fragment;
 import net.sf.okapi.lib.xliff.Unit;
 import net.sf.okapi.lib.xliff.XLIFFWriter;
@@ -150,6 +153,7 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 
 		for ( TextPart part : srcTc ) {
 			if ( part.isSegment() ) {
+				Segment srcSeg = (Segment)part;
 				if ( afterFirst ) {
 					// New segment: push the current one and create a new one
 					unit.add(xSeg);
@@ -158,16 +162,25 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 					afterFirst = true;
 				}
 				xSeg = new net.sf.okapi.lib.xliff.Segment();
-				xSeg.setSource(toXLIFF2Fragment(part.text));
+				xSeg.setSource(toXLIFF2Fragment(srcSeg.text));
 				afterSeg = true;
-				xSeg.setId(((Segment)part).getId());
+				xSeg.setId(srcSeg.getId());
 				// Target
 				if ( trgTc != null ) {
 					Segment trgSeg = trgTc.getSegments().get(xSeg.getId());
 					if ( trgSeg != null ) {
 						xSeg.setTarget(toXLIFF2Fragment(trgSeg.text));
 					}
+					
+					// Alt-trans annotation?
+					AltTranslationsAnnotation ann = trgSeg.getAnnotation(AltTranslationsAnnotation.class);
+					if ( ann != null ) {
+						for ( AltTranslation alt : ann ) {
+							copyData(alt, srcSeg.text, xSeg);
+						}
+					}
 				}
+				
 			}
 			else { // Non-segment part
 				if ( xSeg == null ) {
@@ -189,6 +202,23 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 		}
 		
 		return unit;
+	}
+	
+	private void copyData (AltTranslation alt,
+		TextFragment oriSource,
+		net.sf.okapi.lib.xliff.Segment xSeg)
+	{
+		Fragment src = null;
+		Fragment trg = null;
+		if ( alt.getSource().isEmpty() ) {
+			// Same as the base source
+			src = toXLIFF2Fragment(oriSource);
+		}
+		else {
+			src = toXLIFF2Fragment(alt.getSource().getFirstContent());
+		}
+		trg = toXLIFF2Fragment(alt.getTarget().getFirstContent());
+		xSeg.addCandidate(new Alternate(src, trg));
 	}
 	
 	private Fragment toXLIFF2Fragment (TextFragment tf) {

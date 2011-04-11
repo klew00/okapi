@@ -27,4 +27,24 @@ public class XLIFFWriterTest {
 		
 	}
 
+	@Test
+	public void testSegmentWithMatch () {
+		XLIFFWriter writer = new XLIFFWriter();
+		StringWriter strWriter = new StringWriter();
+		writer.create(strWriter);
+		writer.setLineBreak("\n");
+		
+		Unit unit = new Unit("id");
+		Segment seg = new Segment("Source 1.");
+		seg.addCandidate(new Alternate("Source candidate 1.", "Target candidate 1."));
+		unit.add(seg);
+		writer.writeUnit(unit);
+		
+		writer.close();
+		assertEquals("<unit id=\"id\">\n<segment>\n<source>Source 1.</source>\n"
+			+ "<matches>\n<match>\n<source>Source candidate 1.</source>\n"
+			+ "<target>Target candidate 1.</target>\n</match>\n</matches>\n</segment>\n</unit>\n",
+			strWriter.toString());
+		
+	}
 }

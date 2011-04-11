@@ -112,6 +112,24 @@ public class XLIFFWriter {
 			for ( Fragment frag : seg.getTrailingParts() ) {
 				writeFragment("ignorable", frag);
 			}
+			
+			if ( seg.getCandidates().size() > 0 ) {
+				writer.print(indent+"<matches>"+lb);
+				if ( isIndented ) indent += " ";
+				
+				for ( Alternate alt : seg.getCandidates() ) {
+					writer.print(indent+"<match>"+lb);
+					if ( isIndented ) indent += " ";
+					writeFragment("source", alt.getSource());
+					writeFragment("target", alt.getTarget());
+					if ( isIndented ) indent = indent.substring(1);
+					writer.print(indent+"</match>"+lb);
+				}
+
+				if ( isIndented ) indent = indent.substring(1);
+				writer.print(indent+"</matches>"+lb);
+			}
+			
 			if ( isIndented ) indent = indent.substring(1);
 			writer.print(indent+"</segment>"+lb);
 		}

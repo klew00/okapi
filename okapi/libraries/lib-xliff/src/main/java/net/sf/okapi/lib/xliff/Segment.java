@@ -31,6 +31,7 @@ public class Segment {
 	private Fragment source;
 	private Fragment target;
 	private ArrayList<Fragment> after;
+	private ArrayList<Alternate> candidates;
 	
 	public Segment () {
 		source = new Fragment();
@@ -100,4 +101,14 @@ public class Segment {
 		else return after;
 	}
 
+	public void addCandidate (Alternate candidate) {
+		if ( candidates == null ) candidates = new ArrayList<Alternate>();
+		candidates.add(candidate);
+	}
+	
+	public List<Alternate> getCandidates () {
+		if ( candidates == null ) return Collections.emptyList();
+		else return candidates;
+	}
+	
 }

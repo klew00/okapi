@@ -418,7 +418,7 @@ class QualityChecker {
 		for ( Code code : list ) {
 			if ( tmp.length() > 0 ) tmp.append(", ");
 			if ( code.getData().isEmpty() ) {
-				tmp.append(code.getOuterData());
+				tmp.append(code.getOuterData().replaceAll("></x>", "/>"));
 			}
 			else { // Show the content
 				tmp.append("\""+code.getData()+"\"");
@@ -437,9 +437,6 @@ class QualityChecker {
 		// If no codes: don't check
 		if (( srcList.size() == 0 ) && ( trgList.size() == 0 )) return;
 
-		// Quick check: If strings representations are the same, there is no difference
-		if ( srcList.toString().equals(trgList.toString()) ) return;
-		
 		// Check codes missing in target
 		Iterator<Code> srcIter = srcList.iterator();
 		while ( srcIter.hasNext() ) {

@@ -61,6 +61,14 @@ distribution.</p>
 	<li>Libraries:<ul>
 	<li>Fixed corrupted DefaultFilters.properties so XINI filter and MIF Filter 
 	UI are accessible again.</li>
+	<li>Updated TextUnit to use ITextUnit and a new implementation. This is a 
+	major low-level refactoring that comes with some <b>behavior changes</b>:<ul>
+	<li>in createTarget() IResource.COPY_CONTENT should be replaced by 
+	IResource.COPY_SEGMENTED_CONTENT to have the same behavior.</li>
+	<li>getTarget(locId) should be changed to getTragte(locId, false) to have 
+	the same behavior.</li>
+</ul>
+	</li>
 </ul>
 	</li>
 </ul>
