@@ -38,17 +38,11 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.ProcessingInstruction;
-import org.xml.sax.SAXException;
-
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IdGenerator;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
@@ -59,17 +53,24 @@ import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
-import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.CodeSimplifier;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.ITextUnit;
-import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.ProcessingInstruction;
+import org.xml.sax.SAXException;
 
 @UsingParameters(Parameters.class)
 public class IDMLFilter implements IFilter {
@@ -79,7 +80,7 @@ public class IDMLFilter implements IFilter {
 	private final static String ENDID = "end";
 	private final static String SPREADTYPE = "spread";
 	private final static String STORYTYPE = "story";
-	private final static Simplifier SIMPLIFIER = new Simplifier();
+	private final static CodeSimplifier SIMPLIFIER = new CodeSimplifier();
 	
 	final private DocumentBuilder docBuilder;
 	private URI docURI;
