@@ -134,18 +134,6 @@ public class TextUnitUtil {
 			newCode.setOuterData(null); // Remove XLIFF outer codes if needed
 
 			// Get the data from the original code (match on id)
-//ori
-//			oriCode = null;
-//			for ( int j=0; j<oriIndices.length; j++ ) {
-//				if ( oriIndices[j] == -1) continue; // Used already
-//				if ( oriCodes.get(oriIndices[j]).getTagType() == newCode.getTagType() ) {
-//					oriCode = oriCodes.get(oriIndices[j]);
-//					oriIndices[j] = -1;
-//					done++;
-//					break;
-//				}
-//			}
-//end-ori
 			oriCode = null;
 			for ( int j=0; j<oriIndices.length; j++ ) {
 				// Do we have the same id?

@@ -786,6 +786,19 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 		if ( !isBalanced ) balanceMarkers();
 		return Collections.unmodifiableList(codes);
 	}
+	
+	/**
+	 * Gets a list of the copy of the codes for this fragment.
+	 * @return the list of the copy of the codes for this fragment. If there is no code, an empty list is returned.
+	 */
+	public List<Code> getClonedCodes () {
+		ArrayList<Code> clones = new ArrayList<Code>();
+		for ( Code code : getCodes() ) {
+			clones.add(code.clone());
+		}
+		return clones;
+	}
+	
 
 	/**
 	 * Gets a copy of the list of the codes that are within a given section of

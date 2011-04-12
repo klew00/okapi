@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -121,7 +121,7 @@ public class GoogleMTConnector extends BaseConnector {
 			result.source = fragment;
 			if ( fragment.hasCode() ) {
 				result.target = new TextFragment(util.fromCodedHTML(res, fragment),
-					fragment.getCodes());
+					fragment.getClonedCodes());
 			}
 			else {
 				result.target = new TextFragment(util.fromCodedHTML(res, fragment));
@@ -136,7 +136,7 @@ public class GoogleMTConnector extends BaseConnector {
 		}
 		return ((current==0) ? 1 : 0);
 	}
-
+	
 	@Override
 	protected String toInternalCode (LocaleId locale) {
 		String code = locale.toBCP47();

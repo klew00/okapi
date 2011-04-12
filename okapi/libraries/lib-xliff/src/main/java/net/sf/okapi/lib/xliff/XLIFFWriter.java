@@ -32,7 +32,12 @@ import java.io.Writer;
 
 public class XLIFFWriter {
 
-    private PrintWriter writer = null;
+	/**
+	 * URI for the XLIFF 2.0 namespace.
+	 */
+	public static final String NS_XLIFF20 = "urn:oasis:names:tc:xliff:document:2.0";
+
+	private PrintWriter writer = null;
     private String lb = System.getProperty("line.separator");
     private boolean isIndented = false;
     private String indent;
@@ -140,7 +145,9 @@ public class XLIFFWriter {
 
 	public void writeStartDocument () {
 		writer.print("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+lb);
-		writer.print("<xliff version=\"2.0\">"+lb);
+		writer.print("<xliff version=\"2.0\""+lb);
+		writer.print(" xmlns=\""+NS_XLIFF20+"\""+lb);
+		writer.print(">"+lb);
 		
 		writer.print("<!-- This output is EXPERIMENTAL only. -->"+lb);
 		writer.print("<!-- XLIFF 2.0 is not defined yet. -->"+lb);

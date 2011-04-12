@@ -699,6 +699,23 @@ public class TextFragmentTest {
     }
 	
 	@Test
+	public void testCloneCodes () {
+		TextFragment tf = makeFragment3();
+		List<Code> list1 = tf.getCodes();
+		List<Code> list2 = tf.getClonedCodes();
+		assertEquals(list1.size(), list2.size());
+		for ( int i=0; i<list1.size(); i++ ) {
+			Code c1 = list1.get(i);
+			Code c2 = list2.get(i);
+			assertNotSame(c1, c2);
+			assertEquals(c1.getId(), c2.getId());
+			assertEquals(c1.getData(), c2.getData());
+			assertEquals(c1.type, c2.getType());
+		}
+		
+	}
+	
+	@Test
     public void testCompareToSameFragmentWithDifferentCodes () {
 		TextFragment tf1 = makeFragment1();
 		tf1.getCodes().get(0).setData("[zzz]");
