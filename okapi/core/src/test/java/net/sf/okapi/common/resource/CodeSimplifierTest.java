@@ -740,28 +740,26 @@ public class CodeSimplifierTest {
 	
 	@Test
 	public void testCodeReduction38 () {
-		// !!!
 		TextFragment tf = new TextFragment();		
 		tf.append(TagType.PLACEHOLDER, "x1", "<x1/>");
 		tf.append(TagType.PLACEHOLDER, "x2", "<x2/>");
 		tf.append("T1");		
 		tf.append(TagType.PLACEHOLDER, "x3", "<x3/>");
 		tf.append(TagType.PLACEHOLDER, "x4", "<x4/>");
-		tf.append(TagType.OPENING, "x5", "<x5>");
+		tf.append(TagType.OPENING, "a", "<a>");
 		tf.append("T2");
-		tf.append(TagType.CLOSING, "x5", "</x5>");
+		tf.append(TagType.CLOSING, "a", "</a>");
 				
 			assertEquals("<1/><2/>T1<3/><4/><5>T2</5>", fmt.setContent(tf).toString());
 		
 		String[] res = simplifier.simplifyAll(tf, true);
-		assertEquals("T1<2/>T2", fmt.setContent(tf).toString());
+		assertEquals("T1<2>T2</2>", fmt.setContent(tf).toString());
 		assertEquals("<x1/><x2/>", res[0]);
-		assertEquals("</x5>", res[1]);
+		assertEquals(null, res[1]);
 	}
 	
 	@Test
 	public void testCodeReduction39 () {
-		// !!!
 		TextFragment tf = new TextFragment();		
 		tf.append("T1");		
 		tf.append(TagType.PLACEHOLDER, "x1", "<x1/>");
@@ -773,10 +771,9 @@ public class CodeSimplifierTest {
 			assertEquals("T1<1/><2/><3>T2</3>", fmt.setContent(tf).toString());
 		
 		String[] res = simplifier.simplifyAll(tf, true);
-		//assertEquals("T1<1/><3>T2</3>", fmt.setContent(tf).toString());
-		assertEquals("T1<1/>T2", fmt.setContent(tf).toString());
+		assertEquals("T1<1>T2</1>", fmt.setContent(tf).toString());
 		assertEquals(null, res[0]);
-		assertEquals("</c>", res[1]);
+		assertEquals(null, res[1]);
 	}
 	
 	@Test
@@ -797,7 +794,6 @@ public class CodeSimplifierTest {
 	
 	@Test
 	public void testCodeReduction41 () {
-		// !!!
 		TextFragment tf = new TextFragment();		
 		tf.append("T1");		
 		tf.append(TagType.PLACEHOLDER, "x1", "<x1/>");
@@ -808,10 +804,9 @@ public class CodeSimplifierTest {
 			assertEquals("T1<1/><2>T2</2>", fmt.setContent(tf).toString());
 		
 		String[] res = simplifier.simplifyAll(tf, true);
-		//assertEquals("T1<1/><2>T2</2>", fmt.setContent(tf).toString());
-		assertEquals("T1<1/>T2", fmt.setContent(tf).toString());
+		assertEquals("T1<1>T2</1>", fmt.setContent(tf).toString());
 		assertEquals(null, res[0]);
-		assertEquals("</c>", res[1]);
+		assertEquals(null, res[1]);
 	}
 	
 	@Test
@@ -825,8 +820,7 @@ public class CodeSimplifierTest {
 		tf.append(TagType.CLOSING, "b", "</b>");
 		tf.append(TagType.OPENING, "c", "<c>");
 		tf.append("T3");
-		tf.append(TagType.CLOSING, "c", "</c>");
-		
+		tf.append(TagType.CLOSING, "c", "</c>");		
 				
 			assertEquals("<1>T1</1><2>T2</2><3>T3</3>", fmt.setContent(tf).toString());
 		

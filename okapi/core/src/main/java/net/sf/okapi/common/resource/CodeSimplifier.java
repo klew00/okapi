@@ -57,8 +57,8 @@ public class CodeSimplifier {
 		
 		StartCodeNode (int offset, int intIndex, char charIndex, Code code) {
 			super(offset, intIndex, charIndex, code);
-			marker = new String("\ue101"+charIndex);
-			markerFlag = new String("\ue101");
+			marker = new String("" + (char)TextFragment.MARKER_OPENING + charIndex);
+			markerFlag = new String("" + (char)TextFragment.MARKER_OPENING);
 		}
 	}
 	
@@ -68,8 +68,8 @@ public class CodeSimplifier {
 		
 		EndCodeNode (int offset, int intIndex, char charIndex, Code code) {
 			super(offset, intIndex, charIndex, code);
-			marker = new String("\ue102"+charIndex);
-			markerFlag = new String("\ue102");
+			marker = new String("" + (char)TextFragment.MARKER_CLOSING + charIndex);
+			markerFlag = new String("" + (char)TextFragment.MARKER_CLOSING);
 		}
 	}
 	
@@ -77,8 +77,8 @@ public class CodeSimplifier {
 
 		PhCodeNode (int offset, int intIndex, char charIndex, Code code) {
 			super(offset, intIndex, charIndex, code);
-			marker = new String("\ue103"+charIndex);
-			markerFlag = new String("\ue102");
+			marker = new String("" + (char)TextFragment.MARKER_ISOLATED + charIndex);
+			markerFlag = new String("" + (char)TextFragment.MARKER_ISOLATED);
 		}
 	}
 	
@@ -97,23 +97,23 @@ public class CodeSimplifier {
 		
 		for (int i = 0; i < codedText.length(); i++){ 
 			
-		    char c = codedText.charAt(i);
+		    int c = codedText.codePointAt(i);
 		    
-		    if(c == '\ue101'){
+		    if(c == TextFragment.MARKER_OPENING){
 		    	
 		    	StartCodeNode cn = new StartCodeNode(i, TextFragment.toIndex(codedText.charAt(i+1)), codedText.charAt(i+1), pCodes.get(TextFragment.toIndex(codedText.charAt(i+1))));
 
 		    	codeNodesList.add(cn);
 		    	codeNodesStack.push(cn);
 
-		    }else if(c == '\ue102'){
+		    }else if(c == TextFragment.MARKER_CLOSING){
 		    	
 		    	EndCodeNode cn = new EndCodeNode(i, TextFragment.toIndex(codedText.charAt(i+1)), codedText.charAt(i+1), pCodes.get(TextFragment.toIndex(codedText.charAt(i+1))));
 		    	
 		    	codeNodesList.add(cn);
 		    	codeNodesStack.pop().endNode = cn;
 		    	
-		    }else if(c == '\ue103'){
+		    }else if(c == TextFragment.MARKER_ISOLATED){
 		    	
 		    	PhCodeNode cn = new PhCodeNode(i, TextFragment.toIndex(codedText.charAt(i+1)), codedText.charAt(i+1), pCodes.get(TextFragment.toIndex(codedText.charAt(i+1))));
 		    	
@@ -335,146 +335,7 @@ public class CodeSimplifier {
 				Util.isEmpty(res0)? null : res0, 
 				Util.isEmpty(res1)? null : res1};
 	}
-	
-	private String[] removeLeadingTrailingCodes_Old (TextFragment tf) {
-		if ( tf.isEmpty() ) return null; // Nothing to do
 		
-		String ctext;
-		List<Code> codes;
-		Code code = null;
-		String[] res = new String[2];
-		int startPos;
-		int endPos;
-		StringBuilder sb;
-		List<Integer> leadingCodes = new ArrayList<Integer>();
-		List<Integer> trailingCodes = new ArrayList<Integer>();
-		
-		// Collecting leading codes
-		ctext = tf.getCodedText();
-		codes = tf.getCodes();
-		startPos = 0;
-		endPos = 0;
-				
-		for (int i = 0; i < ctext.length(); i++){
-			if ( TextFragment.isMarker(ctext.charAt(i)) ) {				
-				int codeIndex = TextFragment.toIndex(ctext.charAt(i + 1));
-				code = codes.get(codeIndex);
-				leadingCodes.add(code.getId());
-				
-				endPos = i + 2;					
-				i++; // Skip the pair
-			}
-			else if (Character.isWhitespace(ctext.charAt(i)) && endPos > 0) { // Mind spaces only after a code not to trim-head the string					
-					endPos = i + 1;
-			}
-			else {
-				break; // If came across a non-space and non-code, fall off
-			}			
-		}
-		
-		// Collecting trailing codes
-		ctext = tf.getCodedText();
-		codes = tf.getCodes();
-		startPos = ctext.length();
-		endPos = startPos;
-		
-		for (int i = ctext.length() - 1; i > 0; i--){
-			if ( TextFragment.isMarker(ctext.charAt(i - 1)) ) {				
-				int codeIndex = TextFragment.toIndex(ctext.charAt(i));
-				code = codes.get(codeIndex);
-				trailingCodes.add(code.getId());
-								
-				i--; // Skip the pair
-				startPos = i;
-			}
-			else if (Character.isWhitespace(ctext.charAt(i)) && startPos < ctext.length() - 1) { // Mind spaces only before a code not to trim-tail the string
-				trailingCodes.add(code.getId());
-					startPos = i;
-			}
-			else {
-				break; // If came across a non-space and non-code, and the previous char is not a code marker, fall off
-			}
-		}
-				
-		// Removing leading codes and spaces
-		startPos = 0;
-		endPos = 0;
-		sb = new StringBuilder();
-				
-		for (int i = 0; i < ctext.length(); i++){
-			if ( TextFragment.isMarker(ctext.charAt(i)) ) {				
-				int codeIndex = TextFragment.toIndex(ctext.charAt(i + 1));
-				code = codes.get(codeIndex);
-				boolean breakLoop = false;
-				
-				switch (code.getTagType()) {
-				case PLACEHOLDER:
-					sb.append(code.getOuterData());
-					break;
-
-				case OPENING:
-					if (trailingCodes.contains(code.getId())) {
-						
-					}
-					sb.append(code.getOuterData());
-					break;
-					
-				case CLOSING:
-					sb.append(code.getOuterData());
-					break;
-				}
-				if (breakLoop) break;
-				
-				endPos = i + 2;					
-				i++; // Skip the pair
-			}
-			else if (Character.isWhitespace(ctext.charAt(i)) && endPos > 0) { // Mind spaces only after a code not to trim-head the string
-					sb.append(ctext.charAt(i));
-					endPos = i + 1;
-			}
-			else {
-				break; // If came across a non-space and non-code, fall off
-			}			
-		}
-		
-		if (startPos < endPos) {
-			tf.remove(startPos, endPos);
-			res[0] = sb.toString();
-		}		
-		
-		// Removing trailing codes and spaces
-		ctext = tf.getCodedText();
-		codes = tf.getCodes();
-		startPos = ctext.length();
-		endPos = startPos;
-		sb = new StringBuilder();
-		
-		for (int i = ctext.length() - 1; i > 0; i--){
-			if ( TextFragment.isMarker(ctext.charAt(i - 1)) ) {				
-				int codeIndex = TextFragment.toIndex(ctext.charAt(i));
-				code = codes.get(codeIndex);
-				sb.insert(0, code.getOuterData());
-								
-				i--; // Skip the pair
-				startPos = i;
-			}
-			else if (Character.isWhitespace(ctext.charAt(i)) && startPos < ctext.length() - 1) { // Mind spaces only before a code not to trim-tail the string
-					sb.insert(0, ctext.charAt(i));
-					startPos = i;
-			}
-			else {
-				break; // If came across a non-space and non-code, and the previous char is not a code marker, fall off
-			}
-		}
-		
-		if (startPos < endPos) {
-			tf.remove(startPos, endPos);
-			res[1] = sb.toString();
-		}
-				
-		return res;
-	}
-	
 	/**
 	 * Simplifies all possible tags in a given text fragment.
 	 * @param tf the text fragment to modify.
@@ -720,9 +581,17 @@ public class CodeSimplifier {
 	 * merges codedText and codes for start and isolated nodes
 	 */
 	private void mergeNodes (CodeNode node1, CodeNode node2) {
-		codedText = codedText.replace(node1.marker+node2.marker, node1.marker);
-		node1.code.setData(node1.code.getData()+node2.code.getData());
-		codeNodesList.remove(node2);
+		// PH before Start merges to the Start 
+		if (node1 instanceof PhCodeNode && node2 instanceof StartCodeNode) {
+			codedText = codedText.replace(node1.marker+node2.marker, node2.marker);
+			node2.code.setData(node1.code.getData()+node2.code.getData());
+			codeNodesList.remove(node1);
+		}
+		else {
+			codedText = codedText.replace(node1.marker+node2.marker, node1.marker);
+			node1.code.setData(node1.code.getData()+node2.code.getData());
+			codeNodesList.remove(node2);
+		}		
 	}
 	
 	/*
