@@ -168,6 +168,28 @@ public class RegexFilterTest {
 		assertEquals("\"\"a\"\"b\"\"c\"\"", tu.getSource().toString());
 	}
 
+	@Test
+	public void testEscapeDoubleCharNoEscape () {
+		String snippet = "id = [\"a\" and \"b\"]";
+		Parameters params = new Parameters();
+		Rule rule = new Rule();
+		rule.setRuleType(Rule.RULETYPE_CONTENT);
+		rule.setExpression("^.*?\\[(.*?)]");
+		rule.setSourceGroup(1);
+		rule.setRuleType(Rule.RULETYPE_STRING);
+		params.getRules().add(rule);
+		params.setUseDoubleCharEscape(true);
+		filter.setParameters(params);
+		// Process
+		ArrayList<Event> list = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(list, 1);
+		assertNotNull(tu);
+		assertEquals("a", tu.getSource().toString());
+		tu = FilterTestDriver.getTextUnit(list, 2);
+		assertNotNull(tu);
+		assertEquals("b", tu.getSource().toString());
+	}
+
 	private ArrayList<Event> getEvents(String snippet) {
 		ArrayList<Event> list = new ArrayList<Event>();
 		filter.open(new RawDocument(snippet, locEN));
