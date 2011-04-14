@@ -563,6 +563,25 @@ public class RegexFilter implements IFilter {
 							else throw new OkapiIllegalFilterOperationException("Escape syntax error in ["+data+"]");
 						}
 					}
+					if ( params.getUseDoubleCharEscape() ) {
+						// Is this a string delimiter?
+						char ch = 0x00;
+						if (( n = params.getStartString().indexOf(data.codePointAt(i)) ) > -1 ) {
+							ch = params.getStartString().charAt(n);
+						}
+						else if (( n = params.getEndString().indexOf(data.codePointAt(i)) ) > -1 ) {
+							ch = params.getEndString().charAt(n);
+						}
+						if ( ch != 0x00 ) { // Check if it's doubled
+							 if ( i+1 < data.length() ) {
+								 if ( ch == data.codePointAt(i) ) {
+									 // It is a doubled character: skip it
+									 if ( i+2 < data.length() ) i += 2; // Now point to next
+									 else throw new OkapiIllegalFilterOperationException("Escape syntax error in ["+data+"]");
+								 }
+							 }
+						}
+					}
 				}
 			
 				// Check characters

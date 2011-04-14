@@ -32,6 +32,7 @@ public class Parameters extends BaseParameters {
 	private static final String STARTSTRING = "startString";
 	private static final String ENDSTRING = "endString";
 	private static final String USEBSLASHESCAPE = "useBSlashEscape";
+	private static final String USEDOUBLECHARESCAPE = "useDoubleCharEscape";
 	private static final String ONELEVELGROUP = "oneLevelGroups";
 	private static final String USELD = "useLd";
 	private static final String LOCALIZEOUTSIDE = "localizeOutside";
@@ -42,6 +43,7 @@ public class Parameters extends BaseParameters {
 	private String startString;
 	private String endString;
 	private boolean useBSlashEscape;
+	private boolean useDoubleCharEscape;
 	private int regexOptions;
 	private LocalizationDirectives localizationDirectives;
 	private String mimeType;
@@ -61,6 +63,7 @@ public class Parameters extends BaseParameters {
 		endString = "\"";
 		extractOuterStrings = false;
 		useBSlashEscape = true;
+		useDoubleCharEscape = false;
 		localizationDirectives.reset();
 		mimeType = "text/plain";
 		oneLevelGroups = false;
@@ -98,6 +101,14 @@ public class Parameters extends BaseParameters {
 		this.useBSlashEscape = useBSlashEscape;
 	}
 	
+	public boolean getUseDoubleCharEscape () {
+		return useDoubleCharEscape;
+	}
+	
+	public void setUseDoubleCharEscape (boolean useDoubleCharEscape) {
+		this.useDoubleCharEscape = useDoubleCharEscape;
+	}
+	
 	public int getRegexOptions () {
 		return regexOptions;
 	}
@@ -105,7 +116,6 @@ public class Parameters extends BaseParameters {
 	public void setRegexOptions (int regexOptions) {
 		this.regexOptions = regexOptions;
 	}
-
 	
 	public LocalizationDirectives getLocalizationDirectives () {
 		return localizationDirectives;
@@ -142,6 +152,7 @@ public class Parameters extends BaseParameters {
 		endString = buffer.getString(ENDSTRING, endString);
 		extractOuterStrings = buffer.getBoolean(EXTRACTOUTERSTRINGS, extractOuterStrings);
 		useBSlashEscape = buffer.getBoolean(USEBSLASHESCAPE, useBSlashEscape);
+		useDoubleCharEscape = buffer.getBoolean(USEDOUBLECHARESCAPE, useDoubleCharEscape);
 		oneLevelGroups = buffer.getBoolean(ONELEVELGROUP, oneLevelGroups);
 		regexOptions = buffer.getInteger(REGEXOPTIONS, regexOptions);
 		mimeType = buffer.getString(MIMETYPE, mimeType);
@@ -163,6 +174,7 @@ public class Parameters extends BaseParameters {
 		buffer.setString(ENDSTRING, endString);
 		buffer.setBoolean(EXTRACTOUTERSTRINGS, extractOuterStrings);
 		buffer.setBoolean(USEBSLASHESCAPE, useBSlashEscape);
+		buffer.setBoolean(USEDOUBLECHARESCAPE, useDoubleCharEscape);
 		buffer.setBoolean(ONELEVELGROUP, oneLevelGroups);
 		buffer.setInteger(REGEXOPTIONS, regexOptions);
 		buffer.setString(MIMETYPE, mimeType);

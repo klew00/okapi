@@ -61,9 +61,11 @@ public class Editor implements IParametersEditor {
 	private Shell shell;
 	private boolean result = false;
 	private Text edExpression;
-	private Button chkExtractOuterStrings;
+//	private Button chkExtractOuterStrings;
 	private Text edStartString;
 	private Text edEndString;
+	private Button chkUseBSlashEscape;
+	private Button chkUseDoubleCharEscape;
 	private List lbRules;
 	private Button btAdd;
 	private Button btEdit;
@@ -333,13 +335,13 @@ public class Editor implements IParametersEditor {
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		grpTmp.setLayoutData(gdTmp);
 		
-		chkExtractOuterStrings = new Button(grpTmp, SWT.CHECK);
-		chkExtractOuterStrings.setText(Res.getString("Editor.extractStringsOutside")); //$NON-NLS-1$
-		gdTmp = new GridData();
-		gdTmp.horizontalSpan = 2;
-		chkExtractOuterStrings.setLayoutData(gdTmp);
-//TODO: implement chkExtractOuterStrings		
-chkExtractOuterStrings.setEnabled(false); // NOT WORKING YET		
+//		chkExtractOuterStrings = new Button(grpTmp, SWT.CHECK);
+//		chkExtractOuterStrings.setText(Res.getString("Editor.extractStringsOutside")); //$NON-NLS-1$
+//		gdTmp = new GridData();
+//		gdTmp.horizontalSpan = 2;
+//		chkExtractOuterStrings.setLayoutData(gdTmp);
+////TODO: implement chkExtractOuterStrings		
+//chkExtractOuterStrings.setEnabled(false); // NOT WORKING YET		
 
 		Label label = new Label(grpTmp, SWT.NONE);
 		label.setText(Res.getString("Editor.startOfString")); //$NON-NLS-1$
@@ -352,6 +354,18 @@ chkExtractOuterStrings.setEnabled(false); // NOT WORKING YET
 		edEndString = new Text(grpTmp, SWT.BORDER);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		edEndString.setLayoutData(gdTmp);
+		
+		chkUseBSlashEscape = new Button(grpTmp, SWT.CHECK);
+		chkUseBSlashEscape.setText("Escaped characters use back-slash prefix (e.g. \\\")");
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalSpan = 2;
+		chkUseBSlashEscape.setLayoutData(gdTmp);
+
+		chkUseDoubleCharEscape = new Button(grpTmp, SWT.CHECK);
+		chkUseDoubleCharEscape.setText("Escaped characters are doubled (e.g. \"\")");
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalSpan = 2;
+		chkUseDoubleCharEscape.setLayoutData(gdTmp);
 
 		// Content type
 		grpTmp = new Group(cmpTmp, SWT.NONE);
@@ -601,9 +615,11 @@ chkExtractOuterStrings.setEnabled(false); // NOT WORKING YET
 	private void setData () {
 		pnlLD.setOptions(params.getLocalizationDirectives().useLD(),
 			params.getLocalizationDirectives().localizeOutside());
-		chkExtractOuterStrings.setSelection(params.getExtractOuterStrings());
+//		chkExtractOuterStrings.setSelection(params.getExtractOuterStrings());
 		edStartString.setText(params.getStartString());
 		edEndString.setText(params.getEndString());
+		chkUseBSlashEscape.setSelection(params.getUseBSlashEscape());
+		chkUseDoubleCharEscape.setSelection(params.getUseDoubleCharEscape());
 		edMimeType.setText(params.getMimeType());
 		
 		for ( Rule rule : rules ) {
@@ -625,9 +641,11 @@ chkExtractOuterStrings.setEnabled(false); // NOT WORKING YET
 		saveRuleData(ruleIndex);
 		//TODO: validation
 		params.getLocalizationDirectives().setOptions(pnlLD.getUseLD(), pnlLD.getLocalizeOutside());
-		params.setExtractOuterStrings(chkExtractOuterStrings.getSelection());
+//		params.setExtractOuterStrings(chkExtractOuterStrings.getSelection());
 		params.setStartString(edStartString.getText());
 		params.setEndString(edEndString.getText());
+		params.setUseBSlashEscape(chkUseBSlashEscape.getSelection());
+		params.setUseDoubleCharEscape(chkUseDoubleCharEscape.getSelection());
 		params.setMimeType(edMimeType.getText());
 		
 		ArrayList<Rule> paramRules = params.getRules();
