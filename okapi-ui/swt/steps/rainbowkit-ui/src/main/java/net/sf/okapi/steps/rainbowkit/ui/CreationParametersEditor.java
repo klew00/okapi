@@ -193,8 +193,8 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		optMoreInfo.add("Rainbow TKit - XLIFF with RTF"); // wiki page
 		writers.add("net.sf.okapi.steps.rainbowkit.xliffrtf.XLIFFRTFPackageWriter");
 		// OmegaT options
-		optEditors.add(null);
-		optStrings.add(null);
+		optEditors.add("net.sf.okapi.steps.rainbowkit.omegat.Options");
+		optStrings.add(createParameters(optEditors.get(optEditors.size()-1)));
 		optMoreInfo.add("Rainbow TKit - OmegaT Project"); // wiki page
 		writers.add("net.sf.okapi.steps.rainbowkit.omegat.OmegaTPackageWriter");
 		// Transifex options
@@ -355,7 +355,7 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 				+ "You can translate this package with Trados Translator's Workbench or any compatible tool.");
 			break;
 		case 4: // OmegaT
-			btOptions.setEnabled(false);
+			btOptions.setEnabled(optEditors.get(n)!=null);
 			edDescription.setText("OmegaT project with all its files and directory structure in place.\n"
 				+ "You can translate this package with OmegaT.");
 			break;

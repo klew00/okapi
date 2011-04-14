@@ -30,13 +30,17 @@ import net.sf.okapi.steps.rainbowkit.xliff.XLIFFPackageWriter;
 
 public class OmegaTPackageWriter extends XLIFFPackageWriter {
 
+	Options options;
+	
 	public OmegaTPackageWriter () {
 		super();
+		options = new Options();
 		extractionType = Manifest.EXTRACTIONTYPE_OMEGAT;
 	}
 	
 	@Override
 	protected void processStartBatch () {
+		setForOmegat(true);
 		manifest.setSubDirectories("original", "source", "target", "done", "tm", true);
 		setTMXInfo(true, manifest.getPackageRoot()+"omegat"+File.separator+"project_save.tmx", null, null, null);
 		super.processStartBatch();
@@ -59,6 +63,11 @@ public class OmegaTPackageWriter extends XLIFFPackageWriter {
 	
 	@Override
 	protected void processStartDocument (Event event) {
+		// Set the writer's options
+		// Get the options from the parameters
+		if ( !Util.isEmpty(params.getWriterOptions()) ) {
+			options.fromString(params.getWriterOptions());
+		}
 		super.processStartDocument(event);
 	}
 	
@@ -97,8 +106,8 @@ public class OmegaTPackageWriter extends XLIFFPackageWriter {
 
 			XR.writeStartElement("sentence_seg");
 			// If the data are pre-segmented set the project with no segmentation
-			// Otherwise: TODO set it as defined by the user
-			XR.writeRawXML(getPreSegmented() ? "false" : "true");
+			// Otherwise use the user's choice
+			XR.writeRawXML(getPreSegmented() ? "false" : (options.getAllowSegmentation() ? "true" : "false"));
 			XR.writeEndElementLineBreak(); // sentence_seg
 
 			XR.writeEndElementLineBreak(); // project

@@ -33,6 +33,7 @@ public class XLIFFPackageWriter extends BasePackageWriter {
 	protected XLIFFWriter writer;
 
 	private boolean preSegmented = false;
+	private boolean forOmegat = false;
 
 	public XLIFFPackageWriter () {
 		super(Manifest.EXTRACTIONTYPE_XLIFF);
@@ -44,6 +45,10 @@ public class XLIFFPackageWriter extends BasePackageWriter {
 	 */
 	public boolean getPreSegmented () {
 		return preSegmented;
+	}
+	
+	public void setForOmegat (boolean forOmegat) {
+		this.forOmegat = forOmegat;
 	}
 	
 	@Override
@@ -65,10 +70,12 @@ public class XLIFFPackageWriter extends BasePackageWriter {
 		writer.setOutput(path); // Not really used, but doesn't hurt just in case
 
 		// Set the writer's options
-		// Get the options from the parameters
 		Options options = new Options();
-		if ( !Util.isEmpty(params.getWriterOptions()) ) {
-			options.fromString(params.getWriterOptions());
+		if ( !forOmegat ) {
+			// Get the options from the parameters
+			if ( !Util.isEmpty(params.getWriterOptions()) ) {
+				options.fromString(params.getWriterOptions());
+			}
 		}
 		//TODO: Would be easier to use IParameters in XLIFFWriter.
 		writer.setPlaceholderMode(options.getPlaceholderMode());

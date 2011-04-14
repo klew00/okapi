@@ -18,64 +18,62 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.common.removetarget;
+package net.sf.okapi.steps.rainbowkit.omegat;
 
 import net.sf.okapi.common.BaseParameters;
-import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.ParametersDescription;
 import net.sf.okapi.common.uidescription.EditorDescription;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 
-@EditorFor(Parameters.class)
-public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
+public class Options extends BaseParameters implements IEditorDescriptionProvider {
 
-	private static final String TUS_FOR_TARGET_REMOVAL = "tusForTargetRemoval";
+	private static final String ALLOWSEGMENTATION = "allowSegmentation"; //$NON-NLS-1$
 	
-	private String tusForTargetRemoval;
-	
-	public Parameters() {
+	private boolean allowSegmentation;
+
+	public Options () {
 		reset();
 	}
 	
+	@Override
 	public void reset() {
-		tusForTargetRemoval = "";
+		allowSegmentation = true;
 	}
 
 	@Override
-	public void fromString(String data) {
+	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
-		// Read the file content as a set of fields
-		tusForTargetRemoval = buffer.getString(TUS_FOR_TARGET_REMOVAL, tusForTargetRemoval);
+		allowSegmentation = buffer.getBoolean(ALLOWSEGMENTATION, allowSegmentation);
 	}
 
 	@Override
-	public String toString() {
-		buffer.reset();		
-		buffer.setString(TUS_FOR_TARGET_REMOVAL, tusForTargetRemoval);
+	public String toString () {
+		buffer.reset();
+		buffer.setParameter(ALLOWSEGMENTATION, allowSegmentation);
 		return buffer.toString();
 	}
+
+	public boolean getAllowSegmentation () {
+		return allowSegmentation;
+	}
+
+	public void setAllowSegmentation (boolean allowSegmentation) {
+		this.allowSegmentation = allowSegmentation;
+	}
 	
-	public void setTusForTargetRemoval(String tusForTargetRemoval) {
-		this.tusForTargetRemoval = tusForTargetRemoval;
-	}
-
-	public String getTusForTargetRemoval() {
-		return tusForTargetRemoval;
-	}
-
 	@Override
 	public ParametersDescription getParametersDescription() {
 		ParametersDescription desc = new ParametersDescription(this);
-		desc.add(TUS_FOR_TARGET_REMOVAL, "Comma-delimited list of ids of the text units where targets are to be removed\n" +
-				"(Leave empty to remove targets in all text units)", null);
+		desc.add(ALLOWSEGMENTATION, "Allow segmentation in the OmegaT project",
+			"Allow or not segmentation in the project. Ignored if there is a segmentation step.");
 		return desc;
 	}
 
 	@Override
 	public EditorDescription createEditorDescription(ParametersDescription paramsDesc) {
-		EditorDescription desc = new EditorDescription("Remove Target", true, false);		
-		desc.addTextInputPart(paramsDesc.get(TUS_FOR_TARGET_REMOVAL));
+		EditorDescription desc = new EditorDescription("OmegaT Project", true, false);
+		desc.addCheckboxPart(paramsDesc.get(ALLOWSEGMENTATION));
 		return desc;
 	}
 
