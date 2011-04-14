@@ -20,17 +20,23 @@
 
 package net.sf.okapi.common.resource;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import net.sf.okapi.common.IResource;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.ReversedIterator;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.annotation.IAnnotation;
-import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonPart;
 import net.sf.okapi.common.skeleton.SkeletonUtil;
@@ -40,7 +46,21 @@ import net.sf.okapi.common.skeleton.SkeletonUtil;
  */
 public class TextUnitUtil {
 
-	private static final Logger LOGGER = Logger.getLogger(TextUnitUtil.class.getName()); 
+	private static final Logger LOGGER = Logger.getLogger(TextUnitUtil.class.getName());
+	
+	// Segment markers
+	private static final String SEG_START = "$seg_start$";
+	private static final String SEG_END = "$seg_end$";
+	
+	// Text Part markers
+	private static final String TP_START = "$tp_start$";
+	private static final String TP_END = "$tp_end$";
+	
+	private static final Pattern SEG_START_REGEX = Pattern.compile("\\[#\\$(.+)\\@\\%\\$seg_start\\$\\]");
+	private static final Pattern SEG_END_REGEX = Pattern.compile("\\[#\\$(.+)\\@\\%\\$seg_end\\$\\]");
+	
+	private static final Pattern TP_START_REGEX = Pattern.compile("\\$tp_start\\$");
+	private static final Pattern TP_END_REGEX = Pattern.compile("\\$tp_end\\$");
 	
 	/**
 	 * Removes leading whitespaces from a given text fragment.
@@ -960,7 +980,7 @@ public class TextUnitUtil {
 	}
 	
 	/**
-	 * Simplifies all possible tags in the source part of a given un-segmented text unit resource.
+	 * Simplifies all possible tags in the source part of a given text unit resource.
 	 * @param textUnit the given text unit
 	 * @param removeLeadingTrailingCodes true to remove leading and/or trailing codes
 	 * of the source part and place their text in the skeleton.
@@ -971,17 +991,25 @@ public class TextUnitUtil {
 			return;
 		}
 		
-		// Only un-segmented text units are allowed
-		if (textUnit.getSource().hasBeenSegmented()) {
-			LOGGER.warning(String.format("Text unit %s is segmented, cannot process.", textUnit.getId()));
-			return;
+		if (textUnit.getTargetLocales().size() > 0) {
+			LOGGER.warning(String.format("Text unit %s has one or more targets, " +
+					"desinchronization of codes in source and targets is possible.", textUnit.getId()));
 		}
 		
-		TextFragment tf = textUnit.getSource().getUnSegmentedContentCopy();  
 		CodeSimplifier simplifier = new CodeSimplifier();
-		String[] res = simplifier.simplifyAll(tf, removeLeadingTrailingCodes);
-		textUnit.setSourceContent(tf);
+		TextContainer tc = textUnit.getSource();
+		String[] res;
 		
+		if (textUnit.getSource().hasBeenSegmented()) {
+			res = simplifier.simplifyAll(tc, removeLeadingTrailingCodes);			
+		}
+		else {
+			TextFragment tf = tc.getUnSegmentedContentCopy();  			
+			res = simplifier.simplifyAll(tf, removeLeadingTrailingCodes);
+			textUnit.setSourceContent(tf); // Because we modified a copy
+		}
+			
+		// Move the codes found themselves outside the container/fragment, to the TU skeleton
 		if (removeLeadingTrailingCodes && res != null) {
 			GenericSkeleton tuSkel = TextUnitUtil.forceSkeleton(textUnit);
 			GenericSkeleton skel = new GenericSkeleton();
@@ -995,7 +1023,7 @@ public class TextUnitUtil {
 				SkeletonUtil.replaceSkeletonPart(tuSkel, index, skel);
 			else
 				tuSkel.add(skel);
-		}		
+		}
 	}
 
 	/**
@@ -1171,4 +1199,191 @@ public class TextUnitUtil {
 		return altTrans;
 	}
 
+	/**
+	 * Creates a text fragment containing all segments and text parts of a given text container.
+	 * Original segments and text parts are wrapped with special boundary place-holders, inserted to later restore the 
+	 * original segmentation.
+	 * @param tc the given text container
+	 * @return a text fragment containing the given text container's text parts and segments and segment boundary place-holders. 
+	 */
+	public static TextFragment storeSegmentation (TextContainer tc) {
+		// Join all segment and text parts into a new TextFragment
+		
+		// We need to have markers for both segments and text parts, because if we have segment markers only,
+		// then adjacent text parts in an inter-segment space will get restored as one text part
+		
+		// Cannot store seg ids in Code.type, because if 2 codes are merged, the type of one of them is lost 
+		
+		TextFragment tf = new TextFragment();
+		for ( TextPart part : tc ) {
+			Segment seg = null;
+			
+			if (part.isSegment()) {
+				seg = (Segment)part;
+				tf.append(new Code(TagType.PLACEHOLDER, "seg", TextFragment.makeRefMarker(seg.getId(), SEG_START)));
+			}
+			else {
+				tf.append(new Code(TagType.PLACEHOLDER, "tp", TP_START));
+			}
+			
+			tf.append(part.getContent());
+			
+			if (part.isSegment()) {
+				tf.append(new Code(TagType.PLACEHOLDER, "seg", TextFragment.makeRefMarker(seg.getId(), SEG_END)));
+			}
+			else {
+				tf.append(new Code(TagType.PLACEHOLDER, "tp", TP_END));
+			}
+		}
+		return tf;
+	}		
+	
+	private static final class MarkerDescr {
+		private boolean isSegment;
+		private boolean isStart;
+		private String id;
+		private int position;
+		
+		private MarkerDescr(String id, int position, boolean isStart) {
+			this.isSegment = true;
+			this.isStart = isStart;
+			this.id = id;
+			this.position = position;
+		}
+		
+		private MarkerDescr(int position, boolean isStart) {
+			this.isSegment = false;
+			this.isStart = isStart;
+			this.id = null;
+			this.position = position;
+		}
+	}
+	
+	/**
+	 * Restores original segmentation of a given text container from a given text fragment created with storeSegmentation().
+	 * @param tc the given text container
+	 * @param segStorage the text fragment created with storeSegmentation() and containing the original segmentation info
+	 * @return a test string containing a sequence of markers created by the internal algorithm. Used for tests only. 
+	 */
+	public static String restoreSegmentation(TextContainer tc, TextFragment segStorage) {
+		
+		// Empty tc
+		tc.clear();
+		
+		// Scan the tf, create segments and text parts, and add them to tc
+		TextFragment tf = segStorage;		
+		String ctext = tf.getCodedText();
+		String id;
+		List<Code> codes = tf.getCodes();
+		int pos;
+		
+		List<MarkerDescr> markers = new ArrayList<MarkerDescr> ();
+		
+		for (int i = 0; i < ctext.length(); i++){
+			if ( TextFragment.isMarker(ctext.charAt(i)) ) {				
+				int codeIndex = TextFragment.toIndex(ctext.charAt(i + 1));
+				Code code = codes.get(codeIndex);
+				String data = code.getData();
+				
+				Matcher matcher = SEG_START_REGEX.matcher(data);
+				while (matcher.find()) {
+					pos = matcher.start();
+					id = matcher.group(1);
+					markers.add(new MarkerDescr(id, pos + i, true));
+				}				
+				
+				matcher = SEG_END_REGEX.matcher(data);
+				while (matcher.find()) {
+					pos = matcher.start();
+					id = matcher.group(1);
+					markers.add(new MarkerDescr(id, pos + i, false));
+				}
+				
+				matcher = TP_START_REGEX.matcher(data);
+				while (matcher.find()) {
+					pos = matcher.start();
+					markers.add(new MarkerDescr(pos + i, true));
+				}				
+				
+				matcher = TP_END_REGEX.matcher(data);
+				while (matcher.find()) {
+					pos = matcher.start();
+					markers.add(new MarkerDescr(pos + i, false));
+				}
+				
+				// Remove markers from the code data, code markers stay in place in the tf coded text
+				SEG_START_REGEX.matcher(data).replaceAll("");
+				SEG_END_REGEX.matcher(data).replaceAll("");
+				TP_START_REGEX.matcher(data).replaceAll("");
+				TP_END_REGEX.matcher(data).replaceAll("");
+								
+				i++; // Skip the pair
+			}
+			// For the 1-st iteration mind spaces only after a code not to trim-head the string
+			else if (Character.isWhitespace(ctext.charAt(i))) {
+				
+			}
+		}
+		
+		// TODO merged codes processing
+		
+		// Sort markers
+		StringBuilder markersSb = new StringBuilder();
+		
+		Collections.sort(markers, new Comparator<MarkerDescr>() {
+
+			@Override
+			public int compare(MarkerDescr d1, MarkerDescr d2) {
+				if (d1.isSegment && d2.isSegment || !d1.isSegment && !d2.isSegment) {
+					if (d1.position < d2.position) 
+						return -1;
+					else if (d1.position > d2.position) 
+						return 1;
+					else { // equal positions, markers from a merged code
+						if (!d1.isStart & d2.isStart)
+							return -1;
+						else if (d1.isStart & !d2.isStart)
+							return 1;
+						else
+							return 0;
+					}
+				}
+				else 
+					return 0;
+			}			
+		});
+		
+		for (MarkerDescr d : markers) {
+			markersSb.append(String.format("(%d: %s %s) ", d.position, d.id != null ? d.id : "", d.isStart ? "start" : "end"));
+		}
+		
+		// Create segments and text parts in tc
+		int start = -1;
+		for (MarkerDescr d : markers) {			
+			if (d.isSegment) { // segment
+				if (d.isStart) {
+					start = d.position + 2;
+				}
+				else { // end
+					if (start > -1) {
+						tc.append(new Segment(d.id, tf.subSequence(start, d.position)));
+					}
+					start = -1;
+				}
+			}
+			else { // text part
+				if (d.isStart) {
+					start = d.position + 2;
+				}
+				else { // end
+					if (start > -1) {
+						tc.append(new TextPart(tf.subSequence(start, d.position)));
+					}
+					start = -1;
+				}
+			}
+		}
+		
+		return markersSb.toString().trim(); 		
+	}	
 }

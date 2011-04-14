@@ -26,8 +26,13 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
@@ -377,7 +382,221 @@ public class TextUnitUtilTest {
 		assertEquals(tuRef, parts.get(1).toString());
 		assertEquals("<x2/>", parts.get(2).toString());
 	}
+	
+	@Test
+	public void testSimplifyCodes_segmentedTU() {
+		// TODO
+	}
 
+	@Test
+	public void testStoreSegmentation () {		
+		TextContainer tc = new TextContainer();
+		tc.append(new Segment("s1", new TextFragment("[seg 1]")));
+		tc.append(new TextPart("[text part 1]"));
+		tc.append(new Segment("s2", new TextFragment("[seg 2]")));
+		tc.append(new TextPart("[text part 2]"));
+		tc.append(new TextPart("[text part 3]"));
+		tc.append(new Segment("s3", new TextFragment("[seg 3]")));
+		
+		TextFragment tf = TextUnitUtil.storeSegmentation(tc);
+		assertEquals("<1/>[seg 1]<2/><3/>[text part 1]<4/><5/>[seg 2]<6/><7/>[text part 2]<8/>" +
+				"<9/>[text part 3]<10/><11/>[seg 3]<12/>", 
+				fmt.setContent(tf).toString());
+		
+		List<Code> codes = tf.getCodes();
+		assertEquals(12, codes.size());
+		
+		assertEquals("[#$s1@%$seg_start$]", codes.get(0).toString()); // <1/>
+		assertEquals("[#$s1@%$seg_end$]", codes.get(1).toString()); // <2/>
+		
+		assertEquals("$tp_start$", codes.get(2).toString()); // <3/>
+		assertEquals("$tp_end$", codes.get(3).toString()); // <4/>
+		
+		assertEquals("[#$s2@%$seg_start$]", codes.get(4).toString()); // <5/>
+		assertEquals("[#$s2@%$seg_end$]", codes.get(5).toString()); // <6/>
+		
+		assertEquals("$tp_start$", codes.get(6).toString()); // <7/>
+		assertEquals("$tp_end$", codes.get(7).toString()); // <8/>
+		
+		assertEquals("$tp_start$", codes.get(8).toString()); // <9/>
+		assertEquals("$tp_end$", codes.get(9).toString()); // <10/>
+		
+		assertEquals("[#$s3@%$seg_start$]", codes.get(10).toString()); // <11/>
+		assertEquals("[#$s3@%$seg_end$]", codes.get(11).toString()); // <12/>		
+	}
+
+	@Test
+	public void testRestoreSegmentation () {		
+		TextContainer tc = new TextContainer();
+		tc.append(new Segment("s1", new TextFragment("[seg 1]")));
+		tc.append(new TextPart("[text part 1]"));
+		tc.append(new Segment("s2", new TextFragment("[seg 2]")));
+		tc.append(new TextPart("[text part 2]"));
+		tc.append(new TextPart("[text part 3]"));
+		tc.append(new Segment("s3", new TextFragment("[seg 3]")));
+		tc.append(new Segment("s4", new TextFragment("[seg 4]")));
+		
+		TextFragment tf = TextUnitUtil.storeSegmentation(tc);
+		assertEquals("<1/>[seg 1]<2/><3/>[text part 1]<4/><5/>[seg 2]<6/><7/>[text part 2]<8/>" +
+				"<9/>[text part 3]<10/><11/>[seg 3]<12/><13/>[seg 4]<14/>", 
+				fmt.setContent(tf).toString());
+
+		String st = TextUnitUtil.restoreSegmentation(tc, tf);
+		assertEquals("(0: s1 start) (9: s1 end) (11:  start) (26:  end) (28: s2 start) (37: s2 end) (39:  start) (54:  end) " +
+				"(56:  start) (71:  end) (73: s3 start) (82: s3 end) (84: s4 start) (93: s4 end)", st);
+		
+		assertEquals("[seg 1][text part 1][seg 2][text part 2][text part 3][seg 3][seg 4]", tc.toString());
+		
+		
+		Iterator<TextPart> it = tc.iterator();
+		
+		TextPart part = null; 
+		
+		if (it.hasNext()) {
+			part = it.next();
+			assertTrue(part.isSegment());
+			assertEquals("[seg 1]", part.toString());
+		}
+				
+		if (it.hasNext()) {
+			part = it.next();
+			assertFalse(part.isSegment());
+			assertEquals("[text part 1]", part.toString());
+		}
+		
+		if (it.hasNext()) {
+			part = it.next();
+			assertTrue(part.isSegment());
+			assertEquals("[seg 2]", part.toString());
+		}
+		
+		if (it.hasNext()) {
+			part = it.next();
+			assertFalse(part.isSegment());
+			assertEquals("[text part 2]", part.toString());
+		}
+		
+		if (it.hasNext()) {
+			part = it.next();
+			assertFalse(part.isSegment());
+			assertEquals("[text part 3]", part.toString());
+		}
+		
+		if (it.hasNext()) {
+			part = it.next();
+			assertTrue(part.isSegment());
+			assertEquals("[seg 3]", part.toString());
+		}		
+		
+		if (it.hasNext()) {
+			part = it.next();
+			assertTrue(part.isSegment());
+			assertEquals("[seg 4]", part.toString());
+		}
+	}
+	
+	@Test
+	public void testTreeSet() {
+		TreeSet<Integer> set = new TreeSet<Integer>();
+		set.add(5);
+		set.add(1);
+		set.add(5);
+		set.add(3);
+		set.add(9);
+		
+		assertEquals(4, set.size()); // 5 is repeated
+		assertEquals("[1, 3, 5, 9]", set.toString());
+	}
+	
+	@Test
+	public void testTreeMap() {
+		TreeMap<Integer, String> map = new TreeMap<Integer, String>();
+		map.put(5, "");
+		map.put(1, "");
+		map.put(5, "");
+		map.put(3, "");
+		map.put(9, "");
+		
+		assertEquals(4, map.size()); // 5 is repeated
+		//assertEquals("[1, 3, 5, 9]", set.toString());
+	}
+	
+	@Test
+	public void testHashtableSort() {
+		Hashtable<String, String> h = new Hashtable<String, String>();
+	    h.put("a", "b");	    
+	    h.put("c", "d");
+	    h.put("e", "f");
+	    h.put("a", "bb");
+	    List<String> v = new ArrayList<String>(h.keySet());
+	    Collections.sort(v);
+	}
+	
+	@Test
+	public void testRestoreSegmentation2 () {		
+		TextContainer tc = new TextContainer();
+		tc.append(new Segment("s1", new TextFragment("[seg 1]")));
+		tc.append(new TextPart("[text part 1]"));
+		tc.append(new Segment("s2", new TextFragment("[seg 2]")));
+		tc.append(new TextPart("[text part 2]"));
+		tc.append(new TextPart("[text part 3]"));
+		tc.append(new Segment("s3", new TextFragment("[seg 3]")));
+		tc.append(new TextPart("[text part 4]"));
+		
+		TextFragment tf = TextUnitUtil.storeSegmentation(tc);
+		assertEquals("<1/>[seg 1]<2/><3/>[text part 1]<4/><5/>[seg 2]<6/><7/>[text part 2]<8/>" +
+				"<9/>[text part 3]<10/><11/>[seg 3]<12/><13/>[text part 4]<14/>", 
+				fmt.setContent(tf).toString());
+
+		TextUnitUtil.restoreSegmentation(tc, tf);
+		assertEquals("[seg 1][text part 1][seg 2][text part 2][text part 3][seg 3][text part 4]", tc.toString());
+		
+		Iterator<TextPart> it = tc.iterator();		
+		TextPart part = null; 
+		
+		if (it.hasNext()) {
+			part = it.next();
+			assertTrue(part.isSegment());
+			assertEquals("[seg 1]", part.toString());
+		}
+				
+		if (it.hasNext()) {
+			part = it.next();
+			assertFalse(part.isSegment());
+			assertEquals("[text part 1]", part.toString());
+		}
+		
+		if (it.hasNext()) {
+			part = it.next();
+			assertTrue(part.isSegment());
+			assertEquals("[seg 2]", part.toString());
+		}
+		
+		if (it.hasNext()) {
+			part = it.next();
+			assertFalse(part.isSegment());
+			assertEquals("[text part 2]", part.toString());
+		}
+		
+		if (it.hasNext()) {
+			part = it.next();
+			assertFalse(part.isSegment());
+			assertEquals("[text part 3]", part.toString());
+		}
+		
+		if (it.hasNext()) {
+			part = it.next();
+			assertTrue(part.isSegment());
+			assertEquals("[seg 3]", part.toString());
+		}		
+		
+		if (it.hasNext()) {
+			part = it.next();
+			assertFalse(part.isSegment());
+			assertEquals("[text part 4]", part.toString());
+		}
+	}
+	
 //	@Test
 //	public void testCreateBilingualTextUnit4() {
 //		TextUnit ori = new TextUnit4("id", "Seg1. Seg2");

@@ -196,6 +196,29 @@ public class CodeSimplifier {
 		}
 	}
 	
+	
+	/**
+	 * Simplifies all possible tags in a given possibly segmented text container.
+	 * @param tc the given text container to modify
+	 * @param removeLeadingTrailingCodes true to remove the leading and/or the trailing code
+	 * of the fragment and place their text in the result.
+	 * <b>It is the responsibility of the caller to put the leading/trailing data into the skeleton.</b>
+	 * @return Null (no leading or trailing code removal was) or a string array with the
+	 * original data of the codes removed. The first string if there was a leading code, the second string
+	 * if there was a trailing code. Both or either can be null.
+	 */
+	public String[] simplifyAll (TextContainer tc, boolean removeLeadingTrailingCodes) {
+		// Cannot simplify individual segments as segmentation can change later. 
+		// Store and remove segmentation, simplify the source as the whole, then re-apply initial segmentation,
+		// moving segment boundaries outside codes.
+		
+		TextFragment tf = TextUnitUtil.storeSegmentation(tc);		
+		String[] res = simplifyAll(tf, removeLeadingTrailingCodes);		
+		TextUnitUtil.restoreSegmentation(tc, tf);
+		
+		return res;		
+	}
+	
 	private String[] removeLeadingTrailingCodes (TextFragment tf, int maxIterations) {
 		String ctext;
 		List<Code> codes;
@@ -341,7 +364,6 @@ public class CodeSimplifier {
 	 * @param tf the text fragment to modify.
 	 * @param removeLeadingTrailingCodes true to remove the leading and/or the trailing code
 	 * of the fragment and place their text in the result.
-	 * This works for isolated codes only for now.
 	 * <b>It is the responsibility of the caller to put the leading/trailing data into the skeleton.</b>
 	 * @return Null (no leading or trailing code removal was) or a string array with the
 	 * original data of the codes removed. The first string if there was a leading code, the second string
@@ -622,7 +644,7 @@ public class CodeSimplifier {
 		codeNodesList.remove(node1);
 		codeNodesList.remove(node2);
 		
-	}		
+	}	
 }
 
 //TextFragment oriFrag;

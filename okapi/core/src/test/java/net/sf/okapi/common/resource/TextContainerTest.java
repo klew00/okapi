@@ -1428,11 +1428,17 @@ public class TextContainerTest {
 	}
 
 	@Test
-	public void getFirstSegment () {
+	public void testGetFirstSegment () {
 		Segment seg = new Segment("qwerty", new TextFragment("xyz"));
 		TextContainer tc = new TextContainer(seg);
 		assertNotNull(tc.getFirstSegment());
 		assertSame(seg, tc.getFirstSegment());
+	}
+	
+	@Test
+	public void testGetSegmented () {
+		TextContainer tc = new TextContainer();
+		assertFalse(tc.hasBeenSegmented());
 	}
 
 	private TextContainer createMultiSegmentContent () {
