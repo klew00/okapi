@@ -181,13 +181,13 @@ public class CodeSimplifier {
 			//System.out.println(TextUnitUtil.toText(getCodedText(), getCodes()));
 			tf.setCodedText(getCodedText(), getCodes());
 
-//			prepare(tf.getCodedText(), tf.getCodes());
-//			openCloseMerges = simplifyOpeningClosing();
-//			tf.setCodedText(getCodedText(), getCodes());
-//
-//			prepare(tf.getCodedText(), tf.getCodes());
-//			emptyOpenCloseMerges = simplifyEmptyOpeningClosing();
-//			tf.setCodedText(getCodedText(), getCodes());
+			prepare(tf.getCodedText(), tf.getCodes());
+			openCloseMerges = simplifyOpeningClosing();
+			tf.setCodedText(getCodedText(), getCodes());
+
+			prepare(tf.getCodedText(), tf.getCodes());
+			emptyOpenCloseMerges = simplifyEmptyOpeningClosing();
+			tf.setCodedText(getCodedText(), getCodes());
 		}
 		while ((iteration < maxIterations) && (isolatedMerges + openCloseMerges + emptyOpenCloseMerges) > 0);
 		
