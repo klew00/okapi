@@ -304,6 +304,7 @@ public class MIFFilterTest {
 		list.add(new InputDocument(root+"Test02-v9.mif", null));
 		list.add(new InputDocument(root+"Test03.mif", null));
 		list.add(new InputDocument(root+"TestMarkers.mif", null));
+		list.add(new InputDocument(root+"JATest.mif", null));
 		
 		RoundTripComparison rtc = new RoundTripComparison();
 		assertTrue(rtc.executeCompare(filter, list, null, /*UTF-8*/locEN, locEN));
