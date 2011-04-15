@@ -85,25 +85,25 @@ public class IDMLFilterTest {
 			"UTF-8", locEN, locEN));
 	}
 	
-//	@Test
-//	public void testDoubleExtraction () {
-//		// Read all files in the data directory
-//		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
-//		list.add(new InputDocument(root+"Test00.idml", "okf_idml@ExtractAll.fprm"));
-//		list.add(new InputDocument(root+"Test01.idml", "okf_idml@ExtractAll.fprm"));
-//		list.add(new InputDocument(root+"Test02.idml", "okf_idml@ExtractAll.fprm"));
-//		list.add(new InputDocument(root+"helloworld-1.idml", "okf_idml@ExtractAll.fprm"));
-//		list.add(new InputDocument(root+"ConditionalText.idml", "okf_idml@ExtractAll.fprm"));
-//		list.add(new InputDocument(root+"Test03.idml", "okf_idml@ExtractAll.fprm"));
-//
-//// For local test only, comment out for SVN		
-////		list.add(new InputDocument(root+"private/enlaso_001.idml", "../okf_idml@ExtractAll.fprm"));
-////		list.add(new InputDocument(root+"private/enlaso_002.idml", "../okf_idml@ExtractAll.fprm"));
-////		list.add(new InputDocument(root+"Bluto.idml", "okf_idml@ExtractAll.fprm"));
-//		
-//		RoundTripComparison rtc = new RoundTripComparison(false); // Do not compare skeleton
-//		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, locEN, "output"));
-//	}
+	@Test
+	public void testDoubleExtraction () {
+		// Read all files in the data directory
+		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
+		list.add(new InputDocument(root+"Test00.idml", "okf_idml@ExtractAll.fprm"));
+		list.add(new InputDocument(root+"Test01.idml", "okf_idml@ExtractAll.fprm"));
+		list.add(new InputDocument(root+"Test02.idml", "okf_idml@ExtractAll.fprm"));
+		list.add(new InputDocument(root+"helloworld-1.idml", "okf_idml@ExtractAll.fprm"));
+		list.add(new InputDocument(root+"ConditionalText.idml", "okf_idml@ExtractAll.fprm"));
+		list.add(new InputDocument(root+"Test03.idml", "okf_idml@ExtractAll.fprm"));
+
+// For local test only, comment out for SVN		
+//		list.add(new InputDocument(root+"private/enlaso_001.idml", "../okf_idml@ExtractAll.fprm"));
+//		list.add(new InputDocument(root+"private/enlaso_002.idml", "../okf_idml@ExtractAll.fprm"));
+//		list.add(new InputDocument(root+"Bluto.idml", "okf_idml@ExtractAll.fprm"));
+		
+		RoundTripComparison rtc = new RoundTripComparison(false); // Do not compare skeleton
+		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, locEN, "output"));
+	}
 
 	private ArrayList<Event> getEvents (String path) {
 		ArrayList<Event> list = new ArrayList<Event>();
