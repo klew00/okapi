@@ -1025,6 +1025,34 @@ public class TextUnitUtil {
 				tuSkel.add(skel);
 		}
 	}
+	
+	/**
+	 * Simplifies all possible tags in a given text fragment.
+	 * @param tf the given text fragment
+	 * @param removeLeadingTrailingCodes true to remove leading and/or trailing codes
+	 * of the source part and place their text in the skeleton.
+	 * @return Null (no leading or trailing code removal was) or a string array with the
+	 * original data of the codes removed. The first string if there was a leading code, the second string
+	 * if there was a trailing code. Both or either can be null
+	 */
+	public static String[] simplifyCodes (TextFragment tf, boolean removeLeadingTrailingCodes) {
+		CodeSimplifier simplifier = new CodeSimplifier();
+		return simplifier.simplifyAll(tf, removeLeadingTrailingCodes);
+	}
+	
+	/**
+	 * Simplifies all possible tags in a given text container.
+	 * @param tc the given text container
+	 * @param removeLeadingTrailingCodes true to remove leading and/or trailing codes
+	 * of the source part and place their text in the skeleton.
+	 * @return Null (no leading or trailing code removal was) or a string array with the
+	 * original data of the codes removed. The first string if there was a leading code, the second string
+	 * if there was a trailing code. Both or either can be null
+	 */
+	public static String[] simplifyCodes (TextContainer tc, boolean removeLeadingTrailingCodes) {
+		CodeSimplifier simplifier = new CodeSimplifier();
+		return simplifier.simplifyAll(tc, removeLeadingTrailingCodes);
+	}
 
 	/**
 	 * Removes from the source part of a given text unit resource qualifiers (quotation marks etc.) around text.
@@ -1287,28 +1315,49 @@ public class TextUnitUtil {
 				
 				Matcher matcher = SEG_START_REGEX.matcher(data);
 				while (matcher.find()) {
-					pos = matcher.start();
+					if (code.getTagType() == TagType.OPENING) {
+						pos = i; // move before the code, AQ-B 52*
+					}
+					else {
+						pos = i + 2; // move after the code
+					}
+					
 					id = matcher.group(1);
-					markers.add(new MarkerDescr(id, pos + i, true));
+					markers.add(new MarkerDescr(id, pos, true));
 				}				
 				
 				matcher = SEG_END_REGEX.matcher(data);
 				while (matcher.find()) {
-					pos = matcher.start();
+					if (code.getTagType() == TagType.CLOSING) {
+						pos = i + 2; // move after the code
+					}
+					else {
+						pos = i; // move before the code
+					}
 					id = matcher.group(1);
-					markers.add(new MarkerDescr(id, pos + i, false));
+					markers.add(new MarkerDescr(id, pos, false));
 				}
 				
 				matcher = TP_START_REGEX.matcher(data);
 				while (matcher.find()) {
-					pos = matcher.start();
-					markers.add(new MarkerDescr(pos + i, true));
+					if (code.getTagType() == TagType.OPENING) {
+						pos = i; // move before the code
+					}
+					else {
+						pos = i + 2; // move after the code
+					}
+					markers.add(new MarkerDescr(pos, true));
 				}				
 				
 				matcher = TP_END_REGEX.matcher(data);
 				while (matcher.find()) {
-					pos = matcher.start();
-					markers.add(new MarkerDescr(pos + i, false));
+					if (code.getTagType() == TagType.CLOSING) {
+						pos = i + 2; // move after the code
+					}
+					else {
+						pos = i; // move before the code
+					}
+					markers.add(new MarkerDescr(pos, false));
 				}
 				
 				// Remove markers from the code data, code markers stay in place in the tf coded text
@@ -1325,32 +1374,45 @@ public class TextUnitUtil {
 			}
 		}
 		
-		// TODO merged codes processing
-		
 		// Sort markers
 		StringBuilder markersSb = new StringBuilder();
+//		for (MarkerDescr d : markers) {
+//			markersSb.append(String.format("(%d: %s %s) ", d.position, d.id != null ? d.id : "", d.isStart ? "start" : "end"));
+//		}
 		
 		Collections.sort(markers, new Comparator<MarkerDescr>() {
 
+//			@Override
+//			public int compare(MarkerDescr d1, MarkerDescr d2) {
+//				if (d1.isSegment && d2.isSegment || !d1.isSegment && !d2.isSegment) {
+//					if (d1.position < d2.position) 
+//						return -1;
+//					else if (d1.position > d2.position) 
+//						return 1;
+//					else { // equal positions, markers from a merged code
+//						if (!d1.isStart & d2.isStart)
+//							return -1;
+//						else if (d1.isStart & !d2.isStart)
+//							return 1;
+//						else
+//							return 0;
+//					}
+//				}
+//				else 
+//					return 0;
+//			}			
+			
 			@Override
 			public int compare(MarkerDescr d1, MarkerDescr d2) {
-				if (d1.isSegment && d2.isSegment || !d1.isSegment && !d2.isSegment) {
 					if (d1.position < d2.position) 
 						return -1;
 					else if (d1.position > d2.position) 
 						return 1;
 					else { // equal positions, markers from a merged code
-						if (!d1.isStart & d2.isStart)
-							return -1;
-						else if (d1.isStart & !d2.isStart)
-							return 1;
-						else
-							return 0;
+						return 0;
 					}
-				}
-				else 
-					return 0;
 			}			
+			
 		});
 		
 		for (MarkerDescr d : markers) {
@@ -1362,22 +1424,29 @@ public class TextUnitUtil {
 		for (MarkerDescr d : markers) {			
 			if (d.isSegment) { // segment
 				if (d.isStart) {
-					start = d.position + 2;
+					start = d.position;
 				}
 				else { // end
 					if (start > -1) {
-						tc.append(new Segment(d.id, tf.subSequence(start, d.position)));
+						if (start < d.position)
+							tc.append(new Segment(d.id, tf.subSequence(start, d.position)));
+						else
+							LOGGER.warning(String.format("Cannot create the segment %s - incorrect range: (%d - %d)", 
+									d.id, start, d.position));
 					}
 					start = -1;
 				}
 			}
 			else { // text part
 				if (d.isStart) {
-					start = d.position + 2;
+					start = d.position;
 				}
 				else { // end
 					if (start > -1) {
-						tc.append(new TextPart(tf.subSequence(start, d.position)));
+						if (start < d.position)
+							tc.append(new TextPart(tf.subSequence(start, d.position)));
+						else
+							LOGGER.warning(String.format("Cannot create a text part - incorrect range: (%d - %d)", start, d.position));
 					}
 					start = -1;
 				}
