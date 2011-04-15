@@ -397,6 +397,7 @@ public class TextUnitUtilTest {
 		
 		String[] res = TextUnitUtil.simplifyCodes(tc, false);
 		assertEquals("[seg 1][text part 1][seg 2][text part 2][text part 3][seg 3][seg 4]", tc.toString());
+		assertNull(res);
 	}
 	
 	@Test
@@ -404,9 +405,9 @@ public class TextUnitUtilTest {
 		TextContainer tc = new TextContainer();
 		tc.append(new Segment("s1", new TextFragment("[seg 1]")));
 		
-		String[] res = TextUnitUtil.simplifyCodes(tc, false);
-		assertNull(res);
+		String[] res = TextUnitUtil.simplifyCodes(tc, false);		
 		assertEquals("[seg 1]", tc.toString());
+		assertNull(res);
 	}
 	
 	@Test
@@ -421,9 +422,11 @@ public class TextUnitUtilTest {
 		TextContainer tc = new TextContainer();
 		tc.append(new Segment("s1", tf1));
 		
-		String[] res = TextUnitUtil.simplifyCodes(tc, true);
-		assertNotNull(res);
+		String[] res = TextUnitUtil.simplifyCodes(tc, true);		
 		assertEquals("[seg 1]", tc.toString());
+		assertNotNull(res);
+		assertEquals("<x11/><x12/>", res[0]);
+		assertEquals("<x13/><x14/>", res[1]);
 	}
 	
 	@Test

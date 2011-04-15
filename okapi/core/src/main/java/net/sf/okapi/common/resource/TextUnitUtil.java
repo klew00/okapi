@@ -1292,12 +1292,12 @@ public class TextUnitUtil {
 	}
 	
 	/**
-	 * Extracts segment and text part markers from a given string and creates codes (place-holder type) for those markers in
-	 * a given text fragment.
+	 * Extracts segment and text part markers from a given string, creates codes (place-holder type) for those markers, 
+	 * and appends them to a given text fragment.
 	 * @param tf the given text fragment to append extracted codes
 	 * @param original the given string
 	 * @param removeFromOriginal remove found markers from the given string
-	 * @return the given string if removeFromOriginal == true, or the original string with markers removed
+	 * @return the given string if removeFromOriginal == false, or the modified original string with markers removed otherwise
 	 */
 	public static String extractSegMarkers(TextFragment tf, String original, boolean removeFromOriginal) {
 		if (tf == null) {

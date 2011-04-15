@@ -219,8 +219,8 @@ public class CodeSimplifier {
 			TextFragment leadingMarkers = new TextFragment();
 			TextFragment trailingMarkers = new TextFragment();
 			
-			TextUnitUtil.extractSegMarkers(leadingMarkers, res[0], true);
-			TextUnitUtil.extractSegMarkers(trailingMarkers, res[1], true);
+			res[0] = TextUnitUtil.extractSegMarkers(leadingMarkers, res[0], true);
+			res[1] = TextUnitUtil.extractSegMarkers(trailingMarkers, res[1], true);
 			
 			tf.insert(0, leadingMarkers);
 			tf.append(trailingMarkers);
