@@ -182,7 +182,9 @@ public class CodeSimplifier {
 			tf.setCodedText(getCodedText(), getCodes());
 
 			prepare(tf.getCodedText(), tf.getCodes());
+			//System.out.println(TextUnitUtil.toText(tf));
 			openCloseMerges = simplifyOpeningClosing();
+			//System.out.println(TextUnitUtil.toText(getCodedText(), getCodes()));
 			tf.setCodedText(getCodedText(), getCodes());
 
 			prepare(tf.getCodedText(), tf.getCodes());
@@ -639,6 +641,7 @@ public class CodeSimplifier {
 		else {
 			codedText = codedText.replace(cst, node1.marker);
 			node1.code.setData(node1.code.getData() + gap + node2.code.getData());
+			node1.gapToNext = node2.gapToNext;
 			codeNodesList.remove(node2);
 		}		
 	}
@@ -652,6 +655,7 @@ public class CodeSimplifier {
 		
 		codedText = codedText.replace(cst, node2.marker);
 		node2.code.setData(node1.code.getData() + gap + node2.code.getData());
+		node2.offset = node1.offset;
 		codeNodesList.remove(node1);
 	}
 
