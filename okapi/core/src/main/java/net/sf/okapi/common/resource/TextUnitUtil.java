@@ -56,11 +56,15 @@ public class TextUnitUtil {
 	private static final String TP_START = "$tp_start$";
 	private static final String TP_END = "$tp_end$";
 	
+	// Regex patterns for marker search
 	private static final Pattern SEG_START_REGEX = Pattern.compile("\\[#\\$(.+)\\@\\%\\$seg_start\\$\\]");
 	private static final Pattern SEG_END_REGEX = Pattern.compile("\\[#\\$(.+)\\@\\%\\$seg_end\\$\\]");
 	
 	private static final Pattern TP_START_REGEX = Pattern.compile("\\$tp_start\\$");
 	private static final Pattern TP_END_REGEX = Pattern.compile("\\$tp_end\\$");
+	
+	private static final Pattern ANY_SEG_TP_REGEX = 
+		Pattern.compile("\\[#\\$(.+)\\@\\%\\$seg_start\\$\\]|\\[#\\$(.+)\\@\\%\\$seg_end\\$\\]|\\$tp_start\\$|\\$tp_end\\$");
 	
 	/**
 	 * Removes leading whitespaces from a given text fragment.
@@ -1288,6 +1292,27 @@ public class TextUnitUtil {
 	}
 	
 	/**
+	 * Extracts segment and text part markers from a given string and creates codes (place-holder type) for those markers in
+	 * a given text fragment.
+	 * @param tf the given text fragment to append extracted codes
+	 * @param original the given string
+	 * @param removeFromOriginal remove found markers from the given string
+	 * @return the given string if removeFromOriginal == true, or the original string with markers removed
+	 */
+	public static String extractSegMarkers(TextFragment tf, String original, boolean removeFromOriginal) {
+		if (tf == null) {
+			LOGGER.warning("Text fragment is null, no codes are added");
+		}
+		
+		Matcher matcher = ANY_SEG_TP_REGEX.matcher(original);
+		while (tf != null && matcher.find()) {
+			tf.append(new Code(TagType.PLACEHOLDER, null, matcher.group()));
+		}
+		
+		return removeFromOriginal ? matcher.replaceAll("") : original;
+	}
+	
+	/**
 	 * Restores original segmentation of a given text container from a given text fragment created with storeSegmentation().
 	 * @param tc the given text container
 	 * @param segStorage the text fragment created with storeSegmentation() and containing the original segmentation info
@@ -1454,5 +1479,6 @@ public class TextUnitUtil {
 		}
 		
 		return markersSb.toString().trim(); 		
-	}	
+	}
+		
 }

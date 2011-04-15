@@ -213,7 +213,18 @@ public class CodeSimplifier {
 		// moving segment boundaries outside codes.
 		
 		TextFragment tf = TextUnitUtil.storeSegmentation(tc);		
-		String[] res = simplifyAll(tf, removeLeadingTrailingCodes);		
+		String[] res = simplifyAll(tf, removeLeadingTrailingCodes);
+		
+		if (removeLeadingTrailingCodes && res != null) {
+			TextFragment leadingMarkers = new TextFragment();
+			TextFragment trailingMarkers = new TextFragment();
+			
+			TextUnitUtil.extractSegMarkers(leadingMarkers, res[0], true);
+			TextUnitUtil.extractSegMarkers(trailingMarkers, res[1], true);
+			
+			tf.insert(0, leadingMarkers);
+			tf.append(trailingMarkers);
+		}
 		TextUnitUtil.restoreSegmentation(tc, tf);
 		
 		return res;		

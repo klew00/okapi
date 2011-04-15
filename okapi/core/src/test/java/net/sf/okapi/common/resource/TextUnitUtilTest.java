@@ -23,6 +23,7 @@ package net.sf.okapi.common.resource;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -385,9 +386,46 @@ public class TextUnitUtilTest {
 	
 	@Test
 	public void testSimplifyCodes_segmentedTU() {
-		// TODO
+		TextContainer tc = new TextContainer();
+		tc.append(new Segment("s1", new TextFragment("[seg 1]")));
+		tc.append(new TextPart("[text part 1]"));
+		tc.append(new Segment("s2", new TextFragment("[seg 2]")));
+		tc.append(new TextPart("[text part 2]"));
+		tc.append(new TextPart("[text part 3]"));
+		tc.append(new Segment("s3", new TextFragment("[seg 3]")));
+		tc.append(new Segment("s4", new TextFragment("[seg 4]")));
+		
+		String[] res = TextUnitUtil.simplifyCodes(tc, false);
+		assertEquals("[seg 1][text part 1][seg 2][text part 2][text part 3][seg 3][seg 4]", tc.toString());
 	}
-
+	
+	@Test
+	public void testSimplifyCodes_segmentedTU2() {
+		TextContainer tc = new TextContainer();
+		tc.append(new Segment("s1", new TextFragment("[seg 1]")));
+		
+		String[] res = TextUnitUtil.simplifyCodes(tc, false);
+		assertNull(res);
+		assertEquals("[seg 1]", tc.toString());
+	}
+	
+	@Test
+	public void testSimplifyCodes_segmentedTU3() {
+		TextFragment tf1 = new TextFragment();		
+		tf1.append(TagType.PLACEHOLDER, "x11", "<x11/>");
+		tf1.append(TagType.PLACEHOLDER, "x12", "<x12/>");
+		tf1.append("[seg 1]");
+		tf1.append(TagType.PLACEHOLDER, "x13", "<x13/>");
+		tf1.append(TagType.PLACEHOLDER, "x14", "<x14/>");
+		
+		TextContainer tc = new TextContainer();
+		tc.append(new Segment("s1", tf1));
+		
+		String[] res = TextUnitUtil.simplifyCodes(tc, true);
+		assertNotNull(res);
+		assertEquals("[seg 1]", tc.toString());
+	}
+	
 	@Test
 	public void testStoreSegmentation () {		
 		TextContainer tc = new TextContainer();
@@ -798,6 +836,147 @@ public class TextUnitUtilTest {
 			assertFalse(part.isSegment());
 			assertEquals("[text part 4]", part.toString());
 		}
+	}
+	
+	@Test
+	public void testRestoreSegmentation3_3 () {		
+		TextFragment tf1 = new TextFragment();		
+		tf1.append(TagType.PLACEHOLDER, "x11", "<x11/>");
+		tf1.append(TagType.PLACEHOLDER, "x12", "<x12/>");
+		tf1.append("[seg 1]");
+		tf1.append(TagType.PLACEHOLDER, "x13", "<x13/>");
+		tf1.append(TagType.PLACEHOLDER, "x14", "<x14/>");
+		
+		TextFragment tf2 = new TextFragment();
+		tf2.append("[seg 2]");
+		tf2.append(TagType.PLACEHOLDER, "x21", "<x21/>");
+		tf2.append(TagType.PLACEHOLDER, "x22", "<x22/>");
+		tf2.append(TagType.PLACEHOLDER, "x23", "<x23/>");
+		tf2.append(TagType.PLACEHOLDER, "x24", "<x24/>");
+		
+		TextFragment tf3 = new TextFragment();		
+		tf3.append(TagType.PLACEHOLDER, "x31", "<x31/>");
+		tf3.append(TagType.PLACEHOLDER, "x32", "<x32/>");
+		tf3.append(TagType.PLACEHOLDER, "x33", "<x33/>");
+		tf3.append("[seg 3]");
+		tf3.append(TagType.PLACEHOLDER, "x34", "<x34/>");
+				
+		assertEquals("<1/><2/>[seg 1]<3/><4/>", fmt.setContent(tf1).toString());		
+		assertEquals("[seg 2]<1/><2/><3/><4/>", fmt.setContent(tf2).toString());
+		assertEquals("<1/><2/><3/>[seg 3]<4/>", fmt.setContent(tf3).toString());
+		
+		TextContainer tc = new TextContainer();
+		tc.append(new Segment("s1", tf1));
+		tc.append(new TextPart("[text part 1]"));
+		tc.append(new Segment("s2", tf2));
+		tc.append(new TextPart("[text part 2]"));
+		tc.append(new TextPart("[text part 3]"));
+		tc.append(new Segment("s3", tf3));
+		tc.append(new TextPart("[text part 4]"));
+		
+		//String saveTc = tc.toString();
+		
+		TextFragment tf = TextUnitUtil.storeSegmentation(tc);
+		assertEquals("<1/><1/><2/>[seg 1]<3/><4/><2/><3/>[text part 1]<4/><5/>[seg 2]<1/><2/><3/><4/><6/><7/>" +
+				"[text part 2]<8/><9/>[text part 3]<10/><11/><1/><2/><3/>[seg 3]<4/><12/><13/>[text part 4]<14/>", 
+				fmt.setContent(tf).toString());
+				
+		TextUnitUtil.simplifyCodes(tf, true);
+		assertEquals("[seg 1]<2/>[text part 1]<3/>[seg 2]<4/>[text part 2]<5/>[text part 3]<6/>[seg 3]<7/>[text part 4]", 
+				fmt.setContent(tf).toString());				
+
+		// Codes after simplification
+		List<Code> codes = tf.getCodes();
+		assertEquals(6, codes.size());
+		
+		assertEquals("<x13/><x14/>[#$s1@%$seg_end$]$tp_start$", codes.get(0).toString()); // <1/>
+				
+		assertEquals("$tp_end$[#$s2@%$seg_start$]", codes.get(1).toString()); // <2/>
+		
+		assertEquals("<x21/><x22/><x23/><x24/>[#$s2@%$seg_end$]$tp_start$", codes.get(2).toString()); // <3/>
+		
+		assertEquals("$tp_end$$tp_start$", codes.get(3).toString()); // <4/>
+		
+		assertEquals("$tp_end$[#$s3@%$seg_start$]<x31/><x32/><x33/>", codes.get(4).toString()); // <5/>
+		
+		assertEquals("<x34/>[#$s3@%$seg_end$]$tp_start$", codes.get(5).toString()); // <6/>
+		
+		String res = TextUnitUtil.restoreSegmentation(tc, tf);
+		assertEquals("(7: s1 end) (9:  start) (22:  end) (24: s2 start) (31: s2 end) (33:  start) (46:  end) " +
+				"(48:  start) (61:  end) (63: s3 start) (70: s3 end) (72:  start)", res);
+		
+		assertEquals("[text part 1][seg 2][text part 2][text part 3][seg 3]", tc.toString());
+		
+		Iterator<TextPart> it = tc.iterator();		
+		TextPart part = null;
+		if (it.hasNext()) {
+			part = it.next();
+			assertTrue(part.isSegment());
+			assertEquals("[text part 1]", part.toString());
+		}
+				
+		if (it.hasNext()) {
+			part = it.next();
+			assertTrue(part.isSegment());
+			assertEquals("[seg 2]", part.toString());
+		}
+		
+		if (it.hasNext()) {
+			part = it.next();
+			assertFalse(part.isSegment());
+			assertEquals("[text part 2]", part.toString());
+		}
+		
+		if (it.hasNext()) {
+			part = it.next();
+			assertFalse(part.isSegment());
+			assertEquals("[text part 3]", part.toString());
+		}
+		
+		if (it.hasNext()) {
+			part = it.next();
+			assertTrue(part.isSegment());
+			assertEquals("[seg 3]", part.toString());
+		}		
+		
+		if (it.hasNext()) {
+			part = it.next();
+			assertFalse(part.isSegment());
+			assertEquals("[text part 4]", part.toString());
+		}
+	}
+	
+	@Test
+	public void testExtractSegMarkers() {
+		String st = "$tp_end$[#$s3@%$seg_start$]<x31/><x32/><x33/><x34/>[#$s3@%$seg_end$]$tp_start$";
+		String res;
+		TextFragment tf = new TextFragment(); 
+		res = TextUnitUtil.extractSegMarkers(tf, st, false);
+		
+		assertEquals("<1/><2/><3/><4/>", fmt.setContent(tf).toString());
+		assertEquals("$tp_end$[#$s3@%$seg_start$]<x31/><x32/><x33/><x34/>[#$s3@%$seg_end$]$tp_start$", res);
+		
+		List<Code> codes = tf.getCodes();
+		assertEquals(4, codes.size());
+		
+		assertEquals("$tp_end$", codes.get(0).toString()); // <1/>
+		assertEquals("[#$s3@%$seg_start$]", codes.get(1).toString()); // <2/>
+		assertEquals("[#$s3@%$seg_end$]", codes.get(2).toString()); // <3/>
+		assertEquals("$tp_start$", codes.get(3).toString()); // <4/>
+		
+		tf = new TextFragment();
+		res = TextUnitUtil.extractSegMarkers(tf, st, true);
+		
+		assertEquals("<1/><2/><3/><4/>", fmt.setContent(tf).toString());
+		assertEquals("<x31/><x32/><x33/><x34/>", res);
+		
+		codes = tf.getCodes();
+		assertEquals(4, codes.size());
+		
+		assertEquals("$tp_end$", codes.get(0).toString()); // <1/>
+		assertEquals("[#$s3@%$seg_start$]", codes.get(1).toString()); // <2/>
+		assertEquals("[#$s3@%$seg_end$]", codes.get(2).toString()); // <3/>
+		assertEquals("$tp_start$", codes.get(3).toString()); // <4/>
 	}
 	
 	@Test
