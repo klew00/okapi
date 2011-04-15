@@ -51,13 +51,13 @@ public class TestCodeSimplifierStep {
 		ISkeleton skel = tu1.getSkeleton();
 		assertNull(skel);
 		
-//		Event tue1 = new Event(EventType.TEXT_UNIT, tu1);
-//		css.handleEvent(tue1);
-//		tf = tu1.getSource().getUnSegmentedContentCopy();
-//		assertEquals("T1<3>T2   </3>", fmt.setContent(tf).toString());
-//		
-//		skel = tu1.getSkeleton();
-//		assertEquals("<x1/>   <x2/>[#$$self$]   </b><x5/>   <x6/>", skel.toString());
+		Event tue1 = new Event(EventType.TEXT_UNIT, tu1);
+		css.handleEvent(tue1);
+		tf = tu1.getSource().getUnSegmentedContentCopy();
+		assertEquals("T1<2>T2   </2>", fmt.setContent(tf).toString());
+		
+		skel = tu1.getSkeleton();
+		assertEquals("<x1/>   <x2/>[#$$self$]   </b><x5/>   <x6/>", skel.toString());
 	}
 	
 	@Test
@@ -90,18 +90,16 @@ public class TestCodeSimplifierStep {
 		ISkeleton skel = tu1.getSkeleton();
 		assertNull(skel);
 		
-//		Event tue1 = new Event(EventType.TEXT_UNIT, tu1);
-//		css.handleEvent(tue1);
-//		tf = tu1.getSource().getUnSegmentedContentCopy();
-//		// 1/ -> 1/
-//		// 2/ -> 2/
-//		// 3/ + 4/ + 5 -> 3
-//		// /5 -> /3
-//		// e8/ + 6/ -> e8/
-//		// 7/ -> 6/
-//		assertEquals("<1/>   <2/>T1<3>T2   </3>   <e8/>   <6/>", fmt.setContent(tf).toString());
-//		
-//		skel = tu1.getSkeleton();
-//		assertNull(skel);
+		Event tue1 = new Event(EventType.TEXT_UNIT, tu1);
+		css.handleEvent(tue1);
+		tf = tu1.getSource().getUnSegmentedContentCopy();
+		// 1/ + 2/ -> 1/
+		// 3/ + 4/ + 5 -> 2
+		// /5 -> /2
+		// e8/ + 6/ + 7/ -> e8/
+		assertEquals("<1/>T1<2>T2   </2>   <e8/>", fmt.setContent(tf).toString());
+		
+		skel = tu1.getSkeleton();
+		assertNull(skel);
 	}
 }
