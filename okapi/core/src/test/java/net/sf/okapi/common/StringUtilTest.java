@@ -132,4 +132,10 @@ import org.junit.Test;
 		assertEquals(3, StringUtil.getNumOccurrences("1 text 2 text 1 text 1 text 2", "1"));
 		assertEquals(2, StringUtil.getNumOccurrences("1 text 2 text 1 text 1 text 2", "2"));
 	}
+	
+	@Test
+	public void testIsWhitespace() {
+		assertTrue(StringUtil.isWhitespace("\t   \b\n\f\r"));
+		assertFalse(StringUtil.isWhitespace("\t  text \b\n\f\r"));
+	}
 }

@@ -1303,6 +1303,10 @@ public class TextUnitUtil {
 		if (tf == null) {
 			LOGGER.warning("Text fragment is null, no codes are added");
 		}
+		if (original == null) {
+			LOGGER.warning("Original string is null, no processing was performed");
+			return "";
+		}
 		
 		Matcher matcher = ANY_SEG_TP_REGEX.matcher(original);
 		while (tf != null && matcher.find()) {
@@ -1453,7 +1457,7 @@ public class TextUnitUtil {
 				}
 				else { // end
 					if (start > -1) {
-						if (start < d.position)
+						if (start <= d.position)
 							tc.append(new Segment(d.id, tf.subSequence(start, d.position)));
 						else
 							LOGGER.warning(String.format("Cannot create the segment %s - incorrect range: (%d - %d)", 
@@ -1468,7 +1472,7 @@ public class TextUnitUtil {
 				}
 				else { // end
 					if (start > -1) {
-						if (start < d.position)
+						if (start <= d.position)
 							tc.append(new TextPart(tf.subSequence(start, d.position)));
 						else
 							LOGGER.warning(String.format("Cannot create a text part - incorrect range: (%d - %d)", start, d.position));
@@ -1480,5 +1484,68 @@ public class TextUnitUtil {
 		
 		return markersSb.toString().trim(); 		
 	}
+
+	/**
+	 * Returns the content of a given text fragment, including the original codes whenever
+	 * possible. Codes are decorated with '[' and ']' to tell them from regular text.
+	 * @param tf the given text fragment 
+	 * @return the content of the given fragment
+	 */
+	public static String toText (TextFragment tf) {
+		List<Code> codes = tf.getCodes();
+		String text = tf.getCodedText();
 		
+		if (( codes == null ) || ( codes.size() == 0 )) return text.toString();
+		
+		StringBuilder tmp = new StringBuilder();
+		Code code;
+		for ( int i=0; i<text.length(); i++ ) {
+			switch ( text.charAt(i) ) {
+			case TextFragment.MARKER_OPENING:
+			case TextFragment.MARKER_CLOSING:
+			case TextFragment.MARKER_ISOLATED:
+				code = codes.get(TextFragment.toIndex(text.charAt(++i)));
+				tmp.append(String.format("[%s]", code.data));
+				break;
+			default:
+				tmp.append(text.charAt(i));
+				break;
+			}
+		}
+		return tmp.toString();
+	}
+	
+	/**
+	 * Returns representation of a given coded text with code data enclosed in brackets.
+	 * @param text the given coded text
+	 * @param codes the given list of codes
+	 * @return content of the given coded text
+	 */
+	public static String toText (String text, List<Code> codes) {
+		
+		if (( codes == null ) || ( codes.size() == 0 )) return text.toString();
+		
+		StringBuilder tmp = new StringBuilder();
+		Code code;
+		for ( int i=0; i<text.length(); i++ ) {
+			switch ( text.charAt(i) ) {
+			case TextFragment.MARKER_OPENING:
+			case TextFragment.MARKER_CLOSING:
+			case TextFragment.MARKER_ISOLATED:
+				int index = TextFragment.toIndex(text.charAt(++i));
+				try {
+					code = codes.get(index);
+					tmp.append(String.format("[%s]", code.data));
+				} catch (Exception e) {
+					tmp.append(String.format("[-ERR:UNKNOWN-CODE- %d]", index));
+				}				
+				break;
+			default:
+				tmp.append(text.charAt(i));
+				break;
+			}
+		}
+		return tmp.toString();
+	}
+
 }

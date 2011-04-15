@@ -937,4 +937,21 @@ public class CodeSimplifierTest {
 		assertEquals(1, tf.getCodes().size());
 		assertEquals("x1", tf.getCode(0).getType());
 	}
+	
+	@Test
+	public void testCodeReduction48 () {
+		TextFragment tf = new TextFragment();		
+		tf.append(TagType.PLACEHOLDER, "x1", "<x1/>");
+		tf.append(" ");
+		tf.append(TagType.PLACEHOLDER, "x2", "<x2/>");
+				
+			assertEquals("<1/> <2/>", fmt.setContent(tf).toString());
+			assertEquals("<x1/> <x2/>", tf.toText());
+		
+		String[] res = simplifier.simplifyAll(tf, false);
+		assertEquals("<1/>", fmt.setContent(tf).toString());
+		assertNull(res);
+		assertEquals(1, tf.getCodes().size());
+		assertEquals("x1", tf.getCode(0).getType());
+	}
 }

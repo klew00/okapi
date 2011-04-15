@@ -326,5 +326,16 @@ public final class StringUtil {
 		
 		return count;
 	}
+
+	/**
+	 * Checks if a given string contains only whitespace characters.
+	 * @param str the given string
+	 * @return true if the given string is whitespace
+	 */
+	public static boolean isWhitespace(String str) {
+		if (Util.isEmpty(str)) return false; // "" is neither whitespace
+		
+		return "".equals(str.trim());
+	}
 	
 }
