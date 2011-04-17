@@ -20,44 +20,44 @@
 
 package net.sf.okapi.filters.mif;
 
-import java.nio.charset.CharsetEncoder;
+import java.nio.charset.Charset;
+import java.nio.charset.spi.CharsetProvider;
+import java.util.ArrayList;
+import java.util.Iterator;
 
-import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.Util;
-import net.sf.okapi.common.encoder.EncoderManager;
-import net.sf.okapi.common.filterwriter.GenericFilterWriter;
-import net.sf.okapi.common.skeleton.ISkeletonWriter;
+public class FrameRomanCharsetProvider extends CharsetProvider {
 
-public class MIFFilterWriter extends GenericFilterWriter {
-
-	public MIFFilterWriter (ISkeletonWriter skelWriter,
-		EncoderManager encoderManager)
-	{
-		super(skelWriter, encoderManager);
-	}
-
-	@Override
-	public void setOptions (LocaleId locale,
-		String defaultEncoding)
-	{
-		// Force the encoding
-		if ( !Util.isEmpty(defaultEncoding) && defaultEncoding.startsWith("UTF-16") ) {
-			super.setOptions(locale, defaultEncoding);
-		}
-		else {
-			// Null encoding should make the writer get it from the start-document info
-			super.setOptions(locale, null);
-		}
-	}
-
-	@Override
-	protected CharsetEncoder createCharsetEncoder (String encodingtoUse) {
-		// Special case for FrameRoman
-		if ( encodingtoUse.equals(MIFFilter.FRAMEROMAN) ) {
-			return new FrameRomanCharsetProvider().charsetForName(encodingtoUse).newEncoder();
-		}
-		// else: normal return
-		return null; // Use default otherwise
-	}
+	private static final String NAME = "x-FrameRoman";
 	
+	private final String[] aliases = {"FrameRoman", "MIFRoman"};
+
+	// Zero-argument constructor
+    public FrameRomanCharsetProvider() {
+    }
+
+    @Override
+	public Charset charsetForName (String name) {
+		// Check the main name
+		if ( name.equalsIgnoreCase(NAME) ) {
+			return new FrameRomanCharset(NAME, aliases);
+		}
+		// Check our aliases
+		for ( String aliasName : aliases) {
+			if ( name.equalsIgnoreCase(aliasName)) {
+				return new FrameRomanCharset(NAME, aliases);
+			}
+		}
+		// Else: Unknown name
+		return null;
+	}
+
+	@Override
+	public Iterator<Charset> charsets () {
+		// Create a list with the lone encoding this provider supports
+		ArrayList<Charset> list = new ArrayList<Charset>();
+		list.add(Charset.forName(NAME));
+		// Return the iterator
+		return list.iterator();
+	}
+
 }

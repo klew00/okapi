@@ -75,6 +75,8 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
 @UsingParameters(Parameters.class)
 public class MIFFilter implements IFilter {
 	
+	public static final String FRAMEROMAN = "x-FrameRoman"; //"x-MacRoman"; //TODO: Set to x-FrameRoman when ready
+
 	private final Logger logger = Logger.getLogger(getClass().getName());
 
 	private static final int BLOCKTYPE_TEXTFLOW = 1;
@@ -89,7 +91,6 @@ public class MIFFilter implements IFilter {
 		+ "MarkerTypeCatalog;XRefFormats;Document;BookComponent;InitialAutoNums;Dictionary;AFrames;Page;"; // Must end with ';'
 	
 	private static final String IMPORTOBJECT = "ImportObject";
-	private static final String FRAMEROMAN = "x-MacRoman"; //TODO: Set to x-FrameRoman when ready
 	
 	private Parameters params;
 	private String lineBreak;
@@ -122,9 +123,15 @@ public class MIFFilter implements IFilter {
 	private ArrayList<String> tables;
 	private boolean secondPass;
 	private ByteArrayOutputStream byteStream;
+	private FrameRomanCharsetProvider csProvider;
 	private CharsetDecoder[] decoders;
+	private boolean[] doubleConversion;
+	private CharsetDecoder firstDecoder;
+	private CharsetEncoder firstEncoder;
 	private CharsetEncoder[] encoders;
 	private CharsetDecoder currentDecoder;
+	private CharsetEncoder currentEncoder;
+	private boolean doDoubleConversion;
 	private int currentCharsetIndex;
 	private MIFEncoder encoder;
 	private int decodingErrors;
@@ -293,12 +300,23 @@ public class MIFFilter implements IFilter {
 		RawDocument rd)
 	{
 		try {
+			csProvider = new FrameRomanCharsetProvider();
+			CharsetDecoder decoder;
 			//--- First pass: gather information
 			
 			// Detect encoding
 			version = "";
 			Object[] res = guessEncoding(input);
-			reader = new BufferedReader(new InputStreamReader((InputStream)res[0], (String)res[1]));
+			baseEncoding = (String)res[1];
+			// Use directly a decoder to allow the MIF-specific encoder without having to register it
+			if ( baseEncoding.equals(FRAMEROMAN) ) {
+				decoder = csProvider.charsetForName(FRAMEROMAN).newDecoder();
+			}
+			else {
+				decoder = Charset.forName(baseEncoding).newDecoder();
+			}
+			reader = new BufferedReader(new InputStreamReader((InputStream)res[0], decoder));
+
 			initialize();
 			secondPass = false;
 			textFlows = new ArrayList<Integer>();
@@ -320,7 +338,15 @@ public class MIFFilter implements IFilter {
 			input = rd.getStream();
 			res = guessEncoding(input);
 			baseEncoding = (String)res[1];
-			reader = new BufferedReader(new InputStreamReader((InputStream)res[0], baseEncoding));
+			
+			// Use directly a decoder to allow the MIF-specific encoder without having to register it
+			if ( baseEncoding.equals(FRAMEROMAN) ) {
+				decoder = csProvider.charsetForName(FRAMEROMAN).newDecoder();
+			}
+			else {
+				decoder = Charset.forName(baseEncoding).newDecoder();
+			}
+			reader = new BufferedReader(new InputStreamReader((InputStream)res[0], decoder));
 			initialize();
 			
 			// Compile code finder rules
@@ -329,14 +355,31 @@ public class MIFFilter implements IFilter {
 			}
 			
 			// Initialize the decoders
-			decoders = new CharsetDecoder[2];
-			decoders[0] = Charset.forName(baseEncoding).newDecoder();
-			decoders[1] = decoders[0]; // Use the same to start
+			firstDecoder = csProvider.charsetForName(FRAMEROMAN).newDecoder();
+			firstEncoder = Charset.forName("Windows-1252").newEncoder();
 			currentCharsetIndex = 0;
+			doubleConversion = new boolean[2];
+			doubleConversion[0] = false;
+			doubleConversion[1] = false;
+			doDoubleConversion = doubleConversion[currentCharsetIndex];
+			decoders = new CharsetDecoder[2];
+			if ( baseEncoding.equals(FRAMEROMAN) ) {
+				decoders[0] = firstDecoder;
+			}
+			else {
+				decoders[0] = Charset.forName(baseEncoding).newDecoder();
+			}
+			decoders[1] = decoders[0]; // Use the same to start
 			currentDecoder = decoders[currentCharsetIndex];
 			encoders = new CharsetEncoder[2];
-			encoders[0] = Charset.forName(baseEncoding).newEncoder();
+			if ( baseEncoding.equals(FRAMEROMAN) ) {
+				encoders[0] = csProvider.charsetForName(baseEncoding).newEncoder();
+			}
+			else {
+				encoders[0] = Charset.forName(baseEncoding).newEncoder();
+			}
 			encoders[1] = encoders[0];
+			currentEncoder = encoders[currentCharsetIndex];
 			byteStream = new ByteArrayOutputStream(20);
 			
 			queue = new LinkedList<Event>();
@@ -690,6 +733,28 @@ public class MIFFilter implements IFilter {
 					else if ( tag.equals(IMPORTOBJECT) ) {
 						skipOverImportObject(false, null);
 						blockLevel--;
+					}
+					else if ( tag.equals("PgfCatalog") ) {
+			//			skipOverContent(false, null);
+			//			blockLevel--;
+						// Gather the encoding information for the paragraph formats
+						// based on the font and font encodings
+						int level = blockLevel;
+						while ( true ) {
+							if ( readUntil("Pgf;", false, null, level, true) == null ) {
+								break; // Done
+							}
+							// Inside a Pgf:
+							while ( true ) {
+								tag = readUntil("PgfTag;PgfFont;", false, null, blockLevel, true);
+								if ( tag == null ) {
+									break; // Done
+								}
+								else if ( tag.equals("PgfTag") ) {
+								}
+							}
+						}
+
 					}
 					else if ( "MIFFile".equals(tag) ) {
 						token = getNextTokenInStatement(false, null, true);
@@ -1229,11 +1294,22 @@ public class MIFFilter implements IFilter {
 					sb.append(res[0]);
 					paraLevel--;
 				}
+				else if ( !useUTF && "PgfTag".equals(tag) ) {
+					// Try to update the encoding based of the font for the given paragraph tag
+					
+					String paraName = processString(true, sb);
+					//for test
+					if ( "Haupttext".equals(paraName) ) {
+						updateCurrentDecoder("windows-1253", true);
+					}
+					if ( checkIfParaBufNeeded ) paraBufNeeded = true;
+					paraLevel--;
+				}
 				else if ( !useUTF && "Font".equals(tag) ) {
 					// Do the font-driven encoding resolving only for non-UTF-8 files
 					//TODO: Is it safe? need to be verified
 					if ( checkIfParaBufNeeded ) paraBufNeeded = true;
-					monitorEncoding(sb);
+					monitorFontEncoding(sb);
 					paraLevel--;
 				}
 				// Default: skip over
@@ -1260,7 +1336,7 @@ public class MIFFilter implements IFilter {
 		return 0;
 	}
 
-	private void monitorEncoding (StringBuilder sb)
+	private void monitorFontEncoding (StringBuilder sb)
 		throws IOException
 	{
 		int c;
@@ -1313,7 +1389,8 @@ public class MIFFilter implements IFilter {
 			case '>':
 				baseLevel--;
 				if ( baseLevel == 0 ) {
-					updateCurrentDecoder(ftag, encoding, fontHint);
+					Object[] res = mapFontEncoding(ftag, encoding, fontHint);
+					updateCurrentDecoder((String)res[0], (Boolean)res[1]);
 					return;
 				}
 				break;
@@ -1327,65 +1404,103 @@ public class MIFFilter implements IFilter {
 	private void resetToDefaultDecoder () {
 		currentCharsetIndex = 0;
 		currentDecoder = decoders[0];
+		currentEncoder = encoders[0];
+		doDoubleConversion = doubleConversion[0];
 	}
-	
-	private void updateCurrentDecoder (String ftag,
-		String newEncoding,
-		String newHint)
+
+	private Object[] mapFontEncoding (String ftag,
+		String encoding,
+		String hint)
 	{
-		if ( newEncoding == null ) {
-			// No encoding definition
+		Object[] res = new Object[2];
+		res[1] = false;
+		if ( encoding == null ) {
 			if ( Util.isEmpty(ftag) ) {
 				// No FTag and no encoding: likely a default for the encoding
-				resetToDefaultDecoder();
+				res[0] = "";
+				return res;
 			}
 			else {
 				//TODO: get the encoding info from the font of this paragraph style
+				return res; // For now do nothing
 			}
+		}
+
+		// Map the MIF encoding name to Java canonical charset name
+		String mappedEncoding = encodingTable.get(encoding);
+		if ( mappedEncoding == null ) {
+			// Warn if the name is not found (and just move on)
+			logger.warning(String.format("Unknown encoding name: '%s'.", encoding));
+			return res;
 		}
 		else {
-			// Map the MIF encoding name to Java canonical charset name
-			String mappedEncoding = encodingTable.get(newEncoding);
-			if ( mappedEncoding == null ) {
-				// Warn if the name is not found (and just move on)
-				logger.warning(String.format("Unknown encoding name: '%s'.", mappedEncoding));
-				return;
-			}
-			
-			// Special case for FrameRoman: it may be anything depending on the font
-			if ( mappedEncoding.equals(FRAMEROMAN) && !Util.isEmpty(newHint) ) {
-				// Try to guess the real encoding from the platform font name
-//TODO: the strings should be in parameters so they can be adapted
-				newHint = newHint.toLowerCase();
-				if ( newHint.contains("greek") ) {
-					newEncoding = "x-MacGreek";
-				}
-				else if ( newHint.contains("cyrillic") ) {
-					newEncoding = "x-MacCyrillic";
-				}
-				else if ( newHint.contains(" ce ") ) {
-					newEncoding = "x-MacCentralEurope";
-				}
-			}
-			
-			// Check if the new encoding is the same as the current one
-			if ( !mappedEncoding.equals(currentDecoder.charset().name()) ) {
-				// Test the other one
-				int n = ((currentCharsetIndex == 0) ? 1 : 0);
-				if ( mappedEncoding.equals(decoders[n].charset().name()) ) {
-					// Use this one
-					currentCharsetIndex = n;
-				}
-				else { // Create a new one (keep the number 0 always the same)
-					decoders[1] = Charset.forName(mappedEncoding).newDecoder();
-					encoders[1] = Charset.forName(mappedEncoding).newEncoder();
-					currentCharsetIndex = 1;
-				}
-				// Set the current one
-				currentDecoder = decoders[currentCharsetIndex];
-			}
-			// Else: current decoder in fine
+			res[0] = mappedEncoding;
 		}
+			
+		// Special case for FrameRoman: it may be anything depending on the font
+		if ( mappedEncoding.equals(FRAMEROMAN) && !Util.isEmpty(hint) ) {
+			// Try to guess the real encoding from the platform font name
+			hint = hint.toLowerCase();
+			if ( hint.contains("greek") ) {
+				res[0] = "x-MacGreek";
+				res[1] = true;
+			}
+			else if ( hint.contains("cyrillic") ) {
+				res[0] = "x-MacCyrillic";
+				res[1] = true;
+			}
+			else if ( hint.contains(" ce ") ) {
+				res[0] = "x-MacCentralEurope";
+				res[1] = true;
+			}
+		}
+		
+		return res;
+	}
+	
+	/**
+	 * Updates the current decoder if needed.
+	 * @param newEncoding the new encoding to use. This must be a Java encoding.
+	 * Use empty to reset to the default decoder. If the value is null, it is ignored.
+	 */
+	private void updateCurrentDecoder (String newEncoding,
+		boolean newDoubleConversion)
+	{
+		if ( newEncoding == null ) return; // Do nothing
+		if ( newEncoding.isEmpty() ) {
+			// Reset to default on empty new encoding
+			resetToDefaultDecoder();
+			return;
+		}
+
+		// Try to switch if needed only
+
+		// Check if the new encoding is the same as the current one
+		if ( !newEncoding.equals(currentDecoder.charset().name()) ) {
+			// Test the other one
+			int n = ((currentCharsetIndex == 0) ? 1 : 0);
+			if ( newEncoding.equals(decoders[n].charset().name()) ) {
+				// Use this one
+				currentCharsetIndex = n;
+			}
+			else { // Create a new one (keep the number 0 always the same)
+				if ( newEncoding.equals(FRAMEROMAN) ) {
+					decoders[1] = csProvider.charsetForName(newEncoding).newDecoder();
+					encoders[1] = csProvider.charsetForName(newEncoding).newEncoder();
+				}
+				else {
+					decoders[1] = Charset.forName(newEncoding).newDecoder();
+					encoders[1] = Charset.forName(newEncoding).newEncoder();
+				}
+				doubleConversion[1] = newDoubleConversion;
+				currentCharsetIndex = 1;
+			}
+			// Set the current one
+			currentDecoder = decoders[currentCharsetIndex];
+			currentEncoder = encoders[currentCharsetIndex];
+			doDoubleConversion = doubleConversion[currentCharsetIndex];
+		}
+		// Else: current decoder in fine
 	}
 	
 	/**
@@ -1856,14 +1971,25 @@ public class MIFFilter implements IFilter {
 				case '>':
 					if ( byteMode ) {
 						try {
-							CharBuffer buf = currentDecoder.decode(ByteBuffer.wrap(byteStream.toByteArray()));
-							strBuffer.append(buf.toString());
+							if ( doDoubleConversion ) {
+								CharBuffer buf1 = firstDecoder.decode(ByteBuffer.wrap(byteStream.toByteArray()));
+								byteStream.reset();
+								for ( char ch : buf1.array() ) {
+									byteStream.write((int)ch);
+								}
+								CharBuffer buf2 = currentDecoder.decode(ByteBuffer.wrap(byteStream.toByteArray()));
+								strBuffer.append(buf2.toString());
+							}
+							else {
+								CharBuffer buf = currentDecoder.decode(ByteBuffer.wrap(byteStream.toByteArray()));
+								strBuffer.append(buf.toString());
+							}
 						}
 						catch ( CharacterCodingException e ) {
 							if ( ++decodingErrors < 25 ) {
 								// Warning message, but only up to a point
-								logger.warning(String.format("Error with decoding character \\x%2x (%d) with encoding '%s'.",
-									c, c, currentDecoder.charset().name()));
+								logger.warning(String.format("Error with decoding character with encoding '%s'.",
+									currentDecoder.charset().name()));
 							}
 						}
 					}
@@ -1913,7 +2039,7 @@ public class MIFFilter implements IFilter {
 					else strBuffer.append('\'');
 					continue;
 				case 'u':
-					c = readHexa(4, false);
+					c = readHexa(4, false, store, sb);
 					if ( c == Integer.MAX_VALUE ) {
 						continue; // warning already logged
 					}
@@ -1927,7 +2053,7 @@ public class MIFFilter implements IFilter {
 					}
 					continue;
 				case 'x':
-					c = readHexa(2, true);
+					c = readHexa(2, true, store, sb);
 					if ( c == Integer.MAX_VALUE ) {
 						continue; // warning already logged
 					}
@@ -1935,7 +2061,7 @@ public class MIFFilter implements IFilter {
 						byteStream.reset();
 						byteMode = true;
 					}
-					byteStream.write(c);
+					byteStream.write((char)c);
 					continue;
 				}				
 			}
@@ -1946,21 +2072,31 @@ public class MIFFilter implements IFilter {
 	}
 
 	private int readHexa (int length,
-		boolean readExtraSpace)
+		boolean readExtraSpace,
+		boolean store,
+		StringBuilder sb)
 		throws IOException
 	{
 		tagBuffer.setLength(0);
-
+		int c;
 		// Fill the buffer
 		for ( int i=0; i<length; i++ ) {
-			int c = reader.read();
+			c = reader.read();
 			if ( c == -1 ) {
 				throw new OkapiIllegalFilterOperationException("Unexpected end of file.");
+			}
+			if ( store ) {
+				if ( sb == null ) skel.append((char)c);
+				else sb.append((char)c);
 			}
 			tagBuffer.append((char)c);
 		}
 		if ( readExtraSpace ) {
-			reader.read();
+			c = reader.read();
+			if ( store ) {
+				if ( sb == null ) skel.append((char)c);
+				else sb.append((char)c);
+			}
 		}
 		
 		// Try to convert

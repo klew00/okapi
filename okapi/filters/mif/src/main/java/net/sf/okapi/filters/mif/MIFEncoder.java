@@ -213,7 +213,12 @@ public class MIFEncoder implements IEncoder {
 			chsEnc = null;
 		}
 		else {
-			chsEnc = Charset.forName(encoding).newEncoder();
+			if ( encoding.equals(MIFFilter.FRAMEROMAN) ){
+				chsEnc = new FrameRomanCharsetProvider().charsetForName(encoding).newEncoder();
+			}
+			else {
+				chsEnc = Charset.forName(encoding).newEncoder();
+			}
 		}
 	}
 

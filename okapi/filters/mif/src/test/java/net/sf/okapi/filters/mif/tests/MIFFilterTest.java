@@ -27,6 +27,7 @@ import net.sf.okapi.common.filters.RoundTripComparison;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.Code;
@@ -296,6 +297,20 @@ public class MIFFilterTest {
 	}
 	
 	@Test
+	public void testOutputThenCompare () {
+		rewriteThenCompareFile("TestMarkers.mif");
+		rewriteThenCompareFile("Test03.mif");
+		rewriteThenCompareFile("Test01.mif");
+		rewriteThenCompareFile("Test02-v9.mif");
+		rewriteThenCompareFile("Test01.mif");
+		rewriteThenCompareFile("JATest.mif");
+		rewriteThenCompareFile("TestFootnote.mif");
+
+//		rewriteThenCompareFile("Test03_mif7.mif");
+//		rewriteThenCompareFile("Test01-v7.mif");
+	}
+	
+	@Test
 	public void testDoubleExtraction () {
 		// Read all files in the data directory
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
@@ -322,12 +337,47 @@ public class MIFFilterTest {
 		filter.close();
 	}
 
+	private void rewriteThenCompareFile (String fileName) {
+		// Rewrite the file
+		filter.open(new RawDocument(Util.toURI(root+fileName), null, locEN));
+		IFilterWriter writer = filter.createFilterWriter();
+		writer.setOptions(locEN, null);
+		File outFile = new File(root+fileName+".rewrite.mif");
+		outFile.delete();
+		writer.setOutput(outFile.getAbsolutePath());
+		// Store while rewriting
+		ArrayList<Event> list = new ArrayList<Event>();
+		while ( filter.hasNext() ) {
+			Event event = filter.next();
+			list.add(event);
+			writer.handleEvent(event);
+		}
+		writer.close();
+		filter.close();
+		
+		// Read from the rewritten file
+		int i = 0;
+		filter.open(new RawDocument(outFile.toURI(), null, locEN));
+		while ( filter.hasNext() ) {
+			Event event1 = list.get(i++);
+			Event event2 = filter.next();
+			assertTrue(event1.getEventType() == event2.getEventType());
+			if ( event1.getEventType() == EventType.TEXT_UNIT ) {
+				ITextUnit tu1 = event1.getTextUnit();
+				ITextUnit tu2 = event2.getTextUnit();
+				assertEquals(tu1.getSource().getFirstContent().getText(),
+					tu2.getSource().getFirstContent().getText());
+			}
+		}
+		
+	}
+
 	private ArrayList<Event> getEventsFromFile (String filename,
 		Parameters params)
 	{
 		ArrayList<Event> list = new ArrayList<Event>();
 		
-		// Swithc parameters if needed
+		// Switch parameters if needed
 		Parameters oldParams = (Parameters)filter.getParameters();
 		if ( params != null ) {
 			filter.setParameters(params);

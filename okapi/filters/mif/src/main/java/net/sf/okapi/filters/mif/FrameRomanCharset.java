@@ -20,44 +20,32 @@
 
 package net.sf.okapi.filters.mif;
 
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 
-import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.Util;
-import net.sf.okapi.common.encoder.EncoderManager;
-import net.sf.okapi.common.filterwriter.GenericFilterWriter;
-import net.sf.okapi.common.skeleton.ISkeletonWriter;
+public class FrameRomanCharset extends Charset {
 
-public class MIFFilterWriter extends GenericFilterWriter {
-
-	public MIFFilterWriter (ISkeletonWriter skelWriter,
-		EncoderManager encoderManager)
+	protected FrameRomanCharset (String canonicalName,
+		String[] aliases)
 	{
-		super(skelWriter, encoderManager);
+		super(canonicalName, aliases);
 	}
 
 	@Override
-	public void setOptions (LocaleId locale,
-		String defaultEncoding)
-	{
-		// Force the encoding
-		if ( !Util.isEmpty(defaultEncoding) && defaultEncoding.startsWith("UTF-16") ) {
-			super.setOptions(locale, defaultEncoding);
-		}
-		else {
-			// Null encoding should make the writer get it from the start-document info
-			super.setOptions(locale, null);
-		}
+	public boolean contains (Charset cs) {
+		// Just answer no
+		return false;
 	}
 
 	@Override
-	protected CharsetEncoder createCharsetEncoder (String encodingtoUse) {
-		// Special case for FrameRoman
-		if ( encodingtoUse.equals(MIFFilter.FRAMEROMAN) ) {
-			return new FrameRomanCharsetProvider().charsetForName(encodingtoUse).newEncoder();
-		}
-		// else: normal return
-		return null; // Use default otherwise
+	public CharsetDecoder newDecoder () {
+		return new FrameRomanDecoder(this, 1, 1);
 	}
-	
+
+	@Override
+	public CharsetEncoder newEncoder () {
+		return new FrameRomanEncoder(this, 1, 1);
+	}
+
 }

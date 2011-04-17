@@ -31,6 +31,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.nio.charset.CharsetEncoder;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
@@ -269,6 +270,16 @@ public class GenericFilterWriter implements IFilterWriter {
 	public void setParameters (IParameters params) {
 	}
 
+	/**
+	 * Provides sub-classes an opportunity to creates the character set encoder for the output.
+	 * @param resource the start document resource.
+	 * @return the decoder to use for the output or null. When null is returned (default)
+	 * the output uses the encoding.
+	 */
+	protected CharsetEncoder createCharsetEncoder (String encodingtoUse) {
+		return null; // Default is to use the encoding not the encoder
+	}
+	
 	private void createWriter (StartDocument resource) {
 		try {
 			tempFile = null;
@@ -304,8 +315,19 @@ public class GenericFilterWriter implements IFilterWriter {
 				// if not: Fall back on the encoding of the original
 				encoding = originalEnc;
 			}
+
+			// Get the decoder to used
+			CharsetEncoder csEncoder = createCharsetEncoder(encoding);
 			// Create the output
-			writer = new OutputStreamWriter(output, encoding);
+			if ( csEncoder != null ) { // Use the encoder if not null
+				writer = new OutputStreamWriter(output, csEncoder);
+			}
+			else { // But by default use the encoding
+				// The behavior is different: we get ? for unknown characters with the encoding
+				// but we get an exception with the encoder
+				writer = new OutputStreamWriter(output, encoding);
+			}
+			
 			// Set default UTF-8 BOM usage
 			boolean useUTF8BOM = false; // On all platforms
 			// Check if the output encoding is UTF-8
