@@ -25,6 +25,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PushbackInputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -39,7 +40,6 @@ import java.util.List;
 import java.util.Stack;
 import java.util.logging.Logger;
 
-import net.sf.okapi.common.BOMAwareInputStream;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
@@ -257,7 +257,7 @@ public class MIFFilter implements IFilter {
 	{
 		close();
 		if (( input.getInputURI() == null ) && ( input.getInputCharSequence() == null )) {
-			// Can do this currently because of the double pass
+			// Cannot do this currently because of the double pass
 			throw new OkapiBadFilterInputException("Direct stream input not supported for MIF.");
 		}
 		
@@ -300,22 +300,23 @@ public class MIFFilter implements IFilter {
 		RawDocument rd)
 	{
 		try {
-			csProvider = new FrameRomanCharsetProvider();
-			CharsetDecoder decoder;
 			//--- First pass: gather information
 			
-			// Detect encoding
+			csProvider = new FrameRomanCharsetProvider();
 			version = "";
-			Object[] res = guessEncoding(input);
-			baseEncoding = (String)res[1];
+
+			// Detect encoding
+			InputStream bomAwareInput = guessEncoding(input);
+			
 			// Use directly a decoder to allow the MIF-specific encoder without having to register it
+			CharsetDecoder decoder;
 			if ( baseEncoding.equals(FRAMEROMAN) ) {
 				decoder = csProvider.charsetForName(FRAMEROMAN).newDecoder();
 			}
 			else {
 				decoder = Charset.forName(baseEncoding).newDecoder();
 			}
-			reader = new BufferedReader(new InputStreamReader((InputStream)res[0], decoder));
+			reader = new BufferedReader(new InputStreamReader(bomAwareInput, decoder)); //(InputStream)res[0], decoder));
 
 			initialize();
 			secondPass = false;
@@ -336,17 +337,11 @@ public class MIFFilter implements IFilter {
 			
 			secondPass = true;
 			input = rd.getStream();
-			res = guessEncoding(input);
-			baseEncoding = (String)res[1];
 			
-			// Use directly a decoder to allow the MIF-specific encoder without having to register it
-			if ( baseEncoding.equals(FRAMEROMAN) ) {
-				decoder = csProvider.charsetForName(FRAMEROMAN).newDecoder();
-			}
-			else {
-				decoder = Charset.forName(baseEncoding).newDecoder();
-			}
-			reader = new BufferedReader(new InputStreamReader((InputStream)res[0], decoder));
+			// The base encoding was detected before the first pass, so the decoder is already set
+			// But we do call guessEncoding to handle the possible BOM
+			bomAwareInput = guessEncoding(input);
+			reader = new BufferedReader(new InputStreamReader(bomAwareInput, decoder));
 			initialize();
 			
 			// Compile code finder rules
@@ -772,7 +767,7 @@ public class MIFFilter implements IFilter {
 			
 		}
 		catch ( IOException e ) {
-			throw new OkapiIOException("Error while gathering extraction information.", e);
+			throw new OkapiIOException("Error while gathering extraction information.\n" +e.getMessage(), e);
 		}
 		finally {
 			
@@ -2113,48 +2108,72 @@ public class MIFFilter implements IFilter {
 		return Integer.MAX_VALUE;
 	}
 	
-	private Object[] guessEncoding (InputStream input)
+	private InputStream guessEncoding (InputStream input)
 		throws IOException
 	{
-		Object[] res = new Object[2];
-		String defEncoding = "UTF-8"; // Use v8/v9 default by default
-		if ( !Util.isEmpty(version) ) {
-			// If we have a version, it means we are in the second pass and need to get the correct encoding
-			if ( version.compareTo("8.00") < 0 ) {
-				// Before 8.00 the default was not UTF-8
-				defEncoding = FRAMEROMAN;
-			}
+		PushbackInputStream stream = new PushbackInputStream(input, 28);
+		byte buffer[] = new byte[28];
+		int n = stream.read(buffer, 0, 28);
+		int unread = n;
+		
+		boolean is16 = false;
+		baseEncoding = "UTF-8";
+		if (( buffer[0] == -2 ) && ( buffer[1] == -1 )) {
+			is16 = true;
+			baseEncoding = "UTF-16BE";
+		}
+		else if (( buffer[0] == -1 ) && ( buffer[1] == -2 )) {
+			is16 = true;
+			baseEncoding = "UTF-16LE";
 		}
 		
-		// Detect any BOM-type encoded (and set the stream to skip over it)
-		BOMAwareInputStream bais = new BOMAwareInputStream(input, defEncoding);
-		res[0] = bais;
-		res[1] = bais.detectEncoding();
-		useUTF = (((String)res[1]).startsWith("UTF-"));
-		if ( bais.autoDtected() ) {
-			return res;
+		String tmp = new String(buffer, baseEncoding);
+		if ( is16 ) {
+			tmp = tmp.substring(1); // Remove BOM
+			unread = n-2;
 		}
-			
-//		// Else: try detect based on MIF weird mechanism
-//		//TODO
-//
-//		// Try to match the file signature with the pre-defined signatures
-//		String signature = "";
-//			
-//		if ( signature.equals("\u201C\u00FA\u2013\u007B\u0152\u00EA") ) {
-//			// "Japanese" in Shift-JIS seen in Windows-1252 (coded in Unicode)
-//			res[1] = "Shift_JIS";
-//			return res;
-//		}
-//		else if ( signature.equals("\u00C6\u00FC\u00CB\u00DC\u00B8\u00EC") ) {
-//			res[1] = "EUC-JP";
-//			// "Japanese" in EUC seen in Windows-1252 (coded in Unicode)
-//			return res;
-//		}
-//
-//		// Default
-//		res[1] = DEFENCODING;
-		return res;
+
+		// <MIFFile N.00>
+		if ( tmp.length() < 13 ) {
+			throw new OkapiIOException("Invalid MIF header.");
+		}
+		if ( !tmp.startsWith("<MIFFile ") ) {
+			throw new OkapiIOException("Invalid MIF header.");
+		}
+		
+		version = tmp.substring(9);
+		if ( version.compareTo("8.00") < 0 ) {
+			baseEncoding = FRAMEROMAN;
+		}
+		
+		useUTF = baseEncoding.startsWith("UTF-");
+		stream.unread(buffer, (n-unread), unread);
+		return stream;
 	}
+	
+//	private Object[] guessEncoding (InputStream input)
+//		throws IOException
+//	{
+//		Object[] res = new Object[2];
+//		String defEncoding = "UTF-8"; // Use v8/v9 default by default
+//		if ( !Util.isEmpty(version) ) {
+//			// If we have a version, it means we are in the second pass and need to get the correct encoding
+//			if ( version.compareTo("8.00") < 0 ) {
+//				// Before 8.00 the default was not UTF-8
+//				defEncoding = FRAMEROMAN;
+//			}
+//		}
+//		
+//		// Detect any BOM-type encoded (and set the stream to skip over it)
+//		BOMAwareInputStream bais = new BOMAwareInputStream(input, defEncoding);
+//		res[0] = bais;
+//		res[1] = bais.detectEncoding();
+//		useUTF = (((String)res[1]).startsWith("UTF-"));
+//		if ( bais.autoDtected() ) {
+//			return res;
+//		}
+//			
+//		return res;
+//	}
 
 }

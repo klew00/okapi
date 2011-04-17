@@ -40,17 +40,16 @@ class FrameRomanDecoder extends CharsetDecoder {
 		CharBuffer out)
 	{
 		while ( in.hasRemaining() ) {
+			// First, check if we can output
+			if ( !out.hasRemaining() ) {
+				// If not: return and tell the caller
+				return CoderResult.OVERFLOW;
+			}
 			// Get the Unicode value for the given byte
 			// Make sure we use the un-signed value of the byte
 			char outChar = byteToChar[0xFF & in.get()];
 			// Write the character in the output buffer
-			// If there is enough room
-			if ( out.hasRemaining() ) {
-				out.put(outChar);
-			}
-			else { // No more space for the output
-				return CoderResult.OVERFLOW;
-			}
+			out.put(outChar);
 		}
 		// Done
 		return CoderResult.UNDERFLOW;

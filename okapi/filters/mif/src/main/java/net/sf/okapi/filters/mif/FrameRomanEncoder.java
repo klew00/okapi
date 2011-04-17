@@ -42,6 +42,12 @@ class FrameRomanEncoder extends CharsetEncoder {
 	{
 		Byte outputByte;
 		while ( in.hasRemaining() ) {
+			// First, check if we can output
+			if ( !out.hasRemaining() ) {
+				// If not, return and tell the caller
+				return CoderResult.OVERFLOW;
+			}
+
 			// Get the input character
 			char inputChar = in.get();
 			
@@ -57,13 +63,8 @@ class FrameRomanEncoder extends CharsetEncoder {
 					outputByte = (byte)'?';
 				}
 			}
-			// Output to the buffer, if there is room
-			if ( out.hasRemaining() ) {
-				out.put(outputByte);
-			}
-			else {
-				return CoderResult.OVERFLOW;
-			}
+			// Output to the buffer
+			out.put(outputByte);
 		}
 		// Done
         return CoderResult.UNDERFLOW;

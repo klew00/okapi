@@ -290,12 +290,13 @@ public class MIFFilterTest {
 	public void testOutput () {
 		rewriteFile("TestMarkers.mif");
 		rewriteFile("Test03.mif");
-		rewriteFile("Test03_mif7.mif");
 		rewriteFile("Test01.mif");
 		rewriteFile("Test02-v9.mif");
+
+		rewriteFile("Test03_mif7.mif");
 		rewriteFile("Test01-v7.mif");
 	}
-	
+
 	@Test
 	public void testOutputThenCompare () {
 		rewriteThenCompareFile("TestMarkers.mif");
@@ -306,24 +307,24 @@ public class MIFFilterTest {
 		rewriteThenCompareFile("JATest.mif");
 		rewriteThenCompareFile("TestFootnote.mif");
 
+		rewriteThenCompareFile("Test01-v7.mif");
 //		rewriteThenCompareFile("Test03_mif7.mif");
-//		rewriteThenCompareFile("Test01-v7.mif");
 	}
 	
-	@Test
-	public void testDoubleExtraction () {
-		// Read all files in the data directory
-		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
-		list.add(new InputDocument(root+"Test01.mif", null));
-		list.add(new InputDocument(root+"Test01-v7.mif", null));
-		list.add(new InputDocument(root+"Test02-v9.mif", null));
-		list.add(new InputDocument(root+"Test03.mif", null));
-		list.add(new InputDocument(root+"TestMarkers.mif", null));
-		list.add(new InputDocument(root+"JATest.mif", null));
-		
-		RoundTripComparison rtc = new RoundTripComparison();
-		assertTrue(rtc.executeCompare(filter, list, null, /*UTF-8*/locEN, locEN));
-	}
+//	@Test
+//	public void testDoubleExtraction () {
+//		// Read all files in the data directory
+//		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
+//		list.add(new InputDocument(root+"Test01.mif", null));
+//		list.add(new InputDocument(root+"Test02-v9.mif", null));
+//		list.add(new InputDocument(root+"Test03.mif", null));
+//		list.add(new InputDocument(root+"TestMarkers.mif", null));
+//		list.add(new InputDocument(root+"JATest.mif", null));
+//		list.add(new InputDocument(root+"Test01-v7.mif", null));
+//		
+//		RoundTripComparison rtc = new RoundTripComparison();
+//		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, locEN));
+//	}
 
 	private void rewriteFile (String fileName) {
 		filter.open(new RawDocument(Util.toURI(root+fileName), null, locEN));
@@ -369,6 +370,7 @@ public class MIFFilterTest {
 					tu2.getSource().getFirstContent().getText());
 			}
 		}
+		filter.close();
 		
 	}
 
