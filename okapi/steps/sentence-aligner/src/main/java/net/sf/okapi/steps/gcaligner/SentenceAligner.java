@@ -125,8 +125,9 @@ public class SentenceAligner {
 						+ "\nMulti-Segment Match (TU ID: " + srcTuid + "): Non 1-1 match. Please confirm alignment.");
 			}
 		}
-
-		return TextUnitUtil.createMultilingualTextUnit(sourceParagraph, alignedPairs, trgLocale);
+		
+		sourceParagraph.getAlignedSegments().align(alignedPairs, trgLocale);
+		return sourceParagraph;
 	}
 
 	private ITextUnit alignSegments(ITextUnit bilingualParagraph, LocaleId srcLocale,
@@ -172,6 +173,7 @@ public class SentenceAligner {
 			}
 		}
 
-		return TextUnitUtil.createMultilingualTextUnit(bilingualParagraph, alignedPairs, trgLocale);
+		bilingualParagraph.getAlignedSegments().align(alignedPairs, trgLocale);
+		return bilingualParagraph;
 	}
 }
