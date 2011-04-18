@@ -210,11 +210,13 @@ public class CodeFinderEditor {
 
 	private String escapeToYAML (String text) {
 		text = text.replace("\\", "\\\\");
+		text = text.replace("\"", "\\\"");
 		return text.replace("\n", "\\n");
 	}
 	
 	private String unescapeFromYAML (String text) {
 		text = text.replaceAll("([^\\\\])\\\\n", "$1\n");
+		text = text.replaceAll("\\\\\\\"", "\"");
 		return text.replace("\\\\", "\\");
 	}
 	
