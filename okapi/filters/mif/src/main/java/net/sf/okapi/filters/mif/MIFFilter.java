@@ -1294,9 +1294,9 @@ public class MIFFilter implements IFilter {
 					
 					String paraName = processString(true, sb);
 					//for test
-					if ( "Haupttext".equals(paraName) ) {
-						updateCurrentDecoder("windows-1253", true);
-					}
+//					if ( "Haupttext".equals(paraName) ) {
+//						updateCurrentDecoder("windows-1253", true);
+//					}
 					if ( checkIfParaBufNeeded ) paraBufNeeded = true;
 					paraLevel--;
 				}

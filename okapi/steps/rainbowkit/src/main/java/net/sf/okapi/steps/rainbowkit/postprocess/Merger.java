@@ -51,6 +51,7 @@ public class Merger {
 	private Manifest manifest;
 	private LocaleId trgLoc;
 	private IFilterConfigurationMapper fcMapper;
+	private boolean skipEmptySourceEntries;
 	
 	public Merger (Manifest manifest,
 		IFilterConfigurationMapper fcMapper)
@@ -84,6 +85,7 @@ public class Merger {
 	}
 
 	public void startMerging (MergingInfo info) {
+		LOGGER.info("Merging: "+info.getRelativeInputPath());
 		// Create the filter for this original file
 		filter = fcMapper.createFilter(info.getFilterId(), filter);
 		if ( filter == null ) {
@@ -102,6 +104,9 @@ public class Merger {
 		writer = filter.createFilterWriter();
 		writer.setOptions(trgLoc, info.getTargetEncoding());
 		writer.setOutput(manifest.getMergeDirectory()+info.getRelativeTargetPath());
+		
+		// Skip entries with empty source for PO
+		skipEmptySourceEntries = info.getExtractionType().equals(Manifest.EXTRACTIONTYPE_PO);
 		
 		Event event = null;
 		if ( filter.hasNext() ) {
@@ -149,8 +154,11 @@ public class Merger {
 		// Check if we have a translation
 		TextContainer trgTraCont = traTu.getTarget(trgLoc, false);
 		if ( trgTraCont == null ) {
-			LOGGER.warning(String.format("No translation found for TU id='%s'. Using source.", traTu.getId()));
-			writer.handleEvent(oriEvent); // Use the source
+			if ( !oriTu.getSource().hasText() ) {
+				// Warn only if there source is not empty
+				LOGGER.warning(String.format("No translation found for TU id='%s'. Using source.", traTu.getId()));
+				writer.handleEvent(oriEvent); // Use the source
+			}
 			return;
 		}
 		
@@ -231,6 +239,11 @@ public class Merger {
 				ITextUnit tu = event.getTextUnit();
 				if ( !tu.isTranslatable() ) {
 					// Do not merge the translation for non-translatable
+					writer.handleEvent(event);
+					continue;
+				}
+				if ( skipEmptySourceEntries && tu.isEmpty() ) {
+					// For some types of package: Do not merge the translation for non-translatable
 					writer.handleEvent(event);
 					continue;
 				}
