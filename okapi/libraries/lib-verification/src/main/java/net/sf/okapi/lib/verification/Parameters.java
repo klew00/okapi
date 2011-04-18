@@ -56,6 +56,7 @@ public class Parameters extends BaseParameters {
 	private static final String CHECKWITHLT = "checkWithLT";
 	private static final String SERVERURL = "serverURL";
 	private static final String TRANSLATELTMSG = "translateLTMsg";
+	private static final String LTBILINGUALMODE = "ltBilingualMode";
 	private static final String LTTRANSLATIONSOURCE = "ltTranslationSource";
 	private static final String LTTRANSLATIONTARGET = "ltTranslationTarget";
 	private static final String SAVESESSION = "saveSession";
@@ -100,6 +101,7 @@ public class Parameters extends BaseParameters {
 	boolean checkWithLT;
 	String serverURL;
 	boolean translateLTMsg;
+	boolean ltBilingualMode;
 	String ltTranslationSource;
 	String ltTranslationTarget;
 	boolean saveSession;
@@ -421,6 +423,14 @@ public class Parameters extends BaseParameters {
 		this.translateLTMsg = translateLTMsg;
 	}
 
+	public boolean getLtBilingualMode () {
+		return ltBilingualMode;
+	}
+
+	public void setLtBilingualMode (boolean ltBilingualMode) {
+		this.ltBilingualMode = ltBilingualMode;
+	}
+
 	public String getLtTranslationSource () {
 		return ltTranslationSource;
 	}
@@ -486,6 +496,7 @@ public class Parameters extends BaseParameters {
 		checkWithLT = false;
 		serverURL = "http://localhost:8081/"; // Default
 		translateLTMsg = false;
+		ltBilingualMode = false;
 		ltTranslationSource = "";
 		ltTranslationTarget = "en";
 		saveSession = true;
@@ -578,6 +589,7 @@ public class Parameters extends BaseParameters {
 		checkWithLT = buffer.getBoolean(CHECKWITHLT, checkWithLT);
 		serverURL = buffer.getString(SERVERURL, serverURL);
 		translateLTMsg = buffer.getBoolean(TRANSLATELTMSG, translateLTMsg);
+		ltBilingualMode = buffer.getBoolean(LTBILINGUALMODE, ltBilingualMode);
 		ltTranslationSource = buffer.getString(LTTRANSLATIONSOURCE, ltTranslationSource);
 		ltTranslationTarget = buffer.getString(LTTRANSLATIONTARGET, ltTranslationTarget);
 		saveSession = buffer.getBoolean(SAVESESSION, saveSession);
@@ -653,6 +665,7 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean(CHECKWITHLT, checkWithLT);
 		buffer.setString(SERVERURL, serverURL);
 		buffer.setBoolean(TRANSLATELTMSG, translateLTMsg);
+		buffer.setBoolean(LTBILINGUALMODE, ltBilingualMode);
 		buffer.setString(LTTRANSLATIONSOURCE, ltTranslationSource);
 		buffer.setString(LTTRANSLATIONTARGET, ltTranslationTarget);
 		buffer.setBoolean(SAVESESSION, saveSession);

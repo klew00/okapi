@@ -123,6 +123,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Button chkCheckWithLT;
 	private Text edServerURL;
 	private Button chkTranslateLTMsg;
+	private Button chkLTBilingualMode;
 	private Text edLTTranslationSource;
 	private Text edLTTranslationTarget;
 	private Button chkAbsoluteMaxCharLength;
@@ -693,11 +694,19 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		edServerURL.setLayoutData(gdTmp);
 		
-		chkTranslateLTMsg = new Button(cmpTmp, SWT.CHECK);
-		chkTranslateLTMsg.setText("Auto-translate the messages from the LanguageTool checker");
+		chkLTBilingualMode = new Button(cmpTmp, SWT.CHECK);
+		chkLTBilingualMode.setText("Use bilingual mode");
 		gdTmp = new GridData();
 		gdTmp.verticalIndent = 16;
-		chkTranslateLTMsg.setLayoutData(gdTmp);
+		chkLTBilingualMode.setLayoutData(gdTmp);
+		chkLTBilingualMode.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				updateTranslateLTMsg();
+			};
+		});
+		
+		chkTranslateLTMsg = new Button(cmpTmp, SWT.CHECK);
+		chkTranslateLTMsg.setText("Auto-translate the messages from the LanguageTool checker (using Google Translate)");
 		chkTranslateLTMsg.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				updateTranslateLTMsg();
@@ -1197,6 +1206,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private void updateLTOptions () {
 		boolean enabled = chkCheckWithLT.getSelection();
 		edServerURL.setEnabled(enabled);
+		chkLTBilingualMode.setEnabled(enabled);
 		chkTranslateLTMsg.setEnabled(enabled);
 		if ( enabled ) {
 			updateTranslateLTMsg();
@@ -1289,6 +1299,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		chkCheckWithLT.setSelection(params.getCheckWithLT());
 		edServerURL.setText(params.getServerURL());
 		chkTranslateLTMsg.setSelection(params.getTranslateLTMsg());
+		chkLTBilingualMode.setSelection(params.getLtBilingualMode());
 		edLTTranslationSource.setText(params.getLtTranslationSource());
 		edLTTranslationTarget.setText(params.getLtTranslationTarget());
 		chkPatterns.setSelection(params.getCheckPatterns());
@@ -1493,6 +1504,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		params.setCheckWithLT(chkCheckWithLT.getSelection());
 		if ( chkCheckWithLT.getSelection() ) {
 			params.setServerURL(edServerURL.getText());
+			params.setLtBilingualMode(chkLTBilingualMode.getSelection());
 			params.setTranslateLTMsg(chkTranslateLTMsg.getSelection());
 			if ( chkTranslateLTMsg.getSelection() ) {
 				params.setLtTranslationSource(edLTTranslationSource.getText());

@@ -85,7 +85,7 @@ class QualityChecker {
 		if ( params.getCheckWithLT() ) {
 			ltConn = new LanguageToolConnector();
 			ltConn.initialize(targetLocale, params.getServerURL(), params.translateLTMsg,
-				params.ltTranslationSource, params.ltTranslationTarget);
+				params.ltBilingualMode, params.ltTranslationSource, params.ltTranslationTarget);
 		}
 
 		// Expression for finding doubled words
@@ -278,7 +278,7 @@ class QualityChecker {
 			
 			// Run a check with LanguageTool connector
 			if ( ltConn != null ) {
-				if ( ltConn.checkSegment(currentDocId, trgSeg, tu) > 0 ) {
+				if ( ltConn.checkSegment(currentDocId, srcSeg, trgSeg, tu) > 0 ) {
 					for ( Issue issue : ltConn.getIssues() ) {
 						reportIssue(issue.issueType, tu, issue.segId, issue.message, issue.srcStart, issue.srcEnd,
 							issue.trgStart, issue.trgEnd, issue.severity, srcSeg.toString(), trgSeg.toString(), null);

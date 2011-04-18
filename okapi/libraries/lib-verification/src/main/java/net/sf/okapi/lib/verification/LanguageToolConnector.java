@@ -48,6 +48,7 @@ public class LanguageToolConnector {
 	private String serverUrl;
 	private DocumentBuilder docBuilder;
 	private IQuery mt;
+	private boolean bilingualMode;
 	
 	/**
 	 * Creates a new LanguageToolConnector object.
@@ -67,6 +68,7 @@ public class LanguageToolConnector {
 	public void initialize (LocaleId locId,
 		String serverUrl,
 		boolean translateLTMsg,
+		boolean bilingualMode,
 		String ltTranslationSource,
 		String ltTranslationTarget)
 	{
@@ -80,6 +82,7 @@ public class LanguageToolConnector {
 			mt.close();
 			mt = null;
 		}
+		this.bilingualMode = bilingualMode;
 		if ( translateLTMsg ) {
 			mt = new GoogleMTConnector();
 			mt.setLanguages(LocaleId.fromBCP47(ltTranslationSource),
@@ -93,18 +96,26 @@ public class LanguageToolConnector {
 	}
 
 	public int checkSegment (URI docId,
-		Segment seg,
+		Segment srcSeg,
+		Segment trgSeg,
 		ITextUnit tu)
 	{
 		issues.clear();
-		if ( !seg.text.hasText() ) return 0;
-		String ctext = seg.text.getCodedText();
+		if ( !trgSeg.text.hasText() ) return 0;
+		String ctext = trgSeg.text.getCodedText();
 
 		// Create the connection and query
 		URL url;
 		try {
-			url = new URL(serverUrl + String.format("?language=%s&text=%s", lang,
-				URLEncoder.encode(ctext, "UTF-8")));
+			if ( bilingualMode ) {
+				url = new URL(serverUrl + String.format("?language=%s&text=%s&srctext=%s", lang,
+					URLEncoder.encode(ctext, "UTF-8"),
+					URLEncoder.encode(srcSeg.text.getCodedText(), "UTF-8")));
+			}
+			else {
+				url = new URL(serverUrl + String.format("?language=%s&text=%s", lang,
+					URLEncoder.encode(ctext, "UTF-8")));
+			}
 			URLConnection conn = url.openConnection();
 			
 			// Get and process the results
@@ -120,15 +131,15 @@ public class LanguageToolConnector {
 				}
 				int start = Integer.valueOf(error.getAttribute("fromx"));
 				int end = start+Integer.valueOf(error.getAttribute("errorlength"));
-				issues.add(new Issue(docId, IssueType.LANGUAGETOOL_ERROR, tu.getId(), seg.getId(), msg, 0, 0,
-					QualityChecker.fromFragmentToString(seg.text, start),
-					QualityChecker.fromFragmentToString(seg.text, end),
+				issues.add(new Issue(docId, IssueType.LANGUAGETOOL_ERROR, tu.getId(), trgSeg.getId(), msg, 0, 0,
+					QualityChecker.fromFragmentToString(trgSeg.text, start),
+					QualityChecker.fromFragmentToString(trgSeg.text, end),
 					Issue.SEVERITY_MEDIUM, tu.getName()));
 			}
 		}
 		catch ( Throwable e ) {
 			// -99 for srcEnd special marker
-			issues.add(new Issue(docId, IssueType.LANGUAGETOOL_ERROR, tu.getId(), seg.getId(),
+			issues.add(new Issue(docId, IssueType.LANGUAGETOOL_ERROR, tu.getId(), trgSeg.getId(),
 				"ERROR WITH LanguageTool SERVER: All LT checks are skipped from this text unit on.", 0, -99, 0, -1,
 				Issue.SEVERITY_HIGH, tu.getName()));
 		}
