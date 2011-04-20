@@ -1440,6 +1440,58 @@ public class TextContainerTest {
 		TextContainer tc = new TextContainer();
 		assertFalse(tc.hasBeenSegmented());
 	}
+	
+	@Test
+	public void testPartsAddition () {
+		// Default
+		TextContainer tc = new TextContainer();
+		tc.append(new TextPart("tp"), true);
+		tc.append(new Segment("seg1"), false);
+		tc.append(new Segment("seg2"), false);
+		
+		assertEquals(3, tc.count());
+		assertEquals(3, tc.getSegments().count());
+		
+		// Changing the 1-st part
+		tc = new TextContainer();
+		tc.append(new TextPart("tp"), true);		
+		tc.append(new Segment("seg1"), false);
+		tc.append(new Segment("seg2"), false);
+		tc.changePart(0);
+		
+		assertEquals(3, tc.count());
+		assertEquals(2, tc.getSegments().count());
+		
+		// Adding the part last
+		tc = new TextContainer();			
+		tc.append(new Segment("seg1"), true);
+		tc.append(new Segment("seg2"), false);
+		tc.insert(0, new TextPart("tp"));
+		
+		assertEquals(3, tc.count());
+		assertEquals(2, tc.getSegments().count());
+		
+		// Constructor with a text part and segments
+		tc = new TextContainer(new TextPart("tp"), new Segment("seg1"), new Segment("seg2"));
+		assertEquals(3, tc.count());
+		assertEquals(2, tc.getSegments().count());
+		
+		assertFalse(tc.get(0).isSegment());
+		assertTrue(tc.get(1).isSegment());
+		assertTrue(tc.get(2).isSegment());
+		
+		// Constructor with a text part
+		tc = new TextContainer(new TextPart("tp"));
+		assertEquals(1, tc.count());
+		assertEquals(1, tc.getSegments().count());
+		assertTrue(tc.get(0).isSegment());
+		
+		// Constructor with a segment
+		tc = new TextContainer(new Segment("seg1"));
+		assertEquals(1, tc.count());
+		assertEquals(1, tc.getSegments().count());
+		assertTrue(tc.get(0).isSegment());
+	}
 
 	private TextContainer createMultiSegmentContent () {
 		TextFragment tf = new TextFragment("text1 text2");

@@ -20,6 +20,7 @@
 
 package net.sf.okapi.common;
 
+import java.util.Arrays;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -338,4 +339,36 @@ public final class StringUtil {
 		return "".equals(str.trim());
 	}
 	
+	/**
+	 * Returns a new string padded with a given character repeated given times.
+	 * @param length length of the new string
+	 * @param c the character to pad the string
+	 * @return the new string
+	 */
+	public static String getString(int length, char c) {
+		if (length < 0) length = 0;
+		
+		char[] chars = new char[length];
+		Arrays.fill(chars, c);
+		return new String(chars);
+	}
+
+	/**
+	 * Pads a range of a given string with a given character. 
+	 * @param string the given string
+	 * @param startPos start position of the pad range (including)
+	 * @param endPos end position of the pad range (excluding)
+	 * @param padder the character to pad the range with
+	 * @return the given string with the given range padded with the given char
+	 */
+	public static String padString(String string, int startPos, int endPos, char padder) {
+		if (startPos < 0) startPos = 0;		
+		char[] chars = string.toCharArray();
+		
+		for (int i = startPos; i < Math.min(endPos, string.length()); i++) {
+			chars[i] = padder;
+		}
+		
+		return new String(chars);
+	}
 }

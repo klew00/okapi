@@ -26,12 +26,10 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-
 	public class StringUtilTest {
 
 	@Test
-	public void testRemoveQualifiers() {
-	
+	public void testRemoveQualifiers() {	
 		assertEquals("qualified text", StringUtil.removeQualifiers("\"qualified text\""));
 		assertEquals("qualified text", StringUtil.removeQualifiers("\"qualified text\"", "\""));
 		assertEquals("qualified text", StringUtil.removeQualifiers("\'qualified text\'", "\'"));
@@ -41,8 +39,7 @@ import org.junit.Test;
 	}
 	
 	@Test
-	public void testTitleCase() {
-		
+	public void testTitleCase() {		
 		assertEquals("Title case", StringUtil.titleCase("Title case"));
 		assertEquals("Title case", StringUtil.titleCase("Title Case"));
 		assertEquals("Title case", StringUtil.titleCase("title case"));
@@ -51,8 +48,7 @@ import org.junit.Test;
 	}
 	
 	@Test
-	public void testNormalizeLineBreaks() {
-		
+	public void testNormalizeLineBreaks() {		
 		assertEquals("line1\nline2", StringUtil.normalizeLineBreaks("line1\nline2"));
 		assertEquals("line1\nline2\n", StringUtil.normalizeLineBreaks("line1\nline2\n"));
 		
@@ -64,8 +60,7 @@ import org.junit.Test;
 	}
 	
 	@Test
-	public void testNormalizeWildcards() {
-		
+	public void testNormalizeWildcards() {		
 		assertEquals("en.*?", StringUtil.normalizeWildcards("en*"));
 		assertEquals("en.", StringUtil.normalizeWildcards("en?"));
 		
@@ -108,8 +103,7 @@ import org.junit.Test;
 	}
 	
 	@Test
-	public void testSplit() {
-		
+	public void testSplit() {		
 		String[] chunks = StringUtil.split("item1,   item2,item3,\t\nitem4", ",\\p{Space}*");
 		
 		assertEquals(4, chunks.length);
@@ -127,8 +121,7 @@ import org.junit.Test;
 	}
 	
 	@Test
-	public void testGetNumOccurrences() {
-		
+	public void testGetNumOccurrences() {		
 		assertEquals(3, StringUtil.getNumOccurrences("1 text 2 text 1 text 1 text 2", "1"));
 		assertEquals(2, StringUtil.getNumOccurrences("1 text 2 text 1 text 1 text 2", "2"));
 	}
@@ -138,4 +131,23 @@ import org.junit.Test;
 		assertTrue(StringUtil.isWhitespace("\t   \b\n\f\r"));
 		assertFalse(StringUtil.isWhitespace("\t  text \b\n\f\r"));
 	}
+	
+	@Test
+	public void testGetString() {
+		assertEquals("aaaaaaaaaa", StringUtil.getString(10, 'a'));
+		assertEquals("\u0001\u0001\u0001", StringUtil.getString(3, '\u0001'));
+		assertEquals("", StringUtil.getString(0, '\u0001'));
+		assertEquals("", StringUtil.getString(-3, '\u0001'));
+	}
+	
+	@Test
+	public void testPadString() {
+		assertEquals("012aaaa7890123456789", StringUtil.padString("01234567890123456789", 3, 7, 'a'));
+		assertEquals("aaaaaaa7890123456789", StringUtil.padString("01234567890123456789", -3, 7, 'a'));
+		assertEquals("012345678901aaaaaaaa", StringUtil.padString("01234567890123456789", 12, 70, 'a'));
+		assertEquals("01234567890123456789", StringUtil.padString("01234567890123456789", 50, 70, 'a'));
+		assertEquals("01234567890123456789", StringUtil.padString("01234567890123456789", -100, -10, 'a'));
+	}
 }
+
+	

@@ -214,6 +214,21 @@ public class TextContainer implements Iterable<TextPart> {
 		setContent(fragment);
 	}
 	
+	public TextContainer(TextPart... parts) {
+		resetParts();
+		for (TextPart part : parts) {
+			this.parts.add(part);
+		}
+		if ( segments.count() == 0 ) {
+			if (this.parts.size() > 0) {
+				changePart(0);
+			}
+			else {
+				createSingleSegment(null);
+			}
+		}
+	}
+	
 	/**
 	 * Creates a new TextContainer object with an initial segment.
 	 * If the id of the segment is null it will be set automatically.
