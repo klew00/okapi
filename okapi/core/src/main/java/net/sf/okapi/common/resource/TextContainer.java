@@ -214,6 +214,10 @@ public class TextContainer implements Iterable<TextPart> {
 		setContent(fragment);
 	}
 	
+	/**
+	 * Creates a new TextContainer object with initial {@link TextPart}s (segment or non-segment) appended.
+	 * @param parts the given initial parts.
+	 */
 	public TextContainer(TextPart... parts) {
 		resetParts();
 		for (TextPart part : parts) {
