@@ -1491,6 +1491,22 @@ public class TextContainerTest {
 		assertEquals(1, tc.count());
 		assertEquals(1, tc.getSegments().count());
 		assertTrue(tc.get(0).isSegment());
+		
+		// Constructor with only text parts
+		tc = new TextContainer(new TextPart("tp1"), new TextPart("tp2"), new TextPart("tp3"));
+		assertEquals(3, tc.count());
+		assertEquals(1, tc.getSegments().count());
+		assertTrue(tc.get(0).isSegment());
+		assertFalse(tc.get(1).isSegment());
+		assertFalse(tc.get(2).isSegment());
+		
+		// Constructor with only segments
+		tc = new TextContainer(new Segment("seg1"), new Segment("seg2"), new Segment("seg3"));
+		assertEquals(3, tc.count());
+		assertEquals(3, tc.getSegments().count());
+		assertTrue(tc.get(0).isSegment());
+		assertTrue(tc.get(1).isSegment());
+		assertTrue(tc.get(2).isSegment());
 	}
 
 	private TextContainer createMultiSegmentContent () {
