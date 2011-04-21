@@ -20,41 +20,24 @@
 
 package net.sf.okapi.lib.xliff;
 
-import java.util.ArrayList;
-import java.util.Iterator;
+public class Part {
 
-public class Unit implements Iterable<Part> {
+	protected String id;
+	protected Fragment source;
+	protected Fragment target;
 	
-	private ArrayList<Part> list;
-	private String id;
-
-	public Unit (String id) {
-		this.id = id;
-		list = new ArrayList<Part>();
+	public Part () {
+		source = new Fragment();
 	}
 	
-	@Override
-    public Iterator<Part> iterator() {
-		return new Iterator<Part>() {
-			int current = 0;
-
-			@Override
-			public void remove () {
-				throw new UnsupportedOperationException("The method remove() not supported.");
-			}
-
-			@Override
-			public Part next () {
-				return list.get((++current)-1);
-			}
-
-			@Override
-			public boolean hasNext () {
-				return ( !list.isEmpty() && ( current < list.size() ));
-			}
-		};
-	};
-
+	public Part (Fragment source) {
+		this.source = source;
+	}
+	
+	public Part (String sourceContent) {
+		source = new Fragment(sourceContent);
+	}
+	
 	public String getId () {
 		return id;
 	}
@@ -63,9 +46,26 @@ public class Unit implements Iterable<Part> {
 		this.id = id;
 	}
 	
-	public Unit add (Part part) {
-		list.add(part);
-		return this;
+	public Fragment getSource () {
+		return source;
+	}
+	
+	public Fragment setSource (Fragment fragment) {
+		source = fragment;
+		return source;
+	}
+	
+	public boolean hasTarget () {
+		return (target != null);
 	}
 
+	public Fragment getTarget () {
+		return target;
+	}
+	
+	public Fragment setTarget (Fragment fragment) {
+		target = fragment;
+		return target;
+	}
+	
 }

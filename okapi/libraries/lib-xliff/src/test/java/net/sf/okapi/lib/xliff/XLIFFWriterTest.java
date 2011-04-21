@@ -21,7 +21,7 @@ public class XLIFFWriterTest {
 		writer.writeUnit(unit);
 		
 		writer.close();
-		assertEquals("<unit id=\"id\">\n<segment>\n<source>Source 1.</source>\n"
+		assertEquals("<file>\n<unit id=\"id\">\n<segment>\n<source>Source 1.</source>\n"
 			+ "</segment>\n<segment>\n<source>Source 2.</source>\n</segment>\n</unit>\n",
 			strWriter.toString());
 		
@@ -41,7 +41,7 @@ public class XLIFFWriterTest {
 		writer.writeUnit(unit);
 		
 		writer.close();
-		assertEquals("<unit id=\"id\">\n<segment>\n<source>Source 1.</source>\n"
+		assertEquals("<file>\n<unit id=\"id\">\n<segment>\n<source>Source 1.</source>\n"
 			+ "<matches>\n<match>\n<source>Source candidate 1.</source>\n"
 			+ "<target>Target candidate 1.</target>\n</match>\n</matches>\n</segment>\n</unit>\n",
 			strWriter.toString());

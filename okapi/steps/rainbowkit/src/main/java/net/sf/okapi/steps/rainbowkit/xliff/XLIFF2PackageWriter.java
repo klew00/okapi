@@ -37,6 +37,7 @@ import net.sf.okapi.filters.rainbowkit.Manifest;
 import net.sf.okapi.filters.rainbowkit.MergingInfo;
 import net.sf.okapi.lib.xliff.Alternate;
 import net.sf.okapi.lib.xliff.Fragment;
+import net.sf.okapi.lib.xliff.Part;
 import net.sf.okapi.lib.xliff.Unit;
 import net.sf.okapi.lib.xliff.XLIFFWriter;
 import net.sf.okapi.steps.rainbowkit.common.BasePackageWriter;
@@ -52,7 +53,7 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 	@Override
 	protected void processStartBatch () {
 		manifest.setSubDirectories("original", "work", "work", "done", null, false);
-		setTMXInfo(true, null, null, null, null);
+		setTMXInfo(false, null, null, null, null);
 		super.processStartBatch();
 	}
 	
@@ -97,22 +98,22 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 
 	@Override
 	protected void processStartSubDocument (Event event) {
-//		writer.handleEvent(event);
+		writer.writeStartFile();
 	}
 	
 	@Override
 	protected void processEndSubDocument (Event event) {
-//		writer.handleEvent(event);
+		writer.writeEndFile();
 	}
 	
 	@Override
 	protected void processStartGroup (Event event) {
-//		writer.handleEvent(event);
+		writer.writeStartGroup();
 	}
 	
 	@Override
 	protected void processEndGroup (Event event) {
-//		writer.handleEvent(event);
+		writer.writeEndGroup();
 	}
 	
 	@Override
@@ -146,24 +147,13 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 		if ( tu.hasTarget(manifest.getTargetLocale()) ) {
 			trgTc = tu.getTarget(manifest.getTargetLocale(), false);
 		}
-		
-		boolean afterFirst = false;
-		boolean afterSeg = false;
-		net.sf.okapi.lib.xliff.Segment xSeg = null;
 
 		for ( TextPart part : srcTc ) {
 			if ( part.isSegment() ) {
 				Segment srcSeg = (Segment)part;
-				if ( afterFirst ) {
-					// New segment: push the current one and create a new one
-					unit.add(xSeg);
-				}
-				else { // First segment
-					afterFirst = true;
-				}
-				xSeg = new net.sf.okapi.lib.xliff.Segment();
+				net.sf.okapi.lib.xliff.Segment xSeg = new net.sf.okapi.lib.xliff.Segment();
+				unit.add(xSeg);
 				xSeg.setSource(toXLIFF2Fragment(srcSeg.text));
-				afterSeg = true;
 				xSeg.setId(srcSeg.getId());
 				// Target
 				if ( trgTc != null ) {
@@ -171,7 +161,6 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 					if ( trgSeg != null ) {
 						xSeg.setTarget(toXLIFF2Fragment(trgSeg.text));
 					}
-					
 					// Alt-trans annotation?
 					AltTranslationsAnnotation ann = trgSeg.getAnnotation(AltTranslationsAnnotation.class);
 					if ( ann != null ) {
@@ -180,25 +169,12 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 						}
 					}
 				}
-				
 			}
 			else { // Non-segment part
-				if ( xSeg == null ) {
-					// First part
-					afterFirst = true;
-					xSeg = new net.sf.okapi.lib.xliff.Segment();
-				}
-				if ( afterSeg ) {
-					xSeg.addAfter(toXLIFF2Fragment(part.text));
-				}
-				else {
-					xSeg.addBefore(toXLIFF2Fragment(part.text));
-				}
+				Part xPart = new net.sf.okapi.lib.xliff.Part();
+				unit.add(xPart);
+				xPart.setSource(toXLIFF2Fragment(part.text));
 			}
-		}
-		
-		if ( xSeg != null ) {
-			unit.add(xSeg);
 		}
 		
 		return unit;

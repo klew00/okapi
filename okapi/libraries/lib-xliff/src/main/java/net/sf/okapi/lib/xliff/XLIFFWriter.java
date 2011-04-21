@@ -41,6 +41,7 @@ public class XLIFFWriter {
     private String lb = System.getProperty("line.separator");
     private boolean isIndented = false;
     private String indent;
+    private boolean inFile;
 
     public void create (File file ) {
 		try {
@@ -70,6 +71,7 @@ public class XLIFFWriter {
     public void create (Writer output) {
 		writer = new PrintWriter(output);
 		indent = "";
+		inFile = false;
 	}
     
     public void setLineBreak (String lineBreak) {
@@ -96,47 +98,51 @@ public class XLIFFWriter {
 	}
 	
 	public void writeUnit (Unit unit) {
+		if ( !inFile ) writeStartFile();
 		writer.print(indent+String.format("<unit id=\"%s\"", toXML(unit.getId(), true)));
 		writer.print(">"+lb);
 		if ( isIndented ) indent += " ";
 		
-		for ( Segment seg : unit ) {
-			writer.print(indent+"<segment>"+lb);
-			if ( isIndented ) indent += " ";
-			// Leading parts to ignore
-			for ( Fragment frag : seg.getLeadingParts() ) {
-				writeFragment("ignorable", frag);
-			}
-			// Source
-			writeFragment("source", seg.getSource());
-			// Target
-			if ( seg.hasTarget() ) {
-				writeFragment("target", seg.getTarget());
-			}
-			// Trailing parts to ignore
-			for ( Fragment frag : seg.getTrailingParts() ) {
-				writeFragment("ignorable", frag);
+		for ( Part part : unit ) {
+			Segment seg = null;
+			if ( part instanceof Segment ) {
+				seg = (Segment)part;
 			}
 			
-			if ( seg.getCandidates().size() > 0 ) {
-				writer.print(indent+"<matches>"+lb);
-				if ( isIndented ) indent += " ";
-				
-				for ( Alternate alt : seg.getCandidates() ) {
-					writer.print(indent+"<match>"+lb);
+			if ( seg != null ) writer.print(indent+"<segment>"+lb);
+			else writer.print(indent+"<ignorable>"+lb);
+			
+			if ( isIndented ) indent += " ";
+			
+			// Source
+			writeFragment("source", part.getSource());
+			// Target
+			if ( part.hasTarget() ) {
+				writeFragment("target", part.getTarget());
+			}
+			
+			if ( seg != null ) {
+				if ( seg.getCandidates().size() > 0 ) {
+					writer.print(indent+"<matches>"+lb);
 					if ( isIndented ) indent += " ";
-					writeFragment("source", alt.getSource());
-					writeFragment("target", alt.getTarget());
+				
+					for ( Alternate alt : seg.getCandidates() ) {
+						writer.print(indent+"<match>"+lb);
+						if ( isIndented ) indent += " ";
+						writeFragment("source", alt.getSource());
+						writeFragment("target", alt.getTarget());
+						if ( isIndented ) indent = indent.substring(1);
+						writer.print(indent+"</match>"+lb);
+					}
 					if ( isIndented ) indent = indent.substring(1);
-					writer.print(indent+"</match>"+lb);
+					writer.print(indent+"</matches>"+lb);
 				}
-
-				if ( isIndented ) indent = indent.substring(1);
-				writer.print(indent+"</matches>"+lb);
 			}
 			
 			if ( isIndented ) indent = indent.substring(1);
-			writer.print(indent+"</segment>"+lb);
+			
+			if ( seg != null ) writer.print(indent+"</segment>"+lb);
+			else writer.print(indent+"</ignorable>"+lb);
 		}
 
 		if ( isIndented ) indent = indent.substring(1);
@@ -147,6 +153,8 @@ public class XLIFFWriter {
 		writer.print("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+lb);
 		writer.print("<xliff version=\"2.0\""+lb);
 		writer.print(" xmlns=\""+NS_XLIFF20+"\""+lb);
+		writer.print(" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""+lb);
+		writer.print(" xsi:schemaLocation=\"urn:oasis:names:tc:xliff:document:2.0 xliff_core_2.0.xsd\""+lb);		
 		writer.print(">"+lb);
 		
 		writer.print("<!-- This output is EXPERIMENTAL only. -->"+lb);
@@ -156,8 +164,34 @@ public class XLIFFWriter {
 	}
 	
 	public void writeEndDocument () {
+		if ( inFile ) {
+			writeEndFile();
+		}
 		if ( isIndented ) indent = indent.substring(1);
 		writer.print("</xliff>"+lb);
+	}
+	
+	public void writeStartFile () {
+		writer.print(indent+"<file>"+lb);
+		if ( isIndented ) indent += " ";
+		inFile = true;
+	}
+	
+	public void writeEndFile () {
+		if ( isIndented ) indent = indent.substring(1);
+		writer.print(indent+"</file>"+lb);
+		inFile = false;
+	}
+	
+	public void writeStartGroup () {
+		if ( !inFile ) writeStartFile();
+		writer.print(indent+"<group>"+lb);
+		if ( isIndented ) indent += " ";
+	}
+	
+	public void writeEndGroup () {
+		if ( isIndented ) indent = indent.substring(1);
+		writer.print(indent+"</group>"+lb);
 	}
 	
 	private void writeFragment (String name,

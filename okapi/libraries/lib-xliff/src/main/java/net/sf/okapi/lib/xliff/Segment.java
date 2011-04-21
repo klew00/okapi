@@ -24,13 +24,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Segment {
+public class Segment extends Part {
 
-	private String id;
-	private ArrayList<Fragment> before;
-	private Fragment source;
-	private Fragment target;
-	private ArrayList<Fragment> after;
 	private ArrayList<Alternate> candidates;
 	
 	public Segment () {
@@ -45,62 +40,6 @@ public class Segment {
 		source = new Fragment(sourceContent);
 	}
 	
-	public String getId () {
-		return id;
-	}
-	
-	public void setId (String id) {
-		this.id = id;
-	}
-	
-	public Fragment getSource () {
-		return source;
-	}
-	
-	public Fragment setSource (Fragment fragment) {
-		source = fragment;
-		return source;
-	}
-	
-	public boolean hasTarget () {
-		return (target != null);
-	}
-
-	public Fragment getTarget () {
-		return target;
-	}
-	
-	public Fragment setTarget (Fragment fragment) {
-		target = fragment;
-		return target;
-	}
-	
-	public Fragment addBefore (Fragment fragment) {
-		if ( before == null ) {
-			before = new ArrayList<Fragment>();
-		}
-		before.add(fragment);
-		return fragment;
-	}
-	
-	public Fragment addAfter (Fragment fragment) {
-		if ( after == null ) {
-			after = new ArrayList<Fragment>();
-		}
-		after.add(fragment);
-		return fragment;
-	}
-	
-	List<Fragment> getLeadingParts () {
-		if ( before == null ) return Collections.emptyList();
-		else return before;
-	}
-
-	List<Fragment> getTrailingParts () {
-		if ( after == null ) return Collections.emptyList();
-		else return after;
-	}
-
 	public void addCandidate (Alternate candidate) {
 		if ( candidates == null ) candidates = new ArrayList<Alternate>();
 		candidates.add(candidate);

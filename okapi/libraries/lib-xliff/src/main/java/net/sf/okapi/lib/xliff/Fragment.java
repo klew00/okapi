@@ -72,19 +72,22 @@ public class Fragment {
 	 */
 	@Override
 	public String toString () {
+		/*
+		 * Use a temporary representation with <inline> for all codes.
+		 */
 		StringBuilder tmp = new StringBuilder();
 		for ( int i=0; i<data.length(); i++ ) {
 			char ch = data.charAt(i);
 			if ( data.charAt(i) == MARKER_OPENING ) {
-				tmp.append(String.format("<code id=\"%d\">",
+				tmp.append(String.format("<inline id=\"%d\"/>",
 					toIndex(data.charAt(++i))));
 			}
 			else if ( data.charAt(i) == MARKER_CLOSING ) {
-				tmp.append("</code>");
-				i++; // Skip over index
+				tmp.append(String.format("<inline id=\"%d\"/>",
+					toIndex(data.charAt(++i))));
 			}
 			else if ( data.charAt(i) == MARKER_PLACEHOLDER ) {
-				tmp.append(String.format("<code id=\"%d\"/>",
+				tmp.append(String.format("<inline id=\"%d\"/>",
 					toIndex(data.charAt(++i))));
 			}
 			else {
