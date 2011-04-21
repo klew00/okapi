@@ -67,8 +67,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	@Override
 	public ParametersDescription getParametersDescription() {
 		ParametersDescription desc = new ParametersDescription(this);
-		desc.add(TUS_FOR_TARGET_REMOVAL, "Comma-delimited list of ids of the text units where targets are to be removed\n" +
-				"(Leave empty to remove targets in all text units)", null);
+		desc.add(TUS_FOR_TARGET_REMOVAL, "Comma-delimited list of ids of the text units where targets are to be removed (empty - remove in all)", 
+				null);
 		return desc;
 	}
 
