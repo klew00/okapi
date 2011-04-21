@@ -157,8 +157,8 @@ public class Merger {
 			if ( !oriTu.getSource().hasText() ) {
 				// Warn only if there source is not empty
 				LOGGER.warning(String.format("No translation found for TU id='%s'. Using source.", traTu.getId()));
-				writer.handleEvent(oriEvent); // Use the source
 			}
+			writer.handleEvent(oriEvent); // Use the source
 			return;
 		}
 		
