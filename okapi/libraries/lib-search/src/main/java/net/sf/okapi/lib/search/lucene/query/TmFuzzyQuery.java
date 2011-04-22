@@ -37,10 +37,9 @@ public class TmFuzzyQuery extends Query {
 		return new TmFuzzyWeight(searcher);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public void extractTerms(Set terms) {
-		terms.add(terms);
+	public void extractTerms(Set<Term> terms) {
+		terms.addAll(terms);
 	}
 
 	@Override

@@ -44,13 +44,13 @@ public class Util {
 			// get old source string tokens
 			tokenizer.reset(new StringReader(originalSource));
 			while (tokenizer.incrementToken()) {
-				originalSourceTokens.add(tokenizer.getTermAttribute().term());
+				originalSourceTokens.add(tokenizer.getTermAttribute().toString());
 			}
 
 			// get the new source tokens
 			tokenizer.reset(new StringReader(newSource));
 			while (tokenizer.incrementToken()) {
-				newSourceTokens.add(tokenizer.getTermAttribute().term());
+				newSourceTokens.add(tokenizer.getTermAttribute().toString());
 			}
 		} catch (IOException e) {
 			throw new RuntimeException("Error tokenizing source TextUnits", e);

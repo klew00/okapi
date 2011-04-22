@@ -31,19 +31,19 @@ import net.sf.okapi.common.exceptions.OkapiIOException;
 
 import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
-import org.apache.lucene.analysis.tokenattributes.TermAttribute;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
 
 /**
  * 
  * @author HaslamJD
  */
-public class AlphabeticNgramTokenizer extends Tokenizer {
+public final class AlphabeticNgramTokenizer extends Tokenizer {
 	private static final int NO_CHAR = -1;
 	private int ngramLength;
 	private String ngramType;
 	private int offset;
-	private TermAttribute termAttribute;
+	private CharTermAttribute termAttribute;
 	private OffsetAttribute offsetAttribute;
 	private TypeAttribute typeAttribute;
 
@@ -65,7 +65,7 @@ public class AlphabeticNgramTokenizer extends Tokenizer {
 			throw new IllegalArgumentException("'reader' cannot be null");
 		}
 		this.ngramLength = ngramLength;
-		this.termAttribute = (TermAttribute) addAttribute(TermAttribute.class);
+		this.termAttribute = (CharTermAttribute) addAttribute(CharTermAttribute.class);
 		this.offsetAttribute = (OffsetAttribute) addAttribute(OffsetAttribute.class);
 		this.typeAttribute = (TypeAttribute) addAttribute(TypeAttribute.class);
 		this.locale = locale;
@@ -83,7 +83,7 @@ public class AlphabeticNgramTokenizer extends Tokenizer {
 		return ngramLength;
 	}
 	
-	public TermAttribute getTermAttribute() {
+	public CharTermAttribute getTermAttribute() {
 		return termAttribute;		
 	}
 
@@ -118,7 +118,7 @@ public class AlphabeticNgramTokenizer extends Tokenizer {
 	
 	private void createToken() {
 		// Populate Attributes
-		termAttribute.setTermBuffer(toLowerCase(ngramCache));
+		termAttribute.copyBuffer(toLowerCase(ngramCache).toCharArray(), 0, toLowerCase(ngramCache).toCharArray().length);
 		offsetAttribute.setOffset(offset, offset + ngramCache.size());
 		typeAttribute.setType(ngramType);
 	}

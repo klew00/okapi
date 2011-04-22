@@ -31,8 +31,8 @@ import java.util.Locale;
 
 import net.sf.okapi.lib.search.Helper;
 
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
-import org.apache.lucene.analysis.tokenattributes.TermAttribute;
 import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
 import org.junit.Before;
 import org.junit.Test;
@@ -164,7 +164,7 @@ public class AlphabeticNgramTokenizerTest {
     }
 
     private String getTermString() throws Exception {
-        return ((TermAttribute) Helper.getPrivateMember(ngramTk, "termAttribute")).term();
+        return ((CharTermAttribute) Helper.getPrivateMember(ngramTk, "termAttribute")).toString();
     }
 
     private String getTypeString() throws Exception {

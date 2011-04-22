@@ -31,13 +31,14 @@ import java.util.Set;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.StopFilter;
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.util.Version;
 
 /**
  * 
  * @author HaslamJD
  * @author HARGRAVEJE
  */
-public class NgramAnalyzer extends Analyzer {
+public final class NgramAnalyzer extends Analyzer {
 	private static final String[] ENGLISH_STOP_NGRAMS = { "the ", " the",
 			" to ", "tion", " you", "you ", " and", "and ", "ing ", "atio",
 			" not", "t th", "ter ", " of ", "this", "he s", "ion ", "not ",
@@ -75,7 +76,7 @@ public class NgramAnalyzer extends Analyzer {
 			throw new IllegalArgumentException(
 					"'ngramLength' cannot be less than 0");
 		}
-		this.stopNgrams = StopFilter.makeStopSet(ENGLISH_STOP_NGRAMS);
+		this.stopNgrams = StopFilter.makeStopSet(Version.LUCENE_31, ENGLISH_STOP_NGRAMS);
 		this.locale = locale;
 		this.ngramLength = ngramLength;
 	}
@@ -83,7 +84,7 @@ public class NgramAnalyzer extends Analyzer {
 	@Override
 	public TokenStream tokenStream(String fieldName, Reader reader) {
 		if (locale.getLanguage().equalsIgnoreCase("en")) {
-			return new StopFilter(false, new AlphabeticNgramTokenizer(reader,
+			return new StopFilter(Version.LUCENE_31, new AlphabeticNgramTokenizer(reader,
 					ngramLength, locale), stopNgrams);
 		}
 		return new AlphabeticNgramTokenizer(reader, ngramLength, locale);
