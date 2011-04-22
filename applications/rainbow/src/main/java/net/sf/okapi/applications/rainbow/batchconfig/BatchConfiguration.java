@@ -80,7 +80,7 @@ public class BatchConfiguration {
 
 			for (URL url : pm.getURLs()) {
 				String jarPath = new File(url.getPath()).getPath();
-				String root = Util.longestCommonDir(true, pm.getPluginsDir(), jarPath);				
+				String root = Util.longestCommonDir(true, pm.getPluginsDir().getPath(), jarPath);				
 				String relPath = "";
 				
 				if (!Util.isEmpty(root)) {
