@@ -22,6 +22,7 @@ package net.sf.okapi.common.plugins;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.net.URL;
@@ -50,6 +51,7 @@ public class PluginsManager {
 	private ArrayList<URL> urls;
 	private List<PluginItem> plugins;
 	private URLClassLoader loader;
+	private File pluginsDir;
 	
 	/**
 	 * Explores the given file or directory for plug-ins and add them to
@@ -69,6 +71,8 @@ public class PluginsManager {
 			if ( pluginsDir == null ) return;
 			if ( !pluginsDir.isDirectory() ) return;
 
+			this.pluginsDir = pluginsDir;
+			
 			ArrayList<URL> existingUrls = new ArrayList<URL>();
 			if ( append && ( urls != null )) {
 				existingUrls.addAll(urls);
@@ -76,14 +80,24 @@ public class PluginsManager {
 			urls = new ArrayList<URL>();
 			loader = null;
 	
-			// Inspect all the first level sub-directories in the plugins folder
-			// The plugins directory should have just plugins sub-directories entries
+			// The plug-ins directory can contain single plug-in jars, and/or first-level sub-directories containing plug-in jars
+			FilenameFilter filter = new DefaultFilenameFilter(".jar");
+			
+			// Inspect single jars
+			File[] files = pluginsDir.listFiles(filter);
+			for ( File file : files ) {
+				// Skip over any sub-directories in the plugins directory 
+				if ( file.isDirectory() ) continue;
+				inspectFile(file);
+			}
+			
+			// Inspect sub-directories entries
 			File[] dirs = pluginsDir.listFiles();
 			for ( File dir : dirs ) {
 				// Skip over any file at that level
 				if ( !dir.isDirectory() ) continue;
 				// Else explore all .jar just under the sub-folder
-				File[] files = dir.listFiles(new DefaultFilenameFilter(".jar"));
+				files = dir.listFiles(filter);
 				for ( File file : files ) {
 					inspectFile(file);
 				}
@@ -176,6 +190,14 @@ public class PluginsManager {
 	public List<PluginItem> getList () {
 		return plugins;
 	}
+	
+	/**
+	 * Gets the list of URLs of the jars containing plug-ins currently in this manager. 
+	 * @return the list of URLs.
+	 */
+	public ArrayList<URL> getURLs() {
+		return urls;
+	}
 
 	/**
 	 * Gets the URLClassLoader to use for creating new instance of the
@@ -261,6 +283,14 @@ public class PluginsManager {
 		catch ( IOException e ) {
 			throw new RuntimeException("IO error when inspecting a file for plugins.", e);
 		}
+	}
+
+	/**
+	 * Gets the directory where the plug-ins are located.
+	 * @return full directory path.
+	 */
+	public String getPluginsDir() {
+		return pluginsDir.getPath();
 	}
 
 }
