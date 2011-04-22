@@ -287,10 +287,10 @@ public class PluginsManager {
 
 	/**
 	 * Gets the directory where the plug-ins are located.
-	 * @return full directory path.
+	 * @return directory path.
 	 */
-	public String getPluginsDir() {
-		return pluginsDir.getPath();
+	public File getPluginsDir() {
+		return pluginsDir;
 	}
 
 }
