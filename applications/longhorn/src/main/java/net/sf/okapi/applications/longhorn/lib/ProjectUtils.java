@@ -69,7 +69,7 @@ public class ProjectUtils {
 		// install batch configuration to config directory
 		BatchConfiguration bconf = new BatchConfiguration();
 		bconf.installConfiguration(targetFile.getAbsolutePath(),
-				WorkspaceUtils.getConfigDirPath(projId), pipelineWrapper.getAvailableSteps());
+				WorkspaceUtils.getConfigDirPath(projId), pipelineWrapper);
 	}
 
 	/**
@@ -89,6 +89,7 @@ public class ProjectUtils {
 		// Initialize filter configurations
 		FilterConfigurationMapper fcMapper = new FilterConfigurationMapper();
 		DefaultFilters.setMappings(fcMapper, false, true);
+		fcMapper.addFromPlugins(plManager);
 		fcMapper.setCustomConfigurationsDirectory(WorkspaceUtils.getConfigDirPath(projId));
 		fcMapper.updateCustomConfigurations();
 
