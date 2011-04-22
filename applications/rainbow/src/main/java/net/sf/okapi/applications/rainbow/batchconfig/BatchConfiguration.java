@@ -214,7 +214,7 @@ public class BatchConfiguration {
 		}
 	}
 	
-	private boolean createReferencedFile(RandomAccessFile raf, long pos, long size, String path) throws IOException {
+	private boolean createReferencedFile(RandomAccessFile raf, long size, String path) throws IOException {
 		if (raf == null) return false;
 		if (Util.isEmpty(path)) return false;		
 		
@@ -222,7 +222,6 @@ public class BatchConfiguration {
 		Util.createDirectories(path);		
 		FileOutputStream fos = new FileOutputStream(path);
 		try {
-			raf.seek(pos);			
 			int toRead = (int)Math.min(size, MAXBUFFERSIZE);
 			int bytesRead = raf.read(buffer, 0, toRead);
 			
@@ -273,8 +272,7 @@ public class BatchConfiguration {
 					raf.readUTF(); // Skip original full filename
 					long size = raf.readLong();
 					String path = Util.fixPath(outputDir + relPath);
-					long pos = raf.getFilePointer();
-					createReferencedFile(raf, pos, size, path);
+					createReferencedFile(raf, size, path);
 				}
 				
 				PluginsManager pm = new PluginsManager();
@@ -326,16 +324,18 @@ public class BatchConfiguration {
 						// Read the reference content
 						
 						pos = refMap.get(++id);
+						raf.seek(pos);
 						String filename = raf.readUTF();
 						long size = raf.readLong();
 						String path = outputDir + File.separator + filename;
 						
-						if (!Util.isEmpty(filename) && createReferencedFile(raf, pos, size, path)) {
+						if (!Util.isEmpty(filename) && createReferencedFile(raf, size, path)) {
 							String setMethodName = "set"+m.getName().substring(3);
 							Method setMethod = params.getClass().getMethod(setMethodName, String.class);
 							setMethod.invoke(params, path);
 						}
-						
+//						byte[] buffer = new byte[MAXBUFFERSIZE];
+//						
 //						pos = refMap.get(++id);
 //						raf.seek(pos);
 //						String filename = raf.readUTF();
