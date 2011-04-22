@@ -31,14 +31,14 @@ import java.io.RandomAccessFile;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import net.sf.okapi.applications.rainbow.Input;
 import net.sf.okapi.applications.rainbow.pipeline.PipelineStorage;
-import net.sf.okapi.applications.rainbow.pipeline.StepInfo;
+import net.sf.okapi.applications.rainbow.pipeline.PipelineWrapper;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.ReferenceParameter;
 import net.sf.okapi.common.Util;
@@ -48,16 +48,17 @@ import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.pipeline.IPipeline;
 import net.sf.okapi.common.pipeline.IPipelineStep;
+import net.sf.okapi.common.plugins.PluginsManager;
 
 public class BatchConfiguration {
 	
 	private static final int MAXBUFFERSIZE = 1024*8; 
 	private static final int MAXBLOCKLEN = 65000;
 	private static final String SIGNATURE = "batchConf";
-	private static final int VERSION = 1;
+	private static final int VERSION = 2;
 
 	public void exportConfiguration (String configPath,
-		IPipeline pipeline,
+		PipelineWrapper pipelineWrapper,
 		IFilterConfigurationMapper fcMapper,
 		List<Input> inputFiles)
 	{
@@ -69,10 +70,36 @@ public class BatchConfiguration {
 			dos.writeUTF(SIGNATURE);
 			dos.writeInt(VERSION);
 
-			//=== Section 1: the dereferenced files of the pipeline's parameters
+			//=== Section 1: plug-ins
+			// Plug-ins should be stored first to be later read before the pipeline is 
+			// instantiated (e.g. some steps may come from plug-ins)
+			PluginsManager pm = pipelineWrapper.getPluginsManager();
+			
+			// Number of plugins
+			dos.writeInt(pm.getURLs().size());
+
+			for (URL url : pm.getURLs()) {
+				String jarPath = new File(url.getPath()).getPath();
+				String root = Util.longestCommonDir(true, pm.getPluginsDir(), jarPath);				
+				String relPath = "";
+				
+				if (!Util.isEmpty(root)) {
+					relPath = jarPath.substring(root.length());
+				}
+				else {
+					relPath = Util.getFilename(jarPath, true);
+				}
+				
+				dos.writeUTF(relPath);
+				harvestReferencedFile(dos, 0, jarPath);
+			}
+			
+			//=== Section 2: the dereferenced files of the pipeline's parameters
 			// int = id (-1 mark the end)
 			// String = extension
 			// String = content
+
+			IPipeline pipeline = pipelineWrapper.getPipeline();
 			
 			// Go through each step of the pipeline
 			for ( IPipelineStep step : pipeline.getSteps() ) {
@@ -95,7 +122,7 @@ public class BatchConfiguration {
 			dos.writeInt(-1);
 
 			
-			//=== Section 2: The pipeline itself
+			//=== Section 3: The pipeline itself
 			
 			// OK to use null, because the available steps are not used for writing
 			PipelineStorage store = new PipelineStorage(null);
@@ -103,7 +130,7 @@ public class BatchConfiguration {
 			writeLongString(dos, store.getStringOutput());
 			
 
-			//=== Section 3: The filter configurations
+			//=== Section 4: The filter configurations
 
 			// Get the number of custom configurations
 			Iterator<FilterConfiguration> iter = fcMapper.getAllConfigurations();
@@ -124,7 +151,7 @@ public class BatchConfiguration {
 				}
 			}
 			
-			//=== Section 4: Mapping extensions -> filter configuration id
+			//=== Section 5: Mapping extensions -> filter configuration id
 			
 			if ( inputFiles != null ) {
 				// Gather the extensions (if duplicate: first one is used)
@@ -187,9 +214,38 @@ public class BatchConfiguration {
 		}
 	}
 	
+	private boolean createReferencedFile(RandomAccessFile raf, long pos, long size, String path) throws IOException {
+		if (raf == null) return false;
+		if (Util.isEmpty(path)) return false;		
+		
+		byte[] buffer = new byte[MAXBUFFERSIZE];
+		Util.createDirectories(path);		
+		FileOutputStream fos = new FileOutputStream(path);
+		try {
+			raf.seek(pos);			
+			int toRead = (int)Math.min(size, MAXBUFFERSIZE);
+			int bytesRead = raf.read(buffer, 0, toRead);
+			
+			while ( bytesRead > 0 ) {
+				fos.write(buffer, 0, bytesRead);
+				size -= bytesRead;
+				if ( size <= 0 ) break;
+				
+				toRead = (int)Math.min(size, MAXBUFFERSIZE);
+				bytesRead = raf.read(buffer, 0, toRead);
+			}
+		} catch (Exception e) {
+			return false;
+		} finally {
+			fos.close();
+		}
+		
+		return true;
+	}
+	
 	public void installConfiguration (String configPath,
 		String outputDir,
-		Map<String, StepInfo> availableSteps)
+		PipelineWrapper pipelineWrapper)
 	{
 		RandomAccessFile raf = null;
 		PrintWriter pw = null;
@@ -200,13 +256,33 @@ public class BatchConfiguration {
 				throw new OkapiIOException("Invalid file format.");
 			}
 			int version = raf.readInt(); // Version info
-			if ( version != VERSION ) {
+			if (!(version >= 1 && version <= VERSION)) {
 				throw new OkapiIOException("Invalid version.");
 			}
 			
 			Util.createDirectories(outputDir+File.separator);
 			
-			//=== Section 1: references data
+			//=== Section 1: plug-ins
+			if (version > 1) { // Remain compatible with v.1 bconf files
+				String pluginsDir = outputDir;
+				
+				int numPlugins = raf.readInt();
+				for (int i = 0; i < numPlugins; i++) {
+					String relPath = raf.readUTF();
+					raf.readInt(); // Skip ID
+					raf.readUTF(); // Skip original full filename
+					long size = raf.readLong();
+					String path = Util.fixPath(outputDir + relPath);
+					long pos = raf.getFilePointer();
+					createReferencedFile(raf, pos, size, path);
+				}
+				
+				PluginsManager pm = new PluginsManager();
+				pm.discover(new File(pluginsDir), true);
+				pipelineWrapper.addFromPlugins(pm);
+			}
+						
+			//=== Section 2: references data
 
 			// Build a lookup table to the references
 			HashMap<Integer, Long> refMap = new HashMap<Integer, Long>();
@@ -226,17 +302,15 @@ public class BatchConfiguration {
 				pos = raf.getFilePointer(); // Position
 			}
 		
-			//=== Section 2 : the pipeline itself
+			//=== Section 3 : the pipeline itself
 			
 			tmp = readLongString(raf);
 			long startFilterConfigs = raf.getFilePointer();
 			
 			// Read the pipeline and instantiate the steps
-			PipelineStorage store = new PipelineStorage(availableSteps, (CharSequence)tmp);
+			PipelineStorage store = new PipelineStorage(pipelineWrapper.getAvailableSteps(), (CharSequence)tmp);
 			IPipeline pipeline = store.read(); 
 			
-			byte[] buffer = new byte[MAXBUFFERSIZE];
-
 			// Go through each step of the pipeline
 			for ( IPipelineStep step : pipeline.getSteps() ) {
 				// Get the parameters for that step
@@ -250,30 +324,42 @@ public class BatchConfiguration {
 					if ( Modifier.isPublic(m.getModifiers() ) && m.isAnnotationPresent(ReferenceParameter.class)) {
 						// Update the references to point to the new location
 						// Read the reference content
+						
 						pos = refMap.get(++id);
-						raf.seek(pos);
 						String filename = raf.readUTF();
-						long size = raf.readLong(); // Read the size
-						// Save the data to a file
-						if ( !Util.isEmpty(filename) ) {
-							String path = outputDir + File.separator + filename; 
-							FileOutputStream fos = new FileOutputStream(path);
-							int toRead = (int)Math.min(size, MAXBUFFERSIZE);
-							int bytesRead = raf.read(buffer, 0, toRead);
-							while ( bytesRead > 0 ) {
-								fos.write(buffer, 0, bytesRead);
-								size -= bytesRead;
-								if ( size <= 0 ) break;
-								toRead = (int)Math.min(size, MAXBUFFERSIZE);
-								bytesRead = raf.read(buffer, 0, toRead);
-							}
-							fos.close();
-							// Update the reference in the parameters to point to the saved file
-							// Test changing the value
+						long size = raf.readLong();
+						String path = outputDir + File.separator + filename;
+						
+						if (!Util.isEmpty(filename) && createReferencedFile(raf, pos, size, path)) {
 							String setMethodName = "set"+m.getName().substring(3);
 							Method setMethod = params.getClass().getMethod(setMethodName, String.class);
 							setMethod.invoke(params, path);
 						}
+						
+//						pos = refMap.get(++id);
+//						raf.seek(pos);
+//						String filename = raf.readUTF();
+//						long size = raf.readLong(); // Read the size
+//						// Save the data to a file
+//						if ( !Util.isEmpty(filename) ) {
+//							String path = outputDir + File.separator + filename; 
+//							FileOutputStream fos = new FileOutputStream(path);
+//							int toRead = (int)Math.min(size, MAXBUFFERSIZE);
+//							int bytesRead = raf.read(buffer, 0, toRead);
+//							while ( bytesRead > 0 ) {
+//								fos.write(buffer, 0, bytesRead);
+//								size -= bytesRead;
+//								if ( size <= 0 ) break;
+//								toRead = (int)Math.min(size, MAXBUFFERSIZE);
+//								bytesRead = raf.read(buffer, 0, toRead);
+//							}
+//							fos.close();
+//							// Update the reference in the parameters to point to the saved file
+//							// Test changing the value
+//							String setMethodName = "set"+m.getName().substring(3);
+//							Method setMethod = params.getClass().getMethod(setMethodName, String.class);
+//							setMethod.invoke(params, path);
+//						}
 					}
 				}
 			}
@@ -285,7 +371,7 @@ public class BatchConfiguration {
 			pw.write(store.getStringOutput());
 			pw.close();
 			
-			//=== Section 3 : the filter configurations
+			//=== Section 4 : the filter configurations
 			
 			raf.seek(startFilterConfigs);
 			// Get the number of filter configurations
@@ -302,7 +388,7 @@ public class BatchConfiguration {
 				pw.close();
 			}
 		
-			//=== Section 4: the extensions -> filter configuration id mapping
+			//=== Section 5: the extensions -> filter configuration id mapping
 			
 			// Get the number of mappings
 			path = outputDir + File.separator + "extensions-mapping.txt";
@@ -315,7 +401,6 @@ public class BatchConfiguration {
 				pw.write(ext + "\t" + configId + lb);
 			}
 			pw.close();
-			
 		}
 		catch ( Throwable e ) {
 			throw new OkapiIOException("Error when installing the batch configuration.\n"+e.getMessage(), e);
@@ -348,7 +433,7 @@ public class BatchConfiguration {
 
 			// Deal with empty references
 			if ( Util.isEmpty(refPath) ) {
-				dos.writeLong(0);
+				dos.writeLong(0); // size = 0
 				return;
 			}
 			// Else: copy the content of the referenced file

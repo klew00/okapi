@@ -2494,7 +2494,8 @@ public class MainForm { //implements IParametersProvider {
 			// Get the current pipeline of the project
 			BatchConfiguration bc = new BatchConfiguration();
 			wrapper.loadFromStringStorageOrReset(prj.getUtilityParameters(PRJPIPELINEID));
-			bc.exportConfiguration(path, wrapper.getPipeline(), fcMapper, prj.inputLists.get(0));
+			updatePluginsAndDependencies(); // Update plugin list in the wrapper's pm with pm.discover()
+			bc.exportConfiguration(path, wrapper, fcMapper, prj.inputLists.get(0));
 		}
 		catch ( Exception e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
@@ -2516,7 +2517,7 @@ public class MainForm { //implements IParametersProvider {
 			if ( outputDir == null ) return; // Canceled
 			// Else: install
 			BatchConfiguration bc = new BatchConfiguration();
-			bc.installConfiguration(paths[0], outputDir, wrapper.getAvailableSteps());
+			bc.installConfiguration(paths[0], outputDir, wrapper);
 		}
 		catch ( Exception e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
