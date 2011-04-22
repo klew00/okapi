@@ -1,5 +1,6 @@
 package net.sf.okapi.lib.search.lucene.scorer;
 
+import org.apache.lucene.index.FieldInvertState;
 import org.apache.lucene.search.Similarity;
 
 /**
@@ -20,11 +21,6 @@ public class FuzzySimilarity extends Similarity {
 	}
 
 	@Override
-	public float lengthNorm(String fieldName, int numTokens) {
-		return 1.0f;
-	}
-
-	@Override
 	public float queryNorm(float sumOfSquaredWeights) {
 		return 1.0f;
 	}
@@ -36,6 +32,11 @@ public class FuzzySimilarity extends Similarity {
 
 	@Override
 	public float tf(float freq) {
+		return 1.0f;
+	}
+
+	@Override
+	public float computeNorm(String field, FieldInvertState state) {
 		return 1.0f;
 	}
 }

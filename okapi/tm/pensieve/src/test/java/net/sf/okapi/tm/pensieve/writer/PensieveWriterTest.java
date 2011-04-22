@@ -357,11 +357,11 @@ public class PensieveWriterTest {
         assertEquals("num of docs indexed", 0, tmWriter.getIndexWriter().numDocs());
     }
 
-    @Test
+    @Test(expected = org.apache.lucene.index.IndexNotFoundException.class)
     public void indexTranslationUnitBeforeCommit() throws IOException {
+    	// there must be at least one commit or else we get IndexNotFoundException
         tmWriter.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(locEN, new TextFragment("dax")), new TranslationUnitVariant(locEN, new TextFragment("is funny (sometimes)"))));
         IndexReader reader = IndexReader.open(dir, true);
-        assertEquals("num of docs indexed before endIndex", 0, reader.maxDoc());
     }
 
     @Test
