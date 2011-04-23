@@ -361,9 +361,9 @@
 		   <fileset dir="../shared/licenses" includes="**/axis-*"/>
 		</copy>
 
-		<property name="dep018" value="${mavenStore}/org/apache/lucene/lucene-core/3.0.0"/>
+		<property name="dep018" value="${mavenStore}/org/apache/lucene/lucene-core/3.1.0"/>
 		<fileset id="list.contents" dir="${dep018}"
-		 includes="**/lucene-core-3.0.0.jar"/>
+		 includes="**/lucene-core-3.1.0.jar"/>
 		<property name="jar018" refid="list.contents"/>
 		<echo file="tmpJars" append="yes"> ${jar018}</echo>
 		<copy todir="${distLib}" file="${dep018}/${jar018}"/>
