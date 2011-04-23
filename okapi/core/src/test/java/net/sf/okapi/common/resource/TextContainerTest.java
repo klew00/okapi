@@ -107,6 +107,16 @@ public class TextContainerTest {
 		assertEquals(1, segments.count());
 		assertEquals("<br/>.", segments.get(0).toString());
 	}
+
+	@Test
+	public void testCounts () {
+        TextContainer tc = new TextContainer();
+        tc.append(new Segment("i1", new TextFragment("Hello")));
+        tc.append(new TextPart(" the "));
+        tc.append(new Segment("i2", new TextFragment("World")));
+        assertEquals(3, tc.count());
+        assertEquals(2, tc.getSegments().count());
+	}
 	
 	@Test
 	public void testSegmentsWithJustCode () {
