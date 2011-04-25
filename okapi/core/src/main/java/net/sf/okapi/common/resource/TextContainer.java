@@ -607,7 +607,7 @@ public class TextContainer implements Iterable<TextPart> {
 	 * <li>If end == start or end or -1 : A new part is created on the right side of the position.
 	 * It has the same type as the original part.
 	 * <li>If start == 0: A new part is created on the left side of the original part.
-	 * <li>If the specified span is empty at at either end of the part, or if it is equals to the
+	 * <li>If the specified span is empty at either end of the part, or if it is equals to the
 	 * whole length of the part: No change (it would result in an empty part).
 	 * It has the type specified by spannedPartIsSegment.
 	 * </ul>
@@ -1111,6 +1111,19 @@ public class TextContainer implements Iterable<TextPart> {
 		return i;
 	}
 
-
+//	public void setParts(TextPart... parts) {
+//		resetParts();
+//		for (TextPart part : parts) {
+//			this.parts.add(part);
+//		}
+//		if ( segments.count() == 0 ) {
+//			if (this.parts.size() > 0) {
+//				changePart(0);
+//			}
+//			else {
+//				createSingleSegment(null);
+//			}
+//		}
+//	}
 
 }

@@ -29,6 +29,11 @@ import net.sf.okapi.common.StringUtil;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 
+/**
+ * @author Fredrik Liden
+ * @author Sergei Vasilyev
+ *
+ */
 public class CodeSimplifier {
 
 	protected static final int MAX = 10;
@@ -233,7 +238,10 @@ public class CodeSimplifier {
 			tf.insert(0, leadingMarkers);
 			tf.append(trailingMarkers);
 		}
+		//System.out.println(TextUnitUtil.toText(tf));
 		TextUnitUtil.restoreSegmentation(tc, tf);
+//		System.out.println(res[0]);
+//		System.out.println(res[1]);
 		
 		return res;		
 	}

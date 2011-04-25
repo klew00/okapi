@@ -31,7 +31,9 @@ import java.util.regex.Pattern;
 
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.Range;
 import net.sf.okapi.common.ReversedIterator;
+import net.sf.okapi.common.StringUtil;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
@@ -57,14 +59,20 @@ public class TextUnitUtil {
 	private static final String TP_END = "$tp_end$";
 	
 	// Regex patterns for marker search
-	private static final Pattern SEG_START_REGEX = Pattern.compile("\\[#\\$(.+)\\@\\%\\$seg_start\\$\\]");
-	private static final Pattern SEG_END_REGEX = Pattern.compile("\\[#\\$(.+)\\@\\%\\$seg_end\\$\\]");
+	private static final Pattern SEG_REGEX = Pattern.compile("\\[#\\$(.+?)\\@\\%\\$seg_start\\$\\](.*?)\\[#\\$(\\1)\\@\\%\\$seg_end\\$\\]");
+	private static final Pattern SEG_START_REGEX = Pattern.compile("\\[#\\$(.+?)\\@\\%\\$seg_start\\$\\]");
+	private static final Pattern SEG_END_REGEX = Pattern.compile("\\[#\\$(.+?)\\@\\%\\$seg_end\\$\\]");
 	
+	private static final Pattern TP_REGEX = Pattern.compile("\\$tp_start\\$(.*?)\\$tp_end\\$");
 	private static final Pattern TP_START_REGEX = Pattern.compile("\\$tp_start\\$");
-	private static final Pattern TP_END_REGEX = Pattern.compile("\\$tp_end\\$");
+	private static final Pattern TP_END_REGEX = Pattern.compile("\\$tp_end\\$");	
 	
 	private static final Pattern ANY_SEG_TP_REGEX = 
-		Pattern.compile("\\[#\\$(.+)\\@\\%\\$seg_start\\$\\]|\\[#\\$(.+)\\@\\%\\$seg_end\\$\\]|\\$tp_start\\$|\\$tp_end\\$");
+		Pattern.compile("\\[#\\$(.+?)\\@\\%\\$seg_start\\$\\]|\\[#\\$(.+?)\\@\\%\\$seg_end\\$\\]|\\$tp_start\\$|\\$tp_end\\$");
+	
+	private static final char FOO = '\u0001';
+	private static final Pattern PLAIN_TEXT_REGEX = Pattern.compile(String.format("[^%s]+", FOO));
+	private static String testMarkersSt;
 	
 	/**
 	 * Removes leading whitespaces from a given text fragment.
@@ -1002,7 +1010,7 @@ public class TextUnitUtil {
 		
 		CodeSimplifier simplifier = new CodeSimplifier();
 		TextContainer tc = textUnit.getSource();
-		String[] res;
+		String[] res = null;
 		
 		if (textUnit.getSource().hasBeenSegmented()) {
 			res = simplifier.simplifyAll(tc, removeLeadingTrailingCodes);			
@@ -1055,7 +1063,9 @@ public class TextUnitUtil {
 	 */
 	public static String[] simplifyCodes (TextContainer tc, boolean removeLeadingTrailingCodes) {
 		CodeSimplifier simplifier = new CodeSimplifier();
-		return simplifier.simplifyAll(tc, removeLeadingTrailingCodes);
+		String[] res = simplifier.simplifyAll(tc, removeLeadingTrailingCodes);
+		trimSegments(tc);
+		return res;
 	}
 
 	/**
@@ -1151,24 +1161,73 @@ public class TextUnitUtil {
 		return tf;
 	}		
 	
-	private static final class MarkerDescr {
-		private boolean isSegment;
-		private boolean isStart;
-		private String id;
-		private int position;
+	/**
+	 * Trims segments of a given text container that contain leading or trailing whitespaces.  
+	 * Removed whitespaces are placed in newly created whitespace-only text parts before and after a trimmed segment. 
+	 * @param tc the given text container
+	 * @param trimLeading true to remove leading whitespaces of a segment
+	 * @param trimTrailing true to remove trailing whitespaces of a segment
+	 */
+	public static void trimSegments (TextContainer tc, boolean trimLeading, boolean trimTrailing) {
+		if (!trimLeading && !trimTrailing) return; // Nothing to do
 		
-		private MarkerDescr(String id, int position, boolean isStart) {
-			this.isSegment = true;
-			this.isStart = isStart;
-			this.id = id;
-			this.position = position;
+		int index = 0;
+		while (index < tc.count()) {
+			TextPart part = tc.get(index);
+			if (part.isSegment()) { // Trimming only segments
+				TextFragment tf = part.getContent();
+				
+				if (trimLeading) {
+					GenericSkeleton skel1 = new GenericSkeleton();
+					trimLeading(tf, skel1);
+					if (!skel1.isEmpty()) {
+						tc.insert(index, new TextPart(skel1.toString()));
+						index++; // Segment was moved right 
+					}
+				}
+				
+				if (trimTrailing) {
+					GenericSkeleton skel2 = new GenericSkeleton();
+					trimTrailing(tf, skel2);
+					if (!skel2.isEmpty()) {
+						tc.insert(index + 1, new TextPart(skel2.toString()));
+						index++; // Skip the inserted part
+					}
+				}				
+			}
+			index++; // Move on
+		}
+	}
+	
+	public static void trimSegments (TextContainer tc) {
+		trimSegments(tc, true, true);
+	}
+	
+	private enum MarkerType {
+		M_SEG_START,
+		M_SEG_END,
+		M_TP_START,
+		M_TP_END
+	}
+	
+	private static final class Marker {
+		private MarkerType type;
+		private String id;
+		private int position; // position in coded text, if context == Code then position of the code + 1 (code's 2-nd char) in coded text
+		private int relPos; // if context == null then relPos = 0, if context == Code pos in the code's data
+		private Code context; // a Code ref or null if context is the text
+		
+		private Marker(MarkerType type, int position, int relPos, Code context) {
+			this(type, null, position, relPos, context);
 		}
 		
-		private MarkerDescr(int position, boolean isStart) {
-			this.isSegment = false;
-			this.isStart = isStart;
-			this.id = null;
+		private Marker(MarkerType type, String id, int position, int relPos, Code context) {
+			super();
+			this.type = type;
+			this.id = id;
 			this.position = position;
+			this.relPos = relPos;
+			this.context = context;
 		}
 	}
 	
@@ -1197,6 +1256,32 @@ public class TextUnitUtil {
 		return removeFromOriginal ? matcher.replaceAll("") : original;
 	}
 	
+	private enum TokenType {
+		SEG,
+		TP,
+		SEG_START,
+		SEG_END,
+		TP_START,
+		TP_END
+	}
+	
+	private static final class Token {
+		TokenType type;
+		String id;
+		Range range;
+		Range textRange;
+		String match; // for debug purposes
+		
+		private Token(TokenType type, Range range, Range textRange, String id, String match) {
+			super();
+			this.type = type;
+			this.range = range;
+			this.textRange = textRange == null ? range : textRange;
+			this.id = id;
+			this.match = match;
+		}
+	}
+	
 	/**
 	 * Restores original segmentation of a given text container from a given text fragment created with storeSegmentation().
 	 * @param tc the given text container
@@ -1211,89 +1296,225 @@ public class TextUnitUtil {
 		// Scan the tf, create segments and text parts, and add them to tc
 		TextFragment tf = segStorage;		
 		String ctext = tf.getCodedText();
-		String id;
 		List<Code> codes = tf.getCodes();
-		int pos;
-		
-		List<MarkerDescr> markers = new ArrayList<MarkerDescr> ();
+		Matcher matcher;
+				
+		List<Marker> markers = new ArrayList<Marker> ();
 		
 		for (int i = 0; i < ctext.length(); i++){
 			if ( TextFragment.isMarker(ctext.charAt(i)) ) {				
 				int codeIndex = TextFragment.toIndex(ctext.charAt(i + 1));
 				Code code = codes.get(codeIndex);
-				String data = code.getData();
+				String data = code.getData();				
+
+				// Tokenize code data
+				List<Token> tokens = new ArrayList<Token>();
 				
-				Matcher matcher = SEG_START_REGEX.matcher(data);
+				matcher = SEG_REGEX.matcher(data); // Whole whitespace-only segment in code
+				// Group(1) - id of start seg marker
+				// Group(2) - text between markers
+				// Group(3) - id of end seg marker (regex provides equality to Group(1))				
 				while (matcher.find()) {
-					if (code.getTagType() == TagType.OPENING) {
-						pos = i; // move before the code, AQ-B 52*
-					}
-					else {
-						pos = i + 2; // move after the code
-					}
+//					if (code.getTagType() == TagType.OPENING) {
+//						pos = i; // move before the code, AQ-B 52*
+//					}
+//					else {
+//						pos = i + 2; // move after the code
+//					}
 					
-					id = matcher.group(1);
-					markers.add(new MarkerDescr(id, pos, true));
+//					id = matcher.group(1);
+//					markers.add(new Marker(id, pos, true, matcher.group(), code));
+				
+					tokens.add(new Token(TokenType.SEG, new Range(matcher.start(), matcher.end()), 
+							new Range(matcher.start(2), matcher.end(2)), matcher.group(1), matcher.group()));
+					//data = matcher.replaceFirst(StringUtil.padString(matcher.group().length(), FOO));
+				}
+				
+				matcher = TP_REGEX.matcher(data); // Whole whitespace-only text part in code
+				// Group(1) - text between markers
+				while (matcher.find()) {
+//					if (code.getTagType() == TagType.OPENING) {
+//						pos = i; // move before the code, AQ-B 52*
+//					}
+//					else {
+//						pos = i + 2; // move after the code
+//					}
+					
+//					id = matcher.group(1);
+//					markers.add(new Marker(pos, true, matcher.group(), code));
+					tokens.add(new Token(TokenType.TP, new Range(matcher.start(), matcher.end()), 
+							new Range(matcher.start(1), matcher.end(1)), null, matcher.group()));
+					//data = matcher.replaceFirst(StringUtil.padString(matcher.group().length(), FOO));
 				}				
 				
-				matcher = SEG_END_REGEX.matcher(data);
+				// Pad found ranges with FOO not to find parts of previously found fragments
+				for (Token token : tokens) {
+					data = StringUtil.padString(data, token.range.start, token.range.end, FOO);
+				}
+				
+				matcher = SEG_START_REGEX.matcher(data);
+				// Group(1) - id of start seg marker
 				while (matcher.find()) {
-					if (code.getTagType() == TagType.CLOSING) {
-						pos = i + 2; // move after the code
-					}
-					else {
-						pos = i; // move before the code
-					}
-					id = matcher.group(1);
-					markers.add(new MarkerDescr(id, pos, false));
+//					if (code.getTagType() == TagType.OPENING) {
+//						pos = i; // move before the code, AQ-B 52*
+//					}
+//					else {
+//						pos = i + 2; // move after the code
+//					}
+//					
+//					id = matcher.group(1);
+//					markers.add(new Marker(id, pos, true, matcher.group(), null));
+					tokens.add(new Token(TokenType.SEG_START, new Range(matcher.start(), matcher.end()), 
+							null, matcher.group(1), matcher.group()));
+					//data = matcher.replaceFirst(StringUtil.getString(matcher.group().length(), FOO));
+				}
+				
+				matcher = SEG_END_REGEX.matcher(data);
+				// Group(1) - id of end seg marker
+				while (matcher.find()) {
+//					if (code.getTagType() == TagType.CLOSING) {
+//						pos = i + 2; // move after the code
+//					}
+//					else {
+//						pos = i; // move before the code
+//					}
+//					id = matcher.group(1);
+//					markers.add(new Marker(id, pos, false, matcher.group(), null));
+					tokens.add(new Token(TokenType.SEG_END, new Range(matcher.start(), matcher.end()), null, 
+							matcher.group(1), matcher.group()));
+					//data = matcher.replaceFirst(StringUtil.getString(matcher.group().length(), FOO));
 				}
 				
 				matcher = TP_START_REGEX.matcher(data);
 				while (matcher.find()) {
-					if (code.getTagType() == TagType.OPENING) {
-						pos = i; // move before the code
-					}
-					else {
-						pos = i + 2; // move after the code
-					}
-					markers.add(new MarkerDescr(pos, true));
-				}				
+//					if (code.getTagType() == TagType.OPENING) {
+//						pos = i; // move before the code
+//					}
+//					else {
+//						pos = i + 2; // move after the code
+//					}
+//					markers.add(new Marker(pos, true, matcher.group(), null));
+					tokens.add(new Token(TokenType.TP_START, new Range(matcher.start(), matcher.end()), 
+							null, null, matcher.group()));
+					//data = matcher.replaceFirst(StringUtil.getString(matcher.group().length(), FOO));
+				}
 				
 				matcher = TP_END_REGEX.matcher(data);
 				while (matcher.find()) {
-					if (code.getTagType() == TagType.CLOSING) {
-						pos = i + 2; // move after the code
-					}
-					else {
-						pos = i; // move before the code
-					}
-					markers.add(new MarkerDescr(pos, false));
+//					if (code.getTagType() == TagType.CLOSING) {
+//						pos = i + 2; // move after the code
+//					}
+//					else {
+//						pos = i; // move before the code
+//					}
+//					markers.add(new Marker(pos, false, matcher.group(), null));
+					tokens.add(new Token(TokenType.TP_END, new Range(matcher.start(), matcher.end()), 
+							null, null, matcher.group()));
+					//data = matcher.replaceFirst(StringUtil.getString(matcher.group().length(), FOO));
 				}
 				
-				// Remove markers from the code data, code markers stay in place in the tf coded text
-				SEG_START_REGEX.matcher(data).replaceAll("");
-				SEG_END_REGEX.matcher(data).replaceAll("");
-				TP_START_REGEX.matcher(data).replaceAll("");
-				TP_END_REGEX.matcher(data).replaceAll("");
-								
-				i++; // Skip the pair
-			}
-			// For the 1-st iteration mind spaces only after a code not to trim-head the string
-			else if (Character.isWhitespace(ctext.charAt(i))) {
+				if (tokens.size() == 0) { // No tokens were created, it's a regular code
+					i++; // Skip the pair
+					continue; // The code remains as is, it hasn't been merged with seg/tp markers
+				}
 				
+				// Pad found ranges with FOO not to find parts of previously found fragments
+				for (Token token : tokens) {
+					data = StringUtil.padString(data, token.range.start, token.range.end, FOO);
+				}
+				
+				matcher = PLAIN_TEXT_REGEX.matcher(data);
+				while (matcher.find()) {
+//					if (code.getTagType() == TagType.CLOSING) {
+//						pos = i + 2; // move after the code
+//					}
+//					else {
+//						pos = i; // move before the code
+//					}
+//					markers.add(new Marker(pos, false, matcher.group(), null));
+					//tokens.add(new Token(TokenType.PLAIN_TEXT, matcher.start(), matcher.end(), null, matcher.group()));
+					tokens.add(new Token(TokenType.TP, new Range(matcher.start(), matcher.end()), 
+							new Range(matcher.start(), matcher.end()), null, matcher.group()));
+					//data = matcher.replaceFirst(StringUtil.padString(matcher.group().length(), FOO));
+				}
+				
+//				// Remove markers from the code data, 2-char code markers stay in place in the tf coded text
+//				data = SEG_START_REGEX.matcher(data).replaceAll("");
+//				data = SEG_END_REGEX.matcher(data).replaceAll("");
+//				data = TP_START_REGEX.matcher(data).replaceAll("");
+//				data = TP_END_REGEX.matcher(data).replaceAll("");
+								
+				Collections.sort(tokens, new Comparator<Token>() {
+
+					@Override
+					public int compare(Token t1, Token t2) {
+						// If a text part (from leading plain text) appears before seg end, move it forward behind the seg end
+						if (t1.type == TokenType.SEG_END && t2.type == TokenType.TP) {
+							return -1;
+						}
+						// If a text part (from trailing plain text) appears after seg start, move it backwards before seg start
+						else if (t1.type == TokenType.SEG_START && t2.type == TokenType.TP) {
+							return 1;
+						}
+						// Otherwise text parts and other type combinations are sorted by start position
+						else {
+							if (t1.textRange.start < t2.textRange.start) 
+								return -1;
+							else if (t1.textRange.start > t2.textRange.start) 
+								return 1;
+							else
+								return 0;
+						}				
+					}
+					
+				});
+				
+				// Translate tokens to markers
+				for (Token token : tokens) {
+					switch (token.type) {
+					
+					case SEG:
+						markers.add(new Marker(MarkerType.M_SEG_START, token.id, i, token.textRange.start, code));
+						markers.add(new Marker(MarkerType.M_SEG_END, token.id, i, token.textRange.end, code));
+						break;
+						
+					case TP:
+						markers.add(new Marker(MarkerType.M_TP_START, i, token.textRange.start, code));
+						markers.add(new Marker(MarkerType.M_TP_END, i, token.textRange.end, code));
+						break;
+						
+					case SEG_START:
+						markers.add(new Marker(MarkerType.M_SEG_START, token.id, i + 2, 0, null));
+						break;
+						
+					case SEG_END:
+						markers.add(new Marker(MarkerType.M_SEG_END, token.id, i, 0, null));
+						break;
+						
+					case TP_START:
+						markers.add(new Marker(MarkerType.M_TP_START, i + 2, 0, null));
+						break;
+						
+					case TP_END:
+						markers.add(new Marker(MarkerType.M_TP_END, i, 0, null));
+						break;
+					}
+				}
+				
+				//code.setData(data);
+				i++; // Skip the pair
 			}
 		}
 		
-		// Sort markers
-		StringBuilder markersSb = new StringBuilder();
-//		for (MarkerDescr d : markers) {
+		// Sort markers		
+//		for (Marker d : markers) {
 //			markersSb.append(String.format("(%d: %s %s) ", d.position, d.id != null ? d.id : "", d.isStart ? "start" : "end"));
 //		}
 		
-		Collections.sort(markers, new Comparator<MarkerDescr>() {
+		Collections.sort(markers, new Comparator<Marker>() {
 
 //			@Override
-//			public int compare(MarkerDescr d1, MarkerDescr d2) {
+//			public int compare(Marker d1, Marker d2) {
 //				if (d1.isSegment && d2.isSegment || !d1.isSegment && !d2.isSegment) {
 //					if (d1.position < d2.position) 
 //						return -1;
@@ -1313,59 +1534,122 @@ public class TextUnitUtil {
 //			}			
 			
 			@Override
-			public int compare(MarkerDescr d1, MarkerDescr d2) {
-					if (d1.position < d2.position) 
+			public int compare(Marker m1, Marker m2) {
+					if (m1.position < m2.position) 
 						return -1;
-					else if (d1.position > d2.position) 
+					else if (m1.position > m2.position) 
 						return 1;
 					else { // equal positions, markers from a merged code
-						return 0;
+						if (m1.context != null && m2.context != null) {
+							if (m1.relPos < m2.relPos)
+								return -1;
+							else if (m1.relPos > m2.relPos)
+								return 1;
+							else
+								return 0;
+						}
+						else
+							return 0;
 					}
-			}			
-			
+			}						
 		});
 		
-		for (MarkerDescr d : markers) {
-			markersSb.append(String.format("(%d: %s %s) ", d.position, d.id != null ? d.id : "", d.isStart ? "start" : "end"));
-		}
-		
 		// Create segments and text parts in tc
+		StringBuilder markersSb = new StringBuilder();
+		ArrayList<TextPart> list = new ArrayList<TextPart>(); 		
+		
 		int start = -1;
-		for (MarkerDescr d : markers) {			
-			if (d.isSegment) { // segment
-				if (d.isStart) {
-					start = d.position;
-				}
-				else { // end
-					if (start > -1) {
+		for (Marker d : markers) {
+			switch (d.type) {
+			case M_SEG_START:
+				start = d.context == null ? d.position : d.relPos;
+				if (d.context == null)
+					markersSb.append(String.format("(%d: %s %s) ", d.position, "seg_start", d.id));
+				else
+					markersSb.append(String.format("(%d-%d: %s %s) ", d.position, d.relPos, "seg_start", d.id));
+				break;
+
+			case M_SEG_END:
+				if (start > -1) {
+					if (d.context == null) {
 						if (start <= d.position)
-							tc.append(new Segment(d.id, tf.subSequence(start, d.position)));
+							list.add(new Segment(d.id, tf.subSequence(start, d.position)));
 						else
 							LOGGER.warning(String.format("Cannot create the segment %s - incorrect range: (%d - %d)", 
 									d.id, start, d.position));
 					}
-					start = -1;
+					else {
+						if (start <= d.relPos)
+							list.add(new Segment(d.id, new TextFragment(d.context.getData().substring(start, d.relPos))));
+						else
+							LOGGER.warning(String.format("Cannot create the segment %s - incorrect range: (%d - %d)", 
+									d.id, start, d.relPos));
+					}
 				}
-			}
-			else { // text part
-				if (d.isStart) {
-					start = d.position;
-				}
-				else { // end
-					if (start > -1) {
+				start = -1;
+				if (d.context == null)
+					markersSb.append(String.format("(%d: %s %s) ", d.position, "seg_end", d.id));
+				else
+					markersSb.append(String.format("(%d-%d: %s %s) ", d.position, d.relPos, "seg_end", d.id));
+				break;
+				
+			case M_TP_START:
+				start = d.context == null ? d.position : d.relPos;
+				if (d.context == null)
+					markersSb.append(String.format("(%d: %s) ", d.position, "tp_start"));
+				else
+					markersSb.append(String.format("(%d-%d: %s) ", d.position, d.relPos, "tp_start"));
+				break;
+				
+			case M_TP_END:
+				if (start > -1) {
+					if (d.context == null) {
 						if (start <= d.position)
-							tc.append(new TextPart(tf.subSequence(start, d.position)));
+							list.add(new TextPart(tf.subSequence(start, d.position)));
 						else
 							LOGGER.warning(String.format("Cannot create a text part - incorrect range: (%d - %d)", start, d.position));
 					}
-					start = -1;
+					else {
+						if (start <= d.relPos)
+							list.add(new TextPart(new TextFragment(d.context.getData().substring(start, d.relPos))));
+						else
+							LOGGER.warning(String.format("Cannot create a text part - incorrect range: (%d - %d)", start, d.relPos));
+					}						
 				}
-			}
+				start = -1;
+				if (d.context == null)
+					markersSb.append(String.format("(%d: %s) ", d.position, "tp_end"));
+				else
+					markersSb.append(String.format("(%d-%d: %s) ", d.position, d.relPos, "tp_end"));
+				break;
+			}			
 		}
 		
-		return markersSb.toString().trim(); 		
+		testMarkersSt = markersSb.toString().trim();
+//		return new TextContainer(list.toArray(new TextPart[list.size()]));
+		setParts(tc, list.toArray(new TextPart[list.size()]));
+		return testMarkersSt; 
 	}
 
+	public static String testMarkers() {
+		return testMarkersSt;
+	}
+	
+	private static void setParts(TextContainer tc, TextPart... parts) {
+		tc.clear();
+		for (TextPart part : parts) {
+			append(tc, part);
+		}
+		// Check parts
+		if (tc.get(0).isSegment() != parts[0].isSegment()) {
+			tc.changePart(0);
+		}
+	}
+	
+	private static void append(TextContainer tc, TextPart part) {
+		tc.append(part, tc.isEmpty());
+	}
+	
 	/**
 	 * Returns the content of a given text fragment, including the original codes whenever
 	 * possible. Codes are decorated with '[' and ']' to tell them from regular text.

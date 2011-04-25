@@ -1137,6 +1137,11 @@ public class FilterTestDriver {
 				return false;
 			}
 		}
+		
+//		if (t1.count() != t2.count()) {
+//			System.err.println("Number of text parts difference");
+//			return false;
+//		}
 
 		return true;
 	}

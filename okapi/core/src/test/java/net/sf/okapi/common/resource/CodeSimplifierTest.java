@@ -954,4 +954,29 @@ public class CodeSimplifierTest {
 		assertEquals(1, tf.getCodes().size());
 		assertEquals("x1", tf.getCode(0).getType());
 	}
+	
+	@Test
+	public void testCodeReduction49 () {
+		TextFragment tf = new TextFragment();		
+		tf.append(TagType.OPENING, "a", "<a>");
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append(" ");
+		tf.append(TagType.OPENING, "c", "<c>");
+		tf.append("   ");
+		tf.append("T1");
+		tf.append("   ");
+		tf.append(TagType.PLACEHOLDER, "x1", "<x1/>");
+		tf.append("T2");
+		tf.append(TagType.CLOSING, "c", "</c>");
+		tf.append("   ");
+		tf.append(TagType.CLOSING, "b", "</b>");
+		tf.append(TagType.CLOSING, "a", "</a>");
+				
+			assertEquals("<1><2> <3>   T1   <4/>T2</3>   </2></1>", fmt.setContent(tf).toString());
+		
+		String[] res = simplifier.simplifyAll(tf, true);
+		assertEquals("T1   <2/>T2", fmt.setContent(tf).toString());
+		assertEquals("<a><b> <c>   ", res[0]);
+		assertEquals("</c>   </b></a>", res[1]);
+	}
 }

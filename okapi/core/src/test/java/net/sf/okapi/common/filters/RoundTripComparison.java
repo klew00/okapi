@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
@@ -176,7 +177,7 @@ public class RoundTripComparison {
 			// Execute the first extraction and the re-writing
 			String outPath = executeFirstExtractionToFile(doc, dirSuffux, steps);
 			// Execute the second extraction from the output of the first
-			executeSecondExtractionFromFile(outPath);
+			executeSecondExtractionFromFile(outPath, steps);
 			// Compare the events
 			if ( !FilterTestDriver.compareEvents(extraction1Events, extraction2Events, includeSkeleton) ) {
 				throw new RuntimeException("Events are different for " + doc.path);
@@ -292,17 +293,23 @@ public class RoundTripComparison {
 				case START_GROUP:
 				case END_GROUP:
 				case TEXT_UNIT:
-					extraction1Events.add(event);
+					if (event.isTextUnit()) {
+						// Steps can modify the event, but we need to compare events as were from the filter, so we are cloning 
+						extraction1Events.add(new Event(EventType.TEXT_UNIT, event.getTextUnit().clone()));
+					}
+					else {
+						extraction1Events.add(event);
+					}
+					
 					subDocEvents.add(subDocEvent);
 					break;
 				}
-				if (steps != null)
+				if (steps != null) {
 					for (IPipelineStep step : steps) {
-						event = step.handleEvent(event);
-						writer.handleEvent(event);
+						event = step.handleEvent(event);						
 					}
-				else
-					writer.handleEvent(event);
+				}					
+				writer.handleEvent(event);
 			}
 		} finally {
 			if (filter != null)
@@ -313,6 +320,34 @@ public class RoundTripComparison {
 		return outPath;
 	}
 
+	private void executeSecondExtractionFromFile(String input, IPipelineStep... steps) {
+		try {
+			// Set the input (from the output of first extraction)
+			filter.open(new RawDocument(Util.toURI(input), "UTF-8", srcLoc, trgLoc));
+
+			// Process the document
+			Event event;
+			while (filter.hasNext()) {
+				event = filter.next();
+				switch (event.getEventType()) {
+				case START_DOCUMENT:
+				case END_DOCUMENT:
+				case START_SUBDOCUMENT:
+				case END_SUBDOCUMENT:
+					break;
+				case START_GROUP:
+				case END_GROUP:
+				case TEXT_UNIT:
+					extraction2Events.add(event);
+					break;
+				}
+			}
+		} finally {
+			if (filter != null)
+				filter.close();
+		}
+	}
+	
 	private void executeSecondExtractionFromFile(String input) {
 		try {
 			// Set the input (from the output of first extraction)
