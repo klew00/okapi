@@ -142,7 +142,7 @@ public class RawDocumentToFilterEventsStep extends BasePipelineStep {
 			throw new OkapiIOException(String.format("No events available from '%s'.", filter.getDisplayName()));
 			
 		case END_BATCH_ITEM:
-			filter.close();
+			if (filter != null) filter.close();
 			return event;
 		}
 

@@ -2,13 +2,22 @@ package net.sf.okapi.steps.common.codesimplifier;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+import java.util.ArrayList;
+
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.ISkeleton;
+import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.Util;
+import net.sf.okapi.common.filters.InputDocument;
+import net.sf.okapi.common.filters.RoundTripComparison;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.filters.html.HtmlFilter;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -17,11 +26,15 @@ public class TestCodeSimplifierStep {
 
 	private GenericContent fmt;
 	private CodeSimplifierStep css;
+	private static final LocaleId EN = new LocaleId("en", "us");
+	private static final LocaleId ESES = new LocaleId("es", "es");
+	private String pathBase;
 	
 	@Before
 	public void setup() {
 		css = new CodeSimplifierStep(); 
 		fmt = new GenericContent();
+		pathBase = Util.getDirectoryName(this.getClass().getResource("").getPath()) + "/";
 	}	
 	
 	@Test
@@ -101,5 +114,17 @@ public class TestCodeSimplifierStep {
 		
 		skel = tu1.getSkeleton();
 		assertNull(skel);
+	}
+	
+
+	@Test
+	public void testDoubleExtraction () {
+		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
+		
+		list.add(new InputDocument(pathBase + "test1.html", null));
+		
+		RoundTripComparison rtc = new RoundTripComparison();
+		assertTrue(rtc.executeCompare(new HtmlFilter(), list, "UTF-8", EN, ESES, "out", new CodeSimplifierStep()));
+		//assertTrue(rtc.executeCompare(new HtmlFilter(), list, "UTF-8", EN, ESES, "out"));
 	}
 }
