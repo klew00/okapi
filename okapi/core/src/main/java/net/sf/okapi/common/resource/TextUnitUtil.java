@@ -1008,16 +1008,15 @@ public class TextUnitUtil {
 					"desinchronization of codes in source and targets is possible.", textUnit.getId()));
 		}
 		
-		CodeSimplifier simplifier = new CodeSimplifier();
 		TextContainer tc = textUnit.getSource();
 		String[] res = null;
 		
 		if (textUnit.getSource().hasBeenSegmented()) {
-			res = simplifier.simplifyAll(tc, removeLeadingTrailingCodes);			
+			res = simplifyCodes(tc, removeLeadingTrailingCodes);			
 		}
 		else {
 			TextFragment tf = tc.getUnSegmentedContentCopy();  			
-			res = simplifier.simplifyAll(tf, removeLeadingTrailingCodes);
+			res = simplifyCodes(tf, removeLeadingTrailingCodes);
 			textUnit.setSourceContent(tf); // Because we modified a copy
 		}
 			
