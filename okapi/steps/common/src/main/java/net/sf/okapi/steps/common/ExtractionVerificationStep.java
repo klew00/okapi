@@ -35,6 +35,7 @@ import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.StartSubDocument;
 
 /**
  * Verifies if a {@link RawDocument} is extracted and merged back properly.
@@ -209,37 +210,26 @@ public class ExtractionVerificationStep extends BasePipelineStep {
 			LOGGER.warning("Event Types are different");
 			return false;
 		}
+
+		ExtractionVerificationUtil verificationUtil = new ExtractionVerificationUtil();
 		
 		switch ( event1.getEventType() ) {
 		case START_DOCUMENT:
 			break;
 		case START_SUBDOCUMENT:
-			break;
+			return verificationUtil.compareStartSubDocument((StartSubDocument)event1.getResource(), (StartSubDocument)event2.getResource());
 		case START_GROUP:
-			break;
+			return verificationUtil.compareBaseReferenceable(event1.getStartGroup(), event2.getStartGroup());
 		case END_DOCUMENT:
-			break;
 		case END_SUBDOCUMENT:
-			break;
 		case END_GROUP:
-			break;
+			return verificationUtil.compareIResources(event1.getEnding(), event2.getEnding());
 		case DOCUMENT_PART:
-			break;
+			return verificationUtil.compareBaseReferenceable(event1.getDocumentPart(), event2.getDocumentPart());
 		case TEXT_UNIT:
-			//return identicalTextUnit(event1.getTextUnit(), event2.getTextUnit());
-			return ExtractionVerificationUtil.compareTextUnit(event1.getTextUnit(), event2.getTextUnit(), params.isCompareSkeleton());
+			return verificationUtil.compareTextUnits(event1.getTextUnit(), event2.getTextUnit());
 		}
 		
 		return true;
 	}
-	
-	/*private boolean identicalTextUnit (TextUnit tu1,
-		TextUnit tu2)
-	{
-		if ( !tu1.getId().equals(tu2.getId()) ) {
-			LOGGER.warning("TextUnit ids do not match.\tFirst Run: "+tu1.getId()+ "\tSecond Run: "+tu2.getId());
-			return false;
-		}
-		return true;
-	}*/
 }

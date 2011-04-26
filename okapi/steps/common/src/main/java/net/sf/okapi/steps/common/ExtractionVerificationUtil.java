@@ -20,436 +20,697 @@
 
 package net.sf.okapi.steps.common;
 
+import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
+import java.util.logging.Logger;
 
 import net.sf.okapi.common.IResource;
-import net.sf.okapi.common.ISkeleton;
+import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.resource.BaseReferenceable;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.INameable;
 import net.sf.okapi.common.resource.IReferenceable;
-import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.Segment;
+import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.ITextUnit;
+import net.sf.okapi.common.resource.TextPart;
 
 /**
- *	Copied from the test scoped FilterTestDriver. Should be moved to the resources themselves or into a helper class.   
+ *	Reused the test-scoped FilterTestDriver. Could probably be generalized and moved to the resources themselves or into a helper class.
  *
  */
 public class ExtractionVerificationUtil {
+	
+	private static final Logger LOGGER = Logger.getLogger(ExtractionVerificationUtil.class.getName());
+	
+	boolean compareSkeleton;
+	
+	public ExtractionVerificationUtil(){
+		this.compareSkeleton = true;
+	}
 
-	public static boolean compareTextUnit(ITextUnit tu1, ITextUnit tu2, boolean includeSkeleton) {
+	public ExtractionVerificationUtil(boolean compareSkeleton){
+		this.compareSkeleton = compareSkeleton;
+	}
+	
+	public boolean isCompareSkeleton() {
+		return this.compareSkeleton;
+	}
 
-		if (!compareINameable(tu1, tu2, includeSkeleton)) {
-			System.err.println("Difference in INameable");
+	public void setCompareSkeleton(boolean compareSkeleton) {
+		this.compareSkeleton = compareSkeleton;
+	}
+
+	/**
+	 * Compare two StartSubDocuments 
+	 * @param ssd1 First StartSubDocument
+	 * @param ssd2 Second StartSubDocument
+	 * @return true if equal else false
+	 */
+	public boolean compareStartSubDocument(StartSubDocument ssd1, StartSubDocument ssd2) {
+
+		//--both are null no point checking anything else--
+		if(bothAreNull(ssd1,ssd2)){
+			return true;
+		}
+		
+		//--one is null--
+		if(oneIsNulll(ssd1,ssd2,"compareStartSubDocument","StartSubDocument") 
+				|| oneIsNulll(ssd1.getParentId(),ssd2.getParentId(),"compareStartSubDocument","StartSubDocument Parent Id")
+				|| oneIsNulll(ssd1.getFilterParameters(),ssd2.getFilterParameters(),"compareStartSubDocument","StartSubDocument Parent Id")){
 			return false;
 		}
-		if (!compareIReferenceable(tu1, tu2)) {
-			System.err.println("Difference in IReferenceable");
+
+		//--Parent Id--
+		if( !bothAreNull(ssd1.getParentId(),ssd2.getParentId()) ){
+			if ( !ssd1.getParentId().equals(ssd2.getParentId()) ) {
+				LOGGER.warning("compareStartSubDocument warning: StartSubDocument Parent Id difference.");
+				return false;
+			}
+		}
+		
+		//--FilterParameters--
+		if( !bothAreNull(ssd1.getFilterParameters(),ssd2.getFilterParameters()) ){
+			if ( !ssd1.getFilterParameters().equals(ssd2.getFilterParameters()) ) {
+				LOGGER.warning("compareStartSubDocument warning: StartSubDocument FilterParameters difference.");
+				return false;
+			}
+		}
+		
+		//--INameable portion--
+		if (!compareINameables(ssd1, ssd2)) {
 			return false;
 		}
-		// TextUnit tests
-		if (tu1.preserveWhitespaces() != tu2.preserveWhitespaces()) {
-			System.err.println("preserveWhitespaces difference");
-			return false;
-		}
-		if (!compareTextContainer(tu1.getSource(), tu2.getSource())) {
-			System.err.println("TextContainer difference");
-			return false;
-		}
-		// TODO: target, but we have to take re-writing of source as target in account
+		
 		return true;
 	}
 	
+	/**
+	 * Compare two BaseReferenceables 
+	 * @param br1 First BaseReferenceable
+	 * @param br2 Second BaseReferenceable
+	 * @return true if equal else false
+	 */
+	public boolean compareBaseReferenceable(BaseReferenceable br1, BaseReferenceable br2) {
 
-	public static boolean compareIReferenceable(IReferenceable item1, IReferenceable item2) {
-		
-		if (item1 == null) {
-			return (item2 == null);
-		}
-		if (item2 == null)
-			return false;
-		
-		if (item1.isReferent() != item2.isReferent()) {
-			System.err.println("isReferent difference");
-			return false;
+		//--both are null no point checking anything else--
+		if(bothAreNull(br1,br2)){
+			return true;
 		}
 		
-		if (item1.getReferenceCount() != item2.getReferenceCount()) {
-			System.err.println("referenceCount difference");
+		//--one is null--
+		if(oneIsNulll(br1,br2,"compareBaseReferenceable","BaseReferenceable") 
+				|| oneIsNulll(br1.getParentId(),br2.getParentId(),"compareBaseReferenceable","BaseReferenceable Parent Id") ){
 			return false;
 		}
-		
-		return true;
-	}
 
-	
-	public static boolean compareINameable(INameable item1, INameable item2, boolean includeSkeleton) {
-		
-		if (item1 == null) {
-			return (item2 == null);
+		//--Id--
+		if( !bothAreNull(br1.getParentId(),br2.getParentId()) ){
+			if ( !br1.getParentId().equals(br2.getParentId()) ) {
+				LOGGER.warning("compareBaseReferenceable warning: BaseReferenceable Parent Id difference.");
+				return false;
+			}
 		}
-		if (item2 == null)
-			return false;
-
-		if (!compareIResource(item1, item2, includeSkeleton)) {
-			System.err.println("Difference in IResource");
+		
+		//--INameable portion--
+		if (!compareINameables(br1, br2)) {
 			return false;
 		}
 		
-		// Resource-level properties
-		Set<String> names1 = item1.getPropertyNames();
-		Set<String> names2 = item2.getPropertyNames();
-		if (names1.size() != names2.size()) {
-			System.err.println("Number of resource-level properties difference");
-			return false;
-		}
-		for (String name : item1.getPropertyNames()) {
-			Property p1 = item1.getProperty(name);
-			Property p2 = item2.getProperty(name);
-			if (!compareProperty(p1, p2)) {
-				return false;
-			}
-		}
-
-		// Source properties
-		names1 = item1.getSourcePropertyNames();
-		names2 = item2.getSourcePropertyNames();
-		if (names1.size() != names2.size()) {
-			System.err.println("Number of source properties difference");
-			return false;
-		}
-		for (String name : item1.getSourcePropertyNames()) {
-			Property p1 = item1.getSourceProperty(name);
-			Property p2 = item2.getSourceProperty(name);
-			if (!compareProperty(p1, p2)) {
-				return false;
-			}
-		}
-
-		// Target properties
-		// TODO: Target properties
-
-		// Name
-		String tmp1 = item1.getName();
-		String tmp2 = item2.getName();
-		if (tmp1 == null) {
-			if (tmp2 != null) {
-				System.err.println("Name null difference");
-				return false;
-			}
-		} else {
-			if (tmp2 == null) {
-				System.err.println("Name null difference");
-				return false;
-			}
-			if (!tmp1.equals(tmp2)) {
-				System.err.println("Name difference");
-				return false;
-			}
-		}
-
-		// Type
-		tmp1 = item1.getType();
-		tmp2 = item2.getType();
-		if (tmp1 == null) {
-			if (tmp2 != null) {
-				System.err.println("Type null difference");
-				return false;
-			}
-		} else {
-			if (tmp2 == null) {
-				System.err.println("Type null difference");
-				return false;
-			}
-			if (!tmp1.equals(tmp2)) {
-				System.err.println("Type difference");
-				return false;
-			}
-		}
-
-		// MIME type
-		tmp1 = item1.getMimeType();
-		tmp2 = item2.getMimeType();
-		if (tmp1 == null) {
-			if (tmp2 != null) {
-				System.err.println("Mime-type null difference");
-				return false;
-			}
-		} else {
-			if (tmp2 == null) {
-				System.err.println("Mime-type null difference");
-				return false;
-			}
-			if (!tmp1.equals(tmp2)) {
-				System.err.println("Mime-type difference");
-				return false;
-			}
-		}
-
-		// Is translatable
-		if (item1.isTranslatable() != item2.isTranslatable()) {
-			System.err.println("isTranslatable difference");
+		//--IReferenceable portion--
+		if (!compareIReferenceables(br1, br2)) {
 			return false;
 		}
 
 		return true;
 	}
 	
-	
-	public static boolean compareIResource(IResource item1, IResource item2, boolean includeSkeleton){
+	/**
+	 * Compare two ITextUnits 
+	 * @param tu1 First ITextUnit
+	 * @param tu2 Second ITextUnit
+	 * @return true if equal else false
+	 */
+	public boolean compareTextUnits(ITextUnit tu1, ITextUnit tu2) {
 
-		if (item1 == null) {
-			return (item2 == null);
+		//--both are null no point checking anything else--
+		if(bothAreNull(tu1,tu2)){
+			return true;
 		}
-		if (item2 == null)
+		
+		//--one is null--
+		if(oneIsNulll(tu1,tu2,"compareTextUnits","ITextUnit") ){
 			return false;
-
-		// ID
-		String tmp1 = item1.getId();
-		String tmp2 = item2.getId();
-		if (tmp1 == null) {
-			if (tmp2 != null)
-				return false;
-		} else {
-			if (tmp2 == null)
-				return false;
-			if (!tmp1.equals(tmp2))
-				return false;
+		}
+		
+		//--INameable portion--
+		if (!compareINameables(tu1, tu2)) {
+			return false;
+		}
+		
+		//--IReferenceable portion--
+		if (!compareIReferenceables(tu1, tu2)) {
+			return false;
 		}
 
-		// Skeleton
-		if ( !includeSkeleton ) {
+		//--HasVariantSources--
+		if (tu1.isEmpty() != tu2.isEmpty()) {
+			LOGGER.warning("compareTextUnits warning: ITextUnit isEmtpy difference.");
+			return false;
+		}
+		
+		//--IsEmpty--
+		if (tu1.hasVariantSources() != tu2.hasVariantSources()) {
+			LOGGER.warning("compareTextUnits warning: ITextUnit hasVariantSources difference.");
+			return false;
+		}
+		
+		//--Source Container--
+		if (!compareTextContainers(tu1.getSource(), tu2.getSource())) {
+			return false;
+		}
+		
+		for (LocaleId locId : tu1.getTargetLocales()) {
+
+			if (!compareTextContainers(tu1.getTarget(locId), tu2.getTarget(locId))) {
+				return false;
+			}		
+		}
+
+		return true;
+	}
+
+	/**
+	 * Compares two TextContainers.
+	 * @param tc1 First TextContainer
+	 * @param tc2 Second TextContainer
+	 * @return true if equal else false
+	 */
+	public boolean compareTextContainers(TextContainer tc1, TextContainer tc2) {
+		
+		//--both are null no point checking anything else--
+		if(bothAreNull(tc1,tc2)){
 			return true;
 		}
 
-		ISkeleton skl1 = item1.getSkeleton();
-		ISkeleton skl2 = item2.getSkeleton();
-		if (skl1 == null) {
-			if (skl2 != null)
-				return false;
+		//--one is null--
+		if(oneIsNulll(tc1,tc2,"compareTextContainer","TextContainer")){
+			return false;
 		}
-		else {
-			if (skl2 == null)
+		
+		//--HasBeenSegmented--
+		if (tc1.hasBeenSegmented() != tc2.hasBeenSegmented()) {
+			LOGGER.warning("compareTextContainer warning: hasBeenSegmented difference.");
+			return false;
+		}
+
+		//--PROPERTY CHECK--
+		if( !tc1.getPropertyNames().equals(tc2.getPropertyNames()) ){
+			LOGGER.warning("compareTextContainer warning: TextContainer properties difference.");
+			return false;
+		}
+		
+		for (String name : tc1.getPropertyNames()) {
+			if(!compareProperties(tc1.getProperty(name), tc2.getProperty(name)) ){
 				return false;
-			tmp1 = skl1.toString();
-			tmp2 = skl2.toString();
-			if (tmp1 == null) {
-				if (tmp2 != null)
-					return false;
-			} else {
-				if (tmp2 == null)
-					return false;
-				if (!tmp1.equals(tmp2)) {
-					System.err.println("Skeleton differences: 1='" + tmp1 + "'\n2='" + tmp2 + "'");
+			}
+		}
+		
+		//--TextPart count--
+		if (tc1.count() != tc2.count()) {
+			LOGGER.warning("compareTextContainer warning: TextPart count difference.\n" +
+					"tc1=" + tc1.count() + "\ntc2="+ tc2.count() );
+			return false;
+		}
+		
+		//--Segments--
+		//if (tc1.hasBeenSegmented()) {
+			
+			Iterator<TextPart> it1 = tc1.iterator();
+			Iterator<TextPart> it2 = tc2.iterator();
+			
+			while ( it1.hasNext() ){
+				TextPart tp1 = it1.next();
+				TextPart tp2 = it2.next();
+				
+				if( !(tp1.isSegment()) == (tp2.isSegment())){
+					LOGGER.warning("compareTextContainer warning: TextContainer TextPart <--> Segment difference.");
 					return false;
 				}
+				
+				if (tp1.isSegment()){
+					if( !compareSegments((Segment)tp1, (Segment)tp2)){
+						return false;
+					}
+				}else{
+					if( !compareTextParts(tp1, tp2)){
+						return false;
+					}
+				}
+		    }
+		//}
+
+		return true;
+	}
+
+	/**
+	 * Compares two Segments. 
+	 * @param seg1 First Segment
+	 * @param seg2 Second Segment
+	 * @return true if equal else false
+	 */
+	public boolean compareSegments(Segment seg1, Segment seg2) {
+		
+		//--both are null no point checking anything else--
+		if(bothAreNull(seg1,seg2)){
+			return true;
+		}
+		
+		//--one is null--
+		if( oneIsNulll(seg1,seg2,"compareSegments","Segment")
+				|| oneIsNulll(seg1.getId(),seg2.getId(),"compareSegment","Segment Id")){
+			return false;
+		}
+
+		//--Id--
+		if( !bothAreNull(seg1.getId(),seg2.getId()) ){
+			if ( !seg1.getId().equals(seg2.getId()) ) {
+				LOGGER.warning("compareSegment warning: Segment Id difference.");
+				return false;
 			}
 		}
 
-		//--TODO: How about annotations
+		//--Content--
+		if ( !compareTextFragments(seg1.getContent(), seg2.getContent()) ){
+			return false;
+		}
 		
 		return true;
 	}
 	
-	
-	public static boolean compareProperty(Property p1, Property p2) {
-		if (p1 == null) {
-			if (p2 != null) {
-				System.err.println("Property name null difference");
-				return false;
-			}
+	/**
+	 * Compares two TextPart. 
+	 * @param tp1 First TextPart
+	 * @param tp2 Second TextPart
+	 * @return true if equal else false
+	 */
+	public boolean compareTextParts(TextPart tp1, TextPart tp2) {
+		
+		//--both are null no point checking anything else--
+		if(bothAreNull(tp1,tp2)){
 			return true;
 		}
-		if (p2 == null) {
-			System.err.println("Property name null difference");
+		
+		//--one is null--
+		if( oneIsNulll(tp1,tp2,"compareTextPart","TextPart") ){
 			return false;
 		}
-
-		if (!p1.getName().equals(p2.getName())) {
-			System.err.println("Property name difference");
+		
+		//--Content--
+		if ( !compareTextFragments(tp1.getContent(), tp2.getContent()) ){
 			return false;
 		}
-		if (p1.isReadOnly() != p2.isReadOnly()) {
-			System.err.println("Property isReadOnly difference");
-			return false;
-		}
-		if (p1.getValue() == null) {
-			if (p2.getValue() != null) {
-				System.err.println("Property value null difference");
-				return false;
-			}
-			return true;
-		}
-		if (!p1.getValue().equals(p2.getValue())) {
-			System.err.println("Property value difference");
-		}
+		
 		return true;
 	}
 	
-	public static boolean compareTextContainer(TextContainer t1, TextContainer t2) {
-		if (t1 == null) {
-			System.err.println("Text container null difference");
-			return (t2 == null);
-		}
-		if (t2 == null) {
-			System.err.println("Text container null difference");
-			return false;
-		}
-
-		if (!compareTextFragment(t1.getUnSegmentedContentCopy(), t2.getUnSegmentedContentCopy())) {
-			System.err.println("Fragment difference");
-			return false;
-		}
-
-		if (t1.hasBeenSegmented()) {
-			if (!t2.hasBeenSegmented()) {
-				System.err.println("isSegmented difference");
-				return false;
-			}
-			ISegments t1Segments = t1.getSegments();
-			ISegments t2Segments = t2.getSegments();
-			if (t1Segments.count() != t2Segments.count()) {
-				System.err.println("Number of segments difference");
-				return false;
-			}
-
-			for (Segment seg1 : t1Segments) {
-				Segment seg2 = t2Segments.get(seg1.id);
-				if (seg2 == null) {
-					System.err.println("Segment in t2 not found.");
-					return false;
-				}
-				if (!compareTextFragment(seg1.text, seg2.text)) {
-					System.err.println("Text fragment difference");
-					return false;
-				}
-			}
-		} else {
-			if (t2.hasBeenSegmented()) {
-				System.err.println("Segmentation difference");
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	public static boolean compareTextFragment(TextFragment tf1, TextFragment tf2) {
-		if (tf1 == null) {
-			if (tf2 != null) {
-				System.err.println("Fragment null difference");
-				return false;
-			}
+	/**
+	 * Compares two TextFragments. Basically it's the TextFragments own compareTo with additional null checks
+	 * @param tf1 First TextFragment
+	 * @param tf2 Second TextFragment
+	 * @return true if equal else false
+	 */
+	public boolean compareTextFragments(TextFragment tf1, TextFragment tf2) {
+		
+		//--both are null no point checking anything else--
+		if(bothAreNull(tf1,tf2)){
 			return true;
 		}
-		if (tf2 == null) {
-			System.err.println("Fragment null difference");
+		
+		//--one is null--
+		if(oneIsNulll(tf1,tf2,"compareTextFragment","TextFragment") ){
 			return false;
 		}
 
+		//--number of codes/this would get caught by coded text but with less detail--
 		List<Code> codes1 = tf1.getCodes();
 		List<Code> codes2 = tf2.getCodes();
+		
+		//--code count--
 		if (codes1.size() != codes2.size()) {
-			System.err.println("Number of codes difference");
-			System.err.println("original codes=" + codes1.toString());
-			System.err.println("     new codes=" + codes2.toString());
+			LOGGER.warning("compareTextFragment warning: TextFragment code count difference.\n" +
+					"tf1=" + codes1.size() + "\ntf2="+ codes2.size());
 			return false;
 		}
+
+		//--coded text--
+		if (!tf1.getCodedText().equals(tf2.getCodedText())) {
+			//if(tf1.compareTo(tf2) != 0){
+			LOGGER.warning("compareTextFragment warning: TextFragment coded text difference.\n" +
+					"text1=\"" + tf1.getCodedText() + "\"\ntext2=\""+ tf2.getCodedText() + "\"");
+			return false;
+		}
+		
 		for (int i = 0; i < codes1.size(); i++) {
+			
 			Code code1 = codes1.get(i);
 			Code code2 = codes2.get(i);
+			
+			// Id
 			if (code1.getId() != code2.getId()) {
-				System.err.println("ID difference");
+				LOGGER.warning("compareTextFragment warning: TextFragment Code id difference.\n" +
+						"code1 id=\"" + code1.getId() + "\"\ncode2 id=\""+ code2.getId() + "\"");
 				return false;
 			}
+
 			// Data
-			String tmp1 = code1.getData();
-			String tmp2 = code2.getData();
-			if (tmp1 == null) {
-				if (tmp2 != null) {
-					System.err.println("Data null difference");
-					return false;
-				}
-			} else {
-				if (tmp2 == null) {
-					System.err.println("Data null difference");
-					return false;
-				}
-				if (!tmp1.equals(tmp2)) {
-					System.err.println("Data difference: 1=[" + tmp1 + "] and 2=[" + tmp2 + "]");					
-					return false;
-				}
+			if ( !code1.getData().equals(code2.getData()) ) {
+				LOGGER.warning("compareTextFragment warning: TextFragment Code data difference.\n" +
+						"code1 data=\"" + code1.getData() + "\"\ncode2 data=\""+ code2.getData() + "\"");
+				return false;
 			}
+
 			// Outer data
-			tmp1 = code1.getOuterData();
-			tmp2 = code2.getOuterData();
-			if (tmp1 == null) {
-				if (tmp2 != null) {
-					System.err.println("Outer data null difference");
-					return false;
-				}
-			} else {
-				if (tmp2 == null) {
-					System.err.println("Outer data null difference");
-					return false;
-				}
-				if (!tmp1.equals(tmp2)) {
-					System.err.println("Outer data difference");
-					return false;
-				}
+			if ( !code1.getOuterData().equals(code2.getOuterData()) ) {
+				LOGGER.warning("compareTextFragment warning: TextFragment Code outer data difference.\n" +
+						"code1 outerdata=\"" + code1.getOuterData() + "\"\ncode2 outerdata=\""+ code2.getOuterData() + "\"");
+				return false;
 			}
-			// Type
-			tmp1 = code1.getType();
-			tmp2 = code2.getType();
-			if (tmp1 == null) {
-				if (tmp2 != null) {
-					System.err.println("Type null difference");
-					return false;
-				}
-			} else {
-				if (tmp2 == null) {
-					System.err.println("Type null difference");
-					return false;
-				}
-				if (!tmp1.equals(tmp2)) {
-					System.err.println("Type difference");
-					return false;
-				}
+			
+			if ( !code1.getType().equals(code2.getType()) ) {
+				LOGGER.warning("compareTextFragment warning: TextFragment Code type difference.\n" +
+						"code1 type=\"" + code1.getType() + "\"\ncode2 type=\""+ code2.getType() + "\"");
+				return false;
 			}
-			// Tag type
 			if (code1.getTagType() != code2.getTagType()) {
-				System.err.println("Tag-type difference");
+				LOGGER.warning("compareTextFragment warning: TextFragment Code TagType difference.");
 				return false;
 			}
 			if (code1.hasReference() != code2.hasReference()) {
-				System.err.println("hasReference difference");
+				LOGGER.warning("compareTextFragment warning: TextFragment Code hasReference difference.");
 				return false;
 			}
 			if (code1.isCloneable() != code2.isCloneable()) {
-				System.err.println("isCloenable difference");
+				LOGGER.warning("compareTextFragment warning: TextFragment Code isCloenable difference.");
 				return false;
 			}
 			if (code1.isDeleteable() != code2.isDeleteable()) {
-				System.err.println("isDeleteable difference");
+				LOGGER.warning("compareTextFragment warning: TextFragment Code isDeleteable difference.");
 				return false;
 			}
 			if (code1.hasAnnotation() != code2.hasAnnotation()) {
-				System.err.println("annotation difference");
+				LOGGER.warning("compareTextFragment warning: TextFragment Code hasAnnotation difference.");
 				return false;
 			}
-			// TODO: compare annotations
+			
+			if (code1.hasAnnotation() != code2.hasAnnotation()) {
+				LOGGER.warning("compareTextFragment warning: TextFragment Code hasAnnotation difference.");
+				return false;
+			}
 		}
-
-		// Coded text
-		if (!tf1.getCodedText().equals(tf2.getCodedText())) {
-			System.err.println("Coded text difference:\n1=\"" + tf1.getCodedText() + "\"\n2=\""
-					+ tf2.getCodedText() + "\"");
+		
+		// CodesToString
+		String codeStr1 = Code.codesToString(codes1);
+		String codeStr2 = Code.codesToString(codes2);
+		if ( !codeStr1.equals(codeStr2) ) {
+			LOGGER.warning("compareTextFragment warning: TextFragment Code string difference.\n" +
+					"code1=\"" + codeStr1 + "\"\ncode2=\""+ codeStr2 + "\"");
 			return false;
 		}
+		
 		return true;
+	}
+	
+	
+	/**
+	 * Compare two INameables (Assuming isTranslatable() and preserveWhitespaces() do not return null)
+	 * @param n1 First INameable
+	 * @param n2 Second INameable
+	 * @return true if equal else false
+	 */	
+	public boolean compareINameables(INameable n1, INameable n2) {
+		
+		//--both are null no point checking anything else--
+		if(bothAreNull(n1,n2)){
+			return true;
+		}
+		
+		//--one is null--
+		if(oneIsNulll(n1,n2,"compareINameable","INameable") 
+				|| oneIsNulll(n1.getName(),n2.getName(),"compareINameable","INameable Name")
+				|| oneIsNulll(n1.getType(),n2.getType(),"compareINameable","INameable Type")
+				|| oneIsNulll(n1.getMimeType(),n2.getMimeType(),"compareINameable","INameable MimeType")){
+			return false;
+		}
+
+		//--Name--
+		if( !bothAreNull(n1.getName(),n2.getName()) ){
+			if (!n1.getName().equals(n2.getName())) {
+				LOGGER.warning("compareINameables warning: INameable Name difference.");
+				return false;
+			}
+		}
+
+		//--Type--
+		if( !bothAreNull(n1.getType(),n2.getType()) ){
+			if (!n1.getType().equals(n2.getType())) {
+				LOGGER.warning("compareINameables warning: INameable Type difference.");
+				return false;
+			}
+		}
+
+		//--MimeType--
+		if( !bothAreNull(n1.getMimeType(),n2.getMimeType()) ){
+			if (!n1.getMimeType().equals(n2.getMimeType())) {
+				LOGGER.warning("compareINameables warning: INameable MimeType difference.");
+				return false;
+			}
+		}
+		
+		//--IsTranslatable--
+		if (n1.isTranslatable() != n2.isTranslatable()) {
+			LOGGER.warning("compareINameables warning: INameable isTranslatable difference.");
+			return false;
+		}
+
+		//--PreserveWhitespaces--
+		if (n1.preserveWhitespaces() != n2.preserveWhitespaces()) {
+			LOGGER.warning("compareINameables warning: INameable isTranslatable difference.");
+			return false;
+		}
+		
+		//--PROPERTY CHECK--
+		if( !n1.getPropertyNames().equals(n2.getPropertyNames()) ){
+			LOGGER.warning("compareINameables warning: INameable properties difference.");
+			return false;
+		}
+		
+		for (String name : n1.getPropertyNames()) {
+			if(!compareProperties(n1.getProperty(name), n2.getProperty(name)) ){
+				return false;
+			}
+		}
+		
+		//--SOURCE PROPERTY CHECK--
+		if( !n1.getSourcePropertyNames().equals(n2.getSourcePropertyNames()) ){
+			LOGGER.warning("compareINameables warning: INameable source properties difference.");
+			return false;
+		}
+		
+		for (String name : n1.getSourcePropertyNames()) {
+			if(!compareProperties(n1.getSourceProperty(name), n2.getSourceProperty(name)) ){
+				return false;
+			}
+		}		
+		
+		//--TARGET LOCALE CHECK--
+		if( !n1.getTargetLocales().equals(n2.getTargetLocales()) ){
+			LOGGER.warning("compareINameables warning: INameable target locales difference.");
+			return false;
+		}
+		
+		for (LocaleId locId : n1.getTargetLocales()) {
+
+			//--TARGET PROPERTY CHECK--
+			if( !n1.getTargetPropertyNames(locId).equals(n2.getTargetPropertyNames(locId)) ){
+				LOGGER.warning("compareINameables warning: INameable target properties difference.");
+				return false;
+			}
+			
+			for (String name : n1.getTargetPropertyNames(locId)) {
+				if(!compareProperties(n1.getTargetProperty(locId, name), n2.getTargetProperty(locId, name)) ){
+					return false;
+				}
+			}		
+		}
+
+		//--COMPARE IRESOURCE PORTION--
+		if (!compareIResources(n1, n2)) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Compare two IResources (Assuming isTranslatable() and preserveWhitespaces() do not return null)
+	 * @param r1 First IResource
+	 * @param r2 Second IResource
+	 * @return true if equal else false
+	 */	
+	public boolean compareIResources(IResource r1, IResource r2){
+
+		//--both are null no point checking anything else--
+		if(bothAreNull(r1,r2)){
+			return true;
+		}
+		
+		//--one is null--
+		if(oneIsNulll(r1,r2,"compareIResource","IResource") 
+				|| oneIsNulll(r1.getId(),r2.getId(),"compareIResource","IResource Id")){
+			return false;
+		}
+		
+		if( !bothAreNull(r1.getId(),r2.getId()) ){
+			if (!r1.getId().equals(r2.getId())) {
+				LOGGER.warning("compareIResource warning: IResource Id difference.");
+				return false;
+			}
+		}
+		
+		// Skeleton
+		if ( !compareSkeleton ) {
+			return true;
+		}
+
+		//--both are null no point checking anything else--
+		if( bothAreNull(r1.getSkeleton(),r2.getSkeleton()) ){
+			return true;
+		}
+
+		//--one is null--
+		if(oneIsNulll(r1.getSkeleton(),r2.getSkeleton(),"compareIResource","IResource skeleton") || oneIsNulll(r1.getSkeleton().toString(),r2.getSkeleton().toString(),"compareIResource","IResource skeleton string")){
+			return false;
+		}
+
+		if (!r1.getSkeleton().toString().equals(r2.getSkeleton().toString())) {
+			LOGGER.warning("compareIResource warning: Skeleton content difference.\n" +
+					"skel1=\"" + r1.getSkeleton().toString() + "\"\nskel2=\""+ r2.getSkeleton().toString() + "\"");
+			return false;
+		}
+
+		return true;
+	}
+
+	
+	/**
+	 * Compare two IReferenceables (Assuming isReferent() and referenceCount() do not return null) 
+	 * @param r1 First IReferencable
+	 * @param r2 Second IReferencable
+	 * @return true if equal else false
+	 */
+	public boolean compareIReferenceables(IReferenceable r1, IReferenceable r2) {
+		
+		//--both are null no point checking anything else--
+		if(bothAreNull(r1,r2)){
+			return true;
+		}
+		
+		//--one is null--
+		if(oneIsNulll(r1,r2,"compareIReferenceable","IReferenceable") ){
+			return false;
+		}
+		
+		//--IsReferent--
+		if (r1.isReferent() != r2.isReferent()) {
+			LOGGER.warning("compareIReferenceable warning: IReferenceable isReferent difference.");
+			return false;
+		}
+
+		//--ReferenceCount--
+		if (r1.getReferenceCount() != r2.getReferenceCount()) {
+			LOGGER.warning("compareIReferenceable warning: IReferenceable getReferenceCount difference.");
+			return false;
+		}
+		
+		return true;
+	}
+
+	/**
+	 * Compare two Properties
+	 * @param p1 First Property  
+	 * @param p2 Second Property 
+	 * @return true if equal else false
+	 */
+	public boolean compareProperties(Property p1, Property p2) {
+
+		//--both are null no point checking anything else--
+		if(bothAreNull(p1,p2)){
+			return true;
+		}
+		
+		//--one is null--
+		if(oneIsNulll(p1,p2,"compareProperty","Property") 
+				|| oneIsNulll(p1.getName(),p2.getName(),"compareProperty","Property Name") 
+				|| oneIsNulll(p1.getValue(),p2.getValue(),"compareProperty","Property Value")){
+			return false;
+		}
+
+		if( !bothAreNull(p1.getName(),p2.getName()) ){
+			if (!p1.getName().equals(p2.getName())) {
+				LOGGER.warning("compareProperty warning: Property name difference.");
+				return false;
+			}
+		}
+		if( !bothAreNull(p1.getValue(),p2.getValue()) ){
+			if (!p1.getValue().equals(p2.getValue())) {
+				LOGGER.warning("compareProperty warning: Property value difference.");
+				return false;
+			}
+		}
+		if (p1.isReadOnly() != p2.isReadOnly()) {
+			LOGGER.warning("compareProperty warning: isReadOnly difference.");
+			return false;
+		}
+		
+		return true;
+	}
+	
+	/**
+	 * Checks if both objects are null
+	 * @param o1 First Object
+	 * @param o2 Second Object
+	 * @return true if both are null else false 
+	 */
+	public boolean bothAreNull(Object o1, Object o2){
+		
+		if (o1 == null && o2 == null){
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Checks if one object is null
+	 * @param o1 First Object
+	 * @param o2 Second Object
+	 * @param function The function initiating the call. Used for logging. 
+	 * @param type The object type. Used for logging.
+	 * @return True if one object is null
+	 */
+	public boolean oneIsNulll(Object o1, Object o2, String function, String type){
+		
+		if (o1 == null && o2 != null){
+			LOGGER.warning(function+ " warning: "+type+" 1 is null and "+type+" 2 is not null.");
+			return true;
+		} 
+		if (o1 != null && o2 == null){				
+			LOGGER.warning(function+ " warning: "+type+" 1 is not null and "+type+" 2 is null.");
+			return true;
+		}
+		return false;
 	}
 }
