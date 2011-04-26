@@ -1095,8 +1095,11 @@ public class FilterTestDriver {
 
 	public static boolean compareTextContainer(TextContainer t1, TextContainer t2) {
 		if (t1 == null) {
-			System.err.println("Text container null difference");
-			return (t2 == null);
+			if (t2 != null) {
+				System.err.println("Text container null difference");
+				return false;
+			}
+			return true;
 		}
 		if (t2 == null) {
 			System.err.println("Text container null difference");
