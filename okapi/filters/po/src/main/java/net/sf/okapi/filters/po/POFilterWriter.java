@@ -317,7 +317,7 @@ public class POFilterWriter implements IFilterWriter {
 			}
 
 			// Fuzzy
-			TextContainer tc = plurals.get(0).getTarget(language, false);
+			TextContainer tc = plurals.get(0).getTarget(language);
 			if ( tc != null ) {
 				Property prop = tc.getProperty(Property.APPROVED);
 				if ( prop != null ) {
@@ -340,7 +340,7 @@ public class POFilterWriter implements IFilterWriter {
 			for ( ITextUnit tu : plurals ) {
 				writer.write(String.format("msgstr[%d] ", count));
 				if ( tu.hasTarget(language) && !makePOT ) {
-					writeQuotedContent(tu.getTarget(language, false));
+					writeQuotedContent(tu.getTarget(language));
 				}
 				else {
 					writer.write("\"\"");
@@ -360,7 +360,7 @@ public class POFilterWriter implements IFilterWriter {
 			ITextUnit tu = event.getTextUnit();
 			if ( tu.isEmpty() ) return; // Do not write out entries with empty source
 			
-			TextContainer tc = tu.getTarget(language, false);
+			TextContainer tc = tu.getTarget(language);
 			Property prop = null;
 			if ( tc != null ) {
 				prop = tc.getProperty(Property.APPROVED);

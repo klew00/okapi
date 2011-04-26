@@ -364,7 +364,7 @@ public class PairEditorUserTest {
 			}
 			
 			// Get the existing target, or create an empty one, segmented if needed
-			trgCont = tu.getTarget(trgLoc, false);
+			trgCont = tu.getTarget(trgLoc);
 			if ( trgCont == null ) {
 				// Create a copy
 				trgCont = tu.createTarget(trgLoc, false, IResource.COPY_ALL);
@@ -554,7 +554,7 @@ System.out.println(String.format("displayNext = %d", System.currentTimeMillis()-
 					if ( !oriTU.getId().equals(updTU.getId()) ) {
 						throw new RuntimeException("Text units de-synchronized: the underlying file has changed.");
 					}
-					TextContainer tc = updTU.getTarget(trgLoc, false);
+					TextContainer tc = updTU.getTarget(trgLoc);
 					if ( tc != null ) oriTU.setTarget(trgLoc, tc);
 					tuIndex++;
 					break;

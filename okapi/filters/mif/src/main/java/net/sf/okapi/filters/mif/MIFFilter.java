@@ -75,7 +75,7 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
 @UsingParameters(Parameters.class)
 public class MIFFilter implements IFilter {
 	
-	public static final String FRAMEROMAN = "x-FrameRoman"; //"x-MacRoman"; //TODO: Set to x-FrameRoman when ready
+	public static final String FRAMEROMAN = "x-FrameRoman";
 
 	private final Logger logger = Logger.getLogger(getClass().getName());
 
@@ -112,8 +112,13 @@ public class MIFFilter implements IFilter {
 	private String version;
 	private String sdId;
 	private int paraLevel;
-	private StringBuilder paraBuf;
-	private boolean paraBufNeeded;
+//	private StringBuilder paraBuf;
+	private StringBuilder paraSkelBuf;
+	private StringBuilder paraTextBuf;
+	private StringBuilder paraCodeBuf;
+	private StringBuilder paraCodeTypes;
+//	private int paraLineLevel;
+//	private boolean paraBufNeeded;
 	private int tableGroupLevel;
 	private int rowGroupLevel;
 	private int cellGroupLevel;
@@ -127,10 +132,10 @@ public class MIFFilter implements IFilter {
 	private CharsetDecoder[] decoders;
 	private boolean[] doubleConversion;
 	private CharsetDecoder firstDecoder;
-	private CharsetEncoder firstEncoder;
+//	private CharsetEncoder firstEncoder;
 	private CharsetEncoder[] encoders;
 	private CharsetDecoder currentDecoder;
-	private CharsetEncoder currentEncoder;
+//	private CharsetEncoder currentEncoder;
 	private boolean doDoubleConversion;
 	private int currentCharsetIndex;
 	private MIFEncoder encoder;
@@ -274,7 +279,10 @@ public class MIFFilter implements IFilter {
 	private void initialize () {
 		tagBuffer = new StringBuilder();
 		strBuffer = new StringBuilder();
-		paraBuf = new StringBuilder();
+		paraSkelBuf = new StringBuilder();
+		paraCodeBuf = new StringBuilder();
+		paraCodeTypes = new StringBuilder();
+		paraTextBuf = new StringBuilder();
 		tuId = 0;
 		otherId = 0;
 		grpId = 0;
@@ -351,7 +359,7 @@ public class MIFFilter implements IFilter {
 			
 			// Initialize the decoders
 			firstDecoder = csProvider.charsetForName(FRAMEROMAN).newDecoder();
-			firstEncoder = Charset.forName("Windows-1252").newEncoder();
+//			firstEncoder = Charset.forName("Windows-1252").newEncoder();
 			currentCharsetIndex = 0;
 			doubleConversion = new boolean[2];
 			doubleConversion[0] = false;
@@ -374,7 +382,7 @@ public class MIFFilter implements IFilter {
 				encoders[0] = Charset.forName(baseEncoding).newEncoder();
 			}
 			encoders[1] = encoders[0];
-			currentEncoder = encoders[currentCharsetIndex];
+//			currentEncoder = encoders[currentCharsetIndex];
 			byteStream = new ByteArrayOutputStream(20);
 			
 			queue = new LinkedList<Event>();
@@ -873,7 +881,6 @@ public class MIFFilter implements IFilter {
 			}
 		}
 		// A comment can end the file
-		// Actually that's the case most of the time
 	}
 
 	private boolean startBlock (int stopLevel,
@@ -957,6 +964,134 @@ public class MIFFilter implements IFilter {
 		}
 	}
 
+	private void processPara ()
+		throws IOException
+	{
+		TextFragment tf = new TextFragment();
+		boolean first = true;
+		paraLevel = 1;
+		paraSkelBuf.setLength(0);
+		paraTextBuf.setLength(0);
+		paraCodeBuf.setLength(0);
+		paraCodeTypes.setLength(0);
+		String endString = null;
+		resetToDefaultDecoder();
+		Code code = null;
+		boolean extractedMarker = false;
+
+		// Go to the first ParaLine
+		int res = readUntilText(first, false);
+		while ( res > 0 ) {
+			
+			// Get the text to append
+			switch ( res ) {
+			case 2: // Extracted marker
+				code = new Code(TagType.PLACEHOLDER, "index", "'>"+TextFragment.makeRefMarker(refTU.getId())+"<String `");
+				code.setReferenceFlag(true);
+				extractedMarker = true;
+				break;
+			}
+			
+			if ( first ) {
+				if ( paraSkelBuf.length() > 0 ) {
+					skel.append(paraSkelBuf.toString());
+					skel.append("<String `");
+					endString = "'>";
+				}
+				first = false;
+			}
+			if ( paraCodeBuf.length() > 0 ) {
+				Code code2 = new Code(TagType.PLACEHOLDER,
+					(( paraCodeTypes.length() > 0 ) ? paraCodeTypes.toString() : "code"),
+					"'>"+paraCodeBuf.toString()+"<String `");
+				tf.append(code2);
+			}
+			
+			if ( code != null ) {
+				tf.append(code);
+				code = null;
+			}
+			if ( paraTextBuf.length() > 0 ) {
+				tf.append(paraTextBuf.toString());
+			}
+			
+			// Reset the codes buffer for next sequence
+			paraSkelBuf.setLength(0);
+			paraTextBuf.setLength(0);
+			paraCodeBuf.setLength(0);
+			paraCodeTypes.setLength(0);
+			// Move to the next text
+			res = readUntilText(first, false);
+		}
+
+		// Check for inline codes
+		checkInlineCodes(tf);
+
+		ITextUnit tu = null;
+		if ( !tf.isEmpty() ) {
+			if ( tf.hasText() || extractedMarker ) {
+				// Add the text unit to the queue
+				tu = new TextUnit(String.valueOf(++tuId));
+				tu.setPreserveWhitespaces(true);
+				tu.setSourceContent(tf);
+				tu.setName(resname); resname = null;
+				queue.add(new Event(EventType.TEXT_UNIT, tu, skel));
+
+				// Try to simplify when there is only one leading code which is a font
+				if ( tf.getCodedText().charAt(0) == TextFragment.MARKER_ISOLATED ) {
+					if ( tf.getCodes().size() == 1 ) {
+						code = tf.getCode(0);
+						if ( code.getType().equals("font") ) {
+							// Only one code, it's leading and it's a font: we can move it to the skeleton
+							Code tmp = tf.getCode(0);
+							tf.remove(0, 2);
+							skel.append(tmp.toString());
+						}
+					}
+				}
+				// Add the TU place holder in the skeleton
+				skel.addContentPlaceholder(tu);
+			}
+			else { // No text (only codes and/or white spaces) Put back the content/codes in skeleton
+				// We need to escape the text parts (white spaces like tabs)
+				String ctext = tf.getCodedText();
+				StringBuilder tmp = new StringBuilder();
+				for ( int i=0; i<ctext.length(); i++ ) {
+					char ch = ctext.charAt(i);
+					if ( TextFragment.isMarker(ch) ) {
+						tmp.append(tf.getCode(ctext.charAt(++i)));
+					}
+					else {
+						tmp.append(encoder.encode(ch, 1));
+					}
+				}
+				GenericSkeletonPart part = skel.getLastPart();
+				if (( part == null ) || !part.getData().toString().endsWith("<String `") ) {
+					skel.append("<String `");
+					endString = "'>";
+				}
+				skel.append(tmp.toString());
+			}
+		}
+		
+		if ( endString != null ) {
+			skel.append(endString);
+		}
+		// Ending part
+		if ( paraSkelBuf.length() > 0 ) {
+			skel.append(paraSkelBuf.toString());
+		}
+		if ( paraCodeBuf.length() > 0 ) {
+			skel.append(paraCodeBuf.toString());
+		}
+
+		if ( tu != null ) {
+			// New skeleton object for the next parts of the parent statement
+			skel = new GenericSkeleton();
+		}
+	}
+	
+/*============ before changes to extract leading codes
 	private void processPara ()
 		throws IOException
 	{
@@ -1083,7 +1218,8 @@ public class MIFFilter implements IFilter {
 			skel = new GenericSkeleton();
 		}
 	}
-	
+===========*/
+
 	private MIFToken getNextTokenInStatement (boolean store,
 		StringBuilder sb,
 		boolean updateBlockLevel)
@@ -1250,7 +1386,153 @@ public class MIFFilter implements IFilter {
 		blockLevel = level;
 		return res;
 	}
+
+	/**
+	 * Reads until the next text.
+	 * @param startOfPara true to indicate a start of paragraph.
+	 * @param significant indicates if the current buffer is significant or can be removed.
+	 * Set always to false except sometimes when called recursively.
+	 * @return 0=end of paragraph, 1=text, 2=marker
+	 */
+	private int readUntilText (boolean startOfPara,
+		boolean significant)
+		throws IOException
+	{
+		StringBuilder sb;
+		if ( startOfPara ) sb = paraSkelBuf;
+		else sb = paraCodeBuf;
+		
+		int c;
+		while ( (c = reader.read()) != -1 ) {
+			switch ( c ) {
+			case '#':
+				sb.append((char)c);
+				readComment(true, sb);
+				break;
+				
+			case '<': // Start of statement
+				paraLevel++;
+				sb.append((char)c);
+				String tag = readTag(true, false, sb);
+				if ( "ParaLine".equals(tag) ) {
+					if ( !startOfPara ) {
+						int n = sb.lastIndexOf("<");
+						if ( significant ) sb.delete(n, sb.length());
+						else sb.setLength(0);
+					}
+					return readUntilText(startOfPara, significant);
+				}
+				else if ( "String".equals(tag) ) {
+					String text = processString(false, null);
+					int n = sb.lastIndexOf("<");
+					if ( significant ) sb.delete(n, sb.length());
+					else sb.setLength(0);
+					paraLevel--;
+					if ( !Util.isEmpty(text) ) {
+						paraTextBuf.append(text);
+						return 1;
+					}
+					// Else: continue. This basically remove the empty string
+				}
+				else if ( "Char".equals(tag) ) {
+					String text = processChar(false).toString();
+					if ( !significant ) sb.setLength(0);
+					paraLevel--;
+					if ( !Util.isEmpty(text) ) {
+						paraTextBuf.append(text);
+						return 1;
+					}
+				}
+				else if ( "Marker".equals(tag) ) {
+					int n = sb.lastIndexOf("<Marker");
+					if ( significant ) sb.delete(n, sb.length());
+					else sb.setLength(0);
+					Object[] res = processMarker();
+					significant = true;
+					if ( paraCodeTypes.length() > 0 ) paraCodeTypes.append(";");
+					paraCodeTypes.append(tag.toLowerCase());
+					paraLevel--;
+					if ( res[1] != null ) { // We have a text unit
+						return 2;
+					}
+					// No text unit: nothing to extract
+					sb.append(res[0]);
+				}
+				else if ( !useUTF && "PgfTag".equals(tag) ) {
+					// Try to update the encoding based of the font for the given paragraph tag
+					processString(true, sb);
+					//for test
+//					String paraName = processString(true, sb);
+//					if ( "Haupttext".equals(paraName) ) {
+//						updateCurrentDecoder("windows-1253", true);
+//					}
+					significant = true;
+					if ( paraCodeTypes.length() > 0 ) paraCodeTypes.append(";");
+					paraCodeTypes.append(tag.toLowerCase());
+					paraLevel--;
+				}
+				else if ( "Font".equals(tag) ) {
+					// Do the font-driven encoding resolving only for non-UTF-8 files
+					//TODO: Is it safe? need to be verified
+					monitorFontEncoding(sb);
+					significant = true;
+					if ( paraCodeTypes.length() > 0 ) paraCodeTypes.append(";");
+					paraCodeTypes.append(tag.toLowerCase());
+					paraLevel--;
+				}
+				// Default: skip over
+				else {
+					skipOverContent(true, sb);
+					significant = true;
+					if ( paraCodeTypes.length() > 0 ) paraCodeTypes.append(";");
+					paraCodeTypes.append(tag.toLowerCase());
+					paraLevel--;
+				}
+				
+				if ( startOfPara ) {
+					// Check for inline codes: tags that should be inline even when they are leading before any text
+					if ( "Font;Marker;Conditional;Unconditional;ATbl;AFrame;FNote;Variable;XRef;XRefEnd;".indexOf(tag) != -1 ) {
+						// Switch buffer
+						int n = sb.lastIndexOf("<"+tag+" ");
+						paraCodeBuf.append(sb.substring(n));
+						sb.delete(n, sb.length()); // Remove from buffer since it's in the code now
+						sb = paraCodeBuf;
+						paraCodeTypes.setLength(0); // Rest for inline codes
+						paraCodeTypes.append(tag.toLowerCase());
+						startOfPara = false; // Done
+					}
+				}
+				break;
+				
+			case '>': // End of statement
+				paraLevel--;
+				if ( paraLevel != 1 ) { // Exclude closing ParaLine
+					sb.append((char)c);
+					significant = true;
+				}				
+				if ( paraLevel == 0 ) {
+					// Add final close of ParaLine
+					int n = sb.lastIndexOf(" # end of ParaLine");
+					// Do it before the corresponding comment if possible
+					if ( n > -1 ) {
+						sb.insert(n, '>');
+					}
+					else {
+						sb.append(" # end of ParaLine"+lineBreak+">");
+					}
+					return 0;
+				}
+				break;
+
+			default:
+				sb.append((char)c);
+				break;
+			}
+		}
+		return 0;
+	}
 	
+/*================= before changes to process leading codes	
 	private int readUntilText (StringBuilder sb,
 		boolean checkIfParaBufNeeded)
 		throws IOException
@@ -1330,6 +1612,7 @@ public class MIFFilter implements IFilter {
 		}
 		return 0;
 	}
+=====*/
 
 	private void monitorFontEncoding (StringBuilder sb)
 		throws IOException
@@ -1384,8 +1667,10 @@ public class MIFFilter implements IFilter {
 			case '>':
 				baseLevel--;
 				if ( baseLevel == 0 ) {
-					Object[] res = mapFontEncoding(ftag, encoding, fontHint);
-					updateCurrentDecoder((String)res[0], (Boolean)res[1]);
+					if ( !useUTF ) {
+						Object[] res = mapFontEncoding(ftag, encoding, fontHint);
+						updateCurrentDecoder((String)res[0], (Boolean)res[1]);
+					}
 					return;
 				}
 				break;
@@ -1399,7 +1684,7 @@ public class MIFFilter implements IFilter {
 	private void resetToDefaultDecoder () {
 		currentCharsetIndex = 0;
 		currentDecoder = decoders[0];
-		currentEncoder = encoders[0];
+//		currentEncoder = encoders[0];
 		doDoubleConversion = doubleConversion[0];
 	}
 
@@ -1492,7 +1777,7 @@ public class MIFFilter implements IFilter {
 			}
 			// Set the current one
 			currentDecoder = decoders[currentCharsetIndex];
-			currentEncoder = encoders[currentCharsetIndex];
+//			currentEncoder = encoders[currentCharsetIndex];
 			doDoubleConversion = doubleConversion[currentCharsetIndex];
 		}
 		// Else: current decoder in fine

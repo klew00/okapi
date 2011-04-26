@@ -29,7 +29,6 @@ import net.sf.okapi.common.resource.AlignedPair;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextPart;
-import net.sf.okapi.common.resource.TextUnitUtil;
 
 /**
  * SentenceAligner aligns source and target (paragraph) {@link TextUnit}s and returns a list of aligned sentence-based
@@ -136,14 +135,14 @@ public class SentenceAligner {
 		// To prevent OutOfMemory exception, simply don't perform the
 		// alignment for a block with a lot of segments. TEMPORARY FIX
 		if (bilingualParagraph.getSource().getSegments().count()
-				* bilingualParagraph.getTarget(trgLocale, false).getSegments().count() > MAX_CELL_SIZE) {
+				* bilingualParagraph.getTarget(trgLocale).getSegments().count() > MAX_CELL_SIZE) {
 			throw new IllegalArgumentException("Too many segments. Can only align "
 					+ Long.toString(MAX_CELL_SIZE)
 					+ ". Where the number equals the source segments times the target segments.");
 		}
 
 		DpMatrix matrix = new DpMatrix(bilingualParagraph.getSource().getSegments().asList(),
-				bilingualParagraph.getTarget(trgLocale, false).getSegments().asList(), alignmentFunction);
+				bilingualParagraph.getTarget(trgLocale).getSegments().asList(), alignmentFunction);
 
 		List<DpMatrixCell> result = matrix.align();
 

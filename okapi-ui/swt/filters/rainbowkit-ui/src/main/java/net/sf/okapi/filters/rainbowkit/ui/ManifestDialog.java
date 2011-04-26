@@ -20,7 +20,6 @@
 
 package net.sf.okapi.filters.rainbowkit.ui;
 
-import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;

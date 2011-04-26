@@ -158,7 +158,7 @@ public class GenerateSimpleTmStep extends BasePipelineStep {
 			return event;
 		}
 		
-		if( !tu.hasTarget(targetLocale) || ( tu.getTarget(targetLocale, false)==null )){
+		if( !tu.hasTarget(targetLocale) || ( tu.getTarget(targetLocale)==null )){
 			logger.warning(String.format("TextUnit is missing '%s' target.", targetLocale));
 			countTuNotAdded++;
 			return event;

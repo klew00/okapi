@@ -88,8 +88,7 @@ public class UriConversionStep extends BasePipelineStep {
 		// Else: do the requested modifications
 		
 		// Make sure we have a target where to set data
-		tu.createTarget(trgLang, false, IResource.COPY_ALL);
-		TextContainer cont = tu.getTarget(trgLang, false);
+		TextContainer cont = tu.createTarget(trgLang, false, IResource.COPY_ALL);
 		String res;
 
 		try {

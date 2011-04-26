@@ -383,18 +383,18 @@ public class TmxFilterTest {
 		assertEquals("Hello", tu.getSource().toString());
 		assertEquals(3, tu.getTargetLocales().size());
 		assertTrue(tu.hasTarget(locFR));
-		assertEquals("Bonjour", tu.getTarget(locFR, false).toString());
+		assertEquals("Bonjour", tu.getTarget(locFR).toString());
 		assertTrue(tu.hasTarget(locDE));
-		assertEquals("Hallo", tu.getTarget(locDE, false).toString());
+		assertEquals("Hallo", tu.getTarget(locDE).toString());
 		assertTrue(tu.hasTarget(locIT));
-		assertEquals("Buongiorno", tu.getTarget(locIT, false).toString());
+		assertEquals("Buongiorno", tu.getTarget(locIT).toString());
 
 		tu = FilterTestDriver.getTextUnit(events, 2);
 		assertNotNull(tu);
 		assertEquals("Hello", tu.getSource().toString());
 		assertEquals(1, tu.getTargetLocales().size());
 		assertTrue(tu.hasTarget(locFR));
-		assertEquals("Salut", tu.getTarget(locFR, false).toString());
+		assertEquals("Salut", tu.getTarget(locFR).toString());
 	}
 	
 	@Test

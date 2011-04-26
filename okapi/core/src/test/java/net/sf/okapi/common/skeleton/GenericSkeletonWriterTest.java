@@ -217,8 +217,8 @@ public class GenericSkeletonWriterTest {
 		tu1.getSource().getSegments().append(new Segment("sseg12", new TextFragment("Source segment 12")));
 		
 		tu1.setTarget(locDE, new TextContainer());
-		tu1.getTarget(locDE, false).getSegments().append(new Segment("tseg11", new TextFragment("Target segment 11")));
-		tu1.getTarget(locDE, false).getSegments().append(new Segment("tseg12", new TextFragment("Target segment 12")));
+		tu1.getTarget(locDE).getSegments().append(new Segment("tseg11", new TextFragment("Target segment 11")));
+		tu1.getTarget(locDE).getSegments().append(new Segment("tseg12", new TextFragment("Target segment 12")));
 		
 		GenericSkeleton skel = new GenericSkeleton();
 		tu1.setSkeleton(skel);
@@ -263,8 +263,8 @@ public class GenericSkeletonWriterTest {
 		tu2.getSource().getSegments().append(new Segment("sseg22", new TextFragment("Source segment 22")));
 		
 		tu2.setTarget(locDE, new TextContainer());
-		tu2.getTarget(locDE, false).getSegments().append(new Segment("tseg21", new TextFragment("Target segment 21")));
-		tu2.getTarget(locDE, false).getSegments().append(new Segment("tseg22", new TextFragment("Target segment 22")));
+		tu2.getTarget(locDE).getSegments().append(new Segment("tseg21", new TextFragment("Target segment 21")));
+		tu2.getTarget(locDE).getSegments().append(new Segment("tseg22", new TextFragment("Target segment 22")));
 		
 		skel = new GenericSkeleton();
 		tu2.setSkeleton(skel);
@@ -327,8 +327,8 @@ public class GenericSkeletonWriterTest {
 		tu1.getSource().getSegments().append(new Segment("sseg2", new TextFragment("Source segment 2")));
 		
 		tu1.setTarget(locDE, new TextContainer());
-		tu1.getTarget(locDE, false).getSegments().append(new Segment("tseg1", new TextFragment("Target segment 1")));
-		tu1.getTarget(locDE, false).getSegments().append(new Segment("tseg2", new TextFragment("Target segment 2")));
+		tu1.getTarget(locDE).getSegments().append(new Segment("tseg1", new TextFragment("Target segment 1")));
+		tu1.getTarget(locDE).getSegments().append(new Segment("tseg2", new TextFragment("Target segment 2")));
 		
 		GenericSkeleton skel = new GenericSkeleton();
 		tu1.setSkeleton(skel);
@@ -373,7 +373,7 @@ public class GenericSkeletonWriterTest {
 		tu2.getSource().getSegments().append(new Segment("sseg22", new TextFragment("Source segment 22")));
 		
 		tu2.setTarget(locDE, new TextContainer());
-		tu2.getTarget(locDE, false).getSegments().append(new Segment("tseg21", new TextFragment("Target segment 21")));
+		tu2.getTarget(locDE).getSegments().append(new Segment("tseg21", new TextFragment("Target segment 21")));
 		
 		TextFragment tf2 = new TextFragment();
 		tf2.append("Target segment 22.1");
@@ -383,7 +383,7 @@ public class GenericSkeletonWriterTest {
 		tu1.setIsReferent(true);
 		
 		tf2.append("Target segment 22.2");
-		tu2.getTarget(locDE, false).getSegments().append(new Segment("tseg22", tf2));
+		tu2.getTarget(locDE).getSegments().append(new Segment("tseg22", tf2));
 		
 		skel = new GenericSkeleton();
 		tu2.setSkeleton(skel);

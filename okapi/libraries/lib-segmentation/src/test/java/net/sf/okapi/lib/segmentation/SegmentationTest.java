@@ -326,7 +326,7 @@ public class SegmentationTest {
 		tu.createTargetSegmentation(segmenter, locFR);
 		// We should get the same result
 		assertEquals("[<1>Part 1.</1>][ Part 2.]", fmt.printSegmentedContent(tu.getSource(), true));
-		assertEquals("[<1>Part 1.</1>][ Part 2.]", fmt.printSegmentedContent(tu.getTarget(locFR, false), true));
+		assertEquals("[<1>Part 1.</1>][ Part 2.]", fmt.printSegmentedContent(tu.getTarget(locFR), true));
 	}
 	
 	private TextContainer createSimpleContent () {

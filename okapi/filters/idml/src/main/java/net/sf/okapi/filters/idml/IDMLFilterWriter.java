@@ -302,7 +302,7 @@ public class IDMLFilterWriter implements IFilterWriter {
 		
 		// Get the target content, or fall back to the source
 		// Make a copy to not change the original in the resource
-		TextContainer tc = tu.getTarget(trgLoc, false);
+		TextContainer tc = tu.getTarget(trgLoc);
 		if ( tc == null ) tc = tu.getSource();
 		TextFragment tf = tc.getUnSegmentedContentCopy();
 		if ( tf.isEmpty() && !tu.getSource().isEmpty() ) {

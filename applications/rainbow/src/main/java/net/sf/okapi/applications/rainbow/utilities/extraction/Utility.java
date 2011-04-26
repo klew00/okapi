@@ -238,7 +238,7 @@ public class Utility extends BaseFilterDrivenUtility {
 					cont.getSegments().create(sourceSeg.getRanges());
 				}
 				if ( tu.hasTarget(trgLang) ) {
-					cont = tu.getTarget(trgLang, false);
+					cont = tu.getTarget(trgLang);
 					if ( !cont.hasBeenSegmented() ) {
 						targetSeg.computeSegments(cont);
 						cont.getSegments().create(targetSeg.getRanges());
@@ -263,7 +263,7 @@ public class Utility extends BaseFilterDrivenUtility {
 			qm.leverage(tu, params.threshold, downgradeIdenticalBestMatches);
 			
 			// Compute statistics
-			cont = tu.getTarget(trgLang, false);
+			cont = tu.getTarget(trgLang);
 			if ( cont != null ) {
 				tallyResults(cont.getAnnotation(AltTranslationsAnnotation.class));
 				for ( Segment seg : cont.getSegments() ) {

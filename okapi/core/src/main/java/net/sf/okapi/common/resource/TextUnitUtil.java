@@ -23,16 +23,13 @@ package net.sf.okapi.common.resource;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Range;
-import net.sf.okapi.common.ReversedIterator;
 import net.sf.okapi.common.StringUtil;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.AltTranslation;
@@ -445,7 +442,7 @@ public class TextUnitUtil {
 		if (Util.isNullOrEmpty(locId))
 			return "";
 
-		return getCodedText(textUnit.getTarget(locId, false).getFirstContent());
+		return getCodedText(textUnit.getTarget(locId).getFirstContent());
 	}
 
 	/**
@@ -840,8 +837,8 @@ public class TextUnitUtil {
 	{
 		if ( textUnit == null ) return null;
 		if ( Util.isNullOrEmpty(locId) ) return null;
-		if ( textUnit.getTarget(locId, false) == null ) return null;
-		return textUnit.getTarget(locId, false).getAnnotation(type);
+		if ( textUnit.getTarget(locId) == null ) return null;
+		return textUnit.getTarget(locId).getAnnotation(type);
 	}
 
 	/**
@@ -860,8 +857,8 @@ public class TextUnitUtil {
 	{
 		if ( textUnit == null ) return;
 		if ( Util.isNullOrEmpty(locId) ) return;
-		if ( textUnit.getTarget(locId, false) == null ) return;
-		textUnit.getTarget(locId, false).setAnnotation(annotation);
+		if ( textUnit.getTarget(locId) == null ) return;
+		textUnit.getTarget(locId).setAnnotation(annotation);
 	}
 
 	/**
@@ -897,7 +894,7 @@ public class TextUnitUtil {
 	{
 		// fail fast if ( textUnit == null ) return;
 		// fail fast if ( Util.isNullOrEmpty(locId) ) return;
-		TextFragment target = textUnit.getTarget(locId, false).getFirstContent();
+		TextFragment target = textUnit.getTarget(locId).getFirstContent();
 		// fail fast if ( target == null ) return;
 		target.setCodedText(text);
 	}
@@ -1269,7 +1266,7 @@ public class TextUnitUtil {
 		String id;
 		Range range;
 		Range textRange;
-		String match; // for debug purposes
+//		String match; // for debug purposes
 		
 		private Token(TokenType type, Range range, Range textRange, String id, String match) {
 			super();
@@ -1277,7 +1274,7 @@ public class TextUnitUtil {
 			this.range = range;
 			this.textRange = textRange == null ? range : textRange;
 			this.id = id;
-			this.match = match;
+//			this.match = match;
 		}
 	}
 	

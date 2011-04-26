@@ -40,7 +40,7 @@ public class TestOkapiCounts {
 		tuEvent = new Event(EventType.TEXT_UNIT, tu);
 		tu.setTarget(LocaleId.FRENCH, new TextContainer(
 				"Les éléphants ne peuvent pas voler."));
-		TextContainer target = tu.getTarget(LocaleId.FRENCH, false);
+		TextContainer target = tu.getTarget(LocaleId.FRENCH);
 		target.setAnnotation(new AltTranslationsAnnotation());
 	}
 
@@ -57,7 +57,7 @@ public class TestOkapiCounts {
 
 	private void testCount(Class<? extends BaseCountStep> cls,
 			MatchType matchType) {
-		AltTranslationsAnnotation ata = tu.getTarget(LocaleId.FRENCH, false)
+		AltTranslationsAnnotation ata = tu.getTarget(LocaleId.FRENCH)
 				.getAnnotation(AltTranslationsAnnotation.class);
 		ata.add(new AltTranslation(LocaleId.ENGLISH, LocaleId.FRENCH, tu
 				.getSource().getFirstContent(), null, null, matchType, 100,

@@ -31,6 +31,7 @@ import java.util.Stack;
 import static net.sf.okapi.common.IResource.*;
 import static net.sf.okapi.common.resource.IAlignedSegments.VariantOptions.*;
 import static net.sf.okapi.common.resource.IAlignedSegments.CopyOptions.*;
+import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.ISegmenter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.ReversedIterator;
@@ -261,7 +262,7 @@ public class AlignedSegments implements IAlignedSegments {
         variantOptions = variantOptions.clone();
 
         // Get the target segments (creates them if needed)
-        ISegments trgSegs = myParent.getTarget(trgLoc).getSegments();
+        ISegments trgSegs = myParent.getTargetSegments(trgLoc);
         Segment trgSeg = trgSegs.get(srcSeg.id);
         if (trgSeg == null) { // If no corresponding segment found: create one
             variantOptions.remove(MODIFY_SOURCE); //prevent source being overwritten
@@ -393,7 +394,7 @@ public class AlignedSegments implements IAlignedSegments {
     @Override
     public void align(LocaleId trgLoc) {
         Iterator<Segment> srcSegsIt = getSource(trgLoc).getSegments().iterator();
-        Iterator<Segment> trgSegsIt = myParent.getTarget(trgLoc).getSegments().iterator();
+        Iterator<Segment> trgSegsIt = myParent.createTarget(trgLoc, false, IResource.COPY_SEGMENTATION).getSegments().iterator();
         while (srcSegsIt.hasNext()) {
             try {
                 Segment srcSeg = srcSegsIt.next();
@@ -405,7 +406,7 @@ public class AlignedSegments implements IAlignedSegments {
         }
 
         // these target segments are now aligned with their source counterparts
-        myParent.getTarget(trgLoc).getSegments().setAlignmentStatus(AlignmentStatus.ALIGNED);
+        myParent.getTargetSegments(trgLoc).setAlignmentStatus(AlignmentStatus.ALIGNED);
     }
 
 
@@ -502,7 +503,7 @@ public class AlignedSegments implements IAlignedSegments {
 
         if (!continueWithOperation(trgLoc, variantOptions)) return null;
 
-        TextContainer theTarget = myParent.getTarget(trgLoc);
+        TextContainer theTarget = myParent.createTarget(trgLoc, false, IResource.COPY_SEGMENTATION);
         ISegments trgSegs = theTarget.getSegments();
         int segIndex = trgSegs.getIndex(trgSeg.id);
         if (segIndex == -1) return null; //segment id not found in the container
@@ -588,7 +589,7 @@ public class AlignedSegments implements IAlignedSegments {
     @Override
     public AlignmentStatus getAlignmentStatus () {
         for ( LocaleId loc : myParent.getTargetLocales() ) {
-            ISegments trgSegs = myParent.getTarget(loc).getSegments();
+            ISegments trgSegs = myParent.getTargetSegments(loc);
             if (trgSegs.getAlignmentStatus() == AlignmentStatus.NOT_ALIGNED) {
                 return AlignmentStatus.NOT_ALIGNED;
             }
@@ -598,7 +599,7 @@ public class AlignedSegments implements IAlignedSegments {
 
     @Override
     public AlignmentStatus getAlignmentStatus(LocaleId trgLoc) {
-        return myParent.getTarget(trgLoc).getSegments().getAlignmentStatus();
+        return myParent.getTargetSegments(trgLoc).getAlignmentStatus();
     }
 
     @Override
@@ -610,7 +611,7 @@ public class AlignedSegments implements IAlignedSegments {
 
     @Override
     public void segmentTarget(ISegmenter segmenter, LocaleId targetLocale) {
-        TextContainer theTarget = myParent.getTarget(targetLocale);
+        TextContainer theTarget = myParent.createTarget(targetLocale, false, IResource.COPY_SEGMENTATION);
         segmenter.computeSegments(theTarget);
         theTarget.getSegments().create(segmenter.getRanges());
 //TODO: invalidate source and other targets? or this one.

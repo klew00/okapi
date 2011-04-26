@@ -196,24 +196,24 @@ public class TextUnit implements ITextUnit {
 
     @Override
     public TextContainer getTarget (LocaleId locId) {
-        return createTarget(locId, false, IResource.COPY_SEGMENTATION);
+    	return targets.get(locId);
     }
 
-    @Override
-    public TextContainer getTarget (LocaleId locId,
-    	boolean createIfNeeded)
-    {
-        TextContainer trgCont = targets.get(locId);
-        if ( trgCont == null ) {
-        	if ( createIfNeeded ) {
-        		return createTarget(locId, false, IResource.COPY_SEGMENTATION);
-        	}
-        	else {
-        		return null;
-        	}
-        }
-        return trgCont;
-    }
+//    @Override
+//    public TextContainer getTarget (LocaleId locId,
+//    	boolean createIfNeeded)
+//    {
+//        TextContainer trgCont = targets.get(locId);
+//        if ( trgCont == null ) {
+//        	if ( createIfNeeded ) {
+//        		return createTarget(locId, false, IResource.COPY_SEGMENTATION);
+//        	}
+//        	else {
+//        		return null;
+//        	}
+//        }
+//        return trgCont;
+//    }
 
     @Override
     public TextContainer setTarget (LocaleId locId,
@@ -273,13 +273,13 @@ public class TextUnit implements ITextUnit {
     }
 
     @Override
-    public ISegments getTargetSegments(LocaleId trgLoc) {
-        return getTarget(trgLoc).getSegments();
+    public ISegments getTargetSegments (LocaleId trgLoc) {
+        return createTarget(trgLoc, false, IResource.COPY_SEGMENTATION).getSegments();
     }
 
     @Override
     public Segment getTargetSegment(LocaleId trgLoc, String segId, boolean createIfNeeded) {
-        Segment seg = getTarget(trgLoc).getSegments().get(segId);
+        Segment seg = createTarget(trgLoc, false, IResource.COPY_SEGMENTATION).getSegments().get(segId);
         if (( seg == null ) && createIfNeeded ) {
             // If the segment does not exists: create a new one if requested
             seg = new Segment(segId);
@@ -455,7 +455,7 @@ public class TextUnit implements ITextUnit {
 
     @Override
     public boolean hasTargetProperty (LocaleId locId, String name) {
-        TextContainer tc = getTarget(locId, false);
+        TextContainer tc = getTarget(locId);
         if ( tc == null ) return false;
         return (tc.getProperty(name) != null);
     }
@@ -578,7 +578,7 @@ public class TextUnit implements ITextUnit {
 	public void createTargetSegmentation (ISegmenter segmenter,
 		LocaleId targetLocale)
 	{
-		TextContainer tc = getTarget(targetLocale, false);
+		TextContainer tc = getTarget(targetLocale);
 		if ( tc == null ) {
 			throw new RuntimeException(String.format("There is no target content for '%s'", targetLocale.toString()));
 		}

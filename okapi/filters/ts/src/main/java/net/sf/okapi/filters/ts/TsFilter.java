@@ -925,7 +925,7 @@ public class TsFilter implements IFilter {
 
 		if ( params.useCodeFinder ) {
 			params.codeFinder.process(tu.getSource().getFirstContent());
-			params.codeFinder.process(tu.getTarget(trgLang, false).getFirstContent());
+			params.codeFinder.process(tu.getTarget(trgLang).getFirstContent());
 			//TODO: new codes may need to be escaped!!!
 		}
 		
@@ -1053,7 +1053,7 @@ public class TsFilter implements IFilter {
 					if ( params.useCodeFinder ) {
 						// We can use getFirstPartContent() because nothing is segmented
 						params.codeFinder.process(tf_target.getSource().getFirstContent());
-						params.codeFinder.process(tf_target.getTarget(trgLang, false).getFirstContent());
+						params.codeFinder.process(tf_target.getTarget(trgLang).getFirstContent());
 						//TODO: new codes may need to be escaped!!!
 					}
 					
@@ -1086,7 +1086,7 @@ public class TsFilter implements IFilter {
 					procCharacters(chars);
 				}
 				else if ( ts.currentMessageLocation == MessageLocation.TARGET ) {
-					TextContainer tc = tf_target.getTarget(trgLang, false);
+					TextContainer tc = tf_target.getTarget(trgLang);
 					if ( !tc.hasText() ) {
 						skel.addContentPlaceholder(tf_target, trgLang);	
 					}
@@ -1185,7 +1185,7 @@ public class TsFilter implements IFilter {
 			tc.getFirstContent().append(chars.getData());
 		}
 		else if ( ts.currentMessageLocation == MessageLocation.TARGET ) {
-			TextContainer tc = tu.getTarget(trgLang, false);
+			TextContainer tc = tu.getTarget(trgLang);
 			if ( !tc.hasText() ) {
 				skel.addContentPlaceholder(tu, trgLang);	
 			}
@@ -1343,7 +1343,7 @@ public class TsFilter implements IFilter {
 			tc.getFirstContent().append(sb.toString());
 		}
 		else if ( ts.currentMessageLocation == MessageLocation.TARGET ) {
-			TextContainer tc = tu.getTarget(trgLang, false);
+			TextContainer tc = tu.getTarget(trgLang);
 			if ( !tc.hasText() ) {
 				skel.addContentPlaceholder(tu, trgLang);	
 			}
@@ -1366,7 +1366,7 @@ public class TsFilter implements IFilter {
 			tc.getFirstContent().append(sb.toString());
 		}
 		else if ( ts.currentMessageLocation == MessageLocation.TARGET ) {
-			TextContainer tc = tu.getTarget(trgLang, false);
+			TextContainer tc = tu.getTarget(trgLang);
 			if ( !tc.hasText() ) {
 				skel.addContentPlaceholder(tu, trgLang);	
 			}
@@ -1427,7 +1427,7 @@ public class TsFilter implements IFilter {
 			}
 		}
 		else if ( ts.currentMessageLocation == MessageLocation.TARGET ) {
-			TextContainer tc = tu.getTarget(trgLang, false);
+			TextContainer tc = tu.getTarget(trgLang);
 			//--This segment adds a tu placeholder assuming this is the first content that is added to the container
 			if ( !tc.hasText() ) {
 				skel.addContentPlaceholder(tu,trgLang);	

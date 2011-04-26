@@ -38,14 +38,11 @@ public class TestRemoveTargetStep {
 		rts.handleEvent(sbe);
 		rts.handleEvent(tue);
 		
-		assertNotNull(tu1.getTarget(LocaleId.GERMAN));
-		assertTrue(tu1.getTarget(LocaleId.GERMAN).isEmpty());
+		assertTrue(tu1.getTarget(LocaleId.GERMAN)==null);
 		
-		assertNotNull(tu1.getTarget(LocaleId.FRENCH));
-		assertTrue(tu1.getTarget(LocaleId.FRENCH).isEmpty());
+		assertTrue(tu1.getTarget(LocaleId.FRENCH)==null);
 		
-		assertNotNull(tu1.getTarget(LocaleId.ITALIAN));
-		assertTrue(tu1.getTarget(LocaleId.ITALIAN).isEmpty());
+		assertTrue(tu1.getTarget(LocaleId.ITALIAN)==null);
 	}
 	
 	@Test
@@ -93,14 +90,9 @@ public class TestRemoveTargetStep {
 		rts.handleEvent(tue3);
 		
 		// tu1
-		assertNotNull(tu1.getTarget(LocaleId.GERMAN));
-		assertTrue(tu1.getTarget(LocaleId.GERMAN).isEmpty());
-		
-		assertNotNull(tu1.getTarget(LocaleId.FRENCH));
-		assertTrue(tu1.getTarget(LocaleId.FRENCH).isEmpty());
-		
-		assertNotNull(tu1.getTarget(LocaleId.ITALIAN));
-		assertTrue(tu1.getTarget(LocaleId.ITALIAN).isEmpty());
+		assertTrue(tu1.getTarget(LocaleId.GERMAN)==null);
+		assertTrue(tu1.getTarget(LocaleId.FRENCH)==null);
+		assertTrue(tu1.getTarget(LocaleId.ITALIAN)==null);
 		
 		// tu2
 		assertNotNull(tu2.getTarget(LocaleId.GERMAN));
@@ -113,13 +105,8 @@ public class TestRemoveTargetStep {
 		assertFalse(tu2.getTarget(LocaleId.ITALIAN).isEmpty());
 		
 		// tu3
-		assertNotNull(tu3.getTarget(LocaleId.GERMAN));
-		assertTrue(tu3.getTarget(LocaleId.GERMAN).isEmpty());
-		
-		assertNotNull(tu3.getTarget(LocaleId.FRENCH));
-		assertTrue(tu3.getTarget(LocaleId.FRENCH).isEmpty());
-		
-		assertNotNull(tu3.getTarget(LocaleId.ITALIAN));
-		assertTrue(tu3.getTarget(LocaleId.ITALIAN).isEmpty());
+		assertTrue(tu3.getTarget(LocaleId.GERMAN)==null);
+		assertTrue(tu3.getTarget(LocaleId.FRENCH)==null);
+		assertTrue(tu3.getTarget(LocaleId.ITALIAN)==null);
 	}
 }

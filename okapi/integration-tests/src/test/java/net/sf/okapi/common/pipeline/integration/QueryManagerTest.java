@@ -81,9 +81,9 @@ public class QueryManagerTest {
 		tu.setSourceContent(new TextFragment("Elephants cannot fly."));
 		qm.leverage(tu, 999, false);
 		
-		Assert.assertEquals("", tu.getTarget(locFRFR, false).toString());
+		Assert.assertEquals("", tu.getTarget(locFRFR).toString());
 		
-		AltTranslationsAnnotation a = tu.getTarget(locFRFR, false).getAnnotation(AltTranslationsAnnotation.class);
+		AltTranslationsAnnotation a = tu.getTarget(locFRFR).getAnnotation(AltTranslationsAnnotation.class);
 		Assert.assertNotNull(a);		
 		Assert.assertEquals("Les \u00e9l\u00e9phants ne peuvent pas voler.", a.getFirst().getTarget().toString());
 	}
@@ -94,9 +94,9 @@ public class QueryManagerTest {
 		tu.setSourceContent(new TextFragment("Elephants cannot fly."));
 		qm.leverage(tu, 1, false);
 		
-		Assert.assertEquals("Les \u00e9l\u00e9phants ne peuvent pas voler.", tu.getTarget(locFRFR, false).toString());
+		Assert.assertEquals("Les \u00e9l\u00e9phants ne peuvent pas voler.", tu.getTarget(locFRFR).toString());
 		
-		AltTranslationsAnnotation a = tu.getTarget(locFRFR, false).getAnnotation(AltTranslationsAnnotation.class);
+		AltTranslationsAnnotation a = tu.getTarget(locFRFR).getAnnotation(AltTranslationsAnnotation.class);
 		Assert.assertNotNull(a);		
 		Assert.assertEquals("Les \u00e9l\u00e9phants ne peuvent pas voler.", a.getFirst().getTarget().toString());
 	}
@@ -112,7 +112,7 @@ public class QueryManagerTest {
 		
 		qm.leverage(tu, 1, false);
 		
-		segs = tu.getTarget(locFRFR, false).getSegments();
+		segs = tu.getTarget(locFRFR).getSegments();
 		assertEquals(2, segs.count());
 		assertEquals("Les \u00e9l\u00e9phants ne peuvent pas voler.", segs.get(0).text.toText());
 		assertEquals("", segs.get(1).text.toText());

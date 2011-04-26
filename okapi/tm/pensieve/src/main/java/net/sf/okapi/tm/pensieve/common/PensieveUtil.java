@@ -46,7 +46,7 @@ public final class PensieveUtil {
     	ITextUnit textUnit)
     {
         TranslationUnitVariant source = new TranslationUnitVariant(sourceLoc, textUnit.getSource().getFirstContent());
-        TextContainer tc = textUnit.getTarget(targetLoc, false); // Allow null target content
+        TextContainer tc = textUnit.getTarget(targetLoc); // Allow null target content
         TranslationUnitVariant target = new TranslationUnitVariant(targetLoc, (( tc==null ) ? null : tc.getFirstContent()));
         TranslationUnit tu = new TranslationUnit(source, target);
         populateMetaDataFromProperties(textUnit, tu);

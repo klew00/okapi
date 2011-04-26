@@ -156,7 +156,7 @@ class QualityChecker {
 		
 		// Get the containers
 		TextContainer srcCont = tu.getSource();
-		TextContainer trgCont = tu.getTarget(trgLoc, false);
+		TextContainer trgCont = tu.getTarget(trgLoc);
 		
 		// Check if we have a target (even if option disabled)
 		if ( trgCont == null ) {

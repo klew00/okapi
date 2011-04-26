@@ -74,7 +74,7 @@ public class PensieveUtilTest {
         ITextUnit textUnit = PensieveUtil.convertToTextUnit(tu);
         assertEquals("source content", "bipity bopity boo", textUnit.getSource().getFirstContent().toText());
         assertEquals("target content", "something in korean",
-        	textUnit.getTarget(LocaleId.fromString("KR"), false).getFirstContent().toText());
+        	textUnit.getTarget(LocaleId.fromString("KR")).getFirstContent().toText());
         assertEquals("tuid", null, textUnit.getId());
         assertEquals("name", null, textUnit.getName());
         assertEquals("group attribute", "groupie", textUnit.getProperty(MetadataType.GROUP_NAME.fieldName()).getValue());
@@ -87,7 +87,7 @@ public class PensieveUtilTest {
         ITextUnit textUnit = PensieveUtil.convertToTextUnit(tu);
         assertEquals("source content", "bipity bopity boo", textUnit.getSource().getFirstContent().toText());
         assertEquals("target content", "something in korean",
-        	textUnit.getTarget(LocaleId.fromString("KR"), false).getFirstContent().toText());
+        	textUnit.getTarget(LocaleId.fromString("KR")).getFirstContent().toText());
         assertEquals("tuid", "1", textUnit.getId());
         assertEquals("name", "1", textUnit.getName());
         assertEquals("group attribute", "groupie", textUnit.getProperty(MetadataType.GROUP_NAME.fieldName()).getValue());

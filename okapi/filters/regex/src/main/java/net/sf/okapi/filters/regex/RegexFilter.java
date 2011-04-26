@@ -510,13 +510,13 @@ public class RegexFilter implements IFilter {
 		}
 		else { // Unwrap the content
 			tuRes.getSource().unwrap(true, true);
-			if ( hasTarget ) tuRes.getTarget(trgLang, false).unwrap(true, true);
+			if ( hasTarget ) tuRes.getTarget(trgLang).unwrap(true, true);
 		}
 
 		if ( rule.useCodeFinder ) {
 			// We can use getFirstPartContent() because nothing is segmented yet
 			rule.codeFinder.process(tuRes.getSource().getFirstContent());
-			if ( hasTarget ) rule.codeFinder.process(tuRes.getTarget(trgLang, false).getFirstContent());
+			if ( hasTarget ) rule.codeFinder.process(tuRes.getTarget(trgLang).getFirstContent());
 		}
 
 		if ( rule.nameGroup != -1 ) {

@@ -356,7 +356,7 @@ public class DiffLeverageStep extends BasePipelineStep {
 
 			// copy the old translation to the new TextUnit
 			TextContainer otc = null;
-			if ((otc = oldTu.getTarget(targetLocale, false)) != null) {
+			if ((otc = oldTu.getTarget(targetLocale)) != null) {
 				// only copy the old target if diffOnly is false
 				if (!params.isDiffOnly()) {
 					if (params.getFuzzyThreshold() < 100) {

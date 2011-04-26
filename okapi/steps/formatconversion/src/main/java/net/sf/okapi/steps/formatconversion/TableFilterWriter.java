@@ -283,7 +283,7 @@ public class TableFilterWriter implements IFilterWriter {
 		ITextUnit tu = event.getTextUnit();
 
 		TextContainer srcCont = tu.getSource();
-		TextContainer trgCont = tu.getTarget(trgLoc, false);
+		TextContainer trgCont = tu.getTarget(trgLoc);
 		if ( trgCont == null ) {
 			trgCont = new TextContainer(); // Empty
 		}

@@ -107,14 +107,14 @@ public class CommaSeparatedValuesFilterTest {
 		ITextUnit tu = FilterTestDriver.getTextUnit(events, 1);
 		assertNotNull(tu);
 		assertEquals("Source 1", tu.getSource().toString());
-		assertEquals("Target 1", tu.getTarget(locFR, false).toString());
+		assertEquals("Target 1", tu.getTarget(locFR).toString());
 		assertEquals("Comment 1", tu.getProperty(Property.NOTE).getValue());
 
 		tu = FilterTestDriver.getTextUnit(events, 2);
 		assertNotNull(tu);
 		assertEquals("Source 2", tu.getSource().toString());
 		assertTrue(null==tu.getProperty(Property.NOTE));
-		assertEquals("Target 2", tu.getTarget(locFR, false).toString());
+		assertEquals("Target 2", tu.getTarget(locFR).toString());
 	}
 	
 	@Test
@@ -1981,7 +1981,7 @@ public class CommaSeparatedValuesFilterTest {
 			}
 			
 			if ( !Util.isEmpty(target) && !Util.isNullOrEmpty(language) ) {
-				TextContainer trg = tu.getTarget(language, false);
+				TextContainer trg = tu.getTarget(language);
 				assertNotNull(trg);
 				assertEquals(target, trg.toString());
 			}

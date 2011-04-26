@@ -166,7 +166,7 @@ public class MergingStep extends BasePipelineStep {
 		// Create a target entry with empty segments
 		TextContainer tc;
 		if ( tu.hasTarget(targetLocale) ) {
-			tc = tu.getTarget(targetLocale, false);
+			tc = tu.getTarget(targetLocale);
 		}
 		else { // Create a copy with empty segments
 			tc = tu.createTarget(targetLocale, true, IResource.COPY_SEGMENTATION);

@@ -61,7 +61,7 @@ public class AltTranslationsAnnotationBean extends PersistenceBean<AltTranslatio
 			
 			if (tunit != null) {
 				src = tunit.getSource().getSegments().getFirstContent(); 
-				trg = tunit.getTarget(annot.getTargetLocale(), false).getSegments().getFirstContent();
+				trg = tunit.getTarget(annot.getTargetLocale()).getSegments().getFirstContent();
 			}			
 			obj.add(annot.getSourceLocale(), annot.getTargetLocale(), null,	src, trg, 
 					annot.getType(), annot.getScore(), annot.getOrigin());

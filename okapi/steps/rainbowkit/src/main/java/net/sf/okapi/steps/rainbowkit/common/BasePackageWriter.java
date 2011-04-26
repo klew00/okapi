@@ -361,7 +361,7 @@ public abstract class BasePackageWriter implements IPackageWriter {
 	protected void writeTMXEntries (ITextUnit tu) {
 		// Check if we have a target
 		LocaleId trgLoc = manifest.getTargetLocale();
-		TextContainer tc = tu.getTarget(trgLoc, false);
+		TextContainer tc = tu.getTarget(trgLoc);
 		if ( tc == null ) {
 			return; // No target
 		}

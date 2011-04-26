@@ -95,7 +95,7 @@ public class TTXFilterTest {
 		ISegments segments = cont.getSegments();
 		assertEquals(1, segments.count());
 		assertEquals("en1", segments.get(0).toString());
-		cont = tu.getTarget(locESEM, false);
+		cont = tu.getTarget(locESEM);
 		segments = cont.getSegments();
 		assertEquals(1, segments.count());
 		assertEquals("<b1/>[es1]<e1/>", fmt.printSegmentedContent(cont, true));
@@ -215,7 +215,7 @@ public class TTXFilterTest {
 		ISegments segments = cont.getSegments();
 		assertEquals(1, segments.count());
 		assertEquals("en1", segments.get(0).toString());
-		segments = tu.getTarget(locESEM, false).getSegments();
+		segments = tu.getTarget(locESEM).getSegments();
 		assertEquals(1, segments.count());
 		assertEquals("es1", segments.get(0).toString());
 		assertNull(segments.get(0).getAnnotation(AltTranslationsAnnotation.class));
@@ -299,7 +299,7 @@ public class TTXFilterTest {
 		TextContainer cont = tu.getSource();
 		assertEquals("\ntext", cont.toString());
 		assertTrue(tu.hasTarget(locESEM));
-		assertTrue(tu.getTarget(locESEM, false).isEmpty());
+		assertTrue(tu.getTarget(locESEM).isEmpty());
 	}
 
 //always seg now	@Test
@@ -356,7 +356,7 @@ public class TTXFilterTest {
 		TextContainer cont = tu.getSource();
 		assertEquals("text", cont.toString());
 		assertTrue(tu.hasTarget(locESEM));
-		assertEquals("", tu.getTarget(locESEM, false).toString());
+		assertEquals("", tu.getTarget(locESEM).toString());
 	}
 
 	@Test
@@ -457,7 +457,7 @@ public class TTXFilterTest {
 		TextContainer cont = tu.getSource();
 		assertEquals("[text][ more text]", fmt.printSegmentedContent(cont, true));
 		assertTrue(tu.hasTarget(locESEM));
-		cont = tu.getTarget(locESEM, false);
+		cont = tu.getTarget(locESEM);
 		assertNotNull(cont);
 		assertEquals("[][]", fmt.printSegmentedContent(cont, true));
 		ISegments segs = cont.getSegments();
@@ -489,7 +489,7 @@ public class TTXFilterTest {
 			+ "</Raw></Body></TRADOStag>";
 		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(filter, snippet, locESEM), 1);
 		assertNotNull(tu);
-		TextContainer cont = tu.getTarget(locESEM, false);
+		TextContainer cont = tu.getTarget(locESEM);
 		assertNotNull(cont);
 		ISegments segs = cont.getSegments();
 		AltTranslationsAnnotation ann = segs.get(0).getAnnotation(AltTranslationsAnnotation.class);
@@ -520,7 +520,7 @@ public class TTXFilterTest {
 			+ "</Raw></Body></TRADOStag>";
 		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(filter, snippet, locESEM), 1);
 		assertNotNull(tu);
-		TextContainer cont = tu.getTarget(locESEM, false);
+		TextContainer cont = tu.getTarget(locESEM);
 		assertNotNull(cont);
 		ISegments segs = cont.getSegments();
 		AltTranslationsAnnotation ann = segs.get(0).getAnnotation(AltTranslationsAnnotation.class);
@@ -548,7 +548,7 @@ public class TTXFilterTest {
 		assertEquals("Text <ph id=\"1\"></ph><bpt id=\"2\">[b]</bpt>bold<ph id=\"3\"></ph><ph id=\"4\"></ph><ept id=\"2\">[/b]</ept> after<ph id=\"5\"></ph>",
 			xfmt.setContent(cont.getFirstContent()).toString());
 		assertTrue(tu.hasTarget(locESEM));
-		assertTrue(tu.getTarget(locESEM, false).isEmpty());
+		assertTrue(tu.getTarget(locESEM).isEmpty());
 	}
 
 //always segment	@Test
@@ -602,7 +602,7 @@ public class TTXFilterTest {
 		TextContainer cont = tu.getSource();
 		assertEquals("text", cont.toString());
 		assertTrue(tu.hasTarget(locESEM));
-		assertEquals("", tu.getTarget(locESEM, false).toString());
+		assertEquals("", tu.getTarget(locESEM).toString());
 	}
 
 	@Test
@@ -615,7 +615,7 @@ public class TTXFilterTest {
 		TextContainer cont = tu.getSource();
 		assertEquals("text", cont.toString());
 		assertTrue(tu.hasTarget(locESEM));
-		assertEquals("", tu.getTarget(locESEM, false).toString());
+		assertEquals("", tu.getTarget(locESEM).toString());
 	}
 
 	@Test
@@ -640,7 +640,7 @@ public class TTXFilterTest {
 		TextContainer cont = tu.getSource();
 		assertEquals("before [in] after", cont.toString());
 		assertTrue(tu.hasTarget(locESEM));
-		assertEquals("", tu.getTarget(locESEM, false).toString());
+		assertEquals("", tu.getTarget(locESEM).toString());
 	}
 
 //always segment	@Test
@@ -698,7 +698,7 @@ public class TTXFilterTest {
 		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(filter, snippet, locESEM), 1);
 		assertNotNull(tu);
 		assertEquals("[Src1] [Src2]", fmt.printSegmentedContent(tu.getSource(), true));
-		assertEquals("[Trg1] []", fmt.printSegmentedContent(tu.getTarget(locESEM, false), true));
+		assertEquals("[Trg1] []", fmt.printSegmentedContent(tu.getTarget(locESEM), true));
 	}
 
 	@Test
@@ -849,7 +849,7 @@ public class TTXFilterTest {
 		assertEquals(1, segments.count());
 		segments.joinAll();
 		assertEquals("text en", cont.toString());
-		cont = tu.getTarget(locESEM, false);
+		cont = tu.getTarget(locESEM);
 		segments = cont.getSegments();
 		assertEquals(1, segments.count());
 		segments.joinAll();
@@ -870,7 +870,7 @@ public class TTXFilterTest {
 		assertEquals("text1 en", segments.get(0).text.toText());
 		assertEquals("text2 en", segments.get(1).text.toText());
 		assertEquals("[text1 en]  [text2 en]", fmt.printSegmentedContent(cont, true));
-		cont = tu.getTarget(locESEM, false);
+		cont = tu.getTarget(locESEM);
 		segments = cont.getSegments();
 		assertEquals(2, segments.count());
 		assertEquals("text1 es", segments.get(0).text.toText());
@@ -906,7 +906,7 @@ public class TTXFilterTest {
 		assertEquals(1, segments.count());
 		assertEquals("text <br/>en <b>bold</b>.", segments.get(0).text.toText());
 		assertEquals("text <1/>en <2>bold</2>.", fmt.setContent(segments.get(0).text).toString());
-		cont = tu.getTarget(locESEM, false);
+		cont = tu.getTarget(locESEM);
 		segments = cont.getSegments();
 		assertEquals(1, segments.count());
 		assertEquals("TEXT <br/>ES <b>BOLD</b>.", segments.get(0).text.toText());

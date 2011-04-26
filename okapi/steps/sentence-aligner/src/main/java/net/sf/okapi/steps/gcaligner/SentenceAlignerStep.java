@@ -222,7 +222,7 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 				p.text.collapseWhitespace();
 			}
 			if (targetInput == null) {
-				for (TextPart p : sourceTu.getTarget(targetLocale, false).getSegments()) {
+				for (TextPart p : sourceTu.getTarget(targetLocale).getSegments()) {
 					p.text.collapseWhitespace();
 				}
 			} else {
@@ -265,7 +265,7 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 			p.text.ltrim();
 			p.text.rtrim();
 		}
-		for (TextPart p : alignedTextUnit.getTarget(targetLocale, false).getSegments()) {
+		for (TextPart p : alignedTextUnit.getTarget(targetLocale).getSegments()) {
 			p.text.ltrim();
 			p.text.rtrim();
 		}

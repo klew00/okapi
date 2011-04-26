@@ -24,7 +24,6 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
-import net.sf.okapi.common.resource.RawDocument;
 
 @UsingParameters(Parameters.class)
 public class FileAnalysisStep extends BasePipelineStep {
@@ -68,7 +67,7 @@ public class FileAnalysisStep extends BasePipelineStep {
 	
 	@Override
 	protected Event handleRawDocument (Event event) {
-		RawDocument rawDoc = event.getRawDocument();
+//		RawDocument rawDoc = event.getRawDocument();
 		//TODO: analyze the file
 		return event;
 	}

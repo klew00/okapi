@@ -105,14 +105,11 @@ public interface ITextUnit extends INameable, IReferenceable {
 
     /**
      * Gets the target object for this text unit for a given locale.
-     * If the target does not exists one is created automatically, and contains a copy
-     * of the source with all segments empty.
-     * <p>
-     * Calling this method is the same as calling <code>createTarget(locId, false, IResource.COPY_SEGMENTATION)</code></p>
+     * If the target does not exists a null is retruned.
      *
      * @param locId the locale to query.
-     * @return the target object for this text unit for the given locale. Never returns null.
-     * (Before M10 if the target did not exist none was created and the return was null).
+     * @return the target object for this text unit for the given locale, or null
+     * if the target does not exist.
      * @see #createTarget(LocaleId, boolean, int)
      */
     public TextContainer getTarget (LocaleId locId);
@@ -128,8 +125,8 @@ public interface ITextUnit extends INameable, IReferenceable {
      * target does not exits and no new target was created.
      * @see #createTarget(LocaleId, boolean, int)
      */
-    public TextContainer getTarget (LocaleId locId,
-    	boolean createIfNeeded);
+//    public TextContainer getTarget (LocaleId locId,
+//    	boolean createIfNeeded);
 
     /**
      * Sets the target object for this text unit for a given locale.
@@ -224,8 +221,7 @@ public interface ITextUnit extends INameable, IReferenceable {
 
     /**
      * Get the segments for a given target. Un-segmented content return a single segment.
-     * <p>
-     * If the target does not exists, one is created.</p>
+     * If the target does not exists, one is created, with the same segments as the source, but empty.
      *
      * @param trgLoc the locale of the target to retrieve.
      * @return an object implementing ISegments for the given target content.

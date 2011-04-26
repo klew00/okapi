@@ -82,7 +82,7 @@ public class TextUnitBean extends PersistenceBean<ITextUnit> {
 		for (LocaleId locId : obj.getTargetLocales()) {
 			TextContainerBean targetBean = new TextContainerBean();
 			targets.put(locId.toString(), targetBean);
-			targetBean.set(obj.getTarget(locId, false), session);
+			targetBean.set(obj.getTarget(locId), session);
 		}
 		
 //			// srcSegRanges

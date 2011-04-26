@@ -69,7 +69,7 @@ public class TestGMXCounts {
 		ls.handleEvent(sdEvent);
 		ls.handleEvent(tuEvent);
 		logger.fine(TextUnitLogger.getTuInfo(tu, LocaleId.ENGLISH));
-		AltTranslationsAnnotation ata = tu.getTarget(LocaleId.FRENCH, false).getAnnotation(AltTranslationsAnnotation.class);
+		AltTranslationsAnnotation ata = tu.getTarget(LocaleId.FRENCH).getAnnotation(AltTranslationsAnnotation.class);
 		ata.add(new AltTranslation(LocaleId.ENGLISH, LocaleId.FRENCH, tu.getSource().getFirstContent(), null, null, MatchType.EXACT_UNIQUE_ID, 100, null));
 		logger.fine(TextUnitLogger.getTuInfo(tu, LocaleId.ENGLISH));
 		

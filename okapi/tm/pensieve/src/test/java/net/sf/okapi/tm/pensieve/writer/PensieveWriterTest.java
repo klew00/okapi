@@ -361,7 +361,7 @@ public class PensieveWriterTest {
     public void indexTranslationUnitBeforeCommit() throws IOException {
     	// there must be at least one commit or else we get IndexNotFoundException
         tmWriter.indexTranslationUnit(new TranslationUnit(new TranslationUnitVariant(locEN, new TextFragment("dax")), new TranslationUnitVariant(locEN, new TextFragment("is funny (sometimes)"))));
-        IndexReader reader = IndexReader.open(dir, true);
+        IndexReader.open(dir, true);
     }
 
     @Test

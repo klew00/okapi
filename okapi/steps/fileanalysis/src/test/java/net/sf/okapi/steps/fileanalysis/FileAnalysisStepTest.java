@@ -20,7 +20,7 @@
 
 package net.sf.okapi.steps.fileanalysis;
 
-import static org.junit.Assert.*;
+//import static org.junit.Assert.*;
 
 import java.io.File;
 import java.net.URI;

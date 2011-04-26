@@ -147,7 +147,7 @@ public class PensieveFilterWriter implements IFilterWriter {
 		if ( !tu.hasTarget(trgLoc) ) return;
 
 		TextContainer srcCont = tu.getSource();
-		TextContainer trgCont = tu.getTarget(trgLoc, false);
+		TextContainer trgCont = tu.getTarget(trgLoc);
 		
 		// Un-segmented entry get their metadata
 		if ( srcCont.contentIsOneSegment() && trgCont.contentIsOneSegment() ) {

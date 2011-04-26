@@ -166,7 +166,7 @@ public class SegmentationStep extends BasePipelineStep {
 			}
 		}
 		
-		TextContainer trgCont = tu.getTarget(targetLocale, false);
+		TextContainer trgCont = tu.getTarget(targetLocale);
 
 		// Segment target if requested
 		if ( params.segmentTarget && ( trgCont != null )) {

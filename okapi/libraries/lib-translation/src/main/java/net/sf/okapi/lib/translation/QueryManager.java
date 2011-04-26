@@ -465,7 +465,7 @@ public class QueryManager {
 		AltTranslation bestMatch = null;
 		for ( LocaleId loc : tu.getTargetLocales() ) {
 			
-			TextContainer tc = tu.getTarget(loc, false);
+			TextContainer tc = tu.getTarget(loc);
 			if ( tc == null ) continue;
 			
 			// Check target container first

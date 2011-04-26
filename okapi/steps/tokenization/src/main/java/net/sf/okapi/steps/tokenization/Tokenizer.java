@@ -101,7 +101,7 @@ public class Tokenizer {
 		if (text instanceof ITextUnit) {
 			ITextUnit tu = (ITextUnit)text;
 			if ( tu.hasTarget(language) )
-				return doTokenize(tu.getTarget(language, false), language, tokenNames);
+				return doTokenize(tu.getTarget(language), language, tokenNames);
 			else
 				return doTokenize(tu.getSource(), language, tokenNames);
 		}

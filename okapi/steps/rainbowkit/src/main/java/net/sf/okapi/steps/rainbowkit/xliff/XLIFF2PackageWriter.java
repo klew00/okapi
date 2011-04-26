@@ -145,7 +145,7 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 		TextContainer srcTc = tu.getSource();
 		TextContainer trgTc = null;
 		if ( tu.hasTarget(manifest.getTargetLocale()) ) {
-			trgTc = tu.getTarget(manifest.getTargetLocale(), false);
+			trgTc = tu.getTarget(manifest.getTargetLocale());
 		}
 
 		for ( TextPart part : srcTc ) {

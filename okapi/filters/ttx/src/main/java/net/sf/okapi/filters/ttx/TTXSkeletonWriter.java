@@ -73,7 +73,7 @@ public class TTXSkeletonWriter extends GenericSkeletonWriter {
 		
 		TextContainer trgCont;
 		if ( tu.hasTarget(outputLoc) ) {
-			trgCont = tu.getTarget(outputLoc, false);
+			trgCont = tu.getTarget(outputLoc);
 			if ( !trgCont.hasBeenSegmented() ) {
 				trgCont = trgCont.clone();
 				trgCont.setHasBeenSegmentedFlag(true);

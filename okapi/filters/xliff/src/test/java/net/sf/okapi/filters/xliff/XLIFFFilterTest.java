@@ -107,13 +107,13 @@ public class XLIFFFilterTest {
 			+ "<body>"
 			+ "<trans-unit id=\"1\">"
 			+ "<source>t1. t2</source>"
-			+ "<target xml:lang=\"fr\"><mrk mid=\"i1\" mtype=\"seg\">t1.</mrk> <mrk mid=\"i2\" mtype=\"seg\">t2</mrk></target>"
+			+ "<target xml:lang=\"fr\"><mrk mid=\"i1\" mtype=\"seg\">t1.</mrk>\n<mrk mid=\"i2\" mtype=\"seg\">t2</mrk></target>"
 			+ "</trans-unit>"
 			+ "</body>"
 			+ "</file></xliff>";
 		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
-		TextContainer cont = tu.getTarget(locFR, false);
+		TextContainer cont = tu.getTarget(locFR);
 		ISegments segments = cont.getSegments();
 		assertEquals("[t1.] [t2]", fmt.printSegmentedContent(cont, true));
 		assertEquals(2, segments.count());
@@ -141,7 +141,7 @@ public class XLIFFFilterTest {
 			+ "</file></xliff>";
 		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, noInSegFilter), 1);
 		assertNotNull(tu);
-		TextContainer cont = tu.getTarget(locFR, false);
+		TextContainer cont = tu.getTarget(locFR);
 		ISegments segments = cont.getSegments();
 		assertEquals("[t1. t2]", fmt.printSegmentedContent(cont, true));
 		assertEquals(1, segments.count());
@@ -228,7 +228,7 @@ public class XLIFFFilterTest {
 			+ "</body>"
 			+ "</file></xliff>";
 		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
-		TextContainer cont = tu.getTarget(locFR, false);
+		TextContainer cont = tu.getTarget(locFR);
 		assertEquals("[t1.] [t2]", fmt.printSegmentedContent(tu.getSource(), true));
 		assertEquals("[] []", fmt.printSegmentedContent(cont, true));
 	}
@@ -364,7 +364,7 @@ public class XLIFFFilterTest {
 		
 		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertEquals("[t1.] [t2]", fmt.printSegmentedContent(tu.getSource(), true));
-		assertEquals("[tt1.] [tt2]", fmt.printSegmentedContent(tu.getTarget(locFR, false), true));
+		assertEquals("[tt1.] [tt2]", fmt.printSegmentedContent(tu.getTarget(locFR), true));
 		
 		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
 			locFR, filter.createSkeletonWriter(), filter.getEncoderManager()));
@@ -492,10 +492,10 @@ public class XLIFFFilterTest {
 		ITextUnit tu = FilterTestDriver.getTextUnit(createTUWithAltTrans(), 1);
 		assertNotNull(tu);
 		assertEquals("t1", tu.getSource().toString());
-		AltTranslationsAnnotation annot = tu.getTarget(locFR, false).getAnnotation(AltTranslationsAnnotation.class);
+		AltTranslationsAnnotation annot = tu.getTarget(locFR).getAnnotation(AltTranslationsAnnotation.class);
 		assertNotNull(annot);
 		assertEquals("alt source {t1}", annot.getFirst().getEntry().getSource().toString());
-		assertEquals("alt target {t1}", annot.getFirst().getEntry().getTarget(locFR, false).toString());
+		assertEquals("alt target {t1}", annot.getFirst().getEntry().getTarget(locFR).toString());
 	}
 
 	@Test
@@ -564,17 +564,17 @@ public class XLIFFFilterTest {
 		assertNotNull(tu);
 		assertEquals("t1 inter t2", tu.getSource().toString());
 		assertEquals("[t1] inter [t2]", fmt.printSegmentedContent(tu.getSource(), true));
-		assertEquals("[] inter []", fmt.printSegmentedContent(tu.getTarget(locFR, false), true));
-		AltTranslationsAnnotation annot = tu.getTarget(locFR, false).getAnnotation(AltTranslationsAnnotation.class);
+		assertEquals("[] inter []", fmt.printSegmentedContent(tu.getTarget(locFR), true));
+		AltTranslationsAnnotation annot = tu.getTarget(locFR).getAnnotation(AltTranslationsAnnotation.class);
 		assertNotNull(annot);
 		assertEquals("", annot.getFirst().getEntry().getSource().toString()); // No source
-		assertEquals("TRG for t1 inter t2", annot.getFirst().getEntry().getTarget(locFR, false).toString());
-		ISegments segs = tu.getTarget(locFR, false).getSegments();
+		assertEquals("TRG for t1 inter t2", annot.getFirst().getEntry().getTarget(locFR).toString());
+		ISegments segs = tu.getTarget(locFR).getSegments();
 		annot = segs.get(0).getAnnotation(AltTranslationsAnnotation.class);
 		assertNull(annot);
 		annot = segs.get(1).getAnnotation(AltTranslationsAnnotation.class);
 		assertEquals("", annot.getFirst().getEntry().getSource().toString()); // No source
-		assertEquals("TRG for t2", annot.getFirst().getEntry().getTarget(locFR, false).toString());
+		assertEquals("TRG for t2", annot.getFirst().getEntry().getTarget(locFR).toString());
 		assertNotNull(annot);
 	}
 
@@ -582,7 +582,7 @@ public class XLIFFFilterTest {
 	public void testAlTransData () {
 		ITextUnit tu = FilterTestDriver.getTextUnit(createTUWithAltTransData(), 1);
 		assertNotNull(tu);
-		AltTranslationsAnnotation annot = tu.getTarget(locFR, false).getAnnotation(AltTranslationsAnnotation.class);
+		AltTranslationsAnnotation annot = tu.getTarget(locFR).getAnnotation(AltTranslationsAnnotation.class);
 		int n = 0;
 		for ( AltTranslation at : annot ) {
 			n++;
@@ -652,7 +652,7 @@ public class XLIFFFilterTest {
 			+ "</file></xliff>";
 		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
-		assertEquals("t1 <1>t2</1> t3 <1>t4</1>.", fmt.printSegmentedContent(tu.getTarget(locFR, false), false, false));
+		assertEquals("t1 <1>t2</1> t3 <1>t4</1>.", fmt.printSegmentedContent(tu.getTarget(locFR), false, false));
 	}
 	
 	@Test
@@ -660,7 +660,7 @@ public class XLIFFFilterTest {
 		ITextUnit tu = FilterTestDriver.getTextUnit(createApprovedTU(), 1);
 		assertNotNull(tu);
 		assertEquals("t1", tu.getSource().getFirstContent().toText());
-		assertEquals("translated t1", tu.getTarget(locFR, false).getFirstContent().toText());
+		assertEquals("translated t1", tu.getTarget(locFR).getFirstContent().toText());
 		Property prop = tu.getTargetProperty(locFR, Property.APPROVED);
 		assertNotNull(prop);
 		assertEquals("yes", prop.getValue());
@@ -801,7 +801,7 @@ public class XLIFFFilterTest {
 		ITextUnit tu = FilterTestDriver.getTextUnit(createInputWithNamespace(), 1);
 		assertNotNull(tu);
 		assertEquals("t1", tu.getSource().toString());
-		assertEquals("translated t1", tu.getTarget(locFR, false).toString());
+		assertEquals("translated t1", tu.getTarget(locFR).toString());
 	}
 	
 	@Test
@@ -812,8 +812,8 @@ public class XLIFFFilterTest {
 		fmt.setContent(tu.getSource().getFirstContent());
 		assertEquals("<1>S1</1>, <2>S2</2>", fmt.toString());
 		assertTrue(tu.hasTarget(locFR));
-		assertEquals("T2, T1", tu.getTarget(locFR, false).toString());
-		fmt.setContent(tu.getTarget(locFR, false).getFirstContent());
+		assertEquals("T2, T1", tu.getTarget(locFR).toString());
+		fmt.setContent(tu.getTarget(locFR).getFirstContent());
 		assertEquals("<2>T2</2>, <1>T1</1>", fmt.toString());
 	}
 
@@ -823,7 +823,7 @@ public class XLIFFFilterTest {
 		assertNotNull(tu);
 		assertTrue(tu.hasTarget(locFR));
 		TextFragment src = tu.getSource().getFirstContent();
-		TextFragment trg = tu.getTarget(locFR, false).getFirstContent();
+		TextFragment trg = tu.getTarget(locFR).getFirstContent();
 		assertEquals(4, src.getCodes().size());
 		assertEquals(src.getCodes().size(), trg.getCodes().size());
 		FilterTestDriver.checkCodeData(src, trg);
@@ -836,7 +836,7 @@ public class XLIFFFilterTest {
 		fmt.setContent(tu.getSource().getFirstContent());
 		assertEquals("<1>S1</1>, <2>S2</2>", fmt.toString());
 		assertTrue(tu.hasTarget(locFR));
-		fmt.setContent(tu.getTarget(locFR, false).getFirstContent());
+		fmt.setContent(tu.getTarget(locFR).getFirstContent());
 		assertEquals("<2>T2</2>, <1>T1</1>", fmt.toString());
 	}
 
@@ -881,7 +881,7 @@ public class XLIFFFilterTest {
 		assertNotNull(tu);
 		assertEquals("[t1  t2]  [t3  t4]", fmt.printSegmentedContent(tu.getSource(), true));
 		//TODO: XLIFF filter needs to get segmented targets too
-		assertEquals("[tt1  tt2  tt3  tt4]", fmt.printSegmentedContent(tu.getTarget(locFR, false), true));
+		assertEquals("[tt1  tt2  tt3  tt4]", fmt.printSegmentedContent(tu.getTarget(locFR), true));
 	}
 
 	@Test
@@ -890,7 +890,7 @@ public class XLIFFFilterTest {
 		assertNotNull(tu);
 		assertEquals("[t1 t2] [t3 t4]", fmt.printSegmentedContent(tu.getSource(), true));
 		//TODO: XLIFF filter needs to get segmented targets too
-		assertEquals("[tt1 tt2 tt3 tt4]", fmt.printSegmentedContent(tu.getTarget(locFR, false), true));
+		assertEquals("[tt1 tt2 tt3 tt4]", fmt.printSegmentedContent(tu.getTarget(locFR), true));
 	}
 
 	@Test
@@ -907,7 +907,7 @@ public class XLIFFFilterTest {
 		ITextUnit tu = FilterTestDriver.getTextUnit(createComplexSUBTypeXLIFF(), 1);
 		assertNotNull(tu);
 		tu.createTarget(locFR, true, IResource.COPY_ALL);
-		Code code = tu.getTarget(locFR, false).getFirstContent().getCode(0);
+		Code code = tu.getTarget(locFR).getFirstContent().getCode(0);
 		assertEquals(code.getData(), "startCode<sub>[nested<ph id=\"2\">ph-in-sub</ph>still in sub]</sub>endCode");
 		assertEquals(code.getOuterData(), "<ph id=\"1\">startCode<sub>[nested<ph id=\"2\">ph-in-sub</ph>still in sub]</sub>endCode</ph>");
 	}
@@ -917,7 +917,7 @@ public class XLIFFFilterTest {
 		ITextUnit tu = FilterTestDriver.getTextUnit(createSegmentedTUEmptyTarget(), 1);
 		assertNotNull(tu);
 		assertEquals("<1/>[t1]", fmt.printSegmentedContent(tu.getSource(), true));
-		TextContainer trgCont = tu.getTarget(locFR, false);
+		TextContainer trgCont = tu.getTarget(locFR);
 		assertNotNull(trgCont);
 		assertEquals("<1/>[]", fmt.printSegmentedContent(trgCont, true));
 	}
@@ -1018,7 +1018,7 @@ public class XLIFFFilterTest {
 		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertEquals("code=", tu.getSource().toString());
 		tu.setTarget(LocaleId.FRENCH, tu.getSource());
-		assertEquals("code=", tu.getTarget(LocaleId.FRENCH, false).toString());
+		assertEquals("code=", tu.getTarget(LocaleId.FRENCH).toString());
 		assertNotNull(tu);
 	}
 

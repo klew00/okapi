@@ -931,7 +931,7 @@ public class XLIFFFilter implements IFilter {
 		
 		// Look where the annotation needs to go: segment or container?
 		// Get the target (and possibly creates it if needed)
-		TextContainer tc = tu.getTarget(trgLang, false);
+		TextContainer tc = tu.getTarget(trgLang);
 		if ( tc == null ) {
 			// Create a target from the source if needed
 			tc = tu.createTarget(trgLang, false, IResource.COPY_SEGMENTATION); // was COPY_CONTENT before ITextUnit

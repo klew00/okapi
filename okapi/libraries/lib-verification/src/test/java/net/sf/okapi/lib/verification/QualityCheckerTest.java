@@ -198,7 +198,7 @@ public class QualityCheckerTest {
 		ITextUnit tu = new TextUnit("id", "src text");
 		tu.getSource().getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<code/>");
 		tu.setTarget(locFR, new TextContainer("src text"));
-		tu.getTarget(locFR, false).getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<code/>");
+		tu.getTarget(locFR).getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<code/>");
 		
 		session.processTextUnit(tu);
 		List<Issue> issues = session.getIssues();
@@ -211,7 +211,7 @@ public class QualityCheckerTest {
 		ITextUnit tu = new TextUnit("id", "src text");
 		tu.getSource().getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<code/>");
 		tu.setTarget(locFR, new TextContainer("src text"));
-		tu.getTarget(locFR, false).getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<etc/>");
+		tu.getTarget(locFR).getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<etc/>");
 		
 		session.processTextUnit(tu);
 		List<Issue> issues = session.getIssues();
@@ -226,7 +226,7 @@ public class QualityCheckerTest {
 		ITextUnit tu = new TextUnit("id", "src text");
 		tu.getSource().getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<code/>");
 		tu.setTarget(locFR, new TextContainer("src text"));
-		tu.getTarget(locFR, false).getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<etc/>");
+		tu.getTarget(locFR).getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<etc/>");
 		
 		session.getParameters().setTargetSameAsSourceWithCodes(false);
 		session.processTextUnit(tu);
@@ -243,7 +243,7 @@ public class QualityCheckerTest {
 		ITextUnit tu = new TextUnit("id", "src ");
 		tu.getSource().getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<code/>");
 		tu.setTarget(locFR, new TextContainer("trg "));
-		tu.getTarget(locFR, false).getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<CODE />");
+		tu.getTarget(locFR).getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<CODE />");
 		
 		session.processTextUnit(tu);
 		List<Issue> issues = session.getIssues();
@@ -259,9 +259,9 @@ public class QualityCheckerTest {
 		tu.getSource().getSegments().get(0).text.append(" and ");
 		tu.getSource().getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<code2/>");
 		tu.setTarget(locFR, new TextContainer("trg "));
-		tu.getTarget(locFR, false).getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<code2/>");
-		tu.getTarget(locFR, false).getSegments().get(0).text.append(" et ");
-		tu.getTarget(locFR, false).getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<code1/>");
+		tu.getTarget(locFR).getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<code2/>");
+		tu.getTarget(locFR).getSegments().get(0).text.append(" et ");
+		tu.getTarget(locFR).getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<code1/>");
 		
 		session.processTextUnit(tu);
 		List<Issue> issues = session.getIssues();
@@ -273,7 +273,7 @@ public class QualityCheckerTest {
 		ITextUnit tu = new TextUnit("id", "src text");
 		tu.getSource().getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<code/>");
 		tu.setTarget(locFR, new TextContainer("src text"));
-		tu.getTarget(locFR, false).getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<CODE/>");
+		tu.getTarget(locFR).getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<CODE/>");
 		
 		session.getParameters().setCodeDifference(false);
 		session.startProcess(locEN, locFR);
@@ -289,7 +289,7 @@ public class QualityCheckerTest {
 		ITextUnit tu = new TextUnit("id", "src text");
 		tu.getSource().getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<code/>");
 		tu.setTarget(locFR, new TextContainer("src text"));
-		tu.getTarget(locFR, false).getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<CODE/>");
+		tu.getTarget(locFR).getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<CODE/>");
 		
 		session.getParameters().setCodeDifference(false);
 		session.getParameters().setTargetSameAsSourceWithCodes(false);

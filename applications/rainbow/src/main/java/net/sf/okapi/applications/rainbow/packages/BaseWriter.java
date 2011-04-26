@@ -287,7 +287,7 @@ public abstract class BaseWriter implements IWriter {
 
 	public void writeTMXEntries (ITextUnit tu) {
 		// Check if we have a target
-		TextContainer tc = tu.getTarget(trgLoc, false);
+		TextContainer tc = tu.getTarget(trgLoc);
 		if (( tc == null ) || ( tc.isEmpty() )) {
 			return; // No target
 		}
@@ -311,7 +311,7 @@ public abstract class BaseWriter implements IWriter {
 
 		// Process translations in the AltTranslationsAnnotation annotation
 		// alternates from the input file or leveraged entries
-		TextContainer altCont = tu.getTarget(trgLoc, false);
+		TextContainer altCont = tu.getTarget(trgLoc);
 
 		// From the segments
 		ISegments srcSegs = tu.getSource().getSegments();

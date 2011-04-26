@@ -96,7 +96,7 @@ public class Writer extends net.sf.okapi.applications.rainbow.packages.xliff.Wri
 		// In OmegaT we put both the approved and exact match of the project_save.tmx (the 'approved' one). 
 		String tuid = item.getName();
 		TextContainer srcTC = item.getSource();
-		TextContainer trgTC = item.getTarget(trgLoc, false);
+		TextContainer trgTC = item.getTarget(trgLoc);
 
 		ISegments trgSegs = trgTC.getSegments();
 		for ( Segment srcSeg : srcTC.getSegments() ) {

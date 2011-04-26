@@ -80,7 +80,7 @@ public class DesegmentationStep extends BasePipelineStep {
 		
 		// Desegment target if needed
 		if ( params.getDesegmentTarget() ) {
-			TextContainer cont = tu.getTarget(targetLocale, false);
+			TextContainer cont = tu.getTarget(targetLocale);
 			if ( cont != null ) {
 				if ( cont.hasBeenSegmented() ) {
 					cont.getSegments().joinAll();

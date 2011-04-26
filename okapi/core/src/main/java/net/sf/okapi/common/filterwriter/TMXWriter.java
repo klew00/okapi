@@ -246,8 +246,8 @@ public class TMXWriter {
     	if ( !tu.hasTarget(trgLoc) ) {
     		return; // No target
     	}
-    	ISegments srcSegs = tu.getSource().getSegments();
-    	ISegments trgSegs = tu.getTarget(trgLoc).getSegments();
+    	ISegments srcSegs = tu.getSourceSegments();
+    	ISegments trgSegs = tu.getTargetSegments(trgLoc);
 
     	// Output each segment (handles single-segment entry)
     	String tuId = tu.getId();
@@ -427,7 +427,7 @@ public class TMXWriter {
     public void writeAlternates (ITextUnit tu,
     	LocaleId trgLoc)
     {
-    	TextContainer tc = tu.getTarget(trgLoc, false);
+    	TextContainer tc = tu.getTarget(trgLoc);
     	if ( tc == null ) return; // No target
     	AltTranslationsAnnotation atAnn;
     	
@@ -657,7 +657,7 @@ public class TMXWriter {
     		// Write each target TUV
     		for ( LocaleId loc : locales ) {
     			Segment trgSeg = null;
-        		TextContainer trgCont = item.getTarget(loc, false);
+        		TextContainer trgCont = item.getTarget(loc);
         		if ( trgCont != null ) {
         			trgSeg = trgCont.getSegments().get(srcSeg.id);
         		}

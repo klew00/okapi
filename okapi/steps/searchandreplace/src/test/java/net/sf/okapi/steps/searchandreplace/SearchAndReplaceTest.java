@@ -77,7 +77,7 @@ public class SearchAndReplaceTest {
 		assertEquals(EventType.START_BATCH_ITEM, el.remove(0).getEventType());
 		tu = el.get(0).getTextUnit();
 		assertTrue(tu.getSource().getFirstContent().isEmpty());
-		assertEquals("{nb}{tab}{em}{en}{emsp}{ensp}", tu.getTarget(LocaleId.SPANISH, false).getFirstContent().toString());
+		assertEquals("{nb}{tab}{em}{en}{emsp}{ensp}", tu.getTarget(LocaleId.SPANISH).getFirstContent().toString());
 		assertEquals(EventType.TEXT_UNIT, el.remove(0).getEventType());
 		assertEquals(EventType.END_BATCH_ITEM, el.remove(0).getEventType());
 		assertEquals(EventType.END_BATCH, el.remove(0).getEventType());
@@ -117,7 +117,7 @@ public class SearchAndReplaceTest {
 		assertEquals(EventType.START_BATCH_ITEM, el.remove(0).getEventType());
 		tu = el.get(0).getTextUnit();
 		assertTrue(tu.getSource().getFirstContent().isEmpty());
-		assertEquals("{nb}{tab}{em}{en}{emsp}{ensp}", tu.getTarget(LocaleId.SPANISH, false).getFirstContent().toString());
+		assertEquals("{nb}{tab}{em}{en}{emsp}{ensp}", tu.getTarget(LocaleId.SPANISH).getFirstContent().toString());
 		assertEquals(EventType.TEXT_UNIT, el.remove(0).getEventType());
 		assertEquals(EventType.END_BATCH_ITEM, el.remove(0).getEventType());
 		assertEquals(EventType.END_BATCH, el.remove(0).getEventType());
@@ -181,7 +181,7 @@ public class SearchAndReplaceTest {
 		assertEquals(EventType.START_BATCH_ITEM, el.remove(0).getEventType());
 		tu = el.get(0).getTextUnit();
 		assertEquals("{nb}{tab}{em}{en}{emsp}{ensp}", tu.getSource().getFirstContent().toString());
-		assertTrue(tu.getTarget(LocaleId.SPANISH, false).getFirstContent().isEmpty());
+		assertTrue(tu.getTarget(LocaleId.SPANISH).getFirstContent().isEmpty());
 		assertEquals(EventType.TEXT_UNIT, el.remove(0).getEventType());
 		assertEquals(EventType.END_BATCH_ITEM, el.remove(0).getEventType());
 		assertEquals(EventType.END_BATCH, el.remove(0).getEventType());

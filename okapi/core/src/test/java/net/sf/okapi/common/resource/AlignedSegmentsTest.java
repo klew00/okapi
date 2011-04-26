@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -23,6 +23,7 @@ package net.sf.okapi.common.resource;
 import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
+
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import static net.sf.okapi.common.resource.IAlignedSegments.*;
@@ -430,10 +431,6 @@ public class AlignedSegmentsTest {
         
     }
 
-
-
-
-
     private ITextUnit createSegmentedTU () {
     	ITextUnit tu = new TextUnit("id", "Part 1.");
     	tu.getSource().getSegments().append(new Segment("s2", new TextFragment("Part 2.")), " a ");
@@ -443,10 +440,10 @@ public class AlignedSegmentsTest {
     private ITextUnit createSegmentedTUAndTarget () {
     	ITextUnit tu = createSegmentedTU();
     	// Add the target segments
-    	ISegments segs = tu.getTarget(locFR).getSegments();
+    	ISegments segs = tu.getTargetSegments(locFR);
     	segs.get(0).text.append("Trg 1.");
     	segs.get(1).text.append("Trg 2.");
-    	segs = tu.getTarget(locES).getSegments();
+    	segs = tu.getTargetSegments(locES);
     	segs.get(0).text.append("Objetivo 1.");
     	segs.get(1).text.append("Objetivo 2.");
     	return tu;

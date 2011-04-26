@@ -134,7 +134,7 @@ public class CategoryResolver {
 		}
 		
 		for (LocaleId trgLoc : tu.getTargetLocales()) {
-			tc = tu.getTarget(trgLoc, false);
+			tc = tu.getTarget(trgLoc);
 			ma = tc.getAnnotation(MetricsAnnotation.class);
 			resolve(ma, false);
 			

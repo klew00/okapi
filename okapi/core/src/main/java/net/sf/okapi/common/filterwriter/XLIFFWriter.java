@@ -456,7 +456,7 @@ public class XLIFFWriter implements IFilterWriter {
 		if ( trgLoc != null ) {
 			// At this point tc contains the source
 			// Do we have an available target to use instead?
-			tc = tu.getTarget(trgLoc, false);
+			tc = tu.getTarget(trgLoc);
 			boolean outputTarget = true;
 			if ( useSourceForTranslated || ( tc == null ) || ( tc.isEmpty() )
 				|| ( srcHasText && !tc.hasText(false) )) {
@@ -476,7 +476,7 @@ public class XLIFFWriter implements IFilterWriter {
 			// Possible alternate translations
 			if ( includeAltTrans ) {
 				// We re-get the target because tc could be coming from the source
-				TextContainer altCont = tu.getTarget(trgLoc, false);
+				TextContainer altCont = tu.getTarget(trgLoc);
 				if ( altCont != null ) {
 					// From the target container
 					writeAltTranslations(altCont.getAnnotation(AltTranslationsAnnotation.class), null);

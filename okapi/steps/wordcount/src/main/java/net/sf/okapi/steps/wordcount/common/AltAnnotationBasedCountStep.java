@@ -76,7 +76,7 @@ public abstract class AltAnnotationBasedCountStep extends BaseCountStep {
 		LocaleId trgLocale = getTargetLocale();
 		
 		TextContainer source = textUnit.getSource();
-		TextContainer target = textUnit.getTarget(trgLocale, false);
+		TextContainer target = textUnit.getTarget(trgLocale);
 		if (target == null) return 0;
 		
 		// Individual segments metrics

@@ -75,14 +75,14 @@ public class RTFFilterTest {
 		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents("Test01.rtf", locEN, locFR), 1);
 		assertNotNull(tu);
 		assertEquals("Text (to) translate.", tu.getSource().toString());
-		TextContainer tc = tu.getTarget(locFR, false);
+		TextContainer tc = tu.getTarget(locFR);
 		assertNotNull(tc);
 		assertEquals("Texte \u00e0 traduire.", tc.toString());
 
 		tu = FilterTestDriver.getTextUnit(getEvents("Test01.rtf", locEN, locFR), 2);
 		assertNotNull(tu);
 		assertEquals("[Text with <1>bold</1>.]", fmt.printSegmentedContent(tu.getSource(), true));
-		tc = tu.getTarget(locFR, false);
+		tc = tu.getTarget(locFR);
 		assertNotNull(tc);
 		assertEquals("[Texte avec du <1>gras</1>.]", fmt.printSegmentedContent(tc, true));
 	}

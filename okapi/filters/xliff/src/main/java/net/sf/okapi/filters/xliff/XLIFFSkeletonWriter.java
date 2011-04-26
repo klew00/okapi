@@ -187,7 +187,7 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 		// Determine whether we output segmentation or not
 		boolean doSegments = doSegments(tu);
 		
-		TextContainer trgCont = tu.getTarget(locToUse, false);
+		TextContainer trgCont = tu.getTarget(locToUse);
 		if ( trgCont == null ) {
 			// If there is no target available
 			// We fall back to source
@@ -261,7 +261,7 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 		}
 		
 		StringBuilder tmp = new StringBuilder();
-		TextContainer tc = tu.getTarget(outputLoc, false);
+		TextContainer tc = tu.getTarget(outputLoc);
 		// From the target container
 		formatAltTranslations(tc.getAnnotation(AltTranslationsAnnotation.class), null, tmp);
 		// From the segments

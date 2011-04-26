@@ -121,7 +121,7 @@ class DbStoreBuilder implements IFilterWriter {
 		TextContainer tc;
 		if ( useSource ) tc = tu.getSource();
 		else { // Use the target
-			tc = tu.getTarget(language, false);
+			tc = tu.getTarget(language);
 			if ( tc == null ) return; // No target to set
 		}
 		// Segment if requested

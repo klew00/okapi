@@ -139,7 +139,7 @@ public class IdBasedCopyStep extends BasePipelineStep {
 		ITextUnit toCopyTu = toCopy.get(tu.getName());
 		TextContainer tc;
 		if ( toCopyTu != null ) {
-			if ( useTargetText ) tc = toCopyTu.getTarget(targetLocale, false);
+			if ( useTargetText ) tc = toCopyTu.getTarget(targetLocale);
 			else tc = toCopyTu.getSource();
 			if ( tc != null ) {
 				tu.setTarget(targetLocale, tc);

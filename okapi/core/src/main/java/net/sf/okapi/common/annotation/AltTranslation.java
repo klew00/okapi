@@ -104,7 +104,7 @@ public class AltTranslation implements Comparable<AltTranslation> {
 	 * @return the target content of this entry.
 	 */
 	public TextContainer getTarget () {
-		return tu.getTarget(trgLocId, false);
+		return tu.getTarget(trgLocId);
 	}
 
 	/**

@@ -89,7 +89,7 @@ public class TextUnitBean implements IPersistenceBean {
 			for (LocaleId locId : tu.getTargetLocales()) {
 				TextContainerBean targetBean = new TextContainerBean();
 				targets.put(locId.toString(), targetBean);
-				targetBean.set(tu.getTarget(locId, false));
+				targetBean.set(tu.getTarget(locId));
 			}
 			
 			skeleton.set(tu.getSkeleton());

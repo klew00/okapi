@@ -332,7 +332,7 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 			
 			// search and replace on target
 			if ( params.target ) {							
-				TextContainer tc = tu.getTarget(targetLocale, false);
+				TextContainer tc = tu.getTarget(targetLocale);
 				if (tc != null) {
 					for (Segment seg : tc.getSegments()) {
 						tmp = searchAndReplace(seg.text.toString());

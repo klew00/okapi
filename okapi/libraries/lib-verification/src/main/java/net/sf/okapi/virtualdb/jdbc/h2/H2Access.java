@@ -975,7 +975,7 @@ public class H2Access implements IDBAccess {
 		Iterator<LocaleId> iter = tu.getTargetLocales().iterator();
 		while ( iter.hasNext() ) {
 			LocaleId loc = iter.next();
-			TextContainer tc = tu.getTarget(loc, false);
+			TextContainer tc = tu.getTarget(loc);
 			tmp0.append(loc.toString()+"|");
 			String[] data = TextContainer.contentToSplitStorage(tc);
 			tmp0.append(data[0]);  // Target coded text

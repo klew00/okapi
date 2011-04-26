@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -1215,7 +1214,7 @@ public class TextUnitUtilTest {
 		tc.append(new Segment("s3", tf3));
 		tc.append(new TextPart("[text part 4]"));
 		
-		String saveTc = tc.toString();
+//		String saveTc = tc.toString();
 		
 		TextFragment tf = TextUnitUtil.storeSegmentation(tc);
 		assertEquals("<1/><1/><2/><3/><4/><2/><3/>[text part 1]<4/><5/><1/><2/><3/><4/><6/><7/>[text part 2]<8/>" +

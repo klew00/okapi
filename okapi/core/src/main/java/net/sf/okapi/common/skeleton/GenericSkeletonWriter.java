@@ -259,7 +259,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 					tc = tu.getSource();
 				}
 				else { // Target
-					tc = tu.getTarget(locId, false);
+					tc = tu.getTarget(locId);
 				}
 				Segment seg = null;
 				if ( tc != null ) {
@@ -387,7 +387,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		TextContainer srcCont = tu.getSource();
 		TextContainer trgCont = null;
 		if ( locToUse != null ) { // Expects a target output
-			trgCont = tu.getTarget(locToUse, false);
+			trgCont = tu.getTarget(locToUse);
 			// If we do not have target
 			// or if the target is empty (regardless the source)
 			if (( trgCont == null ) || trgCont.isEmpty() ) {

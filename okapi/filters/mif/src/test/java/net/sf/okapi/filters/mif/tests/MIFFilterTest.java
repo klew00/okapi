@@ -113,7 +113,7 @@ public class MIFFilterTest {
 		list = getEventsFromFile("TestMarkers.mif", params);
 		tu = FilterTestDriver.getTextUnit(list, 1);
 		assertNotNull(tu);
-		assertEquals("Text with index about some subject.", fmt.setContent(tu.getSource().getFirstContent()).toString());
+		assertEquals("<1/>Text with index about some subject.", fmt.setContent(tu.getSource().getFirstContent()).toString());
 	}
 
 	@Test
@@ -165,6 +165,12 @@ public class MIFFilterTest {
 		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
 		assertEquals("text", fmt.setContent(tu.getSource().getFirstContent()).toString());
+		
+		String expected = STARTMIF
+			+ "<Unique 12345><ParaLine <String `text'>> # end of ParaLine\n"
+			+ ENDMIF;
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), locEN));
 	}
 	
 	@Test
@@ -174,30 +180,67 @@ public class MIFFilterTest {
 			+ ENDMIF;
 		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu==null);
+		String expected = STARTMIF
+			+ "<Unique 12345><ParaLine <TextRectID 9> > # end of ParaLine\n"
+			+ ENDMIF;
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), locEN));
 	}
 
 	@Test
 	public void testTwoPartsEntry () {
 		String snippet = STARTMIF
-			+ "<Unique 12345><ParaLine <String `Part 1'><ParaLine <String ` and part 2'>>"
+			+ "<Unique 12345>#EOU\n<ParaLine \n <String `Part 1'>#EOS\n>#EOPL\n<ParaLine \n <String ` and part 2'>#EOS\n>#EOPL\n"
 			+ ENDMIF;
 		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
 		assertEquals("Part 1 and part 2", fmt.setContent(tu.getSource().getFirstContent()).toString());
+		
+		String expected = STARTMIF
+			+ "<Unique 12345>#EOU\n<ParaLine \n <String `Part 1 and part 2'>#EOS\n#EOPL\n> # end of ParaLine\n"
+			+ ENDMIF;
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), locEN));
 	}
-	
+
 	@Test
 	public void testEmptyString () {
 		String snippet = STARTMIF
-			+ "<Unique 12345><ParaLine <String `Text 1'><Dummy 1><Char ThinSpace><String `'><Dummy 2><String ` end'>>"
+			+ "<Unique 12345><ParaLine <String `Text 1'><AFrame 1><Char ThinSpace><String `'><AFrame 2><String ` end'>>"
 			+ ENDMIF;
 		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
 		assertEquals("Text 1<1/>\u2009<2/> end", fmt.setContent(tu.getSource().getFirstContent()).toString());
 		Code code = tu.getSource().getFirstContent().getCode(0);
-		assertEquals("'><Dummy 1><String `", code.getData());
+		assertEquals("'><AFrame 1><String `", code.getData());
 		code = tu.getSource().getFirstContent().getCode(1);
-		assertEquals("'><Dummy 2><String `", code.getData());
+		assertEquals("'><AFrame 2><String `", code.getData());
+	}
+	
+	@Test
+	public void testEmptyStringInFront () {
+		String snippet = STARTMIF
+			+ "<Unique 12345><ParaLine <String `'><Font 1><String `Text'>>"
+			+ ENDMIF;
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertNotNull(tu);
+		assertEquals("Text", fmt.setContent(tu.getSource().getFirstContent()).toString());
+	}
+	
+	@Test
+	public void testTrimFontInFront () {
+		String snippet = STARTMIF
+			+ "<Unique 12345><ParaLine <Font 1><String `Text'>>"
+			+ ENDMIF;
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertNotNull(tu);
+		assertEquals("Text", fmt.setContent(tu.getSource().getFirstContent()).toString());
+		
+		String expected = STARTMIF
+			+ "<Unique 12345><ParaLine <String `'><Font 1><String `Text'>> # end of ParaLine\n"
+			+ ENDMIF;
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), locEN));
 	}
 	
 	@Test
@@ -206,18 +249,24 @@ public class MIFFilterTest {
 			+ "<Unique 12345><ParaLine <String ` '><Var 1><Char Tab><Char Tab>>"
 			+ ENDMIF;
 		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
-		assertTrue(tu==null);
+		assertTrue(tu==null); // No text to extract
+
+		String expected = STARTMIF
+			+ "<Unique 12345><ParaLine <String ` '><Var 1><String `'><Char Tab><String `'><Char Tab><String `'>> # end of ParaLine\n"
+			+ ENDMIF;
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), locEN));
 	}
 
 	@Test
 	public void testTabsAndCodes () {
 		String snippet = STARTMIF
-			+ "<Unique 12345><ParaLine <Char Tab><Font 1><Var 1><Font 2><Char Tab><ParaLine <Font 3>>"
+			+ "<Unique 12345><ParaLine <Char Tab><Font 1><Var 1><Font 2><Char Tab>><ParaLine <Font 3>>"
 			+ ENDMIF;
 		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertTrue(tu==null);
 		DocumentPart dp = FilterTestDriver.getDocumentPart(getEvents(snippet), 2);
-		assertEquals("<TextFlow <Para <Unique 12345><ParaLine <String `'><Char Tab><String `'><Font 1><Var 1><Font 2><String `'><Char Tab><String `'><ParaLine <Font 3>>>>", dp.getSkeleton().toString());
+		assertEquals("<TextFlow <Para <Unique 12345><ParaLine <String `'><Char Tab><String `'><Font 1><Var 1><Font 2><String `'><Char Tab><String `'><Font 3>> # end of ParaLine\n>", dp.getSkeleton().toString());
 	}
 
 	@Test
@@ -230,6 +279,18 @@ public class MIFFilterTest {
 		assertEquals("Text 1<1/>\u2009Text 2", fmt.setContent(tu.getSource().getFirstContent()).toString());
 		Code code = tu.getSource().getFirstContent().getCode(0);
 		assertEquals("'><Dummy <InDummy 2>><String `", code.getData());
+	}
+
+	@Test
+	public void testCodeAtTheFront () {
+		String snippet = STARTMIF
+			+ "<Unique 12345><ParaLine <Font 1><String `text 1'><Font 2><String `text 2'>"
+			+ ENDMIF;
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertNotNull(tu);
+		assertEquals("<1/>text 1<2/>text 2", fmt.setContent(tu.getSource().getFirstContent()).toString());
+		assertEquals("'><Font 1><String `", tu.getSource().getFirstContent().getCode(0).getData());
+		assertEquals("'><Font 2><String `", tu.getSource().getFirstContent().getCode(1).getData());
 	}
 
 	@Test
@@ -254,26 +315,28 @@ public class MIFFilterTest {
 	@Test
 	public void testDummyCharString () {
 		String snippet = STARTMIF
-			+ "<Unique 12345><ParaLine <Var 1><Char Tab><String `aaa'>>"
+			+ "<Unique 12345><ParaLine <AFrame 1><Char Tab><String `aaa'>>"
 			+ ENDMIF;
 		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
-		assertEquals("\taaa", fmt.setContent(tu.getSource().getFirstContent()).toString());
-		assertEquals("<TextFlow <Para <Unique 12345><ParaLine <Var 1><String `[#$$self$]'>>>", tu.getSkeleton().toString());
+		assertEquals("<1/>\taaa", fmt.setContent(tu.getSource().getFirstContent()).toString());
+		assertEquals("'><AFrame 1><String `", tu.getSource().getFirstContent().getCodes().get(0).getData());
+		assertEquals("<TextFlow <Para <Unique 12345><ParaLine <String `[#$$self$]'>> # end of ParaLine\n>", tu.getSkeleton().toString());
 	}
 
 	@Test
 	public void testEmptyFTag () {
 		String snippet = STARTMIF
-			+ "<Unique 12345><ParaLine <Dummy 1><String `Text 1'><Char ThinSpace><Dummy 2><String `5'><Dummy 3>>"
+			+ "<Unique 12345><ParaLine <AFrame 1><String `Text 1'><Char ThinSpace><AFrame 2><String `text 2'><AFrame 3>>"
 			+ ENDMIF;
 		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
-		assertEquals("Text 1\u2009<1/>5", fmt.setContent(tu.getSource().getFirstContent()).toString());
-		Code code = tu.getSource().getFirstContent().getCode(0);
-		assertEquals("'><Dummy 2><String `", code.getData());
+		assertEquals("<1/>Text 1\u2009<2/>text 2", fmt.setContent(tu.getSource().getFirstContent()).toString());
+		assertEquals("'><AFrame 1><String `", tu.getSource().getFirstContent().getCode(0).getData());
+		assertEquals("'><AFrame 2><String `", tu.getSource().getFirstContent().getCode(1).getData());
+//		assertEquals("'><AFrame 3>", tu.getSource().getFirstContent().getCode(2).getData());
 	}
-	
+
 	@Test
 	public void testSoftHyphen () {
 		String snippet = STARTMIF
@@ -283,6 +346,27 @@ public class MIFFilterTest {
 		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
 		assertEquals("However.", fmt.setContent(tu.getSource().getFirstContent()).toString());
+	}
+
+	@Test
+	public void testNormalFont () {
+		String snippet = STARTMIF
+			+ "<Unique 123><ParaLine <Font <FTag `'><FLanguage NoLanguage><FLocked No>> # end of Font\n<String `Text'>>"
+			+ ENDMIF;
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertNotNull(tu);
+		assertEquals("Text", fmt.setContent(tu.getSource().getFirstContent()).toString());
+	}
+	
+	@Test
+	public void testEmptyParaLine () {
+		String snippet = STARTMIF
+			+ "<Unique 123>\n <ParaLine > # end of ParaLine\n"
+			+ ENDMIF;
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertTrue(tu==null);
+		DocumentPart dp = FilterTestDriver.getDocumentPart(getEvents(snippet), 2);
+		assertEquals("<TextFlow <Para <Unique 123>\n <ParaLine > # end of ParaLine\n>", dp.getSkeleton().toString());
 	}
 	
 	@Test
@@ -298,9 +382,10 @@ public class MIFFilterTest {
 
 	@Test
 	public void testOutputThenCompare () {
+		rewriteThenCompareFile("Test01.mif");
 		rewriteThenCompareFile("TestMarkers.mif");
 		rewriteThenCompareFile("Test03.mif");
-		rewriteThenCompareFile("Test01.mif");
+		rewriteThenCompareFile("Test04.mif");
 		rewriteThenCompareFile("Test02-v9.mif");
 		rewriteThenCompareFile("Test01.mif");
 		rewriteThenCompareFile("JATest.mif");
@@ -361,7 +446,10 @@ public class MIFFilterTest {
 		while ( filter.hasNext() ) {
 			Event event1 = list.get(i++);
 			Event event2 = filter.next();
-			assertTrue(event1.getEventType() == event2.getEventType());
+			if ( event1.getEventType() != event2.getEventType() ) {
+				// Trigger assert and allow easy debug
+				assertTrue(false);
+			}
 			if ( event1.getEventType() == EventType.TEXT_UNIT ) {
 				ITextUnit tu1 = event1.getTextUnit();
 				ITextUnit tu2 = event2.getTextUnit();

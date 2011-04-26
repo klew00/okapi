@@ -98,8 +98,8 @@ public class TextUnitTest {
 
 
     @Test
-    public void getTargetReturnsNewEmptyOnNoMatch(){
-        assertNotNull("When there is no match a empty should be returned", tu1.getTarget(locFR));
+    public void createTargetReturnsNewEmptyOnNoMatch(){
+        assertNotNull("When there is no match a empty should be returned", tu1.createTarget(locFR, false, IResource.COPY_SEGMENTATION));
         assertEquals("", tu1.getTarget(locFR).toString());
     }
 
@@ -430,10 +430,10 @@ public class TextUnitTest {
     private ITextUnit createSegmentedTUAndTarget () {
     	ITextUnit tu = createSegmentedTU();
     	// Add the target segments
-    	ISegments segs = tu.getTarget(locFR).getSegments();
+    	ISegments segs = tu.getTargetSegments(locFR);
     	segs.get(0).text.append("Trg 1.");
     	segs.get(1).text.append("Trg 2.");
-    	segs = tu.getTarget(locES).getSegments();
+    	segs = tu.getTargetSegments(locES);
     	segs.get(0).text.append("Objetivo 1.");
     	segs.get(1).text.append("Objetivo 2.");
     	return tu;

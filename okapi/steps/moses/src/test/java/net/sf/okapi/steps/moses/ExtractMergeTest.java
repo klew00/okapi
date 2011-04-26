@@ -131,7 +131,7 @@ public class ExtractMergeTest {
 		ITextUnit tu = FilterTestDriver.getTextUnit(list, 2);
 		assertNotNull(tu);
 		assertEquals("2", tu.getId());
-		ISegments segs = tu.getTarget(locFR, false).getSegments();
+		ISegments segs = tu.getTarget(locFR).getSegments();
 		assertEquals(2, segs.count());
 		for ( Segment seg : segs ) {
 			// Copy to the target was set so the target should be translated

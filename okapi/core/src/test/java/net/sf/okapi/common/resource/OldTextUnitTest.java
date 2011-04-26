@@ -64,13 +64,13 @@ public class OldTextUnitTest {
 
     @Test
     public void getTargetReturnsNullOnNoMatch(){
-        assertNull("When there is no match a null should be returned", tu1.getTarget(locFR, false));
+        assertNull("When there is no match a null should be returned", tu1.getTarget(locFR));
     }
 
 	@Test
 	public void getSetTarget () {
 		tu1.setTarget(locFR, tc1);
-		assertSame("The target should be TextContainer we just set", tc1, tu1.getTarget(locFR, false));
+		assertSame("The target should be TextContainer we just set", tc1, tu1.getTarget(locFR));
 	}
 
     @Test
@@ -104,15 +104,15 @@ public class OldTextUnitTest {
     public void createTargetSourceContentAndTargetContentSame(){
         tu1.setSource(tc1);
         tu1.createTarget(locFR, false, IResource.COPY_ALL);
-        assertEquals("Target text vs Source Text", tu1.getSource().toString(), tu1.getTarget(locFR, false).toString());
+        assertEquals("Target text vs Source Text", tu1.getSource().toString(), tu1.getTarget(locFR).toString());
     }
 
     @Test
 	public void createTargetDoesntAlreadyExist () {
 		tu1.setSource(tc1);
 		TextContainer tc2 = tu1.createTarget(locFR, false, IResource.COPY_ALL);
-		assertSame("Target should be the same as returned from createTarget", tc2, tu1.getTarget(locFR, false));
-		assertNotSame("Target should have been cloned", tu1.getTarget(locFR, false), tu1.getSource());
+		assertSame("Target should be the same as returned from createTarget", tc2, tu1.getTarget(locFR));
+		assertNotSame("Target should have been cloned", tu1.getTarget(locFR), tu1.getSource());
     }
 
     @Test
@@ -122,7 +122,7 @@ public class OldTextUnitTest {
 		TextContainer tc2 = new TextContainer("unique fr text");
 		tu1.setTarget(locFR, tc2);
 		tu1.createTarget(locFR, false, IResource.COPY_ALL);
-		assertSame("Target should not have been modified", tc2, tu1.getTarget(locFR, false));
+		assertSame("Target should not have been modified", tc2, tu1.getTarget(locFR));
     }
 
     @Test
@@ -131,7 +131,7 @@ public class OldTextUnitTest {
         TextContainer tc2 = new TextContainer("unique fr text");
         tu1.setTarget(locFR, tc2);
         tu1.createTarget(locFR, true, IResource.COPY_ALL);
-        assertNotSame("Target should not have been modified", tc2, tu1.getTarget(locFR, false));
+        assertNotSame("Target should not have been modified", tc2, tu1.getTarget(locFR));
 	}
 
     @Test
@@ -139,7 +139,7 @@ public class OldTextUnitTest {
         tu1.setSource(tc1);
         tu1.createTarget(locFR, false, IResource.CREATE_EMPTY);
         assertTrue(tu1.hasTarget(locFR));
-        assertEquals("Empty target created", "", tu1.getTarget(locFR, false).toString());
+        assertEquals("Empty target created", "", tu1.getTarget(locFR).toString());
 	}
     
     @Test
@@ -149,7 +149,7 @@ public class OldTextUnitTest {
         tu1.setTarget(locFR, tc2);
         tu1.createTarget(locFR, true, IResource.CREATE_EMPTY);
         assertTrue(tu1.hasTarget(locFR));
-        assertEquals("Empty target created", "", tu1.getTarget(locFR, false).toString());
+        assertEquals("Empty target created", "", tu1.getTarget(locFR).toString());
 	}
     
     @Test
@@ -158,8 +158,8 @@ public class OldTextUnitTest {
         tu1.getSource().setProperty(new Property("test", "value"));
         tu1.createTarget(locFR, false, IResource.COPY_PROPERTIES);
         assertTrue(tu1.hasTarget(locFR));
-        assertEquals("Empty target created", "", tu1.getTarget(locFR, false).toString());
-        assertTrue(tu1.getTarget(locFR, false).getProperty("test") != null);
+        assertEquals("Empty target created", "", tu1.getTarget(locFR).toString());
+        assertTrue(tu1.getTarget(locFR).getProperty("test") != null);
 	}
     
     @Test
@@ -170,8 +170,8 @@ public class OldTextUnitTest {
         tu1.setTarget(locFR, tc2);
         tu1.createTarget(locFR, true, IResource.COPY_PROPERTIES);
         assertTrue(tu1.hasTarget(locFR));
-        assertEquals("Empty target created", "", tu1.getTarget(locFR, false).toString());
-        assertTrue(tu1.getTarget(locFR, false).getProperty("test") != null);
+        assertEquals("Empty target created", "", tu1.getTarget(locFR).toString());
+        assertTrue(tu1.getTarget(locFR).getProperty("test") != null);
 	}
     
     @Test
@@ -182,8 +182,8 @@ public class OldTextUnitTest {
         tu1.setTarget(locFR, tc2);
         tu1.createTarget(locFR, false, IResource.COPY_PROPERTIES);
         assertTrue(tu1.hasTarget(locFR));
-        assertEquals("unique fr text", tu1.getTarget(locFR, false).toString());
-        assertTrue(tu1.getTarget(locFR, false).getProperty("test") == null);
+        assertEquals("unique fr text", tu1.getTarget(locFR).toString());
+        assertTrue(tu1.getTarget(locFR).getProperty("test") == null);
 	}
     
 	@Test

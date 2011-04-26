@@ -85,7 +85,7 @@ public class TextModificationStep extends BasePipelineStep {
 		if ( !params.applyToExistingTarget && tu.hasTarget(targetLocale) ) return event;
 		// Check if we need to apply to blank entries
 		if ( !params.applyToBlankEntries ) {
-			TextContainer tc = tu.getTarget(targetLocale, false);
+			TextContainer tc = tu.getTarget(targetLocale);
 			if ( tc == null ) tc = tu.getSource();
 			if ( !tc.hasText() ) return event;
 		}
@@ -93,7 +93,7 @@ public class TextModificationStep extends BasePipelineStep {
 		// Create the target if needed
 		tu.createTarget(targetLocale, false, IResource.COPY_ALL);
 		// If the target is empty we use the source
-		if ( tu.getTarget(targetLocale, false).isEmpty() ) {
+		if ( tu.getTarget(targetLocale).isEmpty() ) {
 			tu.createTarget(targetLocale, true, IResource.COPY_ALL);
 		}
 
@@ -128,7 +128,7 @@ public class TextModificationStep extends BasePipelineStep {
 	 * @param tu the text unit to process.
 	 */
 	private void removeText (ITextUnit tu) {
-		for ( TextPart part : tu.getTarget(targetLocale, false) ) {
+		for ( TextPart part : tu.getTarget(targetLocale) ) {
 			StringBuilder sb = new StringBuilder();
 			// Remove the text inside the part
 			String text = part.text.getCodedText();
@@ -150,7 +150,7 @@ public class TextModificationStep extends BasePipelineStep {
 	 */
 	private void replaceWithXN (ITextUnit tu) {
 		String tmp = null;
-		for ( TextPart part : tu.getTarget(targetLocale, false) ) {
+		for ( TextPart part : tu.getTarget(targetLocale) ) {
 			tmp = part.text.getCodedText().replaceAll("\\p{Lu}|\\p{Lo}", "X");
 			tmp = tmp.replaceAll("\\p{Ll}", "x");
 			tmp = tmp.replaceAll("\\d", "N");
@@ -160,7 +160,7 @@ public class TextModificationStep extends BasePipelineStep {
 	
 	private void replaceWithExtendedChars (ITextUnit tu) {
 		int n;
-		for ( TextPart part : tu.getTarget(targetLocale, false) ) {
+		for ( TextPart part : tu.getTarget(targetLocale) ) {
 			StringBuilder sb = new StringBuilder(part.text.getCodedText());
 			for ( int i=0; i<sb.length(); i++ ) {
 				if ( TextFragment.isMarker(sb.charAt(i)) ) {
@@ -177,7 +177,7 @@ public class TextModificationStep extends BasePipelineStep {
 	}
 
 	private void addSegmentMarks (ITextUnit tu) {
-		for ( Segment seg : tu.getTarget(targetLocale, false).getSegments() ) {
+		for ( Segment seg : tu.getTarget(targetLocale).getSegments() ) {
 			seg.text.setCodedText(STARTSEG+seg.text.getCodedText()+ENDSEG);
 		}
 	}
@@ -188,8 +188,8 @@ public class TextModificationStep extends BasePipelineStep {
 	 * @param tu The text unit to process.
 	 */
 	private void addText (ITextUnit tu) {
-		TextFragment firstFrag = tu.getTarget(targetLocale, false).getFirstContent();
-		TextFragment lastFrag = tu.getTarget(targetLocale, false).getLastContent();
+		TextFragment firstFrag = tu.getTarget(targetLocale).getFirstContent();
+		TextFragment lastFrag = tu.getTarget(targetLocale).getLastContent();
 		if ( params.addPrefix ) {
 			firstFrag.setCodedText(params.prefix + firstFrag.getCodedText());
 		}

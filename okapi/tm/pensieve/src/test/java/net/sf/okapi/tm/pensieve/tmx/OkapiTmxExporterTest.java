@@ -105,10 +105,10 @@ public class OkapiTmxExporterTest {
 
         verify(mockTmxWriter, times(2)).writeTUFull(tuCapture.capture());
         assertEquals("source of first tu written", "source", tuCapture.getAllValues().get(0).getSource().getFirstContent().toText());
-        assertEquals("target of first tu written", "target", tuCapture.getAllValues().get(0).getTarget(locFR, false).getFirstContent().toText());
+        assertEquals("target of first tu written", "target", tuCapture.getAllValues().get(0).getTarget(locFR).getFirstContent().toText());
         assertEquals("target of first tu written", "sourceid", tuCapture.getAllValues().get(0).getName());
         assertEquals("source of second tu written", "source2", tuCapture.getAllValues().get(1).getSource().getFirstContent().toText());
-        assertEquals("target of second tu written", "target2", tuCapture.getAllValues().get(1).getTarget(locFR, false).getFirstContent().toText());
+        assertEquals("target of second tu written", "target2", tuCapture.getAllValues().get(1).getTarget(locFR).getFirstContent().toText());
         assertEquals("target of second tu written", "sourceid2", tuCapture.getAllValues().get(1).getName());
     }
 
@@ -119,7 +119,7 @@ public class OkapiTmxExporterTest {
         verify(mockTmxWriter, times(1)).writeTUFull(tuCapture.capture());
         ITextUnit capturedTU = tuCapture.getValue();
         assertEquals("source of first tu written", "props_source", capturedTU.getSource().getFirstContent().toText());
-        assertEquals("target of first tu written", "props_target", capturedTU.getTarget(locProps, false).getFirstContent().toText());
+        assertEquals("target of first tu written", "props_target", capturedTU.getTarget(locProps).getFirstContent().toText());
         assertEquals("target of first tu written", "props_sourceid", capturedTU.getName());
         assertEquals("groupname metadata", "PropsGroupName", capturedTU.getProperty("Txt::GroupName").getValue());
         assertEquals("filename metadata", "PropsFileName", capturedTU.getProperty("Txt::FileName").getValue());

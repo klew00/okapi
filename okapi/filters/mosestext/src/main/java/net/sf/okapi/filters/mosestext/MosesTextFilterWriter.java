@@ -210,7 +210,7 @@ public class MosesTextFilterWriter implements IFilterWriter {
 			ISegments srcSegs = tu.getSource().getSegments();
 			ISegments trgSegs = null;
 			if ( tu.hasTarget(trgLoc) ) {
-				trgSegs = tu.getTarget(trgLoc, false).getSegments();
+				trgSegs = tu.getTargetSegments(trgLoc);
 			}
 
 			// Process by segments

@@ -52,7 +52,7 @@ public class TextModificationStepTest {
 		ITextUnit res = driver.getResult();
 		assertNotNull(res);
 		assertTrue(res.hasTarget(locFR));
-		assertEquals(original, res.getTarget(locFR, false).toString());
+		assertEquals(original, res.getTarget(locFR).toString());
 	}
 
 	@Test
@@ -64,7 +64,7 @@ public class TextModificationStepTest {
 		ITextUnit res = driver.getResult();
 		assertNotNull(res);
 		assertTrue(res.hasTarget(locFR));
-		assertEquals(original, res.getTarget(locFR, false).toString());
+		assertEquals(original, res.getTarget(locFR).toString());
 	}
 
 	@Test
@@ -84,7 +84,7 @@ public class TextModificationStepTest {
 		ITextUnit res = driver.getResult();
 		assertNotNull(res);
 		assertTrue(res.hasTarget(locFR));
-		assertEquals(expected, res.getTarget(locFR, false).toString());
+		assertEquals(expected, res.getTarget(locFR).toString());
 	}
 
 	@Test
@@ -99,7 +99,7 @@ public class TextModificationStepTest {
 		ITextUnit res = driver.getResult();
 		assertNotNull(res);
 		assertTrue(res.hasTarget(locFR));
-		assertEquals(expected, res.getTarget(locFR, false).toString());
+		assertEquals(expected, res.getTarget(locFR).toString());
 	}
 
 	@Test
@@ -116,7 +116,7 @@ public class TextModificationStepTest {
 		ITextUnit res = driver.getResult();
 		assertNotNull(res);
 		assertTrue(res.hasTarget(locFR));
-		assertEquals(expected, res.getTarget(locFR, false).toString());
+		assertEquals(expected, res.getTarget(locFR).toString());
 	}
 
 	@Test
@@ -131,7 +131,7 @@ public class TextModificationStepTest {
 		ITextUnit res = driver.getResult();
 		assertNotNull(res);
 		assertTrue(res.hasTarget(locFR));
-		assertEquals(expected, res.getTarget(locFR, false).toString());
+		assertEquals(expected, res.getTarget(locFR).toString());
 	}
 
 	@Test
@@ -147,7 +147,7 @@ public class TextModificationStepTest {
 		ITextUnit res = driver.getResult();
 		assertNotNull(res);
 		assertTrue(res.hasTarget(locFR));
-		assertEquals(expected, res.getTarget(locFR, false).toString());
+		assertEquals(expected, res.getTarget(locFR).toString());
 	}
 
 }

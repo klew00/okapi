@@ -526,7 +526,7 @@ public class FilterTestDriver {
 		System.out.println("---Text Unit");
 		System.out.println("S=[" + tu.toString() + "]");
 		for (LocaleId lang : tu.getTargetLocales()) {
-			System.out.println("T(" + lang + ")=[" + tu.getTarget(lang, false).toString() + "]");
+			System.out.println("T(" + lang + ")=[" + tu.getTarget(lang).toString() + "]");
 		}
 	}
 

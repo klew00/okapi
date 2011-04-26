@@ -1290,7 +1290,7 @@ public class FixedWidthColumnsFilterTest {
 				assertEquals(expName, tu.getName());
 			}
 			if ( !Util.isEmpty(target) && !Util.isNullOrEmpty(language) ) {
-				TextContainer trg = tu.getTarget(language, false);
+				TextContainer trg = tu.getTarget(language);
 				assertNotNull(trg);
 				assertEquals(target, trg.toString());
 			}

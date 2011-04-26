@@ -388,7 +388,7 @@ public class TokenizationStep extends AbstractPipelineStep {
 		
 		for (LocaleId language : tu.getTargetLocales()) {
 		
-			Tokens tokens = tokenize(tu.getTarget(language, false), language);
+			Tokens tokens = tokenize(tu.getTarget(language), language);
 			if (tokens == null) continue;
 			
 			// Attach to TU		

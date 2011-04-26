@@ -302,7 +302,7 @@ public class Merger {
 		}
 
 		// Get the translated target
-		TextContainer fromTrans = tuFromTrans.getTarget(trgLoc, false);
+		TextContainer fromTrans = tuFromTrans.getTarget(trgLoc);
 		if ( fromTrans == null ) {
 			if ( tuFromTrans.getSource().isEmpty() ) return;
 			// Else: Missing target in the XLIFF

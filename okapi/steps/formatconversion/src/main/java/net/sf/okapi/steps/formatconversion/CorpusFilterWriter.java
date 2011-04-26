@@ -227,7 +227,7 @@ public class CorpusFilterWriter implements IFilterWriter {
 		if ( !tu.isTranslatable() ) return;
 
 		TextContainer srcCont = tu.getSource();
-		TextContainer trgCont = tu.getTarget(trgLoc, false);
+		TextContainer trgCont = tu.getTarget(trgLoc);
 		if ( trgCont == null ) {
 			return; // No output for no-target 
 		}

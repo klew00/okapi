@@ -152,7 +152,7 @@ public class Merger {
 		}
 		
 		// Check if we have a translation
-		TextContainer trgTraCont = traTu.getTarget(trgLoc, false);
+		TextContainer trgTraCont = traTu.getTarget(trgLoc);
 		if ( trgTraCont == null ) {
 			if ( !oriTu.getSource().hasText() ) {
 				// Warn only if there source is not empty

@@ -51,7 +51,7 @@ public class WordCounter {
 		if ( !tu.hasTarget(trgId) ) {
 			return 0;
 		}
-		return getWordCount(tu.getTarget(trgId, false));
+		return getWordCount(tu.getTarget(trgId));
 	}
 	
 	public long getWordCount (TextContainer cont) {

@@ -115,7 +115,7 @@ public class IdAlignerTest {
 
 		Event tue = el.remove(0);
 		assertTrue(tue.getTextUnit().hasTarget(LocaleId.GERMAN));
-		assertEquals("Abbrechen", tue.getTextUnit().getTarget(LocaleId.GERMAN, false)
+		assertEquals("Abbrechen", tue.getTextUnit().getTarget(LocaleId.GERMAN)
 				.toString());
 
 		tue = el.remove(0);

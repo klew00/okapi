@@ -55,7 +55,7 @@ public class AltTranslationBean extends PersistenceBean<AltTranslation> {
 		
 		if (tunit != null) {
 			src = tunit.getSource().getSegments().getFirstContent(); 
-			trg = tunit.getTarget(trgLoc, false).getSegments().getFirstContent();
+			trg = tunit.getTarget(trgLoc).getSegments().getFirstContent();
 		}		
 		return new AltTranslation(srcLoc, trgLoc, null, src, trg, type, score, origin);
 	}

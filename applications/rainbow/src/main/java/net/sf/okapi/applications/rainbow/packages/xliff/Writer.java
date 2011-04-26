@@ -359,7 +359,7 @@ public class Writer extends BaseWriter {
 		
 		// At this point tc contains the source
 		// Do we have an available target to use instead?
-		tc = tu.getTarget(trgLoc, false);
+		tc = tu.getTarget(trgLoc);
 		if ( useSourceForTranslated || ( tc == null ) || ( tc.isEmpty() )
 			|| ( srcHasText && !tc.hasText(false) )) {
 			tc = tu.getSource(); // Fall back to source
@@ -383,7 +383,7 @@ public class Writer extends BaseWriter {
 		
 		// Alt-trans
 		if ( options.includeAltTrans ) {
-			tc = tu.getTarget(trgLoc, false);
+			tc = tu.getTarget(trgLoc);
 			if ( tc != null ) {
 				writeAlternates(tc.getAnnotation(AltTranslationsAnnotation.class), null);
 				for ( Segment seg : tc.getSegments() ) {

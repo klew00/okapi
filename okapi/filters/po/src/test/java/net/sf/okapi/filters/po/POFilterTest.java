@@ -201,7 +201,7 @@ public class POFilterTest {
 		assertNotNull(tu);
 		assertTrue(tu.hasTarget(locFR));
 		TextFragment src = tu.getSource().getFirstContent();
-		TextFragment trg = tu.getTarget(locFR, false).getFirstContent();
+		TextFragment trg = tu.getTarget(locFR).getFirstContent();
 		assertEquals(3, src.getCodes().size());
 		assertEquals(src.getCodes().size(), trg.getCodes().size());
 		FilterTestDriver.checkCodeData(src, trg);
@@ -370,7 +370,7 @@ public class POFilterTest {
 		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
 		assertNotNull(tu);
 		assertEquals("Source", tu.getSource().toString());
-		assertEquals("Target", tu.getTarget(locFR, false).toString());
+		assertEquals("Target", tu.getTarget(locFR).toString());
 		assertEquals("123", tu.getId());
 	}
 	
@@ -400,7 +400,7 @@ public class POFilterTest {
 
 		assertNotNull(tu);
 		assertEquals("Source", tu.getSource().toString());
-		assertEquals("Target", tu.getTarget(locFR, false).toString());
+		assertEquals("Target", tu.getTarget(locFR).toString());
 
 		assertTrue(tu.hasTargetProperty(locFR, Property.APPROVED));
 		Property prop = tu.getTargetProperty(locFR, Property.APPROVED);
@@ -469,7 +469,7 @@ public class POFilterTest {
 		// First TU
 		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
 		assertNotNull(tu);
-		assertEquals("translation-singular", tu.getTarget(locFR, false).toString());
+		assertEquals("translation-singular", tu.getTarget(locFR).toString());
 		Property prop = tu.getTargetProperty(locFR, Property.APPROVED);
 		assertNotNull(prop);
 		assertEquals("no", prop.getValue());
@@ -477,7 +477,7 @@ public class POFilterTest {
 		// Second TU
 		tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 2);
 		assertNotNull(tu);
-		assertEquals("translation-plural", tu.getTarget(locFR, false).toString());
+		assertEquals("translation-plural", tu.getTarget(locFR).toString());
 		prop = tu.getTargetProperty(locFR, Property.APPROVED);
 		assertNotNull(prop);
 		assertEquals("no", prop.getValue());

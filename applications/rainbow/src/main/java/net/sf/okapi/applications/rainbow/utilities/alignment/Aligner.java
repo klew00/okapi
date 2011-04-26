@@ -762,7 +762,7 @@ public class Aligner {
 		if ( !tu.hasTarget(trgLang) ) return 2;
 		// Set the new values
 		source = tu.getSource();
-		target = tu.getTarget(trgLang, false);
+		target = tu.getTarget(trgLang);
 		btToReview.setSelection(false);
 		// If none is segmented, no need to check
 		if ( source.contentIsOneSegment() && target.contentIsOneSegment() ) return 1;

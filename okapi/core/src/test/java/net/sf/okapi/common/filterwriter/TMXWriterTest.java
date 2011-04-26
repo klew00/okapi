@@ -153,7 +153,7 @@ public class TMXWriterTest {
     	String targetTuvs = "";
     	for (LocaleId langName : tu.getTargetLocales()) {
     		targetTuvs += "<tuv xml:lang=\"" + langName + "\">" + "<seg>" + 
-    			tu.getTarget(langName).getSegments().getFirstContent().toText() + "</seg>" + "</tuv>";
+    			tu.getTargetSegments(langName).getFirstContent().toText() + "</seg>" + "</tuv>";
     	}
     	return targetTuvs;
     }

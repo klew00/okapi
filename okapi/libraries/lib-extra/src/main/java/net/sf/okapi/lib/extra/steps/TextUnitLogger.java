@@ -126,10 +126,10 @@ public class TextUnitLogger extends BasePipelineStep {
 		}
 		
 		for (LocaleId locId : tu.getTargetLocales()) {
-			sb.append(String.format("      Target (%s): %s", locId.toString(), tu.getTarget(locId, false)));
+			sb.append(String.format("      Target (%s): %s", locId.toString(), tu.getTarget(locId)));
 			sb.append("\n");
 			
-			TextContainer target = tu.getTarget(locId, false);
+			TextContainer target = tu.getTarget(locId);
 			if (source.getAnnotations() != null) {
 //				sb.append("             ");
 //				sb.append("Target annotations:");
