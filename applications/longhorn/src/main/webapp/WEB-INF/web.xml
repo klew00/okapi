@@ -25,5 +25,9 @@
         <servlet-name>Resteasy</servlet-name>
         <url-pattern>/projects/*</url-pattern>
     </servlet-mapping>
+    
+    <welcome-file-list>
+    	<welcome-file>okapi-longhorn-sample-js-client.html</welcome-file>
+    </welcome-file-list>
 
 </web-app>
