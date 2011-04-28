@@ -5,9 +5,7 @@
     <groupId>net.sf.okapi.steps</groupId>
     <version>0.12-SNAPSHOT</version>
   </parent>
-  <groupId>net.sf.okapi.steps</groupId>
   <artifactId>okapi-step-repetitionanalysis</artifactId>
-  <version>0.12-SNAPSHOT</version>
   <dependencies>
   	<dependency>
   		<groupId>net.sf.okapi</groupId>
