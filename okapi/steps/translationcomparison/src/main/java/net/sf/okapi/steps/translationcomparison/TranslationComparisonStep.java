@@ -463,7 +463,7 @@ public class TranslationComparisonStep extends BasePipelineStep {
 			writer.writeEndElement();
 			writer.writeStartElement("p"); //$NON-NLS-1$
 			writer.writeString(String.format("Comparing %s (%s) against %s (%s)",
-				rawDoc2.getInputURI(), params.getDocument1Label(), inputURI, params.getDocument2Label()));
+				rawDoc2.getInputURI(), params.getDocument2Label(), inputURI, params.getDocument1Label()));
 			if ( rawDoc3 != null ) {
 				writer.writeString(String.format(" and %s (%s)",
 					rawDoc3.getInputURI(), params.getDocument3Label()));
