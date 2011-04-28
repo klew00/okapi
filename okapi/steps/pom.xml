@@ -44,5 +44,6 @@
 		<module>xliffsplitter</module>
 		<module>idbasedaligner</module>
 		<module>xmlvalidation</module>
+		<module>repetitionanalysis</module>
     </modules>
 </project>
