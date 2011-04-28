@@ -44,8 +44,7 @@ public enum MatchType {
 	EXACT_LOCAL_CONTEXT,
 
 	/**
-	 * EXACT and comes from a repeated segment in the same document or a different version of the same document.
-	 * See also {@link #EXACT_PREVIOUS_VERSION}
+	 * EXACT and comes from a repeated segment in the same document.
 	 */
 	EXACT_DOCUMENT_CONTEXT,
 
