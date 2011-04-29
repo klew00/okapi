@@ -38,6 +38,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filterwriter.XLIFFContent;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 
 /**
  * Collection of helper method for preparing and querying translation resources.
@@ -45,7 +46,7 @@ import net.sf.okapi.common.resource.TextFragment;
 public class QueryUtil {
 
 	private static final Pattern HTML_OPENCLOSE = Pattern.compile(
-			"(\\<s(\\s+)id=['\"](.*?)['\"]>)|(\\</s\\>)", Pattern.CASE_INSENSITIVE);
+			"(\\<u(\\s+)id=['\"](.*?)['\"]>)|(\\</u\\>)", Pattern.CASE_INSENSITIVE);
 	private static final Pattern HTML_ISOLATED = Pattern.compile(
 			"\\<br(\\s+)id=['\"](.*?)['\"](\\s*?)/>", Pattern.CASE_INSENSITIVE);
 	private static final Pattern HTML_SPAN = Pattern.compile("\\<span\\s(.*?)>|\\</span>",
@@ -124,7 +125,7 @@ public class QueryUtil {
 
 	/**
 	 * Converts from coded text to coded HTML.
-	 * 
+	 * The resulting string is also valid XML.
 	 * @param fragment
 	 *            the fragment to convert.
 	 * @return The resulting HTML string.
@@ -140,11 +141,11 @@ public class QueryUtil {
 			switch (text.charAt(i)) {
 			case TextFragment.MARKER_OPENING:
 				code = fragment.getCode(text.charAt(++i));
-				sb.append(String.format("<s id='%d'>", code.getId()));
+				sb.append(String.format("<u id='%d'>", code.getId()));
 				break;
 			case TextFragment.MARKER_CLOSING:
 				i++;
-				sb.append("</s>");
+				sb.append("</u>");
 				break;
 			case TextFragment.MARKER_ISOLATED:
 				code = fragment.getCode(text.charAt(++i));
@@ -163,6 +164,146 @@ public class QueryUtil {
 		return sb.toString();
 	}
 
+	/**
+	 * Converts an HTML string created with {@link #toCodedHTML(TextFragment)} back into a text fragment,
+	 * but with empty inline codes.
+	 * @param text the HTML string to convert.
+	 * @param fragment an optional text fragment where to place the converted content. Any existing codes will be
+	 * replaced or removed by the codes coming from the HTML string. Use null to create a new fragment.
+	 * @return the modified or created text fragment.
+	 */
+	public TextFragment fromCodedHTMLToFragment (String text,
+		TextFragment fragment)
+	{
+		if ( Util.isEmpty(text) ) {
+			if ( fragment != null ) {
+				fragment.setCodedText("", true);
+				return fragment;
+			}
+			else {
+				return new TextFragment();
+			}
+		}
+		
+		text = text.toString().replace("&apos;", "'");
+		text = text.replace("&lt;", "<");
+		text = text.replace("&gt;", ">");
+		text = text.replace("&quot;", "\"");
+		StringBuilder sb = new StringBuilder();
+		sb.append(text.replace("&amp;", "&"));
+		if ( entities == null ) {
+			entities = new HTMLCharacterEntities();
+			entities.ensureInitialization(false);
+		}
+
+		// Un-escape character entity references
+		Matcher m;
+		while ( true ) {
+			m = CER.matcher(sb.toString());
+			if ( !m.find() ) break;
+			int val = entities.lookupReference(m.group(0));
+			if ( val != -1 ) {
+				sb.replace(m.start(0), m.end(0), String.valueOf((char) val));
+			}
+			else { // Unknown entity
+				// TODO: replace by something meaningful to allow continuing the replacements
+				break; // Temporary, to avoid infinite loop
+			}
+		}
+
+		// Un-escape numeric character references
+		m = NCR.matcher(sb.toString());
+		while ( m.find() ) {
+			String val = m.group(1);
+			int n = (int) '?'; // Default
+			try {
+				if (val.charAt(0) == 'x') { // Hexadecimal
+					n = Integer.valueOf(m.group(1).substring(1), 16);
+				}
+				else { // Decimal
+					n = Integer.valueOf(m.group(1));
+				}
+			}
+			catch ( NumberFormatException e ) {
+				// Just use default
+			}
+			sb.replace(m.start(0), m.end(0), String.valueOf((char) n));
+			m = NCR.matcher(sb.toString());
+		}
+
+		ArrayList<Code> codes = new ArrayList<Code>();
+		Code code;
+		int id;
+		
+		// Opening/closing markers
+		// This assume no-overlapping tags and no empty elements
+		m = HTML_OPENCLOSE.matcher(sb.toString());
+		Stack<Integer> stack = new Stack<Integer>();
+		String markers;
+		while ( m.find() ) {
+			if ( m.group(1) != null ) {
+				// It's an opening tag
+				id = Util.strToInt(m.group(3), -1);
+				code = new Code(TagType.OPENING, "Xpt", null);
+				code.setId(id);
+				codes.add(code);
+				markers = String.format("%c%c", TextFragment.MARKER_OPENING,
+					TextFragment.toChar(codes.size()-1));
+				sb.replace(m.start(), m.end(), markers);
+				stack.push(id);
+			}
+			else {
+				// It's a closing tag
+				if ( stack.isEmpty() ) {
+					// If the stack is empty it means the string is not well-formed, or a start tag is missing.
+//todo: log warning					
+					markers = "";
+				}
+				else {
+					code = new Code(TagType.CLOSING, "Xpt", null);
+					// ID should be resolved automatically
+					codes.add(code);
+					markers = String.format("%c%c", TextFragment.MARKER_CLOSING,
+						TextFragment.toChar(codes.size()-1));
+				}
+				sb.replace(m.start(), m.end(), markers);
+			}
+			// Next open or close
+			m = HTML_OPENCLOSE.matcher(sb.toString());
+		}
+
+		m = HTML_ISOLATED.matcher(sb.toString());
+		while ( m.find() ) {
+			// Replace the HTML fake code by the coded text markers
+			id = Util.strToInt(m.group(2), -1);
+			code = new Code(TagType.PLACEHOLDER, "Xph", null);
+			code.setId(id);
+			codes.add(code);
+			markers = String.format("%c%c", TextFragment.MARKER_ISOLATED,
+				TextFragment.toChar(codes.size()-1));
+			sb.replace(m.start(), m.end(), markers);
+			// Next isolated
+			m = HTML_ISOLATED.matcher(sb.toString());
+		}
+
+		// Remove any span elements that may have been added
+		// (some MT engines mark up their output with extra info)
+		m = HTML_SPAN.matcher(sb.toString());
+		while ( m.find() ) {
+			sb.replace(m.start(), m.end(), "");
+			m = HTML_SPAN.matcher(sb.toString());
+		}
+
+		// Create the fragment or update the existing one
+		if ( fragment != null ) {
+			fragment.setCodedText(sb.toString(), codes, true);
+			return fragment;
+		}
+		else {
+			return new TextFragment(sb.toString(), codes);
+		}
+	}
+	
 	/**
 	 * Converts back a coded HTML to a coded text.
 	 * 

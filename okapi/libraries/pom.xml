@@ -25,5 +25,6 @@
         <module>lib-transifex</module>
         <module>lib-longhorn-api</module>
         <module>lib-xliff</module>
+        <module>lib-gtt</module>
     </modules>
 </project>

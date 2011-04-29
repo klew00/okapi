@@ -45,5 +45,6 @@
 		<module>idbasedaligner</module>
 		<module>xmlvalidation</module>
 		<module>repetitionanalysis</module>
+		<module>gttbatchtranslation</module>
     </modules>
 </project>

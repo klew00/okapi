@@ -65,7 +65,7 @@ public class QueryUtilTest {
 	public void testToHTML () {
 		TextFragment tf = makeFragment();
 		String htmlText = qu.toCodedHTML(tf);
-		assertEquals("a &amp; &lt; > \" \' <s id='1'>bold</s> t <br id='2'/> z", htmlText);
+		assertEquals("a &amp; &lt; > \" \' <u id='1'>bold</u> t <br id='2'/> z", htmlText);
 	}
 	
 	@Test
@@ -89,12 +89,20 @@ public class QueryUtilTest {
 	}
 	
 	@Test
+	public void testNewTextFragmentFromSameHTML () {
+		TextFragment tf = makeFragment();
+		String htmlText = qu.toCodedHTML(tf);
+		TextFragment resFrag = qu.fromCodedHTMLToFragment(htmlText, null);
+		assertTrue(resFrag.compareTo(tf, false) == 0);
+	}
+	
+	@Test
 	public void testSimpleHTMLWithCorrection () {
 		TextFragment tf = makeFragment();
 		String htmlText = qu.toCodedHTML(tf);
-		assertEquals("a &amp; &lt; > \" \' <s id='1'>bold</s> t <br id='2'/> z", htmlText);
+		assertEquals("a &amp; &lt; > \" \' <u id='1'>bold</u> t <br id='2'/> z", htmlText);
 		// Send something with missing codes (faking translation results)
-		htmlText = "a <s id='1'>b</s> c";
+		htmlText = "a <u id='1'>b</u> c";
 		String codedText = qu.fromCodedHTML(htmlText, tf);
 		TextFragment resFrag = new TextFragment(codedText, tf.getCodes());
 		assertEquals("a <1>b</1> c<2/>", fmt.setContent(resFrag).toString());
@@ -115,13 +123,13 @@ public class QueryUtilTest {
 		TextFragment tf = makeComplexFragment();
 		String htmlText = qu.toCodedHTML(tf);
 		// What we send:
-		assertEquals("t1<s id='1'><s id='2'>bs1</s></s>t2<s id='3'>b1</s>", htmlText);
+		assertEquals("t1<u id='1'><u id='2'>bs1</u></u>t2<u id='3'>b1</u>", htmlText);
 		// What we get back from the translation:
-		htmlText = "t1<s id='2'><s id='3'><s id='1'>t2</s></s>t3</s>";
+		htmlText = "t1<u id='2'><u id='3'><u id='1'>t2</u></u>t3</u>";
 		String codedText = qu.fromCodedHTML(htmlText, tf);
 		TextFragment resFrag = new TextFragment(codedText, tf.getCodes());
 		assertEquals("t1<2><3><1>t2</1></3>t3</2>", fmt.setContent(resFrag).toString());
-		assertEquals("t1<s><b><b>t2</b></b>t3</s>", resFrag.toText());
+		assertEquals("t1<u><b><b>t2</b></b>t3</u>", resFrag.toText());
 	}
 	
 	@Test
@@ -129,13 +137,13 @@ public class QueryUtilTest {
 		TextFragment tf = makeComplexFragment();
 		String htmlText = qu.toCodedHTML(tf);
 		// What we send:
-		assertEquals("t1<s id='1'><s id='2'>bs1</s></s>t2<s id='3'>b1</s>", htmlText);
+		assertEquals("t1<u id='1'><u id='2'>bs1</u></u>t2<u id='3'>b1</u>", htmlText);
 		// What we get back from the translation:
-		htmlText = "t1<s id='2'><s id='1'>t2</s>t3</s>";
+		htmlText = "t1<u id='2'><u id='1'>t2</u>t3</u>";
 		String codedText = qu.fromCodedHTML(htmlText, tf);
 		TextFragment resFrag = new TextFragment(codedText, tf.getCodes());
 		assertEquals("t1<2><1>t2</1>t3</2><3></3>", fmt.setContent(resFrag).toString());
-		assertEquals("t1<s><b>t2</b>t3</s><b></b>", resFrag.toText());
+		assertEquals("t1<u><b>t2</b>t3</u><b></b>", resFrag.toText());
 	}
 	
 	@Test
@@ -162,9 +170,9 @@ public class QueryUtilTest {
 	private TextFragment makeComplexFragment () {
 		TextFragment tf = new TextFragment("t1");
 		tf.append(TagType.OPENING, "b", "<b>");
-		tf.append(TagType.OPENING, "s", "<s>");
+		tf.append(TagType.OPENING, "s", "<u>");
 		tf.append("bs1");
-		tf.append(TagType.CLOSING, "s", "</s>");
+		tf.append(TagType.CLOSING, "s", "</u>");
 		tf.append(TagType.CLOSING, "b", "</b>");
 		tf.append("t2");
 		tf.append(TagType.OPENING, "b", "<b>");

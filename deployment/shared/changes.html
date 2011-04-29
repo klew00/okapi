@@ -40,6 +40,8 @@ distribution.</p>
 	<li>MIF Filter:<ul>
 	<li>Implemented extraction for index markers (default=yes) and hyperlinks 
 	(default=no).</li>
+	<li>When needed, leading codes (font, etc.) are now extracted as inline code 
+	rather than kept in the skeleton.</li>
 </ul>
 	</li>
 	<li>Regex Filter:<ul>
@@ -54,6 +56,8 @@ distribution.</p>
 	<li>Added the Remove Target Step, to remove target entries from text units.</li>
 	<li>Added the Inline Codes Simplifier Step, to join adjacent inline codes in 
 	text units.</li>
+	<li>Added the GTT Batch Translation step, to create TM files using Google 
+	Translator Toolkit.</li>
 	<li>Rainbow Translation Kit Creation Step:<ul>
 	<li>Added option for creating XLIFF 2.0 packages. This is for experimental 
 	tests only. XLIFF 2.0 is not defined yet.</li>
@@ -80,11 +84,12 @@ distribution.</p>
 	<li>Fixed corrupted DefaultFilters.properties so XINI filter and MIF Filter 
 	UI are accessible again.</li>
 	<li>Updated TextUnit to use ITextUnit and a new implementation. This is a 
-	major low-level refactoring that comes with some <b>behavior changes</b>:<ul>
+	major low-level refactoring that comes with some <b>behavior changes</b> and 
+	additions:<ul>
 	<li>in createTarget() IResource.COPY_CONTENT should be replaced by 
 	IResource.COPY_SEGMENTED_CONTENT to have the same behavior.</li>
-	<li>getTarget(locId) should be changed to getTragte(locId, false) to have 
-	the same behavior.</li>
+	<li>the new getTargetSegments() does create a target if it does not exists 
+	(with a COPY_SEGMENTATION option).</li>
 </ul>
 	</li>
 </ul>

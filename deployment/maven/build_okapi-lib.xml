@@ -160,6 +160,8 @@
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi/libraries/lib-xliff/target/classes"
 			 excludes="**/META-INF/**"/>
+			<fileset dir="../../okapi/libraries/lib-gtt/target/classes"
+			 excludes="**/META-INF/**"/>
 			
 			<!-- tm -->
 			<fileset dir="../../okapi/tm/simpletm/target/classes"
@@ -257,6 +259,8 @@
 			<fileset dir="../../okapi/steps/scopingreport/target/classes"
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi/steps/rainbowkit/target/classes"
+			 excludes="**/META-INF/**"/>
+			<fileset dir="../../okapi/steps/gttbatchtranslation/target/classes"
 			 excludes="**/META-INF/**"/>
 		</copy>
 		

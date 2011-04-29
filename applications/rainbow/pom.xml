@@ -457,6 +457,11 @@
 			<artifactId>okapi-step-rtfconversion</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>net.sf.okapi.steps</groupId>
+			<artifactId>okapi-step-gttbatchtranslation</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		
 
 	</dependencies>
