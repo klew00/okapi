@@ -52,6 +52,7 @@ public class Merger {
 	private LocaleId trgLoc;
 	private IFilterConfigurationMapper fcMapper;
 	private boolean skipEmptySourceEntries;
+	private boolean useSource;
 	
 	public Merger (Manifest manifest,
 		IFilterConfigurationMapper fcMapper)
@@ -107,6 +108,8 @@ public class Merger {
 		
 		// Skip entries with empty source for PO
 		skipEmptySourceEntries = info.getExtractionType().equals(Manifest.EXTRACTIONTYPE_PO);
+		// Use the source of the input as the translation for XINI, etc.
+		//TO uncomment when ready useSource = info.getExtractionType().equals(Manifest.EXTRACTIONTYPE_ONTRAM);
 		
 		Event event = null;
 		if ( filter.hasNext() ) {
@@ -152,7 +155,10 @@ public class Merger {
 		}
 		
 		// Check if we have a translation
-		TextContainer trgTraCont = traTu.getTarget(trgLoc);
+		TextContainer trgTraCont;
+		if ( useSource ) trgTraCont = traTu.getSource();
+		else trgTraCont = traTu.getTarget(trgLoc);
+		
 		if ( trgTraCont == null ) {
 			if ( !oriTu.getSource().hasText() ) {
 				// Warn only if there source is not empty
@@ -164,7 +170,10 @@ public class Merger {
 		
 		// Process the "approved" property
 		boolean isTransApproved = false;
-		Property traProp = traTu.getTargetProperty(trgLoc, Property.APPROVED);
+		Property traProp;
+		if ( useSource ) traProp = traTu.getSourceProperty(Property.APPROVED);
+		else traProp = traTu.getTargetProperty(trgLoc, Property.APPROVED);
+		
 		if ( traProp != null ) {
 			isTransApproved = traProp.getValue().equals("yes");
 		}

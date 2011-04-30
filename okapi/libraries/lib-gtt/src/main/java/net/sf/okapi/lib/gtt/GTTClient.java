@@ -268,9 +268,6 @@ public class GTTClient {
 			dos.close();
 			
 			int code =  conn.getResponseCode();
-			System.out.println(code);
-			System.out.println(conn.getResponseMessage());
-			
 			if ( code == RESCODE_CREATED ) {
 				Document doc = docBuilder.parse(conn.getInputStream());
 				Element elem = (Element)doc.getDocumentElement().getFirstChild();

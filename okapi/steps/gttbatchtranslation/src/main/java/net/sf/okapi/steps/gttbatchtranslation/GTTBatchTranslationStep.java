@@ -23,6 +23,10 @@ package net.sf.okapi.steps.gttbatchtranslation;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.nio.CharBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetEncoder;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -54,6 +58,8 @@ import net.sf.okapi.lib.translation.QueryUtil;
 @UsingParameters(Parameters.class)
 public class GTTBatchTranslationStep extends BasePipelineStep {
 
+	private final static long MAXSIZE =(1020*1024); // Less than 1 MB 
+		
 	private final Logger logger = Logger.getLogger(getClass().getName());
 	
 	private Parameters params;
@@ -69,6 +75,8 @@ public class GTTBatchTranslationStep extends BasePipelineStep {
 	private int subDocId;
 	private Map<String, String> attributes;
 	private IWaitDialog waitDlg;
+	private long count;
+	private CharsetEncoder encoder;
 
 	public GTTBatchTranslationStep () {
 		params = new Parameters();
@@ -155,6 +163,9 @@ public class GTTBatchTranslationStep extends BasePipelineStep {
 			attributes.put("creationid", Util.MTFLAG);
 		}
 		attributes.put("Txt::Origin", "Google-GTT");
+	
+		// Create the encoder to use to compute the file size 
+		encoder = Charset.forName("UTF-8").newEncoder();
 		
 		return event;
 	}
@@ -208,10 +219,27 @@ public class GTTBatchTranslationStep extends BasePipelineStep {
 			if ( !seg.text.hasText() ) continue;
 			// Create the HTML entry
 			htmlWriter.writeStartElement("p");
-			htmlWriter.writeAttributeString("id", String.format("%d:%s:%s", subDocId, tu.getId(), seg.id));
-			htmlWriter.writeRawXML(qutil.toCodedHTML(seg.text));
+			String out = String.format("%d:%s:%s", subDocId, tu.getId(), seg.id);
+			count += (out.length() + 10);
+			htmlWriter.writeAttributeString("id", out);
+			out = qutil.toCodedHTML(seg.text);
+			try {
+				count += encoder.encode(CharBuffer.wrap(out)).array().length;
+			}
+			catch ( CharacterCodingException e ) {
+				// Swallow this one
+			}
+			htmlWriter.writeRawXML(out);
 			htmlWriter.writeEndElementLineBreak(); // p
+			
 		}
+		
+		// Check the size of the extraction file
+		if ( count >= MAXSIZE ) {
+			endExtractedBlock();
+			startExtractedBlock();
+		}
+
 		return event;
 	}
 
@@ -228,6 +256,7 @@ public class GTTBatchTranslationStep extends BasePipelineStep {
 			htmlWriter.writeAttributeString("http-equiv", "Content-Type");
 			htmlWriter.writeAttributeString("content", "text/html; charset=UTF-8");
 			htmlWriter.writeEndElementLineBreak();
+			count = 100; // Roughly
 		}
 		catch ( IOException e ) {
 			throw new OkapiIOException("Error creating extraction file.", e);
