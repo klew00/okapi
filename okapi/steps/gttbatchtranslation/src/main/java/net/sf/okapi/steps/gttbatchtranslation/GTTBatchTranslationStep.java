@@ -141,8 +141,8 @@ public class GTTBatchTranslationStep extends BasePipelineStep {
 			throw new RuntimeException("Could not create waiting dialog.");
 		}
 
-		gtt = new GTTClient("company-GTTTrans-1");
-		gtt.setCredentials("yves@opentag.com", "canyon123");
+		gtt = new GTTClient(params.getEmail()+"-GTTBTrans-1");
+		gtt.setCredentials(params.getEmail(), params.getPassword());
 		gtt.setLanguages(sourceLocale, targetLocale);
 		
 		// Create a temporary empty TM
@@ -231,7 +231,6 @@ public class GTTBatchTranslationStep extends BasePipelineStep {
 			}
 			htmlWriter.writeRawXML(out);
 			htmlWriter.writeEndElementLineBreak(); // p
-			
 		}
 		
 		// Check the size of the extraction file
@@ -268,7 +267,7 @@ public class GTTBatchTranslationStep extends BasePipelineStep {
 		htmlWriter.writeEndElementLineBreak(); // html
 		htmlWriter.close();
 		// Check if we need to process 
-		if ( blocks.size() == 4 ) {
+		if ( blocks.size() >= 4 ) {
 			processExtractionBlocks();
 		}
 	}
