@@ -42,8 +42,9 @@ public class XLIFFWriter {
     private boolean isIndented = false;
     private String indent;
     private boolean inFile;
+    private int style = Fragment.STYLE_NODATA;
 
-    public void create (File file ) {
+    public void create (File file) {
 		try {
 			// Create the directories if needed
 			String path = file.getCanonicalPath();
@@ -74,6 +75,22 @@ public class XLIFFWriter {
 		inFile = false;
 	}
     
+    public void setInlineStyle (int style) {
+    	switch ( style ) {
+    	case Fragment.STYLE_DATAINSIDE:
+    	case Fragment.STYLE_DATAOUTSIDE:
+    	case Fragment.STYLE_NODATA:
+    	case Fragment.STYLE_XSDTEMP:
+    		this.style = style;
+    		return;
+    	}
+    	throw new XLIFFWriterException(String.format("Style %d is not valid.", style));
+    }
+    
+    public int getInlineStyle () {
+    	return style;
+    }
+    
     public void setLineBreak (String lineBreak) {
     	lb = lineBreak;
     }
@@ -99,7 +116,7 @@ public class XLIFFWriter {
 	
 	public void writeUnit (Unit unit) {
 		if ( !inFile ) writeStartFile();
-		writer.print(indent+String.format("<unit id=\"%s\"", toXML(unit.getId(), true)));
+		writer.print(indent+String.format("<unit id=\"%s\"", Fragment.toXML(unit.getId(), true)));
 		writer.print(">"+lb);
 		if ( isIndented ) indent += " ";
 		
@@ -198,19 +215,8 @@ public class XLIFFWriter {
 		Fragment fragment)
 	{
 		writer.print(indent+"<"+name+">");
-		writer.print(fragment.toString());
+		writer.print(fragment.getString(style));
 		writer.print("</"+name+">"+lb);
-	}
-
-	private String toXML (String text,
-		boolean attribute)
-	{
-		text = text.replace("&", "&amp;");
-		text = text.replace("<", "&lt;");
-		if ( attribute ) {
-			text = text.replace("\"", "&quot;");
-		}
-		return text;
 	}
 
 }

@@ -828,7 +828,14 @@ public class GenericEditor {
 					desc.getWriteMethod().invoke(desc.getParent(), ((String[])list.getData())[n]);
 				}
 				else if ( desc.getType().equals(int.class) ) {
-					desc.getWriteMethod().invoke(desc.getParent(), (Integer)n);
+					try {
+						int value = Integer.valueOf(((String[])list.getData())[n]);
+						desc.getWriteMethod().invoke(desc.getParent(), value);
+					}
+					catch ( NumberFormatException  e ) {
+						throw new OkapiEditorCreationException(String.format(
+							"Invalid integer value '%s' for the parameter '%s'.", ((String[])list.getData())[n], desc.getName()));
+					}
 				}
 				else {
 					throw new OkapiEditorCreationException(String.format(
@@ -863,7 +870,14 @@ public class GenericEditor {
 					desc.getWriteMethod().invoke(desc.getParent(), ((String[])combo.getData())[n]);
 				}
 				else if ( desc.getType().equals(int.class) ) {
-					desc.getWriteMethod().invoke(desc.getParent(), (Integer)n);
+					try {
+						int value = Integer.valueOf(((String[])combo.getData())[n]);
+						desc.getWriteMethod().invoke(desc.getParent(), value);
+					}
+					catch ( NumberFormatException  e ) {
+						throw new OkapiEditorCreationException(String.format(
+							"Invalid integer value '%s' for the parameter '%s'.", ((String[])combo.getData())[n], desc.getName()));
+					}
 				}
 				else {
 					throw new OkapiEditorCreationException(String.format(
@@ -1012,36 +1026,30 @@ public class GenericEditor {
 			}
 
 			// Set the control
+			String current;
 			if ( desc.getType().equals(String.class) ) {
-				String current = (String)desc.getReadMethod().invoke(desc.getParent());
-				list.setData(values); // Store the list of values in the user-data
-				if ( current == null ) current = "";
-				int found = -1;
-				int n = 0;
-				for ( String item : values ) {
-					list.add(labels[n]);
-					if ( item.equals(current) ) found = n;
-					n++;
-				}
-				if ( found > -1 ) {
-					list.select(found);
-					list.showSelection();
-				}
+				current = (String)desc.getReadMethod().invoke(desc.getParent());
 			}
 			else if ( desc.getType().equals(int.class) ) {
-				list.setData(values); // Store the list of values in the user-data
-				for ( String label : labels ) {
-					list.add(label);
-				}
-				int current = (Integer)desc.getReadMethod().invoke(desc.getParent());
-				if (( current > -1 ) && ( current < list.getItemCount() )) {
-					list.select(current);
-					list.showSelection();
-				}
+				current = String.valueOf((Integer)desc.getReadMethod().invoke(desc.getParent()));
 			}
 			else {
 				throw new OkapiEditorCreationException(String.format(
 					"Invalid type for the parameter '%s'.", desc.getName()));
+			}
+			// Now lookup the value
+			list.setData(values); // Store the list of values in the user-data
+			if ( current == null ) current = "";
+			int found = -1;
+			int n = 0;
+			for ( String item : values ) {
+				list.add(labels[n]);
+				if ( item.equals(current) ) found = n;
+				n++;
+			}
+			if ( found > -1 ) {
+				list.select(found);
+				list.showSelection();
 			}
 		}
 		catch ( IllegalArgumentException e ) {
@@ -1074,33 +1082,29 @@ public class GenericEditor {
 			}
 			
 			// Set the control
-			combo.setData(values); // Store the list of values in the user-data
+			String current;
 			if ( desc.getType().equals(String.class) ) {
-				String current = (String)desc.getReadMethod().invoke(desc.getParent());
-				if ( current == null ) current = "";
-				int found = -1;
-				int n = 0;
-				for ( String item : values ) {
-					combo.add(labels[n]);
-					if ( item.equals(current) ) found = n;
-					n++;
-				}
-				if ( found > -1 ) {
-					combo.select(found);
-				}
+				current = (String)desc.getReadMethod().invoke(desc.getParent());
 			}
 			else if ( desc.getType().equals(int.class) ) {
-				for ( String label : labels ) {
-					combo.add(label);
-				}
-				int current = (Integer)desc.getReadMethod().invoke(desc.getParent());
-				if (( current > -1 ) && ( current < combo.getItemCount() )) {
-					combo.select(current);
-				}
+				current = String.valueOf((Integer)desc.getReadMethod().invoke(desc.getParent()));
 			}
 			else {
 				throw new OkapiEditorCreationException(String.format(
 					"Invalid type for the parameter '%s'.", desc.getName()));
+			}
+			
+			combo.setData(values); // Store the list of values in the user-data
+			if ( current == null ) current = "";
+			int found = -1;
+			int n = 0;
+			for ( String item : values ) {
+				combo.add(labels[n]);
+				if ( item.equals(current) ) found = n;
+				n++;
+			}
+			if ( found > -1 ) {
+				combo.select(found);
 			}
 		}
 		catch ( IllegalArgumentException e ) {

@@ -24,7 +24,6 @@ public class XLIFFWriterTest {
 		assertEquals("<file>\n<unit id=\"id\">\n<segment>\n<source>Source 1.</source>\n"
 			+ "</segment>\n<segment>\n<source>Source 2.</source>\n</segment>\n</unit>\n",
 			strWriter.toString());
-		
 	}
 
 	@Test
@@ -45,6 +44,6 @@ public class XLIFFWriterTest {
 			+ "<matches>\n<match>\n<source>Source candidate 1.</source>\n"
 			+ "<target>Target candidate 1.</target>\n</match>\n</matches>\n</segment>\n</unit>\n",
 			strWriter.toString());
-		
 	}
+
 }

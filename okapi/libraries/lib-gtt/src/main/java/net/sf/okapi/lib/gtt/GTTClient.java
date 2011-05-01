@@ -109,14 +109,14 @@ public class GTTClient {
 				credentials = "GoogleLogin auth=" + resp.substring(n+5).trim();
 			}
 			else {
-				throw new RuntimeException("Cannot connect to GTT:\n"+conn.getResponseMessage());
+				throw new RuntimeException("Cannot connect to Google Translator Toolkit:\n"+conn.getResponseMessage());
 			}
 		}
 		catch ( MalformedURLException e ) {
-			throw new RuntimeException("Cannot connect to GTT.", e);
+			throw new RuntimeException("Cannot connect to Google Translator Toolkit.", e);
 		}
 		catch ( IOException e ) {
-			throw new RuntimeException("Cannot connect to GTT.", e);
+			throw new RuntimeException("Cannot connect to Google Translator Toolkit.", e);
 		}
 		finally {
 			if ( dos != null ) {

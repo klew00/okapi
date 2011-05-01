@@ -208,8 +208,8 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		optMoreInfo.add("Rainbow TKit - ONTRAM XINI"); // wiki page
 		writers.add("net.sf.okapi.steps.rainbowkit.ontram.OntramPackageWriter");
 		// XLIFF 2
-		optEditors.add(null);
-		optStrings.add(null);
+		optEditors.add("net.sf.okapi.steps.rainbowkit.xliff.XLIFF2Options");
+		optStrings.add(createParameters(optEditors.get(optEditors.size()-1)));
 		optMoreInfo.add("Rainbow TKit - XLIFF 2.0"); // wiki page
 		writers.add("net.sf.okapi.steps.rainbowkit.xliff.XLIFF2PackageWriter");
 
@@ -370,7 +370,7 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 				+ "You can translate this package with ONTRAM.");
 			break;
 		case 7: // XLIFF 2
-			btOptions.setEnabled(false);
+			btOptions.setEnabled(optEditors.get(n)!=null);
 			edDescription.setText("Simple package with XLIFF 2.0 experimental files.\n"
 				+ "Not for real projects. The XLIFF 2.0 format is defined yet. See XLIFF TC for more info and feedback.");
 			break;

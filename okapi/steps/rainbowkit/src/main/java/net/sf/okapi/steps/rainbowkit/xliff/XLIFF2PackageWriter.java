@@ -69,16 +69,11 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 		
 		// Set the writer's options
 		// Get the options from the parameters
-		Options options = new Options();
+		XLIFF2Options options = new XLIFF2Options();
 		if ( !Util.isEmpty(params.getWriterOptions()) ) {
 			options.fromString(params.getWriterOptions());
 		}
-//		//TODO: Would be easier to use IParameters in XLIFFWriter.
-//		writer.setPlaceholderMode(options.getPlaceholderMode());
-//		writer.setCopySource(options.getCopySource());
-//		writer.setIncludeAltTrans(options.getIncludeAltTrans());
-//		writer.setSetApprovedasNoTranslate(options.getSetApprovedAsNoTranslate());
-//		writer.setIncludeNoTranslate(options.getIncludeNoTranslate());
+		writer.setInlineStyle(options.getInlineStyle());
 		
 //		StartDocument sd = event.getStartDocument();
 //		writer.create(path, null, manifest.getSourceLocale(), manifest.getTargetLocale(),

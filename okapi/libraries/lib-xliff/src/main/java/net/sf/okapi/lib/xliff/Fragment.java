@@ -27,15 +27,31 @@ import java.util.ArrayList;
  * Holds the usable content for XLIFF constructs: text and inline codes.
  */
 public class Fragment {
+	
+	public static final int STYLE_XSDTEMP = -1;
+	public static final int STYLE_NODATA = 0;
+	public static final int STYLE_DATAINSIDE = 1;
+	public static final int STYLE_DATAOUTSIDE = 2;
 
 	public static final char MARKER_OPENING = '\uE101';
 	public static final char MARKER_CLOSING = '\uE102';
 	public static final char MARKER_PLACEHOLDER = '\uE103';
 	public static final int CHARBASE = 0xE110;
 
-	private StringBuilder data;
+	private StringBuilder ctext;
 	private ArrayList<Code> codes;
 	
+	public static String toXML (String text,
+		boolean attribute)
+	{
+		text = text.replace("&", "&amp;");
+		text = text.replace("<", "&lt;");
+		if ( attribute ) {
+			text = text.replace("\"", "&quot;");
+		}
+		return text;
+	}
+
 	/**
 	 * Helper method to convert a marker index to its character value in the
 	 * coded text string.
@@ -67,28 +83,123 @@ public class Fragment {
 			|| ( ch == MARKER_PLACEHOLDER ));
 	}
 	
+	public String getString (int style) {
+		switch ( style ) {
+		case STYLE_XSDTEMP:
+			return getStringXSDTemp();
+		case STYLE_DATAINSIDE:
+			return getStringDataInside();
+		case STYLE_DATAOUTSIDE:
+			//todo
+			// for now just do no-data
+		case STYLE_NODATA:
+		default:
+			return toString();
+		}
+	}
+	
+	private String getStringXSDTemp () {
+		StringBuilder tmp = new StringBuilder();
+		for ( int i=0; i<ctext.length(); i++ ) {
+			char ch = ctext.charAt(i);
+			if ( ctext.charAt(i) == MARKER_OPENING ) {
+				tmp.append(String.format("<inline id=\"%d\"/>",
+					toIndex(ctext.charAt(++i))));
+			}
+			else if ( ctext.charAt(i) == MARKER_CLOSING ) {
+				tmp.append(String.format("<inline id=\"%d\"/>",
+					toIndex(ctext.charAt(++i))));
+			}
+			else if ( ctext.charAt(i) == MARKER_PLACEHOLDER ) {
+				tmp.append(String.format("<inline id=\"%d\"/>",
+					toIndex(ctext.charAt(++i))));
+			}
+			else {
+				switch ( ch ) {
+				case '\r':
+					tmp.append("&#13;"); // Literal
+					break;
+				case '<':
+					tmp.append("&lt;");
+					break;
+				case '&':
+					tmp.append("&amp;");
+					break;
+				default:
+					tmp.append(ch);
+					break;
+				}
+			}
+		}
+		return tmp.toString();
+	}
+	
+	public String getStringDataInside () {
+		StringBuilder tmp = new StringBuilder();
+		Code code;
+		int index;
+		for ( int i=0; i<ctext.length(); i++ ) {
+			char ch = ctext.charAt(i);
+			if ( ctext.charAt(i) == MARKER_OPENING ) {
+				index = toIndex(ctext.charAt(++i));
+				code = codes.get(index);
+				tmp.append(String.format("<sc id=\"%d\">", index)); // should be id
+				tmp.append(toXML(code.getNativeData(), false));
+				tmp.append("</sc>");
+			}
+			else if ( ctext.charAt(i) == MARKER_CLOSING ) {
+				index = toIndex(ctext.charAt(++i));
+				code = codes.get(index);
+				tmp.append(String.format("<ec id=\"%d\">", index)); // should be id
+				tmp.append(toXML(code.getNativeData(), false));
+				tmp.append("</ec>");
+			}
+			else if ( ctext.charAt(i) == MARKER_PLACEHOLDER ) {
+				index = toIndex(ctext.charAt(++i));
+				code = codes.get(index);
+				tmp.append(String.format("<ic id=\"%d\">", index)); // should be id
+				tmp.append(toXML(code.getNativeData(), false));
+				tmp.append("</ic>");
+			}
+			else {
+				switch ( ch ) {
+				case '\r':
+					tmp.append("&#13;"); // Literal
+					break;
+				case '<':
+					tmp.append("&lt;");
+					break;
+				case '&':
+					tmp.append("&amp;");
+					break;
+				default:
+					tmp.append(ch);
+					break;
+				}
+			}
+		}
+		return tmp.toString();
+	}
+
 	/**
-	 * Returns an XLIFF representation of this fragment.
+	 * Returns an XLIFF representation of this fragment in the style {@link STYLE_NODATA}.
 	 */
 	@Override
 	public String toString () {
-		/*
-		 * Use a temporary representation with <inline> for all codes.
-		 */
 		StringBuilder tmp = new StringBuilder();
-		for ( int i=0; i<data.length(); i++ ) {
-			char ch = data.charAt(i);
-			if ( data.charAt(i) == MARKER_OPENING ) {
-				tmp.append(String.format("<inline id=\"%d\"/>",
-					toIndex(data.charAt(++i))));
+		for ( int i=0; i<ctext.length(); i++ ) {
+			char ch = ctext.charAt(i);
+			if ( ctext.charAt(i) == MARKER_OPENING ) {
+				tmp.append(String.format("<pc id=\"%d\">", // should be id
+					toIndex(ctext.charAt(++i))));
 			}
-			else if ( data.charAt(i) == MARKER_CLOSING ) {
-				tmp.append(String.format("<inline id=\"%d\"/>",
-					toIndex(data.charAt(++i))));
+			else if ( ctext.charAt(i) == MARKER_CLOSING ) {
+				tmp.append("</pc>");
+				i++; // Skip index
 			}
-			else if ( data.charAt(i) == MARKER_PLACEHOLDER ) {
-				tmp.append(String.format("<inline id=\"%d\"/>",
-					toIndex(data.charAt(++i))));
+			else if ( ctext.charAt(i) == MARKER_PLACEHOLDER ) {
+				tmp.append(String.format("<ic id=\"%d\"/>", // should be id
+					toIndex(ctext.charAt(++i))));
 			}
 			else {
 				switch ( ch ) {
@@ -111,28 +222,28 @@ public class Fragment {
 	}
 
 	public Fragment () {
-		data = new StringBuilder();
+		ctext = new StringBuilder();
 	}
 	
-	public Fragment (String text) {
-		data = new StringBuilder(text);
+	public Fragment (String plainText) {
+		ctext = new StringBuilder(plainText);
 	}
 
 	public boolean isEmpty () {
-		return (data.length()==0);
+		return (ctext.length()==0);
 	}
 	
 	public void clear () {
-		data.setLength(0);
+		ctext.setLength(0);
 		codes = null;
 	}
 	
-	public void append (String text) {
-		data.append(text);
+	public void append (String plainText) {
+		ctext.append(plainText);
 	}
 	
 	public void append (char ch) {
-		data.append(ch);
+		ctext.append(ch);
 	}
 	
 	public Code append (int type,
@@ -143,13 +254,13 @@ public class Fragment {
 		codes.add(code);
 		switch ( type ) {
 		case 0:
-			data.append(""+MARKER_OPENING+toChar(codes.size()-1));
+			ctext.append(""+MARKER_OPENING+toChar(codes.size()-1));
 			break;
 		case 1:
-			data.append(""+MARKER_CLOSING+toChar(codes.size()-1));
+			ctext.append(""+MARKER_CLOSING+toChar(codes.size()-1));
 			break;
 		case 2:
-			data.append(""+MARKER_PLACEHOLDER+toChar(codes.size()-1));
+			ctext.append(""+MARKER_PLACEHOLDER+toChar(codes.size()-1));
 			break;
 		}
 		return code;
