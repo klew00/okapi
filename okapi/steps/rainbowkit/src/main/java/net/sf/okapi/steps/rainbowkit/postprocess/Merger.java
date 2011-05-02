@@ -107,7 +107,8 @@ public class Merger {
 		writer.setOutput(manifest.getMergeDirectory()+info.getRelativeTargetPath());
 		
 		// Skip entries with empty source for PO
-		skipEmptySourceEntries = info.getExtractionType().equals(Manifest.EXTRACTIONTYPE_PO);
+		skipEmptySourceEntries = ( info.getExtractionType().equals(Manifest.EXTRACTIONTYPE_PO)
+			|| info.getExtractionType().equals(Manifest.EXTRACTIONTYPE_TRANSIFEX) );
 		// Use the source of the input as the translation for XINI, etc.
 		//TO uncomment when ready useSource = info.getExtractionType().equals(Manifest.EXTRACTIONTYPE_ONTRAM);
 		
@@ -162,7 +163,7 @@ public class Merger {
 		if ( trgTraCont == null ) {
 			if ( !oriTu.getSource().hasText() ) {
 				// Warn only if there source is not empty
-				LOGGER.warning(String.format("No translation found for TU id='%s'. Using source.", traTu.getId()));
+				LOGGER.warning(String.format("No translation found for TU id='%s'. Using source instead.", traTu.getId()));
 			}
 			writer.handleEvent(oriEvent); // Use the source
 			return;
@@ -179,7 +180,7 @@ public class Merger {
 		}
 		if ( !isTransApproved && manifest.getUseApprovedOnly() ) {
 			// Not approved: use the source
-			LOGGER.warning(String.format("Item id='%s': Target is not approved. Using source.", traTu.getId()));
+			LOGGER.warning(String.format("Item id='%s': Target is not approved. Using source instead.", traTu.getId()));
 			writer.handleEvent(oriEvent); // Use the source
 			return;
 		}
@@ -199,7 +200,7 @@ public class Merger {
 		for ( Segment srcOriSeg : srcOriCont.getSegments() ) {
 			Segment trgTraSeg = trgTraSegs.get(srcOriSeg.id);
 			if ( trgTraSeg == null ) {
-				LOGGER.warning(String.format("Item id='%s': No translation found for the segment '%s'. Using source.",
+				LOGGER.warning(String.format("Item id='%s': No translation found for the segment '%s'. Using source instead.",
 					traTu.getId(), srcOriSeg.id));
 				// Use the source instead
 			}

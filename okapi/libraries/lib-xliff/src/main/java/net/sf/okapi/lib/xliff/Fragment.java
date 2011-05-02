@@ -246,20 +246,20 @@ public class Fragment {
 		ctext.append(ch);
 	}
 	
-	public Code append (int type,
+	public Code append (Code.TYPE type,
 		String nativeData)
 	{
 		if ( codes == null ) codes = new ArrayList<Code>();
 		Code code = new Code(nativeData);
 		codes.add(code);
 		switch ( type ) {
-		case 0:
+		case OPENING:
 			ctext.append(""+MARKER_OPENING+toChar(codes.size()-1));
 			break;
-		case 1:
+		case CLOSING:
 			ctext.append(""+MARKER_CLOSING+toChar(codes.size()-1));
 			break;
-		case 2:
+		case PLACEHOLDER:
 			ctext.append(""+MARKER_PLACEHOLDER+toChar(codes.size()-1));
 			break;
 		}

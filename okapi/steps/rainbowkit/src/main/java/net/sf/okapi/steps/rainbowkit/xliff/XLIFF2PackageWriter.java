@@ -206,25 +206,23 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 		int index;
 		Code code;
 		for ( int i=0; i<ctext.length(); i++ ) {
-			switch ( ctext.codePointAt(i) ) {
-			case TextFragment.MARKER_OPENING:
+			if ( TextFragment.isMarker(ctext.charAt(i)) ) {
 				index = TextFragment.toIndex(ctext.charAt(++i));
 				code = codes.get(index);
-				frag.append(0, code.getData());
-				break;
-			case TextFragment.MARKER_CLOSING:
-				index = TextFragment.toIndex(ctext.charAt(++i));
-				code = codes.get(index);
-				frag.append(1, code.getData());
-				break;
-			case TextFragment.MARKER_ISOLATED:
-				index = TextFragment.toIndex(ctext.charAt(++i));
-				code = codes.get(index);
-				frag.append(2, code.getData());
-				break;
-			default:
+				switch ( code.getTagType() ) {
+				case OPENING:
+					frag.append(net.sf.okapi.lib.xliff.Code.TYPE.OPENING, code.getData());
+					break;
+				case CLOSING:
+					frag.append(net.sf.okapi.lib.xliff.Code.TYPE.CLOSING, code.getData());
+					break;
+				case PLACEHOLDER:
+					frag.append(net.sf.okapi.lib.xliff.Code.TYPE.PLACEHOLDER, code.getData());
+					break;
+				}
+			}
+			else {
 				frag.append(ctext.charAt(i));
-				break;
 			}
 		}
 

@@ -22,6 +22,13 @@ package net.sf.okapi.lib.xliff;
 
 public class Code {
 
+	public static enum TYPE {
+		OPENING,
+		CLOSING,
+		PLACEHOLDER
+	}
+
+	private String id;
 	private String nativeData;
 
 	public Code (String nativeData) {
@@ -32,4 +39,16 @@ public class Code {
 		return nativeData;
 	}
 	
+	public void setNativeData (String nativeData) {
+		this.nativeData = nativeData;
+	}
+	
+	public void setId (String id) {
+		this.id = id;
+	}
+	
+	public String getId () {
+		return id;
+	}
+
 }
