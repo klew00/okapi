@@ -112,7 +112,9 @@ public class ApertiumMTConnector extends BaseConnector {
 	    	Map<String, Object> data = (Map<String, Object>)map.get("responseData");
 	    	String res = (String)data.get("translatedText");
 	    	if ( res == null ) { // Probably an unsupported pair
-	    		return 0;
+		    	long code = (Long)map.get("responseStatus");
+	    		res = (String)map.get("responseDetails");
+	    		throw new RuntimeException(String.format("Error code %d: %s.", code, res));
 	    	}
 	    	// Remove extra \n if needed
 	    	if ( res.endsWith("\n") && !qtext.endsWith("\n")) {
