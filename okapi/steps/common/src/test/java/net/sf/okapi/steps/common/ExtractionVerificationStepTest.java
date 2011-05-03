@@ -22,6 +22,7 @@ package net.sf.okapi.steps.common;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.pipeline.Pipeline;
@@ -53,7 +54,6 @@ public class ExtractionVerificationStepTest {
 		verifier.setFilterConfigurationId("okf_html");
 
 		pipeline.addStep(verifier);
-
 	}
 
 	@After
@@ -61,17 +61,21 @@ public class ExtractionVerificationStepTest {
 		pipeline.destroy();
 	}
 	
-	
 	@Test
 	public void testExtractionVerification () throws URISyntaxException, IOException {
 
 		pipeline.startBatch();
 
+		pipeline.process(new RawDocument(this.getClass().getResource("aa324.html").toURI(), "UTF-8", LocaleId.ENGLISH));
+		pipeline.process(new RawDocument(this.getClass().getResource("form.html").toURI(), "UTF-8", LocaleId.ENGLISH));
+		pipeline.process(new RawDocument(this.getClass().getResource("W3CHTMHLTest1.html").toURI(), "UTF-8", LocaleId.ENGLISH));
+		
+		/*
+		FYI: getResourceAsStream does not allow reopening a filter
 		pipeline.process(new RawDocument(this.getClass().getResourceAsStream("aa324.html"), "UTF-8", LocaleId.ENGLISH));
 		pipeline.process(new RawDocument(this.getClass().getResourceAsStream("form.html"), "UTF-8", LocaleId.ENGLISH));
-		pipeline.process(new RawDocument(this.getClass().getResourceAsStream("W3CHTMHLTest1.html"), "UTF-8", LocaleId.ENGLISH));
+		pipeline.process(new RawDocument(this.getClass().getResourceAsStream("W3CHTMHLTest1.html"), "UTF-8", LocaleId.ENGLISH));*/
 		
 		pipeline.endBatch();
-	
 	}
 }

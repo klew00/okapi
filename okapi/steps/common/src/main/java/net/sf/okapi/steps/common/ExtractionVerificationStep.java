@@ -21,13 +21,14 @@
 package net.sf.okapi.steps.common;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.exceptions.OkapiBadStepInputException;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
@@ -50,11 +51,12 @@ public class ExtractionVerificationStep extends BasePipelineStep {
 
 	private static final Logger LOGGER = Logger.getLogger(ExtractionVerificationStep.class.getName());
 	
-	private IFilter filter;
+	private IFilter filter1, filter2;
 	private IFilterWriter writer;
 	private IFilterConfigurationMapper fcMapper;
 	private String filterConfigId;
 	private ExtractionVerificationStepParameters params;
+	ExtractionVerificationUtil verificationUtil;
 	
 	/**
 	 * Creates a new ExtractionVerificationStep object. This constructor is
@@ -62,6 +64,7 @@ public class ExtractionVerificationStep extends BasePipelineStep {
 	 */
 	public ExtractionVerificationStep() {
 		params = new ExtractionVerificationStepParameters();
+		verificationUtil = new ExtractionVerificationUtil();
 	}
 	
 	@Override
@@ -95,14 +98,34 @@ public class ExtractionVerificationStep extends BasePipelineStep {
 
 	@Override
 	protected Event handleRawDocument (Event event) {
+
+		if(!params.getEnabled()){
+			LOGGER.info("ExtractionVerificationStep is disabled");
+			return event;
+		}
+		
+		if(params.isCompareSkeleton()){
+			verificationUtil.setCompareSkeleton(true);
+		}
+		
+		Event event1=null;
+		Event event2=null;
+		int count1 = 0;
+		int count2 = 0;
+		int errorCount = 0;
+		int limit = params.getLimit();
+		boolean interrupt = params.getInterrupt();
+		boolean reachedMax = false;
+		
 		
 		try {
 			if ( Util.isEmpty(filterConfigId) ) {
 				return event;
 			}
 			// Else: Get the filter to use
-			filter = fcMapper.createFilter(filterConfigId, filter);
-			if (filter == null) {
+			filter1 = fcMapper.createFilter(filterConfigId);
+			filter2 = fcMapper.createFilter(filterConfigId);
+			if (filter1 == null) {
 				throw new RuntimeException("Unsupported filter type.");
 			}
 			
@@ -110,60 +133,82 @@ public class ExtractionVerificationStep extends BasePipelineStep {
 			
 			RawDocument initialDoc = event.getRawDocument();
 			// Open the document
-			filter.open(initialDoc);
+			filter1.open(initialDoc);
 			// Create the filter and write out the document 
-			writer = filter.createFilterWriter();
+			writer = filter1.createFilterWriter();
 			// Open the output document
 			File outFile = File.createTempFile("okp-vx_", ".tmp");
 			outFile.deleteOnExit();
 			writer.setOutput(outFile.getAbsolutePath());
 			writer.setOptions(initialDoc.getSourceLocale(), initialDoc.getEncoding());
-			// Re-write the file from the extracted events
-			ArrayList<Event> firstEvents = new ArrayList<Event>();
-			Event event1;
-			while ( filter.hasNext() ) {
-				event1 = filter.next();
-				firstEvents.add(event1);
+
+			while ( filter1.hasNext() ) {
+				event1 = filter1.next();
 				writer.handleEvent(event1);
 			}
 			writer.close();
-			filter.close();
-
+			filter1.close();
 			
 			//=== Second pass: Extract from the merged file and compare
 			
 			RawDocument tmpDoc = new RawDocument(outFile.toURI(), initialDoc.getEncoding(), initialDoc.getSourceLocale());
-			filter.open(tmpDoc);
-			Event event2;
-			int i = 0;
-			while ( filter.hasNext() ) {
-				event2 = filter.next();
+			filter1 = fcMapper.createFilter(filterConfigId);
+			filter1.open(initialDoc);
+			filter2.open(tmpDoc);
+
+			boolean hasNext1 = filter1.hasNext();
+			boolean hasNext2 = filter2.hasNext();
 			
-				if ( i >= firstEvents.size() ) {
-					i++;
-					break;
+			while ( hasNext1 || hasNext2 ) {
+
+				if(hasNext1){
+					count1++;
+					event1 = filter1.next();
 				}
-				event1 = firstEvents.get(i++);
-				// Compare events
-				if ( !identicalEvent(event1, event2) ) {
-					// TODO log error
-					LOGGER.info("different events");
-					break;
-				}else{
-					//LOGGER.info("identical events");
+				if(hasNext2){
+					count2++;
+					event2 = filter2.next();
 				}
+				if(hasNext1 && hasNext2 && !reachedMax){
+		
+					// Compare events
+					if ( !identicalEvent(event1, event2) ) {
+						errorCount++;
+						LOGGER.warning("different events");
+						
+						if(errorCount >= limit && limit > 0){
+							reachedMax = true;
+						}
+						
+						if(reachedMax && interrupt){
+							throw new OkapiBadStepInputException("Reached maximum verification errors");
+						}
+						
+						break;
+					}				
+				}
+				
+				hasNext1 = filter1.hasNext();
+				hasNext2 = filter2.hasNext();
 			}
 			
 			// Compare total number of events
-			if(firstEvents.size() > i){
-				LOGGER.warning("Additional events found in the first run");
-			}else if(i > firstEvents.size()){
-				LOGGER.warning("Additional events found in the second run");
+			if(count1 > count2){
+				LOGGER.warning("ExtractionVerification: Additional events found in the first run");
+			}else if(count2 > count1){
+				LOGGER.warning("ExtractionVerification: Additional events found in the second run");
+			}
+			
+			// Compare total number of events
+			if(errorCount > 0){
+				LOGGER.warning("ExtractionVerification: "+errorCount+ " or more events fail.");
+			}else{
+				LOGGER.info("ExtractionVerification: all events pass.");
 			}
 			
 		}
 		catch ( Throwable e ) {
-			throw new RuntimeException("Error during extraction verification.\n" + e.getMessage(), e);
+			throw new RuntimeException("ExtractionVerification failed.\n" + e.getMessage(), e);
 		}
 		finally {
 			closeFilterAndWriter();
@@ -177,9 +222,13 @@ public class ExtractionVerificationStep extends BasePipelineStep {
 			writer.close();
 			writer = null;
 		}
-		if ( filter != null ) {
-			filter.close();
-			filter = null;
+		if ( filter1 != null ) {
+			filter1.close();
+			filter1 = null;
+		}
+		if ( filter2 != null ) {
+			filter2.close();
+			filter2 = null;
 		}
 	}
 
@@ -188,7 +237,8 @@ public class ExtractionVerificationStep extends BasePipelineStep {
 	}
 
 	public void cancel () {
-		if ( filter != null ) filter.cancel();
+		if ( filter1 != null ) filter1.cancel();
+		if ( filter2 != null ) filter2.cancel();
 	}
 
 	private boolean identicalEvent (Event event1,
@@ -211,25 +261,26 @@ public class ExtractionVerificationStep extends BasePipelineStep {
 			return false;
 		}
 
-		ExtractionVerificationUtil verificationUtil = new ExtractionVerificationUtil();
-		
-		switch ( event1.getEventType() ) {
-		case START_DOCUMENT:
-			break;
-		case START_SUBDOCUMENT:
-			return verificationUtil.compareStartSubDocument((StartSubDocument)event1.getResource(), (StartSubDocument)event2.getResource());
-		case START_GROUP:
-			return verificationUtil.compareBaseReferenceable(event1.getStartGroup(), event2.getStartGroup());
-		case END_DOCUMENT:
-		case END_SUBDOCUMENT:
-		case END_GROUP:
-			return verificationUtil.compareIResources(event1.getEnding(), event2.getEnding());
-		case DOCUMENT_PART:
-			return verificationUtil.compareBaseReferenceable(event1.getDocumentPart(), event2.getDocumentPart());
-		case TEXT_UNIT:
+		if(event1.getEventType() == EventType.TEXT_UNIT){
 			return verificationUtil.compareTextUnits(event1.getTextUnit(), event2.getTextUnit());
+		}else if (params.getAllEvents()){
+			
+			switch ( event1.getEventType() ) {
+			case START_DOCUMENT:
+				break;
+			case START_SUBDOCUMENT:
+				return verificationUtil.compareStartSubDocument((StartSubDocument)event1.getResource(), (StartSubDocument)event2.getResource());
+			case START_GROUP:
+				return verificationUtil.compareBaseReferenceable(event1.getStartGroup(), event2.getStartGroup());
+			case END_DOCUMENT:
+			case END_SUBDOCUMENT:
+			case END_GROUP:
+				return verificationUtil.compareIResources(event1.getEnding(), event2.getEnding());
+			case DOCUMENT_PART:
+				return verificationUtil.compareBaseReferenceable(event1.getDocumentPart(), event2.getDocumentPart());
+			}
 		}
-		
+
 		return true;
 	}
 }

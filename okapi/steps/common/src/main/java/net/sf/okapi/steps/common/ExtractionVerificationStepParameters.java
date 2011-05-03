@@ -30,12 +30,17 @@ import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 public class ExtractionVerificationStepParameters extends BaseParameters implements IEditorDescriptionProvider {
 
 	private static final String COMPARESKELETON = "compareSkeleton";
-	private static final String COMPAREPROPERTIES = "compareProperties";
-	private static final String COMPAREANNOTATIONS = "compareAnnotations";
+	private static final String ENABLED = "enabled";
+	private static final String ALLEVENTS = "allEvents";
+	private static final String LIMIT = "limit";
+	private static final String INTERRUPT = "interrupt";
+	
 	
 	private boolean compareSkeleton;	
-	private boolean compareProperties;
-	private boolean compareAnnotations;
+	private boolean enabled;
+	private boolean allEvents;
+	private int limit;
+	private boolean interrupt;
 	
 	public ExtractionVerificationStepParameters() {
 		reset();
@@ -43,26 +48,31 @@ public class ExtractionVerificationStepParameters extends BaseParameters impleme
 
 	public void reset() {
 		compareSkeleton = true;
-		compareProperties = true;
-		compareAnnotations = true;
+		enabled = true;
+		allEvents = false;
+		limit = 10;
+		interrupt = false;
 	}
 
 	public void fromString(String data) {
 		reset();
 		// Read the file content as a set of fields
 		compareSkeleton = buffer.getBoolean(COMPARESKELETON, compareSkeleton);
-		compareProperties = buffer.getBoolean(COMPAREPROPERTIES, compareProperties);
-		compareAnnotations = buffer.getBoolean(COMPAREANNOTATIONS, compareAnnotations);
+		enabled = buffer.getBoolean(ENABLED, enabled);
+		allEvents = buffer.getBoolean(ALLEVENTS, allEvents);
+		limit = buffer.getInteger(LIMIT, limit);
+		interrupt = buffer.getBoolean(INTERRUPT, interrupt);
 	}
 
 	public String toString() {
 		buffer.reset();		
 		buffer.setBoolean(COMPARESKELETON, compareSkeleton);
-		buffer.setBoolean(COMPAREPROPERTIES, compareProperties);
-		buffer.setBoolean(COMPAREANNOTATIONS, compareAnnotations);
+		buffer.setBoolean(ENABLED, enabled);
+		buffer.setBoolean(ALLEVENTS, allEvents);
+		buffer.setInteger(LIMIT, limit);
+		buffer.setBoolean(INTERRUPT, interrupt);
 		return buffer.toString();
 	}
-
 
 	public boolean isCompareSkeleton() {
 		return compareSkeleton;
@@ -72,28 +82,46 @@ public class ExtractionVerificationStepParameters extends BaseParameters impleme
 		this.compareSkeleton = compareSkeleton;
 	}
 
-	public boolean isCompareProperties() {
-		return compareProperties;
+	public boolean getEnabled() {
+		return enabled;
 	}
 
-	public void setCompareProperties(boolean compareProperties) {
-		this.compareProperties = compareProperties;
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+	
+	public boolean getAllEvents() {
+		return allEvents;
 	}
 
-	public boolean isCompareAnnotations() {
-		return compareAnnotations;
+	public void setAllEvents(boolean allEvents) {
+		this.allEvents = allEvents;
+	}
+	
+	public int getLimit() {
+		return limit;
+	}
+	
+	public void setLimit(int limit) {
+		this.limit = limit;
+	}
+	
+	public boolean getInterrupt() {
+		return interrupt;
 	}
 
-	public void setCompareAnnotations(boolean compareAnnotations) {
-		this.compareAnnotations = compareAnnotations;
+	public void setInterrupt(boolean interrupt) {
+		this.interrupt = interrupt;
 	}
 
 	@Override
 	public ParametersDescription getParametersDescription() {
 		ParametersDescription desc = new ParametersDescription(this);
 		desc.add(COMPARESKELETON, "Compare skeleton", null);
-		desc.add(COMPAREPROPERTIES, "Compare properties", null);
-		desc.add(COMPAREANNOTATIONS, "Compare annotations", null);
+		desc.add(ENABLED, "Enable Extraction Verification Step", null);
+		desc.add(ALLEVENTS, "Verify all events (By default only TextUnits are verified)", null);
+		desc.add(LIMIT, "Max number of verification warnings to report per file", null);
+		desc.add(INTERRUPT, "Interrupt after reaching max verification warnings", null);
 		return desc;
 	}
 
@@ -102,9 +130,13 @@ public class ExtractionVerificationStepParameters extends BaseParameters impleme
 		EditorDescription desc = new EditorDescription("Compare TextUnits", true, false);		
 		desc.addCheckboxPart(paramsDesc.get(COMPARESKELETON));
 		desc.addSeparatorPart();
-		desc.addCheckboxPart(paramsDesc.get(COMPAREPROPERTIES));
+		desc.addCheckboxPart(paramsDesc.get(ENABLED));
 		desc.addSeparatorPart();
-		desc.addCheckboxPart(paramsDesc.get(COMPAREANNOTATIONS));
+		desc.addCheckboxPart(paramsDesc.get(ALLEVENTS));
+		desc.addSeparatorPart();
+		desc.addTextInputPart(paramsDesc.get(LIMIT));
+		desc.addSeparatorPart();
+		desc.addCheckboxPart(paramsDesc.get(INTERRUPT));
 		return desc;
 	}
 }
