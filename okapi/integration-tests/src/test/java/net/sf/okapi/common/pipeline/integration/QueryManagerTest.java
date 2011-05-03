@@ -74,12 +74,12 @@ public class QueryManagerTest {
 		// FIXME: Pensieve should return the match without codes first!!!
 		Assert.assertEquals("Les \u00e9l\u00e9phants <b>ne peuvent pas</b> voler.", qm.next().target.toText());
 	}
-	
+
 	@Test
 	public void leverageNoFill() {
 		ITextUnit tu = new TextUnit("1");
 		tu.setSourceContent(new TextFragment("Elephants cannot fly."));
-		qm.leverage(tu, 999, false);
+		qm.leverage(tu, 999, false, null);
 		
 		Assert.assertEquals("", tu.getTarget(locFRFR).toString());
 		
@@ -92,9 +92,22 @@ public class QueryManagerTest {
 	public void leverageFill() {
 		ITextUnit tu = new TextUnit("1");
 		tu.setSourceContent(new TextFragment("Elephants cannot fly."));
-		qm.leverage(tu, 1, false);
+		qm.leverage(tu, 1, false, null);
 		
 		Assert.assertEquals("Les \u00e9l\u00e9phants ne peuvent pas voler.", tu.getTarget(locFRFR).toString());
+		
+		AltTranslationsAnnotation a = tu.getTarget(locFRFR).getAnnotation(AltTranslationsAnnotation.class);
+		Assert.assertNotNull(a);		
+		Assert.assertEquals("Les \u00e9l\u00e9phants ne peuvent pas voler.", a.getFirst().getTarget().toString());
+	}
+
+	@Test
+	public void leverageFillWithPrefix () {
+		ITextUnit tu = new TextUnit("1");
+		tu.setSourceContent(new TextFragment("Elephants cannot fly."));
+		qm.leverage(tu, 1, false, "PREFIX! ");
+		
+		Assert.assertEquals("PREFIX! Les \u00e9l\u00e9phants ne peuvent pas voler.", tu.getTarget(locFRFR).toString());
 		
 		AltTranslationsAnnotation a = tu.getTarget(locFRFR).getAnnotation(AltTranslationsAnnotation.class);
 		Assert.assertNotNull(a);		
@@ -110,7 +123,7 @@ public class QueryManagerTest {
 		ISegments segs = tu.getSource().getSegments();
 		assertEquals(2, segs.count());
 		
-		qm.leverage(tu, 1, false);
+		qm.leverage(tu, 1, false, null);
 		
 		segs = tu.getTarget(locFRFR).getSegments();
 		assertEquals(2, segs.count());

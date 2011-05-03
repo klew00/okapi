@@ -260,7 +260,7 @@ public class Utility extends BaseFilterDrivenUtility {
 			if ( params.useGroupName && ( tu.getName() != null )) {
 				qm.setAttribute("GroupName", tu.getName());
 			}
-			qm.leverage(tu, params.threshold, downgradeIdenticalBestMatches);
+			qm.leverage(tu, params.threshold, downgradeIdenticalBestMatches, null);
 			
 			// Compute statistics
 			cont = tu.getTarget(trgLang);

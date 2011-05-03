@@ -31,6 +31,8 @@ public class Parameters extends BaseParameters {
 	private static final String MAKETMX = "makeTMX";
 	private static final String TMXPATH = "tmxPath";
 	private static final String USEMTPREFIX = "useMTPrefix";
+	private static final String USETARGETPREFIX = "useTargetPrefix";
+	private static final String TARGETPREFIX = "targetPrefix";
 	
 	private String resourceClassName;
 	private String resourceParameters;
@@ -42,6 +44,8 @@ public class Parameters extends BaseParameters {
 	private String tmxPath;
 	private boolean useMTPrefix;
 	private boolean leverage;
+	private boolean useTargetPrefix;
+	private String targetPrefix;
 
 	public Parameters () {
 		reset();
@@ -127,6 +131,22 @@ public class Parameters extends BaseParameters {
 		this.useMTPrefix = useMTPrefix;
 	}
 
+	public boolean getUseTargetPrefix () {
+		return useTargetPrefix;
+	}
+	
+	public void setUseTargetPrefix (boolean useTargetPrefix) {
+		this.useTargetPrefix = useTargetPrefix;
+	}
+
+	public String getTargetPrefix () {
+		return targetPrefix;
+	}
+	
+	public void setTargetPrefix (String targetPrefix) {
+		this.targetPrefix = targetPrefix;
+	}
+
 	@Override
 	public void reset() {
 		leverage = true;
@@ -139,6 +159,8 @@ public class Parameters extends BaseParameters {
 		makeTMX = false;
 		tmxPath = "";
 		useMTPrefix = true;
+		useTargetPrefix = false;
+		targetPrefix = "FromLeverage! ";
 	}
 
 	@Override
@@ -155,6 +177,8 @@ public class Parameters extends BaseParameters {
 		tmxPath = buffer.getString(TMXPATH, tmxPath);
 		useMTPrefix = buffer.getBoolean(USEMTPREFIX, useMTPrefix);
 		leverage = buffer.getBoolean(LEVERAGE, leverage);
+		useTargetPrefix = buffer.getBoolean(USETARGETPREFIX, useTargetPrefix);
+		targetPrefix = buffer.getString(TARGETPREFIX, targetPrefix);
 	}
 
 	@Override
@@ -170,6 +194,8 @@ public class Parameters extends BaseParameters {
 		buffer.setString(TMXPATH, tmxPath);
 		buffer.setBoolean(USEMTPREFIX, useMTPrefix);
 		buffer.setBoolean(LEVERAGE, leverage);
+		buffer.setBoolean(USETARGETPREFIX, useTargetPrefix);
+		buffer.setString(TARGETPREFIX, targetPrefix);
 		return buffer.toString();
 	}
 

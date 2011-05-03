@@ -441,10 +441,13 @@ public class QueryManager {
 	 * the target: simply use a high value (e.g. <code>Integer.MAX_VALUE</code>).
 	 * @param downgradeIdenticalBestMatches true to reduce the score of best matches when
 	 * they are identical.
+	 * @param targetPrefix A prefix to place at the front of the candidate target if it is 
+	 * leveraged into the text unit. Use null to not set a prefix.
 	 */
 	public void leverage (ITextUnit tu,
 		int thresholdToFill,
-		boolean downgradeIdenticalBestMatches)
+		boolean downgradeIdenticalBestMatches,
+		String targetPrefix)
 	{
 		if ( !tu.isTranslatable() ) {
 			return;
@@ -480,7 +483,14 @@ public class QueryManager {
 					if ( bestMatch.getScore() >= thresholdToFill ) {
 						// Alternate translation content is expected to always be un-segmented
 						// We can use getFirstContent() here
-						tu.setTargetContent(getTargetLanguage(), bestMatch.getTarget().getFirstContent());
+						if ( targetPrefix != null ) {
+							TextFragment tf = new TextFragment(targetPrefix + bestMatch.getTarget().getFirstContent().getCodedText(),
+								bestMatch.getTarget().getFirstContent().getClonedCodes());
+							tu.setTargetContent(getTargetLanguage(), tf);
+						}
+						else {
+							tu.setTargetContent(getTargetLanguage(), bestMatch.getTarget().getFirstContent());
+						}
 					}
 					// Downgrade identical best matches if requested
 					if ( downgradeIdenticalBestMatches ) {
@@ -501,7 +511,14 @@ public class QueryManager {
 						else if ( bestMatch.getScore() > 0 ) fuzzyBestMatches++;
 						// Fill target if requested
 						if ( bestMatch.getScore() >= thresholdToFill ) {
-							ts.text = bestMatch.getTarget().getFirstContent();
+							if ( targetPrefix != null ) {
+								TextFragment tf = new TextFragment(targetPrefix + bestMatch.getTarget().getFirstContent().getCodedText(),
+									bestMatch.getTarget().getFirstContent().getClonedCodes());
+								ts.text = tf;
+							}
+							else {
+								ts.text = bestMatch.getTarget().getFirstContent();	
+							}
 						}
 						// Downgrade identical best matches if requested
 						if ( downgradeIdenticalBestMatches ) {

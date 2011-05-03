@@ -279,7 +279,7 @@ public class ServalForm {
 				else {
 					tu.setSourceContent(parseToTextFragment(edQuery.getText()));
 				}
-				queryMgt.leverage(tu, 1, false);
+				queryMgt.leverage(tu, 1, false, null);
 			}
 			else {
 				if ( chkRawText.getSelection() ) {

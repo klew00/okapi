@@ -47,6 +47,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
+import org.eclipse.swt.widgets.Text;
 
 @EditorFor(Parameters.class)
 public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParametersEditor {
@@ -70,6 +71,8 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Button chkMakeTMX;
 	private TextAndBrowsePanel pnlTMXPath;
 	private Button chkUseMTPrefix;
+	private Button chkUseTargetPrefix;
+	private Text edTargetPrefix;
 	
 	public ParametersEditor () {
 		connectors = new DefaultConnectors();
@@ -206,7 +209,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		chkDowngradeIBM.setLayoutData(gdTmp);
 		
 		chkFillTarget = new Button(mainComposite, SWT.CHECK);
-		chkFillTarget.setText("Fill the target with the leveraged translation");
+		chkFillTarget.setText("Fill the target with the best translation candidate");
 		gdTmp = new GridData();
 		gdTmp.horizontalSpan = 2;
 		chkFillTarget.setLayoutData(gdTmp);
@@ -218,7 +221,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		});
 		
 		stFillTargetThreshold = new Label(mainComposite, SWT.NONE);
-		stFillTargetThreshold.setText("When the best match is equal or above this score:");
+		stFillTargetThreshold.setText("When the best macandidate is equal or above this score:");
 		gdTmp = new GridData();
 		final int indent = 16;
 		gdTmp.horizontalIndent = indent;
@@ -230,6 +233,22 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		spnFillTargetThreshold.setIncrement(1);
 		spnFillTargetThreshold.setPageIncrement(10);
 
+		chkUseTargetPrefix = new Button(mainComposite, SWT.CHECK);
+		chkUseTargetPrefix.setText("Add this prefix to the leveraged translation");
+		gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		chkUseTargetPrefix.setLayoutData(gdTmp);
+		chkUseTargetPrefix.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				edTargetPrefix.setEnabled(chkUseTargetPrefix.getSelection());
+			}
+		});
+		
+		edTargetPrefix = new Text(mainComposite, SWT.BORDER);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalSpan = 2;
+		edTargetPrefix.setLayoutData(gdTmp);
+		
 		chkMakeTMX = new Button(mainComposite, SWT.CHECK);
 		chkMakeTMX.setText("Generate a TMX document");
 		gdTmp = new GridData();
@@ -274,6 +293,15 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		spnThreshold.setEnabled(enabled);
 		chkDowngradeIBM.setEnabled(enabled);
 		chkFillTarget.setEnabled(enabled);
+		
+		chkUseTargetPrefix.setEnabled(enabled);
+		if ( enabled ) {
+			edTargetPrefix.setEnabled(chkUseTargetPrefix.getSelection());
+		}
+		else {
+			edTargetPrefix.setEnabled(false);
+		}
+		
 		chkMakeTMX.setEnabled(enabled);
 		if ( enabled ) {
 			pnlTMXPath.setEnabled(chkMakeTMX.getSelection());
@@ -299,6 +327,8 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		chkMakeTMX.setSelection(params.getMakeTMX());
 		pnlTMXPath.setText(params.getTMXPath());
 		chkUseMTPrefix.setSelection(params.getUseMTPrefix());
+		chkUseTargetPrefix.setSelection(params.getUseTargetPrefix());
+		edTargetPrefix.setText(params.getTargetPrefix());
 		updateOptionsDisplay();
 	}
 
@@ -310,12 +340,21 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			return true; // Save only that option
 		}
 		if ( chkMakeTMX.getSelection() ) {
-			if ( Util.isEmpty(pnlTMXPath.getText()) ) {
+			if ( Util.isEmpty(pnlTMXPath.getText().trim()) ) {
 				Dialogs.showError(shell,
 					"You must provide a path for the TMX output.", null);
 				return false;
 			}
 		}
+		
+		if ( chkUseTargetPrefix.getSelection() ) {
+			if ( Util.isEmpty(edTargetPrefix.getText().trim()) ) {
+				Dialogs.showError(shell,
+					"You must provide a target prefix.", null);
+				return false;
+			}
+		}
+		
 		params.setResourceClassName(pnlConnector.getConnectorClass());
 		params.setResourceParameters(pnlConnector.getConnectorParameters());
 		params.setThreshold(spnThreshold.getSelection());
@@ -325,6 +364,9 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		params.setMakeTMX(chkMakeTMX.getSelection());
 		params.setTMXPath(pnlTMXPath.getText());
 		params.setUseMTPrefix(chkUseMTPrefix.getSelection());
+		params.setUseTargetPrefix(chkUseTargetPrefix.getSelection());
+		params.setTargetPrefix(edTargetPrefix.getText());
+		
 		result = true;
 		return true;
 	}

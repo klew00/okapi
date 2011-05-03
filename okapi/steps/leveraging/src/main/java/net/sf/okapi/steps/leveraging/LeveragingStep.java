@@ -51,8 +51,8 @@ public class LeveragingStep extends BasePipelineStep {
 	private int totalCount;
 	private int exactCount;
 	private int fuzzyCount;
-
 	private int iQueryId;
+	private String targetPrefix;
 
 	public LeveragingStep () {
 		params = new Parameters();
@@ -153,7 +153,7 @@ public class LeveragingStep extends BasePipelineStep {
     	// Leverage
     	qm.leverage(tu, 
     		params.getFillTarget() ? params.getFillTargetThreshold() : Integer.MAX_VALUE,
-    		params.getDowngradeIdenticalBestMatches());
+    		params.getDowngradeIdenticalBestMatches(), targetPrefix);
     	
     	// Optionally write out this TU
 		if ( tmxWriter != null ) {
@@ -193,6 +193,8 @@ public class LeveragingStep extends BasePipelineStep {
 		ResourceItem res = qm.getResource(iQueryId);
 		logger.info("Leveraging settings: "+res.name);
 		logger.info(res.query.getSettingsDisplay());
+		
+		targetPrefix = (params.getUseTargetPrefix() ? params.getTargetPrefix() : null);
 			
 		if ( params.getMakeTMX() ) {
 			// Resolve the variables
