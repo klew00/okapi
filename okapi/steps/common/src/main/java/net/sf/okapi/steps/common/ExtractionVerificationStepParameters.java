@@ -50,7 +50,7 @@ public class ExtractionVerificationStepParameters extends BaseParameters impleme
 	public void reset() {
 		compareSkeleton = true;
 		stepEnabled = true;
-		allEvents = false;
+		allEvents = true;
 		limit = 10;
 		interrupt = false;
 	}
@@ -122,8 +122,8 @@ public class ExtractionVerificationStepParameters extends BaseParameters impleme
 		desc.add(STEPENABLED, "Perform the extraction verification", null);
 		desc.add(COMPARESKELETON, "Compare skeleton", null);
 		desc.add(ALLEVENTS, "Verify all events (otherwise only text units are verified)", null);
-		desc.add(LIMIT, "Max number of verification warnings to report per file", null);
-		desc.add(INTERRUPT, "Interrupt after reaching max verification warnings", null);
+		desc.add(LIMIT, "Maximum number of warnings per document", null);
+		desc.add(INTERRUPT, "Interrupt after reaching the maximum number of warnings", null);
 		return desc;
 	}
 
