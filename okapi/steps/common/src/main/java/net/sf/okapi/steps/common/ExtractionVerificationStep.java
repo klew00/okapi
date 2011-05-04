@@ -99,12 +99,12 @@ public class ExtractionVerificationStep extends BasePipelineStep {
 	@Override
 	protected Event handleRawDocument (Event event) {
 
-		if(!params.getEnabled()){
+		if ( !params.getStepEnabled() ) {
 			LOGGER.info("ExtractionVerificationStep is disabled");
 			return event;
 		}
 		
-		if(params.isCompareSkeleton()){
+		if ( params.getCompareSkeleton() ) {
 			verificationUtil.setCompareSkeleton(true);
 		}
 		
@@ -151,7 +151,7 @@ public class ExtractionVerificationStep extends BasePipelineStep {
 			
 			//=== Second pass: Extract from the merged file and compare
 			
-			RawDocument tmpDoc = new RawDocument(outFile.toURI(), initialDoc.getEncoding(), initialDoc.getSourceLocale());
+			RawDocument tmpDoc = new RawDocument(outFile.toURI(), initialDoc.getEncoding(), initialDoc.getSourceLocale(), initialDoc.getTargetLocale());
 			filter1 = fcMapper.createFilter(filterConfigId);
 			filter1.open(initialDoc);
 			filter2.open(tmpDoc);
@@ -203,7 +203,7 @@ public class ExtractionVerificationStep extends BasePipelineStep {
 			if(errorCount > 0){
 				LOGGER.warning("ExtractionVerification: "+errorCount+ " or more events fail.");
 			}else{
-				LOGGER.info("ExtractionVerification: all events pass.");
+				LOGGER.info("ExtractionVerification: All events pass.");
 			}
 			
 		}

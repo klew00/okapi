@@ -87,7 +87,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	
 	@Override
 	public EditorDescription createEditorDescription (ParametersDescription paramDesc) {
-		EditorDescription desc = new EditorDescription("Desegmentation");
+		EditorDescription desc = new EditorDescription("Desegmentation", true, false);
 		desc.addCheckboxPart(paramDesc.get(DESEGMENTSOURCE));
 		desc.addCheckboxPart(paramDesc.get(DESEGMENTTARGET));
 		return desc;

@@ -52,6 +52,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 
 	public void fromString(String data) {
 		reset();
+		buffer.fromString(data);		
 		// Read the file content as a set of fields
 		copyProperties = buffer.getBoolean(COPYPROPERTIES, copyProperties);
 		copyContent = buffer.getBoolean(COPYCONTENT, copyContent);
