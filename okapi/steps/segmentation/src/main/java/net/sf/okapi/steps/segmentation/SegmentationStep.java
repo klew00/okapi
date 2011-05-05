@@ -143,11 +143,14 @@ public class SegmentationStep extends BasePipelineStep {
 	
 	@Override
 	protected Event handleStartDocument (Event event) {
-		if ( params.getForcesegmentedOutput() ) {
-			// Force to show the segments when possible
-			IParameters prm = event.getStartDocument().getFilterParameters();
-			if ( prm != null ) {
-				prm.setInteger("outputSegmentationType", 3);
+		if ( params.segmentSource || params.segmentTarget ) {
+			// Possibly force the output segmentation, but only if we do any segmentation
+			if ( params.getForcesegmentedOutput() ) {
+				// Force to show the segments when possible
+				IParameters prm = event.getStartDocument().getFilterParameters();
+				if ( prm != null ) {
+					prm.setInteger("outputSegmentationType", 3);
+				}
 			}
 		}
 		return event;
