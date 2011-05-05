@@ -10,12 +10,6 @@
 	<name>Okapi Core</name>
 	
 	<dependencies>
-		<!--DO NOT REMOVE
-		<dependency>
-			<groupId>com.google.collections</groupId>
-			<artifactId>google-collections</artifactId>
-			<version>1.0-rc5</version>
-		</dependency>-->
 	</dependencies>
 
 	<build>

@@ -191,12 +191,12 @@ public class Pipeline implements IPipeline, IObservable, IObserver {
 	}
 
 	@Override
-	public Event process(RawDocument input) {
-		return process(new Event(EventType.RAW_DOCUMENT, input));
+	public void  process(RawDocument input) {
+		process(new Event(EventType.RAW_DOCUMENT, input));
 	}
 
 	@Override
-	public Event process(Event input) {
+	public void  process(Event input) {
 		state = PipelineReturnValue.RUNNING;
 		initialize();
 
@@ -207,15 +207,12 @@ public class Pipeline implements IPipeline, IObservable, IObserver {
 		}
 		notifyObservers(e);
 
-		Event finalEvent = Event.NOOP_EVENT;
-		
-		// Prime the pipeline with the input Event and run it to completion.
-		
+		// Prime the pipeline with the input Event and run it to completion.		
 		// catch case where the first event is MULTI_EVENT
 		if (input.getEventType() == EventType.MULTI_EVENT && 
 				!(((MultiEvent)input.getResource()).isPropagateAsSingleEvent())) {
 			for (Event me : ((MultiEvent) input.getResource())) {
-				finalEvent = execute(me);
+				execute(me);
 				// Copy any remaining steps into finishedSteps - makes initialization
 				// process easier down the road if we use the pipeline again
 				for (IPipelineStep step : steps) {
@@ -225,7 +222,7 @@ public class Pipeline implements IPipeline, IObservable, IObserver {
 				initialize();
 			}
 		} else {
-			finalEvent = execute(input);
+			execute(input);
 		}
 
 		// Copy any remaining steps into finishedSteps - makes initialization
@@ -241,8 +238,6 @@ public class Pipeline implements IPipeline, IObservable, IObserver {
 			step.handleEvent(e);
 		}
 		notifyObservers(e);
-
-		return finalEvent;
 	}
 
 	@Override

@@ -57,10 +57,8 @@ public class ExternalCommandStepTest {
 
 		pipeline.startBatch();
 
-		Event e = pipeline.process(d);
+		pipeline.process(d);
 
 		pipeline.endBatch();
-		
-		assertTrue((new File(e.getRawDocument().getInputURI()).exists()));
 	}
 }

@@ -84,7 +84,7 @@ public enum EventType {
 	 * associated with this event.
 	 */
 	CANCELED,
-
+	
 	/**
 	 * Used to notify pipeline steps that the current batch operation is starting.
 	 */

@@ -38,7 +38,7 @@ public interface IPipeline {
 	 * @param input
 	 *            the RawDocument to process.
 	 */
-	public Event process(RawDocument input);
+	public void process(RawDocument input);
 
 	/**
 	 * Starts {@link IPipeline} processing with a {@link Event} as input.
@@ -46,7 +46,7 @@ public interface IPipeline {
 	 * @param input
 	 *            event that primes the {@link IPipeline}
 	 */
-	public Event process(Event input);
+	public void  process(Event input);
 
 	/**
 	 * Gets the current pipeline state.

@@ -172,5 +172,10 @@ public class XPipelineStep implements IPipelineStep{
 	public IPipelineStep getStep() {
 		return step;
 	}
-	
+
+	@Override
+	public void cancel() {
+		// TODO Auto-generated method stub
+		// implement cancel
+	}	
 }

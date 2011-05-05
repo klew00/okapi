@@ -90,6 +90,12 @@ public interface IPipelineStep {
 	 * pipeline lifecycle.
 	 */
 	public void destroy();
+	
+	/**
+	 * Cancel processing on this pipeline. Each {@link IPipelineStep} is responsible 
+	 * to implement a cancel method that will interrupt long running operations
+	 */
+	public void cancel();
 
 	/**
 	 * Is this step the last step with output in the pipeline?
