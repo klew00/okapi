@@ -101,7 +101,7 @@ public class TestRepetitionAnalysisStep {
 		tmWriter.close();
 	}
 		
-	@Test
+	// @Test
 	public void testExactRepetitions() {
 		String fname = "test1.txt";
 		try {
@@ -132,7 +132,7 @@ public class TestRepetitionAnalysisStep {
 		}
 	}
 	
-	@Test
+	// @Test
 	public void testFuzzyRepetitions() {
 		String fname = "test1.txt";
 		try {
