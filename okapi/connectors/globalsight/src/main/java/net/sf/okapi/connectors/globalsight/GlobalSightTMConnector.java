@@ -184,7 +184,7 @@ public class GlobalSightTMConnector extends BaseConnector implements ITMQuery {
 				list2 = elem.getElementsByTagName("percentage");
 				res = new QueryResult();
 				res.weight = getWeight();
-				res.score = Integer.valueOf(Util.getTextContent(list2.item(0)).replace("%", ""));
+				res.score = Float.valueOf(Util.getTextContent(list2.item(0)).replace("%", "")).intValue();
 				if ( res.score < threshold ) continue;
 				
 				if ( res.score >= 100 ) res.matchType = MatchType.EXACT;
@@ -322,7 +322,7 @@ public class GlobalSightTMConnector extends BaseConnector implements ITMQuery {
 				list2 = elem.getElementsByTagName("percentage");
 				res = new QueryResult();
 				res.weight = getWeight();
-				res.score = Integer.valueOf(Util.getTextContent(list2.item(0)).replace("%", ""));
+				res.score = Float.valueOf(Util.getTextContent(list2.item(0)).replace("%", "")).intValue();
 				if ( res.score < threshold ) continue;
 				list2 = elem.getElementsByTagName("source");
 				list3 = ((Element)list2.item(0)).getElementsByTagName("segment");
