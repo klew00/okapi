@@ -40,6 +40,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
@@ -66,6 +67,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private IHelp help;
 	private String projectDir;
 	private Composite mainComposite;
+	private Group grpOptions;
 	
 	public boolean edit (IParameters params,
 		boolean readOnly,
@@ -171,6 +173,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		chkSegmentSource.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				updateSourceDisplay();
+				updateOptionsDisplay();
 			}
 		});
 
@@ -201,6 +204,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		chkSegmentTarget.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				updateTargetDisplay();
+				updateOptionsDisplay();
 			}
 		});
 
@@ -223,7 +227,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			}
 		});
 		
-		Group grpOptions = new Group(mainComposite, SWT.NONE);
+		grpOptions = new Group(mainComposite, SWT.NONE);
 		grpOptions.setText("Options");
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalSpan = 3;
@@ -292,6 +296,14 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		btGetTargetSRX.setEnabled(chkSegmentTarget.getSelection());
 	}
 	
+	private void updateOptionsDisplay () {
+		boolean enabled = chkSegmentTarget.getSelection() || chkSegmentSource.getSelection();
+		grpOptions.setEnabled(enabled);
+		for ( Control ctrl : grpOptions.getChildren() ) {
+			ctrl.setEnabled(enabled);
+		}
+	}
+	
 	private void setData () {
 		chkSegmentSource.setSelection(params.segmentSource);
 		edSourceSRX.setText(params.getSourceSrxPath());
@@ -303,6 +315,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		chkOverwriteSegmentation.setSelection(params.getOverwriteSegmentation());
 		updateSourceDisplay();
 		updateTargetDisplay();
+		updateOptionsDisplay();
 	}
 
 	private boolean saveData () {

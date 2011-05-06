@@ -161,6 +161,8 @@ public class SegmentationStep extends BasePipelineStep {
 		ITextUnit tu = event.getTextUnit();
 		// Skip non-translatable
 		if ( !tu.isTranslatable() ) return event;
+		// Nothing to do
+		if ( !params.segmentSource && !params.segmentTarget ) return event;  
 
 		// Segment source if requested
 		if ( params.segmentSource ) {

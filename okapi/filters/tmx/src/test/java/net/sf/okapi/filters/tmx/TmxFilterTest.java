@@ -44,6 +44,9 @@ public class TmxFilterTest {
 	private LocaleId locIT = LocaleId.fromString("it");
 	private LocaleId locENUS = LocaleId.fromString("en-us");
 	private LocaleId locFRFR = LocaleId.fromString("fr-fr");
+	private LocaleId locFRCA = LocaleId.fromString("fr-ca");
+	private LocaleId locENGB = LocaleId.fromString("en-gb");
+	private LocaleId locJAJP = LocaleId.fromString("ja-jp");
 	
 	String simpleSnippetWithDTD = "<?xml version=\"1.0\"?>\r"
 		+ "<!DOCTYPE tmx SYSTEM \"tmx14.dtd\"><tmx version=\"1.4\"><header creationtool=\"undefined_creationtool\" creationtoolversion=\"undefined_creationversion\" segtype=\"undefined_segtype\" o-tmf=\"undefined_unknown\" adminlang=\"undefined_adminlang\" srclang=\"en-us\" datatype=\"unknown\"></header><body><tu tuid=\"tuid_1\"><note>hello world note</note><tuv xml:lang=\"en-us\"><seg>Hello World!</seg></tuv></tu><tu tuid=\"tuid_2\"><tuv xml:lang=\"en-us\"><seg>Hello Universe!</seg></tuv></tu></body></tmx>\r";
@@ -530,6 +533,32 @@ public class TmxFilterTest {
 
 		RoundTripComparison rtc = new RoundTripComparison();
 		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locENUS, locFRFR));
+	}	
+	
+	@Test
+	public void testDoubleExtractionCompKit () throws URISyntaxException {
+		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
+		RoundTripComparison rtc = new RoundTripComparison();
+
+		list.add(new InputDocument(root+"compkit/ExportTest1A.tmx", null));
+		list.add(new InputDocument(root+"compkit/ExportTest1B.tmx", null));
+		list.add(new InputDocument(root+"compkit/ExportTest2A.tmx", null));
+		list.add(new InputDocument(root+"compkit/ImportTest1A.tmx", null));
+		list.add(new InputDocument(root+"compkit/ImportTest1B.tmx", null));
+		list.add(new InputDocument(root+"compkit/ImportTest1C.tmx", null));
+		list.add(new InputDocument(root+"compkit/ImportTest2A.tmx", null));
+		list.add(new InputDocument(root+"compkit/ImportTest2B.tmx", null));
+		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locENUS, locFRCA));
+
+		list.clear();
+		list.add(new InputDocument(root+"compkit/ImportTest1D.tmx", null));
+		list.add(new InputDocument(root+"compkit/ImportTest1H.tmx", null));
+		list.add(new InputDocument(root+"compkit/ImportTest1L.tmx", null));
+		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locENUS, locENGB));
+
+		list.clear();
+		list.add(new InputDocument(root+"compkit/ImportTest1I.tmx", null));
+		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locENUS, locJAJP));
 	}	
 	
 }
