@@ -22,6 +22,7 @@ package net.sf.okapi.steps.repetitionanalysis;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.File;
 import java.util.List;
 
 import net.sf.okapi.common.ClassUtil;
@@ -52,8 +53,8 @@ public class TestPensieveWriterSeeker {
 		pathBase = Util.ensureSeparator(ClassUtil.getTargetPath(this.getClass()), true);
 		//tmDir = pathBase + "tm/";
 		tmDir = pathBase;
-		Util.createDirectories(tmDir);
-		//System.out.println((new File(tmDir)).getAbsolutePath());
+//		Util.createDirectories(tmDir);
+//		System.out.println((new File(tmDir)).getAbsolutePath());
 		tmWriter = TmWriterFactory.createFileBasedTmWriter(tmDir, true);
 		currentTm = TmSeekerFactory.createFileBasedTmSeeker(tmDir);
 	}
