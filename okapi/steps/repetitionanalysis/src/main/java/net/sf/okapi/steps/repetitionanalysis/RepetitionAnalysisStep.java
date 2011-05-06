@@ -124,9 +124,11 @@ public class RepetitionAnalysisStep extends BasePipelineStep {
 		Util.deleteDirectory(tmDir, true);
 		Util.createDirectories(tmDir);
 		searchExact = params.getFuzzyThreshold() >= 100;
-		counter = 0;		
+		counter = 0;
+		
 		tmWriter = TmWriterFactory.createFileBasedTmWriter(tmDir, true);
 		tmWriter.close(); // To create a TM for the seeker
+		
 		tmWriter = TmWriterFactory.createFileBasedTmWriter(tmDir, true);
 		currentTm = TmSeekerFactory.createFileBasedTmSeeker(tmDir);
 		return super.handleStartDocument(event);
@@ -176,14 +178,16 @@ public class RepetitionAnalysisStep extends BasePipelineStep {
 					seg.setAnnotation(ann);
 					//System.out.println("= " + tf);
 					
-					Segment tseg = tsegments.get(seg.getId()); // Always exists, created empty in case of no target
-					TextFragment stf = hitTu.getSource().getContent();
-					TextFragment ttf = hitTu.getTarget().getContent();
-					AltTranslationsAnnotation ata = new AltTranslationsAnnotation();
-					ata.add(new AltTranslation(sourceLocale, targetLocale == null ? sourceLocale : targetLocale, 
-							tf, stf, ttf, MatchType.EXACT_DOCUMENT_CONTEXT, 
-							Math.round(hit.getScore() * 100), ""));
-					tseg.setAnnotation(ata);
+					if (tsegments != null) {
+						Segment tseg = tsegments.get(seg.getId()); // Always exists, created empty in case of no target
+						TextFragment stf = hitTu.getSource().getContent();
+						TextFragment ttf = hitTu.getTarget().getContent();
+						AltTranslationsAnnotation ata = new AltTranslationsAnnotation();
+						ata.add(new AltTranslation(sourceLocale, targetLocale == null ? sourceLocale : targetLocale, 
+								tf, stf, ttf, MatchType.EXACT_DOCUMENT_CONTEXT, 
+								Math.round(hit.getScore() * 100), ""));
+						tseg.setAnnotation(ata);
+					}
 				}
 				else {
 					TranslationUnit ntu = new TranslationUnit(
@@ -203,9 +207,8 @@ public class RepetitionAnalysisStep extends BasePipelineStep {
 					// of repetitive segments within a tu
 					tmWriter.commit();
 					
-					// TODO Remove when fixed
-//					currentTm.close();
-//					currentTm = TmSeekerFactory.createFileBasedTmSeeker(tmDir);
+					currentTm.close();
+					currentTm = TmSeekerFactory.createFileBasedTmSeeker(tmDir);
 				}
 			}
 		}

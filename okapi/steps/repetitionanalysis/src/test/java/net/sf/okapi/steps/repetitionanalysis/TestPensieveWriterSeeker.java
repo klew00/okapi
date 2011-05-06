@@ -51,9 +51,9 @@ public class TestPensieveWriterSeeker {
 	@Before
 	public void setup() {
 		pathBase = Util.ensureSeparator(ClassUtil.getTargetPath(this.getClass()), true);
-		//tmDir = pathBase + "tm/";
-		tmDir = pathBase;
-//		Util.createDirectories(tmDir);
+		tmDir = pathBase + "tm/";
+		//tmDir = pathBase;
+		Util.createDirectories(tmDir);
 //		System.out.println((new File(tmDir)).getAbsolutePath());
 		tmWriter = TmWriterFactory.createFileBasedTmWriter(tmDir, true);
 		currentTm = TmSeekerFactory.createFileBasedTmSeeker(tmDir);
@@ -63,7 +63,7 @@ public class TestPensieveWriterSeeker {
 	public void shutdown() {
 		currentTm.close();
 		tmWriter.close();
-		//Util.deleteDirectory(tmDir, false);
+		Util.deleteDirectory(tmDir, false);
 	}
 	
 	@Test
