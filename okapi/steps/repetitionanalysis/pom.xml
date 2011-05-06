@@ -6,6 +6,7 @@
     <version>0.12-SNAPSHOT</version>
   </parent>
   <artifactId>okapi-step-repetitionanalysis</artifactId>
+  <name>Okapi Step for Repetition Analysis</name>
   <dependencies>
   	<dependency>
   		<groupId>net.sf.okapi</groupId>
