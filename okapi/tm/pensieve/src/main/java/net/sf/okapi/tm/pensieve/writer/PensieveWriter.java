@@ -28,7 +28,6 @@ import java.util.logging.Logger;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.resource.Code;
-import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.search.lucene.analysis.NgramAnalyzer;
 import net.sf.okapi.tm.pensieve.common.Metadata;
@@ -45,7 +44,6 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.AlreadyClosedException;
 import org.apache.lucene.store.Directory;
@@ -83,8 +81,7 @@ public class PensieveWriter implements ITmWriter {
 	@Override
 	public void close () {
 		try {
-			indexWriter.commit();
-			indexWriter.optimize();
+			indexWriter.commit();		
 		} catch (IOException e) {
 			throw new OkapiIOException(e); // To change body of catch statement use File | Settings | File Templates.
 		} catch (AlreadyClosedException ignored) {
