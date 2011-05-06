@@ -18,8 +18,10 @@ import net.sf.okapi.tm.pensieve.writer.TmWriterFactory;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore
 public class TestPensieveWriterSeeker {
 	private String tmDir;
 	private String pathBase;
