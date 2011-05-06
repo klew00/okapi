@@ -21,6 +21,7 @@
 package net.sf.okapi.steps.rainbowkit.postprocess;
 
 import java.io.File;
+import java.util.List;
 import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
@@ -28,6 +29,8 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.MimeTypeMapper;
+import net.sf.okapi.common.Range;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
@@ -53,13 +56,16 @@ public class Merger {
 	private IFilterConfigurationMapper fcMapper;
 	private boolean skipEmptySourceEntries;
 	private boolean useSource;
+	private boolean preserveSegmentation;
 	
 	public Merger (Manifest manifest,
-		IFilterConfigurationMapper fcMapper)
+		IFilterConfigurationMapper fcMapper,
+		boolean preserveSegmentation)
 	{
 		this.fcMapper = fcMapper;
 		this.manifest = manifest;
 		trgLoc = manifest.getTargetLocale();
+		this.preserveSegmentation = preserveSegmentation;
 	}
 	
 	public void close () {
@@ -186,17 +192,37 @@ public class Merger {
 		}
 		
 		// Do we need to preserve the segmentation for merging (e.g. TTX case)
-//		boolean mergeAsSegments = false;
-//		if ( oriTu.getMimeType() != null ) { 
-//			if ( oriTu.getMimeType().equals(MimeTypeMapper.TTX_MIME_TYPE)
-//				|| oriTu.getMimeType().equals(MimeTypeMapper.XLIFF_MIME_TYPE) ) {
-//				mergeAsSegments = true;
-//			}
-//		}
-
-		TextContainer srcOriCont = oriTu.getSource();
-		ISegments trgTraSegs = trgTraCont.getSegments();
+		boolean mergeAsSegments = false;
+		if ( oriTu.getMimeType() != null ) { 
+			if ( oriTu.getMimeType().equals(MimeTypeMapper.TTX_MIME_TYPE)
+				|| oriTu.getMimeType().equals(MimeTypeMapper.XLIFF_MIME_TYPE) ) {
+				mergeAsSegments = true;
+			}
+		}
 		
+		// Set the container for the source
+		TextContainer srcOriCont = oriTu.getSource();
+
+		// If we do not need to merge segments then we must join all for the merge
+		// We also remember the ranges to set them back after merging
+		List<Range> srcRanges = null;
+		List<Range> trgRanges = null;
+		if ( !mergeAsSegments ) {
+			// Join only if needed
+			if ( !srcOriCont.contentIsOneSegment() ) {
+				srcRanges = srcOriCont.getSegments().getRanges();
+				srcOriCont.joinAll();
+			}
+			if ( !trgTraCont.contentIsOneSegment() ) {
+				trgRanges = trgTraCont.getSegments().getRanges();
+				trgTraCont.joinAll();
+			}
+		}
+		
+		// Perform the transfer of the inline codes
+		// At this point most formats will have the whole content in a single segment
+		// but we still work based on the segment(s) to handle the other cases
+		ISegments trgTraSegs = trgTraCont.getSegments();
 		for ( Segment srcOriSeg : srcOriCont.getSegments() ) {
 			Segment trgTraSeg = trgTraSegs.get(srcOriSeg.id);
 			if ( trgTraSeg == null ) {
@@ -217,11 +243,6 @@ public class Merger {
 		
 		oriTu.setTarget(trgLoc, trgTraCont);
 		
-//		TextFragment traTrgTf = tc.getUnSegmentedContentCopy();
-//		TextFragment oriSrcTf = oriTu.getSource().getUnSegmentedContentCopy();
-//		TextUnitUtil.adjustTargetCodes(oriSrcTf, traTrgTf, true, true, null, oriTu);
-//		oriTu.setTargetContent(trgLoc, traTrgTf);
-		
 		// Update/add the 'approved' flag of the entry to merge if available
 		// (for example to remove the fuzzy flag in POs or set the approved attribute in XLIFF)
 		if ( manifest.getUpdateApprovedFlag() ) {
@@ -235,6 +256,16 @@ public class Merger {
 		}
 		
 		writer.handleEvent(oriEvent);
+		
+		// Set back the segmentation if we modified it for the merge
+		if ( preserveSegmentation ) {
+			if ( srcRanges != null ) {
+				srcOriCont.getSegments().create(srcRanges);
+			}
+			if ( trgRanges != null ) {
+				trgTraCont.getSegments().create(trgRanges);
+			}
+		}
 	}
 
 	/**

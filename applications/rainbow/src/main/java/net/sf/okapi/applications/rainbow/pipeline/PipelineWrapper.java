@@ -712,9 +712,11 @@ public class PipelineWrapper {
 				"net.sf.okapi.steps.rainbowkit.postprocess.MergingStep").newInstance();
 			params = ps.getParameters();
 			step = new StepInfo(ps.getClass().getSimpleName(),
-				ps.getName(), ps.getDescription(), ps.getClass().getName(), null, null);
+				ps.getName(), ps.getDescription(), ps.getClass().getName(), null,
+				params.getClass().getName());
 			if ( params != null ) {
 				step.paramsData = params.toString();
+				peMapper.addDescriptionProvider("net.sf.okapi.steps.rainbowkit.postprocess.Parameters", step.paramsClass);
 			}
 			availableSteps.put(step.id, step);
 

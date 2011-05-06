@@ -21,6 +21,8 @@
 package net.sf.okapi.steps.rainbowkit.postprocess;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
@@ -30,14 +32,19 @@ import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.filters.rainbowkit.Manifest;
 import net.sf.okapi.filters.rainbowkit.MergingInfo;
 
+@UsingParameters(Parameters.class)
 public class MergingStep extends BasePipelineStep {
 
+	public static final String NAME = "Rainbow Translation Kit Merging";
+	
+	private Parameters params;
 	private MergingInfo info;
 	private Merger merger;
 	IFilterConfigurationMapper fcMapper;
 
 	public MergingStep () {
 		super();
+		params = new Parameters();
 	}
 
 	@Override
@@ -48,7 +55,7 @@ public class MergingStep extends BasePipelineStep {
 
 	@Override
 	public String getName () {
-		return "Rainbow Translation Kit Merging";
+		return NAME;
 	}
 
 	@StepParameterMapping(parameterType = StepParameterType.FILTER_CONFIGURATION_MAPPER)
@@ -94,7 +101,7 @@ public class MergingStep extends BasePipelineStep {
 		
 		// Create the merger if needed
 		if ( merger == null ) {
-			merger = new Merger(manifest, fcMapper);
+			merger = new Merger(manifest, fcMapper, params.getPreserveSegmentation());
 		}
 		// And trigger the merging
 		merger.startMerging(info);
@@ -102,4 +109,13 @@ public class MergingStep extends BasePipelineStep {
 		return event;
 	}
 
+	@Override
+	public IParameters getParameters () {
+		return params;
+	}
+	
+	@Override
+	public void setParameters (IParameters params) {
+		this.params = (Parameters)params;
+	}
 }
