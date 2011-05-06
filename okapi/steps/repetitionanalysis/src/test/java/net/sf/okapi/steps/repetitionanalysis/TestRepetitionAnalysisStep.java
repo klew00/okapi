@@ -36,8 +36,10 @@ import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 import net.sf.okapi.steps.segmentation.Parameters;
 import net.sf.okapi.steps.segmentation.SegmentationStep;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore
 public class TestRepetitionAnalysisStep {
 	private String pathBase = Util.ensureSeparator(ClassUtil.getTargetPath(this.getClass()), true);
 	
