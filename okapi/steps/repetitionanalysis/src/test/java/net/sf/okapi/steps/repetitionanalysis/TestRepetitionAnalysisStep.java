@@ -23,6 +23,8 @@ package net.sf.okapi.steps.repetitionanalysis;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.junit.Test;
+
 import net.sf.okapi.common.ClassUtil;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
@@ -33,16 +35,12 @@ import net.sf.okapi.lib.extra.pipelinebuilder.XParameter;
 import net.sf.okapi.lib.extra.pipelinebuilder.XPipeline;
 import net.sf.okapi.lib.extra.pipelinebuilder.XPipelineStep;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
-import net.sf.okapi.steps.segmentation.Parameters;
 import net.sf.okapi.steps.segmentation.SegmentationStep;
+import net.sf.okapi.steps.segmentation.Parameters;
 
-import org.junit.Ignore;
-import org.junit.Test;
-
-@Ignore
 public class TestRepetitionAnalysisStep {
 	private String pathBase = Util.ensureSeparator(ClassUtil.getTargetPath(this.getClass()), true);
-	
+
 	@Test
 	public void testExactRepetitions() {
 		String fname = "test1.txt";
@@ -73,7 +71,7 @@ public class TestRepetitionAnalysisStep {
 			e.printStackTrace();
 		}
 	}
-	
+
 	@Test
 	public void testFuzzyRepetitions() {
 		String fname = "test1.txt";
@@ -106,4 +104,5 @@ public class TestRepetitionAnalysisStep {
 			e.printStackTrace();
 		}
 	}
+
 }

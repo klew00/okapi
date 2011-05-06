@@ -20,7 +20,6 @@
 
 package net.sf.okapi.steps.repetitionanalysis;
 
-import java.io.File;
 import java.util.List;
 
 import net.sf.okapi.common.ClassUtil;
@@ -37,6 +36,7 @@ import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Segment;
+import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.tm.pensieve.common.MetadataType;
 import net.sf.okapi.tm.pensieve.common.TmHit;
@@ -69,7 +69,8 @@ public class RepetitionAnalysisStep extends BasePipelineStep {
 	public RepetitionAnalysisStep() {
 		super();
 		params = new Parameters();
-		tmDir = Util.ensureSeparator(ClassUtil.getTargetPath(this.getClass()), true) + "tm/";		
+		//tmDir = Util.ensureSeparator(ClassUtil.getTargetPath(this.getClass()), true) + "tm/";
+		tmDir = Util.ensureSeparator(ClassUtil.getTargetPath(this.getClass()), true);
 		//System.out.println((new File(tmDir)).getAbsolutePath());
 	}
 	
@@ -119,8 +120,8 @@ public class RepetitionAnalysisStep extends BasePipelineStep {
 	@Override
 	protected Event handleStartDocument(Event event) {
 		close();
-		Util.deleteDirectory(tmDir, true);
-		Util.createDirectories(tmDir);
+//		Util.deleteDirectory(tmDir, true);
+//		Util.createDirectories(tmDir);
 		searchExact = params.getFuzzyThreshold() >= 100;
 		counter = 0;		
 		tmWriter = TmWriterFactory.createFileBasedTmWriter(tmDir, true);
@@ -139,8 +140,13 @@ public class RepetitionAnalysisStep extends BasePipelineStep {
 		ITextUnit tu = event.getTextUnit();
 		if (tu.isTranslatable()) {
 			ISegments ssegments = tu.getSource().getSegments();
-			ISegments tsegments = tu.getTarget(targetLocale).getSegments();
+			ISegments tsegments = null;
 			
+			if (targetLocale != null) {
+				TextContainer ttc = tu.getTarget(targetLocale);				
+				if (ttc != null) tsegments = ttc.getSegments();
+			}
+						
 			for (Segment seg : ssegments) {
 				counter++;
 				TextFragment tf = seg.getContent();
@@ -171,14 +177,15 @@ public class RepetitionAnalysisStep extends BasePipelineStep {
 					TextFragment stf = hitTu.getSource().getContent();
 					TextFragment ttf = hitTu.getTarget().getContent();
 					AltTranslationsAnnotation ata = new AltTranslationsAnnotation();
-					ata.add(new AltTranslation(sourceLocale, targetLocale, tf, stf, ttf, MatchType.EXACT_DOCUMENT_CONTEXT, 
-							Math.round(hit.getScore() * 100), "aaa"));
+					ata.add(new AltTranslation(sourceLocale, targetLocale == null ? sourceLocale : targetLocale, 
+							tf, stf, ttf, MatchType.EXACT_DOCUMENT_CONTEXT, 
+							Math.round(hit.getScore() * 100), ""));
 					tseg.setAnnotation(ata);
 				}
 				else {
 					TranslationUnit ntu = new TranslationUnit(
 							new TranslationUnitVariant(sourceLocale, tf),
-							new TranslationUnitVariant(targetLocale, new TextFragment("aaa")));
+							new TranslationUnitVariant(targetLocale == null ? sourceLocale : targetLocale, new TextFragment("")));
 					ntu.setMetadataValue(MetadataType.ID, tuid);
 					RepetitiveSegmentAnnotation ann = 
 						new RepetitiveSegmentAnnotation(
@@ -194,8 +201,8 @@ public class RepetitionAnalysisStep extends BasePipelineStep {
 					tmWriter.commit();
 					
 					// TODO Remove when fixed
-					currentTm.close();
-					currentTm = TmSeekerFactory.createFileBasedTmSeeker(tmDir);
+//					currentTm.close();
+//					currentTm = TmSeekerFactory.createFileBasedTmSeeker(tmDir);
 				}
 			}
 		}
