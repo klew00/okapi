@@ -20,6 +20,7 @@
 
 package net.sf.okapi.steps.repetitionanalysis;
 
+import java.io.File;
 import java.util.List;
 
 import net.sf.okapi.common.ClassUtil;
@@ -69,9 +70,9 @@ public class RepetitionAnalysisStep extends BasePipelineStep {
 	public RepetitionAnalysisStep() {
 		super();
 		params = new Parameters();
-		//tmDir = Util.ensureSeparator(ClassUtil.getTargetPath(this.getClass()), true) + "tm/";
-		tmDir = Util.ensureSeparator(ClassUtil.getTargetPath(this.getClass()), true);
-		//System.out.println((new File(tmDir)).getAbsolutePath());
+		tmDir = Util.ensureSeparator(ClassUtil.getTargetPath(this.getClass()), true) + "tm/";
+		//tmDir = Util.ensureSeparator(ClassUtil.getTargetPath(this.getClass()), true);
+		System.out.println((new File(tmDir)).getAbsolutePath());
 	}
 	
 	@Override
@@ -120,10 +121,12 @@ public class RepetitionAnalysisStep extends BasePipelineStep {
 	@Override
 	protected Event handleStartDocument(Event event) {
 		close();
-//		Util.deleteDirectory(tmDir, true);
-//		Util.createDirectories(tmDir);
+		Util.deleteDirectory(tmDir, true);
+		Util.createDirectories(tmDir);
 		searchExact = params.getFuzzyThreshold() >= 100;
 		counter = 0;		
+		tmWriter = TmWriterFactory.createFileBasedTmWriter(tmDir, true);
+		tmWriter.close(); // To create a TM for the seeker
 		tmWriter = TmWriterFactory.createFileBasedTmWriter(tmDir, true);
 		currentTm = TmSeekerFactory.createFileBasedTmSeeker(tmDir);
 		return super.handleStartDocument(event);
