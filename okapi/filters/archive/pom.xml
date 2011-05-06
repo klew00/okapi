@@ -7,6 +7,7 @@
   </parent>
   <groupId>net.sf.okapi.filters</groupId>
   <artifactId>okapi-filter-archive</artifactId>
+  <name>Okapi Filter for Archive</name>
   <dependencies>
   	<dependency>
   		<groupId>net.sf.okapi</groupId>
