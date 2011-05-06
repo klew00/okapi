@@ -70,7 +70,7 @@ public class RepetitionAnalysisStep extends BasePipelineStep {
 		super();
 		params = new Parameters();
 		tmDir = Util.ensureSeparator(ClassUtil.getTargetPath(this.getClass()), true) + "tm/";		
-		System.out.println((new File(tmDir)).getAbsolutePath());
+		//System.out.println((new File(tmDir)).getAbsolutePath());
 	}
 	
 	@Override
@@ -138,12 +138,13 @@ public class RepetitionAnalysisStep extends BasePipelineStep {
 	protected Event handleTextUnit(Event event) {
 		ITextUnit tu = event.getTextUnit();
 		if (tu.isTranslatable()) {
-			ISegments segments = tu.getSource().getSegments();
+			ISegments ssegments = tu.getSource().getSegments();
 			ISegments tsegments = tu.getTarget(targetLocale).getSegments();
 			
-			for (Segment seg : segments) {
+			for (Segment seg : ssegments) {
 				counter++;
-				TextFragment tf = seg.getContent(); 
+				TextFragment tf = seg.getContent();
+				//TextFragment tf = new TextFragment("Elephants cannot fly.");
 				if (tf.isEmpty()) continue;
 				
 				String tuid = Integer.toString(counter);
@@ -171,13 +172,13 @@ public class RepetitionAnalysisStep extends BasePipelineStep {
 					TextFragment ttf = hitTu.getTarget().getContent();
 					AltTranslationsAnnotation ata = new AltTranslationsAnnotation();
 					ata.add(new AltTranslation(sourceLocale, targetLocale, tf, stf, ttf, MatchType.EXACT_DOCUMENT_CONTEXT, 
-							Math.round(hit.getScore() * 100), ""));
+							Math.round(hit.getScore() * 100), "aaa"));
 					tseg.setAnnotation(ata);
 				}
 				else {
 					TranslationUnit ntu = new TranslationUnit(
 							new TranslationUnitVariant(sourceLocale, tf),
-							new TranslationUnitVariant(targetLocale, new TextFragment("")));
+							new TranslationUnitVariant(targetLocale, new TextFragment("aaa")));
 					ntu.setMetadataValue(MetadataType.ID, tuid);
 					RepetitiveSegmentAnnotation ann = 
 						new RepetitiveSegmentAnnotation(
@@ -190,7 +191,11 @@ public class RepetitionAnalysisStep extends BasePipelineStep {
 					
 					// Should be called here after every segment addition to the TM for the situations 
 					// of repetitive segments within a tu
-					tmWriter.commit();  
+					tmWriter.commit();
+					
+					// TODO Remove when fixed
+					currentTm.close();
+					currentTm = TmSeekerFactory.createFileBasedTmSeeker(tmDir);
 				}
 			}
 		}
