@@ -20,7 +20,6 @@
 
 package net.sf.okapi.steps.repetitionanalysis;
 
-import java.io.File;
 import java.util.List;
 
 import net.sf.okapi.common.ClassUtil;
@@ -37,7 +36,6 @@ import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Segment;
-import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.tm.pensieve.common.MetadataType;
 import net.sf.okapi.tm.pensieve.common.TmHit;

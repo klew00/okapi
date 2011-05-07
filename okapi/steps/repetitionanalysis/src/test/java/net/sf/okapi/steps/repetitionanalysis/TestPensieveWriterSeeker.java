@@ -22,7 +22,6 @@ package net.sf.okapi.steps.repetitionanalysis;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.File;
 import java.util.List;
 
 import net.sf.okapi.common.ClassUtil;
