@@ -69,5 +69,11 @@
   		<scope>test</scope>
   		<classifier>tests</classifier>
   	</dependency>
+  	<dependency>
+  		<groupId>net.sf.okapi.steps</groupId>
+  		<artifactId>okapi-step-repetitionanalysis</artifactId>
+  		<version>${project.version}</version>
+  		<scope>test</scope>
+  	</dependency>
   </dependencies>
 </project>
