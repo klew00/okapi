@@ -71,8 +71,8 @@ public class RepetitionAnalysisStep extends BasePipelineStep {
 		super();
 		params = new Parameters();
 		tmDir = Util.ensureSeparator(ClassUtil.getTargetPath(this.getClass()), true) + "tm/";
-		//tmDir = Util.ensureSeparator(ClassUtil.getTargetPath(this.getClass()), true);
-		System.out.println((new File(tmDir)).getAbsolutePath());
+		// tmDir = Util.ensureSeparator(ClassUtil.getTargetPath(this.getClass()), true);
+		// System.out.println((new File(tmDir)).getAbsolutePath());
 	}
 	
 	@Override
