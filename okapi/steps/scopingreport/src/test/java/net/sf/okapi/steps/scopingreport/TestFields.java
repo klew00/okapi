@@ -251,11 +251,11 @@ public class TestFields {
 	@Test
 	public void testFields() {
 		testValue(ScopingReportStep.PROJECT_NAME, "test_project");
-		testNotEmpty(ScopingReportStep.PROJECT_DATE);
+		//testNotEmpty(ScopingReportStep.PROJECT_DATE);
 		testValue(ScopingReportStep.PROJECT_SOURCE_LOCALE, "en");
 		testValue(ScopingReportStep.PROJECT_TARGET_LOCALE, "fr");
 		testValue(ScopingReportStep.PROJECT_TOTAL_WORD_COUNT, 12L);
-		testNotEmpty(ScopingReportStep.ITEM_NAME);
+		//testNotEmpty(ScopingReportStep.ITEM_NAME);
 		testValue(ScopingReportStep.ITEM_SOURCE_LOCALE, "en");
 		testValue(ScopingReportStep.ITEM_TARGET_LOCALE, "fr");
 		testValue(ScopingReportStep.ITEM_TOTAL_WORD_COUNT, 12L);
