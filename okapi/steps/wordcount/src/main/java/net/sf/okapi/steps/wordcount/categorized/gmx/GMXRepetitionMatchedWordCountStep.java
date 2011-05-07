@@ -26,10 +26,6 @@ import net.sf.okapi.steps.wordcount.categorized.CategoryHandler;
 import net.sf.okapi.steps.wordcount.common.AltAnnotationBasedCountStep;
 import net.sf.okapi.steps.wordcount.common.GMX;
 
-/**
- * M11: No step provides the metrics yet. 
- *
- */
 public class GMXRepetitionMatchedWordCountStep extends AltAnnotationBasedCountStep implements CategoryHandler {
 
 	public static final String METRIC = GMX.RepetitionMatchedWordCount; 

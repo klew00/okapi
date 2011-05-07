@@ -49,7 +49,6 @@ public class GMXLeveragedMatchedWordCountStep extends AltAnnotationBasedCountSte
 	@Override
 	protected boolean accept(MatchType type) {
 		return (type == MatchType.EXACT_LOCAL_CONTEXT ||				
-				type == MatchType.EXACT_DOCUMENT_CONTEXT ||
 				type == MatchType.EXACT_STRUCTURAL ||
 				type == MatchType.EXACT);
 	}
