@@ -148,14 +148,14 @@ public class RepetitionAnalysisStep extends BasePipelineStep {
 			ISegments tsegments = null;
 			
 			if (targetLocale != null) {
-				TextContainer ttc = tu.getTarget(targetLocale);				
-				if (ttc != null) tsegments = ttc.getSegments();
+				tsegments = tu.getTargetSegments(targetLocale);
+//				TextContainer ttc = tu.getTarget(targetLocale);				
+//				if (ttc != null) tsegments = ttc.getSegments();
 			}
 						
 			for (Segment seg : ssegments) {
 				counter++;
 				TextFragment tf = seg.getContent();
-				//TextFragment tf = new TextFragment("Elephants cannot fly.");
 				if (tf.isEmpty()) continue;
 				
 				String tuid = Integer.toString(counter);
@@ -185,7 +185,8 @@ public class RepetitionAnalysisStep extends BasePipelineStep {
 						AltTranslationsAnnotation ata = new AltTranslationsAnnotation();
 						ata.add(new AltTranslation(sourceLocale, targetLocale == null ? sourceLocale : targetLocale, 
 								tf, stf, ttf, MatchType.EXACT_DOCUMENT_CONTEXT, 
-								Math.round(hit.getScore() * 100), ""));
+								//Math.round(hit.getScore() * 100), ""));
+								Math.round(hit.getScore()), ""));
 						tseg.setAnnotation(ata);
 					}
 				}
