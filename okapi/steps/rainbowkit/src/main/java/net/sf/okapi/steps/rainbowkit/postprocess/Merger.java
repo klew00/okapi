@@ -167,7 +167,7 @@ public class Merger {
 		else trgTraCont = traTu.getTarget(trgLoc);
 		
 		if ( trgTraCont == null ) {
-			if ( !oriTu.getSource().hasText() ) {
+			if ( oriTu.getSource().hasText() ) {
 				// Warn only if there source is not empty
 				LOGGER.warning(String.format("No translation found for TU id='%s'. Using source instead.", traTu.getId()));
 			}
