@@ -71,7 +71,15 @@ public class XLIFFPackageWriter extends BasePackageWriter {
 
 		// Set the writer's options
 		Options options = new Options();
-		if ( !forOmegat ) {
+		if ( forOmegat ) {
+			// XLIFF options for OmegaT
+			options.setCopySource(true);
+			options.setPlaceholderMode(true);
+			options.setIncludeAltTrans(false);
+			// Direct setting for the writer (not an XLIFF option)
+			writer.setUseSourceForTranslated(true);
+		}
+		else {
 			// Get the options from the parameters
 			if ( !Util.isEmpty(params.getWriterOptions()) ) {
 				options.fromString(params.getWriterOptions());
@@ -81,7 +89,7 @@ public class XLIFFPackageWriter extends BasePackageWriter {
 		writer.setPlaceholderMode(options.getPlaceholderMode());
 		writer.setCopySource(options.getCopySource());
 		writer.setIncludeAltTrans(options.getIncludeAltTrans());
-		writer.setSetApprovedasNoTranslate(options.getSetApprovedAsNoTranslate());
+		writer.setSetApprovedAsNoTranslate(options.getSetApprovedAsNoTranslate());
 		writer.setIncludeNoTranslate(options.getIncludeNoTranslate());
 		
 		StartDocument sd = event.getStartDocument();

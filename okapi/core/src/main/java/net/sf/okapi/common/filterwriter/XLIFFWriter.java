@@ -123,7 +123,7 @@ public class XLIFFWriter implements IFilterWriter {
 	 * Sets the flag indicating if the source text is used in the target, even if 
 	 * a target is available.
 	 * <p>This is for the tools where we trust the target will be obtained by the tool
-	 * from the TMX from original. This to allow editing of pre-translated items in XLIFF 
+	 * from the TMX from original. This is to allow editing of pre-translated items in XLIFF 
 	 * editors that use directly the <target> element.
 	 * @param useSourceForTranslated true to use the source in the target even if a target text
 	 * is available.
@@ -152,7 +152,7 @@ public class XLIFFWriter implements IFilterWriter {
 	 * Sets the flag indicating to mark as not translatable all entries that are approved.
 	 * @param setApprovedasNoTranslate true to mark approved entries as not translatable.
 	 */
-	public void setSetApprovedasNoTranslate (boolean setApprovedasNoTranslate) {
+	public void setSetApprovedAsNoTranslate (boolean setApprovedasNoTranslate) {
 		this.setApprovedAsNoTranslate = setApprovedasNoTranslate;
 	}
 
