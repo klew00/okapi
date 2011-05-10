@@ -22,7 +22,6 @@ package net.sf.okapi.steps.repetitionanalysis;
 
 import java.util.List;
 
-import net.sf.okapi.common.ClassUtil;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
@@ -68,7 +67,8 @@ public class RepetitionAnalysisStep extends BasePipelineStep {
 	public RepetitionAnalysisStep() {
 		super();
 		params = new Parameters();
-		tmDir = Util.ensureSeparator(ClassUtil.getTargetPath(this.getClass()), true) + "tm/";
+		//tmDir = Util.ensureSeparator(ClassUtil.getTargetPath(this.getClass()), true) + "tm/";
+		tmDir = Util.ensureSeparator(Util.getTempDirectory(), true) + "tm/";
 		// tmDir = Util.ensureSeparator(ClassUtil.getTargetPath(this.getClass()), true);
 		// System.out.println((new File(tmDir)).getAbsolutePath());
 	}
@@ -135,6 +135,7 @@ public class RepetitionAnalysisStep extends BasePipelineStep {
 	@Override
 	protected Event handleEndDocument(Event event) {
 		close();
+		Util.deleteDirectory(tmDir, true);
 		return super.handleEndDocument(event);
 	}
 	
