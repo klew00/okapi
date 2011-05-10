@@ -80,13 +80,16 @@ public class POFilterWriter implements IFilterWriter {
 	private ArrayList<ITextUnit> plurals;
 	private boolean forExtractMerge;
 	private boolean makePOT;
+	private boolean transFuzzy; // Used when forExtractMerge == true 
 	private String crumbs;
 	
 	public POFilterWriter () {
 		params = new Parameters();
 		fmt = new GenericContent();
 		plurals = new ArrayList<ITextUnit>();
+		makePOT = false;
 		forExtractMerge = false;
+		transFuzzy = true;
 	}
 	
 	public void cancel () {
@@ -97,12 +100,15 @@ public class POFilterWriter implements IFilterWriter {
 	 * Sets the creation mode for this writer.
 	 * @param forExtractMerge true to create a file that can be merged back into its original format.
 	 * @param makePOT true to create a PO template file.
+	 * @param transFuzzy true to set existing translations as fuzzy (only when forExtractMerge is true)
 	 */
 	public void setMode (boolean forExtractMerge,
-		boolean makePOT)
+		boolean makePOT,
+		boolean transFuzzy)
 	{
 		this.forExtractMerge = forExtractMerge;
 		this.makePOT = makePOT;
+		this.transFuzzy = transFuzzy;
 	}
 	
 	public void close () {
@@ -374,7 +380,7 @@ public class POFilterWriter implements IFilterWriter {
 					}
 				}
 				else if ( forExtractMerge && (( tc != null ) && !tc.isEmpty() )) {
-					writer.write("#, fuzzy"+linebreak);
+					if ( transFuzzy ) writer.write("#, fuzzy"+linebreak);
 				}
 			}
 			// ID reference to allow merging back and duplication of msgid text

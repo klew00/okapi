@@ -183,7 +183,7 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 		StringBuilder assembled = new StringBuilder();
 
 		try {
-			rawDoc = (RawDocument) event.getResource();
+			rawDoc = event.getRawDocument();
 
 			// Detect the BOM (and the encoding) if possible
 			BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(
@@ -198,16 +198,18 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 			while ((numRead = reader.read(buf)) != -1) {
 				assembled.append(buf, 0, numRead);
 			}
-			reader.close();
+			reader.close(); reader = null;
 			result = assembled.toString();
 			assembled = null;
 
 			// Open the output
 			File outFile;
-			if (isLastOutputStep()) {
+			if ( isLastOutputStep() ) {
+				// No need to use a temporary file as this step work with its whole content in memory
 				outFile = new File(outputURI);
 				Util.createDirectories(outFile.getAbsolutePath());
-			} else {
+			}
+			else {
 				try {
 					outFile = File.createTempFile("okp-snr_", ".tmp");
 				} catch (Throwable e) {
@@ -223,7 +225,7 @@ public class SearchAndReplaceStep extends BasePipelineStep {
 					new FileOutputStream(outFile), encoding));
 			Util.writeBOMIfNeeded(writer, detector.hasUtf8Bom(), encoding);
 			writer.write(result);
-			writer.close();
+			writer.close(); writer = null;
 
 			event.setResource(new RawDocument(outFile.toURI(), encoding,
 				rawDoc.getSourceLocale(), rawDoc.getTargetLocale()));

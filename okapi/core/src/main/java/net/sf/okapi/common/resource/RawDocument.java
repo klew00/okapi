@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -22,6 +22,7 @@ package net.sf.okapi.common.resource;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -35,6 +36,7 @@ import java.util.logging.Logger;
 
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.ISkeleton;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.Annotations;
 import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.exceptions.OkapiIOException;
@@ -65,6 +67,10 @@ public class RawDocument implements IResource {
 	private CharSequence inputCharSequence;
 	private boolean hasReaderBeenCalled;
 	private Reader reader;
+
+	// For output methods
+	private URI outputURI;
+	private File workFile;
 
 	/**
 	 * Creates a new RawDocument object with a given CharSequence and a source locale.
@@ -519,4 +525,70 @@ public class RawDocument implements IResource {
 	public Annotations getAnnotations() {
 		return (annotations == null) ? new Annotations() : annotations;
 	}
+	
+	/**
+	 * Creates a new output file object based on a given output URI and the URI of the raw document.
+	 * <p>If the path of the raw document is the same as the path of the output a temporary file is created,
+	 * otherwise the output URI is used directly.
+	 * <b>You must call {@link #finalizeOutput()}</b> when all writing is done and both the input file and output file
+	 * are closed to make sure the proper output file name is used.
+	 * <p>If one or more directories of the output path do not exist, they are created automatically. 
+	 * <p>If the input of the raw document is a CharSequence or a Stream, the method assumes it can
+	 * use directly the path of the output URI.
+	 * @param outputURI the URI of the output file.
+	 * @throws OkapiIOException if an error occurs when creating the work file or its directory.
+	 * @see #finalizeOutput()
+	 */
+	public File createOutputFile (URI outputURI) {
+		this.outputURI = outputURI;
+		if ( getInputURI() != null ) {
+			String dir = Util.getDirectoryName(outputURI.getPath());
+			// If input and output are the same: we need to work with a temporary file
+			if ( outputURI.getPath().equals(getInputURI().getPath()) ) {
+				try {
+					workFile = File.createTempFile("work", null, new File(dir));
+				}
+				catch ( IOException e ) {
+					throw new OkapiIOException(String.format("Cannot create temporary file in '%s'.", dir));
+				}
+				return workFile; // Done
+			}
+		}
+		// Fall back: use the normal output URI
+		workFile = new File(outputURI);
+		// Make sure the full path exists
+		Util.createDirectories(workFile.getAbsolutePath());
+		return workFile;
+	}
+	
+	/**
+	 * Finalizes the name for this output file.
+	 * If a temporary file was used, this call deletes the existing file, 
+	 * and then rename the temporary file to the existing file.
+	 * This method must always be called after both input and output files are closed.
+	 * @throws OkapiIOException if the original input file cannot be deleted or if the work file cannot be renamed. 
+	 * @see #createOutputFile(URI)
+	 */
+	public void finalizeOutput() {
+		if ( workFile == null ) return; // Nothing to do
+		
+		// If the work file is the same as the expected output we are done
+		if ( workFile.toURI().equals(outputURI) ) return;
+		
+		// Otherwise it's a temporary file and we have to rename it
+		File outputFile = new File(outputURI);
+		if ( outputFile.exists() ) {
+			if ( !outputFile.delete() ) {
+				// Cannot delete the original input file to replace it with output
+				throw new OkapiIOException(String.format("Cannot delete original input file '%s'. The output is still in the temporary file '%s'.",
+					outputFile.getAbsolutePath(), workFile.getAbsolutePath()));
+			}
+		}
+		if ( !workFile.renameTo(outputFile) ) {
+			// Cannot rename the temporary file
+			throw new OkapiIOException(String.format("Cannot rename the temporary output file to '%s'. The output is still under the temporary name '%s'.",
+				outputFile.getAbsolutePath(), workFile.getAbsolutePath()));
+		}
+	}
+	
 }

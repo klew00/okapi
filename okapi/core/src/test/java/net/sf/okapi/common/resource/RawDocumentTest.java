@@ -1,6 +1,9 @@
 package net.sf.okapi.common.resource;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.Reader;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -10,6 +13,8 @@ import static org.junit.Assert.*;
 
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.TestUtil;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.RawDocument;
 
 public class RawDocumentTest {
@@ -35,4 +40,46 @@ public class RawDocumentTest {
 		ir.getReader();
 	}
 
+	@Test
+	public void testOutputIsDifferentFromInput ()
+		throws URISyntaxException, FileNotFoundException
+	{
+		String root = TestUtil.getParentDir(this.getClass(), "/safeouttest1.txt");
+		File expectedFile = new File(Util.toURI(root+"safeouttest1.out.txt"));
+		expectedFile.delete();
+		
+		RawDocument rd = new RawDocument(Util.toURI(root+"safeouttest1.txt"), "UTF-8", LocaleId.ENGLISH);
+		writeStringAndFinalize(expectedFile.toURI(), rd, "test1");
+		
+		assertTrue(expectedFile.exists());
+		assertEquals(5, expectedFile.length());
+	}
+
+	@Test
+	public void testOutputIsSameAsInput ()
+		throws URISyntaxException, FileNotFoundException
+	{
+		String root = TestUtil.getParentDir(this.getClass(), "/safeouttest1.out.txt");
+		File expectedFile = new File(Util.toURI(root+"safeouttest1.out.txt"));
+		expectedFile.delete();
+		
+		RawDocument rd = new RawDocument(Util.toURI(root+"safeouttest1.out.txt"), "UTF-8", LocaleId.ENGLISH);
+		writeStringAndFinalize(expectedFile.toURI(), rd, "test1+");
+		
+		assertTrue(expectedFile.exists());
+		assertEquals(6, expectedFile.length());
+	}
+
+	private void writeStringAndFinalize (URI outputURI,
+		RawDocument rd,
+		String text)
+		throws FileNotFoundException
+	{
+		File file = rd.createOutputFile(outputURI);
+		PrintWriter writer = new PrintWriter(file);
+		writer.write(text);
+		writer.close();
+		rd.finalizeOutput();
+	}
+	
 }

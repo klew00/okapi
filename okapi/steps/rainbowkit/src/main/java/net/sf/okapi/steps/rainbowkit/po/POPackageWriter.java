@@ -51,7 +51,7 @@ public class POPackageWriter extends BasePackageWriter {
 		Parameters params = (Parameters)writer.getParameters();
 		params.setOutputGeneric(true);
 		
-		writer.setMode(true, false);
+		writer.setMode(true, false, true);
 		writer.setOptions(manifest.getTargetLocale(), "UTF-8");
 		
 		MergingInfo item = manifest.getItem(docId);

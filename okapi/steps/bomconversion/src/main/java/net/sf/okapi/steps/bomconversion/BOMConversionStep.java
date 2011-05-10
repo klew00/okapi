@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -30,7 +30,6 @@ import java.util.logging.Logger;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.UsingParameters;
-import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
@@ -98,14 +97,13 @@ public class BOMConversionStep extends BasePipelineStep {
 		FileOutputStream output = null;
 		
 		try {
-			rawDoc = (RawDocument)event.getResource();
+			rawDoc = event.getRawDocument();
 			input = rawDoc.getStream();
 						
 			// Open the output
 			File outFile;
 			if ( isLastOutputStep() ) {
-				outFile = new File(outputURI);
-				Util.createDirectories(outFile.getAbsolutePath());
+				outFile = rawDoc.createOutputFile(outputURI);
 			}
 			else {
 				try {
@@ -179,8 +177,11 @@ public class BOMConversionStep extends BasePipelineStep {
 				output.write(buffer, 0, len);
 			}
 			
-			// Done: close the output
-			output.close();
+			// Done: close the files
+			input.close(); input = null;
+			output.close(); output = null;
+			rawDoc.finalizeOutput();
+			
 			// Creates the new RawDocument
 			event.setResource(new RawDocument(outFile.toURI(), rawDoc.getEncoding(), 
 				rawDoc.getSourceLocale(), rawDoc.getTargetLocale()));

@@ -1,10 +1,8 @@
 package net.sf.okapi.steps.externalcommand;
 
-import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
 
-import net.sf.okapi.common.Event;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.pipeline.Pipeline;
@@ -13,7 +11,6 @@ import net.sf.okapi.common.resource.RawDocument;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 public class ExternalCommandStepTest {
 	private Pipeline pipeline;

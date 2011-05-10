@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -107,7 +107,7 @@ public class RTFConversionStep extends BasePipelineStep {
 	
 	@Override
 	protected Event handleRawDocument (Event event) {
-		RawDocument rawDoc = (RawDocument)event.getResource();
+		RawDocument rawDoc = event.getRawDocument();
 		OutputStreamWriter writer = null;
 		try {
 			// Open the RTF input
@@ -116,8 +116,7 @@ public class RTFConversionStep extends BasePipelineStep {
 			// Open the output document
 			File outFile;
 			if ( isLastOutputStep() ) {
-				outFile = new File(outputURI);
-				Util.createDirectories(outFile.getAbsolutePath());
+				outFile = rawDoc.createOutputFile(outputURI);
 			}
 			else {
 				try {
@@ -197,8 +196,9 @@ public class RTFConversionStep extends BasePipelineStep {
 			}
 
 			// Done: close the output
-			writer.close();
-			writer = null;
+			filter.close();
+			writer.close(); writer = null;
+			rawDoc.finalizeOutput();
 			
 			// Set the new raw-document URI and the encoding, other info stays the same
 			RawDocument newDoc = new RawDocument(outFile.toURI(), outputEncoding,

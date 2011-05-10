@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2010 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -83,7 +83,7 @@ public class LineBreakConversionStep extends BasePipelineStep {
 		BufferedReader reader = null;
 		OutputStreamWriter writer = null;
 		try {
-			rawDoc = (RawDocument)event.getResource();
+			rawDoc = event.getRawDocument();
 			
 			BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(rawDoc.getStream(), rawDoc.getEncoding());
 			detector.detectAndRemoveBom();
@@ -93,8 +93,7 @@ public class LineBreakConversionStep extends BasePipelineStep {
 			// Open the output
 			File outFile;
 			if ( isLastOutputStep() ) {
-				outFile = new File(outputURI);
-				Util.createDirectories(outFile.getAbsolutePath());
+				outFile = rawDoc.createOutputFile(outputURI);
 			}
 			else {
 				try {
@@ -157,7 +156,10 @@ public class LineBreakConversionStep extends BasePipelineStep {
 			}
 			
 			// Done: close the output
-			writer.close();
+			reader.close(); reader = null;
+			writer.close(); writer = null;
+			rawDoc.finalizeOutput();
+			
 			// Creates the new RawDocument
 			event.setResource(new RawDocument(outFile.toURI(), rawDoc.getEncoding(), 
 				rawDoc.getSourceLocale(), rawDoc.getTargetLocale()));

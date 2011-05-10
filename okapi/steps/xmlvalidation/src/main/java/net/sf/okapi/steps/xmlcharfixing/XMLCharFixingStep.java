@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -113,8 +113,7 @@ public class XMLCharFixingStep extends BasePipelineStep {
 			// Open the output
 			File outFile;
 			if ( isLastOutputStep() ) {
-				outFile = new File(outputURI);
-				Util.createDirectories(outFile.getAbsolutePath());
+				outFile = rd.createOutputFile(outputURI);
 			}
 			else {
 				try {
@@ -196,8 +195,11 @@ public class XMLCharFixingStep extends BasePipelineStep {
 				writer.write(tmp.toString()+lineBreak);
 			}
 
-			// Done: close the output
-			writer.close();
+			// Done: close the files
+			reader.close(); reader = null;
+			writer.close(); writer = null;
+			rd.finalizeOutput();
+			
 			// Creates the new RawDocument
 			event.setResource(new RawDocument(outFile.toURI(), rd.getEncoding(), 
 				rd.getSourceLocale(), rd.getTargetLocale()));

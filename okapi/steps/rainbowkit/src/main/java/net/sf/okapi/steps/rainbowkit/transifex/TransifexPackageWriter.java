@@ -174,7 +174,7 @@ public class TransifexPackageWriter extends BasePackageWriter {
 		potWriter = new POFilterWriter();
 		net.sf.okapi.filters.po.Parameters params = (net.sf.okapi.filters.po.Parameters)potWriter.getParameters();
 		params.setOutputGeneric(true);
-		potWriter.setMode(true, true);
+		potWriter.setMode(true, true, true);
 		potWriter.setOptions(manifest.getSourceLocale(), "UTF-8");
 
 		MergingInfo item = manifest.getItem(docId);
@@ -185,7 +185,7 @@ public class TransifexPackageWriter extends BasePackageWriter {
 		trgWriter = new POFilterWriter();
 		params = (net.sf.okapi.filters.po.Parameters)trgWriter.getParameters();
 		params.setOutputGeneric(true);
-		trgWriter.setMode(true, false);
+		trgWriter.setMode(true, false, false);
 		trgWriter.setOptions(manifest.getTargetLocale(), "UTF-8");
 		
 		path = makeTargetPath(item);

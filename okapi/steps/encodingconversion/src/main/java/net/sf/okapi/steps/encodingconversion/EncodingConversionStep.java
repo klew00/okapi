@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2010 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -217,8 +217,7 @@ public class EncodingConversionStep extends BasePipelineStep {
 			// Open the output document
 			File outFile;
 			if ( isLastOutputStep() ) {
-				outFile = new File(outputURI);
-				Util.createDirectories(outFile.getAbsolutePath());
+				outFile = rawDoc.createOutputFile(outputURI);
 			}
 			else {
 				try {
@@ -319,8 +318,11 @@ public class EncodingConversionStep extends BasePipelineStep {
 				}
 			}
 			
-			// Done: close the output
-			writer.close();
+			// Done: close the files
+			reader.close(); reader = null; 
+			writer.close(); writer = null;
+			rawDoc.finalizeOutput();
+			
 			// Set the new raw-document URI and the encoding (in case one was auto-detected)
 			// Other info stays the same
 			RawDocument newDoc = new RawDocument(outFile.toURI(), outputEncoding,
