@@ -212,6 +212,8 @@ public class MainForm { //implements IParametersProvider {
 	private MenuItem cmiEditInputProperties;
 	private MenuItem miOpenInputDocument;
 	private MenuItem cmiOpenInputDocument;
+	private MenuItem miCreateInputDocument;
+	private MenuItem cmiCreateInputDocument;
 	private MenuItem miRemoveInputDocuments;
 	private MenuItem cmiRemoveInputDocuments;
 	private MenuItem miMoveDocumentsUp;
@@ -501,6 +503,14 @@ public class MainForm { //implements IParametersProvider {
 		});
 		
 		new MenuItem(dropMenu, SWT.SEPARATOR);
+		
+		miCreateInputDocument = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miCreateInputDocument, "input.createDocument"); //$NON-NLS-1$
+		miCreateInputDocument.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				createDocument();
+            }
+		});
 		
 		miOpenInputDocument = new MenuItem(dropMenu, SWT.PUSH);
 		rm.setCommand(miOpenInputDocument, "input.openDocument"); //$NON-NLS-1$
@@ -816,6 +826,15 @@ public class MainForm { //implements IParametersProvider {
 		});
 		
 		new MenuItem(inputTableMenu, SWT.SEPARATOR);
+		
+		cmiCreateInputDocument = new MenuItem(inputTableMenu, SWT.PUSH);
+		rm.setCommand(cmiCreateInputDocument, "input.createDocument"); //$NON-NLS-1$
+		cmiCreateInputDocument.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				createDocument();
+            }
+		});
+		
 		
 		cmiOpenInputDocument = new MenuItem(inputTableMenu, SWT.PUSH);
 		rm.setCommand(cmiOpenInputDocument, "input.openDocument"); //$NON-NLS-1$
@@ -2368,6 +2387,27 @@ public class MainForm { //implements IParametersProvider {
 		}
 		catch ( Exception e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
+		}
+	}
+	
+	private void createDocument () {
+		try {
+			String paths[] = new String[1];
+			paths[0] = Dialogs.browseFilenamesForSave(shell, "Create New Document", null,
+				"All Files (*.*)", "*.*");
+			if ( Util.isEmpty(paths[0]) ) return;
+			File file = new File(paths[0]);
+			file.createNewFile();
+			addDocumentsFromList(paths);
+			// Select the new entry
+			int index = inputTables.get(currentInput).getItemCount()-1;
+			if ( index > -1 ) {
+				inputTableMods.get(currentInput).updateTable(null, index);
+				updateCommands();
+			}
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, "Error creating file\n"+e.getMessage(), null);
 		}
 	}
 	

@@ -275,6 +275,12 @@ public class ParametersString {
 		setInteger(name, value);
 	}
 
+	/**
+	 * Gets the string value for a given parameter after decoding it if necessary. 
+	 * @param name the name of the parameter.
+	 * @param defaultValue the default (not encoded) value to use.
+	 * @return the string value of the given parameter, decoded if necessary.
+	 */
 	public String getEncodedString (String name,
 		String defaultValue)
 	{
@@ -286,6 +292,13 @@ public class ParametersString {
 		return tmp;
 	}
 	
+	/**
+	 * Sets the string value of a given parameter and encode it.
+	 * The encoding applied is only a basic first level of security protecting
+	 * the value from being casually read by a human, it is not an encryption.
+	 * @param name the name of the parameter.
+	 * @param value the value to set and encode.
+	 */
 	public void setEncodedString (String name,
 		String value)
 	{

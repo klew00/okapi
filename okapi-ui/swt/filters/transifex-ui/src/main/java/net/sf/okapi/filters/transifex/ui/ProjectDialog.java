@@ -94,7 +94,7 @@ public class ProjectDialog implements IProjectEditor {
 		edSource.setEditable(false);
 		
 		label = new Label(cmpTmp, SWT.NONE);
-		label.setText("Username:");
+		label.setText("User name:");
 		label.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END));
 		edUser = new Text(cmpTmp, SWT.BORDER);
 		edUser.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
