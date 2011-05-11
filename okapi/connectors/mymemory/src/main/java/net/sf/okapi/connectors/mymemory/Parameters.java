@@ -63,7 +63,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
-		key = buffer.getString(Parameters.KEY, key);
+		key = buffer.getEncodedString(Parameters.KEY, key);
 		useMT = buffer.getInteger(Parameters.USEMT, useMT);
 	}
 
@@ -76,7 +76,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	@Override
 	public String toString () {
 		buffer.reset();
-		buffer.setString(Parameters.KEY, key);
+		buffer.setEncodedString(Parameters.KEY, key);
 		buffer.setInteger(Parameters.USEMT, useMT);
 		return buffer.toString();
 	}

@@ -28,6 +28,7 @@ public class DummyParameters extends BaseParameters {
 	public int paramInt1;
 	public String paramStr1;
 	public String reference1;
+	public String password1;
 
 	public DummyParameters () {
 		reset();
@@ -39,6 +40,7 @@ public class DummyParameters extends BaseParameters {
 		paramInt1 = 123;
 		paramStr1 = "test";
 		reference1 = "reference1";
+		password1 = "password";
 	}
 
 	public void fromString (String data) {
@@ -47,6 +49,7 @@ public class DummyParameters extends BaseParameters {
 		paramBool1 = buffer.getBoolean("paramBool1", paramBool1);
 		paramInt1 = buffer.getInteger("paramInt1", paramInt1);
 		paramStr1 = buffer.getString("paramStr1", paramStr1);
+		password1 = buffer.getEncodedString("password1", password1);
 	}
 	
 	@Override
@@ -55,6 +58,7 @@ public class DummyParameters extends BaseParameters {
 		buffer.setBoolean("paramBool1", paramBool1);
 		buffer.setInteger("paramInt1", paramInt1);
 		buffer.setString("paramStr1", paramStr1);
+		buffer.setEncodedString("password1", password1);
 		return buffer.toString();
 	}
 
@@ -77,5 +81,13 @@ public class DummyParameters extends BaseParameters {
 	
 	public void setParamInt1 (int value) {
 		paramInt1 = value;
+	}
+	
+	public String getPassword1 () {
+		return password1;
+	}
+	
+	public void setPassword1 (String password1) {
+		this.password1 = password1;
 	}
 }

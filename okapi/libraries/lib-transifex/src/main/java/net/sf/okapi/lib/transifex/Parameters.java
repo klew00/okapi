@@ -54,7 +54,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		server = buffer.getString(SERVER, server);
 		projectId = buffer.getString(PROJECTID, projectId);
 		user = buffer.getString(USER, user);
-		password = buffer.getString(PASSWORD, password);
+		password = buffer.getEncodedString(PASSWORD, password);
 	}
 
 	@Override
@@ -72,7 +72,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.setString(SERVER, server);
 		buffer.setString(PROJECTID, projectId);
 		buffer.setString(USER, user);
-		buffer.setString(PASSWORD, password);
+		buffer.setEncodedString(PASSWORD, password);
 		return buffer.toString();
 	}
 

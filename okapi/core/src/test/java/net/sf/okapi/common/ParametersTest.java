@@ -65,10 +65,12 @@ public class ParametersTest {
 		assertTrue(params.paramBool1);
 		assertEquals(params.paramInt1, 123);
 		assertEquals(params.paramStr1, "test");
+		assertEquals(params.password1, "password");
 		params.reset();
 		assertTrue(params.paramBool1);
 		assertEquals(params.paramInt1, 123);
 		assertEquals(params.paramStr1, "test");
+		assertEquals(params.password1, "password");
 	}
 
 	@Test
@@ -79,16 +81,18 @@ public class ParametersTest {
 		assertFalse(params.paramBool1);
 		assertEquals(params.paramInt1, 456);
 		assertEquals(params.paramStr1, "test"); // Default
+		assertEquals(params.password1, "password");
 	}
 
 	@Test
 	public void testWhitespaces () {
-		String snippet = "#v1\nparamBool1.b  =  true  \nparamInt1.i  =  456 \nparamStr1  = AB  C  ";
+		String snippet = "#v1\nparamBool1.b  =  true  \nparamInt1.i  =  456 \nparamStr1  = AB  C  \npassword1=psw";
 		DummyParameters params = new DummyParameters();
 		params.fromString(snippet);
 		assertTrue(params.paramBool1);
 		assertEquals(params.paramInt1, 456);
 		assertEquals(params.paramStr1, " AB  C  "); // WS count
+		assertEquals(params.password1, "psw");
 	}
 
 	@Test

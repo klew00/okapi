@@ -51,7 +51,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		reset();
 		buffer.fromString(data);
 		server = buffer.getString(SERVER, server);
-		apiKey = buffer.getString(APIKEY, apiKey);
+		apiKey = buffer.getEncodedString(APIKEY, apiKey);
 		timeout = buffer.getInteger(TIMEOUT, timeout);
 	}
 
@@ -67,7 +67,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public String toString () {
 		buffer.reset();
 		buffer.setString(SERVER, server);
-		buffer.setString(APIKEY, apiKey);
+		buffer.setEncodedString(APIKEY, apiKey);
 		buffer.setInteger(TIMEOUT, timeout);
 		return buffer.toString();
 	}

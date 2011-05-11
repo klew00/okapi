@@ -45,6 +45,8 @@ import java.util.LinkedHashMap;
  */
 public class ParametersString {
 
+	private static final String ENCSTR = "#BeNcStr";
+	
 	private LinkedHashMap<String, Object> list;
 	
 	public ParametersString () {
@@ -273,4 +275,24 @@ public class ParametersString {
 		setInteger(name, value);
 	}
 
+	public String getEncodedString (String name,
+		String defaultValue)
+	{
+		String tmp = getString(name, defaultValue);
+		if ( tmp.startsWith(ENCSTR) ) {
+			return Base64.decodeString(tmp.substring(ENCSTR.length()));
+		}
+		// Else: normal string
+		return tmp;
+	}
+	
+	public void setEncodedString (String name,
+		String value)
+	{
+		if ( value == null ) list.remove(name);
+		else {
+			list.put(name, ENCSTR+Base64.encodeString(value));
+		}
+	}
+	
 }

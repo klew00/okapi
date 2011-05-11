@@ -84,7 +84,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		reset();
 		buffer.fromString(data);
 		username = buffer.getString(Parameters.USERNAME, username);
-		password = buffer.getString(Parameters.PASSWORD, password);
+		password = buffer.getEncodedString(Parameters.PASSWORD, password);
 		serverURL = buffer.getString(Parameters.SERVERURL, serverURL);
 		tmProfile = buffer.getString(Parameters.TMPROFILE, tmProfile);
 	}
@@ -101,7 +101,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public String toString () {
 		buffer.reset();
 		buffer.setString(Parameters.USERNAME, username);
-		buffer.setString(Parameters.PASSWORD, password);
+		buffer.setEncodedString(Parameters.PASSWORD, password);
 		buffer.setString(Parameters.SERVERURL, serverURL);
 		buffer.setString(Parameters.TMPROFILE, tmProfile);
 		return buffer.toString();

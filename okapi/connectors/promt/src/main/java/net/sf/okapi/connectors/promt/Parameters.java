@@ -74,7 +74,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.fromString(data);
 		host = buffer.getString(HOST, host);
 		username = buffer.getString(USERNAME, username);
-		password = buffer.getString(PASSWORD, password);
+		password = buffer.getEncodedString(PASSWORD, password);
 	}
 
 	public void reset () {
@@ -91,7 +91,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.reset();
 		buffer.setString(HOST, host);
 		buffer.setString(USERNAME, username);
-		buffer.setString(PASSWORD, password);
+		buffer.setEncodedString(PASSWORD, password);
 		return buffer.toString();
 	}
 

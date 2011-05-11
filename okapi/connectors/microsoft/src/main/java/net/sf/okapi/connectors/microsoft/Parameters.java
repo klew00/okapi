@@ -49,7 +49,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
-		appId = buffer.getString(APPID, appId);
+		appId = buffer.getEncodedString(APPID, appId);
 	}
 
 	@Override
@@ -61,7 +61,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	@Override
 	public String toString () {
 		buffer.reset();
-		buffer.setString(APPID, appId);
+		buffer.setEncodedString(APPID, appId);
 		return buffer.toString();
 	}
 

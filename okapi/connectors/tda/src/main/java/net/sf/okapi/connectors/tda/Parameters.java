@@ -57,9 +57,9 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		reset();
 		buffer.fromString(data);
 		server = buffer.getString(SERVER, server);
-		appKey = buffer.getString(APPKEY, appKey);
+		appKey = buffer.getEncodedString(APPKEY, appKey);
 		username = buffer.getString(USERNAME, username);
-		password = buffer.getString(PASSWORD, password);
+		password = buffer.getEncodedString(PASSWORD, password);
 		industry = buffer.getInteger(INDUSTRY, industry);
 		contentType = buffer.getInteger(CONTENTTYPE, contentType);
 	}
@@ -79,9 +79,9 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public String toString () {
 		buffer.reset();
 		buffer.setString(SERVER, server);
-		buffer.setString(APPKEY, appKey);
+		buffer.setEncodedString(APPKEY, appKey);
 		buffer.setString(USERNAME, username);
-		buffer.setString(PASSWORD, password);
+		buffer.setEncodedString(PASSWORD, password);
 		buffer.setInteger(INDUSTRY, industry);
 		buffer.setInteger(CONTENTTYPE, contentType);
 		return buffer.toString();

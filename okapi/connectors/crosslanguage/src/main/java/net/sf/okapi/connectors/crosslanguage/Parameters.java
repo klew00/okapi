@@ -85,7 +85,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		user = buffer.getString(USER, user);
 		apiKey = buffer.getString(APIKEY, apiKey);
 		serverURL = buffer.getString(SERVERURL, serverURL);
-		password = buffer.getString(PASSWORD, password);
+		password = buffer.getEncodedString(PASSWORD, password);
 	}
 
 	public void reset () {
@@ -101,7 +101,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.setString(USER, user);
 		buffer.setString(APIKEY, apiKey);
 		buffer.setString(SERVERURL, serverURL);
-		buffer.setString(PASSWORD, password);
+		buffer.setEncodedString(PASSWORD, password);
 		return buffer.toString();
 	}
 

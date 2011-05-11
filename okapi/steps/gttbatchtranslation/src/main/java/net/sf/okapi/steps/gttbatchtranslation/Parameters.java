@@ -61,7 +61,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		reset();
 		buffer.fromString(data);
 		email = buffer.getString(EMAIL, email);
-		password = buffer.getString(PASSWORD, password);
+		password = buffer.getEncodedString(PASSWORD, password);
 		tmxPath = buffer.getString(TMXPATH, tmxPath);
 		waitClass = buffer.getString(WAITCLASS, waitClass);
 		markAsMT = buffer.getBoolean(MARKASMT, markAsMT);
@@ -84,7 +84,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public String toString () {
 		buffer.reset();
 		buffer.setString(EMAIL, email);
-		buffer.setString(PASSWORD, password);
+		buffer.setEncodedString(PASSWORD, password);
 		buffer.setString(TMXPATH, tmxPath);
 		buffer.setString(WAITCLASS, waitClass);
 		buffer.setBoolean(MARKASMT, markAsMT);
