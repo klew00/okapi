@@ -262,6 +262,8 @@
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi/steps/gttbatchtranslation/target/classes"
 			 excludes="**/META-INF/**"/>
+			<fileset dir="../../okapi/steps/repetitionanalysis/target/classes"
+			 excludes="**/META-INF/**"/>
 		</copy>
 		
 		<!-- Copy lib dependencies -->

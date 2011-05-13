@@ -24,7 +24,6 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
-import net.sf.okapi.common.ClassUtil;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.TextFragment;
@@ -43,13 +42,12 @@ import org.junit.Test;
 
 public class TestPensieveWriterSeeker {
 	private String tmDir;
-	private String pathBase;
 	private ITmWriter tmWriter;
 	private ITmSeeker currentTm;
 	
 	@Before
 	public void setup() {
-		pathBase = Util.ensureSeparator(ClassUtil.getTargetPath(this.getClass()), true);
+		//pathBase = Util.ensureSeparator(ClassUtil.getTargetPath(this.getClass()), true);
 		//tmDir = pathBase + "tm/";
 		//tmDir = pathBase;
 		tmDir = Util.ensureSeparator(Util.getTempDirectory(), true) + "tm/";
