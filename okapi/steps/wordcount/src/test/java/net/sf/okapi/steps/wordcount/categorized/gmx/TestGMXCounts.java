@@ -158,7 +158,7 @@ public class TestGMXCounts {
 		bcs = new GMXNumericOnlyTextUnitWordCountStep();
 		bcs.handleEvent(sdEvent);
 		bcs.handleEvent(tuEvent);
-		assertEquals(7, BaseCounter.getCount(tu, GMX.NumericOnlyTextUnitWordCount)); // 12, 00, 15, 11, 45, 8, 300
+		assertEquals(1, BaseCounter.getCount(tu, GMX.NumericOnlyTextUnitWordCount)); // Only 15 is a stand-alone number
 	}
 	
 	@Test
@@ -168,7 +168,7 @@ public class TestGMXCounts {
 		
 		tu.setIsTranslatable(false);
 		bcs.handleEvent(tuEvent);
-		assertEquals(15, BaseCounter.getCount(tu, GMX.ProtectedWordCount));		
+		assertEquals(11, BaseCounter.getCount(tu, GMX.ProtectedWordCount)); // freetime@example.com, 8-), $300 are not words	
 		
 		tu.setIsTranslatable(true);
 		bcs.handleEvent(tuEvent);
