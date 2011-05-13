@@ -81,7 +81,7 @@ public class Tokens extends ArrayList<Token> {
 		
 		List<String> names = null; 
 		
-		if (tokenNames == null)
+		if (tokenNames == null || (tokenNames != null && tokenNames.length == 0))
 			return this;
 		else
 			names = Arrays.asList(tokenNames);

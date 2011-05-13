@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.logging.Level;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.ListUtil;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Range;
 import net.sf.okapi.common.UsingParameters;
@@ -259,9 +260,11 @@ public class TokenizationStep extends AbstractPipelineStep {
 		
 		lexem.setLexerId(lexers.indexOf(lexer) + 1);
 		
-		for (int tokenId : rule.getOutTokenIDs())
+		for (int tokenId : rule.getOutTokenIDs()) {
 			//if (tokenFilter.contains(tokenId)) {
-			if (params.supportsToken(tokenId)) {
+			
+			// Tokens are filtered afterwards, because some tokens are dependent on others internally
+			//if (params.supportsToken(tokenId)) { 
 				
 				if (textShift > 0) {
 					
@@ -272,7 +275,8 @@ public class TokenizationStep extends AbstractPipelineStep {
 					 
 				Token token = new Token(tokenId, lexem, 100);
 				tokens.add(token);
-			}
+			//}
+		}
 	}
 	
 	private void runLexers(List<ILexer> lexers, String text, LocaleId language, Tokens tokens, int textShift) {
@@ -336,8 +340,7 @@ public class TokenizationStep extends AbstractPipelineStep {
 			while (rawtextLexems.size() > 0) {
 				
 				// Deadlock and chain-reaction protection
-				if (saveNumRawtextLexems > 0 && rawtextLexems.size() >= saveNumRawtextLexems) {
-					
+				if (saveNumRawtextLexems > 0 && rawtextLexems.size() >= saveNumRawtextLexems) {					
 					if (rawtextLexems.size() == saveNumRawtextLexems)
 						logMessage(Level.FINE, "RAWTEXT lexems are not processed in tokenize()");
 					else
@@ -365,7 +368,7 @@ public class TokenizationStep extends AbstractPipelineStep {
 		if (tokens != null)
 			tokens.fixRanges(positions);
 		
-		return tokens;
+		return tokens.getFilteredList(ListUtil.stringListAsArray(params.getTokenNames()));
 	}
 	
 	private void tokenizeSource(ITextUnit tu) {

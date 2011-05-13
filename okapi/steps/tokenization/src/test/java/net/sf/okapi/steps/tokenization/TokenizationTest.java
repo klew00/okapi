@@ -173,18 +173,19 @@ public class TokenizationTest {
 		logger.fine(sb.toString());
 	}
 	
-// DEBUG	
-//	@Test
-//	public void listTokenizerOutput() {
-//		
-//		//Tokens tokens = Tokenizer.tokenize(text, locENUS); // All tokens
-//		Tokens tokens = Tokenizer.tokenize("L'objectif est defini.", locFR); // All tokens
-//		//Tokens tokens = Tokenizer.tokenize(" for info 3.5pct", locENUS); // All tokens
-//						
-//		listTokens(tokens);
-//		System.out.println(tokens.size());
-//		System.out.println(ts.getConfigInfo());
-//	}
+	
+	@Test
+	public void listTokenizerOutput() {
+		
+		//Tokens tokens = Tokenizer.tokenize(text, locENUS); // All tokens
+		//Tokens tokens = Tokenizer.tokenize("L'objectif est defini.", locFR); // All tokens
+		//Tokens tokens = Tokenizer.tokenize(" for info 3.5pct", locENUS); // All tokens
+		Tokens tokens = Tokenizer.tokenize("NASDAQ is a U.S. stock exchange.", locENUS); // All tokens
+						
+		listTokens(tokens);
+		System.out.println(tokens.size());
+		System.out.println(ts.getConfigInfo());
+	}
 	
 	@Test
 	public void testFilters() {
