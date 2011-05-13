@@ -46,8 +46,9 @@ import net.sf.okapi.tm.pensieve.writer.ITmWriter;
 import net.sf.okapi.tm.pensieve.writer.TmWriterFactory;
 
 /**
- * The step analyzes repetitions in single documents. Either exact or configurable fuzzy search is performed.
- * <p>2 types of annotations are created for found repetitive segments -- RepetitiveSegmentAnnotation and AltTranslationsAnnotation.  
+ * The step analyzes repetitions in input documents. Either exact or configurable fuzzy search is performed.
+ * <p>
+ * 2 types of annotations are created for found repetitive segments -- RepetitiveSegmentAnnotation and AltTranslationsAnnotation.  
  * RepetitiveSegmentAnnotation's are attached to all repetitive source segments. 
  * AltTranslationsAnnotation's are attached to target segments, corresponding to repetitive source segments.
  * AltTranslationsAnnotation is not attached for the first repetitive segment not to be counted by counting steps
@@ -80,8 +81,8 @@ public class RepetitionAnalysisStep extends BasePipelineStep {
 
 	@Override
 	public String getDescription() {
-		return "Analyzes repetitions in input documents. Adds AltTranslationsAnnotation's and RepetitiveSegmentAnnotation's to " +
-				"repetitive segments."
+		return "Analyzes repetitions in input documents. Adds AltTranslationsAnnotation and RepetitiveSegmentAnnotation to " +
+				"a repetitive segment."
 		+ " Expects: raw document. Sends back: raw document.";
 	}
 	
