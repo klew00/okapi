@@ -443,11 +443,14 @@ public class QueryManager {
 	 * they are identical.
 	 * @param targetPrefix A prefix to place at the front of the candidate target if it is 
 	 * leveraged into the text unit. Use null to not set a prefix.
+	 * @param thresholdToPrefix if a target prefix is defined and the score is equal or below this
+	 * threshold the prefix is added. This parameter is ignored if the target prefix is null.
 	 */
 	public void leverage (ITextUnit tu,
 		int thresholdToFill,
 		boolean downgradeIdenticalBestMatches,
-		String targetPrefix)
+		String targetPrefix,
+		int thresholdToPrefix)
 	{
 		if ( !tu.isTranslatable() ) {
 			return;
@@ -483,7 +486,8 @@ public class QueryManager {
 					if ( bestMatch.getScore() >= thresholdToFill ) {
 						// Alternate translation content is expected to always be un-segmented
 						// We can use getFirstContent() here
-						if ( targetPrefix != null ) {
+						// If a prefix is defined and the score equal or below the given threshold: we add it
+						if (( targetPrefix != null ) && ( bestMatch.getScore() <= thresholdToPrefix )) {
 							TextFragment tf = new TextFragment(targetPrefix + bestMatch.getTarget().getFirstContent().getCodedText(),
 								bestMatch.getTarget().getFirstContent().getClonedCodes());
 							tu.setTargetContent(getTargetLanguage(), tf);
@@ -511,7 +515,7 @@ public class QueryManager {
 						else if ( bestMatch.getScore() > 0 ) fuzzyBestMatches++;
 						// Fill target if requested
 						if ( bestMatch.getScore() >= thresholdToFill ) {
-							if ( targetPrefix != null ) {
+							if (( targetPrefix != null ) && ( bestMatch.getScore() <= thresholdToPrefix )) {
 								TextFragment tf = new TextFragment(targetPrefix + bestMatch.getTarget().getFirstContent().getCodedText(),
 									bestMatch.getTarget().getFirstContent().getClonedCodes());
 								ts.text = tf;

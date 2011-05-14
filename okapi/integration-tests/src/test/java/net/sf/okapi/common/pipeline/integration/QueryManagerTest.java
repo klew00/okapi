@@ -79,7 +79,7 @@ public class QueryManagerTest {
 	public void leverageNoFill() {
 		ITextUnit tu = new TextUnit("1");
 		tu.setSourceContent(new TextFragment("Elephants cannot fly."));
-		qm.leverage(tu, 999, false, null);
+		qm.leverage(tu, 999, false, null, 0);
 		
 		Assert.assertEquals("", tu.getTarget(locFRFR).toString());
 		
@@ -92,7 +92,7 @@ public class QueryManagerTest {
 	public void leverageFill() {
 		ITextUnit tu = new TextUnit("1");
 		tu.setSourceContent(new TextFragment("Elephants cannot fly."));
-		qm.leverage(tu, 1, false, null);
+		qm.leverage(tu, 1, false, null, 0);
 		
 		Assert.assertEquals("Les \u00e9l\u00e9phants ne peuvent pas voler.", tu.getTarget(locFRFR).toString());
 		
@@ -105,9 +105,22 @@ public class QueryManagerTest {
 	public void leverageFillWithPrefix () {
 		ITextUnit tu = new TextUnit("1");
 		tu.setSourceContent(new TextFragment("Elephants cannot fly."));
-		qm.leverage(tu, 1, false, "PREFIX! ");
+		qm.leverage(tu, 1, false, "PREFIX! ", 100);
 		
 		Assert.assertEquals("PREFIX! Les \u00e9l\u00e9phants ne peuvent pas voler.", tu.getTarget(locFRFR).toString());
+		
+		AltTranslationsAnnotation a = tu.getTarget(locFRFR).getAnnotation(AltTranslationsAnnotation.class);
+		Assert.assertNotNull(a);		
+		Assert.assertEquals("Les \u00e9l\u00e9phants ne peuvent pas voler.", a.getFirst().getTarget().toString());
+	}
+
+	@Test
+	public void leverageFillWithNoPrefix () {
+		ITextUnit tu = new TextUnit("1");
+		tu.setSourceContent(new TextFragment("Elephants cannot fly."));
+		qm.leverage(tu, 1, false, "PREFIX! ", 99); // Threshold lower than score
+		
+		Assert.assertEquals("Les \u00e9l\u00e9phants ne peuvent pas voler.", tu.getTarget(locFRFR).toString());
 		
 		AltTranslationsAnnotation a = tu.getTarget(locFRFR).getAnnotation(AltTranslationsAnnotation.class);
 		Assert.assertNotNull(a);		
@@ -123,7 +136,7 @@ public class QueryManagerTest {
 		ISegments segs = tu.getSource().getSegments();
 		assertEquals(2, segs.count());
 		
-		qm.leverage(tu, 1, false, null);
+		qm.leverage(tu, 1, false, null, 0);
 		
 		segs = tu.getTarget(locFRFR).getSegments();
 		assertEquals(2, segs.count());

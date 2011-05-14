@@ -33,6 +33,7 @@ public class Parameters extends BaseParameters {
 	private static final String USEMTPREFIX = "useMTPrefix";
 	private static final String USETARGETPREFIX = "useTargetPrefix";
 	private static final String TARGETPREFIX = "targetPrefix";
+	private static final String TARGETPREFIXTHRESHOLD = "targetPrefixThreshold";
 	
 	private String resourceClassName;
 	private String resourceParameters;
@@ -46,6 +47,7 @@ public class Parameters extends BaseParameters {
 	private boolean leverage;
 	private boolean useTargetPrefix;
 	private String targetPrefix;
+	private int targetPrefixThreshold;
 
 	public Parameters () {
 		reset();
@@ -147,6 +149,14 @@ public class Parameters extends BaseParameters {
 		this.targetPrefix = targetPrefix;
 	}
 
+	public int getTargetPrefixThreshold () {
+		return targetPrefixThreshold;
+	}
+
+	public void setTargetPrefixThreshold (int targetPrefixThreshold) {
+		this.targetPrefixThreshold = targetPrefixThreshold;
+	}
+
 	@Override
 	public void reset() {
 		leverage = true;
@@ -160,7 +170,8 @@ public class Parameters extends BaseParameters {
 		tmxPath = "";
 		useMTPrefix = true;
 		useTargetPrefix = false;
-		targetPrefix = "FromLeverage! ";
+		targetPrefix = "FUZZY__";
+		targetPrefixThreshold = 99;
 	}
 
 	@Override
@@ -179,6 +190,7 @@ public class Parameters extends BaseParameters {
 		leverage = buffer.getBoolean(LEVERAGE, leverage);
 		useTargetPrefix = buffer.getBoolean(USETARGETPREFIX, useTargetPrefix);
 		targetPrefix = buffer.getString(TARGETPREFIX, targetPrefix);
+		targetPrefixThreshold = buffer.getInteger(TARGETPREFIXTHRESHOLD, targetPrefixThreshold);
 	}
 
 	@Override
@@ -196,6 +208,7 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean(LEVERAGE, leverage);
 		buffer.setBoolean(USETARGETPREFIX, useTargetPrefix);
 		buffer.setString(TARGETPREFIX, targetPrefix);
+		buffer.setInteger(TARGETPREFIXTHRESHOLD, targetPrefixThreshold);
 		return buffer.toString();
 	}
 

@@ -73,6 +73,8 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Button chkUseMTPrefix;
 	private Button chkUseTargetPrefix;
 	private Text edTargetPrefix;
+	private Label stTargetPrefixThreshold;
+	private Spinner spnTargetPrefixThreshold;
 	
 	public ParametersEditor () {
 		connectors = new DefaultConnectors();
@@ -221,7 +223,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		});
 		
 		stFillTargetThreshold = new Label(mainComposite, SWT.NONE);
-		stFillTargetThreshold.setText("When the best macandidate is equal or above this score:");
+		stFillTargetThreshold.setText("When the best candidate is equal or above this score:");
 		gdTmp = new GridData();
 		final int indent = 16;
 		gdTmp.horizontalIndent = indent;
@@ -241,13 +243,29 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		chkUseTargetPrefix.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				edTargetPrefix.setEnabled(chkUseTargetPrefix.getSelection());
+				stTargetPrefixThreshold.setEnabled(chkUseTargetPrefix.getSelection());
+				spnTargetPrefixThreshold.setEnabled(chkUseTargetPrefix.getSelection());
 			}
 		});
 		
+		stTargetPrefixThreshold = new Label(mainComposite, SWT.NONE);
+		stTargetPrefixThreshold.setText("When the best candidate is equal or below this score:");
+		gdTmp = new GridData();
+		gdTmp.horizontalIndent = indent;
+		stTargetPrefixThreshold.setLayoutData(gdTmp);
+
+		spnTargetPrefixThreshold = new Spinner(mainComposite, SWT.BORDER);
+		spnTargetPrefixThreshold.setMinimum(0);
+		spnTargetPrefixThreshold.setMaximum(100);
+		spnTargetPrefixThreshold.setIncrement(1);
+		spnTargetPrefixThreshold.setPageIncrement(10);
+
 		edTargetPrefix = new Text(mainComposite, SWT.BORDER);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalSpan = 2;
+		gdTmp.horizontalIndent = indent;
 		edTargetPrefix.setLayoutData(gdTmp);
+		
 		
 		chkMakeTMX = new Button(mainComposite, SWT.CHECK);
 		chkMakeTMX.setText("Generate a TMX document");
@@ -297,9 +315,13 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		chkUseTargetPrefix.setEnabled(enabled);
 		if ( enabled ) {
 			edTargetPrefix.setEnabled(chkUseTargetPrefix.getSelection());
+			stTargetPrefixThreshold.setEnabled(chkUseTargetPrefix.getSelection());
+			spnTargetPrefixThreshold.setEnabled(chkUseTargetPrefix.getSelection());
 		}
 		else {
 			edTargetPrefix.setEnabled(false);
+			stTargetPrefixThreshold.setEnabled(false);
+			spnTargetPrefixThreshold.setEnabled(false);
 		}
 		
 		chkMakeTMX.setEnabled(enabled);
@@ -329,6 +351,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		chkUseMTPrefix.setSelection(params.getUseMTPrefix());
 		chkUseTargetPrefix.setSelection(params.getUseTargetPrefix());
 		edTargetPrefix.setText(params.getTargetPrefix());
+		spnTargetPrefixThreshold.setSelection(params.getTargetPrefixThreshold());
 		updateOptionsDisplay();
 	}
 
@@ -366,6 +389,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		params.setUseMTPrefix(chkUseMTPrefix.getSelection());
 		params.setUseTargetPrefix(chkUseTargetPrefix.getSelection());
 		params.setTargetPrefix(edTargetPrefix.getText());
+		params.setTargetPrefixThreshold(spnTargetPrefixThreshold.getSelection());
 		
 		result = true;
 		return true;
