@@ -182,7 +182,11 @@ public class RepetitionAnalysisStep extends BasePipelineStep {
 						Segment tseg = tsegments.get(seg.getId()); // Always exists, created empty in case of no target
 						TextFragment stf = hitTu.getSource().getContent();
 						TextFragment ttf = hitTu.getTarget().getContent();
-						AltTranslationsAnnotation ata = new AltTranslationsAnnotation();
+						
+						AltTranslationsAnnotation ata = tseg.getAnnotation(AltTranslationsAnnotation.class);
+						if (ata == null) {
+							ata = new AltTranslationsAnnotation() ;
+						}
 						ata.add(new AltTranslation(sourceLocale, targetLocale == null ? sourceLocale : targetLocale, 
 								tf, stf, ttf, MatchType.EXACT_DOCUMENT_CONTEXT, 
 								//Math.round(hit.getScore() * 100), ""));
