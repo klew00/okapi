@@ -27,6 +27,7 @@ import net.sf.okapi.common.exceptions.OkapiIOException;
 */
 public class Base64 {
 
+	private static final String ENCSTR = "#BeNcStr";
 	private static final Charset CSUTF8 = Charset.forName("UTF8");
 	
 	// Mapping table from 6-bit nibbles to Base64 characters.
@@ -183,7 +184,31 @@ public class Base64 {
 			 		
 		return sb.toString();		
 	}
+
+	/**
+	 * Encode a password-type string value.
+	 * @param password the password (in clear).
+	 * @return the masked value for the given string.
+	 * @see #decodePassword(String)
+	 */
+	public static String encodePassword (String password) {
+		return ENCSTR+Base64.encodeString(password);
+	}
 	
+	/**
+	 * Decode a string value that is possibly encoded into a clear string.
+	 * @param password the string to decode. It may be a clear string too.
+	 * @return the decoded string.
+	 */
+	public static String decodePassword (String password) {
+		if ( password.startsWith(ENCSTR) ) {
+			return Base64.decodeString(password.substring(ENCSTR.length()));
+		}
+		else {
+			return password;
+		}
+	}
+
 }
 
 

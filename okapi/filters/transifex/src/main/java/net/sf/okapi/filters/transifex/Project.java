@@ -50,7 +50,6 @@ public class Project {
 	public static final String PROJECT_EXTENSION = ".txp";
 
 	private static final String PO_TYPE = "PO";
-	private static final String ENCSTR = "#BeNcStr";
 
 	private String path;
 	private String host;
@@ -135,12 +134,7 @@ public class Project {
 	}
 
 	public void setPassword (String password) {
-		if ( password.startsWith(ENCSTR) ) {
-			this.password = Base64.decodeString(password.substring(ENCSTR.length()));
-		}
-		else {
-			this.password = password;
-		}
+		this.password = Base64.decodePassword(password);
 		cli = null;
 	}
 	
@@ -166,7 +160,7 @@ public class Project {
 			pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(path), "UTF-8"));
 			pw.println(HOST + "=" + host);
 			pw.println(USER + "=" + user);
-			pw.println(PASSWORD + "=" + ENCSTR+Base64.encodeString(password));
+			pw.println(PASSWORD + "=" + Base64.encodePassword(password));
 			pw.println(PROJECTID + "=" + projectId);
 			pw.println(SOURCELOCALE + "=" + sourceLocale.toString());
 			pw.println(TARGETLOCALE + "=" + targetLocale.toString());

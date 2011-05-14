@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -45,8 +45,6 @@ import java.util.LinkedHashMap;
  */
 public class ParametersString {
 
-	private static final String ENCSTR = "#BeNcStr";
-	
 	private LinkedHashMap<String, Object> list;
 	
 	public ParametersString () {
@@ -284,12 +282,7 @@ public class ParametersString {
 	public String getEncodedString (String name,
 		String defaultValue)
 	{
-		String tmp = getString(name, defaultValue);
-		if ( tmp.startsWith(ENCSTR) ) {
-			return Base64.decodeString(tmp.substring(ENCSTR.length()));
-		}
-		// Else: normal string
-		return tmp;
+		return Base64.decodePassword(getString(name, defaultValue));
 	}
 	
 	/**
@@ -302,9 +295,11 @@ public class ParametersString {
 	public void setEncodedString (String name,
 		String value)
 	{
-		if ( value == null ) list.remove(name);
+		if ( value == null ) {
+			list.remove(name);
+		}
 		else {
-			list.put(name, ENCSTR+Base64.encodeString(value));
+			list.put(name, Base64.encodePassword(value));
 		}
 	}
 	

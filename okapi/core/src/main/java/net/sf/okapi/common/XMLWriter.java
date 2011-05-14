@@ -80,6 +80,14 @@ public class XMLWriter {
     public void setLineBreak (String lineBreak) {
     	this.lineBreak = lineBreak;
     }
+    
+    /**
+     * Gets the line break string currently used for this writer.
+     * @return the line break string used.
+     */
+    public String getLineBreak () {
+    	return lineBreak;
+    }
 
     /**
      * Closes the writer and release any associated resources.
