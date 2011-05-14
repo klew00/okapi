@@ -505,6 +505,16 @@ public class XMLFilterTest {
 	}
 	
 	@Test
+	public void testOutputStandaloneYes () {
+		String snippet = "<?xml version=\"1.0\" standalone=\"yes\"?>\n"
+			+ "<doc>text</doc>";
+		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+			+ "<doc>text</doc>";
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), locEN));
+	}
+
+	@Test
 	public void testSeveralUnits () {
 		String snippet = "<?xml version=\"1.0\"?>\n"
 			+ "<doc><p>text 1</p><p>text 2</p><p>text 3</p></doc>";

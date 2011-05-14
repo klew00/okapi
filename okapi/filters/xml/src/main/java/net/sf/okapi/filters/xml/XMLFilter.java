@@ -346,7 +346,7 @@ public class XMLFilter implements IFilter {
 			skel.addValuePlaceholder(startDoc, Property.ENCODING, LocaleId.EMPTY);
 			skel.add("\"");
 			startDoc.setProperty(new Property(Property.ENCODING, encoding, false));
-			if ( doc.getXmlStandalone() ) skel.add(" standalone=\"true\"");
+			if ( doc.getXmlStandalone() ) skel.add(" standalone=\"yes\"");
 			skel.add("?>"+lineBreak);
 		}
 
