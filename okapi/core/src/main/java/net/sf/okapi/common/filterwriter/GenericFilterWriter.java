@@ -272,7 +272,7 @@ public class GenericFilterWriter implements IFilterWriter {
 
 	/**
 	 * Provides sub-classes an opportunity to creates the character set encoder for the output.
-	 * @param resource the start document resource.
+	 * @param encodingtoUse the name of the encoding to use.
 	 * @return the decoder to use for the output or null. When null is returned (default)
 	 * the output uses the encoding.
 	 */

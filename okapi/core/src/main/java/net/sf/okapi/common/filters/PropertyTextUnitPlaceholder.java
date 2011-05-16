@@ -23,10 +23,11 @@ package net.sf.okapi.common.filters;
 import net.sf.okapi.common.HashCodeUtil;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.resource.ITextUnit;
 
 /**
  * This class acts as a placeholder for both {@link Property}s and
- * {@link TextUnit}s that are found within tags. HTML and XML attributes are the
+ * {@link ITextUnit}s that are found within tags. HTML and XML attributes are the
  * canonical case. Along with the attribute name, value and type this class
  * stores offset information for the name and value that can be used by the
  * {@link AbstractFilter} to automatically generate proper attribute-based
@@ -67,7 +68,7 @@ public class PropertyTextUnitPlaceholder implements
 	}
 
 	/**
-	 * Constructor for {@link Property} and {@link TextUnit} without a main
+	 * Constructor for {@link Property} and {@link ITextUnit} without a main
 	 * offsets. This is useful for cases where values are not delimited by any
 	 * formatting
 	 * 
@@ -89,7 +90,7 @@ public class PropertyTextUnitPlaceholder implements
 	}
 
 	/**
-	 * Constructor for {@link Property} and {@link TextUnit} that are delimited
+	 * Constructor for {@link Property} and {@link ITextUnit} that are delimited
 	 * by formatting (i.e., name="value"). The offset 'n' in name is the
 	 * mainStartPos, the offset 'v' in value is the valueStartPos.
 	 * 

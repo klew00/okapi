@@ -108,9 +108,9 @@ public class Event {
 	}
 
 	/**
-	 * Convenience method to tell if this Event carries a {@link TextUnit}
+	 * Convenience method to tell if this Event carries a {@link ITextUnit}
 	 * 
-	 * @return true if {@link TextUnit}, false otherwise
+	 * @return true if {@link ITextUnit}, false otherwise
 	 */
 	public boolean isTextUnit () {
 		return (filterEventType == EventType.TEXT_UNIT);
@@ -162,20 +162,20 @@ public class Event {
 	}
 
 	/**
-	 * Convenience method returns the {@link IResource} as a {@link TextUnit}.
+	 * Convenience method returns the {@link IResource} as a {@link ITextUnit}.
 	 * The caller should confirm the {@link Event} type using isTextUnit before
 	 * calling this method.
 	 * 
-	 * @return the {@link TextUnit}
+	 * @return the {@link ITextUnit}
 	 * 
 	 * @throws OkapiUnexpectedResourceTypeException
-	 *             if the {@link IResource} is not a {@link TextUnit}
+	 *             if the {@link IResource} is not a {@link ITextUnit}
 	 */
 	public ITextUnit getTextUnit () {
 		if ( isTextUnit() ) {
 			return (ITextUnit)resource;
 		}
-		throw new OkapiUnexpectedResourceTypeException("Event resource is not a TextUnit");
+		throw new OkapiUnexpectedResourceTypeException("Event resource is not a text unit.");
 	}
 
 	/**
