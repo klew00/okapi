@@ -31,12 +31,13 @@ import org.junit.Test;
 public class LeveragingStepTest {
 	
 	private String root;
+	private String tmDir;
 	private LocaleId locEN = LocaleId.fromString("en");
 	private LocaleId locFR = LocaleId.fromString("fr");
 	
-	@Before
-	public void setUp() {
+	public LeveragingStepTest () {
 		root = TestUtil.getParentDir(this.getClass(), "/test01.html");
+		tmDir = Util.ensureSeparator(Util.getTempDirectory(), true) + "levtestTM";
 	}
 
 	@Test
@@ -58,7 +59,7 @@ public class LeveragingStepTest {
 		Parameters params = (Parameters)levStep.getParameters();
 		net.sf.okapi.connectors.pensieve.Parameters tmParams = new net.sf.okapi.connectors.pensieve.Parameters();
 		tmParams.fromString(params.getResourceParameters());
-		tmParams.setDbDirectory(root+"myTM.pentm");
+		tmParams.setDbDirectory(tmDir);
 		params.setResourceParameters(tmParams.toString());
 		pdriver.addStep(levStep);
 		
@@ -82,9 +83,10 @@ public class LeveragingStepTest {
 	private static final TextFragment TRG_1 = new TextFragment("FR This is an example of text");
 	
 	private void createTM () {
-		File dir = new File(root+"myTm.pentm");
-		Util.createDirectories(dir.getPath()+"/");
-		ITmWriter tmWriter = TmWriterFactory.createFileBasedTmWriter(dir.getPath(), true);
+		Util.deleteDirectory(tmDir, true);
+		Util.createDirectories(tmDir+"/");
+
+		ITmWriter tmWriter = TmWriterFactory.createFileBasedTmWriter(tmDir, true);
 		TranslationUnitVariant source = new TranslationUnitVariant(locEN, new TextFragment("This is an example of text"));
 		TranslationUnitVariant target = new TranslationUnitVariant(locEN, TRG_1);
 		TranslationUnit tu = new TranslationUnit(source, target);
