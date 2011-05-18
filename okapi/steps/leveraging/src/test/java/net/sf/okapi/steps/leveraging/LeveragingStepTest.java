@@ -25,7 +25,6 @@ import net.sf.okapi.tm.pensieve.common.TranslationUnitVariant;
 import net.sf.okapi.tm.pensieve.writer.ITmWriter;
 import net.sf.okapi.tm.pensieve.writer.TmWriterFactory;
 
-import org.junit.Before;
 import org.junit.Test;
 
 public class LeveragingStepTest {

@@ -110,7 +110,7 @@ public class Utility extends BaseFilterDrivenUtility {
 				// TODO: We now accomplish this via connector weights  
 				// qm.setReorder(false); // Keep results grouped by resources
 			}
-			qm.setOptions(params.threshold, false, false, downgradeIdenticalBestMatches, null, 0);
+			qm.setOptions(params.threshold, false, false, downgradeIdenticalBestMatches, null, 0, false);
 		}
 		
 		resolvedOutputDir = params.outputFolder + File.separator + params.pkgName;

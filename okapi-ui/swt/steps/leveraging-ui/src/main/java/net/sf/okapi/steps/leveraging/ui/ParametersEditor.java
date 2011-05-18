@@ -65,6 +65,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Label stThreshold;
 	private Spinner spnThreshold;
 	private Button chkDowngradeIBM;
+	private Button chkCopySourceOnNoText;
 	private Button chkFillTarget;
 	private Button chkFillIfTargetIsEmpty;
 	private Button chkFillIfTargetIsSameAsSource;
@@ -212,6 +213,12 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		gdTmp.horizontalSpan = 2;
 		chkDowngradeIBM.setLayoutData(gdTmp);
 		
+		chkCopySourceOnNoText = new Button(mainComposite, SWT.CHECK);
+		chkCopySourceOnNoText.setText("Copy the source into the target if the source content has no text");
+		gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		chkCopySourceOnNoText.setLayoutData(gdTmp);
+		
 		chkFillTarget = new Button(mainComposite, SWT.CHECK);
 		chkFillTarget.setText("Fill the target with the best translation candidate");
 		gdTmp = new GridData();
@@ -338,6 +345,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		stThreshold.setEnabled(enabled);
 		spnThreshold.setEnabled(enabled);
 		chkDowngradeIBM.setEnabled(enabled);
+		chkCopySourceOnNoText.setEnabled(enabled);
 		
 		chkFillTarget.setEnabled(enabled);
 		if ( enabled ) {
@@ -396,6 +404,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		chkUseTargetPrefix.setSelection(params.getUseTargetPrefix());
 		edTargetPrefix.setText(params.getTargetPrefix());
 		spnTargetPrefixThreshold.setSelection(params.getTargetPrefixThreshold());
+		chkCopySourceOnNoText.setSelection(params.getCopySourceOnNoText());
 		updateOptionsDisplay();
 	}
 
@@ -436,6 +445,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		params.setUseTargetPrefix(chkUseTargetPrefix.getSelection());
 		params.setTargetPrefix(edTargetPrefix.getText());
 		params.setTargetPrefixThreshold(spnTargetPrefixThreshold.getSelection());
+		params.setCopySourceOnNoText(chkCopySourceOnNoText.getSelection());
 		
 		result = true;
 		return true;

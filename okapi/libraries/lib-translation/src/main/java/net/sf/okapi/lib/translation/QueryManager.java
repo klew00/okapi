@@ -60,6 +60,7 @@ public class QueryManager {
 	private boolean downgradeIdenticalBestMatches = false;
 	private String targetPrefix = null;
 	private int thresholdToPrefix = 99;
+	private boolean copySourceOnNoText = false;
 	
 	/**
 	 * Creates a new QueryManager object.
@@ -444,19 +445,25 @@ public class QueryManager {
 	 * @param thresholdToFill if the first match has a score equal or above this value,
 	 * the target text of the match is placed in the target content. To avoid any filling of
 	 * the target: simply use a high value (e.g. <code>Integer.MAX_VALUE</code>).
+	 * @param fillIfTargetIsEmpty true to fill the target only if its content is currently empty.
+	 * @param fillIfTargetIsSameAsSource true to fill the target if fillIfTargetIsEmpty is true and
+	 * the source and target content are the same. 
 	 * @param downgradeIdenticalBestMatches true to reduce the score of best matches when
 	 * they are identical.
 	 * @param targetPrefix A prefix to place at the front of the candidate target if it is 
 	 * leveraged into the text unit. Use null to not set a prefix.
 	 * @param thresholdToPrefix if a target prefix is defined and the score is equal or below this
 	 * threshold the prefix is added. This parameter is ignored if the target prefix is null.
+	 * @param copySourceOnNoText true to copy the source content for the target segments that have 
+	 * no text (but they may have codes and/or white spaces).
 	 */
 	public void setOptions (int thresholdToFill,
 		boolean fillIfTargetIsEmpty,
 		boolean fillIfTargetIsSameAsSource,
 		boolean downgradeIdenticalBestMatches,
 		String targetPrefix,
-		int thresholdToPrefix)
+		int thresholdToPrefix,
+		boolean copySourceOnNoText)
 	{
 		this.thresholdToFill = thresholdToFill;
 		this.keepIfNotEmpty = !fillIfTargetIsEmpty;
@@ -464,6 +471,7 @@ public class QueryManager {
 		this.downgradeIdenticalBestMatches = downgradeIdenticalBestMatches;
 		this.targetPrefix = targetPrefix;
 		this.thresholdToPrefix = thresholdToPrefix;
+		this.copySourceOnNoText = copySourceOnNoText;
 	}
 		
 	/**
@@ -488,7 +496,7 @@ public class QueryManager {
 		for ( int id : resList.keySet() ) {
 			ResourceItem ri = resList.get(id);
 			if ( !ri.enabled ) continue; // Skip disabled entries
-			ri.query.leverage(tu);				
+			ri.query.leverage(tu);
 		}
 		
 		// Sort annotations added across IQuery.leverage calls
@@ -500,6 +508,18 @@ public class QueryManager {
 			
 			TextContainer tc = tu.getTarget(loc);
 			if ( tc == null ) continue;
+			
+			// Check for entries without text
+			if ( copySourceOnNoText ) {
+				for ( Segment srcSeg : tu.getSourceSegments() ) {
+					if ( !srcSeg.text.hasText(false) ) {
+						Segment trgSeg = tc.getSegments().get(srcSeg.id);
+						if ( trgSeg != null ) {
+							trgSeg.text = srcSeg.text.clone();
+						}
+					}
+				}
+			}
 			
 			// Check target container first
 			altTrans = tc.getAnnotation(AltTranslationsAnnotation.class);
@@ -567,7 +587,7 @@ public class QueryManager {
 						else if ( bestMatch.getScore() > 0 ) fuzzyBestMatches++;
 						// Do we need to fill the target?
 						if ( bestMatch.getScore() >= thresholdToFill ) {
-							// Check condition for overding existing target
+							// Check condition for overwriting existing target
 							Segment ss = tu.getSourceSegment(ts.id, false);
 							if ( ss == null ) continue;
 							boolean leverage = true;

@@ -30,6 +30,7 @@ import java.util.regex.Pattern;
 import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.AbstractFilter;
@@ -47,6 +48,7 @@ import net.sf.okapi.common.resource.TextFragment.TagType;
  * @author HARGRAVEJE
  * @author HiginbothamDW
  */
+@UsingParameters() // No parameters
 public class VersifiedTextFilter extends AbstractFilter {
 	private static final Logger LOGGER = Logger.getLogger(VersifiedTextFilter.class.getName());
 	private static final int BUFFER_SIZE = 128000;

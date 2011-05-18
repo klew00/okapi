@@ -36,6 +36,7 @@ public class Parameters extends BaseParameters {
 	private static final String USETARGETPREFIX = "useTargetPrefix";
 	private static final String TARGETPREFIX = "targetPrefix";
 	private static final String TARGETPREFIXTHRESHOLD = "targetPrefixThreshold";
+	private static final String COPYSOURCEONNOTEXT = "copySourceOnNoText";
 	
 	private String resourceClassName;
 	private String resourceParameters;
@@ -52,6 +53,7 @@ public class Parameters extends BaseParameters {
 	private boolean useTargetPrefix;
 	private String targetPrefix;
 	private int targetPrefixThreshold;
+	private boolean copySourceOnNoText;
 
 	public Parameters () {
 		reset();
@@ -137,6 +139,14 @@ public class Parameters extends BaseParameters {
 		this.makeTMX = makeTMX;
 	}
 
+	public boolean getCopySourceOnNoText () {
+		return copySourceOnNoText;
+	}
+
+	public void setCopySourceOnNoText (boolean copySourceOnNoText) {
+		this.copySourceOnNoText = copySourceOnNoText;
+	}
+
 	public String getTMXPath () {
 		return tmxPath;
 	}
@@ -194,6 +204,7 @@ public class Parameters extends BaseParameters {
 		useTargetPrefix = false;
 		targetPrefix = "FUZZY__";
 		targetPrefixThreshold = 99;
+		copySourceOnNoText = false;
 	}
 
 	@Override
@@ -215,6 +226,7 @@ public class Parameters extends BaseParameters {
 		useTargetPrefix = buffer.getBoolean(USETARGETPREFIX, useTargetPrefix);
 		targetPrefix = buffer.getString(TARGETPREFIX, targetPrefix);
 		targetPrefixThreshold = buffer.getInteger(TARGETPREFIXTHRESHOLD, targetPrefixThreshold);
+		copySourceOnNoText = buffer.getBoolean(COPYSOURCEONNOTEXT, copySourceOnNoText);
 	}
 
 	@Override
@@ -235,6 +247,7 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean(USETARGETPREFIX, useTargetPrefix);
 		buffer.setString(TARGETPREFIX, targetPrefix);
 		buffer.setInteger(TARGETPREFIXTHRESHOLD, targetPrefixThreshold);
+		buffer.setBoolean(COPYSOURCEONNOTEXT, copySourceOnNoText);
 		return buffer.toString();
 	}
 

@@ -35,6 +35,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IdGenerator;
+import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiIOException;
@@ -60,6 +61,7 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
  * Implements the IFilter interface for Moses Text files.
  * One line per segment, normally in UTF-8. No text unit separator.
  */
+@UsingParameters() // No parameters are used
 public class MosesTextFilter implements IFilter {
 
 	public static final String MOSESTEXT_MIME_TYPE = "text/x-mosestext";

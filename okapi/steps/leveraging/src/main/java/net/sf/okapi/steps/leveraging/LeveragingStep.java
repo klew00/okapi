@@ -52,7 +52,6 @@ public class LeveragingStep extends BasePipelineStep {
 	private int exactCount;
 	private int fuzzyCount;
 	private int iQueryId;
-//	private String targetPrefix;
 
 	public LeveragingStep () {
 		params = new Parameters();
@@ -198,9 +197,8 @@ public class LeveragingStep extends BasePipelineStep {
 		// Options
 		String targetPrefix = (params.getUseTargetPrefix() ? params.getTargetPrefix() : null);
 		qm.setOptions(params.getFillTarget() ? params.getFillTargetThreshold() : Integer.MAX_VALUE,
-			true, true,
-			params.getDowngradeIdenticalBestMatches(),
-			targetPrefix, params.getTargetPrefixThreshold());
+			true, true, params.getDowngradeIdenticalBestMatches(),
+			targetPrefix, params.getTargetPrefixThreshold(), params.getCopySourceOnNoText());
 			
 		if ( params.getMakeTMX() ) {
 			// Resolve the variables
