@@ -240,13 +240,13 @@ public class PluginsManager {
 						// Check class type
 						if ( IFilter.class.isAssignableFrom(cls) ) {
 							// Skip IFilter classes that should not be use directly
-							//if ( cls.getAnnotation(UsingParameters.class) == null ) continue;
+							if ( cls.getAnnotation(UsingParameters.class) == null ) continue;
 							if ( !urls.contains(url) ) urls.add(url);
 							plugins.add(new PluginItem(PluginItem.TYPE_IFILTER, name));
 						}
 						else if ( IPipelineStep.class.isAssignableFrom(cls) ) {
 							// Skip IPipelineStep classes that should not be use directly
-							//if ( cls.getAnnotation(UsingParameters.class) == null ) continue;
+							if ( cls.getAnnotation(UsingParameters.class) == null ) continue;
 							if ( !urls.contains(url) ) urls.add(url);
 							plugins.add(new PluginItem(PluginItem.TYPE_IPIPELINESTEP, name));
 						}
