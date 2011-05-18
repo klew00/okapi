@@ -84,19 +84,6 @@ public class Utility extends BaseFilterDrivenUtility {
 			targetSeg = doc.compileLanguageRules(trgLang, null);
 		}
 
-		if ( params.preTranslate ) {
-			qm = new QueryManager();
-			qm.setLanguages(srcLang, trgLang);
-			qm.setThreshold(params.threshold);
-			qm.setRootDirectory(projectDir);
-			qm.addAndInitializeResource(params.transResClass, null, params.transResParams);
-			if ( params.useTransRes2 ) {
-				qm.addAndInitializeResource(params.transResClass2, null, params.transResParams2);
-				// TODO: We now accomplish this via connector weights  
-				// qm.setReorder(false); // Keep results grouped by resources
-			}
-		}
-		
 		downgradeIdenticalBestMatches = false;
 		if ( params.pkgType.equals("xliff") ) {
 			writer = new net.sf.okapi.applications.rainbow.packages.xliff.Writer();
@@ -108,8 +95,23 @@ public class Utility extends BaseFilterDrivenUtility {
 			writer = new net.sf.okapi.applications.rainbow.packages.rtf.Writer();
 			downgradeIdenticalBestMatches = true;
 		}
-		else
+		else {
 			throw new RuntimeException("Unknown package type: " + params.pkgType);
+		}
+		
+		if ( params.preTranslate ) {
+			qm = new QueryManager();
+			qm.setLanguages(srcLang, trgLang);
+			qm.setThreshold(params.threshold);
+			qm.setRootDirectory(projectDir);
+			qm.addAndInitializeResource(params.transResClass, null, params.transResParams);
+			if ( params.useTransRes2 ) {
+				qm.addAndInitializeResource(params.transResClass2, null, params.transResParams2);
+				// TODO: We now accomplish this via connector weights  
+				// qm.setReorder(false); // Keep results grouped by resources
+			}
+			qm.setOptions(params.threshold, false, false, downgradeIdenticalBestMatches, null, 0);
+		}
 		
 		resolvedOutputDir = params.outputFolder + File.separator + params.pkgName;
 		resolvedOutputDir = resolvedOutputDir.replace(VAR_PROJDIR, projectDir);
@@ -260,7 +262,8 @@ public class Utility extends BaseFilterDrivenUtility {
 			if ( params.useGroupName && ( tu.getName() != null )) {
 				qm.setAttribute("GroupName", tu.getName());
 			}
-			qm.leverage(tu, params.threshold, downgradeIdenticalBestMatches, null, 0);
+			
+			qm.leverage(tu); //, params.threshold, downgradeIdenticalBestMatches, null, 0);
 			
 			// Compute statistics
 			cont = tu.getTarget(trgLang);

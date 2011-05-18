@@ -53,6 +53,13 @@ public class QueryManager {
 	private int exactBestMatches;
 	private int fuzzyBestMatches;
 	private String rootDir;
+	// Options
+	private int thresholdToFill = Integer.MAX_VALUE;
+	private boolean keepIfNotEmpty = true; // == false for actual option
+	private boolean keepIfTargetSameAsSource = true; // == false for actual option
+	private boolean downgradeIdenticalBestMatches = false;
+	private String targetPrefix = null;
+	private int thresholdToPrefix = 99;
 	
 	/**
 	 * Creates a new QueryManager object.
@@ -433,9 +440,7 @@ public class QueryManager {
 	}
 
 	/**
-	 * Leverages a text unit (segmented or not) based on the current settings.
-	 * Any options or attributes needed must be set before calling this method.
-	 * @param tu the text unit to leverage.
+	 * Sets the options for performing the leverage.
 	 * @param thresholdToFill if the first match has a score equal or above this value,
 	 * the target text of the match is placed in the target content. To avoid any filling of
 	 * the target: simply use a high value (e.g. <code>Integer.MAX_VALUE</code>).
@@ -446,11 +451,32 @@ public class QueryManager {
 	 * @param thresholdToPrefix if a target prefix is defined and the score is equal or below this
 	 * threshold the prefix is added. This parameter is ignored if the target prefix is null.
 	 */
-	public void leverage (ITextUnit tu,
-		int thresholdToFill,
+	public void setOptions (int thresholdToFill,
+		boolean fillIfTargetIsEmpty,
+		boolean fillIfTargetIsSameAsSource,
 		boolean downgradeIdenticalBestMatches,
 		String targetPrefix,
 		int thresholdToPrefix)
+	{
+		this.thresholdToFill = thresholdToFill;
+		this.keepIfNotEmpty = !fillIfTargetIsEmpty;
+		this.keepIfTargetSameAsSource = !fillIfTargetIsSameAsSource;
+		this.downgradeIdenticalBestMatches = downgradeIdenticalBestMatches;
+		this.targetPrefix = targetPrefix;
+		this.thresholdToPrefix = thresholdToPrefix;
+	}
+		
+	/**
+	 * Leverages a text unit (segmented or not) based on the current settings.
+	 * Any options or attributes needed must be set before calling this method.
+	 * @param tu the text unit to leverage.
+	 * @see #setOptions(int, boolean, boolean, boolean, String, int)
+	 */
+	public void leverage (ITextUnit tu)
+//		int thresholdToFill,
+//		boolean downgradeIdenticalBestMatches,
+//		String targetPrefix,
+//		int thresholdToPrefix)
 	{
 		if ( !tu.isTranslatable() ) {
 			return;
@@ -469,6 +495,7 @@ public class QueryManager {
 		// and fill in best matching target if needed
 		AltTranslationsAnnotation altTrans = null;
 		AltTranslation bestMatch = null;
+		
 		for ( LocaleId loc : tu.getTargetLocales() ) {
 			
 			TextContainer tc = tu.getTarget(loc);
@@ -477,28 +504,48 @@ public class QueryManager {
 			// Check target container first
 			altTrans = tc.getAnnotation(AltTranslationsAnnotation.class);
 			if ( altTrans != null ) {
+				// Sort the results
 				altTrans.sort();
+				// Down-grade identical best matches if requested
+				if ( downgradeIdenticalBestMatches ) {
+					altTrans.downgradeIdenticalBestMatches(false, threshold);
+				}
+				// Check if we do have a best match
 				if ( (bestMatch = altTrans.getFirst()) != null ) {
-					// Count best match
+					// Update the statistics
 					if ( bestMatch.getScore() >= 100 ) exactBestMatches++;
 					else if ( bestMatch.getScore() > 0 ) fuzzyBestMatches++;
-					// Fill target is requested
+					// Do we need to fill the target?
 					if ( bestMatch.getScore() >= thresholdToFill ) {
-						// Alternate translation content is expected to always be un-segmented
-						// We can use getFirstContent() here
-						// If a prefix is defined and the score equal or below the given threshold: we add it
-						if (( targetPrefix != null ) && ( bestMatch.getScore() <= thresholdToPrefix )) {
-							TextFragment tf = new TextFragment(targetPrefix + bestMatch.getTarget().getFirstContent().getCodedText(),
-								bestMatch.getTarget().getFirstContent().getClonedCodes());
-							tu.setTargetContent(getTargetLanguage(), tf);
+						// Alternate translation content is expected to always be un-segmented: We can use getFirstContent()
+						// Check if we need to skip the leveraging
+						boolean leverage = true;
+						if ( keepIfNotEmpty && !tc.isEmpty() ) {
+							if ( keepIfTargetSameAsSource ) {
+								if ( tu.getSource().compareTo(tc, true) != 0 ) {
+									leverage = false; // Target is different that source
+								}
+							}
+							else {
+								leverage = false;
+							}
 						}
-						else {
-							tu.setTargetContent(getTargetLanguage(), bestMatch.getTarget().getFirstContent());
+						// If it's OK to leverage do it
+						if ( leverage ) {
+							// If a prefix is defined and the score equal or below the given threshold: we add it
+							if (( targetPrefix != null ) && ( bestMatch.getScore() <= thresholdToPrefix )) {
+								TextFragment tf = new TextFragment(targetPrefix + bestMatch.getTarget().getFirstContent().getCodedText(),
+									bestMatch.getTarget().getFirstContent().getClonedCodes());
+								tu.setTargetContent(getTargetLanguage(), tf);
+							}
+							else { // Otherwise we just use the found content
+								tu.setTargetContent(getTargetLanguage(), bestMatch.getTarget().getFirstContent());
+							}
+							// We have leveraged an un-segmented target: do we need to un-segment the source?
+							if ( tu.getSource().hasBeenSegmented() ) {
+								tu.getSource().joinAll();
+							}
 						}
-					}
-					// Downgrade identical best matches if requested
-					if ( downgradeIdenticalBestMatches ) {
-						altTrans.downgradeIdenticalBestMatches(false, threshold);
 					}
 				}
 			}
@@ -509,24 +556,42 @@ public class QueryManager {
 				altTrans = ts.getAnnotation(AltTranslationsAnnotation.class);
 				if ( altTrans != null ) {
 					altTrans.sort();
+					// Down-grade identical best matches if requested
+					if ( downgradeIdenticalBestMatches ) {
+						altTrans.downgradeIdenticalBestMatches(false, threshold);
+					}
+					// Check if we have a best match
 					if ( (bestMatch = altTrans.getFirst()) != null ) {
-						// Count best match
+						// Update the statistics
 						if ( bestMatch.getScore() >= 100 ) exactBestMatches++;
 						else if ( bestMatch.getScore() > 0 ) fuzzyBestMatches++;
-						// Fill target if requested
+						// Do we need to fill the target?
 						if ( bestMatch.getScore() >= thresholdToFill ) {
-							if (( targetPrefix != null ) && ( bestMatch.getScore() <= thresholdToPrefix )) {
-								TextFragment tf = new TextFragment(targetPrefix + bestMatch.getTarget().getFirstContent().getCodedText(),
-									bestMatch.getTarget().getFirstContent().getClonedCodes());
-								ts.text = tf;
+							// Check condition for overding existing target
+							Segment ss = tu.getSourceSegment(ts.id, false);
+							if ( ss == null ) continue;
+							boolean leverage = true;
+							if ( keepIfNotEmpty && !ts.text.isEmpty() ) {
+								if ( keepIfTargetSameAsSource ) {
+									if ( ts.text.compareTo(ss.text, true) != 0 ) {
+										leverage = false;
+									}
+								}
+								else {
+									leverage = false;
+								}
 							}
-							else {
-								ts.text = bestMatch.getTarget().getFirstContent();	
+							if ( leverage ) {
+								// Alternate translation content is expected to always be un-segmented: We can use getFirstContent()
+								// If a prefix is defined and the score equal or below the given threshold: we add it
+								if (( targetPrefix != null ) && ( bestMatch.getScore() <= thresholdToPrefix )) {
+									ts.text = new TextFragment(targetPrefix + bestMatch.getTarget().getFirstContent().getCodedText(),
+										bestMatch.getTarget().getFirstContent().getClonedCodes());
+								}
+								else { // Otherwise we just use the found content
+									ts.text = bestMatch.getTarget().getFirstContent();	
+								}
 							}
-						}
-						// Downgrade identical best matches if requested
-						if ( downgradeIdenticalBestMatches ) {
-							altTrans.downgradeIdenticalBestMatches(false, threshold);
 						}
 					}
 				}
@@ -686,32 +751,5 @@ public class QueryManager {
 	public int getFuzzyBestMatches () {
 		return fuzzyBestMatches;
 	}
-
-//	/**
-//	 * Indicates if a) there are several matches with identical rank
-//	 * and at least two of them have different translations.
-//	 * <p><b>This assume the results are sorted</b>
-//	 * @return true if the conditions above are true.
-//	 */
-//	private boolean hasSeveralBestMatches () {
-//		if ( results.size() < 2 ) return false;
-//		
-//		// Get the best match
-//		QueryResult best = results.get(0);
-//		
-//		// Compare it to the next ones
-//		for ( int i=1; i<results.size(); i++ ) {
-//			// Loop through all other results until either:
-//			// - the match is different from the first
-//			// - or the match is identical but has a different translation
-//			QueryResult res = results.get(i);
-//			if ( best.matchType != res.matchType ) return false;
-//			if ( best.score != res.score ) return false;
-//			if ( !best.source.toString().equals(res.source.toString()) ) return false;
-//			// Different target? (if yes -> return true)
-//			if ( !best.target.toString().equals(res.target.toString()) ) return true;
-//		}
-//		return false;
-//	}
 
 }

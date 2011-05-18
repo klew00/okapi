@@ -26,8 +26,10 @@ public class Parameters extends BaseParameters {
 
 	private static final String LEVERAGE = "leverage";
 	private static final String FILLTARGET = "fillTarget";
-	private static final String DOWNGRADEIDENTICALBESTMATCHES = "downgradeIdenticalBestMatches";
 	private static final String FILLTARGETTHRESHOLD = "fillTargetThreshold";
+	private static final String FILLIFTARGETISEMPTY = "fillIfTargetIsEmpty";
+	private static final String FILLIFTARGETISSAMEASSOURCE = "fillIfTargetIsSameAsSource";
+	private static final String DOWNGRADEIDENTICALBESTMATCHES = "downgradeIdenticalBestMatches";
 	private static final String MAKETMX = "makeTMX";
 	private static final String TMXPATH = "tmxPath";
 	private static final String USEMTPREFIX = "useMTPrefix";
@@ -40,6 +42,8 @@ public class Parameters extends BaseParameters {
 	private int threshold;
 	private boolean fillTarget;
 	private int fillTargetThreshold;
+	private boolean fillIfTargetIsEmpty;
+	private boolean fillIfTargetIsSameAsSource;
 	private boolean downgradeIdenticalBestMatches;
 	private boolean makeTMX;
 	private String tmxPath;
@@ -53,6 +57,22 @@ public class Parameters extends BaseParameters {
 		reset();
 	}
 	
+	public boolean getFillIfTargetIsEmpty () {
+		return fillIfTargetIsEmpty;
+	}
+	
+	public void setFillIfTargetIsEmpty (boolean fillIfTargetIsEmpty) {
+		this.fillIfTargetIsEmpty = fillIfTargetIsEmpty;
+	}
+	
+	public boolean getFillIfTargetIsSameAsSource () {
+		return fillIfTargetIsSameAsSource;
+	}
+	
+	public void setFillIfTargetIsSameAsSource (boolean fillIfTargetIsSameAsSource) {
+		this.fillIfTargetIsSameAsSource = fillIfTargetIsSameAsSource;
+	}
+
 	public boolean getLeverage () {
 		return leverage;
 	}
@@ -165,6 +185,8 @@ public class Parameters extends BaseParameters {
 		threshold = 95;
 		fillTarget = true;
 		fillTargetThreshold = 95;
+		fillIfTargetIsEmpty = false;
+		fillIfTargetIsSameAsSource = false;
 		downgradeIdenticalBestMatches = false;
 		makeTMX = false;
 		tmxPath = "";
@@ -183,6 +205,8 @@ public class Parameters extends BaseParameters {
 		threshold = buffer.getInteger("threshold", threshold);
 		fillTarget = buffer.getBoolean(FILLTARGET, fillTarget);
 		fillTargetThreshold = buffer.getInteger(FILLTARGETTHRESHOLD, fillTargetThreshold);
+		fillIfTargetIsEmpty = buffer.getBoolean(FILLIFTARGETISEMPTY, fillIfTargetIsEmpty);
+		fillIfTargetIsSameAsSource = buffer.getBoolean(FILLIFTARGETISSAMEASSOURCE, fillIfTargetIsSameAsSource);
 		downgradeIdenticalBestMatches = buffer.getBoolean(DOWNGRADEIDENTICALBESTMATCHES, downgradeIdenticalBestMatches);
 		makeTMX = buffer.getBoolean(MAKETMX, makeTMX);
 		tmxPath = buffer.getString(TMXPATH, tmxPath);
@@ -201,6 +225,8 @@ public class Parameters extends BaseParameters {
 		buffer.setInteger("threshold", threshold);
 		buffer.setBoolean(FILLTARGET, fillTarget);
 		buffer.setInteger(FILLTARGETTHRESHOLD, fillTargetThreshold);
+		buffer.setBoolean(FILLIFTARGETISEMPTY, fillIfTargetIsEmpty);
+		buffer.setBoolean(FILLIFTARGETISSAMEASSOURCE, fillIfTargetIsSameAsSource);
 		buffer.setBoolean(DOWNGRADEIDENTICALBESTMATCHES, downgradeIdenticalBestMatches);
 		buffer.setBoolean(MAKETMX, makeTMX);
 		buffer.setString(TMXPATH, tmxPath);

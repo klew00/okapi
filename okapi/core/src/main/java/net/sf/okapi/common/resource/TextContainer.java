@@ -319,7 +319,7 @@ public class TextContainer implements Iterable<TextPart> {
 	/**
 	 * Compares this container with another one. Note: This is a costly operation if
 	 * the two containers have segments and no text differences.
-         *
+	 *
 	 * @param cont the other container to compare this one with.
 	 * @param codeSensitive true if the codes need to be compared as well.
 	 * @return a value 0 if the objects are equals.

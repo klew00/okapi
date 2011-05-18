@@ -66,6 +66,8 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Spinner spnThreshold;
 	private Button chkDowngradeIBM;
 	private Button chkFillTarget;
+	private Button chkFillIfTargetIsEmpty;
+	private Button chkFillIfTargetIsSameAsSource;
 	private Label stFillTargetThreshold;
 	private Spinner spnFillTargetThreshold;
 	private Button chkMakeTMX;
@@ -219,6 +221,13 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			public void widgetSelected(SelectionEvent e) {
 				stFillTargetThreshold.setEnabled(chkFillTarget.getSelection());
 				spnFillTargetThreshold.setEnabled(chkFillTarget.getSelection());
+				chkFillIfTargetIsEmpty.setEnabled(chkFillTarget.getSelection());
+				if ( chkFillTarget.getSelection() ) {
+					chkFillIfTargetIsSameAsSource.setEnabled(chkFillIfTargetIsEmpty.getSelection());
+				}
+				else {
+					chkFillIfTargetIsSameAsSource.setEnabled(false);
+				}
 			}
 		});
 		
@@ -234,6 +243,25 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		spnFillTargetThreshold.setMaximum(100);
 		spnFillTargetThreshold.setIncrement(1);
 		spnFillTargetThreshold.setPageIncrement(10);
+		
+		chkFillIfTargetIsEmpty = new Button(mainComposite, SWT.CHECK);
+		chkFillIfTargetIsEmpty.setText("Only if the target is empty");
+		gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		gdTmp.horizontalIndent = indent;
+		chkFillIfTargetIsEmpty.setLayoutData(gdTmp);
+		chkFillIfTargetIsEmpty.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				chkFillIfTargetIsSameAsSource.setEnabled(chkFillIfTargetIsEmpty.getSelection());
+			}
+		});
+		
+		chkFillIfTargetIsSameAsSource = new Button(mainComposite, SWT.CHECK);
+		chkFillIfTargetIsSameAsSource.setText("Or if the target is the same as the source");
+		gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		gdTmp.horizontalIndent = indent*2;
+		chkFillIfTargetIsSameAsSource.setLayoutData(gdTmp);
 
 		chkUseTargetPrefix = new Button(mainComposite, SWT.CHECK);
 		chkUseTargetPrefix.setText("Add this prefix to the leveraged translation");
@@ -310,7 +338,21 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		stThreshold.setEnabled(enabled);
 		spnThreshold.setEnabled(enabled);
 		chkDowngradeIBM.setEnabled(enabled);
+		
 		chkFillTarget.setEnabled(enabled);
+		if ( enabled ) {
+			chkFillIfTargetIsEmpty.setEnabled(chkFillTarget.getSelection());
+			if ( chkFillTarget.getSelection() ) {
+				chkFillIfTargetIsSameAsSource.setEnabled(chkFillIfTargetIsEmpty.getSelection());
+			}
+			else {
+				chkFillIfTargetIsSameAsSource.setEnabled(false);
+			}
+		}
+		else {
+			chkFillIfTargetIsEmpty.setEnabled(false);
+			chkFillIfTargetIsSameAsSource.setEnabled(false);
+		}
 		
 		chkUseTargetPrefix.setEnabled(enabled);
 		if ( enabled ) {
@@ -345,6 +387,8 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		spnThreshold.setSelection(params.getThreshold());
 		chkDowngradeIBM.setSelection(params.getDowngradeIdenticalBestMatches());
 		chkFillTarget.setSelection(params.getFillTarget());
+		chkFillIfTargetIsEmpty.setSelection(params.getFillIfTargetIsEmpty());
+		chkFillIfTargetIsSameAsSource.setSelection(params.getFillIfTargetIsSameAsSource());
 		spnFillTargetThreshold.setSelection(params.getFillTargetThreshold());
 		chkMakeTMX.setSelection(params.getMakeTMX());
 		pnlTMXPath.setText(params.getTMXPath());
@@ -383,6 +427,8 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		params.setThreshold(spnThreshold.getSelection());
 		params.setDowngradeIdenticalBestMatches(chkDowngradeIBM.getSelection());
 		params.setFillTarget(chkFillTarget.getSelection());
+		params.setFillIfTargetIsEmpty(chkFillIfTargetIsEmpty.getSelection());
+		params.setFillIfTargetIsSameAsSource(chkFillIfTargetIsSameAsSource.getSelection());
 		params.setFillTargetThreshold(spnFillTargetThreshold.getSelection());
 		params.setMakeTMX(chkMakeTMX.getSelection());
 		params.setTMXPath(pnlTMXPath.getText());

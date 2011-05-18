@@ -35,5 +35,33 @@
 			<artifactId>jericho-html</artifactId>
 			<version>3.1</version>
 		</dependency>
+		
+		<!-- For tests -->
+        <dependency>
+            <groupId>net.sf.okapi</groupId>
+            <artifactId>okapi-core</artifactId>
+            <version>${project.version}</version>
+			<classifier>tests</classifier>
+			<scope>test</scope>
+        </dependency>        
+		<dependency>
+			<groupId>net.sf.okapi.steps</groupId>
+			<artifactId>okapi-step-common</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.okapi.filters</groupId>
+			<artifactId>okapi-filter-html</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.okapi.connectors</groupId>
+			<artifactId>okapi-connector-pensieve</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
+		
     </dependencies>
 </project>
