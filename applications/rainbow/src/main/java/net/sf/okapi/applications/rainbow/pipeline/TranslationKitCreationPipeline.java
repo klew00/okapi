@@ -44,6 +44,7 @@ public class TranslationKitCreationPipeline extends PredefinedPipeline {
 		
 		LeveragingStep stepLev2 = new LeveragingStep();
 		((net.sf.okapi.steps.leveraging.Parameters)stepLev2.getParameters()).setLeverage(false);
+		((net.sf.okapi.steps.leveraging.Parameters)stepLev2.getParameters()).setFillIfTargetIsEmpty(true);
 		addStep(stepLev2);
 		
 		addStep(new ExtractionStep());

@@ -42,11 +42,13 @@ import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.ITextUnit;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 /**
@@ -418,8 +420,22 @@ public class POFilterWriter implements IFilterWriter {
 				if ( tc.contentIsOneSegment() ) {
 					tmp = fmt.fromFragmentToLetterCoded(tc.getFirstContent());
 				}
-				else {
-					tmp = fmt.fromFragmentToLetterCoded(tc.getUnSegmentedContentCopy());
+				else { // If the container is segmented
+					// We replace content made of only inter-segments by an empty one
+					// (because no segment has really text)
+					boolean hasSomeText = false;
+					for ( Segment seg : tc.getSegments() ) {
+						if ( seg.text.hasText() ) {
+							hasSomeText = true;
+							break;
+						}
+					}
+					if ( hasSomeText ) {
+						tmp = fmt.fromFragmentToLetterCoded(tc.getUnSegmentedContentCopy());
+					}
+					else {
+						tmp = "";
+					}
 				}
 			}
 			else {
