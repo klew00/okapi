@@ -116,7 +116,7 @@ public class Merger {
 		skipEmptySourceEntries = ( info.getExtractionType().equals(Manifest.EXTRACTIONTYPE_PO)
 			|| info.getExtractionType().equals(Manifest.EXTRACTIONTYPE_TRANSIFEX) );
 		// Use the source of the input as the translation for XINI, etc.
-		//TO uncomment when ready useSource = info.getExtractionType().equals(Manifest.EXTRACTIONTYPE_ONTRAM);
+		useSource = info.getExtractionType().equals(Manifest.EXTRACTIONTYPE_ONTRAM);
 		
 		Event event = null;
 		if ( filter.hasNext() ) {

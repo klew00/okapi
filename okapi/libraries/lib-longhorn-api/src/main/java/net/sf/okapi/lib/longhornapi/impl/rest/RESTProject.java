@@ -58,6 +58,7 @@ public class RESTProject implements LonghornProject {
 			this.projUri = new URI(newProjUri);
 		}
 		catch (URISyntaxException e) {
+			// Should not happen, because the URI was used in the Service before
 			throw new RuntimeException(e);
 		}
 	}
@@ -159,6 +160,7 @@ public class RESTProject implements LonghornProject {
 
 	@Override
 	public InputStream getOutputFilesAsZip() {
+		//TODO check if any files are available
 		try {
 			URI remoteFile = new URI(projUri + "/outputFiles.zip");
 			return remoteFile.toURL().openStream();

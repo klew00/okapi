@@ -38,6 +38,8 @@ import net.sf.okapi.common.filters.DefaultFilters;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.plugins.PluginsManager;
 import net.sf.okapi.filters.rainbowkit.Manifest;
+import net.sf.okapi.steps.rainbowkit.creation.ExtractionStep;
+import net.sf.okapi.steps.rainbowkit.creation.Parameters;
 import net.sf.okapi.steps.rainbowkit.postprocess.MergingStep;
 
 public class ProjectUtils {
@@ -125,6 +127,9 @@ public class ProjectUtils {
 		rainbowProject.setOutputRoot(WorkspaceUtils.getOutputDirPath(projId));
 		rainbowProject.setUseOutputRoot(true);
 		
+		// Adjust paths from specific steps
+		adjustStepsPaths(projId, pipelineWrapper);
+		
 		// Load mapping of filter configs to file extensions
 		HashMap<String, String> filterConfigByExtension = loadFilterConfigurationMapping(projId);
 
@@ -143,6 +148,24 @@ public class ProjectUtils {
 	}
 
 	/**
+	 * Adjusts input and output paths from specific steps
+	 * 
+	 * @param pipelineWrapper The pipeline wrapper with the pipeline to be executed
+	 */
+	private static void adjustStepsPaths(int projId, PipelineWrapper pipelineWrapper) {
+		for (StepInfo step : pipelineWrapper.getSteps()) {
+			// TKit Creation
+			if (step.stepClass.equals(ExtractionStep.class.getName())) {
+				Parameters tkitParams = new Parameters();
+				tkitParams.fromString(step.paramsData);
+				tkitParams.setPackageDirectory(WorkspaceUtils.getOutputDirPath(projId));
+				step.paramsData = tkitParams.toString();
+			}
+			//TODO TKit Merge
+		}
+	}
+
+	/**
 	 * @param pipelineWrapper The pipeline wrapper with the pipeline to execute
 	 * @return true if one of the step is the Rainbow TKit Merging Step, false otherwise
 	 */
@@ -150,7 +173,6 @@ public class ProjectUtils {
 		for (StepInfo step : pipelineWrapper.getSteps()) {
 			if (step.stepClass.equals(MergingStep.class.getName()))
 				return true;
-			
 		}
 		return false;
 	}
