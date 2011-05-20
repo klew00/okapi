@@ -635,18 +635,6 @@ public class PipelineWrapper {
 				peMapper.addDescriptionProvider("net.sf.okapi.steps.wordcount.common.Parameters", step.paramsClass);
 			}
 			availableSteps.put(step.id, step);
-			
-			ps = (IPipelineStep)Class.forName(
-					net.sf.okapi.steps.repetitionanalysis.RepetitionAnalysisStep.class.getName()).newInstance();
-			params = ps.getParameters();
-			step = new StepInfo(ps.getClass().getSimpleName(),
-				ps.getName(), ps.getDescription(), ps.getClass().getName(), null,
-				params.getClass().getName());
-			if ( params != null ) {
-				step.paramsData = params.toString();
-				peMapper.addDescriptionProvider(net.sf.okapi.steps.repetitionanalysis.Parameters.class.getName(), step.paramsClass);
-			}
-			availableSteps.put(step.id, step);
 
 			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.xmlcharfixing.XMLCharFixingStep").newInstance();
