@@ -1168,6 +1168,7 @@ public class MainForm { //implements IParametersProvider {
 		// Update the filters
 		fcMapper.addFromPlugins(pm); //TODO: Need to remove as well!!!
 		customFilterConfigsNeedUpdate = true;
+		fm.addConfigurations(fcMapper);
 		
 		// Update the steps
 		if ( wrapper != null ) {

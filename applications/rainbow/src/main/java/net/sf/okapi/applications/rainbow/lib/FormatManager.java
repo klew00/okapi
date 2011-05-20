@@ -21,9 +21,13 @@
 package net.sf.okapi.applications.rainbow.lib;
 
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Map;
 
+import net.sf.okapi.common.ListUtil;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.filters.FilterConfiguration;
+import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 
 public class FormatManager {
 
@@ -99,4 +103,21 @@ public class FormatManager {
 		return aRes;
 	}
 
+	public void addExtensionMapping(FilterConfiguration config) {
+		for (String ext: ListUtil.stringAsList(config.extensions, ";")) {
+			if (Util.isEmpty(ext)) continue;
+			if (pairs.containsKey(ext)) continue; // not to override explicitly set ones
+			
+			pairs.put(ext, config.configId);
+			System.out.println(ext + " = " + config.configId);
+		}
+	}
+	
+	public void addConfigurations(IFilterConfigurationMapper fcMapper) {
+		for (Iterator<FilterConfiguration> iterator = fcMapper.getAllConfigurations(); iterator.hasNext();) {
+			FilterConfiguration config = iterator.next();
+			addExtensionMapping(config);
+		}
+	}
+	
 }
