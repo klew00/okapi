@@ -32,7 +32,9 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
+import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.filters.rainbowkit.MergingInfo;
 import net.sf.okapi.steps.rainbowkit.common.IPackageWriter;
 
 @UsingParameters(Parameters.class)
@@ -117,6 +119,8 @@ public class ExtractionStep extends BasePipelineStep {
 			return handleEndBatch(event);
 		case START_DOCUMENT:
 			return handleStartDocument(event);
+		case RAW_DOCUMENT:
+			return handleRawDocument(event);
 		default:
 			return writer.handleEvent(event);
 		}
@@ -161,6 +165,18 @@ public class ExtractionStep extends BasePipelineStep {
 		writer.close();
 		writer = null;
 		return event;
+	}
+	
+	@Override
+	protected Event handleRawDocument (Event event) {
+		RawDocument rd = event.getRawDocument();
+
+		String tmpIn = rd.getInputURI().getPath();
+		String relativeInput = tmpIn.substring(inputRootDir.length()+1);
+		String relativeOutput = relativeInput; // Input and Output are the same for reference files
+		
+		writer.setDocumentInformation(relativeInput, "", "", "", relativeOutput, "", null);
+		return writer.handleEvent(event);
 	}
 	
 	@Override

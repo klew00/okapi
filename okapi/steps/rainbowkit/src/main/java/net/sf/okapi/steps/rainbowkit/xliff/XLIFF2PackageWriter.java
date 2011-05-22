@@ -22,6 +22,7 @@ package net.sf.okapi.steps.rainbowkit.xliff;
 
 import java.io.File;
 import java.util.List;
+import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.Util;
@@ -44,6 +45,7 @@ import net.sf.okapi.steps.rainbowkit.common.BasePackageWriter;
 
 public class XLIFF2PackageWriter extends BasePackageWriter {
 
+	private static final Logger LOGGER = Logger.getLogger(XLIFF2PackageWriter.class.getName());
 	private XLIFFWriter writer;
 
 	public XLIFF2PackageWriter () {
@@ -141,20 +143,37 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 		TextContainer trgTc = null;
 		if ( tu.hasTarget(manifest.getTargetLocale()) ) {
 			trgTc = tu.getTarget(manifest.getTargetLocale());
+			if ( trgTc.getSegments().count() != srcTc.getSegments().count() ) {
+				// Use un-segmented entry if we have different number of segments
+				LOGGER.warning(String.format("Text unit id='%s' has different number of segments in source and target.\n"
+					+"This entry will be output un-segmented.", tu.getId()));
+				srcTc = tu.getSource().clone(); srcTc.joinAll();
+				trgTc = tu.getTarget(manifest.getTargetLocale()).clone(); trgTc.joinAll();
+			}
 		}
 
-		for ( TextPart part : srcTc ) {
+		// Go through the parts: Use the source to drive the order
+		// But match on segment ids
+		TextPart part;
+		for ( int i=0; i<srcTc.count(); i++ ) {
+			part = srcTc.get(i);
 			if ( part.isSegment() ) {
 				Segment srcSeg = (Segment)part;
 				net.sf.okapi.lib.xliff.Segment xSeg = new net.sf.okapi.lib.xliff.Segment();
 				unit.add(xSeg);
 				xSeg.setSource(toXLIFF2Fragment(srcSeg.text));
 				xSeg.setId(srcSeg.getId());
+				
 				// Target
 				if ( trgTc != null ) {
 					Segment trgSeg = trgTc.getSegments().get(xSeg.getId());
 					if ( trgSeg != null ) {
 						xSeg.setTarget(toXLIFF2Fragment(trgSeg.text));
+						// Check if the order is the same as the source
+						if (( i >= trgTc.count() ) || ( !trgTc.get(i).equals(trgSeg) )) {
+							// Target is cross=aligned
+							xSeg.setTargetOrder(i);
+						}
 					}
 					// Alt-trans annotation?
 					AltTranslationsAnnotation ann = trgSeg.getAnnotation(AltTranslationsAnnotation.class);
@@ -169,6 +188,10 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 				Part xPart = new net.sf.okapi.lib.xliff.Part();
 				unit.add(xPart);
 				xPart.setSource(toXLIFF2Fragment(part.text));
+				// Target
+				if ( trgTc != null ) {
+					
+				}
 			}
 		}
 		

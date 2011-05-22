@@ -298,6 +298,16 @@ public class RainbowKitFilter implements IFilter {
 			file = new File(manifest.getTargetDirectory()+"contents.xini");
 			filter =  new XINIFilter(info.getRelativeInputPath());
 		}
+		else if ( info.getExtractionType().equals(Manifest.EXTRACTIONTYPE_NONE) ) {
+			// Reference file: just copy it to the output
+			String inputPath = manifest.getOriginalDirectory()+info.getRelativeInputPath();
+			String outputPath = manifest.getMergeDirectory()+info.getRelativeInputPath();
+			Util.copyFile(inputPath, outputPath, false);
+			// We send a no-operation event rather than call nextDocument() to avoid
+			// having nested calls that would keep going deeper 
+			queue.add(Event.NOOP_EVENT);
+			return;
+		}
 		else {
 			throw new OkapiIOException("Unsupported extraction type: "+info.getExtractionType());
 		}

@@ -899,6 +899,7 @@ public class PipelineWrapper {
 			rawDoc = new RawDocument(inpURI, prj.buildSourceEncoding(item),
 				prj.getSourceLanguage(), prj.getTargetLanguage());
 			rawDoc.setFilterConfigId(item.filterConfigId);
+			rawDoc.setId(Util.makeId(item.relativePath)); // Set the document ID based on its relative path
 			bic = new BatchItemContext(rawDoc, outURI, prj.buildTargetEncoding(item));
 			
 			// Add input/output data from other input lists if requested
@@ -918,6 +919,7 @@ public class PipelineWrapper {
 						rawDoc = new RawDocument(inpURI, prj.buildSourceEncoding(item),
 							prj.getSourceLanguage(), prj.getTargetLanguage());
 						rawDoc.setFilterConfigId(item2.filterConfigId);
+						rawDoc.setId(Util.makeId(item2.relativePath)); // Set the document ID based on its relative path
 						bic.add(rawDoc, outURI, prj.buildTargetEncoding(item2));
 					}
 					// If no entry for that list: it'll be null

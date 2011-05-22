@@ -188,17 +188,18 @@ public class MergingInfo implements IAnnotation {
 		tmp = element.getAttribute("extractionType");
 		if ( tmp.isEmpty() ) throw new OkapiIOException(String.format(INVALIDVALUE, "extractionType"));
 		info.extractionType = tmp;
+		boolean noExtraction = tmp.equals(Manifest.EXTRACTIONTYPE_NONE);
 		
 		tmp = element.getAttribute("relativeInputPath");
 		if ( tmp.isEmpty() ) throw new OkapiIOException(String.format(INVALIDVALUE, "relativeInputPath"));
 		info.relativeInputPath = tmp;
 		
 		tmp = element.getAttribute("filterId");
-		if ( tmp.isEmpty() ) throw new OkapiIOException(String.format(INVALIDVALUE, "filterId"));
+		if ( tmp.isEmpty() && !noExtraction ) throw new OkapiIOException(String.format(INVALIDVALUE, "filterId"));
 		info.filterId = tmp;
 		
 		tmp = element.getAttribute("inputEncoding");
-		if ( tmp.isEmpty() ) throw new OkapiIOException(String.format(INVALIDVALUE, "inputEncoding"));
+		if ( tmp.isEmpty() && !noExtraction ) throw new OkapiIOException(String.format(INVALIDVALUE, "inputEncoding"));
 		info.inputEncoding = tmp;
 		
 		tmp = element.getAttribute("relativeTargetPath");
@@ -206,7 +207,7 @@ public class MergingInfo implements IAnnotation {
 		info.relativeTargetPath = tmp;
 		
 		tmp = element.getAttribute("targetEncoding");
-		if ( tmp.isEmpty() ) info.targetEncoding = info.inputEncoding;
+		if ( tmp.isEmpty() && !noExtraction ) info.targetEncoding = info.inputEncoding;
 		else info.targetEncoding = tmp;
 		
 		tmp = element.getAttribute("selected");

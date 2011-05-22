@@ -110,7 +110,6 @@ public class MIFFilter implements IFilter {
 	private int inBlock;
 	private int blockLevel;
 	private String version;
-	private String sdId;
 	private int paraLevel;
 //	private StringBuilder paraBuf;
 	private StringBuilder paraSkelBuf;
@@ -295,9 +294,7 @@ public class MIFFilter implements IFilter {
 		rowGroupLevel = -1;
 		cellGroupLevel = -1;
 		fnoteGroupLevel = -1;
-		sdId = "sd1";
 		parentIds = new Stack<String>();
-		parentIds.push(sdId);
 		encoder = new MIFEncoder();
 		decodingErrors = 0;
 		footnotesLevel = -1;
@@ -350,7 +347,11 @@ public class MIFFilter implements IFilter {
 			// But we do call guessEncoding to handle the possible BOM
 			bomAwareInput = guessEncoding(input);
 			reader = new BufferedReader(new InputStreamReader(bomAwareInput, decoder));
+			
 			initialize();
+			String sdId = rd.getId();
+			if ( Util.isEmpty(sdId) ) sdId = "sd1";
+			parentIds.push(sdId);
 			
 			// Compile code finder rules
 			if ( params.getUseCodeFinder() ) {

@@ -25,6 +25,7 @@ public class Part {
 	protected String id;
 	protected Fragment source;
 	protected Fragment target;
+	protected int targetOrder;
 	
 	public Part () {
 		source = new Fragment();
@@ -66,6 +67,10 @@ public class Part {
 	public Fragment setTarget (Fragment fragment) {
 		target = fragment;
 		return target;
+	}
+	
+	public void setTargetOrder (int targetOrder) {
+		this.targetOrder = targetOrder;
 	}
 	
 }

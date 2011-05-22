@@ -35,6 +35,7 @@ import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.filterwriter.TMXWriter;
 import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
@@ -121,6 +122,9 @@ public abstract class BasePackageWriter implements IPackageWriter {
 			break;
 		case START_BATCH_ITEM:
 			processStartBatchItem();
+			break;
+		case RAW_DOCUMENT:
+			processRawDocument(event);
 			break;
 		case END_BATCH_ITEM:
 			processEndBatchItem();
@@ -303,6 +307,17 @@ public abstract class BasePackageWriter implements IPackageWriter {
 	protected void processEndBatchItem () {
 		// Do nothing by default
 	}
+	
+	protected void processRawDocument (Event event) {
+		String ori = manifest.getOriginalDirectory();
+		if ( Util.isEmpty(ori) ) return; // No copy to be done
+		
+		// Else: copy the original
+		MergingInfo info = manifest.getItem(docId);
+		String inputPath = manifest.getInputRoot() + info.getRelativeInputPath();
+		String outputPath = ori + info.getRelativeInputPath();
+		Util.copyFile(inputPath, outputPath, false);
+	}
 
 	@Override
 	public void setDocumentInformation (String relativeInputPath,
@@ -313,15 +328,19 @@ public abstract class BasePackageWriter implements IPackageWriter {
 		String targetEncoding,
 		ISkeletonWriter skelWriter)
 	{
-		this.skelWriter = skelWriter;
-		String res[] = FilterConfigurationMapper.splitFilterFromConfiguration(filterConfigId);
-		manifest.addDocument(++docId, extractionType, relativeInputPath, res[0], filterParameters,
-			inputEncoding, relativeTargetPath, targetEncoding);
+		if ( Util.isEmpty(filterConfigId) ) {
+			manifest.addDocument(++docId, Manifest.EXTRACTIONTYPE_NONE, relativeInputPath, "", filterParameters,
+				inputEncoding, relativeTargetPath, targetEncoding);
+		}
+		else {
+			this.skelWriter = skelWriter;
+			String res[] = FilterConfigurationMapper.splitFilterFromConfiguration(filterConfigId);
+			manifest.addDocument(++docId, extractionType, relativeInputPath, res[0], filterParameters,
+				inputEncoding, relativeTargetPath, targetEncoding);
+		}
 	}
 	
 	protected void processStartDocument (Event event) {
-		// Call setDocumentInformation first
-		
 		String ori = manifest.getOriginalDirectory();
 		if ( Util.isEmpty(ori) ) return; // No copy to be done
 		

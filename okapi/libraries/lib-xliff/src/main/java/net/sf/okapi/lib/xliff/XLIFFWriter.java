@@ -120,11 +120,13 @@ public class XLIFFWriter {
 		writer.print(">"+lb);
 		if ( isIndented ) indent += " ";
 		
+		int sequence = 0;
 		for ( Part part : unit ) {
 			Segment seg = null;
 			if ( part instanceof Segment ) {
 				seg = (Segment)part;
 			}
+			sequence++;
 			
 			if ( seg != null ) writer.print(indent+"<segment>"+lb);
 			else writer.print(indent+"<ignorable>"+lb);
@@ -132,10 +134,11 @@ public class XLIFFWriter {
 			if ( isIndented ) indent += " ";
 			
 			// Source
-			writeFragment("source", part.getSource());
+			writeFragment("source", part.getSource(), -1);
 			// Target
 			if ( part.hasTarget() ) {
-				writeFragment("target", part.getTarget());
+				writeFragment("target", part.getTarget(),
+					(part.targetOrder!=sequence ? part.targetOrder : 0));
 			}
 			
 			if ( seg != null ) {
@@ -146,8 +149,8 @@ public class XLIFFWriter {
 					for ( Alternate alt : seg.getCandidates() ) {
 						writer.print(indent+"<match>"+lb);
 						if ( isIndented ) indent += " ";
-						writeFragment("source", alt.getSource());
-						writeFragment("target", alt.getTarget());
+						writeFragment("source", alt.getSource(), -1);
+						writeFragment("target", alt.getTarget(), -1);
 						if ( isIndented ) indent = indent.substring(1);
 						writer.print(indent+"</match>"+lb);
 					}
@@ -212,9 +215,15 @@ public class XLIFFWriter {
 	}
 	
 	private void writeFragment (String name,
-		Fragment fragment)
+		Fragment fragment,
+		int order)
 	{
-		writer.print(indent+"<"+name+">");
+		if ( order > 0 ) {
+			writer.print(indent+String.format("<%s order=\"%d\">", name, order));
+		}
+		else {
+			writer.print(indent+"<"+name+">");
+		}
 		writer.print(fragment.getString(style));
 		writer.print("</"+name+">"+lb);
 	}
