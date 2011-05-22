@@ -105,6 +105,10 @@ public class TransifexPackageWriter extends BasePackageWriter {
 			}
 			for ( int id : manifest.getItems().keySet() ) {
 				MergingInfo info = manifest.getItem(id);
+				
+				// Skip non-extracted files
+				if ( info.getExtractionType().equals(Manifest.EXTRACTIONTYPE_NONE) ) continue;
+				
 				String poPath = manifest.getSourceDirectory() + info.getRelativeInputPath() + ".po";
 				
 				// Compute the resource filename to use in Transifex
