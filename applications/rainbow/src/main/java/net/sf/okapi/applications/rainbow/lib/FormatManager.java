@@ -103,17 +103,16 @@ public class FormatManager {
 		return aRes;
 	}
 
-	public void addExtensionMapping(FilterConfiguration config) {
+	public void addExtensionMapping (FilterConfiguration config) {
 		for (String ext: ListUtil.stringAsList(config.extensions, ";")) {
 			if (Util.isEmpty(ext)) continue;
 			if (pairs.containsKey(ext)) continue; // not to override explicitly set ones
-			
 			pairs.put(ext, config.configId);
-			System.out.println(ext + " = " + config.configId);
+//			System.out.println(ext + " = " + config.configId);
 		}
 	}
 	
-	public void addConfigurations(IFilterConfigurationMapper fcMapper) {
+	public void addConfigurations (IFilterConfigurationMapper fcMapper) {
 		for (Iterator<FilterConfiguration> iterator = fcMapper.getAllConfigurations(); iterator.hasNext();) {
 			FilterConfiguration config = iterator.next();
 			addExtensionMapping(config);

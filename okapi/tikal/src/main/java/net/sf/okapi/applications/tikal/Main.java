@@ -355,7 +355,12 @@ public class Main {
 				}
 				else if ( arg.equals("-tt") ) {
 					prog.useTransToolkit = true;
-					prog.transToolkitParams = prog.getArgument(args, ++i);
+					prog.transToolkitParams = "amagama.locamotion.org:80";
+					if ( args.size() > i+1 ) {
+						if ( !args.get(i+1).startsWith("-") ) {
+							prog.transToolkitParams = args.get(++i);
+						}
+					}
 				}
 				else if ( arg.equals("-gs") ) {
 					prog.useGlobalSight = true;
@@ -1002,7 +1007,7 @@ public class Main {
 		ps.println("   -e [[-fc] configId]");
 		ps.println("Extracts a file to XLIFF (and optionally segment and pre-translate):");
 		ps.println("   -x inputFile [inputFile2...] [-fc configId] [-ie encoding] [-sl srcLang]");
-		ps.println("      [-tl trgLang] [-seg [srxFile]] [-tt hostname[:port]-mm key");
+		ps.println("      [-tl trgLang] [-seg [srxFile]] [-tt [hostname[:port]]|-mm key");
 		ps.println("      |-pen tmDirectory|-gs configFile|-google|-apertium [serverURL]");
 		ps.println("      |-ms configFile|-tda configFile] [-maketmx [tmxFile]] [-opt threshold]");
 		ps.println("      [-nocopy] [-noalttrans]");
@@ -1011,7 +1016,7 @@ public class Main {
 		ps.println("      [-oe encoding] [-sl srcLang] [-tl trgLang]");
 		ps.println("Translates a file:");
 		ps.println("   -t inputFile [inputFile2...] [-fc configId] [-ie encoding] [-oe encoding]");
-		ps.println("      [-sl srcLang] [-tl trgLang] [-seg [srxFile]] [-tt hostname[:port]");
+		ps.println("      [-sl srcLang] [-tl trgLang] [-seg [srxFile]] [-tt [hostname[:port]]");
 		ps.println("      |-mm key|-pen tmDirectory|-gs configFile|-google|-apertium [serverURL]");
 		ps.println("      |-ms configFile|-tda configFile] [-maketmx [tmxFile]] [-opt threshold]");
 		ps.println("Extracts a file to Moses InlineText:");
@@ -1025,7 +1030,7 @@ public class Main {
 		ps.println("      [-sl srcLang] [-tl trgLang] [-seg [srxFile]]");
 		ps.println("Queries translation resources:");
 		ps.println("   -q \"source text\" [-sl srcLang] [-tl trgLang] [-google] [-opentran]");
-		ps.println("      [-tt hostname[:port]] [-mm key] [-pen tmDirectory] [-gs configFile]");
+		ps.println("      [-tt [hostname[:port]]] [-mm key] [-pen tmDirectory] [-gs configFile]");
 		ps.println("      [-apertium [serverURL]] [-ms configFile] [-tda configFile]");
 		ps.println("      [-opt threshold[:maxhits]]");
 		ps.println("Converts to PO format:");

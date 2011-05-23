@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -22,13 +22,19 @@ package net.sf.okapi.connectors.translatetoolkit;
 
 import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.ParametersDescription;
+import net.sf.okapi.common.uidescription.CheckboxPart;
 import net.sf.okapi.common.uidescription.EditorDescription;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
+	private static final String HOST = "host";
+	private static final String PORT = "port";
+	private static final String SUPPORTCODES = "supportCodes";
+	
 	private String host;
 	private int port;
+	private boolean supportCodes;
 	
 	public Parameters () {
 		reset();
@@ -43,21 +49,24 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
-		host = buffer.getString("host", host);
-		port = buffer.getInteger("port", port);
+		host = buffer.getString(HOST, host);
+		port = buffer.getInteger(PORT, port);
+		supportCodes = buffer.getBoolean(SUPPORTCODES, supportCodes);
 	}
 
 	@Override
 	public void reset () {
-		host = "localhost";
-		port = 8080;
+		host = "amagama.locamotion.org"; //"localhost";
+		port = 80; //8080;
+		supportCodes = false; 
 	}
 
 	@Override
 	public String toString () {
 		buffer.reset();
-		buffer.setString("host", host);
-		buffer.setInteger("port", port);
+		buffer.setString(HOST, host);
+		buffer.setInteger(PORT, port);
+		buffer.setBoolean(SUPPORTCODES, supportCodes);
 		return buffer.toString();
 	}
 
@@ -77,21 +86,30 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.port = port;
 	}
 
+	public boolean getSupportCodes () {
+		return supportCodes;
+	}
+
+	public void setSupportCodes (boolean supportCodes) {
+		this.supportCodes = supportCodes;
+	}
+
 	@Override
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
-		desc.add("host",
-			"Host", "The host name of the TM server (e.g. localhost)");
-		desc.add("port",
-			"Port", "The port number of the TM server (e.g. 8080)");
+		desc.add(HOST, "Host", "The host name of the TM server (e.g. localhost)");
+		desc.add(PORT, "Port", "The port number of the TM server (e.g. 8080)");
+		desc.add(SUPPORTCODES, "Inline codes are letter-coded (e.g. <x1/><g2></g2>)", null);
 		return desc;
 	}
 
 	@Override
 	public EditorDescription createEditorDescription (ParametersDescription paramsDesc) {
 		EditorDescription desc = new EditorDescription("Translation Toolkit TM Connector Settings");
-		desc.addTextInputPart(paramsDesc.get("host"));
-		desc.addTextInputPart(paramsDesc.get("port"));
+		desc.addTextInputPart(paramsDesc.get(HOST));
+		desc.addTextInputPart(paramsDesc.get(PORT));
+		CheckboxPart cbp = desc.addCheckboxPart(paramsDesc.get(SUPPORTCODES));
+		cbp.setVertical(true);
 		return desc;
 	}
 

@@ -34,7 +34,6 @@ import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
-import net.sf.okapi.filters.rainbowkit.MergingInfo;
 import net.sf.okapi.steps.rainbowkit.common.IPackageWriter;
 
 @UsingParameters(Parameters.class)

@@ -39,6 +39,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
+import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.BaseConnector;
@@ -54,9 +55,11 @@ public class TranslateToolkitTMConnector extends BaseConnector implements ITMQue
 	private int maxHits = 25;
 	private int threshold = 60;
 	private JSONParser parser;
+	private GenericContent fmt;
 	
 	public TranslateToolkitTMConnector () {
 		params = new Parameters();
+		fmt = new GenericContent();
 	}
 	
 	@Override
@@ -104,14 +107,73 @@ public class TranslateToolkitTMConnector extends BaseConnector implements ITMQue
 
 	@Override
 	public int query (String plainText) {
+		return query(new TextFragment(plainText));
+//		
+//		results = new ArrayList<QueryResult>();
+//		current = -1;
+//		if ( Util.isEmpty(plainText) ) {
+//			return 0;
+//		}
+//		try {
+//			URL url = new URL(baseURL + srcCode + "/" + trgCode + "/unit/"
+//				+ URLEncoder.encode(plainText, "UTF-8").replace("+", "%20"));
+//			URLConnection conn = url.openConnection();
+//
+//			// Get the response
+//	        JSONArray array = (JSONArray)parser.parse(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+//			QueryResult qr;
+//	        for ( int i=0; i<array.size(); i++ ) {
+//	        	if ( i >= maxHits ) break; // Stop at maxHits
+//	        	@SuppressWarnings("unchecked")
+//	        	Map<String, Object> map = (Map<String, Object>)array.get(i);
+//	        	qr = new QueryResult();
+//	        	qr.weight = getWeight();
+//	        	qr.score = ((Double)map.get("quality")).intValue();
+//	        	if ( qr.score < threshold ) break; // Done
+//	        	qr.source = new TextFragment((String)map.get("source"));
+//	        	qr.target = new TextFragment((String)map.get("target"));
+//	        	// Set match type
+//				if ( qr.score >= 100 ) qr.matchType = MatchType.EXACT;
+//				else if ( qr.score > 0 ) qr.matchType = MatchType.FUZZY;
+//	        	results.add(qr);
+//	        }
+//			if ( results.size() > 0 ) current = 0;
+//			return results.size();
+//		}
+//		catch ( MalformedURLException e ) {
+//			throw new RuntimeException("Error when querying.", e);
+//		}
+//		catch ( UnsupportedEncodingException e ) {
+//			throw new RuntimeException("Error when querying.", e);
+//		}
+//		catch ( IOException e ) {
+//			throw new RuntimeException("Error when querying.", e);
+//		}
+//		catch ( ParseException e ) {
+//			throw new RuntimeException("Error when parsing JSON results.", e);
+//		}
+	}
+
+	@Override
+	public int query (TextFragment text) {
+		// Otherwise, treat the codes depending on the mode
+		String plain;
+		if ( text.hasCode() && params.getSupportCodes() ) {
+			plain = fmt.fromFragmentToLetterCoded(text);
+		}
+		else {
+			plain = text.getCodedText();
+		}
+		
 		results = new ArrayList<QueryResult>();
 		current = -1;
-		if ( Util.isEmpty(plainText) ) {
+		if ( Util.isEmpty(plain) ) {
 			return 0;
 		}
+		
 		try {
 			URL url = new URL(baseURL + srcCode + "/" + trgCode + "/unit/"
-				+ URLEncoder.encode(plainText, "UTF-8").replace("+", "%20"));
+				+ URLEncoder.encode(plain, "UTF-8").replace("+", "%20"));
 			URLConnection conn = url.openConnection();
 
 			// Get the response
@@ -125,8 +187,16 @@ public class TranslateToolkitTMConnector extends BaseConnector implements ITMQue
 	        	qr.weight = getWeight();
 	        	qr.score = ((Double)map.get("quality")).intValue();
 	        	if ( qr.score < threshold ) break; // Done
-	        	qr.source = new TextFragment((String)map.get("source"));
-	        	qr.target = new TextFragment((String)map.get("target"));
+	        	
+	        	if ( text.hasCode() && params.getSupportCodes() ) {
+	        		qr.source = fmt.fromLetterCodedToFragment((String)map.get("source"), null);
+	        		qr.target = fmt.fromLetterCodedToFragment((String)map.get("target"), null);
+	        	}
+	        	else {
+	        		qr.source = new TextFragment((String)map.get("source"));
+	        		qr.target = new TextFragment((String)map.get("target"));
+	        	}
+
 	        	// Set match type
 				if ( qr.score >= 100 ) qr.matchType = MatchType.EXACT;
 				else if ( qr.score > 0 ) qr.matchType = MatchType.FUZZY;
@@ -147,13 +217,6 @@ public class TranslateToolkitTMConnector extends BaseConnector implements ITMQue
 		catch ( ParseException e ) {
 			throw new RuntimeException("Error when parsing JSON results.", e);
 		}
-	}
-
-	@Override
-	public int query (TextFragment text) {
-		//TODO: Deal with inline codes, maybe using generic codes
-		String tmp = text.getCodedText();
-		return query(tmp);
 	}
 	
 	@Override

@@ -48,7 +48,6 @@ import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.ITextUnit;
-import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 /**
