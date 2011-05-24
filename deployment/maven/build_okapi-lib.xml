@@ -188,14 +188,8 @@
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi/connectors/microsoft/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../okapi/connectors/crosslanguage/target/classes"
-			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi/connectors/tda/target/classes"
 			 excludes="**/META-INF/**"/>
-<!--not ready yet
-			<fileset dir="../../okapi/connectors/promt/target/classes"
-			 excludes="**/META-INF/**"/>
--->
 
 			 <!-- steps -->
 			<fileset dir="../../okapi/steps/bomconversion/target/classes"

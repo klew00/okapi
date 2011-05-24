@@ -15,7 +15,7 @@ public class DefaultConnectors implements IConnectorList {
 	// Temporary hard-coded mapping
 	private void setDefaultMapping () {
 		ConnectorInfo trc = new ConnectorInfo();
-		trc.description = "Pensieve TM Engine (Beta)";
+		trc.description = "Pensieve TM Engine";
 		trc.connectorClass = "net.sf.okapi.connectors.pensieve.PensieveTMConnector";
 		trc.descriptionProviderClass = "net.sf.okapi.connectors.pensieve.Parameters";
 		list.add(trc);
@@ -38,7 +38,7 @@ public class DefaultConnectors implements IConnectorList {
 		list.add(trc);
 		
 		trc = new ConnectorInfo();
-		trc.description = "MyMemory TM Web Services (Beta connector)";
+		trc.description = "MyMemory TM Web Services";
 		trc.connectorClass = "net.sf.okapi.connectors.mymemory.MyMemoryTMConnector";
 		trc.descriptionProviderClass = "net.sf.okapi.connectors.mymemory.Parameters";
 		list.add(trc);
@@ -73,11 +73,13 @@ public class DefaultConnectors implements IConnectorList {
 //		trc.descriptionProviderClass = "net.sf.okapi.connectors.promt.Parameters";
 //		list.add(trc);
 //
-		trc = new ConnectorInfo();
-		trc.description = "CrossLanguage MT Server (Beta connector)";
-		trc.connectorClass = "net.sf.okapi.connectors.crosslanguage.CrossLanguageMTConnector";
-		trc.descriptionProviderClass = "net.sf.okapi.connectors.crosslanguage.Parameters";
-		list.add(trc);
+
+// Not ready		
+//		trc = new ConnectorInfo();
+//		trc.description = "CrossLanguage MT Server (Beta connector)";
+//		trc.connectorClass = "net.sf.okapi.connectors.crosslanguage.CrossLanguageMTConnector";
+//		trc.descriptionProviderClass = "net.sf.okapi.connectors.crosslanguage.Parameters";
+//		list.add(trc);
 
 //Implement concordance search only for now
 //		trc = new ConnectorInfo();
