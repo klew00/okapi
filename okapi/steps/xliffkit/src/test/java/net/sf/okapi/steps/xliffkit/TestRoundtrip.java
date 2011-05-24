@@ -16,6 +16,7 @@ import net.sf.okapi.lib.extra.pipelinebuilder.XBatchItem;
 import net.sf.okapi.lib.extra.pipelinebuilder.XParameter;
 import net.sf.okapi.lib.extra.pipelinebuilder.XPipeline;
 import net.sf.okapi.lib.extra.pipelinebuilder.XPipelineStep;
+import net.sf.okapi.lib.extra.steps.EventListBuilderStep;
 import net.sf.okapi.lib.extra.steps.EventLogger;
 import net.sf.okapi.lib.extra.steps.TextUnitLogger;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
