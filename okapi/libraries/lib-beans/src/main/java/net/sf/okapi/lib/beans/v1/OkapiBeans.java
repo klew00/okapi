@@ -26,6 +26,7 @@ import java.util.zip.ZipFile;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Range;
 import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
@@ -66,6 +67,7 @@ import net.sf.okapi.lib.persistence.NamespaceMapper;
 import net.sf.okapi.lib.persistence.VersionMapper;
 import net.sf.okapi.lib.persistence.beans.TypeInfoBean;
 import net.sf.okapi.steps.formatconversion.TableFilterWriter;
+import net.sf.okapi.steps.repetitionanalysis.RepetitiveSegmentAnnotation;
 import net.sf.okapi.steps.tokenization.common.InputTokenAnnotation;
 import net.sf.okapi.steps.tokenization.common.Lexem;
 import net.sf.okapi.steps.tokenization.common.Token;
@@ -114,6 +116,7 @@ public class OkapiBeans implements IVersionDriver {
 		beanMapper.registerBean(ZipFilterWriter.class, ZipFilterWriterBean.class);
 		beanMapper.registerBean(Token.class, TokenBean.class);
 		beanMapper.registerBean(Lexem.class, LexemBean.class);
+		beanMapper.registerBean(LocaleId.class, LocaleIdBean.class);
 		beanMapper.registerBean(AltTranslation.class, AltTranslationBean.class);
 		// Registered here to require dependencies at compile-time
 		beanMapper.registerBean(OpenXMLZipFilterWriter.class, TypeInfoBean.class); 		
@@ -129,6 +132,7 @@ public class OkapiBeans implements IVersionDriver {
 		beanMapper.registerBean(SubFilterAnnotation.class, SubFilterAnnotationBean.class);
 		beanMapper.registerBean(TargetPropertiesAnnotation.class, TargetPropertiesAnnotationBean.class);
 		beanMapper.registerBean(TokensAnnotation.class, TokensAnnotationBean.class);
+		beanMapper.registerBean(RepetitiveSegmentAnnotation.class, RepetitiveSegmentAnnotationBean.class);
 		//beanMapper.registerBean(.class, Bean.class);
 		
 		VersionMapper.mapVersionId("1.0", VERSION);

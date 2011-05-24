@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.lib.beans.v2;
+package net.sf.okapi.lib.beans.v1;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.lib.persistence.IPersistenceSession;
