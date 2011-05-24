@@ -91,6 +91,11 @@ public class TextUnitLogger extends BasePipelineStep {
 			}		
 		}
 		
+		if (tu.getSkeleton() != null) {
+			sb.append(String.format("      Skeleton: %s", tu.getSkeleton().toString()));
+			sb.append("\n");
+		}		
+		
 		sb.append(String.format("      Source (%s): %s", srcLoc, tu.getSource()));
 		sb.append("\n");
 		
@@ -110,7 +115,7 @@ public class TextUnitLogger extends BasePipelineStep {
 		
 		ISegments segs = source.getSegments(); 
 		for (Segment seg : segs) {
-			sb.append(String.format("         %s: %s", seg.getId(), seg.getContent()));
+			sb.append(String.format("         %s: %s", seg.getId(), seg.getContent().toText()));
 			sb.append("\n");
 			if (seg.getAnnotations() != null) {
 //				sb.append("Source annotations:");
@@ -145,7 +150,7 @@ public class TextUnitLogger extends BasePipelineStep {
 			
 			segs = target.getSegments(); 
 			for (Segment seg : segs) {
-				sb.append(String.format("         %s: %s", seg.getId(), seg.getContent()));
+				sb.append(String.format("         %s: %s", seg.getId(), seg.getContent().toText()));
 				sb.append("\n");
 				if (seg.getAnnotations() != null) {
 //					sb.append("Target annotations:");

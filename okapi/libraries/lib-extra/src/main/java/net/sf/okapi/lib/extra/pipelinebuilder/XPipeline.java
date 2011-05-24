@@ -38,11 +38,6 @@ public class XPipeline extends net.sf.okapi.common.pipeline.Pipeline implements 
 	private PipelineDriver pd;
 	private FilterConfigurationMapper fcMapper;
 	
-	{
-		fcMapper = new FilterConfigurationMapper();
-		DefaultFilters.setMappings(fcMapper, true, true);		
-	}
-	
 	public XPipeline(String description, IPipeline pipeline) {
 		this(description, pipeline.getSteps().toArray(new IPipelineStep[] {}));
 		this.setId(pipeline.getId());
@@ -75,6 +70,12 @@ public class XPipeline extends net.sf.okapi.common.pipeline.Pipeline implements 
 		this(description, batch, XPipelineType.SEQUENTIAL, steps);
 	}
 	
+	public XPipeline(String description, XFilters filters, XBatch batch, IPipelineStep... steps) {		
+		this(description, XPipelineType.SEQUENTIAL, false, steps);
+		this.fcMapper = filters.getFcMapper();
+		setBatch(batch);
+	}
+	
 	public XPipeline(String description, XBatch batch, XPipelineType type, IPipelineStep... steps) {
 		this(description, type, false, steps);
 		setBatch(batch);		
@@ -89,7 +90,11 @@ public class XPipeline extends net.sf.okapi.common.pipeline.Pipeline implements 
 				pd.addStep(((XPipelineStep) step).getStep());
 			else
 				pd.addStep(step);
-						
+		
+		if (fcMapper == null) {
+			fcMapper = new FilterConfigurationMapper();
+			DefaultFilters.setMappings(fcMapper, true, true);
+		}
 		pd.setFilterConfigurationMapper(fcMapper);
 		
 		if (batch == null) return;
