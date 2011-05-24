@@ -596,7 +596,7 @@ public class IDMLFilter implements IFilter {
 		while ( node != null ) {
 			switch ( node.getNodeType() ) {
 			case Node.TEXT_NODE:
-				tf.append(node.getNodeValue());
+				processText(tf, node.getNodeValue());
 				break;
 			case Node.PROCESSING_INSTRUCTION_NODE:
 				ProcessingInstruction pi = (ProcessingInstruction)node;
@@ -608,6 +608,56 @@ public class IDMLFilter implements IFilter {
 			node = node.getNextSibling();
 		}
 		return tf;
+	}
+
+	static void processText (TextFragment dest,
+		String text)
+	{
+		for ( int i=0; i<text.length(); i++ ) {
+			char ch = text.charAt(i);
+			switch ( ch ) {
+			case '\u2028': // Forced line-break
+				dest.append(TagType.PLACEHOLDER, "lb", String.valueOf(ch));
+				break;
+			case '\u200b': // Discretionary line-break
+				dest.append(TagType.PLACEHOLDER, "lb-disc", String.valueOf(ch));
+				break;
+			case '\u2011': // Non-breaking hyphen
+				dest.append(TagType.PLACEHOLDER, "nb-hyph", String.valueOf(ch));
+				break;
+			case '\u202f': // Fixed-width non-breaking space
+				dest.append(TagType.PLACEHOLDER, "nbsp-fw", String.valueOf(ch));
+				break;
+			case '\u200a': // Hair space
+				dest.append(TagType.PLACEHOLDER, "sp-hair", String.valueOf(ch));
+				break;
+			case '\u2006': // Sixth space
+				dest.append(TagType.PLACEHOLDER, "sp-6th", String.valueOf(ch));
+				break;
+			case '\u2005': // Thin space
+				dest.append(TagType.PLACEHOLDER, "sp-4th", String.valueOf(ch));
+				break;
+			case '\u2004': // Quarter space
+				dest.append(TagType.PLACEHOLDER, "sp-3rd", String.valueOf(ch));
+				break;
+			case '\u2008': // Punctuation space
+				dest.append(TagType.PLACEHOLDER, "sp-punc", String.valueOf(ch));
+				break;
+			case '\u2009': // Thin space
+				dest.append(TagType.PLACEHOLDER, "sp-thin", String.valueOf(ch));
+				break;
+			case '\u2007': // Figure space
+				dest.append(TagType.PLACEHOLDER, "sp-fig", String.valueOf(ch));
+				break;
+			case '\u2001': // Flush space
+				dest.append(TagType.PLACEHOLDER, "sp-flush", String.valueOf(ch));
+				break;
+			default:
+				dest.append(ch);
+				break;
+			}
+			
+		}
 	}
 
 }
