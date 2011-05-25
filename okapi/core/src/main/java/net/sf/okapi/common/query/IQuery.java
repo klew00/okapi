@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.lib.translation;
+package net.sf.okapi.common.query;
 
 import java.util.List;
 

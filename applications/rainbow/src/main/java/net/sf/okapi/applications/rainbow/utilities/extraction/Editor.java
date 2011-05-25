@@ -96,7 +96,7 @@ public class Editor implements IParametersEditor {
 			this.projectDir = context.getString("projDir");
 			this.params = (Parameters)params;
 			shell = new Shell((Shell)context.getObject("shell"), SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
-			connectors = new DefaultConnectors();
+			connectors = DefaultConnectors.getConnectors();
 	
 			this.context = context;
 			create((Shell)context.getObject("shell"), readOnly);

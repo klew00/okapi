@@ -3,8 +3,8 @@ package net.sf.okapi.connectors.microsoft;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
-import net.sf.okapi.lib.translation.IQuery;
-import net.sf.okapi.lib.translation.QueryResult;
+import net.sf.okapi.common.query.IQuery;
+import net.sf.okapi.common.query.QueryResult;
 
 public class Manual {
 

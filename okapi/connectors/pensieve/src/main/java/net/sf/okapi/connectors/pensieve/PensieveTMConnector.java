@@ -27,7 +27,7 @@ import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.BaseConnector;
 import net.sf.okapi.lib.translation.ITMQuery;
-import net.sf.okapi.lib.translation.QueryResult;
+import net.sf.okapi.common.query.QueryResult;
 import net.sf.okapi.tm.pensieve.common.Metadata;
 import net.sf.okapi.tm.pensieve.common.MetadataType;
 import net.sf.okapi.tm.pensieve.common.TmHit;

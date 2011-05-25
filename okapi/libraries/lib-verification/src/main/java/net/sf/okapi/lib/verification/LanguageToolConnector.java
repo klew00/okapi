@@ -39,7 +39,7 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.connectors.google.GoogleMTConnector;
-import net.sf.okapi.lib.translation.IQuery;
+import net.sf.okapi.common.query.IQuery;
 
 public class LanguageToolConnector {
 

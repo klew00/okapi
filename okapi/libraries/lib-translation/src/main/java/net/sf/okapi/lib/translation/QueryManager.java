@@ -29,6 +29,8 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.query.IQuery;
+import net.sf.okapi.common.query.QueryResult;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;

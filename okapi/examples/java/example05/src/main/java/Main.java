@@ -20,8 +20,8 @@
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.lib.translation.ITMQuery;
-import net.sf.okapi.lib.translation.IQuery;
-import net.sf.okapi.lib.translation.QueryResult;
+import net.sf.okapi.common.query.IQuery;
+import net.sf.okapi.common.query.QueryResult;
 import net.sf.okapi.connectors.opentran.OpenTranTMConnector;
 import net.sf.okapi.connectors.apertium.ApertiumMTConnector;
 

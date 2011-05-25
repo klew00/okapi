@@ -12,7 +12,7 @@ import net.sf.okapi.common.ui.InputDialog;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.filters.tmx.TmxFilter;
 import net.sf.okapi.lib.translation.QueryManager;
-import net.sf.okapi.lib.translation.QueryResult;
+import net.sf.okapi.common.query.QueryResult;
 import net.sf.okapi.tm.pensieve.tmx.OkapiTmxImporter;
 import net.sf.okapi.tm.pensieve.writer.ITmWriter;
 import net.sf.okapi.tm.pensieve.writer.TmWriterFactory;

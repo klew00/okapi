@@ -7,6 +7,7 @@ public class DefaultConnectors implements IConnectorList {
 
 	private ArrayList<ConnectorInfo> list;
 	
+	@Deprecated 
 	public DefaultConnectors () {
 		list = new ArrayList<ConnectorInfo>();
 		setDefaultMapping();
@@ -93,4 +94,16 @@ public class DefaultConnectors implements IConnectorList {
 		return list;
 	}
 
+	private static IConnectorList connectors;
+	static {
+		connectors = new DefaultConnectors();
+	}
+	
+	public static void setConnectors(IConnectorList connectors) {
+		DefaultConnectors.connectors = connectors;
+	}
+
+	public static IConnectorList getConnectors() {
+		return connectors;
+	}
 }

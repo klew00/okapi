@@ -1,4 +1,4 @@
-package net.sf.okapi.lib.translation;
+package net.sf.okapi.common.query;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -12,6 +12,7 @@ import java.util.List;
 import junit.framework.Assert;
 
 import net.sf.okapi.common.query.MatchType;
+import net.sf.okapi.common.query.QueryResult;
 import net.sf.okapi.common.resource.TextFragment;
 
 import org.junit.Before;

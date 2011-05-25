@@ -28,6 +28,7 @@ import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.Range;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.query.IQuery;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.InvalidContentException;
@@ -39,7 +40,6 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.ui.ClosePanel;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.UIUtil;
-import net.sf.okapi.lib.translation.IQuery;
 import net.sf.okapi.lib.ui.segmentation.SRXEditor;
 import net.sf.okapi.connectors.google.GoogleMTConnector;
 

@@ -3,7 +3,7 @@ package net.sf.okapi.connectors.opentran;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
-import net.sf.okapi.lib.translation.QueryResult;
+import net.sf.okapi.common.query.QueryResult;
 
 public class ManualTry {
 

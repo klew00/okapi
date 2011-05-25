@@ -36,6 +36,7 @@ import org.w3c.dom.NodeList;
 import net.sf.okapi.common.HTMLCharacterEntities;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filterwriter.XLIFFContent;
+import net.sf.okapi.common.query.QueryResult;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;

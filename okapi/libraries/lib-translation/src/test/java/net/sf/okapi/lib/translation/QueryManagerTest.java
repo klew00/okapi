@@ -21,6 +21,7 @@
 package net.sf.okapi.lib.translation;
 
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.query.IQuery;
 
 import org.junit.Before;
 import org.junit.Test;

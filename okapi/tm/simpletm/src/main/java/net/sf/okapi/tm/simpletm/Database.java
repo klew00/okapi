@@ -31,7 +31,7 @@ import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.lib.translation.QueryResult;
+import net.sf.okapi.common.query.QueryResult;
 
 import java.io.File;
 import java.io.FilenameFilter;

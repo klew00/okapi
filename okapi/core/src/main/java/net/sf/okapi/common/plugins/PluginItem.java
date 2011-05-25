@@ -59,6 +59,11 @@ public class PluginItem {
 	 * Identifies a plug-in implementing {@link net.sf.okapi.common.uidescription.IEditorDescriptionProvider}.
 	 */
 	public static final int TYPE_IEDITORDESCRIPTIONPROVIDER = 0x0010;
+	
+	/**
+	 * Identifies a plug-in implementing {@link net.sf.okapi.common.query.IQuery}.
+	 */
+	public static final int TYPE_IQUERY = 0x0020;
 
 	int type;
 	String className;

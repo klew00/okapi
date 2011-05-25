@@ -3,7 +3,7 @@ package net.sf.okapi.applications.serval;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
-import net.sf.okapi.lib.translation.IQuery;
+import net.sf.okapi.common.query.IQuery;
 import net.sf.okapi.connectors.apertium.ApertiumMTConnector;
 import net.sf.okapi.connectors.crosslanguage.CrossLanguageMTConnector;
 import net.sf.okapi.connectors.google.GoogleMTConnector;

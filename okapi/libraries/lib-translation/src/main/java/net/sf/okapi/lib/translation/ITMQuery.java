@@ -20,6 +20,8 @@
 
 package net.sf.okapi.lib.translation;
 
+import net.sf.okapi.common.query.IQuery;
+
 /**
  * Provides the methods common to all query engines of translation resources
  * that are translation memory systems. 

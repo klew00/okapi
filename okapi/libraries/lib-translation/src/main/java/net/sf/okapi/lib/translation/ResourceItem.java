@@ -20,6 +20,8 @@
 
 package net.sf.okapi.lib.translation;
 
+import net.sf.okapi.common.query.IQuery;
+
 /**
  * Set of fields common to all translation resources.
  */

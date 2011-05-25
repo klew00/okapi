@@ -80,7 +80,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Spinner spnTargetPrefixThreshold;
 	
 	public ParametersEditor () {
-		connectors = new DefaultConnectors();
+		connectors = DefaultConnectors.getConnectors();
 	}
 	
 	public boolean edit (IParameters params,

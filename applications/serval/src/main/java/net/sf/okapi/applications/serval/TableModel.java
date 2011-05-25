@@ -2,7 +2,7 @@ package net.sf.okapi.applications.serval;
 
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.lib.translation.QueryManager;
-import net.sf.okapi.lib.translation.QueryResult;
+import net.sf.okapi.common.query.QueryResult;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Table;
