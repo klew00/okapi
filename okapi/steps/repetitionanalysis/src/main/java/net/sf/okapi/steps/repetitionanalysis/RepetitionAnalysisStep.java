@@ -58,7 +58,7 @@ public class RepetitionAnalysisStep extends BasePipelineStep {
 
 	private Parameters params;
 	private boolean searchExact;
-	private int counter;
+	private long counter;
 	private String tmDir;
 	private ITmWriter tmWriter;
 	private ITmSeeker currentTm;
@@ -140,6 +140,13 @@ public class RepetitionAnalysisStep extends BasePipelineStep {
 		return super.handleEndDocument(event);
 	}
 	
+	public static boolean checkSegment(Segment segment) {
+		return 
+			segment != null &&
+			segment.getContent() != null &&
+			segment.getContent().hasText();
+	}
+	
 	@Override
 	protected Event handleTextUnit(Event event) {
 		ITextUnit tu = event.getTextUnit();
@@ -153,12 +160,13 @@ public class RepetitionAnalysisStep extends BasePipelineStep {
 //				if (ttc != null) tsegments = ttc.getSegments();
 			}
 						
-			for (Segment seg : ssegments) {
+			for (Segment seg : ssegments) {				
+				if (!checkSegment(seg)) continue;
 				counter++;
 				TextFragment tf = seg.getContent();
-				if (tf.isEmpty()) continue;
+				//if (tf.isEmpty()) continue;				
 				
-				String tuid = Integer.toString(counter);
+				String tuid = Long.toString(counter);
 				List<TmHit> hits = null;
 				if (searchExact) {
 					hits = currentTm.searchExact(tf, null);
