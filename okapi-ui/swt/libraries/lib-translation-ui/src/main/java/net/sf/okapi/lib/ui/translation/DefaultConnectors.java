@@ -1,11 +1,19 @@
 package net.sf.okapi.lib.ui.translation;
 
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
+
+import net.sf.okapi.common.ClassUtil;
+import net.sf.okapi.common.plugins.PluginItem;
+import net.sf.okapi.common.plugins.PluginsManager;
+import net.sf.okapi.common.query.IQuery;
 
 public class DefaultConnectors implements IConnectorList {
 
 	private ArrayList<ConnectorInfo> list;
+	private static final Logger LOGGER = Logger.getLogger(DefaultConnectors.class.getName());
 	
 	@Deprecated 
 	public DefaultConnectors () {
@@ -105,5 +113,34 @@ public class DefaultConnectors implements IConnectorList {
 
 	public static IConnectorList getConnectors() {
 		return connectors;
+	}
+	
+	private static String getName(String connectorClass, URLClassLoader classLoader) {
+		// Instantiate the connector to get the description
+		IQuery connector = null;
+		try {
+			connector = (IQuery) ClassUtil.instantiateClass(connectorClass, classLoader);
+		} catch (Exception e) {
+			LOGGER.warning(String.format("Cannot instantiate the filter '%s'.", connectorClass));
+			return "Unknown plug-in connector";
+		}
+		
+		return connector.getName();		
+	}
+	
+	public static void addFromPlugins (PluginsManager pm) {
+		List<PluginItem> list = pm.getList();
+		
+		for ( PluginItem item : list ) {
+			if ( item.getType() == PluginItem.TYPE_IQUERY ) {
+				ConnectorInfo trc = new ConnectorInfo();
+				trc.description = getName(item.getClassName(), pm.getClassLoader());
+				trc.connectorClass = item.getClassName();
+				trc.descriptionProviderClass = item.getEditorDescriptionProvider() == null ? null : 
+					item.getEditorDescriptionProvider().name;
+				trc.classLoader = pm.getClassLoader();
+				connectors.getList().add(trc);
+			}
+		}
 	}
 }

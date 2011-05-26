@@ -9,5 +9,5 @@ public class ConnectorInfo {
 	public String connectorClass;
 	public String editorClass;
 	public String descriptionProviderClass;
-	
+	public ClassLoader classLoader;
 }

@@ -92,6 +92,7 @@ import net.sf.okapi.filters.rainbowkit.ui.ManifestDialog;
 import net.sf.okapi.filters.transifex.ui.ProjectDialog;
 import net.sf.okapi.lib.ui.editor.PairEditorUserTest;
 import net.sf.okapi.lib.ui.segmentation.SRXEditor;
+import net.sf.okapi.lib.ui.translation.DefaultConnectors;
 import net.sf.okapi.lib.ui.verification.QualityCheckEditor;
 import net.sf.okapi.lib.verification.IQualityCheckEditor;
 
@@ -1169,6 +1170,9 @@ public class MainForm { //implements IParametersProvider {
 		fcMapper.addFromPlugins(pm); //TODO: Need to remove as well!!!
 		customFilterConfigsNeedUpdate = true;
 		fm.addConfigurations(fcMapper);
+		
+		// Update connectors
+		DefaultConnectors.addFromPlugins(pm);
 		
 		// Update the steps
 		if ( wrapper != null ) {

@@ -126,7 +126,14 @@ public class ConnectorSelectionPanel extends Composite {
 
 	private void instantiateConnector (int index) {
 		try {
-			currentConnector = (IQuery)Class.forName(infoList.get(index).connectorClass).newInstance();
+			if (infoList.get(index).classLoader == null) {
+				currentConnector = (IQuery)Class.forName(infoList.get(index).connectorClass).newInstance();
+			}
+			else {
+				currentConnector = (IQuery)Class.forName(infoList.get(index).connectorClass, true, 
+						infoList.get(index).classLoader).newInstance();
+			}
+			
 			currentParams = currentConnector.getParameters();
 			if ( !Util.isEmpty(paramsList.get(index)) ) {
 				// Set the current parameters if they exist
@@ -168,7 +175,14 @@ public class ConnectorSelectionPanel extends Composite {
 			ConnectorInfo ci = infoList.get(n);
 			
 			if ( ci.descriptionProviderClass != null ) {
-				IEditorDescriptionProvider descProv = (IEditorDescriptionProvider)Class.forName(ci.descriptionProviderClass).newInstance();
+				IEditorDescriptionProvider descProv = null;
+				if (ci.classLoader == null) {
+					descProv = (IEditorDescriptionProvider)Class.forName(ci.descriptionProviderClass).newInstance();
+				}
+				else {
+					descProv = (IEditorDescriptionProvider)Class.forName(ci.descriptionProviderClass, true, ci.classLoader).newInstance();
+				}
+				
 				instantiateConnector(n);
 				
 				if ( gedit == null ) {
