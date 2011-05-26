@@ -312,7 +312,7 @@ public class SimpleTermExtractor {
 		if (( token.length() == 0 )
 			|| (( token.length() == 1 ) && ( token.codePointAt(0) < 126 ))) return;
 		// Keep only "letters" (includes CJK characters)
-		if ( !Character.isLetter(token.codePointAt(0)) ) return;
+		if ( !Character.isLetterOrDigit(token.codePointAt(0)) ) return;
 		
 		// Add the word (and preserve or not the case)
 		if ( params.getKeepCase() ) {
