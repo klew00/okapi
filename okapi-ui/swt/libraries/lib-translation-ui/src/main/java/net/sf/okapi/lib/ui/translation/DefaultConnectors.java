@@ -1,6 +1,5 @@
 package net.sf.okapi.lib.ui.translation;
 
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -115,13 +114,13 @@ public class DefaultConnectors implements IConnectorList {
 		return connectors;
 	}
 	
-	private static String getName(String connectorClass, URLClassLoader classLoader) {
+	private static String getName(String connectorClass, ClassLoader classLoader) {
 		// Instantiate the connector to get the description
 		IQuery connector = null;
 		try {
 			connector = (IQuery) ClassUtil.instantiateClass(connectorClass, classLoader);
 		} catch (Exception e) {
-			LOGGER.warning(String.format("Cannot instantiate the filter '%s'.", connectorClass));
+			LOGGER.warning(String.format("Cannot instantiate the connector '%s'.", connectorClass));
 			return "Unknown plug-in connector";
 		}
 		
