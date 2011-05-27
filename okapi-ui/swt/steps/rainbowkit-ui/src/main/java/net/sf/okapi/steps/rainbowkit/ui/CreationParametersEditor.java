@@ -260,7 +260,7 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		lbTypes.add("Transifex Project");
 		lbTypes.setData("5", "net.sf.okapi.steps.rainbowkit.transifex.TransifexPackageWriter");
 
-		lbTypes.add("ONTRAM XINI (Alpha)");
+		lbTypes.add("ONTRAM XINI (Beta)");
 		lbTypes.setData("6", "net.sf.okapi.steps.rainbowkit.ontram.OntramPackageWriter");
 
 		lbTypes.add("XLIFF 2.0 (Experimental - output only)");

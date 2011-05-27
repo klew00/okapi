@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -49,17 +50,20 @@ import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.filters.xini.jaxb.Element;
+import net.sf.okapi.filters.xini.jaxb.Empty;
 import net.sf.okapi.filters.xini.jaxb.EndPlaceHolder;
 import net.sf.okapi.filters.xini.jaxb.Field;
 import net.sf.okapi.filters.xini.jaxb.Page;
 import net.sf.okapi.filters.xini.jaxb.PlaceHolder;
 import net.sf.okapi.filters.xini.jaxb.Seg;
 import net.sf.okapi.filters.xini.jaxb.StartPlaceHolder;
+import net.sf.okapi.filters.xini.jaxb.TextContent;
 import net.sf.okapi.filters.xini.jaxb.Xini;
 import net.sf.okapi.filters.xini.jaxb.Element.ElementContent;
 
 public class XINIReader {
     private static final Map<String, String> tagType;
+    private static final Logger LOGGER = Logger.getLogger(XINIReader.class.getName());
     static {
         Map<String, String> tagTypes = new HashMap<String, String>();
         tagTypes.put("b", Code.TYPE_BOLD);
@@ -195,23 +199,36 @@ public class XINIReader {
 		TextContainer tc = new TextContainer();
 		
 		String emptySegsFlags = field.getEmptySegmentsFlags();
-		int segIndex;
-		int nonEmptySegIndex = 0;
-		for (segIndex = 0; segIndex < emptySegsFlags.length(); segIndex++) {
+		if (emptySegsFlags == null) {
 			
-			char empty = emptySegsFlags.charAt(segIndex);
-			if (empty == '0') {
+			// The emptySegmentsFlag is only used in ONTRAM TKit
+			for (Seg xiniSeg : field.getSeg()) {
 
-				Seg xiniSeg = field.getSeg().get(nonEmptySegIndex);
-				nonEmptySegIndex++;
-				
 				TextFragment tf = new TextFragment(processSegment(xiniSeg));
-				// To merge first XINI Segment into previously created Segment in TC
-				boolean collapseIfPreviousEmpty = segIndex == 0;
-				tc.getSegments().append(tf, collapseIfPreviousEmpty);
+				tc.getSegments().append(tf, false);
 			}
-			else {
-				tc.getSegments().append(new Segment(""));
+		}
+		else {
+			
+			// This is definitely from the ONTRAM TKit
+			int segIndex;
+			int nonEmptySegIndex = 0;
+			for (segIndex = 0; segIndex < emptySegsFlags.length(); segIndex++) {
+				
+				char empty = emptySegsFlags.charAt(segIndex);
+				if (empty == '0') {
+
+					Seg xiniSeg = field.getSeg().get(nonEmptySegIndex);
+					nonEmptySegIndex++;
+					
+					TextFragment tf = new TextFragment(processSegment(xiniSeg));
+					// To merge first XINI Segment into previously created Segment in TC
+					boolean collapseIfPreviousEmpty = segIndex == 0;
+					tc.getSegments().append(tf, collapseIfPreviousEmpty);
+				}
+				else {
+					tc.getSegments().append(new Segment(""));
+				}
 			}
 		}
 
@@ -265,7 +282,7 @@ public class XINIReader {
 				code.setId(ph.getValue().getID());
 				fragment.append(code);
 				
-				String innerText = serializeTextParts(content).getCodedText();
+				TextFragment innerText = serializeTextParts(content);
 				fragment.append(innerText);
 				
 				code = new Code(TagType.CLOSING, null);
@@ -285,8 +302,18 @@ public class XINIReader {
 			code.setId(eph.getValue().getID());
 			fragment.append(code);
 		}
+		else if (jaxbEl.getValue() instanceof Empty) {
+			LOGGER.warning("Inline element " + jaxbEl.getName() + "will be ignored");
+
+		}
+		else if (jaxbEl.getValue() instanceof TextContent) {
+			LOGGER.warning("Inline element " + jaxbEl.getName() + "will be ignored");
+			JAXBElement<TextContent> txtC = (JAXBElement<TextContent>) part;
+			TextFragment innerText = serializeTextParts(txtC.getValue().getContent());
+			fragment.append(innerText);
+		}
 		else {
-			throw new RuntimeException("Unknown placeholder: " + part);
+			throw new RuntimeException("Unknown inline element: " + part);
 		}
 		
 		return fragment;

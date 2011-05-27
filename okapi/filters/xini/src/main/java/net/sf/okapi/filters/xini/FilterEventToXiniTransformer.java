@@ -244,12 +244,6 @@ public class FilterEventToXiniTransformer {
 	}
 
 	private Serializable codeToXMLObject(Code code, List<Code> codes, String innerCodedText, boolean codeIsIsolated) {
-
-		if (code.getType().equals("br")) {
-
-			Empty emptyContent = new Empty();
-			return objectFactory.createTextContentBr(emptyContent);
-		}
 		
 		Serializable phelement;
 

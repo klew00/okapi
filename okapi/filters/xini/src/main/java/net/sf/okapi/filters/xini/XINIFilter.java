@@ -50,6 +50,11 @@ public class XINIFilter implements IFilter {
 		queue = new LinkedList<Event>();
 	}
 
+	/**
+	 * For TKit merging only!
+	 * 
+	 * @param relDocName The relative path if the original document. Used to extract only the pages related to this document.
+	 */
 	public XINIFilter(String relDocName) {
 		this();
 		this.relDocName = relDocName;
@@ -134,7 +139,12 @@ public class XINIFilter implements IFilter {
 		// get events
 		reader = new XINIReader();
 		reader.open(input);
-		queue.addAll(reader.getFilterEvents(relDocName));
+		if (relDocName == null) {
+			queue.addAll(reader.getFilterEvents());
+		}
+		else {
+			queue.addAll(reader.getFilterEvents(relDocName));
+		}
 	}
 
 	@Override
