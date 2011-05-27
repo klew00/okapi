@@ -1058,6 +1058,7 @@ public class Main {
 		if ( conn.getClass().getName().endsWith("PensieveTMConnector")
 			|| conn.getClass().getName().endsWith("GoogleMTConnector")
 			|| conn.getClass().getName().endsWith("MyMemoryTMConnector")
+			|| conn.getClass().getName().endsWith("MicosoftMTConnector")
 //			|| conn.getClass().getName().endsWith("ProMTConnector")
 			|| conn.getClass().getName().endsWith("GlobalSightTMConnector") ) {
 			count = conn.query(parseToTextFragment(query));

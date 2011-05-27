@@ -24,8 +24,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.net.URLEncoder;
 
 import net.sf.okapi.common.IParameters;
@@ -39,6 +40,15 @@ import net.sf.okapi.lib.translation.QueryUtil;
 
 @UsingParameters(Parameters.class)
 public class MicrosoftMTConnector extends BaseConnector {
+
+	private final String OPTIONS = "<TranslateOptions xmlns=\"http://schemas.datacontract.org/2004/07/Microsoft.MT.Web.Service.V2\">" +
+		"<Category>general</Category>" +
+		"<ContentType>text/html</ContentType>" +
+		"<ReservedFlags />" +
+		"<State />" +
+		"<Uri></Uri>" +
+		"<User>defaultUser</User>" +
+		"</TranslateOptions>";
 
 	private QueryUtil util;
 	Parameters params;
@@ -128,27 +138,46 @@ public class MicrosoftMTConnector extends BaseConnector {
 		if ( !frag.hasText(false) ) return 0;
 		try {
 			// Convert the fragment to coded HTML
-			String qtext = util.separateCodesFromText(frag);
-			URL url = new URL(String.format("http://api.microsofttranslator.com/v2/Http.svc/Translate"
-				+ "?appId=%s&text=%s&from=%s&to=%s",
+			String qtext = util.toCodedHTML(frag);
+			URL url = new URL(String.format("http://api.microsofttranslator.com/v2/Http.svc/GetTranslations"
+				+ "?appId=%s&text=%s&from=%s&to=%s&maxTranslations=1",
 				params.getAppId(),
 				URLEncoder.encode(qtext, "UTF-8"),
 				srcCode,
 				trgCode));
-			URLConnection conn = url.openConnection();
+			HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+			conn.addRequestProperty("Content-Type", "text/xml");
+			conn.setRequestMethod("POST");
+			conn.setDoOutput(true);
+		    conn.setDoInput(true);
+		    
+			OutputStreamWriter osw = null;
+			try {
+				osw = new OutputStreamWriter(conn.getOutputStream(), "UTF-8");
+				osw.write(OPTIONS);
+			}
+			finally {
+				osw.flush();
+				osw.close();
+			}
 			String resp = fromInputStreamToString(conn.getInputStream(), "UTF-8");
-			int n1 = resp.indexOf("<string");
-			if ( n1 == -1 ) return 0;
-			n1 = resp.indexOf('>', n1);
-			if ( n1 == -1 ) return 0;
-			int n2 = resp.indexOf("</string>", n1+1);
-			if ( n2 == -1 ) return 0;
-			String res = resp.substring(n1+1, n2);
 			
+			int n1 = resp.indexOf("<TranslatedText>");
+			if ( n1 == -1 ) return 0;
+			int n2 = resp.indexOf("</TranslatedText>", n1+1);
+			if ( n2 == -1 ) return 0;
+			String res = resp.substring(n1+16, n2);
+
 			result = new QueryResult();
 			result.weight = getWeight();
 			result.source = frag;
-			result.target = util.createNewFragmentWithCodes(util.fromPlainTextHTML(res));
+			if ( frag.hasCode() ) {
+				result.target = new TextFragment(util.fromCodedHTML(res, frag),
+					frag.getClonedCodes());
+			}
+			else {
+				result.target = new TextFragment(util.fromCodedHTML(res, frag));
+			}
 			result.score = 95; // Arbitrary score for MT
 			result.origin = getName();
 			result.matchType = MatchType.MT;
@@ -160,6 +189,45 @@ public class MicrosoftMTConnector extends BaseConnector {
 		return ((current==0) ? 1 : 0);
 	}
 	
+//	@Override
+//	public int query (TextFragment frag) {
+//		current = -1;
+//		result = null;
+//		if ( !frag.hasText(false) ) return 0;
+//		try {
+//			// Convert the fragment to coded HTML
+//			String qtext = util.separateCodesFromText(frag);
+//			URL url = new URL(String.format("http://api.microsofttranslator.com/v2/Http.svc/Translate"
+//				+ "?appId=%s&text=%s&from=%s&to=%s",
+//				params.getAppId(),
+//				URLEncoder.encode(qtext, "UTF-8"),
+//				srcCode,
+//				trgCode));
+//			URLConnection conn = url.openConnection();
+//			String resp = fromInputStreamToString(conn.getInputStream(), "UTF-8");
+//			int n1 = resp.indexOf("<string");
+//			if ( n1 == -1 ) return 0;
+//			n1 = resp.indexOf('>', n1);
+//			if ( n1 == -1 ) return 0;
+//			int n2 = resp.indexOf("</string>", n1+1);
+//			if ( n2 == -1 ) return 0;
+//			String res = resp.substring(n1+1, n2);
+//			
+//			result = new QueryResult();
+//			result.weight = getWeight();
+//			result.source = frag;
+//			result.target = util.createNewFragmentWithCodes(util.fromPlainTextHTML(res));
+//			result.score = 95; // Arbitrary score for MT
+//			result.origin = getName();
+//			result.matchType = MatchType.MT;
+//			current = 0;
+//		}
+//		catch ( Throwable e) {
+//			throw new RuntimeException("Error querying the MT server.\n" + e.getMessage(), e);
+//		}
+//		return ((current==0) ? 1 : 0);
+//	}
+
 	@Override
 	protected String toInternalCode (LocaleId locale) {
 		String code = locale.toBCP47();

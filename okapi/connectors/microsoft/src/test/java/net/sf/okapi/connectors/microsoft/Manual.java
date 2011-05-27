@@ -1,17 +1,18 @@
 package net.sf.okapi.connectors.microsoft;
 
 import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.query.IQuery;
 import net.sf.okapi.common.query.QueryResult;
+import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextFragment.TagType;
+
 
 public class Manual {
 
 	public static void main (String[] args) {
 		
 		IQuery conn = new MicrosoftMTConnector();
-		((Parameters)conn.getParameters()).setAppId("myAppID");
+		((Parameters)conn.getParameters()).setAppId("AppId");
 		conn.open();
 		conn.setLanguages(LocaleId.ENGLISH, LocaleId.FRENCH);
 		
@@ -29,9 +30,9 @@ public class Manual {
 		
 		TextFragment tf = new TextFragment("The ");
 		tf.append(TagType.OPENING, "b", "<b>");
-		tf.append("big");
+		tf.append("bolded");
 		tf.append(TagType.CLOSING, "b", "</b>");
-		tf.append(" red car.");
+		tf.append(" text.");
 		
 		conn.query(tf);
 		if ( conn.hasNext() ) {
@@ -41,9 +42,9 @@ public class Manual {
 
 		tf = new TextFragment("The ");
 		tf.append(TagType.OPENING, "b", "<b>");
-		tf.append("big");
+		tf.append("red");
 		tf.append(TagType.CLOSING, "b", "</b>");
-		tf.append(" red car has the markers & and < on its roof.");
+		tf.append(" car has the markers & and < on its roof.");
 		
 		conn.query(tf);
 		if ( conn.hasNext() ) {
