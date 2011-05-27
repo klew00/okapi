@@ -48,8 +48,10 @@ public class QueryUtil {
 
 	private static final Pattern HTML_OPENCLOSE = Pattern.compile(
 			"(\\<u(\\s+)id=['\"](.*?)['\"]>)|(\\</u\\>)", Pattern.CASE_INSENSITIVE);
+	// Try both <br .../> and <br ...> as some engine return an HTML-type <br> rather than an XML-type one (<br/>) 
 	private static final Pattern HTML_ISOLATED = Pattern.compile(
-			"\\<br(\\s+)id=['\"](.*?)['\"](\\s*?)/>", Pattern.CASE_INSENSITIVE);
+			"\\<br(\\s+)id=['\"](.*?)['\"](\\s*?)/?>", Pattern.CASE_INSENSITIVE);
+	// Check also <span> as some engines add their own in the results
 	private static final Pattern HTML_SPAN = Pattern.compile("\\<span\\s(.*?)>|\\</span>",
 			Pattern.CASE_INSENSITIVE);
 
