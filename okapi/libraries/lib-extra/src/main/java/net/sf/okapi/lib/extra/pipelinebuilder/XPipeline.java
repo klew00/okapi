@@ -22,6 +22,7 @@ package net.sf.okapi.lib.extra.pipelinebuilder;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.DefaultFilters;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.pipeline.IPipeline;
@@ -74,6 +75,11 @@ public class XPipeline extends net.sf.okapi.common.pipeline.Pipeline implements 
 		this(description, XPipelineType.SEQUENTIAL, false, steps);
 		this.fcMapper = filters.getFcMapper();
 		setBatch(batch);
+	}
+	
+	public XPipeline(String description, XFilters filters, String rootDir, XBatch batch, IPipelineStep... steps) {		
+		this(description, filters, batch, steps);
+		pd.setRootDirectories(Util.getDirectoryName(rootDir), Util.getDirectoryName(rootDir));
 	}
 	
 	public XPipeline(String description, XBatch batch, XPipelineType type, IPipelineStep... steps) {
