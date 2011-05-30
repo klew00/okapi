@@ -113,7 +113,7 @@ public class PluginsManager {
 				for ( int i=0; i<urls.size(); i++ ) {
 					tmp[i] = urls.get(i);
 				}
-				loader = new URLClassLoader(tmp);
+				loader = new URLClassLoader(tmp, Thread.currentThread().getContextClassLoader());
 			}
 			
 			// Associate the editor-type plugins with their action-type plugins
@@ -221,7 +221,7 @@ public class PluginsManager {
 			URL[] tmpUrls = new URL[1]; 
 			URL url = file.toURI().toURL();
 			tmpUrls[0] = url;
-			URLClassLoader loader = URLClassLoader.newInstance(tmpUrls);
+			URLClassLoader loader = URLClassLoader.newInstance(tmpUrls, Thread.currentThread().getContextClassLoader());
 		
 			// Introspect the classes
 			JarInputStream jarFile = new JarInputStream(new FileInputStream(file));
