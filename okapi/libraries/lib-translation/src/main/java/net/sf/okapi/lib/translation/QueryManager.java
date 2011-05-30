@@ -161,6 +161,44 @@ public class QueryManager {
 	}
 	
 	/**
+	 * Creates a translation resource and its parameters from their class names,
+	 * adds it to the manager and initializes it with the 
+	 * current source and target language of this manager, as well as any
+	 * attributes that is set, and the current threshold and maximum hits if it is relevant.
+	 * @param connectorClass the name of the class for the connector.
+	 * @param resourceName the name of the translation resource (can be null).
+	 * @param loader class loader from which the connector class must be loaded
+	 * @param connectorParams connector parameters stored in a string.
+	 * @return The identifier for the added translation resource. This identifier
+	 * can be used later to access specifically the added translation resource.
+	 * @throws RuntimeException if an error occurs.
+	 */
+	public int addAndInitializeResource (String connectorClass,
+		String resourceName,
+		ClassLoader loader,
+		String connectorParams)
+	{
+		IQuery conn;
+		try {
+			conn = (IQuery)Class.forName(connectorClass, true, loader).newInstance();
+		}
+		catch ( InstantiationException e ) {
+			throw new RuntimeException("Error creating connector.", e);
+		}
+		catch ( IllegalAccessException e ) {
+			throw new RuntimeException("Error creating connector.", e);
+		}
+		catch ( ClassNotFoundException e ) {
+			throw new RuntimeException("Error creating connector.", e);
+		}
+		IParameters tmParams = conn.getParameters();
+		if ( tmParams != null ) { // Set the parameters only if the connector take some
+			tmParams.fromString(connectorParams);
+		}
+		return addAndInitializeResource(conn, ((resourceName==null) ? conn.getName() : resourceName), tmParams);
+	}
+	
+	/**
 	 * Enables or disables a given translation resource.
 	 * @param resourceId ID of the translation resource to enable or disable.
 	 * @param enabled True to enable the resource, false to disable it.
