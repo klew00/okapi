@@ -43,15 +43,17 @@ import net.sf.okapi.common.pipeline.Pipeline;
 import net.sf.okapi.common.pipelinedriver.BatchItemContext;
 import net.sf.okapi.common.pipelinedriver.IPipelineDriver;
 import net.sf.okapi.common.pipelinedriver.PipelineDriver;
-import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.plugins.PluginItem;
 import net.sf.okapi.common.plugins.PluginsManager;
+import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.steps.leveraging.LeveragingStep;
 
 public class PipelineWrapper {
 	
 	private static final Logger LOGGER = Logger.getLogger(PipelineWrapper.class.getName());
 
 	private Map<String, StepInfo> availableSteps;
+	private Map<String, ClassLoader> pluginConnectors;
 	private String path;
 	private ArrayList<StepInfo> steps;
 	private IPipelineDriver driver;
@@ -86,9 +88,15 @@ public class PipelineWrapper {
 	
 	public void addFromPlugins (PluginsManager pm) {
 		try {
+			pluginConnectors = new LinkedHashMap<String, ClassLoader>(); 
 			List<PluginItem> plugins = pm.getList();
 			URLClassLoader classLoader = pm.getClassLoader();
 			for ( PluginItem item : plugins ) {
+				if ( item.getType() == PluginItem.TYPE_IQUERY ) {
+					pluginConnectors.put(item.getClassName(), classLoader);
+					continue;
+				}
+				
 				// Skip plug-ins that are not steps
 				if ( item.getType() != PluginItem.TYPE_IPIPELINESTEP ) continue;
 				try {
@@ -137,7 +145,7 @@ public class PipelineWrapper {
 	 * Populate the hard-wired steps.
 	 */
 	private void buildStepList () {
-		availableSteps = new LinkedHashMap<String, StepInfo>();
+		availableSteps = new LinkedHashMap<String, StepInfo>();		
 		peMapper = new ParametersEditorMapper();
 		try {
 			IPipelineStep ps = (IPipelineStep)Class.forName(
@@ -849,6 +857,17 @@ public class PipelineWrapper {
 				IParameters params = step.getParameters();
 				if (( params != null ) && ( stepInfo.paramsData != null )) {
 					params.fromString(stepInfo.paramsData);
+				}
+				
+				// Enable connectors from plug-ins
+				if (step instanceof LeveragingStep) {
+					LeveragingStep ls = (LeveragingStep) step;
+					net.sf.okapi.steps.leveraging.Parameters lsParams = 
+						(net.sf.okapi.steps.leveraging.Parameters) ls.getParameters();
+					String connectorClassName = lsParams.getResourceClassName();
+					ClassLoader connectorLoader = pluginConnectors.get(connectorClassName);
+					
+					ls.setConnectorContext(connectorLoader);
 				}
 				driver.addStep(step);
 			}
