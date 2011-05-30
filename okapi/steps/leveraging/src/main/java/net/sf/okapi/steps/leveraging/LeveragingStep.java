@@ -52,6 +52,7 @@ public class LeveragingStep extends BasePipelineStep {
 	private int exactCount;
 	private int fuzzyCount;
 	private int iQueryId;
+	private ClassLoader connectorContext;
 
 	public LeveragingStep () {
 		params = new Parameters();
@@ -187,8 +188,14 @@ public class LeveragingStep extends BasePipelineStep {
 		qm = new QueryManager();
 		qm.setThreshold(params.getThreshold());
 		qm.setRootDirectory(rootDir);
-		iQueryId = qm.addAndInitializeResource(params.getResourceClassName(), null,
-			params.getResourceParameters());
+		
+		if (connectorContext == null || connectorContext == Thread.currentThread().getContextClassLoader()) {
+			iQueryId = qm.addAndInitializeResource(params.getResourceClassName(), null,
+					params.getResourceParameters());
+		} else {
+			iQueryId = qm.addAndInitializeResource(params.getResourceClassName(), null, connectorContext,
+					params.getResourceParameters());
+		}
 		
 		ResourceItem res = qm.getResource(iQueryId);
 		logger.info("Leveraging settings: "+res.name);
@@ -212,5 +219,9 @@ public class LeveragingStep extends BasePipelineStep {
 				"sentence", "undefined", "undefined");
 		}
 		initDone = true;
+	}
+	
+	public void setConnectorContext(ClassLoader connectorContext) {
+		this.connectorContext = connectorContext;
 	}
 }
