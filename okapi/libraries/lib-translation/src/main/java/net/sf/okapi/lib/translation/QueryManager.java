@@ -518,7 +518,7 @@ public class QueryManager {
 	 * Leverages a text unit (segmented or not) based on the current settings.
 	 * Any options or attributes needed must be set before calling this method.
 	 * @param tu the text unit to leverage.
-	 * @see #setOptions(int, boolean, boolean, boolean, String, int)
+	 * @see #setOptions(int, boolean, boolean, boolean, String, int, boolean)
 	 */
 	public void leverage (ITextUnit tu)
 //		int thresholdToFill,
