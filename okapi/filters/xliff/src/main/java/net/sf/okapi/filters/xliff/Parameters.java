@@ -66,6 +66,10 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private int targetStateMode;
 	private String targetStateValue;
 	
+	// Write-only parameters
+	public boolean quoteModeDefined;
+	public int quoteMode;
+	
 	public Parameters () {
 		reset();
 		toString(); // fill the list
@@ -166,6 +170,14 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public void setTargetStateValue (String targetStateValue) {
 		this.targetStateValue = targetStateValue;
 	}
+	
+	public boolean getQuoteModeDefined () {
+		return quoteModeDefined;
+	}
+
+	public int getQuoteMode () {
+		return quoteMode;
+	}
 
 	public void reset () {
 		useCustomParser = false;
@@ -180,6 +192,10 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		includeExtensions = true;
 		targetStateMode = TARGETSTATEMODE_IGNORE;
 		targetStateValue = "needs-translation";
+		
+		// Forced write-only default options
+		quoteModeDefined = true;
+		quoteMode = 0; // no double or single quotes escaped
 	}
 
 	public void fromString (String data) {
@@ -197,6 +213,10 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		includeExtensions = buffer.getBoolean(INCLUDEEXTENSIONS, includeExtensions);
 		targetStateMode = buffer.getInteger(TARGETSTATEMODE, targetStateMode);
 		targetStateValue = buffer.getString(TARGETSTATEVALUE, targetStateValue);
+		
+		// Output, not user-defined
+		quoteModeDefined = buffer.getBoolean(XMLEncoder.QUOTEMODEDEFINED, quoteModeDefined);
+		quoteMode = buffer.getInteger(XMLEncoder.QUOTEMODE, quoteMode);
 	}
 
 	@Override
@@ -214,6 +234,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.setBoolean(INCLUDEEXTENSIONS, includeExtensions);
 		buffer.setInteger(TARGETSTATEMODE, targetStateMode);
 		buffer.setString(TARGETSTATEVALUE, targetStateValue);
+		buffer.setBoolean(XMLEncoder.QUOTEMODEDEFINED, quoteModeDefined);
+		buffer.setInteger(XMLEncoder.QUOTEMODE, quoteMode);
 		return buffer.toString();
 	}
 	

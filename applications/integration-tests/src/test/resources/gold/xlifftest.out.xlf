@@ -15,8 +15,8 @@
 </trans-unit>
 
 <trans-unit id="3"> <!-- to translate -->
-<source xml:lang="en">Text to translate. &amp;=amp, &lt;=lt, &apos;=apos, &quot;=quot</source>
-<target xml:lang="fr">Text to translate. &amp;=amp, &lt;=lt, &apos;=apos, &quot;=quot</target>
+<source xml:lang="en">Text to translate. &amp;=amp, &lt;=lt, '=apos, "=quot</source>
+<target xml:lang="fr">Text to translate. &amp;=amp, &lt;=lt, '=apos, "=quot</target>
 </trans-unit>
 
 <trans-unit id="4">

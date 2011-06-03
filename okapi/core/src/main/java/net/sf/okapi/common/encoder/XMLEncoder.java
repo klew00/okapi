@@ -192,10 +192,18 @@ public class XMLEncoder implements IEncoder {
 		switch ( value ) {
 		case '<':
 			return "&lt;";
-		case '\"':
-			return "&quot;";
+		case '"':
+			if ( quoteMode > 0 ) return "&quot;";
+			else return "\"";
 		case '\'':
-			return "&apos;";
+			switch ( quoteMode ) {
+			case 1:
+				return "&apos;";
+			case 2:
+				return "&#39;";
+			default:
+				return "'";
+			}
 		case '&':
 			return "&amp;";
 		case '>':
@@ -233,10 +241,18 @@ public class XMLEncoder implements IEncoder {
 		switch ( value ) {
 		case '<':
 			return "&lt;";
-		case '\"':
-			return "&quot;";
+		case '"':
+			if ( quoteMode > 0 ) return "&quot;";
+			else return "\"";
 		case '\'':
-			return "&apos;";
+			switch ( quoteMode ) {
+			case 1:
+				return "&apos;";
+			case 2:
+				return "&#39;";
+			default:
+				return "'";
+			}
 		case '&':
 			return "&amp;";
 		case '>':
