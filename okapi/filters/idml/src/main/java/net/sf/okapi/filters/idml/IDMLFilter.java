@@ -652,6 +652,9 @@ public class IDMLFilter implements IFilter {
 			case '\u2001': // Flush space
 				dest.append(TagType.PLACEHOLDER, "sp-flush", String.valueOf(ch));
 				break;
+			case '\ufeff': // Text anchor (Not sure about this one, but for sure we don't want it in the text)
+				dest.append(TagType.PLACEHOLDER, "tx-anch", String.valueOf(ch));
+				break;
 			default:
 				dest.append(ch);
 				break;

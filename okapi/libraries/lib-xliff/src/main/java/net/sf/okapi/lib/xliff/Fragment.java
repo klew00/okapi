@@ -40,6 +40,7 @@ public class Fragment {
 
 	private StringBuilder ctext;
 	private ArrayList<Code> codes;
+	private int lastAutoId;
 	
 	public static String toXML (String text,
 		boolean attribute)
@@ -103,16 +104,16 @@ public class Fragment {
 		for ( int i=0; i<ctext.length(); i++ ) {
 			char ch = ctext.charAt(i);
 			if ( ctext.charAt(i) == MARKER_OPENING ) {
-				tmp.append(String.format("<inline id=\"%d\"/>",
-					toIndex(ctext.charAt(++i))));
+				tmp.append(String.format("<inline id=\"%s\"/>",
+					codes.get(toIndex(ctext.charAt(++i))).getId()));
 			}
 			else if ( ctext.charAt(i) == MARKER_CLOSING ) {
-				tmp.append(String.format("<inline id=\"%d\"/>",
-					toIndex(ctext.charAt(++i))));
+				tmp.append(String.format("<inline id=\"%s\"/>",
+					codes.get(toIndex(ctext.charAt(++i))).getId()));
 			}
 			else if ( ctext.charAt(i) == MARKER_PLACEHOLDER ) {
-				tmp.append(String.format("<inline id=\"%d\"/>",
-					toIndex(ctext.charAt(++i))));
+				tmp.append(String.format("<inline id=\"%s\"/>",
+					codes.get(toIndex(ctext.charAt(++i))).getId()));
 			}
 			else {
 				switch ( ch ) {
@@ -138,26 +139,27 @@ public class Fragment {
 		StringBuilder tmp = new StringBuilder();
 		Code code;
 		int index;
+		//TODO: Handle overlapping/partial pairs
 		for ( int i=0; i<ctext.length(); i++ ) {
 			char ch = ctext.charAt(i);
 			if ( ctext.charAt(i) == MARKER_OPENING ) {
 				index = toIndex(ctext.charAt(++i));
 				code = codes.get(index);
-				tmp.append(String.format("<sc id=\"%d\">", index)); // should be id
+				tmp.append(String.format("<sc id=\"%s\">", code.getId()));
 				tmp.append(toXML(code.getNativeData(), false));
 				tmp.append("</sc>");
 			}
 			else if ( ctext.charAt(i) == MARKER_CLOSING ) {
 				index = toIndex(ctext.charAt(++i));
 				code = codes.get(index);
-				tmp.append(String.format("<ec id=\"%d\">", index)); // should be id
+				tmp.append(String.format("<ec id=\"%s\">", code.getId()));
 				tmp.append(toXML(code.getNativeData(), false));
 				tmp.append("</ec>");
 			}
 			else if ( ctext.charAt(i) == MARKER_PLACEHOLDER ) {
 				index = toIndex(ctext.charAt(++i));
 				code = codes.get(index);
-				tmp.append(String.format("<ic id=\"%d\">", index)); // should be id
+				tmp.append(String.format("<ph id=\"%s\">", code.getId()));
 				tmp.append(toXML(code.getNativeData(), false));
 				tmp.append("</ic>");
 			}
@@ -189,17 +191,18 @@ public class Fragment {
 		StringBuilder tmp = new StringBuilder();
 		for ( int i=0; i<ctext.length(); i++ ) {
 			char ch = ctext.charAt(i);
+			//TODO: Handle overlapping/partial spans
 			if ( ctext.charAt(i) == MARKER_OPENING ) {
-				tmp.append(String.format("<pc id=\"%d\">", // should be id
-					toIndex(ctext.charAt(++i))));
+				tmp.append(String.format("<pc id=\"%s\">",
+					codes.get(toIndex(ctext.charAt(++i))).getId()));
 			}
 			else if ( ctext.charAt(i) == MARKER_CLOSING ) {
 				tmp.append("</pc>");
 				i++; // Skip index
 			}
 			else if ( ctext.charAt(i) == MARKER_PLACEHOLDER ) {
-				tmp.append(String.format("<ic id=\"%d\"/>", // should be id
-					toIndex(ctext.charAt(++i))));
+				tmp.append(String.format("<ph id=\"%s\"/>",
+					codes.get(toIndex(ctext.charAt(++i))).getId()));
 			}
 			else {
 				switch ( ch ) {
@@ -223,10 +226,12 @@ public class Fragment {
 
 	public Fragment () {
 		ctext = new StringBuilder();
+		lastAutoId = 0;
 	}
 	
 	public Fragment (String plainText) {
 		ctext = new StringBuilder(plainText);
+		lastAutoId = 0;
 	}
 
 	public boolean isEmpty () {
@@ -235,7 +240,9 @@ public class Fragment {
 	
 	public void clear () {
 		ctext.setLength(0);
+		if ( codes != null ) codes.clear();
 		codes = null;
+		lastAutoId = 0;
 	}
 	
 	public void append (String plainText) {
@@ -245,12 +252,22 @@ public class Fragment {
 	public void append (char ch) {
 		ctext.append(ch);
 	}
-	
-	public Code append (Code.TYPE type,
+
+	public Code append (CodeType type,
 		String nativeData)
 	{
-		if ( codes == null ) codes = new ArrayList<Code>();
-		Code code = new Code(nativeData);
+		return append(type, null, nativeData);
+	}
+	
+	public Code append (CodeType type,
+		String id,
+		String nativeData)
+	{
+		if ( codes == null ) {
+			codes = new ArrayList<Code>();
+		}
+		Code code = new Code(type, nativeData);
+		code.setId(checkId(id));
 		codes.add(code);
 		switch ( type ) {
 		case OPENING:
@@ -264,6 +281,28 @@ public class Fragment {
 			break;
 		}
 		return code;
+	}
+
+	private String checkId (String id) {
+		// Create a new ID if the one provided is null or empty
+		if (( id == null ) || id.isEmpty() ) {
+			id = String.valueOf(++lastAutoId);
+		}
+		// Checks if the ID is already used
+		boolean exists = true;
+		while ( exists ) {
+			exists = false;
+			for ( int i=0; i<codes.size(); i++ ) {
+				if ( codes.get(i).getId().equals(id) ) {
+					// If it is, we just try the next auto value
+					id = String.valueOf(++lastAutoId);
+					exists = true;
+					break;
+				}
+			}
+		}
+		// Returns the validated (and possibly modified id)
+		return id;
 	}
 
 }

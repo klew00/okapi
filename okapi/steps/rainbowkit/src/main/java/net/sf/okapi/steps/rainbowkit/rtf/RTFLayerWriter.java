@@ -107,7 +107,7 @@ public class RTFLayerWriter {
 			writer = new PrintWriter(path, targetEncoding);
 		}
 		catch ( FileNotFoundException e ) {
-			throw new OkapiIOException("Error creating RTF writer.", e);
+			throw new OkapiIOException("Error creating RTF writer.\n"+e.getMessage(), e);
 		}
 		catch ( UnsupportedEncodingException e ) {
 			throw new OkapiIOException("Error creating RTF writer.", e);

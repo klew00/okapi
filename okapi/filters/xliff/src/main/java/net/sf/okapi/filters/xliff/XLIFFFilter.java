@@ -1040,6 +1040,7 @@ public class XLIFFFilter implements IFilter {
 			// we are currently storing the parsed data, the segments are part of the content
 			// at the end, so all can use the same code/skeleton
 			TextFragment current = new TextFragment();
+			current.invalidate(); // To handle bracketing open/close cases
 			
 			while ( reader.hasNext() ) {
 				eventType = reader.next();
@@ -1064,6 +1065,7 @@ public class XLIFFFilter implements IFilter {
 					if ( name.equals("mrk") ) { // Check of end of segment
 						if ( idStack.peek() == segIdStack ) {
 							current = new TextFragment(); // Point back to content
+							current.invalidate(); // To handle bracketing open/close cases
 							idStack.pop(); // Pop only after test is true
 							segIdStack = -1; // Reset to not trigger segment ending again
 							// Add the segment to the content (no collapsing, except when no segments exist yet. Keep empty segments)
@@ -1082,7 +1084,8 @@ public class XLIFFFilter implements IFilter {
 						if ( store ) storeEndElement();
 						// Leave the id set to -1 for balancing
 						code = current.append(TagType.CLOSING, name, "");
-						idStack.pop();
+						// We do know the id since the content must be well-formed
+						code.setId(idStack.pop());
 						tmp = reader.getPrefix();
 						if (( tmp != null ) && ( tmp.length()>0 )) {
 							code.setOuterData("</"+tmp+":"+name+">");
@@ -1111,6 +1114,7 @@ public class XLIFFFilter implements IFilter {
 							segment = new Segment();
 							segment.id = reader.getAttributeValue(null, "mid");
 							current = segment.text; // Segment is now being built
+							current.invalidate(); // To handle bracketing open/close cases							
 							continue;
 						}
 					}

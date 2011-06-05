@@ -1815,4 +1815,12 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 		return text.length();
 	}
 
+	/**
+	 * Sets the fragment in a state where it has to be re-balanced before being used for output.
+	 * This method is not harmful, but should preferably be used only when adding unbalanced paired codes. 
+	 */
+	public void invalidate () {
+		isBalanced = false;
+	}
+
 }

@@ -193,16 +193,10 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 			// We fall back to source
 			trgCont = srcCont;
 		}
-		// We if show segments, make sure both entries are actually segmented
-//		if ( doSegments ) {
-//			doSegments = trgCont.hasBeenSegmented();
-//			if ( doSegments ) {
-//				doSegments = srcCont.hasBeenSegmented();
-//			}
-//		}
-
+		
 		// Process the target content: either with or without segments
-		if ( doSegments ) {
+		// With layers: treat non-segmented translatable entries with existing target as segmented
+		if ( doSegments || (( layer != null ) && tu.isTranslatable() && !trgCont.equals(srcCont) )) {
 			return getSegmentedOutput(srcCont, trgCont, locToUse, context);
 		}
 		else {

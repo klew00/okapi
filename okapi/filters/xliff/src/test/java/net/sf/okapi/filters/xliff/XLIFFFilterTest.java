@@ -154,6 +154,32 @@ public class XLIFFFilterTest {
 	}
 
 	@Test
+	public void testSegmentedSourceWithOuterCodes () {
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+			+ "<xliff version=\"1.2\">"
+			+ "<file source-language=\"en\" target-language=\"fr\" datatype=\"x-test\" original=\"file.ext\">"
+			+ "<body>"
+			+ "<trans-unit id=\"1\">"
+			+ "<source><g id='1'><g id='2'>s1. <g id='3'>s2</g></g></g></source>"
+			+ "<seg-source><g id='1'><g id='2'><mrk mid=\"i1\" mtype=\"seg\">s1.</mrk> <g id='3'><mrk mid=\"i2\" mtype=\"seg\">s2</mrk></g></g></g></seg-source>"
+			+ "</trans-unit>"
+			+ "</body>"
+			+ "</file></xliff>";
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertNotNull(tu);
+		ISegments srcSegs = tu.getSourceSegments();
+		assertEquals(2, srcSegs.count());
+		TextContainer cont = tu.getSource();
+		assertTrue(cont.get(0).text.getCode(0).getTagType()==TagType.OPENING);
+		assertTrue(cont.get(0).text.getCode(1).getTagType()==TagType.OPENING);
+		assertTrue(cont.get(2).text.getCode(0).getTagType()==TagType.OPENING);
+		assertTrue(cont.get(4).text.getCode(0).getTagType()==TagType.CLOSING);
+		assertTrue(cont.get(4).text.getCode(1).getTagType()==TagType.CLOSING);
+		assertTrue(cont.get(4).text.getCode(2).getTagType()==TagType.CLOSING);
+		assertEquals("<b1/><b2/>[s1.] <b3/>[s2]<e3/><e2/><e1/>", fmt.printSegmentedContent(cont, true));
+	}
+
+	@Test
 	public void testIgnoredSegmentedTarget () {
 		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
 			+ "<xliff version=\"1.2\">"

@@ -22,16 +22,21 @@ package net.sf.okapi.lib.xliff;
 
 public class Code {
 
-	public static enum TYPE {
-		OPENING,
-		CLOSING,
-		PLACEHOLDER
-	}
-
+	public static final int CANDELETE = 0x01;
+	public static final int CANREPLICATE = 0x02;
+	public static final int CANREORDER = 0x04;
+	public static final int CANCHANGEPARENT = 0x08;
+	
+	private CodeType type;
 	private String id;
 	private String nativeData;
+	private String rid;
+	private int hints;
 
-	public Code (String nativeData) {
+	public Code (CodeType type,
+		String nativeData)
+	{
+		this.type = type;
 		this.nativeData = nativeData;
 	}
 
@@ -49,6 +54,66 @@ public class Code {
 	
 	public String getId () {
 		return id;
+	}
+	
+	public String getRid () {
+		return rid;
+	}
+	
+	public void setRid (String rid) {
+		this.id = rid;
+	}
+	
+	public CodeType getType () {
+		return type;
+	}
+
+	public void setType (CodeType type) {
+		this.type = type;
+	}
+
+	public int getHints () {
+		return hints;
+	}
+	
+	public void setHints (int hints) {
+		this.hints = hints;
+	}
+	
+	public boolean canDelete () {
+		return (( hints & CANDELETE ) == CANDELETE);
+	}
+
+	public void setCanDelete (boolean canDelete) {
+		if ( canDelete ) hints |= CANDELETE;
+		else hints &= ~CANDELETE;
+	}
+
+	public boolean canReplicate () {
+		return (( hints & CANREPLICATE ) == CANREPLICATE);
+	}
+
+	public void setCanReplicate (boolean canReplicate) {
+		if ( canReplicate ) hints |= CANREPLICATE;
+		else hints &= ~CANREPLICATE;
+	}
+
+	public boolean canReorder () {
+		return (( hints & CANREORDER ) == CANREORDER);
+	}
+
+	public void setCanReorder (boolean canReorder) {
+		if ( canReorder ) hints |= CANREORDER;
+		else hints &= ~CANREORDER;
+	}
+
+	public boolean canChangeParent () {
+		return (( hints & CANCHANGEPARENT ) == CANCHANGEPARENT);
+	}
+
+	public void setCanChangeParent (boolean canChangeParent) {
+		if ( canChangeParent ) hints |= CANCHANGEPARENT;
+		else hints &= ~CANCHANGEPARENT;
 	}
 
 }
