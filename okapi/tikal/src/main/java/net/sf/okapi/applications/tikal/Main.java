@@ -1150,8 +1150,9 @@ public class Main {
 			conn = new MicrosoftMTConnector();
 			conn.setParameters(prepareConnectorParameters(conn.getClass().getName()));
 			conn.setLanguages(srcLoc, trgLoc);
+			setTMOptionsIfPossible(conn, threshold, maxhits);
 			conn.open();
-			displayQuery(conn, false);
+			displayQuery(conn, true);
 			conn.close();
 		}
 //		if ( useProMT ) {
