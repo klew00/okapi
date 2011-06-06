@@ -174,6 +174,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		table.setLinesVisible (true);
 		GridData gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.horizontalSpan = 2;
+		gdTmp.heightHint = 250;
 		table.setLayoutData(gdTmp);
 
 		// Click updates button states
