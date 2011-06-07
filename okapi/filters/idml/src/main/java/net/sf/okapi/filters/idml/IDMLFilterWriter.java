@@ -331,8 +331,12 @@ public class IDMLFilterWriter implements IFilterWriter {
 		
 		try {
 			Document tmpDoc =  docBuilder.parse(new InputSource(new StringReader(xml.toString())));
-			DocumentFragment docFrag = doc.createDocumentFragment();
-			Node imp = doc.importNode(tmpDoc.getDocumentElement(), true);
+			
+			Document docWhereToImport = skel.getScopeNode().getOwnerDocument();
+			
+			DocumentFragment docFrag = docWhereToImport.createDocumentFragment(); // doc.createDocumentFragment();
+			
+			Node imp = docWhereToImport.importNode(tmpDoc.getDocumentElement(), true); // doc.importNode(tmpDoc.getDocumentElement(), true);
 			while ( imp.hasChildNodes() ) {
 				docFrag.appendChild(imp.removeChild(imp.getFirstChild()));
 			}
@@ -346,6 +350,7 @@ public class IDMLFilterWriter implements IFilterWriter {
 			while( node.hasChildNodes() ) {
 				node.removeChild(node.getFirstChild());  
 			}
+			
 			// Attach the new content
 			node.appendChild(docFrag);
 			
