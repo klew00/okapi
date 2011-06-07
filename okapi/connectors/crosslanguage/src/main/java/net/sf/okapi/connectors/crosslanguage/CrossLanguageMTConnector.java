@@ -155,11 +155,11 @@ public class CrossLanguageMTConnector extends BaseConnector {
 			if ( pos > -1 ) data = data.substring(pos+3, data.length()-4);
 			// Convert back to internal codes
 			if ( text.hasCode() ) {
-				result.target = new TextFragment(util.fromCodedHTML(data, text),
+				result.target = new TextFragment(util.fromCodedHTML(data, text, true),
 					text.getClonedCodes());
 			}
 			else {
-				result.target = new TextFragment(util.fromCodedHTML(data, text));
+				result.target = new TextFragment(util.fromCodedHTML(data, text, true));
 			}
 			result.score = 95; // Arbitrary score for MT
 			result.origin = getName();

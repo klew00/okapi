@@ -99,6 +99,7 @@ public class Main {
 	protected final static int CMD_LEVERAGEMOSES = 10;
 	protected final static int CMD_SEGMENTATION = 11;
 	protected final static int CMD_SHOWCONFIGS = 12;
+	protected final static int CMD_ADDTRANS = 13;
 	
 	private static final String DEFAULT_SEGRULES = "-";
 	private static final String MSG_ONLYWITHUICOMP = "UI-based commands are available only in the distributions with UI components.";
@@ -116,6 +117,8 @@ public class Main {
 	protected LocaleId trgLoc;
 	protected int command = -1;
 	protected String query;
+	protected String addTransTrans;
+	protected int addTransRating = 6;
 	protected boolean useGoogle;
 	protected boolean useOpenTran;
 	protected boolean useTransToolkit;
@@ -344,6 +347,25 @@ public class Main {
 					prog.command = CMD_QUERYTRANS;
 					prog.query = prog.getArgument(args, ++i);
 				}
+				else if ( arg.equals("-a") ) {
+					prog.command = CMD_ADDTRANS;
+					prog.query = prog.getArgument(args, ++i);
+					prog.addTransTrans = prog.getArgument(args, ++i);
+					if ( args.size() > i+1 ) {
+						if ( !args.get(i+1).startsWith("-") ) {
+							// Optional rating
+							try {
+								prog.addTransRating = Integer.parseInt(args.get(++i));
+							}
+							catch ( NumberFormatException e ) {
+								throw new RuntimeException(String.format("Invalid rating option: '%s'.", args.get(i)));
+							}
+							if (( prog.addTransRating < 1 ) || ( prog.addTransRating > 10 )) {
+								throw new RuntimeException("Rating must be between 1 and 10.");
+							}
+						}
+					}
+				}
 				else if ( arg.equals("-opt") ) {
 					prog.tmOptions = prog.getArgument(args, ++i);
 				}
@@ -465,6 +487,10 @@ public class Main {
 			}
 			if ( prog.command == CMD_QUERYTRANS ) {
 				prog.processQuery();
+				return;
+			}
+			if ( prog.command == CMD_ADDTRANS ) {
+				prog.processAddTranslation();
 				return;
 			}
 			if ( prog.inputs.size() == 0 ) {
@@ -1033,6 +1059,9 @@ public class Main {
 		ps.println("      [-tt [hostname[:port]]] [-mm key] [-pen tmDirectory] [-gs configFile]");
 		ps.println("      [-apertium [serverURL]] [-ms configFile] [-tda configFile]");
 		ps.println("      [-opt threshold[:maxhits]]");
+		ps.println("Adds translation to a resources:");
+		ps.println("   -a \"source text\" \"target text\" [-sl srcLang] [-tl trgLang]");
+		ps.println("      -ms configFile");
 		ps.println("Converts to PO format:");
 		ps.println("   -2po inputFile [inputFile2...] [-fc configId] [-ie encoding] [-all]");
 		ps.println("      [-sl srcLang] [-tl trgLang] [-generic] [-trgsource|-trgempty]");
@@ -1088,6 +1117,33 @@ public class Main {
 			ps.println(String.format("  Source: \"%s\"", query));
 			ps.println("  <No translation has been found>");
 		}	
+	}
+	
+	private void processAddTranslation () {
+		guessMissingLocales(null);
+		if ( Util.isEmpty(query) ) {
+			throw new RuntimeException(String.format("Cannot add empty source text."));
+		}
+		if ( Util.isEmpty(addTransTrans) ) {
+			throw new RuntimeException(String.format("Cannot add empty target text."));
+		}
+		if ( useMicrosoft ) {
+			MicrosoftMTConnector conn = new MicrosoftMTConnector();
+			conn.setParameters(prepareConnectorParameters(conn.getClass().getName()));
+			conn.setLanguages(srcLoc, trgLoc);
+			conn.open();
+			int res = conn.addTranslation(parseToTextFragment(query), parseToTextFragment(addTransTrans), addTransRating);
+			if ( res == 200 ) {
+				ps.println("Done");
+			}
+			else {
+				ps.println(String.format("Error code %d.", res));
+			}
+			conn.close();
+		}
+		else {
+			throw new RuntimeException(String.format("No valid connector specified to add a translation."));
+		}
 	}
 	
 	private void processQuery () {

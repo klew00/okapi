@@ -34,6 +34,7 @@ import java.util.List;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.UsingParameters;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.BaseConnector;
@@ -158,30 +159,34 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 				// Get the source (when available)
 				n1 = res.indexOf("<MatchedOriginalText", 0); // No > to handle /> cases
 				n2 = res.indexOf("</MatchedOriginalText", n1);
-				if ( n2 > -1 ) stext = res.substring(n1+21, n2);
+				if ( n2 > -1 ) stext = unescapeXML(res.substring(n1+21, n2));
 				else stext = null; // No source (same as original
 				// Translation
 				String ttext = "";
 				n1 = res.indexOf("<TranslatedText", n2); // No > to handle /> cases
 				n2 = res.indexOf("</TranslatedText", n1);
-				if ( n2 > -1 ) ttext = res.substring(n1+16, n2);
+				if ( n2 > -1 ) ttext = unescapeXML(res.substring(n1+16, n2));
 				result = new QueryResult();
+				result.score = score; // Score from the system
+				if ( score > 90 ) {
+					result.score += (rating-10); // Try to adjust high scores
+					// Ideally we would want a composite value for the score
+				}
+				// Weed out the scores lower than the threshold after adjustment
+				if ( result.score < threshold ) continue;
+				// Else: continue with that result
 				result.weight = getWeight();
 				if ( frag.hasCode() ) {
 					if ( stext == null ) result.source = frag;
-					else result.source = new TextFragment(stext);
-					result.target = new TextFragment(util.fromCodedHTML(ttext, frag),
+					else result.source = new TextFragment(util.fromCodedHTML(stext, frag, false),
+						frag.getClonedCodes());
+					result.target = new TextFragment(util.fromCodedHTML(ttext, frag, false),
 						frag.getClonedCodes());
 				}
 				else {
 					if ( stext == null ) result.source = frag;
-					else result.source = new TextFragment(stext);
-					result.target = new TextFragment(util.fromCodedHTML(ttext, frag));
-				}
-				if ( score > 90 ) {
-					result.score = score; // Arbitrary score for MT
-					result.score += (rating-10); // Try to adjust
-					// Ideally we would want a composite value for the score
+					else result.source = new TextFragment(util.fromCodedHTML(stext, frag, false));
+					result.target = new TextFragment(util.fromCodedHTML(ttext, frag, false));
 				}
 				result.origin = getName();
 				result.matchType = MatchType.MT;
@@ -193,6 +198,14 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 		}
 		if ( results.size() > 0 ) current = 0;
 		return results.size();
+	}
+	
+	private String unescapeXML (String text) {
+		text = text.replace("&apos;", "'");
+		text = text.replace("&lt;", "<");
+		text = text.replace("&gt;", ">");
+		text = text.replace("&quot;", "\"");
+		return text.replace("&amp;", "&"); // Ampersand must be done last
 	}
 
 	public int addTranslation (TextFragment source,

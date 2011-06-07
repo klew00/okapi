@@ -120,11 +120,11 @@ public class GoogleMTConnector extends BaseConnector {
 			result.weight = getWeight();
 			result.source = fragment;
 			if ( fragment.hasCode() ) {
-				result.target = new TextFragment(util.fromCodedHTML(res, fragment),
+				result.target = new TextFragment(util.fromCodedHTML(res, fragment, true),
 					fragment.getClonedCodes());
 			}
 			else {
-				result.target = new TextFragment(util.fromCodedHTML(res, fragment));
+				result.target = new TextFragment(util.fromCodedHTML(res, fragment, true));
 			}
 			result.score = 95; // Arbitrary score for MT
 			result.origin = getName();

@@ -473,7 +473,7 @@ public class BatchTranslator {
 				
 				TextFragment trgFrag;
 				try {
-					String ctext = qutil.fromCodedHTML(elem.getContent().toString(), srcFrag);
+					String ctext = qutil.fromCodedHTML(elem.getContent().toString(), srcFrag, true);
 					trgFrag = new TextFragment(ctext, srcFrag.getCodes());
 				}
 				catch ( Throwable e ) {

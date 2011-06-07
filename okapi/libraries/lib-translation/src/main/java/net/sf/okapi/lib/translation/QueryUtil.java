@@ -317,7 +317,8 @@ public class QueryUtil {
 	 * @return the coded text with its code markers.
 	 */
 	public String fromCodedHTML (String text,
-		TextFragment fragment)
+		TextFragment fragment,
+		boolean addMissingCodes)
 	{
 		if ( Util.isEmpty(text) ) {
 			return "";
@@ -326,8 +327,7 @@ public class QueryUtil {
 		text = text.replace("&lt;", "<");
 		text = text.replace("&gt;", ">");
 		text = text.replace("&quot;", "\"");
-		StringBuilder sb = new StringBuilder();
-		sb.append(text.replace("&amp;", "&"));
+		StringBuilder sb = new StringBuilder(text.replace("&amp;", "&"));
 		if ( entities == null ) {
 			entities = new HTMLCharacterEntities();
 			entities.ensureInitialization(false);
@@ -437,7 +437,7 @@ public class QueryUtil {
 		}
 
 		// Try to correct missing codes
-		if ( newCodes.size() < oriCodes.size() ) {
+		if ( addMissingCodes && ( newCodes.size() < oriCodes.size() )) {
 			for ( String tmp : oriCodes ) {
 				if ( !newCodes.contains(tmp) ) {
 					switch ( tmp.charAt(0) ) {

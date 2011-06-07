@@ -72,7 +72,7 @@ public class QueryUtilTest {
 	public void testFromSameHTML () {
 		TextFragment tf = makeFragment();
 		String htmlText = qu.toCodedHTML(tf);
-		String codedText = qu.fromCodedHTML(htmlText, tf);
+		String codedText = qu.fromCodedHTML(htmlText, tf, true);
 		TextFragment resFrag = new TextFragment(codedText, tf.getCodes());
 		assertTrue(resFrag.compareTo(tf, false) == 0);
 		assertTrue(resFrag.compareTo(tf, true) == 0);
@@ -82,7 +82,7 @@ public class QueryUtilTest {
 	public void testFromModifiedHTML () {
 		TextFragment tf = makeFragment();
 		String htmlText = qu.toCodedHTML(tf);
-		String codedText = qu.fromCodedHTML(htmlText, tf);
+		String codedText = qu.fromCodedHTML(htmlText, tf, true);
 		codedText = codedText.toUpperCase();
 		TextFragment resFrag = new TextFragment(codedText, tf.getCodes());
 		assertEquals("A & < > \" \' <b>BOLD</b> T <br/> Z", resFrag.toText());
@@ -103,7 +103,7 @@ public class QueryUtilTest {
 		assertEquals("a &amp; &lt; > \" \' <u id='1'>bold</u> t <br id='2'/> z", htmlText);
 		// Send something with missing codes (faking translation results)
 		htmlText = "a <u id='1'>b</u> c";
-		String codedText = qu.fromCodedHTML(htmlText, tf);
+		String codedText = qu.fromCodedHTML(htmlText, tf, true);
 		TextFragment resFrag = new TextFragment(codedText, tf.getCodes());
 		assertEquals("a <1>b</1> c<2/>", fmt.setContent(resFrag).toString());
 		assertEquals("a <b>b</b> c<br/>", resFrag.toText());
@@ -113,7 +113,7 @@ public class QueryUtilTest {
 	public void testFromSameHTMLComplex () {
 		TextFragment tf = makeComplexFragment();
 		String htmlText = qu.toCodedHTML(tf);
-		String codedText = qu.fromCodedHTML(htmlText, tf);
+		String codedText = qu.fromCodedHTML(htmlText, tf, true);
 		TextFragment resFrag = new TextFragment(codedText, tf.getCodes());
 		assertEquals("t1<1><2>bs1</2></1>t2<3>b1</3>", fmt.setContent(resFrag).toString());
 	}
@@ -126,7 +126,7 @@ public class QueryUtilTest {
 		assertEquals("t1<u id='1'><u id='2'>bs1</u></u>t2<u id='3'>b1</u>", htmlText);
 		// What we get back from the translation:
 		htmlText = "t1<u id='2'><u id='3'><u id='1'>t2</u></u>t3</u>";
-		String codedText = qu.fromCodedHTML(htmlText, tf);
+		String codedText = qu.fromCodedHTML(htmlText, tf, true);
 		TextFragment resFrag = new TextFragment(codedText, tf.getCodes());
 		assertEquals("t1<2><3><1>t2</1></3>t3</2>", fmt.setContent(resFrag).toString());
 		assertEquals("t1<u><b><b>t2</b></b>t3</u>", resFrag.toText());
@@ -140,7 +140,7 @@ public class QueryUtilTest {
 		assertEquals("t1<u id='1'><u id='2'>bs1</u></u>t2<u id='3'>b1</u>", htmlText);
 		// What we get back from the translation:
 		htmlText = "t1<u id='2'><u id='1'>t2</u>t3</u>";
-		String codedText = qu.fromCodedHTML(htmlText, tf);
+		String codedText = qu.fromCodedHTML(htmlText, tf, true);
 		TextFragment resFrag = new TextFragment(codedText, tf.getCodes());
 		assertEquals("t1<2><1>t2</1>t3</2><3></3>", fmt.setContent(resFrag).toString());
 		assertEquals("t1<u><b>t2</b>t3</u><b></b>", resFrag.toText());
@@ -151,7 +151,7 @@ public class QueryUtilTest {
 		TextFragment tf = makeFragment();
 		String htmlText = qu.toCodedHTML(tf);
 		htmlText = htmlText + "&aacute;&amp;&#39;&#x0152;&apos;";
-		String codedText = qu.fromCodedHTML(htmlText, tf);
+		String codedText = qu.fromCodedHTML(htmlText, tf, true);
 		TextFragment resFrag = new TextFragment(codedText, tf.getCodes());
 		assertEquals("a & < > \" \' <b>bold</b> t <br/> z\u00e1&'\u0152'", resFrag.toText());
 	}
