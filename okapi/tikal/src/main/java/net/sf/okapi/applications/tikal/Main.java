@@ -1060,7 +1060,7 @@ public class Main {
 		ps.println("      [-apertium [serverURL]] [-ms configFile] [-tda configFile]");
 		ps.println("      [-opt threshold[:maxhits]]");
 		ps.println("Adds translation to a resources:");
-		ps.println("   -a \"source text\" \"target text\" [-sl srcLang] [-tl trgLang]");
+		ps.println("   -a \"source text\" \"target text\" [rating] [-sl srcLang] [-tl trgLang]");
 		ps.println("      -ms configFile");
 		ps.println("Converts to PO format:");
 		ps.println("   -2po inputFile [inputFile2...] [-fc configId] [-ie encoding] [-all]");

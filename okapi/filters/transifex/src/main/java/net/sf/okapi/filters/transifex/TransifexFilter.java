@@ -287,7 +287,7 @@ public class TransifexFilter implements IFilter {
 		String outputPath = tempDir + File.separator + info.getName();
 		String[] res = cli.getResource(info.getId(), proj.getTargetLocale(), outputPath);
 		if ( res[0] == null ) {
-			logger.severe(String.format("Could not download the resource '%s'.", info.getId()));
+			logger.severe(String.format("Could not download the resource '%s'.\n%s", info.getId(), res[1]));
 			return false;
 		}
 

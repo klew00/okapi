@@ -34,7 +34,6 @@ import java.util.List;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.UsingParameters;
-import net.sf.okapi.common.Util;
 import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.BaseConnector;
@@ -72,7 +71,7 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 
 	@Override
 	public String getName () {
-		return "Micosoft-Translator";
+		return "Microsoft-Translator";
 	}
 
 	@Override
