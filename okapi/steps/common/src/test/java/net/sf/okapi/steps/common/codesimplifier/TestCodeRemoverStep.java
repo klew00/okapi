@@ -21,24 +21,15 @@
 package net.sf.okapi.steps.common.codesimplifier;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
-import java.util.ArrayList;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
-import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.Util;
-import net.sf.okapi.common.filters.InputDocument;
-import net.sf.okapi.common.filters.RoundTripComparison;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.resource.TextUnit;
-import net.sf.okapi.filters.html.HtmlFilter;
 
 import org.junit.Before;
 import org.junit.Test;
