@@ -331,9 +331,7 @@ public class IDMLFilterWriter implements IFilterWriter {
 		
 		try {
 			Document tmpDoc =  docBuilder.parse(new InputSource(new StringReader(xml.toString())));
-			
 			Document docWhereToImport = skel.getScopeNode().getOwnerDocument();
-			
 			DocumentFragment docFrag = docWhereToImport.createDocumentFragment(); // doc.createDocumentFragment();
 			
 			Node imp = docWhereToImport.importNode(tmpDoc.getDocumentElement(), true); // doc.importNode(tmpDoc.getDocumentElement(), true);

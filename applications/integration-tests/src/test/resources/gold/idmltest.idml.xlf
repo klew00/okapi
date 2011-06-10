@@ -2,7 +2,9 @@
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:okp="okapi-framework:xliff-extensions">
 <file original="idmltest.idml" source-language="en" target-language="fr" datatype="x-application/vnd.adobe.indesign-idml-package" okp:inputEncoding="UTF-8">
 <body>
-<group id="spr1" resname="Spreads/Spread_uad.xml" restype="x-spread">
+<group id="spr1" resname="MasterSpreads/MasterSpread_ub4.xml" restype="x-spread">
+</group>
+<group id="spr2" resname="Spreads/Spread_uad.xml" restype="x-spread">
 <group id="sto1" resname="uc2" restype="x-story">
 <trans-unit id="uc2-1">
 <source xml:lang="en">This is a first sentence.<x id="2"/>And a second line in that same paragraph.<x id="3"/>and a third one after Ctrl+Enter<x id="4"/>\=bs, &amp;=amp, &lt;=lt, “=quot, ^=caret<x id="5"/>Text in <x id="6"/>a different font<x id="7"/>.</source>

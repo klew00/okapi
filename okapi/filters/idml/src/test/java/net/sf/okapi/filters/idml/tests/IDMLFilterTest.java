@@ -100,6 +100,7 @@ public class IDMLFilterTest {
 // For local test only, comment out for SVN		
 //		list.add(new InputDocument(root+"private/enlaso_001.idml", "../okf_idml@ExtractAll.fprm"));
 //		list.add(new InputDocument(root+"private/enlaso_002.idml", "../okf_idml@ExtractAll.fprm"));
+//		list.add(new InputDocument(root+"private/WithMasterPage.idml", "../okf_idml@ExtractAll.fprm"));
 //		list.add(new InputDocument(root+"Bluto.idml", "okf_idml@ExtractAll.fprm"));
 		
 		RoundTripComparison rtc = new RoundTripComparison(false); // Do not compare skeleton

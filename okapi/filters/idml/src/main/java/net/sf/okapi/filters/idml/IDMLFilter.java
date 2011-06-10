@@ -333,7 +333,8 @@ public class IDMLFilter implements IFilter {
 			while( entries.hasMoreElements() ) {
 				ZipEntry entry = entries.nextElement();
 				if ( entry.getName().endsWith(".xml") ) {
-					if ( entry.getName().startsWith("Spreads/") ) {
+					if ( entry.getName().startsWith("Spreads/") ||
+						( entry.getName().startsWith("MasterSpreads/") && params.getExtractMasterSpreads() )) {
 						// Gather stories from the spread
 						processSpread(entry);
 					}

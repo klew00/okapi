@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2010 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -31,9 +31,11 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 
 	private static final String EXTRACTNOTES = "extractNotes";
 	private static final String SIMPLIFYCODES = "simplifyCodes";
+	private static final String EXTRACTMASTERSPREADS = "extractMasterSpreads";
 
 	private boolean extractNotes;
 	private boolean simplifyCodes;
+	private boolean extractMasterSpreads;
 
 	public Parameters () {
 		reset();
@@ -43,6 +45,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public void reset () {
 		extractNotes = false;
 		simplifyCodes = true;
+		extractMasterSpreads = true;
 	}
 
 	public void fromString (String data) {
@@ -50,6 +53,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.fromString(data);
 		extractNotes = buffer.getBoolean(EXTRACTNOTES, extractNotes);
 		simplifyCodes = buffer.getBoolean(SIMPLIFYCODES, simplifyCodes);
+		extractMasterSpreads = buffer.getBoolean(EXTRACTMASTERSPREADS, extractMasterSpreads);
 	}
 	
 	@Override
@@ -57,6 +61,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.reset();
 		buffer.setBoolean(EXTRACTNOTES, extractNotes);
 		buffer.setBoolean(SIMPLIFYCODES, simplifyCodes);
+		buffer.setBoolean(EXTRACTMASTERSPREADS, extractMasterSpreads);
 		return buffer.toString();
 	}
 
@@ -76,10 +81,19 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.simplifyCodes = simplifyCodes;
 	}
 
+	public boolean getExtractMasterSpreads () {
+		return extractMasterSpreads;
+	}
+	
+	public void setExtractMasterSpreads (boolean extractMasterSpreads) {
+		this.extractMasterSpreads = extractMasterSpreads;
+	}
+
 	@Override
 	public ParametersDescription getParametersDescription() {
 		ParametersDescription desc = new ParametersDescription(this);
 		desc.add(EXTRACTNOTES, "Extract notes", null);
+		desc.add(EXTRACTMASTERSPREADS, "Extract master spreads", null);
 		desc.add(SIMPLIFYCODES, "Simplify inline codes when possible", null);
 		return desc;
 	}
@@ -89,6 +103,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		EditorDescription desc = new EditorDescription("IDML Filter", true, false);
 		
 		desc.addCheckboxPart(paramsDesc.get(EXTRACTNOTES));
+		desc.addCheckboxPart(paramsDesc.get(EXTRACTMASTERSPREADS));
+		desc.addSeparatorPart();
 		desc.addCheckboxPart(paramsDesc.get(SIMPLIFYCODES));
 		
 		return desc;
