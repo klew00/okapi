@@ -1033,6 +1033,52 @@ public class TextUnitUtil {
 				tuSkel.add(skel);
 		}
 	}
+
+	/**
+	 * Removes all inline tags in the source (or optionally the target) text unit resource.
+	 * @param removeTargetCodes - remove target codes?
+	 */
+	public static void removeCodes(ITextUnit textUnit, boolean removeTargetCodes) {
+		if (textUnit == null) {
+			LOGGER.warning("Text unit is null.");
+			return;
+		}
+		
+		// remove source inline codes
+		TextContainer stc = textUnit.getSource();
+		removeCodes(stc);
+		
+		// if requested and if targets exist remove inline codes for all targets
+		if (removeTargetCodes && !textUnit.getTargetLocales().isEmpty()) {				
+			for (LocaleId locale: textUnit.getTargetLocales()) {
+				TextContainer ttc = textUnit.getTarget(locale);
+				removeCodes(ttc); 
+			}
+		}
+	}
+
+	/**
+	 * Removes all inline tags from the given {@link TextContainer}
+	 */
+	public static void removeCodes(TextContainer tc) {
+		TextFragment tf = TextUnitUtil.storeSegmentation(tc);
+				
+		StringBuilder tmp = new StringBuilder();
+		StringBuilder text = new StringBuilder(tf.getText());
+		for (int i=0; i<text.length(); i++) {
+			switch (text.charAt(i)) {
+				case TextFragment.MARKER_OPENING:
+				case TextFragment.MARKER_CLOSING:
+				case TextFragment.MARKER_ISOLATED:
+					i++; // skip index marker as well
+					break;
+				default:
+					tmp.append(text.charAt(i));
+					break;
+			}
+		}
+		tc.setContent(new TextFragment(tmp.toString()));
+	}
 	
 	/**
 	 * Simplifies all possible tags in a given text fragment.
