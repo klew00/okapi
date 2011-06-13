@@ -50,6 +50,7 @@ class PreferencesForm {
 	private Button rdStartPrjLoad;
 	private Button chkAlwaysOpenLog;
 	private Button chkAllowDuplicateInputs;
+	private Button chkUseUserDefaults;
 	private Combo cbLogLevel;
 	private UserConfiguration config;
 	private TextAndBrowsePanel pnlDropinsDir;
@@ -93,6 +94,12 @@ class PreferencesForm {
 		gdTmp = new GridData();
 		gdTmp.horizontalSpan = 2;
 		chkAllowDuplicateInputs.setLayoutData(gdTmp);
+		
+		chkUseUserDefaults = new Button(grpTmp, SWT.CHECK);
+		chkUseUserDefaults.setText(Res.getString("PreferencesForm.useUserDefaults")); //$NON-NLS-1$
+		gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		chkUseUserDefaults.setLayoutData(gdTmp);
 		
 		Label label = new Label(grpTmp, SWT.NONE);
 		label.setText(Res.getString("PreferencesForm.logLevel")); //$NON-NLS-1$
@@ -152,6 +159,7 @@ class PreferencesForm {
 		this.config = config;
 		chkAlwaysOpenLog.setSelection(config.getBoolean(MainForm.OPT_ALWAYSOPENLOG));
 		chkAllowDuplicateInputs.setSelection(config.getBoolean(MainForm.OPT_ALLOWDUPINPUT));
+		chkUseUserDefaults.setSelection(config.getBoolean(MainForm.OPT_USEUSERDEFAULTS));
 		
 		int n = config.getInteger(MainForm.OPT_LOADMRU);
 		if ( n == 1 ) rdStartPrjAsk.setSelection(true);
@@ -191,6 +199,7 @@ class PreferencesForm {
 			
 			config.setProperty(MainForm.OPT_ALWAYSOPENLOG, chkAlwaysOpenLog.getSelection());
 			config.setProperty(MainForm.OPT_ALLOWDUPINPUT, chkAllowDuplicateInputs.getSelection());
+			config.setProperty(MainForm.OPT_USEUSERDEFAULTS, chkUseUserDefaults.getSelection());
 			
 			if ( rdStartPrjAsk.getSelection() ) config.setProperty(MainForm.OPT_LOADMRU, 1);
 			else if ( rdStartPrjLoad.getSelection() ) config.setProperty(MainForm.OPT_LOADMRU, 2);

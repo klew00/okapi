@@ -33,13 +33,28 @@ public class XLIFFEvent {
 	};
 	
 	private XLIFFEventType type;
+	private EventObject object;
 	
-	public XLIFFEvent (XLIFFEventType type) {
-		this.type = type;
+	public XLIFFEvent (EventObject object) {
+		this.object = object;
+		if ( object instanceof Unit ) {
+			this.type = XLIFFEventType.EXTRACTION_UNIT;
+		}
+		else {
+			throw new RuntimeException("Unknow event object type.");
+		}
 	}
 	
 	public XLIFFEventType getType () {
 		return this.type;
+	}
+
+	public boolean isUnit () {
+		return (type == XLIFFEventType.EXTRACTION_UNIT);
+	}
+	
+	public Unit getUnit () {
+		return (Unit)object;
 	}
 
 }

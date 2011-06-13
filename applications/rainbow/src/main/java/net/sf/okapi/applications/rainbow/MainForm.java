@@ -147,6 +147,11 @@ public class MainForm { //implements IParametersProvider {
 	public static final String OPT_LOGLEVEL = "logLevel"; //$NON-NLS-1$
 	public static final String OPT_ALWAYSOPENLOG = "alwaysOpenLog"; //$NON-NLS-1$
 	public static final String OPT_DROPINSDIR = "dropinsDir"; //$NON-NLS-1$
+	public static final String OPT_USEUSERDEFAULTS = "useUserDefaults"; //$NON-NLS-1$
+	public static final String OPT_SOURCELOCALE = "sourceLocale"; //$NON-NLS-1$
+	public static final String OPT_SOURCEENCODING = "sourceEncoding"; //$NON-NLS-1$
+	public static final String OPT_TARGETLOCALE = "targetLocale"; //$NON-NLS-1$
+	public static final String OPT_TARGETENCODING = "targetEncoding"; //$NON-NLS-1$
 	
 	protected static final String PRJPIPELINEID = "currentProjectPipeline"; //$NON-NLS-1$
 	protected static final String NOEXPAND_EXTENSIONS = ";.pentm;"; //$NON-NLS-1$
@@ -1975,6 +1980,13 @@ public class MainForm { //implements IParametersProvider {
 		config.setProperty(OPT_BOUNDS, String.format("%d,%d,%d,%d", r.x, r.y, r.width, r.height)); //$NON-NLS-1$
 		// Set the MRU list
 		mruList.copyToProperties(config);
+		// Source and target locales and encodings
+		if ( config.getBoolean(OPT_USEUSERDEFAULTS) ) saveSurfaceData();
+		config.setProperty(OPT_SOURCELOCALE, prj.getSourceLanguage().toString());
+		config.setProperty(OPT_SOURCEENCODING, prj.getSourceEncoding());
+		config.setProperty(OPT_TARGETLOCALE, prj.getTargetLanguage().toString());
+		config.setProperty(OPT_TARGETENCODING, prj.getTargetEncoding());
+
 		// Save to the user home directory as ".appname" file
 		config.save(APPNAME, getClass().getPackage().getImplementationVersion());
 	}
@@ -2107,6 +2119,20 @@ public class MainForm { //implements IParametersProvider {
 		}
 		
 		prj = new Project(lm);
+
+		// Overwrite locale/encoding with user defaults if needed
+		if ( config.getBoolean(OPT_USEUSERDEFAULTS) ) {
+			String tmp = config.getProperty(OPT_SOURCELOCALE);
+			if ( !Util.isEmpty(tmp) ) prj.setSourceLanguage(LocaleId.fromString(tmp));
+			tmp = config.getProperty(OPT_SOURCEENCODING);
+			if ( !Util.isEmpty(tmp) ) prj.setSourceEncoding(tmp);
+			tmp = config.getProperty(OPT_TARGETLOCALE);
+			if ( !Util.isEmpty(tmp) ) prj.setTargetLanguage(LocaleId.fromString(tmp));
+			tmp = config.getProperty(OPT_TARGETENCODING);
+			if ( !Util.isEmpty(tmp) ) prj.setTargetEncoding(tmp);
+			prj.isModified = false; // User defaults are not modifications
+		}
+		
 		customFilterConfigsNeedUpdate = true;
 		wrapper = null;
 		currentInput = 0;

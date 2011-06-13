@@ -20,43 +20,16 @@
 
 package net.sf.okapi.lib.xliff;
 
-import java.util.ArrayList;
-import java.util.Iterator;
+class EventObject {
 
-public class Unit extends EventObject implements Iterable<Part> {
-	
-	private ArrayList<Part> list;
+	private String id;
 
-	public Unit (String id) {
-		setId(id);
-		list = new ArrayList<Part>();
+	public String getId () {
+		return id;
 	}
 	
-	@Override
-    public Iterator<Part> iterator() {
-		return new Iterator<Part>() {
-			int current = 0;
-
-			@Override
-			public void remove () {
-				throw new UnsupportedOperationException("The method remove() not supported.");
-			}
-
-			@Override
-			public Part next () {
-				return list.get((++current)-1);
-			}
-
-			@Override
-			public boolean hasNext () {
-				return ( !list.isEmpty() && ( current < list.size() ));
-			}
-		};
-	};
-
-	public Unit add (Part part) {
-		list.add(part);
-		return this;
+	public void setId (String id) {
+		this.id = id;
 	}
-
+	
 }
