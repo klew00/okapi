@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.jar.JarEntry;
@@ -109,11 +111,19 @@ public class PluginsManager {
 			urls.addAll(existingUrls);
 			// Set the loader
 			if ( urls.size() > 0 ) {
-				URL[] tmp = new URL[urls.size()];
+				final URL[] tmp = new URL[urls.size()];
 				for ( int i=0; i<urls.size(); i++ ) {
 					tmp[i] = urls.get(i);
 				}
-				loader = new URLClassLoader(tmp, Thread.currentThread().getContextClassLoader());
+				loader = AccessController.doPrivileged(
+				        new PrivilegedAction<URLClassLoader>() {
+				        	
+						      public URLClassLoader run() {
+						        return new URLClassLoader(tmp,
+						        		Thread.currentThread().getContextClassLoader());
+						      }
+				        }
+				);
 			}
 			
 			// Associate the editor-type plugins with their action-type plugins
