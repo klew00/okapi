@@ -30,8 +30,14 @@ import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
 	private static final String TUS_FOR_TARGET_REMOVAL = "tusForTargetRemoval";
+	private static final String TARGET_LOCALES_TO_KEEP = "targetLocalesToKeep";
+	private static final String FILTER_BASED_ON_IDS = "filterBasedOnIds";
+	private static final String REMOVE_TU_IF_NO_TARGET = "removeTUIfNoTarget";
 	
 	private String tusForTargetRemoval;
+	private String targetLocalesToKeep;
+	private boolean filterBasedOnIds;
+	private boolean removeTUIfNoTarget;
 	
 	public Parameters() {
 		reset();
@@ -39,6 +45,9 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	
 	public void reset() {
 		tusForTargetRemoval = "";
+		targetLocalesToKeep = "";
+		filterBasedOnIds = true;
+		removeTUIfNoTarget = false;
 	}
 
 	@Override
@@ -47,12 +56,18 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.fromString(data);
 		// Read the file content as a set of fields
 		tusForTargetRemoval = buffer.getString(TUS_FOR_TARGET_REMOVAL, tusForTargetRemoval);
+		targetLocalesToKeep = buffer.getString(TARGET_LOCALES_TO_KEEP, targetLocalesToKeep);
+		filterBasedOnIds = buffer.getBoolean(FILTER_BASED_ON_IDS, filterBasedOnIds);
+		removeTUIfNoTarget = buffer.getBoolean(REMOVE_TU_IF_NO_TARGET, removeTUIfNoTarget);
 	}
 
 	@Override
 	public String toString() {
 		buffer.reset();		
 		buffer.setString(TUS_FOR_TARGET_REMOVAL, tusForTargetRemoval);
+		buffer.setString(TARGET_LOCALES_TO_KEEP, targetLocalesToKeep);
+		buffer.setBoolean(FILTER_BASED_ON_IDS, filterBasedOnIds);
+		buffer.setBoolean(REMOVE_TU_IF_NO_TARGET, removeTUIfNoTarget);
 		return buffer.toString();
 	}
 	
@@ -64,18 +79,56 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		return tusForTargetRemoval;
 	}
 
+	public void setTargetLocalesToKeep(String targetLocalesToKeep) {
+		this.targetLocalesToKeep = targetLocalesToKeep;
+	}
+
+	public String getTargetLocalesToKeep() {
+		return targetLocalesToKeep;
+	}
+
+	public boolean isFilterBasedOnIds() {
+		return filterBasedOnIds;
+	}
+	
+	public void setFilterBasedOnIds(boolean filterBasedOnIds) {
+		this.filterBasedOnIds = filterBasedOnIds;
+	}
+
+	public boolean isRemoveTUIfNoTarget() {
+		return removeTUIfNoTarget;
+	}
+	
+	public void setRemoveTUIfNoTarget(boolean removeTUIfNoTarget) {
+		this.removeTUIfNoTarget = removeTUIfNoTarget;
+	}
+	
 	@Override
 	public ParametersDescription getParametersDescription() {
 		ParametersDescription desc = new ParametersDescription(this);
-		desc.add(TUS_FOR_TARGET_REMOVAL, "Comma-delimited list of ids of the text units where targets are to be removed (empty - remove in all)", 
+		desc.add(TUS_FOR_TARGET_REMOVAL, 
+				"Comma-delimited list of ids of the text units where targets are to be removed (empty - remove all targets)", 
 				null);
+		desc.add(TARGET_LOCALES_TO_KEEP, 
+				"Comma-delimited list of locales of the text units of targets that should be kept (empty - keep all targets)", 
+				null);
+		desc.add(FILTER_BASED_ON_IDS, 
+				"If true filter on ID's, if false filter on locales (you cannot filter on both)", 
+				null);
+		desc.add(REMOVE_TU_IF_NO_TARGET, 
+				"If true remove the Text Unit if it has no remaining targets, if false do nothing", 
+				null);
+
 		return desc;
 	}
 
 	@Override
 	public EditorDescription createEditorDescription(ParametersDescription paramsDesc) {
-		EditorDescription desc = new EditorDescription("Remove Target", true, false);		
+		EditorDescription desc = new EditorDescription("Remove Target Options", true, false);
+		desc.addCheckboxPart(paramsDesc.get(FILTER_BASED_ON_IDS));
+		desc.addCheckboxPart(paramsDesc.get(REMOVE_TU_IF_NO_TARGET));
 		desc.addTextInputPart(paramsDesc.get(TUS_FOR_TARGET_REMOVAL));
+		desc.addTextInputPart(paramsDesc.get(TARGET_LOCALES_TO_KEEP));
 		return desc;
 	}
 
