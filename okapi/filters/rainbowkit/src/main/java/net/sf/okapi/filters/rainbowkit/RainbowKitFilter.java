@@ -55,6 +55,8 @@ import net.sf.okapi.lib.transifex.TransifexClient;
 public class RainbowKitFilter implements IFilter {
 
 	public static final String RAINBOWKIT_MIME_TYPE = "application/x-rainbowkit";
+	public static final String RAINBOWKIT_PACKAGE_MIME_TYPE = "application/x-rainbowkit-package";
+	public static final String RAINBOWKIT_PACKAGE_EXTENSION = ".rkp";
 	
 	private static final Logger LOGGER = Logger.getLogger(RainbowKitFilter.class.getName());
 
@@ -117,6 +119,13 @@ public class RainbowKitFilter implements IFilter {
 			"Configuration for Rainbow translation kit.",
 			null,
 			Manifest.MANIFEST_EXTENSION+";"));
+		list.add(new FilterConfiguration(getName() + "-package",
+				RAINBOWKIT_PACKAGE_MIME_TYPE,
+			getClass().getName(),
+			"Rainbow Translation Kit Package",
+			"Configuration for Rainbow translation kit package.",
+			null,
+			RAINBOWKIT_PACKAGE_EXTENSION+";"));
 		return list;
 	}
 	
@@ -182,11 +191,30 @@ public class RainbowKitFilter implements IFilter {
 		close();
 		canceled = false;
 		
-		manifest = new Manifest();
 		if ( input.getInputURI() == null ) {
 			throw new OkapiIOException("This filter requires URI-based raw documents only.");
 		}
-		manifest.load(new File(input.getInputURI()));
+		
+		File inFile = new File(input.getInputURI());
+		String inFileName = inFile.getAbsolutePath();
+		boolean isPackage = inFileName.endsWith(RAINBOWKIT_PACKAGE_EXTENSION);
+			
+		manifest = new Manifest();
+		
+		// Unzip the package if needed and update the path to the extracted manifest
+		// The package is always unzipped (no check if already has been) to be able to upload a new version of the same package 
+		if (isPackage) {
+			String root = Util.getDirectoryName(inFileName);
+			Util.unzip(inFileName, root);
+			
+			String packageName = Util.getFilename(inFileName, false);
+			String manifestFullName = Util.ensureSeparator(root, false);
+			manifestFullName = Util.ensureSeparator(manifestFullName + packageName, false);
+			manifestFullName = manifestFullName + Manifest.MANIFEST_FILENAME + Manifest.MANIFEST_EXTENSION;
+			inFile = new File(manifestFullName); // inFile.exists()
+		}
+		
+		manifest.load(inFile);
 		
 		// Prompt the user?
 		if ( params.getOpenManifest() ) {
