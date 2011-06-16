@@ -189,10 +189,10 @@ public class TMXWriter {
    		String dataType)
     {
     	if ( sourceLocale == null ) {
-    		throw new NullPointerException();
+    		throw new NullPointerException("sourceLocale null");
     	}
     	if ( targetLocale == null ) {
-    		throw new NullPointerException();
+    		throw new NullPointerException("targetLocale null");
     	}
     	this.srcLoc = sourceLocale;
     	this.trgLoc = targetLocale;
