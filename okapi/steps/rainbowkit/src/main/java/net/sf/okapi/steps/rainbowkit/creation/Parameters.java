@@ -31,6 +31,7 @@ public class Parameters extends BaseParameters {
 	static final String PACKAGEDIRECTORY = "packageDirectory"; //$NON-NLS-1$ 
 	static final String MESSAGE = "message"; //$NON-NLS-1$
 	static final String OUTPUTMANIFEST = "outputManifest"; //$NON-NLS-1$
+	static final String CREATEZIP = "createZip"; //$NON-NLS-1$
 	
 	private String writerClass;
 	private String writerOptions;
@@ -38,6 +39,7 @@ public class Parameters extends BaseParameters {
 	private String packageDirectory;
 	private String message;
 	private boolean outputManifest;
+	private boolean createZip;
 
 	public Parameters () {
 		reset();
@@ -52,6 +54,7 @@ public class Parameters extends BaseParameters {
 		// Internal
 		message = "";
 		outputManifest = true;
+		createZip = true;
 	}
 
 	@Override
@@ -65,6 +68,7 @@ public class Parameters extends BaseParameters {
 		// Internal
 		message = buffer.getString(MESSAGE, message);
 		outputManifest = buffer.getBoolean(OUTPUTMANIFEST, outputManifest);
+		createZip = buffer.getBoolean(CREATEZIP, createZip);
 	}
 
 	@Override
@@ -77,6 +81,7 @@ public class Parameters extends BaseParameters {
 		// Internal
 		buffer.setParameter(MESSAGE, message);
 		buffer.setParameter(OUTPUTMANIFEST, outputManifest);
+		buffer.setParameter(CREATEZIP, createZip);
 		return buffer.toString();
 	}
 
@@ -126,6 +131,14 @@ public class Parameters extends BaseParameters {
 
 	public void setOuputManifest (boolean outputManifest) {
 		this.outputManifest = outputManifest;
+	}
+
+	public boolean getCreateZip() {
+		return createZip;
+	}
+
+	public void setCreateZip(boolean createZip) {
+		this.createZip = createZip;
 	}
 
 }

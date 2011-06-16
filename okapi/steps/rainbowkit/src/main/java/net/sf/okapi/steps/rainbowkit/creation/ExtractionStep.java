@@ -34,11 +34,12 @@ import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.filters.rainbowkit.RainbowKitFilter;
 import net.sf.okapi.steps.rainbowkit.common.IPackageWriter;
 
 @UsingParameters(Parameters.class)
 public class ExtractionStep extends BasePipelineStep {
-
+	
 	private IPackageWriter writer;
 	private Parameters params;
 	private LocaleId srcLoc;
@@ -50,6 +51,7 @@ public class ExtractionStep extends BasePipelineStep {
 	private String rootDir;
 	private String inputRootDir;
 	private String outputRootDir;
+	private String resolvedOutputDir;
 
 	public ExtractionStep () {
 		super();
@@ -133,7 +135,7 @@ public class ExtractionStep extends BasePipelineStep {
 			writer = (IPackageWriter)Class.forName(writerClass).newInstance();
 			writer.setParameters(params);
 
-			String resolvedOutputDir = params.getPackageDirectory() + File.separator + params.getPackageName();
+			resolvedOutputDir = params.getPackageDirectory() + File.separator + params.getPackageName();
 			resolvedOutputDir = Util.fillRootDirectoryVariable(resolvedOutputDir, rootDir);
 			resolvedOutputDir = Util.fillInputRootDirectoryVariable(resolvedOutputDir, inputRootDir);
 			resolvedOutputDir = LocaleId.replaceVariables(resolvedOutputDir, srcLoc, trgLoc);
@@ -163,6 +165,10 @@ public class ExtractionStep extends BasePipelineStep {
 		event = writer.handleEvent(event);
 		writer.close();
 		writer = null;
+		
+		if (params.getCreateZip()) {
+			Util.zipFolder(resolvedOutputDir, RainbowKitFilter.RAINBOWKIT_PACKAGE_EXTENSION);
+		}
 		return event;
 	}
 	
