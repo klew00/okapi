@@ -62,6 +62,7 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 	private TabFolder tabs;
 	private Text edPackageName;
 	private TextAndBrowsePanel pnlPackageDir;
+	private Button btCreateZip;
 	private Composite mainComposite;
 	private List lbTypes;
 	private Button btOptions;
@@ -309,21 +310,28 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		//--- Location tab
 		
 		cmpTmp = new Composite(tabs, SWT.NONE);
-		cmpTmp.setLayout(new GridLayout());
+		cmpTmp.setLayout(new GridLayout(2, false));
 		tiTmp = new TabItem(tabs, SWT.NONE);
 		tiTmp.setText("Output Location");
 		tiTmp.setControl(cmpTmp);
 
 		label = new Label(cmpTmp, SWT.NONE);
 		label.setText("Root of the output directory:");
+		new Label(cmpTmp, SWT.NONE);
+		
 		pnlPackageDir = new TextAndBrowsePanel(cmpTmp, SWT.NONE, true);
-		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp = new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1);
 		pnlPackageDir.setLayoutData(gdTmp);
 
 		label = new Label(cmpTmp, SWT.NONE);
 		label.setText("Name of the package:");
+		new Label(cmpTmp, SWT.NONE);
+		
 		edPackageName = new Text(cmpTmp, SWT.BORDER);
-		edPackageName.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		edPackageName.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		
+		btCreateZip = new Button(cmpTmp, SWT.CHECK);
+		btCreateZip.setText("Create ZIP");
 	}
 	
 	private void updatePackageType () {
@@ -435,6 +443,7 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 	private void setData () {
 		pnlPackageDir.setText(params.getPackageDirectory());
 		edPackageName.setText(params.getPackageName());
+		btCreateZip.setSelection(params.getCreateZip());
 
 		String current = params.getWriterClass();
 		int n = 0;
@@ -463,6 +472,7 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		}
 		params.setPackageDirectory(pnlPackageDir.getText().trim());
 		params.setPackageName(edPackageName.getText().trim());
+		params.setCreateZip(btCreateZip.getSelection());
 		
 		int n = lbTypes.getSelectionIndex();
 		// Writer type/class
