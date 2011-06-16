@@ -80,6 +80,7 @@ public class FormatManager {
 		pairs.put(".yml", "okf_railsyaml");
 		pairs.put(".vrsz", "okf_versifiedtxt");
 		pairs.put(".rkm", "okf_rainbowkit");
+		pairs.put(".rkp", "okf_rainbowkit-package");
 		pairs.put(".txp", "okf_transifex");
 	}
 	
