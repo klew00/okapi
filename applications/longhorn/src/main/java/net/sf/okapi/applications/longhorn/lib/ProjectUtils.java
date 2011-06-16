@@ -38,6 +38,7 @@ import net.sf.okapi.common.filters.DefaultFilters;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.plugins.PluginsManager;
 import net.sf.okapi.filters.rainbowkit.Manifest;
+import net.sf.okapi.filters.rainbowkit.RainbowKitFilter;
 import net.sf.okapi.steps.rainbowkit.creation.ExtractionStep;
 import net.sf.okapi.steps.rainbowkit.creation.Parameters;
 import net.sf.okapi.steps.rainbowkit.postprocess.MergingStep;
@@ -219,7 +220,8 @@ public class ProjectUtils {
 			String extension = Util.getExtension(inputFile.getName());
 			String filterConfigurationId = filterConfigByExtension.get(extension);
 			
-			if (inputFile.getName().equals(Manifest.MANIFEST_FILENAME + Manifest.MANIFEST_EXTENSION)) {
+			if (inputFile.getName().endsWith(RainbowKitFilter.RAINBOWKIT_PACKAGE_EXTENSION) ||					
+				inputFile.getName().equals(Manifest.MANIFEST_FILENAME + Manifest.MANIFEST_EXTENSION)) {
 
 				int status = rainbowProject.addDocument(
 						0, inputFile.getAbsolutePath(), null, null, filterConfigurationId, false);
