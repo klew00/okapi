@@ -64,15 +64,20 @@ public class ProjectUtils {
 	}
 
 	public static void addBatchConfig(int projId, File tmpFile) {
-		File targetFile = WorkspaceUtils.getBatchConfigurationFile(projId);
-		Util.copyFile(tmpFile, targetFile);
-		
-		PipelineWrapper pipelineWrapper = preparePipelineWrapper(projId);
-		
-		// install batch configuration to config directory
-		BatchConfiguration bconf = new BatchConfiguration();
-		bconf.installConfiguration(targetFile.getAbsolutePath(),
-				WorkspaceUtils.getConfigDirPath(projId), pipelineWrapper);
+		PluginsManager plManager = new PluginsManager();
+		try {
+			File targetFile = WorkspaceUtils.getBatchConfigurationFile(projId);
+			Util.copyFile(tmpFile, targetFile);
+			
+			PipelineWrapper pipelineWrapper = preparePipelineWrapper(projId, plManager);
+			
+			// install batch configuration to config directory
+			BatchConfiguration bconf = new BatchConfiguration();
+			bconf.installConfiguration(targetFile.getAbsolutePath(),
+					WorkspaceUtils.getConfigDirPath(projId), pipelineWrapper);
+		} finally {
+			plManager.releaseClassLoader();
+		}
 	}
 
 	/**
@@ -81,29 +86,25 @@ public class ProjectUtils {
 	 * (where the batch configuration should have been installed to).
 	 * 
 	 * @param projId The id of a local project
+	 * @param plug-in manager for this wrapper
 	 * @return A PipelineWrapper using all available filter configurations and plug-ins
 	 */
-	private static PipelineWrapper preparePipelineWrapper(int projId) {		
-		PluginsManager plManager = new PluginsManager();
-		try {
-			// Load local plug-ins
-			plManager.discover(new File(WorkspaceUtils.getConfigDirPath(projId)), true);
-			
-			// Initialize filter configurations
-			FilterConfigurationMapper fcMapper = new FilterConfigurationMapper();
-			DefaultFilters.setMappings(fcMapper, false, true);
-			fcMapper.addFromPlugins(plManager);
-			fcMapper.setCustomConfigurationsDirectory(WorkspaceUtils.getConfigDirPath(projId));
-			fcMapper.updateCustomConfigurations();
-	
-			// Load pipeline
-			PipelineWrapper pipelineWrapper = new PipelineWrapper(fcMapper, WorkspaceUtils.getConfigDirPath(projId),
-					plManager, WorkspaceUtils.getInputDirPath(projId), WorkspaceUtils.getInputDirPath(projId), null);
-			pipelineWrapper.addFromPlugins(plManager);
-			return pipelineWrapper;
-		} finally {
-			plManager.releaseClassLoader();
-		}
+	private static PipelineWrapper preparePipelineWrapper(int projId, PluginsManager plManager) {				
+		// Load local plug-ins
+		plManager.discover(new File(WorkspaceUtils.getConfigDirPath(projId)), true);
+		
+		// Initialize filter configurations
+		FilterConfigurationMapper fcMapper = new FilterConfigurationMapper();
+		DefaultFilters.setMappings(fcMapper, false, true);
+		fcMapper.addFromPlugins(plManager);
+		fcMapper.setCustomConfigurationsDirectory(WorkspaceUtils.getConfigDirPath(projId));
+		fcMapper.updateCustomConfigurations();
+
+		// Load pipeline
+		PipelineWrapper pipelineWrapper = new PipelineWrapper(fcMapper, WorkspaceUtils.getConfigDirPath(projId),
+				plManager, WorkspaceUtils.getInputDirPath(projId), WorkspaceUtils.getInputDirPath(projId), null);
+		pipelineWrapper.addFromPlugins(plManager);
+		return pipelineWrapper;		
 	}
 
 	public static void addInputFile(int projId, File tmpFile, String filename) {
@@ -113,42 +114,47 @@ public class ProjectUtils {
 	}
 
 	public static void executeProject(int projId) throws IOException {
-		// Create a new, empty rainbow project
-		Project rainbowProject = new Project(new LanguageManager());
-		rainbowProject.setCustomParametersFolder(WorkspaceUtils.getConfigDirPath(projId));
-		rainbowProject.setUseCustomParametersFolder(true);
-				
-		// Create a pipeline wrapper
-		PipelineWrapper pipelineWrapper = preparePipelineWrapper(projId);
-		
-		// Load pipeline into the rainbow project
-		File pipelineFile = WorkspaceUtils.getPipelineFile(projId);
-		pipelineWrapper.load(pipelineFile.getAbsolutePath());
-		rainbowProject.setUtilityParameters(CURRENT_PROJECT_PIPELINE, pipelineWrapper.getStringStorage());
-
-		// Set new input and output root
-		rainbowProject.setInputRoot(0, WorkspaceUtils.getInputDirPath(projId), true);
-		rainbowProject.setOutputRoot(WorkspaceUtils.getOutputDirPath(projId));
-		rainbowProject.setUseOutputRoot(true);
-		
-		// Adjust paths from specific steps
-		adjustStepsPaths(projId, pipelineWrapper);
-		
-		// Load mapping of filter configs to file extensions
-		HashMap<String, String> filterConfigByExtension = loadFilterConfigurationMapping(projId);
-
-		// Add files to project input list
-		if (!isTKitMergePipeline(pipelineWrapper)) {
-			addDocumentsToProject(projId, rainbowProject, filterConfigByExtension);
+		PluginsManager plManager = new PluginsManager();
+		try {
+			// Create a new, empty rainbow project
+			Project rainbowProject = new Project(new LanguageManager());
+			rainbowProject.setCustomParametersFolder(WorkspaceUtils.getConfigDirPath(projId));
+			rainbowProject.setUseCustomParametersFolder(true);
+					
+			// Create a pipeline wrapper
+			PipelineWrapper pipelineWrapper = preparePipelineWrapper(projId, plManager);
+			
+			// Load pipeline into the rainbow project
+			File pipelineFile = WorkspaceUtils.getPipelineFile(projId);
+			pipelineWrapper.load(pipelineFile.getAbsolutePath());
+			rainbowProject.setUtilityParameters(CURRENT_PROJECT_PIPELINE, pipelineWrapper.getStringStorage());
+	
+			// Set new input and output root
+			rainbowProject.setInputRoot(0, WorkspaceUtils.getInputDirPath(projId), true);
+			rainbowProject.setOutputRoot(WorkspaceUtils.getOutputDirPath(projId));
+			rainbowProject.setUseOutputRoot(true);
+			
+			// Adjust paths from specific steps
+			adjustStepsPaths(projId, pipelineWrapper);
+			
+			// Load mapping of filter configs to file extensions
+			HashMap<String, String> filterConfigByExtension = loadFilterConfigurationMapping(projId);
+	
+			// Add files to project input list
+			if (!isTKitMergePipeline(pipelineWrapper)) {
+				addDocumentsToProject(projId, rainbowProject, filterConfigByExtension);
+			}
+			else {
+				addManifestToProject(projId, rainbowProject, filterConfigByExtension);
+			}
+			
+			rainbowProject.getPathBuilder().setUseExtension(false);
+	
+			// Execute pipeline
+			pipelineWrapper.execute(rainbowProject);
+		} finally {
+			plManager.releaseClassLoader();
 		}
-		else {
-			addManifestToProject(projId, rainbowProject, filterConfigByExtension);
-		}
-		
-		rainbowProject.getPathBuilder().setUseExtension(false);
-
-		// Execute pipeline
-		pipelineWrapper.execute(rainbowProject);
 	}
 		
 	/**
