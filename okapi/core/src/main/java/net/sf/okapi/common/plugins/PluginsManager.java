@@ -24,22 +24,28 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
 
 import net.sf.okapi.common.ClassInfo;
+import net.sf.okapi.common.ClassUtil;
 import net.sf.okapi.common.DefaultFilenameFilter;
 import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.IEmbeddableParametersEditor;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
+import net.sf.okapi.common.ListUtil;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.pipeline.IPipelineStep;
@@ -234,7 +240,8 @@ public class PluginsManager {
 			URLClassLoader loader = URLClassLoader.newInstance(tmpUrls, Thread.currentThread().getContextClassLoader());
 		
 			// Introspect the classes
-			JarInputStream jarFile = new JarInputStream(new FileInputStream(file));
+			FileInputStream fis = new FileInputStream(file);
+			JarInputStream jarFile = new JarInputStream(fis);
 			JarEntry entry;
 			Class<?> cls = null;
 			while ( true ) {
@@ -290,12 +297,17 @@ public class PluginsManager {
 					catch ( Throwable e ) {
 						// If the class cannot be create for some reason, we skip it silently
 					}
+					cls = null; // Try to help unlocking the file
 				}
 			}
 			if ( jarFile != null ) {
 				jarFile.close();
-				jarFile = null;
+				jarFile = null; // Try to help unlocking the file
+				fis.close();
+				fis = null; // Try to help unlocking the file
+				file = null; // Try to help unlocking the file
 			}
+			cls = null; // Try to help unlocking the file
 			loader = null; // Try to help unlocking the file
 		}
 		catch ( IOException e ) {
@@ -310,5 +322,154 @@ public class PluginsManager {
 	public File getPluginsDir() {
 		return pluginsDir;
 	}
+	
+	public void releaseClassLoader() {
+		closeOpenJars(loader);
+		loader = null;
+	}
 
+	/**
+	 * Workaround for non-released jar file lock by URLClassLoader
+	 * http://loracular.blogspot.com/2009/12/dynamic-class-loader-with.html
+	 */
+	@SuppressWarnings("rawtypes")
+	public static void closeOpenJars(ClassLoader classLoader) {
+		if (!(classLoader instanceof URLClassLoader)) return;
+		try {
+		   Class clazz = java.net.URLClassLoader.class;
+		   java.lang.reflect.Field ucp = clazz.getDeclaredField("ucp");
+		   ucp.setAccessible(true);
+		   Object sun_misc_URLClassPath = ucp.get(classLoader);
+		   java.lang.reflect.Field loaders = 
+		      sun_misc_URLClassPath.getClass().getDeclaredField("loaders");
+		   loaders.setAccessible(true);
+		   Object java_util_Collection = loaders.get(sun_misc_URLClassPath);
+		   for (Object sun_misc_URLClassPath_JarLoader :
+		        ((java.util.Collection) java_util_Collection).toArray()) {
+		      try {
+		         java.lang.reflect.Field loader = 
+		            sun_misc_URLClassPath_JarLoader.getClass().getDeclaredField("jar");
+		         loader.setAccessible(true);
+		         Object java_util_jar_JarFile = 
+		            loader.get(sun_misc_URLClassPath_JarLoader);
+		         java.util.jar.JarFile jarFile = (java.util.jar.JarFile) java_util_jar_JarFile;		         
+		         jarFile.close();
+		         cleanupJarFileFactory(jarFile.getName());
+		      } catch (Throwable t) {
+		         // if we got this far, this is probably not a JAR loader so skip it
+		      }
+		   }
+		} catch (Throwable t) {
+		   // probably not a SUN VM
+		}
+	}
+
+	  /**
+	   * cleanup jar file factory cache
+	   * http://loracular.blogspot.com/2009/12/dynamic-class-loader-with.html
+	   */
+	  @SuppressWarnings({ "nls", "rawtypes" })
+	  public static boolean cleanupJarFileFactory(String... jarNames)
+	  {
+		  
+		List<String> setJarFileNames2Close = ListUtil.arrayAsList(jarNames);  
+	    boolean res = false;
+	    Class<?> classJarURLConnection = null;
+	    classJarURLConnection = ClassUtil.getClass("sun.net.www.protocol.jar.JarURLConnection");
+	    if (classJarURLConnection == null) {
+	      return res;
+	    }
+	    Field f = null;
+	    try {
+	      f = classJarURLConnection.getDeclaredField("factory");
+	    } catch (NoSuchFieldException e) {
+	      //ignore
+	    }
+	    if (f == null) {
+	      return res;
+	    }
+	    f.setAccessible(true);
+	    Object obj = null;
+	    try {
+	      obj = f.get(null);
+	    } catch (IllegalAccessException e) {
+	      //ignore
+	    }
+	    if (obj == null) {
+	      return res;
+	    }
+	    Class<?> classJarFileFactory = obj.getClass();
+	    //
+	    HashMap fileCache = null;
+	    try {
+	      f = classJarFileFactory.getDeclaredField("fileCache");
+	      f.setAccessible(true);
+	      obj = f.get(null);
+	      if (obj instanceof HashMap) {
+	        fileCache = (HashMap)obj;
+	      }
+	    } catch (NoSuchFieldException e) {
+	    } catch (IllegalAccessException e) {
+	      //ignore
+	    }
+	    HashMap urlCache = null;
+	    try {
+	      f = classJarFileFactory.getDeclaredField("urlCache");
+	      f.setAccessible(true);
+	      obj = f.get(null);
+	      if (obj instanceof HashMap) {
+	        urlCache = (HashMap)obj;
+	      }
+	    } catch (NoSuchFieldException e) {
+	    } catch (IllegalAccessException e) {
+	      //ignore
+	    }
+	    if (urlCache != null) {
+	      HashMap urlCacheTmp = (HashMap)urlCache.clone();
+	      Iterator it = urlCacheTmp.keySet().iterator();
+	      while (it.hasNext()) {
+	        obj = it.next();
+	        if (!(obj instanceof JarFile)) {
+	          continue;
+	        }
+	        JarFile jarFile = (JarFile)obj;
+	        if (setJarFileNames2Close.contains(jarFile.getName())) {
+	          try {
+	            jarFile.close();
+	          } catch (IOException e) {
+	            //ignore
+	          }
+	          if (fileCache != null) {
+	            fileCache.remove(urlCache.get(jarFile));
+	          }
+	          urlCache.remove(jarFile);
+	        }
+	      }
+	      res = true;
+	    } else if (fileCache != null) {
+	      // urlCache := null
+	      HashMap fileCacheTmp = (HashMap)fileCache.clone();
+	      Iterator it = fileCacheTmp.keySet().iterator();
+	      while (it.hasNext()) {
+	        Object key = it.next();
+	        obj = fileCache.get(key);
+	        if (!(obj instanceof JarFile)) {
+	          continue;
+	        }
+	        JarFile jarFile = (JarFile)obj;
+	        if (setJarFileNames2Close.contains(jarFile.getName())) {
+	          try {
+	            jarFile.close();
+	          } catch (IOException e) {
+	            //ignore
+	          }
+	          fileCache.remove(key);
+	        }
+	      }
+	      res = true;
+	    }
+	    setJarFileNames2Close.clear();
+	    return res;
+	  }
+	
 }
