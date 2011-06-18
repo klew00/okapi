@@ -276,8 +276,12 @@ public class BatchConfiguration {
 				}
 				
 				PluginsManager pm = new PluginsManager();
-				pm.discover(new File(pluginsDir), true);
-				pipelineWrapper.addFromPlugins(pm);
+				try {
+					pm.discover(new File(pluginsDir), true);
+					pipelineWrapper.addFromPlugins(pm);
+				} finally {
+					pm.releaseClassLoader();
+				}
 			}
 						
 			//=== Section 2: references data
