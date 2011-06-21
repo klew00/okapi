@@ -86,6 +86,7 @@ public class Merger {
 			break;
 		case END_DOCUMENT:
 			processEndDocument();
+			close();
 			break;
 		}
 		return event;
