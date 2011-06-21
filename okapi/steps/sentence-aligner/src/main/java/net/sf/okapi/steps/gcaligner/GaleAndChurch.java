@@ -181,7 +181,7 @@ public class GaleAndChurch implements SegmentAlignmentScorer {
 	 * alignment. We take the coefficient as a parameter so that non European languages can be aligned as well.
 	 * */
 
-	private int match(int len1, int len2) {
+	public int match(int len1, int len2) {
 		/* variance per english character */
 		/* May need tweak for the other languages */
 		double var_per_eng_char = 6.8;
