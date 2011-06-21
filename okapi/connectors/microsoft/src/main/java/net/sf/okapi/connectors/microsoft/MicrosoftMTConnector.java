@@ -38,6 +38,7 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
+import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.BaseConnector;
@@ -140,69 +141,10 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 				osw.flush();
 				osw.close();
 			}
-			String resp = fromInputStreamToString(conn.getInputStream(), "UTF-8");
-
-			results = parseBlock(resp, frag);
-			
-//			// Get the results (they are simple enough to avoid the overhead of using an XML parser)
-//			int n1, n2, from = 0;
-//			while ( true ) {
-//				// Isolate the next match result
-//				n1 = resp.indexOf("<TranslationMatch>", from);
-//				if ( n1 < 0 ) break; // Done
-//				n2 = resp.indexOf("</TranslationMatch>", n1);
-//				String res = resp.substring(n1, n2);
-//				from = n2+1; // For next iteration
-//				// Parse the found match
-//				n1 = res.indexOf("<MatchDegree>");
-//				n2 = res.indexOf("</MatchDegree>", n1+1);
-//				int score = Integer.parseInt(res.substring(n1+13, n2));
-//				if ( score < threshold ) continue;
-//				
-//				// Get the rating
-//				int rating = 5;
-//				n1 = res.indexOf("<Rating", 0); // No > to handle /> cases
-//				n2 = res.indexOf("</Rating>", n1);
-//				if ( n2 > -1 ) rating = Integer.parseInt(res.substring(n1+8, n2));
-//				// Get the source (when available)
-//				n1 = res.indexOf("<MatchedOriginalText", 0); // No > to handle /> cases
-//				n2 = res.indexOf("</MatchedOriginalText", n1);
-//				if ( n2 > -1 ) stext = unescapeXML(res.substring(n1+21, n2));
-//				else stext = null; // No source (same as original
-//				// Translation
-//				String ttext = "";
-//				n1 = res.indexOf("<TranslatedText", n2); // No > to handle /> cases
-//				n2 = res.indexOf("</TranslatedText", n1);
-//				if ( n2 > -1 ) ttext = unescapeXML(res.substring(n1+16, n2));
-//				result = new QueryResult();
-//				result.score = score; // Score from the system
-//				if ( score > 90 ) {
-//					result.score += (rating-10); // Try to adjust high scores
-//					// Ideally we would want a composite value for the score
-//				}
-//				// Weed out the scores lower than the threshold after adjustment
-//				if ( result.score < threshold ) continue;
-//				// Else: continue with that result
-//				result.weight = getWeight();
-//				if ( frag.hasCode() ) {
-//					if ( stext == null ) result.source = frag;
-//					else result.source = new TextFragment(util.fromCodedHTML(stext, frag, false),
-//						frag.getClonedCodes());
-//					result.target = new TextFragment(util.fromCodedHTML(ttext, frag, false),
-//						frag.getClonedCodes());
-//				}
-//				else {
-//					if ( stext == null ) result.source = frag;
-//					else result.source = new TextFragment(util.fromCodedHTML(stext, frag, false));
-//					result.target = new TextFragment(util.fromCodedHTML(ttext, frag, false));
-//				}
-//				result.origin = getName();
-//				result.matchType = MatchType.MT;
-//				results.add(result);
-//			}
+			results = parseBlock(fromInputStreamToString(conn.getInputStream(), "UTF-8"), frag);
 		}
 		catch ( Throwable e) {
-			throw new RuntimeException("Error querying the MT server." + e.getMessage(), e);
+			throw new RuntimeException("Error querying the MT server.\n" + e.getMessage(), e);
 		}
 		if ( results.size() > 0 ) current = 0;
 		return results.size();
@@ -338,6 +280,12 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 		}
 	}
 	
+	/**
+	 * Queries the engine for a list of source text.
+	 * @param fragments list of the text fragments to translate.
+	 * @return a list of lists of query result. Each list corresponds to a source text (in the same order)
+	 * The list contains the different matches found for the give source text.
+	 */
 	public List<List<QueryResult>> queryList (List<TextFragment> fragments) {
 		List<List<QueryResult>> list = new ArrayList<List<QueryResult>>();
 
@@ -402,18 +350,14 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 
 			int code = conn.getResponseCode();
 			if ( code == 200 ) {
-				String resp = fromInputStreamToString(conn.getInputStream(), "UTF-8");
-System.out.println(resp);
-				list = parseAllBlocks(resp, fragments);
+				list = parseAllBlocks(fromInputStreamToString(conn.getInputStream(), "UTF-8"), fragments);
 			}
 		}
 		catch ( MalformedURLException e ) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException("URL error in connector.", e);
 		}
 		catch ( IOException e ) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new OkapiIOException("IO error with connector.", e);
 		}
 		
 		return list;
