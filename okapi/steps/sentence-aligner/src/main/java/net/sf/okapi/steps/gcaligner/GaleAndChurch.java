@@ -204,6 +204,35 @@ public class GaleAndChurch implements SegmentAlignmentScorer {
 			return (BIG_DISTANCE);
 	}
 
+	/**
+	 * Return the probability that an source sentence of length len1 is a translation of a foreign sentence of
+	 * length len2. The probability is based on two parameters, the mean and variance of number of foreign characters
+	 * per source character.
+	 * 
+	 * Gale and Church hardcoded foreign_chars_per_eng_char as 1. It apparently works OK for European language
+	 * alignment. We take the coefficient as a parameter so that non European languages can be aligned as well.
+	 * */
+
+	public double prob(int len1, int len2) {
+		/* variance per english character */
+		/* May need tweak for the other languages */
+		double var_per_eng_char = 6.8;
+
+		if (len1 == 0 && len2 == 0)
+			return (0);
+
+		double mean = (len1 + len2 / m_charDist) / 2;
+		double z = (m_charDist * len1 - len2) / Math.sqrt(var_per_eng_char * mean);
+
+		/* Need to deal with both sides of the normal distribution */
+		if (z < 0)
+			z = -z;
+
+		double pd = 2 * (1 - pnorm(z));
+
+		return pd;		
+	}
+	
 	private double getCharacterDistribution(LocaleId p_sourceLocale, LocaleId p_targetLocale) {
 		double charDist = 1;
 
