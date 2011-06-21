@@ -58,6 +58,7 @@ public class TMXWriter {
     private Hashtable<String, String> mtAttribute;
     private Hashtable<String, String> altAttribute;
     private boolean useMTPrefix = true;
+    private boolean writeAllPropertiesAsAttributes;
 
     /**
      * Creates a new TMXWriter object.
@@ -69,6 +70,7 @@ public class TMXWriter {
     	if ( path == null ) {
     		throw new IllegalArgumentException("path must be set");
     	}
+    	this.setWriteAllPropertiesAsAttributes(false);
     	writer = new XMLWriter(path);
     	mtAttribute = new Hashtable<String, String>();
     	mtAttribute.put(CREATIONID, Util.MTFLAG);
@@ -83,6 +85,7 @@ public class TMXWriter {
      * If another document exists already it will be overwritten.
      */
     public TMXWriter (XMLWriter writer) {
+    	this.setWriteAllPropertiesAsAttributes(false);
     	this.writer = writer;
     }
 
@@ -566,7 +569,7 @@ public class TMXWriter {
 
     	// Write properties
     	if (( attributes != null ) && ( attributes.size() > 0 )) {
-    		for ( String name : attributes.keySet() ) {
+    		for ( String name : attributes.keySet() ) {    			
     			// Filter out standard attributes
     			if ( ATTR_NAMES.contains(";"+name+";") ) {
     				continue;
@@ -638,12 +641,19 @@ public class TMXWriter {
     		else {
     			writer.writeAttributeString("tuid", String.format("%s_%s", tuid, srcSeg.id));
     		}
+    		
+    		if (isWriteAllPropertiesAsAttributes()) {
+    			writeAllPropertiesAsAttibutes(writer, names, item);
+    		}
+    		
     		writer.writeLineBreak();
 
     		// Write any resource-level properties
-    		for ( String name : names ) {
+    		for ( String name : names ) {    			
+    			
     			// Filter out attributes (temporary solution)
     			if ( ATTR_NAMES.contains(";"+name+";") ) continue;
+    			
     			// Write out the property
     			writer.writeStartElement("prop");
     			writer.writeAttributeString("type", name);
@@ -674,6 +684,18 @@ public class TMXWriter {
     	
     }
 
+    private void writeAllPropertiesAsAttibutes(XMLWriter writer, 
+    		Set<String> names, 
+    		ITextUnit item) {
+    	// Write any TU-level properties as attributes (but only standard attributes)
+		for ( String name : names ) {
+			if (ATTR_NAMES.contains(name)) {
+				writer.writeAttributeString(name, item.getProperty(name).getValue());
+			}
+		}
+    }
+    
+    
     /**
      * Writes a TUV element.
      * @param frag the TextFragment for the content of this TUV. This can be
@@ -712,5 +734,20 @@ public class TMXWriter {
     	}
     	writer.writeEndElementLineBreak(); // tuv
     }
+    
+    /**
+	 * If true then all TU level properties will be written as TMX attributes.
+	 * @param writeAllProperties
+	 */
+	public void setWriteAllPropertiesAsAttributes(boolean writeAllPropertiesAsAttributes) {
+		this.writeAllPropertiesAsAttributes = writeAllPropertiesAsAttributes;
+	}
 
+	/**
+	 * Write all TU level properties as TMX attributes?
+	 * @return true if all TU level properties will be written, false otherwise.
+	 */
+	public boolean isWriteAllPropertiesAsAttributes() {
+		return writeAllPropertiesAsAttributes;
+	}
 }

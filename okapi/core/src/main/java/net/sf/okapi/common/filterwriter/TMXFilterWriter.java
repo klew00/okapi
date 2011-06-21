@@ -47,6 +47,11 @@ public class TMXFilterWriter implements IFilterWriter {
 	private LocaleId locale;
 	private boolean canceled;
 	private String segType;
+	private Parameters params;
+	
+	public TMXFilterWriter() {
+		this.params = new Parameters();
+	}
 
 	public void setSegType (String segType) {
 		this.segType = segType;
@@ -78,7 +83,7 @@ public class TMXFilterWriter implements IFilterWriter {
 	}
 
 	public IParameters getParameters () {
-		return null;
+		return params;
 	}
 
 	public Event handleEvent (Event event) {
@@ -120,9 +125,9 @@ public class TMXFilterWriter implements IFilterWriter {
 	}
 
 	public void setParameters (IParameters params) {
-		// No parameters for now
+		this.params = (Parameters)params;
 	}
-
+	
 	private void processStartDocument (Event event) {
 		try {
 			StartDocument sd = (StartDocument)event.getResource();
@@ -134,6 +139,9 @@ public class TMXFilterWriter implements IFilterWriter {
 				writer = new TMXWriter(new XMLWriter(
 					new OutputStreamWriter(outputStream, "UTF-8")));
 			}
+			
+			writer.setWriteAllPropertiesAsAttributes(params.isWriteAllPropertiesAsAttributes());		
+			
 			writer.writeStartDocument(sd.getLocale(), locale,
 				null, null, segType, "unknown", "text");
 		}
@@ -149,5 +157,4 @@ public class TMXFilterWriter implements IFilterWriter {
 	private void processTextUnit (Event event) {
 		writer.writeTUFull(event.getTextUnit());
 	}
-
 }
