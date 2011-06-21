@@ -20,6 +20,7 @@
 
 package net.sf.okapi.applications.rainbow.packages;
 
+import net.sf.okapi.common.FileUtil;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.AltTranslation;
@@ -35,7 +36,6 @@ import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.OutputStream;
 
 public abstract class BaseWriter implements IWriter {
@@ -156,47 +156,43 @@ public abstract class BaseWriter implements IWriter {
 	}
 
 	public void writeEndPackage (boolean createZip) {
-		try {
-			// Save the manifest
-			if ( manifest != null ) {
-				manifest.Save();
-			}
-	
-			tmxWriterApproved.writeEndDocument();
-			tmxWriterApproved.close();
-			if ( tmxWriterApproved.getItemCount() == 0 ) {
-				File file = new File(tmxPathApproved);
-				file.delete();
-			}
-
-			tmxWriterUnApproved.writeEndDocument();
-			tmxWriterUnApproved.close();
-			if ( tmxWriterUnApproved.getItemCount() == 0 ) {
-				File file = new File(tmxPathUnApproved);
-				file.delete();
-			}
-
-			tmxWriterAlternate.writeEndDocument();
-			tmxWriterAlternate.close();
-			if ( tmxWriterAlternate.getItemCount() == 0 ) {
-				File file = new File(tmxPathAlternate);
-				file.delete();
-			}
-
-			tmxWriterLeverage.writeEndDocument();
-			tmxWriterLeverage.close();
-			if ( tmxWriterLeverage.getItemCount() == 0 ) {
-				File file = new File(tmxPathLeverage);
-				file.delete();
-			}
-
-			// Zip the package if needed
-			if ( createZip && ( manifest != null )) {
-				Compression.zipDirectory(manifest.getRoot(), manifest.getRoot() + ".zip");
-			}
+		// Save the manifest
+		if ( manifest != null ) {
+			manifest.Save();
 		}
-		catch ( IOException e ) {
-			throw new RuntimeException(e);
+
+		tmxWriterApproved.writeEndDocument();
+		tmxWriterApproved.close();
+		if ( tmxWriterApproved.getItemCount() == 0 ) {
+			File file = new File(tmxPathApproved);
+			file.delete();
+		}
+
+		tmxWriterUnApproved.writeEndDocument();
+		tmxWriterUnApproved.close();
+		if ( tmxWriterUnApproved.getItemCount() == 0 ) {
+			File file = new File(tmxPathUnApproved);
+			file.delete();
+		}
+
+		tmxWriterAlternate.writeEndDocument();
+		tmxWriterAlternate.close();
+		if ( tmxWriterAlternate.getItemCount() == 0 ) {
+			File file = new File(tmxPathAlternate);
+			file.delete();
+		}
+
+		tmxWriterLeverage.writeEndDocument();
+		tmxWriterLeverage.close();
+		if ( tmxWriterLeverage.getItemCount() == 0 ) {
+			File file = new File(tmxPathLeverage);
+			file.delete();
+		}
+
+		// Zip the package if needed
+		if ( createZip && ( manifest != null )) {
+			//Compression.zipDirectory(manifest.getRoot(), manifest.getRoot() + ".zip");
+			FileUtil.zipDirectory(manifest.getRoot()+"/", null);
 		}
 	}
 	

@@ -54,7 +54,7 @@ public class Parameters extends BaseParameters {
 		// Internal
 		message = "";
 		outputManifest = true;
-		createZip = true;
+		createZip = false;
 	}
 
 	@Override

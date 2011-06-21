@@ -33,6 +33,7 @@ import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.FileUtil;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
@@ -205,7 +206,7 @@ public class RainbowKitFilter implements IFilter {
 		// The package is always unzipped (no check if already has been) to be able to upload a new version of the same package 
 		if (isPackage) {
 			String root = Util.getDirectoryName(inFileName);
-			Util.unzip(inFileName, root);
+			FileUtil.unzip(inFileName, root);
 			
 			String packageName = Util.getFilename(inFileName, false);
 			String manifestFullName = Util.ensureSeparator(root, false);

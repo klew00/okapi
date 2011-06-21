@@ -25,6 +25,7 @@ import java.net.URI;
 import java.util.UUID;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.FileUtil;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.UsingParameters;
@@ -166,8 +167,8 @@ public class ExtractionStep extends BasePipelineStep {
 		writer.close();
 		writer = null;
 		
-		if (params.getCreateZip()) {
-			Util.zipFolder(resolvedOutputDir, RainbowKitFilter.RAINBOWKIT_PACKAGE_EXTENSION);
+		if ( params.getCreateZip() ) {
+			FileUtil.zipDirectory(resolvedOutputDir, RainbowKitFilter.RAINBOWKIT_PACKAGE_EXTENSION);
 		}
 		return event;
 	}

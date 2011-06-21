@@ -20,7 +20,6 @@
 
 package net.sf.okapi.common;
 
-import net.sf.okapi.common.exceptions.OkapiFileNotFoundException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
 import net.sf.okapi.common.LocaleId;
@@ -34,7 +33,6 @@ import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.MalformedURLException;
@@ -54,9 +52,6 @@ import java.nio.charset.CharsetEncoder;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-import java.util.zip.ZipOutputStream;
 
 /**
  * Collection of various all-purpose helper functions.
@@ -1511,123 +1506,4 @@ public final class Util {
 		return map.get(key);		
 	}
 	
-	/**
-	 * Compresses a given folder, creates in the same parent folder a ZIP file with the folder name as the file name and a given extension.
-	 * The given folder is not deleted after compression. 
-	 * @author http://www.java2s.com/Code/Java/File-Input-Output/UseJavacodetozipafolder.htm
-	 * @param srcFolder the given folder to be compressed
-	 * @param zipExtension an extension for the output ZIP file (default .ZIP if null or empty string is passed by the caller).
-	 * The extension is expected to contain the leading period.
-	 * @throws Exception
-	 */
-	static public void zipFolder(String srcFolder, String zipExtension) {
-	    ZipOutputStream zip = null;
-	    FileOutputStream fileWriter = null;
-	    String destZipFile = null;
-	    
-	    if (isEmpty(zipExtension)) zipExtension = ".zip";
-	    
-	    if (srcFolder.endsWith(File.separator)) {
-	    	destZipFile = srcFolder.substring(0, srcFolder.length() - 1) + zipExtension;
-	    }
-	    else
-	    	destZipFile = srcFolder + zipExtension;
-
-	    try {	    	
-			fileWriter = new FileOutputStream(destZipFile);
-			zip = new ZipOutputStream(fileWriter);
-
-		    addFolderToZip("", srcFolder, zip);
-		    zip.flush();
-		    zip.close();
-		} catch (FileNotFoundException e) {
-			throw new OkapiFileNotFoundException(e);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}	    
-	  }
-
-	  static private void addFileToZip(String path, String srcFile, ZipOutputStream zip)
-	      throws Exception {
-
-	    File folder = new File(srcFile);
-	    if (folder.isDirectory()) {
-	      addFolderToZip(path, srcFile, zip);
-	    } else {
-	      byte[] buf = new byte[1024];
-	      int len;
-	      FileInputStream in = new FileInputStream(srcFile);
-	      zip.putNextEntry(new ZipEntry(path + "/" + folder.getName()));
-	      while ((len = in.read(buf)) > 0) {
-	        zip.write(buf, 0, len);
-	      }
-	    }
-	  }
-
-	  static private void addFolderToZip(String path, String srcFolder, ZipOutputStream zip)
-	      throws Exception {
-	    File folder = new File(srcFolder);
-
-	    for (String fileName : folder.list()) {
-	      if (path.equals("")) {
-	        addFileToZip(folder.getName(), srcFolder + "/" + fileName, zip);
-	      } else {
-	        addFileToZip(path + "/" + folder.getName(), srcFolder + "/" + fileName, zip);
-	      }
-	    }
-	  }
-	  
-	  /**
-	   * Extract a given ZIP file to a given destination folder.
-	   * @author http://www.java2s.com/Code/Java/File-Input-Output/Extractzipfiletodestinationfolder.htm
-	   * @param zipFileName full path of the given ZIP file
-	   * @param destPath destination folder
-	   */
-	  public static void unzip(String zipFileName, String destPath) {
-		    ZipInputStream in = null;
-		    OutputStream out = null;
-		
-		    try{
-			    try {
-			      // Open the ZIP file
-			      in = new ZipInputStream(new FileInputStream(zipFileName));
-		
-			      // Get the first entry
-			      ZipEntry entry = null;
-		
-			      while ((entry = in.getNextEntry()) != null) {
-			        String outFilename = entry.getName();
-		
-			        // Open the output file
-			        if (entry.isDirectory()) {
-			          new File(destPath, outFilename).mkdirs();
-			        } else {
-			          out = new FileOutputStream(new File(destPath,
-			              outFilename));
-		
-			          // Transfer bytes from the ZIP file to the output file
-			          byte[] buf = new byte[1024];
-			          int len;
-		
-			          while ((len = in.read(buf)) > 0) {
-			            out.write(buf, 0, len);
-			          }
-		
-			          // Close the stream
-			          out.close();
-			        }
-			      }		    
-			    } finally {
-			      // Close the stream
-			      if (in != null) {
-			        in.close();
-			      }
-			      if (out != null) {
-			        out.close();
-			      }
-			    } 
-		  } catch (IOException e) {
-			  throw new OkapiIOException(e);
-		  }
-	  }
 }

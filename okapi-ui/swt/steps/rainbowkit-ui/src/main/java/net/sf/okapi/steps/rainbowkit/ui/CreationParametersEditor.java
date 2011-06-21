@@ -328,10 +328,10 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		new Label(cmpTmp, SWT.NONE);
 		
 		edPackageName = new Text(cmpTmp, SWT.BORDER);
-		edPackageName.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		edPackageName.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
 		
 		btCreateZip = new Button(cmpTmp, SWT.CHECK);
-		btCreateZip.setText("Create ZIP");
+		btCreateZip.setText("Create a ZIP file for the package");
 	}
 	
 	private void updatePackageType () {

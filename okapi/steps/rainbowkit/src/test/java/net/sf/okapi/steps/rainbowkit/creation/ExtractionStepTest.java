@@ -25,7 +25,6 @@ import static org.junit.Assert.*;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.TestUtil;
