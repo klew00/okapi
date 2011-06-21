@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
@@ -41,7 +42,9 @@ import net.sf.okapi.common.query.QueryResult;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.MultiEvent;
 import net.sf.okapi.common.resource.Segment;
+import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.connectors.microsoft.MicrosoftMTConnector;
 
 @UsingParameters(Parameters.class)
@@ -128,20 +131,22 @@ public class MSBatchTranslationStep extends BasePipelineStep {
 		//todo conn.setMaximumHits(params.)
 		//todo conn.setThreshold(params.);
 		
-		// Create the TMX output
-		String tmxOutputPath = Util.fillRootDirectoryVariable(params.getTmxPath(), rootDir);
-		tmxOutputPath = LocaleId.replaceVariables(tmxOutputPath, sourceLocale, targetLocale);
-		tmxWriter = new TMXWriter(tmxOutputPath);
-		tmxWriter.writeStartDocument(sourceLocale, targetLocale, getClass().getCanonicalName(),
-			"1", "sentence", null, "unknown");
+		// Create the TMX output if requested
+		if ( params.getMakeTmx() ) {
+			String tmxOutputPath = Util.fillRootDirectoryVariable(params.getTmxPath(), rootDir);
+			tmxOutputPath = LocaleId.replaceVariables(tmxOutputPath, sourceLocale, targetLocale);
+			tmxWriter = new TMXWriter(tmxOutputPath);
+			tmxWriter.writeStartDocument(sourceLocale, targetLocale, getClass().getCanonicalName(),
+				"1", "sentence", null, "unknown");
 		
-		// Set the attributes to write in the TMX
-		attributes = new Hashtable<String, String>();
-		if ( params.getMarkAsMT() ) {
-			attributes.put("creationid", Util.MTFLAG);
+			// Set the attributes to write in the TMX
+			attributes = new Hashtable<String, String>();
+			if ( params.getMarkAsMT() ) {
+				attributes.put("creationid", Util.MTFLAG);
+			}
+			attributes.put("Txt::Origin", "Microsoft-Translator");
 		}
-		attributes.put("Txt::Origin", "Microsoft-Translator");
-	
+		
 		return event;
 	}
 
@@ -228,6 +233,11 @@ public class MSBatchTranslationStep extends BasePipelineStep {
 			}
 		}
 		
+		// Nothing to translate
+		if ( fragments.isEmpty() ) {
+			return;
+		}
+		
 		// Call the translation engine
 		List<List<QueryResult>> list = conn.queryList(fragments);
 		if ( Util.isEmpty(list) ) {
@@ -243,20 +253,40 @@ public class MSBatchTranslationStep extends BasePipelineStep {
 			if ( event.isTextUnit() ) {
 				ITextUnit tu = event.getTextUnit();
 				if ( !tu.isTranslatable() ) continue;
+				
+				TextContainer trgCont = tu.getTarget(targetLocale);
+				Segment trgSeg = null;
+				
 				for ( Segment srcSeg : tu.getSourceSegments() ) {
 					if ( !srcSeg.text.hasText() ) continue;
-					
 					if ( list.size() < entryIndex-1 ) {
 						logger.warning(String.format("Discrepancy between the number of source and translations for text unit id='%s'", tu.getId()));
 						continue;
 					}
+
+					// Get hold of the target segment where to anotate
+					if ( params.getAnnotate() ) {
+						if ( trgCont == null ) {
+							trgCont = tu.createTarget(targetLocale, false, IResource.COPY_SEGMENTATION);
+						}
+						trgSeg = trgCont.getSegments().get(srcSeg.id);
+						if ( trgSeg == null ) {
+							trgCont.getSegments().append(new Segment(srcSeg.id));
+						}
+					}
+
+					// Go through the matches for that segment
 					List<QueryResult> resList = list.get(entryIndex);
 					entryIndex++; // For next time
-
 					for ( QueryResult res : resList ) {
 						// Write to TMX if needed
 						if ( tmxWriter != null ) {
 							tmxWriter.writeTU(res.source, res.target, null, attributes);
+						}
+						// Annotate if requested
+						if ( trgSeg != null ) {
+							TextUnitUtil.addAltTranslation(trgSeg,
+								res.toAltTranslation(srcSeg.text, sourceLocale, targetLocale));
 						}
 					}
 				}

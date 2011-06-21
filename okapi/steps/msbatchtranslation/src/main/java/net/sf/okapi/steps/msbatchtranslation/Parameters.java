@@ -35,6 +35,8 @@ import net.sf.okapi.common.uidescription.TextInputPart;
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
 	private static final String APPID = "appId";
+	private static final String ANNOTATE = "annotate";
+	private static final String MAKETMX = "makeTmx";
 	private static final String TMXPATH = "tmxPath";
 	private static final String MARKASMT = "markAsMT";
 	private static final String MAXEVENTS = "maxEvents";
@@ -47,6 +49,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private int maxEvents;
 	private int maxMatches;
 	private int threshold;
+	private boolean makeTmx;
+	private boolean annotate;
 	
 	public Parameters () {
 		reset();
@@ -67,6 +71,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		maxEvents = buffer.getInteger(MAXEVENTS, maxEvents);
 		maxMatches = buffer.getInteger(MAXMATCHES, maxMatches);
 		threshold = buffer.getInteger(THRESHOLD, threshold);
+		makeTmx = buffer.getBoolean(MAKETMX, makeTmx);
+		annotate = buffer.getBoolean(ANNOTATE, annotate);
 	}
 
 	@Override
@@ -78,6 +84,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		maxEvents = 20;
 		maxMatches = 1;
 		threshold = 80;
+		makeTmx = false;
+		annotate = true;
 	}
 
 	@Override
@@ -89,6 +97,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.setInteger(MAXEVENTS, maxEvents);
 		buffer.setInteger(MAXMATCHES, maxMatches);
 		buffer.setInteger(THRESHOLD, threshold);
+		buffer.setBoolean(MAKETMX, makeTmx);
+		buffer.setBoolean(ANNOTATE, annotate);
 		return buffer.toString();
 	}
 
@@ -139,6 +149,22 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public void setAppId (String appId) {
 		this.appId = appId;
 	}
+	
+	public boolean getMakeTmx () {
+		return makeTmx;
+	}
+	
+	public void setMakeTmx (boolean makeTmx) {
+		this.makeTmx = makeTmx;
+	}
+	
+	public boolean getAnnotate () {
+		return annotate;
+	}
+	
+	public void setAnnotate (boolean annotate) {
+		this.annotate = annotate;
+	}
 
 	@Override
 	public ParametersDescription getParametersDescription () {
@@ -147,8 +173,10 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.add(MAXEVENTS, "Events buffer", "Number of events to store before sending a query");
 		desc.add(MAXMATCHES, "Maximum matches", "Maximum number of matches allowed");
 		desc.add(THRESHOLD, "Threshold", "Score below which matches are not retained");
-		desc.add(TMXPATH, "TMX document to create", "Full path of the new TMX document to create");
+		desc.add(TMXPATH, null, "Full path of the new TMX document to create");
 		desc.add(MARKASMT, "Mark the generated translation as machine translation results", null);
+		desc.add(MAKETMX, "Generate a TMX document", null);
+		desc.add(ANNOTATE, "Annotate the text units with the translations", null);
 		return desc;
 	}
 
@@ -170,17 +198,25 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		sip = desc.addSpinInputPart(paramsDesc.get(THRESHOLD));
 		sip.setRange(1, 100);
 		
-		CheckboxPart cbp = desc.addCheckboxPart(paramsDesc.get(MARKASMT));
-		cbp.setVertical(true);
-
 		sp = desc.addSeparatorPart();
 		sp.setVertical(true);
 
+		CheckboxPart cbp = desc.addCheckboxPart(paramsDesc.get(ANNOTATE));
+		cbp.setVertical(true);
+		
+		CheckboxPart master = desc.addCheckboxPart(paramsDesc.get(MAKETMX));
+		master.setVertical(true);
+		
 		PathInputPart pip = desc.addPathInputPart(paramsDesc.get(TMXPATH), "TMX Path", true);
 		pip.setBrowseFilters("TMX Documents (*.tmx)\tAll Files (*.*)", "*.tmx\t*.*");
 		pip.setVertical(true);
-		pip.setLabelFlushed(false);
+		pip.setWithLabel(false);
+		pip.setMasterPart(master, true);
 		
+		cbp = desc.addCheckboxPart(paramsDesc.get(MARKASMT));
+		cbp.setVertical(true);
+		cbp.setMasterPart(master, true);
+
 		return desc;
 	}
 

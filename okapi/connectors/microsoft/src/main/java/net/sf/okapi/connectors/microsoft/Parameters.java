@@ -69,7 +69,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
 		desc.add(APPID,
-			"Microsoft AppID (See http://www.bing.com/developers/appids.aspx)", "The AppID to identify the application/user");
+			"Application ID (See http://www.bing.com/developers/appids.aspx)", "The AppID to identify the application/user");
 		return desc;
 	}
 
