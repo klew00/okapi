@@ -252,11 +252,11 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 		ITextUnit alignedTextUnit;
 		if ( targetInput == null ) {
 			// case where the TextUnit is already bilingual
-			alignedTextUnit = sentenceAligner.align(sourceTu, sourceLocale, targetLocale);
+			alignedTextUnit = sentenceAligner.align(sourceTu, sourceLocale, targetLocale, params.isOutputOneTOneMatchesOnly());
 		}
 		else {
 			// case where we have separate source and target TextUnits
-			alignedTextUnit = sentenceAligner.align(sourceTu, targetTu, sourceLocale, targetLocale);
+			alignedTextUnit = sentenceAligner.align(sourceTu, targetTu, sourceLocale, targetLocale, params.isOutputOneTOneMatchesOnly());
 		}
 		
 		// remove leading and trailing whitespace in the aligned TextUnit 

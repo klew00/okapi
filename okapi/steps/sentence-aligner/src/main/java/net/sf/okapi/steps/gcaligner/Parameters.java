@@ -34,7 +34,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private static final String GENERATETMX = "generateTMX";
 	private static final String TMXOUTPUTPATH = "tmxOutputPath";
 	private static final String COLLAPSEWHITESPACE = "collapseWhitespace"; 
-	
+	private static final String OUTPOUT_ONE_TO_ONE_MATCHES_ONLY = "outputOneTOneMatchesOnly";
+		
 	private boolean generateTMX;
 	private String tmxOutputPath;
 
@@ -47,6 +48,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private String customTargetRulesPath;
 	
 	private boolean collapseWhitespace;
+	
+	private boolean outputOneTOneMatchesOnly;
 
 	public Parameters() {
 		reset();
@@ -124,6 +127,14 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.collapseWhitespace = collapseWhitespace;
 	}
 
+	public boolean isOutputOneTOneMatchesOnly() {
+		return outputOneTOneMatchesOnly;
+	}
+
+	public void setOutputOneTOneMatchesOnly(boolean outputOneTOneMatchesOnly) {
+		this.outputOneTOneMatchesOnly = outputOneTOneMatchesOnly;
+	}
+	
 	@Override
 	public void reset() {
 		tmxOutputPath = "aligned.tmx";
@@ -135,6 +146,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		useCustomTargetRules = false;
 		customTargetRulesPath = "";
 		collapseWhitespace = false;
+		outputOneTOneMatchesOnly = false;
 	}
 
 	@Override
@@ -151,6 +163,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		useCustomTargetRules = buffer.getBoolean("useCustomTargetRules", useCustomTargetRules);
 		customTargetRulesPath = buffer.getString("customTargetRulesPath", customTargetRulesPath);
 		collapseWhitespace = buffer.getBoolean(COLLAPSEWHITESPACE, collapseWhitespace);
+		outputOneTOneMatchesOnly = buffer.getBoolean(OUTPOUT_ONE_TO_ONE_MATCHES_ONLY, outputOneTOneMatchesOnly);
 	}
 
 	@Override
@@ -166,7 +179,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.setBoolean("useCustomTargetRules", useCustomTargetRules);
 		buffer.setString("customTargetRulesPath", customTargetRulesPath);
 		buffer.setBoolean(COLLAPSEWHITESPACE, collapseWhitespace);
-		
+		buffer.setBoolean(OUTPOUT_ONE_TO_ONE_MATCHES_ONLY, outputOneTOneMatchesOnly);		
 		return buffer.toString();
 	}
 
@@ -191,6 +204,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 				"Full path of the SRX document to use for the target");
 		desc.add(COLLAPSEWHITESPACE, "Collapse Whitspace?", 
 				"Collapse whitespace (space, newline etc.) to a single space?");
+		desc.add(OUTPOUT_ONE_TO_ONE_MATCHES_ONLY, "Output 1-1 Matches Only?", 
+			"Ouput only 1-1 sentence aligned matches?");
 		return desc;
 	}
 
@@ -227,8 +242,9 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		pip.setMasterPart(cbp2, true);
 		
 		desc.addSeparatorPart();
-
-		desc.addCheckboxPart(paramsDesc.get(COLLAPSEWHITESPACE));
+		desc.addCheckboxPart(paramsDesc.get(COLLAPSEWHITESPACE));		
+		desc.addSeparatorPart();
+		desc.addCheckboxPart(paramsDesc.get(OUTPOUT_ONE_TO_ONE_MATCHES_ONLY));
 		
 		return desc;
 	}

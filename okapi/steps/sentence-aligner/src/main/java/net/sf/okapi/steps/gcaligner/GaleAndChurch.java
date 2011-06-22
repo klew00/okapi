@@ -230,7 +230,7 @@ public class GaleAndChurch implements SegmentAlignmentScorer {
 
 		double pd = 2 * (1 - pnorm(z));
 
-		return pd;		
+		return pd;
 	}
 	
 	private double getCharacterDistribution(LocaleId p_sourceLocale, LocaleId p_targetLocale) {

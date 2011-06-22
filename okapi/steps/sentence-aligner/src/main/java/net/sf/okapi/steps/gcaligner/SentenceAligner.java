@@ -46,31 +46,31 @@ public class SentenceAligner {
 	//private static final int LOW_SCORE_THRESHOLD = 0;
 
 	public ITextUnit align(ITextUnit sourceParagraph, ITextUnit targetParagraph, LocaleId srcLocale,
-			LocaleId trgLocale) {
-		return alignWithoutSkeletonAlignment(sourceParagraph, targetParagraph, srcLocale, trgLocale);
+			LocaleId trgLocale, boolean outputOneTOneMatchesOnly) {
+		return alignWithoutSkeletonAlignment(sourceParagraph, targetParagraph, srcLocale, trgLocale, outputOneTOneMatchesOnly);
 	}
 
-	public ITextUnit align(ITextUnit bilingualParagraph, LocaleId srcLocale, LocaleId trgLocale) {
-		return alignWithoutSkeletonAlignment(bilingualParagraph, srcLocale, trgLocale);
+	public ITextUnit align(ITextUnit bilingualParagraph, LocaleId srcLocale, LocaleId trgLocale, boolean outputOneTOneMatchesOnly) {
+		return alignWithoutSkeletonAlignment(bilingualParagraph, srcLocale, trgLocale, outputOneTOneMatchesOnly);
 	}
 
 	private ITextUnit alignWithoutSkeletonAlignment(ITextUnit sourceParagraph,
-			ITextUnit targetParagraph, LocaleId srcLocale, LocaleId trgLocale) {
+			ITextUnit targetParagraph, LocaleId srcLocale, LocaleId trgLocale, boolean outputOneTOneMatchesOnly) {
 		SegmentAlignmentFunction alignmentFunction = new SegmentAlignmentFunction(srcLocale,
 				trgLocale);
 		return alignSegments(sourceParagraph, targetParagraph, srcLocale, trgLocale,
-				alignmentFunction);
+				alignmentFunction, outputOneTOneMatchesOnly);
 	}
 
 	private ITextUnit alignWithoutSkeletonAlignment(ITextUnit bilingualParagraph, LocaleId srcLocale,
-			LocaleId trgLocale) {
+			LocaleId trgLocale, boolean outputOneTOneMatchesOnly) {
 		SegmentAlignmentFunction alignmentFunction = new SegmentAlignmentFunction(srcLocale,
 				trgLocale);
-		return alignSegments(bilingualParagraph, srcLocale, trgLocale, alignmentFunction);
+		return alignSegments(bilingualParagraph, srcLocale, trgLocale, alignmentFunction, outputOneTOneMatchesOnly);
 	}
 
 	private ITextUnit alignSegments(ITextUnit sourceParagraph, ITextUnit targetParagraph,
-			LocaleId srcLocale, LocaleId trgLocale, SegmentAlignmentFunction alignmentFunction) {
+			LocaleId srcLocale, LocaleId trgLocale, SegmentAlignmentFunction alignmentFunction, boolean outputOneTOneMatchesOnly) {
 
 		// To prevent OutOfMemory exception, simply don't perform the
 		// alignment for a block with a lot of segments. TEMPORARY FIX
@@ -93,6 +93,16 @@ public class SentenceAligner {
 		Iterator<DpMatrixCell> it = result.iterator();
 		while (it.hasNext()) {
 			DpMatrixCell cell = it.next();
+			
+			if (outputOneTOneMatchesOnly) {
+				if (cell.getState() == DpMatrixCell.MATCH) {
+					Segment sourceSegment = matrix.getAlignmentElementX(cell.getXindex());
+					Segment targetSegment = matrix.getAlignmentElementY(cell.getYindex());
+					alignedPairs.add(new AlignedPair(sourceSegment, targetSegment, trgLocale));
+				} 				
+				continue;
+			}			
+			
 			if (cell.getState() == DpMatrixCell.DELETED) {
 				Segment sourceSegment = matrix.getAlignmentElementX(cell.getXindex());
 				alignedPairs.add(new AlignedPair(sourceSegment, null, trgLocale));
@@ -130,7 +140,7 @@ public class SentenceAligner {
 	}
 
 	private ITextUnit alignSegments(ITextUnit bilingualParagraph, LocaleId srcLocale,
-			LocaleId trgLocale, SegmentAlignmentFunction alignmentFunction) {
+			LocaleId trgLocale, SegmentAlignmentFunction alignmentFunction, boolean outputOneTOneMatchesOnly) {
 
 		// To prevent OutOfMemory exception, simply don't perform the
 		// alignment for a block with a lot of segments. TEMPORARY FIX
@@ -152,6 +162,16 @@ public class SentenceAligner {
 		Iterator<DpMatrixCell> it = result.iterator();
 		while (it.hasNext()) {
 			DpMatrixCell cell = it.next();
+			
+			if (outputOneTOneMatchesOnly) {
+				if (cell.getState() == DpMatrixCell.MATCH) {
+					Segment sourceSegment = matrix.getAlignmentElementX(cell.getXindex());
+					Segment targetSegment = matrix.getAlignmentElementY(cell.getYindex());
+					alignedPairs.add(new AlignedPair(sourceSegment, targetSegment, trgLocale));
+				} 				
+				continue;
+			}			
+
 			if (cell.getState() == DpMatrixCell.DELETED) {
 				Segment sourceSegment = matrix.getAlignmentElementX(cell.getXindex());
 				alignedPairs.add(new AlignedPair(sourceSegment, null, trgLocale));
