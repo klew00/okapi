@@ -42,6 +42,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private static final String MAXEVENTS = "maxEvents";
 	private static final String MAXMATCHES = "maxMatches";
 	private static final String THRESHOLD = "threshold";
+	private static final String FILLTARGET = "fillTarget";
+	private static final String FILLTARGETTHRESHOLD = "fillTargetThreshold";
 	
 	private String appId;
 	private String tmxPath;
@@ -51,6 +53,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private int threshold;
 	private boolean makeTmx;
 	private boolean annotate;
+	private boolean fillTarget;
+	private int fillTargetThreshold;
 	
 	public Parameters () {
 		reset();
@@ -73,6 +77,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		threshold = buffer.getInteger(THRESHOLD, threshold);
 		makeTmx = buffer.getBoolean(MAKETMX, makeTmx);
 		annotate = buffer.getBoolean(ANNOTATE, annotate);
+		fillTarget = buffer.getBoolean(FILLTARGET, fillTarget);
+		fillTargetThreshold = buffer.getInteger(FILLTARGETTHRESHOLD, fillTargetThreshold);
 	}
 
 	@Override
@@ -86,6 +92,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		threshold = 80;
 		makeTmx = false;
 		annotate = true;
+		fillTarget = true;
+		fillTargetThreshold = 95;
 	}
 
 	@Override
@@ -99,7 +107,25 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.setInteger(THRESHOLD, threshold);
 		buffer.setBoolean(MAKETMX, makeTmx);
 		buffer.setBoolean(ANNOTATE, annotate);
+		buffer.setBoolean(FILLTARGET, fillTarget);
+		buffer.setInteger(FILLTARGETTHRESHOLD, fillTargetThreshold);
 		return buffer.toString();
+	}
+
+	public boolean getFillTarget () {
+		return fillTarget;
+	}
+
+	public void setFillTarget (boolean fillTarget) {
+		this.fillTarget = fillTarget;
+	}
+
+	public int getFillTargetThreshold () {
+		return fillTargetThreshold;
+	}
+
+	public void setFillTargetThreshold (int fillTargetThreshold) {
+		this.fillTargetThreshold = fillTargetThreshold;
 	}
 
 	public boolean getMarkAsMT () {
@@ -177,6 +203,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.add(MARKASMT, "Mark the generated translation as machine translation results", null);
 		desc.add(MAKETMX, "Generate a TMX document", null);
 		desc.add(ANNOTATE, "Annotate the text units with the translations", null);
+		desc.add(FILLTARGET, "Fill the target with the best translation candidate", null);
+		desc.add(FILLTARGETTHRESHOLD, "Fill threshold", "Fill the target when the best candidate is equal or above this score");
 		return desc;
 	}
 
@@ -217,6 +245,16 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		cbp.setVertical(true);
 		cbp.setMasterPart(master, true);
 
+		sp = desc.addSeparatorPart();
+		sp.setVertical(true);
+
+		cbp = desc.addCheckboxPart(paramsDesc.get(FILLTARGET));
+		cbp.setVertical(true);
+
+		sip = desc.addSpinInputPart(paramsDesc.get(FILLTARGETTHRESHOLD));
+		sip.setRange(1, 100);
+		sip.setMasterPart(cbp, true);
+		
 		return desc;
 	}
 

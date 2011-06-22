@@ -249,13 +249,14 @@ public class MSBatchTranslationStep extends BasePipelineStep {
 		// We need to do the same loop as when gathering as we assume the results
 		// are in the same order
 		int entryIndex = 0;
+		boolean needTrgSeg = params.getAnnotate() || params.getFillTarget();
+		
 		for ( Event event : events ) {
 			if ( event.isTextUnit() ) {
 				ITextUnit tu = event.getTextUnit();
 				if ( !tu.isTranslatable() ) continue;
 				
 				TextContainer trgCont = tu.getTarget(targetLocale);
-				Segment trgSeg = null;
 				
 				for ( Segment srcSeg : tu.getSourceSegments() ) {
 					if ( !srcSeg.text.hasText() ) continue;
@@ -263,31 +264,53 @@ public class MSBatchTranslationStep extends BasePipelineStep {
 						logger.warning(String.format("Discrepancy between the number of source and translations for text unit id='%s'", tu.getId()));
 						continue;
 					}
-
-					// Get hold of the target segment where to anotate
-					if ( params.getAnnotate() ) {
-						if ( trgCont == null ) {
-							trgCont = tu.createTarget(targetLocale, false, IResource.COPY_SEGMENTATION);
-						}
-						trgSeg = trgCont.getSegments().get(srcSeg.id);
-						if ( trgSeg == null ) {
-							trgCont.getSegments().append(new Segment(srcSeg.id));
-						}
-					}
+					Segment trgSeg = null;
 
 					// Go through the matches for that segment
 					List<QueryResult> resList = list.get(entryIndex);
 					entryIndex++; // For next time
+					boolean firstMatch = true;
 					for ( QueryResult res : resList ) {
+						// Determine if we fill the target (first match and it is above threshold) 
+						boolean fill = false;
+						if ( firstMatch && params.getFillTarget() ) {
+							fill = (res.score >= params.getFillTargetThreshold());
+						}
+						
+						// Get hold of the target segment where to annotate or fill
+						// Re-use the same within this loop
+						if (( trgSeg == null ) && ( fill || params.getAnnotate() )) {
+							if ( trgCont == null ) {
+								trgCont = tu.createTarget(targetLocale, false, IResource.COPY_SEGMENTATION);
+							}
+							trgSeg = trgCont.getSegments().get(srcSeg.id);
+							if ( trgSeg == null ) {
+								trgSeg = new Segment(srcSeg.id);
+								trgCont.getSegments().append(trgSeg);
+							}
+							else { // Is it empty?
+								// If not empty we do not fill (no overwriting)
+								fill = trgSeg.text.isEmpty();
+							}
+						}
+
 						// Write to TMX if needed
 						if ( tmxWriter != null ) {
 							tmxWriter.writeTU(res.source, res.target, null, attributes);
 						}
+						
 						// Annotate if requested
-						if ( trgSeg != null ) {
+						if ( params.getAnnotate() ) {
 							TextUnitUtil.addAltTranslation(trgSeg,
 								res.toAltTranslation(srcSeg.text, sourceLocale, targetLocale));
 						}
+							
+						// Fill the target if requested
+						if ( fill ) {
+							trgSeg.text = res.target;
+						}
+						
+						firstMatch = false;
 					}
 				}
 			}
