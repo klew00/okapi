@@ -69,7 +69,7 @@ public class DefaultConnectors implements IConnectorList {
 		list.add(trc);
 
 		trc = new ConnectorInfo();
-		trc.description = "Microsoft MT Server";
+		trc.description = "Microsoft Translator Services";
 		trc.connectorClass = "net.sf.okapi.connectors.microsoft.MicrosoftMTConnector";
 		trc.descriptionProviderClass = "net.sf.okapi.connectors.microsoft.Parameters";
 		list.add(trc);
