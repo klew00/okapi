@@ -31,7 +31,9 @@ import net.sf.okapi.common.Range;
 import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.ITextUnit;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.lib.segmentation.LanguageMap;
 import net.sf.okapi.lib.segmentation.Rule;
 import net.sf.okapi.lib.segmentation.SRXDocument;
@@ -156,6 +158,78 @@ public class SRXSegmenterTest {
 	}
 
 	@Test
+	public void testCodedSegmentationDefault1 () {
+		SRXSegmenter seg = (SRXSegmenter)createSegmenterWithRules(LocaleId.fromString("en"));
+		seg.setOptions(seg.segmentSubFlows(), false, true, false,
+			false, false, false);
+		TextContainer tc = createCodedText();
+		ISegments segments = tc.getSegments();
+		int n = seg.computeSegments(tc);
+		assertEquals(5, n);
+		segments.create(seg.getRanges());
+		assertEquals(5, segments.count());
+		assertEquals("PH after.", segments.get(0).toString());
+		assertEquals("<br/><b> End after.</b>", segments.get(1).toString());
+		assertEquals(" Start after.", segments.get(2).toString());
+		assertEquals("<i> Text.</i>", segments.get(3).toString());
+		assertEquals("  ", segments.get(4).toString());
+	}
+	
+	@Test
+	public void testCodedSegmentationNotDefault1 () {
+		SRXSegmenter seg = (SRXSegmenter)createSegmenterWithRules(LocaleId.fromString("en"));
+		seg.setOptions(seg.segmentSubFlows(), true, false, true,
+			false, false, false);
+		TextContainer tc = createCodedText();
+		ISegments segments = tc.getSegments();
+		int n = seg.computeSegments(tc);
+		assertEquals(5, n);
+		segments.create(seg.getRanges());
+		assertEquals(5, segments.count());
+		assertEquals("PH after.<br/><b>", segments.get(0).toString());
+		assertEquals(" End after.", segments.get(1).toString());
+		assertEquals("</b> Start after.<i>", segments.get(2).toString());
+		assertEquals(" Text.", segments.get(3).toString());
+		assertEquals("</i>  ", segments.get(4).toString());
+	}
+	
+	@Test
+	public void testCodedSegmentationDefault2 () {
+		SRXSegmenter seg = (SRXSegmenter)createSegmenterWithRules(LocaleId.fromString("en"));
+		seg.setOptions(seg.segmentSubFlows(), false, true, false,
+			false, false, false);
+		TextContainer tc = createCodedText2();
+		ISegments segments = tc.getSegments();
+		int n = seg.computeSegments(tc);
+		assertEquals(5, n);
+		segments.create(seg.getRanges());
+		assertEquals(5, segments.count());
+		assertEquals("PH after.", segments.get(0).toString());
+		assertEquals("<br/><br/><b><i> End after.</i></b>", segments.get(1).toString());
+		assertEquals(" Start after.", segments.get(2).toString());
+		assertEquals("<u><i> Text.</i></u>", segments.get(3).toString());
+		assertEquals("  ", segments.get(4).toString());
+	}
+
+	@Test
+	public void testCodedSegmentationNotDefault2 () {
+		SRXSegmenter seg = (SRXSegmenter)createSegmenterWithRules(LocaleId.fromString("en"));
+		seg.setOptions(seg.segmentSubFlows(), true, false, true,
+			false, false, false);
+		TextContainer tc = createCodedText2();
+		ISegments segments = tc.getSegments();
+		int n = seg.computeSegments(tc);
+		assertEquals(5, n);
+		segments.create(seg.getRanges());
+		assertEquals(5, segments.count());
+		assertEquals("PH after.<br/><br/><b><i>", segments.get(0).toString());
+		assertEquals(" End after.", segments.get(1).toString());
+		assertEquals("</i></b> Start after.<u><i>", segments.get(2).toString());
+		assertEquals(" Text.", segments.get(3).toString());
+		assertEquals("</i></u>  ", segments.get(4).toString());
+	}
+	
+	@Test
 	public void testTUSegmentationRemoval () {
 		ITextUnit tu = createMultiTargetSegmentedTextUnit();
 		// Removing the target does not change the source associated with it
@@ -220,4 +294,38 @@ public class SRXSegmenterTest {
 		return tu;
 	}
 
+	private TextContainer createCodedText () {
+		TextFragment tf = new TextFragment();
+		tf.append("PH after.");
+		tf.append(TagType.PLACEHOLDER, "break", "<br/>");
+		tf.append(TagType.OPENING, "bold", "<b>");
+		tf.append(" End after.");
+		tf.append(TagType.CLOSING, "bold", "</b>");
+		tf.append(" Start after.");
+		tf.append(TagType.OPENING, "italics", "<i>");
+		tf.append(" Text.");
+		tf.append(TagType.CLOSING, "italics", "</i>");
+		tf.append("  ");
+		return new TextContainer(tf);
+	}
+
+	private TextContainer createCodedText2 () {
+		TextFragment tf = new TextFragment();
+		tf.append("PH after.");
+		tf.append(TagType.PLACEHOLDER, "break", "<br/>");
+		tf.append(TagType.PLACEHOLDER, "break", "<br/>");
+		tf.append(TagType.OPENING, "bold", "<b>");
+		tf.append(TagType.OPENING, "italics", "<i>");
+		tf.append(" End after.");
+		tf.append(TagType.CLOSING, "italics", "</i>");
+		tf.append(TagType.CLOSING, "bold", "</b>");
+		tf.append(" Start after.");
+		tf.append(TagType.OPENING, "under", "<u>");
+		tf.append(TagType.OPENING, "italics", "<i>");
+		tf.append(" Text.");
+		tf.append(TagType.CLOSING, "italics", "</i>");
+		tf.append(TagType.CLOSING, "under", "</u>");
+		tf.append("  ");
+		return new TextContainer(tf);
+	}
 }
