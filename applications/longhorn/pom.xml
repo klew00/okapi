@@ -96,6 +96,14 @@
                 </configuration>
             </plugin>
             <plugin>
+            	<!-- Use the following dependency in referencing projects: 
+		            <dependency>
+				  		<groupId>net.sf.okapi.applications</groupId>
+				  		<artifactId>okapi-application-longhorn</artifactId>
+				  		<version>${okapi.version}</version>
+				  		<classifier>classes</classifier>
+				  	</dependency> 
+	             -->            
 	            <artifactId>maven-war-plugin</artifactId>
 	            <version>2.1.1</version>
 	            <configuration>
