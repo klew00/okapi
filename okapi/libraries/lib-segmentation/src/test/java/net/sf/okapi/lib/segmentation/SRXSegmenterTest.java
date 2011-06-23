@@ -75,16 +75,61 @@ public class SRXSegmenterTest {
 	}
 	
 	@Test
-	public void testSimpleSegmentation () {
+	public void testSimpleSegmentationDefault () {
 		ISegmenter seg = createSegmenterWithRules(LocaleId.fromString("en"));
-		TextContainer tc = new TextContainer("Part 1. Part 2.");
+		TextContainer tc = new TextContainer("Part 1.  Part 2. ");
+		ISegments segments = tc.getSegments();
+		int n = seg.computeSegments(tc);
+		assertEquals(3, n);
+		segments.create(seg.getRanges());
+		assertEquals(3, segments.count());
+		assertEquals("Part 1.", segments.get(0).toString());
+		assertEquals("  Part 2.", segments.get(1).toString());
+		assertEquals(" ", segments.get(2).toString());
+	}
+	
+	@Test
+	public void testSimpleSegmentationTrimLeading () {
+		SRXSegmenter seg = (SRXSegmenter)createSegmenterWithRules(LocaleId.fromString("en"));
+		seg.setOptions(seg.segmentSubFlows(), seg.includeStartCodes(), seg.includeEndCodes(), seg.includeIsolatedCodes(),
+			seg.oneSegmentIncludesAll(), true, false);
+		TextContainer tc = new TextContainer(" Part 1.  Part 2. ");
 		ISegments segments = tc.getSegments();
 		int n = seg.computeSegments(tc);
 		assertEquals(2, n);
 		segments.create(seg.getRanges());
 		assertEquals(2, segments.count());
 		assertEquals("Part 1.", segments.get(0).toString());
-		assertEquals(" Part 2.", segments.get(1).toString());
+		assertEquals("Part 2.", segments.get(1).toString());
+	}
+	
+	@Test
+	public void testSimpleSegmentationTrimTrailing () {
+		SRXSegmenter seg = (SRXSegmenter)createSegmenterWithRules(LocaleId.fromString("en"));
+		seg.setOptions(seg.segmentSubFlows(), seg.includeStartCodes(), seg.includeEndCodes(), seg.includeIsolatedCodes(),
+			seg.oneSegmentIncludesAll(), false, true);
+		TextContainer tc = new TextContainer(" Part 1.  Part 2. ");
+		ISegments segments = tc.getSegments();
+		int n = seg.computeSegments(tc);
+		assertEquals(2, n);
+		segments.create(seg.getRanges());
+		assertEquals(2, segments.count());
+		assertEquals(" Part 1.", segments.get(0).toString());
+		assertEquals("  Part 2.", segments.get(1).toString());
+	}
+	
+	@Test
+	public void testSimpleSegmentationOneIsAll () {
+		SRXSegmenter seg = (SRXSegmenter)createSegmenterWithRules(LocaleId.fromString("en"));
+		seg.setOptions(seg.segmentSubFlows(), seg.includeStartCodes(), seg.includeEndCodes(), seg.includeIsolatedCodes(),
+			true, true, true);
+		TextContainer tc = new TextContainer(" Part 1  ");
+		ISegments segments = tc.getSegments();
+		int n = seg.computeSegments(tc);
+		assertEquals(1, n);
+		segments.create(seg.getRanges());
+		assertEquals(1, segments.count());
+		assertEquals(" Part 1  ", segments.get(0).toString());
 	}
 	
 	@Test
