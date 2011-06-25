@@ -979,4 +979,15 @@ public class CodeSimplifierTest {
 		assertEquals("<a><b> <c>   ", res[0]);
 		assertEquals("</c>   </b></a>", res[1]);
 	}
+
+	@Test
+	public void testCodeReduction50 () {
+		TextFragment tf = new TextFragment(".");
+		tf.append(TagType.PLACEHOLDER, "x1", "<x/>");
+		tf.append(TagType.PLACEHOLDER, "x2", "<x/>");
+		assertEquals(".<1/><2/>", fmt.setContent(tf).toString());
+		simplifier.simplifyAll(tf, true);		
+		assertEquals(".", fmt.setContent(tf).toString());
+	}
+
 }

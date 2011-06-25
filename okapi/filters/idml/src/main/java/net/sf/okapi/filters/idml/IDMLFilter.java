@@ -423,7 +423,7 @@ public class IDMLFilter implements IFilter {
 			queue.add(new Event(EventType.END_GROUP, ending));
 		}
 		catch ( Throwable e ) {
-			throw new OkapiIOException("Error processing story file.\n"+e.getMessage(), e);
+			throw new OkapiIOException(String.format("Error processing story file '%s'.\n"+e.getMessage(), storyId), e);
 		}
 	}
 	

@@ -177,33 +177,38 @@ public class CodeSimplifier {
 		int emptyOpenCloseMerges=0;
 		int iteration = 0;
 		
-		do {
-			iteration++;
-
-			prepare(tf.getCodedText(), tf.getCodes());
-			//System.out.println(TextUnitUtil.toText(tf));
-			isolatedMerges = simplifyIsolated();
-			//System.out.println(TextUnitUtil.toText(getCodedText(), getCodes()));
-			tf.setCodedText(getCodedText(), getCodes());
-
-			prepare(tf.getCodedText(), tf.getCodes());
-			//System.out.println(TextUnitUtil.toText(tf));
-			openCloseMerges = simplifyOpeningClosing();
-			//System.out.println(TextUnitUtil.toText(getCodedText(), getCodes()));
-			tf.setCodedText(getCodedText(), getCodes());
-
-			prepare(tf.getCodedText(), tf.getCodes());
-			emptyOpenCloseMerges = simplifyEmptyOpeningClosing();
-			tf.setCodedText(getCodedText(), getCodes());
+		try {
+			do {
+				iteration++;
+	
+				prepare(tf.getCodedText(), tf.getCodes());
+				//System.out.println(TextUnitUtil.toText(tf));
+				isolatedMerges = simplifyIsolated();
+				//System.out.println(TextUnitUtil.toText(getCodedText(), getCodes()));
+				tf.setCodedText(getCodedText(), getCodes());
+	
+				prepare(tf.getCodedText(), tf.getCodes());
+				//System.out.println(TextUnitUtil.toText(tf));
+				openCloseMerges = simplifyOpeningClosing();
+				//System.out.println(TextUnitUtil.toText(getCodedText(), getCodes()));
+				tf.setCodedText(getCodedText(), getCodes());
+	
+				prepare(tf.getCodedText(), tf.getCodes());
+				emptyOpenCloseMerges = simplifyEmptyOpeningClosing();
+				tf.setCodedText(getCodedText(), getCodes());
+			}
+			while ((iteration < maxIterations) && (isolatedMerges + openCloseMerges + emptyOpenCloseMerges) > 0);
+			
+			// Check leading and trailing codes if requested
+			if ( removeLeadingTrailingCodes ) {
+				return removeLeadingTrailingCodes(tf, maxIterations);
+			}
+			else {
+				return null;
+			}
 		}
-		while ((iteration < maxIterations) && (isolatedMerges + openCloseMerges + emptyOpenCloseMerges) > 0);
-		
-		// Check leading and trailing codes if requested
-		if ( removeLeadingTrailingCodes ) {
-			return removeLeadingTrailingCodes(tf, maxIterations);
-		}
-		else {
-			return null;
+		catch ( Throwable e ) {
+			throw new RuntimeException("Error simplifiying codes.\n"+e.getMessage(), e);
 		}
 	}
 	
@@ -338,7 +343,7 @@ public class CodeSimplifier {
 			ctext = tf.getCodedText();
 			codes = tf.getCodes();
 			
-			if (ctext.length() > 0 && codes != null) {
+			if ( ctext.length() > 1 && !Util.isEmpty(codes) ) {
 				// Check leading code
 				ctext = tf.getCodedText();
 				codes = tf.getCodes();
