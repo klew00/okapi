@@ -249,8 +249,6 @@ public class MSBatchTranslationStep extends BasePipelineStep {
 		// We need to do the same loop as when gathering as we assume the results
 		// are in the same order
 		int entryIndex = 0;
-		boolean needTrgSeg = params.getAnnotate() || params.getFillTarget();
-		
 		for ( Event event : events ) {
 			if ( event.isTextUnit() ) {
 				ITextUnit tu = event.getTextUnit();
