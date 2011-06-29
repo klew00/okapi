@@ -40,7 +40,7 @@ public class MergingStep extends BasePipelineStep {
 	private Parameters params;
 	private MergingInfo info;
 	private Merger merger;
-	IFilterConfigurationMapper fcMapper;
+	private IFilterConfigurationMapper fcMapper;
 
 	public MergingStep () {
 		super();
@@ -49,8 +49,8 @@ public class MergingStep extends BasePipelineStep {
 
 	@Override
 	public String getDescription () {
-		return "BETA --- Post-process a Rainbow translation kit."
-			+" Expects: filter events. Sends back: filter events.";
+		return "Post-process a Rainbow translation kit."
+			+ " Expects: filter events. Sends back: filter events.";
 	}
 
 	@Override
@@ -70,22 +70,12 @@ public class MergingStep extends BasePipelineStep {
 			return handleStartDocument(event);
 		default:
 			if ( merger != null ) {
-				merger.handleEvent(event);
+				return merger.handleEvent(event);
 			}
-			return event;
 		}
-	}
-
-	@Override
-	protected Event handleStartBatch (Event event) {
 		return event;
 	}
 
-	@Override
-	protected Event handleEndBatch (Event event) {
-		return event;
-	}
-	
 	@Override
 	protected Event handleStartDocument (Event event) {
 		// Initial document is expected to be a manifest
@@ -101,12 +91,10 @@ public class MergingStep extends BasePipelineStep {
 		
 		// Create the merger if needed
 		if ( merger == null ) {
-			merger = new Merger(manifest, fcMapper, params.getPreserveSegmentation());
+			merger = new Merger(manifest, fcMapper, params.getPreserveSegmentation(), params.getReturnRawDocument());
 		}
 		// And trigger the merging
-		merger.startMerging(info);
-		
-		return event;
+		return merger.startMerging(info, event);
 	}
 
 	@Override
@@ -118,4 +106,5 @@ public class MergingStep extends BasePipelineStep {
 	public void setParameters (IParameters params) {
 		this.params = (Parameters)params;
 	}
+
 }

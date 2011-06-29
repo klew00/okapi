@@ -54,7 +54,7 @@ public class XLIFFPackageWriter extends BasePackageWriter {
 	@Override
 	protected void processStartBatch () {
 		manifest.setSubDirectories("original", "work", "work", "done", null, false);
-		setTMXInfo(true, null, null, null, null);
+		setTMXInfo(true, null, null, null, null, (forOmegat ? true : false));
 		super.processStartBatch();
 	}
 	

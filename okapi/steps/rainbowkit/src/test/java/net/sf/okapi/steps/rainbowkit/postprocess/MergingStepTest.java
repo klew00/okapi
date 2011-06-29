@@ -74,7 +74,11 @@ public class MergingStepTest {
 		pdriver.setFilterConfigurationMapper(fcMapper);
 		pdriver.setRootDirectories(Util.deleteLastChar(root), Util.deleteLastChar(root)); // Don't include final separator
 		pdriver.addStep(new RawDocumentToFilterEventsStep());
-		pdriver.addStep(new MergingStep());
+		MergingStep mrgStep = new MergingStep();
+		pdriver.addStep(mrgStep);
+		
+		Parameters prm = (Parameters)mrgStep.getParameters();
+		prm.setReturnRawDocument(true);
 		
 		URI inputURI = new File(root+"xliffPack/manifest.rkm").toURI();
 		pdriver.addBatchItem(new BatchItemContext(inputURI, "UTF-8", "okf_rainbowkit@noPrompt", null, "UTF-8", locEN, locFR));

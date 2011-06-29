@@ -69,7 +69,8 @@ public class FormatManager {
 		pairs.put(".otg", "okf_openoffice");
 		pairs.put(".sxd", "okf_openoffice");
 		pairs.put(".std", "okf_openoffice");
-		pairs.put(".sdlxliff", "okf_xliff");
+		pairs.put(".sdlxlf", "okf_xliff");
+		pairs.put(".xliff", "okf_xliff");
 		pairs.put(".dtd", "okf_dtd");
 		pairs.put(".ts", "okf_ts");
 		pairs.put(".txt", "okf_plaintext");

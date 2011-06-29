@@ -67,7 +67,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public ParametersDescription getParametersDescription() {
 		ParametersDescription desc = new ParametersDescription(this);
 		desc.add(WRITE_ALL_PROPERTIES_AS_ATTRIBUTES, 
-				"Write all TU level properties as TMX attributes?", 
+				"Write all text unit level properties as TMX attributes", 
 				null);
 
 		return desc;

@@ -62,6 +62,7 @@ public abstract class BasePackageWriter implements IPackageWriter {
 	protected TMXWriter tmxWriterLeverage;
 	protected String tmxPathLeverage;
 	protected boolean copiedTargetsLikeApproved = false;
+	protected boolean useLetterCodes = false;
 	
 	public BasePackageWriter (String extractionType) {
 		this.extractionType = extractionType;
@@ -183,8 +184,10 @@ public abstract class BasePackageWriter implements IPackageWriter {
 		String pathApproved,
 		String pathUnApproved,
 		String pathAlternates,
-		String pathLeverage)
+		String pathLeverage,
+		boolean useLetterCodes)
 	{
+		this.useLetterCodes = useLetterCodes;
 		if ( !generate ) {
 			tmxPathApproved = null;
 			tmxPathUnApproved = null;
@@ -234,24 +237,28 @@ public abstract class BasePackageWriter implements IPackageWriter {
 	protected void initializeTMXWriters () {
 		if ( tmxPathApproved != null ) {
 			tmxWriterApproved = new TMXWriter(tmxPathApproved);
+			tmxWriterApproved.setLetterCodedMode(useLetterCodes);
 			tmxWriterApproved.writeStartDocument(manifest.getSourceLocale(),
 				manifest.getTargetLocale(), getClass().getName(), null, null, null, null);
 		}
 
 		if ( tmxPathUnApproved != null ) {
 			tmxWriterUnApproved = new TMXWriter(tmxPathUnApproved);
+			tmxWriterUnApproved.setLetterCodedMode(useLetterCodes);
 			tmxWriterUnApproved.writeStartDocument(manifest.getSourceLocale(),
 				manifest.getTargetLocale(), getClass().getName(), null, null, null, null);
 		}
 
 		if ( tmxPathAlternates != null ) {
 			tmxWriterAlternates = new TMXWriter(tmxPathAlternates);
+			tmxWriterAlternates.setLetterCodedMode(useLetterCodes);
 			tmxWriterAlternates.writeStartDocument(manifest.getSourceLocale(),
 				manifest.getTargetLocale(), getClass().getName(), null, null, null, null);
 		}
 
 		if ( tmxPathLeverage != null ) {
 			tmxWriterLeverage = new TMXWriter(tmxPathLeverage);
+			tmxWriterLeverage.setLetterCodedMode(useLetterCodes);
 			tmxWriterLeverage.writeStartDocument(manifest.getSourceLocale(),
 				manifest.getTargetLocale(), getClass().getName(), null, null, null, null);
 		}

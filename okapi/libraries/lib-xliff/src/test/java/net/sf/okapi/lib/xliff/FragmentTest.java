@@ -49,7 +49,7 @@ public class FragmentTest {
 		Fragment frag = new Fragment();
 		frag.append(CodeType.OPENING, "i1", "[1]");
 		frag.append("text");
-		frag.append(CodeType.CLOSING, "i1", "[/1]"); // Same ID hould be corrected to "1" (next available)
+		frag.append(CodeType.CLOSING, "i1", "[/1]"); // Same ID should be corrected to "1" (next available)
 		//todo: rid missing
 		assertEquals("<sc id=\"i1\">[1]</sc>text<ec id=\"1\">[/1]</ec>", frag.getString(Fragment.STYLE_DATAINSIDE));
 	}

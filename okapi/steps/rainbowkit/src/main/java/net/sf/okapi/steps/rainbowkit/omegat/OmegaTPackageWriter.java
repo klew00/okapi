@@ -42,7 +42,7 @@ public class OmegaTPackageWriter extends XLIFFPackageWriter {
 	protected void processStartBatch () {
 		setForOmegat(true);
 		manifest.setSubDirectories("original", "source", "target", "done", "tm", true);
-		setTMXInfo(true, manifest.getPackageRoot()+"omegat"+File.separator+"project_save.tmx", null, null, null);
+		setTMXInfo(true, manifest.getPackageRoot()+"omegat"+File.separator+"project_save.tmx", null, null, null, true);
 		super.processStartBatch();
 	}
 	

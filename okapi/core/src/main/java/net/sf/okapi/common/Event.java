@@ -23,6 +23,7 @@ package net.sf.okapi.common;
 import net.sf.okapi.common.exceptions.OkapiUnexpectedResourceTypeException;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.PipelineParameters;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
@@ -268,6 +269,29 @@ public class Event {
 			return (StartDocument) resource;
 		}
 		throw new OkapiUnexpectedResourceTypeException("Event resource is not a StartDocument");
+	}
+	
+	/**
+	 * Indicates if this event carries a {@link PieplineParameters} resource.
+	 * @return true if this event carries a {@link PieplineParameters} resource, false otherwise.
+	 */
+	public boolean isPipelineParametersEvent () {
+		return (filterEventType == EventType.PIPELINE_PARAMETERS);
+	}
+	
+	/**
+	 * Convenience method returns the {@link IResource} as a {@link PipelineParameters}.
+	 * 
+	 * @return the {@link PipelineParameters}
+	 * 
+	 * @throws OkapiUnexpectedResourceTypeException 
+	 * 		if the {@link IResource} is not a {@link PipelineParameters}
+	 */
+	public PipelineParameters getPipelineParameters () {
+		if ( isPipelineParametersEvent() ) {
+			return (PipelineParameters)resource;
+		}
+		throw new OkapiUnexpectedResourceTypeException("Event resource is not a PipelineParameters");
 	}
 	
 	@Override

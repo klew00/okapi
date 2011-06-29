@@ -21,6 +21,7 @@
 package net.sf.okapi.steps.rainbowkit.postprocess;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -36,6 +37,8 @@ import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.ISegments;
+import net.sf.okapi.common.resource.MultiEvent;
+import net.sf.okapi.common.resource.PipelineParameters;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Segment;
@@ -57,15 +60,20 @@ public class Merger {
 	private boolean skipEmptySourceEntries;
 	private boolean useSource;
 	private boolean preserveSegmentation;
+	private boolean returnRawDocument;
+	private RawDocument rawDoc;
+	private boolean useSubDoc;
 	
 	public Merger (Manifest manifest,
 		IFilterConfigurationMapper fcMapper,
-		boolean preserveSegmentation)
+		boolean preserveSegmentation,
+		boolean returnRawDocument)
 	{
 		this.fcMapper = fcMapper;
 		this.manifest = manifest;
 		trgLoc = manifest.getTargetLocale();
 		this.preserveSegmentation = preserveSegmentation;
+		this.returnRawDocument = returnRawDocument;
 	}
 	
 	public void close () {
@@ -83,16 +91,60 @@ public class Merger {
 		switch ( event.getEventType() ) {
 		case TEXT_UNIT:
 			processTextUnit(event);
+			if ( returnRawDocument ) {
+				event = Event.NOOP_EVENT;
+			}
+			break;
+		case START_SUBDOCUMENT:
+			if ( returnRawDocument ) {
+				useSubDoc = true;
+			}
+			break;
+		case END_SUBDOCUMENT:
+			if ( returnRawDocument ) {
+				event = createMultiEvent();
+			}
 			break;
 		case END_DOCUMENT:
 			processEndDocument();
 			close();
+			if ( returnRawDocument && !useSubDoc ) {
+				event = createMultiEvent();
+			}
 			break;
+		default:
+			if ( returnRawDocument ) {
+				event = Event.NOOP_EVENT;
+			}
 		}
+		
 		return event;
 	}
+	
+	private Event createMultiEvent () {
+		List<Event> list = new ArrayList<Event>();
+		
+		// Change the pipeline parameters for the raw-document-related data
+		PipelineParameters pp = new PipelineParameters();
+		pp.setOutputURI(rawDoc.getInputURI()); // Use same name as this output for now
+		pp.setSourceLocale(rawDoc.getSourceLocale());
+		pp.setTargetLocale(rawDoc.getTargetLocale());
+		pp.setOutputEncoding(rawDoc.getEncoding()); // Use same as the output document
+		pp.setInputRawDocument(rawDoc);
+		// Add the event to the list
+		list.add(new Event(EventType.PIPELINE_PARAMETERS, pp));
 
-	public void startMerging (MergingInfo info) {
+		// Add raw-document related events
+		list.add(new Event(EventType.RAW_DOCUMENT, rawDoc));
+		
+		// Return the list as a multiple-event event
+		return new Event(EventType.MULTI_EVENT, new MultiEvent(list));
+	}
+
+	public Event startMerging (MergingInfo info,
+		Event event)
+	{
+		useSubDoc = false;
 		LOGGER.info("Merging: "+info.getRelativeInputPath());
 		// Create the filter for this original file
 		filter = fcMapper.createFilter(info.getFilterId(), filter);
@@ -111,7 +163,8 @@ public class Merger {
 		filter.open(rd);
 		writer = filter.createFilterWriter();
 		writer.setOptions(trgLoc, info.getTargetEncoding());
-		writer.setOutput(manifest.getMergeDirectory()+info.getRelativeTargetPath());
+		String outPath = manifest.getMergeDirectory()+info.getRelativeTargetPath();
+		writer.setOutput(outPath);
 		
 		// Skip entries with empty source for PO
 		skipEmptySourceEntries = ( info.getExtractionType().equals(Manifest.EXTRACTIONTYPE_PO)
@@ -119,16 +172,37 @@ public class Merger {
 		// Use the source of the input as the translation for XINI, etc.
 		useSource = info.getExtractionType().equals(Manifest.EXTRACTIONTYPE_ONTRAM);
 		
-		Event event = null;
+		// Process the start document in the document we just open
+		Event internalEvent = null;
 		if ( filter.hasNext() ) {
 			// Should be the start-document event
-			event = filter.next();
+			internalEvent = filter.next();
 		}
-		if (( event == null ) || ( event.getEventType() != EventType.START_DOCUMENT )) {
+		if (( internalEvent == null ) || ( internalEvent.getEventType() != EventType.START_DOCUMENT )) {
 			LOGGER.severe("The start document event is missing when parsing the original file.");
-			return;
 		}
-		writer.handleEvent(event);
+		else {
+			writer.handleEvent(internalEvent);
+		}
+		
+		// Compute what event to return
+		if ( returnRawDocument ) {
+			if ( event.getStartDocument().isMultilingual() ) {
+				rawDoc = new RawDocument(new File(outPath).toURI(), info.getTargetEncoding(),
+					manifest.getSourceLocale(), manifest.getTargetLocale());
+			}
+			else {
+				// Otherwise: the previous target is now the source (and still the target)
+				rawDoc = new RawDocument(new File(outPath).toURI(), info.getTargetEncoding(),
+					manifest.getTargetLocale(), manifest.getTargetLocale());
+			}
+			event = Event.NOOP_EVENT;
+		}
+		else {
+			event = internalEvent;
+		}
+		
+		return event;
 	}
 
 	private void processEndDocument () {
@@ -152,7 +226,7 @@ public class Merger {
 				traTu.getId()));
 			return;
 		}
-		// Get the actual trans-unit object of the original
+		// Get the actual text unit object of the original
 		ITextUnit oriTu = oriEvent.getTextUnit();
 
 		// Check the IDs
@@ -295,7 +369,6 @@ public class Merger {
 			writer.handleEvent(event);
 		}
 		// This text unit is extra in the translated file
-		//TODO: log error
 		return null;
 	}
 }

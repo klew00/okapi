@@ -115,6 +115,11 @@ public enum EventType {
 	 * An Event which holds multiple related Events, possibly of different types.
 	 */
 	MULTI_EVENT,
+	
+	/**
+	 * A special event which holds updated runtime parameters for the pipeline.
+	 */
+	PIPELINE_PARAMETERS,
 
 	/**
 	 * A custom event type used when steps need to exchange non-resource based

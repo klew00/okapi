@@ -55,7 +55,7 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 	@Override
 	protected void processStartBatch () {
 		manifest.setSubDirectories("original", "work", "work", "done", null, false);
-		setTMXInfo(false, null, null, null, null);
+		setTMXInfo(false, null, null, null, null, false);
 		super.processStartBatch();
 	}
 	

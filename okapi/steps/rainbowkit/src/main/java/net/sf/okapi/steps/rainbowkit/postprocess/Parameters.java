@@ -30,8 +30,10 @@ import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
 	static final String PRESERVESEGMENTATION = "preserveSegmentation"; //$NON-NLS-1$
+	static final String RETURNRAWDOCUMENT = "returnRawDocument"; //$NON-NLS-1$
 	
 	private boolean preserveSegmentation;
+	private boolean returnRawDocument;
 
 	public Parameters () {
 		reset();
@@ -42,6 +44,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		// Most of the times, this is the last step of the pipeline
 		// so preserving the segmentation is not needed
 		preserveSegmentation = false;
+		returnRawDocument= false;
 	}
 
 	@Override
@@ -49,12 +52,14 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		reset();
 		buffer.fromString(data);
 		preserveSegmentation = buffer.getBoolean(PRESERVESEGMENTATION, preserveSegmentation);
+		returnRawDocument = buffer.getBoolean(RETURNRAWDOCUMENT, returnRawDocument);
 	}
 
 	@Override
 	public String toString () {
 		buffer.reset();
 		buffer.setParameter(PRESERVESEGMENTATION, preserveSegmentation);
+		buffer.setParameter(RETURNRAWDOCUMENT, returnRawDocument);
 		return buffer.toString();
 	}
 
@@ -66,10 +71,19 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.preserveSegmentation = preserveSegmentation;
 	}
 
+	public boolean getReturnRawDocument () {
+		return returnRawDocument;
+	}
+
+	public void setReturnRawDocument (boolean returnRawDocument) {
+		this.returnRawDocument = returnRawDocument;
+	}
+
 	@Override
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
 		desc.add(PRESERVESEGMENTATION, "Preserve the segmentation for the next steps", null);
+		desc.add(RETURNRAWDOCUMENT, "Return raw documents instead of filter events", null);
 		return desc;
 	}
 
@@ -77,6 +91,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public EditorDescription createEditorDescription (ParametersDescription paramDesc) {
 		EditorDescription desc = new EditorDescription(MergingStep.NAME, true, false);
 		desc.addCheckboxPart(paramDesc.get(PRESERVESEGMENTATION));
+		desc.addCheckboxPart(paramDesc.get(RETURNRAWDOCUMENT));
 		return desc;
 	}
 

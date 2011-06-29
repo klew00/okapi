@@ -20,9 +20,15 @@
 
 package net.sf.okapi.common.pipeline;
 
+import java.lang.reflect.Method;
+import java.util.List;
+
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.pipeline.annotations.ConfigurationParameter;
+import net.sf.okapi.common.pipeline.annotations.StepIntrospector;
+import net.sf.okapi.common.resource.PipelineParameters;
 
 /**
  * Abstract implementation of the {@link IPipelineStep} interface.
@@ -101,6 +107,9 @@ public abstract class BasePipelineStep implements IPipelineStep {
 		case MULTI_EVENT:
 			event = handleMultiEvent(event);
 			break;
+		case PIPELINE_PARAMETERS:
+			event = handlePipelineParameters(event);
+			break;
 		// default:
 		// Just pass it through
 		}
@@ -129,9 +138,8 @@ public abstract class BasePipelineStep implements IPipelineStep {
 
 	/**
 	 * Handles the {@link net.sf.okapi.common.EventType#START_BATCH} event.
-	 * 
-	 * @param event
-	 *            the event itself.
+	 * @param event event to handle.
+	 * @return the event returned.
 	 */
 	protected Event handleStartBatch(Event event) {
 		return event;
@@ -139,9 +147,8 @@ public abstract class BasePipelineStep implements IPipelineStep {
 
 	/**
 	 * Handles the {@link net.sf.okapi.common.EventType#END_BATCH} event.
-	 * 
-	 * @param event
-	 *            the event itself.
+	 * @param event event to handle.
+	 * @return the event returned.
 	 */
 	protected Event handleEndBatch(Event event) {
 		return event;
@@ -149,9 +156,8 @@ public abstract class BasePipelineStep implements IPipelineStep {
 
 	/**
 	 * Handles the {@link net.sf.okapi.common.EventType#START_BATCH_ITEM} event.
-	 * 
-	 * @param event
-	 *            the event itself.
+	 * @param event event to handle.
+	 * @return the event returned.
 	 */
 	protected Event handleStartBatchItem(Event event) {
 		return event;
@@ -159,9 +165,8 @@ public abstract class BasePipelineStep implements IPipelineStep {
 
 	/**
 	 * Handles the {@link net.sf.okapi.common.EventType#END_BATCH_ITEM} event.
-	 * 
-	 * @param event
-	 *            the event itself.
+	 * @param event event to handle.
+	 * @return the event returned.
 	 */
 	protected Event handleEndBatchItem(Event event) {
 		return event;
@@ -169,9 +174,8 @@ public abstract class BasePipelineStep implements IPipelineStep {
 
 	/**
 	 * Handles the {@link net.sf.okapi.common.EventType#RAW_DOCUMENT} event.
-	 * 
-	 * @param event
-	 *            the event itself.
+	 * @param event event to handle.
+	 * @return the event returned.
 	 */
 	protected Event handleRawDocument(Event event) {
 		return event;
@@ -179,9 +183,8 @@ public abstract class BasePipelineStep implements IPipelineStep {
 
 	/**
 	 * Handles the {@link net.sf.okapi.common.EventType#START_DOCUMENT} event.
-	 * 
-	 * @param event
-	 *            the event itself.
+	 * @param event event to handle.
+	 * @return the event returned.
 	 */
 	protected Event handleStartDocument(Event event) {
 		return event;
@@ -189,9 +192,8 @@ public abstract class BasePipelineStep implements IPipelineStep {
 
 	/**
 	 * Handles the {@link net.sf.okapi.common.EventType#END_DOCUMENT} event.
-	 * 
-	 * @param event
-	 *            the event itself.
+	 * @param event event to handle.
+	 * @return the event returned.
 	 */
 	protected Event handleEndDocument(Event event) {
 		return event;
@@ -199,9 +201,8 @@ public abstract class BasePipelineStep implements IPipelineStep {
 
 	/**
 	 * Handles the {@link net.sf.okapi.common.EventType#START_SUBDOCUMENT} event.
-	 * 
-	 * @param event
-	 *            the event itself.
+	 * @param event event to handle.
+	 * @return the event returned.
 	 */
 	protected Event handleStartSubDocument(Event event) {
 		return event;
@@ -209,9 +210,8 @@ public abstract class BasePipelineStep implements IPipelineStep {
 
 	/**
 	 * Handles the {@link net.sf.okapi.common.EventType#END_SUBDOCUMENT} event.
-	 * 
-	 * @param event
-	 *            the event itself.
+	 * @param event event to handle.
+	 * @return the event returned.
 	 */
 	protected Event handleEndSubDocument(Event event) {
 		return event;
@@ -219,9 +219,8 @@ public abstract class BasePipelineStep implements IPipelineStep {
 
 	/**
 	 * Handles the {@link net.sf.okapi.common.EventType#START_GROUP} event.
-	 * 
-	 * @param event
-	 *            the event itself.
+	 * @param event event to handle.
+	 * @return the event returned.
 	 */
 	protected Event handleStartGroup(Event event) {
 		return event;
@@ -229,9 +228,8 @@ public abstract class BasePipelineStep implements IPipelineStep {
 
 	/**
 	 * Handles the {@link net.sf.okapi.common.EventType#END_GROUP} event.
-	 * 
-	 * @param event
-	 *            the event itself.
+	 * @param event event to handle.
+	 * @return the event returned.
 	 */
 	protected Event handleEndGroup(Event event) {
 		return event;
@@ -239,9 +237,8 @@ public abstract class BasePipelineStep implements IPipelineStep {
 
 	/**
 	 * Handles the {@link net.sf.okapi.common.EventType#TEXT_UNIT} event.
-	 * 
-	 * @param event
-	 *            the event itself.
+	 * @param event event to handle.
+	 * @return the event returned.
 	 */
 	protected Event handleTextUnit(Event event) {
 		return event;
@@ -249,9 +246,8 @@ public abstract class BasePipelineStep implements IPipelineStep {
 
 	/**
 	 * Handles the {@link net.sf.okapi.common.EventType#DOCUMENT_PART} event.
-	 * 
-	 * @param event
-	 *            the event itself.
+	 * @param event event to handle.
+	 * @return the event returned.
 	 */
 	protected Event handleDocumentPart(Event event) {
 		return event;
@@ -259,9 +255,8 @@ public abstract class BasePipelineStep implements IPipelineStep {
 
 	/**
 	 * Handles the {@link net.sf.okapi.common.EventType#CUSTOM} event.
-	 * 
-	 * @param event
-	 *            the event itself.
+	 * @param event event to handle.
+	 * @return the event returned.
 	 */
 	protected Event handleCustom(Event event) {
 		return event;
@@ -269,11 +264,100 @@ public abstract class BasePipelineStep implements IPipelineStep {
 
 	/**
 	 * Handles the {@link EventType#MULTI_EVENT} event.
-	 * 
-	 * @param event
-	 * @return event the event itself
+	 * @param event event to handle.
+	 * @return the event returned.
 	 */
 	protected Event handleMultiEvent(Event event) {
+		return event;
+	}
+	
+	/**
+	 * Handles the {@link EventType#PIPELINE_PARAMETERS} event.
+	 * This method relies on the configuration parameters set in each step to set the corresponding values.
+	 * @param event event to handle.
+	 * @return the event returned.
+	 */
+	protected Event handlePipelineParameters (Event event) {
+		PipelineParameters pp = event.getPipelineParameters();
+		List<ConfigurationParameter> pList = StepIntrospector.getStepParameters(this);
+		try {
+			for ( ConfigurationParameter param : pList ) {
+				Method method = param.getMethod();
+				if ( method == null ) continue;
+
+				switch ( param.getParameterType() ) {
+				case OUTPUT_URI:
+					if ( pp.getOutputURI() != null ) {
+						method.invoke(param.getStep(), pp.getOutputURI());
+					}
+					break;
+				case FILTER_CONFIGURATION_ID:
+					if ( pp.getFilterConfigurationId() != null ) {
+						method.invoke(param.getStep(), pp.getFilterConfigurationId());
+					}
+					break;
+				case FILTER_CONFIGURATION_MAPPER:
+					if ( pp.getFilterConfigurationMapper() != null ) {
+						method.invoke(param.getStep(), pp.getFilterConfigurationMapper());
+					}
+					break;
+				case INPUT_RAWDOC:
+					if ( pp.getInputRawDocument() != null ) {
+						method.invoke(param.getStep(), pp.getInputRawDocument());
+					}
+					break;
+				case INPUT_ROOT_DIRECTORY:
+					if ( pp.getInputRootDirectory() != null ) {
+						method.invoke(param.getStep(), pp.getInputRootDirectory());
+					}
+					break;
+				case INPUT_URI:
+					if ( pp.getThirdInputRawDocument() != null ) {
+						method.invoke(param.getStep(), pp.getThirdInputRawDocument());
+					}
+					break;
+				case OUTPUT_ENCODING:
+					if ( pp.getOutputEncoding() != null ) {
+						method.invoke(param.getStep(), pp.getOutputEncoding());
+					}
+					break;
+				case ROOT_DIRECTORY:
+					if ( pp.getRootDirectory() != null ) {
+						method.invoke(param.getStep(), pp.getRootDirectory());
+					}
+					break;
+				case SECOND_INPUT_RAWDOC:
+					if ( pp.getSecondInputRawDocument() != null ) {
+						method.invoke(param.getStep(), pp.getSecondInputRawDocument());
+					}
+					break;
+				case SOURCE_LOCALE:
+					if ( pp.getSourceLocale() != null ) {
+						method.invoke(param.getStep(), pp.getSourceLocale());
+					}
+					break;
+				case TARGET_LOCALE:
+					if ( pp.getTargetLocale() != null ) {
+						method.invoke(param.getStep(), pp.getTargetLocale());
+					}
+					break;
+				case THIRD_INPUT_RAWDOC:
+					if ( pp.getThirdInputRawDocument() != null ) {
+						method.invoke(param.getStep(), pp.getThirdInputRawDocument());
+					}
+					break;
+				case UI_PARENT:
+					if ( pp.getUIParent() != null ) {
+						method.invoke(param.getStep(), pp.getUIParent());
+					}
+					break;
+				}
+			}
+		}
+		catch ( Throwable e ) {
+			throw new RuntimeException("Error when setting pipeline parameter.\n"+e.getMessage(), e);
+		}
+
 		return event;
 	}
 

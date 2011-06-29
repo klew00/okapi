@@ -49,7 +49,7 @@ public class TransifexPackageWriter extends BasePackageWriter {
 	@Override
 	protected void processStartBatch () {
 		manifest.setSubDirectories("original", "uploads", "downloads", "done", null, true);
-		setTMXInfo(false, null, null, null, null);
+		setTMXInfo(false, null, null, null, null, true);
 		super.processStartBatch();
 	}
 
