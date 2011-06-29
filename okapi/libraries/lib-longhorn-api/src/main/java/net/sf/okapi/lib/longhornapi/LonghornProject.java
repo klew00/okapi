@@ -73,6 +73,17 @@ public interface LonghornProject {
 	void executePipeline();
 	
 	/**
+	 * Executes the pipeline from the previously added batch configuration
+	 * on all input files in this project and sets the source and target language
+	 * of the project to the parameter values.
+	 * 
+	 * @param sourceLanguage source language for pipeline
+	 * @param targetLanguage target language for pipeline
+	 * @throws NullPointerException if one of the parameters is <code>null</code>
+	 */
+	void executePipeline(String sourceLanguage, String targetLanguage) throws NullPointerException;
+	
+	/**
 	 * Returns all output files that were generated when the project's pipeline was executed.
 	 * 
 	 * @return A list of all output files in this project
@@ -92,4 +103,5 @@ public interface LonghornProject {
 	 * Deletes this project from the web-service.
 	 */
 	void delete();
+
 }

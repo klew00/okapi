@@ -111,6 +111,19 @@ public class RESTProject implements LonghornProject {
 			throw new RuntimeException(e);
 		}
 	}
+	
+	@Override
+	public void executePipeline(String sourceLanguage, String targetLanguage) {
+		if (sourceLanguage == null || targetLanguage == null)
+			throw new NullPointerException();
+		
+		try {
+			Util.post(projUri + "/tasks/execute/" + sourceLanguage + "/" + targetLanguage, null);
+		}
+		catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
 	@Override
 	public ArrayList<LonghornFile> getInputFiles() {

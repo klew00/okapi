@@ -231,6 +231,33 @@ public class RESTInterface {
 	}
 
 	/**
+	 * Executes the uploaded batch configuration on the input files that have been added.
+	 * 
+	 * @param projId The id of the project to be executed
+	 * @param sourceLanguage source language for pipeline
+	 * @param targetLanguage target language for pipeline
+	 * @return
+	 */
+	@POST
+	@Path("/{projId}/tasks/execute/{source}/{target}")
+	public Response executeProject(@PathParam("projId") int projId, @PathParam("source") String sourceLanguage, @PathParam("target") String targetLanguage) {
+
+		try {
+			ProjectUtils.executeProject(projId, sourceLanguage, targetLanguage);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			int status = HttpStatus.SC_INTERNAL_SERVER_ERROR;
+			String type = MediaType.TEXT_PLAIN;
+			String body = e.toString();
+			return Response.status(status).type(type).entity(body).build();
+		}
+
+		int status = HttpStatus.SC_OK;
+		return Response.status(status).build();
+	}
+	
+	/**
 	 * @param projId The id of a local project
 	 * @return A list of the names of all output files that have been generated in that project
 	 */

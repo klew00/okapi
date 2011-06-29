@@ -33,6 +33,7 @@ import net.sf.okapi.applications.rainbow.batchconfig.BatchConfiguration;
 import net.sf.okapi.applications.rainbow.lib.LanguageManager;
 import net.sf.okapi.applications.rainbow.pipeline.PipelineWrapper;
 import net.sf.okapi.applications.rainbow.pipeline.StepInfo;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.DefaultFilters;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
@@ -66,18 +67,18 @@ public class ProjectUtils {
 	public static void addBatchConfig(int projId, File tmpFile) {
 		PluginsManager plManager = new PluginsManager();
 		try {
-			File targetFile = WorkspaceUtils.getBatchConfigurationFile(projId);
-			Util.copyFile(tmpFile, targetFile);
-			
+		File targetFile = WorkspaceUtils.getBatchConfigurationFile(projId);
+		Util.copyFile(tmpFile, targetFile);
+		
 			PipelineWrapper pipelineWrapper = preparePipelineWrapper(projId, plManager);
-			
-			// install batch configuration to config directory
-			BatchConfiguration bconf = new BatchConfiguration();
-			bconf.installConfiguration(targetFile.getAbsolutePath(),
-					WorkspaceUtils.getConfigDirPath(projId), pipelineWrapper);
+		
+		// install batch configuration to config directory
+		BatchConfiguration bconf = new BatchConfiguration();
+		bconf.installConfiguration(targetFile.getAbsolutePath(),
+				WorkspaceUtils.getConfigDirPath(projId), pipelineWrapper);
 		} finally {
 			plManager.releaseClassLoader();
-		}
+	}
 	}
 
 	/**
@@ -92,7 +93,7 @@ public class ProjectUtils {
 	private static PipelineWrapper preparePipelineWrapper(int projId, PluginsManager plManager) {				
 		// Load local plug-ins
 		plManager.discover(new File(WorkspaceUtils.getConfigDirPath(projId)), true);
-		
+
 		// Initialize filter configurations
 		FilterConfigurationMapper fcMapper = new FilterConfigurationMapper();
 		DefaultFilters.setMappings(fcMapper, false, true);
@@ -104,7 +105,7 @@ public class ProjectUtils {
 		PipelineWrapper pipelineWrapper = new PipelineWrapper(fcMapper, WorkspaceUtils.getConfigDirPath(projId),
 				plManager, WorkspaceUtils.getInputDirPath(projId), WorkspaceUtils.getInputDirPath(projId), null);
 		pipelineWrapper.addFromPlugins(plManager);
-		return pipelineWrapper;		
+		return pipelineWrapper;
 	}
 
 	public static void addInputFile(int projId, File tmpFile, String filename) {
@@ -113,50 +114,61 @@ public class ProjectUtils {
 		Util.copyFile(tmpFile, targetFile);
 	}
 
-	public static void executeProject(int projId) throws IOException {
+	public static void executeProject(int projId) throws IOException{
+		executeProject(projId, null, null);
+	}
+	
+	public static void executeProject(int projId, String sourceLanguage, String targetLanguage) throws IOException {
 		PluginsManager plManager = new PluginsManager();
 		try {
-			// Create a new, empty rainbow project
-			Project rainbowProject = new Project(new LanguageManager());
-			rainbowProject.setCustomParametersFolder(WorkspaceUtils.getConfigDirPath(projId));
-			rainbowProject.setUseCustomParametersFolder(true);
-					
-			// Create a pipeline wrapper
+		// Create a new, empty rainbow project
+		Project rainbowProject = new Project(new LanguageManager());
+		rainbowProject.setCustomParametersFolder(WorkspaceUtils.getConfigDirPath(projId));
+		rainbowProject.setUseCustomParametersFolder(true);
+		
+		if (sourceLanguage != null){
+			rainbowProject.setSourceLanguage(new LocaleId(sourceLanguage, true));
+		}
+		if (targetLanguage != null){
+			rainbowProject.setTargetLanguage(new LocaleId(targetLanguage, true));
+		}
+			
+		// Create a pipeline wrapper
 			PipelineWrapper pipelineWrapper = preparePipelineWrapper(projId, plManager);
-			
-			// Load pipeline into the rainbow project
-			File pipelineFile = WorkspaceUtils.getPipelineFile(projId);
-			pipelineWrapper.load(pipelineFile.getAbsolutePath());
-			rainbowProject.setUtilityParameters(CURRENT_PROJECT_PIPELINE, pipelineWrapper.getStringStorage());
-	
-			// Set new input and output root
-			rainbowProject.setInputRoot(0, WorkspaceUtils.getInputDirPath(projId), true);
-			rainbowProject.setOutputRoot(WorkspaceUtils.getOutputDirPath(projId));
-			rainbowProject.setUseOutputRoot(true);
-			
-			// Adjust paths from specific steps
-			adjustStepsPaths(projId, pipelineWrapper);
-			
-			// Load mapping of filter configs to file extensions
-			HashMap<String, String> filterConfigByExtension = loadFilterConfigurationMapping(projId);
-	
-			// Add files to project input list
-			if (!isTKitMergePipeline(pipelineWrapper)) {
-				addDocumentsToProject(projId, rainbowProject, filterConfigByExtension);
-			}
-			else {
-				addManifestToProject(projId, rainbowProject, filterConfigByExtension);
-			}
-			
-			rainbowProject.getPathBuilder().setUseExtension(false);
-	
-			// Execute pipeline
-			pipelineWrapper.execute(rainbowProject);
+		
+		// Load pipeline into the rainbow project
+		File pipelineFile = WorkspaceUtils.getPipelineFile(projId);
+		pipelineWrapper.load(pipelineFile.getAbsolutePath());
+		rainbowProject.setUtilityParameters(CURRENT_PROJECT_PIPELINE, pipelineWrapper.getStringStorage());
+
+		// Set new input and output root
+		rainbowProject.setInputRoot(0, WorkspaceUtils.getInputDirPath(projId), true);
+		rainbowProject.setOutputRoot(WorkspaceUtils.getOutputDirPath(projId));
+		rainbowProject.setUseOutputRoot(true);
+		
+		// Adjust paths from specific steps
+		adjustStepsPaths(projId, pipelineWrapper);
+		
+		// Load mapping of filter configs to file extensions
+		HashMap<String, String> filterConfigByExtension = loadFilterConfigurationMapping(projId);
+
+		// Add files to project input list
+		if (!isTKitMergePipeline(pipelineWrapper)) {
+			addDocumentsToProject(projId, rainbowProject, filterConfigByExtension);
+		}
+		else {
+			addManifestToProject(projId, rainbowProject, filterConfigByExtension);
+		}
+		
+		rainbowProject.getPathBuilder().setUseExtension(false);
+
+		// Execute pipeline
+		pipelineWrapper.execute(rainbowProject);
 		} finally {
 			plManager.releaseClassLoader();
-		}
 	}
-		
+	}
+
 	/**
 	 * Adjusts input and output paths from specific steps
 	 * 
