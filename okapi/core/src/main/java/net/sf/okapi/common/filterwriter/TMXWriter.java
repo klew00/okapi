@@ -737,7 +737,7 @@ public class TMXWriter {
     
     /**
 	 * If true then all TU level properties will be written as TMX attributes.
-	 * @param writeAllProperties
+	 * @param writeAllPropertiesAsAttributes true to write out all TU level properties as TMX attributes. 
 	 */
 	public void setWriteAllPropertiesAsAttributes(boolean writeAllPropertiesAsAttributes) {
 		this.writeAllPropertiesAsAttributes = writeAllPropertiesAsAttributes;

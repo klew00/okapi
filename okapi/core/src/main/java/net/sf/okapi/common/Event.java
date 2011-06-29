@@ -272,8 +272,8 @@ public class Event {
 	}
 	
 	/**
-	 * Indicates if this event carries a {@link PieplineParameters} resource.
-	 * @return true if this event carries a {@link PieplineParameters} resource, false otherwise.
+	 * Indicates if this event carries a {@link PipelineParameters} resource.
+	 * @return true if this event carries a {@link PipelineParameters} resource, false otherwise.
 	 */
 	public boolean isPipelineParametersEvent () {
 		return (filterEventType == EventType.PIPELINE_PARAMETERS);

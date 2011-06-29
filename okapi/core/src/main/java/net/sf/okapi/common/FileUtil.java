@@ -296,7 +296,7 @@ public final class FileUtil {
 
 	  /**
 	   * Extract a given ZIP file to a given destination folder.
-	   * @author http://www.java2s.com/Code/Java/File-Input-Output/Extractzipfiletodestinationfolder.htm
+	   * From http://www.java2s.com/Code/Java/File-Input-Output/Extractzipfiletodestinationfolder.htm
 	   * @param zipFileName full path of the given ZIP file
 	   * @param destPath destination folder
 	   */
