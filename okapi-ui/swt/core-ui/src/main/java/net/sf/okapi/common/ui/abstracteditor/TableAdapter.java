@@ -20,6 +20,7 @@
 
 package net.sf.okapi.common.ui.abstracteditor;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -245,6 +246,21 @@ public class TableAdapter {
 		return null;
 	}
 	
+	/**
+	 * Returns a list of values in a given column.
+	 * @param columnNumber 1-based column number
+	 * @return a list of values
+	 */
+	public List<String> getColumnValues(int columnNumber) {
+		List<String> list = new ArrayList<String>(); 
+		if (!SWTUtil.checkColumnIndex(table, columnNumber - 1)) return list;
+		
+		for (TableItem item : table.getItems()) {		
+			list.add(item.getText(columnNumber - 1));
+		}
+		return list;
+	}
+	
 	public boolean valueExists(String value, int columnNumber) {
 	
 		return findValue(value, columnNumber) != null;
@@ -434,5 +450,6 @@ public class TableAdapter {
 		TableColumn tc = table.getColumn(colNum - 1);
 		tc.setAlignment(alignment);
 	}
+
 	
 }
