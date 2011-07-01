@@ -424,5 +424,15 @@ public class TableAdapter {
 		
 		table.removeAll();
 	}
+
+	/**
+	 * Sets column alignment.
+	 * @param colNum 1-based column number
+	 * @param alignment one of SWT.LEFT, SWT.CENTER, SWT.RIGHT
+	 */
+	public void setColumnAlignment(int colNum, int alignment) {
+		TableColumn tc = table.getColumn(colNum - 1);
+		tc.setAlignment(alignment);
+	}
 	
 }
