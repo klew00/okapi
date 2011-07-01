@@ -56,18 +56,7 @@ public class Codes implements Serializable {
 		CodeType type)
 	{
 		if ( codes == null ) return null;
-		String tmp;
-		switch ( type ) {
-		case CLOSING:
-			tmp = "c"+id;
-			break;
-		case OPENING:
-			tmp = "o"+id;
-			break;
-		default:
-			tmp = "p"+id;
-			break;
-		}
+		String tmp = Code.toInternalId(id, type);
 		for ( Code code : codes ) {
 			if ( code.internalId.equals(tmp) ) return code;
 		}

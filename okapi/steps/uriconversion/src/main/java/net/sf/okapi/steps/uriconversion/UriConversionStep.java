@@ -60,7 +60,8 @@ public class UriConversionStep extends BasePipelineStep {
 
 	@Override
 	public String getDescription () {
-		return "Encode or Decode URI escape sequences.";
+		return "Encodes or Decodes URI escape sequences."
+			+ " Expects: filter events. Sends back: filter events.";
 	}
 
 	@Override

@@ -657,6 +657,16 @@ public class PipelineWrapper {
 			availableSteps.put(step.id, step);
 
 			ps = (IPipelineStep)Class.forName(
+				"net.sf.okapi.steps.wordcount.SimpleWordCountStep").newInstance();
+			params = ps.getParameters();
+			step = new StepInfo(ps.getClass().getSimpleName(),
+				ps.getName(), ps.getDescription(), ps.getClass().getName(), null, null);
+			if ( params != null ) {
+				step.paramsData = params.toString();
+			}
+			availableSteps.put(step.id, step);
+			
+			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.xmlcharfixing.XMLCharFixingStep").newInstance();
 			params = ps.getParameters();
 			step = new StepInfo(ps.getClass().getSimpleName(),

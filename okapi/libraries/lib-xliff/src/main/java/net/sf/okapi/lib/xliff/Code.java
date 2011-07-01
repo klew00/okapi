@@ -48,6 +48,19 @@ public class Code implements Serializable {
 		this.nativeData = nativeData;
 	}
 
+	static String toInternalId (String id,
+		CodeType type)
+	{
+		switch ( type ) {
+		case CLOSING:
+			return "c"+id;
+		case OPENING:
+			return "o"+id;
+		default:
+			return "p"+id;
+		}
+	}
+	
 	public String getNativeData () {
 		return nativeData;
 	}
