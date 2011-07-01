@@ -1,6 +1,6 @@
 package net.sf.okapi.lib.xliff;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -13,8 +13,12 @@ import org.junit.Test;
 public class UnitTest {
 
 	@Test
-	public void testDummy () {
-		assertEquals("text", "text");
+	public void testNewSegment () {
+		Unit unit = new Unit("id");
+		Segment seg = unit.appendNewSegment();
+		assertNull(seg.id);
+		assertTrue(seg.getCodesStore() == unit.getCodesStore());
+		assertEquals("", seg.getSource().toString());
 	}
 	
 	@Test

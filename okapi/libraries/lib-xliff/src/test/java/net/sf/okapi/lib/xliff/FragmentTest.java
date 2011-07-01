@@ -13,11 +13,6 @@ import org.junit.Test;
 public class FragmentTest {
 
 	@Test
-	public void testDummy () {
-		assertEquals("text", "text");
-	}
-	
-	@Test
 	public void testSimpleFragment () {
 		assertEquals("text", new Fragment(null, false, "text").toString());
 	}

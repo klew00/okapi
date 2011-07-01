@@ -43,6 +43,8 @@ import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
+import net.sf.okapi.common.resource.MultiEvent;
+import net.sf.okapi.common.resource.PipelineParameters;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
@@ -306,10 +308,26 @@ public class RainbowKitFilter implements IFilter {
 			extension = ".po";
 		}
 		else if ( info.getExtractionType().equals(Manifest.EXTRACTIONTYPE_RTF) ) {
-			postprocessRTF(false);
-			// We send a no-operation event rather than call nextDocument() to avoid
-			// having nested calls that would keep going deeper 
-			queue.add(Event.NOOP_EVENT);
+			file = postprocessRTF(false);
+			// Send the RTF raw document as event
+			// We also change the an event to update the outputURI and other pipeline parameters
+			ArrayList<Event> list = new ArrayList<Event>();
+			list.add(new Event(EventType.START_BATCH_ITEM));
+			// Create raw document for the output
+			RawDocument rd = new RawDocument(file.toURI(), info.getTargetEncoding(), manifest.getTargetLocale(),
+				manifest.getTargetLocale());
+			// Change the pipeline parameters for the raw-document-related data
+			PipelineParameters pp = new PipelineParameters();
+			pp.setOutputURI(rd.getInputURI()); // Use same name as this output for now
+			pp.setSourceLocale(rd.getSourceLocale());
+			pp.setTargetLocale(rd.getTargetLocale());
+			pp.setOutputEncoding(rd.getEncoding()); // Use same as the output document
+			pp.setInputRawDocument(rd);
+			// Add the events to the list
+			list.add(new Event(EventType.PIPELINE_PARAMETERS, pp));
+			list.add(new Event(EventType.RAW_DOCUMENT, rd));
+			list.add(new Event(EventType.END_BATCH_ITEM));
+			queue.add(new Event(EventType.MULTI_EVENT, new MultiEvent(list)));
 			return;
 		}
 		else if ( info.getExtractionType().equals(Manifest.EXTRACTIONTYPE_XLIFFRTF) ) {

@@ -102,11 +102,12 @@ public class Merger {
 			break;
 		case END_SUBDOCUMENT:
 			if ( returnRawDocument ) {
+				flushFilterEvents();
 				event = createMultiEvent();
 			}
 			break;
 		case END_DOCUMENT:
-			processEndDocument();
+			flushFilterEvents();
 			close();
 			if ( returnRawDocument && !useSubDoc ) {
 				event = createMultiEvent();
@@ -205,11 +206,12 @@ public class Merger {
 		return event;
 	}
 
-	private void processEndDocument () {
+	private void flushFilterEvents () {
 		// Finish to go through the original file
 		while ( filter.hasNext() ) {
 			writer.handleEvent(filter.next());
 		}
+		writer.close();
 	}
 	
 	private void processTextUnit (Event event) {

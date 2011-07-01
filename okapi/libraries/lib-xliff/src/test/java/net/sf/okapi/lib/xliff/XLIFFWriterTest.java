@@ -9,11 +9,6 @@ import org.junit.Test;
 public class XLIFFWriterTest {
 
 	@Test
-	public void testDummy () {
-		assertEquals("text", "text");
-	}
-	
-	@Test
 	public void testTwoSegments () {
 		XLIFFWriter writer = new XLIFFWriter();
 		StringWriter strWriter = new StringWriter();
@@ -51,4 +46,32 @@ public class XLIFFWriterTest {
 			strWriter.toString());
 	}
 
+	@Test
+	public void testSegmentOrder () {
+		Unit unit = new Unit("id");
+		Segment seg = unit.appendNewSegment();
+		seg.setSource("Source A.");
+		seg.settarget("Target A.");
+		seg.setTargetOrder(2);
+		unit.appendNewIgnorable().setSource(" ");
+		seg = unit.appendNewSegment();
+		seg.setSource("Source B.");
+		seg.settarget("Target B");
+		seg.setTargetOrder(0);
+		
+		XLIFFWriter writer = new XLIFFWriter();
+		StringWriter strWriter = new StringWriter();
+		writer.create(strWriter);
+		writer.setLineBreak("\n");
+		writer.writeUnit(unit);
+		writer.close();
+		
+		assertEquals("<file>\n<unit id=\"id\">\n<segment>\n<source>Source A.</source>\n"
+			+ "<target order=\"2\">Target A.</target>\n"
+			+ "</segment>\n<ignorable>\n<source> </source>\n</ignorable>\n"
+			+ "<segment>\n<source>Source B.</source>\n"
+			+ "<target>Target B</target>\n</segment>\n</unit>\n",
+			strWriter.toString());
+	}
+	
 }
