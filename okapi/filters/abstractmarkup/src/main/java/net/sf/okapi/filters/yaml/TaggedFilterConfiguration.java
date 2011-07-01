@@ -714,7 +714,7 @@ public class TaggedFilterConfiguration {
 		return true;
 	}
 
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings("unchecked")
 	public boolean isPreserveWhitespaceCondition(String attribute, Map<String, String> attributes) {
 		Map attributeRule = configReader.getAttributeRule(attribute);
 		if (doesAttributeRuleConditionApply(attributeRule, attributes)) {
@@ -726,7 +726,7 @@ public class TaggedFilterConfiguration {
 		return false;
 	}
 
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings("unchecked")
 	public boolean isDefaultWhitespaceCondition(String attribute, Map<String, String> attributes) {
 		Map attributeRule = configReader.getAttributeRule(attribute);
 		if (doesAttributeRuleConditionApply(attributeRule, attributes)) {

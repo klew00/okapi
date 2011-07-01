@@ -714,7 +714,8 @@ class QualityChecker {
 			while ( srcM.find(from) ) {
 				// Get the source text corresponding to the match
 				String srcPart = srcCText.substring(srcM.start(), srcM.end());
-				int start, end;
+				int start = 0;
+				int end = 0;
 				boolean found = false;
 				boolean expectSame = item.target.equals(PatternItem.SAME);
 				// Try to get the corresponding part in the target
@@ -727,8 +728,10 @@ class QualityChecker {
 				else { // Target part has its own pattern
 					Matcher trgM = item.getTargetPattern().matcher(trgCTextCopy);
 					found = trgM.find();
-					start = trgM.start();
-					end = trgM.end();
+					if ( found ) {
+						start = trgM.start();
+						end = trgM.end();
+					}
 				}
 				// Process result
 				if ( found ) { // Remove that match in case source has several occurrences to match

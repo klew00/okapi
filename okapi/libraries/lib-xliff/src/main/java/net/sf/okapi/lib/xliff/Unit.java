@@ -20,16 +20,21 @@
 
 package net.sf.okapi.lib.xliff;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class Unit extends EventObject implements Iterable<Part> {
+public class Unit extends EventObject implements Iterable<Part>, Serializable {
 	
+	private static final long serialVersionUID = 0100L;
+
 	private ArrayList<Part> list;
+	private CodesStore store;
 
 	public Unit (String id) {
 		setId(id);
 		list = new ArrayList<Part>();
+		store = new CodesStore();
 	}
 	
 	@Override
@@ -54,9 +59,24 @@ public class Unit extends EventObject implements Iterable<Part> {
 		};
 	};
 
-	public Unit add (Part part) {
+	public Segment appendNewSegment () {
+		Segment seg = new Segment(store);
+		list.add(seg);
+		return seg;
+	}
+	
+	public Part appendNewIgnorable () {
+		Part part = new Part(store); 
 		list.add(part);
-		return this;
+		return part;
+	}
+
+	public Part getPart (int partIndex) {
+		return list.get(partIndex);
+	}
+	
+	public CodesStore getCodesStore () {
+		return store;
 	}
 
 }

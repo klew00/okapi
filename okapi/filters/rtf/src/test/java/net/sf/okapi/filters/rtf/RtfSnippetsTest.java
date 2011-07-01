@@ -1,8 +1,5 @@
 package net.sf.okapi.filters.rtf;
 
-import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.filters.rtf.RTFFilter;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

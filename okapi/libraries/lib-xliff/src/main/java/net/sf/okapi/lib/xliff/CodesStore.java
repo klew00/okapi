@@ -20,34 +20,56 @@
 
 package net.sf.okapi.lib.xliff;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.io.Serializable;
 
-public class Segment extends Part {
+public class CodesStore implements Serializable {
 
 	private static final long serialVersionUID = 0100L;
 
-	private ArrayList<Alternate> candidates;
+	private Codes srcCodes;
+	private Codes trgCodes;
 	
-	public Segment (CodesStore store) {
-		super(store);
+	public CodesStore () {
 	}
 
-	public Segment (CodesStore store,
-		String sourceContent)
-	{
-		super(store, sourceContent);
+	public boolean hasSourceCode () {
+		return (( srcCodes != null ) && srcCodes.hasCode() );
 	}
 	
-	public void addCandidate (Alternate candidate) {
-		if ( candidates == null ) candidates = new ArrayList<Alternate>();
-		candidates.add(candidate);
+	public boolean hasTargetCode () {
+		return (( trgCodes != null ) && trgCodes.hasCode() );
 	}
 	
-	public List<Alternate> getCandidates () {
-		if ( candidates == null ) return Collections.emptyList();
-		else return candidates;
+	public Codes getSourceCodes () {
+		if ( srcCodes == null ) srcCodes = new Codes(this);
+		return srcCodes;
 	}
 	
+	public Codes getTargetCodes () {
+		if ( trgCodes == null ) trgCodes = new Codes(this);
+		return trgCodes;
+	}
+
+//	String checkId (String id) {
+//		// Create a new ID if the one provided is null or empty
+//		if (( id == null ) || id.isEmpty() ) {
+//			id = String.valueOf(++lastAutoId);
+//		}
+//		// Checks if the ID is already used
+//		boolean exists = true;
+//		while ( exists ) {
+//			exists = false;
+//			for ( int i=0; i<codes.size(); i++ ) {
+//				if ( codes.get(i).getId().equals(id) ) {
+//					// If it is, we just try the next auto value
+//					id = String.valueOf(++lastAutoId);
+//					exists = true;
+//					break;
+//				}
+//			}
+//		}
+//		// Returns the validated (and possibly modified id)
+//		return id;
+//	}
+
 }

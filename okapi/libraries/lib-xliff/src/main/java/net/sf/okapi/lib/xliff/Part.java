@@ -20,23 +20,28 @@
 
 package net.sf.okapi.lib.xliff;
 
-public class Part {
+import java.io.Serializable;
+
+public class Part implements Serializable {
+
+	private static final long serialVersionUID = 0100L;
 
 	protected String id;
+	protected CodesStore store;
 	protected Fragment source;
 	protected Fragment target;
 	protected int targetOrder;
 	
-	public Part () {
-		source = new Fragment();
+	public Part (CodesStore store) {
+		this.store = store;
+		source = new Fragment(store);
 	}
 	
-	public Part (Fragment source) {
-		this.source = source;
-	}
-	
-	public Part (String sourceContent) {
-		source = new Fragment(sourceContent);
+	public Part (CodesStore store,
+		String sourceContent)
+	{
+		this.store = store;
+		source = new Fragment(store, false, sourceContent);
 	}
 	
 	public String getId () {
@@ -51,26 +56,45 @@ public class Part {
 		return source;
 	}
 	
-	public Fragment setSource (Fragment fragment) {
+	public void setSource (Fragment fragment) {
+		if ( store != fragment.getCodesStore() ) {
+			throw new RuntimeException("The fragment passed in setSource must use the same codes store.");
+		}
 		source = fragment;
-		return source;
+	}
+	
+	public void setSource (String plainText) {
+		source = new Fragment(store, false, plainText);
 	}
 	
 	public boolean hasTarget () {
 		return (target != null);
 	}
 
-	public Fragment getTarget () {
+	public Fragment getTarget (boolean createIfNeeded) {
+		if (( target == null ) && createIfNeeded ) {
+			target = new Fragment(store, true);
+		}
 		return target;
 	}
 	
-	public Fragment setTarget (Fragment fragment) {
+	public void setTarget (Fragment fragment) {
+		if ( store != fragment.getCodesStore() ) {
+			throw new RuntimeException("The fragment passed in setTarget must use the same codes store.");
+		}
 		target = fragment;
-		return target;
+	}
+	
+	public void settarget (String plainText) {
+		target = new Fragment(store, true, plainText);
 	}
 	
 	public void setTargetOrder (int targetOrder) {
 		this.targetOrder = targetOrder;
 	}
 	
+	public CodesStore getCodesStore () {
+		return store;
+	}
+
 }

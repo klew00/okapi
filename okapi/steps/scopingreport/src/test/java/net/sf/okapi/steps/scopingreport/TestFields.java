@@ -243,10 +243,10 @@ public class TestFields {
 		assertEquals(value, getField(name));
 	}
 	
-	private void testNotEmpty(String name) {
-		assertTrue(!Util.isEmpty(gen.getField(name)));
-		assertTrue(gen.getField(name).indexOf(name) == -1); // not [?FIELD_NAME]
-	}
+//	private void testNotEmpty(String name) {
+//		assertTrue(!Util.isEmpty(gen.getField(name)));
+//		assertTrue(gen.getField(name).indexOf(name) == -1); // not [?FIELD_NAME]
+//	}
 	
 	@Test
 	public void testFields() {

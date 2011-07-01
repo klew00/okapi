@@ -20,34 +20,63 @@
 
 package net.sf.okapi.lib.xliff;
 
+import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
-public class Segment extends Part {
+public class Codes implements Serializable {
 
 	private static final long serialVersionUID = 0100L;
 
-	private ArrayList<Alternate> candidates;
+	private CodesStore store;
+	private ArrayList<Code> codes;
 	
-	public Segment (CodesStore store) {
-		super(store);
+	public Codes (CodesStore store) {
+		this.store = store;
 	}
 
-	public Segment (CodesStore store,
-		String sourceContent)
+	public boolean hasCode () {
+		return (( codes != null ) && !codes.isEmpty() );
+	}
+	
+	public int size () {
+		if ( codes == null ) return 0;
+		return codes.size();
+	}
+
+	public CodesStore getCodesStore () {
+		return store;
+	}
+
+	public Code get (int index) {
+		if ( codes == null ) return null;
+		return codes.get(index);
+	}
+	
+	public Code get (String id,
+		CodeType type)
 	{
-		super(store, sourceContent);
+		if ( codes == null ) return null;
+		String tmp;
+		switch ( type ) {
+		case CLOSING:
+			tmp = "c"+id;
+			break;
+		case OPENING:
+			tmp = "o"+id;
+			break;
+		default:
+			tmp = "p"+id;
+			break;
+		}
+		for ( Code code : codes ) {
+			if ( code.internalId.equals(tmp) ) return code;
+		}
+		return null; // Not found
 	}
-	
-	public void addCandidate (Alternate candidate) {
-		if ( candidates == null ) candidates = new ArrayList<Alternate>();
-		candidates.add(candidate);
+
+	public void add (Code code) {
+		if ( codes == null ) codes = new ArrayList<Code>();
+		codes.add(code);
 	}
-	
-	public List<Alternate> getCandidates () {
-		if ( candidates == null ) return Collections.emptyList();
-		else return candidates;
-	}
-	
+
 }

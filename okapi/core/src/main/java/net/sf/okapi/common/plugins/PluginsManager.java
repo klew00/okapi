@@ -332,7 +332,7 @@ public class PluginsManager {
 	 * Workaround for non-released jar file lock by URLClassLoader
 	 * http://loracular.blogspot.com/2009/12/dynamic-class-loader-with.html
 	 */
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings("unchecked")
 	public static void closeOpenJars(ClassLoader classLoader) {
 		if (!(classLoader instanceof URLClassLoader)) return;
 		try {
@@ -368,10 +368,9 @@ public class PluginsManager {
 	   * cleanup jar file factory cache
 	   * http://loracular.blogspot.com/2009/12/dynamic-class-loader-with.html
 	   */
-	  @SuppressWarnings({ "nls", "rawtypes" })
+	  @SuppressWarnings("unchecked")
 	  public static boolean cleanupJarFileFactory(String... jarNames)
 	  {
-		  
 		List<String> setJarFileNames2Close = ListUtil.arrayAsList(jarNames);  
 	    boolean res = false;
 	    Class<?> classJarURLConnection = null;

@@ -2,20 +2,29 @@ package net.sf.okapi.lib.xliff;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
 import org.junit.Test;
 
 public class FragmentTest {
 
 	@Test
+	public void testDummy () {
+		assertEquals("text", "text");
+	}
+	
+	@Test
 	public void testSimpleFragment () {
-		assertEquals("text",
-			new Fragment("text").toString());
+		assertEquals("text", new Fragment(null, false, "text").toString());
 	}
 
 	@Test
 	public void testAppend () {
-		Fragment frag = new Fragment();
-		frag.append("text1");
+		Fragment frag = new Fragment(null, false, "text1");
 		assertEquals("text1", frag.toString());
 		frag.append("text2");
 		assertEquals("text1text2", frag.toString());
@@ -25,33 +34,54 @@ public class FragmentTest {
 
 	@Test
 	public void testCodes1 () {
-		Fragment frag = new Fragment();
-		frag.append(CodeType.OPENING, "<elem atrr='&amp;'>");
+		Fragment frag = new Fragment(new Unit("id").getCodesStore());
+		frag.append(CodeType.OPENING, "1", "<elem atrr='&amp;'>");
 		frag.append("text");
-		frag.append(CodeType.CLOSING, "</elem>");
-		frag.append(CodeType.PLACEHOLDER, "<br/>");
-		assertEquals("<pc id=\"1\">text</pc><ph id=\"3\"/>", frag.toString());
+		frag.append(CodeType.CLOSING, "1", "</elem>");
+		frag.append(CodeType.PLACEHOLDER, "2", "<br/>");
+		assertEquals("<pc id=\"1\">text</pc><ph id=\"2\"/>", frag.toString());
 	}
 
 	@Test
 	public void testCodes2 () {
-		Fragment frag = new Fragment();
-		frag.append(CodeType.OPENING, "<elem atrr='&amp;'>");
+		Fragment frag = new Fragment(new Unit("id").getCodesStore());
+		frag.append(CodeType.OPENING, "1", "<elem atrr='&amp;'>");
 		frag.append("text");
-		frag.append(CodeType.CLOSING, "</elem>");
-		frag.append(CodeType.PLACEHOLDER, "<br/>");
-		assertEquals("<sc id=\"1\">&lt;elem atrr='&amp;amp;'></sc>text<ec id=\"2\">&lt;/elem></ec><ph id=\"3\">&lt;br/></ic>",
+		frag.append(CodeType.CLOSING, "1", "</elem>");
+		frag.append(CodeType.PLACEHOLDER, "2", "<br/>");
+		assertEquals("<sc id=\"1\">&lt;elem atrr='&amp;amp;'></sc>text<ec id=\"1\">&lt;/elem></ec><ph id=\"2\">&lt;br/></ph>",
 			frag.getString(1));
 	}
 
+//	@Test
+//	public void testCodesWithDuplicatedID () {
+//		Fragment frag = new Fragment(new Unit("id").getCodesStore());
+//		frag.append(CodeType.OPENING, "i1", "[1]");
+//		frag.append("text");
+//		frag.append(CodeType.CLOSING, "i1", "[/1]"); // Same ID should be corrected to "1" (next available)
+//		//todo: rid missing
+//		assertEquals("<sc id=\"i1\">[1]</sc>text<ec id=\"i1\">[/1]</ec>",
+//			frag.getString(Fragment.STYLE_DATAINSIDE));
+//	}
+
 	@Test
-	public void testCodesWithDuplicatedID () {
-		Fragment frag = new Fragment();
-		frag.append(CodeType.OPENING, "i1", "[1]");
-		frag.append("text");
-		frag.append(CodeType.CLOSING, "i1", "[/1]"); // Same ID should be corrected to "1" (next available)
-		//todo: rid missing
-		assertEquals("<sc id=\"i1\">[1]</sc>text<ec id=\"1\">[/1]</ec>", frag.getString(Fragment.STYLE_DATAINSIDE));
+	public void testSerialization ()
+		throws IOException, ClassNotFoundException
+	{
+		Fragment frag = new Fragment(new Unit("id").getCodesStore());
+		frag.append(CodeType.OPENING, "1", "[1]");
+		frag.append("text with \u0305");
+		frag.append(CodeType.CLOSING, "1", "[/1]");
+		frag.append(CodeType.PLACEHOLDER, "2", "[2/]");
+		
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		ObjectOutputStream oos = new ObjectOutputStream(bos);
+		oos.writeObject(frag);
+		oos.close();
+		ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(bos.toByteArray()));
+		Fragment frag2 = (Fragment)ois.readObject();
+		assertEquals(frag.getString(Fragment.STYLE_DATAINSIDE),
+			frag2.getString(Fragment.STYLE_DATAINSIDE));
 	}
 
 }

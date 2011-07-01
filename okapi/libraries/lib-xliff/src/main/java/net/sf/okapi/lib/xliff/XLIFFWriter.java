@@ -137,7 +137,7 @@ public class XLIFFWriter {
 			writeFragment("source", part.getSource(), -1);
 			// Target
 			if ( part.hasTarget() ) {
-				writeFragment("target", part.getTarget(),
+				writeFragment("target", part.getTarget(true),
 					(part.targetOrder!=sequence ? part.targetOrder : 0));
 			}
 			

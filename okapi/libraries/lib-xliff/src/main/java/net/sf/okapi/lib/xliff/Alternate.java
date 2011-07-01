@@ -20,36 +20,42 @@
 
 package net.sf.okapi.lib.xliff;
 
-public class Alternate {
+import java.io.Serializable;
+
+public class Alternate implements Serializable {
+
+	private static final long serialVersionUID = 0100L;
 
 	private Fragment source;
 	private Fragment target;
+	private CodesStore store;
+	
 	
 	public Alternate () {
-		source = new Fragment();
-		target = new Fragment();
-	}
-	
-	public Alternate (Fragment source,
-		Fragment target)
-	{
-		this.source = source;
-		this.target = target;
+		store = new CodesStore();
+		source = new Fragment(store, false);
+		target = new Fragment(store, true);
 	}
 	
 	public Alternate (String sourceContent,
 		String targetContent)
 	{
-		source = new Fragment(sourceContent);
-		target = new Fragment(targetContent);
+		store = new CodesStore();
+		source = new Fragment(store, false, sourceContent);
+		target = new Fragment(store, true, targetContent);
 	}
 	
-	public Fragment getSource () {
+	public Fragment createSource () {
+		source = new Fragment(store, false);
 		return source;
 	}
 	
-	public Fragment setSource (Fragment fragment) {
-		source = fragment;
+	public Fragment createTarget () {
+		target = new Fragment(store, true);
+		return target;
+	}
+
+	public Fragment getSource () {
 		return source;
 	}
 	
@@ -61,9 +67,22 @@ public class Alternate {
 		return target;
 	}
 	
-	public Fragment setTarget (Fragment fragment) {
-		target = fragment;
-		return target;
+	public CodesStore getCodesStore () {
+		return store;
 	}
 	
+	public void setSource (Fragment fragment) {
+		if ( store != fragment.getCodesStore() ) {
+			throw new RuntimeException("The fragment passed in setSource must use the same codes store.");
+		}
+		source = fragment;
+	}
+
+	public void setTarget (Fragment fragment) {
+		if ( store != fragment.getCodesStore() ) {
+			throw new RuntimeException("The fragment passed in setTarget must use the same codes store.");
+		}
+		target = fragment;
+	}
+
 }

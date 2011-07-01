@@ -20,23 +20,31 @@
 
 package net.sf.okapi.lib.xliff;
 
-public class Code {
+import java.io.Serializable;
+
+public class Code implements Serializable {
+
+	private static final long serialVersionUID = 0100L;
 
 	public static final int CANDELETE = 0x01;
 	public static final int CANREPLICATE = 0x02;
 	public static final int CANREORDER = 0x04;
 	public static final int CANCHANGEPARENT = 0x08;
 	
+	String internalId;
 	private CodeType type;
 	private String id;
 	private String nativeData;
-	private String rid;
 	private int hints;
 
 	public Code (CodeType type,
+		String id,
 		String nativeData)
 	{
+		if ( type == null ) throw new RuntimeException("Code type cannot be null.");
+		if ( id == null ) throw new RuntimeException("Code id cannot be null.");
 		this.type = type;
+		this.id = id;
 		this.nativeData = nativeData;
 	}
 
@@ -54,14 +62,6 @@ public class Code {
 	
 	public String getId () {
 		return id;
-	}
-	
-	public String getRid () {
-		return rid;
-	}
-	
-	public void setRid (String rid) {
-		this.id = rid;
 	}
 	
 	public CodeType getType () {

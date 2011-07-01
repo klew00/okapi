@@ -9,6 +9,11 @@ import org.junit.Test;
 public class XLIFFWriterTest {
 
 	@Test
+	public void testDummy () {
+		assertEquals("text", "text");
+	}
+	
+	@Test
 	public void testTwoSegments () {
 		XLIFFWriter writer = new XLIFFWriter();
 		StringWriter strWriter = new StringWriter();
@@ -16,8 +21,8 @@ public class XLIFFWriterTest {
 		writer.setLineBreak("\n");
 		
 		Unit unit = new Unit("id");
-		unit.add(new Segment("Source 1."))
-			.add(new Segment("Source 2."));
+		unit.appendNewSegment().setSource("Source 1.");
+		unit.appendNewSegment().setSource("Source 2.");
 		writer.writeUnit(unit);
 		
 		writer.close();
@@ -34,9 +39,9 @@ public class XLIFFWriterTest {
 		writer.setLineBreak("\n");
 		
 		Unit unit = new Unit("id");
-		Segment seg = new Segment("Source 1.");
+		Segment seg = unit.appendNewSegment();
+		seg.setSource("Source 1.");
 		seg.addCandidate(new Alternate("Source candidate 1.", "Target candidate 1."));
-		unit.add(seg);
 		writer.writeUnit(unit);
 		
 		writer.close();
