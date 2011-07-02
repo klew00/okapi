@@ -97,10 +97,20 @@ public class InputQueryDialog extends AbstractBaseDialog  {
 //	}
 	
 
+//	@Override
+//	protected void setActionButtonsPanel(Shell shell, SelectionAdapter listener) {
+//		
+//		OKCancelPanel pnlActions = new OKCancelPanel(shell, SWT.NONE, listener, true);
+//		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+//		pnlActions.setLayoutData(gdTmp);
+//		shell.setDefaultButton(pnlActions.btOK);
+//		
+//	}
+	
 	@Override
-	protected void setActionButtonsPanel(Shell shell, SelectionAdapter listener) {
+	protected void setActionButtonsPanel(Shell shell, SelectionAdapter listener, boolean showHelp) {
 		
-		OKCancelPanel pnlActions = new OKCancelPanel(shell, SWT.NONE, listener, true);
+		OKCancelPanel pnlActions = new OKCancelPanel(shell, SWT.NONE, listener, showHelp);
 		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		pnlActions.setLayoutData(gdTmp);
 		shell.setDefaultButton(pnlActions.btOK);

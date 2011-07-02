@@ -65,7 +65,8 @@ public abstract class AbstractBaseDialog implements INotifiable {
 //		SWT.APPLICATION_MODAL;
 	}
 	
-	protected abstract void setActionButtonsPanel(Shell shell, SelectionAdapter listener);
+	//protected abstract void setActionButtonsPanel(Shell shell, SelectionAdapter listener);
+	protected abstract void setActionButtonsPanel(Shell shell, SelectionAdapter listener, boolean showHelp);
 	protected abstract void init();
 	protected abstract void done();
 	
@@ -180,7 +181,7 @@ public abstract class AbstractBaseDialog implements INotifiable {
 			};
 		};
 		
-		setActionButtonsPanel(shell, OKCancelActions);
+		setActionButtonsPanel(shell, OKCancelActions, help != null);
 		
 		shell.pack();
 		Rectangle Rect = shell.getBounds();

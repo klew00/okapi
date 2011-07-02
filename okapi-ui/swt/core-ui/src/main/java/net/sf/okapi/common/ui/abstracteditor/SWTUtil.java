@@ -200,12 +200,13 @@ public class SWTUtil {
 	
 	
 // Input query
-	public static Object inputQuery(Shell parent, String caption, String prompt, int initialValue, IHelp help) {
+	public static int inputQuery(Shell parent, String caption, String prompt, int initialValue, int minValue, int MaxValue,
+			IHelp help) {
 
 		InputQueryDialog dlg = new InputQueryDialog();
-		boolean res = dlg.run(parent, InputQueryPageInt.class, caption, prompt, initialValue, help);
-		
-		return (res)? dlg.getResult() : null;
+		Integer[] intArray = new Integer[] {initialValue, minValue, MaxValue};
+		boolean res = dlg.run(parent, InputQueryPageInt.class, caption, prompt, intArray, help);
+		return (res)? intArray[0] : initialValue;
 	}
 	
 	public static Object inputQuery(Shell parent, String caption, String prompt, String initialValue, IHelp help) {

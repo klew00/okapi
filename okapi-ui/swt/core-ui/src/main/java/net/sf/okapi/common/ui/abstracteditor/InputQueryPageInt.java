@@ -77,16 +77,20 @@ public class InputQueryPageInt extends Composite implements IInputQueryPage {
 
 	public boolean load(Object data) {
 		
-		if (!(data instanceof Integer)) return false;
+		if (!(data instanceof Integer[])) return false;
 		
-		spinner.setSelection((Integer) data);
+		Integer[] intArr = (Integer[]) data;		
+		spinner.setMinimum(intArr[1]);
+		spinner.setMaximum(intArr[2]);
+		spinner.setSelection(intArr[0]);
 		return true;
 	}
 
 	public boolean save(Object data) {
 
-		if (!(data instanceof Integer)) return false;
-		data = spinner.getSelection();
+		if (!(data instanceof Integer[])) return false;
+		Integer[] intArr = (Integer[]) data; 
+		intArr[0] = spinner.getSelection();
 		
 		return true;
 	}
