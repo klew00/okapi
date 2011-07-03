@@ -13,32 +13,56 @@ public class Manual {
 	public static void main (String[] args) {
 		
 		MicrosoftMTConnector conn = new MicrosoftMTConnector();
-		((Parameters)conn.getParameters()).setAppId("7286B45B8C4816BDF75DC007C1952DDC11C646C1");
+		((Parameters)conn.getParameters()).setAppId("myAppId");
 		conn.open();
 		conn.setLanguages(LocaleId.ENGLISH, LocaleId.FRENCH);
 		conn.setMaximumHits(5);
 		conn.setThreshold(30);
+
+		// Add list
+		ArrayList<TextFragment> sources = new ArrayList<TextFragment>();
+		ArrayList<TextFragment> targets = new ArrayList<TextFragment>();
+		ArrayList<Integer> ratings = new ArrayList<Integer>();
 		
-		ArrayList<TextFragment> frags = new ArrayList<TextFragment>();
-		frags.add(new TextFragment("This is a test"));
-		TextFragment tf = new TextFragment("This car is black & ");
-		tf.append(TagType.OPENING, "bold", "[b]");
-		tf.append("blue");
-		tf.append(TagType.CLOSING, "bold", "[/b]");
-		frags.add(tf);
-		frags.add(new TextFragment("We can do several queries at once."));
-		List<List<QueryResult>> list = conn.queryList(frags);
-		int i = 1;
-		for ( List<QueryResult> resList : list ) {
-			int j = 1;
-			for ( QueryResult res : resList ) {
-				System.out.println(String.format("%d-%d (%d):", i, j, res.score));
-				System.out.println("src="+res.source.toText());
-				System.out.println("trg="+res.target.toText());
-				j++;
-			}
-			i++;
-		}
+		TextFragment tf = new TextFragment("This is a ");
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append("test");
+		tf.append(TagType.CLOSING, "b", "</b>");
+		sources.add(tf);
+		tf = new TextFragment("Ceci est un ");
+		tf.append(TagType.OPENING, "b", "<b>");
+		tf.append("test");
+		tf.append(TagType.CLOSING, "b", "</b>");
+		targets.add(tf);
+		ratings.add(1);
+		
+//		sources.add(new TextFragment("This is a test"));
+//		targets.add(new TextFragment("C'est un test"));
+//		ratings.add(1);
+		int res = conn.addTranslationList(sources, targets, ratings);
+		
+		
+//		// Query list
+//		ArrayList<TextFragment> frags = new ArrayList<TextFragment>();
+//		frags.add(new TextFragment("This is a test"));
+//		TextFragment tf = new TextFragment("This car is black & ");
+//		tf.append(TagType.OPENING, "bold", "[b]");
+//		tf.append("blue");
+//		tf.append(TagType.CLOSING, "bold", "[/b]");
+//		frags.add(tf);
+//		frags.add(new TextFragment("We can do several queries at once."));
+//		List<List<QueryResult>> list = conn.queryList(frags);
+//		int i = 1;
+//		for ( List<QueryResult> resList : list ) {
+//			int j = 1;
+//			for ( QueryResult res : resList ) {
+//				System.out.println(String.format("%d-%d (%d):", i, j, res.score));
+//				System.out.println("src="+res.source.toText());
+//				System.out.println("trg="+res.target.toText());
+//				j++;
+//			}
+//			i++;
+//		}
 		
 //		conn.query("The big red and blue car. This is a simple test");
 //		if ( conn.hasNext() ) {
