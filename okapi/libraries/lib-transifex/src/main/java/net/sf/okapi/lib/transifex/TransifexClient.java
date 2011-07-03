@@ -100,8 +100,8 @@ public class TransifexClient {
 	 * If the project exists already it is updated.
 	 * @param projectId the project Id.
 	 * @param name the name of the project.
-	 * @param shortDescription a short description.
-	 * @param longDescription a longer description.
+	 * @param shortDescription a short description (can be null).
+	 * @param longDescription a longer description (can be null).
 	 * @return an array of strings: On success 0=the project id.
 	 * On error 0=null, 1=Error code and message.
 	 */

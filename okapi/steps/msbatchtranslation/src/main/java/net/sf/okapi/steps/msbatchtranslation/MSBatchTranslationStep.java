@@ -83,7 +83,7 @@ public class MSBatchTranslationStep extends BasePipelineStep {
 	
 	@Override
 	public String getDescription () {
-		return "Annotates text units with Microosft Translator matches or/and creates a TM from them."
+		return "Annotates text units with Microsoft Translator matches or/and creates a TM from them."
 			+ " Expects: filter events. Sends back: filter events.";
 	}
 

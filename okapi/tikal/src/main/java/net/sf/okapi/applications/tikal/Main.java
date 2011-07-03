@@ -118,7 +118,7 @@ public class Main {
 	protected int command = -1;
 	protected String query;
 	protected String addTransTrans;
-	protected int addTransRating = 6;
+	protected int addTransRating = 4;
 	protected boolean useGoogle;
 	protected boolean useOpenTran;
 	protected boolean useTransToolkit;
@@ -360,8 +360,8 @@ public class Main {
 							catch ( NumberFormatException e ) {
 								throw new RuntimeException(String.format("Invalid rating option: '%s'.", args.get(i)));
 							}
-							if (( prog.addTransRating < 1 ) || ( prog.addTransRating > 10 )) {
-								throw new RuntimeException("Rating must be between 1 and 10.");
+							if (( prog.addTransRating < -10 ) || ( prog.addTransRating > 10 )) {
+								throw new RuntimeException("Rating must be between -10 and 10.");
 							}
 						}
 					}

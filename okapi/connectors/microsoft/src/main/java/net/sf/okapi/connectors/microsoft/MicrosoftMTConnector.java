@@ -65,7 +65,8 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 	int maximumHits = 1;
 	int threshold = 95;
 	private List<QueryResult> results;
-	String template;
+	String queryListTemplate;
+	String addListTemplate;
 
 	public MicrosoftMTConnector () {
 		util = new QueryUtil();
@@ -245,7 +246,7 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 	}
 	
 	/**
-	 * Adds or overwrites a translation.
+	 * Adds or overwrites a translation on the server.
 	 * @param source the text of the source.
 	 * @param target the new text of the translation.
 	 * @param rating the rating to use for this translation.
@@ -281,6 +282,115 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 	}
 	
 	/**
+	 * Adds or overwrites a list of translations on the server.
+	 * @param sources list of the source fragments. They should be 100 at most. 
+	 * @param targets list of the corresponding translations. They must be one for each source
+	 * and they must be in the same order.
+	 * @param ratings  list of the corresponding ratings. They must be one for each source
+	 * and they must be in the same order.
+	 * @return the HTTP response code (200 is success)
+	 */
+	public int addTranslationList (List<TextFragment> sources,
+		List<TextFragment> targets,
+		List<Integer> ratings)
+	{
+		StringWriter strWriter = null;
+		try {
+			// Checking
+			if ( targets.size() != sources.size() ) {
+				throw new RuntimeException("There should be as many targets as sources.");
+			}
+			if ( ratings.size() != sources.size() ) {
+				throw new RuntimeException("There should be as many ratings as sources.");
+			}
+			if ( sources.size() > 100 ) {
+				throw new RuntimeException("No more than 100 segments allowed.");
+			}
+		
+			// Create the query template if needed
+			if ( addListTemplate == null ) {
+				strWriter = new StringWriter();
+				XMLWriter xmlWriter = new XMLWriter(strWriter);
+				xmlWriter.writeStartDocument();
+				xmlWriter.writeStartElement("AddtranslationsRequest");
+				xmlWriter.writeAttributeString("xmlns:o", "http://schemas.datacontract.org/2004/07/Microsoft.MT.Web.Service.V2");
+				xmlWriter.writeElementString("AppId", params.getAppId());
+				xmlWriter.writeElementString("From", srcCode);
+				xmlWriter.writeStartElement("Options");
+				xmlWriter.writeElementString("o:Category", "");
+				xmlWriter.writeElementString("o:ContentType", "text/html");
+				xmlWriter.writeElementString("o:ReservedFlags", "");
+				xmlWriter.writeElementString("o:State", "");
+				xmlWriter.writeElementString("o:Uri", "");
+				xmlWriter.writeElementString("o:User", "defaultUser");
+				xmlWriter.writeEndElement(); // Options
+				xmlWriter.writeElementString("To", trgCode);
+				xmlWriter.writeStartElement("Translations");
+				xmlWriter.writeRawXML(PLACEHOLDER); // Place-holder for the text array
+				xmlWriter.writeEndElement(); // Translations
+				
+				xmlWriter.writeEndElement(); // AddtranslationsRequest
+				xmlWriter.writeEndDocument();
+				xmlWriter.close();
+				strWriter.close();
+				addListTemplate = strWriter.toString();
+			}
+			
+			// Fill the template
+			StringBuilder sb = new StringBuilder();
+			for ( int i=0; i<sources.size(); i++ ) {
+				TextFragment src = sources.get(i);
+				TextFragment trg = targets.get(i);
+				int rating = ratings.get(i);
+				if (( rating < -10 ) && ( rating > 10 )) rating = 4;
+				sb.append("<o:Translation>");
+				// Source
+				sb.append("<o:OriginalText>");
+				String tmp = util.toCodedHTML(src);
+				sb.append(Util.escapeToXML(tmp, 0, false, null));
+				sb.append("</o:OriginalText>");
+				// Rating
+				sb.append(String.format("<o:Rating>%d</o:Rating>", rating));
+				// Sequence
+				sb.append(String.format("<o:Sequence>%d</o:Sequence>", 0));
+				// Source
+				sb.append("<o:TranslatedText>");
+				tmp = util.toCodedHTML(trg);
+				sb.append(Util.escapeToXML(tmp, 0, false, null));
+				sb.append("</o:TranslatedText>");
+				sb.append("</o:Translation>");
+			}
+
+			URL url = new URL(String.format("http://api.microsofttranslator.com/v2/Http.svc/AddTranslationArray"));
+				//+ "?appId=%s", params.getAppId()));
+			HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+			conn.addRequestProperty("Content-Type", "text/xml");
+			conn.setRequestMethod("POST");
+			conn.setDoOutput(true);
+		    conn.setDoInput(true);
+			OutputStreamWriter osw = null;
+			try {
+				osw = new OutputStreamWriter(conn.getOutputStream(), "UTF-8");
+				String query = addListTemplate.replace(PLACEHOLDER, sb.toString());
+				osw.write(query);
+			}
+			finally {
+				osw.flush();
+				osw.close();
+			}
+
+			int code = conn.getResponseCode();
+			if ( code != 200 ) {
+				throw new RuntimeException("HTTP error when adding translation.\n" + conn.getResponseMessage());
+			}
+			return code;
+		}
+		catch ( Throwable e) {
+			throw new RuntimeException("Error adding translations.\n" + e.getMessage(), e);
+		}
+	}
+
+	/**
 	 * Queries the engine for a list of source text.
 	 * @param fragments list of the text fragments to translate.
 	 * @return a list of lists of query result. Each list corresponds to a source text (in the same order)
@@ -292,7 +402,7 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 		// Create the query template if needed
 		StringWriter strWriter = null;
 		try {
-			if ( template == null ) {
+			if ( queryListTemplate == null ) {
 				strWriter = new StringWriter();
 				XMLWriter xmlWriter = new XMLWriter(strWriter);
 				xmlWriter.writeStartDocument();
@@ -318,7 +428,7 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 				xmlWriter.writeEndDocument();
 				xmlWriter.close();
 				strWriter.close();
-				template = strWriter.toString();
+				queryListTemplate = strWriter.toString();
 			}
 			
 			// Fill the template
@@ -340,7 +450,7 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 			OutputStreamWriter osw = null;
 			try {
 				osw = new OutputStreamWriter(conn.getOutputStream(), "UTF-8");
-				String query = template.replace(PLACEHOLDER, sb.toString());
+				String query = queryListTemplate.replace(PLACEHOLDER, sb.toString());
 				osw.write(query);
 			}
 			finally {
@@ -416,7 +526,8 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 	@Override
 	public void setMaximumHits (int maximumHits) {
 		this.maximumHits = maximumHits;
-		template = null;
+		queryListTemplate = null;
+		addListTemplate = null;
 	}
 
 	@Override
@@ -434,7 +545,8 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 		LocaleId targetLocale)
 	{
 		super.setLanguages(sourceLocale, targetLocale);
-		template = null;
+		queryListTemplate = null;
+		addListTemplate = null;
 	}
 
 }

@@ -97,7 +97,7 @@ public class TransifexPackageWriter extends BasePackageWriter {
 			cli.setCredentials(options.getUser(), options.getPassword());
 			
 			// Create the project
-			String[] res1 = cli.createProject(options.getProjectId(), options.getProjectName(), "TODO short desc", "TODO Long desc");
+			String[] res1 = cli.createProject(options.getProjectId(), options.getProjectName(), null, null);
 			if ( res1[0] == null ) {
 				// Could not create the project
 				logger.severe(res1[1]);
