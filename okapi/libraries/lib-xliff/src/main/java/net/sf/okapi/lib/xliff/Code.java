@@ -45,6 +45,7 @@ public class Code implements Serializable {
 		if ( id == null ) throw new RuntimeException("Code id cannot be null.");
 		this.type = type;
 		this.id = id;
+		this.internalId = Code.toInternalId(id, type);
 		this.nativeData = nativeData;
 	}
 
@@ -69,12 +70,16 @@ public class Code implements Serializable {
 		this.nativeData = nativeData;
 	}
 	
-	public void setId (String id) {
-		this.id = id;
-	}
-	
+//	public void setId (String id) {
+//		this.id = id;
+//	}
+//	
 	public String getId () {
 		return id;
+	}
+	
+	public String getInternalId () {
+		return internalId;
 	}
 	
 	public CodeType getType () {

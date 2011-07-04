@@ -42,6 +42,7 @@ public class Fragment implements Serializable {
 
 	private StringBuilder ctext;
 	private Codes codes;
+	private boolean isTarget;
 	
 	public static String toXML (String text,
 		boolean attribute)
@@ -89,6 +90,7 @@ public class Fragment implements Serializable {
 		ctext = new StringBuilder();
 		if ( store != null ) {
 			this.codes = store.getSourceCodes();
+			this.isTarget = false;
 		}
 	}
 	
@@ -96,8 +98,11 @@ public class Fragment implements Serializable {
 		boolean target)
 	{
 		ctext = new StringBuilder();
-		if ( target ) this.codes = store.getTargetCodes();
-		else this.codes = store.getSourceCodes();
+		if ( store != null ) {
+			this.isTarget = target;
+			if ( target ) this.codes = store.getTargetCodes();
+			else this.codes = store.getSourceCodes();
+		}
 	}
 	
 	public Fragment (CodesStore store,
@@ -106,6 +111,7 @@ public class Fragment implements Serializable {
 	{
 		ctext = new StringBuilder(plainText);
 		if ( store != null ) {
+			this.isTarget = target;
 			if ( target ) this.codes = store.getTargetCodes();
 			else this.codes = store.getSourceCodes();
 		}
@@ -116,10 +122,9 @@ public class Fragment implements Serializable {
 		case STYLE_XSDTEMP:
 			return getStringXSDTemp();
 		case STYLE_DATAINSIDE:
-			return getStringDataInside();
+			return getStringWithNativeData(true);
 		case STYLE_DATAOUTSIDE:
-			//todo
-			// for now just do no-data
+			return getStringWithNativeData(false);
 		case STYLE_NODATA:
 		default:
 			return toString();
@@ -136,15 +141,15 @@ public class Fragment implements Serializable {
 			char ch = ctext.charAt(i);
 			if ( ctext.charAt(i) == MARKER_OPENING ) {
 				tmp.append(String.format("<inline id=\"%s\"/>",
-					codes.get(toIndex(ctext.charAt(++i))).getId()));
+					codes.get(toIndex(ctext.charAt(++i))).getInternalId()));
 			}
 			else if ( ctext.charAt(i) == MARKER_CLOSING ) {
 				tmp.append(String.format("<inline id=\"%s\"/>",
-					codes.get(toIndex(ctext.charAt(++i))).getId()));
+					codes.get(toIndex(ctext.charAt(++i))).getInternalId()));
 			}
 			else if ( ctext.charAt(i) == MARKER_PLACEHOLDER ) {
 				tmp.append(String.format("<inline id=\"%s\"/>",
-					codes.get(toIndex(ctext.charAt(++i))).getId()));
+					codes.get(toIndex(ctext.charAt(++i))).getInternalId()));
 			}
 			else {
 				switch ( ch ) {
@@ -166,33 +171,44 @@ public class Fragment implements Serializable {
 		return tmp.toString();
 	}
 	
-	public String getStringDataInside () {
+	public String getStringWithNativeData (boolean dataInside) {
 		StringBuilder tmp = new StringBuilder();
 		Code code;
 		int index;
-		//TODO: Handle overlapping/partial pairs
 		for ( int i=0; i<ctext.length(); i++ ) {
 			char ch = ctext.charAt(i);
 			if ( ctext.charAt(i) == MARKER_OPENING ) {
 				index = toIndex(ctext.charAt(++i));
 				code = codes.get(index);
-				tmp.append(String.format("<sc id=\"%s\">", code.getId()));
-				tmp.append(toXML(code.getNativeData(), false));
-				tmp.append("</sc>");
+				tmp.append(String.format("<sc id=\"%s\"", code.getId()));
+				if ( dataInside ) {
+					tmp.append(">"+toXML(code.getNativeData(), false)+"</sc>");
+				}
+				else {
+					tmp.append(String.format(" nid=\"%c%s\"/>", (isTarget ? 't' : 's'), code.getInternalId()));
+				}
 			}
 			else if ( ctext.charAt(i) == MARKER_CLOSING ) {
 				index = toIndex(ctext.charAt(++i));
 				code = codes.get(index);
-				tmp.append(String.format("<ec id=\"%s\">", code.getId()));
-				tmp.append(toXML(code.getNativeData(), false));
-				tmp.append("</ec>");
+				tmp.append(String.format("<ec id=\"%s\"", code.getId()));
+				if ( dataInside ) {
+					tmp.append(">"+toXML(code.getNativeData(), false)+"</ec>");
+				}
+				else {
+					tmp.append(String.format(" nid=\"%c%s\"/>", (isTarget ? 't' : 's'), code.getInternalId()));
+				}
 			}
 			else if ( ctext.charAt(i) == MARKER_PLACEHOLDER ) {
 				index = toIndex(ctext.charAt(++i));
 				code = codes.get(index);
-				tmp.append(String.format("<ph id=\"%s\">", code.getId()));
-				tmp.append(toXML(code.getNativeData(), false));
-				tmp.append("</ph>");
+				tmp.append(String.format("<ph id=\"%s\"", code.getId()));
+				if ( dataInside ) {
+					tmp.append(">"+toXML(code.getNativeData(), false)+"</ph>");
+				}
+				else {
+					tmp.append(String.format(" nid=\"%c%s\"/>", (isTarget ? 't' : 's'), code.getInternalId()));
+				}
 			}
 			else {
 				switch ( ch ) {

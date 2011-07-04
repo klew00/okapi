@@ -13,7 +13,7 @@ public class Manual {
 	public static void main (String[] args) {
 		
 		MicrosoftMTConnector conn = new MicrosoftMTConnector();
-		((Parameters)conn.getParameters()).setAppId("myAppId");
+		((Parameters)conn.getParameters()).setAppId("7286B45B8C4816BDF75DC007C1952DDC11C646C1");
 		conn.open();
 		conn.setLanguages(LocaleId.ENGLISH, LocaleId.FRENCH);
 		conn.setMaximumHits(5);
@@ -24,21 +24,21 @@ public class Manual {
 		ArrayList<TextFragment> targets = new ArrayList<TextFragment>();
 		ArrayList<Integer> ratings = new ArrayList<Integer>();
 		
-		TextFragment tf = new TextFragment("This is a ");
-		tf.append(TagType.OPENING, "b", "<b>");
-		tf.append("test");
-		tf.append(TagType.CLOSING, "b", "</b>");
-		sources.add(tf);
-		tf = new TextFragment("Ceci est un ");
-		tf.append(TagType.OPENING, "b", "<b>");
-		tf.append("test");
-		tf.append(TagType.CLOSING, "b", "</b>");
-		targets.add(tf);
-		ratings.add(1);
+//		TextFragment tf = new TextFragment("This is a ");
+//		tf.append(TagType.OPENING, "b", "<b>");
+//		tf.append("test");
+//		tf.append(TagType.CLOSING, "b", "</b>");
+//		sources.add(tf);
+//		tf = new TextFragment("Ceci est un");
+//		tf.append(TagType.OPENING, "b", "<b>");
+//		tf.append("test");
+//		tf.append(TagType.CLOSING, "b", "</b>");
+//		targets.add(tf);
+//		ratings.add(-1);
 		
-//		sources.add(new TextFragment("This is a test"));
-//		targets.add(new TextFragment("C'est un test"));
-//		ratings.add(1);
+		sources.add(new TextFragment("This is a test"));
+		targets.add(new TextFragment("1"));
+		ratings.add(-10);
 		int res = conn.addTranslationList(sources, targets, ratings);
 		
 		
@@ -64,11 +64,13 @@ public class Manual {
 //			i++;
 //		}
 		
-//		conn.query("The big red and blue car. This is a simple test");
-//		if ( conn.hasNext() ) {
-//			QueryResult qr = conn.next();
-//			System.out.println("\n"+qr.source.toText()+"\n"+qr.target.toText());
-//		}
+		conn.setThreshold(10);
+		conn.setMaximumHits(20);
+		conn.query("This is a test");
+		while ( conn.hasNext() ) {
+			QueryResult qr = conn.next();
+			System.out.println("\nScore = "+String.valueOf(qr.score)+"\n"+qr.source.toText()+"\n"+qr.target.toText());
+		}
 //		
 //		conn.query("The <span id='1'>big</span> red and blue car. This <span id='2'>is a simple</span> test");
 //		while ( conn.hasNext() ) {

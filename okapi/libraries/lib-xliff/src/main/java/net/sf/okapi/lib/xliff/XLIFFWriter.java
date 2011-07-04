@@ -115,10 +115,19 @@ public class XLIFFWriter {
 	}
 	
 	public void writeUnit (Unit unit) {
+		// Check if there is something to write
+		// A unit must have at least one part 
+		if ( unit.getPartCount() == 0 ) {
+			return;
+		}
 		if ( !inFile ) writeStartFile();
 		writer.print(indent+String.format("<unit id=\"%s\"", Fragment.toXML(unit.getId(), true)));
 		writer.print(">"+lb);
 		if ( isIndented ) indent += " ";
+		
+		if ( style == Fragment.STYLE_DATAOUTSIDE ) {
+			writeNativeData(unit.getCodesStore());
+		}
 		
 		int sequence = 0;
 		for ( Part part : unit ) {
@@ -149,6 +158,9 @@ public class XLIFFWriter {
 					for ( Alternate alt : seg.getCandidates() ) {
 						writer.print(indent+"<match>"+lb);
 						if ( isIndented ) indent += " ";
+						if ( style == Fragment.STYLE_DATAOUTSIDE ) {
+							writeNativeData(alt.getCodesStore());
+						}
 						writeFragment("source", alt.getSource(), -1);
 						writeFragment("target", alt.getTarget(), -1);
 						if ( isIndented ) indent = indent.substring(1);
@@ -198,9 +210,11 @@ public class XLIFFWriter {
 	}
 	
 	public void writeEndFile () {
-		if ( isIndented ) indent = indent.substring(1);
-		writer.print(indent+"</file>"+lb);
-		inFile = false;
+		if ( inFile ) {
+			if ( isIndented ) indent = indent.substring(1);
+			writer.print(indent+"</file>"+lb);
+			inFile = false;
+		}
 	}
 	
 	public void writeStartGroup () {
@@ -226,6 +240,35 @@ public class XLIFFWriter {
 		}
 		writer.print(fragment.getString(style));
 		writer.print("</"+name+">"+lb);
+	}
+	
+	private void writeNativeData (CodesStore store) {
+		if ( !store.hasNonEmptyCode() ) {
+			return; // Nothing to write out
+		}
+		// Else: we have at least one code
+		// Do the output
+		
+		writer.print(indent+"<nativeData>"+lb);
+		if ( isIndented ) indent += " ";
+		
+		Codes codes = store.getSourceCodes();
+		for ( int i=0; i<codes.size(); i++ ) {
+			Code code = codes.get(i);
+			writer.print(indent+String.format("<data id=\"s%s\">", code.getInternalId()));
+			writer.print(Fragment.toXML(code.getNativeData(), false));
+			writer.print("</data>"+lb);
+		}
+		codes = store.getTargetCodes();
+		for ( int i=0; i<codes.size(); i++ ) {
+			Code code = codes.get(i);
+			writer.print(indent+String.format("<data id=\"t%s\">", code.getInternalId()));
+			writer.print(Fragment.toXML(code.getNativeData(), false));
+			writer.print("</data>"+lb);
+		}
+		
+		if ( isIndented ) indent = indent.substring(1);
+		writer.print(indent+"</nativeData>"+lb);
 	}
 
 }

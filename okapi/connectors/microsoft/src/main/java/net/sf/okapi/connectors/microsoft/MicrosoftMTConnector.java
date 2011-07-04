@@ -177,13 +177,19 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 			n1 = res.indexOf("<MatchDegree>");
 			n2 = res.indexOf("</MatchDegree>", n1+1);
 			int score = Integer.parseInt(res.substring(n1+13, n2));
-			if ( score < threshold ) continue;
-			
 			// Get the rating
 			int rating = 5;
 			n1 = res.indexOf("<Rating", 0); // No > to handle /> cases
 			n2 = res.indexOf("</Rating>", n1);
 			if ( n2 > -1 ) rating = Integer.parseInt(res.substring(n1+8, n2));
+
+			// Compute a relative score to take into account the rating
+			if ( score > 90 ) {
+				score += (rating-10);
+				// Ideally we would want a composite value for the score
+			}
+			if ( score < threshold ) continue;
+			
 			// Get the source (when available)
 			n1 = res.indexOf("<MatchedOriginalText", 0); // No > to handle /> cases
 			n2 = res.indexOf("</MatchedOriginalText", n1);
@@ -197,12 +203,6 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 			
 			QueryResult qr = new QueryResult();
 			qr.score = score; // Score from the system
-			if ( score > 90 ) {
-				qr.score += (rating-10); // Try to adjust high scores
-				// Ideally we would want a composite value for the score
-			}
-			// Weed out the scores lower than the threshold after adjustment
-			if ( qr.score < threshold ) continue;
 			// Else: continue with that result
 			qr.weight = getWeight();
 			if ( frag.hasCode() ) {

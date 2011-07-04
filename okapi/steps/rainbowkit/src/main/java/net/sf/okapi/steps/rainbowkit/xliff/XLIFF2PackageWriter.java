@@ -96,11 +96,15 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 
 	@Override
 	protected void processStartSubDocument (Event event) {
-		writer.writeStartFile();
+		// Do not start one explicitly
+		// Let the first unit to trigger the start of the file
+		// otherwise we may get empty file elements
+		// writer.writeStartFile();
 	}
 	
 	@Override
 	protected void processEndSubDocument (Event event) {
+		// Safe to call even if writestartFile(0 was not called
 		writer.writeEndFile();
 	}
 	

@@ -59,6 +59,10 @@ public class Unit extends EventObject implements Iterable<Part>, Serializable {
 		};
 	};
 
+	public int getPartCount () {
+		return list.size();
+	}
+	
 	public Segment appendNewSegment () {
 		Segment seg = new Segment(store);
 		list.add(seg);

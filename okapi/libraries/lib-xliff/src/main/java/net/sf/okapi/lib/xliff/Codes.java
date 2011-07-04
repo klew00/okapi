@@ -38,6 +38,18 @@ public class Codes implements Serializable {
 		return (( codes != null ) && !codes.isEmpty() );
 	}
 	
+	public boolean hasNonEmptyCode () {
+		if ( codes != null ) {
+			for ( Code code : codes ) {
+				String tmp = code.getNativeData();
+				if ( tmp != null ) {
+					if ( !tmp.isEmpty() ) return true;
+				}
+			}
+		}
+		return false;
+	}
+	
 	public int size () {
 		if ( codes == null ) return 0;
 		return codes.size();

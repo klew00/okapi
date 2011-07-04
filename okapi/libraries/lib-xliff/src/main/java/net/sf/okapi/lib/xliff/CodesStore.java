@@ -32,6 +32,16 @@ public class CodesStore implements Serializable {
 	public CodesStore () {
 	}
 
+	public boolean hasNonEmptyCode () {
+		if ( srcCodes != null ) {
+			if ( srcCodes.hasNonEmptyCode() ) return true;
+		}
+		if ( trgCodes != null ) {
+			if ( trgCodes.hasNonEmptyCode() ) return true;
+		}
+		return false;
+	}
+	
 	public boolean hasSourceCode () {
 		return (( srcCodes != null ) && srcCodes.hasCode() );
 	}
@@ -49,7 +59,7 @@ public class CodesStore implements Serializable {
 		if ( trgCodes == null ) trgCodes = new Codes(this);
 		return trgCodes;
 	}
-
+	
 //	String checkId (String id) {
 //		// Create a new ID if the one provided is null or empty
 //		if (( id == null ) || id.isEmpty() ) {
