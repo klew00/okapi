@@ -2,7 +2,7 @@
 RuleCount.i=2
 
 Rule0.name=French word before apostrophe
-Rule0.description=Extracts the first word (before the apostrophe) in French "l�objectif" etc. (apostrophe + a word starting with a vowel)
+Rule0.description=Extracts the first word (before the apostrophe) in French "l'objectif" etc. (apostrophe + a word starting with a vowel)
 Rule0.inTokens=WORD
 Rule0.outTokens=WORD
 Rule0.userTokens=
@@ -14,7 +14,7 @@ Rule0.regexGroup.i=1
 Rule0.languages=fr
 
 Rule1.name=French word after apostrophe
-Rule1.description=Extracts the second word (after the apostrophe) in French "l�objectif" etc. (apostrophe + a word starting with a vowel)
+Rule1.description=Extracts the second word (after the apostrophe) in French "l'objectif" etc. (apostrophe + a word starting with a vowel)
 Rule1.inTokens=WORD
 Rule1.outTokens=WORD
 Rule1.userTokens=
