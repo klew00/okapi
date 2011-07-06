@@ -68,7 +68,7 @@ public class Codes implements Serializable {
 		CodeType type)
 	{
 		if ( codes == null ) return null;
-		String tmp = Code.toInternalId(id, type);
+		String tmp = Util.toInternalId(id, type);
 		for ( Code code : codes ) {
 			if ( code.internalId.equals(tmp) ) return code;
 		}

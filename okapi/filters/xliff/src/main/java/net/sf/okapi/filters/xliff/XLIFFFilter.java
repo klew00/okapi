@@ -219,13 +219,14 @@ public class XLIFFFilter implements IFilter {
 			canceled = false;
 
 			XMLInputFactory fact = null;
-			if (params.getUseCustomParser()) {
+			if ( params.getUseCustomParser() ) {
 				Class<?> factClass = ClassUtil.getClass(params.getFactoryClass());
 				fact = (XMLInputFactory) factClass.newInstance();
 			}
-			else
+			else {
 				fact = XMLInputFactory.newInstance();
-			
+			}
+
 			fact.setProperty(XMLInputFactory.IS_COALESCING, true);
 			//Removed for Java 1.6: fact.setProperty(XMLInputFactory2.P_REPORT_PROLOG_WHITESPACE, true);
 			
@@ -290,14 +291,15 @@ public class XLIFFFilter implements IFilter {
 			skel.addValuePlaceholder(startDoc, Property.ENCODING, LocaleId.EMPTY);
 			skel.append("\"?>");
 			startDoc.setSkeleton(skel);
-		}catch ( XMLStreamException e) {
-			throw new OkapiIOException(e);
-			
-		} catch (InstantiationException e) {
-			throw new OkapiIOException(e);
-			
-		} catch (IllegalAccessException e) {
-			throw new OkapiIOException(e);
+		}
+		catch ( XMLStreamException e) {
+			throw new OkapiIOException("Cannot open XML document.\n"+e.getMessage(), e);
+		}
+		catch ( InstantiationException e ) {
+			throw new OkapiIOException("Cannot open XML document.\n"+e.getMessage(), e);
+		}
+		catch ( IllegalAccessException e ) {
+			throw new OkapiIOException("Cannot open XML document.\n"+e.getMessage(), e);
 		}
 	}
 	

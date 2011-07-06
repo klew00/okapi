@@ -45,23 +45,10 @@ public class Code implements Serializable {
 		if ( id == null ) throw new RuntimeException("Code id cannot be null.");
 		this.type = type;
 		this.id = id;
-		this.internalId = Code.toInternalId(id, type);
+		this.internalId = Util.toInternalId(id, type);
 		this.nativeData = nativeData;
 	}
 
-	static String toInternalId (String id,
-		CodeType type)
-	{
-		switch ( type ) {
-		case CLOSING:
-			return "c"+id;
-		case OPENING:
-			return "o"+id;
-		default:
-			return "p"+id;
-		}
-	}
-	
 	public String getNativeData () {
 		return nativeData;
 	}

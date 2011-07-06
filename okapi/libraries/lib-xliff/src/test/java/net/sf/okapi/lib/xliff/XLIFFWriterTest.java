@@ -12,7 +12,7 @@ public class XLIFFWriterTest {
 	public void testTwoSegments () {
 		XLIFFWriter writer = new XLIFFWriter();
 		StringWriter strWriter = new StringWriter();
-		writer.create(strWriter);
+		writer.create(strWriter, "en");
 		writer.setLineBreak("\n");
 		
 		Unit unit = new Unit("id");
@@ -21,7 +21,7 @@ public class XLIFFWriterTest {
 		writer.writeUnit(unit);
 		
 		writer.close();
-		assertEquals("<file>\n<unit id=\"id\">\n<segment>\n<source>Source 1.</source>\n"
+		assertEquals("<file source=\"en\">\n<unit id=\"id\">\n<segment>\n<source>Source 1.</source>\n"
 			+ "</segment>\n<segment>\n<source>Source 2.</source>\n</segment>\n</unit>\n",
 			strWriter.toString());
 	}
@@ -30,7 +30,7 @@ public class XLIFFWriterTest {
 	public void testSegmentWithMatch () {
 		XLIFFWriter writer = new XLIFFWriter();
 		StringWriter strWriter = new StringWriter();
-		writer.create(strWriter);
+		writer.create(strWriter, "en");
 		writer.setLineBreak("\n");
 		
 		Unit unit = new Unit("id");
@@ -40,7 +40,7 @@ public class XLIFFWriterTest {
 		writer.writeUnit(unit);
 		
 		writer.close();
-		assertEquals("<file>\n<unit id=\"id\">\n<segment>\n<source>Source 1.</source>\n"
+		assertEquals("<file source=\"en\">\n<unit id=\"id\">\n<segment>\n<source>Source 1.</source>\n"
 			+ "<matches>\n<match>\n<source>Source candidate 1.</source>\n"
 			+ "<target>Target candidate 1.</target>\n</match>\n</matches>\n</segment>\n</unit>\n",
 			strWriter.toString());
@@ -61,12 +61,12 @@ public class XLIFFWriterTest {
 		
 		XLIFFWriter writer = new XLIFFWriter();
 		StringWriter strWriter = new StringWriter();
-		writer.create(strWriter);
+		writer.create(strWriter, "en");
 		writer.setLineBreak("\n");
 		writer.writeUnit(unit);
 		writer.close();
 		
-		assertEquals("<file>\n<unit id=\"id\">\n<segment>\n<source>Source A.</source>\n"
+		assertEquals("<file source=\"en\">\n<unit id=\"id\">\n<segment>\n<source>Source A.</source>\n"
 			+ "<target order=\"2\">Target A.</target>\n"
 			+ "</segment>\n<ignorable>\n<source> </source>\n</ignorable>\n"
 			+ "<segment>\n<source>Source B.</source>\n"

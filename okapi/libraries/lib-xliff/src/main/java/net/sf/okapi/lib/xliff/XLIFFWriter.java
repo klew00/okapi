@@ -43,8 +43,12 @@ public class XLIFFWriter {
     private String indent;
     private boolean inFile;
     private int style = Fragment.STYLE_NODATA;
+    private String sourceLang;
+    private String targetLang;
 
-    public void create (File file) {
+    public void create (File file,
+    	String sourceLang)
+    {
 		try {
 			// Create the directories if needed
 			String path = file.getCanonicalPath();
@@ -56,7 +60,8 @@ public class XLIFFWriter {
 			}
 			// Create the file
 			create(new OutputStreamWriter(
-				new BufferedOutputStream(new FileOutputStream(file)), "UTF-8"));
+				new BufferedOutputStream(new FileOutputStream(file)), "UTF-8"),
+				sourceLang);
 		}
 		catch ( FileNotFoundException e ) {
 			throw new XLIFFWriterException("Cannote create document.", e);
@@ -69,11 +74,29 @@ public class XLIFFWriter {
 		}
     }
 
-    public void create (Writer output) {
-		writer = new PrintWriter(output);
+    public void create (Writer output,
+    	String sourceLang)
+    {
+    	setLanguages(sourceLang, null);
+    	writer = new PrintWriter(output);
 		indent = "";
 		inFile = false;
 	}
+    
+    /**
+     * Sets the current source and target language of the XLIFF document.
+     * @param sourceLang XML language code for the source (required)
+     * @param targetLang XML language code for the target (use null when undefined)
+     */
+    public void setLanguages (String sourceLang,
+    	String targetLang)
+    {
+    	if ( Util.isNullOrEmpty(sourceLang) ) {
+    		throw new XLIFFWriterException("Source language must be defined.");
+    	}
+    	this.sourceLang = sourceLang;
+    	this.targetLang = targetLang;
+    }
     
     public void setInlineStyle (int style) {
     	switch ( style ) {
@@ -204,7 +227,11 @@ public class XLIFFWriter {
 	}
 	
 	public void writeStartFile () {
-		writer.print(indent+"<file>"+lb);
+		writer.print(indent+String.format("<file source=\"%s\"", sourceLang));
+		if ( !Util.isNullOrEmpty(targetLang) ) {
+			writer.print(String.format(" target=\"%s\"", targetLang));
+		}
+		writer.print(">"+lb);
 		if ( isIndented ) indent += " ";
 		inFile = true;
 	}

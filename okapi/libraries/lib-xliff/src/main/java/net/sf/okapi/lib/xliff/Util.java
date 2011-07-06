@@ -20,38 +20,24 @@
 
 package net.sf.okapi.lib.xliff;
 
-public class XLIFFEvent {
+public class Util {
 
-	public static enum XLIFFEventType {
-		START_DOCUMENT,
-		START_SECTION,
-		START_GROUP,
-		EXTRACTION_UNIT,
-		END_GROUP,
-		END_SECTION,
-		END_DOCUMENT
-	};
-	
-	private XLIFFEventType type;
-	private EventObject object;
-	
-	public XLIFFEvent (XLIFFEventType type, 
-		EventObject object)
+	static String toInternalId (String id,
+		CodeType type)
 	{
-		this.type = type;
-		this.object = object;
+		switch ( type ) {
+		case CLOSING:
+			return "c"+id;
+		case OPENING:
+			return "o"+id;
+		case PLACEHOLDER:
+		default:
+			return "p"+id;
+		}
 	}
 	
-	public XLIFFEventType getType () {
-		return this.type;
-	}
-
-	public boolean isUnit () {
-		return (type == XLIFFEventType.EXTRACTION_UNIT);
-	}
-	
-	public Unit getUnit () {
-		return (Unit)object;
+	static boolean isNullOrEmpty (String string) {
+		return (( string == null ) || string.isEmpty() );
 	}
 
 }
