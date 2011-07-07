@@ -25,6 +25,7 @@ import com.ibm.icu.text.RuleBasedBreakIterator;
 import com.ibm.icu.util.ULocale;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
@@ -41,6 +42,11 @@ public class SimpleWordCountStep extends BasePipelineStep {
 	private RuleBasedBreakIterator trgWordIterator = null;
 	private LocaleId srcLoc;
 	private LocaleId trgLoc;
+	private ParametersSimpleWordCountStep params;
+	
+	public SimpleWordCountStep() {
+		params = new ParametersSimpleWordCountStep();
+	}
 
 	@StepParameterMapping(parameterType = StepParameterType.SOURCE_LOCALE)
 	public void setSourceLocale(LocaleId sourceLocale) {
@@ -80,17 +86,19 @@ public class SimpleWordCountStep extends BasePipelineStep {
 			m.setMetric(GMX.TotalWordCount, srcWordCount);
 		}
 
-		for (LocaleId loc : tu.getTargetLocales()) {
-			if (!tu.getTarget(loc).isEmpty()) {
-				long trgWordCount = countWords(tu.getTarget(loc).getUnSegmentedContentCopy()
-						.getText(), false);
-				MetricsAnnotation tma = TextUnitUtil.getTargetAnnotation(tu, loc, MetricsAnnotation.class);
-				if (tma == null) {
-					tma = new MetricsAnnotation();
-					tu.getTarget(loc).setAnnotation(tma);
+		if (params.isCountTargets()) {
+			for (LocaleId loc : tu.getTargetLocales()) {
+				if (!tu.getTarget(loc).isEmpty()) {
+					long trgWordCount = countWords(tu.getTarget(loc).getUnSegmentedContentCopy()
+							.getText(), false);
+					MetricsAnnotation tma = TextUnitUtil.getTargetAnnotation(tu, loc, MetricsAnnotation.class);
+					if (tma == null) {
+						tma = new MetricsAnnotation();
+						tu.getTarget(loc).setAnnotation(tma);
+					}
+					Metrics m = tma.getMetrics();
+					m.setMetric(GMX.TotalWordCount, trgWordCount);
 				}
-				Metrics m = tma.getMetrics();
-				m.setMetric(GMX.TotalWordCount, trgWordCount);
 			}
 		}
 		return event;
@@ -105,6 +113,16 @@ public class SimpleWordCountStep extends BasePipelineStep {
 	public String getDescription() {
 		return "Annotates each text units with a total word count (for both source and all targets)"
 			+ " Expects: filter events. Sends back: filter events.";
+	}
+
+	@Override
+	public IParameters getParameters() {		
+		return params;
+	}
+
+	@Override
+	public void setParameters(IParameters params) {	
+		this.params = (ParametersSimpleWordCountStep)params;
 	}
 
 	private long countWords(String text, boolean source) {
