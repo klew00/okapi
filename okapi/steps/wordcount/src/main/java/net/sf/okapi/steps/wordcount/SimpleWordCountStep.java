@@ -75,29 +75,27 @@ public class SimpleWordCountStep extends BasePipelineStep {
 		}
 
 		if (!tu.getSource().isEmpty()) {
-			long srcWordCount = countWords(tu.getSource().getUnSegmentedContentCopy().getText(),
-					true);
+			long srcWordCount = countWords(tu.getSource().getUnSegmentedContentCopy().getText(), true);
 			MetricsAnnotation sma = TextUnitUtil.getSourceAnnotation(tu, MetricsAnnotation.class);
 			if (sma == null) {
-				sma = new MetricsAnnotation();
-				tu.getSource().setAnnotation(sma);
+				sma = new MetricsAnnotation();				
 			}
-			Metrics m = sma.getMetrics();
+			Metrics m = sma.getMetrics();			
 			m.setMetric(GMX.TotalWordCount, srcWordCount);
+			tu.getSource().setAnnotation(sma);
 		}
 
 		if (params.isCountTargets()) {
 			for (LocaleId loc : tu.getTargetLocales()) {
 				if (!tu.getTarget(loc).isEmpty()) {
-					long trgWordCount = countWords(tu.getTarget(loc).getUnSegmentedContentCopy()
-							.getText(), false);
+					long trgWordCount = countWords(tu.getTarget(loc).getUnSegmentedContentCopy().getText(), false);
 					MetricsAnnotation tma = TextUnitUtil.getTargetAnnotation(tu, loc, MetricsAnnotation.class);
 					if (tma == null) {
-						tma = new MetricsAnnotation();
-						tu.getTarget(loc).setAnnotation(tma);
-					}
+						tma = new MetricsAnnotation();						
+					}					
 					Metrics m = tma.getMetrics();
 					m.setMetric(GMX.TotalWordCount, trgWordCount);
+					tu.getTarget(loc).setAnnotation(tma);
 				}
 			}
 		}
