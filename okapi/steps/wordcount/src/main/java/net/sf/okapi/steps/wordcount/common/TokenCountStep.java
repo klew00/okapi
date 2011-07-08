@@ -46,7 +46,7 @@ public abstract class TokenCountStep extends BaseCountStep {
 			tokens = Tokenizer.tokenize(textContainer, locale, getTokenNames());
 		
 		if (tokens == null) return 0;
-		logMessage(Level.FINE, tokens.toString());
+		//logMessage(Level.FINE, tokens.toString());
 		return tokens.size();		
 	}
 			

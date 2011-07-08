@@ -31,6 +31,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
+import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.steps.wordcount.common.GMX;
@@ -42,12 +43,14 @@ public class SimpleWordCountStep extends BasePipelineStep {
 	private RuleBasedBreakIterator trgWordIterator = null;
 	private LocaleId srcLoc;
 	private LocaleId trgLoc;
-	private ParametersSimpleWordCountStep params;
+	private long srcBatchItemWordCount;
+	private long srcBatchWordCount;
+	private ParametersSimpleWordCountStep params;	
 	
 	public SimpleWordCountStep() {
 		params = new ParametersSimpleWordCountStep();
 	}
-
+	
 	@StepParameterMapping(parameterType = StepParameterType.SOURCE_LOCALE)
 	public void setSourceLocale(LocaleId sourceLocale) {
 		this.srcLoc = sourceLocale;
@@ -65,7 +68,59 @@ public class SimpleWordCountStep extends BasePipelineStep {
 		RuleBasedBreakIterator.registerInstance(trgWordIterator, trgLoc.toJavaLocale(),
 				BreakIterator.KIND_WORD);
 	}
+	
+	@Override
+	protected Event handleStartBatch(Event event) {
+		srcBatchWordCount = 0;
+		return super.handleStartBatch(event);
+	}
+	
+	@Override
+	protected Event handleStartBatchItem(Event event) {
+		srcBatchItemWordCount = 0;
+		return super.handleStartBatchItem(event);
+	}
+	
+	@Override
+	protected Event handleEndBatchItem(Event event) {
+		Ending res = event.getEnding();
+		if (res == null) {
+			res = new Ending("");
+			event.setResource(res);
+		}
+			
+		MetricsAnnotation sma = res.getAnnotation(MetricsAnnotation.class);
+		if (sma == null) {
+			sma = new MetricsAnnotation();
+			res.setAnnotation(sma);
+		}
+		Metrics m = sma.getMetrics();
+		m.setMetric(GMX.TotalWordCount, srcBatchItemWordCount);
 
+		srcBatchWordCount += srcBatchItemWordCount;
+		
+		return super.handleEndBatchItem(event);
+	}
+	
+	@Override
+	protected Event handleEndBatch(Event event) {
+		Ending res = event.getEnding();
+		if (res == null) {
+			res = new Ending("");
+			event.setResource(res);
+		}
+			
+		MetricsAnnotation sma = res.getAnnotation(MetricsAnnotation.class);
+		if (sma == null) {
+			sma = new MetricsAnnotation();
+			res.setAnnotation(sma);
+		}
+		Metrics m = sma.getMetrics();
+		m.setMetric(GMX.TotalWordCount, srcBatchWordCount);
+		
+		return super.handleEndBatch(event);
+	}
+	
 	@Override
 	protected Event handleTextUnit(Event event) {
 		ITextUnit tu = event.getTextUnit();
@@ -76,31 +131,70 @@ public class SimpleWordCountStep extends BasePipelineStep {
 
 		if (!tu.getSource().isEmpty()) {
 			long srcWordCount = countWords(tu.getSource().getUnSegmentedContentCopy().getText(), true);
-			MetricsAnnotation sma = TextUnitUtil.getSourceAnnotation(tu, MetricsAnnotation.class);
-			if (sma == null) {
-				sma = new MetricsAnnotation();				
-			}
-			Metrics m = sma.getMetrics();			
-			m.setMetric(GMX.TotalWordCount, srcWordCount);
-			tu.getSource().setAnnotation(sma);
+//			MetricsAnnotation sma = TextUnitUtil.getSourceAnnotation(tu, MetricsAnnotation.class);
+//			if (sma == null) {
+//				sma = new MetricsAnnotation();
+//				tu.getSource().setAnnotation(sma);
+//			}
+//			Metrics m = sma.getMetrics();
+//			m.setMetric(GMX.TotalWordCount, srcWordCount);
+//			
+//			tu.setAnnotation(sma);
+			srcBatchItemWordCount += srcWordCount;
 		}
 
-		if (params.isCountTargets()) {
-			for (LocaleId loc : tu.getTargetLocales()) {
-				if (!tu.getTarget(loc).isEmpty()) {
-					long trgWordCount = countWords(tu.getTarget(loc).getUnSegmentedContentCopy().getText(), false);
-					MetricsAnnotation tma = TextUnitUtil.getTargetAnnotation(tu, loc, MetricsAnnotation.class);
-					if (tma == null) {
-						tma = new MetricsAnnotation();						
-					}					
-					Metrics m = tma.getMetrics();
-					m.setMetric(GMX.TotalWordCount, trgWordCount);
-					tu.getTarget(loc).setAnnotation(tma);
-				}
-			}
-		}
+//		for (LocaleId loc : tu.getTargetLocales()) {
+//			if (!tu.getTarget(loc).isEmpty()) {
+//				long trgWordCount = countWords(tu.getTarget(loc).getUnSegmentedContentCopy()
+//						.getText(), false);
+//				MetricsAnnotation tma = TextUnitUtil.getTargetAnnotation(tu, loc, MetricsAnnotation.class);
+//				if (tma == null) {
+//					tma = new MetricsAnnotation();
+//					tu.getTarget(loc).setAnnotation(tma);
+//				}
+//				Metrics m = tma.getMetrics();
+//				m.setMetric(GMX.TotalWordCount, trgWordCount);
+//			}
+//		}
 		return event;
 	}
+	
+//	@Override
+//	protected Event handleTextUnit(Event event) {
+//		ITextUnit tu = event.getTextUnit();
+//
+//		if (tu.isEmpty() || !tu.isTranslatable()) {
+//			return event;
+//		}
+//
+//		if (!tu.getSource().isEmpty()) {
+//			long srcWordCount = countWords(tu.getSource().getUnSegmentedContentCopy().getText(), true);
+//			MetricsAnnotation sma = TextUnitUtil.getSourceAnnotation(tu, MetricsAnnotation.class);
+//			if (sma == null) {
+//				sma = new MetricsAnnotation();				
+//			}
+//			Metrics m = sma.getMetrics();			
+//			m.setMetric(GMX.TotalWordCount, srcWordCount);
+//			tu.getSource().setAnnotation(sma);
+//		}
+//
+//		if (params.isCountTargets()) {
+//			for (LocaleId loc : tu.getTargetLocales()) {
+//				if (!tu.getTarget(loc).isEmpty()) {
+//					long trgWordCount = countWords(tu.getTarget(loc).getUnSegmentedContentCopy().getText(), false);
+//					MetricsAnnotation tma = TextUnitUtil.getTargetAnnotation(tu, loc, MetricsAnnotation.class);
+//					if (tma == null) {
+//						tma = new MetricsAnnotation();						
+//					}					
+//					Metrics m = tma.getMetrics();
+//					m.setMetric(GMX.TotalWordCount, trgWordCount);
+//					tu.getTarget(loc).setAnnotation(tma);
+//				}
+//			}
+//		}
+//		return event;
+//	}
+
 
 	@Override
 	public String getName() {
