@@ -236,7 +236,7 @@ public class TokenizationTest {
 		ts.handleEvent(new Event(EventType.END_BATCH));
 	}
 	
-	@Test
+	//@Test
 	public void testTokenizer1() {
 		
 		ts.setConfiguration(this.getClass(), "test_config1.tprm");

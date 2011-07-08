@@ -119,6 +119,8 @@ public class RbbiLexer extends AbstractLexer {
 			// Recreate iterator for the language(with new rules), store for future reuse
 			iterator = new RuleBasedBreakIterator(newRules); 
 			iterators.put(language, iterator);
+			RuleBasedBreakIterator.registerInstance(iterator, language.toJavaLocale(),
+					BreakIterator.KIND_WORD);
 		}
 
 		if ( iterator == null ) return;		
