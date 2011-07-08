@@ -49,15 +49,17 @@ public class XLIFFWriterTest {
 	@Test
 	public void testSegmentOrder () {
 		Unit unit = new Unit("id");
+		// Source = "Source A. Source B."
+		// Target = "Target B. Target A."
 		Segment seg = unit.appendNewSegment();
 		seg.setSource("Source A.");
 		seg.settarget("Target A.");
-		seg.setTargetOrder(2);
+		seg.setTargetOrder(3);
 		unit.appendNewIgnorable().setSource(" ");
 		seg = unit.appendNewSegment();
 		seg.setSource("Source B.");
 		seg.settarget("Target B");
-		seg.setTargetOrder(0);
+		seg.setTargetOrder(1);
 		
 		XLIFFWriter writer = new XLIFFWriter();
 		StringWriter strWriter = new StringWriter();
@@ -67,10 +69,10 @@ public class XLIFFWriterTest {
 		writer.close();
 		
 		assertEquals("<file source=\"en\">\n<unit id=\"id\">\n<segment>\n<source>Source A.</source>\n"
-			+ "<target order=\"2\">Target A.</target>\n"
+			+ "<target order=\"3\">Target A.</target>\n"
 			+ "</segment>\n<ignorable>\n<source> </source>\n</ignorable>\n"
 			+ "<segment>\n<source>Source B.</source>\n"
-			+ "<target>Target B</target>\n</segment>\n</unit>\n",
+			+ "<target order=\"1\">Target B</target>\n</segment>\n</unit>\n",
 			strWriter.toString());
 	}
 	

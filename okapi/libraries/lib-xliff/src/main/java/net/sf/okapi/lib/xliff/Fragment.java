@@ -191,7 +191,7 @@ public class Fragment implements Serializable {
 			else if ( ctext.charAt(i) == MARKER_CLOSING ) {
 				index = toIndex(ctext.charAt(++i));
 				code = codes.get(index);
-				tmp.append(String.format("<ec id=\"%s\"", code.getId()));
+				tmp.append(String.format("<ec rid=\"%s\"", code.getId()));
 				if ( dataInside ) {
 					tmp.append(">"+toXML(code.getNativeData(), false)+"</ec>");
 				}

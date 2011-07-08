@@ -44,20 +44,20 @@ public class FragmentTest {
 		frag.append("text");
 		frag.append(CodeType.CLOSING, "1", "</elem>");
 		frag.append(CodeType.PLACEHOLDER, "2", "<br/>");
-		assertEquals("<sc id=\"1\">&lt;elem atrr='&amp;amp;'></sc>text<ec id=\"1\">&lt;/elem></ec><ph id=\"2\">&lt;br/></ph>",
+		assertEquals("<sc id=\"1\">&lt;elem atrr='&amp;amp;'></sc>text<ec rid=\"1\">&lt;/elem></ec><ph id=\"2\">&lt;br/></ph>",
 			frag.getString(1));
 	}
 
-//	@Test
-//	public void testCodesWithDuplicatedID () {
-//		Fragment frag = new Fragment(new Unit("id").getCodesStore());
-//		frag.append(CodeType.OPENING, "i1", "[1]");
-//		frag.append("text");
-//		frag.append(CodeType.CLOSING, "i1", "[/1]"); // Same ID should be corrected to "1" (next available)
-//		//todo: rid missing
-//		assertEquals("<sc id=\"i1\">[1]</sc>text<ec id=\"i1\">[/1]</ec>",
-//			frag.getString(Fragment.STYLE_DATAINSIDE));
-//	}
+	@Test
+	public void testCodes3 () {
+		Fragment frag = new Fragment(new Unit("id").getCodesStore());
+		frag.append(CodeType.OPENING, "1", "<elem atrr='&amp;'>");
+		frag.append("text");
+		frag.append(CodeType.CLOSING, "1", "</elem>");
+		frag.append(CodeType.PLACEHOLDER, "2", "<br/>");
+		assertEquals("<sc id=\"1\" nid=\"so1\"/>text<ec rid=\"1\" nid=\"sc1\"/><ph id=\"2\" nid=\"sp2\"/>",
+			frag.getString(2));
+	}
 
 	@Test
 	public void testSerialization ()

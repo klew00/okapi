@@ -29,6 +29,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextPart;
@@ -161,23 +162,31 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 		// Go through the parts: Use the source to drive the order
 		// But match on segment ids
 		TextPart part;
+		ISegments trgSegs = null;
+		if ( trgTc != null ) {
+			trgSegs = trgTc.getSegments();
+		}
+		int srcSegIndex = -1;
 		for ( int i=0; i<srcTc.count(); i++ ) {
 			part = srcTc.get(i);
 			if ( part.isSegment() ) {
 				Segment srcSeg = (Segment)part;
+				srcSegIndex++;
 				net.sf.okapi.lib.xliff.Segment xSeg = unit.appendNewSegment();
 				xSeg.setSource(toXLIFF2Fragment(srcSeg.text, unit.getCodesStore(), false));
 				xSeg.setId(srcSeg.getId());
 				
 				// Target
-				if ( trgTc != null ) {
-					Segment trgSeg = trgTc.getSegments().get(xSeg.getId());
+				if ( trgSegs != null ) {
+					Segment trgSeg = trgSegs.get(xSeg.getId());
 					if ( trgSeg != null ) {
 						xSeg.setTarget(toXLIFF2Fragment(trgSeg.text, unit.getCodesStore(), true));
 						// Check if the order is the same as the source
-						if (( i >= trgTc.count() ) || ( !trgTc.get(i).equals(trgSeg) )) {
-							// Target is cross=aligned
-							xSeg.setTargetOrder(i);
+						int trgSegIndex = trgSegs.getIndex(xSeg.getId());
+						if ( srcSegIndex != trgSegIndex ) {
+							// Target is cross-aligned
+							int trgPartIndex = trgSegs.getPartIndex(trgSegIndex);
+							xSeg.setTargetOrder(trgPartIndex+1);
 						}
 					}
 					// Alt-trans annotation?
@@ -194,7 +203,7 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 				xPart.setSource(toXLIFF2Fragment(part.text, unit.getCodesStore(), false));
 				// Target
 				if ( trgTc != null ) {
-//todo					
+//todo				trcTc.get
 				}
 			}
 		}

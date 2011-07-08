@@ -152,13 +152,11 @@ public class XLIFFWriter {
 			writeNativeData(unit.getCodesStore());
 		}
 		
-		int sequence = 0;
 		for ( Part part : unit ) {
 			Segment seg = null;
 			if ( part instanceof Segment ) {
 				seg = (Segment)part;
 			}
-			sequence++;
 			
 			if ( seg != null ) writer.print(indent+"<segment>"+lb);
 			else writer.print(indent+"<ignorable>"+lb);
@@ -166,11 +164,10 @@ public class XLIFFWriter {
 			if ( isIndented ) indent += " ";
 			
 			// Source
-			writeFragment("source", part.getSource(), -1);
+			writeFragment("source", part.getSource(), 0);
 			// Target
 			if ( part.hasTarget() ) {
-				writeFragment("target", part.getTarget(true),
-					(part.targetOrder!=sequence ? part.targetOrder : 0));
+				writeFragment("target", part.getTarget(true), part.targetOrder);
 			}
 			
 			if ( seg != null ) {
@@ -257,7 +254,7 @@ public class XLIFFWriter {
 	
 	private void writeFragment (String name,
 		Fragment fragment,
-		int order)
+		int order) // order must be 0 for source fragments
 	{
 		if ( order > 0 ) {
 			writer.print(indent+String.format("<%s order=\"%d\">", name, order));
