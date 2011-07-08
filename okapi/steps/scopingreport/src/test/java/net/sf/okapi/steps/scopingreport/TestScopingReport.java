@@ -54,6 +54,7 @@ import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 import net.sf.okapi.steps.leveraging.LeveragingStep;
 import net.sf.okapi.steps.repetitionanalysis.RepetitionAnalysisStep;
 import net.sf.okapi.steps.segmentation.SegmentationStep;
+import net.sf.okapi.steps.wordcount.SimpleWordCountStep;
 import net.sf.okapi.steps.wordcount.WordCountStep;
 import net.sf.okapi.steps.wordcount.categorized.okapi.ExactLocalContextMatchWordCountStep;
 import net.sf.okapi.steps.wordcount.common.GMX;
@@ -64,8 +65,9 @@ import org.junit.Test;
 
 public class TestScopingReport {
 
-	private static final LocaleId EN = new LocaleId("en");
-	private static final LocaleId ES = new LocaleId("es");
+	private static final LocaleId EN = new LocaleId("en-us");
+	private static final LocaleId ES = new LocaleId("es-es");
+	private static final LocaleId DE = new LocaleId("de-de");
 	
 	
 	public static void testPath(String path) {
@@ -94,10 +96,11 @@ public class TestScopingReport {
 								new URL("file", null, pathBase + "form.html"),
 								"UTF-8",
 								EN,
-								ES)
+								DE)
 						),
 				new RawDocumentToFilterEventsStep(new HtmlFilter()),
 				new EventLogger(),
+				new WordCountStep(),
 				new XPipelineStep(
 						srs,
 						new XParameter("outputPath", pathBase + "out/test_custom_template_report.html")
@@ -106,6 +109,78 @@ public class TestScopingReport {
 		testPath(pathBase + "out");
 		assertEquals("My Project", params.getProjectName());
 		assertEquals("", params.getCustomTemplateURI());
+	}
+	
+	@Test
+	public void testDefaultTemplateSWCS() throws MalformedURLException {
+		ScopingReportStep srs = new ScopingReportStep();
+		Parameters params = (Parameters) srs.getParameters();
+		assertEquals("My Project", params.getProjectName());
+		assertEquals("", params.getCustomTemplateURI());
+		
+		String pathBase = Util.getDirectoryName(this.getClass().getResource("aa324.html").getPath()) + "/";
+		new XPipeline(
+				"HTML report test",
+				new XBatch(
+						new XBatchItem(
+								new URL("file", null, pathBase + "aa324.html"),
+								"UTF-8",
+								EN,
+								ES),								
+						new XBatchItem(
+								new URL("file", null, pathBase + "form.html"),
+								"UTF-8",
+								EN,
+								ES)
+						),
+				new RawDocumentToFilterEventsStep(new HtmlFilter()),
+				new EventLogger(),
+				new SimpleWordCountStep(),
+				new XPipelineStep(
+						srs,
+						new XParameter("outputPath", pathBase + "out/test_custom_template_report.html")
+						)
+		).execute();
+		testPath(pathBase + "out");
+		assertEquals("My Project", params.getProjectName());
+		assertEquals("", params.getCustomTemplateURI());
+	}
+	
+	@Test
+	public void testCustomTemplateSWCS() throws MalformedURLException {
+		String path = this.getClass().getResource("totals_report_template.html").getPath();
+		ScopingReportStep srs = new ScopingReportStep();
+		Parameters params = (Parameters) srs.getParameters();
+		params.setCustomTemplateURI(path);
+		assertEquals("My Project", params.getProjectName());
+		assertEquals(path, params.getCustomTemplateURI());
+		
+		String pathBase = Util.getDirectoryName(this.getClass().getResource("aa324.html").getPath()) + "/";
+		new XPipeline(
+				"HTML report test",
+				new XBatch(
+						new XBatchItem(
+								new URL("file", null, pathBase + "aa324.html"),
+								"UTF-8",
+								EN,
+								ES),								
+						new XBatchItem(
+								new URL("file", null, pathBase + "form.html"),
+								"UTF-8",
+								EN,
+								DE)
+						),
+				new RawDocumentToFilterEventsStep(new HtmlFilter()),
+				new EventLogger(),
+				new SimpleWordCountStep(),
+				new XPipelineStep(
+						srs,
+						new XParameter("outputPath", pathBase + "out/totals_report.html")
+						)
+		).execute();
+		testPath(pathBase + "out");
+		assertEquals("My Project", params.getProjectName());
+		assertEquals(path, params.getCustomTemplateURI());
 	}
 	
 	@Test
