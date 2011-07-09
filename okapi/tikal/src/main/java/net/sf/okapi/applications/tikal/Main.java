@@ -1048,10 +1048,10 @@ public class Main {
 		ps.println("Extracts a file to Moses InlineText:");
 		ps.println("   -xm inputFile [-fc configId] [-ie encoding] [-seg [srxFile]]");
 		ps.println("      [-sl srcLang] [-tl trgLang] [-2] [-to srcOutputFile]");
-		ps.println("Leverage a file with Moses InlineText:");
+		ps.println("Leverages a file with Moses InlineText:");
 		ps.println("   -lm inputFile [-fc configId] [-ie encoding] [-oe encoding] [-sl srcLang]");
 		ps.println("      [-tl trgLang] [-seg [srxFile]] [-totrg|-overtrg] [-from mosesFile]");
-		ps.println("Segment a file:");
+		ps.println("Segments a file:");
 		ps.println("   -s inputFile [-fc configId] [-ie encoding]");
 		ps.println("      [-sl srcLang] [-tl trgLang] [-seg [srxFile]]");
 		ps.println("Queries translation resources:");
@@ -1075,7 +1075,7 @@ public class Main {
 		ps.println("Imports to Pensieve TM:");
 		ps.println("   -imp tmDirectory inputFile [inputFile2...] [-fc configId] [-ie encoding]");
 		ps.println("      [-sl srcLang] [-tl trgLang] [-trgsource|-trgempty] [-all] [-over]");
-		ps.println("Export Pensieve TM as TMX:");
+		ps.println("Exports Pensieve TM as TMX:");
 		ps.println("   -exp tmDirectory1 [tmDirectory2...] [-sl srcLang] [-tl trgLang]");
 		ps.println("      [-trgsource|-trgempty] [-all]");
 	}
