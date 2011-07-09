@@ -30,8 +30,10 @@ public class TestWordCount {
 		assertEquals(4, WordCounter.count("L'objectif est defini.", locFR));
 		assertEquals(4, WordCounter.count("L\u2019objectif est defini.", locFR));
 		
-		assertEquals(11, WordCounter.count("Elle a été la première Française d'une famille d'émigrés.", locFR));
-		assertEquals(11, WordCounter.count("Elle a été la première Française d\u2019une famille d\u2019émigrés.", locFR));
+		assertEquals(11, WordCounter.count("Elle a \u00E9t\u00E9 la " +
+				"premi\u00E8re Fran\u00E7aise d'une famille d'\u00E9migr\u00E9s.", locFR));
+		assertEquals(11, WordCounter.count("Elle a \u00E9t\u00E9 la " +
+				"premi\u00E8re Fran\u00E7aise d\u2019une famille d\u2019\u00E9migr\u00E9s.", locFR));
 
 		assertEquals(5, WordCounter.count("He can't eat that fast.", locEN));
 		assertEquals(5, WordCounter.count("He can\u2019t eat that fast.", locEN));
