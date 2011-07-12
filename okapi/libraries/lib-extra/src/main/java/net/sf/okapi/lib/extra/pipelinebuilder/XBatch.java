@@ -66,7 +66,7 @@ public class XBatch extends XBatchItem {
 		}
 		return this;
 	}
-	
+		
 	public XBatch addItems(String dir, String[] fileList, 
 			String defaultEncoding, URI outputURI, String outputEncoding, LocaleId sourceLocale, LocaleId targetLocale) {		
 		for (String file : fileList) {
@@ -74,5 +74,22 @@ public class XBatch extends XBatchItem {
 					sourceLocale, targetLocale).getContext());
 		}
 		return this;
+	}
+	
+	public XBatch addItem(String dir, String file, 
+			String defaultEncoding, LocaleId sourceLocale, LocaleId targetLocale) {		
+			this.items.add(new XBatchItem(Util.toURI(dir + file), defaultEncoding, sourceLocale, targetLocale).getContext());
+		return this;
+	}
+
+	public XBatch addItem(String dir, String file, 
+			String defaultEncoding, URI outputURI, String outputEncoding, LocaleId sourceLocale, LocaleId targetLocale) {		
+			this.items.add(new XBatchItem(Util.toURI(dir + file), defaultEncoding, outputURI, outputEncoding,
+					sourceLocale, targetLocale).getContext());
+		return this;
+	}
+	
+	public void clearItems() {
+		items.clear();
 	}
 }
