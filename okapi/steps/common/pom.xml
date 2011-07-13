@@ -45,5 +45,17 @@
 		<version>${project.version}</version>
 		<scope>test</scope>
       </dependency>
+       <dependency>
+		<groupId>net.sf.okapi.filters</groupId>
+		<artifactId>okapi-filter-xliff</artifactId>
+		<version>${project.version}</version>
+		<scope>test</scope>
+      </dependency>
+        <dependency>
+		<groupId>net.sf.okapi.filters</groupId>
+		<artifactId>okapi-filter-tmx</artifactId>
+		<version>${project.version}</version>
+		<scope>test</scope>
+      </dependency>
    </dependencies>
 </project>
