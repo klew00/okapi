@@ -26,6 +26,7 @@ import java.util.logging.Logger;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiBadStepInputException;
@@ -36,6 +37,7 @@ import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartSubDocument;
 
 /**
@@ -57,6 +59,7 @@ public class ExtractionVerificationStep extends BasePipelineStep {
 	private String filterConfigId;
 	private ExtractionVerificationStepParameters params;
 	ExtractionVerificationUtil verificationUtil;
+	LocaleId localeId;
 	
 	/**
 	 * Creates a new ExtractionVerificationStep object. This constructor is
@@ -104,9 +107,8 @@ public class ExtractionVerificationStep extends BasePipelineStep {
 			return event;
 		}
 		
-		if ( params.getCompareSkeleton() ) {
-			verificationUtil.setCompareSkeleton(true);
-		}
+		verificationUtil.setCompareSkeleton(params.getCompareSkeleton());
+		verificationUtil.setTargetLocaleOverriden(false);
 		
 		Event event1=null;
 		Event event2=null;
@@ -132,6 +134,8 @@ public class ExtractionVerificationStep extends BasePipelineStep {
 			//=== First extraction
 			
 			RawDocument initialDoc = event.getRawDocument();
+			verificationUtil.setTargetLocale(initialDoc.getTargetLocale());
+			
 			// Open the document
 			filter1.open(initialDoc);
 			// Create the filter and write out the document 
@@ -267,6 +271,8 @@ public class ExtractionVerificationStep extends BasePipelineStep {
 			
 			switch ( event1.getEventType() ) {
 			case START_DOCUMENT:
+				StartDocument sd = event1.getStartDocument();
+				verificationUtil.setMultilingual(sd.isMultilingual());
 				break;
 			case START_SUBDOCUMENT:
 				return verificationUtil.compareStartSubDocument((StartSubDocument)event1.getResource(), (StartSubDocument)event2.getResource());

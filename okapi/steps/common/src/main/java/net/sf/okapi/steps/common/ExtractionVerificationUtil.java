@@ -22,6 +22,7 @@ package net.sf.okapi.steps.common;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import net.sf.okapi.common.IResource;
@@ -47,9 +48,13 @@ public class ExtractionVerificationUtil {
 	private static final Logger LOGGER = Logger.getLogger(ExtractionVerificationUtil.class.getName());
 	
 	boolean compareSkeleton;
+	boolean isMultilingual;
+	LocaleId targetLocale;
+	private boolean targetLocaleOverriden = false;
 	
 	public ExtractionVerificationUtil(){
 		this.compareSkeleton = true;
+		this.isMultilingual = false;
 	}
 
 	public ExtractionVerificationUtil(boolean compareSkeleton){
@@ -63,7 +68,30 @@ public class ExtractionVerificationUtil {
 	public void setCompareSkeleton(boolean compareSkeleton) {
 		this.compareSkeleton = compareSkeleton;
 	}
+	
+	public boolean isMultilingual() {
+		return this.isMultilingual;
+	}
 
+	public void setMultilingual(boolean isMultilingual) {
+		this.isMultilingual = isMultilingual;
+	}
+	
+	public LocaleId getTargetLocale() {
+		return this.targetLocale;
+	}
+
+	public void setTargetLocale(LocaleId targetLocale) {
+		this.targetLocale = targetLocale;
+	}
+
+	public boolean isTargetLocaleOverriden(){
+		return this.targetLocaleOverriden;
+	}
+	
+	public void setTargetLocaleOverriden(boolean targetLocaleOverriden) {
+		this.targetLocaleOverriden = targetLocaleOverriden;
+	}
 	/**
 	 * Compare two StartSubDocuments 
 	 * @param ssd1 First StartSubDocument
@@ -188,16 +216,56 @@ public class ExtractionVerificationUtil {
 			return false;
 		}
 		
-		//--Source Container--
+		//--Source Container: Monolingual format only needs to check this--
 		if (!compareTextContainers(tu1.getSource(), tu2.getSource())) {
 			return false;
 		}
-		
-		for (LocaleId locId : tu1.getTargetLocales()) {
 
-			if (!compareTextContainers(tu1.getTarget(locId), tu2.getTarget(locId))) {
-				return false;
-			}		
+		if (isMultilingual()){
+			
+			//--Check if the targetlang was overriden--
+			if(!targetLocaleOverriden){
+				Set<LocaleId> targetLocales = tu2.getTargetLocales();
+				if(targetLocales.size()==1 && !targetLocales.contains(targetLocale)){
+					LocaleId overridenLocaleId = targetLocales.iterator().next();
+					LOGGER.warning("compareTextUnits warning: Specified targetLocale not found. Assuming it was overriden by the filter. [Overriden from: "+targetLocale+"\tto:"+overridenLocaleId+"]");
+					targetLocale = targetLocales.iterator().next();
+					targetLocaleOverriden = true;
+				}
+			}
+			
+			//--target is copied from source during the first run--
+			if( !tu1.hasTarget(targetLocale) && tu2.hasTarget(targetLocale)){
+
+				if (!compareTextContainers(tu1.getSource(), tu2.getTarget(targetLocale), true)) {
+					return false;
+				}	
+				
+				if (tu1.getTargetLocales().size() > tu2.getTargetLocales().size()-1){
+					LOGGER.warning("compareTextUnits warning: ITextUnit targetCount difference. Tu1 has more targets than Tu2");
+					return false;
+				}else if (tu2.getTargetLocales().size()-1 > tu1.getTargetLocales().size()){
+					LOGGER.warning("compareTextUnits warning: ITextUnit targetCount difference. Tu2 has more targets than Tu1");
+					return false;
+				}
+	
+			}else{
+				
+				if (tu1.getTargetLocales().size() > tu2.getTargetLocales().size()){
+					LOGGER.warning("compareTextUnits warning: ITextUnit targetCount difference. Tu1 has more targets than Tu2");
+					return false;
+				}else if (tu2.getTargetLocales().size() > tu1.getTargetLocales().size()){
+					LOGGER.warning("compareTextUnits warning: ITextUnit targetCount difference. Tu2 has more targets than Tu1");
+					return false;
+				}
+			}
+			
+			//--compares existing targets--
+			for (LocaleId locId : tu1.getTargetLocales()) {
+				if (!compareTextContainers(tu1.getTarget(locId), tu2.getTarget(locId))) {
+					return false;
+				}		
+			}
 		}
 
 		return true;
@@ -210,6 +278,17 @@ public class ExtractionVerificationUtil {
 	 * @return true if equal else false
 	 */
 	public boolean compareTextContainers(TextContainer tc1, TextContainer tc2) {
+		return compareTextContainers(tc1, tc2, false);
+	}
+	
+	/**
+	 * Compares two TextContainers.
+	 * @param tc1 First TextContainer
+	 * @param tc2 Second TextContainer
+	 * @param allowPropValChanges In the cases of multilingual formats some properties values may change such as target lang
+	 * @return true if equal else false
+	 */
+	public boolean compareTextContainers(TextContainer tc1, TextContainer tc2, boolean allowPropValChanges) {
 		
 		//--both are null no point checking anything else--
 		if(bothAreNull(tc1,tc2)){
@@ -229,13 +308,17 @@ public class ExtractionVerificationUtil {
 
 		//--PROPERTY CHECK--
 		if( !tc1.getPropertyNames().equals(tc2.getPropertyNames()) ){
-			LOGGER.warning("compareTextContainer warning: TextContainer properties difference.");
-			return false;
-		}
-		
-		for (String name : tc1.getPropertyNames()) {
-			if(!compareProperties(tc1.getProperty(name), tc2.getProperty(name)) ){
-				return false;
+			LOGGER.warning("compareTextContainer warning: TextContainer properties difference. [tc1:"+tc1.getPropertyNames()+"\ttc2:"+tc2.getPropertyNames()+" ]");
+			if(!allowPropValChanges){
+				return false;				
+			}
+		}else{
+			for (String name : tc1.getPropertyNames()) {
+				if(!compareProperties(tc1.getProperty(name), tc2.getProperty(name))){
+					if(!allowPropValChanges){ 
+						return false;
+					}
+				}
 			}
 		}
 		
@@ -524,14 +607,17 @@ public class ExtractionVerificationUtil {
 			if(!compareProperties(n1.getSourceProperty(name), n2.getSourceProperty(name)) ){
 				return false;
 			}
-		}		
+		}	
 		
 		//--TARGET LOCALE CHECK--
-		if( !n1.getTargetLocales().equals(n2.getTargetLocales()) ){
-			LOGGER.warning("compareINameables warning: INameable target locales difference.");
-			return false;
+		if(!n1.getTargetLocales().equals(n2.getTargetLocales()) ){
+			if(!isMultilingual()){
+				LOGGER.warning("compareINameables warning: INameable target locales difference.");
+				return false;
+			}
 		}
 		
+		//TODO: For multilingual: might need to check a possible added target in the second run and compare to source props
 		for (LocaleId locId : n1.getTargetLocales()) {
 
 			//--TARGET PROPERTY CHECK--
@@ -597,7 +683,7 @@ public class ExtractionVerificationUtil {
 		}
 
 		if (!r1.getSkeleton().toString().equals(r2.getSkeleton().toString())) {
-			LOGGER.warning("compareIResource warning: Skeleton content difference.\n" +
+			LOGGER.warning("compareIResource warning: Skeleton content difference (If skeleton difference is acceptable turn it off in the settings).\n" +
 					"skel1=\"" + r1.getSkeleton().toString() + "\"\nskel2=\""+ r2.getSkeleton().toString() + "\"");
 			return false;
 		}
@@ -667,7 +753,7 @@ public class ExtractionVerificationUtil {
 		}
 		if( !bothAreNull(p1.getValue(),p2.getValue()) ){
 			if (!p1.getValue().equals(p2.getValue())) {
-				LOGGER.warning("compareProperty warning: Property value difference.");
+				LOGGER.warning("compareProperty warning: Property value difference. [prop name:"+p1.getName()+"\tval p1:"+p1.getValue()+"\tval p2:"+p2.getValue()+"]");
 				return false;
 			}
 		}

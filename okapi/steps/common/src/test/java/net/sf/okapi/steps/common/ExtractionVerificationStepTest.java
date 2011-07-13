@@ -46,14 +46,24 @@ public class ExtractionVerificationStepTest {
 		// add ExtractionVerificationStep
 		verifier = new ExtractionVerificationStep();
 
-		ExtractionVerificationStepParameters p = new ExtractionVerificationStepParameters();
-		verifier.setParameters(p);
-		FilterConfigurationMapper fcMapper = new FilterConfigurationMapper();
-		fcMapper.addConfigurations("net.sf.okapi.filters.html.HtmlFilter");
-		verifier.setFilterConfigurationMapper(fcMapper);
-		verifier.setFilterConfigurationId("okf_html");
-
 		pipeline.addStep(verifier);
+		
+	}
+	
+	public void setUpFilter(boolean compareSkeleton, String configurationId){
+
+		ExtractionVerificationStepParameters p = new ExtractionVerificationStepParameters();
+		p.setCompareSkeleton(compareSkeleton);
+		verifier.setParameters(p);
+
+		FilterConfigurationMapper fcMapper = new FilterConfigurationMapper();
+
+		fcMapper.addConfigurations("net.sf.okapi.filters.html.HtmlFilter");
+		fcMapper.addConfigurations("net.sf.okapi.filters.xliff.XLIFFFilter");
+		fcMapper.addConfigurations("net.sf.okapi.filters.tmx.TmxFilter");
+		
+		verifier.setFilterConfigurationMapper(fcMapper);
+		verifier.setFilterConfigurationId(configurationId);		
 	}
 
 	@After
@@ -62,13 +72,52 @@ public class ExtractionVerificationStepTest {
 	}
 	
 	@Test
-	public void testExtractionVerification () throws URISyntaxException, IOException {
+	public void testExtractionVerificationTmx () throws URISyntaxException, IOException {
 
+		setUpFilter(true, "okf_tmx");
+		
+		pipeline.startBatch();
+
+		pipeline.process(new RawDocument(this.getClass().getResource("html_test.tmx").toURI(), "UTF-8", LocaleId.fromBCP47("en-US"), LocaleId.fromBCP47("fr-FR")));
+		pipeline.process(new RawDocument(this.getClass().getResource("ImportTest2A.tmx").toURI(), "UTF-8", LocaleId.fromBCP47("en-US"), LocaleId.fromBCP47("fr-CA")));
+		pipeline.process(new RawDocument(this.getClass().getResource("ImportTest2B.tmx").toURI(), "UTF-8", LocaleId.fromBCP47("en-US"), LocaleId.fromBCP47("fr-CA")));
+		pipeline.process(new RawDocument(this.getClass().getResource("ImportTest2C.tmx").toURI(), "UTF-8", LocaleId.fromBCP47("en-US"), LocaleId.fromBCP47("fr-FR")));
+		
+		pipeline.endBatch();
+	}
+
+	
+	@Test
+	public void testExtractionVerificationHtml () throws URISyntaxException, IOException {
+
+		setUpFilter(true, "okf_html");
+		
 		pipeline.startBatch();
 
 		pipeline.process(new RawDocument(this.getClass().getResource("aa324.html").toURI(), "UTF-8", LocaleId.ENGLISH));
 		pipeline.process(new RawDocument(this.getClass().getResource("form.html").toURI(), "UTF-8", LocaleId.ENGLISH));
 		pipeline.process(new RawDocument(this.getClass().getResource("W3CHTMHLTest1.html").toURI(), "UTF-8", LocaleId.ENGLISH));
+		
+		pipeline.endBatch();
+	}
+	
+	@Test
+	public void testExtractionVerificationXlf () throws URISyntaxException, IOException {
+
+		setUpFilter(false, "okf_xliff");
+		
+		pipeline.startBatch();
+
+		pipeline.process(new RawDocument(this.getClass().getResource("test1_es.xlf").toURI(), "UTF-8", LocaleId.ENGLISH, LocaleId.SPANISH));
+		pipeline.process(new RawDocument(this.getClass().getResource("test2_es.xlf").toURI(), "UTF-8", LocaleId.fromBCP47("en-US"), LocaleId.fromBCP47("es-ES")));
+
+		pipeline.process(new RawDocument(this.getClass().getResource("RB-11-Test01.xlf").toURI(), "UTF-8", LocaleId.ENGLISH, LocaleId.SPANISH));
+		pipeline.process(new RawDocument(this.getClass().getResource("SF-12-Test01.xlf").toURI(), "UTF-8", LocaleId.ENGLISH, LocaleId.FRENCH));
+		pipeline.process(new RawDocument(this.getClass().getResource("SF-12-Test02.xlf").toURI(), "UTF-8", LocaleId.ENGLISH, LocaleId.FRENCH));
+		pipeline.process(new RawDocument(this.getClass().getResource("SF-12-Test03.xlf").toURI(), "UTF-8", LocaleId.ENGLISH, LocaleId.SPANISH));		
+		pipeline.process(new RawDocument(this.getClass().getResource("BinUnitTest01.xlf").toURI(), "UTF-8", LocaleId.ENGLISH, LocaleId.SPANISH));
+		pipeline.process(new RawDocument(this.getClass().getResource("JMP-11-Test01.xlf").toURI(), "UTF-8", LocaleId.ENGLISH, LocaleId.SPANISH));
+		pipeline.process(new RawDocument(this.getClass().getResource("Manual-12-AltTrans.xlf").toURI(), "UTF-8", LocaleId.ENGLISH, LocaleId.SPANISH));
 		
 		/*
 		FYI: getResourceAsStream does not allow reopening a filter

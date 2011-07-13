@@ -42,6 +42,7 @@ public class ExtractionVerificationStepParameters extends BaseParameters impleme
 	private boolean allEvents;
 	private int limit;
 	private boolean interrupt;
+	public boolean monolingual = false;
 	
 	public ExtractionVerificationStepParameters() {
 		reset();
