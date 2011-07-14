@@ -83,16 +83,16 @@ public class SWTUtil {
 			excludes.add(container);
 		}
 									
-		container.setEnabled(enabled);
-		
 	    Control[] children = container.getChildren();
 	    for (Control aChild : children) {
-	        if (!excludes.contains(aChild)) {
-	        	
+	        if (excludes.contains(aChild)) {
+	        	aChild.setEnabled(!enabled);
+	        }
+	        else {
 	        	if (clearSelection && aChild instanceof Button && !enabled)
 	        		((Button) aChild).setSelection(false); // Clear radio and check-boxes
 	        			            
-	            if (aChild instanceof Composite) {
+	            if (aChild instanceof Composite && ((Composite) aChild).getChildren().length > 0) {
 	                setAllEnabled((Composite) aChild, enabled, clearSelection, excludedControls);
 	            }
 	            else
