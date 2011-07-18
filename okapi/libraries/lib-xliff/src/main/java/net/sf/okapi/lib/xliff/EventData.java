@@ -20,8 +20,12 @@
 
 package net.sf.okapi.lib.xliff;
 
-class EventObject {
+import java.io.Serializable;
 
+class EventData implements Serializable {
+
+	private static final long serialVersionUID = 0100L;
+	
 	private String id;
 
 	public String getId () {

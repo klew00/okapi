@@ -20,27 +20,26 @@
 
 package net.sf.okapi.lib.xliff;
 
-import java.io.Serializable;
+import org.oasisopen.xliff.v2.ICandidate;
 
-public class Alternate implements Serializable {
+public class Candidate implements ICandidate {
 
 	private static final long serialVersionUID = 0100L;
 
 	private Fragment source;
 	private Fragment target;
-	private CodesStore store;
+	private CodeStore store;
 	
-	
-	public Alternate () {
-		store = new CodesStore();
+	public Candidate () {
+		store = new CodeStore();
 		source = new Fragment(store, false);
 		target = new Fragment(store, true);
 	}
 	
-	public Alternate (String sourceContent,
+	public Candidate (String sourceContent,
 		String targetContent)
 	{
-		store = new CodesStore();
+		store = new CodeStore();
 		source = new Fragment(store, false, sourceContent);
 		target = new Fragment(store, true, targetContent);
 	}
@@ -67,19 +66,19 @@ public class Alternate implements Serializable {
 		return target;
 	}
 	
-	public CodesStore getCodesStore () {
+	public CodeStore getCodeStore () {
 		return store;
 	}
 	
 	public void setSource (Fragment fragment) {
-		if ( store != fragment.getCodesStore() ) {
+		if ( store != fragment.getCodeStore() ) {
 			throw new RuntimeException("The fragment passed in setSource must use the same codes store.");
 		}
 		source = fragment;
 	}
 
 	public void setTarget (Fragment fragment) {
-		if ( store != fragment.getCodesStore() ) {
+		if ( store != fragment.getCodeStore() ) {
 			throw new RuntimeException("The fragment passed in setTarget must use the same codes store.");
 		}
 		target = fragment;

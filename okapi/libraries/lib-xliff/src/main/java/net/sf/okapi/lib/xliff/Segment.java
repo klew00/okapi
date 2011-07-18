@@ -24,30 +24,74 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Segment extends Part {
+import org.oasisopen.xliff.v2.ICandidate;
+import org.oasisopen.xliff.v2.INote;
+import org.oasisopen.xliff.v2.IWithCandidates;
+import org.oasisopen.xliff.v2.IWithNotes;
+
+public class Segment extends Part implements IWithCandidates, IWithNotes {
 
 	private static final long serialVersionUID = 0100L;
 
-	private ArrayList<Alternate> candidates;
+	private String id;
+	private boolean translatable = true;
+	private ArrayList<ICandidate> candidates;
+	private ArrayList<INote> notes;
 	
-	public Segment (CodesStore store) {
+	public Segment (CodeStore store) {
 		super(store);
 	}
 
-	public Segment (CodesStore store,
-		String sourceContent)
-	{
-		super(store, sourceContent);
+	public String getId () {
+		return id;
 	}
 	
-	public void addCandidate (Alternate candidate) {
-		if ( candidates == null ) candidates = new ArrayList<Alternate>();
+	public void setId (String id) {
+		this.id = id;
+	}
+	
+	public boolean isTranslatable () {
+		return translatable;
+	}
+	
+	public void setTranslatable (boolean translatable) {
+		this.translatable = translatable;
+	}
+	
+	@Override
+	public void addCandidate (ICandidate candidate) {
+		if ( candidates == null ) candidates = new ArrayList<ICandidate>();
 		candidates.add(candidate);
 	}
 	
-	public List<Alternate> getCandidates () {
+	@Override
+	public List<ICandidate> getCandidates () {
 		if ( candidates == null ) return Collections.emptyList();
 		else return candidates;
 	}
 	
+	@Override
+	public int getCandidateCount () {
+		if ( candidates == null ) return 0;
+		return candidates.size();
+	}
+	
+	@Override
+	public void addNote (INote note) {
+		if ( notes == null ) notes = new ArrayList<INote>();
+		notes.add(note);
+	}
+
+	@Override
+	public List<INote> getNotes () {
+		if ( notes == null ) return Collections.emptyList();
+		else return notes;
+	}
+	
+	@Override
+	public int getNoteCount () {
+		if ( notes == null ) return 0;
+		return notes.size();
+	}
+
 }

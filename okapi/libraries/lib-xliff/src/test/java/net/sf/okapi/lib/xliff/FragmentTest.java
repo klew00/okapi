@@ -28,46 +28,66 @@ public class FragmentTest {
 	}
 
 	@Test
-	public void testCodes1 () {
-		Fragment frag = new Fragment(new Unit("id").getCodesStore());
-		frag.append(CodeType.OPENING, "1", "<elem atrr='&amp;'>");
+	public void testCodesNoData () {
+		Fragment frag = new Fragment(new Unit("id").getCodeStore());
+		frag.append(InlineType.OPENING, "1", "<elem atrr='&amp;'>");
 		frag.append("text");
-		frag.append(CodeType.CLOSING, "1", "</elem>");
-		frag.append(CodeType.PLACEHOLDER, "2", "<br/>");
+		frag.append(InlineType.CLOSING, "1", "</elem>");
+		frag.append(InlineType.PLACEHOLDER, "2", "<br/>");
 		assertEquals("<pc id=\"1\">text</pc><ph id=\"2\"/>", frag.toString());
 	}
 
 	@Test
-	public void testCodes2 () {
-		Fragment frag = new Fragment(new Unit("id").getCodesStore());
-		frag.append(CodeType.OPENING, "1", "<elem atrr='&amp;'>");
+	public void testCodesDataInside () {
+		Fragment frag = new Fragment(new Unit("id").getCodeStore());
+		frag.append(InlineType.OPENING, "1", "<elem atrr='&amp;'>");
 		frag.append("text");
-		frag.append(CodeType.CLOSING, "1", "</elem>");
-		frag.append(CodeType.PLACEHOLDER, "2", "<br/>");
+		frag.append(InlineType.CLOSING, "1", "</elem>");
+		frag.append(InlineType.PLACEHOLDER, "2", "<br/>");
 		assertEquals("<sc id=\"1\">&lt;elem atrr='&amp;amp;'></sc>text<ec rid=\"1\">&lt;/elem></ec><ph id=\"2\">&lt;br/></ph>",
-			frag.getString(1));
+			frag.getString(Fragment.STYLE_DATAINSIDE));
 	}
 
 	@Test
-	public void testCodes3 () {
-		Fragment frag = new Fragment(new Unit("id").getCodesStore());
-		frag.append(CodeType.OPENING, "1", "<elem atrr='&amp;'>");
+	public void testCodesDataOutside () {
+		Fragment frag = new Fragment(new Unit("id").getCodeStore());
+		frag.append(InlineType.OPENING, "1", "<elem atrr='&amp;'>");
 		frag.append("text");
-		frag.append(CodeType.CLOSING, "1", "</elem>");
-		frag.append(CodeType.PLACEHOLDER, "2", "<br/>");
-		assertEquals("<sc id=\"1\" nid=\"so1\"/>text<ec rid=\"1\" nid=\"sc1\"/><ph id=\"2\" nid=\"sp2\"/>",
-			frag.getString(2));
+		frag.append(InlineType.CLOSING, "1", "</elem>");
+		frag.append(InlineType.PLACEHOLDER, "2", "<br/>");
+		
+		frag.getCodeStore().calculateOriginalDataToIdsMap();
+		assertEquals("<sc id=\"1\" nid=\"d1\"/>text<ec rid=\"1\" nid=\"d2\"/><ph id=\"2\" nid=\"d3\"/>",
+			frag.getString(Fragment.STYLE_DATAOUTSIDE));
+	}
+
+	@Test
+	public void testCodesDataOutsideWithReuse () {
+		Fragment frag = new Fragment(new Unit("id").getCodeStore());
+		frag.append(InlineType.OPENING, "1", "<elem atrr='&amp;'>");
+		frag.append("t1");
+		frag.append(InlineType.CLOSING, "1", "</elem>");
+		frag.append(InlineType.PLACEHOLDER, "2", "<br/>");
+		frag.append(InlineType.OPENING, "3", "<elem atrr='&amp;'>");
+		frag.append("t2");
+		frag.append(InlineType.CLOSING, "3", "</elem>");
+		frag.append(InlineType.PLACEHOLDER, "4", "<br/>");
+		
+		frag.getCodeStore().calculateOriginalDataToIdsMap();
+		assertEquals("<sc id=\"1\" nid=\"d1\"/>t1<ec rid=\"1\" nid=\"d2\"/><ph id=\"2\" nid=\"d3\"/>"
+			+ "<sc id=\"3\" nid=\"d1\"/>t2<ec rid=\"3\" nid=\"d2\"/><ph id=\"4\" nid=\"d3\"/>",
+			frag.getString(Fragment.STYLE_DATAOUTSIDE));
 	}
 
 	@Test
 	public void testSerialization ()
 		throws IOException, ClassNotFoundException
 	{
-		Fragment frag = new Fragment(new Unit("id").getCodesStore());
-		frag.append(CodeType.OPENING, "1", "[1]");
+		Fragment frag = new Fragment(new Unit("id").getCodeStore());
+		frag.append(InlineType.OPENING, "1", "[1]");
 		frag.append("text with \u0305");
-		frag.append(CodeType.CLOSING, "1", "[/1]");
-		frag.append(CodeType.PLACEHOLDER, "2", "[2/]");
+		frag.append(InlineType.CLOSING, "1", "[/1]");
+		frag.append(InlineType.PLACEHOLDER, "2", "[2/]");
 		
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		ObjectOutputStream oos = new ObjectOutputStream(bos);

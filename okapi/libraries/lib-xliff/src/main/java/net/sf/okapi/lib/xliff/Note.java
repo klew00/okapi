@@ -20,63 +20,45 @@
 
 package net.sf.okapi.lib.xliff;
 
-import java.io.Serializable;
-import java.util.ArrayList;
+import org.oasisopen.xliff.v2.INote;
 
-public class Codes implements Serializable {
+public class Note implements INote {
 
 	private static final long serialVersionUID = 0100L;
 
-	private CodeStore store;
-	private ArrayList<Code> codes;
+	private String content;
+	private AppliesTo appliesTo;
 	
-	public Codes (CodeStore store) {
-		this.store = store;
-	}
-
-	public boolean hasCode () {
-		return (( codes != null ) && !codes.isEmpty() );
-	}
-	
-	public boolean hasCodeWithOriginalData () {
-		if ( codes != null ) {
-			for ( Code code : codes ) {
-				if ( code.hasOriginalData() ) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-	
-	public int size () {
-		if ( codes == null ) return 0;
-		return codes.size();
-	}
-
-	public CodeStore getCodeStore () {
-		return store;
-	}
-
-	public Code get (int index) {
-		if ( codes == null ) return null;
-		return codes.get(index);
-	}
-	
-	public Code get (String id,
-		InlineType type)
+	public Note (String content,
+		AppliesTo appliesTo)
 	{
-		if ( codes == null ) return null;
-		String tmp = Util.toInternalId(id, type);
-		for ( Code code : codes ) {
-			if ( code.internalId.equals(tmp) ) return code;
-		}
-		return null; // Not found
+		this.content = content;
+		this.appliesTo = appliesTo;
 	}
 
-	public void add (Code code) {
-		if ( codes == null ) codes = new ArrayList<Code>();
-		codes.add(code);
+	@Override
+	public String toString () {
+		return content;
+	}
+	
+	public String getText () {
+		return content;
+	}
+	
+	public void setText (String content) {
+		this.content = content;
+	}
+	
+	public boolean hasText () {
+		return !Util.isNullOrEmpty(content);
+	}
+
+	public AppliesTo getAppliesTo () {
+		return appliesTo;
+	}
+
+	public void setAppliesTo (AppliesTo appliesTo) {
+		this.appliesTo = appliesTo;
 	}
 
 }

@@ -30,6 +30,7 @@ import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.ISegments;
+import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextPart;
@@ -37,9 +38,10 @@ import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.filters.rainbowkit.Manifest;
 import net.sf.okapi.filters.rainbowkit.MergingInfo;
-import net.sf.okapi.lib.xliff.Alternate;
-import net.sf.okapi.lib.xliff.CodesStore;
+import net.sf.okapi.lib.xliff.Candidate;
+import net.sf.okapi.lib.xliff.CodeStore;
 import net.sf.okapi.lib.xliff.Fragment;
+import net.sf.okapi.lib.xliff.Note;
 import net.sf.okapi.lib.xliff.Part;
 import net.sf.okapi.lib.xliff.Unit;
 import net.sf.okapi.lib.xliff.XLIFFWriter;
@@ -85,7 +87,7 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 		writer.create(new File(path), manifest.getSourceLocale().toBCP47());
 		writer.setLanguages(manifest.getSourceLocale().toBCP47(), manifest.getTargetLocale().toBCP47());
 		writer.setIsIndented(true);
-		writer.writeStartDocument();
+		writer.writeStartDocument(null, "EXPERIMENTAL OUTPUT ONLY!");
 	}
 	
 	@Override
@@ -112,7 +114,7 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 	
 	@Override
 	protected void processStartGroup (Event event) {
-		writer.writeStartGroup();
+		writer.writeStartGroup(null);
 	}
 	
 	@Override
@@ -122,11 +124,8 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 	
 	@Override
 	protected void processTextUnit (Event event) {
-		
 		Unit unit = toXLIFF2Unit(event.getTextUnit());
 		writer.writeUnit(unit);
-		
-//		event = writer.handleEvent(event);
 		writeTMXEntries(event.getTextUnit());
 	}
 
@@ -159,6 +158,19 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 			}
 		}
 
+		// Add trans-unit level note if needed
+		if ( tu.hasProperty(Property.NOTE) ) {
+			unit.addNote(new Note(tu.getProperty(Property.NOTE).getValue(), Note.AppliesTo.SOURCE_AND_TARGET));
+		}
+		// Add source notes
+		if ( tu.hasSourceProperty(Property.NOTE) ) {
+			unit.addNote(new Note(tu.getSourceProperty(Property.NOTE).getValue(), Note.AppliesTo.SOURCE));
+		}
+		// Add target notes
+		if ( tu.hasTargetProperty(manifest.getTargetLocale(), Property.NOTE) ) {
+			unit.addNote(new Note(tu.getTargetProperty(manifest.getTargetLocale(), Property.NOTE).getValue(), Note.AppliesTo.TARGET));
+		}
+		
 		// Go through the parts: Use the source to drive the order
 		// But match on segment ids
 		TextPart part;
@@ -173,14 +185,17 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 				Segment srcSeg = (Segment)part;
 				srcSegIndex++;
 				net.sf.okapi.lib.xliff.Segment xSeg = unit.appendNewSegment();
-				xSeg.setSource(toXLIFF2Fragment(srcSeg.text, unit.getCodesStore(), false));
+				xSeg.setSource(toXLIFF2Fragment(srcSeg.text, unit.getCodeStore(), false));
 				xSeg.setId(srcSeg.getId());
+				
+				// Applies TU-level translatable property to each segment
+				xSeg.setTranslatable(tu.isTranslatable());
 				
 				// Target
 				if ( trgSegs != null ) {
 					Segment trgSeg = trgSegs.get(xSeg.getId());
 					if ( trgSeg != null ) {
-						xSeg.setTarget(toXLIFF2Fragment(trgSeg.text, unit.getCodesStore(), true));
+						xSeg.setTarget(toXLIFF2Fragment(trgSeg.text, unit.getCodeStore(), true));
 						// Check if the order is the same as the source
 						int trgSegIndex = trgSegs.getIndex(xSeg.getId());
 						if ( srcSegIndex != trgSegIndex ) {
@@ -200,7 +215,7 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 			}
 			else { // Non-segment part
 				Part xPart = unit.appendNewIgnorable();
-				xPart.setSource(toXLIFF2Fragment(part.text, unit.getCodesStore(), false));
+				xPart.setSource(toXLIFF2Fragment(part.text, unit.getCodeStore(), false));
 				// Target
 				if ( trgTc != null ) {
 //todo				trcTc.get
@@ -215,8 +230,8 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 		TextFragment oriSource,
 		net.sf.okapi.lib.xliff.Segment xSeg)
 	{
-		Alternate xAlt = new Alternate();
-		CodesStore cs = xAlt.getCodesStore();
+		Candidate xAlt = new Candidate();
+		CodeStore cs = xAlt.getCodeStore();
 		if ( alt.getSource().isEmpty() ) { // Same as the base source
 			xAlt.setSource(toXLIFF2Fragment(oriSource, cs, false));
 		}
@@ -229,7 +244,7 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 	}
 	
 	private Fragment toXLIFF2Fragment (TextFragment tf,
-		CodesStore store,
+		CodeStore store,
 		boolean isTarget)
 	{
 		// fast track for content without codes
@@ -250,13 +265,13 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 				code = codes.get(index);
 				switch ( code.getTagType() ) {
 				case OPENING:
-					frag.append(net.sf.okapi.lib.xliff.CodeType.OPENING, String.valueOf(code.getId()), code.getData());
+					frag.append(net.sf.okapi.lib.xliff.InlineType.OPENING, String.valueOf(code.getId()), code.getData());
 					break;
 				case CLOSING:
-					frag.append(net.sf.okapi.lib.xliff.CodeType.CLOSING, String.valueOf(code.getId()), code.getData());
+					frag.append(net.sf.okapi.lib.xliff.InlineType.CLOSING, String.valueOf(code.getId()), code.getData());
 					break;
 				case PLACEHOLDER:
-					frag.append(net.sf.okapi.lib.xliff.CodeType.PLACEHOLDER, String.valueOf(code.getId()), code.getData());
+					frag.append(net.sf.okapi.lib.xliff.InlineType.PLACEHOLDER, String.valueOf(code.getId()), code.getData());
 					break;
 				}
 			}

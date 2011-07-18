@@ -20,10 +20,42 @@
 
 package net.sf.okapi.lib.xliff;
 
-public enum CodeType {
+import java.io.Serializable;
 
-	OPENING,
-	CLOSING,
-	PLACEHOLDER
+public class SectionData extends EventData implements Serializable {
+	
+	private static final long serialVersionUID = 0100L;
+	
+	private String original;
+	private String sourceLang;
+	private String targetLang;
+
+	public SectionData (String id) {
+		setId(id);
+	}
+	
+	public String getOriginal () {
+		return original;
+	}
+	
+	public void setOriginal (String original) {
+		this.original = original;
+	}
+	
+	public String getSourceLanguage () {
+		return sourceLang;
+	}
+	
+	public void setSourceLanguage (String sourceLang) {
+		this.sourceLang = sourceLang;
+	}
+	
+	public String getTargetLanguage () {
+		return targetLang;
+	}
+
+	public void setTargetLanguage (String targetLang) {
+		this.targetLang = targetLang;
+	}
 
 }

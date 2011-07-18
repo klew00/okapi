@@ -42,19 +42,7 @@ public class Fragment implements Serializable {
 
 	private StringBuilder ctext;
 	private Codes codes;
-	private boolean isTarget;
 	
-	public static String toXML (String text,
-		boolean attribute)
-	{
-		text = text.replace("&", "&amp;");
-		text = text.replace("<", "&lt;");
-		if ( attribute ) {
-			text = text.replace("\"", "&quot;");
-		}
-		return text;
-	}
-
 	/**
 	 * Helper method to convert a marker index to its character value in the
 	 * coded text string.
@@ -86,32 +74,29 @@ public class Fragment implements Serializable {
 			|| ( ch == MARKER_PLACEHOLDER ));
 	}
 
-	public Fragment (CodesStore store) {
+	public Fragment (CodeStore store) {
 		ctext = new StringBuilder();
 		if ( store != null ) {
 			this.codes = store.getSourceCodes();
-			this.isTarget = false;
 		}
 	}
 	
-	public Fragment (CodesStore store,
+	public Fragment (CodeStore store,
 		boolean target)
 	{
 		ctext = new StringBuilder();
 		if ( store != null ) {
-			this.isTarget = target;
 			if ( target ) this.codes = store.getTargetCodes();
 			else this.codes = store.getSourceCodes();
 		}
 	}
 	
-	public Fragment (CodesStore store,
+	public Fragment (CodeStore store,
 		boolean target,
 		String plainText)
 	{
 		ctext = new StringBuilder(plainText);
 		if ( store != null ) {
-			this.isTarget = target;
 			if ( target ) this.codes = store.getTargetCodes();
 			else this.codes = store.getSourceCodes();
 		}
@@ -122,17 +107,17 @@ public class Fragment implements Serializable {
 		case STYLE_XSDTEMP:
 			return getStringXSDTemp();
 		case STYLE_DATAINSIDE:
-			return getStringWithNativeData(true);
+			return getStringWithOriginalData(true);
 		case STYLE_DATAOUTSIDE:
-			return getStringWithNativeData(false);
+			return getStringWithOriginalData(false);
 		case STYLE_NODATA:
 		default:
 			return toString();
 		}
 	}
 	
-	public CodesStore getCodesStore () {
-		return codes.getCodesStore();
+	public CodeStore getCodeStore () {
+		return codes.getCodeStore();
 	}
 	
 	private String getStringXSDTemp () {
@@ -171,7 +156,7 @@ public class Fragment implements Serializable {
 		return tmp.toString();
 	}
 	
-	public String getStringWithNativeData (boolean dataInside) {
+	public String getStringWithOriginalData (boolean dataInside) {
 		StringBuilder tmp = new StringBuilder();
 		Code code;
 		int index;
@@ -182,10 +167,19 @@ public class Fragment implements Serializable {
 				code = codes.get(index);
 				tmp.append(String.format("<sc id=\"%s\"", code.getId()));
 				if ( dataInside ) {
-					tmp.append(">"+toXML(code.getNativeData(), false)+"</sc>");
+					if ( Util.isNullOrEmpty(code.getOriginalData()) ) {
+						tmp.append("/>");
+					}
+					else {
+						tmp.append(">"+Util.toXML(code.getOriginalData(), false)+"</sc>");
+					}
 				}
 				else {
-					tmp.append(String.format(" nid=\"%c%s\"/>", (isTarget ? 't' : 's'), code.getInternalId()));
+					if ( code.hasOriginalData() ) {
+						tmp.append(String.format(" nid=\"%s\"",
+							codes.getCodeStore().getIdForOriginalData(code.getOriginalData())));
+					}
+					tmp.append("/>");
 				}
 			}
 			else if ( ctext.charAt(i) == MARKER_CLOSING ) {
@@ -193,10 +187,19 @@ public class Fragment implements Serializable {
 				code = codes.get(index);
 				tmp.append(String.format("<ec rid=\"%s\"", code.getId()));
 				if ( dataInside ) {
-					tmp.append(">"+toXML(code.getNativeData(), false)+"</ec>");
+					if ( Util.isNullOrEmpty(code.getOriginalData()) ) {
+						tmp.append("/>");
+					}
+					else {
+						tmp.append(">"+Util.toXML(code.getOriginalData(), false)+"</ec>");
+					}
 				}
 				else {
-					tmp.append(String.format(" nid=\"%c%s\"/>", (isTarget ? 't' : 's'), code.getInternalId()));
+					if ( code.hasOriginalData() ) {
+						tmp.append(String.format(" nid=\"%s\"",
+							codes.getCodeStore().getIdForOriginalData(code.getOriginalData())));
+					}
+					tmp.append("/>");
 				}
 			}
 			else if ( ctext.charAt(i) == MARKER_PLACEHOLDER ) {
@@ -204,10 +207,19 @@ public class Fragment implements Serializable {
 				code = codes.get(index);
 				tmp.append(String.format("<ph id=\"%s\"", code.getId()));
 				if ( dataInside ) {
-					tmp.append(">"+toXML(code.getNativeData(), false)+"</ph>");
+					if ( Util.isNullOrEmpty(code.getOriginalData()) ) {
+						tmp.append("/>");
+					}
+					else {
+						tmp.append(">"+Util.toXML(code.getOriginalData(), false)+"</ph>");
+					}
 				}
 				else {
-					tmp.append(String.format(" nid=\"%c%s\"/>", (isTarget ? 't' : 's'), code.getInternalId()));
+					if ( code.hasOriginalData() ) {
+						tmp.append(String.format(" nid=\"%s\"",
+							codes.getCodeStore().getIdForOriginalData(code.getOriginalData())));
+					}
+					tmp.append("/>");
 				}
 			}
 			else {
@@ -289,20 +301,14 @@ public class Fragment implements Serializable {
 		ctext.append(ch);
 	}
 
-//	public Code append (CodeType type,
-//		String nativeData)
-//	{
-//		return append(type, null, nativeData);
-//	}
-	
-	public Code append (CodeType type,
+	public Code append (InlineType type,
 		String id,
-		String nativeData)
+		String originalData)
 	{
 		if ( codes == null ) {
 			throw new RuntimeException("Cannot add codes in this fragment because it has no associated store of codes.");
 		}
-		Code code = new Code(type, id, nativeData);
+		Code code = new Code(type, id, originalData);
 		codes.add(code);
 		switch ( type ) {
 		case OPENING:

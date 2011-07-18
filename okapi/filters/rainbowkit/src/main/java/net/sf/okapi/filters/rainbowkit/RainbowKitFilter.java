@@ -206,13 +206,14 @@ public class RainbowKitFilter implements IFilter {
 		
 		// Unzip the package if needed and update the path to the extracted manifest
 		// The package is always unzipped (no check if already has been) to be able to upload a new version of the same package 
-		if (isPackage) {
+		if ( isPackage ) {
 			String root = Util.getDirectoryName(inFileName);
-			FileUtil.unzip(inFileName, root);
-			
 			String packageName = Util.getFilename(inFileName, false);
 			String manifestFullName = Util.ensureSeparator(root, false);
 			manifestFullName = Util.ensureSeparator(manifestFullName + packageName, false);
+			// manifestFullName is the root (for now): unzip the package there
+			FileUtil.unzip(inFileName, manifestFullName);
+			// The add the filename
 			manifestFullName = manifestFullName + Manifest.MANIFEST_FILENAME + Manifest.MANIFEST_EXTENSION;
 			inFile = new File(manifestFullName); // inFile.exists()
 		}

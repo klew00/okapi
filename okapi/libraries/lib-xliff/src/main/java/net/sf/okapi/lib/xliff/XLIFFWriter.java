@@ -29,18 +29,20 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.util.Map;
+
+import org.oasisopen.xliff.v2.ICandidate;
+import org.oasisopen.xliff.v2.INote;
+import org.oasisopen.xliff.v2.IWithCandidates;
+import org.oasisopen.xliff.v2.IWithNotes;
 
 public class XLIFFWriter {
-
-	/**
-	 * URI for the XLIFF 2.0 namespace.
-	 */
-	public static final String NS_XLIFF20 = "urn:oasis:names:tc:xliff:document:2.0";
 
 	private PrintWriter writer = null;
     private String lb = System.getProperty("line.separator");
     private boolean isIndented = false;
     private String indent;
+    private boolean inDocument;
     private boolean inFile;
     private int style = Fragment.STYLE_NODATA;
     private String sourceLang;
@@ -64,13 +66,13 @@ public class XLIFFWriter {
 				sourceLang);
 		}
 		catch ( FileNotFoundException e ) {
-			throw new XLIFFWriterException("Cannote create document.", e);
+			throw new XLIFFWriterException(Res.t("cantCreateDocument"), e);
 		}
 		catch ( UnsupportedEncodingException e ) {
 			throw new XLIFFWriterException("Unsupported encoding.", e);
 		}
 		catch ( IOException e ) {
-			throw new XLIFFWriterException("Cannote create document.", e);
+			throw new XLIFFWriterException(Res.t("cantCreateDocument"), e);
 		}
     }
 
@@ -81,6 +83,7 @@ public class XLIFFWriter {
     	writer = new PrintWriter(output);
 		indent = "";
 		inFile = false;
+		inDocument = false;
 	}
     
     /**
@@ -91,9 +94,6 @@ public class XLIFFWriter {
     public void setLanguages (String sourceLang,
     	String targetLang)
     {
-    	if ( Util.isNullOrEmpty(sourceLang) ) {
-    		throw new XLIFFWriterException("Source language must be defined.");
-    	}
     	this.sourceLang = sourceLang;
     	this.targetLang = targetLang;
     }
@@ -107,7 +107,7 @@ public class XLIFFWriter {
     		this.style = style;
     		return;
     	}
-    	throw new XLIFFWriterException(String.format("Style %d is not valid.", style));
+    	throw new XLIFFWriterException(String.format(Res.t("badInlineStyle"), style));
     }
     
     public int getInlineStyle () {
@@ -137,6 +137,41 @@ public class XLIFFWriter {
 		}
 	}
 	
+	public void writeEvent (XLIFFEvent event) {
+		switch ( event.getType() ) {
+		case START_DOCUMENT:
+			// nothing to do
+			// writeStartDocument() is called from writeUnit() as needed
+			break;
+			
+		case START_SECTION:
+			SectionData sd = event.getSectionData();
+			setLanguages(sd.getSourceLanguage(), sd.getTargetLanguage());
+			// writeStartFile() is called from writeUnit() as needed
+			break;
+			
+		case START_GROUP:
+			writeStartGroup(event.getGroupData());
+			break;
+			
+		case EXTRACTION_UNIT:
+			writeUnit(event.getUnit());
+			break;
+			
+		case END_GROUP:
+			writeEndGroup();
+			break;
+			
+		case END_SECTION:
+			writeEndFile();
+			break;
+			
+		case END_DOCUMENT:
+			writeEndDocument();
+			break;
+		}
+	}
+	
 	public void writeUnit (Unit unit) {
 		// Check if there is something to write
 		// A unit must have at least one part 
@@ -144,89 +179,133 @@ public class XLIFFWriter {
 			return;
 		}
 		if ( !inFile ) writeStartFile();
-		writer.print(indent+String.format("<unit id=\"%s\"", Fragment.toXML(unit.getId(), true)));
+		writer.print(indent+String.format("<unit id=\"%s\"", Util.toXML(unit.getId(), true)));
 		writer.print(">"+lb);
 		if ( isIndented ) indent += " ";
 		
 		if ( style == Fragment.STYLE_DATAOUTSIDE ) {
-			writeNativeData(unit.getCodesStore());
+			writeOriginalData(unit.getCodeStore());
 		}
 		
 		for ( Part part : unit ) {
 			Segment seg = null;
 			if ( part instanceof Segment ) {
 				seg = (Segment)part;
+				writer.print(indent+"<"+Util.ELEM_SEGMENT+">"+lb);
 			}
-			
-			if ( seg != null ) writer.print(indent+"<segment>"+lb);
-			else writer.print(indent+"<ignorable>"+lb);
-			
+			else {
+				writer.print(indent+"<"+Util.ELEM_IGNORABLE+">"+lb);
+			}
 			if ( isIndented ) indent += " ";
 			
 			// Source
-			writeFragment("source", part.getSource(), 0);
+			writeFragment(Util.ELEM_SOURCE, part.getSource(), 0);
 			// Target
 			if ( part.hasTarget() ) {
-				writeFragment("target", part.getTarget(true), part.targetOrder);
+				writeFragment(Util.ELEM_TARGET, part.getTarget(true), part.targetOrder);
 			}
 			
 			if ( seg != null ) {
-				if ( seg.getCandidates().size() > 0 ) {
-					writer.print(indent+"<matches>"+lb);
-					if ( isIndented ) indent += " ";
-				
-					for ( Alternate alt : seg.getCandidates() ) {
-						writer.print(indent+"<match>"+lb);
-						if ( isIndented ) indent += " ";
-						if ( style == Fragment.STYLE_DATAOUTSIDE ) {
-							writeNativeData(alt.getCodesStore());
-						}
-						writeFragment("source", alt.getSource(), -1);
-						writeFragment("target", alt.getTarget(), -1);
-						if ( isIndented ) indent = indent.substring(1);
-						writer.print(indent+"</match>"+lb);
-					}
-					if ( isIndented ) indent = indent.substring(1);
-					writer.print(indent+"</matches>"+lb);
-				}
+				// Write notes if needed
+				writeNotes(seg);
+				// Write candidates if needed
+				writeCandidates(seg);
 			}
 			
 			if ( isIndented ) indent = indent.substring(1);
-			
 			if ( seg != null ) writer.print(indent+"</segment>"+lb);
 			else writer.print(indent+"</ignorable>"+lb);
 		}
 
+		// Unit-level notes if needed
+		writeNotes(unit);
+		// Unit-level candidates
+		writeCandidates(unit);
+		
 		if ( isIndented ) indent = indent.substring(1);
 		writer.print(indent+"</unit>"+lb);
 	}
 
-	public void writeStartDocument () {
-		writer.print("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"+lb);
-		writer.print("<xliff version=\"2.0\""+lb);
-		writer.print(" xmlns=\""+NS_XLIFF20+"\""+lb);
-		writer.print(" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""+lb);
-		writer.print(" xsi:schemaLocation=\"urn:oasis:names:tc:xliff:document:2.0 xliff_core_2.0.xsd\""+lb);		
-		writer.print(">"+lb);
-		
-		writer.print("<!-- This output is EXPERIMENTAL only. -->"+lb);
-		writer.print("<!-- XLIFF 2.0 is not defined yet. -->"+lb);
-		writer.print("<!-- For feedback or more info, please see the XLIFF TC (http://www.oasis-open.org/committees/xliff) -->"+lb);
+	private void writeCandidates (IWithCandidates parent) {
+		if ( parent.getCandidates().size() == 0 ) {
+			return;
+		}
+		writer.print(indent+"<matches>"+lb);
 		if ( isIndented ) indent += " ";
+		for ( ICandidate alt : parent.getCandidates() ) {
+			writer.print(indent+"<match>"+lb);
+			if ( isIndented ) indent += " ";
+			if ( style == Fragment.STYLE_DATAOUTSIDE ) {
+				writeOriginalData(alt.getCodeStore());
+			}
+			writeFragment(Util.ELEM_SOURCE, alt.getSource(), -1);
+			writeFragment(Util.ELEM_TARGET, alt.getTarget(), -1);
+			if ( isIndented ) indent = indent.substring(1);
+			writer.print(indent+"</match>"+lb);
+		}
+		if ( isIndented ) indent = indent.substring(1);
+		writer.print(indent+"</matches>"+lb);
+	}
+
+	private void writeNotes (IWithNotes parent) {
+		if ( parent.getNoteCount() == 0 ) {
+			return;
+		}
+		writer.print(indent+"<notes>"+lb);
+		if ( isIndented ) indent += " ";
+		for ( INote note : parent.getNotes() ) {
+			writer.print(indent+"<simpleNote");
+			switch ( note.getAppliesTo() ) {
+			case SOURCE:
+				writer.print(" appliesTo=\"source\"");
+				break;
+			case TARGET:
+				writer.print(" appliesTo=\"target\"");
+				break;
+			case SOURCE_AND_TARGET:
+				// This is the default,no need to output it
+				break;
+			}
+			writer.print(">"+Util.toXML(note.getText(), false));
+			writer.print("</simpleNote>"+lb);
+		}
+		if ( isIndented ) indent = indent.substring(1);
+		writer.print(indent+"</notes>"+lb);
+	}
+	
+	public void writeStartDocument (String extraAttributes,
+		String comment)
+	{
+		writer.print("<?xml version=\"1.0\"?>"+lb);
+		writer.print("<xliff xmlns=\""+Util.NS_XLIFF20+"\" version=\"2.0\"");
+		if ( !Util.isNullOrEmpty(extraAttributes) ) {
+			writer.print(lb+extraAttributes);
+		}
+		writer.print(">"+lb);
+		if ( isIndented ) indent += " ";
+		inDocument = true;
+
+		// Extra comment at the top is needed
+		if ( !Util.isNullOrEmpty(comment) ) {
+			writer.print(indent+"<!-- " + Util.toXML(comment, false) + "-->"+lb);
+		}
 	}
 	
 	public void writeEndDocument () {
 		if ( inFile ) {
 			writeEndFile();
 		}
-		if ( isIndented ) indent = indent.substring(1);
-		writer.print("</xliff>"+lb);
+		if ( inDocument ) {
+			if ( isIndented ) indent = indent.substring(1);
+			writer.print("</xliff>"+lb);
+		}
 	}
 	
 	public void writeStartFile () {
-		writer.print(indent+String.format("<file source=\"%s\"", sourceLang));
+		if ( !inDocument ) writeStartDocument(null, null);
+		writer.print(indent+String.format("<%s %s=\"%s\"", Util.ELEM_SECTION, Util.ATTR_SOURCELANG, sourceLang));
 		if ( !Util.isNullOrEmpty(targetLang) ) {
-			writer.print(String.format(" target=\"%s\"", targetLang));
+			writer.print(String.format(" %s=\"%s\"", Util.ATTR_TARGETLANG, targetLang));
 		}
 		writer.print(">"+lb);
 		if ( isIndented ) indent += " ";
@@ -241,15 +320,19 @@ public class XLIFFWriter {
 		}
 	}
 	
-	public void writeStartGroup () {
+	public void writeStartGroup (GroupData groupData) {
 		if ( !inFile ) writeStartFile();
-		writer.print(indent+"<group>"+lb);
+		writer.print(indent+"<"+Util.ELEM_GROUP);
+		if ( groupData != null ) {
+			writer.print(String.format(" %s=\"%s\"", Util.ATTR_ID, groupData.getId()));
+		}
+		writer.print(">"+lb);
 		if ( isIndented ) indent += " ";
 	}
 	
 	public void writeEndGroup () {
 		if ( isIndented ) indent = indent.substring(1);
-		writer.print(indent+"</group>"+lb);
+		writer.print(indent+"</"+Util.ELEM_GROUP+">"+lb);
 	}
 	
 	private void writeFragment (String name,
@@ -266,33 +349,28 @@ public class XLIFFWriter {
 		writer.print("</"+name+">"+lb);
 	}
 	
-	private void writeNativeData (CodesStore store) {
-		if ( !store.hasNonEmptyCode() ) {
+	private void writeOriginalData (CodeStore store) {
+		if ( !store.hasCodeWithOriginalData() ) {
 			return; // Nothing to write out
 		}
-		// Else: we have at least one code
-		// Do the output
 		
-		writer.print(indent+"<nativeData>"+lb);
+		// Else: compute the map and write it
+		store.calculateOriginalDataToIdsMap();
+		Map<String, String> map = store.getOutsideRepresentationMap();
+
+		writer.print(indent+"<"+Util.ELEM_ORIGINALDATA+">"+lb);
 		if ( isIndented ) indent += " ";
-		
-		Codes codes = store.getSourceCodes();
-		for ( int i=0; i<codes.size(); i++ ) {
-			Code code = codes.get(i);
-			writer.print(indent+String.format("<data id=\"s%s\">", code.getInternalId()));
-			writer.print(Fragment.toXML(code.getNativeData(), false));
-			writer.print("</data>"+lb);
+
+		for ( String originalData : map.keySet() ) {
+			String id = map.get(originalData); // The original data is the key during output
+			writer.print(indent+String.format("<%s %s=\"%s\">", Util.ELEM_DATA, Util.ATTR_ID, id));
+			writer.print(Util.toXML(originalData, false));
+			writer.print("</"+Util.ELEM_DATA+">"+lb);
 		}
-		codes = store.getTargetCodes();
-		for ( int i=0; i<codes.size(); i++ ) {
-			Code code = codes.get(i);
-			writer.print(indent+String.format("<data id=\"t%s\">", code.getInternalId()));
-			writer.print(Fragment.toXML(code.getNativeData(), false));
-			writer.print("</data>"+lb);
-		}
-		
+
 		if ( isIndented ) indent = indent.substring(1);
-		writer.print(indent+"</nativeData>"+lb);
+		writer.print(indent+"</"+Util.ELEM_ORIGINALDATA+">"+lb);
+		store.setOutsideRepresentationMap(map);
 	}
 
 }

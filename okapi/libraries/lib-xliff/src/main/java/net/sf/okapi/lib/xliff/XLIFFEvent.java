@@ -33,10 +33,10 @@ public class XLIFFEvent {
 	};
 	
 	private XLIFFEventType type;
-	private EventObject object;
+	private EventData object;
 	
 	public XLIFFEvent (XLIFFEventType type, 
-		EventObject object)
+		EventData object)
 	{
 		this.type = type;
 		this.object = object;
@@ -52,6 +52,38 @@ public class XLIFFEvent {
 	
 	public Unit getUnit () {
 		return (Unit)object;
+	}
+
+	public boolean isStartDocument () {
+		return (type == XLIFFEventType.START_DOCUMENT);
+	}
+	
+	public boolean isEndDocument () {
+		return (type == XLIFFEventType.END_DOCUMENT);
+	}
+	
+	public boolean isStartSection () {
+		return (type == XLIFFEventType.START_SECTION);
+	}
+	
+	public boolean isEndSection () {
+		return (type == XLIFFEventType.END_SECTION);
+	}
+	
+	public SectionData getSectionData () {
+		return (SectionData)object;
+	}
+
+	public boolean isStartGroup () {
+		return (type == XLIFFEventType.START_GROUP);
+	}
+	
+	public boolean isEndGroup () {
+		return (type == XLIFFEventType.END_GROUP);
+	}
+	
+	public GroupData getGroupData () {
+		return (GroupData)object;
 	}
 
 }

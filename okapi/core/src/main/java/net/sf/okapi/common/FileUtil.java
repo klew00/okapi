@@ -305,6 +305,9 @@ public final class FileUtil {
 	  {
 		  ZipInputStream in = null;
 		  OutputStream out = null;
+		  // Create the directory where we will be unziping everything
+		  Util.createDirectories(destPath);
+		  
 		  try {
 			  // Open the ZIP file
 			  in = new ZipInputStream(new FileInputStream(zipFileName));
@@ -318,6 +321,11 @@ public final class FileUtil {
 					  new File(destPath, outFilename).mkdirs();
 				  }
 				  else {
+					  // Check if the entry has sub-directories, create them if needed
+					  if ( !Util.getDirectoryName(outFilename).isEmpty() ) {
+						  File f = new File(destPath, outFilename);
+						  Util.createDirectories(f.getAbsolutePath());
+					  }
 					  out = new FileOutputStream(new File(destPath, outFilename));
 					  // Transfer bytes from the ZIP file to the output file
 					  int len;
@@ -330,7 +338,7 @@ public final class FileUtil {
 			  }
 		  }
 		  catch ( IOException e ) {
-			  throw new OkapiIOException("Error unzipping file.", e);
+			  throw new OkapiIOException("Error unzipping file.\n"+e.getMessage(), e);
 		  }
 		  finally {
 			  // Close the stream

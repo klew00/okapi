@@ -21,62 +21,23 @@
 package net.sf.okapi.lib.xliff;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 
-public class Codes implements Serializable {
-
+public class GroupData extends EventData implements Serializable {
+	
 	private static final long serialVersionUID = 0100L;
-
-	private CodeStore store;
-	private ArrayList<Code> codes;
 	
-	public Codes (CodeStore store) {
-		this.store = store;
-	}
+	private String type;
 
-	public boolean hasCode () {
-		return (( codes != null ) && !codes.isEmpty() );
+	public GroupData (String id) {
+		setId(id);
 	}
 	
-	public boolean hasCodeWithOriginalData () {
-		if ( codes != null ) {
-			for ( Code code : codes ) {
-				if ( code.hasOriginalData() ) {
-					return true;
-				}
-			}
-		}
-		return false;
+	public String getType () {
+		return type;
 	}
 	
-	public int size () {
-		if ( codes == null ) return 0;
-		return codes.size();
-	}
-
-	public CodeStore getCodeStore () {
-		return store;
-	}
-
-	public Code get (int index) {
-		if ( codes == null ) return null;
-		return codes.get(index);
-	}
-	
-	public Code get (String id,
-		InlineType type)
-	{
-		if ( codes == null ) return null;
-		String tmp = Util.toInternalId(id, type);
-		for ( Code code : codes ) {
-			if ( code.internalId.equals(tmp) ) return code;
-		}
-		return null; // Not found
-	}
-
-	public void add (Code code) {
-		if ( codes == null ) codes = new ArrayList<Code>();
-		codes.add(code);
+	public void setType (String type) {
+		this.type = type;
 	}
 
 }

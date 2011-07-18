@@ -328,6 +328,21 @@ public class SegmentationTest {
 		assertEquals("[<1>Part 1.</1>][ Part 2.]", fmt.printSegmentedContent(tu.getSource(), true));
 		assertEquals("[<1>Part 1.</1>][ Part 2.]", fmt.printSegmentedContent(tu.getTarget(locFR), true));
 	}
+
+	@Test
+	public void testCreateSegmentationWithCodes () {
+		ITextUnit tu = new TextUnit("tuid");
+		TextFragment tf = new TextFragment();
+		tf.append(TagType.OPENING, "s", "<s>");
+		tf.append("Part 1");
+		tf.append(TagType.CLOSING, "s", "</s>");
+		tf.append(". Part 2.");
+		tu.setSource(new TextContainer(tf));
+		// Segment
+		tu.createSourceSegmentation(segmenter);
+		// We should get the same result
+		assertEquals("[<1>Part 1</1>.][ Part 2.]", fmt.printSegmentedContent(tu.getSource(), true));
+	}
 	
 	private TextContainer createSimpleContent () {
 		TextFragment tf = new TextFragment();

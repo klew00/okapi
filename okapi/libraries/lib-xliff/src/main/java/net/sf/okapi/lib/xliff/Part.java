@@ -26,30 +26,21 @@ public class Part implements Serializable {
 
 	private static final long serialVersionUID = 0100L;
 
-	protected String id;
-	protected CodesStore store;
+	protected CodeStore store;
 	protected Fragment source;
 	protected Fragment target;
 	protected int targetOrder;
 	
-	public Part (CodesStore store) {
+	public Part (CodeStore store) {
 		this.store = store;
 		source = new Fragment(store);
 	}
 	
-	public Part (CodesStore store,
+	public Part (CodeStore store,
 		String sourceContent)
 	{
 		this.store = store;
 		source = new Fragment(store, false, sourceContent);
-	}
-	
-	public String getId () {
-		return id;
-	}
-	
-	public void setId (String id) {
-		this.id = id;
 	}
 	
 	public Fragment getSource () {
@@ -57,7 +48,7 @@ public class Part implements Serializable {
 	}
 	
 	public void setSource (Fragment fragment) {
-		if ( store != fragment.getCodesStore() ) {
+		if ( store != fragment.getCodeStore() ) {
 			throw new RuntimeException("The fragment passed in setSource must use the same codes store.");
 		}
 		source = fragment;
@@ -79,13 +70,13 @@ public class Part implements Serializable {
 	}
 	
 	public void setTarget (Fragment fragment) {
-		if ( store != fragment.getCodesStore() ) {
+		if ( store != fragment.getCodeStore() ) {
 			throw new RuntimeException("The fragment passed in setTarget must use the same codes store.");
 		}
 		target = fragment;
 	}
 	
-	public void settarget (String plainText) {
+	public void setTarget (String plainText) {
 		target = new Fragment(store, true, plainText);
 	}
 	
@@ -93,7 +84,7 @@ public class Part implements Serializable {
 		this.targetOrder = targetOrder;
 	}
 	
-	public CodesStore getCodesStore () {
+	public CodeStore getCodeStore () {
 		return store;
 	}
 

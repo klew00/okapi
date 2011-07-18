@@ -22,19 +22,28 @@ package net.sf.okapi.lib.xliff;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
-public class Unit extends EventObject implements Iterable<Part>, Serializable {
+import org.oasisopen.xliff.v2.ICandidate;
+import org.oasisopen.xliff.v2.INote;
+import org.oasisopen.xliff.v2.IWithCandidates;
+import org.oasisopen.xliff.v2.IWithNotes;
+
+public class Unit extends EventData implements Iterable<Part>, Serializable, IWithCandidates, IWithNotes {
 	
 	private static final long serialVersionUID = 0100L;
 
 	private ArrayList<Part> list;
-	private CodesStore store;
+	private CodeStore store;
+	private ArrayList<ICandidate> candidates;
+	private ArrayList<INote> notes;
 
 	public Unit (String id) {
 		setId(id);
 		list = new ArrayList<Part>();
-		store = new CodesStore();
+		store = new CodeStore();
 	}
 	
 	@Override
@@ -78,9 +87,45 @@ public class Unit extends EventObject implements Iterable<Part>, Serializable {
 	public Part getPart (int partIndex) {
 		return list.get(partIndex);
 	}
-	
-	public CodesStore getCodesStore () {
+
+	public CodeStore getCodeStore () {
 		return store;
+	}
+
+	@Override
+	public void addCandidate (ICandidate candidate) {
+		if ( candidates == null ) candidates = new ArrayList<ICandidate>();
+		candidates.add(candidate);
+	}
+	
+	@Override
+	public List<ICandidate> getCandidates () {
+		if ( candidates == null ) return Collections.emptyList();
+		else return candidates;
+	}
+
+	@Override
+	public int getCandidateCount () {
+		if ( candidates == null ) return 0;
+		return candidates.size();
+	}
+
+	@Override
+	public void addNote (INote note) {
+		if ( notes == null ) notes = new ArrayList<INote>();
+		notes.add(note);
+	}
+
+	@Override
+	public List<INote> getNotes () {
+		if ( notes == null ) return Collections.emptyList();
+		else return notes;
+	}
+	
+	@Override
+	public int getNoteCount () {
+		if ( notes == null ) return 0;
+		return notes.size();
 	}
 
 }

@@ -32,35 +32,36 @@ public class Code implements Serializable {
 	public static final int CANCHANGEPARENT = 0x08;
 	
 	String internalId;
-	private CodeType type;
+	
+	private InlineType inlineType;
 	private String id;
-	private String nativeData;
-	private int hints;
+	private String originalData;
+	private int hints = (CANDELETE | CANREPLICATE | CANREORDER | CANCHANGEPARENT);
 
-	public Code (CodeType type,
+	public Code (InlineType inlineType,
 		String id,
-		String nativeData)
+		String originalData)
 	{
-		if ( type == null ) throw new RuntimeException("Code type cannot be null.");
+		if ( inlineType == null ) throw new RuntimeException("inline type cannot be null.");
 		if ( id == null ) throw new RuntimeException("Code id cannot be null.");
-		this.type = type;
+		this.inlineType = inlineType;
 		this.id = id;
-		this.internalId = Util.toInternalId(id, type);
-		this.nativeData = nativeData;
+		this.internalId = Util.toInternalId(id, inlineType);
+		this.originalData = originalData;
 	}
 
-	public String getNativeData () {
-		return nativeData;
+	public String getOriginalData () {
+		return originalData;
 	}
 	
-	public void setNativeData (String nativeData) {
-		this.nativeData = nativeData;
+	public void setOriginalData (String originalData) {
+		this.originalData = originalData;
 	}
 	
-//	public void setId (String id) {
-//		this.id = id;
-//	}
-//	
+	public boolean hasOriginalData () {
+		return !Util.isNullOrEmpty(originalData);
+	}
+	
 	public String getId () {
 		return id;
 	}
@@ -69,12 +70,12 @@ public class Code implements Serializable {
 		return internalId;
 	}
 	
-	public CodeType getType () {
-		return type;
+	public InlineType getInlineType () {
+		return inlineType;
 	}
 
-	public void setType (CodeType type) {
-		this.type = type;
+	public void setInlineType (InlineType inlineType) {
+		this.inlineType = inlineType;
 	}
 
 	public int getHints () {
