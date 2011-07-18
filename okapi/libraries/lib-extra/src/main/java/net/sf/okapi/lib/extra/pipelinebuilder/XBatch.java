@@ -58,7 +58,15 @@ public class XBatch extends XBatchItem {
 				this.items.add(item.getContext());
 		return this;
 	}
-			
+	
+	public XBatch addItem(XBatchItem item) {
+		if (item instanceof XBatch) 
+			this.items.addAll(((XBatch)item).getItems());
+		else
+			this.items.add(item.getContext());
+		return this;
+	}
+	
 	public XBatch addItems(String dir, String[] fileList, 
 			String defaultEncoding, LocaleId sourceLocale, LocaleId targetLocale) {		
 		for (String file : fileList) {
