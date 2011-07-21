@@ -21,19 +21,15 @@
 package net.sf.okapi.filters.versifiedtxt;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.TestUtil;
-import net.sf.okapi.common.Util;
-import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.LocaleId;
 
 import org.junit.Before;
 import org.junit.Test;
