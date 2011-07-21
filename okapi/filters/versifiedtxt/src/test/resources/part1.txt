@@ -1,15 +1,15 @@
 ﻿|b000001
 |cTitle
-|v0
+|v1
 Okapi Handbook
 
-|v1
+|v2
 Book 1 - test é=eacute
 
-|v2
+|v3
 Test Okapi
 
-|v3
+|v4
 More testing
 
 |cCopyright

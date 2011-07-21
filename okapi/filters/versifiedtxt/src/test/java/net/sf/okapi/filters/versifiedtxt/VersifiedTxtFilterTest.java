@@ -48,6 +48,7 @@ public class VersifiedTxtFilterTest {
 	@Before
 	public void setUp() {
 		filter = new VersifiedTextFilter();
+		filter.setOptions(LocaleId.ENGLISH, LocaleId.SPANISH, "UTF-8", true);
 		root = TestUtil.getParentDir(this.getClass(), "/part1.txt");
 	}
 	
@@ -69,11 +70,11 @@ public class VersifiedTxtFilterTest {
 
 	@Test
 	public void testSimpleVerse() {
-		String snippet = "|v1\nThis is a test.";
+		String snippet = "|btest\n|v1\nThis is a test.";
 		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
 		assertEquals("This is a test.\n", tu.getSource().toString());
-		assertEquals("::1", tu.getName());
+		assertEquals("test::1", tu.getName());
 	}
 	
 	@Test
@@ -95,7 +96,7 @@ public class VersifiedTxtFilterTest {
 	}
 
 	@Test
-	public void testOutputSimpleBookChapterVerse () {
+	public void testOutputSimpleBookChapterVerse() {
 		String snippet = "|bbook\n|cchapter\n|v1\nThis is a test.";
 		String expected = "|bbook\n|cchapter\n|v1\nThis is a test.\n"; // Extra LB on output
 		String result = FilterTestDriver.generateOutput(getEvents(snippet),
@@ -123,13 +124,58 @@ public class VersifiedTxtFilterTest {
 		assertNotNull(tu);
 		assertEquals("", tu.getSource().toString());
 	}
+
+	@Test
+	public void testBilingual() {		
+		String snippet = "|bbook\n|cchapter\n|v1\nsource\n<TARGET>\ntarget\n|v2\nsource2\n<TARGET>\ntarget2";
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertNotNull(tu);
+		assertEquals("source\n", tu.getSource().toString());		
+		assertEquals("target\n", tu.getTarget(filter.getTrgLoc()).toString());
+		
+		tu = FilterTestDriver.getTextUnit(getEvents(snippet), 2);
+		assertNotNull(tu);
+		assertEquals("source2\n", tu.getSource().toString());
+		assertEquals("target2\n", tu.getTarget(filter.getTrgLoc()).toString());
+	}
+	
+	@Test
+	public void testBilingualWithGenericWriter() {
+		String snippet = "|bbook\n|cchapter\n|v1\nsource\n<TARGET>\ntarget\n|v2\nsource2\n<TARGET>\ntarget2";
+		String expected = "|bbook\n|cchapter\n|v1\nsource\n<TARGET>\ntarget\n|v2\nsource2\n<TARGET>\ntarget2\n";
+		String result = FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), LocaleId.SPANISH);
+		assertEquals(expected, result);
+	}
+	
+	@Test
+	public void testBilingualWithEmptyVerses() {
+		String snippet = "|bbook\n|cchapter\n|v1\n<TARGET>\n|v2\n<TARGET>\n";
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertNotNull(tu);
+		assertEquals("", tu.getSource().toString());
+		assertEquals("", tu.getTarget(filter.getTrgLoc()).toString());
+		
+		tu = FilterTestDriver.getTextUnit(getEvents(snippet), 2);
+		assertNotNull(tu);
+		assertEquals("", tu.getSource().toString());
+		assertEquals("", tu.getTarget(filter.getTrgLoc()).toString());
+	}
 	
 	@Test
 	public void testDoubleExtraction() throws URISyntaxException {
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
 		list.add(new InputDocument(root+"part1.txt", null));		
-		RoundTripComparison rtc = new RoundTripComparison();
+		RoundTripComparison rtc = new RoundTripComparison(false);
 		assertTrue(rtc.executeCompare(filter, list, "windows-1252", LocaleId.ENGLISH, LocaleId.ENGLISH));
+	}
+	
+	@Test
+	public void testDoubleExtractionBilingual() throws URISyntaxException {
+		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
+		list.add(new InputDocument(root+"bilingual.txt", null));		
+		RoundTripComparison rtc = new RoundTripComparison(false);
+		assertTrue(rtc.executeCompare(filter, list, "windows-1252", LocaleId.ENGLISH, LocaleId.SPANISH));
 	}
 	
 	@Test
@@ -142,7 +188,7 @@ public class VersifiedTxtFilterTest {
 	
 	private ArrayList<Event> getEvents (String snippet) {
 		ArrayList<Event> list = new ArrayList<Event>();		
-		filter.open(new RawDocument(snippet, LocaleId.ENGLISH));
+		filter.open(new RawDocument(snippet, LocaleId.ENGLISH, LocaleId.SPANISH));
 		while (filter.hasNext()) {
 			Event event = filter.next();
 			list.add(event);

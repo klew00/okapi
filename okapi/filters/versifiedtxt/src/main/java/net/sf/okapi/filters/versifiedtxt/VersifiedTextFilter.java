@@ -27,20 +27,27 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.xml.stream.events.StartDocument;
+
 import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.UsingParameters;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.AbstractFilter;
 import net.sf.okapi.common.filters.EventBuilder;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.filterwriter.GenericFilterWriter;
+import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextFragment.TagType;
+import net.sf.okapi.common.skeleton.GenericSkeleton;
 
 /**
  * {@link IFilter} for a Versified text file.
@@ -48,17 +55,19 @@ import net.sf.okapi.common.resource.TextFragment.TagType;
  * @author HARGRAVEJE
  * @author HiginbothamDW
  */
-@UsingParameters() // No parameters
+@UsingParameters()
+// No parameters
 public class VersifiedTextFilter extends AbstractFilter {
 	private static final Logger LOGGER = Logger.getLogger(VersifiedTextFilter.class.getName());
 	private static final int BUFFER_SIZE = 128000;
-	
+
 	public static final String VERSIFIED_TXT_MIME_TYPE = "text/x-versified-txt";
 
 	private static final String VERSE = "^\\|v.+$";
 	private static final String CHAPTER = "^\\|c.+$";
 	private static final String BOOK = "^\\|b.+$";
-	private static final String PLACEHOLDER = "\\{[0-9]+\\}";
+	private static final String TARGET = "^<TARGET>$";
+	private static final String PLACEHOLDER = "(\\{|<)[0-9]+(\\}|>)";
 	private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile(PLACEHOLDER);
 
 	private String newline = "\n";
@@ -71,21 +80,28 @@ public class VersifiedTextFilter extends AbstractFilter {
 	private BufferedReader versifiedFileReader;
 	private RawDocument currentRawDocument;
 	BOMNewlineEncodingDetector detector;
+	private StartSubDocument startSubDocument;
 
 	/** Creates a new instance of VersifiedCodeNgramIndexer */
 	public VersifiedTextFilter() {
 		super();
 		this.currentChapter = "";
-		this.currentBook = "";		
+		this.currentBook = "";
 
 		setMimeType(VERSIFIED_TXT_MIME_TYPE);
-		setFilterWriter(createFilterWriter());
+		setMultilingual(true);
+		setFilterWriter(new VersifiedTextWriter());
 		// Cannot use '_' or '-' in name: conflicts with other filters (e.g. plaintext, table)
 		// for defining different configurations
 		setName("okf_versifiedtxt"); //$NON-NLS-1$
 		setDisplayName("Versified Text Filter"); //$NON-NLS-1$
 		addConfiguration(new FilterConfiguration(getName(), VERSIFIED_TXT_MIME_TYPE, getClass()
 				.getName(), "Versified Text", "Versified Text Documents"));
+	}
+
+	@Override
+	public IFilterWriter createFilterWriter() {
+		return getFilterWriter();
 	}
 
 	@Override
@@ -126,8 +142,11 @@ public class VersifiedTextFilter extends AbstractFilter {
 					detectedEncoding));
 		} else if (!detector.isDefinitive() && getEncoding().equals(RawDocument.UNKOWN_ENCODING)) {
 			detectedEncoding = detector.getEncoding();
-			LOGGER.log(Level.FINE, String.format("Default encoding and detected encoding not found. Using best guess encoding (%s)",
-									detectedEncoding));
+			LOGGER.log(
+					Level.FINE,
+					String.format(
+							"Default encoding and detected encoding not found. Using best guess encoding (%s)",
+							detectedEncoding));
 		}
 
 		input.setEncoding(detectedEncoding);
@@ -143,8 +162,6 @@ public class VersifiedTextFilter extends AbstractFilter {
 		} else {
 			eventBuilder.reset(null, isSubFilter());
 		}
-		
-		eventBuilder.addFilterEvent(createStartFilterEvent());
 	}
 
 	@Override
@@ -197,16 +214,22 @@ public class VersifiedTextFilter extends AbstractFilter {
 		}
 
 		// loop over versified file one verse at a time
-		try {
+		try {			
 			while (((currentLine = versifiedFileReader.readLine()) != null) && !isCanceled()) {
 				if (currentLine.matches(VERSE)) {
-					handleDocumentPart(currentLine + newline);					
+					handleDocumentPart(currentLine + newline);
 					handleVerse(versifiedFileReader, currentLine, currentLine.substring(2));
 				} else if (currentLine.matches(BOOK)) {
 					currentBook = currentLine.substring(2);
+					setDocumentName(currentBook);					
+					eventBuilder.addFilterEvent(createStartFilterEvent());
 					handleDocumentPart(currentLine + newline);
 				} else if (currentLine.matches(CHAPTER)) {
-					currentChapter = currentLine.substring(2);
+					currentChapter = currentLine.substring(2);					
+					if (startSubDocument != null) {
+						eventBuilder.endSubDocument();
+					}
+					handleSubDocument(currentChapter);
 					handleDocumentPart(currentLine + newline);
 				} else {
 					handleDocumentPart(currentLine + newline);
@@ -224,6 +247,9 @@ public class VersifiedTextFilter extends AbstractFilter {
 
 		// reached the end of the file
 		if (currentLine == null) {
+			if (startSubDocument != null) {
+				eventBuilder.endSubDocument();
+			}
 			eventBuilder.flushRemainingTempEvents();
 			eventBuilder.addFilterEvent(createEndFilterEvent());
 		}
@@ -240,48 +266,88 @@ public class VersifiedTextFilter extends AbstractFilter {
 	protected boolean isUtf8Encoding() {
 		return hasUtf8Encoding;
 	}
-
-	private void handleVerse(BufferedReader verse, String currentVerse, String verseNumber)
-			throws IOException {
+	
+	private void handleSubDocument(String chapter) {
+		startSubDocument = eventBuilder.startSubDocument();
+		startSubDocument.setName(chapter);
+	}
+	
+	private void handleVerse(BufferedReader verse, String currentVerse,
+			String verseNumber) throws IOException {
 		String line = null;
 		StringBuilder source = new StringBuilder(BUFFER_SIZE);
-		
+		StringBuilder target = new StringBuilder(BUFFER_SIZE);
+		boolean trg = false;
+		GenericSkeleton bilingualSkel = null;
+				
 		verse.mark(BUFFER_SIZE);
 		while ((line = verse.readLine()) != null) {
 			if (line.matches(VERSE) || line.matches(BOOK) || line.matches(CHAPTER)) {
 				verse.reset();
 				break;
 			}
-			// Need to capture all line-breaks between lines, even empty (they can be between lines)
-			source.append(line + "\n"); // But use standard line-break in content			
+			
+			if (line.matches(TARGET)) {
+				bilingualSkel = new GenericSkeleton();
+				trg = true;		
+				continue;
+			}
+			
+			if (trg) {
+				target.append(line + "\n"); 
+			} else {
+				source.append(line + "\n"); 
+			}				
 			verse.mark(BUFFER_SIZE);
 		}
 
-		// take care of worldserver placeholders
-		String v = source.toString();
 		eventBuilder.startTextUnit();
-
-		Matcher m = PLACEHOLDER_PATTERN.matcher(v);
+		
+		processPlaceHolders(source.toString(), true);
+		if (trg) {
+			processPlaceHolders(target.toString(), false);
+		}
+		// reset for source processing
+		eventBuilder.setTargetLocale(null);
+		ITextUnit tu = eventBuilder.peekMostRecentTextUnit();
+				
+		// if this was a bilingual verse then setup the <TARGET> tag
+		// as skeleton		
+		if (bilingualSkel != null) {
+			bilingualSkel.addContentPlaceholder(tu);
+			bilingualSkel.add("<TARGET>\n");
+			bilingualSkel.addContentPlaceholder(tu, getTrgLoc());
+			tu.setSkeleton(bilingualSkel);			
+		}
+		
+		tu.setName(currentBook + ":" + currentChapter + ":" + verseNumber);
+		eventBuilder.endTextUnit();
+	}
+	
+	private void processPlaceHolders(String text, boolean source) {
+		if (source) {
+			eventBuilder.setTargetLocale(null);
+		} else {
+			eventBuilder.setTargetLocale(getTrgLoc());
+		}
+		
+		Matcher m = PLACEHOLDER_PATTERN.matcher(text);
 		if (m.find()) {
 			m.reset();
-			String[] chunks = PLACEHOLDER_PATTERN.split(v);
+			String[] chunks = PLACEHOLDER_PATTERN.split(text);
 			for (int i = 0; i < chunks.length; i++) {
 				eventBuilder.addToTextUnit(chunks[i]);
 				if (m.find()) {
-					String ph = v.substring(m.start(), m.end());
-					eventBuilder.addToTextUnit(new Code(TagType.PLACEHOLDER, ph, ph));
+					String ph = text.substring(m.start(), m.end());
+					eventBuilder.addToTextUnit(new Code(TagType.PLACEHOLDER, ph, ph));				
 				}
 			}
 		} else {
 			// no placeholders found - treat is text only
-			eventBuilder.addToTextUnit(v);
+			eventBuilder.addToTextUnit(text);
 		}
-
-		ITextUnit tu = eventBuilder.peekMostRecentTextUnit();
-		tu.setName(currentBook + ":" + currentChapter + ":" + verseNumber);
-		eventBuilder.endTextUnit();
 	}
-
+	
 	private void handleDocumentPart(String part) {
 		eventBuilder.addDocumentPart(part);
 	}
