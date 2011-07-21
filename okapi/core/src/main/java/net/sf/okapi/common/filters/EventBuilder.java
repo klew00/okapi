@@ -77,6 +77,8 @@ public class EventBuilder {
 	private DocumentPart currentDocumentPart;
 	private String rootId;
 	private boolean subFilter;
+	// null target means we are processing source
+	private LocaleId targetLocale;
 
 	/**
 	 * Instantiates a new EventBuilder.
@@ -438,6 +440,7 @@ public class EventBuilder {
 		codeStack = new Stack<Code>();
 		currentSkeleton = null;
 		currentDocumentPart = null;
+		targetLocale = null;
 	}
 
 	// ////////////////////////////////////////////////////////////////////////
@@ -447,17 +450,19 @@ public class EventBuilder {
 	/**
 	 * Add the START_SUBDOCUMENT {@link Event} to the event queue.
 	 */
-	public void startSubDocument() {
+	public StartSubDocument startSubDocument() {
+		StartSubDocument startSubDocument = null;
 		if (!subFilter) {
 			if (hasUnfinishedSkeleton()) {
 				endDocumentPart();
 			}
 	
-			StartSubDocument startSubDocument = new StartSubDocument(subDocumentId.createId());
+			startSubDocument = new StartSubDocument(subDocumentId.createId());
 			Event event = new Event(EventType.START_SUBDOCUMENT, startSubDocument);
 			filterEvents.add(event);
-			LOGGER.log(Level.FINE, "Start Sub-Document for " + startSubDocument.getId());
+			LOGGER.log(Level.FINE, "Start Sub-Document for " + startSubDocument.getId());			
 		}
+		return startSubDocument;
 	}
 
 	/**
@@ -829,9 +834,17 @@ public class EventBuilder {
 
 		ITextUnit tu = peekMostRecentTextUnit();
 		// We can use the first part as nothing is segment at this point
-		tu.getSource().getFirstContent().append(text);
+		LocaleId trgLoc = getTargetLocale(); 
+		if (trgLoc == null) {
+			tu.getSource().getFirstContent().append(text);
+		} else {
+			if (tu.getTarget(trgLoc) == null) {
+				tu.createTarget(trgLoc, true, ITextUnit.CREATE_EMPTY);
+			}
+			tu.getTarget(trgLoc).getFirstContent().append(text);
+		}
 	}
-
+	
 	/**
 	 * Adds a child TextUnit to the current (parent) {@link TextUnit}
 	 * 
@@ -1088,7 +1101,15 @@ public class EventBuilder {
 
 		ITextUnit tu = peekMostRecentTextUnit();
 		// We can use the first part as nothing is segment at this point
-		tu.getSource().getFirstContent().append(c);		
+		LocaleId trgLoc = getTargetLocale();
+		if (trgLoc == null) {
+			tu.getSource().getFirstContent().append(c);
+		} else {
+			if (tu.getTarget(trgLoc) == null) {
+				tu.createTarget(trgLoc, true, ITextUnit.CREATE_EMPTY);
+			}
+			tu.getTarget(trgLoc).getFirstContent().append(c);
+		}
 	}
 	
 	/*
@@ -1431,5 +1452,21 @@ public class EventBuilder {
 	 */
 	public IdGenerator getSubDocumentId() {
 		return subDocumentId;
+	}
+	
+	/**
+	 * Set the target locale. <b>Implies we are now processing a target, not source</b>
+	 * @param targetLocale - the target {@link LocaleId}
+	 */
+	public void setTargetLocale(LocaleId targetLocale) {
+		this.targetLocale = targetLocale;
+	}
+	
+	/**
+	 * Get the current target locale. If not null implies we are processing a target</b> 
+	 * @return target locale or null if we are processing the source.
+	 */
+	public LocaleId getTargetLocale() {
+		return targetLocale;
 	}
 }

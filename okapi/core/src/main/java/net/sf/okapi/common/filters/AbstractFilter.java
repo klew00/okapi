@@ -262,7 +262,7 @@ public abstract class AbstractFilter implements IFilter {
 	 * @param srcLoc
 	 *            the new source locale
 	 */
-	protected void setSrcLoc(LocaleId srcLoc) {
+	public void setSrcLoc(LocaleId srcLoc) {
 		this.srcLoc = srcLoc;
 	}
 
@@ -270,7 +270,7 @@ public abstract class AbstractFilter implements IFilter {
 	 * @param trgLoc
 	 *            the target locale to set
 	 */
-	protected void setTrgLoc(LocaleId trgLoc) {
+	public void setTrgLoc(LocaleId trgLoc) {
 		this.trgLoc = trgLoc;
 	}
 
