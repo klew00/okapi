@@ -51,6 +51,8 @@ public class Manifest implements IAnnotation {
 	public static final String EXTRACTIONTYPE_XLIFF2 = "xliff2";
 	public static final String EXTRACTIONTYPE_PO = "po";
 	public static final String EXTRACTIONTYPE_RTF = "rtf";
+	public static final String EXTRACTIONTYPE_VERSIFIED_RTF = "versified+rtf";
+	public static final String EXTRACTIONTYPE_VERSIFIED = "versified";
 	public static final String EXTRACTIONTYPE_XLIFFRTF = "xliff+rtf";
 	public static final String EXTRACTIONTYPE_OMEGAT = "omegat";
 	public static final String EXTRACTIONTYPE_TRANSIFEX = "transifex";

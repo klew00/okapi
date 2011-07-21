@@ -50,6 +50,7 @@ import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 import net.sf.okapi.filters.po.POFilter;
 import net.sf.okapi.filters.rtf.RTFFilter;
+import net.sf.okapi.filters.versifiedtxt.VersifiedTextFilter;
 import net.sf.okapi.filters.xini.XINIFilter;
 import net.sf.okapi.filters.xliff.XLIFFFilter;
 import net.sf.okapi.lib.transifex.TransifexClient;
@@ -345,6 +346,13 @@ public class RainbowKitFilter implements IFilter {
 		else if ( info.getExtractionType().equals(Manifest.EXTRACTIONTYPE_ONTRAM) ) {
 			file = new File(manifest.getTargetDirectory()+"contents.xini");
 			filter =  new XINIFilter(info.getRelativeInputPath());
+		}
+		else if ( info.getExtractionType().equals(Manifest.EXTRACTIONTYPE_VERSIFIED_RTF) ) {
+			// RTF layer already removed by user
+			file = postprocessRTF(true);
+			// Now we have an Versified txt document ready for parsing
+			filter = new VersifiedTextFilter();			
+			extension = ""; // Extension is already on the filename
 		}
 		else if ( info.getExtractionType().equals(Manifest.EXTRACTIONTYPE_NONE) ) {
 			// Reference file: just copy it to the output

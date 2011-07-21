@@ -40,7 +40,12 @@
 			<artifactId>okapi-filter-xini</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-        
+        <dependency>
+			<groupId>net.sf.okapi.filters</groupId>
+			<artifactId>okapi-filter-versifiedtxt</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
         <!-- For test -->
         <dependency>
             <groupId>net.sf.okapi</groupId>
