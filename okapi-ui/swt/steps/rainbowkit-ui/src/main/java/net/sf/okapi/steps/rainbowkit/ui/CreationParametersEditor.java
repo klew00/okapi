@@ -213,6 +213,11 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		optStrings.add(createParameters(optEditors.get(optEditors.size()-1)));
 		optMoreInfo.add("Rainbow TKit - XLIFF 2.0"); // wiki page
 		writers.add("net.sf.okapi.steps.rainbowkit.xliff.XLIFF2PackageWriter");
+		// Versified RTF options
+		optEditors.add(null);
+		optStrings.add(null);
+		optMoreInfo.add("Rainbow TKit - Versified with RTF"); // TDOD: wiki page
+		writers.add("net.sf.okapi.steps.rainbowkit.versified.VersifiedRtfPackageWriter");
 
 		mainComposite = new Composite(parent, SWT.BORDER);
 		mainComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -266,6 +271,9 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 
 		lbTypes.add("XLIFF 2.0 (Experimental - output only)");
 		lbTypes.setData("7", "net.sf.okapi.steps.rainbowkit.xliff.XLIFF2PackageWriter");
+		
+		lbTypes.add("Versified with RTF (BETA)");
+		lbTypes.setData("8", "net.sf.okapi.steps.rainbowkit.versified.VersifiedRtfPackageWriter");
 
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.heightHint = 70;
@@ -381,6 +389,11 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 			btOptions.setEnabled(optEditors.get(n)!=null);
 			edDescription.setText("Simple package with XLIFF 2.0 experimental files.\n"
 				+ "Not for real projects. The XLIFF 2.0 format is defined yet. See XLIFF TC for more info and feedback.");
+			break;
+		case 8: // Versified with RTF
+			btOptions.setEnabled(false);
+			edDescription.setText("Package where the files to translate are converted into a versified RTF file with Trados-compatible styles.\n"
+				+ "You can translate this package with Trados Translator's Workbench, WordFast or any RTF compatible editor.");
 			break;
 		}
 	}
