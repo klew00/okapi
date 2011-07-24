@@ -25,9 +25,9 @@ import java.io.Serializable;
 public interface INote extends Serializable {
 
 	public enum AppliesTo {
+		DEFAULT,
 		SOURCE,
-		TARGET,
-		SOURCE_AND_TARGET
+		TARGET
 	}
 
 	public String getText ();

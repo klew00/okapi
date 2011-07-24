@@ -253,6 +253,46 @@ public class QualityCheckerTest {
 	}
 
 	@Test
+	public void testCODE_OCSEQUENCE () {
+		ITextUnit tu = new TextUnit("id", "src ");
+		tu.getSource().getSegments().get(0).text.append(TagType.OPENING, "b", "<b>");
+		tu.getSource().getSegments().get(0).text.append("text");
+		tu.getSource().getSegments().get(0).text.append(TagType.CLOSING, "b", "</b>");
+		tu.setTarget(locFR, new TextContainer("trg "));
+		tu.getTarget(locFR).getSegments().get(0).text.append(TagType.CLOSING, "b", "</b>");
+		tu.getTarget(locFR).getSegments().get(0).text.append("text");
+		tu.getTarget(locFR).getSegments().get(0).text.append(TagType.OPENING, "b", "<b>");
+		
+		session.processTextUnit(tu);
+		List<Issue> issues = session.getIssues();
+		assertEquals(1, issues.size());
+		assertEquals(IssueType.SUSPECT_CODE, issues.get(0).issueType);
+	}
+
+	@Test
+	public void testCODE_OCSequenceNoError () {
+		ITextUnit tu = new TextUnit("id", "src ");
+		tu.getSource().getSegments().get(0).text.append(TagType.OPENING, "i", "<i>");
+		tu.getSource().getSegments().get(0).text.append(TagType.CLOSING, "i", "</i>");
+		tu.getSource().getSegments().get(0).text.append(TagType.OPENING, "b", "<b>");
+		tu.getSource().getSegments().get(0).text.append("text");
+		tu.getSource().getSegments().get(0).text.append(TagType.CLOSING, "b", "</b>");
+		tu.getSource().getSegments().get(0).text.append(TagType.PLACEHOLDER, "br", "<br/>");
+		// target with moved codes (no parent changes)
+		tu.setTarget(locFR, new TextContainer("trg "));
+		tu.getTarget(locFR).getSegments().get(0).text.append(TagType.OPENING, "b", "<b>");
+		tu.getTarget(locFR).getSegments().get(0).text.append(TagType.PLACEHOLDER, "br", "<br/>");
+		tu.getTarget(locFR).getSegments().get(0).text.append("text");
+		tu.getTarget(locFR).getSegments().get(0).text.append(TagType.CLOSING, "b", "</b>");
+		tu.getTarget(locFR).getSegments().get(0).text.append(TagType.OPENING, "i", "<i>");
+		tu.getTarget(locFR).getSegments().get(0).text.append(TagType.CLOSING, "i", "</i>");
+		
+		session.processTextUnit(tu);
+		List<Issue> issues = session.getIssues();
+		assertEquals(0, issues.size());
+	}
+
+	@Test
 	public void testCODE_DIFFERENCE_OrderDiffIsOK () {
 		ITextUnit tu = new TextUnit("id", "src ");
 		tu.getSource().getSegments().get(0).text.append(TagType.PLACEHOLDER, "codeType", "<code1/>");

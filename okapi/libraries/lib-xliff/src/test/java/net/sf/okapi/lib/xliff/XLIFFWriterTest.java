@@ -146,9 +146,9 @@ public class XLIFFWriterTest {
 		Segment seg = unit.appendNewSegment();
 		seg.setSource("Source 1.");
 		seg.addNote(new Note("seg-note1", Note.AppliesTo.SOURCE));
-		seg.addNote(new Note("seg-note2", Note.AppliesTo.SOURCE_AND_TARGET));
+		seg.addNote(new Note("seg-note2", Note.AppliesTo.DEFAULT));
 		unit.addNote(new Note("unit-note1", Note.AppliesTo.TARGET));
-		unit.addNote(new Note("unit-note2", Note.AppliesTo.SOURCE_AND_TARGET));
+		unit.addNote(new Note("unit-note2", Note.AppliesTo.DEFAULT));
 		writer.writeUnit(unit);
 		
 		writer.close();

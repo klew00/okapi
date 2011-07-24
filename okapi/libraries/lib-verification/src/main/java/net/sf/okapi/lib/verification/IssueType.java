@@ -43,6 +43,7 @@ public enum IssueType {
 	
 	MISSING_CODE,
 	EXTRA_CODE,
+	SUSPECT_CODE,
 	
 	UNEXPECTED_PATTERN,
 	

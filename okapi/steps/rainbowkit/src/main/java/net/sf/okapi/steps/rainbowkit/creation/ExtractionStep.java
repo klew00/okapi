@@ -61,7 +61,7 @@ public class ExtractionStep extends BasePipelineStep {
 
 	@Override
 	public String getDescription () {
-		return "BETA --- Generates a Rainbow translation kit for a batch of input documents."
+		return "Generates a Rainbow translation kit for a batch of input documents."
 			+" Expects: filter events. Sends back: filter events.";
 	}
 

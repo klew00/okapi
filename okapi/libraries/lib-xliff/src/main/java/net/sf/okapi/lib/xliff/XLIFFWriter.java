@@ -262,7 +262,7 @@ public class XLIFFWriter {
 			case TARGET:
 				writer.print(" appliesTo=\"target\"");
 				break;
-			case SOURCE_AND_TARGET:
+			case DEFAULT:
 				// This is the default,no need to output it
 				break;
 			}

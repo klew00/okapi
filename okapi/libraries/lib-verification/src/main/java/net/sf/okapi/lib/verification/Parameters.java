@@ -45,6 +45,7 @@ public class Parameters extends BaseParameters {
 	private static final String TARGETSAMEASSOURCE = "targetSameAsSource";
 	private static final String TARGETSAMEASSOURCE_WITHCODES = "targetSameAsSourceWithCodes";
 	private static final String CODEDIFFERENCE = "codeDifference";
+	private static final String GUESSOPENCLOSE = "guessOpenClose";
 	private static final String CHECKPATTERNS = "checkPatterns";
 	private static final String PATTERNCOUNT = "patternCount";
 	private static final String USEPATTERN = "usePattern";
@@ -96,6 +97,7 @@ public class Parameters extends BaseParameters {
 	boolean targetSameAsSource;
 	boolean targetSameAsSourceWithCodes;
 	boolean codeDifference;
+	boolean guessOpenClose;
 	boolean checkPatterns;
 	List<PatternItem> patterns;
 	boolean checkWithLT;
@@ -382,7 +384,15 @@ public class Parameters extends BaseParameters {
 	public void setCodeDifference (boolean codeDifference) {
 		this.codeDifference = codeDifference;
 	}
+	
+	public boolean getGuessOpenClose () {
+		return guessOpenClose;
+	}
 
+	public void setGuessOpenClose (boolean guessOpenClose) {
+		this.guessOpenClose = guessOpenClose;
+	}
+	
 	public boolean getCheckPatterns () {
 		return checkPatterns;
 	}
@@ -492,6 +502,7 @@ public class Parameters extends BaseParameters {
 		targetSameAsSource = true;
 		targetSameAsSourceWithCodes = true;
 		codeDifference = true;
+		guessOpenClose = true;
 		checkPatterns = true;
 		checkWithLT = false;
 		serverURL = "http://localhost:8081/"; // Default
@@ -586,6 +597,7 @@ public class Parameters extends BaseParameters {
 		targetSameAsSource = buffer.getBoolean(TARGETSAMEASSOURCE, targetSameAsSource);
 		targetSameAsSourceWithCodes = buffer.getBoolean(TARGETSAMEASSOURCE_WITHCODES, targetSameAsSourceWithCodes);
 		codeDifference = buffer.getBoolean(CODEDIFFERENCE, codeDifference);
+		guessOpenClose = buffer.getBoolean(GUESSOPENCLOSE, guessOpenClose);
 		checkWithLT = buffer.getBoolean(CHECKWITHLT, checkWithLT);
 		serverURL = buffer.getString(SERVERURL, serverURL);
 		translateLTMsg = buffer.getBoolean(TRANSLATELTMSG, translateLTMsg);
@@ -662,6 +674,7 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean(TARGETSAMEASSOURCE, targetSameAsSource);
 		buffer.setBoolean(TARGETSAMEASSOURCE_WITHCODES, targetSameAsSourceWithCodes);
 		buffer.setBoolean(CODEDIFFERENCE, codeDifference);
+		buffer.setBoolean(GUESSOPENCLOSE, guessOpenClose);
 		buffer.setBoolean(CHECKWITHLT, checkWithLT);
 		buffer.setString(SERVERURL, serverURL);
 		buffer.setBoolean(TRANSLATELTMSG, translateLTMsg);

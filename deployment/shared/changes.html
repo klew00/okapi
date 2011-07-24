@@ -31,6 +31,10 @@ distribution.</p>
 	<li>CheckMate:<ul>
 	<li>Fixed the null pointer issue when target pattern different from the 
 	source match were not found.</li>
+	<li>Added check of the opening/closing sequence for inline codes. This check 
+	is done only if no other error is found in the segment.</li>
+	<li>Added the option &quot;Try to guess opening/closing types for placeholder 
+	codes&quot; for the codes.</li>
 </ul>
 	</li>
 	<li>Tikal:<ul>
@@ -42,6 +46,8 @@ distribution.</p>
 	<li>Rainbow Translation Kit Creation Step:<ul>
 	<li>Changed the XLIFF and XLIFF + RTF output behavior so single and double 
 	quotes are not escaped in element content.</li>
+	<li>Changed the XLIFF + RTF output to use short notation for empty inline 
+	codes.</li>
 	<li>Added the option &quot;Create a ZIP file for the package&quot;</li>
 	<li>Continued experimental implementation of XLIFF 2.0.</li>
 </ul>
@@ -49,6 +55,10 @@ distribution.</p>
 	<li>Rainbow Translation Kit Merging Step:<ul>
 	<li>Added the option to generate raw document events or filter events.</li>
 	<li>Added support for post-processing directly .rkp zipped files.</li>
+</ul>
+	</li>
+	<li>Extraction Verification Step:<ul>
+	<li>Improved support for bilingual file formats.</li>
 </ul>
 	</li>
 	<li>Search and Replace Step:<ul>
@@ -71,6 +81,8 @@ distribution.</p>
 	existing translation in the layered output (e.g. RTF).</li>
 	<li>Fixed bug of un-balanced opening and closing codes segmented entry when 
 	codes are nested over parts.</li>
+	<li>Updated how outer data of empty inline codes are stored (e.g. now uses 
+	&lt;x id=&#39;1&#39;/&gt; instead of &lt;x id=&#39;1&#39;&gt;&lt;/x&gt;)</li>
 </ul>
 	</li>
 	<li>IDML Filter:<ul>

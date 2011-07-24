@@ -348,14 +348,10 @@ public class XLIFFReader {
 	private void processNote (IWithNotes parent)
 		throws XMLStreamException
 	{
-		Note.AppliesTo at = Note.AppliesTo.SOURCE_AND_TARGET;
+		Note.AppliesTo at = Note.AppliesTo.DEFAULT;
 		String tmp = reader.getAttributeValue(null, Util.ATTR_APPLIESTO);
 		if ( cannotBeEmpty(Util.ATTR_APPLIESTO, tmp) ) {
-			if ( tmp.equals("segment") || tmp.equals("unit") ) {
-				// Done already
-//TODO: discuss values in TC
-			}
-			else if ( tmp.equals("source") ) {
+			if ( tmp.equals("source") ) {
 				at = Note.AppliesTo.SOURCE;
 			}
 			else if ( tmp.equals("target") ) {

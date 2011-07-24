@@ -134,6 +134,7 @@ class IssuesTableModel {
 					break;
 				case MISSING_CODE:
 				case EXTRA_CODE:
+				case SUSPECT_CODE:
 					if ( issueType != 6 ) continue;
 					break;
 				case UNEXPECTED_PATTERN:

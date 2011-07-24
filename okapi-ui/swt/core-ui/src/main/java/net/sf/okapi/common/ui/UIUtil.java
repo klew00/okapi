@@ -271,6 +271,12 @@ public class UIUtil {
 		}
 	}
 
+	/**
+	 * Clones a TextStyle object, creating new colors and font as needed.
+	 * @param device the device where the text style is applied.
+	 * @param ts the text style to clone (null will returns null).
+	 * @return the new TextSyle object.
+	 */
 	public static TextStyle cloneTextStyle (Device device, TextStyle ts) {
 		if ( ts == null ) return null;
 		TextStyle newTS = new TextStyle(ts);

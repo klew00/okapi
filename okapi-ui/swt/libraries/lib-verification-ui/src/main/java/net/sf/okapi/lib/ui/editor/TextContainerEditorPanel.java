@@ -32,6 +32,7 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.ui.Dialogs;
+import net.sf.okapi.common.ui.InputDialog;
 import net.sf.okapi.common.ui.UIUtil;
 
 import org.eclipse.swt.SWT;
@@ -354,6 +355,14 @@ public class TextContainerEditorPanel {
 		if ( targetMode ) {
 			new MenuItem(contextMenu, SWT.SEPARATOR);
 		
+			item = new MenuItem(contextMenu, SWT.PUSH);
+			item.setText("Edit Code");
+			item.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent event) {
+					editCode();
+	            }
+			});
+
 			item = new MenuItem(contextMenu, SWT.PUSH);
 			item.setText("Remove All Codes");
 			item.addSelectionListener(new SelectionAdapter() {
@@ -1123,6 +1132,28 @@ public class TextContainerEditorPanel {
 		}
 		data.codedText = tmp.toString();
 		return data;
+	}
+
+	private void editCode () {
+		Point selection = edit.getSelection();
+		if ( selection.x == selection.y ) {
+			return; // Nothing is selected
+		}
+		FragmentData data = getSelection(selection);
+		if (( data.codedText.length() != 2 ) || !TextFragment.isMarker(data.codedText.charAt(0)) ) {
+			Dialogs.showError(edit.getShell(), "The selection must contain one code and one only.", null);
+			return; 
+		}
+
+		Code code = data.codes.get(0);
+		InputDialog dlg = new InputDialog(edit.getShell(), "Edit Code",
+			"Content of the code", code.getData(), null, 0, 50, 1);
+		String res = dlg.showDialog();
+		if ( res == null ) return; // User cancellation
+		
+		// Else set the new code
+		code.setData(res);
+		setFragmentData(data, 2);
 	}
 	
 	private void cutToClipboard (Point selection) {

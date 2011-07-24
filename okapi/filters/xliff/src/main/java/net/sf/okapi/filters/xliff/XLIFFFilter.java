@@ -702,7 +702,7 @@ public class XLIFFFilter implements IFilter {
 					else if ( "alt-trans".equals(name) ) {
 						inAltTrans = false;
 					}
-					// just store the end
+					// Just store the end
 					storeEndElement();
 					break;
 				
@@ -1306,7 +1306,11 @@ public class XLIFFFilter implements IFilter {
 					if ( tagName.equals(reader.getLocalName()) ) {
 						if ( --endStack == 0 ) {
 							Code code = content.append(tagType, type, innerCode.toString(), id);
-							outerCode.append("</"+tagName+">");
+							if ( innerCode.length() == 0 ) {
+								// Replace '>' by '/>'
+								outerCode.insert(outerCode.length()-1, '/');
+							}
+							else outerCode.append("</"+tagName+">");
 							code.setOuterData(outerCode.toString());
 							return;
 						}

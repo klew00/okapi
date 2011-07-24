@@ -436,6 +436,11 @@ class QualityChecker {
 
 		// If no codes: don't check
 		if (( srcList.size() == 0 ) && ( trgList.size() == 0 )) return;
+		
+		// Prepare the verification of the open-close sequence
+		String srcOC = buildOpenCloseSequence(srcList);
+		String trgOC = buildOpenCloseSequence(trgList);
+		boolean checkOC = true;
 
 		// Check codes missing in target
 		Iterator<Code> srcIter = srcList.iterator();
@@ -477,6 +482,7 @@ class QualityChecker {
 				"Missing codes in the target: "+buildCodeList(srcList),
 				0, -1, 0, -1, Issue.SEVERITY_MEDIUM, srcSeg.toString(), trgSeg.toString(),
 				srcList);
+			checkOC = false;
 		}
 		
 		//--- Extra codes
@@ -495,15 +501,77 @@ class QualityChecker {
 				"Extra codes in the target: "+buildCodeList(trgList),
 				0, -1, 0, -1, Issue.SEVERITY_MEDIUM, srcSeg.toString(), trgSeg.toString(),
 				trgList);
+			checkOC = false;
 		}
 		
-//		// If both list are empty but we get here:
-//		// This means the codes are the same but in a different order
-//		if ( srcList.isEmpty() && trgList.isEmpty() ) {
-//			reportIssue(IssueType.CODE_DIFFERENCE, tu, srcSeg.getId(),
-//				"Codes are in a different order in the source and target.",
-//				0, -1, 0, -1, Issue.SEVERITY_MEDIUM, srcSeg.toString(), trgSeg.toString());
-//		}
+		// Check sequence issue in open-close codes
+		// This is checked only if we did not found already an error
+		if ( checkOC ) {
+			int j = 0;
+			boolean done = false;
+			for ( int i=0; i<srcOC.length(); i++ ) {
+				if ( srcOC.charAt(i) == 'p' ) continue;
+				// Else it's 'o' or 'c'
+				while ( true ) {
+					if ( trgOC.length() <= j ) {
+						// No more code of this type
+						reportIssue(IssueType.SUSPECT_CODE, tu, srcSeg.getId(),
+							"Suspect sequence of opening and closing target codes.",
+							0, -1, 0, -1, Issue.SEVERITY_MEDIUM, srcSeg.toString(), trgSeg.toString(),
+							trgList);
+						done = true;
+						break;
+					}
+					// If it's a placeholder, move to the next code
+					if ( trgOC.charAt(j) == 'p' ) {
+						j++;
+						continue;
+					}
+					// Else: it's a 'o' or 'c'
+					if ( trgOC.charAt(j) != srcOC.charAt(i) ) {
+						// Error in sequence
+						reportIssue(IssueType.SUSPECT_CODE, tu, srcSeg.getId(),
+							String.format("Suspect sequence of opening and closing codes in the target (code %d).", i+1),
+							0, -1, 0, -1, Issue.SEVERITY_MEDIUM, srcSeg.toString(), trgSeg.toString(),
+							trgList);
+						done = true;
+						break;
+					}
+					j++;
+					break; // This code has been checekd
+				}
+				if ( done ) break;
+			}
+		}
+		
+	}
+	
+	private String buildOpenCloseSequence (ArrayList<Code> list) {
+		StringBuilder sb = new StringBuilder();
+		for ( Code code : list ) {
+			switch ( code.getTagType() ) {
+			case OPENING:
+				sb.append("o");
+				break;
+			case CLOSING:
+				sb.append("c");
+				break;
+			case PLACEHOLDER:
+				if ( true ) {
+					String tmp = code.getData();
+					char ch = 'p';
+					if ( !Util.isEmpty(tmp) && params.getGuessOpenClose() ) {
+						if ( tmp.startsWith("</") ) ch = 'c';
+						else if ( tmp.startsWith("<") ) ch = 'o';
+						// Make sure the open is not an empty
+						if ( tmp.endsWith("/>") ) ch = 'p';
+					}
+					// Now add only if it's an open or close
+					sb.append(ch);
+				}
+			}
+		}
+		return sb.toString();
 	}
 	
 	private void checkCorruptedCharacters (String srcOri,

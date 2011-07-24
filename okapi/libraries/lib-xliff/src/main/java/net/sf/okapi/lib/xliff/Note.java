@@ -36,27 +36,36 @@ public class Note implements INote {
 		this.appliesTo = appliesTo;
 	}
 
+	public Note (String content) {
+		this(content, AppliesTo.DEFAULT);
+	}
+	
 	@Override
 	public String toString () {
 		return content;
 	}
 	
+	@Override
 	public String getText () {
 		return content;
 	}
 	
+	@Override
 	public void setText (String content) {
 		this.content = content;
 	}
 	
+	@Override
 	public boolean hasText () {
 		return !Util.isNullOrEmpty(content);
 	}
 
+	@Override
 	public AppliesTo getAppliesTo () {
 		return appliesTo;
 	}
 
+	@Override
 	public void setAppliesTo (AppliesTo appliesTo) {
 		this.appliesTo = appliesTo;
 	}

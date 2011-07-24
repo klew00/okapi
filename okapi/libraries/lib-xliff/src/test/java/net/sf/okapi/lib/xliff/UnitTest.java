@@ -54,7 +54,7 @@ public class UnitTest {
 		assertEquals("unit-TrgNote", unit.getNotes().get(1).getText());
 		assertEquals(Note.AppliesTo.TARGET, unit.getNotes().get(1).getAppliesTo());
 		assertEquals("unit-SrcAndTrgNote", unit.getNotes().get(2).getText());
-		assertEquals(Note.AppliesTo.SOURCE_AND_TARGET, unit.getNotes().get(2).getAppliesTo());
+		assertEquals(Note.AppliesTo.DEFAULT, unit.getNotes().get(2).getAppliesTo());
 
 		Segment seg = (Segment)unit.getPart(0);
 		assertEquals("seg-SrcNote", seg.getNotes().get(0).getText());
@@ -62,7 +62,7 @@ public class UnitTest {
 		assertEquals("seg-TrgNote", seg.getNotes().get(1).getText());
 		assertEquals(Note.AppliesTo.TARGET, seg.getNotes().get(1).getAppliesTo());
 		assertEquals("seg-SrcAndTrgNote", seg.getNotes().get(2).getText());
-		assertEquals(Note.AppliesTo.SOURCE_AND_TARGET, seg.getNotes().get(2).getAppliesTo());
+		assertEquals(Note.AppliesTo.DEFAULT, seg.getNotes().get(2).getAppliesTo());
 	}
 	
 	@Test
@@ -157,11 +157,11 @@ public class UnitTest {
 		// Segment-level note
 		seg.addNote(createNote("seg", Note.AppliesTo.SOURCE));
 		seg.addNote(createNote("seg", Note.AppliesTo.TARGET));
-		seg.addNote(createNote("seg", Note.AppliesTo.SOURCE_AND_TARGET));
+		seg.addNote(createNote("seg", Note.AppliesTo.DEFAULT));
 		// Unit-level note
 		unit.addNote(createNote("unit", Note.AppliesTo.SOURCE));
 		unit.addNote(createNote("unit", Note.AppliesTo.TARGET));
-		unit.addNote(createNote("unit", Note.AppliesTo.SOURCE_AND_TARGET));
+		unit.addNote(createNote("unit", Note.AppliesTo.DEFAULT));
 
 		// Segment-level candidate
 		seg.addCandidate(createAlternate("seg"));
@@ -195,7 +195,7 @@ public class UnitTest {
 			return new Note(prefix+"-SrcNote", appliesTo);
 		case TARGET:
 			return new Note(prefix+"-TrgNote", appliesTo);
-		case SOURCE_AND_TARGET:
+		case DEFAULT:
 		default:
 			return new Note(prefix+"-SrcAndTrgNote", appliesTo);
 		}

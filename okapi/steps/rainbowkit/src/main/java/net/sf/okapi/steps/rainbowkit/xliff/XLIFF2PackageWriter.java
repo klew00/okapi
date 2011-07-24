@@ -160,7 +160,7 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 
 		// Add trans-unit level note if needed
 		if ( tu.hasProperty(Property.NOTE) ) {
-			unit.addNote(new Note(tu.getProperty(Property.NOTE).getValue(), Note.AppliesTo.SOURCE_AND_TARGET));
+			unit.addNote(new Note(tu.getProperty(Property.NOTE).getValue()));
 		}
 		// Add source notes
 		if ( tu.hasSourceProperty(Property.NOTE) ) {

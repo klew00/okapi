@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:okp="okapi-framework:xliff-extensions">
-<file original="versifiedtest.txt" source-language="en" target-language="fr" datatype="x-text/x-versified-txt" okp:inputEncoding="UTF-8">
+<file original="Title" source-language="en" target-language="fr" datatype="x-undefined" okp:inputEncoding="UTF-8">
 <body>
 <trans-unit id="tu1" resname="000001:Title:0" xml:space="preserve">
 <source xml:lang="en">Okapi Handbook
@@ -34,6 +34,10 @@
 
 </target>
 </trans-unit>
+</body>
+</file>
+<file original="Copyright" source-language="en" target-language="fr" datatype="x-undefined" okp:inputEncoding="UTF-8">
+<body>
 <trans-unit id="tu5" resname="000001:Copyright:1" xml:space="preserve">
 <source xml:lang="en">Published by
 Okapi Framework contributors

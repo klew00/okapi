@@ -121,6 +121,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 	private Table tblIssues;
 	private Text edMessage;
 	private Combo cbDocument;
+	private SashForm sashDisplay;
 	private StyledText edSource;
 	private StyledText edTarget;
 	private TextOptions srcTextOpt;
@@ -751,15 +752,15 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 		layTmp.marginHeight = 0;
 		cmpTmp.setLayout(layTmp);
 		
-		SashForm sashEdit = new SashForm(cmpTmp, SWT.VERTICAL);
-		sashEdit.setLayoutData(new GridData(GridData.FILL_BOTH));
-		sashEdit.setSashWidth(2);
+		sashDisplay = new SashForm(cmpTmp, SWT.VERTICAL);
+		sashDisplay.setLayoutData(new GridData(GridData.FILL_BOTH));
+		sashDisplay.setSashWidth(2);
 		
-		edSource = new StyledText(sashEdit, SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
+		edSource = new StyledText(sashDisplay, SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
 		edSource.setLayoutData(new GridData(GridData.FILL_BOTH));
 		edSource.setEditable(false);
 
-		edTarget = new StyledText(sashEdit, SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
+		edTarget = new StyledText(sashDisplay, SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
 		edTarget.setLayoutData(new GridData(GridData.FILL_BOTH));
 		edTarget.setEditable(false);
 

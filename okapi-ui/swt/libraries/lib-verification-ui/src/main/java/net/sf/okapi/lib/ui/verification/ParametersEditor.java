@@ -147,6 +147,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Button rdScopeNotApprovedOnly;
 	private Button btStartLT;
 	private Button chkCodeDifference;
+	private Button chkGuessOpenClose;
 	private StringListPanel pnlMissingCodesAllowed;
 	private StringListPanel pnlExtraCodesAllowed;
 	private Button chkCheckTerms;
@@ -498,6 +499,12 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		gdTmp = new GridData();
 		gdTmp.horizontalSpan = 2;
 		chkCodeDifference.setLayoutData(gdTmp);
+		
+		chkGuessOpenClose = new Button(cmpTmp, SWT.CHECK);
+		chkGuessOpenClose.setText("Try to guess opening/closing types for placeholder codes");
+		gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		chkGuessOpenClose.setLayoutData(gdTmp);
 		
 		Label label = new Label(cmpTmp, SWT.NONE);
 		label.setText("List of the inline code types to ignore:");
@@ -1290,6 +1297,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		chkAutoOpen.setSelection(params.getAutoOpen());
 		
 		chkCodeDifference.setSelection(params.getCodeDifference());
+		chkGuessOpenClose.setSelection(params.getGuessOpenClose());
 		chkLeadingWS.setSelection(params.getLeadingWS());
 		chkTrailingWS.setSelection(params.getTrailingWS());
 		chkEmptyTarget.setSelection(params.getEmptyTarget());
@@ -1489,6 +1497,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		params.setOutputPath(pnlOutputPath.getText());
 		params.setOutputType(cbOutputType.getSelectionIndex());
 		params.setCodeDifference(chkCodeDifference.getSelection());
+		params.setGuessOpenClose(chkGuessOpenClose.getSelection());
 		params.setAutoOpen(chkAutoOpen.getSelection());
 		params.setLeadingWS(chkLeadingWS.getSelection());
 		params.setTrailingWS(chkTrailingWS.getSelection());
