@@ -25,7 +25,7 @@
 				<dependency>
 					<groupId>org.eclipse.swt.win32.win32</groupId>
 					<artifactId>x86</artifactId>
-					<version>3.6.1</version>
+					<version>3.7</version>
 				</dependency>
 			</dependencies>
 		</profile>
@@ -42,7 +42,7 @@
 				<dependency>
 					<groupId>org.eclipse.swt.win32.win32</groupId>
 					<artifactId>x86_64</artifactId>
-					<version>3.6.1</version>
+					<version>3.7</version>
 				</dependency>
 			</dependencies>
 		</profile>
@@ -60,7 +60,7 @@
                 <dependency>
                     <groupId>org.eclipse.swt.cocoa</groupId>
                     <artifactId>macosx-x86_64</artifactId>
-                    <version>3.6.1</version>
+                    <version>3.7</version>
                 </dependency>
             </dependencies>
         </profile>
@@ -76,7 +76,7 @@
                 <dependency>
                     <groupId>org.eclipse.swt.cocoa</groupId>
                     <artifactId>macosx</artifactId>
-                    <version>3.6.1</version>
+                    <version>3.7</version>
                 </dependency>
             </dependencies>
         </profile>
@@ -92,7 +92,7 @@
                 <dependency>
                     <groupId>org.eclipse.swt.gtk2.linux</groupId>
                     <artifactId>x86</artifactId>
-                    <version>3.6.1</version>
+                    <version>3.7</version>
                 </dependency>
             </dependencies>
         </profile>
@@ -108,7 +108,7 @@
                 <dependency>
                     <groupId>org.eclipse.swt.gtk2.linux</groupId>
                     <artifactId>x86_64</artifactId>
-                    <version>3.6.1</version>
+                    <version>3.7</version>
                 </dependency>
             </dependencies>
         </profile>

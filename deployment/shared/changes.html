@@ -47,7 +47,19 @@ distribution.</p>
 	<li>Changed the XLIFF and XLIFF + RTF output behavior so single and double 
 	quotes are not escaped in element content.</li>
 	<li>Changed the XLIFF + RTF output to use short notation for empty inline 
-	codes.</li>
+	codes.<br>
+	<u><b>IMPORTANT</b></u>: This updated notation may have impact on TM matches 
+	using the previous notation. Some TM tools will have coded the two parts
+	<code>&lt;x id=&quot;1&quot;&gt;</code> and <code>&lt;/x&gt;</code>&nbsp; as two separate inline 
+	codes (because they are styled as two spans of tw4winInternal) and will see 
+	the new notation <code>&lt;x id=&quot;1&quot;/&gt;</code>&nbsp; as a single code. For 
+	Trados-2007 TM for example you may want to update your TM by replacing the 
+	two adjacent codes with a single one. Export the TM to TMX 1.4b, replace
+	<span style="font-size: 11.0pt; font-family: Calibri,sans-serif"><code>
+	&lt;bpt\s.*?&gt;&amp;lt;x id=&amp;quot;(\d\d?)&amp;quot;&amp;gt;&lt;/bpt&gt;&lt;ept\s.*?&gt;&amp;lt;/x&amp;gt;&lt;/ept&gt;</code> 
+	by <code>&lt;ph&gt;&amp;lt;x id=&amp;quot;\1&amp;quot;/&gt;&lt;/ph&gt;</code> and create a new TM based 
+	on the modified notation. That new TM should yield segments that will match 
+	with the new notation.</span></li>
 	<li>Added the option &quot;Create a ZIP file for the package&quot;</li>
 	<li>Continued experimental implementation of XLIFF 2.0.</li>
 </ul>
@@ -82,7 +94,7 @@ distribution.</p>
 	<li>Fixed bug of un-balanced opening and closing codes segmented entry when 
 	codes are nested over parts.</li>
 	<li>Updated how outer data of empty inline codes are stored (e.g. now uses 
-	&lt;x id=&#39;1&#39;/&gt; instead of &lt;x id=&#39;1&#39;&gt;&lt;/x&gt;)</li>
+	<code>&lt;x id=&#39;1&#39;/&gt;</code> instead of <code>&lt;x id=&#39;1&#39;&gt;&lt;/x&gt;</code>)</li>
 </ul>
 	</li>
 	<li>IDML Filter:<ul>
@@ -104,6 +116,7 @@ distribution.</p>
 		<li>Added support for quote mode in XMLEncoder.</li>
 		<li>Upgraded ICU4J library from 4.6 to 4.8.</li>
 		<li>Added PIPELINE_PARAMETERS event.</li>
+		<li>Upgraded the SWT library from 3.6.1 to 3.7.</li>
 	</ul></li>
 </ul>
 <h2>Changes from M11 to M12</h2>
