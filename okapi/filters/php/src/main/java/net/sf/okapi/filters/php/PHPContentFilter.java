@@ -567,7 +567,7 @@ public class PHPContentFilter implements IFilter {
 		}
 		
 		// Set the text and process it for inline codes
-		TextFragment tf = new TextFragment(buffer.toString());
+		TextFragment tf = new TextFragment(buffer.toString(), srcFrag.getLastCodeId());
 		if ( params.getUseCodeFinder() ) {
 			params.getCodeFinder().process(tf);
 		}

@@ -421,6 +421,21 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 	}
 
 	/**
+	 * Creates a TextFragment with a given text and an initial id value for codes.
+	 * This constructor can be used to create fragments that will be appended to an existing one.
+	 * @param text the text to use.
+	 * @param lastCodeId value to use to start the code id. The first new code will have for id this value+1.
+	 * The value should be -1 or a positive number. Values below -1 will be automatically reset to -1.
+	 */
+	public TextFragment (String text,
+		int lastCodeId)
+	{
+		this(text);
+		if ( lastCodeId < -1 ) lastCodeId = -1;
+		this.lastCodeID = lastCodeId;
+	}
+
+	/**
 	 * Creates a TextFragment with the content of a given TextFragment.
 	 * @param fragment the content to use.
 	 */
@@ -1823,4 +1838,12 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 		isBalanced = false;
 	}
 
+	/**
+	 * Gets the last value used for code id.
+	 * @return the last value used for code id.
+	 */
+	public int getLastCodeId () {
+		return lastCodeID;
+	}
+	
 }
