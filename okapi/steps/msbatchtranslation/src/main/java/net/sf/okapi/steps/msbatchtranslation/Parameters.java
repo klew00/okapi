@@ -30,6 +30,7 @@ import net.sf.okapi.common.uidescription.PathInputPart;
 import net.sf.okapi.common.uidescription.SeparatorPart;
 import net.sf.okapi.common.uidescription.SpinInputPart;
 import net.sf.okapi.common.uidescription.TextInputPart;
+import net.sf.okapi.common.uidescription.TextLabelPart;
 
 @EditorFor(Parameters.class)
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
@@ -211,10 +212,16 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	@Override
 	public EditorDescription createEditorDescription (ParametersDescription paramsDesc) {
 		EditorDescription desc = new EditorDescription("Microsoft Batch Translation Settings");
+		
+		TextLabelPart tlp = desc.addTextLabelPart("Powered by Microsoft\u00AE Translator"); // Required by TOS
+		tlp.setVertical(true);
+		SeparatorPart sp = desc.addSeparatorPart();
+		sp.setVertical(true);
+		
 		TextInputPart tip = desc.addTextInputPart(paramsDesc.get(APPID));
 		tip.setPassword(true);
-
-		SeparatorPart sp = desc.addSeparatorPart();
+		
+		sp = desc.addSeparatorPart();
 		sp.setVertical(true);
 		
 		SpinInputPart sip = desc.addSpinInputPart(paramsDesc.get(MAXEVENTS));

@@ -29,6 +29,7 @@ import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 import net.sf.okapi.common.uidescription.PathInputPart;
 import net.sf.okapi.common.uidescription.SeparatorPart;
 import net.sf.okapi.common.uidescription.TextInputPart;
+import net.sf.okapi.common.uidescription.TextLabelPart;
 
 @EditorFor(Parameters.class)
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
@@ -154,11 +155,16 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	@Override
 	public EditorDescription createEditorDescription (ParametersDescription paramsDesc) {
 		EditorDescription desc = new EditorDescription("Google Translator Toolkit Settings");
+		TextLabelPart tlp = desc.addTextLabelPart("Powered by Google\u00AE Translator Toolkit"); // Required by TOS
+		tlp.setVertical(true);
+		SeparatorPart sp = desc.addSeparatorPart();
+		sp.setVertical(true);
+
 		desc.addTextInputPart(paramsDesc.get(EMAIL));
 		TextInputPart tip = desc.addTextInputPart(paramsDesc.get(PASSWORD));
 		tip.setPassword(true);
 
-		SeparatorPart sp = desc.addSeparatorPart();
+		sp = desc.addSeparatorPart();
 		sp.setVertical(true);
 		
 		CheckboxPart cbp = desc.addCheckboxPart(paramsDesc.get(MARKASMT));
