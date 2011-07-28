@@ -34,11 +34,13 @@ import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.filterwriter.TMXWriter;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.query.QueryResult;
+import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.MultiEvent;
 import net.sf.okapi.common.resource.Segment;
@@ -128,8 +130,8 @@ public class MSBatchTranslationStep extends BasePipelineStep {
 		net.sf.okapi.connectors.microsoft.Parameters prm = (net.sf.okapi.connectors.microsoft.Parameters)conn.getParameters();
 		prm.setAppId(params.getAppId());
 		conn.setLanguages(sourceLocale, targetLocale);
-		//todo conn.setMaximumHits(params.)
-		//todo conn.setThreshold(params.);
+		conn.setMaximumHits(params.getMaxMatches());
+		conn.setThreshold(params.getThreshold());
 		
 		// Create the TMX output if requested
 		if ( params.getMakeTmx() ) {
@@ -218,18 +220,50 @@ public class MSBatchTranslationStep extends BasePipelineStep {
 	
 		// Process the text unit to leverage
 		ArrayList<TextFragment> fragments = new ArrayList<TextFragment>();
+		ArrayList<String> segIds = new ArrayList<String>();
+		ArrayList<String> tuIds = new ArrayList<String>();
 		
 		// Gather the text fragment to translate
 		for ( Event event : events ) {
 			if ( event.isTextUnit() ) {
 				ITextUnit tu = event.getTextUnit();
+				// Skip non-translatable entries
 				if ( !tu.isTranslatable() ) continue;
-				for ( Segment srcSeg : tu.getSourceSegments() ) {
-					if ( !srcSeg.text.hasText() ) continue;
-					
-					// Add the segment to the list of source
-					fragments.add(srcSeg.text);
+				
+				TextContainer trgCont = tu.getTarget(targetLocale);
+				if ( tu.getSource().hasBeenSegmented() ) {
+					ISegments trgSegs = null;
+					if ( trgCont != null ) trgSegs = trgCont.getSegments();
+					for ( Segment srcSeg : tu.getSourceSegments() ) {
+						// Skip segments without text
+						if ( !srcSeg.text.hasText() ) {
+							continue;
+						}
+						// Skip segments with existing candidate if requested
+						if ( params.getOnlyWhenWithoutCandidate() && hasExistingCandidate(srcSeg, trgSegs) ) {
+							continue;
+						}
+						// Add the segment to the list of source
+						fragments.add(srcSeg.text);
+						tuIds.add(tu.getId());
+						segIds.add(tu.getId()+"\f"+srcSeg.getId());
+					}
 				}
+				else { // Not segmented: Look at container-level
+					TextFragment srcFrag = tu.getSource().getFirstContent();
+					if ( !srcFrag.hasText() ) {
+						continue;
+					}
+					// Skip entry with existing candidate if required
+					if ( params.getOnlyWhenWithoutCandidate() && hasExistingCandidate(trgCont) ) {
+						continue;
+					}
+					// Add the text to the list of source (it may be more than one sentence)
+					fragments.add(srcFrag);
+					tuIds.add(tu.getId());
+					segIds.add(null);
+				}
+				
 			}
 		}
 		
@@ -237,7 +271,6 @@ public class MSBatchTranslationStep extends BasePipelineStep {
 		if ( fragments.isEmpty() ) {
 			return;
 		}
-		
 		// Call the translation engine
 		List<List<QueryResult>> list = conn.queryList(fragments);
 		if ( Util.isEmpty(list) ) {
@@ -245,77 +278,211 @@ public class MSBatchTranslationStep extends BasePipelineStep {
 			return;
 		}
 		
-		// Place back the translations
-		// We need to do the same loop as when gathering as we assume the results
-		// are in the same order
+		// Place the translations
 		int entryIndex = 0;
 		for ( Event event : events ) {
-			if ( event.isTextUnit() ) {
-				ITextUnit tu = event.getTextUnit();
-				if ( !tu.isTranslatable() ) continue;
-				
-				TextContainer trgCont = tu.getTarget(targetLocale);
-				
+			// Skip non-text-unit events
+			if ( !event.isTextUnit() ) continue;
+			// Skip non-translatable entries
+			ITextUnit tu = event.getTextUnit();
+			if ( !tu.isTranslatable() ) continue;
+			// Skip TUs until we reach the next one that was translated
+			if ( !tuIds.get(entryIndex).equals(tu.getId()) ) continue;
+			
+			TextContainer trgCont = tu.getTarget(targetLocale);
+			if ( tu.getSource().hasBeenSegmented() ) {
+				// Process all the segments for this text unit				
 				for ( Segment srcSeg : tu.getSourceSegments() ) {
-					if ( !srcSeg.text.hasText() ) continue;
-					if ( list.size() < entryIndex-1 ) {
-						logger.warning(String.format("Discrepancy between the number of source and translations for text unit id='%s'", tu.getId()));
-						continue;
-					}
-					Segment trgSeg = null;
-
-					// Go through the matches for that segment
+					// Skip until we reach next segment that was translated
+					if ( !segIds.get(entryIndex).equals(tu.getId()+"\f"+srcSeg.getId()) ) continue;
+					
+					// Go through the results for that source
 					List<QueryResult> resList = list.get(entryIndex);
 					entryIndex++; // For next time
 					boolean firstMatch = true;
 					for ( QueryResult res : resList ) {
+						// Write to TMX if needed
+						if ( tmxWriter != null ) {
+							tmxWriter.writeTU(res.source, res.target, null, attributes);
+						}
 						// Determine if we fill the target (first match and it is above threshold) 
 						boolean fill = false;
 						if ( firstMatch && params.getFillTarget() ) {
 							fill = (res.score >= params.getFillTargetThreshold());
 						}
 						
-						// Get hold of the target segment where to annotate or fill
-						// Re-use the same within this loop
-						if (( trgSeg == null ) && ( fill || params.getAnnotate() )) {
+						if ( fill || params.getAnnotate() ) {
+							// Create the target container if needed
 							if ( trgCont == null ) {
 								trgCont = tu.createTarget(targetLocale, false, IResource.COPY_SEGMENTATION);
 							}
-							trgSeg = trgCont.getSegments().get(srcSeg.id);
+							Segment trgSeg = trgCont.getSegments().get(srcSeg.id);
 							if ( trgSeg == null ) {
 								trgSeg = new Segment(srcSeg.id);
 								trgCont.getSegments().append(trgSeg);
 							}
-							else { // Is it empty?
+
+							// Annotate if requested
+							if ( params.getAnnotate() ) {
+								TextUnitUtil.addAltTranslation(trgSeg,
+									res.toAltTranslation(srcSeg.text, sourceLocale, targetLocale));
+							}
+								
+							// Fill the target if requested
+							if ( fill ) {
 								// If not empty we do not fill (no overwriting)
-								fill = trgSeg.text.isEmpty();
+								if ( trgSeg.text.isEmpty() ) {
+									trgSeg.text = res.target;
+								}
 							}
 						}
-
-						// Write to TMX if needed
-						if ( tmxWriter != null ) {
-							tmxWriter.writeTU(res.source, res.target, null, attributes);
-						}
-						
-						// Annotate if requested
-						if ( params.getAnnotate() ) {
-							TextUnitUtil.addAltTranslation(trgSeg,
-								res.toAltTranslation(srcSeg.text, sourceLocale, targetLocale));
-						}
-							
-						// Fill the target if requested
-						if ( fill ) {
-							trgSeg.text = res.target;
-						}
-						
+						// Next entry will not be the first
 						firstMatch = false;
 					}
+				}				
+			}
+			else { // Not segmented: work at the container level
+				// Go through the results for that source
+				List<QueryResult> resList = list.get(entryIndex);
+				entryIndex++; // For next time
+				boolean firstMatch = true;
+				for ( QueryResult res : resList ) {
+					// Write to TMX if needed
+					if ( tmxWriter != null ) {
+						tmxWriter.writeTU(res.source, res.target, null, attributes);
+					}
+					// Determine if we fill the target (first match and it is above threshold) 
+					boolean fill = false;
+					if ( firstMatch && params.getFillTarget() ) {
+						fill = (res.score >= params.getFillTargetThreshold());
+					}
+					
+					if ( fill || params.getAnnotate() ) {
+						// Create the target container if needed
+						if ( trgCont == null ) {
+							trgCont = tu.createTarget(targetLocale, false, IResource.COPY_SEGMENTATION);
+						}
+						// Annotate if requested
+						if ( params.getAnnotate() ) {
+							TextFragment srcFrag = tu.getSource().getFirstContent();
+							TextUnitUtil.addAltTranslation(trgCont,
+								res.toAltTranslation(srcFrag, sourceLocale, targetLocale));
+						}
+						// Fill the target if requested
+						if ( fill ) {
+							TextFragment trgFrag = trgCont.getFirstContent();
+							// If not empty we do not fill (no overwriting)
+							if ( trgFrag.isEmpty() ) {
+								trgFrag = res.target;
+							}
+						}
+					}
+					// Next entry will not be the first
+					firstMatch = false;
 				}
 			}
-		}
+		}		
+		
+//		// Place back the translations
+//		// We need to do the same loop as when gathering the strings
+//		// as we assume the results are in the same order
+//		int entryIndex = 0;
+//		for ( Event event : events ) {
+//			// Skip non-text-unit events
+//			if ( !event.isTextUnit() ) continue;
+//
+//			ITextUnit tu = event.getTextUnit();
+//			// Skip non-translatable entries
+//			if ( !tu.isTranslatable() ) continue;
+//			
+//			TextContainer trgCont = tu.getTarget(targetLocale);
+//			
+//			for ( Segment srcSeg : tu.getSourceSegments() ) {
+//				if ( !srcSeg.text.hasText() ) continue;
+//				if ( list.size() < entryIndex-1 ) {
+//					logger.warning(String.format("Discrepancy between the number of source and translations for text unit id='%s'", tu.getId()));
+//					continue;
+//				}
+//				Segment trgSeg = null;
+//
+//				// Go through the matches for that segment
+//				List<QueryResult> resList = list.get(entryIndex);
+//				entryIndex++; // For next time
+//				boolean firstMatch = true;
+//				for ( QueryResult res : resList ) {
+//					// Determine if we fill the target (first match and it is above threshold) 
+//					boolean fill = false;
+//					if ( firstMatch && params.getFillTarget() ) {
+//						fill = (res.score >= params.getFillTargetThreshold());
+//					}
+//					
+//					// Get hold of the target segment where to annotate or fill
+//					// Re-use the same within this loop
+//					if (( trgSeg == null ) && ( fill || params.getAnnotate() )) {
+//						if ( trgCont == null ) {
+//							trgCont = tu.createTarget(targetLocale, false, IResource.COPY_SEGMENTATION);
+//						}
+//						trgSeg = trgCont.getSegments().get(srcSeg.id);
+//						if ( trgSeg == null ) {
+//							trgSeg = new Segment(srcSeg.id);
+//							trgCont.getSegments().append(trgSeg);
+//						}
+//						else { // Is it empty?
+//							// If not empty we do not fill (no overwriting)
+//							fill = trgSeg.text.isEmpty();
+//						}
+//					}
+//
+//					// Write to TMX if needed
+//					if ( tmxWriter != null ) {
+//						tmxWriter.writeTU(res.source, res.target, null, attributes);
+//					}
+//					
+//					// Annotate if requested
+//					if ( params.getAnnotate() ) {
+//						TextUnitUtil.addAltTranslation(trgSeg,
+//							res.toAltTranslation(srcSeg.text, sourceLocale, targetLocale));
+//					}
+//						
+//					// Fill the target if requested
+//					if ( fill ) {
+//						trgSeg.text = res.target;
+//					}
+//					
+//					firstMatch = false;
+//				}
+//			}
+//		}
 		
 		// We are done: the translations are annotations
 		// and/or written out in the TMX output
+	}
+	
+	private boolean hasExistingCandidate (Segment srcSeg,
+		ISegments trgSegs)
+	{
+		if ( trgSegs == null ) return false; // No target at all
+		
+		Segment trgSeg = trgSegs.get(srcSeg.getId());
+		if ( trgSeg == null ) return false; // No target segment
+
+		// Do we have the annotation?
+		AltTranslationsAnnotation ann = trgSeg.getAnnotation(AltTranslationsAnnotation.class);
+		if ( ann == null ) return false; // No AltTranslationsAnnotation
+		
+		// Do we have at least one entry
+		return (ann.getFirst() != null);
+	}
+	
+	private boolean hasExistingCandidate (TextContainer frag) {
+		if ( frag == null ) return false; // No target at all
+		
+		// Do we have the annotation?
+		AltTranslationsAnnotation ann = frag.getAnnotation(AltTranslationsAnnotation.class);
+		if ( ann == null ) return false; // No AltTranslationsAnnotation
+		
+		// Do we have at least one entry
+		return (ann.getFirst() != null);
 	}
 	
 }

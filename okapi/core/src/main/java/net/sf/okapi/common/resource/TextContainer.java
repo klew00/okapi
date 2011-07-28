@@ -51,7 +51,7 @@ public class TextContainer implements Iterable<TextPart> {
 	private List<TextPart> parts;
 	private boolean segApplied;
 
-        private Segments segments = new Segments(this);
+	private Segments segments = new Segments(this);
 
 
 	/**

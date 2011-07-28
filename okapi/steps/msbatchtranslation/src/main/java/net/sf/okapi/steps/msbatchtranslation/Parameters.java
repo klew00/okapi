@@ -45,6 +45,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private static final String THRESHOLD = "threshold";
 	private static final String FILLTARGET = "fillTarget";
 	private static final String FILLTARGETTHRESHOLD = "fillTargetThreshold";
+	private static final String ONLYWHENWITHOUTCANDIDATE = "onlyWhenWithoutCandidate";
 	
 	private String appId;
 	private String tmxPath;
@@ -56,6 +57,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private boolean annotate;
 	private boolean fillTarget;
 	private int fillTargetThreshold;
+	private boolean onlyWhenWithoutCandidate;
 	
 	public Parameters () {
 		reset();
@@ -80,6 +82,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		annotate = buffer.getBoolean(ANNOTATE, annotate);
 		fillTarget = buffer.getBoolean(FILLTARGET, fillTarget);
 		fillTargetThreshold = buffer.getInteger(FILLTARGETTHRESHOLD, fillTargetThreshold);
+		onlyWhenWithoutCandidate = buffer.getBoolean(ONLYWHENWITHOUTCANDIDATE, onlyWhenWithoutCandidate);
 	}
 
 	@Override
@@ -95,6 +98,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		annotate = true;
 		fillTarget = true;
 		fillTargetThreshold = 95;
+		onlyWhenWithoutCandidate = true;
 	}
 
 	@Override
@@ -110,6 +114,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.setBoolean(ANNOTATE, annotate);
 		buffer.setBoolean(FILLTARGET, fillTarget);
 		buffer.setInteger(FILLTARGETTHRESHOLD, fillTargetThreshold);
+		buffer.setBoolean(ONLYWHENWITHOUTCANDIDATE, onlyWhenWithoutCandidate);
 		return buffer.toString();
 	}
 
@@ -192,6 +197,14 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public void setAnnotate (boolean annotate) {
 		this.annotate = annotate;
 	}
+	
+	public boolean getOnlyWhenWithoutCandidate () {
+		return onlyWhenWithoutCandidate;
+	}
+	
+	public void setOnlyWhenWithoutCandidate (boolean onlyWhenWithoutCandidate) {
+		this.onlyWhenWithoutCandidate = onlyWhenWithoutCandidate;
+	}
 
 	@Override
 	public ParametersDescription getParametersDescription () {
@@ -200,6 +213,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.add(MAXEVENTS, "Events buffer", "Number of events to store before sending a query");
 		desc.add(MAXMATCHES, "Maximum matches", "Maximum number of matches allowed");
 		desc.add(THRESHOLD, "Threshold", "Score below which matches are not retained");
+		desc.add(ONLYWHENWITHOUTCANDIDATE, "Query only entries without existing candidate", null);
 		desc.add(TMXPATH, null, "Full path of the new TMX document to create");
 		desc.add(MARKASMT, "Mark the generated translation as machine translation results", null);
 		desc.add(MAKETMX, "Generate a TMX document", null);
@@ -233,10 +247,13 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		sip = desc.addSpinInputPart(paramsDesc.get(THRESHOLD));
 		sip.setRange(1, 100);
 		
+		CheckboxPart cbp = desc.addCheckboxPart(paramsDesc.get(ONLYWHENWITHOUTCANDIDATE));
+		cbp.setVertical(true);
+		
 		sp = desc.addSeparatorPart();
 		sp.setVertical(true);
 
-		CheckboxPart cbp = desc.addCheckboxPart(paramsDesc.get(ANNOTATE));
+		cbp = desc.addCheckboxPart(paramsDesc.get(ANNOTATE));
 		cbp.setVertical(true);
 		
 		CheckboxPart master = desc.addCheckboxPart(paramsDesc.get(MAKETMX));
