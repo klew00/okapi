@@ -120,7 +120,8 @@ public class RegexFilter implements IFilter {
 			getClass().getName(),
 			"SRT Sub-Titles",
 			"Configuration for SRT (Sub-Rip Text) sub-titles files.",
-			"srt.fprm"));
+			"srt.fprm",
+			".srt;"));
 		list.add(new FilterConfiguration(getName()+"-textLine",
 			MIMETYPE,
 			getClass().getName(),

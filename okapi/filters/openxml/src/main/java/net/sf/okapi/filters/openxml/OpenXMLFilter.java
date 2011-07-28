@@ -253,7 +253,7 @@ public class OpenXMLFilter implements IFilter {
 			"Microsoft Office Document",
 			"Microsoft Office documents (DOCX, XLSX, PPTX).",
 			null,
-			".docx;.pptx;.xslx;"));
+			".docx;.pptx;.xlsx;"));
 		return list;
 	}
 

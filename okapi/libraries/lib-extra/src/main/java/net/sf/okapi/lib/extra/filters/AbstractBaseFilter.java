@@ -103,6 +103,25 @@ public abstract class AbstractBaseFilter extends OkapiComponent implements IFilt
 				name, description, parametersLocation));
 	}
 	
+	protected boolean addConfiguration(			
+			boolean clearAllExisting,
+			String configId,
+			String name,
+			String description,
+			String parametersLocation,
+			String extensions) {
+		
+		if (configList == null) return false;
+		
+		if (clearAllExisting) configList.clear();
+		
+		return configList.add(new FilterConfiguration(
+				configId,
+				getMimeType(),
+				getClass().getName(),
+				name, description, parametersLocation, extensions));
+	}
+	
 	protected boolean addConfigurations(List<FilterConfiguration> configs) {
 	
 		if (configList == null) return false;
@@ -138,7 +157,7 @@ public abstract class AbstractBaseFilter extends OkapiComponent implements IFilt
 				fc.configId,
 				getMimeType(),
 				getClass().getName(),
-				fc.name, fc.description, fc.parametersLocation));
+				fc.name, fc.description, fc.parametersLocation, fc.extensions));
 		
 		return res;
 	}

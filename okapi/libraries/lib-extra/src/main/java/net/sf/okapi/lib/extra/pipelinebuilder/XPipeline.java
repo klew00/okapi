@@ -116,6 +116,10 @@ public class XPipeline extends net.sf.okapi.common.pipeline.Pipeline implements 
 		return pd.getPipeline().getState();		
 	}
 	
+	public void stop() {
+		pd.getPipeline().cancel();
+	}
+	
 	public String getHelpLocation() {
 		return stepImpl.getHelpLocation();
 	}

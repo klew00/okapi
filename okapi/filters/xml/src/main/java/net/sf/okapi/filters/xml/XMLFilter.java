@@ -144,7 +144,8 @@ public class XMLFilter implements IFilter {
 			getClass().getName(),
 			"Mozilla RDF",
 			"Configuration for Mozilla RDF documents.",
-			"MozillaRDF.fprm"));
+			"MozillaRDF.fprm",
+			".rdf;"));
 		list.add(new FilterConfiguration(getName()+"-JavaProperties",
 			MimeTypeMapper.XML_MIME_TYPE,
 			getClass().getName(),
@@ -162,7 +163,8 @@ public class XMLFilter implements IFilter {
 			getClass().getName(),
 			"WiX Localization",
 			"Configuration for WiX (Windows Installer XML) Localization files.",
-			"WixLocalization.fprm"));
+			"WixLocalization.fprm",
+			".wxl;"));
 		return list;
 	}
 	

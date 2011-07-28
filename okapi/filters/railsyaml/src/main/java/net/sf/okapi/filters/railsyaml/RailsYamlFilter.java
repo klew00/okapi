@@ -103,7 +103,8 @@ public class RailsYamlFilter extends AbstractFilter {
 		addConfiguration(new FilterConfiguration(getName(), 
 			YAML_MIME_TYPE, 
 			getClass().getName(),
-			"Ruby on Rails YAML", "Ruby on Rails YAML files"));
+			"Ruby on Rails YAML", "Ruby on Rails YAML files",
+			null, ".yml;"));
 		
 		parseState = PARSE_STOP;
 		indentation = 0;

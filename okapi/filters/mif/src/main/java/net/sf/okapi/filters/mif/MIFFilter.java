@@ -227,7 +227,9 @@ public class MIFFilter implements IFilter {
 			MimeTypeMapper.MIF_MIME_TYPE,
 			getClass().getName(),
 			"MIF (ALPHA don't even try)",
-			"Adobe FrameMaker MIF documents"));
+			"Adobe FrameMaker MIF documents",
+			null,
+			".mif;"));
 		return list;
 	}
 	

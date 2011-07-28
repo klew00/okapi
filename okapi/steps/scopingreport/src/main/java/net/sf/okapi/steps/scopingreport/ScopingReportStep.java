@@ -203,7 +203,7 @@ public class ScopingReportStep extends CompoundStep {
 			try {
 				return new BufferedInputStream(new FileInputStream(new File(params.getCustomTemplateURI())));
 			} catch (IOException e) {
-				logger.warning("Error opening the custom template, default one is used");
+				logger.warning("Error opening the custom template, default one is used. " + e.toString());
 				return this.getClass().getResourceAsStream(DEFAULT_TEMPLATE);
 			} 
 		}

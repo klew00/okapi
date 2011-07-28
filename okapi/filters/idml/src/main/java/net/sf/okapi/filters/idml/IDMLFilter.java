@@ -185,7 +185,9 @@ public class IDMLFilter implements IFilter {
 			MIMETYPE,
 			getClass().getName(),
 			"IDML",
-			"Adobe InDesign IDML documents"));
+			"Adobe InDesign IDML documents",
+			null,
+			".idml;"));
 		return list;
 	}
 	

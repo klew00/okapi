@@ -68,7 +68,8 @@ public class BasePlainTextFilter extends AbstractLineFilter {
 				FILTER_CONFIG,
 				"Plain Text",
 				"Plain text files.", 
-				null);
+				null,
+				".txt;");
 		
 		addConfiguration(false, 
 				FILTER_CONFIG_TRIM_TRAIL,
