@@ -21,7 +21,7 @@ distribution.</p>
 	<li>Google Code Project site: <a href="http://code.google.com/p/okapi/">
 	http://code.google.com/p/okapi/</a></li>
 </ul>
-<h2>Changes from M12 to M13-SNAPSHOT</h2>
+<h2>Changes from M12 to M13</h2>
 <ul>
 	<li>Rainbow:<ul>
 	<li>Added the user preference &quot;Use the last session&#39;s locales and encodings 
@@ -65,9 +65,8 @@ distribution.</p>
 	the new notation <code>&lt;x id=&quot;1&quot;/&gt;</code>&nbsp; as a single code. For 
 	Trados-2007 TM for example you may want to update your TM by replacing the 
 	two adjacent codes with a single one. Export the TM to TMX 1.4b, replace
-	<span style="font-size: 11.0pt; font-family: Calibri,sans-serif"><code>
-	&lt;bpt\s.*?&gt;&amp;lt;x id=&amp;quot;(\d\d?)&amp;quot;&amp;gt;&lt;/bpt&gt;&lt;ept\s.*?&gt;&amp;lt;/x&amp;gt;&lt;/ept&gt;</code> 
-	by <code>&lt;ph&gt;&amp;lt;x id=&amp;quot;\1&amp;quot;/&gt;&lt;/ph&gt;</span></code> and create a new TM based 
+	<code>&lt;bpt\s.*?&gt;&amp;lt;x id=&amp;quot;(\d\d?)&amp;quot;&amp;gt;&lt;/bpt&gt;&lt;ept\s.*?&gt;&amp;lt;/x&amp;gt;&lt;/ept&gt;</code> 
+	by <code>&lt;ph&gt;&amp;lt;x id=&amp;quot;\1&amp;quot;/&gt;&lt;/ph&gt;</code> and create a new TM based 
 	on the modified notation. That new TM should yield segments that will match 
 	with the new notation.</li>
 	<li>Added the option &quot;Create a ZIP file for the package&quot;</li>
