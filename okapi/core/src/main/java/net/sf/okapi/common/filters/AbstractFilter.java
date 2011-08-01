@@ -333,6 +333,9 @@ public abstract class AbstractFilter implements IFilter {
 	}
 
 	public IFilterWriter createFilterWriter() {
+		if (filterWriter != null) {
+			return filterWriter;
+		}
 		return new GenericFilterWriter(createSkeletonWriter(), getEncoderManager());
 	}
 
