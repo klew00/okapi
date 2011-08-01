@@ -31,6 +31,7 @@ import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.UsingParameters;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.AbstractFilter;
@@ -69,20 +70,24 @@ public class VersifiedTextFilter extends AbstractFilter {
 	private String newline = "\n";
 	private String currentChapter;
 	private String currentBook;
+	private int currentChar;
 	private EventBuilder eventBuilder;
 	private EncoderManager encoderManager;
 	private boolean hasUtf8Bom;
 	private boolean hasUtf8Encoding;
 	private BufferedReader versifiedFileReader;
 	private RawDocument currentRawDocument;
-	BOMNewlineEncodingDetector detector;
+	private BOMNewlineEncodingDetector detector;
 	private StartSubDocument startSubDocument;
+	private Parameters params;
+	private StringBuilder filterBuffer;
 
 	/** Creates a new instance of VersifiedCodeNgramIndexer */
 	public VersifiedTextFilter() {
-		super();
+		super();		
+
 		this.currentChapter = "";
-		this.currentBook = "";
+		this.currentBook = "";		
 
 		setMimeType(VERSIFIED_TXT_MIME_TYPE);
 		setMultilingual(true);
@@ -93,6 +98,7 @@ public class VersifiedTextFilter extends AbstractFilter {
 		setDisplayName("Versified Text Filter"); //$NON-NLS-1$
 		addConfiguration(new FilterConfiguration(getName(), VERSIFIED_TXT_MIME_TYPE, getClass()
 				.getName(), "Versified Text", "Versified Text Documents"));
+		setParameters(new Parameters());
 	}
 
 	@Override
@@ -113,7 +119,9 @@ public class VersifiedTextFilter extends AbstractFilter {
 		this.currentRawDocument = input;
 		this.currentChapter = "";
 		this.currentBook = "";
-
+		this.currentChar = -2;
+		filterBuffer = new StringBuilder(BUFFER_SIZE - 1);
+		
 		if (input.getInputURI() != null) {
 			setDocumentName(input.getInputURI().getPath());
 		}
@@ -151,7 +159,7 @@ public class VersifiedTextFilter extends AbstractFilter {
 				generateSkeleton);
 
 		versifiedFileReader = new BufferedReader(input.getReader());
-
+		
 		// create EventBuilder with document name as rootId
 		if (eventBuilder == null) {
 			eventBuilder = new EventBuilder();
@@ -188,11 +196,12 @@ public class VersifiedTextFilter extends AbstractFilter {
 
 	@Override
 	public IParameters getParameters() {
-		return null;
+		return params;
 	}
 
 	@Override
 	public void setParameters(IParameters params) {
+		this.params = (Parameters) params;
 	}
 
 	@Override
@@ -209,40 +218,60 @@ public class VersifiedTextFilter extends AbstractFilter {
 			return eventBuilder.next();
 		}
 
-		// loop over versified file one verse at a time
-		try {			
-			while (((currentLine = versifiedFileReader.readLine()) != null) && !isCanceled()) {
-				if (currentLine.matches(VERSE)) {
-					handleDocumentPart(currentLine + newline);
-					handleVerse(versifiedFileReader, currentLine, currentLine.substring(2));
-				} else if (currentLine.matches(BOOK)) {
-					currentBook = currentLine.substring(2);
-					setDocumentName(currentBook);					
-					eventBuilder.addFilterEvent(createStartFilterEvent());
-					handleDocumentPart(currentLine + newline);
-				} else if (currentLine.matches(CHAPTER)) {
-					currentChapter = currentLine.substring(2);					
-					if (startSubDocument != null) {
-						eventBuilder.endSubDocument();
+		// loop over versified file one character at a time
+		while (currentChar != -1 && !isCanceled()) {
+			try {
+				currentChar = versifiedFileReader.read();
+				filterBuffer.append((char)currentChar);
+				if (currentChar == '\r' || currentChar == '\n' || currentChar == -1) {
+					filterBuffer.setLength(filterBuffer.length() - 1);
+					currentLine = filterBuffer.toString();
+					currentLine = Util.trimEnd(currentLine, "\r\n");
+					filterBuffer = new StringBuilder(BUFFER_SIZE-1);
+
+					// break early if we have no more text
+					if (currentChar == -1 && currentLine.isEmpty()) {
+						break;
 					}
-					handleSubDocument(currentChapter);
-					handleDocumentPart(currentLine + newline);
-				} else {
-					handleDocumentPart(currentLine + newline);
-				}
 
-				// break if we have produced at least one event
-				if (eventBuilder.hasQueuedEvents()) {
-					break;
+					// don't output newline if this is the last text in the file
+					newline = handleNewline();
+					if (currentChar == -1) {
+						newline = "";
+					}
+
+					if (currentLine.matches(VERSE)) {
+						handleDocumentPart(currentLine + newline);
+						handleVerse(versifiedFileReader, currentLine, currentLine.substring(2));
+					} else if (currentLine.matches(BOOK)) {
+						currentBook = currentLine.substring(2);
+						setDocumentName(currentBook);
+						eventBuilder.addFilterEvent(createStartFilterEvent());
+						handleDocumentPart(currentLine + newline);
+					} else if (currentLine.matches(CHAPTER)) {
+						currentChapter = currentLine.substring(2);
+						if (startSubDocument != null) {
+							eventBuilder.endSubDocument();
+						}
+						handleSubDocument(currentChapter);
+						handleDocumentPart(currentLine + newline);
+					} else {
+						handleDocumentPart(currentLine + newline);
+					}
+
+					// break if we have produced at least one event
+					if (eventBuilder.hasQueuedEvents()) {
+						break;
+					}
 				}
+			} catch (IOException e) {
+				throw new OkapiIOException("IO error reading versified file at: "
+						+ (currentLine == null ? "unkown line" : currentLine), e);
 			}
-		} catch (IOException e) {
-			throw new OkapiIOException("IO error reading versified file at: "
-					+ (currentLine == null ? "unkown line" : currentLine), e);
-		}
+		} 
 
-		// reached the end of the file
-		if (currentLine == null) {
+		if (currentChar == -1) {
+			// reached the end of the file
 			if (startSubDocument != null) {
 				eventBuilder.endSubDocument();
 			}
@@ -263,42 +292,79 @@ public class VersifiedTextFilter extends AbstractFilter {
 		return hasUtf8Encoding;
 	}
 	
+	private String handleNewline() throws IOException {
+		String newline = "\n";
+		switch (detector.getNewlineType()) {
+		case CR:
+			newline = "\r";
+			break;
+		case CRLF:
+			newline = "\r\n";
+			// eat the \n
+			versifiedFileReader.read();
+			break;
+		case LF:
+			newline = "\n";
+			break;
+		}
+		return newline;
+	}
+
 	private void handleSubDocument(String chapter) {
 		startSubDocument = eventBuilder.startSubDocument();
 		startSubDocument.setName(chapter);
 	}
-	
-	private void handleVerse(BufferedReader verse, String currentVerse,
-			String verseNumber) throws IOException {
-		String line = null;
+
+	private void handleVerse(BufferedReader verse, String currentVerse, String verseNumber)
+			throws IOException {
+		String currentLine = null;
 		StringBuilder source = new StringBuilder(BUFFER_SIZE);
 		StringBuilder target = new StringBuilder(BUFFER_SIZE);
 		boolean trg = false;
-		GenericSkeleton bilingualSkel = null;
-				
+		String nl = "\n";
+		
 		verse.mark(BUFFER_SIZE);
-		while ((line = verse.readLine()) != null) {
-			if (line.matches(VERSE) || line.matches(BOOK) || line.matches(CHAPTER)) {
-				verse.reset();
-				break;
+		while (currentChar != -1) {			
+			try {
+				currentChar = versifiedFileReader.read();				
+				filterBuffer.append((char)currentChar);
+				if (currentChar == '\r' || currentChar == '\n' || currentChar == -1) {
+					filterBuffer.setLength(filterBuffer.length() - 1);
+					currentLine = filterBuffer.toString();
+					currentLine = Util.trimEnd(currentLine, "\r\n");
+					filterBuffer = new StringBuilder(BUFFER_SIZE - 1);					
+
+					// don't output newline if this is the last text in the file
+					nl = "\n";
+					if (currentChar == -1) {
+						nl = "";
+					}
+
+					if (currentLine.matches(VERSE) || currentLine.matches(BOOK) || currentLine.matches(CHAPTER)) {						
+						verse.reset();
+						nl = "";
+						break;
+					}
+
+					if (currentLine.matches(TARGET)) {
+						trg = true;			
+						continue;
+					}
+
+					if (trg) {
+						target.append(currentLine + nl);
+					} else {
+						source.append(currentLine + nl);
+					}
+					verse.mark(BUFFER_SIZE);
+				}
+			} catch (IOException e) {
+				throw new OkapiIOException("IO error reading versified file at: "
+						+ (currentLine == null ? "unkown line" : currentLine), e);
 			}
-			
-			if (line.matches(TARGET)) {
-				bilingualSkel = new GenericSkeleton();
-				trg = true;		
-				continue;
-			}
-			
-			if (trg) {
-				target.append(line + "\n"); 
-			} else {
-				source.append(line + "\n"); 
-			}				
-			verse.mark(BUFFER_SIZE);
 		}
 
 		eventBuilder.startTextUnit();
-		
 		processPlaceHolders(source.toString(), true);
 		if (trg) {
 			processPlaceHolders(target.toString(), false);
@@ -306,27 +372,29 @@ public class VersifiedTextFilter extends AbstractFilter {
 		// reset for source processing
 		eventBuilder.setTargetLocale(null);
 		ITextUnit tu = eventBuilder.peekMostRecentTextUnit();
-				
+		
 		// if this was a bilingual verse then setup the <TARGET> tag
 		// as skeleton		
-		if (bilingualSkel != null) {
+		if (trg) {
+			GenericSkeleton bilingualSkel = new GenericSkeleton(); 
 			bilingualSkel.addContentPlaceholder(tu);
-			bilingualSkel.add("<TARGET>\n");
+			bilingualSkel.add("<TARGET>" + newline);
 			bilingualSkel.addContentPlaceholder(tu, getTrgLoc());
 			tu.setSkeleton(bilingualSkel);			
 		}
 		
 		tu.setName(currentBook + ":" + currentChapter + ":" + verseNumber);
+		tu.setId(currentChapter + ":" + verseNumber);
 		eventBuilder.endTextUnit();
 	}
-	
+
 	private void processPlaceHolders(String text, boolean source) {
 		if (source) {
 			eventBuilder.setTargetLocale(null);
 		} else {
 			eventBuilder.setTargetLocale(getTrgLoc());
 		}
-		
+
 		Matcher m = PLACEHOLDER_PATTERN.matcher(text);
 		if (m.find()) {
 			m.reset();
@@ -335,7 +403,7 @@ public class VersifiedTextFilter extends AbstractFilter {
 				eventBuilder.addToTextUnit(chunks[i]);
 				if (m.find()) {
 					String ph = text.substring(m.start(), m.end());
-					eventBuilder.addToTextUnit(new Code(TagType.PLACEHOLDER, ph, ph));				
+					eventBuilder.addToTextUnit(new Code(TagType.PLACEHOLDER, ph, ph));
 				}
 			}
 		} else {
@@ -343,7 +411,7 @@ public class VersifiedTextFilter extends AbstractFilter {
 			eventBuilder.addToTextUnit(text);
 		}
 	}
-	
+
 	private void handleDocumentPart(String part) {
 		eventBuilder.addDocumentPart(part);
 	}

@@ -15,6 +15,7 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.BOMNewlineEncodingDetector.NewlineType;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiFileNotFoundException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
@@ -268,29 +269,28 @@ public class VersifiedTextWriter implements IFilterWriter {
 			writer.write("|v" + String.valueOf(++verseCount) + linebreak);
 
 			// source
-			writeTextContainer(tu.getSource());
-			if (tu.getTarget(language) != null) {
-				// <TARGET> tag
-				writer.write("<TARGET>" + linebreak);
-
-				// target
-				writeTextContainer(tu.getTarget(language));
-			}
+			boolean lastCharWasNewline = writeTextContainer(tu.getSource());
+			// <TARGET> tag
+			writer.write((lastCharWasNewline ? "" : linebreak) + "<TARGET>" + linebreak);
+			writeTextContainer(tu.getTarget(language));
 		} catch (IOException e) {
 			throw new OkapiIOException("Error writing a versified text unit.", e);
 		}
 	}
 
-	private void writeTextContainer(TextContainer tc) {
+	private boolean writeTextContainer(TextContainer tc) {
 		try {
 			if (tc == null) {
-				writer.write(linebreak);
-				return;
+				return false;
 			}
 
 			String tmp;
-			tmp = formatter.printSegmentedContent(tc, false, true);
+			tmp = formatter.printSegmentedContent(tc, false, false);
 			writer.write(tmp); // No wrapping needed
+			if (tmp.endsWith("\n")) {
+				return true;
+			}
+			return false;
 		} catch (IOException e) {
 			throw new OkapiIOException("Error writing TextContainer.", e);
 		}

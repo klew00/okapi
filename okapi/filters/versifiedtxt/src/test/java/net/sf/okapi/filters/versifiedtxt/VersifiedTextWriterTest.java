@@ -50,7 +50,7 @@ public class VersifiedTextWriterTest {
 	@Test
 	public void testBilingualWithGenericWriter() throws IOException {
 		String snippet = "|bbook\n|cchapter\n|v1\nsource\n<TARGET>\ntarget\n|v2\nsource2\n<TARGET>\ntarget2";
-		String expected = "|bbook\n|cchapter\n|v1\nsource\n<TARGET>\ntarget\n|v2\nsource2\n<TARGET>\ntarget2\n";
+		String expected = "|bbook\n|cchapter\n|v1\nsource\n<TARGET>\ntarget\n|v2\nsource2\n<TARGET>\ntarget2";
 		String result = eventWriter(snippet);
 		assertEquals(expected, result);
 	}
@@ -58,9 +58,9 @@ public class VersifiedTextWriterTest {
 	@Test
 	public void testOutputSimpleBookChapterVerse() throws IOException {
 		String snippet = "|bbook\n|cchapter\n|v1\nThis is a test.";
-		String expected = "|bbook\n|cchapter\n|v1\nThis is a test.\n"; // Extra LB on output
+		String expected = "|bbook\n|cchapter\n|v1\nThis is a test.\n<TARGET>\n"; 
 		String result = eventWriter(snippet);
-		assertEquals(result, expected);
+		assertEquals(expected, result);
 	}
 
 	private String eventWriter(String input) throws IOException {
@@ -78,8 +78,7 @@ public class VersifiedTextWriterTest {
 			while (filter.hasNext()) {
 				event = filter.next();
 				writer.handleEvent(event);
-			}
-			
+			}			
 			writerBuffer.close();
 			return new String(writerBuffer.toByteArray(), "UTF-8");
 		} finally {

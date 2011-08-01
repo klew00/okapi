@@ -73,7 +73,7 @@ public class VersifiedTxtFilterTest {
 		String snippet = "|btest\n|v1\nThis is a test.";
 		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
-		assertEquals("This is a test.\n", tu.getSource().toString());
+		assertEquals("This is a test.", tu.getSource().toString());
 		assertEquals("test::1", tu.getName());
 	}
 	
@@ -82,14 +82,14 @@ public class VersifiedTxtFilterTest {
 		String snippet = "|bbook\n|cchapter\n|v1\nThis is a test.";
 		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
-		assertEquals("This is a test.\n", tu.getSource().toString());
+		assertEquals("This is a test.", tu.getSource().toString());
 		assertEquals("book:chapter:1", tu.getName());
 	}
 	
 	@Test
 	public void testOutputSimpleBookChapterVerseWithMacLB () {
-		String snippet = "|bbook\r|cchapter\r|v0\rTest\r\r|v1\rThis is a test.\r";
-		String expected = "|bbook\r|cchapter\r|v0\rTest\r\r|v1\rThis is a test.\r";
+		String snippet = "|bbook\r|cchapter\r|v0\rTest\r\r|v1\rThis is a test.";
+		String expected = "|bbook\r|cchapter\r|v0\rTest\r\r|v1\rThis is a test.";
 		String result = FilterTestDriver.generateOutput(getEvents(snippet),
 			filter.getEncoderManager(), LocaleId.ENGLISH);
 		assertEquals(expected, result);
@@ -98,10 +98,10 @@ public class VersifiedTxtFilterTest {
 	@Test
 	public void testOutputSimpleBookChapterVerse() {
 		String snippet = "|bbook\n|cchapter\n|v1\nThis is a test.";
-		String expected = "|bbook\n|cchapter\n|v1\nThis is a test.\n"; // Extra LB on output
+		String expected = "|bbook\n|cchapter\n|v1\nThis is a test."; 
 		String result = FilterTestDriver.generateOutput(getEvents(snippet),
 			filter.getEncoderManager(), LocaleId.ENGLISH);
-		assertEquals(result, expected);
+		assertEquals(expected, result);
 	}
 
 	@Test
@@ -109,7 +109,7 @@ public class VersifiedTxtFilterTest {
 		String snippet = "|bbook\n|cchapter\n|v1\n{1}This is {2}a test{3}";
 		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
-		assertEquals("{1}This is {2}a test{3}\n", tu.getSource().toString());
+		assertEquals("{1}This is {2}a test{3}", tu.getSource().toString());
 		assertEquals("book:chapter:1", tu.getName());
 	}
 	
@@ -136,13 +136,13 @@ public class VersifiedTxtFilterTest {
 		tu = FilterTestDriver.getTextUnit(getEvents(snippet), 2);
 		assertNotNull(tu);
 		assertEquals("source2\n", tu.getSource().toString());
-		assertEquals("target2\n", tu.getTarget(filter.getTrgLoc()).toString());
+		assertEquals("target2", tu.getTarget(filter.getTrgLoc()).toString());
 	}
 	
 	@Test
 	public void testBilingualWithGenericWriter() {
 		String snippet = "|bbook\n|cchapter\n|v1\nsource\n<TARGET>\ntarget\n|v2\nsource2\n<TARGET>\ntarget2";
-		String expected = "|bbook\n|cchapter\n|v1\nsource\n<TARGET>\ntarget\n|v2\nsource2\n<TARGET>\ntarget2\n";
+		String expected = "|bbook\n|cchapter\n|v1\nsource\n<TARGET>\ntarget\n|v2\nsource2\n<TARGET>\ntarget2";
 		String result = FilterTestDriver.generateOutput(getEvents(snippet),
 			filter.getEncoderManager(), LocaleId.SPANISH);
 		assertEquals(expected, result);
