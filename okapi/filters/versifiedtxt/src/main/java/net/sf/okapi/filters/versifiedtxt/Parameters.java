@@ -40,7 +40,7 @@ class Parameters extends BaseParameters {
 	}
 
 	public void reset () {
-		allowEmptyOutputTarget = false;
+		allowEmptyOutputTarget = true;
 	}
 
 	@Override

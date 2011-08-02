@@ -310,7 +310,7 @@ public class RainbowKitFilter implements IFilter {
 			extension = ".po";
 		}
 		else if ( info.getExtractionType().equals(Manifest.EXTRACTIONTYPE_RTF) ) {
-			file = postprocessRTF(false);
+			file = postprocessRTF(Manifest.EXTRACTIONTYPE_RTF);
 			// Send the RTF raw document as event
 			// We also change the an event to update the outputURI and other pipeline parameters
 			ArrayList<Event> list = new ArrayList<Event>();
@@ -334,7 +334,7 @@ public class RainbowKitFilter implements IFilter {
 		}
 		else if ( info.getExtractionType().equals(Manifest.EXTRACTIONTYPE_XLIFFRTF) ) {
 			// Remove the RTF layer and get the resulting XLIFF file
-			file = postprocessRTF(true);
+			file = postprocessRTF(Manifest.EXTRACTIONTYPE_XLIFFRTF);
 			// Now we have an XLIFF document ready for parsing
 			filter = new XLIFFFilter();
 			extension = ""; // Extension is already on the filename
@@ -349,7 +349,7 @@ public class RainbowKitFilter implements IFilter {
 		}
 		else if ( info.getExtractionType().equals(Manifest.EXTRACTIONTYPE_VERSIFIED_RTF) ) {
 			// RTF layer already removed by user
-			file = postprocessRTF(true);
+			file = postprocessRTF(Manifest.EXTRACTIONTYPE_VERSIFIED_RTF);
 			// Now we have an Versified txt document ready for parsing
 			filter = new VersifiedTextFilter();			
 			extension = ""; // Extension is already on the filename
@@ -411,7 +411,7 @@ public class RainbowKitFilter implements IFilter {
 		}
 	}
 
-	private File postprocessRTF (boolean forXLIFFRTF) {
+	private File postprocessRTF (String tkitType) {
 		File outputFile = null;
 		OutputStreamWriter writer = null;
 		try {
@@ -419,25 +419,29 @@ public class RainbowKitFilter implements IFilter {
 			if ( rtfFilter == null ) {
 				rtfFilter = new RTFFilter();
 			}
-//TODO: encoding output warnings
+			//TODO: encoding output warnings
 			
 			//TODO: get LB info from original
 			String lineBreak = Util.LINEBREAK_DOS;
 			
 			// Open the RTF input
 			//TODO: guess encoding based on language
-			File file = new File(manifest.getTargetDirectory()+info.getRelativeInputPath() + (forXLIFFRTF ? ".xlf" : "") + ".rtf");
-			rtfFilter.open(new RawDocument(file.toURI(), "windows-1252", manifest.getTargetLocale()));
-				
-			// Open the output document
-			// Initializes the output
-			String outputPath;
-			if ( forXLIFFRTF ) { // Output in the XLIFF file in the target directory
+			File file;
+			String outputPath = null;
+			if (Manifest.EXTRACTIONTYPE_XLIFFRTF.equals(tkitType)) {
+				file = new File(manifest.getTargetDirectory()+info.getRelativeInputPath() + ".xlf" + ".rtf");
+				rtfFilter.open(new RawDocument(file.toURI(), "windows-1252", manifest.getTargetLocale()));
 				outputPath = manifest.getTargetDirectory()+info.getRelativeInputPath() + ".xlf";
-			}
-			else {
+			} else if (Manifest.EXTRACTIONTYPE_VERSIFIED_RTF.equals(tkitType)) {
+				file = new File(manifest.getTargetDirectory()+info.getRelativeInputPath() + ".vrsz" + ".rtf");
+				rtfFilter.open(new RawDocument(file.toURI(), "UTF-8", manifest.getTargetLocale()));
+				outputPath = manifest.getTargetDirectory()+info.getRelativeInputPath() + ".vrsz";
+			} else {
+				file = new File(manifest.getTargetDirectory()+info.getRelativeInputPath() + ".rtf");
+				rtfFilter.open(new RawDocument(file.toURI(), "windows-1252", manifest.getTargetLocale()));
 				outputPath = manifest.getMergeDirectory()+info.getRelativeTargetPath();
 			}
+				
 			outputFile = new File(outputPath);
 			Util.createDirectories(outputPath);
 			writer = new OutputStreamWriter(new BufferedOutputStream(

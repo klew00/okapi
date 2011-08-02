@@ -71,8 +71,9 @@ public class VersifiedRtfPackageWriter extends VersifiedPackageWriter {
 				filter.close();
 			if (layerWriter != null)
 				layerWriter.close();
-			if (inpFile != null)
-				inpFile.delete();
+			if (inpFile != null) {
+				//inpFile.delete();
+			}
 		}
 	}
 }
