@@ -30,7 +30,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.resource.ITextUnit;
-import net.sf.okapi.filters.po.POFilterWriter;
+import net.sf.okapi.filters.po.POWriter;
 import net.sf.okapi.filters.rainbowkit.Manifest;
 import net.sf.okapi.filters.rainbowkit.MergingInfo;
 import net.sf.okapi.filters.transifex.Project;
@@ -39,8 +39,8 @@ import net.sf.okapi.steps.rainbowkit.common.BasePackageWriter;
 
 public class TransifexPackageWriter extends BasePackageWriter {
 
-	private POFilterWriter potWriter;
-	private POFilterWriter trgWriter;
+	private POWriter potWriter;
+	private POWriter trgWriter;
 
 	public TransifexPackageWriter () {
 		super(Manifest.EXTRACTIONTYPE_TRANSIFEX);
@@ -175,7 +175,7 @@ public class TransifexPackageWriter extends BasePackageWriter {
 		super.processStartDocument(event);
 
 		// Set the source POT file
-		potWriter = new POFilterWriter();
+		potWriter = new POWriter();
 		net.sf.okapi.filters.po.Parameters params = (net.sf.okapi.filters.po.Parameters)potWriter.getParameters();
 		params.setOutputGeneric(true);
 		potWriter.setMode(true, true, true);
@@ -186,7 +186,7 @@ public class TransifexPackageWriter extends BasePackageWriter {
 		potWriter.setOutput(path);
 
 		// Set the target PO file
-		trgWriter = new POFilterWriter();
+		trgWriter = new POWriter();
 		params = (net.sf.okapi.filters.po.Parameters)trgWriter.getParameters();
 		params.setOutputGeneric(true);
 		trgWriter.setMode(true, false, false);

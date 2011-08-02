@@ -58,6 +58,10 @@ public class XLIFFEvent {
 		return (type == XLIFFEventType.START_DOCUMENT);
 	}
 	
+	public DocumentData getDocumentData () {
+		return (DocumentData)object;
+	}
+	
 	public boolean isEndDocument () {
 		return (type == XLIFFEventType.END_DOCUMENT);
 	}

@@ -29,12 +29,12 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.filters.po.POFilter;
-import net.sf.okapi.filters.po.POFilterWriter;
+import net.sf.okapi.filters.po.POWriter;
 
 import org.junit.Before;
 import org.junit.Test;
 
-public class POFilterWriterTest {
+public class POWriterTest {
 	
 	private LocaleId locEN = LocaleId.fromString("en");
 	private LocaleId locFR = LocaleId.fromString("fr");
@@ -155,7 +155,7 @@ public class POFilterWriterTest {
 	private String rewrite (ArrayList<Event> list,
 		LocaleId trgLang)
 	{
-		POFilterWriter writer = new POFilterWriter();
+		POWriter writer = new POWriter();
 		writer.setOptions(trgLang, "UTF-8");
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
 		writer.setOutput(output);

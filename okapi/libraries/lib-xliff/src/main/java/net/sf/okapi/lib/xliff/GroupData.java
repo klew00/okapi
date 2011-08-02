@@ -20,9 +20,7 @@
 
 package net.sf.okapi.lib.xliff;
 
-import java.io.Serializable;
-
-public class GroupData extends EventData implements Serializable {
+public class GroupData extends EventData {
 	
 	private static final long serialVersionUID = 0100L;
 	

@@ -58,7 +58,7 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
  * group and text unit.
  * okpctx: sd=ID:gp=ID:gp=ID...:tuID
  */
-public class POFilterWriter implements IFilterWriter {
+public class POWriter implements IFilterWriter {
 
 	public static final String CRUMBS_PREFIX = "okpCtx";
 	public static final String SUBDOCUMENT_CRUMB = "sd=";
@@ -84,7 +84,7 @@ public class POFilterWriter implements IFilterWriter {
 	private boolean transFuzzy; // Used when forExtractMerge == true 
 	private String crumbs;
 	
-	public POFilterWriter () {
+	public POWriter () {
 		params = new Parameters();
 		fmt = new GenericContent();
 		plurals = new ArrayList<ITextUnit>();

@@ -22,7 +22,9 @@ package net.sf.okapi.lib.xliff;
 
 import java.io.Serializable;
 
-public class Part implements Serializable {
+import org.oasisopen.xliff.v2.IWithExtendedAttributes;
+
+public class Part implements Serializable, IWithExtendedAttributes {
 
 	private static final long serialVersionUID = 0100L;
 
@@ -30,6 +32,7 @@ public class Part implements Serializable {
 	protected Fragment source;
 	protected Fragment target;
 	protected int targetOrder;
+	protected ExtendedAttributes xattrs;
 	
 	public Part (CodeStore store) {
 		this.store = store;
@@ -84,8 +87,28 @@ public class Part implements Serializable {
 		this.targetOrder = targetOrder;
 	}
 	
+	public int getTargetOrder () {
+		return targetOrder;
+	}
+	
 	public CodeStore getCodeStore () {
 		return store;
+	}
+
+	@Override
+	public void setExtendedAttributes (ExtendedAttributes attributes) {
+		this.xattrs = attributes;
+	}
+
+	@Override
+	public ExtendedAttributes getExtendedAttributes () {
+		return xattrs;
+	}
+
+	@Override
+	public boolean hasExtendedAttribute () {
+		if ( xattrs == null ) return false;
+		return (xattrs.size() > 0);
 	}
 
 }

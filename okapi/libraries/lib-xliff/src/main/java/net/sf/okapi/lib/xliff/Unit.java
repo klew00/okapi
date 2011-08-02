@@ -20,7 +20,6 @@
 
 package net.sf.okapi.lib.xliff;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -31,7 +30,7 @@ import org.oasisopen.xliff.v2.INote;
 import org.oasisopen.xliff.v2.IWithCandidates;
 import org.oasisopen.xliff.v2.IWithNotes;
 
-public class Unit extends EventData implements Iterable<Part>, Serializable, IWithCandidates, IWithNotes {
+public class Unit extends EventData implements Iterable<Part>, IWithCandidates, IWithNotes {
 	
 	private static final long serialVersionUID = 0100L;
 

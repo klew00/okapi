@@ -22,40 +22,44 @@ package net.sf.okapi.lib.xliff;
 
 import java.io.Serializable;
 
-import org.oasisopen.xliff.v2.IWithExtendedAttributes;
+import javax.xml.namespace.QName;
 
-class EventData implements Serializable, IWithExtendedAttributes {
+public class ExtendedAttribute implements Serializable {
 
 	private static final long serialVersionUID = 0100L;
-	
-	private String id;
-	private ExtendedAttributes xattrs;
 
-	public String getId () {
-		return id;
-	}
-	
-	public void setId (String id) {
-		this.id = id;
-	}
-	
-	@Override
-	public void setExtendedAttributes (ExtendedAttributes attributes) {
-		this.xattrs = attributes;
+	private QName qname;
+	private String value;
+
+	public ExtendedAttribute (QName qname,
+		String value)
+	{
+		this.qname = qname;
+		this.value = value;
 	}
 
-	@Override
-	public ExtendedAttributes getExtendedAttributes () {
-		if ( xattrs == null ) {
-			xattrs = new ExtendedAttributes();
-		}
-		return xattrs;
+	public QName getQName () {
+		return qname;
 	}
-
-	@Override
-	public boolean hasExtendedAttribute () {
-		if ( xattrs == null ) return false;
-		return (xattrs.size() > 0);
+	
+	public String getValue () {
+		return value;
+	}
+	
+	public void setValue (String value) {
+		this.value = value;
+	}
+	
+	public String getLocalPart () {
+		return qname.getLocalPart();
+	}
+	
+	public String getNamespaceURI () {
+		return qname.getNamespaceURI();
+	}
+	
+	public String getPrefix () {
+		return qname.getPrefix();
 	}
 
 }

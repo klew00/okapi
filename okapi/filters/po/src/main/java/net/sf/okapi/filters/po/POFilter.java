@@ -514,12 +514,12 @@ public class POFilter implements IFilter {
 
 	private void parseCrumbs (String text) {
 		// Check if it is a crumbs-string or not
-		if ( !text.startsWith(POFilterWriter.CRUMBS_PREFIX) ) return;
+		if ( !text.startsWith(POWriter.CRUMBS_PREFIX) ) return;
 
 		// Get the text unit id
-		int n = text.indexOf(POFilterWriter.TEXTUNIT_CRUMB);
+		int n = text.indexOf(POWriter.TEXTUNIT_CRUMB);
 		if ( n == -1 ) return; // No text unit id available
-		originalTuId = text.substring(n+POFilterWriter.TEXTUNIT_CRUMB.length()).trim();
+		originalTuId = text.substring(n+POWriter.TEXTUNIT_CRUMB.length()).trim();
 		if ( originalTuId.isEmpty() ) {
 			// Something is not right
 			originalTuId = null;

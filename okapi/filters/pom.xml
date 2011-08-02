@@ -42,5 +42,6 @@
 		<module>archive</module>
 		<module>transifex</module>
 		<module>xini</module>
+		<module>txml</module>
     </modules>
 </project>

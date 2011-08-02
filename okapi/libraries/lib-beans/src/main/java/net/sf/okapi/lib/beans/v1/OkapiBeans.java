@@ -60,7 +60,7 @@ import net.sf.okapi.common.skeleton.ZipSkeleton;
 import net.sf.okapi.filters.openxml.ConditionalParameters;
 import net.sf.okapi.filters.openxml.OpenXMLZipFilterWriter;
 import net.sf.okapi.filters.pensieve.PensieveFilterWriter;
-import net.sf.okapi.filters.po.POFilterWriter;
+import net.sf.okapi.filters.po.POWriter;
 import net.sf.okapi.lib.persistence.BeanMapper;
 import net.sf.okapi.lib.persistence.IVersionDriver;
 import net.sf.okapi.lib.persistence.NamespaceMapper;
@@ -121,7 +121,7 @@ public class OkapiBeans implements IVersionDriver {
 		// Registered here to require dependencies at compile-time
 		beanMapper.registerBean(OpenXMLZipFilterWriter.class, TypeInfoBean.class); 		
 		beanMapper.registerBean(PensieveFilterWriter.class, TypeInfoBean.class);
-		beanMapper.registerBean(POFilterWriter.class, TypeInfoBean.class);
+		beanMapper.registerBean(POWriter.class, TypeInfoBean.class);
 		beanMapper.registerBean(TableFilterWriter.class, TypeInfoBean.class);
 		// Annotations		
 		beanMapper.registerBean(Annotations.class, AnnotationsBean.class);

@@ -140,14 +140,13 @@ public class XLIFFWriter {
 	public void writeEvent (XLIFFEvent event) {
 		switch ( event.getType() ) {
 		case START_DOCUMENT:
-			// nothing to do
-			// writeStartDocument() is called from writeUnit() as needed
+			writeStartDocument(event.getDocumentData(), null);
 			break;
 			
 		case START_SECTION:
 			SectionData sd = event.getSectionData();
 			setLanguages(sd.getSourceLanguage(), sd.getTargetLanguage());
-			// writeStartFile() is called from writeUnit() as needed
+			writeStartFile(sd);
 			break;
 			
 		case START_GROUP:
@@ -178,8 +177,9 @@ public class XLIFFWriter {
 		if ( unit.getPartCount() == 0 ) {
 			return;
 		}
-		if ( !inFile ) writeStartFile();
+		if ( !inFile ) writeStartFile(null);
 		writer.print(indent+String.format("<unit id=\"%s\"", Util.toXML(unit.getId(), true)));
+		writeExtendedAttributes(unit.getExtendedAttributes());
 		writer.print(">"+lb);
 		if ( isIndented ) indent += " ";
 		
@@ -191,7 +191,12 @@ public class XLIFFWriter {
 			Segment seg = null;
 			if ( part instanceof Segment ) {
 				seg = (Segment)part;
-				writer.print(indent+"<"+Util.ELEM_SEGMENT+">"+lb);
+				writer.print(indent+"<"+Util.ELEM_SEGMENT);
+				if ( seg.getId() != null ) {
+					writer.print(" id=\"" + seg.getId() + "\"");
+				}
+				writeExtendedAttributes(part.getExtendedAttributes());
+				writer.print(">"+lb);
 			}
 			else {
 				writer.print(indent+"<"+Util.ELEM_IGNORABLE+">"+lb);
@@ -202,7 +207,7 @@ public class XLIFFWriter {
 			writeFragment(Util.ELEM_SOURCE, part.getSource(), 0);
 			// Target
 			if ( part.hasTarget() ) {
-				writeFragment(Util.ELEM_TARGET, part.getTarget(true), part.targetOrder);
+				writeFragment(Util.ELEM_TARGET, part.getTarget(true), part.getTargetOrder());
 			}
 			
 			if ( seg != null ) {
@@ -226,6 +231,18 @@ public class XLIFFWriter {
 		writer.print(indent+"</unit>"+lb);
 	}
 
+	private void writeExtendedAttributes (ExtendedAttributes attributes) {
+		if ( attributes == null ) return;
+		for ( String namespaceURI : attributes.getNamespaces() ) {
+			writer.print(" xmlns:" + attributes.getNamespacePrefix(namespaceURI)
+				+ "=\"" + namespaceURI + "\"");
+		}
+		for ( ExtendedAttribute att : attributes ) {
+			writer.print(" " + att.getPrefix() + ":" + att.getLocalPart()
+				+ "=\"" + Util.toXML(att.getValue(), true) + "\"");
+		}
+	}
+	
 	private void writeCandidates (IWithCandidates parent) {
 		if ( parent.getCandidates().size() == 0 ) {
 			return;
@@ -273,14 +290,15 @@ public class XLIFFWriter {
 		writer.print(indent+"</notes>"+lb);
 	}
 	
-	public void writeStartDocument (String extraAttributes,
+	public void writeStartDocument (DocumentData docData,
 		String comment)
 	{
-		writer.print("<?xml version=\"1.0\"?>"+lb);
-		writer.print("<xliff xmlns=\""+Util.NS_XLIFF20+"\" version=\"2.0\"");
-		if ( !Util.isNullOrEmpty(extraAttributes) ) {
-			writer.print(lb+extraAttributes);
+		if ( docData == null ) {
+			docData = new DocumentData("2.0");
 		}
+		writer.print("<?xml version=\"1.0\"?>"+lb);
+		writer.print("<xliff xmlns=\""+Util.NS_XLIFF20+"\" version=\""+docData.getVersion()+"\"");
+		writeExtendedAttributes(docData.getExtendedAttributes());
 		writer.print(">"+lb);
 		if ( isIndented ) indent += " ";
 		inDocument = true;
@@ -301,11 +319,14 @@ public class XLIFFWriter {
 		}
 	}
 	
-	public void writeStartFile () {
+	public void writeStartFile (SectionData secData) {
 		if ( !inDocument ) writeStartDocument(null, null);
 		writer.print(indent+String.format("<%s %s=\"%s\"", Util.ELEM_SECTION, Util.ATTR_SOURCELANG, sourceLang));
 		if ( !Util.isNullOrEmpty(targetLang) ) {
 			writer.print(String.format(" %s=\"%s\"", Util.ATTR_TARGETLANG, targetLang));
+		}
+		if ( secData != null ) {
+			writeExtendedAttributes(secData.getExtendedAttributes());
 		}
 		writer.print(">"+lb);
 		if ( isIndented ) indent += " ";
@@ -321,7 +342,7 @@ public class XLIFFWriter {
 	}
 	
 	public void writeStartGroup (GroupData groupData) {
-		if ( !inFile ) writeStartFile();
+		if ( !inFile ) writeStartFile(null);
 		writer.print(indent+"<"+Util.ELEM_GROUP);
 		if ( groupData != null ) {
 			writer.print(String.format(" %s=\"%s\"", Util.ATTR_ID, groupData.getId()));

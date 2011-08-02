@@ -20,42 +20,18 @@
 
 package net.sf.okapi.lib.xliff;
 
-import java.io.Serializable;
-
-import org.oasisopen.xliff.v2.IWithExtendedAttributes;
-
-class EventData implements Serializable, IWithExtendedAttributes {
-
+public class DocumentData extends EventData {
+	
 	private static final long serialVersionUID = 0100L;
 	
-	private String id;
-	private ExtendedAttributes xattrs;
+	private String version;
 
-	public String getId () {
-		return id;
+	public DocumentData (String version) {
+		this.version = version;
 	}
 	
-	public void setId (String id) {
-		this.id = id;
-	}
-	
-	@Override
-	public void setExtendedAttributes (ExtendedAttributes attributes) {
-		this.xattrs = attributes;
-	}
-
-	@Override
-	public ExtendedAttributes getExtendedAttributes () {
-		if ( xattrs == null ) {
-			xattrs = new ExtendedAttributes();
-		}
-		return xattrs;
-	}
-
-	@Override
-	public boolean hasExtendedAttribute () {
-		if ( xattrs == null ) return false;
-		return (xattrs.size() > 0);
+	public String getVersion () {
+		return version;
 	}
 
 }

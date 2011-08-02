@@ -22,7 +22,7 @@ package net.sf.okapi.steps.rainbowkit.po;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.resource.ITextUnit;
-import net.sf.okapi.filters.po.POFilterWriter;
+import net.sf.okapi.filters.po.POWriter;
 import net.sf.okapi.filters.po.Parameters;
 import net.sf.okapi.filters.rainbowkit.Manifest;
 import net.sf.okapi.filters.rainbowkit.MergingInfo;
@@ -30,7 +30,7 @@ import net.sf.okapi.steps.rainbowkit.common.BasePackageWriter;
 
 public class POPackageWriter extends BasePackageWriter {
 
-	private POFilterWriter writer;
+	private POWriter writer;
 
 	public POPackageWriter () {
 		super(Manifest.EXTRACTIONTYPE_PO);
@@ -47,7 +47,7 @@ public class POPackageWriter extends BasePackageWriter {
 	protected void processStartDocument (Event event) {
 		super.processStartDocument(event);
 		
-		writer = new POFilterWriter();
+		writer = new POWriter();
 		Parameters params = (Parameters)writer.getParameters();
 		params.setOutputGeneric(true);
 		

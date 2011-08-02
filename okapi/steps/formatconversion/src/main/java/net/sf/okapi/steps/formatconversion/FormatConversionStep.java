@@ -39,7 +39,7 @@ import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.filters.pensieve.PensieveFilterWriter;
-import net.sf.okapi.filters.po.POFilterWriter;
+import net.sf.okapi.filters.po.POWriter;
 
 @UsingParameters(Parameters.class)
 public class FormatConversionStep extends BasePipelineStep {
@@ -221,7 +221,7 @@ public class FormatConversionStep extends BasePipelineStep {
 	}
 
 	private void createPOWriter () {
-		writer = new POFilterWriter();
+		writer = new POWriter();
 		net.sf.okapi.filters.po.Parameters outParams = (net.sf.okapi.filters.po.Parameters)writer.getParameters();
 		outParams.setOutputGeneric(params.getUseGenericCodes());
 	}

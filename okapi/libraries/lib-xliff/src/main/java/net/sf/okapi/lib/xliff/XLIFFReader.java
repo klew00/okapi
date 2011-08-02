@@ -31,6 +31,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Stack;
 
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -45,6 +46,7 @@ public class XLIFFReader {
 	private XMLStreamReader reader;
 	private boolean hasNext;
 	private LinkedList<XLIFFEvent> queue;
+	private DocumentData docData;
 	private SectionData sectionData;
 	private Stack<GroupData> groups;
 	private Unit unit;
@@ -121,7 +123,7 @@ public class XLIFFReader {
 					// Not used. The start-document occurs when opening the <xliff> element.
 					break;
 				case XMLStreamReader.END_DOCUMENT:
-					queue.add(new XLIFFEvent(XLIFFEventType.END_DOCUMENT, null));
+					queue.add(new XLIFFEvent(XLIFFEventType.END_DOCUMENT, docData));
 					return;
 				case XMLStreamReader.START_ELEMENT:
 					tmp = reader.getLocalName();
@@ -163,32 +165,19 @@ public class XLIFFReader {
 	}
 
 	private void processXliff () {
-		
-//		String version = null;
-//		for ( int i=0; i<reader.getAttributeCount(); i++ ) {
-//			if ( !reader.isAttributeSpecified(i) ) continue; // Skip defaults
-//			QName qn = reader.getAttributeName(i);
-//			String value = reader.getAttributeValue(i);
-//			if ( qn.getLocalPart().equals("version") ) {
-//				version = value;
-//			}
-//			
-//		}
-//		cannotBeNullOrEmpty("version", version);
-//		if ( !version.equals("2.0") ) {
-//			throw new XLIFFReaderException("Not a 2.0 XLIFF document.");
-//		}
-		
 		String tmp = reader.getAttributeValue(null, "version");
 		cannotBeNullOrEmpty("version", tmp);
 		if ( !tmp.equals("2.0") ) {
 			throw new XLIFFReaderException("Not a 2.0 XLIFF document.");
 		}
-		queue.add(new XLIFFEvent(XLIFFEventType.START_DOCUMENT, null));
+		docData = new DocumentData(tmp);
+		docData.setExtendedAttributes(gatherExtendedAttributes());
+		
+		queue.add(new XLIFFEvent(XLIFFEventType.START_DOCUMENT, docData));
 	}
 
 	private void processStartSection () {
-		sectionData = new SectionData("sectionId");
+		sectionData = new SectionData("sectionId"); //TODO: section id
 
 		// Get original
 		String tmp = reader.getAttributeValue(null, "original");
@@ -207,6 +196,8 @@ public class XLIFFReader {
 		if ( cannotBeEmpty(Util.ATTR_TARGETLANG, tmp) ) {
 			sectionData.setTargetLanguage(tmp);
 		}
+	
+		sectionData.setExtendedAttributes(gatherExtendedAttributes());
 		
 		// We are done
 		queue.add(new XLIFFEvent(XLIFFEventType.START_SECTION, sectionData));
@@ -217,13 +208,14 @@ public class XLIFFReader {
 		String tmp = reader.getAttributeValue(null, Util.ATTR_ID);
 		cannotBeEmpty(Util.ATTR_ID, tmp);
 		GroupData gd = new GroupData(tmp);
-
+		
 		// Get type
 		tmp = reader.getAttributeValue(null, "type");
 		if ( cannotBeEmpty("type", tmp) ) {
 			gd.setType(tmp);
 		}
-	
+		gd.setExtendedAttributes(gatherExtendedAttributes());
+		
 		// We are done
 		groups.push(gd);
 		queue.add(new XLIFFEvent(XLIFFEventType.START_SECTION, gd));
@@ -275,6 +267,7 @@ public class XLIFFReader {
 		String tmp = reader.getAttributeValue(null, Util.ATTR_ID);
 		cannotBeNullOrEmpty(Util.ATTR_ID, tmp);
 		unit = new Unit(tmp);
+		unit.setExtendedAttributes(gatherExtendedAttributes());
 		
 		while ( reader.hasNext() ) {
 			switch ( reader.next() ) {
@@ -343,7 +336,6 @@ public class XLIFFReader {
 			}
 		}
 	}
-	
 	
 	private void processNote (IWithNotes parent)
 		throws XMLStreamException
@@ -438,9 +430,11 @@ public class XLIFFReader {
 			if ( mustBeYesOrNo(Util.ATTR_TRANSLATABLE, tmp) ) {
 				segment.setTranslatable(tmp.equals("yes"));
 			}
+			segment.setExtendedAttributes(gatherExtendedAttributes());
 		}
 		else {
 			ignorable = unit.appendNewIgnorable();
+			ignorable.setExtendedAttributes(gatherExtendedAttributes());
 		}
 
 		while ( reader.hasNext() ) {
@@ -572,5 +566,34 @@ public class XLIFFReader {
 		}
 		// Else: it's OK to use the inside content
 		return (outsideId == null);
+	}
+
+	private ExtendedAttributes gatherExtendedAttributes () {
+		ExtendedAttributes attrs = null;
+		// Get the namespaces
+		for ( int i=0; i<reader.getNamespaceCount(); i++ ) {
+			String namespaceURI = reader.getNamespaceURI(i);
+			if ( !namespaceURI.equals(Util.NS_XLIFF20) ) {
+				if ( attrs == null ) {
+					attrs = new ExtendedAttributes();
+				}
+				attrs.setNamespace(reader.getNamespacePrefix(i), namespaceURI);
+			}
+		}
+		// Get the attributes
+		for ( int i=0; i<reader.getAttributeCount(); i++ ) {
+			QName qname = reader.getAttributeName(i);
+			// Store only the attributes that are not XLIFF
+			if (( qname.getNamespaceURI() != null ) && !qname.getNamespaceURI().isEmpty() ) {
+				if ( !qname.getNamespaceURI().equals(Util.NS_XLIFF20) ) {
+					if ( attrs == null ) {
+						attrs = new ExtendedAttributes();
+					}
+					attrs.setAttribute(new ExtendedAttribute(qname, reader.getAttributeValue(i)));
+				}
+			}
+		}
+		if (( attrs == null ) || ( attrs.size() == 0 )) return null;
+		return attrs;
 	}
 }

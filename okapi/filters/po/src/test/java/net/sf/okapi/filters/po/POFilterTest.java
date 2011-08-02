@@ -353,7 +353,7 @@ public class POFilterTest {
 
 	@Test
 	public void testTUContextParsing () {
-		String snippet = "msgctxt \""+POFilterWriter.CRUMBS_PREFIX+":tu=123\"\n"
+		String snippet = "msgctxt \""+POWriter.CRUMBS_PREFIX+":tu=123\"\n"
 			+ "msgid \"Source\"\n"
 			+ "msgstr \"Target\"\n";
 		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
@@ -364,7 +364,7 @@ public class POFilterTest {
 
 	@Test
 	public void testNoQuoteOnSameLinee () {
-		String snippet = "msgctxt \n\""+POFilterWriter.CRUMBS_PREFIX+":tu=123\"\n"
+		String snippet = "msgctxt \n\""+POWriter.CRUMBS_PREFIX+":tu=123\"\n"
 			+ "msgid \n\"Source\"\n"
 			+ "msgstr \n\"Target\"\n";
 		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
@@ -376,10 +376,10 @@ public class POFilterTest {
 	
 	@Test
 	public void testOuputNoQuoteOnSameLinee () {
-		String snippet = "msgctxt \n\""+POFilterWriter.CRUMBS_PREFIX+":tu=123\"\n"
+		String snippet = "msgctxt \n\""+POWriter.CRUMBS_PREFIX+":tu=123\"\n"
 			+ "msgid \n\"Source\"\n"
 			+ "msgstr \n\"Target\"\n";
-		String expect = "msgctxt \"\"\n\""+POFilterWriter.CRUMBS_PREFIX+":tu=123\"\n"
+		String expect = "msgctxt \"\"\n\""+POWriter.CRUMBS_PREFIX+":tu=123\"\n"
 			+ "msgid \"\"\n\"Source\"\n"
 			+ "msgstr \"\"\n\"Target\"\n";
 		assertEquals(expect, FilterTestDriver.generateOutput(getEvents(snippet, locEN, locFR),
