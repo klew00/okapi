@@ -31,9 +31,11 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 
 	static final String PRESERVESEGMENTATION = "preserveSegmentation"; //$NON-NLS-1$
 	static final String RETURNRAWDOCUMENT = "returnRawDocument"; //$NON-NLS-1$
+	static final String FORCETARGETLOCALE = "forceTargetLocale"; //$NON-NLS-1$
 	
 	private boolean preserveSegmentation;
 	private boolean returnRawDocument;
+	private boolean forceTargetLocale;
 
 	public Parameters () {
 		reset();
@@ -45,6 +47,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		// so preserving the segmentation is not needed
 		preserveSegmentation = false;
 		returnRawDocument= false;
+		forceTargetLocale = false;
 	}
 
 	@Override
@@ -53,13 +56,15 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.fromString(data);
 		preserveSegmentation = buffer.getBoolean(PRESERVESEGMENTATION, preserveSegmentation);
 		returnRawDocument = buffer.getBoolean(RETURNRAWDOCUMENT, returnRawDocument);
+		forceTargetLocale = buffer.getBoolean(FORCETARGETLOCALE, forceTargetLocale);
 	}
 
 	@Override
 	public String toString () {
 		buffer.reset();
-		buffer.setParameter(PRESERVESEGMENTATION, preserveSegmentation);
-		buffer.setParameter(RETURNRAWDOCUMENT, returnRawDocument);
+		buffer.setBoolean(PRESERVESEGMENTATION, preserveSegmentation);
+		buffer.setBoolean(RETURNRAWDOCUMENT, returnRawDocument);
+		buffer.setBoolean(FORCETARGETLOCALE, forceTargetLocale);
 		return buffer.toString();
 	}
 
@@ -79,11 +84,20 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.returnRawDocument = returnRawDocument;
 	}
 
+	public boolean getForceTargetLocale () {
+		return forceTargetLocale;
+	}
+	
+	public void setForceTargetLocale (boolean forceTargetLocale) {
+		this.forceTargetLocale = forceTargetLocale;
+	}
+	
 	@Override
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
 		desc.add(PRESERVESEGMENTATION, "Preserve the segmentation for the next steps", null);
 		desc.add(RETURNRAWDOCUMENT, "Return raw documents instead of filter events", null);
+		desc.add(FORCETARGETLOCALE, "Specify the target locale from the tool instead of the manifest", null);
 		return desc;
 	}
 
@@ -92,6 +106,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		EditorDescription desc = new EditorDescription(MergingStep.NAME, true, false);
 		desc.addCheckboxPart(paramDesc.get(PRESERVESEGMENTATION));
 		desc.addCheckboxPart(paramDesc.get(RETURNRAWDOCUMENT));
+		desc.addCheckboxPart(paramDesc.get(FORCETARGETLOCALE));
 		return desc;
 	}
 

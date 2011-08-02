@@ -170,15 +170,17 @@ public class TXMLFilterTest {
 		assertNull(tu.getTarget(locFR));
 	}
 
-//	@Test
-//	public void testDoubleExtraction () {
-//		// Read all files in the data directory
-//		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
-//		list.add(new InputDocument(root+"Test01.docx.txml", null));
-//		RoundTripComparison rtc = new RoundTripComparison();
-//		// Use non-forced segmentation output
-//		assertTrue(rtc.executeCompare(filter1, list, "UTF-8", locEN, locFR));
-//	}
+	@Test
+	public void testDoubleExtraction () {
+		// Read all files in the data directory
+		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
+		list.add(new InputDocument(root+"Test01.docx.txml", null));
+		list.add(new InputDocument(root+"Test02.html.txml", null));
+		list.add(new InputDocument(root+"Test03.mif.txml", null));
+		RoundTripComparison rtc = new RoundTripComparison();
+		// Use non-forced segmentation output
+		assertTrue(rtc.executeCompare(filter1, list, "UTF-8", locEN, locFR));
+	}
 	
 	private ArrayList<Event> getEvents (IFilter filter,
 		String snippet,

@@ -117,7 +117,7 @@ public class TXMLFilter implements IFilter {
 
 	@Override
 	public String getDisplayName () {
-		return "TXML Filter (ALPHA - Do not use yet)";
+		return "TXML Filter (BETA)";
 	}
 
 	@Override
@@ -244,7 +244,7 @@ public class TXMLFilter implements IFilter {
 			startDoc.setProperty(new Property(Property.ENCODING, encoding, false));
 			skel.append("<?xml version=\"1.0\" encoding=\"");
 			skel.addValuePlaceholder(startDoc, Property.ENCODING, LocaleId.EMPTY);
-			skel.append("\"?>");
+			skel.append("\"?>"+lineBreak);
 			startDoc.setSkeleton(skel);
 		}
 		catch ( XMLStreamException e) {
@@ -431,8 +431,13 @@ public class TXMLFilter implements IFilter {
 						srcCont.append(ws1, srcCont.count()==1);
 						if ( trgCont != null ) trgCont.append(ws1.clone(), trgCont.count()==1);
 					}
+					
 					// Set content: source, then target if needed
 					srcCont.getSegments().append(srcSeg, srcCont.count()==1);
+					// Record the WS used to allow proper merging back later
+					srcSeg.setAnnotation(new TXMLSegAnnotation(
+						(ws1==null ? "" : "b") + (ws2==null ? "" : "a")));
+					
 					if ( trgSeg != null ) {
 						trgCont.getSegments().append(trgSeg, trgCont.count()==1);
 						hasOneTarget = true;

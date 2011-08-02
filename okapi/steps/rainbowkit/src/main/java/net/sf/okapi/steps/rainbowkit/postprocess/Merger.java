@@ -64,14 +64,28 @@ public class Merger {
 	private RawDocument rawDoc;
 	private boolean useSubDoc;
 	
+	/**
+	 * Creates a Merger object. 
+	 * @param manifest The manifest to process.
+	 * @param fcMapper the filter mapper to use.
+	 * @param preserveSegmentation true to preserve the segmentation after the merge is done.
+	 * @param forcedTargetLocale null to use the target locale in the manifest, otherwise: the target locale to merge.
+	 * @param returnRawDocument true to return a raw document rather than filter events.
+	 */
 	public Merger (Manifest manifest,
 		IFilterConfigurationMapper fcMapper,
 		boolean preserveSegmentation,
+		LocaleId forcedTargetLocale,
 		boolean returnRawDocument)
 	{
 		this.fcMapper = fcMapper;
 		this.manifest = manifest;
-		trgLoc = manifest.getTargetLocale();
+		if ( forcedTargetLocale != null ) {
+			trgLoc = forcedTargetLocale;
+		}
+		else {
+			trgLoc = manifest.getTargetLocale();
+		}
 		this.preserveSegmentation = preserveSegmentation;
 		this.returnRawDocument = returnRawDocument;
 	}

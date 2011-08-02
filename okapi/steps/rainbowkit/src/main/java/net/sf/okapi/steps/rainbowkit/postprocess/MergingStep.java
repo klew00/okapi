@@ -22,6 +22,7 @@ package net.sf.okapi.steps.rainbowkit.postprocess;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
@@ -41,6 +42,7 @@ public class MergingStep extends BasePipelineStep {
 	private MergingInfo info;
 	private Merger merger;
 	private IFilterConfigurationMapper fcMapper;
+	private LocaleId targetLocale;
 
 	public MergingStep () {
 		super();
@@ -61,6 +63,11 @@ public class MergingStep extends BasePipelineStep {
 	@StepParameterMapping(parameterType = StepParameterType.FILTER_CONFIGURATION_MAPPER)
 	public void setFilterConfigurationMapper (IFilterConfigurationMapper fcMapper) {
 		this.fcMapper = fcMapper;
+	}
+	
+	@StepParameterMapping(parameterType = StepParameterType.TARGET_LOCALE)
+	public void setTargetLocale (LocaleId targetLocale) {
+		this.targetLocale = targetLocale; 
 	}
 	
 	@Override
@@ -91,7 +98,15 @@ public class MergingStep extends BasePipelineStep {
 		
 		// Create the merger if needed
 		if ( merger == null ) {
-			merger = new Merger(manifest, fcMapper, params.getPreserveSegmentation(), params.getReturnRawDocument());
+			
+			if ( params.getForceTargetLocale() ) {
+				merger = new Merger(manifest, fcMapper, params.getPreserveSegmentation(),
+					targetLocale, params.getReturnRawDocument());
+			}
+			else {
+				merger = new Merger(manifest, fcMapper, params.getPreserveSegmentation(),
+					null, params.getReturnRawDocument());
+			}
 		}
 		// And trigger the merging
 		return merger.startMerging(info, event);

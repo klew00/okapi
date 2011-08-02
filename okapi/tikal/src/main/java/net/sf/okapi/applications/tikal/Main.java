@@ -622,6 +622,9 @@ public class Main {
 		extensionsMap.put(".zip", "okf_archive");
 		filtersMap.put("okf_archive", "net.sf.okapi.filters.archive.ArchiveFilter");
 
+		extensionsMap.put(".txml", "okf_txml");
+		filtersMap.put("okf_txml", "net.sf.okapi.filters.txml.TXMLFilter");
+
 		filtersMap.put("okf_versifiedtxt", "net.sf.okapi.filters.versifiedtxt.VersifiedTextFilter");
 		filtersMap.put("okf_xmlstream", "net.sf.okapi.filters.xmlstream.XmlStreamFilter");
 		filtersMap.put("okf_mosestext", "net.sf.okapi.filters.mosestext.MosesTextFilter");

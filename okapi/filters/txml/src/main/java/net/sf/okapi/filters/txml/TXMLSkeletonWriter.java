@@ -20,17 +20,11 @@
 
 package net.sf.okapi.filters.txml;
 
-import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
-import net.sf.okapi.common.encoder.EncoderManager;
-import net.sf.okapi.common.filterwriter.ILayerProvider;
 import net.sf.okapi.common.resource.Code;
-import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Segment;
-import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextPart;
@@ -47,18 +41,6 @@ public class TXMLSkeletonWriter extends GenericSkeletonWriter {
 	{
 		this.forceSegmentedOutput = forceSegments;
 		this.fallBackToSource = fallBackToSource;
-	}
-	
-	@Override
-	public String processStartDocument (LocaleId outputLocale,
-		String outputEncoding,
-		ILayerProvider layer,
-		EncoderManager encoderManager,
-		StartDocument resource)
-	{
-		// Always use UTF-8 for the output encoding
-		outputEncoding = "UTF-8";
-		return super.processStartDocument(outputLocale, outputEncoding, layer, encoderManager, resource);
 	}
 	
 	@Override
@@ -106,6 +88,7 @@ public class TXMLSkeletonWriter extends GenericSkeletonWriter {
 			
 			// This is a segment: treat it now
 			Segment srcSeg = (Segment)part;
+			TXMLSegAnnotation segAnn = srcSeg.getAnnotation(TXMLSegAnnotation.class);
 			// Get the target, so we can get all information to output the segment attributes
 			AltTranslation altTrans = null;
 			Segment trgSeg = null;
@@ -139,10 +122,14 @@ public class TXMLSkeletonWriter extends GenericSkeletonWriter {
 			if ( i > 0 ) {
 				part = srcCont.get(i-1);
 				if ( !part.isSegment() ) {
-					// Yes, output it as WS
-					tmp.append("<ws>");
-					tmp.append(processFragment(part.getContent(), 1));
-					tmp.append("</ws>");
+					if ((( segAnn == null ) && ( i == 1 ))
+						|| (( segAnn != null ) && segAnn.hasWSBefore() )) {
+						// Not an original segment, but first one
+						// Or original segment did have a ws before
+						tmp.append("<ws>");
+						tmp.append(processFragment(part.getContent(), 1));
+						tmp.append("</ws>");
+					}
 				}
 			}
 			
@@ -150,24 +137,29 @@ public class TXMLSkeletonWriter extends GenericSkeletonWriter {
 			tmp.append("<source>");
 			tmp.append(processFragment(srcSeg.getContent(), 1));
 			tmp.append("</source>");
+
+			// Do we have a part after the segment?
+			// Note: the DTD indicates (ws?, source, target? ws?)
+			// but the files are really (as declared in the XSD): (ws?, source, ws? target)
+			if ( i+1 < srcCont.count() ) {
+				part = srcCont.get(i+1);
+				if ( !part.isSegment() ) {
+					if (( segAnn == null ) || (( segAnn != null ) && segAnn.hasWSAfter() )) {
+						// Not an original segment (any position)
+						// Or original segment did have a ws after
+						tmp.append("<ws>");
+						tmp.append(processFragment(part.getContent(), 1));
+						tmp.append("</ws>");
+					}
+					i++; // This part is done
+				}
+			}
 			
 			// Output the target (if any)
 			if ( trgSeg != null ) {
 				tmp.append("<target>");
 				tmp.append(processFragment(trgSeg.getContent(), 0));
 				tmp.append("</target>");
-			}
-			
-			// Do we have a part after the segment?
-			if ( i+1 < srcCont.count() ) {
-				part = srcCont.get(i+1);
-				if ( !part.isSegment() ) {
-					// Yes, output it as WS
-					tmp.append("<ws>");
-					tmp.append(processFragment(part.getContent(), 1));
-					tmp.append("</ws>");
-					i++; // This part is done
-				}
 			}
 
 			// Close the segment
@@ -181,17 +173,17 @@ public class TXMLSkeletonWriter extends GenericSkeletonWriter {
 		return tmp.toString();
 	}
 	
-	private Segment fetchNextSegment (TextContainer tc,
-		int fromIndex)
-	{
-		for ( int i=fromIndex; i<tc.count(); i++ ) {
-			TextPart part = tc.get(i);
-			if ( part.isSegment() ) {
-				return (Segment)part;
-			}
-		}
-		return null;
-	}
+//	private Segment fetchNextSegment (TextContainer tc,
+//		int fromIndex)
+//	{
+//		for ( int i=fromIndex; i<tc.count(); i++ ) {
+//			TextPart part = tc.get(i);
+//			if ( part.isSegment() ) {
+//				return (Segment)part;
+//			}
+//		}
+//		return null;
+//	}
 	
 	private int fetchNextSegmentIndex (TextContainer tc,
 		int fromIndex)
@@ -242,67 +234,67 @@ public class TXMLSkeletonWriter extends GenericSkeletonWriter {
 		}
 	}
 	
-	private String processSegment (Segment srcSeg,
-		TextFragment trgFrag,
-		AltTranslation altTrans)
-	{
-		TextFragment srcFrag = srcSeg.getContent();
-		if ( trgFrag == null ) { // No target available: use the source
-			trgFrag = srcFrag;
-		}
+//	private String processSegment (Segment srcSeg,
+//		TextFragment trgFrag,
+//		AltTranslation altTrans)
+//	{
+//		TextFragment srcFrag = srcSeg.getContent();
+//		if ( trgFrag == null ) { // No target available: use the source
+//			trgFrag = srcFrag;
+//		}
+//
+//		StringBuilder tmp = new StringBuilder();
+//		tmp.append("<segment segmentId=\""+srcSeg.getId()+"\"");
+//		if ( altTrans != null ) {
+////			tmp.append(String.format("MatchPercent=\"%d\">", altTrans.getScore()));
+//		}
+//		
+//		tmp.append("><source>");
+//		tmp.append(processFragment(srcFrag, 1));
+//		tmp.append("</source>");
+//		
+//		tmp.append("<target>");
+//
+//		if ( layer != null ) {
+//			if ( altTrans != null ) {
+//				// This is an entry with source and target
+//				tmp.append(layer.endCode());
+//				tmp.append(layer.startSegment());
+//				tmp.append(processFragment(srcFrag, 1));
+//				tmp.append(layer.midSegment(altTrans.getScore()));
+//				tmp.append(processFragment(trgFrag, 0));
+//				tmp.append(layer.endSegment());
+//				tmp.append(layer.startCode());
+//			}
+//			else {
+//				// Write target only
+//				tmp.append(layer.endCode()); 
+//				tmp.append(processFragment(trgFrag, 0));
+//				tmp.append(layer.startCode()); 
+//			}
+//		}
+//		else {
+//			tmp.append(processFragment(trgFrag, 0));
+//		}
+//		
+//		tmp.append("</target>");
+//		tmp.append("</segment>");
+//		return tmp.toString();
+//	}
 
-		StringBuilder tmp = new StringBuilder();
-		tmp.append("<segment segmentId=\""+srcSeg.getId()+"\"");
-		if ( altTrans != null ) {
-//			tmp.append(String.format("MatchPercent=\"%d\">", altTrans.getScore()));
-		}
-		
-		tmp.append("><source>");
-		tmp.append(processFragment(srcFrag, 1));
-		tmp.append("</source>");
-		
-		tmp.append("<target>");
-
-		if ( layer != null ) {
-			if ( altTrans != null ) {
-				// This is an entry with source and target
-				tmp.append(layer.endCode());
-				tmp.append(layer.startSegment());
-				tmp.append(processFragment(srcFrag, 1));
-				tmp.append(layer.midSegment(altTrans.getScore()));
-				tmp.append(processFragment(trgFrag, 0));
-				tmp.append(layer.endSegment());
-				tmp.append(layer.startCode());
-			}
-			else {
-				// Write target only
-				tmp.append(layer.endCode()); 
-				tmp.append(processFragment(trgFrag, 0));
-				tmp.append(layer.startCode()); 
-			}
-		}
-		else {
-			tmp.append(processFragment(trgFrag, 0));
-		}
-		
-		tmp.append("</target>");
-		tmp.append("</segment>");
-		return tmp.toString();
-	}
-
-	/**
-	 * Verifies that this skeleton writer can be used for internal purpose by the TTXFilter
-	 * for outputting skeleton chunks.
-	 * @param lineBreak the type of line-break to use.
-	 */
-	protected void checkForFilterInternalUse (String lineBreak) {
-		if ( encoderManager == null ) {
-			encoderManager = new EncoderManager();
-			encoderManager.setMapping(MimeTypeMapper.TTX_MIME_TYPE, "net.sf.okapi.common.encoder.XMLEncoder");
-			encoderManager.setDefaultOptions(null, "US-ASCII", lineBreak); // Make sure we escape extended
-			encoderManager.updateEncoder(MimeTypeMapper.TTX_MIME_TYPE);
-		}
-	}
+//	/**
+//	 * Verifies that this skeleton writer can be used for internal purpose by the TXMLFilter
+//	 * for outputting skeleton chunks.
+//	 * @param lineBreak the type of line-break to use.
+//	 */
+//	protected void checkForFilterInternalUse (String lineBreak) {
+//		if ( encoderManager == null ) {
+//			encoderManager = new EncoderManager();
+//			encoderManager.setMapping(MimeTypeMapper.TTX_MIME_TYPE, "net.sf.okapi.common.encoder.XMLEncoder");
+//			encoderManager.setDefaultOptions(null, "US-ASCII", lineBreak); // Make sure we escape extended
+//			encoderManager.updateEncoder(MimeTypeMapper.TTX_MIME_TYPE);
+//		}
+//	}
 	
 	/**
 	 * Outputs a fragment.
