@@ -266,12 +266,17 @@ public class VersifiedTextWriter implements IFilterWriter {
 			}
 
 			// |v
-			writer.write("|v" + String.valueOf(++verseCount) + linebreak);
+			// the numeric verse id is not unique but we inherit the 
+			// |c chapter name which should be unique per document
+			// here we split out the verse id from the chapter id
+			String verseId = tu.getId().split(":")[1];
+			writer.write("|v" + verseId + linebreak);
 
 			// source
 			boolean lastCharWasNewline = writeTextContainer(tu.getSource());
 			// <TARGET> tag
-			writer.write((lastCharWasNewline ? "" : linebreak) + "<TARGET>" + linebreak);
+			String targetTag = (lastCharWasNewline ? "" : linebreak) + "<TARGET>" + linebreak; 
+			writer.write(targetTag);
 			writeTextContainer(tu.getTarget(language));
 		} catch (IOException e) {
 			throw new OkapiIOException("Error writing a versified text unit.", e);
@@ -281,7 +286,8 @@ public class VersifiedTextWriter implements IFilterWriter {
 	private boolean writeTextContainer(TextContainer tc) {
 		try {
 			if (tc == null) {
-				return false;
+				writer.write("\n");
+				return true;
 			}
 
 			String tmp;

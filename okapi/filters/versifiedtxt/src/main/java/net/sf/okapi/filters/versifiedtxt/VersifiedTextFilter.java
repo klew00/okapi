@@ -38,6 +38,7 @@ import net.sf.okapi.common.filters.AbstractFilter;
 import net.sf.okapi.common.filters.EventBuilder;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.ITextUnit;
@@ -45,6 +46,7 @@ import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
+import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 
 /**
  * {@link IFilter} for a Versified text file.
@@ -90,8 +92,8 @@ public class VersifiedTextFilter extends AbstractFilter {
 		this.currentBook = "";		
 
 		setMimeType(VERSIFIED_TXT_MIME_TYPE);
-		setMultilingual(true);
-		setFilterWriter(new VersifiedTextWriter());
+		setMultilingual(false); // default value, could be multilingual we check below
+		setFilterWriter(new GenericFilterWriter(createSkeletonWriter(), getEncoderManager()));	
 		// Cannot use '_' or '-' in name: conflicts with other filters (e.g. plaintext, table)
 		// for defining different configurations
 		setName("okf_versifiedtxt"); //$NON-NLS-1$
@@ -103,7 +105,7 @@ public class VersifiedTextFilter extends AbstractFilter {
 
 	@Override
 	public IFilterWriter createFilterWriter() {
-		return getFilterWriter();
+		return super.createFilterWriter();
 	}
 
 	@Override
@@ -159,6 +161,27 @@ public class VersifiedTextFilter extends AbstractFilter {
 				generateSkeleton);
 
 		versifiedFileReader = new BufferedReader(input.getReader());
+		
+		// is the format multilingual?
+		String line = "";		
+		int bufferCount = 0;
+		try {
+			versifiedFileReader.mark(BUFFER_SIZE);
+			while ((line = versifiedFileReader.readLine()) != null) {
+				bufferCount += line.length();
+				if (bufferCount >= BUFFER_SIZE) {
+					break;
+				}
+				if (line.matches(TARGET)) {
+					setMultilingual(true);
+					break;
+				}
+			}
+			versifiedFileReader.reset();
+		} catch (IOException e) {
+			throw new OkapiIOException("IO error detecting if file is multilingual: "
+					+ (line == null ? "unkown line" : line), e);
+		}		
 		
 		// create EventBuilder with document name as rootId
 		if (eventBuilder == null) {
@@ -332,7 +355,10 @@ public class VersifiedTextFilter extends AbstractFilter {
 					filterBuffer.setLength(filterBuffer.length() - 1);
 					currentLine = filterBuffer.toString();
 					currentLine = Util.trimEnd(currentLine, "\r\n");
-					filterBuffer = new StringBuilder(BUFFER_SIZE - 1);					
+					filterBuffer = new StringBuilder(BUFFER_SIZE - 1);
+					
+					// newline is always normalized to \n inside TextUnit except for skeleton
+					newline = handleNewline();
 
 					// don't output newline if this is the last text in the file
 					nl = "\n";
@@ -378,7 +404,12 @@ public class VersifiedTextFilter extends AbstractFilter {
 		if (trg) {
 			GenericSkeleton bilingualSkel = new GenericSkeleton(); 
 			bilingualSkel.addContentPlaceholder(tu);
-			bilingualSkel.add("<TARGET>" + newline);
+			boolean lastCharWasNewline = false;
+			if (source.toString().endsWith("\n")) {
+				lastCharWasNewline = true;
+			}
+			String targetTag = (lastCharWasNewline ? "" : newline) + "<TARGET>" + newline; 
+			bilingualSkel.add(targetTag);
 			bilingualSkel.addContentPlaceholder(tu, getTrgLoc());
 			tu.setSkeleton(bilingualSkel);			
 		}

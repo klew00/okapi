@@ -48,7 +48,7 @@ public class VersifiedTextWriterTest {
 	}
 	
 	@Test
-	public void testBilingualWithGenericWriter() throws IOException {
+	public void testBilingual() throws IOException {
 		String snippet = "|bbook\n|cchapter\n|v1\nsource\n<TARGET>\ntarget\n|v2\nsource2\n<TARGET>\ntarget2";
 		String expected = "|bbook\n|cchapter\n|v1\nsource\n<TARGET>\ntarget\n|v2\nsource2\n<TARGET>\ntarget2";
 		String result = eventWriter(snippet);
@@ -58,7 +58,7 @@ public class VersifiedTextWriterTest {
 	@Test
 	public void testOutputSimpleBookChapterVerse() throws IOException {
 		String snippet = "|bbook\n|cchapter\n|v1\nThis is a test.";
-		String expected = "|bbook\n|cchapter\n|v1\nThis is a test.\n<TARGET>\n"; 
+		String expected = "|bbook\n|cchapter\n|v1\nThis is a test."; 
 		String result = eventWriter(snippet);
 		assertEquals(expected, result);
 	}
