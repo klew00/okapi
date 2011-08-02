@@ -15,7 +15,6 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.BOMNewlineEncodingDetector.NewlineType;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiFileNotFoundException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
@@ -35,12 +34,10 @@ public class VersifiedTextWriter implements IFilterWriter {
 	private String encoding;
 	private String linebreak;
 	private File tempFile;
-	private GenericContent formatter;
-	private int verseCount;
+	private GenericContent formatter;	
 
 	public VersifiedTextWriter() {
-		verseCount = 0;
-		formatter = new GenericContent();
+		formatter = new GenericContent();		
 	}
 
 	@Override
@@ -232,8 +229,8 @@ public class VersifiedTextWriter implements IFilterWriter {
 
 	private void processStartDocument(Event event) {
 		try {
-			verseCount = 0;
 			StartDocument sd = event.getStartDocument();
+			
 			// Create the output
 			createWriter(sd);
 
@@ -250,7 +247,6 @@ public class VersifiedTextWriter implements IFilterWriter {
 
 	private void processStartSubDocument(Event event) {
 		try {
-			verseCount = 0;
 			StartSubDocument ssd = (StartSubDocument) event.getResource();
 			writer.write("|c" + ssd.getName() + linebreak);
 		} catch (IOException e) {
@@ -276,11 +272,16 @@ public class VersifiedTextWriter implements IFilterWriter {
 			writer.write("|v" + verseId + linebreak);
 
 			// source
-			boolean lastCharWasNewline = writeTextContainer(tu.getSource());
-			// <TARGET> tag
-			String targetTag = (lastCharWasNewline ? "" : linebreak) + "<TARGET>" + linebreak; 
-			writer.write(targetTag);
+			writeTextContainer(tu.getSource());
+			// <TARGET> tag			
+			writer.write(linebreak + "<TARGET>" + linebreak);
 			writeTextContainer(tu.getTarget(language));
+			// there is always two newlines after the target text as formatting unless the target is empty
+			if (tu.getTarget(language) == null || tu.getTarget(language).isEmpty()) {
+				writer.write(linebreak); 
+			} else {
+				writer.write(linebreak + linebreak);
+			}
 		} catch (IOException e) {
 			throw new OkapiIOException("Error writing a versified text unit.", e);
 		}
@@ -288,9 +289,8 @@ public class VersifiedTextWriter implements IFilterWriter {
 
 	private boolean writeTextContainer(TextContainer tc) {
 		try {
-			if (tc == null) {
-				writer.write("\n");
-				return true;
+			if (tc == null) {				
+				return false;
 			}
 
 			String tmp;

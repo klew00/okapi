@@ -27,6 +27,8 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.swing.text.rtf.RTFEditorKit;
+
 import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
@@ -46,7 +48,6 @@ import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
-import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 
 /**
  * {@link IFilter} for a Versified text file.
@@ -344,7 +345,6 @@ public class VersifiedTextFilter extends AbstractFilter {
 		StringBuilder source = new StringBuilder(BUFFER_SIZE);
 		StringBuilder target = new StringBuilder(BUFFER_SIZE);
 		boolean trg = false;
-		String nl = "\n";
 		
 		verse.mark(BUFFER_SIZE);
 		while (currentChar != -1) {			
@@ -360,15 +360,8 @@ public class VersifiedTextFilter extends AbstractFilter {
 					// newline is always normalized to \n inside TextUnit except for skeleton
 					newline = handleNewline();
 
-					// don't output newline if this is the last text in the file
-					nl = "\n";
-					if (currentChar == -1) {
-						nl = "";
-					}
-
 					if (currentLine.matches(VERSE) || currentLine.matches(BOOK) || currentLine.matches(CHAPTER)) {						
 						verse.reset();
-						nl = "";
 						break;
 					}
 
@@ -376,11 +369,11 @@ public class VersifiedTextFilter extends AbstractFilter {
 						trg = true;			
 						continue;
 					}
-
+					
 					if (trg) {
-						target.append(currentLine + nl);
+						target.append(currentLine + "\n");
 					} else {
-						source.append(currentLine + nl);
+						source.append(currentLine + "\n");
 					}
 					verse.mark(BUFFER_SIZE);
 				}
@@ -391,31 +384,46 @@ public class VersifiedTextFilter extends AbstractFilter {
 		}
 
 		eventBuilder.startTextUnit();
-		processPlaceHolders(source.toString(), true);
-		if (trg) {
-			processPlaceHolders(target.toString(), false);
+
+		// assume any newlines after the final content goes with the string
+		// but we have to at least remove the extra newline added above
+		String s = source.toString().replaceFirst("\n", "");
+		String t = target.toString().replaceFirst("\n", "");		
+		if (currentChar != -1) {
+			if (trg) {
+				s = s.replaceFirst("\n", "");
+				t = t.replaceFirst("\n", "");
+			} else {
+				s = s.replaceFirst("\n", "").replaceFirst("\n", "");
+			}
 		}
+		
+		processPlaceHolders(s, true);
+		if (trg) {
+			processPlaceHolders(t, false);
+		}
+				
 		// reset for source processing
 		eventBuilder.setTargetLocale(null);
 		ITextUnit tu = eventBuilder.peekMostRecentTextUnit();
 		
 		// if this was a bilingual verse then setup the <TARGET> tag
-		// as skeleton		
-		if (trg) {
-			GenericSkeleton bilingualSkel = new GenericSkeleton(); 
-			bilingualSkel.addContentPlaceholder(tu);
-			boolean lastCharWasNewline = false;
-			if (source.toString().endsWith("\n")) {
-				lastCharWasNewline = true;
-			}
-			String targetTag = (lastCharWasNewline ? "" : newline) + "<TARGET>" + newline; 
-			bilingualSkel.add(targetTag);
-			bilingualSkel.addContentPlaceholder(tu, getTrgLoc());
-			tu.setSkeleton(bilingualSkel);			
+		// as skeleton
+		GenericSkeleton skel = new GenericSkeleton();
+		skel.addContentPlaceholder(tu);			
+		if (trg) { // bilingual case			 						 
+			skel.add(newline + "<TARGET>" + newline);
+			skel.addContentPlaceholder(tu, getTrgLoc());			 						
+		} 		
+		// always two newlines after final string of the verse no matter mono or bilingual
+		// not not if its the final string
+		if (currentChar != -1) {			
+			skel.add(newline + newline); 
 		}
+		tu.setSkeleton(skel);
 		
 		tu.setName(currentBook + ":" + currentChapter + ":" + verseNumber);
-		tu.setId(currentChapter + ":" + verseNumber);
+		tu.setId(currentChapter + (currentChapter != null && currentChapter.isEmpty() ? "" : ":") + verseNumber);
 		eventBuilder.endTextUnit();
 	}
 
@@ -445,5 +453,5 @@ public class VersifiedTextFilter extends AbstractFilter {
 
 	private void handleDocumentPart(String part) {
 		eventBuilder.addDocumentPart(part);
-	}
+	}	
 }

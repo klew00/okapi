@@ -17,4 +17,3 @@ More testing
 Published by
 Okapi Framework contributors
 
-

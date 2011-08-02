@@ -42,15 +42,15 @@ public class VersifiedTextWriterTest {
 	@Before
 	public void setUp() {
 		filter = new VersifiedTextFilter();
-		writer = filter.createFilterWriter();
+		writer = new VersifiedTextWriter();
 		filter.setOptions(LocaleId.ENGLISH, LocaleId.SPANISH, "UTF-8", true);
 		root = TestUtil.getParentDir(this.getClass(), "/part1.txt");
 	}
 	
 	@Test
 	public void testBilingual() throws IOException {
-		String snippet = "|bbook\n|cchapter\n|v1\nsource\n<TARGET>\ntarget\n|v2\nsource2\n<TARGET>\ntarget2";
-		String expected = "|bbook\n|cchapter\n|v1\nsource\n<TARGET>\ntarget\n|v2\nsource2\n<TARGET>\ntarget2";
+		String snippet = "|bbook\n|cchapter\n|v1\nsource\n<TARGET>\ntarget\n\n|v2\nsource2\n<TARGET>\ntarget2";
+		String expected = "|bbook\n|cchapter\n|v1\nsource\n<TARGET>\ntarget\n\n|v2\nsource2\n<TARGET>\ntarget2\n\n";
 		String result = eventWriter(snippet);
 		assertEquals(expected, result);
 	}
@@ -58,7 +58,7 @@ public class VersifiedTextWriterTest {
 	@Test
 	public void testOutputSimpleBookChapterVerse() throws IOException {
 		String snippet = "|bbook\n|cchapter\n|v1\nThis is a test.";
-		String expected = "|bbook\n|cchapter\n|v1\nThis is a test."; 
+		String expected = "|bbook\n|cchapter\n|v1\nThis is a test.\n<TARGET>\n\n"; 
 		String result = eventWriter(snippet);
 		assertEquals(expected, result);
 	}

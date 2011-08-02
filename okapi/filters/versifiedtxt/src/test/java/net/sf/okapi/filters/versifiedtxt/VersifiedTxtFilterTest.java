@@ -89,7 +89,7 @@ public class VersifiedTxtFilterTest {
 	@Test
 	public void testOutputSimpleBookChapterVerseWithMacLB () {
 		String snippet = "|bbook\r|cchapter\r|v0\rTest\r\r|v1\rThis is a test.";
-		String expected = "|bbook\r|cchapter\r|v0\rTest\r\r|v1\rThis is a test.";
+		String expected = snippet;
 		String result = FilterTestDriver.generateOutput(getEvents(snippet),
 			filter.getEncoderManager(), LocaleId.ENGLISH);
 		assertEquals(expected, result);
@@ -127,27 +127,35 @@ public class VersifiedTxtFilterTest {
 
 	@Test
 	public void testBilingual() {		
-		String snippet = "|bbook\n|cchapter\n|v1\nsource\n<TARGET>\ntarget\n|v2\nsource2\n<TARGET>\ntarget2";
+		String snippet = "|bbook\n|cchapter\n|v1\nsource\n<TARGET>\ntarget\n\n|v2\nsource2\n<TARGET>\ntarget2\n\n";
 		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
-		assertEquals("source\n", tu.getSource().toString());		
-		assertEquals("target\n", tu.getTarget(filter.getTrgLoc()).toString());
+		assertEquals("source", tu.getSource().toString());		
+		assertEquals("target", tu.getTarget(filter.getTrgLoc()).toString());
 		
 		tu = FilterTestDriver.getTextUnit(getEvents(snippet), 2);
 		assertNotNull(tu);
-		assertEquals("source2\n", tu.getSource().toString());
-		assertEquals("target2", tu.getTarget(filter.getTrgLoc()).toString());
+		assertEquals("source2", tu.getSource().toString());
+		assertEquals("target2\n\n", tu.getTarget(filter.getTrgLoc()).toString());
 	}
 	
 	@Test
 	public void testBilingualWithGenericWriter() {
-		String snippet = "|bbook\n|cchapter\n|v1\nsource\n<TARGET>\ntarget\n|v2\nsource2\n<TARGET>\ntarget2";
-		String expected = "|bbook\n|cchapter\n|v1\nsource\n<TARGET>\ntarget\n|v2\nsource2\n<TARGET>\ntarget2";
+		String snippet = "|bbook\n|cchapter\n|v1\nsource\n<TARGET>\ntarget\n\n|v2\nsource2\n<TARGET>\ntarget2";
+		String expected = snippet;
 		String result = FilterTestDriver.generateOutput(getEvents(snippet),
 			filter.getEncoderManager(), LocaleId.SPANISH);
 		assertEquals(expected, result);
 	}
 	
+	@Test
+	public void testBilingualWithGenericWriterWIthMissingNewlines() {
+		String snippet = "|bbook\n|cchapter\n|v1\nsource\n<TARGET>\ntarget\n|v2\nsource2\n<TARGET>\ntarget2";
+		String expected = "|bbook\n|cchapter\n|v1\nsource\n<TARGET>\ntarget\n\n|v2\nsource2\n<TARGET>\ntarget2";
+		String result = FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), LocaleId.SPANISH);
+		assertEquals(expected, result);
+	}
 	@Test
 	public void testBilingualWithEmptyVerses() {
 		String snippet = "|bbook\n|cchapter\n|v1\n<TARGET>\n|v2\n<TARGET>\n";
