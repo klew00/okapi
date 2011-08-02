@@ -269,7 +269,10 @@ public class VersifiedTextWriter implements IFilterWriter {
 			// the numeric verse id is not unique but we inherit the 
 			// |c chapter name which should be unique per document
 			// here we split out the verse id from the chapter id
-			String verseId = tu.getId().split(":")[1];
+			String verseId = tu.getId();
+			if (verseId.contains(":")) {
+				verseId = verseId.split("\\:")[1];
+			}			
 			writer.write("|v" + verseId + linebreak);
 
 			// source
