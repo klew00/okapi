@@ -23,7 +23,7 @@ package net.sf.okapi.filters.versifiedtxt;
 import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 
-class Parameters extends BaseParameters {
+public class Parameters extends BaseParameters {
 
 	private boolean allowEmptyOutputTarget;
 

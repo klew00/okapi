@@ -130,7 +130,7 @@ public final class FileUtil {
 			// Read the top of the file
 			String trgValue = null;
 			Pattern pattern = Pattern.compile(
-				"\\s(srclang|source-?language|xml:lang|lang|(target-?)?language)\\s*?=\\s*?['\"](.*?)['\"]",
+				"\\s(srclang|source-?language|xml:lang|lang|(target)?locale|(target-?)?language)\\s*?=\\s*?['\"](.*?)['\"]",
 				Pattern.CASE_INSENSITIVE);
 
 			int scanned = 0;
@@ -145,11 +145,12 @@ public final class FileUtil {
 				// For TMX: srcLang, xml:lang, lang
 				// For TTX: SourceLanguage, TargetLanguage, Lang
 				// For TS: sourcelanguage, language
+				// For TXML: locale, targetlocale
 				// Note: the order matter: target cases should be last
 				Matcher m = pattern.matcher(line);
 				int pos = 0;
 				while ( m.find(pos) ) {
-					String lang = m.group(3).toLowerCase();
+					String lang = m.group(4).toLowerCase();
 					if ( lang.isEmpty() ) {
 						pos = m.end();
 						continue;
@@ -157,7 +158,7 @@ public final class FileUtil {
 					String name = m.group(1).toLowerCase();
 				
 					// If we have a header-type target declaration
-					if ( name.equalsIgnoreCase("language") || name.startsWith("target") ) {
+					if ( name.equals("language") || name.startsWith("target") ) {
 						if ( list.isEmpty() ) {
 							// Note that we don't do anything to handle a second match, but that should be OK
 							trgValue = lang;

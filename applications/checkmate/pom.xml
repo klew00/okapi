@@ -45,5 +45,10 @@
 			<artifactId>okapi-filter-rtf</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>net.sf.okapi.filters</groupId>
+			<artifactId>okapi-filter-txml</artifactId>
+			<version>${project.version}</version>
+		</dependency>
     </dependencies>
 </project>

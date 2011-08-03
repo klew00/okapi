@@ -81,6 +81,8 @@
 		<fileset dir="../../okapi/filters/json/target/classes" includes="net/**"/>
 		<!-- IDML filter -->
 		<fileset dir="../../okapi/filters/idml/target/classes" includes="net/**"/>
+		<!-- TXML filter -->
+		<fileset dir="../../okapi/filters/txml/target/classes" includes="net/**"/>
 		<!-- Transifex filter and dependencies -->
 		<fileset dir="../../okapi/filters/transifex/target/classes" includes="net/**"/>
 		<fileset dir="../../okapi/libraries/lib-transifex/target/classes" includes="net/**"/>

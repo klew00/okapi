@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.common.filters.FilterConfiguration;
@@ -37,6 +38,7 @@ import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -91,7 +93,7 @@ public class VersifiedTxtFilterTest {
 		String snippet = "|bbook\r|cchapter\r|v0\rTest\r\r|v1\rThis is a test.";
 		String expected = snippet;
 		String result = FilterTestDriver.generateOutput(getEvents(snippet),
-			filter.getEncoderManager(), LocaleId.ENGLISH);
+			filter.getEncoderManager(), LocaleId.FRENCH);
 		assertEquals(expected, result);
 	}
 
@@ -104,6 +106,26 @@ public class VersifiedTxtFilterTest {
 		assertEquals(expected, result);
 	}
 
+	@Test
+	public void testOutputSimpleBookChapterVerseMultilingual () {
+		String snippet = "|bbook\n|cchapter\n|v1\nsource\n<TARGET>\n\n\n|v2\nsource2\n<TARGET>\ntarget2";
+		String expected = "|bbook\n|cchapter\n|v1\nsource\n<TARGET>\n\n\n|v2\nsource2\n<TARGET>\ntarget2";
+		String result = FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), LocaleId.FRENCH);
+		assertEquals(expected, result);
+	}
+
+	@Test
+	public void testOutputSimpleBookChapterVerseMultilingualFillTarget () {
+		String snippet = "|bbook\n|cchapter\n|v1\nsource\n<TARGET>\n\n\n|v2\nsource2\n<TARGET>\ntarget2";
+		String expected = "|bbook\n|cchapter\n|v1\nsource\n<TARGET>\nsource\n\n|v2\nsource2\n<TARGET>\ntarget2";
+		IParameters p = filter.getParameters();
+		p.setBoolean(GenericSkeletonWriter.ALLOWEMPTYOUTPUTTARGET, false);
+		String result = FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), LocaleId.FRENCH);
+		assertEquals(expected, result);
+	}
+	
 	@Test
 	public void testSimplePlaceholders() {
 		String snippet = "|bbook\n|cchapter\n|v1\n{1}This is {2}a test{3}";

@@ -132,7 +132,8 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		}
 		// By default do not allow empty target in output
 		allowEmptyOutputTarget = false;
-		if ( prm != null ) {
+		// Check if there is a parameter for allowing empty targets (only if the format is multilingual)
+		if (( prm != null ) && isMultilingual ) {
 			allowEmptyOutputTarget = prm.getBoolean(ALLOWEMPTYOUTPUTTARGET);
 		}
 		

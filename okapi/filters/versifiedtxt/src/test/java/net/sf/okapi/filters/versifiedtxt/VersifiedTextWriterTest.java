@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2011 by the Okapi Framework contributors
+  Copyright (C) 2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -27,7 +27,6 @@ import java.io.IOException;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.TestUtil;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.RawDocument;
 
@@ -37,14 +36,12 @@ import org.junit.Test;
 public class VersifiedTextWriterTest {
 	private VersifiedTextFilter filter;
 	private IFilterWriter writer;
-	private String root;
 		
 	@Before
 	public void setUp() {
 		filter = new VersifiedTextFilter();
 		writer = new VersifiedTextWriter();
 		filter.setOptions(LocaleId.ENGLISH, LocaleId.SPANISH, "UTF-8", true);
-		root = TestUtil.getParentDir(this.getClass(), "/part1.txt");
 	}
 	
 	@Test
