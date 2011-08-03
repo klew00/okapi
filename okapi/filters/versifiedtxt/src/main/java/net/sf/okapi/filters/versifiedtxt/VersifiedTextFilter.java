@@ -398,6 +398,10 @@ public class VersifiedTextFilter extends AbstractFilter {
 		
 		processPlaceHolders(s, true);
 		if (trg) {
+			// if this is the last target and there is no text then we don't want any newlines			
+			if (currentChar == -1 && t.replaceAll("\n", "").isEmpty()) {
+				t = "";
+			}
 			processPlaceHolders(t, false);
 		}
 				
