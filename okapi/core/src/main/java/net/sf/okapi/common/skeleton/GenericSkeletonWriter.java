@@ -63,7 +63,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 	protected Stack<StorageList> storageStack;
 	protected boolean isMultilingual;
 	// A few formats may require to allow empty target in output.
-	// They must be multilingual and not used with layer with this option
+	// They must be multilingual
 	protected boolean allowEmptyOutputTarget = false;
 	
 	private final Logger logger = Logger.getLogger(getClass().getName());
@@ -393,7 +393,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 			// or if the target is empty (regardless the source)
 			if (( trgCont == null ) || trgCont.isEmpty() ) {
 				// If there is no target available
-				if ( allowEmptyOutputTarget ) {
+				if ( allowEmptyOutputTarget && ( layer == null )) {
 					// If empty targets are allowed and we don't have one: create a temporary one
 					if ( trgCont == null ) {
 						trgCont = tu.createTarget(locToUse, false, IResource.CREATE_EMPTY);
