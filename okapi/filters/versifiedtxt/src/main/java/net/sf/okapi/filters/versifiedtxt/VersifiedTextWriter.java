@@ -288,8 +288,15 @@ public class VersifiedTextWriter implements IFilterWriter {
 			// here we split out the verse id from the chapter id
 			String verseId = tu.getId();
 			if (verseId.contains(":")) {
+				// this came from a the versified filter
 				verseId = verseId.split("\\:")[1];
-			}			
+			} else {
+				// this came from some other filter which usually has
+				// a number at the end of a tu id
+				// just grab any number on the end
+				verseId = verseId.replaceAll("^[^0-9]+", "");
+			}
+			
 			writer.write("|v" + verseId + linebreak);
 
 			// source
