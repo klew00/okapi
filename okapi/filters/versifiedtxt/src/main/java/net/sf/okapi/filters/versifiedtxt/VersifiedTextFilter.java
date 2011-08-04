@@ -65,7 +65,7 @@ public class VersifiedTextFilter extends AbstractFilter {
 	private static final String CHAPTER = "^\\|c.+$";
 	private static final String BOOK = "^\\|b.+$";
 	private static final String TARGET = "^<TARGET>$";
-	private static final String PLACEHOLDER = "(\\{|<)[0-9]+(\\}|>)";
+	private static final String PLACEHOLDER = "(\\{|</?)[0-9]+(\\}|>)";
 	private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile(PLACEHOLDER);
 
 	private String newline = "\n";
