@@ -33,14 +33,10 @@ import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 
 public class TXMLSkeletonWriter extends GenericSkeletonWriter {
 
-	private boolean forceSegmentedOutput;
-	private boolean fallBackToSource;
+	private boolean allowEmptyOutputTarget;
 	
-	public TXMLSkeletonWriter (boolean forceSegments,
-		boolean fallBackToSource)
-	{
-		this.forceSegmentedOutput = forceSegments;
-		this.fallBackToSource = fallBackToSource;
+	public TXMLSkeletonWriter (boolean allowEmptyOutputTarget) {
+		this.allowEmptyOutputTarget = allowEmptyOutputTarget;
 	}
 	
 	@Override
@@ -59,23 +55,14 @@ public class TXMLSkeletonWriter extends GenericSkeletonWriter {
 		tmp.append(getString(skel.getParts().get(0), 1));
 		
 		TextContainer srcCont = tu.getSource();
-		if ( forceSegmentedOutput && !srcCont.hasBeenSegmented() ) {
-			// Work from a clone if we need to change the segmentation
-			srcCont = srcCont.clone();
-			srcCont.setHasBeenSegmentedFlag(true);
-		}
 		ensureTxmlPattern(srcCont);
 		
 		TextContainer trgCont = null;
 		if ( tu.hasTarget(outputLoc) ) {
 			trgCont = tu.getTarget(outputLoc);
-			if ( forceSegmentedOutput && !trgCont.hasBeenSegmented() ) {
-				trgCont = trgCont.clone();
-				trgCont.setHasBeenSegmentedFlag(true);
-			}
 			ensureTxmlPattern(srcCont);
 		}
-		else if ( fallBackToSource ) { // Fall back to source if we have no target and it's requested
+		else if ( !allowEmptyOutputTarget ) { // Fall back to source if we have no target and it's requested
 			trgCont = srcCont;
 		}
 		
@@ -97,7 +84,9 @@ public class TXMLSkeletonWriter extends GenericSkeletonWriter {
 				trgSeg = trgCont.getSegments().get(srcSeg.id);
 				if ( trgSeg == null ) {
 					// Fall back to the source if requested
-					if ( fallBackToSource ) trgSeg = srcSeg;
+					if ( !allowEmptyOutputTarget ) {
+						trgSeg = srcSeg;
+					}
 				}
 				// Get the alt-trans possible
 				if ( trgSeg != null ) {

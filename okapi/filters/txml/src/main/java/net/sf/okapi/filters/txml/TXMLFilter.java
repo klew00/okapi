@@ -73,6 +73,7 @@ public class TXMLFilter implements IFilter {
 	
 	private final Logger logger = Logger.getLogger(getClass().getName());
 
+	private Parameters params;
 	private boolean hasNext;
 	private XMLStreamReader reader;
 	private LocaleId srcLoc;
@@ -88,7 +89,7 @@ public class TXMLFilter implements IFilter {
 	private EncoderManager encoderManager;
 	
 	public TXMLFilter () {
-		//params = new Parameters();
+		params = new Parameters();
 	}
 	
 	@Override
@@ -132,8 +133,15 @@ public class TXMLFilter implements IFilter {
 			MimeTypeMapper.XML_MIME_TYPE,
 			getClass().getName(),
 			"TXML",
-			"Wordfast TXML documents",
+			"Wordfast Pro TXML documents",
 			null,
+			".txml;"));
+		list.add(new FilterConfiguration(getName()+"-fillEmptyTargets",
+			MimeTypeMapper.XML_MIME_TYPE,
+			getClass().getName(),
+			"TXML (Fill empty targets in output)",
+			"Wordfast Pro TXML documents with empty targets filled on output.",
+			"fillEmptyTargets.fprm",
 			".txml;"));
 		return list;
 	}
@@ -149,7 +157,7 @@ public class TXMLFilter implements IFilter {
 	
 	@Override
 	public IParameters getParameters () {
-		return null; //params;
+		return params;
 	}
 
 	@Override
@@ -258,13 +266,13 @@ public class TXMLFilter implements IFilter {
 
 	@Override
 	public void setParameters (IParameters params) {
-		//this.params = (Parameters)params;
+		this.params = (Parameters)params;
 	}
 
 	@Override
 	public ISkeletonWriter createSkeletonWriter() {
 		if ( skelWriter == null ) {
-			skelWriter = new TXMLSkeletonWriter(false, false);
+			skelWriter = new TXMLSkeletonWriter(params.getAllowEmptyOutputTarget());
 		}
 		return skelWriter;
 	}
@@ -289,6 +297,10 @@ public class TXMLFilter implements IFilter {
 				}
 				else if ( "txml".equals(name) ){
 					processTxml();
+				}
+				else if ( "localizable".equals(name) ) {
+					buildStartElement(true);
+					logger.warning("The <localizable> element is not supported yet: it will not be extracted.");
 				}
 				else {
 					buildStartElement(true);
@@ -386,8 +398,8 @@ public class TXMLFilter implements IFilter {
 		boolean hasOneTarget = false;
 		boolean srcDone = false;
 		String tmp;
-		boolean modified = false;
 		boolean gtmt = false;
+		boolean modified = false;
 		
 		while ( reader.hasNext() ) {
 			switch ( reader.next() ) {
@@ -403,6 +415,10 @@ public class TXMLFilter implements IFilter {
 					if ( !Util.isEmpty(tmp) ) {
 						gtmt = tmp.equals("true");
 					}
+//					tmp = reader.getAttributeValue(null, "unconfirmed");
+//					if ( !Util.isEmpty(tmp) ) {
+//						contAnn.setUnconfirmed(tmp.equals("true"));
+//					}
 				}
 				else if ( "source".equals(name) ) {
 					tf = processContent(name);
@@ -464,8 +480,8 @@ public class TXMLFilter implements IFilter {
 					trgSeg = null;
 					ws2 = null;
 					srcDone = false;
-					modified = false;
 					gtmt = false;
+					modified = false;
 				}
 				else if ( "translatable".equals(name) ) {
 					if ( !hasOneTarget ) {

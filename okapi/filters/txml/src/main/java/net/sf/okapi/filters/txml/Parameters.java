@@ -23,72 +23,56 @@ package net.sf.okapi.filters.txml;
 import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.ParametersDescription;
-import net.sf.okapi.common.encoder.XMLEncoder;
 import net.sf.okapi.common.uidescription.EditorDescription;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 
 @EditorFor(Parameters.class)
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
-	protected static final String FORCESEGMENTS = "forceSegments";
+	public static final String ALLOWEMPTYOUTPUTTARGET = "allowEmptyOutputTarget";
 	
-	private boolean forceSegments;
-	private boolean escapeGT;
-	
+	private boolean allowEmptyOutputTarget;
 
 	public Parameters () {
 		reset();
 		toString(); // fill the list
 	}
 	
-	public boolean getForceSegments () {
-		return forceSegments;
+	public boolean getAllowEmptyOutputTarget () {
+		return allowEmptyOutputTarget;
 	}
 
-	public void setForceSegments (boolean forceSegments) {
-		this.forceSegments = forceSegments;
-	}
-
-	public boolean getEscapeGT () {
-		return escapeGT;
-	}
-
-	public void setEscapeGT (boolean escapeGT) {
-		this.escapeGT = escapeGT;
+	public void setAllowEmptyOutputTarget (boolean allowEmptyOutputTarget) {
+		this.allowEmptyOutputTarget = allowEmptyOutputTarget;
 	}
 
 	public void reset () {
-		forceSegments = true;
-		escapeGT = false;
+		allowEmptyOutputTarget = true;
 	}
 
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
-		forceSegments = buffer.getBoolean(FORCESEGMENTS, forceSegments);
-		escapeGT = buffer.getBoolean(XMLEncoder.ESCAPEGT, escapeGT);
+		allowEmptyOutputTarget = buffer.getBoolean(ALLOWEMPTYOUTPUTTARGET, allowEmptyOutputTarget);
 	}
 
 	@Override
 	public String toString () {
 		buffer.reset();
-		buffer.setBoolean(FORCESEGMENTS, forceSegments);
-		buffer.setBoolean(XMLEncoder.ESCAPEGT, escapeGT);
+		buffer.setBoolean(ALLOWEMPTYOUTPUTTARGET, allowEmptyOutputTarget);
 		return buffer.toString();
 	}
 	
 	@Override
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
-		desc.add(FORCESEGMENTS, "Force un-segmented entries to be output as a segment", null);
-		desc.add(XMLEncoder.ESCAPEGT, "Escape the greater-than characters", null);
+		desc.add(ALLOWEMPTYOUTPUTTARGET, "Allow empty target segments in output", null);
 		return desc;
 	}
 
 	public EditorDescription createEditorDescription (ParametersDescription paramDesc) {
 		EditorDescription desc = new EditorDescription("TXML Filter Parameters", true, false);
-		desc.addCheckboxPart(paramDesc.get(FORCESEGMENTS));
-		desc.addCheckboxPart(paramDesc.get(XMLEncoder.ESCAPEGT));
+		desc.addCheckboxPart(paramDesc.get(ALLOWEMPTYOUTPUTTARGET));
 		return desc;
 	}
 

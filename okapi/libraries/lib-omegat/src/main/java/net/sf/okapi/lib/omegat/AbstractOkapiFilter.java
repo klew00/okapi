@@ -246,10 +246,7 @@ abstract class AbstractOkapiFilter implements org.omegat.filters2.IFilter {
 					if ( tc == null ) {
 						// If there is no target we create one empty but segmented
 						// It'll be used for merging back
-						tc = tu.createTarget(trgLoc, false, IResource.COPY_ALL);
-						for ( Segment seg : tc.getSegments() ) {
-							seg.text = new TextFragment();
-						}
+						tc = tu.createTarget(trgLoc, false, IResource.COPY_SEGMENTATION);
 					}
 					trgSegs = tc.getSegments();
 					

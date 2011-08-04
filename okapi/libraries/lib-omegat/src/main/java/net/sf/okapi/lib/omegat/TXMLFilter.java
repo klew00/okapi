@@ -29,7 +29,7 @@ public class TXMLFilter extends AbstractOkapiFilter {
 	public TXMLFilter () {
 		initialize("Wordfast Pro TXML files",
 			"net.sf.okapi.filters.txml.TXMLFilter",
-			"okf_txml",
+			"okf_txml-fillEmptyTargets",
 			EXTENSION);
 	}
 
