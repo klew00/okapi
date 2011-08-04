@@ -921,14 +921,20 @@ public class RTFFilter implements IFilter {
 	
 	private int readChar () {
 		try {
-			int nRes = reader.read();
-			if ( nRes == -1 ) {
-				chCurrent = (char)0;
-				return TOKEN_ENDINPUT;
+			while ( true ) {
+				int nRes = reader.read();
+				if ( nRes == -1 ) {
+					chCurrent = (char)0;
+					return TOKEN_ENDINPUT;
+				}
+				// Strip out null char in RTF (to read some malformed RTfs)
+				if ( nRes == 0 ) {
+					continue;
+				}
+				// Else get the character
+				chCurrent = (char)nRes;
+				return TOKEN_CHAR;
 			}
-			// Else get the character
-			chCurrent = (char)nRes;
-			return TOKEN_CHAR;
 		}
 		catch ( IOException e ) {
 			throw new OkapiIOException(e);
