@@ -111,7 +111,7 @@ public interface IPredefinedLocales {
 	
 	static public final LocaleId Vietnamese = new LocaleId("vi_VN", true);
 	
-	static public final LocaleId Waray = new LocaleId("wrz_AU", true);
+	static public final LocaleId Waray = new LocaleId("war_PH", true); // aka Samarnon, Warai
 	
 	static public final LocaleId Xhosa = new LocaleId("xho_ZA", true);
 	
