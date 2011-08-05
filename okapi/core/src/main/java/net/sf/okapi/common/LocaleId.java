@@ -32,7 +32,7 @@ public final class LocaleId implements Comparable<Object> {
 	/**
 	 * An empty locale.
 	 */
-	static public LocaleId EMPTY = new LocaleId("", false);
+	static public final LocaleId EMPTY = new LocaleId("", false);
 	
 	// Default for a few locales used often
 	/**
