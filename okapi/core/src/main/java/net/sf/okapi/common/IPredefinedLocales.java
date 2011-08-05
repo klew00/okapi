@@ -31,7 +31,7 @@ public interface IPredefinedLocales {
 	static public final LocaleId Estonian = new LocaleId("et_EE", true);
 	
 	static public final LocaleId Fante = new LocaleId("fan_GH", true);
-	static public final LocaleId Fijian = new LocaleId("	fij_FJ", true);
+	static public final LocaleId Fijian = new LocaleId("fij_FJ", true);
 	static public final LocaleId Finnish = new LocaleId("fi_FI", true);
 	
 	static public final LocaleId Georgian = new LocaleId("ka_GE", true);
