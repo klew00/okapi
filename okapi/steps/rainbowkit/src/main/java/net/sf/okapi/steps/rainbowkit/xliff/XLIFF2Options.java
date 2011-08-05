@@ -83,9 +83,9 @@ public class XLIFF2Options extends BaseParameters implements IEditorDescriptionP
 		};
 		String[] labels = {
 			"Temporary XSD style",
-			"Native data not stored",
-			"Native data stored inline",
-			"Native data stored outside"
+			"Without original data stored",
+			"Original data stored inline",
+			"Original data stored outside the content"
 		};
 		ListSelectionPart lsp = desc.addListSelectionPart(paramsDesc.get(INLINESTYLE), values);
 		lsp.setChoicesLabels(labels);

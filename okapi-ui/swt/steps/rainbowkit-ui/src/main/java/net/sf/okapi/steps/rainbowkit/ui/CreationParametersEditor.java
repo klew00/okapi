@@ -272,7 +272,7 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		lbTypes.add("XLIFF 2.0 (Experimental - output only)");
 		lbTypes.setData("7", "net.sf.okapi.steps.rainbowkit.xliff.XLIFF2PackageWriter");
 		
-		lbTypes.add("Versified with RTF (BETA)");
+		lbTypes.add("Versified with RTF (Beta)");
 		lbTypes.setData("8", "net.sf.okapi.steps.rainbowkit.versified.VersifiedRtfPackageWriter");
 
 		gdTmp = new GridData(GridData.FILL_BOTH);
@@ -378,7 +378,8 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		case 5: // Transifex
 			btOptions.setEnabled(optEditors.get(n)!=null);
 			edDescription.setText("Package where translatable files are uploaded to an online Transifex project.\n"
-				+ "You can translate this package with the online Transifex editor or locally with PO editors.");
+				+ "You can translate this package with the online Transifex editor or locally with PO editors. "
+				+ "You can also use OmegaT to access the remote project directly.");
 			break;
 		case 6: // ONTRAM
 			btOptions.setEnabled(false);
@@ -388,11 +389,11 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		case 7: // XLIFF 2
 			btOptions.setEnabled(optEditors.get(n)!=null);
 			edDescription.setText("Simple package with XLIFF 2.0 experimental files.\n"
-				+ "Not for real projects. The XLIFF 2.0 format is defined yet. See XLIFF TC for more info and feedback.");
+				+ "Not for real projects. The XLIFF 2.0 format is defined yet. See XLIFF TC for more information or to provide feedback.");
 			break;
-		case 8: // Versified with RTF
+		case 8: // Versified Text with RTF
 			btOptions.setEnabled(false);
-			edDescription.setText("Package where the files to translate are converted into a versified RTF file with Trados-compatible styles.\n"
+			edDescription.setText("Package where the files to translate are converted into a Versified RTF file with Trados-compatible styles.\n"
 				+ "You can translate this package with Trados Translator's Workbench, WordFast or any RTF compatible editor.");
 			break;
 		}

@@ -31,11 +31,10 @@ import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
 	private boolean escapeGT;
-	
 
 	public Parameters () {
 		reset();
-		toString(); // fill the list
+		toString(); // Fill the list
 	}
 	
 	public boolean getEscapeGT () {
