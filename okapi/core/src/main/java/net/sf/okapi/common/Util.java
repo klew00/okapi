@@ -1288,6 +1288,28 @@ public final class Util {
 			return longDefault; 
 		}
 	}
+	
+	/**
+	 * Converts a string to a double. If the conversion fails the method
+	 * returns the given default value.
+	 * @param value the string to convert.
+	 * @param doubleDefault the default value to use if the conversion fails.
+	 * @return the double value of the string, or the provided default
+	 * value if the conversion failed.
+	 */
+	public static double strToDouble (String value,
+		double doubleDefault)
+	{
+		if ( Util.isEmpty(value) ) {
+			return doubleDefault;
+		}
+		try {
+			return Double.valueOf(value);
+		}
+		catch (NumberFormatException e) {
+			return doubleDefault; 
+		}
+	}
 
 	/**
 	 * Gets the element of an array for a given index.
