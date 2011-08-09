@@ -277,9 +277,9 @@
 		   <fileset dir="../shared/licenses" includes="**/dtdparser-*"/>
 		</copy>
 
-		<property name="dep002" value="${mavenStore}/net/htmlparser/jericho/jericho-html/3.1"/>
+		<property name="dep002" value="${mavenStore}/net/htmlparser/jericho/jericho-html/3.2"/>
 		<fileset id="list.contents" dir="${dep002}"
-		 includes="**/jericho-html-3.1.jar"/>
+		 includes="**/jericho-html-3.2.jar"/>
 		<property name="jar002" refid="list.contents"/>
 		<echo file="tmpJars" append="yes"> ${jar002}</echo>
 		<copy todir="${distLib}" file="${dep002}/${jar002}"/>
@@ -297,9 +297,9 @@
 		   <fileset dir="../shared/licenses" includes="**/snakeyaml-*"/>
 		</copy>
 
-		<property name="dep005bis" value="${mavenStore}/com/h2database/h2/1.2.135"/>
+		<property name="dep005bis" value="${mavenStore}/com/h2database/h2/1.3.158"/>
 		<fileset id="list.contents" dir="${dep005bis}"
-		 includes="**/h2-1.2.135.jar"/>
+		 includes="**/h2-1.3.158.jar"/>
 		<property name="jar005bis" refid="list.contents"/>
 		<echo file="tmpJars" append="yes"> ${jar005bis}</echo>
 		<copy todir="${distLib}" file="${dep005bis}/${jar005bis}"/>
@@ -317,16 +317,16 @@
 		   <fileset dir="../shared/licenses" includes="**/json-simple-*"/>
 		</copy>
 
-		<property name="dep010" value="${mavenStore}/commons-discovery/commons-discovery/0.2"/>
+		<property name="dep010" value="${mavenStore}/commons-discovery/commons-discovery/0.4"/>
 		<fileset id="list.contents" dir="${dep010}"
-		 includes="**/commons-discovery-0.2.jar"/>
+		 includes="**/commons-discovery-0.4.jar"/>
 		<property name="jar010" refid="list.contents"/>
 		<echo file="tmpJars" append="yes"> ${jar010}</echo>
 		<copy todir="${distLib}" file="${dep010}/${jar010}"/>
 		<!-- + -->
-		<property name="dep011" value="${mavenStore}/commons-logging/commons-logging/1.0.4"/>
+		<property name="dep011" value="${mavenStore}/commons-logging/commons-logging/1.1.1"/>
 		<fileset id="list.contents" dir="${dep011}"
-		 includes="**/commons-logging-1.0.4.jar"/>
+		 includes="**/commons-logging-1.1.1.jar"/>
 		<property name="jar011" refid="list.contents"/>
 		<echo file="tmpJars" append="yes"> ${jar011}</echo>
 		<copy todir="${distLib}" file="${dep011}/${jar011}"/>
@@ -365,16 +365,16 @@
 		   <fileset dir="../shared/licenses" includes="**/axis-*"/>
 		</copy>
 
-		<property name="dep018" value="${mavenStore}/org/apache/lucene/lucene-core/3.1.0"/>
+		<property name="dep018" value="${mavenStore}/org/apache/lucene/lucene-core/3.3.0"/>
 		<fileset id="list.contents" dir="${dep018}"
-		 includes="**/lucene-core-3.1.0.jar"/>
+		 includes="**/lucene-core-3.3.0.jar"/>
 		<property name="jar018" refid="list.contents"/>
 		<echo file="tmpJars" append="yes"> ${jar018}</echo>
 		<copy todir="${distLib}" file="${dep018}/${jar018}"/>
 
-		<property name="dep020" value="${mavenStore}/com/ibm/icu/icu4j/4.8"/>
+		<property name="dep020" value="${mavenStore}/com/ibm/icu/icu4j/4.8.1"/>
 		<fileset id="list.contents" dir="${dep020}"
-		 includes="**/icu4j-4.8.jar"/>
+		 includes="**/icu4j-4.8.1.jar"/>
 		<property name="jar020" refid="list.contents"/>
 		<echo file="tmpJars" append="yes"> ${jar020}</echo>
 		<copy todir="${distLib}" file="${dep020}/${jar020}"/>
@@ -392,9 +392,9 @@
 		   <fileset dir="../shared/licenses" includes="**/trove*"/>
 		</copy>
 		
-		<property name="dep022" value="${mavenStore}/org/apache/commons/commons-exec/1.0.1"/>
+		<property name="dep022" value="${mavenStore}/org/apache/commons/commons-exec/1.1"/>
 		<fileset id="list.contents" dir="${dep022}"
-		 includes="**/commons-exec-1.0.1.jar"/>
+		 includes="**/commons-exec-1.1.jar"/>
 		<property name="jar022" refid="list.contents"/>
 		<echo file="tmpJars" append="yes"> ${jar022}</echo>
 		<copy todir="${distLib}" file="${dep022}/${jar022}"/>
@@ -402,9 +402,9 @@
 		   <fileset dir="../shared/licenses" includes="**/commons-*"/>
 		</copy>
 
-		<property name="dep023" value="${mavenStore}/org/codehaus/woodstox/woodstox-core-lgpl/4.1.0"/>
+		<property name="dep023" value="${mavenStore}/org/codehaus/woodstox/woodstox-core-lgpl/4.1.1"/>
 		<fileset id="list.contents" dir="${dep023}"
-		 includes="**/woodstox-core-lgpl-4.1.0.jar"/>
+		 includes="**/woodstox-core-lgpl-4.1.1.jar"/>
 		<property name="jar023" refid="list.contents"/>
 		<echo file="tmpJars" append="yes"> ${jar023}</echo>
 		<copy todir="${distLib}" file="${dep023}/${jar023}"/>
@@ -412,9 +412,9 @@
 		   <fileset dir="../shared/licenses" includes="**/woodstox-*"/>
 		</copy>
 		<!-- + -->
-		<property name="dep024" value="${mavenStore}/org/codehaus/woodstox/stax2-api/3.1.0"/>
+		<property name="dep024" value="${mavenStore}/org/codehaus/woodstox/stax2-api/3.1.1"/>
 		<fileset id="list.contents" dir="${dep024}"
-		 includes="**/stax2-api-3.1.0.jar"/>
+		 includes="**/stax2-api-3.1.1.jar"/>
 		<property name="jar024" refid="list.contents"/>
 		<echo file="tmpJars" append="yes"> ${jar024}</echo>
 		<copy todir="${distLib}" file="${dep024}/${jar024}"/>
