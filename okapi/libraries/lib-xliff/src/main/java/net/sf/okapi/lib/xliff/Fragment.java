@@ -21,6 +21,8 @@
 package net.sf.okapi.lib.xliff;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Stack;
 
 /**
  * TEMPORARY implementation.
@@ -39,6 +41,7 @@ public class Fragment implements Serializable {
 	public static final char MARKER_CLOSING = '\uE102';
 	public static final char MARKER_PLACEHOLDER = '\uE103';
 	public static final int CHARBASE = 0xE110;
+	public static final int LASTINDEX = 0xF8FF;
 
 	private StringBuilder ctext;
 	private Codes codes;
@@ -248,18 +251,35 @@ public class Fragment implements Serializable {
 	@Override
 	public String toString () {
 		StringBuilder tmp = new StringBuilder();
+		Code code;
+		ArrayList<String> verified = new ArrayList<String>();
 		for ( int i=0; i<ctext.length(); i++ ) {
 			char ch = ctext.charAt(i);
-			//TODO: Handle overlapping/partial spans
-			if ( ctext.charAt(i) == MARKER_OPENING ) {
-				tmp.append(String.format("<pc id=\"%s\">",
-					codes.get(toIndex(ctext.charAt(++i))).getId()));
+			if ( ch == MARKER_OPENING ) {
+				code = codes.get(toIndex(ctext.charAt(++i)));
+				// Check if the corresponding closing part is in the same fragment
+				if ( isWellFormed(code, i) ) {
+					tmp.append(String.format("<pc id=\"%s\">", code.getId()));
+					verified.add(code.getId());
+				}
+				else {
+					// No corresponding closing part
+					tmp.append(String.format("<sc id=\"%s\"/>", code.getId()));
+				}
 			}
-			else if ( ctext.charAt(i) == MARKER_CLOSING ) {
-				tmp.append("</pc>");
-				i++; // Skip index
+			else if ( ch == MARKER_CLOSING ) {
+				code = codes.get(toIndex(ctext.charAt(++i)));
+				if ( verified.contains(code.getId()) ) {
+					// This pair was verified
+					tmp.append("</pc>");
+					// No need to remove the code from the verified list
+					// as it's not used again (no need to waste time cleaning it)
+				}
+				else { // Not in the verified list
+					tmp.append(String.format("<ec rid=\"%s\"/>", code.getId()));
+				}
 			}
-			else if ( ctext.charAt(i) == MARKER_PLACEHOLDER ) {
+			else if ( ch == MARKER_PLACEHOLDER ) {
 				tmp.append(String.format("<ph id=\"%s\"/>",
 					codes.get(toIndex(ctext.charAt(++i))).getId()));
 			}
@@ -286,6 +306,44 @@ public class Fragment implements Serializable {
 	public boolean isEmpty () {
 		return (ctext.length()==0);
 	}
+
+	public boolean isWellFormed (Code openingCode,
+		int from)
+	{
+		Stack<String> stack = new Stack<String>();
+		for ( int i=from; i<ctext.length(); i++ ) {
+			char ch = ctext.charAt(i);
+			Code code;
+			if ( ch == MARKER_OPENING ) {
+				code = codes.get(toIndex(ctext.charAt(++i)));
+				stack.push(code.getId());
+			}
+			else if ( ch == MARKER_CLOSING ) {
+				code = codes.get(toIndex(ctext.charAt(++i)));
+				if ( code.getId().equals(openingCode.getId()) ) {
+					// Well-formed if the stack is empty
+					return stack.isEmpty();
+				}
+				// If it's not our closing code and the stack is already empty
+				// That's not a well-formed pattern
+				if ( stack.isEmpty() ) {
+					return false;
+				}
+				// If the top of the stack is not the closing of the current
+				// element, it's not well-formed.
+				if ( !stack.pop().equals(code.getId()) ) {
+					return false;
+				}
+				// Else: keep going
+			}
+			else if ( ch == MARKER_PLACEHOLDER ) {
+				i++;
+			}
+		}
+		// Closing part not found: not well-formed.
+		return false;
+	}
+	
 	
 //	public void clear () {
 //		ctext.setLength(0);

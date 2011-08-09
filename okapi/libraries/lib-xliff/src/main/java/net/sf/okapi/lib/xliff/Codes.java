@@ -49,6 +49,24 @@ public class Codes implements Serializable {
 		return false;
 	}
 	
+	public Code getClosingPart (Code openingCode) {
+		for ( Code code : codes ) {
+			if ( code.getId().equals(openingCode.getId()) ) {
+				return code;
+			}
+		}
+		return null;
+	}
+	
+	public Code getOpeningPart (Code closingCode) {
+		for ( Code code : codes ) {
+			if ( code.getId().equals(closingCode.getId()) ) {
+				return code;
+			}
+		}
+		return null;
+	}
+	
 	public int size () {
 		if ( codes == null ) return 0;
 		return codes.size();

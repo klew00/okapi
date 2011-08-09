@@ -25,9 +25,9 @@ public class UnitTest {
 	@Test
 	public void testSegment () {
 		Unit unit = createUnitWithSegment();
-		assertEquals("Text<ph id=\"1\"/>in <pc id=\"1\">bold</pc>",
+		assertEquals("Text<ph id=\"1\"/>in <pc id=\"2\">bold</pc>",
 			unit.iterator().next().getSource().toString());
-		assertEquals("TEXT<ph id=\"1\"/>IN <pc id=\"1\">BOLD</pc>",
+		assertEquals("TEXT<ph id=\"1\"/>IN <pc id=\"2\">BOLD</pc>",
 			unit.getPart(0).getTarget(false).toString());
 	}
 
@@ -142,7 +142,7 @@ public class UnitTest {
 		srcFrag.append("Text");
 		srcFrag.append(InlineType.PLACEHOLDER, "1", "<br/>");
 		srcFrag.append("in ");
-		srcFrag.append(InlineType.OPENING, "1", "<b>");
+		srcFrag.append(InlineType.OPENING, "2", "<b>");
 		srcFrag.append("bold");
 		srcFrag.append(InlineType.CLOSING, "2", "</b>");
 		
@@ -150,7 +150,7 @@ public class UnitTest {
 		trgFrag.append("TEXT");
 		trgFrag.append(InlineType.PLACEHOLDER, "1", "<BR/>");
 		trgFrag.append("IN ");
-		trgFrag.append(InlineType.OPENING, "1", "<B>");
+		trgFrag.append(InlineType.OPENING, "2", "<B>");
 		trgFrag.append("BOLD");
 		trgFrag.append(InlineType.CLOSING, "2", "</B>");
 

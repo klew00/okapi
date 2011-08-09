@@ -25,16 +25,39 @@ import java.io.Serializable;
 import net.sf.okapi.lib.xliff.CodeStore;
 import net.sf.okapi.lib.xliff.Fragment;
 
+/**
+ * Provides the methods to access a translation candidate.
+ */
 public interface ICandidate extends Serializable {
 
+	/**
+	 * Creates an empty source.
+	 * @return the empty source created.
+	 */
 	public Fragment createSource ();
 	
+	/**
+	 * Creates an empty target.
+	 * @return the empty target created.
+	 */
 	public Fragment createTarget ();
 
+	/**
+	 * Gets the source of this candidate.
+	 * @return the source of this candidate.
+	 */
 	public Fragment getSource ();
 	
+	/**
+	 * Indicates if this candidate has a target.
+	 * @return true if this candidate has a target.
+	 */
 	public boolean hasTarget ();
 
+	/**
+	 * Gets the target of this candidate.
+	 * @return the target of this candidate, or null if no target exists.
+	 */
 	public Fragment getTarget ();
 	
 	public CodeStore getCodeStore ();
