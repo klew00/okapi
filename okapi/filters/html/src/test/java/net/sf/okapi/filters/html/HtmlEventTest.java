@@ -393,14 +393,14 @@ public class HtmlEventTest {
 					Property mdpProp = dpManual.getSourceProperty(propName);
 					assertEquals(mdpProp.isReadOnly(), gdpProp.isReadOnly() );
 					// TODO This must not fail
-					// assertEquals(mdpProp.getValue(),gdpProp.getValue());
+					assertEquals(mdpProp.getValue(),gdpProp.getValue());
 				}
 			}
 
 			// TODO This must not fail
-			// assertTrue("Event was expected "+manualEvent+" ("+manualEvent.getResource().getSkeleton()+") " +
-			//		"but got "+generatedEvent+" ("+generatedEvent.getResource().getSkeleton()+")",
-			//		FilterTestDriver.laxCompareEvent(manualEvent, generatedEvent));
+			assertTrue("Event was expected "+manualEvent+" ("+manualEvent.getResource().getSkeleton()+") " +
+					"but got "+generatedEvent+" ("+generatedEvent.getResource().getSkeleton()+")",
+					FilterTestDriver.laxCompareEvent(manualEvent, generatedEvent));
 		}
 	}
 	

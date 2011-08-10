@@ -109,6 +109,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		Config.ConvertNonBreakingSpaces = false;
 		Config.NewLine = BOMNewlineEncodingDetector.NewlineType.LF.toString();
 		Config.LoggerProvider = LoggerProvider.JAVA;
+		//Config.CurrentCompatibilityMode = Config.CompatibilityMode.XHTML;
 	}
 
 	/**
@@ -1031,9 +1032,12 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 						attribute.getValue(), startTag, attribute));
 				break;
 			case ATTRIBUTE_WRITABLE:
+				// for these non-translatable (but localizable) attributes use the raw value 
+				// given by attribute.getValueSegment() to avoid any entity unescaping that might 
+				// produce illegal output
 				propertyOrTextUnitPlaceholders.add(createPropertyTextUnitPlaceholder(
 						PlaceholderAccessType.WRITABLE_PROPERTY, attribute.getName(),
-						attribute.getValue(), startTag, attribute));
+						attribute.getValueSegment().toString(), startTag, attribute));
 				break;
 			case ATTRIBUTE_READONLY:
 				propertyOrTextUnitPlaceholders.add(createPropertyTextUnitPlaceholder(

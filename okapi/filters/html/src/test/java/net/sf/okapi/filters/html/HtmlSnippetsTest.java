@@ -363,6 +363,18 @@ public class HtmlSnippetsTest {
 	}
 	
 	@Test
+	public void testInlineAnchorAndAmpersand() {
+		String snippet = "<a href=\"foo.cgi?chapter=1&amp;section=2&amp;copy=3&amp;lang=en\"/>";
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, locEN));
+	}
+	
+	@Test
+	public void testPAndInlineAnchorAndAmpersand() {
+		String snippet = "<p>Before <a href=\"foo.cgi?chapter=1&amp;section=2&amp;copy=3&amp;lang=en\"/> after.</p>";
+		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, locEN));
+	}
+	
+	@Test
 	public void table() {
 		String snippet = 
 		"<table>" +
