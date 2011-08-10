@@ -28,11 +28,13 @@ import net.sf.okapi.common.resource.*;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class HtmlEventTest {
 
@@ -336,6 +338,72 @@ public class HtmlEventTest {
 		assertTrue(FilterTestDriver.laxCompareEvents(events, getEvents(snippet)));
 	}
 
+	@Test
+	public void testPWithInlineAnchorAndAmpersand() {
+		String snippet = "<p>Before <a href=\"foo.cgi?chapter=1&amp;section=2&amp;copy=3&amp;lang=en\"/> after.</p>";
+		ArrayList<Event> events = new ArrayList<Event>();
+
+		addStartEvents(events);
+
+		GenericSkeleton skel = new GenericSkeleton();
+		DocumentPart dp1 = new DocumentPart("dp1", true);
+		skel.add("<a href=\"");
+		skel.addValuePlaceholder(dp1, "href", null);
+		dp1.setSourceProperty(new Property("href", "foo.cgi?chapter=1&amp;section=2&amp;copy=3&amp;lang=en", false));
+		skel.add("\"/>");
+		dp1.setName("a");
+		dp1.setSkeleton(skel);
+		events.add(new Event(EventType.DOCUMENT_PART, dp1));
+
+		skel = new GenericSkeleton();
+		ITextUnit tu1 = new TextUnit("tu1", "Before ");
+		tu1.setType("paragraph");
+		TextFragment tf = tu1.getSource().getFirstContent();
+		Code code = new Code(TagType.PLACEHOLDER, "a");
+		code.setType(Code.TYPE_LINK);
+		code.appendReference("dp1");
+		tf.append(code);
+		tf.append(" after.");
+		skel.add("<p>");
+		skel.addContentPlaceholder(tu1);
+		skel.append("</p>");
+		tu1.setSkeleton(skel);
+		events.add(new Event(EventType.TEXT_UNIT, tu1));
+
+		addEndEvents(events);
+
+		assertEquals(events.size(), getEvents(snippet).size());
+
+		Iterator<Event> manualIter = events.iterator();
+		for (Event generatedEvent : getEvents(snippet)) {
+			Event manualEvent = manualIter.next();
+			assertEquals(manualEvent.getEventType(), generatedEvent.getEventType());
+
+			if (manualEvent.getEventType() == EventType.DOCUMENT_PART) {
+				DocumentPart dpManual = ((DocumentPart)manualEvent.getResource());
+				DocumentPart dpGenerated = ((DocumentPart)generatedEvent.getResource());
+				
+				assertEquals(dpManual.isReferent(),dpGenerated.isReferent());
+				assertEquals(dpManual.isTranslatable(),dpGenerated.isTranslatable());
+				assertEquals(dpManual.getPropertyNames(),dpGenerated.getPropertyNames());
+				assertEquals(dpManual.getSourcePropertyNames(),dpGenerated.getSourcePropertyNames());
+
+				for (String propName : dpManual.getSourcePropertyNames()) {
+					Property gdpProp = dpGenerated.getSourceProperty(propName);
+					Property mdpProp = dpManual.getSourceProperty(propName);
+					assertEquals(mdpProp.isReadOnly(), gdpProp.isReadOnly() );
+					// TODO This must not fail
+					// assertEquals(mdpProp.getValue(),gdpProp.getValue());
+				}
+			}
+
+			// TODO This must not fail
+			// assertTrue("Event was expected "+manualEvent+" ("+manualEvent.getResource().getSkeleton()+") " +
+			//		"but got "+generatedEvent+" ("+generatedEvent.getResource().getSkeleton()+")",
+			//		FilterTestDriver.laxCompareEvent(manualEvent, generatedEvent));
+		}
+	}
+	
 	@Test
 	public void testPWithComment() {
 		String snippet = "<p>Before <!--comment--> after.</p>";
