@@ -184,7 +184,7 @@ public class XLIFFWriter {
 		if ( isIndented ) indent += " ";
 		
 		if ( style == Fragment.STYLE_DATAOUTSIDE ) {
-			writeOriginalData(unit.getCodeStore());
+			writeOriginalData(unit.getDataStore());
 		}
 		
 		for ( Part part : unit ) {
@@ -253,7 +253,7 @@ public class XLIFFWriter {
 			writer.print(indent+"<match>"+lb);
 			if ( isIndented ) indent += " ";
 			if ( style == Fragment.STYLE_DATAOUTSIDE ) {
-				writeOriginalData(alt.getCodeStore());
+				writeOriginalData(alt.getDataStore());
 			}
 			writeFragment(Util.ELEM_SOURCE, alt.getSource(), -1);
 			writeFragment(Util.ELEM_TARGET, alt.getTarget(), -1);
@@ -370,7 +370,7 @@ public class XLIFFWriter {
 		writer.print("</"+name+">"+lb);
 	}
 	
-	private void writeOriginalData (CodeStore store) {
+	private void writeOriginalData (DataStore store) {
 		if ( !store.hasCodeWithOriginalData() ) {
 			return; // Nothing to write out
 		}

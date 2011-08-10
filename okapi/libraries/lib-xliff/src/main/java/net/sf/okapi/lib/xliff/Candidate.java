@@ -28,10 +28,10 @@ public class Candidate implements ICandidate {
 
 	private Fragment source;
 	private Fragment target;
-	private CodeStore store;
+	private DataStore store;
 	
 	public Candidate () {
-		store = new CodeStore();
+		store = new DataStore();
 		source = new Fragment(store, false);
 		target = new Fragment(store, true);
 	}
@@ -39,7 +39,7 @@ public class Candidate implements ICandidate {
 	public Candidate (String sourceContent,
 		String targetContent)
 	{
-		store = new CodeStore();
+		store = new DataStore();
 		source = new Fragment(store, false, sourceContent);
 		target = new Fragment(store, true, targetContent);
 	}
@@ -66,19 +66,19 @@ public class Candidate implements ICandidate {
 		return target;
 	}
 	
-	public CodeStore getCodeStore () {
+	public DataStore getDataStore () {
 		return store;
 	}
 	
 	public void setSource (Fragment fragment) {
-		if ( store != fragment.getCodeStore() ) {
+		if ( store != fragment.getDataStore() ) {
 			throw new RuntimeException("The fragment passed in setSource must use the same codes store.");
 		}
 		source = fragment;
 	}
 
 	public void setTarget (Fragment fragment) {
-		if ( store != fragment.getCodeStore() ) {
+		if ( store != fragment.getDataStore() ) {
 			throw new RuntimeException("The fragment passed in setTarget must use the same codes store.");
 		}
 		target = fragment;

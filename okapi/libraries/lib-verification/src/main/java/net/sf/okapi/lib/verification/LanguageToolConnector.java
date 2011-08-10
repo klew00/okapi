@@ -140,8 +140,8 @@ public class LanguageToolConnector {
 		catch ( Throwable e ) {
 			// -99 for srcEnd special marker
 			issues.add(new Issue(docId, IssueType.LANGUAGETOOL_ERROR, tu.getId(), trgSeg.getId(),
-				"ERROR WITH LanguageTool SERVER: All LT checks are skipped from this text unit on.", 0, -99, 0, -1,
-				Issue.SEVERITY_HIGH, tu.getName()));
+				"Error with LanguageTool server. All LT checks are skipped from this text unit on. "+e.getMessage(),
+				0, -99, 0, -1, Issue.SEVERITY_HIGH, tu.getName()));
 		}
 		
 		return issues.size();

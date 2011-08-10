@@ -20,11 +20,13 @@
 
 package net.sf.okapi.lib.xliff;
 
-import java.io.Serializable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class CodeStore implements Serializable {
+import org.oasisopen.xliff.v2.ICode;
+import org.oasisopen.xliff.v2.IDataStore;
+
+public class DataStore implements IDataStore {
 
 	private static final long serialVersionUID = 0100L;
 
@@ -33,9 +35,7 @@ public class CodeStore implements Serializable {
 
 	private transient Map<String, String> map;
 	
-	public CodeStore () {
-	}
-
+	@Override
 	public boolean hasCodeWithOriginalData () {
 		if ( srcCodes != null ) {
 			if ( srcCodes.hasCodeWithOriginalData() ) return true;
@@ -46,24 +46,29 @@ public class CodeStore implements Serializable {
 		return false;
 	}
 	
+	@Override
 	public boolean hasSourceCode () {
 		return (( srcCodes != null ) && srcCodes.hasCode() );
 	}
 	
+	@Override
 	public boolean hasTargetCode () {
 		return (( trgCodes != null ) && trgCodes.hasCode() );
 	}
 	
+	@Override
 	public Codes getSourceCodes () {
 		if ( srcCodes == null ) srcCodes = new Codes(this);
 		return srcCodes;
 	}
 	
+	@Override
 	public Codes getTargetCodes () {
 		if ( trgCodes == null ) trgCodes = new Codes(this);
 		return trgCodes;
 	}
 
+	@Override
 	public void calculateOriginalDataToIdsMap () {
 		map = new LinkedHashMap<String, String>(); // LinkedHashMap to keep the order (not mandatory, but nicer)
 		int mapId = 0;
@@ -71,7 +76,7 @@ public class CodeStore implements Serializable {
 
 		if ( srcCodes != null ) {
 			for ( int i=0; i<srcCodes.size(); i++ ) {
-				Code code = srcCodes.get(i);
+				ICode code = srcCodes.get(i);
 				tmp = code.getOriginalData(); if ( tmp == null ) tmp = "";
 				if ( !map.containsKey(tmp) ) {
 					// No item like this yet: create one
@@ -81,7 +86,7 @@ public class CodeStore implements Serializable {
 		}
 		if ( trgCodes != null ) {
 			for ( int i=0; i<trgCodes.size(); i++ ) {
-				Code code = trgCodes.get(i);
+				ICode code = trgCodes.get(i);
 				tmp = code.getOriginalData(); if ( tmp == null ) tmp = "";
 				if ( !map.containsKey(tmp) ) {
 					// No item like this yet: create one
@@ -91,10 +96,12 @@ public class CodeStore implements Serializable {
 		}
 	}
 
+	@Override
 	public void setOutsideRepresentationMap (Map<String, String> map) {
 		this.map = map;
 	}
 
+	@Override
 	public Map<String, String> getOutsideRepresentationMap () {
 		return map;
 	}
@@ -105,6 +112,7 @@ public class CodeStore implements Serializable {
 	 * @param originalData the original data
 	 * @return the id for the outside storage of the given original data 
 	 */
+	@Override
 	public String getIdForOriginalData (String originalData) {
 		if ( map == null ) {
 			throw new XLIFFReaderException("No original data map defined for this object.");
@@ -116,6 +124,7 @@ public class CodeStore implements Serializable {
 		return map.get(originalData); // Id for the given data
 	}
 
+	@Override
 	public String getOriginalDataForId (String id) {
 		if ( map == null ) {
 			throw new XLIFFReaderException("No original data map defined for this object.");

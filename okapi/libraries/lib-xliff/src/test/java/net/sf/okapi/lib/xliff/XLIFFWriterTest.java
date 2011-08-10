@@ -305,12 +305,12 @@ public class XLIFFWriterTest {
 	
 	private Candidate createAlternate (String prefix) {
 		Candidate alt = new Candidate();
-		Fragment frag = new Fragment(alt.getCodeStore());
+		Fragment frag = new Fragment(alt.getDataStore());
 		frag.append(prefix+"-text");
 		frag.append(InlineType.PLACEHOLDER, "1", "<br/>");
 		alt.setSource(frag);
 		
-		frag = new Fragment(alt.getCodeStore());
+		frag = new Fragment(alt.getDataStore());
 		frag.append(prefix.toUpperCase()+"-TEXT");
 		frag.append(InlineType.PLACEHOLDER, "1", "<br/>");
 		alt.setTarget(frag);

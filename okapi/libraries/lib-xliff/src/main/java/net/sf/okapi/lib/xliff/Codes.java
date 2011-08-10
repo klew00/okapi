@@ -20,27 +20,32 @@
 
 package net.sf.okapi.lib.xliff;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Codes implements Serializable {
+import org.oasisopen.xliff.v2.ICode;
+import org.oasisopen.xliff.v2.ICodes;
+import org.oasisopen.xliff.v2.IDataStore;
+
+public class Codes implements ICodes {
 
 	private static final long serialVersionUID = 0100L;
 
-	private CodeStore store;
-	private ArrayList<Code> codes;
+	private IDataStore store;
+	private ArrayList<ICode> codes;
 	
-	public Codes (CodeStore store) {
+	public Codes (IDataStore store) {
 		this.store = store;
 	}
 
+	@Override
 	public boolean hasCode () {
 		return (( codes != null ) && !codes.isEmpty() );
 	}
 	
+	@Override
 	public boolean hasCodeWithOriginalData () {
 		if ( codes != null ) {
-			for ( Code code : codes ) {
+			for ( ICode code : codes ) {
 				if ( code.hasOriginalData() ) {
 					return true;
 				}
@@ -49,51 +54,56 @@ public class Codes implements Serializable {
 		return false;
 	}
 	
-	public Code getClosingPart (Code openingCode) {
-		for ( Code code : codes ) {
-			if ( code.getId().equals(openingCode.getId()) ) {
-				return code;
-			}
-		}
-		return null;
-	}
+//	public ICode getClosingPart (ICode openingCode) {
+//		for ( ICode code : codes ) {
+//			if ( code.getId().equals(openingCode.getId()) ) {
+//				return code;
+//			}
+//		}
+//		return null;
+//	}
+//	
+//	public ICode getOpeningPart (Code closingCode) {
+//		for ( Code code : codes ) {
+//			if ( code.getId().equals(closingCode.getId()) ) {
+//				return code;
+//			}
+//		}
+//		return null;
+//	}
 	
-	public Code getOpeningPart (Code closingCode) {
-		for ( Code code : codes ) {
-			if ( code.getId().equals(closingCode.getId()) ) {
-				return code;
-			}
-		}
-		return null;
-	}
-	
+	@Override
 	public int size () {
 		if ( codes == null ) return 0;
 		return codes.size();
 	}
 
-	public CodeStore getCodeStore () {
+	@Override
+	public IDataStore getDataStore () {
 		return store;
 	}
 
-	public Code get (int index) {
+	@Override
+	public ICode get (int index) {
 		if ( codes == null ) return null;
 		return codes.get(index);
 	}
 	
-	public Code get (String id,
+	@Override
+	public ICode get (String id,
 		InlineType type)
 	{
 		if ( codes == null ) return null;
 		String tmp = Util.toInternalId(id, type);
-		for ( Code code : codes ) {
-			if ( code.internalId.equals(tmp) ) return code;
+		for ( ICode code : codes ) {
+			if ( code.getInternalId().equals(tmp) ) return code;
 		}
 		return null; // Not found
 	}
 
-	public void add (Code code) {
-		if ( codes == null ) codes = new ArrayList<Code>();
+	@Override
+	public void add (ICode code) {
+		if ( codes == null ) codes = new ArrayList<ICode>();
 		codes.add(code);
 	}
 

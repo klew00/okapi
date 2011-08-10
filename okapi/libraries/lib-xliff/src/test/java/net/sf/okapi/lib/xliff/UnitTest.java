@@ -17,7 +17,7 @@ public class UnitTest {
 		Unit unit = new Unit("id");
 		Segment seg = unit.appendNewSegment();
 		assertNull(seg.getId());
-		assertTrue(seg.getCodeStore() == unit.getCodeStore());
+		assertTrue(seg.getDataStore() == unit.getDataStore());
 		assertEquals("", seg.getSource().toString());
 		assertFalse(seg.hasTarget());
 	}
@@ -173,13 +173,13 @@ public class UnitTest {
 	
 	private Candidate createAlternate (String prefix) {
 		Candidate alt = new Candidate();
-		Fragment frag = new Fragment(alt.getCodeStore());
+		Fragment frag = new Fragment(alt.getDataStore());
 		// Source
 		frag.append(prefix+"-text");
 		frag.append(InlineType.PLACEHOLDER, "1", "<br/>");
 		alt.setSource(frag);
 		// Target
-		frag = new Fragment(alt.getCodeStore());
+		frag = new Fragment(alt.getDataStore());
 		frag.append(prefix.toUpperCase()+"-TEXT");
 		frag.append(InlineType.PLACEHOLDER, "1", "<br/>");
 		alt.setTarget(frag);

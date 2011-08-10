@@ -28,18 +28,18 @@ public class Part implements Serializable, IWithExtendedAttributes {
 
 	private static final long serialVersionUID = 0100L;
 
-	protected CodeStore store;
+	protected DataStore store;
 	protected Fragment source;
 	protected Fragment target;
 	protected int targetOrder;
 	protected ExtendedAttributes xattrs;
 	
-	public Part (CodeStore store) {
+	public Part (DataStore store) {
 		this.store = store;
 		source = new Fragment(store);
 	}
 	
-	public Part (CodeStore store,
+	public Part (DataStore store,
 		String sourceContent)
 	{
 		this.store = store;
@@ -51,7 +51,7 @@ public class Part implements Serializable, IWithExtendedAttributes {
 	}
 	
 	public void setSource (Fragment fragment) {
-		if ( store != fragment.getCodeStore() ) {
+		if ( store != fragment.getDataStore() ) {
 			throw new RuntimeException("The fragment passed in setSource must use the same codes store.");
 		}
 		source = fragment;
@@ -73,7 +73,7 @@ public class Part implements Serializable, IWithExtendedAttributes {
 	}
 	
 	public void setTarget (Fragment fragment) {
-		if ( store != fragment.getCodeStore() ) {
+		if ( store != fragment.getDataStore() ) {
 			throw new RuntimeException("The fragment passed in setTarget must use the same codes store.");
 		}
 		target = fragment;
@@ -91,7 +91,7 @@ public class Part implements Serializable, IWithExtendedAttributes {
 		return targetOrder;
 	}
 	
-	public CodeStore getCodeStore () {
+	public DataStore getDataStore () {
 		return store;
 	}
 

@@ -3,12 +3,13 @@ package net.sf.okapi.lib.xliff;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+import org.oasisopen.xliff.v2.ICode;
 
 public class CodeTest {
 
 	@Test
 	public void testSimple () {
-		Code code = new Code(InlineType.OPENING, "1", null);
+		ICode code = new Code(InlineType.OPENING, "1", null);
 		assertEquals(InlineType.OPENING, code.getInlineType());
 		assertEquals("1", code.getId());
 		assertNull(code.getOriginalData());
@@ -16,7 +17,7 @@ public class CodeTest {
 	
 	@Test
 	public void testAllInlineTypes () {
-		Code code = new Code(InlineType.OPENING, "1", null);
+		ICode code = new Code(InlineType.OPENING, "1", null);
 		assertEquals(InlineType.OPENING, code.getInlineType());
 		code.setInlineType(InlineType.CLOSING);
 		assertEquals(InlineType.CLOSING, code.getInlineType());
@@ -26,7 +27,7 @@ public class CodeTest {
 	
 	@Test
 	public void testOriginalData () {
-		Code code = new Code(InlineType.PLACEHOLDER, "1", null);
+		ICode code = new Code(InlineType.PLACEHOLDER, "1", null);
 		assertEquals(null, code.getOriginalData());
 		assertFalse(code.hasOriginalData());
 		code = new Code(InlineType.PLACEHOLDER, "1", "");
@@ -39,7 +40,7 @@ public class CodeTest {
 	
 	@Test
 	public void testHintsDefaults () {
-		Code code = new Code(InlineType.PLACEHOLDER, "1", null);
+		ICode code = new Code(InlineType.PLACEHOLDER, "1", null);
 		assertTrue(code.canDelete());
 		assertTrue(code.canReplicate());
 		assertTrue(code.canReorder());
@@ -48,7 +49,7 @@ public class CodeTest {
 	
 	@Test
 	public void testHintsCanDelete () {
-		Code code = new Code(InlineType.PLACEHOLDER, "1", null);
+		ICode code = new Code(InlineType.PLACEHOLDER, "1", null);
 		code.setCanDelete(false);
 		assertFalse(code.canDelete());
 		assertTrue(code.canReplicate());
@@ -63,7 +64,7 @@ public class CodeTest {
 	
 	@Test
 	public void testHintsCanReplicate () {
-		Code code = new Code(InlineType.PLACEHOLDER, "1", null);
+		ICode code = new Code(InlineType.PLACEHOLDER, "1", null);
 		code.setCanReplicate(false);
 		assertTrue(code.canDelete());
 		assertFalse(code.canReplicate());
@@ -78,7 +79,7 @@ public class CodeTest {
 	
 	@Test
 	public void testHintsCanReorder () {
-		Code code = new Code(InlineType.PLACEHOLDER, "1", null);
+		ICode code = new Code(InlineType.PLACEHOLDER, "1", null);
 		code.setCanReorder(false);
 		assertTrue(code.canDelete());
 		assertTrue(code.canReplicate());
@@ -93,7 +94,7 @@ public class CodeTest {
 
 	@Test
 	public void testHintsCanChangeParent () {
-		Code code = new Code(InlineType.PLACEHOLDER, "1", null);
+		ICode code = new Code(InlineType.PLACEHOLDER, "1", null);
 		code.setCanChangeParent(false);
 		assertTrue(code.canDelete());
 		assertTrue(code.canReplicate());

@@ -35,14 +35,14 @@ public class Unit extends EventData implements Iterable<Part>, IWithCandidates, 
 	private static final long serialVersionUID = 0100L;
 
 	private ArrayList<Part> list;
-	private CodeStore store;
+	private DataStore store;
 	private ArrayList<ICandidate> candidates;
 	private ArrayList<INote> notes;
 
 	public Unit (String id) {
 		setId(id);
 		list = new ArrayList<Part>();
-		store = new CodeStore();
+		store = new DataStore();
 	}
 	
 	@Override
@@ -87,7 +87,7 @@ public class Unit extends EventData implements Iterable<Part>, IWithCandidates, 
 		return list.get(partIndex);
 	}
 
-	public CodeStore getCodeStore () {
+	public DataStore getDataStore () {
 		return store;
 	}
 

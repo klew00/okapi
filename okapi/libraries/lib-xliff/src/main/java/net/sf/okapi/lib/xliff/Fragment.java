@@ -24,6 +24,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Stack;
 
+import org.oasisopen.xliff.v2.ICode;
+import org.oasisopen.xliff.v2.IDataStore;
+
 /**
  * TEMPORARY implementation.
  * Holds the usable content for XLIFF constructs: text and inline codes.
@@ -32,16 +35,20 @@ public class Fragment implements Serializable {
 	
 	private static final long serialVersionUID = 0100L;
 	
-	public static final int STYLE_XSDTEMP = -1;
+	public static final int STYLE_XSDTEMP = -1; // Temporary
 	public static final int STYLE_NODATA = 0;
 	public static final int STYLE_DATAINSIDE = 1;
 	public static final int STYLE_DATAOUTSIDE = 2;
 
-	public static final char MARKER_OPENING = '\uE101';
-	public static final char MARKER_CLOSING = '\uE102';
-	public static final char MARKER_PLACEHOLDER = '\uE103';
-	public static final int CHARBASE = 0xE110;
-	public static final int LASTINDEX = 0xF8FF;
+	public static final char CODE_OPENING = '\uE101';
+	public static final char CODE_CLOSING = '\uE102';
+	public static final char CODE_PLACEHOLDER = '\uE103';
+	public static final char ANNO_OPENING = '\uE104';
+	public static final char ANNO_CLOSING = '\uE105';
+	public static final char ANNO_PLACEHOLDER = '\uE106';
+
+	public static final int INDEX_BASE = 0xE110;
+	public static final int INDEX_MAX = (0xF8FF-INDEX_BASE);
 
 	private StringBuilder ctext;
 	private Codes codes;
@@ -53,7 +60,11 @@ public class Fragment implements Serializable {
 	 * @return the corresponding character value.
 	 */
 	public static char toChar (int index) {
-		return (char)(index+CHARBASE);
+		if ( index > INDEX_MAX ) {
+			throw new RuntimeException(
+				String.format("This implementation cannot have fragments with more than %d inline codes.", INDEX_MAX));
+		}
+		return (char)(index+INDEX_BASE);
 	}
 
 	/**
@@ -63,28 +74,31 @@ public class Fragment implements Serializable {
 	 * @return the corresponding index value.
 	 */
 	public static int toIndex (char index) {
-		return ((int)index)-CHARBASE;
+		return ((int)index)-INDEX_BASE;
 	}
 	
 	/**
-	 * Helper method that checks if a given character is an inline code marker.
+	 * Helper method that checks if a given character is an inline marker.
 	 * @param ch the character to check.
-	 * @return true if the character is a code marker, false if it is not.
+	 * @return true if the character is a marker, false if it is not.
 	 */
 	public static boolean isMarker (char ch) {
-		return (( ch == MARKER_OPENING )
-			|| ( ch == MARKER_CLOSING )
-			|| ( ch == MARKER_PLACEHOLDER ));
+		return (( ch == CODE_PLACEHOLDER )
+			|| ( ch == CODE_OPENING )
+			|| ( ch == CODE_CLOSING )
+			|| ( ch == ANNO_PLACEHOLDER )
+			|| ( ch == ANNO_OPENING )
+			|| ( ch == ANNO_CLOSING ));
 	}
 
-	public Fragment (CodeStore store) {
+	public Fragment (DataStore store) {
 		ctext = new StringBuilder();
 		if ( store != null ) {
 			this.codes = store.getSourceCodes();
 		}
 	}
 	
-	public Fragment (CodeStore store,
+	public Fragment (DataStore store,
 		boolean target)
 	{
 		ctext = new StringBuilder();
@@ -94,7 +108,7 @@ public class Fragment implements Serializable {
 		}
 	}
 	
-	public Fragment (CodeStore store,
+	public Fragment (DataStore store,
 		boolean target,
 		String plainText)
 	{
@@ -119,23 +133,23 @@ public class Fragment implements Serializable {
 		}
 	}
 	
-	public CodeStore getCodeStore () {
-		return codes.getCodeStore();
+	public IDataStore getDataStore () {
+		return codes.getDataStore();
 	}
 	
 	private String getStringXSDTemp () {
 		StringBuilder tmp = new StringBuilder();
 		for ( int i=0; i<ctext.length(); i++ ) {
 			char ch = ctext.charAt(i);
-			if ( ctext.charAt(i) == MARKER_OPENING ) {
+			if ( ctext.charAt(i) == CODE_OPENING ) {
 				tmp.append(String.format("<inline id=\"%s\"/>",
 					codes.get(toIndex(ctext.charAt(++i))).getInternalId()));
 			}
-			else if ( ctext.charAt(i) == MARKER_CLOSING ) {
+			else if ( ctext.charAt(i) == CODE_CLOSING ) {
 				tmp.append(String.format("<inline id=\"%s\"/>",
 					codes.get(toIndex(ctext.charAt(++i))).getInternalId()));
 			}
-			else if ( ctext.charAt(i) == MARKER_PLACEHOLDER ) {
+			else if ( ctext.charAt(i) == CODE_PLACEHOLDER ) {
 				tmp.append(String.format("<inline id=\"%s\"/>",
 					codes.get(toIndex(ctext.charAt(++i))).getInternalId()));
 			}
@@ -161,11 +175,11 @@ public class Fragment implements Serializable {
 	
 	public String getStringWithOriginalData (boolean dataInside) {
 		StringBuilder tmp = new StringBuilder();
-		Code code;
+		ICode code;
 		int index;
 		for ( int i=0; i<ctext.length(); i++ ) {
 			char ch = ctext.charAt(i);
-			if ( ctext.charAt(i) == MARKER_OPENING ) {
+			if ( ctext.charAt(i) == CODE_OPENING ) {
 				index = toIndex(ctext.charAt(++i));
 				code = codes.get(index);
 				tmp.append(String.format("<sc id=\"%s\"", code.getId()));
@@ -180,12 +194,12 @@ public class Fragment implements Serializable {
 				else {
 					if ( code.hasOriginalData() ) {
 						tmp.append(String.format(" nid=\"%s\"",
-							codes.getCodeStore().getIdForOriginalData(code.getOriginalData())));
+							codes.getDataStore().getIdForOriginalData(code.getOriginalData())));
 					}
 					tmp.append("/>");
 				}
 			}
-			else if ( ctext.charAt(i) == MARKER_CLOSING ) {
+			else if ( ctext.charAt(i) == CODE_CLOSING ) {
 				index = toIndex(ctext.charAt(++i));
 				code = codes.get(index);
 				tmp.append(String.format("<ec rid=\"%s\"", code.getId()));
@@ -200,12 +214,12 @@ public class Fragment implements Serializable {
 				else {
 					if ( code.hasOriginalData() ) {
 						tmp.append(String.format(" nid=\"%s\"",
-							codes.getCodeStore().getIdForOriginalData(code.getOriginalData())));
+							codes.getDataStore().getIdForOriginalData(code.getOriginalData())));
 					}
 					tmp.append("/>");
 				}
 			}
-			else if ( ctext.charAt(i) == MARKER_PLACEHOLDER ) {
+			else if ( ctext.charAt(i) == CODE_PLACEHOLDER ) {
 				index = toIndex(ctext.charAt(++i));
 				code = codes.get(index);
 				tmp.append(String.format("<ph id=\"%s\"", code.getId()));
@@ -220,7 +234,7 @@ public class Fragment implements Serializable {
 				else {
 					if ( code.hasOriginalData() ) {
 						tmp.append(String.format(" nid=\"%s\"",
-							codes.getCodeStore().getIdForOriginalData(code.getOriginalData())));
+							codes.getDataStore().getIdForOriginalData(code.getOriginalData())));
 					}
 					tmp.append("/>");
 				}
@@ -251,11 +265,11 @@ public class Fragment implements Serializable {
 	@Override
 	public String toString () {
 		StringBuilder tmp = new StringBuilder();
-		Code code;
+		ICode code;
 		ArrayList<String> verified = new ArrayList<String>();
 		for ( int i=0; i<ctext.length(); i++ ) {
 			char ch = ctext.charAt(i);
-			if ( ch == MARKER_OPENING ) {
+			if ( ch == CODE_OPENING ) {
 				code = codes.get(toIndex(ctext.charAt(++i)));
 				// Check if the corresponding closing part is in the same fragment
 				if ( isWellFormed(code, i) ) {
@@ -267,7 +281,7 @@ public class Fragment implements Serializable {
 					tmp.append(String.format("<sc id=\"%s\"/>", code.getId()));
 				}
 			}
-			else if ( ch == MARKER_CLOSING ) {
+			else if ( ch == CODE_CLOSING ) {
 				code = codes.get(toIndex(ctext.charAt(++i)));
 				if ( verified.contains(code.getId()) ) {
 					// This pair was verified
@@ -279,7 +293,7 @@ public class Fragment implements Serializable {
 					tmp.append(String.format("<ec rid=\"%s\"/>", code.getId()));
 				}
 			}
-			else if ( ch == MARKER_PLACEHOLDER ) {
+			else if ( ch == CODE_PLACEHOLDER ) {
 				tmp.append(String.format("<ph id=\"%s\"/>",
 					codes.get(toIndex(ctext.charAt(++i))).getId()));
 			}
@@ -307,18 +321,18 @@ public class Fragment implements Serializable {
 		return (ctext.length()==0);
 	}
 
-	public boolean isWellFormed (Code openingCode,
+	public boolean isWellFormed (ICode openingCode,
 		int from)
 	{
 		Stack<String> stack = new Stack<String>();
 		for ( int i=from; i<ctext.length(); i++ ) {
 			char ch = ctext.charAt(i);
-			Code code;
-			if ( ch == MARKER_OPENING ) {
+			ICode code;
+			if ( ch == CODE_OPENING ) {
 				code = codes.get(toIndex(ctext.charAt(++i)));
 				stack.push(code.getId());
 			}
-			else if ( ch == MARKER_CLOSING ) {
+			else if ( ch == CODE_CLOSING ) {
 				code = codes.get(toIndex(ctext.charAt(++i)));
 				if ( code.getId().equals(openingCode.getId()) ) {
 					// Well-formed if the stack is empty
@@ -336,7 +350,7 @@ public class Fragment implements Serializable {
 				}
 				// Else: keep going
 			}
-			else if ( ch == MARKER_PLACEHOLDER ) {
+			else if ( ch == CODE_PLACEHOLDER ) {
 				i++;
 			}
 		}
@@ -359,24 +373,24 @@ public class Fragment implements Serializable {
 		ctext.append(ch);
 	}
 
-	public Code append (InlineType type,
+	public ICode append (InlineType type,
 		String id,
 		String originalData)
 	{
 		if ( codes == null ) {
 			throw new RuntimeException("Cannot add codes in this fragment because it has no associated store of codes.");
 		}
-		Code code = new Code(type, id, originalData);
+		ICode code = new Code(type, id, originalData);
 		codes.add(code);
 		switch ( type ) {
 		case OPENING:
-			ctext.append(""+MARKER_OPENING+toChar(codes.size()-1));
+			ctext.append(""+CODE_OPENING+toChar(codes.size()-1));
 			break;
 		case CLOSING:
-			ctext.append(""+MARKER_CLOSING+toChar(codes.size()-1));
+			ctext.append(""+CODE_CLOSING+toChar(codes.size()-1));
 			break;
 		case PLACEHOLDER:
-			ctext.append(""+MARKER_PLACEHOLDER+toChar(codes.size()-1));
+			ctext.append(""+CODE_PLACEHOLDER+toChar(codes.size()-1));
 			break;
 		}
 		return code;

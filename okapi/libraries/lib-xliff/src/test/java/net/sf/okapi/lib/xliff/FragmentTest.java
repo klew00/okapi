@@ -29,7 +29,7 @@ public class FragmentTest {
 
 	@Test
 	public void testCodesNoData () {
-		Fragment frag = new Fragment(new Unit("id").getCodeStore());
+		Fragment frag = new Fragment(new Unit("id").getDataStore());
 		frag.append(InlineType.OPENING, "1", "<elem atrr='&amp;'>");
 		frag.append("text");
 		frag.append(InlineType.CLOSING, "1", "</elem>");
@@ -39,7 +39,7 @@ public class FragmentTest {
 
 	@Test
 	public void testCodesNoDataNotWellFormed1 () {
-		Fragment frag = new Fragment(new Unit("id").getCodeStore());
+		Fragment frag = new Fragment(new Unit("id").getDataStore());
 		frag.append(InlineType.OPENING, "1", "[o1]");
 		frag.append("t1");
 		frag.append(InlineType.OPENING, "2", "[o2]");
@@ -54,7 +54,7 @@ public class FragmentTest {
 	//TODO: allow non-well-formed inside well-formed
 //	@Test
 //	public void testCodesNoDataNotWellFormed2 () {
-//		Fragment frag = new Fragment(new Unit("id").getCodeStore());
+//		Fragment frag = new Fragment(new Unit("id").getDataStore());
 //		frag.append(InlineType.OPENING, "1", "[o1]");
 //		frag.append("t1");
 //		frag.append(InlineType.OPENING, "2", "[o2]");
@@ -71,7 +71,7 @@ public class FragmentTest {
 
 	@Test
 	public void testCodesDataInside () {
-		Fragment frag = new Fragment(new Unit("id").getCodeStore());
+		Fragment frag = new Fragment(new Unit("id").getDataStore());
 		frag.append(InlineType.OPENING, "1", "<elem atrr='&amp;'>");
 		frag.append("text");
 		frag.append(InlineType.CLOSING, "1", "</elem>");
@@ -82,20 +82,20 @@ public class FragmentTest {
 
 	@Test
 	public void testCodesDataOutside () {
-		Fragment frag = new Fragment(new Unit("id").getCodeStore());
+		Fragment frag = new Fragment(new Unit("id").getDataStore());
 		frag.append(InlineType.OPENING, "1", "<elem atrr='&amp;'>");
 		frag.append("text");
 		frag.append(InlineType.CLOSING, "1", "</elem>");
 		frag.append(InlineType.PLACEHOLDER, "2", "<br/>");
 		
-		frag.getCodeStore().calculateOriginalDataToIdsMap();
+		frag.getDataStore().calculateOriginalDataToIdsMap();
 		assertEquals("<sc id=\"1\" nid=\"d1\"/>text<ec rid=\"1\" nid=\"d2\"/><ph id=\"2\" nid=\"d3\"/>",
 			frag.getString(Fragment.STYLE_DATAOUTSIDE));
 	}
 
 	@Test
 	public void testCodesDataOutsideWithReuse () {
-		Fragment frag = new Fragment(new Unit("id").getCodeStore());
+		Fragment frag = new Fragment(new Unit("id").getDataStore());
 		frag.append(InlineType.OPENING, "1", "<elem atrr='&amp;'>");
 		frag.append("t1");
 		frag.append(InlineType.CLOSING, "1", "</elem>");
@@ -105,7 +105,7 @@ public class FragmentTest {
 		frag.append(InlineType.CLOSING, "3", "</elem>");
 		frag.append(InlineType.PLACEHOLDER, "4", "<br/>");
 		
-		frag.getCodeStore().calculateOriginalDataToIdsMap();
+		frag.getDataStore().calculateOriginalDataToIdsMap();
 		assertEquals("<sc id=\"1\" nid=\"d1\"/>t1<ec rid=\"1\" nid=\"d2\"/><ph id=\"2\" nid=\"d3\"/>"
 			+ "<sc id=\"3\" nid=\"d1\"/>t2<ec rid=\"3\" nid=\"d2\"/><ph id=\"4\" nid=\"d3\"/>",
 			frag.getString(Fragment.STYLE_DATAOUTSIDE));
@@ -115,7 +115,7 @@ public class FragmentTest {
 	public void testSerialization ()
 		throws IOException, ClassNotFoundException
 	{
-		Fragment frag = new Fragment(new Unit("id").getCodeStore());
+		Fragment frag = new Fragment(new Unit("id").getDataStore());
 		frag.append(InlineType.OPENING, "1", "[1]");
 		frag.append("text with \u0305");
 		frag.append(InlineType.CLOSING, "1", "[/1]");

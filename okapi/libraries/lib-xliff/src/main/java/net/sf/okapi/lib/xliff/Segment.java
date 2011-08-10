@@ -38,7 +38,7 @@ public class Segment extends Part implements IWithCandidates, IWithNotes {
 	private ArrayList<ICandidate> candidates;
 	private ArrayList<INote> notes;
 	
-	public Segment (CodeStore store) {
+	public Segment (DataStore store) {
 		super(store);
 	}
 

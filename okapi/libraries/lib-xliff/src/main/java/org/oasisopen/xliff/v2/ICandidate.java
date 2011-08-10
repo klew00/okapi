@@ -22,7 +22,7 @@ package org.oasisopen.xliff.v2;
 
 import java.io.Serializable;
 
-import net.sf.okapi.lib.xliff.CodeStore;
+import net.sf.okapi.lib.xliff.DataStore;
 import net.sf.okapi.lib.xliff.Fragment;
 
 /**
@@ -60,7 +60,7 @@ public interface ICandidate extends Serializable {
 	 */
 	public Fragment getTarget ();
 	
-	public CodeStore getCodeStore ();
+	public DataStore getDataStore ();
 	
 	public void setSource (Fragment fragment);
 

@@ -20,9 +20,9 @@
 
 package net.sf.okapi.lib.xliff;
 
-import java.io.Serializable;
+import org.oasisopen.xliff.v2.ICode;
 
-public class Code implements Serializable {
+public class Code implements ICode {
 
 	private static final long serialVersionUID = 0100L;
 
@@ -31,8 +31,7 @@ public class Code implements Serializable {
 	public static final int CANREORDER = 0x04;
 	public static final int CANCHANGEPARENT = 0x08;
 	
-	String internalId;
-	
+	private String internalId;
 	private InlineType inlineType;
 	private String id;
 	private String originalData;
@@ -42,81 +41,102 @@ public class Code implements Serializable {
 		String id,
 		String originalData)
 	{
-		if ( inlineType == null ) throw new RuntimeException("inline type cannot be null.");
-		if ( id == null ) throw new RuntimeException("Code id cannot be null.");
+		if ( inlineType == null ) {
+			throw new RuntimeException("Inline type cannot be null.");
+		}
+		if ( id == null ) {
+			throw new RuntimeException("Code id cannot be null.");
+		}
 		this.inlineType = inlineType;
 		this.id = id;
 		this.internalId = Util.toInternalId(id, inlineType);
 		this.originalData = originalData;
 	}
 
+	@Override
 	public String getOriginalData () {
 		return originalData;
 	}
 	
+	@Override
 	public void setOriginalData (String originalData) {
 		this.originalData = originalData;
 	}
 	
+	@Override
 	public boolean hasOriginalData () {
 		return !Util.isNullOrEmpty(originalData);
 	}
 	
+	@Override
 	public String getId () {
 		return id;
 	}
-	
+
+	@Override
 	public String getInternalId () {
 		return internalId;
 	}
 	
+	@Override
 	public InlineType getInlineType () {
 		return inlineType;
 	}
 
+	@Override
 	public void setInlineType (InlineType inlineType) {
 		this.inlineType = inlineType;
 	}
 
+	@Override
 	public int getHints () {
 		return hints;
 	}
 	
+	@Override
 	public void setHints (int hints) {
 		this.hints = hints;
 	}
 	
+	@Override
 	public boolean canDelete () {
 		return (( hints & CANDELETE ) == CANDELETE);
 	}
 
+	@Override
 	public void setCanDelete (boolean canDelete) {
 		if ( canDelete ) hints |= CANDELETE;
 		else hints &= ~CANDELETE;
 	}
 
+	@Override
 	public boolean canReplicate () {
 		return (( hints & CANREPLICATE ) == CANREPLICATE);
 	}
 
+	@Override
 	public void setCanReplicate (boolean canReplicate) {
 		if ( canReplicate ) hints |= CANREPLICATE;
 		else hints &= ~CANREPLICATE;
 	}
 
+	@Override
 	public boolean canReorder () {
 		return (( hints & CANREORDER ) == CANREORDER);
 	}
 
+	@Override
 	public void setCanReorder (boolean canReorder) {
 		if ( canReorder ) hints |= CANREORDER;
 		else hints &= ~CANREORDER;
 	}
 
+	@Override
 	public boolean canChangeParent () {
 		return (( hints & CANCHANGEPARENT ) == CANCHANGEPARENT);
 	}
 
+	@Override
 	public void setCanChangeParent (boolean canChangeParent) {
 		if ( canChangeParent ) hints |= CANCHANGEPARENT;
 		else hints &= ~CANCHANGEPARENT;

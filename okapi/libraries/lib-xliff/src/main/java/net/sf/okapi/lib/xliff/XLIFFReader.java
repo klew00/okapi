@@ -36,6 +36,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.oasisopen.xliff.v2.ICode;
 import org.oasisopen.xliff.v2.IWithCandidates;
 import org.oasisopen.xliff.v2.IWithNotes;
 
@@ -280,7 +281,7 @@ public class XLIFFReader {
 					processPart(false);
 				}
 				else if ( tmp.equals(Util.ELEM_ORIGINALDATA) ) {
-					processOriginalData(unit.getCodeStore()); // unit-level original data
+					processOriginalData(unit.getDataStore()); // unit-level original data
 				}
 				else if ( tmp.equals(Util.ELEM_CANDIDATE) ) {
 					processCandidate(unit); // unit-level match
@@ -306,7 +307,7 @@ public class XLIFFReader {
 	{
 		// New candidate
 		Candidate alt = new Candidate();
-		Part part = new Part(alt.getCodeStore());
+		Part part = new Part(alt.getDataStore());
 
 		String tmp;
 		while ( reader.hasNext() ) {
@@ -322,7 +323,7 @@ public class XLIFFReader {
 					alt.setTarget(part.getTarget(false));
 				}
 				else if ( tmp.equals(Util.ELEM_ORIGINALDATA) ) {
-					processOriginalData(alt.getCodeStore()); // match-level original data
+					processOriginalData(alt.getDataStore()); // match-level original data
 				}
 				break;
 				
@@ -373,7 +374,7 @@ public class XLIFFReader {
 		}
 	}
 	
-	private void processOriginalData (CodeStore store)
+	private void processOriginalData (DataStore store)
 		throws XMLStreamException
 	{
 		String tmp;
@@ -476,9 +477,9 @@ public class XLIFFReader {
 	private void processContent (Part partToFill)
 		throws XMLStreamException
 	{
-		Fragment frag = new Fragment(partToFill.getCodeStore());
+		Fragment frag = new Fragment(partToFill.getDataStore());
 		String tmp;
-		Code code = null;
+		ICode code = null;
 		StringBuilder content = new StringBuilder();
 		String nid = null;
 		
@@ -525,7 +526,7 @@ public class XLIFFReader {
 					tmp = reader.getAttributeValue(null, Util.ATTR_NID);
 					if ( cannotBeEmpty(Util.ATTR_NID, tmp) ) {
 						// Get the original data from the outside storage
-						code.setOriginalData(partToFill.getCodeStore().getOriginalDataForId(tmp));
+						code.setOriginalData(partToFill.getDataStore().getOriginalDataForId(tmp));
 						nid = tmp;
 					}
 				}
@@ -558,7 +559,7 @@ public class XLIFFReader {
 	
 	private boolean checkInsideVersusOutside (String outsideId,
 		StringBuilder insideContent,
-		Code code)
+		ICode code)
 	{
 		if (( insideContent.length() > 0 ) && ( outsideId != null )) {
 			throw new XLIFFReaderException(String.format("Code id='%s' cannot have both content and outside reference ('%s') defined.",

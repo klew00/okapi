@@ -39,7 +39,7 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.filters.rainbowkit.Manifest;
 import net.sf.okapi.filters.rainbowkit.MergingInfo;
 import net.sf.okapi.lib.xliff.Candidate;
-import net.sf.okapi.lib.xliff.CodeStore;
+import net.sf.okapi.lib.xliff.DataStore;
 import net.sf.okapi.lib.xliff.Fragment;
 import net.sf.okapi.lib.xliff.Note;
 import net.sf.okapi.lib.xliff.Part;
@@ -185,7 +185,7 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 				Segment srcSeg = (Segment)part;
 				srcSegIndex++;
 				net.sf.okapi.lib.xliff.Segment xSeg = unit.appendNewSegment();
-				xSeg.setSource(toXLIFF2Fragment(srcSeg.text, unit.getCodeStore(), false));
+				xSeg.setSource(toXLIFF2Fragment(srcSeg.text, unit.getDataStore(), false));
 				xSeg.setId(srcSeg.getId());
 				
 				// Applies TU-level translatable property to each segment
@@ -195,7 +195,7 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 				if ( trgSegs != null ) {
 					Segment trgSeg = trgSegs.get(xSeg.getId());
 					if ( trgSeg != null ) {
-						xSeg.setTarget(toXLIFF2Fragment(trgSeg.text, unit.getCodeStore(), true));
+						xSeg.setTarget(toXLIFF2Fragment(trgSeg.text, unit.getDataStore(), true));
 						// Check if the order is the same as the source
 						int trgSegIndex = trgSegs.getIndex(xSeg.getId());
 						if ( srcSegIndex != trgSegIndex ) {
@@ -215,7 +215,7 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 			}
 			else { // Non-segment part
 				Part xPart = unit.appendNewIgnorable();
-				xPart.setSource(toXLIFF2Fragment(part.text, unit.getCodeStore(), false));
+				xPart.setSource(toXLIFF2Fragment(part.text, unit.getDataStore(), false));
 				// Target
 				if ( trgTc != null ) {
 //todo				trcTc.get
@@ -231,7 +231,7 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 		net.sf.okapi.lib.xliff.Segment xSeg)
 	{
 		Candidate xAlt = new Candidate();
-		CodeStore cs = xAlt.getCodeStore();
+		DataStore cs = xAlt.getDataStore();
 		if ( alt.getSource().isEmpty() ) { // Same as the base source
 			xAlt.setSource(toXLIFF2Fragment(oriSource, cs, false));
 		}
@@ -244,7 +244,7 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 	}
 	
 	private Fragment toXLIFF2Fragment (TextFragment tf,
-		CodeStore store,
+		DataStore store,
 		boolean isTarget)
 	{
 		// fast track for content without codes
