@@ -21,24 +21,24 @@
 package net.sf.okapi.lib.xliff;
 
 /**
- * Possible type of inline codes in XLIFF.
+ * Possible types of inline codes and markers in XLIFF.
  */
 public enum InlineType {
 
 	/**
-	 * Opening code of a span-like original code.
+	 * Opening code of a span-like original code or marker.
 	 * For example, the representation for HTML &lt;b>.
 	 */
 	OPENING,
 	
 	/**
-	 * Closing code of a span-like original code.
+	 * Closing code of a span-like original code or marker.
 	 * For example, the representation for HTML &lt;/b>.
 	 */
 	CLOSING,
 	
 	/**
-	 * Placeholder code for an original code without content.
+	 * Placeholder code for an original code or marker without content.
 	 * For example, the representation for HTML &lt;br/>
 	 */
 	PLACEHOLDER

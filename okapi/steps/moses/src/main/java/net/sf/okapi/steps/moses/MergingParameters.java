@@ -33,10 +33,12 @@ public class MergingParameters extends BaseParameters implements IEditorDescript
 	private static final String COPYTOTARGET = "copyToTarget";
 	private static final String OVERWRITEEXISINGTARGET = "overwriteExistingTarget";
 	private static final String FORCEALTTRANSOUTPUT = "forceAltTransOutput";
+	private static final String USEGMODEINALTTRANS = "useGModeInAltTrans";
 	
 	private boolean copyToTarget;
 	private boolean overwriteExistingTarget;
 	private boolean forceAltTransOutput;
+	private boolean useGModeInAltTrans;
 	
 	public MergingParameters () {
 		reset();
@@ -66,18 +68,30 @@ public class MergingParameters extends BaseParameters implements IEditorDescript
 		this.forceAltTransOutput = forceAltTransOutput;
 	}
 
+	public boolean getUseGModeInAltTrans () {
+		return useGModeInAltTrans;
+	}
+
+	public void setUseGModeInAltTrans (boolean useGModeInAltTrans) {
+		this.useGModeInAltTrans = useGModeInAltTrans;
+	}
+
+	@Override
 	public void reset() {
 		copyToTarget = false;
 		overwriteExistingTarget = false;
 		forceAltTransOutput = true;
+		useGModeInAltTrans = true;
 	}
 
+	@Override
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
 		copyToTarget = buffer.getBoolean(COPYTOTARGET, copyToTarget);
 		overwriteExistingTarget = buffer.getBoolean(OVERWRITEEXISINGTARGET, overwriteExistingTarget);
 		forceAltTransOutput = buffer.getBoolean(FORCEALTTRANSOUTPUT, forceAltTransOutput);
+		useGModeInAltTrans = buffer.getBoolean(USEGMODEINALTTRANS, useGModeInAltTrans);
 	}
 
 	@Override
@@ -86,6 +100,7 @@ public class MergingParameters extends BaseParameters implements IEditorDescript
 		buffer.setBoolean(COPYTOTARGET, copyToTarget);
 		buffer.setBoolean(OVERWRITEEXISINGTARGET, overwriteExistingTarget);
 		buffer.setBoolean(FORCEALTTRANSOUTPUT, forceAltTransOutput);
+		buffer.setBoolean(USEGMODEINALTTRANS, useGModeInAltTrans);
 		return buffer.toString();
 	}
 
@@ -95,6 +110,7 @@ public class MergingParameters extends BaseParameters implements IEditorDescript
 		desc.add(COPYTOTARGET, "Copy the leveraged translation into the target", null);
 		desc.add(OVERWRITEEXISINGTARGET, "Overwrite any existing target text", null);
 		desc.add(FORCEALTTRANSOUTPUT, "In XLIFF, force the new <alt-trans> in the output", null);
+		desc.add(USEGMODEINALTTRANS, "Use the <g> notation in new <alt-trans> elements", null);
 		return desc;
 	}
 
@@ -105,7 +121,8 @@ public class MergingParameters extends BaseParameters implements IEditorDescript
 		CheckboxPart cbp2 = desc.addCheckboxPart(paramDesc.get(OVERWRITEEXISINGTARGET));
 		cbp2.setMasterPart(cbp1, true);
 		
-		desc.addCheckboxPart(paramDesc.get(FORCEALTTRANSOUTPUT));
+		cbp1 = desc.addCheckboxPart(paramDesc.get(FORCEALTTRANSOUTPUT));
+		desc.addCheckboxPart(paramDesc.get(USEGMODEINALTTRANS)).setMasterPart(cbp1, true);
 		
 		return desc;
 	}

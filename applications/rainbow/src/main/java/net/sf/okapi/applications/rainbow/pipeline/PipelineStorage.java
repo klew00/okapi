@@ -146,10 +146,7 @@ public class PipelineStorage implements IPipelineWriter, IPipelineReader {
 				// Create the class
 				// Check if we can use the available steps (and their loaders)
 				String className = node.getNodeValue();
-				String stepName = className;
-				int n = stepName.lastIndexOf('.');
-				if ( n > -1 ) stepName = stepName.substring(n+1);
-				StepInfo stepInfo = availableSteps.get(stepName);
+				StepInfo stepInfo = availableSteps.get(className);
 				if ( stepInfo == null ) {
 					// The pipeline has a step that is not currently in the available steps
 					LOGGER.warning(String.format(

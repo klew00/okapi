@@ -44,6 +44,7 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.filters.mosestext.MosesTextFilter;
+import net.sf.okapi.filters.xliff.Parameters;
 
 @UsingParameters(MergingParameters.class)
 public class MergingStep extends BasePipelineStep {
@@ -122,7 +123,8 @@ public class MergingStep extends BasePipelineStep {
 			// Overwrite the option for the filters where it's possible.
 			IParameters prm = sd.getFilterParameters();
 			if ( prm != null ) {
-				prm.setBoolean("addAltTrans", true);
+				prm.setBoolean(Parameters.ADDALTTRANS, true);
+				prm.setBoolean(Parameters.ADDALTTRANSGMODE, params.getUseGModeInAltTrans());
 			}
 		}
 		

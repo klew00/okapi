@@ -41,6 +41,9 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public static final int TARGETSTATEMODE_EXTRACT = 1;
 	public static final int TARGETSTATEMODE_DONOTEXTRACT = 2;
 
+	public static final String ADDALTTRANS = "addAltTrans";
+	public static final String ADDALTTRANSGMODE = "addAltTransGMode";
+	
 	private static final String USECUSTOMPARSER = "useCustomParser";
 	private static final String FACTORYCLASS = "factoryClass";
 	private static final String FALLBACKTOID = "fallbackToID";
@@ -48,7 +51,6 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private static final String OVERRIDETARGETLANGUAGE = "overrideTargetLanguage";
 	private static final String OUTPUTSEGMENTATIONTYPE = "outputSegmentationType";
 	private static final String IGNOREINPUTSEGMENTATION = "ignoreInputSegmentation";
-	private static final String ADDALTTRANS = "addAltTrans";
 	private static final String INCLUDEEXTENSIONS = "includeExtensions";
 	private static final String TARGETSTATEMODE = "targetStateMode";
 	private static final String TARGETSTATEVALUE = "targetStateValue";
@@ -62,6 +64,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private int outputSegmentationType;
 	private boolean ignoreInputSegmentation;
 	private boolean addAltTrans;
+	private boolean addAltTransGMode;
 	private boolean includeExtensions;
 	private int targetStateMode;
 	private String targetStateValue;
@@ -147,6 +150,14 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.addAltTrans = addAltTrans;
 	}
 
+	public boolean getAddAltTransGMode () {
+		return this.addAltTransGMode;
+	}
+	
+	public void setAddAltTransGMode (boolean addAltTransGMode) {
+		this.addAltTransGMode = addAltTransGMode;
+	}
+
 	public boolean getIncludeExtensions () {
 		return this.includeExtensions;
 	}
@@ -189,6 +200,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		outputSegmentationType = SEGMENTATIONTYPE_ORIGINAL;
 		ignoreInputSegmentation = false;
 		addAltTrans = false;
+		addAltTransGMode = true;
 		includeExtensions = true;
 		targetStateMode = TARGETSTATEMODE_IGNORE;
 		targetStateValue = "needs-translation";
@@ -210,6 +222,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		outputSegmentationType = buffer.getInteger(OUTPUTSEGMENTATIONTYPE, outputSegmentationType);
 		ignoreInputSegmentation = buffer.getBoolean(IGNOREINPUTSEGMENTATION, ignoreInputSegmentation);
 		addAltTrans = buffer.getBoolean(ADDALTTRANS, addAltTrans);
+		addAltTransGMode = buffer.getBoolean(ADDALTTRANSGMODE, addAltTransGMode);
 		includeExtensions = buffer.getBoolean(INCLUDEEXTENSIONS, includeExtensions);
 		targetStateMode = buffer.getInteger(TARGETSTATEMODE, targetStateMode);
 		targetStateValue = buffer.getString(TARGETSTATEVALUE, targetStateValue);
@@ -231,6 +244,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.setInteger(OUTPUTSEGMENTATIONTYPE, outputSegmentationType);
 		buffer.setBoolean(IGNOREINPUTSEGMENTATION, ignoreInputSegmentation);
 		buffer.setBoolean(ADDALTTRANS, addAltTrans);
+		buffer.setBoolean(ADDALTTRANSGMODE, addAltTransGMode);
 		buffer.setBoolean(INCLUDEEXTENSIONS, includeExtensions);
 		buffer.setInteger(TARGETSTATEMODE, targetStateMode);
 		buffer.setString(TARGETSTATEVALUE, targetStateValue);
@@ -251,6 +265,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.add(OVERRIDETARGETLANGUAGE, "Override the target language of the XLIFF document", null);
 		desc.add(OUTPUTSEGMENTATIONTYPE, "Type of output segmentation", "Indicates wether to segment or not the text content in output");
 		desc.add(ADDALTTRANS, "Allow addition of new <alt-trans> elements", "Indicates wether or not to adding new <alt-trans> elements is allowed");
+		desc.add(ADDALTTRANSGMODE, "Use the <g> notation in new <alt-trans> elements", "Indicates wether or not to use the <g> notation in new <alt-trans> elements");
 		desc.add(INCLUDEEXTENSIONS, "Include extra information", "If set: non-standard information are included in the added <alt-trans>");
 		desc.add(TARGETSTATEMODE, "Action to do when the value of the state attribute matches the specified pattern", null);
 		desc.add(TARGETSTATEVALUE, "Pattern for the state attribute value", null);
@@ -298,12 +313,13 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		ListSelectionPart lsp = desc.addListSelectionPart(paramDesc.get(OUTPUTSEGMENTATIONTYPE), values2);
 		lsp.setChoicesLabels(labels2);
 		
-		CheckboxPart cbp1 = desc.addCheckboxPart(paramDesc.get(ADDALTTRANS));
-		desc.addCheckboxPart(paramDesc.get(INCLUDEEXTENSIONS)).setMasterPart(cbp1, true);
+		CheckboxPart cbp = desc.addCheckboxPart(paramDesc.get(ADDALTTRANS));
+		desc.addCheckboxPart(paramDesc.get(INCLUDEEXTENSIONS)).setMasterPart(cbp, true);
+		desc.addCheckboxPart(paramDesc.get(ADDALTTRANSGMODE)).setMasterPart(cbp, true);
 
 		desc.addSeparatorPart();
 		
-		CheckboxPart cbp = desc.addCheckboxPart(paramDesc.get(USECUSTOMPARSER));
+		cbp = desc.addCheckboxPart(paramDesc.get(USECUSTOMPARSER));
 		desc.addTextInputPart(paramDesc.get(FACTORYCLASS)).setMasterPart(cbp, true);
 		
 		return desc;

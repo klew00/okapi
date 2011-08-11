@@ -86,7 +86,7 @@ class StepPicker {
 		for ( String id : steps.keySet() ) {
 			step = steps.get(id);
 			lbUtilities.add(step.name);
-			lbUtilities.setData(step.name, step.id);
+			lbUtilities.setData(step.name, step.stepClass);
 			availableSteps.add(step);
 		}
 		lbUtilities.addSelectionListener(new SelectionAdapter() {

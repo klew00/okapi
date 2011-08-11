@@ -29,6 +29,10 @@ distribution.</p>
 	post-processing pre-defined pipelines.</li>
 </ul>
 	</li>
+	<li>Tikal:<ul>
+	<li>Added the <code>-bpt</code> option in the Moses Leveraging command.</li>
+</ul>
+	</li>
 	<li>Filters Plugin for OmegaT:<ul>
 	<li>Added support for TXML files.</li>
 </ul>
@@ -42,13 +46,27 @@ distribution.</p>
 	<li>Added the support for Versified Text + RTF packages.</li>
 </ul>
 	</li>
+	<li>Moses Leveraging:<ul>
+	<li>Added the option to not use <code>&lt;g&gt;</code> notation in new <code>
+	&lt;alt-trans&gt;</code> elements in output.</li>
+</ul>
+	</li>
 </ul>
 	</li>
 	<li>Filters:<ul>
 	<li>Added the TXML Filter. It allows you to process Wordfast pro native 
 	translation files. This filter is early BETA for now.</li>
+	<li>HTML Filter:<ul>
+	<li>Fixed un-escaping for &#39;&amp;&#39; issue with non-extractable attribute values.</li>
+</ul>
+	</li>
 	<li>Versified Text Filter:<ul>
 	<li>Added support for bilingual variant of the format.</li>
+</ul>
+	</li>
+	<li>XLIFF Filter:<ul>
+	<li>Added the option to not use <code>&lt;g&gt;</code> notation in new <code>
+	&lt;alt-trans&gt;</code> elements in output.</li>
 </ul>
 	</li>
 	<li>RTF Filter:<ul>

@@ -153,6 +153,7 @@ public class Main {
 	protected boolean mosesCopyToTarget = false;
 	protected boolean mosesOverwriteTarget = false;
 	protected boolean moses2Outputs = false;
+	protected boolean mosesUseGModeInAltTrans = true;
 	protected String moses2ndPath;
 	
 	private FilterConfigurationMapper fcMapper;
@@ -266,6 +267,9 @@ public class Main {
 				else if ( arg.equals("-overtrg") ) {
 					prog.mosesCopyToTarget = true;
 					prog.mosesOverwriteTarget = true;
+				}
+				else if ( arg.equals("-bpt") ) {
+					prog.mosesUseGModeInAltTrans = false;
 				}
 				else if ( arg.equals("-over") ) {
 					prog.convOverwrite = true;
@@ -1053,7 +1057,8 @@ public class Main {
 		ps.println("      [-sl srcLang] [-tl trgLang] [-2] [-to srcOutputFile]");
 		ps.println("Leverages a file with Moses InlineText:");
 		ps.println("   -lm inputFile [-fc configId] [-ie encoding] [-oe encoding] [-sl srcLang]");
-		ps.println("      [-tl trgLang] [-seg [srxFile]] [-totrg|-overtrg] [-from mosesFile]");
+		ps.println("      [-tl trgLang] [-seg [srxFile]] [-totrg|-overtrg] [-bpt]");
+		ps.println("      [-from mosesFile]");
 		ps.println("Segments a file:");
 		ps.println("   -s inputFile [-fc configId] [-ie encoding]");
 		ps.println("      [-sl srcLang] [-tl trgLang] [-seg [srxFile]]");
@@ -1502,6 +1507,7 @@ public class Main {
 		params.setCopyToTarget(mosesCopyToTarget);
 		params.setOverwriteExistingTarget(mosesOverwriteTarget);
 		params.setForceAltTransOutput(true);
+		params.setUseGModeInAltTrans(mosesUseGModeInAltTrans);
 		driver.addStep(mrgStep);
 		
 		driver.addStep(new FilterEventsToRawDocumentStep());

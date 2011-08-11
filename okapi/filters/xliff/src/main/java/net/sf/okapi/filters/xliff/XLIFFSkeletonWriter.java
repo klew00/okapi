@@ -299,11 +299,11 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 			if ( !cont.isEmpty() ) {
 				sb.append(String.format("<source xml:lang=\"%s\">", alt.getSourceLocale().toString()));
 				// Write full source content (never with segments markers)
-				sb.append(fmt.toSegmentedString(cont, 0, false, false, true));
+				sb.append(fmt.toSegmentedString(cont, 0, false, false, params.getAddAltTransGMode()));
 				sb.append("</source>"+encoderManager.getLineBreak()); // source
 			}
 			sb.append(String.format("<target xml:lang=\"%s\">", alt.getTargetLocale().toString()));
-			sb.append(fmt.toSegmentedString(alt.getTarget(), 0, false, false, true));
+			sb.append(fmt.toSegmentedString(alt.getTarget(), 0, false, false, params.getAddAltTransGMode()));
 			sb.append("</target>"+encoderManager.getLineBreak()); // target
 			sb.append("</alt-trans>"+encoderManager.getLineBreak()); // alt-trans
 		}

@@ -22,7 +22,6 @@ package net.sf.okapi.applications.rainbow.pipeline;
 
 public class StepInfo {
 
-	public String id;
 	public String name;
 	public String description;
 	public String stepClass;
@@ -30,14 +29,12 @@ public class StepInfo {
 	public String paramsClass;
 	public String paramsData;
 
-	public StepInfo (String id,
-		String name,
+	public StepInfo (String name,
 		String description,
 		String stepClass,
 		ClassLoader loader,
 		String parametersClass)
 	{
-		this.id = id;
 		this.name = name;
 		this.description = description;
 		this.stepClass = stepClass;
@@ -47,7 +44,7 @@ public class StepInfo {
 
 	@Override
 	public StepInfo clone () {
-		StepInfo newStep = new StepInfo(id, name, description, stepClass, loader, paramsClass);
+		StepInfo newStep = new StepInfo(name, description, stepClass, loader, paramsClass);
 		newStep.paramsData = paramsData;
 		return newStep;
 	}
