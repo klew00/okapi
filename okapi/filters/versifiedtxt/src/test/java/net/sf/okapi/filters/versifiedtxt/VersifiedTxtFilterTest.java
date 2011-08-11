@@ -32,6 +32,8 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.TestUtil;
+import net.sf.okapi.common.Util;
+import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filters.InputDocument;
@@ -214,6 +216,31 @@ public class VersifiedTxtFilterTest {
 		filter.open(rawDoc);
 		filter.open(rawDoc);
 		filter.close();
+	}
+
+	@Test(expected=OkapiBadFilterInputException.class)
+	public void testMissingVerse() {
+		String snippet = "|btest\nThis is a test.";
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+	}
+	
+	@Test
+	public void testMissingBook() {
+		String snippet = "|v1\nThis is a test.";
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+	}
+	
+	@Test(expected=OkapiBadFilterInputException.class)
+	public void testMissingTarget() {
+		RawDocument rawDoc = new RawDocument(Util.toURI(root+"xml.vrsz"), "UTF-8", LocaleId.ENGLISH);
+		filter.open(rawDoc);
+		try {
+			while(filter.hasNext()) {
+				filter.next();
+			}
+		} finally {
+			filter.close();
+		}
 	}
 	
 	private ArrayList<Event> getEvents (String snippet) {

@@ -33,6 +33,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.encoder.EncoderManager;
+import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.AbstractFilter;
 import net.sf.okapi.common.filters.EventBuilder;
@@ -61,10 +62,10 @@ public class VersifiedTextFilter extends AbstractFilter {
 
 	public static final String VERSIFIED_TXT_MIME_TYPE = "text/x-versified-txt";
 
-	private static final String VERSE = "^\\|v.+$";
-	private static final String CHAPTER = "^\\|c.+$";
-	private static final String BOOK = "^\\|b.+$";
-	private static final String TARGET = "^<TARGET>$";
+	private static final String VERSE = "^[ \t]*\\|v.+[ \t]*$";
+	private static final String CHAPTER = "^[ \t]*\\|c.+[ \t]*$";
+	private static final String BOOK = "^[ \t]*\\|b.+[ \t]*$";
+	private static final String TARGET = "^[ \t]*<TARGET>[ \t]*$";
 	private static final String PLACEHOLDER = "(\\{|</?)[0-9]+(\\}|>)";
 	private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile(PLACEHOLDER);
 
@@ -82,13 +83,18 @@ public class VersifiedTextFilter extends AbstractFilter {
 	private StartSubDocument startSubDocument;
 	private Parameters params;
 	private StringBuilder filterBuffer;
+	private boolean foundVerse;
+	private boolean foundBook;
 
 	/** Creates a new instance of VersifiedCodeNgramIndexer */
 	public VersifiedTextFilter() {
 		super();		
 
 		this.currentChapter = "";
-		this.currentBook = "";		
+		this.currentBook = "";
+		
+		this.foundVerse = false;
+		this.foundBook = false;
 
 		setMimeType(VERSIFIED_TXT_MIME_TYPE);
 		setMultilingual(false); // default value, could be multilingual we check below
@@ -109,6 +115,8 @@ public class VersifiedTextFilter extends AbstractFilter {
 
 	@Override
 	public void open(RawDocument input) {
+		this.foundVerse = false;
+		this.foundBook = false;
 		open(input, true);
 	}
 
@@ -147,9 +155,7 @@ public class VersifiedTextFilter extends AbstractFilter {
 					detectedEncoding));
 		} else if (!detector.isDefinitive() && getEncoding().equals(RawDocument.UNKOWN_ENCODING)) {
 			detectedEncoding = detector.getEncoding();
-			LOGGER.log(
-					Level.FINE,
-					String.format(
+			LOGGER.log(Level.FINE, String.format(
 							"Default encoding and detected encoding not found. Using best guess encoding (%s)",
 							detectedEncoding));
 		}
@@ -265,11 +271,13 @@ public class VersifiedTextFilter extends AbstractFilter {
 					if (currentLine.matches(VERSE)) {
 						handleDocumentPart(currentLine + newline);
 						handleVerse(versifiedFileReader, currentLine, currentLine.substring(2));
+						this.foundVerse = true;
 					} else if (currentLine.matches(BOOK)) {
 						currentBook = currentLine.substring(2);
 						setDocumentName(currentBook);
 						eventBuilder.addFilterEvent(createStartFilterEvent());
 						handleDocumentPart(currentLine + newline);
+						this.foundBook = true;
 					} else if (currentLine.matches(CHAPTER)) {
 						currentChapter = currentLine.substring(2);
 						if (startSubDocument != null) {
@@ -298,7 +306,16 @@ public class VersifiedTextFilter extends AbstractFilter {
 				eventBuilder.endSubDocument();
 			}
 			eventBuilder.flushRemainingTempEvents();
+			
+			if (!foundBook) {
+				eventBuilder.addFilterEvent(createStartFilterEvent());
+				LOGGER.warning("Missing book marker at start of document: |b");
+			}
 			eventBuilder.addFilterEvent(createEndFilterEvent());
+			
+			if (!foundVerse) {
+				throw new OkapiBadFilterInputException("There are no verse codes in this document");
+			}			
 		}
 
 		return eventBuilder.next();
@@ -381,6 +398,12 @@ public class VersifiedTextFilter extends AbstractFilter {
 			}
 		}
 
+		// if this is a bilingual file and we didn't see a <TARGET> tag
+		// throw an exception
+		if (isMultilingual() && !trg) {
+			throw new OkapiBadFilterInputException("Missing <TARGET> tag for verse " + verseNumber);
+		}
+		
 		eventBuilder.startTextUnit();
 
 		// assume any newlines after the final content goes with the string
