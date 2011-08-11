@@ -417,6 +417,13 @@ public class VersifiedTextFilter extends AbstractFilter {
 			} else {
 				s = chopNewline(chopNewline(s));
 			}
+		} else {
+			// last entry trim *all* training newlines
+			if (trg) {
+				t = Util.trimEnd(t, "\n");
+			} else {
+				s = Util.trimEnd(s, "\n");
+			}
 		}
 		
 		processPlaceHolders(s, true);

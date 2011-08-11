@@ -160,7 +160,8 @@ public class VersifiedTxtFilterTest {
 		tu = FilterTestDriver.getTextUnit(getEvents(snippet), 2);
 		assertNotNull(tu);
 		assertEquals("source2", tu.getSource().toString());
-		assertEquals("target2\n\n", tu.getTarget(filter.getTrgLoc()).toString());
+		// filter will remove all training newlines on last entry
+		assertEquals("target2", tu.getTarget(filter.getTrgLoc()).toString());
 	}
 	
 	@Test
