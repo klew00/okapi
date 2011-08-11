@@ -368,8 +368,8 @@ public class VersifiedTextFilter extends AbstractFilter {
 				filterBuffer.append((char)currentChar);
 				if (currentChar == '\r' || currentChar == '\n' || currentChar == -1) {
 					filterBuffer.setLength(filterBuffer.length() - 1);
-					currentLine = filterBuffer.toString();
-					currentLine = Util.trimEnd(currentLine, "\r\n");
+					currentLine = filterBuffer.toString();					
+					currentLine = Util.trimEnd(currentLine, "\r\n");					
 					filterBuffer = new StringBuilder(BUFFER_SIZE - 1);
 					
 					// newline is always normalized to \n inside TextUnit except for skeleton
@@ -408,21 +408,21 @@ public class VersifiedTextFilter extends AbstractFilter {
 
 		// assume any newlines after the final content goes with the string
 		// but we have to at least remove the extra newline added above
-		String s = source.toString().replaceFirst("\n", "");
-		String t = target.toString().replaceFirst("\n", "");		
+		String s = chopNewline(source.toString());
+		String t = chopNewline(target.toString());		
 		if (currentChar != -1) {
 			if (trg) {
-				s = s.replaceFirst("\n", "");
-				t = t.replaceFirst("\n", "");
+				s = chopNewline(s);
+				t = chopNewline(t);
 			} else {
-				s = s.replaceFirst("\n", "").replaceFirst("\n", "");
+				s = chopNewline(chopNewline(s));
 			}
 		}
 		
 		processPlaceHolders(s, true);
 		if (trg) {
 			// if this is the last target and there is no text then we don't want any newlines			
-			if (currentChar == -1 && t.replaceAll("\n", "").isEmpty()) {
+			if (currentChar == -1 && chopNewline(t).isEmpty()) {
 				t = "";
 			}
 			processPlaceHolders(t, false);
@@ -441,7 +441,7 @@ public class VersifiedTextFilter extends AbstractFilter {
 			skel.addContentPlaceholder(tu, getTrgLoc());			 						
 		} 		
 		// always two newlines after final string of the verse no matter mono or bilingual
-		// not not if its the final string
+		// but not if its the final string
 		if (currentChar != -1) {			
 			skel.add(newline + newline); 
 		}
@@ -479,4 +479,20 @@ public class VersifiedTextFilter extends AbstractFilter {
 	private void handleDocumentPart(String part) {
 		eventBuilder.addDocumentPart(part);
 	}	
+	
+	/* 
+	 * Remove one newline from the end of the string
+	 */
+	private String chopNewline(String text)
+	{
+		if ( text == null || text.isEmpty()) {
+			return text;
+		}
+		
+		if (text.charAt(text.length()-1) == '\n') {
+			return text.substring(0, text.length()-1);
+		}
+		
+		return text;
+	}
 }

@@ -26,12 +26,13 @@ import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 public class Parameters extends BaseParameters {
 
 	private boolean allowEmptyOutputTarget;
+	private boolean forceTargetOutput;
 
 	public Parameters () {	
 		reset();
 	}
 	
-	public boolean getAllowEmptyOutputTarget () {
+	public boolean isAllowEmptyOutputTarget () {
 		return allowEmptyOutputTarget;
 	}
 	
@@ -39,14 +40,30 @@ public class Parameters extends BaseParameters {
 		this.allowEmptyOutputTarget = allowEmptyOutputTarget;
 	}
 
+	/**
+	 * @return the forceTargetOutput
+	 */
+	public boolean isForceTargetOutput() {
+		return forceTargetOutput;
+	}
+
+	/**
+	 * @param forceTargetOutput the forceTargetOutput to set
+	 */
+	public void setForceTargetOutput(boolean forceTargetOutput) {
+		this.forceTargetOutput = forceTargetOutput;
+	}
+
 	public void reset () {
 		allowEmptyOutputTarget = true;
+		forceTargetOutput = true;
 	}
 
 	@Override
 	public String toString () {
 		buffer.reset();
 		buffer.setBoolean(GenericSkeletonWriter.ALLOWEMPTYOUTPUTTARGET, allowEmptyOutputTarget);
+		buffer.setBoolean("forceTargetOutput", forceTargetOutput);
 		return buffer.toString();
 	}
 	
@@ -54,5 +71,6 @@ public class Parameters extends BaseParameters {
 		reset();
 		buffer.fromString(data);
 		allowEmptyOutputTarget = buffer.getBoolean(GenericSkeletonWriter.ALLOWEMPTYOUTPUTTARGET, allowEmptyOutputTarget);
+		forceTargetOutput = buffer.getBoolean("forceTargetOutput", forceTargetOutput);
 	}
 }

@@ -173,13 +173,23 @@ public class VersifiedTxtFilterTest {
 	}
 	
 	@Test
-	public void testBilingualWithGenericWriterWIthMissingNewlines() {
+	public void testBilingualWithInternalNewlinesWithGenericWriter() {
+		String snippet = "|bbook\n|cchapter\n|v1\nsource\n<TARGET>\ntarget1\n\ntarget2\n\n|v2\nsource2\n<TARGET>\ntarget2";
+		String expected = snippet;
+		String result = FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), LocaleId.SPANISH);
+		assertEquals(expected, result);
+	}
+	
+	@Test
+	public void testBilingualWithGenericWriterWithMissingNewlines() {
 		String snippet = "|bbook\n|cchapter\n|v1\nsource\n<TARGET>\ntarget\n|v2\nsource2\n<TARGET>\ntarget2";
 		String expected = "|bbook\n|cchapter\n|v1\nsource\n<TARGET>\ntarget\n\n|v2\nsource2\n<TARGET>\ntarget2";
 		String result = FilterTestDriver.generateOutput(getEvents(snippet),
 			filter.getEncoderManager(), LocaleId.SPANISH);
 		assertEquals(expected, result);
 	}
+	
 	@Test
 	public void testBilingualWithEmptyVerses() {
 		String snippet = "|bbook\n|cchapter\n|v1\n<TARGET>\n|v2\n<TARGET>\n";
