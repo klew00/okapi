@@ -520,6 +520,16 @@ public class XLIFFReader {
 					code = frag.append(InlineType.PLACEHOLDER, tmp, null);
 					content.setLength(0);
 				}
+				else if ( tmp.equals(Util.ELEM_CP) ) {
+					tmp = reader.getAttributeValue(null, Util.ATTR_HEX);
+					cannotBeNullOrEmpty(Util.ATTR_HEX, tmp);
+					try {
+						frag.append((char)((int)Integer.valueOf(tmp, 16)));
+					}
+					catch ( NumberFormatException e ) {
+						throw new XLIFFReaderException(String.format("Invalid code-point value in '%s': '%s'", Util.ATTR_HEX, tmp));
+					}
+				}
 				// Common attributes
 				if ( code != null ) {
 					// Try to see if there are outside data defined

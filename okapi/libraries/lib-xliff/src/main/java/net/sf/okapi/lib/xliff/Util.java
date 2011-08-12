@@ -38,6 +38,7 @@ class Util {
 	final static String ELEM_CLOSINGCODE = "ec";
 	final static String ELEM_PLACEHOLDER = "ph";
 	final static String ELEM_PAIREDCODES = "pc";
+	final static String ELEM_CP = "cp";
 	final static String ELEM_ORIGINALDATA = "originalData";
 	final static String ELEM_DATA = "data";
 
@@ -45,6 +46,7 @@ class Util {
 	final static String ATTR_RID = "rid";
 	final static String ATTR_NID = "nid";
 	final static String ATTR_TYPE = "type";
+	final static String ATTR_HEX = "hex";
 	final static String ATTR_SOURCELANG = "srclang";
 	final static String ATTR_TARGETLANG = "tgtlang";
 	final static String ATTR_TRANSLATABLE = "translatable";

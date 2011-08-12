@@ -23,12 +23,10 @@
 <file original="Copyright" source-language="en" target-language="fr" datatype="x-undefined" okp:inputEncoding="UTF-8">
 <body>
 <trans-unit id="Copyright:1" resname="000001:Copyright:1" xml:space="preserve">
-<source xml:lang="en">Published byOkapi Framework contributors
-
-</source>
-<target xml:lang="fr">Published byOkapi Framework contributors
-
-</target>
+<source xml:lang="en">Published by
+Okapi Framework contributors</source>
+<target xml:lang="fr">Published by
+Okapi Framework contributors</target>
 </trans-unit>
 </body>
 </file>

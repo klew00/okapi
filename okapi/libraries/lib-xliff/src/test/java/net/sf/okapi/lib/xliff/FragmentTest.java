@@ -34,7 +34,7 @@ public class FragmentTest {
 		frag.append("text");
 		frag.append(InlineType.CLOSING, "1", "</elem>");
 		frag.append(InlineType.PLACEHOLDER, "2", "<br/>");
-		assertEquals("<pc id=\"1\">text</pc><ph id=\"2\"/>", frag.toString());
+		assertEquals("<pc id=\"1\">text</pc><ph id=\"2\"/>", frag.toXLIFF());
 	}
 
 	@Test
@@ -48,7 +48,7 @@ public class FragmentTest {
 		frag.append(InlineType.PLACEHOLDER, "3", "<br/>");
 		frag.append("t3");
 		frag.append(InlineType.CLOSING, "2", "[c2]");
-		assertEquals("<sc id=\"1\"/>t1<sc id=\"2\"/>t2<ec rid=\"1\"/><ph id=\"3\"/>t3<ec rid=\"2\"/>", frag.toString());
+		assertEquals("<sc id=\"1\"/>t1<sc id=\"2\"/>t2<ec rid=\"1\"/><ph id=\"3\"/>t3<ec rid=\"2\"/>", frag.toXLIFF());
 	}
 
 	//TODO: allow non-well-formed inside well-formed
@@ -66,7 +66,7 @@ public class FragmentTest {
 //		frag.append(InlineType.CLOSING, "3", "[c3]");
 //		frag.append("t5");
 //		frag.append(InlineType.CLOSING, "1", "[c1]");
-//		assertEquals("<pc id=\"1\">t1<sc id=\"2\"/>t2<sc id=\"3\"/>t3<ec rid=\"2\"/>t4<ec rid=\"3\"/>t5</pc>", frag.toString());
+//		assertEquals("<pc id=\"1\">t1<sc id=\"2\"/>t2<sc id=\"3\"/>t3<ec rid=\"2\"/>t4<ec rid=\"3\"/>t5</pc>", frag.toXLIFF());
 //	}
 
 	@Test
@@ -77,7 +77,7 @@ public class FragmentTest {
 		frag.append(InlineType.CLOSING, "1", "</elem>");
 		frag.append(InlineType.PLACEHOLDER, "2", "<br/>");
 		assertEquals("<sc id=\"1\">&lt;elem atrr='&amp;amp;'></sc>text<ec rid=\"1\">&lt;/elem></ec><ph id=\"2\">&lt;br/></ph>",
-			frag.getString(Fragment.STYLE_DATAINSIDE));
+			frag.toXLIFF(Fragment.STYLE_DATAINSIDE));
 	}
 
 	@Test
@@ -90,7 +90,19 @@ public class FragmentTest {
 		
 		frag.getDataStore().calculateOriginalDataToIdsMap();
 		assertEquals("<sc id=\"1\" nid=\"d1\"/>text<ec rid=\"1\" nid=\"d2\"/><ph id=\"2\" nid=\"d3\"/>",
-			frag.getString(Fragment.STYLE_DATAOUTSIDE));
+			frag.toXLIFF(Fragment.STYLE_DATAOUTSIDE));
+	}
+
+	@Test
+	public void testInvalidChars () {
+		Fragment frag = new Fragment(new Unit("id").getDataStore());
+		frag.append(InlineType.OPENING, "1", "<elem atrr='&amp;'>");
+		frag.append("\u001a\u0002\t\n\u0020\uD7FF\u0019");
+		frag.append(InlineType.CLOSING, "1", "</elem>");
+		
+		frag.getDataStore().calculateOriginalDataToIdsMap();
+		assertEquals("<pc id=\"1\"><cp hex=\"001A\"/><cp hex=\"0002\"/>\t\n\u0020\uD7FF<cp hex=\"0019\"/></pc>",
+			frag.toXLIFF(Fragment.STYLE_NODATA));
 	}
 
 	@Test
@@ -108,7 +120,7 @@ public class FragmentTest {
 		frag.getDataStore().calculateOriginalDataToIdsMap();
 		assertEquals("<sc id=\"1\" nid=\"d1\"/>t1<ec rid=\"1\" nid=\"d2\"/><ph id=\"2\" nid=\"d3\"/>"
 			+ "<sc id=\"3\" nid=\"d1\"/>t2<ec rid=\"3\" nid=\"d2\"/><ph id=\"4\" nid=\"d3\"/>",
-			frag.getString(Fragment.STYLE_DATAOUTSIDE));
+			frag.toXLIFF(Fragment.STYLE_DATAOUTSIDE));
 	}
 
 	@Test
@@ -127,8 +139,8 @@ public class FragmentTest {
 		oos.close();
 		ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(bos.toByteArray()));
 		Fragment frag2 = (Fragment)ois.readObject();
-		assertEquals(frag.getString(Fragment.STYLE_DATAINSIDE),
-			frag2.getString(Fragment.STYLE_DATAINSIDE));
+		assertEquals(frag.toXLIFF(Fragment.STYLE_DATAINSIDE),
+			frag2.toXLIFF(Fragment.STYLE_DATAINSIDE));
 	}
 
 }

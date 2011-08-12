@@ -119,17 +119,32 @@ public class Fragment implements Serializable {
 		}
 	}
 	
-	public String getString (int style) {
+	@Override
+	public String toString () {
+		return ctext.toString();
+	}
+	
+	public String getCodedText () {
+		return ctext.toString();
+	}
+
+	/**
+	 * Gets the content of this fragment formatted in XLIFF in a given style.
+	 * <p>The available styles are: {@link #STYLE_NODATA}, {@link #STYLE_DATAINSIDE}, and {@link #STYLE_DATAOUTSIDE}.
+	 * @param style the style to use for the output.
+	 * @return the content of this fragment formatted in XLIFF in a given style.
+	 */
+	public String toXLIFF (int style) {
 		switch ( style ) {
 		case STYLE_XSDTEMP:
-			return getStringXSDTemp();
+			return toXSDTemp();
 		case STYLE_DATAINSIDE:
-			return getStringWithOriginalData(true);
+			return toXLIFFWithOriginalData(true);
 		case STYLE_DATAOUTSIDE:
-			return getStringWithOriginalData(false);
+			return toXLIFFWithOriginalData(false);
 		case STYLE_NODATA:
 		default:
-			return toString();
+			return toXLIFF();
 		}
 	}
 	
@@ -137,7 +152,7 @@ public class Fragment implements Serializable {
 		return codes.getDataStore();
 	}
 	
-	private String getStringXSDTemp () {
+	private String toXSDTemp () {
 		StringBuilder tmp = new StringBuilder();
 		for ( int i=0; i<ctext.length(); i++ ) {
 			char ch = ctext.charAt(i);
@@ -164,8 +179,21 @@ public class Fragment implements Serializable {
 				case '&':
 					tmp.append("&amp;");
 					break;
-				default:
+				case '\n':
+				case '\t':
 					tmp.append(ch);
+					break;
+				default:
+					if (( ch < 0x0020 ) 
+						|| (( ch > 0xD7FF ) && ( ch < 0xE000 ))
+						|| ( ch > 0xFFFD )) //TODO: deal with high-planes
+					{
+						// Invalid in XML
+						tmp.append(String.format("<cp hex=\"%04X\"/>", (int)ch));
+					}
+					else {
+						tmp.append(ch);
+					}
 					break;
 				}
 			}
@@ -173,7 +201,7 @@ public class Fragment implements Serializable {
 		return tmp.toString();
 	}
 	
-	public String getStringWithOriginalData (boolean dataInside) {
+	private String toXLIFFWithOriginalData (boolean dataInside) {
 		StringBuilder tmp = new StringBuilder();
 		ICode code;
 		int index;
@@ -250,8 +278,21 @@ public class Fragment implements Serializable {
 				case '&':
 					tmp.append("&amp;");
 					break;
-				default:
+				case '\n':
+				case '\t':
 					tmp.append(ch);
+					break;
+				default:
+					if (( ch < 0x0020 ) 
+						|| (( ch > 0xD7FF ) && ( ch < 0xE000 ))
+						|| ( ch > 0xFFFD )) //TODO: deal with high-planes
+					{
+						// Invalid in XML
+						tmp.append(String.format("<cp hex=\"%04X\"/>", (int)ch));
+					}
+					else {
+						tmp.append(ch);
+					}
 					break;
 				}
 			}
@@ -260,10 +301,11 @@ public class Fragment implements Serializable {
 	}
 
 	/**
-	 * Returns an XLIFF representation of this fragment in the style {@link STYLE_NODATA}.
+	 * Gets the content of this fragment formatted in XLIFF in the style {@link #STYLE_NODATA}.
+	 * <p>Use {@link #toXLIFF(int)} to select the style of output.
+	 * @return the content of this fragment formatted in XLIFF in the style {@link #STYLE_NODATA}.
 	 */
-	@Override
-	public String toString () {
+	public String toXLIFF () {
 		StringBuilder tmp = new StringBuilder();
 		ICode code;
 		ArrayList<String> verified = new ArrayList<String>();
@@ -298,6 +340,8 @@ public class Fragment implements Serializable {
 					codes.get(toIndex(ctext.charAt(++i))).getId()));
 			}
 			else {
+				// In XML 1.0 the valid characters are:
+				// #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
 				switch ( ch ) {
 				case '\r':
 					tmp.append("&#13;"); // Literal
@@ -308,8 +352,21 @@ public class Fragment implements Serializable {
 				case '&':
 					tmp.append("&amp;");
 					break;
-				default:
+				case '\n':
+				case '\t':
 					tmp.append(ch);
+					break;
+				default:
+					if (( ch < 0x0020 ) 
+						|| (( ch > 0xD7FF ) && ( ch < 0xE000 ))
+						|| ( ch > 0xFFFD )) //TODO: deal with high-planes
+					{
+						// Invalid in XML
+						tmp.append(String.format("<cp hex=\"%04X\"/>", (int)ch));
+					}
+					else {
+						tmp.append(ch);
+					}
 					break;
 				}
 			}

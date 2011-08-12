@@ -14,5 +14,5 @@ Test Okapi
 
 |cCopyright
 |v1
-Published byOkapi Framework contributors
-
+Published by
+Okapi Framework contributors

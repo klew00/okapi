@@ -56,6 +56,18 @@ public class XLIFFReaderTest {
 	}
 	
 	@Test
+	public void testCPElements () {
+		String text = "<?xml version='1.0'?>\n<xliff version=\"2.0\" xmlns=\"urn:oasis:names:tc:xliff:document:2.0\">"
+			+ "<file srclang=\"en\" tgtlang=\"fr\">\n<unit id=\"id\"><segment>\n"
+			+ "<source><cp hex=\"019\"/><cp hex='45'/></source>"
+			+ "</segment></unit>\n</file></xliff>";
+		Unit unit = getUnit(text, 1);
+		assertNotNull(unit);
+		assertEquals("\u0019\u0045", unit.getPart(0).getSource().getCodedText());
+		assertEquals("<cp hex=\"0019\"/>\u0045", unit.getPart(0).getSource().toXLIFF());
+	}
+	
+	@Test
 	public void testComments () {
 		String text = "<?xml version='1.0'?>\n<xliff version=\"2.0\" xmlns=\"urn:oasis:names:tc:xliff:document:2.0\">"
 			+ "<file srclang=\"en\" tgtlang=\"fr\">\n<unit id=\"id\"><segment>\n"
@@ -64,8 +76,8 @@ public class XLIFFReaderTest {
 			+ "</segment></unit>\n</file></xliff>";
 		Unit unit = getUnit(text, 1);
 		assertNotNull(unit);
-		assertEquals("Source 1.", unit.getPart(0).getSource().toString());
-		assertEquals("Target 1.", unit.getPart(0).getTarget(false).toString());
+		assertEquals("Source 1.", unit.getPart(0).getSource().toXLIFF());
+		assertEquals("Target 1.", unit.getPart(0).getTarget(false).toXLIFF());
 	}
 	
 	@Test

@@ -366,7 +366,7 @@ public class XLIFFWriter {
 		else {
 			writer.print(indent+"<"+name+">");
 		}
-		writer.print(fragment.getString(style));
+		writer.print(fragment.toXLIFF(style));
 		writer.print("</"+name+">"+lb);
 	}
 	

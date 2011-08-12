@@ -18,7 +18,7 @@ public class UnitTest {
 		Segment seg = unit.appendNewSegment();
 		assertNull(seg.getId());
 		assertTrue(seg.getDataStore() == unit.getDataStore());
-		assertEquals("", seg.getSource().toString());
+		assertEquals("", seg.getSource().toXLIFF());
 		assertFalse(seg.hasTarget());
 	}
 	
@@ -26,24 +26,24 @@ public class UnitTest {
 	public void testSegment () {
 		Unit unit = createUnitWithSegment();
 		assertEquals("Text<ph id=\"1\"/>in <pc id=\"2\">bold</pc>",
-			unit.iterator().next().getSource().toString());
+			unit.iterator().next().getSource().toXLIFF());
 		assertEquals("TEXT<ph id=\"1\"/>IN <pc id=\"2\">BOLD</pc>",
-			unit.getPart(0).getTarget(false).toString());
+			unit.getPart(0).getTarget(false).toXLIFF());
 	}
 
 	@Test
 	public void testCandidates () {
 		Unit unit = createUnitWithSegment();
 		assertEquals("unit-text<ph id=\"1\"/>",
-			unit.getCandidates().get(0).getSource().toString());
+			unit.getCandidates().get(0).getSource().toXLIFF());
 		assertEquals("UNIT-TEXT<ph id=\"1\"/>",
-			unit.getCandidates().get(0).getTarget().toString());
+			unit.getCandidates().get(0).getTarget().toXLIFF());
 		
 		Segment seg = (Segment)unit.getPart(0);
 		assertEquals("seg-text<ph id=\"1\"/>",
-			seg.getCandidates().get(0).getSource().toString());
+			seg.getCandidates().get(0).getSource().toXLIFF());
 		assertEquals("SEG-TEXT<ph id=\"1\"/>",
-			seg.getCandidates().get(0).getTarget().toString());
+			seg.getCandidates().get(0).getTarget().toXLIFF());
 	}
 	
 	@Test
@@ -95,11 +95,11 @@ public class UnitTest {
 		Unit unit2 = (Unit)ois.readObject();
 
 		// Check unit-level candidates (source)
-		assertEquals(unit1.getCandidates().get(0).getSource().getString(Fragment.STYLE_DATAINSIDE),
-			unit2.getCandidates().get(0).getSource().getString(Fragment.STYLE_DATAINSIDE));
+		assertEquals(unit1.getCandidates().get(0).getSource().toXLIFF(Fragment.STYLE_DATAINSIDE),
+			unit2.getCandidates().get(0).getSource().toXLIFF(Fragment.STYLE_DATAINSIDE));
 		// Check unit-level candidates (target)
-		assertEquals(unit1.getCandidates().get(0).getTarget().getString(Fragment.STYLE_DATAINSIDE),
-			unit2.getCandidates().get(0).getTarget().getString(Fragment.STYLE_DATAINSIDE));
+		assertEquals(unit1.getCandidates().get(0).getTarget().toXLIFF(Fragment.STYLE_DATAINSIDE),
+			unit2.getCandidates().get(0).getTarget().toXLIFF(Fragment.STYLE_DATAINSIDE));
 		assertEquals(unit1.getId(), unit2.getId());
 		// Check unit-level notes
 		assertEquals(unit1.getNotes().get(0).getText(), unit2.getNotes().get(0).getText());
@@ -115,17 +115,17 @@ public class UnitTest {
 		assertEquals(seg1.isTranslatable(), seg2.isTranslatable());
 		assertEquals(seg1.getId(), seg2.getId());
 		// Check source
-		assertEquals(seg1.getSource().getString(Fragment.STYLE_DATAINSIDE),
-			seg2.getSource().getString(Fragment.STYLE_DATAINSIDE));
+		assertEquals(seg1.getSource().toXLIFF(Fragment.STYLE_DATAINSIDE),
+			seg2.getSource().toXLIFF(Fragment.STYLE_DATAINSIDE));
 		// Check target
-		assertEquals(seg1.getTarget(false).getString(Fragment.STYLE_DATAINSIDE),
-			seg2.getTarget(false).getString(Fragment.STYLE_DATAINSIDE));
+		assertEquals(seg1.getTarget(false).toXLIFF(Fragment.STYLE_DATAINSIDE),
+			seg2.getTarget(false).toXLIFF(Fragment.STYLE_DATAINSIDE));
 		// Check segment-level candidates (source)
-		assertEquals(seg1.getCandidates().get(0).getSource().getString(Fragment.STYLE_DATAINSIDE),
-			seg2.getCandidates().get(0).getSource().getString(Fragment.STYLE_DATAINSIDE));
+		assertEquals(seg1.getCandidates().get(0).getSource().toXLIFF(Fragment.STYLE_DATAINSIDE),
+			seg2.getCandidates().get(0).getSource().toXLIFF(Fragment.STYLE_DATAINSIDE));
 		// Check segment-level candidates (target)
-		assertEquals(seg1.getCandidates().get(0).getTarget().getString(Fragment.STYLE_DATAINSIDE),
-			seg2.getCandidates().get(0).getTarget().getString(Fragment.STYLE_DATAINSIDE));
+		assertEquals(seg1.getCandidates().get(0).getTarget().toXLIFF(Fragment.STYLE_DATAINSIDE),
+			seg2.getCandidates().get(0).getTarget().toXLIFF(Fragment.STYLE_DATAINSIDE));
 		// Check segment-level notes
 		assertEquals(seg1.getNotes().get(0).getText(), seg2.getNotes().get(0).getText());
 		assertEquals(seg1.getNotes().get(0).getAppliesTo(), seg2.getNotes().get(0).getAppliesTo());
