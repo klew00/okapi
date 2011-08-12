@@ -99,7 +99,9 @@ public class MergingStep extends BasePipelineStep {
 		// Create the merger if needed
 		if ( merger == null ) {
 			
-			if ( params.getForceTargetLocale() ) {
+			boolean alwaysForceTargetLocale = info.getExtractionType() == Manifest.EXTRACTIONTYPE_ONTRAM;
+			
+			if ( params.getForceTargetLocale() || alwaysForceTargetLocale) {
 				merger = new Merger(manifest, fcMapper, params.getPreserveSegmentation(),
 					targetLocale, params.getReturnRawDocument());
 			}
