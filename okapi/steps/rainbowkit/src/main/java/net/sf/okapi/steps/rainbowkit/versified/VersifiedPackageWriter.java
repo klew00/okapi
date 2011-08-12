@@ -86,7 +86,7 @@ public class VersifiedPackageWriter extends BasePackageWriter {
 			return;
 
 		writer.handleEvent(event);
-		//writeTMXEntries(event.getTextUnit());
+		writeTMXEntries(event.getTextUnit());
 	}
 
 	@Override

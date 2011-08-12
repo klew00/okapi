@@ -1,9 +1,9 @@
 #!/bin/bash -e
 
 cd ../..
-svn update
-mvn clean
-mvn install
+#svn update
+#mvn clean
+#mvn install
 
 cd deployment/maven
 ant -f build_okapi-lib.xml

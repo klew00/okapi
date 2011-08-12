@@ -27,6 +27,7 @@ import java.io.IOException;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.RawDocument;
 
@@ -60,6 +61,14 @@ public class VersifiedTextWriterTest {
 		assertEquals(expected, result);
 	}
 
+	@Test
+	public void testBilingualWithNewlinesAfterSource() throws IOException {
+		String snippet2 = "|bbook\r\n|v1\r\nsource\r\n\r\n<TARGET>\r\n\r\n";
+		String result = eventWriter(snippet2);
+		String finalResult = eventWriter(result);
+		// here to catch a possible filter exception - no exception = green
+	}
+	
 	private String eventWriter(String input) throws IOException {
 		try {
 			// Open the input

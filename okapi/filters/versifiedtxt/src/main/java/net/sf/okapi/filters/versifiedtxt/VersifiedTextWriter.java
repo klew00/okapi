@@ -323,6 +323,10 @@ public class VersifiedTextWriter implements IFilterWriter {
 
 			String tmp;
 			tmp = formatter.printSegmentedContent(tc, false, false);
+			
+			// replace with original format linefeeds
+			tmp = tmp.replace("\n", linebreak);
+			
 			writer.write(tmp); // No wrapping needed
 			if (tmp.endsWith("\n")) {
 				return true;
