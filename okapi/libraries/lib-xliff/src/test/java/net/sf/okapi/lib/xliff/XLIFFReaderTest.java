@@ -8,6 +8,8 @@ import net.sf.okapi.lib.xliff.XLIFFEvent.XLIFFEventType;
 
 import org.junit.Test;
 import org.oasisopen.xliff.v2.ICandidate;
+import org.oasisopen.xliff.v2.ICode;
+import org.oasisopen.xliff.v2.IFragment;
 import org.oasisopen.xliff.v2.INote;
 
 public class XLIFFReaderTest {
@@ -57,14 +59,23 @@ public class XLIFFReaderTest {
 	
 	@Test
 	public void testCPElements () {
+		char[] chars = Character.toChars(0x10001);
 		String text = "<?xml version='1.0'?>\n<xliff version=\"2.0\" xmlns=\"urn:oasis:names:tc:xliff:document:2.0\">"
 			+ "<file srclang=\"en\" tgtlang=\"fr\">\n<unit id=\"id\"><segment>\n"
-			+ "<source><cp hex=\"019\"/><cp hex='45'/></source>"
+			+ "<source>"
+			+ "<ph id=\"1\">[<cp hex=\"019\"/><cp hex=\"45\"/><cp hex=\"FFFF\"/><cp hex=\"10001\"/>]</ph>"
+			+ "<cp hex=\"019\"/><cp hex=\"45\"/><cp hex=\"FFFF\"/><cp hex=\"10001\"/>"
+			+ "</source>"
 			+ "</segment></unit>\n</file></xliff>";
 		Unit unit = getUnit(text, 1);
 		assertNotNull(unit);
-		assertEquals("\u0019\u0045", unit.getPart(0).getSource().getCodedText());
-		assertEquals("<cp hex=\"0019\"/>\u0045", unit.getPart(0).getSource().toXLIFF());
+		
+		assertEquals("\u0019\u0045\uFFFF"+chars[0]+chars[1], unit.getPart(0).getSource().getCodedText().substring(2));
+		ICode code = unit.getDataStore().getSourceCodes().get(0);
+		assertEquals("[\u0019\u0045\uFFFF"+chars[0]+chars[1]+"]", code.getOriginalData());
+
+		assertEquals("<ph id=\"1\">[<cp hex=\"0019\"/>\u0045<cp hex=\"FFFF\"/>"+chars[0]+chars[1]+"]</ph><cp hex=\"0019\"/>\u0045<cp hex=\"FFFF\"/>"+chars[0]+chars[1],
+			unit.getPart(0).getSource().toXLIFF(IFragment.STYLE_DATAINSIDE));
 	}
 	
 	@Test

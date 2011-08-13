@@ -20,6 +20,8 @@
 
 package net.sf.okapi.lib.xliff;
 
+import org.oasisopen.xliff.v2.InlineType;
+
 class Util {
 
 	final static String NS_XLIFF20 = "urn:oasis:names:tc:xliff:document:2.0";
@@ -94,4 +96,44 @@ class Util {
 		return text;
 	}
 
+	static String toSafeXML (String text) {
+		// In XML 1.0 the valid characters are:
+		// #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
+		StringBuilder tmp = new StringBuilder();
+		for ( int i=0; i<text.length(); i++ ) {
+			int cp = text.codePointAt(i);
+			switch ( cp ) {
+			case '&':
+				tmp.append("&amp;");
+				break;
+			case '<':
+				tmp.append("&lt;");
+				break;
+			case 0x0009:
+			case 0x000A:
+			case 0x000D:
+				tmp.append((char)cp);
+				continue;
+			default:
+				if (( cp < 0x0020 )
+					|| (( cp >0xD7FF ) && ( cp < 0xE000 ))
+					|| ( cp == 0xFFFF ))
+				{
+					// Invalid
+					tmp.append(String.format("<cp hex=\"%04X\"/>", cp));
+				}
+				else if ( cp < 0xFFFF ) {
+					// Valid char 
+					tmp.append((char)cp);
+				}
+				else if ( cp > 0xFFFF ) {
+					// Valid pair
+					tmp.append(Character.toChars(cp));
+					i++; // Skip second char of the pair
+				}
+				continue;
+			}
+		}
+		return tmp.toString();
+	}
 }

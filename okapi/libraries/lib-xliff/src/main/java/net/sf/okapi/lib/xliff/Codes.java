@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import org.oasisopen.xliff.v2.ICode;
 import org.oasisopen.xliff.v2.ICodes;
 import org.oasisopen.xliff.v2.IDataStore;
+import org.oasisopen.xliff.v2.InlineType;
 
 public class Codes implements ICodes {
 

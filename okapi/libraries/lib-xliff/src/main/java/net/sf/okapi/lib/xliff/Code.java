@@ -21,6 +21,7 @@
 package net.sf.okapi.lib.xliff;
 
 import org.oasisopen.xliff.v2.ICode;
+import org.oasisopen.xliff.v2.InlineType;
 
 public class Code implements ICode {
 

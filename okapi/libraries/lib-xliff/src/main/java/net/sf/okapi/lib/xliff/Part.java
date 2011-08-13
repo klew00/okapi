@@ -28,11 +28,11 @@ public class Part implements Serializable, IWithExtendedAttributes {
 
 	private static final long serialVersionUID = 0100L;
 
-	protected DataStore store;
-	protected Fragment source;
-	protected Fragment target;
-	protected int targetOrder;
-	protected ExtendedAttributes xattrs;
+	private DataStore store;
+	private Fragment source;
+	private Fragment target;
+	private int targetOrder;
+	private ExtendedAttributes xattrs;
 	
 	public Part (DataStore store) {
 		this.store = store;

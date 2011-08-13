@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.lib.xliff;
+package org.oasisopen.xliff.v2;
 
 /**
  * Possible types of inline codes and markers in XLIFF.

@@ -265,13 +265,16 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 				code = codes.get(index);
 				switch ( code.getTagType() ) {
 				case OPENING:
-					frag.append(net.sf.okapi.lib.xliff.InlineType.OPENING, String.valueOf(code.getId()), code.getData());
+					frag.append(org.oasisopen.xliff.v2.InlineType.OPENING,
+						String.valueOf(code.getId()), code.getData());
 					break;
 				case CLOSING:
-					frag.append(net.sf.okapi.lib.xliff.InlineType.CLOSING, String.valueOf(code.getId()), code.getData());
+					frag.append(org.oasisopen.xliff.v2.InlineType.CLOSING,
+						String.valueOf(code.getId()), code.getData());
 					break;
 				case PLACEHOLDER:
-					frag.append(net.sf.okapi.lib.xliff.InlineType.PLACEHOLDER, String.valueOf(code.getId()), code.getData());
+					frag.append(org.oasisopen.xliff.v2.InlineType.PLACEHOLDER,
+						String.valueOf(code.getId()), code.getData());
 					break;
 				}
 			}

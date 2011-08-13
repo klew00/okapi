@@ -39,6 +39,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.oasisopen.xliff.v2.ICode;
 import org.oasisopen.xliff.v2.IWithCandidates;
 import org.oasisopen.xliff.v2.IWithNotes;
+import org.oasisopen.xliff.v2.InlineType;
 
 import net.sf.okapi.lib.xliff.XLIFFEvent.XLIFFEventType;
 
@@ -400,6 +401,22 @@ public class XLIFFReader {
 					}
 					content.setLength(0);
 				}
+				else if ( tmp.equals(Util.ELEM_CP) ) {
+					tmp = reader.getAttributeValue(null, Util.ATTR_HEX);
+					cannotBeNullOrEmpty(Util.ATTR_HEX, tmp);
+					try {
+						int cp = Integer.valueOf(tmp, 16);
+						if ( cp > 0xFFFF ) {
+							content.append(Character.toChars(cp));
+						}
+						else {
+							content.append((char)cp);
+						}
+					}
+					catch ( NumberFormatException e ) {
+						throw new XLIFFReaderException(String.format("Invalid code-point value in '%s': '%s'", Util.ATTR_HEX, tmp));
+					}
+				}
 				break;
 				
 			case XMLStreamReader.END_ELEMENT:
@@ -412,6 +429,7 @@ public class XLIFFReader {
 					store.setOutsideRepresentationMap(map);
 					return;
 				}
+				// Else: could be end of ELEM_CP: nothing to do
 				break;
 			}
 		}
@@ -524,11 +542,30 @@ public class XLIFFReader {
 					tmp = reader.getAttributeValue(null, Util.ATTR_HEX);
 					cannotBeNullOrEmpty(Util.ATTR_HEX, tmp);
 					try {
-						frag.append((char)((int)Integer.valueOf(tmp, 16)));
+						int cp = Integer.valueOf(tmp, 16);
+						if ( cp > 0xFFFF ) {
+							char[] chars = Character.toChars(cp);
+							if ( code == null ) {
+								frag.append(chars[0]);
+								frag.append(chars[1]);
+							}
+							else {
+								content.append(chars);
+							}
+						}
+						else {
+							if ( code == null ) {
+								frag.append((char)cp);
+							}
+							else {
+								content.append((char)cp);
+							}
+						}
 					}
 					catch ( NumberFormatException e ) {
 						throw new XLIFFReaderException(String.format("Invalid code-point value in '%s': '%s'", Util.ATTR_HEX, tmp));
 					}
+					continue;
 				}
 				// Common attributes
 				if ( code != null ) {

@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import java.io.StringWriter;
 
 import org.junit.Test;
+import org.oasisopen.xliff.v2.InlineType;
 
 public class XLIFFWriterTest {
 

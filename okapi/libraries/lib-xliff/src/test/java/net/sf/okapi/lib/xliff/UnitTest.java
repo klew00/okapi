@@ -9,6 +9,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import org.junit.Test;
+import org.oasisopen.xliff.v2.InlineType;
 
 public class UnitTest {
 

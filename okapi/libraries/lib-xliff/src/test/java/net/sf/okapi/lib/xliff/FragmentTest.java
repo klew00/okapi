@@ -9,6 +9,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import org.junit.Test;
+import org.oasisopen.xliff.v2.InlineType;
 
 public class FragmentTest {
 
@@ -95,14 +96,17 @@ public class FragmentTest {
 
 	@Test
 	public void testInvalidChars () {
+		char[] chars = Character.toChars(0x10001);
 		Fragment frag = new Fragment(new Unit("id").getDataStore());
-		frag.append(InlineType.OPENING, "1", "<elem atrr='&amp;'>");
-		frag.append("\u001a\u0002\t\n\u0020\uD7FF\u0019");
-		frag.append(InlineType.CLOSING, "1", "</elem>");
+		frag.append(InlineType.OPENING, "1", "[\u0002"+chars[0]+chars[1]+"\uFFFF]");
+		frag.append("\u001a\u0002\t\n\u0020\uD7FF\u0019"+chars[0]+chars[1]+"\uFFFF");
+		frag.append(InlineType.CLOSING, "1", "[/\u0002"+chars[0]+chars[1]+"\uFFFF]");
 		
 		frag.getDataStore().calculateOriginalDataToIdsMap();
-		assertEquals("<pc id=\"1\"><cp hex=\"001A\"/><cp hex=\"0002\"/>\t\n\u0020\uD7FF<cp hex=\"0019\"/></pc>",
-			frag.toXLIFF(Fragment.STYLE_NODATA));
+		assertEquals("<sc id=\"1\">[<cp hex=\"0002\"/>"+chars[0]+chars[1]+"<cp hex=\"FFFF\"/>]</sc>"
+			+ "<cp hex=\"001A\"/><cp hex=\"0002\"/>\t\n\u0020\uD7FF<cp hex=\"0019\"/>"+chars[0]+chars[1]+"<cp hex=\"FFFF\"/>"
+			+ "<ec rid=\"1\">[/<cp hex=\"0002\"/>"+chars[0]+chars[1]+"<cp hex=\"FFFF\"/>]</ec>",
+			frag.toXLIFF(Fragment.STYLE_DATAINSIDE));
 	}
 
 	@Test

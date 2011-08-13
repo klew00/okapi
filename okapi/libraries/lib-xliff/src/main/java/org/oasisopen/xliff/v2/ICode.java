@@ -22,8 +22,6 @@ package org.oasisopen.xliff.v2;
 
 import java.io.Serializable;
 
-import net.sf.okapi.lib.xliff.InlineType;
-
 public interface ICode extends Serializable {
 
 	public String getOriginalData ();

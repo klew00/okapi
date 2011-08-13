@@ -22,8 +22,6 @@ package org.oasisopen.xliff.v2;
 
 import java.io.Serializable;
 
-import net.sf.okapi.lib.xliff.InlineType;
-
 /**
  * Provides the method to store and manipulate codes in a given content.
  */

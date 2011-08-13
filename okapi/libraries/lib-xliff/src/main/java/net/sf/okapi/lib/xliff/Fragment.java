@@ -20,26 +20,22 @@
 
 package net.sf.okapi.lib.xliff;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Stack;
 
 import org.oasisopen.xliff.v2.ICode;
 import org.oasisopen.xliff.v2.IDataStore;
+import org.oasisopen.xliff.v2.IFragment;
+import org.oasisopen.xliff.v2.InlineType;
 
 /**
  * TEMPORARY implementation.
  * Holds the usable content for XLIFF constructs: text and inline codes.
  */
-public class Fragment implements Serializable {
+public class Fragment implements IFragment {
 	
 	private static final long serialVersionUID = 0100L;
 	
-	public static final int STYLE_XSDTEMP = -1; // Temporary
-	public static final int STYLE_NODATA = 0;
-	public static final int STYLE_DATAINSIDE = 1;
-	public static final int STYLE_DATAOUTSIDE = 2;
-
 	public static final char CODE_OPENING = '\uE101';
 	public static final char CODE_CLOSING = '\uE102';
 	public static final char CODE_PLACEHOLDER = '\uE103';
@@ -124,16 +120,12 @@ public class Fragment implements Serializable {
 		return ctext.toString();
 	}
 	
+	@Override
 	public String getCodedText () {
 		return ctext.toString();
 	}
 
-	/**
-	 * Gets the content of this fragment formatted in XLIFF in a given style.
-	 * <p>The available styles are: {@link #STYLE_NODATA}, {@link #STYLE_DATAINSIDE}, and {@link #STYLE_DATAOUTSIDE}.
-	 * @param style the style to use for the output.
-	 * @return the content of this fragment formatted in XLIFF in a given style.
-	 */
+	@Override
 	public String toXLIFF (int style) {
 		switch ( style ) {
 		case STYLE_XSDTEMP:
@@ -148,6 +140,7 @@ public class Fragment implements Serializable {
 		}
 	}
 	
+	@Override
 	public IDataStore getDataStore () {
 		return codes.getDataStore();
 	}
@@ -155,21 +148,21 @@ public class Fragment implements Serializable {
 	private String toXSDTemp () {
 		StringBuilder tmp = new StringBuilder();
 		for ( int i=0; i<ctext.length(); i++ ) {
-			char ch = ctext.charAt(i);
-			if ( ctext.charAt(i) == CODE_OPENING ) {
+			int cp = ctext.codePointAt(i);
+			if ( cp == CODE_OPENING ) {
 				tmp.append(String.format("<inline id=\"%s\"/>",
 					codes.get(toIndex(ctext.charAt(++i))).getInternalId()));
 			}
-			else if ( ctext.charAt(i) == CODE_CLOSING ) {
+			else if ( cp == CODE_CLOSING ) {
 				tmp.append(String.format("<inline id=\"%s\"/>",
 					codes.get(toIndex(ctext.charAt(++i))).getInternalId()));
 			}
-			else if ( ctext.charAt(i) == CODE_PLACEHOLDER ) {
+			else if ( cp == CODE_PLACEHOLDER ) {
 				tmp.append(String.format("<inline id=\"%s\"/>",
 					codes.get(toIndex(ctext.charAt(++i))).getInternalId()));
 			}
 			else {
-				switch ( ch ) {
+				switch ( cp ) {
 				case '\r':
 					tmp.append("&#13;"); // Literal
 					break;
@@ -181,18 +174,24 @@ public class Fragment implements Serializable {
 					break;
 				case '\n':
 				case '\t':
-					tmp.append(ch);
+					tmp.append((char)cp);
 					break;
 				default:
-					if (( ch < 0x0020 ) 
-						|| (( ch > 0xD7FF ) && ( ch < 0xE000 ))
-						|| ( ch > 0xFFFD )) //TODO: deal with high-planes
+					if (( cp < 0x0020 )
+						|| (( cp >0xD7FF ) && ( cp < 0xE000 ))
+						|| ( cp == 0xFFFF ))
 					{
-						// Invalid in XML
-						tmp.append(String.format("<cp hex=\"%04X\"/>", (int)ch));
+						// Invalid
+						tmp.append(String.format("<cp hex=\"%04X\"/>", cp));
 					}
-					else {
-						tmp.append(ch);
+					else if ( cp < 0xFFFF ) {
+						// Valid char 
+						tmp.append((char)cp);
+					}
+					else if ( cp > 0xFFFF ) {
+						// Valid pair
+						tmp.append(Character.toChars(cp));
+						i++; // Skip second char of the pair
 					}
 					break;
 				}
@@ -206,8 +205,8 @@ public class Fragment implements Serializable {
 		ICode code;
 		int index;
 		for ( int i=0; i<ctext.length(); i++ ) {
-			char ch = ctext.charAt(i);
-			if ( ctext.charAt(i) == CODE_OPENING ) {
+			int cp = ctext.codePointAt(i);
+			if ( cp == CODE_OPENING ) {
 				index = toIndex(ctext.charAt(++i));
 				code = codes.get(index);
 				tmp.append(String.format("<sc id=\"%s\"", code.getId()));
@@ -216,7 +215,7 @@ public class Fragment implements Serializable {
 						tmp.append("/>");
 					}
 					else {
-						tmp.append(">"+Util.toXML(code.getOriginalData(), false)+"</sc>");
+						tmp.append(">"+Util.toSafeXML(code.getOriginalData())+"</sc>");
 					}
 				}
 				else {
@@ -227,7 +226,7 @@ public class Fragment implements Serializable {
 					tmp.append("/>");
 				}
 			}
-			else if ( ctext.charAt(i) == CODE_CLOSING ) {
+			else if ( cp == CODE_CLOSING ) {
 				index = toIndex(ctext.charAt(++i));
 				code = codes.get(index);
 				tmp.append(String.format("<ec rid=\"%s\"", code.getId()));
@@ -236,7 +235,7 @@ public class Fragment implements Serializable {
 						tmp.append("/>");
 					}
 					else {
-						tmp.append(">"+Util.toXML(code.getOriginalData(), false)+"</ec>");
+						tmp.append(">"+Util.toSafeXML(code.getOriginalData())+"</ec>");
 					}
 				}
 				else {
@@ -247,7 +246,7 @@ public class Fragment implements Serializable {
 					tmp.append("/>");
 				}
 			}
-			else if ( ctext.charAt(i) == CODE_PLACEHOLDER ) {
+			else if ( cp == CODE_PLACEHOLDER ) {
 				index = toIndex(ctext.charAt(++i));
 				code = codes.get(index);
 				tmp.append(String.format("<ph id=\"%s\"", code.getId()));
@@ -256,7 +255,7 @@ public class Fragment implements Serializable {
 						tmp.append("/>");
 					}
 					else {
-						tmp.append(">"+Util.toXML(code.getOriginalData(), false)+"</ph>");
+						tmp.append(">"+Util.toSafeXML(code.getOriginalData())+"</ph>");
 					}
 				}
 				else {
@@ -268,7 +267,7 @@ public class Fragment implements Serializable {
 				}
 			}
 			else {
-				switch ( ch ) {
+				switch ( cp ) {
 				case '\r':
 					tmp.append("&#13;"); // Literal
 					break;
@@ -280,18 +279,24 @@ public class Fragment implements Serializable {
 					break;
 				case '\n':
 				case '\t':
-					tmp.append(ch);
+					tmp.append((char)cp);
 					break;
 				default:
-					if (( ch < 0x0020 ) 
-						|| (( ch > 0xD7FF ) && ( ch < 0xE000 ))
-						|| ( ch > 0xFFFD )) //TODO: deal with high-planes
+					if (( cp < 0x0020 )
+						|| (( cp >0xD7FF ) && ( cp < 0xE000 ))
+						|| ( cp == 0xFFFF ))
 					{
-						// Invalid in XML
-						tmp.append(String.format("<cp hex=\"%04X\"/>", (int)ch));
+						// Invalid
+						tmp.append(String.format("<cp hex=\"%04X\"/>", cp));
 					}
-					else {
-						tmp.append(ch);
+					else if ( cp < 0xFFFF ) {
+						// Valid char 
+						tmp.append((char)cp);
+					}
+					else if ( cp > 0xFFFF ) {
+						// Valid pair
+						tmp.append(Character.toChars(cp));
+						i++; // Skip second char of the pair
 					}
 					break;
 				}
@@ -300,18 +305,14 @@ public class Fragment implements Serializable {
 		return tmp.toString();
 	}
 
-	/**
-	 * Gets the content of this fragment formatted in XLIFF in the style {@link #STYLE_NODATA}.
-	 * <p>Use {@link #toXLIFF(int)} to select the style of output.
-	 * @return the content of this fragment formatted in XLIFF in the style {@link #STYLE_NODATA}.
-	 */
+	@Override
 	public String toXLIFF () {
 		StringBuilder tmp = new StringBuilder();
 		ICode code;
 		ArrayList<String> verified = new ArrayList<String>();
 		for ( int i=0; i<ctext.length(); i++ ) {
-			char ch = ctext.charAt(i);
-			if ( ch == CODE_OPENING ) {
+			int cp = ctext.codePointAt(i);
+			if ( cp == CODE_OPENING ) {
 				code = codes.get(toIndex(ctext.charAt(++i)));
 				// Check if the corresponding closing part is in the same fragment
 				if ( isWellFormed(code, i) ) {
@@ -323,7 +324,7 @@ public class Fragment implements Serializable {
 					tmp.append(String.format("<sc id=\"%s\"/>", code.getId()));
 				}
 			}
-			else if ( ch == CODE_CLOSING ) {
+			else if ( cp == CODE_CLOSING ) {
 				code = codes.get(toIndex(ctext.charAt(++i)));
 				if ( verified.contains(code.getId()) ) {
 					// This pair was verified
@@ -335,14 +336,14 @@ public class Fragment implements Serializable {
 					tmp.append(String.format("<ec rid=\"%s\"/>", code.getId()));
 				}
 			}
-			else if ( ch == CODE_PLACEHOLDER ) {
+			else if ( cp == CODE_PLACEHOLDER ) {
 				tmp.append(String.format("<ph id=\"%s\"/>",
 					codes.get(toIndex(ctext.charAt(++i))).getId()));
 			}
 			else {
 				// In XML 1.0 the valid characters are:
 				// #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
-				switch ( ch ) {
+				switch ( cp ) {
 				case '\r':
 					tmp.append("&#13;"); // Literal
 					break;
@@ -354,30 +355,37 @@ public class Fragment implements Serializable {
 					break;
 				case '\n':
 				case '\t':
-					tmp.append(ch);
+					tmp.append((char)cp);
 					break;
 				default:
-					if (( ch < 0x0020 ) 
-						|| (( ch > 0xD7FF ) && ( ch < 0xE000 ))
-						|| ( ch > 0xFFFD )) //TODO: deal with high-planes
+					if (( cp < 0x0020 )
+						|| (( cp >0xD7FF ) && ( cp < 0xE000 ))
+						|| ( cp == 0xFFFF ))
 					{
-						// Invalid in XML
-						tmp.append(String.format("<cp hex=\"%04X\"/>", (int)ch));
+						// Invalid
+						tmp.append(String.format("<cp hex=\"%04X\"/>", cp));
 					}
-					else {
-						tmp.append(ch);
+					else if ( cp < 0xFFFF ) {
+						// Valid char 
+						tmp.append((char)cp);
 					}
-					break;
+					else if ( cp > 0xFFFF ) {
+						// Valid pair
+						tmp.append(Character.toChars(cp));
+						i++; // Skip second char of the pair
+					}
 				}
 			}
 		}
 		return tmp.toString();
 	}
 
+	@Override
 	public boolean isEmpty () {
 		return (ctext.length()==0);
 	}
 
+	@Override
 	public boolean isWellFormed (ICode openingCode,
 		int from)
 	{
@@ -415,21 +423,17 @@ public class Fragment implements Serializable {
 		return false;
 	}
 	
-	
-//	public void clear () {
-//		ctext.setLength(0);
-//		if ( codes != null ) codes.clear();
-//		codes = null;
-//	}
-	
+	@Override
 	public void append (String plainText) {
 		ctext.append(plainText);
 	}
 	
+	@Override
 	public void append (char ch) {
 		ctext.append(ch);
 	}
 
+	@Override
 	public ICode append (InlineType type,
 		String id,
 		String originalData)
@@ -452,27 +456,5 @@ public class Fragment implements Serializable {
 		}
 		return code;
 	}
-
-//	private String checkId (String id) {
-//		// Create a new ID if the one provided is null or empty
-//		if (( id == null ) || id.isEmpty() ) {
-//			id = String.valueOf(++lastAutoId);
-//		}
-//		// Checks if the ID is already used
-//		boolean exists = true;
-//		while ( exists ) {
-//			exists = false;
-//			for ( int i=0; i<codes.size(); i++ ) {
-//				if ( codes.get(i).getId().equals(id) ) {
-//					// If it is, we just try the next auto value
-//					id = String.valueOf(++lastAutoId);
-//					exists = true;
-//					break;
-//				}
-//			}
-//		}
-//		// Returns the validated (and possibly modified id)
-//		return id;
-//	}
 
 }

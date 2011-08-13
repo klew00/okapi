@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 import org.oasisopen.xliff.v2.ICode;
+import org.oasisopen.xliff.v2.InlineType;
 
 public class CodeTest {
 
