@@ -500,6 +500,7 @@ public class XLIFFReader {
 		ICode code = null;
 		StringBuilder content = new StringBuilder();
 		String nid = null;
+		Stack<ICode> pairs = new Stack<ICode>();
 		
 		while ( reader.hasNext() ) {
 			switch ( reader.next() ) {
@@ -524,19 +525,40 @@ public class XLIFFReader {
 					tmp = reader.getAttributeValue(null, Util.ATTR_ID);
 					cannotBeNullOrEmpty(Util.ATTR_ID, tmp);
 					code = frag.append(InlineType.OPENING, tmp, null);
+					tmp = reader.getAttributeValue(null, Util.ATTR_TYPE);
+					code.setEquiv(reader.getAttributeValue(null, Util.ATTR_EQUIV));
+					code.setDisp(reader.getAttributeValue(null, Util.ATTR_DISP));
 					content.setLength(0);
 				}
 				else if ( tmp.equals(Util.ELEM_CLOSINGCODE) ) {
 					tmp = reader.getAttributeValue(null, Util.ATTR_RID);
 					cannotBeNullOrEmpty(Util.ATTR_RID, tmp);
 					code = frag.append(InlineType.CLOSING, tmp, null);
+					code.setEquiv(reader.getAttributeValue(null, Util.ATTR_EQUIV));
+					code.setDisp(reader.getAttributeValue(null, Util.ATTR_DISP));
 					content.setLength(0);
 				}
 				else if ( tmp.equals(Util.ELEM_PLACEHOLDER) ) {
 					tmp = reader.getAttributeValue(null, Util.ATTR_ID);
 					cannotBeNullOrEmpty(Util.ATTR_ID, tmp);
 					code = frag.append(InlineType.PLACEHOLDER, tmp, null);
+					code.setEquiv(reader.getAttributeValue(null, Util.ATTR_EQUIV));
+					code.setDisp(reader.getAttributeValue(null, Util.ATTR_DISP));
 					content.setLength(0);
+				}
+				else if ( tmp.equals(Util.ELEM_PAIREDCODES) ) {
+					tmp = reader.getAttributeValue(null, Util.ATTR_ID);
+					cannotBeNullOrEmpty(Util.ATTR_ID, tmp);
+					code = frag.append(InlineType.OPENING, tmp, null);
+					code.setEquiv(reader.getAttributeValue(null, Util.ATTR_EQUIV));
+					code.setDisp(reader.getAttributeValue(null, Util.ATTR_DISP));
+					// Closing code
+					ICode closing = new Code(InlineType.CLOSING, tmp, null);
+					closing.setEquiv(reader.getAttributeValue(null, Util.ATTR_EQUIVEND));
+					closing.setDisp(reader.getAttributeValue(null, Util.ATTR_DISPEND));
+					pairs.push(closing);
+					code = null;
+					continue;
 				}
 				else if ( tmp.equals(Util.ELEM_CP) ) {
 					tmp = reader.getAttributeValue(null, Util.ATTR_HEX);
@@ -591,6 +613,9 @@ public class XLIFFReader {
 					code = null;
 					nid = null;
 				}
+				else if ( tmp.equals(Util.ELEM_PAIREDCODES) ) {
+					frag.append(pairs.pop());
+				}
 				else if ( tmp.equals(Util.ELEM_SOURCE) ) {
 					partToFill.setSource(frag);
 					return;
@@ -603,7 +628,7 @@ public class XLIFFReader {
 			}
 		}
 	}
-	
+
 	private boolean checkInsideVersusOutside (String outsideId,
 		StringBuilder insideContent,
 		ICode code)

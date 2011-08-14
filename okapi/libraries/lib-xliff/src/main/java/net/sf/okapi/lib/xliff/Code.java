@@ -37,6 +37,9 @@ public class Code implements ICode {
 	private String id;
 	private String originalData;
 	private int hints = (CANDELETE | CANREPLICATE | CANREORDER | CANCHANGEPARENT);
+	private String disp;
+	private String equiv;
+	private String type;
 
 	public Code (InlineType inlineType,
 		String id,
@@ -89,6 +92,36 @@ public class Code implements ICode {
 		this.inlineType = inlineType;
 	}
 
+	@Override
+	public String getType () {
+		return type;
+	}
+	
+	@Override
+	public void setType (String type) {
+		this.type = type;
+	}
+	
+	@Override
+	public String getDisp () {
+		return disp;
+	}
+	
+	@Override
+	public void setDisp (String disp) {
+		this.disp = disp;
+	}
+	
+	@Override
+	public String getEquiv () {
+		return equiv;
+	}
+	
+	@Override
+	public void setEquiv (String equiv) {
+		this.equiv = equiv;
+	}
+	
 	@Override
 	public int getHints () {
 		return hints;

@@ -79,6 +79,36 @@ public class XLIFFReaderTest {
 	}
 	
 	@Test
+	public void testInlineCodes () {
+		String text = "<?xml version='1.0'?>\n<xliff version=\"2.0\" xmlns=\"urn:oasis:names:tc:xliff:document:2.0\">"
+			+ "<file srclang=\"en\" tgtlang=\"fr\">\n<unit id=\"id\"><segment>\n"
+			+ "<source>"
+			+ "<sc id=\"1\" equiv=\"eq1\" disp=\"di1\"/>t1<pc id=\"2\" equiv=\"eq2\" disp=\"di2\">t2"
+				+ "<ph id=\"3\" equiv=\"eq3\" disp=\"di3\"/>t3"
+				+ "</pc><ec rid=\"1\" equiv=\"eq1e\" disp=\"di1e\"/>"
+			+ "</source>"
+			+ "</segment></unit>\n</file></xliff>";
+		Unit unit = getUnit(text, 1);
+		assertNotNull(unit);
+		
+		ICode code = unit.getDataStore().getSourceCodes().get(0);
+		assertEquals("eq1", code.getEquiv());
+		assertEquals("di1", code.getDisp());
+		code = unit.getDataStore().getSourceCodes().get(1);
+		assertEquals("eq2", code.getEquiv());
+		assertEquals("di2", code.getDisp());
+		code = unit.getDataStore().getSourceCodes().get(2);
+		assertEquals("eq3", code.getEquiv());
+		assertEquals("di3", code.getDisp());
+		
+		assertEquals("<pc id=\"1\" equiv=\"eq1\" disp=\"di1\" equivEnd=\"eq1e\" dispEnd=\"di1e\">t1" +
+				"<pc id=\"2\" equiv=\"eq2\" disp=\"di2\">t2" +
+				"<ph id=\"3\" equiv=\"eq3\" disp=\"di3\"/>t3" +
+				"</pc></pc>",
+			unit.getPart(0).getSource().toXLIFF(IFragment.STYLE_NODATA));
+	}
+	
+	@Test
 	public void testComments () {
 		String text = "<?xml version='1.0'?>\n<xliff version=\"2.0\" xmlns=\"urn:oasis:names:tc:xliff:document:2.0\">"
 			+ "<file srclang=\"en\" tgtlang=\"fr\">\n<unit id=\"id\"><segment>\n"

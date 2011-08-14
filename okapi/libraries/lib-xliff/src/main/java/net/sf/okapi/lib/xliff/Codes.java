@@ -55,23 +55,23 @@ public class Codes implements ICodes {
 		return false;
 	}
 	
-//	public ICode getClosingPart (ICode openingCode) {
-//		for ( ICode code : codes ) {
-//			if ( code.getId().equals(openingCode.getId()) ) {
-//				return code;
-//			}
-//		}
-//		return null;
-//	}
-//	
-//	public ICode getOpeningPart (Code closingCode) {
-//		for ( Code code : codes ) {
-//			if ( code.getId().equals(closingCode.getId()) ) {
-//				return code;
-//			}
-//		}
-//		return null;
-//	}
+	public ICode getClosingPart (ICode openingCode) {
+		for ( ICode code : codes ) {
+			if ( code.getId().equals(openingCode.getId()) ) {
+				return code;
+			}
+		}
+		return null;
+	}
+	
+	public ICode getOpeningPart (ICode closingCode) {
+		for ( ICode code : codes ) {
+			if ( code.getId().equals(closingCode.getId()) ) {
+				return code;
+			}
+		}
+		return null;
+	}
 	
 	@Override
 	public int size () {
@@ -108,4 +108,26 @@ public class Codes implements ICodes {
 		codes.add(code);
 	}
 
+	boolean validateClosingTypesMatchOpeningTypes () {
+		if ( codes == null ) return true;
+		for ( ICode code : codes ) {
+			if ( code.getInlineType().equals(InlineType.CLOSING) ) {
+				ICode opening = getOpeningPart(code);
+				if ( opening == null ) {
+					// Not found yet
+				}
+				else {
+					String oType = opening.getType();
+					String cType = code.getType();
+					if ( oType == null ) {
+						if ( cType != null ) {
+							// Error: type defined in closing but not in opening
+						}
+					}
+//					else 
+				}
+			}
+		}
+		return true;
+	}
 }

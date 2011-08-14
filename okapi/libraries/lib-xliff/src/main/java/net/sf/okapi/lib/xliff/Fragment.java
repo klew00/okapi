@@ -210,6 +210,7 @@ public class Fragment implements IFragment {
 				index = toIndex(ctext.charAt(++i));
 				code = codes.get(index);
 				tmp.append(String.format("<sc id=\"%s\"", code.getId()));
+				printCommonAttributes(code, tmp, null);
 				if ( dataInside ) {
 					if ( Util.isNullOrEmpty(code.getOriginalData()) ) {
 						tmp.append("/>");
@@ -230,6 +231,7 @@ public class Fragment implements IFragment {
 				index = toIndex(ctext.charAt(++i));
 				code = codes.get(index);
 				tmp.append(String.format("<ec rid=\"%s\"", code.getId()));
+				printCommonAttributes(code, tmp, null);
 				if ( dataInside ) {
 					if ( Util.isNullOrEmpty(code.getOriginalData()) ) {
 						tmp.append("/>");
@@ -250,6 +252,7 @@ public class Fragment implements IFragment {
 				index = toIndex(ctext.charAt(++i));
 				code = codes.get(index);
 				tmp.append(String.format("<ph id=\"%s\"", code.getId()));
+				printCommonAttributes(code, tmp, null);
 				if ( dataInside ) {
 					if ( Util.isNullOrEmpty(code.getOriginalData()) ) {
 						tmp.append("/>");
@@ -304,6 +307,29 @@ public class Fragment implements IFragment {
 		}
 		return tmp.toString();
 	}
+	
+	private void printCommonAttributes (ICode code,
+		StringBuilder tmp,
+		ICode closing)
+	{
+		if ( code.getType() != null ) {
+			tmp.append(String.format(" type=\"%s\"", code.getType()));
+		}
+		if ( code.getEquiv() != null ) {
+			tmp.append(String.format(" equiv=\"%s\"", code.getEquiv()));
+		}
+		if ( code.getDisp() != null ) {
+			tmp.append(String.format(" disp=\"%s\"", code.getDisp()));
+		}
+		if ( closing != null ) {
+			if ( closing.getEquiv() != null ) {
+				tmp.append(String.format(" equivEnd=\"%s\"", closing.getEquiv()));
+			}
+			if ( closing.getDisp() != null ) {
+				tmp.append(String.format(" dispEnd=\"%s\"", closing.getDisp()));
+			}
+		}
+	}
 
 	@Override
 	public String toXLIFF () {
@@ -315,13 +341,18 @@ public class Fragment implements IFragment {
 			if ( cp == CODE_OPENING ) {
 				code = codes.get(toIndex(ctext.charAt(++i)));
 				// Check if the corresponding closing part is in the same fragment
-				if ( isWellFormed(code, i) ) {
-					tmp.append(String.format("<pc id=\"%s\">", code.getId()));
+				ICode closing = getWellFormedClosing(code, i);
+				if ( closing != null ) {
+					tmp.append(String.format("<pc id=\"%s\"", code.getId()));
+					printCommonAttributes(code, tmp, closing);
 					verified.add(code.getId());
+					tmp.append(">");
 				}
 				else {
 					// No corresponding closing part
-					tmp.append(String.format("<sc id=\"%s\"/>", code.getId()));
+					tmp.append(String.format("<sc id=\"%s\"", code.getId()));
+					printCommonAttributes(code, tmp, null);
+					tmp.append("/>");
 				}
 			}
 			else if ( cp == CODE_CLOSING ) {
@@ -333,12 +364,16 @@ public class Fragment implements IFragment {
 					// as it's not used again (no need to waste time cleaning it)
 				}
 				else { // Not in the verified list
-					tmp.append(String.format("<ec rid=\"%s\"/>", code.getId()));
+					tmp.append(String.format("<ec rid=\"%s\"", code.getId()));
+					printCommonAttributes(code, tmp, null);
+					tmp.append("/>");
 				}
 			}
 			else if ( cp == CODE_PLACEHOLDER ) {
-				tmp.append(String.format("<ph id=\"%s\"/>",
-					codes.get(toIndex(ctext.charAt(++i))).getId()));
+				code = codes.get(toIndex(ctext.charAt(++i)));
+				tmp.append(String.format("<ph id=\"%s\"", code.getId()));
+				printCommonAttributes(code, tmp, null);
+				tmp.append("/>");
 			}
 			else {
 				// In XML 1.0 the valid characters are:
@@ -386,7 +421,7 @@ public class Fragment implements IFragment {
 	}
 
 	@Override
-	public boolean isWellFormed (ICode openingCode,
+	public ICode getWellFormedClosing (ICode openingCode,
 		int from)
 	{
 		Stack<String> stack = new Stack<String>();
@@ -401,17 +436,18 @@ public class Fragment implements IFragment {
 				code = codes.get(toIndex(ctext.charAt(++i)));
 				if ( code.getId().equals(openingCode.getId()) ) {
 					// Well-formed if the stack is empty
-					return stack.isEmpty();
+					if ( stack.isEmpty() ) return code;
+					else return null;
 				}
 				// If it's not our closing code and the stack is already empty
 				// That's not a well-formed pattern
 				if ( stack.isEmpty() ) {
-					return false;
+					return null;
 				}
 				// If the top of the stack is not the closing of the current
 				// element, it's not well-formed.
 				if ( !stack.pop().equals(code.getId()) ) {
-					return false;
+					return null;
 				}
 				// Else: keep going
 			}
@@ -420,7 +456,7 @@ public class Fragment implements IFragment {
 			}
 		}
 		// Closing part not found: not well-formed.
-		return false;
+		return null;
 	}
 	
 	@Override
@@ -434,16 +470,9 @@ public class Fragment implements IFragment {
 	}
 
 	@Override
-	public ICode append (InlineType type,
-		String id,
-		String originalData)
-	{
-		if ( codes == null ) {
-			throw new RuntimeException("Cannot add codes in this fragment because it has no associated store of codes.");
-		}
-		ICode code = new Code(type, id, originalData);
+	public ICode append (ICode code) {
 		codes.add(code);
-		switch ( type ) {
+		switch ( code.getInlineType() ) {
 		case OPENING:
 			ctext.append(""+CODE_OPENING+toChar(codes.size()-1));
 			break;
@@ -455,6 +484,18 @@ public class Fragment implements IFragment {
 			break;
 		}
 		return code;
+	}
+
+	@Override
+	public ICode append (InlineType type,
+		String id,
+		String originalData)
+	{
+		if ( codes == null ) {
+			throw new RuntimeException("Cannot add codes in this fragment because it has no associated store of codes.");
+		}
+		ICode code = new Code(type, id, originalData);
+		return append(code);
 	}
 
 }

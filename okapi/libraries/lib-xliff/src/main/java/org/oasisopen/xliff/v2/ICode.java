@@ -38,6 +38,18 @@ public interface ICode extends Serializable {
 
 	public void setInlineType (InlineType inlineType);
 
+	public String getType ();
+	
+	public void setType (String type);
+	
+	public String getDisp ();
+	
+	public void setDisp (String disp);
+	
+	public String getEquiv ();
+	
+	public void setEquiv (String equiv);
+	
 	public int getHints ();
 	
 	public void setHints (int hints);

@@ -49,6 +49,10 @@ class Util {
 	final static String ATTR_NID = "nid";
 	final static String ATTR_TYPE = "type";
 	final static String ATTR_HEX = "hex";
+	final static String ATTR_EQUIV = "equiv";
+	final static String ATTR_EQUIVEND = "equivEnd";
+	final static String ATTR_DISP = "disp";
+	final static String ATTR_DISPEND = "dispEnd";
 	final static String ATTR_SOURCELANG = "srclang";
 	final static String ATTR_TARGETLANG = "tgtlang";
 	final static String ATTR_TRANSLATABLE = "translatable";

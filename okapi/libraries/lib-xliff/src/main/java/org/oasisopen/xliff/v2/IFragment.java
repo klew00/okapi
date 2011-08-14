@@ -75,12 +75,14 @@ public interface IFragment extends Serializable {
 	public boolean isEmpty ();
 
 	/**
-	 * Indicates if the markup of a given opening code is well-formed.
+	 * Gets the closing code of a given opening code, if the content 
+	 * is well-formed.
 	 * @param openingCode the opening code to verify.
 	 * @param from the first position after the opening code.
-	 * @return true if the code is well-formed, false otherwise.
+	 * @return null if the content is not well-formed,
+	 * the corresponding closing code if the content is well-formed.
 	 */
-	public boolean isWellFormed (ICode openingCode,
+	public ICode getWellFormedClosing (ICode openingCode,
 		int from);
 	
 	/**
@@ -95,6 +97,13 @@ public interface IFragment extends Serializable {
 	 */
 	public void append (char ch);
 
+	/**
+	 * Appends an inline code to this fragment.
+	 * @param code the code to append.
+	 * @return the code that was appended.
+	 */
+	public ICode append (ICode code);
+	
 	/**
 	 * Appends an inline code to this fragment.
 	 * @param type the type of code {@link #InlineType}
