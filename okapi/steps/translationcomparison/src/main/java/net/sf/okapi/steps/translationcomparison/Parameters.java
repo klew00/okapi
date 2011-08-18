@@ -35,16 +35,21 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public static final String GENERATETMX = "generateTMX";
 	public static final String TMXPATH = "tmxPath"; 
 	public static final String GENERATEHTML = "generateHTML";
+	public static final String GENERICCODES = "genericCodes"; 
 	public static final String AUTOOPEN = "autoOpen"; 
 	public static final String TARGET2SUFFIX = "target2Suffix";
 	public static final String TARGET3SUFFIX = "target3Suffix";
 	public static final String DOCUMENT1LABEL = "document1Label";
 	public static final String DOCUMENT2LABEL = "document2Label";
 	public static final String DOCUMENT3LABEL = "document3Label";
+	public static final String CASESENSITIVE = "caseSensitive";
+	public static final String WHITESPACESENSITIVE = "whitespaceSensitive";
+	public static final String PUNCTUATIONSENSITIVE = "punctuationSensitive";
 	
 	private boolean generateTMX;
 	private String tmxPath;
 	private boolean generateHTML;
+	private boolean genericCodes;
 	private boolean autoOpen;
 	private boolean caseSensitive;
 	private boolean whitespaceSensitive;
@@ -83,6 +88,14 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.generateHTML = generateHTML;
 	}
 
+	public boolean getGenericCodes () {
+		return genericCodes;
+	}
+	
+	public void setGenericCodes (boolean genericCodes) {
+		this.genericCodes = genericCodes;
+	}
+	
 	public boolean isAutoOpen () {
 		return autoOpen;
 	}
@@ -161,6 +174,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		tmxPath = "comparison.tmx";
 		generateHTML = true;
 		autoOpen = true;
+		genericCodes = true;
 		caseSensitive = true;
 		whitespaceSensitive = true;
 		punctuationSensitive = true;
@@ -179,9 +193,10 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		tmxPath = buffer.getString(TMXPATH, tmxPath);
 		generateHTML = buffer.getBoolean(GENERATEHTML, generateHTML);
 		autoOpen = buffer.getBoolean(AUTOOPEN, autoOpen);
-		caseSensitive = buffer.getBoolean("caseSensitive", caseSensitive);
-		whitespaceSensitive = buffer.getBoolean("whitespaceSensitive", whitespaceSensitive);
-		punctuationSensitive = buffer.getBoolean("punctuationSensitive", punctuationSensitive);
+		genericCodes = buffer.getBoolean(GENERICCODES, genericCodes);
+		caseSensitive = buffer.getBoolean(CASESENSITIVE, caseSensitive);
+		whitespaceSensitive = buffer.getBoolean(WHITESPACESENSITIVE, whitespaceSensitive);
+		punctuationSensitive = buffer.getBoolean(PUNCTUATIONSENSITIVE, punctuationSensitive);
 		target2Suffix = buffer.getString(TARGET2SUFFIX, target2Suffix);
 		target3Suffix = buffer.getString(TARGET3SUFFIX, target3Suffix);
 		document1Label = buffer.getString(DOCUMENT1LABEL, document1Label);
@@ -192,13 +207,14 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	@Override
 	public String toString() {
 		buffer.reset();
-		buffer.setParameter(GENERATETMX, generateTMX);
+		buffer.setBoolean(GENERATETMX, generateTMX);
 		buffer.setParameter(TMXPATH, tmxPath);
-		buffer.setParameter(GENERATEHTML, generateHTML);
-		buffer.setParameter(AUTOOPEN, autoOpen);
-		buffer.setParameter("caseSensitive", caseSensitive);
-		buffer.setParameter("whitespaceSensitive", whitespaceSensitive);
-		buffer.setParameter("punctuationSensitive", punctuationSensitive);
+		buffer.setBoolean(GENERATEHTML, generateHTML);
+		buffer.setBoolean(AUTOOPEN, autoOpen);
+		buffer.setBoolean(GENERICCODES, genericCodes);
+		buffer.setBoolean(CASESENSITIVE, caseSensitive);
+		buffer.setBoolean(WHITESPACESENSITIVE, whitespaceSensitive);
+		buffer.setBoolean(PUNCTUATIONSENSITIVE, punctuationSensitive);
 		buffer.setParameter(TARGET2SUFFIX, target2Suffix);
 		buffer.setParameter(TARGET3SUFFIX, target3Suffix);
 		buffer.setParameter(DOCUMENT1LABEL, document1Label);
@@ -216,6 +232,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 			"TMX output path", "Full path of the output TMX file");
 		desc.add(GENERATEHTML,
 			"Generate output tables in HTML", "Generates output tables in HTML");
+		desc.add(GENERICCODES,
+			"Use generic representation (e.g. <1>...</1>) for the inline codes", null);
 		desc.add(AUTOOPEN,
 			"Opens the first HTML output after completion", null);
 		
@@ -231,11 +249,11 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.add(DOCUMENT3LABEL,
 			"Label for the document 3", null);
 			
-		desc.add("caseSensitive",
+		desc.add(CASESENSITIVE,
 			"Take into account case differences", "Takes into account case differences");
-		desc.add("whitespaceSensitive",
+		desc.add(WHITESPACESENSITIVE,
 			"Take into account whitespace differences", "Takes into account whitespace differences");
-		desc.add("punctuationSensitive",
+		desc.add(PUNCTUATIONSENSITIVE,
 			"Take into account punctuation differences", "Takes into account punctuation differences");
 		return desc;
 	}
@@ -245,36 +263,36 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		EditorDescription desc = new EditorDescription("Translation Comparison", true, false);
 		
 		//TODO: "HTML Output" group
-		CheckboxPart cbpHTML = desc.addCheckboxPart(paramsDesc.get("generateHTML"));
-		CheckboxPart cbp2 = desc.addCheckboxPart(paramsDesc.get("autoOpen"));
-		cbp2.setMasterPart(cbpHTML, true);
+		CheckboxPart cbpHTML = desc.addCheckboxPart(paramsDesc.get(GENERATEHTML));
+		desc.addCheckboxPart(paramsDesc.get(GENERICCODES)).setMasterPart(cbpHTML, true);
+		desc.addCheckboxPart(paramsDesc.get(AUTOOPEN)).setMasterPart(cbpHTML, true);
 		
 		//TODO: "TMX Output" group
-		CheckboxPart cbpTMX = desc.addCheckboxPart(paramsDesc.get("generateTMX"));
-		PathInputPart pip = desc.addPathInputPart(paramsDesc.get("tmxPath"), "TMX Document", true);
+		CheckboxPart cbpTMX = desc.addCheckboxPart(paramsDesc.get(GENERATETMX));
+		PathInputPart pip = desc.addPathInputPart(paramsDesc.get(TMXPATH), "TMX Document", true);
 		pip.setBrowseFilters("TMX Documents (*.tmx)\tAll Files (*.*)", "*.tmx\t*.*");
 		pip.setMasterPart(cbpTMX, true);
 		pip.setWithLabel(false);
-		TextInputPart tip = desc.addTextInputPart(paramsDesc.get(Parameters.TARGET2SUFFIX));
+		TextInputPart tip = desc.addTextInputPart(paramsDesc.get(TARGET2SUFFIX));
 		tip.setMasterPart(cbpTMX, true);
-		tip = desc.addTextInputPart(paramsDesc.get(Parameters.TARGET3SUFFIX));
+		tip = desc.addTextInputPart(paramsDesc.get(TARGET3SUFFIX));
 		tip.setMasterPart(cbpTMX, true);
 		
 		// HTML group
-		tip = desc.addTextInputPart(paramsDesc.get(Parameters.DOCUMENT1LABEL));
+		tip = desc.addTextInputPart(paramsDesc.get(DOCUMENT1LABEL));
 		tip.setMasterPart(cbpHTML, true);
 		tip.setVertical(false);
-		tip = desc.addTextInputPart(paramsDesc.get(Parameters.DOCUMENT2LABEL));
+		tip = desc.addTextInputPart(paramsDesc.get(DOCUMENT2LABEL));
 		tip.setMasterPart(cbpHTML, true);
 		tip.setVertical(false);
-		tip = desc.addTextInputPart(paramsDesc.get(Parameters.DOCUMENT3LABEL));
+		tip = desc.addTextInputPart(paramsDesc.get(DOCUMENT3LABEL));
 		tip.setMasterPart(cbpHTML, true);
 		tip.setVertical(false);
 		
 		//TODO: "Comparison Options" group
-		desc.addCheckboxPart(paramsDesc.get("caseSensitive"));
-		desc.addCheckboxPart(paramsDesc.get("whitespaceSensitive"));
-		desc.addCheckboxPart(paramsDesc.get("punctuationSensitive"));
+		desc.addCheckboxPart(paramsDesc.get(CASESENSITIVE));
+		desc.addCheckboxPart(paramsDesc.get(WHITESPACESENSITIVE));
+		desc.addCheckboxPart(paramsDesc.get(PUNCTUATIONSENSITIVE));
 		
 		return desc;
 	}

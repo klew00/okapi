@@ -31,6 +31,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
+import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.filterwriter.TMXWriter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
@@ -70,9 +71,11 @@ public class TranslationComparisonStep extends BasePipelineStep {
 	private URI inputURI;
 	private RawDocument rawDoc2;
 	private RawDocument rawDoc3;
+	private GenericContent fmt;
 
 	public TranslationComparisonStep () {
 		params = new Parameters();
+		fmt = new GenericContent();
 	}
 	
 	@StepParameterMapping(parameterType = StepParameterType.FILTER_CONFIGURATION_MAPPER)
@@ -364,7 +367,9 @@ public class TranslationComparisonStep extends BasePipelineStep {
 				writer.writeString("Src:");
 				writer.writeRawXML("</td>"); //$NON-NLS-1$
 				writer.writeRawXML("<td class='p'>"); //$NON-NLS-1$
-				writer.writeString(srcFrag.toText());
+				fmt.setContent(srcFrag);
+				writer.writeString(fmt.toString(!params.getGenericCodes()));
+				
 				writer.writeRawXML("</td></tr>\n"); //$NON-NLS-1$
 				writer.writeRawXML("<tr><td>"); //$NON-NLS-1$
 			}
@@ -372,20 +377,23 @@ public class TranslationComparisonStep extends BasePipelineStep {
 			writer.writeRawXML("</td>"); //$NON-NLS-1$
 			if ( srcFrag != null ) writer.writeRawXML("<td>"); //$NON-NLS-1$
 			else writer.writeRawXML("<td class='p'>"); //$NON-NLS-1$
-			writer.writeString(trgFrag1.toText());
+			fmt.setContent(trgFrag1);
+			writer.writeString(fmt.toString(!params.getGenericCodes()));
 			writer.writeRawXML("</td></tr>"); //$NON-NLS-1$
 			// T2
 			writer.writeRawXML("<tr><td>"); //$NON-NLS-1$
 			writer.writeString(params.getDocument2Label()+":");
 			writer.writeRawXML("</td><td>"); //$NON-NLS-1$
-			writer.writeString(trgFrag2.toText());
+			fmt.setContent(trgFrag2);
+			writer.writeString(fmt.toString(!params.getGenericCodes()));
 			writer.writeRawXML("</td></tr>"); //$NON-NLS-1$
 			// T3
 			if ( filter3 != null ) {
 				writer.writeRawXML("<tr><td>"); //$NON-NLS-1$
 				writer.writeString(params.getDocument3Label()+":");
 				writer.writeRawXML("</td><td>"); //$NON-NLS-1$
-				writer.writeString(trgFrag3.toText());
+				fmt.setContent(trgFrag3);
+				writer.writeString(fmt.toString(!params.getGenericCodes()));
 				writer.writeRawXML("</td></tr>"); //$NON-NLS-1$
 			}
 			writer.writeRawXML("<tr><td>"); //$NON-NLS-1$
@@ -462,11 +470,15 @@ public class TranslationComparisonStep extends BasePipelineStep {
 			writer.writeString("Translation Comparison");
 			writer.writeEndElement();
 			writer.writeStartElement("p"); //$NON-NLS-1$
-			writer.writeString(String.format("Comparing %s (%s) against %s (%s)",
-				rawDoc2.getInputURI(), params.getDocument2Label(), inputURI, params.getDocument1Label()));
+			writer.writeString(String.format("Base document: %s (%s)",
+				inputURI.getPath(), params.getDocument1Label()));
+			writer.writeRawXML("<br>");
+			writer.writeString(String.format("Comparison 1: %s (%s)",
+				rawDoc2.getInputURI().getPath(), params.getDocument2Label()));
 			if ( rawDoc3 != null ) {
-				writer.writeString(String.format(" and %s (%s)",
-					rawDoc3.getInputURI(), params.getDocument3Label()));
+				writer.writeRawXML("<br>");
+				writer.writeString(String.format("Comparison 2: %s (%s)",
+					rawDoc3.getInputURI().getPath(), params.getDocument3Label()));
 			}
 			writer.writeString(".");
 			writer.writeEndElement();
