@@ -27,7 +27,7 @@ public class JSONFilter extends AbstractOkapiFilter {
 	private static final String EXTENSION = ".json";
 	
 	public JSONFilter () {
-		initialize("JSON files",
+		initialize("JSON files (Okapi)",
 			"net.sf.okapi.filters.json.JSONFilter",
 			"okf_json",
 			EXTENSION);

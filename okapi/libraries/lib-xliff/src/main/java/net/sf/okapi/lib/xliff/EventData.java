@@ -22,14 +22,15 @@ package net.sf.okapi.lib.xliff;
 
 import java.io.Serializable;
 
+import org.oasisopen.xliff.v2.IExtendedAttributes;
 import org.oasisopen.xliff.v2.IWithExtendedAttributes;
 
-class EventData implements Serializable, IWithExtendedAttributes {
+public class EventData implements Serializable, IWithExtendedAttributes {
 
 	private static final long serialVersionUID = 0100L;
 	
 	private String id;
-	private ExtendedAttributes xattrs;
+	private IExtendedAttributes xattrs;
 
 	public String getId () {
 		return id;
@@ -40,12 +41,12 @@ class EventData implements Serializable, IWithExtendedAttributes {
 	}
 	
 	@Override
-	public void setExtendedAttributes (ExtendedAttributes attributes) {
+	public void setExtendedAttributes (IExtendedAttributes attributes) {
 		this.xattrs = attributes;
 	}
 
 	@Override
-	public ExtendedAttributes getExtendedAttributes () {
+	public IExtendedAttributes getExtendedAttributes () {
 		if ( xattrs == null ) {
 			xattrs = new ExtendedAttributes();
 		}

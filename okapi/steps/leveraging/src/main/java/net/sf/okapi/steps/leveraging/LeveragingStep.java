@@ -152,9 +152,6 @@ public class LeveragingStep extends BasePipelineStep {
     	
     	// Leverage
     	qm.leverage(tu);
-//    	qm.leverage(tu, 
-//    		params.getFillTarget() ? params.getFillTargetThreshold() : Integer.MAX_VALUE,
-//    		params.getDowngradeIdenticalBestMatches(), targetPrefix, params.getTargetPrefixThreshold());
     	
     	// Optionally write out this TU
 		if ( tmxWriter != null ) {

@@ -28,7 +28,7 @@ public class XLIFFReaderException extends RuntimeException {
 	/**
 	 * Serialization version id.
 	 */
-	private static final long serialVersionUID = 3190082329157671926L;
+	private static final long serialVersionUID = 0100L;
 
 	/**
 	 * Creates an empty new XLIFFReaderException object.

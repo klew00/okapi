@@ -28,7 +28,7 @@ public class XLIFFWriterException extends RuntimeException {
 	/**
 	 * Serialization version id.
 	 */
-	private static final long serialVersionUID = -2168788420976348797L;
+	private static final long serialVersionUID = -0100;
 
 	/**
 	 * Creates an empty new XLIFFWriterException object.

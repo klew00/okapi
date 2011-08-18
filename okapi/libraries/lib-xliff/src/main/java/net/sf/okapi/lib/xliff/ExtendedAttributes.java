@@ -20,7 +20,6 @@
 
 package net.sf.okapi.lib.xliff;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -30,18 +29,22 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
-public class ExtendedAttributes implements Serializable, Iterable<ExtendedAttribute> {
+import org.oasisopen.xliff.v2.IExtendedAttribute;
+import org.oasisopen.xliff.v2.IExtendedAttributes;
+
+public class ExtendedAttributes implements IExtendedAttributes {
 
 	private static final long serialVersionUID = 0100L;
 	
-	private ArrayList<ExtendedAttribute> attrs;
+	private ArrayList<IExtendedAttribute> attrs;
 	private Map<String, String> namespaces;
 
+	@Override
 	public String getAttributeValue (String namespaceURI,
 		String localName)
 	{
 		if ( attrs == null ) return null;
-		for ( ExtendedAttribute att : attrs ) {
+		for ( IExtendedAttribute att : attrs ) {
 			if ( att.getLocalPart().equals(localName)
 				&& att.getNamespaceURI().equals(namespaceURI) ) {
 				return att.getValue();
@@ -50,11 +53,12 @@ public class ExtendedAttributes implements Serializable, Iterable<ExtendedAttrib
 		return null;
 	}
 	
-	public ExtendedAttribute getAttribute (String namespaceURI,
+	@Override
+	public IExtendedAttribute getAttribute (String namespaceURI,
 		String localName)
 	{
 		if ( attrs == null ) return null;
-		for ( ExtendedAttribute att : attrs ) {
+		for ( IExtendedAttribute att : attrs ) {
 			if ( att.getLocalPart().equals(localName)
 				&& att.getNamespaceURI().equals(namespaceURI) ) {
 				return att;
@@ -63,12 +67,13 @@ public class ExtendedAttributes implements Serializable, Iterable<ExtendedAttrib
 		return null;
 	}
 	
-	public ExtendedAttribute setAttribute (ExtendedAttribute attribute) {
+	@Override
+	public IExtendedAttribute setAttribute (IExtendedAttribute attribute) {
 		if ( attrs == null ) {
-			attrs = new ArrayList<ExtendedAttribute>();
+			attrs = new ArrayList<IExtendedAttribute>();
 		}
 		int pos = 0;
-		for ( ExtendedAttribute att : attrs ) {
+		for ( IExtendedAttribute att : attrs ) {
 			if ( att.getLocalPart().equals(attribute.getLocalPart())
 				&& att.getNamespaceURI().equals(attribute.getNamespaceURI()) ) {
 				attrs.set(pos, attribute);
@@ -80,14 +85,15 @@ public class ExtendedAttributes implements Serializable, Iterable<ExtendedAttrib
 		return attribute;
 	}
 
-	public ExtendedAttribute setAttribute (String namespaceURI,
+	@Override
+	public IExtendedAttribute setAttribute (String namespaceURI,
 		String localName,
 		String value)
 	{
 		if ( attrs == null ) {
-			attrs = new ArrayList<ExtendedAttribute>();
+			attrs = new ArrayList<IExtendedAttribute>();
 		}
-		ExtendedAttribute att = getAttribute(namespaceURI, localName);
+		IExtendedAttribute att = getAttribute(namespaceURI, localName);
 		if ( att == null ) {
 			att = new ExtendedAttribute(new QName(namespaceURI, localName), value);
 			attrs.add(att);
@@ -96,23 +102,25 @@ public class ExtendedAttributes implements Serializable, Iterable<ExtendedAttrib
 		return att;
 	}
 	
+	@Override
 	public void deleteAttribute (String namespaceURI,
 		String localName)
 	{
 		if ( attrs == null ) return;
-		ExtendedAttribute att = getAttribute(namespaceURI, localName);
+		IExtendedAttribute att = getAttribute(namespaceURI, localName);
 		if ( att == null ) return;
 		attrs.remove(att);
 	}
 
+	@Override
 	public int size () {
 		if ( attrs == null ) return 0;
 		return attrs.size();
 	}
 
 	@Override
-	public Iterator<ExtendedAttribute> iterator () {
-		return new Iterator<ExtendedAttribute>() {
+	public Iterator<IExtendedAttribute> iterator () {
+		return new Iterator<IExtendedAttribute>() {
 			int current = 0;
 
 			@Override
@@ -121,7 +129,7 @@ public class ExtendedAttributes implements Serializable, Iterable<ExtendedAttrib
 			}
 
 			@Override
-			public ExtendedAttribute next () {
+			public IExtendedAttribute next () {
 				return attrs.get((++current)-1);
 			}
 
@@ -132,6 +140,7 @@ public class ExtendedAttributes implements Serializable, Iterable<ExtendedAttrib
 		};
 	}
 
+	@Override
 	public void setNamespace (String prefix,
 		String namespaceURI)
 	{
@@ -141,16 +150,19 @@ public class ExtendedAttributes implements Serializable, Iterable<ExtendedAttrib
 		namespaces.put(namespaceURI, prefix);
 	}
 
+	@Override
 	public String getNamespacePrefix (String namespaceURI) {
 		if ( namespaces == null ) return null;
 		return namespaces.get(namespaceURI);
 	}
 	
+	@Override
 	public boolean hasNamespace () {
 		if ( namespaces == null ) return false;
 		return (namespaces.size() > 0);
 	}
 
+	@Override
 	public Set<String> getNamespaces () {
 		if ( namespaces == null ) return Collections.emptySet();
 		return namespaces.keySet();

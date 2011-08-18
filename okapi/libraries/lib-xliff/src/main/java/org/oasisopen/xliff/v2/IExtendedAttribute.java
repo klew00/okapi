@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -18,26 +18,24 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.lib.omegat;
+package org.oasisopen.xliff.v2;
 
-import org.omegat.filters2.Instance;
+import java.io.Serializable;
 
-public class TTXFilter extends AbstractOkapiFilter {
+import javax.xml.namespace.QName;
 
-	private static final String EXTENSION = ".ttx";
+public interface IExtendedAttribute extends Serializable {
+
+	public QName getQName ();
 	
-	public TTXFilter () {
-		initialize("TagEditor TTX files (Okapi)",
-			"net.sf.okapi.filters.ttx.TTXFilter",
-			"okf_ttx",
-			EXTENSION);
-	}
-
-	@Override
-	public Instance[] getDefaultInstances () {
-        return new Instance[] {
-        	new Instance("*"+EXTENSION)
-        };
-	}
+	public String getValue ();
+	
+	public void setValue (String value);
+	
+	public String getLocalPart ();
+	
+	public String getNamespaceURI ();
+	
+	public String getPrefix ();
 
 }

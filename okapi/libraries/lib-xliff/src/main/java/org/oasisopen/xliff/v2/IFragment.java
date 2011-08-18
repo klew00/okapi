@@ -22,9 +22,6 @@ package org.oasisopen.xliff.v2;
 
 import java.io.Serializable;
 
-import org.oasisopen.xliff.v2.ICode;
-import org.oasisopen.xliff.v2.IDataStore;
-
 public interface IFragment extends Serializable {
 	
 	public static final int STYLE_XSDTEMP = -1; // Temporary
@@ -106,7 +103,7 @@ public interface IFragment extends Serializable {
 	
 	/**
 	 * Appends an inline code to this fragment.
-	 * @param type the type of code {@link #InlineType}
+	 * @param type the type of code {@link org.oasisopen.xliff.v2.InlineType#InlineType InlineType}
 	 * @param id the id of the code (corresponding opening and closing codes must have the same id).
 	 * @param originalData the original data for this code.
 	 * @return the code that was appended to this fragment.

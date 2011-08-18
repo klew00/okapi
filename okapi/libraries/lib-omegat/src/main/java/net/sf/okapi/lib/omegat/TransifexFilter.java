@@ -29,7 +29,7 @@ public class TransifexFilter extends AbstractOkapiFilter {
 	private static final String EXTENSION = Project.PROJECT_EXTENSION;
 	
 	public TransifexFilter () {
-		initialize("Transifex project files",
+		initialize("Transifex project files (Okapi)",
 			"net.sf.okapi.filters.transifex.TransifexFilter",
 			"okf_transifex-noPrompt",
 			EXTENSION);

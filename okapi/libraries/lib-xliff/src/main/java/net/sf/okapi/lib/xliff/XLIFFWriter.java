@@ -32,6 +32,10 @@ import java.io.Writer;
 import java.util.Map;
 
 import org.oasisopen.xliff.v2.ICandidate;
+import org.oasisopen.xliff.v2.IDataStore;
+import org.oasisopen.xliff.v2.IExtendedAttribute;
+import org.oasisopen.xliff.v2.IExtendedAttributes;
+import org.oasisopen.xliff.v2.IFragment;
 import org.oasisopen.xliff.v2.INote;
 import org.oasisopen.xliff.v2.IWithCandidates;
 import org.oasisopen.xliff.v2.IWithNotes;
@@ -231,13 +235,13 @@ public class XLIFFWriter {
 		writer.print(indent+"</unit>"+lb);
 	}
 
-	private void writeExtendedAttributes (ExtendedAttributes attributes) {
+	private void writeExtendedAttributes (IExtendedAttributes attributes) {
 		if ( attributes == null ) return;
 		for ( String namespaceURI : attributes.getNamespaces() ) {
 			writer.print(" xmlns:" + attributes.getNamespacePrefix(namespaceURI)
 				+ "=\"" + namespaceURI + "\"");
 		}
-		for ( ExtendedAttribute att : attributes ) {
+		for ( IExtendedAttribute att : attributes ) {
 			writer.print(" " + att.getPrefix() + ":" + att.getLocalPart()
 				+ "=\"" + Util.toXML(att.getValue(), true) + "\"");
 		}
@@ -357,7 +361,7 @@ public class XLIFFWriter {
 	}
 	
 	private void writeFragment (String name,
-		Fragment fragment,
+		IFragment fragment,
 		int order) // order must be 0 for source fragments
 	{
 		if ( order > 0 ) {
@@ -370,7 +374,7 @@ public class XLIFFWriter {
 		writer.print("</"+name+">"+lb);
 	}
 	
-	private void writeOriginalData (DataStore store) {
+	private void writeOriginalData (IDataStore store) {
 		if ( !store.hasCodeWithOriginalData() ) {
 			return; // Nothing to write out
 		}

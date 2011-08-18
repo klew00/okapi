@@ -154,7 +154,8 @@ public class Main {
 	protected boolean mosesOverwriteTarget = false;
 	protected boolean moses2Outputs = false;
 	protected boolean mosesUseGModeInAltTrans = true;
-	protected String moses2ndPath;
+	protected String mosesFromPath;
+	protected String mosesToPath;
 	
 	private FilterConfigurationMapper fcMapper;
 	private Hashtable<String, String> extensionsMap;
@@ -274,8 +275,11 @@ public class Main {
 				else if ( arg.equals("-over") ) {
 					prog.convOverwrite = true;
 				}
-				else if ( arg.equals("-from") || arg.equals("-to") ) {
-					prog.moses2ndPath = prog.getArgument(args, ++i);
+				else if ( arg.equals("-from")) {
+					prog.mosesFromPath = prog.getArgument(args, ++i);
+				}
+				else if ( arg.equals("-to") ) {
+					prog.mosesToPath = prog.getArgument(args, ++i);
 				}
 				else if ( arg.equals("-2po") ) {
 					prog.command = CMD_CONV2PO;
@@ -844,13 +848,18 @@ public class Main {
 	private void guessMergingMosesArguments (String input) {
 		// Main input is the original file, not the Moses file
 		// The Moses file is specified with -from or null
-		if ( Util.isEmpty(moses2ndPath) ) {
+		if ( Util.isEmpty(mosesFromPath) ) {
 			// We guess the Moses filename:
-			moses2ndPath = input + "."+trgLoc.toString();
+			mosesFromPath = input + "."+trgLoc.toString();
 		}
-		String ext = Util.getExtension(input);
-		int n = input.lastIndexOf('.');
-		output = input.substring(0, n) + ".out" + ext;
+		if ( !Util.isEmpty(mosesToPath) ) {
+			output = mosesToPath;
+		}
+		else {
+			String ext = Util.getExtension(input);
+			int n = input.lastIndexOf('.');
+			output = input.substring(0, n) + ".out" + ext;
+		}
 	}
 	
 	protected void process (String input) throws URISyntaxException {
@@ -1058,7 +1067,7 @@ public class Main {
 		ps.println("Leverages a file with Moses InlineText:");
 		ps.println("   -lm inputFile [-fc configId] [-ie encoding] [-oe encoding] [-sl srcLang]");
 		ps.println("      [-tl trgLang] [-seg [srxFile]] [-totrg|-overtrg] [-bpt]");
-		ps.println("      [-from mosesFile]");
+		ps.println("      [-from mosesFile] [-to outputFile]");
 		ps.println("Segments a file:");
 		ps.println("   -s inputFile [-fc configId] [-ie encoding]");
 		ps.println("      [-sl srcLang] [-tl trgLang] [-seg [srxFile]]");
@@ -1513,7 +1522,7 @@ public class Main {
 		driver.addStep(new FilterEventsToRawDocumentStep());
 		
 		// Two parallel inputs: 1=the original file, 2=the Moses translated file
-		RawDocument rdMoses = new RawDocument(new File(moses2ndPath).toURI(), "UTF-8", trgLoc);
+		RawDocument rdMoses = new RawDocument(new File(mosesFromPath).toURI(), "UTF-8", trgLoc);
 		driver.addBatchItem(new BatchItemContext(rd, new File(output).toURI(), outputEncoding, rdMoses));
 		// Execute
 		driver.processBatch();
@@ -1544,13 +1553,13 @@ public class Main {
 		driver.addStep(extStep);
 
 		// Create the raw document and set the output
-		if ( Util.isEmpty(moses2ndPath) ) {
-			moses2ndPath = rd.getInputURI().getPath();
+		if ( Util.isEmpty(mosesToPath) ) {
+			mosesToPath = rd.getInputURI().getPath();
 		}
-		if ( !moses2ndPath.endsWith("."+srcLoc.toString()) ) {
-			moses2ndPath = moses2ndPath + ("."+srcLoc.toString());
+		if ( !mosesToPath.endsWith("."+srcLoc.toString()) ) {
+			mosesToPath = mosesToPath + ("."+srcLoc.toString());
 		}
-		driver.addBatchItem(rd, new File(moses2ndPath).toURI(), "UTF-8");
+		driver.addBatchItem(rd, new File(mosesToPath).toURI(), "UTF-8");
 
 		ps.println("Source language: "+srcLoc);
 		if ( moses2Outputs ) {

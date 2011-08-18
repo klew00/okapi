@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -18,26 +18,37 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.lib.omegat;
+package org.oasisopen.xliff.v2;
 
-import org.omegat.filters2.Instance;
+import java.io.Serializable;
+import java.util.Set;
 
-public class TTXFilter extends AbstractOkapiFilter {
+public interface IExtendedAttributes extends Serializable, Iterable<IExtendedAttribute> {
 
-	private static final String EXTENSION = ".ttx";
+	public String getAttributeValue (String namespaceURI,
+		String localName);
 	
-	public TTXFilter () {
-		initialize("TagEditor TTX files (Okapi)",
-			"net.sf.okapi.filters.ttx.TTXFilter",
-			"okf_ttx",
-			EXTENSION);
-	}
+	public IExtendedAttribute getAttribute (String namespaceURI,
+		String localName);
+	
+	public IExtendedAttribute setAttribute (IExtendedAttribute attribute);
 
-	@Override
-	public Instance[] getDefaultInstances () {
-        return new Instance[] {
-        	new Instance("*"+EXTENSION)
-        };
-	}
+	public IExtendedAttribute setAttribute (String namespaceURI,
+		String localName,
+		String value);
+	
+	public void deleteAttribute (String namespaceURI,
+		String localName);
+
+	public int size ();
+
+	public void setNamespace (String prefix,
+		String namespaceURI);
+
+	public String getNamespacePrefix (String namespaceURI);
+	
+	public boolean hasNamespace ();
+
+	public Set<String> getNamespaces ();
 
 }

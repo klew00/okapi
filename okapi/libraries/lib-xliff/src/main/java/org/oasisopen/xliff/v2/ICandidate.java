@@ -22,9 +22,6 @@ package org.oasisopen.xliff.v2;
 
 import java.io.Serializable;
 
-import net.sf.okapi.lib.xliff.DataStore;
-import net.sf.okapi.lib.xliff.Fragment;
-
 /**
  * Provides the methods to access a translation candidate.
  */
@@ -34,19 +31,19 @@ public interface ICandidate extends Serializable {
 	 * Creates an empty source.
 	 * @return the empty source created.
 	 */
-	public Fragment createSource ();
+	public IFragment createSource ();
 	
 	/**
 	 * Creates an empty target.
 	 * @return the empty target created.
 	 */
-	public Fragment createTarget ();
+	public IFragment createTarget ();
 
 	/**
 	 * Gets the source of this candidate.
 	 * @return the source of this candidate.
 	 */
-	public Fragment getSource ();
+	public IFragment getSource ();
 	
 	/**
 	 * Indicates if this candidate has a target.
@@ -58,12 +55,12 @@ public interface ICandidate extends Serializable {
 	 * Gets the target of this candidate.
 	 * @return the target of this candidate, or null if no target exists.
 	 */
-	public Fragment getTarget ();
+	public IFragment getTarget ();
 	
-	public DataStore getDataStore ();
+	public IDataStore getDataStore ();
 	
-	public void setSource (Fragment fragment);
+	public void setSource (IFragment fragment);
 
-	public void setTarget (Fragment fragment);
+	public void setTarget (IFragment fragment);
 
 }

@@ -22,6 +22,7 @@ package net.sf.okapi.lib.xliff;
 
 import java.io.Serializable;
 
+import org.oasisopen.xliff.v2.IExtendedAttributes;
 import org.oasisopen.xliff.v2.IWithExtendedAttributes;
 
 public class Part implements Serializable, IWithExtendedAttributes {
@@ -32,7 +33,7 @@ public class Part implements Serializable, IWithExtendedAttributes {
 	private Fragment source;
 	private Fragment target;
 	private int targetOrder;
-	private ExtendedAttributes xattrs;
+	private IExtendedAttributes xattrs;
 	
 	public Part (DataStore store) {
 		this.store = store;
@@ -96,12 +97,12 @@ public class Part implements Serializable, IWithExtendedAttributes {
 	}
 
 	@Override
-	public void setExtendedAttributes (ExtendedAttributes attributes) {
+	public void setExtendedAttributes (IExtendedAttributes attributes) {
 		this.xattrs = attributes;
 	}
 
 	@Override
-	public ExtendedAttributes getExtendedAttributes () {
+	public IExtendedAttributes getExtendedAttributes () {
 		return xattrs;
 	}
 

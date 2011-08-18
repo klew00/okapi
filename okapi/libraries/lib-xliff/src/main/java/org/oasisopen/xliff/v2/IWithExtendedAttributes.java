@@ -20,13 +20,11 @@
 
 package org.oasisopen.xliff.v2;
 
-import net.sf.okapi.lib.xliff.ExtendedAttributes;
-
 public interface IWithExtendedAttributes {
 
-	public ExtendedAttributes getExtendedAttributes ();
+	public IExtendedAttributes getExtendedAttributes ();
 	
-	public void setExtendedAttributes (ExtendedAttributes attributes);
+	public void setExtendedAttributes (IExtendedAttributes attributes);
 
 	public boolean hasExtendedAttribute ();
 

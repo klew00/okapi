@@ -27,7 +27,7 @@ public class TXMLFilter extends AbstractOkapiFilter {
 	private static final String EXTENSION = ".txml";
 	
 	public TXMLFilter () {
-		initialize("Wordfast Pro TXML files",
+		initialize("Wordfast Pro TXML files (Okapi)",
 			"net.sf.okapi.filters.txml.TXMLFilter",
 			"okf_txml-fillEmptyTargets",
 			EXTENSION);

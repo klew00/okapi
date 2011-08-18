@@ -103,7 +103,7 @@ public class XLIFFFilter implements IFilter {
 	private boolean targetDone;
 	private boolean altTransDone;
 	private boolean segSourceDone;
-	private TextContainer content;
+	//private TextContainer content;
 	private String encoding;
 	private Stack<String> parentIds;
 	private AltTranslationsAnnotation altTrans;
@@ -1027,7 +1027,7 @@ public class XLIFFFilter implements IFilter {
 	{
 		try {
 			boolean changeFirstPart = false;
-			content = new TextContainer();
+			TextContainer content = new TextContainer();
 			ISegments segments = content.getSegments();
 			int id = 0;
 			Stack<Integer> idStack = new Stack<Integer>();

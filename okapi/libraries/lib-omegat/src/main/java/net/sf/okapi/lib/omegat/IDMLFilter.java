@@ -27,7 +27,7 @@ public class IDMLFilter extends AbstractOkapiFilter {
 	private static final String EXTENSION = ".idml";
 	
 	public IDMLFilter () {
-		initialize("InDesign IDML files",
+		initialize("InDesign IDML files (Okapi)",
 			"net.sf.okapi.filters.idml.IDMLFilter",
 			"okf_idml",
 			EXTENSION);

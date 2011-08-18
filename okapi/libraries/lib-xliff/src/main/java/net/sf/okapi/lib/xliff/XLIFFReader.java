@@ -37,6 +37,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.oasisopen.xliff.v2.ICode;
+import org.oasisopen.xliff.v2.IDataStore;
 import org.oasisopen.xliff.v2.IWithCandidates;
 import org.oasisopen.xliff.v2.IWithNotes;
 import org.oasisopen.xliff.v2.InlineType;
@@ -498,6 +499,7 @@ public class XLIFFReader {
 		Fragment frag = new Fragment(partToFill.getDataStore());
 		String tmp;
 		ICode code = null;
+		boolean inTextContent = true;
 		StringBuilder content = new StringBuilder();
 		String nid = null;
 		Stack<ICode> pairs = new Stack<ICode>();
@@ -505,7 +507,7 @@ public class XLIFFReader {
 		while ( reader.hasNext() ) {
 			switch ( reader.next() ) {
 			case XMLStreamReader.CHARACTERS:
-				if ( code == null ) {
+				if ( inTextContent ) {
 					frag.append(reader.getText());
 				}
 				else {
@@ -525,40 +527,40 @@ public class XLIFFReader {
 					tmp = reader.getAttributeValue(null, Util.ATTR_ID);
 					cannotBeNullOrEmpty(Util.ATTR_ID, tmp);
 					code = frag.append(InlineType.OPENING, tmp, null);
-					tmp = reader.getAttributeValue(null, Util.ATTR_TYPE);
-					code.setEquiv(reader.getAttributeValue(null, Util.ATTR_EQUIV));
-					code.setDisp(reader.getAttributeValue(null, Util.ATTR_DISP));
+					setCommonAttributes(code);
+					nid = setNid(code, partToFill.getDataStore());
 					content.setLength(0);
+					inTextContent = false;
 				}
 				else if ( tmp.equals(Util.ELEM_CLOSINGCODE) ) {
 					tmp = reader.getAttributeValue(null, Util.ATTR_RID);
 					cannotBeNullOrEmpty(Util.ATTR_RID, tmp);
 					code = frag.append(InlineType.CLOSING, tmp, null);
-					code.setEquiv(reader.getAttributeValue(null, Util.ATTR_EQUIV));
-					code.setDisp(reader.getAttributeValue(null, Util.ATTR_DISP));
+					setCommonAttributes(code);
+					nid = setNid(code, partToFill.getDataStore());
 					content.setLength(0);
+					inTextContent = false;
 				}
 				else if ( tmp.equals(Util.ELEM_PLACEHOLDER) ) {
 					tmp = reader.getAttributeValue(null, Util.ATTR_ID);
 					cannotBeNullOrEmpty(Util.ATTR_ID, tmp);
 					code = frag.append(InlineType.PLACEHOLDER, tmp, null);
-					code.setEquiv(reader.getAttributeValue(null, Util.ATTR_EQUIV));
-					code.setDisp(reader.getAttributeValue(null, Util.ATTR_DISP));
+					setCommonAttributes(code);
+					nid = setNid(code, partToFill.getDataStore());
 					content.setLength(0);
+					inTextContent = false;
 				}
 				else if ( tmp.equals(Util.ELEM_PAIREDCODES) ) {
 					tmp = reader.getAttributeValue(null, Util.ATTR_ID);
 					cannotBeNullOrEmpty(Util.ATTR_ID, tmp);
 					code = frag.append(InlineType.OPENING, tmp, null);
-					code.setEquiv(reader.getAttributeValue(null, Util.ATTR_EQUIV));
-					code.setDisp(reader.getAttributeValue(null, Util.ATTR_DISP));
+					setCommonAttributes(code);
+					code = null; // We nullify the code 
 					// Closing code
 					ICode closing = new Code(InlineType.CLOSING, tmp, null);
 					closing.setEquiv(reader.getAttributeValue(null, Util.ATTR_EQUIVEND));
 					closing.setDisp(reader.getAttributeValue(null, Util.ATTR_DISPEND));
 					pairs.push(closing);
-					code = null;
-					continue;
 				}
 				else if ( tmp.equals(Util.ELEM_CP) ) {
 					tmp = reader.getAttributeValue(null, Util.ATTR_HEX);
@@ -567,7 +569,7 @@ public class XLIFFReader {
 						int cp = Integer.valueOf(tmp, 16);
 						if ( cp > 0xFFFF ) {
 							char[] chars = Character.toChars(cp);
-							if ( code == null ) {
+							if ( inTextContent ) {
 								frag.append(chars[0]);
 								frag.append(chars[1]);
 							}
@@ -576,7 +578,7 @@ public class XLIFFReader {
 							}
 						}
 						else {
-							if ( code == null ) {
+							if ( inTextContent ) {
 								frag.append((char)cp);
 							}
 							else {
@@ -585,19 +587,14 @@ public class XLIFFReader {
 						}
 					}
 					catch ( NumberFormatException e ) {
-						throw new XLIFFReaderException(String.format("Invalid code-point value in '%s': '%s'", Util.ATTR_HEX, tmp));
+						throw new XLIFFReaderException(String.format("Invalid code-point value in '%s': '%s'",
+							Util.ATTR_HEX, tmp));
 					}
-					continue;
 				}
-				// Common attributes
-				if ( code != null ) {
-					// Try to see if there are outside data defined
-					tmp = reader.getAttributeValue(null, Util.ATTR_NID);
-					if ( cannotBeEmpty(Util.ATTR_NID, tmp) ) {
-						// Get the original data from the outside storage
-						code.setOriginalData(partToFill.getDataStore().getOriginalDataForId(tmp));
-						nid = tmp;
-					}
+				else {
+					// Unknown element
+					throw new XLIFFReaderException(String.format("Invalid element in inline content: '%s'",
+						reader.getName().toString()));
 				}
 				break;
 
@@ -610,7 +607,7 @@ public class XLIFFReader {
 					if ( checkInsideVersusOutside(nid, content, code) ) {
 						code.setOriginalData(content.toString());
 					}
-					code = null;
+					inTextContent = true; // back to text content
 					nid = null;
 				}
 				else if ( tmp.equals(Util.ELEM_PAIREDCODES) ) {
@@ -629,6 +626,24 @@ public class XLIFFReader {
 		}
 	}
 
+	private void setCommonAttributes (ICode code) {
+		code.setEquiv(reader.getAttributeValue(null, Util.ATTR_EQUIV));
+		code.setDisp(reader.getAttributeValue(null, Util.ATTR_DISP));
+	}
+	
+	private String setNid (ICode code,
+		IDataStore store)
+	{
+		// Try to see if there are outside data defined
+		String tmp = reader.getAttributeValue(null, Util.ATTR_NID);
+		if ( cannotBeEmpty(Util.ATTR_NID, tmp) ) {
+			// Get the original data from the outside storage
+			code.setOriginalData(store.getOriginalDataForId(tmp));
+			return tmp;
+		}
+		return null;
+	}
+	
 	private boolean checkInsideVersusOutside (String outsideId,
 		StringBuilder insideContent,
 		ICode code)

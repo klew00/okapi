@@ -11,4 +11,26 @@
     <name>Okapi Library for XLIFF 2</name>
     <dependencies>
     </dependencies>
+    <build>
+		<plugins>
+			<!-- Disable the bundle:manifest to allow for empty source -->
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<version>2.2.0</version>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+				<executions>
+					<execution>
+						<id>bundle-manifest</id>
+						<phase>none</phase>
+						<goals>
+							<goal>manifest</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>

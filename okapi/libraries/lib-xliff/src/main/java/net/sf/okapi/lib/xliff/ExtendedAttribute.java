@@ -20,11 +20,11 @@
 
 package net.sf.okapi.lib.xliff;
 
-import java.io.Serializable;
-
 import javax.xml.namespace.QName;
 
-public class ExtendedAttribute implements Serializable {
+import org.oasisopen.xliff.v2.IExtendedAttribute;
+
+public class ExtendedAttribute implements IExtendedAttribute {
 
 	private static final long serialVersionUID = 0100L;
 

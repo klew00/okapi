@@ -172,9 +172,6 @@ public class MergingStep extends BasePipelineStep {
 		}
 		else { // Create a copy with empty segments
 			tc = tu.createTarget(targetLocale, true, IResource.COPY_SEGMENTATION);
-//			for ( Segment seg : tc.getSegments() ) {
-//				seg.text = new TextFragment();
-//			}
 		}
 
 		// Leverage on the container or on each segment

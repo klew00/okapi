@@ -9,6 +9,8 @@ import net.sf.okapi.lib.xliff.XLIFFEvent.XLIFFEventType;
 import org.junit.Test;
 import org.oasisopen.xliff.v2.ICandidate;
 import org.oasisopen.xliff.v2.ICode;
+import org.oasisopen.xliff.v2.IExtendedAttribute;
+import org.oasisopen.xliff.v2.IExtendedAttributes;
 import org.oasisopen.xliff.v2.IFragment;
 import org.oasisopen.xliff.v2.INote;
 
@@ -243,9 +245,9 @@ public class XLIFFReaderTest {
 			+ "</segment></unit>\n</file></xliff>";
 		Unit unit = getUnit(text, 1);
 		assertNotNull(unit);
-		ExtendedAttributes atts = unit.getExtendedAttributes();
+		IExtendedAttributes atts = unit.getExtendedAttributes();
 		assertNotNull(atts);
-		ExtendedAttribute att = atts.getAttribute("abc", "a1");
+		IExtendedAttribute att = atts.getAttribute("abc", "a1");
 		assertNotNull(att);
 		assertEquals("abc", att.getNamespaceURI());
 		assertEquals("x", att.getPrefix());

@@ -27,7 +27,7 @@ public class TSFilter extends AbstractOkapiFilter {
 	private static final String EXTENSION = ".ts";
 	
 	public TSFilter () {
-		initialize("Qt TS files",
+		initialize("Qt TS files (Okapi)",
 			"net.sf.okapi.filters.ts.TsFilter",
 			"okf_ts",
 			EXTENSION);
