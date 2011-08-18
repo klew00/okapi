@@ -56,10 +56,16 @@ public class LeveragingStepTest {
 		
 		LeveragingStep levStep = new LeveragingStep();
 		Parameters params = (Parameters)levStep.getParameters();
+		// Set connector to use
 		net.sf.okapi.connectors.pensieve.Parameters tmParams = new net.sf.okapi.connectors.pensieve.Parameters();
 		tmParams.fromString(params.getResourceParameters());
 		tmParams.setDbDirectory(tmDir);
 		params.setResourceParameters(tmParams.toString());
+		// Set threshold for fuzzy
+		params.setThreshold(90);
+		// Set threshold for filling the target
+		params.setFillTargetThreshold(90);
+		
 		pdriver.addStep(levStep);
 		
 		pdriver.addStep(new FilterEventsToRawDocumentStep());
@@ -74,12 +80,18 @@ public class LeveragingStepTest {
 		assertTrue(outFile.exists());
 		
 		InputDocument doc = new InputDocument(outFile.getPath(), null);
+		// Check exact
 		ITextUnit tu = FilterTestDriver.getTextUnit(new HtmlFilter(), doc, "UTF-8", locFR, LocaleId.EMPTY, 1);
 		assertNotNull(tu);
 		assertEquals(TRG_1.toText(), tu.getSource().getFirstContent().toText());
+		// Check fuzzy
+		tu = FilterTestDriver.getTextUnit(new HtmlFilter(), doc, "UTF-8", locFR, LocaleId.EMPTY, 2);
+		assertNotNull(tu);
+		assertEquals(TRG_2.toText(), tu.getSource().getFirstContent().toText());
 	}
 	
 	private static final TextFragment TRG_1 = new TextFragment("FR This is an example of text");
+	private static final TextFragment TRG_2 = new TextFragment("FR This is an example of TEXT");
 	
 	private void createTM () {
 		Util.deleteDirectory(tmDir, true);
@@ -89,6 +101,10 @@ public class LeveragingStepTest {
 		TranslationUnitVariant source = new TranslationUnitVariant(locEN, new TextFragment("This is an example of text"));
 		TranslationUnitVariant target = new TranslationUnitVariant(locEN, TRG_1);
 		TranslationUnit tu = new TranslationUnit(source, target);
+		tmWriter.indexTranslationUnit(tu);
+		source = new TranslationUnitVariant(locEN, new TextFragment("This is an example of TEXT"));
+		target = new TranslationUnitVariant(locEN, TRG_2);
+		tu = new TranslationUnit(source, target);
 		tmWriter.indexTranslationUnit(tu);
 		tmWriter.commit();
 	}
