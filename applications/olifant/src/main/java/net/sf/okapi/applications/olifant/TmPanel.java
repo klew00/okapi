@@ -8,11 +8,8 @@ import net.sf.okapi.lib.tmdb.ITm;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -159,10 +156,8 @@ class TmPanel extends Composite {
 		for ( IRecord rec : tm.getRecords() ) {
 			TableItem item = new TableItem(table, SWT.NONE);
 			item.setText(0, String.format("%d", rec.getKey()));
-			int i = 0;
-			for ( String value : rec.getFields() ) {
+			for ( int i=0; i<rec.size(); i++ ) {
 				item.setText(i+1, rec.get(i));
-				i++;
 			}
 			item.setData(rec);
 		}

@@ -22,7 +22,7 @@ package net.sf.okapi.applications.olifant;
 
 import java.io.File;
 import java.net.URI;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.LocaleId;
@@ -170,6 +170,16 @@ public class MainForm {
 		topItem.setMenu(dropMenu);
 
 		MenuItem menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "file.open"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				openFile();
+            }
+		});
+		
+		new MenuItem(dropMenu, SWT.SEPARATOR);
+
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
 		rm.setCommand(menuItem, "file.exit"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
@@ -252,6 +262,25 @@ public class MainForm {
 			if ( rm != null ) rm.dispose();
 		}
 	}
+	
+	private void openFile () {
+		try {
+			String[] paths = Dialogs.browseFilenames(shell, "Open Files", true, null, null, null);
+			if ( paths == null ) return;
+			boolean acceptAll = false;
+			for ( String path : paths ) {
+				Boolean res;
+				if ((res = addDocumentFromUI(path, paths.length>1, acceptAll)) == null ) {
+					return; // Stop now
+				}
+				// Else use the result to set the next value of the accept-all button
+				acceptAll = res;
+			}
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, "Error opening document.\n"+e.getMessage(), null);
+		}
+	}
 
 	/**
 	 * Adds a document using the UI dialog.
@@ -306,7 +335,7 @@ public class MainForm {
 		filter.open(rd);
 		String filename = Util.getFilename(rd.getInputURI().getPath(), true);
 		ITm tm = repo.addTm(filename, null);
-		HashMap<String, String> map = new HashMap<String, String>();
+		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
 		String[] trgFields;
 		
 		while ( filter.hasNext() ) {
@@ -326,8 +355,8 @@ public class MainForm {
 
 				// For each target
 				for ( LocaleId locId : tu.getTargetLocales() ) {
-					// Get the segment
-					net.sf.okapi.common.resource.Segment trgSeg = tu.getTargetSegments(rd.getTargetLocale()).get(srcSeg.getId());
+					// Get the target segment
+					net.sf.okapi.common.resource.Segment trgSeg = tu.getTargetSegments(locId).get(srcSeg.getId());
 					if ( trgSeg != null ) {
 						trgFields = DbUtil.fragmentToTmFields(trgSeg.getContent());
 					}

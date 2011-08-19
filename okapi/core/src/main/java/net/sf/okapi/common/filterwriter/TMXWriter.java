@@ -684,17 +684,17 @@ public class TMXWriter {
     	
     }
 
-    private void writeAllPropertiesAsAttibutes(XMLWriter writer, 
-    		Set<String> names, 
-    		ITextUnit item) {
+    private void writeAllPropertiesAsAttibutes (XMLWriter writer, 
+    	Set<String> names, 
+    	ITextUnit item)
+    {
     	// Write any TU-level properties as attributes (but only standard attributes)
 		for ( String name : names ) {
-			if (ATTR_NAMES.contains(name)) {
+			if ( ATTR_NAMES.contains(";"+name+";") ) {
 				writer.writeAttributeString(name, item.getProperty(name).getValue());
 			}
 		}
     }
-    
     
     /**
      * Writes a TUV element.
