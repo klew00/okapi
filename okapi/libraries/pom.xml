@@ -26,5 +26,6 @@
         <module>lib-longhorn-api</module>
         <module>lib-xliff</module>
         <module>lib-gtt</module>
+        <module>lib-tmdb</module>
     </modules>
 </project>
