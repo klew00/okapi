@@ -41,6 +41,7 @@ import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.translation.TextMatcher;
@@ -270,14 +271,20 @@ public class TranslationComparisonStep extends BasePipelineStep {
 			}
 		}
 		
+		TextContainer trgCont;
 		// Get the text for the base translation
 		TextFragment trgFrag1;
 		if ( isBaseMultilingual ) {
-			if ( tu1.getTarget(targetLocale).contentIsOneSegment() ) {
-				trgFrag1 = tu1.getTarget(targetLocale).getFirstContent();
+			trgCont = tu1.getTarget(targetLocale);
+			if ( trgCont == null ) {
+				throw new RuntimeException(String.format("Missing '%s' entry for text unit id='%s' in base document.",
+					targetLocale.toString(), tu1.getId()));
+			}
+			if ( trgCont.contentIsOneSegment() ) {
+				trgFrag1 = trgCont.getFirstContent();
 			}
 			else {
-				trgFrag1 = tu1.getTarget(targetLocale).getUnSegmentedContentCopy();
+				trgFrag1 = trgCont.getUnSegmentedContentCopy();
 			}
 		}
 		else {
@@ -292,11 +299,16 @@ public class TranslationComparisonStep extends BasePipelineStep {
 		// Get the text for the to-compare translation 1
 		TextFragment trgFrag2;
 		if ( isInput2Multilingual ) {
-			if ( tu2.getTarget(targetLocale).contentIsOneSegment() ) {
-				trgFrag2 = tu2.getTarget(targetLocale).getFirstContent();
+			trgCont = tu2.getTarget(targetLocale);
+			if ( trgCont == null ) {
+				throw new RuntimeException(String.format("Missing '%s' entry for text unit id='%s' in document 2.",
+					targetLocale.toString(), tu2.getId()));
+			}
+			if ( trgCont.contentIsOneSegment() ) {
+				trgFrag2 = trgCont.getFirstContent();
 			}
 			else {
-				trgFrag2 = tu2.getTarget(targetLocale).getUnSegmentedContentCopy();
+				trgFrag2 = trgCont.getUnSegmentedContentCopy();
 			}
 		}
 		else {
@@ -312,11 +324,16 @@ public class TranslationComparisonStep extends BasePipelineStep {
 		TextFragment trgFrag3 = null;
 		if ( tu3 != null ) {
 			if ( isInput3Multilingual ) {
-				if ( tu3.getTarget(targetLocale).contentIsOneSegment() ) {
-					trgFrag3 = tu3.getTarget(targetLocale).getFirstContent();
+				trgCont = tu3.getTarget(targetLocale);
+				if ( trgCont == null ) {
+					throw new RuntimeException(String.format("Missing '%s' entry for text unit id='%s' in document 3.",
+						targetLocale.toString(), tu3.getId()));
+				}
+				if ( trgCont.contentIsOneSegment() ) {
+					trgFrag3 = trgCont.getFirstContent();
 				}
 				else {
-					trgFrag3 = tu3.getTarget(targetLocale).getUnSegmentedContentCopy();
+					trgFrag3 = trgCont.getUnSegmentedContentCopy();
 				}
 			}
 			else {
