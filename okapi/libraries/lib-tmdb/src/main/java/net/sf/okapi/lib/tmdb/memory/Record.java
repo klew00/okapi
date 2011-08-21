@@ -28,6 +28,7 @@ import net.sf.okapi.lib.tmdb.IRecord;
 public class Record implements IRecord {
 
 	private long key;
+	private boolean flag;
 	private ArrayList<String> fields;
 	
 	public Record (long key) {
@@ -79,6 +80,16 @@ public class Record implements IRecord {
 		}
 		// Set the value
 		fields.set(index, value);
+	}
+
+	@Override
+	public boolean getFlag () {
+		return flag;
+	}
+
+	@Override
+	public void setFlag (boolean flag) {
+		this.flag = flag;
 	}
 	
 }

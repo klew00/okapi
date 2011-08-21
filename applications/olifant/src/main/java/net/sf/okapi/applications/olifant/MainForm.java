@@ -72,7 +72,11 @@ public class MainForm {
 	private SashForm topSash;
 	private CTabFolder tabs;
 	private List tmList;
-	private TmPanel currentTmTab;
+	private TmPanel currentTP;
+	private StatusBar statusBar;
+	
+	private MenuItem miShowHideThirdField;
+	private MenuItem miShowHideFieldList;
 
 	public MainForm (Shell shell,
 		String[] args)
@@ -131,8 +135,9 @@ public class MainForm {
 		tabs.setLayoutData(gdTmp);
 		
 		tabs.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(org.eclipse.swt.events.SelectionEvent event) {
-				currentTmTab = (TmPanel)tabs.getSelection().getControl();
+			public void widgetSelected(SelectionEvent event) {
+				currentTP = (TmPanel)tabs.getSelection().getControl();
+				updateCommands();
 			}
 		});
 		
@@ -140,16 +145,25 @@ public class MainForm {
 
 		topSash.setWeights(new int[]{4, 1});
 		
+		statusBar = new StatusBar(shell, SWT.NONE);
+
 		// Set the minimal size to the packed size
 		// And then set the start size
 		Point startSize = shell.getSize();
 		shell.pack();
 		shell.setMinimumSize(shell.getSize());
 		shell.setSize(startSize);
+		
+		updateCommands();
 	}
 
+	private void updateCommands () {
+		miShowHideThirdField.setEnabled(currentTP != null);
+		miShowHideFieldList.setEnabled((currentTP != null) && currentTP.getEditorPanel().isExtraVisible());
+	}
+	
 	private void addTmTab (ITm tm) {
-		TmPanel tp = new TmPanel(tabs, SWT.NONE, tm);
+		TmPanel tp = new TmPanel(tabs, SWT.NONE, tm, statusBar);
 		CTabItem ti = new CTabItem(tabs, SWT.NONE);
 		ti.setText(tm.getName());
 		ti.setControl(tp);
@@ -208,22 +222,23 @@ public class MainForm {
             }
 		});
 		
-		menuItem = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(menuItem, "view.showhideextrafield"); //$NON-NLS-1$
-		menuItem.addSelectionListener(new SelectionAdapter() {
+		miShowHideThirdField = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miShowHideThirdField, "view.showhideextrafield"); //$NON-NLS-1$
+		miShowHideThirdField.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				if ( currentTmTab != null ) {
-					currentTmTab.toggleExtra();
+				if ( currentTP != null ) {
+					currentTP.toggleExtra();
+					updateCommands();
 				}
             }
 		});
 		
-		menuItem = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(menuItem, "view.showhidefieldlist"); //$NON-NLS-1$
-		menuItem.addSelectionListener(new SelectionAdapter() {
+		miShowHideFieldList = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miShowHideFieldList, "view.showhidefieldlist"); //$NON-NLS-1$
+		miShowHideFieldList.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				if ( currentTmTab != null ) {
-					currentTmTab.getEditorPanel().getExtraFieldPanel().toggleFieldList();
+				if ( currentTP != null ) {
+					currentTP.getEditorPanel().getExtraFieldPanel().toggleFieldList();
 				}
 			}
 		});
@@ -335,6 +350,7 @@ public class MainForm {
 		filter.open(rd);
 		String filename = Util.getFilename(rd.getInputURI().getPath(), true);
 		ITm tm = repo.addTm(filename, null);
+		LinkedHashMap<String, String> mapTUProp = new LinkedHashMap<String, String>();
 		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
 		String[] trgFields;
 		
@@ -344,6 +360,15 @@ public class MainForm {
 			
 			ITextUnit tu = event.getTextUnit();
 			ISegments srcSegs = tu.getSourceSegments();
+			
+			// Get text-unit level properties
+			mapTUProp.clear();
+			for ( String name : tu.getPropertyNames() ) {
+				mapTUProp.put("@"+name, tu.getProperty(name).getValue());
+			}
+			
+			// Get source container properties
+			
 
 			// For each source segment
 			for ( net.sf.okapi.common.resource.Segment srcSeg : srcSegs ) {
@@ -351,7 +376,7 @@ public class MainForm {
 				// Get the source fields
 				String[] srcFields = DbUtil.fragmentToTmFields(srcSeg.getContent());
 				map.clear();
-				map.put("Text_"+DbUtil.toDbLang(rd.getSourceLocale()),srcFields[0]);
+				map.put("Text_"+DbUtil.toDbLang(rd.getSourceLocale()), srcFields[0]);
 
 				// For each target
 				for ( LocaleId locId : tu.getTargetLocales() ) {
@@ -366,10 +391,14 @@ public class MainForm {
 					map.put("Text_"+DbUtil.toDbLang(locId), trgFields[0]);
 				}
 				// Add the record to the database
+				if ( !mapTUProp.isEmpty() ) {
+					map.putAll(mapTUProp);
+				}
 				tm.addRecord(map);
 			}
 		}
 		filter.close();
 		addTmTab(tm);
 	}
+
 }

@@ -1,5 +1,6 @@
 package net.sf.okapi.applications.olifant;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.okapi.common.ui.Dialogs;
@@ -8,8 +9,11 @@ import net.sf.okapi.lib.tmdb.ITm;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -19,18 +23,23 @@ import org.eclipse.swt.widgets.TableItem;
 
 class TmPanel extends Composite {
 
+	private final static int KEYCOLUMNWIDTH = 80;
+	
 	private final Table table;
 	private final EditorPanel editPanel;
 	private ITm tm;
 	private int currentEntry;
 	private List<String> visibleFields;
+	private StatusBar statusBar;
 
 	public TmPanel (Composite parent,
 		int flags,
-		ITm tm)
+		ITm tm,
+		StatusBar statusBar)
 	{
 		super(parent, flags);
 		this.tm = tm;
+		this.statusBar = statusBar;
 
 		GridLayout layout = new GridLayout(1, false);
 		layout.marginHeight = 0;
@@ -53,17 +62,24 @@ class TmPanel extends Composite {
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
 
-//		table.addControlListener(new ControlAdapter() {
-//		    public void controlResized(ControlEvent e) {
-//		    	Rectangle rect = table.getClientArea();
-//		    	int flagColWidth = 80;
-//				int part = (int)((rect.width-flagColWidth) / 100);
-//				int remainder = (int)((rect.width-flagColWidth) % 100);
-//				table.getColumn(0).setWidth(flagColWidth);
-//				table.getColumn(1).setWidth(part*50);
-//				table.getColumn(2).setWidth(remainder+(part*50));
-//		    }
-//		});
+		table.addControlListener(new ControlAdapter() {
+		    public void controlResized(ControlEvent e) {
+		    	try {
+		    		table.setRedraw(false);
+		    		Rectangle rect = table.getClientArea();
+		    		int keyColWidth = table.getColumn(0).getWidth();
+		    		int part = (int)((rect.width-keyColWidth) / (table.getColumnCount()-1));
+		    		int remainder = (int)((rect.width-keyColWidth) % (table.getColumnCount()-1));
+		    		for ( int i=1; i<table.getColumnCount(); i++ ) {
+		    			table.getColumn(i).setWidth(part);
+		    		}
+		    		table.getColumn(1).setWidth(table.getColumn(1).getWidth()+remainder);
+		    	}
+		    	finally {
+		    		table.setRedraw(true);
+		    	}
+		    }
+		});
 		
 		table.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
@@ -72,8 +88,14 @@ class TmPanel extends Composite {
             }
 		});
 
-		// For now set all fields visible by default
-		visibleFields = tm.getAvailableFields();
+		// By default: all and only text fields are visible
+		
+		visibleFields = new ArrayList<String>();
+		for ( String fn : tm.getAvailableFields() ) {
+			if ( fn.startsWith("Text_") ) {
+				visibleFields.add(fn);
+			}
+		}
 		tm.setRecordFields(visibleFields);
 		updateColumns();
 		
@@ -92,7 +114,8 @@ class TmPanel extends Composite {
 			// Add the key column
 			TableColumn col = new TableColumn(table, SWT.NONE);
 			col.setText("Key");
-			col.setWidth(80);
+			col.setWidth(KEYCOLUMNWIDTH);
+			
 			// Add the new ones
 			for ( String fn : visibleFields ) {
 				col = new TableColumn(table, SWT.NONE);
@@ -107,14 +130,14 @@ class TmPanel extends Composite {
 		
 	}
 	
-//	@Override
-//	protected void finalize () {
-//		dispose();
-//	}
-//
-//	public void dispose () {
-//		super.dispose();
-//	}
+	@Override
+	protected void finalize () {
+		dispose();
+	}
+
+	public void dispose () {
+		super.dispose();
+	}
 
 	public void updateCurrentEntry () {
 		try {
@@ -127,7 +150,7 @@ class TmPanel extends Composite {
 				editPanel.setFields(rec.get(0), rec.get(1));
 			}
 			currentEntry = n;
-//			statusBar.setCounter(n, tblIssues.getItemCount(), session.getIssues().size());
+			statusBar.setCounter(n, table.getItemCount());
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(getShell(), "Error while updating entry.\n"+e.getMessage(), null);
@@ -156,8 +179,9 @@ class TmPanel extends Composite {
 		for ( IRecord rec : tm.getRecords() ) {
 			TableItem item = new TableItem(table, SWT.NONE);
 			item.setText(0, String.format("%d", rec.getKey()));
+			item.setChecked(rec.getFlag());
 			for ( int i=0; i<rec.size(); i++ ) {
-				item.setText(i+1, rec.get(i));
+				item.setText(i+1, rec.get(i)==null ? "" : rec.get(i));
 			}
 			item.setData(rec);
 		}

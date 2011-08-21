@@ -26,6 +26,10 @@ public interface IRecord {
 
 	public long getKey ();
 	
+	public boolean getFlag ();
+	
+	public void setFlag (boolean flag);
+	
 	public List<String> getFields ();
 	
 	public String get (int index);

@@ -115,6 +115,10 @@ class EditorPanel extends SashForm {
 		}
 	}
 	
+	public boolean isExtraVisible () {
+		return (getWeights()[2] > 0);
+	}
+	
 	public ExtraFieldPanel getExtraFieldPanel () {
 		return extraPanel;
 	}

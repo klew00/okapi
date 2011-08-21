@@ -75,7 +75,12 @@ class Store {
 		for ( IRecord rec : records ) {
 			Record outRec = new Record(rec.getKey());
 			for ( Integer index : recFields ) {
-				outRec.add(rec.get(index));
+				if ( index < rec.size() ) {
+					outRec.add(rec.get(index));
+				}
+				else { // No such field
+					outRec.add("");
+				}
 			}
 			list.add(outRec);
 		}
