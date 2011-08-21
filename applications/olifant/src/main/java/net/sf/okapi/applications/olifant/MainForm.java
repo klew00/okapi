@@ -77,6 +77,8 @@ public class MainForm {
 	
 	private MenuItem miShowHideThirdField;
 	private MenuItem miShowHideFieldList;
+	private MenuItem miEditColumns;
+	private MenuItem miShowHideLog;
 
 	public MainForm (Shell shell,
 		String[] args)
@@ -158,8 +160,10 @@ public class MainForm {
 	}
 
 	private void updateCommands () {
+		miShowHideLog.setEnabled(currentTP != null);
 		miShowHideThirdField.setEnabled(currentTP != null);
 		miShowHideFieldList.setEnabled((currentTP != null) && currentTP.getEditorPanel().isExtraVisible());
+		miEditColumns.setEnabled(currentTP != null);
 	}
 	
 	private void addTmTab (ITm tm) {
@@ -167,7 +171,7 @@ public class MainForm {
 		CTabItem ti = new CTabItem(tabs, SWT.NONE);
 		ti.setText(tm.getName());
 		ti.setControl(tp);
-		tp.fillTable();
+//		tp.fillTable();
 		tmList.add(tm.getName());
 		tmList.setData(tm.getUUID(), tm);
 	}
@@ -222,6 +226,16 @@ public class MainForm {
             }
 		});
 		
+		miShowHideLog = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miShowHideLog, "view.showhidelog"); //$NON-NLS-1$
+		miShowHideLog.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				if ( currentTP != null ) {
+					currentTP.toggleLog();
+				}
+			}
+		});
+	
 		miShowHideThirdField = new MenuItem(dropMenu, SWT.PUSH);
 		rm.setCommand(miShowHideThirdField, "view.showhideextrafield"); //$NON-NLS-1$
 		miShowHideThirdField.addSelectionListener(new SelectionAdapter() {
@@ -243,6 +257,18 @@ public class MainForm {
 			}
 		});
 	
+		new MenuItem(dropMenu, SWT.SEPARATOR);
+
+		miEditColumns = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miEditColumns, "view.editcolumns"); //$NON-NLS-1$
+		miEditColumns.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				if ( currentTP != null ) {
+					currentTP.editColumns();
+				}
+            }
+		});
+		
 	}
 
 	private void loadResources ()
@@ -330,6 +356,8 @@ public class MainForm {
 			URI uri = (new File((String)data[0])).toURI();
 			RawDocument rd = new RawDocument(uri, (String)data[2], (LocaleId)data[3], (LocaleId)data[4]);
 			rd.setFilterConfigId((String)data[1]);
+			
+			//addRawDocument(fcMapper, repo, rd, statusBar).start();
 			addRawDocument(rd);
 			
 			if ( canChangeLocales ) { // In case the locales have changed
@@ -345,14 +373,36 @@ public class MainForm {
 		}
 	}
 
+	//test for threading
+	private static Thread addRawDocument (IFilterConfigurationMapper p_fcMapper,
+		IRepository p_repo,
+		RawDocument p_rd,
+		StatusBar p_statusBar)
+	{
+		final IFilterConfigurationMapper fcMapper = p_fcMapper;
+		final RawDocument rd = p_rd;
+		final IRepository repo = p_repo;
+		final StatusBar statusBar = p_statusBar;
+
+		return new Thread () {
+			public void run () {
+				Importer imp = new Importer(fcMapper, repo, rd, statusBar);
+				ITm tm = imp.process();
+			}
+		};
+	}
+	
 	private void addRawDocument (RawDocument rd) {
 		IFilter filter = fcMapper.createFilter(rd.getFilterConfigId());
 		filter.open(rd);
 		String filename = Util.getFilename(rd.getInputURI().getPath(), true);
 		ITm tm = repo.addTm(filename, null);
 		LinkedHashMap<String, String> mapTUProp = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> mapSrcProp = new LinkedHashMap<String, String>();
+		LinkedHashMap<String, String> mapTrgProp = new LinkedHashMap<String, String>();
 		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
 		String[] trgFields;
+		String srcDbLang = DbUtil.toDbLang(rd.getSourceLocale());
 		
 		while ( filter.hasNext() ) {
 			Event event = filter.next();
@@ -368,7 +418,10 @@ public class MainForm {
 			}
 			
 			// Get source container properties
-			
+			mapSrcProp.clear();
+			for ( String name : tu.getSourcePropertyNames() ) {
+				mapSrcProp.put("@"+name+"_"+srcDbLang, tu.getSourceProperty(name).getValue());
+			}
 
 			// For each source segment
 			for ( net.sf.okapi.common.resource.Segment srcSeg : srcSegs ) {
@@ -376,10 +429,17 @@ public class MainForm {
 				// Get the source fields
 				String[] srcFields = DbUtil.fragmentToTmFields(srcSeg.getContent());
 				map.clear();
-				map.put("Text_"+DbUtil.toDbLang(rd.getSourceLocale()), srcFields[0]);
+				map.put(DbUtil.TEXT_PREFIX+srcDbLang, srcFields[0]);
 
 				// For each target
 				for ( LocaleId locId : tu.getTargetLocales() ) {
+					String trgDbLang = DbUtil.toDbLang(locId);
+					
+					mapTrgProp.clear();
+					for ( String name : tu.getTargetPropertyNames(locId) ) {
+						mapTrgProp.put("@"+name+trgDbLang, tu.getTargetProperty(locId, name).getValue());
+					}
+					
 					// Get the target segment
 					net.sf.okapi.common.resource.Segment trgSeg = tu.getTargetSegments(locId).get(srcSeg.getId());
 					if ( trgSeg != null ) {
@@ -388,16 +448,23 @@ public class MainForm {
 					else {
 						trgFields = new String[2];
 					}
-					map.put("Text_"+DbUtil.toDbLang(locId), trgFields[0]);
+					map.put(DbUtil.TEXT_PREFIX+trgDbLang, trgFields[0]);
 				}
 				// Add the record to the database
 				if ( !mapTUProp.isEmpty() ) {
 					map.putAll(mapTUProp);
 				}
+				if ( !mapSrcProp.isEmpty() ) {
+					map.putAll(mapSrcProp);
+				}
+				if ( !mapTrgProp.isEmpty() ) {
+					map.putAll(mapTrgProp);
+				}
 				tm.addRecord(map);
 			}
 		}
 		filter.close();
+
 		addTmTab(tm);
 	}
 

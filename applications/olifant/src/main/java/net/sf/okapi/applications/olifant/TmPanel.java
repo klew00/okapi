@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.okapi.common.ui.Dialogs;
+import net.sf.okapi.lib.tmdb.DbUtil;
 import net.sf.okapi.lib.tmdb.IRecord;
 import net.sf.okapi.lib.tmdb.ITm;
 
@@ -24,9 +25,11 @@ import org.eclipse.swt.widgets.TableItem;
 class TmPanel extends Composite {
 
 	private final static int KEYCOLUMNWIDTH = 80;
-	
-	private final Table table;
+
+	private final SashForm sashMain;
 	private final EditorPanel editPanel;
+	private final Table table;
+	private final LogPanel logPanel;
 	private ITm tm;
 	private int currentEntry;
 	private List<String> visibleFields;
@@ -48,7 +51,7 @@ class TmPanel extends Composite {
 		setLayoutData(new GridData(GridData.FILL_BOTH));
 		
 		// Create the two main parts of the UI
-		SashForm sashMain = new SashForm(this, SWT.VERTICAL);
+		sashMain = new SashForm(this, SWT.VERTICAL);
 		sashMain.setLayout(new GridLayout(1, false));
 		sashMain.setLayoutData(new GridData(GridData.FILL_BOTH));
 		sashMain.setSashWidth(4);
@@ -92,42 +95,64 @@ class TmPanel extends Composite {
 		
 		visibleFields = new ArrayList<String>();
 		for ( String fn : tm.getAvailableFields() ) {
-			if ( fn.startsWith("Text_") ) {
+			if ( fn.startsWith(DbUtil.TEXT_PREFIX) ) {
 				visibleFields.add(fn);
 			}
 		}
-		tm.setRecordFields(visibleFields);
-		updateColumns();
+
+		// Create the first column (always present)
+		TableColumn col = new TableColumn(table, SWT.NONE);
+		col.setText("Kay");
+		col.setWidth(KEYCOLUMNWIDTH);
 		
-		sashMain.setWeights(new int[]{1, 2});
+		logPanel = new LogPanel(sashMain, 0);
+		
+		updateVisibleFields();
+		sashMain.setWeights(new int[]{2, 3, 1});
 	}
 
+	public void editColumns () {
+		try {
+			// For now reset to all fields
+			visibleFields = tm.getAvailableFields();
+			updateVisibleFields();
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(getShell(), "Error editing columns document.\n"+e.getMessage(), null);
+		}
+	}
+
+	private void updateVisibleFields () {
+		tm.setRecordFields(visibleFields);
+		updateColumns();
+	}
+	
+	/**
+	 * Updates variable columns (The key column cannot be changed)
+	 */
 	private void updateColumns () {
 		try {
 			table.setRedraw(false);
-			
-			// Remove all columns
-			while ( table.getColumnCount() > 0 ) {
-			    table.getColumns()[0].dispose();
+			// Remove all variable columns
+			int n;
+			while ( (n = table.getColumnCount()) > 1 ) {
+				table.getColumns()[n-1].dispose();
+				table.getColumnCount();
 			}
-			
-			// Add the key column
-			TableColumn col = new TableColumn(table, SWT.NONE);
-			col.setText("Key");
-			col.setWidth(KEYCOLUMNWIDTH);
-			
 			// Add the new ones
 			for ( String fn : visibleFields ) {
-				col = new TableColumn(table, SWT.NONE);
+				TableColumn col = new TableColumn(table, SWT.NONE);
 				col.setText(fn);
 				col.setWidth(150);
 			}
-			
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(getShell(), "Error updating columns.\n"+e.getMessage(), null);
 		}
 		finally {
 			table.setRedraw(true);
 		}
-		
+		fillTable();
 	}
 	
 	@Override
@@ -193,6 +218,15 @@ class TmPanel extends Composite {
 	
 	public void toggleExtra () {
 		editPanel.toggleExtra();
+	}
+	
+	public void toggleLog () {
+		if ( sashMain.getWeights()[2] > 0 ) {
+			sashMain.setWeights(new int[]{2, 3, 0});
+		}
+		else {
+			sashMain.setWeights(new int[]{2, 3, 1});
+		}
 	}
 
 	public EditorPanel getEditorPanel () {

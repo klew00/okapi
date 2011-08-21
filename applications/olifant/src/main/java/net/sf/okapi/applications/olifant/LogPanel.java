@@ -18,28 +18,33 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.lib.tmdb;
+package net.sf.okapi.applications.olifant;
 
-import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.filterwriter.GenericContent;
-import net.sf.okapi.common.resource.Code;
-import net.sf.okapi.common.resource.TextFragment;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Text;
 
-public class DbUtil {
+class LogPanel extends Composite {
+
+	private Text edLog;
 	
-	public static final String TEXT_PREFIX = "Text_";
-
-	private static GenericContent fmt = new GenericContent();
-	
-	public static String[] fragmentToTmFields (TextFragment frag) {
-		String[] res = new String[2];
-		res[0] = fmt.setContent(frag).toString();
-		res[1] = Code.codesToString(frag.getCodes());
-		return res;
+	LogPanel (Composite p_Parent,
+		int p_nFlags)
+	{
+		super(p_Parent, p_nFlags);
+		createContent();
 	}
 	
-	public static String toDbLang (LocaleId locId) {
-		String tmp = locId.toString();
-		return tmp.toUpperCase().replace('-', '_');
+	private void createContent () {
+		GridLayout layout = new GridLayout(1, false);
+		layout.marginHeight = 0;
+		layout.marginWidth = 0;
+		setLayout(layout);
+
+		edLog = new Text(this, SWT.WRAP | SWT.V_SCROLL | SWT.BORDER);
+		edLog.setLayoutData(new GridData(GridData.FILL_BOTH));
 	}
+
 }

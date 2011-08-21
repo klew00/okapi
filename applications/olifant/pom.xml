@@ -8,7 +8,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>okapi-application-olifant</artifactId>
-    <name>Okapi Borneo</name>
+    <name>Okapi Olifant</name>
     <dependencies>
 		<dependency>
 			<groupId>net.sf.okapi</groupId>
