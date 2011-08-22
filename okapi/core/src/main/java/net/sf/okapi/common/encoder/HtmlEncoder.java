@@ -23,6 +23,7 @@ package net.sf.okapi.common.encoder;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 
+import net.sf.okapi.common.HTMLCharacterEntities;
 import net.sf.okapi.common.IParameters;
 
 /**
@@ -39,6 +40,8 @@ public class HtmlEncoder implements IEncoder {
 	private CharsetEncoder chsEnc;
 	private String lineBreak;
 	private int quoteMode = 1;
+	private String charsToCER = null;
+	private HTMLCharacterEntities entities;
 
 	@Override
 	public void setOptions (IParameters params,
@@ -58,11 +61,8 @@ public class HtmlEncoder implements IEncoder {
 		// Get options from the filter's configuration
 		if ( params != null ) {
 			// Retrieve the options
-			if ( params.getBoolean("quoteModeDefined") ) {
-				quoteMode = params.getInteger("quoteMode");
-			}
+			charsToCER = params.getString("escapeCharacters");
 		}
-		
 	}
 
 	@Override
@@ -123,6 +123,12 @@ public class HtmlEncoder implements IEncoder {
 						}
 					}
 					else { // Should be able to fold to char, supplementary case will be treated
+						String cer = checkCER(ch);
+						if ( cer != null ) {
+							sbTmp.append(cer);
+							continue;
+						}
+						// Else: fall back to normal character process
 						if (( chsEnc != null ) && !chsEnc.canEncode(ch) ) {
 							sbTmp.append(String.format("&#x%04x;", (int)ch));
 						}
@@ -140,6 +146,24 @@ public class HtmlEncoder implements IEncoder {
 		return sbTmp.toString();
 	}
 
+	/**
+	 * Checks if the character needs/can be represented as a CER.
+	 * @param ch the character to process.
+	 * @return the string representing the CER or null if the character needs to be processed as usual.
+	 */
+	private String checkCER (char ch) {
+		if (( charsToCER != null ) && ( charsToCER.indexOf(ch) > -1 )) {
+			if ( entities == null ) {
+				entities = new HTMLCharacterEntities();
+				entities.ensureInitialization(false);
+			}
+			String name = entities.getName(ch);
+			if ( name == null ) return null;
+			else return "&"+name+";";
+		}
+		return null;
+	}
+	
 	public String encode (char value,
 		int context)
 	{
@@ -158,6 +182,11 @@ public class HtmlEncoder implements IEncoder {
 			return lineBreak;
 		default:
 			if ( value > 127 ) { // Extended chars
+				String cer = checkCER(value);
+				if ( cer != null ) {
+					return cer;
+				}
+				// Else: fall back to normal character process
 				if (( chsEnc != null ) && ( !chsEnc.canEncode(value) )) {
 					return String.format("&#x%04x;", (int)value);
 				}
@@ -197,6 +226,11 @@ public class HtmlEncoder implements IEncoder {
 					}
 					return tmp;
 				}
+				String cer = checkCER((char)value);
+				if ( cer != null ) {
+					return cer;
+				}
+				// Else: fall back to normal character process
 				// Should be able to fold to char, supplementary case will be treated
 				if (( chsEnc != null ) && !chsEnc.canEncode((char)value) ) {
 					return String.format("&#x%04x;", value);

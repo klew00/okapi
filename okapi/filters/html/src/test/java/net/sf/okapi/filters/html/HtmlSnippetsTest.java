@@ -1,6 +1,7 @@
 package net.sf.okapi.filters.html;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.filters.FilterTestDriver;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.LocaleId;
@@ -374,6 +375,17 @@ public class HtmlSnippetsTest {
 		assertEquals(snippet, generateOutput(getEvents(snippet), snippet, locEN));
 	}
 	
+	@Test
+	public void testCERinOutput () {
+		String config = "escapeCharacters: \"\u00a0\u0104\"";
+		IParameters ori = htmlFilter.getParameters();
+		htmlFilter.setParameters(new Parameters(config));
+		String snippet = "<p>[\u00a0\u0104]</p>";
+		String expected = "<p>[&nbsp;\u0104]</p>";
+		assertEquals(expected, generateOutput(getEventsDefault(snippet), snippet, locEN));
+		htmlFilter.setParameters(ori);
+	}
+
 	@Test
 	public void table() {
 		String snippet = 

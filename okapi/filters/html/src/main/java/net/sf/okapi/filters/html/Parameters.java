@@ -80,6 +80,21 @@ public class Parameters extends BaseParameters {
 		taggedConfig = new TaggedFilterConfiguration(HtmlFilter.class.getResource(NONWELLFORMED_PARAMETERS));
 	}
 
+	@Override
+	public boolean getBoolean (String name) {
+		// getBoolean is not using buffer.getBoolean(name); with YAML
+		// So we normally return false
+		// But can have some exceptions
+		return taggedConfig.getBooleanParameter(name);
+	}
+
+	public String getString (String name) {
+		// getString is not using buffer.getString(name); with YAML
+		// So we normally return false
+		// But can have some exceptions
+		return taggedConfig.getStringParameter(name);
+	}
+	
 	public TaggedFilterConfiguration getTaggedConfig() {
 		return taggedConfig;
 	}
@@ -90,4 +105,5 @@ public class Parameters extends BaseParameters {
 	public void setTaggedConfig(TaggedFilterConfiguration taggedConfig) {
 		this.taggedConfig = taggedConfig;
 	}
+
 }

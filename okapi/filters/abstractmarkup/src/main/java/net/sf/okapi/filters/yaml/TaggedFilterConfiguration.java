@@ -33,7 +33,6 @@ import net.htmlparser.jericho.StartTagType;
 import net.htmlparser.jericho.Tag;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
-import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.filters.abstractmarkup.AbstractMarkupFilter;
 
 /**
@@ -97,6 +96,7 @@ public class TaggedFilterConfiguration {
 	public static final String WELLFORMED = "assumeWellformed";
 	public static final String USECODEFINDER = "useCodeFinder";
 	public static final String CODEFINDERRULES = "codeFinderRules";
+	public static final String GLOBAL_ESCAPE_NBSP = "escapeNbsp";
 	public static final String GLOBAL_PCDATA_SUBFILTER = "global_pcdata_subfilter";
 	public static final String GLOBAL_CDATA_SUBFILTER = "global_cdata_subfilter";
 	public static final String CONDITIONS = "conditions";
@@ -243,10 +243,26 @@ public class TaggedFilterConfiguration {
 
 	public boolean isUseCodeFinder() {
 		Boolean useCF = (Boolean) configReader.getProperty(USECODEFINDER);
-		if (useCF == null)
+		if ( useCF == null ) {
 			return false;
-		else
-			return useCF;
+		}
+		else {
+			return useCF.booleanValue();
+		}
+	}
+	
+	public boolean getBooleanParameter (String parameterName) {
+		Boolean res = (Boolean)configReader.getProperty(parameterName);
+		if ( res == null ) {
+			return false;
+		}
+		else {
+			return res.booleanValue();
+		}
+	}
+	
+	public String getStringParameter (String parameterName) {
+		return (String)configReader.getProperty(parameterName);
 	}
 
 	public String getGlobalPCDATASubfilter() {
