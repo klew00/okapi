@@ -43,6 +43,8 @@ import net.sf.okapi.lib.ui.editor.InputDocumentDialog;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabFolder2Adapter;
+import org.eclipse.swt.custom.CTabFolderEvent;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.dnd.DND;
@@ -98,6 +100,7 @@ public class MainForm {
 	private void createContent ()
 		throws Exception
 	{
+		
 		shell.setLayout(new GridLayout(1, false));
 		
 		createMenu();
@@ -140,6 +143,22 @@ public class MainForm {
 			public void widgetSelected(SelectionEvent event) {
 				currentTP = (TmPanel)tabs.getSelection().getControl();
 				updateCommands();
+				currentTP.updateCurrentEntry();
+			}
+		});
+
+		tabs.addCTabFolder2Listener(new CTabFolder2Adapter() {
+			public void close (CTabFolderEvent event) {
+				// Get the tab panel from the closing item
+				TmPanel tmp = (TmPanel)((CTabItem)event.item).getControl();
+				// Remove the corresponding tm from the list (temporary)
+				tmList.remove(tmp.getTm().getName());
+				// If the tab we are closing is the last one: update the commands
+				// Otherwise currentTP will be set to null, but without update
+				if ( tabs.getItemCount() == 1 ) {
+					currentTP = null;
+					updateCommands();
+				}
 			}
 		});
 		
@@ -157,6 +176,11 @@ public class MainForm {
 		shell.setSize(startSize);
 		
 		updateCommands();
+		updateTitle();
+	}
+
+	private void updateTitle () {
+		shell.setText(APPNAME);
 	}
 
 	private void updateCommands () {
@@ -166,16 +190,16 @@ public class MainForm {
 		miEditColumns.setEnabled(currentTP != null);
 	}
 	
-	private void addTmTab (ITm tm) {
+	private TmPanel addTmTab (ITm tm) {
 		TmPanel tp = new TmPanel(tabs, SWT.NONE, tm, statusBar);
 		CTabItem ti = new CTabItem(tabs, SWT.NONE);
 		ti.setText(tm.getName());
 		ti.setControl(tp);
-//		tp.fillTable();
 		tmList.add(tm.getName());
 		tmList.setData(tm.getUUID(), tm);
+		return tp;
 	}
-	
+
 	private void createMenu () {
 		// Menus
 	    Menu menuBar = new Menu(shell, SWT.BAR);
@@ -357,12 +381,16 @@ public class MainForm {
 			RawDocument rd = new RawDocument(uri, (String)data[2], (LocaleId)data[3], (LocaleId)data[4]);
 			rd.setFilterConfigId((String)data[1]);
 			
-			//addRawDocument(fcMapper, repo, rd, statusBar).start();
-			addRawDocument(rd);
 			
-			if ( canChangeLocales ) { // In case the locales have changed
-//				resetTextFieldOrientation();
-			}
+			// Create the TM in the repository
+			String filename = Util.getFilename(rd.getInputURI().getPath(), true);
+			ITm tm = repo.addTm(filename, null);
+			// Create the tab for that TM
+			TmPanel tp = addTmTab(tm);
+			addRawDocument(fcMapper, tm, rd, tp.getLog()).start();
+			
+			
+//			addRawDocument(rd);
 			
 			// If dialog return OK, we return value of accept all
 			return (Boolean)data[5];
@@ -375,97 +403,104 @@ public class MainForm {
 
 	//test for threading
 	private static Thread addRawDocument (IFilterConfigurationMapper p_fcMapper,
-		IRepository p_repo,
+		ITm p_tm,
 		RawDocument p_rd,
-		StatusBar p_statusBar)
+		LogPanel p_logPanel)
 	{
 		final IFilterConfigurationMapper fcMapper = p_fcMapper;
 		final RawDocument rd = p_rd;
-		final IRepository repo = p_repo;
-		final StatusBar statusBar = p_statusBar;
+		final ITm tm = p_tm;
+		final LogPanel logPanel = p_logPanel;
 
 		return new Thread () {
 			public void run () {
-				Importer imp = new Importer(fcMapper, repo, rd, statusBar);
-				ITm tm = imp.process();
+				Importer imp = new Importer(fcMapper, tm, rd, logPanel);
+				imp.process();
 			}
 		};
 	}
 	
-	private void addRawDocument (RawDocument rd) {
-		IFilter filter = fcMapper.createFilter(rd.getFilterConfigId());
-		filter.open(rd);
-		String filename = Util.getFilename(rd.getInputURI().getPath(), true);
-		ITm tm = repo.addTm(filename, null);
-		LinkedHashMap<String, String> mapTUProp = new LinkedHashMap<String, String>();
-		LinkedHashMap<String, String> mapSrcProp = new LinkedHashMap<String, String>();
-		LinkedHashMap<String, String> mapTrgProp = new LinkedHashMap<String, String>();
-		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
-		String[] trgFields;
-		String srcDbLang = DbUtil.toDbLang(rd.getSourceLocale());
-		
-		while ( filter.hasNext() ) {
-			Event event = filter.next();
-			if ( !event.isTextUnit() ) continue;
-			
-			ITextUnit tu = event.getTextUnit();
-			ISegments srcSegs = tu.getSourceSegments();
-			
-			// Get text-unit level properties
-			mapTUProp.clear();
-			for ( String name : tu.getPropertyNames() ) {
-				mapTUProp.put("@"+name, tu.getProperty(name).getValue());
-			}
-			
-			// Get source container properties
-			mapSrcProp.clear();
-			for ( String name : tu.getSourcePropertyNames() ) {
-				mapSrcProp.put("@"+name+"_"+srcDbLang, tu.getSourceProperty(name).getValue());
-			}
-
-			// For each source segment
-			for ( net.sf.okapi.common.resource.Segment srcSeg : srcSegs ) {
-
-				// Get the source fields
-				String[] srcFields = DbUtil.fragmentToTmFields(srcSeg.getContent());
-				map.clear();
-				map.put(DbUtil.TEXT_PREFIX+srcDbLang, srcFields[0]);
-
-				// For each target
-				for ( LocaleId locId : tu.getTargetLocales() ) {
-					String trgDbLang = DbUtil.toDbLang(locId);
-					
-					mapTrgProp.clear();
-					for ( String name : tu.getTargetPropertyNames(locId) ) {
-						mapTrgProp.put("@"+name+trgDbLang, tu.getTargetProperty(locId, name).getValue());
-					}
-					
-					// Get the target segment
-					net.sf.okapi.common.resource.Segment trgSeg = tu.getTargetSegments(locId).get(srcSeg.getId());
-					if ( trgSeg != null ) {
-						trgFields = DbUtil.fragmentToTmFields(trgSeg.getContent());
-					}
-					else {
-						trgFields = new String[2];
-					}
-					map.put(DbUtil.TEXT_PREFIX+trgDbLang, trgFields[0]);
-				}
-				// Add the record to the database
-				if ( !mapTUProp.isEmpty() ) {
-					map.putAll(mapTUProp);
-				}
-				if ( !mapSrcProp.isEmpty() ) {
-					map.putAll(mapSrcProp);
-				}
-				if ( !mapTrgProp.isEmpty() ) {
-					map.putAll(mapTrgProp);
-				}
-				tm.addRecord(map);
-			}
-		}
-		filter.close();
-
-		addTmTab(tm);
-	}
+//	private void addRawDocument (RawDocument rd) {
+//		TmPanel tp = null;
+//		IFilter filter = null;
+//		try {
+//			filter = fcMapper.createFilter(rd.getFilterConfigId());
+//			filter.open(rd);
+//			LinkedHashMap<String, String> mapTUProp = new LinkedHashMap<String, String>();
+//			LinkedHashMap<String, String> mapSrcProp = new LinkedHashMap<String, String>();
+//			LinkedHashMap<String, String> mapTrgProp = new LinkedHashMap<String, String>();
+//			LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+//			String[] trgFields;
+//			String srcDbLang = DbUtil.toDbLang(rd.getSourceLocale());
+//			
+//			while ( filter.hasNext() ) {
+//				Event event = filter.next();
+//				if ( !event.isTextUnit() ) continue;
+//				
+//				ITextUnit tu = event.getTextUnit();
+//				ISegments srcSegs = tu.getSourceSegments();
+//				
+//				// Get text-unit level properties
+//				mapTUProp.clear();
+//				for ( String name : tu.getPropertyNames() ) {
+//					mapTUProp.put("@"+name, tu.getProperty(name).getValue());
+//				}
+//				
+//				// Get source container properties
+//				mapSrcProp.clear();
+//				for ( String name : tu.getSourcePropertyNames() ) {
+//					mapSrcProp.put("@"+name+"_"+srcDbLang, tu.getSourceProperty(name).getValue());
+//				}
+//	
+//				// For each source segment
+//				for ( net.sf.okapi.common.resource.Segment srcSeg : srcSegs ) {
+//	
+//					// Get the source fields
+//					String[] srcFields = DbUtil.fragmentToTmFields(srcSeg.getContent());
+//					map.clear();
+//					map.put(DbUtil.TEXT_PREFIX+srcDbLang, srcFields[0]);
+//	
+//					// For each target
+//					for ( LocaleId locId : tu.getTargetLocales() ) {
+//						String trgDbLang = DbUtil.toDbLang(locId);
+//						
+//						mapTrgProp.clear();
+//						for ( String name : tu.getTargetPropertyNames(locId) ) {
+//							mapTrgProp.put("@"+name+"_"+trgDbLang, tu.getTargetProperty(locId, name).getValue());
+//						}
+//						
+//						// Get the target segment
+//						net.sf.okapi.common.resource.Segment trgSeg = tu.getTargetSegments(locId).get(srcSeg.getId());
+//						if ( trgSeg != null ) {
+//							trgFields = DbUtil.fragmentToTmFields(trgSeg.getContent());
+//						}
+//						else {
+//							trgFields = new String[2];
+//						}
+//						map.put(DbUtil.TEXT_PREFIX+trgDbLang, trgFields[0]);
+//					}
+//					// Add the record to the database
+//					if ( !mapTUProp.isEmpty() ) {
+//						map.putAll(mapTUProp);
+//					}
+//					if ( !mapSrcProp.isEmpty() ) {
+//						map.putAll(mapSrcProp);
+//					}
+//					if ( !mapTrgProp.isEmpty() ) {
+//						map.putAll(mapTrgProp);
+//					}
+//					tm.addRecord(map);
+//				}
+//			}
+//		}
+//		finally {
+//			if ( filter != null ) {
+//				filter.close();
+//			}
+//			if ( tp != null ) {
+//				tp.resetTmDisplay();
+//			}
+//		}
+//	}
 
 }

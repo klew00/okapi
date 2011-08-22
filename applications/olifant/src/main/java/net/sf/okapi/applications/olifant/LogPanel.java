@@ -21,14 +21,18 @@
 package net.sf.okapi.applications.olifant;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 
 class LogPanel extends Composite {
 
 	private Text edLog;
+	private Button button;
+	private CLabel info;
 	
 	LogPanel (Composite p_Parent,
 		int p_nFlags)
@@ -38,13 +42,33 @@ class LogPanel extends Composite {
 	}
 	
 	private void createContent () {
-		GridLayout layout = new GridLayout(1, false);
+		GridLayout layout = new GridLayout(2, false);
 		layout.marginHeight = 0;
 		layout.marginWidth = 0;
 		setLayout(layout);
 
+		button = new Button(this, SWT.PUSH);
+		button.setText("Cancel");
+		button.setEnabled(false);
+		
+		info = new CLabel(this, SWT.BORDER);
+		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		info.setLayoutData(gdTmp);
+		
 		edLog = new Text(this, SWT.WRAP | SWT.V_SCROLL | SWT.BORDER);
-		edLog.setLayoutData(new GridData(GridData.FILL_BOTH));
+		gdTmp = new GridData(GridData.FILL_BOTH);
+		gdTmp.horizontalSpan = 2;
+		edLog.setLayoutData(gdTmp);
 	}
+
+	public void setInfo (String text) {
+		info.setText((text == null) ? "" : text); //$NON-NLS-1$
+	}
+	
+	public void log (String text) {
+		if ( text == null ) return;
+		edLog.append(text+"\n");
+	}
+	
 
 }

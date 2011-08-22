@@ -29,17 +29,21 @@ public class DbUtil {
 	
 	public static final String TEXT_PREFIX = "Text_";
 
-	private static GenericContent fmt = new GenericContent();
+	/**
+	 * Cannot use fully static methods as this is used across threads.
+	 */
+	private final GenericContent fmt = new GenericContent();
 	
-	public static String[] fragmentToTmFields (TextFragment frag) {
+	public static String toDbLang (LocaleId locId) {
+		String tmp = locId.toString();
+		return tmp.toUpperCase().replace('-', '_');
+	}
+
+	public String[] fragmentToTmFields (TextFragment frag) {
 		String[] res = new String[2];
 		res[0] = fmt.setContent(frag).toString();
 		res[1] = Code.codesToString(frag.getCodes());
 		return res;
 	}
 	
-	public static String toDbLang (LocaleId locId) {
-		String tmp = locId.toString();
-		return tmp.toUpperCase().replace('-', '_');
-	}
 }

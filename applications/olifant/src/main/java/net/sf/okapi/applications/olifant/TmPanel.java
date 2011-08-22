@@ -67,12 +67,14 @@ class TmPanel extends Composite {
 
 		table.addControlListener(new ControlAdapter() {
 		    public void controlResized(ControlEvent e) {
+		    	int count = table.getColumnCount()-1; // Exclude Key column
+		    	if ( count < 1 ) return;
 		    	try {
 		    		table.setRedraw(false);
 		    		Rectangle rect = table.getClientArea();
 		    		int keyColWidth = table.getColumn(0).getWidth();
-		    		int part = (int)((rect.width-keyColWidth) / (table.getColumnCount()-1));
-		    		int remainder = (int)((rect.width-keyColWidth) % (table.getColumnCount()-1));
+		    		int part = (int)((rect.width-keyColWidth) / count);
+		    		int remainder = (int)((rect.width-keyColWidth) % count);
 		    		for ( int i=1; i<table.getColumnCount(); i++ ) {
 		    			table.getColumn(i).setWidth(part);
 		    		}
@@ -91,14 +93,13 @@ class TmPanel extends Composite {
             }
 		});
 
-		// By default: all and only text fields are visible
-		
-		visibleFields = new ArrayList<String>();
-		for ( String fn : tm.getAvailableFields() ) {
-			if ( fn.startsWith(DbUtil.TEXT_PREFIX) ) {
-				visibleFields.add(fn);
-			}
-		}
+//		// By default: all and only text fields are visible
+//		visibleFields = new ArrayList<String>();
+//		for ( String fn : tm.getAvailableFields() ) {
+//			if ( fn.startsWith(DbUtil.TEXT_PREFIX) ) {
+//				visibleFields.add(fn);
+//			}
+//		}
 
 		// Create the first column (always present)
 		TableColumn col = new TableColumn(table, SWT.NONE);
@@ -107,10 +108,17 @@ class TmPanel extends Composite {
 		
 		logPanel = new LogPanel(sashMain, 0);
 		
-		updateVisibleFields();
 		sashMain.setWeights(new int[]{2, 3, 1});
 	}
 
+	public ITm getTm () {
+		return tm;
+	}
+	
+	public LogPanel getLog () {
+		return logPanel;
+	}
+	
 	public void editColumns () {
 		try {
 			// For now reset to all fields
@@ -122,17 +130,24 @@ class TmPanel extends Composite {
 		}
 	}
 
-	private void updateVisibleFields () {
-		tm.setRecordFields(visibleFields);
-		updateColumns();
+	public void resetTmDisplay () {
+		// By default: all and only text fields are visible
+		visibleFields = new ArrayList<String>();
+		for ( String fn : tm.getAvailableFields() ) {
+			if ( fn.startsWith(DbUtil.TEXT_PREFIX) ) {
+				visibleFields.add(fn);
+			}
+		}
+
+		// Update the visible fields
+		updateVisibleFields();
 	}
 	
-	/**
-	 * Updates variable columns (The key column cannot be changed)
-	 */
-	private void updateColumns () {
+	private void updateVisibleFields () {
 		try {
 			table.setRedraw(false);
+			// Indicate to the TM back-end which fields the UI wants
+			tm.setRecordFields(visibleFields);
 			// Remove all variable columns
 			int n;
 			while ( (n = table.getColumnCount()) > 1 ) {
