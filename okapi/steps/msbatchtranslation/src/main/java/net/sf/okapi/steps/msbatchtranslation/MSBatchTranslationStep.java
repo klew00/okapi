@@ -64,6 +64,7 @@ public class MSBatchTranslationStep extends BasePipelineStep {
 	private LocaleId sourceLocale;
 	private LocaleId targetLocale;
 	private String rootDir;
+	private String inputRootDir;
 	private Map<String, String> attributes;
 	private boolean needReset;
 
@@ -109,6 +110,11 @@ public class MSBatchTranslationStep extends BasePipelineStep {
 		this.rootDir = rootDir;
 	}
 	
+	@StepParameterMapping(parameterType = StepParameterType.INPUT_ROOT_DIRECTORY)
+	public void setInputRootDirectory (String inputRootDir) {
+		this.inputRootDir = inputRootDir;
+	}
+
 	@Override
 	public IParameters getParameters () {
 		return params;
@@ -136,6 +142,7 @@ public class MSBatchTranslationStep extends BasePipelineStep {
 		// Create the TMX output if requested
 		if ( params.getMakeTmx() ) {
 			String tmxOutputPath = Util.fillRootDirectoryVariable(params.getTmxPath(), rootDir);
+			tmxOutputPath = Util.fillInputRootDirectoryVariable(tmxOutputPath, inputRootDir);
 			tmxOutputPath = LocaleId.replaceVariables(tmxOutputPath, sourceLocale, targetLocale);
 			tmxWriter = new TMXWriter(tmxOutputPath);
 			tmxWriter.writeStartDocument(sourceLocale, targetLocale, getClass().getCanonicalName(),

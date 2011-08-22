@@ -47,6 +47,7 @@ public class LeveragingStep extends BasePipelineStep {
 	private QueryManager qm;
 	private TMXWriter tmxWriter;
 	private String rootDir;
+	private String inputRootDir;
 	private boolean initDone;
 	private int totalCount;
 	private int exactCount;
@@ -73,6 +74,11 @@ public class LeveragingStep extends BasePipelineStep {
 		this.rootDir = rootDir;
 	}
 	
+	@StepParameterMapping(parameterType = StepParameterType.INPUT_ROOT_DIRECTORY)
+	public void setInputRootDirectory (String inputRootDir) {
+		this.inputRootDir = inputRootDir;
+	}
+
 	public String getName () {
 		return "Leveraging";
 	}
@@ -207,6 +213,7 @@ public class LeveragingStep extends BasePipelineStep {
 		if ( params.getMakeTMX() ) {
 			// Resolve the variables
 			String realPath = Util.fillRootDirectoryVariable(params.getTMXPath(), rootDir);
+			realPath = Util.fillInputRootDirectoryVariable(realPath, inputRootDir);
 			realPath = LocaleId.replaceVariables(realPath, sourceLocale, targetLocale);
 			// Create the output
 			tmxWriter = new TMXWriter(realPath);

@@ -50,6 +50,7 @@ public class SegmentationStep extends BasePipelineStep {
 	private LocaleId targetLocale;
 	private boolean initDone;
 	private String rootDir;
+	private String inputRootDir;
 
 	public SegmentationStep () {
 		params = new Parameters();
@@ -71,6 +72,11 @@ public class SegmentationStep extends BasePipelineStep {
 		this.rootDir = rootDir;
 	}
 	
+	@StepParameterMapping(parameterType = StepParameterType.INPUT_ROOT_DIRECTORY)
+	public void setInputRootDirectory (String inputRootDir) {
+		this.inputRootDir = inputRootDir;
+	}
+
 	public String getName () {
 		return "Segmentation";
 	}
@@ -103,6 +109,7 @@ public class SegmentationStep extends BasePipelineStep {
 		String src = null;
 		if ( params.segmentSource ) {
 			src = Util.fillRootDirectoryVariable(params.getSourceSrxPath(), rootDir);
+			src = Util.fillInputRootDirectoryVariable(src, inputRootDir);			
 			srxDoc.loadRules(src);
 			if ( srxDoc.hasWarning() ) {
 				logger.warning(srxDoc.getWarning());
@@ -119,6 +126,7 @@ public class SegmentationStep extends BasePipelineStep {
 		}
 		if ( params.segmentTarget ) {
 			String trg = Util.fillRootDirectoryVariable(params.getTargetSrxPath(), rootDir);
+			trg = Util.fillInputRootDirectoryVariable(trg, inputRootDir);
 			// Load target SRX only if different from sources
 			if ( Util.isEmpty(src) || !src.equals(trg) ) {
 				srxDoc.loadRules(trg);
