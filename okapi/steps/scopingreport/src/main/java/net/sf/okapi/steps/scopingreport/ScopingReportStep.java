@@ -530,18 +530,15 @@ public class ScopingReportStep extends CompoundStep {
 		if (sd != null) {
 			String fname = sd.getName();
 			gen.setField(ITEM_NAME, new File(fname).getAbsolutePath());
-			
-			setItemFields(gen, sd);
 		}		
 		return ev;
 	}
 	
 	@Override
 	protected Event handleEndDocument (Event event) {
-		// src/target might have changed during processing of the document, so let's set them here and not in handleStartDocument()
+		// Src/target locale might have changed during processing of the document, so let's set them here and not in handleStartDocument()
 		gen.setField(ITEM_SOURCE_LOCALE, getSourceLocale().toString());
 		gen.setField(ITEM_TARGET_LOCALE, getTargetLocale().toString());
-		setItemFields(gen, event.getResource());		
 		return super.handleEndDocument(event);
 	}
 	
