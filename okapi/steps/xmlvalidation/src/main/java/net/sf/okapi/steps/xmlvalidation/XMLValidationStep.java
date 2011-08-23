@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -113,22 +113,32 @@ public class XMLValidationStep extends BasePipelineStep {
 		
 		// Create the input source
 		// Use the stream, so the encoding auto-detection can be done
-		Source xmlInput = new javax.xml.transform.stream.StreamSource(rawDoc.getStream());
+		// Use the file path as systemId if possible
+		Source xmlInput = null;
+		if ( rawDoc.getInputURI() == null ) {
+			xmlInput = new javax.xml.transform.stream.StreamSource(rawDoc.getStream());
+		}
+		else {
+			xmlInput = new javax.xml.transform.stream.StreamSource(rawDoc.getStream(),
+				rawDoc.getInputURI().getPath());
+		}
 		
 		//--Checking for well-formedness--
 		try {
 			XMLStreamReader reader  = xmlInputFact.createXMLStreamReader(xmlInput);
+			
 			while(reader.hasNext()) {
 				reader.next();
 			}
 			reader.close();
 
-		} catch (XMLStreamException e) {
-			logger.severe("Well-Formedness Error" +
-					"\nLine: "+ e.getLocation().getLineNumber() +
-					"\nColumn: "+ e.getLocation().getColumnNumber() +
-					"\nOffset: "+ e.getLocation().getCharacterOffset() +
-					"\n"+ e.getMessage().substring(e.getMessage().indexOf("Message:")));
+		}
+		catch ( XMLStreamException e ) {
+			logger.severe("Well-Formedness Error " +
+				"Line: "+ e.getLocation().getLineNumber() +
+				", Column: "+ e.getLocation().getColumnNumber() +
+				", Offset: "+ e.getLocation().getCharacterOffset() +
+				"\n"+ e.getMessage());
 			return event;
 		}
 		
@@ -219,25 +229,25 @@ public class XMLValidationStep extends BasePipelineStep {
 				  reader.setErrorHandler(new ErrorHandler(){
 
 					public void error(SAXParseException e) throws SAXException {
-						logger.severe("Validation Error" +
-								"\nLine: "+ e.getLineNumber() +
-								"\nColumn: "+ e.getColumnNumber() +
+						logger.severe("Validation Error " +
+								"Line: "+ e.getLineNumber() +
+								", Column: "+ e.getColumnNumber() +
 								"\n"+ e.getMessage()+"\n");
 						throw new SAXException("Error encountered");
 					}
 
 					public void fatalError(SAXParseException e) throws SAXException {
-						logger.severe("Validation Fatal Error" +
-								"\nLine: "+ e.getLineNumber() +
-								"\nColumn: "+ e.getColumnNumber() +
+						logger.severe("Validation Fatal Error " +
+								"Line: "+ e.getLineNumber() +
+								", Column: "+ e.getColumnNumber() +
 								"\n"+ e.getMessage()+"\n");
 						throw new SAXException("Fatal Error encountered");
 					}
 
 					public void warning(SAXParseException e) throws SAXException {
-						logger.severe("Validation Warning" +
-								"\nLine: "+ e.getLineNumber() +
-								"\nColumn: "+ e.getColumnNumber() +
+						logger.severe("Validation Warning " +
+								"Line: "+ e.getLineNumber() +
+								", Column: "+ e.getColumnNumber() +
 								"\n"+ e.getMessage()+"\n");
 						throw new SAXException("Warning encountered");
 					}
