@@ -20,6 +20,7 @@
 
 package net.sf.okapi.lib.translation;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -27,7 +28,6 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
-import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.query.IQuery;
 import net.sf.okapi.common.query.QueryResult;
 import net.sf.okapi.common.resource.ISegments;
@@ -131,9 +131,23 @@ public abstract class BaseConnector implements IQuery {
 		this.weight = weight;
 	}
 
+	/**
+	 * Slow default implementation using query!!
+	 * Override to take advantage of servers batch API
+	 */
 	@Override
 	public List<List<QueryResult>> batchQuery (List<TextFragment> fragments) {
-		throw new OkapiNotImplementedException();
+		List<List<QueryResult>> queriesResults = new LinkedList<List<QueryResult>>();
+		for (TextFragment fragment : fragments) {
+			query(fragment);
+			List<QueryResult> results = new LinkedList<QueryResult>();
+			while (hasNext()) {
+				QueryResult qr = next();
+				results.add(qr);
+			}
+			queriesResults.add(results);
+		}				
+		return queriesResults;
 	}
 
 	@Override
@@ -194,6 +208,17 @@ public abstract class BaseConnector implements IQuery {
 			if ( at != null ) {
 				at.sort();
 			}
+		}
+	}
+	
+	/**
+	 * Slow default implementation using leverage(TextUnit).
+	 * Override in sub-class if you want a custom batchLeverage
+	 */
+	@Override	
+	public void batchLeverage(List<ITextUnit> tus) {
+		for (ITextUnit tu : tus) {
+			leverage(tu);
 		}
 	}
 	

@@ -131,6 +131,13 @@ public interface IQuery {
 	public void leverage(ITextUnit tu);
 	
 	/**
+	 * Leverages a batch of text units (segmented or not) based on the current settings.
+	 * Any options or attributes needed must be set before calling this method.
+	 * @param tus of the text unit to leverage.
+	 */
+	public void batchLeverage(List<ITextUnit> tus);
+	
+	/**
 	 * Starts a batch query for a given list of {@link TextFragment}s.
 	 * Some {@link IQuery} implementations are significantly faster when 
 	 * a using batch query.
