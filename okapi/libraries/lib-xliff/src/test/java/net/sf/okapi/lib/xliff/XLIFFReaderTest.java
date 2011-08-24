@@ -81,6 +81,26 @@ public class XLIFFReaderTest {
 	}
 	
 	@Test
+	public void testBadCPValues () {
+		String text = "<?xml version='1.0'?>\n<xliff version=\"2.0\" xmlns=\"urn:oasis:names:tc:xliff:document:2.0\">"
+			+ "<file srclang=\"en\" tgtlang=\"fr\">\n<unit id=\"id\"><segment>\n"
+			+ "<source>"
+			+ "<ph id=\"1\">[<cp hex=\"_bad1_\"/>]</ph>"
+			+ "a<cp hex=\"_bad2_\"/>z"
+			+ "</source>"
+			+ "</segment></unit>\n</file></xliff>";
+		Unit unit = getUnit(text, 1);
+		assertNotNull(unit);
+		
+		assertEquals("a\uFFFDz", unit.getPart(0).getSource().getCodedText().substring(2));
+		ICode code = unit.getDataStore().getSourceCodes().get(0);
+		assertEquals("[\uFFFD]", code.getOriginalData());
+
+		assertEquals("<ph id=\"1\">[\uFFFD]</ph>a\uFFFDz",
+			unit.getPart(0).getSource().toXLIFF(IFragment.STYLE_DATAINSIDE));
+	}
+	
+	@Test
 	public void testInlineCodes () {
 		String text = "<?xml version='1.0'?>\n<xliff version=\"2.0\" xmlns=\"urn:oasis:names:tc:xliff:document:2.0\">"
 			+ "<file srclang=\"en\" tgtlang=\"fr\">\n<unit id=\"id\"><segment>\n"

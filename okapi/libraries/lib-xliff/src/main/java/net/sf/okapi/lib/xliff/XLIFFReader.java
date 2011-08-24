@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Stack;
+import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLInputFactory;
@@ -46,6 +47,10 @@ import net.sf.okapi.lib.xliff.XLIFFEvent.XLIFFEventType;
 
 public class XLIFFReader {
 	
+	private final static char REPCHAR = '\uFFFD';
+	
+	private final Logger logger = Logger.getLogger(getClass().getName());
+
 	private XMLStreamReader reader;
 	private boolean hasNext;
 	private LinkedList<XLIFFEvent> queue;
@@ -415,7 +420,8 @@ public class XLIFFReader {
 						}
 					}
 					catch ( NumberFormatException e ) {
-						throw new XLIFFReaderException(String.format("Invalid code-point value in '%s': '%s'", Util.ATTR_HEX, tmp));
+						logger.severe(String.format("Invalid code-point value in '%s': '%s'", Util.ATTR_HEX, tmp));
+						content.append(REPCHAR); // Use replacement character to mark the place
 					}
 				}
 				break;
@@ -587,8 +593,14 @@ public class XLIFFReader {
 						}
 					}
 					catch ( NumberFormatException e ) {
-						throw new XLIFFReaderException(String.format("Invalid code-point value in '%s': '%s'",
-							Util.ATTR_HEX, tmp));
+						logger.severe(String.format("Invalid code-point value in '%s': '%s'", Util.ATTR_HEX, tmp));
+						// Use replacement character to mark the place
+						if ( inTextContent ) {
+							frag.append(REPCHAR);
+						}
+						else {
+							content.append(REPCHAR);
+						}
 					}
 				}
 				else {
