@@ -32,7 +32,7 @@ import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.lib.tmdb.DbUtil;
 import net.sf.okapi.lib.tmdb.ITm;
 
-public class Importer {
+public class Importer extends ObservableRunnable {
 
 	private final IFilterConfigurationMapper fcMapper;
 	private final RawDocument rd;
@@ -128,6 +128,7 @@ public class Importer {
 					}
 				}
 			}
+			// Final update (includes notifying the observers that we are done)
 			updateUI(count, 2, null);
 		}
 		catch ( Throwable e ) {
@@ -163,9 +164,15 @@ public class Importer {
 				case 2: // Done
 					logPanel.setInfo("");
 					logPanel.log(String.format("Entries processed: %d", count));
+					notifyObservers();
 					break;
 				}
 			}
 		});		
+	}
+
+	@Override
+	public void run () {
+		process();
 	}
 }

@@ -22,20 +22,14 @@ package net.sf.okapi.applications.olifant;
 
 import java.io.File;
 import java.net.URI;
-import java.util.LinkedHashMap;
 
-import net.sf.okapi.common.Event;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
-import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
-import net.sf.okapi.common.resource.ISegments;
-import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.ResourceManager;
-import net.sf.okapi.lib.tmdb.DbUtil;
 import net.sf.okapi.lib.tmdb.IRepository;
 import net.sf.okapi.lib.tmdb.ITm;
 import net.sf.okapi.lib.tmdb.memory.Repository;
@@ -150,9 +144,14 @@ public class MainForm {
 		tabs.addCTabFolder2Listener(new CTabFolder2Adapter() {
 			public void close (CTabFolderEvent event) {
 				// Get the tab panel from the closing item
-				TmPanel tmp = (TmPanel)((CTabItem)event.item).getControl();
+				TmPanel tp = (TmPanel)((CTabItem)event.item).getControl();
+				// Check if we can close it
+				if ( !tp.canClose() ) {
+					event.doit = false;
+					return;
+				}
 				// Remove the corresponding tm from the list (temporary)
-				tmList.remove(tmp.getTm().getName());
+				tmList.remove(tp.getTm().getName());
 				// If the tab we are closing is the last one: update the commands
 				// Otherwise currentTP will be set to null, but without update
 				if ( tabs.getItemCount() == 1 ) {
@@ -179,19 +178,24 @@ public class MainForm {
 		updateTitle();
 	}
 
+	TmPanel getCurrentTmPanel () {
+		return currentTP;
+	}
+
 	private void updateTitle () {
 		shell.setText(APPNAME);
 	}
 
-	private void updateCommands () {
-		miShowHideLog.setEnabled(currentTP != null);
-		miShowHideThirdField.setEnabled(currentTP != null);
-		miShowHideFieldList.setEnabled((currentTP != null) && currentTP.getEditorPanel().isExtraVisible());
-		miEditColumns.setEnabled(currentTP != null);
+	void updateCommands () {
+		boolean active = (( currentTP != null ) && !currentTP.hasRunningThread() );
+		miShowHideLog.setEnabled(active);
+		miShowHideThirdField.setEnabled(active);
+		miShowHideFieldList.setEnabled((active) && currentTP.getEditorPanel().isExtraVisible());
+		miEditColumns.setEnabled(active);
 	}
 	
 	private TmPanel addTmTab (ITm tm) {
-		TmPanel tp = new TmPanel(tabs, SWT.NONE, tm, statusBar);
+		TmPanel tp = new TmPanel(this, tabs, SWT.NONE, tm, statusBar);
 		CTabItem ti = new CTabItem(tabs, SWT.NONE);
 		ti.setText(tm.getName());
 		ti.setControl(tp);
@@ -381,16 +385,17 @@ public class MainForm {
 			RawDocument rd = new RawDocument(uri, (String)data[2], (LocaleId)data[3], (LocaleId)data[4]);
 			rd.setFilterConfigId((String)data[1]);
 			
-			
 			// Create the TM in the repository
 			String filename = Util.getFilename(rd.getInputURI().getPath(), true);
 			ITm tm = repo.addTm(filename, null);
 			// Create the tab for that TM
 			TmPanel tp = addTmTab(tm);
-			addRawDocument(fcMapper, tm, rd, tp.getLog()).start();
 			
-			
-//			addRawDocument(rd);
+			// Start the import thread
+			Importer imp = new Importer(fcMapper, tm, rd, tp.getLog());
+			imp.addObserver(tp);
+			tp.startThread(new Thread(imp));
+			updateCommands();
 			
 			// If dialog return OK, we return value of accept all
 			return (Boolean)data[5];
@@ -401,25 +406,25 @@ public class MainForm {
 		}
 	}
 
-	//test for threading
-	private static Thread addRawDocument (IFilterConfigurationMapper p_fcMapper,
-		ITm p_tm,
-		RawDocument p_rd,
-		LogPanel p_logPanel)
-	{
-		final IFilterConfigurationMapper fcMapper = p_fcMapper;
-		final RawDocument rd = p_rd;
-		final ITm tm = p_tm;
-		final LogPanel logPanel = p_logPanel;
-
-		return new Thread () {
-			public void run () {
-				Importer imp = new Importer(fcMapper, tm, rd, logPanel);
-				imp.process();
-			}
-		};
-	}
-	
+//	//test for threading
+//	private static Thread addRawDocument (IFilterConfigurationMapper p_fcMapper,
+//		ITm p_tm,
+//		RawDocument p_rd,
+//		LogPanel p_logPanel)
+//	{
+//		final IFilterConfigurationMapper fcMapper = p_fcMapper;
+//		final RawDocument rd = p_rd;
+//		final ITm tm = p_tm;
+//		final LogPanel logPanel = p_logPanel;
+//
+//		return new Thread () {
+//			public void run () {
+//				Importer imp = new Importer(fcMapper, tm, rd, logPanel);
+//				imp.process();
+//			}
+//		};
+//	}
+//	
 //	private void addRawDocument (RawDocument rd) {
 //		TmPanel tp = null;
 //		IFilter filter = null;

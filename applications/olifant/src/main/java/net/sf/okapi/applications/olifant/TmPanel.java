@@ -3,6 +3,8 @@ package net.sf.okapi.applications.olifant;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.okapi.common.observer.IObservable;
+import net.sf.okapi.common.observer.IObserver;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.lib.tmdb.DbUtil;
 import net.sf.okapi.lib.tmdb.IRecord;
@@ -22,7 +24,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
-class TmPanel extends Composite {
+class TmPanel extends Composite implements IObserver {
 
 	private final static int KEYCOLUMNWIDTH = 80;
 
@@ -34,13 +36,17 @@ class TmPanel extends Composite {
 	private int currentEntry;
 	private List<String> visibleFields;
 	private StatusBar statusBar;
+	private Thread workerThread;
+	private MainForm mainForm;
 
-	public TmPanel (Composite parent,
+	public TmPanel (MainForm mainForm,
+		Composite parent,
 		int flags,
 		ITm tm,
 		StatusBar statusBar)
 	{
 		super(parent, flags);
+		this.mainForm = mainForm;
 		this.tm = tm;
 		this.statusBar = statusBar;
 
@@ -93,17 +99,9 @@ class TmPanel extends Composite {
             }
 		});
 
-//		// By default: all and only text fields are visible
-//		visibleFields = new ArrayList<String>();
-//		for ( String fn : tm.getAvailableFields() ) {
-//			if ( fn.startsWith(DbUtil.TEXT_PREFIX) ) {
-//				visibleFields.add(fn);
-//			}
-//		}
-
 		// Create the first column (always present)
 		TableColumn col = new TableColumn(table, SWT.NONE);
-		col.setText("Kay");
+		col.setText("Key");
 		col.setWidth(KEYCOLUMNWIDTH);
 		
 		logPanel = new LogPanel(sashMain, 0);
@@ -117,6 +115,17 @@ class TmPanel extends Composite {
 	
 	public LogPanel getLog () {
 		return logPanel;
+	}
+	
+	public boolean canClose () {
+		if ( hasRunningThread() ) {
+			return false;
+		}
+		return true;
+	}
+	
+	public boolean hasRunningThread () {
+		return (( workerThread != null ) && workerThread.isAlive() );
 	}
 	
 	public void editColumns () {
@@ -248,8 +257,23 @@ class TmPanel extends Composite {
 		return editPanel;
 	}
 	
-	public void setVisibleFields () {
-		
+//	public void setVisibleFields () {
+//		
+//	}
+
+	public void startThread (Thread workerThread) {
+		this.workerThread = workerThread;
+		workerThread.start();
+	}
+	
+	@Override
+	public void update (IObservable source,
+		Object arg)
+	{
+		if ( mainForm.getCurrentTmPanel() == this ) {
+			mainForm.updateCommands();
+		}
+		resetTmDisplay();
 	}
 
 }
