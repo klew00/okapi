@@ -36,6 +36,12 @@
 			<version>3.2</version>
 		</dependency>
 		
+		<dependency>
+			<groupId>net.sf.okapi.steps</groupId>
+			<artifactId>okapi-step-diffleverage</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
 		<!-- For tests -->
         <dependency>
             <groupId>net.sf.okapi</groupId>
