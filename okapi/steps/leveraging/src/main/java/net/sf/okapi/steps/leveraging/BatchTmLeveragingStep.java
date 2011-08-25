@@ -23,10 +23,14 @@ public class BatchTmLeveragingStep extends BasePipelineStep {
 	private LocaleId sourceLocale;
 	private LocaleId targetLocale;
 	private Parameters params;
-	private ITMQuery connector; 
+	private ITMQuery connector;
+
+	private String rootDir;
+	private String inputRootDir; 
 
 	public BatchTmLeveragingStep() {		
 		params = new Parameters();
+		batchedTuEvents = new LinkedList<Event>();
 	}
 	
 	@StepParameterMapping(parameterType = StepParameterType.SOURCE_LOCALE)
@@ -39,6 +43,16 @@ public class BatchTmLeveragingStep extends BasePipelineStep {
 		this.targetLocale = targetLocale;
 	}
 
+	@StepParameterMapping(parameterType = StepParameterType.ROOT_DIRECTORY)
+	public void setRootDirectory (String rootDir) {
+		this.rootDir = rootDir;
+	}
+	
+	@StepParameterMapping(parameterType = StepParameterType.INPUT_ROOT_DIRECTORY)
+	public void setInputRootDirectory (String inputRootDir) {
+		this.inputRootDir = inputRootDir;
+	}
+	
 	@Override
 	public String getName() {		
 		return "Simple Batch Leveraging Step";
@@ -114,21 +128,25 @@ public class BatchTmLeveragingStep extends BasePipelineStep {
 
 		IParameters connectorParams = connector.getParameters();
 		if ( connectorParams != null ) { // Set the parameters only if the connector takes them
-			connectorParams.fromString(params.toString());
+			connectorParams.fromString(params.getResourceParameters());
 		}
 		
+		connector.setRootDirectory(rootDir); // Before open()
 		connector.setParameters(connectorParams);
 		connector.open();
 		if (( sourceLocale != null ) && ( targetLocale != null )) {
-			connector.setLanguages(sourceLocale, sourceLocale);
+			connector.setLanguages(sourceLocale, targetLocale);
 		}		
+		
+		connector.setThreshold(params.getThreshold());
+		connector.setMaximumHits(5);
 	
 		return event;
 	}
-
+	
 	@Override
-	protected Event handleEndBatch(Event event) {
-		// leverage any remaining batched TextUnits
+	protected Event handleEndDocument(Event event) {
+		// leverage any remaining batched TextUnits for this document
 		if (!batchedTuEvents.isEmpty()) {
 			batchLeverage();
 			MultiEvent me = new MultiEvent();
@@ -137,7 +155,7 @@ public class BatchTmLeveragingStep extends BasePipelineStep {
 			}
 			batchedTuEvents.clear();
 
-			// add END BATCH event
+			// add END DOCUMENT event
 			me.addEvent(event);
 			return new Event(EventType.MULTI_EVENT, me);
 		}

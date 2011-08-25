@@ -141,6 +141,8 @@ public interface IQuery {
 	 * Starts a batch query for a given list of {@link TextFragment}s.
 	 * Some {@link IQuery} implementations are significantly faster when 
 	 * a using batch query.
+	 * <br>
+	 * <b>Note that batchQuery does not use hasNext and next methods. Callers must use the returned list directly</b>
 	 * @param fragments the list of {@link TextFragment}s to query.
 	 * @return a list of lists of {@link QueryResult}s.
 	 */

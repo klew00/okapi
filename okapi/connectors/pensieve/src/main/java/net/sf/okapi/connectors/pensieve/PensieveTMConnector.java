@@ -170,11 +170,6 @@ public class PensieveTMConnector extends BaseConnector implements ITMQuery {
 		}
 	}
 	
-	@Override
-	public List<List<QueryResult>> batchQuery (List<TextFragment> fragments) {
-		throw new OkapiNotImplementedException();
-	}
-	
 	// Direct query, using the seeker
 	private int queryDirectory (TextFragment text) {
 		List<TmHit> list;
