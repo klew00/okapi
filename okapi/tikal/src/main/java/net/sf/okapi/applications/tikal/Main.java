@@ -426,7 +426,12 @@ public class Main {
 				}
 				else if ( arg.equals("-mm") ) {
 					prog.useMyMemory = true;
-					prog.myMemoryParams = prog.getArgument(args, ++i);
+					// Key is optional (left for backward compatibility)
+					if ( args.size() > i+1 ) {
+						if ( !args.get(i+1).startsWith("-") ) {
+							prog.myMemoryParams = prog.getArgument(args, ++i);
+						}
+					}
 				}
 				else if ( arg.equals("-pen") ) {
 					prog.usePensieve = true;
@@ -1049,7 +1054,7 @@ public class Main {
 		ps.println("   -e [[-fc] configId]");
 		ps.println("Extracts a file to XLIFF (and optionally segment and pre-translate):");
 		ps.println("   -x inputFile [inputFile2...] [-fc configId] [-ie encoding] [-sl srcLang]");
-		ps.println("      [-tl trgLang] [-seg [srxFile]] [-tt [hostname[:port]]|-mm key");
+		ps.println("      [-tl trgLang] [-seg [srxFile]] [-tt [hostname[:port]]|-mm [key]");
 		ps.println("      |-pen tmDirectory|-gs configFile|-google|-apertium [configFile]");
 		ps.println("      |-ms configFile|-tda configFile] [-maketmx [tmxFile]] [-opt threshold]");
 		ps.println("      [-nocopy] [-noalttrans]");
@@ -1059,7 +1064,7 @@ public class Main {
 		ps.println("Translates a file:");
 		ps.println("   -t inputFile [inputFile2...] [-fc configId] [-ie encoding] [-oe encoding]");
 		ps.println("      [-sl srcLang] [-tl trgLang] [-seg [srxFile]] [-tt [hostname[:port]]");
-		ps.println("      |-mm key|-pen tmDirectory|-gs configFile|-google|-apertium [configFile]");
+		ps.println("      |-mm [key]|-pen tmDirectory|-gs configFile|-google|-apertium [configFile]");
 		ps.println("      |-ms configFile|-tda configFile] [-maketmx [tmxFile]] [-opt threshold]");
 		ps.println("Extracts a file to Moses InlineText:");
 		ps.println("   -xm inputFile [-fc configId] [-ie encoding] [-seg [srxFile]]");
@@ -1073,7 +1078,7 @@ public class Main {
 		ps.println("      [-sl srcLang] [-tl trgLang] [-seg [srxFile]]");
 		ps.println("Queries translation resources:");
 		ps.println("   -q \"source text\" [-sl srcLang] [-tl trgLang] [-google] [-opentran]");
-		ps.println("      [-tt [hostname[:port]]] [-mm key] [-pen tmDirectory] [-gs configFile]");
+		ps.println("      [-tt [hostname[:port]]] [-mm [key]] [-pen tmDirectory] [-gs configFile]");
 		ps.println("      [-apertium [configFile]] [-ms configFile] [-tda configFile]");
 		ps.println("      [-opt threshold[:maxhits]]");
 		ps.println("Adds translation to a resources:");
@@ -1125,7 +1130,10 @@ public class Main {
 			QueryResult qr;
 			while ( conn.hasNext() ) {
 				qr = conn.next();
-				ps.println(String.format("score: %d, origin: '%s'", qr.score, (qr.origin==null ? "" : qr.origin)));
+				ps.println(String.format("score: %d, origin: '%s'%s",
+					qr.score,
+					(qr.origin==null ? "" : qr.origin),
+					(qr.fromMT() ? " (from MT)" : "")));
 				ps.println(String.format("  Source: \"%s\"", qr.source.toText()));
 				ps.println(String.format("  Target: \"%s\"", qr.target.toText()));
 			}

@@ -38,6 +38,9 @@ import net.sf.okapi.lib.translation.BaseConnector;
 import net.sf.okapi.common.query.QueryResult;
 import net.sf.okapi.lib.translation.QueryUtil;
 
+/**
+ * Connector to Google Translate APi v1
+ */
 public class GoogleMTConnector extends BaseConnector {
 
 	private static final String addressAjax = "http://ajax.googleapis.com/ajax/services/language/translate";

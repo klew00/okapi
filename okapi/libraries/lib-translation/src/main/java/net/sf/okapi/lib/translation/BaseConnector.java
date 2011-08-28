@@ -214,6 +214,7 @@ public abstract class BaseConnector implements IQuery {
 	/**
 	 * Slow default implementation using leverage(TextUnit).
 	 * Override in sub-class if you want a custom batchLeverage
+	 * @param tus list of the text units to process.
 	 */
 	@Override	
 	public void batchLeverage(List<ITextUnit> tus) {

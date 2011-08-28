@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -24,15 +24,16 @@ import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.ParametersDescription;
 import net.sf.okapi.common.uidescription.EditorDescription;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
-import net.sf.okapi.common.uidescription.TextInputPart;
 
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
 	public static final String KEY = "key";
 	public static final String USEMT = "useMT";
+	public static final String SENDIP = "sendIP";
 	
 	private String key;
 	private int useMT;
+	private boolean sendIP;
 	
 	public Parameters () {
 		reset();
@@ -58,43 +59,59 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public void setUseMT (int useMT) {
 		this.useMT = useMT;
 	}
+	
+	public boolean getSendIP () {
+		return sendIP;
+	}
+	
+	public void setSendIP (boolean sendIP) {
+		this.sendIP = sendIP;
+	}
 
 	@Override
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
-		key = buffer.getEncodedString(Parameters.KEY, key);
-		useMT = buffer.getInteger(Parameters.USEMT, useMT);
+		key = buffer.getEncodedString(KEY, key);
+		useMT = buffer.getInteger(USEMT, useMT);
+		sendIP = buffer.getBoolean(SENDIP, sendIP);
 	}
 
 	@Override
 	public void reset () {
 		key = "mmDemo123";
 		useMT = 1;
+		sendIP = true;
 	}
 
 	@Override
 	public String toString () {
 		buffer.reset();
-		buffer.setEncodedString(Parameters.KEY, key);
-		buffer.setInteger(Parameters.USEMT, useMT);
+		buffer.setEncodedString(KEY, key);
+		buffer.setInteger(USEMT, useMT);
+		buffer.setBoolean(SENDIP, sendIP);
 		return buffer.toString();
 	}
 
 	@Override
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
-		desc.add(Parameters.KEY, "Key", "Access key");
-		desc.add(Parameters.USEMT, "Provide also machine translation result", null);
+		desc.add(KEY, "Key", "Access key");
+		desc.add(USEMT, "Provide also machine translation result", null);
+		desc.add(SENDIP, "Send IP address (recommended for large volumes)", null);
 		return desc;
 	}
 
 	@Override
 	public EditorDescription createEditorDescription (ParametersDescription paramsDesc) {
 		EditorDescription desc = new EditorDescription("MyMemory TM Connector Settings");
-		TextInputPart tip = desc.addTextInputPart(paramsDesc.get(Parameters.KEY));
-		tip.setPassword(true);
-		desc.addCheckboxPart(paramsDesc.get(Parameters.USEMT));
+		// Key is used for setting translations, which is not implemented
+		// The key is not used with REST interface
+//		TextInputPart tip = desc.addTextInputPart(paramsDesc.get(Parameters.KEY));
+//		tip.setPassword(true);
+		desc.addCheckboxPart(paramsDesc.get(USEMT));
+		desc.addCheckboxPart(paramsDesc.get(SENDIP));
 		return desc;
 	}
+
 }

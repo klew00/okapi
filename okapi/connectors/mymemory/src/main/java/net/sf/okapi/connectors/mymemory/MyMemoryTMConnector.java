@@ -20,17 +20,19 @@
 
 package net.sf.okapi.connectors.mymemory;
 
-import java.net.MalformedURLException;
+import java.io.InputStreamReader;
+import java.net.InetAddress;
 import java.net.URL;
-import java.rmi.RemoteException;
+import java.net.URLConnection;
+import java.net.URLEncoder;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-import org.apache.axis.AxisFault;
-import org.tempuri.GetResponse;
-import org.tempuri.Match;
-import org.tempuri.OtmsSoapStub;
-import org.tempuri.Query;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
@@ -44,19 +46,23 @@ import net.sf.okapi.lib.translation.QueryUtil;
 
 public class MyMemoryTMConnector extends BaseConnector implements ITMQuery {
 
-	private static final String SERVER_URL = "http://mymemory.translated.net/otms/";
+	private static final String BASE_URL = "http://mymemory.translated.net/api/get";
+	private static final String BASE_QUERY = "?q=%s&langpair=%s|%s";
 	
 	private List<QueryResult> results;
 	private int current = -1;
 	private int maxHits = 25;
 	private int threshold = 75;
 	private Parameters params;
-	private OtmsSoapStub otms;
 	private QueryUtil qutil;
+	private JSONParser parser;
+	private String ipAddress;
 
 	public MyMemoryTMConnector () {
 		params = new Parameters();
 		qutil = new QueryUtil();
+		parser = new JSONParser();
+		results = new ArrayList<QueryResult>();
 	}
 
 	@Override
@@ -66,12 +72,13 @@ public class MyMemoryTMConnector extends BaseConnector implements ITMQuery {
 
 	@Override
 	public String getSettingsDisplay () {
-		return String.format("Server: %s\nAllow MT: %s", SERVER_URL,
+		return String.format("Server: %s\nAllow MT: %s", BASE_URL,
 			((params.getUseMT()==1) ? "Yes" : "No"));
 	}
 	
 	@Override
 	public void close () {
+		// Nothing to do
 	}
 
 	@Override
@@ -96,16 +103,14 @@ public class MyMemoryTMConnector extends BaseConnector implements ITMQuery {
 
 	@Override
 	public void open () {
-		try {
-			results = new ArrayList<QueryResult>();
-			URL url = new URL(SERVER_URL);
-			otms = new OtmsSoapStub(url, null);
-		}
-		catch ( AxisFault e ) {
-			throw new RuntimeException("Error creating the MyMemory Web services.", e);
-		}
-		catch ( MalformedURLException e ) {
-			throw new RuntimeException("Invalid server URL.", e);
+		if ( params.getSendIP() ) {
+			try {
+				InetAddress thisIp = InetAddress.getLocalHost();
+				ipAddress = thisIp.getHostAddress();
+			}
+			catch ( UnknownHostException e ) {
+				ipAddress = null;
+			}
 		}
 	}
 
@@ -116,50 +121,81 @@ public class MyMemoryTMConnector extends BaseConnector implements ITMQuery {
 		if ( !frag.hasText(false) ) return 0;
 		try {
 			String text = qutil.separateCodesFromText(frag);
-			Query query = new Query(null, text, srcCode, trgCode, null, params.getUseMT());
-			GetResponse gresp = otms.otmsGet(params.getKey(), query);
-			if ( gresp.isSuccess() ) {
-				QueryResult res;
-				Match[] matches = gresp.getMatches();
-				int i = 0;
-				for ( Match match : matches ) {
-					if ( ++i > maxHits ) break; // Maximum reached
-					res = new QueryResult();
-					res.weight = getWeight();
-					res.origin = getName();
-					if ( match.getTranslator().equals("MT!") ) {
-						res.matchType = MatchType.MT;
-						res.score = 95; // Standard score for MT
-					}
-					else res.score = match.getScore();
-					// To workaround bug in score calculation
-					// Score > 100 should be treated as 100 per Alberto's info.
-					if (res.score > 100 ) res.score = 100;
-					// Set match type
-					if ( res.score >= 100 ) res.matchType = MatchType.EXACT;
-					else if ( res.score > 0 ) res.matchType = MatchType.FUZZY;
 
-					if ( res.score < getThreshold() ) break;
-					if ( qutil.hasCode() ) {
-						res.score--;
-						res.source = qutil.createNewFragmentWithCodes(match.getSegment());
-						res.target = qutil.createNewFragmentWithCodes(match.getTranslation());
-					}
-					else {
-						res.source = new TextFragment(match.getSegment());
-						res.target = new TextFragment(match.getTranslation());
-					}
-					results.add(res);
-				}
+			// Create the connection and query
+			String urlString = BASE_URL + String.format(BASE_QUERY, URLEncoder.encode(text, "UTF-8"), srcCode, trgCode);
+			if ( ipAddress != null ) {
+				urlString += ("&ip=" + ipAddress);
 			}
+			
+			URL url = new URL(urlString);
+			URLConnection conn = url.openConnection();
+
+			// Get the response
+			JSONObject object = (JSONObject)parser.parse(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+			@SuppressWarnings("unchecked")
+			Map<String, Object> map = (Map<String, Object>)object;
+	    	JSONArray matches = (JSONArray)map.get("matches");
+	    	int count = 0;
+	    	
+	    	for ( int i=0; i<matches.size(); i++ ) {
+	    		if ( ++count > maxHits ) break; // Maximum reached
+	    		
+	    		@SuppressWarnings("unchecked")
+	    		Map<String, Object> details = (Map<String, Object>)matches.get(i);
+	    		QueryResult res = new QueryResult();
+	    		
+	    		// Check origin
+	    		String from = (String)details.get("last-updated-by");
+	    		if ( from == null ) {
+	    			from = (String)details.get("created-by");
+	    			if ( from == null) from = "";
+	    		}
+	    		if ( from.equals("MT!") ) {
+	    			if ( params.getUseMT() != 1 ) {
+	    				count--;
+	    				continue; // Skip MT results
+	    			}
+					res.matchType = MatchType.MT;
+					//TODO: should we set the standard MT score? (or use myMemory)?
+					//res.score = 95; // Standard score for MT
+				}
+	    		//else {
+	    			// Check the score
+	    			Double match = ((Double)details.get("match"))*100;
+	    			res.score = match.intValue();
+	    			// To workaround bug in score calculation
+	    			// Score > 100 should be treated as 100 per Alberto's info.
+	    			if (res.score > 100 ) res.score = 100;
+	    		//}
+	    		// Stop if we reach the threshold (we assume things are sorted)
+	    		if ( res.score < getThreshold() ) break;
+				
+				// Set various data
+	    		res.weight = getWeight();
+	    		res.origin = getName();
+
+	    		// Set source and target text
+				if ( qutil.hasCode() ) {
+					res.score--;
+					res.source = qutil.createNewFragmentWithCodes((String)details.get("segment"));
+					res.target = qutil.createNewFragmentWithCodes((String)details.get("translation"));
+				}
+				else {
+					res.source = new TextFragment((String)details.get("segment"));
+					res.target = new TextFragment((String)details.get("translation"));
+				}
+	    		
+	    		results.add(res);
+	    	}
+			current = 0;
 		}
-		catch ( RemoteException e ) {
-			throw new RuntimeException("Error querying TM.", e);
+		catch ( Throwable e ) {
+			throw new RuntimeException("Error querying the server." + e.getMessage(), e);
 		}
 		if ( results.size() > 0 ) current = 0;
 		return results.size();
 	}
-
 
 	@Override
 	public int query (String plainText) {
@@ -209,7 +245,9 @@ public class MyMemoryTMConnector extends BaseConnector implements ITMQuery {
 		else if ( lang.equals("zh") ) {
 			if ( reg != null ) reg = "cn";
 		}
-		else reg = lang;
+		else {
+			reg = lang;
+		}
 		return lang+"-"+reg;
 	}
 
