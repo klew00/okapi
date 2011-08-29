@@ -18,7 +18,7 @@ import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.steps.diffleverage.DiffMatchAnnotation;
 
 public class BatchTmLeveragingStep extends BasePipelineStep {
-	private static final int BATCH_LEVERAGE_MAX = 250;
+	private static final int BATCH_LEVERAGE_MAX = 50;
 
 	private List<Event> batchedTuEvents;
 	private int tuEventCount;
