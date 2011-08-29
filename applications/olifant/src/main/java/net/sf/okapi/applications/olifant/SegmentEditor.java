@@ -28,6 +28,9 @@ import org.eclipse.swt.custom.ExtendedModifyEvent;
 import org.eclipse.swt.custom.ExtendedModifyListener;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.custom.VerifyKeyListener;
+import org.eclipse.swt.events.VerifyEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 
@@ -37,7 +40,6 @@ class SegmentEditor {
 
 	private StyledText edit;
 	private boolean modified;
-	
 	
 	public SegmentEditor (Composite parent,
 		int flags)
@@ -50,6 +52,7 @@ class SegmentEditor {
 		edit.setLayoutData(gdTmp);
 		
 		edit.addExtendedModifyListener(new ExtendedModifyListener() {
+			@Override
 			public void modifyText(ExtendedModifyEvent event) {
 				String text = edit.getText();
 		    	  java.util.List<StyleRange> ranges = new java.util.ArrayList<StyleRange>();
@@ -57,7 +60,7 @@ class SegmentEditor {
 		    	  while ( m.find() ) {
 		    		  ranges.add(new StyleRange(m.start(), m.end()-m.start(),
 		    			  edit.getDisplay().getSystemColor(SWT.COLOR_GRAY),
-		    			  null, 0));
+		    			  null));
 		    	  }		    	  
 		    	  if ( !ranges.isEmpty() ) {
 		    		  edit.replaceStyleRanges(0, text.length(),
@@ -66,6 +69,68 @@ class SegmentEditor {
 		    	  modified = true;
 			}
 		});
+		
+//		edit.addVerifyKeyListener(new VerifyKeyListener() {
+//			@Override
+//			public void verifyKey(VerifyEvent e) {
+//				if ( e.stateMask == SWT.ALT ) {
+//					switch ( e.keyCode ) {
+//					case SWT.ARROW_RIGHT:
+//						selectNextCode(edit.getCaretOffset(), true);
+//						e.doit = false;
+//						break;
+//					case SWT.ARROW_LEFT:
+//						selectPreviousCode(edit.getCaretOffset(), true);
+//						e.doit = false;
+//						break;
+////					case SWT.ARROW_DOWN: // Target-mode command
+////						setNextSourceCode();
+////						e.doit = false;
+////						break;
+////					case SWT.ARROW_UP: // Target-mode command
+////						setPreviousSourceCode();
+////						e.doit = false;
+////						break;
+//					}
+//				}
+//				else if ( e.stateMask == SWT.CTRL ) {
+//					switch ( e.keyCode ) {
+////					case 'd':
+////						cycleDisplayMode();
+////						e.doit = false;
+////						break;
+////					case 'c':
+////						copyToClipboard(edit.getSelection());
+////						e.doit = false;
+////						break;
+////					case 'v':
+////						pasteFromClipboard();
+////						e.doit = false;
+////						break;
+//					case ' ':
+//						placeText("\u00a0");
+//						e.doit = false;
+//						break;
+//					}
+//				}
+////				else if ( e.stateMask == SWT.SHIFT ) {
+////					switch ( e.keyCode ) {
+////					case SWT.DEL:
+////						cutToClipboard(edit.getSelection());
+////						e.doit = false;
+////						break;
+////					case SWT.INSERT:
+////						pasteFromClipboard();
+////						e.doit = false;
+////						break;
+////					}
+////				}
+//				else if ( e.keyCode == SWT.DEL ){
+//					int i = 0;
+//				}
+//			}
+//		});
+		
 	}
 
 	public boolean setFocus () {
@@ -102,6 +167,52 @@ class SegmentEditor {
 
 	public String getText () {
 		return edit.getText();
+	}
+
+	private void placeText (String text) {
+		Point pt = edit.getSelection();
+		edit.replaceTextRange(pt.x, pt.y-pt.x, text);
+		edit.setCaretOffset(pt.x+text.length());
+	}
+	
+	private void selectNextCode (int position,
+		boolean cycle)
+	{
+		StyleRange[] ranges = edit.getStyleRanges();
+		if ( ranges.length == 0 ) return;
+		while ( true ) {
+			for ( StyleRange range : ranges ) {
+				if ( position <= range.start ) {
+					edit.setSelection(range.start, range.start+range.length);
+					return;
+				}
+			}
+			// Not found yet: Stop here if we don't cycle to the first
+			if ( !cycle ) return;
+			position = 0; // Otherwise: re-start from front
+		}
+	}
+	
+	private void selectPreviousCode (int position,
+		boolean cycle)
+	{
+		StyleRange[] ranges = edit.getStyleRanges();
+		if ( ranges.length == 0 ) return;
+		StyleRange sr;
+		while ( true ) {
+			for ( int i=ranges.length-1; i>=0; i-- ) {
+				sr = ranges[i];
+				if ( position >= sr.start+sr.length ) {
+					Point pt = edit.getSelection();
+					if (( pt.x == sr.start ) && ( pt.x != pt.y )) continue;
+					edit.setSelection(sr.start, sr.start+sr.length);
+					return;
+				}
+			}
+			// Not found yet: Stop here if we don't cycle to the first
+			if ( !cycle ) return;
+			position = edit.getCharCount()-1; // Otherwise: re-start from the end
+		}
 	}
 
 }
