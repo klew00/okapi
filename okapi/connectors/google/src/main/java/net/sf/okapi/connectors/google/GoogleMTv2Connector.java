@@ -26,6 +26,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Map;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
@@ -103,13 +104,12 @@ public class GoogleMTv2Connector extends BaseConnector {
 			// Create the connection and query
 			String urlString = baseUrl + String.format(baseQuery, params.getApiKey(), srcCode, trgCode);
 			//TODO: calculate the space needed for the query (need to count 1 or more for %-escape?)
-			int left = 2000 - urlString.length();
+			//int left = 2000 - urlString.length();
 
 			URL url = new URL(urlString+URLEncoder.encode(qtext, "UTF-8"));
-			
 			HttpURLConnection conn = (HttpURLConnection)url.openConnection();
-			
-			int code = conn.getResponseCode();
+
+			int code = conn.getResponseCode(); // Cost occurs at this point
 			if ( code != 200 ) {
 				throw new RuntimeException(String.format("Error: response code %d\n"
 					+ conn.getResponseMessage(), code)); 
@@ -117,13 +117,15 @@ public class GoogleMTv2Connector extends BaseConnector {
 			
 			// Get the response
 			JSONObject object = (JSONObject)parser.parse(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+			
 			@SuppressWarnings("unchecked")
 			Map<String, Object> map = (Map<String, Object>)object;
 	    	@SuppressWarnings("unchecked")
 	    	Map<String, Object> data = (Map<String, Object>)map.get("data");
+	    	JSONArray translations = (JSONArray)data.get("translations");
 	    	@SuppressWarnings("unchecked")
-	    	Map<String, Object> translations = (Map<String, Object>)data.get("translations");
-	    	String res = (String)translations.get("translatedText");
+	    	Map<String, String> resp = (Map<String, String>)translations.get(0);
+	    	String res = (String)resp.get("translatedText");
 	        
 			result = new QueryResult();
 			result.weight = getWeight();
