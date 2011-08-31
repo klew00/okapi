@@ -69,6 +69,13 @@ public class SubFilterEventConverter {
 		this.endGroupSkeleton = endGroupSkeleton;
 	}
 	
+	public SubFilterEventConverter(String parentId) {
+		this.groupIdGenerator = new IdGenerator(parentId); 
+		this.parentId = parentId;
+		this.startGroupSkeleton = null;
+		this.endGroupSkeleton = null;
+	}
+
 	/**
 	 * Converts an event.
 	 * @param event the event coming from the sub-filter.

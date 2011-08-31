@@ -50,7 +50,9 @@ import net.htmlparser.jericho.Tag;
 
 import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.MimeTypeMapper;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.AbstractFilter;
@@ -62,12 +64,14 @@ import net.sf.okapi.common.filters.SubFilter;
 import net.sf.okapi.common.filters.SubFilterEventConverter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
+import net.sf.okapi.common.skeleton.GenericSkeletonPart;
 import net.sf.okapi.filters.abstractmarkup.ExtractionRuleState.RuleType;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration;
 import net.sf.okapi.filters.yaml.TaggedFilterConfiguration.RULE_TYPE;
@@ -101,6 +105,8 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	private ExtractionRuleState ruleState;
 	@SubFilter() // make this IFilter a subfilter 
 	private IFilter cdataSubfilter;
+	@SubFilter() // make this IFilter a subfilter 
+	private IFilter pcdataSubfilter;
 	private String currentId;
 	private boolean documentEncoding;
 	private String currentDocName;
@@ -121,13 +127,13 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		this.hasUtf8Encoding = false;
 		this.hasBOM = false;
 		this.currentId = null;
-		this.documentEncoding = false;
+		this.documentEncoding = false;		
 	}
 
 	/**
 	 * Default constructor for {@link AbstractMarkupFilter} using default {@link EventBuilder}
 	 */
-	public AbstractMarkupFilter(EventBuilder eventBuilder) {
+	public AbstractMarkupFilter(EventBuilder eventBuilder) {		
 		this.eventBuilder = eventBuilder;
 		this.bufferedWhitespace = new StringBuilder();
 		this.hasUtf8Bom = false;
@@ -148,7 +154,9 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	/**
 	 * Close the filter and all used resources.
 	 */
-	public void close() {		
+	public void close() {	
+		super.close();
+		
 		this.hasUtf8Bom = false;
 		this.hasUtf8Encoding = false;
 		this.currentId = null;
@@ -169,6 +177,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 			throw new OkapiIOException("Could not close " + getDocumentName(), e);
 		}
 		this.document = null; // help Java GC
+		
 		LOGGER.log(Level.FINE, getDocumentName() + " has been closed");
 	}
 
@@ -254,7 +263,9 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	public void open(RawDocument input, boolean generateSkeleton) {
 		// close RawDocument from previous run
 		close();
-
+		
+		super.open(input, generateSkeleton);
+		
 		currentRawDocument = input;
 
 		// doc name may be set by sub-classes
@@ -383,6 +394,13 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 			cdataSubfilter = getFilterConfigurationMapper().createFilter(
 					getConfig().getGlobalCDATASubfilter(), cdataSubfilter); 
 			getEncoderManager().mergeMappings(cdataSubfilter.getEncoderManager());
+		}
+		
+		// intialize pcdata sub-filter
+		if (config != null && config.getGlobalPCDATASubfilter() != null) {
+			String subfilterName = getConfig().getGlobalPCDATASubfilter();
+			pcdataSubfilter = getFilterConfigurationMapper().createFilter(subfilterName, pcdataSubfilter); 
+			getEncoderManager().mergeMappings(pcdataSubfilter.getEncoderManager());
 		}
 	}
 
@@ -548,8 +566,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		if ( ruleState.isExludedState() ) {
 			// Excluded content
 			addToDocumentPart(tag.toString());
-		}
-		else { // Content to extract
+		} else { // Content to extract
 			if (cdataSubfilter != null) {				
 				String parentId = eventBuilder.findMostRecentParentId();
 				cdataSubfilter.close();
@@ -560,7 +577,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 							new GenericSkeleton("<![CDATA["), 
 							new GenericSkeleton("]]>"));
 			
-				// TODO: only AbstractFilter subclasses can be used as subflters!!!
+				// TODO: only AbstractFilter subclasses can be used as subfilters!!!
 				((AbstractFilter)cdataSubfilter).setParentId(parentId);
 				cdataSubfilter.open(new RawDocument(cdataWithoutMarkers, getSrcLoc()));	
 				while (cdataSubfilter.hasNext()) {
@@ -605,7 +622,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 				bufferedWhitespace.append(text.toString());
 			}
 			return;
-		}
+		}		
 
 		if (canStartNewTextUnit()) {
 			startTextUnit(text.toString());			
@@ -895,8 +912,67 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		case INCLUDED_ELEMENT:
 			addToDocumentPart(endTag.toString());
 			break;
-		case TEXT_UNIT_ELEMENT:
-			endTextUnit(new GenericSkeleton(endTag.toString()));
+		case TEXT_UNIT_ELEMENT:			
+			// if a pcdata subfilter is configured let it do the processsing
+			if (pcdataSubfilter != null && isInsideTextRun()) {		
+				// remove the TextUnit we have accumulated since the start tag
+				ITextUnit pcdata = popTempEvent().getTextUnit();
+				
+				String parentId = eventBuilder.findMostRecentParentId();
+				pcdataSubfilter.close();
+				
+				parentId = (parentId == null ? getDocumentId().getLastId() : parentId); 
+				SubFilterEventConverter converter = new SubFilterEventConverter(parentId,
+						// the first GenericSkekeletonPart should be the start tag
+						new GenericSkeleton(((GenericSkeleton)pcdata.getSkeleton()).getFirstPart().toString()), 
+						new GenericSkeleton(endTag.toString()));
+			
+				// TODO: only AbstractFilter subclasses can be used as subfilters!!!
+				((AbstractFilter)pcdataSubfilter).setParentId(parentId);						
+				pcdataSubfilter.open(new RawDocument(pcdata.getSource().toString(), getSrcLoc()));	
+				while (pcdataSubfilter.hasNext()) {
+					Event event = converter.convertEvent(pcdataSubfilter.next());
+					// we need to escape back to the original format
+					if ("okf_html".equals(getConfig().getGlobalPCDATASubfilter())) {
+						switch(event.getEventType()) {
+						case DOCUMENT_PART:
+							DocumentPart dp = event.getDocumentPart();
+							dp.setSkeleton(new GenericSkeleton(Util.escapeToXML(dp.getSkeleton().toString(), 0, true, null)));
+							break;
+						case TEXT_UNIT:
+							ITextUnit tu = event.getTextUnit();
+							
+							// escape the skeleton parts
+							GenericSkeleton s = (GenericSkeleton)tu.getSkeleton();
+							for (GenericSkeletonPart p : s.getParts()) {
+								if (p.getParent() == null) {
+									p.setData(Util.escapeToXML(p.getData().toString(), 0, true, null));
+								}
+							}							
+							tu.setSkeleton(s);
+							
+							// now escape all the code content
+							List<Code> codes = tu.getSource().getFirstContent().getCodes();
+							for (Code c : codes) {
+								c.setData(Util.escapeToXML(c.getData(), 0, true, null));
+								if (c.hasOuterData()) {
+									c.setOuterData(Util.escapeToXML(c.getOuterData(), 0, true, null));
+								}								
+							}
+							
+							// now escape any remaining text
+							TextFragment f = new TextFragment(Util.escapeToXML(tu.getSource().getFirstContent().getCodedText(), 0, true, null), codes);
+							tu.setSourceContent(f);
+							break;
+						}
+					}
+					eventBuilder.addFilterEvent(event);
+				}			
+				pcdataSubfilter.close();		
+				
+			} else {
+				endTextUnit(new GenericSkeleton(endTag.toString()));
+			}
 			break;
 		default:
 			addToDocumentPart(endTag.toString());
@@ -1291,7 +1367,15 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	protected void addFilterEvent(Event event) {
 		eventBuilder.addFilterEvent(event);
 	}
+	
+	protected Event popTempEvent() {
+		return eventBuilder.popTempEvent();
+	}
 
+	protected Event peekTempEvent() {
+		return eventBuilder.peekTempEvent();
+	}
+	
 	protected ExtractionRuleState getRuleState() {
 		return ruleState;
 	}

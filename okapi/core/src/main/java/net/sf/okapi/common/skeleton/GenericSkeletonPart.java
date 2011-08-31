@@ -78,4 +78,7 @@ public class GenericSkeletonPart { // public for OpenXML
 		return data;
 	}
 
+	public void setData(String data) {
+		this.data = new StringBuilder(data);
+	}
 }

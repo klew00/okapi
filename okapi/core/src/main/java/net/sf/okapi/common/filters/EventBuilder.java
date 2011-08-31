@@ -174,7 +174,7 @@ public class EventBuilder {
 	/*
 	 * Return the current buffered Event without removing it.
 	 */
-	private Event peekTempEvent() {
+	public Event peekTempEvent() {
 		if (tempFilterEventStack.isEmpty()) {
 			return null;
 		}
@@ -184,7 +184,7 @@ public class EventBuilder {
 	/*
 	 * Return the current buffered Event and removes it from the buffer.
 	 */
-	private Event popTempEvent() {
+	public Event popTempEvent() {
 		if (tempFilterEventStack.isEmpty()) {
 			return null;
 		}

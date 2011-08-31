@@ -313,4 +313,12 @@ public class GenericSkeleton implements ISkeleton {
 		else return list.get(list.size()-1);
 	}
 
+	/**
+	 * Gets the first part of this skeleton, or null if there are none.
+	 * @return the first part of this skeleton, or null if there are none.
+	 */
+	public GenericSkeletonPart getFirstPart () {
+		if  ( list.size() == 0 ) return null;
+		else return list.get(0);
+	}
 }

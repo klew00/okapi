@@ -35,6 +35,7 @@ import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
@@ -70,22 +71,24 @@ public abstract class AbstractFilter implements IFilter {
 		// defaults
 		setNewlineType("\n"); //$NON-NLS-1$
 		setMultilingual(false);
-		fcMapper = new FilterConfigurationMapper();
+		setFilterConfigurationMapper(new FilterConfigurationMapper());
 		documentId = new IdGenerator(null, IdGenerator.START_DOCUMENT);
 	}
 
 	/**
-	 * Each {@link IFilter} has a small set of options beyond normal configuration that gives the {@link IFilter} the
-	 * needed information to properly parse the content.
+	 * Each {@link IFilter} has a small set of options beyond normal configuration that gives the
+	 * {@link IFilter} the needed information to properly parse the content.
 	 * 
 	 * @param sourceLocale
 	 *            - source locale of the input document
 	 * @param targetLocale
 	 *            - target locale if the input document is multilingual.
 	 * @param defaultEncoding
-	 *            - assumed encoding of the input document. May be overriden if a different encoding is detected.
+	 *            - assumed encoding of the input document. May be overriden if a different encoding
+	 *            is detected.
 	 * @param generateSkeleton
-	 *            - store skeleton (non-translatable parts of the document) along with the extracted text.
+	 *            - store skeleton (non-translatable parts of the document) along with the extracted
+	 *            text.
 	 */
 	public void setOptions(LocaleId sourceLocale, LocaleId targetLocale, String defaultEncoding,
 			boolean generateSkeleton) {
@@ -176,13 +179,30 @@ public abstract class AbstractFilter implements IFilter {
 		configList.add(configuration);
 	}
 
+	@Override
 	public void cancel() {
 		canceled = true;
 	}
 
+	@Override
+	public void close() {
+	}
+
+	@Override
+	public void open(RawDocument input, boolean generateSkeleton) {
+		// defaults
+		setNewlineType("\n"); //$NON-NLS-1$
+		setMultilingual(false);
+		documentId = new IdGenerator(null, IdGenerator.START_DOCUMENT);
+		this.parentId = null;
+		this.canceled = false;
+		this.multilingual = false;
+		this.generateSkeleton = generateSkeleton;
+	}
+
 	/**
-	 * Gets the filter configuration mapper if available. This mapper can be used to instantiate sub-filters based on
-	 * filter configurations.
+	 * Gets the filter configuration mapper if available. This mapper can be used to instantiate
+	 * sub-filters based on filter configurations.
 	 * 
 	 * @return the filter configuration mapper.
 	 */
@@ -402,15 +422,15 @@ public abstract class AbstractFilter implements IFilter {
 	public IdGenerator getDocumentId() {
 		return documentId;
 	}
-	
+
 	public boolean isSubFilter() {
 		return this.getClass().isAnnotationPresent(SubFilter.class);
 	}
-	
+
 	public String getParentId() {
 		return parentId;
 	}
-	
+
 	public void setParentId(String parentId) {
 		this.parentId = parentId;
 	}
