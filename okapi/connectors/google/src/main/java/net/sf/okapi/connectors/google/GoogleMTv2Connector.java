@@ -284,6 +284,16 @@ public class GoogleMTv2Connector extends BaseConnector {
 		return allResults;
 	}
 	
+//	@Override
+//	public void leverage (ITextUnit tu) {
+//		leverageUsingBatchQuery(tu);
+//	}
+//
+//	@Override
+//	public void batchLeverage (List<ITextUnit> tuList) {
+//		batchLeverageUsingBatchQuery(tuList);
+//	}
+
 	@Override
 	protected String toInternalCode (LocaleId locale) {
 		String code = locale.toBCP47();

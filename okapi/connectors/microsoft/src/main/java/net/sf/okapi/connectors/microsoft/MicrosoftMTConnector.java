@@ -40,6 +40,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.query.MatchType;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.BaseConnector;
 import net.sf.okapi.lib.translation.ITMQuery;
@@ -390,6 +391,16 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 		}
 	}
 
+	@Override
+	public void leverage (ITextUnit tu) {
+		leverageUsingBatchQuery(tu);
+	}
+	
+	@Override	
+	public void batchLeverage(List<ITextUnit> tuList) {
+		batchLeverageUsingBatchQuery(tuList);
+	}
+	
 	@Override
 	public List<List<QueryResult>> batchQuery (List<TextFragment> fragments) {
 		List<List<QueryResult>> list = new ArrayList<List<QueryResult>>();

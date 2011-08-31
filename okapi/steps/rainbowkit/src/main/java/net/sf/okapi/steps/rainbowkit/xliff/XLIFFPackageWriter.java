@@ -99,8 +99,8 @@ public class XLIFFPackageWriter extends BasePackageWriter {
 	
 	@Override
 	protected void processEndDocument (Event event) {
-		writer.handleEvent(event);
 		if ( writer != null ) {
+			writer.handleEvent(event);
 			writer.close();
 			writer = null;
 		}

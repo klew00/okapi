@@ -20,6 +20,7 @@
 
 package net.sf.okapi.lib.translation;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -222,6 +223,77 @@ public abstract class BaseConnector implements IQuery {
 			leverage(tu);
 		}
 	}
+	
+	protected void leverageUsingBatchQuery (ITextUnit tu) {
+		if (( tu == null ) || !tu.isTranslatable() ) {
+			return; // No need to query
+		}
+		List<ITextUnit> tuList = new ArrayList<ITextUnit>();
+		tuList.add(tu);
+		batchLeverageUsingBatchQuery(tuList);
+	}
+	
+	protected void batchLeverageUsingBatchQuery (List<ITextUnit> tuList) {
+		// Gather all fragments in a list
+		ArrayList<TextFragment> frags = new ArrayList<TextFragment>();
+		for ( ITextUnit tu : tuList ) {
+			// Skip non-translatable
+			if ( !tu.isTranslatable() ) continue;
+			// We assume here that if there is a target content it match the segmentation of the source
+			// Create an empty target (or return existing target)
+			for ( Segment srcSeg : tu.getSource().getSegments() ) {
+				frags.add(srcSeg.text);
+			}
+		}
+		
+		// Do the query for the list of fragments
+		List<List<QueryResult>> allResults = batchQuery(frags);
+
+		// Place the translations
+		int transIndex = -1;
+		
+		
+		for ( ITextUnit tu : tuList ) {
+			// Skip non-translatable
+			if ( !tu.isTranslatable() ) continue;
+			
+			// Go through each segments in that text unit 
+			TextContainer trgCont = tu.createTarget(getTargetLanguage(), false, IResource.COPY_SEGMENTATION);
+			ISegments trgSegs = trgCont.getSegments();
+			for ( Segment srcSeg : tu.getSource().getSegments() ) {
+			
+				// Get the list of translation for that segment
+				List<QueryResult> resList = allResults.get(++transIndex);
+				AltTranslationsAnnotation at = null;
+				for ( QueryResult qr : resList ) {
+					// Adjust codes so that leveraged target matches the source
+					TextUnitUtil.adjustTargetCodes(srcSeg.text, qr.target, true, false, null, tu);
+					// Annotate
+					if ( trgCont.hasBeenSegmented() ) {
+						// Get corresponding target segment
+						Segment ts = trgSegs.get(srcSeg.getId());
+						if ( ts == null ) {
+							ts = new Segment(srcSeg.id, new TextFragment(""));
+							trgSegs.append(ts);
+						}
+						at = TextUnitUtil.addAltTranslation(ts,
+							qr.toAltTranslation(srcSeg.text, getSourceLanguage(), getTargetLanguage()));
+					}
+					else { // Add to the text container 
+						at = TextUnitUtil.addAltTranslation(trgCont,
+							qr.toAltTranslation(srcSeg.text, getSourceLanguage(), getTargetLanguage()));
+					}
+				}
+				// Then sort AltTranslations into ranked order
+				if ( at != null ) {
+					at.sort();
+				}
+
+			}
+		}
+		
+	}
+	
 	
 //	@Override
 //	public void leverage (TextUnit tu) {
