@@ -110,18 +110,23 @@ distribution.</p>
 	interface.</li>
 </ul>
 	</li>
-	<li>Google MT v2 Connector:<ul>
-	<li>Implemented the new version (v2) of the <b>paying service</b> of Google 
-	Translate. See
-	<a href="http://code.google.com/apis/language/translate/v2/getting_started.html">
-	http://code.google.com/apis/language/translate/v2/getting_started.html</a> 
-	for more details on how to obtain an API Key to use this connector.</li>
+	<li>Microsoft Translator Connector:<ul>
+	<li>Changed the queryList() method to batchQuery() so it can be used through 
+	the IQuery interface.</li>
 </ul>
 	</li>
+	<li>Google MT v2 Connector:<ul>
+		<li>Implemented the new version (v2) of the <b>paid service</b> of Google 
+	Translate. See
+		<a href="http://code.google.com/apis/language/translate/v2/getting_started.html">http://code.google.com/apis/language/translate/v2/getting_started.html</a> 
+	for more details on how to obtain an API Key to use this connector. The 
+		connector implements both query() and batchQuery().</li>
+	</ul></li>
 </ul>
 	</li>
 	<li>Libraries:<ul>
 	<li>Continued to improve the XLIFF 2.0 experimental library.</li>
+	<li>Updated IQuery to include batchQuery() and batchLeverage().</li>
 </ul>
 	</li>
 </ul>
