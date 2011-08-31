@@ -43,8 +43,10 @@ import net.sf.okapi.lib.translation.QueryUtil;
 
 public class GoogleMTv2Connector extends BaseConnector {
 
-	private static final String baseUrl = "https://www.googleapis.com/language/translate/v2";
-	private static final String baseQuery = "?key=%s&source=%s&target=%s";
+	private static final int QUERY_LIMIT = 2000;
+	private static final String BASE_URL = "https://www.googleapis.com/language/translate/v2";
+	private static final String BASE_QUERY = "?key=%s&source=%s&target=%s";
+	private static final String QPARAM = "&q=";
 
 	private GoogleMTv2Parameters params;
 	private JSONParser parser;
@@ -78,7 +80,7 @@ public class GoogleMTv2Connector extends BaseConnector {
 
 	@Override
 	public String getSettingsDisplay () {
-		return "Server: " + baseUrl;
+		return "Server: " + BASE_URL;
 	}
 
 	@Override
@@ -104,14 +106,14 @@ public class GoogleMTv2Connector extends BaseConnector {
 			// Convert the fragment to coded HTML
 			String qtext = util.toCodedHTML(frag);
 			// Create the connection and query
-			String urlString = baseUrl + String.format(baseQuery, params.getApiKey(), srcCode, trgCode);
+			String urlString = BASE_URL + String.format(BASE_QUERY, params.getApiKey(), srcCode, trgCode);
 			// Check the space needed for the query
-			int left = 2000 - (urlString.length()+3); // 3 is for "&q="
+			int left = QUERY_LIMIT - (urlString.length()+QPARAM.length());
 			if ( left < qtext.length() ) {
 				throw new RuntimeException(String.format("Query too long: Character available: %d, characters in query: %d.",
 					left, qtext.length()));
 			}
-			URL url = new URL(urlString+"&q="+URLEncoder.encode(qtext, "UTF-8"));
+			URL url = new URL(urlString + QPARAM + URLEncoder.encode(qtext, "UTF-8"));
 
 			HttpURLConnection conn = (HttpURLConnection)url.openConnection();
 			int code = conn.getResponseCode();
@@ -164,7 +166,7 @@ public class GoogleMTv2Connector extends BaseConnector {
 				throw new RuntimeException("You must have a Google API Key to use this connector.");
 			}
 			// Create the query string
-			String urlString = baseUrl + String.format(baseQuery, params.getApiKey(), srcCode, trgCode);
+			String urlString = BASE_URL + String.format(BASE_QUERY, params.getApiKey(), srcCode, trgCode);
 
 			// Add the text of the queries
 			for ( TextFragment frag : fragments ) {
@@ -174,12 +176,12 @@ public class GoogleMTv2Connector extends BaseConnector {
 				String qtext = util.toCodedHTML(frag);
 
 				// Check the space needed for the query
-				int left = 2000 - (urlString.length()+3); // 3 is for "&q="
+				int left = QUERY_LIMIT - (urlString.length()+QPARAM.length());
 				if ( left < qtext.length() ) {
 					throw new RuntimeException(String.format("Query too long: Character available: %d, characters in query: %d.",
 						left, qtext.length()));
 				}
-				urlString += ("&q=" + URLEncoder.encode(qtext, "UTF-8"));
+				urlString += (QPARAM + URLEncoder.encode(qtext, "UTF-8"));
 			}
 
 			// Create the connection and query
