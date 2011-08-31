@@ -279,7 +279,7 @@ public class MSBatchTranslationStep extends BasePipelineStep {
 			return;
 		}
 		// Call the translation engine
-		List<List<QueryResult>> list = conn.queryList(fragments);
+		List<List<QueryResult>> list = conn.batchQuery(fragments);
 		if ( Util.isEmpty(list) ) {
 			logger.warning("No translation generated.");
 			return;

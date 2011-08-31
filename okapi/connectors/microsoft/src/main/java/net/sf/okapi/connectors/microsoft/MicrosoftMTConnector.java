@@ -390,13 +390,8 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 		}
 	}
 
-	/**
-	 * Queries the engine for a list of source text.
-	 * @param fragments list of the text fragments to translate.
-	 * @return a list of lists of query result. Each list corresponds to a source text (in the same order)
-	 * The list contains the different matches found for the give source text.
-	 */
-	public List<List<QueryResult>> queryList (List<TextFragment> fragments) {
+	@Override
+	public List<List<QueryResult>> batchQuery (List<TextFragment> fragments) {
 		List<List<QueryResult>> list = new ArrayList<List<QueryResult>>();
 
 		// Create the query template if needed

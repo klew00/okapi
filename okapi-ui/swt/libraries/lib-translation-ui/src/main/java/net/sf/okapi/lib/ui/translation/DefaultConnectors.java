@@ -46,7 +46,7 @@ public class DefaultConnectors implements IConnectorList {
 		list.add(trc);
 		
 		trc = new ConnectorInfo();
-		trc.description = "Google Translate Services (v2, with charge)";
+		trc.description = "Google Translate Services (v2, paid service)";
 		trc.connectorClass = "net.sf.okapi.connectors.google.GoogleMTv2Connector";
 		trc.descriptionProviderClass = "net.sf.okapi.connectors.google.GoogleMTv2Parameters";
 		list.add(trc);

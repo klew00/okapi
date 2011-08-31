@@ -142,9 +142,9 @@ public interface IQuery {
 	 * Some {@link IQuery} implementations are significantly faster when 
 	 * a using batch query.
 	 * <br>
-	 * <b>Note that batchQuery does not use hasNext and next methods. Callers must use the returned list directly</b>
-	 * @param fragments the list of {@link TextFragment}s to query.
-	 * @return a list of lists of {@link QueryResult}s.
+	 * <b>Note that batchQuery does not use hasNext and next methods. Callers must use the returned list directly.</b>
+	 * @param fragments list of the text fragments to translate.
+	 * @return a list of lists of query result. Each list corresponds to a source text (in the same order)
 	 */
 	public List<List<QueryResult>> batchQuery (List<TextFragment> fragments);
 

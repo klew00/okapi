@@ -24,6 +24,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.json.simple.JSONArray;
@@ -42,7 +44,7 @@ import net.sf.okapi.lib.translation.QueryUtil;
 public class GoogleMTv2Connector extends BaseConnector {
 
 	private static final String baseUrl = "https://www.googleapis.com/language/translate/v2";
-	private static final String baseQuery = "?key=%s&source=%s&target=%s&q=";
+	private static final String baseQuery = "?key=%s&source=%s&target=%s";
 
 	private GoogleMTv2Parameters params;
 	private JSONParser parser;
@@ -103,13 +105,16 @@ public class GoogleMTv2Connector extends BaseConnector {
 			String qtext = util.toCodedHTML(frag);
 			// Create the connection and query
 			String urlString = baseUrl + String.format(baseQuery, params.getApiKey(), srcCode, trgCode);
-			//TODO: calculate the space needed for the query (need to count 1 or more for %-escape?)
-			//int left = 2000 - urlString.length();
+			// Check the space needed for the query
+			int left = 2000 - (urlString.length()+3); // 3 is for "&q="
+			if ( left < qtext.length() ) {
+				throw new RuntimeException(String.format("Query too long: Character available: %d, characters in query: %d.",
+					left, qtext.length()));
+			}
+			URL url = new URL(urlString+"&q="+URLEncoder.encode(qtext, "UTF-8"));
 
-			URL url = new URL(urlString+URLEncoder.encode(qtext, "UTF-8"));
 			HttpURLConnection conn = (HttpURLConnection)url.openConnection();
-
-			int code = conn.getResponseCode(); // Cost occurs at this point
+			int code = conn.getResponseCode();
 			if ( code != 200 ) {
 				throw new RuntimeException(String.format("Error: response code %d\n"
 					+ conn.getResponseMessage(), code)); 
@@ -146,6 +151,101 @@ public class GoogleMTv2Connector extends BaseConnector {
 			throw new RuntimeException("Error querying the server.\n" + e.getMessage(), e);
 		}
 		return ((current==0) ? 1 : 0);
+	}
+
+	@Override
+	public List<List<QueryResult>> batchQuery (List<TextFragment> fragments) {
+		current = -1;
+		List<List<QueryResult>> allResults = new ArrayList<List<QueryResult>>();
+		
+		try {
+			// Check that we have some Key available
+			if ( Util.isEmpty(params.getApiKey()) ) {
+				throw new RuntimeException("You must have a Google API Key to use this connector.");
+			}
+			// Create the query string
+			String urlString = baseUrl + String.format(baseQuery, params.getApiKey(), srcCode, trgCode);
+
+			// Add the text of the queries
+			for ( TextFragment frag : fragments ) {
+				// Check if there is actually text to translate
+				if ( !frag.hasText(false) ) continue;
+				// Convert the fragment to coded HTML
+				String qtext = util.toCodedHTML(frag);
+
+				// Check the space needed for the query
+				int left = 2000 - (urlString.length()+3); // 3 is for "&q="
+				if ( left < qtext.length() ) {
+					throw new RuntimeException(String.format("Query too long: Character available: %d, characters in query: %d.",
+						left, qtext.length()));
+				}
+				urlString += ("&q=" + URLEncoder.encode(qtext, "UTF-8"));
+			}
+
+			// Create the connection and query
+			URL url = new URL(urlString);
+			HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+			int code = conn.getResponseCode();
+			if ( code != 200 ) {
+				throw new RuntimeException(String.format("Error: response code %d\n"
+					+ conn.getResponseMessage(), code)); 
+			}
+			
+			// Get the results
+			JSONObject object = (JSONObject)parser.parse(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+			@SuppressWarnings("unchecked")
+			Map<String, Object> map = (Map<String, Object>)object;
+	    	@SuppressWarnings("unchecked")
+	    	Map<String, Object> data = (Map<String, Object>)map.get("data");
+	    	JSONArray translations = (JSONArray)data.get("translations");
+
+	    	for ( TextFragment frag : fragments ) {
+	    		// Create the list for that query
+	    		// Note that with this connector we have always only 1 result per query
+	    		List<QueryResult> list = new ArrayList<QueryResult>();
+	    		
+				// Check if there is actually text to translate
+				if ( !frag.hasText(false) ) {
+					// If not: just send an empty result
+					result = new QueryResult();
+					result.weight = getWeight();
+					result.source = frag;
+					result.target = frag.clone();
+					result.score = 95; // Arbitrary score for MT
+					result.origin = getName();
+					result.matchType = MatchType.MT;
+					list.add(result);
+					allResults.add(list);
+					continue;
+				}
+
+				// Else: get the translation
+				@SuppressWarnings("unchecked")
+	    		Map<String, String> resp = (Map<String, String>)translations.get(0);
+	    		String res = (String)resp.get("translatedText");
+	        	result = new QueryResult();
+	        	result.weight = getWeight();
+	        	result.source = frag;
+	        	if ( frag.hasCode() ) {
+	        		result.target = new TextFragment(util.fromCodedHTML(res, frag, true),
+	        			frag.getClonedCodes());
+	        	}
+	        	else {
+	        		result.target = new TextFragment(util.fromCodedHTML(res, frag, true));
+	        	}
+	        	result.score = 95; // Arbitrary score for MT
+	        	result.origin = getName();
+	        	result.matchType = MatchType.MT;
+	        	list.add(result);
+	        	allResults.add(list);
+	    	}
+
+		}
+		catch ( Throwable e ) {
+			throw new RuntimeException("Error querying the server.\n" + e.getMessage(), e);
+		}
+		
+		return allResults;
 	}
 	
 	@Override
