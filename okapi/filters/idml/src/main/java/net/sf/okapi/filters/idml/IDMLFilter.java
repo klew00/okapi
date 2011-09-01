@@ -80,6 +80,7 @@ public class IDMLFilter implements IFilter {
 	private final static String ENDID = "end";
 	private final static String SPREADTYPE = "spread";
 	private final static String STORYTYPE = "story";
+	private final static String EMBEDDEDSTORIES = "embedded-stories";
 	private final static CodeSimplifier SIMPLIFIER = new CodeSimplifier();
 	
 	final private DocumentBuilder docBuilder;
@@ -270,7 +271,12 @@ public class IDMLFilter implements IFilter {
 				StartGroup sg = new StartGroup(DOCID, spreadIdGen.createId());
 				queue.add(new Event(EventType.START_GROUP, sg));
 				sg.setName(spreadName);
-				sg.setType(SPREADTYPE);
+				if ( spreadName.equals(EMBEDDEDSTORIES) ) {
+					sg.setId(EMBEDDEDSTORIES);
+				}
+				else {
+					sg.setType(SPREADTYPE);
+				}
 				spreadStack++;
 			}
 		}
@@ -309,7 +315,12 @@ public class IDMLFilter implements IFilter {
 				storyIter = spreads.get(spreadName).iterator();
 				StartGroup sg = new StartGroup(DOCID, spreadIdGen.createId());
 				sg.setName(spreadName);
-				sg.setType(SPREADTYPE);
+				if ( spreadName.equals(EMBEDDEDSTORIES) ) {
+					sg.setId(EMBEDDEDSTORIES);
+				}
+				else {
+					sg.setType(SPREADTYPE);
+				}
 				queue.add(new Event(EventType.START_GROUP, sg));
 				spreadStack++;
 			}	
@@ -338,9 +349,11 @@ public class IDMLFilter implements IFilter {
 					if ( entry.getName().startsWith("Spreads/") ||
 						( entry.getName().startsWith("MasterSpreads/") && params.getExtractMasterSpreads() )) {
 						// Gather stories from the spread
-						processSpread(entry);
+						gatherStoriesInSpread(entry);
 					}
 					else if ( entry.getName().startsWith("Stories/") ) {
+						// Gather stories from the story itself (embedded in TextFrame)
+						gatherStoriesInStory(entry);
 						// Add the entry to the lookup list
 						String storyId = Util.getFilename(entry.getName(), false);
 						int p = storyId.indexOf('_');
@@ -360,7 +373,7 @@ public class IDMLFilter implements IFilter {
 	 * @param entry the zip entry for the spread.
 	 * @return the total number of stories in the given spread.
 	 */
-	private int processSpread (ZipEntry entry)
+	private int gatherStoriesInSpread (ZipEntry entry)
 		throws SAXException, IOException, ParserConfigurationException
 	{
 		ArrayList<String> storyList = new ArrayList<String>();
@@ -386,6 +399,43 @@ public class IDMLFilter implements IFilter {
 		spreads.put(name, storyList);
 		// Return the number of stories in this spread
 		return storyList.size();
+	}
+
+	/**
+	 * Gather all the stories used in this story.
+	 * @param entry the zip entry for the story.
+	 */
+	private void gatherStoriesInStory (ZipEntry entry)
+		throws SAXException, IOException, ParserConfigurationException
+	{
+		ArrayList<String> storyList = new ArrayList<String>();
+		Document doc = docBuilder.parse(zipFile.getInputStream(entry));
+		
+		NodeList list = doc.getElementsByTagName("TextFrame");
+		for ( int i=0; i<list.getLength(); i++ ) {
+			Element tf = (Element)list.item(i);
+			String tmp = tf.getAttribute("ParentStory");
+			if ( Util.isEmpty(tmp) ) {
+				throw new IOException("Missing value for parentStory.");
+			}
+			// Add the the story to the lookup list
+			if ( !storiesDone.contains(tmp) ) {
+				storyList.add(tmp);
+				storiesDone.add(tmp);
+			}
+		}
+		
+		// If needed, add the stories for this story to the overall list of stories to process
+		if ( !storyList.isEmpty() ) {
+			ArrayList<String> existingList = spreads.get(EMBEDDEDSTORIES);
+			if ( existingList == null ) {
+				spreads.put(EMBEDDEDSTORIES, storyList);
+			}
+			else {
+				existingList.addAll(storyList);
+				spreads.put(EMBEDDEDSTORIES, existingList);
+			}
+		}
 	}
 
 	private void processStory (String storyId) {
