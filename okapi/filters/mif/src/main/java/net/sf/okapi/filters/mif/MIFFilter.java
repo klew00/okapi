@@ -212,7 +212,7 @@ public class MIFFilter implements IFilter {
 	
 	@Override
 	public String getDisplayName () {
-		return "MIF Filter (early BETA)";
+		return "MIF Filter";
 	}
 
 	@Override
@@ -226,7 +226,7 @@ public class MIFFilter implements IFilter {
 		list.add(new FilterConfiguration(getName(),
 			MimeTypeMapper.MIF_MIME_TYPE,
 			getClass().getName(),
-			"MIF (ALPHA don't even try)",
+			"MIF (BETA)",
 			"Adobe FrameMaker MIF documents",
 			null,
 			".mif;"));

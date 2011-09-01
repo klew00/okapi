@@ -171,7 +171,7 @@ public class IDMLFilter implements IFilter {
 
 	@Override
 	public String getDisplayName () {
-		return "IDML Filter (BETA)";
+		return "IDML Filter";
 	}
 
 	@Override

@@ -161,16 +161,8 @@ public abstract class BaseConnector implements IQuery {
 
 		// We assume here that if there is a target content it match the segmentation of the source
 		// Create an empty target (or return existing target)
-//		boolean hadTarget = tu.hasTarget(getTargetLanguage());
 		TextContainer trgCont = tu.createTarget(getTargetLanguage(), false, IResource.COPY_SEGMENTATION);
 		ISegments trgSegs = trgCont.getSegments();
-//		if ( !hadTarget ) {
-//			// If we did not have an existing target, we use the copy from the source
-//			// but make sure the segments are empty. We just need the segment to attach the annotations
-//			for ( Segment seg : trgSegs ) {
-//				seg.text.clear();
-//			}
-//		}
 		
 		// For each segment
 		for ( Segment srcSeg : tu.getSource().getSegments() ) {
@@ -182,8 +174,6 @@ public abstract class BaseConnector implements IQuery {
 			// Then process each result
 			while ( hasNext() ) {
 				qr = next();
-				qr.weight = getWeight(); // Set weight based on connector weight
-				// Match type should already be set in query()
 					
 				// Adjust codes so that leveraged target matches the source
 				TextUnitUtil.adjustTargetCodes(srcSeg.text, qr.target, true, false, null, tu);
@@ -224,6 +214,11 @@ public abstract class BaseConnector implements IQuery {
 		}
 	}
 	
+	/**
+	 * Call this method inside the overriding {@link #leverage(ITextUnit)} method
+	 * of the derived class, if that class offers a fast {@link #batchQuery(List)} method.
+	 * @param tu the text unit to leverage.
+	 */
 	protected void leverageUsingBatchQuery (ITextUnit tu) {
 		if (( tu == null ) || !tu.isTranslatable() ) {
 			return; // No need to query
@@ -233,6 +228,11 @@ public abstract class BaseConnector implements IQuery {
 		batchLeverageUsingBatchQuery(tuList);
 	}
 	
+	/**
+	 * Call this method inside the overriding {@link #batchLeverage(List)} method
+	 * of the derived class, if that class offers a fast {@link #batchQuery(List)} method.
+	 * @param tuList list of the text units to leverage.
+	 */
 	protected void batchLeverageUsingBatchQuery (List<ITextUnit> tuList) {
 		// Gather all fragments in a list
 		ArrayList<TextFragment> frags = new ArrayList<TextFragment>();
@@ -251,8 +251,6 @@ public abstract class BaseConnector implements IQuery {
 
 		// Place the translations
 		int transIndex = -1;
-		
-		
 		for ( ITextUnit tu : tuList ) {
 			// Skip non-translatable
 			if ( !tu.isTranslatable() ) continue;
@@ -293,7 +291,6 @@ public abstract class BaseConnector implements IQuery {
 		}
 		
 	}
-	
 	
 //	@Override
 //	public void leverage (TextUnit tu) {

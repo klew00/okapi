@@ -36,6 +36,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.query.MatchType;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.BaseConnector;
 import net.sf.okapi.common.query.QueryResult;
@@ -284,15 +285,15 @@ public class GoogleMTv2Connector extends BaseConnector {
 		return allResults;
 	}
 	
-//	@Override
-//	public void leverage (ITextUnit tu) {
-//		leverageUsingBatchQuery(tu);
-//	}
-//
-//	@Override
-//	public void batchLeverage (List<ITextUnit> tuList) {
-//		batchLeverageUsingBatchQuery(tuList);
-//	}
+	@Override
+	public void leverage (ITextUnit tu) {
+		leverageUsingBatchQuery(tu);
+	}
+
+	@Override
+	public void batchLeverage (List<ITextUnit> tuList) {
+		batchLeverageUsingBatchQuery(tuList);
+	}
 
 	@Override
 	protected String toInternalCode (LocaleId locale) {
