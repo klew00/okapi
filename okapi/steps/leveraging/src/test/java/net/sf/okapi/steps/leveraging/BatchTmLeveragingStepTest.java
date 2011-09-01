@@ -81,7 +81,7 @@ public class BatchTmLeveragingStepTest {
 		pdriver.processBatch();
 		
 		// Check exact
-		ITextUnit tu = o.getResult().get(15).getTextUnit();
+		ITextUnit tu = o.getResult().get(8).getTextUnit();
 		assertNotNull(tu);
 		AltTranslationsAnnotation a = tu.getTarget(locFR).getAnnotation(AltTranslationsAnnotation.class);
 		Assert.assertNotNull(a);				
@@ -89,7 +89,7 @@ public class BatchTmLeveragingStepTest {
 		
 		
 		// Check fuzzy
-		tu = o.getResult().get(16).getTextUnit();
+		tu = o.getResult().get(11).getTextUnit();
 		assertNotNull(tu);
 		a = tu.getTarget(locFR).getAnnotation(AltTranslationsAnnotation.class);
 		Assert.assertNotNull(a);				
