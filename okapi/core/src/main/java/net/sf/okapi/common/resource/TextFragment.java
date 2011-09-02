@@ -790,7 +790,7 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 	public Code getCode (int index) {
 		return codes.get(index);
 	}
-	
+		
 	/**
 	 * Gets the list of all codes for the fragment.
 	 * @return the list of all codes for the fragment. If there is no code, an empty
@@ -1516,6 +1516,36 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 			if ( code.tagType != TagType.CLOSING ) code.id = ++lastCodeID;
 		}
 		isBalanced = false;
+	}
+	
+	/**
+	 * Remove the {@link Code} from this TextFragment 
+	 * @param code - the {@link Code} to remove
+	 */
+	public void removeCode(Code code) {
+		if (code == null || 
+				codes == null || 
+				codes.isEmpty()) {
+			return;
+		}
+		
+		for (int i=0; i<text.length(); i++) {
+			switch (text.charAt(i)) {
+				case TextFragment.MARKER_OPENING:
+				case TextFragment.MARKER_CLOSING:
+				case TextFragment.MARKER_ISOLATED:
+					int index = toIndex(text.charAt(i+1));
+					if (codes.get(index).getId() == code.getId() &&
+							codes.get(index).getTagType() == code.getTagType()) {
+						remove(i, i+2);
+						return;
+					}
+					i++; // skip index marker as well
+					break;
+				default:					
+					break;
+			}
+		}	
 	}
 	
 	/**

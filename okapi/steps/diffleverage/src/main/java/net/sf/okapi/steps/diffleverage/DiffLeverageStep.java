@@ -367,13 +367,14 @@ public class DiffLeverageStep extends BasePipelineStep {
 					
 					// We force the source to be a paragraph!! We use getUnSegmentedContentCopy
 					// to make sure we get *all* TextParts (just in case segmentation has been applied
-					// or  somehow extra TextParts were added in an external process)
-					TextFragment atf = TextUnitUtil.adjustTargetCodes(
+					// or  somehow extra TextParts were added in an external process)	
+					
+					TextFragment atf = TextUnitUtil.adjustTargetCodes(						
 							newTu.getSource().getUnSegmentedContentCopy(),
 							otc.getUnSegmentedContentCopy(), 
 							true, false, null, newTu);
 					otc.setContent(atf);
-					
+				
 					if (params.isCopyToTarget()) {
 						newTu.setTarget(targetLocale, otc);
 					}
