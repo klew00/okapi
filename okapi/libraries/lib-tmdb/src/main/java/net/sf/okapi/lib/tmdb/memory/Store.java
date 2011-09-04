@@ -87,6 +87,10 @@ class Store {
 		return list;
 	}
 	
+	public Results getResults () {
+		return new Results(getRecords());
+	}
+	
 	public List<String> getAvailableFields () {
 		return new ArrayList<String>(fieldNames.keySet());
 	}

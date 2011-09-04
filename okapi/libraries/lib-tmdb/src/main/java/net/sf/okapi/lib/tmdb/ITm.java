@@ -20,6 +20,8 @@
 
 package net.sf.okapi.lib.tmdb;
 
+import java.sql.ResultSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,18 +29,15 @@ public interface ITm {
 
 	/**
 	 * Gets the UUID of this TM.
+	 * The UUID is a global universal unique identifier. It can be used for example
+	 * to link display property with a specific TM.
 	 * @return the UUID of this TM.
 	 */
 	public String getUUID ();
 	
 	/**
-	 * Gets the database key of this TM.
-	 * @return the database key of this TM.
-	 */
-	public long getKey ();
-	
-	/**
 	 * Gets the name of this TM.
+	 * The name of the TM is unique per repository.
 	 * @return the name of this TM.
 	 */
 	public String getName ();
@@ -50,23 +49,41 @@ public interface ITm {
 	public String getDescription ();
 
 	/**
+	 * Gets a list of all available fields in this TM.
+	 * @return the list of all available fields in this TM.
+	 */
+	public List<String> getAvailableFields ();
+	
+	/**
 	 * Sets the list of fields to be returned by {@link #getRecords()}.
 	 * @param names list of fields to be returned. 
 	 */
 	public void setRecordFields (List<String> names);
 
+	public void startImport ();
+	
+	public void addNewRecord (LinkedHashMap<String, Object> fields);
+	
+	public void finishImport();
+	
+	// to remove later
 	public IRecord addRecord (Map<String, String> fields);
-
-	// Not sure about this one
-	public long addRecordVar (String ... vars);
 
 	//TODO: we should have page-based getters
 	public List<IRecord> getRecords ();
 	
 	/**
-	 * Gets a list of all available fields in this TM.
-	 * @return the list of all available fields in this TM.
+	 * Sets the number of records a call to a paging method should return.
+	 * @param size the number of records a call to a paging method should return.
 	 */
-	public List<String> getAvailableFields ();
+	public void setPageSize (int size);
+	
+	public ResultSet getFirstPage ();
+	
+	public ResultSet getLastPage ();
+	
+	public ResultSet getNextPage ();
+	
+	public ResultSet getPreviousPage ();
 	
 }

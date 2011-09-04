@@ -29,11 +29,11 @@ public class Record implements IRecord {
 
 	private long key;
 	private boolean flag;
-	private ArrayList<String> fields;
+	private ArrayList<Object> fields;
 	
 	public Record (long key) {
 		this.key = key;
-		fields = new ArrayList<String>();
+		fields = new ArrayList<Object>();
 	}
 	
 	public Record (long key,
@@ -51,7 +51,7 @@ public class Record implements IRecord {
 	}
 	
 	@Override
-	public List<String> getFields () {
+	public List<Object> getFields () {
 		return fields;
 	}
 
@@ -61,12 +61,12 @@ public class Record implements IRecord {
 	}
 	
 	@Override
-	public String get (int index) {
+	public Object get (int index) {
 		return fields.get(index);
 	}
 
 	@Override
-	public void add (String value) {
+	public void add (Object value) {
 		fields.add(value);
 	}
 	

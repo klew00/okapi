@@ -20,6 +20,8 @@
 
 package net.sf.okapi.lib.tmdb.memory;
 
+import java.sql.ResultSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -32,23 +34,15 @@ public class Tm implements ITm {
 	private String name;
 	private String description;
 	private String uuid;
-	private long key;
 	private Store store;
 	
-	public Tm (long key,
-		String name,
+	public Tm (String name,
 		String description)
 	{
 		uuid = UUID.randomUUID().toString();
-		this.key = key;
 		this.name = name;
 		this.description = description;
 		store = new Store();
-	}
-	
-	@Override
-	public long getKey () {
-		return key;
 	}
 	
 	@Override
@@ -81,14 +75,52 @@ public class Tm implements ITm {
 	}
 	
 	@Override
-	public long addRecordVar (String ... vars) {
-		Record rec = store.add(vars);
-		return rec.getKey();
+	public List<String> getAvailableFields () {
+		return store.getAvailableFields();
 	}
 
 	@Override
-	public List<String> getAvailableFields () {
-		return store.getAvailableFields();
+	public ResultSet getFirstPage () {
+		return store.getResults();
+	}
+
+	@Override
+	public ResultSet getLastPage () {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ResultSet getNextPage () {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ResultSet getPreviousPage () {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setPageSize (int size) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void finishImport () {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void startImport () {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void addNewRecord (LinkedHashMap<String, Object> fields) {
+		// TODO Auto-generated method stub
 	}
 
 }

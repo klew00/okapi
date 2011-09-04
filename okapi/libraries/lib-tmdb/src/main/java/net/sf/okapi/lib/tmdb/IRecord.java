@@ -30,14 +30,14 @@ public interface IRecord {
 	
 	public void setFlag (boolean flag);
 	
-	public List<String> getFields ();
+	public List<Object> getFields ();
 	
-	public String get (int index);
+	public Object get (int index);
 	
 	public void set (int index,
 		String value);
 	
-	public void add (String value);
+	public void add (Object value);
 	
 	public int size ();
 	

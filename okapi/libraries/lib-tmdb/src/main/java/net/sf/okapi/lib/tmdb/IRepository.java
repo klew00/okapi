@@ -22,11 +22,40 @@ package net.sf.okapi.lib.tmdb;
 
 import java.util.List;
 
+import net.sf.okapi.common.LocaleId;
+
 public interface IRepository {
 
-	public List<ITm> getTmList ();
+	/**
+	 * Gets the list of all TMs in this repository.
+	 * @return the list of all TMs in this repository.
+	 */
+	public List<String> getTmNames ();
 	
-	public ITm addTm (String name,
-		String description);
+	/**
+	 * Creates a new TM.
+	 * @param name the name of the new tM to create.
+	 * @param description the description for the new TM.
+	 * @param locId the locale of the initial language.
+	 * @return the ITm object for the newly created TM, or null if the TM was not created.
+	 */
+	public ITm createTm (String name,
+		String description,
+		LocaleId locId);
 	
+	/**
+	 * Deletes a given TM from this repository.
+	 * If there is no TM with such name in the repository, nothing happens.
+	 * @param name the name of the TM to remove.
+	 */
+	public void deleteTm (String name);
+
+	/**
+	 * Gets the ITm object for the given TM name.
+	 * @param name the name of the TM to retrieve.
+	 * @return the ITm object for the given TM name, or null if the name is not the one
+	 * of an existing TM.
+	 */
+	public ITm getTm (String name);
+
 }
