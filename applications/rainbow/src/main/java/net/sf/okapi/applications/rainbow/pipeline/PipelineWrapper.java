@@ -376,7 +376,13 @@ public class PipelineWrapper {
 			
 			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.idbasedcopy.IdBasedCopyStep").newInstance();
-			step = new StepInfo(ps.getName(), ps.getDescription(), ps.getClass().getName(), null, null);
+			params = ps.getParameters();
+			step = new StepInfo(ps.getName(), ps.getDescription(), ps.getClass().getName(), null,
+				params.getClass().getName());
+			if ( params != null ) {
+				step.paramsData = params.toString();
+				peMapper.addDescriptionProvider("net.sf.okapi.steps.idbasedcopy.Parameters", step.paramsClass);
+			}
 			availableSteps.put(step.stepClass, step);
 			
 			ps = (IPipelineStep)Class.forName(
