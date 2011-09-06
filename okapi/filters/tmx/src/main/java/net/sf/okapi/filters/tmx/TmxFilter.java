@@ -433,7 +433,7 @@ public class TmxFilter implements IFilter {
 			skel.append(String.format(" %s%s=\"%s\"",
 				(((prefix==null)||(prefix.length()==0)) ? "" : prefix+":"),
 				reader.getAttributeLocalName(i),
-				reader.getAttributeValue(i)));
+				Util.escapeToXML(reader.getAttributeValue(i).replace("\n", lineBreak), 3, params.escapeGT, null)));
 		}
 		skel.append(">");
 	}
@@ -499,7 +499,7 @@ public class TmxFilter implements IFilter {
 		
 		if(tuvTrgType == TuvXmlLang.UNDEFINED){
 			//determine the property name and add skel to TmxTu
-			propName = tmxTu.parseStartElement(reader,startElement);
+			propName = tmxTu.parseStartElement(reader,startElement, params.escapeGT);
 		}else if (tuvTrgType == TuvXmlLang.SOURCE || tuvTrgType == TuvXmlLang.TARGET || params.processAllTargets){
 			//determine the property name and add skel to TmxTuv
 			propName = tmxTu.curTuv.parseStartElement(reader, tuvTrgType, params.processAllTargets, startElement);
@@ -652,7 +652,7 @@ public class TmxFilter implements IFilter {
 		
 		LocaleId currentLang;
 		TmxTu tmxTu = new TmxTu(srcLang, trgLang, lineBreak);	//create the TmxTu helper
-		tmxTu.parseStartElement(reader);						//add to TmxTu skelBefore
+		tmxTu.parseStartElement(reader, params.escapeGT);		//add to TmxTu skelBefore
 
 		String curLocalName;
 		
@@ -754,7 +754,7 @@ public class TmxFilter implements IFilter {
 				outerCode.append(String.format(" %s%s=\"%s\"",
 					(((prefix==null)||(prefix.length()==0)) ? "" : prefix+":"),
 					reader.getAttributeLocalName(i),
-					reader.getAttributeValue(i)));
+					Util.escapeToXML(reader.getAttributeValue(i).replace("\n", lineBreak), 3, params.escapeGT, null)));
 			}
 			outerCode.append(">");
 			
@@ -802,7 +802,7 @@ public class TmxFilter implements IFilter {
 						tmpg.append(String.format(" %s%s=\"%s\"",
 							(((prefix==null)||(prefix.length()==0)) ? "" : prefix+":"),
 							reader.getAttributeLocalName(i),
-							reader.getAttributeValue(i)));
+							Util.escapeToXML(reader.getAttributeValue(i).replace("\n", lineBreak), 3, params.escapeGT, null)));
 					}
 					tmpg.append(">");
 				

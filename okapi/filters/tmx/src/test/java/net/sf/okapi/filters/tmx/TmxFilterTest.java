@@ -326,6 +326,23 @@ public class TmxFilterTest {
 	}	
 
 	@Test
+	public void testOutputWithLT () {
+		String snippet = "<?xml version=\"1.0\"?>\r"
+			+ "<tmx version=\"1.1\"><header creationtool=\"undefined_creationtool\" creationtoolversion=\"undefined_creationversion\" segtype=\"undefined_segtype\" o-tmf=\"undefined_unknown\" adminlang=\"undefined_adminlang\" srclang=\"en-us\" datatype=\"unknown\"></header><body>"
+			+ "<tu tuid=\"1\" creationtool=\"abc&lt;&apos;>\">"
+			+ "<tuv xml:lang=\"en-US\"><seg>a<ph id='1' x=\"&lt;codeph class=&quot;+ topic/ph pr-d/codeph &quot;&gt;\">&lt;code></ph>b</seg></tuv></tu>"
+			+ "</body></tmx>";
+		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+			+ "<tmx version=\"1.1\"><header creationtool=\"undefined_creationtool\" creationtoolversion=\"undefined_creationversion\" segtype=\"undefined_segtype\" o-tmf=\"undefined_unknown\" adminlang=\"undefined_adminlang\" srclang=\"en-us\" datatype=\"unknown\"></header><body>"
+			+ "<tu tuid=\"1\" creationtool=\"abc&lt;'>\">"
+			+ "<tuv xml:lang=\"en-US\"><seg>a<ph id=\"1\" x=\"&lt;codeph class=&quot;+ topic/ph pr-d/codeph &quot;>\">&lt;code></ph>b</seg></tuv>"
+			+ "<tuv xml:lang=\"fr-fr\"><seg>a<ph id=\"1\" x=\"&lt;codeph class=&quot;+ topic/ph pr-d/codeph &quot;>\">&lt;code></ph>b</seg></tuv>\r"
+			+ "</tu></body></tmx>";
+		assertEquals(expected, FilterTestDriver.generateOutput(getEvents(snippet,locENUS, locFRFR),
+			filter.getEncoderManager(), locFR));
+	}		
+	
+	@Test
 	public void testUnConsolidatedStream() {
 		Parameters params = (Parameters)filter.getParameters();
 		params.consolidateDpSkeleton=false;

@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamReader;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.MimeTypeMapper;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Property;
@@ -192,8 +193,10 @@ class TmxTu {
 	 * Parse element and add properties to TmxTuv.
 	 * @param reader XmlStreamReader.
 	 */
-	void parseStartElement (XMLStreamReader reader) {
-		parseStartElement (reader,null);
+	void parseStartElement (XMLStreamReader reader,
+		boolean escapeGT)
+	{
+		parseStartElement(reader, null, escapeGT);
 	}
 
 
@@ -201,9 +204,13 @@ class TmxTu {
 	 * Parse element and add properties to TmxTu or return the property name for props and notes.
 	 * @param reader XmlStreamReader.
 	 * @param elem Element is null, prop, or notes.
+	 * @param escapeGT true to escape '>' false to output as raw character
 	 * @return Name of property if elem is passed as "prop" or "note".
 	 */
-	String parseStartElement (XMLStreamReader reader, String elem) {
+	String parseStartElement (XMLStreamReader reader,
+		String elem,
+		boolean escapeGT)
+	{
 
 		String propName="";
 		
@@ -229,7 +236,7 @@ class TmxTu {
 			skelBefore.append(String.format(" %s%s=\"%s\"",
 				(((prefix==null)||(prefix.length()==0)) ? "" : prefix+":"),
 				reader.getAttributeLocalName(i),
-				reader.getAttributeValue(i)));
+				Util.escapeToXML(reader.getAttributeValue(i).replace("\n", lineBreak), 3, escapeGT, null)));
 			
 			if(elem!=null && elem.equals("prop")){
 				if(reader.getAttributeLocalName(i).equals("type")){
