@@ -26,6 +26,8 @@ import net.sf.okapi.common.LocaleId;
 
 public interface IRepository {
 
+	public String getName ();
+
 	/**
 	 * Gets the list of all TMs in this repository.
 	 * @return the list of all TMs in this repository.

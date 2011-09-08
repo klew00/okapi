@@ -27,7 +27,14 @@ import net.sf.okapi.common.resource.TextFragment;
 
 public class DbUtil {
 	
-	public static final String TEXT_PREFIX = "Text_";
+	public static final String LANG_SEP = "~";
+	public static final String SEGKEY_NAME = "SegKey";
+	public static final String FLAG_NAME = "Flag";
+	public static final String TUKEY_NAME = "TuKey";
+	public static final String TUREF_NAME = "TuRef";
+	public static final String TEXT_PREFIX = ("Text"+LANG_SEP);
+	public static final String CODES_PREFIX = ("Codes"+LANG_SEP);
+	public static final String QUALITY_PREFIX = ("Quality"+LANG_SEP);
 
 	/**
 	 * Cannot use fully static methods as this is used across threads.
@@ -37,6 +44,14 @@ public class DbUtil {
 	public static String toDbLang (LocaleId locId) {
 		String tmp = locId.toString();
 		return tmp.toUpperCase().replace('-', '_');
+	}
+
+	public static String checkFieldName (String name) {
+		if (( name.indexOf(LANG_SEP) != -1 ) || ( name.indexOf('\'') != -1 )) {
+			throw new RuntimeException(String.format("The name of a field '%s' cannot have the character ''' or '%s'.",
+				name, LANG_SEP));
+		}
+		return name;
 	}
 
 	public String[] fragmentToTmFields (TextFragment frag) {

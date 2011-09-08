@@ -1,13 +1,12 @@
 package net.sf.okapi.applications.olifant;
 
+import java.sql.ResultSet;
 import java.util.ArrayList;
-import java.util.List;
 
 import net.sf.okapi.common.observer.IObservable;
 import net.sf.okapi.common.observer.IObserver;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.lib.tmdb.DbUtil;
-import net.sf.okapi.lib.tmdb.IRecord;
 import net.sf.okapi.lib.tmdb.ITm;
 
 import org.eclipse.swt.SWT;
@@ -26,7 +25,7 @@ import org.eclipse.swt.widgets.TableItem;
 
 class TmPanel extends Composite implements IObserver {
 
-	private final static int KEYCOLUMNWIDTH = 80;
+	private final static int KEYCOLUMNWIDTH = 90;
 
 	private final SashForm sashMain;
 	private final EditorPanel editPanel;
@@ -34,10 +33,12 @@ class TmPanel extends Composite implements IObserver {
 	private final LogPanel logPanel;
 	private ITm tm;
 	private int currentEntry;
-	private List<String> visibleFields;
+	private ArrayList<String> visibleFields;
 	private StatusBar statusBar;
 	private Thread workerThread;
 	private MainForm mainForm;
+	private int srcCol; // Column in the table that holds the source text, use -1 for none, 0-based, 1=SegKey+Flag
+	private int trgCol; // Column in the table that holds the target text, use -1 for none, 0-based, 1=SegKey+Flag
 
 	public TmPanel (MainForm mainForm,
 		Composite parent,
@@ -49,7 +50,10 @@ class TmPanel extends Composite implements IObserver {
 		this.mainForm = mainForm;
 		this.tm = tm;
 		this.statusBar = statusBar;
-
+		
+		srcCol = -1;
+		trgCol = -1;
+		
 		GridLayout layout = new GridLayout(1, false);
 		layout.marginHeight = 0;
 		layout.marginWidth = 0;
@@ -71,6 +75,19 @@ class TmPanel extends Composite implements IObserver {
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
 
+//		tblResults.addControlListener(new ControlAdapter() {
+//		    public void controlResized(ControlEvent e) {
+//		    	Table table = (Table)e.getSource();
+//		    	Rectangle rect = table.getClientArea();
+//				int nPart = rect.width / 100;
+//				int nRemain = rect.width % 100;
+//				table.getColumn(0).setWidth(8*nPart);
+//				table.getColumn(1).setWidth(12*nPart);
+//				table.getColumn(2).setWidth(40*nPart);
+//				table.getColumn(3).setWidth((40*nPart)+nRemain);
+//		    }
+//		});
+		
 		table.addControlListener(new ControlAdapter() {
 		    public void controlResized(ControlEvent e) {
 		    	int count = table.getColumnCount()-1; // Exclude Key column
@@ -101,7 +118,7 @@ class TmPanel extends Composite implements IObserver {
 
 		// Create the first column (always present)
 		TableColumn col = new TableColumn(table, SWT.NONE);
-		col.setText("Key");
+		col.setText("Flag/SegKey");
 		col.setWidth(KEYCOLUMNWIDTH);
 		
 		logPanel = new LogPanel(sashMain, 0);
@@ -130,8 +147,22 @@ class TmPanel extends Composite implements IObserver {
 	
 	public void editColumns () {
 		try {
-			// For now reset to all fields
-			visibleFields = tm.getAvailableFields();
+			ColumnsForm dlg = new ColumnsForm(getShell(), tm, visibleFields);
+			ArrayList<String> res = dlg.showDialog();
+			if ( res == null ) return;
+			
+			visibleFields = res;
+			//TODO Set the columns with the source and target
+			srcCol = -1;
+			trgCol = -1;
+			int n = 1;
+			for ( String fn : visibleFields ) {
+				if ( fn.startsWith(DbUtil.TEXT_PREFIX) ) {
+					if ( srcCol == -1 ) srcCol = n;
+					else if ( trgCol == -1 ) trgCol = n;
+				}
+				n++;
+			}
 			updateVisibleFields();
 		}
 		catch ( Throwable e ) {
@@ -140,11 +171,17 @@ class TmPanel extends Composite implements IObserver {
 	}
 
 	public void resetTmDisplay () {
+		srcCol = -1;
+		trgCol = -1;
 		// By default: all and only text fields are visible
 		visibleFields = new ArrayList<String>();
+		int n = 1; // SEGKEY and FLAG are there by default
 		for ( String fn : tm.getAvailableFields() ) {
 			if ( fn.startsWith(DbUtil.TEXT_PREFIX) ) {
 				visibleFields.add(fn);
+				if ( srcCol == -1 ) srcCol = n;
+				else if ( trgCol == -1 ) trgCol = n;
+				n++;
 			}
 		}
 
@@ -161,7 +198,6 @@ class TmPanel extends Composite implements IObserver {
 			int n;
 			while ( (n = table.getColumnCount()) > 1 ) {
 				table.getColumns()[n-1].dispose();
-				table.getColumnCount();
 			}
 			// Add the new ones
 			for ( String fn : visibleFields ) {
@@ -195,8 +231,10 @@ class TmPanel extends Composite implements IObserver {
 				editPanel.setFields(null, null);
 			}
 			else {
-				IRecord rec = (IRecord)table.getItem(n).getData();
-				editPanel.setFields(rec.get(0), rec.get(1));
+				TableItem ti = table.getItem(n);
+				editPanel.setFields(
+					srcCol==-1 ? null : ti.getText(srcCol),
+					trgCol==-1 ? null : ti.getText(trgCol));
 			}
 			currentEntry = n;
 			statusBar.setCounter(n, table.getItemCount());
@@ -210,33 +248,35 @@ class TmPanel extends Composite implements IObserver {
 		if ( currentEntry < 0 ) return;
 		// Else: save the entry
 		TableItem ti = table.getItem(currentEntry);
-		if ( editPanel.isSourceModified() ) {
-			IRecord rec = (IRecord)ti.getData();
-			rec.set(0, editPanel.getSourceText());
-			ti.setText(1, rec.get(0));
+		if ( editPanel.isSourceModified() && ( srcCol != -1 )) {
+			ti.setText(srcCol, editPanel.getSourceText());
 		}
-		if ( editPanel.isTargetModified() ) {
-			IRecord rec = (IRecord)ti.getData();
-			rec.set(1, editPanel.getTargetText());
-			ti.setText(2, rec.get(1));
+		if ( editPanel.isTargetModified() && ( trgCol != -1 )) {
+			ti.setText(trgCol, editPanel.getTargetText());
 		}
 	}
 	
 	public void fillTable () {
-		table.removeAll();
-		currentEntry = -1;
-		for ( IRecord rec : tm.getRecords() ) {
-			TableItem item = new TableItem(table, SWT.NONE);
-			item.setText(0, String.format("%d", rec.getKey()));
-			item.setChecked(rec.getFlag());
-			for ( int i=0; i<rec.size(); i++ ) {
-				item.setText(i+1, rec.get(i)==null ? "" : rec.get(i));
+		try {
+			table.removeAll();
+			currentEntry = -1;
+			ResultSet rs = tm.getFirstPage();
+			while ( rs.next() ) {
+				TableItem item = new TableItem(table, SWT.NONE);
+				item.setText(0, String.format("%d", rs.getLong(ITm.SEGKEY_FIELD)));
+				item.setChecked(rs.getBoolean(ITm.FLAG_FIELD));
+				for ( int i=0; i<visibleFields.size(); i++ ) {
+					// +2 because the result set has always seg-key and flag (and 1-based index)
+					item.setText(i+1, rs.getString(i+3)==null ? "" : rs.getString(i+3));
+				}
 			}
-			item.setData(rec);
+			if ( table.getItemCount() > 0 ) {
+				table.setSelection(0);
+				updateCurrentEntry();
+			}
 		}
-		if ( table.getItemCount() > 0 ) {
-			table.setSelection(0);
-			updateCurrentEntry();
+		catch ( Throwable e ) {
+			Dialogs.showError(getShell(), "Error while filling the table.\n"+e.getMessage(), null);
 		}
 	}
 	

@@ -59,13 +59,14 @@ public class Importer extends ObservableRunnable {
 			filter = fcMapper.createFilter(rd.getFilterConfigId());
 			filter.open(rd);
 	
-			LinkedHashMap<String, String> mapTUProp = new LinkedHashMap<String, String>();
-			LinkedHashMap<String, String> mapSrcProp = new LinkedHashMap<String, String>();
-			LinkedHashMap<String, String> mapTrgProp = new LinkedHashMap<String, String>();
-			LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+			LinkedHashMap<String, Object> mapTUProp = new LinkedHashMap<String, Object>();
+			LinkedHashMap<String, Object> mapSrcProp = new LinkedHashMap<String, Object>();
+			LinkedHashMap<String, Object> mapTrgProp = new LinkedHashMap<String, Object>();
+			LinkedHashMap<String, Object> map = new LinkedHashMap<String, Object>();
 			String[] trgFields;
 			String srcDbLang = DbUtil.toDbLang(rd.getSourceLocale());
 			
+			tm.startImport();
 			while ( filter.hasNext() ) {
 				Event event = filter.next();
 				if ( !event.isTextUnit() ) continue;
@@ -76,13 +77,14 @@ public class Importer extends ObservableRunnable {
 				// Get text-unit level properties
 				mapTUProp.clear();
 				for ( String name : tu.getPropertyNames() ) {
-					mapTUProp.put("@"+name, tu.getProperty(name).getValue());
+					mapTUProp.put(DbUtil.checkFieldName(name), tu.getProperty(name).getValue());
 				}
 				
 				// Get source container properties
 				mapSrcProp.clear();
 				for ( String name : tu.getSourcePropertyNames() ) {
-					mapSrcProp.put("@"+name+"_"+srcDbLang, tu.getSourceProperty(name).getValue());
+					if ( name.equals("lang") ) continue;
+					mapSrcProp.put(DbUtil.checkFieldName(name)+DbUtil.LANG_SEP+srcDbLang, tu.getSourceProperty(name).getValue());
 				}
 	
 				// For each source segment
@@ -92,6 +94,7 @@ public class Importer extends ObservableRunnable {
 					String[] srcFields = dbUtil.fragmentToTmFields(srcSeg.getContent());
 					map.clear();
 					map.put(DbUtil.TEXT_PREFIX+srcDbLang, srcFields[0]);
+					long tuKey = -1;
 	
 					// For each target
 					for ( LocaleId locId : tu.getTargetLocales() ) {
@@ -99,7 +102,8 @@ public class Importer extends ObservableRunnable {
 						
 						mapTrgProp.clear();
 						for ( String name : tu.getTargetPropertyNames(locId) ) {
-							mapTrgProp.put("@"+name+"_"+trgDbLang, tu.getTargetProperty(locId, name).getValue());
+							if ( name.equals("lang") ) continue;
+							mapTrgProp.put(DbUtil.checkFieldName(name)+DbUtil.LANG_SEP+trgDbLang, tu.getTargetProperty(locId, name).getValue());
 						}
 						
 						// Get the target segment
@@ -113,28 +117,37 @@ public class Importer extends ObservableRunnable {
 						map.put(DbUtil.TEXT_PREFIX+trgDbLang, trgFields[0]);
 					}
 					// Add the record to the database
-					if ( !mapTUProp.isEmpty() ) {
-						map.putAll(mapTUProp);
-					}
-					if ( !mapSrcProp.isEmpty() ) {
-						map.putAll(mapSrcProp);
-					}
-					if ( !mapTrgProp.isEmpty() ) {
-						map.putAll(mapTrgProp);
-					}
-					tm.addRecord(map);
+	
+					map.putAll(mapSrcProp);
+					map.putAll(mapTrgProp);
+					tuKey = tm.addRecord(tuKey, mapTUProp, map);
+					
+					
+//					if ( !mapTUProp.isEmpty() ) {
+//						map.putAll(mapTUProp);
+//					}
+//					if ( !mapSrcProp.isEmpty() ) {
+//						map.putAll(mapSrcProp);
+//					}
+//					if ( !mapTrgProp.isEmpty() ) {
+//						map.putAll(mapTrgProp);
+//					}
+//					tm.addRecord(map);
+
 					if ( (++count % 152) == 0 ) {
 						updateUI(count, 1, null);
 					}
 				}
 			}
 			// Final update (includes notifying the observers that we are done)
+			tm.finishImport();
 			updateUI(count, 2, null);
 		}
 		catch ( Throwable e ) {
 			updateUI(count, 3, e.getMessage());
 		}
 		finally {
+			tm.finishImport();
 			if ( filter != null ) {
 				filter.close();
 			}

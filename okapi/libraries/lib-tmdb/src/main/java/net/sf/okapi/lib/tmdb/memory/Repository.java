@@ -35,6 +35,10 @@ public class Repository implements IRepository {
 		tms = new ArrayList<ITm>();
 	}
 
+	public String getName () {
+		return "In-Memory Repositoy";
+	}
+
 	@Override
 	public ITm createTm (String name,
 		String description,

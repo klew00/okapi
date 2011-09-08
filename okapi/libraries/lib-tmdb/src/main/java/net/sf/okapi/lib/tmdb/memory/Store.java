@@ -50,13 +50,13 @@ class Store {
 		}
 	}
 
-	public IRecord add (Map<String, String> fields) {
+	public IRecord add (Map<String, Object> fields) {
 		Record rec = new Record(++lastKey);
 		for ( String fn : fields.keySet() ) {
 			Integer index = fieldNames.get(fn);
 			if ( index == null ) {
-				fieldNames.put(fn, fieldNames.size());
-				index = fieldNames.size()-1;
+				index = fieldNames.size()+2; // +2 for key and flag
+				fieldNames.put(fn, index);
 			}
 			rec.set(index, fields.get(fn));
 		}
@@ -64,12 +64,6 @@ class Store {
 		return rec;
 	}
 	
-	public Record add (String ... vars) {
-		Record rec = new Record(++lastKey, vars);
-		records.add(rec);
-		return rec;
-	}
-
 	public List<IRecord> getRecords () {
 		List<IRecord> list = new ArrayList<IRecord>();
 		for ( IRecord rec : records ) {

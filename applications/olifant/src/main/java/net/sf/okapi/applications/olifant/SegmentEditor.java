@@ -28,9 +28,6 @@ import org.eclipse.swt.custom.ExtendedModifyEvent;
 import org.eclipse.swt.custom.ExtendedModifyListener;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.custom.VerifyKeyListener;
-import org.eclipse.swt.events.VerifyEvent;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 
@@ -169,50 +166,50 @@ class SegmentEditor {
 		return edit.getText();
 	}
 
-	private void placeText (String text) {
-		Point pt = edit.getSelection();
-		edit.replaceTextRange(pt.x, pt.y-pt.x, text);
-		edit.setCaretOffset(pt.x+text.length());
-	}
+//	private void placeText (String text) {
+//		Point pt = edit.getSelection();
+//		edit.replaceTextRange(pt.x, pt.y-pt.x, text);
+//		edit.setCaretOffset(pt.x+text.length());
+//	}
+//	
+//	private void selectNextCode (int position,
+//		boolean cycle)
+//	{
+//		StyleRange[] ranges = edit.getStyleRanges();
+//		if ( ranges.length == 0 ) return;
+//		while ( true ) {
+//			for ( StyleRange range : ranges ) {
+//				if ( position <= range.start ) {
+//					edit.setSelection(range.start, range.start+range.length);
+//					return;
+//				}
+//			}
+//			// Not found yet: Stop here if we don't cycle to the first
+//			if ( !cycle ) return;
+//			position = 0; // Otherwise: re-start from front
+//		}
+//	}
 	
-	private void selectNextCode (int position,
-		boolean cycle)
-	{
-		StyleRange[] ranges = edit.getStyleRanges();
-		if ( ranges.length == 0 ) return;
-		while ( true ) {
-			for ( StyleRange range : ranges ) {
-				if ( position <= range.start ) {
-					edit.setSelection(range.start, range.start+range.length);
-					return;
-				}
-			}
-			// Not found yet: Stop here if we don't cycle to the first
-			if ( !cycle ) return;
-			position = 0; // Otherwise: re-start from front
-		}
-	}
-	
-	private void selectPreviousCode (int position,
-		boolean cycle)
-	{
-		StyleRange[] ranges = edit.getStyleRanges();
-		if ( ranges.length == 0 ) return;
-		StyleRange sr;
-		while ( true ) {
-			for ( int i=ranges.length-1; i>=0; i-- ) {
-				sr = ranges[i];
-				if ( position >= sr.start+sr.length ) {
-					Point pt = edit.getSelection();
-					if (( pt.x == sr.start ) && ( pt.x != pt.y )) continue;
-					edit.setSelection(sr.start, sr.start+sr.length);
-					return;
-				}
-			}
-			// Not found yet: Stop here if we don't cycle to the first
-			if ( !cycle ) return;
-			position = edit.getCharCount()-1; // Otherwise: re-start from the end
-		}
-	}
+//	private void selectPreviousCode (int position,
+//		boolean cycle)
+//	{
+//		StyleRange[] ranges = edit.getStyleRanges();
+//		if ( ranges.length == 0 ) return;
+//		StyleRange sr;
+//		while ( true ) {
+//			for ( int i=ranges.length-1; i>=0; i-- ) {
+//				sr = ranges[i];
+//				if ( position >= sr.start+sr.length ) {
+//					Point pt = edit.getSelection();
+//					if (( pt.x == sr.start ) && ( pt.x != pt.y )) continue;
+//					edit.setSelection(sr.start, sr.start+sr.length);
+//					return;
+//				}
+//			}
+//			// Not found yet: Stop here if we don't cycle to the first
+//			if ( !cycle ) return;
+//			position = edit.getCharCount()-1; // Otherwise: re-start from the end
+//		}
+//	}
 
 }

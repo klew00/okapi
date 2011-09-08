@@ -30,9 +30,10 @@ import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.ResourceManager;
+import net.sf.okapi.common.ui.UIUtil;
+import net.sf.okapi.common.ui.UserConfiguration;
 import net.sf.okapi.lib.tmdb.IRepository;
 import net.sf.okapi.lib.tmdb.ITm;
-import net.sf.okapi.lib.tmdb.memory.Repository;
 import net.sf.okapi.lib.ui.editor.InputDocumentDialog;
 
 import org.eclipse.swt.SWT;
@@ -48,7 +49,10 @@ import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.FileTransfer;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Display;
@@ -60,8 +64,12 @@ import org.eclipse.swt.widgets.Shell;
 public class MainForm {
 	
 	public static final String APPNAME = "Olifant"; //$NON-NLS-1$
-	
+
+	public static final String OPT_BOUNDS = "bounds"; //$NON-NLS-1$
+	public static final String OPT_MAXIMIZED = "maximized"; //$NON-NLS-1$
+
 	private Shell shell;
+	private UserConfiguration config;
 	private ResourceManager rm;
 	private IFilterConfigurationMapper fcMapper;
 	private IRepository repo;
@@ -71,6 +79,7 @@ public class MainForm {
 	private TmPanel currentTP;
 	private StatusBar statusBar;
 	
+	private MenuItem miFileOpen;
 	private MenuItem miShowHideThirdField;
 	private MenuItem miShowHideFieldList;
 	private MenuItem miEditColumns;
@@ -83,20 +92,48 @@ public class MainForm {
 			this.shell = shell;
 			shell.setLayout(new GridLayout());
 			loadResources();
+			
+			config = new UserConfiguration();
+			config.load(APPNAME); // Load the current user preferences
+			
 			createContent();
-			repo = new Repository();
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
 		}
 	}
 
+	private void saveUserConfiguration () {
+		// Set the window placement
+		config.setProperty(OPT_MAXIMIZED, shell.getMaximized());
+		Rectangle r = shell.getBounds();
+		config.setProperty(OPT_BOUNDS, String.format("%d,%d,%d,%d", r.x, r.y, r.width, r.height)); //$NON-NLS-1$
+		// Save to the user home directory as ".appname" file
+		config.save(APPNAME, getClass().getPackage().getImplementationVersion());
+	}
+
+	private boolean canClose () {
+		// TODO: check here if the application can be closed
+		return true;
+	}
+	
 	private void createContent ()
 		throws Exception
 	{
-		
 		shell.setLayout(new GridLayout(1, false));
 		
+		// Handling of the closing event
+		shell.addShellListener(new ShellListener() {
+			public void shellActivated(ShellEvent event) {}
+			public void shellClosed(ShellEvent event) {
+				saveUserConfiguration();
+				if ( !canClose() ) event.doit = false;
+			}
+			public void shellDeactivated(ShellEvent event) {}
+			public void shellDeiconified(ShellEvent event) {}
+			public void shellIconified(ShellEvent event) {}
+		});
+
 		createMenu();
 
 		// Drag and drop handling for adding files
@@ -173,9 +210,23 @@ public class MainForm {
 		shell.pack();
 		shell.setMinimumSize(shell.getSize());
 		shell.setSize(startSize);
+		// Maximize if requested
+		if ( config.getBoolean(OPT_MAXIMIZED) ) {
+			shell.setMaximized(true);
+		}
+		else { // Or try to re-use the bounds of the previous session
+			Rectangle ar = UIUtil.StringToRectangle(config.getProperty(OPT_BOUNDS));
+			if ( ar != null ) {
+				Rectangle dr = shell.getDisplay().getBounds();
+				if ( dr.contains(ar.x+ar.width, ar.y+ar.height)
+					&& dr.contains(ar.x, ar.y) ) {
+					shell.setBounds(ar);
+				}
+			}
+		}
 		
-		updateCommands();
 		updateTitle();
+		updateCommands();
 	}
 
 	TmPanel getCurrentTmPanel () {
@@ -183,11 +234,18 @@ public class MainForm {
 	}
 
 	private void updateTitle () {
-		shell.setText(APPNAME);
+		String tmp = APPNAME + " - ";
+		if ( repo == null ) {
+			shell.setText(tmp + "<No Repository>");
+		}
+		else {
+			shell.setText(tmp + repo.getName());
+		}
 	}
 
 	void updateCommands () {
-		boolean active = (( currentTP != null ) && !currentTP.hasRunningThread() );
+		miFileOpen.setEnabled(repo!=null);
+		boolean active = (( repo != null ) && ( currentTP != null ) && !currentTP.hasRunningThread() );
 		miShowHideLog.setEnabled(active);
 		miShowHideThirdField.setEnabled(active);
 		miShowHideFieldList.setEnabled((active) && currentTP.getEditorPanel().isExtraVisible());
@@ -216,8 +274,16 @@ public class MainForm {
 		topItem.setMenu(dropMenu);
 
 		MenuItem menuItem = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(menuItem, "file.open"); //$NON-NLS-1$
+		rm.setCommand(menuItem, "file.selectrepository"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				selectRepository();
+            }
+		});
+
+		miFileOpen = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miFileOpen, "file.open"); //$NON-NLS-1$
+		miFileOpen.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				openFile();
             }
@@ -332,6 +398,47 @@ public class MainForm {
 		}
 	}
 	
+	private void selectRepository () {
+		try {
+			RepositoryForm dlg = new RepositoryForm(shell);
+			String[] res = dlg.showDialog();
+			if ( res == null ) return; // No repository selected
+			openRepository(res[0], res[1]);
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, "Error selecting repository.\n"+e.getMessage(), null);
+		}
+	}
+	
+	private void closeRepository () {
+		
+	}
+	
+	private void openRepository (String type,
+		String name)
+	{
+		try {
+			// Make sure we close the previous repository
+			closeRepository();
+
+			// Instantiate the new repository
+			if ( type.equals("m") ) {
+				//repo = new net.sf.okapi.lib.tmdb.memory.Repository();
+			}
+			else if ( type.equals("d") ) {
+				repo = new net.sf.okapi.lib.tmdb.local.Repository();
+				((net.sf.okapi.lib.tmdb.local.Repository)repo).open(name, true);
+			}
+			
+			// Update the display
+			updateCommands();
+			updateTitle();
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, "Error opening repository.\n"+e.getMessage(), null);
+		}
+	}
+	
 	private void openFile () {
 		try {
 			String[] paths = Dialogs.browseFilenames(shell, "Open Files", true, null, null, null);
@@ -386,8 +493,9 @@ public class MainForm {
 			rd.setFilterConfigId((String)data[1]);
 			
 			// Create the TM in the repository
-			String filename = Util.getFilename(rd.getInputURI().getPath(), true);
-			ITm tm = repo.addTm(filename, null);
+			String filename = Util.getFilename(rd.getInputURI().getPath(), false);
+//TODO: check if it exists			
+			ITm tm = repo.createTm(filename, null, LocaleId.ENGLISH);
 			// Create the tab for that TM
 			TmPanel tp = addTmTab(tm);
 			

@@ -35,7 +35,7 @@ public interface IRecord {
 	public Object get (int index);
 	
 	public void set (int index,
-		String value);
+		Object value);
 	
 	public void add (Object value);
 	

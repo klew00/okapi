@@ -34,7 +34,7 @@ import java.util.UUID;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.lib.tmdb.IRecord;
+import net.sf.okapi.lib.tmdb.DbUtil;
 import net.sf.okapi.lib.tmdb.IRepository;
 import net.sf.okapi.lib.tmdb.ITm;
 
@@ -43,6 +43,7 @@ public class Repository implements IRepository {
 	public static final String DATAFILE_EXT = ".h2.db";
 
 	private Connection  conn = null;
+	private String name;
 
 	private static String localeIdToDbLang (LocaleId locId) {
 		return locId.toPOSIXLocaleId().toUpperCase();
@@ -56,6 +57,11 @@ public class Repository implements IRepository {
 		catch ( ClassNotFoundException e ) {
 			throw new RuntimeException(e);
 		}
+	}
+	
+	@Override
+	public String getName () {
+		return name;
 	}
 	
 	Connection getConnection () {
@@ -74,6 +80,7 @@ public class Repository implements IRepository {
 				conn.close();
 				conn = null;
 			}
+			name = null;
 		}
 		catch ( SQLException e ) {
 			throw new RuntimeException(e);
@@ -127,6 +134,7 @@ public class Repository implements IRepository {
 			if ( pathNoExt.endsWith(DATAFILE_EXT) ) {
 				pathNoExt = pathNoExt.substring(0, pathNoExt.length()-DATAFILE_EXT.length());
 			}
+			name = Util.getFilename(pathNoExt, false);
 			
 			// Check if the database exists
 			if ( (new File(pathNoExt+DATAFILE_EXT)).exists() ) {
@@ -178,7 +186,7 @@ public class Repository implements IRepository {
 		}
 	}
 	
-	public String[] getTmData (String uuid) {
+	String[] getTmData (String uuid) {
 		String[] res = new String[2];
 		Statement stm = null;
 		try {
@@ -208,6 +216,7 @@ public class Repository implements IRepository {
 		return res;
 	}
 	
+	@Override
 	public ITm getTm (String name) {
 		ITm tm = null;
 		Statement stm = null;
@@ -239,6 +248,7 @@ public class Repository implements IRepository {
 		return tm;
 	}
 	
+	@Override
 	public ITm createTm (String name,
 		String description,
 		LocaleId locId)
@@ -259,21 +269,19 @@ public class Repository implements IRepository {
 			}
 			
 			// Create the TU-level table for the new TM
-			String tuTable = name+"_TU";
-			stm.execute("CREATE TABLE "+tuTable+" ("
-				+ "ID INTEGER IDENTITY PRIMARY KEY,"
-				+ "TUID VARCHAR"
+			stm.execute("CREATE TABLE \""+name+"_TU"+"\" ("
+				+ "TUKEY INTEGER IDENTITY PRIMARY KEY"
 				+ ")");
 			
 			// Create the SEG-level table for the new TM
-			String segTable = name+"_SEG";
-			stm.execute("CREATE TABLE "+segTable+" ("
-				+ "ID INTEGER IDENTITY PRIMARY KEY,"
-				+ "FLAG BOOLEAN, "
+			stm.execute("CREATE TABLE \""+name+"_SEG"+"\" ("
+				+ "SEGKEY INTEGER IDENTITY PRIMARY KEY,"
+				+ "TUREF INTEGER,"
+				+ "FLAG BOOLEAN,"
 				// One language
-				+ "CTEXT_"+lang+" VARCHAR,"
-				+ "QUALITY_"+lang+" INTEGER,"
-				+ "CODES_"+lang+" VARCHAR"
+				+ "\""+DbUtil.TEXT_PREFIX+lang+"\" VARCHAR,"
+				+ "\""+DbUtil.QUALITY_PREFIX+lang+"\" INTEGER,"
+				+ "\""+DbUtil.CODES_PREFIX+lang+"\" VARCHAR"
 				+ ")");
 
 			// Update the TMLIST
@@ -313,7 +321,7 @@ public class Repository implements IRepository {
 		Statement stm = null;
 		try {
 			stm = conn.createStatement();
-			ResultSet result = stm.executeQuery(String.format("SHOW COLUMNS FROM %s%s", tmName, (segmentTable ? "_SEG" : "_TU")));
+			ResultSet result = stm.executeQuery(String.format("SHOW COLUMNS FROM \"%s%s\"", tmName, (segmentTable ? "_SEG" : "_TU")));
 			result.first(); //Skip key
 			if ( segmentTable ) result.next(); // Skip FLAG
 			while ( result.next() ) {
@@ -349,7 +357,7 @@ public class Repository implements IRepository {
 		try {
 			StringBuilder tmp = new StringBuilder();
 			for ( String name : newFields.keySet() ) {
-				tmp.append(String.format("ALTER TABLE %s%s ADD %s %s; ",
+				tmp.append(String.format("ALTER TABLE \"%s%s\" ADD \"%s\" %s; ",
 					tmName, (inSegmentTable ? "_SEG" : "_TU"),
 					name, newFields.get(name)));
 			}
@@ -379,13 +387,14 @@ public class Repository implements IRepository {
 		Statement stm = null;
 		try {
 			stm = conn.createStatement();
-			ResultSet result = stm.executeQuery("SHOW COLUMNS FROM "+tmName+"_TU");
-			result.first(); //Skip ID
+			ResultSet result = stm.executeQuery("SHOW COLUMNS FROM \""+tmName+"_TU\"");
+			result.first(); //Skip TUKEY
 			while ( result.next() ) {
 				list.add(result.getString(1));
 			}
-			result = stm.executeQuery("SHOW COLUMNS FROM "+tmName+"_SEG");
-			result.first(); //Skip ID
+			result = stm.executeQuery("SHOW COLUMNS FROM \""+tmName+"_SEG\"");
+			result.first(); //Skip SEGKEY
+			result.next(); list.add(result.getString(1)); // Include TUREF
 			result.next(); //Skip FLAG
 			while ( result.next() ) {
 				list.add(result.getString(1));
@@ -436,12 +445,4 @@ public class Repository implements IRepository {
 		return list;
 	}
 
-	
-	// paging:
-	// select id from (select t.*, rownum as r from test t) where r between 2 and 3;
-
-	IRecord[] getFirstPage (String tmName) {
-		//TODO
-		return null;
-	}
 }

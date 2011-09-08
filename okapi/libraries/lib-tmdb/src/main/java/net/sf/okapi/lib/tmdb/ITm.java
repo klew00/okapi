@@ -21,12 +21,15 @@
 package net.sf.okapi.lib.tmdb;
 
 import java.sql.ResultSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 public interface ITm {
 
+	// 1-Based index of the given fields (in result set)
+	public static final int SEGKEY_FIELD = 1;
+	public static final int FLAG_FIELD = 2;
+	
 	/**
 	 * Gets the UUID of this TM.
 	 * The UUID is a global universal unique identifier. It can be used for example
@@ -62,12 +65,23 @@ public interface ITm {
 
 	public void startImport ();
 	
-	public void addNewRecord (LinkedHashMap<String, Object> fields);
-	
 	public void finishImport();
 	
-	// to remove later
-	public IRecord addRecord (Map<String, String> fields);
+	public void addRecord (Map<String, Object> fields);
+	
+	/**
+	 * Adds a record to the repository.
+	 * @param tuKey the key for the text unit this record belongs.
+	 * <b>You must use -1 when adding the first entry of this text unit</b> the call returns
+	 * the text unit key that you can use for the subsequent call to add other records to
+	 * that given text unit.
+	 * @param tuFields the list of the text unit level fields.
+	 * @param segFields the list of the segment level fields.
+	 * @return the key of text unit of the added record. 
+	 */
+	public long addRecord (long tuKey,
+		Map<String, Object> tuFields,
+		Map<String, Object> segFields);
 
 	//TODO: we should have page-based getters
 	public List<IRecord> getRecords ();

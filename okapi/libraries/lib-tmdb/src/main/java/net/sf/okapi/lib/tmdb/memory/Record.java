@@ -27,13 +27,12 @@ import net.sf.okapi.lib.tmdb.IRecord;
 
 public class Record implements IRecord {
 
-	private long key;
-	private boolean flag;
 	private ArrayList<Object> fields;
 	
 	public Record (long key) {
-		this.key = key;
 		fields = new ArrayList<Object>();
+		fields.add(key);
+		fields.add(false);
 	}
 	
 	public Record (long key,
@@ -47,7 +46,7 @@ public class Record implements IRecord {
 
 	@Override
 	public long getKey () {
-		return key;
+		return (Long)fields.get(0);
 	}
 	
 	@Override
@@ -72,7 +71,7 @@ public class Record implements IRecord {
 	
 	@Override
 	public void set (int index,
-		String value)
+		Object value)
 	{
 		// Make sure the fields have room for this index
 		while ( (index+1)-fields.size() > 0 ) {
@@ -84,12 +83,12 @@ public class Record implements IRecord {
 
 	@Override
 	public boolean getFlag () {
-		return flag;
+		return (Boolean)fields.get(1);
 	}
 
 	@Override
 	public void setFlag (boolean flag) {
-		this.flag = flag;
+		fields.set(1, flag);
 	}
 	
 }

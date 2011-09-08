@@ -21,7 +21,6 @@
 package net.sf.okapi.lib.tmdb.memory;
 
 import java.sql.ResultSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -70,8 +69,8 @@ public class Tm implements ITm {
 		return store.getRecords();
 	}
 
-	public IRecord addRecord (Map<String, String> fields) {
-		return store.add(fields);
+	public void addRecord (Map<String, Object> fields) {
+		store.add(fields);
 	}
 	
 	@Override
@@ -119,8 +118,10 @@ public class Tm implements ITm {
 	}
 
 	@Override
-	public void addNewRecord (LinkedHashMap<String, Object> fields) {
+	public long addRecord (long tuKey, Map<String, Object> tuFields,
+		Map<String, Object> segFields) {
 		// TODO Auto-generated method stub
+		return 0;
 	}
 
 }
