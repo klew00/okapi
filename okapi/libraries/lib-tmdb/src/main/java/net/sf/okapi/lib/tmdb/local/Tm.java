@@ -528,7 +528,9 @@ public class Tm implements ITm {
 				// and add the ones that do not exist to the list of fields to create
 				for ( String name : fields.keySet() ) {
 					// This is a TU-level field
+					boolean add = false;
 					if ( !existingFields.contains(name) ) {
+						add = true;
 						if ( fieldsToCreate == null ) {
 							fieldsToCreate = new LinkedHashMap<String, String>();
 						}
@@ -556,7 +558,7 @@ public class Tm implements ITm {
 					
 					// If the field is to create type should be set because
 					// it was also a filed that wasn't in the fieldsToImport list
-					if ( fieldsToCreate != null ) {
+					if ( add ) {
 						// Nothing to add, move on to the next field
 						fieldsToCreate.put(name, type);
 					}

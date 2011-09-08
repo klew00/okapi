@@ -73,4 +73,10 @@ public class Repository implements IRepository {
 		return list;
 	}
 
+	@Override
+	public void close () {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

@@ -74,6 +74,7 @@ public class Repository implements IRepository {
         super.finalize();
 	}
 
+	@Override
 	public void close () {
 		try {
 			if ( conn != null ) {

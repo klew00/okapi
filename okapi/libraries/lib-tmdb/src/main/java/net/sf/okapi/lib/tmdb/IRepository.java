@@ -26,7 +26,17 @@ import net.sf.okapi.common.LocaleId;
 
 public interface IRepository {
 
+	/**
+	 * Gets the name of this repository.
+	 * @return the name of this repository.
+	 */
 	public String getName ();
+	
+	/**
+	 * Closes and free any resources allocated by this repository.
+	 * This method can be called even when the repository is not open.
+	 */
+	public void close ();
 
 	/**
 	 * Gets the list of all TMs in this repository.

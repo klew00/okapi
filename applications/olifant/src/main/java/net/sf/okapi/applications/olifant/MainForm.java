@@ -394,6 +394,7 @@ public class MainForm {
 		}
 		finally {
 			// Dispose of any global resources
+			closeRepository();
 			if ( rm != null ) rm.dispose();
 		}
 	}
@@ -411,7 +412,10 @@ public class MainForm {
 	}
 	
 	private void closeRepository () {
-		
+		if ( repo != null ) {
+			repo.close();
+			repo = null;
+		}
 	}
 	
 	private void openRepository (String type,
@@ -429,13 +433,14 @@ public class MainForm {
 				repo = new net.sf.okapi.lib.tmdb.local.Repository();
 				((net.sf.okapi.lib.tmdb.local.Repository)repo).open(name, true);
 			}
-			
-			// Update the display
-			updateCommands();
-			updateTitle();
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, "Error opening repository.\n"+e.getMessage(), null);
+		}
+		finally {
+			// Update the display
+			updateCommands();
+			updateTitle();
 		}
 	}
 	
@@ -495,7 +500,7 @@ public class MainForm {
 			// Create the TM in the repository
 			String filename = Util.getFilename(rd.getInputURI().getPath(), false);
 //TODO: check if it exists			
-			ITm tm = repo.createTm(filename, null, LocaleId.ENGLISH);
+			ITm tm = repo.createTm(filename, null, (LocaleId)data[3]);
 			// Create the tab for that TM
 			TmPanel tp = addTmTab(tm);
 			

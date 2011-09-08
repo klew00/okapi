@@ -98,6 +98,12 @@ public class InputDocumentDialog {
 		Dialogs.centerWindow(shell, parent);
 	}
 
+	/**
+	 * Opens the dialog box.
+	 * @return Null if the user cancel the operation.
+	 * Or an array of objects: 0=path of the document, 1=filter configuration id,
+	 * 2=encoding, 3=source locale, 4=first target locale, 5=true to accept all next open or false to prompt.
+	 */
 	public Object[] showDialog () {
 		// Open the dialog box
 		shell.open();

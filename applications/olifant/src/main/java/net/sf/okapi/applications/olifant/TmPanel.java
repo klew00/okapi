@@ -123,7 +123,7 @@ class TmPanel extends Composite implements IObserver {
 		
 		logPanel = new LogPanel(sashMain, 0);
 		
-		sashMain.setWeights(new int[]{2, 3, 1});
+		sashMain.setWeights(new int[]{3, 7, 2});
 	}
 
 	public ITm getTm () {
@@ -286,10 +286,10 @@ class TmPanel extends Composite implements IObserver {
 	
 	public void toggleLog () {
 		if ( sashMain.getWeights()[2] > 0 ) {
-			sashMain.setWeights(new int[]{2, 3, 0});
+			sashMain.setWeights(new int[]{3, 7, 0});
 		}
 		else {
-			sashMain.setWeights(new int[]{2, 3, 1});
+			sashMain.setWeights(new int[]{3, 7, 2});
 		}
 	}
 
@@ -297,10 +297,6 @@ class TmPanel extends Composite implements IObserver {
 		return editPanel;
 	}
 	
-//	public void setVisibleFields () {
-//		
-//	}
-
 	public void startThread (Thread workerThread) {
 		this.workerThread = workerThread;
 		workerThread.start();
