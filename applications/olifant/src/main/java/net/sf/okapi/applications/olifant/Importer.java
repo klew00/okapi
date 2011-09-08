@@ -94,6 +94,7 @@ public class Importer extends ObservableRunnable {
 					String[] srcFields = dbUtil.fragmentToTmFields(srcSeg.getContent());
 					map.clear();
 					map.put(DbUtil.TEXT_PREFIX+srcDbLang, srcFields[0]);
+					map.put(DbUtil.CODES_PREFIX+srcDbLang, srcFields[1]);
 					long tuKey = -1;
 	
 					// For each target
@@ -115,6 +116,7 @@ public class Importer extends ObservableRunnable {
 							trgFields = new String[2];
 						}
 						map.put(DbUtil.TEXT_PREFIX+trgDbLang, trgFields[0]);
+						map.put(DbUtil.CODES_PREFIX+trgDbLang, trgFields[1]);
 					}
 					// Add the record to the database
 	

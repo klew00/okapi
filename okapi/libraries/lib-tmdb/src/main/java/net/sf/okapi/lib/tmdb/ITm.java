@@ -67,8 +67,6 @@ public interface ITm {
 	
 	public void finishImport();
 	
-	public void addRecord (Map<String, Object> fields);
-	
 	/**
 	 * Adds a record to the repository.
 	 * @param tuKey the key for the text unit this record belongs.
@@ -83,9 +81,6 @@ public interface ITm {
 		Map<String, Object> tuFields,
 		Map<String, Object> segFields);
 
-	//TODO: we should have page-based getters
-	public List<IRecord> getRecords ();
-	
 	/**
 	 * Sets the number of records a call to a paging method should return.
 	 * @param size the number of records a call to a paging method should return.

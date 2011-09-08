@@ -34,7 +34,6 @@ public class DbUtil {
 	public static final String TUREF_NAME = "TuRef";
 	public static final String TEXT_PREFIX = ("Text"+LANG_SEP);
 	public static final String CODES_PREFIX = ("Codes"+LANG_SEP);
-	public static final String QUALITY_PREFIX = ("Quality"+LANG_SEP);
 
 	/**
 	 * Cannot use fully static methods as this is used across threads.
@@ -54,6 +53,12 @@ public class DbUtil {
 		return name;
 	}
 
+	/**
+	 * Split a text fragment into its generic coded text and a string holding the codes.
+	 * @param frag the text fragment to process.
+	 * @return An array of two strings:
+	 * 0=the coded text, 1=the codes
+	 */
 	public String[] fragmentToTmFields (TextFragment frag) {
 		String[] res = new String[2];
 		res[0] = fmt.setContent(frag).toString();

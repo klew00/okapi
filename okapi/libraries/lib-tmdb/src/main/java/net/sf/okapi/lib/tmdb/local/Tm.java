@@ -31,7 +31,6 @@ import java.util.Map;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.lib.tmdb.DbUtil;
-import net.sf.okapi.lib.tmdb.IRecord;
 import net.sf.okapi.lib.tmdb.ITm;
 
 public class Tm implements ITm {
@@ -109,12 +108,6 @@ public class Tm implements ITm {
 	}
 
 	@Override
-	public List<IRecord> getRecords () {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public String getUUID () {
 		return uuid;
 	}
@@ -154,7 +147,6 @@ public class Tm implements ITm {
 				tmp.append(" FROM \""+name+"_SEG\" "); //LIMIT ? OFFSET ?;");
 			}
 			pstmGet = store.getConnection().prepareStatement(tmp.toString());
-			
 		}
 		catch ( SQLException e ) {
 			throw new RuntimeException(e);
@@ -241,181 +233,181 @@ public class Tm implements ITm {
 		}
 	}
 	
-	private void verifyFieldsToImport (Map<String, Object> fields,
-		boolean useValuesAsDefault)
-	{
-		try {
-			LinkedHashMap<String, String> tuFieldsToCreate = null;
-			LinkedHashMap<String, String> segFieldsToCreate = null;
-			LinkedHashMap<String, String> currentFieldsToCreate;
-			String type = null;
-			// Go through the list of fields
-			// and add the ones that do not exist to the list of fields to create
-			for ( String name : fields.keySet() ) {
-				// Check where the field belongs, and if it exists yet
-				// currentFieldsToCreate will be null if the field is not to add
-				currentFieldsToCreate = null;
-				if ( isSegmentField(name) ) {
-					// This is a segment-level field
-					if ( !existingSegFields.contains(name) ) {
-						if ( segFieldsToCreate == null ) {
-							segFieldsToCreate = new LinkedHashMap<String, String>();
-						}
-						currentFieldsToCreate = segFieldsToCreate;
-					}
-				}
-				else {
-					// This is a TU-level field
-					if ( !existingTuFields.contains(name) ) {
-						if ( tuFieldsToCreate == null ) {
-							tuFieldsToCreate = new LinkedHashMap<String, String>();
-						}
-						currentFieldsToCreate = tuFieldsToCreate;
-					}
-				}
-
-				if ( !fieldsToImport.containsKey(name) ) {
-					Object value = fields.get(name);
-					if ( value instanceof String ) {
-						type = "VARCHAR";
-						if ( useValuesAsDefault ) fieldsToImport.put(name, value);
-						else fieldsToImport.put(name, null);
-					}
-					else if (( value instanceof Long ) || ( value instanceof Integer )) {
-						type = "INTEGER";
-						if ( useValuesAsDefault ) fieldsToImport.put(name, value);
-						else fieldsToImport.put(name, 0);
-					}
-					else if ( value instanceof Boolean ) {
-						type = "BOOLEAN";
-						if ( useValuesAsDefault ) fieldsToImport.put(name, value);
-						else fieldsToImport.put(name, false);
-					}
-					else throw new RuntimeException("Invalid field type to add.");
-				}
-				
-				// If the field is to create type should be set because
-				// it was also a filed that wasn't in the fieldsToImport list
-				if ( currentFieldsToCreate != null ) {
-					// Nothing to add, move on to the next field
-					currentFieldsToCreate.put(name, type);
-				}
-			}
-			
-			// Create the new fields as needed, and update the lists
-			// The lists can be null or empty in this call
-			store.createNewFields(name, true, segFieldsToCreate, existingSegFields);
-			store.createNewFields(name, false, tuFieldsToCreate, existingTuFields);
-
-			// Create or re-create the statement to insert the entry
-			if (( pstmAddSeg == null ) || Util.isEmpty(segFieldsToCreate) ) {
-				if ( pstmAddSeg != null ) {
-					pstmAddSeg.close();
-				}
-				boolean first = true;
-				int count = 0;
-				StringBuilder tmp = new StringBuilder("INSERT INTO \""+name+"_SEG\" (");
-				for ( String name : fieldsToImport.keySet() ) {
-					if ( !isSegmentField(name) ) continue; // Skip TU-level fields
-					if ( first ) {
-						first = false;
-						tmp.append("\""+name+"\"");
-					}
-					else {
-						tmp.append(", \""+name+"\"");
-					}
-					count++;
-				}
-				tmp.append(") VALUES (");
-				for ( int i=0; i<count; i++ ) {
-					tmp.append((i==0) ? "?" : ", ?");
-				}
-				tmp.append(");");
-				pstmAddSeg = store.getConnection().prepareStatement(tmp.toString());
-			}
-
-			// Create or re-create the statement to insert the entry
-			if (( pstmAddTu == null ) || Util.isEmpty(tuFieldsToCreate) ) {
-				if ( pstmAddTu != null ) {
-					pstmAddTu.close();
-				}
-				boolean first = true;
-				int count = 0;
-				StringBuilder tmp = new StringBuilder("INSERT INTO \""+name+"_TU\" (");
-				for ( String name : fieldsToImport.keySet() ) {
-					if ( isSegmentField(name) ) continue; // Skip segment-level fields
-					if ( first ) {
-						first = false;
-						tmp.append("\""+name+"\"");
-					}
-					else {
-						tmp.append(", \""+name+"\"");
-					}
-					count++;
-				}
-				tmp.append(") VALUES (");
-				for ( int i=0; i<count; i++ ) {
-					tmp.append((i==0) ? "?" : ", ?");
-				}
-				tmp.append(");");
-				pstmAddTu = store.getConnection().prepareStatement(tmp.toString());
-			}
-		}
-		catch ( SQLException e ) {
-			throw new RuntimeException(e);
-		}
-	}
+//	private void verifyFieldsToImport (Map<String, Object> fields,
+//		boolean useValuesAsDefault)
+//	{
+//		try {
+//			LinkedHashMap<String, String> tuFieldsToCreate = null;
+//			LinkedHashMap<String, String> segFieldsToCreate = null;
+//			LinkedHashMap<String, String> currentFieldsToCreate;
+//			String type = null;
+//			// Go through the list of fields
+//			// and add the ones that do not exist to the list of fields to create
+//			for ( String name : fields.keySet() ) {
+//				// Check where the field belongs, and if it exists yet
+//				// currentFieldsToCreate will be null if the field is not to add
+//				currentFieldsToCreate = null;
+//				if ( isSegmentField(name) ) {
+//					// This is a segment-level field
+//					if ( !existingSegFields.contains(name) ) {
+//						if ( segFieldsToCreate == null ) {
+//							segFieldsToCreate = new LinkedHashMap<String, String>();
+//						}
+//						currentFieldsToCreate = segFieldsToCreate;
+//					}
+//				}
+//				else {
+//					// This is a TU-level field
+//					if ( !existingTuFields.contains(name) ) {
+//						if ( tuFieldsToCreate == null ) {
+//							tuFieldsToCreate = new LinkedHashMap<String, String>();
+//						}
+//						currentFieldsToCreate = tuFieldsToCreate;
+//					}
+//				}
+//
+//				if ( !fieldsToImport.containsKey(name) ) {
+//					Object value = fields.get(name);
+//					if ( value instanceof String ) {
+//						type = "VARCHAR";
+//						if ( useValuesAsDefault ) fieldsToImport.put(name, value);
+//						else fieldsToImport.put(name, null);
+//					}
+//					else if (( value instanceof Long ) || ( value instanceof Integer )) {
+//						type = "INTEGER";
+//						if ( useValuesAsDefault ) fieldsToImport.put(name, value);
+//						else fieldsToImport.put(name, 0);
+//					}
+//					else if ( value instanceof Boolean ) {
+//						type = "BOOLEAN";
+//						if ( useValuesAsDefault ) fieldsToImport.put(name, value);
+//						else fieldsToImport.put(name, false);
+//					}
+//					else throw new RuntimeException("Invalid field type to add.");
+//				}
+//				
+//				// If the field is to create type should be set because
+//				// it was also a filed that wasn't in the fieldsToImport list
+//				if ( currentFieldsToCreate != null ) {
+//					// Nothing to add, move on to the next field
+//					currentFieldsToCreate.put(name, type);
+//				}
+//			}
+//			
+//			// Create the new fields as needed, and update the lists
+//			// The lists can be null or empty in this call
+//			store.createNewFields(name, true, segFieldsToCreate, existingSegFields);
+//			store.createNewFields(name, false, tuFieldsToCreate, existingTuFields);
+//
+//			// Create or re-create the statement to insert the entry
+//			if (( pstmAddSeg == null ) || Util.isEmpty(segFieldsToCreate) ) {
+//				if ( pstmAddSeg != null ) {
+//					pstmAddSeg.close();
+//				}
+//				boolean first = true;
+//				int count = 0;
+//				StringBuilder tmp = new StringBuilder("INSERT INTO \""+name+"_SEG\" (");
+//				for ( String name : fieldsToImport.keySet() ) {
+//					if ( !isSegmentField(name) ) continue; // Skip TU-level fields
+//					if ( first ) {
+//						first = false;
+//						tmp.append("\""+name+"\"");
+//					}
+//					else {
+//						tmp.append(", \""+name+"\"");
+//					}
+//					count++;
+//				}
+//				tmp.append(") VALUES (");
+//				for ( int i=0; i<count; i++ ) {
+//					tmp.append((i==0) ? "?" : ", ?");
+//				}
+//				tmp.append(");");
+//				pstmAddSeg = store.getConnection().prepareStatement(tmp.toString());
+//			}
+//
+//			// Create or re-create the statement to insert the entry
+//			if (( pstmAddTu == null ) || Util.isEmpty(tuFieldsToCreate) ) {
+//				if ( pstmAddTu != null ) {
+//					pstmAddTu.close();
+//				}
+//				boolean first = true;
+//				int count = 0;
+//				StringBuilder tmp = new StringBuilder("INSERT INTO \""+name+"_TU\" (");
+//				for ( String name : fieldsToImport.keySet() ) {
+//					if ( isSegmentField(name) ) continue; // Skip segment-level fields
+//					if ( first ) {
+//						first = false;
+//						tmp.append("\""+name+"\"");
+//					}
+//					else {
+//						tmp.append(", \""+name+"\"");
+//					}
+//					count++;
+//				}
+//				tmp.append(") VALUES (");
+//				for ( int i=0; i<count; i++ ) {
+//					tmp.append((i==0) ? "?" : ", ?");
+//				}
+//				tmp.append(");");
+//				pstmAddTu = store.getConnection().prepareStatement(tmp.toString());
+//			}
+//		}
+//		catch ( SQLException e ) {
+//			throw new RuntimeException(e);
+//		}
+//	}
 	
-	@Override
-	public void addRecord (Map<String, Object> fields) {
-		if ( Util.isEmpty(fields) ) {
-			return;
-		}
-		// Check if any field is new and create the columns as needed
-		// And create a new pre-defined statement if needed
-		verifyFieldsToImport(fields, false);
-		
-		try {
-			// Do the addition using the pre-defined statement
-			// Fill the parameters
-			int n = 1;
-			Object value;
-			PreparedStatement pstm;
-			for ( String name : fieldsToImport.keySet() ) {
-				// Get the value from the provided map or from the defaults
-				if ( fields.containsKey(name) ) {
-					value = fields.get(name);
-				}
-				else {
-					// Not in the current set of fields provided
-					// Set the value to its default
-					value = fieldsToImport.get(name);
-				}
-				if ( isSegmentField(name) ) pstm = pstmAddSeg;
-				else pstm = pstmAddTu;
-	
-				if ( value instanceof String ) {
-					pstm.setString(n, (String)value);
-				}
-				else if ( value instanceof Boolean ) {
-					pstm.setBoolean(n, (Boolean)value);
-				}
-				else if ( value instanceof Integer ) {
-					pstm.setLong(n, ((Integer)value).longValue());
-				}
-				else if ( value instanceof Long ) {
-					pstm.setLong(n, (Long)value);
-				}
-				n++;
-			}
-			// Execute the addition
-			if ( pstmAddSeg != null ) pstmAddSeg.executeUpdate();
-			if ( pstmAddTu != null ) pstmAddTu.executeUpdate();
-		}
-		catch ( SQLException e ) {
-			throw new RuntimeException(e);
-		}
-	}
+//	@Override
+//	public void addRecord (Map<String, Object> fields) {
+//		if ( Util.isEmpty(fields) ) {
+//			return;
+//		}
+//		// Check if any field is new and create the columns as needed
+//		// And create a new pre-defined statement if needed
+//		verifyFieldsToImport(fields, false);
+//		
+//		try {
+//			// Do the addition using the pre-defined statement
+//			// Fill the parameters
+//			int n = 1;
+//			Object value;
+//			PreparedStatement pstm;
+//			for ( String name : fieldsToImport.keySet() ) {
+//				// Get the value from the provided map or from the defaults
+//				if ( fields.containsKey(name) ) {
+//					value = fields.get(name);
+//				}
+//				else {
+//					// Not in the current set of fields provided
+//					// Set the value to its default
+//					value = fieldsToImport.get(name);
+//				}
+//				if ( isSegmentField(name) ) pstm = pstmAddSeg;
+//				else pstm = pstmAddTu;
+//	
+//				if ( value instanceof String ) {
+//					pstm.setString(n, (String)value);
+//				}
+//				else if ( value instanceof Boolean ) {
+//					pstm.setBoolean(n, (Boolean)value);
+//				}
+//				else if ( value instanceof Integer ) {
+//					pstm.setLong(n, ((Integer)value).longValue());
+//				}
+//				else if ( value instanceof Long ) {
+//					pstm.setLong(n, (Long)value);
+//				}
+//				n++;
+//			}
+//			// Execute the addition
+//			if ( pstmAddSeg != null ) pstmAddSeg.executeUpdate();
+//			if ( pstmAddTu != null ) pstmAddTu.executeUpdate();
+//		}
+//		catch ( SQLException e ) {
+//			throw new RuntimeException(e);
+//		}
+//	}
 
 	@Override
 	public long addRecord (long tuKey,

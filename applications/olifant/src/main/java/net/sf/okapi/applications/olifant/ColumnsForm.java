@@ -69,14 +69,19 @@ class ColumnsForm {
 		group.setText("Available fields:");
 		group.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
-		lbAvailableFields = new List(group, SWT.V_SCROLL);
-		lbAvailableFields.setLayoutData(new GridData(GridData.FILL_BOTH));
+		lbAvailableFields = new List(group, SWT.BORDER | SWT.V_SCROLL);
+		GridData gdTmp = new GridData(GridData.FILL_BOTH);
+		int minListWidth = 150;
+		int minListHeight = 250;
+		gdTmp.widthHint = minListWidth;
+		gdTmp.heightHint = minListHeight;
+		lbAvailableFields.setLayoutData(gdTmp);
 		
 		Composite cmp = new Composite(shell, SWT.NONE);
 		cmp.setLayout(new GridLayout());
 		
-		int minWidth = 100;
-		btShow = UIUtil.createGridButton(cmp, SWT.PUSH, "Show >>", minWidth, 1);
+		int minButtonWidth = 100;
+		btShow = UIUtil.createGridButton(cmp, SWT.PUSH, "Show >>", minButtonWidth, 1);
 		btShow.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_CENTER));
 		btShow.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -84,7 +89,7 @@ class ColumnsForm {
 			}
 		});
 		
-		btHide = UIUtil.createGridButton(cmp, SWT.PUSH, "<< Hide", minWidth, 1);
+		btHide = UIUtil.createGridButton(cmp, SWT.PUSH, "<< Hide", minButtonWidth, 1);
 		btHide.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_CENTER));
 		btHide.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -92,7 +97,7 @@ class ColumnsForm {
 			}
 		});
 		
-		btShowAll = UIUtil.createGridButton(cmp, SWT.PUSH, "Show All", minWidth, 1);
+		btShowAll = UIUtil.createGridButton(cmp, SWT.PUSH, "Show All", minButtonWidth, 1);
 		btShowAll.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_CENTER));
 		btShowAll.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -100,7 +105,7 @@ class ColumnsForm {
 			}
 		});
 		
-		btShowAllTexts = UIUtil.createGridButton(cmp, SWT.PUSH, "Show All Texts", minWidth, 1);
+		btShowAllTexts = UIUtil.createGridButton(cmp, SWT.PUSH, "Show All Texts", minButtonWidth, 1);
 		btShowAllTexts.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_CENTER));
 		btShowAllTexts.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -108,7 +113,7 @@ class ColumnsForm {
 			}
 		});
 		
-		btMoveUp = UIUtil.createGridButton(cmp, SWT.PUSH, "Move Up", minWidth, 1);
+		btMoveUp = UIUtil.createGridButton(cmp, SWT.PUSH, "Move Up", minButtonWidth, 1);
 		btMoveUp.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_CENTER));
 		btMoveUp.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -116,7 +121,7 @@ class ColumnsForm {
 			}
 		});
 		
-		btMoveDown = UIUtil.createGridButton(cmp, SWT.PUSH, "Move Down", minWidth, 1);
+		btMoveDown = UIUtil.createGridButton(cmp, SWT.PUSH, "Move Down", minButtonWidth, 1);
 		btMoveDown.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_CENTER));
 		btMoveDown.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -124,7 +129,7 @@ class ColumnsForm {
 			}
 		});
 		
-		UIUtil.setSameWidth(minWidth, cmp.getChildren());
+		UIUtil.setSameWidth(minButtonWidth, cmp.getChildren());
 		
 		group = new Group(shell, SWT.NONE);
 		group.setLayout(new GridLayout());
@@ -133,7 +138,11 @@ class ColumnsForm {
 		group.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 		lbDisplayFields = new List(group, SWT.BORDER | SWT.V_SCROLL);
-		lbDisplayFields.setLayoutData(new GridData(GridData.FILL_BOTH));
+		gdTmp = new GridData(GridData.FILL_BOTH);
+		gdTmp.widthHint = minListWidth;
+		gdTmp.heightHint = minListHeight;
+		lbDisplayFields.setLayoutData(gdTmp);
+
 		lbDisplayFields.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				updateMoveCommands();
@@ -165,7 +174,7 @@ class ColumnsForm {
 			};
 		};
 		OKCancelPanel pnlActions = new OKCancelPanel(shell, SWT.NONE, OKCancelActions, false);
-		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalSpan = 3;
 		pnlActions.setLayoutData(gdTmp);
 		shell.setDefaultButton(pnlActions.btOK);

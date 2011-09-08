@@ -92,10 +92,10 @@ public class Repository implements IRepository {
 	public void deleteTm (String name) {
 		Statement stm = null;
 		try {
-			name = name.toUpperCase();
+			//name = name.toUpperCase();
 			stm = conn.createStatement();
-			stm.execute("DROP TABLE "+name+"_TU");
-			stm.execute("DROP TABLE "+name+"_SEG");
+			stm.execute("DROP TABLE \""+name+"_TU\"");
+			stm.execute("DROP TABLE \""+name+"_SEG\"");
 			stm.executeUpdate("DELETE FROM TMLIST WHERE NAME='"+name+"'");
 		}
 		catch ( SQLException e ) {
@@ -222,7 +222,7 @@ public class Repository implements IRepository {
 		ITm tm = null;
 		Statement stm = null;
 		try {
-			name = name.toUpperCase();
+			//name = name.toUpperCase();
 			stm = conn.createStatement();
 			ResultSet result = stm.executeQuery("SELECT UUID FROM TMLIST WHERE NAME='"+name+"'");
 			if ( result.first() ) {
@@ -260,7 +260,7 @@ public class Repository implements IRepository {
 		PreparedStatement pstm = null;
 		String lang = localeIdToDbLang(locId);
 		try {
-			name = name.toUpperCase();
+			//name = name.toUpperCase();
 			// Checks if the name is already used
 			stm = conn.createStatement();
 			ResultSet result = stm.executeQuery("SELECT NAME FROM TMLIST WHERE NAME='"+name+"'");
@@ -281,7 +281,6 @@ public class Repository implements IRepository {
 				+ "FLAG BOOLEAN,"
 				// One language
 				+ "\""+DbUtil.TEXT_PREFIX+lang+"\" VARCHAR,"
-				+ "\""+DbUtil.QUALITY_PREFIX+lang+"\" INTEGER,"
 				+ "\""+DbUtil.CODES_PREFIX+lang+"\" VARCHAR"
 				+ ")");
 
