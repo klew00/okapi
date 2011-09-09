@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.lib.tmdb.local;
+package net.sf.okapi.lib.tmdb.h2;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
