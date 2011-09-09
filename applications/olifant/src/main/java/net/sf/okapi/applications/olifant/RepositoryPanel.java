@@ -40,9 +40,12 @@ import org.eclipse.swt.widgets.List;
 
 class RepositoryPanel extends Composite {
 
+	static final String NOREPOSELECTED_TEXT = "<No Repository Selected>";
+	
 	private MainForm mainForm;
 	private List tmList;
 	private Button btNewTM;
+	private Label stListTitle;
 	private IRepository repo;
 
 	public RepositoryPanel (MainForm mainForm,
@@ -77,11 +80,10 @@ class RepositoryPanel extends Composite {
 		
 		UIUtil.setSameWidth(minButtonWidth, btSelectRepo, btNewTM);
 
-		Label stTmp = new Label(this, SWT.NONE);
-		stTmp.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		stTmp.setText("TMs in this repository:");
+		stListTitle = new Label(this, SWT.NONE);
+		stListTitle.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
-		tmList = new List(this, SWT.BORDER);
+		tmList = new List(this, SWT.BORDER | SWT.V_SCROLL);
 		tmList.setLayoutData(new GridData(GridData.FILL_BOTH));
 		tmList.addMouseListener(new MouseListener() {
 			public void mouseDoubleClick (MouseEvent e) {
@@ -93,6 +95,7 @@ class RepositoryPanel extends Composite {
 			public void mouseUp (MouseEvent e) {}
 		});
 		
+		updateRepositoryUI();
 	}
 
 	private void openTmTab (String tmName) {
@@ -151,6 +154,12 @@ class RepositoryPanel extends Composite {
 				if ( !isRepositoryOpen() ) return null;
 			}
 		
+			// Check if it exists already
+			if ( repo.getTmNames().contains(name) ) {
+				Dialogs.showError(getShell(), "The TM "+name+" exists already.", null);
+				return null;
+			}
+			
 			// Create the empty TM
 			ITm tm = repo.createTm(name, description, locId);
 			if ( tm == null ) return null;
@@ -180,9 +189,6 @@ class RepositoryPanel extends Composite {
 		String name)
 	{
 		try {
-//			// Make sure we close the previous repository
-//			closeRepository();
-
 			// Instantiate the new repository
 			if ( type.equals("m") ) {
 				closeRepository();
@@ -205,13 +211,19 @@ class RepositoryPanel extends Composite {
 	
 	void updateRepositoryUI () {
 		tmList.removeAll();
-		if ( repo == null ) return;
+		if ( repo == null ) {
+			stListTitle.setText(NOREPOSELECTED_TEXT);
+			return;
+		}
+		
+		// Otherwise: show the list of TM
 		for ( String name : repo.getTmNames() ) {
 			tmList.add(name);
 		}
 		if ( tmList.getItemCount() > 0 ) {
 			tmList.setSelection(0);
 		}
+		stListTitle.setText(String.format("TMs in this repository (%d):", tmList.getItemCount()));
 	}
 
 	void closeRepository () {

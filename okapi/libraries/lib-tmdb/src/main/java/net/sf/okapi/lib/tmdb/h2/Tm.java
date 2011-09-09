@@ -39,8 +39,8 @@ public class Tm implements ITm {
 	private String name;
 	private String uuid;
 	private PreparedStatement pstmGet;
-//	private long pageTop = 1;
-//	private int pageSize = 100;
+	private long pageTop = 1;
+	private int pageSize = 100;
 
 	private PreparedStatement pstmAddSeg;
 	private PreparedStatement pstmAddTu;
@@ -138,14 +138,16 @@ public class Tm implements ITm {
 					else tmp.append(", "+tuTable+".\""+name+"\"");
 				}
 				tmp.append(" FROM "+segTable+" LEFT JOIN "+tuTable+" ON "+segTable+".TUREF="+tuTable+".TUKEY");
+				
 			}
 			else { // Simple select in the segment table
 				tmp = new StringBuilder("SELECT SEGKEY, FLAG");
 				for ( String name : names ) {
 					tmp.append(", \""+name+"\"");
 				}
-				tmp.append(" FROM \""+name+"_SEG\" "); //LIMIT ? OFFSET ?;");
+				tmp.append(" FROM \""+name+"_SEG\"");
 			}
+			tmp.append(" LIMIT ?");
 			pstmGet = store.getConnection().prepareStatement(tmp.toString());
 		}
 		catch ( SQLException e ) {
@@ -156,7 +158,7 @@ public class Tm implements ITm {
 	private ResultSet getPage (long start) {
 		ResultSet result = null;
 		try {
-//			pstmGet.setLong(1, pageSize);
+			pstmGet.setLong(1, pageSize);
 //			pstmGet.setLong(2, start);
 			result = pstmGet.executeQuery();
 		}

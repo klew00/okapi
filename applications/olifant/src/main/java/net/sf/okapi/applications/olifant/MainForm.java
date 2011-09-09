@@ -270,7 +270,7 @@ public class MainForm {
 
 	void updateTitle () {
 		String name = repoPanel.getRepositoryName();
-		if ( name == null ) name = "<No Repository>";
+		if ( name == null ) name = RepositoryPanel.NOREPOSELECTED_TEXT;
 		shell.setText(APPNAME + " - " + name);
 	}
 
