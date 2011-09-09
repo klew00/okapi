@@ -89,6 +89,9 @@ public class OpenXMLRoundTripTest {
 		themfiles.add("commentTable.xlsx");
 		themfiles.add("InsertText.pptx");
 		themfiles.add("Endpara.pptx");
+		
+		//FIXME:  Fix these tests!!!  Gold files probably need tweaking 
+		
 		themfiles.add("TestDako2.docx");
 		themfiles.add("TextBoxes.docx");
 		themfiles.add("OutOfTheTextBox.docx");

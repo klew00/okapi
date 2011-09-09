@@ -56,7 +56,7 @@ public class TextUnitUtilTest {
 		TextFragment toTransSrc = makeFragment1();
 		TextFragment proposalTrg = makeFragment1Bis("trg");
 		assertEquals("{B}A{/B}B{BR/}C trg", proposalTrg.toText());
-		TextUnitUtil.adjustTargetCodes(toTransSrc, proposalTrg, true, true, null, null);
+		TextUnitUtil.copySrcCodeDataToMatchingTrgCodes(toTransSrc, proposalTrg, true, true, null, null);
 		assertEquals("[b]A[/b]B[br/]C trg", proposalTrg.toText());
 	}
 	
@@ -66,7 +66,7 @@ public class TextUnitUtilTest {
 		TextFragment proposalTrg = makeFragment1Bis("trg");
 		proposalTrg.remove(6, 8); // "xxAxxBxxC trg"
 		assertEquals("{B}A{/B}BC trg", proposalTrg.toText());
-		TextUnitUtil.adjustTargetCodes(toTransSrc, proposalTrg, true, true, null, null);
+		TextUnitUtil.copySrcCodeDataToMatchingTrgCodes(toTransSrc, proposalTrg, true, true, null, null);
 		assertEquals("[b]A[/b]BC trg[br/]", proposalTrg.toText());
 	}
 	
@@ -76,7 +76,7 @@ public class TextUnitUtilTest {
 		TextFragment proposalTrg = makeFragment1Bis("with warning");
 		proposalTrg.remove(6, 8); // "xxAxxBxxC with warning"
 		assertEquals("{B}A{/B}BC with warning", proposalTrg.toText());
-		TextUnitUtil.adjustTargetCodes(toTransSrc, proposalTrg, true, false, null, null);
+		TextUnitUtil.copySrcCodeDataToMatchingTrgCodes(toTransSrc, proposalTrg, true, false, null, null);
 		assertEquals("[b]A[/b]BC with warning", proposalTrg.toText());
 	}
 	
@@ -85,7 +85,7 @@ public class TextUnitUtilTest {
 		ITextUnit tu = new TextUnit("1", "src");
 		TextFragment newSrc = new TextFragment("src");
 		TextFragment newTrg = new TextFragment("trg");
-		TextUnitUtil.adjustTargetCodes(tu.getSource().getSegments().getFirstContent(), newTrg, true, false, newSrc, tu);
+		TextUnitUtil.copySrcCodeDataToMatchingTrgCodes(tu.getSource().getSegments().getFirstContent(), newTrg, true, false, newSrc, tu);
 		assertEquals(locTrg, newTrg.toText());
 	}
 	
@@ -98,7 +98,7 @@ public class TextUnitUtilTest {
 		tf.append(TagType.CLOSING, "b", "</T>");
 		tf.append(" T ");
 		tf.append(TagType.PLACEHOLDER, "br", "<PH/>");
-		TextUnitUtil.adjustTargetCodes(tu.getSource().getSegments().getFirstContent(), tf, true, false, null, tu);
+		TextUnitUtil.copySrcCodeDataToMatchingTrgCodes(tu.getSource().getSegments().getFirstContent(), tf, true, false, null, tu);
 		assertEquals("T <b>BOLD</b> T <br/>", tf.toText());
 		fmt.setContent(tf);
 		assertEquals("T <1>BOLD</1> T <2/>", fmt.toString());
@@ -114,7 +114,7 @@ public class TextUnitUtilTest {
 		tf.append(" T ");
 		tf.append(TagType.PLACEHOLDER, "br", "<PH/>");
 		tf.append(TagType.PLACEHOLDER, "extra", "<EXTRA/>");
-		TextUnitUtil.adjustTargetCodes(tu.getSource().getSegments().getFirstContent(), tf, true, false, null, tu);
+		TextUnitUtil.copySrcCodeDataToMatchingTrgCodes(tu.getSource().getSegments().getFirstContent(), tf, true, false, null, tu);
 		assertEquals("T <b>BOLD</b> T <br/><EXTRA/>", tf.toText());
 		fmt.setContent(tf);
 		assertEquals("T <1>BOLD</1> T <2/><3/>", fmt.toString());
@@ -129,7 +129,7 @@ public class TextUnitUtilTest {
 		tf.append(" T ");
 		tf.append(TagType.PLACEHOLDER, "br", "<PH/>");
 		tf.append(TagType.PLACEHOLDER, "extra", "<EXTRA/>");
-		TextUnitUtil.adjustTargetCodes(tu.getSource().getSegments().getFirstContent(), tf, true, false, null, tu);
+		TextUnitUtil.copySrcCodeDataToMatchingTrgCodes(tu.getSource().getSegments().getFirstContent(), tf, true, false, null, tu);
 		assertEquals("T <b>BOLD T <br/><EXTRA/>", tf.toText());
 		fmt.setContent(tf);
 		assertEquals("T <b1/>BOLD T <2/><3/>", fmt.toString());
@@ -145,7 +145,7 @@ public class TextUnitUtilTest {
 		tf.append(" U ");
 		tf.append(TagType.PLACEHOLDER, "br", "<br/>");
 		// Fuzzy match but codes are the same
-		TextUnitUtil.adjustTargetCodes(tu.getSource().getFirstContent(), tf, true, false, null, tu);
+		TextUnitUtil.copySrcCodeDataToMatchingTrgCodes(tu.getSource().getFirstContent(), tf, true, false, null, tu);
 		assertEquals("U <b>BOLD</b> U <br/>", tf.toText());
 		assertEquals("U <1>BOLD</1> U <2/>", fmt.setContent(tf).toString());
 	}
@@ -159,7 +159,7 @@ public class TextUnitUtilTest {
 		oriFrag.append(" s3 ");
 		oriFrag.append(TagType.CLOSING, "c2", "[<c2]");
 		TextFragment trgFrag = fmt.fromLetterCodedToFragment("<g2>t3</g2> t1 <x1/> t2", null);
-		TextUnitUtil.adjustTargetCodes(oriFrag, trgFrag, true, false, null, null);
+		TextUnitUtil.copySrcCodeDataToMatchingTrgCodes(oriFrag, trgFrag, true, false, null, null);
 		assertEquals("[c2>]t3[<c2] t1 [c1] t2", fmt.setContent(trgFrag).toString(true));
 	}
 	

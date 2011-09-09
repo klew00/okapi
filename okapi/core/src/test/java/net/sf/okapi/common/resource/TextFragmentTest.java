@@ -736,7 +736,7 @@ public class TextFragmentTest {
     public void testSynchronizeCodeIdentifiers () {
 		TextFragment tf1 = makeFragment1();
 		TextFragment tf2 = makeFragment2();
-		tf2.synchronizeCodes(tf1);
+		tf2.alignCodeIds(tf1);
 		FilterTestDriver.checkCodeData(tf1, tf2);
 		assertEquals(fmt.setContent(tf1).toString(false),
 			"<1>A<2/>B</1>C");
@@ -748,7 +748,7 @@ public class TextFragmentTest {
     public void testSynchronizeCodeIdentifiersComplex () {
 		TextFragment tf1 = makeFragment1();
 		TextFragment tf2 = makeFragment3();
-		tf2.synchronizeCodes(tf1);
+		tf2.alignCodeIds(tf1);
 		FilterTestDriver.checkCodeData(tf1, tf2);
 		assertEquals(fmt.setContent(tf1).toString(false),
 			"<1>A<2/>B</1>C");
@@ -760,14 +760,38 @@ public class TextFragmentTest {
     public void testSynchronizeCodeIdentifiersMoreComplex () {
 		TextFragment tf1 = makeFragment1();
 		TextFragment tf2 = makeFragment4();
-		tf2.synchronizeCodes(tf1);
+		tf2.alignCodeIds(tf1);
 		FilterTestDriver.checkCodeData(tf1, tf2);
 		assertEquals(fmt.setContent(tf1).toString(false),
 			"<1>A<2/>B</1>C");
 		assertEquals(fmt.setContent(tf2).toString(false),
 			"<2/>A<3>B</3>C");
     }
+	
+	@Test
+    public void testSynchronizeCodeIdentifiersMoreComplex2 () {
+		TextFragment tf1 = makeFragment1();
+		TextFragment tf2 = makeFragment3();
+		tf2.alignCodeIds(tf1);
+		FilterTestDriver.checkCodeData(tf1, tf2);
+		assertEquals(fmt.setContent(tf1).toString(false),
+			"<1>A<2/>B</1>C");
+		assertEquals(fmt.setContent(tf2).toString(false),
+			"<3><2/>A</3>B<1>C</1>D<4/>");
+    }
 
+	@Test
+    public void testSynchronizeCodeIdentifiersPlaceholderOnly () {
+		TextFragment tf1 = makeFragment5();
+		TextFragment tf2 = makeFragment6();
+		tf2.alignCodeIds(tf1);
+		FilterTestDriver.checkCodeData(tf1, tf2);
+		assertEquals(fmt.setContent(tf1).toString(false),
+			"<1/>A<2/>B<3/>C");
+		assertEquals(fmt.setContent(tf2).toString(false),
+			"<2/>A<1/>B<3/>C<4/>");
+    }
+	
 	@Test
 	public void testIndexOfNonWSEmpty () {
 		assertEquals(-1, TextFragment.indexOfLastNonWhitespace("", -1, 0, true, true, true, true));
@@ -945,4 +969,35 @@ public class TextFragmentTest {
 		return tf;
 	}
 
+	
+	/**
+	 * Makes a fragment <code>{1}A{2}B{3}C<code>
+	 * @return the new fragment.
+	 */
+	private TextFragment makeFragment5 () {
+		TextFragment tf = new TextFragment();
+		tf.append(TagType.PLACEHOLDER, "1", "{1}");
+		tf.append("A");
+		tf.append(TagType.PLACEHOLDER, "2", "{2}");
+		tf.append("B");
+		tf.append(TagType.PLACEHOLDER, "3", "{3}");
+		tf.append("C");
+		return tf;
+	}
+	
+	/**
+	 * Makes a fragment <code>{2}A{1}B{3}C<code>
+	 * @return the new fragment.
+	 */
+	private TextFragment makeFragment6 () {
+		TextFragment tf = new TextFragment();
+		tf.append(TagType.PLACEHOLDER, "2", "{2}");
+		tf.append("A");
+		tf.append(TagType.PLACEHOLDER, "1", "{1}");
+		tf.append("B");
+		tf.append(TagType.PLACEHOLDER, "3", "{3}");
+		tf.append("C");
+		tf.append(TagType.PLACEHOLDER, "4", "{4}");
+		return tf;
+	}
 }

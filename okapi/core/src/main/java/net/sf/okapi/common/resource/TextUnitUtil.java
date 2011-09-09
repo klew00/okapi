@@ -82,7 +82,9 @@ public class TextUnitUtil {
 	}
 
 	/**
-	 * Adjusts the inline codes of a new target text based on an original source.
+	 * Copies the aligned inline codes of the source to the corresponding target codes.
+	 * <b>WARNING: This method assumes that the source and target {@link TextFragment}'s codes are already id aligned.
+	 * If they are not then call {@link TextFragment#alignCodeIds(TextFragment)} to align the codes based on their native data</b>
 	 * <p>This method compares an original source with a new target, and transfer the codes of the original source
 	 * at their equivalent places in the new target. The text of the new target is left untouched.</p>
 	 * <p>If the option alwaysCopyCodes is false, the codes are copied only if it the original source codes
@@ -104,7 +106,7 @@ public class TextUnitUtil {
 	 *    the parent text unit (Can be null. Used for error information only).
 	 * @return the newTrg parameter with its inline codes adjusted
 	 */
-	public static TextFragment adjustTargetCodes (TextFragment oriSrc,
+	public static TextFragment copySrcCodeDataToMatchingTrgCodes (TextFragment oriSrc,
 		TextFragment newTrg,
 		boolean alwaysCopyCodes,
 		boolean addMissingCodes,
@@ -243,6 +245,24 @@ public class TextUnitUtil {
 		return newTrg;
 	}
 
+	/**
+	 * Align the codes between the original source and new target by adjusting the 
+	 * {@link Code} ids to match for aligned codes. 
+	 * @param source - source {@link TextFragment} 
+	 * @param target - target {@link TextFragment}
+	 * @param parent - {@link ITextUnit} of these {@link TextFragment}s
+	 * @return the target with aligned codes
+	 */
+	public static TextFragment alignCodes(TextFragment oriSrc,
+			TextFragment source,
+			TextFragment target,
+			ITextUnit parent) 
+	{
+		
+		
+		return target;		
+	}
+	
 	/**
 	 * Removes leading whitespaces from a given text fragment, puts removed whitespaces to the given skeleton.
 	 * 
@@ -1078,6 +1098,28 @@ public class TextUnitUtil {
 			}
 		}
 		tc.setContent(new TextFragment(tmp.toString()));
+	}
+	
+	/**
+	 * Removes all inline tags from the given {@link TextFragment}
+	 */
+	public static void removeCodes(TextFragment tf) {				
+		StringBuilder tmp = new StringBuilder();
+		StringBuilder text = new StringBuilder(tf.getText());
+		for (int i=0; i<text.length(); i++) {
+			switch (text.charAt(i)) {
+				case TextFragment.MARKER_OPENING:
+				case TextFragment.MARKER_CLOSING:
+				case TextFragment.MARKER_ISOLATED:
+					i++; // skip index marker as well
+					break;
+				default:
+					tmp.append(text.charAt(i));
+					break;
+			}
+		}
+		tf.clear();
+		tf.setCodedText(tmp.toString());				
 	}
 	
 	/**

@@ -46,6 +46,7 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
+import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 
 /**
@@ -152,6 +153,10 @@ public class EventBuilder {
 			} else {
 				filterEvents.add(event);
 			}
+			break;
+		case TEXT_UNIT:
+			event.getTextUnit().getSource().getFirstContent().renumberCodes();
+			filterEvents.add(event);
 			break;
 		default:
 			filterEvents.add(event);
@@ -814,8 +819,18 @@ public class EventBuilder {
 			skel.add((GenericSkeleton) endMarker);
 		}
 
-		tempTextUnit.setResource(postProcessTextUnit((ITextUnit) tempTextUnit.getResource()));
+		tempTextUnit.setResource(postProcessTextUnit(tempTextUnit.getTextUnit()));
 		filterEvents.add(tempTextUnit);
+		
+		// before we close this TextUnit correctly set the code ids 
+		ITextUnit tu = tempTextUnit.getTextUnit();
+		tu.getSource().getFirstContent().renumberCodes();
+		for (LocaleId t : tu.getTargetLocales()) {
+			// align the code ids with the target
+			tu.getTarget(t).getFirstContent().renumberCodes();
+			TextFragment targetFrag = tu.getTarget(t).getFirstContent();
+			tu.getSource().getFirstContent().alignCodeIds(targetFrag);			
+		}
 		return (ITextUnit)tempTextUnit.getResource();
 	}
 

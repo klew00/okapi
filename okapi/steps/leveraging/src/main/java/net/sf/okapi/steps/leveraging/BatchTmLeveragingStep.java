@@ -17,6 +17,7 @@ import net.sf.okapi.common.resource.MultiEvent;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.steps.diffleverage.DiffMatchAnnotation;
 
@@ -85,7 +86,7 @@ public class BatchTmLeveragingStep extends BasePipelineStep {
 		case TEXT_UNIT:
 			ITextUnit tu = event.getTextUnit();
 			batchedEvents.add(event);
-			
+
 			if (!canLeverageTu(tu)) {
 				return Event.NOOP_EVENT;
 			}
@@ -97,7 +98,7 @@ public class BatchTmLeveragingStep extends BasePipelineStep {
 			return event;
 		case END_BATCH_ITEM:
 			event = handleEndBatchItem(event);
-			return event;		
+			return event;
 		case START_BATCH:
 			event = handleStartBatch(event);
 			return event;
@@ -184,7 +185,7 @@ public class BatchTmLeveragingStep extends BasePipelineStep {
 
 		return event;
 	}
-	
+
 	private boolean canLeverageTu(ITextUnit tu) {
 		// Do not leverage non-translatable entries
 		if (!tu.isTranslatable()) {
@@ -207,7 +208,7 @@ public class BatchTmLeveragingStep extends BasePipelineStep {
 		if (wasDiffLeveraged(tu)) {
 			return false;
 		}
-		
+
 		return true;
 	}
 
@@ -233,32 +234,35 @@ public class BatchTmLeveragingStep extends BasePipelineStep {
 			AltTranslationsAnnotation ata;
 
 			for (ITextUnit tu : tus) {
-				if (tu.getSource().hasBeenSegmented()) {
-					for (Segment srcSeg : tu.getSourceSegments()) {
-						if (!srcSeg.text.hasText()) {
-							continue;
-						}
-
-						Segment trgSeg = tu.getTarget(targetLocale).getSegments().get(srcSeg.id);
-						if (trgSeg != null) {
-							ata = trgSeg.getAnnotation(AltTranslationsAnnotation.class);
-							if (ata != null) {
-								AltTranslation at = ata.getFirst(); // first should be best
-								if (at.getScore() >= params.getFillTargetThreshold()) {
-									TextFragment tf = new TextFragment(
-											at.getTarget().getCodedText(), 
-											at.getTarget().getFirstContent().getClonedCodes());
-									trgSeg.text = tf;
+				// only copy if there is no existing target 
+				if (!tu.getTarget(targetLocale).hasText()) {															
+					if (tu.getSource().hasBeenSegmented()) {
+						for (Segment srcSeg : tu.getSourceSegments()) {
+							if (!srcSeg.text.hasText()) {
+								continue;
+							}
+	
+							Segment trgSeg = tu.getTarget(targetLocale).getSegments().get(srcSeg.id);
+							if (trgSeg != null) {																					
+								ata = trgSeg.getAnnotation(AltTranslationsAnnotation.class);
+								if (ata != null) {
+									AltTranslation at = ata.getFirst(); // first should be best
+									if (at.getScore() >= params.getFillTargetThreshold()) {
+										TextFragment tf = new TextFragment(
+												at.getTarget().getCodedText(), 
+												at.getTarget().getFirstContent().getClonedCodes());
+										trgSeg.text = tf;
+									}
 								}
 							}
 						}
-					}
-				} else {
-					ata = tu.getTarget(targetLocale).getAnnotation(AltTranslationsAnnotation.class);
-					if (ata != null) {
-						AltTranslation at = ata.getFirst(); // first should be best
-						if (at.getScore() >= params.getFillTargetThreshold()) {
-							tu.setTargetContent(targetLocale, at.getTarget().getFirstContent());
+					} else {
+						ata = tu.getTarget(targetLocale).getAnnotation(AltTranslationsAnnotation.class);
+						if (ata != null) {
+							AltTranslation at = ata.getFirst(); // first should be best
+							if (at.getScore() >= params.getFillTargetThreshold()) {
+								tu.setTargetContent(targetLocale, at.getTarget().getFirstContent());
+							}
 						}
 					}
 				}

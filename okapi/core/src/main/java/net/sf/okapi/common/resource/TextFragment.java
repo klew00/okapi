@@ -1573,7 +1573,7 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 	 * and existing id that found themselves isolated keep the same id.
 	 * This method also reset the last code id value to the highest code id found.
 	 */
-	private void balanceMarkers () {
+	protected void balanceMarkers () {
 		if ( codes == null ) return;
 		lastCodeID = 0;
 		int[] closingIds = new int[codes.size()];
@@ -1713,9 +1713,10 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 	}
 
 	/**
-	 * Synchronizes the code IDs of this fragment with the ones of a given fragment.
-	 * This method re-assign the IDs of the in-line codes of this fragment based on the
-	 * ones of the provided fragment.
+	 * Aligns the code IDs of this fragment with the ones of a given fragment.
+	 * This method re-assigns the IDs of the in-line codes of this fragment based on the
+	 * code data of the provided fragment. If there is a code with the same data, then 
+	 * prefer the first code as this is the matching target code in the majority of cases.
 	 * An example of usage is when source and target fragments have codes generated
 	 * from regular expressions and not in the same order.
 	 * For example if the source is <code>%d equals %s</code> and the target is
@@ -1723,7 +1724,7 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 	 * You want their IDs to match for the code with the same content.
 	 * @param base the fragment to use as the base for the synchronization.
 	 */
-	public void synchronizeCodes (TextFragment base) {
+	public void alignCodeIds (TextFragment base) {
 		if ( !base.hasCode() ) return;
 		if ( codes == null ) return; // No codes in this fragment
 		List<Code> toUse = new ArrayList<Code>(base.getCodes());
@@ -1732,7 +1733,7 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 		isBalanced = false;
 		lastCodeID = 0;
 		boolean needExtra = false;
-
+		
 		for ( Code trgCode : codes ) {
 			// Closing codes are aligned by the balancing
 			if ( trgCode.tagType == TagType.CLOSING ) continue;

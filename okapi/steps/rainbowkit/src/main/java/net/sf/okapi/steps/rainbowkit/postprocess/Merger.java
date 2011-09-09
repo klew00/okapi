@@ -322,7 +322,7 @@ public class Merger {
 				// Use the source instead
 			}
 			else {
-				TextUnitUtil.adjustTargetCodes(srcOriSeg.text, trgTraSeg.text, true, true, null, oriTu);
+				TextUnitUtil.copySrcCodeDataToMatchingTrgCodes(srcOriSeg.text, trgTraSeg.text, true, true, null, oriTu);
 			}
 		}
 		// Check if the target has more segments

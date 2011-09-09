@@ -176,7 +176,8 @@ public abstract class BaseConnector implements IQuery {
 				qr = next();
 					
 				// Adjust codes so that leveraged target matches the source
-				TextUnitUtil.adjustTargetCodes(srcSeg.text, qr.target, true, false, null, tu);
+				// !!! We assume codes have been aligned - use TextFragment::alignCodeIds if needed
+				TextUnitUtil.copySrcCodeDataToMatchingTrgCodes(srcSeg.text, qr.target, true, false, null, tu);
 
 				if ( trgCont.hasBeenSegmented() ) {
 					// Get corresponding target segment
@@ -265,7 +266,8 @@ public abstract class BaseConnector implements IQuery {
 				AltTranslationsAnnotation at = null;
 				for ( QueryResult qr : resList ) {
 					// Adjust codes so that leveraged target matches the source
-					TextUnitUtil.adjustTargetCodes(srcSeg.text, qr.target, true, false, null, tu);
+					// !!! We assume codes have been aligned - use TextFragment::alignCodeIds if needed
+					TextUnitUtil.copySrcCodeDataToMatchingTrgCodes(srcSeg.text, qr.target, true, false, null, tu);
 					// Annotate
 					if ( trgCont.hasBeenSegmented() ) {
 						// Get corresponding target segment

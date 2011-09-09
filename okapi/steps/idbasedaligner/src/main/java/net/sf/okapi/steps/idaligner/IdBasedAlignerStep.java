@@ -165,8 +165,11 @@ public class IdBasedAlignerStep extends BasePipelineStep {
 		TextContainer targetTC = sourceTu.getSource();
 				
 		if (targetInput != null) {
+			// align codes (assume filter as numbered them correctly)										
+			sourceTu.getSource().getFirstContent().alignCodeIds(targetTC.getFirstContent());		
+			
 			// adjust codes to match new source
-			TextFragment atf = TextUnitUtil.adjustTargetCodes(
+			TextFragment atf = TextUnitUtil.copySrcCodeDataToMatchingTrgCodes(
 					sourceTu.getSource().getUnSegmentedContentCopy(),
 					targetTC.getUnSegmentedContentCopy(), 
 					true, false, null, sourceTu);

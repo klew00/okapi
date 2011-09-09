@@ -264,6 +264,10 @@ public class DiffLeverageStep extends BasePipelineStep {
 
 	@Override
 	protected Event handleTextUnit(final Event event) {
+		if (event.getTextUnit().getSource().hasBeenSegmented()) {
+			throw new OkapiBadStepInputException("DiffLeverageStep only aligns unsegmented TextUnits");
+		}
+		
 		if (oldSource != null) {
 			newTextUnits.add(event.getTextUnit());
 			newDocumentEvents.add(event);
@@ -331,6 +335,11 @@ public class DiffLeverageStep extends BasePipelineStep {
 		while (!found && filter.hasNext()) {
 			event = filter.next();
 			found = (event.getEventType() == untilType);
+			if (event.isTextUnit()) {
+				if (event.getTextUnit().getSource().hasBeenSegmented()) {
+					throw new OkapiBadStepInputException("DiffLeverageStep only aligns unsegmented TextUnits");
+				}
+			}
 		}
 		if (!found) {
 			throw new RuntimeException(
@@ -367,9 +376,13 @@ public class DiffLeverageStep extends BasePipelineStep {
 					
 					// We force the source to be a paragraph!! We use getUnSegmentedContentCopy
 					// to make sure we get *all* TextParts (just in case segmentation has been applied
-					// or  somehow extra TextParts were added in an external process)	
+					// or  somehow extra TextParts were added in an external process)
 					
-					TextFragment atf = TextUnitUtil.adjustTargetCodes(						
+					// create code ids, align codes and copy source code data to target
+
+					// call renumberCodes just in case upstream filter did not do it!!										
+					newTu.getSource().getFirstContent().alignCodeIds(otc.getFirstContent());					
+					TextFragment atf = TextUnitUtil.copySrcCodeDataToMatchingTrgCodes(						
 							newTu.getSource().getUnSegmentedContentCopy(),
 							otc.getUnSegmentedContentCopy(), 
 							true, false, null, newTu);

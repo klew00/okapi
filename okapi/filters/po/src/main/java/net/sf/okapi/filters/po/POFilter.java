@@ -657,7 +657,7 @@ public class POFilter implements IFilter {
 				}
 				// Synchronizes source and target codes as much as possible
 				TextFragment tf = tc.getFirstContent();
-				tf.synchronizeCodes(tu.getSource().getFirstContent());
+				tf.alignCodeIds(tu.getSource().getFirstContent());
 			}
 		}
 		else { // Parameters.MODE_MONOLINGUAL

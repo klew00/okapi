@@ -238,7 +238,7 @@ public class MergingStep extends BasePipelineStep {
 		ITextUnit mtu = event.getTextUnit();
 		TextFragment trgFrag = mtu.getSource().getFirstContent();
 		// Substitute the codes (and complete them if needed)
-		TextUnitUtil.adjustTargetCodes(srcFrag, trgFrag, true, true, null, null);
+		TextUnitUtil.copySrcCodeDataToMatchingTrgCodes(srcFrag, trgFrag, true, true, null, null);
 		
 		// Create a new annotation if one does not exists already
 		if ( ann == null ) {

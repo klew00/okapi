@@ -39,9 +39,13 @@ import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.IPipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
+import net.sf.okapi.common.resource.IAlignedSegments;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.Segment;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextPart;
+import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.lib.segmentation.SRXDocument;
 
 /**
@@ -268,6 +272,17 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 		for (TextPart p : alignedTextUnit.getTarget(targetLocale).getSegments()) {
 			p.text.ltrim();
 			p.text.rtrim();
+		}
+		
+		// align codes betwen source and target and 
+		// copy source code data to corresponding target codes		
+		IAlignedSegments segments = alignedTextUnit.getAlignedSegments();
+		for (Segment s : segments) {
+			Segment t = segments.getCorrespondingTarget(s, targetLocale, 
+					IAlignedSegments.MODIFY_AS_VARIANT, 
+					IAlignedSegments.COPY_TO_SOURCE_AND_TARGET);
+			s.text.alignCodeIds(t.text);
+			TextUnitUtil.copySrcCodeDataToMatchingTrgCodes(s.text, t.text, true, false, null, alignedTextUnit);
 		}
 		
 		// Send the aligned TU to the TMX file
