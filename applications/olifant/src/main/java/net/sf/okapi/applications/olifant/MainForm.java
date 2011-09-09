@@ -32,7 +32,6 @@ import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.ResourceManager;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.common.ui.UserConfiguration;
-import net.sf.okapi.lib.tmdb.IRepository;
 import net.sf.okapi.lib.tmdb.ITm;
 import net.sf.okapi.lib.ui.editor.InputDocumentDialog;
 
@@ -56,7 +55,6 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
@@ -72,10 +70,9 @@ public class MainForm {
 	private UserConfiguration config;
 	private ResourceManager rm;
 	private IFilterConfigurationMapper fcMapper;
-	private IRepository repo;
 	private SashForm topSash;
 	private CTabFolder tabs;
-	private List tmList;
+	private RepositoryPanel repoPanel;
 	private TmPanel currentTP;
 	private StatusBar statusBar;
 	
@@ -169,36 +166,35 @@ public class MainForm {
 		tabs.setBorderVisible(true);
 		GridData gdTmp = new GridData(GridData.FILL_BOTH);
 		tabs.setLayoutData(gdTmp);
-		
 		tabs.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				currentTP = (TmPanel)tabs.getSelection().getControl();
-				updateCommands();
-				currentTP.updateCurrentEntry();
+				setCurrentTP((TmPanel)tabs.getSelection().getControl());
 			}
 		});
 
 		tabs.addCTabFolder2Listener(new CTabFolder2Adapter() {
 			public void close (CTabFolderEvent event) {
 				// Get the tab panel from the closing item
-				TmPanel tp = (TmPanel)((CTabItem)event.item).getControl();
+				CTabItem ti = (CTabItem)(CTabItem)event.item;
+				TmPanel tp = (TmPanel)ti.getControl();;
 				// Check if we can close it
 				if ( !tp.canClose() ) {
 					event.doit = false;
 					return;
 				}
-				// Remove the corresponding tm from the list (temporary)
-				tmList.remove(tp.getTm().getName());
-				// If the tab we are closing is the last one: update the commands
-				// Otherwise currentTP will be set to null, but without update
-				if ( tabs.getItemCount() == 1 ) {
-					currentTP = null;
-					updateCommands();
+				// When removing dynamically a tab we need to manually dispose 
+				// of both the tabItem and its control.
+				ti.dispose();
+				tp.dispose();
+				// If we are closing the last tab we need to manually set the current TP to null
+				if ( tabs.getItemCount() < 1 ) {
+					setCurrentTP(null);
 				}
 			}
 		});
 		
-		tmList = new List(topSash, SWT.BORDER);
+		repoPanel = new RepositoryPanel(this, topSash, SWT.NONE);
+		repoPanel.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 		topSash.setWeights(new int[]{4, 1});
 		
@@ -232,33 +228,66 @@ public class MainForm {
 	TmPanel getCurrentTmPanel () {
 		return currentTP;
 	}
+	
+	/**
+	 * Locates the tab for a given TM name.
+	 * @param tmName the name of the tM to look for.
+	 * @param selectTab true to make the found tab active, false to not change the tab selection.
+	 * @return the TmPanel for that TM or null if no panel is open.
+	 */
+	TmPanel findTmTab (String tmName,
+		boolean selectTab)
+	{
+		TmPanel tp;
+		for ( CTabItem ti : tabs.getItems() ) {
+			tp = (TmPanel)ti.getControl();
+			if ( tmName.equals(tp.getTm().getName()) ) {
+				if ( selectTab ) {
+					tabs.setSelection(ti);
+					setCurrentTP(tp);
+				}
+				return tp;
+			}
+		}
+		return null;
+	}
 
-	private void updateTitle () {
-		String tmp = APPNAME + " - ";
-		if ( repo == null ) {
-			shell.setText(tmp + "<No Repository>");
+	void updateCurrentTmTab () {
+		updateCommands();
+		if ( currentTP != null ) {
+			currentTP.updateCurrentEntry();
 		}
-		else {
-			shell.setText(tmp + repo.getName());
-		}
+	}
+	
+	void setCurrentTP (TmPanel tp) {
+//		if ( setSeelection ) {
+//			CTabItem ti = (CTabItem)tp.getParent(); 
+//			tabs.setSelection(ti);
+//		}
+		currentTP = tp;
+		updateCurrentTmTab();
+	}
+
+	void updateTitle () {
+		String name = repoPanel.getRepositoryName();
+		if ( name == null ) name = "<No Repository>";
+		shell.setText(APPNAME + " - " + name);
 	}
 
 	void updateCommands () {
-		miFileOpen.setEnabled(repo!=null);
-		boolean active = (( repo != null ) && ( currentTP != null ) && !currentTP.hasRunningThread() );
+		boolean active = ( repoPanel.isRepositoryOpen() && ( currentTP != null ) && !currentTP.hasRunningThread() );
 		miShowHideLog.setEnabled(active);
 		miShowHideThirdField.setEnabled(active);
 		miShowHideFieldList.setEnabled((active) && currentTP.getEditorPanel().isExtraVisible());
 		miEditColumns.setEnabled(active);
 	}
 	
-	private TmPanel addTmTab (ITm tm) {
+	TmPanel addTmTabEmpty (ITm tm) {
+		if ( tm == null ) return null;
 		TmPanel tp = new TmPanel(this, tabs, SWT.NONE, tm, statusBar);
 		CTabItem ti = new CTabItem(tabs, SWT.NONE);
 		ti.setText(tm.getName());
 		ti.setControl(tp);
-		tmList.add(tm.getName());
-		tmList.setData(tm.getUUID(), tm);
 		return tp;
 	}
 
@@ -277,7 +306,7 @@ public class MainForm {
 		rm.setCommand(menuItem, "file.selectrepository"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				selectRepository();
+				repoPanel.selectRepository();
             }
 		});
 
@@ -394,55 +423,55 @@ public class MainForm {
 		}
 		finally {
 			// Dispose of any global resources
-			closeRepository();
+//			closeRepository();
 			if ( rm != null ) rm.dispose();
 		}
 	}
 	
-	private void selectRepository () {
-		try {
-			RepositoryForm dlg = new RepositoryForm(shell);
-			String[] res = dlg.showDialog();
-			if ( res == null ) return; // No repository selected
-			openRepository(res[0], res[1]);
-		}
-		catch ( Throwable e ) {
-			Dialogs.showError(shell, "Error selecting repository.\n"+e.getMessage(), null);
-		}
-	}
+//	private void selectRepository () {
+//		try {
+//			RepositoryForm dlg = new RepositoryForm(shell);
+//			String[] res = dlg.showDialog();
+//			if ( res == null ) return; // No repository selected
+//			openRepository(res[0], res[1]);
+//		}
+//		catch ( Throwable e ) {
+//			Dialogs.showError(shell, "Error selecting repository.\n"+e.getMessage(), null);
+//		}
+//	}
 	
-	private void closeRepository () {
-		if ( repo != null ) {
-			repo.close();
-			repo = null;
-		}
-	}
+//	private void closeRepository () {
+//		if ( repo != null ) {
+//			repo.close();
+//			repo = null;
+//		}
+//	}
 	
-	private void openRepository (String type,
-		String name)
-	{
-		try {
-			// Make sure we close the previous repository
-			closeRepository();
-
-			// Instantiate the new repository
-			if ( type.equals("m") ) {
-				//repo = new net.sf.okapi.lib.tmdb.memory.Repository();
-			}
-			else if ( type.equals("d") ) {
-				repo = new net.sf.okapi.lib.tmdb.local.Repository();
-				((net.sf.okapi.lib.tmdb.local.Repository)repo).open(name, true);
-			}
-		}
-		catch ( Throwable e ) {
-			Dialogs.showError(shell, "Error opening repository.\n"+e.getMessage(), null);
-		}
-		finally {
-			// Update the display
-			updateCommands();
-			updateTitle();
-		}
-	}
+//	private void openRepository (String type,
+//		String name)
+//	{
+//		try {
+//			// Make sure we close the previous repository
+//			closeRepository();
+//
+//			// Instantiate the new repository
+//			if ( type.equals("m") ) {
+//				//repo = new net.sf.okapi.lib.tmdb.memory.Repository();
+//			}
+//			else if ( type.equals("d") ) {
+//				repo = new net.sf.okapi.lib.tmdb.local.Repository();
+//				((net.sf.okapi.lib.tmdb.local.Repository)repo).open(name, true);
+//			}
+//		}
+//		catch ( Throwable e ) {
+//			Dialogs.showError(shell, "Error opening repository.\n"+e.getMessage(), null);
+//		}
+//		finally {
+//			// Update the display
+//			updateCommands();
+//			updateTitle();
+//		}
+//	}
 	
 	private void openFile () {
 		try {
@@ -499,16 +528,17 @@ public class MainForm {
 			
 			// Create the TM in the repository
 			String filename = Util.getFilename(rd.getInputURI().getPath(), false);
-//TODO: check if it exists			
-			ITm tm = repo.createTm(filename, null, (LocaleId)data[3]);
-			// Create the tab for that TM
-			TmPanel tp = addTmTab(tm);
 			
-			// Start the import thread
-			Importer imp = new Importer(fcMapper, tm, rd, tp.getLog());
-			imp.addObserver(tp);
-			tp.startThread(new Thread(imp));
-			updateCommands();
+			// Create an empty TM
+			TmPanel tp = repoPanel.createTmAndTmTab(filename, null, (LocaleId)data[3]);
+			// Trigger the import 
+			if ( tp != null ) {
+				// Start the import thread
+				Importer imp = new Importer(fcMapper, tp.getTm(), rd, tp.getLog());
+				imp.addObserver(tp);
+				tp.startThread(new Thread(imp));
+				updateCommands();
+			}
 			
 			// If dialog return OK, we return value of accept all
 			return (Boolean)data[5];
@@ -518,107 +548,5 @@ public class MainForm {
 			return null;
 		}
 	}
-
-//	//test for threading
-//	private static Thread addRawDocument (IFilterConfigurationMapper p_fcMapper,
-//		ITm p_tm,
-//		RawDocument p_rd,
-//		LogPanel p_logPanel)
-//	{
-//		final IFilterConfigurationMapper fcMapper = p_fcMapper;
-//		final RawDocument rd = p_rd;
-//		final ITm tm = p_tm;
-//		final LogPanel logPanel = p_logPanel;
-//
-//		return new Thread () {
-//			public void run () {
-//				Importer imp = new Importer(fcMapper, tm, rd, logPanel);
-//				imp.process();
-//			}
-//		};
-//	}
-//	
-//	private void addRawDocument (RawDocument rd) {
-//		TmPanel tp = null;
-//		IFilter filter = null;
-//		try {
-//			filter = fcMapper.createFilter(rd.getFilterConfigId());
-//			filter.open(rd);
-//			LinkedHashMap<String, String> mapTUProp = new LinkedHashMap<String, String>();
-//			LinkedHashMap<String, String> mapSrcProp = new LinkedHashMap<String, String>();
-//			LinkedHashMap<String, String> mapTrgProp = new LinkedHashMap<String, String>();
-//			LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
-//			String[] trgFields;
-//			String srcDbLang = DbUtil.toDbLang(rd.getSourceLocale());
-//			
-//			while ( filter.hasNext() ) {
-//				Event event = filter.next();
-//				if ( !event.isTextUnit() ) continue;
-//				
-//				ITextUnit tu = event.getTextUnit();
-//				ISegments srcSegs = tu.getSourceSegments();
-//				
-//				// Get text-unit level properties
-//				mapTUProp.clear();
-//				for ( String name : tu.getPropertyNames() ) {
-//					mapTUProp.put("@"+name, tu.getProperty(name).getValue());
-//				}
-//				
-//				// Get source container properties
-//				mapSrcProp.clear();
-//				for ( String name : tu.getSourcePropertyNames() ) {
-//					mapSrcProp.put("@"+name+"_"+srcDbLang, tu.getSourceProperty(name).getValue());
-//				}
-//	
-//				// For each source segment
-//				for ( net.sf.okapi.common.resource.Segment srcSeg : srcSegs ) {
-//	
-//					// Get the source fields
-//					String[] srcFields = DbUtil.fragmentToTmFields(srcSeg.getContent());
-//					map.clear();
-//					map.put(DbUtil.TEXT_PREFIX+srcDbLang, srcFields[0]);
-//	
-//					// For each target
-//					for ( LocaleId locId : tu.getTargetLocales() ) {
-//						String trgDbLang = DbUtil.toDbLang(locId);
-//						
-//						mapTrgProp.clear();
-//						for ( String name : tu.getTargetPropertyNames(locId) ) {
-//							mapTrgProp.put("@"+name+"_"+trgDbLang, tu.getTargetProperty(locId, name).getValue());
-//						}
-//						
-//						// Get the target segment
-//						net.sf.okapi.common.resource.Segment trgSeg = tu.getTargetSegments(locId).get(srcSeg.getId());
-//						if ( trgSeg != null ) {
-//							trgFields = DbUtil.fragmentToTmFields(trgSeg.getContent());
-//						}
-//						else {
-//							trgFields = new String[2];
-//						}
-//						map.put(DbUtil.TEXT_PREFIX+trgDbLang, trgFields[0]);
-//					}
-//					// Add the record to the database
-//					if ( !mapTUProp.isEmpty() ) {
-//						map.putAll(mapTUProp);
-//					}
-//					if ( !mapSrcProp.isEmpty() ) {
-//						map.putAll(mapSrcProp);
-//					}
-//					if ( !mapTrgProp.isEmpty() ) {
-//						map.putAll(mapTrgProp);
-//					}
-//					tm.addRecord(map);
-//				}
-//			}
-//		}
-//		finally {
-//			if ( filter != null ) {
-//				filter.close();
-//			}
-//			if ( tp != null ) {
-//				tp.resetTmDisplay();
-//			}
-//		}
-//	}
 
 }

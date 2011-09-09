@@ -59,7 +59,7 @@ class ColumnsForm {
 		ArrayList<String> visibleFields)
 	{
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
-		shell.setText("Fields Selection");
+		shell.setText("Column Selection");
 		UIUtil.inheritIcon(shell, parent);
 		shell.setLayout(new GridLayout(3, false));
 
@@ -142,7 +142,6 @@ class ColumnsForm {
 		gdTmp.widthHint = minListWidth;
 		gdTmp.heightHint = minListHeight;
 		lbDisplayFields.setLayoutData(gdTmp);
-
 		lbDisplayFields.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				updateMoveCommands();

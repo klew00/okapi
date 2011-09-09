@@ -119,23 +119,11 @@ public class Importer extends ObservableRunnable {
 						map.put(DbUtil.CODES_PREFIX+trgDbLang, trgFields[1]);
 					}
 					// Add the record to the database
-	
 					map.putAll(mapSrcProp);
 					map.putAll(mapTrgProp);
 					tuKey = tm.addRecord(tuKey, mapTUProp, map);
-					
-					
-//					if ( !mapTUProp.isEmpty() ) {
-//						map.putAll(mapTUProp);
-//					}
-//					if ( !mapSrcProp.isEmpty() ) {
-//						map.putAll(mapSrcProp);
-//					}
-//					if ( !mapTrgProp.isEmpty() ) {
-//						map.putAll(mapTrgProp);
-//					}
-//					tm.addRecord(map);
-
+					// Update UI from time to time
+		//TODO: check for cancellation!!
 					if ( (++count % 152) == 0 ) {
 						updateUI(count, 1, null);
 					}

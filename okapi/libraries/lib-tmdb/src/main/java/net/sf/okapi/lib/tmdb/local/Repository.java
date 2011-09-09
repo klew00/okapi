@@ -49,23 +49,84 @@ public class Repository implements IRepository {
 		return locId.toPOSIXLocaleId().toUpperCase();
 	}
 	
-	public Repository () {
+	static public void delete (String path) {
+		String pathNoExt = path;
+		if ( pathNoExt.endsWith(DATAFILE_EXT) ) {
+			pathNoExt = pathNoExt.substring(0, pathNoExt.length()-DATAFILE_EXT.length());
+		}
+		File file = new File(pathNoExt+DATAFILE_EXT);
+		if ( file.exists() ) {
+			file.delete();
+		}
+	}
+
+	/**
+	 * Creates a new Repository object. the local back-end files are created if 
+	 * they do not exists yet. If the files exist they are used.
+	 * @param path the path of the main storage file (without extension normally).
+	 */
+	public Repository (String path) {
+		Statement stm = null;
 		try {
 			// Initialize the driver
 			Class.forName("org.h2.Driver");
+			boolean exist = false;
+			
+			if ( path == null ) {
+				// Open the connection, this creates the DB if none exists
+				conn = DriverManager.getConnection("jdbc:h2:mem:", "sa", "");
+				name = "In-Memory Repository";
+			}
+			else {
+				String pathNoExt = path;
+				if ( pathNoExt.endsWith(DATAFILE_EXT) ) {
+					pathNoExt = pathNoExt.substring(0, pathNoExt.length()-DATAFILE_EXT.length());
+				}
+				name = Util.getFilename(pathNoExt, false);
+			
+				// Check if the database exists
+				exist = (new File(pathNoExt+DATAFILE_EXT)).exists();
+				if ( !exist ) {
+					// Create the directory if needed
+					Util.createDirectories(pathNoExt);
+				}
+				
+				// Open the connection, this creates the DB if none exists
+				conn = DriverManager.getConnection("jdbc:h2:"+pathNoExt, "sa", "");
+			}
+	
+			if ( !exist ) {
+				// Create the source table
+				stm = conn.createStatement();
+				stm.execute("CREATE TABLE REPO ("
+					+ "NAME INTEGER,"
+					+ "DESCRIPTION VARCHAR"
+					+ ")");
+			
+				stm.execute("CREATE TABLE TMLIST ("
+					+ "UUID VARCHAR,"
+					+ "NAME VARCHAR,"
+					+ "DESCRIPTION VARCHAR"
+					+ ")");
+			}
+		}
+		catch ( SQLException e ) {
+			throw new RuntimeException(e);
 		}
 		catch ( ClassNotFoundException e ) {
 			throw new RuntimeException(e);
 		}
-	}
-	
-	@Override
-	public String getName () {
-		return name;
-	}
-	
-	Connection getConnection () {
-		return conn;
+		finally {
+			try {
+				if ( stm != null ) {
+					stm.close();
+					stm = null;
+				}
+			}
+			catch ( SQLException e ) {
+				throw new RuntimeException(e);
+			}
+		}
 	}
 	
 	@Override
@@ -88,6 +149,15 @@ public class Repository implements IRepository {
 		}
 	}
 
+	@Override
+	public String getName () {
+		return name;
+	}
+	
+	Connection getConnection () {
+		return conn;
+	}
+	
 	@Override
 	public void deleteTm (String name) {
 		Statement stm = null;
@@ -114,79 +184,6 @@ public class Repository implements IRepository {
 		}
 	}
 
-	public void delete (String path) {
-		String pathNoExt = path;
-		if ( pathNoExt.endsWith(DATAFILE_EXT) ) {
-			pathNoExt = pathNoExt.substring(0, pathNoExt.length()-DATAFILE_EXT.length());
-		}
-		File file = new File(pathNoExt+DATAFILE_EXT);
-		if ( file.exists() ) {
-			file.delete();
-		}
-	}
-	
-	public boolean open (String path,
-		boolean createIfNeeded)
-	{
-		Statement stm = null;
-		try {
-			close();
-			String pathNoExt = path;
-			if ( pathNoExt.endsWith(DATAFILE_EXT) ) {
-				pathNoExt = pathNoExt.substring(0, pathNoExt.length()-DATAFILE_EXT.length());
-			}
-			name = Util.getFilename(pathNoExt, false);
-			
-			// Check if the database exists
-			if ( (new File(pathNoExt+DATAFILE_EXT)).exists() ) {
-				conn = DriverManager.getConnection("jdbc:h2:"+pathNoExt, "sa", "");
-				return true;
-			}
-			
-			// Else: the database does not exists
-			if ( createIfNeeded ) {
-				// Create the path
-				Util.createDirectories(pathNoExt);
-			}
-			else {
-				// We do not create it
-				return false;
-			}
-
-			// Open the connection, this creates the DB if none exists
-			conn = DriverManager.getConnection("jdbc:h2:"+pathNoExt, "sa", "");
-	
-			// Create the source table
-			stm = conn.createStatement();
-			stm.execute("CREATE TABLE REPO ("
-				+ "NAME INTEGER,"
-				+ "DESCRIPTION VARCHAR"
-				+ ")");
-			
-			stm.execute("CREATE TABLE TMLIST ("
-				+ "UUID VARCHAR,"
-				+ "NAME VARCHAR,"
-				+ "DESCRIPTION VARCHAR"
-				+ ")");
-			
-			return true;
-		}
-		catch ( SQLException e ) {
-			throw new RuntimeException(e);
-		}
-		finally {
-			try {
-				if ( stm != null ) {
-					stm.close();
-					stm = null;
-				}
-			}
-			catch ( SQLException e ) {
-				throw new RuntimeException(e);
-			}
-		}
-	}
-	
 	String[] getTmData (String uuid) {
 		String[] res = new String[2];
 		Statement stm = null;
