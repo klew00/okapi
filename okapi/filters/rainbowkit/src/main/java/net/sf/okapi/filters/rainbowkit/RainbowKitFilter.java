@@ -179,7 +179,7 @@ public class RainbowKitFilter implements IFilter {
 			return queue.poll();
 		}
 		catch ( Throwable e ) {
-			throw new OkapiIOException("Error reading the package.", e);
+			throw new OkapiIOException("Error reading the package.\n"+e.getMessage(), e);
 		}
 	}
 
@@ -459,7 +459,7 @@ public class RainbowKitFilter implements IFilter {
 		catch ( Exception e ) {
 			// Log and move on to the next file
 			Throwable e2 = e.getCause();
-			LOGGER.severe("RTF Conversion error. " + ((e2!=null) ? e2.getMessage() : e.getMessage()));
+			LOGGER.severe("RTF Conversion error.\n" + ((e2!=null) ? e2.getMessage() : e.getMessage()));
 		}
 		finally {
 			if ( rtfFilter != null ) {
@@ -470,7 +470,7 @@ public class RainbowKitFilter implements IFilter {
 					writer.close();
 				}
 				catch ( IOException e ) {
-					LOGGER.severe("RTF Conversion error when closing file. " + e.getMessage());
+					LOGGER.severe("RTF Conversion error when closing file.\n" + e.getMessage());
 				}
 			}
 		}
