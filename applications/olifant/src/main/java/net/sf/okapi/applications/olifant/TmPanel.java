@@ -30,6 +30,7 @@ import net.sf.okapi.lib.tmdb.DbUtil;
 import net.sf.okapi.lib.tmdb.ITm;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
@@ -47,6 +48,7 @@ class TmPanel extends Composite implements IObserver {
 
 	private final static int KEYCOLUMNWIDTH = 90;
 
+	private CTabItem tabItem;
 	private final SashForm sashMain;
 	private final EditorPanel editPanel;
 	private final Table table;
@@ -146,26 +148,34 @@ class TmPanel extends Composite implements IObserver {
 		sashMain.setWeights(new int[]{3, 7, 2});
 	}
 
-	public ITm getTm () {
+	ITm getTm () {
 		return tm;
 	}
 	
-	public LogPanel getLog () {
+	void setTabItem (CTabItem tabItem) {
+		this.tabItem = tabItem;
+	}
+	
+	CTabItem getTabItem () {
+		return tabItem;
+	}
+	
+	LogPanel getLog () {
 		return logPanel;
 	}
 	
-	public boolean canClose () {
+	boolean canClose () {
 		if ( hasRunningThread() ) {
 			return false;
 		}
 		return true;
 	}
 	
-	public boolean hasRunningThread () {
+	boolean hasRunningThread () {
 		return (( workerThread != null ) && workerThread.isAlive() );
 	}
 	
-	public void editColumns () {
+	void editColumns () {
 		try {
 			ColumnsForm dlg = new ColumnsForm(getShell(), tm, visibleFields);
 			ArrayList<String> res = dlg.showDialog();
@@ -190,7 +200,7 @@ class TmPanel extends Composite implements IObserver {
 		}
 	}
 
-	public void resetTmDisplay () {
+	void resetTmDisplay () {
 		srcCol = -1;
 		trgCol = -1;
 		// By default: all and only text fields are visible
@@ -246,7 +256,7 @@ class TmPanel extends Composite implements IObserver {
 		super.dispose();
 	}
 
-	public void updateCurrentEntry () {
+	void updateCurrentEntry () {
 		try {
 			int n = table.getSelectionIndex();
 			if ( n == -1 ) {
@@ -266,7 +276,7 @@ class TmPanel extends Composite implements IObserver {
 		}
 	}
 	
-	public void saveEntry () {
+	void saveEntry () {
 		if ( currentEntry < 0 ) return;
 		// Else: save the entry
 		TableItem ti = table.getItem(currentEntry);
@@ -278,7 +288,7 @@ class TmPanel extends Composite implements IObserver {
 		}
 	}
 	
-	public void fillTable () {
+	void fillTable () {
 		try {
 			table.removeAll();
 			currentEntry = -1;
@@ -302,11 +312,11 @@ class TmPanel extends Composite implements IObserver {
 		}
 	}
 	
-	public void toggleExtra () {
+	void toggleExtra () {
 		editPanel.toggleExtra();
 	}
 	
-	public void toggleLog () {
+	void toggleLog () {
 		if ( sashMain.getWeights()[2] > 0 ) {
 			sashMain.setWeights(new int[]{3, 7, 0});
 		}
@@ -315,11 +325,11 @@ class TmPanel extends Composite implements IObserver {
 		}
 	}
 
-	public EditorPanel getEditorPanel () {
+	EditorPanel getEditorPanel () {
 		return editPanel;
 	}
 	
-	public void startThread (Thread workerThread) {
+	void startThread (Thread workerThread) {
 		this.workerThread = workerThread;
 		workerThread.start();
 	}

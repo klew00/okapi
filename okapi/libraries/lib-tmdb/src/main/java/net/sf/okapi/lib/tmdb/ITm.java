@@ -57,6 +57,8 @@ public interface ITm {
 	 */
 	public List<String> getAvailableFields ();
 	
+	public void rename (String newName);
+	
 	/**
 	 * Sets the list of fields to be returned by {@link #getRecords()}.
 	 * @param names list of fields to be returned. 
@@ -95,4 +97,9 @@ public interface ITm {
 	
 	public ResultSet getPreviousPage ();
 	
+//	public void addLocale (String LocaleId);
+//	
+//	public void deleteLocale (String localeId);
+//	
+//	public List<String> getLocales ();
 }

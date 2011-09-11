@@ -162,7 +162,6 @@ public class Repository implements IRepository {
 	public void deleteTm (String name) {
 		Statement stm = null;
 		try {
-			//name = name.toUpperCase();
 			stm = conn.createStatement();
 			stm.execute("DROP TABLE \""+name+"_TU\"");
 			stm.execute("DROP TABLE \""+name+"_SEG\"");
@@ -215,11 +214,10 @@ public class Repository implements IRepository {
 	}
 	
 	@Override
-	public ITm getTm (String name) {
+	public ITm openTm (String name) {
 		ITm tm = null;
 		Statement stm = null;
 		try {
-			//name = name.toUpperCase();
 			stm = conn.createStatement();
 			ResultSet result = stm.executeQuery("SELECT UUID FROM TMLIST WHERE NAME='"+name+"'");
 			if ( result.first() ) {
@@ -257,13 +255,12 @@ public class Repository implements IRepository {
 		PreparedStatement pstm = null;
 		String lang = localeIdToDbLang(locId);
 		try {
-			//name = name.toUpperCase();
 			// Checks if the name is already used
 			stm = conn.createStatement();
 			ResultSet result = stm.executeQuery("SELECT NAME FROM TMLIST WHERE NAME='"+name+"'");
 			if ( result.first() ) {
 				// TM exists already
-				return getTm(name);
+				return openTm(name);
 			}
 			
 			// Create the TU-level table for the new TM
@@ -440,6 +437,81 @@ public class Repository implements IRepository {
 			}
 		}
 		return list;
+	}
+
+	@Override
+	public long getTotalSegmentCount (String tmName) {
+		Statement stm = null;
+		long count = 0;
+		try {
+			stm = conn.createStatement();
+			ResultSet result = stm.executeQuery("SELECT COUNT(*) FROM \""+tmName+"_SEG\""); // Optimized call for H2
+			if ( result.first() ) {
+				count = result.getLong(1);
+			}
+		}		
+		catch ( SQLException e ) {
+			throw new RuntimeException(e);
+		}
+		finally {
+			try {
+				if ( stm != null ) {
+					stm.close();
+					stm = null;
+				}
+			}
+			catch ( SQLException e ) {
+				throw new RuntimeException(e);
+			}
+		}
+		return count;
+	}
+
+	void renameTm (String currentName,
+		String newName)
+	{
+		Statement stm = null;
+		PreparedStatement pstm = null;
+		try {
+			// Checks if the name is already used
+			stm = conn.createStatement();
+			ResultSet result = stm.executeQuery("SELECT NAME FROM TMLIST WHERE NAME='"+newName+"'");
+			if ( result.first() ) {
+				// the name exists already
+				// (DB is case-sensitive, unlike Olifant)
+				return;
+			}
+			
+			// Update the TM tables
+			stm.execute("ALTER TABLE \""+currentName+"_TU\" RENAME TO \""+newName+"_TU\"; "
+				+ "ALTER TABLE \""+currentName+"_SEG\" RENAME TO \""+newName+"_SEG\";");
+			
+			// Update the TMLIST
+			pstm = conn.prepareStatement("UPDATE TMLIST SET NAME=? WHERE NAME=?");
+			pstm.setString(1, newName);
+			pstm.setString(2, currentName);
+			pstm.executeUpdate();
+			
+			name = newName;
+		}
+		catch ( SQLException e ) {
+			throw new RuntimeException(e);
+		}
+		finally {
+			try {
+				if ( stm != null ) {
+					stm.close();
+					stm = null;
+				}
+				if ( pstm != null ) {
+					pstm.close();
+					pstm = null;
+				}
+			}
+			catch ( SQLException e ) {
+				throw new RuntimeException(e);
+			}
+		}
 	}
 
 }

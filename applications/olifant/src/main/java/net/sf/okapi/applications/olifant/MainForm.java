@@ -77,9 +77,11 @@ public class MainForm {
 	private StatusBar statusBar;
 	
 	private MenuItem miFileOpen;
+	private MenuItem miFileClose;
 	private MenuItem miShowHideThirdField;
 	private MenuItem miShowHideFieldList;
 	private MenuItem miEditColumns;
+	private MenuItem miStatistics;
 	private MenuItem miShowHideLog;
 
 	public MainForm (Shell shell,
@@ -110,7 +112,9 @@ public class MainForm {
 	}
 
 	private boolean canClose () {
-		// TODO: check here if the application can be closed
+		for ( CTabItem ti : tabs.getItems() ) {
+			if ( !((TmPanel)ti.getControl()).canClose() ) return false;
+		}
 		return true;
 	}
 	
@@ -118,6 +122,7 @@ public class MainForm {
 		throws Exception
 	{
 		shell.setLayout(new GridLayout(1, false));
+		shell.setImage(rm.getImage("Olifant")); //$NON-NLS-1$
 		
 		// Handling of the closing event
 		shell.addShellListener(new ShellListener() {
@@ -193,7 +198,7 @@ public class MainForm {
 			}
 		});
 		
-		repoPanel = new RepositoryPanel(this, topSash, SWT.NONE);
+		repoPanel = new RepositoryPanel(this, topSash, SWT.NONE, rm);
 		repoPanel.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 		topSash.setWeights(new int[]{4, 1});
@@ -252,18 +257,51 @@ public class MainForm {
 		return null;
 	}
 
+	boolean closeTmTab (CTabItem tabItem) {
+		try {
+			// If tabItem is null: use the current tab
+			if ( tabItem == null ) {
+				tabItem = tabs.getSelection();
+				if ( tabItem == null ) return true; // Nothing to close
+			}
+			
+			// Get the TmPanel
+			TmPanel tp = (TmPanel)tabItem.getControl();
+			// Verify that we can close
+			if ( !tp.canClose() ) return false;
+			// When removing dynamically a tab we need to manually dispose 
+			// of both the tabItem and its control.
+			tabItem.dispose();
+			tp.dispose();
+			// If we are closing the last tab we need to manually set the current TP to null
+			if ( tabs.getItemCount() < 1 ) {
+				setCurrentTP(null);
+			}
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, "Error closing tab.\n"+e.getMessage(), null);
+		}
+		return true;
+	}
+	
+	void closeAllTmTabs () {
+		while ( tabs.getItemCount() > 0 ) {
+			closeTmTab(tabs.getItem(0));
+		}
+	}
+	
 	void updateCurrentTmTab () {
 		updateCommands();
-		if ( currentTP != null ) {
+		if ( currentTP == null ) {
+			statusBar.setCounter(-1, 0);
+			statusBar.clearInfo();
+		}
+		else {
 			currentTP.updateCurrentEntry();
 		}
 	}
 	
 	void setCurrentTP (TmPanel tp) {
-//		if ( setSeelection ) {
-//			CTabItem ti = (CTabItem)tp.getParent(); 
-//			tabs.setSelection(ti);
-//		}
 		currentTP = tp;
 		updateCurrentTmTab();
 	}
@@ -275,7 +313,9 @@ public class MainForm {
 	}
 
 	void updateCommands () {
+		miStatistics.setEnabled(repoPanel.isRepositoryOpen());
 		boolean active = ( repoPanel.isRepositoryOpen() && ( currentTP != null ) && !currentTP.hasRunningThread() );
+		miFileClose.setEnabled(active);
 		miShowHideLog.setEnabled(active);
 		miShowHideThirdField.setEnabled(active);
 		miShowHideFieldList.setEnabled((active) && currentTP.getEditorPanel().isExtraVisible());
@@ -288,6 +328,7 @@ public class MainForm {
 		CTabItem ti = new CTabItem(tabs, SWT.NONE);
 		ti.setText(tm.getName());
 		ti.setControl(tp);
+		tp.setTabItem(ti);
 		return tp;
 	}
 
@@ -310,11 +351,21 @@ public class MainForm {
             }
 		});
 
+		new MenuItem(dropMenu, SWT.SEPARATOR);
+
 		miFileOpen = new MenuItem(dropMenu, SWT.PUSH);
 		rm.setCommand(miFileOpen, "file.open"); //$NON-NLS-1$
 		miFileOpen.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				openFile();
+            }
+		});
+		
+		miFileClose = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miFileClose, "file.close"); //$NON-NLS-1$
+		miFileClose.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				closeTmTab(null); // null=use current tab
             }
 		});
 		
@@ -392,13 +443,21 @@ public class MainForm {
             }
 		});
 		
+		miStatistics = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miStatistics, "view.stats"); //$NON-NLS-1$
+		miStatistics.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				repoPanel.getStatistics();
+            }
+		});
+
 	}
 
 	private void loadResources ()
 		throws Exception 
 	{
 		rm = new ResourceManager(MainForm.class, shell.getDisplay());
-//		rm.addImage("Olifant"); //$NON-NLS-1$
+		rm.addImage("Olifant"); //$NON-NLS-1$
 	
 		rm.loadCommands("net.sf.okapi.applications.olifant.Commands"); //$NON-NLS-1$
 
@@ -529,8 +588,8 @@ public class MainForm {
 			// Create the TM in the repository
 			String filename = Util.getFilename(rd.getInputURI().getPath(), false);
 			
-			// Create an empty TM
-			TmPanel tp = repoPanel.createTmAndTmTab(filename, null, (LocaleId)data[3]);
+			// Create an empty TM (filling the display is done later)
+			TmPanel tp = repoPanel.createTmAndTmTab(filename, null, (LocaleId)data[3], false);
 			// Trigger the import 
 			if ( tp != null ) {
 				// Start the import thread

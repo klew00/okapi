@@ -67,7 +67,6 @@ class ColumnsForm {
 		group.setLayout(new GridLayout());
 		group.setLayoutData(new GridData(GridData.FILL_BOTH));
 		group.setText("Available fields:");
-		group.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
 		lbAvailableFields = new List(group, SWT.BORDER | SWT.V_SCROLL);
 		GridData gdTmp = new GridData(GridData.FILL_BOTH);
@@ -135,7 +134,6 @@ class ColumnsForm {
 		group.setLayout(new GridLayout());
 		group.setLayoutData(new GridData(GridData.FILL_BOTH));
 		group.setText("Fields to display:");
-		group.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 		lbDisplayFields = new List(group, SWT.BORDER | SWT.V_SCROLL);
 		gdTmp = new GridData(GridData.FILL_BOTH);
@@ -286,6 +284,7 @@ class ColumnsForm {
 			int n = lbDisplayFields.getSelectionIndex();
 			if ( n < 2 ) return;
 //todo			
+			Dialogs.showWarning(shell, "Not implemented yet.", null);
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
@@ -297,6 +296,7 @@ class ColumnsForm {
 			int n = lbDisplayFields.getSelectionIndex();
 			if ( n < 0 ) return;
 //todo			
+			Dialogs.showWarning(shell, "Not implemented yet.", null);
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getMessage(), null);

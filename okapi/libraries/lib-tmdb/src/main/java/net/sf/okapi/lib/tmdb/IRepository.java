@@ -51,7 +51,7 @@ public interface IRepository {
 	 * @param locId the locale of the initial language.
 	 * @return the ITm object for the newly created TM, or null if the TM was not created.
 	 */
-	public ITm createTm (String name,
+	public ITm createTm (String tmName,
 		String description,
 		LocaleId locId);
 	
@@ -60,14 +60,16 @@ public interface IRepository {
 	 * If there is no TM with such name in the repository, nothing happens.
 	 * @param name the name of the TM to remove.
 	 */
-	public void deleteTm (String name);
+	public void deleteTm (String tmName);
 
 	/**
-	 * Gets the ITm object for the given TM name.
-	 * @param name the name of the TM to retrieve.
+	 * Create a new object that gives access to the TM of the given name.
+	 * Each call returns a new object!
+	 * @param name the name of the TM to access.
 	 * @return the ITm object for the given TM name, or null if the name is not the one
 	 * of an existing TM.
 	 */
-	public ITm getTm (String name);
+	public ITm openTm (String tmName);
 
+	public long getTotalSegmentCount (String tmName);
 }
