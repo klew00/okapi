@@ -116,23 +116,27 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 	
 	/**
 	 * Coded text buffer of this fragment.
-	 */
+	 */	
+	// FIXME - why is this protected?
 	protected StringBuilder text;
 	
 	/**
 	 * List of the inline codes for this fragment.  
 	 */
+	// FIXME - why is this protected?
 	protected ArrayList<Code> codes;
 	
 	/**
 	 * Flag indicating if the opening/closing inline codes of this fragment
 	 * have been balanced or not. 
 	 */
+	// FIXME - why is this protected?
 	protected boolean isBalanced;
 	
 	/**
 	 * Value of the last inline code ID in this fragment.
 	 */
+	// FIXME - why is this protected?
 	protected int lastCodeID;
 
 	/**
@@ -462,7 +466,9 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 	 */
 	@Override
 	public TextFragment clone () {
-		return new TextFragment(this);
+		TextFragment tf = new TextFragment(this.getCodedText(), this.getClonedCodes());
+		tf.lastCodeID = this.getLastCodeId();
+		return tf;
 	}
 	
 	/**
@@ -1516,6 +1522,9 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 			if ( code.tagType != TagType.CLOSING ) code.id = ++lastCodeID;
 		}
 		isBalanced = false;
+		// go ahead and balance as we usually 
+		//want full id assignment at this point
+		balanceMarkers();
 	}
 	
 	/**
@@ -1529,6 +1538,7 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 			return;
 		}
 		
+		// TODO: should we balance the codes before removal?
 		for (int i=0; i<text.length(); i++) {
 			switch (text.charAt(i)) {
 				case TextFragment.MARKER_OPENING:
@@ -1574,6 +1584,9 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 	 * This method also reset the last code id value to the highest code id found.
 	 */
 	protected void balanceMarkers () {
+		// FIXME: there are many ways to access codes
+		// that do *not* balance them!!! How do we
+		// make sure codes are balance in all cases?
 		if ( codes == null ) return;
 		lastCodeID = 0;
 		int[] closingIds = new int[codes.size()];

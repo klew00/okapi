@@ -585,4 +585,27 @@ public class XmlSnippetsTest {
 
 		parameters = originalParameters;
 	}
+	
+	@Test
+	public void testBadCodeIdsAfterRenumber() {
+		String snippet = "A<xref href=\"https://consultant.familysearch.org\" scope=\"external\"\n                              format=\"html\">B</xref>C";
+		URL originalParameters = parameters;
+		parameters = XmlSnippetsTest.class.getResource("dita.yml");
+		ITextUnit tu = FilterTestDriver.getTextUnit(
+				XmlStreamTestUtils.getEvents(snippet, xmlStreamFilter, parameters), 1);
+		assertNotNull(tu);
+		List<Code> list = tu.getSource().getFirstContent().getCodes();
+		assertEquals(2, list.size());
+		assertEquals(1, list.get(0).getId());
+		assertEquals(1, list.get(1).getId());
+		
+		tu.getSource().getFirstContent().renumberCodes();
+		
+		list = tu.getSource().getFirstContent().getCodes();
+		assertEquals(2, list.size());
+		assertEquals(1, list.get(0).getId());
+		assertEquals(1, list.get(1).getId());
+		
+		parameters = originalParameters;
+	}
 }

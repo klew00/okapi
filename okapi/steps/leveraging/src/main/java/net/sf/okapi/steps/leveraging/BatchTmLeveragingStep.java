@@ -108,6 +108,9 @@ public class BatchTmLeveragingStep extends BasePipelineStep {
 		case END_DOCUMENT:
 			event = handleEndDocument(event);
 			return event;
+		case START_DOCUMENT:
+			event = handleEndDocument(event);
+			return event;
 		default:
 			batchedEvents.add(event);
 			break;
