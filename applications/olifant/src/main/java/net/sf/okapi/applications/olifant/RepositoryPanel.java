@@ -402,15 +402,31 @@ class RepositoryPanel extends Composite {
 		mainForm.updateTitle();
 	}
 	
+	// Temporary output
 	void getStatistics () {
 		try {
 			StringBuilder tmp = new StringBuilder();
+			StringBuilder tmp2 = new StringBuilder();
 			long totalSeg = 0;
 			for ( String tmName : tmList.getItems() ) {
+				// Counts
 				long segCount = repo.getTotalSegmentCount(tmName);
 				totalSeg += segCount;
+				// Locales
+				java.util.List<String> locales = repo.getTmLocales(tmName);
+				for ( String loc: locales ) {
+					String add = loc+", ";
+					if ( tmp2.indexOf(add) == -1 ) {
+						tmp2.append(add);
+					}
+				}
+			}
+			if ( tmp2.length() > 0 ) {
+				tmp2.delete(tmp2.length()-2, tmp2.length());
 			}
 			tmp.append(String.format("Total number of segment-entries: %d", totalSeg));
+			tmp.append("\n\nLocales: "+tmp2.toString());
+			
 			MessageBox dlg = new MessageBox(getShell());
 			dlg.setMessage(tmp.toString());
 			dlg.setText("Statistics");

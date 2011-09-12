@@ -56,7 +56,11 @@ public interface ITm {
 	 * @return the list of all available fields in this TM.
 	 */
 	public List<String> getAvailableFields ();
-	
+
+	/**
+	 * Rename this TM.
+	 * @param newName the name name of the TM.
+	 */
 	public void rename (String newName);
 	
 	/**
@@ -65,8 +69,20 @@ public interface ITm {
 	 */
 	public void setRecordFields (List<String> names);
 
+	/**
+	 * Prepares the system to import a set of new entries.
+	 * This method must be called before calling {@link #addRecord(long, Map, Map)}.
+	 * You must call {@link #finishImport()} to terminate the batch of import.
+	 * @see #finishImport()
+	 * @see #addRecord(long, Map, Map)
+	 */
 	public void startImport ();
 	
+	/**
+	 * Finishes a batch of {@link #addRecord(long, Map, Map)}.
+	 * @see #startImport()
+	 * @see #addRecord(long, Map, Map)
+	 */
 	public void finishImport();
 	
 	/**
@@ -86,9 +102,18 @@ public interface ITm {
 	/**
 	 * Sets the number of records a call to a paging method should return.
 	 * @param size the number of records a call to a paging method should return.
+	 * The minimum size of a page is 2. If a smaller value is given, the value is
+	 * silently changed to 2.
 	 */
-	public void setPageSize (int size);
+	public void setPageSize (long size);
 	
+	public void moveBeforeFirstPage ();
+	
+	/**
+	 * Gets the first page of records.
+	 * This method is the same has calling {@link #moveBeforeFirstPage()} and then {@link #getNextPage()}.
+	 * @return the results for the first page.
+	 */
 	public ResultSet getFirstPage ();
 	
 	public ResultSet getLastPage ();
@@ -100,6 +125,10 @@ public interface ITm {
 //	public void addLocale (String LocaleId);
 //	
 //	public void deleteLocale (String localeId);
-//	
-//	public List<String> getLocales ();
+
+	/**
+	 * Gets the list of the locales in this TM.
+	 * @return the list of the locales in this TM.
+	 */
+	public List<String> getLocales ();
 }

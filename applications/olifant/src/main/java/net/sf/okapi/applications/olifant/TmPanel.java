@@ -97,9 +97,16 @@ class TmPanel extends Composite implements IObserver {
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
 
-//		tblResults.addControlListener(new ControlAdapter() {
+//		table.addControlListener(new ControlAdapter() {
 //		    public void controlResized(ControlEvent e) {
 //		    	Table table = (Table)e.getSource();
+		    	
+//		    	Rectangle rect = table.getClientArea();
+//				int itemHeight = table.getItemHeight();
+//				int headerHeight = table.getHeaderHeight();
+//				int visibleCount = (rect.height - headerHeight + itemHeight - 1) / itemHeight;
+//				int u = visibleCount;
+				
 //		    	Rectangle rect = table.getClientArea();
 //				int nPart = rect.width / 100;
 //				int nRemain = rect.width % 100;
@@ -242,7 +249,7 @@ class TmPanel extends Composite implements IObserver {
 		finally {
 			table.setRedraw(true);
 		}
-		fillTable();
+		fillTable(0);
 	}
 	
 	@Override
@@ -256,6 +263,15 @@ class TmPanel extends Composite implements IObserver {
 		super.dispose();
 	}
 
+	void updatePage () {
+		int newEntry = table.getSelectionIndex();
+		boolean moveDown = ((newEntry-currentEntry) > 0);
+		if ( newEntry >= table.getItemCount() ) {
+			fillTable(1);
+			
+		}
+	}
+	
 	void updateCurrentEntry () {
 		try {
 			int n = table.getSelectionIndex();
@@ -288,11 +304,31 @@ class TmPanel extends Composite implements IObserver {
 		}
 	}
 	
-	void fillTable () {
+	/**
+	 * Fills the table with a new page
+	 * @param direction 0=from the top, 1=next, 2=previous
+	 */
+	void fillTable (int direction) {
 		try {
 			table.removeAll();
 			currentEntry = -1;
-			ResultSet rs = tm.getFirstPage();
+			
+			ResultSet rs;
+			switch ( direction ) {
+			case 0:
+				rs = tm.getFirstPage();
+				break;
+			case 1:
+				rs = tm.getNextPage();
+				break;
+			case 2:
+				rs = tm.getPreviousPage();
+				break;
+			default:
+				rs = tm.getLastPage();
+				break;
+			}
+			
 			while ( rs.next() ) {
 				TableItem item = new TableItem(table, SWT.NONE);
 				item.setText(0, String.format("%d", rs.getLong(ITm.SEGKEY_FIELD)));

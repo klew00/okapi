@@ -39,8 +39,9 @@ public class Tm implements ITm {
 	private String name;
 	private String uuid;
 	private PreparedStatement pstmGet;
-	private long pageTop = 1;
-	private int pageSize = 100;
+	private long offset = 0;
+	private long limit = 30;
+	private long currentRowCount = 0;
 
 	private PreparedStatement pstmAddSeg;
 	private PreparedStatement pstmAddTu;
@@ -151,8 +152,9 @@ public class Tm implements ITm {
 				}
 				tmp.append(" FROM \""+name+"_SEG\"");
 			}
-			tmp.append(" LIMIT ?");
-			pstmGet = store.getConnection().prepareStatement(tmp.toString());
+			tmp.append(" LIMIT ? OFFSET ?");
+			pstmGet = store.getConnection().prepareStatement( tmp.toString(),
+				ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 		}
 		catch ( SQLException e ) {
 			throw new RuntimeException(e);
@@ -160,45 +162,66 @@ public class Tm implements ITm {
 	}
 
 	private ResultSet getPage (long start) {
+		if ( start < 0 ) return null;
 		ResultSet result = null;
 		try {
-			pstmGet.setLong(1, pageSize);
-//			pstmGet.setLong(2, start);
+			pstmGet.setLong(1, limit);
+			pstmGet.setLong(2, start);
 			result = pstmGet.executeQuery();
+			// Get the size of the page
+			if ( result.last() ) {
+				currentRowCount = result.getRow();
+			}
+			else {
+				currentRowCount = 0;
+			}
+			result.beforeFirst(); // Reset the current row
+			if ( currentRowCount < limit ) offset = -1; // Last or first page
+			else offset = start;
 		}
 		catch ( SQLException e ) {
 			throw new RuntimeException(e);
 		}
 		return result;
 	}
+
+	public void moveBeforeFirstPage () {
+		offset = 0;
+	}
 	
 	@Override
 	public ResultSet getFirstPage () {
-		return getPage(1);
+		offset = 0;
+		return getPage(offset);
 	}
 
 	@Override
 	public ResultSet getLastPage () {
 		// TODO Auto-generated method stub
+//		offset = last row of query
+//		offset -= pageSize;
+		if ( offset < 0 ) offset = 0;
 		return null;
 	}
 
 	@Override
 	public ResultSet getNextPage () {
-		// TODO Auto-generated method stub
-		return null;
+		// First row of next page is last of the current one
+		return getPage(offset += (currentRowCount-1));
 	}
 
 	@Override
 	public ResultSet getPreviousPage () {
-		// TODO Auto-generated method stub
-		return null;
+		// Last row of previous page is first of the current one
+		long start = offset - (limit-1);
+		if ( start < 0 ) start = 0;
+		return getPage(start);
 	}
 
 	@Override
-	public void setPageSize (int size) {
-//		if ( size < 1 ) size = 10;
-//		this.pageSize = size;
+	public void setPageSize (long size) {
+		if ( size < 2 ) this.limit = 2;
+		else this.limit = size;
 	}
 	
 	private boolean isSegmentField (String name) {
@@ -459,4 +482,8 @@ public class Tm implements ITm {
 		}
 	}
 
+	@Override
+	public List<String> getLocales () {
+		return store.getTmLocales(name);
+	}
 }

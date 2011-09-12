@@ -71,5 +71,7 @@ public interface IRepository {
 	 */
 	public ITm openTm (String tmName);
 
+	public List<String> getTmLocales (String tmName);
+	
 	public long getTotalSegmentCount (String tmName);
 }

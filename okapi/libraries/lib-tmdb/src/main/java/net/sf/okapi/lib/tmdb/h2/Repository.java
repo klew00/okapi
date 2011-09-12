@@ -514,4 +514,39 @@ public class Repository implements IRepository {
 		}
 	}
 
+	@Override
+	public List<String> getTmLocales (String tmName) {
+		ArrayList<String> list = new ArrayList<String>();
+		// Look for all Text fields and extract the locale info from them.
+		Statement stm = null;
+		try {
+			stm = conn.createStatement();
+			ResultSet result = stm.executeQuery("SHOW COLUMNS FROM \""+tmName+"_SEG\"");
+			while ( result.next() ) {
+				String fn = result.getString(1);
+				if ( fn.startsWith(DbUtil.TEXT_PREFIX) ) {
+					int n = fn.lastIndexOf(DbUtil.LANG_SEP);
+					if ( n > -1 ) {
+						list.add(fn.substring(n+1));
+					}
+				}
+			}
+		}		
+		catch ( SQLException e ) {
+			throw new RuntimeException(e);
+		}
+		finally {
+			try {
+				if ( stm != null ) {
+					stm.close();
+					stm = null;
+				}
+			}
+			catch ( SQLException e ) {
+				throw new RuntimeException(e);
+			}
+		}
+		return list;
+	}
+
 }
