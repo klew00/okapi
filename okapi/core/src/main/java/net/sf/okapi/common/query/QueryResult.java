@@ -33,6 +33,8 @@ import net.sf.okapi.common.resource.TextFragment;
  */
 public class QueryResult implements Comparable<QueryResult> {
 
+	public static int QUALITY_UNDEFINED = Integer.MIN_VALUE;
+	
 	/**
 	 * Convert a QueryResult to an {@link AltTranslation}
 	 * 
@@ -95,6 +97,13 @@ public class QueryResult implements Comparable<QueryResult> {
 	 * value can be null and depends on each type of resource.
 	 */
 	public String origin;
+	
+	/**
+	 * Quality rating of the translation in this result
+	 * (a value between 0 and 100, or {@link #QUALITY_UNDEFINED} if the value is not defined).
+	 * Each connector is responsible for adjusting the original quality information (if any) to this scale.
+	 */
+	public int quality = QUALITY_UNDEFINED;
 
 	/**
 	 * Indicator telling if the result is coming from a machine translation
