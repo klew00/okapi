@@ -21,13 +21,6 @@
 			<artifactId>okapi-step-common</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
-		<dependency>
-            <groupId>net.sf.okapi.lib</groupId>
-            <artifactId>okapi-lib-search</artifactId>
-            <version>${project.version}</version>
-        </dependency> 
-		
 		<!-- For test -->
 		<dependency>
 			<groupId>net.sf.okapi.filters</groupId>
