@@ -209,6 +209,17 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 
 		group = new Group(cmpTmp, SWT.NONE);
 		group.setLayout(new GridLayout());
+		group.setText("What characters should be escaped");
+		group.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+		rdEscapeUnsupported = new Button(group, SWT.RADIO);
+		rdEscapeUnsupported.setText("Only the characters un-supported by the output encoding");
+		
+		rdEscapeAll = new Button(group, SWT.RADIO);
+		rdEscapeAll.setText("All extended characters");
+
+		group = new Group(cmpTmp, SWT.NONE);
+		group.setLayout(new GridLayout());
 		group.setText("Escape notation to use");
 		group.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
@@ -256,17 +267,6 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		gdTmp.horizontalIndent = 16;
 		chkUseBytes.setLayoutData(gdTmp);
 		
-		group = new Group(cmpTmp, SWT.NONE);
-		group.setLayout(new GridLayout());
-		group.setText("What characters should be escaped");
-		group.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-
-		rdEscapeUnsupported = new Button(group, SWT.RADIO);
-		rdEscapeUnsupported.setText("Only the characters un-supported by the output encoding");
-		
-		rdEscapeAll = new Button(group, SWT.RADIO);
-		rdEscapeAll.setText("All extended characters");
-
 		group = new Group(cmpTmp, SWT.NONE);
 		group.setLayout(new GridLayout());
 		group.setText("Miscellaneous");
