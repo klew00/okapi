@@ -34,6 +34,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private static final String GENERATETMX = "generateTMX";
 	private static final String TMXOUTPUTPATH = "tmxOutputPath";
 	private static final String REPLACEWITHSOURCE = "replaceWithSource";
+	private static final String COPYTOTARGET = "copyToTarget";
+	private static final String STOREASALTTRANSLATION = "storeAsAltTranslation";
 
 	private boolean generateTMX;
 	private String tmxOutputPath;
@@ -107,8 +109,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		generateTMX = buffer.getBoolean(GENERATETMX, generateTMX);
 		tmxOutputPath = buffer.getString(TMXOUTPUTPATH, tmxOutputPath);
 		replaceWithSource = buffer.getBoolean(REPLACEWITHSOURCE, replaceWithSource);
-		copyToTarget = buffer.getBoolean("copyToTarget", copyToTarget);
-		storeAsAltTranslation = buffer.getBoolean("storeAsAltTranslation", storeAsAltTranslation);
+		copyToTarget = buffer.getBoolean(COPYTOTARGET, copyToTarget);
+		storeAsAltTranslation = buffer.getBoolean(STOREASALTTRANSLATION, storeAsAltTranslation);
 	}
 
 	@Override
@@ -117,8 +119,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.setBoolean(GENERATETMX, generateTMX);
 		buffer.setParameter(TMXOUTPUTPATH, tmxOutputPath);
 		buffer.setBoolean(REPLACEWITHSOURCE, replaceWithSource);
-		buffer.setParameter("copyToTarget", copyToTarget);
-		buffer.setParameter("storeAsAltTranslation", storeAsAltTranslation);
+		buffer.setParameter(COPYTOTARGET, copyToTarget);
+		buffer.setParameter(STOREASALTTRANSLATION, storeAsAltTranslation);
 		
 		return buffer.toString();
 	}
@@ -129,11 +131,12 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		desc.add(GENERATETMX, "Generate a TMX file:",
 				"If generateTMX is false generate bilingual TextUnits, otherwise (true) output a TMX file");
 		desc.add(TMXOUTPUTPATH, "TMX output path", "Full path of the output TMX file");
-		desc.add(REPLACEWITHSOURCE, "Replace with source", "If no target text available, use the source text");
-		desc.add("copyToTarget", 
-				"Copy to/over the target? (WARNING: Copied target will not be segmented!)", "Copy to/over the target (a leverage annotation " +
-				"will still be created). WARNING: Copied target will not be segmented and any exisiting target will be lost.");
-		desc.add("storeAsAltTranslation", "Store the target as an alternate translation?", "If true store the matched target so that subsequent steps can see it.");
+		desc.add(REPLACEWITHSOURCE, "Fall back to source text", "If no target text is available, use the source text");
+		desc.add(COPYTOTARGET, 
+				"Copy to/over the target (WARNING: Copied target will not be segmented)", "Copy to/over the target (an annotation " +
+				"will still be created if requested). WARNING: Copied target will not be segmented and any exisiting target will be lost.");
+		desc.add(STOREASALTTRANSLATION, "Create an alternate translation annotation", "Store the matched target as an alternate translation "
+			+ "so that subsequent steps can see it.");
 		return desc;
 	}
 
@@ -149,8 +152,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 
 		desc.addSeparatorPart();
 		desc.addCheckboxPart(paramsDesc.get(REPLACEWITHSOURCE));
-		desc.addCheckboxPart(paramsDesc.get("copyToTarget"));
-		desc.addCheckboxPart(paramsDesc.get("storeAsAltTranslation"));
+		desc.addCheckboxPart(paramsDesc.get(COPYTOTARGET));
+		desc.addCheckboxPart(paramsDesc.get(STOREASALTTRANSLATION));
 		return desc;
 	}
 }
