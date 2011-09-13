@@ -4,12 +4,17 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 
+import junit.framework.Assert;
+
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.pipeline.Pipeline;
+import net.sf.okapi.common.query.MatchType;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.filters.properties.PropertiesFilter;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
@@ -40,7 +45,9 @@ public class IdAlignerTest {
 
 		Parameters p = new Parameters();
 		p.setGenerateTMX(false);
+		p.setCopyToTarget(true);
 		aligner.setParameters(p);
+		
 		FilterConfigurationMapper fcMapper = new FilterConfigurationMapper();
 		fcMapper.addConfigurations("net.sf.okapi.filters.properties.PropertiesFilter");
 		aligner.setFilterConfigurationMapper(fcMapper);
@@ -81,8 +88,12 @@ public class IdAlignerTest {
 		assertEquals("key.Cancel", tue.getTextUnit().getName());
 
 		tue = el.remove(0);
-		assertEquals("Unable to communicate with the <b>server</b>.", tue
-				.getResource().toString());
+		
+		// get first alttranslation - should be our match
+		Assert.assertNotNull(tue.getTextUnit().getTarget(LocaleId.ENGLISH).getAnnotation(AltTranslationsAnnotation.class));
+		Assert.assertEquals("Unable to communicate with the <b>server</b>.", getAltTransTarget(tue.getTextUnit(), LocaleId.ENGLISH));
+		
+		assertEquals("Unable to communicate with the <b>server</b>.", tue.getResource().toString());
 		assertEquals("key.server", tue.getTextUnit().getName());
 
 		assertEquals(EventType.END_DOCUMENT, el.remove(0).getEventType());
@@ -114,19 +125,32 @@ public class IdAlignerTest {
 		assertEquals(EventType.START_DOCUMENT, el.remove(0).getEventType());
 
 		Event tue = el.remove(0);
+		
+		Assert.assertNotNull(tue.getTextUnit().getTarget(LocaleId.GERMAN).getAnnotation(AltTranslationsAnnotation.class));
+		Assert.assertEquals("Abbrechen", getAltTransTarget(tue.getTextUnit(), LocaleId.GERMAN));
+		AltTranslationsAnnotation ata = tue.getTextUnit().getTarget(LocaleId.GERMAN).getAnnotation(AltTranslationsAnnotation.class);
+		Assert.assertEquals(MatchType.EXACT_UNIQUE_ID, ata.getFirst().getType());
+		
 		assertTrue(tue.getTextUnit().hasTarget(LocaleId.GERMAN));
-		assertEquals("Abbrechen", tue.getTextUnit().getTarget(LocaleId.GERMAN)
-				.toString());
+		assertEquals("Abbrechen", tue.getTextUnit().getTarget(LocaleId.GERMAN).toString());
 
 		tue = el.remove(0);
+		
+		Assert.assertNotNull(tue.getTextUnit().getTarget(LocaleId.GERMAN).getAnnotation(AltTranslationsAnnotation.class));
+		Assert.assertEquals("Es konnte keine Verbindung zum <b>Server</b> aufgebaut werden.", getAltTransTarget(tue.getTextUnit(), LocaleId.GERMAN));
+		ata = tue.getTextUnit().getTarget(LocaleId.GERMAN).getAnnotation(AltTranslationsAnnotation.class);
+		Assert.assertEquals(MatchType.EXACT_UNIQUE_ID, ata.getFirst().getType());
+
 		assertTrue(tue.getTextUnit().hasTarget(LocaleId.GERMAN));
-		assertEquals(
-				"Es konnte keine Verbindung zum <b>Server</b> aufgebaut werden.",
-				tue.getTextUnit().toString());
+		assertEquals("Es konnte keine Verbindung zum <b>Server</b> aufgebaut werden.", tue.getTextUnit().toString());
 
 		assertEquals(EventType.END_DOCUMENT, el.remove(0).getEventType());
 		assertEquals(EventType.END_BATCH_ITEM, el.remove(0).getEventType());
 		assertEquals(EventType.END_BATCH, el.remove(0).getEventType());
 	}
-
+	
+	private String getAltTransTarget(ITextUnit tu, LocaleId targetLocale) {
+		AltTranslationsAnnotation ata = tu.getTarget(targetLocale).getAnnotation(AltTranslationsAnnotation.class); 
+		return ata.getFirst().getTarget().toString();
+	}
 }

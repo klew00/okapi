@@ -38,6 +38,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private boolean generateTMX;
 	private String tmxOutputPath;
 	private boolean replaceWithSource;
+	private boolean copyToTarget;
+	private boolean storeAsAltTranslation;
 
 	public Parameters() {
 		reset();
@@ -67,11 +69,35 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.replaceWithSource = replaceWithSource;
 	}
 
+	public void setCopyToTarget(boolean copyToTarget) {
+		this.copyToTarget = copyToTarget;
+	}
+
+	public boolean isCopyToTarget() {
+		return copyToTarget;
+	}
+	
+	/**
+	 * @return the storeAsAltTranslation
+	 */
+	public boolean isStoreAsAltTranslation() {
+		return storeAsAltTranslation;
+	}
+
+	/**
+	 * @param storeAsAltTranslation the storeAsAltTranslation to set
+	 */
+	public void setStoreAsAltTranslation(boolean storeAsAltTranslation) {
+		this.storeAsAltTranslation = storeAsAltTranslation;
+	}
+
 	@Override
 	public void reset() {
 		tmxOutputPath = "aligned.tmx";
-		generateTMX = true;
-		replaceWithSource = true;
+		generateTMX = false;
+		replaceWithSource = false;
+		copyToTarget = false;
+		storeAsAltTranslation = true;
 	}
 
 	@Override
@@ -81,6 +107,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		generateTMX = buffer.getBoolean(GENERATETMX, generateTMX);
 		tmxOutputPath = buffer.getString(TMXOUTPUTPATH, tmxOutputPath);
 		replaceWithSource = buffer.getBoolean(REPLACEWITHSOURCE, replaceWithSource);
+		copyToTarget = buffer.getBoolean("copyToTarget", copyToTarget);
+		storeAsAltTranslation = buffer.getBoolean("storeAsAltTranslation", storeAsAltTranslation);
 	}
 
 	@Override
@@ -89,7 +117,9 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		buffer.setBoolean(GENERATETMX, generateTMX);
 		buffer.setParameter(TMXOUTPUTPATH, tmxOutputPath);
 		buffer.setBoolean(REPLACEWITHSOURCE, replaceWithSource);
-
+		buffer.setParameter("copyToTarget", copyToTarget);
+		buffer.setParameter("storeAsAltTranslation", storeAsAltTranslation);
+		
 		return buffer.toString();
 	}
 
@@ -100,6 +130,10 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 				"If generateTMX is false generate bilingual TextUnits, otherwise (true) output a TMX file");
 		desc.add(TMXOUTPUTPATH, "TMX output path", "Full path of the output TMX file");
 		desc.add(REPLACEWITHSOURCE, "Replace with source", "If no target text available, use the source text");
+		desc.add("copyToTarget", 
+				"Copy to/over the target? (WARNING: Copied target will not be segmented!)", "Copy to/over the target (a leverage annotation " +
+				"will still be created). WARNING: Copied target will not be segmented and any exisiting target will be lost.");
+		desc.add("storeAsAltTranslation", "Store the target as an alternate translation?", "If true store the matched target so that subsequent steps can see it.");
 		return desc;
 	}
 
@@ -115,7 +149,8 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 
 		desc.addSeparatorPart();
 		desc.addCheckboxPart(paramsDesc.get(REPLACEWITHSOURCE));
-
+		desc.addCheckboxPart(paramsDesc.get("copyToTarget"));
+		desc.addCheckboxPart(paramsDesc.get("storeAsAltTranslation"));
 		return desc;
 	}
 }

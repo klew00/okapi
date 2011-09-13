@@ -27,14 +27,19 @@ import java.util.logging.Logger;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.UsingParameters;
+import net.sf.okapi.common.annotation.AltTranslation;
+import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
+import net.sf.okapi.common.exceptions.OkapiBadStepInputException;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filterwriter.TMXWriter;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
+import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
@@ -54,7 +59,7 @@ import net.sf.okapi.common.resource.TextUnitUtil;
 @UsingParameters(Parameters.class)
 public class IdBasedAlignerStep extends BasePipelineStep {
 
-	private final Logger logger = Logger.getLogger(getClass().getName());
+	private static final Logger LOGGER = Logger.getLogger(IdBasedAlignerStep.class.getName());
 	private Parameters params;
 	private IFilter filter = null;
 	private IFilterConfigurationMapper fcMapper;
@@ -110,7 +115,7 @@ public class IdBasedAlignerStep extends BasePipelineStep {
 	}
 
 	@Override
-	protected Event handleStartBatch(final Event event) {
+	protected Event handleStartBatch(final Event event) {		
 		// Start TMX writer (one for all input documents)
 		if (tmx == null && params.getGenerateTMX()) {
 			tmx = new TMXWriter(params.getTmxOutputPath());
@@ -133,10 +138,12 @@ public class IdBasedAlignerStep extends BasePipelineStep {
 
 	@Override
 	protected Event handleStartDocument(Event event) {
-		if (targetInput != null) {
-			targetTextUnitMap = new HashMap<String, ITextUnit>();
-			getTargetTextUnits();
+		if (targetInput == null) {
+			throw new OkapiBadStepInputException("Second input file (target) not configured.");
 		}
+		
+		targetTextUnitMap = new HashMap<String, ITextUnit>();
+		getTargetTextUnits();
 
 		return event;
 	}
@@ -152,43 +159,60 @@ public class IdBasedAlignerStep extends BasePipelineStep {
 
 	@Override
 	protected Event handleTextUnit(Event sourceEvent) {
+		int score = 100;
+		
+		if (sourceEvent.getTextUnit().getSource().hasBeenSegmented()) {
+			throw new OkapiBadStepInputException("IdBasedAlignerStep only aligns unsegmented TextUnits");
+		}
+
 		ITextUnit sourceTu = sourceEvent.getTextUnit();
-//		ITextUnit targetTu = null;
 
 		// Skip non-translatable and empty
 		if (!sourceTu.isTranslatable() || sourceTu.isEmpty()) {
 			return sourceEvent;
 		}
-
 		// Populate the target TU
-		ITextUnit alignedTextUnit = sourceTu.clone();
-		TextContainer targetTC = sourceTu.getSource();
-				
-		if (targetInput != null) {
+		ITextUnit alignedTextUnit = sourceTu.clone();		
+		
+		TextContainer targetTC = alignedTextUnit.createTarget(targetLocale, false, IResource.COPY_PROPERTIES);
+		
+		// Use the target text, if it exists
+		ITextUnit targetTu = targetTextUnitMap.get(sourceTu.getName());
+		if (targetTu != null) {			
 			// align codes (assume filter as numbered them correctly)										
-			sourceTu.getSource().getFirstContent().alignCodeIds(targetTC.getFirstContent());		
+			alignedTextUnit.getSource().getFirstContent().alignCodeIds(targetTu.getSource().getFirstContent());		
 			
 			// adjust codes to match new source
-			TextFragment atf = TextUnitUtil.copySrcCodeDataToMatchingTrgCodes(
-					sourceTu.getSource().getUnSegmentedContentCopy(),
-					targetTC.getUnSegmentedContentCopy(), 
-					true, false, null, sourceTu);
-			targetTC.setContent(atf);
-
-			// Use the target text, if it exists
-			if (targetTextUnitMap.containsKey(sourceTu.getName())) {
-//				targetTu = targetTextUnitMap.get(sourceTu.getName());
-				alignedTextUnit.setTarget(targetLocale, targetTC);
-			}
-			else {
-				logger.warning("String is missing from the target: " + sourceTu.getName());
-				if ( params.getReplaceWithSource()) {
-					// Use the source text if there is no target
-					alignedTextUnit.setTarget(targetLocale, sourceTu.getSource());
-				}
+			TextFragment tf = TextUnitUtil.copySrcCodeDataToMatchingTrgCodes(
+					sourceTu.getSource().getFirstContent(),
+					targetTu.getSource().getFirstContent(), 
+					true, false, null, alignedTextUnit);									
+			
+			if (params.isCopyToTarget()) {				
+				targetTC.setContent(tf);							
+			}			
+			
+			if (params.isStoreAsAltTranslation()) {
+				// make an AltTranslation and attach to the target container
+				AltTranslation alt = new AltTranslation(sourceLocale, targetLocale, 
+						alignedTextUnit.getSource().getUnSegmentedContentCopy(), 
+						null, tf, MatchType.EXACT_UNIQUE_ID, score, getName());
+								
+				// add the annotation to the target container since we are diffing paragraphs only
+				// we may need to create the target if it doesn't exist
+				AltTranslationsAnnotation alta = TextUnitUtil.addAltTranslation(targetTC, alt);
+				// resort AltTranslation in case we already had some in the list
+				alta.sort();
 			}
 		}
-
+		else {
+			LOGGER.warning("Missing target string for: " + sourceTu.getName());
+			if ( params.getReplaceWithSource()) {
+				// Use the source text if there is no target
+				alignedTextUnit.setTarget(targetLocale, sourceTu.getSource());
+			}
+		}
+		
 		// Send the aligned TU to the TMX file or pass it on
 		if (params.getGenerateTMX()) {
 			tmx.writeTUFull(alignedTextUnit);
@@ -209,8 +233,19 @@ public class IdBasedAlignerStep extends BasePipelineStep {
 			while (filter.hasNext()) {
 				final Event event = filter.next();
 				if (event.getEventType() == EventType.TEXT_UNIT) {
-					// TODO: Error checking: Does the TU have a Name?
-					// TODO: Error checking: Is there already an element with this Name?
+					// check  if we have a name value
+					if (event.getTextUnit().getName() == null) {
+						LOGGER.warning("Missing id (name value) Skipping...");
+						continue;
+					}
+					
+					// check if we have a duplicate name
+					if (targetTextUnitMap.get(event.getTextUnit().getName()) != null) {
+						LOGGER.warning("Duplicate entry for: " + event.getTextUnit().getName() + " Skipping...");
+						continue;
+					}
+					
+					// safe to continue storing the match
 					targetTextUnitMap.put(event.getTextUnit().getName(), event.getTextUnit());
 				}
 			}

@@ -370,21 +370,19 @@ public class DiffLeverageStep extends BasePipelineStep {
 				if (!params.isDiffOnly()) {
 					if (params.getFuzzyThreshold() < 100) {
 						score = (int) Util.calculateNgramDiceCoefficient(
-								oldTu.getSource().getUnSegmentedContentCopy().toString(), 
-								newTu.getSource().getUnSegmentedContentCopy().toString(), tokenizer);
+								oldTu.getSource().getFirstContent().toString(), 
+								newTu.getSource().getFirstContent().toString(), tokenizer);
 					}
 					
 					// We force the source to be a paragraph!! We use getUnSegmentedContentCopy
 					// to make sure we get *all* TextParts (just in case segmentation has been applied
 					// or  somehow extra TextParts were added in an external process)
 					
-					// create code ids, align codes and copy source code data to target
-
-					// call renumberCodes just in case upstream filter did not do it!!										
+					// align codes and copy source code data to target										
 					newTu.getSource().getFirstContent().alignCodeIds(otc.getFirstContent());					
 					TextFragment atf = TextUnitUtil.copySrcCodeDataToMatchingTrgCodes(						
-							newTu.getSource().getUnSegmentedContentCopy(),
-							otc.getUnSegmentedContentCopy(), 
+							newTu.getSource().getFirstContent(),
+							otc.getFirstContent(), 
 							true, false, null, newTu);
 					otc.setContent(atf);
 				
