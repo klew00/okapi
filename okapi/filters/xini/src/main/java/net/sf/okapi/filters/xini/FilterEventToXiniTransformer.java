@@ -1,18 +1,18 @@
 /*===========================================================================
   Copyright (C) 2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
-  This library is free software; you can redistribute it and/or modify it 
-  under the terms of the GNU Lesser General Public License as published by 
-  the Free Software Foundation; either version 2.1 of the License, or (at 
+  This library is free software; you can redistribute it and/or modify it
+  under the terms of the GNU Lesser General Public License as published by
+  the Free Software Foundation; either version 2.1 of the License, or (at
   your option) any later version.
 
-  This library is distributed in the hope that it will be useful, but 
-  WITHOUT ANY WARRANTY; without even the implied warranty of 
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
+  This library is distributed in the hope that it will be useful, but
+  WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser
   General Public License for more details.
 
-  You should have received a copy of the GNU Lesser General Public License 
-  along with this library; if not, write to the Free Software Foundation, 
+  You should have received a copy of the GNU Lesser General Public License
+  along with this library; if not, write to the Free Software Foundation,
   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
@@ -24,19 +24,20 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.filters.xini.jaxb.Element;
-import net.sf.okapi.filters.xini.jaxb.Empty;
 import net.sf.okapi.filters.xini.jaxb.EndPlaceHolder;
 import net.sf.okapi.filters.xini.jaxb.Field;
 import net.sf.okapi.filters.xini.jaxb.Fields;
@@ -47,6 +48,7 @@ import net.sf.okapi.filters.xini.jaxb.PlaceHolder;
 import net.sf.okapi.filters.xini.jaxb.PlaceHolderType;
 import net.sf.okapi.filters.xini.jaxb.Seg;
 import net.sf.okapi.filters.xini.jaxb.StartPlaceHolder;
+import net.sf.okapi.filters.xini.jaxb.Trans;
 import net.sf.okapi.filters.xini.jaxb.Xini;
 import net.sf.okapi.filters.xini.jaxb.Page.Elements;
 
@@ -102,30 +104,15 @@ public class FilterEventToXiniTransformer {
 
 		// Get the source container
 		TextContainer textContainer = tu.getSource();
+		Set<LocaleId> targetLocals = tu.getTargetLocales();
 
 		// Skip non-translatable TextUnits
 		if ( !tu.isTranslatable() ) {
 			return;
 		}
 
-		// Create XML elements
-		Element element = objectFactory.createElement();
-		Element.ElementContent elementContent = objectFactory.createElementElementContent();
-		Fields fields = objectFactory.createFields();
-		Field field = objectFactory.createField();
-		
-		// Connect XML elements
-		currentPage.getElements().getElement().add(element);
-		element.setElementContent(elementContent);
-		elementContent.setFields(fields);
-		fields.getField().add(field);
-		
-		// Set IDs and add meta-data
-		element.setElementID(currentElementId);
-		field.setFieldID(currentFieldId);
-		field.setExternalID(tu.getId());
-		field.setLabel(tu.getName());
-		
+		Field field = prepareXiniStructure(tu);
+
 		int currentSegmentId = 0;
 		StringBuilder emptySegsFlags = new StringBuilder();
 		
@@ -152,11 +139,53 @@ public class FilterEventToXiniTransformer {
 			else {
 				emptySegsFlags.append("1");
 			}
-			
+
+			for (LocaleId trgLoc : targetLocals) {
+				Segment trgSegment = tu.getTargetSegment(trgLoc, okapiSegment.id, false);
+
+				TextFragment trgTextFragment = trgSegment.getContent();
+				if (!trgTextFragment.isEmpty()) {
+					Trans xiniTrans = objectFactory.createTrans();
+					xiniTrans.setSegID(currentSegmentId);
+					xiniTrans.setLanguage(trgLoc.toBCP47());
+					field.getSegAndTrans().add(xiniTrans);
+
+					List<Code> codes = trgTextFragment.getCodes();
+					if (codes.size() > 0)
+						xiniTrans.getContent().addAll(transformInlineTags(
+										trgTextFragment.getCodedText(), codes));
+					else
+						xiniTrans.getContent().add(trgTextFragment.getText());
+				}
+
+			}
+
 			currentSegmentId++;
 		}
 		
 		field.setEmptySegmentsFlags(emptySegsFlags.toString());
+
+	}
+
+	private Field prepareXiniStructure(ITextUnit tu) {
+		// Create XML elements
+		Element element = objectFactory.createElement();
+		Element.ElementContent elementContent = objectFactory.createElementElementContent();
+		Fields fields = objectFactory.createFields();
+		Field field = objectFactory.createField();
+
+		// Connect XML elements
+		currentPage.getElements().getElement().add(element);
+		element.setElementContent(elementContent);
+		elementContent.setFields(fields);
+		fields.getField().add(field);
+
+		// Set IDs and add meta-data
+		element.setElementID(currentElementId);
+		field.setFieldID(currentFieldId);
+		field.setExternalID(tu.getId());
+		field.setLabel(tu.getName());
+		return field;
 	}
 
 	private ArrayList<Serializable> transformInlineTags(String codedText, List<Code> codes) {
