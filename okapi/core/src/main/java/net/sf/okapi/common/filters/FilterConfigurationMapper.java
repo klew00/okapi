@@ -549,15 +549,15 @@ public class FilterConfigurationMapper extends ParametersEditorMapper implements
 			filter.setFilterConfigurationMapper(this);
 		}
 		catch ( InstantiationException e ) {
-			LOGGER.warning(String.format("Cannot instantiate the filter '%s'.", filterClass));
+			LOGGER.warning(String.format("Cannot instantiate the filter '%s'. (InstantiationException)", filterClass));
 			return null;
 		}
 		catch ( IllegalAccessException e ) {
-			LOGGER.warning(String.format("Cannot instantiate the filter '%s'.", filterClass));
+			LOGGER.warning(String.format("Cannot instantiate the filter '%s'. (IllegalAccessException)", filterClass));
 			return null;
 		}
 		catch ( ClassNotFoundException e ) {
-			LOGGER.warning(String.format("Cannot instantiate the filter '%s'.", filterClass));
+			LOGGER.warning(String.format("Cannot instantiate the filter '%s'. (ClassNotFoundException)", filterClass));
 			return null;
 		}
 		
