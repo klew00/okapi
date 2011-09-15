@@ -277,7 +277,7 @@ public class Repository implements IRepository {
 				+ "\""+DbUtil.TEXT_PREFIX+lang+"\" VARCHAR,"
 				+ "\""+DbUtil.CODES_PREFIX+lang+"\" VARCHAR"
 				+ ")");
-
+			
 			// Update the TMLIST
 			pstm = conn.prepareStatement("INSERT INTO TMLIST (UUID,NAME,DESCRIPTION) VALUES(?,?,?)");
 			uuid = UUID.randomUUID().toString();
@@ -357,6 +357,7 @@ public class Repository implements IRepository {
 			}
 			stm = conn.createStatement();
 			stm.execute(tmp.toString());
+
 			// Update the live list of existing fields
 			existingFields.addAll(newFields.keySet());
 		}

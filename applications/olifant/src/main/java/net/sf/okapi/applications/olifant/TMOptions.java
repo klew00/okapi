@@ -18,27 +18,33 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.lib.tmdb;
+package net.sf.okapi.applications.olifant;
 
-import java.util.List;
+import java.util.ArrayList;
 
-public interface IRecord {
+public class TMOptions {
 
-	public long getKey ();
+	private long pageSize;
+	private ArrayList<String> visibleFields;
 	
-	public boolean getFlag ();
+	public TMOptions () {
+		pageSize = 500;
+	}
 	
-	public void setFlag (boolean flag);
+	public long getPageSize () {
+		return pageSize;
+	}
 	
-	public List<Object> getFields ();
+	public void setPageSize (long pageSize) {
+		this.pageSize = pageSize;
+	}
 	
-	public Object get (int index);
+	public ArrayList<String> getVisibleFields () {
+		return visibleFields;
+	}
 	
-	public void set (int index,
-		Object value);
-	
-	public void add (Object value);
-	
-	public int size ();
-	
+	public void setVisibleFields (ArrayList<String> visibleFields) {
+		this.visibleFields = visibleFields;
+	}
+
 }

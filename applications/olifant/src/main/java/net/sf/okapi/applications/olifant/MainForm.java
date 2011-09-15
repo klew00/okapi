@@ -608,4 +608,7 @@ public class MainForm {
 		}
 	}
 
+	IFilterConfigurationMapper getFCMapper () {
+		return fcMapper;
+	}
 }

@@ -20,12 +20,18 @@
 
 package net.sf.okapi.applications.olifant;
 
+import java.io.File;
+import java.net.URI;
+import java.util.ArrayList;
+
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.ResourceManager;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.lib.tmdb.IRepository;
 import net.sf.okapi.lib.tmdb.ITm;
+import net.sf.okapi.lib.ui.editor.InputDocumentDialog;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
@@ -53,6 +59,8 @@ class RepositoryPanel extends Composite {
 	private Button btNewTM;
 	private Label stListTitle;
 	private IRepository repo;
+	private MenuItem miContextEditTMOptions;
+	private MenuItem miContextImportFile;
 	private MenuItem miContextDeleteTM;
 	private MenuItem miContextRenameTM;
 
@@ -112,15 +120,35 @@ class RepositoryPanel extends Composite {
 		// Context menu for the list
 		Menu contextMenu = new Menu(getShell(), SWT.POP_UP);
 		
+		miContextEditTMOptions = new MenuItem(contextMenu, SWT.PUSH);
+		rm.setCommand(miContextEditTMOptions, "repository.edittmoptions"); //$NON-NLS-1$
+		miContextEditTMOptions.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				editTmOptions(null); // selected TM
+            }
+		});
+		
+		new MenuItem(contextMenu, SWT.SEPARATOR);
+		
+		miContextImportFile = new MenuItem(contextMenu, SWT.PUSH);
+		rm.setCommand(miContextImportFile, "repository.import"); //$NON-NLS-1$
+		miContextImportFile.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				importDocument(null); // In the selected TM
+            }
+		});
+
+		new MenuItem(contextMenu, SWT.SEPARATOR);
+		
 		miContextDeleteTM = new MenuItem(contextMenu, SWT.PUSH);
-		rm.setCommand(miContextDeleteTM, "repository.deleteTM"); //$NON-NLS-1$
+		rm.setCommand(miContextDeleteTM, "repository.deletetm"); //$NON-NLS-1$
 		miContextDeleteTM.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				deleteTm(null); // selected TM
             }
 		});
 		miContextRenameTM = new MenuItem(contextMenu, SWT.PUSH);
-		rm.setCommand(miContextRenameTM, "repository.renameTM"); //$NON-NLS-1$
+		rm.setCommand(miContextRenameTM, "repository.renametm"); //$NON-NLS-1$
 		miContextRenameTM.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				renameTm(null); // selected TM
@@ -365,6 +393,7 @@ class RepositoryPanel extends Composite {
 
 	void updateRepositoryCommands () {
 		boolean hasOneTm = tmList.getItemCount()>0;
+		miContextEditTMOptions.setEnabled(hasOneTm);
 		miContextDeleteTM.setEnabled(hasOneTm);
 		miContextRenameTM.setEnabled(hasOneTm);
 	}
@@ -434,6 +463,96 @@ class RepositoryPanel extends Composite {
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(getShell(), e.getMessage(), null);
+		}
+	}
+
+	private void editTmOptions (String tmName)
+	{
+		try {
+			// If tmName is null use the current selection
+			if ( tmName == null ) {
+				int n = tmList.getSelectionIndex();
+				if ( n < 0 ) return;
+				tmName = tmList.getItem(n);
+			}
+
+			ITm tm = null;
+			TmPanel tp = mainForm.findTmTab(tmName, false);
+			if ( tp != null ) {
+				tm = tp.getTm();
+			}
+			else {
+				tm = repo.openTm(tmName);
+			}
+			
+			ArrayList<Object> data = new ArrayList<Object>();
+			data.add(tm.getPageSize());
+			
+			TMOptionsForm dlg = new TMOptionsForm(getShell(), data);
+			Object[]res = dlg.showDialog();
+			if ( res == null ) return;
+			
+			if ( tp != null ) {
+				tm.setPageSize((Long)res[0]);
+			}
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(getShell(), "Error editing TM options.\n"+e.getMessage(), null);
+		}
+		finally {
+			// Update the display
+			resetRepositoryUI(0);
+			updateRepositoryStatus();
+		}
+	}
+	
+	private void importDocument (String tmName) {
+		try {
+			// If tmName is null use the current selection
+			if ( tmName == null ) {
+				int n = tmList.getSelectionIndex();
+				if ( n < 0 ) return;
+				tmName = tmList.getItem(n);
+			}
+
+			// Get the file to import
+			String[] paths = Dialogs.browseFilenames(getShell(), "Import File into "+tmName, false, null, null, null);
+			if ( paths == null ) return;
+			
+			InputDocumentDialog dlg = new InputDocumentDialog(getShell(), "Document to import into "+tmName,
+				mainForm.getFCMapper(), false);
+			// Lock the locales if we have already documents in the session
+			dlg.setLocalesEditable(true);
+			// Set default data
+			dlg.setData(paths[0], null, "UTF-8", LocaleId.ENGLISH, LocaleId.FRENCH);
+			// Edit configuration
+			Object[] data = dlg.showDialog();
+			if ( data == null ) return; // Cancel
+
+			// Get the Tab and TM data
+			TmPanel tp = mainForm.findTmTab(tmName, true);
+			if ( tp == null ) {
+				ITm tm = repo.openTm(tmName);
+				tp = mainForm.addTmTabEmpty(tm);
+				if ( tp == null ) return;
+				// Now the tab should exist
+				mainForm.findTmTab(tmName, true);
+				tp.resetTmDisplay();
+			}
+			
+			// Create the raw document to add to the session
+			URI uri = (new File((String)data[0])).toURI();
+			RawDocument rd = new RawDocument(uri, (String)data[2], (LocaleId)data[3], (LocaleId)data[4]);
+			rd.setFilterConfigId((String)data[1]);
+			
+			// Start the import thread
+			Importer imp = new Importer(mainForm.getFCMapper(), tp.getTm(), rd, tp.getLog());
+			imp.addObserver(tp);
+			tp.startThread(new Thread(imp));
+			mainForm.updateCommands();
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(getShell(), "Error adding document.\n"+e.getMessage(), null);
 		}
 	}
 

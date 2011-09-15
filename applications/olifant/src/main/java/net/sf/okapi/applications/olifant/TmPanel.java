@@ -34,6 +34,8 @@ import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Rectangle;
@@ -55,12 +57,12 @@ class TmPanel extends Composite implements IObserver {
 	private final LogPanel logPanel;
 	private ITm tm;
 	private int currentEntry;
-	private ArrayList<String> visibleFields;
 	private StatusBar statusBar;
 	private Thread workerThread;
 	private MainForm mainForm;
 	private int srcCol; // Column in the table that holds the source text, use -1 for none, 0-based, 1=SegKey+Flag
 	private int trgCol; // Column in the table that holds the target text, use -1 for none, 0-based, 1=SegKey+Flag
+	private TMOptions opt;
 
 	public TmPanel (MainForm mainForm,
 		Composite parent,
@@ -72,6 +74,8 @@ class TmPanel extends Composite implements IObserver {
 		this.mainForm = mainForm;
 		this.tm = tm;
 		this.statusBar = statusBar;
+		
+		opt = new TMOptions();
 		
 		srcCol = -1;
 		trgCol = -1;
@@ -145,6 +149,12 @@ class TmPanel extends Composite implements IObserver {
             }
 		});
 
+		table.addKeyListener(new KeyAdapter() {
+			public void keyPressed(KeyEvent e) {
+				checkPage(e.keyCode, e.stateMask);
+			}
+		});
+		
 		// Create the first column (always present)
 		TableColumn col = new TableColumn(table, SWT.NONE);
 		col.setText("Flag/SegKey");
@@ -181,19 +191,23 @@ class TmPanel extends Composite implements IObserver {
 	boolean hasRunningThread () {
 		return (( workerThread != null ) && workerThread.isAlive() );
 	}
+
+	void setTmOptions (TMOptions opt) {
+		this.opt = opt;
+	}
 	
 	void editColumns () {
 		try {
-			ColumnsForm dlg = new ColumnsForm(getShell(), tm, visibleFields);
+			ColumnsForm dlg = new ColumnsForm(getShell(), tm, opt.getVisibleFields());
 			ArrayList<String> res = dlg.showDialog();
 			if ( res == null ) return;
 			
-			visibleFields = res;
+			opt.setVisibleFields(res);
 			//TODO Set the columns with the source and target
 			srcCol = -1;
 			trgCol = -1;
 			int n = 1;
-			for ( String fn : visibleFields ) {
+			for ( String fn : opt.getVisibleFields() ) {
 				if ( fn.startsWith(DbUtil.TEXT_PREFIX) ) {
 					if ( srcCol == -1 ) srcCol = n;
 					else if ( trgCol == -1 ) trgCol = n;
@@ -211,17 +225,19 @@ class TmPanel extends Composite implements IObserver {
 		srcCol = -1;
 		trgCol = -1;
 		// By default: all and only text fields are visible
-		visibleFields = new ArrayList<String>();
+		opt.setVisibleFields(new ArrayList<String>());
+		
 		int n = 1; // SEGKEY and FLAG are there by default
 		for ( String fn : tm.getAvailableFields() ) {
 			if ( fn.startsWith(DbUtil.TEXT_PREFIX) ) {
-				visibleFields.add(fn);
+				opt.getVisibleFields().add(fn);
 				if ( srcCol == -1 ) srcCol = n;
 				else if ( trgCol == -1 ) trgCol = n;
 				n++;
 			}
 		}
 
+		tm.setPageSize(opt.getPageSize());
 		// Update the visible fields
 		updateVisibleFields();
 	}
@@ -230,14 +246,14 @@ class TmPanel extends Composite implements IObserver {
 		try {
 			table.setRedraw(false);
 			// Indicate to the TM back-end which fields the UI wants
-			tm.setRecordFields(visibleFields);
+			tm.setRecordFields(opt.getVisibleFields());
 			// Remove all variable columns
 			int n;
 			while ( (n = table.getColumnCount()) > 1 ) {
 				table.getColumns()[n-1].dispose();
 			}
 			// Add the new ones
-			for ( String fn : visibleFields ) {
+			for ( String fn : opt.getVisibleFields() ) {
 				TableColumn col = new TableColumn(table, SWT.NONE);
 				col.setText(fn);
 				col.setWidth(150);
@@ -249,7 +265,7 @@ class TmPanel extends Composite implements IObserver {
 		finally {
 			table.setRedraw(true);
 		}
-		fillTable(0);
+		fillTable(0, 0);
 	}
 	
 	@Override
@@ -263,12 +279,66 @@ class TmPanel extends Composite implements IObserver {
 		super.dispose();
 	}
 
-	void updatePage () {
-		int newEntry = table.getSelectionIndex();
-		boolean moveDown = ((newEntry-currentEntry) > 0);
-		if ( newEntry >= table.getItemCount() ) {
-			fillTable(1);
-			
+	// To call before currentEntry is updated to the upcoming value
+	void checkPage (int keyCode,
+		int stateMask)
+	{
+		int direction = -1;
+		int selection = 0;
+		int n = table.getSelectionIndex();
+
+		switch ( keyCode ) {
+		case SWT.ARROW_DOWN:
+			if ( n == table.getItemCount()-1 ) {
+				direction = 1;
+			}
+			break;
+		case SWT.PAGE_DOWN:
+			if ( (stateMask & SWT.CTRL) != 0 ) {
+				// Ctrl+PageDown goes to the next page
+				direction = 1;
+			}
+			else if ( n == table.getItemCount()-1 ) {
+				// PageDown goes to the next page only if 
+				// the current selection is the last row of the current page 
+				direction = 1;
+			}
+			break;
+		case SWT.ARROW_UP:
+			if ( n == 0 ) {
+				direction = 2;
+				selection = -1;
+			}
+			break;
+		case SWT.PAGE_UP:
+			if ( (stateMask & SWT.CTRL) != 0 ) {
+				// Ctrl+PageUp goes to the previous page
+				direction = 2;
+				selection = -1;
+			}
+			else if ( n == 0 ) {
+				// PageUp goes to the previous page only if 
+				// the current selection is the first row of the current page 
+				direction = 2;
+				selection = -1;
+			}
+			break;
+		case SWT.HOME:
+			if ( n == 0 ) {
+				direction = 0;
+			}
+			break;
+		case SWT.END:
+			if ( n == table.getItemCount()-1 ) {
+				direction = 3;
+				selection = -1;
+			}
+			break;
+		}
+
+		if ( direction > -1 ) {
+			saveEntry();
+			fillTable(direction, selection);
 		}
 	}
 	
@@ -306,14 +376,14 @@ class TmPanel extends Composite implements IObserver {
 	
 	/**
 	 * Fills the table with a new page
-	 * @param direction 0=from the top, 1=next, 2=previous
+	 * @param direction 0=from the top, 1=next, 2=previous, 3=last
+	 * @param selection 0=top, -1=last
 	 */
-	void fillTable (int direction) {
+	void fillTable (int direction,
+		int selection)
+	{
 		try {
-			table.removeAll();
-			currentEntry = -1;
-			
-			ResultSet rs;
+			ResultSet rs = null;
 			switch ( direction ) {
 			case 0:
 				rs = tm.getFirstPage();
@@ -324,22 +394,30 @@ class TmPanel extends Composite implements IObserver {
 			case 2:
 				rs = tm.getPreviousPage();
 				break;
-			default:
+			case 3:
 				rs = tm.getLastPage();
 				break;
 			}
+			if ( rs == null ) {
+				// No move of the page, leave things as they are
+				return;
+			}
+			
+			table.removeAll();
+			currentEntry = -1;
 			
 			while ( rs.next() ) {
 				TableItem item = new TableItem(table, SWT.NONE);
 				item.setText(0, String.format("%d", rs.getLong(ITm.SEGKEY_FIELD)));
 				item.setChecked(rs.getBoolean(ITm.FLAG_FIELD));
-				for ( int i=0; i<visibleFields.size(); i++ ) {
+				for ( int i=0; i<opt.getVisibleFields().size(); i++ ) {
 					// +2 because the result set has always seg-key and flag (and 1-based index)
 					item.setText(i+1, rs.getString(i+3)==null ? "" : rs.getString(i+3));
 				}
 			}
 			if ( table.getItemCount() > 0 ) {
-				table.setSelection(0);
+				if ( selection == -1 ) table.setSelection(table.getItemCount()-1);
+				else table.setSelection(0);
 				updateCurrentEntry();
 			}
 		}

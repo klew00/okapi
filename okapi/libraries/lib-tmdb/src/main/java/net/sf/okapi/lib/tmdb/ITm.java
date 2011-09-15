@@ -107,6 +107,8 @@ public interface ITm {
 	 */
 	public void setPageSize (long size);
 	
+	public long getPageSize ();
+	
 	public void moveBeforeFirstPage ();
 	
 	/**

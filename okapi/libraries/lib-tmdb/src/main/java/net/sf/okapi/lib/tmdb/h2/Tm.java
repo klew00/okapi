@@ -39,16 +39,19 @@ public class Tm implements ITm {
 	private String name;
 	private String uuid;
 	private PreparedStatement pstmGet;
-	private long offset = 0;
+
 	private long limit = 30;
-	private long currentRowCount = 0;
+	private boolean needPagingRefresh = true; // Must be set to true anytime we change the row count
+	private long totalRows;
+	private long pageCount;
+	private long currentPage = -1; // 0-based
+	private boolean pagingWithMethod = true;
 
 	private PreparedStatement pstmAddSeg;
 	private PreparedStatement pstmAddTu;
 	private ArrayList<String> existingTuFields;
 	private ArrayList<String> existingSegFields;
 	private LinkedHashMap<String, Object> fieldsToImport;
-	
 	
 	public Tm (Repository store,
 		String uuid,
@@ -152,7 +155,10 @@ public class Tm implements ITm {
 				}
 				tmp.append(" FROM \""+name+"_SEG\"");
 			}
-			tmp.append(" LIMIT ? OFFSET ?");
+			
+			//old tmp.append(" ORDER BY SegKey LIMIT ? OFFSET ?");
+			tmp.append(" WHERE SegKey>=? ORDER BY SegKey LIMIT ?");
+
 			pstmGet = store.getConnection().prepareStatement( tmp.toString(),
 				ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 		}
@@ -161,67 +167,21 @@ public class Tm implements ITm {
 		}
 	}
 
-	private ResultSet getPage (long start) {
-		if ( start < 0 ) return null;
-		ResultSet result = null;
-		try {
-			pstmGet.setLong(1, limit);
-			pstmGet.setLong(2, start);
-			result = pstmGet.executeQuery();
-			// Get the size of the page
-			if ( result.last() ) {
-				currentRowCount = result.getRow();
-			}
-			else {
-				currentRowCount = 0;
-			}
-			result.beforeFirst(); // Reset the current row
-			if ( currentRowCount < limit ) offset = -1; // Last or first page
-			else offset = start;
-		}
-		catch ( SQLException e ) {
-			throw new RuntimeException(e);
-		}
-		return result;
-	}
-
 	public void moveBeforeFirstPage () {
-		offset = 0;
+		currentPage = -1;
 	}
 	
-	@Override
-	public ResultSet getFirstPage () {
-		offset = 0;
-		return getPage(offset);
-	}
-
-	@Override
-	public ResultSet getLastPage () {
-		// TODO Auto-generated method stub
-//		offset = last row of query
-//		offset -= pageSize;
-		if ( offset < 0 ) offset = 0;
-		return null;
-	}
-
-	@Override
-	public ResultSet getNextPage () {
-		// First row of next page is last of the current one
-		return getPage(offset += (currentRowCount-1));
-	}
-
-	@Override
-	public ResultSet getPreviousPage () {
-		// Last row of previous page is first of the current one
-		long start = offset - (limit-1);
-		if ( start < 0 ) start = 0;
-		return getPage(start);
-	}
-
 	@Override
 	public void setPageSize (long size) {
 		if ( size < 2 ) this.limit = 2;
 		else this.limit = size;
+		// We changed the number of rows
+		needPagingRefresh = true;
+	}
+	
+	@Override
+	public long getPageSize () {
+		return limit;
 	}
 	
 	private boolean isSegmentField (String name) {
@@ -286,6 +246,9 @@ public class Tm implements ITm {
 				fillStatement(true, segFields, tuKey);
 				pstmAddSeg.executeUpdate();
 			}
+			
+			// We changed the number of rows
+			needPagingRefresh = true;
 		}
 		catch ( SQLException e ) {
 			throw new RuntimeException(e);
@@ -448,7 +411,7 @@ public class Tm implements ITm {
 						pstmAddTu.close();
 					}
 					StringBuilder tmp;
-					if ( !Util.isEmpty(fieldsToCreate) ) {
+					if ( !Util.isEmpty(fieldsToImport) ) {
 						boolean first = true;
 						int count = 0;
 						tmp = new StringBuilder("INSERT INTO \""+name+"_TU\" (");
@@ -485,5 +448,81 @@ public class Tm implements ITm {
 	@Override
 	public List<String> getLocales () {
 		return store.getTmLocales(name);
+	}
+
+	@Override
+	public ResultSet getFirstPage () {
+		checkPagingVariables();
+		currentPage = 0;
+		return getPage2(getFirstKeySegValueForPage(currentPage));
+	}
+
+	@Override
+	public ResultSet getLastPage () {
+		checkPagingVariables();
+		currentPage = pageCount-1;
+		return getPage2(getFirstKeySegValueForPage(currentPage));
+	}
+
+	@Override
+	public ResultSet getNextPage () {
+		checkPagingVariables();
+		if ( currentPage >= pageCount-1 ) return null; // Last page reached
+		currentPage++;
+		return getPage2(getFirstKeySegValueForPage(currentPage));
+	}
+
+	@Override
+	public ResultSet getPreviousPage () {
+		checkPagingVariables();
+		if ( currentPage <= 0 ) return null; // First page reached
+		currentPage--;
+		return getPage2(getFirstKeySegValueForPage(currentPage));
+	}
+
+	private void checkPagingVariables () {
+		// Do we need to re-compute the paging variables
+		if ( !needPagingRefresh ) return;
+		
+		totalRows = store.getTotalSegmentCount(name);
+		if ( totalRows < 1 ) {
+			pageCount = 0;
+		}
+		else {
+			pageCount = (totalRows-1) / (limit-1); // -1 for overlap
+			if ( (totalRows-1) % (limit-1) > 0 ) pageCount++; // Last page
+		}
+		pagingWithMethod = true;
+		
+		currentPage = -1;
+		needPagingRefresh = false; // Stable until we add or delete rows or change the page-size
+		//TODO: handle sort on other fields
+	}
+	
+	private ResultSet getPage2 (long topSegKey) {
+		if ( topSegKey < 1 ) return null;
+		ResultSet result = null;
+		try {
+			pstmGet.setLong(1, topSegKey);
+			pstmGet.setLong(2, limit);
+			result = pstmGet.executeQuery();
+		}
+		catch ( SQLException e ) {
+			throw new RuntimeException(e);
+		}
+		return result;
+	}
+
+	private long getFirstKeySegValueForPage (long page) {
+		if ( pagingWithMethod ) {
+			// Used if the sort is on the SegKey
+			if ( page == 0 ) return 1;
+			return (page * (limit-1)) + 1;
+		}
+		else {
+			// Get the key from a pre-computed list
+			//TODO
+			return 1;
+		}
 	}
 }

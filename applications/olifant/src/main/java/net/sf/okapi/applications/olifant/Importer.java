@@ -65,7 +65,9 @@ public class Importer extends ObservableRunnable {
 			LinkedHashMap<String, Object> map = new LinkedHashMap<String, Object>();
 			String[] trgFields;
 			String srcDbLang = DbUtil.toDbLang(rd.getSourceLocale());
-			
+
+//TODO: implement check for duplicates
+//TODO: implement filter for fields
 			tm.startImport();
 			while ( filter.hasNext() ) {
 				Event event = filter.next();
