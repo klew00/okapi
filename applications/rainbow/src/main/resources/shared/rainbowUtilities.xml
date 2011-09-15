@@ -8,7 +8,7 @@
   editorClass="net.sf.okapi.applications.rainbow.utilities.extraction.Editor"
   updateUri="http://okapi.opentag.com/updates.html">
   <info>
-   <name>Translation Package Creation</name>
+   <name>Translation Package Creation (Old)</name>
    <description>Creates a translation package.</description>
    <provider>Okapi Framework</provider>
   </info>
@@ -25,7 +25,7 @@
   pluginClass="net.sf.okapi.applications.rainbow.utilities.merging.Utility"
   updateUri="http://okapi.opentag.com/updates.html">
   <info>
-   <name>Translation Package Post-Processing</name>
+   <name>Translation Package Post-Processing (Old)</name>
    <description>Post-processes translation packages.</description>
    <provider>Okapi Framework</provider>
   </info>
