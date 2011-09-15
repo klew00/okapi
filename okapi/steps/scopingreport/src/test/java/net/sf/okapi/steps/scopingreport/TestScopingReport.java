@@ -304,7 +304,7 @@ public class TestScopingReport {
 				"HTML report test",
 				new XBatch(
 //						new XBatchItem(
-//								new URL("file", null, pathBase + "aa324.html"),
+//								new URL("file", null, pathBase + "test2.txt"),
 //								"UTF-8",
 //								EN,
 //								ES),								

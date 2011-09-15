@@ -264,6 +264,12 @@ public class ScopingReportStep extends CompoundStep {
 		return super.handleStartBatch(event);
 	}
 	
+	@Override
+	protected Event handleStartBatchItem(Event event) {
+		resolver.reset();
+		return super.handleStartBatchItem(event);
+	}
+	
 	/**
 	 * Sets per-project fields
 	 */
