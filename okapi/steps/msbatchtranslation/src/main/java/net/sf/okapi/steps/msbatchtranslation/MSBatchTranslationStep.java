@@ -315,7 +315,7 @@ public class MSBatchTranslationStep extends BasePipelineStep {
 						// Determine if we fill the target (first match and it is above threshold) 
 						boolean fill = false;
 						if ( firstMatch && params.getFillTarget() ) {
-							fill = (res.score >= params.getFillTargetThreshold());
+							fill = (res.getCombinedScore() >= params.getFillTargetThreshold());
 						}
 						
 						if ( fill || params.getAnnotate() ) {
@@ -361,7 +361,7 @@ public class MSBatchTranslationStep extends BasePipelineStep {
 					// Determine if we fill the target (first match and it is above threshold) 
 					boolean fill = false;
 					if ( firstMatch && params.getFillTarget() ) {
-						fill = (res.score >= params.getFillTargetThreshold());
+						fill = (res.getCombinedScore() >= params.getFillTargetThreshold());
 					}
 					
 					if ( fill || params.getAnnotate() ) {

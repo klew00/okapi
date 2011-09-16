@@ -359,24 +359,24 @@ public class Database {
 				qr.target.setCodedText(result.getString(3),
 					Code.stringToCodes(result.getString(4)), false);
 				// Non-code text is exactly the same
-				qr.score = 100;
+				qr.setScore(100);
 				qr.matchType = exactMatchType;
 				// Check the codes between query source and found source, if requested
 				if ( penalizeSourceWithDifferentCodes ) {
 					if ( !queryCodes.equals(qr.source.getCodes().toString()) ) {
-						qr.score--; // 99 if there are code difference between codes in query and codes in source
+						qr.setScore(qr.getScore()-1); // 99 if there are code difference between codes in query and codes in source
 						qr.matchType = fuzzyMatchType;
 					}
 				}
 				// Check the codes between query source and found target, if requested
 				if ( penalizeTargetWithDifferentCodes ) {
 					if ( !queryCodes.equals(qr.target.getCodes().toString()) ) {
-						qr.score--;
+						qr.setScore(qr.getScore()-1);
 						qr.matchType = fuzzyMatchType;
 					}
 				}
 				
-				if ( qr.score >= threshold ) {
+				if ( qr.getScore() >= threshold ) {
 					list.add(qr);
 				}
 			} while ( result.next() && ( list.size() < maxCount ));

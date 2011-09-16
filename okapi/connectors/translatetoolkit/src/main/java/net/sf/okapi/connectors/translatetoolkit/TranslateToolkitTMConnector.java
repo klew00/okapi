@@ -185,8 +185,8 @@ public class TranslateToolkitTMConnector extends BaseConnector implements ITMQue
 	        	Map<String, Object> map = (Map<String, Object>)array.get(i);
 	        	qr = new QueryResult();
 	        	qr.weight = getWeight();
-	        	qr.score = ((Double)map.get("quality")).intValue();
-	        	if ( qr.score < threshold ) break; // Done
+	        	qr.setScore(((Double)map.get("quality")).intValue());
+	        	if ( qr.getScore() < threshold ) break; // Done
 	        	
 	        	if ( text.hasCode() && params.getSupportCodes() ) {
 	        		qr.source = fmt.fromLetterCodedToFragment((String)map.get("source"), null);
@@ -198,8 +198,8 @@ public class TranslateToolkitTMConnector extends BaseConnector implements ITMQue
 	        	}
 
 	        	// Set match type
-				if ( qr.score >= 100 ) qr.matchType = MatchType.EXACT;
-				else if ( qr.score > 0 ) qr.matchType = MatchType.FUZZY;
+				if ( qr.getScore() >= 100 ) qr.matchType = MatchType.EXACT;
+				else if ( qr.getScore() > 0 ) qr.matchType = MatchType.FUZZY;
 	        	results.add(qr);
 	        }
 			if ( results.size() > 0 ) current = 0;

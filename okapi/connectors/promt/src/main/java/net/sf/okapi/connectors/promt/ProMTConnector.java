@@ -243,7 +243,7 @@ public class ProMTConnector extends BaseConnector implements IQuery {
 	        			result.target = qutil.fromXLIFF(prepareXLIFF(buffer), frag);
 	        		}
 	        		
-	        		result.score = 95; // Arbitrary score for MT
+	        		result.setScore(95); // Arbitrary score for MT
 	        		result.origin = getName();
 	        		result.matchType = MatchType.MT;
 	    			current = 0;

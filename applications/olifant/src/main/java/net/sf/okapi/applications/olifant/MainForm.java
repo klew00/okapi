@@ -294,6 +294,7 @@ public class MainForm {
 		updateCommands();
 		if ( currentTP == null ) {
 			statusBar.setCounter(-1, 0);
+			statusBar.setPage(-1, 0);
 			statusBar.clearInfo();
 		}
 		else {

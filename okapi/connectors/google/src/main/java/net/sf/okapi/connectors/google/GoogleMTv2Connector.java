@@ -145,7 +145,7 @@ public class GoogleMTv2Connector extends BaseConnector {
 			else {
 				result.target = new TextFragment(util.fromCodedHTML(res, frag, true));
 			}
-			result.score = 95; // Arbitrary score for MT
+			result.setScore(95); // Arbitrary score for MT
 			result.origin = getName();
 			result.matchType = MatchType.MT;
 			current = 0;
@@ -244,7 +244,7 @@ public class GoogleMTv2Connector extends BaseConnector {
 						result.weight = getWeight();
 						result.source = frag;
 						result.target = frag.clone();
-						result.score = 95; // Arbitrary score for MT
+						result.setScore(95); // Arbitrary score for MT
 						result.origin = getName();
 						result.matchType = MatchType.MT;
 						list.add(result);
@@ -266,7 +266,7 @@ public class GoogleMTv2Connector extends BaseConnector {
 		        	else {
 		        		result.target = new TextFragment(util.fromCodedHTML(res, frag, true));
 		        	}
-		        	result.score = 95; // Arbitrary score for MT
+		        	result.setScore(95); // Arbitrary score for MT
 		        	result.origin = getName();
 		        	result.matchType = MatchType.MT;
 		        	list.add(result);

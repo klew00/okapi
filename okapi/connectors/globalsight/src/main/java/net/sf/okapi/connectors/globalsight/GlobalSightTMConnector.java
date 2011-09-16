@@ -184,11 +184,11 @@ public class GlobalSightTMConnector extends BaseConnector implements ITMQuery {
 				list2 = elem.getElementsByTagName("percentage");
 				res = new QueryResult();
 				res.weight = getWeight();
-				res.score = Float.valueOf(Util.getTextContent(list2.item(0)).replace("%", "")).intValue();
-				if ( res.score < threshold ) continue;
+				res.setScore(Float.valueOf(Util.getTextContent(list2.item(0)).replace("%", "")).intValue());
+				if ( res.getScore() < threshold ) continue;
 				
-				if ( res.score >= 100 ) res.matchType = MatchType.EXACT;
-				else if ( res.score > 0 ) res.matchType = MatchType.FUZZY;
+				if ( res.getScore() >= 100 ) res.matchType = MatchType.EXACT;
+				else if ( res.getScore() > 0 ) res.matchType = MatchType.FUZZY;
 				
 				list2 = elem.getElementsByTagName("tm");
 				res.origin = Util.getTextContent(list2.item(0));
@@ -322,8 +322,8 @@ public class GlobalSightTMConnector extends BaseConnector implements ITMQuery {
 				list2 = elem.getElementsByTagName("percentage");
 				res = new QueryResult();
 				res.weight = getWeight();
-				res.score = Float.valueOf(Util.getTextContent(list2.item(0)).replace("%", "")).intValue();
-				if ( res.score < threshold ) continue;
+				res.setScore(Float.valueOf(Util.getTextContent(list2.item(0)).replace("%", "")).intValue());
+				if ( res.getScore() < threshold ) continue;
 				list2 = elem.getElementsByTagName("source");
 				list3 = ((Element)list2.item(0)).getElementsByTagName("segment");
 				res.source = readSegment((Element)list3.item(0), null);

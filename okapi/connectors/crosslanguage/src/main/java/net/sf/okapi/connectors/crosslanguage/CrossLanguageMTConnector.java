@@ -117,7 +117,7 @@ public class CrossLanguageMTConnector extends BaseConnector {
 			result.weight = getWeight();
 			result.source = new TextFragment(text);
 			result.target = new TextFragment(res);
-			result.score = 95; // Arbitrary score for MT
+			result.setScore(95); // Arbitrary score for MT
 			result.origin = getName();
 			result.matchType = MatchType.MT;
 			current = 0;
@@ -161,7 +161,7 @@ public class CrossLanguageMTConnector extends BaseConnector {
 			else {
 				result.target = new TextFragment(util.fromCodedHTML(data, text, true));
 			}
-			result.score = 95; // Arbitrary score for MT
+			result.setScore(95); // Arbitrary score for MT
 			result.origin = getName();
 			result.matchType = MatchType.MT;
 			current = 0;

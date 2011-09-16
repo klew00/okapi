@@ -133,4 +133,9 @@ public interface ITm {
 	 * @return the list of the locales in this TM.
 	 */
 	public List<String> getLocales ();
+	
+	public long getCurrentPage ();
+	
+	public long getPageCount ();
+	
 }

@@ -1,12 +1,10 @@
 package net.sf.okapi.connectors.microsoft;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.query.QueryResult;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextFragment.TagType;
 
 public class Manual {
 
@@ -39,7 +37,7 @@ public class Manual {
 		sources.add(new TextFragment("This is a test"));
 		targets.add(new TextFragment("1"));
 		ratings.add(-10);
-		int res = conn.addTranslationList(sources, targets, ratings);
+		conn.addTranslationList(sources, targets, ratings);
 		
 		
 //		// Query list
@@ -69,7 +67,7 @@ public class Manual {
 		conn.query("This is a test");
 		while ( conn.hasNext() ) {
 			QueryResult qr = conn.next();
-			System.out.println("\nScore = "+String.valueOf(qr.score)+"\n"+qr.source.toText()+"\n"+qr.target.toText());
+			System.out.println("\nScore = "+String.valueOf(qr.getScore())+"\n"+qr.source.toText()+"\n"+qr.target.toText());
 		}
 //		
 //		conn.query("The <span id='1'>big</span> red and blue car. This <span id='2'>is a simple</span> test");

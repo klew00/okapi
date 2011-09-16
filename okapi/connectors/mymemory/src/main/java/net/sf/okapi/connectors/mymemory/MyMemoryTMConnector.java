@@ -163,13 +163,12 @@ public class MyMemoryTMConnector extends BaseConnector implements ITMQuery {
 	    		//else {
 	    			// Check the score
 	    			Double match = ((Double)details.get("match"))*100;
-	    			res.score = match.intValue();
 	    			// To workaround bug in score calculation
 	    			// Score > 100 should be treated as 100 per Alberto's info.
-	    			if (res.score > 100 ) res.score = 100;
+	    			res.setScore(match.intValue() > 100 ? 100 : match.intValue());
 	    		//}
 	    		// Stop if we reach the threshold (we assume things are sorted)
-	    		if ( res.score < getThreshold() ) break;
+	    		if ( res.getScore() < getThreshold() ) break;
 				
 				// Set various data
 	    		res.weight = getWeight();
@@ -177,7 +176,7 @@ public class MyMemoryTMConnector extends BaseConnector implements ITMQuery {
 
 	    		// Set source and target text
 				if ( qutil.hasCode() ) {
-					res.score--;
+					res.setScore(res.getScore()-1);
 					res.source = qutil.createNewFragmentWithCodes((String)details.get("segment"));
 					res.target = qutil.createNewFragmentWithCodes((String)details.get("translation"));
 				}

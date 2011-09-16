@@ -129,7 +129,7 @@ public class GoogleMTConnector extends BaseConnector {
 			else {
 				result.target = new TextFragment(util.fromCodedHTML(res, fragment, true));
 			}
-			result.score = 95; // Arbitrary score for MT
+			result.setScore(95); // Arbitrary score for MT
 			result.origin = getName();
 			result.matchType = MatchType.MT;
 			current = 0;

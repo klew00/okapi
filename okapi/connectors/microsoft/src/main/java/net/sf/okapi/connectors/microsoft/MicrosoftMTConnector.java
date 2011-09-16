@@ -203,7 +203,7 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 			if ( n2 > -1 ) ttext = unescapeXML(res.substring(n1+16, n2));
 			
 			QueryResult qr = new QueryResult();
-			qr.score = score; // Score from the system
+			qr.setScore(score); // Score from the system
 			// Else: continue with that result
 			qr.weight = getWeight();
 			if ( frag.hasCode() ) {

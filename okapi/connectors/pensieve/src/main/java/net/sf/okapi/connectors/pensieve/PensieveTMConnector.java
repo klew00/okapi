@@ -23,7 +23,6 @@ package net.sf.okapi.connectors.pensieve;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
-import net.sf.okapi.common.exceptions.OkapiNotImplementedException;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.lib.translation.BaseConnector;
 import net.sf.okapi.lib.translation.ITMQuery;
@@ -185,7 +184,7 @@ public class PensieveTMConnector extends BaseConnector implements ITMQuery {
 			Float f = hit.getScore();
 			QueryResult qr = new QueryResult();
 			qr.weight = getWeight();
-			qr.score = f.intValue();
+			qr.setScore(f.intValue());
 			qr.source = hit.getTu().getSource().getContent();
 			qr.target = hit.getTu().getTarget().getContent();
 			qr.matchType = hit.getMatchType();
@@ -220,7 +219,7 @@ public class PensieveTMConnector extends BaseConnector implements ITMQuery {
 				result.weight = getWeight();
 				result.source = new TextFragment((String)map.get("source"));
 				result.target = new TextFragment((String)map.get("target"));
-				result.score = ((Double)map.get("score")).intValue();
+				result.setScore(((Double)map.get("score")).intValue());
 				result.origin = origin;
 				results.add(result);
 			}

@@ -419,6 +419,7 @@ class TmPanel extends Composite implements IObserver {
 				if ( selection == -1 ) table.setSelection(table.getItemCount()-1);
 				else table.setSelection(0);
 				updateCurrentEntry();
+				statusBar.setPage(tm.getCurrentPage(), tm.getPageCount());
 			}
 		}
 		catch ( Throwable e ) {

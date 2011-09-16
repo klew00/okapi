@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.Composite;
 class StatusBar extends Composite {
 
 	private CLabel      counterLabel;
+	private CLabel      pageLabel;
 	private CLabel      infoLabel;
 	
 	StatusBar (Composite p_Parent,
@@ -42,7 +43,7 @@ class StatusBar extends Composite {
 		gdTmp.horizontalSpan = 3;
 		setLayoutData(gdTmp);
 		
-		GridLayout layout = new GridLayout(2, false);
+		GridLayout layout = new GridLayout(3, false);
 		layout.marginHeight = 0;
 		layout.marginWidth = 0;
 		layout.horizontalSpacing = 2;
@@ -52,6 +53,11 @@ class StatusBar extends Composite {
 		gdTmp = new GridData();
 		gdTmp.widthHint = 120;
 		counterLabel.setLayoutData(gdTmp);
+
+		pageLabel = new CLabel(this, SWT.BORDER | SWT.CENTER);
+		gdTmp = new GridData();
+		gdTmp.widthHint = 200;
+		pageLabel.setLayoutData(gdTmp);
 
 		infoLabel = new CLabel(this, SWT.BORDER);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
@@ -71,5 +77,12 @@ class StatusBar extends Composite {
 	{
 		if ( current < 0 ) counterLabel.setText(""); //$NON-NLS-1$
 		else counterLabel.setText(String.format("%d / %d", current+1, total)); //$NON-NLS-1$
+	}
+	
+	void setPage (long current,
+		long total)
+	{
+		if ( current < 0 ) pageLabel.setText(""); //$NON-NLS-1$
+		else pageLabel.setText(String.format("page %d of %d", current+1, total)); //$NON-NLS-1$
 	}
 }

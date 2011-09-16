@@ -20,6 +20,7 @@
 
 package net.sf.okapi.common.query;
 
+import java.security.InvalidParameterException;
 import java.util.Date;
 
 import net.sf.okapi.common.HashCodeUtil;
@@ -34,6 +35,7 @@ import net.sf.okapi.common.resource.TextFragment;
 public class QueryResult implements Comparable<QueryResult> {
 
 	public static int QUALITY_UNDEFINED = Integer.MIN_VALUE;
+	public static int COMBINEDSCORE_UNDEFINED = Integer.MIN_VALUE;
 	
 	/**
 	 * Convert a QueryResult to an {@link AltTranslation}
@@ -60,7 +62,7 @@ public class QueryResult implements Comparable<QueryResult> {
 	/**
 	 * Score of this result (a value between 0 and 100).
 	 */
-	public int score;
+	private int score;
 
 	/**
 	 * {@link MatchType} of this result.
@@ -98,13 +100,9 @@ public class QueryResult implements Comparable<QueryResult> {
 	 */
 	public String origin;
 	
-	/**
-	 * Quality rating of the translation in this result
-	 * (a value between 0 and 100, or {@link #QUALITY_UNDEFINED} if the value is not defined).
-	 * Each connector is responsible for adjusting the original quality information (if any) to this scale.
-	 */
-	public int quality = QUALITY_UNDEFINED;
-
+	private int quality = QUALITY_UNDEFINED;
+	private int combinedScore = COMBINEDSCORE_UNDEFINED;
+	
 	/**
 	 * Indicator telling if the result is coming from a machine translation
 	 * engine or not.
@@ -114,6 +112,71 @@ public class QueryResult implements Comparable<QueryResult> {
 	 */
 	public boolean fromMT() {
 		return (matchType == MatchType.MT);
+	}
+
+	/** Gets the quality rating of the translation in this result.
+	 * @return A value between 0 and 100, or {@link #QUALITY_UNDEFINED} if no quality rating is set.
+	 */
+	public int getQuality () {
+		return quality;
+	}
+	
+	/**
+	 * Sets the quality rating of the translation in this result
+	 * Each connector is responsible for adjusting the original quality information (if any) to this scale.
+	 * @param quality the new quality value
+	 * (a value between 0 and 100, or {@link #QUALITY_UNDEFINED} if the value is not defined.
+	 * @throws InvalidParameterException if the parameter value is not valid.
+	 */
+	public void setQuality (int quality) {
+		if ((( quality < 0 ) && quality != QUALITY_UNDEFINED ) || ( quality > 100 )) {
+			throw new InvalidParameterException("Invalid quality value.");
+		}
+		this.quality = quality;
+	}
+
+	/**
+	 * Gets the combined score for this result.
+	 * @return the combined score for this result.
+	 * If no combined score is set (default), this returns the normal score.
+	 */
+	public int getCombinedScore () {
+		if ( combinedScore == COMBINEDSCORE_UNDEFINED ) {
+			return score;
+		}
+		return combinedScore;
+	}
+	
+	/**
+	 * Sets the combined score for this result.
+	 * @param combinedScore the new combined score value
+	 * (a value between 0 and 100, or {@link #COMBINEDSCORE_UNDEFINED} if the value is not defined.
+	 */
+	public void setCombinedScore (int combinedScore) {
+		if ((( combinedScore < 0 ) && combinedScore != COMBINEDSCORE_UNDEFINED ) || ( combinedScore > 100 )) {
+			throw new InvalidParameterException("Invalid combined score value.");
+		}
+		this.combinedScore = combinedScore;
+	}
+
+	/**
+	 * Gets the score for this result.
+	 * @return the score for this result.
+	 */
+	public int getScore () {
+		return score;
+	}
+	
+	/**
+	 * Sets the score for this result.
+	 * @param score the new combined score value
+	 * (a value between 0 and 100).
+	 */
+	public void setScore (int score) {
+		if (( score < 0 ) || ( score > 100 )) {
+			throw new InvalidParameterException("Invalid score value.");
+		}
+		this.score = score;
 	}
 
 	/**

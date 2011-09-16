@@ -40,7 +40,7 @@ public class Tm implements ITm {
 	private String uuid;
 	private PreparedStatement pstmGet;
 
-	private long limit = 30;
+	private long limit = 500;
 	private boolean needPagingRefresh = true; // Must be set to true anytime we change the row count
 	private long totalRows;
 	private long pageCount;
@@ -454,14 +454,14 @@ public class Tm implements ITm {
 	public ResultSet getFirstPage () {
 		checkPagingVariables();
 		currentPage = 0;
-		return getPage2(getFirstKeySegValueForPage(currentPage));
+		return getPage(getFirstKeySegValueForPage(currentPage));
 	}
 
 	@Override
 	public ResultSet getLastPage () {
 		checkPagingVariables();
 		currentPage = pageCount-1;
-		return getPage2(getFirstKeySegValueForPage(currentPage));
+		return getPage(getFirstKeySegValueForPage(currentPage));
 	}
 
 	@Override
@@ -469,7 +469,7 @@ public class Tm implements ITm {
 		checkPagingVariables();
 		if ( currentPage >= pageCount-1 ) return null; // Last page reached
 		currentPage++;
-		return getPage2(getFirstKeySegValueForPage(currentPage));
+		return getPage(getFirstKeySegValueForPage(currentPage));
 	}
 
 	@Override
@@ -477,7 +477,7 @@ public class Tm implements ITm {
 		checkPagingVariables();
 		if ( currentPage <= 0 ) return null; // First page reached
 		currentPage--;
-		return getPage2(getFirstKeySegValueForPage(currentPage));
+		return getPage(getFirstKeySegValueForPage(currentPage));
 	}
 
 	private void checkPagingVariables () {
@@ -497,9 +497,34 @@ public class Tm implements ITm {
 		currentPage = -1;
 		needPagingRefresh = false; // Stable until we add or delete rows or change the page-size
 		//TODO: handle sort on other fields
+		
+//		Statement stm = null;
+//		long count = 0;
+//		try {
+//			stm = store.getConnection().createStatement();
+//			ResultSet result = stm.executeQuery("SELECT COUNT(*) FROM \""+nme+"_SEG\""); // Optimized call for H2
+//			if ( result.first() ) {
+//				count = result.getLong(1);
+//			}
+//		}		
+//		catch ( SQLException e ) {
+//			throw new RuntimeException(e);
+//		}
+//		finally {
+//			try {
+//				if ( stm != null ) {
+//					stm.close();
+//					stm = null;
+//				}
+//			}
+//			catch ( SQLException e ) {
+//				throw new RuntimeException(e);
+//			}
+//		}
+		
 	}
 	
-	private ResultSet getPage2 (long topSegKey) {
+	private ResultSet getPage (long topSegKey) {
 		if ( topSegKey < 1 ) return null;
 		ResultSet result = null;
 		try {
@@ -524,5 +549,15 @@ public class Tm implements ITm {
 			//TODO
 			return 1;
 		}
+	}
+
+	@Override
+	public long getCurrentPage () {
+		return currentPage;
+	}
+
+	@Override
+	public long getPageCount () {
+		return pageCount;
 	}
 }

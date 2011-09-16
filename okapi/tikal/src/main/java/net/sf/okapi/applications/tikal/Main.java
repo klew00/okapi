@@ -1131,7 +1131,7 @@ public class Main {
 			while ( conn.hasNext() ) {
 				qr = conn.next();
 				ps.println(String.format("score: %d, origin: '%s'%s",
-					qr.score,
+					qr.getCombinedScore(),
 					(qr.origin==null ? "" : qr.origin),
 					(qr.fromMT() ? " (from MT)" : "")));
 				ps.println(String.format("  Source: \"%s\"", qr.source.toText()));

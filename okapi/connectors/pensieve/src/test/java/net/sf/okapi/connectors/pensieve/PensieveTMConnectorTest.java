@@ -167,7 +167,7 @@ public class PensieveTMConnectorTest {
 		QueryResult qr = connector.next();
 		assertEquals(input, qr.source.toText());
 		assertEquals("Les \u00e9l\u00e9phants ne peuvent pas voler.", qr.target.toText());
-		assertEquals(100, qr.score);
+		assertEquals(100, qr.getScore());
 	}
 
 	@Test
@@ -178,7 +178,7 @@ public class PensieveTMConnectorTest {
 		QueryResult qr = connector.next();
 		assertEquals(tf.toText(), qr.source.toText());
 		assertEquals("Les \u00e9l\u00e9phants <b>ne peuvent pas</b> voler.", qr.target.toText());
-		assertEquals(100, qr.score);
+		assertEquals(100, qr.getScore());
 	}
 
 	@Test
@@ -189,15 +189,15 @@ public class PensieveTMConnectorTest {
 
 		// First exact
 		QueryResult qr = connector.next();
-		assertEquals(100, qr.score);
+		assertEquals(100, qr.getScore());
 		
 		// Second exact
 		qr = connector.next();
-		assertEquals(100, qr.score);
+		assertEquals(100, qr.getScore());
 		
 		// Fuzzy
 		qr = connector.next();
-		assertTrue(qr.score!=100);
+		assertTrue(qr.getScore()!=100);
 	}
 
 	private TextFragment createElephantsFragment () {

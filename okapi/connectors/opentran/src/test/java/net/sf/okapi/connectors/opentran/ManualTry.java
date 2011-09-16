@@ -48,7 +48,7 @@ public class ManualTry {
 			System.out.println("-- S="+qr.source.toText());
 			System.out.println("   T="+qr.target.toText());
 			System.out.println("   O="+qr.origin);
-			System.out.println("   score="+qr.score);
+			System.out.println("   score="+qr.getScore());
 		}
 		System.out.println("--- end.");
 	}
