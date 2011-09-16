@@ -785,6 +785,7 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 	 * @return the corresponding code.
 	 */
 	public Code getCode (char indexAsChar) {
+		if ( !isBalanced ) balanceMarkers();
 		return codes.get(toIndex(indexAsChar)); 
 	}
 	
@@ -794,6 +795,7 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 	 * @return the code for the given index.
 	 */
 	public Code getCode (int index) {
+		if ( !isBalanced ) balanceMarkers();
 		return codes.get(index);
 	}
 		
@@ -1521,7 +1523,6 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 		for ( Code code : codes ) {
 			if ( code.tagType != TagType.CLOSING ) code.id = ++lastCodeID;
 		}
-		isBalanced = false;
 		// go ahead and balance as we usually 
 		//want full id assignment at this point
 		balanceMarkers();
@@ -1746,6 +1747,8 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 		isBalanced = false;
 		lastCodeID = 0;
 		boolean needExtra = false;
+		
+		// FIXME: Do we need to balance the codes here?
 		
 		for ( Code trgCode : codes ) {
 			// Closing codes are aligned by the balancing
