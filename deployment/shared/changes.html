@@ -133,6 +133,8 @@ distribution.</p>
 	<li>Microsoft Translator Connector:<ul>
 	<li>Changed the queryList() method to batchQuery() so it can be used through 
 	the IQuery interface.</li>
+	<li>The original score is now set in score, while the re-calculated score is 
+	the combined score.</li>
 </ul>
 	</li>
 	<li>Google MT v2 Connector:<ul>
@@ -147,6 +149,9 @@ distribution.</p>
 	<li>Libraries:<ul>
 	<li>Continued to improve the XLIFF 2.0 experimental library.</li>
 	<li>Updated IQuery to include batchQuery() and batchLeverage().</li>
+	<li>Updated QueryResult to include the new combinedScore and quality fields.</li>
+	<li>Changed various classes to use the combined score rather than the score 
+	for their filtering.</li>
 </ul>
 	</li>
 </ul>

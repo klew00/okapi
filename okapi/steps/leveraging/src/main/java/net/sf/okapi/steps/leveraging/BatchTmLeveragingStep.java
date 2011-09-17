@@ -250,7 +250,7 @@ public class BatchTmLeveragingStep extends BasePipelineStep {
 								ata = trgSeg.getAnnotation(AltTranslationsAnnotation.class);
 								if (ata != null) {
 									AltTranslation at = ata.getFirst(); // first should be best
-									if (at.getScore() >= params.getFillTargetThreshold()) {
+									if (at.getCombinedScore() >= params.getFillTargetThreshold()) {
 										TextFragment tf = new TextFragment(
 												at.getTarget().getCodedText(), 
 												at.getTarget().getFirstContent().getClonedCodes());
@@ -263,7 +263,7 @@ public class BatchTmLeveragingStep extends BasePipelineStep {
 						ata = tu.getTarget(targetLocale).getAnnotation(AltTranslationsAnnotation.class);
 						if (ata != null) {
 							AltTranslation at = ata.getFirst(); // first should be best
-							if (at.getScore() >= params.getFillTargetThreshold()) {
+							if (at.getCombinedScore() >= params.getFillTargetThreshold()) {
 								tu.setTargetContent(targetLocale, at.getTarget().getFirstContent());
 							}
 						}

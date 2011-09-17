@@ -227,7 +227,7 @@ public class TextContainerTest {
         assertNotSame("properties should not be the same reference due to clone", p1, tc2.getProperty("name"));
         AltTranslationsAnnotation ann2 = tc2.getAnnotation(AltTranslationsAnnotation.class); 
         assertNotNull(ann2);
-        assertEquals(99, ann2.getFirst().getScore());
+        assertEquals(99, ann2.getFirst().getCombinedScore());
         assertEquals("origin", ann2.getLast().getOrigin());
 //TODO: check this with everyone        assertNotSame(ann2, ann1);
     }

@@ -49,9 +49,11 @@ public class QueryResult implements Comparable<QueryResult> {
 	 * @return an {@link AltTranslation} corresponding to this QueryResult
 	 */
 	public AltTranslation toAltTranslation(TextFragment originalSource,
-			LocaleId sourceLocId, LocaleId targetLocId) {
+		LocaleId sourceLocId,
+		LocaleId targetLocId)
+	{
 		return new AltTranslation(sourceLocId, targetLocId, originalSource,
-				source, target, matchType, score, origin);
+				source, target, matchType, getCombinedScore(), origin);
 	}
 
 	/**
@@ -138,7 +140,7 @@ public class QueryResult implements Comparable<QueryResult> {
 	/**
 	 * Gets the combined score for this result.
 	 * @return the combined score for this result.
-	 * If no combined score is set (default), this returns the normal score.
+	 * If no combined score is set (default), this returns the "normal" score.
 	 */
 	public int getCombinedScore () {
 		if ( combinedScore == COMBINEDSCORE_UNDEFINED ) {
@@ -149,7 +151,8 @@ public class QueryResult implements Comparable<QueryResult> {
 	
 	/**
 	 * Sets the combined score for this result.
-	 * @param combinedScore the new combined score value
+	 * @param combinedScore the new combined score value.
+	 * <p>This is a re-calculated score to take into account quality (when available) 
 	 * (a value between 0 and 100, or {@link #COMBINEDSCORE_UNDEFINED} if the value is not defined.
 	 */
 	public void setCombinedScore (int combinedScore) {
@@ -162,6 +165,7 @@ public class QueryResult implements Comparable<QueryResult> {
 	/**
 	 * Gets the score for this result.
 	 * @return the score for this result.
+	 * @see #getCombinedScore()
 	 */
 	public int getScore () {
 		return score;

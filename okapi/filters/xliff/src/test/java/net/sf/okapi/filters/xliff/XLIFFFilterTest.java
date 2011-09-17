@@ -678,31 +678,31 @@ public class XLIFFFilterTest {
 			switch ( n ) {
 			case 1:
 				assertEquals("alt-trans best target", at.getTarget().toString());
-				assertEquals(100, at.getScore());
+				assertEquals(100, at.getCombinedScore());
 				assertEquals(MatchType.EXACT_UNIQUE_ID, at.getType());
 				assertEquals(AltTranslation.ORIGIN_SOURCEDOC, at.getOrigin());
 				break;
 			case 2:
 				assertEquals("alt-trans local context", at.getTarget().toString());
-				assertEquals(100, at.getScore());
+				assertEquals(100, at.getCombinedScore());
 				assertEquals(MatchType.EXACT_LOCAL_CONTEXT, at.getType());
 				assertEquals("qwe", at.getOrigin());
 				break;
 			case 3:
 				assertEquals("alt-trans target 2", at.getTarget().toString());
-				assertEquals(101, at.getScore());
+				assertEquals(101, at.getCombinedScore());
 				assertEquals(MatchType.EXACT, at.getType());
 				assertEquals("xyz", at.getOrigin());
 				break;
 			case 4:
 				assertEquals("alt-trans target 3", at.getTarget().toString());
-				assertEquals(0, at.getScore());
+				assertEquals(0, at.getCombinedScore());
 				assertEquals(MatchType.UKNOWN, at.getType());
 				assertEquals(AltTranslation.ORIGIN_SOURCEDOC, at.getOrigin());
 				break;
 			case 5:
 				assertEquals("alt-trans target 4", at.getTarget().toString());
-				assertEquals(0, at.getScore());
+				assertEquals(0, at.getCombinedScore());
 				assertEquals(MatchType.UKNOWN, at.getType());
 				assertEquals(AltTranslation.ORIGIN_SOURCEDOC, at.getOrigin());
 				break;

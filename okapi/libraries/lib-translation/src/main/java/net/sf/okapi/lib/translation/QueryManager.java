@@ -323,7 +323,7 @@ public class QueryManager {
 				while ( ri.query.hasNext() ) {
 					res = ri.query.next();
 					res.connectorId = id;
-					if ( res.getScore() < threshold ) break; // Weed out MT if needed
+					if ( res.getCombinedScore() < threshold ) break; // Weed out MT if needed
 					results.add(res);
 				}
 				if ( res != null ) resources++;
@@ -354,7 +354,7 @@ public class QueryManager {
 				QueryResult res = null;
 				while ( ri.query.hasNext() ) {
 					res = ri.query.next();
-					if ( res.getScore() < threshold ) break;
+					if ( res.getCombinedScore() < threshold ) break;
 					res.connectorId = id;
 					results.add(res);
 				}
@@ -573,10 +573,10 @@ public class QueryManager {
 				// Check if we do have a best match
 				if ( (bestMatch = altTrans.getFirst()) != null ) {
 					// Update the statistics
-					if ( bestMatch.getScore() >= 100 ) exactBestMatches++;
-					else if ( bestMatch.getScore() > 0 ) fuzzyBestMatches++;
+					if ( bestMatch.getCombinedScore() >= 100 ) exactBestMatches++;
+					else if ( bestMatch.getCombinedScore() > 0 ) fuzzyBestMatches++;
 					// Do we need to fill the target?
-					if ( bestMatch.getScore() >= thresholdToFill ) {
+					if ( bestMatch.getCombinedScore() >= thresholdToFill ) {
 						// Alternate translation content is expected to always be un-segmented: We can use getFirstContent()
 						// Check if we need to skip the leveraging
 						boolean leverage = true;
@@ -593,7 +593,7 @@ public class QueryManager {
 						// If it's OK to leverage do it
 						if ( leverage ) {
 							// If a prefix is defined and the score equal or below the given threshold: we add it
-							if (( targetPrefix != null ) && ( bestMatch.getScore() <= thresholdToPrefix )) {
+							if (( targetPrefix != null ) && ( bestMatch.getCombinedScore() <= thresholdToPrefix )) {
 								TextFragment tf = new TextFragment(targetPrefix + bestMatch.getTarget().getFirstContent().getCodedText(),
 									bestMatch.getTarget().getFirstContent().getClonedCodes());
 								tu.setTargetContent(getTargetLanguage(), tf);
@@ -623,10 +623,10 @@ public class QueryManager {
 					// Check if we have a best match
 					if ( (bestMatch = altTrans.getFirst()) != null ) {
 						// Update the statistics
-						if ( bestMatch.getScore() >= 100 ) exactBestMatches++;
-						else if ( bestMatch.getScore() > 0 ) fuzzyBestMatches++;
+						if ( bestMatch.getCombinedScore() >= 100 ) exactBestMatches++;
+						else if ( bestMatch.getCombinedScore() > 0 ) fuzzyBestMatches++;
 						// Do we need to fill the target?
-						if ( bestMatch.getScore() >= thresholdToFill ) {
+						if ( bestMatch.getCombinedScore() >= thresholdToFill ) {
 							// Check condition for overwriting existing target
 							Segment ss = tu.getSourceSegment(ts.id, false);
 							if ( ss == null ) continue;
@@ -644,7 +644,7 @@ public class QueryManager {
 							if ( leverage ) {
 								// Alternate translation content is expected to always be un-segmented: We can use getFirstContent()
 								// If a prefix is defined and the score equal or below the given threshold: we add it
-								if (( targetPrefix != null ) && ( bestMatch.getScore() <= thresholdToPrefix )) {
+								if (( targetPrefix != null ) && ( bestMatch.getCombinedScore() <= thresholdToPrefix )) {
 									ts.text = new TextFragment(targetPrefix + bestMatch.getTarget().getFirstContent().getCodedText(),
 										bestMatch.getTarget().getFirstContent().getClonedCodes());
 								}

@@ -160,23 +160,27 @@ public class MyMemoryTMConnector extends BaseConnector implements ITMQuery {
 					//TODO: should we set the standard MT score? (or use myMemory)?
 					//res.score = 95; // Standard score for MT
 				}
+	    		//TODO: Need to take quality into account
 	    		//else {
 	    			// Check the score
 	    			Double match = ((Double)details.get("match"))*100;
 	    			// To workaround bug in score calculation
 	    			// Score > 100 should be treated as 100 per Alberto's info.
-	    			res.setScore(match.intValue() > 100 ? 100 : match.intValue());
+	    			int score = match.intValue() > 100 ? 100 : match.intValue();
 	    		//}
+	    		// Take presence of codes into account (unsupported)
+				if ( qutil.hasCode() ) score--;
+
 	    		// Stop if we reach the threshold (we assume things are sorted)
-	    		if ( res.getScore() < getThreshold() ) break;
+	    		if ( score < getThreshold() ) break;
 				
 				// Set various data
 	    		res.weight = getWeight();
 	    		res.origin = getName();
+	    		res.setScore(score);
 
 	    		// Set source and target text
 				if ( qutil.hasCode() ) {
-					res.setScore(res.getScore()-1);
 					res.source = qutil.createNewFragmentWithCodes((String)details.get("segment"));
 					res.target = qutil.createNewFragmentWithCodes((String)details.get("translation"));
 				}

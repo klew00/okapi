@@ -283,8 +283,8 @@ public class Utility extends BaseFilterDrivenUtility {
     	// Counting only the top matches, so we can get percentages
     	AltTranslation best = atAnn.getFirst();
     	if ( best != null ) {
-    		if ( best.getScore() > 99 ) htmlRpt.addExactMatch(1);
-    		else if ( best.getScore() != 0 ) htmlRpt.addFuzzyMatch(1);
+    		if ( best.getCombinedScore() > 99 ) htmlRpt.addExactMatch(1);
+    		else if ( best.getCombinedScore() != 0 ) htmlRpt.addFuzzyMatch(1);
     	}
     }
 }

@@ -497,7 +497,7 @@ public class TTXFilterTest {
 		assertEquals(1, ann.size());
 		assertEquals("es", ann.getFirst().getTarget().toString());
 		assertEquals("abc", ann.getFirst().getOrigin());
-		assertEquals(50, ann.getFirst().getScore());
+		assertEquals(50, ann.getFirst().getCombinedScore());
 		assertEquals(MatchType.FUZZY, ann.getFirst().getType());
 	}
 
@@ -528,7 +528,7 @@ public class TTXFilterTest {
 		assertEquals(1, ann.size());
 		assertEquals("es", ann.getFirst().getTarget().toString());
 		assertEquals("xtranslate", ann.getFirst().getOrigin());
-		assertEquals(101, ann.getFirst().getScore());
+		assertEquals(101, ann.getFirst().getCombinedScore());
 		assertEquals(MatchType.EXACT_LOCAL_CONTEXT, ann.getFirst().getType());
 	}
 

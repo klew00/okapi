@@ -47,7 +47,7 @@ public class AltTranslation implements Comparable<AltTranslation> {
 	LocaleId trgLocId;
 	ITextUnit tu;
 	MatchType type;
-	int score;
+	int combinedScore;
 	String origin;
 	boolean fromOriginal;
 
@@ -66,8 +66,8 @@ public class AltTranslation implements Comparable<AltTranslation> {
 	 *            the content of alternate translation.
 	 * @param type
 	 *            the type of alternate translation.
-	 * @param score
-	 *            the score for this alternate translation (must be between 0 and 100).
+	 * @param combinedScore
+	 *            the combined score for this alternate translation (must be between 0 and 100).
 	 * @param origin
 	 *            an optional identifier for the origin of this alternate translation.
 	 */
@@ -77,13 +77,13 @@ public class AltTranslation implements Comparable<AltTranslation> {
 		TextFragment alternateSource,
 		TextFragment alternateTarget,
 		MatchType type,
-		int score,
+		int combinedScore,
 		String origin)
 	{
 		this.srcLocId = sourceLocId;
 		this.trgLocId = targetLocId;
 		this.type = type;
-		this.score = score;
+		this.combinedScore = combinedScore;
 		this.origin = origin;
 
 		tu = new TextUnit(UUID.randomUUID().toString());
@@ -151,12 +151,11 @@ public class AltTranslation implements Comparable<AltTranslation> {
 	}
 
 	/**
-	 * Gets the score for this entry.
-	 * 
-	 * @return the score for this entry.
+	 * Gets the combined score for this entry.
+	 * @return the combined score for this entry.
 	 */
-	public int getScore () {
-		return score;
+	public int getCombinedScore () {
+		return combinedScore;
 	}
 
 	/**
@@ -199,7 +198,7 @@ public class AltTranslation implements Comparable<AltTranslation> {
 	 * @param score the new score.
 	 */
 	public void setScore (int score) {
-		this.score = score;
+		this.combinedScore = score;
 	}
 
 	/**
@@ -277,7 +276,7 @@ public class AltTranslation implements Comparable<AltTranslation> {
 		}
 		
 		// compare score
-		comparison = Float.compare(this.score, other.getScore());
+		comparison = Float.compare(this.combinedScore, other.getCombinedScore());
 		if ( comparison != EQUAL ) {
 			return comparison * -1; // we want to reverse the normal score sort
 		}
@@ -327,7 +326,7 @@ public class AltTranslation implements Comparable<AltTranslation> {
 	
 	@Override
 	public String toString() {		
-		return String.format("%s %d%% %s", type.name(), score, tu.getSource());
+		return String.format("%s %d%% %s", type.name(), combinedScore, tu.getSource());
 	}
 
 }

@@ -143,7 +143,7 @@ public class TTXSkeletonWriter extends GenericSkeletonWriter {
 			else {
 				tmp.append("<Tu ");
 			}
-			tmp.append(String.format("MatchPercent=\"%d\">", altTrans.getScore()));
+			tmp.append(String.format("MatchPercent=\"%d\">", altTrans.getCombinedScore()));
 		}
 		else {
 			tmp.append("<Tu MatchPercent=\"0\">");
@@ -161,7 +161,7 @@ public class TTXSkeletonWriter extends GenericSkeletonWriter {
 				tmp.append(layer.endCode());
 				tmp.append(layer.startSegment());
 				tmp.append(processFragment(srcFrag, 1));
-				tmp.append(layer.midSegment(altTrans.getScore()));
+				tmp.append(layer.midSegment(altTrans.getCombinedScore()));
 				tmp.append(processFragment(trgFrag, 0));
 				tmp.append(layer.endSegment());
 				tmp.append(layer.startCode());

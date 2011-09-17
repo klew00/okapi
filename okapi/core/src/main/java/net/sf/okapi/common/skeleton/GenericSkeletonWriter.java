@@ -471,7 +471,7 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 				if ( atAnn != null ) {
 					at = atAnn.getFirst();
 					if ( at != null ) {
-						lev = at.getScore();
+						lev = at.getCombinedScore();
 					}
 				}
 				

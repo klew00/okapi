@@ -412,8 +412,8 @@ public class Writer extends BaseWriter {
 			if ( seg != null ) {
 				writer.writeAttributeString("mid", seg.id);
 			}
-			if ( at.getScore() > 0 ) {
-				writer.writeAttributeString("match-quality", at.getScore()+"%");
+			if ( at.getCombinedScore() > 0 ) {
+				writer.writeAttributeString("match-quality", at.getCombinedScore()+"%");
 			}
 			if ( !Util.isEmpty(at.getOrigin()) ) {
 				writer.writeAttributeString("origin", at.getOrigin());

@@ -70,8 +70,8 @@ public class AltTranslationsAnnotation implements IAnnotation, Iterable<AltTrans
 	 *            the content of alternate translation.
 	 * @param type
 	 *            the type of alternate translation.
-	 * @param score
-	 *            the score for this alternate translation (must be between 0 and 100).
+	 * @param combinedScore
+	 *            the combined score for this alternate translation (must be between 0 and 100).
 	 * @param origin
 	 *            an optional identifier for the origin of this alternate translation.
 	 * @return the {@link AltTranslation} object created and added to this annotation.
@@ -82,11 +82,11 @@ public class AltTranslationsAnnotation implements IAnnotation, Iterable<AltTrans
 		TextFragment alternateSource,
 		TextFragment alternateTarget,
 		MatchType type,
-		int score,
+		int combinedScore,
 		String origin)
 	{
 		list.add(new AltTranslation(sourceLocId, targetLocId, originalSource, alternateSource,
-			alternateTarget, type, score, origin));
+			alternateTarget, type, combinedScore, origin));
 		return list.get(list.size()-1);
 	}
 
@@ -184,7 +184,7 @@ public class AltTranslationsAnnotation implements IAnnotation, Iterable<AltTrans
 		
 		// Get the best match
 		AltTranslation best = list.get(0);
-		if ( best.score < 100 ) return false;
+		if ( best.combinedScore < 100 ) return false;
 		
 		// Compare it to the next ones
 		for ( int i=1; i<list.size(); i++ ) {
@@ -193,7 +193,7 @@ public class AltTranslationsAnnotation implements IAnnotation, Iterable<AltTrans
 			// - or the match is identical but has a different translation
 			AltTranslation res = list.get(i);
 			//TODO: Cannot use matchType as not all connectors set it: if ( best.type != res.type ) return false;
-			if ( best.score != res.score ) return false;
+			if ( best.combinedScore != res.combinedScore ) return false;
 			if ( !best.getSource().toString().equals(res.getSource().toString()) ) return false;
 			// Different target? (if yes -> return true)
 			if ( !best.getTarget().toString().equals(res.getTarget().toString()) ) return true;
@@ -226,18 +226,18 @@ public class AltTranslationsAnnotation implements IAnnotation, Iterable<AltTrans
 			// - or the match is identical but has a different translation
 			AltTranslation res = list.get(i);
 			//TODO: Settle the matchType issue: Can't use it here as not all connector set it if ( best.type != res.type ) break;
-			if ( best.score != res.score ) break;
+			if ( best.combinedScore != res.combinedScore ) break;
 			if ( !best.getSource().toString().equals(res.getSource().toString()) ) break;
-			res.score--;
+			res.combinedScore--;
 		}
-		best.score--;
+		best.combinedScore--;
 		
 		// Remove any annotation below the threshold
 		// Assumes the list is sorted
 		Iterator<AltTranslation> iter = list.iterator();
 		while ( iter.hasNext() ) {
 			AltTranslation at = iter.next();
-			if ( at.score >= threshold ) break; // Done
+			if ( at.combinedScore >= threshold ) break; // Done
 			iter.remove(); // Or remove
 		}
 	}

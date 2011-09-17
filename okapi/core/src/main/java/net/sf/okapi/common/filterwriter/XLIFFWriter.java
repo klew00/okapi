@@ -515,8 +515,8 @@ public class XLIFFWriter implements IFilterWriter {
 			if ( segment != null ) {
 				writer.writeAttributeString("mid", segment.getId());
 			}
-			if ( alt.getScore() > 0 ) {
-				writer.writeAttributeString("match-quality", String.format("%d", alt.getScore()));
+			if ( alt.getCombinedScore() > 0 ) {
+				writer.writeAttributeString("match-quality", String.format("%d", alt.getCombinedScore()));
 			}
 			if ( !Util.isEmpty(alt.getOrigin()) ) {
 				writer.writeAttributeString("origin", alt.getOrigin());

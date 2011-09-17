@@ -66,7 +66,7 @@ public class AltTranslationBean extends PersistenceBean<AltTranslation> {
 		trgLocId = obj.getTargetLocale().toString();
 		tu.set(obj.getEntry(), session);
 		type = obj.getType();
-		score = obj.getScore();
+		score = obj.getCombinedScore();
 		origin = obj.getOrigin();
 	}
 

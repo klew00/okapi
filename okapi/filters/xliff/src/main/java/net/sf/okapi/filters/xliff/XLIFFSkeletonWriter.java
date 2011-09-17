@@ -274,14 +274,14 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 			return; // No annotation
 		}
 		for ( AltTranslation alt : ann ) {
-			if ( alt.getScore() <= 0 ) continue;
+			if ( alt.getCombinedScore() <= 0 ) continue;
 			if ( alt.getFromOriginal() ) continue; // New alt-trans only
 			
 			sb.append("<alt-trans");
 			if ( segment != null ) {
 				sb.append(String.format(" mid=\"%s\"", Util.escapeToXML(segment.getId(), 0, false, chsEnc)));
 			}
-			sb.append(String.format(" match-quality=\"%d\"", alt.getScore()));
+			sb.append(String.format(" match-quality=\"%d\"", alt.getCombinedScore()));
 			if ( !Util.isEmpty(alt.getOrigin()) ) {
 				sb.append(String.format(" origin=\"%s\"", Util.escapeToXML(alt.getOrigin(), 0, false, chsEnc)));
 			}

@@ -67,7 +67,7 @@ public class Manual {
 		conn.query("This is a test");
 		while ( conn.hasNext() ) {
 			QueryResult qr = conn.next();
-			System.out.println("\nScore = "+String.valueOf(qr.getScore())+"\n"+qr.source.toText()+"\n"+qr.target.toText());
+			System.out.println("\nScore = "+String.valueOf(qr.getCombinedScore())+"\n"+qr.source.toText()+"\n"+qr.target.toText());
 		}
 //		
 //		conn.query("The <span id='1'>big</span> red and blue car. This <span id='2'>is a simple</span> test");

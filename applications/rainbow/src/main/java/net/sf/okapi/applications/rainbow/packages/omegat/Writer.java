@@ -106,12 +106,12 @@ public class Writer extends net.sf.okapi.applications.rainbow.packages.xliff.Wri
 				if ( atAnn == null ) continue; // Nothing to do
 				// Else: add the alt-trans
 				for ( AltTranslation at : atAnn ) {
-					if ( at.getScore() >= 100 ) {
+					if ( at.getCombinedScore() >= 100 ) {
 						tmxWriterApproved.writeTU(srcSeg.getContent(),
 							trgSeg.getContent(),
 							((tuid==null) ? null : String.format("%s_s%s", tuid, trgSeg.id)), null);
 					}
-					else if ( at.getScore() > 0 ) {
+					else if ( at.getCombinedScore() > 0 ) {
 						tmxWriterLeverage.writeTU(srcSeg.getContent(),
 							trgSeg.getContent(),
 							((tuid==null) ? null : String.format("%s_s%s", tuid, trgSeg.id)), null);

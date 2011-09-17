@@ -18,7 +18,7 @@ public class Manual {
 		conn.query(tf);
 		while ( conn.hasNext() ) {
 			QueryResult qr = conn.next();
-			System.out.println("\nScore = "+String.valueOf(qr.getScore())+"\n"+qr.source.toText()+"\n"+qr.target.toText());
+			System.out.println("\nScore = "+String.valueOf(qr.getCombinedScore())+"\n"+qr.source.toText()+"\n"+qr.target.toText());
 			System.out.println("Origin = "+qr.origin);
 		}
 	}
