@@ -137,6 +137,7 @@ public class ProcesswithAPI {
 		
 		// test pages with the 4 entries
 		tm.setPageSize(2);
+		tm.setPageMode(ITm.PAGEMODE_EDITOR);
 		rs = tm.getFirstPage();
 		assertTrue(rs.next());
 		assertEquals("Text EN 1", rs.getString(3));
@@ -291,6 +292,8 @@ public class ProcesswithAPI {
 		tm.finishImport();
 		
 		tm.setRecordFields(tm.getAvailableFields());
+		tm.setPageMode(ITm.PAGEMODE_EDITOR);
+
 		ResultSet rs = tm.getFirstPage();
 		rs.next();
 		assertEquals("F1 1", rs.getString(3));

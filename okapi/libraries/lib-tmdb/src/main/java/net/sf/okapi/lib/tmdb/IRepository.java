@@ -46,10 +46,13 @@ public interface IRepository {
 	
 	/**
 	 * Creates a new TM.
+	 * If a TM with the same name already exists, no new TM is created and the existing TM
+	 * is used. 
 	 * @param name the name of the new tM to create.
 	 * @param description the description for the new TM.
 	 * @param locId the locale of the initial language.
-	 * @return the ITm object for the newly created TM, or null if the TM was not created.
+	 * @return the ITm object for the newly created TM or the already existing TM,
+	 * or null if the TM was not created.
 	 */
 	public ITm createTm (String tmName,
 		String description,
@@ -68,10 +71,22 @@ public interface IRepository {
 	 * @param name the name of the TM to access.
 	 * @return the ITm object for the given TM name, or null if the name is not the one
 	 * of an existing TM.
+	 * @throws InvalidParameterException if the TM does not exists.
 	 */
 	public ITm openTm (String tmName);
 
+	/**
+	 * Gets the list of the locales present in a given TM.
+	 * @param tmName the name of the TM to look up.
+	 * @return the list of the locales present in the given TM.
+	 */
 	public List<String> getTmLocales (String tmName);
-	
+
+	/**
+	 * Gets the total number of segments in a given TM.
+	 * @param tmName the name of the TM to look up.
+	 * @return the total number of segments in the given TM.
+	 */
 	public long getTotalSegmentCount (String tmName);
+
 }

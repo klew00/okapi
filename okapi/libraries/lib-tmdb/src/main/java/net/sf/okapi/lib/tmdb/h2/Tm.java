@@ -571,4 +571,15 @@ public class Tm implements ITm {
 	public void setPageMode (int pageMode) {
 		this.pageMode = pageMode;
 	}
+
+	@Override
+	public void addLocale (String LocaleId) {
+		throw new RuntimeException("Not implemented yet");
+	}
+
+	@Override
+	public void deleteLocale (String localeId) {
+		throw new RuntimeException("Not implemented yet");
+	}
+
 }

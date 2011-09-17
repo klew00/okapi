@@ -61,18 +61,22 @@ public interface ITm {
 
 	/**
 	 * Gets a list of all available fields in this TM.
+	 * <p>Note that the segKey and Flag fields are not included in this list.
 	 * @return the list of all available fields in this TM.
 	 */
 	public List<String> getAvailableFields ();
 
 	/**
 	 * Rename this TM.
+	 * If the new name is already used by another TM, nothing happens.
 	 * @param newName the name name of the TM.
 	 */
 	public void rename (String newName);
 	
 	/**
-	 * Sets the list of fields to be returned by {@link #getRecords()}.
+	 * Sets the list of fields to be returned by {@link #getNextPage()} and other paging methods.
+	 * <p>Note that the SegKey and Flag fields are always returned as the first and second fields
+	 * of each record. They should not be present in the parameter list.
 	 * @param names list of fields to be returned. 
 	 */
 	public void setRecordFields (List<String> names);
@@ -159,7 +163,7 @@ public interface ITm {
 	
 	/**
 	 * Gets the last page of records.
-	 * @return the results for the last page, or null if the is no last page.
+	 * @return the results for the last page, or null if there is no last page.
 	 * Note that the number of records in the last page may be smaller than the 
 	 * current page size.
 	 * See {@link #setPageMode(int)} for details.
@@ -167,13 +171,32 @@ public interface ITm {
 	 */
 	public ResultSet getLastPage ();
 	
+	/**
+	 * Gets the next page of records.
+	 * @return the results for the next page, or null if there is no next page.
+	 */
 	public ResultSet getNextPage ();
 	
+	/**
+	 * Gets the previous page of records.
+	 * @return the results for the previous page, or null if there is no previous page.
+	 */
 	public ResultSet getPreviousPage ();
+
+	/**
+	 * Adds a given locale to the TM.
+	 * <p>If the locale already exists for this TM, nothing happens.
+	 * <p>Only the Text and Codes fields are created for the new locale.
+	 * @param LocaleId the locale code for the new locale.
+	 */
+	public void addLocale (String LocaleId);
 	
-//	public void addLocale (String LocaleId);
-//	
-//	public void deleteLocale (String localeId);
+	/**
+	 * Deletes all fields for a given locale.
+	 * <p>If the locale does not exist in this TM, nothing happens.
+	 * @param localeId the code of the locale to remove. 
+	 */
+	public void deleteLocale (String localeId);
 
 	/**
 	 * Gets the list of the locales in this TM.

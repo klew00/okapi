@@ -21,6 +21,7 @@
 package net.sf.okapi.lib.tmdb.h2;
 
 import java.io.File;
+import java.security.InvalidParameterException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -45,7 +46,7 @@ public class Repository implements IRepository {
 	private Connection  conn = null;
 	private String name;
 
-	private static String localeIdToDbLang (LocaleId locId) {
+	static private String localeIdToDbLang (LocaleId locId) {
 		return locId.toPOSIXLocaleId().toUpperCase();
 	}
 	
@@ -64,6 +65,7 @@ public class Repository implements IRepository {
 	 * Creates a new Repository object. the local back-end files are created if 
 	 * they do not exists yet. If the files exist they are used.
 	 * @param path the path of the main storage file (without extension normally).
+	 * Use null to use a private in-memory repository.
 	 */
 	public Repository (String path) {
 		Statement stm = null;
@@ -224,7 +226,7 @@ public class Repository implements IRepository {
 				tm = new Tm(this, result.getString(1), name);
 			}
 			else { // TM does not exist
-				throw new RuntimeException(String.format("The TM '%s' does not exists.", name));
+				throw new InvalidParameterException(String.format("The TM '%s' does not exists.", name));
 			}
 		}		
 		catch ( SQLException e ) {
