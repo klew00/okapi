@@ -40,6 +40,7 @@ public class Tm implements ITm {
 	private String uuid;
 	private PreparedStatement pstmGet;
 
+	private int pageMode = ITm.PAGEMODE_EDITOR;
 	private long limit = 500;
 	private boolean needPagingRefresh = true; // Must be set to true anytime we change the row count
 	private long totalRows;
@@ -559,5 +560,15 @@ public class Tm implements ITm {
 	@Override
 	public long getPageCount () {
 		return pageCount;
+	}
+
+	@Override
+	public int getPageMode () {
+		return pageMode;
+	}
+
+	@Override
+	public void setPageMode (int pageMode) {
+		this.pageMode = pageMode;
 	}
 }

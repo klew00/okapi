@@ -29,6 +29,14 @@ public interface ITm {
 	// 1-Based index of the given fields (in result set)
 	public static final int SEGKEY_FIELD = 1;
 	public static final int FLAG_FIELD = 2;
+
+	/**
+	 * Page mode for editors.
+	 * See {@link #setPageMode(int)} for details. 
+	 */
+	public static final int PAGEMODE_EDITOR = 0;
+
+	//public static final int PAGEMODE_ITERATOR = 1;
 	
 	/**
 	 * Gets the UUID of this TM.
@@ -107,17 +115,56 @@ public interface ITm {
 	 */
 	public void setPageSize (long size);
 	
+	/**
+	 * Gets the current number of records per page.
+	 * @return the current number of records per page.
+	 */
 	public long getPageSize ();
 	
+	/**
+	 * Sets the type of pages the system returns.
+	 * @param pageMode the type of pages the system should return.
+	 * Currently: {@link #PAGEMODE_EDITOR}.
+	 * <p>In {@link #PAGEMODE_EDITOR} mode the last record of the previous page
+	 * is the first record of the next one, and the first record of the next one 
+	 * is the last of the previous. In other words: there is one record that is 
+	 * common to each adjacent pages.
+	 * <p>For example, if the database has 6 records numbered from 1 to 6 and 
+	 * the page size is set to 3: There are 3 pages (not 2). The first record of 
+	 * the first page is 1, the one of the second page is 3 (not 4), and the one
+	 * of the last page is 5.
+	 */
+	public void setPageMode (int pageMode);
+	
+	/**
+	 * Gets the type of page the system returns.
+	 * @return the type of page the system returns.
+	 * See {@link #setPageMode(int)} for details.
+	 */
+	public int getPageMode ();
+	
+	/**
+	 * Moves the page cursor before the first page.
+	 * See {@link #setPageMode(int)} for details.
+	 */
 	public void moveBeforeFirstPage ();
 	
 	/**
 	 * Gets the first page of records.
 	 * This method is the same has calling {@link #moveBeforeFirstPage()} and then {@link #getNextPage()}.
-	 * @return the results for the first page.
+	 * See {@link #setPageMode(int)} for details.
+	 * @return the results for the first page, or null if there is no first page.
 	 */
 	public ResultSet getFirstPage ();
 	
+	/**
+	 * Gets the last page of records.
+	 * @return the results for the last page, or null if the is no last page.
+	 * Note that the number of records in the last page may be smaller than the 
+	 * current page size.
+	 * See {@link #setPageMode(int)} for details.
+	 * @param the results for the last page, or null if there is no last page.
+	 */
 	public ResultSet getLastPage ();
 	
 	public ResultSet getNextPage ();
@@ -134,8 +181,17 @@ public interface ITm {
 	 */
 	public List<String> getLocales ();
 	
+	/**
+	 * Gets the zero-based index of the current page.
+	 * @return the index of the current page, or -1 if no page is active.
+	 * 0 is the first page.
+	 */
 	public long getCurrentPage ();
 	
+	/**
+	 * Gets the number of pages available.
+	 * @return the number of pages available.
+	 */
 	public long getPageCount ();
 	
 }
