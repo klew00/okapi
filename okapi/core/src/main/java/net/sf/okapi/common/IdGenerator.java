@@ -20,6 +20,8 @@
 
 package net.sf.okapi.common;
 
+import java.util.List;
+
 /**
  * Provides a common way to generate sequential ID that are unique for a given root.
  * <p>Each value generated is made of two main parts separated by a '-':
@@ -40,6 +42,7 @@ public class IdGenerator {
 	private long seq = 0;
 	private String rootId;
 	private String prefix;
+	private String lastId;
 	
 	/**
 	 * Creates a generator with a given root and no prefix.
@@ -78,11 +81,25 @@ public class IdGenerator {
 	 */
 	public String createId () {
 		if ( rootId == null ) {
-			return prefix + Long.toString(++seq);
+			lastId = prefix + Long.toString(++seq);
 		}
 		else {
-			return rootId + "-" + prefix + Long.toString(++seq);
+			lastId = rootId + "-" + prefix + Long.toString(++seq);
 		}
+		return lastId;
+	}
+	
+	/**
+	 * Creates a new identifier that is not in the given list.
+	 * @param list the list of identifiers not to use.
+	 * @return a new identifier that is not in the given list.
+	 */
+	public String createIdNotInList (List<String> list) {
+		String tmp = createId();
+		while ( list.contains(tmp) ) {
+			tmp = createId();
+		}
+		return tmp;
 	}
 	
 	/**
@@ -96,17 +113,27 @@ public class IdGenerator {
 		this.prefix = prefix;
 		try {
 			if ( rootId == null ) {
-				return prefix + Long.toString(++seq);
+				lastId = prefix + Long.toString(++seq);
 			}
 			else {
-				return rootId + "-" + prefix + Long.toString(++seq);
-			} 
+				lastId = rootId + "-" + prefix + Long.toString(++seq);
+			}
+			return lastId;
 		}
 		finally {
 			this.prefix = orginalPrefix;
 		}		
 	}
 	
+	/**
+	 * sets the internal value that is used to remember the last identifier.
+	 * Use this method when you create the ID from outside the object, but still need the last id. 
+	 * @param lastId the new last id.
+	 */
+	public void setLastId (String lastId) {
+		this.lastId = lastId;
+	}
+
 	/**
 	 * Gets the last identifier generated.
 	 * This method allows you to get the last identifier that was returned by {@link #createId()}.
@@ -117,45 +144,40 @@ public class IdGenerator {
 	 *  before call this method. 
 	 */
 	public String getLastId () {
-		if ( seq <= 0 ) {
+		if ( lastId == null ) {
 			throw new RuntimeException("The method createId() has not been called yet.");
 		}
-		if ( rootId == null ) {
-			return prefix + Long.toString(seq);
-		}
-		else {
-			return rootId + "-" + prefix + Long.toString(seq);
-		}
+		return lastId;
 	}
 
-	/**
-	 * Gets the last identifier generated with the given prefix
-	 * This method allows you to get the last identifier that was returned by {@link #createId()}.
-	 * @param prefix prefix to be used with this id
-	 * @return
-	 *  the last identifier generated.
-	 * @throws
-	 *  RuntimeException if the method {@link #createId()} has not been called at least once
-	 *  before call this method. 
-	 */
-	public String getLastId (String prefix) {
-		String orginalPrefix = this.prefix;
-		this.prefix = prefix;
-
-		try {
-			if ( seq <= 0 ) {
-				throw new RuntimeException("The method createId() has not been called yet.");
-			}
-			if ( rootId == null ) {
-				return prefix + Long.toString(seq);
-			}
-			else {
-				return rootId + "-" + prefix + Long.toString(seq);
-			}
-		} finally {
-			this.prefix = orginalPrefix;
-		}
-	}
+//	/**
+//	 * Gets the last identifier generated with the given prefix
+//	 * This method allows you to get the last identifier that was returned by {@link #createId()}.
+//	 * @param prefix prefix to be used with this id
+//	 * @return
+//	 *  the last identifier generated.
+//	 * @throws
+//	 *  RuntimeException if the method {@link #createId()} has not been called at least once
+//	 *  before call this method. 
+//	 */
+//	public String getLastId (String prefix) {
+//		String orginalPrefix = this.prefix;
+//		this.prefix = prefix;
+//
+//		try {
+//			if ( seq <= 0 ) {
+//				throw new RuntimeException("The method createId() has not been called yet.");
+//			}
+//			if ( rootId == null ) {
+//				return prefix + Long.toString(seq);
+//			}
+//			else {
+//				return rootId + "-" + prefix + Long.toString(seq);
+//			}
+//		} finally {
+//			this.prefix = orginalPrefix;
+//		}
+//	}
 	
 	/**
 	 * Gets the id generated from the root string given when creating this object.

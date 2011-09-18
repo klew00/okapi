@@ -120,7 +120,7 @@ public abstract class AbstractFilter implements IFilter {
 	 * create a END_DOCUMENT {@link Event}
 	 */
 	protected Event createEndFilterEvent() {
-		Ending endDocument = new Ending(documentId.getLastId(IdGenerator.END_DOCUMENT));
+		Ending endDocument = new Ending(documentId.getLastId());
 		LOGGER.log(Level.FINE, "End Document for " + endDocument.getId()); //$NON-NLS-1$
 		return new Event(EventType.END_DOCUMENT, endDocument);
 	}

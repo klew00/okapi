@@ -154,7 +154,7 @@ public class TransifexPackageWriter extends BasePackageWriter {
 			
 			// Save the manifest again (for the esourceId)
 			if ( params.getOutputManifest() ) {
-				manifest.Save();
+				manifest.save();
 			}
 	
 			Util.openURL("file:///"+reportPath);

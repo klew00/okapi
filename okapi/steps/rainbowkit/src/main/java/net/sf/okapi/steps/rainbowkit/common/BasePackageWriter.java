@@ -266,7 +266,7 @@ public abstract class BasePackageWriter implements IPackageWriter {
 
 	protected void processEndBatch () {
 		if ( params.getOutputManifest() ) {
-			manifest.Save();
+			manifest.save();
 		}
 
 		if ( tmxWriterApproved != null ) {

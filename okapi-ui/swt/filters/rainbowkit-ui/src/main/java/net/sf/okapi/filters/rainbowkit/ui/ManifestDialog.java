@@ -167,7 +167,7 @@ public class ManifestDialog implements IManifestEditor {
 					tableMod.saveData();
 					manifest.setUseApprovedOnly(chkUseApprovedOnly.getSelection());
 					manifest.setUpdateApprovedFlag(chkUpdateApprovedFlag.getSelection());
-					manifest.Save();
+					manifest.save();
 					result = true;
 				}
 				shell.close();

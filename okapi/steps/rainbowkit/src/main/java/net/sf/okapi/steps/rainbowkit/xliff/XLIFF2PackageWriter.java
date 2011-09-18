@@ -58,7 +58,12 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 
 	@Override
 	protected void processStartBatch () {
-		manifest.setSubDirectories("original", "work", "work", "done", null, false);
+//		manifest.setGenerateTIPManifest(true);
+//		manifest.setSubDirectories("pobjects/input", "pobjects/bilingual", "pobjects/bilingual",
+//			"pobjects/output", "pobjects/tm", false);
+		
+		manifest.setSubDirectories("input", "bilingual", "bilingual", "output", null, false);
+
 		setTMXInfo(false, null, null, null, null, false);
 		super.processStartBatch();
 	}

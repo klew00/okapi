@@ -172,7 +172,7 @@ public class IdGeneratorTest {
 		idGen = new IdGenerator(null, "p");
 		String id = idGen.createId("zxc");
 		assertEquals("zxc1", id);
-		assertEquals("zxc1", idGen.getLastId("zxc"));
+		assertEquals("zxc1", idGen.getLastId());
 		assertEquals("p2", idGen.createId());
 //Not working or not logical		assertEquals("zxc1", idGen.getLastId("zxc"));
 	}

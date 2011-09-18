@@ -38,6 +38,7 @@ import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
@@ -206,6 +207,31 @@ public class XLIFFFilterTest {
 		tu = FilterTestDriver.getTextUnit(getEvents(snippet, noInSegFilter), 2);
 		assertNotNull(tu);
 		assertEquals("t1. t2", segments.get(0).text.toText());
+	}
+
+	@Test
+	public void testGroupIds () {
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+			+ "<xliff version=\"1.2\">"
+			+ "<file source-language=\"en\" target-language=\"fr\" datatype=\"x-test\" original=\"file.ext\">"
+			+ "<body>"
+			+ "<group id=\"_1\">"
+			+ " <group>" // no id
+			+ "  <group id=\"g1\">" // 2 will be a duplicate
+			+ "  </group>"
+			+ " </group>"
+			+ "</group>"
+			+ "</body>"
+			+ "</file></xliff>";
+		StartGroup sg = FilterTestDriver.getGroup(getEvents(snippet, noInSegFilter),  1);
+		assertNotNull(sg);
+		assertEquals("_1", sg.getId());
+		sg = FilterTestDriver.getGroup(getEvents(snippet, noInSegFilter),  2);
+		assertNotNull(sg);
+		assertEquals("g1", sg.getId());
+		sg = FilterTestDriver.getGroup(getEvents(snippet, noInSegFilter),  3);
+		assertNotNull(sg);
+		assertEquals("g2", sg.getId());
 	}
 
 	@Test

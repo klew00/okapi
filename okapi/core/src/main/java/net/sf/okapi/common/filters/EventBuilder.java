@@ -1085,7 +1085,7 @@ public class EventBuilder {
 		}
 
 		popTempEvent();
-		Ending eg = new Ending(groupId.getLastId(IdGenerator.END_GROUP));
+		Ending eg = new Ending(groupId.getLastId());
 		filterEvents.add(new Event(EventType.END_GROUP, eg, skel));
 	}
 

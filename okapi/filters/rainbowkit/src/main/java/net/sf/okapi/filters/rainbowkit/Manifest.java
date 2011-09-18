@@ -23,8 +23,10 @@ package net.sf.okapi.filters.rainbowkit;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -61,6 +63,8 @@ public class Manifest implements IAnnotation {
 	public static final String VERSION = "2";
 	public static final String MANIFEST_FILENAME = "manifest";
 	public static final String MANIFEST_EXTENSION = ".rkm";
+
+	private static final String TIP_VERSION = "1.3";
 	
 	private LinkedHashMap<Integer, MergingInfo> docs;
 	private String packageRoot;
@@ -83,6 +87,7 @@ public class Manifest implements IAnnotation {
 	private boolean useApprovedOnly;
 	private boolean updateApprovedFlag;
 	private String date;
+	private boolean generateTIPManifest = false;
 
 	public Manifest () {
 		docs = new LinkedHashMap<Integer, MergingInfo>();
@@ -139,6 +144,14 @@ public class Manifest implements IAnnotation {
 	
 	public void setUpdateApprovedFlag (boolean value) {
 		updateApprovedFlag = value;
+	}
+	
+	public boolean getGenerateTIPManifest () {
+		return generateTIPManifest;
+	}
+	
+	public void setGenerateTIPManifest (boolean generateTIPManifest) {
+		this.generateTIPManifest = generateTIPManifest;
 	}
 	
 	/**
@@ -290,7 +303,13 @@ public class Manifest implements IAnnotation {
 	/**
 	 * Saves the manifest file. This method assumes the root is set.
 	 */
-	public void Save () {
+	public void save () {
+		
+		if ( generateTIPManifest ) {
+			saveTIPManifest();
+			return;
+		}
+
 		XMLWriter writer = null;
 		try {
 			writer = new XMLWriter(getPath());
@@ -322,13 +341,114 @@ public class Manifest implements IAnnotation {
 			writer.writeString(Base64.encodeString(creatorParams.toString()));
 			writer.writeEndElementLineBreak();
 			
-			// Infor for the documents
+			// Info for the documents
 			for ( MergingInfo item : docs.values() ) {
 				writer.writeRawXML(item.writeToXML("doc", true));
 				writer.writeLineBreak();
 			}
 
 			writer.writeEndElement(); // manifest
+			writer.writeEndDocument();
+		}
+		finally {
+			if ( writer != null ) writer.close();
+		}
+	}
+
+	private void saveTIPManifest () {
+		XMLWriter writer = null;
+		try {
+			String tipManifestPath = getPath();
+			tipManifestPath = tipManifestPath.replace(MANIFEST_EXTENSION, ".xml");
+			writer = new XMLWriter(tipManifestPath);
+
+			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+			df.setTimeZone(TimeZone.getTimeZone("GMT"));
+			String outputDate = df.format(new Date());
+			
+			writer.writeStartDocument();
+			writer.writeComment("EXPERIMENTAL OUTPUT ONLY!", true);
+			writer.writeStartElement("TIPManifest");
+			writer.writeAttributeString("version", TIP_VERSION);
+			writer.writeStartElement("GlobalDescriptor");
+
+			writer.writeElementString("UniquePackageID", packageId);
+			
+			writer.writeStartElement("PackageCreator");
+			
+			writer.writeElementString("CreatorName", getClass().getName());
+			writer.writeLineBreak();
+			writer.writeElementString("CreatorID", "urn:rainbowkit-creation-step");
+			writer.writeLineBreak();
+			writer.writeElementString("CreatorUpdate", outputDate);
+			writer.writeLineBreak();
+
+			writer.writeStartElement("ContributorTool");
+			writer.writeElementString("ToolName", getClass().getName());
+			writer.writeLineBreak();
+			writer.writeElementString("ToolID", "undefined");
+			writer.writeLineBreak();
+			writer.writeElementString("ToolVersion", "0.0");
+			writer.writeLineBreak();
+			writer.writeEndElementLineBreak(); // ContributorTool
+
+			writer.writeElementString("Communication", "FTP"); // Just to have something valid
+			writer.writeLineBreak();
+			
+			writer.writeEndElementLineBreak(); // PackageCreator
+			
+			writer.writeStartElement("OrderAction");
+			writer.writeStartElement("OrderTask");
+			writer.writeElementString("TaskType", "Translate");
+			writer.writeLineBreak();
+			writer.writeElementString("SourceLanguage", getSourceLocale().toString());
+			writer.writeLineBreak();
+			writer.writeElementString("TargetLanguage", getTargetLocale().toString());
+			writer.writeLineBreak();
+			writer.writeEndElementLineBreak(); // OrderTask
+			writer.writeEndElementLineBreak(); // OrderAction
+			
+			writer.writeEndElementLineBreak(); // GlobalDescriptor
+			
+			
+			writer.writeStartElement("PackageObjects");
+
+			//--- files in input
+			writer.writeStartElement("PackageObjectSection");
+			writer.writeAttributeString("sectionname", "input");
+			int seq = 1;
+			for ( MergingInfo item : docs.values() ) {
+				writer.writeStartElement("ObjectFile");
+				writer.writeAttributeString("localizable", "yes");
+				writer.writeAttributeString("sequence", String.valueOf(seq));
+				writer.writeElementString("Type", item.getFilterId());
+				writer.writeElementString("LocationPath", item.getRelativeInputPath().substring(1));
+				//Optional: writer.writeElementString("Description", "todo");
+				writer.writeEndElementLineBreak(); // ObjectFile
+				seq++;
+			}
+			writer.writeEndElementLineBreak(); // PackageObjectSection
+
+			//--- files in bilingual
+			writer.writeStartElement("PackageObjectSection");
+			writer.writeAttributeString("sectionname", "bilingual");
+			seq = 1;
+			for ( MergingInfo item : docs.values() ) {
+				writer.writeStartElement("ObjectFile");
+				writer.writeAttributeString("localizable", "yes");
+				writer.writeAttributeString("sequence", String.valueOf(seq));
+				writer.writeElementString("Type", "XLIFF 2.0");
+				writer.writeElementString("LocationPath", item.getRelativeInputPath().substring(1)+".xlf");
+				//Optional: writer.writeElementString("Description", "todo");
+				writer.writeEndElementLineBreak(); // ObjectFile
+				seq++;
+			}
+			writer.writeEndElementLineBreak(); // PackageObjectSection
+			
+			writer.writeEndElementLineBreak(); // PackageObjects
+			
+			
+			writer.writeEndElement(); // TIPManifest
 			writer.writeEndDocument();
 		}
 		finally {

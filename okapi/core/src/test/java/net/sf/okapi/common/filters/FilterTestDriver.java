@@ -800,15 +800,17 @@ public class FilterTestDriver {
 	 * 
 	 * @param list
 	 *            The list of events
-	 * @param tuNumber
+	 * @param groupNumber
 	 *            The number of the group to return: 1 for the first one, 2 for the second, etc.
 	 * @return The group found, or null.
 	 */
-	public static StartGroup getGroup(List<Event> list, int tuNumber) {
+	public static StartGroup getGroup(List<Event> list,
+		int groupNumber)
+	{
 		int n = 0;
 		for (Event event : list) {
 			if (event.getEventType() == EventType.START_GROUP) {
-				if (++n == tuNumber) {
+				if (++n == groupNumber) {
 					return (StartGroup) event.getResource();
 				}
 			}

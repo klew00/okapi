@@ -106,6 +106,7 @@ public class XLIFFFilter implements IFilter {
 	//private TextContainer content;
 	private String encoding;
 	private Stack<String> parentIds;
+	private List<String> groupUsedIds;
 	private AltTranslationsAnnotation altTrans;
 	private int altTransQuality;
 	private MatchType altTransMatchType;
@@ -269,6 +270,7 @@ public class XLIFFFilter implements IFilter {
 			// Set the start event
 			hasNext = true;
 			queue = new LinkedList<Event>();
+			groupUsedIds = new ArrayList<String>();
 			
 			startDocId = otherId.createId();
 			StartDocument startDoc = new StartDocument(startDocId);
@@ -1417,8 +1419,21 @@ public class XLIFFFilter implements IFilter {
 			}
 		}
 		
+		// Try to get the existing id from the XLIFF group
+		String grpId = reader.getAttributeValue(null, "id");
+		if (( grpId == null ) || ( groupUsedIds.contains(grpId) )) {
+			// If it does not exists, or if it has been used already
+			// we create a new id that is not a duplicate
+			grpId = groupId.createIdNotInList(groupUsedIds);
+		}
+		else {
+			groupId.setLastId(grpId);
+		}
+		// Update the list with the new used identifier
+		groupUsedIds.add(grpId);
+		
 		// Else: it's a structural group
-		StartGroup group = new StartGroup(parentIds.peek().toString(), groupId.createId());
+		StartGroup group = new StartGroup(parentIds.peek().toString(), grpId);
 		group.setSkeleton(skel);
 		parentIds.push(groupId.getLastId());
 		queue.add(new Event(EventType.START_GROUP, group));
@@ -1427,6 +1442,7 @@ public class XLIFFFilter implements IFilter {
 		tmp = reader.getAttributeValue(null, "resname");
 		if ( tmp != null ) group.setName(tmp);
 		else if ( params.getFallbackToID() ) {
+			// Use the true original id that can be null
 			group.setName(reader.getAttributeValue(null, "id"));
 		}
 

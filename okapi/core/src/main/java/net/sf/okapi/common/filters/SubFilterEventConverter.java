@@ -95,7 +95,7 @@ public class SubFilterEventConverter {
 			break;
 
 		case END_DOCUMENT:
-			Ending endGroup = new Ending(groupIdGenerator.getLastId(IdGenerator.END_GROUP));
+			Ending endGroup = new Ending(groupIdGenerator.getLastId());
 			endGroup.setSkeleton(endGroupSkeleton);
 			endGroup.setAnnotation(new SubFilterAnnotation());
 			event = new Event(EventType.END_GROUP, endGroup);
