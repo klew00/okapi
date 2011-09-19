@@ -20,7 +20,10 @@
 
 package net.sf.okapi.steps.repetitionanalysis;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
@@ -28,6 +31,7 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
+import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
@@ -68,10 +72,10 @@ public class RepetitionAnalysisStep extends BasePipelineStep {
 	public RepetitionAnalysisStep() {
 		super();
 		params = new Parameters();
-		//tmDir = Util.ensureSeparator(ClassUtil.getTargetPath(this.getClass()), true) + "tm/";
-		tmDir = Util.ensureSeparator(Util.getTempDirectory(), true) + "tm/";
-		// tmDir = Util.ensureSeparator(ClassUtil.getTargetPath(this.getClass()), true);
-		// System.out.println((new File(tmDir)).getAbsolutePath());
+		//tmDir = Util.ensureSeparator(Util.getTempDirectory(), true) + "tm/";
+		
+		// For concurrent pipelines 
+		tmDir = String.format("%s~okapi-step-repetitionanalysis-%s/", Util.ensureSeparator(Util.getTempDirectory(), true), UUID.randomUUID().toString());		
 	}
 	
 	@Override
@@ -89,6 +93,11 @@ public class RepetitionAnalysisStep extends BasePipelineStep {
 	@Override
 	public IParameters getParameters () {
 		return params;
+	}
+	
+	@Override
+	public void cancel() {
+		close();
 	}
 	
 	@Override
@@ -115,12 +124,12 @@ public class RepetitionAnalysisStep extends BasePipelineStep {
 			currentTm.close();
 			currentTm = null;
 		}
+		Util.deleteDirectory(tmDir, false);
 	}
 	
 	@Override
 	protected Event handleStartDocument(Event event) {
 		close();
-		Util.deleteDirectory(tmDir, true);
 		Util.createDirectories(tmDir);
 		searchExact = params.getFuzzyThreshold() >= 100;
 		counter = 0;
@@ -135,8 +144,7 @@ public class RepetitionAnalysisStep extends BasePipelineStep {
 	
 	@Override
 	protected Event handleEndDocument(Event event) {
-		close();
-		Util.deleteDirectory(tmDir, true);
+		close();		
 		return super.handleEndDocument(event);
 	}
 	
