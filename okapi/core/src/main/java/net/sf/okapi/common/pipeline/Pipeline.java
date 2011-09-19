@@ -148,6 +148,13 @@ public class Pipeline implements IPipeline, IObservable, IObserver {
 				// ignore
 			}
 		}
+		
+		// Cancel steps if the pipeline is canceled
+		if (state == PipelineReturnValue.CANCELLED) {
+			for (IPipelineStep step : steps) {
+				step.cancel();
+			}
+		}
 
 		return event;
 	}
