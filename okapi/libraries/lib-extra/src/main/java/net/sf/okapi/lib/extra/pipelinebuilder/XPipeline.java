@@ -20,13 +20,18 @@
 
 package net.sf.okapi.lib.extra.pipelinebuilder;
 
+import java.util.List;
+
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.DefaultFilters;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
+import net.sf.okapi.common.observer.IObservable;
+import net.sf.okapi.common.observer.IObserver;
 import net.sf.okapi.common.pipeline.IPipeline;
 import net.sf.okapi.common.pipeline.IPipelineStep;
+import net.sf.okapi.common.pipeline.Pipeline;
 import net.sf.okapi.common.pipeline.PipelineReturnValue;
 import net.sf.okapi.common.pipelinedriver.IBatchItemContext;
 import net.sf.okapi.common.pipelinedriver.PipelineDriver;
@@ -38,6 +43,7 @@ public class XPipeline extends net.sf.okapi.common.pipeline.Pipeline implements 
 	private XBatch batch;
 	private PipelineDriver pd;
 	private FilterConfigurationMapper fcMapper;
+	private IObservable delegatedObservable;
 	
 	public XPipeline(String description, IPipeline pipeline) {
 		this(description, pipeline.getSteps().toArray(new IPipelineStep[] {}));
@@ -89,6 +95,10 @@ public class XPipeline extends net.sf.okapi.common.pipeline.Pipeline implements 
 	
 	private void recreatePipeline(){
 		pd = new PipelineDriver();
+		IPipeline pl = pd.getPipeline();
+		if (pl instanceof Pipeline) {
+			delegatedObservable = (IObservable) pl;
+		}
 		//pd.setPipeline(this); // Commented, need to handle PipelineStep class to get annotations of the internal class, not the wraper's
 		
 		for (IPipelineStep step : this.getSteps())
@@ -166,4 +176,31 @@ public class XPipeline extends net.sf.okapi.common.pipeline.Pipeline implements 
 		return stepImpl.getDescription();
 	}
 	
+	public void addObserver(IObserver observer) {
+		delegatedObservable.addObserver(observer);
+	}
+
+	public int countObservers() {
+		return delegatedObservable.countObservers();
+	}
+
+	public void deleteObserver(IObserver observer) {
+		delegatedObservable.deleteObserver(observer);
+	}
+
+	public void notifyObservers() {
+		delegatedObservable.notifyObservers();
+	}
+
+	public void notifyObservers(Object arg) {
+		delegatedObservable.notifyObservers(arg);
+	}
+
+	public void deleteObservers() {
+		delegatedObservable.deleteObservers();
+	}
+
+	public List<IObserver> getObservers() {
+		return delegatedObservable.getObservers();
+	}
 }

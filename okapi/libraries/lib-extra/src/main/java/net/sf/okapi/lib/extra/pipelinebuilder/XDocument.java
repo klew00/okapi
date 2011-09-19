@@ -164,6 +164,7 @@ public class XDocument  {
 		RawDocument rd = getRawDocument();
 		if (rd == null) return;
 		if (!Util.isEmpty(rd.getFilterConfigId())) return; // Already set
+		if (rd.getInputURI() == null) return; 
 		
 		String ext = Util.getExtension(rd.getInputURI().toString());
 		if (Util.isEmpty(ext)) return;
