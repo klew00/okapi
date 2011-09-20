@@ -960,6 +960,49 @@ public class TextUnitUtil {
 	}
 
 	/**
+	 * Adds to the skeleton of a given text unit resource qualifiers (quotation marks etc.) to appear around text. 
+	 * This method is useful when the starting and ending qualifiers are different.
+	 * @param textUnit
+	 *            the given text unit resource
+	 * @param startQualifier
+	 *            the qualifier to be added before text
+	 * @param endQualifier
+	 *            the qualifier to be added after text
+	 */
+	public static void addQualifiers (ITextUnit textUnit,
+			String startQualifier,
+			String endQualifier) {
+		if (textUnit == null) return;
+		if (Util.isEmpty(startQualifier)) return;
+		if (Util.isEmpty(endQualifier)) return;
+		
+		GenericSkeleton tuSkel = TextUnitUtil.forceSkeleton(textUnit);
+		GenericSkeleton skel = new GenericSkeleton();
+
+		skel.add(startQualifier);
+		skel.addContentPlaceholder(textUnit);
+		skel.add(endQualifier);
+
+		int index = SkeletonUtil.findTuRefInSkeleton(tuSkel);
+		if (index != -1)
+			SkeletonUtil.replaceSkeletonPart(tuSkel, index, skel);
+		else
+			tuSkel.add(skel);
+	}
+	
+	/**
+	 * Adds to the skeleton of a given text unit resource qualifiers (quotation marks etc.) to appear around text. 
+	 * @param textUnit
+	 *            the given text unit resource
+	 * @param qualifier
+	 *            the qualifier to be added before and after text
+	 */
+	public static void addQualifiers (ITextUnit textUnit,
+			String qualifier) {
+		addQualifiers(textUnit, qualifier, qualifier);
+	}
+	
+	/**
 	 * Removes from the source part of a given un-segmented text unit resource qualifiers (parenthesis, quotation marks
 	 * etc.) around text. This method is useful when the starting and ending qualifiers are different.
 	 * 
@@ -969,22 +1012,24 @@ public class TextUnitUtil {
 	 *            the qualifier to be removed before source text.
 	 * @param endQualifier
 	 *            the qualifier to be removed after source text.
+	 * @return true if the qualifiers were found and removed
 	 */
-	public static void removeQualifiers (ITextUnit textUnit,
+	public static boolean removeQualifiers (ITextUnit textUnit,
 		String startQualifier,
 		String endQualifier)
 	{
 		if (textUnit == null)
-			return;
+			return false;
 		if (Util.isEmpty(startQualifier))
-			return;
+			return false;
 		if (Util.isEmpty(endQualifier))
-			return;
+			return false;
 
 		String st = getSourceText(textUnit);
 		if (st == null)
-			return;
+			return false;
 
+		boolean res = false;
 		int startQualifierLen = startQualifier.length();
 		int endQualifierLen = endQualifier.length();
 
@@ -997,6 +1042,7 @@ public class TextUnitUtil {
 			skel.addContentPlaceholder(textUnit);
 			skel.add(endQualifier);
 
+			res = true;
 			setSourceText(textUnit, st.substring(startQualifierLen, Util.getLength(st)
 					- endQualifierLen));
 
@@ -1006,6 +1052,7 @@ public class TextUnitUtil {
 			else
 				tuSkel.add(skel);
 		}
+		return res;
 	}
 	
 	/**
@@ -1159,11 +1206,12 @@ public class TextUnitUtil {
 	 *            the given text unit resource.
 	 * @param qualifier
 	 *            the qualifier to be removed before and after source text.
+	 * @return true if the qualifiers were found and removed
 	 */
-	public static void removeQualifiers (ITextUnit textUnit,
+	public static boolean removeQualifiers (ITextUnit textUnit,
 		String qualifier)
 	{
-		removeQualifiers(textUnit, qualifier, qualifier);
+		return removeQualifiers(textUnit, qualifier, qualifier);
 	}
 	
 	/**
