@@ -33,7 +33,6 @@ import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.ITextUnit;
-import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.steps.wordcount.common.GMX;
 import net.sf.okapi.steps.wordcount.common.Metrics;
 import net.sf.okapi.steps.wordcount.common.MetricsAnnotation;
@@ -131,71 +130,11 @@ public class SimpleWordCountStep extends BasePipelineStep {
 
 		if (!tu.getSource().isEmpty()) {
 			long srcWordCount = countWords(tu.getSource().getUnSegmentedContentCopy().getText(), true);
-//			MetricsAnnotation sma = TextUnitUtil.getSourceAnnotation(tu, MetricsAnnotation.class);
-//			if (sma == null) {
-//				sma = new MetricsAnnotation();
-//				tu.getSource().setAnnotation(sma);
-//			}
-//			Metrics m = sma.getMetrics();
-//			m.setMetric(GMX.TotalWordCount, srcWordCount);
-//			
-//			tu.setAnnotation(sma);
 			srcBatchItemWordCount += srcWordCount;
 		}
-
-//		for (LocaleId loc : tu.getTargetLocales()) {
-//			if (!tu.getTarget(loc).isEmpty()) {
-//				long trgWordCount = countWords(tu.getTarget(loc).getUnSegmentedContentCopy()
-//						.getText(), false);
-//				MetricsAnnotation tma = TextUnitUtil.getTargetAnnotation(tu, loc, MetricsAnnotation.class);
-//				if (tma == null) {
-//					tma = new MetricsAnnotation();
-//					tu.getTarget(loc).setAnnotation(tma);
-//				}
-//				Metrics m = tma.getMetrics();
-//				m.setMetric(GMX.TotalWordCount, trgWordCount);
-//			}
-//		}
 		return event;
 	}
 	
-//	@Override
-//	protected Event handleTextUnit(Event event) {
-//		ITextUnit tu = event.getTextUnit();
-//
-//		if (tu.isEmpty() || !tu.isTranslatable()) {
-//			return event;
-//		}
-//
-//		if (!tu.getSource().isEmpty()) {
-//			long srcWordCount = countWords(tu.getSource().getUnSegmentedContentCopy().getText(), true);
-//			MetricsAnnotation sma = TextUnitUtil.getSourceAnnotation(tu, MetricsAnnotation.class);
-//			if (sma == null) {
-//				sma = new MetricsAnnotation();				
-//			}
-//			Metrics m = sma.getMetrics();			
-//			m.setMetric(GMX.TotalWordCount, srcWordCount);
-//			tu.getSource().setAnnotation(sma);
-//		}
-//
-//		if (params.isCountTargets()) {
-//			for (LocaleId loc : tu.getTargetLocales()) {
-//				if (!tu.getTarget(loc).isEmpty()) {
-//					long trgWordCount = countWords(tu.getTarget(loc).getUnSegmentedContentCopy().getText(), false);
-//					MetricsAnnotation tma = TextUnitUtil.getTargetAnnotation(tu, loc, MetricsAnnotation.class);
-//					if (tma == null) {
-//						tma = new MetricsAnnotation();						
-//					}					
-//					Metrics m = tma.getMetrics();
-//					m.setMetric(GMX.TotalWordCount, trgWordCount);
-//					tu.getTarget(loc).setAnnotation(tma);
-//				}
-//			}
-//		}
-//		return event;
-//	}
-
-
 	@Override
 	public String getName() {
 		return "Simple Word Count";

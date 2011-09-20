@@ -391,6 +391,21 @@ public class UtilTest {
 		assertEquals((Long) 5L, Util.getValue(map, "three", 5L));
 	}
 	
+	@Test
+	public void testNormalizRange() {
+		int nv = Util.normalizeRange(0, 100, 50);
+		assertEquals(50, nv);
+		
+		nv = Util.normalizeRange(-5, 5, 0);
+		assertEquals(50, nv);
+		
+		nv = Util.normalizeRange(-5, 5, 5);
+		assertEquals(100, nv);
+		
+		nv = Util.normalizeRange(-5, 5, -5);
+		assertEquals(0, nv);
+	}
+	
 	private Document createXMLdocument (String data) {
 		InputSource input = new InputSource(new StringReader(data));
 		Document doc = null;

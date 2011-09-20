@@ -177,7 +177,7 @@ public class MyMemoryTMConnector extends BaseConnector implements ITMQuery {
 				// Set various data
 	    		res.weight = getWeight();
 	    		res.origin = getName();
-	    		res.setScore(score);
+	    		res.setFuzzyScore(score);
 
 	    		// Set source and target text
 				if ( qutil.hasCode() ) {

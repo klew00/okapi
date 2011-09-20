@@ -205,7 +205,7 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 			
 			QueryResult qr = new QueryResult();
 			qr.setQuality(rating);
-			qr.setScore(score); // Score from the system
+			qr.setFuzzyScore(score); // Score from the system
 			qr.setCombinedScore(combinedScore); // Adjusted score
 			// Else: continue with that result
 			qr.weight = getWeight();

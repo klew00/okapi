@@ -56,75 +56,75 @@ public class QueryResultTest {
 		
 		at1 = new QueryResult();
 		at1.matchType = MatchType.MT;
-		at1.setScore(60);
+		at1.setFuzzyScore(60);
 		at1.source = source1;
 		at1.target = target1;
 		
 		at2 = new QueryResult();
 		at2.matchType = MatchType.EXACT;
-		at2.setScore(90);
+		at2.setFuzzyScore(90);
 		at2.source = source2;
 		at2.target = target2;
 		
 		at3 = new QueryResult();
 		at3.matchType = MatchType.EXACT_PREVIOUS_VERSION;
-		at3.setScore(100);
+		at3.setFuzzyScore(100);
 		at3.source = source3;
 		at3.target = target3;
 		
 		at4 = new QueryResult();
 		at4.matchType = MatchType.FUZZY;
-		at4.setScore(60);
+		at4.setFuzzyScore(60);
 		at4.source = source1;
 		at4.target = target1;
 		
 		at5 = new QueryResult();
 		at5.matchType = MatchType.EXACT_TEXT_ONLY;
-		at5.setScore(95);
+		at5.setFuzzyScore(95);
 		at5.source = source2;
 		at5.target = target2;		
 		
 		at6 = new QueryResult();
 		at6.matchType = MatchType.FUZZY_UNIQUE_ID;
-		at6.setScore(99);
+		at6.setFuzzyScore(99);
 		at6.source = source3;
 		at6.target = target3;
 		
 		at7 = new QueryResult();
 		at7.matchType = MatchType.FUZZY;
-		at7.setScore(99);
+		at7.setFuzzyScore(99);
 		at7.source = source3;
 		at7.target = target3;
 		
 		at8 = new QueryResult();
 		at8.matchType = MatchType.FUZZY;
-		at8.setScore(98);
+		at8.setFuzzyScore(98);
 		at8.creationDate = new Date(2);
 		at8.source = source3;
 		at8.target = target3;
 		
 		at9 = new QueryResult();
 		at9.matchType = MatchType.FUZZY;
-		at9.setScore(98);
+		at9.setFuzzyScore(98);
 		at8.creationDate = new Date(1);
 		at9.source = source3;
 		at9.target = target3;
 		
 		at10 = new QueryResult();
 		at10.matchType = MatchType.FUZZY;
-		at10.setScore(99);
+		at10.setFuzzyScore(99);
 		at10.source = source3;
 		at10.target = target3;
 		
 		at11 = new QueryResult();
 		at11.matchType = MatchType.FUZZY;
-		at11.setScore(98);
+		at11.setFuzzyScore(98);
 		at11.source = source3;
 		at11.target = target3;
 		
 		at12 = new QueryResult();
 		at12.matchType = MatchType.FUZZY;
-		at12.setScore(97);
+		at12.setFuzzyScore(97);
 		at12.source = source3;
 		at12.target = target3;
 	}
@@ -181,7 +181,7 @@ public class QueryResultTest {
 	public void instanceEquality() {
 		QueryResult h1 = new QueryResult();
 		h1.matchType = MatchType.EXACT;
-		h1.setScore(90);
+		h1.setFuzzyScore(90);
 		h1.source = source2;
 		h1.target = target2;
 		
@@ -193,7 +193,7 @@ public class QueryResultTest {
 	public void equals() {		
 		QueryResult h1 = new QueryResult();
 		h1.matchType = MatchType.EXACT;
-		h1.setScore(90);
+		h1.setFuzzyScore(90);
 		h1.source = source2;
 		h1.target = target2;
 
@@ -209,7 +209,7 @@ public class QueryResultTest {
 	public void compareToEquals() {
 		QueryResult h1 = new QueryResult();
 		h1.matchType = MatchType.EXACT;
-		h1.setScore(90);
+		h1.setFuzzyScore(90);
 		h1.source = source2;
 		h1.target = target2;
 		
@@ -220,14 +220,14 @@ public class QueryResultTest {
 	public void compareToGreaterThanScore() {
 		QueryResult h1 = new QueryResult();
 		h1.matchType = MatchType.FUZZY;
-		h1.setScore(90);
+		h1.setFuzzyScore(90);
 		h1.source = source2;
 		h1.target = target2;
 
 		
 		QueryResult h2 = new QueryResult();
 		h2.matchType = MatchType.FUZZY;
-		h2.setScore(50);
+		h2.setFuzzyScore(50);
 		h2.source = source2;
 		h2.target = target2;
 
@@ -238,13 +238,13 @@ public class QueryResultTest {
 	public void compareToLessThanScore() {
 		QueryResult h1 = new QueryResult();
 		h1.matchType = MatchType.FUZZY;
-		h1.setScore(90);
+		h1.setFuzzyScore(90);
 		h1.source = source2;
 		h1.target = target2;
 		
 		QueryResult h2 = new QueryResult();
 		h2.matchType = MatchType.FUZZY;
-		h2.setScore(50);
+		h2.setFuzzyScore(50);
 		h2.source = source2;
 		h2.target = target2;
 		
@@ -255,13 +255,13 @@ public class QueryResultTest {
 	public void compareToLessThanMatchType() {
 		QueryResult h1 = new QueryResult();
 		h1.matchType = MatchType.EXACT;
-		h1.setScore(90);
+		h1.setFuzzyScore(90);
 		h1.source = source2;
 		h1.target = target2;
 		
 		QueryResult h2 = new QueryResult();
 		h2.matchType = MatchType.MT;
-		h2.setScore(90);
+		h2.setFuzzyScore(90);
 		h2.source = source2;
 		h2.target = target2;
 		
@@ -272,13 +272,13 @@ public class QueryResultTest {
 	public void compareToGreaterThanMatchType() {
 		QueryResult h1 = new QueryResult();
 		h1.matchType = MatchType.EXACT;
-		h1.setScore(90);
+		h1.setFuzzyScore(90);
 		h1.source = source2;
 		h1.target = target2;
 		
 		QueryResult h2 = new QueryResult();
 		h2.matchType = MatchType.MT;
-		h2.setScore(90);
+		h2.setFuzzyScore(90);
 		h2.source = source2;
 		h2.target = target2;
 		
@@ -296,25 +296,25 @@ public class QueryResultTest {
 	@Test 
 	public void testCombinedScore () {
 		QueryResult qr = new QueryResult();
-		qr.setScore(99);
-		assertEquals(qr.getScore(), qr.getCombinedScore()); // When not set: Should be like score
+		qr.setFuzzyScore(99);
+		assertEquals(qr.getFuzzyScore(), qr.getCombinedScore()); // When not set: Should be like score
 		qr.setCombinedScore(44);
 		assertEquals(44, qr.getCombinedScore());
 		qr.setCombinedScore(QueryResult.COMBINEDSCORE_UNDEFINED);
-		assertEquals(qr.getScore(), qr.getCombinedScore());
+		assertEquals(qr.getFuzzyScore(), qr.getCombinedScore());
 	}
 	
 	@Test 
 	public void compareToLessThanSource() {
 		QueryResult h1 = new QueryResult();
 		h1.matchType = MatchType.EXACT;
-		h1.setScore(90);
+		h1.setFuzzyScore(90);
 		h1.source = new TextFragment("A");
 		h1.target = target2;
 		
 		QueryResult h2 = new QueryResult();
 		h2.matchType = MatchType.MT;
-		h2.setScore(90);
+		h2.setFuzzyScore(90);
 		h2.source = new TextFragment("B");
 		h2.target = target2;
 
@@ -325,13 +325,13 @@ public class QueryResultTest {
 	public void compareToGreaterThanSource() {
 		QueryResult h1 = new QueryResult();
 		h1.matchType = MatchType.EXACT;
-		h1.setScore(90);
+		h1.setFuzzyScore(90);
 		h1.source = new TextFragment("A");
 		h1.target = target2;
 		
 		QueryResult h2 = new QueryResult();
 		h2.matchType = MatchType.MT;
-		h2.setScore(90);
+		h2.setFuzzyScore(90);
 		h2.source = new TextFragment("B");
 		h2.target = target2;
 		
@@ -342,14 +342,14 @@ public class QueryResultTest {
 	public void compareToWithCreationDates() {
 		QueryResult h1 = new QueryResult();
 		h1.matchType = MatchType.EXACT;
-		h1.setScore(100);
+		h1.setFuzzyScore(100);
 		h1.source = new TextFragment("A");
 		h1.target = target2;
 		h1.creationDate = new Date(0);
 		
 		QueryResult h2 = new QueryResult();
 		h2.matchType = MatchType.EXACT;
-		h2.setScore(100);
+		h2.setFuzzyScore(100);
 		h2.source = new TextFragment("A");
 		h2.target = target2;
 		h2.creationDate = new Date(1);

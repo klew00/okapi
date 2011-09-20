@@ -184,7 +184,7 @@ public class PensieveTMConnector extends BaseConnector implements ITMQuery {
 			Float f = hit.getScore();
 			QueryResult qr = new QueryResult();
 			qr.weight = getWeight();
-			qr.setScore(f.intValue());
+			qr.setFuzzyScore(f.intValue());
 			qr.source = hit.getTu().getSource().getContent();
 			qr.target = hit.getTu().getTarget().getContent();
 			qr.matchType = hit.getMatchType();
@@ -219,7 +219,7 @@ public class PensieveTMConnector extends BaseConnector implements ITMQuery {
 				result.weight = getWeight();
 				result.source = new TextFragment((String)map.get("source"));
 				result.target = new TextFragment((String)map.get("target"));
-				result.setScore(((Double)map.get("score")).intValue());
+				result.setFuzzyScore(((Double)map.get("score")).intValue());
 				result.origin = origin;
 				results.add(result);
 			}

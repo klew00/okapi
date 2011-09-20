@@ -177,6 +177,10 @@ public class IdBasedAlignerStep extends BasePipelineStep {
 		TextContainer targetTC = alignedTextUnit.createTarget(targetLocale, false, IResource.COPY_PROPERTIES);
 		
 		// Use the target text, if it exists
+		if (sourceTu.isReferent() && sourceTu.getName() == null) {
+			
+		}
+		
 		ITextUnit targetTu = targetTextUnitMap.get(sourceTu.getName());
 		if (targetTu != null) {			
 			// align codes (assume filter as numbered them correctly)										
@@ -233,20 +237,27 @@ public class IdBasedAlignerStep extends BasePipelineStep {
 			while (filter.hasNext()) {
 				final Event event = filter.next();
 				if (event.getEventType() == EventType.TEXT_UNIT) {
-					// check  if we have a name value
-					if (event.getTextUnit().getName() == null) {
-						LOGGER.warning("Missing id (name value) Skipping...");
+					ITextUnit tu = event.getTextUnit();
+					
+					// check if we have a name value and a target to leverage
+					if (tu.getName() == null && tu.getTarget(targetLocale) != null) {
+						LOGGER.warning("Missing id (name value) and empty target Skipping...");
 						continue;
 					}
-					
+
+					// check if this is a TU without a target (probably a parent tu with name)
+					if (tu.isReferent() && tu.getName() != null && tu.getTarget(targetLocale) == null) {
+						continue;
+					}
+
 					// check if we have a duplicate name
-					if (targetTextUnitMap.get(event.getTextUnit().getName()) != null) {
-						LOGGER.warning("Duplicate entry for: " + event.getTextUnit().getName() + " Skipping...");
+					if (targetTextUnitMap.get(tu.getName()) != null) {
+						LOGGER.warning("Duplicate entry for: " + tu.getName() + " Skipping...");
 						continue;
 					}
 					
 					// safe to continue storing the match
-					targetTextUnitMap.put(event.getTextUnit().getName(), event.getTextUnit());
+					targetTextUnitMap.put(tu.getName(), tu);
 				}
 			}
 		} finally {

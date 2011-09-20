@@ -61,7 +61,7 @@ public class OpenTranTMConnector extends BaseConnector implements ITMQuery {
 	
 	class ScoreComparer implements Comparator<QueryResult> {
 		public int compare(QueryResult arg0, QueryResult arg1) {
-			return (arg0.getScore()>arg1.getScore() ? -1 : (arg0.getScore()==arg1.getScore() ? 0 : 1));
+			return (arg0.getFuzzyScore()>arg1.getFuzzyScore() ? -1 : (arg0.getFuzzyScore()==arg1.getFuzzyScore() ? 0 : 1));
 		}
 	}
 	
@@ -263,16 +263,16 @@ public class OpenTranTMConnector extends BaseConnector implements ITMQuery {
 		for ( Iterator<QueryResult> iter = results.iterator(); iter.hasNext(); ) {
 			QueryResult qr = iter.next();
 			// Compute the adjusted score
-			qr.setScore(matcher.compareToBaseTokens(plainText, tokens, qr.source));
+			qr.setFuzzyScore(matcher.compareToBaseTokens(plainText, tokens, qr.source));
 			// Make sure we don't get exact if there are codes
-			if ( hasCodes && ( qr.getScore() > 99 )) qr.setScore(qr.getScore()-1);
+			if ( hasCodes && ( qr.getFuzzyScore() > 99 )) qr.setFuzzyScore(qr.getFuzzyScore()-1);
 			// Remove the item if lower than the threshold 
-			if ( qr.getScore() < threshold ) {
+			if ( qr.getFuzzyScore() < threshold ) {
 				iter.remove();
 			}
 			else { // Set match type
-				if ( qr.getScore() >= 100 ) qr.matchType = MatchType.EXACT;
-				else if ( qr.getScore() > 0 ) qr.matchType = MatchType.FUZZY;
+				if ( qr.getFuzzyScore() >= 100 ) qr.matchType = MatchType.EXACT;
+				else if ( qr.getFuzzyScore() > 0 ) qr.matchType = MatchType.FUZZY;
 			}
 		}
 		// Re-order the list based on the scores 

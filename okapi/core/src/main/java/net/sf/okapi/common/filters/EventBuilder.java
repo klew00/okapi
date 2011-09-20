@@ -1368,7 +1368,14 @@ public class EventBuilder {
 	public void setTextUnitName(String name) {
 		ITextUnit tu = peekMostRecentTextUnit();
 		if (tu != null) {
-			tu.setName(name);
+			String n = name;
+			if (tu.isReferent()) {
+				// the parent TU has the name so each
+				// child must use the name pluss its 
+				// TU id to be unique
+				n = tu.getId() + "-" + name;
+			}			
+			tu.setName(n);
 		}
 	}
 

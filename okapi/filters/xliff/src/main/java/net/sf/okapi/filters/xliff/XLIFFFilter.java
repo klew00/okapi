@@ -772,7 +772,7 @@ public class XLIFFFilter implements IFilter {
 							altTransMatchType, 0, altTransOrigin);
 						alt.getEntry().setPreserveWhitespaces(preserveSpaces.peek());
 						if ( altTransQuality > 0 ) {
-							alt.setScore(altTransQuality);
+							alt.setCombinedScore(altTransQuality);
 						}
 					}
 				}
@@ -834,7 +834,7 @@ public class XLIFFFilter implements IFilter {
 							altTransMatchType, 0, altTransOrigin);
 						alt.getEntry().setPreserveWhitespaces(preserveSpaces.peek());
 						if ( altTransQuality > 0 ) {
-							alt.setScore(altTransQuality);
+							alt.setCombinedScore(altTransQuality);
 						}
 					}
 					if ( tc.contentIsOneSegment() ) {

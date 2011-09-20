@@ -53,7 +53,7 @@ public class QueryResult implements Comparable<QueryResult> {
 		LocaleId targetLocId)
 	{
 		return new AltTranslation(sourceLocId, targetLocId, originalSource,
-				source, target, matchType, getCombinedScore(), origin);
+				source, target, matchType, getCombinedScore(), origin, getFuzzyScore(), getQuality());
 	}
 
 	/**
@@ -64,7 +64,7 @@ public class QueryResult implements Comparable<QueryResult> {
 	/**
 	 * Score of this result (a value between 0 and 100).
 	 */
-	private int score;
+	private int fuzzyScore;
 
 	/**
 	 * {@link MatchType} of this result.
@@ -144,7 +144,7 @@ public class QueryResult implements Comparable<QueryResult> {
 	 */
 	public int getCombinedScore () {
 		if ( combinedScore == COMBINEDSCORE_UNDEFINED ) {
-			return score;
+			return fuzzyScore;
 		}
 		return combinedScore;
 	}
@@ -163,24 +163,25 @@ public class QueryResult implements Comparable<QueryResult> {
 	}
 
 	/**
-	 * Gets the score for this result.
+	 * Gets the fuzzy score (i.e., string distance) for this result.
 	 * @return the score for this result.
 	 * @see #getCombinedScore()
 	 */
-	public int getScore () {
-		return score;
+	public int getFuzzyScore () {
+		return fuzzyScore;
 	}
 	
 	/**
 	 * Sets the score for this result.
 	 * @param score the new combined score value
-	 * (a value between 0 and 100).
+	 * (normally a value between 0 and 100, but some systems can set higher scores).
 	 */
-	public void setScore (int score) {
-		if (( score < 0 ) || ( score > 100 )) {
+	public void setFuzzyScore (int fuzzyScore) {
+		// some systems set scores higher than 100
+		if (( fuzzyScore < 0 )) {
 			throw new InvalidParameterException("Invalid score value.");
 		}
-		this.score = score;
+		this.fuzzyScore = fuzzyScore;
 	}
 
 	/**
@@ -220,9 +221,9 @@ public class QueryResult implements Comparable<QueryResult> {
 		}
 
 		// compare score
-		comparison = Float.compare(this.score, other.score);
+		comparison = Float.compare(this.getCombinedScore(), other.getCombinedScore());
 		if (comparison != EQUAL) {
-			return comparison * -1; // we want to reverse the normal score sort
+			return comparison * -1; // we want to reverse the normal sort
 		}
 
 		// compare source strings with codes

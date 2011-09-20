@@ -27,6 +27,7 @@ import java.util.NoSuchElementException;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.query.MatchType;
+import net.sf.okapi.common.query.QueryResult;
 import net.sf.okapi.common.resource.TextFragment;
 
 /**
@@ -85,8 +86,47 @@ public class AltTranslationsAnnotation implements IAnnotation, Iterable<AltTrans
 		int combinedScore,
 		String origin)
 	{
+		// by default fuzzyScore is set the same as combinedScore which is true in most cases
+		return add(sourceLocId, targetLocId, originalSource, alternateSource, alternateTarget,
+				type, combinedScore, origin, combinedScore, QueryResult.QUALITY_UNDEFINED);
+	}
+
+	/**
+	 * Adds a new entry to the list of alternate translations.
+	 * 
+	 * @param sourceLocId
+	 *            the locale of the source.
+	 * @param targetLocId
+	 *            the locale of the target.
+	 * @param originalSource
+	 *            the original source content.
+	 * @param alternateSource
+	 *            the source content corresponding to the alternate translation.
+	 * @param alternateTarget
+	 *            the content of alternate translation.
+	 * @param type
+	 *            the type of alternate translation.
+	 * @param combinedScore
+	 *            the combined score for this alternate translation (must be between 0 and 100).
+	 * @param origin
+	 *            an optional identifier for the origin of this alternate translation.
+	 * @param fuzzyScore - fuzzy score (string distance) between the original source and alternate translation source 
+	 * @param qualityScore - optional quality score from the TM or MT engine
+	 * @return the {@link AltTranslation} object created and added to this annotation.
+	 */
+	public AltTranslation add (LocaleId sourceLocId,
+		LocaleId targetLocId,
+		TextFragment originalSource,
+		TextFragment alternateSource,
+		TextFragment alternateTarget,
+		MatchType type,
+		int combinedScore,
+		String origin, 
+		int fuzzyScore,
+		int qualityScore)
+	{
 		list.add(new AltTranslation(sourceLocId, targetLocId, originalSource, alternateSource,
-			alternateTarget, type, combinedScore, origin));
+			alternateTarget, type, combinedScore, origin, fuzzyScore, qualityScore));
 		return list.get(list.size()-1);
 	}
 

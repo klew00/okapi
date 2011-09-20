@@ -1528,4 +1528,16 @@ public final class Util {
 		return map.get(key);		
 	}
 	
+	/**
+	 * Given an integer range and a value normalize that value on a scale between 0 and 100.
+	 * @param low - lowest value of the range
+	 * @param high - highest value of the range
+	 * @param value - the value that needs to be mapped to 0-100
+	 * @return mapped value, a number between 0 and 100
+	 */
+	public static int normalizeRange(float low, float high, float value) {
+		float m = 0.0f; // low value  of map to range
+		float n = 100.0f; // high value of map to range
+		return (int) (m +((value-low)/(high-low) * (n-m)));
+	}
 }

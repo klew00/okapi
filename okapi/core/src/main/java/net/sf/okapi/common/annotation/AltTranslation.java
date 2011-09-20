@@ -20,11 +20,13 @@
 
 package net.sf.okapi.common.annotation;
 
+import java.security.InvalidParameterException;
 import java.util.UUID;
 
 import net.sf.okapi.common.HashCodeUtil;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.query.MatchType;
+import net.sf.okapi.common.query.QueryResult;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.ITextUnit;
@@ -48,6 +50,8 @@ public class AltTranslation implements Comparable<AltTranslation> {
 	ITextUnit tu;
 	MatchType type;
 	int combinedScore;
+	int fuzzyScore;
+	int qualityScore;
 	String origin;
 	boolean fromOriginal;
 
@@ -80,11 +84,52 @@ public class AltTranslation implements Comparable<AltTranslation> {
 		int combinedScore,
 		String origin)
 	{
+		// by default fuzzyScore is set the same as combinedScore which is true in most cases
+		this(sourceLocId, targetLocId, originalSource, alternateSource, alternateTarget, type,
+				combinedScore, origin, combinedScore, QueryResult.QUALITY_UNDEFINED);
+	}
+
+	/**
+	 * Creates a new AltTranslation object.
+	 * 
+	 * @param sourceLocId
+	 *            the locale of the source.
+	 * @param targetLocId
+	 *            the locale of the target.
+	 * @param originalSource
+	 *            the original source content.
+	 * @param alternateSource
+	 *            the source content corresponding to the alternate translation (can be null).
+	 * @param alternateTarget
+	 *            the content of alternate translation.
+	 * @param type
+	 *            the type of alternate translation.
+	 * @param combinedScore
+	 *            the combined score for this alternate translation (must be between 0 and 100).
+	 *            Combined score is usually a combination of fuzzyScore and qualityScore.
+	 * @param origin
+	 *            an optional identifier for the origin of this alternate translation.
+	 * @param fuzzyScore - fuzzy score (string distance) between the original source and alternate translation source 
+	 * @param qualityScore - optional quality score from the TM or MT engine
+	 */
+	public AltTranslation (LocaleId sourceLocId,
+		LocaleId targetLocId,
+		TextFragment originalSource,
+		TextFragment alternateSource,
+		TextFragment alternateTarget,
+		MatchType type,
+		int combinedScore,
+		String origin, 
+		int fuzzyScore, 
+		int qualityScore)
+	{
 		this.srcLocId = sourceLocId;
 		this.trgLocId = targetLocId;
 		this.type = type;
 		this.combinedScore = combinedScore;
 		this.origin = origin;
+		this.qualityScore = qualityScore;
+		this.fuzzyScore = fuzzyScore;
 
 		tu = new TextUnit(UUID.randomUUID().toString());
 		if ( alternateSource != null ) {
@@ -197,7 +242,11 @@ public class AltTranslation implements Comparable<AltTranslation> {
 	 * Sets the score of this alternate translation.
 	 * @param score the new score.
 	 */
-	public void setScore (int score) {
+	public void setCombinedScore (int score) {
+		// some systems set scores higher than 100!!!
+		if ((( score < 0 ) && score != QueryResult.COMBINEDSCORE_UNDEFINED )) {
+			throw new InvalidParameterException("Invalid quality value.");
+		}
 		this.combinedScore = score;
 	}
 
@@ -226,6 +275,28 @@ public class AltTranslation implements Comparable<AltTranslation> {
 		return this.fromOriginal;
 	}
 	
+	public int getFuzzyScore() {
+		return fuzzyScore;
+	}
+
+	public void setFuzzyScore(int fuzzyScore) {
+		if (( fuzzyScore < 0 ) || ( fuzzyScore > 100 )) {
+			throw new InvalidParameterException("Invalid score value.");
+		}
+		this.fuzzyScore = fuzzyScore;
+	}
+
+	public int getQualityScore() {
+		return qualityScore;
+	}
+
+	public void setQualityScore(int qualityScore) {
+		if ((( qualityScore < 0 ) && qualityScore != QueryResult.QUALITY_UNDEFINED ) || ( qualityScore > 100 )) {
+			throw new InvalidParameterException("Invalid quality value.");
+		}
+		this.qualityScore = qualityScore;
+	}
+
 	/**
 	 * Indicates if a given match type is considered as exact or not.
 	 * @param type the match type to evaluate.
