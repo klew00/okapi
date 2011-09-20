@@ -173,7 +173,7 @@ public class QueryResult implements Comparable<QueryResult> {
 	
 	/**
 	 * Sets the score for this result.
-	 * @param score the new combined score value
+	 * @param fuzzyScore the new combined score value
 	 * (normally a value between 0 and 100, but some systems can set higher scores).
 	 */
 	public void setFuzzyScore (int fuzzyScore) {
