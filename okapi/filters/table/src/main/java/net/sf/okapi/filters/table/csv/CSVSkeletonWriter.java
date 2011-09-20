@@ -24,7 +24,6 @@ public class CSVSkeletonWriter extends GenericSkeletonWriter {
 	
 	@Override
 	public String processTextUnit(ITextUnit tu) {
-		System.out.println(tu.getSource().getUnSegmentedContentCopy().toString());
 		if (tu.isReferent()) {
 			return super.processTextUnit(tu);
 		}
