@@ -49,6 +49,7 @@ import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.query.MatchType;
+import net.sf.okapi.common.query.QueryResult;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
@@ -505,7 +506,7 @@ public class TTXFilter implements IFilter {
 									matchType = MatchType.EXACT;
 								}
 								altTrans = new AltTranslation(srcLoc, trgLoc, null, null, null, matchType,
-									value, ((origin==null) ? AltTranslation.ORIGIN_SOURCEDOC : origin));
+									value, ((origin==null) ? AltTranslation.ORIGIN_SOURCEDOC : origin), value, QueryResult.QUALITY_UNDEFINED);
 							}
 						}
 						continue;
