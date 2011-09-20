@@ -29,6 +29,7 @@ import net.sf.okapi.common.StringUtil;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
+import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.ITextUnit;
@@ -36,6 +37,7 @@ import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonPart;
+import net.sf.okapi.common.skeleton.ISkeletonWriter;
 import net.sf.okapi.filters.table.base.BaseTableFilter;
 import net.sf.okapi.lib.extra.filters.TextProcessingResult;
 
@@ -49,6 +51,7 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 
 	public static final String FILTER_NAME		= "okf_table_csv";
 	public static final String FILTER_CONFIG	= "okf_table_csv";
+	public static final String PROP_QUALIFIED	= "qualified";
 	
 	private static String MERGE_START_TAG	= "\ue10a";
 	private static String MERGE_END_TAG		= "\ue10b";
@@ -114,203 +117,6 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 		
 		return params.fieldDelimiter;
 	}
-
-//	@Override
-//	protected TextProcessingResult extractCells(List<TextUnit> cells, TextContainer lineContainer, long lineNum) {		
-//		// Extract cells from the line, if no multi-line chunks, fill up the cells list, if there are, fill the chunk buffer.
-//		// The cells is always an empty non-null list ready for addition
-//		
-//		if (cells == null) return TextProcessingResult.REJECTED;
-//		if (lineContainer == null) return TextProcessingResult.REJECTED;
-//		
-//		String line = lineContainer.getCodedText();
-//		String trimmedChunk = "";
-//		
-//		if (Util.isEmpty(params.fieldDelimiter)) return super.extractCells(cells, lineContainer, lineNum);		
-//		
-//		String[] chunks;
-//		if (Util.isEmpty(line)) 
-//			chunks = new String[] {""};
-//		else					
-//			chunks = ListUtil.stringAsArray(line, params.fieldDelimiter);
-//								
-//		boolean allowNesting = !lineStopped; 
-//		
-//		// Analyze chunks for being multi-line
-//		for (String chunk : chunks) {
-//			
-//			trimmedChunk = chunk.trim();			
-//																	
-//			if (trimmedChunk.indexOf(params.textQualifier) < 0 && !merging)
-//				{buffer.add(chunk); continue;}
-//							
-//			int numLeadingQ;
-//			int numTrailingQ;
-//			
-//			if (trimmedChunk.equals(params.textQualifier)) {
-//				
-//				if (merging) {
-//					
-//					numLeadingQ = 0;
-//					numTrailingQ = 1;
-//				}
-//				else {
-//					
-//					numLeadingQ = 1;
-//					numTrailingQ = 0;
-//				}					
-//			}
-//			else {
-//				int numQ = StringUtil.getNumOccurrences(trimmedChunk, params.textQualifier);
-//				numLeadingQ = RegexUtil.countLeadingQualifiers(trimmedChunk, params.textQualifier);
-//				numTrailingQ = RegexUtil.countTrailingQualifiers(trimmedChunk, params.textQualifier);
-//				int numUndetectedQ = numQ - (numLeadingQ + numTrailingQ); 
-//		
-//				// Nested qualified fragments are allowed only within a line; when a new line is started to be analyzed, no nesting is 
-//				// allowed, and an attempt to increase the level causes canceling of merging.				
-//				boolean startsQualified = trimmedChunk.startsWith(params.textQualifier);
-//				
-//				if (merging && level > 0 && startsQualified && !allowNesting)		
-////				if (merging && level > 0 && startsQualified)
-//					cancelMerging();
-//				
-//				if (numUndetectedQ > 0)					
-//					if (merging) 
-//						numTrailingQ += numUndetectedQ;
-//					else
-//						numLeadingQ += numUndetectedQ;
-//			}
-//						
-//			if (merging) {
-//				
-////				if (numLeadingQ == numTrailingQ) // == 0 is included
-////					{buffer.add(chunk); continue;}
-////				
-////				if (numLeadingQ > numTrailingQ)
-////					{level += numLeadingQ - numTrailingQ; buffer.add(chunk); continue;}
-////				
-////				if (numLeadingQ < numTrailingQ)
-////					{level += numLeadingQ - numTrailingQ; buffer.add(chunk); if (level <= 0) endMerging(); continue;}
-//				
-//				
-////					
-////				if (startsQualified && endsQualified) {		// 111
-////					
-////					if (trimmedChunk.length() == qualifierLen) // hanging qualifier
-////						{buffer.add(chunk); endMerging(); continue;}
-////					else
-////						{cancelMerging(); buffer.add(chunk); continue;}
-////				}
-//				
-//				int saveLevel = level;
-//				
-//				level += numLeadingQ - numTrailingQ;
-//				boolean endsQualified = trimmedChunk.endsWith(params.textQualifier);
-//				if (level == saveLevel && endsQualified && numTrailingQ == 0) level--;
-//				
-//				buffer.add(chunk);
-//				if (numLeadingQ <= numTrailingQ)
-//					if (level <= 0) 
-//						endMerging();
-//				//continue;
-//			}
-//			else {
-//				
-////				if (numLeadingQ == numTrailingQ) // == 0 is included
-////					{buffer.add(chunk); continue;}
-////				
-////				if (numLeadingQ > numTrailingQ)
-////					{startMerging(); level += numLeadingQ; buffer.add(chunk); continue;}
-////				
-////				if (numLeadingQ < numTrailingQ)
-////					{level -= numTrailingQ; buffer.add(chunk); continue;}
-//				
-//				if (numLeadingQ > numTrailingQ) {
-//					
-//					startMerging();
-//					allowNesting = true; // Nesting of qualified fragments is allowed within a single line.
-//				}
-//					
-//				level += numLeadingQ - numTrailingQ;
-//				buffer.add(chunk);
-//				//continue;
-//			}
-//			
-////			boolean startsQualified = trimmedChunk.startsWith(params.textQualifier); 
-////			boolean endsQualified = trimmedChunk.endsWith(params.textQualifier);
-////			
-//////			boolean evenNumQ = numQ % 2 == 0; 			
-//////			boolean startsQualified = false; 
-//////			boolean endsQualified = false;
-//////			
-//////			if (merging) {
-//////			
-//////				startsQualified = false; 
-//////
-//////				endsQualified = 
-//////					trimmedChunk.endsWith(params.textQualifier) && !evenNumQ;				
-//////			} 
-//////			else {
-//////				
-//////				startsQualified = 
-//////					(trimmedChunk.startsWith(params.textQualifier) && !evenNumQ) || (numQ > 0 && !evenNumQ);
-//////
-//////				endsQualified = 
-//////					trimmedChunk.endsWith(params.textQualifier) && evenNumQ;
-//////			}
-////				
-////			if (!merging && !startsQualified && !endsQualified)		// 000
-////				{buffer.add(chunk); continue;}
-////			
-////			if (!merging && !startsQualified && endsQualified)		// 001
-////				{buffer.add(chunk); continue;}
-////				
-////			if (!merging && startsQualified && !endsQualified)		// 010
-////				{startMerging(); buffer.add(chunk); continue;}
-////				
-////			if (!merging && startsQualified && endsQualified)		// 011
-////				{buffer.add(chunk); continue;}
-////				
-////			if (merging && !startsQualified && !endsQualified)		// 100
-////				{buffer.add(chunk); continue;}
-////				
-////			if (merging && !startsQualified && endsQualified)		// 101
-////				{buffer.add(chunk); endMerging(); continue;}
-////				
-////			if (merging && startsQualified && !endsQualified)		// 110
-////				{cancelMerging(); startMerging(); buffer.add(chunk); continue;}
-////				
-////			if (merging && startsQualified && endsQualified) {		// 111
-////				
-////				if (trimmedChunk.length() == qualifierLen) // hanging qualifier
-////					{buffer.add(chunk); endMerging(); continue;}
-////				else
-////					{cancelMerging(); buffer.add(chunk); continue;}
-////			}
-//							
-//		}
-//				
-//		//lineStopped = "".equals(trimmedChunk); // If the line ends with a comma, then the last chunk will be ""
-////		lineStopped = false;
-////		if (merging) {
-//////			if (lineStopped) {
-//////				cancelMerging();
-//////			}
-////			if ("".equals(trimmedChunk))
-////				lineStopped = true;
-////			else
-////				lineStopped = false;
-////		}
-////		else
-//			lineStopped = true;
-//		
-//		buffer.add(LINE_BREAK_TAG);
-//		buffer.add(String.valueOf(lineNum));
-//		
-//		processBuffer(false);
-//		
-//		return TextProcessingResult.DELAYED_DECISION;			
-//	}
 
 	@Override
 	protected TextProcessingResult extractCells(List<ITextUnit> cells, TextContainer lineContainer, long lineNum) {		
@@ -410,13 +216,15 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 	}
 	
 	@Override
-	protected boolean processTU(ITextUnit textUnit) {
-	
+	protected boolean processTU(ITextUnit textUnit) {	
 		if (textUnit == null) return false;
 		
 		TextUnitUtil.trimTU(textUnit, true, true);
-		if (params.removeQualifiers)
-			TextUnitUtil.removeQualifiers(textUnit, params.textQualifier);
+		if (params.removeQualifiers) {
+			if (TextUnitUtil.removeQualifiers(textUnit, params.textQualifier)) {
+				textUnit.setProperty(new Property(PROP_QUALIFIED, "yes"));
+			}
+		}			
 		
 		// Process wrapped lines
 		// We can use getFirstPartContent() because nothing is segmented
@@ -657,5 +465,9 @@ public class CommaSeparatedValuesFilter  extends BaseTableFilter {
 		
 		
 	}
-	
+
+	@Override
+	public ISkeletonWriter createSkeletonWriter() {
+		return new CSVSkeletonWriter();
+	}
 }

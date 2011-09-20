@@ -22,6 +22,7 @@ package net.sf.okapi.filters.table;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -53,6 +54,7 @@ import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnitUtil;
+import net.sf.okapi.filters.table.csv.CSVSkeletonWriter;
 import net.sf.okapi.filters.table.csv.CommaSeparatedValuesFilter;
 import net.sf.okapi.filters.table.csv.Parameters;
 import net.sf.okapi.lib.extra.filters.AbstractLineFilter;
@@ -284,6 +286,33 @@ public class CommaSeparatedValuesFilterTest {
 		testEvent(EventType.END_DOCUMENT, null);
 				filter.close();		
 	}	
+	
+	@Test
+	public void testSkeletonWriter () {
+		String snippet = "text1, \"text2\", text3, text4";
+		String snippet2 = "text1, \"text2_1, text2_2\", \"text3_1, text3_2\", text4";
+
+		List<Event> list = getEvents(snippet, locEN, locFRCA);
+		assertEquals(8, list.size());
+		
+		Event e;
+		ITextUnit tu;
+		
+		e = list.get(3);
+		tu = e.getTextUnit();
+		tu.setSource(new TextContainer("text2_1, text2_2"));
+		assertEquals("yes", tu.getProperty("qualified").getValue());
+		
+		e = list.get(4);
+		tu = e.getTextUnit();
+		tu.setSource(new TextContainer("text3_1, text3_2"));
+		assertNull(tu.getProperty("qualified"));
+		
+		String result = FilterTestDriver.generateOutput(list, locFRCA,
+				new CSVSkeletonWriter(), filter.getEncoderManager());
+
+		assertEquals(snippet2, result);
+	}
 	
 	public static void setDefaults(net.sf.okapi.filters.table.base.Parameters params) {
 		
