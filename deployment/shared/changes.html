@@ -56,6 +56,9 @@ distribution.</p>
 	<li>Rainbow Translation Kit Creation Step:<ul>
 	<li>Added the support for Versified Text + RTF packages.</li>
 	<li>The XINI package output now support pre-translated items.</li>
+	<li>Changed the default output directory from <code>${rootDir}</code> to
+	<code>${inputRootDir}</code>.</li>
+	<li>Continued to improved the experimental XLIFF 2.0 package.</li>
 </ul>
 	</li>
 	<li>XML Validation Step:<ul>
@@ -104,6 +107,8 @@ distribution.</p>
 	&lt;alt-trans&gt;</code> elements in output.</li>
 	<li>Modified the generation of group IDs to take into account the ones 
 	existing in the input file. This fixes issue #185.</li>
+	<li>Added support for cases where a <code>&lt;seg-source&gt;</code> element has no
+	<code>&lt;mrk&gt;</code> element: it&#39;s treated as a single-segment entry.</li>
 </ul>
 	</li>
 	<li>RTF Filter:<ul>

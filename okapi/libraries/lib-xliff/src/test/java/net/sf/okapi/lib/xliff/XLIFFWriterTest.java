@@ -195,8 +195,8 @@ public class XLIFFWriterTest {
 			+ "<data id=\"d3\">&lt;/B></data>\n"
 			+ "</originalData>\n"
 			+ "<segment>\n"
-			+ "<source><sc id=\"1\" nid=\"d1\"/>source<ec rid=\"1\" nid=\"d2\"/></source>\n"
-			+ "<target><sc id=\"1\" nid=\"d1\"/>target<ec rid=\"1\" nid=\"d3\"/></target>\n"
+			+ "<source><pc id=\"1\" nidEnd=\"d2\" nidStart=\"d1\">source</pc></source>\n"
+			+ "<target><pc id=\"1\" nidEnd=\"d3\" nidStart=\"d1\">target</pc></target>\n"
 			+ "</segment>\n"
 			+ "</unit>\n",
 			strWriter.toString());

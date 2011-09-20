@@ -50,7 +50,7 @@ public class Parameters extends BaseParameters {
 		writerClass = "net.sf.okapi.steps.rainbowkit.xliff.XLIFFPackageWriter";
 		writerOptions = "";
 		packageName = "pack1";
-		packageDirectory = Util.ROOT_DIRECTORY_VAR;
+		packageDirectory = Util.INPUT_ROOT_DIRECTORY_VAR;
 		// Internal
 		message = "";
 		outputManifest = true;

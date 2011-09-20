@@ -69,9 +69,10 @@ public class Main {
 		}
 		
 		if ( showUsage || list.isEmpty() ) {
+			System.out.println("------------------------------------------------------------");
 			System.out.println("Parameters: [options] file1 file2 ...");
 			System.out.println("Where options are:");
-			System.out.println("-trace:   show the details of the documents being read");
+			System.out.println("-verbose: show the details of the documents being read");
 			System.out.println("-outside: in the output, store original data of codes outside the content");
 			System.out.println("-inside:  in the output, store original data of codes inside the content");
 			System.out.println("-? or -h = shows this help");
@@ -80,7 +81,7 @@ public class Main {
 		
 		// Else: process the input files
 		reader = new XLIFFReader();
-			
+
 		for ( File input : list ) {
 			// Compute the output path
 			String path = input.getAbsolutePath();

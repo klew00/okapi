@@ -107,7 +107,6 @@ public class XLIFFWriter {
     	case Fragment.STYLE_DATAINSIDE:
     	case Fragment.STYLE_DATAOUTSIDE:
     	case Fragment.STYLE_NODATA:
-    	case Fragment.STYLE_XSDTEMP:
     		this.style = style;
     		return;
     	}

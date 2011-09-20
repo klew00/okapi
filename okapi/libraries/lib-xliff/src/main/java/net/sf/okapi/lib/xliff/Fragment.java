@@ -128,8 +128,6 @@ public class Fragment implements IFragment {
 	@Override
 	public String toXLIFF (int style) {
 		switch ( style ) {
-		case STYLE_XSDTEMP:
-			return toXSDTemp();
 		case STYLE_DATAINSIDE:
 			return toXLIFFWithOriginalData(true);
 		case STYLE_DATAOUTSIDE:
@@ -144,115 +142,84 @@ public class Fragment implements IFragment {
 	public IDataStore getDataStore () {
 		return codes.getDataStore();
 	}
-	
-	private String toXSDTemp () {
-		StringBuilder tmp = new StringBuilder();
-		for ( int i=0; i<ctext.length(); i++ ) {
-			int cp = ctext.codePointAt(i);
-			if ( cp == CODE_OPENING ) {
-				tmp.append(String.format("<inline id=\"%s\"/>",
-					codes.get(toIndex(ctext.charAt(++i))).getInternalId()));
-			}
-			else if ( cp == CODE_CLOSING ) {
-				tmp.append(String.format("<inline id=\"%s\"/>",
-					codes.get(toIndex(ctext.charAt(++i))).getInternalId()));
-			}
-			else if ( cp == CODE_PLACEHOLDER ) {
-				tmp.append(String.format("<inline id=\"%s\"/>",
-					codes.get(toIndex(ctext.charAt(++i))).getInternalId()));
-			}
-			else {
-				switch ( cp ) {
-				case '\r':
-					tmp.append("&#13;"); // Literal
-					break;
-				case '<':
-					tmp.append("&lt;");
-					break;
-				case '&':
-					tmp.append("&amp;");
-					break;
-				case '\n':
-				case '\t':
-					tmp.append((char)cp);
-					break;
-				default:
-					if (( cp < 0x0020 )
-						|| (( cp >0xD7FF ) && ( cp < 0xE000 ))
-						|| ( cp == 0xFFFF ))
-					{
-						// Invalid
-						tmp.append(String.format("<cp hex=\"%04X\"/>", cp));
-					}
-					else if ( cp < 0xFFFF ) {
-						// Valid char 
-						tmp.append((char)cp);
-					}
-					else if ( cp > 0xFFFF ) {
-						// Valid pair
-						tmp.append(Character.toChars(cp));
-						i++; // Skip second char of the pair
-					}
-					break;
-				}
-			}
-		}
-		return tmp.toString();
-	}
-	
+
 	private String toXLIFFWithOriginalData (boolean dataInside) {
 		StringBuilder tmp = new StringBuilder();
 		ICode code;
 		int index;
+		ArrayList<String> verified = new ArrayList<String>();
+		
 		for ( int i=0; i<ctext.length(); i++ ) {
 			int cp = ctext.codePointAt(i);
 			if ( cp == CODE_OPENING ) {
-				index = toIndex(ctext.charAt(++i));
-				code = codes.get(index);
-				tmp.append(String.format("<sc id=\"%s\"", code.getId()));
-				printCommonAttributes(code, tmp, null);
+				code = codes.get(toIndex(ctext.charAt(++i)));
+				// Check if the corresponding closing part is in the same fragment
+				ICode closing = null;
+				if ( !dataInside ) {
+					// For data outside we can use <pc>
+					closing = getWellFormedClosing(code, i);
+				}
+				if ( closing != null ) {
+					tmp.append(String.format("<pc id=\"%s\"", code.getId()));
+					verified.add(code.getId());
+				}
+				else {
+					// No corresponding closing part or data inside
+					tmp.append(String.format("<sc id=\"%s\"", code.getId()));
+				}
+				printCommonAttributes(code, tmp, closing, true); // closing can be null
+				
 				if ( dataInside ) {
 					if ( Util.isNullOrEmpty(code.getOriginalData()) ) {
 						tmp.append("/>");
 					}
-					else {
+					else { // Data inside is always using <sc>
 						tmp.append(">"+Util.toSafeXML(code.getOriginalData())+"</sc>");
 					}
 				}
 				else {
 					if ( code.hasOriginalData() ) {
-						tmp.append(String.format(" nid=\"%s\"",
+						String ending = (closing==null ? "" : "Start");
+						tmp.append(String.format(" nid%s=\"%s\"", ending,
 							codes.getDataStore().getIdForOriginalData(code.getOriginalData())));
 					}
-					tmp.append("/>");
+					tmp.append(closing==null ? "/>" : ">");
 				}
 			}
 			else if ( cp == CODE_CLOSING ) {
-				index = toIndex(ctext.charAt(++i));
-				code = codes.get(index);
-				tmp.append(String.format("<ec rid=\"%s\"", code.getId()));
-				printCommonAttributes(code, tmp, null);
-				if ( dataInside ) {
-					if ( Util.isNullOrEmpty(code.getOriginalData()) ) {
-						tmp.append("/>");
+				code = codes.get(toIndex(ctext.charAt(++i)));
+				if ( verified.contains(code.getId()) ) {
+					// This pair was verified
+					tmp.append("</pc>");
+					// No need to remove the code from the verified list
+					// as it's not used again (no need to waste time cleaning it)
+				}
+				else { // Not in the verified list: use <ec>
+					tmp.append(String.format("<ec rid=\"%s\"", code.getId()));
+					printCommonAttributes(code, tmp, null, false);
+				
+					if ( dataInside ) {
+						if ( Util.isNullOrEmpty(code.getOriginalData()) ) {
+							tmp.append("/>");
+						}
+						else {
+							tmp.append(">"+Util.toSafeXML(code.getOriginalData())+"</ec>");
+						}
 					}
 					else {
-						tmp.append(">"+Util.toSafeXML(code.getOriginalData())+"</ec>");
+						if ( code.hasOriginalData() ) {
+							tmp.append(String.format(" nid=\"%s\"",
+								codes.getDataStore().getIdForOriginalData(code.getOriginalData())));
+						}
+						tmp.append("/>");
 					}
-				}
-				else {
-					if ( code.hasOriginalData() ) {
-						tmp.append(String.format(" nid=\"%s\"",
-							codes.getDataStore().getIdForOriginalData(code.getOriginalData())));
-					}
-					tmp.append("/>");
 				}
 			}
 			else if ( cp == CODE_PLACEHOLDER ) {
 				index = toIndex(ctext.charAt(++i));
 				code = codes.get(index);
 				tmp.append(String.format("<ph id=\"%s\"", code.getId()));
-				printCommonAttributes(code, tmp, null);
+				printCommonAttributes(code, tmp, null, false);
 				if ( dataInside ) {
 					if ( Util.isNullOrEmpty(code.getOriginalData()) ) {
 						tmp.append("/>");
@@ -308,19 +275,29 @@ public class Fragment implements IFragment {
 		return tmp.toString();
 	}
 	
+	/**
+	 * Output the common attributes
+	 * @param code the code to output.
+	 * @param tmp the buffer where to output.
+	 * @param closing the closing code if this is a paired-code.
+	 */
 	private void printCommonAttributes (ICode code,
 		StringBuilder tmp,
-		ICode closing)
+		ICode closing,
+		boolean outputNid)
 	{
 		if ( code.getType() != null ) {
 			tmp.append(String.format(" type=\"%s\"", code.getType()));
 		}
+
+		String ending = (closing == null ? "" : "Start");
 		if ( code.getEquiv() != null ) {
-			tmp.append(String.format(" equiv=\"%s\"", code.getEquiv()));
+			tmp.append(String.format(" equiv%s=\"%s\"", ending, code.getEquiv()));
 		}
 		if ( code.getDisp() != null ) {
-			tmp.append(String.format(" disp=\"%s\"", code.getDisp()));
+			tmp.append(String.format(" disp%s=\"%s\"", ending, code.getDisp()));
 		}
+		
 		if ( closing != null ) {
 			if ( closing.getEquiv() != null ) {
 				tmp.append(String.format(" equivEnd=\"%s\"", closing.getEquiv()));
@@ -328,6 +305,12 @@ public class Fragment implements IFragment {
 			if ( closing.getDisp() != null ) {
 				tmp.append(String.format(" dispEnd=\"%s\"", closing.getDisp()));
 			}
+
+			if ( outputNid && closing.hasOriginalData() ) {
+				tmp.append(String.format(" nidEnd=\"%s\"",
+					codes.getDataStore().getIdForOriginalData(closing.getOriginalData())));
+			}
+			
 		}
 	}
 
@@ -344,14 +327,14 @@ public class Fragment implements IFragment {
 				ICode closing = getWellFormedClosing(code, i);
 				if ( closing != null ) {
 					tmp.append(String.format("<pc id=\"%s\"", code.getId()));
-					printCommonAttributes(code, tmp, closing);
+					printCommonAttributes(code, tmp, closing, false);
 					verified.add(code.getId());
 					tmp.append(">");
 				}
 				else {
 					// No corresponding closing part
 					tmp.append(String.format("<sc id=\"%s\"", code.getId()));
-					printCommonAttributes(code, tmp, null);
+					printCommonAttributes(code, tmp, null, false);
 					tmp.append("/>");
 				}
 			}
@@ -365,14 +348,14 @@ public class Fragment implements IFragment {
 				}
 				else { // Not in the verified list
 					tmp.append(String.format("<ec rid=\"%s\"", code.getId()));
-					printCommonAttributes(code, tmp, null);
+					printCommonAttributes(code, tmp, null, false);
 					tmp.append("/>");
 				}
 			}
 			else if ( cp == CODE_PLACEHOLDER ) {
 				code = codes.get(toIndex(ctext.charAt(++i)));
 				tmp.append(String.format("<ph id=\"%s\"", code.getId()));
-				printCommonAttributes(code, tmp, null);
+				printCommonAttributes(code, tmp, null, false);
 				tmp.append("/>");
 			}
 			else {

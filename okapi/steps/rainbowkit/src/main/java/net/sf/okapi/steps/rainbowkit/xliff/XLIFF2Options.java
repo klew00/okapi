@@ -39,7 +39,7 @@ public class XLIFF2Options extends BaseParameters implements IEditorDescriptionP
 	
 	@Override
 	public void reset() {
-		inlineStyle = Fragment.STYLE_XSDTEMP;
+		inlineStyle = Fragment.STYLE_DATAINSIDE;
 	}
 
 	@Override
@@ -76,13 +76,11 @@ public class XLIFF2Options extends BaseParameters implements IEditorDescriptionP
 		EditorDescription desc = new EditorDescription("Experimental XLIFF 2.0", true, false);
 
 		String[] values = {
-			String.valueOf(Fragment.STYLE_XSDTEMP),
 			String.valueOf(Fragment.STYLE_NODATA),
 			String.valueOf(Fragment.STYLE_DATAINSIDE),
 			String.valueOf(Fragment.STYLE_DATAOUTSIDE)
 		};
 		String[] labels = {
-			"Temporary XSD style",
 			"Without original data stored",
 			"Original data stored inline",
 			"Original data stored outside the content"

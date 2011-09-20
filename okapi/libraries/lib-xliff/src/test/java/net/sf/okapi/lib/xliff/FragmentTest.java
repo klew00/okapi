@@ -90,7 +90,7 @@ public class FragmentTest {
 		frag.append(InlineType.PLACEHOLDER, "2", "<br/>");
 		
 		frag.getDataStore().calculateOriginalDataToIdsMap();
-		assertEquals("<sc id=\"1\" nid=\"d1\"/>text<ec rid=\"1\" nid=\"d2\"/><ph id=\"2\" nid=\"d3\"/>",
+		assertEquals("<pc id=\"1\" nidEnd=\"d2\" nidStart=\"d1\">text</pc><ph id=\"2\" nid=\"d3\"/>",
 			frag.toXLIFF(Fragment.STYLE_DATAOUTSIDE));
 	}
 
@@ -122,8 +122,8 @@ public class FragmentTest {
 		frag.append(InlineType.PLACEHOLDER, "4", "<br/>");
 		
 		frag.getDataStore().calculateOriginalDataToIdsMap();
-		assertEquals("<sc id=\"1\" nid=\"d1\"/>t1<ec rid=\"1\" nid=\"d2\"/><ph id=\"2\" nid=\"d3\"/>"
-			+ "<sc id=\"3\" nid=\"d1\"/>t2<ec rid=\"3\" nid=\"d2\"/><ph id=\"4\" nid=\"d3\"/>",
+		assertEquals("<pc id=\"1\" nidEnd=\"d2\" nidStart=\"d1\">t1</pc><ph id=\"2\" nid=\"d3\"/>"
+			+ "<pc id=\"3\" nidEnd=\"d2\" nidStart=\"d1\">t2</pc><ph id=\"4\" nid=\"d3\"/>",
 			frag.toXLIFF(Fragment.STYLE_DATAOUTSIDE));
 	}
 

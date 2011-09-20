@@ -784,6 +784,7 @@ public class XLIFFFilter implements IFilter {
 					logger.warning(String.format("The <seg-source> content for the entry id='%s' is different from its <source>. The un-segmented content of <source> will be used.", tu.getId()));
 				}
 				else { // Same content: use the segmented one
+					tc.setHasBeenSegmentedFlag(true); // Force entries without mrk to single segment entries
 					tu.setSource(tc);
 				}
 			}

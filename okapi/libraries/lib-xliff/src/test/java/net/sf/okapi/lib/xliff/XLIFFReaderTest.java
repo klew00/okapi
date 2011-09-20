@@ -123,8 +123,8 @@ public class XLIFFReaderTest {
 		assertEquals("eq3", code.getEquiv());
 		assertEquals("di3", code.getDisp());
 		
-		assertEquals("<pc id=\"1\" equiv=\"eq1\" disp=\"di1\" equivEnd=\"eq1e\" dispEnd=\"di1e\">t1" +
-				"<pc id=\"2\" equiv=\"eq2\" disp=\"di2\">t2" +
+		assertEquals("<pc id=\"1\" equivStart=\"eq1\" dispStart=\"di1\" equivEnd=\"eq1e\" dispEnd=\"di1e\">t1" +
+				"<pc id=\"2\" equivStart=\"eq2\" dispStart=\"di2\">t2" +
 				"<ph id=\"3\" equiv=\"eq3\" disp=\"di3\"/>t3" +
 				"</pc></pc>",
 			unit.getPart(0).getSource().toXLIFF(IFragment.STYLE_NODATA));

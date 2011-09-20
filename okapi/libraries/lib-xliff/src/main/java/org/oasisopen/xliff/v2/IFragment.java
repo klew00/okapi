@@ -24,7 +24,6 @@ import java.io.Serializable;
 
 public interface IFragment extends Serializable {
 	
-	public static final int STYLE_XSDTEMP = -1; // Temporary
 	public static final int STYLE_NODATA = 0;
 	public static final int STYLE_DATAINSIDE = 1;
 	public static final int STYLE_DATAOUTSIDE = 2;
