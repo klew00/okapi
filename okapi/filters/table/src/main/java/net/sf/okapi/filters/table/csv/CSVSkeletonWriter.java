@@ -1,43 +1,24 @@
 package net.sf.okapi.filters.table.csv;
 
-import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.encoder.EncoderManager;
-import net.sf.okapi.common.filterwriter.ILayerProvider;
 import net.sf.okapi.common.resource.ITextUnit;
-import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
-import net.sf.okapi.common.resource.TextUnitUtil;
+import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 
 public class CSVSkeletonWriter extends GenericSkeletonWriter {
 
-	private LocaleId outputLocale;
-	
-	@Override
-	public String processStartDocument(LocaleId outputLocale,
-			String outputEncoding, ILayerProvider layer,
-			EncoderManager encoderManager, StartDocument resource) {		
-		this.outputLocale = outputLocale;
-		return super.processStartDocument(outputLocale, outputEncoding, layer,
-				encoderManager, resource);
-	}
-	
 	@Override
 	public String processTextUnit(ITextUnit tu) {
-		if (tu.isReferent()) {
-			return super.processTextUnit(tu);
-		}
-		
 		if (tu.hasProperty(CommaSeparatedValuesFilter.PROP_QUALIFIED) && 
 			"yes".equals(tu.getProperty(CommaSeparatedValuesFilter.PROP_QUALIFIED).getValue())) {
 				return super.processTextUnit(tu);
 		}
 
 		TextContainer tc;
-		String text;
-		boolean isTarget = tu.hasTarget(outputLocale);
+		boolean isTarget = tu.hasTarget(outputLoc);
 		if (isTarget) {
-			tc = tu.getTarget(outputLocale);
+			tc = tu.getTarget(outputLoc);
 		}
 		else {
 			tc = tu.getSource();
@@ -46,11 +27,19 @@ public class CSVSkeletonWriter extends GenericSkeletonWriter {
 		if (tc == null)
 			return super.processTextUnit(tu);
 		
-		text = tc.getUnSegmentedContentCopy().toText(); // Just to detect "bad" characters
+		TextFragment tf = tc.getUnSegmentedContentCopy();
+		String text = tf.toText(); // Just to detect "bad" characters
 		if (text.contains(",") || text.contains("\n")) {
-			TextUnitUtil.addQualifiers(tu, "\"");
-		}
-		
+			if (tc.hasBeenSegmented()) {
+				tc.insert(0, new TextPart("\""));
+				tc.append(new TextPart("\""));
+			}
+			else {
+				tf.insert(0, new TextFragment("\""));
+				tf.append("\"");
+				tc.setContent(tf);
+			}
+		}		
 		return super.processTextUnit(tu);
 	}
 
