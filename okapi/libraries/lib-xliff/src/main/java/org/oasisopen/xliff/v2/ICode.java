@@ -50,6 +50,10 @@ public interface ICode extends Serializable {
 	
 	public void setEquiv (String equiv);
 	
+	public String getSubFlows ();
+	
+	public void setSubFlows (String subFlows);
+	
 	public int getHints ();
 	
 	public void setHints (int hints);

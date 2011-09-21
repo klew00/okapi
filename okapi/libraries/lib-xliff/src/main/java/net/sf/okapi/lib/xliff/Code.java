@@ -40,6 +40,7 @@ public class Code implements ICode {
 	private String disp;
 	private String equiv;
 	private String type;
+	private String subFlows;
 
 	public Code (InlineType inlineType,
 		String id,
@@ -120,6 +121,16 @@ public class Code implements ICode {
 	@Override
 	public void setEquiv (String equiv) {
 		this.equiv = equiv;
+	}
+	
+	@Override
+	public String getSubFlows () {
+		return subFlows;
+	}
+	
+	@Override
+	public void setSubFlows (String subFlows) {
+		this.subFlows = subFlows;
 	}
 	
 	@Override

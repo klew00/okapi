@@ -297,6 +297,9 @@ public class Fragment implements IFragment {
 		if ( code.getDisp() != null ) {
 			tmp.append(String.format(" disp%s=\"%s\"", ending, code.getDisp()));
 		}
+		if ( code.getSubFlows() != null ) {
+			tmp.append(String.format(" subFlows%s=\"%s\"", ending, code.getSubFlows()));
+		}
 		
 		if ( closing != null ) {
 			if ( closing.getEquiv() != null ) {
@@ -304,6 +307,9 @@ public class Fragment implements IFragment {
 			}
 			if ( closing.getDisp() != null ) {
 				tmp.append(String.format(" dispEnd=\"%s\"", closing.getDisp()));
+			}
+			if ( closing.getSubFlows() != null ) {
+				tmp.append(String.format(" subFlowsEnd=\"%s\"", closing.getSubFlows()));
 			}
 
 			if ( outputNid && closing.hasOriginalData() ) {

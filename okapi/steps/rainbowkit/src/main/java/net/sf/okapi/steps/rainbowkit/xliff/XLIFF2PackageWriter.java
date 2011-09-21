@@ -21,14 +21,20 @@
 package net.sf.okapi.steps.rainbowkit.xliff;
 
 import java.io.File;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.oasisopen.xliff.v2.ICode;
+
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.IResource;
+import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.resource.Code;
+import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.Segment;
@@ -49,8 +55,11 @@ import net.sf.okapi.steps.rainbowkit.common.BasePackageWriter;
 
 public class XLIFF2PackageWriter extends BasePackageWriter {
 
+	private static final String TU_PREFIX = "$tu$";
 	private static final Logger LOGGER = Logger.getLogger(XLIFF2PackageWriter.class.getName());
+	
 	private XLIFFWriter writer;
+	private LinkedHashMap<String, String> referents;
 
 	public XLIFF2PackageWriter () {
 		super(Manifest.EXTRACTIONTYPE_XLIFF2);
@@ -73,6 +82,7 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 		super.processStartDocument(event);
 		
 		writer = new XLIFFWriter();
+		referents = new LinkedHashMap<String, String>();
 
 //		writer.setOptions(manifest.getTargetLocale(), "UTF-8");
 		MergingInfo item = manifest.getItem(docId);
@@ -100,6 +110,8 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 		writer.writeEndDocument();
 		writer.close();
 		writer = null;
+		referents.clear();
+		referents = null;
 		super.processEndDocument(event);
 	}
 
@@ -129,11 +141,72 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 	
 	@Override
 	protected void processTextUnit (Event event) {
-		Unit unit = toXLIFF2Unit(event.getTextUnit());
+		ITextUnit tu = event.getTextUnit();
+		if ( tu.isReferent() ) {
+			storeReferent(tu);
+		}
+		Unit unit = toXLIFF2Unit(tu);
 		writer.writeUnit(unit);
 		writeTMXEntries(event.getTextUnit());
 	}
+	
+	@Override
+	protected void processDocumentPart (Event event) {
+		DocumentPart dp = event.getDocumentPart();
+		if ( dp.isReferent() ) {
+			storeReferent(dp);
+		}
+	}
 
+	private void storeReferent (IResource res) {
+		ISkeleton skel = res.getSkeleton();
+		if ( skel == null ) return;
+		if ( res instanceof ITextUnit ) {
+			referents.put(res.getId(), TU_PREFIX+skel.toString());
+		}
+		else {
+			referents.put(res.getId(), skel.toString());
+		}
+	}
+
+	/**
+	 * Gets the text unit id of the referenced objects.
+	 * @param text the initial skeleton string.
+	 * @return a list of IDs or empty
+	 */
+	private String getReferences (String text) {
+		if ( text == null ) return null;
+		StringBuilder tmp = new StringBuilder();
+		StringBuilder data = new StringBuilder(text);
+		Object[] res = null;
+		do {
+			// Check if that data has a reference marker
+			res = TextFragment.getRefMarker(data);
+			if ( res != null ) {
+				String refId = (String)res[0];
+				if ( !refId.equals("$self$") ) {
+					String skel = referents.get(refId);
+					if ( skel != null ) {
+						if ( !skel.startsWith(TU_PREFIX) ) {
+							String refs = getReferences(skel);
+							if ( refs != null ) {
+								tmp.append(refs+" ");
+							}
+						}
+						else { // text unit
+							tmp.append(refId+" ");
+						}
+						referents.remove(refId); // Clean up
+					}
+				}
+				// Remove this and check for next
+				data.delete((Integer)res[1], (Integer)res[2]);
+			}
+		}
+		while ( res != null );
+		return tmp.toString().trim(); 
+	}
+	
 	@Override
 	public void close () {
 		if ( writer != null ) {
@@ -252,13 +325,13 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 		DataStore store,
 		boolean isTarget)
 	{
-		// fast track for content without codes
+		// Fast track for content without codes
 		if ( !tf.hasCode() ) {
 			return new Fragment(store, isTarget, tf.getCodedText());
 		}
 		
 		// Otherwise: we map the codes
-		Fragment frag = new Fragment(store, isTarget);
+		Fragment xFrag = new Fragment(store, isTarget);
 		String ctext = tf.getCodedText();
 		List<Code> codes = tf.getCodes();
 
@@ -268,27 +341,36 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 			if ( TextFragment.isMarker(ctext.charAt(i)) ) {
 				index = TextFragment.toIndex(ctext.charAt(++i));
 				code = codes.get(index);
+				ICode xCode;
 				switch ( code.getTagType() ) {
 				case OPENING:
-					frag.append(org.oasisopen.xliff.v2.InlineType.OPENING,
+					xCode = xFrag.append(org.oasisopen.xliff.v2.InlineType.OPENING,
 						String.valueOf(code.getId()), code.getData());
 					break;
 				case CLOSING:
-					frag.append(org.oasisopen.xliff.v2.InlineType.CLOSING,
+					xCode = xFrag.append(org.oasisopen.xliff.v2.InlineType.CLOSING,
 						String.valueOf(code.getId()), code.getData());
 					break;
 				case PLACEHOLDER:
-					frag.append(org.oasisopen.xliff.v2.InlineType.PLACEHOLDER,
+				default:
+					xCode = xFrag.append(org.oasisopen.xliff.v2.InlineType.PLACEHOLDER,
 						String.valueOf(code.getId()), code.getData());
 					break;
 				}
+				if ( code.hasReference() ) {
+					String data = getReferences(code.getData());
+					if ( data != null ) {
+						xCode.setSubFlows(data);
+					}
+				}
+				
 			}
 			else {
-				frag.append(ctext.charAt(i));
+				xFrag.append(ctext.charAt(i));
 			}
 		}
 
-		return frag;
+		return xFrag;
 	}
 
 }
