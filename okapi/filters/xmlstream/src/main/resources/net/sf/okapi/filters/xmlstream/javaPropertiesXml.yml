@@ -1,3 +1,4 @@
+assumeWellformed: true
 global_cdata_subfilter: okf_html
 preserve_whitespace: false
 

@@ -29,7 +29,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -94,11 +93,6 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	private static final Pattern CDATA_END_PATTERN = Pattern.compile(CDATA_END_REGEX);
 	private static final int PREVIEW_BYTE_COUNT = 1024;
 
-	class CurrentStartTag {
-		StartTag startTag;
-		String id;
-	}
-	
 	private StringBuilder bufferedWhitespace;
 	private StreamedSource document;
 	private Iterator<Segment> nodeIterator;
@@ -112,9 +106,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	private IFilter cdataSubfilter;
 	@SubFilter() // make this IFilter a subfilter 
 	private IFilter pcdataSubfilter;
-	// stack of start tags used to remeber the current tag id (aka ITextUnit name)
-	private Stack<CurrentStartTag> startTagStack;
-	
+	private String currentId;
 	private boolean documentEncoding;
 	private String currentDocName;
 	
@@ -133,7 +125,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		this.hasUtf8Bom = false;
 		this.hasUtf8Encoding = false;
 		this.hasBOM = false;
-		this.startTagStack = new Stack<AbstractMarkupFilter.CurrentStartTag>();
+		this.currentId = null;
 		this.documentEncoding = false;		
 	}
 
@@ -146,7 +138,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		this.hasUtf8Bom = false;
 		this.hasUtf8Encoding = false;
 		this.hasBOM = false;
-		this.startTagStack = new Stack<AbstractMarkupFilter.CurrentStartTag>();
+		this.currentId = null;
 		this.documentEncoding = false;
 	}
 
@@ -166,7 +158,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		
 		this.hasUtf8Bom = false;
 		this.hasUtf8Encoding = false;
-		this.startTagStack = new Stack<AbstractMarkupFilter.CurrentStartTag>();
+		this.currentId = null;
 
 		if (ruleState != null) {
 			ruleState.reset(!getConfig().isGlobalPreserveWhitespace());
@@ -590,6 +582,13 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 				while (cdataSubfilter.hasNext()) {
 					Event event = converter.convertEvent(cdataSubfilter.next());
 					eventBuilder.addFilterEvent(event);
+					// subfiltered textunits inherit any name from a parent TU
+					if (event.isTextUnit()) {
+						if (event.getTextUnit().getName() == null) {
+							event.getTextUnit().setName(
+									eventBuilder.findMostRecentTextUnitName());
+						}
+					}
 				}			
 				cdataSubfilter.close();			
 			} else {
@@ -677,6 +676,11 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		String idValue = null;
 		RULE_TYPE ruleType = getConfig().getConditionalElementRuleType(startTag.getName(),
 				attributes);
+
+		// reset after each start tag so that we never 
+		// set a TextUnit name that id from a far out tag
+		currentId = null;
+		
 		try {
 			// if in excluded state everything is skeleton including text
 			if (ruleState.isExludedState()) {
@@ -944,6 +948,11 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 						case TEXT_UNIT:
 							ITextUnit tu = event.getTextUnit();
 							
+							// subfiltered textunits can inherit name from a parent TU
+							if (tu.getName() == null) {
+								tu.setName(eventBuilder.findMostRecentTextUnitName());
+							}
+							
 							// escape the skeleton parts
 							GenericSkeleton s = (GenericSkeleton)tu.getSkeleton();
 							for (GenericSkeletonPart p : s.getParts()) {
@@ -991,20 +1000,6 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 		} else if (ruleState.peekPreserverWhitespaceRule().ruleName.equalsIgnoreCase(endTag.getName())) {
 			ruleState.popPreserverWhitespaceRule();
 			setPreserveWhitespace(ruleState.isPreserveWhitespaceState());
-		}
-		
-		if (getConfig().isWellformed()) {
-			if (!startTagStack.isEmpty()) {
-				CurrentStartTag cst = startTagStack.peek();
-				if (cst.startTag.getName().equals(endTag.getName())) {
-					// only pop if the start and end tag names match
-					startTagStack.pop();
-				}			
-			} 			
-		} else {
-			// since this is not a well formed format we
-			// have no choice but to remove all id tags
-			startTagStack.clear();			
 		}
 	}
 
@@ -1140,12 +1135,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 				propertyOrTextUnitPlaceholders.add(createPropertyTextUnitPlaceholder(
 						PlaceholderAccessType.NAME, attribute.getName(), attribute.getValue(),
 						startTag, attribute));
-				// save id (aka TextUNit name) on stack for use when the TU is created
-				CurrentStartTag cst = new CurrentStartTag();
-				cst.id = attribute.getValue() + "-" + attribute.getName();
-				cst.startTag = startTag;
-				startTagStack.push(cst);
-				 
+				currentId = attribute.getValue() + "-" + attribute.getName();
 				break;
 			case ATTRIBUTE_PRESERVE_WHITESPACE:
 				boolean preserveWS = getConfig().isPreserveWhitespaceCondition(attribute.getName(),
@@ -1266,13 +1256,18 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 
 	protected void startTextUnit(String text) {
 		eventBuilder.startTextUnit(text);
-		if (!startTagStack.isEmpty()) {
-			setTextUnitName(startTagStack.peek().id);
-		}
+		setTextUnitName(currentId);
 	}
 
 	protected void setTextUnitName(String name) {
-		eventBuilder.setTextUnitName(name);
+		String n = name;
+		if (name == null) {
+			// we have no name for this TU but lets check for a parent
+			// name. All children will inherit this
+			n = eventBuilder.findMostRecentTextUnitName();
+		}
+		eventBuilder.setTextUnitName(n);
+		currentId = null;
 	}
 
 	protected void setTextUnitType(String type) {
@@ -1337,17 +1332,13 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 
 	protected void startTextUnit(GenericSkeleton startMarker) {
 		eventBuilder.startTextUnit(startMarker);
-		if (!startTagStack.isEmpty()) {
-			setTextUnitName(startTagStack.peek().id);
-		}
+		setTextUnitName(currentId);		
 	}
 
 	protected void startTextUnit(GenericSkeleton startMarker,
 			List<PropertyTextUnitPlaceholder> propertyTextUnitPlaceholders) {
 		eventBuilder.startTextUnit(startMarker, propertyTextUnitPlaceholders);
-		if (!startTagStack.isEmpty()) {
-			setTextUnitName(startTagStack.peek().id);
-		}
+		setTextUnitName(currentId);
 	}
 
 	protected void endTextUnit(GenericSkeleton endMarker) {
@@ -1360,10 +1351,7 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 
 	protected void startTextUnit() {
 		eventBuilder.startTextUnit();
-		if (!startTagStack.isEmpty()) {
-			setTextUnitName(startTagStack.peek().id);
-		}
-
+		setTextUnitName(currentId);
 	}
 
 	protected long getTextUnitId() {

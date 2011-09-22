@@ -168,21 +168,18 @@ public class IdBasedAlignerStep extends BasePipelineStep {
 		ITextUnit sourceTu = sourceEvent.getTextUnit();
 
 		// Skip non-translatable and empty
-		if (!sourceTu.isTranslatable() || sourceTu.isEmpty()) {
+		if (!sourceTu.isTranslatable() || sourceTu.isEmpty() || 
+				!sourceTu.getSource().hasText()) {
 			return sourceEvent;
 		}
 		// Populate the target TU
 		ITextUnit alignedTextUnit = sourceTu.clone();		
 		
 		TextContainer targetTC = alignedTextUnit.createTarget(targetLocale, false, IResource.COPY_PROPERTIES);
-		
-		// Use the target text, if it exists
-		if (sourceTu.isReferent() && sourceTu.getName() == null) {
-			
-		}
-		
+				
 		ITextUnit targetTu = targetTextUnitMap.get(sourceTu.getName());
-		if (targetTu != null) {			
+		if (targetTu != null && !targetTu.isEmpty() && 
+				targetTu.getSource().hasText()) {			
 			// align codes (assume filter as numbered them correctly)										
 			alignedTextUnit.getSource().getFirstContent().alignCodeIds(targetTu.getSource().getFirstContent());		
 			
@@ -239,14 +236,14 @@ public class IdBasedAlignerStep extends BasePipelineStep {
 				if (event.getEventType() == EventType.TEXT_UNIT) {
 					ITextUnit tu = event.getTextUnit();
 					
-					// check if we have a name value and a target to leverage
-					if (tu.getName() == null && tu.getTarget(targetLocale) != null) {
+					// check if we have a name value
+					if (tu.getName() == null) {
 						LOGGER.warning("Missing id (name value) and empty target Skipping...");
 						continue;
 					}
 
-					// check if this is a TU without a target (probably a parent tu with name)
-					if (tu.isReferent() && tu.getName() != null && tu.getTarget(targetLocale) == null) {
+					// check if this is a TU without a target (probably a parent tu)
+					if (!tu.getSource().hasText()) {
 						continue;
 					}
 

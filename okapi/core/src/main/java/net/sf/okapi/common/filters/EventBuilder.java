@@ -307,6 +307,24 @@ public class EventBuilder {
 		
 		return null;	
 	}
+
+	/**
+	 * Find in our buffered queue the most recent TextUnit
+	 * that has an assigned name
+	 * @return - the TextUnit name, null if not found
+	 */
+	public String findMostRecentTextUnitName() {	
+		if (tempFilterEventStack.isEmpty()) {
+			return null;
+		}
+		// skip current TextUnit - the one we are currently processing
+		for (Event fe : tempFilterEventStack) {
+			if (fe.getEventType() == EventType.TEXT_UNIT && fe.getTextUnit().getName() != null) {
+				return fe.getTextUnit().getName();
+			}
+		}
+		return null;	
+	}
 	
 	/**
 	 * Peek at the most recently created {@link StartGroup}.
@@ -1367,15 +1385,8 @@ public class EventBuilder {
 	 */
 	public void setTextUnitName(String name) {
 		ITextUnit tu = peekMostRecentTextUnit();
-		if (tu != null) {
-			String n = name;
-			if (tu.isReferent()) {
-				// the parent TU has the name so each
-				// child must use the name pluss its 
-				// TU id to be unique
-				n = tu.getId() + "-" + name;
-			}			
-			tu.setName(n);
+		if (tu != null) {			
+			tu.setName(name);
 		}
 	}
 
