@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -161,10 +161,21 @@ public interface ISegments extends Iterable<Segment> {
      * @param ranges the ranges of the segments to create. The ranges must be ordered from the lesser
      * position to the higher one (i.e. from left to right). If this parameter is empty or null, no
      * modification is done.
+     * @param allowEmptySegments true to allow empty segments to be created, false to skip them.
      * @return the number of parts (segments and non-segments) created during the operation.
      */
-    public int create(List<Range> ranges);
+    public int create(List<Range> ranges,
+    	boolean allowEmptySegments);
 
+    /**
+     * Helper method to create segments without empty segments.
+     * This is the same as calling {@link #create(List, boolean)} with false.
+     * @param ranges the ranges of the segments to create.
+     * @return the number of parts (segments and non-segments) created during the operation.
+     * @see #create(List, boolean)
+     */
+    public int create (List<Range> ranges);
+    
     /**
      * Creates a segment in this container. Use {@link TextContainer#getCodedText()}
      * to get the coded text to use as the base for the segment boundaries.

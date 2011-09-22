@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2010 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -25,7 +25,6 @@ import net.sf.okapi.common.exceptions.OkapiIOException;
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
@@ -36,11 +35,11 @@ import java.util.Stack;
  */
 public class XMLWriter {
 
-    private PrintWriter writer = null;
+    private final PrintWriter writer;
     private boolean inStartTag;
     private Stack<String> elements = new Stack<String>();
     private String lineBreak = System.getProperty("line.separator");
-
+    
     /**
      * Creates a new XML document on disk.
      * @param path the full path of the document to create. If any directory in the
@@ -51,8 +50,10 @@ public class XMLWriter {
     public XMLWriter (String path) {
     	try {
     		Util.createDirectories(path);
-    		OutputStream output = new BufferedOutputStream(new FileOutputStream(path));
-    		writer = new PrintWriter(new OutputStreamWriter(output, "UTF-8"));
+    		final OutputStreamWriter osw = new OutputStreamWriter(
+				new BufferedOutputStream(new FileOutputStream(path)),
+				"UTF-8");
+    		writer = new PrintWriter(osw);
     	}
     	catch ( IOException e ) {
     		throw new OkapiIOException(e);
@@ -66,6 +67,17 @@ public class XMLWriter {
      */
     public XMLWriter (Writer writer) {
     	this.writer = new PrintWriter(writer);
+    }
+    
+    protected void finalize()
+    	throws Throwable
+    {
+    	try {
+    		close();
+    	}
+    	finally {
+    		super.finalize();
+    	}
     }
     
     /**
@@ -94,8 +106,8 @@ public class XMLWriter {
      */
     public void close () {
     	if ( writer != null ) {
+    		writer.flush();
     		writer.close();
-    		writer = null;
     	}
     	if ( elements != null ) {
     		elements.clear();

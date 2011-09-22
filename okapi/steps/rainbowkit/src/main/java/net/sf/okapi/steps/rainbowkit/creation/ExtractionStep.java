@@ -37,6 +37,7 @@ import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.filters.rainbowkit.RainbowKitFilter;
 import net.sf.okapi.steps.rainbowkit.common.IPackageWriter;
+import net.sf.okapi.steps.rainbowkit.xliff.XLIFF2PackageWriter;
 
 @UsingParameters(Parameters.class)
 public class ExtractionStep extends BasePipelineStep {
@@ -164,12 +165,23 @@ public class ExtractionStep extends BasePipelineStep {
 	@Override
 	protected Event handleEndBatch (Event event) {
 		event = writer.handleEvent(event);
+		
+		boolean createTipp = false;
+		if ( writer instanceof XLIFF2PackageWriter ) {
+			createTipp = ((XLIFF2PackageWriter)writer).getCreeatTipPackage();
+		}
 		writer.close();
 		writer = null;
-		
-		if ( params.getCreateZip() ) {
-			FileUtil.zipDirectory(resolvedOutputDir, RainbowKitFilter.RAINBOWKIT_PACKAGE_EXTENSION);
+
+		if ( createTipp ) {
+			FileUtil.zipDirectory(resolvedOutputDir, ".tipp");
+			Util.deleteDirectory(resolvedOutputDir, false);
 		}
+		else if ( params.getCreateZip() ) {
+			FileUtil.zipDirectory(resolvedOutputDir, RainbowKitFilter.RAINBOWKIT_PACKAGE_EXTENSION);
+			Util.deleteDirectory(resolvedOutputDir, false);
+		}
+		
 		return event;
 	}
 	

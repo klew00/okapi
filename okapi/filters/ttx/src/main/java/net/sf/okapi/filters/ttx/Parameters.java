@@ -30,7 +30,10 @@ import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 @EditorFor(Parameters.class)
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
+	private final static String INCLUDEUNSEGMENTEDPARTS = "includeUnsegmentedParts";
+	
 	private boolean escapeGT;
+	private boolean includeUnsegmentedParts;
 
 	public Parameters () {
 		reset();
@@ -44,21 +47,32 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public void setEscapeGT (boolean escapeGT) {
 		this.escapeGT = escapeGT;
 	}
+	
+	public boolean getIncludeUnsegmentedParts () {
+		return includeUnsegmentedParts;
+	}
+	
+	public void setIncludeUnsegmentedParts (boolean includeUnsegmentedParts) {
+		this.includeUnsegmentedParts = includeUnsegmentedParts;
+	}
 
 	public void reset () {
 		escapeGT = false;
+		includeUnsegmentedParts = true;
 	}
 
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
 		escapeGT = buffer.getBoolean(XMLEncoder.ESCAPEGT, escapeGT);
+		includeUnsegmentedParts = buffer.getBoolean(INCLUDEUNSEGMENTEDPARTS, includeUnsegmentedParts);
 	}
 
 	@Override
 	public String toString () {
 		buffer.reset();
 		buffer.setBoolean(XMLEncoder.ESCAPEGT, escapeGT);
+		buffer.setBoolean(INCLUDEUNSEGMENTEDPARTS, includeUnsegmentedParts);
 		return buffer.toString();
 	}
 	
@@ -66,12 +80,14 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
 		desc.add(XMLEncoder.ESCAPEGT, "Escape the greater-than characters", null);
+		desc.add(INCLUDEUNSEGMENTEDPARTS, "Include un-segmented text", null);
 		return desc;
 	}
 
 	public EditorDescription createEditorDescription (ParametersDescription paramDesc) {
 		EditorDescription desc = new EditorDescription("TTX Filter Parameters", true, false);
 		desc.addCheckboxPart(paramDesc.get(XMLEncoder.ESCAPEGT));
+		desc.addCheckboxPart(paramDesc.get(INCLUDEUNSEGMENTEDPARTS));
 		return desc;
 	}
 

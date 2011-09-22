@@ -30,8 +30,10 @@ import net.sf.okapi.lib.xliff.Fragment;
 public class XLIFF2Options extends BaseParameters implements IEditorDescriptionProvider {
 
 	private static final String INLINESTYLE = "inlineStyle"; //$NON-NLS-1$
+	private static final String CREATETIPPACKAGE = "createTipPackage"; //$NON-NLS-1$
 	
 	private int inlineStyle;
+	private boolean createTipPackage;
 
 	public XLIFF2Options () {
 		reset();
@@ -40,6 +42,7 @@ public class XLIFF2Options extends BaseParameters implements IEditorDescriptionP
 	@Override
 	public void reset() {
 		inlineStyle = Fragment.STYLE_DATAINSIDE;
+		createTipPackage = false;
 	}
 
 	@Override
@@ -47,12 +50,14 @@ public class XLIFF2Options extends BaseParameters implements IEditorDescriptionP
 		reset();
 		buffer.fromString(data);
 		inlineStyle = buffer.getInteger(INLINESTYLE, inlineStyle);
+		createTipPackage = buffer.getBoolean(CREATETIPPACKAGE, createTipPackage);
 	}
 
 	@Override
 	public String toString () {
 		buffer.reset();
 		buffer.setInteger(INLINESTYLE, inlineStyle);
+		buffer.setBoolean(CREATETIPPACKAGE, createTipPackage);
 		return buffer.toString();
 	}
 
@@ -63,11 +68,20 @@ public class XLIFF2Options extends BaseParameters implements IEditorDescriptionP
 	public void setInlineStyle (int inlineStyle) {
 		this.inlineStyle = inlineStyle;
 	}
+	
+	public boolean getCreateTipPackage () {
+		return createTipPackage;
+	}
+	
+	public void setCreateTipPackage (boolean createTipPackage) {
+		this.createTipPackage = createTipPackage;
+	}
 
 	@Override
 	public ParametersDescription getParametersDescription() {
 		ParametersDescription desc = new ParametersDescription(this);
 		desc.add(INLINESTYLE, "Style to use for the inline codes", null);
+		desc.add(CREATETIPPACKAGE, "Create a TIP package", null);
 		return desc;
 	}
 
@@ -88,6 +102,8 @@ public class XLIFF2Options extends BaseParameters implements IEditorDescriptionP
 		ListSelectionPart lsp = desc.addListSelectionPart(paramsDesc.get(INLINESTYLE), values);
 		lsp.setChoicesLabels(labels);
 		lsp.setListType(ListSelectionPart.LISTTYPE_SIMPLE);
+		
+		desc.addCheckboxPart(paramsDesc.get(CREATETIPPACKAGE));
 
 		return desc;
 	}

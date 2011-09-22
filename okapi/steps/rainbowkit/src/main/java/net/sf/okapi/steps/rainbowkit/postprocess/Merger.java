@@ -36,12 +36,10 @@ import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
-import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.MultiEvent;
 import net.sf.okapi.common.resource.PipelineParameters;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
@@ -298,33 +296,34 @@ public class Merger {
 		// We also remember the ranges to set them back after merging
 		List<Range> srcRanges = null;
 		List<Range> trgRanges = null;
-		if ( !mergeAsSegments ) {
-			// Join only if needed
-			if ( !srcOriCont.contentIsOneSegment() ) {
-				srcRanges = srcOriCont.getSegments().getRanges();
-				srcOriCont.joinAll();
-			}
-			if ( !trgTraCont.contentIsOneSegment() ) {
-				trgRanges = trgTraCont.getSegments().getRanges();
-				trgTraCont.joinAll();
-			}
-		}
 		
+		// Merge the segments together for the code transfer
+		// This allows to move codes anywhere in the text unit, not just each part.
+		// We do remember the ranges because some formats will required to be merged by segments
+		if ( !srcOriCont.contentIsOneSegment() ) {
+			srcRanges = srcOriCont.getSegments().getRanges();
+			srcOriCont.joinAll();
+		}
+		if ( !trgTraCont.contentIsOneSegment() ) {
+			trgRanges = trgTraCont.getSegments().getRanges();
+			trgTraCont.joinAll();
+		}
+
 		// Perform the transfer of the inline codes
-		// At this point most formats will have the whole content in a single segment
-		// but we still work based on the segment(s) to handle the other cases
-		ISegments trgTraSegs = trgTraCont.getSegments();
-		for ( Segment srcOriSeg : srcOriCont.getSegments() ) {
-			Segment trgTraSeg = trgTraSegs.get(srcOriSeg.id);
-			if ( trgTraSeg == null ) {
-				LOGGER.warning(String.format("Item id='%s': No translation found for the segment '%s'. Using source instead.",
-					traTu.getId(), srcOriSeg.id));
-				// Use the source instead
+		// At this point we have a single segment/part
+		TextUnitUtil.copySrcCodeDataToMatchingTrgCodes(srcOriCont.getFirstContent(),
+			trgTraCont.getFirstContent(), true, true, null, oriTu);
+		
+		// Resegment for the special formats
+		if ( mergeAsSegments ) {
+			if ( srcRanges != null ) {
+				srcOriCont.getSegments().create(srcRanges, true);
 			}
-			else {
-				TextUnitUtil.copySrcCodeDataToMatchingTrgCodes(srcOriSeg.text, trgTraSeg.text, true, true, null, oriTu);
+			if ( trgRanges != null ) {
+				trgTraCont.getSegments().create(trgRanges, true);
 			}
 		}
+
 		// Check if the target has more segments
 		if ( srcOriCont.getSegments().count() < trgTraCont.getSegments().count() ) {
 			LOGGER.warning(String.format("Item id='%s': There is at least one extra segment in the translation file.\n"
@@ -332,6 +331,7 @@ public class Merger {
 				traTu.getId()));
 		}
 		
+		// Assign the translated target to the target text unit
 		oriTu.setTarget(trgLoc, trgTraCont);
 		
 		// Update/add the 'approved' flag of the entry to merge if available
@@ -346,15 +346,17 @@ public class Merger {
 			}
 		}
 		
+		// Output the translation
 		writer.handleEvent(oriEvent);
 		
 		// Set back the segmentation if we modified it for the merge
-		if ( preserveSegmentation ) {
+		// (Already done if it's a special format)
+		if ( preserveSegmentation && !mergeAsSegments ) {
 			if ( srcRanges != null ) {
-				srcOriCont.getSegments().create(srcRanges);
+				srcOriCont.getSegments().create(srcRanges, true);
 			}
 			if ( trgRanges != null ) {
-				trgTraCont.getSegments().create(trgRanges);
+				trgTraCont.getSegments().create(trgRanges, true);
 			}
 		}
 	}

@@ -36,6 +36,7 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IdGenerator;
 import net.sf.okapi.common.MimeTypeMapper;
+import net.sf.okapi.common.Range;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.AltTranslation;
@@ -69,6 +70,9 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
 @UsingParameters(Parameters.class)
 public class TTXFilter implements IFilter {
 
+	public final static String DFSTART_TYPE = "x-df-s";
+	public final static String DFEND_TYPE = "x-df-e";
+	
 	private final static String MATCHPERCENT = "MatchPercent";
 	private final static String ORIGIN = "Origin";
 	
@@ -146,13 +150,13 @@ public class TTXFilter implements IFilter {
 			"Configuration for Trados TTX documents.",
 			null,
 			".ttx;"));
-//		list.add(new FilterConfiguration(getName()+"-noForcedTuv",
-//			MimeTypeMapper.TTX_MIME_TYPE,
-//			getClass().getName(),
-//			"TTX (without forced Tuv in output)",
-//			"Configuration for Trados TTX documents without forcing Tuv in output.",
-//			"noForcedTuv.fprm",
-//			".ttx;"));
+		list.add(new FilterConfiguration(getName()+"-preSegmented",
+			MimeTypeMapper.TTX_MIME_TYPE,
+			getClass().getName(),
+			"TTX (extract only existing segments)",
+			"Configuration for pre-segmented Trados TTX documents.",
+			"preSegmented.fprm",
+			".ttx;"));
 		return list;
 	}
 	
@@ -439,7 +443,7 @@ public class TTXFilter implements IFilter {
 			
 			String lastDFOpen = "";
 			String crumbs = ""; // to keep track of open.close of df elements
-			
+			boolean hasOriginalSeg = false; // True if the content has TTX segments
 			
 			while ( !done ) {
 				// Move to next event if required 
@@ -471,8 +475,8 @@ public class TTXFilter implements IFilter {
 						srcSegFrag = new TextFragment();
 						trgSegFrag = null;
 						altTrans = null;
-						if ( !inter.isEmpty() ) {
-							if ( hasText(inter.getCodedText()) ) {
+						if ( !inter.isEmpty() ) { // Deal with previous text span
+							if ( params.getIncludeUnsegmentedParts() && hasText(inter.getCodedText()) ) {
 								// Unsegmented section contain text: make it a text unit
 								addSegment(inter, srcCont, trgFragments, altTranslations, dfCount, crumbs, movedCodes);
 							}
@@ -512,6 +516,7 @@ public class TTXFilter implements IFilter {
 						continue;
 					}
 					else if ( name.equals("Tuv") ) { // New language content
+						hasOriginalSeg = true;
 						tmp = reader.getAttributeValue(null, "Lang");
 						if ( tmp != null ) {
 							inTarget = trgLoc.equals(tmp);
@@ -532,7 +537,7 @@ public class TTXFilter implements IFilter {
 						// We have to use placeholder for df because they don't match ut nesting order
 						dfCount++;
 						crumbs += "o";
-						Code code = current.append(TagType.PLACEHOLDER, "x-df-s", "", -1);
+						Code code = current.append(TagType.PLACEHOLDER, DFSTART_TYPE, "", -1);
 						lastDFOpen = buildStartElement(false);
 						code.setOuterData(lastDFOpen);
 						continue;
@@ -571,7 +576,7 @@ public class TTXFilter implements IFilter {
 						// We have to use placeholder for df because they don't match ut nesting order
 						dfCount--;
 						crumbs += "c";
-						Code code = current.append(TagType.PLACEHOLDER, "x-df-e", "", -1); //(inTarget ? ++trgId : ++srcId));
+						Code code = current.append(TagType.PLACEHOLDER, DFEND_TYPE, "", -1); //(inTarget ? ++trgId : ++srcId));
 						code.setOuterData(buildEndElement(false));
 						continue;
 					}
@@ -605,7 +610,7 @@ public class TTXFilter implements IFilter {
 							// A Tu stops the current segment, but not the text unit
 						}
 						else if (( inter != null ) && !inter.isEmpty() ) { // If no source segment: only content
-							if ( hasText(inter.getCodedText()) ) {
+							if ( params.getIncludeUnsegmentedParts() && hasText(inter.getCodedText()) ) {
 								// Unsegmented section contain text: make it a text unit
 								addSegment(inter, srcCont, trgFragments, altTranslations, dfCount, crumbs, movedCodes);
 							}
@@ -627,7 +632,7 @@ public class TTXFilter implements IFilter {
 			// Check if we had only non-segmented text
 			if (( inter != null) && !inter.isEmpty() ) {
 				String ctext = inter.getCodedText();
-				if ( hasText(ctext) ) {
+				if ( params.getIncludeUnsegmentedParts() && hasText(ctext) ) {
 					// Unsegmented section contain text: make it a text unit
 
 					// Move leading whitespace characters to outside
@@ -654,7 +659,13 @@ public class TTXFilter implements IFilter {
 			}
 			
 			// Check if this it is worth sending as text unit
-			if ( !hasText(srcCont) ) { // Use special hasText()
+			boolean changeToSkel = !hasText(srcCont); // Use special hasText()
+			// And make sure text fragments un-segments are skeleton if they are not to be extracted
+			// This last check is because we always have at least one segment in a TC.
+			if ( !hasOriginalSeg && !params.getIncludeUnsegmentedParts() ) {
+				changeToSkel = true;
+			}
+			if ( changeToSkel ) { 
 				// No text-type characters
 				if ( skelWriter == null ) {
 					skelWriter = new TTXSkeletonWriter();
@@ -676,10 +687,34 @@ public class TTXFilter implements IFilter {
 			// Else genuine text unit, finalize and send
 			String toMoveAfter = "";
 			if ( srcCont.hasBeenSegmented() ) {
+
+				// Renumber the source on the whole content, then re-segment
+				TextContainer tc = tu.getSource();
+				List<Range> ranges = tc.getSegments().getRanges();
+				tc.joinAll();
+				tc.getFirstContent().renumberCodes();
+				tc.getSegments().create(ranges, true);
+				
+				// Create the target content using the source as the base
 				TextContainer cont = srcCont.clone();
 				int i = 0;
 				for ( Segment seg : cont.getSegments() ) {
 					seg.text = trgFragments.get(i);
+					i++;
+				}
+				tu.setTarget(trgLoc, cont);
+				
+				// Renumber the target like the source
+				tc = tu.getTarget(trgLoc);
+				ranges = tc.getSegments().getRanges();
+				tc.joinAll();
+				tc.getFirstContent().renumberCodes();
+				tc.getSegments().create(ranges, true);
+				// We expect the code to be aligned in the TTX, so no need to re-align them
+				
+				// Set the annotations
+				i = 0;
+				for ( Segment seg : tc.getSegments() ) {
 					AltTranslation altTmp = altTranslations.get(i);
 					if ( altTmp != null ) {
 						AltTranslationsAnnotation ann = new AltTranslationsAnnotation();
@@ -688,7 +723,6 @@ public class TTXFilter implements IFilter {
 					}
 					i++;
 				}
-				tu.setTarget(trgLoc, cont);
 			}
 			else { // We assume pre-segmented entry don't have the overlapping DF problem.
 				// If they are un-segmented they may, and we try to fix it here:
@@ -767,7 +801,7 @@ public class TTXFilter implements IFilter {
 			for ( int i=0; i<ctext.length(); i++ ) {
 				if ( TextFragment.isMarker(ctext.charAt(i)) ) {
 					Code code = codes.get(TextFragment.toIndex(ctext.charAt(i+1)));
-					if ( code.getType().equals("x-df-e") ) {
+					if ( code.getType().equals(DFEND_TYPE) ) {
 						// Copy the code data at the front of the skeleton string
 						tmp += code.getOuterData(); // Same order as in TU
 						// Remove the code from the fragment
@@ -788,7 +822,7 @@ public class TTXFilter implements IFilter {
 		for ( int i=ctext.length()-1; i>=0; i-- ) {
 			if ( TextFragment.isMarker(ctext.charAt(i)) ) {
 				Code code = codes.get(TextFragment.toIndex(ctext.charAt(i+1)));
-				if (( code.getType() != null ) && code.getType().equals("x-df-e") ) {
+				if (( code.getType() != null ) && code.getType().equals(DFEND_TYPE) ) {
 					// Copy the code data at the front of the skeleton string
 					tmp = code.getOuterData() + tmp;
 					// Remove the code from the fragment
@@ -816,7 +850,7 @@ public class TTXFilter implements IFilter {
 //		for ( int i=ctext.length()-1; i>=0; i-- ) {
 //			if ( TextFragment.isMarker(ctext.charAt(i)) ) {
 //				Code code = codes.get(TextFragment.toIndex(ctext.charAt(i+1)));
-//				if (( code.getType() != null ) && code.getType().equals("x-df-e") ) {
+//				if (( code.getType() != null ) && code.getType().equals(DFEND_TYPE) ) {
 //					// Copy the code data at the front of the skeleton string
 //					tmp = code.getOuterData() + tmp;
 //					// Remove the code from the fragment

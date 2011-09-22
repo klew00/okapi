@@ -304,6 +304,7 @@ public abstract class BasePackageWriter implements IPackageWriter {
 				file.delete();
 			}
 		}
+		close();
 	}
 
 	protected void processStartBatchItem () {

@@ -202,7 +202,14 @@ public class Segments implements ISegments {
     }
 
     @Override
-    public int create(List<Range> ranges) {
+    public int create (List<Range> ranges) {
+    	return create(ranges, false);
+    }
+    
+    @Override
+    public int create (List<Range> ranges,
+    	boolean allowEmptySegments)
+    {
             // Do nothing if null or empty
             if (( ranges == null ) || ranges.isEmpty() ) return 0;
 
@@ -234,8 +241,9 @@ public class Segments implements ISegments {
                             throw new InvalidPositionException("Invalid range order.");
                     }
                     if ( range.end == range.start ) {
-                            // Empty range, skip it
-                            continue;
+                    	// If empty segments are not allowed, we skip this one
+                    	if ( !allowEmptySegments ) continue;
+                    	// Otherwise we proceed
                     }
                     // If there is an interstice: creates the corresponding part
                     if ( start < range.start ) {
@@ -254,11 +262,16 @@ public class Segments implements ISegments {
             // Check if we have remaining text after the last segment
             if ( start < holder.text.length() ) {
                     if ( start == 0 ) { // If the remain is the whole content: make it a segment
+                    	if ( parts.size() > 0 ) {
+                    		parts.add(new TextPart(holder.subSequence(start, -1)));
+                    	}
+                    	else {
                             parts.add(new Segment(String.valueOf(id), holder));
+                    	}
                             // That is the only segment: no need to validate the id
                     }
                     else { // Otherwise: make it an interstice
-                            parts.add(new TextPart(holder.subSequence(start, -1)));
+                    	parts.add(new TextPart(holder.subSequence(start, -1)));
                     }
             }
 

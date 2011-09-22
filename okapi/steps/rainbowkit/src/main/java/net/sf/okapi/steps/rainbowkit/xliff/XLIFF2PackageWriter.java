@@ -21,6 +21,7 @@
 package net.sf.okapi.steps.rainbowkit.xliff;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.logging.Logger;
@@ -28,6 +29,7 @@ import java.util.logging.Logger;
 import org.oasisopen.xliff.v2.ICode;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.FileUtil;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.Util;
@@ -56,10 +58,13 @@ import net.sf.okapi.steps.rainbowkit.common.BasePackageWriter;
 public class XLIFF2PackageWriter extends BasePackageWriter {
 
 	private static final String TU_PREFIX = "$tu$";
+	private static final String POBJECTS_DIR = "pobjects";
+
 	private static final Logger LOGGER = Logger.getLogger(XLIFF2PackageWriter.class.getName());
 	
 	private XLIFFWriter writer;
 	private LinkedHashMap<String, String> referents;
+	private XLIFF2Options options;
 
 	public XLIFF2PackageWriter () {
 		super(Manifest.EXTRACTIONTYPE_XLIFF2);
@@ -67,14 +72,68 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 
 	@Override
 	protected void processStartBatch () {
-//		manifest.setGenerateTIPManifest(true);
-//		manifest.setSubDirectories("pobjects/input", "pobjects/bilingual", "pobjects/bilingual",
-//			"pobjects/output", "pobjects/tm", false);
-		
-		manifest.setSubDirectories("input", "bilingual", "bilingual", "output", null, false);
+		// Get the options from the parameters
+		options = new XLIFF2Options();
+		if ( !Util.isEmpty(params.getWriterOptions()) ) {
+			options.fromString(params.getWriterOptions());
+		}
 
-		setTMXInfo(false, null, null, null, null, false);
+		if ( options.getCreateTipPackage() ) {
+			manifest.setGenerateTIPManifest(true);
+			manifest.setSubDirectories(POBJECTS_DIR+"/input", POBJECTS_DIR+"/bilingual", POBJECTS_DIR+"/bilingual",
+				POBJECTS_DIR+"/output", POBJECTS_DIR+"/tm", false);
+		}
+		else {
+			manifest.setSubDirectories("input", "bilingual", "bilingual", "output", null, false);
+		}
+
+		// Create TM only for TIP package
+		setTMXInfo(options.getCreateTipPackage(), null, null, null, null, false);
 		super.processStartBatch();
+	}
+	
+	// For final zip 
+	public boolean getCreeatTipPackage () {
+		return options.getCreateTipPackage();
+	}
+	
+	@Override
+	protected void processEndBatch () {
+		// Base process
+		super.processEndBatch();
+		
+		// TIP-specific process
+		if ( options.getCreateTipPackage() ) {
+			// Gather the list of TMs created for TIP
+			ArrayList<String> tms = new ArrayList<String>();
+			if ( tmxWriterApproved != null ) {
+				if ( tmxWriterApproved.getItemCount() > 0 ) tms.add(tmxPathApproved);
+			}
+			if ( tmxWriterAlternates != null ) {
+				if ( tmxWriterAlternates.getItemCount() > 0 ) tms.add(tmxPathAlternates);
+			}
+			if ( tmxWriterLeverage != null ) {
+				if ( tmxWriterLeverage.getItemCount() > 0 ) tms.add(tmxPathLeverage);
+			}
+			if ( tmxWriterUnApproved != null ) {
+				if ( tmxWriterUnApproved.getItemCount() > 0 ) tms.add(tmxPathUnApproved);
+			}
+
+			// Save the TIP manifest
+			manifest.saveTIPManifest(tms);
+			
+			// Zip the project files
+			String dir = Util.getDirectoryName(manifest.getPath())+File.separator+POBJECTS_DIR;
+			
+			manifest = null; System.gc(); // Try to free the manifest to unlock, so it can be delete
+			System.runFinalization();
+
+			FileUtil.zipDirectory(dir, ".zip");
+			// Delete the original
+			Util.deleteDirectory(dir, false);
+			// The creation of the .tipp file is done at the step level
+			// otherwise to be done after the directory is freed from locks
+		}
 	}
 	
 	@Override
@@ -89,11 +148,6 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 		String path = manifest.getSourceDirectory() + item.getRelativeInputPath() + ".xlf";
 		
 		// Set the writer's options
-		// Get the options from the parameters
-		XLIFF2Options options = new XLIFF2Options();
-		if ( !Util.isEmpty(params.getWriterOptions()) ) {
-			options.fromString(params.getWriterOptions());
-		}
 		writer.setInlineStyle(options.getInlineStyle());
 		
 //		StartDocument sd = event.getStartDocument();

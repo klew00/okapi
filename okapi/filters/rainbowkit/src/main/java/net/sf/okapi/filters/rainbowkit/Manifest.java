@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
@@ -304,9 +305,8 @@ public class Manifest implements IAnnotation {
 	 * Saves the manifest file. This method assumes the root is set.
 	 */
 	public void save () {
-		
 		if ( generateTIPManifest ) {
-			saveTIPManifest();
+			// TIP manifest to save from the package writer
 			return;
 		}
 
@@ -355,14 +355,14 @@ public class Manifest implements IAnnotation {
 		}
 	}
 
-	private void saveTIPManifest () {
+	public void saveTIPManifest (List<String> tms) {
 		XMLWriter writer = null;
 		try {
 			String tipManifestPath = getPath();
 			tipManifestPath = tipManifestPath.replace(MANIFEST_EXTENSION, ".xml");
 			writer = new XMLWriter(tipManifestPath);
 
-			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 			df.setTimeZone(TimeZone.getTimeZone("GMT"));
 			String outputDate = df.format(new Date());
 			
@@ -445,6 +445,23 @@ public class Manifest implements IAnnotation {
 			}
 			writer.writeEndElementLineBreak(); // PackageObjectSection
 			
+			//--- files in tm
+			if ( !tms.isEmpty() ) {
+				writer.writeStartElement("PackageObjectSection");
+				writer.writeAttributeString("sectionname", "tm");
+				seq = 1;
+				for ( String path : tms ) {
+					writer.writeStartElement("ObjectFile");
+					writer.writeAttributeString("localizable", "no");
+					writer.writeAttributeString("sequence", String.valueOf(seq));
+					writer.writeElementString("Type", "TMX");
+					writer.writeElementString("LocationPath", path);
+					writer.writeEndElementLineBreak(); // ObjectFile
+					seq++;
+				}
+				writer.writeEndElementLineBreak(); // PackageObjectSection
+			}
+
 			writer.writeEndElementLineBreak(); // PackageObjects
 			
 			

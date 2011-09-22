@@ -113,6 +113,11 @@ public class TextUnitUtil {
 		TextFragment newSrc,
 		ITextUnit parent)
 	{
+		// If it's the same object, there is no need to transfer
+		if ( newTrg == oriSrc ) {
+			return newTrg;
+		}
+		
 		List<Code> newCodes = newTrg.getCodes();
 		List<Code> oriCodes = oriSrc.getCodes();
 		
@@ -182,6 +187,8 @@ public class TextUnitUtil {
 								LOGGER.warning(String.format("The extra code id='%d' cannot be cloned.",
 									newCode.getId()) + ((place == null) ? "" : place));
 							}
+//							// Work around to allow multiple codes with same ID
+//							continue; // Keep searching
 						}
 					}
 					else {

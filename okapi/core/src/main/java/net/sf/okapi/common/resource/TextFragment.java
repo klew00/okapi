@@ -1890,6 +1890,7 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 	 * @return the last value used for code id.
 	 */
 	public int getLastCodeId () {
+		if ( !isBalanced ) balanceMarkers();
 		return lastCodeID;
 	}
 	
