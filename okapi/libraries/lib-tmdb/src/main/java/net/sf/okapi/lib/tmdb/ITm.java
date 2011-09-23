@@ -188,13 +188,17 @@ public interface ITm {
 	 * <p>If the locale already exists for this TM, nothing happens.
 	 * <p>Only the Text and Codes fields are created for the new locale.
 	 * @param LocaleId the locale code for the new locale.
+	 * The code of the locale is case-insensitive.
 	 */
 	public void addLocale (String LocaleId);
 	
 	/**
 	 * Deletes all fields for a given locale.
 	 * <p>If the locale does not exist in this TM, nothing happens.
+	 * <p>A TM must have at least one locale, so if there is only a single locale left in
+	 * this TM before the call, nothing happens. 
 	 * @param localeId the code of the locale to remove. 
+	 * The code of the locale is case-insensitive.
 	 */
 	public void deleteLocale (String localeId);
 

@@ -81,6 +81,7 @@ public class MainForm {
 	private MenuItem miShowHideThirdField;
 	private MenuItem miShowHideFieldList;
 	private MenuItem miEditColumns;
+	private MenuItem miEditLocales;
 	private MenuItem miStatistics;
 	private MenuItem miShowHideLog;
 
@@ -322,6 +323,7 @@ public class MainForm {
 		miShowHideThirdField.setEnabled(active);
 		miShowHideFieldList.setEnabled((active) && currentTP.getEditorPanel().isExtraVisible());
 		miEditColumns.setEnabled(active);
+		miEditLocales.setEnabled(active);
 	}
 	
 	TmPanel addTmTabEmpty (ITm tm) {
@@ -445,6 +447,18 @@ public class MainForm {
             }
 		});
 		
+		miEditLocales = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miEditLocales, "view.editlocales"); //$NON-NLS-1$
+		miEditLocales.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				if ( currentTP != null ) {
+					currentTP.editLocales();
+				}
+            }
+		});
+		
+		new MenuItem(dropMenu, SWT.SEPARATOR);
+
 		miStatistics = new MenuItem(dropMenu, SWT.PUSH);
 		rm.setCommand(miStatistics, "view.stats"); //$NON-NLS-1$
 		miStatistics.addSelectionListener(new SelectionAdapter() {

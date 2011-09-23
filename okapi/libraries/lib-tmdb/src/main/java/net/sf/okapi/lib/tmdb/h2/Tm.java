@@ -371,7 +371,8 @@ public class Tm implements ITm {
 						fieldsToCreate.put(name, type);
 					}
 				}
-				
+//TODO: detect new locale and make sure all fields for the locale are added (e.g. codes not just text)
+
 				// Create the new fields as needed, and update the lists
 				// The lists can be null or empty in this call
 				store.createNewFields(name, segmentLevel, fieldsToCreate, existingFields);
@@ -573,13 +574,86 @@ public class Tm implements ITm {
 	}
 
 	@Override
-	public void addLocale (String LocaleId) {
-		throw new RuntimeException("Not implemented yet");
+	public void addLocale (String localeId) {
+		localeId = localeId.toUpperCase();
+		List<String> existing = getLocales();
+		if ( existing.contains(localeId) ) {
+			return; // This locale exists already
+		}
+
+		// Locale does not exists we can add it
+		Statement stm = null;
+		try {
+			StringBuilder tmp = new StringBuilder();
+			tmp.append(String.format("ALTER TABLE \"%s%s\" ADD \"%s\" VARCHAR; ",
+				name, "_SEG", DbUtil.TEXT_PREFIX+localeId));
+			tmp.append(String.format("ALTER TABLE \"%s%s\" ADD \"%s\" VARCHAR;",
+				name, "_SEG", DbUtil.CODES_PREFIX+localeId));
+			stm = store.getConnection().createStatement();
+			stm.execute(tmp.toString());
+		}
+		catch ( SQLException e ) {
+			throw new RuntimeException(e);
+		}
+		finally {
+			try {
+				if ( stm != null ) {
+					stm.close();
+					stm = null;
+				}
+			}
+			catch ( SQLException e ) {
+				throw new RuntimeException(e);
+			}
+		}
 	}
 
 	@Override
 	public void deleteLocale (String localeId) {
-		throw new RuntimeException("Not implemented yet");
+		List<String> existing = getLocales();
+		if ( existing.size() < 2 ) {
+			return; // Must keep at least one locale
+		}
+		localeId = localeId.toUpperCase();
+		if ( !existing.contains(localeId) ) {
+			return; // This locale does not exist
+		}
+
+		// Locale does not exists and we need to remove all it fields
+		Statement stm = null;
+		try {
+			StringBuilder tmp = new StringBuilder();
+			stm = store.getConnection().createStatement();
+			ResultSet result = stm.executeQuery("SHOW COLUMNS FROM \""+name+"_SEG\"");
+			while ( result.next() ) {
+				String fn = result.getString(1);
+				int n = fn.lastIndexOf(DbUtil.LANG_SEP);
+				if ( n > -1 ) {
+					if ( fn.substring(n+1).equals(localeId) ) {
+						// This field is to be removed
+						tmp.append(String.format("ALTER TABLE \"%s%s\" DROP COLUMN \"%s\"; ",
+							name, "_SEG", fn));
+					}
+				}
+			}
+			if ( tmp.length() > 0 ) {
+				stm.execute(tmp.toString());
+			}
+		}
+		catch ( SQLException e ) {
+			throw new RuntimeException(e);
+		}
+		finally {
+			try {
+				if ( stm != null ) {
+					stm.close();
+					stm = null;
+				}
+			}
+			catch ( SQLException e ) {
+				throw new RuntimeException(e);
+			}
+		}
 	}
 
 }

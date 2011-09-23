@@ -221,6 +221,40 @@ class TmPanel extends Composite implements IObserver {
 		}
 	}
 
+	void editLocales () {
+		try {
+			LocalesForm dlg = new LocalesForm(getShell(), tm);
+			if ( !dlg.showDialog() ) {
+				// No change was made, we can skip the re-drawing
+				return;
+			}
+
+			// Ensure columns of delete locales are removed from the display
+			java.util.List<String> available = tm.getAvailableFields();
+			// Update the list of visible fields
+			// by removing any fields not available anymore
+			ArrayList<String> visible = opt.getVisibleFields();
+			visible.retainAll(available);
+			opt.setVisibleFields(visible);
+			
+			//TODO Set the columns with the source and target
+			srcCol = -1;
+			trgCol = -1;
+			int n = 1;
+			for ( String fn : opt.getVisibleFields() ) {
+				if ( fn.startsWith(DbUtil.TEXT_PREFIX) ) {
+					if ( srcCol == -1 ) srcCol = n;
+					else if ( trgCol == -1 ) trgCol = n;
+				}
+				n++;
+			}
+			updateVisibleFields();
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(getShell(), "Error editing columns document.\n"+e.getMessage(), null);
+		}
+	}
+
 	void resetTmDisplay () {
 		srcCol = -1;
 		trgCol = -1;

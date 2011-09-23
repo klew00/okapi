@@ -261,7 +261,6 @@ public class ProcesswithAPI {
 		assertEquals(newTmName, tm.getName());
 		assertEquals(newTmName, repo.getTmNames().get(0));
 
-		
 		//=== Deletion
 		
 		repo.deleteTm(newTmName);
@@ -314,6 +313,32 @@ public class ProcesswithAPI {
 		rs.next(); rs.next();
 		assertEquals("F1 2", rs.getString(3));
 		assertEquals("Src 2", rs.getString(5));
+
+		//=== Test addition of locale
+		
+		tm.addLocale("bg");
+		List<String> list = tm.getLocales();
+		assertEquals(2, list.size());
+		assertEquals("EN", list.get(0));
+		assertEquals("BG", list.get(1));
+		// Do it a second time: no change
+		tm.addLocale("bG");
+		list = tm.getLocales();
+		assertEquals(2, list.size());
+		assertEquals("EN", list.get(0));
+		assertEquals("BG", list.get(1));
+
+		//===Test deletion of locales
+		
+		tm.deleteLocale("Bg");
+		list = tm.getLocales();
+		assertEquals(1, list.size());
+		assertEquals("EN", list.get(0));
+		tm.deleteLocale("EN"); // Try to delete the last one
+		list = tm.getLocales();
+		assertEquals(1, list.size()); // It should not be deleted
+		assertEquals("EN", list.get(0));
+		
 		
 		repo.close();
 	}
