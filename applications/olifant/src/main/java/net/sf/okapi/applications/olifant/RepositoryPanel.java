@@ -22,6 +22,7 @@ package net.sf.okapi.applications.olifant;
 
 import java.io.File;
 import java.net.URI;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 
 import net.sf.okapi.common.LocaleId;
@@ -453,7 +454,8 @@ class RepositoryPanel extends Composite {
 			if ( tmp2.length() > 0 ) {
 				tmp2.delete(tmp2.length()-2, tmp2.length());
 			}
-			tmp.append(String.format("Total number of segment-entries: %d", totalSeg));
+			tmp.append(String.format("Total number of segment-entries: %s",
+				NumberFormat.getInstance().format(totalSeg)));
 			tmp.append("\n\nLocales: "+tmp2.toString());
 			
 			MessageBox dlg = new MessageBox(getShell());

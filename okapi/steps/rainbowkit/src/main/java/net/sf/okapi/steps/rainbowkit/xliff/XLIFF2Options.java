@@ -103,7 +103,7 @@ public class XLIFF2Options extends BaseParameters implements IEditorDescriptionP
 		lsp.setChoicesLabels(labels);
 		lsp.setListType(ListSelectionPart.LISTTYPE_SIMPLE);
 		
-		desc.addCheckboxPart(paramsDesc.get(CREATETIPPACKAGE));
+//		desc.addCheckboxPart(paramsDesc.get(CREATETIPPACKAGE));
 
 		return desc;
 	}

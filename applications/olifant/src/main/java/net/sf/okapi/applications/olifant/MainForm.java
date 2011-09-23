@@ -299,6 +299,7 @@ public class MainForm {
 		}
 		else {
 			currentTP.updateCurrentEntry();
+			statusBar.setPage(currentTP.getTm().getCurrentPage(), currentTP.getTm().getPageCount());
 		}
 	}
 	

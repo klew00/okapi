@@ -84,7 +84,7 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 				POBJECTS_DIR+"/output", POBJECTS_DIR+"/tm", false);
 		}
 		else {
-			manifest.setSubDirectories("input", "bilingual", "bilingual", "output", null, false);
+			manifest.setSubDirectories("original", "work", "work", "done", null, false);
 		}
 
 		// Create TM only for TIP package
@@ -250,7 +250,7 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 						else { // text unit
 							tmp.append(refId+" ");
 						}
-						referents.remove(refId); // Clean up
+						//referents.remove(refId); // Clean up
 					}
 				}
 				// Remove this and check for next

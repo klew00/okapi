@@ -53,11 +53,13 @@ class ColumnsForm {
 	private final Button btMoveUp;
 	private final Button btMoveDown;
 	private ArrayList<String> results = null;
+	private ITm tm;
 
 	ColumnsForm (Shell parent,
 		ITm tm,
 		ArrayList<String> visibleFields)
 	{
+		this.tm = tm;
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		shell.setText("Column Selection");
 		UIUtil.inheritIcon(shell, parent);
@@ -146,21 +148,23 @@ class ColumnsForm {
 			};
 		});
 
-		ArrayList<String> list = new ArrayList<String>(tm.getAvailableFields());
-		list.removeAll(visibleFields);
-		for ( String fn :  list ) {
-			lbAvailableFields.add(fn);
-		}
-		if ( lbAvailableFields.getItemCount() > 0 ) {
-			lbAvailableFields.setSelection(0);
-		}
+//		ArrayList<String> list = new ArrayList<String>(tm.getAvailableFields());
+//		list.removeAll(visibleFields);
+//		for ( String fn :  list ) {
+//			lbAvailableFields.add(fn);
+//		}
+//		if ( lbAvailableFields.getItemCount() > 0 ) {
+//			lbAvailableFields.setSelection(0);
+//		}
+//
+//		lbDisplayFields.add("Flag/SegKey (always)");
+//		for ( String fn : visibleFields ) {
+//			lbDisplayFields.add(fn);
+//		}
+//		lbDisplayFields.setSelection((lbDisplayFields.getItemCount() > 1 ? 1 : 0));
 
-		lbDisplayFields.add("Flag/SegKey (always)");
-		for ( String fn : visibleFields ) {
-			lbDisplayFields.add(fn);
-		}
-		lbDisplayFields.setSelection((lbDisplayFields.getItemCount() > 1 ? 1 : 0));
-
+		updateLists(visibleFields);
+		
 		SelectionAdapter OKCancelActions = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if ( e.widget.getData().equals("o") ) { //$NON-NLS-1$
@@ -180,10 +184,39 @@ class ColumnsForm {
 		Rectangle Rect = shell.getBounds();
 		shell.setMinimumSize(Rect.width, Rect.height);
 		Dialogs.centerWindow(shell, parent);
-		
-		updateCommands();
 	}
 
+	private void updateLists (ArrayList<String> visibleFields) {
+		// Get the current list of available fields
+		ArrayList<String> list = new ArrayList<String>(tm.getAvailableFields());
+		// Remove from the display list fields not available
+		visibleFields.retainAll(list);
+		// Remove the fields that are already in the display list
+		list.removeAll(visibleFields);
+		
+		// Reset the list of available fields
+		lbAvailableFields.removeAll();
+		for ( String fn :  list ) {
+			lbAvailableFields.add(fn);
+		}
+		// Set the selection
+		if ( lbAvailableFields.getItemCount() > 0 ) {
+			lbAvailableFields.setSelection(0);
+		}
+
+		// Reset the list of display fields
+		lbDisplayFields.removeAll();
+		lbDisplayFields.add("Flag/SegKey (always)");
+		for ( String fn : visibleFields ) {
+			lbDisplayFields.add(fn);
+		}
+		// Set the selection
+		lbDisplayFields.setSelection((lbDisplayFields.getItemCount() > 1 ? 1 : 0));
+		
+		// Update the buttons
+		updateCommands();
+	}
+	
 	private void updateCommands () {
 		btShow.setEnabled(lbAvailableFields.getSelectionCount()>0);
 		btShowAll.setEnabled(lbAvailableFields.getItemCount()>0);
