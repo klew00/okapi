@@ -20,9 +20,13 @@
 
 package net.sf.okapi.applications.olifant;
 
+import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.ui.ClosePanel;
 import net.sf.okapi.common.ui.Dialogs;
+import net.sf.okapi.common.ui.InputDialog;
 import net.sf.okapi.common.ui.UIUtil;
+import net.sf.okapi.lib.tmdb.DbUtil;
 import net.sf.okapi.lib.tmdb.ITm;
 
 import org.eclipse.swt.SWT;
@@ -121,7 +125,10 @@ class LocalesForm {
 		}
 		
 		// Set the selection
-		if (( selection < 0 ) || ( selection >= lbLocales.getItemCount() )) {
+		if ( selection < 0 ) {
+			selection = lbLocales.getItemCount()-1;
+		}
+		else if ( selection >= lbLocales.getItemCount() ) {
 			selection = 0;
 		}
 		if ( lbLocales.getItemCount() > 0 ) {
@@ -134,8 +141,27 @@ class LocalesForm {
 	
 	private void addLocale () {
 		try {
+			java.util.List<String> existing = tm.getLocales();
+			String res = "";
 			
-			throw new RuntimeException("Not implemented yet.");
+			while ( true ) {
+				InputDialog dlg = new InputDialog(shell, "Add Locale", "Code of the locale to add:", res, null, 0, -1, -1);
+				res = dlg.showDialog();
+				if ( Util.isEmpty(res) ) return; // Cancel
+				// Convert to a LocaleId to check the syntax and convert to Olifant locale
+				try {
+					res = DbUtil.toDbLang(LocaleId.fromString(res));
+				}
+				catch ( Throwable e ) {
+					Dialogs.showError(shell, e.getMessage(), null);
+				}
+				if ( !existing.contains(res) ) break;
+				// Else: error message: locale exists already
+				Dialogs.showError(shell, String.format("The locale '%s' exists already", res), null);
+			}
+			
+			tm.addLocale(res);
+			updateList(-1);
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
