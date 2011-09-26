@@ -192,11 +192,72 @@ public class PropertiesFilterTest {
 		assertEquals(snippet, result);
 	}
 	
+	@Test
+	public void testWithSubfilter() {
+		Parameters p = (Parameters)filter.getParameters();
+		p.setSubfilter("okf_html");
+		String snippet = "Key1=<b>Text with \\u00E3 more <br> test</b>";
+		List<Event> el = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(el, 1);
+		p.setSubfilter(null);
+		filter.setParameters(p);
+		assertNotNull(tu);
+		assertEquals("<b>Text with ã more <br> test</b>", tu.getSource().toString());
+	}
+	
+	@Test
+	public void testWithSubfilterTwoParas() {
+		Parameters p = (Parameters)filter.getParameters();
+		p.setSubfilter("okf_html");
+		String snippet = "Key1=<b>Text with \\u00E3 more</b> <p> test";
+		List<Event> el = getEvents(snippet);
+		ITextUnit tu1 = FilterTestDriver.getTextUnit(el, 1);
+		ITextUnit tu2 = FilterTestDriver.getTextUnit(el, 2);
+		p.setSubfilter(null);
+		filter.setParameters(p);
+		assertNotNull(tu1);
+		assertNotNull(tu2);
+		assertEquals("<b>Text with ã more</b>", tu1.getSource().toString());
+		assertEquals("test", tu2.getSource().toString());
+	}
+	
+	@Test
+	public void testWithSubfilterWithEmbeddedMessagePH() {
+		Parameters p = (Parameters)filter.getParameters();
+		p.setSubfilter("okf_html");
+		String snippet = "Key1=<b>Text with {1} more {2} test</b>";
+		List<Event> el = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(el, 1);
+		p.setSubfilter(null);
+		filter.setParameters(p);
+		assertNotNull(tu);
+		assertEquals("<b>Text with {1} more {2} test</b>", tu.getSource().toString());
+	}
+	
+	@Test
+	public void testDoubleExtractionSubFilter() {
+		// Read all files in the data directory
+		Parameters p = (Parameters)filter.getParameters();
+		p.setSubfilter("okf_html");
+		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
+		URL url = PropertiesFilterTest.class.getResource("/Test05.properties");
+		list.add(new InputDocument(url.getPath(), null));	
+		RoundTripComparison rtc = new RoundTripComparison();
+		p.setSubfilter(null);
+		filter.setParameters(p);
+		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, locFR));
+	}
+	
 	private ArrayList<Event> getEvents(String snippet) {
 		ArrayList<Event> list = new ArrayList<Event>();
 		filter.open(new RawDocument(snippet, locEN));
 		while (filter.hasNext()) {
 			Event event = filter.next();
+			if (event.isMultiEvent()) {
+				for (Event e : event.getMultiEvent()) {
+					list.add(e);
+				}
+			}
 			list.add(event);
 		}
 		filter.close();

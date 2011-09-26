@@ -62,6 +62,24 @@ public class AbstractMarkupEventBuilder extends EventBuilder {
 			codeFinder.compile();
 		}
 	}
+	
+	/**
+	 * Initializes the code finder. this must be called before the first time using it, for example 
+	 * when starting to process the inputs.
+	 * @param useCodeFinder true to use the code finder.
+	 * @param rules the string representation of the rules.
+	 */
+	public void initializeCodeFinder (boolean useCodeFinder,
+		List<String> rules)
+	{
+		this.useCodeFinder = useCodeFinder;
+		if ( useCodeFinder ) {
+			for (String r : rules) {
+				codeFinder.addRule(r);
+			}
+			codeFinder.compile();
+		}
+	}
 
 	@Override
 	protected ITextUnit postProcessTextUnit (ITextUnit textUnit) {

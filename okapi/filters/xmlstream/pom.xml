@@ -33,7 +33,6 @@
 			<groupId>net.sf.okapi.filters</groupId>
 			<artifactId>okapi-filter-html</artifactId>
 			<version>${project.version}</version>
-			<scope>test</scope>
 		</dependency>
 	</dependencies>
 </project>

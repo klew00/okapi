@@ -23,6 +23,7 @@ package net.sf.okapi.common;
 import net.sf.okapi.common.exceptions.OkapiUnexpectedResourceTypeException;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.MultiEvent;
 import net.sf.okapi.common.resource.PipelineParameters;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
@@ -163,6 +164,15 @@ public class Event {
 	}
 
 	/**
+	 * Convenience method to tell if this Event is a MULTI_EVENT
+	 * 
+	 * @return true if {@link MultiEvent}, false otherwise
+	 */
+	public boolean isMultiEvent () {
+		return (filterEventType == EventType.MULTI_EVENT);
+	}
+	
+	/**
 	 * Convenience method returns the {@link IResource} as a {@link ITextUnit}.
 	 * The caller should confirm the {@link Event} type using isTextUnit before
 	 * calling this method.
@@ -269,6 +279,23 @@ public class Event {
 			return (StartDocument) resource;
 		}
 		throw new OkapiUnexpectedResourceTypeException("Event resource is not a StartDocument");
+	}
+	
+	/**
+	 * Convenience method returns the {@link IResource} as a {@link MultiEvent}. The
+	 * caller should confirm the {@link EventType} using isMultiEvent before calling
+	 * this method.
+	 * 
+	 * @return the {@link RawDocument}
+	 * 
+	 * @throws OkapiUnexpectedResourceTypeException
+	 *             if the {@link IResource} is not a {@link RawDocument}
+	 */
+	public MultiEvent getMultiEvent() {
+		if ( isMultiEvent() ) {
+			return (MultiEvent) resource;
+		}
+		throw new OkapiUnexpectedResourceTypeException("Event resource is not a MultiEvent");
 	}
 	
 	/**

@@ -35,18 +35,26 @@ import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.encoder.EncoderManager;
+import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
+import net.sf.okapi.common.filters.AbstractFilter;
+import net.sf.okapi.common.filters.DefaultFilters;
 import net.sf.okapi.common.filters.FilterConfiguration;
+import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
+import net.sf.okapi.common.filters.SubFilter;
+import net.sf.okapi.common.filters.SubFilterEventConverter;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.MultiEvent;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.StartDocument;
@@ -55,16 +63,19 @@ import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.common.skeleton.GenericSkeletonWriter;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
+import net.sf.okapi.filters.abstractmarkup.AbstractMarkupEventBuilder;
+import net.sf.okapi.filters.abstractmarkup.AbstractMarkupFilter;
 
 /**
  * Implements the IFilter interface for properties files.
  */
 @UsingParameters(Parameters.class)
 public class PropertiesFilter implements IFilter {
+	private static final String TU_SELF_REFFERENCE_REGEX = "\\[\\#\\$\\$self\\$\\]";
 
-	private static final int RESULT_END     = 0;
-	private static final int RESULT_ITEM    = 1;
-	private static final int RESULT_DATA    = 2;
+	private static final int RESULT_END = 0;
+	private static final int RESULT_ITEM = 1;
+	private static final int RESULT_DATA = 2;
 
 	private final Logger logger = Logger.getLogger(getClass().getName());
 
@@ -86,113 +97,130 @@ public class PropertiesFilter implements IFilter {
 	private String docName;
 	private boolean hasUTF8BOM;
 	private EncoderManager encoderManager;
-	
-	public PropertiesFilter () {
+	@SubFilter
+	// subfilter annotation convinces the filter below it is a subfilter
+	private IFilter subfilter;
+	private LocaleId srcLocale;
+
+	public PropertiesFilter() {
 		params = new Parameters();
 	}
-	
-	public void cancel () {
+
+	public void cancel() {
 		canceled = true;
 	}
 
-	public void close () {
+	public void close() {
 		try {
-			if ( reader != null ) {
+			if (reader != null) {
 				reader.close();
 				reader = null;
 				docName = null;
 			}
 			parseState = 0;
-		}
-		catch ( IOException e) {
+		} catch (IOException e) {
 			throw new OkapiIOException(e);
 		}
 	}
 
-	public String getName () {
+	public String getName() {
 		return "okf_properties";
 	}
-	
-	public String getDisplayName () {
+
+	public String getDisplayName() {
 		return "Properties Filter";
 	}
 
-	public String getMimeType () {
+	public String getMimeType() {
 		return MimeTypeMapper.PROPERTIES_MIME_TYPE;
 	}
 
-	public List<FilterConfiguration> getConfigurations () {
+	public List<FilterConfiguration> getConfigurations() {
 		List<FilterConfiguration> list = new ArrayList<FilterConfiguration>();
-		list.add(new FilterConfiguration(getName(),
-			MimeTypeMapper.PROPERTIES_MIME_TYPE,
-			getClass().getName(),
-			"Java Properties",
-			"Java properties files (Output used \\uHHHH escapes)",
-			null,
-			".properties;"));
-		list.add(new FilterConfiguration(getName()+"-outputNotEscaped",
-			MimeTypeMapper.PROPERTIES_MIME_TYPE,
-			getClass().getName(),
-			"Java Properties (Output not escaped)",
-			"Java properties files (Characters in the output encoding are not escaped)",
-			"outputNotEscaped.fprm"));
-		list.add(new FilterConfiguration(getName()+"-skypeLang",
-			MimeTypeMapper.PROPERTIES_MIME_TYPE,
-			getClass().getName(),
-			"Skype Language Files",
-			"Skype language properties files (including support for HTML codes)",
-			"skypeLang.fprm",
-			".lang;"));
+		list.add(new FilterConfiguration(getName(), MimeTypeMapper.PROPERTIES_MIME_TYPE, getClass()
+				.getName(), "Java Properties",
+				"Java properties files (Output used \\uHHHH escapes)", null, ".properties;"));
+		list.add(new FilterConfiguration(getName() + "-outputNotEscaped",
+				MimeTypeMapper.PROPERTIES_MIME_TYPE, getClass().getName(),
+				"Java Properties (Output not escaped)",
+				"Java properties files (Characters in the output encoding are not escaped)",
+				"outputNotEscaped.fprm"));
+		list.add(new FilterConfiguration(getName() + "-skypeLang",
+				MimeTypeMapper.PROPERTIES_MIME_TYPE, getClass().getName(), "Skype Language Files",
+				"Skype language properties files (including support for HTML codes)",
+				"skypeLang.fprm", ".lang;"));
+		list.add(new FilterConfiguration(getName() + "-html-subfilter",
+				MimeTypeMapper.PROPERTIES_MIME_TYPE, getClass().getName(), "Properties with complex HTML Content",
+				"Java Property content processed by an HTML subfilter",
+				"html-subfilter.fprm", ".lang;"));
 		return list;
 	}
 
-	public EncoderManager getEncoderManager () {
-		if ( encoderManager == null ) {
+	public EncoderManager getEncoderManager() {
+		if (encoderManager == null) {
 			encoderManager = new EncoderManager();
-			encoderManager.setMapping(MimeTypeMapper.PROPERTIES_MIME_TYPE, "net.sf.okapi.common.encoder.PropertiesEncoder");
+			encoderManager.setMapping(MimeTypeMapper.PROPERTIES_MIME_TYPE,
+					"net.sf.okapi.common.encoder.PropertiesEncoder");
 		}
 		return encoderManager;
 	}
-	
-	public IParameters getParameters () {
+
+	public IParameters getParameters() {
 		return params;
 	}
 
-	public boolean hasNext () {
+	public boolean hasNext() {
 		return (parseState > 0);
 	}
 
-	public Event next () {
+	public Event next() {
 		// Cancel if requested
-		if ( canceled ) {
+		if (canceled) {
 			parseState = 0;
 			queue.clear();
 			queue.add(new Event(EventType.CANCELED));
 		}
-		
+
 		// Process queue if it's not empty yet
-		if ( queue.size() > 0 ) {
+		if (queue.size() > 0) {
 			return queue.poll();
 		}
-		
+
 		// Continue the parsing
 		int n;
 		boolean resetBuffer = true;
 		do {
-			switch ( n = readItem(resetBuffer) ) {
+			switch (n = readItem(resetBuffer)) {
 			case RESULT_DATA:
 				// Don't send the skeleton chunk now, wait for the complete one
 				resetBuffer = false;
 				break;
 			case RESULT_ITEM:
 				// It's a text-unit, the skeleton is already set
+				if (subfilter != null) {
+					String ss = tuRes.getSkeleton().toString();
+					String[] skel = ss.split(TU_SELF_REFFERENCE_REGEX);
+					String beforeSkeleton = null;
+					String afterSkeleton = null;
+					if (skel.length >= 2) {
+						beforeSkeleton = skel[0];
+						afterSkeleton = skel[1];
+					} else if (skel.length == 1) {
+						beforeSkeleton = skel[0];
+					}
+
+					// returns a multi event
+					return processWithSubfilter(tuRes.getId(), tuRes.getSource().toString(),
+							beforeSkeleton, afterSkeleton);
+				}
+
 				return new Event(EventType.TEXT_UNIT, tuRes);
 			default:
 				resetBuffer = true;
 				break;
 			}
-		} while ( n > RESULT_END );
-		
+		} while (n > RESULT_END);
+
 		// Set the ending call
 		Ending ending = new Ending("ed");
 		ending.setSkeleton(skel);
@@ -200,66 +228,64 @@ public class PropertiesFilter implements IFilter {
 		return new Event(EventType.END_DOCUMENT, ending);
 	}
 
-	public void open (RawDocument input) {
+	public void open(RawDocument input) {
 		open(input, true);
 	}
-	
+
 	@Override
-	public void setFilterConfigurationMapper (IFilterConfigurationMapper fcMapper) {
+	public void setFilterConfigurationMapper(IFilterConfigurationMapper fcMapper) {
 	}
 
-	public void setParameters (IParameters params) {
-		this.params = (Parameters)params;
+	public void setParameters(IParameters params) {
+		this.params = (Parameters) params;
 	}
 
 	public ISkeletonWriter createSkeletonWriter() {
 		return new GenericSkeletonWriter();
 	}
 
-	public IFilterWriter createFilterWriter () {
+	public IFilterWriter createFilterWriter() {
 		return new GenericFilterWriter(createSkeletonWriter(), getEncoderManager());
 	}
 
-	public void open (RawDocument input,
-		boolean generateSkeleton)
-	{
+	public void open(RawDocument input, boolean generateSkeleton) {
 		close();
 		parseState = 1;
 		canceled = false;
+		srcLocale = input.getSourceLocale();
 
 		// Open the input reader from the provided reader
-		BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input.getStream(), input.getEncoding());
+		BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input.getStream(),
+				input.getEncoding());
 		detector.detectAndRemoveBom();
 		input.setEncoding(detector.getEncoding());
 		encoding = input.getEncoding();
-		
+
 		try {
 			reader = new BufferedReader(new InputStreamReader(detector.getInputStream(), encoding));
-		}
-		catch ( UnsupportedEncodingException e ) {
-			throw new OkapiUnsupportedEncodingException(
-				String.format("The encoding '%s' is not supported.", encoding), e);
+		} catch (UnsupportedEncodingException e) {
+			throw new OkapiUnsupportedEncodingException(String.format(
+					"The encoding '%s' is not supported.", encoding), e);
 		}
 		hasUTF8BOM = detector.hasUtf8Bom();
 		lineBreak = detector.getNewlineType().toString();
-		if ( input.getInputURI() != null ) {
+		if (input.getInputURI() != null) {
 			docName = input.getInputURI().getPath();
 		}
-		
+
 		// Initializes the variables
 		tuId = 0;
 		lineNumber = 0;
 		lineSince = 0;
 		position = 0;
 		// Compile conditions
-		if ( params.useKeyCondition ) {
-			keyConditionPattern = Pattern.compile(params.keyCondition); 
-		}
-		else {
+		if (params.useKeyCondition) {
+			keyConditionPattern = Pattern.compile(params.keyCondition);
+		} else {
 			keyConditionPattern = null;
 		}
 		// Compile code finder rules
-		if ( params.useCodeFinder ) {
+		if (params.useCodeFinder) {
 			params.codeFinder.compile();
 		}
 		// Set the start event
@@ -275,14 +301,25 @@ public class PropertiesFilter implements IFilter {
 		startDoc.setType(MimeTypeMapper.PROPERTIES_MIME_TYPE);
 		startDoc.setMimeType(MimeTypeMapper.PROPERTIES_MIME_TYPE);
 		queue.add(new Event(EventType.START_DOCUMENT, startDoc));
+
+		// set up subfilter if required
+		if (params.getSubfilter() != null) {
+			FilterConfigurationMapper fcMapper = new FilterConfigurationMapper();
+			DefaultFilters.setMappings(fcMapper, true, true);
+			subfilter = fcMapper.createFilter(params.getSubfilter(), subfilter);
+
+			if (subfilter == null) {
+				throw new OkapiBadFilterInputException("Unkown subfilter: " + params.getSubfilter());
+			}
+		}
 	}
 
-	private int readItem (boolean resetBuffer) {
+	private int readItem(boolean resetBuffer) {
 		try {
-			if ( resetBuffer ) {
+			if (resetBuffer) {
 				skel = new GenericSkeleton();
 			}
-			
+
 			StringBuilder keyBuffer = new StringBuilder();
 			StringBuilder textBuffer = new StringBuilder();
 			String value = "";
@@ -292,8 +329,8 @@ public class PropertiesFilter implements IFilter {
 			int startText = 0;
 			long lS = -1;
 
-			while ( true ) {
-				if ( !getNextLine() ) {
+			while (true) {
+				if (!getNextLine()) {
 					return RESULT_END;
 				}
 				// Else: process the line
@@ -301,37 +338,37 @@ public class PropertiesFilter implements IFilter {
 				// Remove any leading white-spaces
 				String tmp = Util.trimStart(textLine, "\t\r\n \f");
 
-				if ( isMultiline ) {
+				if (isMultiline) {
 					value += tmp;
-				}
-				else {
+				} else {
 					// Empty lines
-					if ( tmp.length() == 0 ) {
+					if (tmp.length() == 0) {
 						skel.append(textLine);
 						skel.append(lineBreak);
 						continue;
 					}
 
 					// Comments
-					boolean isComment = (( tmp.charAt(0) == '#' ) || ( tmp.charAt(0) == '!' ));
-					if ( isComment ) tmp = tmp.substring(1);
-					if ( params.extraComments && !isComment ) {
-						if ( tmp.charAt(0) == ';' ) {
+					boolean isComment = ((tmp.charAt(0) == '#') || (tmp.charAt(0) == '!'));
+					if (isComment)
+						tmp = tmp.substring(1);
+					if (params.extraComments && !isComment) {
+						if (tmp.charAt(0) == ';') {
 							isComment = true; // .NET-style
 							tmp = tmp.substring(1);
-						}
-						else if ( tmp.startsWith("//") ) {
+						} else if (tmp.startsWith("//")) {
 							isComment = true; // C++/Java-style,
 							tmp = tmp.substring(2);
 						}
 					}
 
-					if ( isComment ) {
+					if (isComment) {
 						params.locDir.process(tmp);
 						skel.append(textLine);
 						skel.append(lineBreak);
-						if ( params.commentsAreNotes ) {
-							if ( note.length() > 0 ) note += "\n";
+						if (params.commentsAreNotes) {
+							if (note.length() > 0)
+								note += "\n";
 							note += tmp;
 						}
 						continue;
@@ -340,15 +377,16 @@ public class PropertiesFilter implements IFilter {
 					// Get the key
 					boolean bEscape = false;
 					int n = 0;
-					for ( int i=0; i<tmp.length(); i++ ) {
-						if ( bEscape ) bEscape = false;
+					for (int i = 0; i < tmp.length(); i++) {
+						if (bEscape)
+							bEscape = false;
 						else {
-							if ( tmp.charAt(i) == '\\' ) {
+							if (tmp.charAt(i) == '\\') {
 								bEscape = true;
 								continue;
 							}
-							if (( tmp.charAt(i) == ':' ) || ( tmp.charAt(i) == '=' )
-								|| ( Character.isWhitespace(tmp.charAt(i)) )) {
+							if ((tmp.charAt(i) == ':') || (tmp.charAt(i) == '=')
+									|| (Character.isWhitespace(tmp.charAt(i)))) {
 								// That the first white-space after the key
 								n = i;
 								break;
@@ -357,7 +395,7 @@ public class PropertiesFilter implements IFilter {
 					}
 
 					// Get the key
-					if ( n == 0 ) {
+					if (n == 0) {
 						// Line empty after the key
 						n = tmp.length();
 					}
@@ -366,13 +404,12 @@ public class PropertiesFilter implements IFilter {
 					// Gets the value
 					boolean bEmpty = true;
 					boolean bCheckEqual = true;
-					for ( int i=n; i<tmp.length(); i++ ) {
-						if ( bCheckEqual && (( tmp.charAt(i) == ':' )
-							|| ( tmp.charAt(i) == '=' ))) {
+					for (int i = n; i < tmp.length(); i++) {
+						if (bCheckEqual && ((tmp.charAt(i) == ':') || (tmp.charAt(i) == '='))) {
 							bCheckEqual = false;
 							continue;
 						}
-						if ( !Character.isWhitespace(tmp.charAt(i)) ) {
+						if (!Character.isWhitespace(tmp.charAt(i))) {
 							// That the first white-space after the key
 							n = i;
 							bEmpty = false;
@@ -380,28 +417,28 @@ public class PropertiesFilter implements IFilter {
 						}
 					}
 
-					if ( bEmpty ) n = tmp.length();
+					if (bEmpty)
+						n = tmp.length();
 					value = tmp.substring(n);
 					// Real text start point (adjusted for trimmed characters)
 					startText = n + (textLine.length() - tmp.length());
 					// Use m_nLineSince-1 to not count the current one
-					lS = (position-(textLine.length()+(lineSince-1))) + startText;
+					lS = (position - (textLine.length() + (lineSince - 1))) + startText;
 					lineSince = 0; // Reset the line counter for next time
 				}
 
 				// Is it a multi-lines entry?
-				if ( value.endsWith("\\") ) {
+				if (value.endsWith("\\")) {
 					// Make sure we have an odd number of ending '\'
 					int n = 0;
-					for ( int i=value.length()-1;
-						(( i > -1 ) && ( value.charAt(i) == '\\' ));
-						i-- ) n++;
+					for (int i = value.length() - 1; ((i > -1) && (value.charAt(i) == '\\')); i--)
+						n++;
 
-					if ( (n % 2) != 0 ) { // Continue onto the next line
-						value = value.substring(0, value.length()-1);
+					if ((n % 2) != 0) { // Continue onto the next line
+						value = value.substring(0, value.length() - 1);
 						isMultiline = true;
 						// Preserve parsed text in case we do not extract
-						if ( keyBuffer.length() == 0 ) {
+						if (keyBuffer.length() == 0) {
 							keyBuffer.append(textLine.substring(0, startText));
 							startText = 0; // Next time we get the whole line
 						}
@@ -413,38 +450,35 @@ public class PropertiesFilter implements IFilter {
 				// Check for key condition
 				// Directives overwrite the key condition
 				boolean extract = true;
-				if ( params.locDir.isWithinScope() ) {
+				if (params.locDir.isWithinScope()) {
 					extract = params.locDir.isLocalizable(true);
-				}
-				else { // Check for key condition
-					if (  keyConditionPattern != null ) {
-						if ( params.extractOnlyMatchingKey ) {
-							if ( !keyConditionPattern.matcher(key).matches() )
+				} else { // Check for key condition
+					if (keyConditionPattern != null) {
+						if (params.extractOnlyMatchingKey) {
+							if (!keyConditionPattern.matcher(key).matches())
+								extract = false;
+						} else { // Extract all but items with matching keys
+							if (keyConditionPattern.matcher(key).matches())
 								extract = false;
 						}
-						else { // Extract all but items with matching keys
-							if ( keyConditionPattern.matcher(key).matches() )
-								extract = false;
-						}
-					}
-					else { // Outside directive scope: check if we extract text outside
+					} else { // Outside directive scope: check if we extract text outside
 						extract = params.locDir.localizeOutside();
 					}
 				}
 
-				if ( extract ) {
+				if (extract) {
 					tuRes = new TextUnit(String.valueOf(++tuId), unescape(value));
 					tuRes.setName(key);
 					tuRes.setMimeType(MimeTypeMapper.PROPERTIES_MIME_TYPE);
 					tuRes.setPreserveWhitespaces(true);
-					if ( note.length() > 0 ) {
+					if (note.length() > 0) {
 						tuRes.setProperty(new Property(Property.NOTE, note, true));
 					}
 				}
 
-				if ( extract ) {
+				if (extract) {
 					// Parts before the text
-					if ( keyBuffer.length() == 0 ) {
+					if (keyBuffer.length() == 0) {
 						// Single-line case
 						keyBuffer.append(textLine.substring(0, startText));
 					}
@@ -452,8 +486,7 @@ public class PropertiesFilter implements IFilter {
 					skel.addContentPlaceholder(tuRes, null);
 					// Line-break
 					skel.append(lineBreak);
-				}
-				else {
+				} else {
 					skel.append(keyBuffer.toString());
 					skel.append(textBuffer.toString());
 					skel.append(textLine);
@@ -461,31 +494,29 @@ public class PropertiesFilter implements IFilter {
 					return RESULT_DATA;
 				}
 
-				if ( params.useCodeFinder ) {
+				// if a subfilter is enabled we delegate code processing to it
+				if (params.useCodeFinder && subfilter == null) {
 					params.codeFinder.process(tuRes.getSource().getFirstContent());
 				}
-				
+
 				tuRes.setSkeleton(skel);
 				tuRes.setSourceProperty(new Property("start", String.valueOf(lS), true));
 				return RESULT_ITEM;
 			}
-		}
-		catch ( IOException e ) {
+		} catch (IOException e) {
 			throw new OkapiIOException(e);
 		}
 	}
 
 	/**
 	 * Gets the next line of the string or file input.
-	 * @return True if there was a line to read,
-	 * false if this is the end of the input.
+	 * 
+	 * @return True if there was a line to read, false if this is the end of the input.
 	 */
-	private boolean getNextLine ()
-		throws IOException
-	{
-		while ( true ) {
+	private boolean getNextLine() throws IOException {
+		while (true) {
 			textLine = reader.readLine();
-			if ( textLine != null ) {
+			if (textLine != null) {
 				lineNumber++;
 				lineSince++;
 				// We count char instead of byte, while the BaseStream.Length is in byte
@@ -498,67 +529,96 @@ public class PropertiesFilter implements IFilter {
 
 	/**
 	 * Un-escapes slash-u+HHHH characters in a string.
-	 * @param text The string to convert.
+	 * 
+	 * @param text
+	 *            The string to convert.
 	 * @return The converted string.
 	 */
-	private String unescape (String text) {
-		if ( text.indexOf('\\') == -1 ) return text;
+	private String unescape(String text) {
+		if (text.indexOf('\\') == -1)
+			return text;
 		StringBuilder tmpText = new StringBuilder();
-		for ( int i=0; i<text.length(); i++ ) {
-			if ( text.charAt(i) == '\\' ) {
-				switch ( text.charAt(i+1) ) {
+		for (int i = 0; i < text.length(); i++) {
+			if (text.charAt(i) == '\\') {
+				switch (text.charAt(i + 1)) {
 				case 'u':
-					if ( i+5 < text.length() ) {
+					if (i + 5 < text.length()) {
 						try {
-							int nTmp = Integer.parseInt(text.substring(i+2, i+6), 16);
-							tmpText.append((char)nTmp);
-						}
-						catch ( Exception e ) {
-							logMessage(Level.WARNING,
-								String.format(Res.getString("INVALID_UESCAPE"),
-								text.substring(i+2, i+6)));
+							int nTmp = Integer.parseInt(text.substring(i + 2, i + 6), 16);
+							tmpText.append((char) nTmp);
+						} catch (Exception e) {
+							logMessage(
+									Level.WARNING,
+									String.format(Res.getString("INVALID_UESCAPE"),
+											text.substring(i + 2, i + 6)));
 						}
 						i += 5;
 						continue;
-					}
-					else {
-						logMessage(Level.WARNING,
-							String.format(Res.getString("INVALID_UESCAPE"),
-							text.substring(i+2)));
+					} else {
+						logMessage(
+								Level.WARNING,
+								String.format(Res.getString("INVALID_UESCAPE"),
+										text.substring(i + 2)));
 					}
 					break;
 				case 'n':
-					if ( params.convertLFandTab ) {
+					if (params.convertLFandTab) {
 						tmpText.append("\n");
-					}
-					else {
+					} else {
 						tmpText.append("\\n");
 					}
 					i++;
 					continue;
 				case 't':
-					if ( params.convertLFandTab ) {
+					if (params.convertLFandTab) {
 						tmpText.append("\t");
-					}
-					else {
+					} else {
 						tmpText.append("\\t");
 					}
 					i++;
 					continue;
 				default: // b-slash, f, v, etc. all other
-					tmpText.append("\\"+text.charAt(++i));
+					tmpText.append("\\" + text.charAt(++i));
 					continue;
 				}
-			}
-			else tmpText.append(text.charAt(i));
+			} else
+				tmpText.append(text.charAt(i));
 		}
 		return tmpText.toString();
 	}
-	
-	private void logMessage (Level level,
-		String text)
-	{
+
+	private void logMessage(Level level, String text) {
 		logger.log(level, String.format(Res.getString("LINE_LOCATION"), lineNumber) + text);
 	}
 
+	private Event processWithSubfilter(String parentId, String content, String beforeSkeleton,
+			String afterSkeleton) {
+		MultiEvent me = new MultiEvent();
+
+		// reset filter for good measure
+		subfilter.close();
+
+		SubFilterEventConverter converter = new SubFilterEventConverter(parentId,
+				new GenericSkeleton(beforeSkeleton), new GenericSkeleton(afterSkeleton));
+
+		// TODO: only AbstractFilter subclasses can be used as subfilters!!!
+		((AbstractFilter) subfilter).setParentId(parentId);
+		subfilter.open(new RawDocument(content, srcLocale));
+
+		// if this is an html or xmlstream filter then set inline code
+		// rules used to parse Java property codes
+		if (subfilter.getName().startsWith("okf_html")
+				|| subfilter.getName().startsWith("okf_xmlstream")) {
+			AbstractMarkupEventBuilder eb = (AbstractMarkupEventBuilder)((AbstractMarkupFilter)subfilter).getEventBuilder();
+			eb.initializeCodeFinder(params.isUseCodeFinder(), params.getCodeFinder().getRules());
+		}
+
+		while (subfilter.hasNext()) {
+			Event event = converter.convertEvent(subfilter.next());
+			me.addEvent(event);
+		}
+		subfilter.close();
+
+		return new Event(EventType.MULTI_EVENT, me);
+	}
 }

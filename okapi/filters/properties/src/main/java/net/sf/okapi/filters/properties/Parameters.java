@@ -36,6 +36,8 @@ public class Parameters extends BaseParameters {
 	public boolean commentsAreNotes;
 	public LocalizationDirectives locDir;
 	public boolean convertLFandTab;
+	public String subfilter;
+	
 
 	public Parameters () {
 		locDir = new LocalizationDirectives();
@@ -66,6 +68,7 @@ public class Parameters extends BaseParameters {
 
 		extraComments = false;
 		commentsAreNotes = true;
+		subfilter = null;
 	}
 
 	@Override
@@ -82,6 +85,7 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean("escapeExtendedChars", escapeExtendedChars);
 		buffer.setBoolean("useCodeFinder", useCodeFinder);
 		buffer.setGroup("codeFinderRules", codeFinder.toString());
+		buffer.setString("subfilter", subfilter);
 		return buffer.toString();
 	}
 	
@@ -100,6 +104,94 @@ public class Parameters extends BaseParameters {
 		escapeExtendedChars = buffer.getBoolean("escapeExtendedChars", escapeExtendedChars);
 		useCodeFinder = buffer.getBoolean("useCodeFinder", useCodeFinder);
 		codeFinder.fromString(buffer.getGroup("codeFinderRules", ""));
+		subfilter = buffer.getString("subfilter", subfilter);
 	}
 
+	public boolean isUseCodeFinder() {
+		return useCodeFinder;
+	}
+
+	public void setUseCodeFinder(boolean useCodeFinder) {
+		this.useCodeFinder = useCodeFinder;
+	}
+
+	public InlineCodeFinder getCodeFinder() {
+		return codeFinder;
+	}
+
+	public void setCodeFinder(InlineCodeFinder codeFinder) {
+		this.codeFinder = codeFinder;
+	}
+
+	public boolean isEscapeExtendedChars() {
+		return escapeExtendedChars;
+	}
+
+	public void setEscapeExtendedChars(boolean escapeExtendedChars) {
+		this.escapeExtendedChars = escapeExtendedChars;
+	}
+
+	public boolean isUseKeyCondition() {
+		return useKeyCondition;
+	}
+
+	public void setUseKeyCondition(boolean useKeyCondition) {
+		this.useKeyCondition = useKeyCondition;
+	}
+
+	public boolean isExtractOnlyMatchingKey() {
+		return extractOnlyMatchingKey;
+	}
+
+	public void setExtractOnlyMatchingKey(boolean extractOnlyMatchingKey) {
+		this.extractOnlyMatchingKey = extractOnlyMatchingKey;
+	}
+
+	public String getKeyCondition() {
+		return keyCondition;
+	}
+
+	public void setKeyCondition(String keyCondition) {
+		this.keyCondition = keyCondition;
+	}
+
+	public boolean isExtraComments() {
+		return extraComments;
+	}
+
+	public void setExtraComments(boolean extraComments) {
+		this.extraComments = extraComments;
+	}
+
+	public boolean isCommentsAreNotes() {
+		return commentsAreNotes;
+	}
+
+	public void setCommentsAreNotes(boolean commentsAreNotes) {
+		this.commentsAreNotes = commentsAreNotes;
+	}
+
+	public LocalizationDirectives getLocDir() {
+		return locDir;
+	}
+
+	public void setLocDir(LocalizationDirectives locDir) {
+		this.locDir = locDir;
+	}
+
+	public boolean isConvertLFandTab() {
+		return convertLFandTab;
+	}
+
+	public void setConvertLFandTab(boolean convertLFandTab) {
+		this.convertLFandTab = convertLFandTab;
+	}
+
+	public String getSubfilter() {
+		return subfilter;
+	}
+
+	public void setSubfilter(String subfilter) {
+		this.subfilter = subfilter;
+	}
 }
