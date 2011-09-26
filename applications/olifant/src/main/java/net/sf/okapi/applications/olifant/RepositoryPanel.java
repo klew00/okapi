@@ -370,6 +370,10 @@ class RepositoryPanel extends Composite {
 				closeRepository();
 				repo = new net.sf.okapi.lib.tmdb.h2.Repository(name);
 			}
+			else if ( type.equals("oL") ) {
+				closeRepository();
+				repo = new net.sf.okapi.lib.tmdb.mongodb.Repository("REPO");
+			}
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(getShell(), "Error opening repository.\n"+e.getMessage(), null);

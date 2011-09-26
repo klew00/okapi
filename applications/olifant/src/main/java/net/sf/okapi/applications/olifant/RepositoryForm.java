@@ -65,7 +65,7 @@ class RepositoryForm {
 		
 		rdOtherLocal = new Button(group, SWT.RADIO);
 		rdOtherLocal.setText("Other local or network repository");
-rdOtherLocal.setEnabled(false); // for now
+        rdOtherLocal.setEnabled(true); // for now
 
 		rdRemote = new Button(group, SWT.RADIO);
 		rdRemote.setText("Remote repository over Internet");
@@ -110,6 +110,9 @@ rdRemote.setEnabled(false); // for now
 			}
 			else if ( rdInMemory.getSelection() ) {
 				res[0] = "m";
+			}
+			else if ( rdOtherLocal.getSelection() ) {
+				res[0] = "oL";
 			}
 			else {
 				return false;
