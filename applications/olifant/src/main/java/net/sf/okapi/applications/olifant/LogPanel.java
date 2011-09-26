@@ -33,6 +33,7 @@ class LogPanel extends Composite {
 	private Text edLog;
 	private Button button;
 	private CLabel info;
+	private long startTime;
 	
 	LogPanel (Composite p_Parent,
 		int p_nFlags)
@@ -70,5 +71,26 @@ class LogPanel extends Composite {
 		edLog.append(text+"\n");
 	}
 	
+	public void startTask (String text) {
+		startTime = System.currentTimeMillis();
+		edLog.setText(""); // Clear all
+		log(text);
+	}
+	
+	public void endTask (String text) {
+		setInfo("");
+		log(text);
+		log("Duration: "+toHMSMS(System.currentTimeMillis()-startTime));
+	}
 
+	private String toHMSMS (long millis) {
+		long hours = millis/3600000;
+		millis = millis - (hours*3600000);
+		long minutes = millis/60000;
+		millis = millis-(minutes*60000);
+		long seconds = millis/1000;
+		millis = millis-(seconds*1000);
+		return String.format("%dh %dm %ds %dms", hours, minutes, seconds, millis);
+	}
+	
 }

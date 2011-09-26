@@ -158,17 +158,16 @@ public class Importer extends ObservableRunnable {
 			public void run () {
 				switch ( state ) {
 				case 0:
-					logPanel.log("Importing...");
+					logPanel.startTask("Importing "+rd.getInputURI().toString()+"...");
 					break;
 				case 1:
 					logPanel.setInfo(String.valueOf(count));
 					break;
 				case 3: // Error
 					logPanel.log("ERROR: "+text);
-					// Fall through
+					// Done too. Fall through
 				case 2: // Done
-					logPanel.setInfo("");
-					logPanel.log(String.format("Entries processed: %d", count));
+					logPanel.endTask(String.format("Entries processed: %d", count));
 					notifyObservers();
 					break;
 				}
