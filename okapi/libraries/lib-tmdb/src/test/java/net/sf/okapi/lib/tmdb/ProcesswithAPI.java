@@ -14,6 +14,7 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.lib.tmdb.DbUtil;
 import net.sf.okapi.lib.tmdb.IRepository;
 import net.sf.okapi.lib.tmdb.ITm;
+import net.sf.okapi.lib.tmdb.DbUtil.PageMode;
 
 public class ProcesswithAPI {
 	
@@ -138,7 +139,7 @@ public class ProcesswithAPI {
 		
 		// test pages with the 4 entries
 		tm.setPageSize(2);
-		tm.setPageMode(ITm.PAGEMODE_EDITOR);
+		tm.setPageMode(PageMode.EDITOR);
 		rs = tm.getFirstPage();
 		assertTrue(rs.next());
 		assertEquals("Text EN 1", rs.getString(3));
@@ -294,7 +295,7 @@ public class ProcesswithAPI {
 		tm.finishImport();
 		
 		tm.setRecordFields(tm.getAvailableFields());
-		tm.setPageMode(ITm.PAGEMODE_EDITOR);
+		tm.setPageMode(PageMode.EDITOR);
 
 		ResultSet rs = tm.getFirstPage();
 		rs.next();

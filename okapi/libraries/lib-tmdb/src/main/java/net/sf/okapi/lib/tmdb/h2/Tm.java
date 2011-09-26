@@ -32,6 +32,7 @@ import java.util.Map;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.lib.tmdb.DbUtil;
 import net.sf.okapi.lib.tmdb.ITm;
+import net.sf.okapi.lib.tmdb.DbUtil.PageMode;
 
 public class Tm implements ITm {
 
@@ -40,7 +41,7 @@ public class Tm implements ITm {
 	private String uuid;
 	private PreparedStatement pstmGet;
 
-	private int pageMode = ITm.PAGEMODE_EDITOR;
+	private DbUtil.PageMode pageMode = PageMode.EDITOR;
 	private long limit = 500;
 	private boolean needPagingRefresh = true; // Must be set to true anytime we change the row count
 	private long totalRows;
@@ -53,6 +54,10 @@ public class Tm implements ITm {
 	private ArrayList<String> existingTuFields;
 	private ArrayList<String> existingSegFields;
 	private LinkedHashMap<String, Object> fieldsToImport;
+	
+	private PreparedStatement pstmUpdSeg;
+	private ArrayList<String> updSegFields;
+
 	
 	public Tm (Repository store,
 		String uuid,
@@ -79,6 +84,11 @@ public class Tm implements ITm {
 		if ( pstmAddTu != null ) {
 			pstmAddTu.close();
 			pstmAddTu = null;
+		}
+		if ( pstmUpdSeg != null ) {
+			pstmUpdSeg.close();
+			pstmUpdSeg = null;
+			updSegFields = null;
 		}
 	}
 
@@ -484,8 +494,14 @@ public class Tm implements ITm {
 			pageCount = 0;
 		}
 		else {
-			pageCount = (totalRows-1) / (limit-1); // -1 for overlap
-			if ( (totalRows-1) % (limit-1) > 0 ) pageCount++; // Last page
+			if ( pageMode == PageMode.EDITOR ) {
+				pageCount = (totalRows-1) / (limit-1); // -1 for overlap
+				if ( (totalRows-1) % (limit-1) > 0 ) pageCount++; // Last page
+			}
+			else {
+				pageCount = totalRows / limit; // -1 for overlap
+				if ( totalRows % limit > 0 ) pageCount++; // Last page
+			}
 		}
 		pagingWithMethod = true;
 		
@@ -537,7 +553,12 @@ public class Tm implements ITm {
 		if ( pagingWithMethod ) {
 			// Used if the sort is on the SegKey
 			if ( page == 0 ) return 1;
-			return (page * (limit-1)) + 1;
+			if ( pageMode == PageMode.EDITOR ) {
+				return (page * (limit-1)) + 1;
+			}
+			else {
+				return (page * limit) + 1;
+			}
 		}
 		else {
 			// Get the key from a pre-computed list
@@ -557,12 +578,12 @@ public class Tm implements ITm {
 	}
 
 	@Override
-	public int getPageMode () {
+	public PageMode getPageMode () {
 		return pageMode;
 	}
 
 	@Override
-	public void setPageMode (int pageMode) {
+	public void setPageMode (PageMode pageMode) {
 		this.pageMode = pageMode;
 	}
 
@@ -696,6 +717,59 @@ public class Tm implements ITm {
 			catch ( SQLException e ) {
 				throw new RuntimeException(e);
 			}
+		}
+	}
+
+	@Override
+	public void updateRecord (long segKey,
+		Map<String, Object> tuFields,
+		Map<String, Object> segFields)
+	{
+		try {
+			if ( segKey < 0 ) {
+				throw new IllegalArgumentException("Illegal SegKey value.");
+			}
+	
+	
+			boolean changed = (pstmUpdSeg == null);
+			if ( updSegFields == null ) {
+				updSegFields = new ArrayList<String>(segFields.keySet());
+			}
+			else { // Update the existing list
+				// Use brute force for now
+				updSegFields = new ArrayList<String>(segFields.keySet());
+				changed = true;
+			}
+			
+			if ( changed ) {
+				if ( pstmUpdSeg != null ) {
+					pstmUpdSeg.close();
+					pstmUpdSeg = null;
+				}
+				
+				StringBuilder tmp = new StringBuilder("UPDATE \""+name+"_SEG\"");
+				for ( int i=0; i<updSegFields.size(); i++ ) {
+					tmp.append(String.format("%s SET \"%s\" = ?", (i==0 ? "" : ","), updSegFields.get(i)));
+				}
+				tmp.append(String.format(" WHERE \"%s\" = ?", DbUtil.SEGKEY_NAME));
+				
+				pstmUpdSeg = store.getConnection().prepareStatement(tmp.toString());
+			}
+//For now supports only strings			
+			// Fill the statement
+			int i = 1;
+			for ( String fn : segFields.keySet() ) {
+				pstmUpdSeg.setString(i, (String)segFields.get(fn));
+				i++;
+			}
+			// Fill the SegKey value
+			pstmUpdSeg.setLong(i, segKey);
+			
+			pstmUpdSeg.execute();
+			
+		}
+		catch ( SQLException e ) {
+			throw new RuntimeException(e);
 		}
 	}
 

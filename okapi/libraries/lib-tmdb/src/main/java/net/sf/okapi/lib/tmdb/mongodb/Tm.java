@@ -12,6 +12,7 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import net.sf.okapi.lib.tmdb.DbUtil;
 import net.sf.okapi.lib.tmdb.ITm;
+import net.sf.okapi.lib.tmdb.DbUtil.PageMode;
 import net.sf.okapi.lib.tmdb.mongodb.Repository;
 
 public class Tm implements ITm {
@@ -25,6 +26,8 @@ public class Tm implements ITm {
 	private long totalRows;
 	private long pageCount;
 	private long currentPage = -1; // 0-based
+	private PageMode pageMode = PageMode.EDITOR;
+	
 	@SuppressWarnings("unused")
 	private boolean pagingWithMethod = true;
 
@@ -89,7 +92,10 @@ public class Tm implements ITm {
 	}
 	
 	@Override
-	public long addRecord(long tuKey, Map<String, Object> tuFields, Map<String, Object> segFields) {
+	public long addRecord (long tuKey,
+		Map<String, Object> tuFields,
+		Map<String, Object> segFields)
+	{
 		DBCollection segColl = store.getDb().getCollection(name+"_SEG");
 		
 		calculateAndUpdateTuFields(tuFields);
@@ -272,7 +278,14 @@ public class Tm implements ITm {
 	 */
 	private ResultSet getPage(){
 		DBCollection segColl = store.getDb().getCollection(name+"_SEG");
-		DBCursor cur = segColl.find().limit(limit).skip((int) ((limit-1)*currentPage));
+		DBCursor cur;
+		if (pageMode == PageMode.EDITOR ) {
+			cur = segColl.find().limit(limit).skip((int)((limit-1)*currentPage));
+		}
+		else {
+//TOFIX: YS: Not sure if it's the right code for this case (no overlap)
+			cur = segColl.find().limit(limit).skip((int)(limit*currentPage));
+		}
 
 		return new MongodbResultSet(cur, recordFields, limit);
 	}
@@ -366,8 +379,14 @@ public class Tm implements ITm {
 			pageCount = 0;
 		}
 		else {
-			pageCount = (totalRows-1) / (limit-1); // -1 for overlap
-			if ( (totalRows-1) % (limit-1) > 0 ) pageCount++; // Last page
+			if ( pageMode == PageMode.EDITOR ) {
+				pageCount = (totalRows-1) / (limit-1); // -1 for overlap
+				if ( (totalRows-1) % (limit-1) > 0 ) pageCount++; // Last page
+			}
+			else {
+				pageCount = totalRows / limit; // -1 for overlap
+				if ( totalRows % limit > 0 ) pageCount++; // Last page
+			}
 		}
 		pagingWithMethod = true;
 		
@@ -389,19 +408,28 @@ public class Tm implements ITm {
 	}
 
 	@Override
-	public int getPageMode() {
-		// TODO Auto-generated method stub
-		return 0;
+	public PageMode getPageMode() {
+		return pageMode;
 	}
 
 	@Override
-	public void setPageMode(int pageMode) {
-		// TODO Auto-generated method stub
-		
+	public void setPageMode(PageMode pageMode) {
+		this.pageMode = pageMode;
 	}
 	
 	@Override
-	public void renameLocale(String currentCode, String newCode) {
+	public void renameLocale (String currentCode,
+		String newCode)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void updateRecord (long segKey,
+		Map<String, Object> tuFields,
+		Map<String, Object> segFields)
+	{
 		// TODO Auto-generated method stub
 		
 	}

@@ -34,6 +34,23 @@ public class DbUtil {
 	public static final String TEXT_PREFIX = ("Text"+LANG_SEP);
 	public static final String CODES_PREFIX = ("Codes"+LANG_SEP);
 
+
+	/**
+	 * Page mode for going through the TM.
+	 */
+	public enum PageMode {
+		/**
+		 * Page mode for editors.
+		 * <p>In this mode the pages overlap by one record.
+		 */
+		EDITOR,
+		/**
+		 * Page mode for iteration.
+		 * <p>In this mode the page do not have overlapping records. 
+		 */
+		ITERATOR
+	}
+
 	/**
 	 * Cannot use fully static methods as this is used across threads.
 	 */
@@ -50,9 +67,29 @@ public class DbUtil {
 			throw new IllegalArgumentException("Cannot use LocaleId.EMPTY");
 		}
 		String tmp = locId.toString();
-		return tmp.toUpperCase().replace('-', '_');
+		String lang = locId.getLanguage().toUpperCase();
+		String region = locId.getRegion();
+		if ( region != null ) {
+			lang = lang + "_" + region.toUpperCase();
+		}
+		if ( tmp.length() == lang.length() ) {
+			return lang; // Nothing else
+		}
+		else {
+			return lang + tmp.substring(lang.length());
+		}
 	}
 
+	/**
+	 * Gets the LocaleId object from a given Olifant locale code.
+	 * @param localeCode the Olifant locale code to convert.
+	 * @return the corresponding LocaleId object.
+	 * @throws IllegalArgumentException if the given locale code is invalid.
+	 */
+	public static LocaleId fromOlifantLocaleCode (String localeCode) {
+		return LocaleId.fromString(localeCode);
+	}
+	
 	/**
 	 * Indicates if a given field is a segment-level field.
 	 * @param name the full name of the field to check.

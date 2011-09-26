@@ -34,6 +34,9 @@ public class RepositoryTest {
 		// Create memory repository
 		IRepository repo = new Repository(null);
 		ProcesswithAPI.runMultipleTestsStep3(repo);
+		
+		repo = new Repository(null);
+//		ProcesswithAPI.runMultipleTestsStep4(repo);
 	}
 	
 }

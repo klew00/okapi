@@ -37,6 +37,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
@@ -58,7 +59,7 @@ class LocalesForm {
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		shell.setText("Locales");
 		UIUtil.inheritIcon(shell, parent);
-		shell.setLayout(new GridLayout(3, false));
+		shell.setLayout(new GridLayout());
 
 		Group group = new Group(shell, SWT.NONE);
 		group.setLayout(new GridLayout(2, false));
@@ -99,6 +100,13 @@ class LocalesForm {
 		UIUtil.setSameWidth(UIUtil.BUTTON_DEFAULT_WIDTH, btAdd, btDelete, btRename);
 		updateList(0);
 		
+		Label stNote = new Label(group, SWT.WRAP);
+		stNote.setText("Note that adding or removing locales on a large translation memory may take time.");
+		gdTmp = new GridData(GridData.FILL_BOTH);
+		gdTmp.horizontalSpan = 2;
+		gdTmp.widthHint = 150;
+		stNote.setLayoutData(gdTmp);
+		
 		SelectionAdapter CloseActions = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				shell.close();
@@ -107,7 +115,6 @@ class LocalesForm {
 		
 		ClosePanel pnlActions = new ClosePanel(shell, SWT.NONE, CloseActions, false);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.horizontalSpan = 3;
 		pnlActions.setLayoutData(gdTmp);
 
 		shell.pack();

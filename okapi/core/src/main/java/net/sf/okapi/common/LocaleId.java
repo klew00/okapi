@@ -406,7 +406,7 @@ public final class LocaleId implements Comparable<Object> {
 	 * Calling this method is the same as calling <code>new LocaleId(locId, true);</code>
 	 * @param locId the locale identifier to use (it will be normalized).
 	 * @return a new localeId object from the given identifier.
-	 * @throws IllegalArgumentException if the argument in invalid.
+	 * @throws IllegalArgumentException if the argument is invalid.
 	 */
 	static public LocaleId fromString (String locId) {
 		return new LocaleId(locId, true);
@@ -416,6 +416,7 @@ public final class LocaleId implements Comparable<Object> {
 	 * Creates a new LocaleId from a POSIX locale identifier.
 	 * @param locId the POSIX locale identifier (e.g. "de-at.UTF-8@EURO")
 	 * @return a new LocaleId or null if an error occurred.
+	 * @throws IllegalArgumentException if the argument is invalid.
 	 */
 	static public LocaleId fromPOSIXLocale (String locId) {
 		// POSIX syntax: language[_territory][.encoding][@modifier]

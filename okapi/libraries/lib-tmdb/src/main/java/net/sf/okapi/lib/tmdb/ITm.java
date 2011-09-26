@@ -24,6 +24,8 @@ import java.sql.ResultSet;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.okapi.lib.tmdb.DbUtil.PageMode;
+
 /**
  * Provides implementation-agnostic access to an Olifant translation memory.
  */
@@ -39,19 +41,6 @@ public interface ITm {
 	 */
 	public static final int FLAG_FIELD = 2;
 
-	/**
-	 * Page mode for editors.
-	 * <p>In this mode the pages overlap by one record.
-	 * See {@link #setPageMode(int)} for details. 
-	 */
-	public static final int PAGEMODE_EDITOR = 0;
-	
-	/**
-	 * Page mode for iteration.
-	 * <p>In this mode the page do not have overlaping records. 
-	 */
-	public static final int PAGEMODE_ITERATOR = 1;
-	
 	/**
 	 * Gets the UUID of this TM.
 	 * The UUID is a global universal unique identifier. It can be used for example
@@ -124,6 +113,19 @@ public interface ITm {
 	public long addRecord (long tuKey,
 		Map<String, Object> tuFields,
 		Map<String, Object> segFields);
+	
+	/**
+	 * Updates the given field for an existing record.
+	 * <p>None of the fields can be a new field.
+	 * <p>The SegKey value of a record can be obtained from the ResultSet returned by {@link #getNextPage()}
+	 * or any other paging method.
+	 * @param segKey the key of the segment to update. 
+	 * @param tuFields the list of the text unit level fields to update.
+	 * @param segFields the list of the segment level fields to update.
+	 */
+	public void updateRecord (long segKey,
+		Map<String, Object> tuFields,
+		Map<String, Object> segFields);
 
 	/**
 	 * Sets the number of records a call to a paging method should return.
@@ -142,8 +144,8 @@ public interface ITm {
 	/**
 	 * Sets the type of pages the system returns.
 	 * @param pageMode the type of pages the system should return.
-	 * {@link #PAGEMODE_EDITOR} or {@link #PAGEMODE_ITERATOR}.
-	 * <p>In {@link #PAGEMODE_EDITOR} mode the last record of the previous page
+	 * {@link PageMode#EDITOR} or {@link PageMode#ITERATOR} 
+	 * <p>In {@link PageMode#EDITOR} mode the last record of the previous page
 	 * is the first record of the next page, and the first record of the next page 
 	 * is the last of the previous page. In other words: there is one record that is 
 	 * common to each adjacent pages.
@@ -151,7 +153,7 @@ public interface ITm {
 	 * the page size is set to 3: There are 3 pages (not 2). The first record of 
 	 * the first page is 1, the one of the second page is 3 (not 4), and the one
 	 * of the last page is 5.
-	 * <p>In {@link #PAGEMODE_ITERATOR} mode the last record of the previous page
+	 * <p>In {@link PageMode#ITERATOR} mode the last record of the previous page
 	 * is the record before the first record of the next page, and the first record
 	 * of the next page is the record after the last record of the previous page.
 	 * In other words: page recored do not overlap. No record is common to several pages.
@@ -159,14 +161,14 @@ public interface ITm {
 	 * page size is set to 3: There are 2 pages. the first record of the first 
 	 * page is 1 and the one of the second page is 4. 
 	 */
-	public void setPageMode (int pageMode);
+	public void setPageMode (PageMode pageMode);
 	
 	/**
 	 * Gets the type of page the system returns.
 	 * @return the type of page the system returns.
 	 * See {@link #setPageMode(int)} for details.
 	 */
-	public int getPageMode ();
+	public PageMode getPageMode ();
 	
 	/**
 	 * Moves the page cursor before the first page.
