@@ -64,7 +64,7 @@ public class Importer extends ObservableRunnable {
 			LinkedHashMap<String, Object> mapTrgProp = new LinkedHashMap<String, Object>();
 			LinkedHashMap<String, Object> map = new LinkedHashMap<String, Object>();
 			String[] trgFields;
-			String srcDbLang = DbUtil.toDbLang(rd.getSourceLocale());
+			String srcDbLang = DbUtil.toOlifantLocaleCode(rd.getSourceLocale());
 
 //TODO: implement check for duplicates
 //TODO: implement filter for fields
@@ -101,7 +101,7 @@ public class Importer extends ObservableRunnable {
 	
 					// For each target
 					for ( LocaleId locId : tu.getTargetLocales() ) {
-						String trgDbLang = DbUtil.toDbLang(locId);
+						String trgDbLang = DbUtil.toOlifantLocaleCode(locId);
 						
 						mapTrgProp.clear();
 						for ( String name : tu.getTargetPropertyNames(locId) ) {

@@ -33,7 +33,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.UUID;
 
-import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.lib.tmdb.DbUtil;
 import net.sf.okapi.lib.tmdb.IRepository;
@@ -46,10 +45,6 @@ public class Repository implements IRepository {
 	private Connection  conn = null;
 	private String name;
 
-	static private String localeIdToDbLang (LocaleId locId) {
-		return locId.toPOSIXLocaleId().toUpperCase();
-	}
-	
 	static public void delete (String path) {
 		String pathNoExt = path;
 		if ( pathNoExt.endsWith(DATAFILE_EXT) ) {
@@ -249,13 +244,12 @@ public class Repository implements IRepository {
 	@Override
 	public ITm createTm (String name,
 		String description,
-		LocaleId locId)
+		String localeCode)
 	{
 		String uuid = null;
 		ITm tm = null;
 		Statement stm = null;
 		PreparedStatement pstm = null;
-		String lang = localeIdToDbLang(locId);
 		try {
 			// Checks if the name is already used
 			stm = conn.createStatement();
@@ -271,13 +265,13 @@ public class Repository implements IRepository {
 				+ ")");
 			
 			// Create the SEG-level table for the new TM
-			stm.execute("CREATE TABLE \""+name+"_SEG"+"\" ("
-				+ "SEGKEY INTEGER IDENTITY PRIMARY KEY,"
-				+ "TUREF INTEGER,"
-				+ "FLAG BOOLEAN,"
+			stm.execute("CREATE TABLE \"" + name + "_SEG" + "\" ("
+				+ "\"" + DbUtil.SEGKEY_NAME + "\" INTEGER IDENTITY PRIMARY KEY,"
+				+ "\"" + DbUtil.TUREF_NAME + "\" INTEGER,"
+				+ "\"" + DbUtil.FLAG_NAME + "\" BOOLEAN,"
 				// One language
-				+ "\""+DbUtil.TEXT_PREFIX+lang+"\" VARCHAR,"
-				+ "\""+DbUtil.CODES_PREFIX+lang+"\" VARCHAR"
+				+ "\"" + DbUtil.TEXT_PREFIX+localeCode + "\" VARCHAR,"
+				+ "\"" + DbUtil.CODES_PREFIX+localeCode + "\" VARCHAR"
 				+ ")");
 			
 			// Update the TMLIST

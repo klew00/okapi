@@ -42,6 +42,7 @@ public class CdiInjectorFactory implements InjectorFactory
    }
    
 
+   @SuppressWarnings("unchecked")
    public ConstructorInjector createConstructor(Constructor constructor)
    {
       Class<?> clazz = constructor.getDeclaringClass();
@@ -63,11 +64,13 @@ public class CdiInjectorFactory implements InjectorFactory
       return delegate.createConstructor(constructor);
    }
 
+   @SuppressWarnings("unchecked")
    public MethodInjector createMethodInjector(Class root, Method method)
    {
       return delegate.createMethodInjector(root, method);
    }
 
+   @SuppressWarnings("unchecked")
    public PropertyInjector createPropertyInjector(Class resourceClass)
    {
       // JAX-RS property injection is performed twice. Firstly by the JaxrsInjectionTarget
@@ -75,6 +78,7 @@ public class CdiInjectorFactory implements InjectorFactory
       return noopPropertyInjector;
    }
    
+   @SuppressWarnings("unchecked")
    public ValueInjector createParameterExtractor(Class injectTargetClass, AccessibleObject injectTarget, Class type, Type genericType, Annotation[] annotations)
    {
       return delegate.createParameterExtractor(injectTargetClass, injectTarget, type, genericType, annotations);

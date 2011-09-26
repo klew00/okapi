@@ -232,13 +232,14 @@ public class VersifiedTxtFilterTest {
 	@Test(expected=OkapiBadFilterInputException.class)
 	public void testMissingVerse() {
 		String snippet = "|btest\nThis is a test.";
-		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 	}
 	
 	@Test
 	public void testMissingBook() {
 		String snippet = "|v1\nThis is a test.";
 		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertEquals("This is a test.", tu.getSource().toString());
 	}
 	
 	@Test(expected=OkapiBadFilterInputException.class)

@@ -25,22 +25,22 @@ import java.util.ArrayList;
 public class TBXProperty {
 
 	private final String name;
-	private final TBXProperyType type;
-	private boolean multivalued;
+//	private final TBXProperyType type;
+//	private boolean multivalued;
 	private ArrayList<String> values;
 	
 	public TBXProperty (TBXProperyType type,
 		String name)
 	{
 		this.name = name;
-		this.type = type;
+//		this.type = type;
 	}
 	
 	public TBXProperty (String name,
 		String value)
 	{
 		this.name = name;
-		this.type = TBXProperyType.STRING;
+//		this.type = TBXProperyType.STRING;
 		values = new ArrayList<String>(1);
 		values.add(value);
 	}

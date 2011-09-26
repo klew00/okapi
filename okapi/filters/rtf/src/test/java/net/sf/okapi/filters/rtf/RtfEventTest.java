@@ -20,11 +20,12 @@
 package net.sf.okapi.filters.rtf;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.filters.rtf.RTFFilter;
 
 import org.junit.Before;
@@ -35,7 +36,7 @@ import static org.junit.Assert.*;
 public class RtfEventTest {
 
 	private RTFFilter filter;
-	private LocaleId locEN = LocaleId.fromString("en");
+	private LocaleId locEN = LocaleId.ENGLISH;
 
 	@Before
 	public void setUp() throws Exception {
@@ -43,7 +44,13 @@ public class RtfEventTest {
 	}
 	
 	@Test
-	public void testBold() {		
+	public void testStartDoc () {
+		String snippet = "{\\rtf1\\ansi\\ansicpg1252\\deff0\\deflang1033{\\fonttbl{\\f0\\fnil\\fcharset0 Courier New;}}"
+			+ "\\uc1\\pard\\f0\\fs22 t\\b e\\b0 st\\par }";
+		List<Event> list = getEvents(snippet);
+		assertTrue(list.get(0).isStartDocument());
+		StartDocument sd = list.get(0).getStartDocument();
+		assertNotNull(sd.getFilterWriter());
 	}
 	
 	private ArrayList<Event> getEvents(String snippet) {
@@ -55,13 +62,5 @@ public class RtfEventTest {
 		}
 		filter.close();
 		return list;
-	}
-
-	private void addStartEvents(ArrayList<Event> events) {		
-		events.add(new Event(EventType.START_DOCUMENT));
-	}
-
-	private void addEndEvents(ArrayList<Event> events) {
-		events.add(new Event(EventType.END_DOCUMENT));
 	}
 }

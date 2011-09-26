@@ -26,7 +26,8 @@ public class ProcesswithAPI {
 
 		// Create a first TM
 		String tmName = "first";
-		ITm tm = repo.createTm(tmName, null, LocaleId.ENGLISH);
+		String localeCode = DbUtil.toOlifantLocaleCode(LocaleId.ENGLISH);
+		ITm tm = repo.createTm(tmName, null, localeCode);
 		assertEquals(tmName, tm.getName());
 		list = repo.getTmNames();
 		assertEquals(1, list.size());
@@ -276,7 +277,8 @@ public class ProcesswithAPI {
 		throws SQLException
 	{
 		String tmName = "\u0195\u0222b_ test";
-		ITm tm = repo.createTm(tmName, null, LocaleId.ENGLISH);
+		String localeCode = DbUtil.toOlifantLocaleCode(LocaleId.ENGLISH);
+		ITm tm = repo.createTm(tmName, null, localeCode);
 		assertEquals(tmName, tm.getName());
 		
 		Map<String, Object> tuFlds = new HashMap<String, Object>();
@@ -316,21 +318,41 @@ public class ProcesswithAPI {
 
 		//=== Test addition of locale
 		
-		tm.addLocale("bg");
+		tm.addLocale("BG");
 		List<String> list = tm.getLocales();
 		assertEquals(2, list.size());
 		assertEquals("EN", list.get(0));
 		assertEquals("BG", list.get(1));
 		// Do it a second time: no change
-		tm.addLocale("bG");
+		tm.addLocale("BG");
 		list = tm.getLocales();
 		assertEquals(2, list.size());
 		assertEquals("EN", list.get(0));
 		assertEquals("BG", list.get(1));
-
-		//===Test deletion of locales
 		
-		tm.deleteLocale("Bg");
+		//=== Test renaming of locale
+		
+		tm.renameLocale("BG", "ZU");
+		list = tm.getLocales();
+		assertEquals(2, list.size());
+		assertEquals("EN", list.get(0));
+		assertEquals("ZU", list.get(1));
+
+		tm.renameLocale("BG", "ZZ"); // BG does not exists: nothing happens
+		list = tm.getLocales();
+		assertEquals(2, list.size());
+		assertEquals("EN", list.get(0));
+		assertEquals("ZU", list.get(1));
+		
+		tm.renameLocale("ZU", "EN"); // EN exists already: nothing happens
+		list = tm.getLocales();
+		assertEquals(2, list.size());
+		assertEquals("EN", list.get(0));
+		assertEquals("ZU", list.get(1));
+		
+		//=== Test deletion of locales
+		
+		tm.deleteLocale("ZU");
 		list = tm.getLocales();
 		assertEquals(1, list.size());
 		assertEquals("EN", list.get(0));

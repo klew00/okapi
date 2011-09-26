@@ -65,10 +65,10 @@ public class Writer extends net.sf.okapi.applications.rainbow.packages.xliff.Wri
 		// Call the base class method
 		super.writeStartPackage();
 		
-		tmxWriterApproved.setLetterCodedMode(true);
-		tmxWriterUnApproved.setLetterCodedMode(true);
-		tmxWriterAlternate.setLetterCodedMode(true);
-		tmxWriterLeverage.setLetterCodedMode(true);
+		tmxWriterApproved.setLetterCodedMode(true, true);
+		tmxWriterUnApproved.setLetterCodedMode(true, true);
+		tmxWriterAlternate.setLetterCodedMode(true, true);
+		tmxWriterLeverage.setLetterCodedMode(true, true);
 
 		// Force OmegaT-specific settings
 		options.gMode = true;

@@ -164,7 +164,7 @@ public class RTFFilter implements IFilter {
 	private char uChar;
 	private int internalStyle;
 	private boolean rtfDetected;
-	private int doNotTranslateStyle;
+//	private int doNotTranslateStyle;
 	private CharsetDecoder currentCSDec;
 	private int currentDBCSCodepage;
 	private String currentCSName;
@@ -462,7 +462,7 @@ public class RTFFilter implements IFilter {
 		inFontTable = 0;
 		noReset = 0;
 		internalStyle = 6;
-		doNotTranslateStyle = 8;
+//		doNotTranslateStyle = 8;
 
 		RTFContext ctx = new RTFContext();
 		ctx.uniCount = 1;
@@ -689,9 +689,9 @@ public class RTFFilter implements IFilter {
 						if ( "tw4winInternal;".compareTo(sTmp) == 0 ) {
 							internalStyle = nCode;
 						}
-						else if ( "DO_NOT_TRANSLATE;".compareTo(sTmp) == 0 ) {
-							doNotTranslateStyle = nCode;
-						}
+//						else if ( "DO_NOT_TRANSLATE;".compareTo(sTmp) == 0 ) {
+//							doNotTranslateStyle = nCode;
+//						}
 					}
 					else {
 						nStyle = 0;

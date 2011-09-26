@@ -20,8 +20,6 @@
 
 package net.sf.okapi.steps.wordcount.common;
 
-import java.util.logging.Level;
-
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.ITextUnit;

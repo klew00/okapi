@@ -120,9 +120,12 @@ public class TMXWriter {
      * Sets the flag indicating whether the writer should output
      * letter-coded content (e.g. to work for OmegaT).
      * @param value true to output letter-coded content. False otherwise.
+     * @param zeroBased true to have 0-based code, false for unaltered IDs.
      */
-    public void setLetterCodedMode (boolean value) {
-    	tmxCont.setLetterCodedMode(value);
+    public void setLetterCodedMode (boolean value,
+    	boolean zeroBased)
+    {
+    	tmxCont.setLetterCodedMode(value, zeroBased);
     }
     
     /**

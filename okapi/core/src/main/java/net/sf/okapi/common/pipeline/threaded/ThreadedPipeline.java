@@ -43,7 +43,7 @@ public class ThreadedPipeline implements IPipeline {
 	private volatile PipelineReturnValue state;
 	private LinkedList<BaseThreadedPipelineStepAdaptor> threadedSteps;
 	private LinkedList<IPipelineStep> steps;
-	private ProducerPipelineStepAdaptor firstThreadedStep;
+//	private ProducerPipelineStepAdaptor firstThreadedStep;
 	private BlockingQueue<Event> previousQueue;
 	private BlockingQueue<Event> inputQueue;
 	private String id;
@@ -78,7 +78,7 @@ public class ThreadedPipeline implements IPipeline {
 				producerStep.setInputQueue(inputQueue);
 				executor.submit(producerStep);
 				threadedSteps.add(producerStep);
-				firstThreadedStep = producerStep;
+//				firstThreadedStep = producerStep;
 			} else if (step == steps.getLast()) {
 				// last step is a consumer
 				if (previousQueue == null) {

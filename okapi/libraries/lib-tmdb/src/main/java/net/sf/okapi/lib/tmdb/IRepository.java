@@ -22,8 +22,9 @@ package net.sf.okapi.lib.tmdb;
 
 import java.util.List;
 
-import net.sf.okapi.common.LocaleId;
-
+/**
+ * provides an implementation-agnostic access to an Olifant repository.
+ */
 public interface IRepository {
 
 	/**
@@ -50,13 +51,13 @@ public interface IRepository {
 	 * is used. 
 	 * @param name the name of the new tM to create.
 	 * @param description the description for the new TM.
-	 * @param locId the locale of the initial language.
+	 * @param localeCode the locale code of the initial language.
 	 * @return the ITm object for the newly created TM or the already existing TM,
 	 * or null if the TM was not created.
 	 */
 	public ITm createTm (String tmName,
 		String description,
-		LocaleId locId);
+		String localeCode);
 	
 	/**
 	 * Deletes a given TM from this repository.

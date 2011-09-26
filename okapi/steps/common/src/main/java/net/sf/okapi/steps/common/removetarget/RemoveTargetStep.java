@@ -30,7 +30,6 @@ import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.resource.ITextUnit;
-import net.sf.okapi.common.resource.TextUnit;
 
 @UsingParameters(Parameters.class)
 public class RemoveTargetStep extends BasePipelineStep {

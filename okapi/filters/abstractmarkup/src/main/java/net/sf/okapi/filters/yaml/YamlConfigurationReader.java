@@ -99,6 +99,7 @@ public class YamlConfigurationReader {
 		initialize();
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void initialize() {
 		elementRules = new HashMap<String, Object>();
 		attributeRules = new HashMap<String, Object>();

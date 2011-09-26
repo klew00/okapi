@@ -48,7 +48,7 @@ public class TMXContentTest {
 	public void testSimple_OmegaT () {
 		TextFragment tf = createTextUnit();
 		assertEquals(tf.getCodes().size(), 5);
-		fmt.setLetterCodedMode(true);
+		fmt.setLetterCodedMode(true, true);
 		fmt.setContent(tf);
 		assertEquals("t1<bpt i=\"1\">&lt;g0&gt;</bpt><bpt i=\"2\">&lt;g1&gt;</bpt><ph x=\"3\">&lt;x2/&gt;</ph>t2<ept i=\"2\">&lt;/g1&gt;</ept><ept i=\"1\">&lt;/g0&gt;</ept>t3",
 			fmt.toString());
@@ -60,7 +60,7 @@ public class TMXContentTest {
 		assertEquals(tf.getCodes().size(), 5);
 		fmt.setCodeMode(TMXContent.CODEMODE_LETTERCODED);
 		fmt.setContent(tf);
-		assertEquals("t1<bpt i=\"1\">&lt;g0&gt;</bpt><bpt i=\"2\">&lt;g1&gt;</bpt><ph x=\"3\">&lt;x2/&gt;</ph>t2<ept i=\"2\">&lt;/g1&gt;</ept><ept i=\"1\">&lt;/g0&gt;</ept>t3",
+		assertEquals("t1<bpt i=\"1\">&lt;g1&gt;</bpt><bpt i=\"2\">&lt;g2&gt;</bpt><ph x=\"3\">&lt;x3/&gt;</ph>t2<ept i=\"2\">&lt;/g2&gt;</ept><ept i=\"1\">&lt;/g1&gt;</ept>t3",
 			fmt.toString());
 	}
 
@@ -80,7 +80,7 @@ public class TMXContentTest {
 		assertEquals(tf.getCodes().size(), 5);
 		fmt.setCodeMode(TMXContent.CODEMODE_GENERIC);
 		fmt.setContent(tf);
-		assertEquals("t1<bpt i=\"1\">&lt;0&gt;</bpt><bpt i=\"2\">&lt;1&gt;</bpt><ph x=\"3\">&lt;2/&gt;</ph>t2<ept i=\"2\">&lt;/1&gt;</ept><ept i=\"1\">&lt;/0&gt;</ept>t3",
+		assertEquals("t1<bpt i=\"1\">&lt;1&gt;</bpt><bpt i=\"2\">&lt;2&gt;</bpt><ph x=\"3\">&lt;3/&gt;</ph>t2<ept i=\"2\">&lt;/2&gt;</ept><ept i=\"1\">&lt;/1&gt;</ept>t3",
 				fmt.toString());
 	}
 

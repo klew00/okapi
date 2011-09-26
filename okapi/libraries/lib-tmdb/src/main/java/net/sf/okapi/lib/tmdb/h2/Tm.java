@@ -131,7 +131,7 @@ public class Tm implements ITm {
 			// Check if we have at least one field that is TU-level
 			boolean hasTUField = false;
 			for ( String name : names ) {
-				if ( !isSegmentField(name) ) {
+				if ( !DbUtil.isSegmentField(name) ) {
 					hasTUField = true;
 					break;
 				}
@@ -141,16 +141,16 @@ public class Tm implements ITm {
 			if ( hasTUField ) {
 				String tuTable = "\""+name+"_TU\"";
 				String segTable = "\""+name+"_SEG\"";
-				tmp = new StringBuilder("SELECT "+segTable+".SEGKEY, "+segTable+".FLAG");
+				tmp = new StringBuilder(String.format("SELECT %s.\"%s\", %s.\"%s\"", segTable, DbUtil.SEGKEY_NAME, segTable, DbUtil.FLAG_NAME));
 				for ( String name : names ) {
-					if ( isSegmentField(name) ) tmp.append(", "+segTable+".\""+name+"\"");
+					if ( DbUtil.isSegmentField(name) ) tmp.append(", "+segTable+".\""+name+"\"");
 					else tmp.append(", "+tuTable+".\""+name+"\"");
 				}
-				tmp.append(" FROM "+segTable+" LEFT JOIN "+tuTable+" ON "+segTable+".TUREF="+tuTable+".TUKEY");
+				tmp.append(" FROM "+segTable+" LEFT JOIN "+tuTable+" ON "+segTable+".\""+DbUtil.TUREF_NAME+"\"="+tuTable+".TUKEY");
 				
 			}
 			else { // Simple select in the segment table
-				tmp = new StringBuilder("SELECT SEGKEY, FLAG");
+				tmp = new StringBuilder(String.format("SELECT \"%s\", \"%s\"", DbUtil.SEGKEY_NAME, DbUtil.FLAG_NAME));
 				for ( String name : names ) {
 					tmp.append(", \""+name+"\"");
 				}
@@ -158,7 +158,7 @@ public class Tm implements ITm {
 			}
 			
 			//old tmp.append(" ORDER BY SegKey LIMIT ? OFFSET ?");
-			tmp.append(" WHERE SegKey>=? ORDER BY SegKey LIMIT ?");
+			tmp.append(String.format(" WHERE \"%s\">=? ORDER BY \"%s\" LIMIT ?", DbUtil.SEGKEY_NAME, DbUtil.SEGKEY_NAME));
 
 			pstmGet = store.getConnection().prepareStatement( tmp.toString(),
 				ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
@@ -185,13 +185,6 @@ public class Tm implements ITm {
 		return limit;
 	}
 	
-	private boolean isSegmentField (String name) {
-		return (( name.indexOf(DbUtil.LANG_SEP) != -1 )
-			|| name.equals("TUREF")
-			|| name.equals("FLAG")
-		); 
-	}
-
 	@Override
 	public void startImport () {
 		try {
@@ -278,10 +271,10 @@ public class Tm implements ITm {
 		for ( String name : fieldsToImport.keySet() ) {
 			// Skip fields for the other statement
 			if ( segmentLevel ) {
-				if ( !isSegmentField(name) ) continue;
+				if ( !DbUtil.isSegmentField(name) ) continue;
 			}
 			else {
-				if ( isSegmentField(name) ) continue;
+				if ( DbUtil.isSegmentField(name) ) continue;
 			}
 			// Get the value from the provided map or from the defaults
 			// Empty list is treat like it's all defaults
@@ -388,7 +381,7 @@ public class Tm implements ITm {
 					int count = 0;
 					StringBuilder tmp = new StringBuilder("INSERT INTO \""+name+"_SEG\" (");
 					for ( String name : fieldsToImport.keySet() ) {
-						if ( !isSegmentField(name) ) continue;  // Skip over TU level fields
+						if ( !DbUtil.isSegmentField(name) ) continue;  // Skip over TU level fields
 						if ( first ) {
 							first = false;
 							tmp.append("\""+name+"\"");
@@ -398,7 +391,7 @@ public class Tm implements ITm {
 						}
 						count++;
 					}
-					tmp.append(", TUREF) VALUES (?"); // Always include TUREF at the end
+					tmp.append(", \""+DbUtil.TUREF_NAME+"\") VALUES (?"); // Always include TUREF at the end
 					for ( int i=0; i<count; i++ ) {
 						tmp.append(", ?");
 					}
@@ -418,7 +411,7 @@ public class Tm implements ITm {
 						int count = 0;
 						tmp = new StringBuilder("INSERT INTO \""+name+"_TU\" (");
 						for ( String name : fieldsToImport.keySet() ) {
-							if ( isSegmentField(name) ) continue; // Skip over segment-level fields
+							if ( DbUtil.isSegmentField(name) ) continue; // Skip over segment-level fields
 							if ( first ) {
 								first = false;
 								tmp.append("\""+name+"\"");
@@ -633,6 +626,56 @@ public class Tm implements ITm {
 						// This field is to be removed
 						tmp.append(String.format("ALTER TABLE \"%s%s\" DROP COLUMN \"%s\"; ",
 							name, "_SEG", fn));
+					}
+				}
+			}
+			if ( tmp.length() > 0 ) {
+				stm.execute(tmp.toString());
+			}
+		}
+		catch ( SQLException e ) {
+			throw new RuntimeException(e);
+		}
+		finally {
+			try {
+				if ( stm != null ) {
+					stm.close();
+					stm = null;
+				}
+			}
+			catch ( SQLException e ) {
+				throw new RuntimeException(e);
+			}
+		}
+	}
+
+	@Override
+	public void renameLocale (String currentCode,
+		String newCode)
+	{
+		List<String> existing = getLocales();
+		if ( !existing.contains(currentCode) ) {
+			return; // There is not a locale with that name
+		}
+		if ( existing.contains(newCode) ) {
+			return; // The name/code is already used
+		}
+
+		// Locale does not exists and we need to remove all it fields
+		Statement stm = null;
+		try {
+			StringBuilder tmp = new StringBuilder();
+			stm = store.getConnection().createStatement();
+			ResultSet result = stm.executeQuery("SHOW COLUMNS FROM \""+name+"_SEG\"");
+			while ( result.next() ) {
+				String fn = result.getString(1);
+				int n = fn.lastIndexOf(DbUtil.LANG_SEP);
+				if ( n > -1 ) {
+					if ( fn.substring(n+1).equals(currentCode) ) {
+						// This field is to be renamed
+						String fnRoot = fn.substring(0, n+1);
+						tmp.append(String.format("ALTER TABLE \"%s%s\" ALTER COLUMN \"%s\" RENAME TO \"%s\"; ",
+							name, "_SEG", fn, fnRoot+newCode));
 					}
 				}
 			}

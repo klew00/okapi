@@ -150,7 +150,7 @@ class LocalesForm {
 				if ( Util.isEmpty(res) ) return; // Cancel
 				// Convert to a LocaleId to check the syntax and convert to Olifant locale
 				try {
-					res = DbUtil.toDbLang(LocaleId.fromString(res));
+					res = DbUtil.toOlifantLocaleCode(LocaleId.fromString(res));
 				}
 				catch ( Throwable e ) {
 					Dialogs.showError(shell, e.getMessage(), null);
@@ -194,7 +194,16 @@ class LocalesForm {
 
 	private void renameLocale () {
 		try {
-			throw new RuntimeException("Not implemented yet.");
+			int n = lbLocales.getSelectionIndex();
+			if ( n < 0 ) return;
+			String currentCode = lbLocales.getItem(n);
+			java.util.List<String> existingCodes = tm.getLocales();
+			RenameLocaleForm dlg = new RenameLocaleForm(shell, currentCode, existingCodes);
+			String newCode = dlg.showDialog();
+			if ( newCode == null ) return; // Cancel
+			// Rename the locale
+			tm.renameLocale(currentCode, newCode);
+			updateList(n);
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getMessage(), null);

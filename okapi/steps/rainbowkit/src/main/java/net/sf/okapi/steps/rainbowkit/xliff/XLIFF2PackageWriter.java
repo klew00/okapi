@@ -88,7 +88,7 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 		}
 
 		// Create TM only for TIP package
-		setTMXInfo(options.getCreateTipPackage(), null, null, null, null, false);
+		setTMXInfo(options.getCreateTipPackage(), null, null, null, null, false, false);
 		super.processStartBatch();
 	}
 	

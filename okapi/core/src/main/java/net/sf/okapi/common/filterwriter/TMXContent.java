@@ -57,6 +57,7 @@ public class TMXContent {
 	private boolean withTradosWorkarounds = false;
 	private int defaultQuoteMode = 1;
 	private int codeMode = CODEMODE_ORIGINAL;
+	private int letterCodeOffset = 0;
 
 	/**
 	 * Creates a new TMXContent object without any content.
@@ -88,9 +89,13 @@ public class TMXContent {
 	 * Note that for OmegaT to take the work-around
 	 * into account, the attribute <code>creationtool</code> must be set to "OmegaT".
 	 * @param value true to use workarounds, false to not use workarounds.
+	 * @param zeroBased true to have 0-based code, false for unaltered IDs.
 	 */
-	public void setLetterCodedMode (boolean value) {
+	public void setLetterCodedMode (boolean value,
+		boolean zeroBased)
+	{
 		codeMode = CODEMODE_LETTERCODED;
+		letterCodeOffset = zeroBased ? 1 : 0;  // Minus 1 if zero-based
 	}
 	
 	/**
@@ -166,7 +171,7 @@ public class TMXContent {
 		
 		// Variables for OmegaT work-around
 		Stack<Integer> otStack = new Stack<Integer>();
-		int otId = 0;
+//2011-Sep-24: changed OT numbering to use id		int otId = 0; 
 
 		for ( int i=0; i<codedText.length(); i++ ) {
 			//TODO: output attribute 'type' whenever possible
@@ -181,11 +186,13 @@ public class TMXContent {
 					tmp.append(String.format("<bpt i=\"%d\">", code.getId()));
 					switch ( codeMode ) {
 					case CODEMODE_GENERIC:
-						otStack.push(otId++);
+						//otStack.push(otId++);
+						otStack.push(code.getId());
 						tmp.append(Util.escapeToXML(String.format("<%d>", otStack.peek()), quoteMode, escapeGT, null));
 						break;
 					case CODEMODE_LETTERCODED:
-						otStack.push(otId++);
+						//otStack.push(otId++);
+						otStack.push(code.getId()-letterCodeOffset);
 						tmp.append(Util.escapeToXML(String.format("<g%d>", otStack.peek()), quoteMode, escapeGT, null));
 						break;
 					case CODEMODE_EMPTY:
@@ -241,10 +248,12 @@ public class TMXContent {
 						tmp.append(String.format("<ph x=\"%d\">", id));
 						switch ( codeMode ) {
 						case CODEMODE_GENERIC:
-							tmp.append(Util.escapeToXML(String.format("<%d/>", otId++), quoteMode, escapeGT, null));
+							//tmp.append(Util.escapeToXML(String.format("<%d/>", otId++), quoteMode, escapeGT, null));
+							tmp.append(Util.escapeToXML(String.format("<%d/>", id), quoteMode, escapeGT, null));
 							break;
 						case CODEMODE_LETTERCODED:
-							tmp.append(Util.escapeToXML(String.format("<x%d/>", otId++), quoteMode, escapeGT, null));
+							//tmp.append(Util.escapeToXML(String.format("<x%d/>", otId++), quoteMode, escapeGT, null));
+							tmp.append(Util.escapeToXML(String.format("<x%d/>", id-letterCodeOffset), quoteMode, escapeGT, null));
 							break;
 						case CODEMODE_EMPTY:
 							// Nothing to output
@@ -260,10 +269,12 @@ public class TMXContent {
 					tmp.append(String.format("<it x=\"%d\" pos=\"begin\">", id));
 					switch ( codeMode ) {
 					case CODEMODE_GENERIC:
-						tmp.append(Util.escapeToXML(String.format("<%d/>", otId++), quoteMode, escapeGT, null));
+						//tmp.append(Util.escapeToXML(String.format("<%d/>", otId++), quoteMode, escapeGT, null));
+						tmp.append(Util.escapeToXML(String.format("<%d/>", id), quoteMode, escapeGT, null));
 						break;
 					case CODEMODE_LETTERCODED:
-						tmp.append(Util.escapeToXML(String.format("<x%d/>", otId++), quoteMode, escapeGT, null));
+						//tmp.append(Util.escapeToXML(String.format("<x%d/>", otId++), quoteMode, escapeGT, null));
+						tmp.append(Util.escapeToXML(String.format("<x%d/>", id-letterCodeOffset), quoteMode, escapeGT, null));
 						break;
 					case CODEMODE_EMPTY:
 						// Nothing to output
@@ -278,10 +289,12 @@ public class TMXContent {
 					tmp.append(String.format("<it x=\"%d\" pos=\"end\">", id));
 					switch ( codeMode ) {
 					case CODEMODE_GENERIC:
-						tmp.append(Util.escapeToXML(String.format("<%d/>", otId++), quoteMode, escapeGT, null));
+						//tmp.append(Util.escapeToXML(String.format("<%d/>", otId++), quoteMode, escapeGT, null));
+						tmp.append(Util.escapeToXML(String.format("<%d/>", id), quoteMode, escapeGT, null));
 						break;
 					case CODEMODE_LETTERCODED:
-						tmp.append(Util.escapeToXML(String.format("<x%d/>", otId++), quoteMode, escapeGT, null));
+						//tmp.append(Util.escapeToXML(String.format("<x%d/>", otId++), quoteMode, escapeGT, null));
+						tmp.append(Util.escapeToXML(String.format("<x%d/>", id-letterCodeOffset), quoteMode, escapeGT, null));
 						break;
 					case CODEMODE_EMPTY:
 						// Nothing to output

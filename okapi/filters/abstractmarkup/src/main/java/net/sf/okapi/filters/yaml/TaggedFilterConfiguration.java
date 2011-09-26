@@ -286,7 +286,7 @@ public class TaggedFilterConfiguration {
 		return false;
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings("unchecked")
 	public boolean isRuleType(String ruleName, RULE_TYPE ruleType) {
 		List<Map> rules = configReader.getRules(ruleName.toLowerCase());
 		for (Map rule : rules) {
@@ -343,7 +343,7 @@ public class TaggedFilterConfiguration {
 				getAttributeRuleType(attribute.toLowerCase()));
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({ "unchecked" })
 	private RULE_TYPE findMatchingAttributeRuleOnElementRule(String tag,
 			Map<String, String> attributes, String attribute) {
 
@@ -433,7 +433,7 @@ public class TaggedFilterConfiguration {
 		return type;
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({ "unchecked" })
 	public RULE_TYPE getAttributeRuleType(String attribute) {
 		Map rule = configReader.getAttributeRule(attribute.toLowerCase());
 		if (rule != null) {
@@ -458,7 +458,7 @@ public class TaggedFilterConfiguration {
 	 * @param elementName
 	 * @return
 	 */
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings("unchecked")
 	private RULE_TYPE findMatchingElementOnAttributeRule(String tag, String attribute,
 			Map<String, String> attributes, RULE_TYPE ruleType) {
 		List excludedElements;
@@ -531,7 +531,7 @@ public class TaggedFilterConfiguration {
 		return type;
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({ "unchecked" })
 	public RULE_TYPE getElementRuleType(String tag) {
 		Map rule = configReader.getElementRule(tag.toLowerCase());
 		if (rule != null) {
@@ -638,7 +638,7 @@ public class TaggedFilterConfiguration {
 		}
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({ "unchecked" })
 	private boolean applyConditions(List condition, Map<String, String> attributes) {
 		String conditionalAttribute = null;
 		conditionalAttribute = (String) condition.get(0);
@@ -709,7 +709,7 @@ public class TaggedFilterConfiguration {
 		}
 	}
 
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({ "unchecked" })
 	private boolean doesElementRuleConditionApply(Map elementRule, Map<String, String> attributes) {
 		List conditions = (List) elementRule.get(CONDITIONS);
 		if (conditions != null) {
@@ -719,7 +719,7 @@ public class TaggedFilterConfiguration {
 		return true;
 	}
 
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings("unchecked")
 	private boolean doesAttributeRuleConditionApply(Map attributeRule,
 			Map<String, String> attributes) {
 		List conditions = (List) attributeRule.get(CONDITIONS);

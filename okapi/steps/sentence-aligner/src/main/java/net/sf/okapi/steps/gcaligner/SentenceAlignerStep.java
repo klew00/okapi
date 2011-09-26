@@ -43,7 +43,6 @@ import net.sf.okapi.common.resource.IAlignedSegments;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Segment;
-import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.lib.segmentation.SRXDocument;

@@ -20,8 +20,6 @@
 
 package net.sf.okapi.steps.repetitionanalysis;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,7 +29,6 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
-import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;

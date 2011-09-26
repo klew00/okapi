@@ -30,6 +30,7 @@ import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.ResourceManager;
 import net.sf.okapi.common.ui.UIUtil;
+import net.sf.okapi.lib.tmdb.DbUtil;
 import net.sf.okapi.lib.tmdb.IRepository;
 import net.sf.okapi.lib.tmdb.ITm;
 import net.sf.okapi.lib.ui.editor.InputDocumentDialog;
@@ -327,7 +328,7 @@ class RepositoryPanel extends Composite {
 			}
 			
 			// Create the empty TM
-			ITm tm = repo.createTm(name, description, locId);
+			ITm tm = repo.createTm(name, description, DbUtil.toOlifantLocaleCode(locId));
 			if ( tm == null ) return null;
 			
 			tmList.add(tm.getName());
@@ -395,6 +396,7 @@ class RepositoryPanel extends Composite {
 	void updateRepositoryCommands () {
 		boolean hasOneTm = tmList.getItemCount()>0;
 		miContextEditTMOptions.setEnabled(hasOneTm);
+		miContextImportFile.setEnabled(hasOneTm);
 		miContextDeleteTM.setEnabled(hasOneTm);
 		miContextRenameTM.setEnabled(hasOneTm);
 	}

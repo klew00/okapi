@@ -38,7 +38,7 @@ public class VersifiedPackageWriter extends BasePackageWriter {
 	@Override
 	protected void processStartBatch() {
 		manifest.setSubDirectories("original", "work", "work", "done", null, true);
-		setTMXInfo(true, null, null, null, null, true);
+		setTMXInfo(true, null, null, null, null, true, true);
 		super.processStartBatch();
 	}
 

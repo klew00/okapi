@@ -17,7 +17,6 @@ import net.sf.okapi.common.resource.MultiEvent;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextFragment;
-import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.lib.translation.ITMQuery;
 import net.sf.okapi.steps.diffleverage.DiffMatchAnnotation;
 

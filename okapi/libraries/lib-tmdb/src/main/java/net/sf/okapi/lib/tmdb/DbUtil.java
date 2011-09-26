@@ -30,7 +30,6 @@ public class DbUtil {
 	public static final String LANG_SEP = "~";
 	public static final String SEGKEY_NAME = "SegKey";
 	public static final String FLAG_NAME = "Flag";
-	public static final String TUKEY_NAME = "TuKey";
 	public static final String TUREF_NAME = "TuRef";
 	public static final String TEXT_PREFIX = ("Text"+LANG_SEP);
 	public static final String CODES_PREFIX = ("Codes"+LANG_SEP);
@@ -40,21 +39,50 @@ public class DbUtil {
 	 */
 	private final GenericContent fmt = new GenericContent();
 	
-	public static String toDbLang (LocaleId locId) {
+	/**
+	 * Gets the Olifant locale code for a given LocaleId object.
+	 * @param locId the LocaleId to convert. The value must not be null or LocaleId.EMPTY.
+	 * @return the Olifant locale code.
+	 * @throws IllegalArgumentException if the given LocaleId is invalid.
+	 */
+	public static String toOlifantLocaleCode (LocaleId locId) {
+		if ( locId == LocaleId.EMPTY ) {
+			throw new IllegalArgumentException("Cannot use LocaleId.EMPTY");
+		}
 		String tmp = locId.toString();
 		return tmp.toUpperCase().replace('-', '_');
 	}
 
+	/**
+	 * Indicates if a given field is a segment-level field.
+	 * @param name the full name of the field to check.
+	 * @return true if the given field corresponds to a segment-level field,
+	 * false otherwise, that is: it is a text unit-level field.
+	 */
+	public static boolean isSegmentField (String name) {
+		return (( name.indexOf(DbUtil.LANG_SEP) != -1 )
+			|| name.equalsIgnoreCase(SEGKEY_NAME)
+			|| name.equalsIgnoreCase(TUREF_NAME)
+			|| name.equalsIgnoreCase(FLAG_NAME)
+		); 
+	}
+
+	/**
+	 * Checks a potential field name to be used in Olifant.
+	 * @param name the name to check.
+	 * @return the valid name, usually un-changed.
+	 * @throws IllegalArgumentException if the name is invalid.
+	 */
 	public static String checkFieldName (String name) {
 		if (( name.indexOf(LANG_SEP) != -1 ) || ( name.indexOf('\'') != -1 )) {
-			throw new RuntimeException(String.format("The name of a field '%s' cannot have the character ''' or '%s'.",
+			throw new IllegalArgumentException(String.format("The name of a field '%s' cannot have the character ''' or '%s'.",
 				name, LANG_SEP));
 		}
 		return name;
 	}
 
 	/**
-	 * Split a text fragment into its generic coded text and a string holding the codes.
+	 * Splits a text fragment into its generic coded text and a string holding the codes.
 	 * @param frag the text fragment to process.
 	 * @return An array of two strings:
 	 * 0=the coded text, 1=the codes
