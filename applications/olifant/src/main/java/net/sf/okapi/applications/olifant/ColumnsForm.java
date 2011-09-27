@@ -38,6 +38,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Shell;
 
@@ -52,6 +53,7 @@ class ColumnsForm {
 	private final Button btShowAllTexts;
 	private final Button btMoveUp;
 	private final Button btMoveDown;
+	private final Button btAdd;
 	private ArrayList<String> results = null;
 	private ITm tm;
 
@@ -114,6 +116,8 @@ class ColumnsForm {
 			}
 		});
 		
+		new Label(cmp, SWT.NONE); // Separator
+
 		btMoveUp = UIUtil.createGridButton(cmp, SWT.PUSH, "Move Up", minButtonWidth, 1);
 		btMoveUp.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_CENTER));
 		btMoveUp.addSelectionListener(new SelectionAdapter() {
@@ -127,6 +131,16 @@ class ColumnsForm {
 		btMoveDown.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				moveDown();
+			}
+		});
+		
+		new Label(cmp, SWT.NONE); // Separator
+		
+		btAdd = UIUtil.createGridButton(cmp, SWT.PUSH, "Add Fields...", minButtonWidth, 1);
+		btAdd.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_CENTER));
+		btAdd.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				addField();
 			}
 		});
 		
@@ -330,6 +344,17 @@ class ColumnsForm {
 			if ( n < 0 ) return;
 //todo			
 			Dialogs.showWarning(shell, "Not implemented yet.", null);
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+	}
+	
+	private void addField () {
+		try {
+			AddFieldsForm dlg = new AddFieldsForm(shell, tm);
+			dlg.showDialog();
+			
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getMessage(), null);

@@ -779,4 +779,22 @@ public class Tm implements ITm {
 		}
 	}
 
+	@Override
+	public void addField (String fullName) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void deleteField (String fullName) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void renameField (String currentFullName, String newFiiullName) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

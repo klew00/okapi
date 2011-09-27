@@ -255,5 +255,30 @@ public interface ITm {
 	 * @return the number of pages available.
 	 */
 	public long getPageCount ();
+
+	/**
+	 * Adds a new field to the TM.
+	 * @param fullName the full name of the field to add.
+	 * Locale-specific field must have their locale code suffix.
+	 */
+	public void addField (String fullName);
 	
+	/**
+	 * Deletes a given field from this TM, all its data will be lost.
+	 * <p>You cannot remove special fields. To remove all the fields of a locale use {@link #deleteLocale(String)}.
+	 * @param fullName the full name of the field to remove.
+	 * Locale-specific field must have their locale code suffix.
+	 */
+	public void deleteField (String fullName);
+	
+	/**
+	 * Renames an existing field with a new name.
+	 * <p>You cannot change a locale using this method.
+	 * Special fields cannot be renamed.
+	 * To change the locale suffix of all the fields of a locale use {@link #renameLocale(String, String)}.
+	 * @param currentFullName the current full name.
+	 * @param newFiiullName the new full name.
+	 */
+	public void renameField (String currentFullName,
+		String newFiiullName);
 }
