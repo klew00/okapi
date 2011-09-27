@@ -302,8 +302,8 @@ public class PropertiesFilter implements IFilter {
 		startDoc.setMimeType(MimeTypeMapper.PROPERTIES_MIME_TYPE);
 		queue.add(new Event(EventType.START_DOCUMENT, startDoc));
 
-		// set up subfilter if required
-		if (params.getSubfilter() != null) {
+		// Set up sub-filter if required
+		if ( !Util.isEmpty(params.getSubfilter()) ) {
 			FilterConfigurationMapper fcMapper = new FilterConfigurationMapper();
 			DefaultFilters.setMappings(fcMapper, true, true);
 			subfilter = fcMapper.createFilter(params.getSubfilter(), subfilter);

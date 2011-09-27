@@ -25,6 +25,7 @@ import net.sf.okapi.common.IContext;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IParametersEditor;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.filters.InlineCodeFinderPanel;
@@ -65,6 +66,7 @@ public class Editor implements IParametersEditor {
 	private InlineCodeFinderPanel pnlCodeFinder;
 	private IHelp help;
 	private Button chkConvertLFAndTab;
+	private Text edSubFilter;
 
 	public boolean edit (IParameters p_Options,
 		boolean readOnly,
@@ -158,6 +160,12 @@ public class Editor implements IParametersEditor {
 		gdTmp.horizontalIndent = 16;
 		gdTmp.widthHint = 300;
 		label.setLayoutData(gdTmp);
+		
+		Label stSubFilter = new Label(cmpTmp, SWT.NONE);
+		stSubFilter.setText("Configuration identifier of the sub-filter to use on the content (empty for none):");
+		
+		edSubFilter = new Text(cmpTmp, SWT.BORDER);
+		edSubFilter.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
 		chkExtraComments = new Button(cmpTmp, SWT.CHECK);
 		chkExtraComments.setText(Res.getString("chkExtraComments"));
@@ -267,6 +275,8 @@ public class Editor implements IParametersEditor {
 		chkUseCodeFinder.setSelection(params.useCodeFinder);
 		pnlCodeFinder.setRules(params.codeFinder.toString());
 		chkConvertLFAndTab.setSelection(params.convertLFandTab);
+		String tmp = params.getSubfilter();
+		edSubFilter.setText(Util.isEmpty(tmp) ? "" : tmp);
 		
 		updateInlineCodes();
 		pnlCodeFinder.updateDisplay();
@@ -291,6 +301,7 @@ public class Editor implements IParametersEditor {
 		params.escapeExtendedChars = chkEscapeExtendedChars.getSelection();
 		params.useCodeFinder = chkUseCodeFinder.getSelection();
 		params.convertLFandTab = chkConvertLFAndTab.getSelection();
+		params.setSubfilter(edSubFilter.getText().trim());
 		return true;
 	}
 	

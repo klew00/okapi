@@ -68,7 +68,7 @@ class RepositoryForm {
         rdOtherLocal.setEnabled(true); // for now
 
 		rdRemote = new Button(group, SWT.RADIO);
-		rdRemote.setText("Remote repository over Internet");
+		rdRemote.setText("Server-based repository");
 rdRemote.setEnabled(false); // for now
 		
 		SelectionAdapter OKCancelActions = new SelectionAdapter() {
