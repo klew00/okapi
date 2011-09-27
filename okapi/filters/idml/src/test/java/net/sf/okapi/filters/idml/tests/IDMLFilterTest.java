@@ -102,6 +102,7 @@ public class IDMLFilterTest {
 //		list.add(new InputDocument(root+"private/enlaso_002.idml", "../okf_idml@ExtractAll.fprm"));
 //		list.add(new InputDocument(root+"private/WithMasterPage.idml", "../okf_idml@ExtractAll.fprm"));
 //		list.add(new InputDocument(root+"Bluto.idml", "okf_idml@ExtractAll.fprm"));
+//		list.add(new InputDocument(root+"private/CS5WithEmptyContentAfterTable.idml", "../okf_idml@ExtractAll.fprm"));
 		
 		RoundTripComparison rtc = new RoundTripComparison(false); // Do not compare skeleton
 		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, locEN, "output"));

@@ -210,7 +210,10 @@ public class IDMLContext {
 	}
 	
 	public String buildEndTag (Element elem) {
-		return "</"+elem.getNodeName()+">";
+		if ( elem.hasChildNodes() ) {
+			return "</"+elem.getNodeName()+">";
+		}
+		return ""; // If there are no children, the element was closed in buildStartTag()
 	}
 
 }
