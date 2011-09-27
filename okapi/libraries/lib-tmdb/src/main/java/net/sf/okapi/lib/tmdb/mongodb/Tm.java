@@ -35,6 +35,10 @@ public class Tm implements ITm {
 	
 	private static int segIndex=0;
 
+	private List<String> existingTuFields;
+	private List<String> existingSegFields;
+	private List<String> existingLocales;
+	
 	//List<String> cachedTuFields;
 	//List<String> cachedSegFields;
 	//List<String> cachedLocales;
@@ -85,10 +89,16 @@ public class Tm implements ITm {
 
 	@Override
 	public void startImport() {
+		existingTuFields = store.getTuFields(name);
+		existingSegFields = store.getSegFields(name);
+		existingLocales = store.getTmLocales(name);
 	}
 	
 	@Override
 	public void finishImport() {
+		existingTuFields = null;
+		existingSegFields = null;
+		existingLocales = null;
 	}
 	
 	@Override
@@ -141,35 +151,33 @@ public class Tm implements ITm {
 	
 	private void calculateAndUpdateTuFields(Map<String, Object> intputFields) {
 		if(intputFields != null){
-			List<String> updateWithFields;
-			
-			List<String> existingFields = store.getTuFields(name);
-			if(existingFields.size()==0){
-				updateWithFields = new ArrayList<String>(intputFields.keySet());
+			if(existingTuFields.size()==0){
+				updateTuFields(new ArrayList<String>(intputFields.keySet()));
 			}else{
 			    Collection<String> newFields = new ArrayList<String>(intputFields.keySet());
-			    newFields.removeAll(existingFields);
-		    	existingFields.addAll(newFields);
-		    	updateWithFields = existingFields;
+			    newFields.removeAll(existingTuFields);
+				if(newFields.size() > 0){
+				    existingTuFields.addAll(newFields);
+					updateTuFields(existingTuFields);				    
+		    		//return newFields.size();
+		    	}
 			}
-			updateTuFields(updateWithFields);
 		}
 	}
 	
 	private void calculateAndUpdateSegFields(Map<String, Object> intputFields) {
 		if(intputFields != null){
-			List<String> updateWithFields;
-			
-			List<String> existingFields = store.getSegFields(name);
-			if(existingFields.size()==0){
-				updateWithFields = new ArrayList<String>(intputFields.keySet());
+			if(existingSegFields.size()==0){
+				updateSegFields(new ArrayList<String>(intputFields.keySet()));
 			}else{
 			    Collection<String> newFields = new ArrayList<String>(intputFields.keySet());
-			    newFields.removeAll(existingFields);
-		    	existingFields.addAll(newFields);
-		    	updateWithFields = existingFields;
+			    newFields.removeAll(existingSegFields);
+				if(newFields.size() > 0){
+				    existingSegFields.addAll(newFields);
+					updateSegFields(existingSegFields);
+		    		//return newFields.size();
+		    	}
 			}
-			updateSegFields(updateWithFields);
 		}
 	}
 	
@@ -187,12 +195,11 @@ public class Tm implements ITm {
 			}
 		}
 
-		List<String> existingList = store.getTmLocales(name);
 	    Collection<String> result = new ArrayList<String>(langs);
-    	result.removeAll(existingList);
+    	result.removeAll(existingLocales);
     	if(result.size() > 0){
-        	existingList.addAll(result);
-        	updateLocales(existingList);
+    		existingLocales.addAll(result);
+        	updateLocales(existingLocales);
     		return result.size();
     	}
 		return 0;
