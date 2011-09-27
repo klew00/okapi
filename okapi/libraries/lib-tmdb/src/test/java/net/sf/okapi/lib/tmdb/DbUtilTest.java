@@ -10,8 +10,7 @@ import net.sf.okapi.lib.tmdb.DbUtil;
 public class DbUtilTest {
 	
 	@Test
-	public void testLocaleCodes ()
-	{
+	public void testLocaleCodes () {
 		String code = DbUtil.toOlifantLocaleCode(LocaleId.ENGLISH);
 		assertEquals("EN", code);
 		
@@ -26,5 +25,15 @@ public class DbUtilTest {
 		
 		code = DbUtil.toOlifantLocaleCode(LocaleId.fromString("es-419"));
 		assertEquals("ES_419", code);
+	}
+
+	@Test
+	public void testGetFieldLocale () {
+		assertEquals("EN", DbUtil.getFieldLocale("Name"+DbUtil.LOC_SEP+"EN"));
+		assertEquals("EN_GB", DbUtil.getFieldLocale("Name"+DbUtil.LOC_SEP+"EN_GB"));
+		assertNull(DbUtil.getFieldLocale("Name"));
+		assertNull(DbUtil.getFieldLocale(DbUtil.FLAG_NAME));
+		assertNull(DbUtil.getFieldLocale(DbUtil.SEGKEY_NAME));
+		assertNull(DbUtil.getFieldLocale(DbUtil.TUREF_NAME));
 	}
 }

@@ -188,7 +188,7 @@ public class Tm implements ITm {
 		
 		for (String field : segFields) {
 			if ( field.startsWith(DbUtil.TEXT_PREFIX) ) {
-				int n = field.lastIndexOf(DbUtil.LANG_SEP);
+				int n = field.lastIndexOf(DbUtil.LOC_SEP);
 				if ( n > -1 ) {
 					langs.add(field.substring(n+1));
 				}

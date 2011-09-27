@@ -87,7 +87,7 @@ public class ProcesswithAPI {
 		tm.startImport();
 		segMap.clear();
 		segMap.put(DbUtil.TEXT_PREFIX+"EN", "Text EN 2");
-		segMap.put("Quality"+DbUtil.LANG_SEP+"EN", 80);
+		segMap.put("Quality"+DbUtil.LOC_SEP+"EN", 80);
 
 		LinkedHashMap<String, Object> tuMap = new LinkedHashMap<String, Object>();
 		tuMap.put("TUInfo", "TU-level info");
@@ -95,7 +95,7 @@ public class ProcesswithAPI {
 		tm.finishImport();
 
 		// Check the two rows
-		tm.setRecordFields(Arrays.asList(new String[]{DbUtil.TEXT_PREFIX+"EN","Quality"+DbUtil.LANG_SEP+"EN","TUInfo"}));
+		tm.setRecordFields(Arrays.asList(new String[]{DbUtil.TEXT_PREFIX+"EN","Quality"+DbUtil.LOC_SEP+"EN","TUInfo"}));
 		rs = tm.getFirstPage();
 		rs.next();
 		assertEquals("Text EN 1", rs.getString(3));
@@ -110,7 +110,7 @@ public class ProcesswithAPI {
 		segMap.clear();
 		segMap.put(DbUtil.TEXT_PREFIX+"EN", "Text EN 3");
 		segMap.put(DbUtil.TEXT_PREFIX+"FR", "Text FR 3");
-		segMap.put("Quality"+DbUtil.LANG_SEP+"FR", 33);
+		segMap.put("Quality"+DbUtil.LOC_SEP+"FR", 33);
 		tm.addRecord(-1, null, segMap);
 		segMap.clear();
 		segMap.put(DbUtil.TEXT_PREFIX+"EN", "Text EN 4");
@@ -120,8 +120,8 @@ public class ProcesswithAPI {
 
 		// Check the new row
 		tm.setRecordFields(Arrays.asList(new String[]{DbUtil.TEXT_PREFIX+"EN",
-			"Quality"+DbUtil.LANG_SEP+"EN",
-			"Quality"+DbUtil.LANG_SEP+"FR",
+			"Quality"+DbUtil.LOC_SEP+"EN",
+			"Quality"+DbUtil.LOC_SEP+"FR",
 			DbUtil.TEXT_PREFIX+"FR"}));
 		rs = tm.getFirstPage();
 		rs.next(); rs.next(); rs.next();

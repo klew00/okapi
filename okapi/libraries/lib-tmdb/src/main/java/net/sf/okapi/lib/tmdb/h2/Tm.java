@@ -85,6 +85,11 @@ public class Tm implements ITm {
 			pstmAddTu.close();
 			pstmAddTu = null;
 		}
+	}
+	
+	private void closeUpdateStatements ()
+		throws SQLException
+	{
 		if ( pstmUpdSeg != null ) {
 			pstmUpdSeg.close();
 			pstmUpdSeg = null;
@@ -99,6 +104,7 @@ public class Tm implements ITm {
 				pstmGet = null;
 			}
 			closeAddStatements();
+			closeUpdateStatements();
 		}
 		catch ( SQLException e ) {
 			throw new RuntimeException(e);
@@ -199,6 +205,7 @@ public class Tm implements ITm {
 	public void startImport () {
 		try {
 			closeAddStatements();
+			closeUpdateStatements();
 			// Get the list of the original existing fields
 			// This list will be use until the end of the import
 			// It will be update with any added field from the API, not from the database
@@ -641,7 +648,7 @@ public class Tm implements ITm {
 			ResultSet result = stm.executeQuery("SHOW COLUMNS FROM \""+name+"_SEG\"");
 			while ( result.next() ) {
 				String fn = result.getString(1);
-				int n = fn.lastIndexOf(DbUtil.LANG_SEP);
+				int n = fn.lastIndexOf(DbUtil.LOC_SEP);
 				if ( n > -1 ) {
 					if ( fn.substring(n+1).equals(localeId) ) {
 						// This field is to be removed
@@ -690,7 +697,7 @@ public class Tm implements ITm {
 			ResultSet result = stm.executeQuery("SHOW COLUMNS FROM \""+name+"_SEG\"");
 			while ( result.next() ) {
 				String fn = result.getString(1);
-				int n = fn.lastIndexOf(DbUtil.LANG_SEP);
+				int n = fn.lastIndexOf(DbUtil.LOC_SEP);
 				if ( n > -1 ) {
 					if ( fn.substring(n+1).equals(currentCode) ) {
 						// This field is to be renamed
@@ -729,8 +736,7 @@ public class Tm implements ITm {
 			if ( segKey < 0 ) {
 				throw new IllegalArgumentException("Illegal SegKey value.");
 			}
-	
-	
+
 			boolean changed = (pstmUpdSeg == null);
 			if ( updSegFields == null ) {
 				updSegFields = new ArrayList<String>(segFields.keySet());

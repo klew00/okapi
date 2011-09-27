@@ -27,12 +27,14 @@ import net.sf.okapi.common.resource.TextFragment;
 
 public class DbUtil {
 	
-	public static final String LANG_SEP = "~";
+	public static final String LOC_SEP = "~";
+	
 	public static final String SEGKEY_NAME = "SegKey";
 	public static final String FLAG_NAME = "Flag";
 	public static final String TUREF_NAME = "TuRef";
-	public static final String TEXT_PREFIX = ("Text"+LANG_SEP);
-	public static final String CODES_PREFIX = ("Codes"+LANG_SEP);
+	
+	public static final String TEXT_PREFIX = ("Text"+LOC_SEP);
+	public static final String CODES_PREFIX = ("Codes"+LOC_SEP);
 
 
 	/**
@@ -97,7 +99,7 @@ public class DbUtil {
 	 * false otherwise, that is: it is a text unit-level field.
 	 */
 	public static boolean isSegmentField (String name) {
-		return (( name.indexOf(DbUtil.LANG_SEP) != -1 )
+		return (( name.indexOf(DbUtil.LOC_SEP) != -1 )
 			|| name.equalsIgnoreCase(SEGKEY_NAME)
 			|| name.equalsIgnoreCase(TUREF_NAME)
 			|| name.equalsIgnoreCase(FLAG_NAME)
@@ -105,15 +107,30 @@ public class DbUtil {
 	}
 
 	/**
+	 * Gets the locale code of a given field name.
+	 * <p>Note that not all fields without a locale code are text unit level fields.
+	 * Use {@link #isSegmentField(String)} to check whether a field is segment level or text unit level.
+	 * @param fullName the name of the field to process.
+	 * @return the locale code of the field or null if there is not associated loacle code.
+	 */
+	public static String getFieldLocale (String fullName) {
+		int n = fullName.indexOf(LOC_SEP);
+		if ( n > -1 ) {
+			return fullName.substring(n+1);
+		}
+		return null;
+	}
+	
+	/**
 	 * Checks a potential field name to be used in Olifant.
 	 * @param name the name to check.
 	 * @return the valid name, usually un-changed.
 	 * @throws IllegalArgumentException if the name is invalid.
 	 */
 	public static String checkFieldName (String name) {
-		if (( name.indexOf(LANG_SEP) != -1 ) || ( name.indexOf('\'') != -1 )) {
+		if (( name.indexOf(LOC_SEP) != -1 ) || ( name.indexOf('\'') != -1 )) {
 			throw new IllegalArgumentException(String.format("The name of a field '%s' cannot have the character ''' or '%s'.",
-				name, LANG_SEP));
+				name, LOC_SEP));
 		}
 		return name;
 	}

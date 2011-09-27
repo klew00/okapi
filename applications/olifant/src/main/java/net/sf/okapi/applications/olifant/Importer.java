@@ -86,7 +86,7 @@ public class Importer extends ObservableRunnable {
 				mapSrcProp.clear();
 				for ( String name : tu.getSourcePropertyNames() ) {
 					if ( name.equals("lang") ) continue;
-					mapSrcProp.put(DbUtil.checkFieldName(name)+DbUtil.LANG_SEP+srcDbLang, tu.getSourceProperty(name).getValue());
+					mapSrcProp.put(DbUtil.checkFieldName(name)+DbUtil.LOC_SEP+srcDbLang, tu.getSourceProperty(name).getValue());
 				}
 	
 				// For each source segment
@@ -106,7 +106,7 @@ public class Importer extends ObservableRunnable {
 						mapTrgProp.clear();
 						for ( String name : tu.getTargetPropertyNames(locId) ) {
 							if ( name.equals("lang") ) continue;
-							mapTrgProp.put(DbUtil.checkFieldName(name)+DbUtil.LANG_SEP+trgDbLang, tu.getTargetProperty(locId, name).getValue());
+							mapTrgProp.put(DbUtil.checkFieldName(name)+DbUtil.LOC_SEP+trgDbLang, tu.getTargetProperty(locId, name).getValue());
 						}
 						
 						// Get the target segment

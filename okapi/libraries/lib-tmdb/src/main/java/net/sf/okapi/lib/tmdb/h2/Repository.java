@@ -522,7 +522,7 @@ public class Repository implements IRepository {
 			while ( result.next() ) {
 				String fn = result.getString(1);
 				if ( fn.startsWith(DbUtil.TEXT_PREFIX) ) {
-					int n = fn.lastIndexOf(DbUtil.LANG_SEP);
+					int n = fn.lastIndexOf(DbUtil.LOC_SEP);
 					if ( n > -1 ) {
 						list.add(fn.substring(n+1));
 					}
