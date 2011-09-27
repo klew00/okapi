@@ -579,14 +579,19 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 				// TODO: only AbstractFilter subclasses can be used as subfilters!!!
 				((AbstractFilter)cdataSubfilter).setParentId(parentId);
 				cdataSubfilter.open(new RawDocument(cdataWithoutMarkers, getSrcLoc()));	
+				int tuChildCount = 0;
 				while (cdataSubfilter.hasNext()) {
 					Event event = converter.convertEvent(cdataSubfilter.next());
 					eventBuilder.addFilterEvent(event);
 					// subfiltered textunits inherit any name from a parent TU
 					if (event.isTextUnit()) {
 						if (event.getTextUnit().getName() == null) {
-							event.getTextUnit().setName(
-									eventBuilder.findMostRecentTextUnitName());
+							String parentName = eventBuilder.findMostRecentTextUnitName();
+							// we need to add a child id so each tu name is unique for this subfiltered content
+							if (parentName != null) {
+								parentName = parentName + "-" + Integer.toString(++tuChildCount); 
+							}
+							event.getTextUnit().setName(parentName);
 						}
 					}
 				}			
@@ -935,7 +940,8 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 			
 				// TODO: only AbstractFilter subclasses can be used as subfilters!!!
 				((AbstractFilter)pcdataSubfilter).setParentId(parentId);						
-				pcdataSubfilter.open(new RawDocument(pcdata.getSource().toString(), getSrcLoc()));	
+				pcdataSubfilter.open(new RawDocument(pcdata.getSource().toString(), getSrcLoc()));
+				int tuChildCount = 0;
 				while (pcdataSubfilter.hasNext()) {
 					Event event = converter.convertEvent(pcdataSubfilter.next());
 					// we need to escape back to the original format
@@ -950,7 +956,12 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 							
 							// subfiltered textunits can inherit name from a parent TU
 							if (tu.getName() == null) {
-								tu.setName(eventBuilder.findMostRecentTextUnitName());
+								String parentName = eventBuilder.findMostRecentTextUnitName();
+								// we need to add a child id so each tu name is unique for this subfiltered content
+								if (parentName != null) {
+									parentName = parentName + "-" + Integer.toString(++tuChildCount); 
+								}
+								tu.setName(parentName);
 							}
 							
 							// escape the skeleton parts
