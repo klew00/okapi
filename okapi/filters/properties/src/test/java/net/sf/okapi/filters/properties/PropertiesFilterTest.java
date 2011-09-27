@@ -91,6 +91,26 @@ public class PropertiesFilterTest {
 			filter.getEncoderManager(), locEN);
 		assertEquals(snippet, result);
 	}
+	
+	@Test
+	public void testMessagePlaceholders () {
+		String snippet = "Key1={1}Text1{2}";
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertNotNull(tu);
+		assertEquals(2, tu.getSource().getFirstContent().getCodes().size());
+		assertEquals("{1}Text1{2}", tu.getSource().toString());
+	}
+	
+	//@Test
+	// FIXME: how do you escape message format variables? 
+	// shouldn't this test pass 
+	public void testMessagePlaceholdersEscaped () {
+		String snippet = "Key1=\\{1\\}Text1\\{2\\}";
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertNotNull(tu);
+		assertEquals(0, tu.getSource().getFirstContent().getCodes().size());
+		assertEquals("\\{1\\}Text1\\{2\\}", tu.getSource().toString());
+	}
 
 	@Test
 	public void testineBreaks_CRLF () {
@@ -197,6 +217,7 @@ public class PropertiesFilterTest {
 		Parameters p = (Parameters)filter.getParameters();
 		p.setSubfilter("okf_html");
 		String snippet = "Key1=<b>Text with \\u00E3 more <br> test</b>";
+		System.out.print(snippet);
 		List<Event> el = getEvents(snippet);
 		ITextUnit tu = FilterTestDriver.getTextUnit(el, 1);
 		p.setSubfilter(null);
@@ -232,6 +253,20 @@ public class PropertiesFilterTest {
 		filter.setParameters(p);
 		assertNotNull(tu);
 		assertEquals("<b>Text with {1} more {2} test</b>", tu.getSource().toString());
+	}
+	
+	//@Test
+	public void testWithSubfilterWithEmbeddedEscapedMessagePH() {
+		Parameters p = (Parameters)filter.getParameters();
+		p.setSubfilter("okf_html");
+		String snippet = "Key1=<b>Text with \\{1\\} more \\{2\\} test</b>";
+		List<Event> el = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(el, 1);
+		p.setSubfilter(null);
+		filter.setParameters(p);
+		assertNotNull(tu);
+		assertEquals(2, tu.getSource().getFirstContent().getCodes().size());
+		assertEquals("<b>Text with \\{1\\} more \\{2\\} test</b>", tu.getSource().toString());
 	}
 	
 	@Test
