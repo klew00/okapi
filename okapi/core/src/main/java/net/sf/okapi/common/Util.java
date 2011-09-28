@@ -748,8 +748,10 @@ public final class Util {
 	static public String getFilename (String path,
 		boolean keepExtension)
 	{
-		// Get the filename
-		int n = path.lastIndexOf('/'); // Try generic first
+		// Get the filename (allow path with mixed separators)
+		int n = path.lastIndexOf('/');
+		int n2 = path.lastIndexOf('\\');
+		if ( n2 > n ) n = n2;
 		if ( n == -1 ) { // Then try Windows
 			n = path.lastIndexOf('\\');
 		}

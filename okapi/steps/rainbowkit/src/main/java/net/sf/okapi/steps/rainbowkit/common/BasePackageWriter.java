@@ -53,14 +53,23 @@ public abstract class BasePackageWriter implements IPackageWriter {
 	protected int docId;
 	protected String extractionType;
 	protected ISkeletonWriter skelWriter;
+	
 	protected TMXWriter tmxWriterApproved;
 	protected String tmxPathApproved;
+	protected String tempTmxPathApproved;
+	
 	protected TMXWriter tmxWriterUnApproved;
 	protected String tmxPathUnApproved;
+	protected String tempTmxPathUnApproved;
+	
 	protected TMXWriter tmxWriterAlternates;
 	protected String tmxPathAlternates;
+	protected String tempTmxPathAlternates;
+	
 	protected TMXWriter tmxWriterLeverage;
 	protected String tmxPathLeverage;
+	protected String tempTmxPathLeverage;
+	
 	protected boolean copiedTargetsLikeApproved = false;
 	protected boolean useLetterCodes = false;
 	protected boolean zeroBasedLetterCodes = true;
@@ -87,9 +96,11 @@ public abstract class BasePackageWriter implements IPackageWriter {
 		String inputRoot,
 		String packageId,
 		String projectId,
-		String creatorParams)
+		String creatorParams,
+		String tempPackageRoot)
 	{
-		manifest.setInformation(packageRoot, srcLoc, trgLoc, inputRoot, packageId, projectId, creatorParams);
+		manifest.setInformation(packageRoot, srcLoc, trgLoc, inputRoot,
+			packageId, projectId, creatorParams, tempPackageRoot);
 	}
 
 	public String getMainOutputPath () {
@@ -183,9 +194,6 @@ public abstract class BasePackageWriter implements IPackageWriter {
 	
 	protected void setTMXInfo (boolean generate,
 		String pathApproved,
-		String pathUnApproved,
-		String pathAlternates,
-		String pathLeverage,
 		boolean useLetterCodes,
 		boolean zerobasedletterCodes)
 	{
@@ -202,65 +210,56 @@ public abstract class BasePackageWriter implements IPackageWriter {
 		if ( pathApproved == null ) {
 			if ( tmxPathApproved == null ) {
 				tmxPathApproved = manifest.getTmDirectory() + "approved.tmx";
+				tempTmxPathApproved = manifest.getTmDirectory() + "approved.tmx";
 			}
 		}
 		else {
 			tmxPathApproved = pathApproved;
+			//TOFIX: Case of overridden approved TMX not supported if tempPackageRoot is not the package root
+			tempTmxPathApproved = pathApproved;
 		}
 		
-		if ( pathUnApproved == null ) {
-			if ( tmxPathUnApproved == null ) {
-				tmxPathUnApproved = manifest.getTmDirectory() + "unapproved.tmx";
-			}
-		}
-		else {
-			tmxPathUnApproved = pathUnApproved;
+		if ( tmxPathUnApproved == null ) {
+			tmxPathUnApproved = manifest.getTmDirectory() + "unapproved.tmx";
+			tempTmxPathUnApproved = manifest.getTmDirectory() + "unapproved.tmx";
 		}
 		
-		if ( pathAlternates == null ) {
-			if ( tmxPathAlternates == null ) {
-				tmxPathAlternates = manifest.getTmDirectory() + "alternates.tmx";
-			}
-		}
-		else {
-			tmxPathAlternates = pathAlternates;
+		if ( tmxPathAlternates == null ) {
+			tmxPathAlternates = manifest.getTmDirectory() + "alternates.tmx";
+			tempTmxPathAlternates = manifest.getTmDirectory() + "alternates.tmx";
 		}
 		
-		if ( pathLeverage == null ) {
-			if ( tmxPathLeverage == null ) {
-				tmxPathLeverage = manifest.getTmDirectory() + "leverage.tmx";
-			}
-		}
-		else {
-			tmxPathLeverage = pathLeverage;
+		if ( tmxPathLeverage == null ) {
+			tmxPathLeverage = manifest.getTmDirectory() + "leverage.tmx";
+			tempTmxPathLeverage = manifest.getTmDirectory() + "leverage.tmx";
 		}
 		
 	}
 	
 	protected void initializeTMXWriters () {
 		if ( tmxPathApproved != null ) {
-			tmxWriterApproved = new TMXWriter(tmxPathApproved);
+			tmxWriterApproved = new TMXWriter(tempTmxPathApproved);
 			tmxWriterApproved.setLetterCodedMode(useLetterCodes, zeroBasedLetterCodes);
 			tmxWriterApproved.writeStartDocument(manifest.getSourceLocale(),
 				manifest.getTargetLocale(), getClass().getName(), null, null, null, null);
 		}
 
 		if ( tmxPathUnApproved != null ) {
-			tmxWriterUnApproved = new TMXWriter(tmxPathUnApproved);
+			tmxWriterUnApproved = new TMXWriter(tempTmxPathUnApproved);
 			tmxWriterUnApproved.setLetterCodedMode(useLetterCodes, zeroBasedLetterCodes);
 			tmxWriterUnApproved.writeStartDocument(manifest.getSourceLocale(),
 				manifest.getTargetLocale(), getClass().getName(), null, null, null, null);
 		}
 
 		if ( tmxPathAlternates != null ) {
-			tmxWriterAlternates = new TMXWriter(tmxPathAlternates);
+			tmxWriterAlternates = new TMXWriter(tempTmxPathAlternates);
 			tmxWriterAlternates.setLetterCodedMode(useLetterCodes, zeroBasedLetterCodes);
 			tmxWriterAlternates.writeStartDocument(manifest.getSourceLocale(),
 				manifest.getTargetLocale(), getClass().getName(), null, null, null, null);
 		}
 
 		if ( tmxPathLeverage != null ) {
-			tmxWriterLeverage = new TMXWriter(tmxPathLeverage);
+			tmxWriterLeverage = new TMXWriter(tempTmxPathLeverage);
 			tmxWriterLeverage.setLetterCodedMode(useLetterCodes, zeroBasedLetterCodes);
 			tmxWriterLeverage.writeStartDocument(manifest.getSourceLocale(),
 				manifest.getTargetLocale(), getClass().getName(), null, null, null, null);
@@ -269,14 +268,14 @@ public abstract class BasePackageWriter implements IPackageWriter {
 
 	protected void processEndBatch () {
 		if ( params.getOutputManifest() ) {
-			manifest.save();
+			manifest.save(null);
 		}
 
 		if ( tmxWriterApproved != null ) {
 			tmxWriterApproved.writeEndDocument();
 			tmxWriterApproved.close();
 			if ( tmxWriterApproved.getItemCount() == 0 ) {
-				File file = new File(tmxPathApproved);
+				File file = new File(tempTmxPathApproved);
 				file.delete();
 			}
 		}
@@ -285,7 +284,7 @@ public abstract class BasePackageWriter implements IPackageWriter {
 			tmxWriterUnApproved.writeEndDocument();
 			tmxWriterUnApproved.close();
 			if ( tmxWriterUnApproved.getItemCount() == 0 ) {
-				File file = new File(tmxPathUnApproved);
+				File file = new File(tempTmxPathUnApproved);
 				file.delete();
 			}
 		}
@@ -294,7 +293,7 @@ public abstract class BasePackageWriter implements IPackageWriter {
 			tmxWriterAlternates.writeEndDocument();
 			tmxWriterAlternates.close();
 			if ( tmxWriterAlternates.getItemCount() == 0 ) {
-				File file = new File(tmxPathAlternates);
+				File file = new File(tempTmxPathAlternates);
 				file.delete();
 			}
 		}
@@ -303,7 +302,7 @@ public abstract class BasePackageWriter implements IPackageWriter {
 			tmxWriterLeverage.writeEndDocument();
 			tmxWriterLeverage.close();
 			if ( tmxWriterLeverage.getItemCount() == 0 ) {
-				File file = new File(tmxPathLeverage);
+				File file = new File(tempTmxPathLeverage);
 				file.delete();
 			}
 		}

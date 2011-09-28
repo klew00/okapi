@@ -60,11 +60,6 @@ public class MergingStepTest {
 	}
 
 	@Test
-	public void stub () {
-		assertTrue(true);
-	}
-	
-	@Test
 	public void testXLIFFMerging ()
 		throws URISyntaxException
 	{

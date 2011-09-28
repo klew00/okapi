@@ -41,7 +41,7 @@ public class XLIFF2Options extends BaseParameters implements IEditorDescriptionP
 	
 	@Override
 	public void reset() {
-		inlineStyle = Fragment.STYLE_DATAINSIDE;
+		inlineStyle = Fragment.STYLE_NODATA;
 		createTipPackage = false;
 	}
 
@@ -81,7 +81,7 @@ public class XLIFF2Options extends BaseParameters implements IEditorDescriptionP
 	public ParametersDescription getParametersDescription() {
 		ParametersDescription desc = new ParametersDescription(this);
 		desc.add(INLINESTYLE, "Style to use for the inline codes", null);
-		desc.add(CREATETIPPACKAGE, "Create a TIP package", null);
+		desc.add(CREATETIPPACKAGE, "Create a TIPP file", null);
 		return desc;
 	}
 
@@ -103,7 +103,7 @@ public class XLIFF2Options extends BaseParameters implements IEditorDescriptionP
 		lsp.setChoicesLabels(labels);
 		lsp.setListType(ListSelectionPart.LISTTYPE_SIMPLE);
 		
-//		desc.addCheckboxPart(paramsDesc.get(CREATETIPPACKAGE));
+		desc.addCheckboxPart(paramsDesc.get(CREATETIPPACKAGE));
 
 		return desc;
 	}

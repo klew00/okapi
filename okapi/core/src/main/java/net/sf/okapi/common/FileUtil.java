@@ -214,21 +214,49 @@ public final class FileUtil {
 	 * The extension is expected to contain the leading period.
 	 */
 	public static void zipDirectory (String sourceDir,
-		String zipExtension)
+		String zipExtension) 
+	{
+		zipDirectory(sourceDir, zipExtension, null);
+	}
+
+	/**
+	 * Compresses a given directory.
+	 * The given directory is not deleted after compression.
+	 * <p>This method uses the Java ZIP package and does not supports files to zip that have a path 
+	 * with extended characters.
+	 * @param sourceDir the given directory to be compressed
+	 * @param zipExtension an extension for the output ZIP file (default is .zip if a null or empty 
+	 * string is passed by the caller).
+	 * The extension is expected to contain the leading period.
+	 * @param destinationPathWithoutExtension output path of the zip file, without extension.
+	 * Use null to use the source directory path.
+	 */
+	public static void zipDirectory (String sourceDir,
+		String zipExtension,
+		String destinationPathWithoutExtension)
 	{
 		ZipOutputStream os = null;
 		String zipPath = null;
 
-		// Set the zip full path
+		if ( Util.isEmpty(destinationPathWithoutExtension) ) {
+			// Use the directory as the destination path
+		    if ( sourceDir.endsWith(File.separator) || sourceDir.endsWith("/") ) {
+		    	zipPath = sourceDir.substring(0, sourceDir.length()-1);
+		    }
+		    else {
+		    	zipPath = sourceDir;
+		    }
+		}
+		else { // destinationPathWithoutExtension is specified
+			zipPath = destinationPathWithoutExtension;
+		}
+		// Set the extension
 		if ( Util.isEmpty(zipExtension) ) {
-	    	zipExtension = ".zip";
+	    	zipPath += ".zip";
 	    }
-	    if ( sourceDir.endsWith(File.separator) || sourceDir.endsWith("/") ) {
-	    	zipPath = sourceDir.substring(0, sourceDir.length()-1) + zipExtension;
-	    }
-	    else {
-	    	zipPath = sourceDir + zipExtension;
-	    }
+		else {
+			zipPath += zipExtension;
+		}
 
 	    // Compress the directory
 	    try { 
@@ -253,7 +281,70 @@ public final class FileUtil {
 			}
 		}
 	}
-	
+
+	/**
+	 * Creates a ZIP file and adds a list of files in it.
+	 * @param zipPath the path of the ZIP file to create.
+	 * @param sourceDir the path of the directory where the source files are located.
+	 * @param filenames the list of files to zip. 
+	 */
+	public static void zipFiles (String zipPath,
+		String sourceDir,
+		String... filenames)
+	{
+		ZipOutputStream os = null;
+	    try {
+	    	// Creates the zip file
+			Util.createDirectories(zipPath);
+			os = new ZipOutputStream(new FileOutputStream(zipPath)); 
+            for ( String name : filenames ) {
+            	File file = new File(Util.ensureSeparator(sourceDir, true) + name);
+            	addFileToZip(file, os);
+            }
+        }
+		catch ( IOException e ) {
+			throw new OkapiIOException("Error while zipping.", e);
+		} 
+		finally {
+			if ( os != null ) {
+				try {
+					os.close();
+				}
+				catch ( IOException e ) {
+					throw new OkapiIOException("Error closing stream while zipping.", e);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Adds a file to a ZIP output.
+	 * @param file the directory to add.
+	 * @param os the output stream where to add it.
+	 * @throws IOException signals an I/O error.
+	 */
+	private static void addFileToZip (File file,
+		ZipOutputStream os)
+		throws IOException
+	{
+        FileInputStream input = null;
+        try {
+        	byte[] aBuf = new byte[1024]; 
+       		input = new FileInputStream(file); 
+       		os.putNextEntry(new ZipEntry(file.getName())); 
+       		int nCount; 
+       		while( (nCount = input.read(aBuf)) > 0 ) { 
+       			os.write(aBuf, 0, nCount); 
+       		}
+       		os.closeEntry();
+        }
+        finally {
+        	if ( input != null ) {
+        		input.close(); 
+        	}
+        }
+	}
+
 	/**
 	 * Adds a directory to a ZIP output.
 	 * @param dir the directory to add.
@@ -295,71 +386,71 @@ public final class FileUtil {
         }
 	}
 
-	  /**
-	   * Extract a given ZIP file to a given destination folder.
-	   * From http://www.java2s.com/Code/Java/File-Input-Output/Extractzipfiletodestinationfolder.htm
-	   * @param zipFileName full path of the given ZIP file
-	   * @param destPath destination folder
-	   */
-	  public static void unzip (String zipFileName,
-		  String destPath)
-	  {
-		  ZipInputStream in = null;
-		  OutputStream out = null;
-		  // Create the directory where we will be unziping everything
-		  Util.createDirectories(destPath);
-		  
-		  try {
-			  // Open the ZIP file
-			  in = new ZipInputStream(new FileInputStream(zipFileName));
-			  byte[] buf = new byte[1024];
-			  ZipEntry entry = null;
-
-			  // Process the entries
-			  while (( entry = in.getNextEntry() ) != null ) {
-				  String outFilename = entry.getName();
-				  if ( entry.isDirectory() ) {
-					  new File(destPath, outFilename).mkdirs();
-				  }
-				  else {
-					  // Check if the entry has sub-directories, create them if needed
-					  if ( !Util.getDirectoryName(outFilename).isEmpty() ) {
-						  File f = new File(destPath, outFilename);
-						  Util.createDirectories(f.getAbsolutePath());
-					  }
-					  out = new FileOutputStream(new File(destPath, outFilename));
-					  // Transfer bytes from the ZIP file to the output file
-					  int len;
-					  while (( len = in.read(buf) ) > 0 ) {
-						  out.write(buf, 0, len);
-					  }
-					  // Close the stream
-					  out.close();
-				  }
-			  }
-		  }
-		  catch ( IOException e ) {
-			  throw new OkapiIOException("Error unzipping file.\n"+e.getMessage(), e);
-		  }
-		  finally {
-			  // Close the stream
-			  if ( in != null ) {
-				  try {
-					  in.close();
-				  }
-				  catch ( IOException e ) {
-					  throw new OkapiIOException("Error closing input while unzipping file.", e);
-				  }
-			  }
-			  if ( out != null ) {
-				  try {
-					  out.close();
-				  }
-				  catch ( IOException e ) {
-					  throw new OkapiIOException("Error closing output while unzipping file.", e);
-				  }
-			  }
-		  } 
-	  }
+	/**
+	 * Extract a given ZIP file to a given destination folder.
+	 * From http://www.java2s.com/Code/Java/File-Input-Output/Extractzipfiletodestinationfolder.htm
+	 * @param zipFileName full path of the given ZIP file
+	 * @param destPath destination folder
+	 */
+	public static void unzip (String zipFileName,
+	  String destPath)
+	{
+		ZipInputStream in = null;
+		OutputStream out = null;
+		// Create the directory where we will be unziping everything
+		Util.createDirectories(destPath);
+		
+		try {
+			// Open the ZIP file
+			in = new ZipInputStream(new FileInputStream(zipFileName));
+			byte[] buf = new byte[1024];
+			ZipEntry entry = null;
+	
+			// Process the entries
+			while (( entry = in.getNextEntry() ) != null ) {
+				String outFilename = entry.getName();
+				if ( entry.isDirectory() ) {
+					new File(destPath, outFilename).mkdirs();
+				}
+				else {
+					// Check if the entry has sub-directories, create them if needed
+					if ( !Util.getDirectoryName(outFilename).isEmpty() ) {
+						File f = new File(destPath, outFilename);
+						Util.createDirectories(f.getAbsolutePath());
+					}
+					out = new FileOutputStream(new File(destPath, outFilename));
+					// Transfer bytes from the ZIP file to the output file
+					int len;
+					while (( len = in.read(buf) ) > 0 ) {
+						out.write(buf, 0, len);
+					}
+					// Close the stream
+					out.close();
+				}
+			}
+		}
+		catch ( IOException e ) {
+			throw new OkapiIOException("Error unzipping file.\n"+e.getMessage(), e);
+		}
+		finally {
+			// Close the stream
+			if ( in != null ) {
+				try {
+					in.close();
+				}
+				catch ( IOException e ) {
+					throw new OkapiIOException("Error closing input while unzipping file.", e);
+				}
+			}
+			if ( out != null ) {
+				try {
+					out.close();
+				}
+				catch ( IOException e ) {
+					throw new OkapiIOException("Error closing output while unzipping file.", e);
+				}
+			}
+		} 
+	}
 
 }

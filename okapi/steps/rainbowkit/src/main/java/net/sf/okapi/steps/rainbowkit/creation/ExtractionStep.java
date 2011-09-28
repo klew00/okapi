@@ -35,8 +35,10 @@ import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.StartDocument;
+import net.sf.okapi.filters.rainbowkit.Manifest;
 import net.sf.okapi.filters.rainbowkit.RainbowKitFilter;
 import net.sf.okapi.steps.rainbowkit.common.IPackageWriter;
+import net.sf.okapi.steps.rainbowkit.xliff.XLIFF2Options;
 import net.sf.okapi.steps.rainbowkit.xliff.XLIFF2PackageWriter;
 
 @UsingParameters(Parameters.class)
@@ -54,6 +56,8 @@ public class ExtractionStep extends BasePipelineStep {
 	private String inputRootDir;
 	private String outputRootDir;
 	private String resolvedOutputDir;
+	private String tempPackageRoot;
+	private boolean createTipp;
 
 	public ExtractionStep () {
 		super();
@@ -137,6 +141,15 @@ public class ExtractionStep extends BasePipelineStep {
 			writer = (IPackageWriter)Class.forName(writerClass).newInstance();
 			writer.setParameters(params);
 
+			createTipp = false;
+			if ( writer instanceof XLIFF2PackageWriter ) {
+				XLIFF2Options opt = new XLIFF2Options();
+				if ( !Util.isEmpty(params.getWriterOptions()) ) {
+					opt.fromString(params.getWriterOptions());
+					createTipp = opt.getCreateTipPackage();
+				}
+			}
+			
 			resolvedOutputDir = params.getPackageDirectory() + File.separator + params.getPackageName();
 			resolvedOutputDir = Util.fillRootDirectoryVariable(resolvedOutputDir, rootDir);
 			resolvedOutputDir = Util.fillInputRootDirectoryVariable(resolvedOutputDir, inputRootDir);
@@ -146,8 +159,20 @@ public class ExtractionStep extends BasePipelineStep {
 			String packageId = UUID.randomUUID().toString();
 			String projectId = Util.makeId(params.getPackageName()+srcLoc.toString()+trgLoc.toString());
 
+			// If we zip we create the initial package in a temp location, then zip it to the correct one
+			// This is to avoid issues with files that are still locked and can't be deleted 
+			tempPackageRoot = resolvedOutputDir;
+			if ( params.getCreateZip() || createTipp ) {
+				// Create a set the tempPackageRoot
+				final File sysTempDir = new File(System.getProperty("java.io.tmpdir"));
+		        String dirName = UUID.randomUUID().toString();
+		        File newTempDir = new File(sysTempDir, dirName);
+		        newTempDir.mkdirs();
+		        tempPackageRoot = newTempDir.getAbsolutePath();
+			}
+			
 			writer.setBatchInformation(resolvedOutputDir, srcLoc, trgLoc, inputRootDir,
-				packageId, projectId, params.getWriterOptions());
+				packageId, projectId, params.getWriterOptions(), tempPackageRoot);
 		}
 		catch ( InstantiationException e ) {
 			throw new RuntimeException("Error creating writer class.", e);
@@ -165,21 +190,18 @@ public class ExtractionStep extends BasePipelineStep {
 	@Override
 	protected Event handleEndBatch (Event event) {
 		event = writer.handleEvent(event);
-		
-		boolean createTipp = false;
-		if ( writer instanceof XLIFF2PackageWriter ) {
-			createTipp = ((XLIFF2PackageWriter)writer).getCreeatTipPackage();
-		}
 		writer.close();
 		writer = null;
 
 		if ( createTipp ) {
-			FileUtil.zipDirectory(resolvedOutputDir, ".tipp");
-			Util.deleteDirectory(resolvedOutputDir, false);
+			FileUtil.zipFiles(resolvedOutputDir + ".tipp", tempPackageRoot,
+				Manifest.MANIFEST_FILENAME+".xml",
+				XLIFF2PackageWriter.POBJECTS_DIR+".zip");
+			Util.deleteDirectory(tempPackageRoot, false);
 		}
 		else if ( params.getCreateZip() ) {
-			FileUtil.zipDirectory(resolvedOutputDir, RainbowKitFilter.RAINBOWKIT_PACKAGE_EXTENSION);
-			Util.deleteDirectory(resolvedOutputDir, false);
+			FileUtil.zipDirectory(tempPackageRoot, RainbowKitFilter.RAINBOWKIT_PACKAGE_EXTENSION, resolvedOutputDir);
+			Util.deleteDirectory(tempPackageRoot, false);
 		}
 		
 		return event;

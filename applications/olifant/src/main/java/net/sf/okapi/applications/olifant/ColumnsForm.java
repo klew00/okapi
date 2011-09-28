@@ -162,21 +162,6 @@ class ColumnsForm {
 			};
 		});
 
-//		ArrayList<String> list = new ArrayList<String>(tm.getAvailableFields());
-//		list.removeAll(visibleFields);
-//		for ( String fn :  list ) {
-//			lbAvailableFields.add(fn);
-//		}
-//		if ( lbAvailableFields.getItemCount() > 0 ) {
-//			lbAvailableFields.setSelection(0);
-//		}
-//
-//		lbDisplayFields.add("Flag/SegKey (always)");
-//		for ( String fn : visibleFields ) {
-//			lbDisplayFields.add(fn);
-//		}
-//		lbDisplayFields.setSelection((lbDisplayFields.getItemCount() > 1 ? 1 : 0));
-
 		updateLists(visibleFields);
 		
 		SelectionAdapter OKCancelActions = new SelectionAdapter() {
@@ -352,9 +337,13 @@ class ColumnsForm {
 	
 	private void addField () {
 		try {
+			ArrayList<String> toDisplay = new ArrayList<String>(Arrays.asList(lbDisplayFields.getItems()));
+			toDisplay.remove(0);
+
 			AddFieldsForm dlg = new AddFieldsForm(shell, tm);
-			dlg.showDialog();
-			
+			if ( !dlg.showDialog() ) return; // Nothing changed
+			// Else: update the lists
+			updateLists(toDisplay);
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getMessage(), null);

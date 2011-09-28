@@ -149,6 +149,7 @@ class AddFieldsForm {
 			}
 
 			// Do the addition
+			tm.addField(fn);
 			
 			// Update the list
 			changeWasMade = true;

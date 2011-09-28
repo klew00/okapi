@@ -40,7 +40,8 @@ public interface IPackageWriter extends IFilterWriter {
 		String inputRoot,
 		String packageId,
 		String projectId,
-		String creatorParams);
+		String creatorParams,
+		String tempPackageRoot);
 	
 	public void setDocumentInformation (String relativeInputPath,
 		String filterConfigId,

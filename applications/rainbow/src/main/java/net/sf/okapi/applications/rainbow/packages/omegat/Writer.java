@@ -147,6 +147,10 @@ public class Writer extends net.sf.okapi.applications.rainbow.packages.xliff.Wri
 			XR.writeRawXML("__DEFAULT__");
 			XR.writeEndElementLineBreak(); // glossary_dir
 			
+			XR.writeStartElement("dictionary_dir");
+			XR.writeRawXML("__DEFAULT__");
+			XR.writeEndElementLineBreak(); // dictionary_dir
+			
 			XR.writeStartElement("source_lang");
 			XR.writeRawXML(manifest.getSourceLanguage().toBCP47());
 			XR.writeEndElementLineBreak(); // source_lang

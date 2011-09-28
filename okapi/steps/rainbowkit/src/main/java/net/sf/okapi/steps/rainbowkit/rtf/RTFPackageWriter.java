@@ -36,7 +36,7 @@ public class RTFPackageWriter extends BasePackageWriter {
 	@Override
 	protected void processStartBatch () {
 		manifest.setSubDirectories("original", "work", "work", "done", null, true);
-		setTMXInfo(true, null, null, null, null, false, false);
+		setTMXInfo(true, null, false, false);
 		super.processStartBatch();
 	}
 	

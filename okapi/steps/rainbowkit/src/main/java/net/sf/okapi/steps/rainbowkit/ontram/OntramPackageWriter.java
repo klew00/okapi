@@ -39,7 +39,7 @@ public class OntramPackageWriter extends BasePackageWriter {
 	@Override
 	protected void processStartBatch() {
 		manifest.setSubDirectories("original", "xini", "xini", "translated", null, false);
-		setTMXInfo(false, null, null, null, null, false, false);
+		setTMXInfo(false, null, false, false);
 
 		writer = new XINIWriter();
 		writer.setOutputPath(manifest.getSourceDirectory() + "contents.xini");

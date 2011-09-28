@@ -57,9 +57,9 @@ import net.sf.okapi.steps.rainbowkit.common.BasePackageWriter;
 
 public class XLIFF2PackageWriter extends BasePackageWriter {
 
-	private static final String TU_PREFIX = "$tu$";
-	private static final String POBJECTS_DIR = "pobjects";
+	public static final String POBJECTS_DIR = "pobjects";
 
+	private static final String TU_PREFIX = "$tu$";
 	private static final Logger LOGGER = Logger.getLogger(XLIFF2PackageWriter.class.getName());
 	
 	private XLIFFWriter writer;
@@ -88,7 +88,7 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 		}
 
 		// Create TM only for TIP package
-		setTMXInfo(options.getCreateTipPackage(), null, null, null, null, false, false);
+		setTMXInfo(options.getCreateTipPackage(), null, false, false);
 		super.processStartBatch();
 	}
 	
@@ -104,31 +104,37 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 		
 		// TIP-specific process
 		if ( options.getCreateTipPackage() ) {
-			// Gather the list of TMs created for TIP
+			// Gather the list of TMs created
 			ArrayList<String> tms = new ArrayList<String>();
 			if ( tmxWriterApproved != null ) {
-				if ( tmxWriterApproved.getItemCount() > 0 ) tms.add(tmxPathApproved);
+				if ( tmxWriterApproved.getItemCount() > 0 ) {
+					tms.add(Util.getFilename(tmxPathApproved, true));
+				}
 			}
 			if ( tmxWriterAlternates != null ) {
-				if ( tmxWriterAlternates.getItemCount() > 0 ) tms.add(tmxPathAlternates);
+				if ( tmxWriterAlternates.getItemCount() > 0 ) {
+					tms.add(Util.getFilename(tmxPathAlternates, true));
+				}
 			}
 			if ( tmxWriterLeverage != null ) {
-				if ( tmxWriterLeverage.getItemCount() > 0 ) tms.add(tmxPathLeverage);
+				if ( tmxWriterLeverage.getItemCount() > 0 ) {
+					tms.add(Util.getFilename(tmxPathLeverage, true));
+				}
 			}
 			if ( tmxWriterUnApproved != null ) {
-				if ( tmxWriterUnApproved.getItemCount() > 0 ) tms.add(tmxPathUnApproved);
+				if ( tmxWriterUnApproved.getItemCount() > 0 ) {
+					tms.add(Util.getFilename(tmxPathUnApproved, true));
+				}
 			}
 
 			// Save the TIP manifest
-			manifest.saveTIPManifest(tms);
-			
+			manifest.saveTIPManifest(manifest.getTempPackageRoot(), tms);
+
 			// Zip the project files
-			String dir = Util.getDirectoryName(manifest.getPath())+File.separator+POBJECTS_DIR;
-			
-			manifest = null; System.gc(); // Try to free the manifest to unlock, so it can be delete
-			System.runFinalization();
+			String dir = manifest.getTempPackageRoot()+POBJECTS_DIR;
 
 			FileUtil.zipDirectory(dir, ".zip");
+			
 			// Delete the original
 			Util.deleteDirectory(dir, false);
 			// The creation of the .tipp file is done at the step level

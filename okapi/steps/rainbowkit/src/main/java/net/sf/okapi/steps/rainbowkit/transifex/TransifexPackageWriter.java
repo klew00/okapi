@@ -49,7 +49,7 @@ public class TransifexPackageWriter extends BasePackageWriter {
 	@Override
 	protected void processStartBatch () {
 		manifest.setSubDirectories("original", "uploads", "downloads", "done", null, true);
-		setTMXInfo(false, null, null, null, null, true, true);
+		setTMXInfo(false, null, true, true);
 		super.processStartBatch();
 	}
 
@@ -154,7 +154,7 @@ public class TransifexPackageWriter extends BasePackageWriter {
 			
 			// Save the manifest again (for the esourceId)
 			if ( params.getOutputManifest() ) {
-				manifest.save();
+				manifest.save(null);
 			}
 	
 			Util.openURL("file:///"+reportPath);

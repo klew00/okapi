@@ -68,6 +68,7 @@ public class Manifest implements IAnnotation {
 	private static final String TIP_VERSION = "1.3";
 	
 	private LinkedHashMap<Integer, MergingInfo> docs;
+	private String tempPackageRoot;
 	private String packageRoot;
 	private String packageId;
 	private String projectId;
@@ -80,10 +81,14 @@ public class Manifest implements IAnnotation {
 	private String tmSubDir;
 	private String mergeSubDir;
 	private String originalDir;
+	private String tempOriginalDir;
 	private String sourceDir;
+	private String tempSourceDir;
 	private String targetDir;
+	private String tempTargetDir;
 	private String mergeDir;
 	private String tmDir;
+	private String tempTmDir;
 	private String creatorParams;
 	private boolean useApprovedOnly;
 	private boolean updateApprovedFlag;
@@ -92,6 +97,7 @@ public class Manifest implements IAnnotation {
 
 	public Manifest () {
 		docs = new LinkedHashMap<Integer, MergingInfo>();
+		tempPackageRoot = "";
 		packageRoot = "";
 		originalSubDir = "";
 		sourceSubDir = "";
@@ -171,6 +177,10 @@ public class Manifest implements IAnnotation {
 		return packageRoot;
 	}
 	
+	public String getTempPackageRoot () {
+		return tempPackageRoot;
+	}
+	
 	/**
 	 * Sets the sub-directories used by the given package.
 	 * All defaults to "" (same directory as the directory of the package itself.
@@ -212,7 +222,7 @@ public class Manifest implements IAnnotation {
 	 * @return the directory where to store the original files.
 	 */
 	public String getOriginalDirectory () {
-		return originalDir;
+		return tempOriginalDir;
 	}
 	
 	/**
@@ -220,7 +230,7 @@ public class Manifest implements IAnnotation {
 	 * @return the directory where to store the prepared source files.
 	 */
 	public String getSourceDirectory () {
-		return sourceDir;
+		return tempSourceDir;
 	}
 	
 	/**
@@ -228,7 +238,7 @@ public class Manifest implements IAnnotation {
 	 * @return the directory where to store the prepared target files.
 	 */
 	public String getTargetDirectory () {
-		return targetDir;
+		return tempTargetDir;
 	}
 	
 	/**
@@ -244,7 +254,7 @@ public class Manifest implements IAnnotation {
 	 * @return the directory where to store TM-related information.
 	 */
 	public String getTmDirectory () {
-		return tmDir;
+		return tempTmDir;
 	}
 	
 	/**
@@ -262,12 +272,14 @@ public class Manifest implements IAnnotation {
 		String inputRoot,
 		String packageId,
 		String projectId,
-		String creatorParams)
+		String creatorParams,
+		String tempPackageRoot)
 	{
 		this.sourceLoc = srcLoc;
 		this.targetLoc = trgLoc;
 		this.inputRoot = Util.ensureSeparator(inputRoot, false);
 		this.packageRoot = Util.ensureSeparator(packageRoot, false);
+		this.tempPackageRoot = Util.ensureSeparator(tempPackageRoot, false);
 		this.packageId = packageId;
 		this.projectId = projectId;
 		updateFullDirectories();
@@ -303,16 +315,21 @@ public class Manifest implements IAnnotation {
 
 	/**
 	 * Saves the manifest file. This method assumes the root is set.
+	 * @param dir directory where to save the file, use null for the default.
 	 */
-	public void save () {
+	public void save (String dir) {
 		if ( generateTIPManifest ) {
-			// TIP manifest to save from the package writer
+			// TIPP manifest to save from the package writer
 			return;
 		}
 
 		XMLWriter writer = null;
 		try {
-			writer = new XMLWriter(getPath());
+			String outputPath = getPath();
+			if ( dir != null ) {
+				outputPath = Util.ensureSeparator(dir, false) + MANIFEST_FILENAME + MANIFEST_EXTENSION;
+			}
+			writer = new XMLWriter(outputPath);
 
 			writer.writeStartDocument();
 			writer.writeComment("=================================================================", true);
@@ -355,12 +372,19 @@ public class Manifest implements IAnnotation {
 		}
 	}
 
-	public void saveTIPManifest (List<String> tms) {
+	public void saveTIPManifest (String dir,
+		List<String> tms)
+	{
 		XMLWriter writer = null;
 		try {
-			String tipManifestPath = getPath();
-			tipManifestPath = tipManifestPath.replace(MANIFEST_EXTENSION, ".xml");
-			writer = new XMLWriter(tipManifestPath);
+			String tippManifestPath = getPath();
+			if ( dir != null ) {
+				tippManifestPath = Util.ensureSeparator(dir, false) + MANIFEST_FILENAME + ".xml";
+			}
+			else {
+				tippManifestPath = tippManifestPath.replace(MANIFEST_EXTENSION, ".xml");
+			}
+			writer = new XMLWriter(tippManifestPath);
 
 			SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 			df.setTimeZone(TimeZone.getTimeZone("GMT"));
@@ -552,6 +576,7 @@ public class Manifest implements IAnnotation {
 		    	docs.put(item.getDocId(), item);
 		    }
 		    packageRoot = Util.ensureSeparator(Util.getDirectoryName(inputFile.getAbsolutePath()), false);
+		    tempPackageRoot = packageRoot;
 			updateFullDirectories();
 		}
 		catch ( SAXException e ) {
@@ -565,33 +590,18 @@ public class Manifest implements IAnnotation {
 		}
 	}
 
-//	/**
-//	 * Checks the content of the manifest against the package where
-//	 * it has been found.
-//	 * @return The number of error found.
-//	 */
-//	public int checkPackageContent () {
-//		int nErrors = 0;
-//		Iterator<Integer> iter = docs.keySet().iterator();
-//		int docId;
-//		while ( iter.hasNext() ) {
-//			docId = iter.next();
-//////			mi = docs.get(docId);
-//////			File F = new File(getFileToMergePath(docId));
-////			if ( !F.exists() ) {
-////				nErrors++;
-////				mi.setExists(false);
-////			}
-//		}
-//		return nErrors;
-//	}
-
 	private void updateFullDirectories () {
 		originalDir = Util.ensureSeparator(packageRoot + originalSubDir, false);
 		sourceDir = Util.ensureSeparator(packageRoot + sourceSubDir, false);
 		targetDir = Util.ensureSeparator(packageRoot + targetSubDir, false);
 		mergeDir = Util.ensureSeparator(packageRoot + mergeSubDir, false);
 		tmDir = Util.ensureSeparator(packageRoot + tmSubDir, false);
+
+		tempOriginalDir = Util.ensureSeparator(tempPackageRoot + originalSubDir, false);
+		tempSourceDir = Util.ensureSeparator(tempPackageRoot + sourceSubDir, false);
+		tempTargetDir = Util.ensureSeparator(tempPackageRoot + targetSubDir, false);
+//		tempMergeDir = Util.ensureSeparator(tempPackageRoot + mergeSubDir, false);
+		tempTmDir = Util.ensureSeparator(tempPackageRoot + tmSubDir, false);
 	}
 
 }

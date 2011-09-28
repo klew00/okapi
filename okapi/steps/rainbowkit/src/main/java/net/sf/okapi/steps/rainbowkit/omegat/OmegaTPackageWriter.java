@@ -42,7 +42,7 @@ public class OmegaTPackageWriter extends XLIFFPackageWriter {
 	protected void processStartBatch () {
 		setForOmegat(true);
 		manifest.setSubDirectories("original", "source", "target", "done", "tm", true);
-		setTMXInfo(true, manifest.getPackageRoot()+"omegat"+File.separator+"project_save.tmx", null, null, null, true, true);
+		setTMXInfo(true, manifest.getPackageRoot()+"omegat"+File.separator+"project_save.tmx", true, true);
 		super.processStartBatch();
 	}
 	
@@ -95,6 +95,10 @@ public class OmegaTPackageWriter extends XLIFFPackageWriter {
 			XR.writeStartElement("glossary_dir");
 			XR.writeRawXML("__DEFAULT__");
 			XR.writeEndElementLineBreak(); // glossary_dir
+			
+			XR.writeStartElement("dictionary_dir");
+			XR.writeRawXML("__DEFAULT__");
+			XR.writeEndElementLineBreak(); // dictionary_dir
 			
 			XR.writeStartElement("source_lang");
 			XR.writeRawXML(manifest.getSourceLocale().toString());
