@@ -222,6 +222,14 @@ public class VersifiedTxtFilterTest {
 	}
 	
 	@Test
+	public void testDoubleExtractionEmptyVerses() throws URISyntaxException {
+		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
+		list.add(new InputDocument(root+"empty_verses.vrsz", null));		
+		RoundTripComparison rtc = new RoundTripComparison(false);
+		assertTrue(rtc.executeCompare(filter, list, "windows-1252", LocaleId.ENGLISH, LocaleId.SPANISH));
+	}
+	
+	@Test
 	public void testOpenTwiceWithString() {
 		RawDocument rawDoc = new RawDocument("|vtest", LocaleId.ENGLISH);
 		filter.open(rawDoc);

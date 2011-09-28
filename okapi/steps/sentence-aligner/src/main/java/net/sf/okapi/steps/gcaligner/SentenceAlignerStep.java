@@ -277,9 +277,7 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 		// copy source code data to corresponding target codes		
 		IAlignedSegments segments = alignedTextUnit.getAlignedSegments();
 		for (Segment s : segments) {
-			Segment t = segments.getCorrespondingTarget(s, targetLocale, 
-					IAlignedSegments.MODIFY_SOURCE_AND_ASSOCIATED_TARGET, 
-					IAlignedSegments.COPY_TO_NONE);
+			Segment t = segments.getCorrespondingTarget(s, targetLocale);
 			s.text.alignCodeIds(t.text);
 			TextUnitUtil.copySrcCodeDataToMatchingTrgCodes(s.text, t.text, true, false, null, alignedTextUnit);
 		}
@@ -311,6 +309,13 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 		Event event = null;
 		while (!found && filter.hasNext()) {
 			event = filter.next();
+			if (event.isTextUnit()) {
+				ITextUnit stu = event.getTextUnit();
+				// Skip non-translatable and empty just like our primary filter
+				if ( !stu.isTranslatable() || stu.isEmpty() ) {
+					continue;
+				}
+			}
 			found = (event.getEventType() == untilType);
 		}
 		if (!found) {

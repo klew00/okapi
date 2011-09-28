@@ -358,7 +358,23 @@ public interface IAlignedSegments extends Iterable<Segment> {
                                           LocaleId trgLoc,
                                           EnumSet<VariantOptions> variantOptions,
                                           EnumSet<CopyOptions> copyOptions);
-	
+    
+    /**
+     * Gets the target segment corresponding to a given source segment given 
+     * the most common use case of one source and one target. Same as calling
+     * with {@link VariantOptions} MODIFY_SOURCE_AND_ASSOCIATED_TARGET 
+     * and {@link CopyOptions} COPY_TO_NONE
+     * <p>
+     * This always returns a segment: If the target does not exists one is created.
+     * If the segment does not exists one is created at the end of the target content.</p>
+     *
+     * @param seg the source (or other target) segment for which a
+     *            corresponding target segment is requested.
+     * @param trgLoc the target to look up.
+     * @return the corresponding target {@link Segment} (may be empty).
+     */
+    public Segment getCorrespondingTarget(Segment seg, LocaleId trgLoc);
+    	
     /**
      * Gets the source segment corresponding to a given target segment.
      * <p>
@@ -381,6 +397,21 @@ public interface IAlignedSegments extends Iterable<Segment> {
                                           LocaleId trgLoc,
                                           EnumSet<VariantOptions> variantOptions,
                                           EnumSet<CopyOptions> copyOptions);
+
+    /**
+     * Gets the source segment corresponding to a given target segment given 
+     * the most common use case of one source and one target. Same as calling
+     * with {@link VariantOptions} MODIFY_SOURCE_AND_ASSOCIATED_TARGET 
+     * and {@link CopyOptions} COPY_TO_NONE
+     * <p>
+     * If no corresponding source segment is found a new one is added at the
+     * end of the container and returned as the new corresponding segment.</p>
+     *
+     * @param trgSeg the target segment for which the corresponding source
+     *               segment is requested.
+     * @param trgLoc the target locale of the source to look up.
+     */
+    public Segment getCorrespondingSource(Segment trgSeg, LocaleId trgLoc);
 
     /**
      * Aligns all the segments listed in the aligned pairs for given locale.

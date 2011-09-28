@@ -289,7 +289,19 @@ public class AlignedSegments implements IAlignedSegments {
         }
         return srcSegs.get(trgSeg.id);
     }
+    
+    
+	@Override
+	public Segment getCorrespondingTarget(Segment seg, LocaleId trgLoc) {
+		return getCorrespondingSource(seg, trgLoc, IAlignedSegments.MODIFY_SOURCE_AND_ASSOCIATED_TARGET, 
+					IAlignedSegments.COPY_TO_NONE);
+	}
 
+	@Override
+	public Segment getCorrespondingSource(Segment trgSeg, LocaleId trgLoc) {
+		return getCorrespondingSource(trgSeg, trgLoc, IAlignedSegments.MODIFY_SOURCE_AND_ASSOCIATED_TARGET, 
+				IAlignedSegments.COPY_TO_NONE);
+	}
 
     @Override
     public void align(List<AlignedPair> alignedSegmentPairs,
