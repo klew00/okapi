@@ -125,6 +125,15 @@ public interface IAlignedSegments extends Iterable<Segment> {
             VariantOptions.MODIFY_TARGETS_WITH_SAME_SOURCE);
 
     /**
+     * MODIFY_SOURCE + MODIFY_TARGET
+     *
+     * @see VariantOptions
+     */
+    public final EnumSet<VariantOptions> MODIFY_SOURCE_AND_ASSOCIATED_TARGET = EnumSet.of(
+            VariantOptions.MODIFY_SOURCE,
+            VariantOptions.MODIFY_TARGET);
+
+    /**
      * Modify all {@link TextContainer}s in the parent {@link ITextUnit}.
      * MODIFY_SOURCE + MODIFY_TARGET + MODIFY_TARGETS_WITH_SAME_SOURCE +
      * MODIFY_VARIANT_SOURCES + MODIFY_TARGETS_OF_VARIANT_SOURCES

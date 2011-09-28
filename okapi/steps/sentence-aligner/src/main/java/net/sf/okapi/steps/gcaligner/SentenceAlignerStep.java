@@ -278,8 +278,8 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 		IAlignedSegments segments = alignedTextUnit.getAlignedSegments();
 		for (Segment s : segments) {
 			Segment t = segments.getCorrespondingTarget(s, targetLocale, 
-					IAlignedSegments.MODIFY_AS_VARIANT, 
-					IAlignedSegments.COPY_TO_SOURCE_AND_TARGET);
+					IAlignedSegments.MODIFY_SOURCE_AND_ASSOCIATED_TARGET, 
+					IAlignedSegments.COPY_TO_NONE);
 			s.text.alignCodeIds(t.text);
 			TextUnitUtil.copySrcCodeDataToMatchingTrgCodes(s.text, t.text, true, false, null, alignedTextUnit);
 		}
