@@ -25,7 +25,9 @@ import java.io.File;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
+import net.sf.okapi.common.ui.TextAndBrowsePanel;
 import net.sf.okapi.common.ui.UIUtil;
+import net.sf.okapi.common.uidescription.PathInputPart;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -35,15 +37,28 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
 
 class RepositoryForm {
+
+	public static final String REPOTYPE_INMEMORY = "M";
+	public static final String REPOTYPE_DEFAULTLOCAL = "L";
+	public static final String REPOTYPE_OTHERLOCALORNETWORK = "O";
+	public static final String REPOTYPE_SERVER = "S";
 	
-	private Shell shell;
-	private Button rdDefaultLocal;
-	private Button rdInMemory;
-	private Button rdOtherLocal;
-	private Button rdRemote;
+	private final Shell shell;
+	private final Button rdDefaultLocal;
+	private final Text edDefaultLocal;
+	private final Button rdInMemory;
+	private final Text edInMemory;
+	private final Button rdOtherLocal;
+	private final TextAndBrowsePanel pnlOtherLocal;
+	private final Button rdServerBased;
+	private final Text edServerBased;
+	private final String defaultLocalname;
+
 	private String[] results = null;
 
 	RepositoryForm (Shell parent) {
@@ -51,26 +66,74 @@ class RepositoryForm {
 		shell.setText("Repository Selection");
 		UIUtil.inheritIcon(shell, parent);
 		shell.setLayout(new GridLayout());
-
+		
 		Group group = new Group(shell, SWT.NONE);
 		group.setLayout(new GridLayout());
 		group.setLayoutData(new GridData(GridData.FILL_BOTH));
-		group.setText("Available repositories:");
 		
 		rdDefaultLocal = new Button(group, SWT.RADIO);
 		rdDefaultLocal.setText("Default local repository");
+		rdDefaultLocal.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				updateDisplay();
+            }
+		});
 		
-		rdInMemory = new Button(group, SWT.RADIO);
-		rdInMemory.setText("In-Memory repository");
+		defaultLocalname = Util.ensureSeparator(System.getProperty("user.home"), false)
+			+ "Olifant" + File.separator + "defaultOlifantTMrepository";
+		edDefaultLocal = new Text(group, SWT.BORDER);
+		edDefaultLocal.setEditable(false);
+		edDefaultLocal.setText(defaultLocalname);
+		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalIndent = 16;
+		edDefaultLocal.setLayoutData(gdTmp);
 		
 		rdOtherLocal = new Button(group, SWT.RADIO);
 		rdOtherLocal.setText("Other local or network repository");
-        rdOtherLocal.setEnabled(true); // for now
+        rdOtherLocal.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				updateDisplay();
+            }
+		});
 
-		rdRemote = new Button(group, SWT.RADIO);
-		rdRemote.setText("Server-based repository");
-rdRemote.setEnabled(false); // for now
+		pnlOtherLocal = new TextAndBrowsePanel(group, SWT.NONE, false);
+		pnlOtherLocal.setTitle("Select the repository file");
+		pnlOtherLocal.setBrowseFilters("TM Repositories (*.h2.db)\tAll Files (*.*)", "*.h2.db\t*.*");
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalIndent = 16;
+		gdTmp.widthHint = 400;
+		pnlOtherLocal.setLayoutData(gdTmp);
+
+		rdServerBased = new Button(group, SWT.RADIO);
+		rdServerBased.setText("Server-based repository");
+		rdServerBased.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				updateDisplay();
+            }
+		});
 		
+		edServerBased = new Text(group, SWT.BORDER);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalIndent = 16;
+		edServerBased.setLayoutData(gdTmp);
+		
+		rdInMemory = new Button(group, SWT.RADIO);
+		rdInMemory.setText("Memory-based repository");
+		rdInMemory.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				updateDisplay();
+            }
+		});
+		
+		edInMemory = new Text(group, SWT.NONE);
+		edInMemory.setEditable(false);
+		edInMemory.setText("(No physical storage: all data are in memory)");
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalIndent = 16;
+		edInMemory.setLayoutData(gdTmp);
+
+		updateDisplay();
+
 		SelectionAdapter OKCancelActions = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if ( e.widget.getData().equals("o") ) { //$NON-NLS-1$
@@ -80,7 +143,7 @@ rdRemote.setEnabled(false); // for now
 			};
 		};
 		OKCancelPanel pnlActions = new OKCancelPanel(shell, SWT.NONE, OKCancelActions, false);
-		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalSpan = 2;
 		pnlActions.setLayoutData(gdTmp);
 		shell.setDefaultButton(pnlActions.btOK);
@@ -89,6 +152,13 @@ rdRemote.setEnabled(false); // for now
 		Rectangle Rect = shell.getBounds();
 		shell.setMinimumSize(Rect.width, Rect.height);
 		Dialogs.centerWindow(shell, parent);
+	}
+	
+	private void updateDisplay () {
+		edInMemory.setEnabled(rdInMemory.getSelection());
+		edDefaultLocal.setEnabled(rdDefaultLocal.getSelection());
+		pnlOtherLocal.setEnabled(rdOtherLocal.getSelection());
+		edServerBased.setEnabled(rdServerBased.getSelection());
 	}
 	
 	String[] showDialog () {
@@ -104,22 +174,29 @@ rdRemote.setEnabled(false); // for now
 		try {
 			String[] res = new String[2];
 			if ( rdDefaultLocal.getSelection() ) {
-				res[0] = "d";
-				res[1] = System.getProperty("user.home");
-				res[1] = Util.ensureSeparator(res[1], false)+"Olifant"+File.separator+"defaultOlifantTMrepository";
+				res[0] = REPOTYPE_DEFAULTLOCAL;
+				res[1] = defaultLocalname;
 			}
 			else if ( rdInMemory.getSelection() ) {
-				res[0] = "m";
+				res[0] = REPOTYPE_INMEMORY;
+			}
+			else if ( rdServerBased.getSelection() ) {
+				res[0] = REPOTYPE_SERVER;
 			}
 			else if ( rdOtherLocal.getSelection() ) {
-				res[0] = "oL";
-			}
-			else {
-				return false;
+				String path = pnlOtherLocal.getText().trim();
+				if ( path.isEmpty() ) {
+					Dialogs.showError(shell, "You must specify a database file.", null);
+					pnlOtherLocal.setFocus();
+					return false;
+				}
+				res[0] = REPOTYPE_OTHERLOCALORNETWORK;
+				res[1] = path;
 			}
 			results = res;
 		}
-		catch ( Exception E ) {
+		catch ( Exception e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
 			return false;
 		}
 		return true;

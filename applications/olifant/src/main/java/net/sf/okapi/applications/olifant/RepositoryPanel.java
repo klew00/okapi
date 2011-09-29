@@ -362,15 +362,16 @@ class RepositoryPanel extends Composite {
 	{
 		try {
 			// Instantiate the new repository
-			if ( type.equals("m") ) {
+			if ( type.equals(RepositoryForm.REPOTYPE_INMEMORY) ) {
 				closeRepository();
 				repo = new net.sf.okapi.lib.tmdb.h2.Repository(null);
 			}
-			else if ( type.equals("d") ) {
+			else if ( type.equals(RepositoryForm.REPOTYPE_DEFAULTLOCAL) 
+				|| type.equals(RepositoryForm.REPOTYPE_OTHERLOCALORNETWORK) ) {
 				closeRepository();
 				repo = new net.sf.okapi.lib.tmdb.h2.Repository(name);
 			}
-			else if ( type.equals("oL") ) {
+			else if ( type.equals(RepositoryForm.REPOTYPE_SERVER) ) {
 				closeRepository();
 				repo = new net.sf.okapi.lib.tmdb.mongodb.Repository("REPO");
 			}
