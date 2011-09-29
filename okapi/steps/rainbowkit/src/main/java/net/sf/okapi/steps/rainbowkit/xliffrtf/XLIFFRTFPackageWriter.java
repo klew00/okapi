@@ -42,6 +42,7 @@ public class XLIFFRTFPackageWriter extends XLIFFPackageWriter {
 		// Finish the XLIFF output
 		super.processEndBatchItem();
 
+		
 		// The XLIFF output is done.
 		// Now re-write it with the RTF layer.
 		RTFLayerWriter layerWriter = null;
@@ -50,6 +51,12 @@ public class XLIFFRTFPackageWriter extends XLIFFPackageWriter {
 		try {
 			// Prepare the output in RTF from the temporary XLIFF
 			MergingInfo info = manifest.getItem(docId);
+			
+			if ( info.getExtractionType().equals(Manifest.EXTRACTIONTYPE_NONE) ) {
+				// This file is not to be extracted
+				return;
+			}
+			
 			inpFile = new File(manifest.getSourceDirectory() + info.getRelativeInputPath() + ".xlf");
 			String outPath =  inpFile.getAbsolutePath() + ".rtf";
 			RawDocument rd = new RawDocument(inpFile.toURI(), "UTF-8", manifest.getSourceLocale());
