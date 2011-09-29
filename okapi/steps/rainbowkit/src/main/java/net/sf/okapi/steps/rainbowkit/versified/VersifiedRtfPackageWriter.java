@@ -49,6 +49,12 @@ public class VersifiedRtfPackageWriter extends VersifiedPackageWriter {
 		try {
 			// Prepare the output in RTF from the temporary Versified file
 			MergingInfo info = manifest.getItem(docId);
+			
+			if ( info.getExtractionType().equals(Manifest.EXTRACTIONTYPE_NONE) ) {
+				// This file is not to be extracted
+				return;
+			}
+			
 			inpFile = new File(manifest.getSourceDirectory() + info.getRelativeInputPath() + ".vrsz");
 			String outPath = inpFile.getAbsolutePath() + ".rtf";
 			RawDocument rd = new RawDocument(inpFile.toURI(), "UTF-8", manifest.getSourceLocale());
