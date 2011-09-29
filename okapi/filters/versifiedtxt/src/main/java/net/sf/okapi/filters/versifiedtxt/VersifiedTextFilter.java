@@ -61,8 +61,12 @@ public class VersifiedTextFilter extends AbstractFilter {
 	private static final int BUFFER_SIZE = 128000;
 
 	public static final String VERSIFIED_TXT_MIME_TYPE = "text/x-versified-txt";
-
-	private static final String VERSE = "^[ \t]*\\|v.+[ \t]*$";
+	private static final String VERSE = "^[ \t]*\\|v(.+)[ \t]*$";
+	private static final Pattern VERSE_COMPILED = Pattern.compile(VERSE);
+	
+	private static final String VERSIFIED_ID = "^([0-9]+)$";
+	private static final Pattern VERSIFIED_ID_COMPILED = Pattern.compile(VERSIFIED_ID);
+	
 	private static final String CHAPTER = "^[ \t]*\\|c.+[ \t]*$";
 	private static final String BOOK = "^[ \t]*\\|b.+[ \t]*$";
 	private static final String TARGET = "^[ \t]*<TARGET>[ \t]*$";
@@ -269,8 +273,13 @@ public class VersifiedTextFilter extends AbstractFilter {
 					}
 
 					if (currentLine.matches(VERSE)) {
-						handleDocumentPart(currentLine + newline);
-						handleVerse(versifiedFileReader, currentLine, currentLine.substring(2));
+						handleDocumentPart(currentLine + newline);		
+						Matcher m = VERSE_COMPILED.matcher(currentLine);
+						String verseId = "";
+						if (m.matches()) {
+							verseId = m.group(1);
+						}
+						handleVerse(versifiedFileReader, currentLine, verseId);
 						this.foundVerse = true;
 					} else if (currentLine.matches(BOOK)) {
 						currentBook = currentLine.substring(2);
@@ -354,7 +363,7 @@ public class VersifiedTextFilter extends AbstractFilter {
 		startSubDocument.setName(chapter);
 	}
 
-	private void handleVerse(BufferedReader verse, String currentVerse, String verseNumber)
+	private void handleVerse(BufferedReader verse, String currentVerse, String verseId)
 			throws IOException {
 		String currentLine = null;
 		StringBuilder source = new StringBuilder(BUFFER_SIZE);
@@ -401,7 +410,7 @@ public class VersifiedTextFilter extends AbstractFilter {
 		// if this is a bilingual file and we didn't see a <TARGET> tag
 		// throw an exception
 		if (isMultilingual() && !trg) {
-			throw new OkapiBadFilterInputException("Missing <TARGET> tag for verse " + verseNumber);
+			throw new OkapiBadFilterInputException("Missing <TARGET> tag for verse " + verseId);
 		}
 		
 		eventBuilder.startTextUnit();
@@ -453,9 +462,18 @@ public class VersifiedTextFilter extends AbstractFilter {
 			skel.add(newline + newline); 
 		}
 		tu.setSkeleton(skel);
-		
-		tu.setName(currentBook + ":" + currentChapter + ":" + verseNumber);
-		tu.setId(currentChapter + (currentChapter != null && currentChapter.isEmpty() ? "" : ":") + verseNumber);
+				
+		// see if the verse id is a number only - if so it it not unique so we
+		// add book and chapter ids 
+		Matcher m = VERSIFIED_ID_COMPILED.matcher(verseId);
+		if (m.matches()) {
+			tu.setName(currentBook + ":" + currentChapter + ":" + m.group(1));
+			tu.setId(currentChapter + (currentChapter != null && currentChapter.isEmpty() ? "" : ":") + m.group(1));
+		} else {
+			// else id from some other source just copy the id
+			tu.setName(verseId);
+			tu.setId(verseId);
+		}
 		eventBuilder.endTextUnit();
 	}
 

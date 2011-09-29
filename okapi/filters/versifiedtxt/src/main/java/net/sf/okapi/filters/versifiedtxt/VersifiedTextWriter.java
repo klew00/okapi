@@ -30,6 +30,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
@@ -47,6 +49,8 @@ import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 public class VersifiedTextWriter implements IFilterWriter {
+	private static final String VERSIFIED_ID = "[^:]*:?[^:]+:([0-9]+)$";
+	private static final Pattern VERSIFIED_ID_COMPILED = Pattern.compile(VERSIFIED_ID);
 	
 	private OutputStream output;
 	private String outputPath;
@@ -282,21 +286,13 @@ public class VersifiedTextWriter implements IFilterWriter {
 				return; // Do not write out entries with empty source
 			}
 
-			// |v
-			// the numeric verse id is not unique but we inherit the 
-			// |c chapter name which should be unique per document
-			// here we split out the verse id from the chapter id
 			String verseId = tu.getId();
-			if (verseId.contains(":")) {
-				// this came from a the versified filter
-				verseId = verseId.split("\\:")[1];
-			} else {
-				// this came from some other filter which usually has
-				// a number at the end of a tu id
-				// just grab any number on the end
-				verseId = verseId.replaceAll("^[^0-9]+", "");
+			Matcher m = VERSIFIED_ID_COMPILED.matcher(verseId);
+			// if this is from an original versified file with book:chapter:verse 
+			// then we just want to output the verse part (a number)
+			if (m.matches()) {
+				verseId = m.group(1);
 			}
-			
 			writer.write("|v" + verseId + linebreak);
 
 			// source

@@ -209,9 +209,10 @@ public class PropertiesFilter implements IFilter {
 						beforeSkeleton = skel[0];
 					}
 
-					// returns a multi event
-					return processWithSubfilter(tuRes.getId(), tuRes.getSource().toString(),
-							beforeSkeleton, afterSkeleton);
+					// queue up subfilter events
+					processWithSubfilter(tuRes.getId(), tuRes, beforeSkeleton, afterSkeleton);
+					
+					return queue.poll();
 				}
 
 				return new Event(EventType.TEXT_UNIT, tuRes);
@@ -591,10 +592,8 @@ public class PropertiesFilter implements IFilter {
 		logger.log(level, String.format(Res.getString("LINE_LOCATION"), lineNumber) + text);
 	}
 
-	private Event processWithSubfilter(String parentId, String content, String beforeSkeleton,
+	private void processWithSubfilter(String parentId, ITextUnit parentTu, String beforeSkeleton,
 			String afterSkeleton) {
-		MultiEvent me = new MultiEvent();
-
 		// reset filter for good measure
 		subfilter.close();
 
@@ -603,7 +602,7 @@ public class PropertiesFilter implements IFilter {
 
 		// TODO: only AbstractFilter subclasses can be used as subfilters!!!
 		((AbstractFilter) subfilter).setParentId(parentId);
-		subfilter.open(new RawDocument(content, srcLocale));
+		subfilter.open(new RawDocument(parentTu.getSource().toString(), srcLocale));
 
 		// if this is an html or xmlstream filter then set inline code
 		// rules used to parse Java property codes
@@ -613,12 +612,23 @@ public class PropertiesFilter implements IFilter {
 			eb.initializeCodeFinder(params.isUseCodeFinder(), params.getCodeFinder().getRules());
 		}
 
+		int tuChildCount = 0;
 		while (subfilter.hasNext()) {
-			Event event = converter.convertEvent(subfilter.next());
-			me.addEvent(event);
+			Event e = converter.convertEvent(subfilter.next());
+			// subfiltered TU's inherit the property key (TU name)
+			if (e.isTextUnit()) {
+				ITextUnit stu = e.getTextUnit();
+				if (stu.getName() == null) {
+					String parentName = parentTu.getName();
+					// we need to add a child id so each tu name is unique for this subfiltered content
+					if (parentName != null) {
+						parentName = parentName + "-" + Integer.toString(++tuChildCount); 
+					}
+					stu.setName(parentName);
+				}
+			}
+			queue.add(e);
 		}
 		subfilter.close();
-
-		return new Event(EventType.MULTI_EVENT, me);
 	}
 }
