@@ -443,7 +443,7 @@ public class Manifest implements IAnnotation {
 			int seq = 1;
 			for ( MergingInfo item : docs.values() ) {
 				writer.writeStartElement("ObjectFile");
-				writer.writeAttributeString("localizable", "yes");
+				writer.writeAttributeString("localizable", "no"); // Because we send the bilingual folder
 				writer.writeAttributeString("sequence", String.valueOf(seq));
 				writer.writeElementString("Type", item.getFilterId());
 				writer.writeElementString("LocationPath", item.getRelativeInputPath().substring(1));
@@ -458,6 +458,9 @@ public class Manifest implements IAnnotation {
 			writer.writeAttributeString("sectionname", "bilingual");
 			seq = 1;
 			for ( MergingInfo item : docs.values() ) {
+				if ( item.getExtractionType().equals(Manifest.EXTRACTIONTYPE_NONE) ) {
+					continue; // Skip non-filtered files
+				}
 				writer.writeStartElement("ObjectFile");
 				writer.writeAttributeString("localizable", "yes");
 				writer.writeAttributeString("sequence", String.valueOf(seq));
