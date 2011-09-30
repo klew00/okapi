@@ -182,7 +182,12 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 			int rating = 5;
 			n1 = res.indexOf("<Rating", 0); // No > to handle /> cases
 			n2 = res.indexOf("</Rating>", n1);
-			if ( n2 > -1 ) rating = Integer.parseInt(res.substring(n1+8, n2));
+			if ( n2 > -1 ) {
+				rating = Integer.parseInt(res.substring(n1+8, n2));
+				// Ensure it's withing expected range of -10 to 10.
+				if ( rating < -10 ) rating = -10;
+				else if ( rating > 10 ) rating = 10;
+			}
 
 			// Compute a relative score to take into account the rating
 			int combinedScore = score;
@@ -204,7 +209,7 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 			if ( n2 > -1 ) ttext = unescapeXML(res.substring(n1+16, n2));
 			
 			QueryResult qr = new QueryResult();
-			qr.setQuality(rating);
+			qr.setQuality(Util.normalizeRange(-10, 10, rating));
 			qr.setFuzzyScore(score); // Score from the system
 			qr.setCombinedScore(combinedScore); // Adjusted score
 			// Else: continue with that result
@@ -236,14 +241,21 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 
 		// Look for the results of each query:
 		for ( TextFragment frag : fragments ) {
-			// Move the start at the proper position
-			from = resp.indexOf("<Translations>", from);
-			if ( from < 0 ) break; // Nothing more
-			int n = resp.indexOf("</Translations>", from);
-			String block = resp.substring(from, n);
-			from = n+1; // For next iteration
-			// Parse the block and store the results
-			list.add(parseBlock(block, frag));
+			if ( !frag.hasText(false) ) {
+				// Create auto-result for skipped entries to have the same number of responses
+				List<QueryResult> res = new ArrayList<QueryResult>();
+				list.add(res);
+			}
+			else {
+				// Move the start at the proper position
+				from = resp.indexOf("<Translations>", from);
+				if ( from < 0 ) break; // Nothing more
+				int n = resp.indexOf("</Translations>", from);
+				String block = resp.substring(from, n);
+				from = n+1; // For next iteration
+				// Parse the block and store the results
+				list.add(parseBlock(block, frag));
+			}
 		}
 		
 		return list;
@@ -443,10 +455,20 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 			// Fill the template
 			StringBuilder sb = new StringBuilder();
 			for ( TextFragment tf : fragments ) {
+				if ( !tf.hasText(false) ) continue; // Skip no-text entries
 				sb.append("<s:string>");
 				String stext = util.toCodedHTML(tf);
 				sb.append(Util.escapeToXML(stext, 0, false, null));
 				sb.append("</s:string>");
+			}
+
+			if ( sb.length() == 0 ) {
+				// Case where all segments are non-text: We build a list of empty results
+				for ( int i=0; i<fragments.size(); i++ ) {
+					List<QueryResult> res = new ArrayList<QueryResult>();
+					list.add(res);
+				}
+				return list;
 			}
 
 			URL url = new URL(String.format("http://api.microsofttranslator.com/v2/Http.svc/GetTranslationsArray"
