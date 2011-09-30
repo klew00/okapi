@@ -96,19 +96,15 @@ public class MergingStep extends BasePipelineStep {
 			throw new OkapiBadFilterInputException("Start document is missing the manifest annotation.");
 		}
 		
-		// Create the merger if needed
-		if ( merger == null ) {
-			
-			boolean alwaysForceTargetLocale = info.getExtractionType() == Manifest.EXTRACTIONTYPE_ONTRAM;
-			
-			if ( params.getForceTargetLocale() || alwaysForceTargetLocale) {
-				merger = new Merger(manifest, fcMapper, params.getPreserveSegmentation(),
-					targetLocale, params.getReturnRawDocument());
-			}
-			else {
-				merger = new Merger(manifest, fcMapper, params.getPreserveSegmentation(),
-					null, params.getReturnRawDocument());
-			}
+		// Create the merger (for each new manifest)
+		boolean alwaysForceTargetLocale = info.getExtractionType() == Manifest.EXTRACTIONTYPE_ONTRAM;
+		if ( params.getForceTargetLocale() || alwaysForceTargetLocale) {
+			merger = new Merger(manifest, fcMapper, params.getPreserveSegmentation(),
+				targetLocale, params.getReturnRawDocument());
+		}
+		else {
+			merger = new Merger(manifest, fcMapper, params.getPreserveSegmentation(),
+				null, params.getReturnRawDocument());
 		}
 		// And trigger the merging
 		return merger.startMerging(info, event);
