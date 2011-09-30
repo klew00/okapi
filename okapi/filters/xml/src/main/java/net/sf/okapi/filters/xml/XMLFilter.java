@@ -732,8 +732,30 @@ public class XMLFilter implements IFilter {
 	private boolean addTextUnit (Node node,
 		boolean popStack)
 	{
-		// Create a unit only if needed
-		if ( !frag.hasCode() && !frag.hasText(false) ) {
+		// Extract if there is some text, or if there is code and we always extract codes
+		boolean extract = frag.hasText(false)
+			|| ( params.extractIfOnlyCodes && frag.hasCode() );
+		
+		if ( extract ) {
+			// Deal with inline codes if needed
+			if ( params.useCodeFinder ) {
+				params.codeFinder.process(frag);
+				// Escape inline code content
+				List<Code> codes = frag.getCodes();
+				for ( Code code : codes ) {
+					// Escape the data of the new inline code (and only them)
+					if ( code.getType().equals(InlineCodeFinder.TAGTYPE) ) { 
+						code.setData(Util.escapeToXML(code.getData(), 0, params.escapeGT, null));
+					}
+				}
+			}
+		
+			// Update the flag after the new codes
+			extract = frag.hasText(false)
+				|| ( params.extractIfOnlyCodes && frag.hasCode() );
+		}
+		
+		if ( !extract ) {
 			if ( !frag.isEmpty() ) { // Nothing but white spaces
 				skel.add(frag.toText().replace("\n", (params.escapeLineBreak ? "&#10;" : lineBreak))); // Pass them as skeleton
 			}
@@ -744,22 +766,10 @@ public class XMLFilter implements IFilter {
 			}
 			return false;
 		}
+
 		// Create the unit
 		ITextUnit tu = new TextUnit(String.valueOf(++tuId));
 		tu.setMimeType(MimeTypeMapper.XML_MIME_TYPE);
-		
-		// Deal with inline codes if needed
-		if ( params.useCodeFinder ) {
-			params.codeFinder.process(frag);
-			// Escape inline code content
-			List<Code> codes = frag.getCodes();
-			for ( Code code : codes ) {
-				// Escape the data of the new inline code (and only them)
-				if ( code.getType().equals(InlineCodeFinder.TAGTYPE) ) { 
-					code.setData(Util.escapeToXML(code.getData(), 0, params.escapeGT, null));
-				}
-			}
-		}
 		
 		tu.setSourceContent(frag);
 		

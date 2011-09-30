@@ -68,6 +68,7 @@ public class Parameters implements IParameters {
 	private static final String USECODEFINDER = "useCodeFinder";
 	private static final String OMITXMLDECLARATION = "omitXMLDeclaration";
 	private static final String ESCAPEQUOTES = "escapeQuotes";
+	private static final String EXTRACTIFONLYCODES = "extractIfOnlyCodes";
 
 	private static final String OKP_NS_PREFIX = "okp";
 	private static final String OKP_NS_URI = "okapi-framework:xmlfilter-options";
@@ -97,6 +98,7 @@ public class Parameters implements IParameters {
 	public boolean lineBreakAsCode;
 	public boolean omitXMLDeclaration;
 	public boolean escapeQuotes;
+	public boolean extractIfOnlyCodes;
 	// Write-only parameters
 	public boolean quoteModeDefined;
 	public int quoteMode;
@@ -244,6 +246,7 @@ public class Parameters implements IParameters {
 		quoteMode = 3; // escape quot, not apos
 		// Quote escaping option
 		escapeQuotes = true;
+		extractIfOnlyCodes = true;
 	}
 
 	@Override
@@ -298,6 +301,7 @@ public class Parameters implements IParameters {
 		if ( name.equals(OMITXMLDECLARATION) ) return omitXMLDeclaration;
 		if ( name.equals(XMLEncoder.QUOTEMODEDEFINED) ) return quoteModeDefined;
 		if ( name.equals(ESCAPEQUOTES) ) return escapeQuotes;
+		if ( name.equals(EXTRACTIFONLYCODES) ) return extractIfOnlyCodes;
 		return false;
 	}
 
@@ -313,6 +317,7 @@ public class Parameters implements IParameters {
 		else if ( name.equals(OMITXMLDECLARATION) ) omitXMLDeclaration = value;
 		else if ( name.equals(XMLEncoder.QUOTEMODEDEFINED) ) quoteModeDefined = value;
 		else if ( name.equals(ESCAPEQUOTES) ) escapeQuotes = value;
+		else if ( name.equals(EXTRACTIFONLYCODES) ) extractIfOnlyCodes = value;
 	}
 
 	@Override
@@ -370,6 +375,10 @@ public class Parameters implements IParameters {
 			tmp = elem.getAttribute(ESCAPEQUOTES);
 			if ( !Util.isEmpty(tmp) ) {
 				escapeQuotes = tmp.equals("yes");
+			}
+			tmp = elem.getAttribute(EXTRACTIFONLYCODES);
+			if ( !Util.isEmpty(tmp) ) {
+				extractIfOnlyCodes = tmp.equals("yes");
 			}
 			tmp = elem.getAttribute(PROTECTENTITYREF);
 			if ( !Util.isEmpty(tmp) ) {
