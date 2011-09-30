@@ -123,6 +123,7 @@ public class Pipeline implements IPipeline, IObservable, IObserver {
 					event = step.handleEvent(event);
 					// Recursively expand the event if needed
 					event = expandEvent(event, step);
+					if (event.isNoop()) break; // The event has been processed in expandEvent(), no need to process further here
 				}
 
 				// notify observers that the final step has sent an Event
@@ -179,6 +180,7 @@ public class Pipeline implements IPipeline, IObservable, IObserver {
 				for (IPipelineStep remainingStep : remainingSteps) {
 					event = remainingStep.handleEvent(event);
 					event = expandEvent(event, remainingStep);
+					if (event.isNoop()) break; // The event has been processed in expandEvent(), no need to process further here
 				}
 				// notify observers that the final step has sent an Event
 				// always filter out NO_OP events
@@ -187,6 +189,7 @@ public class Pipeline implements IPipeline, IObservable, IObserver {
 					notifiedObserver = true;
 				}				
 			}
+			return Event.NOOP_EVENT; // All events have been propagated and processed by remaining step 
 		}
 		
 		return event;
