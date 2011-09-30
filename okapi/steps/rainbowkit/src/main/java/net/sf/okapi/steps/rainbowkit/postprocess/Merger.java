@@ -169,7 +169,7 @@ public class Merger {
 			fprm.fromString(info.getFilterParameters());
 		}
 
-		File file = new File(manifest.getOriginalDirectory() + info.getRelativeInputPath());
+		File file = new File(manifest.getTempOriginalDirectory() + info.getRelativeInputPath());
 		RawDocument rd = new RawDocument(file.toURI(), info.getInputEncoding(),
 			manifest.getSourceLocale(), trgLoc);
 		

@@ -434,7 +434,7 @@ public class TikalTest {
     public void testTranslateXML () throws IOException, InterruptedException {
     	// Delete previous output
     	assertTrue(deleteOutputFile("xmltest2out.xml"));
-    	int res = runTikal("-t -sl en -tl eo xmltest2.xml -apertium myApertium.cfg -oe UTF-8");
+    	int res = runTikal("-t -sl en -tl eo xmltest2.xml -apertium myApertium.cfg -oe UTF-8 -trace");
     	if ( res == 0 ) {
     		assertTrue("File different from gold", compareWithGoldFile("xmltest2.out.xml", "UTF-8"));
     	}

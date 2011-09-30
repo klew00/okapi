@@ -44,7 +44,7 @@ public class RTFPackageWriter extends BasePackageWriter {
 	protected void processStartDocument (Event event) {
 		super.processStartDocument(event);
 		MergingInfo item = manifest.getItem(docId);
-		String path = manifest.getSourceDirectory() + item.getRelativeInputPath() + ".rtf";
+		String path = manifest.getTempSourceDirectory() + item.getRelativeInputPath() + ".rtf";
 		layerWriter = new RTFLayerWriter(skelWriter, path, manifest.getTargetLocale(), item.getTargetEncoding());
 		layerWriter.writeEvent(event);
 	}

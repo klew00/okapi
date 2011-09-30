@@ -195,7 +195,7 @@ public class ManifestDialog implements IManifestEditor {
 	
 	private void setData (Manifest manifest) {
 		this.manifest = manifest;
-		edTargetDirectory.setText(manifest.getTargetDirectory());
+		edTargetDirectory.setText(manifest.getTempTargetDirectory());
 		edProjectId.setText(manifest.getProjectId());
 		edPkgID.setText(manifest.getPackageId());
 		edSource.setText(manifest.getSourceLocale().toString());

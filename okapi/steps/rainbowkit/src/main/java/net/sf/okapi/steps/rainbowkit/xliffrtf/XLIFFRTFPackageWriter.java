@@ -57,7 +57,7 @@ public class XLIFFRTFPackageWriter extends XLIFFPackageWriter {
 				return;
 			}
 			
-			inpFile = new File(manifest.getSourceDirectory() + info.getRelativeInputPath() + ".xlf");
+			inpFile = new File(manifest.getTempSourceDirectory() + info.getRelativeInputPath() + ".xlf");
 			String outPath =  inpFile.getAbsolutePath() + ".rtf";
 			RawDocument rd = new RawDocument(inpFile.toURI(), "UTF-8", manifest.getSourceLocale());
 			rd.setTargetLocale(manifest.getTargetLocale());

@@ -209,8 +209,8 @@ public abstract class BasePackageWriter implements IPackageWriter {
 		
 		if ( pathApproved == null ) {
 			if ( tmxPathApproved == null ) {
-				tmxPathApproved = manifest.getTmDirectory() + "approved.tmx";
-				tempTmxPathApproved = manifest.getTmDirectory() + "approved.tmx";
+				tmxPathApproved = manifest.getTempTmDirectory() + "approved.tmx";
+				tempTmxPathApproved = manifest.getTempTmDirectory() + "approved.tmx";
 			}
 		}
 		else {
@@ -220,18 +220,18 @@ public abstract class BasePackageWriter implements IPackageWriter {
 		}
 		
 		if ( tmxPathUnApproved == null ) {
-			tmxPathUnApproved = manifest.getTmDirectory() + "unapproved.tmx";
-			tempTmxPathUnApproved = manifest.getTmDirectory() + "unapproved.tmx";
+			tmxPathUnApproved = manifest.getTempTmDirectory() + "unapproved.tmx";
+			tempTmxPathUnApproved = manifest.getTempTmDirectory() + "unapproved.tmx";
 		}
 		
 		if ( tmxPathAlternates == null ) {
-			tmxPathAlternates = manifest.getTmDirectory() + "alternates.tmx";
-			tempTmxPathAlternates = manifest.getTmDirectory() + "alternates.tmx";
+			tmxPathAlternates = manifest.getTempTmDirectory() + "alternates.tmx";
+			tempTmxPathAlternates = manifest.getTempTmDirectory() + "alternates.tmx";
 		}
 		
 		if ( tmxPathLeverage == null ) {
-			tmxPathLeverage = manifest.getTmDirectory() + "leverage.tmx";
-			tempTmxPathLeverage = manifest.getTmDirectory() + "leverage.tmx";
+			tmxPathLeverage = manifest.getTempTmDirectory() + "leverage.tmx";
+			tempTmxPathLeverage = manifest.getTempTmDirectory() + "leverage.tmx";
 		}
 		
 	}
@@ -317,7 +317,7 @@ public abstract class BasePackageWriter implements IPackageWriter {
 	}
 	
 	protected void processRawDocument (Event event) {
-		String ori = manifest.getOriginalDirectory();
+		String ori = manifest.getTempOriginalDirectory();
 		if ( Util.isEmpty(ori) ) return; // No copy to be done
 		
 		// Else: copy the original
@@ -349,7 +349,7 @@ public abstract class BasePackageWriter implements IPackageWriter {
 	}
 	
 	protected void processStartDocument (Event event) {
-		String ori = manifest.getOriginalDirectory();
+		String ori = manifest.getTempOriginalDirectory();
 		if ( Util.isEmpty(ori) ) return; // No copy to be done
 		
 		// Else: copy the original

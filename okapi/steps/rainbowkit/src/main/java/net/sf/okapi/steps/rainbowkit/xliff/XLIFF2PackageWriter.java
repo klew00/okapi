@@ -151,7 +151,7 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 
 //		writer.setOptions(manifest.getTargetLocale(), "UTF-8");
 		MergingInfo item = manifest.getItem(docId);
-		String path = manifest.getSourceDirectory() + item.getRelativeInputPath() + ".xlf";
+		String path = manifest.getTempSourceDirectory() + item.getRelativeInputPath() + ".xlf";
 		
 		// Set the writer's options
 		writer.setInlineStyle(options.getInlineStyle());

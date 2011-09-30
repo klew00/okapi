@@ -50,7 +50,7 @@ public class VersifiedPackageWriter extends BasePackageWriter {
 		writer.setOptions(manifest.getTargetLocale(), "UTF-8");
 
 		MergingInfo item = manifest.getItem(docId);
-		String path = manifest.getSourceDirectory() + item.getRelativeInputPath() + ".vrsz";
+		String path = manifest.getTempSourceDirectory() + item.getRelativeInputPath() + ".vrsz";
 		writer.setOutput(path);
 
 		writer.handleEvent(event);

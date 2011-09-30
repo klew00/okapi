@@ -55,7 +55,7 @@ public class VersifiedRtfPackageWriter extends VersifiedPackageWriter {
 				return;
 			}
 			
-			inpFile = new File(manifest.getSourceDirectory() + info.getRelativeInputPath() + ".vrsz");
+			inpFile = new File(manifest.getTempSourceDirectory() + info.getRelativeInputPath() + ".vrsz");
 			String outPath = inpFile.getAbsolutePath() + ".rtf";
 			RawDocument rd = new RawDocument(inpFile.toURI(), "UTF-8", manifest.getSourceLocale());
 			rd.setTargetLocale(manifest.getTargetLocale());

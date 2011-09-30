@@ -30,11 +30,14 @@ distribution.</p>
 </ul>
 	</li>
 	<li>Tikal:<ul>
-	<li>Added the <code>-bpt</code> option in the Moses Leveraging command.</li>
-	<li>Added the <code>-to</code> option in the Moses Leveraging command.</li>
+	<li>Added the <code>-bpt</code> option in the Leverage Files from Moses command.</li>
+	<li>Added the <code>-to</code> option in the Leverage Files from Moses command.</li>
 	<li>Made the key parameter of the MyMemory connector optional (kept it for 
 	backward compatibility)</li>
 	<li>Updated bash script (tikal.sh) to allow more than 9 arguments.</li>
+	<li>Added the <code>-od</code> option in the Extract Files and Merge Files 
+	commands.</li>
+	<li>Added the <code>-sd</code> option in the Merge Files commands.</li>
 </ul>
 	</li>
 	<li>Filters Plugin for OmegaT:<ul>
@@ -125,6 +128,12 @@ distribution.</p>
 	some cases.</li>
 </ul>
 	</li>
+	<li>XML Filter:<ul>
+	<li>Added the option <code>extractIfOnlyCodes</code> to allow entries with 
+	only codes or whitespace but no text to not be extracted. For backward 
+	compatibility this option is set to true.</li>
+</ul>
+	</li>
 	<li>IDML Filter:<ul>
 	<li>Added support for stories nested inside other stories.</li>
 	<li>Fixed issue with empty &lt;Content&gt; element, and tested with more complex 
@@ -182,6 +191,7 @@ distribution.</p>
 	<li>Updated QueryResult to include the new combinedScore and quality fields.</li>
 	<li>Changed various classes to use the combined score rather than the score 
 	for their filtering.</li>
+	<li>Made various fixes and improvments to the core libraries.</li>
 </ul>
 	</li>
 </ul>

@@ -42,7 +42,7 @@ public class OntramPackageWriter extends BasePackageWriter {
 		setTMXInfo(false, null, false, false);
 
 		writer = new XINIWriter();
-		writer.setOutputPath(manifest.getSourceDirectory() + "contents.xini");
+		writer.setOutputPath(manifest.getTempSourceDirectory() + "contents.xini");
 		
 		writer.init();
 		

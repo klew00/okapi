@@ -55,7 +55,7 @@ public class POPackageWriter extends BasePackageWriter {
 		writer.setOptions(manifest.getTargetLocale(), "UTF-8");
 		
 		MergingInfo item = manifest.getItem(docId);
-		String path = manifest.getSourceDirectory() + item.getRelativeInputPath() + ".po";
+		String path = manifest.getTempSourceDirectory() + item.getRelativeInputPath() + ".po";
 		writer.setOutput(path);
 		
 		writer.handleEvent(event);

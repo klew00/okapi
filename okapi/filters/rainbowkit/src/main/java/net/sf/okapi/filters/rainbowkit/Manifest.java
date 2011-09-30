@@ -80,14 +80,14 @@ public class Manifest implements IAnnotation {
 	private String targetSubDir;
 	private String tmSubDir;
 	private String mergeSubDir;
-	private String originalDir;
+//	private String originalDir;
 	private String tempOriginalDir;
-	private String sourceDir;
+//	private String sourceDir;
 	private String tempSourceDir;
-	private String targetDir;
+//	private String targetDir;
 	private String tempTargetDir;
 	private String mergeDir;
-	private String tmDir;
+//	private String tmDir;
 	private String tempTmDir;
 	private String creatorParams;
 	private boolean useApprovedOnly;
@@ -177,6 +177,10 @@ public class Manifest implements IAnnotation {
 		return packageRoot;
 	}
 	
+	/**
+	 * Gets the temporary package root (always with the terminal separator).
+	 * @return the temporary package root.
+	 */
 	public String getTempPackageRoot () {
 		return tempPackageRoot;
 	}
@@ -218,26 +222,26 @@ public class Manifest implements IAnnotation {
 	}
 	
 	/**
-	 * Gets the directory where to store the original files (always with a terminal separator).
-	 * @return the directory where to store the original files.
+	 * Gets the temporary directory where to store the original files (always with a terminal separator).
+	 * @return the temporary directory where to store the original files.
 	 */
-	public String getOriginalDirectory () {
+	public String getTempOriginalDirectory () {
 		return tempOriginalDir;
 	}
 	
 	/**
-	 * Gets the full directory where to store the prepared source files (always with a terminal separator). 
-	 * @return the directory where to store the prepared source files.
+	 * Gets the full temporary directory where to store the prepared source files (always with a terminal separator). 
+	 * @return the temporary directory where to store the prepared source files.
 	 */
-	public String getSourceDirectory () {
+	public String getTempSourceDirectory () {
 		return tempSourceDir;
 	}
 	
 	/**
-	 * Get the directory where to store the prepared target files (always with a terminal separator).
-	 * @return the directory where to store the prepared target files.
+	 * Get the temporary directory where to store the prepared target files (always with a terminal separator).
+	 * @return the temporary directory where to store the prepared target files.
 	 */
-	public String getTargetDirectory () {
+	public String getTempTargetDirectory () {
 		return tempTargetDir;
 	}
 	
@@ -250,10 +254,10 @@ public class Manifest implements IAnnotation {
 	}
 	
 	/**
-	 * Gets the directory where to output TM-related information (always with a terminal separator).
-	 * @return the directory where to store TM-related information.
+	 * Gets the temporary directory where to output TM-related information (always with a terminal separator).
+	 * @return the temporary directory where to store TM-related information.
 	 */
-	public String getTmDirectory () {
+	public String getTempTmDirectory () {
 		return tempTmDir;
 	}
 	
@@ -594,11 +598,11 @@ public class Manifest implements IAnnotation {
 	}
 
 	private void updateFullDirectories () {
-		originalDir = Util.ensureSeparator(packageRoot + originalSubDir, false);
-		sourceDir = Util.ensureSeparator(packageRoot + sourceSubDir, false);
-		targetDir = Util.ensureSeparator(packageRoot + targetSubDir, false);
+//		originalDir = Util.ensureSeparator(packageRoot + originalSubDir, false);
+//		sourceDir = Util.ensureSeparator(packageRoot + sourceSubDir, false);
+//		targetDir = Util.ensureSeparator(packageRoot + targetSubDir, false);
 		mergeDir = Util.ensureSeparator(packageRoot + mergeSubDir, false);
-		tmDir = Util.ensureSeparator(packageRoot + tmSubDir, false);
+//		tmDir = Util.ensureSeparator(packageRoot + tmSubDir, false);
 
 		tempOriginalDir = Util.ensureSeparator(tempPackageRoot + originalSubDir, false);
 		tempSourceDir = Util.ensureSeparator(tempPackageRoot + sourceSubDir, false);

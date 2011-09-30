@@ -109,7 +109,7 @@ public class TransifexPackageWriter extends BasePackageWriter {
 				// Skip non-extracted files
 				if ( info.getExtractionType().equals(Manifest.EXTRACTIONTYPE_NONE) ) continue;
 				
-				String poPath = manifest.getSourceDirectory() + info.getRelativeInputPath() + ".po";
+				String poPath = manifest.getTempSourceDirectory() + info.getRelativeInputPath() + ".po";
 				
 				// Compute the resource filename to use in Transifex
 				String resourceFile = Util.getFilename(poPath, true);
@@ -182,7 +182,7 @@ public class TransifexPackageWriter extends BasePackageWriter {
 		potWriter.setOptions(manifest.getSourceLocale(), "UTF-8");
 
 		MergingInfo item = manifest.getItem(docId);
-		String path = manifest.getSourceDirectory() + item.getRelativeInputPath() + ".po";
+		String path = manifest.getTempSourceDirectory() + item.getRelativeInputPath() + ".po";
 		potWriter.setOutput(path);
 
 		// Set the target PO file
@@ -261,7 +261,7 @@ public class TransifexPackageWriter extends BasePackageWriter {
 		String sd = Util.getDirectoryName(item.getRelativeInputPath());
 		String fn = Util.getFilename(item.getRelativeInputPath(), false);
 		
-		return manifest.getSourceDirectory()
+		return manifest.getTempSourceDirectory()
 			+ ( sd.isEmpty() ? "" : sd + "/" )
 			+ fn + "_" + manifest.getTargetLocale().toPOSIXLocaleId()
 			+ ex + ".po";

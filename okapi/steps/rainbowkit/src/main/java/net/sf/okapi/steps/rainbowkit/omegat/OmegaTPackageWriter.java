@@ -51,8 +51,8 @@ public class OmegaTPackageWriter extends XLIFFPackageWriter {
 		// Force creation of needed sub-directories even if empty
 		Util.createDirectories(manifest.getPackageRoot()+"omegat/");
 		Util.createDirectories(manifest.getPackageRoot()+"glossary/");
-		Util.createDirectories(manifest.getTargetDirectory());
-		Util.createDirectories(manifest.getTmDirectory());
+		Util.createDirectories(manifest.getTempTargetDirectory());
+		Util.createDirectories(manifest.getTempTmDirectory());
 
 		// Write the OmegaT project file
 		createOmegaTProject();

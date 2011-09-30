@@ -110,6 +110,7 @@ public class Main {
 	protected String skeleton;
 	protected String output;
 	protected String specifiedConfigId;
+	protected String specifiedConfigIdPath;
 	protected String configId;
 	protected String inputEncoding;
 	protected String outputEncoding;
@@ -156,6 +157,8 @@ public class Main {
 	protected boolean mosesUseGModeInAltTrans = true;
 	protected String mosesFromPath;
 	protected String mosesToPath;
+	protected String skeletonDir;
+	protected String outputDir;
 	
 	private FilterConfigurationMapper fcMapper;
 	private Hashtable<String, String> extensionsMap;
@@ -242,6 +245,12 @@ public class Main {
 				}
 				else if ( arg.equals("-oe") ) {
 					prog.outputEncoding = prog.getArgument(args, ++i);
+				}
+				else if ( arg.equals("-od") ) {
+					prog.outputDir = prog.getArgument(args, ++i);
+				}
+				else if ( arg.equals("-sd") ) {
+					prog.skeletonDir = prog.getArgument(args, ++i);
 				}
 				else if ( arg.equals("-x") ) {
 					prog.command = CMD_EXTRACT;
@@ -474,6 +483,11 @@ public class Main {
 
 			// Forgive having the extension .fprm from configuration ID if there is one
 			if ( prog.specifiedConfigId != null ) {
+				String cfgPath = Util.getDirectoryName(prog.specifiedConfigId);
+				if ( !cfgPath.isEmpty() ) {
+					prog.specifiedConfigIdPath = cfgPath;
+					prog.specifiedConfigId = Util.getFilename(prog.specifiedConfigId, true);
+				}
 				if ( prog.specifiedConfigId.endsWith(FilterConfigurationMapper.CONFIGFILE_EXT) ) {
 					prog.specifiedConfigId = Util.getFilename(prog.specifiedConfigId, false);
 				}
@@ -641,6 +655,9 @@ public class Main {
 		filtersMap.put("okf_versifiedtxt", "net.sf.okapi.filters.versifiedtxt.VersifiedTextFilter");
 		filtersMap.put("okf_xmlstream", "net.sf.okapi.filters.xmlstream.XmlStreamFilter");
 		filtersMap.put("okf_mosestext", "net.sf.okapi.filters.mosestext.MosesTextFilter");
+
+		if (specifiedConfigIdPath != null)
+			fcMapper.setCustomConfigurationsDirectory(specifiedConfigIdPath);
 	}
 	
 	private String getConfigurationId (String ext) {
@@ -835,6 +852,26 @@ public class Main {
 		}
 	}
 	
+	String pathChangeFolder (String newFolder,
+		String oldPath)
+	{
+		String result;
+		if ( newFolder == null ) {
+			result = oldPath;
+		}
+		else {
+			File file = new File(newFolder, Util.getFilename(oldPath, true));
+			result = file.toString();
+		}
+		return result;
+	}
+
+	String pathInsertOutBeforeExt(String oldPath) {
+		String ext = Util.getExtension(oldPath);
+		int n = oldPath.lastIndexOf('.');
+		return oldPath.substring(0, n) + ".out" + ext; //$NON-NLS-1$
+	}
+
 	private void guessMergingArguments (String input) {
 		String ext = Util.getExtension(input);
 		if ( !ext.equals(".xlf") ) {
@@ -844,10 +881,15 @@ public class Main {
 		
 		int n = input.lastIndexOf('.');
 		skeleton = input.substring(0, n);
-		
-		ext = Util.getExtension(skeleton);
-		n = skeleton.lastIndexOf('.');
-		output = skeleton.substring(0, n) + ".out" + ext;
+
+		if ( outputDir == null ) {
+			output = pathInsertOutBeforeExt(skeleton);
+		}
+		else {
+			output = pathChangeFolder(outputDir, skeleton);
+		}
+
+		skeleton = pathChangeFolder(skeletonDir, skeleton);
 	}
 	
 	private void guessMergingMosesArguments (String input) {
@@ -861,9 +903,7 @@ public class Main {
 			output = mosesToPath;
 		}
 		else {
-			String ext = Util.getExtension(input);
-			int n = input.lastIndexOf('.');
-			output = input.substring(0, n) + ".out" + ext;
+			output = pathInsertOutBeforeExt(input);
 		}
 	}
 	
@@ -1057,10 +1097,11 @@ public class Main {
 		ps.println("      [-tl trgLang] [-seg [srxFile]] [-tt [hostname[:port]]|-mm [key]");
 		ps.println("      |-pen tmDirectory|-gs configFile|-google|-apertium [configFile]");
 		ps.println("      |-ms configFile|-tda configFile] [-maketmx [tmxFile]] [-opt threshold]");
-		ps.println("      [-nocopy] [-noalttrans]");
+		ps.println("      [-of outputDirectory] [-nocopy] [-noalttrans]");
 		ps.println("Merges an XLIFF document back to its original format:");
-		ps.println("   -m xliffFile [xliffFile2...] [-fc configId] [-ie encoding]");
-		ps.println("      [-oe encoding] [-sl srcLang] [-tl trgLang]");
+		ps.println("   -m xliffFile [xliffFile2...] [-fc configId] [-ie encoding] [-oe encoding]");
+		ps.println("      [-sd sourceDirectory] [-od outputDirectory]");
+		ps.println("      [-sl srcLang] [-tl trgLang]");
 		ps.println("Translates a file:");
 		ps.println("   -t inputFile [inputFile2...] [-fc configId] [-ie encoding] [-oe encoding]");
 		ps.println("      [-sl srcLang] [-tl trgLang] [-seg [srxFile]] [-tt [hostname[:port]]");
@@ -1458,6 +1499,8 @@ public class Main {
 			tmp = tmp.substring(0, tmp.length()-1);
 		}
 		tmp += ".xlf";
+
+		tmp = pathChangeFolder(outputDir, tmp);
 		driver.addBatchItem(rd, new File(tmp).toURI(), outputEncoding);
 
 		ps.println("Source language: "+srcLoc);
@@ -1489,9 +1532,8 @@ public class Main {
 
 		// Create the raw document and set the output
 		String tmp = rd.getInputURI().getPath();
-		String ext = Util.getExtension(tmp);
-		int n = tmp.lastIndexOf('.');
-		output = tmp.substring(0, n) + ".out" + ext;
+
+		output = pathInsertOutBeforeExt(tmp);
 
 		ps.println("Source language: "+srcLoc);
 		ps.println("Target language: "+trgLoc);
@@ -1611,9 +1653,8 @@ public class Main {
 
 		// Create the raw document and set the output
 		String tmp = rd.getInputURI().getPath();
-		String ext = Util.getExtension(tmp);
-		int n = tmp.lastIndexOf('.');
-		output = tmp.substring(0, n) + ".out" + ext;
+
+		output = pathInsertOutBeforeExt(tmp);
 
 		ps.println("Source language: "+srcLoc);
 		ps.println("Target language: "+trgLoc);

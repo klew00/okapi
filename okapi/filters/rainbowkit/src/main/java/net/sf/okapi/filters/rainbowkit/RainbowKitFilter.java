@@ -344,7 +344,7 @@ public class RainbowKitFilter implements IFilter {
 			filter = new POFilter();
 		}
 		else if ( info.getExtractionType().equals(Manifest.EXTRACTIONTYPE_ONTRAM) ) {
-			file = new File(manifest.getTargetDirectory()+"contents.xini");
+			file = new File(manifest.getTempTargetDirectory()+"contents.xini");
 			filter =  new XINIFilter(info.getRelativeInputPath());
 		}
 		else if ( info.getExtractionType().equals(Manifest.EXTRACTIONTYPE_VERSIFIED_RTF) ) {
@@ -356,7 +356,7 @@ public class RainbowKitFilter implements IFilter {
 		}
 		else if ( info.getExtractionType().equals(Manifest.EXTRACTIONTYPE_NONE) ) {
 			// Reference file: just copy it to the output
-			String inputPath = manifest.getOriginalDirectory()+info.getRelativeInputPath();
+			String inputPath = manifest.getTempOriginalDirectory()+info.getRelativeInputPath();
 			String outputPath = manifest.getMergeDirectory()+info.getRelativeInputPath();
 			Util.copyFile(inputPath, outputPath, false);
 			// We send a no-operation event rather than call nextDocument() to avoid
@@ -369,7 +369,7 @@ public class RainbowKitFilter implements IFilter {
 		}
 		
 		if ( file == null ) {
-			file = new File(manifest.getTargetDirectory()+info.getRelativeInputPath()+extension);
+			file = new File(manifest.getTempTargetDirectory()+info.getRelativeInputPath()+extension);
 		}
 		RawDocument rd = new RawDocument(file.toURI(), info.getInputEncoding(),
 			manifest.getSourceLocale(), manifest.getTargetLocale());
@@ -429,15 +429,15 @@ public class RainbowKitFilter implements IFilter {
 			File file;
 			String outputPath = null;
 			if (Manifest.EXTRACTIONTYPE_XLIFFRTF.equals(tkitType)) {
-				file = new File(manifest.getTargetDirectory()+info.getRelativeInputPath() + ".xlf" + ".rtf");
+				file = new File(manifest.getTempTargetDirectory()+info.getRelativeInputPath() + ".xlf" + ".rtf");
 				rtfFilter.open(new RawDocument(file.toURI(), "windows-1252", manifest.getTargetLocale()));
-				outputPath = manifest.getTargetDirectory()+info.getRelativeInputPath() + ".xlf";
+				outputPath = manifest.getTempTargetDirectory()+info.getRelativeInputPath() + ".xlf";
 			} else if (Manifest.EXTRACTIONTYPE_VERSIFIED_RTF.equals(tkitType)) {
-				file = new File(manifest.getTargetDirectory()+info.getRelativeInputPath() + ".vrsz" + ".rtf");
+				file = new File(manifest.getTempTargetDirectory()+info.getRelativeInputPath() + ".vrsz" + ".rtf");
 				rtfFilter.open(new RawDocument(file.toURI(), "UTF-8", manifest.getTargetLocale()));
-				outputPath = manifest.getTargetDirectory()+info.getRelativeInputPath() + ".vrsz";
+				outputPath = manifest.getTempTargetDirectory()+info.getRelativeInputPath() + ".vrsz";
 			} else {
-				file = new File(manifest.getTargetDirectory()+info.getRelativeInputPath() + ".rtf");
+				file = new File(manifest.getTempTargetDirectory()+info.getRelativeInputPath() + ".rtf");
 				rtfFilter.open(new RawDocument(file.toURI(), "windows-1252", manifest.getTargetLocale()));
 				outputPath = manifest.getMergeDirectory()+info.getRelativeTargetPath();
 			}
@@ -499,7 +499,7 @@ public class RainbowKitFilter implements IFilter {
 		
 		// Set the path of the output
 		// This file will be the one merged after it's downloaded
-		String outputPath = manifest.getTargetDirectory()+info.getRelativeInputPath()+".po";
+		String outputPath = manifest.getTempTargetDirectory()+info.getRelativeInputPath()+".po";
 		// Retrieve the file
 		String[] res = cli.getResource(info.getResourceId(), manifest.getTargetLocale(), outputPath);
 		if ( res[0] == null ) {
