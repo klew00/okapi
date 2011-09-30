@@ -210,7 +210,7 @@ public class Pipeline implements IPipeline, IObservable, IObserver {
 		// Pre-process for this batch-item
 		Event e = new Event(EventType.START_BATCH_ITEM);
 		for (IPipelineStep step : steps) {
-			step.handleEvent(e);
+			e = step.handleEvent(e);
 		}
 		notifyObservers(e);
 
@@ -242,7 +242,7 @@ public class Pipeline implements IPipeline, IObservable, IObserver {
 		// Post-process for this batch-item
 		e = new Event(EventType.END_BATCH_ITEM);
 		for (IPipelineStep step : finishedSteps) {
-			step.handleEvent(e);
+			e = step.handleEvent(e);
 		}
 		notifyObservers(e);
 	}
