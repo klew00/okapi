@@ -8,17 +8,13 @@ import junit.framework.Assert;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
-import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
-import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.pipeline.Pipeline;
-import net.sf.okapi.common.pipelinedriver.PipelineDriver;
 import net.sf.okapi.common.query.MatchType;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
-import net.sf.okapi.filters.properties.PropertiesFilter;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 
 import org.junit.After;
