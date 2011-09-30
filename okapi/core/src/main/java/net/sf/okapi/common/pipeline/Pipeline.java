@@ -189,7 +189,7 @@ public class Pipeline implements IPipeline, IObservable, IObserver {
 					notifiedObserver = true;
 				}				
 			}
-			return Event.NOOP_EVENT; // All events have been propagated and processed by remaining step 
+			return Event.NOOP_EVENT; // All events have been propagated and processed by remaining steps 
 		}
 		
 		return event;
