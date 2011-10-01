@@ -83,7 +83,8 @@ class RepositoryForm {
 		edDefaultLocal.setEditable(false);
 		edDefaultLocal.setText(defaultLocalname);
 		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.horizontalIndent = 16;
+		final int indent = 16;
+		gdTmp.horizontalIndent = indent;
 		edDefaultLocal.setLayoutData(gdTmp);
 		
 		rdOtherLocal = new Button(group, SWT.RADIO);
@@ -98,8 +99,8 @@ class RepositoryForm {
 		pnlOtherLocal.setTitle("Select the repository file");
 		pnlOtherLocal.setBrowseFilters("TM Repositories (*.h2.db)\tAll Files (*.*)", "*.h2.db\t*.*");
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.horizontalIndent = 16;
-		gdTmp.widthHint = 400;
+		gdTmp.horizontalIndent = indent;
+		gdTmp.widthHint = 500;
 		pnlOtherLocal.setLayoutData(gdTmp);
 
 		rdServerBased = new Button(group, SWT.RADIO);
@@ -112,7 +113,7 @@ class RepositoryForm {
 		
 		edServerBased = new Text(group, SWT.BORDER);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.horizontalIndent = 16;
+		gdTmp.horizontalIndent = indent;
 		edServerBased.setLayoutData(gdTmp);
 		
 		rdInMemory = new Button(group, SWT.RADIO);
@@ -127,7 +128,7 @@ class RepositoryForm {
 		edInMemory.setEditable(false);
 		edInMemory.setText("(No physical storage: all data are in memory)");
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.horizontalIndent = 16;
+		gdTmp.horizontalIndent = indent;
 		edInMemory.setLayoutData(gdTmp);
 
 		updateDisplay();

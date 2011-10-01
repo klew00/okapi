@@ -53,7 +53,7 @@ This will run additional integration tests.
 The file _tests_results.txt shows any differences between the expected results and the curren ones. Note that some differences may be fine if they are coming from a fix or a new feature. Update the gold files if it is the case.
 //TODO: Port those tests to applications integration tests
 
---- 6bis) Test underdifferent platforms
+--- 6bis) Test under different platforms
 
 --- 7) Post each package of the distributions (stored in maven/done) to the GoogleCode download area.
 Use the labels: OpSys-... and Featured

@@ -46,8 +46,10 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
@@ -61,6 +63,7 @@ class RepositoryPanel extends Composite {
 	private Button btNewTM;
 	private Label stListTitle;
 	private IRepository repo;
+	private MenuItem miContextOpen;
 	private MenuItem miContextEditTMOptions;
 	private MenuItem miContextImportFile;
 	private MenuItem miContextDeleteTM;
@@ -113,7 +116,8 @@ class RepositoryPanel extends Composite {
 		});
 		tmList.addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent e) {
-				if ( e.character == 13 ) { // Return key
+				// Return and space-bar open the TM
+				if (( e.character == 13 ) || ( e.character == 32 )) {
 					openTmTab(null); // Use current selection
 				}
 			}
@@ -121,6 +125,14 @@ class RepositoryPanel extends Composite {
 		
 		// Context menu for the list
 		Menu contextMenu = new Menu(getShell(), SWT.POP_UP);
+		
+		miContextOpen = new MenuItem(contextMenu, SWT.PUSH);
+		rm.setCommand(miContextOpen, "repository.opentm"); //$NON-NLS-1$
+		miContextOpen.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				openTmTab(null); // Use current selection
+            }
+		});
 		
 		miContextEditTMOptions = new MenuItem(contextMenu, SWT.PUSH);
 		rm.setCommand(miContextEditTMOptions, "repository.edittmoptions"); //$NON-NLS-1$
@@ -157,9 +169,33 @@ class RepositoryPanel extends Composite {
             }
 		});
 
+		contextMenu.addListener (SWT.Show, new Listener () {
+			public void handleEvent (Event event) {
+				boolean enabled = false;
+				int n = tmList.getSelectionIndex();
+				if ( n > -1 ) {
+					TmPanel tp = getTmPanel(-1);
+					// If there is no tab or a tab but no process running: it's enabled
+					if (( tp == null ) || !tp.hasRunningThread() ) {
+						enabled = true;
+					}
+				}
+				miContextOpen.setEnabled(n>-1);
+				miContextEditTMOptions.setEnabled(enabled);
+				miContextImportFile.setEnabled(enabled);
+				miContextDeleteTM.setEnabled(enabled);
+				miContextRenameTM.setEnabled(enabled);
+			}
+		});
 		tmList.setMenu(contextMenu);
 		
 		resetRepositoryUI(0);
+	}
+
+	private TmPanel getTmPanel (int index) {
+		if ( index < 0 ) index = tmList.getSelectionIndex();
+		if ( index < 0 ) return null;
+		return mainForm.findTmTab(tmList.getItem(index), false);
 	}
 
 	void deleteTm (String tmName) {
@@ -398,14 +434,6 @@ class RepositoryPanel extends Composite {
 		updateRepositoryStatus();
 	}
 
-	void updateRepositoryCommands () {
-		boolean hasOneTm = tmList.getItemCount()>0;
-		miContextEditTMOptions.setEnabled(hasOneTm);
-		miContextImportFile.setEnabled(hasOneTm);
-		miContextDeleteTM.setEnabled(hasOneTm);
-		miContextRenameTM.setEnabled(hasOneTm);
-	}
-	
 	/**
 	 * Resets the content of the panel.
 	 * @param selection -1 to select the last TM, otherwise the index of the TM to select.
@@ -429,12 +457,10 @@ class RepositoryPanel extends Composite {
 			}
 			stListTitle.setText(String.format("TMs in this repository (%d):", tmList.getItemCount()));
 		}
-		updateRepositoryCommands();
 	}
 
 	void updateRepositoryStatus () {
 		btNewTM.setEnabled(isRepositoryOpen());
-		updateRepositoryCommands();
 		mainForm.updateCommands();
 		mainForm.updateTitle();
 	}
@@ -461,13 +487,14 @@ class RepositoryPanel extends Composite {
 			if ( tmp2.length() > 0 ) {
 				tmp2.delete(tmp2.length()-2, tmp2.length());
 			}
+			tmp.append("Information for this repository:\n\n");
 			tmp.append(String.format("Total number of segment-entries: %s",
 				NumberFormat.getInstance().format(totalSeg)));
-			tmp.append("\n\nLocales: "+tmp2.toString());
+			tmp.append("\nLocales: "+tmp2.toString());
 			
 			MessageBox dlg = new MessageBox(getShell());
 			dlg.setMessage(tmp.toString());
-			dlg.setText("Statistics");
+			dlg.setText("Repository Statistics");
 			dlg.open();
 		}
 		catch ( Throwable e ) {
