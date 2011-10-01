@@ -1097,7 +1097,7 @@ public class Main {
 		ps.println("      [-tl trgLang] [-seg [srxFile]] [-tt [hostname[:port]]|-mm [key]");
 		ps.println("      |-pen tmDirectory|-gs configFile|-google|-apertium [configFile]");
 		ps.println("      |-ms configFile|-tda configFile] [-maketmx [tmxFile]] [-opt threshold]");
-		ps.println("      [-of outputDirectory] [-nocopy] [-noalttrans]");
+		ps.println("      [-od outputDirectory] [-nocopy] [-noalttrans]");
 		ps.println("Merges an XLIFF document back to its original format:");
 		ps.println("   -m xliffFile [xliffFile2...] [-fc configId] [-ie encoding] [-oe encoding]");
 		ps.println("      [-sd sourceDirectory] [-od outputDirectory]");
