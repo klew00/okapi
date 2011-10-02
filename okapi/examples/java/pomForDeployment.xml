@@ -43,7 +43,7 @@
     	<repository>
         	<name>OkapiPublicRepository</name>
         	<id>okapi-pub-repo</id>
-        	<url>http://openl10n.net/maven2</url>
+        	<url>http://repository-okapi.forge.cloudbees.com/release/</url>
     	</repository>
 	</repositories>
     
