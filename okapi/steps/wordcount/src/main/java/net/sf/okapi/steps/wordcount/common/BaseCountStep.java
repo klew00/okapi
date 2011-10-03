@@ -28,6 +28,7 @@ import net.sf.okapi.common.resource.Ending;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.extra.steps.AbstractPipelineStep;
 
 /**
@@ -45,6 +46,7 @@ public abstract class BaseCountStep extends AbstractPipelineStep {
 	private Parameters params;
 	private IdGenerator gen = new IdGenerator("ending");
 	private TextContainer source;
+	private StringBuilder sb;
 	
 	private long batchCount;
 	private long batchItemCount;
@@ -239,6 +241,8 @@ public abstract class BaseCountStep extends AbstractPipelineStep {
 	
 	@Override
 	protected Event handleEndBatch(Event event) {
+		flushBuffer();
+		
 		if (!params.getCountInBatch()) return event;
 		if (batchCount == 0) return event;
 		
@@ -255,6 +259,8 @@ public abstract class BaseCountStep extends AbstractPipelineStep {
 	
 	@Override
 	protected Event handleEndBatchItem(Event event) {
+		flushBuffer();
+		
 		if (!params.getCountInBatchItems()) return event;
 		if (batchItemCount == 0) return event;
 		
@@ -384,6 +390,33 @@ public abstract class BaseCountStep extends AbstractPipelineStep {
 //		}
 //	}
 	
+	private void flushBuffer() {
+		if (params.getBufferSize() == 0) return; 
+		if (sb == null) return;
+		
+//		System.out.println("====== flush");
+//		System.out.println(sb.toString());
+//		System.out.println("======");
+		ITextUnit tu = new TextUnit("temp", sb.toString());
+		sb = null;
+		updateCounts(tu, null);
+	}
+	
+	private void updateCounts(ITextUnit tu, Event event) {
+		long textUnitCount = countInTextUnit(tu);
+		
+		// Whole TU metrics
+		if (textUnitCount != 0) {				
+			saveToMetrics(event, textUnitCount); // Saves in annotations of the whole TU
+					
+			if (params.getCountInBatch()) batchCount += textUnitCount;
+			if (params.getCountInBatchItems()) batchItemCount += textUnitCount;
+			if (params.getCountInDocuments()) documentCount += textUnitCount;
+			if (params.getCountInSubDocuments()) subDocumentCount += textUnitCount;
+			if (params.getCountInGroups()) groupCount += textUnitCount;
+		}
+	}
+	
 	@Override
 	protected Event handleTextUnit(Event event) {		
 		ITextUnit tu = event.getTextUnit();
@@ -391,31 +424,23 @@ public abstract class BaseCountStep extends AbstractPipelineStep {
 		if (tu.isEmpty()) return event;
 		if (!tu.isTranslatable() && countOnlyTranslatable()) return event;
 		
-		long textUnitCount = 0;
 		source = tu.getSource();
 		
-//		switch (getCountContext()) {
-//		case CC_SOURCE:
-//			textUnitCount = countInSource(tu);
-//			break;
-//			
-//		case CC_TARGET:
-//			textUnitCount = countInTarget(tu, getTargetLocale());
-//			break;
-//		}		
+		if (params.getBufferSize() > 0) {
+			if (sb == null) {
+				sb = new StringBuilder(params.getBufferSize());
+			}
+			// Non-translatable text doesn't get here
+			String srcText = tu.getSource().getUnSegmentedContentCopy().getText();
+			sb.append(srcText);
+			//System.out.println(srcText);
+			if (sb.length() >= params.getBufferSize()) {
+				flushBuffer();
+			}
+			return event;
+		}
 		
-		textUnitCount = countInTextUnit(tu);
-		
-		// Whole TU metrics
-		if (textUnitCount == 0) return event;
-				
-		saveToMetrics(event, textUnitCount); // Saves in annotations of the whole TU
-				
-		if (params.getCountInBatch()) batchCount += textUnitCount;
-		if (params.getCountInBatchItems()) batchItemCount += textUnitCount;
-		if (params.getCountInDocuments()) documentCount += textUnitCount;
-		if (params.getCountInSubDocuments()) subDocumentCount += textUnitCount;
-		if (params.getCountInGroups()) groupCount += textUnitCount;
+		updateCounts(tu, event);
 		return event;
 	}		
 }

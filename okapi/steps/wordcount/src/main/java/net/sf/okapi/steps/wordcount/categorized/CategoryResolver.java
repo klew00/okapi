@@ -25,6 +25,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
@@ -145,20 +147,34 @@ public class CategoryResolver {
 		}
 	}
 	
-	public void resolve(IResource res) {
-		if (res instanceof ITextUnit) {
+	public void resolve(IResource res, EventType eventType) {
+		switch (eventType) {
+		case TEXT_UNIT:
 			resolveTU((ITextUnit)res);
-		}
-		else if (res instanceof Ending) {
-			resolveEnding((Ending) res);
+			break;
+
+		case END_BATCH_ITEM:
+			resolveEnding((Ending) res, false);
+			break;
+			
+		case END_BATCH:
+			resolveEnding((Ending) res, true);
+			break;
+			
+		default:
+			break;
 		}
 	}
 
-	private void resolveEnding(Ending res) {		
+	private void resolveEnding(Ending res, boolean isEndBatch) {		
 		MetricsAnnotation ma = res.getAnnotation(MetricsAnnotation.class);
 		
 		if (ma != null) {
 			Metrics metrics = ma.getMetrics();
+			if (isEndBatch) {
+				resolve(ma, false);
+				return;
+			}
 			
 			// Can't do it on metrics directly for concurrency reasons
 			List<String> m = new LinkedList<String>(metrics);

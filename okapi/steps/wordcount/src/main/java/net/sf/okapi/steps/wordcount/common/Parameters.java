@@ -36,12 +36,14 @@ public class Parameters extends AbstractParameters implements IEditorDescription
 	private static final String COUNTINDOCUMENTS = "countInDocuments";
 	private static final String COUNTINSUBDOCUMENTS = "countInSubDocuments";
 	private static final String COUNTINGROUPS = "countInGroups";
+	private static final String BUFFERSIZE = "bufferSize";
 	
 	private boolean countInBatch;
 	private boolean countInBatchItems;
 	private boolean countInDocuments;
 	private boolean countInSubDocuments;
 	private boolean countInGroups;
+	private int bufferSize;
 	
 	public boolean getCountInBatch () {
 		return countInBatch;
@@ -87,6 +89,14 @@ public class Parameters extends AbstractParameters implements IEditorDescription
 		return true; // Always
 	}
 
+	public void setBufferSize(int bufferSize) {
+		this.bufferSize = bufferSize;
+	}
+
+	public int getBufferSize() {
+		return bufferSize;
+	}
+	
 	@Override
 	protected void parameters_init() {
 	}
@@ -97,7 +107,8 @@ public class Parameters extends AbstractParameters implements IEditorDescription
 		countInBatchItems = buffer.getBoolean(COUNTINBATCHITEMS, countInBatchItems);
 		countInDocuments = buffer.getBoolean(COUNTINDOCUMENTS, countInDocuments);
 		countInSubDocuments = buffer.getBoolean(COUNTINSUBDOCUMENTS, countInSubDocuments);
-		countInGroups = buffer.getBoolean(COUNTINGROUPS, countInGroups);		
+		countInGroups = buffer.getBoolean(COUNTINGROUPS, countInGroups);
+		bufferSize = buffer.getInteger(BUFFERSIZE, bufferSize);
 	}
 
 	@Override
@@ -107,6 +118,7 @@ public class Parameters extends AbstractParameters implements IEditorDescription
 		countInDocuments = false;
 		countInSubDocuments = false;
 		countInGroups = false;
+		bufferSize = 0;
 	}
 
 	@Override
@@ -116,6 +128,7 @@ public class Parameters extends AbstractParameters implements IEditorDescription
 		buffer.setBoolean(COUNTINDOCUMENTS, countInDocuments);
 		buffer.setBoolean(COUNTINSUBDOCUMENTS, countInSubDocuments);
 		buffer.setBoolean(COUNTINGROUPS, countInGroups);
+		buffer.setInteger(BUFFERSIZE, bufferSize);
 	}
 	
 	@Override
@@ -127,6 +140,7 @@ public class Parameters extends AbstractParameters implements IEditorDescription
 		desc.add(COUNTINDOCUMENTS, "Documents", null);
 		desc.add(COUNTINSUBDOCUMENTS, "Sub-documents", null);
 		desc.add(COUNTINGROUPS, "Groups", null);
+		desc.add(BUFFERSIZE, "Size of text buffer:", null);
 		return desc;
 	}	
 
@@ -140,7 +154,8 @@ public class Parameters extends AbstractParameters implements IEditorDescription
 		desc.addCheckboxPart(paramsDesc.get(COUNTINDOCUMENTS));
 		desc.addCheckboxPart(paramsDesc.get(COUNTINSUBDOCUMENTS));
 		desc.addCheckboxPart(paramsDesc.get(COUNTINGROUPS));
+		desc.addSpinInputPart(paramsDesc.get(BUFFERSIZE));
 		return desc;
 	}
-	
+
 }
