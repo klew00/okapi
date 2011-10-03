@@ -1117,10 +1117,8 @@ public class Aligner {
 			String srcText;
 			int toJoin;
 
-			int i = -1;
 			for ( Segment srcSeg : sourceSegments ) {
 	    		
-				i++;
 				matchFound = false;
 				srcText = srcSeg.toString();
 				for ( int j=trgStart; j<targetSegments.count(); j++ ) {

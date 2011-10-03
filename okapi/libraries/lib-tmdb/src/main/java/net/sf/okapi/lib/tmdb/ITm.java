@@ -277,8 +277,8 @@ public interface ITm {
 	 * Special fields cannot be renamed.
 	 * To change the locale suffix of all the fields of a locale use {@link #renameLocale(String, String)}.
 	 * @param currentFullName the current full name.
-	 * @param newFiiullName the new full name.
+	 * @param newFullName the new full name.
 	 */
 	public void renameField (String currentFullName,
-		String newFiiullName);
+		String newFullName);
 }

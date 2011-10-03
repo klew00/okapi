@@ -689,7 +689,6 @@ public class Tm implements ITm {
 			return; // The name/code is already used
 		}
 
-		// Locale does not exists and we need to remove all it fields
 		Statement stm = null;
 		try {
 			StringBuilder tmp = new StringBuilder();
@@ -770,7 +769,6 @@ public class Tm implements ITm {
 			}
 			// Fill the SegKey value
 			pstmUpdSeg.setLong(i, segKey);
-			
 			pstmUpdSeg.execute();
 			
 		}
@@ -781,20 +779,121 @@ public class Tm implements ITm {
 
 	@Override
 	public void addField (String fullName) {
-		// TODO Auto-generated method stub
+		// Cannot add pre-defined fields
+		if ( DbUtil.isPreDefinedField(fullName) ) {
+			return;
+		}
 		
+		String suffix = "_TU";
+		
+		// Check the locale
+		String loc = DbUtil.getFieldLocale(fullName);
+		if ( loc != null ) {
+			suffix = "_SEG";
+			if ( !getLocales().contains(loc) ) {
+				// Not an existing locale
+				return;
+			}
+		}
+
+		Statement stm = null;
+		try {
+			stm = store.getConnection().createStatement();
+			String tmp = String.format("ALTER TABLE \"%s%s\" ADD \"%s\" VARCHAR",
+				name, suffix, fullName);
+			stm.execute(tmp);
+		}
+		catch ( SQLException e ) {
+			throw new RuntimeException(e);
+		}
+		finally {
+			try {
+				if ( stm != null ) {
+					stm.close();
+					stm = null;
+				}
+			}
+			catch ( SQLException e ) {
+				throw new RuntimeException(e);
+			}
+		}
 	}
 
 	@Override
 	public void deleteField (String fullName) {
-		// TODO Auto-generated method stub
+		// Block deletion of system fields
+		if ( DbUtil.isPreDefinedField(fullName) ) {
+			return;
+		}
+		
+		// TODO
 		
 	}
 
 	@Override
-	public void renameField (String currentFullName, String newFiiullName) {
-		// TODO Auto-generated method stub
+	public void renameField (String currentFullName,
+		String newFullName)
+	{
+		// Block renaming of system fields
+		if ( DbUtil.isPreDefinedField(currentFullName) ) {
+			// Cannot rename those fields
+			return;
+		}
+		List<String> existing = getAvailableFields();
+		if ( !existing.contains(currentFullName) ) {
+			// This field does not exists: do nothing
+			return;
+		}
+		if ( existing.contains(newFullName) ) {
+			// This field does exists already: do nothing
+			return;
+		}
+
+		// Check if the locale part changes
+		String loc1 = DbUtil.getFieldLocale(currentFullName);
+		String loc2 = DbUtil.getFieldLocale(newFullName);
+		if ( loc1 != null ) {
+			if ( loc2 != null ) {
+				if ( !loc1.equals(loc2) ) {
+					// Check if it goes to an existing locale
+					if ( !getLocales().contains(loc2) ) {
+						return;
+					}
+				}
+			}
+			// It is allowed to make a segment level field into a unit level one
+		}
+
+		boolean sameTable = (( loc1 == null ) && ( loc2 == null)) || (( loc1 != null ) && ( loc2 != null ));
+		if ( !sameTable ) {
+			throw new RuntimeException("Changing level of field not implemented yet");
+		}
 		
+		String suffix = "_SEG";
+		if ( loc1 == null ) suffix = "_TU";
+		
+		Statement stm = null;
+		try {
+			stm = store.getConnection().createStatement();
+			StringBuilder tmp = new StringBuilder();
+			tmp.append(String.format("ALTER TABLE \"%s%s\" ALTER COLUMN \"%s\" RENAME TO \"%s\"; ",
+				name, suffix, currentFullName, newFullName));
+			stm.execute(tmp.toString());
+		}
+		catch ( SQLException e ) {
+			throw new RuntimeException(e);
+		}
+		finally {
+			try {
+				if ( stm != null ) {
+					stm.close();
+					stm = null;
+				}
+			}
+			catch ( SQLException e ) {
+				throw new RuntimeException(e);
+			}
+		}
 	}
 
 }

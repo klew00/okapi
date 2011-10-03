@@ -317,10 +317,11 @@ public class ProcesswithAPI {
 		rs.next(); rs.next();
 		assertEquals("F1 2", rs.getString(3));
 		assertEquals("Src 2", rs.getString(5));
+		
 
 		//=== Test addition of locale
 		
-		/*tm.addLocale("BG");
+		tm.addLocale("BG");
 		List<String> list = tm.getLocales();
 		assertEquals(2, list.size());
 		assertEquals("EN", list.get(0));
@@ -361,8 +362,51 @@ public class ProcesswithAPI {
 		tm.deleteLocale("EN"); // Try to delete the last one
 		list = tm.getLocales();
 		assertEquals(1, list.size()); // It should not be deleted
-		assertEquals("EN", list.get(0));*/
+		assertEquals("EN", list.get(0));
 		
+		
+		repo.close();
+	}
+
+	public static void runMultipleTestsStep4 (IRepository repo)
+		throws SQLException
+	{
+		String tmName = "myTm";
+		String localeCode = DbUtil.toOlifantLocaleCode(LocaleId.ENGLISH);
+		ITm tm = repo.createTm(tmName, null, localeCode);
+		assertEquals(tmName, tm.getName());
+		
+		Map<String, Object> tuFlds = new HashMap<String, Object>();
+		Map<String, Object> segFlds = new HashMap<String, Object>();
+		String srcFName = DbUtil.TEXT_PREFIX+localeCode;
+		tm.startImport();
+		tuFlds.put("F1", "F1 1");
+		segFlds.put(srcFName, "Src 1");
+		tm.addRecord(-1, tuFlds, segFlds);
+		tm.finishImport();
+
+		tm.setRecordFields(tm.getAvailableFields());
+		tm.setPageMode(PageMode.EDITOR);
+		ResultSet rs = tm.getFirstPage();
+		rs.next();
+		assertEquals("F1 1", rs.getString(3));
+		assertEquals("Src 1", rs.getString(5));
+
+		tm.addField("NEWTUField");
+		assertTrue(tm.getAvailableFields().contains("NEWTUField"));
+		
+		tm.renameField("NEWTUField", "NewNamedField");
+		assertFalse(tm.getAvailableFields().contains("NEWTUField"));
+		assertTrue(tm.getAvailableFields().contains("NewNamedField"));
+
+		String newFieldName = "NewSegField"+DbUtil.LOC_SEP+localeCode; 
+		tm.addField(newFieldName);
+		assertTrue(tm.getAvailableFields().contains(newFieldName));
+
+		String newName = "NewName"+DbUtil.LOC_SEP+localeCode;
+		tm.renameField(newFieldName, newName);
+		assertFalse(tm.getAvailableFields().contains(newFieldName));
+		assertTrue(tm.getAvailableFields().contains(newName));
 		
 		repo.close();
 	}

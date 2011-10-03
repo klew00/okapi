@@ -37,7 +37,7 @@ import org.eclipse.swt.widgets.MenuItem;
 
 public class ResourceManager {
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	private Class cls;
 	private Display display;
 	private Hashtable<String, Image> images;
@@ -54,7 +54,6 @@ public class ResourceManager {
 	 * root location of the place where the resources are.
 	 * @param p_Display Display to associate with the resources.
 	 */
-	@SuppressWarnings("unchecked")
 	public ResourceManager (Class p_Class,
 		Display p_Display)
 	{

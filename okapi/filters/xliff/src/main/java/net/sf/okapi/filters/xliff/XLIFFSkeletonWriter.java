@@ -351,11 +351,9 @@ public class XLIFFSkeletonWriter extends GenericSkeletonWriter {
 
 		// The output is driven by the target, not the source, so the interstices parts
 		// are the ones of the target, no the one of the source
-		int scoreIndex = -1;
 		ISegments srcSegs = srcCont.getSegments();
 		for ( TextPart part : trgCont ) {
 			if ( part.isSegment() ) {
-				scoreIndex++;
 				int lev = 0; //TODO: score values for RTF
 				Segment trgSeg = (Segment)part;
 				Segment srcSeg = srcSegs.get(trgSeg.id);

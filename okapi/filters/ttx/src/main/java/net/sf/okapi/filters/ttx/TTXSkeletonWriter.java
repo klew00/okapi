@@ -84,7 +84,6 @@ public class TTXSkeletonWriter extends GenericSkeletonWriter {
 		}
 		
 		// Drive from target
-		int i = 0;
 		for ( TextPart part : trgCont ) {
 			if ( part.isSegment() ) {
 				Segment trgSeg = (Segment)part;
@@ -114,7 +113,6 @@ public class TTXSkeletonWriter extends GenericSkeletonWriter {
 			else { // Inter-segment parts
 				tmp.append(processFragment(part.getContent(), 1));
 			}
-			i++;
 		}
 
 		return tmp.toString();

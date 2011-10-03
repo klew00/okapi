@@ -314,7 +314,6 @@ public class QueryManager {
 	public int query (String plainText) {
 		results.clear();
 		ResourceItem ri;
-		int resources = 0;
 		for ( int id : resList.keySet() ) {
 			ri = resList.get(id);
 			if ( !ri.enabled ) continue; // Skip disabled entries
@@ -326,7 +325,6 @@ public class QueryManager {
 					if ( res.getCombinedScore() < threshold ) break; // Weed out MT if needed
 					results.add(res);
 				}
-				if ( res != null ) resources++;
 			}
 		}
 		
@@ -346,7 +344,6 @@ public class QueryManager {
 	public int query (TextFragment text) {
 		results.clear();
 		ResourceItem ri;
-		int resources = 0;
 		for ( int id : resList.keySet() ) {
 			ri = resList.get(id);
 			if ( !ri.enabled ) continue; // Skip disabled entries
@@ -358,7 +355,6 @@ public class QueryManager {
 					res.connectorId = id;
 					results.add(res);
 				}
-				if ( res != null ) resources++;
 			}
 		}
 		

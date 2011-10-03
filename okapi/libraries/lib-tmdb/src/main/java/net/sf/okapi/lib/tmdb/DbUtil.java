@@ -107,6 +107,21 @@ public class DbUtil {
 	}
 
 	/**
+	 * Indicates if a given field name is the name of a pre-defined field.
+	 * Pre-defined names are for example: {@link DbUtil#SEGKEY_NAME}, {@link DbUtil#FLAG_NAME},
+	 * {@link DbUtil#TUREF_NAME}, or the prefixes {@link DbUtil#TEXT_PREFIX} and {@link DbUtil#CODES_PREFIX}.
+	 * @param name the field name to check.
+	 * @return true if the name is reserved for special fields.
+	 */
+	public static boolean isPreDefinedField (String name) {
+		return ( name.equals(DbUtil.SEGKEY_NAME)
+			|| name.equals(DbUtil.FLAG_NAME)
+			|| name.equals(DbUtil.TUREF_NAME)
+			|| name.startsWith(DbUtil.TEXT_PREFIX)
+			|| name.startsWith(DbUtil.CODES_PREFIX) );
+	}
+
+	/**
 	 * Gets the locale code of a given field name.
 	 * <p>Note that not all fields without a locale code are text unit level fields.
 	 * Use {@link #isSegmentField(String)} to check whether a field is segment level or text unit level.

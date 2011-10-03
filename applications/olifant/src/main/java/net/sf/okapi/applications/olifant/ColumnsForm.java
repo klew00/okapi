@@ -54,6 +54,8 @@ class ColumnsForm {
 	private final Button btMoveUp;
 	private final Button btMoveDown;
 	private final Button btAdd;
+	private final Button btDelete;
+	private final Button btRename;
 	private ArrayList<String> results = null;
 	private ITm tm;
 
@@ -80,10 +82,40 @@ class ColumnsForm {
 		gdTmp.heightHint = minListHeight;
 		lbAvailableFields.setLayoutData(gdTmp);
 		
+		// Buttons for the "available fields" list
+		
+		int minButtonWidth = 100;
+		btAdd = UIUtil.createGridButton(group, SWT.PUSH, "Add Fields...", minButtonWidth, 1);
+		btAdd.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING));
+		btAdd.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				addFields();
+			}
+		});
+		
+		btDelete = UIUtil.createGridButton(group, SWT.PUSH, "Delete Field...", minButtonWidth, 1);
+		btDelete.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING));
+		btDelete.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				deleteField();
+			}
+		});
+
+		btRename = UIUtil.createGridButton(group, SWT.PUSH, "Rename Field...", minButtonWidth, 1);
+		btRename.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING));
+		btRename.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				renameField();
+			}
+		});
+
+		UIUtil.setSameWidth(minButtonWidth, btAdd, btDelete, btRename);
+
+		
+		//--- Middle buttons
 		Composite cmp = new Composite(shell, SWT.NONE);
 		cmp.setLayout(new GridLayout());
 		
-		int minButtonWidth = 100;
 		btShow = UIUtil.createGridButton(cmp, SWT.PUSH, "Show >>", minButtonWidth, 1);
 		btShow.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_CENTER));
 		btShow.addSelectionListener(new SelectionAdapter() {
@@ -131,16 +163,6 @@ class ColumnsForm {
 		btMoveDown.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				moveDown();
-			}
-		});
-		
-		new Label(cmp, SWT.NONE); // Separator
-		
-		btAdd = UIUtil.createGridButton(cmp, SWT.PUSH, "Add Fields...", minButtonWidth, 1);
-		btAdd.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_CENTER));
-		btAdd.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				addField();
 			}
 		});
 		
@@ -335,7 +357,7 @@ class ColumnsForm {
 		}
 	}
 	
-	private void addField () {
+	private void addFields () {
 		try {
 			ArrayList<String> toDisplay = new ArrayList<String>(Arrays.asList(lbDisplayFields.getItems()));
 			toDisplay.remove(0);
@@ -344,6 +366,37 @@ class ColumnsForm {
 			if ( !dlg.showDialog() ) return; // Nothing changed
 			// Else: update the lists
 			updateLists(toDisplay);
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+	}
+	
+	private void deleteField () {
+		try {
+			int n = lbAvailableFields.getSelectionIndex();
+			if ( n < 0 ) return;
+			String fn = lbAvailableFields.getItem(n);
+			if ( DbUtil.isPreDefinedField(fn) ) {
+				Dialogs.showError(shell, "You cannot delete a special field.", null);
+			}
+			tm.deleteField(fn);
+			updateLists(new ArrayList<String>(Arrays.asList(lbDisplayFields.getItems())));
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+		}
+	}
+	
+	private void renameField () {
+		try {
+			int n = lbAvailableFields.getSelectionIndex();
+			if ( n < 0 ) return;
+//			String fn = lbAvailableFields.getItem(n);
+
+			
+			
+			updateLists(new ArrayList<String>(Arrays.asList(lbDisplayFields.getItems())));
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getMessage(), null);

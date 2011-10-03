@@ -36,7 +36,7 @@ public class RepositoryTest {
 		ProcesswithAPI.runMultipleTestsStep3(repo);
 		
 		repo = new Repository(null);
-//		ProcesswithAPI.runMultipleTestsStep4(repo);
+		ProcesswithAPI.runMultipleTestsStep4(repo);
 	}
 	
 }
