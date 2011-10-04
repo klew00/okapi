@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.UsingParameters;
@@ -277,7 +278,7 @@ public class ScopingReportStep extends CompoundStep {
 	protected Event handleEndBatch(Event event) {
 		IResource res = event.getResource();
 		if (res != null) {
-			resolver.resolve(res);
+			resolver.resolve(res, EventType.END_BATCH);
 			
 			gen.setField(PROJECT_TOTAL_WORD_COUNT, BaseCounter.getCount(res, GMX.TotalWordCount));
 			
@@ -481,7 +482,7 @@ public class ScopingReportStep extends CompoundStep {
 	protected Event handleEndBatchItem(Event event) {
 		IResource res = event.getResource();
 		if (res != null) {
-			resolver.resolve(res);
+			resolver.resolve(res, EventType.END_BATCH_ITEM);
 			
 			gen.setField(ITEM_TOTAL_WORD_COUNT, BaseCounter.getCount(res, GMX.TotalWordCount));
 			
@@ -550,7 +551,7 @@ public class ScopingReportStep extends CompoundStep {
 	
 	@Override
 	protected Event handleTextUnit (Event event) {
-		resolver.resolve(event.getTextUnit());
+		resolver.resolve(event.getTextUnit(), EventType.TEXT_UNIT);
 		return super.handleTextUnit(event);
 	}
 	
