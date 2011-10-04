@@ -180,7 +180,7 @@ public class ScopingReportStep extends CompoundStep {
 	private Parameters params;
 	private ReportGenerator gen;
 	private String rootDir;
-	private CategoryResolver resolver;
+//@	private CategoryResolver resolver;
 	
 	public ScopingReportStep() {
 		super();
@@ -247,12 +247,12 @@ public class ScopingReportStep extends CompoundStep {
 		list.add(new MTWordCountStep());
 		list.add(new ConcordanceWordCountStep());
 		
-		resolver = new CategoryResolver(list); // List should be filled up at this point
+//@		resolver = new CategoryResolver(list); // List should be filled up at this point
 	}
 
 	@Override
 	protected Event handleStartBatch(Event event) {
-		resolver.reset();
+		//@		resolver.reset();
 		params = getParameters(Parameters.class);
 		gen = new ReportGenerator(getTemplateStream());
 		DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
@@ -267,7 +267,7 @@ public class ScopingReportStep extends CompoundStep {
 	
 	@Override
 	protected Event handleStartBatchItem(Event event) {
-		resolver.reset();
+		//@		resolver.reset();
 		return super.handleStartBatchItem(event);
 	}
 	
@@ -278,7 +278,7 @@ public class ScopingReportStep extends CompoundStep {
 	protected Event handleEndBatch(Event event) {
 		IResource res = event.getResource();
 		if (res != null) {
-			resolver.resolve(res, EventType.END_BATCH);
+			//@			resolver.resolve(res, EventType.END_BATCH);
 			
 			gen.setField(PROJECT_TOTAL_WORD_COUNT, BaseCounter.getCount(res, GMX.TotalWordCount));
 			
@@ -482,7 +482,7 @@ public class ScopingReportStep extends CompoundStep {
 	protected Event handleEndBatchItem(Event event) {
 		IResource res = event.getResource();
 		if (res != null) {
-			resolver.resolve(res, EventType.END_BATCH_ITEM);
+			//@			resolver.resolve(res, EventType.END_BATCH_ITEM);
 			
 			gen.setField(ITEM_TOTAL_WORD_COUNT, BaseCounter.getCount(res, GMX.TotalWordCount));
 			
@@ -551,7 +551,7 @@ public class ScopingReportStep extends CompoundStep {
 	
 	@Override
 	protected Event handleTextUnit (Event event) {
-		resolver.resolve(event.getTextUnit(), EventType.TEXT_UNIT);
+		//@		resolver.resolve(event.getTextUnit(), EventType.TEXT_UNIT);
 		return super.handleTextUnit(event);
 	}
 	
