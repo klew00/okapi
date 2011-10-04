@@ -5,7 +5,7 @@
     <groupId>net.sf.okapi.filters</groupId>
     <version>0.15-SNAPSHOT</version>
   </parent>
-  <groupId>net.sf.okapi.filters</groupId>
+<!--  <groupId>net.sf.okapi.filters</groupId>-->
   <artifactId>okapi-filter-archive</artifactId>
   <name>Okapi Filter for Archive</name>
   <dependencies>

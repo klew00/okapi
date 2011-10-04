@@ -404,9 +404,9 @@ public class Manifest implements IAnnotation {
 			
 			writer.writeStartElement("PackageCreator");
 			
-			writer.writeElementString("CreatorName", getClass().getName());
+			writer.writeElementString("CreatorName", "unspecified");
 			writer.writeLineBreak();
-			writer.writeElementString("CreatorID", "urn:rainbowkit-creation-step");
+			writer.writeElementString("CreatorID", "urn:unspecified");
 			writer.writeLineBreak();
 			writer.writeElementString("CreatorUpdate", outputDate);
 			writer.writeLineBreak();
@@ -414,9 +414,9 @@ public class Manifest implements IAnnotation {
 			writer.writeStartElement("ContributorTool");
 			writer.writeElementString("ToolName", getClass().getName());
 			writer.writeLineBreak();
-			writer.writeElementString("ToolID", "undefined");
+			writer.writeElementString("ToolID", "urn:"+getClass().getName().replace('.', ':'));
 			writer.writeLineBreak();
-			writer.writeElementString("ToolVersion", "0.0");
+			writer.writeElementString("ToolVersion", "1.0");
 			writer.writeLineBreak();
 			writer.writeEndElementLineBreak(); // ContributorTool
 

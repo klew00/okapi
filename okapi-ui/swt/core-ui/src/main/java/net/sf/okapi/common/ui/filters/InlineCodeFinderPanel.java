@@ -205,9 +205,8 @@ public class InlineCodeFinderPanel extends Composite {
 		UIUtil.ensureWidth(btInsertPattern, buttonSet2Width);
 		btInsertPattern.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				//TODO: Implement real insert
-				//Dialogs.showError(getShell(), Res.getString("InlineCodeFinderPanel.8"), null); //$NON-NLS-1$
-				Util.openURL("http://java.sun.com/j2se/1.5.0/docs/api/java/util/regex/Pattern.html");
+				//TODO: Implement real insert. For now just open the help on Java regex patterns
+				Util.openURL("http://download.oracle.com/javase/6/docs/api/java/util/regex/Pattern.html"); //$NON-NLS-1$
 			};
 		});
 		

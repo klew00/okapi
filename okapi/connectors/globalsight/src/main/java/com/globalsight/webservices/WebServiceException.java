@@ -45,7 +45,7 @@ public class WebServiceException  extends org.apache.axis.AxisFault  implements 
     public synchronized boolean equals(java.lang.Object obj) {
         if (!(obj instanceof WebServiceException)) return false;
         WebServiceException other = (WebServiceException) obj;
-        if (obj == null) return false;
+        //if (obj == null) return false;
         if (this == obj) return true;
         if (__equalsCalc != null) {
             return (__equalsCalc == obj);
@@ -98,7 +98,7 @@ public class WebServiceException  extends org.apache.axis.AxisFault  implements 
     /**
      * Get Custom Serializer
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
     public static org.apache.axis.encoding.Serializer getSerializer(
            java.lang.String mechType, 
            java.lang.Class _javaType,  
@@ -111,7 +111,7 @@ public class WebServiceException  extends org.apache.axis.AxisFault  implements 
     /**
      * Get Custom Deserializer
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
     public static org.apache.axis.encoding.Deserializer getDeserializer(
            java.lang.String mechType, 
            java.lang.Class _javaType,  

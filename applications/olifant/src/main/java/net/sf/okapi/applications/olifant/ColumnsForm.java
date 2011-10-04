@@ -40,6 +40,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 
 class ColumnsForm {
@@ -239,10 +240,13 @@ class ColumnsForm {
 	}
 	
 	private void updateCommands () {
-		btShow.setEnabled(lbAvailableFields.getSelectionCount()>0);
-		btShowAll.setEnabled(lbAvailableFields.getItemCount()>0);
-		btShowAllTexts.setEnabled(lbAvailableFields.getItemCount()>0);
+		boolean hasAvailableFields = (lbAvailableFields.getItemCount()>0);
+		btShow.setEnabled(hasAvailableFields);
+		btShowAll.setEnabled(hasAvailableFields);
+		btShowAllTexts.setEnabled(hasAvailableFields);
 		updateMoveCommands();
+		btDelete.setEnabled(hasAvailableFields);
+		btRename.setEnabled(hasAvailableFields);
 	}
 	
 	private void updateMoveCommands () {
@@ -380,6 +384,16 @@ class ColumnsForm {
 			if ( DbUtil.isPreDefinedField(fn) ) {
 				Dialogs.showError(shell, "You cannot delete a special field.", null);
 			}
+			
+			// Ask confirmation
+			MessageBox dlg = new MessageBox(shell, SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
+			dlg.setMessage(String.format(
+				"This command will delete the field '%s' in the TM '%s'.\nThis operation cannot be undone.\nDo you want to proceed?",
+				fn, tm.getName()));
+			if ( dlg.open() != SWT.YES ) {
+				return; // Cancel or no.
+			}
+			
 			tm.deleteField(fn);
 			updateLists(new ArrayList<String>(Arrays.asList(lbDisplayFields.getItems())));
 		}
@@ -393,8 +407,9 @@ class ColumnsForm {
 			int n = lbAvailableFields.getSelectionIndex();
 			if ( n < 0 ) return;
 //			String fn = lbAvailableFields.getItem(n);
-
 			
+//todo			
+			Dialogs.showWarning(shell, "Not implemented yet.", null);
 			
 			updateLists(new ArrayList<String>(Arrays.asList(lbDisplayFields.getItems())));
 		}

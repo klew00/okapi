@@ -408,6 +408,9 @@ public class ProcesswithAPI {
 		assertFalse(tm.getAvailableFields().contains(newFieldName));
 		assertTrue(tm.getAvailableFields().contains(newName));
 		
+		tm.deleteField(newName);
+		assertFalse(tm.getAvailableFields().contains(newFieldName));
+		
 		repo.close();
 	}
 	

@@ -825,9 +825,30 @@ public class Tm implements ITm {
 		if ( DbUtil.isPreDefinedField(fullName) ) {
 			return;
 		}
+		String suffix = "_TU";
+		if ( DbUtil.isSegmentField(fullName) ) suffix = "_SEG";
 		
-		// TODO
-		
+		Statement stm = null;
+		try {
+			stm = store.getConnection().createStatement();
+			String tmp = String.format("ALTER TABLE \"%s%s\" DROP COLUMN \"%s\"",
+				name, suffix, fullName);
+			stm.execute(tmp);
+		}
+		catch ( SQLException e ) {
+			throw new RuntimeException(e);
+		}
+		finally {
+			try {
+				if ( stm != null ) {
+					stm.close();
+					stm = null;
+				}
+			}
+			catch ( SQLException e ) {
+				throw new RuntimeException(e);
+			}
+		}
 	}
 
 	@Override

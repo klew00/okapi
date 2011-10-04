@@ -63,7 +63,6 @@ public class FilterTestDriver {
 
 	private boolean showSkeleton = true;
 	private int displayLevel = 0;
-	private int warnings;
 	private boolean ok;
 
 	static public boolean laxCompareEvent(Event manual, Event generated) {
@@ -426,7 +425,6 @@ public class FilterTestDriver {
 	 */
 	public boolean process(IFilter filter) {
 		ok = true;
-		warnings = 0;
 		int startDoc = 0;
 		int endDoc = 0;
 		int startGroup = 0;
@@ -558,21 +556,18 @@ public class FilterTestDriver {
 		String tmp = startDoc.getEncoding();
 		if ((tmp == null) || (tmp.length() == 0)) {
 			System.err.println("WARNING: No encoding specified in StartDocument.");
-			warnings++;
 		} else if (displayLevel > 1)
 			System.out.println("StartDocument encoding = " + tmp);
 
 		LocaleId locId = startDoc.getLocale();
 		if (Util.isNullOrEmpty(locId)) {
 			System.err.println("WARNING: No language specified in StartDocument.");
-			warnings++;
 		} else if (displayLevel > 1)
 			System.out.println("StartDocument language = " + locId.toString());
 
 		tmp = startDoc.getName();
 		if ((tmp == null) || (tmp.length() == 0)) {
 			System.err.println("WARNING: No name specified in StartDocument.");
-			warnings++;
 		} else if (displayLevel > 1)
 			System.out.println("StartDocument name = " + tmp);
 

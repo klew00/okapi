@@ -75,7 +75,7 @@ public class ClGatewayLocator extends org.apache.axis.client.Service implements 
      * If this service has no port for the given interface,
      * then ServiceException is thrown.
      */
-    @SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public java.rmi.Remote getPort(Class serviceEndpointInterface) throws javax.xml.rpc.ServiceException {
         try {
             if (com.crosslang.gateway.clgateway.CLGateway.class.isAssignableFrom(serviceEndpointInterface)) {
@@ -95,7 +95,7 @@ public class ClGatewayLocator extends org.apache.axis.client.Service implements 
      * If this service has no port for the given interface,
      * then ServiceException is thrown.
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
 	public java.rmi.Remote getPort(javax.xml.namespace.QName portName, Class serviceEndpointInterface) throws javax.xml.rpc.ServiceException {
         if (portName == null) {
             return getPort(serviceEndpointInterface);
@@ -115,10 +115,10 @@ public class ClGatewayLocator extends org.apache.axis.client.Service implements 
         return new javax.xml.namespace.QName("http://impl.gateway.ws.clgateway.crosslang.com/", "clGateway");
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
 	private java.util.HashSet ports = null;
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public java.util.Iterator getPorts() {
         if (ports == null) {
             ports = new java.util.HashSet();

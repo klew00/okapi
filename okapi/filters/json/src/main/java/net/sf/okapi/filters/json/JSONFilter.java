@@ -88,8 +88,6 @@ public class JSONFilter implements IFilter {
 	private String docName;
 	private LinkedList<Event> queue;
 	private boolean canceled;
-	private int objectCount;
-	private int arrayCount;
 	private int current;
 	private int startRead;
 	private StringBuilder buffer;
@@ -227,8 +225,6 @@ public class JSONFilter implements IFilter {
 		// Set the input string
 		inputText = tmp.toString().replace(lineBreak, "\n");
 		current = 0;
-		objectCount = 0;
-		arrayCount = 0;
 		tuId = 0;
 		otherId = 0;
 		buffer = new StringBuilder();
@@ -332,16 +328,12 @@ public class JSONFilter implements IFilter {
 			
 			switch ( inputText.charAt(++current) ) {
 			case '{':
-				objectCount++;
 				return TOKEN.STARTOBJECT;
 			case '}':
-				objectCount--;
 				return TOKEN.ENDOBJECT;
 			case '[':
-				arrayCount++;
 				return TOKEN.STARTARRAY;
 			case ']':
-				arrayCount--;
 				return TOKEN.ENDARRAY;
 			case ':':
 				return TOKEN.KEYVALUESEP;

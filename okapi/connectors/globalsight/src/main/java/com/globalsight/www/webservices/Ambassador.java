@@ -7,7 +7,7 @@
 
 package com.globalsight.www.webservices;
 
-@SuppressWarnings("unchecked")
+@SuppressWarnings("rawtypes")
 public interface Ambassador extends java.rmi.Remote {
     public java.lang.String getUserInfo(java.lang.String p_accessToken, java.lang.String p_userId) throws java.rmi.RemoteException, com.globalsight.webservices.WebServiceException;
     public java.lang.String getVersion(java.lang.String p_accessToken) throws java.rmi.RemoteException, com.globalsight.webservices.WebServiceException;

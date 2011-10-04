@@ -22,7 +22,7 @@ public class TestUtil {
      * of the classpath.
      * @return The path of directory which contains the file
      */
-    @SuppressWarnings({ "unchecked"})
+	@SuppressWarnings("rawtypes")
 	public static String getParentDir(Class clazz, String filepath) {
         URL url = clazz.getResource(filepath);
         String parentDir = null;

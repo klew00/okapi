@@ -332,7 +332,7 @@ public class PluginsManager {
 	 * Workaround for non-released jar file lock by URLClassLoader
 	 * http://loracular.blogspot.com/2009/12/dynamic-class-loader-with.html
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public static void closeOpenJars(ClassLoader classLoader) {
 		if (!(classLoader instanceof URLClassLoader)) return;
 		try {
@@ -364,111 +364,110 @@ public class PluginsManager {
 		}
 	}
 
-	  /**
-	   * cleanup jar file factory cache
-	   * http://loracular.blogspot.com/2009/12/dynamic-class-loader-with.html
-	   */
-	  @SuppressWarnings("unchecked")
-	  public static boolean cleanupJarFileFactory(String... jarNames)
-	  {
+	/**
+	 * cleanup jar file factory cache
+	 * http://loracular.blogspot.com/2009/12/dynamic-class-loader-with.html
+	 */
+	@SuppressWarnings("rawtypes")
+	public static boolean cleanupJarFileFactory (String... jarNames) {
 		List<String> setJarFileNames2Close = ListUtil.arrayAsList(jarNames);  
-	    boolean res = false;
-	    Class<?> classJarURLConnection = null;
-	    classJarURLConnection = ClassUtil.getClass("sun.net.www.protocol.jar.JarURLConnection");
-	    if (classJarURLConnection == null) {
-	      return res;
-	    }
-	    Field f = null;
-	    try {
-	      f = classJarURLConnection.getDeclaredField("factory");
-	    } catch (NoSuchFieldException e) {
-	      //ignore
-	    }
-	    if (f == null) {
-	      return res;
-	    }
-	    f.setAccessible(true);
-	    Object obj = null;
-	    try {
-	      obj = f.get(null);
-	    } catch (IllegalAccessException e) {
-	      //ignore
-	    }
-	    if (obj == null) {
-	      return res;
-	    }
-	    Class<?> classJarFileFactory = obj.getClass();
-	    //
-	    HashMap fileCache = null;
-	    try {
-	      f = classJarFileFactory.getDeclaredField("fileCache");
-	      f.setAccessible(true);
-	      obj = f.get(null);
-	      if (obj instanceof HashMap) {
-	        fileCache = (HashMap)obj;
-	      }
-	    } catch (NoSuchFieldException e) {
-	    } catch (IllegalAccessException e) {
-	      //ignore
-	    }
-	    HashMap urlCache = null;
-	    try {
-	      f = classJarFileFactory.getDeclaredField("urlCache");
-	      f.setAccessible(true);
-	      obj = f.get(null);
-	      if (obj instanceof HashMap) {
-	        urlCache = (HashMap)obj;
-	      }
-	    } catch (NoSuchFieldException e) {
-	    } catch (IllegalAccessException e) {
-	      //ignore
-	    }
-	    if (urlCache != null) {
-	      HashMap urlCacheTmp = (HashMap)urlCache.clone();
-	      Iterator it = urlCacheTmp.keySet().iterator();
-	      while (it.hasNext()) {
-	        obj = it.next();
-	        if (!(obj instanceof JarFile)) {
-	          continue;
-	        }
-	        JarFile jarFile = (JarFile)obj;
-	        if (setJarFileNames2Close.contains(jarFile.getName())) {
-	          try {
-	            jarFile.close();
-	          } catch (IOException e) {
-	            //ignore
-	          }
-	          if (fileCache != null) {
-	            fileCache.remove(urlCache.get(jarFile));
-	          }
-	          urlCache.remove(jarFile);
-	        }
-	      }
-	      res = true;
-	    } else if (fileCache != null) {
-	      // urlCache := null
-	      HashMap fileCacheTmp = (HashMap)fileCache.clone();
-	      Iterator it = fileCacheTmp.keySet().iterator();
-	      while (it.hasNext()) {
-	        Object key = it.next();
-	        obj = fileCache.get(key);
-	        if (!(obj instanceof JarFile)) {
-	          continue;
-	        }
-	        JarFile jarFile = (JarFile)obj;
-	        if (setJarFileNames2Close.contains(jarFile.getName())) {
-	          try {
-	            jarFile.close();
-	          } catch (IOException e) {
-	            //ignore
-	          }
-	          fileCache.remove(key);
-	        }
-	      }
-	      res = true;
-	    }
-	    setJarFileNames2Close.clear();
-	    return res;
+		boolean res = false;
+		Class<?> classJarURLConnection = null;
+		classJarURLConnection = ClassUtil.getClass("sun.net.www.protocol.jar.JarURLConnection");
+		if (classJarURLConnection == null) {
+			return res;
+		}
+		Field f = null;
+		try {
+			f = classJarURLConnection.getDeclaredField("factory");
+		} catch (NoSuchFieldException e) {
+			//ignore
+		}
+		if (f == null) {
+			return res;
+		}
+		f.setAccessible(true);
+		Object obj = null;
+		try {
+			obj = f.get(null);
+		} catch (IllegalAccessException e) {
+			//ignore
+		}
+		if (obj == null) {
+			return res;
+		}
+		Class<?> classJarFileFactory = obj.getClass();
+		//
+		HashMap fileCache = null;
+		try {
+			f = classJarFileFactory.getDeclaredField("fileCache");
+			f.setAccessible(true);
+			obj = f.get(null);
+			if (obj instanceof HashMap) {
+				fileCache = (HashMap)obj;
+			}
+		} catch (NoSuchFieldException e) {
+		} catch (IllegalAccessException e) {
+			//ignore
+		}
+		HashMap urlCache = null;
+		try {
+			f = classJarFileFactory.getDeclaredField("urlCache");
+			f.setAccessible(true);
+			obj = f.get(null);
+			if (obj instanceof HashMap) {
+				urlCache = (HashMap)obj;
+			}
+		} catch (NoSuchFieldException e) {
+		} catch (IllegalAccessException e) {
+			//ignore
+		}
+		if (urlCache != null) {
+			HashMap urlCacheTmp = (HashMap)urlCache.clone();
+			Iterator it = urlCacheTmp.keySet().iterator();
+			while (it.hasNext()) {
+				obj = it.next();
+				if (!(obj instanceof JarFile)) {
+					continue;
+				}
+				JarFile jarFile = (JarFile)obj;
+				if (setJarFileNames2Close.contains(jarFile.getName())) {
+					try {
+						jarFile.close();
+					} catch (IOException e) {
+						//ignore
+					}
+					if (fileCache != null) {
+						fileCache.remove(urlCache.get(jarFile));
+					}
+					urlCache.remove(jarFile);
+				}
+			}
+			res = true;
+		} else if (fileCache != null) {
+			// urlCache := null
+			HashMap fileCacheTmp = (HashMap)fileCache.clone();
+			Iterator it = fileCacheTmp.keySet().iterator();
+			while (it.hasNext()) {
+				Object key = it.next();
+				obj = fileCache.get(key);
+				if (!(obj instanceof JarFile)) {
+					continue;
+				}
+				JarFile jarFile = (JarFile)obj;
+				if (setJarFileNames2Close.contains(jarFile.getName())) {
+					try {
+						jarFile.close();
+					} catch (IOException e) {
+						//ignore
+					}
+					fileCache.remove(key);
+				}
+			}
+			res = true;
+		}
+		setJarFileNames2Close.clear();
+		return res;
 	  }
 	
 }

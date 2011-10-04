@@ -7,7 +7,7 @@
 
 package com.crosslang.gateway.clgateway;
 
-@SuppressWarnings("unchecked")
+@SuppressWarnings("rawtypes")
 public class PermanentServerExceptionBean  extends org.apache.axis.AxisFault  implements java.io.Serializable {
 	
 	private static final long serialVersionUID = 3083695564471921783L;
@@ -46,7 +46,7 @@ public class PermanentServerExceptionBean  extends org.apache.axis.AxisFault  im
     public synchronized boolean equals(java.lang.Object obj) {
         if (!(obj instanceof PermanentServerExceptionBean)) return false;
         PermanentServerExceptionBean other = (PermanentServerExceptionBean) obj;
-        if (obj == null) return false;
+//        if (obj == null) return false;
         if (this == obj) return true;
         if (__equalsCalc != null) {
             return (__equalsCalc == obj);

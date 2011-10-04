@@ -7,7 +7,7 @@
 
 package com.globalsight.www.webservices;
 
-@SuppressWarnings("unchecked")
+@SuppressWarnings("rawtypes")
 public class AmbassadorWebServiceSoapBindingStub extends org.apache.axis.client.Stub implements com.globalsight.www.webservices.Ambassador {
     private java.util.Vector cachedSerClasses = new java.util.Vector();
     private java.util.Vector cachedSerQNames = new java.util.Vector();
@@ -789,6 +789,7 @@ public class AmbassadorWebServiceSoapBindingStub extends org.apache.axis.client.
          super.cachedEndpoint = endpointURL;
     }
 
+	@SuppressWarnings("unchecked")
 	public AmbassadorWebServiceSoapBindingStub(javax.xml.rpc.Service service) throws org.apache.axis.AxisFault {
         if (service == null) {
             super.service = new org.apache.axis.client.Service();

@@ -243,7 +243,6 @@ public class Database {
 				pstm.setString(1, tu.getType());
 				pstm.setString(6, grpName);
 				pstm.setString(7, fileName);
-				int segIndex = 0;
 				ISegments trgSegs = trgCont.getSegments();
 				for ( Segment srcSeg : srcCont.getSegments() ) {
 					pstm.setString(2, srcSeg.text.getCodedText());
@@ -255,7 +254,6 @@ public class Database {
 						pstm.setString(5, Code.codesToString(trgSeg.text.getCodes(), true));
 						pstm.execute();
 						count++;
-						segIndex++;
 					}
 				}
 			}

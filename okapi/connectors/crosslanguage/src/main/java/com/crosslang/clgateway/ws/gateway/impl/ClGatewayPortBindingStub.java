@@ -7,7 +7,7 @@
 
 package com.crosslang.clgateway.ws.gateway.impl;
 
-@SuppressWarnings("unchecked")
+@SuppressWarnings("rawtypes")
 public class ClGatewayPortBindingStub extends org.apache.axis.client.Stub implements com.crosslang.gateway.clgateway.CLGateway {
     private java.util.Vector cachedSerClasses = new java.util.Vector();
     private java.util.Vector cachedSerQNames = new java.util.Vector();
@@ -269,7 +269,8 @@ public class ClGatewayPortBindingStub extends org.apache.axis.client.Stub implem
          super.cachedEndpoint = endpointURL;
     }
 
-    public ClGatewayPortBindingStub(javax.xml.rpc.Service service) throws org.apache.axis.AxisFault {
+    @SuppressWarnings("unchecked")
+	public ClGatewayPortBindingStub(javax.xml.rpc.Service service) throws org.apache.axis.AxisFault {
         if (service == null) {
             super.service = new org.apache.axis.client.Service();
         } else {

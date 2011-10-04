@@ -43,7 +43,7 @@ public class IDMLContext {
 	private Node scopeNode;
 //	private Node contentNode;
 	private TextFragment tf;
-	private int status;
+//	private int status;
 	private boolean isReferent;
 	private IDMLSkeleton skel;
 	private String tuId;
@@ -67,7 +67,7 @@ public class IDMLContext {
 		this.scopeNode = scopeNode;
 		this.tuId = tuId;
 		tf = new TextFragment();
-		status = 0;
+		//status = 0;
 		inScope = true;
 	}
 
@@ -134,7 +134,7 @@ public class IDMLContext {
 			IDMLFilter.processContent(elem, tf);
 			tf.append(TagType.CLOSING, "code", buildEndTag(elem));
 		}
-		status++;
+		//status++;
 //		contentNode = elem;
 	}
 	
