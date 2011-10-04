@@ -37,9 +37,14 @@ public abstract class AltAnnotationBasedCountStep extends BaseCountStep {
 	private boolean acceptATA(AltTranslationsAnnotation ata) {
 		if (ata == null) return false;
 		
-		for (AltTranslation at : ata) {
-			if (at == null) continue;
-			
+//		for (AltTranslation at : ata) {
+//			if (at == null) continue;
+//			
+//			MatchType type = at.getType();
+//			if (accept(type)) return true;
+//		}
+		AltTranslation at = ata.getFirst(); // The top match only
+		if (at != null) {
 			MatchType type = at.getType();
 			if (accept(type)) return true;
 		}

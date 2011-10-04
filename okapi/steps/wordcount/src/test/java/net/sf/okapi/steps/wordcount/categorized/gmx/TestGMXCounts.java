@@ -73,14 +73,14 @@ public class TestGMXCounts {
 		ata.add(new AltTranslation(LocaleId.ENGLISH, LocaleId.FRENCH, tu.getSource().getFirstContent(), null, null, MatchType.EXACT_UNIQUE_ID, 100, null));
 		logger.fine(TextUnitLogger.getTuInfo(tu, LocaleId.ENGLISH));
 		
-		bcs = new GMXExactMatchedWordCountStep();
+		bcs = new GMXLeveragedMatchedWordCountStep();
 		bcs.setSourceLocale(LocaleId.ENGLISH);
 		bcs.setTargetLocale(LocaleId.FRENCH);
 		bcs.handleEvent(sdEvent);
 		bcs.handleEvent(tuEvent);
 		logger.fine(TextUnitLogger.getTuInfo(tu, LocaleId.ENGLISH));
 		
-		assertEquals(3, BaseCounter.getCount(tu, GMX.ExactMatchedWordCount)); //
+		assertEquals(3, BaseCounter.getCount(tu, GMX.LeveragedMatchedWordCount));
 	}
 
 	@Test
