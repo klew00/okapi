@@ -21,8 +21,10 @@
 package net.sf.okapi.common.resource;
 
 import net.sf.okapi.common.IResource;
+import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.filterwriter.GenericContent;
+import net.sf.okapi.common.skeleton.GenericSkeleton;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -417,7 +419,23 @@ public class TextUnitTest {
         assertSame("Properties should be the same", p1, tu1.getTargetProperty(locFR, "name"));
     }
 
-
+    @Test
+    public void testTextUnitClone() {
+    	TextUnit tu1 = new TextUnit("tu1");
+    	GenericSkeleton skel = new GenericSkeleton();
+    	skel.add("partBefore");
+    	skel.addContentPlaceholder(tu1);
+    	skel.add("partAfter");
+    	assertEquals(3, skel.getParts().size());
+    	assertEquals(tu1, skel.getParts().get(1).getParent());
+    	tu1.setSkeleton(skel);
+    	
+    	TextUnit tu2 = tu1.clone();
+    	assertTrue(tu2.getSkeleton() instanceof GenericSkeleton);
+    	GenericSkeleton newSkel = (GenericSkeleton) tu2.getSkeleton();    	
+    	assertEquals(3, newSkel.getParts().size());
+    	assertEquals(tu2, newSkel.getParts().get(1).getParent());
+    }
 
     //utility methods
 

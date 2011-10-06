@@ -22,6 +22,7 @@ package net.sf.okapi.common.resource;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -547,11 +548,14 @@ public class TextUnit implements ITextUnit {
         if (this.getSkeleton() instanceof GenericSkeleton) {
         	GenericSkeleton skel = (GenericSkeleton) this.getSkeleton();
         	GenericSkeleton newSkel = new GenericSkeleton();        	
+        	List<GenericSkeletonPart> newParts = newSkel.getParts();
+        	
         	for (GenericSkeletonPart part : skel.getParts()) {
 				if (TextFragment.makeRefMarker("$self$").equals(part.toString()) && part.getParent() == this) {
 					// Change the parent ref from this to new tu
 					part = new GenericSkeletonPart(part.getData().toString(), tu, part.getLocale());
 				}
+				newParts.add(part);
 			}
         	tu.setSkeleton(newSkel);
         }
