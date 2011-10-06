@@ -31,6 +31,8 @@ import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.annotation.Annotations;
 import net.sf.okapi.common.annotation.IAnnotation;
+import net.sf.okapi.common.skeleton.GenericSkeleton;
+import net.sf.okapi.common.skeleton.GenericSkeletonPart;
 
 /**
  * Basic unit of extraction from a filter and also the resource associated with
@@ -520,7 +522,6 @@ public class TextUnit implements ITextUnit {
         tu.setName(getName());
         tu.setPreserveWhitespaces(preserveWS);
         tu.setReferenceCount(getReferenceCount());
-        tu.setSkeleton(getSkeleton());
         tu.setSource(getSource().clone());
         tu.setType(getType());
 
@@ -542,6 +543,22 @@ public class TextUnit implements ITextUnit {
             tu.setTarget(entry.getKey(), entry.getValue().clone());
         }
 
+        // Set the skeleton fixing tu references in skeleton parts
+        if (this.getSkeleton() instanceof GenericSkeleton) {
+        	GenericSkeleton skel = (GenericSkeleton) this.getSkeleton();
+        	GenericSkeleton newSkel = new GenericSkeleton();        	
+        	for (GenericSkeletonPart part : skel.getParts()) {
+				if (TextFragment.makeRefMarker("$self$").equals(part.toString()) && part.getParent() == this) {
+					// Change the parent ref from this to new tu
+					part = new GenericSkeletonPart(part.getData().toString(), tu, part.getLocale());
+				}
+			}
+        	tu.setSkeleton(newSkel);
+        }
+        else {
+        	tu.setSkeleton(this.getSkeleton());
+        }
+        
         return tu;
     }
 
