@@ -452,5 +452,30 @@ public final class FileUtil {
 			}
 		} 
 	}
+	
+	
+	/**
+	 * Delete all files in the specified directory.
+	 * @throws OkapiIOException if a file cannot be deleted.
+	 * @param directoryPath - the path to the directory
+	 */
+	public static void deleteAllFilesinDirectory(String directoryPath) {
+		File directory = new File(directoryPath);
+		// Get all files in directory
+		File[] files = directory.listFiles();
+		
+		if (files == null) {
+			throw new OkapiIOException("Error finding directory: " + directoryPath);
+		}
+		
+		for (File file : files)
+		{
+		   // Delete each file
+		   if (!file.delete())
+		   {
+		       throw new OkapiIOException("Error deleting file: " + file.getPath());
+		   }
+		}
+	}
 
 }
