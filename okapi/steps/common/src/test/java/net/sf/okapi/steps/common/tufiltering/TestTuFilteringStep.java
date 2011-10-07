@@ -22,6 +22,7 @@ package net.sf.okapi.steps.common.tufiltering;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.resource.ITextUnit;
@@ -68,6 +69,7 @@ public class TestTuFilteringStep {
 			// Correct behavior is to throw an exception here 
 			return;
 		}
+		fail("Exception should have been thrown");
 	}
 	
 	@Test
@@ -84,6 +86,7 @@ public class TestTuFilteringStep {
 			// Correct behavior is to throw an exception here 
 			return;
 		}
+		fail("Exception should have been thrown");
 	}
 	
 	@Test
