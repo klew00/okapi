@@ -62,25 +62,15 @@ public class TuFilteringStep extends BasePipelineStep {
 
 	private void initFilter() {
 		if (tuFilter == null) {
-			if (!Util.isEmpty(params.getTuFilterClassName())) {
-				try {
-					tuFilter = (ITextUnitFilter) ClassUtil.instantiateClass(params.getTuFilterClassName());
-				} catch (Exception e) {
-					// tuFilter remains null
-					LOGGER.severe(e.toString());
-				}
+			if (Util.isEmpty(params.getTuFilterClassName())) {
+				throw new RuntimeException("Text Unit filter class is not specified in step parameters.");
+			}
+			try {
+				tuFilter = (ITextUnitFilter) ClassUtil.instantiateClass(params.getTuFilterClassName());
+			} catch (Exception e) {
+				throw new RuntimeException(String.format("Cannot instantiate the specified Text Unit filter (%s)", e.toString()));
 			}
 		}
-		if (tuFilter == null) {
-			tuFilter = new ITextUnitFilter() {
-				
-				@Override
-				public boolean accept(ITextUnit tu) {
-					// Let all TUs go unmodified (retaining their translatable/non-translatable status)
-					return false;
-				}
-			};
-		}		
 	}
 	
 	/**
