@@ -50,6 +50,11 @@ public class TuFilteringStep extends BasePipelineStep {
 	}
 	
 	@Override
+	public void setParameters(IParameters params) {
+		this.params = (Parameters) params;
+	}
+	
+	@Override
 	public String getName() {
 		return "Text Unit Filtering";
 	}

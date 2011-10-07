@@ -56,7 +56,7 @@ public class TestTuFilteringStep {
 	}
 	
 	@Test
-	public void testDefaultFiltering() {
+	public void testEmptyParameters() {
 		TuFilteringStep tfs = new TuFilteringStep();
 		
 		try {
@@ -68,6 +68,46 @@ public class TestTuFilteringStep {
 			// Correct behavior is to throw an exception here 
 			return;
 		}
+	}
+	
+	@Test
+	public void testNullParameters() {
+		TuFilteringStep tfs = new TuFilteringStep();
+		tfs.setParameters(null);
+		
+		try {
+			tfs.handleEvent(sbe);
+			tfs.handleEvent(tue1);
+			tfs.handleEvent(tue2);
+			tfs.handleEvent(tue3);
+		} catch (Exception e) {
+			// Correct behavior is to throw an exception here 
+			return;
+		}
+	}
+	
+	@Test
+	public void testDefaultFiltering() {
+		TuFilteringStep tfs = new TuFilteringStep(new ITextUnitFilter() {
+			
+			@Override
+			public boolean accept(ITextUnit tu) {
+				return false;
+			}
+		});
+		
+		assertTrue(tu1.isTranslatable());
+		assertTrue(tu2.isTranslatable());
+		assertTrue(tu3.isTranslatable());
+		
+		tfs.handleEvent(sbe);
+		tfs.handleEvent(tue1);
+		tfs.handleEvent(tue2);
+		tfs.handleEvent(tue3);
+		
+		assertTrue(tu1.isTranslatable());
+		assertTrue(tu2.isTranslatable());
+		assertTrue(tu3.isTranslatable());
 	}
 	
 	@Test
