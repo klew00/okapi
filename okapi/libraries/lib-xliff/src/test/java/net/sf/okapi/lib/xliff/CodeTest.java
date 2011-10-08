@@ -108,4 +108,58 @@ public class CodeTest {
 		assertTrue(code.canChangeParent());
 	}
 
+	@Test
+	public void testEquals () {
+		assertTrue(new Code(InlineType.PLACEHOLDER, "1", null).equals(
+			new Code(InlineType.PLACEHOLDER, "1", null)));
+		assertFalse(new Code(InlineType.PLACEHOLDER, "1", null).equals(
+			new Code(InlineType.PLACEHOLDER, "2", null)));
+		assertFalse(new Code(InlineType.PLACEHOLDER, "1", null).equals(
+			new Code(InlineType.OPENING, "1", null)));
+		assertFalse(new Code(InlineType.PLACEHOLDER, "1", null).equals(
+			new Code(InlineType.PLACEHOLDER, "1", "data")));
+		
+		ICode code1 = new Code(InlineType.PLACEHOLDER, "1", "d1");
+		code1.setDisp("di1");
+		code1.setEquiv("eq1");
+		code1.setSubFlows("sf1");
+		code1.setCanDelete(false);
+		code1.setType("ty1");
+
+		ICode code2 = new Code(InlineType.PLACEHOLDER, "1", "d1");
+		code2.setDisp("di1");
+		code2.setEquiv("eq1");
+		code2.setSubFlows("sf1");
+		code2.setCanDelete(false);
+		code2.setType("ty1");
+		
+		assertTrue(code1.equals(code2));
+		
+		code2.setType("ty2");
+		assertFalse(code1.equals(code2));
+		code2.setType("ty1");
+		assertTrue(code1.equals(code2));
+		
+		code2.setEquiv("eq2");
+		assertFalse(code1.equals(code2));
+		code2.setEquiv("eq1");
+		assertTrue(code1.equals(code2));
+		
+		code2.setDisp("di2");
+		assertFalse(code1.equals(code2));
+		code2.setDisp("di1");
+		assertTrue(code1.equals(code2));
+		
+		code2.setSubFlows("sf2");
+		assertFalse(code1.equals(code2));
+		code2.setSubFlows("sf1");
+		assertTrue(code1.equals(code2));
+		
+		code2.setCanReplicate(false);
+		assertFalse(code1.equals(code2));
+		code2.setCanReplicate(true);
+		assertTrue(code1.equals(code2));
+		
+		
+	}
 }

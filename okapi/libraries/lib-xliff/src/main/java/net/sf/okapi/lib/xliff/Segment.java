@@ -35,6 +35,7 @@ public class Segment extends Part implements IWithCandidates, IWithNotes {
 
 	private String id;
 	private boolean translatable = true;
+	private boolean preserveWS = false;
 	private ArrayList<ICandidate> candidates;
 	private ArrayList<INote> notes;
 	
@@ -56,6 +57,14 @@ public class Segment extends Part implements IWithCandidates, IWithNotes {
 	
 	public void setTranslatable (boolean translatable) {
 		this.translatable = translatable;
+	}
+	
+	public boolean getPreserveWS () {
+		return preserveWS;
+	}
+	
+	public void setPreserveWS (boolean preserveWS) {
+		this.preserveWS = preserveWS;
 	}
 	
 	@Override

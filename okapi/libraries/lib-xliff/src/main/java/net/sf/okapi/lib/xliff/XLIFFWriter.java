@@ -156,7 +156,7 @@ public class XLIFFWriter {
 			writeStartGroup(event.getGroupData());
 			break;
 			
-		case EXTRACTION_UNIT:
+		case TEXT_UNIT:
 			writeUnit(event.getUnit());
 			break;
 			

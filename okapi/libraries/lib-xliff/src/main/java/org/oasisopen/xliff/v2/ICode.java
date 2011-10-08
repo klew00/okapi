@@ -73,5 +73,7 @@ public interface ICode extends Serializable {
 	public boolean canChangeParent ();
 
 	public void setCanChangeParent (boolean canChangeParent);
+	
+	public boolean equals (ICode code);
 
 }

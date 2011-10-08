@@ -105,7 +105,7 @@ public class XLIFFReaderTest {
 		String text = "<?xml version='1.0'?>\n<xliff version=\"2.0\" xmlns=\"urn:oasis:names:tc:xliff:document:2.0\">"
 			+ "<file srclang=\"en\" tgtlang=\"fr\">\n<unit id=\"id\"><segment>\n"
 			+ "<source>"
-			+ "<sc id=\"1\" equiv=\"eq1\" disp=\"di1\"/>t1<pc id=\"2\" equiv=\"eq2\" disp=\"di2\">t2"
+			+ "<sc id=\"1\" equiv=\"eq1\" disp=\"di1\"/>t1<pc id=\"2\" equivStart=\"eq2\" dispStart=\"di2\">t2"
 				+ "<ph id=\"3\" equiv=\"eq3\" disp=\"di3\"/>t3"
 				+ "</pc><ec rid=\"1\" equiv=\"eq1e\" disp=\"di1e\"/>"
 			+ "</source>"
@@ -157,7 +157,7 @@ public class XLIFFReaderTest {
 	}
 	
 	@Test
-	public void testTranslatble () {
+	public void testTranslatable () {
 		String text = "<?xml version='1.0'?>\n<xliff version=\"2.0\" xmlns=\"urn:oasis:names:tc:xliff:document:2.0\">"
 			+ "<file srclang=\"en\" tgtlang=\"fr\">\n<unit id=\"id\">"
 			+ "<segment>"
@@ -175,6 +175,28 @@ public class XLIFFReaderTest {
 		assertTrue(((Segment)unit.getPart(0)).isTranslatable());
 		assertFalse(((Segment)unit.getPart(1)).isTranslatable());
 		assertTrue(((Segment)unit.getPart(2)).isTranslatable());
+	}
+	
+	@Test
+	public void testWhiteSpaces () {
+		String text = "<?xml version='1.0'?>\n<xliff version=\"2.0\" xmlns=\"urn:oasis:names:tc:xliff:document:2.0\">"
+			+ "<file srclang=\"en\" tgtlang=\"fr\">\n<unit id=\"id\">"
+			+ "<segment>"
+			+ "<source>a  b \t c <ph id=\"1\">a  b</ph></source>"
+			+ "</segment>"
+			+ "<segment>"
+			+ "<source xml:space=\"preserve\">a  b \t c <ph id=\"1\">a  b</ph></source>"
+			+ "</segment>"
+			+ "<segment>"
+			+ "<source xml:space=\"default\">a  b \t c <ph id=\"1\">a  b</ph></source>"
+			+ "</segment>"
+			+ "</unit>\n</file></xliff>";
+		Unit unit = getUnit(text, 1);
+		assertNotNull(unit);
+		
+		Segment seg = (Segment)unit.getPart(0);
+		assertEquals("a  b \t c <ph id=\"1\">a  b</ph>", seg.getSource().toXLIFF(IFragment.STYLE_DATAINSIDE));
+		
 	}
 	
 	@Test
@@ -325,7 +347,7 @@ public class XLIFFReaderTest {
 				assertEquals("fr", sd.getTargetLanguage());
 				break;
 			case 2:
-				assertTrue(e.getType() == XLIFFEventType.EXTRACTION_UNIT);
+				assertTrue(e.getType() == XLIFFEventType.TEXT_UNIT);
 				assertTrue(e.isUnit());
 				Unit unit = e.getUnit();
 				assertNotNull(unit);

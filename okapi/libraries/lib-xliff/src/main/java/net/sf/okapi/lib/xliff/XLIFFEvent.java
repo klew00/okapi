@@ -26,7 +26,7 @@ public class XLIFFEvent {
 		START_DOCUMENT,
 		START_SECTION,
 		START_GROUP,
-		EXTRACTION_UNIT,
+		TEXT_UNIT,
 		END_GROUP,
 		END_SECTION,
 		END_DOCUMENT
@@ -47,7 +47,7 @@ public class XLIFFEvent {
 	}
 
 	public boolean isUnit () {
-		return (type == XLIFFEventType.EXTRACTION_UNIT);
+		return (type == XLIFFEventType.TEXT_UNIT);
 	}
 	
 	public Unit getUnit () {

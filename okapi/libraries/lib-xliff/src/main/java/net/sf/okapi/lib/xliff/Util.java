@@ -25,7 +25,8 @@ import org.oasisopen.xliff.v2.InlineType;
 class Util {
 
 	final static String NS_XLIFF20 = "urn:oasis:names:tc:xliff:document:2.0";
-
+	final static String NS_XML = "http://www.w3.org/XML/1998/namespace";
+		
 	final static String ELEM_DOC = "xliff";
 	final static String ELEM_SECTION = "file";
 	final static String ELEM_GROUP = "group";
@@ -50,9 +51,14 @@ class Util {
 	final static String ATTR_TYPE = "type";
 	final static String ATTR_HEX = "hex";
 	final static String ATTR_EQUIV = "equiv";
+	final static String ATTR_EQUIVSTART = "equivStart";
 	final static String ATTR_EQUIVEND = "equivEnd";
 	final static String ATTR_DISP = "disp";
+	final static String ATTR_DISPSTART = "dispStart";
 	final static String ATTR_DISPEND = "dispEnd";
+	final static String ATTR_SUBFLOWS = "subFlows";
+	final static String ATTR_SUBFLOWSSTART = "subFlowsStart";
+	final static String ATTR_SUBFLOWSEND = "subFlowsEnd";
 	final static String ATTR_SOURCELANG = "srclang";
 	final static String ATTR_TARGETLANG = "tgtlang";
 	final static String ATTR_TRANSLATABLE = "translatable";

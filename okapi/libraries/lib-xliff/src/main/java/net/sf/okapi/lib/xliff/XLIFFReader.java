@@ -60,6 +60,7 @@ public class XLIFFReader {
 	private Unit unit;
 	private Segment segment;
 	private Part ignorable;
+	private Stack<Boolean> preserveWS;
 
 	public void open (URI inputURI) {
 		try {
@@ -87,6 +88,8 @@ public class XLIFFReader {
 			reader = fact.createXMLStreamReader(inputStream);
 			queue = new LinkedList<XLIFFEvent>();
 			groups = new Stack<GroupData>();
+			preserveWS = new Stack<Boolean>();
+			preserveWS.push(false); // Default is false
 			hasNext = true;
 		}
 		catch ( XMLStreamException e ) {
@@ -117,6 +120,10 @@ public class XLIFFReader {
 		}
 		if ( queue.peek().getType() == XLIFFEventType.END_DOCUMENT ) {
 			hasNext = false;
+			// Check stack of preserveWS: it should be 1
+			if ( preserveWS.size() != 1 ) {
+				logger.warning(String.format("Stack for xml:space is at %d instead of 1.", preserveWS.size()));
+			}
 		}
 		return queue.poll();
 	}
@@ -135,6 +142,7 @@ public class XLIFFReader {
 					return;
 				case XMLStreamReader.START_ELEMENT:
 					tmp = reader.getLocalName();
+					pushWSState();
 					if ( tmp.equals(Util.ELEM_UNIT) ) {
 						processUnit();
 						return;
@@ -154,6 +162,7 @@ public class XLIFFReader {
 					break;
 				case XMLStreamReader.END_ELEMENT:
 					tmp = reader.getLocalName();
+					preserveWS.pop();
 					if ( tmp.equals(Util.ELEM_GROUP) ) {
 						queue.add(new XLIFFEvent(XLIFFEventType.END_GROUP, groups.pop()));
 						return;
@@ -172,6 +181,16 @@ public class XLIFFReader {
 		}
 	}
 
+	private void pushWSState () {
+		String tmp = reader.getAttributeValue(Util.NS_XML, "space");
+		if ( !Util.isNullOrEmpty(tmp) ) {
+			preserveWS.push(tmp.equals("preserve"));
+		}
+		else { // Else: inherite from parent
+			preserveWS.push(preserveWS.peek());
+		}
+	}
+	
 	private void processXliff () {
 		String tmp = reader.getAttributeValue(null, "version");
 		cannotBeNullOrEmpty("version", tmp);
@@ -281,6 +300,7 @@ public class XLIFFReader {
 			switch ( reader.next() ) {
 			case XMLStreamReader.START_ELEMENT:
 				tmp = reader.getLocalName();
+				pushWSState();
 				if ( tmp.equals(Util.ELEM_SEGMENT) ) {
 					processPart(true);
 				}
@@ -300,8 +320,9 @@ public class XLIFFReader {
 				
 			case XMLStreamReader.END_ELEMENT:
 				tmp = reader.getLocalName();
+				preserveWS.pop();
 				if ( tmp.equals(Util.ELEM_UNIT) ) { // End of this unit
-					queue.add(new XLIFFEvent(XLIFFEventType.EXTRACTION_UNIT, unit));
+					queue.add(new XLIFFEvent(XLIFFEventType.TEXT_UNIT, unit));
 					return;
 				}
 				break;
@@ -321,6 +342,7 @@ public class XLIFFReader {
 			switch ( reader.next() ) {
 			case XMLStreamReader.START_ELEMENT:
 				tmp = reader.getLocalName();
+				pushWSState();
 				if ( tmp.equals(Util.ELEM_SOURCE) ) {
 					processContent(part);
 					alt.setSource(part.getSource());
@@ -336,6 +358,7 @@ public class XLIFFReader {
 				
 			case XMLStreamReader.END_ELEMENT:
 				tmp = reader.getLocalName();
+				preserveWS.pop();
 				if ( tmp.equals(Util.ELEM_CANDIDATE) ) { // End of this candidate
 					parent.addCandidate(alt);
 					return;
@@ -369,8 +392,13 @@ public class XLIFFReader {
 				sb.append(reader.getText());
 				break;
 				
+			case XMLStreamReader.START_ELEMENT:
+				pushWSState();
+				break;
+				
 			case XMLStreamReader.END_ELEMENT:
 				tmp = reader.getLocalName();
+				preserveWS.pop();
 				if ( tmp.equals(Util.ELEM_NOTE) ) { // End of this note
 					Note note = new Note(sb.toString(), at);
 					parent.addNote(note);
@@ -399,6 +427,7 @@ public class XLIFFReader {
 				
 			case XMLStreamReader.START_ELEMENT:
 				tmp = reader.getLocalName();
+				pushWSState();
 				if ( tmp.equals(Util.ELEM_DATA) ) {
 					id = reader.getAttributeValue(null, Util.ATTR_ID);
 					cannotBeNullOrEmpty(Util.ATTR_ID, id);
@@ -428,6 +457,7 @@ public class XLIFFReader {
 				
 			case XMLStreamReader.END_ELEMENT:
 				tmp = reader.getLocalName();
+				preserveWS.pop();
 				if ( tmp.equals(Util.ELEM_DATA) ) {
 					map.put(id, content.toString());
 					id = null;
@@ -467,6 +497,7 @@ public class XLIFFReader {
 			switch ( reader.next() ) {
 			case XMLStreamReader.START_ELEMENT:
 				tmp = reader.getLocalName();
+				pushWSState();
 				if ( tmp.equals(Util.ELEM_SOURCE) ) {
 					if ( isSegment ) processContent(segment);
 					else processContent(ignorable);
@@ -488,6 +519,7 @@ public class XLIFFReader {
 				
 			case XMLStreamReader.END_ELEMENT:
 				tmp = reader.getLocalName();
+				preserveWS.pop();
 				if ( tmp.equals(Util.ELEM_SEGMENT) ) {
 					return;
 				}
@@ -560,12 +592,15 @@ public class XLIFFReader {
 					tmp = reader.getAttributeValue(null, Util.ATTR_ID);
 					cannotBeNullOrEmpty(Util.ATTR_ID, tmp);
 					code = frag.append(InlineType.OPENING, tmp, null);
-					setCommonAttributes(code);
+					code.setEquiv(reader.getAttributeValue(null, Util.ATTR_EQUIVSTART));
+					code.setDisp(reader.getAttributeValue(null, Util.ATTR_DISPSTART));
+					code.setSubFlows(reader.getAttributeValue(null, Util.ATTR_SUBFLOWSSTART));
 					code = null; // We nullify the code 
 					// Closing code
 					ICode closing = new Code(InlineType.CLOSING, tmp, null);
 					closing.setEquiv(reader.getAttributeValue(null, Util.ATTR_EQUIVEND));
 					closing.setDisp(reader.getAttributeValue(null, Util.ATTR_DISPEND));
+					closing.setSubFlows(reader.getAttributeValue(null, Util.ATTR_SUBFLOWSEND));
 					pairs.push(closing);
 				}
 				else if ( tmp.equals(Util.ELEM_CP) ) {
@@ -627,10 +662,12 @@ public class XLIFFReader {
 				}
 				else if ( tmp.equals(Util.ELEM_SOURCE) ) {
 					partToFill.setSource(frag);
+					preserveWS.pop();
 					return;
 				}
 				else if ( tmp.equals(Util.ELEM_TARGET) ) {
 					partToFill.setTarget(frag);
+					preserveWS.pop();
 					return;
 				}
 				break;
@@ -641,6 +678,7 @@ public class XLIFFReader {
 	private void setCommonAttributes (ICode code) {
 		code.setEquiv(reader.getAttributeValue(null, Util.ATTR_EQUIV));
 		code.setDisp(reader.getAttributeValue(null, Util.ATTR_DISP));
+		code.setSubFlows(reader.getAttributeValue(null, Util.ATTR_SUBFLOWS));
 	}
 	
 	private String setNid (ICode code,

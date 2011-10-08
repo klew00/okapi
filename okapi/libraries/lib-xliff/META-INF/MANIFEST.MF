@@ -6,5 +6,4 @@ Bundle-Name: Okapi Library for XLIFF 2
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: net.sf.okapi.lib.okapi-lib-xliff
 Import-Package: javax.xml.namespace,javax.xml.stream
-Main-Class: net.sf.okapi.lib.xliff.Main
 

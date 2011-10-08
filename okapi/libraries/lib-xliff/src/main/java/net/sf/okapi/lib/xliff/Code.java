@@ -187,4 +187,32 @@ public class Code implements ICode {
 		else hints &= ~CANCHANGEPARENT;
 	}
 
+	@Override
+	public boolean equals (ICode code) {
+		if ( this == code ) return true;
+		if ( inlineType.compareTo(code.getInlineType()) != 0 ) return false;
+		if ( compStr(id, code.getId()) != 0 ) return false;
+		if ( compStr(type, code.getType()) != 0 ) return false;
+		if ( compStr(subFlows, code.getSubFlows()) != 0 ) return false;
+		if ( compStr(originalData, code.getOriginalData()) != 0 ) return false;
+		if ( compStr(disp, code.getDisp()) != 0 ) return false;
+		if ( compStr(equiv, code.getEquiv()) != 0 ) return false;
+		if ( hints != code.getHints() ) return false;
+		if ( compStr(internalId, code.getInternalId()) != 0 ) return false;
+		return true;
+	}
+	
+	private int compStr (String s1,
+		String s2)
+	{
+		if ( s1 == null ) {
+			if ( s2 == null ) return 0;
+			else return -1;
+		}
+		if ( s2 == null ) {
+			return 1;
+		}
+		return s1.compareTo(s2);
+	}
+
 }
