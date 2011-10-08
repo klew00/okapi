@@ -21,6 +21,8 @@
 package net.sf.okapi.lib.reporting;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import net.sf.okapi.lib.reporting.ReportGenerator;
 
@@ -212,5 +214,33 @@ public class ReportGeneratorTest {
 		assertEquals("Test report\n\n#Creation Date: <a1>\n#Project Name: <a2>\n#Target Locale: <a3>\n\n" +
 				"[?[?A7]]\n\n" +
 				"Total,<a4>,<a5>,<a6>\n\nThe report was created on <a1>\n", report);
+	}
+	
+	@Test
+	public void tableReportTest5() {
+		ReportGenerator gen = new ReportGenerator(this.getClass().getResourceAsStream("scoping_report.html"));
+		assertTrue(gen.isHtmlReport());
+		assertTrue(gen.isMultiItemReport());
+	}
+	
+	@Test
+	public void tableReportTest6() {
+		ReportGenerator gen = new ReportGenerator(this.getClass().getResourceAsStream("scoping_report2.html"));
+		assertTrue(gen.isHtmlReport());
+		assertFalse(gen.isMultiItemReport());
+	}
+	
+	@Test
+	public void tableReportTest7() {
+		ReportGenerator gen = new ReportGenerator(this.getClass().getResourceAsStream("test_table_report3.txt"));
+		assertFalse(gen.isHtmlReport());
+		assertTrue(gen.isMultiItemReport());
+	}
+	
+	@Test
+	public void tableReportTest8() {
+		ReportGenerator gen = new ReportGenerator(this.getClass().getResourceAsStream("test_table_report4.txt"));
+		assertFalse(gen.isHtmlReport());
+		assertFalse(gen.isMultiItemReport());
 	}
 }

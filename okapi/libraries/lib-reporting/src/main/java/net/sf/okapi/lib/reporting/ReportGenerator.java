@@ -47,13 +47,14 @@ public class ReportGenerator {
 	private Hashtable<String, String> simpleFields = new Hashtable<String, String>();
 	private Hashtable<String, LinkedList<String>> multiFields = new Hashtable<String, LinkedList<String>>();
 	private StringBuilder sb;
+	private boolean multiItemReport;
+	private boolean htmlReport;
 	
 	private final Logger logger = Logger.getLogger(this.getClass().getName());
 	
 	public ReportGenerator(String template) {
 		super();
-		setTemplate(template);		
-		registerFields();
+		setTemplate(template);				
 		sb = new StringBuilder(); 
 	}
 	
@@ -372,7 +373,25 @@ public class ReportGenerator {
 
 	public void setTemplate(String template) {
 		this.template = template;
-		if (!Util.isEmpty(template) && template.indexOf("<html>") != -1 && template.indexOf("<body>") != -1)
-			setLineBreak("<br>");
+		if (Util.isEmpty(template)) {
+			logger.warning("Scoping Report template is not set.");
+			return;
+		}
+		registerFields();
+		multiItemReport = multiFields.size() > 0; 
+		htmlReport = template.indexOf("<html") != -1 && template.indexOf("<body") != -1;
+		if (htmlReport)	setLineBreak("<br>");
+	}
+	
+	/**
+	 * Report contains at least one table with counts for individual project items
+	 * @return
+	 */
+	protected boolean isMultiItemReport() {
+		return multiItemReport;
+	}
+
+	protected boolean isHtmlReport() {
+		return htmlReport;
 	}
 }
