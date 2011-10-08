@@ -36,7 +36,6 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
-import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.UsingParameters;
@@ -50,7 +49,6 @@ import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.lib.extra.steps.CompoundStep;
 import net.sf.okapi.lib.reporting.ReportGenerator;
 import net.sf.okapi.steps.wordcount.categorized.CategoryGroup;
-import net.sf.okapi.steps.wordcount.categorized.CategoryResolver;
 import net.sf.okapi.steps.wordcount.categorized.gmx.GMXAlphanumericOnlyTextUnitWordCountStep;
 import net.sf.okapi.steps.wordcount.categorized.gmx.GMXExactMatchedWordCountStep;
 import net.sf.okapi.steps.wordcount.categorized.gmx.GMXFuzzyMatchWordCountStep;
