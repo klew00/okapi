@@ -280,8 +280,9 @@ public class XLIFFWriter implements IFilterWriter {
 		if ( dataType == null ) dataType = "x-undefined";
 		else if ( dataType.equals("text/html") ) dataType = "html";
 		else if ( dataType.equals("text/xml") ) dataType = "xml";
-		// TODO: other standard XLIFF content types
-		else dataType = "x-"+dataType;
+		else if ( !dataType.startsWith("x-") ) {
+			dataType = "x-"+dataType;
+		}
 		writer.writeAttributeString("datatype", dataType);
 
 		if ( !Util.isEmpty(inputEncoding) ) {

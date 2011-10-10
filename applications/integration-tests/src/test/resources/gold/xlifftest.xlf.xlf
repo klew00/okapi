@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:okp="okapi-framework:xliff-extensions">
-<file original="test" source-language="en" target-language="fr" datatype="x-undefined" okp:inputEncoding="utf-8">
+<file original="test" source-language="en" target-language="fr" datatype="xml" okp:inputEncoding="utf-8">
 <body>
 <trans-unit id="1" translate="no">
 <source xml:lang="en">Text not to translate</source>

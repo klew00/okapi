@@ -436,6 +436,19 @@ public class XLIFFFilter implements IFilter {
 			}
 		}
 		
+		// Get datatype property to use for mime-type
+		tmp = reader.getAttributeValue(null, "datatype");
+		if ( tmp != null ) {
+			// make sure this is in-synch with XLIFFWriter
+			if ( tmp.equals("x-undefined") ) tmp = null;
+			else if ( tmp.equals("html") ) tmp = "text/html";
+			else if ( tmp.equals("xml") ) tmp = "text/xml";
+			//else if ( tmp.startsWith("x-") ) {
+			//	tmp = tmp.substring(2);
+			//}
+			startSubDoc.setMimeType(tmp);
+		}
+
 		// Get build-num as read-only property
 		tmp = reader.getAttributeValue(null, PROP_BUILDNUM);
 		if ( tmp != null ) {
