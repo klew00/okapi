@@ -76,6 +76,7 @@ import net.sf.okapi.steps.segmentation.SegmentationStep;
 import net.sf.okapi.connectors.apertium.ApertiumMTConnector;
 import net.sf.okapi.connectors.globalsight.GlobalSightTMConnector;
 import net.sf.okapi.connectors.google.GoogleMTConnector;
+import net.sf.okapi.connectors.google.GoogleMTv2Connector;
 import net.sf.okapi.connectors.microsoft.MicrosoftMTConnector;
 import net.sf.okapi.connectors.mymemory.MyMemoryTMConnector;
 import net.sf.okapi.connectors.opentran.OpenTranTMConnector;
@@ -121,6 +122,8 @@ public class Main {
 	protected String addTransTrans;
 	protected int addTransRating = 4;
 	protected boolean useGoogle;
+	protected boolean useGoogleV2;
+	protected String googleV2Params;
 	protected boolean useOpenTran;
 	protected boolean useTransToolkit;
 	protected String transToolkitParams;
@@ -388,6 +391,14 @@ public class Main {
 				}
 				else if ( arg.equals("-google") ) {
 					prog.useGoogle = true;
+				}
+				else if ( arg.equals("-gg") ) {
+					prog.useGoogleV2 = true;
+					if ( args.size() > i+1 ) {
+						if ( !args.get(i+1).startsWith("-") ) {
+							prog.googleV2Params = args.get(++i);
+						}
+					}
 				}
 				else if ( arg.equals("-opentran") ) {
 					prog.useOpenTran = true;
@@ -1096,7 +1107,8 @@ public class Main {
 		ps.println("   -x inputFile [inputFile2...] [-fc configId] [-ie encoding] [-sl srcLang]");
 		ps.println("      [-tl trgLang] [-seg [srxFile]] [-tt [hostname[:port]]|-mm [key]");
 		ps.println("      |-pen tmDirectory|-gs configFile|-google|-apertium [configFile]");
-		ps.println("      |-ms configFile|-tda configFile] [-maketmx [tmxFile]] [-opt threshold]");
+		ps.println("      |-ms configFile|-tda configFile|-gg configFile]");
+		ps.println("      [-maketmx [tmxFile]] [-opt threshold]");
 		ps.println("      [-od outputDirectory] [-nocopy] [-noalttrans]");
 		ps.println("Merges an XLIFF document back to its original format:");
 		ps.println("   -m xliffFile [xliffFile2...] [-fc configId] [-ie encoding] [-oe encoding]");
@@ -1106,7 +1118,8 @@ public class Main {
 		ps.println("   -t inputFile [inputFile2...] [-fc configId] [-ie encoding] [-oe encoding]");
 		ps.println("      [-sl srcLang] [-tl trgLang] [-seg [srxFile]] [-tt [hostname[:port]]");
 		ps.println("      |-mm [key]|-pen tmDirectory|-gs configFile|-google|-apertium [configFile]");
-		ps.println("      |-ms configFile|-tda configFile] [-maketmx [tmxFile]] [-opt threshold]");
+		ps.println("      |-ms configFile|-tda configFile|-gg configFile]");
+		ps.println("      [-maketmx [tmxFile]] [-opt threshold]");
 		ps.println("Extracts a file to Moses InlineText:");
 		ps.println("   -xm inputFile [-fc configId] [-ie encoding] [-seg [srxFile]]");
 		ps.println("      [-sl srcLang] [-tl trgLang] [-2] [-to srcOutputFile]");
@@ -1121,7 +1134,7 @@ public class Main {
 		ps.println("   -q \"source text\" [-sl srcLang] [-tl trgLang] [-google] [-opentran]");
 		ps.println("      [-tt [hostname[:port]]] [-mm [key]] [-pen tmDirectory] [-gs configFile]");
 		ps.println("      [-apertium [configFile]] [-ms configFile] [-tda configFile]");
-		ps.println("      [-opt threshold[:maxhits]]");
+		ps.println("      [-gg configFile] [-opt threshold[:maxhits]]");
 		ps.println("Adds translation to a resources:");
 		ps.println("   -a \"source text\" \"target text\" [rating] [-sl srcLang] [-tl trgLang]");
 		ps.println("      -ms configFile");
@@ -1149,6 +1162,7 @@ public class Main {
 		int count;
 		if ( conn.getClass().getName().endsWith("PensieveTMConnector")
 			|| conn.getClass().getName().endsWith("GoogleMTConnector")
+			|| conn.getClass().getName().endsWith("GoogleMTv2Connector")
 			|| conn.getClass().getName().endsWith("MyMemoryTMConnector")
 			|| conn.getClass().getName().endsWith("MicrosoftMTConnector")
 //			|| conn.getClass().getName().endsWith("ProMTConnector")
@@ -1214,7 +1228,7 @@ public class Main {
 	
 	private void processQuery () {
 		guessMissingLocales(null);
-		if ( !useGoogle && !useOpenTran && !useTransToolkit && !useMyMemory
+		if ( !useGoogle && !useGoogleV2 && !useOpenTran && !useTransToolkit && !useMyMemory
 			&& !usePensieve && !useGlobalSight && !useApertium && !useMicrosoft && !useTDA ) {
 			useGoogle = true; // Default if none is specified
 		}
@@ -1226,6 +1240,14 @@ public class Main {
 		IQuery conn;
 		if ( useGoogle ) {
 			conn = new GoogleMTConnector();
+			conn.setParameters(prepareConnectorParameters(conn.getClass().getName()));
+			conn.setLanguages(srcLoc, trgLoc);
+			conn.open();
+			displayQuery(conn, false);
+			conn.close();
+		}
+		if ( useGoogleV2 ) {
+			conn = new GoogleMTv2Connector();
 			conn.setParameters(prepareConnectorParameters(conn.getClass().getName()));
 			conn.setLanguages(srcLoc, trgLoc);
 			conn.open();
@@ -1433,6 +1455,9 @@ public class Main {
 		else if ( useGoogle ) {
 			levParams.setResourceClassName(GoogleMTConnector.class.getName());
 		}
+		else if ( useGoogleV2 ) {
+			levParams.setResourceClassName(GoogleMTv2Connector.class.getName());
+		}
 		else if ( useGlobalSight ) {
 			levParams.setResourceClassName(GlobalSightTMConnector.class.getName());
 		}
@@ -1478,7 +1503,7 @@ public class Main {
 		}
 		
 		// Add leveraging step if requested
-		if ( useGoogle || useTransToolkit || useMyMemory || usePensieve
+		if ( useGoogle || useGoogleV2 || useTransToolkit || useMyMemory || usePensieve
 			|| useGlobalSight || useApertium || useMicrosoft || useTDA ) {
 			driver.addStep(addLeveragingStep());
 		}
@@ -1639,7 +1664,7 @@ public class Main {
 		}
 		
 		// Add leveraging step
-		if ( useGoogle || useTransToolkit || useMyMemory || usePensieve
+		if ( useGoogle || useGoogleV2 || useTransToolkit || useMyMemory || usePensieve
 			|| useGlobalSight || useApertium || useMicrosoft || useTDA ) {
 			driver.addStep(addLeveragingStep());
 		}
@@ -1736,7 +1761,18 @@ public class Main {
 				params.load(paramURI, false);
 			}
 			return params;
-	}
+		}
+
+		if ( connectorClassName.equals(GoogleMTv2Connector.class.getName()) ) {
+			net.sf.okapi.connectors.google.GoogleMTv2Parameters params
+				= new net.sf.okapi.connectors.google.GoogleMTv2Parameters();
+			// Use the specified parameters if available, otherwise use the default
+			if ( googleV2Params != null ) {
+				URI paramURI = (new File(googleV2Params).toURI());
+				params.load(paramURI, false);
+			}
+			return params;
+		}
 
 //		if ( connectorClassName.equals(ProMTConnector.class.getName()) ) {
 //			net.sf.okapi.connectors.promt.Parameters params
