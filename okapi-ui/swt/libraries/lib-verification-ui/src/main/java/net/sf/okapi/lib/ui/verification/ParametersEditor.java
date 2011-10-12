@@ -126,6 +126,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Button chkLTBilingualMode;
 	private Text edLTTranslationSource;
 	private Text edLTTranslationTarget;
+	private Text edLTTranslationServiceKey;
 	private Button chkAbsoluteMaxCharLength;
 	private Spinner spAbsoluteMaxCharLength;
 	private Button chkMaxCharLength;
@@ -722,6 +723,14 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		
 		Composite cmpLTTrans = new Composite(cmpTmp, SWT.NONE);
 		cmpLTTrans.setLayout(new GridLayout(2, false));
+		cmpLTTrans.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		
+		label = new Label(cmpLTTrans, SWT.NONE);
+		label.setText("API Key:");
+		
+		edLTTranslationServiceKey = new Text(cmpLTTrans, SWT.BORDER);
+		edLTTranslationServiceKey.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		edLTTranslationServiceKey.setEchoChar('*');
 		
 		label = new Label(cmpLTTrans, SWT.NONE);
 		label.setText("From:");
@@ -1219,12 +1228,14 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			updateTranslateLTMsg();
 		}
 		else {
+			edLTTranslationServiceKey.setEnabled(false);
 			edLTTranslationSource.setEnabled(false);
 			edLTTranslationTarget.setEnabled(false);
 		}
 	}
 	
 	private void updateTranslateLTMsg () {
+		edLTTranslationServiceKey.setEnabled(chkTranslateLTMsg.getSelection());
 		edLTTranslationSource.setEnabled(chkTranslateLTMsg.getSelection());
 		edLTTranslationTarget.setEnabled(chkTranslateLTMsg.getSelection());
 	}
@@ -1310,6 +1321,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		chkLTBilingualMode.setSelection(params.getLtBilingualMode());
 		edLTTranslationSource.setText(params.getLtTranslationSource());
 		edLTTranslationTarget.setText(params.getLtTranslationTarget());
+		edLTTranslationServiceKey.setText(params.getLtTranslationServiceKey());
 		chkPatterns.setSelection(params.getCheckPatterns());
 		chkDoubledWord.setSelection(params.getDoubledWord());
 		edDoubledWordExceptions.setText(params.getDoubledWordExceptions());
@@ -1393,6 +1405,13 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 				return false;
 			}
 			if ( chkTranslateLTMsg.getSelection() ) {
+				if ( edLTTranslationServiceKey.getText().trim().length() == 0 ) {
+					Dialogs.showError(shell, "Please, enter the API key to access the MT service.", null);
+					edLTTranslationServiceKey.setFocus();
+					tabs.setSelection(TAB_LANGUAGETOOL);
+					return false;
+					
+				}
 				if ( edLTTranslationSource.getText().trim().length() == 0 ) {
 					Dialogs.showError(shell, "Please, enter the language code of the messages returned by LanguageTool (e.g. fr).", null);
 					edLTTranslationSource.setFocus();
@@ -1516,6 +1535,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 			params.setLtBilingualMode(chkLTBilingualMode.getSelection());
 			params.setTranslateLTMsg(chkTranslateLTMsg.getSelection());
 			if ( chkTranslateLTMsg.getSelection() ) {
+				params.setLtTranslationServiceKey(edLTTranslationServiceKey.getText());
 				params.setLtTranslationSource(edLTTranslationSource.getText());
 				params.setLtTranslationTarget(edLTTranslationTarget.getText());
 			}

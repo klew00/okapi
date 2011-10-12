@@ -39,6 +39,8 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.connectors.google.GoogleMTConnector;
+import net.sf.okapi.connectors.google.GoogleMTv2Connector;
+import net.sf.okapi.connectors.google.GoogleMTv2Parameters;
 import net.sf.okapi.common.query.IQuery;
 
 public class LanguageToolConnector {
@@ -70,7 +72,8 @@ public class LanguageToolConnector {
 		boolean translateLTMsg,
 		boolean bilingualMode,
 		String ltTranslationSource,
-		String ltTranslationTarget)
+		String ltTranslationTarget,
+		String ltTranslationServiceKey)
 	{
 		//TODO: Better mapping to LT language codes
 		lang = locId.getLanguage();
@@ -85,6 +88,11 @@ public class LanguageToolConnector {
 		this.bilingualMode = bilingualMode;
 		if ( translateLTMsg ) {
 			mt = new GoogleMTConnector();
+			/* v2 ready for switch
+			mt = new GoogleMTv2Connector();
+			GoogleMTv2Parameters prm = (GoogleMTv2Parameters)mt.getParameters();
+			prm.setApiKey(ltTranslationServiceKey);
+			*/
 			mt.setLanguages(LocaleId.fromBCP47(ltTranslationSource),
 				LocaleId.fromBCP47(ltTranslationTarget));
 			mt.open();

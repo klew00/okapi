@@ -60,6 +60,7 @@ public class Parameters extends BaseParameters {
 	private static final String LTBILINGUALMODE = "ltBilingualMode";
 	private static final String LTTRANSLATIONSOURCE = "ltTranslationSource";
 	private static final String LTTRANSLATIONTARGET = "ltTranslationTarget";
+	private static final String LTTRANSLATIONSERVICEKEY = "ltTranslationServiceKey";
 	private static final String SAVESESSION = "saveSession";
 	private static final String SESSIONPATH = "sessionPath";
 	private static final String DOUBLEDWORD = "doubledWord";
@@ -106,6 +107,7 @@ public class Parameters extends BaseParameters {
 	boolean ltBilingualMode;
 	String ltTranslationSource;
 	String ltTranslationTarget;
+	String ltTranslationServiceKey;
 	boolean saveSession;
 	String sessionPath;
 	boolean doubledWord;
@@ -456,7 +458,15 @@ public class Parameters extends BaseParameters {
 	public void setLtTranslationTarget (String ltTranslationTarget) {
 		this.ltTranslationTarget = ltTranslationTarget;
 	}
+	
+	public String getLtTranslationServiceKey () {
+		return ltTranslationServiceKey;
+	}
 
+	public void setLtTranslationServiceKey (String ltTranslationServiceKey) {
+		this.ltTranslationServiceKey = ltTranslationServiceKey;
+	}
+	
 	public boolean getCheckTerms () {
 		return checkTerms;
 	}
@@ -510,6 +520,7 @@ public class Parameters extends BaseParameters {
 		ltBilingualMode = false;
 		ltTranslationSource = "";
 		ltTranslationTarget = "en";
+		ltTranslationServiceKey = "";
 		saveSession = true;
 		sessionPath = Util.ROOT_DIRECTORY_VAR+"/qa-session"+QualityCheckSession.FILE_EXTENSION;
 		doubledWord = true;
@@ -604,6 +615,7 @@ public class Parameters extends BaseParameters {
 		ltBilingualMode = buffer.getBoolean(LTBILINGUALMODE, ltBilingualMode);
 		ltTranslationSource = buffer.getString(LTTRANSLATIONSOURCE, ltTranslationSource);
 		ltTranslationTarget = buffer.getString(LTTRANSLATIONTARGET, ltTranslationTarget);
+		ltTranslationServiceKey = buffer.getEncodedString(LTTRANSLATIONSERVICEKEY, ltTranslationServiceKey);
 		saveSession = buffer.getBoolean(SAVESESSION, saveSession);
 		sessionPath = buffer.getString(SESSIONPATH, sessionPath);
 		doubledWord = buffer.getBoolean(DOUBLEDWORD, doubledWord);
@@ -681,6 +693,7 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean(LTBILINGUALMODE, ltBilingualMode);
 		buffer.setString(LTTRANSLATIONSOURCE, ltTranslationSource);
 		buffer.setString(LTTRANSLATIONTARGET, ltTranslationTarget);
+		buffer.setEncodedString(LTTRANSLATIONSERVICEKEY, ltTranslationServiceKey);
 		buffer.setBoolean(SAVESESSION, saveSession);
 		buffer.setString(SESSIONPATH, sessionPath);
 		buffer.setBoolean(DOUBLEDWORD, doubledWord);

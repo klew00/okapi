@@ -85,7 +85,8 @@ class QualityChecker {
 		if ( params.getCheckWithLT() ) {
 			ltConn = new LanguageToolConnector();
 			ltConn.initialize(targetLocale, params.getServerURL(), params.translateLTMsg,
-				params.ltBilingualMode, params.ltTranslationSource, params.ltTranslationTarget);
+				params.ltBilingualMode, params.ltTranslationSource, params.ltTranslationTarget,
+				params.ltTranslationServiceKey);
 		}
 
 		// Expression for finding doubled words
