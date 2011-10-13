@@ -75,12 +75,14 @@ public class TTXFilterTest {
 //		+ "</FrontMatter><Body><Raw>\n";
 
 	public TTXFilterTest () {
-		filterIncUnSeg = new TTXFilter();
 		fmt = new GenericContent();
 		root = TestUtil.getParentDir(this.getClass(), "/Test01.html.ttx");
+		filterIncUnSeg = new TTXFilter();
+		Parameters prm1 = (Parameters)filterIncUnSeg.getParameters();
+		prm1.setSegmentMode(Parameters.MODE_ALL);
 		filterNoUnSeg = new TTXFilter();
-		Parameters prm = (Parameters)filterNoUnSeg.getParameters();
-		prm.setIncludeUnsegmentedParts(false);
+		Parameters prm2 = (Parameters)filterNoUnSeg.getParameters();
+		prm2.setSegmentMode(Parameters.MODE_EXISTINGSEGMENTS);
 	}
 
 	@Test

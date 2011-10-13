@@ -14,9 +14,6 @@ OmegaT-Plugin: filter
 Name: net.sf.okapi.lib.omegat.TTXFilter
 OmegaT-Plugin: filter
 
-Name: net.sf.okapi.lib.omegat.TTXFilter2
-OmegaT-Plugin: filter
-
 Name: net.sf.okapi.lib.omegat.JSONFilter
 OmegaT-Plugin: filter
 

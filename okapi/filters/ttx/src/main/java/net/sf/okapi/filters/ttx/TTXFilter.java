@@ -20,6 +20,11 @@
 
 package net.sf.okapi.filters.ttx;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -107,6 +112,7 @@ public class TTXFilter implements IFilter {
 	private boolean insideContent;
 	private TTXSkeletonWriter skelWriter;
 	private EncoderManager encoderManager;
+	private boolean includeUnsegmentedParts;
 	
 	public TTXFilter () {
 		params = new Parameters();
@@ -149,13 +155,6 @@ public class TTXFilter implements IFilter {
 			"TTX",
 			"Configuration for Trados TTX documents.",
 			null,
-			".ttx;"));
-		list.add(new FilterConfiguration(getName()+"-preSegmented",
-			MimeTypeMapper.TTX_MIME_TYPE,
-			getClass().getName(),
-			"TTX (extract only existing segments)",
-			"Configuration for pre-segmented Trados TTX documents.",
-			"preSegmented.fprm",
 			".ttx;"));
 		return list;
 	}
@@ -227,6 +226,19 @@ public class TTXFilter implements IFilter {
 			input.setEncoding("UTF-8"); // Default for XML, other should be auto-detected
 			BOMNewlineEncodingDetector detector = new BOMNewlineEncodingDetector(input.getStream(), input.getEncoding());
 			detector.detectBom();
+
+			if ( params.getSegmentMode() == Parameters.MODE_AUTO ) {
+				String enc = input.getEncoding();
+				if ( detector.isAutodetected() ) {
+					enc = detector.getEncoding();
+				}
+				// If we detect a segment we assume we should extract pre-segmented content only
+				includeUnsegmentedParts = !doesFileContainSegment(input.getInputURI(), enc);
+			}
+			else {
+				includeUnsegmentedParts = (params.getSegmentMode() == Parameters.MODE_ALL);
+			}
+			
 			if ( detector.isAutodetected() ) {
 				reader = fact.createXMLStreamReader(input.getStream(), detector.getEncoding());
 			}
@@ -298,6 +310,9 @@ public class TTXFilter implements IFilter {
 			startDoc.setSkeleton(skel);
 		}
 		catch ( XMLStreamException e) {
+			throw new OkapiIOException(e);
+		}
+		catch ( IOException e ) {
 			throw new OkapiIOException(e);
 		}
 	}
@@ -476,7 +491,7 @@ public class TTXFilter implements IFilter {
 						trgSegFrag = null;
 						altTrans = null;
 						if ( !inter.isEmpty() ) { // Deal with previous text span
-							if ( params.getIncludeUnsegmentedParts() && hasText(inter.getCodedText()) ) {
+							if ( includeUnsegmentedParts && hasText(inter.getCodedText()) ) {
 								// Unsegmented section contain text: make it a text unit
 								addSegment(inter, srcCont, trgFragments, altTranslations, dfCount, crumbs, movedCodes);
 							}
@@ -610,7 +625,7 @@ public class TTXFilter implements IFilter {
 							// A Tu stops the current segment, but not the text unit
 						}
 						else if (( inter != null ) && !inter.isEmpty() ) { // If no source segment: only content
-							if ( params.getIncludeUnsegmentedParts() && hasText(inter.getCodedText()) ) {
+							if ( includeUnsegmentedParts && hasText(inter.getCodedText()) ) {
 								// Unsegmented section contain text: make it a text unit
 								addSegment(inter, srcCont, trgFragments, altTranslations, dfCount, crumbs, movedCodes);
 							}
@@ -632,7 +647,7 @@ public class TTXFilter implements IFilter {
 			// Check if we had only non-segmented text
 			if (( inter != null) && !inter.isEmpty() ) {
 				String ctext = inter.getCodedText();
-				if ( params.getIncludeUnsegmentedParts() && hasText(ctext) ) {
+				if ( includeUnsegmentedParts && hasText(ctext) ) {
 					// Unsegmented section contain text: make it a text unit
 
 					// Move leading whitespace characters to outside
@@ -662,7 +677,7 @@ public class TTXFilter implements IFilter {
 			boolean changeToSkel = !hasText(srcCont); // Use special hasText()
 			// And make sure text fragments un-segments are skeleton if they are not to be extracted
 			// This last check is because we always have at least one segment in a TC.
-			if ( !hasOriginalSeg && !params.getIncludeUnsegmentedParts() ) {
+			if ( !hasOriginalSeg && !includeUnsegmentedParts ) {
 				changeToSkel = true;
 			}
 			if ( changeToSkel ) { 
@@ -1186,6 +1201,36 @@ public class TTXFilter implements IFilter {
 		catch ( XMLStreamException e) {
 			throw new OkapiIOException(e);
 		}
+	}
+
+	private boolean doesFileContainSegment (URI inputURI,
+		String encoding)
+		throws IOException
+	{
+		if ( inputURI == null ) {
+			throw new OkapiIOException("Cannot use the auto-detection of segments with strean or strings.");
+		}
+		// Just a basic search for "<Tu" (comments not taken into account as they are likely not there in TTX
+		BufferedReader reader = null;
+		try {
+			int count = 0;
+			reader = new BufferedReader(new InputStreamReader(new FileInputStream(inputURI.getPath()), encoding));
+			String line = reader.readLine();
+			while ( line != null ) {
+				count++;
+				if ( line.indexOf("<Tuv ") > -1 ) {
+					return true;
+				}
+				line = reader.readLine();
+				if ( count > 5000 ) break; // Most likely not segmented
+			}
+		}
+		finally {
+			if ( reader != null ) {
+				reader.close();
+			}
+		}
+		return false;
 	}
 	
 }

@@ -29,10 +29,22 @@ distribution.</p>
 	This fixes issue #189.</li>
 </ul>
 	</li>
+	<li>Filters Plugin for OmegaT:<ul>
+	<li>Changed the TTX filter implementation back to a single option: the mode 
+	0 that auto-detect segments.</li>
+</ul>
+	</li>
 	<li>Filters:<ul>
 	<li>XLIFF Filter:<ul>
 	<li>Fixed issue where the <code>datatype</code> attribute for
 	<code>&lt;file&gt;</code> was not read properly.</li>
+</ul>
+	</li>
+	<li>TTX Filter:<ul>
+	<li>Replace the &quot;include un-segmented part&quot; option by a new segmentMode 
+	option: Mode 0: auto-detect, if a segment is detected mode 1 is used, If no 
+	segment is detected mode 2 is used. Mode 1: only existing segments are 
+	extracted. Mode 2: all text is extracted, segmented or not.</li>
 </ul>
 	</li>
 </ul>

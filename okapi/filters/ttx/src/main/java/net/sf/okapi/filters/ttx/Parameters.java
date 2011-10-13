@@ -26,14 +26,19 @@ import net.sf.okapi.common.ParametersDescription;
 import net.sf.okapi.common.encoder.XMLEncoder;
 import net.sf.okapi.common.uidescription.EditorDescription;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
+import net.sf.okapi.common.uidescription.ListSelectionPart;
 
 @EditorFor(Parameters.class)
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
-	private final static String INCLUDEUNSEGMENTEDPARTS = "includeUnsegmentedParts";
+	public static final int MODE_AUTO = 0;
+	public static final int MODE_EXISTINGSEGMENTS = 1;
+	public static final int MODE_ALL = 2;
+	
+	private final static String SEGMENTMODE = "segmentMode";
 	
 	private boolean escapeGT;
-	private boolean includeUnsegmentedParts;
+	private int segmentMode;
 
 	public Parameters () {
 		reset();
@@ -48,46 +53,58 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.escapeGT = escapeGT;
 	}
 	
-	public boolean getIncludeUnsegmentedParts () {
-		return includeUnsegmentedParts;
+	public int getSegmentMode () {
+		return segmentMode;
 	}
 	
-	public void setIncludeUnsegmentedParts (boolean includeUnsegmentedParts) {
-		this.includeUnsegmentedParts = includeUnsegmentedParts;
+	public void setSegmentMode (int segmentMode) {
+		this.segmentMode = segmentMode;
 	}
 
 	public void reset () {
 		escapeGT = false;
-		includeUnsegmentedParts = true;
+		segmentMode = 0;
 	}
 
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
 		escapeGT = buffer.getBoolean(XMLEncoder.ESCAPEGT, escapeGT);
-		includeUnsegmentedParts = buffer.getBoolean(INCLUDEUNSEGMENTEDPARTS, includeUnsegmentedParts);
+		segmentMode = buffer.getInteger(SEGMENTMODE, segmentMode);
 	}
 
 	@Override
 	public String toString () {
 		buffer.reset();
 		buffer.setBoolean(XMLEncoder.ESCAPEGT, escapeGT);
-		buffer.setBoolean(INCLUDEUNSEGMENTEDPARTS, includeUnsegmentedParts);
+		buffer.setInteger(SEGMENTMODE, segmentMode);
 		return buffer.toString();
 	}
 	
 	@Override
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
-		desc.add(XMLEncoder.ESCAPEGT, "Escape the greater-than characters", null);
-		desc.add(INCLUDEUNSEGMENTEDPARTS, "Include un-segmented text", null);
+		desc.add(XMLEncoder.ESCAPEGT, "Escape the greater-than characters in output", null);
+		desc.add(SEGMENTMODE, "What to extract with regard to segments", null);
 		return desc;
 	}
 
 	public EditorDescription createEditorDescription (ParametersDescription paramDesc) {
 		EditorDescription desc = new EditorDescription("TTX Filter Parameters", true, false);
+		
+		String[] values = {String.valueOf(MODE_AUTO),
+			String.valueOf(MODE_EXISTINGSEGMENTS),
+			String.valueOf(MODE_ALL)};
+		String[] labels = {
+			"Auto-detect existing segments. If found: extract only those, otherwise extract all.",
+			"Extract only existing segments",
+			"Extract all (existing segments and un-segmented text parts)",
+		};
+		ListSelectionPart lsp = desc.addListSelectionPart(paramDesc.get(SEGMENTMODE), values);
+		lsp.setChoicesLabels(labels);
+		
+		desc.addSeparatorPart();
 		desc.addCheckboxPart(paramDesc.get(XMLEncoder.ESCAPEGT));
-		desc.addCheckboxPart(paramDesc.get(INCLUDEUNSEGMENTEDPARTS));
 		return desc;
 	}
 
