@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -85,10 +85,11 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	public ParametersDescription getParametersDescription () {
 		ParametersDescription desc = new ParametersDescription(this);
 		desc.add(XMLEncoder.ESCAPEGT, "Escape the greater-than characters in output", null);
-		desc.add(SEGMENTMODE, "What to extract with regard to segments", null);
+		desc.add(SEGMENTMODE, "Extraction mode", null);
 		return desc;
 	}
 
+	@Override
 	public EditorDescription createEditorDescription (ParametersDescription paramDesc) {
 		EditorDescription desc = new EditorDescription("TTX Filter Parameters", true, false);
 		
@@ -96,14 +97,13 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 			String.valueOf(MODE_EXISTINGSEGMENTS),
 			String.valueOf(MODE_ALL)};
 		String[] labels = {
-			"Auto-detect existing segments. If found: extract only those, otherwise extract all.",
+			"Auto-detect existing segments (If found: extract only those, otherwise extract all)",
 			"Extract only existing segments",
 			"Extract all (existing segments and un-segmented text parts)",
 		};
 		ListSelectionPart lsp = desc.addListSelectionPart(paramDesc.get(SEGMENTMODE), values);
 		lsp.setChoicesLabels(labels);
 		
-		desc.addSeparatorPart();
 		desc.addCheckboxPart(paramDesc.get(XMLEncoder.ESCAPEGT));
 		return desc;
 	}
