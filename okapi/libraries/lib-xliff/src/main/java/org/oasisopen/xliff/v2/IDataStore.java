@@ -37,13 +37,13 @@ public interface IDataStore extends Serializable {
 	 */
 	public boolean hasCodeWithOriginalData ();
 	
-	public boolean hasSourceCode ();
+	public boolean hasSourceMarker ();
 	
-	public boolean hasTargetCode ();
+	public boolean hasTargetMarker ();
 	
-	public ICodes getSourceCodes ();
+	public IMarkers getSourceMarkers ();
 	
-	public ICodes getTargetCodes ();
+	public IMarkers getTargetMarkers ();
 
 	public void calculateOriginalDataToIdsMap ();
 

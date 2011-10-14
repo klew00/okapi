@@ -25,47 +25,48 @@ import java.util.Map;
 
 import org.oasisopen.xliff.v2.ICode;
 import org.oasisopen.xliff.v2.IDataStore;
+import org.oasisopen.xliff.v2.IMarkers;
 
 public class DataStore implements IDataStore {
 
 	private static final long serialVersionUID = 0100L;
 
-	private Codes srcCodes;
-	private Codes trgCodes;
+	private Markers srcMarkers;
+	private Markers trgMarkers;
 
 	private transient Map<String, String> map;
 	
 	@Override
 	public boolean hasCodeWithOriginalData () {
-		if ( srcCodes != null ) {
-			if ( srcCodes.hasCodeWithOriginalData() ) return true;
+		if ( srcMarkers != null ) {
+			if ( srcMarkers.hasCodeWithOriginalData() ) return true;
 		}
-		if ( trgCodes != null ) {
-			if ( trgCodes.hasCodeWithOriginalData() ) return true;
+		if ( trgMarkers != null ) {
+			if ( trgMarkers.hasCodeWithOriginalData() ) return true;
 		}
 		return false;
 	}
 	
 	@Override
-	public boolean hasSourceCode () {
-		return (( srcCodes != null ) && srcCodes.hasCode() );
+	public boolean hasSourceMarker () {
+		return (( srcMarkers != null ) && ( srcMarkers.size() > 0 ));
 	}
 	
 	@Override
-	public boolean hasTargetCode () {
-		return (( trgCodes != null ) && trgCodes.hasCode() );
+	public boolean hasTargetMarker () {
+		return (( trgMarkers != null ) && ( trgMarkers.size() > 0 ));
 	}
 	
 	@Override
-	public Codes getSourceCodes () {
-		if ( srcCodes == null ) srcCodes = new Codes(this);
-		return srcCodes;
+	public IMarkers getSourceMarkers () {
+		if ( srcMarkers == null ) srcMarkers = new Markers(this);
+		return srcMarkers;
 	}
 	
 	@Override
-	public Codes getTargetCodes () {
-		if ( trgCodes == null ) trgCodes = new Codes(this);
-		return trgCodes;
+	public IMarkers getTargetMarkers () {
+		if ( trgMarkers == null ) trgMarkers = new Markers(this);
+		return trgMarkers;
 	}
 
 	@Override
@@ -74,9 +75,10 @@ public class DataStore implements IDataStore {
 		int mapId = 0;
 		String tmp;
 
-		if ( srcCodes != null ) {
-			for ( int i=0; i<srcCodes.size(); i++ ) {
-				ICode code = srcCodes.get(i);
+		if ( srcMarkers != null ) {
+			for ( int i=0; i<srcMarkers.size(); i++ ) {
+				if ( srcMarkers.get(i).isAnnotation() ) continue;
+				ICode code = (ICode)srcMarkers.get(i);
 				tmp = code.getOriginalData(); if ( tmp == null ) tmp = "";
 				if ( !map.containsKey(tmp) ) {
 					// No item like this yet: create one
@@ -84,9 +86,10 @@ public class DataStore implements IDataStore {
 				}
 			}
 		}
-		if ( trgCodes != null ) {
-			for ( int i=0; i<trgCodes.size(); i++ ) {
-				ICode code = trgCodes.get(i);
+		if ( trgMarkers != null ) {
+			for ( int i=0; i<trgMarkers.size(); i++ ) {
+				if ( srcMarkers.get(i).isAnnotation() ) continue;
+				ICode code = (ICode)trgMarkers.get(i);
 				tmp = code.getOriginalData(); if ( tmp == null ) tmp = "";
 				if ( !map.containsKey(tmp) ) {
 					// No item like this yet: create one

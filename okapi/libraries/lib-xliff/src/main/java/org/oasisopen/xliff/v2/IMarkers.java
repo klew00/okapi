@@ -23,36 +23,30 @@ package org.oasisopen.xliff.v2;
 import java.io.Serializable;
 
 /**
- * Provides the method to store and manipulate codes in a given content.
+ * Provides the method to store and manipulate markers (e.g. codes, annotations) in a given content.
  */
-public interface ICodes extends Serializable {
-
-	/**
-	 * Indicates if this list of codes has at least one code.
-	 * @return true if this list of codes has at least one code.
-	 */
-	public boolean hasCode ();
-	
-	public boolean hasCodeWithOriginalData ();
+public interface IMarkers extends Serializable, Iterable<IMarker> {
 
 	public int size ();
 
+	public boolean hasCodeWithOriginalData ();
+	
 	/**
-	 * Gets the data store associated with this list of codes.
+	 * Gets the data store associated with this list of markers.
 	 * @return the data store associated with this object.
 	 */
 	public IDataStore getDataStore ();
 
 	/**
-	 * Gets the code at a given position.
-	 * @param index the index of the code to retrieve (first code is at 0).
-	 * @return the retrieved code. 
+	 * Gets the marker at a given position.
+	 * @param index the index of the marker to retrieve (first one is at 0).
+	 * @return the retrieved marker. 
 	 */
-	public ICode get (int index);
+	public IMarker get (int index);
 	
-	public ICode get (String id,
+	public IMarker get (String id,
 		InlineType type);
 
-	public void add (ICode code);
+	public void add (IMarker marker);
 
 }

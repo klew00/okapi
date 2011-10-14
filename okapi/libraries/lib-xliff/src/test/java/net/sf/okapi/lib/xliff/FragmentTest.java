@@ -52,9 +52,26 @@ public class FragmentTest {
 		assertEquals("<sc id=\"1\"/>t1<sc id=\"2\"/>t2<ec rid=\"1\"/><ph id=\"3\"/>t3<ec rid=\"2\"/>", frag.toXLIFF());
 	}
 
-	//TODO: allow non-well-formed inside well-formed
-//	@Test
-//	public void testCodesNoDataNotWellFormed2 () {
+	@Test
+	public void testCodesNoDataNotWellFormed2 () {
+		// Allow non-well-formed inside well-formed
+		Fragment frag = new Fragment(new Unit("id").getDataStore());
+		frag.append(InlineType.OPENING, "1", "[o1]");
+		frag.append("t1");
+		frag.append(InlineType.OPENING, "2", "[o2]");
+		frag.append("t2");
+		frag.append(InlineType.OPENING, "3", "[o3]");
+		frag.append("t3");
+		frag.append(InlineType.CLOSING, "2", "[c2]");
+		frag.append("t4");
+		frag.append(InlineType.CLOSING, "3", "[c3]");
+		frag.append("t5");
+		frag.append(InlineType.CLOSING, "1", "[c1]");
+		assertEquals("<pc id=\"1\">t1<sc id=\"2\"/>t2<sc id=\"3\"/>t3<ec rid=\"2\"/>t4<ec rid=\"3\"/>t5</pc>", frag.toXLIFF());
+	}
+
+////	@Test
+//	public void testMarkersNotWellFormed1 () {
 //		Fragment frag = new Fragment(new Unit("id").getDataStore());
 //		frag.append(InlineType.OPENING, "1", "[o1]");
 //		frag.append("t1");
@@ -67,7 +84,7 @@ public class FragmentTest {
 //		frag.append(InlineType.CLOSING, "3", "[c3]");
 //		frag.append("t5");
 //		frag.append(InlineType.CLOSING, "1", "[c1]");
-//		assertEquals("<pc id=\"1\">t1<sc id=\"2\"/>t2<sc id=\"3\"/>t3<ec rid=\"2\"/>t4<ec rid=\"3\"/>t5</pc>", frag.toXLIFF());
+//		assertEquals("TODO", frag.toXLIFF());
 //	}
 
 	@Test

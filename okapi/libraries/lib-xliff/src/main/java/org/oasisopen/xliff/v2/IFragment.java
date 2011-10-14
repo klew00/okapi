@@ -65,20 +65,20 @@ public interface IFragment extends Serializable {
 	
 	/**
 	 * Indicates if this fragment is empty or not.
-	 * A fragment is empty if it has no text and no codes and no markers.
+	 * A fragment is empty if it has no text and no markers.
 	 * @return true if the fragment is empty, false otherwise.
 	 */
 	public boolean isEmpty ();
 
 	/**
-	 * Gets the closing code of a given opening code, if the content 
-	 * is well-formed.
-	 * @param openingCode the opening code to verify.
-	 * @param from the first position after the opening code.
+	 * Gets the closing marker of a given opening one, if it
+	 * corresponds to a well-formed span.
+	 * @param openingCode the opening marker to verify.
+	 * @param from the first position after the opening marker.
 	 * @return null if the content is not well-formed,
-	 * the corresponding closing code if the content is well-formed.
+	 * the corresponding closing marker if the content is well-formed.
 	 */
-	public ICode getWellFormedClosing (ICode openingCode,
+	public IMarker getWellFormedClosing (IMarker openingMarker,
 		int from);
 	
 	/**

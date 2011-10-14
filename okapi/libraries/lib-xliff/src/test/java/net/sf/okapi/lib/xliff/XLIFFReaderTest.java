@@ -73,7 +73,7 @@ public class XLIFFReaderTest {
 		assertNotNull(unit);
 		
 		assertEquals("\u0019\u0045\uFFFF"+chars[0]+chars[1], unit.getPart(0).getSource().getCodedText().substring(2));
-		ICode code = unit.getDataStore().getSourceCodes().get(0);
+		ICode code = (ICode)unit.getDataStore().getSourceMarkers().get(0);
 		assertEquals("[\u0019\u0045\uFFFF"+chars[0]+chars[1]+"]", code.getOriginalData());
 
 		assertEquals("<ph id=\"1\">[<cp hex=\"0019\"/>\u0045<cp hex=\"FFFF\"/>"+chars[0]+chars[1]+"]</ph><cp hex=\"0019\"/>\u0045<cp hex=\"FFFF\"/>"+chars[0]+chars[1],
@@ -93,7 +93,7 @@ public class XLIFFReaderTest {
 		assertNotNull(unit);
 		
 		assertEquals("a\uFFFDz", unit.getPart(0).getSource().getCodedText().substring(2));
-		ICode code = unit.getDataStore().getSourceCodes().get(0);
+		ICode code = (ICode)unit.getDataStore().getSourceMarkers().get(0);
 		assertEquals("[\uFFFD]", code.getOriginalData());
 
 		assertEquals("<ph id=\"1\">[\uFFFD]</ph>a\uFFFDz",
@@ -113,13 +113,13 @@ public class XLIFFReaderTest {
 		Unit unit = getUnit(text, 1);
 		assertNotNull(unit);
 		
-		ICode code = unit.getDataStore().getSourceCodes().get(0);
+		ICode code = (ICode)unit.getDataStore().getSourceMarkers().get(0);
 		assertEquals("eq1", code.getEquiv());
 		assertEquals("di1", code.getDisp());
-		code = unit.getDataStore().getSourceCodes().get(1);
+		code = (ICode)unit.getDataStore().getSourceMarkers().get(1);
 		assertEquals("eq2", code.getEquiv());
 		assertEquals("di2", code.getDisp());
-		code = unit.getDataStore().getSourceCodes().get(2);
+		code = (ICode)unit.getDataStore().getSourceMarkers().get(2);
 		assertEquals("eq3", code.getEquiv());
 		assertEquals("di3", code.getDisp());
 		

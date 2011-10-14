@@ -26,11 +26,12 @@ import java.util.Stack;
 import org.oasisopen.xliff.v2.ICode;
 import org.oasisopen.xliff.v2.IDataStore;
 import org.oasisopen.xliff.v2.IFragment;
+import org.oasisopen.xliff.v2.IMarker;
+import org.oasisopen.xliff.v2.IMarkers;
 import org.oasisopen.xliff.v2.InlineType;
 
 /**
- * TEMPORARY implementation.
- * Holds the usable content for XLIFF constructs: text and inline codes.
+ * Holds the usable content for XLIFF constructs: text and inline markers.
  */
 public class Fragment implements IFragment {
 	
@@ -41,13 +42,12 @@ public class Fragment implements IFragment {
 	public static final char CODE_PLACEHOLDER = '\uE103';
 	public static final char ANNO_OPENING = '\uE104';
 	public static final char ANNO_CLOSING = '\uE105';
-	public static final char ANNO_PLACEHOLDER = '\uE106';
 
 	public static final int INDEX_BASE = 0xE110;
 	public static final int INDEX_MAX = (0xF8FF-INDEX_BASE);
 
 	private StringBuilder ctext;
-	private Codes codes;
+	private IMarkers markers;
 	
 	/**
 	 * Helper method to convert a marker index to its character value in the
@@ -82,7 +82,6 @@ public class Fragment implements IFragment {
 		return (( ch == CODE_PLACEHOLDER )
 			|| ( ch == CODE_OPENING )
 			|| ( ch == CODE_CLOSING )
-			|| ( ch == ANNO_PLACEHOLDER )
 			|| ( ch == ANNO_OPENING )
 			|| ( ch == ANNO_CLOSING ));
 	}
@@ -90,7 +89,7 @@ public class Fragment implements IFragment {
 	public Fragment (DataStore store) {
 		ctext = new StringBuilder();
 		if ( store != null ) {
-			this.codes = store.getSourceCodes();
+			this.markers = store.getSourceMarkers();
 		}
 	}
 	
@@ -99,8 +98,8 @@ public class Fragment implements IFragment {
 	{
 		ctext = new StringBuilder();
 		if ( store != null ) {
-			if ( target ) this.codes = store.getTargetCodes();
-			else this.codes = store.getSourceCodes();
+			if ( target ) this.markers = store.getTargetMarkers();
+			else this.markers = store.getSourceMarkers();
 		}
 	}
 	
@@ -110,8 +109,8 @@ public class Fragment implements IFragment {
 	{
 		ctext = new StringBuilder(plainText);
 		if ( store != null ) {
-			if ( target ) this.codes = store.getTargetCodes();
-			else this.codes = store.getSourceCodes();
+			if ( target ) this.markers = store.getTargetMarkers();
+			else this.markers = store.getSourceMarkers();
 		}
 	}
 	
@@ -140,7 +139,10 @@ public class Fragment implements IFragment {
 	
 	@Override
 	public IDataStore getDataStore () {
-		return codes.getDataStore();
+		if ( markers == null ) {
+			throw new RuntimeException("This fragment has no associated store.");
+		}
+		return markers.getDataStore();
 	}
 
 	private String toXLIFFWithOriginalData (boolean dataInside) {
@@ -152,12 +154,12 @@ public class Fragment implements IFragment {
 		for ( int i=0; i<ctext.length(); i++ ) {
 			int cp = ctext.codePointAt(i);
 			if ( cp == CODE_OPENING ) {
-				code = codes.get(toIndex(ctext.charAt(++i)));
+				code = (ICode)markers.get(toIndex(ctext.charAt(++i)));
 				// Check if the corresponding closing part is in the same fragment
 				ICode closing = null;
 				if ( !dataInside ) {
 					// For data outside we can use <pc>
-					closing = getWellFormedClosing(code, i);
+					closing = (ICode)getWellFormedClosing(code, i);
 				}
 				if ( closing != null ) {
 					tmp.append(String.format("<pc id=\"%s\"", code.getId()));
@@ -181,13 +183,13 @@ public class Fragment implements IFragment {
 					if ( code.hasOriginalData() ) {
 						String ending = (closing==null ? "" : "Start");
 						tmp.append(String.format(" nid%s=\"%s\"", ending,
-							codes.getDataStore().getIdForOriginalData(code.getOriginalData())));
+							markers.getDataStore().getIdForOriginalData(code.getOriginalData())));
 					}
 					tmp.append(closing==null ? "/>" : ">");
 				}
 			}
 			else if ( cp == CODE_CLOSING ) {
-				code = codes.get(toIndex(ctext.charAt(++i)));
+				code = (ICode)markers.get(toIndex(ctext.charAt(++i)));
 				if ( verified.contains(code.getId()) ) {
 					// This pair was verified
 					tmp.append("</pc>");
@@ -209,7 +211,7 @@ public class Fragment implements IFragment {
 					else {
 						if ( code.hasOriginalData() ) {
 							tmp.append(String.format(" nid=\"%s\"",
-								codes.getDataStore().getIdForOriginalData(code.getOriginalData())));
+								markers.getDataStore().getIdForOriginalData(code.getOriginalData())));
 						}
 						tmp.append("/>");
 					}
@@ -217,7 +219,7 @@ public class Fragment implements IFragment {
 			}
 			else if ( cp == CODE_PLACEHOLDER ) {
 				index = toIndex(ctext.charAt(++i));
-				code = codes.get(index);
+				code = (ICode)markers.get(index);
 				tmp.append(String.format("<ph id=\"%s\"", code.getId()));
 				printCommonAttributes(code, tmp, null, false);
 				if ( dataInside ) {
@@ -231,10 +233,18 @@ public class Fragment implements IFragment {
 				else {
 					if ( code.hasOriginalData() ) {
 						tmp.append(String.format(" nid=\"%s\"",
-							codes.getDataStore().getIdForOriginalData(code.getOriginalData())));
+							markers.getDataStore().getIdForOriginalData(code.getOriginalData())));
 					}
 					tmp.append("/>");
 				}
+			}
+			else if ( cp == ANNO_OPENING ) {
+				//TODO
+				i++;
+			}
+			else if ( cp == ANNO_CLOSING ) {
+				//TODO
+				i++;
 			}
 			else {
 				switch ( cp ) {
@@ -314,7 +324,7 @@ public class Fragment implements IFragment {
 
 			if ( outputNid && closing.hasOriginalData() ) {
 				tmp.append(String.format(" nidEnd=\"%s\"",
-					codes.getDataStore().getIdForOriginalData(closing.getOriginalData())));
+					markers.getDataStore().getIdForOriginalData(closing.getOriginalData())));
 			}
 			
 		}
@@ -328,9 +338,9 @@ public class Fragment implements IFragment {
 		for ( int i=0; i<ctext.length(); i++ ) {
 			int cp = ctext.codePointAt(i);
 			if ( cp == CODE_OPENING ) {
-				code = codes.get(toIndex(ctext.charAt(++i)));
+				code = (ICode)markers.get(toIndex(ctext.charAt(++i)));
 				// Check if the corresponding closing part is in the same fragment
-				ICode closing = getWellFormedClosing(code, i);
+				ICode closing = (ICode)getWellFormedClosing(code, i);
 				if ( closing != null ) {
 					tmp.append(String.format("<pc id=\"%s\"", code.getId()));
 					printCommonAttributes(code, tmp, closing, false);
@@ -345,7 +355,7 @@ public class Fragment implements IFragment {
 				}
 			}
 			else if ( cp == CODE_CLOSING ) {
-				code = codes.get(toIndex(ctext.charAt(++i)));
+				code = (ICode)markers.get(toIndex(ctext.charAt(++i)));
 				if ( verified.contains(code.getId()) ) {
 					// This pair was verified
 					tmp.append("</pc>");
@@ -359,10 +369,18 @@ public class Fragment implements IFragment {
 				}
 			}
 			else if ( cp == CODE_PLACEHOLDER ) {
-				code = codes.get(toIndex(ctext.charAt(++i)));
+				code = (ICode)markers.get(toIndex(ctext.charAt(++i)));
 				tmp.append(String.format("<ph id=\"%s\"", code.getId()));
 				printCommonAttributes(code, tmp, null, false);
 				tmp.append("/>");
+			}
+			else if ( cp == ANNO_OPENING ) {
+				//TODO
+				i++;
+			}
+			else if ( cp == ANNO_CLOSING ) {
+				//TODO
+				i++;
 			}
 			else {
 				// In XML 1.0 the valid characters are:
@@ -410,22 +428,23 @@ public class Fragment implements IFragment {
 	}
 
 	@Override
-	public ICode getWellFormedClosing (ICode openingCode,
+	public IMarker getWellFormedClosing (IMarker openingMarker,
 		int from)
 	{
 		Stack<String> stack = new Stack<String>();
 		for ( int i=from; i<ctext.length(); i++ ) {
 			char ch = ctext.charAt(i);
-			ICode code;
-			if ( ch == CODE_OPENING ) {
-				code = codes.get(toIndex(ctext.charAt(++i)));
-				stack.push(code.getId());
+			IMarker marker;
+			if (( ch == CODE_OPENING ) || ( ch == ANNO_OPENING )) {
+				marker = markers.get(toIndex(ctext.charAt(++i)));
+				stack.push(marker.getId());
 			}
-			else if ( ch == CODE_CLOSING ) {
-				code = codes.get(toIndex(ctext.charAt(++i)));
-				if ( code.getId().equals(openingCode.getId()) ) {
+//TODO: annotation take precedence over codees for well-formness!!			
+			else if (( ch == CODE_CLOSING ) || ( ch == ANNO_CLOSING )) {
+				marker = markers.get(toIndex(ctext.charAt(++i)));
+				if ( marker.getId().equals(openingMarker.getId()) ) {
 					// Well-formed if the stack is empty
-					if ( stack.isEmpty() ) return code;
+					if ( stack.isEmpty() ) return marker;
 					else return null;
 				}
 				// If it's not our closing code and the stack is already empty
@@ -433,12 +452,10 @@ public class Fragment implements IFragment {
 				if ( stack.isEmpty() ) {
 					return null;
 				}
-				// If the top of the stack is not the closing of the current
-				// element, it's not well-formed.
-				if ( !stack.pop().equals(code.getId()) ) {
-					return null;
-				}
-				// Else: keep going
+				// Remove the marker
+				// If it's at the top it's like a pop()
+				// Otherwise it says the opening was closed
+				stack.remove(marker.getId());
 			}
 			else if ( ch == CODE_PLACEHOLDER ) {
 				i++;
@@ -460,16 +477,16 @@ public class Fragment implements IFragment {
 
 	@Override
 	public ICode append (ICode code) {
-		codes.add(code);
+		markers.add(code);
 		switch ( code.getInlineType() ) {
 		case OPENING:
-			ctext.append(""+CODE_OPENING+toChar(codes.size()-1));
+			ctext.append(""+CODE_OPENING+toChar(markers.size()-1));
 			break;
 		case CLOSING:
-			ctext.append(""+CODE_CLOSING+toChar(codes.size()-1));
+			ctext.append(""+CODE_CLOSING+toChar(markers.size()-1));
 			break;
 		case PLACEHOLDER:
-			ctext.append(""+CODE_PLACEHOLDER+toChar(codes.size()-1));
+			ctext.append(""+CODE_PLACEHOLDER+toChar(markers.size()-1));
 			break;
 		}
 		return code;
@@ -480,8 +497,8 @@ public class Fragment implements IFragment {
 		String id,
 		String originalData)
 	{
-		if ( codes == null ) {
-			throw new RuntimeException("Cannot add codes in this fragment because it has no associated store of codes.");
+		if ( markers == null ) {
+			throw new RuntimeException("Cannot add codes in this fragment because it has no associated store.");
 		}
 		ICode code = new Code(type, id, originalData);
 		return append(code);

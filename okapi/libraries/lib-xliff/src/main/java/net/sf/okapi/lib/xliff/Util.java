@@ -64,6 +64,19 @@ class Util {
 	final static String ATTR_TRANSLATABLE = "translatable";
 	final static String ATTR_APPLIESTO = "appliesTo";
 	
+	static 	int compareAllowingNull (String s1,
+		String s2)
+	{
+		if ( s1 == null ) {
+			if ( s2 == null ) return 0;
+			else return -1;
+		}
+		if ( s2 == null ) {
+			return 1;
+		}
+		return s1.compareTo(s2);
+	}
+	
 	static String toInternalId (String id,
 		InlineType inlineType)
 	{

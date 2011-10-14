@@ -21,6 +21,7 @@
 package net.sf.okapi.lib.xliff;
 
 import org.oasisopen.xliff.v2.ICode;
+import org.oasisopen.xliff.v2.IMarker;
 import org.oasisopen.xliff.v2.InlineType;
 
 public class Code implements ICode {
@@ -77,7 +78,7 @@ public class Code implements ICode {
 	public String getId () {
 		return id;
 	}
-
+	
 	@Override
 	public String getInternalId () {
 		return internalId;
@@ -188,31 +189,30 @@ public class Code implements ICode {
 	}
 
 	@Override
-	public boolean equals (ICode code) {
-		if ( this == code ) return true;
+	public boolean equals (IMarker marker) {
+		if ( marker == null ) {
+			throw new NullPointerException("The parameter of Code.equals() must not be null.");
+		}
+		if ( this == marker ) return true;
+		if ( !(marker instanceof ICode) ) return false;
+		
+		// Code-specific comparison
+		ICode code = (ICode)marker;
 		if ( inlineType.compareTo(code.getInlineType()) != 0 ) return false;
-		if ( compStr(id, code.getId()) != 0 ) return false;
-		if ( compStr(type, code.getType()) != 0 ) return false;
-		if ( compStr(subFlows, code.getSubFlows()) != 0 ) return false;
-		if ( compStr(originalData, code.getOriginalData()) != 0 ) return false;
-		if ( compStr(disp, code.getDisp()) != 0 ) return false;
-		if ( compStr(equiv, code.getEquiv()) != 0 ) return false;
+		if ( Util.compareAllowingNull(id, code.getId()) != 0 ) return false;
+		if ( Util.compareAllowingNull(type, code.getType()) != 0 ) return false;
+		if ( Util.compareAllowingNull(subFlows, code.getSubFlows()) != 0 ) return false;
+		if ( Util.compareAllowingNull(originalData, code.getOriginalData()) != 0 ) return false;
+		if ( Util.compareAllowingNull(disp, code.getDisp()) != 0 ) return false;
+		if ( Util.compareAllowingNull(equiv, code.getEquiv()) != 0 ) return false;
 		if ( hints != code.getHints() ) return false;
-		if ( compStr(internalId, code.getInternalId()) != 0 ) return false;
+		if ( Util.compareAllowingNull(internalId, code.getInternalId()) != 0 ) return false;
 		return true;
 	}
-	
-	private int compStr (String s1,
-		String s2)
-	{
-		if ( s1 == null ) {
-			if ( s2 == null ) return 0;
-			else return -1;
-		}
-		if ( s2 == null ) {
-			return 1;
-		}
-		return s1.compareTo(s2);
-	}
 
+	@Override
+	public boolean isAnnotation () {
+		return false;
+	}
+	
 }

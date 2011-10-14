@@ -20,44 +20,24 @@ See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 
 package org.oasisopen.xliff.v2;
 
-public interface ICode extends IMarker {
+import java.io.Serializable;
 
-	public String getOriginalData ();
-	
-	public void setOriginalData (String originalData);
-	
-	public boolean hasOriginalData ();
-	
-	public String getDisp ();
-	
-	public void setDisp (String disp);
-	
-	public String getEquiv ();
-	
-	public void setEquiv (String equiv);
-	
-	public String getSubFlows ();
-	
-	public void setSubFlows (String subFlows);
-	
-	public int getHints ();
-	
-	public void setHints (int hints);
-	
-	public boolean canDelete ();
+public interface IMarker extends Serializable {
 
-	public void setCanDelete (boolean canDelete);
+	public InlineType getInlineType ();
 
-	public boolean canReplicate ();
+	public void setInlineType (InlineType inlineType);
 
-	public void setCanReplicate (boolean canReplicate);
-
-	public boolean canReorder ();
-
-	public void setCanReorder (boolean canReorder);
-
-	public boolean canChangeParent ();
-
-	public void setCanChangeParent (boolean canChangeParent);
+	public String getId ();
 	
+	public String getInternalId ();
+	
+	public String getType ();
+	
+	public void setType (String type);
+	
+	public boolean equals (IMarker code);
+	
+	public boolean isAnnotation ();
+
 }
