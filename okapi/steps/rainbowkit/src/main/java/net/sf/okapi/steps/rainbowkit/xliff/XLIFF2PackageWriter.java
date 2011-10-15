@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import org.oasisopen.xliff.v2.ICode;
+import org.oasisopen.xliff.v2.IWithCandidates;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.FileUtil;
@@ -361,12 +362,24 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 			}
 		}
 		
+		if ( trgTc != null ) {
+			// Text-unit level: add possible Alt-trans annotation
+			AltTranslationsAnnotation ann = trgTc.getAnnotation(AltTranslationsAnnotation.class);
+			if ( ann != null ) {
+				TextFragment tf = tu.getSource().getUnSegmentedContentCopy();
+				for ( AltTranslation alt : ann ) {
+					copyData(alt, tf, unit);
+				}
+			}
+			
+		}
+		
 		return unit;
 	}
 	
 	private void copyData (AltTranslation alt,
 		TextFragment oriSource,
-		net.sf.okapi.lib.xliff.Segment xSeg)
+		IWithCandidates xObject)
 	{
 		Candidate xAlt = new Candidate();
 		DataStore cs = xAlt.getDataStore();
@@ -378,7 +391,7 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 			
 		}
 		xAlt.setTarget(toXLIFF2Fragment(alt.getTarget().getFirstContent(), cs, true));
-		xSeg.addCandidate(xAlt);
+		xObject.addCandidate(xAlt);
 	}
 	
 	private Fragment toXLIFF2Fragment (TextFragment tf,

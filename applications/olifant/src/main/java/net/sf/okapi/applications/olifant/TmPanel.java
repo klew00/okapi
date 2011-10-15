@@ -198,11 +198,22 @@ class TmPanel extends Composite implements IObserver {
 	
 	void editColumns () {
 		try {
-			ColumnsForm dlg = new ColumnsForm(getShell(), tm, opt.getVisibleFields());
-			ArrayList<String> res = dlg.showDialog();
-			if ( res == null ) return;
+			ArrayList<String> prevList = opt.getVisibleFields();
+			ColumnsForm dlg = new ColumnsForm(getShell(), tm, prevList);
 			
-			opt.setVisibleFields(res);
+			Object[] res = dlg.showDialog();
+			if (( res[0] == null ) && ( !(Boolean)res[1] )) {
+				return; // Nothing to do
+			}
+			if ( res[0] == null ) {
+				opt.setVisibleFields(prevList);
+			}
+			else {
+				@SuppressWarnings("unchecked")
+				ArrayList<String> newList = (ArrayList<String>)res[0];
+				opt.setVisibleFields(newList);
+			}
+
 			//TODO Set the columns with the source and target
 			srcCol = -1;
 			trgCol = -1;

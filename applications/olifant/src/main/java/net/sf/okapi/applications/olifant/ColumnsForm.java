@@ -57,7 +57,8 @@ class ColumnsForm {
 	private final Button btAdd;
 	private final Button btDelete;
 	private final Button btRename;
-	private ArrayList<String> results = null;
+	private boolean changedFields = false;
+	private Object results[] = new Object[2];
 	private ITm tm;
 
 	ColumnsForm (Shell parent,
@@ -190,9 +191,14 @@ class ColumnsForm {
 		SelectionAdapter OKCancelActions = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if ( e.widget.getData().equals("o") ) { //$NON-NLS-1$
-					results = new ArrayList<String>(Arrays.asList(lbDisplayFields.getItems()));
-					results.remove(0);
+					ArrayList<String> newList = new ArrayList<String>();
+					newList = new ArrayList<String>(Arrays.asList(lbDisplayFields.getItems()));
+					newList.remove(0);
+					results[0] = newList;
 				}
+				// In both case: the second returned object is a boolean saying if fields
+				// have been added or deleted
+				results[1] = changedFields;
 				shell.close();
 			};
 		};
@@ -370,6 +376,7 @@ class ColumnsForm {
 			if ( !dlg.showDialog() ) return; // Nothing changed
 			// Else: update the lists
 			updateLists(toDisplay);
+			changedFields = true;
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
@@ -383,18 +390,22 @@ class ColumnsForm {
 			String fn = lbAvailableFields.getItem(n);
 			if ( DbUtil.isPreDefinedField(fn) ) {
 				Dialogs.showError(shell, "You cannot delete a special field.", null);
+				return;
 			}
 			
 			// Ask confirmation
 			MessageBox dlg = new MessageBox(shell, SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
 			dlg.setMessage(String.format(
-				"This command will delete the field '%s' in the TM '%s'.\nThis operation cannot be undone.\nDo you want to proceed?",
+				"This command will delete the field '%s' in the TM '%s'.\n" +
+				"This operation is done immediately and cannot be undone.\n" +
+				"Do you want to proceed?",
 				fn, tm.getName()));
 			if ( dlg.open() != SWT.YES ) {
 				return; // Cancel or no.
 			}
 			
 			tm.deleteField(fn);
+			changedFields = true;
 			updateLists(new ArrayList<String>(Arrays.asList(lbDisplayFields.getItems())));
 		}
 		catch ( Throwable e ) {
@@ -406,11 +417,18 @@ class ColumnsForm {
 		try {
 			int n = lbAvailableFields.getSelectionIndex();
 			if ( n < 0 ) return;
-//			String fn = lbAvailableFields.getItem(n);
+			String currentName = lbAvailableFields.getItem(n);
+
+			ArrayList<String> existingNames = new ArrayList<String>(tm.getAvailableFields());
+			java.util.List<String> existingCodes = tm.getLocales();
+			RenameFieldForm dlg = new RenameFieldForm(shell, currentName, existingNames, existingCodes);
+			String newName = dlg.showDialog();
+			if ( newName == null ) return; // Cancel
+
+			// Rename the field
+			tm.renameField(currentName, newName);
 			
-//todo			
-			Dialogs.showWarning(shell, "Not implemented yet.", null);
-			
+			changedFields = true;
 			updateLists(new ArrayList<String>(Arrays.asList(lbDisplayFields.getItems())));
 		}
 		catch ( Throwable e ) {
@@ -418,7 +436,11 @@ class ColumnsForm {
 		}
 	}
 	
-	ArrayList<String> showDialog () {
+	/* Return 2 objects:
+	 * 0 = an ArrayList<String> of the new fields to display or null if cancel
+	 * 1 = a boolean true if fields have been modified (added, deleted, renamed)
+	 */
+	Object[] showDialog () {
 		shell.open();
 		while ( !shell.isDisposed() ) {
 			if ( !shell.getDisplay().readAndDispatch() )

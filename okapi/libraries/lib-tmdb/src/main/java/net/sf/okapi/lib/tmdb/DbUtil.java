@@ -137,6 +137,20 @@ public class DbUtil {
 	}
 	
 	/**
+	 * Gets the root part of a given field name.
+	 * That is the part without the locale code and separator if the name has a locale suffix.
+	 * @param fullName the full name of the field to process.
+	 * @return the root part of the name, or the same string.
+	 */
+	public static String getFieldRoot (String fullName) {
+		int n = fullName.indexOf(LOC_SEP);
+		if ( n > -1 ) {
+			return fullName.substring(0, n);
+		}
+		return fullName;
+	}
+	
+	/**
 	 * Checks a potential field name to be used in Olifant.
 	 * @param name the name to check.
 	 * @return the valid name, usually un-changed.
