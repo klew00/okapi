@@ -118,7 +118,6 @@ class RenameFieldForm {
 			fullName = DbUtil.checkFieldName(tmp);
 			if ( loc != null ) {
 				fullName = fullName + DbUtil.LOC_SEP + loc;
-				
 				// Check the code
 				if ( !existingCodes.contains(loc) ) {
 					Dialogs.showError(shell, String.format("The locale '%s' does not exists.", loc), null);

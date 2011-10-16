@@ -78,7 +78,7 @@ class RepositoryForm {
 		});
 		
 		defaultLocalname = Util.ensureSeparator(System.getProperty("user.home"), false)
-			+ "Olifant" + File.separator + "defaultOlifantTMrepository";
+			+ "Olifant" + File.separator + "defaultOlifantTMRepository";
 		edDefaultLocal = new Text(group, SWT.BORDER);
 		edDefaultLocal.setEditable(false);
 		edDefaultLocal.setText(defaultLocalname);

@@ -120,6 +120,9 @@ class RepositoryPanel extends Composite {
 				if (( e.character == 13 ) || ( e.character == 32 )) {
 					openTmTab(null); // Use current selection
 				}
+				else if ( e.keyCode == SWT.F2 ) {
+					renameTm(null); // Use current selection
+				}
 			}
 		});
 		
@@ -201,11 +204,15 @@ class RepositoryPanel extends Composite {
 	void deleteTm (String tmName) {
 		int n = 0;
 		try {
-			// If tmName is null use the current selection
-			n = tmList.getSelectionIndex();
 			if ( tmName == null ) {
+				// If tmName is null use the current selection
+				n = tmList.getSelectionIndex();
 				if ( n < 0 ) return;
 				tmName = tmList.getItem(n);
+			}
+			else {
+				n = tmList.indexOf(tmName);
+				if ( n < 0 ) return;
 			}
 			
 			// Ask confirmation
@@ -238,11 +245,15 @@ class RepositoryPanel extends Composite {
 	void renameTm (String tmName) {
 		int n = 0;
 		try {
-			// If tmName is null use the current selection
-			n = tmList.getSelectionIndex();
 			if ( tmName == null ) {
+				// If tmName is null use the current selection
+				n = tmList.getSelectionIndex();
 				if ( n < 0 ) return;
 				tmName = tmList.getItem(n);
+			}
+			else {
+				n = tmList.indexOf(tmName);
+				if ( n < 0 ) return;
 			}
 			
 			// Check if the TM is open
@@ -575,6 +586,7 @@ class RepositoryPanel extends Composite {
 				mainForm.findTmTab(tmName, true);
 				tp.resetTmDisplay();
 			}
+			tp.showLog(); // Make sure to display the log
 			
 			// Create the raw document to add to the session
 			URI uri = (new File((String)data[0])).toURI();

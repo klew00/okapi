@@ -32,13 +32,14 @@ import net.sf.okapi.lib.tmdb.ITm;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
@@ -60,6 +61,7 @@ class ColumnsForm {
 	private boolean changedFields = false;
 	private Object results[] = new Object[2];
 	private ITm tm;
+	private boolean inProcessMode = false;
 
 	ColumnsForm (Shell parent,
 		ITm tm,
@@ -67,10 +69,21 @@ class ColumnsForm {
 	{
 		this.tm = tm;
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
-		shell.setText("Column Selection");
+		shell.setText("Columns and Fields");
 		UIUtil.inheritIcon(shell, parent);
 		shell.setLayout(new GridLayout(3, false));
 
+		// Handling of the closing event
+		shell.addShellListener(new ShellListener() {
+			public void shellActivated(ShellEvent event) {}
+			public void shellClosed(ShellEvent event) {
+				results[1] = changedFields;
+			}
+			public void shellDeactivated(ShellEvent event) {}
+			public void shellDeiconified(ShellEvent event) {}
+			public void shellIconified(ShellEvent event) {}
+		});
+		
 		Group group = new Group(shell, SWT.NONE);
 		group.setLayout(new GridLayout());
 		group.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -150,23 +163,6 @@ class ColumnsForm {
 			}
 		});
 		
-		new Label(cmp, SWT.NONE); // Separator
-
-		btMoveUp = UIUtil.createGridButton(cmp, SWT.PUSH, "Move Up", minButtonWidth, 1);
-		btMoveUp.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_CENTER));
-		btMoveUp.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				moveUp();
-			}
-		});
-		
-		btMoveDown = UIUtil.createGridButton(cmp, SWT.PUSH, "Move Down", minButtonWidth, 1);
-		btMoveDown.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_CENTER));
-		btMoveDown.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				moveDown();
-			}
-		});
 		
 		UIUtil.setSameWidth(minButtonWidth, cmp.getChildren());
 		
@@ -186,7 +182,25 @@ class ColumnsForm {
 			};
 		});
 
-		updateLists(visibleFields);
+		btMoveUp = UIUtil.createGridButton(group, SWT.PUSH, "Move Up", minButtonWidth, 1);
+		btMoveUp.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING));
+		btMoveUp.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				moveUp();
+			}
+		});
+		
+		btMoveDown = UIUtil.createGridButton(group, SWT.PUSH, "Move Down", minButtonWidth, 1);
+		btMoveDown.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING));
+		btMoveDown.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				moveDown();
+			}
+		});
+
+		UIUtil.setSameWidth(minButtonWidth, btMoveUp, btMoveDown);
+
+		updateLists(visibleFields, 0, 1);
 		
 		SelectionAdapter OKCancelActions = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
@@ -214,7 +228,10 @@ class ColumnsForm {
 		Dialogs.centerWindow(shell, parent);
 	}
 
-	private void updateLists (ArrayList<String> visibleFields) {
+	private void updateLists (ArrayList<String> visibleFields,
+		int availableSelection,
+		int displaySelection)
+	{
 		// Get the current list of available fields
 		ArrayList<String> list = new ArrayList<String>(tm.getAvailableFields());
 		// Remove from the display list fields not available
@@ -228,8 +245,12 @@ class ColumnsForm {
 			lbAvailableFields.add(fn);
 		}
 		// Set the selection
-		if ( lbAvailableFields.getItemCount() > 0 ) {
-			lbAvailableFields.setSelection(0);
+		if (( availableSelection < 0 )
+			|| ( availableSelection >= lbAvailableFields.getItemCount() )) {
+			availableSelection = lbAvailableFields.getItemCount()-1;
+		}
+		if ( lbAvailableFields.getItemCount() > availableSelection ) {
+			lbAvailableFields.setSelection(availableSelection);
 		}
 
 		// Reset the list of display fields
@@ -239,14 +260,21 @@ class ColumnsForm {
 			lbDisplayFields.add(fn);
 		}
 		// Set the selection
-		lbDisplayFields.setSelection((lbDisplayFields.getItemCount() > 1 ? 1 : 0));
+		if (( displaySelection < 0 ) 
+			|| ( displaySelection >= lbDisplayFields.getItemCount() )) {
+			displaySelection = lbDisplayFields.getItemCount()-1;
+		}
+		if ( lbDisplayFields.getItemCount() > displaySelection ) {
+			lbDisplayFields.setSelection(displaySelection);
+		}
 		
 		// Update the buttons
 		updateCommands();
 	}
 	
 	private void updateCommands () {
-		boolean hasAvailableFields = (lbAvailableFields.getItemCount()>0);
+		boolean hasAvailableFields = (( lbAvailableFields.getItemCount() > 0 ) && !inProcessMode );
+		btAdd.setEnabled(!inProcessMode);
 		btShow.setEnabled(hasAvailableFields);
 		btShowAll.setEnabled(hasAvailableFields);
 		btShowAllTexts.setEnabled(hasAvailableFields);
@@ -256,7 +284,7 @@ class ColumnsForm {
 	}
 	
 	private void updateMoveCommands () {
-		int n = lbDisplayFields.getSelectionIndex();
+		int n = (inProcessMode ? -1 : lbDisplayFields.getSelectionIndex());
 		btHide.setEnabled(lbDisplayFields.getSelectionCount()>0 && lbDisplayFields.getItemCount()>1 && n>0);
 		btMoveUp.setEnabled(n>1);
 		btMoveDown.setEnabled(n<lbDisplayFields.getItemCount()-1 && n>0);
@@ -367,19 +395,28 @@ class ColumnsForm {
 		}
 	}
 	
+	private void setInProcess (boolean inProcess) {
+		this.inProcessMode = inProcess;
+		updateCommands();
+	}
+	
 	private void addFields () {
 		try {
 			ArrayList<String> toDisplay = new ArrayList<String>(Arrays.asList(lbDisplayFields.getItems()));
 			toDisplay.remove(0);
 
 			AddFieldsForm dlg = new AddFieldsForm(shell, tm);
+			setInProcess(true);
 			if ( !dlg.showDialog() ) return; // Nothing changed
 			// Else: update the lists
-			updateLists(toDisplay);
+			updateLists(toDisplay, lbAvailableFields.getSelectionIndex(), lbDisplayFields.getSelectionIndex());
 			changedFields = true;
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
+		}
+		finally {
+			setInProcess(false);
 		}
 	}
 	
@@ -387,6 +424,7 @@ class ColumnsForm {
 		try {
 			int n = lbAvailableFields.getSelectionIndex();
 			if ( n < 0 ) return;
+			setInProcess(true);
 			String fn = lbAvailableFields.getItem(n);
 			if ( DbUtil.isPreDefinedField(fn) ) {
 				Dialogs.showError(shell, "You cannot delete a special field.", null);
@@ -403,13 +441,16 @@ class ColumnsForm {
 			if ( dlg.open() != SWT.YES ) {
 				return; // Cancel or no.
 			}
-			
 			tm.deleteField(fn);
 			changedFields = true;
-			updateLists(new ArrayList<String>(Arrays.asList(lbDisplayFields.getItems())));
+			updateLists(new ArrayList<String>(Arrays.asList(lbDisplayFields.getItems())),
+				lbAvailableFields.getSelectionIndex(), lbDisplayFields.getSelectionIndex());
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
+		}
+		finally {
+			setInProcess(false);
 		}
 	}
 	
@@ -422,6 +463,7 @@ class ColumnsForm {
 			ArrayList<String> existingNames = new ArrayList<String>(tm.getAvailableFields());
 			java.util.List<String> existingCodes = tm.getLocales();
 			RenameFieldForm dlg = new RenameFieldForm(shell, currentName, existingNames, existingCodes);
+			setInProcess(true);
 			String newName = dlg.showDialog();
 			if ( newName == null ) return; // Cancel
 
@@ -429,10 +471,14 @@ class ColumnsForm {
 			tm.renameField(currentName, newName);
 			
 			changedFields = true;
-			updateLists(new ArrayList<String>(Arrays.asList(lbDisplayFields.getItems())));
+			updateLists(new ArrayList<String>(Arrays.asList(lbDisplayFields.getItems())),
+				lbAvailableFields.getSelectionIndex(), lbDisplayFields.getSelectionIndex());
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
+		}
+		finally {
+			setInProcess(false);
 		}
 	}
 	

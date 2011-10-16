@@ -65,6 +65,8 @@ public class MainForm {
 
 	public static final String OPT_BOUNDS = "bounds"; //$NON-NLS-1$
 	public static final String OPT_MAXIMIZED = "maximized"; //$NON-NLS-1$
+	public static final String OPT_REPOSITORYTYPE = "repositoryType"; //$NON-NLS-1$
+	public static final String OPT_REPOSITORYARG = "repositoryArg"; //$NON-NLS-1$
 
 	private Shell shell;
 	private UserConfiguration config;
@@ -77,11 +79,14 @@ public class MainForm {
 	private StatusBar statusBar;
 	
 	private MenuItem miFileOpen;
-	private MenuItem miFileClose;
+	private MenuItem miTMNew;
+	private MenuItem miTMClose;
+	private MenuItem miTMDelete;
+	private MenuItem miTMRename;
+	private MenuItem miTMEditColumns;
+	private MenuItem miTMEditLocales;
 	private MenuItem miShowHideThirdField;
 	private MenuItem miShowHideFieldList;
-	private MenuItem miEditColumns;
-	private MenuItem miEditLocales;
 	private MenuItem miStatistics;
 	private MenuItem miShowHideLog;
 
@@ -108,6 +113,7 @@ public class MainForm {
 		config.setProperty(OPT_MAXIMIZED, shell.getMaximized());
 		Rectangle r = shell.getBounds();
 		config.setProperty(OPT_BOUNDS, String.format("%d,%d,%d,%d", r.x, r.y, r.width, r.height)); //$NON-NLS-1$
+		
 		// Save to the user home directory as ".appname" file
 		config.save(APPNAME, getClass().getPackage().getImplementationVersion());
 	}
@@ -312,18 +318,21 @@ public class MainForm {
 	void updateTitle () {
 		String name = repoPanel.getRepositoryName();
 		if ( name == null ) name = RepositoryPanel.NOREPOSELECTED_TEXT;
-		shell.setText(APPNAME + " - " + name);
+		shell.setText(APPNAME + " (ALPHA) - " + name);
 	}
 
 	void updateCommands () {
 		miStatistics.setEnabled(repoPanel.isRepositoryOpen());
+		miTMNew.setEnabled(repoPanel.isRepositoryOpen());
 		boolean active = ( repoPanel.isRepositoryOpen() && ( currentTP != null ) && !currentTP.hasRunningThread() );
-		miFileClose.setEnabled(active);
+		miTMClose.setEnabled(active);
+		miTMDelete.setEnabled(active);
+		miTMRename.setEnabled(active);
+		miTMEditColumns.setEnabled(active);
+		miTMEditLocales.setEnabled(active);
 		miShowHideLog.setEnabled(active);
 		miShowHideThirdField.setEnabled(active);
 		miShowHideFieldList.setEnabled((active) && currentTP.getEditorPanel().isExtraVisible());
-		miEditColumns.setEnabled(active);
-		miEditLocales.setEnabled(active);
 	}
 	
 	TmPanel addTmTabEmpty (ITm tm) {
@@ -365,14 +374,6 @@ public class MainForm {
             }
 		});
 		
-		miFileClose = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(miFileClose, "file.close"); //$NON-NLS-1$
-		miFileClose.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent event) {
-				closeTmTab(null); // null=use current tab
-            }
-		});
-		
 		new MenuItem(dropMenu, SWT.SEPARATOR);
 
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
@@ -383,6 +384,69 @@ public class MainForm {
             }
 		});
 		
+		// Translation memory menu
+		topItem = new MenuItem(menuBar, SWT.CASCADE);
+		topItem.setText(rm.getCommandLabel("tm")); //$NON-NLS-1$
+		dropMenu = new Menu(shell, SWT.DROP_DOWN);
+		topItem.setMenu(dropMenu);
+		
+		miTMNew = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miTMNew, "tm.new"); //$NON-NLS-1$
+		miTMNew.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				repoPanel.createTM();
+            }
+		});
+		
+		miTMClose = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miTMClose, "tm.close"); //$NON-NLS-1$
+		miTMClose.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				closeTmTab(null); // null=use current tab
+            }
+		});
+		
+		new MenuItem(dropMenu, SWT.SEPARATOR);
+
+		miTMDelete = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miTMDelete, "tm.delete"); //$NON-NLS-1$
+		miTMDelete.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				repoPanel.deleteTm(currentTP.getTm().getName());
+            }
+		});
+		
+		miTMRename = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miTMRename, "tm.rename"); //$NON-NLS-1$
+		miTMRename.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				repoPanel.renameTm(currentTP.getTm().getName());
+            }
+		});
+		
+		new MenuItem(dropMenu, SWT.SEPARATOR);
+
+		miTMEditColumns = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miTMEditColumns, "tm.editcolumns"); //$NON-NLS-1$
+		miTMEditColumns.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				if ( currentTP != null ) {
+					currentTP.editColumns();
+				}
+            }
+		});
+		
+		miTMEditLocales = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miTMEditLocales, "tm.editlocales"); //$NON-NLS-1$
+		miTMEditLocales.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				if ( currentTP != null ) {
+					currentTP.editLocales();
+				}
+            }
+		});
+		
+
 		// View menu
 		topItem = new MenuItem(menuBar, SWT.CASCADE);
 		topItem.setText(rm.getCommandLabel("view")); //$NON-NLS-1$
@@ -437,28 +501,6 @@ public class MainForm {
 	
 		new MenuItem(dropMenu, SWT.SEPARATOR);
 
-		miEditColumns = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(miEditColumns, "view.editcolumns"); //$NON-NLS-1$
-		miEditColumns.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent event) {
-				if ( currentTP != null ) {
-					currentTP.editColumns();
-				}
-            }
-		});
-		
-		miEditLocales = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(miEditLocales, "view.editlocales"); //$NON-NLS-1$
-		miEditLocales.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent event) {
-				if ( currentTP != null ) {
-					currentTP.editLocales();
-				}
-            }
-		});
-		
-		new MenuItem(dropMenu, SWT.SEPARATOR);
-
 		miStatistics = new MenuItem(dropMenu, SWT.PUSH);
 		rm.setCommand(miStatistics, "view.stats"); //$NON-NLS-1$
 		miStatistics.addSelectionListener(new SelectionAdapter() {
@@ -498,55 +540,9 @@ public class MainForm {
 		}
 		finally {
 			// Dispose of any global resources
-//			closeRepository();
 			if ( rm != null ) rm.dispose();
 		}
 	}
-	
-//	private void selectRepository () {
-//		try {
-//			RepositoryForm dlg = new RepositoryForm(shell);
-//			String[] res = dlg.showDialog();
-//			if ( res == null ) return; // No repository selected
-//			openRepository(res[0], res[1]);
-//		}
-//		catch ( Throwable e ) {
-//			Dialogs.showError(shell, "Error selecting repository.\n"+e.getMessage(), null);
-//		}
-//	}
-	
-//	private void closeRepository () {
-//		if ( repo != null ) {
-//			repo.close();
-//			repo = null;
-//		}
-//	}
-	
-//	private void openRepository (String type,
-//		String name)
-//	{
-//		try {
-//			// Make sure we close the previous repository
-//			closeRepository();
-//
-//			// Instantiate the new repository
-//			if ( type.equals("m") ) {
-//				//repo = new net.sf.okapi.lib.tmdb.memory.Repository();
-//			}
-//			else if ( type.equals("d") ) {
-//				repo = new net.sf.okapi.lib.tmdb.local.Repository();
-//				((net.sf.okapi.lib.tmdb.local.Repository)repo).open(name, true);
-//			}
-//		}
-//		catch ( Throwable e ) {
-//			Dialogs.showError(shell, "Error opening repository.\n"+e.getMessage(), null);
-//		}
-//		finally {
-//			// Update the display
-//			updateCommands();
-//			updateTitle();
-//		}
-//	}
 	
 	private void openFile () {
 		try {

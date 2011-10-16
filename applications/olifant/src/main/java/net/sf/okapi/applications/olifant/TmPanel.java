@@ -484,6 +484,13 @@ class TmPanel extends Composite implements IObserver {
 			sashMain.setWeights(new int[]{3, 7, 2});
 		}
 	}
+	
+	void showLog () {
+		// Ensure the Log panel is visible
+		if ( sashMain.getWeights()[2] <= 0 ) {
+			toggleLog();
+		}
+	}
 
 	EditorPanel getEditorPanel () {
 		return editPanel;
