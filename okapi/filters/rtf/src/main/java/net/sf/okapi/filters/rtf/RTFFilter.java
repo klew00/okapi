@@ -1003,7 +1003,8 @@ public class RTFFilter implements IFilter {
 							chCurrent = charBuf.get(0);
 						}
 						catch (CharacterCodingException e) {
-							logger.warning(e.getLocalizedMessage());
+							logger.warning(String.format("Encoding issue: %s%s", e.getLocalizedMessage(),
+								ctxStack.peek().inText ? " Character replaced by '?' in text." : ""));
 							chCurrent = '?';
 						}
 					}
@@ -1025,7 +1026,8 @@ public class RTFFilter implements IFilter {
 									chCurrent = charBuf.get(0);
 								}
 								catch (CharacterCodingException e) {
-									logger.warning(e.getLocalizedMessage());
+									logger.warning(String.format("Issue decoding bytes into character: %s%s", e.getLocalizedMessage(),
+										ctxStack.peek().inText ? " Character replaced by '?' in text." : ""));
 									chCurrent = '?';
 								}
 							}

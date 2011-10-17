@@ -614,7 +614,7 @@ public class SRXEditor {
 		rm.setCommand(menuItem, "help.srx20"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				UIUtil.start("http://www.lisa.org/fileadmin/standards/srx20.html"); //$NON-NLS-1$
+				UIUtil.start("http://www.gala-global.org/oscarStandards/srx/srx20.html"); //$NON-NLS-1$
             }
 		});
 		
