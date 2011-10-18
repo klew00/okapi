@@ -64,6 +64,7 @@ class TmPanel extends Composite implements IObserver {
 	private ITm tm;
 	private int currentEntry;
 	private boolean needSave = false;
+	private boolean wasModified = false;
 	private StatusBar statusBar;
 	private Thread workerThread;
 	private MainForm mainForm;
@@ -443,6 +444,10 @@ class TmPanel extends Composite implements IObserver {
 		}
 	}
 	
+	boolean wasModified () {
+		return wasModified;
+	}
+	
 	/**
 	 * Saves the modifications in the current page into the back-end.
 	 */
@@ -450,6 +455,7 @@ class TmPanel extends Composite implements IObserver {
 		if ( !needSave ) {
 			return; // Nothing need to be saved
 		}
+		wasModified = true; // Indicates that the TM was changed in this session
 		
 		LinkedHashMap<String, Object> tuFields = new LinkedHashMap<String, Object>();
 		LinkedHashMap<String, Object> segFields = new LinkedHashMap<String, Object>();

@@ -21,14 +21,24 @@
 package net.sf.okapi.applications.olifant;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-public class TMOptions {
+import net.sf.okapi.common.BaseParameters;
+import net.sf.okapi.common.ListUtil;
+import net.sf.okapi.lib.tmdb.ITm;
 
+public class TMOptions extends BaseParameters {
+
+	private static final String PAGESIZE = "pageSize";
+	private static final String VISIBLEFIELDS = "visibleFields";
+	
 	private long pageSize;
 	private ArrayList<String> visibleFields;
 	
 	public TMOptions () {
-		pageSize = 500;
+		reset();
+		toString(); // fill the list
 	}
 	
 	public long getPageSize () {
@@ -45,6 +55,43 @@ public class TMOptions {
 	
 	public void setVisibleFields (ArrayList<String> visibleFields) {
 		this.visibleFields = visibleFields;
+	}
+
+
+	@Override
+	public void reset () {
+		pageSize = 500;
+		visibleFields = new ArrayList<String>();
+	}
+
+	@Override
+	public void fromString (String data) {
+		reset();
+		buffer.fromString(data);
+		String tmp = buffer.getString(PAGESIZE, String.valueOf(pageSize));
+		pageSize = Long.valueOf(tmp);
+		tmp = buffer.getString(VISIBLEFIELDS, null);
+		visibleFields = new ArrayList<String>(ListUtil.stringAsList(tmp));
+	}
+	
+	@Override
+	public String toString () {
+		buffer.reset();
+		buffer.setString(PAGESIZE, String.valueOf(pageSize));
+		buffer.setString(VISIBLEFIELDS, ListUtil.listAsString(visibleFields));
+		return buffer.toString();
+	}
+	
+	public void ajustOptions (ITm tm) {
+		// Checks that all visible fields exist
+		List<String> available = tm.getAvailableFields();
+		Iterator<String> iter = visibleFields.iterator();
+		while ( iter.hasNext() ) {
+			String fn = iter.next();
+			if ( available.indexOf(fn) == -1 ) {
+				iter.remove();
+			}
+		}
 	}
 
 }

@@ -70,6 +70,7 @@ public class MainForm {
 	public static final String OPT_MAXIMIZED = "maximized"; //$NON-NLS-1$
 	public static final String OPT_REPOSITORYTYPE = "repositoryType"; //$NON-NLS-1$
 	public static final String OPT_REPOSITORYARG = "repositoryArg"; //$NON-NLS-1$
+	public static final String OPT_TMOPT = "tmOptions_"; //$NON-NLS-1$
 
 	private static final String HELP_USAGE = "Olifant - Usage"; //$NON-NLS-1$
 	
@@ -82,6 +83,7 @@ public class MainForm {
 	private RepositoryPanel repoPanel;
 	private TmPanel currentTP;
 	private StatusBar statusBar;
+	private ToolBarWrapper toolBar;
 	private BaseHelp help;
 	
 	private MenuItem miFileOpen;
@@ -123,18 +125,22 @@ public class MainForm {
 			Dialogs.showError(shell, e.getMessage(), null);
 		}
 	}
-
+	
 	private void saveUserConfiguration () {
 		// Set the window placement
 		config.setProperty(OPT_MAXIMIZED, shell.getMaximized());
 		Rectangle r = shell.getBounds();
 		config.setProperty(OPT_BOUNDS, String.format("%d,%d,%d,%d", r.x, r.y, r.width, r.height)); //$NON-NLS-1$
-		
+
 		// Save to the user home directory as ".appname" file
 		config.save(APPNAME, getClass().getPackage().getImplementationVersion());
 	}
 
-	private boolean canClose () {
+	Shell getShell () {
+		return shell;
+	}
+
+	boolean canCloseRepository () {
 		for ( CTabItem ti : tabs.getItems() ) {
 			if ( !((TmPanel)ti.getControl()).canClose() ) return false;
 		}
@@ -152,13 +158,15 @@ public class MainForm {
 			public void shellActivated(ShellEvent event) {}
 			public void shellClosed(ShellEvent event) {
 				saveUserConfiguration();
-				if ( !canClose() ) event.doit = false;
+				if ( !canCloseRepository() ) event.doit = false;
 			}
 			public void shellDeactivated(ShellEvent event) {}
 			public void shellDeiconified(ShellEvent event) {}
 			public void shellIconified(ShellEvent event) {}
 		});
 
+		toolBar = new ToolBarWrapper(this);
+		
 		createMenus();
 
 		// Drag and drop handling for adding files
@@ -338,7 +346,7 @@ public class MainForm {
 	}
 
 	void updateCommands () {
-		boolean active = ( repoPanel.isRepositoryOpen() && ( currentTP != null ) && !currentTP.hasRunningThread() );
+		boolean active = (repoPanel.isRepositoryOpen() && ( currentTP != null ) && !currentTP.hasRunningThread());
 		
 		miTMNew.setEnabled(repoPanel.isRepositoryOpen());
 		miTMClose.setEnabled(active);
@@ -353,6 +361,8 @@ public class MainForm {
 		miShowHideThirdField.setEnabled(active);
 		miShowHideFieldList.setEnabled((active) && currentTP.getEditorPanel().isExtraVisible());
 		miStatistics.setEnabled(repoPanel.isRepositoryOpen());
+		
+		toolBar.update(currentTP);
 	}
 	
 	TmPanel addTmTabEmpty (ITm tm) {

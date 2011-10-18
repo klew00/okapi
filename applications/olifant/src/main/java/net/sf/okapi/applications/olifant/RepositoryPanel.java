@@ -63,6 +63,7 @@ class RepositoryPanel extends Composite {
 	private Button btNewTM;
 	private Label stListTitle;
 	private IRepository repo;
+	private String repoType = "";
 	private MenuItem miContextOpen;
 	private MenuItem miContextEditTMOptions;
 	private MenuItem miContextImportFile;
@@ -337,6 +338,10 @@ class RepositoryPanel extends Composite {
 		if ( repo == null ) return null;
 		else return repo.getName();
 	}
+	
+	String getRepositoryType () {
+		return repoType;
+	}
 
 	boolean isRepositoryOpen () {
 		return (repo != null);
@@ -412,15 +417,18 @@ class RepositoryPanel extends Composite {
 			if ( type.equals(RepositoryForm.REPOTYPE_INMEMORY) ) {
 				closeRepository();
 				repo = new net.sf.okapi.lib.tmdb.h2.Repository(null);
+				repoType = type;
 			}
 			else if ( type.equals(RepositoryForm.REPOTYPE_DEFAULTLOCAL) 
 				|| type.equals(RepositoryForm.REPOTYPE_OTHERLOCALORNETWORK) ) {
 				closeRepository();
 				repo = new net.sf.okapi.lib.tmdb.h2.Repository(name);
+				repoType = type;
 			}
 			else if ( type.equals(RepositoryForm.REPOTYPE_SERVER) ) {
 				closeRepository();
 				repo = new net.sf.okapi.lib.tmdb.mongodb.Repository("REPO");
+				repoType = type;
 			}
 		}
 		catch ( Throwable e ) {
@@ -433,6 +441,10 @@ class RepositoryPanel extends Composite {
 		}
 	}
 	
+	boolean canClose () {
+		return mainForm.canCloseRepository();
+	}
+	
 	void closeRepository () {
 		// Close all tabs
 		mainForm.closeAllTmTabs();
@@ -440,6 +452,7 @@ class RepositoryPanel extends Composite {
 		if ( repo != null ) {
 			repo.close();
 			repo = null;
+			repoType = "";
 		}
 		resetRepositoryUI(0);
 		updateRepositoryStatus();
