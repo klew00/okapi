@@ -21,6 +21,7 @@
 package net.sf.okapi.lib.tmdb;
 
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
@@ -157,6 +158,9 @@ public class DbUtil {
 	 * @throws IllegalArgumentException if the name is invalid.
 	 */
 	public static String checkFieldName (String name) {
+		if ( Util.isEmpty(name) ) {
+			throw new IllegalArgumentException("The name of a field cannot be null or empty.");
+		}
 		if (( name.indexOf(LOC_SEP) != -1 ) || ( name.indexOf('\'') != -1 )) {
 			throw new IllegalArgumentException(String.format("The name of a field '%s' cannot have the character ''' or '%s'.",
 				name, LOC_SEP));

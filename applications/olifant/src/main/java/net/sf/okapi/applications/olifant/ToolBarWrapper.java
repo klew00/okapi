@@ -41,7 +41,10 @@ class ToolBarWrapper {
 		//coolBar.setLocked(true);
 		
 		Composite comp = new Composite(coolBar, SWT.NONE);
-		comp.setLayout(new GridLayout(4, false));
+		GridLayout layout = new GridLayout(4, false);
+		layout.marginHeight = 0;
+		layout.marginWidth = 0;
+		comp.setLayout(layout);
 		
 		final Label stSource = new Label(comp, SWT.NONE);
 		stSource.setText("Source:");

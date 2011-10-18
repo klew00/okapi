@@ -465,6 +465,8 @@ class TmPanel extends Composite implements IObserver {
 			int signal = (Integer)ti.getData();
 			if ( signal != 0 ) {
 				long segKey = Long.valueOf(ti.getText(0));
+				tuFields.clear();
+				segFields.clear();
 				
 				if ( (signal & SAVE_FLAG) == SAVE_FLAG ) {
 					segFields.put(DbUtil.FLAG_NAME, ti.getChecked());
