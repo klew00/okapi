@@ -21,6 +21,7 @@
 package net.sf.okapi.lib.tmdb;
 
 import java.sql.ResultSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -83,6 +84,19 @@ public interface ITm {
 	 * @param names list of fields to be returned. 
 	 */
 	public void setRecordFields (List<String> names);
+	
+	/**
+	 * Sets the sort order in which the records should be retrieved with {@link #getNextPage()}
+	 * or other paging methods.
+	 * @param fields list of the fields to sort on. The first on is the primary field,
+	 * the second the secondary, etc.
+	 * <p>The key of the map is the field full name, the boolean value is set to true for
+	 * ascending order or false for descending order.
+	 * <p>The fields must exist, but it may be not in the list of the fields returned by
+	 * {@link #getNextPage()} or the other paging methods.
+	 * Use a null or empty map to restore whatever default the natural order the back-end uses. 
+	 */
+	public void setSortOrder (LinkedHashMap<String, Boolean> fields);
 
 	/**
 	 * Prepares the system to import a set of new entries.

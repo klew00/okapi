@@ -78,6 +78,7 @@ class RenameFieldForm {
 		
 		edName = new Text(group, SWT.BORDER);
 		edName.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		edName.setText(currentName);
 		edName.setFocus();
 		
 		SelectionAdapter OKCancelActions = new SelectionAdapter() {

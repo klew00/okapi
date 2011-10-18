@@ -22,6 +22,7 @@ package net.sf.okapi.applications.olifant;
 
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 import net.sf.okapi.common.observer.IObservable;
 import net.sf.okapi.common.observer.IObserver;
@@ -50,6 +51,11 @@ class TmPanel extends Composite implements IObserver {
 
 	private final static int KEYCOLUMNWIDTH = 90;
 
+	private final static int SAVE_FLAG = 0x01;
+	private final static int SAVE_SOURCE = 0x02;
+	private final static int SAVE_TARGET = 0x04;
+	//private final static int SAVE_THIRD = 0x08;
+
 	private CTabItem tabItem;
 	private final SashForm sashMain;
 	private final EditorPanel editPanel;
@@ -57,6 +63,7 @@ class TmPanel extends Composite implements IObserver {
 	private final LogPanel logPanel;
 	private ITm tm;
 	private int currentEntry;
+	private boolean needSave = false;
 	private StatusBar statusBar;
 	private Thread workerThread;
 	private MainForm mainForm;
@@ -101,26 +108,6 @@ class TmPanel extends Composite implements IObserver {
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
 
-//		table.addControlListener(new ControlAdapter() {
-//		    public void controlResized(ControlEvent e) {
-//		    	Table table = (Table)e.getSource();
-		    	
-//		    	Rectangle rect = table.getClientArea();
-//				int itemHeight = table.getItemHeight();
-//				int headerHeight = table.getHeaderHeight();
-//				int visibleCount = (rect.height - headerHeight + itemHeight - 1) / itemHeight;
-//				int u = visibleCount;
-				
-//		    	Rectangle rect = table.getClientArea();
-//				int nPart = rect.width / 100;
-//				int nRemain = rect.width % 100;
-//				table.getColumn(0).setWidth(8*nPart);
-//				table.getColumn(1).setWidth(12*nPart);
-//				table.getColumn(2).setWidth(40*nPart);
-//				table.getColumn(3).setWidth((40*nPart)+nRemain);
-//		    }
-//		});
-		
 		table.addControlListener(new ControlAdapter() {
 		    public void controlResized(ControlEvent e) {
 		    	int count = table.getColumnCount()-1; // Exclude Key column
@@ -144,14 +131,33 @@ class TmPanel extends Composite implements IObserver {
 		
 		table.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				saveEntry();
-				updateCurrentEntry();
+				if ( event.detail == SWT.CHECK ) {
+					// Do not force the selection: table.setSelection((TableItem)event.item);
+					TableItem ti = (TableItem)event.item;
+					ti.setData((Integer)ti.getData() | SAVE_FLAG); // Entry has been changed
+					needSave = true;
+				}
+				else {
+					saveEntry();
+					updateCurrentEntry();
+				}
             }
 		});
 
 		table.addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent e) {
-				checkPage(e.keyCode, e.stateMask);
+				if ( e.character == ' ' ) { // Changes the flag with the space-bar
+					TableItem si = table.getItem(table.getSelectionIndex());
+					for ( TableItem ti : table.getSelection() ) {
+						if ( ti == si ) continue; // Skip focused item because it will get set by SelectionAdapter()
+						ti.setChecked(!ti.getChecked());
+						ti.setData((Integer)ti.getData() | SAVE_FLAG); // Entry has been changed
+						needSave = true;
+					}
+				}
+				else { 
+					checkPage(e.keyCode, e.stateMask);
+				}
 			}
 		});
 		
@@ -182,12 +188,24 @@ class TmPanel extends Composite implements IObserver {
 	}
 	
 	boolean canClose () {
-		if ( hasRunningThread() ) {
+		try {
+			if ( hasRunningThread() ) {
+				return false;
+			}
+			saveEntryAndModificationsIfNeeded();
+			return true;
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(getShell(), e.getMessage(), null);
 			return false;
 		}
-		return true;
 	}
-	
+
+	void saveEntryAndModificationsIfNeeded () {
+		saveEntry();
+		saveModificationsIfNeeded();
+	}
+
 	boolean hasRunningThread () {
 		return (( workerThread != null ) && workerThread.isAlive() );
 	}
@@ -198,6 +216,7 @@ class TmPanel extends Composite implements IObserver {
 	
 	void editColumns () {
 		try {
+			saveEntryAndModificationsIfNeeded();
 			ArrayList<String> prevList = opt.getVisibleFields();
 			ColumnsForm dlg = new ColumnsForm(getShell(), tm, prevList);
 			
@@ -234,6 +253,7 @@ class TmPanel extends Composite implements IObserver {
 
 	void editLocales () {
 		try {
+			saveEntryAndModificationsIfNeeded();
 			LocalesForm dlg = new LocalesForm(getShell(), tm);
 			if ( !dlg.showDialog() ) {
 				// No change was made, we can skip the re-drawing
@@ -413,10 +433,48 @@ class TmPanel extends Composite implements IObserver {
 		TableItem ti = table.getItem(currentEntry);
 		if ( editPanel.isSourceModified() && ( srcCol != -1 )) {
 			ti.setText(srcCol, editPanel.getSourceText());
+			ti.setData((Integer)ti.getData() | SAVE_SOURCE);
+			needSave = true;
 		}
 		if ( editPanel.isTargetModified() && ( trgCol != -1 )) {
 			ti.setText(trgCol, editPanel.getTargetText());
+			ti.setData((Integer)ti.getData() | SAVE_TARGET);
+			needSave = true;
 		}
+	}
+	
+	/**
+	 * Saves the modifications in the current page into the back-end.
+	 */
+	private void saveModificationsIfNeeded () {
+		if ( !needSave ) {
+			return; // Nothing need to be saved
+		}
+		
+		LinkedHashMap<String, Object> tuFields = new LinkedHashMap<String, Object>();
+		LinkedHashMap<String, Object> segFields = new LinkedHashMap<String, Object>();
+
+		for ( int i=0; i<table.getItemCount(); i++ ) {
+			TableItem ti = table.getItem(i);
+			int signal = (Integer)ti.getData();
+			if ( signal != 0 ) {
+				long segKey = Long.valueOf(ti.getText(0));
+				
+				if ( (signal & SAVE_FLAG) == SAVE_FLAG ) {
+					segFields.put(DbUtil.FLAG_NAME, ti.getChecked());
+				}
+				if ( (signal & SAVE_SOURCE) == SAVE_SOURCE ) {
+					String fn = table.getColumns()[srcCol].getText();
+					segFields.put(fn, ti.getText(srcCol));
+				}
+				if ( (signal & SAVE_TARGET) == SAVE_TARGET ) {
+					String fn = table.getColumns()[trgCol].getText();
+					segFields.put(fn, ti.getText(trgCol));
+				}
+				tm.updateRecord(segKey, tuFields, segFields);
+			}
+		}
+		needSave = false;
 	}
 	
 	/**
@@ -428,6 +486,7 @@ class TmPanel extends Composite implements IObserver {
 		int selection)
 	{
 		try {
+			saveModificationsIfNeeded();
 			ResultSet rs = null;
 			switch ( direction ) {
 			case 0:
@@ -455,6 +514,7 @@ class TmPanel extends Composite implements IObserver {
 				TableItem item = new TableItem(table, SWT.NONE);
 				item.setText(0, String.format("%d", rs.getLong(ITm.SEGKEY_FIELD)));
 				item.setChecked(rs.getBoolean(ITm.FLAG_FIELD));
+				item.setData(0); // Modified flag
 				for ( int i=0; i<opt.getVisibleFields().size(); i++ ) {
 					// +2 because the result set has always seg-key and flag (and 1-based index)
 					item.setText(i+1, rs.getString(i+3)==null ? "" : rs.getString(i+3));

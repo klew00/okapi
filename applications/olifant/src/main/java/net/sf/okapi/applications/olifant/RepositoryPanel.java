@@ -513,8 +513,7 @@ class RepositoryPanel extends Composite {
 		}
 	}
 
-	private void editTmOptions (String tmName)
-	{
+	void editTmOptions (String tmName) {
 		try {
 			// If tmName is null use the current selection
 			if ( tmName == null ) {
@@ -553,7 +552,7 @@ class RepositoryPanel extends Composite {
 		}
 	}
 	
-	private void importDocument (String tmName) {
+	void importDocument (String tmName) {
 		try {
 			// If tmName is null use the current selection
 			if ( tmName == null ) {

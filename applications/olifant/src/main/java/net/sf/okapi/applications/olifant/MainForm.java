@@ -22,12 +22,15 @@ package net.sf.okapi.applications.olifant;
 
 import java.io.File;
 import java.net.URI;
+import java.net.URLDecoder;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.ui.AboutDialog;
+import net.sf.okapi.common.ui.BaseHelp;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.ResourceManager;
 import net.sf.okapi.common.ui.UIUtil;
@@ -68,6 +71,8 @@ public class MainForm {
 	public static final String OPT_REPOSITORYTYPE = "repositoryType"; //$NON-NLS-1$
 	public static final String OPT_REPOSITORYARG = "repositoryArg"; //$NON-NLS-1$
 
+	private static final String HELP_USAGE = "Olifant - Usage"; //$NON-NLS-1$
+	
 	private Shell shell;
 	private UserConfiguration config;
 	private ResourceManager rm;
@@ -77,14 +82,17 @@ public class MainForm {
 	private RepositoryPanel repoPanel;
 	private TmPanel currentTP;
 	private StatusBar statusBar;
+	private BaseHelp help;
 	
 	private MenuItem miFileOpen;
 	private MenuItem miTMNew;
 	private MenuItem miTMClose;
+	private MenuItem miTMImport;
 	private MenuItem miTMDelete;
 	private MenuItem miTMRename;
 	private MenuItem miTMEditColumns;
 	private MenuItem miTMEditLocales;
+	private MenuItem miTMEditProperties;
 	private MenuItem miShowHideThirdField;
 	private MenuItem miShowHideFieldList;
 	private MenuItem miStatistics;
@@ -100,6 +108,14 @@ public class MainForm {
 			
 			config = new UserConfiguration();
 			config.load(APPNAME); // Load the current user preferences
+			
+	    	// Get the location of the main class source
+	    	File file = new File(getClass().getProtectionDomain().getCodeSource().getLocation().getFile());
+	    	String appRootFolder = URLDecoder.decode(file.getAbsolutePath(),"utf-8"); //$NON-NLS-1$
+	    	// Remove the JAR file if running an installed version
+	    	boolean fromJar = appRootFolder.endsWith(".jar");
+	    	if ( fromJar ) appRootFolder = Util.getDirectoryName(appRootFolder); //$NON-NLS-1$
+			help = new BaseHelp(appRootFolder);
 			
 			createContent();
 		}
@@ -143,7 +159,7 @@ public class MainForm {
 			public void shellIconified(ShellEvent event) {}
 		});
 
-		createMenu();
+		createMenus();
 
 		// Drag and drop handling for adding files
 		DropTarget dropTarget = new DropTarget(shell, DND.DROP_DEFAULT | DND.DROP_COPY | DND.DROP_MOVE);
@@ -322,17 +338,21 @@ public class MainForm {
 	}
 
 	void updateCommands () {
-		miStatistics.setEnabled(repoPanel.isRepositoryOpen());
-		miTMNew.setEnabled(repoPanel.isRepositoryOpen());
 		boolean active = ( repoPanel.isRepositoryOpen() && ( currentTP != null ) && !currentTP.hasRunningThread() );
+		
+		miTMNew.setEnabled(repoPanel.isRepositoryOpen());
 		miTMClose.setEnabled(active);
+		miTMImport.setEnabled(active);
 		miTMDelete.setEnabled(active);
 		miTMRename.setEnabled(active);
 		miTMEditColumns.setEnabled(active);
 		miTMEditLocales.setEnabled(active);
+		miTMEditProperties.setEnabled(active);
+		
 		miShowHideLog.setEnabled(active);
 		miShowHideThirdField.setEnabled(active);
 		miShowHideFieldList.setEnabled((active) && currentTP.getEditorPanel().isExtraVisible());
+		miStatistics.setEnabled(repoPanel.isRepositoryOpen());
 	}
 	
 	TmPanel addTmTabEmpty (ITm tm) {
@@ -345,12 +365,13 @@ public class MainForm {
 		return tp;
 	}
 
-	private void createMenu () {
+	private void createMenus () {
 		// Menus
 	    Menu menuBar = new Menu(shell, SWT.BAR);
 		shell.setMenuBar(menuBar);
 
-		// File menu
+		//--- File menu
+		
 		MenuItem topItem = new MenuItem(menuBar, SWT.CASCADE);
 		topItem.setText(rm.getCommandLabel("file")); //$NON-NLS-1$
 		Menu dropMenu = new Menu(shell, SWT.DROP_DOWN);
@@ -384,7 +405,8 @@ public class MainForm {
             }
 		});
 		
-		// Translation memory menu
+		//--- Translation memory menu
+		
 		topItem = new MenuItem(menuBar, SWT.CASCADE);
 		topItem.setText(rm.getCommandLabel("tm")); //$NON-NLS-1$
 		dropMenu = new Menu(shell, SWT.DROP_DOWN);
@@ -408,19 +430,11 @@ public class MainForm {
 		
 		new MenuItem(dropMenu, SWT.SEPARATOR);
 
-		miTMDelete = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(miTMDelete, "tm.delete"); //$NON-NLS-1$
-		miTMDelete.addSelectionListener(new SelectionAdapter() {
+		miTMImport = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miTMImport, "tm.import"); //$NON-NLS-1$
+		miTMImport.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				repoPanel.deleteTm(currentTP.getTm().getName());
-            }
-		});
-		
-		miTMRename = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(miTMRename, "tm.rename"); //$NON-NLS-1$
-		miTMRename.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent event) {
-				repoPanel.renameTm(currentTP.getTm().getName());
+				repoPanel.importDocument(currentTP.getTm().getName());
             }
 		});
 		
@@ -446,8 +460,36 @@ public class MainForm {
             }
 		});
 		
+		miTMEditProperties = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miTMEditProperties, "tm.properties"); //$NON-NLS-1$
+		miTMEditProperties.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				if ( currentTP != null ) {
+					repoPanel.editTmOptions(currentTP.getTm().getName());
+				}
+            }
+		});
 
-		// View menu
+		new MenuItem(dropMenu, SWT.SEPARATOR);
+
+		miTMRename = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miTMRename, "tm.rename"); //$NON-NLS-1$
+		miTMRename.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				repoPanel.renameTm(currentTP.getTm().getName());
+            }
+		});
+		
+		miTMDelete = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miTMDelete, "tm.delete"); //$NON-NLS-1$
+		miTMDelete.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				repoPanel.deleteTm(currentTP.getTm().getName());
+            }
+		});
+		
+		//--- View menu
+		
 		topItem = new MenuItem(menuBar, SWT.CASCADE);
 		topItem.setText(rm.getCommandLabel("view")); //$NON-NLS-1$
 		dropMenu = new Menu(shell, SWT.DROP_DOWN);
@@ -507,6 +549,87 @@ public class MainForm {
 			public void widgetSelected(SelectionEvent event) {
 				repoPanel.getStatistics();
             }
+		});
+		
+		//--- Help menu
+		
+		topItem = new MenuItem(menuBar, SWT.CASCADE);
+		topItem.setText(rm.getCommandLabel("help")); //$NON-NLS-1$
+		dropMenu = new Menu(shell, SWT.DROP_DOWN);
+		topItem.setMenu(dropMenu);
+
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "help.topics"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				if ( help != null ) help.showWiki("Olifant"); //$NON-NLS-1$
+			}
+		});
+
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "help.howtouse"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				if ( help != null ) help.showWiki(HELP_USAGE); //$NON-NLS-1$
+			}
+		});
+
+		menuItem = new MenuItem(dropMenu, SWT.SEPARATOR);
+
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "help.feedback"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				UIUtil.start("mailto:okapitools@opentag.com&subject=Feedback (Olifant)"); //$NON-NLS-1$
+			}
+		});
+		
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "help.bugreport"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				UIUtil.start("http://code.google.com/p/okapi/issues/list"); //$NON-NLS-1$
+			}
+		});
+		
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "help.featurerequest"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				UIUtil.start("http://code.google.com/p/okapi/issues/list"); //$NON-NLS-1$
+			}
+		});
+		
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "help.users"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				UIUtil.start("http://groups.yahoo.com/group/okapitools/"); //$NON-NLS-1$
+			}
+		});
+		
+		menuItem = new MenuItem(dropMenu, SWT.SEPARATOR);
+
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "help.tmx14b"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				UIUtil.start("http://www.gala-global.org/oscarStandards/tmx/tmx14b.html"); //$NON-NLS-1$
+            }
+		});
+
+		new MenuItem(dropMenu, SWT.SEPARATOR);
+
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "help.about"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				AboutDialog dlg = new AboutDialog(shell,
+					"About Olifant",
+					"Olifant (ALPHA) - Okapi Translation Memory Manager",
+					getClass().getPackage().getImplementationVersion());
+				dlg.showDialog();
+			}
 		});
 
 	}

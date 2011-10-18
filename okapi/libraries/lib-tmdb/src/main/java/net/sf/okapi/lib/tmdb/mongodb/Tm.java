@@ -23,6 +23,7 @@ package net.sf.okapi.lib.tmdb.mongodb;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -475,6 +476,12 @@ public class Tm implements ITm {
 
 	@Override
 	public void renameField (String currentFullName, String newFiiullName) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setSortOrder (LinkedHashMap<String, Boolean> fields) {
 		// TODO Auto-generated method stub
 		
 	}

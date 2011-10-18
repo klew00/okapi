@@ -47,7 +47,7 @@ class TMOptionsForm {
 		List<Object> data)
 	{
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
-		shell.setText("TM Options");
+		shell.setText("TM Properties");
 		UIUtil.inheritIcon(shell, parent);
 		shell.setLayout(new GridLayout(1, false));
 

@@ -75,6 +75,7 @@ class RenameTMForm {
 		edName = new Text(group, SWT.BORDER);
 		edName.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		edName.setFocus();
+		edName.setText(currentName);
 		
 		SelectionAdapter OKCancelActions = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {

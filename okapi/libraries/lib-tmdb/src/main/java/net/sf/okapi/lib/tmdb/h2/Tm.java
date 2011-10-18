@@ -338,6 +338,7 @@ public class Tm implements ITm {
 			else existingFields = existingTuFields;
 			
 			LinkedHashMap<String, String> fieldsToCreate = null;
+			boolean hasNewFieldToImport = false;
 			
 			if ( !Util.isEmpty(fields) ) {
 
@@ -346,9 +347,9 @@ public class Tm implements ITm {
 				// and add the ones that do not exist to the list of fields to create
 				for ( String name : fields.keySet() ) {
 					// This is a TU-level field
-					boolean add = false;
+					boolean hasFieldToCreate = false;
 					if ( !existingFields.contains(name) ) {
-						add = true;
+						hasFieldToCreate = true;
 						if ( fieldsToCreate == null ) {
 							fieldsToCreate = new LinkedHashMap<String, String>();
 						}
@@ -360,23 +361,26 @@ public class Tm implements ITm {
 							type = "VARCHAR";
 							if ( useValuesAsDefault ) fieldsToImport.put(name, value);
 							else fieldsToImport.put(name, null);
+							hasNewFieldToImport = true;
 						}
 						else if (( value instanceof Long ) || ( value instanceof Integer )) {
 							type = "INTEGER";
 							if ( useValuesAsDefault ) fieldsToImport.put(name, value);
 							else fieldsToImport.put(name, 0);
+							hasNewFieldToImport = true;
 						}
 						else if ( value instanceof Boolean ) {
 							type = "BOOLEAN";
 							if ( useValuesAsDefault ) fieldsToImport.put(name, value);
 							else fieldsToImport.put(name, false);
+							hasNewFieldToImport = true;
 						}
 						else throw new RuntimeException("Invalid field type to add.");
 					}
 					
 					// If the field is to create type should be set because
 					// it was also a filed that wasn't in the fieldsToImport list
-					if ( add ) {
+					if ( hasFieldToCreate ) {
 						// Nothing to add, move on to the next field
 						fieldsToCreate.put(name, type);
 					}
@@ -418,7 +422,7 @@ public class Tm implements ITm {
 			}
 			else {
 				// Create or re-create the statement to insert the entry
-				if (( pstmAddTu == null ) || !Util.isEmpty(fieldsToCreate) ) {
+				if (( pstmAddTu == null ) || !Util.isEmpty(fieldsToCreate) || hasNewFieldToImport ) {
 					if ( pstmAddTu != null ) {
 						pstmAddTu.close();
 					}
@@ -754,17 +758,22 @@ public class Tm implements ITm {
 				
 				StringBuilder tmp = new StringBuilder("UPDATE \""+name+"_SEG\"");
 				for ( int i=0; i<updSegFields.size(); i++ ) {
-					tmp.append(String.format("%s SET \"%s\" = ?", (i==0 ? "" : ","), updSegFields.get(i)));
+					tmp.append(String.format("%s%s \"%s\"=?", (i==0 ? "" : ","), (i==0 ? " SET" : ""), updSegFields.get(i)));
 				}
-				tmp.append(String.format(" WHERE \"%s\" = ?", DbUtil.SEGKEY_NAME));
+				tmp.append(String.format(" WHERE \"%s\"=?", DbUtil.SEGKEY_NAME));
 				
 				pstmUpdSeg = store.getConnection().prepareStatement(tmp.toString());
 			}
-//For now supports only strings			
+//TODO: support the various filed types!
 			// Fill the statement
 			int i = 1;
 			for ( String fn : segFields.keySet() ) {
-				pstmUpdSeg.setString(i, (String)segFields.get(fn));
+				if ( fn.equals(DbUtil.FLAG_NAME) ) {
+					pstmUpdSeg.setBoolean(i, (Boolean)segFields.get(fn));
+				}
+				else {
+					pstmUpdSeg.setString(i, (String)segFields.get(fn));
+				}
 				i++;
 			}
 			// Fill the SegKey value
@@ -915,6 +924,12 @@ public class Tm implements ITm {
 				throw new RuntimeException(e);
 			}
 		}
+	}
+
+	@Override
+	public void setSortOrder (LinkedHashMap<String, Boolean> fields) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
