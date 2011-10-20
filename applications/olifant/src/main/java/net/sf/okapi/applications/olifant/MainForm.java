@@ -36,6 +36,7 @@ import net.sf.okapi.common.ui.ResourceManager;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.common.ui.UserConfiguration;
 import net.sf.okapi.lib.tmdb.ITm;
+import net.sf.okapi.lib.tmdb.Importer;
 import net.sf.okapi.lib.ui.editor.InputDocumentDialog;
 
 import org.eclipse.swt.SWT;
@@ -738,10 +739,9 @@ public class MainForm {
 			// Trigger the import 
 			if ( tp != null ) {
 				// Start the import thread
-				Importer imp = new Importer(fcMapper, tp.getTm(), rd, tp.getLog());
-				imp.addObserver(tp);
+				ProgressCallback callback = new ProgressCallback(tp);
+				Importer imp = new Importer(callback, tp.getTm(), rd, fcMapper);
 				tp.startThread(new Thread(imp));
-				updateCommands();
 			}
 			
 			// If dialog return OK, we return value of accept all

@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.applications.olifant;
+package net.sf.okapi.lib.tmdb;
 
 import java.util.LinkedHashMap;
 
@@ -30,32 +30,35 @@ import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.lib.tmdb.DbUtil;
+import net.sf.okapi.lib.tmdb.IProgressCallback;
 import net.sf.okapi.lib.tmdb.ITm;
 
-public class Importer extends ObservableRunnable {
+public class Importer implements Runnable {
 
-	private final IFilterConfigurationMapper fcMapper;
-	private final RawDocument rd;
+	private final IProgressCallback callback;
 	private final ITm tm;
-	private final LogPanel logPanel;
+	private final RawDocument rd;
+	private final IFilterConfigurationMapper fcMapper;
 	private final DbUtil dbUtil = new DbUtil();
 	
-	public Importer (IFilterConfigurationMapper fcMapper,
+	public Importer (IProgressCallback progressCallback,
 		ITm tm,
 		RawDocument rd,
-		LogPanel logPanel)
+		IFilterConfigurationMapper fcMapper)
 	{
-		this.fcMapper = fcMapper;
+		this.callback = progressCallback;
 		this.tm = tm;
 		this.rd = rd;
-		this.logPanel = logPanel;
+		this.fcMapper = fcMapper;
 	}
 	
-	public ITm process () {
+	@Override
+	public void run () {
 		long count = 0;
 		IFilter filter = null;
+		boolean canceled = false;
 		try {
-			updateUI(0, 0, null);
+			callback.startProcess("Importing "+rd.getInputURI().getPath()+"...");
 			filter = fcMapper.createFilter(rd.getFilterConfigId());
 			filter.open(rd);
 	
@@ -69,7 +72,7 @@ public class Importer extends ObservableRunnable {
 //TODO: implement check for duplicates
 //TODO: implement filter for fields
 			tm.startImport();
-			while ( filter.hasNext() ) {
+			while ( filter.hasNext() && !canceled ) {
 				Event event = filter.next();
 				if ( !event.isTextUnit() ) continue;
 				
@@ -125,58 +128,30 @@ public class Importer extends ObservableRunnable {
 					map.putAll(mapTrgProp);
 					tuKey = tm.addRecord(tuKey, mapTUProp, map);
 					// Update UI from time to time
-		//TODO: check for cancellation!!
 					if ( (++count % 152) == 0 ) {
-						updateUI(count, 1, null);
+						// And check for cancellation
+						if ( !callback.updateProgress(count) ) {
+							if ( !canceled ) {
+								callback.logMessage(1, "Process interrupted by user.");
+								canceled = true;
+							}
+						}
 					}
 				}
 			}
-			// Final update (includes notifying the observers that we are done)
-			tm.finishImport();
-			updateUI(count, 2, null);
 		}
 		catch ( Throwable e ) {
-			updateUI(count, 3, e.getMessage());
+			//updateUI(count, 3, e.getMessage());
+			callback.logMessage(3, e.getMessage());
 		}
 		finally {
+			// Final update (includes notifying the observers that we are done)
 			tm.finishImport();
 			if ( filter != null ) {
 				filter.close();
 			}
+			callback.endProcess(count);
 		}
-		return tm;
 	}
 
-	private void updateUI (long p_count,
-		int p_state,
-		String p_text)
-	{
-		final long count = p_count;
-		final int state = p_state;
-		final String text = p_text;
-		logPanel.getDisplay().asyncExec(new Runnable() {
-			public void run () {
-				switch ( state ) {
-				case 0:
-					logPanel.startTask("Importing "+rd.getInputURI().getPath()+"...");
-					break;
-				case 1:
-					logPanel.setInfo(String.valueOf(count));
-					break;
-				case 3: // Error
-					logPanel.log("ERROR: "+text);
-					// Done too. Fall through
-				case 2: // Done
-					logPanel.endTask(String.format("Entries processed: %d", count));
-					notifyObservers();
-					break;
-				}
-			}
-		});		
-	}
-
-	@Override
-	public void run () {
-		process();
-	}
 }

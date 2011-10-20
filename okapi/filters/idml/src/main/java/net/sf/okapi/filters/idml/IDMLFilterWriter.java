@@ -131,7 +131,6 @@ public class IDMLFilterWriter implements IFilterWriter {
 
 	@Override
 	public EncoderManager getEncoderManager () {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -332,9 +331,9 @@ public class IDMLFilterWriter implements IFilterWriter {
 		try {
 			Document tmpDoc =  docBuilder.parse(new InputSource(new StringReader(xml.toString())));
 			Document docWhereToImport = skel.getScopeNode().getOwnerDocument();
-			DocumentFragment docFrag = docWhereToImport.createDocumentFragment(); // doc.createDocumentFragment();
+			DocumentFragment docFrag = docWhereToImport.createDocumentFragment();
 			
-			Node imp = docWhereToImport.importNode(tmpDoc.getDocumentElement(), true); // doc.importNode(tmpDoc.getDocumentElement(), true);
+			Node imp = docWhereToImport.importNode(tmpDoc.getDocumentElement(), true);
 			while ( imp.hasChildNodes() ) {
 				docFrag.appendChild(imp.removeChild(imp.getFirstChild()));
 			}
@@ -369,24 +368,6 @@ public class IDMLFilterWriter implements IFilterWriter {
 					parent.replaceChild(original, marker);
 				}
 			}
-//			// If needed, re-inject the nodes referenced in the inline codes.
-//			if ( skel.hasReferences() ) {
-//				HashMap<String, NodeReference> map = skel.getReferences();
-//				// Re-inject the reference nodes using the skeleton copies
-//				NodeList list = ((Element)node).getElementsByTagName(IDMLSkeleton.NODEREMARKER);
-//				// The list is dynamic, so replacing the node, decrease the list
-//				while ( list.getLength() > 0 ) {
-//					Element marker = (Element)list.item(0);
-//					String key = marker.getAttribute("id");
-//					Node original = map.get(key);
-//					if ( original == null ) {
-//						logger.severe(String.format("Missing original node for a reference in text unit id='%s'.", tu.getId()));
-//						break; // Break now or we'll be in an infinite loop
-//					}
-//					Element parent = (Element)marker.getParentNode();
-//					parent.replaceChild(original, marker);
-//				}
-//			}
 		}
 		catch ( Throwable e ) {
 			logger.severe(String.format("Error when parsing XML of text unit id='%s'.\n"+e.getMessage(), tu.getId()));

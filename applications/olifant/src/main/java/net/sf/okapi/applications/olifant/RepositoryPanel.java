@@ -33,6 +33,7 @@ import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.lib.tmdb.DbUtil;
 import net.sf.okapi.lib.tmdb.IRepository;
 import net.sf.okapi.lib.tmdb.ITm;
+import net.sf.okapi.lib.tmdb.Importer;
 import net.sf.okapi.lib.ui.editor.InputDocumentDialog;
 
 import org.eclipse.swt.SWT;
@@ -606,10 +607,9 @@ class RepositoryPanel extends Composite {
 			rd.setFilterConfigId((String)data[1]);
 			
 			// Start the import thread
-			Importer imp = new Importer(mainForm.getFCMapper(), tp.getTm(), rd, tp.getLog());
-			imp.addObserver(tp);
+			ProgressCallback callback = new ProgressCallback(tp);
+			Importer imp = new Importer(callback, tp.getTm(), rd, mainForm.getFCMapper());
 			tp.startThread(new Thread(imp));
-			mainForm.updateCommands();
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(getShell(), "Error adding document.\n"+e.getMessage(), null);

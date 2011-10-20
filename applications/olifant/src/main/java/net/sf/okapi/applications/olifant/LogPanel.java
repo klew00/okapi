@@ -22,6 +22,8 @@ package net.sf.okapi.applications.olifant;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -34,11 +36,14 @@ class LogPanel extends Composite {
 	private Button button;
 	private CLabel info;
 	private long startTime;
+	private boolean inProgress;
+	private boolean isCanceled;
 	
 	LogPanel (Composite p_Parent,
 		int p_nFlags)
 	{
 		super(p_Parent, p_nFlags);
+		inProgress = isCanceled = false;
 		createContent();
 	}
 	
@@ -51,6 +56,11 @@ class LogPanel extends Composite {
 		button = new Button(this, SWT.PUSH);
 		button.setText("Cancel");
 		button.setEnabled(false);
+		button.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				isCanceled = true;
+            }
+		});
 		
 		info = new CLabel(this, SWT.BORDER);
 		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
@@ -62,25 +72,39 @@ class LogPanel extends Composite {
 		edLog.setLayoutData(gdTmp);
 	}
 
-	public void setInfo (String text) {
+	public boolean setInfo (String text) {
 		info.setText((text == null) ? "" : text); //$NON-NLS-1$
+		return isCanceled;
 	}
 	
-	public void log (String text) {
-		if ( text == null ) return;
+	public boolean log (String text) {
+		if ( text == null ) {
+			return isCanceled;
+		}
 		edLog.append(text+"\n");
+		return isCanceled;
 	}
 	
 	public void startTask (String text) {
+		isCanceled = false;
+		inProgress = true;
 		startTime = System.currentTimeMillis();
 		edLog.setText(""); // Clear all
 		log(text);
+		button.setEnabled(true);
 	}
 	
 	public void endTask (String text) {
 		setInfo("");
 		log(text);
 		log("Duration: "+toHMSMS(System.currentTimeMillis()-startTime));
+		isCanceled = false;
+		inProgress = false;
+		button.setEnabled(false);
+	}
+	
+	public boolean inProgress () {
+		return inProgress;
 	}
 
 	private String toHMSMS (long millis) {

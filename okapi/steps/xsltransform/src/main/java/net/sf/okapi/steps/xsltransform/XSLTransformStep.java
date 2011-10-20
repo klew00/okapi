@@ -29,7 +29,6 @@ import java.util.logging.Logger;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import net.sf.okapi.common.ConfigurationString;
@@ -153,7 +152,7 @@ public class XSLTransformStep extends BasePipelineStep {
 			logger.info("Transformer used: " + trans.getClass().getCanonicalName());
 			isDone = true;
 		}
-		catch ( TransformerConfigurationException e ) {
+		catch ( Throwable e ) {
 			throw new OkapiIOException("Error in XSLT input.\n" + e.getMessage(), e);
 		}
 		finally {

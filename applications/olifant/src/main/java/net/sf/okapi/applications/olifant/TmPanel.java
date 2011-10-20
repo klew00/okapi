@@ -567,6 +567,7 @@ class TmPanel extends Composite implements IObserver {
 	void startThread (Thread workerThread) {
 		this.workerThread = workerThread;
 		workerThread.start();
+		mainForm.updateCommands();
 	}
 	
 	@Override
