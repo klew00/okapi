@@ -31,6 +31,7 @@ import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.ResourceManager;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.lib.tmdb.DbUtil;
+import net.sf.okapi.lib.tmdb.Exporter;
 import net.sf.okapi.lib.tmdb.IRepository;
 import net.sf.okapi.lib.tmdb.ITm;
 import net.sf.okapi.lib.tmdb.Importer;
@@ -68,6 +69,7 @@ class RepositoryPanel extends Composite {
 	private MenuItem miContextOpen;
 	private MenuItem miContextEditTMOptions;
 	private MenuItem miContextImportFile;
+	private MenuItem miContextExportTM;
 	private MenuItem miContextDeleteTM;
 	private MenuItem miContextRenameTM;
 
@@ -157,6 +159,14 @@ class RepositoryPanel extends Composite {
             }
 		});
 
+		miContextExportTM = new MenuItem(contextMenu, SWT.PUSH);
+		rm.setCommand(miContextExportTM, "repository.export"); //$NON-NLS-1$
+		miContextExportTM.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				exportTM(null); // In the selected TM
+            }
+		});
+
 		new MenuItem(contextMenu, SWT.SEPARATOR);
 		
 		miContextDeleteTM = new MenuItem(contextMenu, SWT.PUSH);
@@ -188,6 +198,7 @@ class RepositoryPanel extends Composite {
 				miContextOpen.setEnabled(n>-1);
 				miContextEditTMOptions.setEnabled(enabled);
 				miContextImportFile.setEnabled(enabled);
+				miContextExportTM.setEnabled(enabled);
 				miContextDeleteTM.setEnabled(enabled);
 				miContextRenameTM.setEnabled(enabled);
 			}
@@ -613,6 +624,41 @@ class RepositoryPanel extends Composite {
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(getShell(), "Error adding document.\n"+e.getMessage(), null);
+		}
+	}
+
+	void exportTM (String tmName) {
+		try {
+			// If tmName is null use the current selection
+			if ( tmName == null ) {
+				int n = tmList.getSelectionIndex();
+				if ( n < 0 ) return;
+				tmName = tmList.getItem(n);
+			}
+
+			// Get the output filename
+			String path = Dialogs.browseFilenamesForSave(getShell(), "Export "+tmName, null, null, null);
+			if ( path == null ) return;
+			
+			// Get the Tab and TM data
+			TmPanel tp = mainForm.findTmTab(tmName, true);
+			if ( tp == null ) {
+				ITm tm = repo.openTm(tmName);
+				tp = mainForm.addTmTabEmpty(tm);
+				if ( tp == null ) return;
+				// Now the tab should exist
+				mainForm.findTmTab(tmName, true);
+				tp.resetTmDisplay();
+			}
+			tp.showLog(); // Make sure to display the log
+			
+			// Start the import thread
+			ProgressCallback callback = new ProgressCallback(tp);
+			Exporter exp = new Exporter(callback, repo, tmName, path);
+			tp.startThread(new Thread(exp));
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(getShell(), "Error while exporting.\n"+e.getMessage(), null);
 		}
 	}
 

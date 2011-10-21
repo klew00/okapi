@@ -128,7 +128,7 @@ public class Importer implements Runnable {
 					map.putAll(mapTrgProp);
 					tuKey = tm.addRecord(tuKey, mapTUProp, map);
 					// Update UI from time to time
-					if ( (++count % 152) == 0 ) {
+					if ( (++count % 452) == 0 ) {
 						// And check for cancellation
 						if ( !callback.updateProgress(count) ) {
 							if ( !canceled ) {

@@ -181,4 +181,14 @@ public class DbUtil {
 		return res;
 	}
 	
+	public TextFragment tmFieldsToFragment (String ctext,
+		String codes)
+	{
+		//fmt.fromLetterCodedToFragment(text, fragment)
+		TextFragment tf = new TextFragment(ctext,
+			Code.stringToCodes(codes));
+		return tf;
+	}
+	
+	
 }
