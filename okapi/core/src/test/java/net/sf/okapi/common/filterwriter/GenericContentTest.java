@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009 by the Okapi Framework contributors
+  Copyright (C) 2009-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -48,6 +48,27 @@ public class GenericContentTest {
 		fmt.updateFragment(gtext, tf2, false);
 		assertEquals("t1<1><2><3/>t2</2></1>t3", fmt.setContent(tf2).toString());
 	}
+	
+	@Test
+	public void testFromNumericCodedToFragment1 () {
+		TextFragment tf = createTextFragment();
+		String gtext = fmt.setContent(tf).toString();
+		assertEquals("t1<1><2><3/>t2</2></1>t3", gtext);
+		// Reconstruct it
+		TextFragment tf2 = fmt.fromNumericCodedToFragment(gtext, tf.getCodes(), false);
+		assertEquals("t1<1><2><3/>t2</2></1>t3", fmt.setContent(tf2).toString());
+	}
+	
+//	@Test
+//	public void testFromNumericCodedToFragment2 () {
+//		TextFragment tf = createTextFragment();
+//		StringBuilder tmp = new StringBuilder(fmt.setContent(tf).toString());
+//		assertEquals("t1<1><2><3/>t2</2></1>t3", tmp.toString());
+//		// Reconstruct it (with lost of codes)
+//		tmp.delete(2, 5); // Removes <1>
+//		TextFragment tf2 = fmt.fromNumericCodedToFragment(tmp.toString(), tf.getCodes(), true);
+//		assertEquals("t1<2><3/>t2</2><e1>t3", fmt.setContent(tf2).toString());
+//	}
 	
 	@Test
 	public void testSimple_WithOption () {

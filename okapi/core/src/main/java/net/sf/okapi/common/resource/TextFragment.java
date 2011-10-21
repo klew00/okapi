@@ -1528,36 +1528,38 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 		balanceMarkers();
 	}
 	
-	/**
-	 * Remove the {@link Code} from this TextFragment 
-	 * @param code - the {@link Code} to remove
-	 */
-	public void removeCode(Code code) {
-		if (code == null || 
-				codes == null || 
-				codes.isEmpty()) {
-			return;
-		}
-		
-		// TODO: should we balance the codes before removal?
-		for (int i=0; i<text.length(); i++) {
-			switch (text.charAt(i)) {
-				case TextFragment.MARKER_OPENING:
-				case TextFragment.MARKER_CLOSING:
-				case TextFragment.MARKER_ISOLATED:
-					int index = toIndex(text.charAt(i+1));
-					if (codes.get(index).getId() == code.getId() &&
-							codes.get(index).getTagType() == code.getTagType()) {
-						remove(i, i+2);
-						return;
-					}
-					i++; // skip index marker as well
-					break;
-				default:					
-					break;
-			}
-		}	
-	}
+//	/**
+//	 * Remove the {@link Code} from this TextFragment 
+//	 * @param code - the {@link Code} to remove
+//	 */
+//TODO: This does not delete the code from the list of codes
+// and does not re-index the markers in the coded-text
+//	public void removeCode(Code code) {
+//		if (code == null || 
+//				codes == null || 
+//				codes.isEmpty()) {
+//			return;
+//		}
+//		
+//		// TODO: should we balance the codes before removal?
+//		for (int i=0; i<text.length(); i++) {
+//			switch (text.charAt(i)) {
+//				case TextFragment.MARKER_OPENING:
+//				case TextFragment.MARKER_CLOSING:
+//				case TextFragment.MARKER_ISOLATED:
+//					int index = toIndex(text.charAt(i+1));
+//					if (codes.get(index).getId() == code.getId() &&
+//							codes.get(index).getTagType() == code.getTagType()) {
+//						remove(i, i+2);
+//						return;
+//					}
+//					i++; // skip index marker as well
+//					break;
+//				default:					
+//					break;
+//			}
+//		}	
+//	}
 	
 	/**
 	 * Verifies if a given position in the coded text is on the second special

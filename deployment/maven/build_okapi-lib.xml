@@ -164,6 +164,8 @@
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi/libraries/lib-gtt/target/classes"
 			 excludes="**/META-INF/**"/>
+			<fileset dir="../../okapi/libraries/lib-tmdb/target/classes"
+			 excludes="**/META-INF/**"/>
 			
 			<!-- tm -->
 			<fileset dir="../../okapi/tm/simpletm/target/classes"
@@ -305,6 +307,16 @@
 		<copy todir="${distLib}" file="${dep005bis}/${jar005bis}"/>
 		<copy todir="${distLicenses}">
 		   <fileset dir="../shared/licenses" includes="**/h2-*"/>
+		</copy>
+
+		<property name="dep006" value="${mavenStore}/org/mongodb/mongo-java-driver/2.6.5"/>
+		<fileset id="list.contents" dir="${dep006}"
+		 includes="**/mongo-java-driver-2.6.5.jar"/>
+		<property name="jar006" refid="list.contents"/>
+		<echo file="tmpJars" append="yes"> ${jar006}</echo>
+		<copy todir="${distLib}" file="${dep006}/${jar006}"/>
+		<copy todir="${distLicenses}">
+		   <fileset dir="../shared/licenses" includes="**/mongodb-*"/>
 		</copy>
 
 		<property name="dep009" value="${mavenStore}/com/googlecode/json-simple/json-simple/1.1"/>

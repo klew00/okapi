@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -186,6 +186,35 @@ public class Code {
 			}
 		}
 		return true;
+	}
+	
+	/**
+	 * Gets the index in a list of codes for the id of a given code.
+	 * @param codes the list of codes to lookup.
+	 * @param forClosing true to get the index of the closing code.
+	 * @param id the id to search for.
+	 * @return the index of the first opening or closing code with the given id, or -1 if not found.
+	 */
+	public static int getIndex (List<Code> codes,
+		boolean forClosing,
+		int id)
+	{
+		if ( codes == null ) return -1;
+		int i = 0;
+		for ( Code code : codes ) {
+			if ( code.id == id ) {
+				if ( forClosing ) {
+					if ( code.tagType == TagType.CLOSING ) {
+						return i;
+					}
+				}
+				else {
+					return i;
+				}
+			}
+			i++;
+		}
+		return -1;
 	}
 	
 	/**

@@ -181,13 +181,19 @@ public class DbUtil {
 		return res;
 	}
 	
+	/**
+	 * Creates a new text fragment from a text and code Olifant fields. 
+	 * @param ctext the text field to use
+	 * @param codes the code field to use
+	 * @return a new text fragment.
+	 */
 	public TextFragment tmFieldsToFragment (String ctext,
 		String codes)
 	{
-		//fmt.fromLetterCodedToFragment(text, fragment)
-		TextFragment tf = new TextFragment(ctext,
-			Code.stringToCodes(codes));
+		TextFragment tf = new TextFragment("", Code.stringToCodes(codes));
+		fmt.updateFragment(ctext, tf, false);
 		return tf;
+		//return fmt.fromNumericCodedToFragment(ctext, Code.stringToCodes(codes), false);
 	}
 	
 	

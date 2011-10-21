@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -263,9 +263,9 @@ public class GenericContent {
 		while ( m.find(start) ) {
 			n = m.start();
 			index = fragment.getIndexForClosing(Integer.valueOf(m.group(1)));
-			fragment.getCode(index).setId(-1); // For re-balancing
 			if ( index == -1 )
 				throw new InvalidContentException(String.format("Invalid code: '%s'", m.group()));
+			fragment.getCode(index).setId(-1); // For re-balancing
 			tmp.replace(n+diff, (n+diff)+m.group().length(), String.format("%c%c",
 				(char)TextFragment.MARKER_CLOSING, TextFragment.toChar(index)));
 			diff += (2-m.group().length());
@@ -300,9 +300,9 @@ public class GenericContent {
 		while ( m.find(start) ) {
 			n = m.start();
 			index = fragment.getIndexForClosing(Integer.valueOf(m.group(1)));
-			fragment.getCode(index).setId(-1); // For re-balancing
 			if ( index == -1 )
 				throw new InvalidContentException(String.format("Invalid code: '%s'", m.group()));
+			fragment.getCode(index).setId(-1); // For re-balancing
 			tmp.replace(n+diff, (n+diff)+m.group().length(), String.format("%c%c",
 				(char)TextFragment.MARKER_ISOLATED, TextFragment.toChar(index)));
 			diff += (2-m.group().length());
@@ -313,6 +313,106 @@ public class GenericContent {
 		fragment.setCodedText(tmp.toString(), allowCodeDeletion);
 	}
 
+	/**
+	 * Creates a new fragment from a numeric-codes text and corresponding codes.
+	 * <p>A numeric-coded text is like "&lt;1>text&lt;2/>&lt;/1>&lt;b3/>".
+	 * @param text the text to convert.
+	 * @param codes the codes to use with the coded text.
+	 * @param allowCodeDeletion true to allow the deletion of some codes.
+	 * @return the new fragment created from the text.
+	 */
+	public TextFragment fromNumericCodedToFragment (String genericText,
+		List<Code> codes,
+		boolean allowCodeDeletion)
+	{
+		TextFragment tf = new TextFragment("", codes);
+		updateFragment(genericText, tf, false);
+		return tf;
+//		
+//		if ( genericText == null )
+//			throw new NullPointerException("Parameter genericText cannot be null");
+//
+//		// Case with no in-line codes
+//		if ( Util.isEmpty(codes) && ( genericText.indexOf('<') == -1 )) {
+//			return new TextFragment(genericText);
+//		}
+//		
+//		// Otherwise: we have in-line codes
+//		StringBuilder tmp = new StringBuilder(genericText);
+//		
+//		int n;
+//		int start = 0;
+//		int diff = 0;
+//		int index;
+//		
+//		Matcher m = patternOpening.matcher(genericText);
+//		while ( m.find(start) ) {
+//			n = m.start();
+//			index = Code.getIndex(codes, false, Integer.valueOf(m.group(1)));
+//			if ( index == -1 )
+//				throw new InvalidContentException(String.format("Invalid code: '%s'", m.group()));
+//			tmp.replace(n+diff, (n+diff)+m.group().length(), String.format("%c%c",
+//				(char)TextFragment.MARKER_OPENING, TextFragment.toChar(index)));
+//			diff += (2-m.group().length());
+//			start = n+m.group().length();
+//		}
+//		start = diff = 0;
+//		m = patternClosing.matcher(tmp.toString());
+//		while ( m.find(start) ) {
+//			n = m.start();
+//			index = Code.getIndex(codes, true, Integer.valueOf(m.group(1)));
+//			if ( index == -1 )
+//				throw new InvalidContentException(String.format("Invalid code: '%s'", m.group()));
+//			codes.get(index).setId(-1); // For re-balancing
+//			tmp.replace(n+diff, (n+diff)+m.group().length(), String.format("%c%c",
+//				(char)TextFragment.MARKER_CLOSING, TextFragment.toChar(index)));
+//			diff += (2-m.group().length());
+//			start = n+m.group().length();
+//		}
+//		start = diff = 0;
+//		m = patternIsolated.matcher(tmp.toString());
+//		while ( m.find(start) ) {
+//			n = m.start();
+//			index = Code.getIndex(codes, false, Integer.valueOf(m.group(1)));
+//			if ( index == -1 )
+//				throw new InvalidContentException(String.format("Invalid code: '%s'", m.group()));
+//			tmp.replace(n+diff, (n+diff)+m.group().length(), String.format("%c%c",
+//				(char)TextFragment.MARKER_ISOLATED, TextFragment.toChar(index)));
+//			diff += (2-m.group().length());
+//			start = n+m.group().length();
+//		}
+//		start = diff = 0;
+//		m = patternIsolatedB.matcher(tmp.toString());
+//		while ( m.find(start) ) {
+//			n = m.start();
+//			index = Code.getIndex(codes, false, Integer.valueOf(m.group(1)));
+//			if ( index == -1 )
+//				throw new InvalidContentException(String.format("Invalid code: '%s'", m.group()));
+//			tmp.replace(n+diff, (n+diff)+m.group().length(), String.format("%c%c",
+//				(char)TextFragment.MARKER_ISOLATED, TextFragment.toChar(index)));
+//			diff += (2-m.group().length());
+//			start = n+m.group().length();
+//		}
+//		start = diff = 0;
+//		m = patternIsolatedE.matcher(tmp.toString());
+//		while ( m.find(start) ) {
+//			n = m.start();
+//			index = Code.getIndex(codes, true, Integer.valueOf(m.group(1)));
+//			if ( index == -1 )
+//				throw new InvalidContentException(String.format("Invalid code: '%s'", m.group()));
+//			codes.get(index).setId(-1); // For re-balancing
+//			tmp.replace(n+diff, (n+diff)+m.group().length(), String.format("%c%c",
+//				(char)TextFragment.MARKER_ISOLATED, TextFragment.toChar(index)));
+//			diff += (2-m.group().length());
+//			start = n+m.group().length();
+//		}
+//		
+//		
+//		TextFragment tf = new TextFragment();
+//		tf.setCodedText(tmp.toString(), codes, allowCodeDeletion);
+//		return tf;
+	}
+	
 	/**
 	 * Converts a letter-coded text to a fragment.
 	 * <p>A letter-coded text is like "&lt;g1>text&lt;x2/>&lt;/g1>&lt;b3/>".

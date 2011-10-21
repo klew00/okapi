@@ -91,6 +91,7 @@ public class MainForm {
 	private MenuItem miTMNew;
 	private MenuItem miTMClose;
 	private MenuItem miTMImport;
+	private MenuItem miTMExport;
 	private MenuItem miTMDelete;
 	private MenuItem miTMRename;
 	private MenuItem miTMEditColumns;
@@ -352,6 +353,7 @@ public class MainForm {
 		miTMNew.setEnabled(repoPanel.isRepositoryOpen());
 		miTMClose.setEnabled(active);
 		miTMImport.setEnabled(active);
+		miTMExport.setEnabled(active);
 		miTMDelete.setEnabled(active);
 		miTMRename.setEnabled(active);
 		miTMEditColumns.setEnabled(active);
@@ -446,6 +448,14 @@ public class MainForm {
 		miTMImport.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				repoPanel.importDocument(currentTP.getTm().getName());
+            }
+		});
+		
+		miTMExport = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miTMExport, "tm.export"); //$NON-NLS-1$
+		miTMExport.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				repoPanel.exportTM(currentTP.getTm().getName());
             }
 		});
 		
