@@ -897,13 +897,13 @@ public class TextFragmentTest {
 		assertEquals(8, TextFragment.indexOfLastNonWhitespace(text, 9, 0, true, true, false, true));
 	}
 	
-//	@Test
-//	public void testRemoveCode() {
-//		TextFragment f = makeFragment1();
-//		Code c = f.getCode(1);
-//		f.removeCode(c);
-//		assertEquals("[b]AB[/b]C", f.toText());
-//	}
+	@Test
+	public void testRemoveCode() {
+		TextFragment f = makeFragment1();
+		Code c = f.getCode(1);
+		f.removeCode(c);
+		assertEquals("[b]AB[/b]C", f.toText());
+	}
 
 	/**
 	 * Makes a fragment <code>[b]A[br/]B[/b]C<code>
