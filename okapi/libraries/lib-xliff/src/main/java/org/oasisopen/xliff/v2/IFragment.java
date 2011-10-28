@@ -101,6 +101,13 @@ public interface IFragment extends Serializable {
 	public ICode append (ICode code);
 	
 	/**
+	 * Appends an inline annotation to this fragment.
+	 * @param annotation the annotation to append.
+	 * @return the annotation that was appended.
+	 */
+	public IAnnotation append (IAnnotation annotation);
+	
+	/**
 	 * Appends an inline code to this fragment.
 	 * @param type the type of code {@link org.oasisopen.xliff.v2.InlineType#InlineType InlineType}
 	 * @param id the id of the code (corresponding opening and closing codes must have the same id).

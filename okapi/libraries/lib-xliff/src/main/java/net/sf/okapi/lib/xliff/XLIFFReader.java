@@ -37,8 +37,10 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.oasisopen.xliff.v2.IAnnotation;
 import org.oasisopen.xliff.v2.ICode;
 import org.oasisopen.xliff.v2.IDataStore;
+import org.oasisopen.xliff.v2.IMarker;
 import org.oasisopen.xliff.v2.IWithCandidates;
 import org.oasisopen.xliff.v2.IWithNotes;
 import org.oasisopen.xliff.v2.InlineType;
@@ -61,6 +63,7 @@ public class XLIFFReader {
 	private Segment segment;
 	private Part ignorable;
 	private Stack<Boolean> preserveWS;
+	private int lastAutoId = 0;
 
 	public void open (URI inputURI) {
 		try {
@@ -295,6 +298,7 @@ public class XLIFFReader {
 		cannotBeNullOrEmpty(Util.ATTR_ID, tmp);
 		unit = new Unit(tmp);
 		unit.setExtendedAttributes(gatherExtendedAttributes());
+		resetAutoId();
 		
 		while ( reader.hasNext() ) {
 			switch ( reader.next() ) {
@@ -344,11 +348,11 @@ public class XLIFFReader {
 				tmp = reader.getLocalName();
 				pushWSState();
 				if ( tmp.equals(Util.ELEM_SOURCE) ) {
-					processContent(part);
+					processContent(part, false);
 					alt.setSource(part.getSource());
 				}
 				else if ( tmp.equals(Util.ELEM_TARGET) ) {
-					processContent(part);
+					processContent(part, true);
 					alt.setTarget(part.getTarget(false));
 				}
 				else if ( tmp.equals(Util.ELEM_ORIGINALDATA) ) {
@@ -482,8 +486,8 @@ public class XLIFFReader {
 			if ( cannotBeEmpty(Util.ATTR_ID, tmp) ) {
 				segment.setId(tmp);
 			}
-			tmp = reader.getAttributeValue(null, Util.ATTR_TRANSLATABLE);
-			if ( mustBeYesOrNo(Util.ATTR_TRANSLATABLE, tmp) ) {
+			tmp = reader.getAttributeValue(null, Util.ATTR_TRANSLATE);
+			if ( mustBeYesOrNo(Util.ATTR_TRANSLATE, tmp) ) {
 				segment.setTranslatable(tmp.equals("yes"));
 			}
 			segment.setExtendedAttributes(gatherExtendedAttributes());
@@ -499,12 +503,12 @@ public class XLIFFReader {
 				tmp = reader.getLocalName();
 				pushWSState();
 				if ( tmp.equals(Util.ELEM_SOURCE) ) {
-					if ( isSegment ) processContent(segment);
-					else processContent(ignorable);
+					if ( isSegment ) processContent(segment, false);
+					else processContent(ignorable, false);
 				}
 				else if ( tmp.equals(Util.ELEM_TARGET) ) {
-					if ( isSegment ) processContent(segment);
-					else processContent(ignorable);
+					if ( isSegment ) processContent(segment, true);
+					else processContent(ignorable, true);
 					if ( sectionData.getTargetLanguage() == null ) {
 						throw new XLIFFReaderException("No target language defined in a file with a target entry.");
 					}
@@ -531,16 +535,17 @@ public class XLIFFReader {
 		}
 	}
 	
-	private void processContent (Part partToFill)
+	private void processContent (Part partToFill,
+		boolean isTarget)
 		throws XMLStreamException
 	{
-		Fragment frag = new Fragment(partToFill.getDataStore());
+		Fragment frag = new Fragment(partToFill.getDataStore(), isTarget);
 		String tmp;
 		ICode code = null;
 		boolean inTextContent = true;
 		StringBuilder content = new StringBuilder();
 		String nid = null;
-		Stack<ICode> pairs = new Stack<ICode>();
+		Stack<IMarker> pairs = new Stack<IMarker>();
 		
 		while ( reader.hasNext() ) {
 			switch ( reader.next() ) {
@@ -603,6 +608,41 @@ public class XLIFFReader {
 					closing.setSubFlows(reader.getAttributeValue(null, Util.ATTR_SUBFLOWSEND));
 					pairs.push(closing);
 				}
+				else if ( tmp.equals(Util.ELEM_OPENINGANNO) ) {
+					String id = reader.getAttributeValue(null, Util.ATTR_ID);
+					cannotBeNullOrEmpty(Util.ATTR_ID, id);
+					tmp = reader.getAttributeValue(null, Util.ATTR_TYPE);
+					cannotBeNullOrEmpty(Util.ATTR_TYPE, tmp);
+					IAnnotation ann = new Annotation(id, true, tmp);
+					frag.append(ann);
+					ann.setValue(reader.getAttributeValue(null, Util.ATTR_VALUE));
+					ann.setRef(reader.getAttributeValue(null, Util.ATTR_REF));
+					//TODO: translate attribute
+				}
+				else if ( tmp.equals(Util.ELEM_CLOSINGANNO) ) {
+					tmp = reader.getAttributeValue(null, Util.ATTR_RID);
+					cannotBeNullOrEmpty(Util.ATTR_RID, tmp);
+					IAnnotation ann = new Annotation(tmp, false, "TODO");
+					frag.append(ann);
+				}
+				else if ( tmp.equals(Util.ELEM_PAIREDANNO) ) {
+					tmp = reader.getAttributeValue(null, Util.ATTR_TYPE);
+					cannotBeNullOrEmpty(Util.ATTR_TYPE, tmp);
+					String id = reader.getAttributeValue(null, Util.ATTR_ID);
+					if ( Util.isNullOrEmpty(id) ) {
+						id = getNextAutoId(); // If no id is provided generate one
+					}
+					IAnnotation ann = new Annotation(id, true, tmp);
+					frag.append(ann);
+					ann.setValue(reader.getAttributeValue(null, Util.ATTR_VALUE));
+					ann.setRef(reader.getAttributeValue(null, Util.ATTR_REF));
+					// Closing marker
+					IAnnotation ann2 = new Annotation(id, false, tmp);
+					ann2.setRef(ann.getRef());
+					ann2.setValue(ann.getValue());
+					ann2.setTranslate(ann.getTranslate());
+					pairs.push(ann2);
+				}
 				else if ( tmp.equals(Util.ELEM_CP) ) {
 					tmp = reader.getAttributeValue(null, Util.ATTR_HEX);
 					cannotBeNullOrEmpty(Util.ATTR_HEX, tmp);
@@ -654,11 +694,14 @@ public class XLIFFReader {
 					if ( checkInsideVersusOutside(nid, content, code) ) {
 						code.setOriginalData(content.toString());
 					}
-					inTextContent = true; // back to text content
+					inTextContent = true; // Back to text content
 					nid = null;
 				}
 				else if ( tmp.equals(Util.ELEM_PAIREDCODES) ) {
-					frag.append(pairs.pop());
+					frag.append((ICode)pairs.pop());
+				}
+				else if ( tmp.equals(Util.ELEM_PAIREDANNO) ) {
+					frag.append((IAnnotation)pairs.pop());
 				}
 				else if ( tmp.equals(Util.ELEM_SOURCE) ) {
 					partToFill.setSource(frag);
@@ -733,5 +776,13 @@ public class XLIFFReader {
 		}
 		if (( attrs == null ) || ( attrs.size() == 0 )) return null;
 		return attrs;
+	}
+
+	private void resetAutoId () {
+		lastAutoId = 0;
+	}
+	
+	private String getNextAutoId () {
+		return String.format("autoId%d", ++lastAutoId);
 	}
 }

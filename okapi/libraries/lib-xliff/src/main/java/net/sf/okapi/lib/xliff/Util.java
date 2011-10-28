@@ -41,6 +41,9 @@ class Util {
 	final static String ELEM_CLOSINGCODE = "ec";
 	final static String ELEM_PLACEHOLDER = "ph";
 	final static String ELEM_PAIREDCODES = "pc";
+	final static String ELEM_OPENINGANNO = "sa";
+	final static String ELEM_CLOSINGANNO = "ea";
+	final static String ELEM_PAIREDANNO = "mrk";
 	final static String ELEM_CP = "cp";
 	final static String ELEM_ORIGINALDATA = "originalData";
 	final static String ELEM_DATA = "data";
@@ -61,8 +64,10 @@ class Util {
 	final static String ATTR_SUBFLOWSEND = "subFlowsEnd";
 	final static String ATTR_SOURCELANG = "srclang";
 	final static String ATTR_TARGETLANG = "tgtlang";
-	final static String ATTR_TRANSLATABLE = "translatable";
 	final static String ATTR_APPLIESTO = "appliesTo";
+	final static String ATTR_VALUE = "value";
+	final static String ATTR_REF = "ref";
+	final static String ATTR_TRANSLATE = "translate";
 	
 	static 	int compareAllowingNull (String s1,
 		String s2)

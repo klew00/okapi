@@ -36,13 +36,22 @@ public class Annotation implements IAnnotation {
 	private String ref;
 	private boolean translate = true;
 
-	public Annotation (String type) {
+	public Annotation (String id,
+		boolean opening,
+		String type)
+	{
+		this.id = id;
+		inlineType = (opening ? InlineType.OPENING : InlineType.CLOSING);
 		setType(type);
 	}
 
-	public Annotation (String type,
+	public Annotation (String id,
+		boolean opening,
+		String type,
 		String value)
 	{
+		this.id = id;
+		inlineType = (opening ? InlineType.OPENING : InlineType.CLOSING);
 		setType(type);
 		setValue(value);
 	}

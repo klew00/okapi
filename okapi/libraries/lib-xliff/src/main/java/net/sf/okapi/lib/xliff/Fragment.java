@@ -23,6 +23,7 @@ package net.sf.okapi.lib.xliff;
 import java.util.ArrayList;
 import java.util.Stack;
 
+import org.oasisopen.xliff.v2.IAnnotation;
 import org.oasisopen.xliff.v2.ICode;
 import org.oasisopen.xliff.v2.IDataStore;
 import org.oasisopen.xliff.v2.IFragment;
@@ -148,6 +149,7 @@ public class Fragment implements IFragment {
 	private String toXLIFFWithOriginalData (boolean dataInside) {
 		StringBuilder tmp = new StringBuilder();
 		ICode code;
+		IAnnotation ann;
 		int index;
 		ArrayList<String> verified = new ArrayList<String>();
 		
@@ -239,12 +241,38 @@ public class Fragment implements IFragment {
 				}
 			}
 			else if ( cp == ANNO_OPENING ) {
-				//TODO
-				i++;
+				ann = (IAnnotation)markers.get(toIndex(ctext.charAt(++i)));
+				// Check if the corresponding closing part is in the same fragment
+				IAnnotation closing = (IAnnotation)getWellFormedClosing(ann, i);
+				if ( closing != null ) {
+					tmp.append(String.format("<mrk id=\"%s\" type=\"%s\"", ann.getId(), ann.getType()));
+					if ( !Util.isNullOrEmpty(ann.getValue()) ) {
+						tmp.append(" value=\""+Util.toXML(ann.getValue(), true)+"\"");
+					}
+					verified.add(ann.getId());
+					tmp.append(">");
+				}
+				else {
+					// No corresponding closing part
+					tmp.append(String.format("<sa id=\"%s\" type=\"%s\"", ann.getId(), ann.getType()));
+					if ( !Util.isNullOrEmpty(ann.getValue()) ) {
+						tmp.append(" value=\""+Util.toXML(ann.getValue(), true)+"\"");
+					}
+					tmp.append("/>");
+				}
 			}
 			else if ( cp == ANNO_CLOSING ) {
-				//TODO
-				i++;
+				ann = (IAnnotation)markers.get(toIndex(ctext.charAt(++i)));
+				if ( verified.contains(ann.getId()) ) {
+					// This pair was verified
+					tmp.append("</mrk>");
+					// No need to remove the annotation from the verified list
+					// as it's not used again (no need to waste time cleaning it)
+				}
+				else { // Not in the verified list
+					tmp.append(String.format("<ea rid=\"%s\"", ann.getId()));
+					tmp.append("/>");
+				}
 			}
 			else {
 				switch ( cp ) {
@@ -334,6 +362,7 @@ public class Fragment implements IFragment {
 	public String toXLIFF () {
 		StringBuilder tmp = new StringBuilder();
 		ICode code;
+		IAnnotation ann;
 		ArrayList<String> verified = new ArrayList<String>();
 		for ( int i=0; i<ctext.length(); i++ ) {
 			int cp = ctext.codePointAt(i);
@@ -375,12 +404,38 @@ public class Fragment implements IFragment {
 				tmp.append("/>");
 			}
 			else if ( cp == ANNO_OPENING ) {
-				//TODO
-				i++;
+				ann = (IAnnotation)markers.get(toIndex(ctext.charAt(++i)));
+				// Check if the corresponding closing part is in the same fragment
+				IAnnotation closing = (IAnnotation)getWellFormedClosing(ann, i);
+				if ( closing != null ) {
+					tmp.append(String.format("<mrk id=\"%s\" type=\"%s\"", ann.getId(), ann.getType()));
+					if ( !Util.isNullOrEmpty(ann.getValue()) ) {
+						tmp.append(" value=\""+Util.toXML(ann.getValue(), true)+"\"");
+					}
+					verified.add(ann.getId());
+					tmp.append(">");
+				}
+				else {
+					// No corresponding closing part
+					tmp.append(String.format("<sa id=\"%s\" type=\"%s\"", ann.getId(), ann.getType()));
+					if ( !Util.isNullOrEmpty(ann.getValue()) ) {
+						tmp.append(" value=\""+Util.toXML(ann.getValue(), true)+"\"");
+					}
+					tmp.append("/>");
+				}
 			}
 			else if ( cp == ANNO_CLOSING ) {
-				//TODO
-				i++;
+				ann = (IAnnotation)markers.get(toIndex(ctext.charAt(++i)));
+				if ( verified.contains(ann.getId()) ) {
+					// This pair was verified
+					tmp.append("</mrk>");
+					// No need to remove the annotation from the verified list
+					// as it's not used again (no need to waste time cleaning it)
+				}
+				else { // Not in the verified list
+					tmp.append(String.format("<ea rid=\"%s\"", ann.getId()));
+					tmp.append("/>");
+				}
 			}
 			else {
 				// In XML 1.0 the valid characters are:
@@ -439,7 +494,7 @@ public class Fragment implements IFragment {
 				marker = markers.get(toIndex(ctext.charAt(++i)));
 				stack.push(marker.getId());
 			}
-//TODO: annotation take precedence over codees for well-formness!!			
+//TODO: annotation take precedence over codes for well-formness!!			
 			else if (( ch == CODE_CLOSING ) || ( ch == ANNO_CLOSING )) {
 				marker = markers.get(toIndex(ctext.charAt(++i)));
 				if ( marker.getId().equals(openingMarker.getId()) ) {
@@ -490,6 +545,20 @@ public class Fragment implements IFragment {
 			break;
 		}
 		return code;
+	}
+
+	@Override
+	public IAnnotation append (IAnnotation annotation) {
+		markers.add(annotation);
+		switch ( annotation.getInlineType() ) {
+		case OPENING:
+			ctext.append(""+ANNO_OPENING+toChar(markers.size()-1));
+			break;
+		case CLOSING:
+			ctext.append(""+ANNO_CLOSING+toChar(markers.size()-1));
+			break;
+		}
+		return annotation;
 	}
 
 	@Override

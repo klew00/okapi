@@ -7,6 +7,7 @@ import java.util.List;
 import net.sf.okapi.lib.xliff.XLIFFEvent.XLIFFEventType;
 
 import org.junit.Test;
+import org.oasisopen.xliff.v2.IAnnotation;
 import org.oasisopen.xliff.v2.ICandidate;
 import org.oasisopen.xliff.v2.ICode;
 import org.oasisopen.xliff.v2.IExtendedAttribute;
@@ -128,6 +129,33 @@ public class XLIFFReaderTest {
 				"<ph id=\"3\" equiv=\"eq3\" disp=\"di3\"/>t3" +
 				"</pc></pc>",
 			unit.getPart(0).getSource().toXLIFF(IFragment.STYLE_NODATA));
+	}
+	
+	@Test
+	public void testAnnotations () {
+		String text = "<?xml version='1.0'?>\n<xliff version=\"2.0\" xmlns=\"urn:oasis:names:tc:xliff:document:2.0\">"
+			+ "<file srclang=\"en\" tgtlang=\"fr\">\n<unit id=\"id\"><segment>\n"
+			+ "<source>"
+			+ "<sa id=\"1\" type=\"comment\" value=\"my note\"/>t1<ea rid=\"1\"/>"
+			+ "</source>"
+			+ "<target>"
+			+ "<mrk id=\"1\" type=\"comment\" value=\"my note trg\">t1</mrk>"
+			+ "</target>"
+			+ "</segment></unit>\n</file></xliff>";
+		Unit unit = getUnit(text, 1);
+		assertNotNull(unit);
+		
+		IAnnotation ann = (IAnnotation)unit.getDataStore().getSourceMarkers().get(0);
+		assertEquals("comment", ann.getType());
+		assertEquals("my note", ann.getValue());
+		assertEquals("<mrk id=\"1\" type=\"comment\" value=\"my note\">t1</mrk>",
+			unit.getPart(0).getSource().toXLIFF(IFragment.STYLE_NODATA));
+		
+		ann = (IAnnotation)unit.getDataStore().getTargetMarkers().get(0);
+		assertEquals("comment", ann.getType());
+		assertEquals("my note trg", ann.getValue());
+		assertEquals("<mrk id=\"1\" type=\"comment\" value=\"my note trg\">t1</mrk>",
+			unit.getPart(0).getTarget(false).toXLIFF(IFragment.STYLE_NODATA));
 	}
 	
 	@Test

@@ -88,7 +88,7 @@ public class DataStore implements IDataStore {
 		}
 		if ( trgMarkers != null ) {
 			for ( int i=0; i<trgMarkers.size(); i++ ) {
-				if ( srcMarkers.get(i).isAnnotation() ) continue;
+				if ( trgMarkers.get(i).isAnnotation() ) continue;
 				ICode code = (ICode)trgMarkers.get(i);
 				tmp = code.getOriginalData(); if ( tmp == null ) tmp = "";
 				if ( !map.containsKey(tmp) ) {
@@ -137,5 +137,5 @@ public class DataStore implements IDataStore {
 		}
 		return map.get(id);
 	}
-	
+
 }

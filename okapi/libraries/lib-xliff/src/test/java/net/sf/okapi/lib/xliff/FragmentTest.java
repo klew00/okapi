@@ -9,6 +9,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import org.junit.Test;
+import org.oasisopen.xliff.v2.IAnnotation;
 import org.oasisopen.xliff.v2.InlineType;
 
 public class FragmentTest {
@@ -70,22 +71,28 @@ public class FragmentTest {
 		assertEquals("<pc id=\"1\">t1<sc id=\"2\"/>t2<sc id=\"3\"/>t3<ec rid=\"2\"/>t4<ec rid=\"3\"/>t5</pc>", frag.toXLIFF());
 	}
 
-////	@Test
-//	public void testMarkersNotWellFormed1 () {
-//		Fragment frag = new Fragment(new Unit("id").getDataStore());
-//		frag.append(InlineType.OPENING, "1", "[o1]");
-//		frag.append("t1");
-//		frag.append(InlineType.OPENING, "2", "[o2]");
-//		frag.append("t2");
-//		frag.append(InlineType.OPENING, "3", "[o3]");
-//		frag.append("t3");
-//		frag.append(InlineType.CLOSING, "2", "[c2]");
-//		frag.append("t4");
-//		frag.append(InlineType.CLOSING, "3", "[c3]");
-//		frag.append("t5");
-//		frag.append(InlineType.CLOSING, "1", "[c1]");
-//		assertEquals("TODO", frag.toXLIFF());
-//	}
+	@Test
+	public void testSimpleAnnotations () {
+		Fragment frag = new Fragment(new Unit("id").getDataStore());
+		IAnnotation ann = new Annotation("a1", true, "comment", "my comment");
+		frag.append(ann);
+		frag.append("t1 ");
+		ann = new Annotation("a1", false, "comment");
+		frag.append(ann);
+		frag.append("t2.");
+		assertEquals("<mrk id=\"a1\" type=\"comment\" value=\"my comment\">t1 </mrk>t2.", frag.toXLIFF());
+	}
+	
+	@Test
+	public void testMarkersNotWellFormed1 () {
+		Fragment frag = new Fragment(new Unit("id").getDataStore());
+		frag.append(new Annotation("1", true, "type1"));
+		frag.append("t1");
+		frag.append(InlineType.OPENING, "2", "[c2]");
+		frag.append(new Annotation("1", false, "type1"));
+		frag.append(InlineType.CLOSING, "2", "[/c2]");
+		assertEquals("<sa id=\"1\" type=\"type1\"/>t1<sc id=\"2\"/><ea rid=\"1\"/><ec rid=\"2\"/>", frag.toXLIFF());
+	}
 
 	@Test
 	public void testCodesDataInside () {
