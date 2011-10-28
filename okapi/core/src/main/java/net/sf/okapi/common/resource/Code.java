@@ -446,7 +446,7 @@ public class Code {
 	public Code clone () {
 		Code newCode = new Code(tagType, type, data);
 		newCode.id = id;
-		newCode.outerData = outerData;
+		newCode.outerData = ((outerData == null) ? null : new StringBuilder(outerData));
 		newCode.flag = flag;
 		// Clone the annotations
 		if ( annotations != null ) {

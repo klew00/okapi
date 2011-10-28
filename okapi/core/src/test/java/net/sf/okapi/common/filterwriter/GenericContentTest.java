@@ -128,26 +128,47 @@ public class GenericContentTest {
 
 	@Test
 	public void testLetterCodedToFragment () {
-		String ori = "t1<g1>t2</g1><g2><x3/>t3<g4>t4</g4>t5</g2>t6";
-		TextFragment tf1 = fmt.fromLetterCodedToFragment(ori, null);
+		String ori = "t1<g1>t2</g1><g2><x3/>t3<g4>t4</g4>t5</g2>t6<x5/>t<b6/>t<g7>t</g7>t<e6/><x8/><x9/><x10/>";
+		TextFragment tf1 = fmt.fromLetterCodedToFragment(ori, null, false);
 		assertNotNull(tf1);
-		assertEquals(7, tf1.getCodes().size());
-		assertEquals("t1<1>t2</1><2><3/>t3<4>t4</4>t5</2>t6", fmt.setContent(tf1).toString());
+		assertEquals(15, tf1.getCodes().size());
+		assertEquals("t1<1>t2</1><2><3/>t3<4>t4</4>t5</2>t6<5/>t<6>t<7>t</7>t</6><8/><9/><10/>", fmt.setContent(tf1).toString());
 		
 		TextFragment tf = createTextFragment();
-		tf1 = fmt.fromLetterCodedToFragment(ori, tf);
+		tf1 = fmt.fromLetterCodedToFragment(ori, tf, false);
 		assertEquals(tf, tf1);
-		assertEquals("t1<1>t2</1><2><3/>t3<4>t4</4>t5</2>t6", fmt.setContent(tf1).toString());
+		assertEquals("t1<1>t2</1><2><3/>t3<4>t4</4>t5</2>t6<5/>t<6>t<7>t</7>t</6><8/><9/><10/>", fmt.setContent(tf1).toString());
 	}
-	
+
 	@Test
 	public void testFragmentToLetterCoded () {
 		TextFragment tf1 = createTextFragment();
 		String res = fmt.fromFragmentToLetterCoded(tf1);
 		assertEquals("t1<g1><g2><x3/>t2</g2></g1>t3", res);
 		// Try round trip
-		TextFragment tf2 = fmt.fromLetterCodedToFragment(res, null);
+		TextFragment tf2 = fmt.fromLetterCodedToFragment(res, null, false);
 		assertEquals(fmt.setContent(tf1).toString(), fmt.setContent(tf2).toString());
+	}
+
+	@Test
+	public void testDataTransfer () {
+		TextFragment tf = new TextFragment();
+		tf.append("t1");
+		tf.append(TagType.OPENING, "b1", "[b1]");
+		tf.append(TagType.OPENING, "b2", "[b2]");
+		tf.append(TagType.PLACEHOLDER, "x1", "[x/]");
+		tf.append("t2");
+		tf.append(TagType.CLOSING, "b2", "[/b2]");
+		tf.append(TagType.CLOSING, "b1", "[/b1]");
+		tf.append("t3");
+		assertEquals("t1[b1][b2][x/]t2[/b2][/b1]t3", tf.toText());
+		
+		String res = fmt.fromFragmentToLetterCoded(tf);
+		TextFragment tf2 = fmt.fromLetterCodedToFragment(res, tf, true);
+		assertEquals("t1[b1][b2][x/]t2[/b2][/b1]t3", tf2.toText());
+
+		TextFragment tf3 = fmt.fromLetterCodedToFragment(res, tf, false);
+		assertEquals("t1<g1><g2><x3/>t2</g2></g1>t3", tf3.toText());
 	}
 	
 	private TextFragment createTextFragment () {

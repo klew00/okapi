@@ -60,6 +60,21 @@ public class CodeTest {
     	assertTrue(code.isDeleteable());
     	assertTrue(code.hasReference());
     }
+    
+    @Test
+    public void testClone () {
+    	Code code = new Code(TagType.OPENING, "ctype", "data");
+    	code.setOuterData("out1");
+    	Code c2 = code.clone();
+    	assertNotSame(c2, code);
+    	assertEquals(c2.getId(), code.getId());
+    	assertEquals(c2.getData(), code.getData());
+    	assertNotSame(c2.data, code.data);
+    	assertEquals(c2.getTagType(), code.getTagType());
+    	assertEquals(c2.getType(), code.getType());
+    	assertEquals(c2.getOuterData(), code.getOuterData());
+    	assertNotSame(c2.outerData, code.outerData);
+    }
 
     @Test
     public void testStrings () {

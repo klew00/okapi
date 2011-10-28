@@ -70,6 +70,7 @@ class ToolBarWrapper {
 		cbSource.removeAll();
 		cbTarget.removeAll();
 		if ( tp != null ) {
+			//TODO: change to available locales
 			java.util.List<String> locs = tp.getTm().getLocales();
 			for ( String loc : locs ) {
 				cbSource.add(loc);

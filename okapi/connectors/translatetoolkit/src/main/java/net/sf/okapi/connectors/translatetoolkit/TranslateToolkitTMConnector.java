@@ -189,8 +189,8 @@ public class TranslateToolkitTMConnector extends BaseConnector implements ITMQue
 	        	if ( qr.getFuzzyScore() < threshold ) break; // Done
 	        	
 	        	if ( text.hasCode() && params.getSupportCodes() ) {
-	        		qr.source = fmt.fromLetterCodedToFragment((String)map.get("source"), null);
-	        		qr.target = fmt.fromLetterCodedToFragment((String)map.get("target"), null);
+	        		qr.source = fmt.fromLetterCodedToFragment((String)map.get("source"), null, false);
+	        		qr.target = fmt.fromLetterCodedToFragment((String)map.get("target"), null, false);
 	        	}
 	        	else {
 	        		qr.source = new TextFragment((String)map.get("source"));

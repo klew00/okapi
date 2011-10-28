@@ -21,7 +21,6 @@
 package net.sf.okapi.common.resource;
 
 import net.sf.okapi.common.IResource;
-import net.sf.okapi.common.ISkeleton;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.skeleton.GenericSkeleton;

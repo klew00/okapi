@@ -44,7 +44,8 @@ class RepositoryForm {
 	public static final String REPOTYPE_INMEMORY = "M";
 	public static final String REPOTYPE_DEFAULTLOCAL = "L";
 	public static final String REPOTYPE_OTHERLOCALORNETWORK = "O";
-	public static final String REPOTYPE_SERVER = "S";
+	public static final String REPOTYPE_MONGOSERVER = "SM";
+	public static final String REPOTYPE_H2SERVER = "SH";
 	
 	private final Shell shell;
 	private final Button rdDefaultLocal;
@@ -53,13 +54,18 @@ class RepositoryForm {
 	private final Text edInMemory;
 	private final Button rdOtherLocal;
 	private final TextAndBrowsePanel pnlOtherLocal;
-	private final Button rdServerBased;
-	private final Text edServerBased;
+	private final Button rdMongoServerBased;
+	private final Text edMongoServerBased;
+	private final Button rdH2ServerBased;
+	private final Text edH2ServerBased;
 	private final String defaultLocalname;
 
 	private String[] results = null;
 
-	RepositoryForm (Shell parent) {
+	RepositoryForm (Shell parent,
+		String type,
+		String param)
+	{
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		shell.setText("Repository Selection");
 		UIUtil.inheritIcon(shell, parent);
@@ -103,18 +109,31 @@ class RepositoryForm {
 		gdTmp.widthHint = 500;
 		pnlOtherLocal.setLayoutData(gdTmp);
 
-		rdServerBased = new Button(group, SWT.RADIO);
-		rdServerBased.setText("Server-based repository");
-		rdServerBased.addSelectionListener(new SelectionAdapter() {
+		rdMongoServerBased = new Button(group, SWT.RADIO);
+		rdMongoServerBased.setText("MongoDB server-based repository");
+		rdMongoServerBased.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				updateDisplay();
             }
 		});
 		
-		edServerBased = new Text(group, SWT.BORDER);
+		edMongoServerBased = new Text(group, SWT.BORDER);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalIndent = indent;
-		edServerBased.setLayoutData(gdTmp);
+		edMongoServerBased.setLayoutData(gdTmp);
+		
+		rdH2ServerBased = new Button(group, SWT.RADIO);
+		rdH2ServerBased.setText("H2 server-based repository");
+		rdH2ServerBased.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				updateDisplay();
+            }
+		});
+		
+		edH2ServerBased = new Text(group, SWT.BORDER);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalIndent = indent;
+		edH2ServerBased.setLayoutData(gdTmp);
 		
 		rdInMemory = new Button(group, SWT.RADIO);
 		rdInMemory.setText("Memory-based repository");
@@ -131,6 +150,27 @@ class RepositoryForm {
 		gdTmp.horizontalIndent = indent;
 		edInMemory.setLayoutData(gdTmp);
 
+		// Set the current selection
+		if ( type == null ) type = REPOTYPE_DEFAULTLOCAL;
+		if ( param == null ) param = "";
+		if ( type.equals(REPOTYPE_OTHERLOCALORNETWORK) ) {
+			rdOtherLocal.setSelection(true);
+			pnlOtherLocal.setText(param);
+		}
+		else if ( type.equals(REPOTYPE_MONGOSERVER) ) {
+			rdMongoServerBased.setSelection(true);
+		}
+		else if ( type.equals(REPOTYPE_H2SERVER) ) {
+			rdH2ServerBased.setSelection(true);
+			edH2ServerBased.setText(param);
+		}
+		else if ( type.equals(REPOTYPE_INMEMORY) ) {
+			rdInMemory.setSelection(true);
+		}
+		else { // Default
+			rdDefaultLocal.setSelection(true);
+		}
+		
 		updateDisplay();
 
 		SelectionAdapter OKCancelActions = new SelectionAdapter() {
@@ -157,7 +197,8 @@ class RepositoryForm {
 		edInMemory.setEnabled(rdInMemory.getSelection());
 		edDefaultLocal.setEnabled(rdDefaultLocal.getSelection());
 		pnlOtherLocal.setEnabled(rdOtherLocal.getSelection());
-		edServerBased.setEnabled(rdServerBased.getSelection());
+		edMongoServerBased.setEnabled(rdMongoServerBased.getSelection());
+		edH2ServerBased.setEnabled(rdH2ServerBased.getSelection());
 	}
 	
 	String[] showDialog () {
@@ -179,8 +220,18 @@ class RepositoryForm {
 			else if ( rdInMemory.getSelection() ) {
 				res[0] = REPOTYPE_INMEMORY;
 			}
-			else if ( rdServerBased.getSelection() ) {
-				res[0] = REPOTYPE_SERVER;
+			else if ( rdMongoServerBased.getSelection() ) {
+				res[0] = REPOTYPE_MONGOSERVER;
+			}
+			else if ( rdH2ServerBased.getSelection() ) {
+				String path = edH2ServerBased.getText().trim();
+				if ( path.isEmpty() ) {
+					Dialogs.showError(shell, "You must specify a host and database name.", null);
+					edH2ServerBased.setFocus();
+					return false;
+				}
+				res[0] = REPOTYPE_H2SERVER;
+				res[1] = path;
 			}
 			else if ( rdOtherLocal.getSelection() ) {
 				String path = pnlOtherLocal.getText().trim();

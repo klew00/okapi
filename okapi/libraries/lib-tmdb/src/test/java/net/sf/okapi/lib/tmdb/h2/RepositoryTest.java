@@ -19,11 +19,11 @@ public class RepositoryTest {
 		Repository.delete(repoPath);
 
 		// Create repository (step 1)
-		IRepository repo = new Repository(repoPath);
+		IRepository repo = new Repository(repoPath, false);
 		ProcesswithAPI.runMultipleTestsStep1(repo);
 
 		// Run the second step with the existing repository (step 2)
-		repo = new Repository(repoPath);
+		repo = new Repository(repoPath, false);
 		ProcesswithAPI.runMultipleTestsStep2(repo);
 	}
 
@@ -32,10 +32,10 @@ public class RepositoryTest {
 		throws SQLException
 	{
 		// Create memory repository
-		IRepository repo = new Repository(null);
+		IRepository repo = new Repository(null, false);
 		ProcesswithAPI.runMultipleTestsStep3(repo);
 		
-		repo = new Repository(null);
+		repo = new Repository(null, false);
 		ProcesswithAPI.runMultipleTestsStep4(repo);
 	}
 	

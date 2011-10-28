@@ -59,10 +59,15 @@ public class Repository implements IRepository {
 	/**
 	 * Creates a new Repository object. the local back-end files are created if 
 	 * they do not exists yet. If the files exist they are used.
-	 * @param path the path of the main storage file (without extension normally).
+	 * @param path the path of the main storage file (without extension normally)
+	 * Or Host URL and database name for server mode (e.g. "localhost/myDB" or "123.123.12.1:9092/myDB")
+	 * The server must define the base directory to use.
+	 * @param serverMode true to use the TCP server connection mode.
 	 * Use null to use a private in-memory repository.
 	 */
-	public Repository (String path) {
+	public Repository (String path,
+		boolean serverMode)
+	{
 		Statement stm = null;
 		try {
 			// Initialize the driver
@@ -81,15 +86,20 @@ public class Repository implements IRepository {
 				}
 				name = Util.getFilename(pathNoExt, false);
 			
-				// Check if the database exists
-				exist = (new File(pathNoExt+DATAFILE_EXT)).exists();
-				if ( !exist ) {
-					// Create the directory if needed
-					Util.createDirectories(pathNoExt);
-				}
-				
 				// Open the connection, this creates the DB if none exists
-				conn = DriverManager.getConnection("jdbc:h2:"+pathNoExt, "sa", "");
+				if ( serverMode ) {
+					conn = DriverManager.getConnection("jdbc:h2:tcp://"+pathNoExt, "sa", "");
+					exist = true; // Assumes it exists
+				}
+				else {
+					// Check if the database exists
+					exist = (new File(pathNoExt+DATAFILE_EXT)).exists();
+					if ( !exist ) {
+						// Create the directory if needed
+						Util.createDirectories(pathNoExt);
+					}
+					conn = DriverManager.getConnection("jdbc:h2:"+pathNoExt, "sa", "");
+				}
 			}
 	
 			if ( !exist ) {

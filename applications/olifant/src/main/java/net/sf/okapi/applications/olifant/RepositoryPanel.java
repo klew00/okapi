@@ -65,7 +65,8 @@ class RepositoryPanel extends Composite {
 	private Button btNewTM;
 	private Label stListTitle;
 	private IRepository repo;
-	private String repoType = "";
+	private String repoType;
+	private String repoParam;
 	private MenuItem miContextOpen;
 	private MenuItem miContextEditTMOptions;
 	private MenuItem miContextImportFile;
@@ -411,7 +412,7 @@ class RepositoryPanel extends Composite {
 	
 	void selectRepository () {
 		try {
-			RepositoryForm dlg = new RepositoryForm(getShell());
+			RepositoryForm dlg = new RepositoryForm(getShell(), repoType, repoParam);
 			String[] res = dlg.showDialog();
 			if ( res == null ) return; // No repository selected
 			openRepository(res[0], res[1]);
@@ -422,22 +423,27 @@ class RepositoryPanel extends Composite {
 	}
 
 	private void openRepository (String type,
-		String name)
+		String param)
 	{
 		try {
 			// Instantiate the new repository
 			if ( type.equals(RepositoryForm.REPOTYPE_INMEMORY) ) {
 				closeRepository();
-				repo = new net.sf.okapi.lib.tmdb.h2.Repository(null);
+				repo = new net.sf.okapi.lib.tmdb.h2.Repository(null, false);
 				repoType = type;
 			}
 			else if ( type.equals(RepositoryForm.REPOTYPE_DEFAULTLOCAL) 
 				|| type.equals(RepositoryForm.REPOTYPE_OTHERLOCALORNETWORK) ) {
 				closeRepository();
-				repo = new net.sf.okapi.lib.tmdb.h2.Repository(name);
+				repo = new net.sf.okapi.lib.tmdb.h2.Repository(param, false);
 				repoType = type;
 			}
-			else if ( type.equals(RepositoryForm.REPOTYPE_SERVER) ) {
+			else if ( type.equals(RepositoryForm.REPOTYPE_H2SERVER) ) {
+				closeRepository();
+				repo = new net.sf.okapi.lib.tmdb.h2.Repository(param, true);
+				repoType = type;
+			}
+			else if ( type.equals(RepositoryForm.REPOTYPE_MONGOSERVER) ) {
 				closeRepository();
 				repo = new net.sf.okapi.lib.tmdb.mongodb.Repository("REPO");
 				repoType = type;
@@ -447,6 +453,8 @@ class RepositoryPanel extends Composite {
 			Dialogs.showError(getShell(), "Error opening repository.\n"+e.getMessage(), null);
 		}
 		finally {
+			repoType = type;
+			repoParam = param;
 			// Update the display
 			resetRepositoryUI(0);
 			updateRepositoryStatus();

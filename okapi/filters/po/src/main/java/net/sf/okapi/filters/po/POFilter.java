@@ -782,7 +782,7 @@ public class POFilter implements IFilter {
 		if ( originalTuId != null ) {
 			if ( fmt == null ) fmt = new GenericContent();
 			// At this point the fragment should not be segmented nor have any inline codes
-			fmt.fromLetterCodedToFragment(frag.getCodedText(), frag);
+			fmt.fromLetterCodedToFragment(frag.getCodedText(), frag, false);
 		}
 		else { // Else: Normal PO entry
 			// Sets the inline codes

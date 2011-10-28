@@ -121,6 +121,13 @@ public class MainForm {
 	    	if ( fromJar ) appRootFolder = Util.getDirectoryName(appRootFolder); //$NON-NLS-1$
 			help = new BaseHelp(appRootFolder);
 			
+			// Temporary ALPHA version warning for end-user (not when running under eclipse)
+			//TODO: Remove this warning when ready
+			if ( fromJar ) {
+				Dialogs.showWarning(shell, "This version of Olifant is only ALPHA\nIt should not be used for production.\n\n"
+					+ "If you are on Windows you can still use the .NET version of Olifant\n(http://sourceforge.net/projects/okapi/files/)", null);
+			}
+
 			createContent();
 		}
 		catch ( Throwable e ) {

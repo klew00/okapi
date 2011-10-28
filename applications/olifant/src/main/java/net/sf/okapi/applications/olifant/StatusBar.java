@@ -62,6 +62,8 @@ class StatusBar extends Composite {
 		infoLabel = new CLabel(this, SWT.BORDER);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		infoLabel.setLayoutData(gdTmp);
+		
+		pack();
 	}
 
 	void setInfo (String p_sText) {

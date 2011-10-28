@@ -449,6 +449,7 @@ public class TTXFilter implements IFilter {
 			StringBuilder movedCodes = new StringBuilder();
 
 			String tmp;
+			String disp;
 			String name;
 			boolean moveToNext = false;
 			int dfCount = 0;
@@ -561,6 +562,7 @@ public class TTXFilter implements IFilter {
 					TagType tagType = TagType.PLACEHOLDER;
 					String type = "ph";
 					int idToUse = -1;
+					disp = reader.getAttributeValue(null, "DisplayText");
 					tmp = reader.getAttributeValue(null, "Type");
 					if ( tmp != null ) {
 						if ( tmp.equals("start") ) {
@@ -570,12 +572,12 @@ public class TTXFilter implements IFilter {
 							}
 							else { // Normal start tag
 								tagType = TagType.OPENING;
-								type = "Xpt";
+								type = ((disp != null) ? disp : "Xpt");
 							}
 						}
 						else if ( tmp.equals("end") ) {
 							tagType = TagType.CLOSING;
-							type = "Xpt";
+							type = ((disp != null) ? disp : "Xpt");
 							idToUse = -1;
 						}
 					}

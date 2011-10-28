@@ -419,11 +419,14 @@ public class GenericContent {
 	 * @param text the text to convert.
 	 * @param fragment optional existing fragment where to set the converted data, or null to create a new fragment.
 	 * If an existing fragment is provided, no existing code is preserved: all codes are coming from the parsing
-	 * of the input text.
+	 * of the input text, except if reuseCodes is set to true.
+	 * @param reuseCodes true to re-use the codes of the provided text fragment. If a code is not found in the
+	 * provided text fragment, one is created for the output.
 	 * @return the new fragment created from the text.
 	 */
 	public TextFragment fromLetterCodedToFragment (String text,
-		TextFragment fragment)
+		TextFragment fragment,
+		boolean reuseCodes)
 	{
 		// Case with no in-line codes
 		if ( text.indexOf('<') == -1 ) {
@@ -435,6 +438,10 @@ public class GenericContent {
 				return new TextFragment(text);
 			}
 		}
+		// Adjust the reuse flag to avoid extra tests
+		if ( fragment == null ) {
+			reuseCodes = false;
+		}
 		
 		// Otherwise: we have in-line codes
 		ArrayList<Code> codes = new ArrayList<Code>();
@@ -444,12 +451,22 @@ public class GenericContent {
 		int start = 0;
 		int diff = 0;
 		Code code;
+		int index;
 		
 		Matcher m = patternLCOpening.matcher(text);
 		while ( m.find(start) ) {
 			n = m.start();
-			code = new Code(TagType.OPENING, "Xpt", tmp.substring(n+diff, (n+diff)+m.group().length()));
-			code.setId(Integer.valueOf(m.group(1)));
+			code = null;
+			if ( reuseCodes ) {
+				index = fragment.getIndex(Integer.valueOf(m.group(1)));
+				if ( index > -1 ) {
+					code = fragment.getCode(index).clone();
+				}
+			}
+			if ( code == null ) {
+				code = new Code(TagType.OPENING, "Xpt", tmp.substring(n+diff, (n+diff)+m.group().length()));
+				code.setId(Integer.valueOf(m.group(1)));
+			}
 			codes.add(code);
 			tmp.replace(n+diff, (n+diff)+m.group().length(), String.format("%c%c",
 				(char)TextFragment.MARKER_OPENING, TextFragment.toChar(codes.size()-1)));
@@ -460,8 +477,17 @@ public class GenericContent {
 		m = patternLCClosing.matcher(tmp.toString());
 		while ( m.find(start) ) {
 			n = m.start();
-			code = new Code(TagType.CLOSING, "Xpt", tmp.substring(n+diff, (n+diff)+m.group().length()));
-			code.setId(Integer.valueOf(m.group(1)));
+			code = null;
+			if ( reuseCodes ) {
+				index = fragment.getIndexForClosing(Integer.valueOf(m.group(1)));
+				if ( index > -1 ) {
+					code = fragment.getCode(index).clone();
+				}
+			}
+			if ( code == null ) {
+				code = new Code(TagType.CLOSING, "Xpt", tmp.substring(n+diff, (n+diff)+m.group().length()));
+				code.setId(Integer.valueOf(m.group(1)));
+			}
 			codes.add(code);
 			tmp.replace(n+diff, (n+diff)+m.group().length(), String.format("%c%c",
 				(char)TextFragment.MARKER_CLOSING, TextFragment.toChar(codes.size()-1)));
@@ -472,8 +498,17 @@ public class GenericContent {
 		m = patternLCIsolated.matcher(tmp.toString());
 		while ( m.find(start) ) {
 			n = m.start();
-			code = new Code(TagType.PLACEHOLDER, "Xph", tmp.substring(n+diff, (n+diff)+m.group().length()));
-			code.setId(Integer.valueOf(m.group(1)));
+			code = null;
+			if ( reuseCodes ) {
+				index = fragment.getIndex(Integer.valueOf(m.group(1)));
+				if ( index > -1 ) {
+					code = fragment.getCode(index).clone();
+				}
+			}
+			if ( code == null ) {
+				code = new Code(TagType.PLACEHOLDER, "Xph", tmp.substring(n+diff, (n+diff)+m.group().length()));
+				code.setId(Integer.valueOf(m.group(1)));
+			}
 			codes.add(code);
 			tmp.replace(n+diff, (n+diff)+m.group().length(), String.format("%c%c",
 				(char)TextFragment.MARKER_ISOLATED, TextFragment.toChar(codes.size()-1)));
@@ -484,8 +519,17 @@ public class GenericContent {
 		m = patternLCIsolatedB.matcher(tmp.toString());
 		while ( m.find(start) ) {
 			n = m.start();
-			code = new Code(TagType.OPENING, "Xpt", tmp.substring(n+diff, (n+diff)+m.group().length()));
-			code.setId(Integer.valueOf(m.group(1)));
+			code = null;
+			if ( reuseCodes ) {
+				index = fragment.getIndex(Integer.valueOf(m.group(1)));
+				if ( index > -1 ) {
+					code = fragment.getCode(index).clone();
+				}
+			}
+			if ( code == null ) {
+				code = new Code(TagType.OPENING, "Xpt", tmp.substring(n+diff, (n+diff)+m.group().length()));
+				code.setId(Integer.valueOf(m.group(1)));
+			}
 			codes.add(code);
 			tmp.replace(n+diff, (n+diff)+m.group().length(), String.format("%c%c",
 				(char)TextFragment.MARKER_ISOLATED, TextFragment.toChar(codes.size()-1)));
@@ -496,8 +540,17 @@ public class GenericContent {
 		m = patternLCIsolatedE.matcher(tmp.toString());
 		while ( m.find(start) ) {
 			n = m.start();
-			code = new Code(TagType.CLOSING, "Xpt", tmp.substring(n+diff, (n+diff)+m.group().length()));
-			code.setId(Integer.valueOf(m.group(1)));
+			code = null;
+			if ( reuseCodes ) {
+				index = fragment.getIndexForClosing(Integer.valueOf(m.group(1)));
+				if ( index > -1 ) {
+					code = fragment.getCode(index).clone();
+				}
+			}
+			if ( code == null ) {
+				code = new Code(TagType.CLOSING, "Xpt", tmp.substring(n+diff, (n+diff)+m.group().length()));
+				code.setId(Integer.valueOf(m.group(1)));
+			}
 			codes.add(code);
 			tmp.replace(n+diff, (n+diff)+m.group().length(), String.format("%c%c",
 				(char)TextFragment.MARKER_ISOLATED, TextFragment.toChar(codes.size()-1)));

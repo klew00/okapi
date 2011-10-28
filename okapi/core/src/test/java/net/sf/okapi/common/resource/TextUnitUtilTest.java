@@ -158,7 +158,7 @@ public class TextUnitUtilTest {
 		oriFrag.append(TagType.OPENING, "c2", "[c2>]");
 		oriFrag.append(" s3 ");
 		oriFrag.append(TagType.CLOSING, "c2", "[<c2]");
-		TextFragment trgFrag = fmt.fromLetterCodedToFragment("<g2>t3</g2> t1 <x1/> t2", null);
+		TextFragment trgFrag = fmt.fromLetterCodedToFragment("<g2>t3</g2> t1 <x1/> t2", null, false);
 		TextUnitUtil.copySrcCodeDataToMatchingTrgCodes(oriFrag, trgFrag, true, false, null, null);
 		assertEquals("[c2>]t3[<c2] t1 [c1] t2", fmt.setContent(trgFrag).toString(true));
 	}

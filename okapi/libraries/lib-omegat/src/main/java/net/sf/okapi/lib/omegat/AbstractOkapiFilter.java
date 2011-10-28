@@ -23,10 +23,7 @@ package net.sf.okapi.lib.omegat;
 import java.awt.Dialog;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IResource;
@@ -34,17 +31,15 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
-import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.ISegments;
-import net.sf.okapi.common.resource.InvalidContentException;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.ITextUnit;
-import net.sf.okapi.common.resource.TextFragment.TagType;
 
 import org.omegat.filters2.FilterContext;
 import org.omegat.filters2.IAlignCallback;
@@ -61,15 +56,16 @@ abstract class AbstractOkapiFilter implements org.omegat.filters2.IFilter {
     protected String defaultOutEncoding = "UTF-8";
     protected String supportedExtensions;
 
-	private final Pattern patternOpening = Pattern.compile("\\<g(\\d+?)\\>");
-	private final Pattern patternClosing = Pattern.compile("\\</g(\\d+?)\\>");
-	private final Pattern patternIsolated = Pattern.compile("\\<x(\\d+?)/\\>");
-	private final Pattern patternIsolatedB = Pattern.compile("\\<b(\\d+?)/\\>");
-	private final Pattern patternIsolatedE = Pattern.compile("\\<e(\\d+?)/\\>");
+//	private final Pattern patternOpening = Pattern.compile("\\<g(\\d+?)\\>");
+//	private final Pattern patternClosing = Pattern.compile("\\</g(\\d+?)\\>");
+//	private final Pattern patternIsolated = Pattern.compile("\\<x(\\d+?)/\\>");
+//	private final Pattern patternIsolatedB = Pattern.compile("\\<b(\\d+?)/\\>");
+//	private final Pattern patternIsolatedE = Pattern.compile("\\<e(\\d+?)/\\>");
 
 	private String filterConfigId;
 	private FilterConfigurationMapper fcMapper;
 	private String name;
+	private GenericContent fmt = new GenericContent();
 
 	protected void initialize (String name,
 		String filterClassName,
@@ -313,129 +309,135 @@ abstract class AbstractOkapiFilter implements org.omegat.filters2.IFilter {
     }
 	
 	private String toOmegat (TextFragment tf) {
-		// Use directly the coded text if there is no codes
-		if ( !tf.hasCode() ) {
-			return tf.getCodedText();
-		}
-
-		// Else: represent the code the OmegaT way
-		StringBuilder tmp = new StringBuilder();
-		String ctext = tf.getCodedText();
-		List<Code> codes = tf.getCodes();
-		Code code;
-		int index;
 		
-		for ( int i = 0; i<ctext.length(); i++ ) {
-			if ( TextFragment.isMarker(ctext.charAt(i)) ) {
-				index = TextFragment.toIndex(ctext.charAt(++i));
-				code = codes.get(index);
-				switch ( code.getTagType() ) {
-				case OPENING:
-					tmp.append(String.format("<g%d>", code.getId()));
-					break;
-				case CLOSING:
-					tmp.append(String.format("</g%d>", code.getId()));
-					break;
-				case PLACEHOLDER:
-					if ( code.getTagType() == TagType.OPENING ) {
-						tmp.append(String.format("<b%d/>", code.getId()));
-					}
-					else if ( code.getTagType() == TagType.CLOSING ) {
-						tmp.append(String.format("<e%d/>", code.getId()));
-					}
-					else {
-						tmp.append(String.format("<x%d/>", code.getId()));
-					}
-					break;
-				}
-			}
-			else {
-				tmp.append(ctext.charAt(i));
-			}
-		}
-		return tmp.toString();
+		return fmt.fromFragmentToLetterCoded(tf);
+//		
+//		
+//		// Use directly the coded text if there is no codes
+//		if ( !tf.hasCode() ) {
+//			return tf.getCodedText();
+//		}
+//
+//		// Else: represent the code the OmegaT way
+//		StringBuilder tmp = new StringBuilder();
+//		String ctext = tf.getCodedText();
+//		List<Code> codes = tf.getCodes();
+//		Code code;
+//		int index;
+//		
+//		for ( int i = 0; i<ctext.length(); i++ ) {
+//			if ( TextFragment.isMarker(ctext.charAt(i)) ) {
+//				index = TextFragment.toIndex(ctext.charAt(++i));
+//				code = codes.get(index);
+//				switch ( code.getTagType() ) {
+//				case OPENING:
+//					tmp.append(String.format("<g%d>", code.getId()));
+//					break;
+//				case CLOSING:
+//					tmp.append(String.format("</g%d>", code.getId()));
+//					break;
+//				case PLACEHOLDER:
+//					if ( code.getTagType() == TagType.OPENING ) {
+//						tmp.append(String.format("<b%d/>", code.getId()));
+//					}
+//					else if ( code.getTagType() == TagType.CLOSING ) {
+//						tmp.append(String.format("<e%d/>", code.getId()));
+//					}
+//					else {
+//						tmp.append(String.format("<x%d/>", code.getId()));
+//					}
+//					break;
+//				}
+//			}
+//			else {
+//				tmp.append(ctext.charAt(i));
+//			}
+//		}
+//		return tmp.toString();
 	}
 
 	private void fromOmegat (String text,
 		TextFragment frag)
 	{
-		// Case with no in-line codes
-		if ( !frag.hasCode() && ( text.indexOf('<') == -1 )) {
-			frag.setCodedText(text);
-			return;
-		}
-		
-		// Otherwise: we have in-line codes
-		StringBuilder tmp = new StringBuilder(text);
-		
-		int n;
-		int start = 0;
-		int diff = 0;
-		int index;
-		Matcher m = patternOpening.matcher(text);
-		while ( m.find(start) ) {
-			n = m.start();
-			index = frag.getIndex(Integer.valueOf(m.group(1)));
-			if ( index == -1 )
-				throw new InvalidContentException(String.format("Invalid code: '%s'", m.group()));
-			tmp.replace(n+diff, (n+diff)+m.group().length(), String.format("%c%c",
-				(char)TextFragment.MARKER_OPENING, TextFragment.toChar(index)));
-			diff += (2-m.group().length());
-			start = n+m.group().length();
-		}
-		start = diff = 0;
-		m = patternClosing.matcher(tmp.toString());
-		while ( m.find(start) ) {
-			n = m.start();
-			index = frag.getIndexForClosing(Integer.valueOf(m.group(1)));
-			frag.getCode(index).setId(-1); // For re-balancing
-			if ( index == -1 )
-				throw new InvalidContentException(String.format("Invalid code: '%s'", m.group()));
-			tmp.replace(n+diff, (n+diff)+m.group().length(), String.format("%c%c",
-				(char)TextFragment.MARKER_CLOSING, TextFragment.toChar(index)));
-			diff += (2-m.group().length());
-			start = n+m.group().length();
-		}
-		start = diff = 0;
-		m = patternIsolated.matcher(tmp.toString());
-		while ( m.find(start) ) {
-			n = m.start();
-			index = frag.getIndex(Integer.valueOf(m.group(1)));
-			if ( index == -1 )
-				throw new InvalidContentException(String.format("Invalid code: '%s'", m.group()));
-			tmp.replace(n+diff, (n+diff)+m.group().length(), String.format("%c%c",
-				(char)TextFragment.MARKER_ISOLATED, TextFragment.toChar(index)));
-			diff += (2-m.group().length());
-			start = n+m.group().length();
-		}
-		start = diff = 0;
-		m = patternIsolatedB.matcher(tmp.toString());
-		while ( m.find(start) ) {
-			n = m.start();
-			index = frag.getIndex(Integer.valueOf(m.group(1)));
-			if ( index == -1 )
-				throw new InvalidContentException(String.format("Invalid code: '%s'", m.group()));
-			tmp.replace(n+diff, (n+diff)+m.group().length(), String.format("%c%c",
-				(char)TextFragment.MARKER_ISOLATED, TextFragment.toChar(index)));
-			diff += (2-m.group().length());
-			start = n+m.group().length();
-		}
-		start = diff = 0;
-		m = patternIsolatedE.matcher(tmp.toString());
-		while ( m.find(start) ) {
-			n = m.start();
-			index = frag.getIndexForClosing(Integer.valueOf(m.group(1)));
-			frag.getCode(index).setId(-1); // For re-balancing
-			if ( index == -1 )
-				throw new InvalidContentException(String.format("Invalid code: '%s'", m.group()));
-			tmp.replace(n+diff, (n+diff)+m.group().length(), String.format("%c%c",
-				(char)TextFragment.MARKER_ISOLATED, TextFragment.toChar(index)));
-			diff += (2-m.group().length());
-			start = n+m.group().length();
-		}
-		
-		// Allow deletion of codes
-		frag.setCodedText(tmp.toString(), false);
+		fmt.fromLetterCodedToFragment(text, frag, true);
+//		
+//		// Case with no in-line codes
+//		if ( !frag.hasCode() && ( text.indexOf('<') == -1 )) {
+//			frag.setCodedText(text);
+//			return;
+//		}
+//		
+//		// Otherwise: we have in-line codes
+//		StringBuilder tmp = new StringBuilder(text);
+//		
+//		int n;
+//		int start = 0;
+//		int diff = 0;
+//		int index;
+//		Matcher m = patternOpening.matcher(text);
+//		while ( m.find(start) ) {
+//			n = m.start();
+//			index = frag.getIndex(Integer.valueOf(m.group(1)));
+//			if ( index == -1 )
+//				throw new InvalidContentException(String.format("Invalid code: '%s'", m.group()));
+//			tmp.replace(n+diff, (n+diff)+m.group().length(), String.format("%c%c",
+//				(char)TextFragment.MARKER_OPENING, TextFragment.toChar(index)));
+//			diff += (2-m.group().length());
+//			start = n+m.group().length();
+//		}
+//		start = diff = 0;
+//		m = patternClosing.matcher(tmp.toString());
+//		while ( m.find(start) ) {
+//			n = m.start();
+//			index = frag.getIndexForClosing(Integer.valueOf(m.group(1)));
+//			frag.getCode(index).setId(-1); // For re-balancing
+//			if ( index == -1 )
+//				throw new InvalidContentException(String.format("Invalid code: '%s'", m.group()));
+//			tmp.replace(n+diff, (n+diff)+m.group().length(), String.format("%c%c",
+//				(char)TextFragment.MARKER_CLOSING, TextFragment.toChar(index)));
+//			diff += (2-m.group().length());
+//			start = n+m.group().length();
+//		}
+//		start = diff = 0;
+//		m = patternIsolated.matcher(tmp.toString());
+//		while ( m.find(start) ) {
+//			n = m.start();
+//			index = frag.getIndex(Integer.valueOf(m.group(1)));
+//			if ( index == -1 )
+//				throw new InvalidContentException(String.format("Invalid code: '%s'", m.group()));
+//			tmp.replace(n+diff, (n+diff)+m.group().length(), String.format("%c%c",
+//				(char)TextFragment.MARKER_ISOLATED, TextFragment.toChar(index)));
+//			diff += (2-m.group().length());
+//			start = n+m.group().length();
+//		}
+//		start = diff = 0;
+//		m = patternIsolatedB.matcher(tmp.toString());
+//		while ( m.find(start) ) {
+//			n = m.start();
+//			index = frag.getIndex(Integer.valueOf(m.group(1)));
+//			if ( index == -1 )
+//				throw new InvalidContentException(String.format("Invalid code: '%s'", m.group()));
+//			tmp.replace(n+diff, (n+diff)+m.group().length(), String.format("%c%c",
+//				(char)TextFragment.MARKER_ISOLATED, TextFragment.toChar(index)));
+//			diff += (2-m.group().length());
+//			start = n+m.group().length();
+//		}
+//		start = diff = 0;
+//		m = patternIsolatedE.matcher(tmp.toString());
+//		while ( m.find(start) ) {
+//			n = m.start();
+//			index = frag.getIndexForClosing(Integer.valueOf(m.group(1)));
+//			frag.getCode(index).setId(-1); // For re-balancing
+//			if ( index == -1 )
+//				throw new InvalidContentException(String.format("Invalid code: '%s'", m.group()));
+//			tmp.replace(n+diff, (n+diff)+m.group().length(), String.format("%c%c",
+//				(char)TextFragment.MARKER_ISOLATED, TextFragment.toChar(index)));
+//			diff += (2-m.group().length());
+//			start = n+m.group().length();
+//		}
+//		
+//		// Allow deletion of codes
+//		frag.setCodedText(tmp.toString(), false);
 	}
 
 }

@@ -107,6 +107,60 @@ public class TTXFilterTest {
 		assertEquals("<b1/>[es1]<e1/>", fmt.printSegmentedContent(cont, true));
 	}
 
+//TODO: fix complex case	@Test
+	public void testSegmentedComplex () {
+		String snippet = STARTFILENOLB
+			+ "<ut Type=\"start\" Style=\"external\" RightEdge=\"angle\" DisplayText=\"paragraph\">&lt;paragraph &gt;</ut>"
+			+ "<df Font=\"Wingdings 3\">" // ph 1 <df>
+			+ "<ut Type=\"start\" RightEdge=\"angle\" DisplayText=\"cf\">&lt;cf &gt;</ut>" // start 2 <cf>
+			+ "</df>" // ph 3 </df>
+			+ "<ut DisplayText=\"symbol\">&lt;symbol /&gt;</ut>" // ph 4
+			+ "<ut Type=\"end\" LeftEdge=\"angle\" DisplayText=\"cf\">&lt;/cf&gt;</ut>" // end 2 </cf> 
+			+ "<df Font=\"Myriad Pro\">" // ph 5 <df>
+			+ "<ut Type=\"start\" RightEdge=\"angle\" DisplayText=\"cf\">&lt;cf &gt;</ut>" // start 6 <cf>
+			+ " <Tu><Tuv Lang=\"EN-US\"><df Font=\"Arial\">" // ph 7 <df>
+			+ "<ut Type=\"end\" LeftEdge=\"angle\" DisplayText=\"cf\">&lt;/cf&gt;</ut>" // end 6 </cf>
+			+ "<ut Type=\"start\" RightEdge=\"angle\" DisplayText=\"cf\">&lt;cf &gt;</ut>" // start 8 <cf>
+			+ "<ut Type=\"start\" RightEdge=\"angle\" DisplayText=\"indenthere\">&lt;indenthere/&gt;</ut>" // start 9 <indent>
+			+ "<ut Type=\"end\" LeftEdge=\"angle\" DisplayText=\"cf\">&lt;/cf&gt;</ut>" // end 8 </cf>
+			+ "<ut Type=\"start\" RightEdge=\"angle\" DisplayText=\"cf\">&lt;cf &gt;</ut>" // start 9 <cf>
+			+ "Src 1 "
+			+ "<ut Type=\"end\" LeftEdge=\"angle\" DisplayText=\"cf\">&lt;/cf&gt;</ut>"
+			+ "<ut Type=\"start\" RightEdge=\"angle\" DisplayText=\"cf\">&lt;cf &gt;</ut>"
+			+ "<ut Type=\"start\" RightEdge=\"angle\" DisplayText=\"linebreak\">&lt;linebreak/&gt;</ut>"
+			+ "<ut Type=\"end\" LeftEdge=\"angle\" DisplayText=\"cf\">&lt;/cf&gt;</ut>"
+			+ "<ut Type=\"start\" RightEdge=\"angle\" DisplayText=\"cf\">&lt;cf &gt;</ut>"
+			+ "Src 2."
+			+ "</df>"
+			+ "</Tuv>"
+			+ "<Tuv Lang=\"ES-EM\">"
+			+ "<df Font=\"Arial\">"
+			+ "<ut Type=\"end\" LeftEdge=\"angle\" DisplayText=\"cf\">&lt;/cf&gt;</ut>"
+			+ "<ut Type=\"start\" RightEdge=\"angle\" DisplayText=\"cf\">&lt;cf &gt;</ut>"
+			+ "<ut Type=\"start\" RightEdge=\"angle\" DisplayText=\"indenthere\">&lt;indenthere/&gt;</ut>"
+			+ "<ut Type=\"end\" LeftEdge=\"angle\" DisplayText=\"cf\">&lt;/cf&gt;</ut>"
+			+ "<ut Type=\"start\" RightEdge=\"angle\" DisplayText=\"cf\">&lt;cf &gt;</ut>"
+			+ "Trg 1 "
+			+ "<ut Type=\"end\" LeftEdge=\"angle\" DisplayText=\"cf\">&lt;/cf&gt;</ut>"
+			+ "<ut Type=\"start\" RightEdge=\"angle\" DisplayText=\"cf\">&lt;cf &gt;</ut>"
+			+ "<ut Type=\"start\" RightEdge=\"angle\" DisplayText=\"linebreak\">&lt;linebreak/&gt;</ut>"
+			+ "<ut Type=\"end\" LeftEdge=\"angle\" DisplayText=\"cf\">&lt;/cf&gt;</ut>"
+			+ "<ut Type=\"start\" RightEdge=\"angle\" DisplayText=\"cf\">&lt;cf &gt;</ut>"
+			+ "Trg 2."
+			+ "</df>"
+			+ "</Tuv></Tu>"
+			+ "</df>"
+			+ "<ut Type=\"end\" LeftEdge=\"angle\" DisplayText=\"cf\">&lt;/cf&gt;</ut>"
+			+ "<ut Type=\"end\" Style=\"external\" LeftEdge=\"angle\" DisplayText=\"paragraph\">&lt;/paragraph&gt;</ut>"
+			+ "</Raw></Body></TRADOStag>";
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(filterIncUnSeg, snippet, locESEM), 1);
+		assertNotNull(tu);
+		TextContainer cont = tu.getSource();
+		ISegments segments = cont.getSegments();
+		assertEquals(1, segments.count());
+		assertEquals("Src 1", fmt.setContent(segments.get(0).text).toString());
+	}
+
 	@Test
 	public void testNotSegmentedWithDFAndCodes () {
 		String snippet = STARTFILENOLB
