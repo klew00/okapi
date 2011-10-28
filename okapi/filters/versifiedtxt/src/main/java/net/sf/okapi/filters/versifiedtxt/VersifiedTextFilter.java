@@ -58,7 +58,7 @@ import net.sf.okapi.common.skeleton.GenericSkeleton;
 // No parameters
 public class VersifiedTextFilter extends AbstractFilter {
 	private static final Logger LOGGER = Logger.getLogger(VersifiedTextFilter.class.getName());
-	private static final int BUFFER_SIZE = 128000;
+	private static final int BUFFER_SIZE = 2800;
 
 	public static final String VERSIFIED_TXT_MIME_TYPE = "text/x-versified-txt";
 	private static final String VERSE = "^[ \t]*\\|v(.+)[ \t]*$";
@@ -177,7 +177,7 @@ public class VersifiedTextFilter extends AbstractFilter {
 		try {
 			versifiedFileReader.mark(BUFFER_SIZE);
 			while ((line = versifiedFileReader.readLine()) != null) {
-				bufferCount += line.length();
+				bufferCount += (line.length()+2);
 				if (bufferCount >= BUFFER_SIZE) {
 					break;
 				}
