@@ -191,10 +191,10 @@ public class XLIFFReaderTest {
 			+ "<segment>"
 			+ "<source>translatable</source>"
 			+ "</segment>"
-			+ "<segment translatable=\"no\">"
+			+ "<segment translate=\"no\">"
 			+ "<source>non-translatable</source>"
 			+ "</segment>"
-			+ "<segment translatable=\"yes\">"
+			+ "<segment translate=\"yes\">"
 			+ "<source>translatable</source>"
 			+ "</segment>"
 			+ "</unit>\n</file></xliff>";
