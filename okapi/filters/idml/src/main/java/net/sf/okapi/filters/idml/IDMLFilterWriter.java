@@ -401,6 +401,11 @@ public class IDMLFilterWriter implements IFilterWriter {
 	}
 	
 	private void processEndGroup (Ending ending) {
+		// Merge any remaining TU
+		while ( !referents.isEmpty() ) {
+			mergeTextUnit((ITextUnit)referents.pop());
+		}
+		// Process the group
 		group--;
 		try {
 			if ( group != 1 ) {
