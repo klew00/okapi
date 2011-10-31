@@ -24,6 +24,7 @@ import java.io.File;
 import java.net.URI;
 import java.net.URLDecoder;
 
+import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
@@ -85,7 +86,7 @@ public class MainForm {
 	private TmPanel currentTP;
 	private StatusBar statusBar;
 	private ToolBarWrapper toolBar;
-	private BaseHelp help;
+	private IHelp help;
 	
 	private MenuItem miFileOpen;
 	private MenuItem miTMNew;
@@ -147,6 +148,10 @@ public class MainForm {
 
 	Shell getShell () {
 		return shell;
+	}
+	
+	IHelp getHelp () {
+		return help;
 	}
 
 	boolean canCloseRepository () {

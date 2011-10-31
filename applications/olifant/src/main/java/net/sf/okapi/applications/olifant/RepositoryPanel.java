@@ -412,7 +412,7 @@ class RepositoryPanel extends Composite {
 	
 	void selectRepository () {
 		try {
-			RepositoryForm dlg = new RepositoryForm(getShell(), repoType, repoParam);
+			RepositoryForm dlg = new RepositoryForm(getShell(), mainForm.getHelp(), repoType, repoParam);
 			String[] res = dlg.showDialog();
 			if ( res == null ) return; // No repository selected
 			openRepository(res[0], res[1]);

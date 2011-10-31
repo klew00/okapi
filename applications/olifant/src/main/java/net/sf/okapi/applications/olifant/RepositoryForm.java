@@ -22,6 +22,7 @@ package net.sf.okapi.applications.olifant;
 
 import java.io.File;
 
+import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
@@ -48,6 +49,7 @@ class RepositoryForm {
 	public static final String REPOTYPE_H2SERVER = "SH";
 	
 	private final Shell shell;
+	private final IHelp help;
 	private final Button rdDefaultLocal;
 	private final Text edDefaultLocal;
 	private final Button rdInMemory;
@@ -63,9 +65,11 @@ class RepositoryForm {
 	private String[] results = null;
 
 	RepositoryForm (Shell parent,
+		IHelp helpParam,
 		String type,
 		String param)
 	{
+		help = helpParam;
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		shell.setText("Repository Selection");
 		UIUtil.inheritIcon(shell, parent);
@@ -109,19 +113,6 @@ class RepositoryForm {
 		gdTmp.widthHint = 500;
 		pnlOtherLocal.setLayoutData(gdTmp);
 
-		rdMongoServerBased = new Button(group, SWT.RADIO);
-		rdMongoServerBased.setText("MongoDB server-based repository");
-		rdMongoServerBased.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent event) {
-				updateDisplay();
-            }
-		});
-		
-		edMongoServerBased = new Text(group, SWT.BORDER);
-		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
-		gdTmp.horizontalIndent = indent;
-		edMongoServerBased.setLayoutData(gdTmp);
-		
 		rdH2ServerBased = new Button(group, SWT.RADIO);
 		rdH2ServerBased.setText("H2 server-based repository");
 		rdH2ServerBased.addSelectionListener(new SelectionAdapter() {
@@ -134,6 +125,19 @@ class RepositoryForm {
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalIndent = indent;
 		edH2ServerBased.setLayoutData(gdTmp);
+		
+		rdMongoServerBased = new Button(group, SWT.RADIO);
+		rdMongoServerBased.setText("MongoDB server-based repository");
+		rdMongoServerBased.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				updateDisplay();
+            }
+		});
+		
+		edMongoServerBased = new Text(group, SWT.BORDER);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		gdTmp.horizontalIndent = indent;
+		edMongoServerBased.setLayoutData(gdTmp);
 		
 		rdInMemory = new Button(group, SWT.RADIO);
 		rdInMemory.setText("Memory-based repository");
@@ -175,13 +179,17 @@ class RepositoryForm {
 
 		SelectionAdapter OKCancelActions = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
+				if ( e.widget.getData().equals("h") ) { //$NON-NLS-1$
+					help.showWiki("Olifant - Repositories");
+					return;
+				}
 				if ( e.widget.getData().equals("o") ) { //$NON-NLS-1$
 					if ( !saveData() ) return;
 				}
 				shell.close();
 			};
 		};
-		OKCancelPanel pnlActions = new OKCancelPanel(shell, SWT.NONE, OKCancelActions, false);
+		OKCancelPanel pnlActions = new OKCancelPanel(shell, SWT.NONE, OKCancelActions, (help!=null));
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalSpan = 2;
 		pnlActions.setLayoutData(gdTmp);
