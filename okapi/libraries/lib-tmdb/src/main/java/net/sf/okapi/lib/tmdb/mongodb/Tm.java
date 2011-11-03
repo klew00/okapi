@@ -49,6 +49,8 @@ public class Tm implements ITm {
 	private long currentPage = -1; // 0-based
 	private PageMode pageMode = PageMode.EDITOR;
 	
+	BasicDBObject sortObject = new BasicDBObject("_id",1);
+	
 	@SuppressWarnings("unused")
 	private boolean pagingWithMethod = true;
 
@@ -308,11 +310,11 @@ public class Tm implements ITm {
 		DBCollection segColl = store.getDb().getCollection(name+"_SEG");
 		DBCursor cur;
 		if (pageMode == PageMode.EDITOR ) {
-			cur = segColl.find().limit(limit).skip((int)((limit-1)*currentPage));
+			cur = segColl.find().sort(sortObject).limit(limit).skip((int)((limit-1)*currentPage));
 		}
 		else {
 //TOFIX: YS: Not sure if it's the right code for this case (no overlap)
-			cur = segColl.find().limit(limit).skip((int)(limit*currentPage));
+			cur = segColl.find().sort(sortObject).limit(limit).skip((int)(limit*currentPage));
 		}
 
 		return new MongodbResultSet(cur, recordFields, limit);
@@ -458,8 +460,24 @@ public class Tm implements ITm {
 		Map<String, Object> tuFields,
 		Map<String, Object> segFields)
 	{
-		// TODO Auto-generated method stub
+		DBCollection segColl = store.getDb().getCollection(name+"_SEG");
 		
+		BasicDBObject doc = new BasicDBObject();
+		for (Entry<String, Object> entry : segFields.entrySet()) {
+			doc.put(entry.getKey(), entry.getValue());
+		}
+		if(tuFields != null){
+			for (Entry<String, Object> entry : tuFields.entrySet()) {
+				doc.put(entry.getKey(), entry.getValue());
+			}
+		}
+		
+		BasicDBObject query = new BasicDBObject();
+        query.put(Repository.SEG_COL_SEGKEY, segKey);
+
+        BasicDBObject set = new BasicDBObject("$set", doc);
+        
+		segColl.update(query, set, false, false);
 	}
 
 	@Override
@@ -476,13 +494,47 @@ public class Tm implements ITm {
 
 	@Override
 	public void renameField (String currentFullName, String newFiiullName) {
-		// TODO Auto-generated method stub
+
+		boolean found = false;
 		
+		//--check segfields-
+		List<String> segFields = store.getSegFields(name);
+		if(segFields.contains(currentFullName)){
+			segFields.remove(currentFullName);
+			segFields.add(newFiiullName);
+			updateSegFields(segFields);
+			found=true;
+		}
+		
+		//--check tufields-
+		List<String> tuFields = store.getTuFields(name);
+		if(tuFields.contains(currentFullName)){
+			tuFields.remove(currentFullName);
+			tuFields.add(newFiiullName);
+			updateTuFields(tuFields);
+			found=true;
+		}
+		
+		if(found){
+			DBCollection segColl = store.getDb().getCollection(name+"_SEG");
+
+			BasicDBObject doc = new BasicDBObject();
+			doc.put(currentFullName, newFiiullName);
+
+			BasicDBObject query = new BasicDBObject();
+
+			BasicDBObject set = new BasicDBObject("$rename", doc);
+
+			segColl.update(query, set, false, true);
+		}
 	}
 
 	@Override
 	public void setSortOrder (LinkedHashMap<String, Boolean> fields) {
-		// TODO Auto-generated method stub
 		
+		BasicDBObject sortObject = new BasicDBObject();
+		for (Entry<String, Boolean> field : fields.entrySet()) {
+			sortObject.put(field.getKey(),field.getValue());
+		}
 	}
 }
