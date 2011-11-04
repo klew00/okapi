@@ -544,7 +544,7 @@ public class TextUnit implements ITextUnit {
             tu.setTarget(entry.getKey(), entry.getValue().clone());
         }
 
-        tu.setSkeleton(this.getSkeleton() == null ? null : this.getSkeleton().clone(this));
+        tu.setSkeleton(this.getSkeleton() == null ? null : this.getSkeleton().clone(tu));
         
         return tu;
     }
