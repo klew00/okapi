@@ -277,7 +277,7 @@ public class GenericSkeleton implements ISkeleton {
     	String start = TextFragment.REFMARKER_START+"$self$";
     	
     	for (GenericSkeletonPart part : this.getParts()) {
-			if (part.data.toString().startsWith(start) && part.getParent() == this) {
+			if (part.data.toString().startsWith(start) && part.getParent().getSkeleton() == this) {
 				// Change the parent ref from this to new parent
 				part = new GenericSkeletonPart(part.getData().toString(), parent, part.getLocale());
 			}
