@@ -36,4 +36,12 @@ public interface ISkeleton {
 	 */
 	public String toString ();
 
+	/**
+	 * Clones this skeleton object.
+	 * @param parent the resource that attaches this skeleton object with IResource.setSkeleton().
+	 * @return a new skeleton object that is a copy of this one. 
+	 * Implementations of this interface are expected to replace in the returned object the references to the 
+	 * parent of this object (being cloned) with references to the given parent (the object that attaches the new cloned skeleton).
+	 */
+	public ISkeleton clone(IResource parent);
 }

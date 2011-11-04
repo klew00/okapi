@@ -544,24 +544,7 @@ public class TextUnit implements ITextUnit {
             tu.setTarget(entry.getKey(), entry.getValue().clone());
         }
 
-        // Set the skeleton fixing tu references in skeleton parts
-        if (this.getSkeleton() instanceof GenericSkeleton) {
-        	GenericSkeleton skel = (GenericSkeleton) this.getSkeleton();
-        	GenericSkeleton newSkel = new GenericSkeleton();        	
-        	List<GenericSkeletonPart> newParts = newSkel.getParts();
-        	
-        	for (GenericSkeletonPart part : skel.getParts()) {
-				if (TextFragment.makeRefMarker("$self$").equals(part.toString()) && part.getParent() == this) {
-					// Change the parent ref from this to new tu
-					part = new GenericSkeletonPart(part.getData().toString(), tu, part.getLocale());
-				}
-				newParts.add(part);
-			}
-        	tu.setSkeleton(newSkel);
-        }
-        else {
-        	tu.setSkeleton(this.getSkeleton());
-        }
+        tu.setSkeleton(this.getSkeleton() == null ? null : this.getSkeleton().clone(this));
         
         return tu;
     }
