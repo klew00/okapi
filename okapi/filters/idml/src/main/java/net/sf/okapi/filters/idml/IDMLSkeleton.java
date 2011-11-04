@@ -27,6 +27,7 @@ import java.util.zip.ZipFile;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
+import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.ISkeleton;
 
 public class IDMLSkeleton implements ISkeleton {
@@ -104,4 +105,19 @@ public class IDMLSkeleton implements ISkeleton {
 		return scopeNode;
 	}
 
+	/**
+	 * Returns a shallow copy of this object.
+	 */
+	@Override
+	public ISkeleton clone(IResource parent) {
+		IDMLSkeleton newSkel = new IDMLSkeleton(original);
+		newSkel.entry = entry;
+		newSkel.doc = doc;
+		newSkel.topNode = topNode;
+		newSkel.scopeNode = scopeNode;
+		newSkel.refs = refs;
+		newSkel.movedParts = movedParts;
+		return newSkel;
+	}
 }
+ 
