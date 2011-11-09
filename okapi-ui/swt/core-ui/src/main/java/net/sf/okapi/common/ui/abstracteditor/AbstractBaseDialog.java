@@ -24,6 +24,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.ui.Dialogs;
+import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.lib.extra.INotifiable;
 
 import org.eclipse.swt.SWT;
@@ -53,16 +54,13 @@ public abstract class AbstractBaseDialog implements INotifiable {
 	protected IDialogPage page;
 	protected Composite pageC;
 	private Class<? extends Composite> pageClass;
+	private int style;
+	private boolean sizeable;
 
-	protected int getStyle() {
-		
-		return SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL;
-//		return 
-//		//SWT.CLOSE |
-//		//SWT.BORDER |
-//		SWT.TITLE | 
-//		SWT.RESIZE | 
-//		SWT.APPLICATION_MODAL;
+	public AbstractBaseDialog(boolean sizeable) {
+		super();
+		style = sizeable ? SWT.CLOSE | SWT.BORDER |	SWT.TITLE |	SWT.RESIZE | SWT.APPLICATION_MODAL : SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL;
+		this.sizeable = sizeable;
 	}
 	
 	//protected abstract void setActionButtonsPanel(Shell shell, SelectionAdapter listener);
@@ -75,12 +73,13 @@ public abstract class AbstractBaseDialog implements INotifiable {
 		try {	
 			result = false;
 			
-			shell = new Shell(p_Parent, getStyle());
+			shell = new Shell(p_Parent, style);
 			if (shell == null) return;
 			
 			shell.setText(caption);
 			shell.setData("owner", this);			
 			shell.setData("parent", p_Parent);
+			if (sizeable) UIUtil.inheritIcon(shell, p_Parent);
 			
 			//if ( p_Parent != null ) shell.setImage(p_Parent.getImage());
 			
@@ -96,7 +95,8 @@ public abstract class AbstractBaseDialog implements INotifiable {
 			
 			if (cc == null) return;
 			
-			pageC = cc.newInstance(new Object[] {shell, SWT.BORDER});
+			//pageC = cc.newInstance(new Object[] {shell, SWT.BORDER});
+			pageC = cc.newInstance(new Object[] {shell, SWT.NONE});
 			if (pageC instanceof IDialogPage) {
 				page = (IDialogPage) pageC;
 				pageC.setData("dialog", this);
@@ -257,6 +257,10 @@ public abstract class AbstractBaseDialog implements INotifiable {
 	public Object getResult() {
 		
 		return data;
+	}
+	
+	public <T> T getResult(Class<T> classRef) {		
+		return classRef.cast(data);
 	}
 	
 	public void setData(Object data) {

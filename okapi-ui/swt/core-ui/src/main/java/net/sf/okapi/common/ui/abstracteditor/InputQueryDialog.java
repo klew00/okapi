@@ -37,13 +37,21 @@ import org.eclipse.swt.widgets.Shell;
 
 public class InputQueryDialog extends AbstractBaseDialog  {
 	
-//	private OKCancelPanel pnlActions;
+	//	private OKCancelPanel pnlActions;
 //	private String caption;
-	private String prompt;
+	private String prompt;	
 //	private Object data = null;
 //	private IHelp help;
 //	private Class<?> pageClass;
 //	private IInputQueryPage page; 
+
+	public InputQueryDialog() {
+		super(false);
+	}
+	
+	public InputQueryDialog(boolean sizeable) {
+		super(sizeable);		
+	}
 	
 	public boolean run(Shell parent, Class<? extends Composite> pageClass, String caption, String prompt, Object initialData, IHelp help) {
 		

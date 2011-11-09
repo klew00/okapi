@@ -203,26 +203,51 @@ public class SWTUtil {
 	public static int inputQuery(Shell parent, String caption, String prompt, int initialValue, int minValue, int MaxValue,
 			IHelp help) {
 
-		InputQueryDialog dlg = new InputQueryDialog();
+		InputQueryDialog dlg = new InputQueryDialog(false);
 		Integer[] intArray = new Integer[] {initialValue, minValue, MaxValue};
 		boolean res = dlg.run(parent, InputQueryPageInt.class, caption, prompt, intArray, help);
 		return (res)? intArray[0] : initialValue;
 	}
 	
-	public static Object inputQuery(Shell parent, String caption, String prompt, String initialValue, IHelp help) {
+	public static String inputQuery(Shell parent, String caption, String prompt, String initialValue, IHelp help) {
 		
-		InputQueryDialog dlg = new InputQueryDialog();
-		boolean res = dlg.run(parent, InputQueryPageString.class, caption, prompt, initialValue, help);
+		InputQueryDialog dlg = new InputQueryDialog(false);
+		String[] strArray = new String[] {initialValue};
+		boolean res = dlg.run(parent, InputQueryPageString.class, caption, prompt, strArray, help);
+		
+		return (res)? strArray[0] : initialValue;
+	}
+	
+	public static Object inputQuery(boolean sizeable, Class<? extends Composite> pageClass, Shell parent, String caption, Object initialData, IHelp help) {
+
+		InputQueryDialog dlg = new InputQueryDialog(sizeable);
+		boolean res = dlg.run(parent, pageClass, caption, null, initialData, help);
 		
 		return (res)? dlg.getResult() : null;
 	}
 	
+	public static <T> T inputQuery(boolean sizeable, Class<T> resClass, Class<? extends Composite> pageClass, Shell parent, String caption, T initialData, IHelp help) {
+
+		InputQueryDialog dlg = new InputQueryDialog(sizeable);
+		boolean res = dlg.run(parent, pageClass, caption, null, initialData, help);
+		
+		return resClass.cast((res)? dlg.getResult() : null);
+	}
+	
 	public static Object inputQuery(Class<? extends Composite> pageClass, Shell parent, String caption, Object initialData, IHelp help) {
 
-		InputQueryDialog dlg = new InputQueryDialog();
+		InputQueryDialog dlg = new InputQueryDialog(false);
 		boolean res = dlg.run(parent, pageClass, caption, null, initialData, help);
 		
 		return (res)? dlg.getResult() : null;
+	}
+	
+	public static <T> T inputQuery(Class<T> resClass, Class<? extends Composite> pageClass, Shell parent, String caption, T initialData, IHelp help) {
+
+		InputQueryDialog dlg = new InputQueryDialog(false);
+		boolean res = dlg.run(parent, pageClass, caption, null, initialData, help);
+		
+		return resClass.cast((res)? dlg.getResult() : null);
 	}
 
 // Radio group

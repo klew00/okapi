@@ -78,16 +78,16 @@ public class InputQueryPageString extends Composite implements IInputQueryPage  
 
 	public boolean load(Object data) {
 		
-		if (!(data instanceof String)) return false;
+		if (!(data instanceof String[])) return false;
 		
-		text.setText((String)data);
+		text.setText(((String[])data)[0]);
 		return true;
 	}
 
 	public boolean save(Object data) {
 
-		if (!(data instanceof String)) return false;
-		data = text.getText();
+		if (!(data instanceof String[])) return false;
+		((String[])data)[0] = text.getText();
 		
 		return true;
 	}
