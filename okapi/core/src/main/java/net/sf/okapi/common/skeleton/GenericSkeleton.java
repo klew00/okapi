@@ -270,19 +270,22 @@ public class GenericSkeleton implements ISkeleton {
 			createNew = true;
 	}
 	
-	@Override
-	public GenericSkeleton clone(IResource parent) {
-    	GenericSkeleton newSkel = new GenericSkeleton();        	
-    	List<GenericSkeletonPart> newParts = newSkel.getParts();    	
-    	String start = TextFragment.REFMARKER_START+"$self$";
+	protected void updateParts(List<GenericSkeletonPart> newParts, List<GenericSkeletonPart> originalParts, IResource parent) {
+		String start = TextFragment.REFMARKER_START + "$self$";
     	
-    	for (GenericSkeletonPart part : this.getParts()) {
+    	for (GenericSkeletonPart part : originalParts) {
 			if (part.data.toString().startsWith(start) && part.getParent() != null && part.getParent().getSkeleton() == this) {
 				// Change the parent ref from this to new parent
 				part = new GenericSkeletonPart(part.getData().toString(), parent, part.getLocale());
 			}
 			newParts.add(part);
 		}
+	}
+	
+	@Override
+	public GenericSkeleton clone(IResource parent) {
+    	GenericSkeleton newSkel = new GenericSkeleton();
+    	updateParts(newSkel.getParts(), this.getParts(), parent);
     	return newSkel;
 	}
 	

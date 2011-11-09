@@ -371,4 +371,14 @@ public final class StringUtil {
 		
 		return new String(chars);
 	}
+
+	public static String substring(String string, int start, int end) {
+		int len = string.length();
+		if (start < 0) return null;
+		if (end < 0) return null;
+		if (start > len) return null;
+		if (end > len) end = len;
+		if (start > end) return null;
+		return string.substring(start, end);
+	}
 }

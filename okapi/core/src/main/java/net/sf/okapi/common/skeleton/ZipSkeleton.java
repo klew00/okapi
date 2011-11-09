@@ -23,6 +23,7 @@ package net.sf.okapi.common.skeleton;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.skeleton.GenericSkeleton;
 
 /**
@@ -52,4 +53,10 @@ public class ZipSkeleton extends GenericSkeleton {
 		return entry;
 	}
 
+	@Override
+	public ZipSkeleton clone(IResource parent) {
+		ZipSkeleton newSkel = new ZipSkeleton(original, entry);
+    	updateParts(newSkel.getParts(), this.getParts(), parent);
+    	return newSkel;
+	}
 }
