@@ -30,6 +30,7 @@ public class Parameters extends BaseParameters {
 	public static final int TYPE_EXTREPLACE = 3;
 	
 	private static final String APPLYTOBLANKENTRIES = "applyToBlankEntries";
+	private static final String EXPAND = "expand";
 	
 	public int type;
 	public boolean addPrefix;
@@ -41,6 +42,7 @@ public class Parameters extends BaseParameters {
 	public boolean addID;
 	public boolean markSegments;
 	public boolean applyToBlankEntries;
+	public boolean expand;
 	
 	public Parameters () {
 		reset();
@@ -57,6 +59,7 @@ public class Parameters extends BaseParameters {
 		addID = false;
 		markSegments = false;
 		applyToBlankEntries = true; // For backward compatibility
+		expand = false;
 	}
 
 	public void fromString (String data) {
@@ -72,6 +75,7 @@ public class Parameters extends BaseParameters {
 		addID = buffer.getBoolean("addID", addID);
 		markSegments = buffer.getBoolean("markSegments", markSegments);
 		applyToBlankEntries = buffer.getBoolean(APPLYTOBLANKENTRIES, applyToBlankEntries);
+		expand = buffer.getBoolean(EXPAND, expand);
 	}
 
 	@Override
@@ -87,6 +91,7 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean("addID", addID);
 		buffer.setBoolean("markSegments", markSegments);
 		buffer.setBoolean(APPLYTOBLANKENTRIES, applyToBlankEntries);
+		buffer.setBoolean(EXPAND, expand);
 		return buffer.toString();
 	}
 	

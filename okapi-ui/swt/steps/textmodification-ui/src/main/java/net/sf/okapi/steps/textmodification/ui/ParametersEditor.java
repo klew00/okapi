@@ -61,6 +61,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Button chkAddID;
 	private Button chkAddName;
 	private Button chkMarkSegments;
+	private Button chkExpand;
 	private Button chkApplyToBlankEntries;
 	private IHelp help;
 	private Composite mainComposite;
@@ -220,6 +221,12 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		gdTmp.horizontalSpan = 2;
 		chkMarkSegments.setLayoutData(gdTmp);
 		
+		chkExpand = new Button(mainComposite, SWT.CHECK);
+		chkExpand.setText("Expand the text");
+		gdTmp = new GridData();
+		gdTmp.horizontalSpan = 2;
+		chkExpand.setLayoutData(gdTmp);
+		
 		Label separator = new Label(mainComposite, SWT.BORDER);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.heightHint = 1;
@@ -260,6 +267,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		chkAddName.setSelection(params.addName);
 		chkAddID.setSelection(params.addID);
 		chkMarkSegments.setSelection(params.markSegments);
+		chkExpand.setSelection(params.expand);
 
 		edPrefix.setEnabled(chkAddPrefix.getSelection());
 		edSuffix.setEnabled(chkAddSuffix.getSelection());
@@ -277,6 +285,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		params.addName = chkAddName.getSelection();
 		params.addID = chkAddID.getSelection();
 		params.markSegments = chkMarkSegments.getSelection();
+		params.expand = chkExpand.getSelection();
 		result = true;
 		return true;
 	}

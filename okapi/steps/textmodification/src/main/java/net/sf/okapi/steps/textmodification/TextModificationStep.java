@@ -25,6 +25,7 @@ import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.UsingParameters;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
@@ -33,6 +34,7 @@ import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextPart;
+import net.sf.okapi.common.resource.TextUnitUtil;
 
 @UsingParameters(Parameters.class)
 public class TextModificationStep extends BasePipelineStep {
@@ -89,7 +91,7 @@ public class TextModificationStep extends BasePipelineStep {
 			if ( tc == null ) tc = tu.getSource();
 			if ( !tc.hasText() ) return event;
 		}
-		
+
 		// Create the target if needed
 		tu.createTarget(targetLocale, false, IResource.COPY_ALL);
 		// If the target is empty we use the source
@@ -108,6 +110,11 @@ public class TextModificationStep extends BasePipelineStep {
 		case Parameters.TYPE_KEEPINLINE:
 			removeText(tu);
 			break;
+		}
+		
+		// Expand if needed
+		if ( params.expand ) {
+			expand(tu);
 		}
 		
 		// Add segment marks if needed
@@ -188,14 +195,14 @@ public class TextModificationStep extends BasePipelineStep {
 	 * @param tu The text unit to process.
 	 */
 	private void addText (ITextUnit tu) {
-		TextFragment firstFrag = tu.getTarget(targetLocale).getFirstContent();
-		TextFragment lastFrag = tu.getTarget(targetLocale).getLastContent();
 		if ( params.addPrefix ) {
+			TextFragment firstFrag = tu.getTarget(targetLocale).getFirstContent();
 			firstFrag.setCodedText(params.prefix + firstFrag.getCodedText());
 		}
+		TextFragment lastFrag = tu.getTarget(targetLocale).getLastContent();
 		if ( params.addName ) {
 			String name = tu.getName();
-			if (( name != null ) && ( name.length() > 0 )) {
+			if ( !Util.isEmpty(name) ) {
 				lastFrag.setCodedText(lastFrag.getCodedText() + "_"+name);
 			}
 			else {
@@ -210,4 +217,39 @@ public class TextModificationStep extends BasePipelineStep {
 		}
 	}
 
+	private void expand (ITextUnit tu) {
+		// Get the total length of the original
+		int length = getLength(tu.getSource());
+		// Calculate the number of characters to add
+		int addition = length; // 100% for long strings
+		if ( length <= 20 ) { // 50% (or at least 1 char) for short strings
+			addition = (addition+1) / 2; 
+		}
+		
+		// Create the string to add
+		StringBuilder extra = new StringBuilder();
+		for ( int i=0; i<addition; i++ ) {
+			if (( i % 6 == 0 ) && ( i != addition-1 )) {
+				extra.append(' ');
+			}
+			else {
+				extra.append('z');
+			}
+		}
+		
+		// Add the expansion
+		TextFragment frag = tu.getTarget(targetLocale).getLastContent();
+		frag.append(extra);
+	}
+	
+	private int getLength (TextContainer tc) {
+		TextFragment tf;
+		if ( tc.contentIsOneSegment() ) {
+			tf = tc.getFirstContent();
+		}
+		else {
+			tf = tc.getUnSegmentedContentCopy();
+		}
+		return TextUnitUtil.getText(tf).length();
+	}
 }

@@ -135,6 +135,42 @@ public class TextModificationStepTest {
 	}
 
 	@Test
+	public void testExpansion () {
+		TextModificationStep step = new TextModificationStep(); // Defaults
+		Parameters params = (Parameters)step.getParameters();
+		params.type = Parameters.TYPE_KEEPORIGINAL;
+		params.expand = true; // Overwrite existing target
+
+		String original = "Original.";
+		String expected = "Original. zzzz";
+		driver.prepareFilterEventsStep(original, null, locEN, locFR);
+		driver.testFilterEventsStep(step);
+		ITextUnit res = driver.getResult();
+		assertEquals(expected, res.getTarget(locFR).toString());
+
+		original = "O";
+		expected = "Oz";
+		driver.prepareFilterEventsStep(original, null, locEN, locFR);
+		driver.testFilterEventsStep(step);
+		res = driver.getResult();
+		assertEquals(expected, res.getTarget(locFR).toString());
+
+		original = "";
+		expected = "";
+		driver.prepareFilterEventsStep(original, null, locEN, locFR);
+		driver.testFilterEventsStep(step);
+		res = driver.getResult();
+		assertEquals(expected, res.getTarget(locFR).toString());
+
+		original = "This is a longer text with a lot more words and characters.";
+		expected = "This is a longer text with a lot more words and characters. zzzzz zzzzz zzzzz zzzzz zzzzz zzzzz zzzzz zzzzz zzzzz zzzz";
+		driver.prepareFilterEventsStep(original, null, locEN, locFR);
+		driver.testFilterEventsStep(step);
+		res = driver.getResult();
+		assertEquals(expected, res.getTarget(locFR).toString());
+	}
+
+	@Test
 	public void testTargetOverwriting () {
 		String original = "This is the content #1 with @#$0.";
 		String expected = "Xxxx xx xxx xxxxxxx #N xxxx @#$0.";

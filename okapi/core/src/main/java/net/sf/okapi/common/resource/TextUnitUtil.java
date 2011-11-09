@@ -417,7 +417,7 @@ public class TextUnitUtil {
 	}
 
 	/**
-	 * Gets the coded text of the source part of a given text unit resource.
+	 * Gets the coded text of the first part of the source of a given text unit resource.
 	 * 
 	 * @param textUnit
 	 *            the text unit resource which source text should be returned.
@@ -430,8 +430,9 @@ public class TextUnitUtil {
 	}
 
 	/**
-	 * Gets the coded text of the source part of a given text unit resource. If removeCodes = false, and the text
-	 * contains inline codes, then the codes will be removed.
+	 * Gets the coded text of the first part of a source part of a given text unit resource.
+	 * If removeCodes = false, and the text contains inline codes,
+	 * then the codes will be removed.
 	 * 
 	 * @param textUnit
 	 *            the text unit resource which source text should be returned.
@@ -452,7 +453,7 @@ public class TextUnitUtil {
 	}
 
 	/**
-	 * Gets text of the target part of a given text unit resource in the given locale.
+	 * Gets text of the first part of the target of a given text unit resource in the given locale.
 	 * 
 	 * @param textUnit
 	 *            the text unit resource which source text should be returned.
