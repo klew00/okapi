@@ -395,6 +395,20 @@ public class IDMLFilter implements IFilter {
 			}
 		}
 		
+		list = doc.getElementsByTagName("TextPath");
+		for ( int i=0; i<list.getLength(); i++ ) {
+			Element tf = (Element)list.item(i);
+			String tmp = tf.getAttribute("ParentStory");
+			if ( Util.isEmpty(tmp) ) {
+				throw new IOException("Missing value for parentStory.");
+			}
+			// Add the the story to the lookup list
+			if ( !storiesDone.contains(tmp) ) {
+				storyList.add(tmp);
+				storiesDone.add(tmp);
+			}
+		}
+
 		// Add the stories for this spread to the overall list of stories to process
 		spreads.put(name, storyList);
 		// Return the number of stories in this spread

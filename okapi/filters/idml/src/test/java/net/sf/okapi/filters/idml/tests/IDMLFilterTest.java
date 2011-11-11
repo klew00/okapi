@@ -97,6 +97,10 @@ public class IDMLFilterTest {
 		list.add(new InputDocument(root+"Test03.idml", "okf_idml@ExtractAll.fprm"));
 		list.add(new InputDocument(root+"testWithSpecialChars.idml", "okf_idml@ExtractAll.fprm"));
 
+		list.add(new InputDocument(root+"TextPathTest01.idml", "okf_idml@ExtractAll.fprm"));
+		list.add(new InputDocument(root+"TextPathTest02.idml", "okf_idml@ExtractAll.fprm"));
+		list.add(new InputDocument(root+"TextPathTest03.idml", "okf_idml@ExtractAll.fprm"));
+		list.add(new InputDocument(root+"TextPathTest04.idml", "okf_idml@ExtractAll.fprm"));
 // For local test only, comment out for SVN		
 //		list.add(new InputDocument(root+"private/enlaso_001.idml", "../okf_idml@ExtractAll.fprm"));
 //		list.add(new InputDocument(root+"private/enlaso_002.idml", "../okf_idml@ExtractAll.fprm"));
