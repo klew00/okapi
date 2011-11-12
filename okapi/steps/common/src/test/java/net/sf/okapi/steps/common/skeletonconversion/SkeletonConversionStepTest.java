@@ -1,24 +1,4 @@
-/*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
------------------------------------------------------------------------------
-  This library is free software; you can redistribute it and/or modify it 
-  under the terms of the GNU Lesser General Public License as published by 
-  the Free Software Foundation; either version 2.1 of the License, or (at 
-  your option) any later version.
-
-  This library is distributed in the hope that it will be useful, but 
-  WITHOUT ANY WARRANTY; without even the implied warranty of 
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser 
-  General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public License 
-  along with this library; if not, write to the Free Software Foundation, 
-  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-
-  See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
-===========================================================================*/
-
-package net.sf.okapi.steps.common;
+package net.sf.okapi.steps.common.skeletonconversion;
 
 import static org.junit.Assert.assertTrue;
 
@@ -33,6 +13,7 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.filters.html.HtmlFilter;
 import net.sf.okapi.lib.extra.pipelinebuilder.XBatch;
 import net.sf.okapi.lib.extra.pipelinebuilder.XBatchItem;
@@ -41,11 +22,16 @@ import net.sf.okapi.lib.extra.steps.DocumentPartLogger;
 import net.sf.okapi.lib.extra.steps.EventListBuilderStep;
 import net.sf.okapi.lib.extra.steps.EventLogger;
 import net.sf.okapi.lib.extra.steps.TextUnitLogger;
+import net.sf.okapi.lib.extra.steps.TuDpLogger;
+import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
+import net.sf.okapi.steps.common.ResourceSimplifierStep;
+import net.sf.okapi.steps.common.tufiltering.ITextUnitFilter;
 
 import org.junit.Test;
 
-public class ResourceSimplifierStepTest {
-	private static final LocaleId ENUS = new LocaleId("en", "us");
+public class SkeletonConversionStepTest {
+
+private static final LocaleId ENUS = new LocaleId("en", "us");
 	
 	@Test
 	public void testDoubleExtraction () throws URISyntaxException, IOException {
@@ -58,10 +44,17 @@ public class ResourceSimplifierStepTest {
 		list.add(new InputDocument(pathBase + "msg00058.html", null));
 		
 		RoundTripComparison rtc = new RoundTripComparison();
-		ResourceSimplifierStep rss = new ResourceSimplifierStep(false);
+		SkeletonConversionStep sks = new SkeletonConversionStep(new ITextUnitFilter() {
+			
+			@Override
+			public boolean accept(ITextUnit tu) {
+				return true;
+			}
+		});
 		
-		assertTrue(rtc.executeCompare(new HtmlFilter(), list, "UTF-8", ENUS, ENUS, "skeleton", rss));
+		assertTrue(rtc.executeCompare(new HtmlFilter(), list, "UTF-8", ENUS, ENUS, "skeleton", sks));
 		//assertTrue(rtc.executeCompare(new HtmlFilter(), list, "UTF-8", ENUS, ENUS, "skeleton"));
+		//assertTrue(rtc.executeCompare(new HtmlFilter(), list, "UTF-8", ENUS, ENUS, "skeleton", new ResourceSimplifierStep()));
 	}
 	
 	@Test
@@ -71,17 +64,17 @@ public class ResourceSimplifierStepTest {
 		EventListBuilderStep elbs2 = new EventListBuilderStep();
 		
 		new XPipeline(
-				"Test pipeline for ResourceSimplifierStepTest",
+				"Test pipeline for SkeletonConversionStepTest",
 				new XBatch(
-						new XBatchItem(
-								new URL("file", null, pathBase + "aa324.html"),
-								"UTF-8",
-								ENUS)
-//						,
 //						new XBatchItem(
-//								new URL("file", null, pathBase + "form.html"),
+//								new URL("file", null, pathBase + "aa324.html"),
 //								"UTF-8",
 //								ENUS)
+//						,
+						new XBatchItem(
+								new URL("file", null, pathBase + "form.html"),
+								"UTF-8",
+								ENUS)
 //						,
 //						new XBatchItem(
 //								new URL("file", null, pathBase + "W3CHTMHLTest1.html"),
@@ -91,20 +84,20 @@ public class ResourceSimplifierStepTest {
 						
 				new RawDocumentToFilterEventsStep(new HtmlFilter()),
 				elbs1,
-				new ResourceSimplifierStep(),
-				//new EventLogger(),
-				new DocumentPartLogger(),
+//				new EventLogger(),
+//				new TuDpLogger()
+//				,
+				new SkeletonConversionStep(new ITextUnitFilter() {
+					
+					@Override
+					public boolean accept(ITextUnit tu) {
+						return true;
+					}
+				}),
+//				new EventLogger(),
+				new TuDpLogger(),
 				elbs2
 		).execute();
-		
-//		for (Event event : elbs2.getList()) {
-//			if (event.isTextUnit()) {
-//				System.out.println(TextUnitLogger.getTuInfo(event.getTextUnit(), ENUS));
-//			}
-//			else if (event.isDocumentPart()) {
-//				System.out.println(DocumentPartLogger.getDpInfo(event.getDocumentPart(), ENUS));
-//			}
-//		}
 		
 //		System.out.println("==== Before");
 //		for (Event event : elbs1.getList()) {
@@ -116,6 +109,12 @@ public class ResourceSimplifierStepTest {
 //		for (Event event : elbs1.getList()) {
 //			if (event.isTextUnit() && "tu40".equals(event.getResource().getId())) {
 //				System.out.println(TextUnitLogger.getTuInfo(event.getTextUnit(), ENUS));
+//			}
+//		}
+//		
+//		for (Event event : elbs1.getList()) {
+//			if (event.isDocumentPart() && "dp_tu40".equals(event.getResource().getId())) {
+//				System.out.println(DocumentPartLogger.getDpInfo(event.getDocumentPart(), ENUS));
 //			}
 //		}
 //		
@@ -131,6 +130,14 @@ public class ResourceSimplifierStepTest {
 //				System.out.println(TextUnitLogger.getTuInfo(event.getTextUnit(), ENUS));
 //			}
 //		}
+//		
+//		for (Event event : elbs2.getList()) {
+//			if (event.isDocumentPart() && "dp_tu40".equals(event.getResource().getId())) {
+//				System.out.println(DocumentPartLogger.getDpInfo(event.getDocumentPart(), ENUS));
+//			}
+//		}
+		
+		
 	}
 	
 	@Test
@@ -140,7 +147,7 @@ public class ResourceSimplifierStepTest {
 		EventListBuilderStep elbs2 = new EventListBuilderStep();
 		
 		new XPipeline(
-				"Test pipeline for ResourceSimplifierStepTest",
+				"Test pipeline for SkeletonConversionStepTest",
 				new XBatch(
 						new XBatchItem(
 								new URL("file", null, pathBase + "msg00058.html"),
@@ -149,20 +156,20 @@ public class ResourceSimplifierStepTest {
 						),
 						
 				new RawDocumentToFilterEventsStep(new HtmlFilter()),
-//				elbs1,
-				//new ResourceSimplifierStep(),
+				elbs1,
+				//new EventLogger(),
+				//new TuDpLogger(),
+				new SkeletonConversionStep(new ITextUnitFilter() {
+					
+					@Override
+					public boolean accept(ITextUnit tu) {
+						return true;
+					}
+				}),
 				new EventLogger(),
+				new TuDpLogger(),
 				elbs2
 		).execute();
-		
-		for (Event event : elbs2.getList()) {
-			if (event.isTextUnit()) {
-				System.out.println(TextUnitLogger.getTuInfo(event.getTextUnit(), ENUS));
-			}
-			else if (event.isDocumentPart()) {
-				System.out.println(DocumentPartLogger.getDpInfo(event.getDocumentPart(), ENUS));
-			}
-		}		
 	}
-	
+
 }

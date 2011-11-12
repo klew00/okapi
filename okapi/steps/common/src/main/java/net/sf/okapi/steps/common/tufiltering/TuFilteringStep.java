@@ -20,8 +20,6 @@
 
 package net.sf.okapi.steps.common.tufiltering;
 
-import java.util.logging.Logger;
-
 import net.sf.okapi.common.ClassUtil;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IParameters;
@@ -33,7 +31,6 @@ public class TuFilteringStep extends BasePipelineStep {
 	
 	private ITextUnitFilter tuFilter;
 	private Parameters params;
-	private final Logger LOGGER = Logger.getLogger(this.getClass().getName());
 	
 	public TuFilteringStep() {
 		params = new Parameters();
@@ -105,6 +102,7 @@ public class TuFilteringStep extends BasePipelineStep {
 
 	@Override
 	protected Event handleTextUnit(Event event) {
+		initFilter();
 		if (tuFilter.accept(event.getTextUnit())) {
 			return processFiltered(event);
 		}

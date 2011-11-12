@@ -33,6 +33,9 @@ import net.sf.okapi.common.skeleton.ResourceSimplifier;
  * The skeleton parts are attached to newly created DOCUMENT_PART events.
  * Original references are converted either to skeleton parts or TEXT_UNIT events.
  * The sequence of DOCUMENT_PART and TEXT_UNIT events is packed into a single MULTI_EVENT event.
+ * <p>
+ * For text units, the step removes the skeleton of a text unit, creating document parts for the skeleton parts before and after
+ * the content placeholder, and removes the remaining tu skeleton as holding the content placeholder as its only part.  
  */
 @UsingParameters() // No parameters
 public class ResourceSimplifierStep extends BasePipelineStep {
@@ -71,7 +74,7 @@ public class ResourceSimplifierStep extends BasePipelineStep {
 	public Event handleEvent(Event event) {
 		switch (event.getEventType()) {
 		case START_DOCUMENT:
-			simplifier = new ResourceSimplifier(targetLocale);
+			simplifier = new ResourceSimplifier(null, targetLocale);
 			simplifier.setResolveCodeRefs(resolveCodeRefs);
 		case END_DOCUMENT:
 		case START_SUBDOCUMENT:
