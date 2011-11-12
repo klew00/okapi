@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
+import net.sf.okapi.common.resource.ITextUnit;
 
 public class EventListBuilderStep extends BasePipelineStep {
 
@@ -41,8 +43,13 @@ public class EventListBuilderStep extends BasePipelineStep {
 				break;
 			case START_GROUP:
 			case END_GROUP:
+			case DOCUMENT_PART:
 			case TEXT_UNIT:
+			{
+//				ITextUnit tu = event.getTextUnit(); 
+//				list.add(new Event(EventType.TEXT_UNIT, tu.clone()));
 				list.add(event);
+			}
 				break;
 			}
 		return super.handleEvent(event);
