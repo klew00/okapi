@@ -38,10 +38,13 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.annotation.IAnnotation;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
+import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.MultiEvent;
 import net.sf.okapi.common.resource.Property;
+import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
@@ -577,4 +580,289 @@ public class ResourceSimplifierTest {
 		assertTrue(ev.getResource() instanceof DocumentPart);
 		assertEquals("Suffix", ev.getResource().toString());
 	}
+
+	public static String getDpInfo(DocumentPart dp, LocaleId srcLoc) {
+		StringBuilder sb = new StringBuilder();
+		fillSB(sb, dp, srcLoc);
+		return sb.toString();
+	}
+	
+	public static String getTuInfo(ITextUnit tu, LocaleId srcLoc) {
+		StringBuilder sb = new StringBuilder();
+		fillSB(sb, tu, srcLoc);
+		return sb.toString();
+	}
+	
+	private static void fillSB(StringBuilder sb, DocumentPart dp, LocaleId srcLoc) {
+		sb.append(dp.getId());		
+		sb.append(":");
+		if (dp.isReferent()) sb.append(" referent");
+		sb.append("\n");
+		
+		if (dp.getAnnotations() != null) {
+//			sb.append("             ");
+//			sb.append("Source annotations:");
+//			sb.append("\n");
+			for (IAnnotation annot : dp.getAnnotations()) {
+				sb.append("                    ");
+				sb.append(annot.getClass().getName());
+				sb.append(" ");
+				sb.append(annot.toString());
+				sb.append("\n");
+			}		
+		}
+		
+		if (dp.getPropertyNames() != null && dp.getPropertyNames().size() > 0) {
+			sb.append("             ");
+			sb.append("Properties:");
+			sb.append("\n");
+			for (String name : dp.getPropertyNames()) {
+				sb.append("                    ");
+				sb.append(name);
+				sb.append(" ");
+				sb.append(dp.getProperty(name).toString());
+				sb.append("\n");
+			}		
+		}
+		
+		if (dp.getSourcePropertyNames() != null && dp.getSourcePropertyNames().size() > 0) {
+			sb.append("             ");
+			sb.append("Source properties:");
+			sb.append("\n");
+			
+			for (String name : dp.getSourcePropertyNames()) {
+				sb.append("                    ");
+				sb.append(name);
+				sb.append(" ");
+				sb.append(dp.getSourceProperty(name).toString());
+				sb.append("\n");
+			}		
+		}
+				
+		for (LocaleId locId : dp.getTargetLocales()) {
+			if (dp.getTargetPropertyNames(locId) != null && dp.getTargetPropertyNames(locId).size() > 0) {
+				sb.append("             ");
+				sb.append("Target properties:");
+				sb.append("\n");
+				
+				for (String name : dp.getTargetPropertyNames(locId)) {
+					sb.append("                    ");
+					sb.append(name);
+					sb.append(" ");
+					sb.append(dp.getTargetProperty(locId, name).toString());
+					sb.append("\n");
+				}		
+			}
+		}		
+		
+		if (dp.getSkeleton() != null) {
+			sb.append(String.format("      Skeleton: %s", dp.getSkeleton().toString()));
+			sb.append("\n");
+		}
+	}
+	
+	private static void fillSB(StringBuilder sb, ITextUnit tu, LocaleId srcLoc) {
+		sb.append(tu.getId());
+		sb.append(":");
+		if (tu.isReferent()) sb.append(" referent");
+		sb.append("\n");
+		
+		if (tu.getAnnotations() != null) {
+//			sb.append("             ");
+//			sb.append("Source annotations:");
+//			sb.append("\n");
+			for (IAnnotation annot : tu.getAnnotations()) {
+				sb.append("                    ");
+				sb.append(annot.getClass().getName());
+				sb.append(" ");
+				sb.append(annot.toString());
+				sb.append("\n");
+			}		
+		}
+		
+		if (tu.getSkeleton() != null) {
+			sb.append(String.format("      Skeleton: %s", tu.getSkeleton().toString()));
+			sb.append("\n");
+		}		
+		
+		sb.append(String.format("      Source (%s): %s", srcLoc, tu.getSource()));
+		sb.append("\n");
+		
+		TextContainer source = tu.getSource();
+		if (source.getAnnotations() != null) {
+//			sb.append("             ");
+//			sb.append("Source annotations:");
+//			sb.append("\n");
+			for (IAnnotation annot : source.getAnnotations()) {
+				sb.append("                    ");
+				sb.append(annot.getClass().getName());
+				sb.append(" ");
+				sb.append(annot.toString());
+				sb.append("\n");
+			}		
+		}
+		
+		ISegments segs = source.getSegments(); 
+		for (Segment seg : segs) {
+			sb.append(String.format("         %s: %s", seg.getId(), seg.getContent().toText()));
+			sb.append("\n");
+			if (seg.getAnnotations() != null) {
+//				sb.append("Source annotations:");
+//				sb.append("\n");
+				for (IAnnotation annot : seg.getAnnotations()) {
+					sb.append("                    ");
+					sb.append(annot.getClass().getName());
+					sb.append(" ");
+					sb.append(annot.toString());
+					sb.append("\n");
+				}		
+			}
+		}
+		
+		for (LocaleId locId : tu.getTargetLocales()) {
+			sb.append(String.format("      Target (%s): %s", locId.toString(), tu.getTarget(locId)));
+			sb.append("\n");
+			
+			TextContainer target = tu.getTarget(locId);
+			if (source.getAnnotations() != null) {
+//				sb.append("             ");
+//				sb.append("Target annotations:");
+//				sb.append("\n");
+				for (IAnnotation annot : target.getAnnotations()) {
+					sb.append("                    ");
+					sb.append(annot.getClass().getName());
+					sb.append(" ");
+					sb.append(annot.toString());
+					sb.append("\n");
+				}		
+			}
+			
+			segs = target.getSegments(); 
+			for (Segment seg : segs) {
+				sb.append(String.format("         %s: %s", seg.getId(), seg.getContent().toText()));
+				sb.append("\n");
+				if (seg.getAnnotations() != null) {
+//					sb.append("Target annotations:");
+//					sb.append("\n");
+					for (IAnnotation annot : seg.getAnnotations()) {
+						sb.append("                    ");
+						sb.append(annot.getClass().getName());
+						sb.append(" ");
+						sb.append(annot.toString());
+						sb.append("\n");
+					}		
+				}
+			}
+		}
+	}
+
+	@Test
+	public void testAltTextRef() {
+		// See events of /okapi-step-common/src/test/resources/net/sf/okapi/steps/common/msg00058.html
+		// in /okapi-step-common/src/test/resources/net/sf/okapi/steps/common/res_simpl1.txt
+		
+		// dp6
+		GenericSkeleton dp6Skel = new GenericSkeleton();		
+		DocumentPart dp6 = new DocumentPart("dp6", true, dp6Skel);
+		dp6.setSourceProperty(new Property("href", "http://osdir.com/ml/"));
+		dp6Skel.add("<a href=\"");
+		dp6Skel.addValuePlaceholder(dp6, "href", null);
+		dp6Skel.add("\">");
+		
+		assertEquals("<a href=\"[#$$self$@%href]\">", dp6.getSkeleton().toString());
+		assertEquals("http://osdir.com/ml/", dp6.getSourceProperty("href").getValue());
+		
+		// tu3
+		TextUnit tu3 = new TextUnit("tu3", "logo", true);
+		GenericSkeleton tu3Skel = new GenericSkeleton();
+		tu3Skel.add("alt=\"");
+		tu3Skel.addContentPlaceholder(tu3);
+		tu3Skel.add("\"");
+		tu3.setSkeleton(tu3Skel);
+		
+		assertEquals("alt=\"[#$$self$]\"", tu3.getSkeleton().toString());
+		assertEquals("logo", tu3.toString());
+		
+		// dp7
+		GenericSkeleton dp7Skel = new GenericSkeleton();		
+		DocumentPart dp7 = new DocumentPart("dp7", true, dp7Skel);
+		dp7.setSourceProperty(new Property("src", "msg00058_files/MLnewosdirlogo.gif"));
+		dp7Skel.add("<img src=\"");
+		dp7Skel.addValuePlaceholder(dp7, "src", null);
+		dp7Skel.add("\" ");
+		dp7Skel.addReference(tu3);
+		dp7Skel.add(" border=\"0\">");
+		
+		assertEquals("<img src=\"[#$$self$@%src]\" [#$tu3] border=\"0\">", dp7.getSkeleton().toString());
+		assertEquals("msg00058_files/MLnewosdirlogo.gif", dp7.getSourceProperty("src").getValue());
+		
+		// tu2
+		TextUnit tu2 = new TextUnit("tu2");
+		GenericSkeleton tu2Skel = new GenericSkeleton();
+		tu2.setSkeleton(tu2Skel);
+		
+		tu2Skel.add("<td valign=\"middle\">");
+		tu2Skel.addContentPlaceholder(tu2);
+		
+		TextFragment tf = new TextFragment();
+		Code c1 = new Code(TagType.PLACEHOLDER, null);
+		c1.appendReference("dp6");		
+		tf.append(c1);
+		
+		Code c2 = new Code(TagType.PLACEHOLDER, null);
+		c2.appendReference("dp7");		
+		tf.append(c2);
+		
+		tf.append("</a>");
+		
+		TextContainer tc = new TextContainer();
+		tc.append(new Segment("0", tf));
+		
+		tu2.setSource(tc);
+		
+		assertEquals("<td valign=\"middle\">[#$$self$]", tu2.getSkeleton().toString());
+		assertEquals("[#$dp6][#$dp7]</a>", tu2.toString());
+		
+		// Conversion
+		ResourceSimplifier rs = new ResourceSimplifier(ENUS);
+		Event event;
+		event = rs.convert(new Event(EventType.DOCUMENT_PART, dp6));
+		assertTrue(event.getResource() instanceof DocumentPart);
+		DocumentPart dp = event.getDocumentPart();
+		assertTrue(dp.isReferent());
+		
+		event = rs.convert(new Event(EventType.TEXT_UNIT, tu3));
+		assertTrue(event.getResource() instanceof TextUnit);
+		ITextUnit tu = event.getTextUnit();
+		assertTrue(tu.isReferent());
+		
+		event = rs.convert(new Event(EventType.DOCUMENT_PART, dp7));
+		assertTrue(event.getResource() instanceof DocumentPart);
+		dp = event.getDocumentPart();
+		assertTrue(dp.isReferent());
+		
+		event = rs.convert(new Event(EventType.TEXT_UNIT, tu2));
+		assertTrue(event.getResource() instanceof MultiEvent);
+		MultiEvent me = event.getMultiEvent();
+		assertEquals(2, me.size());
+		
+		Iterator<Event> itr = me.iterator();
+		
+		dp = itr.next().getDocumentPart();
+		assertEquals("dp_tu2", dp.getId());
+		assertFalse(dp.isReferent());
+		
+		
+		tu = itr.next().getTextUnit();
+		assertEquals("tu2", tu.getId());
+		assertFalse(tu.isReferent());
+		
+//		System.out.println(getDpInfo(dp, ENUS));
+//		System.out.println(getTuInfo(tu, ENUS));
+		
+		assertEquals("<td valign=\"middle\">", dp.getSkeleton().toString());
+		assertEquals("<a href=\"http://osdir.com/ml/\"><img src=\"msg00058_files/MLnewosdirlogo.gif\" " +
+				"alt=\"logo\" border=\"0\"></a>", tu.toString());
+	}
+	
 }

@@ -21,9 +21,9 @@
 package net.sf.okapi.common.skeleton;
 
 import java.security.InvalidParameterException;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Logger;
+
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IResource;
@@ -32,12 +32,12 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.DocumentPart;
 import net.sf.okapi.common.resource.IReferenceable;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.MultiEvent;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextPart;
-import net.sf.okapi.common.resource.ITextUnit;
 
 /**
  * Simplifies events, i.e. splits the generic skeleton of a given event resource into parts to contain no references.
@@ -57,27 +57,39 @@ public class ResourceSimplifier {
 	private boolean resolveCodeRefs;
 	
 	public ResourceSimplifier() {
+		this((GenericSkeletonWriter) null);
+	}
+	
+	public ResourceSimplifier(LocaleId trgLoc) {
+		this(null, trgLoc);
+	}
+	
+	public ResourceSimplifier(LocaleId trgLoc, String outEncoding) {
+		this(null, trgLoc, outEncoding);
+	}
+	
+	public ResourceSimplifier(GenericSkeletonWriter writer) {
 		super();
 		resolveCodeRefs = true;
 		useSDEncoding = true;
 		useSDLocale = true;
 		
-		writer = new GenericSkeletonWriter();
+		this.writer = (writer == null) ? new GenericSkeletonWriter() : writer;
 		newSkel = new GenericSkeleton();
 		
 		StartDocument sd = new StartDocument("");
 		sd.setMultilingual(false); // Simple resources
-		writer.processStartDocument(trgLoc, outEncoding, null, null, sd); // Sets writer fields + activates ref tracking mechanism of GSW
+		this.writer.processStartDocument(trgLoc, outEncoding, null, null, sd); // Sets writer fields + activates ref tracking mechanism of GSW
 	}
 	
-	public ResourceSimplifier(LocaleId trgLoc) {
-		this();
+	public ResourceSimplifier(GenericSkeletonWriter writer, LocaleId trgLoc) {
+		this(writer);
 		this.trgLoc = trgLoc;
 		useSDLocale = false;
 	}
 	
-	public ResourceSimplifier(LocaleId trgLoc, String outEncoding) {
-		this(trgLoc);		
+	public ResourceSimplifier(GenericSkeletonWriter writer, LocaleId trgLoc, String outEncoding) {
+		this(writer, trgLoc);		
 		this.outEncoding = outEncoding;
 		useSDEncoding = false;
 	}
@@ -133,7 +145,7 @@ public class ResourceSimplifier {
 	}
 	
 	/**
-	 * Converts a given event into a multi-event if it contains references in its skeleton, or passes it on if 
+	 * Converts a given event into a multi-event if it contains references in its source's codes or in skeleton, or passes it on if 
 	 * either the skeleton is no instance of GenericSkeleton, contains no references, or the resource is referent.
 	 * @param event the given event
 	 * @return the given event or a newly created multi-event
@@ -159,7 +171,7 @@ public class ResourceSimplifier {
 		if (event.getEventType() == EventType.START_DOCUMENT) {
 			StartDocument sd = (StartDocument) res;
 			isMultilingual = sd.isMultilingual();
-			if (useSDEncoding) this.outEncoding = sd.getEncoding(); // Default setting output encoding = input encoding
+			if (useSDEncoding) this.outEncoding = sd.getEncoding(); // Default setting: output encoding = input encoding
 			if (useSDLocale) this.trgLoc = sd.getLocale();
 		}
 				
@@ -369,8 +381,7 @@ public class ResourceSimplifier {
 				// Regular TU
 				TextContainer tc = tu.getSource();
 				
-				for (Iterator<TextPart> iter = tc.iterator(); iter.hasNext();) {
-					TextPart part = iter.next();
+				for (TextPart part : tc) {
 					TextFragment tf = part.getContent();
 					for (Code code : tf.getCodes()) {
 						if (code.hasReference()) {
@@ -379,7 +390,18 @@ public class ResourceSimplifier {
 								code.setData(writer.expandCodeContent(code, trgLoc, 0));
 						}
 					}
-				}			
+				}
+//				for (Iterator<TextPart> iter = tc.iterator(); iter.hasNext();) {
+//					TextPart part = iter.next();
+//					TextFragment tf = part.getContent();
+//					for (Code code : tf.getCodes()) {
+//						if (code.hasReference()) {
+//							// Resolve reference(s) with GSW, replace the original data
+//							if (resolveCodeRefs)
+//								code.setData(writer.expandCodeContent(code, trgLoc, 0));
+//						}
+//					}
+//				}			
 				if (!hasGenericSkeleton)
 					addTU(me, resId, ++tuCounter, tu);
 			}
