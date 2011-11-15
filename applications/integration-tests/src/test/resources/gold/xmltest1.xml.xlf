@@ -15,8 +15,8 @@
 <target xml:lang="fr">Text of paragraph 3.<x id="1"/></target>
 </trans-unit>
 <trans-unit id="4">
-<source xml:lang="en">Text &amp;=amp, &lt;=lt, >=gt, ]=cbracket, [=obracket</source>
-<target xml:lang="fr">Text &amp;=amp, &lt;=lt, >=gt, ]=cbracket, [=obracket</target>
+<source xml:lang="en"> Text &amp;=amp, &lt;=lt, >=gt, ]=cbracket, [=obracket </source>
+<target xml:lang="fr"> Text &amp;=amp, &lt;=lt, >=gt, ]=cbracket, [=obracket </target>
 </trans-unit>
 <trans-unit id="5">
 <source xml:lang="en">Before <x id="1"/> after.</source>
@@ -31,26 +31,30 @@
 <target xml:lang="fr">Text for p <g id="1">within text text for b</g> text for p again</target>
 </trans-unit>
 <trans-unit id="8">
-<source xml:lang="en">Text for p</source>
-<target xml:lang="fr">Text for p</target>
+<source xml:lang="en">Text for p </source>
+<target xml:lang="fr">Text for p </target>
 </trans-unit>
 <trans-unit id="9">
-<source xml:lang="en">text for p again</source>
-<target xml:lang="fr">text for p again</target>
+<source xml:lang="en"> text for p again</source>
+<target xml:lang="fr"> text for p again</target>
 </trans-unit>
 <trans-unit id="10">
-<source xml:lang="en">Text for p</source>
-<target xml:lang="fr">Text for p</target>
+<source xml:lang="en">Text for p </source>
+<target xml:lang="fr">Text for p </target>
 </trans-unit>
 <trans-unit id="11">
 <source xml:lang="en">embedded text for q</source>
 <target xml:lang="fr">embedded text for q</target>
 </trans-unit>
 <trans-unit id="12">
-<source xml:lang="en">text for p again</source>
-<target xml:lang="fr">text for p again</target>
+<source xml:lang="en"> text for p again</source>
+<target xml:lang="fr"> text for p again</target>
 </trans-unit>
-<trans-unit id="13" xml:space="preserve">
+<trans-unit id="13">
+<source xml:lang="en"> Text with ws [ ] <g id="1">and more [ ]</g> after </source>
+<target xml:lang="fr"> Text with ws [ ] <g id="1">and more [ ]</g> after </target>
+</trans-unit>
+<trans-unit id="14" xml:space="preserve">
 <source xml:lang="en">Text with ws [  		] <g id="1">and more [  		]</g> after</source>
 <target xml:lang="fr">Text with ws [  		] <g id="1">and more [  		]</g> after</target>
 </trans-unit>

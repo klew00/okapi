@@ -17,6 +17,7 @@
  <p>Text for p <b>within text text for b</b> text for p again</p>
  <p>Text for p <q its:translate="no">no trans embedded</q> text for p again</p>
  <p>Text for p <q>embedded text for q</q> text for p again</p>
+ <p> Text with ws [  		] <b>and more [  		]</b> after </p>
  <pre>Text with ws [  		] <b>and more [  		]</b> after</pre>
 
 </text>
