@@ -681,9 +681,14 @@ public class XMLFilter implements IFilter {
 			case ITraversal.WITHINTEXT_YES:
 			case ITraversal.WITHINTEXT_NESTED: //TODO: deal with nested elements
 				if ( frag == null ) { // Not yet in extraction
-					// Strange case: inline without parent???
-					//TODO: do something about this, warning?
-					assert(false);
+					//// Strange case: inline without parent???
+					////TODO: do something about this, warning?
+					//assert(false);
+					// case of inline within non-translatable
+					addStartTagToSkeleton(node);
+					if ( node.hasChildNodes() ) {
+						context.push(new ContextItem(node, trav));
+					}
 				}
 				else { // Already in extraction
 					//frag.append(TagType.OPENING, node.getLocalName(), buildStartTag(node));
