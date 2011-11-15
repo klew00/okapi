@@ -33,11 +33,15 @@ msgstr "Text avec une traduction non-approuvée %s"
 msgid "First sentence. Second sentence with %s."
 msgstr "Deuxième phrase d'abord avec %s. Puis la première."
 
+#. Developer comment for this entry
 #, c-format, fuzzy
+#  Comments from translator
 msgid "Text 2 with non-approved translation %s"
 msgstr "Text 2 avec une traduction non-approuvée %s et d'autre codes %d."
 
 #, c-format
+#  Comments from a translator about this text
+#. Developer comment
 msgid "Text without translation"
 msgstr ""
 
