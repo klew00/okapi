@@ -693,7 +693,7 @@ public class TMXWriter {
     {
     	// Write any TU-level properties as attributes (but only standard attributes)
 		for ( String name : names ) {
-			if ( ATTR_NAMES.contains(";"+name+";") ) {
+			if ( ATTR_NAMES.contains(";"+name+";") && !name.equals("tuid")) {
 				writer.writeAttributeString(name, item.getProperty(name).getValue());
 			}
 		}
