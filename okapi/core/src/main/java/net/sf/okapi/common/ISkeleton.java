@@ -42,16 +42,16 @@ public interface ISkeleton {
      */
 	ISkeleton clone();
 
+	/**
+	 * Sets a parent of this skeleton object. The parent is the resource that attaches this skeleton with SetSkeleton().
+	 * Normally the IResorce implementations set themselves as a parent for the skeleton.  
+	 * @param parent reference to the resource that attaches this skeleton object with IResource.setSkeleton()
+	 */
 	void setParent(IResource parent);
 	
+	/**
+	 * Gets the parent resource of this skeleton. 
+	 * @return reference to the resource that attaches this skeleton object with IResource.setSkeleton()
+	 */
 	IResource getParent();
-	
-//	/**
-//	 * If the skeleton stored references to a parent, it should update them.
-//	 * @param oldParent reference to a parent that attaches this skeleton object with IResource.setSkeleton().
-//	 * @param newParent reference to a parent that attaches this skeleton object with IResource.setSkeleton().
-//	 * Implementations of this interface are expected to replace their references to the old 
-//	 * parent of this object with the given reference to a new parent (i.e. the object that attaches this skeleton).
-//	 */
-//	public void updateParent(IResource oldParent, IResource newParent);		
 }
