@@ -34,14 +34,24 @@ public interface ISkeleton {
 	 * strings that cannot be compared in a meaningful way. 
 	 * @return the string representation of this skeleton object, or null.
 	 */
-	public String toString ();
-
+	String toString ();
+	
 	/**
-	 * Clones this skeleton object.
-	 * @param parent the resource that attaches this skeleton object with IResource.setSkeleton().
-	 * @return a new skeleton object that is a copy of this one. 
-	 * Implementations of this interface are expected to replace in the returned object the references to the 
-	 * parent of this object (being cloned) with references to the given parent (the object that attaches the new cloned skeleton).
-	 */
-	public ISkeleton clone(IResource parent);
+     * Clones this skeleton object.
+     * @return a new skeleton object that is a copy of this one.
+     */
+	ISkeleton clone();
+
+	void setParent(IResource parent);
+	
+	IResource getParent();
+	
+//	/**
+//	 * If the skeleton stored references to a parent, it should update them.
+//	 * @param oldParent reference to a parent that attaches this skeleton object with IResource.setSkeleton().
+//	 * @param newParent reference to a parent that attaches this skeleton object with IResource.setSkeleton().
+//	 * Implementations of this interface are expected to replace their references to the old 
+//	 * parent of this object with the given reference to a new parent (i.e. the object that attaches this skeleton).
+//	 */
+//	public void updateParent(IResource oldParent, IResource newParent);		
 }

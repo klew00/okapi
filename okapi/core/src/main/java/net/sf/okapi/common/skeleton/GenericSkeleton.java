@@ -43,6 +43,7 @@ public class GenericSkeleton implements ISkeleton {
 
 	private ArrayList<GenericSkeletonPart> list;
 	private boolean createNew = true;
+	private IResource parent;
 
 	/**
 	 * Creates a new empty GenericSkeleton object.
@@ -270,23 +271,19 @@ public class GenericSkeleton implements ISkeleton {
 			createNew = true;
 	}
 	
-	protected void updateParts(List<GenericSkeletonPart> newParts, List<GenericSkeletonPart> originalParts, IResource parent) {
+	@Override
+	public void setParent(IResource parent) {
 		String start = TextFragment.REFMARKER_START + "$self$";
     	
-    	for (GenericSkeletonPart part : originalParts) {
-			if (part.data.toString().startsWith(start) && part.getParent() != null && part.getParent().getSkeleton() == this) {
+		// Update references to the current parent with references to the new parent
+    	for (GenericSkeletonPart part : list) {
+			if (part.data.toString().startsWith(start) && part.getParent() != null && part.getParent() == this.getParent()) {
 				// Change the parent ref from this to new parent
-				part = new GenericSkeletonPart(part.getData().toString(), parent, part.getLocale());
+				//part = new GenericSkeletonPart(part.getData().toString(), parent, part.getLocale());
+				part.parent = parent;
 			}
-			newParts.add(part);
 		}
-	}
-	
-	@Override
-	public GenericSkeleton clone(IResource parent) {
-    	GenericSkeleton newSkel = new GenericSkeleton();
-    	updateParts(newSkel.getParts(), this.getParts(), parent);
-    	return newSkel;
+		this.parent = parent;
 	}
 	
 	/**
@@ -339,5 +336,37 @@ public class GenericSkeleton implements ISkeleton {
 	public GenericSkeletonPart getFirstPart () {
 		if  ( list.size() == 0 ) return null;
 		else return list.get(0);
+	}
+	
+	protected void copyFields(GenericSkeleton toSkel) {
+		toSkel.createNew = this.createNew;
+		toSkel.parent = this.parent;
+		
+		if (toSkel.list == null) {
+			toSkel.list = new ArrayList<GenericSkeletonPart>();
+		}
+		
+		for (GenericSkeletonPart part : list) {
+			GenericSkeletonPart newPart = new GenericSkeletonPart(part.data.toString(), part.parent, part.locId);
+			toSkel.list.add(newPart);
+		}
+	}
+	
+	/**
+	 * Clones this GenericSkeleton object. Shallow copy is provided as the cloned skeleton can be coupled with
+	 * its original via the parent field. If you need a deep copy of the skeleton,
+	 * call setParent() when the cloned skeleton is attached to a parent resource with setSkeleton(). 
+	 * @return a new GenericSkeleton object that is a shallow copy of this one.
+	 */
+	@Override
+	public GenericSkeleton clone() {		
+		GenericSkeleton newSkel = new GenericSkeleton();
+		copyFields(newSkel);		
+		return newSkel;
+	}
+
+	@Override
+	public IResource getParent() {
+		return parent;
 	}
 }

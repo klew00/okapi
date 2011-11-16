@@ -65,6 +65,7 @@ public class BaseNameable implements INameable {
 	@Override
 	public void setSkeleton (ISkeleton skeleton) {
 		this.skeleton = skeleton;
+		if (skeleton != null) skeleton.setParent(this);
 	}
 
 	@Override

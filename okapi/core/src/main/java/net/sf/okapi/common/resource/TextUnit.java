@@ -25,6 +25,7 @@ import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
 import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.ISegmenter;
 import net.sf.okapi.common.ISkeleton;
@@ -329,7 +330,10 @@ public class TextUnit implements ITextUnit {
     @Override
     public ISkeleton getSkeleton () {return skeleton;}
     @Override
-    public void setSkeleton (ISkeleton skeleton) {this.skeleton = skeleton;}
+    public void setSkeleton (ISkeleton skeleton) {
+    	this.skeleton = skeleton;
+    	if (skeleton != null) skeleton.setParent(this);
+    }
 
     @Override
     public boolean isReferent () {return (refCount > 0);}
@@ -541,7 +545,10 @@ public class TextUnit implements ITextUnit {
             tu.setTarget(entry.getKey(), entry.getValue().clone());
         }
 
-        tu.setSkeleton(this.getSkeleton() == null ? null : this.getSkeleton().clone(tu));
+        if (this.getSkeleton() != null) {
+        	ISkeleton skel = this.getSkeleton().clone();
+        	tu.setSkeleton(skel);
+        }
         
         return tu;
     }

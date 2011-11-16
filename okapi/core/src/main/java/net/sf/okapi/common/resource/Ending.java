@@ -59,6 +59,7 @@ public class Ending implements IResource {
 	
 	public void setSkeleton (ISkeleton skeleton) {
 		this.skeleton = skeleton;
+		if (skeleton != null) skeleton.setParent(this);
 	}
 
 	public <A extends IAnnotation> A getAnnotation (Class<A> annotationType) {

@@ -23,9 +23,6 @@ package net.sf.okapi.common.skeleton;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import net.sf.okapi.common.IResource;
-import net.sf.okapi.common.skeleton.GenericSkeleton;
-
 /**
  * Extension of the {@link GenericSkeleton} skeleton implementation that allow
  * ZipFile and ZipEntry objects to be passed along with skeleton parts. 
@@ -54,9 +51,9 @@ public class ZipSkeleton extends GenericSkeleton {
 	}
 
 	@Override
-	public ZipSkeleton clone(IResource parent) {
+	public ZipSkeleton clone() {
 		ZipSkeleton newSkel = new ZipSkeleton(original, entry);
-    	updateParts(newSkel.getParts(), this.getParts(), parent);
+		super.copyFields(newSkel);
     	return newSkel;
 	}
 }
