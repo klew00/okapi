@@ -106,10 +106,10 @@ public class IDMLSkeleton implements ISkeleton {
 	}
 
 	/**
-	 * Returns a shallow copy of this object.
+	 * Returns a shallow copy of this skeleton.
 	 */
 	@Override
-	public ISkeleton clone(IResource parent) {
+	public IDMLSkeleton clone() {
 		IDMLSkeleton newSkel = new IDMLSkeleton(original);
 		newSkel.entry = entry;
 		newSkel.doc = doc;
@@ -118,6 +118,16 @@ public class IDMLSkeleton implements ISkeleton {
 		newSkel.refs = refs;
 		newSkel.movedParts = movedParts;
 		return newSkel;
+	}
+
+	@Override
+	public void setParent(IResource parent) {
+		// Parent is not stored
+	}
+
+	@Override
+	public IResource getParent() {
+		return null;
 	}
 }
  
