@@ -278,8 +278,6 @@ public class GenericSkeleton implements ISkeleton {
 		// Update references to the current parent with references to the new parent
     	for (GenericSkeletonPart part : list) {
 			if (part.data.toString().startsWith(start) && part.getParent() != null && part.getParent() == this.getParent()) {
-				// Change the parent ref from this to new parent
-				//part = new GenericSkeletonPart(part.getData().toString(), parent, part.getLocale());
 				part.parent = parent;
 			}
 		}
@@ -354,9 +352,10 @@ public class GenericSkeleton implements ISkeleton {
 	
 	/**
 	 * Clones this GenericSkeleton object. Shallow copy is provided as the cloned skeleton can be coupled with
-	 * its original via the parent field. If you need a deep copy of the skeleton,
-	 * call setParent() when the cloned skeleton is attached to a parent resource with setSkeleton(). 
-	 * @return a new GenericSkeleton object that is a shallow copy of this one.
+	 * its original via the parent field. After the cloned skeleton is attached to a parent resource which implementation
+	 * invokes ISkeleton.setParent(), the copy becomes deep as the parent fields are updated with new values thus decoupling
+	 * the original and the clone. 
+	 * @return a new GenericSkeleton object that is a shallow copy of this object.
 	 */
 	@Override
 	public GenericSkeleton clone() {		
