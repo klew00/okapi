@@ -24,6 +24,7 @@ import java.awt.Dialog;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.IResource;
@@ -55,12 +56,7 @@ abstract class AbstractOkapiFilter implements org.omegat.filters2.IFilter {
     protected String defaultInEncoding = "UTF-8";
     protected String defaultOutEncoding = "UTF-8";
     protected String supportedExtensions;
-
-//	private final Pattern patternOpening = Pattern.compile("\\<g(\\d+?)\\>");
-//	private final Pattern patternClosing = Pattern.compile("\\</g(\\d+?)\\>");
-//	private final Pattern patternIsolated = Pattern.compile("\\<x(\\d+?)/\\>");
-//	private final Pattern patternIsolatedB = Pattern.compile("\\<b(\\d+?)/\\>");
-//	private final Pattern patternIsolatedE = Pattern.compile("\\<e(\\d+?)/\\>");
+    private Boolean processOmegaT2_5 = null;
 
 	private String filterConfigId;
 	private FilterConfigurationMapper fcMapper;
@@ -150,6 +146,13 @@ abstract class AbstractOkapiFilter implements org.omegat.filters2.IFilter {
 		alignCallback = null;
         try {
             processFile(inFile, null, context);
+
+            // 2.5 version also needs to link previous/next
+            if ( requirePrevNextFields() ) {
+                // parsing - need to link prev/next
+                parseCallback.linkPrevNextSegments();
+            }
+            
         }
         finally {
         	parseCallback = null;
@@ -168,13 +171,33 @@ abstract class AbstractOkapiFilter implements org.omegat.filters2.IFilter {
 		translateCallback = callback;
 		alignCallback = null;
         try {
+        	// For 2.5
+        	if ( doProcessFor2_5() ) {
+        		translateCallback.setPass(1);
+        	}
             processFile(inFile, outFile, context);
+
+        	// For 2.5 only too
+            if ( requirePrevNextFields() ) {
+            	translateCallback.linkPrevNextSegments();
+            	translateCallback.setPass(2);
+                processFile(inFile, outFile, context);
+            }
         }
         finally {
         	translateCallback = null;
         }
 	}
 
+    /**
+     * Method can be overrided for return true. It means what two-pass parsing and translating will be
+     * processed and prev/next segments will be linked.
+     */
+    protected boolean requirePrevNextFields () {
+        return false; // Default: all Okapi filters have IDs
+        // Take doProcessFor2_5() into account if this changes
+    }
+	
     protected void processFile (File inFile,
        	File outFile,
 		FilterContext context)
@@ -312,7 +335,6 @@ abstract class AbstractOkapiFilter implements org.omegat.filters2.IFilter {
 		
 		return fmt.fromFragmentToLetterCoded(tf);
 //		
-//		
 //		// Use directly the coded text if there is no codes
 //		if ( !tf.hasCode() ) {
 //			return tf.getCodedText();
@@ -440,4 +462,16 @@ abstract class AbstractOkapiFilter implements org.omegat.filters2.IFilter {
 //		frag.setCodedText(tmp.toString(), false);
 	}
 
+	private boolean doProcessFor2_5 () {
+		if ( processOmegaT2_5 == null ) {
+			try {
+				String tmp = ResourceBundle.getBundle("org/omegat/Version").getString("version");
+				processOmegaT2_5 = (tmp.compareTo("2.5.0") >= 0);
+			}
+			catch ( Throwable e ) {
+				processOmegaT2_5 = false;
+			}
+		}
+		return processOmegaT2_5;
+	}
 }

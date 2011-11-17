@@ -768,6 +768,9 @@ public class XMLFilter implements IFilter {
 			if ( popStack ) {
 				context.pop();
 				skel.add(buildEndTag(node));
+				if ( isContextTranslatable() ) {
+					frag = new TextFragment();
+				}
 			}
 			return false;
 		}
@@ -804,7 +807,14 @@ public class XMLFilter implements IFilter {
 		}
 		tu.setSkeleton(skel);
 		queue.add(new Event(EventType.TEXT_UNIT, tu));
-		frag = null;
+		if ( popStack ) {
+			if ( isContextTranslatable() ) {
+				frag = new TextFragment();
+			}
+		}
+		else {
+			frag = null;
+		}
 		skel = new GenericSkeleton();
 		return true;
 	}
