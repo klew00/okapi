@@ -783,7 +783,6 @@ public class XMLFilter implements IFilter {
 		
 		String locNote = context.peek().locNote;
 		if ( locNote != null ) {
-			//TODO: implement real notes
 			tu.setProperty(new Property(Property.NOTE, locNote));
 		}
 		
@@ -807,22 +806,12 @@ public class XMLFilter implements IFilter {
 		}
 		tu.setSkeleton(skel);
 		queue.add(new Event(EventType.TEXT_UNIT, tu));
-		if ( popStack ) {
-			if ( isContextTranslatable() ) {
-				frag = new TextFragment();
-			}
-		}
-		else {
-			frag = null;
+		frag = null;
+		if ( popStack && isContextTranslatable() ) {
+			frag = new TextFragment();
 		}
 		skel = new GenericSkeleton();
 		return true;
 	}
-
-	//TODO: use sub-filter to extract a content
-//	private void processSubContent () {
-//		// The variable frag contains the content
-//		
-//	}
 
 }
