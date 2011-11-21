@@ -10,6 +10,7 @@ import java.io.ObjectOutputStream;
 
 import org.junit.Test;
 import org.oasisopen.xliff.v2.IAnnotation;
+import org.oasisopen.xliff.v2.IFragment;
 import org.oasisopen.xliff.v2.InlineType;
 
 public class FragmentTest {
@@ -116,6 +117,28 @@ public class FragmentTest {
 		frag.getDataStore().calculateOriginalDataToIdsMap();
 		assertEquals("<pc id=\"1\" nidEnd=\"d2\" nidStart=\"d1\">text</pc><ph id=\"2\" nid=\"d3\"/>",
 			frag.toXLIFF(Fragment.STYLE_DATAOUTSIDE));
+	}
+
+	@Test
+	public void testOpeningIsolatedCodes () {
+		Fragment frag = new Fragment(new Unit("id").getDataStore());
+		frag.append(InlineType.OPENING, "1", "[o1]");
+		frag.append("t1");
+		assertEquals("<sc id=\"1\" isolated=\"yes\"/>t1", frag.toXLIFF());
+		assertEquals("<sc id=\"1\" isolated=\"yes\">[o1]</sc>t1", frag.toXLIFF(IFragment.STYLE_DATAINSIDE));
+		frag.getDataStore().calculateOriginalDataToIdsMap();
+		assertEquals("<sc id=\"1\" isolated=\"yes\" nid=\"d1\"/>t1", frag.toXLIFF(IFragment.STYLE_DATAOUTSIDE));
+	}
+
+	@Test
+	public void testclosingIsolatedCodes () {
+		Fragment frag = new Fragment(new Unit("id").getDataStore());
+		frag.append(InlineType.CLOSING, "1", "[c1]");
+		frag.append("t1");
+		assertEquals("<ec id=\"1\" isolated=\"yes\"/>t1", frag.toXLIFF());
+		assertEquals("<ec id=\"1\" isolated=\"yes\">[c1]</ec>t1", frag.toXLIFF(IFragment.STYLE_DATAINSIDE));
+		frag.getDataStore().calculateOriginalDataToIdsMap();
+		assertEquals("<ec id=\"1\" isolated=\"yes\" nid=\"d1\"/>t1", frag.toXLIFF(IFragment.STYLE_DATAOUTSIDE));
 	}
 
 	@Test

@@ -280,7 +280,7 @@ public class XLIFFReader {
 		return true;
 	}
 	
-	private boolean mustBeYesOrNo (String name,
+	private boolean canBeYesOrNo (String name,
 		String value)
 	{
 		if ( value == null ) return false; // Allowed but nothing to set
@@ -487,7 +487,7 @@ public class XLIFFReader {
 				segment.setId(tmp);
 			}
 			tmp = reader.getAttributeValue(null, Util.ATTR_TRANSLATE);
-			if ( mustBeYesOrNo(Util.ATTR_TRANSLATE, tmp) ) {
+			if ( canBeYesOrNo(Util.ATTR_TRANSLATE, tmp) ) {
 				segment.setTranslatable(tmp.equals("yes"));
 			}
 			segment.setExtendedAttributes(gatherExtendedAttributes());
@@ -569,6 +569,9 @@ public class XLIFFReader {
 				if ( tmp.equals(Util.ELEM_OPENINGCODE) ) {
 					tmp = reader.getAttributeValue(null, Util.ATTR_ID);
 					cannotBeNullOrEmpty(Util.ATTR_ID, tmp);
+					// Check value on isolated
+					String isolated = reader.getAttributeValue(null, Util.ATTR_ISOLATED);
+					canBeYesOrNo(Util.ATTR_ISOLATED, isolated);
 					code = frag.append(InlineType.OPENING, tmp, null);
 					setCommonAttributes(code);
 					nid = setNid(code, partToFill.getDataStore());
@@ -576,8 +579,16 @@ public class XLIFFReader {
 					inTextContent = false;
 				}
 				else if ( tmp.equals(Util.ELEM_CLOSINGCODE) ) {
-					tmp = reader.getAttributeValue(null, Util.ATTR_RID);
-					cannotBeNullOrEmpty(Util.ATTR_RID, tmp);
+					String isolated = reader.getAttributeValue(null, Util.ATTR_ISOLATED);
+					if ( isolated != null ) {
+						canBeYesOrNo(Util.ATTR_ISOLATED, isolated);
+						tmp = reader.getAttributeValue(null, Util.ATTR_ID);
+						cannotBeNullOrEmpty(Util.ATTR_ID, tmp);
+					}
+					else {
+						tmp = reader.getAttributeValue(null, Util.ATTR_RID);
+						cannotBeNullOrEmpty(Util.ATTR_RID, tmp);
+					}
 					code = frag.append(InlineType.CLOSING, tmp, null);
 					setCommonAttributes(code);
 					nid = setNid(code, partToFill.getDataStore());

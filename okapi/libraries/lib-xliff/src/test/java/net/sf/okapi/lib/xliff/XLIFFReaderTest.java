@@ -14,6 +14,7 @@ import org.oasisopen.xliff.v2.IExtendedAttribute;
 import org.oasisopen.xliff.v2.IExtendedAttributes;
 import org.oasisopen.xliff.v2.IFragment;
 import org.oasisopen.xliff.v2.INote;
+import org.oasisopen.xliff.v2.InlineType;
 
 public class XLIFFReaderTest {
 
@@ -128,6 +129,29 @@ public class XLIFFReaderTest {
 				"<pc id=\"2\" equivStart=\"eq2\" dispStart=\"di2\">t2" +
 				"<ph id=\"3\" equiv=\"eq3\" disp=\"di3\"/>t3" +
 				"</pc></pc>",
+			unit.getPart(0).getSource().toXLIFF(IFragment.STYLE_NODATA));
+	}
+
+	@Test
+	public void testInlineCodes2 () {
+		String text = "<?xml version='1.0'?>\n<xliff version=\"2.0\" xmlns=\"urn:oasis:names:tc:xliff:document:2.0\">"
+			+ "<file srclang=\"en\" tgtlang=\"fr\">\n<unit id=\"id\"><segment>\n"
+			+ "<source>"
+			+ "<sc id=\"1\" isolated=\"yes\"/>t1<ec id=\"2\" isolated=\"yes\"/>"
+			+ "</source>"
+			+ "</segment></unit>\n</file></xliff>";
+		Unit unit = getUnit(text, 1);
+		assertNotNull(unit);
+		
+		ICode code = (ICode)unit.getDataStore().getSourceMarkers().get(0);
+		assertEquals("1", code.getId());
+		assertEquals(InlineType.OPENING, code.getInlineType());
+		
+		code = (ICode)unit.getDataStore().getSourceMarkers().get(1);
+		assertEquals("2", code.getId());
+		assertEquals(InlineType.CLOSING, code.getInlineType());
+		
+		assertEquals("<sc id=\"1\" isolated=\"yes\"/>t1<ec id=\"2\" isolated=\"yes\"/>",
 			unit.getPart(0).getSource().toXLIFF(IFragment.STYLE_NODATA));
 	}
 	

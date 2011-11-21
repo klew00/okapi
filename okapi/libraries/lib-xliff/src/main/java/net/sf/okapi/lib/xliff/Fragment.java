@@ -170,6 +170,9 @@ public class Fragment implements IFragment {
 				else {
 					// No corresponding closing part or data inside
 					tmp.append(String.format("<sc id=\"%s\"", code.getId()));
+					if ( !unitHasClosing(code) ) {
+						tmp.append(" isolated=\"yes\"");
+					}
 				}
 				printCommonAttributes(code, tmp, closing, true); // closing can be null
 				
@@ -199,7 +202,15 @@ public class Fragment implements IFragment {
 					// as it's not used again (no need to waste time cleaning it)
 				}
 				else { // Not in the verified list: use <ec>
-					tmp.append(String.format("<ec rid=\"%s\"", code.getId()));
+					tmp.append("<ec");
+					boolean isolated = !unitHasOpening(code);
+					if ( isolated ) {
+						tmp.append(String.format(" id=\"%s\"", code.getId()));
+						tmp.append(" isolated=\"yes\"");
+					}
+					else {
+						tmp.append(String.format(" rid=\"%s\"", code.getId()));
+					}
 					printCommonAttributes(code, tmp, null, false);
 				
 					if ( dataInside ) {
@@ -314,6 +325,38 @@ public class Fragment implements IFragment {
 	}
 	
 	/**
+	 * Tests if the unit to which this fragment belongs has a closing code
+	 * for a given opening code.
+	 * @param code the opening code to test.
+	 * @return true if there is a corresponding closing code. False otherwise.
+	 */
+	private boolean unitHasClosing (ICode code) {
+		if ( markers == null ) return false;
+		for ( IMarker marker : markers ) {
+			if ( code.getId().equals(marker.getId()) ) {
+				if ( marker.getInlineType() == InlineType.CLOSING ) return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Tests if the unit to which this fragment belongs has an opening code
+	 * for a given closing code.
+	 * @param code the closing code to test.
+	 * @return true if there is a corresponding opening code. False otherwise.
+	 */
+	private boolean unitHasOpening (ICode code) {
+		if ( markers == null ) return false;
+		for ( IMarker marker : markers ) {
+			if ( code.getId().equals(marker.getId()) ) {
+				if ( marker.getInlineType() == InlineType.OPENING ) return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
 	 * Output the common attributes
 	 * @param code the code to output.
 	 * @param tmp the buffer where to output.
@@ -379,6 +422,9 @@ public class Fragment implements IFragment {
 				else {
 					// No corresponding closing part
 					tmp.append(String.format("<sc id=\"%s\"", code.getId()));
+					if ( !unitHasClosing(code) ) {
+						tmp.append(" isolated=\"yes\"");
+					}
 					printCommonAttributes(code, tmp, null, false);
 					tmp.append("/>");
 				}
@@ -392,7 +438,15 @@ public class Fragment implements IFragment {
 					// as it's not used again (no need to waste time cleaning it)
 				}
 				else { // Not in the verified list
-					tmp.append(String.format("<ec rid=\"%s\"", code.getId()));
+					tmp.append("<ec");
+					boolean isolated = !unitHasOpening(code);
+					if ( isolated ) {
+						tmp.append(String.format(" id=\"%s\"", code.getId()));
+						tmp.append(" isolated=\"yes\"");
+					}
+					else {
+						tmp.append(String.format(" rid=\"%s\"", code.getId()));
+					}
 					printCommonAttributes(code, tmp, null, false);
 					tmp.append("/>");
 				}

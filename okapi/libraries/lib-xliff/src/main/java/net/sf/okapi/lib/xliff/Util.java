@@ -52,6 +52,7 @@ class Util {
 	final static String ATTR_RID = "rid";
 	final static String ATTR_NID = "nid";
 	final static String ATTR_TYPE = "type";
+	final static String ATTR_ISOLATED = "isolated";
 	final static String ATTR_HEX = "hex";
 	final static String ATTR_EQUIV = "equiv";
 	final static String ATTR_EQUIVSTART = "equivStart";
