@@ -41,15 +41,31 @@ public class TextModificationStep extends BasePipelineStep {
 
 	private static final char STARTSEG = '[';
 	private static final char ENDSEG = ']';
-	private static final String OLDCHARS = "AaEeIiOoUuYyCcDdNn";
-	private static final String NEWCHARS = "\u00c2\u00e5\u00c9\u00e8\u00cf\u00ec\u00d8\u00f5\u00db\u00fc\u00dd\u00ff\u00c7\u00e7\u00d0\u00f0\u00d1\u00f1";
 
 	private Parameters params;
 	private LocaleId targetLocale;
-	
+	private String[] oldChars = new String[3];
+	private String[] newChars = new String[3];
 
 	public TextModificationStep () {
 		params = new Parameters();
+		
+		oldChars = new String[3];
+		newChars = new String[3];
+		// Latin extended characters
+		oldChars[0] = "AaEeIiOoUuYyCcDdNn";
+		newChars[0] = "\u00c2\u00e5\u00c9\u00e8\u00cf\u00ec\u00d8\u00f5\u00db\u00fc\u00dd\u00ff\u00c7\u00e7\u00d0\u00f0"
+			+ "\u00d1\u00f1";
+		// Cyrillic extended characters
+		oldChars[1] = "AaEeIiOoUuYyBbVvPpKkSsNnDdFfGgHhJjLlMmQqRrTtWwZzCcXx";
+		newChars[1] = "\u0410\u0430\u042d\u044d\u0418\u0438\u041e\u043e\u0423\u0443\u042e\u044e\u0411\u0431\u0412\u0432"
+			+ "\u041f\u043f\u041a\u043a\u0421\u0441\u041d\u043d\u0414\u0434\u0424\u0444\u0413\u0433\u0425\u0445\u0427\u0447"
+			+ "\u041b\u043b\u041c\u043c\u0428\u0448\u0420\u0440\u0422\u0442\u042f\u044f\u0417\u0437\u0426\u0446\u0429\u0449";
+		// Arabic extended characters
+		oldChars[2] = "AaBbTtGgHhDdRrMmNnLlQqKkSsVvWwXxYyZzCcFfJjPpEeIiOoUu";
+		newChars[2] = "\u0627\u0627\u0628\u0628\u062a\u062a\u062c\u062c\u062d\u062d\u062f\u062f\u0631\u0631\u0645\u0645"
+			+ "\u0646\u0646\u0644\u0644\u0642\u0642\u0643\u0643\u0633\u0633\u062e\u062e\u0648\u0648\u0632\u0632\u064a\u064a"
+			+ "\u0638\u0638\u0635\u0635\u0641\u0641\u063a\u063a\u0630\u0630\u0647\u0647\u0639\u0639\u0636\u0636\u0634\u0634";
 	}
 	
 	@StepParameterMapping(parameterType = StepParameterType.TARGET_LOCALE)
@@ -167,6 +183,9 @@ public class TextModificationStep extends BasePipelineStep {
 	
 	private void replaceWithExtendedChars (ITextUnit tu) {
 		int n;
+		int charDest = params.script;
+		if ( charDest > 2 ) charDest = 0;
+		
 		for ( TextPart part : tu.getTarget(targetLocale) ) {
 			StringBuilder sb = new StringBuilder(part.text.getCodedText());
 			for ( int i=0; i<sb.length(); i++ ) {
@@ -174,8 +193,8 @@ public class TextModificationStep extends BasePipelineStep {
 					i++; // Skip codes
 				}
 				else {
-					if ( (n = OLDCHARS.indexOf(sb.charAt(i))) > -1 ) {
-						sb.setCharAt(i, NEWCHARS.charAt(n));
+					if ( (n = oldChars[charDest].indexOf(sb.charAt(i))) > -1 ) {
+						sb.setCharAt(i, newChars[charDest].charAt(n));
 					}
 				}
 			}
@@ -252,4 +271,5 @@ public class TextModificationStep extends BasePipelineStep {
 		}
 		return TextUnitUtil.getText(tf).length();
 	}
+
 }

@@ -175,7 +175,9 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		lbTypes.add("Keep the original text");
 		lbTypes.add("Replace letters by Xs and digits by Ns");
 		lbTypes.add("Remove text but keep inline codes");
-		lbTypes.add("Replace selected ASCII letters by extended characters");
+		lbTypes.add("Replace selected ASCII letters by Extended Latin characters");
+		lbTypes.add("Replace selected ASCII letters by Cyrillic characters");
+		lbTypes.add("Replace selected ASCII letters by Arabic characters");
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.heightHint = 70;
 		gdTmp.horizontalSpan = 2;
@@ -257,7 +259,12 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	}
 
 	private void setData () {
-		lbTypes.setSelection(params.type);
+		int n = params.type;
+		if ( n == Parameters.TYPE_EXTREPLACE ) {
+			n += params.script;
+		}
+		lbTypes.setSelection(n);
+		
 		chkAddPrefix.setSelection(params.addPrefix);
 		edPrefix.setText(params.prefix);
 		chkAddSuffix.setSelection(params.addSuffix);
@@ -275,7 +282,14 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 
 	private boolean saveData () {
 		if ( inInit ) return true;
-		params.type = lbTypes.getSelectionIndex();
+		
+		int n = lbTypes.getSelectionIndex();
+		if ( n >= Parameters.TYPE_EXTREPLACE ) {
+			params.script = n-Parameters.TYPE_EXTREPLACE;
+			n = Parameters.TYPE_EXTREPLACE;
+		}
+		params.type = n;
+		
 		params.addPrefix = chkAddPrefix.getSelection();
 		params.prefix = edPrefix.getText();
 		params.addSuffix = chkAddSuffix.getSelection();

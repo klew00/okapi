@@ -31,6 +31,7 @@ public class Parameters extends BaseParameters {
 	
 	private static final String APPLYTOBLANKENTRIES = "applyToBlankEntries";
 	private static final String EXPAND = "expand";
+	private static final String SCRIPT = "script";
 	
 	public int type;
 	public boolean addPrefix;
@@ -43,6 +44,7 @@ public class Parameters extends BaseParameters {
 	public boolean markSegments;
 	public boolean applyToBlankEntries;
 	public boolean expand;
+	public int script;
 	
 	public Parameters () {
 		reset();
@@ -60,6 +62,7 @@ public class Parameters extends BaseParameters {
 		markSegments = false;
 		applyToBlankEntries = true; // For backward compatibility
 		expand = false;
+		script = 0;
 	}
 
 	public void fromString (String data) {
@@ -76,6 +79,7 @@ public class Parameters extends BaseParameters {
 		markSegments = buffer.getBoolean("markSegments", markSegments);
 		applyToBlankEntries = buffer.getBoolean(APPLYTOBLANKENTRIES, applyToBlankEntries);
 		expand = buffer.getBoolean(EXPAND, expand);
+		script = buffer.getInteger(SCRIPT, script);
 	}
 
 	@Override
@@ -92,6 +96,7 @@ public class Parameters extends BaseParameters {
 		buffer.setBoolean("markSegments", markSegments);
 		buffer.setBoolean(APPLYTOBLANKENTRIES, applyToBlankEntries);
 		buffer.setBoolean(EXPAND, expand);
+		buffer.setInteger(SCRIPT, script);
 		return buffer.toString();
 	}
 	
