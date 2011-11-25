@@ -84,7 +84,6 @@ class TmPanel extends Composite implements IObserver {
 		this.statusBar = statusBar;
 		
 		opt = new TMOptions();
-		
 		srcCol = -1;
 		trgCol = -1;
 		
@@ -215,6 +214,10 @@ class TmPanel extends Composite implements IObserver {
 		this.opt = opt;
 	}
 	
+	TMOptions getTmOptions () {
+		return opt;
+	}
+	
 	void editColumns () {
 		try {
 			saveEntryAndModificationsIfNeeded();
@@ -235,13 +238,19 @@ class TmPanel extends Composite implements IObserver {
 			}
 
 			//TODO Set the columns with the source and target
-			srcCol = -1;
-			trgCol = -1;
+			srcCol = -1; opt.setSourceLocale(null);
+			trgCol = -1; opt.setTargetLocale(null);
 			int n = 1;
 			for ( String fn : opt.getVisibleFields() ) {
 				if ( fn.startsWith(DbUtil.TEXT_PREFIX) ) {
-					if ( srcCol == -1 ) srcCol = n;
-					else if ( trgCol == -1 ) trgCol = n;
+					if ( srcCol == -1 ) {
+						srcCol = n;
+						opt.setSourceLocale(DbUtil.getFieldLocale(fn));
+					}
+					else if ( trgCol == -1 ) {
+						trgCol = n;
+						opt.setTargetLocale(DbUtil.getFieldLocale(fn));
+					}
 				}
 				n++;
 			}
@@ -270,13 +279,19 @@ class TmPanel extends Composite implements IObserver {
 			opt.setVisibleFields(visible);
 			
 			//TODO Set the columns with the source and target
-			srcCol = -1;
-			trgCol = -1;
+			srcCol = -1; opt.setSourceLocale(null);
+			trgCol = -1; opt.setTargetLocale(null);
 			int n = 1;
 			for ( String fn : opt.getVisibleFields() ) {
 				if ( fn.startsWith(DbUtil.TEXT_PREFIX) ) {
-					if ( srcCol == -1 ) srcCol = n;
-					else if ( trgCol == -1 ) trgCol = n;
+					if ( srcCol == -1 ) {
+						srcCol = n;
+						opt.setSourceLocale(DbUtil.getFieldLocale(fn));
+					}
+					else if ( trgCol == -1 ) {
+						trgCol = n;
+						opt.setTargetLocale(DbUtil.getFieldLocale(fn));
+					}
 				}
 				n++;
 			}
@@ -288,8 +303,8 @@ class TmPanel extends Composite implements IObserver {
 	}
 
 	void resetTmDisplay () {
-		srcCol = -1;
-		trgCol = -1;
+		srcCol = -1; opt.setSourceLocale(null);
+		trgCol = -1; opt.setTargetLocale(null);
 		// By default: all and only text fields are visible
 		opt.setVisibleFields(new ArrayList<String>());
 		
@@ -297,8 +312,14 @@ class TmPanel extends Composite implements IObserver {
 		for ( String fn : tm.getAvailableFields() ) {
 			if ( fn.startsWith(DbUtil.TEXT_PREFIX) ) {
 				opt.getVisibleFields().add(fn);
-				if ( srcCol == -1 ) srcCol = n;
-				else if ( trgCol == -1 ) trgCol = n;
+				if ( srcCol == -1 ) {
+					srcCol = n;
+					opt.setSourceLocale(DbUtil.getFieldLocale(fn));
+				}
+				else if ( trgCol == -1 ) {
+					trgCol = n;
+					opt.setTargetLocale(DbUtil.getFieldLocale(fn));
+				}
 				n++;
 			}
 		}
@@ -577,6 +598,16 @@ class TmPanel extends Composite implements IObserver {
 		if ( mainForm.getCurrentTmPanel() == this ) {
 			mainForm.updateCommands();
 		}
+		
+		// Update the list of the repositories if needed
+		if ( arg != null ) {
+			if (( arg instanceof Boolean ) && (Boolean)arg ) {
+				int n = mainForm.getRepositoryPanel().getTmList().getSelectionIndex();
+				mainForm.getRepositoryPanel().resetRepositoryUI(n);
+				mainForm.getRepositoryPanel().updateRepositoryStatus();
+			}
+		}
+		// Update the TM
 		resetTmDisplay();
 	}
 

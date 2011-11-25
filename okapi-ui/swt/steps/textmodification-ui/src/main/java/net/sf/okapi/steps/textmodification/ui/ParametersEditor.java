@@ -173,11 +173,11 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 
 		lbTypes = new List(mainComposite, SWT.BORDER | SWT.V_SCROLL);
 		lbTypes.add("Keep the original text");
-		lbTypes.add("Replace letters by Xs and digits by Ns");
+		lbTypes.add("Replace letters with Xs and digits with Ns");
 		lbTypes.add("Remove text but keep inline codes");
-		lbTypes.add("Replace selected ASCII letters by Extended Latin characters");
-		lbTypes.add("Replace selected ASCII letters by Cyrillic characters");
-		lbTypes.add("Replace selected ASCII letters by Arabic characters");
+		lbTypes.add("Replace selected ASCII characters with Extended Latin characters");
+		lbTypes.add("Replace selected ASCII characters with Cyrillic characters");
+		lbTypes.add("Replace selected ASCII characters with Arabic characters");
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.heightHint = 70;
 		gdTmp.horizontalSpan = 2;

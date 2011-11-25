@@ -20,26 +20,47 @@
 
 package net.sf.okapi.lib.tmdb;
 
-import net.sf.okapi.common.observer.IObservable;
+public class SplitterOptions {
 
-public interface IProgressCallback extends IObservable {
+	private boolean splitLocales;
+	private boolean splitEntries = true;
+	private long entriesPerPart;
+	private String sourceLocale;
+	
+	public SplitterOptions (String sourceLocale) {
+		this.sourceLocale = sourceLocale;
+	}
 
-	public void startProcess (String text);
-	
-	/**
-	 * Notifies the end of the process.
-	 * @param count number of entries processed, or -1 to get no message.
-	 * @param updateRepositories true if the display of list of repositries needs to be updated,
-	 * null or fals otherwise.
-	 */
-	public void endProcess (long count,
-		Boolean updateRepositories);
+	public boolean getSplitLocales () {
+		return splitLocales;
+	}
 
-	public boolean updateProgress (long count);
+	public void setSplitLocales (boolean splitLocales) {
+		this.splitLocales = splitLocales;
+	}
+
+	public boolean getSplitEntries () {
+		return splitEntries;
+	}
+
+	public void setSplitEntries (boolean splitEntries) {
+		this.splitEntries = splitEntries;
+	}
+
+	public long getEntriesPerPart () {
+		return entriesPerPart;
+	}
+
+	public void setEntriesPerPart (long entriesPerPart) {
+		this.entriesPerPart = entriesPerPart;
+	}
+
+	public String getSourceLocale () {
+		return sourceLocale;
+	}
 	
-	public boolean logMessage (int type,
-		String text);
-	
-	public boolean isCanceled ();
+	public void setSourceLocale (String sourceLocale) {
+		this.sourceLocale = sourceLocale;
+	}
 
 }

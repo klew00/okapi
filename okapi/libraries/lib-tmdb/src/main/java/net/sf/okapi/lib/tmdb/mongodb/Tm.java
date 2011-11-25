@@ -537,4 +537,10 @@ public class Tm implements ITm {
 			sortObject.put(field.getKey(),field.getValue());
 		}
 	}
+
+	@Override
+	public long getTotalSegmentCount () {
+		return store.getTotalSegmentCount(name);
+	}
+
 }

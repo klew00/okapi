@@ -44,6 +44,7 @@ public class Repository implements IRepository {
 
 	private Connection  conn = null;
 	private String name;
+	private boolean shared = false;
 
 	static public void delete (String path) {
 		String pathNoExt = path;
@@ -89,6 +90,7 @@ public class Repository implements IRepository {
 				// Open the connection, this creates the DB if none exists
 				if ( serverMode ) {
 					conn = DriverManager.getConnection("jdbc:h2:tcp://"+pathNoExt, "sa", "");
+					shared = true;
 					exist = true; // Assumes it exists
 				}
 				else {
@@ -554,6 +556,11 @@ public class Repository implements IRepository {
 			}
 		}
 		return list;
+	}
+
+	@Override
+	public boolean isShared () {
+		return shared;
 	}
 
 }

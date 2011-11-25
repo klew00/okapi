@@ -74,7 +74,7 @@ public class Repository implements IRepository {
 		}
 	}
 	
-	public Repository(String repoName){
+	public Repository (String repoName){
 		name = repoName;
 		try {
 			connection = new Mongo();
@@ -102,12 +102,15 @@ public class Repository implements IRepository {
 	}
 	
 	@Override
-	public void close() {
+	public void close () {
 		connection.close();
 	}
 
 	@Override
-	public ITm createTm(String tmName, String description, String localeId) {
+	public ITm createTm (String tmName,
+		String description,
+		String localeId)
+	{
 		tm_coll = repository.getCollection(Repository.TM_COLL);
 
 		BasicDBObject query = new BasicDBObject();
@@ -128,7 +131,7 @@ public class Repository implements IRepository {
 	}
 
 	@Override
-	public void deleteTm(String tmName) {
+	public void deleteTm (String tmName) {
 		tm_coll = repository.getCollection(Repository.TM_COLL);
 		
 		BasicDBObject obj = new BasicDBObject();
@@ -141,17 +144,17 @@ public class Repository implements IRepository {
 	}
 
 	@Override
-	public String getName() {
+	public String getName () {
 		return name;
 	}
 
 	@Override
-	public List<String> getTmLocales(String tmName) {
+	public List<String> getTmLocales (String tmName) {
 		return getCommaSeparatedValues(tmName, Repository.TM_COL_LOCALES);
 	}
 
 	@Override
-	public List<String> getTmNames() {
+	public List<String> getTmNames () {
 		tm_coll = repository.getCollection(Repository.TM_COLL);
 		
 		List<String> list = new ArrayList<String>();
@@ -168,12 +171,12 @@ public class Repository implements IRepository {
 	}
 
 	@Override
-	public long getTotalSegmentCount(String tmName) {
+	public long getTotalSegmentCount (String tmName) {
 		return repository.getCollection(tmName+"_SEG").count();
 	}
 
 	@Override
-	public ITm openTm(String tmName) {
+	public ITm openTm (String tmName) {
 		tm_coll = repository.getCollection(Repository.TM_COLL);
 		
 		BasicDBObject query = new BasicDBObject();
@@ -199,7 +202,7 @@ public class Repository implements IRepository {
 	 * @param tmName
 	 * @return
 	 */
-	public String getTmDescription(String tmName){
+	public String getTmDescription (String tmName){
 		tm_coll = repository.getCollection(Repository.TM_COLL);
 
 		BasicDBObject query = new BasicDBObject();
@@ -327,4 +330,10 @@ public class Repository implements IRepository {
 		DBCollection segList = repository.getCollection(currentName+"_SEG");
 		segList.rename(newName+"_SEG");
 	}
+
+	@Override
+	public boolean isShared () {
+		return true; // Always in shared mode
+	}
+	
 }

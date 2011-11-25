@@ -32,9 +32,13 @@ public class TMOptions extends BaseParameters {
 
 	private static final String PAGESIZE = "pageSize";
 	private static final String VISIBLEFIELDS = "visibleFields";
+	private static final String SOURCELOCALE = "sourceLocale";
+	private static final String TARGETLOCALE = "targetLocale";
 	
 	private long pageSize;
 	private ArrayList<String> visibleFields;
+	private String sourceLocale;
+	private String targetLocale;
 	
 	public TMOptions () {
 		reset();
@@ -56,7 +60,22 @@ public class TMOptions extends BaseParameters {
 	public void setVisibleFields (ArrayList<String> visibleFields) {
 		this.visibleFields = visibleFields;
 	}
+	
+	public String getSourceLocale () {
+		return sourceLocale;
+	}
+	
+	public void setSourceLocale (String sourceLocale) {
+		this.sourceLocale = sourceLocale;
+	}
+	
+	public String getTargetLocale () {
+		return targetLocale;
+	}
 
+	public void setTargetLocale (String targetLocale) {
+		this.targetLocale = targetLocale;
+	}
 
 	@Override
 	public void reset () {
@@ -72,6 +91,8 @@ public class TMOptions extends BaseParameters {
 		pageSize = Long.valueOf(tmp);
 		tmp = buffer.getString(VISIBLEFIELDS, null);
 		visibleFields = new ArrayList<String>(ListUtil.stringAsList(tmp));
+		sourceLocale = buffer.getString(SOURCELOCALE, sourceLocale);
+		targetLocale = buffer.getString(TARGETLOCALE, targetLocale);
 	}
 	
 	@Override
@@ -79,6 +100,8 @@ public class TMOptions extends BaseParameters {
 		buffer.reset();
 		buffer.setString(PAGESIZE, String.valueOf(pageSize));
 		buffer.setString(VISIBLEFIELDS, ListUtil.listAsString(visibleFields));
+		buffer.setString(SOURCELOCALE, sourceLocale);
+		buffer.setString(TARGETLOCALE, targetLocale);
 		return buffer.toString();
 	}
 	
@@ -92,6 +115,9 @@ public class TMOptions extends BaseParameters {
 				iter.remove();
 			}
 		}
+		
+		// Check if the source/target locales are still valid
+		//TODO
 	}
 
 }

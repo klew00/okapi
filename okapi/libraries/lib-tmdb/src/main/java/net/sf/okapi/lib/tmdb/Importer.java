@@ -150,7 +150,7 @@ public class Importer implements Runnable {
 			if ( filter != null ) {
 				filter.close();
 			}
-			callback.endProcess(count);
+			callback.endProcess(count, false);
 		}
 	}
 

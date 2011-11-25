@@ -78,15 +78,18 @@ distribution.</p>
 	extracted. Mode 2: all text is extracted, segmented or not.</li>
 </ul>
 	</li>
-	<li>XML Filter:<ul>
-	<li>Fixed issue of missing start tag in case of non-translatable inline with 
-	no translatable text before.</li>
-	<li>Changed unwrapping default: ends are not trimmed anymore (was causing 
-	lost of spaces in fragment extraction).</li>
-	<li>Fixed issue where translation context was not reset after an embedded 
-	structural translatable element was extracted (e.g. para inside para case)</li>
+	<li>Properties Filter:<ul>
+	<li>Added inline code support for HTML tags in default</li>
 </ul>
 	</li>
+	<li>XML Filter:<ul>
+		<li>Fixed issue of missing start tag in case of non-translatable inline with 
+	no translatable text before.</li>
+		<li>Changed unwrapping default: ends are not trimmed anymore (was causing 
+	lost of spaces in fragment extraction).</li>
+		<li>Fixed issue where translation context was not reset after an embedded 
+	structural translatable element was extracted (e.g. para inside para case)</li>
+	</ul></li>
 </ul>
 	</li>
 	<li>Libraries:<ul>

@@ -90,4 +90,12 @@ public interface IRepository {
 	 */
 	public long getTotalSegmentCount (String tmName);
 
+	/**
+	 * Indicates if this repository is currently used in shared mode.
+	 * That is other users may make modification in the repository such
+	 * as add or remove TMs, etc. 
+	 * @return true if this repository is shared.
+	 */
+	public boolean isShared ();
+	
 }

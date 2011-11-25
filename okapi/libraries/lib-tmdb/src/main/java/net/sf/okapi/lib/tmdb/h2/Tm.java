@@ -932,4 +932,9 @@ public class Tm implements ITm {
 		
 	}
 
+	@Override
+	public long getTotalSegmentCount () {
+		return store.getTotalSegmentCount(name);
+	}
+
 }

@@ -93,6 +93,7 @@ public class MainForm {
 	private MenuItem miTMClose;
 	private MenuItem miTMImport;
 	private MenuItem miTMExport;
+	private MenuItem miTMSplit;
 	private MenuItem miTMDelete;
 	private MenuItem miTMRename;
 	private MenuItem miTMEditColumns;
@@ -366,6 +367,7 @@ public class MainForm {
 		miTMClose.setEnabled(active);
 		miTMImport.setEnabled(active);
 		miTMExport.setEnabled(active);
+		miTMSplit.setEnabled(active);
 		miTMDelete.setEnabled(active);
 		miTMRename.setEnabled(active);
 		miTMEditColumns.setEnabled(active);
@@ -468,6 +470,14 @@ public class MainForm {
 		miTMExport.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				repoPanel.exportTM(currentTP.getTm().getName());
+            }
+		});
+		
+		miTMSplit = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miTMSplit, "tm.split"); //$NON-NLS-1$
+		miTMSplit.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				repoPanel.splitTM(currentTP.getTm().getName());
             }
 		});
 		
@@ -778,4 +788,9 @@ public class MainForm {
 	IFilterConfigurationMapper getFCMapper () {
 		return fcMapper;
 	}
+	
+	RepositoryPanel getRepositoryPanel () {
+		return repoPanel;
+	}
+
 }

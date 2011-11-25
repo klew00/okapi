@@ -77,11 +77,13 @@ public class ProgressCallback implements IProgressCallback {
 
 	private boolean updateUI (int p_kind,
 		long p_count,
-		String p_text)
+		String p_text,
+		Boolean p_updateRepositories)
 	{
 		final long count = p_count;
 		final int kind = p_kind;
 		final String text = p_text;
+		final Boolean updateRepositories = p_updateRepositories;
 		logPanel.getDisplay().asyncExec(new Runnable() {
 			public void run () {
 				switch ( kind ) {
@@ -101,8 +103,10 @@ public class ProgressCallback implements IProgressCallback {
 					isCanceled = logPanel.log("ERROR: "+text);
 					break;
 				case 6: // Done
-					logPanel.endTask(String.format("Entries processed: %d", count));
-					notifyObservers();
+					if ( count > -1 ) {
+						logPanel.endTask(String.format("Entries processed: %d", count));
+					}
+					notifyObservers(updateRepositories);
 					break;
 				}
 			}
@@ -113,17 +117,19 @@ public class ProgressCallback implements IProgressCallback {
 	
 	@Override
 	public void startProcess (String text) {
-		updateUI(0, 0, text);
+		updateUI(0, 0, text, null);
 	}
 	
 	@Override
-	public void endProcess (long count) {
-		updateUI(6, count, null);
+	public void endProcess (long count,
+		Boolean updateRepositories)
+	{
+		updateUI(6, count, null, updateRepositories);
 	}
 
 	@Override
 	public boolean updateProgress (long count) {
-		return updateUI(1, count, null);
+		return updateUI(1, count, null, null);
 	}
 	
 	@Override
@@ -132,12 +138,12 @@ public class ProgressCallback implements IProgressCallback {
 	{
 		switch ( type ) {
 		case 1: // Warning message
-			return updateUI(4, 0, text);
+			return updateUI(4, 0, text, null);
 		case 2: // Error message
-			return updateUI(5, 0, text);
+			return updateUI(5, 0, text, null);
 		default:
 		case 0: // Normal message
-			return updateUI(3, 0, text);
+			return updateUI(3, 0, text, null);
 		}
 	}
 	

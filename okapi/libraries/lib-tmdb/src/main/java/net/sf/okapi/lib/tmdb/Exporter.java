@@ -26,9 +26,7 @@ import java.util.List;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.filterwriter.TMXWriter;
-import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.Property;
-import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.lib.tmdb.DbUtil.PageMode;
 
@@ -105,7 +103,7 @@ public class Exporter implements Runnable {
 				writer.writeEndDocument();
 				writer.close();
 			}
-			callback.endProcess(count);
+			callback.endProcess(count, false);
 		}
 	}
 

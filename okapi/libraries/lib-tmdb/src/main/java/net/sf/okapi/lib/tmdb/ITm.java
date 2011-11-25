@@ -295,4 +295,12 @@ public interface ITm {
 	 */
 	public void renameField (String currentFullName,
 		String newFullName);
+	
+	
+	/**
+	 * Gets the total number of segments in this TM.
+	 * @return the total number of segments in this TM.
+	 */
+	public long getTotalSegmentCount ();
+	
 }

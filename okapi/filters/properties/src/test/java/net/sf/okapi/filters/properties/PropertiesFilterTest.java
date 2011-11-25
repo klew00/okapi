@@ -101,15 +101,14 @@ public class PropertiesFilterTest {
 		assertEquals("{1}Text1{2}", tu.getSource().toString());
 	}
 	
-	//@Test
-	// FIXME: how do you escape message format variables? 
-	// shouldn't this test pass 
+	@Test
 	public void testMessagePlaceholdersEscaped () {
-		String snippet = "Key1=\\{1\\}Text1\\{2\\}";
+		// Message with place holders. They are treated an inline code by default
+		String snippet = "Key1={1}Text1{2}";
 		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
 		assertNotNull(tu);
-		assertEquals(0, tu.getSource().getFirstContent().getCodes().size());
-		assertEquals("\\{1\\}Text1\\{2\\}", tu.getSource().toString());
+		assertEquals(2, tu.getSource().getFirstContent().getCodes().size());
+		assertEquals("{1}Text1{2}", tu.getSource().toString());
 	}
 
 	@Test

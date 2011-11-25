@@ -61,6 +61,8 @@ public class Parameters extends BaseParameters {
 		codeFinder.addRule("(\\\\r\\\\n)|\\\\a|\\\\b|\\\\f|\\\\n|\\\\r|\\\\t|\\\\v");
 		//TODO: Add Java-style variables. this is too basic
 		codeFinder.addRule("\\{\\d.*?\\}");
+		// Basic HTML/XML
+		codeFinder.addRule("\\<(/?)\\w+[^>]*?>");
 		
 		useKeyCondition = false;
 		extractOnlyMatchingKey = true;

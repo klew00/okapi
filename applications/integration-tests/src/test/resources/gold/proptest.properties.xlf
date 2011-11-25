@@ -122,8 +122,8 @@
 <note>_eskip</note>
 </trans-unit>
 <trans-unit id="29" resname="htmlText" xml:space="preserve">
-<source xml:lang="en">&lt;b>Bold text&lt;/> and some other text.</source>
-<target xml:lang="fr">&lt;b>Bold text&lt;/> and some other text.</target>
+<source xml:lang="en"><x id="1"/>Bold text&lt;/> and some other text.</source>
+<target xml:lang="fr"><x id="1"/>Bold text&lt;/> and some other text.</target>
 </trans-unit>
 <trans-unit id="30" resname="test200" xml:space="preserve">
 <source xml:lang="en">Ć=C-acute, À=A-grave, A=A, Љ=U+0409, ß=sharp-s, etc.</source>
@@ -169,8 +169,8 @@
 <note>Test with properties</note>
 </trans-unit>
 <trans-unit id="40" resname="KeyHTML" xml:space="preserve">
-<source xml:lang="en">Some HTML &lt;p>Text in HTML. With &lt;b>tags&lt;/tag>. And without.&lt;/p></source>
-<target xml:lang="fr">Some HTML &lt;p>Text in HTML. With &lt;b>tags&lt;/tag>. And without.&lt;/p></target>
+<source xml:lang="en">Some HTML <x id="1"/>Text in HTML. With <x id="2"/>tags<x id="3"/>. And without.<x id="4"/></source>
+<target xml:lang="fr">Some HTML <x id="1"/>Text in HTML. With <x id="2"/>tags<x id="3"/>. And without.<x id="4"/></target>
 </trans-unit>
 <trans-unit id="41" resname="Key1" xml:space="preserve">
 <source xml:lang="en">Text of key1 é=aacute; à=agrave</source>
