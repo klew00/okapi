@@ -89,6 +89,7 @@ public class MainForm {
 	private IHelp help;
 	
 	private MenuItem miFileOpen;
+	private MenuItem miEntriesNew;
 	private MenuItem miTMNew;
 	private MenuItem miTMClose;
 	private MenuItem miTMImport;
@@ -363,6 +364,8 @@ public class MainForm {
 	void updateCommands () {
 		boolean active = (repoPanel.isRepositoryOpen() && ( currentTP != null ) && !currentTP.hasRunningThread());
 		
+		miEntriesNew.setEnabled(active);
+		
 		miTMNew.setEnabled(repoPanel.isRepositoryOpen());
 		miTMClose.setEnabled(active);
 		miTMImport.setEnabled(active);
@@ -429,6 +432,21 @@ public class MainForm {
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				shell.close();
+            }
+		});
+		
+		//--- Entries menu
+		
+		topItem = new MenuItem(menuBar, SWT.CASCADE);
+		topItem.setText(rm.getCommandLabel("entries")); //$NON-NLS-1$
+		dropMenu = new Menu(shell, SWT.DROP_DOWN);
+		topItem.setMenu(dropMenu);
+		
+		miEntriesNew = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miEntriesNew, "entries.new"); //$NON-NLS-1$
+		miEntriesNew.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				currentTP.addNewEntry();
             }
 		});
 		

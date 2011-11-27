@@ -22,7 +22,9 @@ package net.sf.okapi.applications.olifant;
 
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 import net.sf.okapi.common.observer.IObservable;
 import net.sf.okapi.common.observer.IObserver;
@@ -467,6 +469,23 @@ class TmPanel extends Composite implements IObserver {
 	
 	boolean wasModified () {
 		return wasModified;
+	}
+	
+	void addNewEntry () {
+		try {
+			saveEntry();
+			Map<String, Object> emptyMap = Collections.emptyMap();
+			tm.startImport();
+			tm.addRecord(-1, emptyMap, emptyMap);
+			wasModified = true;
+			fillTable(3, -1);
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(getShell(), "Error while adding new entry.\n"+e.getMessage(), null);
+		}
+		finally {
+			tm.finishImport();
+		}
 	}
 	
 	/**

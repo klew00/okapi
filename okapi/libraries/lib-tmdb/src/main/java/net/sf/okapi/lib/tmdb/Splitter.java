@@ -64,6 +64,7 @@ public class Splitter implements Runnable {
 			tm = repo.openTm(tmName);
 			tm.setRecordFields(tm.getAvailableFields());
 			tm.setPageMode(PageMode.ITERATOR);
+			//tm.setPageSize(5);
 			
 			// Get the list of all initial locales
 			locales = tm.getLocales();

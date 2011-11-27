@@ -116,12 +116,14 @@ public interface ITm {
 	
 	/**
 	 * Adds a record to the repository.
+	 * <p>You must call {@link #startImport()} once before calling this method, and call {@link #finishImport()}
+	 * once all calls to this method are done for a given batch.
 	 * @param tuKey the key for the text unit this record belongs.
 	 * <b>You must use -1 when adding the first entry of this text unit</b> the call returns
 	 * the text unit key that you can use for the subsequent call to add other records to
 	 * that given text unit.
-	 * @param tuFields the list of the text unit level fields.
-	 * @param segFields the list of the segment level fields.
+	 * @param tuFields the list of the text unit level fields. This list can be empty.
+	 * @param segFields the list of the segment level fields. This list can be empty.
 	 * @return the key of text unit of the added record. 
 	 */
 	public long addRecord (long tuKey,

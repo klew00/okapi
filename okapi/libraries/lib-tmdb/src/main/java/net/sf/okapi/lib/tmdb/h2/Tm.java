@@ -379,7 +379,7 @@ public class Tm implements ITm {
 					}
 					
 					// If the field is to create type should be set because
-					// it was also a filed that wasn't in the fieldsToImport list
+					// it was also a field that wasn't in the fieldsToImport list
 					if ( hasFieldToCreate ) {
 						// Nothing to add, move on to the next field
 						fieldsToCreate.put(name, type);
@@ -412,7 +412,7 @@ public class Tm implements ITm {
 						}
 						count++;
 					}
-					tmp.append(", \""+DbUtil.TUREF_NAME+"\") VALUES (?"); // Always include TUREF at the end
+					tmp.append((first ? "" : ", ")+"\""+DbUtil.TUREF_NAME+"\") VALUES (?"); // Always include TUREF at the end
 					for ( int i=0; i<count; i++ ) {
 						tmp.append(", ?");
 					}
