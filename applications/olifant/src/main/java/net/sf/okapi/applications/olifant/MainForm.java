@@ -90,6 +90,7 @@ public class MainForm {
 	
 	private MenuItem miFileOpen;
 	private MenuItem miEntriesNew;
+	private MenuItem miEntriesDelete;
 	private MenuItem miTMNew;
 	private MenuItem miTMClose;
 	private MenuItem miTMImport;
@@ -365,6 +366,7 @@ public class MainForm {
 		boolean active = (repoPanel.isRepositoryOpen() && ( currentTP != null ) && !currentTP.hasRunningThread());
 		
 		miEntriesNew.setEnabled(active);
+		miEntriesDelete.setEnabled(active);
 		
 		miTMNew.setEnabled(repoPanel.isRepositoryOpen());
 		miTMClose.setEnabled(active);
@@ -447,6 +449,14 @@ public class MainForm {
 		miEntriesNew.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				currentTP.addNewEntry();
+            }
+		});
+		
+		miEntriesDelete = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miEntriesDelete, "entries.remove"); //$NON-NLS-1$
+		miEntriesDelete.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				currentTP.deleteEntries();
             }
 		});
 		

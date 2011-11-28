@@ -563,4 +563,65 @@ public class Repository implements IRepository {
 		return shared;
 	}
 
+	void deleteSegments (String tmName,
+		List<Long> segKeys)
+	{
+		if ( segKeys.isEmpty() ) return;
+		PreparedStatement pstm = null;
+		PreparedStatement pstm2 = null;
+		try {
+			// Gets the list of the TU involved
+			ArrayList<Long> tuKeys = new ArrayList<Long>();
+			pstm = conn.prepareStatement("SELECT \""+DbUtil.TUREF_NAME+"\" FROM \""+tmName+"_SEG\" WHERE \""+DbUtil.SEGKEY_NAME+"\"=?");
+			for ( long segKey : segKeys ) {
+				pstm.setLong(1, segKey);
+				ResultSet rs = pstm.executeQuery();
+				if ( rs.next() ) {
+					long tuRef = rs.getLong(1);
+					if ( !tuKeys.contains(tuRef) ) tuKeys.add(tuRef);
+				}
+			}
+			pstm.close();
+			
+			// Delete the segments
+			pstm = conn.prepareStatement("DELETE FROM \""+tmName+"_SEG\" WHERE \""+DbUtil.SEGKEY_NAME+"\"=?");
+			for ( long segKey : segKeys ) {
+				pstm.setLong(1, segKey);
+				pstm.executeUpdate();
+			}
+			pstm.close();
+			
+			// Delete any TU record that has no segments any more
+			pstm = conn.prepareStatement("SELECT COUNT(*) FROM \""+tmName+"_SEG\" WHERE \""+DbUtil.TUREF_NAME+"\"=?");
+			pstm2 = conn.prepareStatement("DELETE FROM \""+tmName+"_TU\" WHERE TUKEY=?");
+			for ( long tuKey : tuKeys ) {
+				pstm.setLong(1, tuKey);
+				ResultSet rs = pstm.executeQuery();
+				rs.next();
+				if ( rs.getLong(1) == 0 ) {
+					pstm2.setLong(1, tuKey);
+					pstm2.executeUpdate();
+				}
+			}
+		}
+		catch ( SQLException e ) {
+			throw new RuntimeException(e);
+		}
+		finally {
+			try {
+				if ( pstm != null ) {
+					pstm.close();
+					pstm = null;
+				}
+				if ( pstm2 != null ) {
+					pstm2.close();
+					pstm2 = null;
+				}
+			}
+			catch ( SQLException e ) {
+				throw new RuntimeException(e);
+			}
+		}
+	}
+	
 }

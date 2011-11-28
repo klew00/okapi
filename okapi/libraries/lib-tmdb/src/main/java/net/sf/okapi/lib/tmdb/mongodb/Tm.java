@@ -543,4 +543,20 @@ public class Tm implements ITm {
 		return store.getTotalSegmentCount(name);
 	}
 
+	@Override
+	public void deleteSegments (List<Long> segKeys) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("deleteSegments() not implemented yet");
+	}
+
+	@Override
+	public ResultSet refreshCurrentPage () {
+		long oldPage = currentPage;
+		needPagingRefresh = true;
+		checkPagingVariables();
+		if ( pageCount > oldPage ) currentPage = oldPage;
+		else if ( pageCount > 0 ) currentPage = pageCount-1; 
+		return getPage();
+	}
+
 }

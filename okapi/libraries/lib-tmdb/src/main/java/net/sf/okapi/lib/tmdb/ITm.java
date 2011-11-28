@@ -142,6 +142,14 @@ public interface ITm {
 	public void updateRecord (long segKey,
 		Map<String, Object> tuFields,
 		Map<String, Object> segFields);
+	
+	/**
+	 * Removes permanently a list of given segments from the database.
+	 * If after this deletion, the TU-level entries that have no more attached segment 
+	 * it are deleted automatically too.
+	 * @param segKeys the keys of the segments to remove.
+	 */
+	public void deleteSegments (List<Long> segKeys);
 
 	/**
 	 * Sets the number of records a call to a paging method should return.
@@ -185,6 +193,12 @@ public interface ITm {
 	 * See {@link #setPageMode(int)} for details.
 	 */
 	public PageMode getPageMode ();
+	
+	/**
+	 * Gets the records for the current page.
+	 * @return the results for the current page, or null if there is no current page.
+	 */
+	public ResultSet refreshCurrentPage ();
 	
 	/**
 	 * Moves the page cursor before the first page.

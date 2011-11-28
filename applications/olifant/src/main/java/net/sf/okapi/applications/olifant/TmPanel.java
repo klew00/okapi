@@ -354,7 +354,7 @@ class TmPanel extends Composite implements IObserver {
 		finally {
 			table.setRedraw(true);
 		}
-		fillTable(0, 0);
+		fillTable(0, 0, 0);
 	}
 	
 	@Override
@@ -427,7 +427,7 @@ class TmPanel extends Composite implements IObserver {
 
 		if ( direction > -1 ) {
 			saveEntry();
-			fillTable(direction, selection);
+			fillTable(direction, selection, selection);
 		}
 	}
 	
@@ -478,13 +478,34 @@ class TmPanel extends Composite implements IObserver {
 			tm.startImport();
 			tm.addRecord(-1, emptyMap, emptyMap);
 			wasModified = true;
-			fillTable(3, -1);
+			// Move to the last entry (the one we just created)
+			//TODO: adjust to go to proper entry when sort is working 
+			fillTable(3, -1, -1);
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(getShell(), "Error while adding new entry.\n"+e.getMessage(), null);
 		}
 		finally {
 			tm.finishImport();
+		}
+	}
+	
+	void deleteEntries () {
+		try {
+			int n = table.getSelectionIndex();
+			if ( n == -1 ) {
+				return; // Nothing to do
+			}
+			saveEntryAndModificationsIfNeeded();
+			ArrayList<Long> segKeys = new ArrayList<Long>();
+			for ( TableItem ti : table.getSelection() ) {
+				segKeys.add(Long.valueOf(ti.getText(0)));
+			}
+			tm.deleteSegments(segKeys);
+			fillTable(4, n, -1);
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(getShell(), "Error while deleting an entry.\n"+e.getMessage(), null);
 		}
 	}
 	
@@ -528,10 +549,12 @@ class TmPanel extends Composite implements IObserver {
 	/**
 	 * Fills the table with a new page
 	 * @param direction 0=from the top, 1=next, 2=previous, 3=last
-	 * @param selection 0=top, -1=last
+	 * @param selection 0=top, -1=last, n=another row
+	 * @param fallbackSelection 0=top,  -1=end
 	 */
 	void fillTable (int direction,
-		int selection)
+		int selection,
+		int fallbackSelection)
 	{
 		try {
 			saveModificationsIfNeeded();
@@ -549,9 +572,17 @@ class TmPanel extends Composite implements IObserver {
 			case 3:
 				rs = tm.getLastPage();
 				break;
+			case 4:
+				rs = tm.refreshCurrentPage();
+				break;
 			}
 			if ( rs == null ) {
 				// No move of the page, leave things as they are
+				// (except if we refresh)
+				if ( direction == 4 ) {
+					table.removeAll();
+					currentEntry = -1;
+				}
 				return;
 			}
 			
@@ -569,8 +600,16 @@ class TmPanel extends Composite implements IObserver {
 				}
 			}
 			if ( table.getItemCount() > 0 ) {
-				if ( selection == -1 ) table.setSelection(table.getItemCount()-1);
-				else table.setSelection(0);
+				if ( selection == -1 ) {
+					table.setSelection(table.getItemCount()-1);
+				}
+				else if ( table.getItemCount() > selection ) {
+					table.setSelection(selection);
+				}
+				else {
+					if ( fallbackSelection == -1 ) table.setSelection(table.getItemCount()-1);
+					else table.setSelection(0);
+				}
 				updateCurrentEntry();
 				statusBar.setPage(tm.getCurrentPage(), tm.getPageCount());
 			}

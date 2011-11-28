@@ -466,6 +466,16 @@ public class Tm implements ITm {
 		return store.getTmLocales(name);
 	}
 
+	@Override	
+	public ResultSet refreshCurrentPage () {
+		long oldPage = currentPage;
+		needPagingRefresh = true;
+		checkPagingVariables();
+		if ( pageCount > oldPage ) currentPage = oldPage;
+		else if ( pageCount > 0 ) currentPage = pageCount-1; 
+		return getPage(getFirstKeySegValueForPage(currentPage));
+	}
+	
 	@Override
 	public ResultSet getFirstPage () {
 		checkPagingVariables();
@@ -935,6 +945,11 @@ public class Tm implements ITm {
 	@Override
 	public long getTotalSegmentCount () {
 		return store.getTotalSegmentCount(name);
+	}
+
+	@Override
+	public void deleteSegments (List<Long> segKeys) {
+		store.deleteSegments(name, segKeys);
 	}
 
 }
