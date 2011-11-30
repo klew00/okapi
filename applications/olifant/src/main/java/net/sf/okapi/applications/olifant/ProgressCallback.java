@@ -94,13 +94,13 @@ public class ProgressCallback implements IProgressCallback {
 					isCanceled = logPanel.setInfo(String.valueOf(count));
 					break;
 				case 3: // Normal message
-					isCanceled = logPanel.log(text);
+					isCanceled = logPanel.log(IProgressCallback.MSGTYPE_INFO, text);
 					break;
 				case 4: // Warning message
-					isCanceled = logPanel.log("WARNING: "+text);
+					isCanceled = logPanel.log(IProgressCallback.MSGTYPE_WARNING, "WARNING: "+text);
 					break;
 				case 5: // Error message
-					isCanceled = logPanel.log("ERROR: "+text);
+					isCanceled = logPanel.log(IProgressCallback.MSGTYPE_ERROR, "ERROR: "+text);
 					break;
 				case 6: // Done
 					if ( count > -1 ) {
@@ -137,12 +137,12 @@ public class ProgressCallback implements IProgressCallback {
 		String text)
 	{
 		switch ( type ) {
-		case 1: // Warning message
+		case IProgressCallback.MSGTYPE_WARNING:
 			return updateUI(4, 0, text, null);
-		case 2: // Error message
+		case IProgressCallback.MSGTYPE_ERROR:
 			return updateUI(5, 0, text, null);
 		default:
-		case 0: // Normal message
+		case IProgressCallback.MSGTYPE_INFO:
 			return updateUI(3, 0, text, null);
 		}
 	}

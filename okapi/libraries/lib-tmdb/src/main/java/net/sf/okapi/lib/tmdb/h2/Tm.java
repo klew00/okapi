@@ -375,7 +375,9 @@ public class Tm implements ITm {
 							else fieldsToImport.put(name, false);
 							hasNewFieldToImport = true;
 						}
-						else throw new RuntimeException("Invalid field type to add.");
+						else {
+							throw new RuntimeException("Invalid field type to add.");
+						}
 					}
 					
 					// If the field is to create type should be set because
@@ -517,7 +519,8 @@ public class Tm implements ITm {
 		else {
 			if ( pageMode == PageMode.EDITOR ) {
 				pageCount = (totalRows-1) / (limit-1); // -1 for overlap
-				if ( (totalRows-1) % (limit-1) > 0 ) pageCount++; // Last page
+				if ( totalRows == 1 ) pageCount++;
+				else if ( (totalRows-1) % (limit-1) > 0 ) pageCount++; // Last page
 			}
 			else {
 				pageCount = totalRows / limit; // -1 for overlap

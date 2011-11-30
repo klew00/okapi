@@ -21,6 +21,8 @@
 package net.sf.okapi.lib.tmdb;
 
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import net.sf.okapi.lib.tmdb.IProgressCallback;
@@ -71,6 +73,8 @@ public class Splitter implements Runnable {
 			
 			long currentCount = -1;
 			int tmCount = 0;
+			long prevTuKey = -1;
+			long outTuKey = -1;
 			
 			ResultSet rs = tm.getFirstPage();
 			while  (( rs != null ) && !canceled ) {
@@ -80,13 +84,38 @@ public class Splitter implements Runnable {
 					
 					// Do we need to start a new TM for this entry?
 					if (( currentCount == 0 ) || ( currentCount > options.getEntriesPerPart() )) {
+						if ( outTm != null ) outTm.finishImport();
 						outTm = createNewTm(++tmCount);
+						outTm.startImport();
 						currentCount = 1;
+						prevTuKey = -1;
 					}
 					
 					// Add the entry to the output TM
-//TODO					
-					//outTm.addRecord(tuKey, tuFields, segFields)
+					long tuKey = rs.getLong(DbUtil.TUREF_NAME);
+					if ( tuKey != prevTuKey ) outTuKey = -1;
+					
+					LinkedHashMap<String, Object> tuFields = new LinkedHashMap<String, Object>();
+					LinkedHashMap<String, Object> segFields = new LinkedHashMap<String, Object>();
+					ResultSetMetaData rsMetaData = rs.getMetaData();
+				    int colCount = rsMetaData.getColumnCount();
+				    for ( int i=1; i<=colCount; i++ ) { // 1-based index
+				    	String fn = rsMetaData.getColumnName(i);
+				    	if ( fn.equals(DbUtil.SEGKEY_NAME) || fn.equals(DbUtil.TUREF_NAME) ) {
+				    		continue; // Auto-generated
+				    	}
+				    	Object value = rs.getObject(fn);
+				    	if ( value == null ) {
+				    		if ( fn.equals(DbUtil.FLAG_NAME) ) value = false;
+				    		else { // Skip other null values 
+				    			continue;
+				    		}
+				    	}
+				    	if ( DbUtil.isSegmentField(fn) ) segFields.put(fn, value);
+				    	else tuFields.put(fn, value);
+				    }
+					
+					outTuKey = outTm.addRecord(outTuKey, tuFields, segFields);
 
 					// Update UI from time to time
 					if ( (totalCount % 652) == 0 ) {
@@ -106,9 +135,10 @@ public class Splitter implements Runnable {
 			
 		}
 		catch ( Throwable e ) {
-			callback.logMessage(3, e.getMessage());
+			callback.logMessage(IProgressCallback.MSGTYPE_ERROR, e.getMessage());
 		}
 		finally {
+			if ( outTm != null ) outTm.finishImport();
 			callback.endProcess(totalCount, true);
 		}
 	}

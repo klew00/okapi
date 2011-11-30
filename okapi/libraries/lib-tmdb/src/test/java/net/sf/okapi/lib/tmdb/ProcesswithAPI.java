@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -245,6 +246,19 @@ public class ProcesswithAPI {
 		rs = tm.getPreviousPage();
 		assertNull(rs);
 
+		// Test with one entry
+		ArrayList<Long> segKeys = new ArrayList<Long>();
+		segKeys.add(1L); segKeys.add(2L); segKeys.add(3L);
+		tm.deleteSegments(segKeys);
+		assertEquals(1, tm.getTotalSegmentCount());
+		
+		tm.setPageMode(PageMode.EDITOR);
+		tm.setPageSize(5);
+		rs = tm.getLastPage();
+		assertNotNull(rs);
+		assertTrue(rs.next());
+		assertEquals("Text EN 4", rs.getString(3));
+		
 		
 		//==== Check the locales
 		

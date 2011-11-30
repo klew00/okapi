@@ -20,6 +20,8 @@
 
 package net.sf.okapi.applications.olifant;
 
+import net.sf.okapi.lib.tmdb.IProgressCallback;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -38,6 +40,8 @@ class LogPanel extends Composite {
 	private long startTime;
 	private boolean inProgress;
 	private boolean isCanceled;
+	private long errors;
+	private long warnings;
 	
 	LogPanel (Composite p_Parent,
 		int p_nFlags)
@@ -77,11 +81,14 @@ class LogPanel extends Composite {
 		return isCanceled;
 	}
 	
-	public boolean log (String text) {
-		if ( text == null ) {
-			return isCanceled;
+	public boolean log (int type,
+		String text)
+	{
+		if ( text != null ) {
+			edLog.append(text+"\n");
+			if ( type == IProgressCallback.MSGTYPE_WARNING ) warnings++;
+			else if ( type == IProgressCallback.MSGTYPE_ERROR ) errors++;
 		}
-		edLog.append(text+"\n");
 		return isCanceled;
 	}
 	
@@ -90,14 +97,17 @@ class LogPanel extends Composite {
 		inProgress = true;
 		startTime = System.currentTimeMillis();
 		edLog.setText(""); // Clear all
-		log(text);
+		log(IProgressCallback.MSGTYPE_INFO, text);
 		button.setEnabled(true);
+		warnings = errors = 0;
 	}
 	
 	public void endTask (String text) {
 		setInfo("");
-		log(text);
-		log("Duration: "+toHMSMS(System.currentTimeMillis()-startTime));
+		log(IProgressCallback.MSGTYPE_INFO, text);
+		log(IProgressCallback.MSGTYPE_INFO,
+			String.format("Duration: %s. Errors=%d Warnings=%d.",
+				toHMSMS(System.currentTimeMillis()-startTime), errors, warnings));
 		isCanceled = false;
 		inProgress = false;
 		button.setEnabled(false);

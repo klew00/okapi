@@ -133,6 +133,9 @@ public class MainForm {
 			}
 
 			createContent();
+			if ( args.length > 0 ) {
+				openFile(args);
+			}
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, e.getMessage(), null);
@@ -389,7 +392,7 @@ public class MainForm {
 	
 	TmPanel addTmTabEmpty (ITm tm) {
 		if ( tm == null ) return null;
-		TmPanel tp = new TmPanel(this, tabs, SWT.NONE, tm, statusBar);
+		TmPanel tp = new TmPanel(this, tabs, SWT.NONE, tm, statusBar, rm);
 		CTabItem ti = new CTabItem(tabs, SWT.NONE);
 		ti.setText(tm.getName());
 		ti.setControl(tp);
@@ -423,7 +426,7 @@ public class MainForm {
 		rm.setCommand(miFileOpen, "file.open"); //$NON-NLS-1$
 		miFileOpen.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				openFile();
+				openFile(null);
             }
 		});
 		
@@ -738,9 +741,11 @@ public class MainForm {
 		}
 	}
 	
-	private void openFile () {
+	private void openFile (String[] paths) {
 		try {
-			String[] paths = Dialogs.browseFilenames(shell, "Open Files", true, null, null, null);
+			if ( paths == null ) {
+				paths = Dialogs.browseFilenames(shell, "Open Files", true, null, null, null);
+			}
 			if ( paths == null ) return;
 			boolean acceptAll = false;
 			for ( String path : paths ) {

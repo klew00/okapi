@@ -567,6 +567,7 @@ public class Repository implements IRepository {
 		List<Long> segKeys)
 	{
 		if ( segKeys.isEmpty() ) return;
+		
 		PreparedStatement pstm = null;
 		PreparedStatement pstm2 = null;
 		try {

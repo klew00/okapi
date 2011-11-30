@@ -29,6 +29,7 @@ import java.util.Map;
 import net.sf.okapi.common.observer.IObservable;
 import net.sf.okapi.common.observer.IObserver;
 import net.sf.okapi.common.ui.Dialogs;
+import net.sf.okapi.common.ui.ResourceManager;
 import net.sf.okapi.lib.tmdb.DbUtil;
 import net.sf.okapi.lib.tmdb.ITm;
 
@@ -45,6 +46,10 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -74,11 +79,15 @@ class TmPanel extends Composite implements IObserver {
 	private int trgCol; // Column in the table that holds the target text, use -1 for none, 0-based, 1=SegKey+Flag
 	private TMOptions opt;
 
+	private MenuItem miCtxAddEntry;
+	private MenuItem miCtxDeleteEntries;
+
 	public TmPanel (MainForm mainForm,
 		Composite parent,
 		int flags,
 		ITm tm,
-		StatusBar statusBar)
+		StatusBar statusBar,
+		ResourceManager rm)
 	{
 		super(parent, flags);
 		this.mainForm = mainForm;
@@ -171,6 +180,44 @@ class TmPanel extends Composite implements IObserver {
 		logPanel = new LogPanel(sashMain, 0);
 		
 		sashMain.setWeights(new int[]{3, 7, 2});
+		
+		createContextMenu(rm);
+	}
+	
+	private void createContextMenu (ResourceManager rm) {
+		// Context menu for the list
+		Menu contextMenu = new Menu(getShell(), SWT.POP_UP);
+		
+		miCtxAddEntry = new MenuItem(contextMenu, SWT.PUSH);
+		rm.setCommand(miCtxAddEntry, "entries.new"); //$NON-NLS-1$
+		miCtxAddEntry.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				addNewEntry();
+            }
+		});
+		
+		miCtxDeleteEntries = new MenuItem(contextMenu, SWT.PUSH);
+		rm.setCommand(miCtxDeleteEntries, "entries.remove"); //$NON-NLS-1$
+		miCtxDeleteEntries.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				deleteEntries();
+			}
+		});
+		
+		contextMenu.addListener (SWT.Show, new Listener () {
+			public void handleEvent (Event event) {
+				boolean enabled = false;
+				int n = table.getSelectionIndex();
+				if ( n > -1 ) {
+					if ( !hasRunningThread() ) {
+						enabled = true;
+					}
+				}
+				miCtxAddEntry.setEnabled(!hasRunningThread());
+				miCtxDeleteEntries.setEnabled(enabled);
+			}
+		});
+		table.setMenu(contextMenu);
 	}
 
 	ITm getTm () {
@@ -481,6 +528,7 @@ class TmPanel extends Composite implements IObserver {
 			// Move to the last entry (the one we just created)
 			//TODO: adjust to go to proper entry when sort is working 
 			fillTable(3, -1, -1);
+			//TODO: Move focus in source edit box
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(getShell(), "Error while adding new entry.\n"+e.getMessage(), null);
@@ -550,7 +598,8 @@ class TmPanel extends Composite implements IObserver {
 	 * Fills the table with a new page
 	 * @param direction 0=from the top, 1=next, 2=previous, 3=last
 	 * @param selection 0=top, -1=last, n=another row
-	 * @param fallbackSelection 0=top,  -1=end
+	 * @param fallbackSelection 0=top, -1=end. Selection to use if the given selection is
+	 * not possible (e.g. when the page has less entries)
 	 */
 	void fillTable (int direction,
 		int selection,
@@ -582,6 +631,8 @@ class TmPanel extends Composite implements IObserver {
 				if ( direction == 4 ) {
 					table.removeAll();
 					currentEntry = -1;
+					updateCurrentEntry();
+					statusBar.setPage(tm.getCurrentPage(), tm.getPageCount());
 				}
 				return;
 			}

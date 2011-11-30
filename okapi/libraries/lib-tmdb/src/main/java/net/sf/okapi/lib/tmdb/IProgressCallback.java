@@ -24,6 +24,10 @@ import net.sf.okapi.common.observer.IObservable;
 
 public interface IProgressCallback extends IObservable {
 
+	public static final int MSGTYPE_WARNING = 1;
+	public static final int MSGTYPE_ERROR = 2;
+	public static final int MSGTYPE_INFO = 3;
+	
 	public void startProcess (String text);
 	
 	/**

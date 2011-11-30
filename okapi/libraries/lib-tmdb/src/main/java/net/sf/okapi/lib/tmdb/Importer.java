@@ -141,8 +141,7 @@ public class Importer implements Runnable {
 			}
 		}
 		catch ( Throwable e ) {
-			//updateUI(count, 3, e.getMessage());
-			callback.logMessage(3, e.getMessage());
+			callback.logMessage(IProgressCallback.MSGTYPE_ERROR, e.getMessage());
 		}
 		finally {
 			// Final update (includes notifying the observers that we are done)

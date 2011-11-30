@@ -96,7 +96,7 @@ public class Exporter implements Runnable {
 			}
 		}
 		catch ( Throwable e ) {
-			callback.logMessage(3, e.getMessage());
+			callback.logMessage(IProgressCallback.MSGTYPE_ERROR, e.getMessage());
 		}
 		finally {
 			if ( writer != null ) {
