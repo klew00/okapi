@@ -495,7 +495,12 @@ public class XLIFFWriter implements IFilterWriter {
 			writer.writeString(tu.getProperty(Property.NOTE).getValue());
 			writer.writeEndElementLineBreak(); // note
 		}
-
+		if ( tu.hasProperty(Property.TRANSNOTE) ) {
+			writer.writeStartElement("note");
+			writer.writeAttributeString("from", "translator");
+			writer.writeString(tu.getProperty(Property.TRANSNOTE).getValue());
+			writer.writeEndElementLineBreak(); // note
+		}
 		writer.writeEndElementLineBreak(); // trans-unit
 	}
 

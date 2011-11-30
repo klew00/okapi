@@ -35,6 +35,7 @@ public class Property {
 	public static final String LANGUAGE = "language";
 	public static final String APPROVED = "approved"; 
 	public static final String NOTE = "note"; 
+	public static final String TRANSNOTE = "transNote"; 
 	public static final String COORDINATES = "coordinates"; 
 	
 	private final String name;

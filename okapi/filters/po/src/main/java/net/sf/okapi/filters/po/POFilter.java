@@ -72,7 +72,6 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
 public class POFilter implements IFilter {
 
 	public static final String PROPERTY_PLURALFORMS = "pluralforms";
-	public static final String PROPERTY_TRANSNOTE = "transnote";
 	public static final String PROPERTY_REFERENCES = "references";
 	public static final String PROPERTY_CONTEXT = "context";
 	
@@ -618,7 +617,7 @@ public class POFilter implements IFilter {
 			tu.setProperty(new Property(Property.NOTE, locNote));
 		}
 		if ( transNote.length() > 0 ) {
-			tu.setProperty(new Property(PROPERTY_TRANSNOTE, transNote));
+			tu.setProperty(new Property(Property.TRANSNOTE, transNote));
 		}
 		if ( references.length() > 0 ) {
 			tu.setProperty(new Property(PROPERTY_REFERENCES, references));

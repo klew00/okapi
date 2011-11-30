@@ -417,8 +417,8 @@ public class POFilterTest {
 		assertEquals("Reference", prop.getValue());
 		assertTrue(prop.isReadOnly());
 
-		assertTrue(tu.hasProperty(POFilter.PROPERTY_TRANSNOTE));
-		prop = tu.getProperty(POFilter.PROPERTY_TRANSNOTE);
+		assertTrue(tu.hasProperty(Property.TRANSNOTE));
+		prop = tu.getProperty(Property.TRANSNOTE);
 		assertEquals("Translator note", prop.getValue());
 		assertTrue(prop.isReadOnly());
 

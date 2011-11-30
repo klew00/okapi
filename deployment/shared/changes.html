@@ -56,7 +56,7 @@ distribution.</p>
 	<li>IDML Filter:<ul>
 	<li>Fixed issue of not merging last cell of a table that is the last element 
 	of a story.</li>
-	<li>Fixed TextPath-attached stories not being extracted This fixes issue 
+	<li>Fixed TextPath-attached stories not being extracted. This fixes issue 
 	#194.</li>
 </ul>
 	</li>
@@ -82,6 +82,11 @@ distribution.</p>
 	<li>Added inline code support for HTML tags in default</li>
 </ul>
 	</li>
+	<li>PO Filter:<ul>
+	<li>The translator&#39;s comments are now extracted into the common <i>transNote</i> 
+	read-only property.</li>
+</ul>
+	</li>
 	<li>XML Filter:<ul>
 		<li>Fixed issue of missing start tag in case of non-translatable inline with 
 	no translatable text before.</li>
@@ -100,6 +105,8 @@ distribution.</p>
 	<li>Deprecated Google MT v1 connector.</li>
 	<li>Fixed icon and cancel command in Filter Configuration common dialog.</li>
 	<li>Improved cloning of skeleton parts.</li>
+	<li>The XLIFFWriter output the common <i>transNote</i> property as a <code>
+	&lt;note from=&quot;translator&quot;&gt;</code>. This fixes issue #195.</li>
 </ul>
 	</li>
 </ul>
