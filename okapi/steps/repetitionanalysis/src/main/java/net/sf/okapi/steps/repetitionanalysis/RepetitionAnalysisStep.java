@@ -84,7 +84,7 @@ public class RepetitionAnalysisStep extends BasePipelineStep {
 	public String getDescription() {
 		return "Analyzes repetitions in input documents. Adds AltTranslationsAnnotation and RepetitiveSegmentAnnotation to " +
 				"a repetitive segment."
-		+ " Expects: raw document. Sends back: raw document.";
+		+ " Expects: filter events. Sends back: filter events.";
 	}
 	
 	@Override

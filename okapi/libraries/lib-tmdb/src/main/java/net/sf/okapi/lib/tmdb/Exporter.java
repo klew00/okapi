@@ -107,7 +107,8 @@ public class Exporter implements Runnable {
 		}
 	}
 
-	private TextUnit toTextUnit (ResultSet rs, LocaleId srcLoc)
+	private TextUnit toTextUnit (ResultSet rs,
+		LocaleId srcLoc)
 		throws SQLException 
 	{
 		TextUnit tu = new TextUnit(rs.getString(DbUtil.SEGKEY_NAME));

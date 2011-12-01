@@ -22,6 +22,7 @@ package net.sf.okapi.applications.olifant;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -49,10 +50,14 @@ class ToolBarWrapper {
 		final Label stSource = new Label(comp, SWT.NONE);
 		stSource.setText("Source:");
 		cbSource = new Combo(comp, SWT.READ_ONLY | SWT.BORDER);
+		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		cbSource.setLayoutData(gdTmp);
 
 		final Label stTarget = new Label(comp, SWT.NONE);
 		stTarget.setText("Target:");
 		cbTarget = new Combo(comp, SWT.READ_ONLY | SWT.BORDER);
+		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
+		cbTarget.setLayoutData(gdTmp);
 
 		CoolItem ci = new CoolItem(coolBar, SWT.NONE);
 

@@ -33,10 +33,13 @@ import org.eclipse.swt.widgets.Composite;
 
 class SegmentEditor {
 
-	private static final Pattern CODES = Pattern.compile("\\<[/be]?(\\d+?)/?\\>");
+	private static final Pattern CLEANCODES = Pattern.compile("\\<[/be]?(\\d+?)/?\\>");
+	private static final Pattern REALCODES = Pattern.compile("\\<[/be]?(\\d+?)/?\\>"); //TODO
 
 	private StyledText edit;
 	private boolean modified;
+	private boolean fullCodesMode = false;
+	private Pattern currentCodes;
 	
 	public SegmentEditor (Composite parent,
 		int flags)
@@ -48,12 +51,14 @@ class SegmentEditor {
 		GridData gdTmp = new GridData(GridData.FILL_BOTH);
 		edit.setLayoutData(gdTmp);
 		
+		currentCodes = CLEANCODES;
+		
 		edit.addExtendedModifyListener(new ExtendedModifyListener() {
 			@Override
 			public void modifyText(ExtendedModifyEvent event) {
 				String text = edit.getText();
 		    	  java.util.List<StyleRange> ranges = new java.util.ArrayList<StyleRange>();
-		    	  Matcher m = CODES.matcher(text);
+		    	  Matcher m = currentCodes.matcher(text);
 		    	  while ( m.find() ) {
 		    		  ranges.add(new StyleRange(m.start(), m.end()-m.start(),
 		    			  edit.getDisplay().getSystemColor(SWT.COLOR_GRAY),

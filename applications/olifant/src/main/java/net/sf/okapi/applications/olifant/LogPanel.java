@@ -35,7 +35,8 @@ import org.eclipse.swt.widgets.Text;
 class LogPanel extends Composite {
 
 	private Text edLog;
-	private Button button;
+	private Button btCancel;
+	private Button btClear;
 	private CLabel info;
 	private long startTime;
 	private boolean inProgress;
@@ -52,17 +53,25 @@ class LogPanel extends Composite {
 	}
 	
 	private void createContent () {
-		GridLayout layout = new GridLayout(2, false);
+		GridLayout layout = new GridLayout(3, false);
 		layout.marginHeight = 0;
 		layout.marginWidth = 0;
 		setLayout(layout);
 
-		button = new Button(this, SWT.PUSH);
-		button.setText("Cancel");
-		button.setEnabled(false);
-		button.addSelectionListener(new SelectionAdapter() {
+		btCancel = new Button(this, SWT.PUSH);
+		btCancel.setText("Cancel");
+		btCancel.setEnabled(false);
+		btCancel.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				isCanceled = true;
+            }
+		});
+		
+		btClear = new Button(this, SWT.PUSH);
+		btClear.setText("Clear");
+		btClear.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				edLog.setText("");
             }
 		});
 		
@@ -72,7 +81,7 @@ class LogPanel extends Composite {
 		
 		edLog = new Text(this, SWT.WRAP | SWT.V_SCROLL | SWT.BORDER);
 		gdTmp = new GridData(GridData.FILL_BOTH);
-		gdTmp.horizontalSpan = 2;
+		gdTmp.horizontalSpan = 3;
 		edLog.setLayoutData(gdTmp);
 	}
 
@@ -98,7 +107,7 @@ class LogPanel extends Composite {
 		startTime = System.currentTimeMillis();
 		edLog.setText(""); // Clear all
 		log(IProgressCallback.MSGTYPE_INFO, text);
-		button.setEnabled(true);
+		btCancel.setEnabled(true);
 		warnings = errors = 0;
 	}
 	
@@ -110,7 +119,7 @@ class LogPanel extends Composite {
 				toHMSMS(System.currentTimeMillis()-startTime), errors, warnings));
 		isCanceled = false;
 		inProgress = false;
-		button.setEnabled(false);
+		btCancel.setEnabled(false);
 	}
 	
 	public boolean inProgress () {
