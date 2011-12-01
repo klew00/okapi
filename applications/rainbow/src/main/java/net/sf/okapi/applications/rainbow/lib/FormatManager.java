@@ -83,6 +83,8 @@ public class FormatManager {
 		pairs.put(".rkm", "okf_rainbowkit");
 		pairs.put(".rkp", "okf_rainbowkit-package");
 		pairs.put(".txp", "okf_transifex");
+		pairs.put(".txml", "okf_txml");
+		pairs.put(".strings", "okf_regex-macStrings");
 	}
 	
 	/**

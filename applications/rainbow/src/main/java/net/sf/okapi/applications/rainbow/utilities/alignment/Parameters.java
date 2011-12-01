@@ -40,6 +40,7 @@ public class Parameters extends BaseParameters {
 	public String exclusion;
 	public boolean createTMXForUnknown;
 	public String tmxForUnknownPath;
+	public String mtKey;
 
 	public Parameters () {
 		reset();
@@ -62,6 +63,7 @@ public class Parameters extends BaseParameters {
 		attributes = "Txt::FileName=${filename}\nTxt::GroupName=${resname}";
 		useExclusion = false;
 		exclusion = "";
+		mtKey = "";
 	}
 
 	public void fromString (String data) {
@@ -83,6 +85,7 @@ public class Parameters extends BaseParameters {
 		exclusion = buffer.getString("exclusion", exclusion);
 		createTMXForUnknown = buffer.getBoolean("createTMXForUnknown", createTMXForUnknown);
 		tmxForUnknownPath = buffer.getString("tmxForUnknownPath", tmxForUnknownPath);
+		mtKey = buffer.getEncodedString("mtKey", mtKey);
 	}
 
 	public String toString () {
@@ -103,6 +106,7 @@ public class Parameters extends BaseParameters {
 		buffer.setString("exclusion", exclusion);
 		buffer.setBoolean("createTMXForUnknown", createTMXForUnknown);
 		buffer.setString("tmxForUnknownPath", tmxForUnknownPath);
+		buffer.setEncodedString("mtKey", mtKey);
 		return buffer.toString();
 	}
 }

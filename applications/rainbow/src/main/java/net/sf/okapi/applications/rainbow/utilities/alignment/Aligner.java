@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 
 import net.sf.okapi.common.IHelp;
 import net.sf.okapi.common.Range;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.query.IQuery;
@@ -41,7 +42,8 @@ import net.sf.okapi.common.ui.ClosePanel;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.lib.ui.segmentation.SRXEditor;
-import net.sf.okapi.connectors.google.GoogleMTConnector;
+import net.sf.okapi.connectors.google.GoogleMTv2Connector;
+import net.sf.okapi.connectors.google.GoogleMTv2Parameters;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
@@ -499,10 +501,6 @@ public class Aligner {
 		pnlActions.btClose.setText("Cancel");
 		shell.setDefaultButton(btAccept);
 		
-		// Query engine
-		mtQuery = new GoogleMTConnector();
-		mtQuery.open();
-
 		// Size and position of dialog
 		shell.pack();
 		shell.setMinimumSize(shell.getSize());
@@ -566,13 +564,24 @@ public class Aligner {
 		boolean checkSingleSegUnit,
 		boolean useAutoCorrection,
 		LocaleId sourceLanguage,
-		LocaleId targetLanguage)
+		LocaleId targetLanguage,
+		String mtKey)
 	{
 		this.srcLang = sourceLanguage;
 		this.trgLang = targetLanguage;
 		this.targetSrxPath = targetSrxPath;
 		chkCheckSingleSegUnit.setSelection(checkSingleSegUnit);
 		chkUseAutoCorrection.setSelection(useAutoCorrection);
+		
+		// Query engine
+		if ( mtQuery == null ) {
+			if ( !Util.isEmpty(mtKey) ) {
+				mtQuery = new GoogleMTv2Connector();
+				GoogleMTv2Parameters prm = new GoogleMTv2Parameters();
+				prm.setApiKey(mtKey);
+				mtQuery.open();
+			}
+		}
 	}
 	
 	private void gotoIssue () {
@@ -1262,31 +1271,36 @@ public class Aligner {
 
 	private void getGist (boolean targetToSource) {
 		try {
-			int n;
-			TextFragment oriFrag;
-			if ( targetToSource ) {
-				if ( (n = trgList.getSelectionIndex()) == -1 ) return;
-				mtQuery.setLanguages(trgLang, srcLang);
-				oriFrag = target.getSegments().get(n).text;
-			}
-			else {
-				if ( (n = srcList.getSelectionIndex()) == -1 ) return;
-				mtQuery.setLanguages(srcLang, trgLang);
-				oriFrag = source.getSegments().get(n).text;
-			}
-			
-			mtQuery.query(oriFrag);
 			String text;
-			if ( mtQuery.hasNext() ) {
-				text = "Original segment:\n" + oriFrag.toText()
-					+ "\n\nPossible translation:\n" + mtQuery.next().target.toText();
+			if ( mtQuery != null ) {
+				int n;
+				TextFragment oriFrag;
+				if ( targetToSource ) {
+					if ( (n = trgList.getSelectionIndex()) == -1 ) return;
+					mtQuery.setLanguages(trgLang, srcLang);
+					oriFrag = target.getSegments().get(n).text;
+				}
+				else {
+					if ( (n = srcList.getSelectionIndex()) == -1 ) return;
+					mtQuery.setLanguages(srcLang, trgLang);
+					oriFrag = source.getSegments().get(n).text;
+				}
+				
+				mtQuery.query(oriFrag);
+				if ( mtQuery.hasNext() ) {
+					text = "Original segment:\n" + oriFrag.toText()
+						+ "\n\nPossible translation:\n" + mtQuery.next().target.toText();
+				}
+				else {
+					text = "No translation found for the select segment.";
+				}
 			}
 			else {
-				text = "No translation found for the select segment.";
+				text = "No MT key has been specified. This function is disabled.";
 			}
 			MessageBox dlg = new MessageBox(shell, SWT.ICON_INFORMATION | SWT.OK);
 			dlg.setMessage(text);
-			dlg.setText("translation Query");
+			dlg.setText("Translation Query");
 			dlg.open();
 		}
 		catch ( Throwable e ) {

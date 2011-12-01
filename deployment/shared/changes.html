@@ -29,13 +29,19 @@ distribution.</p>
 	This fixes issue #189.</li>
 </ul>
 	</li>
-	<li>Added initial ALPHA version of Olifant. For early tests only.</li>
+	<li>Rainbow:<ul>
+	<li>Update the ID-Based Alignment utility to use the GT v2 API for the MT 
+	services instead of v1.</li>
+</ul>
+	</li>
 	<li>Filters Plugin for OmegaT:<ul>
 	<li>Changed the TTX filter implementation back to a single option: the mode 
 	0 that auto-detect segments.</li>
 </ul>
 	<ul>
 		<li>Fixed code re-construction issues for some cases.</li>
+		<li>Improved backward compatibility, and implemented support for 
+		alternate translation of repeated source segments for OmeagT 2.5.</li>
 	</ul>
 	</li>
 	<li>Steps:<ul>
@@ -46,11 +52,6 @@ distribution.</p>
 </ul>
 	</li>
 </ul>
-	</li>
-	<li>Filters Plugin for OmegaT:<ul>
-		<li>Improved backward compatibility, and implemented support for 
-		alternate translation of repeated source segments for OmeagT 2.5.</li>
-	</ul>
 	</li>
 	<li>Filters:<ul>
 	<li>IDML Filter:<ul>
@@ -85,6 +86,10 @@ distribution.</p>
 	<li>PO Filter:<ul>
 	<li>The translator&#39;s comments are now extracted into the common <i>transNote</i> 
 	read-only property.</li>
+</ul>
+	</li>
+	<li>Regex Filter:<ul>
+	<li>Added a pre-defined configuration for apple iOS .strings files.</li>
 </ul>
 	</li>
 	<li>XML Filter:<ul>

@@ -134,6 +134,12 @@ public class RegexFilter implements IFilter {
 			"Text (Block=Paragraph)",
 			"Configuration for text files where text units are separated by 2 or more line-breaks.",
 			"textBlock.fprm"));
+		list.add(new FilterConfiguration(getName()+"-macStrings",
+			MIMETYPE,
+			getClass().getName(),
+			"Text (Mac Strings)",
+			"Configuration for Macintosh .strings files.",
+			"macStrings.fprm"));
 		return list;
 	}
 

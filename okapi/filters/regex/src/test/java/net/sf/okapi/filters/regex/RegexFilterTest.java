@@ -90,7 +90,7 @@ public class RegexFilterTest {
 	public void testConfigurations () {
 		List<FilterConfiguration> list = filter.getConfigurations();
 		assertNotNull(list);
-		assertEquals(4, list.size());
+		assertEquals(5, list.size());
 		IParameters params = filter.getParameters();
 		assertNotNull(params);
 		for ( FilterConfiguration config : list ) {

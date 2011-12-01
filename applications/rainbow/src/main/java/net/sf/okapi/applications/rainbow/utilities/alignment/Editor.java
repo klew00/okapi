@@ -41,6 +41,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
@@ -72,6 +73,7 @@ public class Editor implements IParametersEditor {
 	private boolean inInit = true;
 	private IHelp help;
 	private String projectDir;
+	private Text edMTKey;
 
 	public boolean edit (IParameters p_Options,
 		boolean readOnly,
@@ -143,8 +145,15 @@ public class Editor implements IParametersEditor {
 			"Verify in-line codes for text units with a single segment", -1, 2);
 		chkUseAutoCorrection = UIUtil.createGridButton(grpTmp, SWT.CHECK,
 			"Use auto-correction automatically", -1, 2);
-
-		//--- TM tab
+		
+		Label stMT = new Label(grpTmp, SWT.NONE);
+		stMT.setText("API key for Google MT (leave empty to not use):");
+		
+		edMTKey = new Text(grpTmp, SWT.BORDER);
+		edMTKey.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		edMTKey.setEchoChar('*');
+		
+		//--- Output tab
 		
 		cmpTmp = new Composite(tfTmp, SWT.NONE);
 		cmpTmp.setLayout(new GridLayout());
@@ -350,6 +359,8 @@ public class Editor implements IParametersEditor {
 		ConfigurationString tmp = new ConfigurationString(params.attributes);
 		edAttributes.setText(tmp.toString());
 		edAttributes.setEnabled(chkCreateAttributes.getSelection());
+		
+		edMTKey.setText(params.mtKey);
 	}
 
 	private void updateTMXOptions () {
@@ -449,6 +460,8 @@ public class Editor implements IParametersEditor {
 			ConfigurationString tmp = new ConfigurationString(edAttributes.getText());
 			params.attributes = tmp.toString();
 		}
+		
+		params.mtKey = edMTKey.getText().trim();
 
 		return true;
 	}

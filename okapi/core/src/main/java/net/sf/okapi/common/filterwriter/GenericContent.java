@@ -316,7 +316,7 @@ public class GenericContent {
 	/**
 	 * Creates a new fragment from a numeric-codes text and corresponding codes.
 	 * <p>A numeric-coded text is like "&lt;1>text&lt;2/>&lt;/1>&lt;b3/>".
-	 * @param text the text to convert.
+	 * @param genericText the text to convert.
 	 * @param codes the codes to use with the coded text.
 	 * @param allowCodeDeletion true to allow the deletion of some codes.
 	 * @return the new fragment created from the text.
@@ -570,7 +570,7 @@ public class GenericContent {
 
 	/**
 	 * Converts a text fragment into a letter-coded text.
-	 * Use {@link #fromLetterCodedToFragment(String, TextFragment)} to convert back to a fragment.
+	 * Use {@link #fromLetterCodedToFragment(String, TextFragment, boolean)} to convert back to a fragment.
 	 * @param fragment the fragment to convert.
 	 * @return the resulting letter-coded text. 
 	 */
