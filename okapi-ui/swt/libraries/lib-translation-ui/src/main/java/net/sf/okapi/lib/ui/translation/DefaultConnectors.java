@@ -39,11 +39,12 @@ public class DefaultConnectors implements IConnectorList {
 		trc.connectorClass = "net.sf.okapi.connectors.globalsight.GlobalSightTMConnector";
 		trc.descriptionProviderClass = "net.sf.okapi.connectors.globalsight.Parameters";
 		list.add(trc);
-		
-		trc = new ConnectorInfo();
-		trc.description = "Google Translate Services (v1, free, deprecated)";
-		trc.connectorClass = "net.sf.okapi.connectors.google.GoogleMTConnector";
-		list.add(trc);
+
+// This service has been discontinued on December-1-2011
+//		trc = new ConnectorInfo();
+//		trc.description = "Google Translate Services (v1, free, deprecated)";
+//		trc.connectorClass = "net.sf.okapi.connectors.google.GoogleMTConnector";
+//		list.add(trc);
 		
 		trc = new ConnectorInfo();
 		trc.description = "Google Translate Services (v2, paid service)";

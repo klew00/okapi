@@ -6,7 +6,7 @@ import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.common.query.IQuery;
 import net.sf.okapi.connectors.apertium.ApertiumMTConnector;
 import net.sf.okapi.connectors.crosslanguage.CrossLanguageMTConnector;
-import net.sf.okapi.connectors.google.GoogleMTConnector;
+import net.sf.okapi.connectors.google.GoogleMTv2Connector;
 import net.sf.okapi.connectors.globalsight.GlobalSightTMConnector;
 import net.sf.okapi.connectors.mymemory.MyMemoryTMConnector;
 import net.sf.okapi.connectors.opentran.OpenTranTMConnector;
@@ -46,7 +46,7 @@ public class SelectionForm {
 		lbResources.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 		//TODO: get list and attached data from plugin system
-		lbResources.add("Google MT (Internet)");
+		lbResources.add("Google MT v2 (Internet)");
 		lbResources.add("SimpleTM local translation memory file");
 		lbResources.add("Open-Tran translation search server (Internet)");
 		lbResources.add("GlobalSight TM Web service");
@@ -70,7 +70,7 @@ public class SelectionForm {
 					int n = lbResources.getSelectionIndex();
 					switch ( n ) {
 					case 0: // Google MT
-						result = new GoogleMTConnector();
+						result = new GoogleMTv2Connector();
 						break;
 					case 1: // SimpleTM
 						result = new SimpleTMConnector();

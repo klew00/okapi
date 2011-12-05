@@ -34,11 +34,11 @@ import org.eclipse.swt.widgets.Composite;
 class SegmentEditor {
 
 	private static final Pattern CLEANCODES = Pattern.compile("\\<[/be]?(\\d+?)/?\\>");
-	private static final Pattern REALCODES = Pattern.compile("\\<[/be]?(\\d+?)/?\\>"); //TODO
+	private static final Pattern REALCODES = Pattern.compile("<(bpt|ept|ph|it|ut).*?>(.*?)</\\1>"); //"<(bpt|ept|ph|it|ut)[^>]*?>[^<]*?</\\1>|<(bpt|ept|ph|it|ut)[^>]*?/>"); //'|<ept[^<]*?</ept>|<ept[^>]*?/>|<ph[^<]*?</ph>|<ph[^>]*?/>");
 
 	private StyledText edit;
 	private boolean modified;
-	private boolean fullCodesMode = false;
+	private boolean fullCodesMode;
 	private Pattern currentCodes;
 	
 	public SegmentEditor (Composite parent,
@@ -51,6 +51,7 @@ class SegmentEditor {
 		GridData gdTmp = new GridData(GridData.FILL_BOTH);
 		edit.setLayoutData(gdTmp);
 		
+		fullCodesMode = false;
 		currentCodes = CLEANCODES;
 		
 		edit.addExtendedModifyListener(new ExtendedModifyListener() {
@@ -71,7 +72,7 @@ class SegmentEditor {
 		    	  modified = true;
 			}
 		});
-		
+	
 //		edit.addVerifyKeyListener(new VerifyKeyListener() {
 //			@Override
 //			public void verifyKey(VerifyEvent e) {
@@ -135,6 +136,17 @@ class SegmentEditor {
 		
 	}
 
+	public void setFullCodesMode (boolean fullCodesMode) {
+		this.fullCodesMode = fullCodesMode;
+		if ( fullCodesMode ) currentCodes = REALCODES;
+		else currentCodes = CLEANCODES;
+		edit.append(""); // Make a modification to trigger the re-parsing
+	}
+	
+	public boolean getFullcodesMode () {
+		return fullCodesMode;
+	}
+	
 	public boolean setFocus () {
 		return edit.setFocus();
 	}

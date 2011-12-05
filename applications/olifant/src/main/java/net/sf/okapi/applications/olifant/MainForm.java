@@ -103,6 +103,7 @@ public class MainForm {
 	private MenuItem miTMEditProperties;
 	private MenuItem miShowHideThirdField;
 	private MenuItem miShowHideFieldList;
+	private MenuItem miToggleCodeDisplay;
 	private MenuItem miStatistics;
 	private MenuItem miShowHideLog;
 
@@ -385,6 +386,7 @@ public class MainForm {
 		miShowHideLog.setEnabled(active);
 		miShowHideThirdField.setEnabled(active);
 		miShowHideFieldList.setEnabled((active) && currentTP.getEditorPanel().isExtraVisible());
+		miToggleCodeDisplay.setEnabled(active);
 		miStatistics.setEnabled(repoPanel.isRepositoryOpen());
 		
 		toolBar.update(currentTP);
@@ -615,6 +617,16 @@ public class MainForm {
 			}
 		});
 	
+		miToggleCodeDisplay = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miToggleCodeDisplay, "view.togglecodedisplay"); //$NON-NLS-1$
+		miToggleCodeDisplay.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				if ( currentTP != null ) {
+					currentTP.getEditorPanel().setFullCodesMode(!currentTP.getEditorPanel().getFullCodesMode());
+				}
+            }
+		});
+		
 		new MenuItem(dropMenu, SWT.SEPARATOR);
 
 		miStatistics = new MenuItem(dropMenu, SWT.PUSH);

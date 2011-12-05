@@ -56,6 +56,16 @@ class EditorPanel extends SashForm {
 		edTarget.setText(target);
 	}
 	
+	public void setFullCodesMode (boolean fullCodesMode) {
+		edSource.setFullCodesMode(fullCodesMode);
+		edTarget.setFullCodesMode(fullCodesMode);
+	}
+	
+	public boolean getFullCodesMode () {
+		return edSource.getFullcodesMode();
+		// Source and target are always in the same mode
+	}
+	
 	public void setExtraText (String text) {
 		extraPanel.setText(text);
 	}

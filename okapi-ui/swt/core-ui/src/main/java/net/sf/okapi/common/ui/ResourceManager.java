@@ -54,7 +54,7 @@ public class ResourceManager {
 	 * root location of the place where the resources are.
 	 * @param p_Display Display to associate with the resources.
 	 */
-	public ResourceManager (Class p_Class,
+	public ResourceManager (@SuppressWarnings("rawtypes") Class p_Class,
 		Display p_Display)
 	{
 		display = p_Display;
