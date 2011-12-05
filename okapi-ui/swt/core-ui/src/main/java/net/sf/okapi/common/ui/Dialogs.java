@@ -27,6 +27,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 
 /**
@@ -138,8 +139,9 @@ public class Dialogs {
 		Rectangle parentRect;
 		Rectangle winRect = target.getBounds();
 		if ( centerOn == null ) {
-			Display Disp = target.getDisplay();
-			parentRect = Disp.getClientArea();
+			// Handle the case of multiple monitors
+			Monitor monitor = target.getDisplay().getPrimaryMonitor();
+			parentRect = monitor.getClientArea();
 		}
 		else parentRect = centerOn.getBounds();
 		

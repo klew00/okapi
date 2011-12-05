@@ -39,7 +39,8 @@ import net.sf.okapi.common.query.QueryResult;
 import net.sf.okapi.lib.translation.QueryUtil;
 
 /**
- * Connector to Google Translate APi v1
+ * Connector to Google Translate APi v1.
+ * This service was discontinued by Google on December 1th 2011.
  */
 @Deprecated
 public class GoogleMTConnector extends BaseConnector {

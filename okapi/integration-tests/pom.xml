@@ -92,11 +92,13 @@
 			<artifactId>okapi-step-xliffkit</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+<!--
 		<dependency>
 			<groupId>net.sf.okapi.connectors</groupId>
 			<artifactId>okapi-connector-google</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+-->
 		<dependency>
 			<groupId>net.sf.okapi.connectors</groupId>
 			<artifactId>okapi-connector-pensieve</artifactId>
