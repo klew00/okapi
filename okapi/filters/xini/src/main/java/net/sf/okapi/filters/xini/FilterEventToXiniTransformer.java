@@ -263,7 +263,7 @@ public class FilterEventToXiniTransformer {
 				int endCodeIndex = TextFragment.toIndex(codedText.charAt(++charIndex));
 				Code endCode = codes.get(endCodeIndex);
 
-				if (endCode.getType() == code.getType())
+				if (endCode.getType() == code.getType() && endCode.getId() == code.getId())
 					return charIndex;
 			}
 		}
