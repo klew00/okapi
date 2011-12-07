@@ -36,6 +36,8 @@ import net.sf.okapi.common.pipelinedriver.PipelineDriver;
 import net.sf.okapi.filters.openoffice.OpenOfficeFilter;
 import net.sf.okapi.filters.properties.PropertiesFilter;
 import net.sf.okapi.filters.rainbowkit.RainbowKitFilter;
+import net.sf.okapi.filters.xini.XINIFilter;
+import net.sf.okapi.filters.xliff.XLIFFFilter;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 
 import org.junit.Before;
@@ -55,6 +57,7 @@ public class MergingStepTest {
 		fcMapper.addConfigurations(PropertiesFilter.class.getName());
 		fcMapper.addConfigurations(OpenOfficeFilter.class.getName());
 		fcMapper.addConfigurations(RainbowKitFilter.class.getName());
+		fcMapper.addConfigurations(XLIFFFilter.class.getName());
 		fcMapper.setCustomConfigurationsDirectory(root);
 		fcMapper.updateCustomConfigurations();
 	}
@@ -85,6 +88,31 @@ public class MergingStepTest {
 		file = new File(root+"xliffPack/done/sub Dir/test01.out.odt");
 		assertTrue(file.exists());
 		
+	}
+	
+	@Test
+	public void testXINIMerging ()
+		throws URISyntaxException
+	{
+		deleteOutputDir("xiniPack/translated", true);
+		
+		IPipelineDriver pdriver = new PipelineDriver();
+		pdriver.setFilterConfigurationMapper(fcMapper);
+		pdriver.setRootDirectories(Util.deleteLastChar(root), Util.deleteLastChar(root)); // Don't include final separator
+		pdriver.addStep(new RawDocumentToFilterEventsStep());
+		MergingStep mrgStep = new MergingStep();
+		pdriver.addStep(mrgStep);
+		
+		Parameters prm = (Parameters)mrgStep.getParameters();
+		prm.setReturnRawDocument(true);
+		
+		URI inputURI = new File(root+"xiniPack/manifest.rkm").toURI();
+		pdriver.addBatchItem(new BatchItemContext(inputURI, "UTF-8", "okf_rainbowkit@noPrompt", null, "UTF-8", locEN, locFR));
+		
+		pdriver.processBatch();
+
+		File file = new File(root+"xiniPack/translated/test1.out.xlf");
+		assertTrue(file.exists());
 	}
 	
 	@Test

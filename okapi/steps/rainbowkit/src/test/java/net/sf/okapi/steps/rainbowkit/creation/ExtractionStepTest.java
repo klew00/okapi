@@ -20,9 +20,11 @@
 
 package net.sf.okapi.steps.rainbowkit.creation;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -35,7 +37,10 @@ import net.sf.okapi.common.pipelinedriver.IPipelineDriver;
 import net.sf.okapi.common.pipelinedriver.PipelineDriver;
 import net.sf.okapi.filters.openoffice.OpenOfficeFilter;
 import net.sf.okapi.filters.properties.PropertiesFilter;
+import net.sf.okapi.filters.xliff.XLIFFFilter;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
+import net.sf.okapi.steps.common.createtarget.CreateTargetStep;
+import net.sf.okapi.steps.rainbowkit.ontram.OntramPackageWriter;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -45,6 +50,8 @@ public class ExtractionStepTest {
 	private String root;
 	private LocaleId locEN = LocaleId.fromString("en");
 	private LocaleId locFR = LocaleId.fromString("fr");
+	private LocaleId locENUS = LocaleId.fromString("en-us");
+	private LocaleId locRURU = LocaleId.fromString("ru-ru");
 	
 	@Before
 	public void setUp() {
@@ -91,6 +98,47 @@ public class ExtractionStepTest {
 		file = new File(root+"pack1/work/sub Dir/test01.odt.xlf");
 		assertTrue(file.exists());
 		
+	}
+	
+	@Test
+	public void testXINICreation ()	throws URISyntaxException, IOException
+	{
+		// Ensure output is deleted
+		assertTrue(deleteOutputDir("pack2", true));
+		
+		IPipelineDriver pdriver = new PipelineDriver();
+		FilterConfigurationMapper fcMapper = new FilterConfigurationMapper();
+		fcMapper.addConfigurations(XLIFFFilter.class.getName());
+		pdriver.setFilterConfigurationMapper(fcMapper);
+		pdriver.setRootDirectories(Util.deleteLastChar(root), 
+				Util.deleteLastChar(root)); // Don't include final separator
+		pdriver.addStep(new RawDocumentToFilterEventsStep());
+		pdriver.addStep(new CreateTargetStep());
+		
+		ExtractionStep es = new ExtractionStep();
+		pdriver.addStep(es);
+		Parameters params = (Parameters) es.getParameters();
+		params.setWriterClass(OntramPackageWriter.class.getName());
+		params.setPackageName("pack2");
+		
+		String inputPath = root+"xiniPack/original/test1.xlf";
+		String outputPath = root+"pack2/original/test1.out.xlf";
+		URI inputURI = new File(inputPath).toURI();
+		URI outputURI = new File(outputPath).toURI();
+		pdriver.addBatchItem(new BatchItemContext(inputURI, "UTF-8", "okf_xliff", outputURI, 
+				"UTF-8", locENUS, locRURU));
+		
+		pdriver.processBatch();
+
+		File file = new File(root+"pack2/xini/contents.xini");
+		assertTrue(file.exists());
+		
+		// Compare with the gold file
+		assertEquals(
+				TestUtil.getFileAsString(new File(root+"xiniPack/xini/contents.xini")), 
+				TestUtil.getFileAsString(new File(root+"pack2/xini/contents.xini"))
+					.replaceFirst("xiniPack/original", ""));
+		assertTrue(deleteOutputDir("pack2", true));
 	}
 	
     public boolean deleteOutputDir (String dirname, boolean relative) {
