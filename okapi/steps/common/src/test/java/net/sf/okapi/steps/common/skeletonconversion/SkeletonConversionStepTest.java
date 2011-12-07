@@ -8,7 +8,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 
-import net.sf.okapi.common.Event;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filters.InputDocument;
@@ -18,13 +17,10 @@ import net.sf.okapi.filters.html.HtmlFilter;
 import net.sf.okapi.lib.extra.pipelinebuilder.XBatch;
 import net.sf.okapi.lib.extra.pipelinebuilder.XBatchItem;
 import net.sf.okapi.lib.extra.pipelinebuilder.XPipeline;
-import net.sf.okapi.lib.extra.steps.DocumentPartLogger;
 import net.sf.okapi.lib.extra.steps.EventListBuilderStep;
 import net.sf.okapi.lib.extra.steps.EventLogger;
-import net.sf.okapi.lib.extra.steps.TextUnitLogger;
 import net.sf.okapi.lib.extra.steps.TuDpLogger;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
-import net.sf.okapi.steps.common.ResourceSimplifierStep;
 import net.sf.okapi.steps.common.tufiltering.ITextUnitFilter;
 
 import org.junit.Test;

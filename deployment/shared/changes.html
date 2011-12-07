@@ -51,6 +51,19 @@ distribution.</p>
 	characters.</li>
 </ul>
 	</li>
+	<li>Rainbow Kit Creation Step:<ul>
+	<li>Fixed incorrectly mapped inline code that resulted in invalid merged 
+	files.</li>
+</ul>
+	</li>
+</ul>
+	</li>
+	<li>Connectors:<ul>
+	<li>Google MT v2 Connector:<ul>
+	<li>Fixed error when list of segments to translate is empty or made of 
+	segments with only codes.</li>
+</ul>
+	</li>
 </ul>
 	</li>
 	<li>Filters:<ul>
@@ -59,6 +72,12 @@ distribution.</p>
 	of a story.</li>
 	<li>Fixed TextPath-attached stories not being extracted. This fixes issue 
 	#194.</li>
+</ul>
+	</li>
+	<li>HTML Filter:<ul>
+	<li>Files with no encoding declaration detected within the fisrt 1 KB have 
+	an encoding declaration added on output (only if the file has a &lt;head&gt; 
+	element).</li>
 </ul>
 	</li>
 	<li>XLIFF Filter:<ul>

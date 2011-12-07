@@ -182,11 +182,13 @@ public class GoogleMTv2Connector extends BaseConnector {
 				String urlString = BASE_URL + String.format(BASE_QUERY, params.getApiKey(), srcCode, trgCode);
 				
 				// Add the text to the query
+				int count = 0;
 				for ( int index=start; index<fragments.size() && !doAnotherQuery; index++ ) {
 					// Get the fragment
 					TextFragment frag = fragments.get(index);
 					// Check if there is actually text to translate
 					if ( !frag.hasText(false) ) continue;
+					else count++; // Count number of segment to actually query
 					// Convert the fragment to coded HTML
 					String qtext = util.toCodedHTML(frag);
 	
@@ -211,24 +213,27 @@ public class GoogleMTv2Connector extends BaseConnector {
 						urlString += (QPARAM + URLEncoder.encode(qtext, "UTF-8"));
 					}
 				}
-	
-				// Create the connection and query
-				URL url = new URL(urlString);
-				HttpURLConnection conn = (HttpURLConnection)url.openConnection();
-				int code = conn.getResponseCode();
-				if ( code != 200 ) {
-					throw new RuntimeException(String.format("Error: response code %d\n"
-						+ conn.getResponseMessage(), code)); 
+
+				JSONArray translations = null;
+				if ( count > 0 ) {
+					// Create the connection and query
+					URL url = new URL(urlString);
+					HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+					int code = conn.getResponseCode();
+					if ( code != 200 ) {
+						throw new RuntimeException(String.format("Error: response code %d\n"
+							+ conn.getResponseMessage(), code)); 
+					}
+					
+					// Get the results
+					JSONObject object = (JSONObject)parser.parse(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+					@SuppressWarnings("unchecked")
+					Map<String, Object> map = (Map<String, Object>)object;
+			    	@SuppressWarnings("unchecked")
+			    	Map<String, Object> data = (Map<String, Object>)map.get("data");
+			    	translations = (JSONArray)data.get("translations");
 				}
-				
-				// Get the results
-				JSONObject object = (JSONObject)parser.parse(new InputStreamReader(conn.getInputStream(), "UTF-8"));
-				@SuppressWarnings("unchecked")
-				Map<String, Object> map = (Map<String, Object>)object;
-		    	@SuppressWarnings("unchecked")
-		    	Map<String, Object> data = (Map<String, Object>)map.get("data");
-		    	JSONArray translations = (JSONArray)data.get("translations");
-	
+					
 		    	// Add the results to the list
 		    	int transIndex = -1;
 		    	for ( int index=start; index<end; index++ ) {
@@ -272,7 +277,7 @@ public class GoogleMTv2Connector extends BaseConnector {
 		        	list.add(result);
 		        	allResults.add(list);
 		    	}
-		    	
+
 		    	// This query is done
 		    	// We have to do another one if doAnotherQuery is true
 			}

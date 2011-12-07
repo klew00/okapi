@@ -186,8 +186,7 @@ public class CommandLine {
 					throw new RuntimeException(Res.getString("CommandLine.tooManyInput")); //$NON-NLS-1$
 				}
 				File f = new File(arg);
-				boolean specialDir = (MainForm.NOEXPAND_EXTENSIONS.indexOf(Util.getExtension(arg))==-1);
-				String[] res = fm.guessFormat(f.getAbsolutePath(), !specialDir);
+				String[] res = fm.guessFormat(f.getAbsolutePath());
 				prj.inputLists.get(inpList).clear();
 				prj.setInputRoot(inpList, Util.getDirectoryName(f.getAbsolutePath()), true);
 				prj.addDocument(inpList, f.getAbsolutePath(), res[0], null, res[1], false);

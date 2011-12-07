@@ -52,10 +52,10 @@ public class ResourceSimplifierStepTest {
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();				
 		String pathBase = Util.getDirectoryName(this.getClass().getResource("aa324.html").getPath()) + "/";
 		
-		list.add(new InputDocument(pathBase + "aa324.html", null));
+//		list.add(new InputDocument(pathBase + "aa324.html", null));
 		list.add(new InputDocument(pathBase + "form.html", null));
-		list.add(new InputDocument(pathBase + "W3CHTMHLTest1.html", null));
-		list.add(new InputDocument(pathBase + "msg00058.html", null));
+//		list.add(new InputDocument(pathBase + "W3CHTMHLTest1.html", null));
+//		list.add(new InputDocument(pathBase + "msg00058.html", null));
 		
 		RoundTripComparison rtc = new RoundTripComparison();
 		ResourceSimplifierStep rss = new ResourceSimplifierStep(false);

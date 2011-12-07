@@ -70,7 +70,8 @@ public class ExtractionComparisionTest {
 	public void testDoubleExtractionSingle() throws URISyntaxException, MalformedURLException {
 		RoundTripComparison rtc = new RoundTripComparison();
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
-		list.add(new InputDocument(root + "Carnation Chiropractic Center Inc.htm", null));
+		//list.add(new InputDocument(root + "Carnation Chiropractic Center Inc.htm", null));
+		list.add(new InputDocument(root + "test.html", null));
 		assertTrue(rtc.executeCompare(htmlFilter, list, "UTF-8", locEN, locEN));
 	}
 	

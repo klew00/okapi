@@ -185,9 +185,16 @@ public abstract class AbstractMarkupFilter extends AbstractFilter {
 	 */
 	protected Source getParsedHeader(final InputStream inputStream) {
 		try {
-			final byte[] bytes = new byte[PREVIEW_BYTE_COUNT];
+			// Make sure we grab the same buffer for UTF-16/32
+			// this is to avoid round trip problem when not detecting a declaration
+			// between a non-UTF-16/32 and a UTF-16/32 input
+			int charSize = 1;
+			if ( getEncoding().toLowerCase().startsWith("utf-16") ) charSize = 2;
+			else if ( getEncoding().toLowerCase().startsWith("utf-32") ) charSize = 4;
+			
+			final byte[] bytes = new byte[PREVIEW_BYTE_COUNT * charSize];
 			int i;
-			for (i = 0; i < PREVIEW_BYTE_COUNT; i++) {
+			for (i = 0; i < bytes.length; i++) {
 				final int nextByte = inputStream.read();
 				if (nextByte == -1)
 					break;

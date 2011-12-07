@@ -2289,7 +2289,7 @@ public class MainForm { //implements IParametersProvider {
 				n += doAddDocuments(f.list(), path);
 			}
 			else {
-				String[] res = fm.guessFormat(path, allowExpand);
+				String[] res = fm.guessFormat(path);
 				
 				// If project is not saved and it's the first added file:
 				if (( prj.path == null )

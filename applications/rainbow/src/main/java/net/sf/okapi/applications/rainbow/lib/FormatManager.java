@@ -93,16 +93,10 @@ public class FormatManager {
 	 * @return An array of string: 0=guessed encoding or null,
 	 * 1=guessed filter settings or null,
 	 */
-	public String[] guessFormat (String p_sPath,
-		boolean tryDetectingEncoding)
-	{
+	public String[] guessFormat (String p_sPath) {
 		String[] aRes = new String[2];
-		if ( tryDetectingEncoding ) {
-			// The only encodings detectEncoding() detect are UTF-n
-			// Which will be detected anyway by the filters, so let's skip the overhead
-			aRes[0] = null; // = Utils.detectEncoding(p_sPath);
-		}
 		String sExt = Util.getExtension(p_sPath).toLowerCase();
+		aRes[0] = null; // Encoding not detected
 		aRes[1] = pairs.get(sExt);
 		return aRes;
 	}

@@ -29,6 +29,7 @@ import java.net.URI;
 import java.util.LinkedHashMap;
 
 import net.htmlparser.jericho.Attribute;
+import net.htmlparser.jericho.HTMLElementName;
 import net.htmlparser.jericho.Segment;
 import net.htmlparser.jericho.StartTag;
 import net.htmlparser.jericho.StartTagType;
@@ -47,7 +48,7 @@ class StreamedSourceCopy {
 	/**
 	 * Rewrite input and add quotes to any attributes that don't have them. Also add missing META tags
 	 * @param input - {@link RawDocument} input
-	 * @param documentEncoding - does he document have a hard coded encoding?
+	 * @param documentEncoding - does the document have a hard coded encoding?
 	 * @param encoding - detected or set encoding for the content.
 	 * @param hasBOM - does the content contain a Byte Order Mark?
 	 * @return the transformed {@link RawDocument}
@@ -58,6 +59,8 @@ class StreamedSourceCopy {
 		LocaleId locale = input.getSourceLocale();
 		URI tempUri = File.createTempFile("_modifiedHtml", ".sourceTemp").toURI();
 
+		boolean needEncodingDeclaration = !documentEncoding;
+		
 		// make a new source copy with tidied tags and add any missing meta tags
 		Writer writer = null;
 		try {
@@ -99,13 +102,27 @@ class StreamedSourceCopy {
 							// rewrite tag as-is
 							writer.write(st.toString());
 						}
+						
+						// If needed: add the encoding declaration just after <head>
+						// (If there is a <head> in the file, this is not triggered.
+						if ( needEncodingDeclaration ) {
+							if ( st.getName() == HTMLElementName.HEAD ) {
+								// Insert the encoding declaration
+								writer.write(String.format(
+									"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=%s\">",
+									(input.getEncoding()==RawDocument.UNKOWN_ENCODING ? encoding : input.getEncoding())));
+								needEncodingDeclaration = false;
+							}
+						}
+						
 						continue;
 					}
 				}
 				writer.write(segment.toString());
 			}
 			return new RawDocument(tempUri, encoding, locale);
-		} finally {
+		}
+		finally {
 			input.close();
 			if (writer != null)
 				try {
