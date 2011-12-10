@@ -699,7 +699,9 @@ public class SRXDocument {
 			if ( inputType == 0 ) {
 				String pathOrURL = (String)input;
 				//doc = docBuilder.parse(Util.makeURIFromPath(pathOrURL));
-				doc = docBuilder.parse(new File(pathOrURL));
+				File srxFile = new File(pathOrURL);
+				if (!srxFile.exists()) throw new RuntimeException("SRX file not found");
+				doc = docBuilder.parse(srxFile);
 			}
 			else if ( inputType == 1 ) {
 				CharSequence data = (CharSequence)input;
