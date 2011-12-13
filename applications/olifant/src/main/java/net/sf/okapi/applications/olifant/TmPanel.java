@@ -32,6 +32,9 @@ import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.ResourceManager;
 import net.sf.okapi.lib.tmdb.DbUtil;
 import net.sf.okapi.lib.tmdb.ITm;
+import net.sf.okapi.lib.tmdb.SearchAndReplace;
+import net.sf.okapi.lib.tmdb.SearchAndReplaceOptions;
+import net.sf.okapi.lib.tmdb.SearchAndReplaceOptions.ACTIONS;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabItem;
@@ -78,6 +81,8 @@ class TmPanel extends Composite implements IObserver {
 	private int srcCol; // Column in the table that holds the source text, use -1 for none, 0-based, 1=SegKey+Flag
 	private int trgCol; // Column in the table that holds the target text, use -1 for none, 0-based, 1=SegKey+Flag
 	private TMOptions opt;
+	private SearchAndReplaceForm sarForm;
+	private SearchAndReplaceOptions sarOptions;
 
 	private MenuItem miCtxAddEntry;
 	private MenuItem miCtxDeleteEntries;
@@ -97,6 +102,8 @@ class TmPanel extends Composite implements IObserver {
 		opt = new TMOptions();
 		srcCol = -1;
 		trgCol = -1;
+		
+		sarOptions = new SearchAndReplaceOptions();
 		
 		GridLayout layout = new GridLayout(1, false);
 		layout.marginHeight = 0;
@@ -554,6 +561,31 @@ class TmPanel extends Composite implements IObserver {
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(getShell(), "Error while deleting an entry.\n"+e.getMessage(), null);
+		}
+	}
+	
+	void searchAndReplace (boolean search) {
+		try {
+			int n = table.getSelectionIndex();
+			if ( n == -1 ) {
+				return; // Nothing to do
+			}
+			if ( sarForm == null ) {
+				sarForm = new SearchAndReplaceForm(getShell(), sarOptions, opt.getVisibleFields());
+			}
+			ACTIONS res = sarForm.showDialog();
+			sarForm = null;
+			if ( res == ACTIONS.CLOSE ) return; // Close
+			
+			showLog(); // Make sure to display the log
+			
+			// Start the thread
+			ProgressCallback callback = new ProgressCallback(this);
+			SearchAndReplace sar = new SearchAndReplace(callback, tm.getRepository(), tm.getName(), sarOptions);
+			startThread(new Thread(sar));
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(getShell(), "Error while search or replacing.\n"+e.getMessage(), null);
 		}
 	}
 	

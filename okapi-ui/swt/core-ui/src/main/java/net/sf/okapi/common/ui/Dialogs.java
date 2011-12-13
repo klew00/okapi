@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2011 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -24,7 +24,6 @@ import java.io.File;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Monitor;
@@ -148,6 +147,32 @@ public class Dialogs {
 		// Compute the position and set the window
 		int x = parentRect.x + (parentRect.width - winRect.width) / 2;
 		int y = parentRect.y + (parentRect.height - winRect.height) / 2;
+		// Make sure it's at least set to (0,0)
+		target.setLocation(((x<0) ? 0 : x), ((y<0)? 0 : y));
+	}
+
+	/**
+	 * Moves a given windows to the south-east corner of a given parent.
+	 * @param target the window to move.
+	 * @param parent the parent, or null to use the whole screen.
+	 */
+	static public void placeWindowsInSECorner (Shell target,
+		Shell parent)
+	{
+		Rectangle parentRect;
+		Rectangle winRect = target.getBounds();
+		if ( parent == null ) {
+			// Handle the case of multiple monitors
+			Monitor monitor = target.getDisplay().getPrimaryMonitor();
+			parentRect = monitor.getClientArea();
+		}
+		else {
+			parentRect = parent.getBounds();
+		}
+		
+		// Compute the position and set the window
+		int x = parentRect.x + (parentRect.width - winRect.width);
+		int y = parentRect.y + (parentRect.height - winRect.height);
 		// Make sure it's at least set to (0,0)
 		target.setLocation(((x<0) ? 0 : x), ((y<0)? 0 : y));
 	}

@@ -31,6 +31,7 @@ import java.util.Map;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.lib.tmdb.DbUtil;
+import net.sf.okapi.lib.tmdb.IRepository;
 import net.sf.okapi.lib.tmdb.ITm;
 import net.sf.okapi.lib.tmdb.DbUtil.PageMode;
 
@@ -955,4 +956,9 @@ public class Tm implements ITm {
 		store.deleteSegments(name, segKeys);
 	}
 
+	@Override
+	public IRepository getRepository () {
+		return store;
+	}
+	
 }

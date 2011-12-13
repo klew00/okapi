@@ -32,6 +32,7 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import net.sf.okapi.lib.tmdb.DbUtil;
+import net.sf.okapi.lib.tmdb.IRepository;
 import net.sf.okapi.lib.tmdb.ITm;
 import net.sf.okapi.lib.tmdb.DbUtil.PageMode;
 import net.sf.okapi.lib.tmdb.mongodb.Repository;
@@ -557,6 +558,11 @@ public class Tm implements ITm {
 		if ( pageCount > oldPage ) currentPage = oldPage;
 		else if ( pageCount > 0 ) currentPage = pageCount-1; 
 		return getPage();
+	}
+
+	@Override
+	public IRepository getRepository () {
+		return store;
 	}
 
 }

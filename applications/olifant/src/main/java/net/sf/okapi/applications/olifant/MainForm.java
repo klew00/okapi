@@ -91,6 +91,7 @@ public class MainForm {
 	private MenuItem miFileOpen;
 	private MenuItem miEntriesNew;
 	private MenuItem miEntriesDelete;
+	private MenuItem miEditSearch;
 	private MenuItem miTMNew;
 	private MenuItem miTMClose;
 	private MenuItem miTMImport;
@@ -372,6 +373,8 @@ public class MainForm {
 		miEntriesNew.setEnabled(active);
 		miEntriesDelete.setEnabled(active);
 		
+		miEditSearch.setEnabled(active);
+		
 		miTMNew.setEnabled(repoPanel.isRepositoryOpen());
 		miTMClose.setEnabled(active);
 		miTMImport.setEnabled(active);
@@ -462,6 +465,14 @@ public class MainForm {
 		miEntriesDelete.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				currentTP.deleteEntries();
+            }
+		});
+		
+		miEditSearch = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miEditSearch, "edit.search"); //$NON-NLS-1$
+		miEditSearch.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				currentTP.searchAndReplace(true);
             }
 		});
 		

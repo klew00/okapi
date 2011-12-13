@@ -20,6 +20,13 @@
 
 package net.sf.okapi.lib.tmdb;
 
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filterwriter.GenericContent;
@@ -195,6 +202,35 @@ public class DbUtil {
 		return tf;
 		//return fmt.fromNumericCodedToFragment(ctext, Code.stringToCodes(codes), false);
 	}
-	
+
+	public static List<LinkedHashMap<String, Object>> resultSetToMaps (ResultSet rs)
+		throws SQLException
+	{
+		List<LinkedHashMap<String, Object>> res = new ArrayList<LinkedHashMap<String, Object>>();
+		
+		LinkedHashMap<String, Object> tuFields = new LinkedHashMap<String, Object>();
+		res.add(tuFields);
+		LinkedHashMap<String, Object> segFields = new LinkedHashMap<String, Object>();
+		res.add(segFields);
+		
+		ResultSetMetaData rsMetaData = rs.getMetaData();
+	    int colCount = rsMetaData.getColumnCount();
+	    for ( int i=1; i<=colCount; i++ ) { // 1-based index
+	    	String fn = rsMetaData.getColumnName(i);
+	    	if ( fn.equals(DbUtil.SEGKEY_NAME) || fn.equals(DbUtil.TUREF_NAME) ) {
+	    		continue; // Auto-generated
+	    	}
+	    	Object value = rs.getObject(fn);
+	    	if ( value == null ) {
+	    		if ( fn.equals(DbUtil.FLAG_NAME) ) value = false;
+	    		else { // Skip other null values 
+	    			continue;
+	    		}
+	    	}
+	    	if ( DbUtil.isSegmentField(fn) ) segFields.put(fn, value);
+	    	else tuFields.put(fn, value);
+	    }
+	    return res;
+	}
 	
 }

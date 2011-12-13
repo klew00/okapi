@@ -229,7 +229,8 @@ public class CorpusFilterWriter implements IFilterWriter {
 		TextContainer srcCont = tu.getSource();
 		TextContainer trgCont = tu.getTarget(trgLoc);
 		if ( trgCont == null ) {
-			return; // No output for no-target 
+			// Use an empty target when we have none
+			trgCont = new TextContainer("");
 		}
 
 		// If not segmented: use the whole entry
@@ -243,7 +244,8 @@ public class CorpusFilterWriter implements IFilterWriter {
 		for ( Segment srcSeg : srcCont.getSegments() ) {
 			Segment trgSeg = trgSegs.get(srcSeg.id);
 			if ( trgSeg == null ) {
-				continue; // Don't output half-pairs
+				// Use an empty target segment if we have none 
+				trgSeg = new Segment();
 			}
 			writeLine(srcSeg.text, trgSeg.text);
 		}

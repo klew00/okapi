@@ -21,7 +21,6 @@
 package net.sf.okapi.lib.tmdb;
 
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -29,20 +28,17 @@ import net.sf.okapi.lib.tmdb.IProgressCallback;
 import net.sf.okapi.lib.tmdb.ITm;
 import net.sf.okapi.lib.tmdb.DbUtil.PageMode;
 
-public class Splitter implements Runnable {
+public class SearchAndReplace implements Runnable {
 
 	private final IProgressCallback callback;
 	private final IRepository repo;
 	private final String tmName;
-	private final SplitterOptions options;
-	
-	private List<String> tmNames;
-	private List<String> locales;
-	
-	public Splitter (IProgressCallback progressCallback,
+	private final SearchAndReplaceOptions options;
+
+	public SearchAndReplace (IProgressCallback progressCallback,
 		IRepository repo,
 		String tmName,
-		SplitterOptions options)
+		SearchAndReplaceOptions options)
 	{
 		this.callback = progressCallback;
 		this.repo = repo;
@@ -53,50 +49,33 @@ public class Splitter implements Runnable {
 	@Override
 	public void run () {
 		long totalCount = 0;
+		long changeCount = 0;
 		ITm tm = null;
-		ITm outTm = null;
 		boolean canceled = false;
 		
 		try {
-			callback.startProcess("Splitting TM...");
-			
-			//=== Split entries
+			callback.startProcess("Searching and replacing...");
 			
 			// Get the original TM and set it for iteration
 			tm = repo.openTm(tmName);
-			tm.setRecordFields(tm.getAvailableFields());
+			tm.setRecordFields(options.getFields());
 			tm.setPageMode(PageMode.ITERATOR);
-			//tm.setPageSize(5);
-			
-			// Get the list of all initial locales
-			locales = tm.getLocales();
-			
-			long currentCount = -1;
-			int tmCount = 0;
-			long prevTuKey = -1;
-			long outTuKey = -1;
 			
 			ResultSet rs = tm.getFirstPage();
 			while  (( rs != null ) && !canceled ) {
 				while ( rs.next() && !canceled ) {
 					totalCount++;
-					currentCount++;
-					
-					// Do we need to start a new TM for this entry?
-					if (( currentCount == 0 ) || ( currentCount > options.getEntriesPerPart() )) {
-						if ( outTm != null ) outTm.finishImport();
-						outTm = createNewTm(++tmCount);
-						outTm.startImport();
-						currentCount = 1;
-						prevTuKey = -1;
-					}
-					
-					// Add the entry to the output TM
-					long tuKey = rs.getLong(DbUtil.TUREF_NAME);
-					if ( tuKey != prevTuKey ) outTuKey = -1;
-					
+
 					List<LinkedHashMap<String, Object>> res = DbUtil.resultSetToMaps(rs);
-					outTuKey = outTm.addRecord(outTuKey, res.get(0), res.get(1));
+
+					for ( String fn : res.get(1).keySet() ) {
+						if ( options.getFields().contains(fn) ) {
+							String tmp = (String)res.get(1).get(fn);
+							if ( tmp.contains(options.getSearch()) ) {
+								Boolean b = (Boolean)(res.get(1).get("Flag"));
+							}
+						}
+					}
 
 					// Update UI from time to time
 					if ( (totalCount % 652) == 0 ) {
@@ -119,27 +98,8 @@ public class Splitter implements Runnable {
 			callback.logMessage(IProgressCallback.MSGTYPE_ERROR, e.getMessage());
 		}
 		finally {
-			if ( outTm != null ) outTm.finishImport();
 			callback.endProcess(totalCount, true);
 		}
 	}
 
-	private ITm createNewTm (int tmCount) {
-		ITm tm = null;
-		// Create the name
-		String tmp = String.format("%s_%d", tmName, tmCount);
-		
-		// If it exists try another one
-		if ( repo.isShared() || ( tmNames == null )) {
-			tmNames = repo.getTmNames();
-		}
-		int copy = 0;
-		while ( tmNames.contains(tmp) ) {
-			tmp = String.format("%s_%d(%d)", tmName, tmCount, ++copy);
-		}
-		// Create the new TM
-		tm = repo.createTm(tmp, String.format("Part of %s.", tmName), options.getSourceLocale());
-		return tm;
-	}
-	
 }

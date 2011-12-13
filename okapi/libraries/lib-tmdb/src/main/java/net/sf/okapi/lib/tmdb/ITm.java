@@ -318,5 +318,10 @@ public interface ITm {
 	 * @return the total number of segments in this TM.
 	 */
 	public long getTotalSegmentCount ();
-	
+
+	/**
+	 * Gets the repository where this TM is stored.
+	 * @return the repository where this TM is stored.
+	 */
+	public IRepository getRepository ();
 }
