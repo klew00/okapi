@@ -21,6 +21,7 @@
 package net.sf.okapi.lib.segmentation;
 
 import java.io.File;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -238,11 +239,11 @@ public class SegmentationTest {
 	}
 
 	@Test
-	public void testTrimOptionsSettingFromFile () {
+	public void testTrimOptionsSettingFromFile () throws URISyntaxException {
 		SRXDocument srxDoc = new SRXDocument();
 		// Trim options are 'true' in this file (inverse of default)
 		URL url = SegmentationTest.class.getResource("/Test01.srx");
-		srxDoc.loadRules(url.getPath());
+		srxDoc.loadRules(url.toURI().getPath());
 		ISegmenter segter = srxDoc.compileLanguageRules(LocaleId.ENGLISH, null);
 		segter.computeSegments(" a ");
 		// Trim options worked

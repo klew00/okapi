@@ -32,7 +32,7 @@ private static final LocaleId ENUS = new LocaleId("en", "us");
 	@Test
 	public void testDoubleExtraction () throws URISyntaxException, IOException {
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();				
-		String pathBase = Util.getDirectoryName(this.getClass().getResource("aa324.html").getPath()) + "/";
+		String pathBase = Util.getDirectoryName(this.getClass().getResource("aa324.html").toURI().getPath()) + "/";
 		
 		list.add(new InputDocument(pathBase + "aa324.html", null));
 		list.add(new InputDocument(pathBase + "form.html", null));

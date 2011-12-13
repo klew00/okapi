@@ -23,6 +23,7 @@ package net.sf.okapi.lib.terminology.tbx;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,9 +46,9 @@ public class TBXReaderTest {
 	private LocaleId locTR = LocaleId.fromString("tr");
 	private String root;
 	
-	public TBXReaderTest () {
+	public TBXReaderTest () throws URISyntaxException {
 		URL url = TBXReaderTest.class.getResource("/test01.tbx");
-		root = Util.getDirectoryName(url.getPath()) + File.separator;
+		root = Util.getDirectoryName(url.toURI().getPath()) + File.separator;
 	}
 	
 	@Test

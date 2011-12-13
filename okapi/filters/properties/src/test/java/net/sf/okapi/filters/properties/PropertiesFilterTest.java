@@ -20,6 +20,7 @@
 
 package net.sf.okapi.filters.properties;
 
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,27 +61,27 @@ public class PropertiesFilterTest {
 	}
 
 	@Test
-	public void testDoubleExtraction () {
+	public void testDoubleExtraction () throws URISyntaxException {
 		// Read all files in the data directory
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
 		URL url = PropertiesFilterTest.class.getResource("/Test01.properties");
-		list.add(new InputDocument(url.getPath(), null));
+		list.add(new InputDocument(url.toURI().getPath(), null));
 		url = PropertiesFilterTest.class.getResource("/Test02.properties");
-		list.add(new InputDocument(url.getPath(), "okf_properties@Test02.fprm"));
+		list.add(new InputDocument(url.toURI().getPath(), "okf_properties@Test02.fprm"));
 		url = PropertiesFilterTest.class.getResource("/Test03.properties");
-		list.add(new InputDocument(url.getPath(), "okf_properties@Test03.fprm"));
+		list.add(new InputDocument(url.toURI().getPath(), "okf_properties@Test03.fprm"));
 		url = PropertiesFilterTest.class.getResource("/Test04.properties");
-		list.add(new InputDocument(url.getPath(), "okf_properties@Test04.fprm"));
+		list.add(new InputDocument(url.toURI().getPath(), "okf_properties@Test04.fprm"));
 	
 		RoundTripComparison rtc = new RoundTripComparison();
 		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, locFR));
 	}
 
 	@Test
-	public void testStartDocument () {
+	public void testStartDocument () throws URISyntaxException {
 		URL url = PropertiesFilterTest.class.getResource("/Test01.properties");
 		assertTrue("Problem in StartDocument", FilterTestDriver.testStartDocument(filter,
-			new InputDocument(url.getPath(), null),
+			new InputDocument(url.toURI().getPath(), null),
 			"UTF-8", locEN, locEN));
 	}
 	
@@ -269,13 +270,13 @@ public class PropertiesFilterTest {
 	}
 	
 	@Test
-	public void testDoubleExtractionSubFilter() {
+	public void testDoubleExtractionSubFilter() throws URISyntaxException {
 		// Read all files in the data directory
 		Parameters p = (Parameters)filter.getParameters();
 		p.setSubfilter("okf_html");
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
 		URL url = PropertiesFilterTest.class.getResource("/Test05.properties");
-		list.add(new InputDocument(url.getPath(), null));	
+		list.add(new InputDocument(url.toURI().getPath(), null));	
 		RoundTripComparison rtc = new RoundTripComparison();
 		p.setSubfilter(null);
 		filter.setParameters(p);

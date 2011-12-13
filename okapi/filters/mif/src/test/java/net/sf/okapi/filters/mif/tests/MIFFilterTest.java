@@ -43,6 +43,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,10 +60,10 @@ public class MIFFilterTest {
 	private GenericContent fmt = new GenericContent();
 	
 	@Before
-	public void setUp() {
+	public void setUp() throws URISyntaxException {
 		filter = new MIFFilter();
 		URL url = MIFFilterTest.class.getResource("/Test01.mif");
-		root = Util.getDirectoryName(url.getPath()) + File.separator;
+		root = Util.getDirectoryName(url.toURI().getPath()) + File.separator;
 	}
 
 	@Test

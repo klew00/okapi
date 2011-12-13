@@ -23,6 +23,7 @@ package net.sf.okapi.filters.openxml;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -111,7 +112,7 @@ public class OpenXMLRoundTripSequenceTest {
 //			sOutputPath = sUserDir + "/output/";
 //			sGoldPath = sUserDir + "/gold/";
 
-			uri = new URI(sInputPath+filename);
+			uri = new File(sInputPath+filename).toURI();
 			try
 			{
 //				filly = new File(sInputPath+filename);

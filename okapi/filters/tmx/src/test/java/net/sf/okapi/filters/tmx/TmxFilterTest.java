@@ -300,7 +300,7 @@ public class TmxFilterTest {
 	
 	@Test (expected=OkapiIOException.class)
 	public void testOpenInvalidUri() throws Exception{
-		String basePath = TmxFilterTest.class.getResource("/Paragraph_TM.tmx").toURI().getPath();
+		String basePath = TmxFilterTest.class.getResource("/Paragraph_TM.tmx").getPath();
 		basePath = "file://"+basePath.replace("/bin/Paragraph_TM.tmx","");
 
 		URI invalid_uri = new URI(basePath+"/invalid_filename.tmx");

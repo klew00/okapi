@@ -58,7 +58,7 @@ public class MultistepPipelineTest {
 
 	@Test
 	public void xsltPipeline() throws URISyntaxException {
-		String xsltPath = MultistepPipelineTest.class.getResource("identity.xsl").getPath();
+		String xsltPath = MultistepPipelineTest.class.getResource("identity.xsl").toURI().getPath();
 		IPipelineStep step1 = new XSLTransformStep();
 		((net.sf.okapi.steps.xsltransform.Parameters) step1.getParameters()).setXsltPath(xsltPath);
 

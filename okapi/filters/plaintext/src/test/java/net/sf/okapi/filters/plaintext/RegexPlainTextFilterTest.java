@@ -29,6 +29,7 @@ import static org.junit.Assert.fail;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -153,7 +154,7 @@ public class RegexPlainTextFilterTest {
 	}		
 	
 	@Test
-	public void testParameters() {
+	public void testParameters() throws URISyntaxException {
 		// Test if default regex parameters have been loaded
 		IParameters rp = filter.getRegexParameters();
 				
@@ -176,7 +177,7 @@ public class RegexPlainTextFilterTest {
 		URL paramsUrl = RegexPlainTextFilter.class.getResource("/test_params1.txt");
 		assertNotNull(paramsUrl);  
 		
-		params.load(Util.toURI(paramsUrl.getPath()), false);
+		params.load(Util.toURI(paramsUrl.toURI().getPath()), false);
 		assertEquals(params.rule, "(.)"); 
 		assertEquals(params.sourceGroup, 1);
 		assertEquals(params.regexOptions, 8);
@@ -187,7 +188,7 @@ public class RegexPlainTextFilterTest {
 	
 		filter.setRule("(Test (rule))", 2, 0x88);
 		
-		params.save(paramsUrl.getPath());
+		params.save(paramsUrl.toURI().getPath());
 		
 		// Test the parameters are loaded into the internal regex and compiled
 		filter.open(new RawDocument("Line 1/r/nLine2 Test rule", locEN, locEN), true);
@@ -200,7 +201,7 @@ public class RegexPlainTextFilterTest {
 		params.sourceGroup = 1;
 		params.regexOptions = 40;
 		
-		params.load(Util.toURI(paramsUrl.getPath()), false);
+		params.load(Util.toURI(paramsUrl.toURI().getPath()), false);
 		
 		assertEquals(params.rule, "(Test (rule))");
 		assertEquals(params.sourceGroup, 2);
@@ -211,12 +212,12 @@ public class RegexPlainTextFilterTest {
 		params.sourceGroup = 1;
 		params.regexOptions = 40;
 		
-		params.save(paramsUrl.getPath());
+		params.save(paramsUrl.toURI().getPath());
 		params.rule = "(Test (rule))";
 		params.sourceGroup = 2;
 		params.regexOptions = 0x88;
 		
-		params.load(Util.toURI(paramsUrl.getPath()), false);
+		params.load(Util.toURI(paramsUrl.toURI().getPath()), false);
 		
 		assertEquals(params.rule, "(a*+)");
 		assertEquals(params.sourceGroup, 1);

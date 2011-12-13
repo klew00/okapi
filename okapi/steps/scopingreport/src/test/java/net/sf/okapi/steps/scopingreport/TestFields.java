@@ -2,6 +2,8 @@ package net.sf.okapi.steps.scopingreport;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
+import java.net.URISyntaxException;
 import java.util.logging.Logger;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -24,7 +26,7 @@ public class TestFields {
 	private ReportGenerator gen;
 	
 	@Before
-	public void startup() {
+	public void startup() throws URISyntaxException {
 		ScopingReportStep srs;
 		WordCountStep wcs;
 		StartDocument sd;
@@ -35,7 +37,7 @@ public class TestFields {
 		Event tuEvent1, tuEvent2, tuEvent3, tuEvent4;
 		Logger logger = Logger.getLogger(getClass().getName());
 		
-		String pathBase = Util.getDirectoryName(this.getClass().getResource("").getPath()) + "/";
+		String pathBase = Util.getDirectoryName(this.getClass().getResource("").toURI().getPath()) + "/";
 		net.sf.okapi.connectors.pensieve.Parameters rparams = 
 			new net.sf.okapi.connectors.pensieve.Parameters();
 		rparams.setDbDirectory(pathBase + "testtm");
@@ -86,7 +88,7 @@ public class TestFields {
 		Parameters params2 = (Parameters) srs.getParameters();
 		params2.setProjectName("test_project");
 		params2.setOutputPath(outputFilePath);
-		params2.setCustomTemplateURI(this.getClass().getResource("golden_file_template2.txt").getPath());
+		params2.setCustomTemplateURI(this.getClass().getResource("golden_file_template2.txt").toURI().getPath());
 		params2.setCountAsNonTranslatable_ExactMatch(true);
 		params2.setCountAsNonTranslatable_GMXFuzzyMatch(true);
 		sd.setName(params2.getCustomTemplateURI());

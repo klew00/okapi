@@ -25,6 +25,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -221,7 +222,7 @@ public class XLIFFKitWriterTest {
 	@Test
 	public void testPackageFormat() throws URISyntaxException, MalformedURLException {
 
-		String pathBase = Util.getDirectoryName(this.getClass().getResource("test2.txt").getPath()) + "/";
+		String pathBase = Util.getDirectoryName(this.getClass().getResource("test2.txt").toURI().getPath()) + "/";
 		String src1Path = pathBase + "src1/";
 		String src2Path = pathBase + "src2/";
 		//System.out.println(pathBase);
@@ -288,7 +289,7 @@ public class XLIFFKitWriterTest {
 //								DEDE)
 //						
 						new XBatchItem(
-								(new URL("file", null, src1Path + "test11.docx")).toURI(),
+								(new File(src1Path + "test11.docx")).toURI(),
 								"UTF-8",
 								"okf_openxml",
 								null,
@@ -316,7 +317,7 @@ public class XLIFFKitWriterTest {
 						new XParameter("includeOriginal", true),
 						new XParameter("message", "This document is a part of the test t-kit, generated from net.sf.okapi.steps.xliffkit.writer.testPackageFormat()"),
 						//new Parameter("outputURI", this.getClass().getResource("draft4.xliff.kit").toURI().toString()))
-						new XParameter("outputURI", new URL("file", null, pathBase + "testPackageFormat.xliff.kit").toURI().toString()))
+						new XParameter("outputURI", new File(pathBase + "testPackageFormat.xliff.kit").toURI().toString()))
 		).execute();
 	}
 	
@@ -324,7 +325,7 @@ public class XLIFFKitWriterTest {
 	@Test
 	public void testPackageFormat2() throws URISyntaxException, MalformedURLException {
 
-		String pathBase = Util.getDirectoryName(this.getClass().getResource("test2.txt").getPath()) + "/";
+		String pathBase = Util.getDirectoryName(this.getClass().getResource("test2.txt").toURI().getPath()) + "/";
 		String src1Path = pathBase + "src1/";
 		String src2Path = pathBase + "src2/";
 		//System.out.println(pathBase);
@@ -410,7 +411,7 @@ public class XLIFFKitWriterTest {
 						new XParameter("includeOriginal", true),
 						new XParameter("message", "This document is a part of the test t-kit, generated from net.sf.okapi.steps.xliffkit.writer.testPackageFormat()"),
 						//new XParameter("outputURI", this.getClass().getResource("draft4.xliff.kit").toURI().toString()))
-						new XParameter("outputURI", new URL("file", null, pathBase + "testPackageFormat2.xliff.kit").toURI().toString()))
+						new XParameter("outputURI", new File(pathBase + "testPackageFormat2.xliff.kit").toURI().toString()))
 		).execute();
 	}
 	
@@ -571,7 +572,7 @@ public class XLIFFKitWriterTest {
 		int loops = 1;
 		long start = System.currentTimeMillis();
 		
-		String pathBase = Util.getDirectoryName(this.getClass().getResource("test2.txt").getPath()) + "/";
+		String pathBase = Util.getDirectoryName(this.getClass().getResource("test2.txt").toURI().getPath()) + "/";
 		String src1Path = pathBase + "src1/";
 		String src2Path = pathBase + "src2/";
 		//System.out.println(pathBase);
@@ -681,7 +682,7 @@ public class XLIFFKitWriterTest {
 	@Test
 	public void testPackageFormat6() throws URISyntaxException, MalformedURLException {
 
-		String pathBase = Util.getDirectoryName(this.getClass().getResource("test2.txt").getPath()) + "/";
+		String pathBase = Util.getDirectoryName(this.getClass().getResource("test2.txt").toURI().getPath()) + "/";
 		String src1Path = pathBase + "src1/";
 		String src2Path = pathBase + "src2/";
 		//System.out.println(pathBase);
@@ -766,7 +767,7 @@ public class XLIFFKitWriterTest {
 						new XParameter("includeOriginal", true),
 						new XParameter("message", "This document is a part of the test t-kit, generated from net.sf.okapi.steps.xliffkit.writer.testPackageFormat()"),
 						//new XParameter("outputURI", this.getClass().getResource("draft4.xliff.kit").toURI().toString()))
-						new XParameter("outputURI", new URL("file", null, pathBase + "testPackageFormat6.xliff.kit").toURI().toString()))
+						new XParameter("outputURI", new File(pathBase + "testPackageFormat6.xliff.kit").toURI().toString()))
 		).execute();
 	}
 

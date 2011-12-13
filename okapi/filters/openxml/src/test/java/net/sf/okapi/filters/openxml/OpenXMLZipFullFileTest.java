@@ -65,7 +65,7 @@ public class OpenXMLZipFullFileTest {
 
 		// read all files in the test html directory
 		URL url = OpenXMLZipFullFileTest.class.getResource("/BoldWorld.docx");
-		File dir = new File(Util.getDirectoryName(url.getPath()));
+		File dir = new File(Util.getDirectoryName(url.toURI().getPath()));
 
 		FilenameFilter filter = new FilenameFilter() {
 			public boolean accept(File dir, String name) {

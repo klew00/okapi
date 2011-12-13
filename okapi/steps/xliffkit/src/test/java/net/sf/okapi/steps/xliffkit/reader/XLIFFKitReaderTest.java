@@ -24,7 +24,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
@@ -55,15 +57,15 @@ public class XLIFFKitReaderTest {
 	
 	// DEBUG 		
 	@Test
-	public void testReader() {
+	public void testReader() throws URISyntaxException {
 		
 		new XPipeline(
 				"Test pipeline for XLIFFKitReaderStep",
 				new XBatch(
 						new XBatchItem(
-								this.getClass().getResource("testPackageFormat.xliff.kit"),
+								this.getClass().getResource("testPackageFormat.xliff.kit").toURI(),
 								"UTF-8",
-								Util.getTempDirectory() + "/testPackageFormat",
+								new File(Util.getTempDirectory() + "/testPackageFormat").toURI(),
 								"UTF-8",
 								ENUS,
 								ENUS)
@@ -79,15 +81,15 @@ public class XLIFFKitReaderTest {
 	
 	// DEBUG 		
 	@Test
-	public void testReader2() {
+	public void testReader2() throws URISyntaxException {
 		
 		new XPipeline(
 				"Test pipeline for XLIFFKitReaderStep",
 				new XBatch(
 						new XBatchItem(
-								this.getClass().getResource("testPackageFormat2.xliff.kit"),
+								this.getClass().getResource("testPackageFormat2.xliff.kit").toURI(),
 								"UTF-8",
-								Util.getTempDirectory() + "/testPackageFormat2",
+								new File(Util.getTempDirectory() + "/testPackageFormat2").toURI(),
 								"UTF-8",
 								ENUS,
 								DEDE)
@@ -103,15 +105,15 @@ public class XLIFFKitReaderTest {
 
 	// DEBUG 		
 	@Test
-	public void testReader4() {
+	public void testReader4() throws URISyntaxException {
 		
 		new XPipeline(
 				"Test pipeline for XLIFFKitReaderStep",
 				new XBatch(
 						new XBatchItem(
-								this.getClass().getResource("testPackageFormat4.xliff.kit"),
+								this.getClass().getResource("testPackageFormat4.xliff.kit").toURI(),
 								"UTF-8",
-								Util.getTempDirectory() + "/testPackageFormat4",
+								new File(Util.getTempDirectory() + "/testPackageFormat4").toURI(),
 								"UTF-8",
 								ENUS,
 								ENUS)
@@ -127,15 +129,15 @@ public class XLIFFKitReaderTest {
 
 	// DEBUG 		
 	@Test
-	public void testReader5() {
+	public void testReader5() throws URISyntaxException {
 		
 		new XPipeline(
 				"Test pipeline for XLIFFKitReaderStep",
 				new XBatch(
 						new XBatchItem(
-								this.getClass().getResource("testPackageFormat5.xliff.kit"),
+								this.getClass().getResource("testPackageFormat5.xliff.kit").toURI(),
 								"UTF-8",
-								Util.getTempDirectory() + "/testPackageFormat4",
+								new File(Util.getTempDirectory() + "/testPackageFormat4").toURI(),
 								"UTF-8",
 								ENUS,
 								ENUS)
@@ -151,15 +153,15 @@ public class XLIFFKitReaderTest {
 
 	// DEBUG 		
 	@Test
-	public void testReader6() {
+	public void testReader6() throws URISyntaxException {
 		
 		new XPipeline(
 				"Test pipeline for XLIFFKitReaderStep",
 				new XBatch(
 						new XBatchItem(
-								this.getClass().getResource("testPackageFormat6.xliff.kit"),
+								this.getClass().getResource("testPackageFormat6.xliff.kit").toURI(),
 								"UTF-8",
-								Util.getTempDirectory() + "/testPackageFormat2",
+								new File(Util.getTempDirectory() + "/testPackageFormat2").toURI(),
 								"UTF-8",
 								ENUS,
 								FRFR)

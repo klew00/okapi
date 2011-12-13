@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 /**
@@ -27,11 +28,15 @@ public class TestUtil {
         URL url = clazz.getResource(filepath);
         String parentDir = null;
         if (url != null) {
-            parentDir = Util.getDirectoryName(url.getPath()) + "/";
+			try {
+				parentDir = Util.getDirectoryName(url.toURI().getPath()) + "/";
+			} catch (URISyntaxException e) {
+				return null;
+			}
         }
         return parentDir;
     }
-
+	
     public static String getFileAsString(final File file) throws IOException {
         final BufferedInputStream bis = new BufferedInputStream(
             new FileInputStream(file));

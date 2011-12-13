@@ -51,7 +51,7 @@ public class PropertyXmlExtractionComparisionTest {
 		propertyXmlFileList = XmlStreamTestUtils.getTestFiles("/about.xml", ".xml");
 
 		URL propertyXmlUrl = PropertyXmlExtractionComparisionTest.class.getResource("/about.xml");
-		propertyXmlRoot = Util.getDirectoryName(propertyXmlUrl.getPath()) + File.separator;
+		propertyXmlRoot = Util.getDirectoryName(propertyXmlUrl.toURI().getPath()) + File.separator;
 	}
 
 	@After

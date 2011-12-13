@@ -26,6 +26,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 import net.sf.okapi.common.Util;
@@ -50,13 +51,13 @@ public class PensieveTMConnectorTest {
 	private LocaleId locFRFR = LocaleId.fromString("FR-FR");
 	
 	@Before
-	public void setUp() {
+	public void setUp() throws URISyntaxException {
 		URL url = PensieveTMConnectorTest.class.getResource("/testtm/segments.gen");
 		connector = null;
 		if ( url == null ) return; // Creation case
 		connector = new PensieveTMConnector();
 		Parameters params = new Parameters();
-		params.setDbDirectory(Util.getDirectoryName(url.getPath()));
+		params.setDbDirectory(Util.getDirectoryName(url.toURI().getPath()));
 		connector.setParameters(params);
 		connector.open();
 		connector.setLanguages(locENUS, locFRFR);
@@ -71,12 +72,12 @@ public class PensieveTMConnectorTest {
 	}
 
 	@Test
-	public void testCreateTM () throws IOException {
+	public void testCreateTM () throws IOException, URISyntaxException {
 		if ( connector != null ) {
 			connector.close(); // Close the connector created by setUp()
 		}
 		URL url = PensieveTMConnectorTest.class.getResource("/mytm.tmx");
-		String dir =  Util.getDirectoryName(url.getPath())+File.separator+"testtm"+File.separator;
+		String dir =  Util.getDirectoryName(url.toURI().getPath())+File.separator+"testtm"+File.separator;
 		Util.createDirectories(dir);
 		ITmWriter writer = TmWriterFactory.createFileBasedTmWriter(dir, true);
 		

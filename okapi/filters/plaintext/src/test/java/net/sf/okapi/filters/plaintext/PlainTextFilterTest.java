@@ -34,6 +34,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -357,7 +358,7 @@ public class PlainTextFilterTest {
 	}
 		
 	@Test
-	public void testSynchronization() {
+	public void testSynchronization() throws URISyntaxException {
 		
 		//------------------------
 		filter.setConfiguration(ParaPlainTextFilter.FILTER_CONFIG);
@@ -390,7 +391,7 @@ public class PlainTextFilterTest {
 		URL url = PlainTextFilterTest.class.getResource("/test_params1.fprm");
 		if (url == null) return;
 		
-		String root = Util.getDirectoryName(url.getPath());
+		String root = Util.getDirectoryName(url.toURI().getPath());
 		
 		params.load(Util.toURI(root + "/test_params1.fprm"), false);
 
@@ -654,7 +655,7 @@ public class PlainTextFilterTest {
 	}
 	
 	@Test
-	public void testLoadParams() {
+	public void testLoadParams() throws URISyntaxException {
 		
 		IParameters params = filter.getParameters();
 		params.load(new File(getPainTextConfig("okf_plaintext_spliced_backslash.fprm")).toURI(), false);
@@ -794,9 +795,9 @@ public class PlainTextFilterTest {
 		}
 	}
 	
-	private String getPainTextConfig(String fileName) {
+	private String getPainTextConfig(String fileName) throws URISyntaxException {
 		URL url = PlainTextFilter.class.getResource("okf_plaintext_paragraphs.fprm");
-		String root = Util.getDirectoryName(url.getPath());
+		String root = Util.getDirectoryName(url.toURI().getPath());
 //		root = Util.getDirectoryName(root) + "/data/";
 		return root + "/" + fileName;
 	}

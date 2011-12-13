@@ -1,6 +1,8 @@
 package net.sf.okapi.steps.wordcount.categorized.gmx;
 
 import static org.junit.Assert.assertEquals;
+
+import java.net.URISyntaxException;
 import java.util.logging.Logger;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
@@ -51,8 +53,8 @@ public class TestGMXCounts {
 	}
 	
 	@Test
-	public void testGMXExactMatchedWordCountStep () {
-		String pathBase = Util.getDirectoryName(this.getClass().getResource("").getPath()) + "/";
+	public void testGMXExactMatchedWordCountStep () throws URISyntaxException {
+		String pathBase = Util.getDirectoryName(this.getClass().getResource("").toURI().getPath()) + "/";
 		net.sf.okapi.connectors.pensieve.Parameters rparams = 
 			new net.sf.okapi.connectors.pensieve.Parameters();
 		rparams.setDbDirectory(pathBase + "testtm");
@@ -84,8 +86,8 @@ public class TestGMXCounts {
 	}
 
 	@Test
-	public void testGMXLeveragedMatchedWordCountStep () {
-		String pathBase = Util.getDirectoryName(this.getClass().getResource("").getPath()) + "/";
+	public void testGMXLeveragedMatchedWordCountStep () throws URISyntaxException {
+		String pathBase = Util.getDirectoryName(this.getClass().getResource("").toURI().getPath()) + "/";
 		net.sf.okapi.connectors.pensieve.Parameters rparams = 
 			new net.sf.okapi.connectors.pensieve.Parameters();
 		rparams.setDbDirectory(pathBase + "testtm");
@@ -115,8 +117,8 @@ public class TestGMXCounts {
 	}
 	
 	@Test
-	public void testGMXFuzzyMatchWordCountStep () {
-		String pathBase = Util.getDirectoryName(this.getClass().getResource("").getPath()) + "/";
+	public void testGMXFuzzyMatchWordCountStep () throws URISyntaxException {
+		String pathBase = Util.getDirectoryName(this.getClass().getResource("").toURI().getPath()) + "/";
 		net.sf.okapi.connectors.pensieve.Parameters rparams = 
 			new net.sf.okapi.connectors.pensieve.Parameters();
 		rparams.setDbDirectory(pathBase + "testtm");

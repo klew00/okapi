@@ -22,6 +22,7 @@ package net.sf.okapi.common;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URISyntaxException;
 
 /**
  * Collection of helper functions for working with classes.
@@ -147,7 +148,11 @@ public class ClassUtil {
 	}
 
 	public static String getTargetPath(Class<?> cls) {
-		return cls.getResource("").getPath();
+		try {
+			return cls.getResource("").toURI().getPath();
+		} catch (URISyntaxException e) {
+			return null;
+		}
 	}
 	
 	/**

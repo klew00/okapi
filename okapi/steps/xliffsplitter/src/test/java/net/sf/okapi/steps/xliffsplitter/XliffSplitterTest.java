@@ -21,7 +21,7 @@ public class XliffSplitterTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		xlfRoot = Util.getDirectoryName(this.getClass().getResource("tasks_Test_SDL_XLIFF_18961_es_ES_xliff.xlf").getPath()) 
+		xlfRoot = Util.getDirectoryName(this.getClass().getResource("tasks_Test_SDL_XLIFF_18961_es_ES_xliff.xlf").toURI().getPath()) 
 					+ File.separator;
 		xlfFileList = Util.getFilteredFiles(xlfRoot, ".xlf");
 		splitPath = xlfRoot + "/split";

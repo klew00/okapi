@@ -23,6 +23,7 @@ package net.sf.okapi.virtualdb.jdbc.h2;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
 
@@ -51,9 +52,9 @@ public class H2ImplementationTest {
 	private LocaleId locFR = LocaleId.fromBCP47("fr");
 	private String root;
 
-	public H2ImplementationTest () {
+	public H2ImplementationTest () throws URISyntaxException {
 		URL url = H2ImplementationTest.class.getResource("/test01.xlf");
-		root = Util.getDirectoryName(url.getPath());
+		root = Util.getDirectoryName(url.toURI().getPath());
 	}
 
 	@Test

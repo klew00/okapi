@@ -25,6 +25,7 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -1009,10 +1010,10 @@ public class TsFilterTest {
 	}	
 	
 	@Test
-	public void testStartDocument () {
+	public void testStartDocument () throws URISyntaxException {
 		URL url = TsFilterTest.class.getResource("/TSTest01.ts");
 		assertTrue("Problem in StartDocument", FilterTestDriver.testStartDocument(filter,
-			new InputDocument(url.getPath(), null),
+			new InputDocument(url.toURI().getPath(), null),
 			"UTF-8", locEN, locEN));
 	}
 	

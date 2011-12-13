@@ -21,6 +21,7 @@
 package net.sf.okapi.virtualdb;
 
 import java.io.File;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -46,9 +47,9 @@ public class RepositoryTest {
 	private LocaleId locFR = LocaleId.fromBCP47("fr");
 	private String root;
 
-	public RepositoryTest () {
+	public RepositoryTest () throws URISyntaxException {
 		URL url = RepositoryTest.class.getResource("/test01.xlf");
-		root = Util.getDirectoryName(url.getPath());
+		root = Util.getDirectoryName(url.toURI().getPath());
 	}
 	
 	@Test

@@ -28,7 +28,7 @@ public class PIExtractionTest {
 		xmlStreamFilter = new XmlStreamFilter();	
 		xmlStreamFilter.setParametersFromURL(XmlStreamFilter.class.getResource("dita.yml"));
 		URL ditaUrl = DitaExtractionComparisionTest.class.getResource("/bookmap-readme.dita");				
-		ditaRoot = Util.getDirectoryName(ditaUrl.getPath()) + File.separator;
+		ditaRoot = Util.getDirectoryName(ditaUrl.toURI().getPath()) + File.separator;
 	}
 	
 	@Test

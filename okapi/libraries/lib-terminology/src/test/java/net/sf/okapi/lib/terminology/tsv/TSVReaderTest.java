@@ -23,6 +23,7 @@ package net.sf.okapi.lib.terminology.tsv;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,9 +42,9 @@ public class TSVReaderTest {
 	private LocaleId locFR = LocaleId.FRENCH;
 	private String root;
 	
-	public TSVReaderTest () {
+	public TSVReaderTest () throws URISyntaxException {
 		URL url = TSVReaderTest.class.getResource("/test01.tsv");
-		root = Util.getDirectoryName(url.getPath()) + File.separator;
+		root = Util.getDirectoryName(url.toURI().getPath()) + File.separator;
 	}
 	
 	@Test

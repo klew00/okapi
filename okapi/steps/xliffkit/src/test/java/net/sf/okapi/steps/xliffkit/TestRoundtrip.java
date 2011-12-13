@@ -1,5 +1,6 @@
 package net.sf.okapi.steps.xliffkit;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -32,7 +33,7 @@ public class TestRoundtrip {
 
 	@Test
 	public void testDoubleExtraction() throws MalformedURLException, URISyntaxException {
-		String pathBase = Util.getDirectoryName(this.getClass().getResource("").getPath()) + "/";
+		String pathBase = Util.getDirectoryName(this.getClass().getResource("").toURI().getPath()) + "/";
 		String src1Path = pathBase + "writer/src1/";
 		String inPath = src1Path + "BoldWorld.docx";
 		String midPath = pathBase + "testRoundtrip.xliff.kit";
@@ -58,7 +59,7 @@ public class TestRoundtrip {
 						new XParameter("includeOriginal", true),
 						new XParameter("message", "This document is a part of the test t-kit, generated from net.sf.okapi.steps.xliffkit.writer.testPackageFormat()"),
 						//new XParameter("outputURI", this.getClass().getResource("draft4.xliff.kit").toURI().toString()))
-						new XParameter("outputURI", new URL("file", null, midPath).toURI().toString()))
+						new XParameter("outputURI", new File(midPath).toURI().toString()))
 		).execute();
 		
 		List<Event> list1 = elb.getList();
@@ -89,7 +90,7 @@ public class TestRoundtrip {
 	
 	@Test
 	public void testDoubleExtraction2() throws MalformedURLException, URISyntaxException {
-		String pathBase = Util.getDirectoryName(this.getClass().getResource("").getPath()) + "/";
+		String pathBase = Util.getDirectoryName(this.getClass().getResource("").toURI().getPath()) + "/";
 		String src1Path = pathBase + "writer/src1/";
 		String inPath = src1Path + "aa324.html";
 		String midPath = pathBase + "testRoundtrip.xliff.kit";
@@ -116,7 +117,7 @@ public class TestRoundtrip {
 						new XParameter("includeOriginal", true),
 						new XParameter("message", "This document is a part of the test t-kit, generated from net.sf.okapi.steps.xliffkit.writer.testPackageFormat()"),
 						//new XParameter("outputURI", this.getClass().getResource("draft4.xliff.kit").toURI().toString()))
-						new XParameter("outputURI", new URL("file", null, midPath).toURI().toString()))
+						new XParameter("outputURI", new File(midPath).toURI().toString()))
 		).execute();
 		
 		List<Event> list1 = elb1.getList();

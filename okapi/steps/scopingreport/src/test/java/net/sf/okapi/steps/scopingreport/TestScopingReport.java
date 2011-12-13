@@ -77,13 +77,13 @@ public class TestScopingReport {
 	}
 	
 	@Test
-	public void testDefaultTemplate() throws MalformedURLException {
+	public void testDefaultTemplate() throws MalformedURLException, URISyntaxException {
 		ScopingReportStep srs = new ScopingReportStep();
 		Parameters params = (Parameters) srs.getParameters();
 		assertEquals("My Project", params.getProjectName());
 		assertEquals("", params.getCustomTemplateURI());
 		
-		String pathBase = Util.getDirectoryName(this.getClass().getResource("aa324.html").getPath()) + "/";
+		String pathBase = Util.getDirectoryName(this.getClass().getResource("aa324.html").toURI().getPath()) + "/";
 		new XPipeline(
 				"HTML report test",
 				new XBatch(
@@ -112,13 +112,13 @@ public class TestScopingReport {
 	}
 	
 	@Test
-	public void testDefaultTemplateSWCS() throws MalformedURLException {
+	public void testDefaultTemplateSWCS() throws MalformedURLException, URISyntaxException {
 		ScopingReportStep srs = new ScopingReportStep();
 		Parameters params = (Parameters) srs.getParameters();
 		assertEquals("My Project", params.getProjectName());
 		assertEquals("", params.getCustomTemplateURI());
 		
-		String pathBase = Util.getDirectoryName(this.getClass().getResource("aa324.html").getPath()) + "/";
+		String pathBase = Util.getDirectoryName(this.getClass().getResource("aa324.html").toURI().getPath()) + "/";
 		new XPipeline(
 				"HTML report test",
 				new XBatch(
@@ -147,15 +147,15 @@ public class TestScopingReport {
 	}
 	
 	@Test
-	public void testCustomTemplateSWCS() throws MalformedURLException {
-		String path = this.getClass().getResource("totals_report_template.html").getPath();
+	public void testCustomTemplateSWCS() throws MalformedURLException, URISyntaxException {
+		String path = this.getClass().getResource("totals_report_template.html").toURI().getPath();
 		ScopingReportStep srs = new ScopingReportStep();
 		Parameters params = (Parameters) srs.getParameters();
 		params.setCustomTemplateURI(path);
 		assertEquals("My Project", params.getProjectName());
 		assertEquals(path, params.getCustomTemplateURI());
 		
-		String pathBase = Util.getDirectoryName(this.getClass().getResource("aa324.html").getPath()) + "/";
+		String pathBase = Util.getDirectoryName(this.getClass().getResource("aa324.html").toURI().getPath()) + "/";
 		new XPipeline(
 				"HTML report test",
 				new XBatch(
@@ -184,17 +184,17 @@ public class TestScopingReport {
 	}
 	
 	@Test
-	public void testCustomTemplate() throws MalformedURLException {
+	public void testCustomTemplate() throws MalformedURLException, URISyntaxException {
 		ScopingReportStep srs = new ScopingReportStep();
 		Parameters params = (Parameters) srs.getParameters();
 		assertEquals("", params.getCustomTemplateURI());
 		params.setProjectName("Test scoping report");
-		String path = this.getClass().getResource("test_scoping_report.html").getPath();
+		String path = this.getClass().getResource("test_scoping_report.html").toURI().getPath();
 		assertNotNull(path);
 		params.setCustomTemplateURI(path);
 		assertEquals("test_scoping_report.html", Util.getFilename(path, true));
 		
-		String pathBase = Util.getDirectoryName(this.getClass().getResource("aa324.html").getPath()) + "/";
+		String pathBase = Util.getDirectoryName(this.getClass().getResource("aa324.html").toURI().getPath()) + "/";
 		XPipeline pipeline = new XPipeline(
 				"HTML report test",
 				new XBatch(
@@ -225,8 +225,8 @@ public class TestScopingReport {
 	}
 		
 	@Test
-	public void htmlReportTest() throws MalformedURLException {
-		String pathBase = Util.getDirectoryName(this.getClass().getResource("aa324.html").getPath()) + "/";
+	public void htmlReportTest() throws MalformedURLException, URISyntaxException {
+		String pathBase = Util.getDirectoryName(this.getClass().getResource("aa324.html").toURI().getPath()) + "/";
 		
 		new XPipeline(
 				"HTML report test",
@@ -257,7 +257,7 @@ public class TestScopingReport {
 	
 	@Test
 	public void htmlReportTest2() throws URISyntaxException {
-		String pathBase = Util.getDirectoryName(this.getClass().getResource("aa324.html").getPath()) + "/";
+		String pathBase = Util.getDirectoryName(this.getClass().getResource("aa324.html").toURI().getPath()) + "/";
 		
 		StartDocument sd1 = new StartDocument("sd1");
 		sd1.setName(new File(this.getClass().getResource("aa324.html").toURI()).getAbsolutePath());
@@ -293,9 +293,9 @@ public class TestScopingReport {
 	}
 	
 	@Test
-	public void testLeveraging() throws MalformedURLException {
+	public void testLeveraging() throws MalformedURLException, URISyntaxException {
 
-		String pathBase = Util.getDirectoryName(this.getClass().getResource("aa324.html").getPath()) + "/";
+		String pathBase = Util.getDirectoryName(this.getClass().getResource("aa324.html").toURI().getPath()) + "/";
 		net.sf.okapi.connectors.pensieve.Parameters params = 
 			new net.sf.okapi.connectors.pensieve.Parameters();
 		params.setDbDirectory(pathBase + "testtm");
@@ -353,7 +353,7 @@ public class TestScopingReport {
 	}
 
 	@Test
-	public void test_a_word_is_counted_only_once() throws MalformedURLException {
+	public void test_a_word_is_counted_only_once() throws MalformedURLException, URISyntaxException {
 		ScopingReportStep srs;
 		WordCountStep wcs;
 		StartDocument sd;
@@ -364,7 +364,7 @@ public class TestScopingReport {
 		Event tuEvent1, tuEvent2, tuEvent3, tuEvent4;
 		Logger logger = Logger.getLogger(getClass().getName());
 		
-		String pathBase = Util.getDirectoryName(this.getClass().getResource("").getPath()) + "/";
+		String pathBase = Util.getDirectoryName(this.getClass().getResource("").toURI().getPath()) + "/";
 		net.sf.okapi.connectors.pensieve.Parameters rparams = 
 			new net.sf.okapi.connectors.pensieve.Parameters();
 		rparams.setDbDirectory(pathBase + "testtm");
@@ -415,7 +415,7 @@ public class TestScopingReport {
 		srs.setTargetLocale(LocaleId.FRENCH);
 		Parameters params2 = (Parameters) srs.getParameters();
 		params2.setOutputPath(outputFilePath);
-		params2.setCustomTemplateURI(this.getClass().getResource("golden_file_template.txt").getPath());
+		params2.setCustomTemplateURI(this.getClass().getResource("golden_file_template.txt").toURI().getPath());
 		sd.setName(params2.getCustomTemplateURI());
 				
 		wcs.handleEvent(sbEvent);
@@ -464,7 +464,7 @@ public class TestScopingReport {
 	}	
 	
 	@Test
-	public void test_a_word_is_counted_only_once2() throws MalformedURLException {
+	public void test_a_word_is_counted_only_once2() throws MalformedURLException, URISyntaxException {
 		ScopingReportStep srs;
 		WordCountStep wcs;
 		StartDocument sd;
@@ -475,7 +475,7 @@ public class TestScopingReport {
 		Event tuEvent1, tuEvent2, tuEvent3, tuEvent4;
 		Logger logger = Logger.getLogger(getClass().getName());
 		
-		String pathBase = Util.getDirectoryName(this.getClass().getResource("").getPath()) + "/";
+		String pathBase = Util.getDirectoryName(this.getClass().getResource("").toURI().getPath()) + "/";
 		net.sf.okapi.connectors.pensieve.Parameters rparams = 
 			new net.sf.okapi.connectors.pensieve.Parameters();
 		rparams.setDbDirectory(pathBase + "testtm");
@@ -526,7 +526,7 @@ public class TestScopingReport {
 		srs.setTargetLocale(LocaleId.FRENCH);
 		Parameters params2 = (Parameters) srs.getParameters();
 		params2.setOutputPath(outputFilePath);
-		params2.setCustomTemplateURI(this.getClass().getResource("golden_file_template.txt").getPath());
+		params2.setCustomTemplateURI(this.getClass().getResource("golden_file_template.txt").toURI().getPath());
 		params2.setCountAsNonTranslatable_ExactMatch(true);
 		params2.setCountAsNonTranslatable_GMXFuzzyMatch(true);
 		sd.setName(params2.getCustomTemplateURI());
@@ -576,7 +576,7 @@ public class TestScopingReport {
 	}
 	
 	@Test
-	public void test_repetitions() throws MalformedURLException {
+	public void test_repetitions() throws MalformedURLException, URISyntaxException {
 		ScopingReportStep srs;
 		WordCountStep wcs;
 		StartDocument sd;
@@ -588,7 +588,7 @@ public class TestScopingReport {
 		Event tuEvent1, tuEvent2, tuEvent3, tuEvent4;
 		Logger logger = Logger.getLogger(getClass().getName());
 		
-		String pathBase = Util.getDirectoryName(this.getClass().getResource("").getPath()) + "/";
+		String pathBase = Util.getDirectoryName(this.getClass().getResource("").toURI().getPath()) + "/";
 //		net.sf.okapi.connectors.pensieve.Parameters rparams = 
 //			new net.sf.okapi.connectors.pensieve.Parameters();
 //		rparams.setDbDirectory(pathBase + "testtm");
@@ -647,7 +647,7 @@ public class TestScopingReport {
 		srs.setTargetLocale(LocaleId.FRENCH);
 		Parameters params2 = (Parameters) srs.getParameters();
 		params2.setOutputPath(outputFilePath);
-		params2.setCustomTemplateURI(this.getClass().getResource("golden_file_template2.txt").getPath());
+		params2.setCustomTemplateURI(this.getClass().getResource("golden_file_template2.txt").toURI().getPath());
 		sd.setName(params2.getCustomTemplateURI());
 				
 		ras.handleEvent(sbEvent);

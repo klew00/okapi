@@ -21,6 +21,7 @@
 package net.sf.okapi.filters.mosestext;
 
 import java.io.File;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,10 +49,10 @@ public class MosesTextFilterTest {
 	private LocaleId locPT = LocaleId.PORTUGUESE;
 	private GenericContent fmt;
 
-	public MosesTextFilterTest () {
+	public MosesTextFilterTest () throws URISyntaxException {
 		filter = new MosesTextFilter();
 		URL url = MosesTextFilterTest.class.getResource("/Test01.txt");
-		root = Util.getDirectoryName(url.getPath()) + File.separator;
+		root = Util.getDirectoryName(url.toURI().getPath()) + File.separator;
 		fmt = new GenericContent();
 	}
 
@@ -65,10 +66,10 @@ public class MosesTextFilterTest {
 	}
 
 	@Test
-	public void testStartDocument () {
+	public void testStartDocument () throws URISyntaxException {
 		URL url = MosesTextFilterTest.class.getResource("/Test01.txt");
 		assertTrue("Problem in StartDocument", FilterTestDriver.testStartDocument(filter,
-			new InputDocument(url.getPath(), null),
+			new InputDocument(url.toURI().getPath(), null),
 			"UTF-8", locEN, locEN));
 	}
 	

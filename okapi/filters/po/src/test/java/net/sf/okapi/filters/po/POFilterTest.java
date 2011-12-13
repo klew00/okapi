@@ -24,6 +24,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,10 +59,10 @@ public class POFilterTest {
 	private LocaleId locFR = LocaleId.fromString("fr");
 	
 	@Before
-	public void setUp() {
+	public void setUp() throws URISyntaxException {
 		filter = new POFilter();
 		URL url = POFilterTest.class.getResource("/Test01.po");
-		root = Util.getDirectoryName(url.getPath()) + File.separator;
+		root = Util.getDirectoryName(url.toURI().getPath()) + File.separator;
 	}
 
 	@Test

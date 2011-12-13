@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -66,10 +67,10 @@ public class ArchiveFilterTest {
 	private final Logger logger = Logger.getLogger(getClass().getName());
 	
 	@Before
-	public void setUp() {
+	public void setUp() throws URISyntaxException {
 		logger.setLevel(Level.FINE);
 		filter = new ArchiveFilter();
-		pathBase = Util.getDirectoryName(this.getClass().getResource("test1_es.archive").getPath()) + "/";
+		pathBase = Util.getDirectoryName(this.getClass().getResource("test1_es.archive").toURI().getPath()) + "/";
 	}
 
 	@Test
@@ -358,9 +359,9 @@ public class ArchiveFilterTest {
 				"Test pipeline for ArchiveFilterTest",
 				new XBatch(
 						new XBatchItem(
-								new URL("file", null, pathBase + "test5_es.archive"),
+								new File(pathBase + "test5_es.archive").toURI(),
 								"UTF-8",
-								new URL("file", null, pathBase + "out/test5_es.archive"),
+								new File(pathBase + "out/test5_es.archive").toURI(),
 								"UTF-8",
 								EN,
 								ESES

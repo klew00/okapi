@@ -204,7 +204,7 @@ public class FixedWidthColumnsFilterTest {
 	}
 	
 	@Test
-	public void testParameters() {
+	public void testParameters() throws URISyntaxException {
 		
 		// Check if PlainTextFilter params are set for inherited fields
 		Parameters params = (Parameters) filter.getParameters();
@@ -245,7 +245,7 @@ public class FixedWidthColumnsFilterTest {
 		paramsUrl = TableFilterTest.class.getResource("/test_params2.txt");
 		assertNotNull(paramsUrl);
 		
-		params.save(paramsUrl.getPath());
+		params.save(paramsUrl.toURI().getPath());
 		
 		// Change params before loading them
 		params = (Parameters) filter.getParameters();
@@ -254,7 +254,7 @@ public class FixedWidthColumnsFilterTest {
 		params.columnStartPositions = "1, 23, 30";
 		params.columnEndPositions = "10, 21, 40";
 		
-		params.load(Util.toURI(paramsUrl.getPath()), false);		
+		params.load(Util.toURI(paramsUrl.toURI().getPath()), false);		
 		// assertEquals("19, 30, 21, 16, 15, 21, 20", params.columnWidths);
 		assertEquals("1, 20, 50, 71, 87, 102, 123, 144", params.columnStartPositions);
 		assertEquals("11, 32, 62, 83, 97, 112, 133, 151", params.columnEndPositions);

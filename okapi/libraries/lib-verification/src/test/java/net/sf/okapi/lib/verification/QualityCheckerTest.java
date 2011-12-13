@@ -21,6 +21,7 @@
 package net.sf.okapi.lib.verification;
 
 import java.io.File;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,9 +46,9 @@ public class QualityCheckerTest {
 	private LocaleId locFR = LocaleId.FRENCH;
 	private String root;
 
-	public QualityCheckerTest () {
+	public QualityCheckerTest () throws URISyntaxException {
 		URL url = QualityCheckerTest.class.getResource("/test01.tsv");
-		root = Util.getDirectoryName(url.getPath()) + File.separator;
+		root = Util.getDirectoryName(url.toURI().getPath()) + File.separator;
 	}
 	
 	@Before

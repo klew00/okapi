@@ -38,7 +38,7 @@ public class ParagraphToSentenceAlignStepTest {
 		p.setSegmentTarget(true);
 		p.setSegmentSource(true);
 		p.setUseCustomTargetRules(true);
-		p.setCustomTargetRulesPath(this.getClass().getResource("default.srx").getPath());
+		p.setCustomTargetRulesPath(this.getClass().getResource("default.srx").toURI().getPath());
 		aligner.setParameters(p);
 		FilterConfigurationMapper fcMapper = new FilterConfigurationMapper();
 		fcMapper.addConfigurations("net.sf.okapi.filters.plaintext.PlainTextFilter");
@@ -62,9 +62,9 @@ public class ParagraphToSentenceAlignStepTest {
 		splitParagraphAlignment("/fullParagraph.tmx");
 	}
 */
-	public void splitParagraphAlignment(String initialTmx) {
+	public void splitParagraphAlignment(String initialTmx) throws URISyntaxException {
 		URL url = this.getClass().getResource(initialTmx);
-		String sPath = url.getPath();
+		String sPath = url.toURI().getPath();
 		String sOutputPath = sPath+".out";
 		String sGoldPath = sPath+".gold";
 

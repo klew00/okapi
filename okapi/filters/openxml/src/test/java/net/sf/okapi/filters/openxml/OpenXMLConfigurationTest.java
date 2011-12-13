@@ -18,6 +18,7 @@
 /*===========================================================================*/
 package net.sf.okapi.filters.openxml;
 
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -89,10 +90,10 @@ public class OpenXMLConfigurationTest {
 	}
 
 	@Test
-	public void testStartDocument () {
+	public void testStartDocument () throws URISyntaxException {
 		URL url = OpenXMLConfigurationTest.class.getResource("/BoldWorld.docx");
 		assertTrue("Problem in StartDocument", FilterTestDriver.testStartDocument(filter,
-			new InputDocument(url.getPath(), null),
+			new InputDocument(url.toURI().getPath(), null),
 			"UTF-8", locEN, locEN));
 	}
 	

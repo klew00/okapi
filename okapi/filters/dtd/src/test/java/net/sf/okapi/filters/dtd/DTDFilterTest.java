@@ -24,6 +24,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,10 +65,10 @@ public class DTDFilterTest {
 	}
 
 	@Test
-	public void testStartDocument () {
+	public void testStartDocument () throws URISyntaxException {
 		URL url = DTDFilterTest.class.getResource("/Test01.dtd");
 		assertTrue("Problem in StartDocument", FilterTestDriver.testStartDocument(filter,
-			new InputDocument(url.getPath(), null),
+			new InputDocument(url.toURI().getPath(), null),
 			"UTF-8", locEN, locEN));
 	}
 	
@@ -117,13 +118,13 @@ public class DTDFilterTest {
 //	}
 	
 	@Test
-	public void testDoubleExtraction () {
+	public void testDoubleExtraction () throws URISyntaxException {
 		// Read all files in the data directory
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
 		URL url = DTDFilterTest.class.getResource("/Test01.dtd");
-		list.add(new InputDocument(url.getPath(), null));
+		list.add(new InputDocument(url.toURI().getPath(), null));
 		url = DTDFilterTest.class.getResource("/Test02.dtd");
-		list.add(new InputDocument(url.getPath(), null));
+		list.add(new InputDocument(url.toURI().getPath(), null));
 		
 		RoundTripComparison rtc = new RoundTripComparison();
 		assertTrue(rtc.executeCompare(filter, list, "UTF-8", locEN, locEN));

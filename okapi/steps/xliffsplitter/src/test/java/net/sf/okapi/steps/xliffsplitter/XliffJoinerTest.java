@@ -22,7 +22,7 @@ public class XliffJoinerTest {
 	@Before
 	public void setUp() throws Exception {
 		
-		xlfRoot = Util.getDirectoryName(this.getClass().getResource("to_join/tasks_Test_SDL_XLIFF_18961_es_ES_xliff_singleFile_PART0001.xlf").getPath())
+		xlfRoot = Util.getDirectoryName(this.getClass().getResource("to_join/tasks_Test_SDL_XLIFF_18961_es_ES_xliff_singleFile_PART0001.xlf").toURI().getPath())
 					+ File.separator;
 		xlfFileList = Util.getFilteredFiles(xlfRoot, ".xlf");
 		joinPath = xlfRoot + "out" + File.separator;

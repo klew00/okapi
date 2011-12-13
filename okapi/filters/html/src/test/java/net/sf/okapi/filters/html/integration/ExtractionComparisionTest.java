@@ -41,7 +41,7 @@ public class ExtractionComparisionTest {
 		testFileList = HtmlUtils.getHtmlTestFiles();
 
 		URL url = ExtractionComparisionTest.class.getResource("/324.html");
-		root = Util.getDirectoryName(url.getPath()) + File.separator;
+		root = Util.getDirectoryName(url.toURI().getPath()) + File.separator;
 	}
 
 	@After

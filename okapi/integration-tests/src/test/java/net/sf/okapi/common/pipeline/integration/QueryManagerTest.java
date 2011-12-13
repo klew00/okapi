@@ -33,7 +33,7 @@ public class QueryManagerTest {
 	@Before
 	public void setUp() throws Exception {
 		URL url = QueryManagerTest.class.getResource("/mytm.tmx");
-		String rootDir = Util.getDirectoryName(url.getPath());
+		String rootDir = Util.getDirectoryName(url.toURI().getPath());
 		
 		// create local pensieve TM		
 		TmxFilter tmxFilter = new TmxFilter();

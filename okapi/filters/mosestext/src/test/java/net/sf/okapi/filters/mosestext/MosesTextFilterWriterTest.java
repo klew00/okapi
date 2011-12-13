@@ -23,6 +23,7 @@ package net.sf.okapi.filters.mosestext;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,10 +48,10 @@ public class MosesTextFilterWriterTest {
 	private LocaleId locFR = LocaleId.FRENCH;
 	private final String lb = System.getProperty("line.separator");
 
-	public MosesTextFilterWriterTest () {
+	public MosesTextFilterWriterTest () throws URISyntaxException {
 		filter = new MosesTextFilter();
 		URL url = MosesTextFilterWriterTest.class.getResource("/Test01.txt");
-		root = Util.getDirectoryName(url.getPath()) + File.separator;
+		root = Util.getDirectoryName(url.toURI().getPath()) + File.separator;
 	}
 
 	@Test

@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 import net.sf.okapi.common.Event;
@@ -31,10 +32,10 @@ public class TestCodeSimplifierStep {
 	private String pathBase;
 	
 	@Before
-	public void setup() {
+	public void setup() throws URISyntaxException {
 		css = new CodeSimplifierStep(); 
 		fmt = new GenericContent();
-		pathBase = Util.getDirectoryName(this.getClass().getResource("").getPath()) + "/";
+		pathBase = Util.getDirectoryName(this.getClass().getResource("").toURI().getPath()) + "/";
 	}	
 	
 	@Test
