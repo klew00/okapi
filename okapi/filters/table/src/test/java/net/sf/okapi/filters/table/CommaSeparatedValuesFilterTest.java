@@ -446,7 +446,7 @@ public class CommaSeparatedValuesFilterTest {
 	}
 	
 	@Test
-	public void testParameters() {
+	public void testParameters() throws URISyntaxException {
 		
 		// Check if PlainTextFilter params are set for inherited fields
 		Parameters params = (Parameters) filter.getParameters();
@@ -496,13 +496,7 @@ public class CommaSeparatedValuesFilterTest {
 //		URL paramsUrl = TableFilterTest.class.getResource("/test_params1.txt");
 //		assertNotNull(paramsUrl);  
 		
-
-		try {
-		String st = "file:" + getFullFileName("test_params1.txt");
-		params.load(new URI(st), false);
-	} catch (URISyntaxException e) {
-	}
-
+		params.load(new File(getFullFileName("test_params1.txt")).toURI(), false);
 		
 		assertEquals("2", params.fieldDelimiter);
 		assertEquals(params.columnNamesLineNum, 2);
@@ -518,7 +512,7 @@ public class CommaSeparatedValuesFilterTest {
 		URL paramsUrl = TableFilterTest.class.getResource("/test_params2.txt");
 		assertNotNull(paramsUrl);
 		
-		params.save(paramsUrl.getPath());
+		params.save(paramsUrl.toURI().getPath());
 		
 		// Change params before loading them
 		params = (Parameters) filter.getParameters();
@@ -532,7 +526,7 @@ public class CommaSeparatedValuesFilterTest {
 		params.preserveWS = true;
 		params.useCodeFinder = true;
 		
-		params.load(Util.toURI(paramsUrl.getPath()), false);
+		params.load(Util.toURI(paramsUrl.toURI().getPath()), false);
 		
 		assertEquals(params.fieldDelimiter, "2");
 		assertEquals(params.columnNamesLineNum, 2);
@@ -1822,11 +1816,8 @@ public class CommaSeparatedValuesFilterTest {
 	@Test
 	public void testRecordId() {
 		IParameters params = filter.getParameters();
-		try {
-			String st = "file:" + getFullFileName("okf_table@record_id.fprm");
-			params.load(new URI(st), false);
-		} catch (URISyntaxException e) {
-		}
+
+		params.load(new File(getFullFileName("okf_table@record_id.fprm")).toURI(), false);
 		
 		InputStream input = TableFilterTest.class.getResourceAsStream("/csv_testd.txt");
 		assertNotNull(input);
@@ -1854,11 +1845,8 @@ public class CommaSeparatedValuesFilterTest {
 	@Test
 	public void testSourceId() {
 		IParameters params = filter.getParameters();
-		try {
-			String st = "file:" + getFullFileName("okf_table@source_id.fprm");
-			params.load(new URI(st), false);
-		} catch (URISyntaxException e) {
-		}
+
+		params.load(new File(getFullFileName("okf_table@source_id.fprm")).toURI(), false);
 		
 		InputStream input = TableFilterTest.class.getResourceAsStream("/csv_teste.txt");
 		assertNotNull(input);
@@ -1887,11 +1875,8 @@ public class CommaSeparatedValuesFilterTest {
 	public void testEmptySourceId() {
 		// 1. No suffix
 		IParameters params = filter.getParameters();
-		try {
-			String st = "file:" + getFullFileName("okf_table@record_id2.fprm");
-			params.load(new URI(st), false);
-		} catch (URISyntaxException e) {
-		}
+
+		params.load(new File(getFullFileName("okf_table@record_id2.fprm")).toURI(), false);
 		
 		InputStream input = TableFilterTest.class.getResourceAsStream("/csv_testf.txt");
 		assertNotNull(input);
@@ -1916,11 +1901,8 @@ public class CommaSeparatedValuesFilterTest {
 		filter.close();
 		
 		// 2. With suffix
-		try {
-			String st = "file:" + getFullFileName("okf_table@record_id3.fprm");
-			params.load(new URI(st), false);
-		} catch (URISyntaxException e) {
-		}
+		params.load(new File(getFullFileName("okf_table@record_id3.fprm")).toURI(), false);
+
 		input = TableFilterTest.class.getResourceAsStream("/csv_testf.txt");
 		assertNotNull(input);
 		
