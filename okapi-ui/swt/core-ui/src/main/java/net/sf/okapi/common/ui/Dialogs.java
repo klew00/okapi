@@ -152,11 +152,11 @@ public class Dialogs {
 	}
 
 	/**
-	 * Moves a given windows to the south-east corner of a given parent.
+	 * Moves a given window to the south-east corner of a given parent.
 	 * @param target the window to move.
 	 * @param parent the parent, or null to use the whole screen.
 	 */
-	static public void placeWindowsInSECorner (Shell target,
+	static public void placeWindowInSECorner (Shell target,
 		Shell parent)
 	{
 		Rectangle parentRect;

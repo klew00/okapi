@@ -68,6 +68,7 @@ public class IdBasedAlignerStep extends BasePipelineStep {
 	private RawDocument targetInput = null;
 	private TMXWriter tmx;
 	private Map<String, ITextUnit> targetTextUnitMap;
+	private boolean useTargetText;
 
 	public IdBasedAlignerStep() {
 		params = new Parameters();
@@ -142,6 +143,8 @@ public class IdBasedAlignerStep extends BasePipelineStep {
 			throw new OkapiBadStepInputException("Second input file (target) not configured.");
 		}
 		
+		// Use target text if reference file is bilingual, otherwise use the source
+		useTargetText = event.getStartDocument().isMultilingual();
 		targetTextUnitMap = new HashMap<String, ITextUnit>();
 		getTargetTextUnits();
 
@@ -176,28 +179,49 @@ public class IdBasedAlignerStep extends BasePipelineStep {
 		ITextUnit alignedTextUnit = sourceTu.clone();		
 		
 		TextContainer targetTC = alignedTextUnit.createTarget(targetLocale, false, IResource.COPY_PROPERTIES);
-				
-		ITextUnit targetTu = targetTextUnitMap.get(sourceTu.getName());
-		if (targetTu != null && !targetTu.isEmpty() && 
-				targetTu.getSource().hasText()) {			
+
+		// Get the target content from the reference (if possible)
+		ITextUnit refTu = targetTextUnitMap.get(sourceTu.getName());
+		TextContainer refTc = null;
+		boolean missingReferenceMatch = true;
+		if (( refTu != null ) && !refTu.isEmpty() ) {
+			if ( useTargetText ) {
+				// For bilingual reference file: check also the source of the reference
+				TextContainer srcRefTc = refTu.getSource();
+				// Use the target only if the source is the same
+				if ( srcRefTc.compareTo(alignedTextUnit.getSource(), true) == 0 ) {
+					refTc = refTu.getTarget(targetLocale);
+				}
+				else {
+					// We had a match, but the source text is not the same
+					missingReferenceMatch = false;
+				}
+			}
+			else { // Monolingual files:
+				// Use the source of the reference as the target of the aligned TU
+				refTc = refTu.getSource();
+			}
+		}
+		
+		if (( refTc != null ) && refTc.hasText()) {			
 			// align codes (assume filter as numbered them correctly)										
-			alignedTextUnit.getSource().getFirstContent().alignCodeIds(targetTu.getSource().getFirstContent());		
+			alignedTextUnit.getSource().getFirstContent().alignCodeIds(refTc.getFirstContent());		
 			
 			// adjust codes to match new source
 			TextFragment tf = TextUnitUtil.copySrcCodeDataToMatchingTrgCodes(
-					sourceTu.getSource().getFirstContent(),
-					targetTu.getSource().getFirstContent(), 
-					true, false, null, alignedTextUnit);									
+				sourceTu.getSource().getFirstContent(),
+				refTc.getFirstContent(), 
+				true, false, null, alignedTextUnit);									
 			
-			if (params.isCopyToTarget()) {				
-				targetTC.setContent(tf);							
+			if ( params.isCopyToTarget() ) {				
+				targetTC.setContent(tf);
 			}			
 			
-			if (params.isStoreAsAltTranslation()) {
+			if ( params.isStoreAsAltTranslation() ) {
 				// make an AltTranslation and attach to the target container
 				AltTranslation alt = new AltTranslation(sourceLocale, targetLocale, 
-						alignedTextUnit.getSource().getUnSegmentedContentCopy(), 
-						null, tf, MatchType.EXACT_UNIQUE_ID, score, getName());
+					alignedTextUnit.getSource().getUnSegmentedContentCopy(), 
+					null, tf, MatchType.EXACT_UNIQUE_ID, score, getName());
 								
 				// add the annotation to the target container since we are diffing paragraphs only
 				// we may need to create the target if it doesn't exist
@@ -206,8 +230,13 @@ public class IdBasedAlignerStep extends BasePipelineStep {
 				alta.sort();
 			}
 		}
-		else {
-			LOGGER.warning("Missing target string for: " + sourceTu.getName());
+		else { // No match in the reference file
+			if ( missingReferenceMatch ) {
+				LOGGER.warning("No match found for: " + sourceTu.getName());
+			}
+			else {
+				LOGGER.warning("Source texts differ for: " + sourceTu.getName());
+			}
 			if ( params.getReplaceWithSource()) {
 				// Use the source text if there is no target
 				alignedTextUnit.setTarget(targetLocale, sourceTu.getSource());
@@ -215,9 +244,10 @@ public class IdBasedAlignerStep extends BasePipelineStep {
 		}
 		
 		// Send the aligned TU to the TMX file or pass it on
-		if (params.getGenerateTMX()) {
+		if ( params.getGenerateTMX() ) {
 			tmx.writeTUFull(alignedTextUnit);
-		} else { // Otherwise send each aligned TextUnit downstream
+		}
+		else { // Otherwise send each aligned TextUnit downstream
 			return new Event(EventType.TEXT_UNIT, alignedTextUnit);
 		}
 

@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.lib.tmdb.SearchAndReplaceOptions;
-import net.sf.okapi.lib.tmdb.SearchAndReplaceOptions.ACTIONS;
+import net.sf.okapi.lib.tmdb.SearchAndReplaceOptions.ACTION;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -53,10 +53,9 @@ class SearchAndReplaceForm {
 	private Button btReplaceAll;
 	private Table tblFields;
 	private SearchAndReplaceOptions options;
-	private ACTIONS result = ACTIONS.CLOSE;
 
 	SearchAndReplaceForm (Shell parent,
-		SearchAndReplaceOptions options,
+		SearchAndReplaceOptions p_options,
 		ArrayList<String> displayFields)
 	{
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
@@ -64,7 +63,7 @@ class SearchAndReplaceForm {
 		UIUtil.inheritIcon(shell, parent);
 		shell.setLayout(new GridLayout(3, false));
 
-		this.options = options;
+		this.options = p_options;
 		
 		Label label = new Label(shell, SWT.NONE);
 		label.setText("Search for:");
@@ -81,22 +80,23 @@ class SearchAndReplaceForm {
 		
 		SelectionAdapter adapter = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				result = ACTIONS.CLOSE;
+				options.setAction(ACTION.CLOSE);
+				options.getAction();
 				if ( e.widget == btFindNext ) { //$NON-NLS-1$
 					if ( !saveData() ) return;
-					result = ACTIONS.FINDNEXT;
+					options.setAction(ACTION.FINDNEXT);
 				}
 				else if ( e.widget == btReplaceOne ) { //$NON-NLS-1$
 					if ( !saveData() ) return;
-					result = ACTIONS.REPLACE;
+					options.setAction(ACTION.REPLACE);
 				}
 				else if ( e.widget == btReplaceAll ) { //$NON-NLS-1$
 					if ( !saveData() ) return;
-					result = ACTIONS.REPLACEALL;
+					options.setAction(ACTION.REPLACEALL);
 				}
 				else if ( e.widget == btFlagAll ) { //$NON-NLS-1$
 					if ( !saveData() ) return;
-					result = ACTIONS.FLAGALL;
+					options.setAction(ACTION.FLAGALL);
 				}
 				shell.close();
 			};
@@ -139,7 +139,7 @@ class SearchAndReplaceForm {
 		shell.setMinimumSize(Rect.width, Rect.height);
 		
 		updateData(displayFields);
-		Dialogs.placeWindowsInSECorner(shell, parent);
+		Dialogs.placeWindowInSECorner(shell, parent);
 	}
 
 	private void updateData (ArrayList<String> displayFields) {
@@ -154,13 +154,13 @@ class SearchAndReplaceForm {
 		}
 	}
 	
-	ACTIONS showDialog () {
+	ACTION showDialog () {
 		shell.open();
 		while ( !shell.isDisposed() ) {
 			if ( !shell.getDisplay().readAndDispatch() )
 				shell.getDisplay().sleep();
 		}
-		return result;
+		return options.getAction();
 	}
 
 	private boolean saveData () {

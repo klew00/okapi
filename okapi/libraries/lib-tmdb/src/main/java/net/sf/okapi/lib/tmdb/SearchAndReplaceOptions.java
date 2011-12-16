@@ -24,7 +24,7 @@ import java.util.ArrayList;
 
 public class SearchAndReplaceOptions {
 
-	public static enum ACTIONS {
+	public static enum ACTION {
 		CLOSE,
 		FINDNEXT,
 		REPLACE,
@@ -35,10 +35,26 @@ public class SearchAndReplaceOptions {
 	private String search;
 	private String replace;
 	private ArrayList<String> fields;
+	private ACTION action;
+	
+	private int startPos;
+	private int currentPos;
+	private String startField;
+	private String currentField;
+	private long startSegKey;
+	private long currentSegKey;
 	
 	public SearchAndReplaceOptions () {
 		setSearch(null);
 		setReplace(null);
+	}
+
+	public ACTION getAction () {
+		return action;
+	}
+
+	public void setAction (ACTION action) {
+		this.action = action;
 	}
 
 	public String getSearch () {

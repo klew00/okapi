@@ -54,7 +54,18 @@ public class SearchAndReplace implements Runnable {
 		boolean canceled = false;
 		
 		try {
-			callback.startProcess("Searching and replacing...");
+			switch ( options.getAction() ) {
+			case FINDNEXT:
+			case REPLACE:
+				callback.startProcess("Searching...");
+				break;
+			case REPLACEALL:
+				callback.startProcess("Searching and replacing...");
+				break;
+			case FLAGALL:
+				callback.startProcess("Searching and flagging...");
+				break;
+			}
 			
 			// Get the original TM and set it for iteration
 			tm = repo.openTm(tmName);
@@ -71,8 +82,9 @@ public class SearchAndReplace implements Runnable {
 					for ( String fn : res.get(1).keySet() ) {
 						if ( options.getFields().contains(fn) ) {
 							String tmp = (String)res.get(1).get(fn);
+							//temporary
 							if ( tmp.contains(options.getSearch()) ) {
-								Boolean b = (Boolean)(res.get(1).get("Flag"));
+								
 							}
 						}
 					}

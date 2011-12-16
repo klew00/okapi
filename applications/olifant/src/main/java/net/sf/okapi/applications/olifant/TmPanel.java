@@ -32,13 +32,15 @@ import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.ResourceManager;
 import net.sf.okapi.lib.tmdb.DbUtil;
 import net.sf.okapi.lib.tmdb.ITm;
+import net.sf.okapi.lib.tmdb.Location;
 import net.sf.okapi.lib.tmdb.SearchAndReplace;
 import net.sf.okapi.lib.tmdb.SearchAndReplaceOptions;
-import net.sf.okapi.lib.tmdb.SearchAndReplaceOptions.ACTIONS;
+import net.sf.okapi.lib.tmdb.SearchAndReplaceOptions.ACTION;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.KeyAdapter;
@@ -49,6 +51,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
@@ -566,16 +569,16 @@ class TmPanel extends Composite implements IObserver {
 	
 	void searchAndReplace (boolean search) {
 		try {
-			int n = table.getSelectionIndex();
-			if ( n == -1 ) {
-				return; // Nothing to do
-			}
+			Location loc = getCurrentLocation(null);
+			
+			
+			
 			if ( sarForm == null ) {
 				sarForm = new SearchAndReplaceForm(getShell(), sarOptions, opt.getVisibleFields());
 			}
-			ACTIONS res = sarForm.showDialog();
+			ACTION res = sarForm.showDialog();
 			sarForm = null;
-			if ( res == ACTIONS.CLOSE ) return; // Close
+			if ( res == ACTION.CLOSE ) return; // Close
 			
 			showLog(); // Make sure to display the log
 			
@@ -752,4 +755,32 @@ class TmPanel extends Composite implements IObserver {
 		resetTmDisplay();
 	}
 
+	/**
+	 * Build a new Location object with the current location of the cursor. 
+	 * @param loc Location object to update, or null to create a new one.
+	 * @return the updated (and possibly new) Location object.
+	 */
+	public Location getCurrentLocation (Location loc) {
+		if ( loc == null ) {
+			loc = new Location();
+		}
+		// Get the current field
+		Control ctrl = getDisplay().getFocusControl();
+		if ( ctrl instanceof StyledText ) {
+			loc.setPosition(((StyledText)ctrl).getCaretOffset());
+		}
+		else {
+			loc.setPosition(-1);
+			loc.setFieldName(null);
+		}
+		
+		//loc.setSegKey();
+		
+		
+		// Get the current cursor position in the field
+		
+		// Get the current segment key
+		
+		return loc;
+	}
 }

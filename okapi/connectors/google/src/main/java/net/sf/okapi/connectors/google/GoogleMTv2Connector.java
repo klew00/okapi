@@ -44,7 +44,12 @@ import net.sf.okapi.lib.translation.QueryUtil;
 
 public class GoogleMTv2Connector extends BaseConnector {
 
-	private static final int QUERY_LIMIT = 2000;
+	// Changed from 2000 in Dec-15-2011 to let the error be handled by GT
+	private static final int QUERY_LIMIT = 20000;
+	// Keep some kind of batch limit otherwise we will always go for long queries
+	// when the batch query method is called with many fragments
+	private static final int QUERY_BLIMIT = 2048;
+
 	private static final String BASE_URL = "https://www.googleapis.com/language/translate/v2";
 	private static final String BASE_QUERY = "?key=%s&source=%s&target=%s";
 	private static final String QPARAM = "&q=";
@@ -111,7 +116,7 @@ public class GoogleMTv2Connector extends BaseConnector {
 			// Check the space needed for the query
 			int left = QUERY_LIMIT - (urlString.length()+QPARAM.length());
 			if ( left < qtext.length() ) {
-				throw new RuntimeException(String.format("Query too long: Character available: %d, characters in query: %d.",
+				throw new RuntimeException(String.format("Query too long: Characters available: %d, characters in query: %d.",
 					left, qtext.length()));
 			}
 			URL url = new URL(urlString + QPARAM + URLEncoder.encode(qtext, "UTF-8"));
@@ -172,7 +177,7 @@ public class GoogleMTv2Connector extends BaseConnector {
 			// The outer loop does as many calls to the service as it is needed to process
 			// all input fragments.
 			// The inside loop fill the request with as many fragments as possible
-			// based on the QUERY_LIMIT maximum size.
+			// based on the QUERY_BLIMIT maximum size.
 			do {
 				// Each query may be the last one
 				doAnotherQuery = false;
@@ -193,11 +198,11 @@ public class GoogleMTv2Connector extends BaseConnector {
 					String qtext = util.toCodedHTML(frag);
 	
 					// Check the space needed for the query
-					int left = QUERY_LIMIT - (urlString.length()+QPARAM.length());
+					int left = QUERY_BLIMIT - (urlString.length()+QPARAM.length());
 					if ( left < qtext.length() ) {
 						if ( index == start ) {
 							// If the first fragment does not fit: it's just too long
-							throw new RuntimeException(String.format("Query too long: Character available: %d, characters in query: %d.",
+							throw new RuntimeException(String.format("Query too long: Characters available: %d, characters in query: %d.",
 								left, qtext.length()));
 						}
 						else {

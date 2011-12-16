@@ -218,6 +218,11 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		optStrings.add(null);
 		optMoreInfo.add("Rainbow TKit - Versified with RTF"); // TDOD: wiki page
 		writers.add("net.sf.okapi.steps.rainbowkit.versified.VersifiedRtfPackageWriter");
+//		// Table options
+//		optEditors.add(null);
+//		optStrings.add(null);
+//		optMoreInfo.add("Rainbow TKit - Table"); // TDOD: wiki page
+//		writers.add("net.sf.okapi.steps.rainbowkit.table.TablePackageWriter");
 
 		mainComposite = new Composite(parent, SWT.BORDER);
 		mainComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -274,6 +279,9 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		
 		lbTypes.add("Versified with RTF (Beta)");
 		lbTypes.setData("8", "net.sf.okapi.steps.rainbowkit.versified.VersifiedRtfPackageWriter");
+
+//		lbTypes.add("Table (Alpha)");
+//		lbTypes.setData("9", "net.sf.okapi.steps.rainbowkit.table.TablePackageWriter");
 
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.heightHint = 70;
@@ -395,6 +403,11 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 			btOptions.setEnabled(false);
 			edDescription.setText("Package where the files to translate are converted into a Versified RTF file with Trados-compatible styles.\n"
 				+ "You can translate this package with Trados Translator's Workbench, WordFast or any RTF compatible editor.");
+			break;
+		case 9: // Table
+			btOptions.setEnabled(false);
+			edDescription.setText("Package where the files to translate are converted into tab-delimited tables.\n"
+				+ "You can translate this package with a spreadsheet application.");
 			break;
 		}
 	}
