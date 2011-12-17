@@ -40,6 +40,7 @@ import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.query.MatchType;
+import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
@@ -215,6 +216,8 @@ public class IdBasedAlignerStep extends BasePipelineStep {
 			
 			if ( params.isCopyToTarget() ) {				
 				targetTC.setContent(tf);
+				Property prop = refTc.getProperty(Property.APPROVED);
+				if ( prop != null ) targetTC.setProperty(prop.clone());
 			}			
 			
 			if ( params.isStoreAsAltTranslation() ) {

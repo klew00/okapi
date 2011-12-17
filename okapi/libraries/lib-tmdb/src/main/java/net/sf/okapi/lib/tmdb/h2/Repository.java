@@ -61,7 +61,7 @@ public class Repository implements IRepository {
 	 * Creates a new Repository object. the local back-end files are created if 
 	 * they do not exists yet. If the files exist they are used.
 	 * @param path the path of the main storage file (without extension normally)
-	 * Or Host URL and database name for server mode (e.g. "localhost/myDB" or "123.123.12.1:9092/myDB")
+	 * Or the host URL and database name for server mode (e.g. "localhost/myDB" or "123.123.12.1:9092/myDB")
 	 * The server must define the base directory to use.
 	 * @param serverMode true to use the TCP server connection mode.
 	 * Use null to use a private in-memory repository.
@@ -87,13 +87,13 @@ public class Repository implements IRepository {
 				}
 				name = Util.getFilename(pathNoExt, false);
 			
-				// Open the connection, this creates the DB if none exists
-				if ( serverMode ) {
+				// Open the connection
+				if ( serverMode ) { // server mode (assumes the database exists)
 					conn = DriverManager.getConnection("jdbc:h2:tcp://"+pathNoExt, "sa", "");
 					shared = true;
 					exist = true; // Assumes it exists
 				}
-				else {
+				else { // Local mode (creates the database if it does not exist)
 					// Check if the database exists
 					exist = (new File(pathNoExt+DATAFILE_EXT)).exists();
 					if ( !exist ) {

@@ -357,6 +357,10 @@ class RepositoryPanel extends Composite {
 	String getRepositoryType () {
 		return repoType;
 	}
+	
+	String getRepositoryParameter () {
+		return repoParam;
+	}
 
 	boolean isRepositoryOpen () {
 		return (repo != null);
@@ -414,17 +418,20 @@ class RepositoryPanel extends Composite {
 	
 	void selectRepository () {
 		try {
-			RepositoryForm dlg = new RepositoryForm(getShell(), mainForm.getHelp(), repoType, repoParam);
-			String[] res = dlg.showDialog();
+			RepositoryForm dlg = new RepositoryForm(getShell(), mainForm.getHelp(), repoType, repoParam,
+				mainForm.getUserConfiguration().getBoolean(MainForm.OPT_AUTOOPENREPOSITORY));
+			Object[] res = dlg.showDialog();
 			if ( res == null ) return; // No repository selected
-			openRepository(res[0], res[1]);
+
+			openRepository((String)res[0], (String)res[1]);
+			mainForm.getUserConfiguration().setProperty(MainForm.OPT_AUTOOPENREPOSITORY, (Boolean)res[2]);
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(getShell(), "Error selecting repository.\n"+e.getMessage(), null);
 		}
 	}
 
-	private void openRepository (String type,
+	void openRepository (String type,
 		String param)
 	{
 		try {

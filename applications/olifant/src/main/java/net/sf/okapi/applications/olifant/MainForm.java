@@ -71,7 +71,8 @@ public class MainForm {
 	public static final String OPT_BOUNDS = "bounds"; //$NON-NLS-1$
 	public static final String OPT_MAXIMIZED = "maximized"; //$NON-NLS-1$
 	public static final String OPT_REPOSITORYTYPE = "repositoryType"; //$NON-NLS-1$
-	public static final String OPT_REPOSITORYARG = "repositoryArg"; //$NON-NLS-1$
+	public static final String OPT_REPOSITORYPARAM = "repositoryParam"; //$NON-NLS-1$
+	public static final String OPT_AUTOOPENREPOSITORY = "autoOpenRepository"; //$NON-NLS-1$
 	public static final String OPT_TMOPT = "tmOptions_"; //$NON-NLS-1$
 
 	private static final String HELP_USAGE = "Olifant - Usage"; //$NON-NLS-1$
@@ -135,8 +136,18 @@ public class MainForm {
 			}
 
 			createContent();
+			
+			// Load the file if we have a parameter (open with drop)
 			if ( args.length > 0 ) {
 				openFile(args);
+			}
+			// Otherwise, if requested, open the last repository
+			else if ( config.getBoolean(OPT_AUTOOPENREPOSITORY) ) {
+				String type = config.getProperty(OPT_REPOSITORYTYPE);
+				if ( !Util.isEmpty(type) ) {
+					String param = config.getProperty(OPT_REPOSITORYPARAM);
+					repoPanel.openRepository(type, param);
+				}
 			}
 		}
 		catch ( Throwable e ) {
@@ -149,11 +160,22 @@ public class MainForm {
 		config.setProperty(OPT_MAXIMIZED, shell.getMaximized());
 		Rectangle r = shell.getBounds();
 		config.setProperty(OPT_BOUNDS, String.format("%d,%d,%d,%d", r.x, r.y, r.width, r.height)); //$NON-NLS-1$
-
+		
+		// Set the repository type and parameter (is available)
+		if ( repoPanel.getRepositoryType() != null ) {
+			config.setProperty(OPT_REPOSITORYTYPE, repoPanel.getRepositoryType());
+			config.setProperty(OPT_REPOSITORYPARAM, repoPanel.getRepositoryParameter());
+			// OPT_AUTOOPENREPOSITORY is set from other places
+		}
+		
 		// Save to the user home directory as ".appname" file
 		config.save(APPNAME, getClass().getPackage().getImplementationVersion());
 	}
 
+	UserConfiguration getUserConfiguration () {
+		return config;
+	}
+	
 	Shell getShell () {
 		return shell;
 	}

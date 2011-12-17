@@ -61,13 +61,15 @@ class RepositoryForm {
 	private final Button rdH2ServerBased;
 	private final Text edH2ServerBased;
 	private final String defaultLocalname;
+	private final Button chkAutoOpen;
 
-	private String[] results = null;
+	private Object[] results = null;
 
 	RepositoryForm (Shell parent,
 		IHelp helpParam,
 		String type,
-		String param)
+		String param,
+		boolean autoOpen)
 	{
 		help = helpParam;
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
@@ -153,6 +155,15 @@ class RepositoryForm {
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		gdTmp.horizontalIndent = indent;
 		edInMemory.setLayoutData(gdTmp);
+		
+		// Options group
+		group = new Group(shell, SWT.NONE);
+		group.setLayout(new GridLayout());
+		group.setLayoutData(new GridData(GridData.FILL_BOTH));
+		
+		chkAutoOpen = new Button(group, SWT.CHECK);
+		chkAutoOpen.setText("When starting Olifant, open automatically the last repository used");
+		chkAutoOpen.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		// Set the current selection
 		if ( type == null ) type = REPOTYPE_DEFAULTLOCAL;
@@ -174,6 +185,8 @@ class RepositoryForm {
 		else { // Default
 			rdDefaultLocal.setSelection(true);
 		}
+		
+		chkAutoOpen.setSelection(autoOpen);
 		
 		updateDisplay();
 
@@ -209,7 +222,12 @@ class RepositoryForm {
 		edH2ServerBased.setEnabled(rdH2ServerBased.getSelection());
 	}
 	
-	String[] showDialog () {
+	/**
+	 * Opens and show the dialog.
+	 * @return an array of 3 objects (0=repository type, 1=repository parameter
+	 * 2=auto-open option), or null if the user cancelled the operation.
+	 */
+	Object[] showDialog () {
 		shell.open();
 		while ( !shell.isDisposed() ) {
 			if ( !shell.getDisplay().readAndDispatch() )
@@ -220,7 +238,7 @@ class RepositoryForm {
 
 	private boolean saveData () {
 		try {
-			String[] res = new String[2];
+			Object[] res = new Object[3];
 			if ( rdDefaultLocal.getSelection() ) {
 				res[0] = REPOTYPE_DEFAULTLOCAL;
 				res[1] = defaultLocalname;
@@ -251,6 +269,7 @@ class RepositoryForm {
 				res[0] = REPOTYPE_OTHERLOCALORNETWORK;
 				res[1] = path;
 			}
+			res[2] = chkAutoOpen.getSelection();
 			results = res;
 		}
 		catch ( Exception e ) {

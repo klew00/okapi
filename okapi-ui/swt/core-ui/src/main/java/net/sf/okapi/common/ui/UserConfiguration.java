@@ -87,6 +87,19 @@ public class UserConfiguration extends Properties {
 	}
 
 	/**
+	 * Gets a boolean property value possibly set to a default value.
+	 * @param key the name of the property.
+	 * @param defaultValue the default value.
+	 * @return the value of the property if it exists, 
+	 * or the default value if it does not exist.
+	 */
+	public boolean getBoolean (String key,
+		boolean defaultValue)
+	{
+		return "true".equals(getProperty(key, (defaultValue ? "true" : "false")));
+	}
+	
+	/**
 	 * Sets a boolean property.
 	 * @param key The name of the property.
 	 * @param value The new value for the property.
