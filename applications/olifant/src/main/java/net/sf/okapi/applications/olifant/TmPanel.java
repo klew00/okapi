@@ -569,7 +569,7 @@ class TmPanel extends Composite implements IObserver {
 	
 	void searchAndReplace (boolean search) {
 		try {
-			Location loc = getCurrentLocation(null);
+//			Location loc = getCurrentLocation(null);
 			
 			
 			

@@ -62,6 +62,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 
 public class MainForm {
@@ -89,6 +90,7 @@ public class MainForm {
 	private ToolBarWrapper toolBar;
 	private IHelp help;
 	
+	private MenuItem miFileCloseRepository;
 	private MenuItem miFileOpen;
 	private MenuItem miEntriesNew;
 	private MenuItem miEntriesDelete;
@@ -186,7 +188,13 @@ public class MainForm {
 
 	boolean canCloseRepository () {
 		for ( CTabItem ti : tabs.getItems() ) {
-			if ( !((TmPanel)ti.getControl()).canClose() ) return false;
+			if ( !((TmPanel)ti.getControl()).canClose() ) {
+				MessageBox dlg = new MessageBox(shell, SWT.ICON_INFORMATION);
+				dlg.setMessage("At least one process is still running\nYou need to cancel or complete all processes to be able to close the current repository.");
+				dlg.setText("Olifant");
+				dlg.open();
+				return false;
+			}
 		}
 		return true;
 	}
@@ -392,6 +400,8 @@ public class MainForm {
 	void updateCommands () {
 		boolean active = (repoPanel.isRepositoryOpen() && ( currentTP != null ) && !currentTP.hasRunningThread());
 		
+		miFileCloseRepository.setEnabled(repoPanel.isRepositoryOpen());
+		
 		miEntriesNew.setEnabled(active);
 		miEntriesDelete.setEnabled(active);
 		
@@ -447,6 +457,14 @@ public class MainForm {
             }
 		});
 
+		miFileCloseRepository = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miFileCloseRepository, "file.closerepository"); //$NON-NLS-1$
+		miFileCloseRepository.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				repoPanel.closeRepository();
+            }
+		});
+		
 		new MenuItem(dropMenu, SWT.SEPARATOR);
 
 		miFileOpen = new MenuItem(dropMenu, SWT.PUSH);

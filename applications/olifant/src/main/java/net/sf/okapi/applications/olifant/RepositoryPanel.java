@@ -418,6 +418,7 @@ class RepositoryPanel extends Composite {
 	
 	void selectRepository () {
 		try {
+			if ( !mainForm.canCloseRepository() ) return;
 			RepositoryForm dlg = new RepositoryForm(getShell(), mainForm.getHelp(), repoType, repoParam,
 				mainForm.getUserConfiguration().getBoolean(MainForm.OPT_AUTOOPENREPOSITORY));
 			Object[] res = dlg.showDialog();
@@ -470,11 +471,8 @@ class RepositoryPanel extends Composite {
 		}
 	}
 	
-	boolean canClose () {
-		return mainForm.canCloseRepository();
-	}
-	
 	void closeRepository () {
+		if ( !mainForm.canCloseRepository() ) return;
 		// Close all tabs
 		mainForm.closeAllTmTabs();
 		// Free the current repository
