@@ -81,6 +81,8 @@ public class TMOptions extends BaseParameters {
 	public void reset () {
 		pageSize = 500;
 		visibleFields = new ArrayList<String>();
+		sourceLocale = "";
+		targetLocale = "";
 	}
 
 	@Override

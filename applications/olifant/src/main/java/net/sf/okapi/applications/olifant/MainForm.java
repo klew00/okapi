@@ -209,8 +209,10 @@ public class MainForm {
 		shell.addShellListener(new ShellListener() {
 			public void shellActivated(ShellEvent event) {}
 			public void shellClosed(ShellEvent event) {
+				// Note: The user options are save when the repository is closed
 				saveUserConfiguration();
 				if ( !canCloseRepository() ) event.doit = false;
+				repoPanel.closeRepository();
 			}
 			public void shellDeactivated(ShellEvent event) {}
 			public void shellDeiconified(ShellEvent event) {}
@@ -270,14 +272,7 @@ public class MainForm {
 					event.doit = false;
 					return;
 				}
-				// When removing dynamically a tab we need to manually dispose 
-				// of both the tabItem and its control.
-				ti.dispose();
-				tp.dispose();
-				// If we are closing the last tab we need to manually set the current TP to null
-				if ( tabs.getItemCount() < 1 ) {
-					setCurrentTP(null);
-				}
+				actuallyCloseTab(ti, tp);
 			}
 		});
 		
@@ -347,24 +342,31 @@ public class MainForm {
 				tabItem = tabs.getSelection();
 				if ( tabItem == null ) return true; // Nothing to close
 			}
-			
 			// Get the TmPanel
 			TmPanel tp = (TmPanel)tabItem.getControl();
 			// Verify that we can close
 			if ( !tp.canClose() ) return false;
-			// When removing dynamically a tab we need to manually dispose 
-			// of both the tabItem and its control.
-			tabItem.dispose();
-			tp.dispose();
-			// If we are closing the last tab we need to manually set the current TP to null
-			if ( tabs.getItemCount() < 1 ) {
-				setCurrentTP(null);
-			}
+			actuallyCloseTab(tabItem, tp);
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(shell, "Error closing tab.\n"+e.getMessage(), null);
 		}
 		return true;
+	}
+
+	private void actuallyCloseTab (CTabItem ti,
+		TmPanel tp)
+	{
+		// Save the user options
+		repoPanel.updateOptions(tp);
+		// When removing dynamically a tab we need to manually dispose 
+		// of both the tabItem and its control.
+		ti.dispose();
+		tp.dispose();
+		// If we are closing the last tab we need to manually set the current TP to null
+		if ( tabs.getItemCount() < 1 ) {
+			setCurrentTP(null);
+		}
 	}
 	
 	void closeAllTmTabs () {
@@ -427,9 +429,15 @@ public class MainForm {
 		toolBar.update(currentTP);
 	}
 	
-	TmPanel addTmTabEmpty (ITm tm) {
+	ToolBarWrapper getToolBar () {
+		return toolBar;
+	}
+	
+	TmPanel addTmTabEmpty (ITm tm,
+		TMOptions opt)
+	{
 		if ( tm == null ) return null;
-		TmPanel tp = new TmPanel(this, tabs, SWT.NONE, tm, statusBar, rm);
+		TmPanel tp = new TmPanel(this, tabs, SWT.NONE, tm, opt, statusBar, rm);
 		CTabItem ti = new CTabItem(tabs, SWT.NONE);
 		ti.setText(tm.getName());
 		ti.setControl(tp);

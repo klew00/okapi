@@ -20,7 +20,13 @@
 
 package net.sf.okapi.applications.olifant;
 
+import java.util.ArrayList;
+
+import net.sf.okapi.lib.tmdb.DbUtil;
+
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -32,11 +38,12 @@ import org.eclipse.swt.widgets.Label;
 
 class ToolBarWrapper {
 
-	//private MainForm mainForm;
 	private final CoolBar coolBar;
 	private final Combo cbSource;
 	private final Combo cbTarget;
 	
+	private TmPanel tp;
+
 	public ToolBarWrapper (MainForm mainForm) {
 		coolBar = new CoolBar(mainForm.getShell(), SWT.FLAT);
 		//coolBar.setLocked(true);
@@ -52,12 +59,32 @@ class ToolBarWrapper {
 		cbSource = new Combo(comp, SWT.READ_ONLY | SWT.BORDER);
 		GridData gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		cbSource.setLayoutData(gdTmp);
+		cbSource.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetSelected (SelectionEvent event) {
+				tp.verifySourceChange();
+			}
+			@Override
+			public void widgetDefaultSelected (SelectionEvent event) {
+				tp.verifySourceChange();
+			}
+		});
 
 		final Label stTarget = new Label(comp, SWT.NONE);
 		stTarget.setText("Target:");
 		cbTarget = new Combo(comp, SWT.READ_ONLY | SWT.BORDER);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL);
 		cbTarget.setLayoutData(gdTmp);
+		cbTarget.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetSelected (SelectionEvent event) {
+				tp.verifyTargetChange();
+			}
+			@Override
+			public void widgetDefaultSelected (SelectionEvent event) {
+				tp.verifyTargetChange();
+			}
+		});
 
 		CoolItem ci = new CoolItem(coolBar, SWT.NONE);
 
@@ -69,25 +96,136 @@ class ToolBarWrapper {
 	    coolBar.pack();		
 	}
 	
+//	void updateCommands () {
+//		boolean enabled = (( tp != null ) && !tp.hasRunningThread() );
+//		
+//		
+//		cbSource.setEnabled(enabled);
+//		cbTarget.setEnabled(enabled);
+//	}
+	
 	void update (TmPanel tp) {
+		TmPanel oldTp = this.tp;
 		boolean enabled = (( tp != null ) && !tp.hasRunningThread() );
+		this.tp = tp;
 		
-		cbSource.removeAll();
-		cbTarget.removeAll();
-		if ( tp != null ) {
-			//TODO: change to available locales
-			java.util.List<String> locs = tp.getTm().getLocales();
-			for ( String loc : locs ) {
-				cbSource.add(loc);
-				cbTarget.add(loc);
+		// Remember current selection if possible
+		String oldSrc = cbSource.getText();
+		String oldTrg = cbTarget.getText();
+		
+		if ( tp != oldTp ) {
+			fillLocales();
+			if ( cbSource.getItemCount() > 0 ) {
+				setTarget(oldTrg);
+				setSource(oldSrc, oldSrc.isEmpty());
 			}
-//TODO: select from tm options object			
-			if ( locs.size() > 0 ) cbSource.select(0);
-			if ( locs.size() > 1 ) cbTarget.select(1);
 		}
 		
 		cbSource.setEnabled(enabled);
 		cbTarget.setEnabled(enabled);
 	}
 
+	void fillLocales () {
+		cbSource.removeAll();
+		cbTarget.removeAll();
+		if ( tp == null ) return;
+		// Get the list of the visible locales
+		java.util.List<String> fields = tp.getTmOptions().getVisibleFields();
+		java.util.List<String> locs = new ArrayList<String>();
+		for ( String fn : fields ) {
+			if ( fn.startsWith(DbUtil.TEXT_PREFIX) ) {
+				String loc = DbUtil.getFieldLocale(fn);
+				if (( loc != null ) && !locs.contains(loc) ) {
+					locs.add(loc);
+				}
+			}
+		}
+		for ( String loc : locs ) {
+			cbSource.add(loc);
+			cbTarget.add(loc);
+		}
+	}
+	
+	void setSource (String locale,
+		boolean forceFirst)
+	{
+		int n = cbSource.indexOf(locale);
+		// If the selected locale is not present, select another one:
+		if ( n < 0 ) {
+			if ( cbSource.getItemCount() > 0 ) {
+				if ( forceFirst ) {
+					n = 0;
+				}
+				// Else try to see if the top one is available
+				else if ( cbTarget.getSelectionIndex() == 0 ) {
+					// If it's already the target, use the second top if possible
+					if ( cbSource.getItemCount() > 1 ) {
+						n = 1;
+					}
+					else {
+						// If there is no second locale, switch the lone loacle to source
+						n = 0;
+					}
+				}
+				else {
+					n = 0;
+				}
+			}
+		}
+		// Set the locale
+		if ( n > -1 ) {
+			cbSource.select(n);
+			// Change the target if the source is now what was the target
+			if ( n == cbTarget.getSelectionIndex() ) {
+				setTarget("");
+			}
+		}
+	}
+	
+	void setTarget (String locale) {
+		int n = cbTarget.indexOf(locale);
+		// If the selected locale is not present, select another one:
+		if ( n < 0 ) {
+			if ( cbTarget.getItemCount() > 0 ) {
+				// Try to see if the top one is available
+				if ( cbSource.getSelectionIndex() == 0 ) {
+					// If it's already the source, use the second top if possible
+					if ( cbTarget.getItemCount() > 1 ) {
+						n = 1;
+					}
+				}
+				else {
+					n = 0;
+				}
+			}
+		}
+		// Set the locale
+		if ( n > -1 ) {
+			cbTarget.select(n);
+		}
+	}
+
+	/**
+	 * Gets the current source locale.
+	 * @return the code of the current source locale or an empty string if none is selected.
+	 */
+	String getSource () {
+		return cbSource.getText();
+	}
+	
+	int getSourceIndex () {
+		return cbSource.getSelectionIndex();
+	}
+	
+	/**
+	 * Gets the current target locale.
+	 * @return the code of the current target locale or an empty string if none is selected.
+	 */
+	String getTarget () {
+		return cbTarget.getText();
+	}
+
+	int getTargetIndex () {
+		return cbTarget.getSelectionIndex();
+	}
 }

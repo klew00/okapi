@@ -23,6 +23,7 @@ package net.sf.okapi.applications.olifant;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -94,15 +95,16 @@ class TmPanel extends Composite implements IObserver {
 		Composite parent,
 		int flags,
 		ITm tm,
+		TMOptions opt,
 		StatusBar statusBar,
 		ResourceManager rm)
 	{
 		super(parent, flags);
 		this.mainForm = mainForm;
 		this.tm = tm;
+		this.opt = opt;
 		this.statusBar = statusBar;
 		
-		opt = new TMOptions();
 		srcCol = -1;
 		trgCol = -1;
 		
@@ -269,10 +271,6 @@ class TmPanel extends Composite implements IObserver {
 		return (( workerThread != null ) && workerThread.isAlive() );
 	}
 
-	void setTmOptions (TMOptions opt) {
-		this.opt = opt;
-	}
-	
 	TMOptions getTmOptions () {
 		return opt;
 	}
@@ -296,23 +294,9 @@ class TmPanel extends Composite implements IObserver {
 				opt.setVisibleFields(newList);
 			}
 
-			//TODO Set the columns with the source and target
-			srcCol = -1; opt.setSourceLocale(null);
-			trgCol = -1; opt.setTargetLocale(null);
-			int n = 1;
-			for ( String fn : opt.getVisibleFields() ) {
-				if ( fn.startsWith(DbUtil.TEXT_PREFIX) ) {
-					if ( srcCol == -1 ) {
-						srcCol = n;
-						opt.setSourceLocale(DbUtil.getFieldLocale(fn));
-					}
-					else if ( trgCol == -1 ) {
-						trgCol = n;
-						opt.setTargetLocale(DbUtil.getFieldLocale(fn));
-					}
-				}
-				n++;
-			}
+			// Update commands (including current locales, extra field)
+			updateCurrentLocales(true);
+			mainForm.updateCommands();
 			updateVisibleFields();
 		}
 		catch ( Throwable e ) {
@@ -337,23 +321,9 @@ class TmPanel extends Composite implements IObserver {
 			visible.retainAll(available);
 			opt.setVisibleFields(visible);
 			
-			//TODO Set the columns with the source and target
-			srcCol = -1; opt.setSourceLocale(null);
-			trgCol = -1; opt.setTargetLocale(null);
-			int n = 1;
-			for ( String fn : opt.getVisibleFields() ) {
-				if ( fn.startsWith(DbUtil.TEXT_PREFIX) ) {
-					if ( srcCol == -1 ) {
-						srcCol = n;
-						opt.setSourceLocale(DbUtil.getFieldLocale(fn));
-					}
-					else if ( trgCol == -1 ) {
-						trgCol = n;
-						opt.setTargetLocale(DbUtil.getFieldLocale(fn));
-					}
-				}
-				n++;
-			}
+			// Update commands (including current locales, extra field)
+			updateCurrentLocales(true);
+			mainForm.updateCommands();
 			updateVisibleFields();
 		}
 		catch ( Throwable e ) {
@@ -361,28 +331,111 @@ class TmPanel extends Composite implements IObserver {
 		}
 	}
 
-	void resetTmDisplay () {
-		srcCol = -1; opt.setSourceLocale(null);
-		trgCol = -1; opt.setTargetLocale(null);
-		// By default: all and only text fields are visible
-		opt.setVisibleFields(new ArrayList<String>());
+	/**
+	 * Updates the column variable of the source and target locales after they
+	 * have been (possibly) changed in the toolbar.
+	 */
+	void updateCurrentLocales (boolean updateLocaleLists) {
+		if ( updateLocaleLists ) {
+			mainForm.getToolBar().fillLocales();
+		}
+		// Set the source and target locales
+		mainForm.getToolBar().setSource(opt.getSourceLocale(), false);
+		mainForm.getToolBar().setTarget(opt.getTargetLocale());
+		verifySourceChange();
+		verifyTargetChange();
+	}
+	
+	void verifySourceChange () {
+		final ToolBarWrapper toolBar = mainForm.getToolBar();
+		int oldSrc = srcCol;
+		int oldTrg = srcCol;
+		int newSrc = toolBar.getSourceIndex();
+		int newTrg = toolBar.getTargetIndex();
 		
-		int n = 1; // SEGKEY and FLAG are there by default
-		for ( String fn : tm.getAvailableFields() ) {
-			if ( fn.startsWith(DbUtil.TEXT_PREFIX) ) {
-				opt.getVisibleFields().add(fn);
-				if ( srcCol == -1 ) {
-					srcCol = n;
-					opt.setSourceLocale(DbUtil.getFieldLocale(fn));
-				}
-				else if ( trgCol == -1 ) {
-					trgCol = n;
-					opt.setTargetLocale(DbUtil.getFieldLocale(fn));
-				}
-				n++;
+		if ( newSrc > -1 ) {
+			// If the new source is the same at the target, change the target
+			if ( newSrc == newTrg ) {
+				toolBar.setTarget("");
+				newTrg = toolBar.getTargetIndex();
 			}
 		}
+		
+		// Update the new source column and field
+		opt.setSourceLocale(mainForm.getToolBar().getSource());
+		newSrc = opt.getVisibleFields().indexOf(DbUtil.TEXT_PREFIX+opt.getSourceLocale());
+		newSrc = (newSrc > -1 ? newSrc+1 : newSrc); // Columns are 1-based
+		
+		// Update the new target column and field
+		opt.setTargetLocale(mainForm.getToolBar().getTarget());
+		newTrg = opt.getVisibleFields().indexOf(DbUtil.TEXT_PREFIX+opt.getTargetLocale());
+		newTrg = (newTrg > -1 ? newTrg+1 : newTrg); // Columns are 1-based
 
+		// Make sure the current entry is saved 
+		if (( oldSrc != newSrc ) || ( oldTrg != newTrg )) {
+			saveEntry();
+		}
+		// Set the new columns and update the content
+		srcCol = newSrc;
+		trgCol = newTrg;
+		updateCurrentEntry();
+	}
+	
+	void verifyTargetChange () {
+		final ToolBarWrapper toolBar = mainForm.getToolBar();
+		int oldTrg = srcCol;
+		int newTrg = toolBar.getTargetIndex();
+		
+		if ( newTrg > -1 ) {
+			// If the new source is the same at the target, change the target
+			if ( newTrg == toolBar.getSourceIndex() ) {
+				toolBar.setTarget("");
+				newTrg = toolBar.getTargetIndex();
+			}
+		}
+		
+		// Update the new target column and field
+		opt.setTargetLocale(mainForm.getToolBar().getTarget());
+		newTrg = opt.getVisibleFields().indexOf(DbUtil.TEXT_PREFIX+opt.getTargetLocale());
+		newTrg = (newTrg > -1 ? newTrg+1 : newTrg); // Columns are 1-based
+
+		// Make sure the current entry is saved 
+		if ( oldTrg != newTrg ) {
+			saveEntry();
+		}
+		// Set the new column and update the content
+		trgCol = newTrg;
+		updateCurrentEntry();
+	}
+	
+	void resetTmDisplay () {
+		srcCol = -1;
+		trgCol = -1;
+		
+		// Set the visible fields
+		ArrayList<String> visibleFields = opt.getVisibleFields();
+		if ( visibleFields.size() > 0 ) {
+			// If we have already options: adjust them to fit the latest real-time TM
+			java.util.List<String> available = tm.getAvailableFields();
+			Iterator<String> iter = visibleFields.iterator();
+			while ( iter.hasNext() ) {
+				if ( !available.contains(iter.next()) ) {
+					iter.remove();
+				}
+			}
+		}
+		else {
+			// If there are no options: by default make visible just all text fields
+			for ( String fn : tm.getAvailableFields() ) {
+				if ( fn.startsWith(DbUtil.TEXT_PREFIX) ) {
+					opt.getVisibleFields().add(fn);
+				}
+			}
+		}
+		
+		// Set the source and target locales
+		updateCurrentLocales(true);
+		
 		tm.setPageSize(opt.getPageSize());
 		// Update the visible fields
 		updateVisibleFields();
@@ -404,6 +457,8 @@ class TmPanel extends Composite implements IObserver {
 				col.setText(fn);
 				col.setWidth(150);
 			}
+			// Update the list of locales in the toolbar
+			
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(getShell(), "Error updating columns.\n"+e.getMessage(), null);

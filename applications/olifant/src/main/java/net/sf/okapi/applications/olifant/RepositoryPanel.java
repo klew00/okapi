@@ -61,9 +61,11 @@ import org.eclipse.swt.widgets.MessageBox;
 class RepositoryPanel extends Composite {
 
 	static final String NOREPOSELECTED_TEXT = "<No Repository Selected>";
+	static final String USEROPTIONSFILE = MainForm.APPNAME + "_Options";
 	
 	private MainForm mainForm;
 	private List tmList;
+	private TMOptionsList options;
 	private Button btNewTM;
 	private Label stListTitle;
 	private IRepository repo;
@@ -83,6 +85,9 @@ class RepositoryPanel extends Composite {
 	{
 		super(parent, flags);
 		this.mainForm = mainForm;
+		
+		options = new TMOptionsList();
+		options.load(USEROPTIONSFILE);
 		
 		GridLayout layout = new GridLayout(1, false);
 		layout.marginHeight = 0;
@@ -249,6 +254,7 @@ class RepositoryPanel extends Composite {
 			}
 			// Delete the TM
 			repo.deleteTm(tmName);
+//TODO: Delete the associated options			
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(getShell(), "Error selecting repository.\n"+e.getMessage(), null);
@@ -323,8 +329,10 @@ class RepositoryPanel extends Composite {
 			
 			// Else: create a new TmPanel
 			ITm tm = repo.openTm(tmName);
-			tp = mainForm.addTmTabEmpty(tm);
-			if ( tp == null ) return;
+			TMOptions opt = options.getItem(tm.getUUID(), true);
+			
+			tp = mainForm.addTmTabEmpty(tm, opt);
+			if ( tp == null ) return; // Just in case
 
 			// Now the tab should exist
 			mainForm.findTmTab(tmName, true);
@@ -335,12 +343,6 @@ class RepositoryPanel extends Composite {
 		}
 	}
 	
-	@Override
-	public void dispose () {
-		closeRepository();
-		super.dispose();
-	}
-
 	List getTmList () {
 		return tmList;
 	}
@@ -401,10 +403,11 @@ class RepositoryPanel extends Composite {
 			// Create the empty TM
 			ITm tm = repo.createTm(name, description, DbUtil.toOlifantLocaleCode(locId));
 			if ( tm == null ) return null;
+			TMOptions opt = options.getItem(tm.getUUID(), true);
 			
 			tmList.add(tm.getName());
 			resetRepositoryUI(-1);
-			TmPanel tp = mainForm.addTmTabEmpty(tm);
+			TmPanel tp = mainForm.addTmTabEmpty(tm, opt);
 			if ( fillTm && ( tp != null )) {
 				tp.resetTmDisplay();
 			}
@@ -475,6 +478,8 @@ class RepositoryPanel extends Composite {
 		if ( !mainForm.canCloseRepository() ) return;
 		// Close all tabs
 		mainForm.closeAllTmTabs();
+		// Save the user options
+		saveUserOptions();
 		// Free the current repository
 		if ( repo != null ) {
 			repo.close();
@@ -619,7 +624,8 @@ class RepositoryPanel extends Composite {
 			TmPanel tp = mainForm.findTmTab(tmName, true);
 			if ( tp == null ) {
 				ITm tm = repo.openTm(tmName);
-				tp = mainForm.addTmTabEmpty(tm);
+				TMOptions opt = options.getItem(tm.getUUID(), true);
+				tp = mainForm.addTmTabEmpty(tm, opt);
 				if ( tp == null ) return;
 				// Now the tab should exist
 				mainForm.findTmTab(tmName, true);
@@ -659,7 +665,8 @@ class RepositoryPanel extends Composite {
 			TmPanel tp = mainForm.findTmTab(tmName, true);
 			if ( tp == null ) {
 				ITm tm = repo.openTm(tmName);
-				tp = mainForm.addTmTabEmpty(tm);
+				TMOptions opt = options.getItem(tm.getUUID(), true);
+				tp = mainForm.addTmTabEmpty(tm, opt);
 				if ( tp == null ) return;
 				// Now the tab should exist
 				mainForm.findTmTab(tmName, true);
@@ -690,7 +697,8 @@ class RepositoryPanel extends Composite {
 			TmPanel tp = mainForm.findTmTab(tmName, true);
 			if ( tp == null ) {
 				ITm tm = repo.openTm(tmName);
-				tp = mainForm.addTmTabEmpty(tm);
+				TMOptions opt = options.getItem(tm.getUUID(), true);
+				tp = mainForm.addTmTabEmpty(tm, opt);
 				if ( tp == null ) return;
 				// Now the tab should exist
 				mainForm.findTmTab(tmName, true);
@@ -710,6 +718,24 @@ class RepositoryPanel extends Composite {
 		catch ( Throwable e ) {
 			Dialogs.showError(getShell(), "Error while splitting.\n"+e.getMessage(), null);
 		}
+	}
+
+	/**
+	 * Saves the live user options of the open TM into the
+	 * list of options in the repository. 
+	 * @param tp the tab of the TM associated with the options to save.
+	 */
+	void updateOptions (TmPanel tp) {
+		options.setItem(tp);
+	}
+
+	/**
+	 * Saves all the user options.
+	 * Each user options in the repository list is updated when the tab of the TM is closed.
+	 */
+	void saveUserOptions () {
+		// Save the file
+		options.save(USEROPTIONSFILE, getClass().getPackage().getImplementationVersion());
 	}
 
 }
