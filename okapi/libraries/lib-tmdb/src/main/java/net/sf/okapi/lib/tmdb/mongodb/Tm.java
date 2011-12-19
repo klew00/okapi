@@ -361,6 +361,36 @@ public class Tm implements ITm {
 	void updateLocales (List<String> fields){
 		updateCommaSeparatedValues(fields, Repository.TM_COL_LOCALES);
 	}
+
+	/**
+	 * Retrieve the specific TM entry
+	 * @return
+	 */
+	DBObject getTmEntry(){
+		DBCollection tmList = store.getDb().getCollection(Repository.TM_COLL);
+		
+		BasicDBObject query = new BasicDBObject();
+	    query.put(Repository.TM_COL_NAME, name);
+
+	    DBObject entry = tmList.findOne(query);
+	    
+	    if(entry == null){
+	    	throw new RuntimeException(String.format("TM '%s' does not exists.", name));
+	    }
+	    return entry;
+	}
+
+	
+	/**
+	 * Retrieve the specific TM entry
+	 * @return
+	 */
+	private DBObject getTmAsQuery(){
+		BasicDBObject query = new BasicDBObject();
+	    query.put(Repository.TM_COL_NAME, name);
+	    return query;
+	}
+	
 	
 	/**
 	 * Updates list as comma separated values
@@ -427,76 +457,183 @@ public class Tm implements ITm {
 	}
 
 	@Override
-	public void addLocale(String localeCode) {
-		// TODO Auto-generated method stub
+	public void addLocale (String localeCode) {
+		localeCode = localeCode.toUpperCase();
+		List<String> existing = getLocales();
+		if ( existing.contains(localeCode) ) {
+			return; // This locale exists already
+		}
 		
-	}
+		//-get the locale and seg fields--
+		DBObject entry = getTmEntry();
+		String locales = (String)entry.get(Repository.TM_COL_LOCALES);
+		String fields = (String)entry.get(Repository.TM_COL_SEG_FIELDS);
 
-	@Override
-	public void deleteLocale(String localeCode) {
-		// TODO Auto-generated method stub
+		//--update fields--
+		locales = locales + "," + localeCode;
+		fields = fields + "," + DbUtil.TEXT_PREFIX+localeCode+","+DbUtil.CODES_PREFIX+localeCode;
 		
+		BasicDBObject newObj = new BasicDBObject();
+		newObj.put(Repository.TM_COL_LOCALES, locales);
+		newObj.put(Repository.TM_COL_SEG_FIELDS, fields);
+		
+		//--update the locale field--
+		DBCollection tmList = store.getDb().getCollection(Repository.TM_COLL);
+		tmList.update(getTmAsQuery(), new BasicDBObject("$set", newObj));
 	}
 
 	@Override
-	public PageMode getPageMode() {
-		return pageMode;
+	public void deleteLocale (String localeCode) {
+		localeCode = localeCode.toUpperCase();
+		List<String> existing = getLocales();
+		if ( existing.size() < 2 ) {
+			return; // Must keep at least one locale
+		}
+
+		if ( !existing.contains(localeCode) ) {
+			return; // This locale does not exist
+		}
+
+		//-get the locale and seg fields--
+		DBObject entry = getTmEntry();
+		String locales = (String)entry.get(Repository.TM_COL_LOCALES);
+		String fields = (String)entry.get(Repository.TM_COL_SEG_FIELDS);
+
+		//--update fields--
+		locales = locales.replace(localeCode, "");
+		locales = cleanCommas(locales);
+
+		fields = fields.replace(DbUtil.TEXT_PREFIX+localeCode, "");
+		fields = cleanCommas(fields);
+		fields = fields.replace(DbUtil.CODES_PREFIX+localeCode, "");
+		fields = cleanCommas(fields);
+		
+		BasicDBObject newObj = new BasicDBObject();
+		newObj.put(Repository.TM_COL_LOCALES, locales);
+		newObj.put(Repository.TM_COL_SEG_FIELDS, fields);
+		
+		//--update the locale field--
+		DBCollection tmList = store.getDb().getCollection(Repository.TM_COLL);
+		tmList.update(getTmAsQuery(), new BasicDBObject("$set", newObj));
+		
+		//TODO: remove the actual values from all rows
 	}
 
 	@Override
-	public void setPageMode(PageMode pageMode) {
-		this.pageMode = pageMode;
+	public void renameLocale (String currentCode, String newCode) {
+		currentCode = currentCode.toUpperCase();
+		newCode = newCode.toUpperCase();
+		List<String> existing = getLocales();
+		if ( !existing.contains(currentCode) ) {
+			return; // There is not a locale with that name
+		}
+		if ( existing.contains(newCode) ) {
+			return; // The name/code is already used
+		}
+		
+		//-get the locale and seg fields--
+		DBObject entry = getTmEntry();
+		String locales = (String)entry.get(Repository.TM_COL_LOCALES);
+		String fields = (String)entry.get(Repository.TM_COL_SEG_FIELDS);
+
+		//--update fields--
+		locales = locales.replace(currentCode, newCode);
+		fields = fields.replace(DbUtil.TEXT_PREFIX+currentCode, DbUtil.TEXT_PREFIX+newCode);
+		fields = fields.replace(DbUtil.CODES_PREFIX+currentCode, DbUtil.CODES_PREFIX+newCode);
+		
+		BasicDBObject newObj = new BasicDBObject();
+		newObj.put(Repository.TM_COL_LOCALES, locales);
+		newObj.put(Repository.TM_COL_SEG_FIELDS, fields);
+		
+		//--update the locale field--
+		DBCollection tmList = store.getDb().getCollection(Repository.TM_COLL);
+		tmList.update(getTmAsQuery(), new BasicDBObject("$set", newObj));
+		
+		//--rename the field names in ALL the rows--
+		DBCollection segColl = store.getDb().getCollection(name+"_SEG");
+		segColl.update(new BasicDBObject(), new BasicDBObject("$rename", new BasicDBObject(DbUtil.TEXT_PREFIX+currentCode, DbUtil.TEXT_PREFIX+newCode)), false, true);
+		segColl.update(new BasicDBObject(), new BasicDBObject("$rename", new BasicDBObject(DbUtil.CODES_PREFIX+currentCode, DbUtil.CODES_PREFIX+newCode)), false, true);
 	}
 	
 	@Override
-	public void renameLocale (String currentCode,
-		String newCode)
-	{
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void updateRecord (long segKey,
-		Map<String, Object> tuFields,
-		Map<String, Object> segFields)
-	{
-		DBCollection segColl = store.getDb().getCollection(name+"_SEG");
-		
-		BasicDBObject doc = new BasicDBObject();
-		for (Entry<String, Object> entry : segFields.entrySet()) {
-			doc.put(entry.getKey(), entry.getValue());
-		}
-		if(tuFields != null){
-			for (Entry<String, Object> entry : tuFields.entrySet()) {
-				doc.put(entry.getKey(), entry.getValue());
-			}
-		}
-		
-		BasicDBObject query = new BasicDBObject();
-        query.put(Repository.SEG_COL_SEGKEY, segKey);
-
-        BasicDBObject set = new BasicDBObject("$set", doc);
-        
-		segColl.update(query, set, false, false);
-	}
-
-	@Override
 	public void addField (String fullName) {
-		// TODO Auto-generated method stub
+		//TODO: prevent predefined fields
+		List<String> existing = store.getSegFields(name);
+		if ( existing.contains(fullName) ) {
+			return; // This field exists already
+		}
 		
+		//-get the seg fields--
+		DBObject entry = getTmEntry();
+		String fields = (String)entry.get(Repository.TM_COL_SEG_FIELDS);
+
+		//--update fields--
+		fields = fields + "," + fullName;
+		
+		BasicDBObject newObj = new BasicDBObject();
+		newObj.put(Repository.TM_COL_SEG_FIELDS, fields);
+		
+		//--update the fields--
+		DBCollection tmList = store.getDb().getCollection(Repository.TM_COLL);
+		tmList.update(getTmAsQuery(), new BasicDBObject("$set", newObj));
 	}
 
 	@Override
 	public void deleteField (String fullName) {
-		// TODO Auto-generated method stub
+		//TODO: prevent predefined fields
+		List<String> existing = store.getSegFields(name);
+		if ( !existing.contains(fullName) ) {
+			return; // This field does not exist
+		}
+
+		//-get the seg fields--
+		DBObject entry = getTmEntry();
+		String fields = (String)entry.get(Repository.TM_COL_SEG_FIELDS);
+
+		//--update fields--
+		fields = fields.replace(fullName, "");
+		fields = cleanCommas(fields);
+
+		BasicDBObject newObj = new BasicDBObject();
+		newObj.put(Repository.TM_COL_SEG_FIELDS, fields);
 		
+		//--update the fields--
+		DBCollection tmList = store.getDb().getCollection(Repository.TM_COLL);
+		tmList.update(getTmAsQuery(), new BasicDBObject("$set", newObj));
+		
+		//TODO: remove the actual values from all rows
 	}
 
 	@Override
-	public void renameField (String currentFullName, String newFiiullName) {
+	public void renameField (String currentFullName, String newFullName) {
+		//TODO: prevent predefined fields
+		List<String> existing = store.getSegFields(name);
+		if ( !existing.contains(currentFullName) ) {
+			return; // There is not a field with that name
+		}
+		if ( existing.contains(newFullName) ) {
+			return; // The name/field is already used
+		}
+		
+		//-get the seg fields--
+		DBObject entry = getTmEntry();
+		String fields = (String)entry.get(Repository.TM_COL_SEG_FIELDS);
 
-		boolean found = false;
+		//--update fields--
+		fields = fields.replace(currentFullName, newFullName);
+		
+		BasicDBObject newObj = new BasicDBObject();
+		newObj.put(Repository.TM_COL_SEG_FIELDS, fields);
+		
+		//--update the seg field--
+		DBCollection tmList = store.getDb().getCollection(Repository.TM_COLL);
+		tmList.update(getTmAsQuery(), new BasicDBObject("$set", newObj));
+		
+		//--rename the field names in ALL the rows--
+		DBCollection segColl = store.getDb().getCollection(name+"_SEG");
+		segColl.update(new BasicDBObject(), new BasicDBObject("$rename", new BasicDBObject(currentFullName, newFullName)), false, true);
+		
+		/*boolean found = false;
 		
 		//--check segfields-
 		List<String> segFields = store.getSegFields(name);
@@ -527,7 +664,42 @@ public class Tm implements ITm {
 			BasicDBObject set = new BasicDBObject("$rename", doc);
 
 			segColl.update(query, set, false, true);
+		}*/
+	}
+	
+	@Override
+	public PageMode getPageMode() {
+		return pageMode;
+	}
+
+	@Override
+	public void setPageMode(PageMode pageMode) {
+		this.pageMode = pageMode;
+	}
+	
+	@Override
+	public void updateRecord (long segKey,
+		Map<String, Object> tuFields,
+		Map<String, Object> segFields)
+	{
+		DBCollection segColl = store.getDb().getCollection(name+"_SEG");
+		
+		BasicDBObject doc = new BasicDBObject();
+		for (Entry<String, Object> entry : segFields.entrySet()) {
+			doc.put(entry.getKey(), entry.getValue());
 		}
+		if(tuFields != null){
+			for (Entry<String, Object> entry : tuFields.entrySet()) {
+				doc.put(entry.getKey(), entry.getValue());
+			}
+		}
+		
+		BasicDBObject query = new BasicDBObject();
+        query.put(Repository.SEG_COL_SEGKEY, segKey);
+
+        BasicDBObject set = new BasicDBObject("$set", doc);
+        
+		segColl.update(query, set, false, false);
 	}
 
 	@Override
@@ -546,10 +718,38 @@ public class Tm implements ITm {
 
 	@Override
 	public void deleteSegments (List<Long> segKeys) {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("deleteSegments() not implemented yet");
+
+		BasicDBObject query = new BasicDBObject();
+	    query.put(Repository.SEG_COL_SEGKEY, new BasicDBObject("$in", segKeys));
+		
+		//--update the locale field--
+		DBCollection segColl = store.getDb().getCollection(name+"_SEG");
+		segColl.remove(query);
 	}
 
+	/**
+	 * Helper method to keep the comma separated string clean
+	 * @param str
+	 * @return
+	 */
+	private String cleanCommas(String str){
+
+		//--duplicate commas--
+		str = str.replace(",,", ",");
+
+		//--comma at the end--
+		if(str.charAt(str.length() - 1) == ','){
+			str = str.substring(0, str.length()-1);
+		}
+
+		//--comma at the beginning--
+		if(str.charAt(0) == ','){
+			str = str.substring(1);
+		}
+
+		return str;
+	}
+	
 	@Override
 	public ResultSet refreshCurrentPage () {
 		long oldPage = currentPage;
@@ -559,7 +759,7 @@ public class Tm implements ITm {
 		else if ( pageCount > 0 ) currentPage = pageCount-1; 
 		return getPage();
 	}
-
+	
 	@Override
 	public IRepository getRepository () {
 		return store;
