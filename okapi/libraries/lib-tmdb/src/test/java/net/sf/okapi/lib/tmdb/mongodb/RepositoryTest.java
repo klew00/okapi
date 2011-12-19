@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.net.UnknownHostException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -32,8 +33,14 @@ public class RepositoryTest {
 	DBCollection tmListColl;
 	IRepository repo;
 	
+	boolean skipTests = true;
+	
 	@Before
 	public void setUp() throws UnknownHostException, MongoException {
+		
+		if (skipTests)
+			return;
+		
 		mongo = new Mongo();
 		db = mongo.getDB(testRepo);
 		tmListColl = db.getCollection(Repository.TM_COLL);
@@ -47,6 +54,9 @@ public class RepositoryTest {
 	
 	@After
 	public void destroy() {
+		if (skipTests)
+			return;
+		
 		repo.close();
 		mongo.close();
 	}
@@ -55,6 +65,9 @@ public class RepositoryTest {
 	public void testAddUpdateDeleteRecord ()
 		throws SQLException, InterruptedException
 	{
+		if (skipTests)
+			return;
+		
 		// There should be no TM
 		List<String> list = repo.getTmNames();
 		assertEquals(0, list.size());
@@ -78,7 +91,6 @@ public class RepositoryTest {
 		tm.addRecord(-1, null, segMap);
 		tm.finishImport();
 		Thread.sleep(100);	
-		
 		assertEquals(1, segColl.count());
 		
 		// Add another row
@@ -92,7 +104,6 @@ public class RepositoryTest {
 		tm.addRecord(-1, tuMap, segMap);
 		tm.finishImport();
 		Thread.sleep(100);
-		
 		assertEquals(2, segColl.count());
 
 		tm.setRecordFields(Arrays.asList(new String[]{DbUtil.TEXT_PREFIX+"EN","Quality"+DbUtil.LOC_SEP+"EN","TUInfo"}));
@@ -103,6 +114,42 @@ public class RepositoryTest {
 		assertEquals("Text EN 2", entry.get(DbUtil.TEXT_PREFIX+"EN"));
 		assertEquals(80, entry.get("Quality"+DbUtil.LOC_SEP+"EN"));
 		assertEquals("TU-level info", entry.get("TUInfo"));
+		
+		// Add another row, this time create new fields
+		tm.startImport();
+		segMap.clear();
+		segMap.put(DbUtil.TEXT_PREFIX+"EN", "Text EN 3");
+		segMap.put(DbUtil.TEXT_PREFIX+"FR", "Text FR 3");
+		segMap.put("Quality"+DbUtil.LOC_SEP+"FR", 33);
+		tm.addRecord(-1, null, segMap);
+		segMap.clear();
+		segMap.put(DbUtil.TEXT_PREFIX+"EN", "Text EN 4");
+		segMap.put(DbUtil.TEXT_PREFIX+"FR", "Text FR 4");
+		tm.addRecord(-1, null, segMap);
+		tm.finishImport();
+		Thread.sleep(100);	
+		assertEquals(4, segColl.count());
+		
+		tm.setRecordFields(Arrays.asList(new String[]{DbUtil.TEXT_PREFIX+"EN",
+				"Quality"+DbUtil.LOC_SEP+"EN",
+				"Quality"+DbUtil.LOC_SEP+"FR",
+				DbUtil.TEXT_PREFIX+"FR"}));
+		entry = MongoHelper.findCollEntry(db, tmName+"_SEG", Repository.SEG_COL_SEGKEY, 3);
+		assertEquals("Text EN 3", entry.get(DbUtil.TEXT_PREFIX+"EN"));
+		assertEquals("Text FR 3", entry.get(DbUtil.TEXT_PREFIX+"FR"));
+		assertEquals(33, entry.get("Quality"+DbUtil.LOC_SEP+"FR"));
+
+		entry = MongoHelper.findCollEntry(db, tmName+"_SEG", Repository.SEG_COL_SEGKEY, 4);
+		assertEquals("Text EN 4", entry.get(DbUtil.TEXT_PREFIX+"EN"));
+		assertEquals("Text FR 4", entry.get(DbUtil.TEXT_PREFIX+"FR"));
+		
+		List<Long> deleteEntries = new ArrayList<Long>();
+		deleteEntries.add((long) 2);
+		deleteEntries.add((long) 4);
+		tm.deleteSegments(deleteEntries);
+		
+		Thread.sleep(100);	
+		assertEquals(2, segColl.count());
 		
 		
 		/*tm.addLocale(DbUtil.toOlifantLocaleCode(LocaleId.FRENCH));
@@ -128,6 +175,9 @@ public class RepositoryTest {
 	public void testAddRenameDeleteLocalesTest ()
 		throws SQLException, InterruptedException
 	{
+		if (skipTests)
+			return;
+		
 		// There should be no TM
 		List<String> list = repo.getTmNames();
 		assertEquals(0, list.size());
@@ -162,6 +212,9 @@ public class RepositoryTest {
 	public void testAddRenameDeleteFieldTest ()
 		throws SQLException, InterruptedException
 	{
+		if (skipTests)
+			return;
+		
 		// There should be no TM
 		List<String> list = repo.getTmNames();
 		assertEquals(0, list.size());
