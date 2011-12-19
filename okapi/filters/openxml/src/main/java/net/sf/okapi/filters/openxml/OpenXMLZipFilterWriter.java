@@ -98,6 +98,12 @@ public class OpenXMLZipFilterWriter implements IFilterWriter {
 		InputStream orig = null;
 		OutputStream dest = null;
 		try {
+			// Closing reference to the original input stream 
+			if (zipOriginal != null){
+				zipOriginal.close();
+				zipOriginal = null;
+			}
+			
 			// Close the output
 			zipOut.close();
 			zipOut = null;
