@@ -293,13 +293,14 @@ public class MSBatchTranslationStep extends BasePipelineStep {
 			// Skip non-translatable entries
 			ITextUnit tu = event.getTextUnit();
 			if ( !tu.isTranslatable() ) continue;
-			// Skip TUs until we reach the next one that was translated
-			if ( !tuIds.get(entryIndex).equals(tu.getId()) ) continue;
 			
 			TextContainer trgCont = tu.getTarget(targetLocale);
 			if ( tu.getSource().hasBeenSegmented() ) {
 				// Process all the segments for this text unit				
 				for ( Segment srcSeg : tu.getSourceSegments() ) {
+					if ( !srcSeg.text.hasText() ) {
+						continue;
+					}
 					// Skip until we reach next segment that was translated
 					if ( !segIds.get(entryIndex).equals(tu.getId()+"\f"+srcSeg.getId()) ) continue;
 					
@@ -339,7 +340,7 @@ public class MSBatchTranslationStep extends BasePipelineStep {
 							if ( fill ) {
 								// If not empty we do not fill (no overwriting)
 								if ( trgSeg.text.isEmpty() ) {
-									trgSeg.text = res.target;
+									trgSeg.text.setCodedText(res.target.getCodedText(), res.target.getClonedCodes());
 								}
 							}
 						}
@@ -349,6 +350,12 @@ public class MSBatchTranslationStep extends BasePipelineStep {
 				}				
 			}
 			else { // Not segmented: work at the container level
+				if ( !tu.getSource().getFirstContent().hasText() ) {
+					continue;
+				}
+				// Skip TUs until we reach the next one that was translated
+				if ( !tuIds.get(entryIndex).equals(tu.getId()) ) continue;
+				
 				// Go through the results for that source
 				List<QueryResult> resList = list.get(entryIndex);
 				entryIndex++; // For next time
@@ -380,7 +387,7 @@ public class MSBatchTranslationStep extends BasePipelineStep {
 							TextFragment trgFrag = trgCont.getFirstContent();
 							// If not empty we do not fill (no overwriting)
 							if ( trgFrag.isEmpty() ) {
-								trgFrag = res.target;
+								trgFrag.setCodedText(res.target.getCodedText(), res.target.getClonedCodes());
 							}
 						}
 					}

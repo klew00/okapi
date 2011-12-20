@@ -236,29 +236,34 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 	private List<List<QueryResult>> parseAllBlocks (String resp,
 		List<TextFragment> fragments)
 	{
-		List<List<QueryResult>> list = new ArrayList<List<QueryResult>>();
-		int from = 0;
-
-		// Look for the results of each query:
-		for ( TextFragment frag : fragments ) {
-			if ( !frag.hasText(false) ) {
-				// Create auto-result for skipped entries to have the same number of responses
-				List<QueryResult> res = new ArrayList<QueryResult>();
-				list.add(res);
+		try {
+			List<List<QueryResult>> list = new ArrayList<List<QueryResult>>();
+			int from = 0;
+	
+			// Look for the results of each query:
+			for ( TextFragment frag : fragments ) {
+				if ( !frag.hasText(false) ) {
+					// Create auto-result for skipped entries to have the same number of responses
+					List<QueryResult> res = new ArrayList<QueryResult>();
+					list.add(res);
+				}
+				else {
+					// Move the start at the proper position
+					from = resp.indexOf("<Translations>", from);
+					if ( from < 0 ) break; // Nothing more
+					int n = resp.indexOf("</Translations>", from);
+					String block = resp.substring(from, n);
+					from = n+1; // For next iteration
+					// Parse the block and store the results
+					list.add(parseBlock(block, frag));
+				}
 			}
-			else {
-				// Move the start at the proper position
-				from = resp.indexOf("<Translations>", from);
-				if ( from < 0 ) break; // Nothing more
-				int n = resp.indexOf("</Translations>", from);
-				String block = resp.substring(from, n);
-				from = n+1; // For next iteration
-				// Parse the block and store the results
-				list.add(parseBlock(block, frag));
-			}
+			
+			return list;
 		}
-		
-		return list;
+		catch ( Throwable e ) {
+			throw new RuntimeException("Error parsing translation results.", e);
+		}
 	}
 	
 	/**
@@ -494,11 +499,8 @@ public class MicrosoftMTConnector extends BaseConnector implements ITMQuery {
 				list = parseAllBlocks(fromInputStreamToString(conn.getInputStream(), "UTF-8"), fragments);
 			}
 		}
-		catch ( MalformedURLException e ) {
-			throw new RuntimeException("URL error in connector.", e);
-		}
-		catch ( IOException e ) {
-			throw new OkapiIOException("IO error with connector.", e);
+		catch ( Throwable e ) {
+			throw new RuntimeException("Error when batch translating.", e);
 		}
 		
 		return list;
