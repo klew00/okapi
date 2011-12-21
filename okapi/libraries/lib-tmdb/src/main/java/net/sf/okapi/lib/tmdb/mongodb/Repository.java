@@ -74,11 +74,30 @@ public class Repository implements IRepository {
 		}
 	}
 	
-	public Repository (String repoName){
-		name = repoName;
+	public Repository (String connStr){
+		
+		String host = "localhost";
+		
+		//--parse the url--
+		String[] params = connStr.split("/");
+		if(params.length == 1){
+			name = params[0];
+		}else if (params.length > 1){
+			host = params[0];
+			name = params[1];
+		}
+
+		//--verify--
+		if(host == null || host.trim().length() == 0){
+			return;
+		} 
+		if(name == null || name.trim().length() == 0){
+			return;
+		}
+		
 		try {
-			connection = new Mongo();
-			repository = connection.getDB(repoName);
+			connection = new Mongo(host);
+			repository = connection.getDB(name);
 			
 			DBCollection repo = repository.getCollection(Repository.REPO_COLL);
 			

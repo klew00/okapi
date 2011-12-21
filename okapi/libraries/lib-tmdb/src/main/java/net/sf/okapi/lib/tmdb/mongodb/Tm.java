@@ -151,7 +151,43 @@ public class Tm implements ITm {
 		segColl.insert(doc);
 		return tuKey;
 	}
+	
+	@Override
+	public void updateRecord (long segKey,
+		Map<String, Object> tuFields,
+		Map<String, Object> segFields)
+	{
+		DBCollection segColl = store.getDb().getCollection(name+"_SEG");
+		
+		BasicDBObject doc = new BasicDBObject();
+		for (Entry<String, Object> entry : segFields.entrySet()) {
+			doc.put(entry.getKey(), entry.getValue());
+		}
+		if(tuFields != null){
+			for (Entry<String, Object> entry : tuFields.entrySet()) {
+				doc.put(entry.getKey(), entry.getValue());
+			}
+		}
+		
+		BasicDBObject query = new BasicDBObject();
+        query.put(Repository.SEG_COL_SEGKEY, segKey);
 
+        BasicDBObject set = new BasicDBObject("$set", doc);
+        
+		segColl.update(query, set, false, false);
+	}
+
+	@Override
+	public void deleteSegments (List<Long> segKeys) {
+		//--create query--
+		BasicDBObject query = new BasicDBObject();
+	    query.put(Repository.SEG_COL_SEGKEY, new BasicDBObject("$in", segKeys));
+		
+	    //--delete--
+		DBCollection segColl = store.getDb().getCollection(name+"_SEG");
+		segColl.remove(query);
+	}
+	
 	/**
 	 * the provided fields check which ones need to be added to the tuFields
 	 * @param tuFields
@@ -678,31 +714,6 @@ public class Tm implements ITm {
 	}
 	
 	@Override
-	public void updateRecord (long segKey,
-		Map<String, Object> tuFields,
-		Map<String, Object> segFields)
-	{
-		DBCollection segColl = store.getDb().getCollection(name+"_SEG");
-		
-		BasicDBObject doc = new BasicDBObject();
-		for (Entry<String, Object> entry : segFields.entrySet()) {
-			doc.put(entry.getKey(), entry.getValue());
-		}
-		if(tuFields != null){
-			for (Entry<String, Object> entry : tuFields.entrySet()) {
-				doc.put(entry.getKey(), entry.getValue());
-			}
-		}
-		
-		BasicDBObject query = new BasicDBObject();
-        query.put(Repository.SEG_COL_SEGKEY, segKey);
-
-        BasicDBObject set = new BasicDBObject("$set", doc);
-        
-		segColl.update(query, set, false, false);
-	}
-
-	@Override
 	public void setSortOrder (LinkedHashMap<String, Boolean> fields) {
 		
 		BasicDBObject sortObject = new BasicDBObject();
@@ -714,17 +725,6 @@ public class Tm implements ITm {
 	@Override
 	public long getTotalSegmentCount () {
 		return store.getTotalSegmentCount(name);
-	}
-
-	@Override
-	public void deleteSegments (List<Long> segKeys) {
-
-		BasicDBObject query = new BasicDBObject();
-	    query.put(Repository.SEG_COL_SEGKEY, new BasicDBObject("$in", segKeys));
-		
-		//--update the locale field--
-		DBCollection segColl = store.getDb().getCollection(name+"_SEG");
-		segColl.remove(query);
 	}
 
 	/**

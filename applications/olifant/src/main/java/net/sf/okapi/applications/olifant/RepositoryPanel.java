@@ -458,7 +458,7 @@ class RepositoryPanel extends Composite {
 			}
 			else if ( type.equals(RepositoryForm.REPOTYPE_MONGOSERVER) ) {
 				closeRepository();
-				repo = new net.sf.okapi.lib.tmdb.mongodb.Repository("REPO");
+				repo = new net.sf.okapi.lib.tmdb.mongodb.Repository(param);
 				repoType = type;
 			}
 		}

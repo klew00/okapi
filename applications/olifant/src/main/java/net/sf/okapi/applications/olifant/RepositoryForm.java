@@ -129,7 +129,7 @@ class RepositoryForm {
 		edH2ServerBased.setLayoutData(gdTmp);
 		
 		rdMongoServerBased = new Button(group, SWT.RADIO);
-		rdMongoServerBased.setText("MongoDB server-based repository");
+		rdMongoServerBased.setText("MongoDB server-based repository [<optional host name>/]<database name>");
 		rdMongoServerBased.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				updateDisplay();
@@ -174,6 +174,7 @@ class RepositoryForm {
 		}
 		else if ( type.equals(REPOTYPE_MONGOSERVER) ) {
 			rdMongoServerBased.setSelection(true);
+			rdMongoServerBased.setText(param);
 		}
 		else if ( type.equals(REPOTYPE_H2SERVER) ) {
 			rdH2ServerBased.setSelection(true);
@@ -247,7 +248,14 @@ class RepositoryForm {
 				res[0] = REPOTYPE_INMEMORY;
 			}
 			else if ( rdMongoServerBased.getSelection() ) {
+				String path = edMongoServerBased.getText().trim();
+				if ( path.isEmpty() ) {
+					Dialogs.showError(shell, "You must specify a database name and optional host in the following format: myhost/myrepository", null);
+					edMongoServerBased.setFocus();
+					return false;
+				}
 				res[0] = REPOTYPE_MONGOSERVER;
+				res[1] = path;
 			}
 			else if ( rdH2ServerBased.getSelection() ) {
 				String path = edH2ServerBased.getText().trim();

@@ -96,7 +96,11 @@ public class MongodbResultSet implements ResultSet {
 
 	@Override
 	public long getLong(int columnIndex) throws SQLException {
-		return (Integer) dbObject.get(getName(columnIndex-1, fields));
+		Object obj = dbObject.get(getName(columnIndex-1, fields));
+		if (obj != null)
+			return (Integer) obj;
+		else 
+			return -1;
 	}
 
 	@Override
