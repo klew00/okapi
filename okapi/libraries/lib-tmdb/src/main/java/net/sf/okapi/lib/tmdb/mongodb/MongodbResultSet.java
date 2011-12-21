@@ -52,16 +52,30 @@ public class MongodbResultSet implements ResultSet {
 	List<String> fields;
 	int limit;
 
-	public static String getName(int index, List<String> fields){
-		return fields.get(index);
-	}
-	
 	public MongodbResultSet(DBCursor dbCursor, List<String> fields, int limit){
 		this.dbCursor = dbCursor;
 		this.fields = fields;
 		this.limit = limit;
 	}
+	
+	public int getColumnCount(){
+		return fields.size();
+	}
 
+	public String getColumnName(int index){
+		return fields.get(index);
+	}
+
+	@Override
+	public ResultSetMetaData getMetaData() throws SQLException {
+		return new MongodbResultSetMetaData(this);
+	}
+
+	@Override
+	public Object getObject(String columnLabel) throws SQLException {
+		return dbObject.get(columnLabel);
+	}
+	
 	@Override
 	public boolean next() throws SQLException {
 		if(dbCursor.hasNext()){
@@ -81,7 +95,7 @@ public class MongodbResultSet implements ResultSet {
 	@Override
 	public String getString(int columnIndex) throws SQLException {
 
-		Object dbObj = dbObject.get(getName(columnIndex-1, fields));
+		Object dbObj = dbObject.get(getColumnName(columnIndex-1));
 	
 		if(dbObj instanceof String){
 			return (String) dbObj;
@@ -96,7 +110,7 @@ public class MongodbResultSet implements ResultSet {
 
 	@Override
 	public long getLong(int columnIndex) throws SQLException {
-		Object obj = dbObject.get(getName(columnIndex-1, fields));
+		Object obj = dbObject.get(getColumnName(columnIndex-1));
 		if (obj != null)
 			return (Integer) obj;
 		else 
@@ -105,9 +119,9 @@ public class MongodbResultSet implements ResultSet {
 
 	@Override
 	public int getInt(int columnIndex) throws SQLException {
-		Object dbObj = dbObject.get(getName(columnIndex-1, fields));
+		Object dbObj = dbObject.get(getColumnName(columnIndex-1));
 		if( dbObj != null){
-			return (Integer) dbObject.get(getName(columnIndex-1, fields));
+			return (Integer) dbObject.get(getColumnName(columnIndex-1));
 		}else{
 			return 0;
 		}
@@ -115,7 +129,7 @@ public class MongodbResultSet implements ResultSet {
 	
 	@Override
 	public boolean getBoolean(int columnIndex) throws SQLException {
-		String columnName = getName(columnIndex-1, fields);
+		String columnName = getColumnName(columnIndex-1);
 		Object dbObj = dbObject.get(columnName);
 		if( dbObj != null){
 			return (Boolean) dbObj;
@@ -409,12 +423,6 @@ public class MongodbResultSet implements ResultSet {
 	}
 
 	@Override
-	public ResultSetMetaData getMetaData() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public Reader getNCharacterStream(int columnIndex) throws SQLException {
 		// TODO Auto-generated method stub
 		return null;
@@ -452,12 +460,6 @@ public class MongodbResultSet implements ResultSet {
 
 	@Override
 	public Object getObject(int columnIndex) throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Object getObject(String columnLabel) throws SQLException {
 		// TODO Auto-generated method stub
 		return null;
 	}
