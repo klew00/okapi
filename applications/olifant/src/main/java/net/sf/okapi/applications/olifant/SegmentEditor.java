@@ -34,7 +34,7 @@ import org.eclipse.swt.widgets.Composite;
 class SegmentEditor {
 
 	private static final Pattern CLEANCODES = Pattern.compile("\\<[/be]?(\\d+?)/?\\>");
-	private static final Pattern REALCODES = Pattern.compile("<(bpt|ept|ph|it|ut).*?>(.*?)</\\1>"); //"<(bpt|ept|ph|it|ut)[^>]*?>[^<]*?</\\1>|<(bpt|ept|ph|it|ut)[^>]*?/>"); //'|<ept[^<]*?</ept>|<ept[^>]*?/>|<ph[^<]*?</ph>|<ph[^>]*?/>");
+	private static final Pattern REALCODES = Pattern.compile("<(bpt|ept|ph|it|ut).*?>(.*?)</\\1>");
 
 	private StyledText edit;
 	private boolean modified;

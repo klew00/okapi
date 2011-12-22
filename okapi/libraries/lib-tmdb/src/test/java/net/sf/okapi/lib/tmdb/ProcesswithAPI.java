@@ -139,23 +139,17 @@ public class ProcesswithAPI {
 		assertEquals(4, repo.getTotalSegmentCount(tmName));
 		
 		// test pages with the 4 entries
-		tm.setPageSize(2);
+		tm.setPageSize(3);
 		tm.setPageMode(PageMode.EDITOR);
 		rs = tm.getFirstPage();
 		assertTrue(rs.next());
 		assertEquals("Text EN 1", rs.getString(3));
 		assertTrue(rs.last());
-		assertEquals("Text EN 2", rs.getString(3));
-		// Next page
-		rs = tm.getNextPage();
-		assertTrue(rs.next());
-		assertEquals("Text EN 2", rs.getString(3)); // Last row of previous page is first of the next
-		assertTrue(rs.last());
 		assertEquals("Text EN 3", rs.getString(3));
 		// Next page
 		rs = tm.getNextPage();
 		assertTrue(rs.next());
-		assertEquals("Text EN 3", rs.getString(3));
+		assertEquals("Text EN 3", rs.getString(3)); // Last row of previous page is first of the next
 		assertTrue(rs.last());
 		assertEquals("Text EN 4", rs.getString(3));
 		// Next should return empty set
@@ -165,16 +159,9 @@ public class ProcesswithAPI {
 		rs = tm.getPreviousPage();
 		assertNotNull(rs);
 		assertTrue(rs.next());
-		assertEquals("Text EN 2", rs.getString(3));
-		assertTrue(rs.last());
-		assertEquals("Text EN 3", rs.getString(3));
-		// Previous 
-		rs = tm.getPreviousPage();
-		assertNotNull(rs);
-		assertTrue(rs.next());
 		assertEquals("Text EN 1", rs.getString(3));
 		assertTrue(rs.last());
-		assertEquals("Text EN 2", rs.getString(3));
+		assertEquals("Text EN 3", rs.getString(3));
 		// Previous empty
 		rs = tm.getPreviousPage();
 		assertNull(rs);

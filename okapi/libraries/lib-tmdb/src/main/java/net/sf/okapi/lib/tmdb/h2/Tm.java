@@ -48,7 +48,7 @@ public class Tm implements ITm {
 	private long totalRows;
 	private long pageCount;
 	private long currentPage = -1; // 0-based
-	private boolean pagingWithMethod = true;
+	private boolean testPagingType2 = true;
 
 	private PreparedStatement pstmAddSeg;
 	private PreparedStatement pstmAddTu;
@@ -59,6 +59,9 @@ public class Tm implements ITm {
 	private PreparedStatement pstmUpdSeg;
 	private ArrayList<String> updSegFields;
 
+	private PreparedStatement pstmAnchors;
+	private ArrayList<Long> anchors;
+	
 	
 	public Tm (Repository store,
 		String uuid,
@@ -106,6 +109,11 @@ public class Tm implements ITm {
 			}
 			closeAddStatements();
 			closeUpdateStatements();
+			if ( pstmAnchors != null ) {
+				pstmAnchors.close();
+				pstmAnchors = null;
+				anchors = null;
+			}
 		}
 		catch ( SQLException e ) {
 			throw new RuntimeException(e);
@@ -155,9 +163,9 @@ public class Tm implements ITm {
 			}
 			
 			StringBuilder tmp;
+			String segTable = "\""+name+"_SEG\"";
 			if ( hasTUField ) {
 				String tuTable = "\""+name+"_TU\"";
-				String segTable = "\""+name+"_SEG\"";
 				tmp = new StringBuilder(String.format("SELECT %s.\"%s\", %s.\"%s\"", segTable, DbUtil.SEGKEY_NAME, segTable, DbUtil.FLAG_NAME));
 				for ( String name : names ) {
 					if ( DbUtil.isSegmentField(name) ) tmp.append(", "+segTable+".\""+name+"\"");
@@ -174,11 +182,27 @@ public class Tm implements ITm {
 				tmp.append(" FROM \""+name+"_SEG\"");
 			}
 			
-			//old tmp.append(" ORDER BY SegKey LIMIT ? OFFSET ?");
 			tmp.append(String.format(" WHERE \"%s\">=? ORDER BY \"%s\" LIMIT ?", DbUtil.SEGKEY_NAME, DbUtil.SEGKEY_NAME));
 
-			pstmGet = store.getConnection().prepareStatement( tmp.toString(),
+			pstmGet = store.getConnection().prepareStatement(tmp.toString(),
 				ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+			
+			if ( testPagingType2 ) {
+			// Create statement for the anchors
+//	SELECT "SegKey", R FROM (SELECT "SegKey", ROWNUM() AS R FROM (SELECT "SegKey" FROM "my tm_SEG"  ORDER BY "Text~EN_US" DESC)) WHERE MOD(R, 200)=0
+			if ( pageMode == PageMode.ITERATOR ) {
+				tmp = new StringBuilder(String.format(
+					"SELECT \"%s\", R FROM (SELECT \"%s\", ROWNUM() AS R FROM %s) WHERE (R=1 OR MOD(R, ?)=1)", DbUtil.SEGKEY_NAME, DbUtil.SEGKEY_NAME, segTable));
+			}
+			else {
+				tmp = new StringBuilder(String.format(
+					"SELECT \"%s\", R FROM (SELECT \"%s\", ROWNUM() AS R FROM %s) WHERE (R=1 OR MOD(R, (?-1))=1)", DbUtil.SEGKEY_NAME, DbUtil.SEGKEY_NAME, segTable));
+			}
+			pstmAnchors = store.getConnection().prepareStatement(tmp.toString(),
+				ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+			anchors = new ArrayList<Long>();
+			}
+			
 		}
 		catch ( SQLException e ) {
 			throw new RuntimeException(e);
@@ -191,7 +215,7 @@ public class Tm implements ITm {
 	
 	@Override
 	public void setPageSize (long size) {
-		if ( size < 2 ) this.limit = 2;
+		if ( size < 3 ) this.limit = 3;
 		else this.limit = size;
 		// We changed the number of rows
 		needPagingRefresh = true;
@@ -528,35 +552,25 @@ public class Tm implements ITm {
 				if ( totalRows % limit > 0 ) pageCount++; // Last page
 			}
 		}
-		pagingWithMethod = true;
 		
 		currentPage = -1;
 		needPagingRefresh = false; // Stable until we add or delete rows or change the page-size
 		//TODO: handle sort on other fields
-		
-//		Statement stm = null;
-//		long count = 0;
-//		try {
-//			stm = store.getConnection().createStatement();
-//			ResultSet result = stm.executeQuery("SELECT COUNT(*) FROM \""+nme+"_SEG\""); // Optimized call for H2
-//			if ( result.first() ) {
-//				count = result.getLong(1);
-//			}
-//		}		
-//		catch ( SQLException e ) {
-//			throw new RuntimeException(e);
-//		}
-//		finally {
-//			try {
-//				if ( stm != null ) {
-//					stm.close();
-//					stm = null;
-//				}
-//			}
-//			catch ( SQLException e ) {
-//				throw new RuntimeException(e);
-//			}
-//		}
+
+		if ( testPagingType2 ) {
+		try {
+			pstmAnchors.setLong(1, limit);
+			ResultSet result = pstmAnchors.executeQuery();
+			anchors.clear();
+			while ( result.next() ) {
+				long rn = result.getLong(2);
+				anchors.add(result.getLong(1));
+			}
+		}		
+		catch ( SQLException e ) {
+			throw new RuntimeException(e);
+		}
+		}
 		
 	}
 	
@@ -575,21 +589,28 @@ public class Tm implements ITm {
 	}
 
 	private long getFirstKeySegValueForPage (long page) {
-		if ( pagingWithMethod ) {
+		if ( testPagingType2 ) {
+		long key = -1;
+		if ( anchors.size() > page ) {
+			key = anchors.get((int)page);
+		}
+		}
+		
+		//if ( pagingWithMethod ) {
 			// Used if the sort is on the SegKey
-			if ( page == 0 ) return 1;
+			if ( page == 0 ) {
+				return 1;
+			}
 			if ( pageMode == PageMode.EDITOR ) {
+				long test = (page * (limit-1)) + 1;
 				return (page * (limit-1)) + 1;
 			}
 			else {
+				long test = (page * limit) + 1;
 				return (page * limit) + 1;
 			}
-		}
-		else {
-			// Get the key from a pre-computed list
-			//TODO
-			return 1;
-		}
+		//}
+		
 	}
 
 	@Override

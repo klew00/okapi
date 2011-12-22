@@ -75,16 +75,16 @@ class StatusBar extends Composite {
 	}
 	
 	void setCounter (int current,
-		int total)
+		int pageTotal)
 	{
 		if ( current < 0 ) counterLabel.setText(""); //$NON-NLS-1$
-		else counterLabel.setText(String.format("%d / %d", current+1, total)); //$NON-NLS-1$
+		else counterLabel.setText(String.format("%d / %d", current+1, pageTotal)); //$NON-NLS-1$
 	}
 	
 	void setPage (long current,
-		long total)
+		long numberOfPages)
 	{
-		if (( current < 0 ) || ( total < 1 )) pageLabel.setText(""); //$NON-NLS-1$
-		else pageLabel.setText(String.format("page %d of %d", current+1, total)); //$NON-NLS-1$
+		if (( current < 0 ) || ( numberOfPages < 1 )) pageLabel.setText(""); //$NON-NLS-1$
+		else pageLabel.setText(String.format("page %d of %d", current+1, numberOfPages)); //$NON-NLS-1$
 	}
 }

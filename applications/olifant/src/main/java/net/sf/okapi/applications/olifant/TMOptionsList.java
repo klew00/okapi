@@ -20,6 +20,8 @@
 
 package net.sf.okapi.applications.olifant;
 
+import java.util.Iterator;
+
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.ui.UserConfiguration;
 
@@ -30,11 +32,13 @@ public class TMOptionsList extends UserConfiguration {
 	TMOptions getItem (String uuid,
 		boolean createIfNeeded)
 	{
-		String data = this.getProperty(uuid);
+		String data = getProperty(uuid);
 		IParameters prm = new TMOptions();
 		
 		if ( data != null ) {
 			prm.fromString(data);
+			// Update the last-usage information
+			((TMOptions)prm).setLastUsage(System.currentTimeMillis());
 			return (TMOptions)prm;
 		}
 		else if ( createIfNeeded ) {
@@ -49,4 +53,21 @@ public class TMOptionsList extends UserConfiguration {
 		setProperty(tp.getTm().getUUID(), tp.getTmOptions().toString());
 	}
 
+	/**
+	 * Removes from the list any entry that has its last-usage time older than 30 days.
+	 */
+	void purgeOldItems () {
+		final long limit = System.currentTimeMillis() + (((1000L*60L)*24)*30);
+		Iterator<Object> iter = keySet().iterator();
+		while ( iter.hasNext() ) {
+			String uuid = (String)iter.next();
+			String data = getProperty(uuid);
+			if ( data == null )  continue;
+			TMOptions opt = new TMOptions();
+			((IParameters)opt).fromString(data);
+			if ( opt.getLastUsage() < limit ) {
+				iter.remove();
+			}
+		}
+	}
 }

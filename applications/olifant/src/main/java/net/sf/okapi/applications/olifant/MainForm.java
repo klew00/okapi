@@ -94,6 +94,7 @@ public class MainForm {
 	private MenuItem miFileOpen;
 	private MenuItem miEntriesNew;
 	private MenuItem miEntriesDelete;
+	private MenuItem miRefresh;
 	private MenuItem miEditSearch;
 	private MenuItem miTMNew;
 	private MenuItem miTMClose;
@@ -406,6 +407,7 @@ public class MainForm {
 		
 		miEntriesNew.setEnabled(active);
 		miEntriesDelete.setEnabled(active);
+		miRefresh.setEnabled(active);
 		
 		miEditSearch.setEnabled(active);
 		
@@ -513,6 +515,14 @@ public class MainForm {
 		miEntriesDelete.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				currentTP.deleteEntries();
+            }
+		});
+		
+		miRefresh = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miRefresh, "entries.refresh"); //$NON-NLS-1$
+		miRefresh.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				currentTP.saveAndRefresh();
             }
 		});
 		

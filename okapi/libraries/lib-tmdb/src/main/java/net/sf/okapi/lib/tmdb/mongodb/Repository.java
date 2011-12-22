@@ -122,7 +122,10 @@ public class Repository implements IRepository {
 	
 	@Override
 	public void close () {
-		connection.close();
+		if ( connection != null ) {
+			connection.close();
+			connection = null;
+		}
 	}
 
 	@Override

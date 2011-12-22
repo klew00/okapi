@@ -42,12 +42,14 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.custom.TableCursor;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -74,7 +76,10 @@ class TmPanel extends Composite implements IObserver {
 	private final SashForm sashMain;
 	private final EditorPanel editPanel;
 	private final Table table;
+	private final TableCursor cursor;
 	private final LogPanel logPanel;
+	
+	private Point cursorLoc;
 	private ITm tm;
 	private int currentEntry;
 	private boolean needSave = false;
@@ -105,6 +110,7 @@ class TmPanel extends Composite implements IObserver {
 		this.opt = opt;
 		this.statusBar = statusBar;
 		
+		cursorLoc = new Point(0, 0);
 		srcCol = -1;
 		trgCol = -1;
 		
@@ -167,12 +173,56 @@ class TmPanel extends Composite implements IObserver {
             }
 		});
 
-		table.addKeyListener(new KeyAdapter() {
+//		table.addKeyListener(new KeyAdapter() {
+//			public void keyPressed(KeyEvent e) {
+//				if ( e.character == ' ' ) { // Changes the flag with the space-bar
+//					TableItem si = table.getItem(table.getSelectionIndex());
+//					for ( TableItem ti : table.getSelection() ) {
+//						if ( ti == si ) continue; // Skip focused item because it will get set by SelectionAdapter()
+//						ti.setChecked(!ti.getChecked());
+//						ti.setData((Integer)ti.getData() | SAVE_FLAG); // Entry has been changed
+//						needSave = true;
+//					}
+//				}
+////				else { 
+////					checkPage(e.keyCode, e.stateMask);
+////				}
+//			}
+//		});
+		
+		cursor = new TableCursor(table, SWT.NONE);
+		cursor.setBackground(getDisplay().getSystemColor(SWT.COLOR_LIST_SELECTION));
+		cursor.setForeground(getDisplay().getSystemColor(SWT.COLOR_LIST_SELECTION_TEXT));
+
+		cursor.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				// Update the selection
+				table.setSelection(cursor.getRow()); //new TableItem[]{cursor.getRow()});
+				updateCurrentEntry();
+			}
+			@Override
+			public void widgetDefaultSelected(SelectionEvent event){
+				int n = cursor.getColumn();
+				String fn = table.getColumn(n).getText();
+				n = cursor.getColumn();
+				//todo
+			}
+		});
+		
+		// Hide the TableCursor when the user hits the "MOD1" or "MOD2" key.
+		// This allows the user to select multiple items in the table.
+		cursor.addKeyListener(new KeyAdapter() {
 			public void keyPressed(KeyEvent e) {
+				if ( e.keyCode == SWT.MOD1 || e.keyCode == SWT.MOD2 || 
+					(e.stateMask & SWT.MOD1) != 0 || (e.stateMask & SWT.MOD2) != 0 )
+				{
+					cursor.setVisible(false);
+				}
 				if ( e.character == ' ' ) { // Changes the flag with the space-bar
 					TableItem si = table.getItem(table.getSelectionIndex());
 					for ( TableItem ti : table.getSelection() ) {
-						if ( ti == si ) continue; // Skip focused item because it will get set by SelectionAdapter()
+						//if ( ti == si ) continue; // Skip focused item because it will get set by SelectionAdapter()
 						ti.setChecked(!ti.getChecked());
 						ti.setData((Integer)ti.getData() | SAVE_FLAG); // Entry has been changed
 						needSave = true;
@@ -182,7 +232,23 @@ class TmPanel extends Composite implements IObserver {
 					checkPage(e.keyCode, e.stateMask);
 				}
 			}
-		});
+        });
+		// Show the TableCursor when the user releases the "MOD2" or "MOD1" key.
+		// This signals the end of the multiple selection task.
+		table.addKeyListener(new KeyAdapter() {
+			public void keyReleased(KeyEvent e) {
+				if (e.keyCode == SWT.MOD1 && (e.stateMask & SWT.MOD2) != 0) return;
+				if (e.keyCode == SWT.MOD2 && (e.stateMask & SWT.MOD1) != 0) return;
+				if (e.keyCode != SWT.MOD1 && (e.stateMask & SWT.MOD1) != 0) return;
+				if (e.keyCode != SWT.MOD2 && (e.stateMask & SWT.MOD2) != 0) return;
+				// cursorLoc.y has the last selected table row
+				// and the column selected before hiding the cursor
+				getCursorSelection();
+				cursor.setSelection(cursorLoc.y, cursorLoc.x);
+				cursor.setVisible(true);
+				cursor.setFocus();
+			}
+        });
 		
 		// Create the first column (always present)
 		TableColumn col = new TableColumn(table, SWT.NONE);
@@ -443,6 +509,7 @@ class TmPanel extends Composite implements IObserver {
 	
 	private void updateVisibleFields () {
 		try {
+			getCursorSelection();
 			table.setRedraw(false);
 			// Indicate to the TM back-end which fields the UI wants
 			tm.setRecordFields(opt.getVisibleFields());
@@ -466,7 +533,7 @@ class TmPanel extends Composite implements IObserver {
 		finally {
 			table.setRedraw(true);
 		}
-		fillTable(0, 0, 0);
+		fillTable(0, cursorLoc.y, 0, cursorLoc.x);
 	}
 	
 	@Override
@@ -486,11 +553,11 @@ class TmPanel extends Composite implements IObserver {
 	{
 		int direction = -1;
 		int selection = 0;
-		int n = table.getSelectionIndex();
+		getCursorSelection();
 
 		switch ( keyCode ) {
 		case SWT.ARROW_DOWN:
-			if ( n == table.getItemCount()-1 ) {
+			if ( cursorLoc.y == table.getItemCount()-1 ) {
 				direction = 1;
 			}
 			break;
@@ -499,14 +566,14 @@ class TmPanel extends Composite implements IObserver {
 				// Ctrl+PageDown goes to the next page
 				direction = 1;
 			}
-			else if ( n == table.getItemCount()-1 ) {
+			else if ( cursorLoc.y == table.getItemCount()-1 ) {
 				// PageDown goes to the next page only if 
 				// the current selection is the last row of the current page 
 				direction = 1;
 			}
 			break;
 		case SWT.ARROW_UP:
-			if ( n == 0 ) {
+			if ( cursorLoc.y == 0 ) {
 				direction = 2;
 				selection = -1;
 			}
@@ -517,7 +584,7 @@ class TmPanel extends Composite implements IObserver {
 				direction = 2;
 				selection = -1;
 			}
-			else if ( n == 0 ) {
+			else if ( cursorLoc.y == 0 ) {
 				// PageUp goes to the previous page only if 
 				// the current selection is the first row of the current page 
 				direction = 2;
@@ -525,12 +592,12 @@ class TmPanel extends Composite implements IObserver {
 			}
 			break;
 		case SWT.HOME:
-			if ( n == 0 ) {
+			if ( cursorLoc.y == 0 ) {
 				direction = 0;
 			}
 			break;
 		case SWT.END:
-			if ( n == table.getItemCount()-1 ) {
+			if ( cursorLoc.y == table.getItemCount()-1 ) {
 				direction = 3;
 				selection = -1;
 			}
@@ -539,7 +606,7 @@ class TmPanel extends Composite implements IObserver {
 
 		if ( direction > -1 ) {
 			saveEntry();
-			fillTable(direction, selection, selection);
+			fillTable(direction, selection, selection, cursorLoc.x);
 		}
 	}
 	
@@ -592,7 +659,7 @@ class TmPanel extends Composite implements IObserver {
 			wasModified = true;
 			// Move to the last entry (the one we just created)
 			//TODO: adjust to go to proper entry when sort is working 
-			fillTable(3, -1, -1);
+			fillTable(3, -1, -1, srcCol);
 			//TODO: Move focus in source edit box
 		}
 		catch ( Throwable e ) {
@@ -605,8 +672,8 @@ class TmPanel extends Composite implements IObserver {
 	
 	void deleteEntries () {
 		try {
-			int n = table.getSelectionIndex();
-			if ( n == -1 ) {
+			getCursorSelection();
+			if ( cursorLoc.y == -1 ) {
 				return; // Nothing to do
 			}
 			saveEntryAndModificationsIfNeeded();
@@ -615,18 +682,31 @@ class TmPanel extends Composite implements IObserver {
 				segKeys.add(Long.valueOf(ti.getText(0)));
 			}
 			tm.deleteSegments(segKeys);
-			fillTable(4, n, -1);
+			fillTable(4, cursorLoc.y, -1, cursorLoc.x);
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(getShell(), "Error while deleting an entry.\n"+e.getMessage(), null);
 		}
 	}
 	
+	void saveAndRefresh () {
+		try {
+			getCursorSelection();
+			if ( cursorLoc.y == -1 ) {
+				return; // Nothing to do
+			}
+			saveEntry();
+			// fillTable saves the modifications if needed
+			fillTable(4, cursorLoc.y, 0, cursorLoc.x);
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(getShell(), "Error while refreshing the table.\n"+e.getMessage(), null);
+		}
+	}
+	
 	void searchAndReplace (boolean search) {
 		try {
-//			Location loc = getCurrentLocation(null);
-			
-			
+			Location loc = getCurrentLocation(null);
 			
 			if ( sarForm == null ) {
 				sarForm = new SearchAndReplaceForm(getShell(), sarOptions, opt.getVisibleFields());
@@ -686,14 +766,16 @@ class TmPanel extends Composite implements IObserver {
 	
 	/**
 	 * Fills the table with a new page
-	 * @param direction 0=from the top, 1=next, 2=previous, 3=last
-	 * @param selection 0=top, -1=last, n=another row
-	 * @param fallbackSelection 0=top, -1=end. Selection to use if the given selection is
+	 * @param direction 0=first page, 1=next page, 2=previous page, 3=last page, 4=current page
+	 * @param row 0=top, -1=last, n=another row
+	 * @param fallbackRow 0=top, -1=end. Selection to use if the given selection is
 	 * not possible (e.g. when the page has less entries)
+	 * @param column index of the column to select.
 	 */
 	void fillTable (int direction,
-		int selection,
-		int fallbackSelection)
+		int row,
+		int fallbackRow,
+		int column)
 	{
 		try {
 			saveModificationsIfNeeded();
@@ -741,16 +823,21 @@ class TmPanel extends Composite implements IObserver {
 				}
 			}
 			if ( table.getItemCount() > 0 ) {
-				if ( selection == -1 ) {
-					table.setSelection(table.getItemCount()-1);
+				if ( row == -1 ) {
+					row = table.getItemCount()-1;
 				}
-				else if ( table.getItemCount() > selection ) {
-					table.setSelection(selection);
+				else if ( table.getItemCount() > row ) {
+					// Selection value is already OK
 				}
 				else {
-					if ( fallbackSelection == -1 ) table.setSelection(table.getItemCount()-1);
-					else table.setSelection(0);
+					if ( fallbackRow == -1 ) row = table.getItemCount()-1;
+					row = 0;
 				}
+				
+				table.setSelection(row);
+//				cursor.setSelection(row, (column >= table.getColumnCount() ? 0 : column));
+				cursor.setFocus();
+				
 				updateCurrentEntry();
 				statusBar.setPage(tm.getCurrentPage(), tm.getPageCount());
 			}
@@ -811,6 +898,17 @@ class TmPanel extends Composite implements IObserver {
 	}
 
 	/**
+	 * Updates and return the cursorLoc variable that holds
+	 * the selected row and the column of the table cursor.
+	 * @return the cursorLoc variable.
+	 */
+	Point getCursorSelection () {
+		cursorLoc.y = table.getSelectionIndex();
+		cursorLoc.x = cursor.getColumn();
+		return cursorLoc;
+	}
+
+	/**
 	 * Build a new Location object with the current location of the cursor. 
 	 * @param loc Location object to update, or null to create a new one.
 	 * @return the updated (and possibly new) Location object.
@@ -823,6 +921,10 @@ class TmPanel extends Composite implements IObserver {
 		Control ctrl = getDisplay().getFocusControl();
 		if ( ctrl instanceof StyledText ) {
 			loc.setPosition(((StyledText)ctrl).getCaretOffset());
+		}
+		else if ( ctrl == table ) {
+			String fn = table.getColumn(cursor.getColumn()).getText();
+			loc.setFieldName(fn);
 		}
 		else {
 			loc.setPosition(-1);

@@ -734,6 +734,8 @@ class RepositoryPanel extends Composite {
 	 * Each user options in the repository list is updated when the tab of the TM is closed.
 	 */
 	void saveUserOptions () {
+		// Make sure we keep the list relatively small
+		options.purgeOldItems();
 		// Save the file
 		options.save(USEROPTIONSFILE, getClass().getPackage().getImplementationVersion());
 	}

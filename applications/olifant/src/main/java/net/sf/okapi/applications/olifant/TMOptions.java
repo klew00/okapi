@@ -30,11 +30,13 @@ import net.sf.okapi.lib.tmdb.ITm;
 
 public class TMOptions extends BaseParameters {
 
+	private static final String LASTUSAGE = "lastUsage";
 	private static final String PAGESIZE = "pageSize";
 	private static final String VISIBLEFIELDS = "visibleFields";
 	private static final String SOURCELOCALE = "sourceLocale";
 	private static final String TARGETLOCALE = "targetLocale";
 	
+	private long lastUsage;
 	private long pageSize;
 	private ArrayList<String> visibleFields;
 	private String sourceLocale;
@@ -76,9 +78,18 @@ public class TMOptions extends BaseParameters {
 	public void setTargetLocale (String targetLocale) {
 		this.targetLocale = targetLocale;
 	}
+	
+	public long getLastUsage () {
+		return lastUsage;
+	}
+
+	public void setLastUsage (long lastUsage) {
+		this.lastUsage = lastUsage;
+	}
 
 	@Override
 	public void reset () {
+		lastUsage = System.currentTimeMillis();
 		pageSize = 500;
 		visibleFields = new ArrayList<String>();
 		sourceLocale = "";
@@ -95,6 +106,8 @@ public class TMOptions extends BaseParameters {
 		visibleFields = new ArrayList<String>(ListUtil.stringAsList(tmp));
 		sourceLocale = buffer.getString(SOURCELOCALE, sourceLocale);
 		targetLocale = buffer.getString(TARGETLOCALE, targetLocale);
+		tmp = buffer.getString(LASTUSAGE, String.valueOf(lastUsage));
+		lastUsage = Long.valueOf(tmp);
 	}
 	
 	@Override
@@ -104,6 +117,7 @@ public class TMOptions extends BaseParameters {
 		buffer.setString(VISIBLEFIELDS, ListUtil.listAsString(visibleFields));
 		buffer.setString(SOURCELOCALE, sourceLocale);
 		buffer.setString(TARGETLOCALE, targetLocale);
+		buffer.setString(LASTUSAGE, String.valueOf(lastUsage));
 		return buffer.toString();
 	}
 	

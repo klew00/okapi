@@ -30,6 +30,8 @@ import net.sf.okapi.common.ui.TextAndBrowsePanel;
 import net.sf.okapi.common.ui.UIUtil;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Rectangle;
@@ -116,7 +118,7 @@ class RepositoryForm {
 		pnlOtherLocal.setLayoutData(gdTmp);
 
 		rdH2ServerBased = new Button(group, SWT.RADIO);
-		rdH2ServerBased.setText("H2 server-based repository");
+		rdH2ServerBased.setText("H2 server-based repository  (<host URL>[:<port>]/<database name>)");
 		rdH2ServerBased.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				updateDisplay();
@@ -129,7 +131,7 @@ class RepositoryForm {
 		edH2ServerBased.setLayoutData(gdTmp);
 		
 		rdMongoServerBased = new Button(group, SWT.RADIO);
-		rdMongoServerBased.setText("MongoDB server-based repository [<optional host name>/]<database name>");
+		rdMongoServerBased.setText("MongoDB server-based repository  ([<host URL>[:<port>]/]<database name>)");
 		rdMongoServerBased.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				updateDisplay();
@@ -174,7 +176,7 @@ class RepositoryForm {
 		}
 		else if ( type.equals(REPOTYPE_MONGOSERVER) ) {
 			rdMongoServerBased.setSelection(true);
-			rdMongoServerBased.setText(param);
+			edMongoServerBased.setText(param);
 		}
 		else if ( type.equals(REPOTYPE_H2SERVER) ) {
 			rdH2ServerBased.setSelection(true);
@@ -250,7 +252,7 @@ class RepositoryForm {
 			else if ( rdMongoServerBased.getSelection() ) {
 				String path = edMongoServerBased.getText().trim();
 				if ( path.isEmpty() ) {
-					Dialogs.showError(shell, "You must specify a database name and optional host in the following format: myhost/myrepository", null);
+					Dialogs.showError(shell, "You must specify a database name (with an optional host URL).", null);
 					edMongoServerBased.setFocus();
 					return false;
 				}
