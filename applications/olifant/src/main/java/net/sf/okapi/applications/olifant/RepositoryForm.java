@@ -118,7 +118,7 @@ class RepositoryForm {
 		pnlOtherLocal.setLayoutData(gdTmp);
 
 		rdH2ServerBased = new Button(group, SWT.RADIO);
-		rdH2ServerBased.setText("H2 server-based repository  (<host URL>[:<port>]/<database name>)");
+		rdH2ServerBased.setText("H2 server-based repository  (<host>[:<port>]/<repositoryName>)");
 		rdH2ServerBased.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				updateDisplay();
@@ -131,7 +131,7 @@ class RepositoryForm {
 		edH2ServerBased.setLayoutData(gdTmp);
 		
 		rdMongoServerBased = new Button(group, SWT.RADIO);
-		rdMongoServerBased.setText("MongoDB server-based repository  ([<host URL>[:<port>]/]<database name>)");
+		rdMongoServerBased.setText("MongoDB server-based repository  ([<host>[:<port>]/]<repositoryName>)");
 		rdMongoServerBased.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				updateDisplay();
