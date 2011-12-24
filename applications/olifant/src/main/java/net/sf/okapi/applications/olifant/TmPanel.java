@@ -47,6 +47,8 @@ import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
@@ -63,7 +65,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
-class TmPanel extends Composite implements IObserver {
+class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 
 	private final static int KEYCOLUMNWIDTH = 90;
 
@@ -131,9 +133,9 @@ class TmPanel extends Composite implements IObserver {
 		sashMain.setSashWidth(4);
 		
 		// Edit panels
-		editPanel = new EditorPanel(sashMain, SWT.VERTICAL);
+		editPanel = new EditorPanel(sashMain, SWT.VERTICAL, this);
 		editPanel.clear();
-
+		
 		// Table
 		table = new Table(sashMain, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION | SWT.CHECK | SWT.V_SCROLL);
 		table.setHeaderVisible(true);
@@ -168,10 +170,10 @@ class TmPanel extends Composite implements IObserver {
 					ti.setData((Integer)ti.getData() | SAVE_FLAG); // Entry has been changed
 					needSave = true;
 				}
-				else {
-					saveEntry();
-					updateCurrentEntry();
-				}
+//				else {
+//					saveEntry();
+//					updateCurrentEntry();
+//				}
             }
 		});
 
@@ -194,6 +196,7 @@ class TmPanel extends Composite implements IObserver {
 //		});
 		
 		cursor = new TableCursor(table, SWT.NONE);
+
 		cursor.setBackground(getDisplay().getSystemColor(SWT.COLOR_LIST_SELECTION));
 		cursor.setForeground(getDisplay().getSystemColor(SWT.COLOR_LIST_SELECTION_TEXT));
 
@@ -201,15 +204,26 @@ class TmPanel extends Composite implements IObserver {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
 				// Update the selection
+				saveEntry();
 				table.setSelection(cursor.getRow());
 				updateCurrentEntry();
 			}
 			@Override
 			public void widgetDefaultSelected(SelectionEvent event){
-				int n = cursor.getColumn();
-				String fn = table.getColumn(n).getText();
-				n = cursor.getColumn();
-				//todo
+				editCurrentCell();
+			}
+		});
+		
+		cursor.addMouseListener(new MouseListener() {
+			@Override
+			public void mouseUp (MouseEvent event) {
+			}
+			@Override
+			public void mouseDown (MouseEvent event) {
+			}
+			@Override
+			public void mouseDoubleClick (MouseEvent event) {
+				editCurrentCell();
 			}
 		});
 		
@@ -222,15 +236,22 @@ class TmPanel extends Composite implements IObserver {
 				{
 					cursor.setVisible(false);
 				}
-				if ( e.character == ' ' ) { // Changes the flag with the space-bar
+				switch ( e.keyCode ) {
+				case 32: // Changes the flag with the space-bar
 					for ( TableItem ti : table.getSelection() ) {
 						ti.setChecked(!ti.getChecked());
 						ti.setData((Integer)ti.getData() | SAVE_FLAG); // Entry has been changed
 						needSave = true;
 					}
-				}
-				else { 
+					break;
+				case SWT.ARROW_DOWN:
+				case SWT.ARROW_UP:
+				case SWT.PAGE_DOWN:
+				case SWT.PAGE_UP:
+				case SWT.HOME:
+				case SWT.END:
 					checkPage(e.keyCode, e.stateMask);
+					break;
 				}
 			}
         });
@@ -578,7 +599,7 @@ class TmPanel extends Composite implements IObserver {
 			}
 			else if ( rowToTest == table.getItemCount()-1 ) {
 				// PageDown goes to the next page only if 
-				// the current selection is the last row of the current page 
+				// the current selection is the last row of the current page
 				direction = 1;
 			}
 			break;
@@ -602,12 +623,12 @@ class TmPanel extends Composite implements IObserver {
 			}
 			break;
 		case SWT.HOME:
-			if ( rowToTest == 0 ) {
+			if (( rowToTest == 0 ) && ( tm.getCurrentPage() > 0 )) {
 				direction = 0;
 			}
 			break;
 		case SWT.END:
-			if ( rowToTest == table.getItemCount()-1 ) {
+			if (( rowToTest == table.getItemCount()-1 ) && ( tm.getCurrentPage() < tm.getPageCount()-1 )) {
 				direction = 3;
 				selection = -1;
 			}
@@ -645,14 +666,15 @@ class TmPanel extends Composite implements IObserver {
 	
 	void saveEntry () {
 		if ( currentRow < 0 ) return;
-		// Else: save the entry
-		TableItem ti = table.getItem(currentRow);
+		// Else: save the entry if needed
 		if ( editPanel.isSourceModified() && ( srcCol != -1 )) {
+			TableItem ti = table.getItem(currentRow);
 			ti.setText(srcCol, editPanel.getSourceText());
 			ti.setData((Integer)ti.getData() | SAVE_SOURCE);
 			needSave = true;
 		}
 		if ( editPanel.isTargetModified() && ( trgCol != -1 )) {
+			TableItem ti = table.getItem(currentRow);
 			ti.setText(trgCol, editPanel.getTargetText());
 			ti.setData((Integer)ti.getData() | SAVE_TARGET);
 			needSave = true;
@@ -673,7 +695,7 @@ class TmPanel extends Composite implements IObserver {
 			// Move to the last entry (the one we just created)
 			//TODO: adjust to go to proper entry when sort is working 
 			fillTable(3, -1, -1, srcCol);
-			//TODO: Move focus in source edit box
+			editPanel.setFocus(0, 0, -1);
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(getShell(), "Error while adding new entry.\n"+e.getMessage(), null);
@@ -946,14 +968,31 @@ class TmPanel extends Composite implements IObserver {
 			loc.setPosition(-1);
 			loc.setFieldName(null);
 		}
-		
-		//loc.setSegKey();
-		
-		
-		// Get the current cursor position in the field
-		
-		// Get the current segment key
-		
 		return loc;
 	}
+	
+	private void editCurrentCell () {
+		int n = cursor.getColumn();
+		if ( n == srcCol ) {
+			editPanel.setFocus(0, 0, -1);
+		}
+		else if ( n == trgCol ) {
+			editPanel.setFocus(1, 0, -1);
+		}
+		//TODO: other columns go to extra
+	}
+
+	@Override
+	public void returnFromEdit (boolean save) {
+		if ( save ) {
+			saveEntry();
+			//TODO: reset the modified flag in edit control!!
+			// so we don't save again when moving to next location
+		}
+		else {
+			updateCurrentEntry();
+		}
+		cursor.setFocus();
+	}
+	
 }

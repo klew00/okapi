@@ -92,7 +92,7 @@ public interface ITm {
 	 * the second the secondary, etc.
 	 * <p>The key of the map is the field full name, the boolean value is set to true for
 	 * ascending order or false for descending order.
-	 * <p>The fields must exist, but it may be not in the list of the fields returned by
+	 * <p>The fields must exist, but they may be not in the list of the fields returned by
 	 * {@link #getNextPage()} or the other paging methods.
 	 * Use a null or empty map to restore whatever default the natural order the back-end uses. 
 	 */

@@ -575,14 +575,16 @@ class RepositoryPanel extends Composite {
 			else {
 				tm = repo.openTm(tmName);
 			}
+			TMOptions opt = options.getItem(tm.getUUID(), true);
 			
 			ArrayList<Object> data = new ArrayList<Object>();
-			data.add(tm.getPageSize());
+			data.add(opt.getPageSize());
 			
 			TMOptionsForm dlg = new TMOptionsForm(getShell(), data);
 			Object[]res = dlg.showDialog();
 			if ( res == null ) return;
 			
+			opt.setPageSize((Long)res[0]);
 			if ( tp != null ) {
 				tm.setPageSize((Long)res[0]);
 			}

@@ -217,7 +217,6 @@ public class Tm implements ITm {
 	public void setPageSize (long size) {
 		if ( size < 3 ) this.limit = 3;
 		else this.limit = size;
-		// We changed the number of rows
 		needPagingRefresh = true;
 	}
 	
@@ -631,6 +630,7 @@ public class Tm implements ITm {
 	@Override
 	public void setPageMode (PageMode pageMode) {
 		this.pageMode = pageMode;
+		needPagingRefresh = true;
 	}
 
 	@Override
@@ -964,7 +964,6 @@ public class Tm implements ITm {
 	@Override
 	public void setSortOrder (LinkedHashMap<String, Boolean> fields) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override

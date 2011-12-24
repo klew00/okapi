@@ -64,6 +64,7 @@ class SearchAndReplaceForm {
 		shell.setLayout(new GridLayout(3, false));
 
 		this.options = p_options;
+		options.setAction(ACTION.CLOSE);
 		
 		Label label = new Label(shell, SWT.NONE);
 		label.setText("Search for:");
@@ -80,8 +81,6 @@ class SearchAndReplaceForm {
 		
 		SelectionAdapter adapter = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				options.setAction(ACTION.CLOSE);
-				options.getAction();
 				if ( e.widget == btFindNext ) { //$NON-NLS-1$
 					if ( !saveData() ) return;
 					options.setAction(ACTION.FINDNEXT);

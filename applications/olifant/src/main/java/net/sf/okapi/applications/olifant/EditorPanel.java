@@ -32,16 +32,17 @@ class EditorPanel extends SashForm {
 	private ExtraFieldPanel extraPanel;
 
 	public EditorPanel (Composite parent,
-		int flags)
+		int flags,
+		ISegmentEditorUser caller)
 	{
 		super(parent, flags);
 		// Default layout
 		setLayout(new GridLayout(1, false));
 		setLayoutData(new GridData(GridData.FILL_BOTH));
 		
-		edSource = new SegmentEditor(this, -1);
-		edTarget = new SegmentEditor(this, -1);
-		extraPanel = new ExtraFieldPanel(this, 0);
+		edSource = new SegmentEditor(this, -1, caller);
+		edTarget = new SegmentEditor(this, -1, caller);
+		extraPanel = new ExtraFieldPanel(this, 0, caller);
 		
 		setWeights(new int[]{1, 1, 0});
 		setSashWidth(0);
@@ -133,4 +134,21 @@ class EditorPanel extends SashForm {
 		return extraPanel;
 	}
 
+	/**
+	 * Sets the focus on a given field in this edit panel.
+	 * @param field Field to focus: 0=source, 1=target, 3=extra.
+	 * @param start the start position of the selection
+	 * @param end the end position of the selection, use -1 for the end.
+	 */
+	public void setFocus (int field,
+		int start,
+		int end)
+	{
+		SegmentEditor ed;
+		if ( field == 1 ) ed = edTarget;
+		else if ( field == 2 ) ed = edSource; //TODO: change to use extra
+		else ed = edSource;
+		ed.setFocus();
+		ed.setSelection(start, end);
+	}
 }

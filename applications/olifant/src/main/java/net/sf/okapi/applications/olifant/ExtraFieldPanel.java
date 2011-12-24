@@ -34,14 +34,15 @@ public class ExtraFieldPanel extends SashForm {
 	private SegmentEditor edExtra;
 
 	ExtraFieldPanel (Composite parent,
-		int flags)
+		int flags,
+		ISegmentEditorUser caller)
 	{
 		super(parent, flags);
 		setLayout(new GridLayout(1, false));
 		setLayoutData(new GridData(GridData.FILL_BOTH));
 		setOrientation(SWT.HORIZONTAL);
 		
-		edExtra = new SegmentEditor(this, -1);
+		edExtra = new SegmentEditor(this, -1, caller);
 		
 		lbFields = new List(this, SWT.BORDER);
 		lbFields.setLayoutData(new GridData(GridData.FILL_BOTH));

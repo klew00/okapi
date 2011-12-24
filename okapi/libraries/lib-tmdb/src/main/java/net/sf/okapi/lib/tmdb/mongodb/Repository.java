@@ -23,6 +23,8 @@ package net.sf.okapi.lib.tmdb.mongodb;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
@@ -41,6 +43,7 @@ public class Repository implements IRepository {
 	
 	public static final String TM_COL_NAME = "name";
 	public static final String TM_COL_DESC = "desc";
+	public static final String TM_COL_UUID = "uuid";
 	public static final String TM_COL_TU_FIELDS = "tuFields";	
 	public static final String TM_COL_SEG_FIELDS = "segFields";
 	public static final String TM_COL_LOCALES = "locales";
@@ -139,17 +142,22 @@ public class Repository implements IRepository {
         query.put("name", tmName);
 
         DBObject dbObj = tm_coll.findOne(query);
-		if(dbObj == null){
+		if ( dbObj == null ) {
 			BasicDBObject doc = new BasicDBObject();
 		    doc.put(Repository.TM_COL_NAME, tmName);
+		    doc.put(Repository.TM_COL_UUID, UUID.randomUUID().toString());
 		    doc.put(Repository.TM_COL_DESC, description);
 		    doc.put(Repository.TM_COL_LOCALES, localeId);
 		    doc.put(Repository.TM_COL_TU_FIELDS, "");
 		    doc.put(Repository.TM_COL_SEG_FIELDS, DbUtil.TEXT_PREFIX+localeId+","+DbUtil.CODES_PREFIX+localeId);		    
 		    tm_coll.insert(doc);
+		    dbObj = tm_coll.findOne(query);
 		}
-		 //TODO: What should we use as id? Name seems to be unique.
-		return new Tm(this,"1",tmName);
+		
+		// Get the UUID
+		String uuid = (String)dbObj.get(Repository.TM_COL_UUID);
+		// Create the TM
+		return new Tm(this, uuid, tmName);
 	}
 
 	@Override
@@ -205,9 +213,21 @@ public class Repository implements IRepository {
         query.put(Repository.TM_COL_NAME, tmName);
 
         DBObject dbObj = tm_coll.findOne(query);
-		if(dbObj != null){
-			return new Tm(this,"1",tmName);	
-		}else{
+		if ( dbObj != null ) {
+			// Get the UUID
+			Object obj = dbObj.get(Repository.TM_COL_UUID);
+			String uuid;
+			if ( obj == null ) {
+				// For now: if it wasn't there: create it to allow backward compatibility
+				uuid = UUID.randomUUID().toString();
+		        BasicDBObject set = new BasicDBObject("$set",
+		        	new BasicDBObject(Repository.TM_COL_UUID, uuid));
+		        tm_coll.update(dbObj, set);
+			}
+			else uuid = (String)obj;
+			return new Tm(this, uuid, tmName);	
+		}
+		else {
 			throw new RuntimeException(String.format("TM '%s' does not exists.", tmName));
 		}
 	}

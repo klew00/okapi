@@ -69,13 +69,13 @@ public class Tm implements ITm {
 	//int cachedSegmentCount;
 	
 	public Tm (Repository store,
-			String uuid,
-			String name)
-		{
-			this.store = store;
-			this.name = name;
-			this.uuid = uuid;
-		}
+		String uuid,
+		String name)
+	{
+		this.store = store;
+		this.name = name;
+		this.uuid = uuid;
+	}
 	
 	@Override
 	public String getUUID() {
@@ -139,7 +139,7 @@ public class Tm implements ITm {
 		BasicDBObject doc = new BasicDBObject();
 		segIndex++;
 		doc.put(Repository.SEG_COL_SEGKEY, segIndex);
-		doc.put(Repository.SEG_COL_FLAG, true);
+		doc.put(Repository.SEG_COL_FLAG, false);
 		for (Entry<String, Object> entry : segFields.entrySet()) {
 			doc.put(entry.getKey(), entry.getValue());
 		}
@@ -267,9 +267,8 @@ public class Tm implements ITm {
 	
 	@Override
 	public void setPageSize(long size) {
-		if ( size < 2 ) this.limit = 2;
-		else this.limit = (int) size;
-		// We changed the number of rows
+		if ( size < 3 ) this.limit = 3;
+		else this.limit = (int)size;
 		needPagingRefresh = true;
 	}
 	
@@ -711,6 +710,7 @@ public class Tm implements ITm {
 	@Override
 	public void setPageMode(PageMode pageMode) {
 		this.pageMode = pageMode;
+		needPagingRefresh = true;
 	}
 	
 	@Override

@@ -57,7 +57,7 @@ public class TMOptionsList extends UserConfiguration {
 	 * Removes from the list any entry that has its last-usage time older than 30 days.
 	 */
 	void purgeOldItems () {
-		final long limit = System.currentTimeMillis() + (((1000L*60L)*24)*30);
+		final long limit = System.currentTimeMillis() - (((1000L*60L)*24)*30);
 		Iterator<Object> iter = keySet().iterator();
 		while ( iter.hasNext() ) {
 			String uuid = (String)iter.next();

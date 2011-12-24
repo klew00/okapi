@@ -152,7 +152,8 @@ class LocalesForm {
 			String res = "";
 			
 			while ( true ) {
-				InputDialog dlg = new InputDialog(shell, "Add Locale", "Code of the locale to add:", res, null, 0, -1, -1);
+				InputDialog dlg = new InputDialog(shell, "Add Locale",
+					"Code of the locale to add (e.g. EN for English, etc.):", res, null, 0, -1, -1);
 				res = dlg.showDialog();
 				if ( Util.isEmpty(res) ) return; // Cancel
 				// Convert to a LocaleId to check the syntax and convert to Olifant locale

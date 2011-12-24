@@ -131,9 +131,6 @@ public class TMOptions extends BaseParameters {
 				iter.remove();
 			}
 		}
-		
-		// Check if the source/target locales are still valid
-		//TODO
 	}
 
 }

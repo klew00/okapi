@@ -30,12 +30,13 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Text;
 
 class LogPanel extends Composite {
 
 	private Text edLog;
-	private Button btCancel;
+	private Button btStop;
 	private Button btClear;
 	private CLabel info;
 	private long startTime;
@@ -58,11 +59,18 @@ class LogPanel extends Composite {
 		layout.marginWidth = 0;
 		setLayout(layout);
 
-		btCancel = new Button(this, SWT.PUSH);
-		btCancel.setText("Cancel");
-		btCancel.setEnabled(false);
-		btCancel.addSelectionListener(new SelectionAdapter() {
+		btStop = new Button(this, SWT.PUSH);
+		btStop.setText("Stop...");
+		btStop.setEnabled(false);
+		btStop.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
+				// Ask confirmation
+				MessageBox dlg = new MessageBox(getShell(), SWT.ICON_QUESTION | SWT.YES | SWT.NO);
+				dlg.setMessage("Do you want to stop this process?");
+				dlg.setText(MainForm.APPNAME);
+				if ( dlg.open() != SWT.YES ) {
+					return; // Cancel or no.
+				}
 				isCanceled = true;
             }
 		});
@@ -107,7 +115,7 @@ class LogPanel extends Composite {
 		startTime = System.currentTimeMillis();
 		edLog.setText(""); // Clear all
 		log(IProgressCallback.MSGTYPE_INFO, text);
-		btCancel.setEnabled(true);
+		btStop.setEnabled(true);
 		warnings = errors = 0;
 	}
 	
@@ -119,7 +127,7 @@ class LogPanel extends Composite {
 				toHMSMS(System.currentTimeMillis()-startTime), errors, warnings));
 		isCanceled = false;
 		inProgress = false;
-		btCancel.setEnabled(false);
+		btStop.setEnabled(false);
 	}
 	
 	public boolean inProgress () {

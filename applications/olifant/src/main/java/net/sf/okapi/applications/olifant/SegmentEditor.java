@@ -28,6 +28,8 @@ import org.eclipse.swt.custom.ExtendedModifyEvent;
 import org.eclipse.swt.custom.ExtendedModifyListener;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.custom.VerifyKeyListener;
+import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 
@@ -36,17 +38,22 @@ class SegmentEditor {
 	private static final Pattern CLEANCODES = Pattern.compile("\\<[/be]?(\\d+?)/?\\>");
 	private static final Pattern REALCODES = Pattern.compile("<(bpt|ept|ph|it|ut).*?>(.*?)</\\1>");
 
+	private final ISegmentEditorUser caller;
+	
 	private StyledText edit;
 	private boolean modified;
 	private boolean fullCodesMode;
 	private Pattern currentCodes;
 	
 	public SegmentEditor (Composite parent,
-		int flags)
+		int flags,
+		ISegmentEditorUser p_caller)
 	{
 		if ( flags < 0 ) { // Use the default styles if requested
 			flags = SWT.WRAP | SWT.V_SCROLL | SWT.BORDER;
 		}
+		caller = p_caller;
+		
 		edit = new StyledText(parent, flags);
 		GridData gdTmp = new GridData(GridData.FILL_BOTH);
 		edit.setLayoutData(gdTmp);
@@ -72,7 +79,21 @@ class SegmentEditor {
 		    	  modified = true;
 			}
 		});
-	
+
+		edit.addVerifyKeyListener(new VerifyKeyListener() {
+			@Override
+			public void verifyKey (VerifyEvent e) {
+				if ( e.keyCode == 13 ) {
+					caller.returnFromEdit(true);
+					e.doit = false;
+				}
+				else if ( e.keyCode == SWT.ESC ) {
+					caller.returnFromEdit(false);
+					e.doit = false;
+				}
+			}
+		});
+		
 //		edit.addVerifyKeyListener(new VerifyKeyListener() {
 //			@Override
 //			public void verifyKey(VerifyEvent e) {
@@ -151,6 +172,13 @@ class SegmentEditor {
 		return edit.setFocus();
 	}
 	
+	public void setSelection (int start,
+		int end)
+	{
+		if ( end < 0 ) end = edit.getText().length();
+		edit.setSelection(start, end);
+	}
+	
 	public void setEnabled (boolean enabled) {
 		edit.setEnabled(enabled);
 	}
@@ -166,6 +194,10 @@ class SegmentEditor {
 	
 	public boolean isModified () {
 		return modified;
+	}
+	
+	public void setModified (boolean modified) {
+		this.modified = modified;
 	}
 
 	public void setText (String text) {
