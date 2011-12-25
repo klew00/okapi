@@ -235,6 +235,8 @@ public class Tm implements ITm {
 			// It will be update with any added field from the API, not from the database
 			existingTuFields = store.getFields(name, false);
 			existingSegFields = store.getFields(name, true);
+			// Add the Flag field to the list, so we don't try to re-create it
+			existingSegFields.add(DbUtil.FLAG_NAME);
 			// Create the list of the fields to import (to use with the pre-defined statement
 			fieldsToImport = new LinkedHashMap<String, Object>();
 			

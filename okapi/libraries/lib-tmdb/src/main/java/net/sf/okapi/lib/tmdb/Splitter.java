@@ -21,7 +21,6 @@
 package net.sf.okapi.lib.tmdb;
 
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.util.LinkedHashMap;
 import java.util.List;
 

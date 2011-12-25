@@ -35,6 +35,8 @@ import net.sf.okapi.common.resource.TextFragment;
 
 public class DbUtil {
 	
+	public static final String PROP_FLAG = "x-olf-flag";
+	
 	public static final String LOC_SEP = "~";
 	
 	public static final String SEGKEY_NAME = "SegKey";

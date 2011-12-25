@@ -25,6 +25,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filterwriter.TMXWriter;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.TextUnit;
@@ -164,6 +165,15 @@ public class Exporter implements Runnable {
 					tu.setProperty(new Property(fn, rs.getString(fn)));
 				}
 			}
+		}
+		// Export the Olifant-specific flag
+		boolean flag = rs.getBoolean(DbUtil.FLAG_NAME);
+		if ( flag ) {
+			tu.setProperty(new Property(DbUtil.PROP_FLAG, "1"));
+		}
+		// Use the segment key as the tuid if none was defined
+		if ( Util.isEmpty(tu.getName()) ) {
+			tu.setName(String.valueOf(rs.getLong(DbUtil.SEGKEY_NAME)));
 		}
 		
 		// Done

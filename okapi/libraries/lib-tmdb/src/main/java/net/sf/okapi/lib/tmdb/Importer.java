@@ -57,6 +57,7 @@ public class Importer implements Runnable {
 		long count = 0;
 		IFilter filter = null;
 		boolean canceled = false;
+		boolean flag;
 		try {
 			callback.startProcess("Importing "+rd.getInputURI().getPath()+"...");
 			filter = fcMapper.createFilter(rd.getFilterConfigId());
@@ -81,8 +82,14 @@ public class Importer implements Runnable {
 				
 				// Get text-unit level properties
 				mapTUProp.clear();
+				flag = false;
 				for ( String name : tu.getPropertyNames() ) {
-					mapTUProp.put(DbUtil.checkFieldName(name), tu.getProperty(name).getValue());
+					if ( name.equals(DbUtil.PROP_FLAG) ) {
+						flag = "1".equals(tu.getProperty(name).getValue());
+					}
+					else {
+						mapTUProp.put(DbUtil.checkFieldName(name), tu.getProperty(name).getValue());
+					}
 				}
 				
 				// Get source container properties
@@ -101,6 +108,9 @@ public class Importer implements Runnable {
 					map.put(DbUtil.TEXT_PREFIX+srcDbLang, srcFields[0]);
 					map.put(DbUtil.CODES_PREFIX+srcDbLang, srcFields[1]);
 					long tuKey = -1;
+					if ( flag ) {
+						map.put(DbUtil.FLAG_NAME, (Boolean)flag);
+					}
 	
 					// For each target
 					for ( LocaleId locId : tu.getTargetLocales() ) {
