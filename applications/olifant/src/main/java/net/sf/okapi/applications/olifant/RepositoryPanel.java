@@ -66,11 +66,11 @@ class RepositoryPanel extends Composite {
 	private MainForm mainForm;
 	private List tmList;
 	private TMOptionsList options;
-	private Button btNewTM;
 	private Label stListTitle;
 	private IRepository repo;
 	private String repoType;
 	private String repoParam;
+	private MenuItem miContextNewTM;
 	private MenuItem miContextOpen;
 	private MenuItem miContextEditTMOptions;
 	private MenuItem miContextImportFile;
@@ -103,17 +103,6 @@ class RepositoryPanel extends Composite {
 			}
 		});
 		
-		btNewTM = UIUtil.createGridButton(this, SWT.PUSH, "Create New TM...", minButtonWidth, 1);
-		//btNewTM.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END));
-		btNewTM.setEnabled(false); // No repository is open yet
-		btNewTM.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				createTM();
-			}
-		});
-		
-		UIUtil.setSameWidth(minButtonWidth, btSelectRepo, btNewTM);
-
 		stListTitle = new Label(this, SWT.NONE);
 		stListTitle.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
@@ -140,6 +129,16 @@ class RepositoryPanel extends Composite {
 		
 		// Context menu for the list
 		Menu contextMenu = new Menu(getShell(), SWT.POP_UP);
+		
+		miContextNewTM = new MenuItem(contextMenu, SWT.PUSH);
+		rm.setCommand(miContextNewTM, "repository.createtm"); //$NON-NLS-1$
+		miContextNewTM.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				createTM();
+            }
+		});
+		
+		new MenuItem(contextMenu, SWT.SEPARATOR);
 		
 		miContextOpen = new MenuItem(contextMenu, SWT.PUSH);
 		rm.setCommand(miContextOpen, "repository.opentm"); //$NON-NLS-1$
@@ -203,6 +202,7 @@ class RepositoryPanel extends Composite {
 						enabled = true;
 					}
 				}
+				miContextNewTM.setEnabled(isRepositoryOpen());
 				miContextOpen.setEnabled(n>-1);
 				miContextEditTMOptions.setEnabled(enabled);
 				miContextImportFile.setEnabled(enabled);
@@ -516,7 +516,6 @@ class RepositoryPanel extends Composite {
 	}
 
 	void updateRepositoryStatus () {
-		btNewTM.setEnabled(isRepositoryOpen());
 		mainForm.updateCommands();
 		mainForm.updateTitle();
 	}

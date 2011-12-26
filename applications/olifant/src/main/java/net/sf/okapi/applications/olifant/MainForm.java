@@ -92,14 +92,16 @@ public class MainForm {
 	
 	private MenuItem miFileCloseRepository;
 	private MenuItem miFileOpen;
+	private MenuItem miFileImport;
+	private MenuItem miFileExport;
+	private MenuItem miEditCopy;
+	private MenuItem miEditPaste;
 	private MenuItem miEntriesNew;
 	private MenuItem miEntriesDelete;
 	private MenuItem miRefresh;
 	private MenuItem miEditSearch;
 	private MenuItem miTMNew;
 	private MenuItem miTMClose;
-	private MenuItem miTMImport;
-	private MenuItem miTMExport;
 	private MenuItem miTMSplit;
 	private MenuItem miTMDelete;
 	private MenuItem miTMRename;
@@ -405,6 +407,9 @@ public class MainForm {
 		
 		miFileCloseRepository.setEnabled(repoPanel.isRepositoryOpen());
 		
+		miEditCopy.setEnabled(false);
+		miEditPaste.setEnabled(false);
+		
 		miEntriesNew.setEnabled(active);
 		miEntriesDelete.setEnabled(active);
 		miRefresh.setEnabled(active);
@@ -413,8 +418,8 @@ public class MainForm {
 		
 		miTMNew.setEnabled(repoPanel.isRepositoryOpen());
 		miTMClose.setEnabled(active);
-		miTMImport.setEnabled(active);
-		miTMExport.setEnabled(active);
+		miFileImport.setEnabled(active);
+		miFileExport.setEnabled(active);
 		miTMSplit.setEnabled(active);
 		miTMDelete.setEnabled(active);
 		miTMRename.setEnabled(active);
@@ -487,11 +492,50 @@ public class MainForm {
 		
 		new MenuItem(dropMenu, SWT.SEPARATOR);
 
+		miFileImport = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miFileImport, "file.import"); //$NON-NLS-1$
+		miFileImport.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				repoPanel.importDocument(currentTP.getTm().getName());
+            }
+		});
+		
+		miFileExport = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miFileExport, "file.export"); //$NON-NLS-1$
+		miFileExport.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				repoPanel.exportTM(currentTP.getTm().getName());
+            }
+		});
+		
+		new MenuItem(dropMenu, SWT.SEPARATOR);
+
 		menuItem = new MenuItem(dropMenu, SWT.PUSH);
 		rm.setCommand(menuItem, "file.exit"); //$NON-NLS-1$
 		menuItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				shell.close();
+            }
+		});
+		
+		//--- Edit menu
+		
+		topItem = new MenuItem(menuBar, SWT.CASCADE);
+		topItem.setText(rm.getCommandLabel("edit")); //$NON-NLS-1$
+		dropMenu = new Menu(shell, SWT.DROP_DOWN);
+		topItem.setMenu(dropMenu);
+		
+		miEditCopy = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miEditCopy, "edit.copy"); //$NON-NLS-1$
+		miEditCopy.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+            }
+		});
+		
+		miEditPaste = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miEditPaste, "edit.paste"); //$NON-NLS-1$
+		miEditPaste.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
             }
 		});
 		
@@ -559,22 +603,6 @@ public class MainForm {
 		
 		new MenuItem(dropMenu, SWT.SEPARATOR);
 
-		miTMImport = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(miTMImport, "tm.import"); //$NON-NLS-1$
-		miTMImport.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent event) {
-				repoPanel.importDocument(currentTP.getTm().getName());
-            }
-		});
-		
-		miTMExport = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(miTMExport, "tm.export"); //$NON-NLS-1$
-		miTMExport.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent event) {
-				repoPanel.exportTM(currentTP.getTm().getName());
-            }
-		});
-		
 		miTMSplit = new MenuItem(dropMenu, SWT.PUSH);
 		rm.setCommand(miTMSplit, "tm.split"); //$NON-NLS-1$
 		miTMSplit.addSelectionListener(new SelectionAdapter() {

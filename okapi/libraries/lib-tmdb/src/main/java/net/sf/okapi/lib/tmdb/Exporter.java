@@ -79,7 +79,9 @@ public class Exporter implements Runnable {
 				while ( rs.next() && !canceled ) {
 					count++;
 					TextUnit tu = toTextUnit(rs, srcLoc);
-					writer.writeTUFull(tu);
+					if ( tu != null ) { // TU is null if the conversion failed
+						writer.writeTUFull(tu);
+					}
 					// Update UI from time to time
 					if ( (count % 652) == 0 ) {
 						// And check for cancellation
@@ -112,72 +114,79 @@ public class Exporter implements Runnable {
 		LocaleId srcLoc)
 		throws SQLException 
 	{
-		TextUnit tu = new TextUnit(rs.getString(DbUtil.SEGKEY_NAME));
-		String srcDbLoc = DbUtil.toOlifantLocaleCode(srcLoc);
-
-		// Source
-		String codesFld;
-		String textFld = rs.getString(DbUtil.TEXT_PREFIX + srcDbLoc);
-		if ( textFld != null ) { 
-			codesFld = rs.getString(DbUtil.CODES_PREFIX + srcDbLoc);
-			tu.setSourceContent(util.tmFieldsToFragment(textFld, codesFld));
-		}
-		
-		// Targets
-		for ( String loc : locales ) {
-			if ( loc.equals(srcDbLoc) ) continue; // Skip the source
-			textFld = rs.getString(DbUtil.TEXT_PREFIX + loc);
-			if ( textFld == null ) continue; // Skip non-existing target
-			codesFld = rs.getString(DbUtil.CODES_PREFIX + loc);
-			tu.setTargetContent(DbUtil.fromOlifantLocaleCode(loc),
-				util.tmFieldsToFragment(textFld, codesFld));
-		}
-
-		// Properties
-		for ( String fn : availableFields ) {
-			if ( DbUtil.isSegmentField(fn) ) {
-				if ( fn.equals(DbUtil.TUREF_NAME) ) {
-					// Do nothing
-				}
-				else if ( fn.equals(DbUtil.SEGKEY_NAME) ) {
-					// Do nothing
-				}
-				else if ( fn.startsWith(DbUtil.CODES_PREFIX) || fn.startsWith(DbUtil.TEXT_PREFIX) ) {
-					// Do nothing
-				}
-				else {
-					String loc = DbUtil.getFieldLocale(fn);
-					String rn = DbUtil.getFieldRoot(fn);
-					if ( loc.equals(srcDbLoc) ) {
-						tu.setSourceProperty(new Property(rn, rs.getString(fn)));
+		try {
+			TextUnit tu = new TextUnit(rs.getString(DbUtil.SEGKEY_NAME));
+			String srcDbLoc = DbUtil.toOlifantLocaleCode(srcLoc);
+	
+			// Source
+			String codesFld;
+			String textFld = rs.getString(DbUtil.TEXT_PREFIX + srcDbLoc);
+			if ( textFld != null ) { 
+				codesFld = rs.getString(DbUtil.CODES_PREFIX + srcDbLoc);
+				tu.setSourceContent(util.tmFieldsToFragment(textFld, codesFld));
+			}
+			
+			// Targets
+			for ( String loc : locales ) {
+				if ( loc.equals(srcDbLoc) ) continue; // Skip the source
+				textFld = rs.getString(DbUtil.TEXT_PREFIX + loc);
+				if ( textFld == null ) continue; // Skip non-existing target
+				codesFld = rs.getString(DbUtil.CODES_PREFIX + loc);
+				tu.setTargetContent(DbUtil.fromOlifantLocaleCode(loc),
+					util.tmFieldsToFragment(textFld, codesFld));
+			}
+	
+			// Properties
+			for ( String fn : availableFields ) {
+				if ( DbUtil.isSegmentField(fn) ) {
+					if ( fn.equals(DbUtil.TUREF_NAME) ) {
+						// Do nothing
+					}
+					else if ( fn.equals(DbUtil.SEGKEY_NAME) ) {
+						// Do nothing
+					}
+					else if ( fn.startsWith(DbUtil.CODES_PREFIX) || fn.startsWith(DbUtil.TEXT_PREFIX) ) {
+						// Do nothing
 					}
 					else {
-						tu.setTargetProperty(DbUtil.fromOlifantLocaleCode(loc),
-							new Property(rn, rs.getString(fn)));
+						String loc = DbUtil.getFieldLocale(fn);
+						String rn = DbUtil.getFieldRoot(fn);
+						if ( loc.equals(srcDbLoc) ) {
+							tu.setSourceProperty(new Property(rn, rs.getString(fn)));
+						}
+						else {
+							tu.setTargetProperty(DbUtil.fromOlifantLocaleCode(loc),
+								new Property(rn, rs.getString(fn)));
+						}
+					}
+				}
+				else {
+					if ( fn.equals("tuid") ) {
+						tu.setName(rs.getString(fn));
+					}
+					else {
+						tu.setProperty(new Property(fn, rs.getString(fn)));
 					}
 				}
 			}
-			else {
-				if ( fn.equals("tuid") ) {
-					tu.setName(rs.getString(fn));
-				}
-				else {
-					tu.setProperty(new Property(fn, rs.getString(fn)));
-				}
+			// Export the Olifant-specific flag
+			boolean flag = rs.getBoolean(DbUtil.FLAG_NAME);
+			if ( flag ) {
+				tu.setProperty(new Property(DbUtil.PROP_FLAG, "1"));
 			}
+			// Use the segment key as the tuid if none was defined
+			if ( Util.isEmpty(tu.getName()) ) {
+				tu.setName(String.valueOf(rs.getLong(DbUtil.SEGKEY_NAME)));
+			}
+			
+			// Done
+			return tu;
 		}
-		// Export the Olifant-specific flag
-		boolean flag = rs.getBoolean(DbUtil.FLAG_NAME);
-		if ( flag ) {
-			tu.setProperty(new Property(DbUtil.PROP_FLAG, "1"));
+		catch ( Throwable e ) {
+			callback.logMessage(IProgressCallback.MSGTYPE_ERROR,
+				String.format("SegKey=%d: "+e.getMessage(), rs.getLong(DbUtil.SEGKEY_NAME)));
 		}
-		// Use the segment key as the tuid if none was defined
-		if ( Util.isEmpty(tu.getName()) ) {
-			tu.setName(String.valueOf(rs.getLong(DbUtil.SEGKEY_NAME)));
-		}
-		
-		// Done
-		return tu;
+		return null;
 	}
 	
 }

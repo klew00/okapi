@@ -169,7 +169,7 @@ class ColumnsForm {
 		group = new Group(shell, SWT.NONE);
 		group.setLayout(new GridLayout());
 		group.setLayoutData(new GridData(GridData.FILL_BOTH));
-		group.setText("Fields to display:");
+		group.setText("Fields to display (Columns):");
 
 		lbDisplayFields = new List(group, SWT.BORDER | SWT.V_SCROLL);
 		gdTmp = new GridData(GridData.FILL_BOTH);

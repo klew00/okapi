@@ -88,6 +88,9 @@ public class Importer implements Runnable {
 						flag = "1".equals(tu.getProperty(name).getValue());
 					}
 					else {
+						if ( DbUtil.isPreDefinedField(name) ) {
+							name = name + "_Bis";
+						}
 						mapTUProp.put(DbUtil.checkFieldName(name), tu.getProperty(name).getValue());
 					}
 				}
