@@ -34,23 +34,28 @@ import net.sf.okapi.lib.tmdb.DbUtil.PageMode;
 public class Exporter implements Runnable {
 
 	private final IProgressCallback callback;
-	private String tmName;
+	private final String tmName;
 	private final IRepository repo;
 	private final DbUtil util;
+	private final List<String> locales;
+	private final List<String> fields;
+
 	private String path;
-	private List<String> locales;
-	private List<String> availableFields;
 
 	public Exporter (IProgressCallback callback,
 		IRepository repo,
 		String tmName,
-		String path)
+		String path,
+		List<String> locales,
+		List<String> fields)
 	{
 		util = new DbUtil();
 		this.callback = callback;
 		this.repo = repo;
 		this.path = path;
 		this.tmName = tmName;
+		this.locales = locales;
+		this.fields = fields;
 	}
 
 	@Override
@@ -62,11 +67,16 @@ public class Exporter implements Runnable {
 			callback.startProcess("Exporting "+path+"...");
 			
 			tm = repo.openTm(tmName);
-			availableFields = tm.getAvailableFields();
-			tm.setRecordFields(availableFields);
+			
+			// Add the fields for the locales
+			for ( String loc : locales ) {
+				fields.add(DbUtil.TEXT_PREFIX+loc);
+				fields.add(DbUtil.CODES_PREFIX+loc);
+			}
+			
+			tm.setRecordFields(fields);
 			tm.setPageMode(PageMode.ITERATOR);
-//temporary			
-			locales = tm.getLocales();
+		
 			LocaleId srcLoc = DbUtil.fromOlifantLocaleCode(locales.get(0));
 			LocaleId trgLoc = srcLoc;
 			
@@ -137,7 +147,7 @@ public class Exporter implements Runnable {
 			}
 	
 			// Properties
-			for ( String fn : availableFields ) {
+			for ( String fn : fields ) {
 				if ( DbUtil.isSegmentField(fn) ) {
 					if ( fn.equals(DbUtil.TUREF_NAME) ) {
 						// Do nothing

@@ -664,8 +664,19 @@ class RepositoryPanel extends Composite {
 			
 			// Get the Tab and TM data
 			TmPanel tp = mainForm.findTmTab(tmName, true);
+			ITm tm;
 			if ( tp == null ) {
-				ITm tm = repo.openTm(tmName);
+				tm = repo.openTm(tmName);
+			}
+			else {
+				tm = tp.getTm();
+			}
+
+			ExportForm dlg = new ExportForm(getShell(), tm);
+			Object[] res = dlg.showDialog();
+			if ( res == null ) return;
+			
+			if ( tp == null ) {
 				TMOptions opt = options.getItem(tm.getUUID(), true);
 				tp = mainForm.addTmTabEmpty(tm, opt);
 				if ( tp == null ) return;
@@ -677,7 +688,8 @@ class RepositoryPanel extends Composite {
 			
 			// Start the import thread
 			ProgressCallback callback = new ProgressCallback(tp);
-			Exporter exp = new Exporter(callback, repo, tmName, path);
+			Exporter exp = new Exporter(callback, repo, tmName, path,
+				(java.util.List<String>)res[0], (java.util.List<String>)res[1]);
 			tp.startThread(new Thread(exp));
 		}
 		catch ( Throwable e ) {
