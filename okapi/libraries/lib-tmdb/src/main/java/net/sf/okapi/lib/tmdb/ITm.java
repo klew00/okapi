@@ -237,6 +237,22 @@ public interface ITm {
 	 * @return the results for the previous page, or null if there is no previous page.
 	 */
 	public ResultSet getPreviousPage ();
+	
+	/**
+	 * Finds the index of the page where a given segment is located.
+	 * @param segKey the key of the segment to search for.
+	 * @return the index of the page where the segment was found,
+	 * or -1 if the key was not found. 
+	 */
+	public long findPageForSegment (long segKey);
+	
+	/**
+	 * Gets the page for a given page index.
+	 * The page is based on the current type of filtering/sorting.
+	 * @param pageIndex the 0-based index of the page.
+	 * @return the results for the given page, or null if an error occurs.
+	 */
+	public ResultSet getPage (long pageIndex);
 
 	/**
 	 * Adds a given locale to the TM.

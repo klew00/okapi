@@ -501,21 +501,21 @@ public class Tm implements ITm {
 		checkPagingVariables();
 		if ( pageCount > oldPage ) currentPage = oldPage;
 		else if ( pageCount > 0 ) currentPage = pageCount-1; 
-		return getPage(getFirstKeySegValueForPage(currentPage));
+		return moveToPage(getFirstKeySegValueForPage(currentPage));
 	}
 	
 	@Override
 	public ResultSet getFirstPage () {
 		checkPagingVariables();
 		currentPage = 0;
-		return getPage(getFirstKeySegValueForPage(currentPage));
+		return moveToPage(getFirstKeySegValueForPage(currentPage));
 	}
 
 	@Override
 	public ResultSet getLastPage () {
 		checkPagingVariables();
 		currentPage = pageCount-1;
-		return getPage(getFirstKeySegValueForPage(currentPage));
+		return moveToPage(getFirstKeySegValueForPage(currentPage));
 	}
 
 	@Override
@@ -523,7 +523,7 @@ public class Tm implements ITm {
 		checkPagingVariables();
 		if ( currentPage >= pageCount-1 ) return null; // Last page reached
 		currentPage++;
-		return getPage(getFirstKeySegValueForPage(currentPage));
+		return moveToPage(getFirstKeySegValueForPage(currentPage));
 	}
 
 	@Override
@@ -531,7 +531,7 @@ public class Tm implements ITm {
 		checkPagingVariables();
 		if ( currentPage <= 0 ) return null; // First page reached
 		currentPage--;
-		return getPage(getFirstKeySegValueForPage(currentPage));
+		return moveToPage(getFirstKeySegValueForPage(currentPage));
 	}
 
 	private void checkPagingVariables () {
@@ -575,7 +575,7 @@ public class Tm implements ITm {
 		
 	}
 	
-	private ResultSet getPage (long topSegKey) {
+	private ResultSet moveToPage (long topSegKey) {
 		if ( topSegKey < 1 ) return null;
 		ResultSet result = null;
 		try {
@@ -981,6 +981,24 @@ public class Tm implements ITm {
 	@Override
 	public IRepository getRepository () {
 		return store;
+	}
+
+	@Override
+	public long findPageForSegment (long segKey) {
+		if ( pageCount < 1 ) return -1;
+//TODO
+		
+		return -1;
+	}
+
+	@Override
+	public ResultSet getPage (long pageIndex) {
+		checkPagingVariables();
+		if (( pageIndex < 0 ) || ( pageIndex >= pageCount )) {
+			return null;
+		}
+		currentPage = pageIndex;
+		return moveToPage(getFirstKeySegValueForPage(currentPage));
 	}
 	
 }

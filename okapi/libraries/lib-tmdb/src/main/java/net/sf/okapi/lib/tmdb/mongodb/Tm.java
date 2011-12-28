@@ -765,4 +765,21 @@ public class Tm implements ITm {
 		return store;
 	}
 
+	@Override
+	public long findPageForSegment (long segKey) {
+		if ( pageCount < 1 ) return -1;
+//TODO		
+		return -1;
+	}
+
+	@Override
+	public ResultSet getPage (long pageIndex) {
+		checkPagingVariables();
+		if (( pageIndex < 0 ) || ( pageIndex >= pageCount )) {
+			return null;
+		}
+		currentPage = pageIndex;
+		return getPage();
+	}
+	
 }

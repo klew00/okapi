@@ -557,7 +557,7 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 		finally {
 			table.setRedraw(true);
 		}
-		fillTable(0, cursorLoc.y, 0, cursorLoc.x);
+		fillTable(0, cursorLoc.y, 0, cursorLoc.x, -1);
 	}
 	
 	@Override
@@ -638,7 +638,7 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 		lastRowTested = rowToTest;
 		if ( direction > -1 ) {
 			saveEntry();
-			fillTable(direction, selection, selection, cursorLoc.x);
+			fillTable(direction, selection, selection, cursorLoc.x, -1);
 		}
 		
 	}
@@ -665,6 +665,7 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 	}
 	
 	void saveEntry () {
+		cursor.setVisible(true);
 		if ( currentRow < 0 ) return;
 		// Else: save the entry if needed
 		if ( editPanel.isSourceModified() && ( srcCol != -1 )) {
@@ -694,7 +695,7 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 			wasModified = true;
 			// Move to the last entry (the one we just created)
 			//TODO: adjust to go to proper entry when sort is working 
-			fillTable(3, -1, -1, srcCol);
+			fillTable(3, -1, -1, srcCol, -1);
 			editPanel.setFocus(0, 0, -1);
 		}
 		catch ( Throwable e ) {
@@ -717,7 +718,7 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 				segKeys.add(Long.valueOf(ti.getText(0)));
 			}
 			tm.deleteSegments(segKeys);
-			fillTable(4, cursorLoc.y, -1, cursorLoc.x);
+			fillTable(4, cursorLoc.y, -1, cursorLoc.x, -1);
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(getShell(), "Error while deleting an entry.\n"+e.getMessage(), null);
@@ -732,10 +733,67 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 			}
 			saveEntry();
 			// fillTable saves the modifications if needed
-			fillTable(4, cursorLoc.y, 0, cursorLoc.x);
+			fillTable(4, cursorLoc.y, 0, cursorLoc.x, -1);
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(getShell(), "Error while refreshing the table.\n"+e.getMessage(), null);
+		}
+	}
+	
+	/**
+	 * Move the cursor at the given segment location.
+	 * @param value the key of the segment where to move. Use -1 have
+	 * the application prompt the user.
+	 */
+	void gotoEntry (long value) {
+		try {
+			saveEntry();
+			char type = 'e';
+			
+			// Prompt the user if needed
+			if ( value < 0 ) {
+				GoToForm dlg = new GoToForm(getShell(), tm.getPageCount());
+				Object[] res = dlg.showDialog();
+				if ( res == null ) return;
+				type = (Character)res[0];
+				value = (Long)res[1];
+			}
+			
+			if ( type == 'e' ) {
+				// Get the page
+				if ( tm.getPageCount() != 1 ) {
+					long page = tm.findPageForSegment(value);
+					if ( page < 0 ) {
+						Dialogs.showError(getShell(), String.format("No page with the segment key '%d' was not found.", value), null);
+						return;
+					}
+					// Fill the table with the proper page
+					fillTable(5, 0, 0, cursor.getColumn(), page);
+				}
+				// Find the entry in the current table
+				int row = -1;
+				String tmp = String.valueOf(value);
+				for ( int i=0; i<table.getItemCount(); i++ ) {
+					TableItem ti = table.getItem(i);
+					if ( ti.getText(0).equals(tmp) ) {
+						row = i;
+						break;
+					}
+				}
+				if ( row < 0 ) {
+					// Not found
+					Dialogs.showError(getShell(), String.format("The segment key '%d' was not found.", value), null);
+					return;
+				}
+				// Move to the new row
+				cursor.setSelection(row, cursor.getColumn());
+			}
+			else { // Go to a page
+				fillTable(5, 0, 0, cursor.getColumn(), value);
+			}
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(getShell(), "Error while moving position.\n"+e.getMessage(), null);
 		}
 	}
 	
@@ -806,11 +864,13 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 	 * @param fallbackRow 0=top, -1=end. Selection to use if the given selection is
 	 * not possible (e.g. when the page has less entries)
 	 * @param column index of the column to select.
+	 * @param pageIndex index of the page to display (used for direction==5 only)
 	 */
 	void fillTable (int direction,
 		int row,
 		int fallbackRow,
-		int column)
+		int column,
+		long pageIndex)
 	{
 		try {
 			saveModificationsIfNeeded();
@@ -830,6 +890,9 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 				break;
 			case 4:
 				rs = tm.refreshCurrentPage();
+				break;
+			case 5:
+				rs = tm.getPage(pageIndex);
 				break;
 			}
 			if ( rs == null ) {
