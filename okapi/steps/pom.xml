@@ -12,6 +12,7 @@
     <packaging>pom</packaging>
     <name>Okapi Steps Build</name>
     <modules>
+        <module>aligner</module>
         <module>bomconversion</module>
 		<module>charlisting</module>
         <module>codeshandling</module>
@@ -31,7 +32,6 @@
 		<module>scopingreport</module>
 		<module>searchandreplace</module>
 		<module>segmentation</module>
-        <module>sentence-aligner</module>
 		<module>rainbowkit</module>
         <module>termextraction</module>
 		<module>textmodification</module>
