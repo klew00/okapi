@@ -192,9 +192,6 @@ public class DpMatrix<T> {
 
 				DpMatrixCell cell = m_matrix[x][y];
 				sb.append(cell.getScore()).append("\t");
-
-				// sb.append(">>").append(x).append(":")
-				// .append(y).append(" ").append(cell.toString());
 			}
 		}
 
