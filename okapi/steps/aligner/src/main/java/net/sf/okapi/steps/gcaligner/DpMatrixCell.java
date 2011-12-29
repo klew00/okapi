@@ -21,8 +21,6 @@
 
 package net.sf.okapi.steps.gcaligner;
 
-//import java.util.logging.Logger;
-
 /**
  * DpMatrixCell is a cell of DpMatrix. It records the score of the
  * cell, the state of the cell (match, insertion or subtraction), the
@@ -220,7 +218,5 @@ public class DpMatrixCell
         sb.append(state).append("]\r\n");
         
         return sb.toString();
-    }
-    
-        
+    }        
 }

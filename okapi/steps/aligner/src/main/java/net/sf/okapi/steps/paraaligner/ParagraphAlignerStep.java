@@ -39,7 +39,7 @@ import net.sf.okapi.common.resource.MultiEvent;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.lib.extra.diff.incava.DiffLists;
 import net.sf.okapi.lib.extra.diff.incava.Difference;
-import net.sf.okapi.steps.gcaligner.SentenceAlignerStep;
+import net.sf.okapi.steps.sentencealigner.SentenceAlignerStep;
 
 /**
  * Align paragraphs (TextUnits) between a source and target document. Uses inter-paragraph

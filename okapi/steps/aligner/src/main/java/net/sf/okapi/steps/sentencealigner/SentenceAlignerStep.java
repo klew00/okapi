@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.gcaligner;
+package net.sf.okapi.steps.sentencealigner;
 
 import java.io.InputStream;
 import java.util.logging.Logger;
@@ -134,7 +134,7 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 				}
 			}
 			if (loadDefault) {
-				InputStream is = SentenceAlignerStep.class.getResourceAsStream("default.srx");
+				InputStream is = SentenceAlignerStep.class.getResourceAsStream("/net/sf/okapi/steps/gcaligner/default.srx");
 				srxDocument.loadRules(is);
 			}
 			// TODO: decide how we deal with leading/trailing spaces
@@ -157,7 +157,7 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 				}
 			}
 			if (loadDefault) {
-				InputStream is = SentenceAlignerStep.class.getResourceAsStream("default.srx");
+				InputStream is = SentenceAlignerStep.class.getResourceAsStream("/net/sf/okapi/steps/gcaligner/default.srx");
 				srxDocument.loadRules(is);
 			}
 			// TODO: decide how we deal with leading/trailing spaces

@@ -28,14 +28,14 @@ import java.util.Enumeration;
 import java.util.Iterator;
 
 import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.resource.Segment;
 
 /**
  * SegmentAlignmentFunction implements DpFunction. The class is used to align source and target segments. The type of
  * the alignment element is PageTmTuv.
+ * @param <T>
  */
 
-public class SegmentAlignmentFunction implements DpFunction {
+public class AlignmentFunction<T> implements DpFunction<T> {
 	/* -100 * log([prob of 2-1 match] / [prob of 1-1 match]) */
 	private final static int PENALTY_21 = 230; // orig 400
 
@@ -48,20 +48,20 @@ public class SegmentAlignmentFunction implements DpFunction {
 	private LocaleId m_sourceLocale;
 	private LocaleId m_targetLocale;
 
-	private List<SegmentAlignmentScorer> m_scorerList;
+	private List<AlignmentScorer<T>> m_scorerList;
 
-	public SegmentAlignmentFunction(LocaleId p_sourceLocale, LocaleId p_targetLocale) {
+	public AlignmentFunction(LocaleId p_sourceLocale, LocaleId p_targetLocale) {
 		m_sourceLocale = p_sourceLocale;
 		m_targetLocale = p_targetLocale;
-		m_scorerList = new ArrayList<SegmentAlignmentScorer>();
+		m_scorerList = new ArrayList<AlignmentScorer<T>>();
 
 		try {
 			ResourceBundle res = ResourceBundle.getBundle("net/sf/okapi/steps/gcaligner/Scorer");
 			Enumeration<String> keys = res.getKeys();
 			while (keys.hasMoreElements()) {
 				String scorerClass = keys.nextElement();
-				SegmentAlignmentScorer scorer = (SegmentAlignmentScorer) Class.forName(scorerClass)
-						.newInstance();
+				@SuppressWarnings("unchecked")
+				AlignmentScorer<T> scorer = (AlignmentScorer<T>) Class.forName(scorerClass).newInstance();
 				scorer.setLocales(m_sourceLocale, m_targetLocale);
 
 				m_scorerList.add(scorer);
@@ -82,7 +82,7 @@ public class SegmentAlignmentFunction implements DpFunction {
 	 * @param p_matrix
 	 *            matrix
 	 */
-	public void setCellScore(int p_xPos, int p_yPos, DpMatrix p_matrix) {
+	public void setCellScore(int p_xPos, int p_yPos, DpMatrix<T> p_matrix) {
 		if (p_xPos == 0 && p_yPos == 0) {
 			return;
 		}
@@ -109,7 +109,7 @@ public class SegmentAlignmentFunction implements DpFunction {
 
 	}
 
-	private DpMatrixCell getCell(int p_xPos, int p_yPos, DpMatrix p_matrix) {
+	private DpMatrixCell getCell(int p_xPos, int p_yPos, DpMatrix<T> p_matrix) {
 		DpMatrixCell cell = null;
 
 		if (p_xPos >= 0 && p_yPos >= 0) {
@@ -119,16 +119,16 @@ public class SegmentAlignmentFunction implements DpFunction {
 		return cell;
 	}
 
-	private int getDeletionScore(DpMatrixCell p_deletionCell, int p_xPos, DpMatrix p_matrix) {
+	private int getDeletionScore(DpMatrixCell p_deletionCell, int p_xPos, DpMatrix<T> p_matrix) {
 		int score = Integer.MAX_VALUE;
 
 		if (p_deletionCell != null) {
 			score = 0;
-			Segment seg = p_matrix.getAlignmentElementX(p_xPos);
+			T seg = p_matrix.getAlignmentElementX(p_xPos);
 
-			Iterator<SegmentAlignmentScorer> it = m_scorerList.iterator();
+			Iterator<AlignmentScorer<T>> it = m_scorerList.iterator();
 			while (it.hasNext()) {
-				SegmentAlignmentScorer scorer = it.next();
+				AlignmentScorer<T> scorer = it.next();
 				score += scorer.deletionScore(seg);
 			}
 			score += p_deletionCell.getScore() + PENALTY_01;
@@ -137,17 +137,17 @@ public class SegmentAlignmentFunction implements DpFunction {
 		return score;
 	}
 
-	private int getInsertionScore(DpMatrixCell p_insertionCell, int p_yPos, DpMatrix p_matrix) {
+	private int getInsertionScore(DpMatrixCell p_insertionCell, int p_yPos, DpMatrix<T> p_matrix) {
 		int score = Integer.MAX_VALUE;
 
 		if (p_insertionCell != null) {
 			score = 0;
-			Segment tuv = p_matrix.getAlignmentElementY(p_yPos);
+			T seg = p_matrix.getAlignmentElementY(p_yPos);
 
-			Iterator<SegmentAlignmentScorer> it = m_scorerList.iterator();
+			Iterator<AlignmentScorer<T>> it = m_scorerList.iterator();
 			while (it.hasNext()) {
-				SegmentAlignmentScorer scorer = it.next();
-				score += scorer.insertionScore(tuv);
+				AlignmentScorer<T> scorer = it.next();
+				score += scorer.insertionScore(seg);
 			}
 			score += p_insertionCell.getScore() + PENALTY_01;
 		}
@@ -156,18 +156,18 @@ public class SegmentAlignmentFunction implements DpFunction {
 	}
 
 	private int getSubstitutionScore(DpMatrixCell p_substitutionCell, int p_xPos, int p_yPos,
-			DpMatrix p_matrix) {
+			DpMatrix<T> p_matrix) {
 		int score = Integer.MAX_VALUE;
 
 		if (p_substitutionCell != null) {
 			score = 0;
-			Segment sourceTuv = p_matrix.getAlignmentElementX(p_xPos);
-			Segment targetTuv = p_matrix.getAlignmentElementY(p_yPos);
+			T sourceSeg = p_matrix.getAlignmentElementX(p_xPos);
+			T targetSeg = p_matrix.getAlignmentElementY(p_yPos);
 
-			Iterator<SegmentAlignmentScorer> it = m_scorerList.iterator();
+			Iterator<AlignmentScorer<T>> it = m_scorerList.iterator();
 			while (it.hasNext()) {
-				SegmentAlignmentScorer scorer = it.next();
-				score += scorer.substitutionScore(sourceTuv, targetTuv);
+				AlignmentScorer<T> scorer = it.next();
+				score += scorer.substitutionScore(sourceSeg, targetSeg);
 			}
 			score += p_substitutionCell.getScore();
 		}
@@ -176,20 +176,20 @@ public class SegmentAlignmentFunction implements DpFunction {
 	}
 
 	private int getContractionScore(DpMatrixCell p_contractionCell, int p_xPos, int p_yPos,
-			DpMatrix p_matrix) {
+			DpMatrix<T> p_matrix) {
 		int score = Integer.MAX_VALUE;
 
 		if (p_contractionCell != null) {
 			score = 0;
 
-			Segment currentSourceTuv = p_matrix.getAlignmentElementX(p_xPos);
-			Segment prevSourceTuv = p_matrix.getAlignmentElementX(p_xPos - 1);
-			Segment targetTuv = p_matrix.getAlignmentElementY(p_yPos);
+			T currentSourceSeg = p_matrix.getAlignmentElementX(p_xPos);
+			T prevSourceSeg = p_matrix.getAlignmentElementX(p_xPos - 1);
+			T targetSeg = p_matrix.getAlignmentElementY(p_yPos);
 
-			Iterator<SegmentAlignmentScorer> it = m_scorerList.iterator();
+			Iterator<AlignmentScorer<T>> it = m_scorerList.iterator();
 			while (it.hasNext()) {
-				SegmentAlignmentScorer scorer = it.next();
-				score += scorer.contractionScore(currentSourceTuv, prevSourceTuv, targetTuv);
+				AlignmentScorer<T> scorer = it.next();
+				score += scorer.contractionScore(currentSourceSeg, prevSourceSeg, targetSeg);
 			}
 			score += p_contractionCell.getScore() + PENALTY_21;
 		}
@@ -198,20 +198,20 @@ public class SegmentAlignmentFunction implements DpFunction {
 	}
 
 	private int getExpansionScore(DpMatrixCell p_expansionCell, int p_xPos, int p_yPos,
-			DpMatrix p_matrix) {
+			DpMatrix<T> p_matrix) {
 		int score = Integer.MAX_VALUE;
 
 		if (p_expansionCell != null) {
 			score = 0;
 
-			Segment sourceTuv = p_matrix.getAlignmentElementX(p_xPos);
-			Segment currentTargetTuv = p_matrix.getAlignmentElementY(p_yPos);
-			Segment prevTargetTuv = p_matrix.getAlignmentElementY(p_yPos - 1);
+			T srcSeg = p_matrix.getAlignmentElementX(p_xPos);
+			T currentTargetSeg = p_matrix.getAlignmentElementY(p_yPos);
+			T prevTargetSeg = p_matrix.getAlignmentElementY(p_yPos - 1);
 
-			Iterator<SegmentAlignmentScorer> it = m_scorerList.iterator();
+			Iterator<AlignmentScorer<T>> it = m_scorerList.iterator();
 			while (it.hasNext()) {
-				SegmentAlignmentScorer scorer = it.next();
-				score += scorer.expansionScore(sourceTuv, currentTargetTuv, prevTargetTuv);
+				AlignmentScorer<T> scorer = it.next();
+				score += scorer.expansionScore(srcSeg, currentTargetSeg, prevTargetSeg);
 			}
 			score += p_expansionCell.getScore() + PENALTY_21;
 		}
@@ -220,22 +220,22 @@ public class SegmentAlignmentFunction implements DpFunction {
 	}
 
 	private int getMeldingScore(DpMatrixCell p_meldingCell, int p_xPos, int p_yPos,
-			DpMatrix p_matrix) {
+			DpMatrix<T> p_matrix) {
 		int score = Integer.MAX_VALUE;
 
 		if (p_meldingCell != null) {
 			score = 0;
 
-			Segment currentSourceTuv = p_matrix.getAlignmentElementX(p_xPos);
+			T currentSourceSeg = p_matrix.getAlignmentElementX(p_xPos);
 			// Segment prevSourceTuv = p_matrix.getAlignmentElementX(p_xPos - 1);
-			Segment currentTargetTuv = p_matrix.getAlignmentElementY(p_yPos);
-			Segment prevTargetTuv = p_matrix.getAlignmentElementY(p_yPos - 1);
+			T currentTargetSeg = p_matrix.getAlignmentElementY(p_yPos);
+			T prevTargetSeg = p_matrix.getAlignmentElementY(p_yPos - 1);
 
-			Iterator<SegmentAlignmentScorer> it = m_scorerList.iterator();
+			Iterator<AlignmentScorer<T>> it = m_scorerList.iterator();
 			while (it.hasNext()) {
-				SegmentAlignmentScorer scorer = it.next();
-				score += scorer.meldingScore(currentSourceTuv, prevTargetTuv, currentTargetTuv,
-						prevTargetTuv);
+				AlignmentScorer<T> scorer = it.next();
+				score += scorer.meldingScore(currentSourceSeg, prevTargetSeg, currentTargetSeg,
+						prevTargetSeg);
 			}
 			score += p_meldingCell.getScore() + PENALTY_22;
 		}
@@ -284,5 +284,4 @@ public class SegmentAlignmentFunction implements DpFunction {
 
 		p_currentCell.setScoreAndLink(minScore, backLink);
 	}
-
 }

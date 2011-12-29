@@ -16,7 +16,7 @@
  */
 
 /*===========================================================================
- Additonal changes Copyright (C) 2009 by the Okapi Framework contributors
+ Additional changes Copyright (C) 2009 by the Okapi Framework contributors
  ===========================================================================*/
 
 package net.sf.okapi.steps.gcaligner;
@@ -26,9 +26,8 @@ import java.util.MissingResourceException;
 import java.util.logging.Logger;
 
 import net.sf.okapi.common.LocaleId;
-import net.sf.okapi.common.resource.Segment;
 
-public class GaleAndChurch implements SegmentAlignmentScorer {
+public class GaleAndChurch<T> implements AlignmentScorer<T> {
 	private static final Logger LOGGER = Logger.getLogger(GaleAndChurch.class.getName());
 
 	private final static int BIG_DISTANCE = 2500;
@@ -59,7 +58,7 @@ public class GaleAndChurch implements SegmentAlignmentScorer {
 	 *            Target TUV. Target is in Y sequence in the DP map.
 	 * @return cost of the substitution
 	 */
-	public int substitutionScore(Segment p_sourceTuv, Segment p_targetTuv) {
+	public int substitutionScore(T p_sourceTuv, T p_targetTuv) {
 		// TODO: remove codes to get length
 		int sourceLength = p_sourceTuv.toString().length();
 		int targetLength = p_targetTuv.toString().length();
@@ -74,7 +73,7 @@ public class GaleAndChurch implements SegmentAlignmentScorer {
 	 *            Source TUV. Source is in X sequence in the DP map.
 	 * @return cost of the deletion
 	 */
-	public int deletionScore(Segment p_sourceTuv) {
+	public int deletionScore(T p_sourceTuv) {
 		// TODO: remove codes to get length
 		int sourceLength = p_sourceTuv.toString().length();
 
@@ -88,7 +87,7 @@ public class GaleAndChurch implements SegmentAlignmentScorer {
 	 *            Target TUV. Target is in Y sequence in the DP map.
 	 * @return cost of the insertion
 	 */
-	public int insertionScore(Segment p_targetTuv) {
+	public int insertionScore(T p_targetTuv) {
 		// TODO: remove codes to get length
 		int targetLength = p_targetTuv.toString().length();
 		return match(0, targetLength);
@@ -105,7 +104,7 @@ public class GaleAndChurch implements SegmentAlignmentScorer {
 	 *            Target TUV. Target is in Y sequence in the DP map.
 	 * @return cost of the contraction
 	 */
-	public int contractionScore(Segment p_sourceTuv1, Segment p_sourceTuv2, Segment p_targetTuv) {
+	public int contractionScore(T p_sourceTuv1, T p_sourceTuv2, T p_targetTuv) {
 		// TODO: remove codes to get length
 		int sourceLength1 = p_sourceTuv1.toString().length();
 		int sourceLength2 = p_sourceTuv2.toString().length();
@@ -125,7 +124,7 @@ public class GaleAndChurch implements SegmentAlignmentScorer {
 	 *            Target TUV2. Target is in Y sequence in the DP map.
 	 * @return cost of the expansion
 	 */
-	public int expansionScore(Segment p_sourceTuv, Segment p_targetTuv1, Segment p_targetTuv2) {
+	public int expansionScore(T p_sourceTuv, T p_targetTuv1, T p_targetTuv2) {
 		// TODO: remove codes to get length
 		int sourceLength = p_sourceTuv.toString().length();
 		int targetLength1 = p_targetTuv1.toString().length();
@@ -147,8 +146,8 @@ public class GaleAndChurch implements SegmentAlignmentScorer {
 	 *            Target TUV2. Target is in Y sequence in the DP map.
 	 * @return cost of the melding
 	 */
-	public int meldingScore(Segment p_sourceTuv1, Segment p_sourceTuv2, Segment p_targetTuv1,
-			Segment p_targetTuv2) {
+	public int meldingScore(T p_sourceTuv1, T p_sourceTuv2, T p_targetTuv1,
+			T p_targetTuv2) {
 		// TODO: remove codes to get length
 		int sourceLength1 = p_sourceTuv1.toString().length();
 		int sourceLength2 = p_sourceTuv2.toString().length();
@@ -267,5 +266,4 @@ public class GaleAndChurch implements SegmentAlignmentScorer {
 
 		return Double.parseDouble(charDistStr);
 	}
-
 }

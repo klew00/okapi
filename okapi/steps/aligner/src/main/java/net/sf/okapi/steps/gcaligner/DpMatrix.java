@@ -25,8 +25,6 @@ import java.util.List;
 import java.util.LinkedList;
 import java.util.ArrayList;
 
-import net.sf.okapi.common.resource.Segment;
-
 /**
  * DpMatrix is a matrix used in dynamic programming. Two sequences to be aligned are passed to this class in a form of
  * List of Object. Each cell (DpMatrixCell) of the matrix records the alignment score of the two elements. The score is
@@ -34,19 +32,19 @@ import net.sf.okapi.common.resource.Segment;
  * DpMatrixCell.
  */
 
-public class DpMatrix {
+public class DpMatrix<T> {
 	// matrix
 	private DpMatrixCell[][] m_matrix;
 
 	// sequences to be aligned
-	private List<Segment> sequenceX;
-	private List<Segment> sequenceY;
+	private List<T> sequenceX;
+	private List<T> sequenceY;
 
 	// DpFunction class
-	private DpFunction m_dpFunction;
+	private DpFunction<T> m_dpFunction;
 
 	// constructor
-	public DpMatrix(List<Segment> sequenceX, List<Segment> sequenceY, DpFunction p_dpFunction) {
+	public DpMatrix(List<T> sequenceX, List<T> sequenceY, DpFunction<T> p_dpFunction) {
 		this.sequenceX = sequenceX;
 		this.sequenceY = sequenceY;
 		m_dpFunction = p_dpFunction;
@@ -73,9 +71,9 @@ public class DpMatrix {
 	 *            index of X sequence. The index starts with 1. The rule of sum is to specify the same index as the
 	 *            cell's X index, then you'll get what you want. If 0 is specified, IndexOutOfBoundsException will be
 	 *            thrown.
-	 * @return {@link Segment}
+	 * @return {@link T}
 	 */
-	public Segment getAlignmentElementX(int p_xIdx) {
+	public T getAlignmentElementX(int p_xIdx) {
 		return sequenceX.get(p_xIdx - 1);
 	}
 
@@ -86,9 +84,9 @@ public class DpMatrix {
 	 *            index of Y sequence. The index starts with 1. The rule of sum is to specify the same index as the
 	 *            cell's Y index, then you'll get what you want. If 0 is specified, IndexOutOfBoundsException will be
 	 *            thrown.
-	 * @return {@link Segment}
+	 * @return {@link T}
 	 */
-	public Segment getAlignmentElementY(int p_yIdx) {
+	public T getAlignmentElementY(int p_yIdx) {
 		return sequenceY.get(p_yIdx - 1);
 	}
 
@@ -103,8 +101,8 @@ public class DpMatrix {
 	 *            DpMatrixCell#getMultiMatchXIndexEnd() is specified.
 	 * @return List of X sequence elements
 	 */
-	public List<Segment> getAlignmentElementsX(int p_xFromIdx, int p_xToIdx) {
-		return new ArrayList<Segment>(sequenceX.subList(p_xFromIdx - 1, p_xToIdx - 1));
+	public List<T> getAlignmentElementsX(int p_xFromIdx, int p_xToIdx) {
+		return new ArrayList<T>(sequenceX.subList(p_xFromIdx - 1, p_xToIdx - 1));
 	}
 
 	/**
@@ -118,8 +116,8 @@ public class DpMatrix {
 	 *            DpMatrixCell#getMultiMatchYIndexEnd() is specified.
 	 * @return List of Y sequence elements
 	 */
-	public List<Segment> getAlignmentElementsY(int p_yFromIdx, int p_yToIdx) {
-		return new ArrayList<Segment>(sequenceY.subList(p_yFromIdx - 1, p_yToIdx - 1));
+	public List<T> getAlignmentElementsY(int p_yFromIdx, int p_yToIdx) {
+		return new ArrayList<T>(sequenceY.subList(p_yFromIdx - 1, p_yToIdx - 1));
 	}
 
 	/**

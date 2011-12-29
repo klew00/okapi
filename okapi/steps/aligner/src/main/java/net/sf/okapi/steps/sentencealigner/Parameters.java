@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.gcaligner;
+package net.sf.okapi.steps.sentencealigner;
 
 import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.EditorFor;

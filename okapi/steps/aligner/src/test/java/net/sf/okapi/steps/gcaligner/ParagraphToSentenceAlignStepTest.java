@@ -9,6 +9,8 @@ import net.sf.okapi.common.pipeline.Pipeline;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.filters.tmx.TmxFilter;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
+import net.sf.okapi.steps.sentencealigner.Parameters;
+import net.sf.okapi.steps.sentencealigner.SentenceAlignerStep;
 
 import org.junit.After;
 import org.junit.Before;
@@ -71,7 +73,7 @@ public class ParagraphToSentenceAlignStepTest {
 		aligner.setSourceLocale(sourceLocale);
 		aligner.setTargetLocale(targetLocale);
 
-		Parameters p = (net.sf.okapi.steps.gcaligner.Parameters) aligner.getParameters();
+		Parameters p = (Parameters) aligner.getParameters();
 		p.setTmxOutputPath(sOutputPath);
 		p.setGenerateTMX(true);
 		aligner.setParameters(p);

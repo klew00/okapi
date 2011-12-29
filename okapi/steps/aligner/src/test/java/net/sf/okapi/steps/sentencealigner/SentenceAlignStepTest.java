@@ -1,4 +1,4 @@
-package net.sf.okapi.steps.gcaligner;
+package net.sf.okapi.steps.sentencealigner;
 
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -9,10 +9,12 @@ import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.filters.IFilter;
+import net.sf.okapi.common.pipeline.EventObserver;
 import net.sf.okapi.common.pipeline.Pipeline;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.filters.plaintext.PlainTextFilter;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
+import net.sf.okapi.steps.sentencealigner.SentenceAlignerStep;
 
 import org.junit.After;
 import org.junit.Before;

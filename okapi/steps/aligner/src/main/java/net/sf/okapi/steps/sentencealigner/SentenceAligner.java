@@ -17,7 +17,7 @@
  *  
  */
 
-package net.sf.okapi.steps.gcaligner;
+package net.sf.okapi.steps.sentencealigner;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -29,6 +29,9 @@ import net.sf.okapi.common.resource.AlignedPair;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextPart;
+import net.sf.okapi.steps.gcaligner.DpMatrix;
+import net.sf.okapi.steps.gcaligner.DpMatrixCell;
+import net.sf.okapi.steps.gcaligner.AlignmentFunction;
 
 /**
  * SentenceAligner aligns source and target (paragraph) {@link TextUnit}s and returns a list of aligned sentence-based
@@ -56,7 +59,7 @@ public class SentenceAligner {
 
 	private ITextUnit alignWithoutSkeletonAlignment(ITextUnit sourceParagraph,
 			ITextUnit targetParagraph, LocaleId srcLocale, LocaleId trgLocale, boolean outputOneTOneMatchesOnly) {
-		SegmentAlignmentFunction alignmentFunction = new SegmentAlignmentFunction(srcLocale,
+		AlignmentFunction<Segment> alignmentFunction = new AlignmentFunction<Segment>(srcLocale,
 				trgLocale);
 		return alignSegments(sourceParagraph, targetParagraph, srcLocale, trgLocale,
 				alignmentFunction, outputOneTOneMatchesOnly);
@@ -64,13 +67,13 @@ public class SentenceAligner {
 
 	private ITextUnit alignWithoutSkeletonAlignment(ITextUnit bilingualParagraph, LocaleId srcLocale,
 			LocaleId trgLocale, boolean outputOneTOneMatchesOnly) {
-		SegmentAlignmentFunction alignmentFunction = new SegmentAlignmentFunction(srcLocale,
+		AlignmentFunction<Segment> alignmentFunction = new AlignmentFunction<Segment>(srcLocale,
 				trgLocale);
 		return alignSegments(bilingualParagraph, srcLocale, trgLocale, alignmentFunction, outputOneTOneMatchesOnly);
 	}
 
 	private ITextUnit alignSegments(ITextUnit sourceParagraph, ITextUnit targetParagraph,
-			LocaleId srcLocale, LocaleId trgLocale, SegmentAlignmentFunction alignmentFunction, boolean outputOneTOneMatchesOnly) {
+			LocaleId srcLocale, LocaleId trgLocale, AlignmentFunction<Segment> alignmentFunction, boolean outputOneTOneMatchesOnly) {
 
 		// To prevent OutOfMemory exception, simply don't perform the
 		// alignment for a block with a lot of segments. TEMPORARY FIX
@@ -81,7 +84,7 @@ public class SentenceAligner {
 					+ ". Where the number equals the source segments times the target segments.");
 		}
 
-		DpMatrix matrix = new DpMatrix(sourceParagraph.getSource().getSegments().asList(),
+		DpMatrix<Segment> matrix = new DpMatrix<Segment>(sourceParagraph.getSource().getSegments().asList(),
 				targetParagraph.getSource().getSegments().asList(), alignmentFunction);
 
 		List<DpMatrixCell> result = matrix.align();
@@ -140,7 +143,7 @@ public class SentenceAligner {
 	}
 
 	private ITextUnit alignSegments(ITextUnit bilingualParagraph, LocaleId srcLocale,
-			LocaleId trgLocale, SegmentAlignmentFunction alignmentFunction, boolean outputOneTOneMatchesOnly) {
+			LocaleId trgLocale, AlignmentFunction<Segment> alignmentFunction, boolean outputOneTOneMatchesOnly) {
 
 		// To prevent OutOfMemory exception, simply don't perform the
 		// alignment for a block with a lot of segments. TEMPORARY FIX
@@ -151,7 +154,7 @@ public class SentenceAligner {
 					+ ". Where the number equals the source segments times the target segments.");
 		}
 
-		DpMatrix matrix = new DpMatrix(bilingualParagraph.getSource().getSegments().asList(),
+		DpMatrix<Segment> matrix = new DpMatrix<Segment>(bilingualParagraph.getSource().getSegments().asList(),
 				bilingualParagraph.getTarget(trgLocale).getSegments().asList(), alignmentFunction);
 
 		List<DpMatrixCell> result = matrix.align();

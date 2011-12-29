@@ -26,7 +26,7 @@ package net.sf.okapi.steps.gcaligner;
  * interface should have the knowledge of the type of the sequences to be aligned.
  */
 
-public interface DpFunction {
+public interface DpFunction<T> {
 	/**
 	 * Set the score to DpMatrixCell at the specified location of the matrix.
 	 * 
@@ -37,5 +37,5 @@ public interface DpFunction {
 	 * @param matrix
 	 *            matrix
 	 */
-	void setCellScore(int xPos, int yPos, DpMatrix matrix);
+	void setCellScore(int xPos, int yPos, DpMatrix<T> matrix);
 }
