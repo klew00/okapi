@@ -228,6 +228,26 @@ class ColumnsForm {
 		Dialogs.centerWindow(shell, parent);
 	}
 
+	private boolean saveData () {
+		ArrayList<String> newList = new ArrayList<String>();
+		newList = new ArrayList<String>(Arrays.asList(lbDisplayFields.getItems()));
+		newList.remove(0);
+		boolean hasText = false;
+		for ( String fn : lbDisplayFields.getItems() ) {
+			if ( fn.startsWith(DbUtil.TEXT_PREFIX) ) {
+				hasText = true;
+				break;
+			}
+		}
+		if ( !hasText ) {
+			Dialogs.showError(shell, "You must select at least one text field to display.", null);
+			return false;
+		}
+		results[0] = newList;
+		
+		return true;
+	}
+	
 	private void updateLists (ArrayList<String> visibleFields,
 		int availableSelection,
 		int displaySelection)

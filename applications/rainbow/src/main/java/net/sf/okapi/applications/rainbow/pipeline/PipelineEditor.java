@@ -667,7 +667,7 @@ public class PipelineEditor {
 	private void save (String path) {
 		try {
 			if ( Util.isEmpty(path) ) {
-				path = Dialogs.browseFilenamesForSave(shell, "Save Pipeline As", null,
+				path = Dialogs.browseFilenamesForSave(shell, "Save Pipeline As", null, null,
 					"Pipeline Files (*.pln)\tAll Files (*.*)",
 					"*.pln\t*.*");
 				if ( path == null ) return;

@@ -81,16 +81,18 @@ public class Dialogs {
 	 * @param parent Parent of the dialog.
 	 * @param title Title of the dialog box.
 	 * @param root Directory where to start. Use null for default directory.
+	 * @param fileName the default filename. Use null for none.
 	 * @param filterNames List of filter names (tab-separated) to use. Can be null.
 	 * @param filterExtensions List of filter extensions (tab-separated) to use.
 	 * Can be null.
-	 * Must be the same number of items as for p_aFilterNames.
+	 * Must be the same number of items as for filterNames.
 	 * @return The full path of the selected file or null if the user canceled
 	 * the command or an error occurred.
 	 */
 	static public String browseFilenamesForSave (Shell parent,
 			String title,
 			String root,
+			String fileName,
 			String filterNames,
 			String filterExtensions)
 		{
@@ -103,6 +105,7 @@ public class Dialogs {
 			while ( true ) {
 				FileDialog dlg = new FileDialog(parent, SWT.SAVE);
 				dlg.setFilterPath(root); // Can be null
+				dlg.setFileName(fileName); // Can be null
 				if ( filterNames != null ) dlg.setFilterNames(aNames);
 				if ( filterExtensions != null ) dlg.setFilterExtensions(aExts);
 				dlg.setText(title);

@@ -64,7 +64,7 @@ public class ExtraFieldPanel extends SashForm {
 	}
 
 	public void clear () {
-		edExtra.setText("");
+		edExtra.setText("", -2);
 		modified = false;
 	}
 	
@@ -72,13 +72,14 @@ public class ExtraFieldPanel extends SashForm {
 		return modified;
 	}
 
-	public void setText (String text) {
+	public void setText (String text,
+		int column) {
 		edExtra.setEnabled(text != null);
 		if ( text == null ) {
-			edExtra.setText("");
+			edExtra.setText("", column);
 		}
 		else {
-			edExtra.setText(text);
+			edExtra.setText(text, column);
 		}
 		modified = false;
 	}

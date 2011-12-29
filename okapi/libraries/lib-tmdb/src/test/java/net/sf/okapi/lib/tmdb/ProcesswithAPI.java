@@ -60,11 +60,12 @@ public class ProcesswithAPI {
 		list.remove(0);
 		tm.setRecordFields(list);
 		ResultSet rs = tm.getFirstPage();
-		int i = 0;
-		while ( rs.next() ) {
-			i++;
-		}
-		assertEquals(0, i);
+		assertNull(rs);
+//		int i = 0;
+//		while ( rs.next() ) {
+//			i++;
+//		}
+//		assertEquals(0, i);
 		
 		// Add some records
 		tm.startImport();
@@ -76,7 +77,7 @@ public class ProcesswithAPI {
 		// Test the result
 		tm.setRecordFields(Arrays.asList(new String[]{DbUtil.TEXT_PREFIX+"EN"}));
 		rs = tm.getFirstPage();
-		i = 0;
+		int i = 0;
 		while ( rs.next() ) {
 			i++;
 			assertEquals("Text EN 1", rs.getString(3));

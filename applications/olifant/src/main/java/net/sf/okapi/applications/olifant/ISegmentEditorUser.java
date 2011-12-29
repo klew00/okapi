@@ -29,4 +29,10 @@ interface ISegmentEditorUser {
 	 */
 	public void returnFromEdit (boolean save);
 	
+	/**
+	 * Informs the caller that one of the edit fields has just gain focus.
+	 * @param field feild that just gain the focus: 0=source, 1=target, 2=extra.
+	 */
+	public void notifyOfFocus (int field);
+
 }

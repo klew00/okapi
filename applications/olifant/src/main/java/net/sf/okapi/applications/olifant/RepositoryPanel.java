@@ -567,14 +567,17 @@ class RepositoryPanel extends Composite {
 			}
 
 			ITm tm = null;
+			TMOptions opt;
 			TmPanel tp = mainForm.findTmTab(tmName, false);
 			if ( tp != null ) {
 				tm = tp.getTm();
+				opt = tp.getTmOptions();
 			}
 			else {
 				tm = repo.openTm(tmName);
+				opt = options.getItem(tm.getUUID(), true);
 			}
-			TMOptions opt = options.getItem(tm.getUUID(), true);
+			long oldPageSize = opt.getPageSize();
 			
 			ArrayList<Object> data = new ArrayList<Object>();
 			data.add(opt.getPageSize());
@@ -583,9 +586,15 @@ class RepositoryPanel extends Composite {
 			Object[]res = dlg.showDialog();
 			if ( res == null ) return;
 			
-			opt.setPageSize((Long)res[0]);
+			long newPageSize = (Long)res[0];
+			opt.setPageSize(newPageSize);
+			
 			if ( tp != null ) {
-				tm.setPageSize((Long)res[0]);
+				tm.setPageSize(newPageSize);
+				tp.saveAndRefresh();
+			}
+			else {
+				//TODO: save the modified opt to the list
 			}
 		}
 		catch ( Throwable e ) {
@@ -659,7 +668,10 @@ class RepositoryPanel extends Composite {
 			}
 
 			// Get the output filename
-			String path = Dialogs.browseFilenamesForSave(getShell(), "Export "+tmName, null, null, null);
+			
+			String path = Dialogs.browseFilenamesForSave(getShell(), "Export "+tmName, null,
+				tmName + ".tmx",
+				"TMX Documents (*.tmx)\tAll Files (*.*)", "*.tmx\t*.*");
 			if ( path == null ) return;
 			
 			// Get the Tab and TM data
@@ -688,8 +700,10 @@ class RepositoryPanel extends Composite {
 			
 			// Start the import thread
 			ProgressCallback callback = new ProgressCallback(tp);
+			@SuppressWarnings("unchecked")
 			Exporter exp = new Exporter(callback, repo, tmName, path,
-				(java.util.List<String>)res[0], (java.util.List<String>)res[1]);
+				(java.util.List<String>)res[0],
+				(java.util.List<String>)res[1]);
 			tp.startThread(new Thread(exp));
 		}
 		catch ( Throwable e ) {

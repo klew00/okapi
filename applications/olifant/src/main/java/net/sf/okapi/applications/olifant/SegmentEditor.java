@@ -29,6 +29,8 @@ import org.eclipse.swt.custom.ExtendedModifyListener;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.custom.VerifyKeyListener;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -39,7 +41,8 @@ class SegmentEditor {
 	private static final Pattern REALCODES = Pattern.compile("<(bpt|ept|ph|it|ut).*?>(.*?)</\\1>");
 
 	private final ISegmentEditorUser caller;
-	
+
+	private int column = -1;
 	private StyledText edit;
 	private boolean modified;
 	private boolean fullCodesMode;
@@ -91,6 +94,16 @@ class SegmentEditor {
 					caller.returnFromEdit(false);
 					e.doit = false;
 				}
+			}
+		});
+		
+		edit.addFocusListener(new FocusListener() {
+			@Override
+			public void focusLost (FocusEvent e) {
+			}
+			@Override
+			public void focusGained (FocusEvent e) {
+				caller.notifyOfFocus(column);
 			}
 		});
 		
@@ -200,7 +213,15 @@ class SegmentEditor {
 		this.modified = modified;
 	}
 
-	public void setText (String text) {
+	/**
+	 * Sets the text of the field, and its originating column.
+	 * @param text the text
+	 * @param column the column. Use -1 for no column, -2 for not changing the current one.
+	 */
+	public void setText (String text,
+		int column)
+	{
+		if ( column != -2 ) this.column = column;
 		edit.setEnabled(text != null);
 		if ( text == null ) {
 			edit.setText("");

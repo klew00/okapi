@@ -171,7 +171,7 @@ public class TextAndBrowsePanel extends Composite {
 		try {
 			if ( saveAs ) {
 				String path = Dialogs.browseFilenamesForSave(getShell(), title,
-					null, filterNames, filterExtensions);
+					null, null, filterNames, filterExtensions);
 				if ( path == null ) return;
 				edText.setText(path);
 			}

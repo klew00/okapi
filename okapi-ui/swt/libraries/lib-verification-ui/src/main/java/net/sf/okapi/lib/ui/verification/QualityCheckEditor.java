@@ -1432,7 +1432,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 
 	private void saveConfiguration () {
 		try {
-			String path = Dialogs.browseFilenamesForSave(shell, "Save Configuration", null,
+			String path = Dialogs.browseFilenamesForSave(shell, "Save Configuration", null, null,
 				String.format("Quality Check Configurations (*%s)\tAll Files (*.*)", Parameters.FILE_EXTENSION),
 				String.format("*%s\t*.*", Parameters.FILE_EXTENSION));
 				if ( path == null ) return;
@@ -1469,7 +1469,7 @@ public class QualityCheckEditor implements IQualityCheckEditor {
 	private void saveSessionAs (String path) {
 		try {
 			if ( path == null ) {
-				path = Dialogs.browseFilenamesForSave(shell, "Save Session", null,
+				path = Dialogs.browseFilenamesForSave(shell, "Save Session", null, null,
 					String.format("Quality Check Sessions (*%s)\tAll Files (*.*)", QualityCheckSession.FILE_EXTENSION),
 					String.format("*%s\t*.*", QualityCheckSession.FILE_EXTENSION));
 				if ( path == null ) return;

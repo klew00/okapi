@@ -2070,7 +2070,7 @@ public class MainForm { //implements IParametersProvider {
 	private void saveProject (String path) {
 		try {
 			if ( path == null ) {
-				path = Dialogs.browseFilenamesForSave(shell, Res.getString("MainForm.saveProjectBrowseCaption"), null, //$NON-NLS-1$
+				path = Dialogs.browseFilenamesForSave(shell, Res.getString("MainForm.saveProjectBrowseCaption"), null, null, //$NON-NLS-1$
 					Res.getString("MainForm.33"), "*.rnb");  //$NON-NLS-1$//$NON-NLS-2$
 				if ( path == null ) return;
 				mruList.add(path);
@@ -2424,7 +2424,7 @@ public class MainForm { //implements IParametersProvider {
 	private void createDocument () {
 		try {
 			String paths[] = new String[1];
-			paths[0] = Dialogs.browseFilenamesForSave(shell, "Create New Document", null,
+			paths[0] = Dialogs.browseFilenamesForSave(shell, "Create New Document", null, null,
 				"All Files (*.*)", "*.*");
 			if ( Util.isEmpty(paths[0]) ) return;
 			File file = new File(paths[0]);
@@ -2558,7 +2558,7 @@ public class MainForm { //implements IParametersProvider {
 	private void exportBatchConfiguration () {
 		try {
 			setupPipelineWrapper();
-			String path = Dialogs.browseFilenamesForSave(shell, "Save Batch Configuration", null,
+			String path = Dialogs.browseFilenamesForSave(shell, "Save Batch Configuration", null, null,
 				"Batch Configuration Files (*.bconf)", "*.bconf");
 			if ( Util.isEmpty(path) ) return;
 			// Else: export

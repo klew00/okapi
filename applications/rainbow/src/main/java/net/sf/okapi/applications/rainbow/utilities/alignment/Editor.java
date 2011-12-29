@@ -186,7 +186,7 @@ public class Editor implements IParametersEditor {
 		btGetTMXPath.setText("...");
 		btGetTMXPath.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				String path = Dialogs.browseFilenamesForSave(shell, "TMX File", null,
+				String path = Dialogs.browseFilenamesForSave(shell, "TMX File", null, null,
 					"TMX Documents (*.tmx)\tAll Files (*.*)",
 					"*.tmx\t*.*");
 				Utils.checkProjectDirAfterPick(path, edTMXPath, projectDir);				
@@ -211,7 +211,7 @@ public class Editor implements IParametersEditor {
 		btGetTMXForUnknownPath.setText("...");
 		btGetTMXForUnknownPath.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				String path = Dialogs.browseFilenamesForSave(shell, "TMX File", null,
+				String path = Dialogs.browseFilenamesForSave(shell, "TMX File", null, null,
 					"TMX Documents (*.tmx)\tAll Files (*.*)",
 					"*.tmx\t*.*");
 				Utils.checkProjectDirAfterPick(path, edTMXForUnknownPath, projectDir);				
@@ -265,7 +265,7 @@ public class Editor implements IParametersEditor {
 		btGetTMPath.setText("...");
 		btGetTMPath.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				String path = Dialogs.browseFilenamesForSave(shell, "Simple TM File", null,
+				String path = Dialogs.browseFilenamesForSave(shell, "Simple TM File", null, null,
 					"Simple TMs (*"+Database.DATAFILE_EXT+")\tAll Files (*.*)",
 					"*"+Database.DATAFILE_EXT+"\t*.*");
 				Utils.checkProjectDirAfterPick(path, edTMPath, projectDir);

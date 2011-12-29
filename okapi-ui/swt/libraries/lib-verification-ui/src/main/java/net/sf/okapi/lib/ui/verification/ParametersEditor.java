@@ -945,7 +945,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private void exportConfiguration () {
 		try {
 			if ( !saveData() ) return;
-			String path = Dialogs.browseFilenamesForSave(shell, "Export Configuration", null,
+			String path = Dialogs.browseFilenamesForSave(shell, "Export Configuration", null, null,
 				String.format("Quality Check Configurations (*%s)\tAll Files (*.*)", Parameters.FILE_EXTENSION),
 				String.format("*%s\t*.*", Parameters.FILE_EXTENSION));
 				if ( path == null ) return;
@@ -1209,7 +1209,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 
 	private void exportPatterns () {
 		try {
-			String path = Dialogs.browseFilenamesForSave(shell, "Export Patterns", null,
+			String path = Dialogs.browseFilenamesForSave(shell, "Export Patterns", null, null,
 				"Patterns Files (*.txt)\tAll Files (*.*)", "*.txt\t*.*");
 			if ( path == null ) return;
 			PatternItem.saveFile(path, savePatternsData());

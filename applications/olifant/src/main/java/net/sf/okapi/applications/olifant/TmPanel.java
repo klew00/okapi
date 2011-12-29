@@ -210,6 +210,7 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 			}
 			@Override
 			public void widgetDefaultSelected(SelectionEvent event){
+				// When Enter is pressed on a cell
 				editCurrentCell();
 			}
 		});
@@ -243,6 +244,9 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 						ti.setData((Integer)ti.getData() | SAVE_FLAG); // Entry has been changed
 						needSave = true;
 					}
+					break;
+				case SWT.F2:
+					editCurrentCell();
 					break;
 				case SWT.ARROW_DOWN:
 				case SWT.ARROW_UP:
@@ -439,7 +443,7 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 	void verifySourceChange () {
 		final ToolBarWrapper toolBar = mainForm.getToolBar();
 		int oldSrc = srcCol;
-		int oldTrg = srcCol;
+		int oldTrg = trgCol;
 		int newSrc = toolBar.getSourceIndex();
 		int newTrg = toolBar.getTargetIndex();
 		
@@ -473,7 +477,7 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 	
 	void verifyTargetChange () {
 		final ToolBarWrapper toolBar = mainForm.getToolBar();
-		int oldTrg = srcCol;
+		int oldTrg = trgCol;
 		int newTrg = toolBar.getTargetIndex();
 		
 		if ( newTrg > -1 ) {
@@ -647,13 +651,13 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 		try {
 			int n = table.getSelectionIndex();
 			if ( n == -1 ) {
-				editPanel.setFields(null, null);
+				editPanel.setFields(null, -1, null, -1);
 			}
 			else {
 				TableItem ti = table.getItem(n);
 				editPanel.setFields(
-					srcCol==-1 ? null : ti.getText(srcCol),
-					trgCol==-1 ? null : ti.getText(trgCol));
+					srcCol==-1 ? null : ti.getText(srcCol), srcCol,
+					trgCol==-1 ? null : ti.getText(trgCol), trgCol);
 			}
 			previousRow = currentRow;
 			currentRow = n;
@@ -873,6 +877,9 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 		long pageIndex)
 	{
 		try {
+			statusBar.setInfo("Fetching data...");
+			statusBar.update(); // Force the text to be displayed now
+			
 			saveModificationsIfNeeded();
 			ResultSet rs = null;
 			switch ( direction ) {
@@ -943,6 +950,9 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(getShell(), "Error while filling the table.\n"+e.getMessage(), null);
+		}
+		finally {
+			statusBar.setInfo("");
 		}
 	}
 	
@@ -1056,6 +1066,13 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 			updateCurrentEntry();
 		}
 		cursor.setFocus();
+	}
+
+	@Override
+	public void notifyOfFocus (int column) {
+		if ( column > -1 ) {
+			cursor.setSelection(table.getSelectionIndex(), column);
+		}
 	}
 	
 }

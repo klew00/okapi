@@ -48,7 +48,7 @@ public class Tm implements ITm {
 	private long totalRows;
 	private long pageCount;
 	private long currentPage = -1; // 0-based
-	private boolean testPagingType2 = true;
+	private boolean usePagingType2 = true;
 
 	private PreparedStatement pstmAddSeg;
 	private PreparedStatement pstmAddTu;
@@ -187,7 +187,7 @@ public class Tm implements ITm {
 			pstmGet = store.getConnection().prepareStatement(tmp.toString(),
 				ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			
-			if ( testPagingType2 ) {
+			if ( usePagingType2 ) {
 			// Create statement for the anchors
 //	SELECT "SegKey", R FROM (SELECT "SegKey", ROWNUM() AS R FROM (SELECT "SegKey" FROM "my tm_SEG"  ORDER BY "Text~EN_US" DESC)) WHERE MOD(R, 200)=0
 			if ( pageMode == PageMode.ITERATOR ) {
@@ -200,7 +200,6 @@ public class Tm implements ITm {
 			}
 			pstmAnchors = store.getConnection().prepareStatement(tmp.toString(),
 				ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-			anchors = new ArrayList<Long>();
 			}
 			
 		}
@@ -558,19 +557,19 @@ public class Tm implements ITm {
 		needPagingRefresh = false; // Stable until we add or delete rows or change the page-size
 		//TODO: handle sort on other fields
 
-		if ( testPagingType2 ) {
-		try {
-			pstmAnchors.setLong(1, limit);
-			ResultSet result = pstmAnchors.executeQuery();
-			anchors.clear();
-			while ( result.next() ) {
-				long rn = result.getLong(2);
-				anchors.add(result.getLong(1));
+		if ( usePagingType2 ) {
+			try {
+				pstmAnchors.setLong(1, limit);
+				ResultSet result = pstmAnchors.executeQuery();
+				anchors = new ArrayList<Long>();
+				while ( result.next() ) {
+					long rn = result.getLong(2);
+					anchors.add(result.getLong(1));
+				}
+			}		
+			catch ( SQLException e ) {
+				throw new RuntimeException(e);
 			}
-		}		
-		catch ( SQLException e ) {
-			throw new RuntimeException(e);
-		}
 		}
 		
 	}
@@ -590,28 +589,29 @@ public class Tm implements ITm {
 	}
 
 	private long getFirstKeySegValueForPage (long page) {
-		if ( testPagingType2 ) {
 		long key = -1;
-		if ( anchors.size() > page ) {
-			key = anchors.get((int)page);
-		}
-		}
-		
-		//if ( pagingWithMethod ) {
-			// Used if the sort is on the SegKey
-			if ( page == 0 ) {
-				return 1;
-			}
-			if ( pageMode == PageMode.EDITOR ) {
-				long test = (page * (limit-1)) + 1;
-				return (page * (limit-1)) + 1;
+		if ( usePagingType2 ) {
+			if ( anchors.size() > page ) {
+				key = anchors.get((int)page);
 			}
 			else {
-				long test = (page * limit) + 1;
-				return (page * limit) + 1;
+				key = -1; //temporary for test
 			}
-		//}
+		}
 		
+		if ( page == 0 ) {
+			long oldMethod = 1;
+			return usePagingType2 ? key : oldMethod;
+		}
+			
+		if ( pageMode == PageMode.EDITOR ) {
+			long oldMethod = (page * (limit-1)) + 1;
+			return usePagingType2 ? key : oldMethod;
+		}
+		else {
+			long oldMethod = (page * limit) + 1;
+			return usePagingType2 ? key : oldMethod;
+		}
 	}
 
 	@Override

@@ -216,7 +216,7 @@ public class OkapiGUITester {
 					public void widgetSelected(SelectionEvent e) {
 
 						String selected = Dialogs.browseFilenamesForSave(shell,
-								"Save As", text.getText(),
+								"Save As", text.getText(), null,
 								"Filter Parameters (*.fprm)\tAll Files (*.*)",
 								"*.fprm\t*.*");
 

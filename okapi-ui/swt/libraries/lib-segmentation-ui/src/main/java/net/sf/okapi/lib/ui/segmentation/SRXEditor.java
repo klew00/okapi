@@ -914,7 +914,7 @@ public class SRXEditor {
 				if ( dlg.open() != SWT.YES ) return false;
 			}
 			if ( path == null ) {
-				path = Dialogs.browseFilenamesForSave(shell, Res.getString("edit.saveDocCaption"), null, //$NON-NLS-1$
+				path = Dialogs.browseFilenamesForSave(shell, Res.getString("edit.saveDocCaption"), null, null, //$NON-NLS-1$
 					Res.getString("edit.saveDocFileTypes"), //$NON-NLS-1$
 					Res.getString("edit.saveDocFilters")); //$NON-NLS-1$
 				if ( path == null ) return false;
