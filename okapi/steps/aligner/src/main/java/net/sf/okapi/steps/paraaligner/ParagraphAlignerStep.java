@@ -230,5 +230,6 @@ public class ParagraphAlignerStep extends BasePipelineStep {
 	}
 	
 	private void paragraphAlign(DiffLists<Event> skeletonAlignments) {
+		//TODO for Jerry
 	}
 }

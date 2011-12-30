@@ -33,22 +33,15 @@ import net.sf.okapi.common.LocaleId;
  */
 
 public class AlignmentFunction<T> implements DpFunction<T> {
-	/* -100 * log([prob of 2-1 match] / [prob of 1-1 match]) */
-	private final static int PENALTY_21 = 230; // orig 400
-
-	/* -100 * log([prob of 2-2 match] / [prob of 1-1 match]) */
-	private final static int PENALTY_22 = 440; // orig 440
-
-	/* -100 * log([prob of 0-1 match] / [prob of 1-1 match]) */
-	private final static int PENALTY_01 = 450; // orig 100
-
 	private LocaleId m_sourceLocale;
 	private LocaleId m_targetLocale;
 	private List<AlignmentScorer<T>> m_scorerList;
+	private Penalties penalties;
 
 	public AlignmentFunction(LocaleId p_sourceLocale, LocaleId p_targetLocale, 
-			List<AlignmentScorer<T>> scorerList) {
+			List<AlignmentScorer<T>> scorerList, Penalties penalties) {
 		this.m_scorerList = scorerList;
+		this.penalties = penalties;
 		m_sourceLocale = p_sourceLocale;
 		m_targetLocale = p_targetLocale;
 		for (AlignmentScorer<T> s : m_scorerList) {
@@ -115,7 +108,7 @@ public class AlignmentFunction<T> implements DpFunction<T> {
 				AlignmentScorer<T> scorer = it.next();
 				score += scorer.deletionScore(seg);
 			}
-			score += p_deletionCell.getScore() + PENALTY_01;
+			score += p_deletionCell.getScore() + penalties.penalty0_1;
 		}
 
 		return score;
@@ -133,7 +126,7 @@ public class AlignmentFunction<T> implements DpFunction<T> {
 				AlignmentScorer<T> scorer = it.next();
 				score += scorer.insertionScore(seg);
 			}
-			score += p_insertionCell.getScore() + PENALTY_01;
+			score += p_insertionCell.getScore() + penalties.penalty0_1;
 		}
 
 		return score;
@@ -175,7 +168,7 @@ public class AlignmentFunction<T> implements DpFunction<T> {
 				AlignmentScorer<T> scorer = it.next();
 				score += scorer.contractionScore(currentSourceSeg, prevSourceSeg, targetSeg);
 			}
-			score += p_contractionCell.getScore() + PENALTY_21;
+			score += p_contractionCell.getScore() + penalties.penalty2_1;
 		}
 
 		return score;
@@ -197,7 +190,7 @@ public class AlignmentFunction<T> implements DpFunction<T> {
 				AlignmentScorer<T> scorer = it.next();
 				score += scorer.expansionScore(srcSeg, currentTargetSeg, prevTargetSeg);
 			}
-			score += p_expansionCell.getScore() + PENALTY_21;
+			score += p_expansionCell.getScore() + penalties.penalty2_1;
 		}
 
 		return score;
@@ -221,7 +214,7 @@ public class AlignmentFunction<T> implements DpFunction<T> {
 				score += scorer.meldingScore(currentSourceSeg, prevTargetSeg, currentTargetSeg,
 						prevTargetSeg);
 			}
-			score += p_meldingCell.getScore() + PENALTY_22;
+			score += p_meldingCell.getScore() + penalties.penalty2_2;
 		}
 
 		return score;

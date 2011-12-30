@@ -33,6 +33,7 @@ import net.sf.okapi.steps.gcaligner.AlignmentScorer;
 import net.sf.okapi.steps.gcaligner.DpMatrix;
 import net.sf.okapi.steps.gcaligner.DpMatrixCell;
 import net.sf.okapi.steps.gcaligner.AlignmentFunction;
+import net.sf.okapi.steps.gcaligner.Penalties;
 
 /**
  * SentenceAligner aligns source and target (paragraph) {@link TextUnit}s and returns a list of aligned sentence-based
@@ -66,7 +67,7 @@ public class SentenceAligner {
 	private ITextUnit alignWithoutSkeletonAlignment(ITextUnit sourceParagraph,
 			ITextUnit targetParagraph, LocaleId srcLocale, LocaleId trgLocale, boolean outputOneTOneMatchesOnly) {
 		AlignmentFunction<Segment> alignmentFunction = new AlignmentFunction<Segment>(srcLocale,
-				trgLocale, scorerList);
+				trgLocale, scorerList, new Penalties());
 		return alignSegments(sourceParagraph, targetParagraph, srcLocale, trgLocale,
 				alignmentFunction, outputOneTOneMatchesOnly);
 	}
@@ -74,7 +75,7 @@ public class SentenceAligner {
 	private ITextUnit alignWithoutSkeletonAlignment(ITextUnit bilingualParagraph, LocaleId srcLocale,
 			LocaleId trgLocale, boolean outputOneTOneMatchesOnly) {
 		AlignmentFunction<Segment> alignmentFunction = new AlignmentFunction<Segment>(srcLocale,
-				trgLocale, scorerList);
+				trgLocale, scorerList, new Penalties());
 		return alignSegments(bilingualParagraph, srcLocale, trgLocale, alignmentFunction, outputOneTOneMatchesOnly);
 	}
 

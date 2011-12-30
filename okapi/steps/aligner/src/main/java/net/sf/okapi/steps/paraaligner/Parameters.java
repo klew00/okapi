@@ -29,7 +29,7 @@ import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 @EditorFor(Parameters.class)
 public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
-	private static final String OUTPOUT_ONE_TO_ONE_MATCHES_ONLY = "outputOneTOneMatchesOnly";	
+	private static final String OUTPOUT_ONE_TO_ONE_MATCHES_ONLY = "outputOneToneMatchesOnly";	
 	private boolean outputOneTOneMatchesOnly;
 
 	public Parameters() {
@@ -46,7 +46,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	
 	@Override
 	public void reset() {
-		outputOneTOneMatchesOnly = false;
+		outputOneTOneMatchesOnly = true;
 	}
 
 	@Override

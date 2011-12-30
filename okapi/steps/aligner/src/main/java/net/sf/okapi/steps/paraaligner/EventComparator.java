@@ -35,7 +35,7 @@ import net.sf.okapi.common.resource.DocumentPart;
  * 
  */
 public class EventComparator implements Comparator<Event> {
-	private static final int MIN_LENGTH = 20;
+	private static final int MIN_LENGTH = 10;
 	private static final String WHITESPACE_REGEX = "[ \t\r\n\f\u200B]+";
 	private static final Pattern WHITESPACE_PATTERN = Pattern.compile(WHITESPACE_REGEX);
 	
@@ -61,8 +61,8 @@ public class EventComparator implements Comparator<Event> {
 		
 		if (srcEvent.getEventType() == EventType.DOCUMENT_PART && 
 				trgEvent.getEventType() == EventType.DOCUMENT_PART) {
-			String src = WHITESPACE_PATTERN.matcher(srcEvent.getDocumentPart().toString()).replaceAll(" ");
-			String trg = WHITESPACE_PATTERN.matcher(trgEvent.getDocumentPart().toString()).replaceAll(" ");
+			String src = WHITESPACE_PATTERN.matcher(srcEvent.getDocumentPart().toString()).replaceAll("");
+			String trg = WHITESPACE_PATTERN.matcher(trgEvent.getDocumentPart().toString()).replaceAll("");
 			if (src.length() <= minLength || trg.length() <= minLength) {
 				return -1;
 			}
@@ -70,6 +70,6 @@ public class EventComparator implements Comparator<Event> {
 		}
 		
 		// any other Event types never match
-		return 1;
+		return -1;
 	}
 }

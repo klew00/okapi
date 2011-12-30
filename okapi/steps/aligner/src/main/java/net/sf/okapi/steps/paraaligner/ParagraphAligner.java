@@ -1,6 +1,3 @@
-/**===========================================================================
- Additional changes Copyright (C) 2009-2011 by the Okapi Framework contributors
- ===========================================================================*/
 /*  Copyright 2009 Welocalize, Inc. 
  *  
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,6 +13,9 @@
  *  limitations under the License.
  *  
  */
+/*===========================================================================
+ Additional changes Copyright (C) 2009-2011 by the Okapi Framework contributors
+ ===========================================================================*/
 
 package net.sf.okapi.steps.paraaligner;
 
@@ -30,6 +30,7 @@ import net.sf.okapi.steps.gcaligner.AlignmentFunction;
 import net.sf.okapi.steps.gcaligner.AlignmentScorer;
 import net.sf.okapi.steps.gcaligner.DpMatrix;
 import net.sf.okapi.steps.gcaligner.DpMatrixCell;
+import net.sf.okapi.steps.gcaligner.Penalties;
 
 /**
  * SentenceAligner aligns source and target (paragraph) {@link TextUnit}s and returns a list of aligned sentence-based
@@ -46,11 +47,6 @@ public class ParagraphAligner {
 		this.scorerList = scorerList;
 	}
 
-	/*
-	 * TODO: set value for what we consider low scoring matches 
-	 */
-	//private static final int LOW_SCORE_THRESHOLD = 0;
-
 	public List<ITextUnit> align(List<ITextUnit> sourceParagraphs, List<ITextUnit> targetParagraphs, LocaleId srcLocale,
 			LocaleId trgLocale, boolean outputOneTOneMatchesOnly) {
 		return alignWithoutSkeletonAlignment(sourceParagraphs, targetParagraphs, srcLocale, trgLocale, outputOneTOneMatchesOnly);
@@ -59,7 +55,7 @@ public class ParagraphAligner {
 	private List<ITextUnit> alignWithoutSkeletonAlignment(List<ITextUnit> sourceParagraphs,
 			List<ITextUnit> targetParagraphs, LocaleId srcLocale, LocaleId trgLocale, boolean outputOneTOneMatchesOnly) {
 		AlignmentFunction<ITextUnit> alignmentFunction = new AlignmentFunction<ITextUnit>(srcLocale,
-				trgLocale, scorerList);
+				trgLocale, scorerList, new Penalties());
 		return alignSegments(sourceParagraphs, targetParagraphs, srcLocale, trgLocale,
 				alignmentFunction, outputOneTOneMatchesOnly);
 	}
