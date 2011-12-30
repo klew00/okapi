@@ -29,8 +29,8 @@ import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.steps.gcaligner.AlignmentScorer;
 
-public class GaleAndChurch implements AlignmentScorer<Segment> {
-	private static final Logger LOGGER = Logger.getLogger(GaleAndChurch.class.getName());
+public class SimpleGaleAndChurch implements AlignmentScorer<Segment> {
+	private static final Logger LOGGER = Logger.getLogger(SimpleGaleAndChurch.class.getName());
 
 	private final static int BIG_DISTANCE = 2500;
 

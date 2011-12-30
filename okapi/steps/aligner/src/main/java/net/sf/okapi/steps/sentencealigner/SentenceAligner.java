@@ -29,6 +29,7 @@ import net.sf.okapi.common.resource.AlignedPair;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextPart;
+import net.sf.okapi.steps.gcaligner.AlignmentScorer;
 import net.sf.okapi.steps.gcaligner.DpMatrix;
 import net.sf.okapi.steps.gcaligner.DpMatrixCell;
 import net.sf.okapi.steps.gcaligner.AlignmentFunction;
@@ -42,6 +43,11 @@ public class SentenceAligner {
 	private static final Logger LOGGER = Logger.getLogger(SentenceAligner.class.getName());
 	
 	private static final long MAX_CELL_SIZE = 80000L;
+	private List<AlignmentScorer<Segment>> scorerList;
+	
+	public SentenceAligner(List<AlignmentScorer<Segment>> scorerList) {
+		this.scorerList = scorerList;
+	}
 
 	/*
 	 * TODO: set value for what we consider low scoring matches 
@@ -60,7 +66,7 @@ public class SentenceAligner {
 	private ITextUnit alignWithoutSkeletonAlignment(ITextUnit sourceParagraph,
 			ITextUnit targetParagraph, LocaleId srcLocale, LocaleId trgLocale, boolean outputOneTOneMatchesOnly) {
 		AlignmentFunction<Segment> alignmentFunction = new AlignmentFunction<Segment>(srcLocale,
-				trgLocale);
+				trgLocale, scorerList);
 		return alignSegments(sourceParagraph, targetParagraph, srcLocale, trgLocale,
 				alignmentFunction, outputOneTOneMatchesOnly);
 	}
@@ -68,7 +74,7 @@ public class SentenceAligner {
 	private ITextUnit alignWithoutSkeletonAlignment(ITextUnit bilingualParagraph, LocaleId srcLocale,
 			LocaleId trgLocale, boolean outputOneTOneMatchesOnly) {
 		AlignmentFunction<Segment> alignmentFunction = new AlignmentFunction<Segment>(srcLocale,
-				trgLocale);
+				trgLocale, scorerList);
 		return alignSegments(bilingualParagraph, srcLocale, trgLocale, alignmentFunction, outputOneTOneMatchesOnly);
 	}
 

@@ -21,11 +21,8 @@
 
 package net.sf.okapi.steps.gcaligner;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.ResourceBundle;
-import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.List;
 
 import net.sf.okapi.common.LocaleId;
 
@@ -47,31 +44,18 @@ public class AlignmentFunction<T> implements DpFunction<T> {
 
 	private LocaleId m_sourceLocale;
 	private LocaleId m_targetLocale;
-
 	private List<AlignmentScorer<T>> m_scorerList;
 
-	public AlignmentFunction(LocaleId p_sourceLocale, LocaleId p_targetLocale) {
+	public AlignmentFunction(LocaleId p_sourceLocale, LocaleId p_targetLocale, 
+			List<AlignmentScorer<T>> scorerList) {
+		this.m_scorerList = scorerList;
 		m_sourceLocale = p_sourceLocale;
 		m_targetLocale = p_targetLocale;
-		m_scorerList = new ArrayList<AlignmentScorer<T>>();
-
-		try {
-			ResourceBundle res = ResourceBundle.getBundle("net/sf/okapi/steps/gcaligner/Scorer");
-			Enumeration<String> keys = res.getKeys();
-			while (keys.hasMoreElements()) {
-				String scorerClass = keys.nextElement();
-				@SuppressWarnings("unchecked")
-				AlignmentScorer<T> scorer = (AlignmentScorer<T>) Class.forName(scorerClass).newInstance();
-				scorer.setLocales(m_sourceLocale, m_targetLocale);
-
-				m_scorerList.add(scorer);
-			}
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-
+		for (AlignmentScorer<T> s : m_scorerList) {
+			s.setLocales(m_sourceLocale, m_targetLocale);
+		}		
 	}
-
+	
 	/**
 	 * Set the score to DpMatrixCell at the specified location of the matrix.
 	 * 

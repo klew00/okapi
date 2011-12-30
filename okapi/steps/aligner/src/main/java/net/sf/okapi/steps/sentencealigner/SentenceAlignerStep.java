@@ -21,6 +21,8 @@
 package net.sf.okapi.steps.sentencealigner;
 
 import java.io.InputStream;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import net.sf.okapi.common.Event;
@@ -46,6 +48,7 @@ import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.common.resource.TextUnitUtil;
 import net.sf.okapi.lib.segmentation.SRXDocument;
+import net.sf.okapi.steps.gcaligner.AlignmentScorer;
 
 /**
  * Align sentences between source and target paragraphs (TextUnits) and produce a TMX file with aligned sentences. This
@@ -72,7 +75,9 @@ public class SentenceAlignerStep extends BasePipelineStep implements IObserver {
 
 	public SentenceAlignerStep() {
 		params = new Parameters();
-		sentenceAligner = new SentenceAligner();
+		List<AlignmentScorer<Segment>> scorerList = new LinkedList<AlignmentScorer<Segment>>();
+		scorerList.add(new SimpleGaleAndChurch());
+		sentenceAligner = new SentenceAligner(scorerList);
 	}
 
 	@StepParameterMapping(parameterType = StepParameterType.FILTER_CONFIGURATION_MAPPER)
