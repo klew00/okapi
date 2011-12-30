@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tmx version="1.4"><header creationtool="net.sf.okapi.steps.gcaligner.SentenceAlignerStep" creationtoolversion="unknown" segtype="sentence" o-tmf="unknown" adminlang="en" srclang="en-us" datatype="application/x-tmx+xml"></header><body>
+<tmx version="1.4"><header creationtool="net.sf.okapi.steps.sentencealigner.SentenceAlignerStep" creationtoolversion="unknown" segtype="sentence" o-tmf="unknown" adminlang="en" srclang="en-us" datatype="application/x-tmx+xml"></header><body>
 <tu tuid="/OTBible/Genesis/50/17_0">
 <tuv xml:lang="en-us"><seg>17 So shall ye say unto Joseph, Forgive, I pray thee now, the trespass of thy brethren, and their sin; for they did unto thee evil: and now, we pray thee, forgive the trespass of the servants of the God of thy father.</seg></tuv>
 <tuv xml:lang="pt-br"><seg>17 Assim direis a José: Perdoa, rogo-te, a transgressão de teus irmãos, e o seu peccado, porque te fizeram mal: agora pois rogamos-te que perdoes a transgressão dos servos do Deus de teu pae.</seg></tuv>
