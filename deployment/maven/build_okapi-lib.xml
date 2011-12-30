@@ -230,7 +230,7 @@
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi/steps/searchandreplace/target/classes"
 			 excludes="**/META-INF/**"/>
-			<fileset dir="../../okapi/steps/sentence-aligner/target/classes"
+			<fileset dir="../../okapi/steps/aligner/target/classes"
 			 excludes="**/META-INF/**"/>
 			<fileset dir="../../okapi/steps/segmentation/target/classes"
 			 excludes="**/META-INF/**"/>
