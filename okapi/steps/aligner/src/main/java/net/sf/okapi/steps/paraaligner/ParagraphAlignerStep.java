@@ -35,9 +35,11 @@ import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.pipeline.annotations.StepParameterMapping;
 import net.sf.okapi.common.pipeline.annotations.StepParameterType;
+import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.MultiEvent;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.lib.extra.diff.incava.DiffLists;
+import net.sf.okapi.steps.gcaligner.AlignmentScorer;
 import net.sf.okapi.steps.sentencealigner.SentenceAlignerStep;
 
 /**
@@ -61,9 +63,13 @@ public class ParagraphAlignerStep extends BasePipelineStep {
 	private List<Event> trgEvents;
 	private RawDocument targetInput = null;
 	private EventComparator comparator;
+	private ParagraphAligner paragraphAligner;
 
 	public ParagraphAlignerStep() {
 		params = new Parameters();
+		List<AlignmentScorer<ITextUnit>> scorerList = new LinkedList<AlignmentScorer<ITextUnit>>();
+		scorerList.add(new ParagraphGaleAndChurch());
+		paragraphAligner = new ParagraphAligner(scorerList);
 	}
 
 	@StepParameterMapping(parameterType = StepParameterType.FILTER_CONFIGURATION_MAPPER)
