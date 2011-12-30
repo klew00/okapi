@@ -26,7 +26,6 @@ import java.util.regex.Pattern;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.resource.DocumentPart;
-import net.sf.okapi.common.resource.IReferenceable;
 
 /**
  * Compare two {@link DocumentPart}s. Remove whitespace before comparison. If the strings are less

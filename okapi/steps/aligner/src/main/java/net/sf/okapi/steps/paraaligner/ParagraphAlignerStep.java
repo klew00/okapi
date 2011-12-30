@@ -38,7 +38,6 @@ import net.sf.okapi.common.pipeline.annotations.StepParameterType;
 import net.sf.okapi.common.resource.MultiEvent;
 import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.lib.extra.diff.incava.DiffLists;
-import net.sf.okapi.lib.extra.diff.incava.Difference;
 import net.sf.okapi.steps.sentencealigner.SentenceAlignerStep;
 
 /**
@@ -94,7 +93,7 @@ public class ParagraphAlignerStep extends BasePipelineStep {
 
 	@Override
 	public String getDescription() {
-		return "Align paragraphs (TextUnits) between a source and target document.";
+		return "Align paragraphs (text units) between a source and a target document.";
 	}
 
 	@Override

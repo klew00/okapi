@@ -461,6 +461,17 @@ public class PipelineWrapper {
 			availableSteps.put(step.stepClass, step);
 
 			ps = (IPipelineStep)Class.forName(
+				"net.sf.okapi.steps.paraaligner.ParagraphAlignerStep").newInstance();
+			params = ps.getParameters();
+			step = new StepInfo(ps.getName(), ps.getDescription(), ps.getClass().getName(), null,
+				params.getClass().getName());
+			if ( params != null ) {
+				step.paramsData = params.toString();
+				peMapper.addDescriptionProvider("net.sf.okapi.steps.paraaligner.Parameters", step.paramsClass);
+			}
+			availableSteps.put(step.stepClass, step);
+			
+			ps = (IPipelineStep)Class.forName(
 				"net.sf.okapi.steps.qualitycheck.QualityCheckStep").newInstance();
 			params = ps.getParameters();
 			step = new StepInfo(ps.getName(), ps.getDescription(), ps.getClass().getName(), null,
@@ -569,13 +580,13 @@ public class PipelineWrapper {
 			availableSteps.put(step.stepClass, step);
 
 			ps = (IPipelineStep)Class.forName(
-				"net.sf.okapi.steps.gcaligner.SentenceAlignerStep").newInstance();
+				"net.sf.okapi.steps.sentencealigner.SentenceAlignerStep").newInstance();
 			params = ps.getParameters();
 			step = new StepInfo(ps.getName(), ps.getDescription(), ps.getClass().getName(), null,
 				params.getClass().getName());
 			if ( params != null ) {
 				step.paramsData = params.toString();
-				peMapper.addDescriptionProvider("net.sf.okapi.steps.gcaligner.Parameters", step.paramsClass);
+				peMapper.addDescriptionProvider("net.sf.okapi.steps.sentencealigner.Parameters", step.paramsClass);
 			}
 			availableSteps.put(step.stepClass, step);
 
