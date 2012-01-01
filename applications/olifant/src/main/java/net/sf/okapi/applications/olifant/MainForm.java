@@ -111,6 +111,10 @@ public class MainForm {
 	private MenuItem miShowHideThirdField;
 	private MenuItem miShowHideFieldList;
 	private MenuItem miToggleCodeDisplay;
+	private MenuItem miViewFilterSettings;
+	private MenuItem miViewSetFilterForFlaggedEntries;
+	private MenuItem miToggleFilter;
+	private MenuItem miSetSortOrder;
 	private MenuItem miStatistics;
 	private MenuItem miViewGoto;
 	private MenuItem miShowHideLog;
@@ -411,6 +415,17 @@ public class MainForm {
 		miEditCopy.setEnabled(false);
 		miEditPaste.setEnabled(false);
 		
+		miShowHideLog.setEnabled(active);
+		miShowHideThirdField.setEnabled(active);
+		miShowHideFieldList.setEnabled((active) && currentTP.getEditorPanel().isExtraVisible());
+		miToggleCodeDisplay.setEnabled(active);
+		miViewFilterSettings.setEnabled(active);
+		miViewSetFilterForFlaggedEntries.setEnabled(active);
+		miToggleFilter.setEnabled(active);
+		miSetSortOrder.setEnabled(active);
+		miViewGoto.setEnabled(active);
+		miStatistics.setEnabled(repoPanel.isRepositoryOpen());
+		
 		miEntriesNew.setEnabled(active);
 		miEntriesDelete.setEnabled(active);
 		miRefresh.setEnabled(active);
@@ -421,19 +436,13 @@ public class MainForm {
 		miTMClose.setEnabled(active);
 		miFileImport.setEnabled(active);
 		miFileExport.setEnabled(active);
+
 		miTMSplit.setEnabled(active);
 		miTMDelete.setEnabled(active);
 		miTMRename.setEnabled(active);
 		miTMEditColumns.setEnabled(active);
 		miTMEditLocales.setEnabled(active);
 		miTMEditProperties.setEnabled(active);
-		
-		miShowHideLog.setEnabled(active);
-		miShowHideThirdField.setEnabled(active);
-		miShowHideFieldList.setEnabled((active) && currentTP.getEditorPanel().isExtraVisible());
-		miToggleCodeDisplay.setEnabled(active);
-		miViewGoto.setEnabled(active);
-		miStatistics.setEnabled(repoPanel.isRepositoryOpen());
 		
 		toolBar.update(currentTP);
 	}
@@ -541,6 +550,119 @@ public class MainForm {
             }
 		});
 		
+		//--- View menu
+		
+		topItem = new MenuItem(menuBar, SWT.CASCADE);
+		topItem.setText(rm.getCommandLabel("view")); //$NON-NLS-1$
+		dropMenu = new Menu(shell, SWT.DROP_DOWN);
+		topItem.setMenu(dropMenu);
+
+		menuItem = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(menuItem, "view.showhidetmlist"); //$NON-NLS-1$
+		menuItem.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				if ( topSash.getSashWidth() > 0 ) {
+					topSash.setWeights(new int[]{1, 0});
+					topSash.setSashWidth(0);
+				}
+				else {
+					topSash.setWeights(new int[]{4, 1});
+					topSash.setSashWidth(4);
+				}
+            }
+		});
+		
+		miShowHideLog = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miShowHideLog, "view.showhidelog"); //$NON-NLS-1$
+		miShowHideLog.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				currentTP.toggleLog();
+			}
+		});
+	
+		miShowHideThirdField = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miShowHideThirdField, "view.showhideextrafield"); //$NON-NLS-1$
+		miShowHideThirdField.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				currentTP.toggleExtra();
+				updateCommands();
+            }
+		});
+		
+		miShowHideFieldList = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miShowHideFieldList, "view.showhidefieldlist"); //$NON-NLS-1$
+		miShowHideFieldList.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				currentTP.getEditorPanel().getExtraFieldPanel().toggleFieldList();
+			}
+		});
+	
+		miToggleCodeDisplay = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miToggleCodeDisplay, "view.togglecodedisplay"); //$NON-NLS-1$
+		miToggleCodeDisplay.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				currentTP.getEditorPanel().setFullCodesMode(!currentTP.getEditorPanel().getFullCodesMode());
+            }
+		});
+		
+		new MenuItem(dropMenu, SWT.SEPARATOR);
+		
+		miViewFilterSettings = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miViewFilterSettings, "view.filtersettings"); //$NON-NLS-1$
+		miViewFilterSettings.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				currentTP.editFilterSettings();
+            }
+		});
+
+		miViewSetFilterForFlaggedEntries = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miViewSetFilterForFlaggedEntries, "view.filterflaggedentries"); //$NON-NLS-1$
+		miViewSetFilterForFlaggedEntries.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				currentTP.setFilterForFlaggedEntries();
+            }
+		});
+
+		miToggleFilter = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miToggleFilter, "view.togglefilter"); //$NON-NLS-1$
+		miToggleFilter.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				currentTP.toggleFilter();
+            }
+		});
+		
+		
+		new MenuItem(dropMenu, SWT.SEPARATOR);
+
+		miSetSortOrder = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miSetSortOrder, "view.sortorder"); //$NON-NLS-1$
+		miSetSortOrder.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				currentTP.editSortOrder();
+            }
+		});
+
+		new MenuItem(dropMenu, SWT.SEPARATOR);
+
+		miViewGoto = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miViewGoto, "view.goto"); //$NON-NLS-1$
+		miViewGoto.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				currentTP.gotoEntry(-1);
+            }
+		});
+		
+		new MenuItem(dropMenu, SWT.SEPARATOR);
+
+		miStatistics = new MenuItem(dropMenu, SWT.PUSH);
+		rm.setCommand(miStatistics, "view.stats"); //$NON-NLS-1$
+		miStatistics.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				repoPanel.getStatistics();
+            }
+		});
+		
+
 		//--- Entries menu
 		
 		topItem = new MenuItem(menuBar, SWT.CASCADE);
@@ -619,9 +741,7 @@ public class MainForm {
 		rm.setCommand(miTMEditColumns, "tm.editcolumns"); //$NON-NLS-1$
 		miTMEditColumns.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				if ( currentTP != null ) {
-					currentTP.editColumns();
-				}
+				currentTP.editColumns();
             }
 		});
 		
@@ -629,9 +749,7 @@ public class MainForm {
 		rm.setCommand(miTMEditLocales, "tm.editlocales"); //$NON-NLS-1$
 		miTMEditLocales.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				if ( currentTP != null ) {
-					currentTP.editLocales();
-				}
+				currentTP.editLocales();
             }
 		});
 		
@@ -639,9 +757,7 @@ public class MainForm {
 		rm.setCommand(miTMEditProperties, "tm.properties"); //$NON-NLS-1$
 		miTMEditProperties.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				if ( currentTP != null ) {
-					repoPanel.editTmOptions(currentTP.getTm().getName());
-				}
+				repoPanel.editTmOptions(currentTP.getTm().getName());
             }
 		});
 
@@ -660,91 +776,6 @@ public class MainForm {
 		miTMDelete.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				repoPanel.deleteTm(currentTP.getTm().getName());
-            }
-		});
-		
-		//--- View menu
-		
-		topItem = new MenuItem(menuBar, SWT.CASCADE);
-		topItem.setText(rm.getCommandLabel("view")); //$NON-NLS-1$
-		dropMenu = new Menu(shell, SWT.DROP_DOWN);
-		topItem.setMenu(dropMenu);
-
-		menuItem = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(menuItem, "view.showhidetmlist"); //$NON-NLS-1$
-		menuItem.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent event) {
-				if ( topSash.getSashWidth() > 0 ) {
-					topSash.setWeights(new int[]{1, 0});
-					topSash.setSashWidth(0);
-				}
-				else {
-					topSash.setWeights(new int[]{4, 1});
-					topSash.setSashWidth(4);
-				}
-            }
-		});
-		
-		miShowHideLog = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(miShowHideLog, "view.showhidelog"); //$NON-NLS-1$
-		miShowHideLog.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent event) {
-				if ( currentTP != null ) {
-					currentTP.toggleLog();
-				}
-			}
-		});
-	
-		miShowHideThirdField = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(miShowHideThirdField, "view.showhideextrafield"); //$NON-NLS-1$
-		miShowHideThirdField.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent event) {
-				if ( currentTP != null ) {
-					currentTP.toggleExtra();
-					updateCommands();
-				}
-            }
-		});
-		
-		miShowHideFieldList = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(miShowHideFieldList, "view.showhidefieldlist"); //$NON-NLS-1$
-		miShowHideFieldList.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent event) {
-				if ( currentTP != null ) {
-					currentTP.getEditorPanel().getExtraFieldPanel().toggleFieldList();
-				}
-			}
-		});
-	
-		miToggleCodeDisplay = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(miToggleCodeDisplay, "view.togglecodedisplay"); //$NON-NLS-1$
-		miToggleCodeDisplay.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent event) {
-				if ( currentTP != null ) {
-					currentTP.getEditorPanel().setFullCodesMode(!currentTP.getEditorPanel().getFullCodesMode());
-				}
-            }
-		});
-		
-		new MenuItem(dropMenu, SWT.SEPARATOR);
-
-		miViewGoto = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(miViewGoto, "view.goto"); //$NON-NLS-1$
-		miViewGoto.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent event) {
-				if ( currentTP != null ) {
-					currentTP.gotoEntry(-1);
-				}
-            }
-		});
-		
-		new MenuItem(dropMenu, SWT.SEPARATOR);
-
-		miStatistics = new MenuItem(dropMenu, SWT.PUSH);
-		rm.setCommand(miStatistics, "view.stats"); //$NON-NLS-1$
-		miStatistics.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent event) {
-				repoPanel.getStatistics();
             }
 		});
 		
@@ -867,7 +898,7 @@ public class MainForm {
 	private void openFile (String[] paths) {
 		try {
 			if ( paths == null ) {
-				paths = Dialogs.browseFilenames(shell, "Open Files", true, null, null, null);
+				paths = Dialogs.browseFilenames(shell, "Open Files in New TMs", true, null, null, null);
 			}
 			if ( paths == null ) return;
 			boolean acceptAll = false;

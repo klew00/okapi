@@ -61,6 +61,7 @@ public class Tm implements ITm {
 
 	private PreparedStatement pstmAnchors;
 	private ArrayList<Long> anchors;
+	private String rowSubQuery;
 	
 	
 	public Tm (Repository store,
@@ -187,19 +188,19 @@ public class Tm implements ITm {
 			pstmGet = store.getConnection().prepareStatement(tmp.toString(),
 				ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			
+			rowSubQuery = String.format("(SELECT \"%s\", ROWNUM() AS R FROM %s)", DbUtil.SEGKEY_NAME, segTable);
 			if ( usePagingType2 ) {
-			// Create statement for the anchors
-//	SELECT "SegKey", R FROM (SELECT "SegKey", ROWNUM() AS R FROM (SELECT "SegKey" FROM "my tm_SEG"  ORDER BY "Text~EN_US" DESC)) WHERE MOD(R, 200)=0
-			if ( pageMode == PageMode.ITERATOR ) {
-				tmp = new StringBuilder(String.format(
-					"SELECT \"%s\", R FROM (SELECT \"%s\", ROWNUM() AS R FROM %s) WHERE (R=1 OR MOD(R, ?)=1)", DbUtil.SEGKEY_NAME, DbUtil.SEGKEY_NAME, segTable));
-			}
-			else {
-				tmp = new StringBuilder(String.format(
-					"SELECT \"%s\", R FROM (SELECT \"%s\", ROWNUM() AS R FROM %s) WHERE (R=1 OR MOD(R, (?-1))=1)", DbUtil.SEGKEY_NAME, DbUtil.SEGKEY_NAME, segTable));
-			}
-			pstmAnchors = store.getConnection().prepareStatement(tmp.toString(),
-				ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+				// Create statement for the anchors
+				if ( pageMode == PageMode.ITERATOR ) {
+					tmp = new StringBuilder(String.format(
+						"SELECT \"%s\", R FROM (SELECT \"%s\", ROWNUM() AS R FROM %s) WHERE (R=1 OR MOD(R, ?)=1)", DbUtil.SEGKEY_NAME, DbUtil.SEGKEY_NAME, segTable));
+				}
+				else {
+					tmp = new StringBuilder(String.format(
+						"SELECT \"%s\", R FROM (SELECT \"%s\", ROWNUM() AS R FROM %s) WHERE (R=1 OR MOD(R, (?-1))=1)", DbUtil.SEGKEY_NAME, DbUtil.SEGKEY_NAME, segTable));
+				}
+				pstmAnchors = store.getConnection().prepareStatement(tmp.toString(),
+					ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			}
 			
 		}
@@ -987,8 +988,60 @@ public class Tm implements ITm {
 	public long findPageForSegment (long segKey) {
 		if ( pageCount < 1 ) return -1;
 //TODO
-		
-		return -1;
+		Statement stm = null;
+		try {
+			stm = store.getConnection().createStatement();
+			String tmp;
+
+//			tmp = String.format(
+//				"SELECT \"%s\", R FROM %s WHERE (R=1 OR MOD(R, (10-1))=1)", DbUtil.SEGKEY_NAME, rowSubQuery);
+
+			tmp = String.format(
+				"SELECT \"%s\", R FROM %s WHERE MOD(\"%s\",%d)=0", DbUtil.SEGKEY_NAME, rowSubQuery, DbUtil.SEGKEY_NAME, segKey);
+			
+			ResultSet rs = stm.executeQuery(tmp.toString());
+			long x;
+			while ( rs.next() ) {
+				x = rs.getLong(2);
+				x = rs.getLong(1);
+			}
+
+			if ( rs.next() ) {
+				return -1;
+//				// Get the row number for this entry
+//				long rn = rs.getLong(2);
+//				// Compute which page this row number belong to (page is 0-based)
+//				if ( pageMode == PageMode.ITERATOR ) {
+//					long page = -1; //rn div limit - ((rn % limit) == 0 ? 1 : 0);
+//					return page;
+//				}
+//				else {
+//					// Because of overlap we don't need to use limit-1
+//					// and don't need to subtract on numbers that are multiple
+//					// The overlapped entry goes as top entry
+//					long page = rn / limit;
+//					return page;
+//				}
+			}
+			else {
+				// Not entry with such a key
+				return -1;
+			}
+		}
+		catch ( SQLException e ) {
+			throw new RuntimeException(e);
+		}
+		finally {
+			try {
+				if ( stm != null ) {
+					stm.close();
+					stm = null;
+				}
+			}
+			catch ( SQLException e ) {
+				throw new RuntimeException(e);
+			}
+		}
 	}
 
 	@Override

@@ -87,7 +87,9 @@ class SegmentEditor {
 			@Override
 			public void verifyKey (VerifyEvent e) {
 				if ( e.keyCode == 13 ) {
-					caller.returnFromEdit(true);
+					if ( caller.returnFromEdit(true) ) {
+						setModified(false);
+					}
 					e.doit = false;
 				}
 				else if ( e.keyCode == SWT.ESC ) {

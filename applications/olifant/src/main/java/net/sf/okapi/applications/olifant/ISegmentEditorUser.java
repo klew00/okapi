@@ -23,11 +23,14 @@ package net.sf.okapi.applications.olifant;
 interface ISegmentEditorUser {
 
 	/**
-	 * Informs the caller of the sgment editor that the edit is done
+	 * Informs the caller of the segment editor that the edit is done
 	 * and it can reclaim the focus.
 	 * @param save true if the edit is to be saved, false to cancel it.
+	 * @return true if the caller has done its task successfully, false if an error
+	 * occurred. This can be used for example to tell the editor if
+	 * the edit is really done or not. 
 	 */
-	public void returnFromEdit (boolean save);
+	public boolean returnFromEdit (boolean save);
 	
 	/**
 	 * Informs the caller that one of the edit fields has just gain focus.

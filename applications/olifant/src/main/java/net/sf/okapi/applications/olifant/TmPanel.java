@@ -1056,22 +1056,46 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 	}
 
 	@Override
-	public void returnFromEdit (boolean save) {
+	public boolean returnFromEdit (boolean save) {
 		if ( save ) {
 			saveEntry();
-			//TODO: reset the modified flag in edit control!!
-			// so we don't save again when moving to next location
 		}
 		else {
 			updateCurrentEntry();
 		}
 		cursor.setFocus();
+		return true;
 	}
 
 	@Override
 	public void notifyOfFocus (int column) {
 		if ( column > -1 ) {
 			cursor.setSelection(table.getSelectionIndex(), column);
+		}
+	}
+
+	void setFilterForFlaggedEntries () {
+		//TODO
+		Dialogs.showError(getShell(), "Not implemented yet.", null);
+	}
+
+	void toggleFilter () {
+		//TODO
+		Dialogs.showError(getShell(), "Not implemented yet.", null);
+	}
+	
+	void editSortOrder () {
+		//TODO
+		Dialogs.showError(getShell(), "Not implemented yet.", null);
+	}
+	
+	void editFilterSettings () {
+		try {
+			saveEntryAndModificationsIfNeeded();
+			Dialogs.showError(getShell(), "Not implemented yet.", null);
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(getShell(), "Error editing filter settings.\n"+e.getMessage(), null);
 		}
 	}
 	
