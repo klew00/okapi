@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2010 by the Okapi Framework contributors
+  Copyright (C) 2008-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -178,6 +178,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		lbTypes.add("Replace selected ASCII characters with Extended Latin characters");
 		lbTypes.add("Replace selected ASCII characters with Cyrillic characters");
 		lbTypes.add("Replace selected ASCII characters with Arabic characters");
+		lbTypes.add("Replace selected ASCII characters with Chinese characters");
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		gdTmp.heightHint = 70;
 		gdTmp.horizontalSpan = 2;

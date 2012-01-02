@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2011 by the Okapi Framework contributors
+  Copyright (C) 2009-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -41,6 +41,7 @@ public class TextModificationStep extends BasePipelineStep {
 
 	private static final char STARTSEG = '[';
 	private static final char ENDSEG = ']';
+	private static final int SCRIPT_MAX = 3;
 
 	private Parameters params;
 	private LocaleId targetLocale;
@@ -50,8 +51,8 @@ public class TextModificationStep extends BasePipelineStep {
 	public TextModificationStep () {
 		params = new Parameters();
 		
-		oldChars = new String[3];
-		newChars = new String[3];
+		oldChars = new String[4];
+		newChars = new String[4];
 		// Latin extended characters
 		oldChars[0] = "AaEeIiOoUuYyCcDdNn";
 		newChars[0] = "\u00c2\u00e5\u00c9\u00e8\u00cf\u00ec\u00d8\u00f5\u00db\u00fc\u00dd\u00ff\u00c7\u00e7\u00d0\u00f0"
@@ -67,6 +68,11 @@ public class TextModificationStep extends BasePipelineStep {
 			+ "\u0646\u0646\u0644\u0644\u0642\u0642\u0643\u0643\u0633\u0633\u062e\u062e\u0648\u0648\u0632\u0632\u064a\u064a"
 			+ "\u0638\u0638\u0635\u0635\u0641\u0641\u063a\u063a\u0630\u0630\u0647\u0647\u0639\u0639\u0636\u0636\u0634\u0634"
 			+ "\u0660\u0661\u0662\u0663\u0664\u0665\u0666\u0667\u0668\u0669\u066a\u061f\u061b\u060c";
+		// Han characters (Simplified)
+		oldChars[3] = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz";
+		newChars[3] = "\u35F2\u35F2\u3737\u3737\u3DFF\u3DFF\u4039\u4039\u4150\u4150\u42D4\u42D4\u6E26\u6E26\u6E88\u6E88"
+			+ "\u6EB3\u6EB3\u6F38\u6F38\u6F70\u6F70\u6FAE\u6FAE\u6FF0\u6FF0\u7121\u7121\u7189\u7189\u71D2\u71D2\u721B\u721B"
+			+ "\u7258\u7258\u7372\u7372\u73FC\u73FC\u74DA\u74DA\u7587\u7587\u760D\u760D\u93C7\u93C7\u93F7\u93F7\u9F7E\u9F7E";
 	}
 	
 	@StepParameterMapping(parameterType = StepParameterType.TARGET_LOCALE)
@@ -185,7 +191,9 @@ public class TextModificationStep extends BasePipelineStep {
 	private void replaceWithExtendedChars (ITextUnit tu) {
 		int n;
 		int charDest = params.script;
-		if ( charDest > 2 ) charDest = 0;
+		if ( charDest > SCRIPT_MAX ) {
+			charDest = 0; // Just making sure
+		}
 		
 		for ( TextPart part : tu.getTarget(targetLocale) ) {
 			StringBuilder sb = new StringBuilder(part.text.getCodedText());
