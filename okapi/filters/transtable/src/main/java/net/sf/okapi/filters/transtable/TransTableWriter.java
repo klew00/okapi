@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2011 by the Okapi Framework contributors
+  Copyright (C) 2011-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -18,7 +18,7 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.steps.rainbowkit.table;
+package net.sf.okapi.filters.transtable;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -47,7 +47,7 @@ import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
-public class TableWriter implements IFilterWriter {
+public class TransTableWriter implements IFilterWriter {
 
 	public static final String CRUMBS_PREFIX = "okpCtx";
 	public static final String SUBDOCUMENT_CRUMB = "sd=";
@@ -67,7 +67,7 @@ public class TableWriter implements IFilterWriter {
 	private GenericContent fmt;
 	private String crumbs;
 	
-	public TableWriter () {
+	public TransTableWriter () {
 		params = new Parameters();
 		fmt = new GenericContent();
 	}

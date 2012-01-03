@@ -50,6 +50,7 @@ import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 import net.sf.okapi.filters.po.POFilter;
 import net.sf.okapi.filters.rtf.RTFFilter;
+import net.sf.okapi.filters.transtable.TransTableFilter;
 import net.sf.okapi.filters.versifiedtxt.VersifiedTextFilter;
 import net.sf.okapi.filters.xini.XINIFilter;
 import net.sf.okapi.filters.xliff.XLIFFFilter;
@@ -354,6 +355,10 @@ public class RainbowKitFilter implements IFilter {
 			filter = new VersifiedTextFilter();			
 			extension = ""; // Extension is already on the filename
 		}
+		else if ( info.getExtractionType().equals(Manifest.EXTRACTIONTYPE_TABLE) ) {
+			filter = new TransTableFilter();
+			extension = ".txt";
+		}
 		else if ( info.getExtractionType().equals(Manifest.EXTRACTIONTYPE_NONE) ) {
 			// Reference file: just copy it to the output
 			String inputPath = manifest.getTempOriginalDirectory()+info.getRelativeInputPath();
@@ -432,11 +437,13 @@ public class RainbowKitFilter implements IFilter {
 				file = new File(manifest.getTempTargetDirectory()+info.getRelativeInputPath() + ".xlf" + ".rtf");
 				rtfFilter.open(new RawDocument(file.toURI(), "windows-1252", manifest.getTargetLocale()));
 				outputPath = manifest.getTempTargetDirectory()+info.getRelativeInputPath() + ".xlf";
-			} else if (Manifest.EXTRACTIONTYPE_VERSIFIED_RTF.equals(tkitType)) {
+			}
+			else if (Manifest.EXTRACTIONTYPE_VERSIFIED_RTF.equals(tkitType)) {
 				file = new File(manifest.getTempTargetDirectory()+info.getRelativeInputPath() + ".vrsz" + ".rtf");
 				rtfFilter.open(new RawDocument(file.toURI(), "UTF-8", manifest.getTargetLocale()));
 				outputPath = manifest.getTempTargetDirectory()+info.getRelativeInputPath() + ".vrsz";
-			} else {
+			}
+			else {
 				file = new File(manifest.getTempTargetDirectory()+info.getRelativeInputPath() + ".rtf");
 				rtfFilter.open(new RawDocument(file.toURI(), "windows-1252", manifest.getTargetLocale()));
 				outputPath = manifest.getMergeDirectory()+info.getRelativeTargetPath();

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2011 by the Okapi Framework contributors
+  Copyright (C) 2011-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -24,11 +24,12 @@ import net.sf.okapi.common.Event;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.filters.rainbowkit.Manifest;
 import net.sf.okapi.filters.rainbowkit.MergingInfo;
+import net.sf.okapi.filters.transtable.TransTableWriter;
 import net.sf.okapi.steps.rainbowkit.common.BasePackageWriter;
 
 public class TablePackageWriter extends BasePackageWriter {
 
-	private TableWriter writer;
+	private TransTableWriter writer;
 
 	public TablePackageWriter () {
 		super(Manifest.EXTRACTIONTYPE_TABLE);
@@ -45,10 +46,7 @@ public class TablePackageWriter extends BasePackageWriter {
 	protected void processStartDocument (Event event) {
 		super.processStartDocument(event);
 		
-		writer = new TableWriter();
-		Parameters params = (Parameters)writer.getParameters();
-		params.setOutputGeneric(true);
-		
+		writer = new TransTableWriter();
 		writer.setOptions(manifest.getTargetLocale(), "UTF-8");
 		
 		MergingInfo item = manifest.getItem(docId);
