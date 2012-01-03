@@ -27,18 +27,21 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
 import net.sf.okapi.common.IdGenerator;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
 import net.sf.okapi.common.filters.FilterConfiguration;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
+import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.LocaleId;
@@ -53,6 +56,8 @@ import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 public class TransTableFilter implements IFilter {
 
+	private final Logger logger = Logger.getLogger(getClass().getName());
+
 	private static String MIMETYPE = "text/x-transtable";
 	
 	private BufferedReader reader = null;
@@ -66,10 +71,11 @@ public class TransTableFilter implements IFilter {
 	private String lineBreak;
 	private boolean hasUTF8BOM;
 	private EncoderManager encoderManager;
-	private boolean firstLineDone;
 	private boolean hasNext;
+	private GenericContent fmt;
 	
 	public TransTableFilter () {
+		fmt = new GenericContent();
 	}
 
 	public void cancel () {
@@ -162,16 +168,6 @@ public class TransTableFilter implements IFilter {
 						continue;
 					}
 					
-					if ( !firstLineDone ) {
-						firstLineDone = true;
-						// First entry is just information
-						String[] parts = tmp.split("\t");
-						// Source locale
-						
-						// Target locale
-						trgLoc = LocaleId.fromString(parts[2]);
-						continue;
-					}
 					// Parse the line
 					String[] parts = tmp.split("\t");
 					if ( parts.length < 2 ) {
@@ -183,12 +179,17 @@ public class TransTableFilter implements IFilter {
 					
 					// Source
 					tmp = unescape(parts[1]);
-					tu.setSourceContent(new TextFragment(tmp));
+					TextFragment srcFrag = fmt.fromLetterCodedToFragment(tmp, null, false);
+					tu.setSourceContent(srcFrag);
 					
 					// Process the target if there is one
 					if ( parts.length > 2 ) {
 						tmp = unescape(parts[2]);
-						tu.setTargetContent(trgLoc, new TextFragment(tmp));
+						TextFragment trgFrag = fmt.fromLetterCodedToFragment(tmp, null, false);
+						// Synchronizes source and target codes as much as possible
+						trgFrag.alignCodeIds(srcFrag);
+						// Set the content
+						tu.setTargetContent(trgLoc, trgFrag);
 					}
 					
 					return new Event(EventType.TEXT_UNIT, tu);
@@ -247,9 +248,50 @@ public class TransTableFilter implements IFilter {
 		}
 		
 		otherId = new IdGenerator(null);
-		firstLineDone = false;
 		line = 0;
 		hasNext = true;
+		
+		// Read the first line
+		String tmp;
+		try {
+			tmp = reader.readLine();
+		}
+		catch ( IOException e ) {
+			throw new OkapiIOException("Error reading header.", e);
+		}
+		if ( Util.isEmpty(tmp) ) {
+			throw new OkapiIOException("Empty header line.");
+		}
+		line++;
+		// First entry is just information
+		String[] parts = tmp.split("\t");
+		// Check signature
+		if ( parts.length != 3 ) {
+			throw new OkapiIOException("Unexpected header.");
+		}
+		parts[0] = unescape(parts[0]);
+		parts[1] = unescape(parts[1]);
+		parts[2] = unescape(parts[2]);
+		if ( !parts[0].startsWith(TransTableWriter.SIGNATURE) ) {
+			throw new OkapiIOException("Invalid signature. This may not be a TransTable file.");
+		}
+		// Source locale
+		LocaleId srcLoc = LocaleId.fromString(parts[1]);
+		if ( !srcLoc.equals(input.getSourceLocale()) ) {
+			logger.warning(String.format("The source locale declared in the file ('%s') is not the expected one ('%s')\n"
+				+ "%s will be used.",
+				srcLoc.toString(), input.getSourceLocale().toString(), input.getSourceLocale().toString()));
+		}
+		// Target locale
+		trgLoc = LocaleId.fromString(parts[2]);
+		if ( input.getTargetLocale() != null ) {
+			if ( !trgLoc.equals(input.getTargetLocale()) ) {
+				logger.warning(String.format("The target locale declared in the file ('%s') is not the expected one ('%s')\n"
+					+ "%s will be used.",
+					trgLoc.toString(), input.getTargetLocale().toString(), input.getTargetLocale().toString()));
+				trgLoc = input.getTargetLocale();
+			}
+		}
 		
 		// Set the start event
 		queue = new LinkedList<Event>();

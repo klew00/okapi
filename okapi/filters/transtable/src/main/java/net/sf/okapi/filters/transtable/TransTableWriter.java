@@ -53,6 +53,8 @@ public class TransTableWriter implements IFilterWriter {
 	public static final String SUBDOCUMENT_CRUMB = "sd=";
 	public static final String GROUP_CRUMB = "gp=";
 	public static final String TEXTUNIT_CRUMB = "tu=";
+	public static final String SIGNATURE = "TransTable";
+	public static final String VERSION = "V1";
 
 	private static final String ESCAPEABLE = "\\\"abfnrtv";
 	private static final String LINEBREAK = System.getProperty("line.separator");
@@ -207,7 +209,8 @@ public class TransTableWriter implements IFilterWriter {
 			// Create the output
 			createWriter(sd);
 			// Writer header
-			writer.write(String.format("MergeID\t%s\t%s"+LINEBREAK, sd.getLocale().toString(), language.toString()));
+			writer.write(String.format("%s%s\t%s\t%s"+LINEBREAK, SIGNATURE, VERSION,
+				sd.getLocale().toString(), language.toString()));
 			crumbs = CRUMBS_PREFIX;
 		}
 		catch ( IOException e ) {

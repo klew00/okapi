@@ -216,12 +216,12 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		// Versified RTF options
 		optEditors.add(null);
 		optStrings.add(null);
-		optMoreInfo.add("Rainbow TKit - Versified with RTF"); // TDOD: wiki page
+		optMoreInfo.add("Rainbow TKit - Versified with RTF"); // wiki page
 		writers.add("net.sf.okapi.steps.rainbowkit.versified.VersifiedRtfPackageWriter");
 		// Table options
 		optEditors.add(null);
 		optStrings.add(null);
-		optMoreInfo.add("Rainbow TKit - Table"); // TDOD: wiki page
+		optMoreInfo.add("Rainbow TKit - Translation Table"); // wiki page
 		writers.add("net.sf.okapi.steps.rainbowkit.table.TablePackageWriter");
 
 		mainComposite = new Composite(parent, SWT.BORDER);
@@ -271,7 +271,7 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		lbTypes.add("Transifex Project");
 		lbTypes.setData("5", "net.sf.okapi.steps.rainbowkit.transifex.TransifexPackageWriter");
 
-		lbTypes.add("ONTRAM XINI (Beta)");
+		lbTypes.add("ONTRAM XINI");
 		lbTypes.setData("6", "net.sf.okapi.steps.rainbowkit.ontram.OntramPackageWriter");
 
 		lbTypes.add("XLIFF 2.0 (Experimental - output only)");
@@ -280,7 +280,7 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		lbTypes.add("Versified with RTF (Beta)");
 		lbTypes.setData("8", "net.sf.okapi.steps.rainbowkit.versified.VersifiedRtfPackageWriter");
 
-		lbTypes.add("Table (Alpha)");
+		lbTypes.add("Translation Table (Beta)");
 		lbTypes.setData("9", "net.sf.okapi.steps.rainbowkit.table.TablePackageWriter");
 
 		gdTmp = new GridData(GridData.FILL_BOTH);
