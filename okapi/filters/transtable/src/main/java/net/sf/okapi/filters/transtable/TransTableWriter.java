@@ -55,8 +55,8 @@ public class TransTableWriter implements IFilterWriter {
 	public static final String TEXTUNIT_CRUMB = "tu=";
 	public static final String SIGNATURE = "TransTable";
 	public static final String VERSION = "V1";
-
-	private static final String ESCAPEABLE = "\\\"abfnrtv";
+	public static final String ESCAPEABLE = "\\\"abfnrtv";
+	
 	private static final String LINEBREAK = System.getProperty("line.separator");
 
 	private Parameters params;

@@ -80,6 +80,7 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 	private final Table table;
 	private final TableCursor cursor;
 	private final LogPanel logPanel;
+	private final Listener columnHeaderListener;
 	
 	private Point cursorLoc;
 	private ITm tm;
@@ -99,6 +100,7 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 
 	private MenuItem miCtxAddEntry;
 	private MenuItem miCtxDeleteEntries;
+	private MenuItem miCtxSortOrder;
 
 	public TmPanel (MainForm mainForm,
 		Composite parent,
@@ -135,6 +137,26 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 		// Edit panels
 		editPanel = new EditorPanel(sashMain, SWT.VERTICAL, this);
 		editPanel.clear();
+		
+		columnHeaderListener = new Listener() {
+			@Override
+			public void handleEvent (Event event) {
+				try {
+					TableColumn col = (TableColumn)event.widget;
+					// Check the current sort if any
+					//TODO
+					// Set the new sort
+					LinkedHashMap<String, Boolean> map = new LinkedHashMap<String, Boolean>();
+					map.put(col.getText(), true);
+					saveEntryAndModifications();
+					getTm().setSortOrder(map);
+					fillTable(0, 0, 0, cursor.getColumn(), -1);
+				}
+				catch ( Throwable e ) {
+					Dialogs.showError(getShell(), "Error setting sort order.\n"+e.getMessage(), null);
+				}
+			}
+		};
 		
 		// Table
 		table = new Table(sashMain, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION | SWT.CHECK | SWT.V_SCROLL);
@@ -281,6 +303,7 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 		TableColumn col = new TableColumn(table, SWT.NONE);
 		col.setText("Flag/SegKey");
 		col.setWidth(KEYCOLUMNWIDTH);
+		col.addListener(SWT.Selection, columnHeaderListener);
 		
 		logPanel = new LogPanel(sashMain, 0);
 		
@@ -309,6 +332,16 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 			}
 		});
 		
+		new MenuItem(contextMenu, SWT.SEPARATOR);
+
+		miCtxSortOrder = new MenuItem(contextMenu, SWT.PUSH);
+		rm.setCommand(miCtxSortOrder, "view.sortorder"); //$NON-NLS-1$
+		miCtxSortOrder.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				editSortOrder();
+			}
+		});
+		
 		contextMenu.addListener (SWT.Show, new Listener () {
 			public void handleEvent (Event event) {
 				boolean enabled = false;
@@ -320,6 +353,7 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 				}
 				miCtxAddEntry.setEnabled(!hasRunningThread());
 				miCtxDeleteEntries.setEnabled(enabled);
+				miCtxSortOrder.setEnabled(enabled);
 			}
 		});
 		table.setMenu(contextMenu);
@@ -347,7 +381,7 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 			if ( hasRunningThread() ) {
 				return false;
 			}
-			saveEntryAndModificationsIfNeeded();
+			saveEntryAndModifications();
 			return true;
 		}
 		catch ( Throwable e ) {
@@ -356,7 +390,7 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 		}
 	}
 
-	void saveEntryAndModificationsIfNeeded () {
+	void saveEntryAndModifications () {
 		saveEntry();
 		saveModificationsIfNeeded();
 	}
@@ -371,7 +405,7 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 	
 	void editColumns () {
 		try {
-			saveEntryAndModificationsIfNeeded();
+			saveEntryAndModifications();
 			ArrayList<String> prevList = opt.getVisibleFields();
 			ColumnsForm dlg = new ColumnsForm(getShell(), tm, prevList);
 			
@@ -400,7 +434,7 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 
 	void editLocales () {
 		try {
-			saveEntryAndModificationsIfNeeded();
+			saveEntryAndModifications();
 			LocalesForm dlg = new LocalesForm(getShell(), tm);
 			if ( !dlg.showDialog() ) {
 				// No change was made, we can skip the re-drawing
@@ -551,6 +585,7 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 				TableColumn col = new TableColumn(table, SWT.NONE);
 				col.setText(fn);
 				col.setWidth(150);
+				col.addListener(SWT.Selection, columnHeaderListener);
 			}
 			// Update the list of locales in the toolbar
 			
@@ -716,7 +751,7 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 			if ( cursorLoc.y == -1 ) {
 				return; // Nothing to do
 			}
-			saveEntryAndModificationsIfNeeded();
+			saveEntryAndModifications();
 			ArrayList<Long> segKeys = new ArrayList<Long>();
 			for ( TableItem ti : table.getSelection() ) {
 				segKeys.add(Long.valueOf(ti.getText(0)));
@@ -803,7 +838,7 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 	
 	void searchAndReplace (boolean search) {
 		try {
-			Location loc = getCurrentLocation(null);
+//			Location loc = getCurrentLocation(null);
 			
 			if ( sarForm == null ) {
 				sarForm = new SearchAndReplaceForm(getShell(), sarOptions, opt.getVisibleFields());
@@ -1085,13 +1120,23 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 	}
 	
 	void editSortOrder () {
-		//TODO
-		Dialogs.showError(getShell(), "Not implemented yet.", null);
+		try {
+			saveEntryAndModifications();
+			SortOrderForm dlg = new SortOrderForm(getShell(), getTm(),
+				opt.getSourceLocale(), opt.getTargetLocale());
+			LinkedHashMap<String, Boolean> res = dlg.showDialog();
+			if ( res == null ) return;
+			getTm().setSortOrder(res);
+			fillTable(0, 0, 0, cursor.getColumn(), -1);
+		}
+		catch ( Throwable e ) {
+			Dialogs.showError(getShell(), "Error editing sort order.\n"+e.getMessage(), null);
+		}
 	}
 	
 	void editFilterSettings () {
 		try {
-			saveEntryAndModificationsIfNeeded();
+			saveEntryAndModifications();
 			Dialogs.showError(getShell(), "Not implemented yet.", null);
 		}
 		catch ( Throwable e ) {

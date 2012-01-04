@@ -577,7 +577,7 @@ class RepositoryPanel extends Composite {
 				tm = repo.openTm(tmName);
 				opt = options.getItem(tm.getUUID(), true);
 			}
-			long oldPageSize = opt.getPageSize();
+//			long oldPageSize = opt.getPageSize();
 			
 			ArrayList<Object> data = new ArrayList<Object>();
 			data.add(opt.getPageSize());

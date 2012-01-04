@@ -64,6 +64,27 @@ public class TransTableFilterTest {
 		assertEquals("1", tu.getId());
 	}
 		
+	@Test
+	public void testMinimalSourceTarget () {
+		String snippet = "TransTableV1\ten\tfr\n"
+			+ "\"okpCtx:tu=1\"\t\"source\"\t\"target\"";	
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		assertNotNull(tu);
+		assertEquals("source", tu.getSource().toString());
+		assertEquals("target", tu.getTarget(locFR).toString());
+		assertEquals("1", tu.getId());
+	}
+
+	@Test
+	public void testQuotesInput () {
+		String snippet = "\"TransTableV1\"\t\"en\"\t\"fr\"\n"
+			+ "okpCtx:tu=1\tsource";	
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		assertNotNull(tu);
+		assertEquals("source", tu.getSource().toString());
+		assertEquals("1", tu.getId());
+	}
+		
 	
 //	@Test
 //	public void testDoubleExtraction () {
