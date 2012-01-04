@@ -715,8 +715,7 @@ public class Tm implements ITm {
 	
 	@Override
 	public void setSortOrder (LinkedHashMap<String, Boolean> fields) {
-		
-		BasicDBObject sortObject = new BasicDBObject();
+		sortObject.clear();
 		for (Entry<String, Boolean> field : fields.entrySet()) {
 			sortObject.put(field.getKey(),field.getValue());
 		}
@@ -768,8 +767,27 @@ public class Tm implements ITm {
 	@Override
 	public long findPageForSegment (long segKey) {
 		if ( pageCount < 1 ) return -1;
-//TODO		
-		return -1;
+
+		DBCollection segColl = store.getDb().getCollection(name+"_SEG");
+		DBCursor cur = segColl.find().sort(sortObject);
+		
+		int index = 0;
+		boolean found = false;
+		
+		while(cur.hasNext()) {
+            index++;
+            DBObject obj = cur.next();
+            if((Integer)obj.get("_id") == segKey){
+            	found = true;
+            	break;
+            }
+        }
+		
+		if (!found){
+			return -1;
+		}else{
+			return (index / limit);
+		}
 	}
 
 	@Override
