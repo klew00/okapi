@@ -825,6 +825,7 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 					return;
 				}
 				// Move to the new row
+				table.setSelection(row);
 				cursor.setSelection(row, cursor.getColumn());
 			}
 			else { // Go to a page
