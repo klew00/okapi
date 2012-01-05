@@ -66,8 +66,11 @@ class StatusBar extends Composite {
 		pack();
 	}
 
-	void setInfo (String p_sText) {
+	void setInfo (String p_sText,
+		boolean displayNow)
+	{
 		infoLabel.setText((p_sText == null) ? "" : p_sText); //$NON-NLS-1$
+		if ( displayNow ) update(); // Force the text to be displayed now
 	}
 	
 	void clearInfo () {

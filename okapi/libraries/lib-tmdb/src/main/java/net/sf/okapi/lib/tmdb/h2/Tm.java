@@ -991,22 +991,15 @@ public class Tm implements ITm {
 		Statement stm = null;
 		try {
 			stm = store.getConnection().createStatement();
-			String tmp;
-
-//			tmp = String.format(
-//				"SELECT \"%s\", R FROM %s WHERE (R=1 OR MOD(R, (10-1))=1)", DbUtil.SEGKEY_NAME, rowSubQuery);
-
-			tmp = String.format(
+			String tmp = String.format(
 				"SELECT \"%s\", R FROM %s WHERE (\"%s\" / %d)=1 AND MOD(\"%s\", %d)=0",
 				DbUtil.SEGKEY_NAME, rowSubQuery, DbUtil.SEGKEY_NAME, segKey, DbUtil.SEGKEY_NAME, segKey);
 			
-			ResultSet rs = stm.executeQuery(tmp.toString());
-//			long x;
-//			while ( rs.next() ) {
-//				x = rs.getLong(2);
-//				x = rs.getLong(1);
-//			}
+//			tmp = String.format(
+//				"SELECT \"%s\", R FROM %s WHERE (-%s=-%d)",
+//				DbUtil.SEGKEY_NAME, rowSubQuery, DbUtil.SEGKEY_NAME, segKey);
 
+			ResultSet rs = stm.executeQuery(tmp.toString());
 			if ( rs.next() ) {
 				// Get the row number for this entry
 				long rn = rs.getLong(2);

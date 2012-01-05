@@ -751,6 +751,7 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 			if ( cursorLoc.y == -1 ) {
 				return; // Nothing to do
 			}
+			statusBar.setInfo("Deleting entries...", true);
 			saveEntryAndModifications();
 			ArrayList<Long> segKeys = new ArrayList<Long>();
 			for ( TableItem ti : table.getSelection() ) {
@@ -762,6 +763,9 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 		catch ( Throwable e ) {
 			Dialogs.showError(getShell(), "Error while deleting an entry.\n"+e.getMessage(), null);
 		}
+		finally {
+			statusBar.setInfo("", false);
+		}
 	}
 	
 	void saveAndRefresh () {
@@ -770,8 +774,9 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 			if ( cursorLoc.y == -1 ) {
 				return; // Nothing to do
 			}
+			// Note that fillTable saves the modifications if needed
+			// (but not the current entry)
 			saveEntry();
-			// fillTable saves the modifications if needed
 			fillTable(4, cursorLoc.y, 0, cursorLoc.x, -1);
 		}
 		catch ( Throwable e ) {
@@ -780,14 +785,14 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 	}
 	
 	/**
-	 * Move the cursor at the given segment location.
+	 * Move the cursor at the given segment or page.
 	 * @param value the key of the segment where to move. Use -1 have
-	 * the application prompt the user.
+	 * the application prompt the user. In that case the move can be a page.
 	 */
 	void gotoEntry (long value) {
 		try {
 			saveEntry();
-			char type = 'e';
+			char type = 's';
 			
 			// Prompt the user if needed
 			if ( value < 0 ) {
@@ -797,9 +802,11 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 				type = (Character)res[0];
 				value = (Long)res[1];
 			}
+
+			statusBar.setInfo("Looking up entry...", true);
 			
-			if ( type == 'e' ) {
-				// Get the page
+			if ( type == 's' ) {
+				// Get the page for this segment
 				if ( tm.getPageCount() != 1 ) {
 					long page = tm.findPageForSegment(value);
 					if ( page < 0 ) {
@@ -834,6 +841,9 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(getShell(), "Error while moving position.\n"+e.getMessage(), null);
+		}
+		finally {
+			statusBar.setInfo("", false);
 		}
 	}
 	
@@ -913,9 +923,7 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 		long pageIndex)
 	{
 		try {
-			statusBar.setInfo("Fetching data...");
-			statusBar.update(); // Force the text to be displayed now
-			
+			statusBar.setInfo("Fetching data...", true);
 			saveModificationsIfNeeded();
 			ResultSet rs = null;
 			switch ( direction ) {
@@ -988,7 +996,7 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 			Dialogs.showError(getShell(), "Error while filling the table.\n"+e.getMessage(), null);
 		}
 		finally {
-			statusBar.setInfo("");
+			statusBar.setInfo("", false);
 		}
 	}
 	
