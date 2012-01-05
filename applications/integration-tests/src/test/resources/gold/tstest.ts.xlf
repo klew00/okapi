@@ -7,14 +7,17 @@
 <trans-unit id="1" resname="1">
 <source xml:lang="en-us">hello <x id="1"/>world</source>
 <target xml:lang="fr-fr">hejsan <x id="1"/>varlden</target>
+<note from="translator">old hello translator comment</note>
 </trans-unit>
 <trans-unit id="2" resname="3" approved="yes">
 <source xml:lang="en-us">hello <x id="1"/>world</source>
 <target xml:lang="fr-fr">hejsan <x id="1"/>varlden</target>
+<note from="translator">old hello translator comment</note>
 </trans-unit>
 <trans-unit id="3" resname="4">
 <source xml:lang="en-us">hello <x id="1"/>world</source>
 <target xml:lang="fr-fr">hello <x id="1"/>world</target>
+<note from="translator">old hello translator comment</note>
 </trans-unit>
 </group>
 </group>
