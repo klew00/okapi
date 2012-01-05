@@ -191,6 +191,12 @@ public class TsFilterTest {
 		assertEquals("1", tu.getName());
 		assertFalse(tu.isEmpty());
 		
+		//--translator comments--
+		assertTrue(tu.hasProperty(Property.TRANSNOTE));
+		Property prop = tu.getProperty(Property.TRANSNOTE);
+		assertEquals("old hello translator comment", prop.getValue());
+		assertTrue(prop.isReadOnly());
+		
 		assertEquals("1", tu.getProperty("id").getValue());
 		assertEquals("utf-8", tu.getProperty("encoding").getValue());
 		assertEquals("no", tu.getProperty("numerus").getValue());

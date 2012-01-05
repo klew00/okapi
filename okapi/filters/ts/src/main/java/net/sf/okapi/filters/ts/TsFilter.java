@@ -94,6 +94,8 @@ public class TsFilter implements IFilter {
 		int numerusFormCount = 0;
 		String messageId = null;
 		
+		boolean procTransComment = false;
+		
 		int obsoletes = 0;
 		int approved = 0;
 		int unfinished = 0;
@@ -845,8 +847,12 @@ public class TsFilter implements IFilter {
 
 				StartElement startElem = event.asStartElement();
 				String startElemName = startElem.getName().getLocalPart();
-				
 				nextIsSkippableEmpty = nextIsSkippableEmpty(startElem);
+				
+				//--begin translator comment--
+				if( startElemName.equals("translatorcomment") ){
+					ts.procTransComment = true;
+				}
 				
 				if( startElemName.equals("message") ){
 					procStartElemMessage(startElem, tu);
@@ -879,6 +885,11 @@ public class TsFilter implements IFilter {
 
 				EndElement endElem = event.asEndElement();
 				String endElemName = endElem.getName().getLocalPart();
+				
+				//--end translator comment--
+				if( endElemName.equals("translatorcomment") ){
+					ts.procTransComment = false;
+				}
 				
 				if( endElemName.equals("source") ){
 					ts.currentMessageLocation = MessageLocation.RESOURCE;
@@ -1173,6 +1184,11 @@ public class TsFilter implements IFilter {
 	private void procCharacters (Characters chars,
 		ITextUnit tu)
 	{
+		//--setting translator comment--
+		if(ts.procTransComment){
+			tu.setProperty(new Property(Property.TRANSNOTE, chars.getData()));
+		}
+		
 		if ( ts.currentMessageLocation == MessageLocation.RESOURCE ) {
 			procCharacters(chars);
 		}
