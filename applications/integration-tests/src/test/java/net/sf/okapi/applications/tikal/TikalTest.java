@@ -52,7 +52,13 @@ public class TikalTest {
 		libDir = Util.getDirectoryName(libDir); // Go up one dir
 		libDir += String.format("%sdeployment%smaven%s%s%slib%s",
 			File.separator, File.separator, File.separator, distDir, File.separator, File.separator);
-		javaTikal = "java -jar \"" + libDir + "tikal.jar\"";
+		
+		if ( osName.startsWith("Windows") ) { // Windows case
+			javaTikal = "java -jar \"" + libDir + "tikal.jar\"";
+		}
+		else { // Assumes Mac, Unix or Linux
+			javaTikal = "java -jar " + libDir + "tikal.jar";
+		}
 	}
 	
     @Test
