@@ -219,8 +219,8 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 		optMoreInfo.add("Rainbow TKit - Versified with RTF"); // wiki page
 		writers.add("net.sf.okapi.steps.rainbowkit.versified.VersifiedRtfPackageWriter");
 		// Table options
-		optEditors.add(null);
-		optStrings.add(null);
+		optEditors.add("net.sf.okapi.filters.transtable.Parameters");
+		optStrings.add(createParameters(optEditors.get(optEditors.size()-1)));
 		optMoreInfo.add("Rainbow TKit - Translation Table"); // wiki page
 		writers.add("net.sf.okapi.steps.rainbowkit.table.TablePackageWriter");
 
@@ -405,7 +405,7 @@ public class CreationParametersEditor implements IParametersEditor, ISWTEmbeddab
 				+ "You can translate this package with Trados Translator's Workbench, WordFast or any RTF compatible editor.");
 			break;
 		case 9: // Table
-			btOptions.setEnabled(false);
+			btOptions.setEnabled(optEditors.get(n)!=null);
 			edDescription.setText("Package where the files to translate are converted into tab-delimited tables.\n"
 				+ "You can translate this package with a spreadsheet application.");
 			break;

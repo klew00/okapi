@@ -40,11 +40,14 @@ import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.resource.ISegments;
+import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.StartGroup;
 import net.sf.okapi.common.resource.StartSubDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.ITextUnit;
+import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.skeleton.ISkeletonWriter;
 
 public class TransTableWriter implements IFilterWriter {
@@ -53,6 +56,7 @@ public class TransTableWriter implements IFilterWriter {
 	public static final String SUBDOCUMENT_CRUMB = "sd=";
 	public static final String GROUP_CRUMB = "gp=";
 	public static final String TEXTUNIT_CRUMB = "tu=";
+	public static final String SEGMENT_CRUMB = "s=";
 	public static final String SIGNATURE = "TransTable";
 	public static final String VERSION = "V1";
 	public static final String ESCAPEABLE = "\\\"abfnrtv";
@@ -254,34 +258,85 @@ public class TransTableWriter implements IFilterWriter {
 			ITextUnit tu = event.getTextUnit();
 			if ( tu.isEmpty() ) return; // Do not write out entries with empty source
 			
+			if ( params.getAllowSegments() ) {
+				processWithSegments(tu);
+			}
+			else {
+				processWithoutSegments(tu);
+			}
+		}
+		catch ( Throwable e ) {
+			throw new OkapiIOException("Error writing a text unit.", e);
+		}
+	}
+	
+	private void processWithSegments (ITextUnit tu) {
+		try {
+			ISegments srcSegs = tu.getSourceSegments();
+			ISegments trgSegs = null;
+			TextContainer tc = tu.getTarget(language);
+			if ( tc != null ) {
+				trgSegs = tc.getSegments();
+			}
+	
+			for ( Segment srcSeg : srcSegs ) {
+				// Write the ID
+				writer.write("\"" + crumbs + ":" + TEXTUNIT_CRUMB+tu.getId() + ":" + SEGMENT_CRUMB+srcSeg.getId()+ "\"\t");
+				
+				// Write the source
+				writeQuotedContent(srcSeg.getContent());
+				
+				// Write the target
+				if ( trgSegs != null ) {
+					Segment trgSeg = trgSegs.get(srcSeg.getId());
+					if ( trgSeg != null ) {
+						writeQuotedContent(trgSeg.getContent());
+					}
+				}
+				// EOL
+				writer.write(LINEBREAK);
+			}
+		}
+		catch ( IOException e ) {
+			throw new OkapiIOException("Error writing segments.", e);
+		}
+	}
+	
+	private void processWithoutSegments (ITextUnit tu) {
+		try {
 			// ID reference to allow merging back and duplication of msgid text
 			writer.write("\"" + crumbs + ":" + TEXTUNIT_CRUMB+tu.getId() + "\"\t");
-
 			// Source
 			writeQuotedContent(tu.getSource());
 			writer.write("\t");
-
 			// Target
 			TextContainer tc = tu.getTarget(language);
 			if ( tc != null ) {
 				writeQuotedContent(tc);
 			}
-			
 			// EOL
 			writer.write(LINEBREAK);
 		}
 		catch ( IOException e ) {
-			throw new OkapiIOException("Error writing a text unit.", e);
+			throw new OkapiIOException("Error writing text unit.", e);
 		}
 	}
 
+	private void writeQuotedContent (TextFragment tf) {
+		try {
+			String tmp = fmt.fromFragmentToLetterCoded(tf);
+			tmp = escapeIfNeeded(tmp);
+			writer.write("\"");
+			writer.write(tmp); // No wrapping needed
+			writer.write("\"");
+		}
+		catch ( IOException e ) {
+			throw new OkapiIOException("Error writing a quoted text.", e);
+		}
+	}
+	
 	private void writeQuotedContent (TextContainer tc) {
 		try {
-			if ( tc == null ) {
-				writer.write("\"\"");
-				return;
-			}
-
 			String tmp;
 			if ( tc.contentIsOneSegment() ) {
 				tmp = fmt.fromFragmentToLetterCoded(tc.getFirstContent());

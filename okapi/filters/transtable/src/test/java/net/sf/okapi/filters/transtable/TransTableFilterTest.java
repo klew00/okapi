@@ -85,6 +85,66 @@ public class TransTableFilterTest {
 		assertEquals("1", tu.getId());
 	}
 		
+	@Test
+	public void testUnSegmented () {
+		String snippet = "\"TransTableV1\"\t\"en\"\t\"fr\"\n"
+			+ "okpCtx:tu=1:s=0\tsource1\n"	
+			+ "okpCtx:tu=2\tsource2";	
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		assertEquals("source1", tu.getSource().toString());
+		assertEquals("1", tu.getId());
+		tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 2);
+		assertEquals("source2", tu.getSource().toString());
+		assertEquals("2", tu.getId());
+	}
+		
+	@Test
+	public void testSegmented () {
+		String snippet = "\"TransTableV1\"\t\"en\"\t\"fr\"\n"
+			+ "okpCtx:tu=1:s=0\tsource1\n"	
+			+ "okpCtx:tu=2:s=0\tsrc2-seg0\n"	
+			+ "okpCtx:tu=2:s=1\tsrc2-seg1\n"	
+			+ "okpCtx:tu=2:s=2\tsrc2-seg2\n"	
+			+ "okpCtx:tu=3:s=ZZZ\tsrc3-segZZZ\n"	
+			+ "okpCtx:tu=4\tsrc4-seg0";	
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		assertEquals("source1", tu.getSource().toString());
+		assertEquals("1", tu.getId());
+		tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 2);
+		assertEquals("src2-seg0src2-seg1src2-seg2", tu.getSource().toString());
+		assertEquals("2", tu.getId());
+		tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 3);
+		assertEquals("src3-segZZZ", tu.getSource().toString());
+		assertEquals("src3-segZZZ", tu.getSourceSegments().get("ZZZ").getContent().toString());
+		assertEquals("3", tu.getId());
+	}
+
+	@Test
+	public void testSegmentedWithTarget () {
+		String snippet = "\"TransTableV1\"\t\"en\"\t\"fr\"\n"
+			+ "okpCtx:tu=1:s=0\tsource1\ttarget1\n"	
+			+ "okpCtx:tu=2:s=0\tsrc2-seg0\n"
+			+ "\n  \n\n"
+			+ "okpCtx:tu=2:s=1\tsrc2-seg1\ttrg2-seg1\n"	
+			+ "okpCtx:tu=2:s=2\tsrc2-seg2\n"
+			+ "okpCtx:tu=3:s=ZZZ\tsrc3-segZZZ\n"	
+			+ "okpCtx:tu=4\tsrc4-seg0\ttrg4-seg0\n";	
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 1);
+		assertEquals("source1", tu.getSource().toString());
+		assertEquals("target1", tu.getTarget(locFR).toString());
+		assertEquals("1", tu.getId());
+		tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 2);
+		assertEquals("src2-seg0src2-seg1src2-seg2", tu.getSource().toString());
+		assertEquals("trg2-seg1", tu.getTarget(locFR).toString());
+		assertEquals("2", tu.getId());
+		tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 3);
+		assertEquals("src3-segZZZ", tu.getSource().toString());
+		assertEquals("src3-segZZZ", tu.getSourceSegments().get("ZZZ").getContent().toString());
+		assertEquals("3", tu.getId());
+		tu = FilterTestDriver.getTextUnit(getEvents(snippet, locEN, locFR), 4);
+		assertEquals("src4-seg0", tu.getSource().toString());
+		assertEquals("trg4-seg0", tu.getTarget(locFR).toString());
+	}
 	
 //	@Test
 //	public void testDoubleExtraction () {

@@ -21,11 +21,13 @@
 package net.sf.okapi.steps.rainbowkit.table;
 
 import net.sf.okapi.common.Event;
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.filters.rainbowkit.Manifest;
 import net.sf.okapi.filters.rainbowkit.MergingInfo;
 import net.sf.okapi.filters.transtable.TransTableWriter;
 import net.sf.okapi.steps.rainbowkit.common.BasePackageWriter;
+import net.sf.okapi.filters.transtable.Parameters;
 
 public class TablePackageWriter extends BasePackageWriter {
 
@@ -47,6 +49,13 @@ public class TablePackageWriter extends BasePackageWriter {
 		super.processStartDocument(event);
 		
 		writer = new TransTableWriter();
+		// Get the parameters/options for the package
+		Parameters options = (Parameters)writer.getParameters();
+		// Get the options from the parameters
+		if ( !Util.isEmpty(params.getWriterOptions()) ) {
+			options.fromString(params.getWriterOptions());
+		}
+		
 		writer.setOptions(manifest.getTargetLocale(), "UTF-8");
 		
 		MergingInfo item = manifest.getItem(docId);

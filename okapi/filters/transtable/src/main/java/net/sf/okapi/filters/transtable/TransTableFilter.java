@@ -33,6 +33,7 @@ import net.sf.okapi.common.BOMNewlineEncodingDetector;
 import net.sf.okapi.common.Event;
 import net.sf.okapi.common.EventType;
 import net.sf.okapi.common.IParameters;
+import net.sf.okapi.common.IResource;
 import net.sf.okapi.common.IdGenerator;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.encoder.EncoderManager;
@@ -46,8 +47,10 @@ import net.sf.okapi.common.filterwriter.GenericFilterWriter;
 import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.Ending;
+import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextUnit;
@@ -73,6 +76,13 @@ public class TransTableFilter implements IFilter {
 	private EncoderManager encoderManager;
 	private boolean hasNext;
 	private GenericContent fmt;
+	private ITextUnit tu;
+	private ISegments srcSegs;
+	private ISegments trgSegs;
+	private String currentTuId;
+	private boolean needToRead;
+	private String[] parts;
+	private String[] ids;
 	
 	public TransTableFilter () {
 		fmt = new GenericContent();
@@ -129,6 +139,7 @@ public class TransTableFilter implements IFilter {
 	}
 
 	public boolean hasNext () {
+		if ( !queue.isEmpty() ) return true;
 		return hasNext;
 	}
 
@@ -148,54 +159,95 @@ public class TransTableFilter implements IFilter {
 			// Next entry in the table
 			String tmp;
 			while ( true ) {
-				try {
-					tmp = reader.readLine();
-				}
-				catch ( IOException e ) {
-					throw new OkapiIOException("Error reading the table.", e);
-				}
-				// Process the line
-				if ( tmp == null ) {
-					// End of the file
-					hasNext = false;
-					Ending ending = new Ending(otherId.createId());
-					return new Event(EventType.END_DOCUMENT, ending);
-				}
-				else {
+				
+				// Read and parse the line if needed
+				if ( needToRead ) {
+					try {
+						tmp = reader.readLine();
+					}
+					catch ( IOException e ) {
+						throw new OkapiIOException("Error reading the table.", e);
+					}
+					
+					// Check for end of file
+					if ( tmp == null ) {
+						hasNext = false;
+						// Finish the current text unit if needed
+						if ( tu != null ) {
+							queue.add(new Event(EventType.TEXT_UNIT, tu));
+						}
+						// Last even if end-of-document
+						Ending ending = new Ending(otherId.createId());
+						queue.add(new Event(EventType.END_DOCUMENT, ending));
+						// Return whatever is in the queue
+						return queue.poll();
+					}
+					
+					// Else: process the line
 					line++;
 					// Check for empty or white-spaces-only lines (allowed)
 					if ( tmp.trim().length() == 0 ) {
 						continue;
 					}
-					
 					// Parse the line
-					String[] parts = tmp.split("\t");
+					parts = tmp.split("\t");
 					if ( parts.length < 2 ) {
 						throw new OkapiIOException(String.format("Not enough fields in line %d.", line));
 					}
-
-					String id = parseCrumbs(unescape(parts[0]));
-					ITextUnit tu = new TextUnit(id);
-					
-					// Source
-					tmp = unescape(parts[1]);
-					TextFragment srcFrag = fmt.fromLetterCodedToFragment(tmp, null, false);
-					tu.setSourceContent(srcFrag);
-					
-					// Process the target if there is one
-					if ( parts.length > 2 ) {
-						tmp = unescape(parts[2]);
-						TextFragment trgFrag = fmt.fromLetterCodedToFragment(tmp, null, false);
-						// Synchronizes source and target codes as much as possible
-						trgFrag.alignCodeIds(srcFrag);
-						// Set the content
-						tu.setTargetContent(trgLoc, trgFrag);
-					}
-					
-					return new Event(EventType.TEXT_UNIT, tu);
+					ids = parseCrumbs(unescape(parts[0]));
 				}
-			}
+				needToRead = true;
 
+				// Check if we are still in the same text unit (several segments)
+				if ( !currentTuId.equals(ids[0]) ) {
+					// This is a new text unit:
+					// Return the current one if needed
+					if ( tu != null ) {
+						needToRead = false; // Make sure we don't re-read
+						Event event = new Event(EventType.TEXT_UNIT, tu);
+						// Reset the text unit work variable for next time
+						tu = null;
+						srcSegs = null;
+						trgSegs = null;
+						// Return the text unit
+						return event;
+					}
+					// Start the new text unit
+					currentTuId = ids[0];
+					tu = new TextUnit(currentTuId);
+				}
+
+				// Store the text of this line
+				// Note that segmented text unit are represented without any content
+				// between segments as that information is not stored in the table
+				
+				// Process the source
+				tmp = unescape(parts[1]);
+				TextFragment srcFrag = fmt.fromLetterCodedToFragment(tmp, null, false);
+				if ( srcSegs == null ) {
+					srcSegs = tu.getSourceSegments();
+				}
+				if ( ids[1] == null ) ids[1] = "0"; // Set default segment id if none was provided
+				srcSegs.append(new Segment(ids[1], srcFrag));
+					
+				// Process the target if there is one
+				if ( parts.length > 2 ) {
+					tmp = unescape(parts[2]);
+					TextFragment trgFrag = fmt.fromLetterCodedToFragment(tmp, null, false);
+					// Synchronizes source and target codes as much as possible
+					trgFrag.alignCodeIds(srcFrag);
+					// Set the content
+					if ( trgSegs == null ) {
+						// Create the target container first
+						tu.createTarget(trgLoc, false, IResource.CREATE_EMPTY);
+						// Then get the segments interface
+						trgSegs = tu.getTargetSegments(trgLoc);
+					}
+					trgSegs.append(new Segment(ids[1], trgFrag));
+				}
+
+				// Move to the next line
+			}
 		}
 		catch ( Throwable e ) {
 			throw new OkapiIOException(String.format("Error parsing the table in line %d.", line));
@@ -250,6 +302,9 @@ public class TransTableFilter implements IFilter {
 		otherId = new IdGenerator(null);
 		line = 0;
 		hasNext = true;
+		tu = null;
+		currentTuId = "";
+		needToRead = true;
 		
 		// Read the first line
 		String tmp;
@@ -321,14 +376,14 @@ public class TransTableFilter implements IFilter {
 		return tmp;
 	}
 
-	private String parseCrumbs (String text) {
+	private String[] parseCrumbs (String text) {
 		// Check if it is a crumbs-string or not
 		if ( !text.startsWith(TransTableWriter.CRUMBS_PREFIX) ) {
 			// Not an expected pattern
 			throw new OkapiIOException(String.format("Error in ID pattern ('%s'", text));
 		}
 
-		// Get the text unit id
+		// Get the text unit id and segment parts
 		int n = text.indexOf(TransTableWriter.TEXTUNIT_CRUMB);
 		if ( n == -1 ) {
 			throw new OkapiIOException(String.format("Error in ID pattern ('%s'", text));
@@ -338,7 +393,18 @@ public class TransTableFilter implements IFilter {
 			// Something is not right
 			throw new OkapiIOException(String.format("Error in ID pattern ('%s'", text));
 		}
-		return tmp;
+		
+		String[] res = new String[2];
+		// Check for segments
+		n = tmp.indexOf(':');
+		if ( n == -1 ) {
+			res[0] = tmp;
+		}
+		else { // Has segment id
+			res[0] = tmp.substring(0, n);
+			res[1] = tmp.substring(n+1+TransTableWriter.SEGMENT_CRUMB.length()); // ":s=<id>"
+		}
+		return res;
 	}
 	
 }

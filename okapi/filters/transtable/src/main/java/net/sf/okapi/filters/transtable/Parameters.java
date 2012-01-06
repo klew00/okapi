@@ -21,63 +21,60 @@ See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 package net.sf.okapi.filters.transtable;
 
 import net.sf.okapi.common.BaseParameters;
-import net.sf.okapi.common.filters.InlineCodeFinder;
+import net.sf.okapi.common.EditorFor;
+import net.sf.okapi.common.ParametersDescription;
+import net.sf.okapi.common.uidescription.EditorDescription;
+import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
 
-public class Parameters extends BaseParameters {
+@EditorFor(Parameters.class)
+public class Parameters extends BaseParameters implements IEditorDescriptionProvider {
 
-	private static final String USECODEFINDER = "useCodeFinder";
-	private static final String CODEFINDERRULES = "codeFinderRules";
+	private static final String ALLOWSEGMENTS = "allowSegments";
 
-	private boolean useCodeFinder;
-	private InlineCodeFinder codeFinder;
+	private boolean allowSegments;
 
 	public Parameters () {
-		codeFinder = new InlineCodeFinder();
 		reset();
 		toString(); // Fill the list
 	}
 	
-	public boolean getUseCodeFinder () {
-		return useCodeFinder;
+	public boolean getAllowSegments () {
+		return allowSegments;
 	}
 	
-	public void setUseCodeFinder (boolean useCodeFinder) {
-		this.useCodeFinder = useCodeFinder;
-	}
-	
-	public InlineCodeFinder getCodeFinder () {
-		return codeFinder;
-	}
-
-	public void setCodeFinder (InlineCodeFinder codeFinder) {
-		this.codeFinder = codeFinder;
+	public void setAllowSegments (boolean allowSegments) {
+		this.allowSegments = allowSegments;
 	}
 
 	public void reset () {
-		useCodeFinder = true;
-		codeFinder.reset();
-		codeFinder.setSample("%s, %d, {1}, \\n, \\r, \\t, etc.");
-		codeFinder.setUseAllRulesWhenTesting(true);
-		// Default in-line codes: special escaped-chars and printf-style variable
-		codeFinder.addRule("%(([-0+#]?)[-0+#]?)((\\d\\$)?)(([\\d\\*]*)(\\.[\\d\\*]*)?)[dioxXucsfeEgGpn]");
-		codeFinder.addRule("(\\\\r\\\\n)|\\\\a|\\\\b|\\\\f|\\\\n|\\\\r|\\\\t|\\\\v");
-		//TODO: Add Java-style variables. this is too basic
-		codeFinder.addRule("\\{\\d.*?\\}");
+		allowSegments = true;
 	}
 
 	@Override
 	public String toString () {
 		buffer.reset();
-		buffer.setBoolean(USECODEFINDER, useCodeFinder);
-		buffer.setGroup(CODEFINDERRULES, codeFinder.toString());
+		buffer.setBoolean(ALLOWSEGMENTS, allowSegments);
 		return buffer.toString();
 	}
 	
 	public void fromString (String data) {
 		reset();
 		buffer.fromString(data);
-		useCodeFinder = buffer.getBoolean(USECODEFINDER, useCodeFinder);
-		codeFinder.fromString(buffer.getGroup(CODEFINDERRULES, ""));
+		allowSegments = buffer.getBoolean(ALLOWSEGMENTS, allowSegments);
+	}
+
+	@Override
+	public EditorDescription createEditorDescription (ParametersDescription paramDesc) {
+		EditorDescription desc = new EditorDescription("Translation Table Parameters", true, false);
+		desc.addCheckboxPart(paramDesc.get(ALLOWSEGMENTS));
+		return desc;
+	}
+	
+	@Override
+	public ParametersDescription getParametersDescription () {
+		ParametersDescription desc = new ParametersDescription(this);
+		desc.add(ALLOWSEGMENTS, "Allow segmentation (one row per segment)", null);
+		return desc;
 	}
 
 }
