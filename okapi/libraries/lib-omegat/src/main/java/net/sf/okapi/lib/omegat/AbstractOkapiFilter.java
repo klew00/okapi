@@ -220,7 +220,8 @@ abstract class AbstractOkapiFilter implements org.omegat.filters2.IFilter {
     	}
     	String outEncoding = context.getOutEncoding();
     	if ( outEncoding == null ) { // auto
-    		outEncoding = defaultOutEncoding;
+    		if ( filterConfigId.startsWith("okf_ttx") ) outEncoding = "UTF-16";
+    		else outEncoding = defaultOutEncoding;
     	}
     	
 		Segment trgSeg;

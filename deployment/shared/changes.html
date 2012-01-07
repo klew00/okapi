@@ -35,13 +35,14 @@ distribution.</p>
 </ul>
 	</li>
 	<li>Filters Plugin for OmegaT:<ul>
-	<li>Changed the TTX filter implementation back to a single option: the mode 
-	0 that auto-detect segments.</li>
+	<li>Existing segmentation is auto-detected.</li>
 </ul>
 	<ul>
 		<li>Fixed code re-construction issues for some cases.</li>
 		<li>Improved backward compatibility, and implemented support for 
 		alternate translation of repeated source segments for OmeagT 2.5.</li>
+		<li>Now if output encoding is not defained for TTX file, UTF-16 is used 
+		(instead of UTF-8).</li>
 	</ul>
 	</li>
 	<li>Steps:<ul>
