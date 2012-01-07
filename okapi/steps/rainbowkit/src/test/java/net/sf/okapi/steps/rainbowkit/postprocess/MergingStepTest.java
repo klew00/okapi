@@ -36,7 +36,6 @@ import net.sf.okapi.common.pipelinedriver.PipelineDriver;
 import net.sf.okapi.filters.openoffice.OpenOfficeFilter;
 import net.sf.okapi.filters.properties.PropertiesFilter;
 import net.sf.okapi.filters.rainbowkit.RainbowKitFilter;
-import net.sf.okapi.filters.xini.XINIFilter;
 import net.sf.okapi.filters.xliff.XLIFFFilter;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 
