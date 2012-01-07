@@ -353,7 +353,7 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<artifactId>okapi-step-sentence-aligner</artifactId>
+			<artifactId>okapi-step-aligner</artifactId>
 			<groupId>net.sf.okapi.steps</groupId>
 			<version>${project.version}</version>
 		</dependency>

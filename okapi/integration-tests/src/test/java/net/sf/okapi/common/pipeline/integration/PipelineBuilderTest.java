@@ -35,7 +35,7 @@ import net.sf.okapi.lib.extra.pipelinebuilder.XPipeline;
 import net.sf.okapi.lib.extra.pipelinebuilder.XPipelineType;
 import net.sf.okapi.steps.common.FilterEventsWriterStep;
 import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
-import net.sf.okapi.steps.gcaligner.SentenceAlignerStep;
+import net.sf.okapi.steps.sentencealigner.SentenceAlignerStep;
 
 
 public class PipelineBuilderTest {

@@ -54,7 +54,7 @@
 		
 		<dependency>
 			<groupId>net.sf.okapi.steps</groupId>
-			<artifactId>okapi-step-sentence-aligner</artifactId>
+			<artifactId>okapi-step-aligner</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>

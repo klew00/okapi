@@ -96,7 +96,7 @@ public class OkapiGUITester {
 
 			// Descriptors
 			net.sf.okapi.steps.batchtranslation.Parameters.class.getName(),
-			net.sf.okapi.steps.gcaligner.Parameters.class.getName() };
+			net.sf.okapi.steps.sentencealigner.Parameters.class.getName() };
 
 	private Group grpParameters;
 	private FormData formData_1;

@@ -117,7 +117,7 @@
 
 		<dependency>
 			<groupId>net.sf.okapi.steps</groupId>
-			<artifactId>okapi-step-sentence-aligner</artifactId>
+			<artifactId>okapi-step-aligner</artifactId>
 			<version>0.15-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
