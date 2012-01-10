@@ -69,6 +69,9 @@ public class TraversalTest {
 		elem = getElement(trav, "term", 1);
 		assertNotNull(elem);
 		assertTrue(trav.isTerm());
+		// This is empty because ref in id(@ref) is not defined as IDType
+		// So no text is detected
+		assertEquals("", trav.getTermInfo());
 	}
 
 	@Test

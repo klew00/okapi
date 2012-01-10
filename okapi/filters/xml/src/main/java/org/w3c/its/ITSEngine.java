@@ -1022,6 +1022,10 @@ public class ITSEngine implements IProcessor, ITraversal
 	public boolean isTerm () {
 		return trace.peek().term;
 	}
+	
+	public String getTermInfo () {
+		return trace.peek().termInfo;
+	}
 
 	public boolean isTerm (Attr attribute) {
 		if ( attribute == null ) return false;

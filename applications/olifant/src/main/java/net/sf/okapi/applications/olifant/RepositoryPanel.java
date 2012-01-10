@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2011 by the Okapi Framework contributors
+  Copyright (C) 2011-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -422,13 +422,10 @@ class RepositoryPanel extends Composite {
 	void selectRepository () {
 		try {
 			if ( !mainForm.canCloseRepository() ) return;
-			RepositoryForm dlg = new RepositoryForm(getShell(), mainForm.getHelp(), repoType, repoParam,
-				mainForm.getUserConfiguration().getBoolean(MainForm.OPT_AUTOOPENREPOSITORY));
+			RepositoryForm dlg = new RepositoryForm(getShell(), mainForm, repoType, repoParam);
 			Object[] res = dlg.showDialog();
 			if ( res == null ) return; // No repository selected
-
 			openRepository((String)res[0], (String)res[1]);
-			mainForm.getUserConfiguration().setProperty(MainForm.OPT_AUTOOPENREPOSITORY, (Boolean)res[2]);
 		}
 		catch ( Throwable e ) {
 			Dialogs.showError(getShell(), "Error selecting repository.\n"+e.getMessage(), null);

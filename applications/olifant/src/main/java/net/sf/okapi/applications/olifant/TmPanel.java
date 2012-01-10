@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2011 by the Okapi Framework contributors
+  Copyright (C) 2011-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -37,6 +37,7 @@ import net.sf.okapi.lib.tmdb.Location;
 import net.sf.okapi.lib.tmdb.SearchAndReplace;
 import net.sf.okapi.lib.tmdb.SearchAndReplaceOptions;
 import net.sf.okapi.lib.tmdb.SearchAndReplaceOptions.ACTION;
+import net.sf.okapi.lib.tmdb.filter.FilterOptions;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabItem;
@@ -97,6 +98,7 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 	private TMOptions opt;
 	private SearchAndReplaceForm sarForm;
 	private SearchAndReplaceOptions sarOptions;
+	private FilterOptions fltOptions;
 
 	private MenuItem miCtxAddEntry;
 	private MenuItem miCtxDeleteEntries;
@@ -121,6 +123,7 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 		trgCol = -1;
 		
 		sarOptions = new SearchAndReplaceOptions();
+		fltOptions = new FilterOptions();
 		
 		GridLayout layout = new GridLayout(1, false);
 		layout.marginHeight = 0;
@@ -834,6 +837,7 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 				// Move to the new row
 				table.setSelection(row);
 				cursor.setSelection(row, cursor.getColumn());
+				updateCurrentEntry();
 			}
 			else { // Go to a page
 				fillTable(5, 0, 0, cursor.getColumn(), value);
@@ -1146,6 +1150,10 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 	void editFilterSettings () {
 		try {
 			saveEntryAndModifications();
+			
+			FilterForm dlg = new FilterForm(getShell(), fltOptions, getTm().getAvailableFields());
+			if ( !dlg.showDialog() ) return;
+			
 			Dialogs.showError(getShell(), "Not implemented yet.", null);
 		}
 		catch ( Throwable e ) {

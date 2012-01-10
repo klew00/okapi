@@ -42,6 +42,7 @@ import com.ibm.icu.text.BreakIterator;
 
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.annotation.TermsAnnotation;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextUnitUtil;
@@ -56,6 +57,7 @@ public class SimpleTermExtractor {
 	private Map<String, Boolean> notStartWords;
 	private Map<String, Boolean> notEndWords;
 	private Map<String, Integer> terms;
+	private Map<String, Integer> annotationTerms;
 	private Locale srcLocale;
 	private BreakIterator breaker;
 	private String rootDir;
@@ -78,6 +80,7 @@ public class SimpleTermExtractor {
 		notStartWords = loadList(params.getNotStartWordsPath(), "notStartWords_en.txt");
 		notEndWords = loadList(params.getNotEndWordsPath(), "notEndWords_en.txt");
 		terms = new LinkedHashMap<String, Integer>();
+		annotationTerms = new LinkedHashMap<String, Integer>();
 		breaker = null;
 	}
 	
@@ -155,6 +158,20 @@ public class SimpleTermExtractor {
 				}
 			}
 		}
+		
+		// Extract from the TermsAnnotation
+		TermsAnnotation ann = tu.getSource().getAnnotation(TermsAnnotation.class);
+		if ( ann != null ) {
+			for ( int i=0; i<ann.size(); i++ ) {
+				term = ann.getTerm(i);
+				if ( annotationTerms.containsKey(term) ) {
+					annotationTerms.put(term, annotationTerms.get(term)+1);
+				}
+				else {
+					annotationTerms.put(term, 1);
+				}
+			}
+		}
 	}
 	
 	/**
@@ -190,6 +207,9 @@ public class SimpleTermExtractor {
 			// Then re-cleanup entries with less occurrences than allowed
 			cleanupLowCounts(terms);
 		}
+		
+		// Add annotation-terms
+		terms.putAll(annotationTerms);
 
 		// Sort alphabetically
 		terms = new TreeMap<String, Integer>(terms);

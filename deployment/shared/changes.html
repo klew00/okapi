@@ -72,6 +72,11 @@ distribution.</p>
 	cases when it should.</li>
 </ul>
 	</li>
+	<li>Term Extraction Step:<ul>
+	<li>The <i>TermsAnnotation</i> annotations are taken into account and are 
+	extracted.</li>
+</ul>
+	</li>
 </ul>
 	</li>
 	<li>Connectors:<ul>
@@ -135,6 +140,8 @@ distribution.</p>
 	</li>
 	<li>OpenXML Filter:<ul>
 	<li>Fixed the issue where a ZIP stream was not closed properly.</li>
+	<li>Fixed issue #143 (Excel parameters not working)</li>
+	<li>Fixed issue #144 (Color not save for Excel options))</li>
 </ul>
 	</li>
 	<li>XML Filter:<ul>
@@ -144,6 +151,8 @@ distribution.</p>
 	lost of spaces in fragment extraction).</li>
 		<li>Fixed issue where translation context was not reset after an embedded 
 	structural translatable element was extracted (e.g. para inside para case)</li>
+		<li><i>TermsAnnotation</i> annotations are now generated for entries 
+		matching the ITS Terminology datacategory.</li>
 	</ul></li>
 </ul>
 	</li>

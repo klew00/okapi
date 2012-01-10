@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2011 by the Okapi Framework contributors
+  Copyright (C) 2011-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -74,6 +74,9 @@ public class MainForm {
 	public static final String OPT_REPOSITORYTYPE = "repositoryType"; //$NON-NLS-1$
 	public static final String OPT_REPOSITORYPARAM = "repositoryParam"; //$NON-NLS-1$
 	public static final String OPT_AUTOOPENREPOSITORY = "autoOpenRepository"; //$NON-NLS-1$
+	public static final String OPT_REPODATA_OTHERLOCALORNETWORK = "repoDataOtherLocalNetwork"; //$NON-NLS-1$
+	public static final String OPT_REPODATA_MONGOSERVER = "repoDataMongoServer"; //$NON-NLS-1$
+	public static final String OPT_REPODATA_H2SERVER = "repoDataH2Server"; //$NON-NLS-1$
 	public static final String OPT_TMOPT = "tmOptions_"; //$NON-NLS-1$
 
 	private static final String HELP_USAGE = "Olifant - Usage"; //$NON-NLS-1$

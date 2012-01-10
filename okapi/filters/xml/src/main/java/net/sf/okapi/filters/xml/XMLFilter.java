@@ -39,6 +39,7 @@ import net.sf.okapi.common.IdGenerator;
 import net.sf.okapi.common.MimeTypeMapper;
 import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.Util;
+import net.sf.okapi.common.annotation.TermsAnnotation;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.filters.FilterConfiguration;
@@ -91,6 +92,7 @@ public class XMLFilter implements IFilter {
 	private Parameters params;
 	private boolean hasUTF8BOM;
 	private EncoderManager encoderManager;
+	private TermsAnnotation terms;
 
 	public XMLFilter () {
 		params = new Parameters();
@@ -305,7 +307,7 @@ public class XMLFilter implements IFilter {
 		
 		// Apply the all rules (external and internal) to the document
 		itsEng.applyRules(IProcessor.DC_TRANSLATE | IProcessor.DC_LANGINFO 
-			| IProcessor.DC_LOCNOTE | IProcessor.DC_WITHINTEXT);
+			| IProcessor.DC_LOCNOTE | IProcessor.DC_WITHINTEXT | IProcessor.DC_TERMINOLOGY);
 		
 		trav = itsEng;
 		trav.startTraversal();
@@ -675,6 +677,13 @@ public class XMLFilter implements IFilter {
 					frag.append(TagType.CLOSING, node.getLocalName(), buildEndTag(node));
 				}
 			}
+			
+			if ( trav.isTerm() ) {
+				if ( terms == null ) {
+					terms = new TermsAnnotation();
+				}
+				terms.add(node.getTextContent(), trav.getTermInfo());
+			}
 		}
 		else { // Else: Start tag
 			switch ( trav.getWithinText() ) {
@@ -784,6 +793,11 @@ public class XMLFilter implements IFilter {
 		String locNote = context.peek().locNote;
 		if ( locNote != null ) {
 			tu.setProperty(new Property(Property.NOTE, locNote));
+		}
+		
+		if ( terms != null ) {
+			tu.getSource().setAnnotation(terms);
+			terms = null; // Reset for next time
 		}
 		
 		String id = context.peek().idPointer;

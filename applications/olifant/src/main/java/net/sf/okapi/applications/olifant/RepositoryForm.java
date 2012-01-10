@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2011 by the Okapi Framework contributors
+  Copyright (C) 2011-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -28,6 +28,7 @@ import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.TextAndBrowsePanel;
 import net.sf.okapi.common.ui.UIUtil;
+import net.sf.okapi.common.ui.UserConfiguration;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -62,16 +63,17 @@ class RepositoryForm {
 	private final Text edH2ServerBased;
 	private final String defaultLocalname;
 	private final Button chkAutoOpen;
+	private final MainForm mainForm;
 
 	private Object[] results = null;
 
 	RepositoryForm (Shell parent,
-		IHelp helpParam,
+		MainForm mainForm,
 		String type,
-		String param,
-		boolean autoOpen)
+		String param)
 	{
-		help = helpParam;
+		this.mainForm = mainForm;
+		help = mainForm.getHelp();
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		shell.setText("Repository Selection");
 		UIUtil.inheritIcon(shell, parent);
@@ -161,10 +163,16 @@ class RepositoryForm {
 		group.setLayout(new GridLayout());
 		group.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
+		UserConfiguration uc = mainForm.getUserConfiguration();
+		
 		chkAutoOpen = new Button(group, SWT.CHECK);
 		chkAutoOpen.setText("When starting Olifant, open automatically the last repository used");
 		chkAutoOpen.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
+		pnlOtherLocal.setText(uc.getProperty(MainForm.OPT_REPODATA_OTHERLOCALORNETWORK, ""));
+		edMongoServerBased.setText(uc.getProperty(MainForm.OPT_REPODATA_MONGOSERVER, ""));
+		edH2ServerBased.setText(uc.getProperty(MainForm.OPT_REPODATA_H2SERVER, ""));
+		
 		// Set the current selection
 		if ( type == null ) type = REPOTYPE_DEFAULTLOCAL;
 		if ( param == null ) param = "";
@@ -187,7 +195,7 @@ class RepositoryForm {
 			rdDefaultLocal.setSelection(true);
 		}
 		
-		chkAutoOpen.setSelection(autoOpen);
+		chkAutoOpen.setSelection(mainForm.getUserConfiguration().getBoolean(MainForm.OPT_AUTOOPENREPOSITORY));
 		
 		updateDisplay();
 
@@ -225,8 +233,8 @@ class RepositoryForm {
 	
 	/**
 	 * Opens and show the dialog.
-	 * @return an array of 3 objects (0=repository type, 1=repository parameter
-	 * 2=auto-open option), or null if the user cancelled the operation.
+	 * @return an array of 2 objects (0=repository type, 1=repository parameter),
+	 * or null if the user cancelled the operation.
 	 */
 	Object[] showDialog () {
 		shell.open();
@@ -239,7 +247,7 @@ class RepositoryForm {
 
 	private boolean saveData () {
 		try {
-			Object[] res = new Object[3];
+			Object[] res = new Object[2];
 			if ( rdDefaultLocal.getSelection() ) {
 				res[0] = REPOTYPE_DEFAULTLOCAL;
 				res[1] = defaultLocalname;
@@ -277,7 +285,13 @@ class RepositoryForm {
 				res[0] = REPOTYPE_OTHERLOCALORNETWORK;
 				res[1] = path;
 			}
-			res[2] = chkAutoOpen.getSelection();
+			
+			UserConfiguration uc = mainForm.getUserConfiguration();
+			uc.setProperty(MainForm.OPT_AUTOOPENREPOSITORY, chkAutoOpen.getSelection());
+			uc.setProperty(MainForm.OPT_REPODATA_OTHERLOCALORNETWORK, pnlOtherLocal.getText());
+			uc.setProperty(MainForm.OPT_REPODATA_MONGOSERVER, edMongoServerBased.getText());
+			uc.setProperty(MainForm.OPT_REPODATA_H2SERVER, edH2ServerBased.getText());
+
 			results = res;
 		}
 		catch ( Exception e ) {

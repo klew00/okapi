@@ -110,6 +110,12 @@ public interface ITraversal {
 	 * @return True if the current node is a tern, false otherwise.
 	 */
 	public boolean isTerm ();
+
+	/**
+	 * Gets the information associated with a given term node.
+	 * @return the information associated with a given term node.
+	 */
+	public String getTermInfo ();
 	
 	/**
 	 * Indicates if a given attribute of the current element of the traversal is

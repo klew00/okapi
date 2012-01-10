@@ -28,6 +28,7 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.XMLWriter;
 import net.sf.okapi.common.annotation.AltTranslation;
 import net.sf.okapi.common.annotation.AltTranslationsAnnotation;
+import net.sf.okapi.common.annotation.TermsAnnotation;
 import net.sf.okapi.common.encoder.EncoderManager;
 import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
 import net.sf.okapi.common.filterwriter.XLIFFContent;
@@ -489,7 +490,7 @@ public class XLIFFWriter implements IFilterWriter {
 			}
 		}
 		
-		// Note
+		// Notes
 		if ( tu.hasProperty(Property.NOTE) ) {
 			writer.writeStartElement("note");
 			writer.writeString(tu.getProperty(Property.NOTE).getValue());
@@ -501,6 +502,17 @@ public class XLIFFWriter implements IFilterWriter {
 			writer.writeString(tu.getProperty(Property.TRANSNOTE).getValue());
 			writer.writeEndElementLineBreak(); // note
 		}
+		
+		// Temporary output for terms annotation
+		//TODO: replace this by extended element linked with <mrk>
+		TermsAnnotation ann = tu.getSource().getAnnotation(TermsAnnotation.class);
+		if (( ann != null ) && ( ann.size() > 0 )) {
+			writer.writeStartElement("note");
+			writer.writeAttributeString("annotates", "source");
+			writer.writeString("Terms:\n"+ann.toString());
+			writer.writeEndElementLineBreak(); // note
+		}
+		
 		writer.writeEndElementLineBreak(); // trans-unit
 	}
 
