@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.okapi.lib.tmdb.DbUtil.PageMode;
+import net.sf.okapi.lib.tmdb.filter.FilterNode;
 
 /**
  * Provides implementation-agnostic access to an Olifant translation memory.
@@ -98,6 +99,13 @@ public interface ITm {
 	 */
 	public void setSortOrder (LinkedHashMap<String, Boolean> fields);
 
+	/**
+	 * Sets the filter with which to query the records retrieved with {@link #getNextPage()}
+	 * or other paging methods.
+	 * @param root the root of the expression tree representing the filter.
+	 */
+	public void setFilter (FilterNode root);
+	
 	/**
 	 * Prepares the system to import a set of new entries.
 	 * This method must be called before calling {@link #addRecord(long, Map, Map)}.

@@ -22,15 +22,57 @@ package net.sf.okapi.lib.tmdb.filter;
 
 public class OperatorNode extends FilterNode {
 
-	public static enum OPERATOR {
-		OR,
-		AND
+	private Operator operator;
+	private FilterNode left;
+	private FilterNode right;
+	
+	public OperatorNode (Operator operator,
+		FilterNode expression)
+	{
+		super();
+		this.operator = operator;
+		this.right = expression;
 	}
 	
-	private OPERATOR operator;
+	public OperatorNode (Operator operator,
+		FilterNode leftExpression,
+		FilterNode rightExpression)
+	{
+		super();
+		this.operator = operator;
+		this.left = leftExpression;
+		this.right = rightExpression;
+	}
 	
-	public OPERATOR getOperator () {
+	public OperatorNode (Operator operator,
+		String leftFieldName,
+		boolean rightBoolean)
+	{
+		super();
+		this.operator = operator;
+		this.left = new ValueNode(true, leftFieldName);
+		this.right = new ValueNode(rightBoolean);
+	}
+	
+	public boolean isBinary () {
+		return ((right != null) && ( left != null));
+	}
+	
+	public Operator getOperator () {
 		return operator;
+	}
+	
+	public FilterNode getLeft () {
+		return left;
+	}
+	
+	public FilterNode getRight () {
+		return right;
+	}
+	
+	public FilterNode getExpression () {
+		// Same as getRight()
+		return right;
 	}
 	
 }

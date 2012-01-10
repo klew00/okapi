@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2011 by the Okapi Framework contributors
+  Copyright (C) 2011-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -25,11 +25,13 @@ import java.util.ArrayList;
 import net.sf.okapi.lib.tmdb.DbUtil;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.CoolBar;
@@ -41,6 +43,7 @@ class ToolBarWrapper {
 	private final CoolBar coolBar;
 	private final Combo cbSource;
 	private final Combo cbTarget;
+	private final Button chkFlaggedEntries;
 	
 	private TmPanel tp;
 
@@ -49,7 +52,7 @@ class ToolBarWrapper {
 		//coolBar.setLocked(true);
 		
 		Composite comp = new Composite(coolBar, SWT.NONE);
-		GridLayout layout = new GridLayout(4, false);
+		GridLayout layout = new GridLayout(6, false);
 		layout.marginHeight = 0;
 		layout.marginWidth = 0;
 		comp.setLayout(layout);
@@ -83,6 +86,17 @@ class ToolBarWrapper {
 			@Override
 			public void widgetDefaultSelected (SelectionEvent event) {
 				tp.verifyTargetChange();
+			}
+		});
+		
+		final Label stFilter = new Label(comp, SWT.NONE);
+		stFilter.setText("  Filter:");
+
+		chkFlaggedEntries = new Button(comp, SWT.CHECK);
+		chkFlaggedEntries.setText("Flagged entries only");
+		chkFlaggedEntries.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				tp.setFilterForFlaggedEntries();
 			}
 		});
 
@@ -123,6 +137,7 @@ class ToolBarWrapper {
 		
 		cbSource.setEnabled(enabled);
 		cbTarget.setEnabled(enabled);
+		chkFlaggedEntries.setEnabled(enabled);
 	}
 
 	void fillLocales () {

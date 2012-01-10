@@ -20,7 +20,51 @@
 
 package net.sf.okapi.lib.tmdb.filter;
 
-public class OperandNode extends FilterNode {
+public class ValueNode extends FilterNode {
 
+	public static enum TYPE {
+		BOOLEAN,
+		STRING,
+		NUMBER,
+		DATE
+	}
 	
+	private final TYPE type;
+	private final boolean isField;
+	private Object value;
+	
+	public ValueNode (boolean isField,
+		String value)
+	{
+		super();
+		this.type = TYPE.STRING;
+		this.isField = isField;
+		this.value = value;
+	}
+	
+	public ValueNode (boolean value) {
+		super();
+		this.type = TYPE.BOOLEAN;
+		this.isField = false;
+		this.value = value;
+	}
+	
+	public TYPE getType () {
+		return type;
+	}
+	
+	public boolean isField () {
+		return isField;
+	}
+	
+	public String getStringValue () {
+		if ( type == TYPE.STRING ) return (String)value;
+		throw new RuntimeException("Not a string value.");
+	}
+	
+	public boolean getBooleanValue () {
+		if ( type == TYPE.BOOLEAN ) return (Boolean)value;
+		throw new RuntimeException("Not a boolean value.");
+	}
+
 }

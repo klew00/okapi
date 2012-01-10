@@ -34,6 +34,7 @@ import net.sf.okapi.lib.tmdb.DbUtil;
 import net.sf.okapi.lib.tmdb.IRepository;
 import net.sf.okapi.lib.tmdb.ITm;
 import net.sf.okapi.lib.tmdb.DbUtil.PageMode;
+import net.sf.okapi.lib.tmdb.filter.FilterNode;
 
 public class Tm implements ITm {
 
@@ -1042,6 +1043,11 @@ public class Tm implements ITm {
 		}
 		currentPage = pageIndex;
 		return moveToPage(getFirstKeySegValueForPage(currentPage));
+	}
+
+	@Override
+	public void setFilter (FilterNode root) {
+		// TODO
 	}
 	
 }

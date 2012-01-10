@@ -20,22 +20,51 @@
 
 package net.sf.okapi.lib.tmdb.filter;
 
-/**
- * Represents a node in the expression tree for the database filter.
- * <p>The grammar is:
- * <li>Root = Expression
- * <li>Expression = BinaryExp | UnaryExp
- * <li>BinaryExp = BinaryOperator Node Node
- * <li>UnaryExp = UnaryOperator Node
- * <li>Node = Expression | Value
- * <li>Value = Field | Constant
- * <li>BinaryOperator = OP_EQUALS | ...
- * <li>UnaryOperator = OP_NOT | ...
- */
-public abstract class FilterNode {
+public class Operator {
 
-	public boolean isValue () {
-		return this instanceof ValueNode;
+	public static enum TYPE {
+		OR,
+		AND,
+		NOT,
+		EQUALS,
+		CONTAINS
+	}
+	
+	public static final int SCOPE_BOOLEAN = 0x01;
+	public static final int SCOPE_STRING = 0x02;
+	public static final int SCOPE_NUMBER = 0x04;
+	public static final int SCOPE_DATE = 0x08;
+	public static final int SCOPE_ALL = 0xFF;
+
+	public static final Operator OP_OR = new Operator(TYPE.OR, SCOPE_BOOLEAN, "or");
+	public static final Operator OP_AND = new Operator(TYPE.AND, SCOPE_BOOLEAN, "and");
+	public static final Operator OP_NOT = new Operator(TYPE.NOT, SCOPE_BOOLEAN, "not");
+	public static final Operator OP_EQUALS = new Operator(TYPE.EQUALS, SCOPE_ALL, "equals");
+	public static final Operator OP_CONTAINS = new Operator(TYPE.CONTAINS, SCOPE_STRING, "contains");
+	
+	private final TYPE type;
+	private final int scope;
+	private final String name;
+	
+	public Operator (TYPE type,
+		int scope,
+		String name)
+	{
+		this.type = type;
+		this.scope = scope;
+		this.name = name;
+	}
+	
+	public String getName () {
+		return name;
+	}
+	
+	public TYPE getType () {
+		return type;
+	}
+	
+	public int getScope () {
+		return scope;
 	}
 
 }
