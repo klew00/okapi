@@ -283,6 +283,13 @@ public class HtmlFilter extends AbstractMarkupFilter {
 			return normalizedName;
 		}
 
+		// <meta charset="ISO-2022-JP">
+		if (tag.getName().equalsIgnoreCase("meta") && 
+				attrName.equalsIgnoreCase(HtmlEncoder.CHARSET)) {
+			normalizedName = Property.ENCODING;
+			return normalizedName;
+		}
+
 		// <meta http-equiv="Content-Language" content="en"
 		if (tag.getName().equalsIgnoreCase("meta")
 				&& attrName.equalsIgnoreCase(HtmlEncoder.CONTENT)) {
@@ -295,11 +302,12 @@ public class HtmlFilter extends AbstractMarkupFilter {
 				}
 			}
 		}
-
+		
 		// <x lang="en"> or <x xml:lang="en">
 		if (attrName.equalsIgnoreCase("lang")
 				|| attrName.equalsIgnoreCase("xml:lang")) {
 			normalizedName = Property.LANGUAGE;
+			return normalizedName;
 		}
 
 		return normalizedName;

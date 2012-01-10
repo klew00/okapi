@@ -501,6 +501,27 @@ public class HtmlEventTest {
 	}
 
 	@Test
+	public void testMetaWithCharsetAttribute() {
+		String snippet = "<meta charset=\"ISO-2022-JP\">";
+		ArrayList<Event> events = new ArrayList<Event>();
+
+		addStartEvents(events);
+
+		GenericSkeleton skel = new GenericSkeleton();
+		DocumentPart dp = new DocumentPart("dp1", false);//("N9033D6E2-dp1", false);
+		skel.add("<meta charset=\"");
+		skel.addValuePlaceholder(dp, "encoding", null);
+		skel.add("\">");
+		dp.setSourceProperty(new Property("encoding", "ISO-2022-JP", false));
+		dp.setSkeleton(skel);
+		events.add(new Event(EventType.DOCUMENT_PART, dp));
+
+		addEndEvents(events);
+
+		assertTrue(FilterTestDriver.compareEvents(events, getEvents(snippet)));
+	}
+	
+	@Test
 	public void testPWithInlines2() {
 		String snippet = "<p>Before <b>bold</b> <img href=\"there\" alt=\"text\"/> after.</p>";
 		ArrayList<Event> events = new ArrayList<Event>();

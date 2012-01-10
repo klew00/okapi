@@ -63,7 +63,7 @@ elements:
   meta:
     ruleTypes: [ATTRIBUTES_ONLY]
     translatableAttributes: {content: [[http-equiv, EQUALS, keywords], [name, EQUALS, [keywords, description]]]}
-    writableLocalizableAttributes: {content: [http-equiv, EQUALS, [content-language, content-type]] }
+    writableLocalizableAttributes: {content: [http-equiv, EQUALS, [content-language, content-type]], charset}
     readOnlyLocalizableAttributes: {content: [name, EQUALS, [generator, author, progid, date]]}
     
   area:
