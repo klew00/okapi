@@ -119,12 +119,16 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 
 		CheckboxPart cbp = desc.addCheckboxPart(paramDesc.get(VALIDATE));
 
+		String[] labels = {
+			"DTD",
+			"XML Schema"
+		};
 		String[] values = {
-				"DTD",
-				"XML Schema",
-//				"RelaxNG"
-			};
+			"0",
+			"1"
+		};
 		ListSelectionPart lsp = desc.addListSelectionPart(paramDesc.get(VALIDATIONTYPE), values);
+		lsp.setChoicesLabels(labels);
 		lsp.setMasterPart(cbp, true);
 		
 		PathInputPart part = desc.addPathInputPart(paramDesc.get(SCHEMAPATH), "Schema", false);

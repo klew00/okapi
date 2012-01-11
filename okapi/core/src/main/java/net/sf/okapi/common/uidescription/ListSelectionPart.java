@@ -41,7 +41,7 @@ public class ListSelectionPart extends AbstractPart {
 	 * Creates a new ListSelectionPart object with a given parameter descriptor.
 	 * @param paramDescriptor the parameter descriptor for this UI part.
 	 * @param choicesValues the list of the items that can be selected. When the type of the parameter
-	 * is an int, the first value return 0, the next 1, and so forth (regardless of their actual text. 
+	 * is an int, the list of values must be defined. 
 	 */
 	public ListSelectionPart (ParameterDescriptor paramDescriptor,
 		String[] choicesValues)
