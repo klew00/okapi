@@ -344,83 +344,87 @@ public class TTXFilter implements IFilter {
 	}
 	
 	private boolean read () throws XMLStreamException {
-		skel = new GenericSkeleton();
-		buffer.setLength(0);
-
-		while ( true ) {
-			switch ( reader.getEventType() ) {
-			case XMLStreamConstants.START_ELEMENT:
-				String name = reader.getLocalName();
-				if ( "Tu".equals(name) || "ut".equals(name) || "df".equals(name) ) {
-					if ( processTextUnit(name) ) return true;
-					// We may return on an end-tag (e.g. Raw), so check for it
-					if ( reader.getEventType() == XMLStreamConstants.START_ELEMENT ) { 
-						buildStartElement(true);
-						// The element at the exit may be different than at the call
-						// so we refresh the name here to store the correct ending
-						name = reader.getLocalName(); 
-						storeUntilEndElement(name);
+		try {
+			skel = new GenericSkeleton();
+			buffer.setLength(0);
+			while ( true ) {
+				switch ( reader.getEventType() ) {
+				case XMLStreamConstants.START_ELEMENT:
+					String name = reader.getLocalName();
+					if ( "Tu".equals(name) || "ut".equals(name) || "df".equals(name) ) {
+						if ( processTextUnit(name) ) return true;
+						// We may return on an end-tag (e.g. Raw), so check for it
+						if ( reader.getEventType() == XMLStreamConstants.START_ELEMENT ) { 
+							buildStartElement(true);
+							// The element at the exit may be different than at the call
+							// so we refresh the name here to store the correct ending
+							name = reader.getLocalName(); 
+							storeUntilEndElement(name);
+						}
+						continue; // reader.next() was called
 					}
-					continue; // reader.next() was called
+					else if ( "UserSettings".equals(name) ){
+						processUserSettings();
+					}
+					else if ( "Raw".equals(name) ) {
+						insideContent = true;
+						buildStartElement(true);
+					}
+					else {
+						buildStartElement(true);
+					}
+					break;
+					
+				case XMLStreamConstants.END_ELEMENT:
+					buildEndElement(true);
+					break;
+					
+				case XMLStreamConstants.SPACE: // Non-significant spaces
+					skel.append(reader.getText().replace("\n", lineBreak));
+					break;
+	
+				case XMLStreamConstants.CHARACTERS:
+				case XMLStreamConstants.CDATA:
+					if ( insideContent && !whitespacesOnly(reader.getText()) ) {
+						if ( processTextUnit(null) ) return true;
+						continue; // next() was called
+					}
+					else {
+						skel.append(Util.escapeToXML(reader.getText().replace("\n", lineBreak), 0, true, null));
+					}
+					break;
+					
+				case XMLStreamConstants.COMMENT:
+					skel.append("<!--"+ reader.getText().replace("\n", lineBreak) + "-->");
+					break;
+					
+				case XMLStreamConstants.PROCESSING_INSTRUCTION:
+					skel.append("<?"+ reader.getPITarget() + " " + reader.getPIData() + "?>");
+					break;
+					
+				case XMLStreamConstants.DTD:
+					//TODO: Reconstruct the DTD declaration
+					// but how? nothing is available to do that
+					break;
+					
+				case XMLStreamConstants.ENTITY_REFERENCE:
+				case XMLStreamConstants.ENTITY_DECLARATION:
+				case XMLStreamConstants.NAMESPACE:
+				case XMLStreamConstants.NOTATION_DECLARATION:
+				case XMLStreamConstants.ATTRIBUTE:
+					break;
+				case XMLStreamConstants.START_DOCUMENT:
+					break;
+				case XMLStreamConstants.END_DOCUMENT:
+					break;
 				}
-				else if ( "UserSettings".equals(name) ){
-					processUserSettings();
-				}
-				else if ( "Raw".equals(name) ) {
-					insideContent = true;
-					buildStartElement(true);
-				}
-				else {
-					buildStartElement(true);
-				}
-				break;
 				
-			case XMLStreamConstants.END_ELEMENT:
-				buildEndElement(true);
-				break;
-				
-			case XMLStreamConstants.SPACE: // Non-significant spaces
-				skel.append(reader.getText().replace("\n", lineBreak));
-				break;
-
-			case XMLStreamConstants.CHARACTERS:
-			case XMLStreamConstants.CDATA:
-				if ( insideContent && !whitespacesOnly(reader.getText()) ) {
-					if ( processTextUnit(null) ) return true;
-					continue; // next() was called
-				}
-				else {
-					skel.append(Util.escapeToXML(reader.getText().replace("\n", lineBreak), 0, true, null));
-				}
-				break;
-				
-			case XMLStreamConstants.COMMENT:
-				skel.append("<!--"+ reader.getText().replace("\n", lineBreak) + "-->");
-				break;
-				
-			case XMLStreamConstants.PROCESSING_INSTRUCTION:
-				skel.append("<?"+ reader.getPITarget() + " " + reader.getPIData() + "?>");
-				break;
-				
-			case XMLStreamConstants.DTD:
-				//TODO: Reconstruct the DTD declaration
-				// but how? nothing is available to do that
-				break;
-				
-			case XMLStreamConstants.ENTITY_REFERENCE:
-			case XMLStreamConstants.ENTITY_DECLARATION:
-			case XMLStreamConstants.NAMESPACE:
-			case XMLStreamConstants.NOTATION_DECLARATION:
-			case XMLStreamConstants.ATTRIBUTE:
-				break;
-			case XMLStreamConstants.START_DOCUMENT:
-				break;
-			case XMLStreamConstants.END_DOCUMENT:
-				break;
+				if ( reader.hasNext() ) reader.next();
+				else return false;
 			}
-			
-			if ( reader.hasNext() ) reader.next();
-			else return false;
+		}
+		catch ( Throwable e ) {
+			throw new OkapiIOException("Error reading TTX.\n"+e.getMessage(), e);
 		}
 	}
 
@@ -587,6 +591,9 @@ public class TTXFilter implements IFilter {
 				case XMLStreamConstants.END_ELEMENT:
 					name = reader.getLocalName();
 					if ( name.equals("Raw") ) { // End of document
+						done = true;
+					}
+					else if ( name.equals("Body") ) { // End of document
 						done = true;
 					}
 					else if ( name.equals("df") ) {
