@@ -47,11 +47,8 @@ Then run the integration tests for the applications
 
 NOTE: If you are not using the default local maven repository you will need to update the mavenStore property in build_okapi_apps.xml
 
---- 6) If you have trunk/deployment/utils/tests
-Go there and run the batch file
-This will run additional integration tests.
-The file _tests_results.txt shows any differences between the expected results and the curren ones. Note that some differences may be fine if they are coming from a fix or a new feature. Update the gold files if it is the case.
-//TODO: Port those tests to applications integration tests
+--- 6) If you have trunk/deployment/privateTests
+Go there and run the tests with non-sharable material
 
 --- 6bis) Test under different platforms
 
