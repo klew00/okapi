@@ -50,14 +50,29 @@ public class TermsAnnotation implements IAnnotation {
 		infos.add(info==null ? "" : info);
 	}
 
+	/**
+	 * Gets the number of terms in this annotation.
+	 * @return the number of terms in this annotation.
+	 */
 	public int size () {
 		return terms.size();
 	}
 	
+	/**
+	 * Gets the term for a given index.
+	 * @param index the index of the term to retrieve.
+	 * @return the term for a given index.
+	 */
 	public String getTerm (int index) {
 		return terms.get(index);
 	}
 	
+	/**
+	 * Gets the term information for a given index,
+	 * or an empty string if there is not associated information for the term.
+	 * @param index the index of the term information to retrieve.
+	 * @return the term information for a given index.
+	 */
 	public String getInfo (int index) {
 		return infos.get(index);
 	}

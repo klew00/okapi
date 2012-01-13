@@ -639,6 +639,7 @@ public class SRXEditor {
 		}
 		if ( rm != null ) {
 			rm.dispose();
+			rm = null;
 		}
 	}
 
@@ -669,6 +670,7 @@ public class SRXEditor {
 			if ( !shell.getDisplay().readAndDispatch() )
 				shell.getDisplay().sleep();
 		}
+		dispose();
 	}
 	
 	/**

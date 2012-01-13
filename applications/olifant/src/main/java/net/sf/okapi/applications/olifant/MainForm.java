@@ -870,6 +870,7 @@ public class MainForm {
 	{
 		rm = new ResourceManager(MainForm.class, shell.getDisplay());
 		rm.addImage("Olifant"); //$NON-NLS-1$
+		rm.addImage("viewusefilter"); //$NON-NLS-1$
 	
 		rm.loadCommands("net.sf.okapi.applications.olifant.Commands"); //$NON-NLS-1$
 
@@ -982,5 +983,10 @@ public class MainForm {
 	RepositoryPanel getRepositoryPanel () {
 		return repoPanel;
 	}
+
+	ResourceManager getResources () {
+		return rm;
+	}
+	
 
 }

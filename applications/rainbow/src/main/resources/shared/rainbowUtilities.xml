@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <okapiPlugins version="1.0">
- 
+
+ <plugin type="utility"
+  id="oku_alignment"
+  version="1.0"
+  pluginClass="net.sf.okapi.applications.rainbow.utilities.alignment.Utility"
+  editorClass="net.sf.okapi.applications.rainbow.utilities.alignment.Editor"
+  updateUri="http://okapi.opentag.com/updates.html">
+  <info>
+   <name>ID-Based Alignment</name>
+   <description>Aligns pairs of files to create a TMX output.</description>
+   <provider>Okapi Framework</provider>
+  </info>
+ </plugin>
+
  <plugin type="utility"
   id="oku_extraction"
   version="1.0"
@@ -27,19 +40,6 @@
   <info>
    <name>Translation Package Post-Processing (Old)</name>
    <description>Post-processes translation packages.</description>
-   <provider>Okapi Framework</provider>
-  </info>
- </plugin>
-
- <plugin type="utility"
-  id="oku_alignment"
-  version="1.0"
-  pluginClass="net.sf.okapi.applications.rainbow.utilities.alignment.Utility"
-  editorClass="net.sf.okapi.applications.rainbow.utilities.alignment.Editor"
-  updateUri="http://okapi.opentag.com/updates.html">
-  <info>
-   <name>ID-Based Alignment</name>
-   <description>Aligns pairs of files to create a TMX output.</description>
    <provider>Okapi Framework</provider>
   </info>
  </plugin>

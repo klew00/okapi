@@ -37,12 +37,15 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.CoolBar;
 import org.eclipse.swt.widgets.CoolItem;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 
 class ToolBarWrapper {
 
 	private final CoolBar coolBar;
 	private final Combo cbSource;
 	private final Combo cbTarget;
+//	private final Button btUseFilter;
 	private final Button chkFlaggedEntries;
 	
 	private TmPanel tp;
@@ -89,6 +92,9 @@ class ToolBarWrapper {
 			}
 		});
 		
+//		btUseFilter = new Button(comp, SWT.TOGGLE);
+//		btUseFilter.setImage(mainForm.getResources().getImage("viewusefilter"));
+
 		final Label stFilter = new Label(comp, SWT.NONE);
 		stFilter.setText("  Filter:");
 

@@ -37,7 +37,9 @@ import net.sf.okapi.lib.tmdb.Location;
 import net.sf.okapi.lib.tmdb.SearchAndReplace;
 import net.sf.okapi.lib.tmdb.SearchAndReplaceOptions;
 import net.sf.okapi.lib.tmdb.SearchAndReplaceOptions.ACTION;
-import net.sf.okapi.lib.tmdb.filter.FilterOptions;
+import net.sf.okapi.lib.tmdb.filter.FilterNode;
+import net.sf.okapi.lib.tmdb.filter.Operator;
+import net.sf.okapi.lib.tmdb.filter.OperatorNode;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabItem;
@@ -1125,6 +1127,16 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 	void setFilterForFlaggedEntries () {
 		//TODO
 		Dialogs.showError(getShell(), "Not implemented yet.", null);
+		
+		fltOptions.setActive(!fltOptions.getActive());
+		if ( fltOptions.getActive() ) {
+			FilterNode node = new OperatorNode(Operator.OP_EQUALS, DbUtil.FLAG_NAME, true);
+			tm.setFilter(node);
+		}
+		else {
+			tm.setFilter(null);
+		}
+		
 	}
 
 	void toggleFilter () {

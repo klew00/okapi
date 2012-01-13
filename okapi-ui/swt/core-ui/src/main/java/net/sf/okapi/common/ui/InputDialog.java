@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2009 by the Okapi Framework contributors
+  Copyright (C) 2008-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -23,6 +23,9 @@ package net.sf.okapi.common.ui;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Device;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -44,6 +47,7 @@ public class InputDialog {
 	private String help;
 	private OKCancelPanel pnlActions;
 	private boolean allowEmptyValue = false;
+	private Font customFont;
 
 	/**
 	 * Creates a simple input dialog with one text field.
@@ -90,7 +94,6 @@ public class InputDialog {
 		int opt = SWT.BORDER | SWT.SINGLE;
 		if ( multiline > 0 ) opt = SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.V_SCROLL;
 		edField = new Text(cmpTmp, opt);
-		if ( defaultInputText != null ) edField.setText(defaultInputText);
 		gdTmp = new GridData(GridData.FILL_BOTH);
 		if ( buttonOptions == 0 ) {
 			gdTmp.horizontalSpan = 2;
@@ -133,6 +136,11 @@ public class InputDialog {
 		}
 		shell.setMinimumSize(size);
 		if ( size.x < 450 ) size.x = 450;
+
+		if ( defaultInputText != null ) {
+			edField.setText(defaultInputText);
+		}
+		
 		shell.setSize(size);
 		Dialogs.centerWindow(shell, parent);
 	}
@@ -147,9 +155,34 @@ public class InputDialog {
 			if ( !shell.getDisplay().readAndDispatch() )
 				shell.getDisplay().sleep();
 		}
+		dispose();
 		return result;
 	}
+	
+	private void dispose () {
+		if ( customFont != null ) {
+			customFont.dispose();
+			customFont = null;
+		}
+	}
 
+	/**
+	 * Increases or decreases the size of the text for this input text.
+	 * @param change the change to apply, e.g. +2 or -2.
+	 */
+	public void changeFontSize (int change) {
+		Font font = edField.getFont();
+		Device device = font.getDevice();
+		FontData[] fontData = font.getFontData();
+		fontData[0].setHeight(fontData[0].getHeight()+change);
+		Font tmpFont = customFont;
+		customFont = new Font(device, fontData[0]);
+		edField.setFont(customFont);
+		if ( tmpFont != null ) {
+			tmpFont.dispose();
+		}
+	}
+	
 	/**
 	 * Sets the default input value.
 	 * @param value the default input value.

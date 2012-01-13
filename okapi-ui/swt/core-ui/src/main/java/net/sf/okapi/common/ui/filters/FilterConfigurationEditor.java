@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010 by the Okapi Framework contributors
+  Copyright (C) 2010-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -99,8 +99,9 @@ public class FilterConfigurationEditor implements IFilterConfigurationEditor, IF
 				}
 				InputDialog dlg  = new InputDialog(shell,
 					String.format("Filter Parameters (%s)", config.configId), "Parameters:",
-					params.toString(), null, 0, 200, 600);
+					params.toString(), null, 0, 300, 800);
 				dlg.setReadOnly(!config.custom); // Pre-defined configurations should be read-only
+				dlg.changeFontSize(+2);
 				String data = dlg.showDialog();
 				if ( data == null ) return false; // Cancel
 				if ( !config.custom ) return true; // Don't save pre-defined parameters

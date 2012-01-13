@@ -32,6 +32,7 @@ distribution.</p>
 	<li>Rainbow:<ul>
 	<li>Update the ID-Based Alignment utility to use the GT v2 API for the MT 
 	services instead of v1.</li>
+	<li>Moved old utilities at the bottom of the Utilities menu.</li>
 </ul>
 	</li>
 	<li>Filters Plugin for OmegaT:<ul>
@@ -41,10 +42,8 @@ distribution.</p>
 		<li>Fixed code re-construction issues for some cases.</li>
 		<li>Improved backward compatibility, and implemented support for 
 		alternate translation of repeated source segments for OmeagT 2.5.</li>
-		<li>Now if output encoding is not defained for TTX file, UTF-16 is used 
+		<li>Now if output encoding is not defined for a TTX file, UTF-16 is used 
 		(instead of UTF-8).</li>
-		<li>Added support for Catalyst-generated TTTX (that have no &lt;Raw&gt; nor 
-		&lt;ut&gt; elements)</li>
 	</ul>
 	</li>
 	<li>Steps:<ul>
@@ -57,6 +56,8 @@ distribution.</p>
 	<li>Rainbow Kit Creation Step:<ul>
 	<li>Fixed incorrectly mapped inline code that resulted in invalid merged 
 	files.</li>
+	<li>The Translation Table format is now available as an package type 9allows 
+	extraction and merge of tab-delimited files)</li>
 </ul>
 	</li>
 	<li>Format Conversion Step:<ul>
@@ -126,6 +127,8 @@ distribution.</p>
 	option: Mode 0: auto-detect, if a segment is detected mode 1 is used, If no 
 	segment is detected mode 2 is used. Mode 1: only existing segments are 
 	extracted. Mode 2: all text is extracted, segmented or not.</li>
+		<li>Added support for Catalyst-generated TTX (that have no <code>&lt;Raw&gt;</code> nor 
+		<code>&lt;ut&gt;</code> elements)</li>
 </ul>
 	</li>
 	<li>Properties Filter:<ul>
@@ -174,6 +177,7 @@ distribution.</p>
 	<li>Improved cloning of skeleton parts.</li>
 	<li>The XLIFFWriter output the common <i>transNote</i> property as a <code>
 	&lt;note from=&quot;translator&quot;&gt;</code>. This fixes issue #195.</li>
+	<li>Added <code>changeFontSize()</code> to InputDialog UI.</li>
 </ul>
 	</li>
 </ul>

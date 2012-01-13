@@ -18,31 +18,43 @@
   See also the full LGPL text here: http://www.gnu.org/copyleft/lesser.html
 ===========================================================================*/
 
-package net.sf.okapi.lib.tmdb.filter;
+package net.sf.okapi.applications.olifant;
+
+import net.sf.okapi.lib.tmdb.filter.FilterNode;
 
 public class FilterOptions {
 
-	public static enum TRISTATE {
-		NO_VALUE,
-		INCLUDE,
-		EXCLUDE
-	}
+	private boolean active;
+	private boolean useSimpleFilter;
+	private FilterNode simpleFilter;
+	private FilterNode fullFilter;
 	
-	private TRISTATE flaggedEntries;
-
 	public FilterOptions () {
-		setFlaggedEntries(TRISTATE.NO_VALUE);
 	}
 
-	public TRISTATE getFlaggedEntries () {
-		return flaggedEntries;
-	}
-
-	public void setFlaggedEntries (TRISTATE flaggedEntries) {
-		this.flaggedEntries = flaggedEntries; 
+	public FilterNode getCurrentFilter () {
+		if ( useSimpleFilter ) {
+			return simpleFilter;
+		}
+		else {
+			return fullFilter;
+		}
 	}
 	
-	public void getTree () {
-		
+	public boolean getActive () {
+		return active;
 	}
+	
+	public void setActive (boolean active) {
+		this.active = active;
+	}
+	
+	public FilterNode getSimpleFilter () {
+		return simpleFilter;
+	}
+	
+	public void setSimpleFilter (FilterNode root) {
+		simpleFilter = root;
+	}
+
 }

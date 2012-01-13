@@ -22,12 +22,9 @@ package net.sf.okapi.applications.olifant;
 
 import java.util.List;
 
-import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
-import net.sf.okapi.lib.tmdb.filter.FilterOptions;
-import net.sf.okapi.lib.tmdb.filter.FilterOptions.TRISTATE;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -35,18 +32,13 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
 
 class FilterForm {
 	
 	final private Shell shell;
-	final private Button chkFlaggedEntriesBoth;
-	final private Button chkFlaggedEntriesInclude;
-	final private Button chkFlaggedEntriesExclude;
 	final private List<String> availableFields;
 	final private FilterOptions options;
 	
@@ -67,18 +59,9 @@ class FilterForm {
 		group.setLayout(new GridLayout());
 		group.setLayoutData(new GridData(GridData.FILL_BOTH));
 		
-		chkFlaggedEntriesBoth = new Button(group, SWT.RADIO);
-		chkFlaggedEntriesBoth.setText("Include both &flagged and non-flagged entries");
-		chkFlaggedEntriesBoth.setSelection(options.getFlaggedEntries() == TRISTATE.NO_VALUE);
-
-		chkFlaggedEntriesInclude = new Button(group, SWT.RADIO);
-		chkFlaggedEntriesInclude.setText("Include only &flagged entries");
-		chkFlaggedEntriesInclude.setSelection(options.getFlaggedEntries() == TRISTATE.INCLUDE);
-
-		chkFlaggedEntriesExclude = new Button(group, SWT.RADIO);
-		chkFlaggedEntriesExclude.setText("Include only non-flagged entries");
-		chkFlaggedEntriesExclude.setSelection(options.getFlaggedEntries() == TRISTATE.EXCLUDE);
-
+		Label label = new Label(group, SWT.NONE);
+		label.setText("Not implemented yet.");
+		
 		SelectionAdapter OKCancelActions = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				if ( e.widget.getData().equals("o") ) { //$NON-NLS-1$
@@ -109,15 +92,6 @@ class FilterForm {
 	}
 
 	private boolean saveData () {
-		if ( chkFlaggedEntriesInclude.getSelection() ) {
-			options.setFlaggedEntries(TRISTATE.INCLUDE);
-		}
-		else if ( chkFlaggedEntriesExclude.getSelection() ) {
-			options.setFlaggedEntries(TRISTATE.EXCLUDE);
-		}
-		else {
-			options.setFlaggedEntries(TRISTATE.NO_VALUE);
-		}
 		result = true;
 		return true;
 	}

@@ -1497,27 +1497,6 @@ public class MainForm { //implements IParametersProvider {
 			}
 		});
 		
-		new MenuItem(dropMenu, SWT.SEPARATOR);
-		
-		// Add the plug-in utilities
-		Iterator<String> iter = utilitiesAccess.getIterator();
-		while ( iter.hasNext() ) {
-			UtilitiesAccessItem item = utilitiesAccess.getItem(iter.next());
-			if ( item.type == -1 ) {
-				new MenuItem(dropMenu, SWT.SEPARATOR);
-			}
-			else {
-				menuItem = new MenuItem(dropMenu, SWT.PUSH);
-				menuItem.setText(item.name+"..."); //$NON-NLS-1$
-				menuItem.setData(item.id);
-				menuItem.addSelectionListener(new SelectionAdapter() {
-					public void widgetSelected(SelectionEvent event) {
-						launchUtility((String)((MenuItem)event.getSource()).getData());
-					}
-				});
-			}
-		}
-		
 		// Add pre-defined pipelines
 
 		new MenuItem(dropMenu, SWT.SEPARATOR);
@@ -1726,6 +1705,28 @@ public class MainForm { //implements IParametersProvider {
 				executePipeline(new CharListingPipeline());
 			}
 		});
+
+		// Add the plug-in utilities
+		new MenuItem(dropMenu, SWT.SEPARATOR);
+		
+		Iterator<String> iter = utilitiesAccess.getIterator();
+		while ( iter.hasNext() ) {
+			UtilitiesAccessItem item = utilitiesAccess.getItem(iter.next());
+			if ( item.type == -1 ) {
+				new MenuItem(dropMenu, SWT.SEPARATOR);
+			}
+			else {
+				menuItem = new MenuItem(dropMenu, SWT.PUSH);
+				menuItem.setText(item.name+"..."); //$NON-NLS-1$
+				menuItem.setData(item.id);
+				menuItem.addSelectionListener(new SelectionAdapter() {
+					public void widgetSelected(SelectionEvent event) {
+						launchUtility((String)((MenuItem)event.getSource()).getData());
+					}
+				});
+			}
+		}
+		
 	}
 
 	public void run () {

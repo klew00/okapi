@@ -103,6 +103,7 @@ public interface ITm {
 	 * Sets the filter with which to query the records retrieved with {@link #getNextPage()}
 	 * or other paging methods.
 	 * @param root the root of the expression tree representing the filter.
+	 * Use null to remove any filter expression.
 	 */
 	public void setFilter (FilterNode root);
 	
