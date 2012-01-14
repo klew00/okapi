@@ -34,8 +34,8 @@ package net.sf.okapi.lib.tmdb.filter;
  */
 public abstract class FilterNode {
 
-	public boolean isValue () {
-		return this instanceof ValueNode;
+	public boolean isOperator () {
+		return this instanceof OperatorNode;
 	}
 
 }

@@ -35,6 +35,10 @@ import net.sf.okapi.lib.tmdb.IRepository;
 import net.sf.okapi.lib.tmdb.ITm;
 import net.sf.okapi.lib.tmdb.DbUtil.PageMode;
 import net.sf.okapi.lib.tmdb.filter.FilterNode;
+import net.sf.okapi.lib.tmdb.filter.Operator;
+import net.sf.okapi.lib.tmdb.filter.OperatorNode;
+import net.sf.okapi.lib.tmdb.filter.ValueNode;
+import net.sf.okapi.lib.tmdb.filter.ValueNode.TYPE;
 
 public class Tm implements ITm {
 
@@ -65,6 +69,47 @@ public class Tm implements ITm {
 	private String rowSubQuery;
 	
 	
+	private String toSQL (FilterNode node) {
+		String tmp = "";
+		if ( node == null ) return tmp;
+		if ( node.isOperator() ) {
+			OperatorNode on = (OperatorNode)node;
+			String sqlOp = "";
+			switch ( on.getOperator().getType() ) {
+			case EQUALS: sqlOp = "="; break;
+			case NOT: sqlOp = "NOT"; break;
+			case OR: sqlOp = "OR"; break;
+			case AND: sqlOp = "AND"; break;
+			}
+			
+			if ( on.isBinary() ) {
+				tmp = toSQL(on.getRight());
+				tmp = sqlOp + " " + tmp + ")";
+				tmp = "(" + toSQL(on.getLeft()) + " " + tmp;
+			}
+			else { // Unary operator
+				tmp = "(" + sqlOp + " ";
+				tmp = tmp + toSQL(on.getRight()) + ")"; 
+			}
+		}
+		else {
+			ValueNode vn = (ValueNode)node;
+			if ( vn.isField() ) {
+				return "\""+vn.getStringValue()+"\"";
+			}
+			else { // Constant
+				if ( vn.getType() == TYPE.BOOLEAN ) {
+					return vn.getBooleanValue() ? "TRUE" : "FALSE";
+				}
+				if ( vn.getType() == TYPE.STRING ) {
+					return vn.getStringValue();
+				}
+			}
+			return "ERROR";
+		}
+		return tmp;
+	}
+
 	public Tm (Repository store,
 		String uuid,
 		String name)
@@ -1048,6 +1093,10 @@ public class Tm implements ITm {
 	@Override
 	public void setFilter (FilterNode root) {
 		// TODO
+		String clause = toSQL(root);
+		clause = clause.toUpperCase();
+		// Convert the tree into an SQL WHERE clause
+		
 	}
 	
 }

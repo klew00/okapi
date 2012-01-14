@@ -1125,16 +1125,20 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 	}
 
 	void setFilterForFlaggedEntries () {
-		//TODO
-		Dialogs.showError(getShell(), "Not implemented yet.", null);
-		
-		fltOptions.setActive(!fltOptions.getActive());
-		if ( fltOptions.getActive() ) {
-			FilterNode node = new OperatorNode(Operator.OP_EQUALS, DbUtil.FLAG_NAME, true);
-			tm.setFilter(node);
+		try {
+			saveEntryAndModifications();
+			fltOptions.setActive(!fltOptions.getActive());
+			if ( fltOptions.getActive() ) {
+				FilterNode node = new OperatorNode(Operator.OP_EQUALS, DbUtil.FLAG_NAME, true);
+				tm.setFilter(node);
+			}
+			else {
+				tm.setFilter(null);
+			}
+			fillTable(0, 0, 0, cursor.getColumn(), -1);
 		}
-		else {
-			tm.setFilter(null);
+		catch ( Throwable e ) {
+			Dialogs.showError(getShell(), "Error when filtering.\n"+e.getMessage(), null);
 		}
 		
 	}
