@@ -591,8 +591,10 @@ public class SkeletonUtilTest {
 		
 		tu2.setIsReferent(true);		
 		writer.processStartDocument(ENUS, "UTF-8", null, new EncoderManager(), sd);
-		assertEquals("", writer.processTextUnit(tu2));		
-		assertEquals("text before_text before2_source2_text after2_text after", writer.processTextUnit(tu1));				
+		assertEquals("", writer.processTextUnit(tu2));
+		assertEquals("text before_[#$tu2]_text after", tu1.getSkeleton().toString());
+		assertEquals("text before_text before2_source2_text after2_text after", writer.processTextUnit(tu1));
+		assertEquals("text before_[#$tu2]_text after", tu1.getSkeleton().toString());
 		
 		tu2.setIsReferent(true);		
 		writer.processStartDocument(ESES, "UTF-8", null, new EncoderManager(), sd);

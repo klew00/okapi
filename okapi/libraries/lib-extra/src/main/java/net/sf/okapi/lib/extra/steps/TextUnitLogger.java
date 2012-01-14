@@ -69,7 +69,7 @@ public class TextUnitLogger extends BasePipelineStep {
 	
 	@Override
 	protected Event handleEndBatch(Event event) {
-		logger.fine(sb.toString());
+		logger.info(sb.toString());
 		return super.handleEndBatch(event);
 	}
 	
@@ -118,6 +118,12 @@ public class TextUnitLogger extends BasePipelineStep {
 		for (Segment seg : segs) {
 			sb.append(String.format("         %s: %s", seg.getId(), seg.getContent().toText()));
 			sb.append("\n");
+			if (seg.getContent().getCodes() != null) {
+				sb.append(String.format("         %s codes (%d): %s", seg.getId(), 
+						seg.getContent().getCodes().size(), seg.getContent().getCodes().toString()));
+				sb.append("\n");
+			}
+			
 			if (seg.getAnnotations() != null) {
 //				sb.append("Source annotations:");
 //				sb.append("\n");

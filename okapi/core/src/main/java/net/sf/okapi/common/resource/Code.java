@@ -513,6 +513,9 @@ public class Code {
 		data.setLength(0);
 		if ( value != null ) {
 			data.append(value);
+			if (value.contains(TextFragment.REFMARKER_START)) {
+				setReferenceFlag(true);
+			}
 		}
 	}
 	

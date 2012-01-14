@@ -85,6 +85,14 @@ public class ExtractionComparisionTest {
 		assertTrue(rtc.executeCompare(htmlFilter, list, "UTF-8", locEN, locEN));
 	}
 	
+	@Test
+	public void testDoubleExtraction2() throws URISyntaxException {
+		RoundTripComparison rtc = new RoundTripComparison();
+		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
+		list.add(new InputDocument(root + "home_big.html", null));
+		assertTrue(rtc.executeCompare(htmlFilter, list, "UTF-8", locEN, locEN, "out"));
+	}
+	
 	//@Test
 	public void testReconstructFile() {
 		GenericSkeletonWriter writer = new GenericSkeletonWriter();

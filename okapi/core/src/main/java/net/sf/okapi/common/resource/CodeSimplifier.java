@@ -56,6 +56,19 @@ public class CodeSimplifier {
 			this.charIndex = charIndex;
 			this.code = code;
 		}
+		
+		public void setMergedData(CodeNode node1, CodeNode node2) {
+			String data1 = node1.code.getData();
+			String data2 = node2.code.getData();
+			
+			String odata1 = node1.code.getOuterData();
+			String odata2 = node2.code.getOuterData();
+			
+			String gap = node1.gapToNext;
+			
+			this.code.setData(data1 + gap + data2);
+			this.code.setOuterData(odata1 + gap + odata2);
+		}
 	}
 	
 	class StartCodeNode extends CodeNode {
@@ -128,7 +141,7 @@ public class CodeSimplifier {
 		    	
 		    }
 		}
-		updateAdjacentFlags();
+		updateAdjacentFlags(); // codeNodesList.get(2)
 	}
 	
 	/*
@@ -180,22 +193,38 @@ public class CodeSimplifier {
 		try {
 			do {
 				iteration++;
-	
+				
+				// TODO check if codes can be combined. Codes can have references to different
+				// resources (parent is different), in this case cannot combine them even if
+				// they both are placeholders
+				
+				//int n1 = tf.getCodedText().length();
+				//System.out.println("--- 1:" + n1);
 				prepare(tf.getCodedText(), tf.getCodes());
 				//System.out.println(TextUnitUtil.toText(tf));
 				isolatedMerges = simplifyIsolated();
 				//System.out.println(TextUnitUtil.toText(getCodedText(), getCodes()));
 				tf.setCodedText(getCodedText(), getCodes());
 	
+				//int n2 = tf.getCodedText().length();
+				//System.out.println("--- 2:" + n2);
 				prepare(tf.getCodedText(), tf.getCodes());
+				//System.out.println("--- 2a:" + getCodedText().length());
 				//System.out.println(TextUnitUtil.toText(tf));
 				openCloseMerges = simplifyOpeningClosing();
 				//System.out.println(TextUnitUtil.toText(getCodedText(), getCodes()));
-				tf.setCodedText(getCodedText(), getCodes());
-	
+				tf.setCodedText(getCodedText(), getCodes());				
+				
+				//int n3 = tf.getCodedText().length();
+				//System.out.println("--- 3:" + n3);
 				prepare(tf.getCodedText(), tf.getCodes());
 				emptyOpenCloseMerges = simplifyEmptyOpeningClosing();
 				tf.setCodedText(getCodedText(), getCodes());
+				
+//				System.out.println("--- 1:" + n1);
+//				System.out.println("--- 2:" + n2);
+//				System.out.println("--- 3:" + n3);
+//				System.out.println("--- 4:" + tf.getCodedText().length());
 			}
 			while ((iteration < maxIterations) && (isolatedMerges + openCloseMerges + emptyOpenCloseMerges) > 0);
 			
@@ -568,7 +597,7 @@ public class CodeSimplifier {
 			CodeNode cn = codeNodesList.get(i);
 			char newCharIndex = TextFragment.toChar(i);
 			String newMarker = new String(cn.markerFlag+newCharIndex);
-			codedText = codedText.replace(cn.marker, newMarker);
+			codedTextReplace(cn.marker, newMarker);
 			cn.intIndex = i;
 			cn.charIndex = newCharIndex;
 			cn.marker = newMarker;
@@ -644,19 +673,46 @@ public class CodeSimplifier {
 	private void mergeNodes (CodeNode node1, CodeNode node2) {
 		String gap = node1.gapToNext;
 		String cst = node1.marker + gap + node2.marker; 
-		
-		// PH before Start merges to the Start		
-		if (node1 instanceof PhCodeNode && node2 instanceof StartCodeNode) {
-			codedText = codedText.replace(cst, node2.marker);
-			node2.code.setData(node1.code.getData() + gap + node2.code.getData());
+						
+		// PH before Start/End merges to the Start/End		
+		if (node1 instanceof PhCodeNode && 
+				(node2 instanceof StartCodeNode || node2 instanceof EndCodeNode)) {
+			codedTextReplace(cst, node2.marker);
+//			node2.code.setData(node1.code.getData() + gap + node2.code.getData());
+//			node2.code.setOuterData(node1.code.getOuterData() + gap + node2.code.getOuterData());
+			node2.setMergedData(node1, node2);
 			codeNodesList.remove(node1);
 		}
-		else {
-			codedText = codedText.replace(cst, node1.marker);
-			node1.code.setData(node1.code.getData() + gap + node2.code.getData());
+		// PH after Start/End merges to the Start/End
+		else if (node2 instanceof PhCodeNode && 
+				(node1 instanceof StartCodeNode || node1 instanceof EndCodeNode)) {
+			codedTextReplace(cst, node1.marker);
+//			node1.code.setData(node1.code.getData() + gap + node2.code.getData());
+//			node1.code.setOuterData(node1.code.getOuterData() + gap + node2.code.getOuterData());
+			node1.setMergedData(node1, node2);
 			node1.gapToNext = node2.gapToNext;
 			codeNodesList.remove(node2);
 		}		
+		// PH + PH
+		else {
+			codedTextReplace(cst, node1.marker);
+//			node1.code.setData(node1.code.getData() + gap + node2.code.getData());
+//			node1.code.setOuterData(node1.code.getOuterData() + gap + node2.code.getOuterData());
+			node1.setMergedData(node1, node2);
+			node1.gapToNext = node2.gapToNext;
+			codeNodesList.remove(node2);
+		}
+	}
+	
+	private void updateOffsets(int start, int delta) {
+		for (CodeNode node : codeNodesList) {
+			if (node.offset > start) {
+				//System.out.println(node.offset);
+				node.offset += delta;
+//				System.out.println(node.offset);				
+//				System.out.println();
+			}
+		}
 	}
 	
 	/*
@@ -666,10 +722,15 @@ public class CodeSimplifier {
 		String gap = node1.gapToNext;
 		String cst = node1.marker + gap + node2.marker;
 		
-		codedText = codedText.replace(cst, node2.marker);
-		node2.code.setData(node1.code.getData() + gap + node2.code.getData());
+		codedTextReplace(cst, node2.marker);
+//		node2.code.setData(node1.code.getData() + gap + node2.code.getData());
+//		node2.code.setOuterData(node1.code.getOuterData() + gap + node2.code.getOuterData());
+		node2.setMergedData(node1, node2);
 		node2.offset = node1.offset;
 		codeNodesList.remove(node1);
+		
+//		System.out.println("----- " + cst.length());
+//		updateOffsets(node1.offset, cst.length() - 2);
 	}
 
 	/*
@@ -679,10 +740,12 @@ public class CodeSimplifier {
 		String gap = node1.gapToNext;
 		String cst = node1.marker + gap + node2.marker;
 		
-		//codedText = codedText.replace(node1.marker+node2.marker, "\ue103"+node1.charIndex);
-		codedText = codedText.replace(cst, new String("" + (char)TextFragment.MARKER_ISOLATED + node1.charIndex));
+		//codedText = codedTextReplace(node1.marker+node2.marker, "\ue103"+node1.charIndex);
+		codedTextReplace(cst, new String("" + (char)TextFragment.MARKER_ISOLATED + node1.charIndex));
 		
-		node1.code.setData(node1.code.getData() + gap + node2.code.getData());
+//		node1.code.setData(node1.code.getData() + gap + node2.code.getData());
+//		node1.code.setOuterData(node1.code.getOuterData() + gap + node2.code.getOuterData());
+		node1.setMergedData(node1, node2);
 		node1.code.setTagType(TagType.PLACEHOLDER);
 
 		PhCodeNode pcn = new PhCodeNode(node1.offset,node1.intIndex, node1.charIndex, node1.code);
@@ -693,6 +756,18 @@ public class CodeSimplifier {
 		
 		codeNodesList.remove(node1);
 		codeNodesList.remove(node2);		
+	}
+
+	private void codedTextReplace(String findWhat, String replaceWith) {
+		int startLen = codedText.length();
+		int startIndex = codedText.indexOf(findWhat);
+		codedText = codedText.replace(findWhat, replaceWith);
+		int endLen = codedText.length();
+		int delta = endLen - startLen;
+		
+		if (delta != 0) {
+			updateOffsets(startIndex, delta);
+		}
 	}	
 }
 

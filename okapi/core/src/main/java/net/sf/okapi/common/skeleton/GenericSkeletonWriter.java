@@ -231,7 +231,8 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 		int context)
 	{
 		// If it is not a reference marker, just use the data
-		if ( !part.data.toString().startsWith(TextFragment.REFMARKER_START) ) {
+		//if ( !part.data.toString().startsWith(TextFragment.REFMARKER_START) ) {
+		if ( !part.data.toString().contains(TextFragment.REFMARKER_START) ) {
 			if ( layer == null ) {
 				return part.data.toString();
 			}
@@ -239,82 +240,97 @@ public class GenericSkeletonWriter implements ISkeletonWriter {
 				return layer.encode(part.data.toString(), context);
 			}
 		}
-		// Get the reference info
-		Object[] marker = TextFragment.getRefMarker(part.data);
-		// Check for problem
-		if ( marker == null ) {
-			return "-ERR:INVALID-REF-MARKER-";
-		}
-		String propName = (String)marker[3];
-
-		// If we have a property name: It's a reference to a property of 
-		// the resource holding this skeleton
-		if ( propName != null ) { // Reference to the content of the referent
-			if (Segment.REF_MARKER.equals(propName)) {
-				String segId = (String) marker[0];
-				ITextUnit tu = (ITextUnit)part.getParent();
-				LocaleId locId = part.getLocale();
-				TextContainer tc = null;
-				
-				if ( locId == null ) { // Source
-					tc = tu.getSource();
-				}
-				else { // Target
-					tc = tu.getTarget(locId);
-				}
-				Segment seg = null;
-				if ( tc != null ) {
-					seg = tc.getSegments().get(segId);
-				}
-				if (seg == null) {
-					logger.warning(String.format("Segment reference '%s' not found.", (String)marker[0]));
-					return "-ERR:INVALID-SEGMENT-REF-";
-				}
-				
-				return getContent(seg.getContent(), locId, context);
-			}
-			else
-				return getString((INameable)part.parent, propName, part.locId, context);
-		}
-
-		// Set the locToUse and the contextToUse parameters
-		// If locToUse==null: it's source, so use output locale for monolingual
-		LocaleId locToUse = (part.locId==null) ? outputLoc : part.locId;
-		int contextToUse = context;
-		if ( isMultilingual ) {
-			locToUse = part.locId;
-			// If locToUse==null: it's source, so not text in multilingual
-			contextToUse = (locToUse==null) ? 0 : context;
-		}
 		
-		// If a parent if set, it's a reference to the content of the resource
-		// holding this skeleton. And it's always a TextUnit
-		if ( part.parent != null ) {
-			if ( part.parent instanceof ITextUnit ) {
-				return getContent((ITextUnit)part.parent, locToUse, contextToUse);
+		StringBuilder sb = new StringBuilder(part.data); 
+		while (sb.indexOf(TextFragment.REFMARKER_START) != -1) {
+			// Get the reference info
+			Object[] marker = TextFragment.getRefMarker(sb);
+			// Check for problem
+			if ( marker == null ) {
+				return "-ERR:INVALID-REF-MARKER-";
 			}
-			else {
-				throw new RuntimeException("The self-reference to this skeleton part must be a text-unit.");
+			String propName = (String)marker[3];
+
+			// If we have a property name: It's a reference to a property of 
+			// the resource holding this skeleton
+			if ( propName != null ) { // Reference to the content of the referent
+				if (Segment.REF_MARKER.equals(propName)) {
+					String segId = (String) marker[0];
+					ITextUnit tu = (ITextUnit)part.getParent();
+					LocaleId locId = part.getLocale();
+					TextContainer tc = null;
+					
+					if ( locId == null ) { // Source
+						tc = tu.getSource();
+					}
+					else { // Target
+						tc = tu.getTarget(locId);
+					}
+					Segment seg = null;
+					if ( tc != null ) {
+						seg = tc.getSegments().get(segId);
+					}
+					if (seg == null) {
+						logger.warning(String.format("Segment reference '%s' not found.", (String)marker[0]));
+						return "-ERR:INVALID-SEGMENT-REF-";
+					}
+					
+					return getContent(seg.getContent(), locId, context);
+				}
+				else
+					return getString((INameable)part.parent, propName, part.locId, context);
 			}
+
+			// Set the locToUse and the contextToUse parameters
+			// If locToUse==null: it's source, so use output locale for monolingual
+			LocaleId locToUse = (part.locId==null) ? outputLoc : part.locId;
+			int contextToUse = context;
+			if ( isMultilingual ) {
+				locToUse = part.locId;
+				// If locToUse==null: it's source, so not text in multilingual
+				contextToUse = (locToUse==null) ? 0 : context;
+			}
+			
+			// If a parent if set, it's a reference to the content of the resource
+			// holding this skeleton. And it's always a TextUnit
+			if ( part.parent != null ) {
+				if ( part.parent instanceof ITextUnit ) {
+					return getContent((ITextUnit)part.parent, locToUse, contextToUse);
+				}
+				else {
+					throw new RuntimeException("The self-reference to this skeleton part must be a text-unit.");
+				}
+			}
+			
+			// Else this is a true reference to a referent
+			IReferenceable ref = getReference((String)marker[0]);
+			
+			String refData = null;
+//			int start = part.data.indexOf(TextFragment.REFMARKER_START);
+//			int end = part.data.indexOf(TextFragment.REFMARKER_END, start) + 
+//					TextFragment.REFMARKER_END.length();
+			int start = (Integer) marker[1];
+			int end = (Integer) marker[2];
+			
+			if ( ref == null ) {
+				logger.warning(String.format("Reference '%s' not found.", (String)marker[0]));
+				refData = "-ERR:REF-NOT-FOUND-";
+			}
+			else if ( ref instanceof ITextUnit ) {
+				refData = getString((ITextUnit)ref, locToUse, contextToUse); //TODO: Test locToUse
+			}
+			else if ( ref instanceof GenericSkeletonPart ) {
+				refData = getString((GenericSkeletonPart)ref, contextToUse);
+			}
+			else if ( ref instanceof StorageList ) { // == StartGroup
+				refData = getString((StorageList)ref, locToUse, contextToUse); //TODO: Test locToUse
+			}
+			else // DocumentPart, StartDocument, StartSubDocument		
+				refData = getString((GenericSkeleton)((IResource)ref).getSkeleton(), context);
+			
+			sb.replace(start, end, refData);
 		}
-		
-		// Else this is a true reference to a referent
-		IReferenceable ref = getReference((String)marker[0]);
-		if ( ref == null ) {
-			logger.warning(String.format("Reference '%s' not found.", (String)marker[0]));
-			return "-ERR:REF-NOT-FOUND-";
-		}
-		if ( ref instanceof ITextUnit ) {
-			return getString((ITextUnit)ref, locToUse, contextToUse); //TODO: Test locToUse
-		}
-		if ( ref instanceof GenericSkeletonPart ) {
-			return getString((GenericSkeletonPart)ref, contextToUse);
-		}
-		if ( ref instanceof StorageList ) { // == StartGroup
-			return getString((StorageList)ref, locToUse, contextToUse); //TODO: Test locToUse
-		}
-		// Else: DocumentPart, StartDocument, StartSubDocument 
-		return getString((GenericSkeleton)((IResource)ref).getSkeleton(), context);
+		return sb.toString();
 	}
 
 	protected String getString (INameable ref,

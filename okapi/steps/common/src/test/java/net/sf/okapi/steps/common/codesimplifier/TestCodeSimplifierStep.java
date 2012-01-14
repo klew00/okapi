@@ -4,7 +4,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 
 import net.sf.okapi.common.Event;
@@ -19,6 +21,15 @@ import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.resource.TextUnit;
 import net.sf.okapi.filters.html.HtmlFilter;
+import net.sf.okapi.filters.xliff.XLIFFFilter;
+import net.sf.okapi.lib.extra.pipelinebuilder.XBatch;
+import net.sf.okapi.lib.extra.pipelinebuilder.XBatchItem;
+import net.sf.okapi.lib.extra.pipelinebuilder.XPipeline;
+import net.sf.okapi.lib.extra.steps.DocumentPartLogger;
+import net.sf.okapi.lib.extra.steps.EventListBuilderStep;
+import net.sf.okapi.lib.extra.steps.EventLogger;
+import net.sf.okapi.lib.extra.steps.TextUnitLogger;
+import net.sf.okapi.steps.common.RawDocumentToFilterEventsStep;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -126,6 +137,136 @@ public class TestCodeSimplifierStep {
 		
 		RoundTripComparison rtc = new RoundTripComparison();
 		assertTrue(rtc.executeCompare(new HtmlFilter(), list, "UTF-8", EN, ESES, "out", new CodeSimplifierStep()));
+		//assertTrue(rtc.executeCompare(new HtmlFilter(), list, "UTF-8", EN, ESES, "out"));
+	}
+	
+	@Test
+	public void testDoubleExtraction2 () {
+		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
+		
+		list.add(new InputDocument(pathBase + "aa324.html", null));
+		
+		RoundTripComparison rtc = new RoundTripComparison();
+		assertTrue(rtc.executeCompare(new HtmlFilter(), list, "UTF-8", EN, ESES, "out", new CodeSimplifierStep()));
+		//assertTrue(rtc.executeCompare(new HtmlFilter(), list, "UTF-8", EN, ESES, "out"));
+	}
+	
+	@Test
+	public void testEvents() throws MalformedURLException {
+		//EventListBuilderStep elbs1 = new EventListBuilderStep();
+		EventListBuilderStep elbs2 = new EventListBuilderStep();
+		
+		new XPipeline(
+				"Test pipeline for CodeSimplifierStep",
+				new XBatch(
+						new XBatchItem(
+								new URL("file", null, pathBase + "aa324.html"),
+								"UTF-8",
+								EN)
+						),
+						
+				new RawDocumentToFilterEventsStep(new HtmlFilter()),
+//				elbs1,
+				//new ResourceSimplifierStep(),
+				new EventLogger(),
+				elbs2
+		).execute();
+		
+		for (Event event : elbs2.getList()) {
+			if (event.isTextUnit()) {
+				System.out.println(TextUnitLogger.getTuInfo(event.getTextUnit(), EN));
+			}
+			else if (event.isDocumentPart()) {
+				System.out.println(DocumentPartLogger.getDpInfo(event.getDocumentPart(), EN));
+			}
+		}		
+	}
+	
+	@Test
+	public void testEvents2() throws MalformedURLException {
+		//EventListBuilderStep elbs1 = new EventListBuilderStep();
+		EventListBuilderStep elbs2 = new EventListBuilderStep();
+		
+		new XPipeline(
+				"Test pipeline for CodeSimplifierStep",
+				new XBatch(
+						new XBatchItem(
+								new URL("file", null, pathBase + "out/aa324.html"),
+								"UTF-8",
+								EN)
+						),
+						
+				new RawDocumentToFilterEventsStep(new HtmlFilter()),
+//				elbs1,
+				//new ResourceSimplifierStep(),
+				new EventLogger(),
+				elbs2
+		).execute();
+		
+		for (Event event : elbs2.getList()) {
+			if (event.isTextUnit()) {
+				System.out.println(TextUnitLogger.getTuInfo(event.getTextUnit(), EN));
+			}
+			else if (event.isDocumentPart()) {
+				System.out.println(DocumentPartLogger.getDpInfo(event.getDocumentPart(), EN));
+			}
+		}		
+	}
+	
+	@Test
+	public void testEvents3() throws MalformedURLException {
+		new XPipeline(
+				"Test pipeline for CodeSimplifierStep",
+				new XBatch(
+						new XBatchItem(
+								new URL("file", null, pathBase + "aa324.html"),
+								"UTF-8",
+								EN)
+						),
+						
+				new RawDocumentToFilterEventsStep(new HtmlFilter()),
+				new TextUnitLogger()
+		).execute();
+	}
+	
+	@Test
+	public void testEvents4() throws MalformedURLException {
+		new XPipeline(
+				"Test pipeline for CodeSimplifierStep",
+				new XBatch(
+						new XBatchItem(
+								new URL("file", null, pathBase + "out/aa324.html"),
+								"UTF-8",
+								EN)
+						),
+						
+				new RawDocumentToFilterEventsStep(new HtmlFilter()),
+				new TextUnitLogger()
+		).execute();
+	}
+	
+	@Test
+	public void testDoubleExtraction3 () {
+		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
+		
+		list.add(new InputDocument(pathBase + "form.html", null));
+		
+		RoundTripComparison rtc = new RoundTripComparison();
+		assertTrue(rtc.executeCompare(new HtmlFilter(), list, "UTF-8", EN, ESES, "out", new CodeSimplifierStep()));
+		//assertTrue(rtc.executeCompare(new HtmlFilter(), list, "UTF-8", EN, ESES, "out"));
+	}		
+	
+	@Test
+	public void testDoubleExtraction4 () {
+		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
+		
+		list.add(new InputDocument(pathBase + "BinUnitTest01.xlf", null));
+		list.add(new InputDocument(pathBase + "JMP-11-Test01.xlf", null));
+		list.add(new InputDocument(pathBase + "Manual-12-AltTrans.xlf", null));
+		list.add(new InputDocument(pathBase + "test1.xlf", null));
+		
+		RoundTripComparison rtc = new RoundTripComparison();
+		assertTrue(rtc.executeCompare(new XLIFFFilter(), list, "UTF-8", EN, ESES, "out", new CodeSimplifierStep()));
 		//assertTrue(rtc.executeCompare(new HtmlFilter(), list, "UTF-8", EN, ESES, "out"));
 	}
 }
