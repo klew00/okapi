@@ -20,12 +20,16 @@
 
 package net.sf.okapi.applications.olifant;
 
+import net.sf.okapi.lib.tmdb.DbUtil;
 import net.sf.okapi.lib.tmdb.filter.FilterNode;
+import net.sf.okapi.lib.tmdb.filter.Operator;
+import net.sf.okapi.lib.tmdb.filter.OperatorNode;
 
 public class FilterOptions {
 
 	private boolean active;
-	private boolean useSimpleFilter;
+	private boolean simpleFilterFlaggedOnly;
+	private boolean simpleFilterExpression;
 	private FilterNode simpleFilter;
 	private FilterNode fullFilter;
 	
@@ -33,20 +37,12 @@ public class FilterOptions {
 	}
 
 	public FilterNode getCurrentFilter () {
-		if ( useSimpleFilter ) {
-			return simpleFilter;
+		//TODO: complex filter
+		if ( simpleFilterFlaggedOnly ) {
+			return new OperatorNode(Operator.OP_EQUALS, DbUtil.FLAG_NAME, true);
 		}
-		else {
-			return fullFilter;
-		}
-	}
-	
-	public boolean getActive () {
-		return active;
-	}
-	
-	public void setActive (boolean active) {
-		this.active = active;
+
+		return null;
 	}
 	
 	public FilterNode getSimpleFilter () {
@@ -57,4 +53,11 @@ public class FilterOptions {
 		simpleFilter = root;
 	}
 
+	public boolean getSimpleFilterFlaggedOnly () {
+		return simpleFilterFlaggedOnly;
+	}
+	
+	public void setSimpleFilterFlaggedOnly (boolean simpleFilterFlaggedOnly) {
+		this.simpleFilterFlaggedOnly = simpleFilterFlaggedOnly;
+	}
 }

@@ -35,18 +35,21 @@ import net.sf.okapi.lib.tmdb.IRepository;
 import net.sf.okapi.lib.tmdb.ITm;
 import net.sf.okapi.lib.tmdb.DbUtil.PageMode;
 import net.sf.okapi.lib.tmdb.filter.FilterNode;
-import net.sf.okapi.lib.tmdb.filter.Operator;
 import net.sf.okapi.lib.tmdb.filter.OperatorNode;
 import net.sf.okapi.lib.tmdb.filter.ValueNode;
 import net.sf.okapi.lib.tmdb.filter.ValueNode.TYPE;
 
 public class Tm implements ITm {
 
-	private Repository store;
+	private final Repository store;
+	private final String uuid;
+	
 	private String name;
-	private String uuid;
+	private String segTable;
+	private String tuTable;
 	private PreparedStatement pstmGet;
-
+	private List<String> recordFields;
+	
 	private DbUtil.PageMode pageMode = PageMode.EDITOR;
 	private long limit = 500;
 	private boolean needPagingRefresh = true; // Must be set to true anytime we change the row count
@@ -54,6 +57,7 @@ public class Tm implements ITm {
 	private long pageCount;
 	private long currentPage = -1; // 0-based
 	private boolean usePagingType2 = true;
+	private boolean testMode = true;
 
 	private PreparedStatement pstmAddSeg;
 	private PreparedStatement pstmAddTu;
@@ -66,8 +70,12 @@ public class Tm implements ITm {
 
 	private PreparedStatement pstmAnchors;
 	private ArrayList<Long> anchors;
-	private String rowSubQuery;
+	private String rownumSubQuery;
 	
+	private FilterNode filterRoot;
+	private String whereClause;
+	LinkedHashMap<String, Boolean> orderByFields;
+	private String orderByClause;
 	
 	private String toSQL (FilterNode node) {
 		String tmp = "";
@@ -95,7 +103,13 @@ public class Tm implements ITm {
 		else {
 			ValueNode vn = (ValueNode)node;
 			if ( vn.isField() ) {
-				return "\""+vn.getStringValue()+"\"";
+				String fn = vn.getStringValue();
+				if ( DbUtil.isSegmentField(fn) ) {
+					return segTable+".\""+fn+"\"";
+				}
+				else {
+					return tuTable+".\""+fn+"\"";
+				}
 			}
 			else { // Constant
 				if ( vn.getType() == TYPE.BOOLEAN ) {
@@ -115,8 +129,8 @@ public class Tm implements ITm {
 		String name)
 	{
 		this.store = store;
-		this.name = name;
 		this.uuid = uuid;
+		updateName(name);
 	}
 	
 	@Override
@@ -125,6 +139,36 @@ public class Tm implements ITm {
         super.finalize();
 	}
 
+	private void updateName (String name) {
+		this.name = name;
+		this.segTable = "\""+name+"_SEG\"";
+		this.tuTable = "\""+name+"_TU\"";
+		
+		// Reset the sort clause
+		if ( Util.isEmpty(orderByFields) ) {
+			orderByClause = "\""+DbUtil.SEGKEY_NAME+"\""; // Defaulr
+		}
+		else {
+			StringBuilder tmp = new StringBuilder();
+			for ( String fn : orderByFields.keySet() ) {
+				if ( tmp.length() > 0 ) tmp.append(", ");
+				tmp.append(
+					(DbUtil.isSegmentField(fn) ? segTable : tuTable) +
+					".\"" + fn + "\" " +
+					(orderByFields.get(fn) ? "ASC" : "DESC"));
+			}
+			orderByClause = tmp.toString();
+		}
+		
+		// Reset the filter clause
+		if ( filterRoot == null ) whereClause = "";
+		else {
+			whereClause = toSQL(filterRoot);
+		}
+		
+		updateMainQueries();
+	}
+	
 	private void closeAddStatements ()
 		throws SQLException
 	{
@@ -190,11 +234,17 @@ public class Tm implements ITm {
 
 	public void rename (String newName) {
 		store.renameTm(name, newName);
-		name = newName;
+		updateName(newName);
+		//TODO: predefined statements need to be reset too
 	}
 	
 	@Override
 	public void setRecordFields (List<String> names) {
+		recordFields = names;
+		updateMainQueries();
+	}
+	
+	private void updateMainQueries () {
 		try {
 			// Create a prepared statement to use to retrieve the selection
 			if ( pstmGet != null ) {
@@ -202,39 +252,51 @@ public class Tm implements ITm {
 			}
 			// Check if we have at least one field that is TU-level
 			boolean hasTUField = false;
-			for ( String name : names ) {
-				if ( !DbUtil.isSegmentField(name) ) {
-					hasTUField = true;
-					break;
+			if ( recordFields != null ) {
+				for ( String name : recordFields ) {
+					if ( !DbUtil.isSegmentField(name) ) {
+						hasTUField = true;
+						break;
+					}
 				}
 			}
 			
 			StringBuilder tmp;
-			String segTable = "\""+name+"_SEG\"";
 			if ( hasTUField ) {
-				String tuTable = "\""+name+"_TU\"";
 				tmp = new StringBuilder(String.format("SELECT %s.\"%s\", %s.\"%s\"", segTable, DbUtil.SEGKEY_NAME, segTable, DbUtil.FLAG_NAME));
-				for ( String name : names ) {
-					if ( DbUtil.isSegmentField(name) ) tmp.append(", "+segTable+".\""+name+"\"");
-					else tmp.append(", "+tuTable+".\""+name+"\"");
+				if ( recordFields != null ) {
+					for ( String name : recordFields ) {
+						if ( DbUtil.isSegmentField(name) ) tmp.append(", "+segTable+".\""+name+"\"");
+						else tmp.append(", "+tuTable+".\""+name+"\"");
+					}
 				}
 				tmp.append(" FROM "+segTable+" LEFT JOIN "+tuTable+" ON "+segTable+".\""+DbUtil.TUREF_NAME+"\"="+tuTable+".TUKEY");
 				
 			}
 			else { // Simple select in the segment table
 				tmp = new StringBuilder(String.format("SELECT \"%s\", \"%s\"", DbUtil.SEGKEY_NAME, DbUtil.FLAG_NAME));
-				for ( String name : names ) {
-					tmp.append(", \""+name+"\"");
+				if ( recordFields != null ) {
+					for ( String name : recordFields ) {
+						tmp.append(", \""+name+"\"");
+					}
 				}
 				tmp.append(" FROM \""+name+"_SEG\"");
 			}
 			
-			tmp.append(String.format(" WHERE \"%s\">=? ORDER BY \"%s\" LIMIT ?", DbUtil.SEGKEY_NAME, DbUtil.SEGKEY_NAME));
+			if ( testMode ) {
+				tmp.append(String.format(" %s ORDER BY %s LIMIT ? OFFSET ?",
+					( Util.isEmpty(whereClause) ? "" : "WHERE "+whereClause),
+					orderByClause));
+			}
+			else {
+				tmp.append(String.format(" WHERE \"%s\">=? ORDER BY \"%s\" LIMIT ?", DbUtil.SEGKEY_NAME, DbUtil.SEGKEY_NAME));
+			}
 
 			pstmGet = store.getConnection().prepareStatement(tmp.toString(),
 				ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 			
-			rowSubQuery = String.format("(SELECT \"%s\", ROWNUM() AS R FROM %s)", DbUtil.SEGKEY_NAME, segTable);
+			rownumSubQuery = String.format("(SELECT \"%s\", ROWNUM() AS R FROM %s)", DbUtil.SEGKEY_NAME, segTable);
+			
 			if ( usePagingType2 ) {
 				// Create statement for the anchors
 				if ( pageMode == PageMode.ITERATOR ) {
@@ -610,7 +672,7 @@ public class Tm implements ITm {
 				ResultSet result = pstmAnchors.executeQuery();
 				anchors = new ArrayList<Long>();
 				while ( result.next() ) {
-					long rn = result.getLong(2);
+					//long rn = result.getLong(2);
 					anchors.add(result.getLong(1));
 				}
 			}		
@@ -625,8 +687,14 @@ public class Tm implements ITm {
 		if ( topSegKey < 1 ) return null;
 		ResultSet result = null;
 		try {
-			pstmGet.setLong(1, topSegKey);
-			pstmGet.setLong(2, limit);
+			if ( testMode ) {
+				pstmGet.setLong(1, limit);
+				pstmGet.setLong(2, (pageMode == PageMode.EDITOR ? limit-1 : limit) * currentPage);
+			}
+			else {
+				pstmGet.setLong(1, topSegKey);
+				pstmGet.setLong(2, limit);
+			}
 			result = pstmGet.executeQuery();
 		}
 		catch ( SQLException e ) {
@@ -1012,7 +1080,9 @@ public class Tm implements ITm {
 
 	@Override
 	public void setSortOrder (LinkedHashMap<String, Boolean> fields) {
-		// TODO Auto-generated method stub
+		orderByFields = fields;
+		updateName(name);
+		needPagingRefresh = true;
 	}
 
 	@Override
@@ -1039,7 +1109,7 @@ public class Tm implements ITm {
 			stm = store.getConnection().createStatement();
 			String tmp = String.format(
 				"SELECT \"%s\", R FROM %s WHERE (\"%s\" / %d)=1 AND MOD(\"%s\", %d)=0",
-				DbUtil.SEGKEY_NAME, rowSubQuery, DbUtil.SEGKEY_NAME, segKey, DbUtil.SEGKEY_NAME, segKey);
+				DbUtil.SEGKEY_NAME, rownumSubQuery, DbUtil.SEGKEY_NAME, segKey, DbUtil.SEGKEY_NAME, segKey);
 			
 //			tmp = String.format(
 //				"SELECT \"%s\", R FROM %s WHERE (-%s=-%d)",
@@ -1092,11 +1162,9 @@ public class Tm implements ITm {
 
 	@Override
 	public void setFilter (FilterNode root) {
-		// TODO
-		String clause = toSQL(root);
-		clause = clause.toUpperCase();
-		// Convert the tree into an SQL WHERE clause
-		
+		filterRoot = root;
+		updateName(name);
+		needPagingRefresh = true;
 	}
 	
 }

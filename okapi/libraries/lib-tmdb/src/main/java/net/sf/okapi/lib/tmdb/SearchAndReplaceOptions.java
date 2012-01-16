@@ -34,6 +34,7 @@ public class SearchAndReplaceOptions {
 	
 	private String search;
 	private String replace;
+	private boolean replaceMode;
 	private ArrayList<String> fields;
 	private ACTION action;
 	
@@ -55,6 +56,14 @@ public class SearchAndReplaceOptions {
 
 	public void setAction (ACTION action) {
 		this.action = action;
+	}
+	
+	public boolean getReplaceMode () {
+		return replaceMode;
+	}
+	
+	public void setReplaceMode (boolean replaceMode) {
+		this.replaceMode = replaceMode;
 	}
 
 	public String getSearch () {

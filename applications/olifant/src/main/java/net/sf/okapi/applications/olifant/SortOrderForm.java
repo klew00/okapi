@@ -60,7 +60,8 @@ class SortOrderForm {
 	SortOrderForm (Shell parent,
 		ITm tm,
 		String source,
-		String target)
+		String target,
+		LinkedHashMap<String, Boolean> currentOrder)
 	{
 		shell = new Shell(parent, SWT.CLOSE | SWT.TITLE | SWT.RESIZE | SWT.APPLICATION_MODAL);
 		shell.setText("Sort Order");
@@ -129,6 +130,9 @@ class SortOrderForm {
 		
 		shell.pack();
 		shell.setMinimumSize(shell.getBounds().width, shell.getBounds().height);
+
+		edExpression.setText(convertToString(currentOrder));
+		
 		Dialogs.centerWindow(shell, parent);
 	}
 
@@ -164,7 +168,7 @@ class SortOrderForm {
 					result.put(parts[0], order.equals("asc"));
 				}
 				else {
-					error = String.format("Invalid direction '%s'. It must be 'asc' or 'desc'.", order);
+					error = String.format("Invalid direction '%s'. It must be 'ASC' or 'DESC'.", order);
 				}
 			}
 			if ( error != null ) {
@@ -184,7 +188,12 @@ class SortOrderForm {
 				@Override
 				public void handleEvent (Event event) {
 					MenuItem mi = (MenuItem)event.widget;
-					target.insert((String)mi.getData());
+					// Get the value to insert
+					String tmp = (String)mi.getData();
+					// Make sure it's quoted if it has a space
+					if ( tmp.indexOf(' ') > -1 ) tmp = "\""+tmp+"\"";
+					// Insert the value
+					target.insert(tmp);
 					target.setFocus();
 				}
 			};
@@ -217,5 +226,18 @@ class SortOrderForm {
             }
 		});
 		return button;
+	}
+	
+	private String convertToString (LinkedHashMap<String, Boolean> order) {
+		if ( Util.isEmpty(order) ) return "";
+		StringBuilder tmp = new StringBuilder();
+		for ( String fn : order.keySet() ) {
+			Boolean asc = order.get(fn);
+			if ( fn.indexOf(' ') > -1 ) fn = "\""+fn+"\"";
+			if ( tmp.length() > 0 ) tmp.append(", ");
+			tmp.append(fn+" ");
+			tmp.append(asc ? "ASC" : "DESC");
+		}
+		return tmp.toString();
 	}
 }

@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import net.sf.okapi.common.Util;
 import net.sf.okapi.common.observer.IObservable;
 import net.sf.okapi.common.observer.IObserver;
 import net.sf.okapi.common.ui.Dialogs;
@@ -37,9 +38,6 @@ import net.sf.okapi.lib.tmdb.Location;
 import net.sf.okapi.lib.tmdb.SearchAndReplace;
 import net.sf.okapi.lib.tmdb.SearchAndReplaceOptions;
 import net.sf.okapi.lib.tmdb.SearchAndReplaceOptions.ACTION;
-import net.sf.okapi.lib.tmdb.filter.FilterNode;
-import net.sf.okapi.lib.tmdb.filter.Operator;
-import net.sf.okapi.lib.tmdb.filter.OperatorNode;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabItem;
@@ -71,11 +69,12 @@ import org.eclipse.swt.widgets.TableItem;
 class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 
 	private final static int KEYCOLUMNWIDTH = 90;
-
 	private final static int SAVE_FLAG = 0x01;
 	private final static int SAVE_SOURCE = 0x02;
 	private final static int SAVE_TARGET = 0x04;
 	//private final static int SAVE_THIRD = 0x08;
+	
+	private final static String FLAGSEGKEY_COLNAME = "Flag/SegKey";
 
 	private CTabItem tabItem;
 	private final SashForm sashMain;
@@ -101,6 +100,7 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 	private SearchAndReplaceForm sarForm;
 	private SearchAndReplaceOptions sarOptions;
 	private FilterOptions fltOptions;
+	private LinkedHashMap<String, Boolean> sortOrder;
 
 	private MenuItem miCtxAddEntry;
 	private MenuItem miCtxDeleteEntries;
@@ -147,14 +147,28 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 			@Override
 			public void handleEvent (Event event) {
 				try {
-					TableColumn col = (TableColumn)event.widget;
-					// Check the current sort if any
-					//TODO
-					// Set the new sort
-					LinkedHashMap<String, Boolean> map = new LinkedHashMap<String, Boolean>();
-					map.put(col.getText(), true);
 					saveEntryAndModifications();
-					getTm().setSortOrder(map);
+					// Get the field name for the column
+					TableColumn col = (TableColumn)event.widget;
+					String fn = col.getText();
+					if ( fn.equals(FLAGSEGKEY_COLNAME) ) fn = DbUtil.SEGKEY_NAME;
+					// Check the current sort
+					Boolean asc = true;
+					if ( !Util.isEmpty(sortOrder) ) {
+						if ( sortOrder.size() == 1 ) {
+							// Reverse the order if we were sorting on that field
+							asc = sortOrder.get(fn);
+							if ( asc != null ) asc = !asc;
+							else asc = true;
+						}
+					}
+					// Clear or create the holder variable
+					if ( sortOrder == null ) sortOrder = new LinkedHashMap<String, Boolean>();
+					else sortOrder.clear();
+					// Set the new sort directive
+					sortOrder.put(fn, asc);
+					getTm().setSortOrder(sortOrder);
+					// Refresh the display
 					fillTable(0, 0, 0, cursor.getColumn(), -1);
 				}
 				catch ( Throwable e ) {
@@ -306,7 +320,7 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 		
 		// Create the first column (always present)
 		TableColumn col = new TableColumn(table, SWT.NONE);
-		col.setText("Flag/SegKey");
+		col.setText(FLAGSEGKEY_COLNAME);
 		col.setWidth(KEYCOLUMNWIDTH);
 		col.addListener(SWT.Selection, columnHeaderListener);
 		
@@ -379,6 +393,10 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 	
 	LogPanel getLog () {
 		return logPanel;
+	}
+	
+	FilterOptions getFilterOptions () {
+		return fltOptions;
 	}
 	
 	boolean canClose () {
@@ -1127,14 +1145,8 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 	void setFilterForFlaggedEntries () {
 		try {
 			saveEntryAndModifications();
-			fltOptions.setActive(!fltOptions.getActive());
-			if ( fltOptions.getActive() ) {
-				FilterNode node = new OperatorNode(Operator.OP_EQUALS, DbUtil.FLAG_NAME, true);
-				tm.setFilter(node);
-			}
-			else {
-				tm.setFilter(null);
-			}
+			fltOptions.setSimpleFilterFlaggedOnly(!fltOptions.getSimpleFilterFlaggedOnly());
+			tm.setFilter(fltOptions.getCurrentFilter());
 			fillTable(0, 0, 0, cursor.getColumn(), -1);
 		}
 		catch ( Throwable e ) {
@@ -1152,10 +1164,11 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 		try {
 			saveEntryAndModifications();
 			SortOrderForm dlg = new SortOrderForm(getShell(), getTm(),
-				opt.getSourceLocale(), opt.getTargetLocale());
+				opt.getSourceLocale(), opt.getTargetLocale(), sortOrder);
 			LinkedHashMap<String, Boolean> res = dlg.showDialog();
 			if ( res == null ) return;
-			getTm().setSortOrder(res);
+			sortOrder = res; // Set the new sort order
+			getTm().setSortOrder(sortOrder);
 			fillTable(0, 0, 0, cursor.getColumn(), -1);
 		}
 		catch ( Throwable e ) {

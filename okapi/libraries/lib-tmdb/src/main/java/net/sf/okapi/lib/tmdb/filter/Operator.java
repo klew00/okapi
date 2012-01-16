@@ -20,6 +20,8 @@
 
 package net.sf.okapi.lib.tmdb.filter;
 
+import java.util.LinkedHashMap;
+
 public class Operator {
 
 	public static enum TYPE {
@@ -41,6 +43,16 @@ public class Operator {
 	public static final Operator OP_NOT = new Operator(TYPE.NOT, SCOPE_BOOLEAN, "not");
 	public static final Operator OP_EQUALS = new Operator(TYPE.EQUALS, SCOPE_ALL, "equals");
 	public static final Operator OP_CONTAINS = new Operator(TYPE.CONTAINS, SCOPE_STRING, "contains");
+	
+	public static final LinkedHashMap<TYPE, Operator> OPERATORS;
+	static {
+		OPERATORS = new LinkedHashMap<Operator.TYPE, Operator>();
+		OPERATORS.put(TYPE.OR, OP_OR);
+		OPERATORS.put(TYPE.AND, OP_AND);
+		OPERATORS.put(TYPE.NOT, OP_NOT);
+		OPERATORS.put(TYPE.EQUALS, OP_EQUALS);
+		OPERATORS.put(TYPE.CONTAINS, OP_CONTAINS);
+	}
 	
 	private final TYPE type;
 	private final int scope;

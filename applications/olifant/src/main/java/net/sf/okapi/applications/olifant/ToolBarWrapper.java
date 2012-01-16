@@ -37,16 +37,18 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.CoolBar;
 import org.eclipse.swt.widgets.CoolItem;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.ToolBar;
-import org.eclipse.swt.widgets.ToolItem;
 
 class ToolBarWrapper {
 
 	private final CoolBar coolBar;
 	private final Combo cbSource;
 	private final Combo cbTarget;
-//	private final Button btUseFilter;
 	private final Button chkFlaggedEntries;
+//	private final Button chkExpression;
+//	private final Combo cbField;
+//	private final Combo cbOperator;
+//	private final Text edValue;
+//	private final FilterExpressionPanel pnlExpr;
 	
 	private TmPanel tp;
 
@@ -92,11 +94,8 @@ class ToolBarWrapper {
 			}
 		});
 		
-//		btUseFilter = new Button(comp, SWT.TOGGLE);
-//		btUseFilter.setImage(mainForm.getResources().getImage("viewusefilter"));
-
 		final Label stFilter = new Label(comp, SWT.NONE);
-		stFilter.setText("  Filter:");
+		stFilter.setText("      ");
 
 		chkFlaggedEntries = new Button(comp, SWT.CHECK);
 		chkFlaggedEntries.setText("Flagged entries only");
@@ -106,6 +105,21 @@ class ToolBarWrapper {
 			}
 		});
 
+//		chkExpression = new Button(comp, SWT.CHECK);
+//		chkExpression.setText("Condition:");
+//		
+//		cbField = new Combo(comp, SWT.READ_ONLY | SWT.BORDER);
+//		cbField.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));		
+//		
+//		cbOperator = new Combo(comp, SWT.READ_ONLY | SWT.BORDER);
+//		cbOperator.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));		
+//		
+//		edValue = new Text(comp, SWT.BORDER);
+//		edValue.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));		
+//
+//		pnlExpr = new FilterExpressionPanel(comp, SWT.NONE);
+//		pnlExpr.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		
 		CoolItem ci = new CoolItem(coolBar, SWT.NONE);
 
 		ci.setControl(comp);
@@ -115,14 +129,6 @@ class ToolBarWrapper {
 
 	    coolBar.pack();		
 	}
-	
-//	void updateCommands () {
-//		boolean enabled = (( tp != null ) && !tp.hasRunningThread() );
-//		
-//		
-//		cbSource.setEnabled(enabled);
-//		cbTarget.setEnabled(enabled);
-//	}
 	
 	void update (TmPanel tp) {
 		TmPanel oldTp = this.tp;
@@ -139,6 +145,12 @@ class ToolBarWrapper {
 				setTarget(oldTrg);
 				setSource(oldSrc, oldSrc.isEmpty());
 			}
+		}
+		if ( tp != null ) {
+			chkFlaggedEntries.setSelection(tp.getFilterOptions().getSimpleFilterFlaggedOnly());
+		}
+		else {
+			chkFlaggedEntries.setSelection(false);
 		}
 		
 		cbSource.setEnabled(enabled);
@@ -249,4 +261,5 @@ class ToolBarWrapper {
 	int getTargetIndex () {
 		return cbTarget.getSelectionIndex();
 	}
+	
 }

@@ -30,6 +30,7 @@ import net.sf.okapi.lib.tmdb.SearchAndReplaceOptions.ACTION;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -43,16 +44,16 @@ import org.eclipse.swt.widgets.Text;
 
 class SearchAndReplaceForm {
 	
-	private Shell shell;
-	private Text edSearch;
-	private Button chkReplace;
-	private Text edReplace;
-	private Button btFindNext;
-	private Button btReplaceOne;
-	private Button btFlagAll;
-	private Button btReplaceAll;
-	private Table tblFields;
-	private SearchAndReplaceOptions options;
+	private final SearchAndReplaceOptions options;
+	private final Shell shell;
+	private final Text edSearch;
+	private final Button chkReplace;
+	private final Text edReplace;
+	private final Button btFindNext;
+	private final Button btReplaceOne;
+	private final Button btFlagAll;
+	private final Button btReplaceAll;
+	private final Table tblFields;
 
 	SearchAndReplaceForm (Shell parent,
 		SearchAndReplaceOptions p_options,
@@ -122,6 +123,11 @@ class SearchAndReplaceForm {
 		chkReplace = new Button(shell, SWT.CHECK); 
 		chkReplace.setText("Replace with:");
 		chkReplace.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END | GridData.VERTICAL_ALIGN_BEGINNING));
+		chkReplace.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				updateMode();
+			}
+		});
 		
 		edReplace = new Text(shell, SWT.BORDER);
 		gdTmp = new GridData(GridData.FILL_HORIZONTAL | GridData.VERTICAL_ALIGN_BEGINNING);
@@ -141,6 +147,13 @@ class SearchAndReplaceForm {
 		Dialogs.placeWindowInSECorner(shell, parent);
 	}
 
+	private void updateMode () {
+		boolean enabled = chkReplace.getSelection();
+		edReplace.setEnabled(enabled);
+		btReplaceOne.setEnabled(enabled);
+		btReplaceAll.setEnabled(enabled);
+	}
+	
 	private void updateData (ArrayList<String> displayFields) {
 		edSearch.setText(options.getSearch());
 		edReplace.setText(options.getReplace());
@@ -151,6 +164,9 @@ class SearchAndReplaceForm {
 			ti.setText(fn);
 			ti.setChecked(fields.contains(fn));
 		}
+
+		chkReplace.setSelection(options.getReplaceMode());
+		updateMode();
 	}
 	
 	ACTION showDialog () {
@@ -183,6 +199,7 @@ class SearchAndReplaceForm {
 		options.setSearch(tmp);
 		options.setReplace(edReplace.getText());
 		options.setFields(fields);
+		options.setReplaceMode(chkReplace.getSelection());
 		return true;
 	}
 }

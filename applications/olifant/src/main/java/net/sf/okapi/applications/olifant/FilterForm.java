@@ -41,6 +41,7 @@ class FilterForm {
 	final private Shell shell;
 	final private List<String> availableFields;
 	final private FilterOptions options;
+	final private FilterExpressionPanel pnlExpr;
 	
 	private boolean result = false;
 
@@ -61,6 +62,10 @@ class FilterForm {
 		
 		Label label = new Label(group, SWT.NONE);
 		label.setText("Not implemented yet.");
+		
+		pnlExpr = new FilterExpressionPanel(group, SWT.BORDER);
+		pnlExpr.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		pnlExpr.updateAvailableFields(availableFields);
 		
 		SelectionAdapter OKCancelActions = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {

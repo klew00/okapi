@@ -244,6 +244,8 @@ class RepositoryPanel extends Composite {
 				return; // Cancel or no.
 			}
 			
+			mainForm.getStatusBar().setInfo("Deleting translation memory...", true);
+			
 			// Check if the TM is open
 			TmPanel tp = mainForm.findTmTab(tmName, false);
 			if ( tp != null ) {
@@ -260,6 +262,7 @@ class RepositoryPanel extends Composite {
 			Dialogs.showError(getShell(), "Error selecting repository.\n"+e.getMessage(), null);
 		}
 		finally {
+			mainForm.getStatusBar().setInfo("", false);
 			resetRepositoryUI(n);
 		}
 	}

@@ -454,6 +454,10 @@ public class MainForm {
 		return toolBar;
 	}
 	
+	StatusBar getStatusBar () {
+		return statusBar;
+	}
+	
 	TmPanel addTmTabEmpty (ITm tm,
 		TMOptions opt)
 	{
