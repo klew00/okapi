@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -156,11 +157,13 @@ public class TestCodeSimplifierStep {
 		//EventListBuilderStep elbs1 = new EventListBuilderStep();
 		EventListBuilderStep elbs2 = new EventListBuilderStep();
 		
+		System.out.println(new File(pathBase).toURI().getPath());
+		
 		new XPipeline(
 				"Test pipeline for CodeSimplifierStep",
 				new XBatch(
 						new XBatchItem(
-								new URL("file", null, pathBase + "aa324.html"),
+								new File(pathBase + "aa324.html").toURI(),
 								"UTF-8",
 								EN)
 						),
@@ -191,7 +194,7 @@ public class TestCodeSimplifierStep {
 				"Test pipeline for CodeSimplifierStep",
 				new XBatch(
 						new XBatchItem(
-								new URL("file", null, pathBase + "out/aa324.html"),
+								new File(pathBase + "out/aa324.html").toURI(), 
 								"UTF-8",
 								EN)
 						),
@@ -219,7 +222,7 @@ public class TestCodeSimplifierStep {
 				"Test pipeline for CodeSimplifierStep",
 				new XBatch(
 						new XBatchItem(
-								new URL("file", null, pathBase + "aa324.html"),
+								new File(pathBase + "aa324.html").toURI(),
 								"UTF-8",
 								EN)
 						),
@@ -235,7 +238,7 @@ public class TestCodeSimplifierStep {
 				"Test pipeline for CodeSimplifierStep",
 				new XBatch(
 						new XBatchItem(
-								new URL("file", null, pathBase + "out/aa324.html"),
+								new File(pathBase + "out/aa324.html").toURI(),
 								"UTF-8",
 								EN)
 						),
