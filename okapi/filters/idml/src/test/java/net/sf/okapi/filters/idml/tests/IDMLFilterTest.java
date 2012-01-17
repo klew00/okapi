@@ -101,6 +101,9 @@ public class IDMLFilterTest {
 		list.add(new InputDocument(root+"TextPathTest02.idml", "okf_idml@ExtractAll.fprm"));
 		list.add(new InputDocument(root+"TextPathTest03.idml", "okf_idml@ExtractAll.fprm"));
 		list.add(new InputDocument(root+"TextPathTest04.idml", "okf_idml@ExtractAll.fprm"));
+		
+		list.add(new InputDocument(root+"idmltest.idml", "okf_idml@ExtractAll.fprm"));
+		list.add(new InputDocument(root+"idmltest.idml", null));
 // For local test only, comment out for SVN		
 //		list.add(new InputDocument(root+"private/enlaso_001.idml", "../okf_idml@ExtractAll.fprm"));
 //		list.add(new InputDocument(root+"private/enlaso_002.idml", "../okf_idml@ExtractAll.fprm"));
