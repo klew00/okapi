@@ -295,7 +295,7 @@ public class TestCodeSimplifierStep {
 				"Test pipeline for CodeSimplifierStep",
 				new XBatch(
 						new XBatchItem(
-								new URL("file", null, pathBase + "idmltest.idml"),
+								new File(pathBase + "idmltest.idml").toURI(),
 								"UTF-8",
 								EN)
 						),
@@ -311,7 +311,7 @@ public class TestCodeSimplifierStep {
 				"Test pipeline for CodeSimplifierStep",
 				new XBatch(
 						new XBatchItem(
-								new URL("file", null, pathBase + "out/idmltest.idml"),
+								new File(pathBase + "out/idmltest.idml").toURI(),
 								"UTF-8",
 								EN)
 						),
