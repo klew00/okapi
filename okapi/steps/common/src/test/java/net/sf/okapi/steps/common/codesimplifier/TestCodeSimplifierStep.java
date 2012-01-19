@@ -305,22 +305,6 @@ public class TestCodeSimplifierStep {
 	}
 	
 	@Test
-	public void testEvents6() throws MalformedURLException {
-		new XPipeline(
-				"Test pipeline for CodeSimplifierStep",
-				new XBatch(
-						new XBatchItem(
-								new File(pathBase + "out/idmltest.idml").toURI(),
-								"UTF-8",
-								EN)
-						),
-						
-				new RawDocumentToFilterEventsStep(new IDMLFilter()),
-				new TextUnitLogger()
-		).execute();
-	}
-	
-	@Test
 	public void testDoubleExtraction3 () {
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
 		
