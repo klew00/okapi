@@ -26,6 +26,7 @@ import net.sf.okapi.common.UsingParameters;
 import net.sf.okapi.common.pipeline.BasePipelineStep;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
+import net.sf.okapi.common.skeleton.GenericSkeleton;
 
 /**
  * !!! It's important to include this step in a pipeline before any source-copying or leveraging steps, because it can modify 
@@ -67,7 +68,8 @@ public class CodeSimplifierStep extends BasePipelineStep {
 	@Override
 	protected Event handleTextUnit(Event event) {
 		ITextUnit tu = event.getTextUnit();
-		TextUnitUtil.simplifyCodes(tu, params.getRemoveLeadingTrailingCodes());
+		TextUnitUtil.simplifyCodes(tu, params.getRemoveLeadingTrailingCodes() && 
+				tu.getSkeleton() instanceof GenericSkeleton);
 		
 		return super.handleTextUnit(event);
 	}

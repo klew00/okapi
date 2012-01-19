@@ -1,6 +1,7 @@
 package net.sf.okapi.steps.common.codesimplifier;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -21,7 +22,9 @@ import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextFragment.TagType;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.common.skeleton.GenericSkeleton;
 import net.sf.okapi.filters.html.HtmlFilter;
+import net.sf.okapi.filters.idml.IDMLFilter;
 import net.sf.okapi.filters.xliff.XLIFFFilter;
 import net.sf.okapi.lib.extra.pipelinebuilder.XBatch;
 import net.sf.okapi.lib.extra.pipelinebuilder.XBatchItem;
@@ -76,6 +79,44 @@ public class TestCodeSimplifierStep {
 
 		ISkeleton skel = tu1.getSkeleton();
 		assertNull(skel);
+		
+		Event tue1 = new Event(EventType.TEXT_UNIT, tu1);
+		css.handleEvent(tue1);
+		tf = tu1.getSource().getUnSegmentedContentCopy();
+		assertEquals("<1/>T1<2>T2   </2>   <e8/>", fmt.setContent(tf).toString());
+		
+		skel = tu1.getSkeleton();
+		assertNull(skel);
+	}
+	
+	@Test
+	public void testDefaults2 () {
+		TextFragment tf = new TextFragment();		
+		tf.append(TagType.PLACEHOLDER, "x1", "<x1/>");
+		tf.append("   ");
+		tf.append(TagType.PLACEHOLDER, "x2", "<x2/>");
+		tf.append("T1");		
+		tf.append(TagType.PLACEHOLDER, "x3", "<x3/>");
+		tf.append(TagType.PLACEHOLDER, "x4", "<x4/>");
+		tf.append(TagType.OPENING, "a", "<a>");
+		tf.append("T2");
+		tf.append("   ");
+		tf.append(TagType.CLOSING, "a", "</a>");
+		tf.append("   ");
+		tf.append(TagType.CLOSING, "b", "</b>");
+		tf.append(TagType.PLACEHOLDER, "x5", "<x5/>");
+		tf.append("   ");
+		tf.append(TagType.PLACEHOLDER, "x6", "<x6/>");
+				
+		assertEquals("<1/>   <2/>T1<3/><4/><5>T2   </5>   <e8/><6/>   <7/>", fmt.setContent(tf).toString());
+		
+		TextUnit tu1 = new TextUnit("tu1");
+		tu1.setSourceContent(tf);
+
+		ISkeleton skel = new GenericSkeleton();
+		assertNotNull(skel);
+		tu1.setSkeleton(skel);
+		assertNotNull(tu1.getSkeleton());
 		
 		Event tue1 = new Event(EventType.TEXT_UNIT, tu1);
 		css.handleEvent(tue1);
@@ -249,6 +290,38 @@ public class TestCodeSimplifierStep {
 	}
 	
 	@Test
+	public void testEvents5() throws MalformedURLException {
+		new XPipeline(
+				"Test pipeline for CodeSimplifierStep",
+				new XBatch(
+						new XBatchItem(
+								new URL("file", null, pathBase + "idmltest.idml"),
+								"UTF-8",
+								EN)
+						),
+						
+				new RawDocumentToFilterEventsStep(new IDMLFilter()),
+				new TextUnitLogger()
+		).execute();
+	}
+	
+	@Test
+	public void testEvents6() throws MalformedURLException {
+		new XPipeline(
+				"Test pipeline for CodeSimplifierStep",
+				new XBatch(
+						new XBatchItem(
+								new URL("file", null, pathBase + "out/idmltest.idml"),
+								"UTF-8",
+								EN)
+						),
+						
+				new RawDocumentToFilterEventsStep(new IDMLFilter()),
+				new TextUnitLogger()
+		).execute();
+	}
+	
+	@Test
 	public void testDoubleExtraction3 () {
 		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
 		
@@ -272,4 +345,16 @@ public class TestCodeSimplifierStep {
 		assertTrue(rtc.executeCompare(new XLIFFFilter(), list, "UTF-8", EN, ESES, "out", new CodeSimplifierStep()));
 		//assertTrue(rtc.executeCompare(new HtmlFilter(), list, "UTF-8", EN, ESES, "out"));
 	}
+	
+	@Test
+	public void testDoubleExtraction5 () {
+		ArrayList<InputDocument> list = new ArrayList<InputDocument>();
+		
+		list.add(new InputDocument(pathBase + "idmltest.idml", null));
+		
+		RoundTripComparison rtc = new RoundTripComparison(false);
+		assertTrue(rtc.executeCompare(new IDMLFilter(), list, "UTF-8", EN, EN, "out", new CodeSimplifierStep()));
+		//assertTrue(rtc.executeCompare(new HtmlFilter(), list, "UTF-8", EN, ESES, "out"));
+	}
+	
 }
