@@ -221,7 +221,11 @@ public class FormatConversionStep extends BasePipelineStep {
 	}
 
 	private void createPOWriter () {
-		writer = new POWriter();
+		if (params.getWriter() == null) {
+			writer = new POWriter();
+		} else {
+			writer = params.getWriter();
+		}
 		net.sf.okapi.filters.po.Parameters outParams = (net.sf.okapi.filters.po.Parameters)writer.getParameters();
 		outParams.setOutputGeneric(params.getUseGenericCodes());
 	}
@@ -244,7 +248,11 @@ public class FormatConversionStep extends BasePipelineStep {
 	}
 
 	private void createTMXWriter () {
-		writer = new TMXFilterWriter();
+		if (params.getWriter() == null) {
+			writer = new TMXFilterWriter();
+		} else {
+			writer = params.getWriter();
+		}
 //		net.sf.okapi.filters.po.Parameters outParams = (net.sf.okapi.filters.po.Parameters)writer.getParameters();
 //		outParams.outputGeneric = params.getUseGenericCodes();
 	}
@@ -268,7 +276,11 @@ public class FormatConversionStep extends BasePipelineStep {
 	}
 
 	private void createCorpusWriter () {
-		writer = new CorpusFilterWriter();
+		if (params.getWriter() == null) {
+			writer = new CorpusFilterWriter();
+		} else {
+			writer = params.getWriter();
+		}
 	}
 	
 	private void startCorpusOutput () {
@@ -290,7 +302,11 @@ public class FormatConversionStep extends BasePipelineStep {
 	}
 
 	private void createTableWriter () {
-		writer = new TableFilterWriter();
+		if (params.getWriter() == null) { 
+			writer = new TableFilterWriter();
+		} else {
+			writer = params.getWriter();
+		}
 		TableFilterWriterParameters options = (TableFilterWriterParameters)writer.getParameters();
 		options.fromString(params.getFormatOptions());
 	}
@@ -315,7 +331,11 @@ public class FormatConversionStep extends BasePipelineStep {
 	}
 
 	private void createPensieveWriter () {
-		writer = new PensieveFilterWriter();
+		if (params.getWriter() == null) {
+			writer = new PensieveFilterWriter();
+		} else {
+			writer = params.getWriter();
+		}
 		((PensieveFilterWriter)writer).setOverwriteSameSource(params.getOverwriteSameSource());
 	}
 

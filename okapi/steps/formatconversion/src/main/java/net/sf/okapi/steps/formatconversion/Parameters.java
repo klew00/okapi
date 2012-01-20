@@ -23,6 +23,7 @@ package net.sf.okapi.steps.formatconversion;
 import net.sf.okapi.common.BaseParameters;
 import net.sf.okapi.common.EditorFor;
 import net.sf.okapi.common.ParametersDescription;
+import net.sf.okapi.common.filterwriter.IFilterWriter;
 import net.sf.okapi.common.uidescription.CheckboxPart;
 import net.sf.okapi.common.uidescription.EditorDescription;
 import net.sf.okapi.common.uidescription.IEditorDescriptionProvider;
@@ -63,6 +64,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 	private boolean skipEntriesWithoutText;
 	private boolean approvedEntriesOnly;
 	private boolean overwriteSameSource;
+	private IFilterWriter writer;
 	
 	public Parameters () {
 		reset();
@@ -148,6 +150,20 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		this.overwriteSameSource = overwriteSameSource;
 	}
 	
+	/**
+	 * @return the writer
+	 */
+	public IFilterWriter getWriter() {
+		return writer;
+	}
+
+	/**
+	 * @param writer the writer to set
+	 */
+	public void setWriter(IFilterWriter writer) {
+		this.writer = writer;
+	}
+
 	public void reset () {
 		singleOutput = true;
 		autoExtensions = false;
@@ -159,6 +175,7 @@ public class Parameters extends BaseParameters implements IEditorDescriptionProv
 		skipEntriesWithoutText = true;
 		approvedEntriesOnly = false;
 		overwriteSameSource = false;
+		writer = null;
 	}
 
 	public void fromString (String data) {
