@@ -36,6 +36,9 @@ import net.sf.okapi.lib.tmdb.IRepository;
 import net.sf.okapi.lib.tmdb.ITm;
 import net.sf.okapi.lib.tmdb.DbUtil.PageMode;
 import net.sf.okapi.lib.tmdb.filter.FilterNode;
+import net.sf.okapi.lib.tmdb.filter.OperatorNode;
+import net.sf.okapi.lib.tmdb.filter.ValueNode;
+import net.sf.okapi.lib.tmdb.filter.ValueNode.TYPE;
 import net.sf.okapi.lib.tmdb.mongodb.Repository;
 
 public class Tm implements ITm {
@@ -63,6 +66,9 @@ public class Tm implements ITm {
 	private List<String> existingTuFields;
 	private List<String> existingSegFields;
 	private List<String> existingLocales;
+	
+	private FilterNode filterRoot;
+	private BasicDBObject filterQuery;
 	
 	//List<String> cachedTuFields;
 	//List<String> cachedSegFields;
@@ -347,7 +353,12 @@ public class Tm implements ITm {
 		DBCollection segColl = store.getDb().getCollection(name+"_SEG");
 		DBCursor cur;
 		if (pageMode == PageMode.EDITOR ) {
-			cur = segColl.find().sort(sortObject).limit(limit).skip((int)((limit-1)*currentPage));
+			
+			if(filterRoot != null && filterQuery != null){
+				cur = segColl.find(filterQuery).sort(sortObject).limit(limit).skip((int)((limit-1)*currentPage));
+			}else{
+				cur = segColl.find().sort(sortObject).limit(limit).skip((int)((limit-1)*currentPage));
+			}
 		}
 		else {
 //TOFIX: YS: Not sure if it's the right code for this case (no overlap)
@@ -803,7 +814,40 @@ public class Tm implements ITm {
 
 	@Override
 	public void setFilter (FilterNode root) {
-		// TODO
+
+		filterQuery = null;
+		filterRoot = root;
+
+		if(filterRoot != null){
+			filterQuery = toQuery(root);
+		}
+		needPagingRefresh = true;
 	}
-	
+
+	/**
+	 * Convert the root node to a query object
+	 * @param node
+	 * @return
+	 */
+	private BasicDBObject toQuery (FilterNode node) {
+		
+		BasicDBObject query = new BasicDBObject();
+
+		if ( node.isOperator() ) {
+			OperatorNode on = (OperatorNode)node;
+			if(on.getOperator().getType() == net.sf.okapi.lib.tmdb.filter.Operator.TYPE.EQUALS) {
+				
+				ValueNode left = (ValueNode) on.getLeft();
+				ValueNode right = (ValueNode) on.getRight();
+		
+				if ( right.getType() == TYPE.BOOLEAN ) {
+					query.put(left.getStringValue(),right.getBooleanValue());
+				}
+				if ( right.getType() == TYPE.STRING ) {
+					query.put(left.getStringValue(),right.getStringValue());
+				}
+			}
+		}		
+		return query;
+	}
 }

@@ -49,7 +49,7 @@ public class Repository implements IRepository {
 	public static final String TM_COL_LOCALES = "locales";
 	
 	public static final String SEG_COL_SEGKEY = "_id";
-	public static final String SEG_COL_FLAG = "flag";
+	public static final String SEG_COL_FLAG = "Flag";
 	
 	private String name;			//Repository name
 	Mongo connection = null;		//Working Connection
