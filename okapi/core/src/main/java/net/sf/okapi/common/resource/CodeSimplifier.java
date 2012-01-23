@@ -66,8 +66,12 @@ public class CodeSimplifier {
 			
 			String gap = node1.gapToNext;
 			
-			this.code.setData(data1 + gap + data2);
-			this.code.setOuterData(odata1 + gap + odata2);
+			if (!Util.isEmpty(data1) && !Util.isEmpty(data2)) {
+				this.code.setData(data1 + gap + data2);
+			}
+			else {
+				this.code.setOuterData(odata1 + gap + odata2);
+			}			
 		}
 	}
 	
