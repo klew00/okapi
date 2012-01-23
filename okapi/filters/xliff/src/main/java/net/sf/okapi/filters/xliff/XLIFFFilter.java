@@ -1087,11 +1087,16 @@ public class XLIFFFilter implements IFilter {
 							idStack.pop(); // Pop only after test is true
 							segIdStack = -1; // Reset to not trigger segment ending again
 							// Add the segment to the content (no collapsing, except when no segments exist yet. Keep empty segments)
+							String oriId = segment.getId();
 							segments.append(segment, !content.hasBeenSegmented());
 							if ( changeFirstPart && ( content.count()==2 )) {
 								// Change the initial part into a non-segment
 								changeFirstPart = false;
 								content.changePart(0);
+								segment.forceId(oriId); // Make sure we use the ID defined in the XLIFF
+								// We need to do this because if a non-segment part was before it was seen 9so far)
+								// as the first segment and its ID may have been the same as the one of the real
+								// first segment
 							}
 							if ( store ) storeEndElement();
 							continue;

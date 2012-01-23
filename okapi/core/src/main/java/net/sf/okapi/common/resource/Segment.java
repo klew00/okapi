@@ -90,6 +90,16 @@ public class Segment extends TextPart {
 	public String getId () {
 		return id;
 	}
+	
+	/**
+	 * Forces the id of this segment to a specific value.
+	 * No check is made to validate this ID value. It is the caller's responsability
+	 * to avoid duplicates, null value, and other wrong values.
+	 * @param id the new value of the segment.
+	 */
+	public void forceId (String id) {
+		this.id = id;
+	}
 
 	/**
 	 * Gets the annotation object for a given class for this segment.

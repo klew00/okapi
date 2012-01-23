@@ -149,9 +149,37 @@ public class XLIFFFilterTest {
 		assertEquals("[t1.] [t2]", fmt.printSegmentedContent(cont, true));
 		assertEquals(2, segments.count());
 		assertEquals("t1.", segments.get(0).text.toText());
-		assertEquals("i2", segments.get(1).id);
+		assertEquals("i1", segments.get(0).id);
 		assertEquals("t2", segments.get(1).text.toText());
 		assertEquals("i2", segments.get(1).id);
+	}
+
+	@Test
+	public void testSegmentIDs () {
+		String snippet = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+			+ "<xliff version=\"1.2\">"
+			+ "<file source-language=\"en\" target-language=\"fr\" datatype=\"x-test\" original=\"file.ext\">"
+			+ "<body>"
+			+ "<trans-unit id=\"1\" xml:space=\"preserve\">"
+			+ "<source>  s1.</source>"
+			+ "<seg-source>  <mrk mid=\"0\" mtype=\"seg\">s1.</mrk></seg-source>"
+			+ "<target xml:lang=\"fr\">  <mrk mid=\"0\" mtype=\"seg\">t1.</mrk></target>"
+			+ "</trans-unit>"
+			+ "</body>"
+			+ "</file></xliff>";
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertNotNull(tu);
+		ISegments srcSegs = tu.getSourceSegments();
+		assertEquals(1, srcSegs.count());
+		TextContainer cont = tu.getSource();
+		assertEquals("  [s1.]", fmt.printSegmentedContent(cont, true));
+		
+		cont = tu.getTarget(locFR);
+		ISegments segments = cont.getSegments();
+		assertEquals("  [t1.]", fmt.printSegmentedContent(cont, true));
+		assertEquals(1, segments.count());
+		assertEquals("t1.", segments.get(0).text.toText());
+		assertEquals("0", segments.get(0).id);
 	}
 
 	@Test
