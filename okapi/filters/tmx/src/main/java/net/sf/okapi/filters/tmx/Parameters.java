@@ -30,6 +30,7 @@ public class Parameters extends BaseParameters{
 	public boolean processAllTargets;
 	public boolean consolidateDpSkeleton;
 	public boolean escapeGT;
+	public boolean exitOnInvalid;
 
 	public Parameters () {
 		reset();
@@ -39,6 +40,7 @@ public class Parameters extends BaseParameters{
 		escapeGT = false;
 		processAllTargets=true;
 		consolidateDpSkeleton=true;
+		exitOnInvalid = false;
 	}
 	
 	public boolean getProcessAllTargets () {
@@ -65,12 +67,21 @@ public class Parameters extends BaseParameters{
 		this.escapeGT = escapeGT;
 	}
 
+	public boolean getExitOnInvalid () {
+		return exitOnInvalid;
+	}
+
+	public void setExitOnInvalid  (boolean exitOnInvalid) {
+		this.exitOnInvalid = exitOnInvalid;
+	}
+	
 	public void fromString(String data) {
 		reset();
 		buffer.fromString(data);
 		escapeGT = buffer.getBoolean(XMLEncoder.ESCAPEGT, escapeGT);
 		processAllTargets = buffer.getBoolean("processAllTargets", processAllTargets);
 		consolidateDpSkeleton = buffer.getBoolean("consolidateDpSkeleton", consolidateDpSkeleton);
+		exitOnInvalid = buffer.getBoolean("exitOnInvalid", exitOnInvalid);
 	}
 
 	public String toString () {
@@ -78,6 +89,7 @@ public class Parameters extends BaseParameters{
 		buffer.setBoolean(XMLEncoder.ESCAPEGT, escapeGT);		
 		buffer.setBoolean("processAllTargets", processAllTargets);
 		buffer.setBoolean("consolidateDpSkeleton", consolidateDpSkeleton);
+		buffer.setBoolean("exitOnInvalid", exitOnInvalid);
 		return buffer.toString();
 	}
 
@@ -87,6 +99,7 @@ public class Parameters extends BaseParameters{
 		desc.add(XMLEncoder.ESCAPEGT, "Escape the greater-than characters", null);
 		desc.add("processAllTargets", "Read all target entries", null);
 		desc.add("consolidateDpSkeleton", "Group all document parts skeleton into one", null);
+		desc.add("exitOnInvalid", "Exit when encountering invalid <tu>s (default is to skip invalid <tu>s).", null);
 		return desc;
 	}
 

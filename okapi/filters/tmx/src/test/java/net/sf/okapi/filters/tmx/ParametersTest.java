@@ -26,27 +26,30 @@ public class ParametersTest {
 		assertFalse("escapeGT should default to false", p.escapeGT);
 		assertTrue("processAllTargets should default to true", p.processAllTargets);
 		assertTrue("consolidateDpSkeleton should default to true", p.consolidateDpSkeleton);
+		assertFalse("exitOnInvalid should default to false", p.exitOnInvalid);
 	}
 
 	@Test
 	public void testReset() {
-		p.fromString("#v1\nescapeGT.b=true\nprocessAllTargets.b=false\nconsolidateDpSkeleton.b=false");
+		p.fromString("#v1\nescapeGT.b=true\nprocessAllTargets.b=false\nconsolidateDpSkeleton.b=false\nexitOnInvalid.b=true");
 		p.reset();
 		assertFalse("escapeGT should be false", p.escapeGT);
 		assertTrue("processAllTargets should be true", p.processAllTargets);
 		assertTrue("consolidateDpSkeleton should be true", p.consolidateDpSkeleton);
+		assertFalse("exitOnInvalid should default to false", p.exitOnInvalid);
 	}
 
 	@Test
 	public void testFromString() {
-		p.fromString("#v1\nescapeGT.b=true\nprocessAllTargets.b=false\nconsolidateDpSkeleton.b=false");
+		p.fromString("#v1\nescapeGT.b=true\nprocessAllTargets.b=false\nconsolidateDpSkeleton.b=false\nexitOnInvalid.b=true");
 		assertTrue("escapeGT should be true", p.escapeGT);
 		assertFalse("processAllTargets should be false", p.processAllTargets);
 		assertFalse("consolidateDpSkeleton should be false", p.consolidateDpSkeleton);
+		assertTrue("exitOnInvalid should to true", p.exitOnInvalid);
 	}
 
 	@Test
 	public void testToString() {
-		assertEquals("Incorrect format","#v1\nescapeGT.b=false\nprocessAllTargets.b=true\nconsolidateDpSkeleton.b=true",p.toString());
+		assertEquals("Incorrect format","#v1\nescapeGT.b=false\nprocessAllTargets.b=true\nconsolidateDpSkeleton.b=true\nexitOnInvalid.b=false",p.toString());
 	}
 }

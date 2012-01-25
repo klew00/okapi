@@ -92,6 +92,8 @@ public class TmxFilter implements IFilter {
 	private Stack<String> elemStack=new Stack<String>();
 	private EncoderManager encoderManager;
 	
+	private boolean skipInvalidTu = false; 						//--allows processing of slightly invalid tmx files but skips any invalid <tu>s
+	
 	public TmxFilter () {
 		params = new Parameters();
 		
@@ -572,6 +574,16 @@ public class TmxFilter implements IFilter {
 			while(reader.hasNext()){					//loop through the <seg> content
 				int eventType;
 				eventType = reader.next();
+				
+				//--if invalid skip to end </seg>--
+				if ( skipInvalidTu){
+					if (eventType == XMLStreamConstants.END_ELEMENT && reader.getLocalName().equalsIgnoreCase("seg")){
+						return false;
+					}else{
+						continue;
+					}
+				}
+				
 				switch ( eventType ) {
 				case XMLStreamConstants.CHARACTERS:
 				case XMLStreamConstants.CDATA:
@@ -588,8 +600,11 @@ public class TmxFilter implements IFilter {
 				case XMLStreamConstants.START_ELEMENT:		
 
 					curLocalName = reader.getLocalName().toLowerCase();
-					if(!isValidElement(elemStack.peek(),curLocalName,true)){
-						//--throws OkapiBadFilterInputException if not valid--
+					
+					//--skip TUs with invalid content--
+					if(!isValidElement(elemStack.peek(), curLocalName, params.exitOnInvalid)){
+						skipInvalidTu = true;
+						break;
 					}
 					
 					if(curLocalName.equals("ut") && !skipUtWarning){
@@ -660,6 +675,26 @@ public class TmxFilter implements IFilter {
 			while(reader.hasNext()){
 				
 				int eventType = reader.next();
+				
+				//-- if invalid skip to end </tu>
+				if ( skipInvalidTu ){
+					if (eventType == XMLStreamConstants.END_ELEMENT && reader.getLocalName().equalsIgnoreCase("tu")){
+						//--reset--
+						tuvTrgType = TuvXmlLang.UNDEFINED;
+						skipInvalidTu = false;
+						elemStack.clear();
+						Property p = tmxTu.getProp("tuid");
+						if (p != null){
+							logger.warning("Skipping invalid <tu> element with tuid: "+p.getValue()+".");
+						}else{
+							logger.warning("Skipping invalid <tu> element.");
+						}
+						return true;
+					}else{
+						continue;
+					}
+				}
+				
 				switch ( eventType ) {
 				
 				case XMLStreamConstants.COMMENT:
@@ -711,7 +746,13 @@ public class TmxFilter implements IFilter {
 
 					}else{
 						//--TMX RULE: Entering here would mean content other than <note>, <prop>, or <tuv> inside the <tu> which is invalid.
-						throw new OkapiBadFilterInputException("Only <note>, <prop>, and <tuv> elements are allowed inside <tu>");
+						if (params.exitOnInvalid) {
+							throw new OkapiBadFilterInputException("Only <note>, <prop>, and <tuv> elements are allowed inside <tu>");
+						} else{
+							logger.warning("Only <note>, <prop>, and <tuv> elements are allowed inside <tu>");
+							skipInvalidTu = true;
+							break;
+						}
 					} 	
 					break;
 				}

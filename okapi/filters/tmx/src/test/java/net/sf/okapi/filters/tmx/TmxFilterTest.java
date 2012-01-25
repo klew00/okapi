@@ -277,6 +277,9 @@ public class TmxFilterTest {
 
 	@Test (expected=OkapiBadFilterInputException.class)
 	public void testInvalidElementInTu() {
+		
+		Parameters p = (Parameters) filter.getParameters();
+		p.setExitOnInvalid(true);
 		FilterTestDriver.getStartDocument(getEvents(invalidElementsInsideTuSnippet, locENUS,locFRFR));
 	}
 	

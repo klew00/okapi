@@ -34,6 +34,7 @@ public class ParametersUI implements IEditorDescriptionProvider {
 		desc.addCheckboxPart(paramDesc.get("consolidateDpSkeleton"));
 		desc.addSeparatorPart();
 		desc.addCheckboxPart(paramDesc.get("escapeGT"));
+		desc.addCheckboxPart(paramDesc.get("exitOnInvalid"));
 		return desc;
 	}
 
