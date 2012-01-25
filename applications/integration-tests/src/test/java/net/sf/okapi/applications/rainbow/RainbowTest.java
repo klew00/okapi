@@ -50,7 +50,14 @@ public class RainbowTest {
 		libDir = Util.getDirectoryName(libDir); // Go up one dir
 		libDir += String.format("%sdeployment%smaven%s%s%slib%s",
 			File.separator, File.separator, File.separator, distDir, File.separator, File.separator);
-		javaRainbow = "java -jar " + libDir + "rainbow.jar";
+		
+		if ( osName.startsWith("Windows") ) { // Windows case
+			javaRainbow = "java -jar \"" + libDir + "rainbow.jar\"";
+
+		}
+		else { // Assumes Mac, Unix or Linux
+			javaRainbow = "java -jar " + libDir + "rainbow.jar";
+		}
 	}
 
 	@Test
