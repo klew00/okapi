@@ -250,5 +250,12 @@ public class XMLWriter {
     		inStartTag = false;
     	}
     }
+    
+    /**
+     * Flushes the current buffer to the device.
+     */
+    public void flush () {
+    	writer.flush();
+    }
 
 }

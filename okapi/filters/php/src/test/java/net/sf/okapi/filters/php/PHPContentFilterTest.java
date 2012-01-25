@@ -156,6 +156,22 @@ public class PHPContentFilterTest {
 	}
 	
 	@Test
+	public void testConcatDQStringsWithCodesAndVariable () {
+		String snippet = "$a=\"t1<b>\".$_CONFIG[\"site\"].\"</b>t2\";";
+		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);
+		assertTrue(tu!=null);
+		assertEquals("t1<b>\".$_CONFIG[\"site\"].\"</b>t2", tu.getSource().toString());
+		List<Code> codes = tu.getSource().getFirstContent().getCodes();
+		assertEquals(3, codes.size());
+		assertEquals("<b>", codes.get(0).toString());
+		assertEquals(1, codes.get(0).getId());
+		assertEquals("\".$_CONFIG[\"site\"].\"", codes.get(1).toString());
+//TOFIX		assertEquals(2, codes.get(1).getId());
+		assertEquals("</b>", codes.get(2).toString());
+//will be ok when above is fixed		assertEquals(3, codes.get(2).getId());
+	}
+	
+	@Test
 	public void testCommaCaseWithConcat () {
 		String snippet = "$a=test('t1', 't2 '.\"and t3\");";
 		ITextUnit tu = FilterTestDriver.getTextUnit(getEvents(snippet), 1);

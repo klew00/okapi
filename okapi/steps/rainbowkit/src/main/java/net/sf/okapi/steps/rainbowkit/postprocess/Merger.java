@@ -40,6 +40,7 @@ import net.sf.okapi.common.resource.MultiEvent;
 import net.sf.okapi.common.resource.PipelineParameters;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.RawDocument;
+import net.sf.okapi.common.resource.StartDocument;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.TextUnitUtil;
@@ -58,6 +59,7 @@ public class Merger {
 	private boolean skipEmptySourceEntries;
 	private boolean useSource;
 	private boolean preserveSegmentation;
+	private boolean forceSegmentationInMerge;
 	private boolean returnRawDocument;
 	private RawDocument rawDoc;
 	private boolean useSubDoc;
@@ -134,6 +136,17 @@ public class Merger {
 		return event;
 	}
 	
+	private void processStartDocument (StartDocument sd) {
+		if ( sd.getMimeType().equals(MimeTypeMapper.XLIFF_MIME_TYPE) ) {
+			net.sf.okapi.filters.xliff.Parameters prm = (net.sf.okapi.filters.xliff.Parameters)sd.getFilterParameters();
+			forceSegmentationInMerge = (prm.getOutputSegmentationType() 
+				== net.sf.okapi.filters.xliff.Parameters.SEGMENTATIONTYPE_SEGMENTED);
+		}
+		else {
+			forceSegmentationInMerge = false;
+		}
+	}
+	
 	private Event createMultiEvent () {
 		List<Event> list = new ArrayList<Event>();
 		
@@ -196,6 +209,7 @@ public class Merger {
 			LOGGER.severe("The start document event is missing when parsing the original file.");
 		}
 		else {
+			processStartDocument(internalEvent.getStartDocument());
 			writer.handleEvent(internalEvent);
 		}
 		
@@ -292,6 +306,17 @@ public class Merger {
 		
 		// Set the container for the source
 		TextContainer srcOriCont = oriTu.getSource();
+		TextContainer srcTraCont = traTu.getSource();
+		
+		if ( forceSegmentationInMerge ) {
+			// Use the source of the target to get the proper segmentations
+			if ( !srcOriCont.getUnSegmentedContentCopy().getCodedText().equals(
+				srcTraCont.getUnSegmentedContentCopy().getCodedText()) ) {
+				LOGGER.warning(String.format("Item id='%s': Original source and source in the translated file are different.\n"
+					+ "Cannot use the source of the translation as the new segmented source.",
+					traTu.getId()));
+			}
+		}
 
 		// If we do not need to merge segments then we must join all for the merge
 		// We also remember the ranges to set them back after merging
@@ -302,8 +327,20 @@ public class Merger {
 		// This allows to move codes anywhere in the text unit, not just each part.
 		// We do remember the ranges because some formats will required to be merged by segments
 		if ( !srcOriCont.contentIsOneSegment() ) {
-			srcRanges = srcOriCont.getSegments().getRanges();
 			srcOriCont.joinAll();
+		}
+		if ( forceSegmentationInMerge ) {
+			// Get the source segmentation from the translated file if it's 
+			// a forced segmentation
+			if ( !srcTraCont.contentIsOneSegment() ) {
+				srcRanges = srcTraCont.getSegments().getRanges();
+			}
+		}
+		else {
+			// Else: take from the original source
+			if ( !srcOriCont.contentIsOneSegment() ) {
+				srcRanges = srcOriCont.getSegments().getRanges();
+			}
 		}
 		if ( !trgTraCont.contentIsOneSegment() ) {
 			trgRanges = trgTraCont.getSegments().getRanges();

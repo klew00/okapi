@@ -665,14 +665,19 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 		if (( codes == null ) && ( newCodes.size() > 0 )) {
 			codes = new ArrayList<Code>();
 		}
-
+		
 		// Update the coded text to use new code indices
 		for ( int i=0; i<tmp.length(); i++ ) {
 			switch ( tmp.charAt(i) ) {
 			case MARKER_OPENING:
 			case MARKER_CLOSING:
 			case MARKER_ISOLATED:
-				codes.add(newCodes.get(toIndex(tmp.charAt(++i))).clone());
+				Code c = newCodes.get(toIndex(tmp.charAt(++i))).clone();
+				if (( c.getTagType() != TagType.CLOSING ) && ( c.getId() <= lastCodeID )) {
+					c.setId(++lastCodeID);
+					// Closing codes will be handled when re-balancing
+				}
+				codes.add(c);
 				tmp.setCharAt(i, toChar(codes.size()-1));
 				break;
 			}
@@ -681,8 +686,8 @@ public class TextFragment implements Appendable, CharSequence, Comparable<Object
 		// Insert the new text in one chunk
 		if ( offset < 0 ) text.append(tmp);
 		else text.insert(offset, tmp);
+		
 		// If there was new codes we will need to re-balance
-		//TODO: do we need to renumber all? bad because we loose existing number, but need for new
 		if ( newCodes.size() > 0 ) {
 			this.isBalanced = false;
 		}

@@ -176,7 +176,7 @@ public class SimpleTermExtractor {
 	
 	/**
 	 * Gets the string that is the separator to use between two words.
-	 * @param prevChar tha last character of the string where the separator needs to be added.
+	 * @param prevChar the last character of the string where the separator needs to be added.
 	 * @return the separator (a space or empty)
 	 */
 	private String getWordSeparator (char prevChar) {

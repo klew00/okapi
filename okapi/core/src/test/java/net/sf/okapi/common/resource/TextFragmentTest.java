@@ -93,6 +93,23 @@ public class TextFragmentTest {
 	}
 	
 	@Test
+	public void testAppendWithDifferentCodeIDs () {
+		TextFragment tf1 = new TextFragment();
+		tf1.append(TagType.PLACEHOLDER, "a", "[A/]");
+		assertEquals(1, tf1.getCode(0).getId());
+		
+		TextFragment tf2 = new TextFragment();
+		tf2.append(TagType.PLACEHOLDER, "b", "[B/]");
+		assertEquals(1, tf2.getCode(0).getId());
+		
+		tf1.append(' ');
+		tf1.append(tf2);
+		assertEquals("[A/] [B/]", tf1.toText());
+		assertEquals(1, tf1.getCode(0).getId());
+		assertEquals(2, tf1.getCode(1).getId());
+	}
+	
+	@Test
 	public void testInsert () {
 		TextFragment tf1 = new TextFragment();
 		tf1.insert(0, new TextFragment("[ins1]"));

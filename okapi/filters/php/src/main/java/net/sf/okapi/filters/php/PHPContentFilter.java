@@ -575,7 +575,10 @@ public class PHPContentFilter implements IFilter {
 		// Do we still have text in the fragment? (and started the source?) 
 		if ( !tf.hasText(true) && srcFrag.isEmpty() ) {
 			// If no text yet: string-with-codes-only goes to skeleton
-			srcSkel.add(inputText.substring(stringStart, stringEnd+1).replace("\n", lineBreak));
+			srcSkel.add(inputText.substring(stringStart+1, stringEnd).replace("\n", lineBreak));
+			// Move the start for the next skeleton part
+			skelStart = stringEnd;
+			return;
 		}
 	
 		// Otherwise it's either text or inline codes or both
