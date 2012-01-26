@@ -38,6 +38,7 @@ import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.lib.segmentation.SRXDocument;
+import net.sf.okapi.steps.segmentation.Parameters.SegmStrategy;
 
 @UsingParameters(Parameters.class)
 public class SegmentationStep extends BasePipelineStep {
@@ -175,11 +176,11 @@ public class SegmentationStep extends BasePipelineStep {
 
 		// Segment source if requested
 		if ( params.segmentSource ) {
-			if ( params.getSegmentationStrategy() == Parameters.SEGM_OVERWRITEEXISTING || 
+			if ( params.getSegmentationStrategy() == SegmStrategy.OVERWRITE_EXISTING || 
 					!tu.getSource().hasBeenSegmented() ) {
 				tu.createSourceSegmentation(srcSeg);
 			}
-			else if (params.getSegmentationStrategy() == Parameters.SEGM_DEEPENEXISTING) {
+			else if (params.getSegmentationStrategy() == SegmStrategy.DEEPEN_EXISTING) {
 				// Has been segmented or not (if unsegmented, it's still 1 segment)
 				deepenSegmentation(tu.getSource(), srcSeg);
 			}
@@ -189,12 +190,12 @@ public class SegmentationStep extends BasePipelineStep {
 
 		// Segment target if requested
 		if ( params.segmentTarget && ( trgCont != null )) {
-			if ( params.getSegmentationStrategy() == Parameters.SEGM_OVERWRITEEXISTING ||
+			if ( params.getSegmentationStrategy() == SegmStrategy.OVERWRITE_EXISTING ||
 					!trgCont.hasBeenSegmented() ) {
 				trgSeg.computeSegments(trgCont);
 				trgCont.getSegments().create(trgSeg.getRanges());
 			}
-			else if (params.getSegmentationStrategy() == Parameters.SEGM_DEEPENEXISTING) {
+			else if (params.getSegmentationStrategy() == SegmStrategy.DEEPEN_EXISTING) {
 				// Has been segmented or not (if unsegmented, it's still 1 segment)
 				deepenSegmentation(trgCont, trgSeg);
 			}

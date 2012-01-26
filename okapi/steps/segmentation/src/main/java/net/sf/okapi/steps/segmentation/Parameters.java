@@ -29,9 +29,13 @@ public class Parameters extends BaseParameters {
 	public static int TRIM_NO = 0;
 	public static int TRIM_YES = 1;
 	
-	public static int SEGM_KEEPEXISTING = 0;
-	public static int SEGM_OVERWRITEEXISTING = 1;
-	public static int SEGM_DEEPENEXISTING = 2;
+	public enum SegmStrategy {
+		KEEP_EXISTING,
+		
+		OVERWRITE_EXISTING,
+		
+		DEEPEN_EXISTING
+	}
 	
 	private static final String FORCESEGMENTEDOUTPUT = "forceSegmentedOutput";
 	private static final String OVERWRITESEGMENTATION = "overwriteSegmentation";
@@ -137,23 +141,23 @@ public class Parameters extends BaseParameters {
 		return buffer.toString();
 	}
 
-	public int getSegmentationStrategy() {
+	public SegmStrategy getSegmentationStrategy() {
 		if (!overwriteSegmentation && deepenSegmentation)
-			return SEGM_DEEPENEXISTING;
+			return SegmStrategy.DEEPEN_EXISTING;
 		
 		else if (overwriteSegmentation)
-			return SEGM_OVERWRITEEXISTING;
+			return SegmStrategy.OVERWRITE_EXISTING;
 		
 		else
-			return SEGM_KEEPEXISTING;
+			return SegmStrategy.KEEP_EXISTING;
 	}
 	
-	public void setSegmentationStrategy(int strategy) {
-		if (strategy == SEGM_DEEPENEXISTING) {
+	public void setSegmentationStrategy(SegmStrategy strategy) {
+		if (strategy == SegmStrategy.DEEPEN_EXISTING) {
 			overwriteSegmentation = false;
 			deepenSegmentation = true;
 		}
-		else if (strategy == SEGM_OVERWRITEEXISTING) {
+		else if (strategy == SegmStrategy.OVERWRITE_EXISTING) {
 			overwriteSegmentation = true;
 			deepenSegmentation = false;
 		}

@@ -15,6 +15,7 @@ import net.sf.okapi.common.resource.TextContainer;
 import net.sf.okapi.common.resource.TextFragment;
 import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.common.resource.TextUnit;
+import net.sf.okapi.steps.segmentation.Parameters.SegmStrategy;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -54,7 +55,7 @@ public class SegmentationStepTest {
 		assertTrue(source.get(2).isSegment());
 		
 		// 1
-		params.setSegmentationStrategy(Parameters.SEGM_KEEPEXISTING);
+		params.setSegmentationStrategy(SegmStrategy.KEEP_EXISTING);
 		segStep.handleTextUnit(new Event(EventType.TEXT_UNIT, tu1));
 		
 		// Check if not changed
@@ -71,7 +72,7 @@ public class SegmentationStepTest {
 		assertTrue(source.get(2).isSegment());
 		
 		// 2
-		params.setSegmentationStrategy(Parameters.SEGM_DEEPENEXISTING);
+		params.setSegmentationStrategy(SegmStrategy.DEEPEN_EXISTING);
 		segStep.handleTextUnit(new Event(EventType.TEXT_UNIT, tu1));
 		
 		// Check if did change
@@ -94,7 +95,7 @@ public class SegmentationStepTest {
 		assertTrue(source.get(4).isSegment());
 		
 		// 3
-		params.setSegmentationStrategy(Parameters.SEGM_OVERWRITEEXISTING);
+		params.setSegmentationStrategy(SegmStrategy.OVERWRITE_EXISTING);
 		segStep.handleTextUnit(new Event(EventType.TEXT_UNIT, tu1));
 		
 		// Check if did change
@@ -135,7 +136,7 @@ public class SegmentationStepTest {
 		assertEquals("  Text ", source.get(0).toString());
 		assertTrue(source.get(0).isSegment());
 		
-		params.setSegmentationStrategy(Parameters.SEGM_DEEPENEXISTING);
+		params.setSegmentationStrategy(SegmStrategy.DEEPEN_EXISTING);
 		segStep.handleTextUnit(new Event(EventType.TEXT_UNIT, tu1));
 		
 		assertEquals(1, source.getSegments().count());
