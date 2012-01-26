@@ -44,6 +44,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.List;
 
 @EditorFor(Parameters.class)
 public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParametersEditor {
@@ -61,13 +63,14 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 	private Button chkCopySource;
 	private Button chkCheckSegments;
 	private Button chkForceSegmentedOutput;
-	private Button chkOverwriteSegmentation;
 	private Text edSourceSRX;
 	private Text edTargetSRX;
 	private IHelp help;
 	private String projectDir;
 	private Composite mainComposite;
 	private Group grpOptions;
+	private Label lblBehaviorForSegmented;
+	private List listBehaviorForSegmented;
 	
 	public boolean edit (IParameters params,
 		boolean readOnly,
@@ -160,6 +163,9 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		Dialogs.centerWindow(shell, parent);
 	}
 	
+	/**
+	 * @wbp.parser.entryPoint
+	 */
 	private void createComposite (Composite parent) {
 		mainComposite = new Composite(parent, SWT.BORDER);
 		mainComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -234,16 +240,24 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		grpOptions.setLayoutData(gdTmp);
 		grpOptions.setLayout(new GridLayout(1, false));
 		
-		chkOverwriteSegmentation = new Button(grpOptions, SWT.CHECK);
-		chkOverwriteSegmentation.setText("Overwrite existing segmentation");
+		lblBehaviorForSegmented = new Label(grpOptions, SWT.NONE);
+		lblBehaviorForSegmented.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+		lblBehaviorForSegmented.setText("Behavior if input text is already segmented:");
+		
+		listBehaviorForSegmented = new List(grpOptions, SWT.BORDER);
+		listBehaviorForSegmented.setItems(new String[] {"Keep existing segmentation", "Overwrite existing segmentation (resegment)", "Keep existing segmentation, segment further against the SRX rules"});
+		listBehaviorForSegmented.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		
 		chkCopySource = new Button(grpOptions, SWT.CHECK);
+		chkCopySource.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		chkCopySource.setText("Copy source into target if no  target exists");
 
 		chkCheckSegments = new Button(grpOptions, SWT.CHECK);
+		chkCheckSegments.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		chkCheckSegments.setText("Verify that a target segment matches each source segment when a target content exists");
 		
 		chkForceSegmentedOutput = new Button(grpOptions, SWT.CHECK);
+		chkForceSegmentedOutput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 		chkForceSegmentedOutput.setText("When possible force the output to show the segmentation");
 	}
 		
@@ -312,7 +326,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		chkCopySource.setSelection(params.copySource);
 		chkCheckSegments.setSelection(params.checkSegments);
 		chkForceSegmentedOutput.setSelection(params.getForcesegmentedOutput());
-		chkOverwriteSegmentation.setSelection(params.getOverwriteSegmentation());
+		listBehaviorForSegmented.setSelection(params.getSegmentationStrategy());
 		updateSourceDisplay();
 		updateTargetDisplay();
 		updateOptionsDisplay();
@@ -330,7 +344,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		params.copySource = chkCopySource.getSelection();
 		params.checkSegments = chkCheckSegments.getSelection();
 		params.setForcesegmentedOutput(chkForceSegmentedOutput.getSelection());
-		params.setOverwriteSegmentation(chkOverwriteSegmentation.getSelection());
+		params.setSegmentationStrategy(listBehaviorForSegmented.getSelectionIndex());
 		result = true;
 		return true;
 	}
