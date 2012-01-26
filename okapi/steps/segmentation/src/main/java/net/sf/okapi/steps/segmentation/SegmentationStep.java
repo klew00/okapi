@@ -36,6 +36,7 @@ import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.common.resource.Segment;
 import net.sf.okapi.common.resource.ISegments;
 import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextPart;
 import net.sf.okapi.lib.segmentation.SRXDocument;
 
 @UsingParameters(Parameters.class)
@@ -174,8 +175,13 @@ public class SegmentationStep extends BasePipelineStep {
 
 		// Segment source if requested
 		if ( params.segmentSource ) {
-			if ( params.getOverwriteSegmentation() || !tu.getSource().hasBeenSegmented() ) {
+			if ( params.getSegmentationStrategy() == Parameters.SEGM_OVERWRITEEXISTING || 
+					!tu.getSource().hasBeenSegmented() ) {
 				tu.createSourceSegmentation(srcSeg);
+			}
+			else if (params.getSegmentationStrategy() == Parameters.SEGM_DEEPENEXISTING) {
+				// Has been segmented or not (if unsegmented, it's still 1 segment)
+				deepenSegmentation(tu.getSource(), srcSeg);
 			}
 		}
 		
@@ -183,13 +189,18 @@ public class SegmentationStep extends BasePipelineStep {
 
 		// Segment target if requested
 		if ( params.segmentTarget && ( trgCont != null )) {
-			if ( params.getOverwriteSegmentation() || !trgCont.hasBeenSegmented() ) {
+			if ( params.getSegmentationStrategy() == Parameters.SEGM_OVERWRITEEXISTING ||
+					!trgCont.hasBeenSegmented() ) {
 				trgSeg.computeSegments(trgCont);
 				trgCont.getSegments().create(trgSeg.getRanges());
 			}
+			else if (params.getSegmentationStrategy() == Parameters.SEGM_DEEPENEXISTING) {
+				// Has been segmented or not (if unsegmented, it's still 1 segment)
+				deepenSegmentation(trgCont, trgSeg);
+			}
 		}
 		
-		// Make sure we have target content if needed
+		// Make sure we have target content if needed, segmentation is incurred by the variant source 
 		if ( params.copySource ) {
 			trgCont = tu.createTarget(targetLocale, false, IResource.COPY_ALL);
 		}
@@ -216,6 +227,43 @@ public class SegmentationStep extends BasePipelineStep {
 		}
 		
 		return event;
+	}
+
+	/**
+	 * Iterates a given TextContainer's segments to apply segmentation rules to them.
+	 * @param tc the given TextContainer
+	 * @param segmenter the segmenter to perform additional segmentation for existing segments
+	 */
+	private void deepenSegmentation(TextContainer tc, ISegmenter segmenter) {
+		if (tc == null || segmenter == null) {
+			logger.severe("Parameter cannot be null");
+			return;
+		}
+		
+		// Reverse order so we can insert parts in the loop
+		for (int i = tc.count() - 1; i >= 0; i--) {
+			TextPart part = tc.get(i);
+			if (!part.isSegment()) continue;
+			
+			// Part is always a segment here
+			TextContainer segTc = new TextContainer(part);
+			segmenter.computeSegments(segTc);
+			
+			// Apply segmentation, replace segment with the new list of parts
+			segTc.getSegments().create(segmenter.getRanges());
+			replacePart(tc, i, segTc);
+		}
+	}
+	
+	private void replacePart(TextContainer oldPartContainer, int index, 
+			TextContainer newPartsContainer) {
+		for (int i = newPartsContainer.count() - 1; i >= 0; i--) {
+			oldPartContainer.insert(index, newPartsContainer.get(i));
+		}
+		// Remove the old (unsegmented) segment.
+		// Do it after inserting the new segments, because if the segment is the only one in 
+		// its container, it won't be removed (TC always contains at least one segment) 
+		oldPartContainer.remove(index+newPartsContainer.count());
 	}
 
 }

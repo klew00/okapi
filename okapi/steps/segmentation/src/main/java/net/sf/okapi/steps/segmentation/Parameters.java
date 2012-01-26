@@ -29,8 +29,13 @@ public class Parameters extends BaseParameters {
 	public static int TRIM_NO = 0;
 	public static int TRIM_YES = 1;
 	
+	public static int SEGM_KEEPEXISTING = 0;
+	public static int SEGM_OVERWRITEEXISTING = 1;
+	public static int SEGM_DEEPENEXISTING = 2;
+	
 	private static final String FORCESEGMENTEDOUTPUT = "forceSegmentedOutput";
 	private static final String OVERWRITESEGMENTATION = "overwriteSegmentation";
+	private static final String DEEPENSEGMENTATION = "deepenSegmentation";
 	private static final String SOURCESRXPATH = "sourceSrxPath";
 	private static final String TARGETSRXPATH = "targetSrxPath";
 	
@@ -46,6 +51,7 @@ public class Parameters extends BaseParameters {
 	private String targetSrxPath;
 	private boolean forceSegmentedOutput;
 	private boolean overwriteSegmentation;
+	private boolean deepenSegmentation;
 
 	
 	public Parameters () {
@@ -65,6 +71,7 @@ public class Parameters extends BaseParameters {
 		trimTrgTrailingWS = TRIM_DEFAULT;
 		forceSegmentedOutput = true;
 		overwriteSegmentation = false;
+		deepenSegmentation = false;
 	}
 	
 	public boolean getForcesegmentedOutput () {
@@ -75,12 +82,20 @@ public class Parameters extends BaseParameters {
 		this.forceSegmentedOutput = forceSegmentedOutput;
 	}
 	
-	public boolean getOverwriteSegmentation () {
-		return this.overwriteSegmentation;
+//	public boolean getOverwriteSegmentation () {
+//		return this.overwriteSegmentation;
+//	}
+//	
+//	public void setOverwriteSegmentation (boolean overwriteSegmentation) {
+//		this.overwriteSegmentation = overwriteSegmentation;
+//	}
+
+	public boolean getDeepenSegmentation() {
+		return deepenSegmentation;
 	}
-	
-	public void setOverwriteSegmentation (boolean overwriteSegmentation) {
-		this.overwriteSegmentation = overwriteSegmentation;
+
+	public void setDeepenSegmentation(boolean deepenSegmentation) {
+		this.deepenSegmentation = deepenSegmentation;
 	}
 	
 	public void setSourceSrxPath (String sourceSrxPath) {
@@ -116,6 +131,7 @@ public class Parameters extends BaseParameters {
 		trimTrgTrailingWS = buffer.getInteger("trimTrgTrailingWS", trimTrgTrailingWS);
 		forceSegmentedOutput = buffer.getBoolean(FORCESEGMENTEDOUTPUT, forceSegmentedOutput);
 		overwriteSegmentation = buffer.getBoolean(OVERWRITESEGMENTATION, overwriteSegmentation);
+		deepenSegmentation = buffer.getBoolean(DEEPENSEGMENTATION, deepenSegmentation);
 	}
 
 	@Override
@@ -133,7 +149,33 @@ public class Parameters extends BaseParameters {
 		buffer.setInteger("trimTrgTrailingWS", trimTrgTrailingWS);
 		buffer.setBoolean(FORCESEGMENTEDOUTPUT, forceSegmentedOutput);
 		buffer.setBoolean(OVERWRITESEGMENTATION, overwriteSegmentation);
+		buffer.setBoolean(DEEPENSEGMENTATION, deepenSegmentation);
 		return buffer.toString();
-	}	
+	}
 
+	public int getSegmentationStrategy() {
+		if (!overwriteSegmentation && deepenSegmentation)
+			return SEGM_DEEPENEXISTING;
+		
+		else if (overwriteSegmentation)
+			return SEGM_OVERWRITEEXISTING;
+		
+		else
+			return SEGM_KEEPEXISTING;
+	}
+	
+	public void setSegmentationStrategy(int strategy) {
+		if (strategy == SEGM_DEEPENEXISTING) {
+			overwriteSegmentation = false;
+			deepenSegmentation = true;
+		}
+		else if (strategy == SEGM_OVERWRITEEXISTING) {
+			overwriteSegmentation = true;
+			deepenSegmentation = false;
+		}
+		else {
+			overwriteSegmentation = false;
+			deepenSegmentation = false;
+		}
+	}
 }

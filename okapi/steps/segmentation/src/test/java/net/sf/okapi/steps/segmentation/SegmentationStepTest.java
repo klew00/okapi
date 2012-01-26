@@ -1,0 +1,153 @@
+package net.sf.okapi.steps.segmentation;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import java.net.URISyntaxException;
+
+import net.sf.okapi.common.Event;
+import net.sf.okapi.common.EventType;
+import net.sf.okapi.common.LocaleId;
+import net.sf.okapi.common.resource.ITextUnit;
+import net.sf.okapi.common.resource.Segment;
+import net.sf.okapi.common.resource.TextContainer;
+import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.common.resource.TextPart;
+import net.sf.okapi.common.resource.TextUnit;
+
+import org.junit.Before;
+import org.junit.Test;
+
+public class SegmentationStepTest {
+
+	private SegmentationStep segStep;
+	private Parameters params;
+	
+	@Before
+	public void startUp() throws URISyntaxException {
+		segStep = new SegmentationStep();
+		segStep.setSourceLocale(LocaleId.ENGLISH);
+		segStep.setTargetLocale(LocaleId.FRENCH);
+		params = (Parameters) segStep.getParameters();
+		params.setSourceSrxPath(this.getClass().getResource("/Test01.srx").toURI().getPath());
+		segStep.handleStartBatchItem(new Event(EventType.START_BATCH_ITEM));
+	}
+	
+	@Test
+	public void testSegmentationStrategy() {
+		ITextUnit tu1 = new TextUnit("tu1");
+		TextContainer source = tu1.getSource();
+		source.append(new Segment("seg1", new TextFragment("Sentence1. Sentence2.")));
+		source.append(new TextPart(" Text part 1. "));
+		source.append(new Segment("seg1", new TextFragment("Sentence3.")));
+		
+		assertEquals(2, source.getSegments().count());
+		
+		assertEquals("Sentence1. Sentence2.", source.get(0).toString());
+		assertTrue(source.get(0).isSegment());
+		
+		assertEquals(" Text part 1. ", source.get(1).toString());
+		assertFalse(source.get(1).isSegment());
+		
+		assertEquals("Sentence3.", source.get(2).toString());
+		assertTrue(source.get(2).isSegment());
+		
+		// 1
+		params.setSegmentationStrategy(Parameters.SEGM_KEEPEXISTING);
+		segStep.handleTextUnit(new Event(EventType.TEXT_UNIT, tu1));
+		
+		// Check if not changed
+		assertEquals(2, source.getSegments().count());
+		assertEquals(3, source.count());
+		
+		assertEquals("Sentence1. Sentence2.", source.get(0).toString());
+		assertTrue(source.get(0).isSegment());
+		
+		assertEquals(" Text part 1. ", source.get(1).toString());
+		assertFalse(source.get(1).isSegment());
+		
+		assertEquals("Sentence3.", source.get(2).toString());
+		assertTrue(source.get(2).isSegment());
+		
+		// 2
+		params.setSegmentationStrategy(Parameters.SEGM_DEEPENEXISTING);
+		segStep.handleTextUnit(new Event(EventType.TEXT_UNIT, tu1));
+		
+		// Check if did change
+		assertEquals(3, source.getSegments().count());
+		assertEquals(5, source.count());
+		
+		assertEquals("Sentence1.", source.get(0).toString());
+		assertTrue(source.get(0).isSegment());
+		
+		assertEquals(" ", source.get(1).toString());
+		assertFalse(source.get(1).isSegment());
+		
+		assertEquals("Sentence2.", source.get(2).toString());
+		assertTrue(source.get(2).isSegment());
+		
+		assertEquals(" Text part 1. ", source.get(3).toString());
+		assertFalse(source.get(3).isSegment());
+		
+		assertEquals("Sentence3.", source.get(4).toString());
+		assertTrue(source.get(4).isSegment());
+		
+		// 3
+		params.setSegmentationStrategy(Parameters.SEGM_OVERWRITEEXISTING);
+		segStep.handleTextUnit(new Event(EventType.TEXT_UNIT, tu1));
+		
+		// Check if did change
+		assertEquals(4, source.getSegments().count());
+		assertEquals(7, source.count());
+		
+		assertEquals("Sentence1.", source.get(0).toString());
+		assertTrue(source.get(0).isSegment());
+		
+		assertEquals(" ", source.get(1).toString());
+		assertFalse(source.get(1).isSegment());
+		
+		assertEquals("Sentence2.", source.get(2).toString());
+		assertTrue(source.get(2).isSegment());
+		
+		assertEquals(" ", source.get(3).toString());
+		assertFalse(source.get(3).isSegment());
+		
+		assertEquals("Text part 1.", source.get(4).toString());
+		assertTrue(source.get(4).isSegment());
+		
+		assertEquals(" ", source.get(5).toString());
+		assertFalse(source.get(5).isSegment());
+		
+		assertEquals("Sentence3.", source.get(6).toString());
+		assertTrue(source.get(6).isSegment());
+	}
+	
+	@Test
+	public void testWhiteSpacesInSingleSegment() throws URISyntaxException {
+		ITextUnit tu1 = new TextUnit("tu1");
+		TextContainer source = tu1.getSource();
+		source.append(new Segment("seg1", new TextFragment("  Text ")));
+		
+		assertEquals(1, source.getSegments().count());
+		assertEquals(1, source.count());
+		
+		assertEquals("  Text ", source.get(0).toString());
+		assertTrue(source.get(0).isSegment());
+		
+		params.setSegmentationStrategy(Parameters.SEGM_DEEPENEXISTING);
+		segStep.handleTextUnit(new Event(EventType.TEXT_UNIT, tu1));
+		
+		assertEquals(1, source.getSegments().count());
+		assertEquals(3, source.count());
+		
+		assertEquals("  ", source.get(0).toString());
+		assertFalse(source.get(0).isSegment());
+		
+		assertEquals("Text", source.get(1).toString());
+		assertTrue(source.get(1).isSegment());
+		
+		assertEquals(" ", source.get(2).toString());
+		assertFalse(source.get(2).isSegment());
+	}
+}
