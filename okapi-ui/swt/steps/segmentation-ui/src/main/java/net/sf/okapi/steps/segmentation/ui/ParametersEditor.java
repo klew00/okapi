@@ -31,6 +31,7 @@ import net.sf.okapi.common.ui.OKCancelPanel;
 import net.sf.okapi.common.ui.UIUtil;
 import net.sf.okapi.lib.ui.segmentation.SRXEditor;
 import net.sf.okapi.steps.segmentation.Parameters;
+import net.sf.okapi.steps.segmentation.Parameters.SegmStrategy;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -326,7 +327,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		chkCopySource.setSelection(params.copySource);
 		chkCheckSegments.setSelection(params.checkSegments);
 		chkForceSegmentedOutput.setSelection(params.getForcesegmentedOutput());
-		listBehaviorForSegmented.setSelection(params.getSegmentationStrategy());
+		listBehaviorForSegmented.setSelection(params.getSegmentationStrategy().ordinal());
 		updateSourceDisplay();
 		updateTargetDisplay();
 		updateOptionsDisplay();
@@ -344,7 +345,7 @@ public class ParametersEditor implements IParametersEditor, ISWTEmbeddableParame
 		params.copySource = chkCopySource.getSelection();
 		params.checkSegments = chkCheckSegments.getSelection();
 		params.setForcesegmentedOutput(chkForceSegmentedOutput.getSelection());
-		params.setSegmentationStrategy(listBehaviorForSegmented.getSelectionIndex());
+		params.setSegmentationStrategy(SegmStrategy.values()[listBehaviorForSegmented.getSelectionIndex()]);
 		result = true;
 		return true;
 	}
