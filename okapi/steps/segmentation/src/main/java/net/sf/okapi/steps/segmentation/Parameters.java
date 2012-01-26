@@ -82,22 +82,6 @@ public class Parameters extends BaseParameters {
 		this.forceSegmentedOutput = forceSegmentedOutput;
 	}
 	
-//	public boolean getOverwriteSegmentation () {
-//		return this.overwriteSegmentation;
-//	}
-//	
-//	public void setOverwriteSegmentation (boolean overwriteSegmentation) {
-//		this.overwriteSegmentation = overwriteSegmentation;
-//	}
-
-	public boolean getDeepenSegmentation() {
-		return deepenSegmentation;
-	}
-
-	public void setDeepenSegmentation(boolean deepenSegmentation) {
-		this.deepenSegmentation = deepenSegmentation;
-	}
-	
 	public void setSourceSrxPath (String sourceSrxPath) {
 		this.sourceSrxPath = sourceSrxPath.trim();
 	}
