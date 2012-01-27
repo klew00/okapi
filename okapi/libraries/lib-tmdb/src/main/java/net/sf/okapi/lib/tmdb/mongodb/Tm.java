@@ -727,10 +727,18 @@ public class Tm implements ITm {
 	
 	@Override
 	public void setSortOrder (LinkedHashMap<String, Boolean> fields) {
+		DBCollection segColl = store.getDb().getCollection(name+"_SEG");
 		sortObject.clear();
 		for (Entry<String, Boolean> field : fields.entrySet()) {
-			sortObject.put(field.getKey(),field.getValue());
+			int sort;
+			if (field.getValue() ){
+				sort = 1;
+			}else{
+				sort = -1;
+			}
+			sortObject.put(field.getKey(),sort);
 		}
+		segColl.ensureIndex(sortObject);
 	}
 
 	@Override
@@ -846,7 +854,18 @@ public class Tm implements ITm {
 				if ( right.getType() == TYPE.STRING ) {
 					query.put(left.getStringValue(),right.getStringValue());
 				}
-			}
+			}/*else if(on.getOperator().getType() == net.sf.okapi.lib.tmdb.filter.Operator.TYPE.NOT) {
+				
+				ValueNode left = (ValueNode) on.getLeft();
+				ValueNode right = (ValueNode) on.getRight();
+		
+				if ( right.getType() == TYPE.BOOLEAN ) {
+					query.put(left.getStringValue(),right.getBooleanValue());
+				}
+				if ( right.getType() == TYPE.STRING ) {
+					query.put(left.getStringValue(),right.getStringValue());
+				}
+			}*/
 		}		
 		return query;
 	}
