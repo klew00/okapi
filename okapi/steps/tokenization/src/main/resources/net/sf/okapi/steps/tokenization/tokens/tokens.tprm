@@ -1,5 +1,5 @@
 #v1
-TokenItemCount.i=18
+TokenItemCount.i=19
 TokenItem0.name=ABBREVIATION
 TokenItem0.description=Abbreviations like pct in 3.3pct, U.S., USD
 TokenItem1.name=COMPANY
@@ -36,3 +36,5 @@ TokenItem16.name=WHITESPACE
 TokenItem16.description=Whitespace characters as defined by the Unicode Consortium standardsWhite space
 TokenItem17.name=WORD
 TokenItem17.description=A run of characters constituting a word of the given language
+TokenItem18.name=PROTECTED
+TokenItem18.description=Internal use only (The area covered by this token is blocked for tokenization)

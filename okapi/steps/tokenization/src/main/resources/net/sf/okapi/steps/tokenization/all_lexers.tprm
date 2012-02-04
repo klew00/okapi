@@ -83,7 +83,7 @@ StructureParametersItem15.lexerClass=net.sf.okapi.steps.tokenization.engine.Reco
 StructureParametersItem15.rulesLocation=
 
 StructureParametersItem16.enabled.b=true
-StructureParametersItem16.description=RAWTEXT-type tokens remover.
+StructureParametersItem16.description=RAWTEXT and PROTECTED tokens remover.
 StructureParametersItem16.lexerClass=net.sf.okapi.steps.tokenization.engine.Remover
 StructureParametersItem16.rulesLocation=remover_rawtext.tprm
 
