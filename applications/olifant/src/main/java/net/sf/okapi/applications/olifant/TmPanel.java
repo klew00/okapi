@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.observer.IObservable;
@@ -82,6 +83,7 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 	private final Table table;
 	private final TableCursor cursor;
 	private final LogPanel logPanel;
+	private final LogHandler logHandler;
 	private final Listener columnHeaderListener;
 	
 	private Point cursorLoc;
@@ -325,10 +327,16 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 		col.addListener(SWT.Selection, columnHeaderListener);
 		
 		logPanel = new LogPanel(sashMain, 0);
+		logHandler = new LogHandler();
+		Logger.getLogger("").addHandler(logHandler); //$NON-NLS-1$
 		
 		sashMain.setWeights(new int[]{3, 7, 2});
 		
 		createContextMenu(rm);
+	}
+	
+	LogHandler getLogHandler () {
+		return logHandler;
 	}
 	
 	private void createContextMenu (ResourceManager rm) {

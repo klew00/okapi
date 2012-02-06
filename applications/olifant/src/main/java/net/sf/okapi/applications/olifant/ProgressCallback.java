@@ -35,6 +35,7 @@ public class ProgressCallback implements IProgressCallback {
 	public ProgressCallback (TmPanel tp) {
 		observers = new ArrayList<IObserver>();
 		this.logPanel = tp.getLog();
+		tp.getLogHandler().setCallback(this);
 		addObserver(tp);
 	}
 	
