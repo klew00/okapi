@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2008-2011 by the Okapi Framework contributors
+  Copyright (C) 2008-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -44,9 +44,7 @@ import net.sf.okapi.common.exceptions.OkapiBadFilterInputException;
 import net.sf.okapi.common.exceptions.OkapiIOException;
 import net.sf.okapi.common.exceptions.OkapiUnsupportedEncodingException;
 import net.sf.okapi.common.filters.AbstractFilter;
-import net.sf.okapi.common.filters.DefaultFilters;
 import net.sf.okapi.common.filters.FilterConfiguration;
-import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.filters.IFilter;
 import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filters.SubFilter;
@@ -96,10 +94,10 @@ public class PropertiesFilter implements IFilter {
 	private String docName;
 	private boolean hasUTF8BOM;
 	private EncoderManager encoderManager;
-	@SubFilter
-	// subfilter annotation convinces the filter below it is a subfilter
-	private IFilter subfilter;
 	private LocaleId srcLocale;
+	@SubFilter
+	private IFilter subfilter;
+	private IFilterConfigurationMapper fcMapper;
 
 	public PropertiesFilter() {
 		params = new Parameters();
@@ -158,8 +156,11 @@ public class PropertiesFilter implements IFilter {
 	public EncoderManager getEncoderManager() {
 		if (encoderManager == null) {
 			encoderManager = new EncoderManager();
-			encoderManager.setMapping(MimeTypeMapper.PROPERTIES_MIME_TYPE,
-					"net.sf.okapi.common.encoder.PropertiesEncoder");
+			// Use this because we have sub-filters, but this work only for sub-filters that have common encoder
+			//TODO: fix the sub-filters mechanism
+			encoderManager.setAllKnownMappings();
+//			encoderManager.setMapping(MimeTypeMapper.PROPERTIES_MIME_TYPE,
+//				"net.sf.okapi.common.encoder.PropertiesEncoder");
 		}
 		return encoderManager;
 	}
@@ -208,7 +209,7 @@ public class PropertiesFilter implements IFilter {
 						beforeSkeleton = skel[0];
 					}
 
-					// queue up subfilter events
+					// Queue up subfilter events
 					processWithSubfilter(tuRes.getId(), tuRes, beforeSkeleton, afterSkeleton);
 					
 					return queue.poll();
@@ -234,6 +235,7 @@ public class PropertiesFilter implements IFilter {
 
 	@Override
 	public void setFilterConfigurationMapper(IFilterConfigurationMapper fcMapper) {
+		this.fcMapper = fcMapper;
 	}
 
 	public void setParameters(IParameters params) {
@@ -304,10 +306,7 @@ public class PropertiesFilter implements IFilter {
 
 		// Set up sub-filter if required
 		if ( !Util.isEmpty(params.getSubfilter()) ) {
-			FilterConfigurationMapper fcMapper = new FilterConfigurationMapper();
-			DefaultFilters.setMappings(fcMapper, true, true);
 			subfilter = fcMapper.createFilter(params.getSubfilter(), subfilter);
-
 			if (subfilter == null) {
 				throw new OkapiBadFilterInputException("Unkown subfilter: " + params.getSubfilter());
 			}

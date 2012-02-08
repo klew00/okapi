@@ -49,7 +49,7 @@ public class EncoderManager implements IEncoder {
 	 */
 	public EncoderManager () {
 		mimeMap = new Hashtable<String, String>();
-		// All the filters have their mapping, all mapping should be explicite only
+		// All the filters have their mapping, all mapping should be explicit only
 		// Not needed anymore: setAllKnownMappings();
 	}
 

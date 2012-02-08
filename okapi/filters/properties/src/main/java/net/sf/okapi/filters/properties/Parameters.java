@@ -60,7 +60,7 @@ public class Parameters extends BaseParameters {
 		codeFinder.addRule("%(([-0+#]?)[-0+#]?)((\\d\\$)?)(([\\d\\*]*)(\\.[\\d\\*]*)?)[dioxXucsfeEgGpn]");
 		codeFinder.addRule("(\\\\r\\\\n)|\\\\a|\\\\b|\\\\f|\\\\n|\\\\r|\\\\t|\\\\v");
 		//TODO: Add Java-style variables. this is too basic
-		codeFinder.addRule("\\{\\d.*?\\}");
+		codeFinder.addRule("\\{\\d[^\\\\]*?\\}");		
 		// Basic HTML/XML
 		codeFinder.addRule("\\<(/?)\\w+[^>]*?>");
 		

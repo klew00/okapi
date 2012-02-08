@@ -27,6 +27,7 @@ public class Main {
 
 	public static void main (String args[]) {
 		
+		int exitCode = 0;
 		Display dispMain = null;
 		try {
 			dispMain = new Display();
@@ -44,14 +45,18 @@ public class Main {
 			}
 			else { // Command line mode
 				CommandLine cmd = new CommandLine();
-				cmd.execute(shlMain, args);
+				exitCode = cmd.execute(shlMain, args);
 			}
 		}
 		catch ( Throwable e ) {
 			e.printStackTrace();
+			exitCode = 1;
 		}
 		finally {
 			if ( dispMain != null ) dispMain.dispose();
+		}
+		if ( exitCode > 0 ) {
+			System.exit(exitCode);
 		}
     }
 

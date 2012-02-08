@@ -31,7 +31,10 @@ import net.sf.okapi.common.resource.RawDocument;
 import net.sf.okapi.common.resource.Property;
 import net.sf.okapi.common.resource.ITextUnit;
 import net.sf.okapi.filters.properties.PropertiesFilter;
+import net.sf.okapi.common.filters.DefaultFilters;
+import net.sf.okapi.common.filters.FilterConfigurationMapper;
 import net.sf.okapi.common.filters.FilterTestDriver;
+import net.sf.okapi.common.filters.IFilterConfigurationMapper;
 import net.sf.okapi.common.filters.InputDocument;
 import net.sf.okapi.common.filters.RoundTripComparison;
 import net.sf.okapi.common.LocaleId;
@@ -49,6 +52,9 @@ public class PropertiesFilterTest {
 	@Before
 	public void setUp() {
 		filter = new PropertiesFilter();
+		IFilterConfigurationMapper fcMapper = new FilterConfigurationMapper();
+		DefaultFilters.setMappings(fcMapper, true, true);
+		filter.setFilterConfigurationMapper(fcMapper);
 	}
 
 	@Test
@@ -252,10 +258,39 @@ public class PropertiesFilterTest {
 		p.setSubfilter(null);
 		filter.setParameters(p);
 		assertNotNull(tu);
+		// the Properties filter code-finder rules are passed to the HTML/XML sub-filters, so {1} and {2} are seen as codes 
+		assertEquals(4, tu.getSource().getFirstContent().getCodes().size());
 		assertEquals("<b>Text with {1} more {2} test</b>", tu.getSource().toString());
 	}
 	
-	//@Test
+	@Test
+	public void testWithSubfilterWithHTMLEscapes() {
+		Parameters p = (Parameters)filter.getParameters();
+		p.setSubfilter("okf_html");
+		String snippet = "Key1=<b>Text with &amp;=amp test</b>";
+		List<Event> el = getEvents(snippet);
+		ITextUnit tu = FilterTestDriver.getTextUnit(el, 1);
+		p.setSubfilter(null);
+		filter.setParameters(p);
+		assertNotNull(tu);
+		assertEquals(2, tu.getSource().getFirstContent().getCodes().size());
+		assertEquals("<b>Text with &=amp test</b>", tu.getSource().toString());
+	}
+	
+	@Test
+	public void testWithSubfilterOutput () {
+		Parameters p = (Parameters)filter.getParameters();
+		p.setSubfilter("okf_html");
+		String snippet = "Key1=<b>Text with &amp;=amp test</b>\n";
+		List<Event> el = getEvents(snippet);
+		String result = FilterTestDriver.generateOutput(getEvents(snippet),
+			filter.getEncoderManager(), locEN);
+		assertEquals(snippet, result);
+		p.setSubfilter(null);
+		filter.setParameters(p);
+	}
+	
+	@Test
 	public void testWithSubfilterWithEmbeddedEscapedMessagePH() {
 		Parameters p = (Parameters)filter.getParameters();
 		p.setSubfilter("okf_html");
@@ -265,6 +300,8 @@ public class PropertiesFilterTest {
 		p.setSubfilter(null);
 		filter.setParameters(p);
 		assertNotNull(tu);
+		// The Properties filter code-finder rules are passed to the HTML/XML sub-filters,
+		// But {1} and {2} are escaped, so not seen as codes 
 		assertEquals(2, tu.getSource().getFirstContent().getCodes().size());
 		assertEquals("<b>Text with \\{1\\} more \\{2\\} test</b>", tu.getSource().toString());
 	}

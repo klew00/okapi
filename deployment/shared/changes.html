@@ -23,13 +23,33 @@ distribution.</p>
 </ul>
 <h2>Changes from M15 to M16-SNAPSHOT</h2>
 <ul>
+	<li>Rainbow:<ul>
+	<li>Rainbow now return a non-zero error code if the command-line ends with 
+	an error (Issue #201)</li>
+</ul>
+	</li>
 	<li>Filters:<ul>
 	<li>TMX Filter:<ul>
-	<li>Added an option to stop processing when encountering invalid &lt;tu&gt;s. By default invalid &lt;tu&gt;s are excluded.</li>
+	<li>Added an option to stop processing when encountering invalid <code>&lt;tu&gt;</code> 
+	elements. By default invalid <code>&lt;tu&gt;</code> elements are excluded.</li>
 </ul>
 	<li>PHP Content Filter:<ul>
 	<li>Fixed the issue #204: duplicated code when a string is an inline code 
 	with concatenation and linebreak.</li>
+</ul>
+	</li>
+	<li>Properties Filter:<ul>
+	<li>Fixed the default rule for Java inline code so escaped is supported.</li>
+	<li>Fixed the issue where custom filter configurations for sub-filters were 
+	not loaded properly.</li>
+</ul>
+	</li>
+	<li>TS Filter:<ul>
+	<li>Fixed the default rule for Java inline code so escaped is supported.</li>
+</ul>
+	</li>
+	<li>PO Filter:<ul>
+	<li>Fixed the default rule for Java inline code so escaped is supported.</li>
 </ul>
 	</li>
 	<li>XLIFF Filter:<ul>

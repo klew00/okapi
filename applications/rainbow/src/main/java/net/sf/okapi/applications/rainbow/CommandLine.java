@@ -61,7 +61,7 @@ public class CommandLine {
 	private BaseHelp help;
 	private PluginsManager pm;
 	
-	public void execute (Shell shell,
+	public int execute (Shell shell,
 		String[] args)
 	{
 		try {
@@ -69,7 +69,7 @@ public class CommandLine {
 			printBanner();
 			initialize();
 			if ( !parseArguments(args) ) {
-				return;
+				return 1;
 			}
 			
 			IPredefinedPipeline predefinedPipeline = null;
@@ -98,6 +98,13 @@ public class CommandLine {
 		}
 		catch ( Throwable e ) {
 			e.printStackTrace();
+			return 1;
+		}
+		if (( log != null ) && ( log.getErrorCount() > 0 )) {
+			return 1;
+		}
+		else {
+			return 0;
 		}
 	}
 	

@@ -47,6 +47,7 @@ public class IdAlignerTest {
 		
 		FilterConfigurationMapper fcMapper = new FilterConfigurationMapper();
 		fcMapper.addConfigurations("net.sf.okapi.filters.properties.PropertiesFilter");
+		fcMapper.addConfigurations("net.sf.okapi.filters.html.HtmlFilter");
 		rawDocumentToFilterStep.setFilterConfigurationMapper(fcMapper);
 		aligner.setFilterConfigurationMapper(fcMapper);
 		pipeline.addStep(aligner);
