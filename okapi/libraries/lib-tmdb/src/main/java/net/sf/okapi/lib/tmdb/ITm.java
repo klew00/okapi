@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2011 by the Okapi Framework contributors
+  Copyright (C) 2011-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -20,7 +20,6 @@
 
 package net.sf.okapi.lib.tmdb;
 
-import java.sql.ResultSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -207,7 +206,7 @@ public interface ITm {
 	 * Gets the records for the current page.
 	 * @return the results for the current page, or null if there is no current page.
 	 */
-	public ResultSet refreshCurrentPage ();
+	public IRecordSet refreshCurrentPage ();
 	
 	/**
 	 * Moves the page cursor before the first page.
@@ -223,7 +222,7 @@ public interface ITm {
 	 * See {@link #setPageMode(int)} for details.
 	 * @return the results for the first page, or null if there is no first page.
 	 */
-	public ResultSet getFirstPage ();
+	public IRecordSet getFirstPage ();
 	
 	/**
 	 * Gets the last page of records.
@@ -233,19 +232,19 @@ public interface ITm {
 	 * See {@link #setPageMode(int)} for details.
 	 * @param the results for the last page, or null if there is no last page.
 	 */
-	public ResultSet getLastPage ();
+	public IRecordSet getLastPage ();
 	
 	/**
 	 * Gets the next page of records.
 	 * @return the results for the next page, or null if there is no next page.
 	 */
-	public ResultSet getNextPage ();
+	public IRecordSet getNextPage ();
 	
 	/**
 	 * Gets the previous page of records.
 	 * @return the results for the previous page, or null if there is no previous page.
 	 */
-	public ResultSet getPreviousPage ();
+	public IRecordSet getPreviousPage ();
 	
 	/**
 	 * Finds the index of the page where a given segment is located.
@@ -261,7 +260,7 @@ public interface ITm {
 	 * @param pageIndex the 0-based index of the page.
 	 * @return the results for the given page, or null if an error occurs.
 	 */
-	public ResultSet getPage (long pageIndex);
+	public IRecordSet getPage (long pageIndex);
 
 	/**
 	 * Adds a given locale to the TM.

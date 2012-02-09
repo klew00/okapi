@@ -205,7 +205,7 @@ public class DbUtil {
 		//return fmt.fromNumericCodedToFragment(ctext, Code.stringToCodes(codes), false);
 	}
 
-	public static List<LinkedHashMap<String, Object>> resultSetToMaps (ResultSet rs)
+	public static List<LinkedHashMap<String, Object>> resultSetToMaps (IRecordSet rs)
 		throws SQLException
 	{
 		List<LinkedHashMap<String, Object>> res = new ArrayList<LinkedHashMap<String, Object>>();
@@ -215,10 +215,9 @@ public class DbUtil {
 		LinkedHashMap<String, Object> segFields = new LinkedHashMap<String, Object>();
 		res.add(segFields);
 		
-		ResultSetMetaData rsMetaData = rs.getMetaData();
-	    int colCount = rsMetaData.getColumnCount();
+	    int colCount = rs.getFieldCount();
 	    for ( int i=1; i<=colCount; i++ ) { // 1-based index
-	    	String fn = rsMetaData.getColumnName(i);
+	    	String fn = rs.getFieldName(i);
 	    	if ( fn.equals(DbUtil.SEGKEY_NAME) || fn.equals(DbUtil.TUREF_NAME) ) {
 	    		continue; // Auto-generated
 	    	}

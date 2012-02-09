@@ -75,7 +75,7 @@ public class Splitter implements Runnable {
 			long prevTuKey = -1;
 			long outTuKey = -1;
 			
-			ResultSet rs = tm.getFirstPage();
+			IRecordSet rs = tm.getFirstPage();
 			while  (( rs != null ) && !canceled ) {
 				while ( rs.next() && !canceled ) {
 					totalCount++;
@@ -91,7 +91,7 @@ public class Splitter implements Runnable {
 					}
 					
 					// Add the entry to the output TM
-					long tuKey = rs.getLong(DbUtil.TUREF_NAME);
+					long tuKey = rs.getTuRef();
 					if ( tuKey != prevTuKey ) outTuKey = -1;
 					
 					List<LinkedHashMap<String, Object>> res = DbUtil.resultSetToMaps(rs);

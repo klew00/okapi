@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2011 by the Okapi Framework contributors
+  Copyright (C) 2011-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -20,7 +20,6 @@
 
 package net.sf.okapi.lib.tmdb;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -84,7 +83,7 @@ public class Exporter implements Runnable {
 			writer.writeStartDocument(srcLoc, trgLoc, getClass().getCanonicalName(), "1", null, null, null);
 			boolean canceled = false;
 			
-			ResultSet rs = tm.getFirstPage();
+			IRecordSet rs = tm.getFirstPage();
 			while  (( rs != null ) && !canceled ) {
 				while ( rs.next() && !canceled ) {
 					count++;
@@ -120,7 +119,7 @@ public class Exporter implements Runnable {
 		}
 	}
 
-	private TextUnit toTextUnit (ResultSet rs,
+	private TextUnit toTextUnit (IRecordSet rs,
 		LocaleId srcLoc)
 		throws SQLException 
 	{
@@ -180,13 +179,13 @@ public class Exporter implements Runnable {
 				}
 			}
 			// Export the Olifant-specific flag
-			boolean flag = rs.getBoolean(DbUtil.FLAG_NAME);
+			boolean flag = rs.getFlag();
 			if ( flag ) {
 				tu.setProperty(new Property(DbUtil.PROP_FLAG, "1"));
 			}
 			// Use the segment key as the tuid if none was defined
 			if ( Util.isEmpty(tu.getName()) ) {
-				tu.setName(String.valueOf(rs.getLong(DbUtil.SEGKEY_NAME)));
+				tu.setName(String.valueOf(rs.getSegKey()));
 			}
 			
 			// Done
@@ -194,7 +193,7 @@ public class Exporter implements Runnable {
 		}
 		catch ( Throwable e ) {
 			callback.logMessage(IProgressCallback.MSGTYPE_ERROR,
-				String.format("SegKey=%d: "+e.getMessage(), rs.getLong(DbUtil.SEGKEY_NAME)));
+				String.format("SegKey=%d: "+e.getMessage(), rs.getSegKey()));
 		}
 		return null;
 	}

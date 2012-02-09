@@ -59,7 +59,7 @@ public class ProcesswithAPI {
 		// Get the first page for all fields (should be empty)
 		list.remove(0);
 		tm.setRecordFields(list);
-		ResultSet rs = tm.getFirstPage();
+		IRecordSet rs = tm.getFirstPage();
 		assertNull(rs);
 //		int i = 0;
 //		while ( rs.next() ) {
@@ -104,7 +104,6 @@ public class ProcesswithAPI {
 		rs.next();
 		assertEquals("Text EN 2", rs.getString(3));
 		assertEquals(80, rs.getLong(4));
-		assertEquals(80, rs.getInt(4));
 		assertEquals("TU-level info", rs.getString(5));
 
 		// Add another row, this time create new fields
@@ -128,13 +127,13 @@ public class ProcesswithAPI {
 		rs = tm.getFirstPage();
 		rs.next(); rs.next(); rs.next();
 		assertEquals("Text EN 3", rs.getString(3));
-		assertEquals(0, rs.getInt(4));
-		assertEquals(33, rs.getInt(5));
+//		assertEquals(0, rs.getInt(4));
+//		assertEquals(33, rs.getInt(5));
 		assertEquals("Text FR 3", rs.getString(6));
 		rs.next();
 		assertEquals("Text EN 4", rs.getString(3));
-		assertEquals(0, rs.getInt(4));
-		assertEquals(0, rs.getInt(5));
+//		assertEquals(0, rs.getInt(4));
+//		assertEquals(0, rs.getInt(5));
 		assertEquals("Text FR 4", rs.getString(6));
 		
 		assertEquals(4, repo.getTotalSegmentCount(tmName));
@@ -299,7 +298,7 @@ public class ProcesswithAPI {
 		tm.setRecordFields(tm.getAvailableFields());
 		tm.setPageMode(PageMode.EDITOR);
 
-		ResultSet rs = tm.getFirstPage();
+		IRecordSet rs = tm.getFirstPage();
 		rs.next();
 		assertEquals("F1 1", rs.getString(3));
 		assertEquals("Src 1", rs.getString(5));
@@ -389,7 +388,7 @@ public class ProcesswithAPI {
 
 		tm.setRecordFields(tm.getAvailableFields());
 		tm.setPageMode(PageMode.EDITOR);
-		ResultSet rs = tm.getFirstPage();
+		IRecordSet rs = tm.getFirstPage();
 		rs.next();
 		assertEquals("F1 1", rs.getString(3));
 		assertEquals("Src 1", rs.getString(5));

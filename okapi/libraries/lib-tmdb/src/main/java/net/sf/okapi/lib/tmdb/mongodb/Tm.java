@@ -20,7 +20,6 @@
 
 package net.sf.okapi.lib.tmdb.mongodb;
 
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -32,6 +31,7 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import net.sf.okapi.lib.tmdb.DbUtil;
+import net.sf.okapi.lib.tmdb.IRecordSet;
 import net.sf.okapi.lib.tmdb.IRepository;
 import net.sf.okapi.lib.tmdb.ITm;
 import net.sf.okapi.lib.tmdb.DbUtil.PageMode;
@@ -290,14 +290,14 @@ public class Tm implements ITm {
 	}
 	
 	@Override
-	public ResultSet getFirstPage() {
+	public IRecordSet getFirstPage() {
 		checkPagingVariables();
 		currentPage = 0;
 		return getPage();
 	}
 
 	@Override
-	public ResultSet getLastPage() {	
+	public IRecordSet getLastPage() {	
 		checkPagingVariables();
 		currentPage = pageCount-1;
 		//int pageCount = calculatePageCount(); 
@@ -308,7 +308,7 @@ public class Tm implements ITm {
 	}
 
 	@Override
-	public ResultSet getNextPage() {
+	public IRecordSet getNextPage() {
 		checkPagingVariables();
 		if ( currentPage >= pageCount-1 ) return null; // Last page reached
 		currentPage++;
@@ -320,7 +320,7 @@ public class Tm implements ITm {
 	}
 	
 	@Override
-	public ResultSet getPreviousPage() {
+	public IRecordSet getPreviousPage() {
 		checkPagingVariables();
 		if ( currentPage <= 0 ) return null; // First page reached
 		currentPage--;
@@ -349,7 +349,7 @@ public class Tm implements ITm {
 	 * Return the ResultSet from the current page. Should all Close() to release the Mongo DBCursor.
 	 * @return
 	 */
-	private ResultSet getPage(){
+	private IRecordSet getPage(){
 		DBCollection segColl = store.getDb().getCollection(name+"_SEG");
 		DBCursor cur;
 		if (pageMode == PageMode.EDITOR ) {
@@ -365,7 +365,7 @@ public class Tm implements ITm {
 			cur = segColl.find().sort(sortObject).limit(limit).skip((int)(limit*currentPage));
 		}
 
-		return new MongodbResultSet(cur, recordFields, limit);
+		return new RecordSet(cur, recordFields, limit);
 	}
 
 	/**
@@ -770,7 +770,7 @@ public class Tm implements ITm {
 	}
 	
 	@Override
-	public ResultSet refreshCurrentPage () {
+	public IRecordSet refreshCurrentPage () {
 		long oldPage = currentPage;
 		needPagingRefresh = true;
 		checkPagingVariables();
@@ -811,7 +811,7 @@ public class Tm implements ITm {
 	}
 
 	@Override
-	public ResultSet getPage (long pageIndex) {
+	public IRecordSet getPage (long pageIndex) {
 		checkPagingVariables();
 		if (( pageIndex < 0 ) || ( pageIndex >= pageCount )) {
 			return null;

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2011 by the Okapi Framework contributors
+  Copyright (C) 2011-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -72,7 +72,7 @@ public class SearchAndReplace implements Runnable {
 			tm.setRecordFields(options.getFields());
 			tm.setPageMode(PageMode.ITERATOR);
 			
-			ResultSet rs = tm.getFirstPage();
+			IRecordSet rs = tm.getFirstPage();
 			while  (( rs != null ) && !canceled ) {
 				while ( rs.next() && !canceled ) {
 					totalCount++;

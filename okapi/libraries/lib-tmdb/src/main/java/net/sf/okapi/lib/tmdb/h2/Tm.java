@@ -31,6 +31,7 @@ import java.util.Map;
 
 import net.sf.okapi.common.Util;
 import net.sf.okapi.lib.tmdb.DbUtil;
+import net.sf.okapi.lib.tmdb.IRecordSet;
 import net.sf.okapi.lib.tmdb.IRepository;
 import net.sf.okapi.lib.tmdb.ITm;
 import net.sf.okapi.lib.tmdb.DbUtil.PageMode;
@@ -603,7 +604,7 @@ public class Tm implements ITm {
 	}
 
 	@Override	
-	public ResultSet refreshCurrentPage () {
+	public IRecordSet refreshCurrentPage () {
 		long oldPage = currentPage;
 		needPagingRefresh = true;
 		checkPagingVariables();
@@ -613,21 +614,21 @@ public class Tm implements ITm {
 	}
 	
 	@Override
-	public ResultSet getFirstPage () {
+	public IRecordSet getFirstPage () {
 		checkPagingVariables();
 		currentPage = 0;
 		return moveToPage(getFirstKeySegValueForPage(currentPage));
 	}
 
 	@Override
-	public ResultSet getLastPage () {
+	public IRecordSet getLastPage () {
 		checkPagingVariables();
 		currentPage = pageCount-1;
 		return moveToPage(getFirstKeySegValueForPage(currentPage));
 	}
 
 	@Override
-	public ResultSet getNextPage () {
+	public IRecordSet getNextPage () {
 		checkPagingVariables();
 		if ( currentPage >= pageCount-1 ) return null; // Last page reached
 		currentPage++;
@@ -635,7 +636,7 @@ public class Tm implements ITm {
 	}
 
 	@Override
-	public ResultSet getPreviousPage () {
+	public IRecordSet getPreviousPage () {
 		checkPagingVariables();
 		if ( currentPage <= 0 ) return null; // First page reached
 		currentPage--;
@@ -683,7 +684,7 @@ public class Tm implements ITm {
 		
 	}
 	
-	private ResultSet moveToPage (long topSegKey) {
+	private IRecordSet moveToPage (long topSegKey) {
 		if ( topSegKey < 1 ) return null;
 		ResultSet result = null;
 		try {
@@ -700,7 +701,7 @@ public class Tm implements ITm {
 		catch ( SQLException e ) {
 			throw new RuntimeException(e);
 		}
-		return result;
+		return new RecordSet(result);
 	}
 
 	private long getFirstKeySegValueForPage (long page) {
@@ -1151,7 +1152,7 @@ public class Tm implements ITm {
 	}
 
 	@Override
-	public ResultSet getPage (long pageIndex) {
+	public IRecordSet getPage (long pageIndex) {
 		checkPagingVariables();
 		if (( pageIndex < 0 ) || ( pageIndex >= pageCount )) {
 			return null;

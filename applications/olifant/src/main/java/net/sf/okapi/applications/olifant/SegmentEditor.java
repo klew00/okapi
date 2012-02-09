@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2011 by the Okapi Framework contributors
+  Copyright (C) 2011-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -37,7 +37,7 @@ import org.eclipse.swt.widgets.Composite;
 
 class SegmentEditor {
 
-	private static final Pattern CLEANCODES = Pattern.compile("\\<[/be]?(\\d+?)/?\\>");
+	private static final Pattern SHORTCODES = Pattern.compile("\\<[/be]?(\\d+?)/?\\>");
 	private static final Pattern REALCODES = Pattern.compile("<(bpt|ept|ph|it|ut).*?>(.*?)</\\1>");
 
 	private final ISegmentEditorUser caller;
@@ -62,7 +62,7 @@ class SegmentEditor {
 		edit.setLayoutData(gdTmp);
 		
 		fullCodesMode = false;
-		currentCodes = CLEANCODES;
+		currentCodes = SHORTCODES;
 		
 		edit.addExtendedModifyListener(new ExtendedModifyListener() {
 			@Override
@@ -175,7 +175,7 @@ class SegmentEditor {
 	public void setFullCodesMode (boolean fullCodesMode) {
 		this.fullCodesMode = fullCodesMode;
 		if ( fullCodesMode ) currentCodes = REALCODES;
-		else currentCodes = CLEANCODES;
+		else currentCodes = SHORTCODES;
 		edit.append(""); // Make a modification to trigger the re-parsing
 	}
 	

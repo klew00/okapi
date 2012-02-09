@@ -20,7 +20,6 @@
 
 package net.sf.okapi.applications.olifant;
 
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -34,6 +33,7 @@ import net.sf.okapi.common.observer.IObserver;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.ResourceManager;
 import net.sf.okapi.lib.tmdb.DbUtil;
+import net.sf.okapi.lib.tmdb.IRecordSet;
 import net.sf.okapi.lib.tmdb.ITm;
 import net.sf.okapi.lib.tmdb.Location;
 import net.sf.okapi.lib.tmdb.SearchAndReplace;
@@ -957,7 +957,7 @@ class TmPanel extends Composite implements IObserver, ISegmentEditorUser {
 		try {
 			statusBar.setInfo("Fetching data...", true);
 			saveModificationsIfNeeded();
-			ResultSet rs = null;
+			IRecordSet rs = null;
 			switch ( direction ) {
 			case 0:
 				rs = tm.getFirstPage();
