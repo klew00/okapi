@@ -285,6 +285,7 @@ public class TransTableWriter implements IFilterWriter {
 				
 				// Write the source
 				writeQuotedContent(srcSeg.getContent());
+				writer.write("\t");
 				
 				// Write the target
 				if ( trgSegs != null ) {
