@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2009-2011 by the Okapi Framework contributors
+  Copyright (C) 2009-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -91,6 +91,7 @@ public class XLIFFWriter implements IFilterWriter {
 	private boolean hasFile;
 	private boolean useSourceForTranslated = false;
 
+	private boolean escapeGt = false;
 	private boolean placeholderMode = false;
 	private boolean includeNoTranslate = true;
 	private boolean setApprovedAsNoTranslate = false;
@@ -118,6 +119,14 @@ public class XLIFFWriter implements IFilterWriter {
 	 */
 	public void setPlaceholderMode (boolean placeholderMode) {
 		this.placeholderMode = placeholderMode;
+	}
+	
+	/**
+	 * Sets the flag indicating if '>' should be escaped or not.
+	 * @param escapeGt true to always escape '>', false to not escape it.
+	 */
+	public void setEscapeGt (boolean escapeGt) {
+		this.escapeGt = escapeGt;
 	}
 	
 	/**
@@ -444,12 +453,12 @@ public class XLIFFWriter implements IFilterWriter {
 		writer.writeStartElement("source");
 		writer.writeAttributeString("xml:lang", srcLoc.toBCP47());
 		// Write full source content (always without segments markers
-		writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, false, false, placeholderMode));
+		writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, escapeGt, false, placeholderMode));
 		writer.writeEndElementLineBreak(); // source
 		// Write segmented source (with markers) if needed
 		if ( tc.hasBeenSegmented() ) {
 			writer.writeStartElement("seg-source");
-			writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, false, true, placeholderMode));
+			writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, escapeGt, true, placeholderMode));
 			writer.writeEndElementLineBreak(); // seg-source
 		}
 
@@ -471,7 +480,7 @@ public class XLIFFWriter implements IFilterWriter {
 				writer.writeStartElement("target");
 				writer.writeAttributeString("xml:lang", trgLoc.toBCP47());
 				// Now tc hold the content to write. Write it with or without marks
-				writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, false, tc.hasBeenSegmented(), placeholderMode));
+				writer.writeRawXML(xliffCont.toSegmentedString(tc, 0, escapeGt, tc.hasBeenSegmented(), placeholderMode));
 				writer.writeEndElementLineBreak(); // target
 			}
 
@@ -547,12 +556,12 @@ public class XLIFFWriter implements IFilterWriter {
 				writer.writeStartElement("source");
 				writer.writeAttributeString("xml:lang", alt.getSourceLocale().toBCP47());
 				// Write full source content (always without segments markers
-				writer.writeRawXML(xliffCont.toSegmentedString(cont, 0, false, false, placeholderMode));
+				writer.writeRawXML(xliffCont.toSegmentedString(cont, 0, escapeGt, false, placeholderMode));
 				writer.writeEndElementLineBreak(); // source
 			}
 			writer.writeStartElement("target");
 			writer.writeAttributeString("xml:lang", alt.getTargetLocale().toBCP47());
-			writer.writeRawXML(xliffCont.toSegmentedString(alt.getTarget(), 0, false, false, placeholderMode));
+			writer.writeRawXML(xliffCont.toSegmentedString(alt.getTarget(), 0, escapeGt, false, placeholderMode));
 			writer.writeEndElementLineBreak(); // target
 			writer.writeEndElementLineBreak(); // alt-trans
 		}

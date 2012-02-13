@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2010-2011 by the Okapi Framework contributors
+  Copyright (C) 2010-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -100,7 +100,7 @@ public class XLIFFWriterTest {
 		throws IOException
 	{
 		writer.create(root+"out.xlf", null, locEN, null, null, "original.ext", null);
-		ITextUnit tu = new TextUnit("tu1", "src1");
+		ITextUnit tu = new TextUnit("tu1", "src1 with <>");
 		writer.writeTextUnit(tu);
 		writer.close();
 
@@ -110,7 +110,28 @@ public class XLIFFWriterTest {
 			+ "<file original=\"original.ext\" source-language=\"en\" datatype=\"x-undefined\">\n"
 			+ "<body>\n"
 			+ "<trans-unit id=\"tu1\">\n"
-			+ "<source xml:lang=\"en\">src1</source>\n"
+			+ "<source xml:lang=\"en\">src1 with &lt;></source>\n"
+			+ "</trans-unit>\n"
+			+ "</body>\n</file>\n</xliff>\n", result);
+	}
+
+	@Test
+	public void testBasicSourceOnlyGtEscaped ()
+		throws IOException
+	{
+		writer.create(root+"out.xlf", null, locEN, null, null, "original.ext", null);
+		ITextUnit tu = new TextUnit("tu1", "src1 with <>");
+		writer.setEscapeGt(true);
+		writer.writeTextUnit(tu);
+		writer.close();
+
+		String result = readFile(root+"out.xlf");
+		assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+			+ "<xliff version=\"1.2\" xmlns=\"urn:oasis:names:tc:xliff:document:1.2\" xmlns:okp=\"okapi-framework:xliff-extensions\">\n"
+			+ "<file original=\"original.ext\" source-language=\"en\" datatype=\"x-undefined\">\n"
+			+ "<body>\n"
+			+ "<trans-unit id=\"tu1\">\n"
+			+ "<source xml:lang=\"en\">src1 with &lt;&gt;</source>\n"
 			+ "</trans-unit>\n"
 			+ "</body>\n</file>\n</xliff>\n", result);
 	}
