@@ -1,5 +1,5 @@
 /*===========================================================================
-Copyright (C) 2011 by the Okapi Framework contributors
+Copyright (C) 2011-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
 This library is free software; you can redistribute it and/or modify it 
 under the terms of the GNU Lesser General Public License as published by 
@@ -53,12 +53,21 @@ public interface IDataStore extends Serializable {
 
 	/**
 	 * Gets the id for the outside storage of a given original data.
-	 * You must have called {@link #calculateOriginalDataToIdsMap()} before calling this method the first time.
+	 * You must have called {@link #calculateOriginalDataToIdsMap()} or {@link #setOutsideRepresentationMap(Map)}
+	 * before calling this method the first time.
 	 * @param originalData the original data
 	 * @return the id for the outside storage of the given original data 
 	 */
 	public String getIdForOriginalData (String originalData);
 
+	/**
+	 * Gets the original data for a given id.
+	 * You must have called {@link #calculateOriginalDataToIdsMap()} or {@link #setOutsideRepresentationMap(Map)}
+	 * before calling this method the first time.
+	 * @param id the id to look for.
+	 * @return the original data for a given id,
+	 * or null if no original data is found for the given id.
+	 */
 	public String getOriginalDataForId (String id);
 	
 }

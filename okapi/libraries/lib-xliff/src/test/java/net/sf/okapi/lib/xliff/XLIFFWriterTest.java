@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import java.io.StringWriter;
 
 import org.junit.Test;
+import org.oasisopen.xliff.v2.IFragment;
 import org.oasisopen.xliff.v2.InlineType;
 
 public class XLIFFWriterTest {
@@ -298,7 +299,7 @@ public class XLIFFWriterTest {
 		seg.getSource().append(InlineType.OPENING, "1", "<b>");
 		seg.getSource().append("source");
 		seg.getSource().append(InlineType.CLOSING, "1", "</b>");
-		Fragment frag = seg.getTarget(true);
+		IFragment frag = seg.getTarget(true);
 		frag.append(InlineType.OPENING, "1", "<b>");
 		frag.append("target");
 		frag.append(InlineType.CLOSING, "1", "</B>");

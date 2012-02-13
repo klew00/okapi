@@ -43,9 +43,8 @@ public class CodeTest {
 	public void testHintsDefaults () {
 		ICode code = new Code(InlineType.PLACEHOLDER, "1", null);
 		assertTrue(code.canDelete());
-		assertTrue(code.canReplicate());
+		assertTrue(code.canCopy());
 		assertTrue(code.canReorder());
-		assertTrue(code.canChangeParent());
 	}
 	
 	@Test
@@ -53,29 +52,25 @@ public class CodeTest {
 		ICode code = new Code(InlineType.PLACEHOLDER, "1", null);
 		code.setCanDelete(false);
 		assertFalse(code.canDelete());
-		assertTrue(code.canReplicate());
+		assertTrue(code.canCopy());
 		assertTrue(code.canReorder());
-		assertTrue(code.canChangeParent());
 		code.setCanDelete(true);
 		assertTrue(code.canDelete());
-		assertTrue(code.canReplicate());
+		assertTrue(code.canCopy());
 		assertTrue(code.canReorder());
-		assertTrue(code.canChangeParent());
 	}
 	
 	@Test
 	public void testHintsCanReplicate () {
 		ICode code = new Code(InlineType.PLACEHOLDER, "1", null);
-		code.setCanReplicate(false);
+		code.setCanCopy(false);
 		assertTrue(code.canDelete());
-		assertFalse(code.canReplicate());
+		assertFalse(code.canCopy());
 		assertTrue(code.canReorder());
-		assertTrue(code.canChangeParent());
-		code.setCanReplicate(true);
+		code.setCanCopy(true);
 		assertTrue(code.canDelete());
-		assertTrue(code.canReplicate());
+		assertTrue(code.canCopy());
 		assertTrue(code.canReorder());
-		assertTrue(code.canChangeParent());
 	}
 	
 	@Test
@@ -83,29 +78,12 @@ public class CodeTest {
 		ICode code = new Code(InlineType.PLACEHOLDER, "1", null);
 		code.setCanReorder(false);
 		assertTrue(code.canDelete());
-		assertTrue(code.canReplicate());
+		assertTrue(code.canCopy());
 		assertFalse(code.canReorder());
-		assertTrue(code.canChangeParent());
 		code.setCanReorder(true);
 		assertTrue(code.canDelete());
-		assertTrue(code.canReplicate());
+		assertTrue(code.canCopy());
 		assertTrue(code.canReorder());
-		assertTrue(code.canChangeParent());
-	}
-
-	@Test
-	public void testHintsCanChangeParent () {
-		ICode code = new Code(InlineType.PLACEHOLDER, "1", null);
-		code.setCanChangeParent(false);
-		assertTrue(code.canDelete());
-		assertTrue(code.canReplicate());
-		assertTrue(code.canReorder());
-		assertFalse(code.canChangeParent());
-		code.setCanChangeParent(true);
-		assertTrue(code.canDelete());
-		assertTrue(code.canReplicate());
-		assertTrue(code.canReorder());
-		assertTrue(code.canChangeParent());
 	}
 
 	@Test
@@ -155,9 +133,9 @@ public class CodeTest {
 		code2.setSubFlows("sf1");
 		assertTrue(code1.equals(code2));
 		
-		code2.setCanReplicate(false);
+		code2.setCanCopy(false);
 		assertFalse(code1.equals(code2));
-		code2.setCanReplicate(true);
+		code2.setCanCopy(true);
 		assertTrue(code1.equals(code2));
 		
 		

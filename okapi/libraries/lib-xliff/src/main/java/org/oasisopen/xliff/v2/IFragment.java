@@ -42,6 +42,8 @@ public interface IFragment extends Serializable {
 	 */
 	public String getCodedText ();
 
+	public void setCodedText (String codedText);
+	
 	/**
 	 * Gets the content of this fragment formatted in XLIFF in the style {@link #STYLE_NODATA}.
 	 * <p>Use {@link #toXLIFF(int)} to select the style of output.

@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2011 by the Okapi Framework contributors
+  Copyright (C) 2011-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -20,18 +20,17 @@
 
 package net.sf.okapi.lib.xliff;
 
-import java.io.Serializable;
-
 import org.oasisopen.xliff.v2.IExtendedAttributes;
-import org.oasisopen.xliff.v2.IWithExtendedAttributes;
+import org.oasisopen.xliff.v2.IFragment;
+import org.oasisopen.xliff.v2.IPart;
 
-public class Part implements Serializable, IWithExtendedAttributes {
+public class Part implements IPart {
 
 	private static final long serialVersionUID = 0100L;
 
 	private DataStore store;
-	private Fragment source;
-	private Fragment target;
+	private IFragment source;
+	private IFragment target;
 	private int targetOrder;
 	private IExtendedAttributes xattrs;
 	
@@ -46,52 +45,62 @@ public class Part implements Serializable, IWithExtendedAttributes {
 		this.store = store;
 		source = new Fragment(store, false, sourceContent);
 	}
-	
-	public Fragment getSource () {
+
+	@Override
+	public IFragment getSource () {
 		return source;
 	}
 	
-	public void setSource (Fragment fragment) {
+	@Override
+	public void setSource (IFragment fragment) {
 		if ( store != fragment.getDataStore() ) {
 			throw new RuntimeException("The fragment passed in setSource must use the same codes store.");
 		}
 		source = fragment;
 	}
 	
+	@Override
 	public void setSource (String plainText) {
 		source = new Fragment(store, false, plainText);
 	}
 	
+	@Override
 	public boolean hasTarget () {
 		return (target != null);
 	}
 
-	public Fragment getTarget (boolean createIfNeeded) {
+	@Override
+	public IFragment getTarget (boolean createIfNeeded) {
 		if (( target == null ) && createIfNeeded ) {
 			target = new Fragment(store, true);
 		}
 		return target;
 	}
 	
-	public void setTarget (Fragment fragment) {
+	@Override
+	public void setTarget (IFragment fragment) {
 		if ( store != fragment.getDataStore() ) {
 			throw new RuntimeException("The fragment passed in setTarget must use the same codes store.");
 		}
 		target = fragment;
 	}
 	
+	@Override
 	public void setTarget (String plainText) {
 		target = new Fragment(store, true, plainText);
 	}
 	
+	@Override
 	public void setTargetOrder (int targetOrder) {
 		this.targetOrder = targetOrder;
 	}
 	
+	@Override
 	public int getTargetOrder () {
 		return targetOrder;
 	}
 	
+	@Override
 	public DataStore getDataStore () {
 		return store;
 	}

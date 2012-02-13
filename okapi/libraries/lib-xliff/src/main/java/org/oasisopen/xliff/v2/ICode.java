@@ -48,16 +48,12 @@ public interface ICode extends IMarker {
 
 	public void setCanDelete (boolean canDelete);
 
-	public boolean canReplicate ();
+	public boolean canCopy ();
 
-	public void setCanReplicate (boolean canReplicate);
+	public void setCanCopy (boolean canCopy);
 
 	public boolean canReorder ();
 
 	public void setCanReorder (boolean canReorder);
 
-	public boolean canChangeParent ();
-
-	public void setCanChangeParent (boolean canChangeParent);
-	
 }

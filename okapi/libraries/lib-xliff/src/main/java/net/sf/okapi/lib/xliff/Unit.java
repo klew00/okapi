@@ -26,7 +26,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.oasisopen.xliff.v2.ICandidate;
+import org.oasisopen.xliff.v2.IFragment;
 import org.oasisopen.xliff.v2.INote;
+import org.oasisopen.xliff.v2.IPart;
 import org.oasisopen.xliff.v2.IWithCandidates;
 import org.oasisopen.xliff.v2.IWithNotes;
 
@@ -127,4 +129,58 @@ public class Unit extends EventData implements Iterable<Part>, IWithCandidates, 
 		return notes.size();
 	}
 
+	//TODO
+	public void split (int partIndex,
+		int srcStart,
+		int srcEnd,
+		int trgStart,
+		int trgEnd)
+	{
+		IPart part = getPart(partIndex);
+		IFragment src = part.getSource();
+		String ctext = src.getCodedText();
+		if ( srcEnd == -1 ) srcEnd = ctext.length()-1;
+		if ( srcStart > srcEnd ) {
+			throw new RuntimeException("Bad range.");
+		}
+		
+		if ( ctext.length() < srcEnd ) {
+			throw new RuntimeException("Range out of bounds.");
+		}
+		//TODO: check valid position (not at the middle of a marker
+		if (( srcStart < ctext.length() ) && Fragment.isMarker(ctext.charAt(srcStart+1)) ) {
+			
+		}
+
+		String left = "";
+		left = ctext.substring(0, srcStart);
+		String mid = "";
+		mid = ctext.substring(srcStart, srcEnd);
+		String right = "";
+		right = ctext.substring(srcEnd); 
+		
+		// Add on the right first (no change on the indices
+		if ( !right.isEmpty() ) {
+			Segment seg = new Segment(store);
+			seg.getSource().setCodedText(right);
+			list.add(partIndex+1, seg);
+		}
+		// Add to the left last: this part moves to partIndex+1
+		if ( !left.isEmpty() ) {
+			Segment seg = new Segment(store);
+			seg.getSource().setCodedText(left);
+			list.add(partIndex, seg);
+		}
+		if ( mid.isEmpty() ) {
+			list.remove(part);
+		}
+		else if ( mid.length() != ctext.length() ) {
+			part.getSource().setCodedText(mid);
+		}
+		// Else: new segments were empty:  No change for this part
+		
+		
+	}
+	
+	
 }

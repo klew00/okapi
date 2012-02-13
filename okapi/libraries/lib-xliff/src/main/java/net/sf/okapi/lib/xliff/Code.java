@@ -29,15 +29,14 @@ public class Code implements ICode {
 	private static final long serialVersionUID = 0100L;
 
 	public static final int CANDELETE = 0x01;
-	public static final int CANREPLICATE = 0x02;
+	public static final int CANCOPY = 0x02;
 	public static final int CANREORDER = 0x04;
-	public static final int CANCHANGEPARENT = 0x08;
 	
 	private String internalId;
 	private InlineType inlineType;
 	private String id;
 	private String originalData;
-	private int hints = (CANDELETE | CANREPLICATE | CANREORDER | CANCHANGEPARENT);
+	private int hints = (CANDELETE | CANCOPY | CANREORDER);
 	private String disp;
 	private String equiv;
 	private String type;
@@ -156,14 +155,14 @@ public class Code implements ICode {
 	}
 
 	@Override
-	public boolean canReplicate () {
-		return (( hints & CANREPLICATE ) == CANREPLICATE);
+	public boolean canCopy () {
+		return (( hints & CANCOPY ) == CANCOPY);
 	}
 
 	@Override
-	public void setCanReplicate (boolean canReplicate) {
-		if ( canReplicate ) hints |= CANREPLICATE;
-		else hints &= ~CANREPLICATE;
+	public void setCanCopy (boolean canCopy) {
+		if ( canCopy ) hints |= CANCOPY;
+		else hints &= ~CANCOPY;
 	}
 
 	@Override
@@ -175,17 +174,6 @@ public class Code implements ICode {
 	public void setCanReorder (boolean canReorder) {
 		if ( canReorder ) hints |= CANREORDER;
 		else hints &= ~CANREORDER;
-	}
-
-	@Override
-	public boolean canChangeParent () {
-		return (( hints & CANCHANGEPARENT ) == CANCHANGEPARENT);
-	}
-
-	@Override
-	public void setCanChangeParent (boolean canChangeParent) {
-		if ( canChangeParent ) hints |= CANCHANGEPARENT;
-		else hints &= ~CANCHANGEPARENT;
 	}
 
 	@Override

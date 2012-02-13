@@ -126,6 +126,11 @@ public class Fragment implements IFragment {
 	}
 
 	@Override
+	public void setCodedText (String codedText) {
+		ctext = new StringBuilder(codedText);
+	}
+	
+	@Override
 	public String toXLIFF (int style) {
 		switch ( style ) {
 		case STYLE_DATAINSIDE:

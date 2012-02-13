@@ -9,6 +9,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import org.junit.Test;
+import org.oasisopen.xliff.v2.IFragment;
 import org.oasisopen.xliff.v2.InlineType;
 
 public class UnitTest {
@@ -31,6 +32,43 @@ public class UnitTest {
 		assertEquals("TEXT<ph id=\"1\"/>IN <pc id=\"2\">BOLD</pc>",
 			unit.getPart(0).getTarget(false).toXLIFF());
 	}
+
+	@Test
+	public void testIsolatedRebuilding () {
+		Unit unit = new Unit("u1");
+		Segment seg = unit.appendNewSegment();
+		IFragment srcFrag = seg.getSource();
+		srcFrag.append("Text of part ");
+		srcFrag.append(InlineType.OPENING, "1", "<b>");
+		srcFrag.append("1. Text of part 2.");
+		srcFrag.append(InlineType.CLOSING, "1", "</b>");
+		
+		srcFrag.getDataStore().calculateOriginalDataToIdsMap();
+		assertEquals("Text of part <pc id=\"1\" nidEnd=\"d2\" nidStart=\"d1\">1. Text of part 2.</pc>",
+			srcFrag.toXLIFF(IFragment.STYLE_DATAOUTSIDE));
+
+		unit = new Unit("u1");
+		seg = unit.appendNewSegment();
+		srcFrag = seg.getSource();
+		srcFrag.append("Text of part ");
+		srcFrag.append(InlineType.OPENING, "1", "<b>");
+		srcFrag.append("1. ");
+		
+		seg = unit.appendNewSegment();
+		srcFrag = seg.getSource();
+		srcFrag.append("Text of part 2.");
+		srcFrag.append(InlineType.CLOSING, "1", "</b>");
+
+//TC needs to decide when isolated is used (outside the unit or outside the segment?)		
+		unit.getDataStore().calculateOriginalDataToIdsMap();
+		Part part = unit.getPart(0);
+		assertEquals("Text of part <sc id=\"1\" nid=\"d1\"/>1. ",
+			part.getSource().toXLIFF(IFragment.STYLE_DATAOUTSIDE));
+		part = unit.getPart(1);
+		part.getDataStore().calculateOriginalDataToIdsMap();
+		assertEquals("Text of part 2.<ec rid=\"1\" nid=\"d2\"/>",
+			part.getSource().toXLIFF(IFragment.STYLE_DATAOUTSIDE));
+}
 
 	@Test
 	public void testCandidates () {
@@ -136,10 +174,46 @@ public class UnitTest {
 		assertEquals(seg1.getNotes().get(2).getAppliesTo(), seg2.getNotes().get(2).getAppliesTo());
 	}
 
+	@Test
+	public void testSplit1 () {
+		Unit unit = createSimpleUnit();
+		// text @@bold@@ text.
+		// 0123456789012345678
+		unit.split(0, 5, 13, -1, -1);
+		assertEquals(3, unit.getPartCount());
+		assertEquals("text ", unit.getPart(0).getSource().toXLIFF());
+		assertEquals("<pc id=\"1\">bold</pc>", unit.getPart(1).getSource().toXLIFF());
+		assertEquals(" text.", unit.getPart(2).getSource().toXLIFF());
+	}
+
+	@Test
+	public void testSplit2 () {
+		Unit unit = createSimpleUnit();
+		// text @@bold@@ text.
+		// 0123456789012345678
+		unit.split(0, 8, 14, -1, -1);
+		assertEquals(3, unit.getPartCount());
+//TC needs to decide when isolated is used (outside the unit or outside the segment?)		
+		assertEquals("text <sc id=\"1\"/>b", unit.getPart(0).getSource().toXLIFF());
+		assertEquals("old<ec rid=\"1\"/> ", unit.getPart(1).getSource().toXLIFF());
+		assertEquals("text.", unit.getPart(2).getSource().toXLIFF());
+	}
+
+	private Unit createSimpleUnit () {
+		Unit unit = new Unit("u1");
+		Segment seg = unit.appendNewSegment();
+		IFragment srcFrag = seg.getSource();
+		srcFrag.append("text ");
+		srcFrag.append(InlineType.OPENING, "1", "<b>");
+		srcFrag.append("bold");
+		srcFrag.append(InlineType.CLOSING, "1", "</b>");
+		srcFrag.append(" text.");
+		return unit;
+	}
 	private Unit createUnitWithSegment () {
 		Unit unit = new Unit("u1");
 		Segment seg = unit.appendNewSegment();
-		Fragment srcFrag = seg.getSource();
+		IFragment srcFrag = seg.getSource();
 		srcFrag.append("Text");
 		srcFrag.append(InlineType.PLACEHOLDER, "1", "<br/>");
 		srcFrag.append("in ");
@@ -147,7 +221,7 @@ public class UnitTest {
 		srcFrag.append("bold");
 		srcFrag.append(InlineType.CLOSING, "2", "</b>");
 		
-		Fragment trgFrag = seg.getTarget(true);
+		IFragment trgFrag = seg.getTarget(true);
 		trgFrag.append("TEXT");
 		trgFrag.append(InlineType.PLACEHOLDER, "1", "<BR/>");
 		trgFrag.append("IN ");
