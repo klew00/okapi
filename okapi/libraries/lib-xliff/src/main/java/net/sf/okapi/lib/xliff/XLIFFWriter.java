@@ -185,10 +185,7 @@ public class XLIFFWriter {
 		writeExtendedAttributes(unit.getExtendedAttributes());
 		writer.print(">"+lb);
 		if ( isIndented ) indent += " ";
-		
-		if ( style == Fragment.STYLE_DATAOUTSIDE ) {
-			writeOriginalData(unit.getDataStore());
-		}
+		unit.getDataStore().calculateOriginalDataToIdsMap();
 		
 		for ( Part part : unit ) {
 			Segment seg = null;
@@ -230,6 +227,10 @@ public class XLIFFWriter {
 		// Unit-level candidates
 		writeCandidates(unit);
 		
+		if ( style == Fragment.STYLE_DATAOUTSIDE ) {
+			writeOriginalData(unit.getDataStore());
+		}
+		
 		if ( isIndented ) indent = indent.substring(1);
 		writer.print(indent+"</unit>"+lb);
 	}
@@ -255,11 +256,12 @@ public class XLIFFWriter {
 		for ( ICandidate alt : parent.getCandidates() ) {
 			writer.print(indent+"<match>"+lb);
 			if ( isIndented ) indent += " ";
+			alt.getDataStore().calculateOriginalDataToIdsMap();
+			writeFragment(Util.ELEM_SOURCE, alt.getSource(), -1);
+			writeFragment(Util.ELEM_TARGET, alt.getTarget(), -1);
 			if ( style == Fragment.STYLE_DATAOUTSIDE ) {
 				writeOriginalData(alt.getDataStore());
 			}
-			writeFragment(Util.ELEM_SOURCE, alt.getSource(), -1);
-			writeFragment(Util.ELEM_TARGET, alt.getTarget(), -1);
 			if ( isIndented ) indent = indent.substring(1);
 			writer.print(indent+"</match>"+lb);
 		}
@@ -378,8 +380,7 @@ public class XLIFFWriter {
 			return; // Nothing to write out
 		}
 		
-		// Else: compute the map and write it
-		store.calculateOriginalDataToIdsMap();
+		// Else: write the data
 		Map<String, String> map = store.getOutsideRepresentationMap();
 
 		writer.print(indent+"<"+Util.ELEM_ORIGINALDATA+">"+lb);

@@ -199,6 +199,26 @@ public class UnitTest {
 		assertEquals("text.", unit.getPart(2).getSource().toXLIFF());
 	}
 
+	@Test
+	public void testPcVsScEc () {
+		Unit unit = new Unit("u1");
+		Segment seg = unit.appendNewSegment();
+		IFragment frag = seg.getSource();
+		frag.append("This ");
+		frag.append(InlineType.OPENING, "1", "[1]");
+		frag.append("is a ");
+		frag.append(InlineType.OPENING, "2", "[2]");
+		frag.append("sample. Of the");
+		frag.append(InlineType.CLOSING, "2", "[/2]");
+		frag.append(" problem ");
+		frag.append(InlineType.CLOSING, "1", "[/1]");
+		frag.append("case.");
+		
+		frag.getDataStore().calculateOriginalDataToIdsMap();
+		assertEquals("This <pc id=\"1\" nidEnd=\"d4\" nidStart=\"d1\">is a <pc id=\"2\" nidEnd=\"d3\" nidStart=\"d2\">sample. Of the</pc> problem </pc>case.",
+			frag.toXLIFF(IFragment.STYLE_DATAOUTSIDE));
+	}
+
 	private Unit createSimpleUnit () {
 		Unit unit = new Unit("u1");
 		Segment seg = unit.appendNewSegment();

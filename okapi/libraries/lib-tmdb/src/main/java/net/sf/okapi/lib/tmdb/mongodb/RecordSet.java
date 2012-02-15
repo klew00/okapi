@@ -20,7 +20,6 @@
 
 package net.sf.okapi.lib.tmdb.mongodb;
 
-import java.sql.SQLException;
 import java.util.List;
 
 import com.mongodb.DBCursor;

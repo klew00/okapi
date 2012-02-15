@@ -25,7 +25,6 @@ import java.util.LinkedHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.okapi.common.ListUtil;
 import net.sf.okapi.common.Util;
 import net.sf.okapi.common.ui.Dialogs;
 import net.sf.okapi.common.ui.OKCancelPanel;
@@ -111,10 +110,6 @@ class SortOrderForm {
 		sampleData.add(target+", "+source);
 		createDropDownButton(group, "Examples...", UIUtil.BUTTON_DEFAULT_WIDTH, 1, sampleText, sampleData, edExpression);
 		
-		
-//		label = new Label(group, SWT.NONE);
-//		label.setText("<fieldName1>[ DESC | ASC], <fieldName2>[ DESC | ASC], etc.");
-
 		SelectionAdapter OKCancelActions = new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				result = null;
@@ -151,7 +146,7 @@ class SortOrderForm {
 		try {
 			// Syntax: fieldname1 desc, fieldName2 asc, etc.
 			// or fieldName1, fieldName2, etc.
-			// or [file name], filename2 desc, etc.
+			// or "file name"; 'filename2' desc, etc.
 			String expr = edExpression.getText().trim();
 			// Split by comma
 			String[] tmp = expr.split("[,;]", -1);
