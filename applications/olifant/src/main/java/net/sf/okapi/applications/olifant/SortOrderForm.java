@@ -22,6 +22,8 @@ package net.sf.okapi.applications.olifant;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import net.sf.okapi.common.ListUtil;
 import net.sf.okapi.common.Util;
@@ -100,9 +102,9 @@ class SortOrderForm {
 		sampleText.add("Sort by segment key in descending order");
 		sampleText.add("Sort by target text, and for the same target by source text");
 		ArrayList<String> sampleData = new ArrayList<String>();
-		if ( Util.isEmpty(source) ) source = DbUtil.TEXT_PREFIX+"ZZ";
+		if ( Util.isEmpty(source) ) source = DbUtil.TEXT_PREFIX+"??";
 		else source = DbUtil.TEXT_PREFIX+source;
-		if ( Util.isEmpty(target) ) target = DbUtil.TEXT_PREFIX+"ZZ";
+		if ( Util.isEmpty(target) ) target = DbUtil.TEXT_PREFIX+"??";
 		else target = DbUtil.TEXT_PREFIX+target;
 		sampleData.add(source+", SegKey");
 		sampleData.add("SegKey DESC");
@@ -146,39 +148,52 @@ class SortOrderForm {
 	}
 
 	private boolean saveData () {
-		// Syntax: fieldname1 desc, fieldName2 asc, etc.
-		// or fieldName1, fieldName2, etc.
-		String expr = edExpression.getText().trim();
-		String[] tmp = ListUtil.stringAsArray(expr);
-		String error = null;
-		result = new LinkedHashMap<String, Boolean>();
-		for ( String fld : tmp ) {
-			String[] parts = ListUtil.stringAsArray(fld, " ");
-			if (( parts.length < 1 ) || ( parts.length > 2 )) {
-				// Invalid expression (empty or too many parts)
-				error = String.format("Invalid expression '%s'.", fld);
-			}
-			else if ( !fields.contains(parts[0]) ) {
-				// Invalid field name (it's case-sensitive)
-				error = String.format("Invalid field name '%s'.", parts[0]);
-			}
-			else {
-				String order = parts[1].toLowerCase();
+		try {
+			// Syntax: fieldname1 desc, fieldName2 asc, etc.
+			// or fieldName1, fieldName2, etc.
+			// or [file name], filename2 desc, etc.
+			String expr = edExpression.getText().trim();
+			// Split by comma
+			String[] tmp = expr.split("[,;]", -1);
+			result = new LinkedHashMap<String, Boolean>();
+			Pattern pat = Pattern.compile("(((['\"](.+)['\"]))|([^\\s]+))(\\s+(\\w+))?");
+			for ( String part : tmp ) {
+				part = part.trim();
+				if ( part.isEmpty() ) continue;
+				Matcher m = pat.matcher(part);
+				if ( !m.find() ) {
+					throw new RuntimeException(String.format("Invalid expression '%s'.", part));
+				}
+				
+				// Parse field name
+				String fn = m.group(4); // Check quoted first
+				if ( Util.isEmpty(fn) ) {
+					fn = m.group(5); // Un-quoted
+					if ( Util.isEmpty(fn) ) {
+						throw new RuntimeException(String.format("Invalid field name in '%s'.", part));
+					}
+				}
+				if ( !fields.contains(fn) ) {
+					throw new RuntimeException(String.format("Unkown field name '%s'.", fn));
+				}
+				
+				// Parse order
+				String order = m.group(7);
+				if ( Util.isEmpty(order) ) order = "asc"; // Default
+				else order = order.toLowerCase();
 				if ( order.equals("asc") || order.equals("desc") ) {
-					result.put(parts[0], order.equals("asc"));
+					result.put(fn, order.equals("asc"));
 				}
 				else {
-					error = String.format("Invalid direction '%s'. It must be 'ASC' or 'DESC'.", order);
+					throw new RuntimeException(String.format("Invalid direction '%s'. It must be 'ASC' or 'DESC'.", order));
 				}
 			}
-			if ( error != null ) {
-				Dialogs.showError(shell, error, null);
-				edExpression.setFocus();
-				return false;
-			}
 		}
-
-		
+		catch ( Throwable e ) {
+			Dialogs.showError(shell, e.getMessage(), null);
+			edExpression.setFocus();
+			return false;
+		}
 		return true;
 	}
 
@@ -190,8 +205,8 @@ class SortOrderForm {
 					MenuItem mi = (MenuItem)event.widget;
 					// Get the value to insert
 					String tmp = (String)mi.getData();
-					// Make sure it's quoted if it has a space
-					if ( tmp.indexOf(' ') > -1 ) tmp = "\""+tmp+"\"";
+//					// Make sure it's quoted if it has a space
+//					if ( tmp.indexOf(' ') > -1 ) tmp = "\""+tmp+"\"";
 					// Insert the value
 					target.insert(tmp);
 					target.setFocus();
