@@ -22,8 +22,8 @@ public class XLIFFReaderTest {
 	public void testWithoutNamespace () {
 		// No namespace declaration
 		String text = "<?xml version='1.0'?>\n"
-			+ "<xliff version=\"2.0\">"
-			+ "<file srclang=\"en\" tgtlang=\"fr\">\n<unit id=\"id\">\n<segment>\n<source>Source 1.</source><target>Target 1.</target>\n"
+			+ "<xliff version=\"2.0\" srcLang=\"en\" tgtLang=\"fr\">"
+			+ "<file>\n<unit id=\"id\">\n<segment>\n<source>Source 1.</source><target>Target 1.</target>\n"
 			+ "</segment>\n<segment>\n<source>Source 2.</source><target>Target 2.</target>\n</segment>\n</unit>\n</file></xliff>";
 		verifyDocument(text);
 	}
@@ -32,8 +32,8 @@ public class XLIFFReaderTest {
 	public void testWithDefaultNamespace () {
 		// XLIFF namespace is the default declaration
 		String text = "<?xml version='1.0'?>\n"
-			+ "<xliff version=\"2.0\" xmlns=\"urn:oasis:names:tc:xliff:document:2.0\">"
-			+ "<file srclang=\"en\" tgtlang=\"fr\">\n<unit id=\"id\">\n<segment>\n<source>Source 1.</source><target>Target 1.</target>\n"
+			+ "<xliff version=\"2.0\" xmlns=\"urn:oasis:names:tc:xliff:document:2.0\" srcLang=\"en\" tgtLang=\"fr\">"
+			+ "<file>\n<unit id=\"id\">\n<segment>\n<source>Source 1.</source><target>Target 1.</target>\n"
 			+ "</segment>\n<segment>\n<source>Source 2.</source><target>Target 2.</target>\n</segment>\n</unit>\n</file></xliff>";
 		verifyDocument(text);
 	}
@@ -42,16 +42,16 @@ public class XLIFFReaderTest {
 	public void testWithSpecifiedNamespace () {
 		// XLIFF namespace is the default declaration
 		String text = "<?xml version='1.0'?>\n"
-			+ "<x:xliff version=\"2.0\" xmlns:x=\"urn:oasis:names:tc:xliff:document:2.0\">"
-			+ "<x:file srclang=\"en\" tgtlang=\"fr\">\n<x:unit id=\"id\">\n<x:segment>\n<x:source>Source 1.</x:source><x:target>Target 1.</x:target>\n"
+			+ "<x:xliff version=\"2.0\" xmlns:x=\"urn:oasis:names:tc:xliff:document:2.0\" srcLang=\"en\" tgtLang=\"fr\">"
+			+ "<x:file>\n<x:unit id=\"id\">\n<x:segment>\n<x:source>Source 1.</x:source><x:target>Target 1.</x:target>\n"
 			+ "</x:segment>\n<x:segment>\n<x:source>Source 2.</x:source><x:target>Target 2.</x:target>\n</x:segment>\n</x:unit>\n</x:file></x:xliff>";
 		verifyDocument(text);
 	}
 	
 	@Test
 	public void testCDATA () {
-		String text = "<?xml version='1.0'?>\n<xliff version=\"2.0\" xmlns=\"urn:oasis:names:tc:xliff:document:2.0\">"
-			+ "<file srclang=\"en\" tgtlang=\"fr\">\n<unit id=\"id\"><segment>\n"
+		String text = "<?xml version='1.0'?>\n<xliff version=\"2.0\" xmlns=\"urn:oasis:names:tc:xliff:document:2.0\" srcLang=\"en\" tgtLang=\"fr\">"
+			+ "<file>\n<unit id=\"id\"><segment>\n"
 			+ "<source><![CDATA[Source 1]]>.</source>"
 			+ "<target>Target<![CDATA[ 1.]]></target>\n"
 			+ "</segment></unit>\n</file></xliff>";
@@ -64,8 +64,8 @@ public class XLIFFReaderTest {
 	@Test
 	public void testCPElements () {
 		char[] chars = Character.toChars(0x10001);
-		String text = "<?xml version='1.0'?>\n<xliff version=\"2.0\" xmlns=\"urn:oasis:names:tc:xliff:document:2.0\">"
-			+ "<file srclang=\"en\" tgtlang=\"fr\">\n<unit id=\"id\"><segment>\n"
+		String text = "<?xml version='1.0'?>\n<xliff version=\"2.0\" xmlns=\"urn:oasis:names:tc:xliff:document:2.0\" srcLang=\"en\" tgtLang=\"fr\">"
+			+ "<file>\n<unit id=\"id\"><segment>\n"
 			+ "<source>"
 			+ "<ph id=\"1\">[<cp hex=\"019\"/><cp hex=\"45\"/><cp hex=\"FFFF\"/><cp hex=\"10001\"/>]</ph>"
 			+ "<cp hex=\"019\"/><cp hex=\"45\"/><cp hex=\"FFFF\"/><cp hex=\"10001\"/>"
@@ -84,8 +84,8 @@ public class XLIFFReaderTest {
 	
 	@Test
 	public void testBadCPValues () {
-		String text = "<?xml version='1.0'?>\n<xliff version=\"2.0\" xmlns=\"urn:oasis:names:tc:xliff:document:2.0\">"
-			+ "<file srclang=\"en\" tgtlang=\"fr\">\n<unit id=\"id\"><segment>\n"
+		String text = "<?xml version='1.0'?>\n<xliff version=\"2.0\" xmlns=\"urn:oasis:names:tc:xliff:document:2.0\" srcLang=\"en\" tgtLang=\"fr\">"
+			+ "<file>\n<unit id=\"id\"><segment>\n"
 			+ "<source>"
 			+ "<ph id=\"1\">[<cp hex=\"_bad1_\"/>]</ph>"
 			+ "a<cp hex=\"_bad2_\"/>z"
@@ -104,8 +104,8 @@ public class XLIFFReaderTest {
 	
 	@Test
 	public void testInlineCodes () {
-		String text = "<?xml version='1.0'?>\n<xliff version=\"2.0\" xmlns=\"urn:oasis:names:tc:xliff:document:2.0\">"
-			+ "<file srclang=\"en\" tgtlang=\"fr\">\n<unit id=\"id\"><segment>\n"
+		String text = "<?xml version='1.0'?>\n<xliff version=\"2.0\" xmlns=\"urn:oasis:names:tc:xliff:document:2.0\" srcLang=\"en\" tgtLang=\"fr\">"
+			+ "<file>\n<unit id=\"id\"><segment>\n"
 			+ "<source>"
 			+ "<sc id=\"1\" equiv=\"eq1\" disp=\"di1\"/>t1<pc id=\"2\" equivStart=\"eq2\" dispStart=\"di2\">t2"
 				+ "<ph id=\"3\" equiv=\"eq3\" disp=\"di3\"/>t3"
@@ -134,8 +134,8 @@ public class XLIFFReaderTest {
 
 	@Test
 	public void testInlineCodes2 () {
-		String text = "<?xml version='1.0'?>\n<xliff version=\"2.0\" xmlns=\"urn:oasis:names:tc:xliff:document:2.0\">"
-			+ "<file srclang=\"en\" tgtlang=\"fr\">\n<unit id=\"id\"><segment>\n"
+		String text = "<?xml version='1.0'?>\n<xliff version=\"2.0\" xmlns=\"urn:oasis:names:tc:xliff:document:2.0\" srcLang=\"en\" tgtLang=\"fr\">"
+			+ "<file>\n<unit id=\"id\"><segment>\n"
 			+ "<source>"
 			+ "<sc id=\"1\" isolated=\"yes\"/>t1<ec id=\"2\" isolated=\"yes\"/>"
 			+ "</source>"
@@ -157,8 +157,8 @@ public class XLIFFReaderTest {
 	
 	@Test
 	public void testAnnotations () {
-		String text = "<?xml version='1.0'?>\n<xliff version=\"2.0\" xmlns=\"urn:oasis:names:tc:xliff:document:2.0\">"
-			+ "<file srclang=\"en\" tgtlang=\"fr\">\n<unit id=\"id\"><segment>\n"
+		String text = "<?xml version='1.0'?>\n<xliff version=\"2.0\" xmlns=\"urn:oasis:names:tc:xliff:document:2.0\" srcLang=\"en\" tgtLang=\"fr\">"
+			+ "<file>\n<unit id=\"id\"><segment>\n"
 			+ "<source>"
 			+ "<sa id=\"1\" type=\"comment\" value=\"my note\"/>t1<ea rid=\"1\"/>"
 			+ "</source>"
@@ -184,8 +184,8 @@ public class XLIFFReaderTest {
 	
 	@Test
 	public void testComments () {
-		String text = "<?xml version='1.0'?>\n<xliff version=\"2.0\" xmlns=\"urn:oasis:names:tc:xliff:document:2.0\">"
-			+ "<file srclang=\"en\" tgtlang=\"fr\">\n<unit id=\"id\"><segment>\n"
+		String text = "<?xml version='1.0'?>\n<xliff version=\"2.0\" xmlns=\"urn:oasis:names:tc:xliff:document:2.0\" srcLang=\"en\" tgtLang=\"fr\">"
+			+ "<file>\n<unit id=\"id\"><segment>\n"
 			+ "<source><!--comment-->Source 1.</source>"
 			+ "<target>Target<!--comment--> 1.</target>\n"
 			+ "</segment></unit>\n</file></xliff>";
@@ -197,8 +197,8 @@ public class XLIFFReaderTest {
 	
 	@Test
 	public void testPI () {
-		String text = "<?xml version='1.0'?>\n<xliff version=\"2.0\" xmlns=\"urn:oasis:names:tc:xliff:document:2.0\">"
-			+ "<file srclang=\"en\" tgtlang=\"fr\">\n<unit id=\"id\"><segment>\n"
+		String text = "<?xml version='1.0'?>\n<xliff version=\"2.0\" xmlns=\"urn:oasis:names:tc:xliff:document:2.0\" srcLang=\"en\" tgtLang=\"fr\">"
+			+ "<file>\n<unit id=\"id\"><segment>\n"
 			+ "<source><?myPI?>Source 1.</source>"
 			+ "<target>Target<?myPI?> 1.</target>\n"
 			+ "</segment></unit>\n</file></xliff>";
@@ -210,8 +210,8 @@ public class XLIFFReaderTest {
 	
 	@Test
 	public void testTranslatable () {
-		String text = "<?xml version='1.0'?>\n<xliff version=\"2.0\" xmlns=\"urn:oasis:names:tc:xliff:document:2.0\">"
-			+ "<file srclang=\"en\" tgtlang=\"fr\">\n<unit id=\"id\">"
+		String text = "<?xml version='1.0'?>\n<xliff version=\"2.0\" xmlns=\"urn:oasis:names:tc:xliff:document:2.0\" srcLang=\"en\" tgtLang=\"fr\">"
+			+ "<file>\n<unit id=\"id\">"
 			+ "<segment>"
 			+ "<source>translatable</source>"
 			+ "</segment>"
@@ -231,8 +231,8 @@ public class XLIFFReaderTest {
 	
 	@Test
 	public void testWhiteSpaces () {
-		String text = "<?xml version='1.0'?>\n<xliff version=\"2.0\" xmlns=\"urn:oasis:names:tc:xliff:document:2.0\">"
-			+ "<file srclang=\"en\" tgtlang=\"fr\">\n<unit id=\"id\">"
+		String text = "<?xml version='1.0'?>\n<xliff version=\"2.0\" xmlns=\"urn:oasis:names:tc:xliff:document:2.0\" srcLang=\"en\" tgtLang=\"fr\">"
+			+ "<file>\n<unit id=\"id\">"
 			+ "<segment>"
 			+ "<source>a  b \t c <ph id=\"1\">a  b</ph></source>"
 			+ "</segment>"
@@ -253,8 +253,8 @@ public class XLIFFReaderTest {
 	
 	@Test
 	public void testIgnorables () {
-		String text = "<?xml version='1.0'?>\n<xliff version=\"2.0\" xmlns=\"urn:oasis:names:tc:xliff:document:2.0\">"
-			+ "<file srclang=\"en\" tgtlang=\"fr\">\n<unit id=\"id\"><ignorable>\n"
+		String text = "<?xml version='1.0'?>\n<xliff version=\"2.0\" xmlns=\"urn:oasis:names:tc:xliff:document:2.0\" srcLang=\"en\" tgtLang=\"fr\">"
+			+ "<file>\n<unit id=\"id\"><ignorable>\n"
 			+ "<source>  \t</source>"
 			+ "<target>\t\t </target>\n"
 			+ "</ignorable></unit>\n</file></xliff>";
@@ -266,8 +266,8 @@ public class XLIFFReaderTest {
 
 	@Test
 	public void testMatches () {
-		String text = "<?xml version='1.0'?>\n<xliff version=\"2.0\" xmlns=\"urn:oasis:names:tc:xliff:document:2.0\">"
-			+ "<file srclang=\"en\" tgtlang=\"fr\">\n<unit id=\"id\"><segment>\n"
+		String text = "<?xml version='1.0'?>\n<xliff version=\"2.0\" xmlns=\"urn:oasis:names:tc:xliff:document:2.0\" srcLang=\"en\" tgtLang=\"fr\">"
+			+ "<file>\n<unit id=\"id\"><segment>\n"
 			+ "<source>source</source>"
 			+ "<matches>\n"
 			+ "<match>\n"
@@ -302,8 +302,8 @@ public class XLIFFReaderTest {
 	
 	@Test
 	public void testOutsideData () {
-		String text = "<?xml version='1.0'?>\n<xliff version=\"2.0\" xmlns=\"urn:oasis:names:tc:xliff:document:2.0\">"
-			+ "<file srclang=\"en\" tgtlang=\"fr\">\n<unit id=\"id\"><segment>\n"
+		String text = "<?xml version='1.0'?>\n<xliff version=\"2.0\" xmlns=\"urn:oasis:names:tc:xliff:document:2.0\" srcLang=\"en\" tgtLang=\"fr\">"
+			+ "<file>\n<unit id=\"id\"><segment>\n"
 			+ "<source>source <ph id='1' nid='d1'/> and <pc id='2' nidStart='d2' nidEnd='d3'>bold</pc></source>"
 			+ "</segment>\n"
 			+ "<originalData>"
@@ -323,8 +323,8 @@ public class XLIFFReaderTest {
 	
 	@Test
 	public void testNotes () {
-		String text = "<?xml version='1.0'?>\n<xliff version=\"2.0\" xmlns=\"urn:oasis:names:tc:xliff:document:2.0\">"
-			+ "<file srclang=\"en\" tgtlang=\"fr\">\n<unit id=\"id\"><segment>\n"
+		String text = "<?xml version='1.0'?>\n<xliff version=\"2.0\" xmlns=\"urn:oasis:names:tc:xliff:document:2.0\" srcLang=\"en\" tgtLang=\"fr\">"
+			+ "<file>\n<unit id=\"id\"><segment>\n"
 			+ "<source>source</source>"
 			+ "<notes>\n"
 			+ "<simpleNote>seg-note</simpleNote>\n"
@@ -351,8 +351,8 @@ public class XLIFFReaderTest {
 	
 	@Test
 	public void testExtendedAttributes () {
-		String text = "<?xml version='1.0'?>\n<xliff version=\"2.0\" xmlns=\"urn:oasis:names:tc:xliff:document:2.0\" xmlns:x=\"abc\">"
-			+ "<file srclang=\"en\" tgtlang=\"fr\">"
+		String text = "<?xml version='1.0'?>\n<xliff version=\"2.0\" xmlns=\"urn:oasis:names:tc:xliff:document:2.0\" xmlns:x=\"abc\" srcLang=\"en\" tgtLang=\"fr\">"
+			+ "<file>"
 			+ "<unit id=\"id\" x:a1=\"v1\" x:a2=\"v2\">"
 			+ "<segment x:sa1='sv1'>"
 			+ "<source>src</source>"
@@ -410,14 +410,16 @@ public class XLIFFReaderTest {
 			case 0:
 				assertTrue(e.getType() == XLIFFEventType.START_DOCUMENT);
 				assertTrue(e.isStartDocument());
+				DocumentData dd = e.getDocumentData();
+				assertNotNull(dd);
+				assertEquals("en", dd.getSourceLanguage());
+				assertEquals("fr", dd.getTargetLanguage());
 				break;
 			case 1:
 				assertTrue(e.getType() == XLIFFEventType.START_SECTION);
 				assertTrue(e.isStartSection());
 				SectionData sd = e.getSectionData();
 				assertNotNull(sd);
-				assertEquals("en", sd.getSourceLanguage());
-				assertEquals("fr", sd.getTargetLanguage());
 				break;
 			case 2:
 				assertTrue(e.getType() == XLIFFEventType.TEXT_UNIT);

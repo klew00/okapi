@@ -75,7 +75,7 @@ public interface IFragment extends Serializable {
 	/**
 	 * Gets the closing marker of a given opening one, if it
 	 * corresponds to a well-formed span.
-	 * @param openingCode the opening marker to verify.
+	 * @param openingMarker the opening marker to verify.
 	 * @param from the first position after the opening marker.
 	 * @return null if the content is not well-formed,
 	 * the corresponding closing marker if the content is well-formed.

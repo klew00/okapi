@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2011 by the Okapi Framework contributors
+  Copyright (C) 2011-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -53,7 +53,8 @@ public class XLIFFWriter {
     private String targetLang;
 
     public void create (File file,
-    	String sourceLang)
+    	String sourceLang,
+    	String targetLang)
     {
 		try {
 			// Create the directories if needed
@@ -67,7 +68,7 @@ public class XLIFFWriter {
 			// Create the file
 			create(new OutputStreamWriter(
 				new BufferedOutputStream(new FileOutputStream(file)), "UTF-8"),
-				sourceLang);
+				sourceLang, targetLang);
 		}
 		catch ( FileNotFoundException e ) {
 			throw new XLIFFWriterException(Res.t("cantCreateDocument"), e);
@@ -80,26 +81,28 @@ public class XLIFFWriter {
 		}
     }
 
-    public void create (Writer output,
+    public void create (File file,
     	String sourceLang)
     {
-    	setLanguages(sourceLang, null);
+    	create(file, sourceLang, null);
+    }
+    
+    public void create (Writer output,
+    	String sourceLang,
+    	String targetLang)
+    {
+    	this.sourceLang = sourceLang;
+    	this.targetLang = targetLang;
     	writer = new PrintWriter(output);
 		indent = "";
 		inFile = false;
 		inDocument = false;
 	}
     
-    /**
-     * Sets the current source and target language of the XLIFF document.
-     * @param sourceLang XML language code for the source (required)
-     * @param targetLang XML language code for the target (use null when undefined)
-     */
-    public void setLanguages (String sourceLang,
-    	String targetLang)
+    public void create (Writer output,
+    	String sourceLang)
     {
-    	this.sourceLang = sourceLang;
-    	this.targetLang = targetLang;
+    	create(output, sourceLang, null);
     }
     
     public void setInlineStyle (int style) {
@@ -143,13 +146,14 @@ public class XLIFFWriter {
 	public void writeEvent (XLIFFEvent event) {
 		switch ( event.getType() ) {
 		case START_DOCUMENT:
-			writeStartDocument(event.getDocumentData(), null);
+			DocumentData dd = event.getDocumentData();
+			this.sourceLang = dd.getSourceLanguage();
+			this.targetLang = dd.getTargetLanguage();
+			writeStartDocument(dd, null);
 			break;
 			
 		case START_SECTION:
-			SectionData sd = event.getSectionData();
-			setLanguages(sd.getSourceLanguage(), sd.getTargetLanguage());
-			writeStartFile(sd);
+			writeStartFile(event.getSectionData());
 			break;
 			
 		case START_GROUP:
@@ -303,6 +307,10 @@ public class XLIFFWriter {
 		}
 		writer.print("<?xml version=\"1.0\"?>"+lb);
 		writer.print("<xliff xmlns=\""+Util.NS_XLIFF20+"\" version=\""+docData.getVersion()+"\"");
+		writer.print(String.format(" %s=\"%s\"", Util.ATTR_SOURCELANG, sourceLang));
+		if ( !Util.isNullOrEmpty(targetLang) ) {
+			writer.print(String.format(" %s=\"%s\"", Util.ATTR_TARGETLANG, targetLang));
+		}
 		writeExtendedAttributes(docData.getExtendedAttributes());
 		writer.print(">"+lb);
 		if ( isIndented ) indent += " ";
@@ -326,10 +334,7 @@ public class XLIFFWriter {
 	
 	public void writeStartFile (SectionData secData) {
 		if ( !inDocument ) writeStartDocument(null, null);
-		writer.print(indent+String.format("<%s %s=\"%s\"", Util.ELEM_SECTION, Util.ATTR_SOURCELANG, sourceLang));
-		if ( !Util.isNullOrEmpty(targetLang) ) {
-			writer.print(String.format(" %s=\"%s\"", Util.ATTR_TARGETLANG, targetLang));
-		}
+		writer.print(indent+String.format("<%s", Util.ELEM_SECTION));
 		if ( secData != null ) {
 			writeExtendedAttributes(secData.getExtendedAttributes());
 		}

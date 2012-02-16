@@ -47,8 +47,8 @@ public class XLIFFWriterTest {
 		
 		writer.close();
 		assertEquals("<?xml version=\"1.0\"?>\n"
-			+ "<xliff xmlns=\"urn:oasis:names:tc:xliff:document:2.0\" version=\"2.0\">\n"
-			+ "<file srclang=\"en\">\n"
+			+ "<xliff xmlns=\"urn:oasis:names:tc:xliff:document:2.0\" version=\"2.0\" srcLang=\"en\">\n"
+			+ "<file>\n"
 			+ "<unit id=\"id2\">\n"
 			+ "<ignorable>\n"
 			+ "<source></source>\n"
@@ -78,8 +78,8 @@ public class XLIFFWriterTest {
 		
 		writer.close();
 		assertEquals("<?xml version=\"1.0\"?>\n"
-			+ "<xliff xmlns=\"urn:oasis:names:tc:xliff:document:2.0\" version=\"2.0\">\n"
-			+ "<file srclang=\"en\">\n"
+			+ "<xliff xmlns=\"urn:oasis:names:tc:xliff:document:2.0\" version=\"2.0\" srcLang=\"en\">\n"
+			+ "<file>\n"
 			+ "<unit id=\"id\">\n"
 			+ "<segment>\n"
 			+ "<source>Source 1.</source>\n"
@@ -108,8 +108,8 @@ public class XLIFFWriterTest {
 		
 		writer.close();
 		assertEquals("<?xml version=\"1.0\"?>\n"
-			+ "<xliff xmlns=\"urn:oasis:names:tc:xliff:document:2.0\" version=\"2.0\">\n"
-			+ "<file srclang=\"en\">\n"
+			+ "<xliff xmlns=\"urn:oasis:names:tc:xliff:document:2.0\" version=\"2.0\" srcLang=\"en\">\n"
+			+ "<file>\n"
 			+ "<unit id=\"id\">\n"
 			+ "<segment>\n"
 			+ "<source>Source 1.</source>\n"
@@ -155,8 +155,8 @@ public class XLIFFWriterTest {
 		
 		writer.close();
 		assertEquals("<?xml version=\"1.0\"?>\n"
-			+ "<xliff xmlns=\"urn:oasis:names:tc:xliff:document:2.0\" version=\"2.0\">\n"
-			+ "<file srclang=\"en\">\n"
+			+ "<xliff xmlns=\"urn:oasis:names:tc:xliff:document:2.0\" version=\"2.0\" srcLang=\"en\">\n"
+			+ "<file>\n"
 			+ "<unit id=\"id\">\n"
 			+ "<segment>\n"
 			+ "<source>Source 1.</source>\n"
@@ -187,8 +187,8 @@ public class XLIFFWriterTest {
 		
 		writer.close();
 		assertEquals("<?xml version=\"1.0\"?>\n"
-			+ "<xliff xmlns=\"urn:oasis:names:tc:xliff:document:2.0\" version=\"2.0\">\n"
-			+ "<file srclang=\"en\">\n"
+			+ "<xliff xmlns=\"urn:oasis:names:tc:xliff:document:2.0\" version=\"2.0\" srcLang=\"en\">\n"
+			+ "<file>\n"
 			+ "<unit id=\"id\">\n"
 			+ "<segment>\n"
 			+ "<source><pc id=\"1\" nidEnd=\"d2\" nidStart=\"d1\">source</pc></source>\n"
@@ -217,8 +217,8 @@ public class XLIFFWriterTest {
 		
 		writer.close();
 		assertEquals("<?xml version=\"1.0\"?>\n"
-			+ "<xliff xmlns=\"urn:oasis:names:tc:xliff:document:2.0\" version=\"2.0\">\n"
-			+ "<file srclang=\"en\">\n"
+			+ "<xliff xmlns=\"urn:oasis:names:tc:xliff:document:2.0\" version=\"2.0\" srcLang=\"en\">\n"
+			+ "<file>\n"
 			+ "<unit id=\"id\">\n"
 			+ "<segment>\n"
 			+ "<source><sc id=\"1\">&lt;b></sc>source<ec rid=\"1\">&lt;/b></ec></source>\n"
@@ -242,8 +242,8 @@ public class XLIFFWriterTest {
 		
 		writer.close();
 		assertEquals("<?xml version=\"1.0\"?>\n"
-			+ "<xliff xmlns=\"urn:oasis:names:tc:xliff:document:2.0\" version=\"2.0\">\n"
-			+ "<file srclang=\"en\">\n"
+			+ "<xliff xmlns=\"urn:oasis:names:tc:xliff:document:2.0\" version=\"2.0\" srcLang=\"en\">\n"
+			+ "<file>\n"
 			+ "<unit id=\"id\">\n"
 			+ "<segment>\n"
 			+ "<source><pc id=\"1\">source</pc></source>\n"
@@ -276,8 +276,8 @@ public class XLIFFWriterTest {
 		writer.close();
 		
 		assertEquals("<?xml version=\"1.0\"?>\n"
-			+ "<xliff xmlns=\"urn:oasis:names:tc:xliff:document:2.0\" version=\"2.0\">\n"
-			+ "<file srclang=\"en\">\n"
+			+ "<xliff xmlns=\"urn:oasis:names:tc:xliff:document:2.0\" version=\"2.0\" srcLang=\"en\">\n"
+			+ "<file>\n"
 			+ "<unit id=\"id\">\n"
 			+ "<segment>\n"
 			+ "<source>Source A.</source>\n"

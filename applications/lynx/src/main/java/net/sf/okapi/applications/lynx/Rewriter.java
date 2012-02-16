@@ -23,6 +23,7 @@ package net.sf.okapi.applications.lynx;
 import java.io.File;
 import java.util.List;
 
+import net.sf.okapi.lib.xliff.DocumentData;
 import net.sf.okapi.lib.xliff.Fragment;
 import net.sf.okapi.lib.xliff.GroupData;
 import net.sf.okapi.lib.xliff.Part;
@@ -89,14 +90,15 @@ public class Rewriter {
 					// Display the trace
 					switch ( event.getType() ) {
 					case START_DOCUMENT:
+						DocumentData dd = event.getDocumentData();
 						printLine("Start document");
+						printLine(String.format("source language=%s", dd.getSourceLanguage()));
+						printLine(String.format("target language=%s", dd.getTargetLanguage()==null ? "<none declated>" : dd.getTargetLanguage()));
 						break;
 					case START_SECTION:
 						SectionData sd = event.getSectionData();
 						printLine(String.format("Start section (file id=%s):", sd.getId()));
 						printLine(String.format("original=%s", sd.getOriginal()));
-						printLine(String.format("source language=%s", sd.getSourceLanguage()));
-						printLine(String.format("target language=%s", sd.getTargetLanguage()));
 						break;
 					case START_GROUP:
 						GroupData gd = event.getGroupData();

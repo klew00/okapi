@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2011 by the Okapi Framework contributors
+  Copyright (C) 2011-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -25,6 +25,8 @@ public class DocumentData extends EventData {
 	private static final long serialVersionUID = 0100L;
 	
 	private String version;
+	private String sourceLang;
+	private String targetLang;
 
 	public DocumentData (String version) {
 		this.version = version;
@@ -32,6 +34,22 @@ public class DocumentData extends EventData {
 	
 	public String getVersion () {
 		return version;
+	}
+
+	public String getSourceLanguage () {
+		return sourceLang;
+	}
+	
+	public void setSourceLanguage (String sourceLang) {
+		this.sourceLang = sourceLang;
+	}
+	
+	public String getTargetLanguage () {
+		return targetLang;
+	}
+
+	public void setTargetLanguage (String targetLang) {
+		this.targetLang = targetLang;
 	}
 
 }

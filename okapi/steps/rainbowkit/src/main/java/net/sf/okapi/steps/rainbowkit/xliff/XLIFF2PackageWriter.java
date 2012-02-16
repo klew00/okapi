@@ -160,8 +160,8 @@ public class XLIFF2PackageWriter extends BasePackageWriter {
 //		StartDocument sd = event.getStartDocument();
 //		writer.create(path, null, manifest.getSourceLocale(), manifest.getTargetLocale(),
 //			sd.getMimeType(), item.getRelativeInputPath(), null);
-		writer.create(new File(path), manifest.getSourceLocale().toBCP47());
-		writer.setLanguages(manifest.getSourceLocale().toBCP47(), manifest.getTargetLocale().toBCP47());
+		writer.create(new File(path), manifest.getSourceLocale().toBCP47(),
+			manifest.getTargetLocale().toBCP47());
 		writer.setIsIndented(true);
 		writer.writeStartDocument(null, "EXPERIMENTAL OUTPUT ONLY!");
 	}

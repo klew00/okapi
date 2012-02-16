@@ -1,5 +1,5 @@
 /*===========================================================================
-  Copyright (C) 2011 by the Okapi Framework contributors
+  Copyright (C) 2011-2012 by the Okapi Framework contributors
 -----------------------------------------------------------------------------
   This library is free software; you can redistribute it and/or modify it 
   under the terms of the GNU Lesser General Public License as published by 
@@ -65,8 +65,8 @@ class Util {
 	final static String ATTR_SUBFLOWSEND = "subFlowsEnd";
 	final static String ATTR_NIDSTART = "nidStart";
 	final static String ATTR_NIDEND = "nidEnd";
-	final static String ATTR_SOURCELANG = "srclang";
-	final static String ATTR_TARGETLANG = "tgtlang";
+	final static String ATTR_SOURCELANG = "srcLang";
+	final static String ATTR_TARGETLANG = "tgtLang";
 	final static String ATTR_APPLIESTO = "appliesTo";
 	final static String ATTR_VALUE = "value";
 	final static String ATTR_REF = "ref";

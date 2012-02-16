@@ -201,6 +201,18 @@ public class XLIFFReader {
 			throw new XLIFFReaderException("Not a 2.0 XLIFF document.");
 		}
 		docData = new DocumentData(tmp);
+		// Get the source language
+		tmp = reader.getAttributeValue(null, Util.ATTR_SOURCELANG);
+		cannotBeNullOrEmpty(Util.ATTR_SOURCELANG, tmp);
+		//TODO: basic validation of the value
+		docData.setSourceLanguage(tmp);
+
+		// Get the target language
+		tmp = reader.getAttributeValue(null, Util.ATTR_TARGETLANG);
+		if ( cannotBeEmpty(Util.ATTR_TARGETLANG, tmp) ) {
+			docData.setTargetLanguage(tmp);
+		}
+	
 		docData.setExtendedAttributes(gatherExtendedAttributes());
 		
 		queue.add(new XLIFFEvent(XLIFFEventType.START_DOCUMENT, docData));
@@ -215,18 +227,6 @@ public class XLIFFReader {
 			sectionData.setOriginal(tmp);
 		}
 		
-		// Get the source language
-		tmp = reader.getAttributeValue(null, Util.ATTR_SOURCELANG);
-		cannotBeNullOrEmpty(Util.ATTR_SOURCELANG, tmp);
-		//TODO: basic validation of the value
-		sectionData.setSourceLanguage(tmp);
-
-		// Get the target language
-		tmp = reader.getAttributeValue(null, Util.ATTR_TARGETLANG);
-		if ( cannotBeEmpty(Util.ATTR_TARGETLANG, tmp) ) {
-			sectionData.setTargetLanguage(tmp);
-		}
-	
 		sectionData.setExtendedAttributes(gatherExtendedAttributes());
 		
 		// We are done
@@ -547,7 +547,7 @@ public class XLIFFReader {
 				else if ( tmp.equals(Util.ELEM_TARGET) ) {
 					if ( isSegment ) processContent(segment, true);
 					else processContent(ignorable, true);
-					if ( sectionData.getTargetLanguage() == null ) {
+					if ( docData.getTargetLanguage() == null ) {
 						throw new XLIFFReaderException("No target language defined in a file with a target entry.");
 					}
 				}
