@@ -63,6 +63,8 @@ class Util {
 	final static String ATTR_SUBFLOWS = "subFlows";
 	final static String ATTR_SUBFLOWSSTART = "subFlowsStart";
 	final static String ATTR_SUBFLOWSEND = "subFlowsEnd";
+	final static String ATTR_NIDSTART = "nidStart";
+	final static String ATTR_NIDEND = "nidEnd";
 	final static String ATTR_SOURCELANG = "srclang";
 	final static String ATTR_TARGETLANG = "tgtlang";
 	final static String ATTR_APPLIESTO = "appliesTo";

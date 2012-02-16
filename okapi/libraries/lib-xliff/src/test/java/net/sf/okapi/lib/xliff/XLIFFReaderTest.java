@@ -300,18 +300,25 @@ public class XLIFFReaderTest {
 		assertEquals("unit-trg-match", list.get(0).getTarget().toString());
 	}
 	
-//TOFIX	@Test
+	@Test
 	public void testOutsideData () {
 		String text = "<?xml version='1.0'?>\n<xliff version=\"2.0\" xmlns=\"urn:oasis:names:tc:xliff:document:2.0\">"
 			+ "<file srclang=\"en\" tgtlang=\"fr\">\n<unit id=\"id\"><segment>\n"
 			+ "<source>source <ph id='1' nid='d1'/> and <pc id='2' nidStart='d2' nidEnd='d3'>bold</pc></source>"
 			+ "</segment>\n"
+			+ "<originalData>"
+			+ "<data id='d1'>[1/]</data>"
+			+ "<data id='d2'>[2]</data>"
+			+ "<data id='d3'>[/2]</data>"
+			+ "</originalData>"
 			+ "</unit>\n</file></xliff>";
 		Unit unit = getUnit(text, 1);
 		assertNotNull(unit);
 		// Test segment-level match
 		Segment seg = (Segment)unit.getPart(0);
-		assertEquals("source <ph id=\"1\"/> and <pc id=\"2\">", seg.getSource().toXLIFF());
+		unit.getDataStore().calculateOriginalDataToIdsMap();
+		assertEquals("source <ph id=\"1\" nid=\"d1\"/> and <pc id=\"2\" nidEnd=\"d3\" nidStart=\"d2\">bold</pc>",
+			seg.getSource().toXLIFF(IFragment.STYLE_DATAOUTSIDE));
 	}
 	
 	@Test

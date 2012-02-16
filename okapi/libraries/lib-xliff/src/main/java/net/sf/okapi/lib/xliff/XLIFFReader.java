@@ -326,6 +326,9 @@ public class XLIFFReader {
 				tmp = reader.getLocalName();
 				preserveWS.pop();
 				if ( tmp.equals(Util.ELEM_UNIT) ) { // End of this unit
+					// Copy the potential original data stored outside
+					copyOriginalDataToCodes(unit.getDataStore());
+					// Push to the queue
 					queue.add(new XLIFFEvent(XLIFFEventType.TEXT_UNIT, unit));
 					return;
 				}
@@ -364,10 +367,45 @@ public class XLIFFReader {
 				tmp = reader.getLocalName();
 				preserveWS.pop();
 				if ( tmp.equals(Util.ELEM_CANDIDATE) ) { // End of this candidate
+					// Copy the potential original data stored outside
+					copyOriginalDataToCodes(alt.getDataStore());
+					// Add to the parent
 					parent.addCandidate(alt);
 					return;
 				}
 				break;
+			}
+		}
+	}
+	
+	/**
+	 * Copies the original data from the common store into the specific codes.
+	 * During the normal lifetime of an object, the original data are with each code.
+	 * This transfer from the store to the code are done only when reading.
+	 * @param dataStore the data store to update.
+	 */
+	private void copyOriginalDataToCodes (IDataStore dataStore) {
+		if ( dataStore == null ) return;
+		// Transfer in the source
+		if ( dataStore.hasSourceMarker() ) {
+			for ( IMarker marker : dataStore.getSourceMarkers() ) {
+				if ( marker.isAnnotation() ) continue; // Not a code
+				ICode code = (ICode)marker;
+				String nid = code.getNid();
+				if ( nid != null ) {
+					code.setOriginalData(dataStore.getOriginalDataForId(nid));
+				}
+			}
+		}
+		// Transfer in the target
+		if ( dataStore.hasTargetMarker() ) {
+			for ( IMarker marker : dataStore.getTargetMarkers() ) {
+				if ( marker.isAnnotation() ) continue; // Not a code
+				ICode code = (ICode)marker;
+				String nid = code.getNid();
+				if ( nid != null ) {
+					code.setOriginalData(dataStore.getOriginalDataForId(nid));
+				}
 			}
 		}
 	}
@@ -605,18 +643,34 @@ public class XLIFFReader {
 					inTextContent = false;
 				}
 				else if ( tmp.equals(Util.ELEM_PAIREDCODES) ) {
-					tmp = reader.getAttributeValue(null, Util.ATTR_ID);
-					cannotBeNullOrEmpty(Util.ATTR_ID, tmp);
-					code = frag.append(InlineType.OPENING, tmp, null);
+					String id = reader.getAttributeValue(null, Util.ATTR_ID);
+					cannotBeNullOrEmpty(Util.ATTR_ID, id);
+					code = frag.append(InlineType.OPENING, id, null);
 					code.setEquiv(reader.getAttributeValue(null, Util.ATTR_EQUIVSTART));
 					code.setDisp(reader.getAttributeValue(null, Util.ATTR_DISPSTART));
 					code.setSubFlows(reader.getAttributeValue(null, Util.ATTR_SUBFLOWSSTART));
+					// Check for nidStart
+					tmp = reader.getAttributeValue(null, Util.ATTR_NIDSTART);
+					if ( cannotBeEmpty(Util.ATTR_NID, tmp) ) {
+						nid = tmp; code.setNid(nid);
+					} 
 					code = null; // We nullify the code 
 					// Closing code
-					ICode closing = new Code(InlineType.CLOSING, tmp, null);
+					ICode closing = new Code(InlineType.CLOSING, id, null);
 					closing.setEquiv(reader.getAttributeValue(null, Util.ATTR_EQUIVEND));
 					closing.setDisp(reader.getAttributeValue(null, Util.ATTR_DISPEND));
 					closing.setSubFlows(reader.getAttributeValue(null, Util.ATTR_SUBFLOWSEND));
+					// Check for nidEnd
+					tmp = reader.getAttributeValue(null, Util.ATTR_NIDEND);
+					if ((( tmp != null ) && ( nid == null )) || (( tmp == null ) && ( nid != null ))) {
+						// If we have nidEnd, we should have nidStart and vice-versa
+						throw new XLIFFReaderException(String.format(
+							"Both '%s' and '%s' must be present or absent.", Util.ATTR_NIDSTART, Util.ATTR_NIDEND));
+					}
+					if ( cannotBeEmpty(Util.ATTR_NID, tmp) ) {
+						closing.setNid(tmp);
+					}
+					nid = null;
 					pairs.push(closing);
 				}
 				else if ( tmp.equals(Util.ELEM_OPENINGANNO) ) {
@@ -702,7 +756,7 @@ public class XLIFFReader {
 					|| tmp.equals(Util.ELEM_CLOSINGCODE)
 					|| tmp.equals(Util.ELEM_PLACEHOLDER) )
 				{
-					if ( checkInsideVersusOutside(nid, content, code) ) {
+					if ( isInsideContentAllowed(nid, content, code) ) {
 						code.setOriginalData(content.toString());
 					}
 					inTextContent = true; // Back to text content
@@ -741,14 +795,16 @@ public class XLIFFReader {
 		// Try to see if there are outside data defined
 		String tmp = reader.getAttributeValue(null, Util.ATTR_NID);
 		if ( cannotBeEmpty(Util.ATTR_NID, tmp) ) {
-			// Get the original data from the outside storage
-			code.setOriginalData(store.getOriginalDataForId(tmp));
+			// The actual original data may not be available yet.
+			// We just set the id to use.
+			// the copy is done when we finish to parse the block
+			code.setNid(tmp);
 			return tmp;
 		}
 		return null;
 	}
 	
-	private boolean checkInsideVersusOutside (String outsideId,
+	private boolean isInsideContentAllowed (String outsideId,
 		StringBuilder insideContent,
 		ICode code)
 	{

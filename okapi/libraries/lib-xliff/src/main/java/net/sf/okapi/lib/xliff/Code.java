@@ -41,6 +41,7 @@ public class Code implements ICode {
 	private String equiv;
 	private String type;
 	private String subFlows;
+	private String nid;
 
 	public Code (InlineType inlineType,
 		String id,
@@ -71,6 +72,16 @@ public class Code implements ICode {
 	@Override
 	public boolean hasOriginalData () {
 		return !Util.isNullOrEmpty(originalData);
+	}
+	
+	@Override
+	public String getNid () {
+		return nid;
+	}
+
+	@Override
+	public void setNid (String nid) {
+		this.nid = nid;
 	}
 	
 	@Override
@@ -202,5 +213,5 @@ public class Code implements ICode {
 	public boolean isAnnotation () {
 		return false;
 	}
-	
+
 }

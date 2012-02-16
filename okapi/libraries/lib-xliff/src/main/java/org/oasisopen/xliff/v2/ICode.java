@@ -28,6 +28,10 @@ public interface ICode extends IMarker {
 	
 	public boolean hasOriginalData ();
 	
+	public String getNid ();
+	
+	public void setNid (String nid);
+	
 	public String getDisp ();
 	
 	public void setDisp (String disp);
