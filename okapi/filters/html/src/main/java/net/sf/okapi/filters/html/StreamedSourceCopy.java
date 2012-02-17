@@ -109,7 +109,7 @@ class StreamedSourceCopy {
 							if ( st.getName() == HTMLElementName.HEAD ) {
 								// Insert the encoding declaration
 								writer.write(String.format(
-									"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=%s\">",
+									"<meta http-equiv=\"Content-Type\" content=\"text/html; charset=%s\"/>",
 									(input.getEncoding()==RawDocument.UNKOWN_ENCODING ? encoding : input.getEncoding())));
 								needEncodingDeclaration = false;
 							}
