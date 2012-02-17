@@ -2,7 +2,6 @@ package net.sf.okapi.lib.tmdb.lucene;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -22,7 +21,6 @@ import org.apache.lucene.search.PhraseQuery;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.RAMDirectory;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,8 +42,8 @@ public class OIndexTest {
 	
 	@Before
 	public void init() throws IOException {
-		//dir = new RAMDirectory();
-		dir = FSDirectory.open(new File("C:\\PENSIEVE")); 
+		dir = new RAMDirectory();
+		//dir = FSDirectory.open(new File("C:\\PENSIEVE")); 
 
 		tmWriter = new OWriter(dir, true);
 		tmSeeker = new OSeeker(dir);

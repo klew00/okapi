@@ -22,7 +22,8 @@ package net.sf.okapi.lib.tmdb.lucene;
 import net.sf.okapi.common.LocaleId;
 import net.sf.okapi.common.resource.TextFragment;
 import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.store.RAMDirectory;
+
 import static org.junit.Assert.*;
 
 import org.junit.After;
@@ -30,7 +31,6 @@ import org.junit.Before;
 import org.junit.Test;
 //import static org.mockito.Mockito.*;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -54,8 +54,8 @@ public class OSeekerTest  {
 
     @Before
     public void setUp() throws IOException {
-    	//DIR = new RAMDirectory();
-    	DIR = FSDirectory.open(new File("C:\\PENSIEVE"));
+    	DIR = new RAMDirectory();
+    	//DIR = FSDirectory.open(new File("C:\\PENSIEVE"));
         seeker = new OSeeker(DIR);
         
     }
