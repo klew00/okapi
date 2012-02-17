@@ -32,6 +32,10 @@ import net.sf.okapi.common.Util;
 import net.sf.okapi.common.filterwriter.GenericContent;
 import net.sf.okapi.common.resource.Code;
 import net.sf.okapi.common.resource.TextFragment;
+import net.sf.okapi.lib.tmdb.lucene.OField;
+import net.sf.okapi.lib.tmdb.lucene.OFields;
+import net.sf.okapi.lib.tmdb.lucene.OTranslationUnitInput;
+import net.sf.okapi.lib.tmdb.lucene.OTranslationUnitVariant;
 
 public class DbUtil {
 	
@@ -232,6 +236,42 @@ public class DbUtil {
 	    	else tuFields.put(fn, value);
 	    }
 	    return res;
+	}
+	
+	public static OTranslationUnitInput getFieldsAsIndexable(String id, LinkedHashMap<String, Object> segMap){
+		
+		OTranslationUnitInput inTu = new OTranslationUnitInput(id);
+	
+		for (String fieldname : segMap.keySet()) {
+			
+			//skip codes they will be added below
+			if(fieldname.startsWith(DbUtil.CODES_PREFIX)){
+				continue;
+			}
+			
+			//indexable field
+			if(fieldname.startsWith(DbUtil.TEXT_PREFIX)){
+				
+				String lang = DbUtil.getFieldLocale(fieldname);
+				LocaleId loc = DbUtil.fromOlifantLocaleCode(lang);
+				String text = (String) segMap.get(fieldname);
+				
+				TextFragment tf;
+				
+				//ANY CORRESPONDING CODES
+				if (segMap.containsKey(DbUtil.CODES_PREFIX+lang)){
+					String codes = (String) segMap.get(DbUtil.CODES_PREFIX+lang);
+					tf = new TextFragment(text, Code.stringToCodes(codes));
+				}else{
+					tf = new TextFragment(text);
+				}
+				
+				inTu.add(new OTranslationUnitVariant(loc, tf));
+			}else{
+				inTu.setField(new OField(fieldname, (String)segMap.get(fieldname)));
+			}
+		}
+		return inTu;
 	}
 	
 }
